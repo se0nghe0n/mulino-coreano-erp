@@ -228,3 +228,75 @@ Governance Engine은 모든 액션성 API 호출을 가로채고 불변 감사 �
 | `recalls`, `alert_rules`, `alert_events` | QM | 품질알림 및 검사관리 |
 | `users` | HCM | 사용자 관리 |
 | `governance_*`, `regulatory_submissions` | GRC | 거버넌스, 리스크, 컴플라이언스 |
+
+---
+
+## 인터페이스 운영 상태와 업무 흐름의 연결
+
+ERP 추적 체인 위의 목표·책임·판단은 별도 운영 상태로 저장한다. 추가된 13개 테이블과 FK는 `docs/03_erd.md` §6, 채널 원칙은 `docs/08_interface_overview.md`, 이벤트 전이 계약은 `docs/09_dispatcher_spec.md`를 따른다.
+
+```mermaid
+flowchart TD
+    Query[ASK 제품명·SKU 재고 조회] --> ERP[stock / products / warehouses]
+    Objective[ACT 목표] --> Case[cases / channels]
+    Case --> Participants[case_participants / agents / users]
+    Case --> Work[work_items: 명시적 담당]
+    Work --> Waiting[waiting_conditions: WAITING]
+    Input[이벤트 API / 수동·모니터 재판정] --> Event[events: 불변 사실]
+    Event --> Match[Dispatcher 조건 판정]
+    Waiting --> Match
+    Match --> Ready[모든 ACTIVE 조건 해소: READY]
+    Ready --> Run[runs: 실행 예약·현재 컨텍스트]
+    Ready --> Attention[담당 누락·실행 준비 실패: attention_requests]
+    Event --> Link[claims / claim_evidence / evidence]
+    Decision[decisions: 인간 결정과 적용 범위] --> Context[실행 컨텍스트]
+    Participants --> Context
+    Work --> Context
+    Link --> Context
+    Context --> Run
+```
+
+- ASK는 Case나 업무를 만들지 않는다. ACT는 활성 Orchestrator에 초기 의무를 배정하며, 담당 설정 오류를 성공으로 숨기지 않는다.
+- 공급사 회신·이메일 Send·외부 자료·승인·시간·의존 업무 종료는 명세에 맞는 대기만 해소한다. `DONE`/`CANCELLED` 업무는 변경하지 않는다.
+- `waiting_conditions.resolved_by_event_id`와 `runs.trigger_event_id`가 재개 원인을 보존한다. 증거와 Claim의 지지/반증 관계는 검증된 동일 Case 안에 기록한다.
+- `decisions`와 `attention_requests`가 Work Item을 참조하면 같은 Case여야 한다. 인간 답변의 `answer_scope`/결정의 `scope`는 컨텍스트에 보존하며 자동으로 전사 정책으로 확대하지 않는다.
+- Work Item의 `metadata.businessRef`는 ERP 행을 가리키는 인덱스다. 운영 Case의 생성이나 승인 Event 수신이 발주·입고·리콜 등 ERP 쓰기 권한을 대신하지 않는다. 해당 변경은 위 거버넌스 승인 매트릭스를 그대로 따른다.
+- 실제 LLM executor, 인간 답변/승인 채널, ERP 변경 capability는 후속 구현이다. 현재 디스패처는 실행 예약까지 기록한다.
+
+## 로컬 인간의 Case 접수 (#47)
+
+`local` 프로필의 `POST /api/v1/cases`는 역할 헤더로 확인한
+OPERATOR 또는 MANAGER만 호출한다. Case의 생성자와 USER 참여자를
+같이 기록한다. `Idempotency-Key`를 보내면 인간별 scope에서 요청과
+응답을 `request_idempotency`에 저장하고, 같은 요청은 기존 응답을
+반환한다. 다른 본문으로 같은 키를 쓰면 409로 거부한다.
+Case·초기 Work Item·요청 기록은 같은 트랜잭션으로 처리한다.
+기본 프로필의 무인증 접수는 생성자 NULL을 유지하고 해당 키를 무시한다.
+이 기록은 LOT 사슬이나 ERP 승인 관계를 바꾸지 않는다.
+
+## 인간 재보충 계획 (#48)
+
+인간의 Case → 계획 요청 → ERP snapshot → 수요·BOM·가용 재고·공급처
+계산 → 불변 계획 저장 순서다. 자료가 모자라거나 맞지 않으면 attention을
+남긴다. 이 단계는 발주나 재고를 변경하지 않는다. 같은 요청은 같은 계획을
+반환하고 새 요청은 버전을 증가시킨다. 상세 계약은
+[계획 API](13_execution_and_plan_api.md)를 따른다.
+
+## 실행기의 업무 청구 (#49)
+
+Run 예약(QUEUED) → service claim → lease가 있는 RUNNING →
+해당 Case capability로 실행 → 결과와 업무 상태를 함께 기록한다.
+만료는 1회 재시도하며 두 번째 실패는 인간 attention으로 넘긴다.
+SUPPLY_CHAIN은 최근 계획 READY 증거가 있어야 DONE으로 종료한다.
+
+
+## #45·#50·#51·#52 이후의 로컬 계약
+
+일반 Attention 답변과 구매 승인은 서로 다른 API·권한 경계다.
+구매 제안은 발주를 만들지 않으며 활성 MANAGER의 결정이 발주·audit·
+재개 Event를 원자적으로 기록한다. 승인 transaction에서 구매를 DONE으로 끝내고 가장 이른 납기의
+WAITING 후속 책임을 남기며 입고·생산을 만들어 Case를 끝내지 않는다.
+위 foundation 검토의 미구현 설명은 당시 범위를 가리킨다. 현재 API,
+15,2 base 가격과 정확한 구매 금액, version/idempotency, V24~V26과
+독립 DDL 16~18 계약은 [인간 답변·구매 결정](14_human_purchase_api.md)을
+따른다. #33의 나머지 ERP gate와 #34의 실제 데모 DB 검증은 남아 있다.

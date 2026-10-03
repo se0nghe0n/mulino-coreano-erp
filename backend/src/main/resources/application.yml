@@ -22,3 +22,11 @@ springdoc:
     enabled: true
     operations-sorter: method
     disable-swagger-default-url: true
+
+mulino:
+  local-auth:
+    service-secret: ${MULINO_LOCAL_SERVICE_SECRET:}
+
+agent:
+  runtime:
+    default: ${MULINO_AGENT_RUNTIME:CODEX}
