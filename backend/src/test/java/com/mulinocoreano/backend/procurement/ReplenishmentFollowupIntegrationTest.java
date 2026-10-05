@@ -35,7 +35,7 @@ import java.util.*;
 import java.util.concurrent.*;
 
 @SpringBootTest(
-        properties = {
+        properties = {"mulino.local-auth.human-secret=test-human-gateway",
             "spring.flyway.schemas=followup_core_it",
             "spring.flyway.clean-disabled=false",
             "spring.flyway.init-sqls=CREATE EXTENSION IF NOT EXISTS btree_gist WITH SCHEMA public",
@@ -300,7 +300,7 @@ class ReplenishmentFollowupIntegrationTest {
         var result =
                 mvc.perform(
                                 post("/api/v1/approvals/{id}/decision", id)
-                                        .with(authentication(auth))
+                                        .header("X-Mulino-Local-Human","test-human-gateway").header("X-Mulino-Local-Role",role)
                                         .header("Idempotency-Key", key)
                                         .contentType("application/json")
                                         .content(body))
@@ -317,7 +317,7 @@ class ReplenishmentFollowupIntegrationTest {
                             + " VALUES(:name,:email,'test-only',CAST(:role AS user_role)) RETURNING"
                             + " user_id")
                 .param("name", name)
-                .param("email", name + "@purchase.test")
+                .param("email", "local-" + name + "@mulino.local")
                 .param("role", role)
                 .query(Long.class)
                 .single();

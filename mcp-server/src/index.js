@@ -6,6 +6,7 @@
  * ChatGPT, Claude Desktop, or any MCP client can query ERP state, create
  * Cases, and inspect attention items over a single, durable business surface.
  */
+import { humanHeaders, safeHumanError } from "./human-headers.js";
 import { randomUUID } from "node:crypto";
 import { conversationTools, callConversationTool } from "./human-tools.js";
 import { Server } from "@modelcontextprotocol/sdk/server/index.js";
@@ -135,7 +136,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
         requestKey = args.requestKey ?? randomUUID();
         if (typeof requestKey !== "string" || !requestKey.trim() || requestKey.length > 200) throw new Error("Invalid requestKey");
       }
-      return await callConversationTool(humanTool, args, (path, opts = {}) => api(path, {...opts, headers: {...opts.headers, "X-Mulino-Local-Role": process.env.MULINO_LOCAL_ROLE ?? "OPERATOR"}}), requestKey);
+      return await callConversationTool(humanTool, args, (path, opts = {}) => api(path, {...opts, headers: {...opts.headers, ...humanHeaders()}}), requestKey);
     }
     switch (name) {
       case "whoami":
@@ -144,7 +145,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
         const ref = name === "get_case" ? args.caseRef : args.planRef;
         if (name !== "whoami" && (typeof ref !== "string" || !ref.trim())) throw new Error("참조가 필요합니다.");
         const path = name === "whoami" ? "/me" : (name === "get_case" ? "/cases/" : "/plans/") + encodeURIComponent(ref);
-        const data = await api(path, {headers: {"X-Mulino-Local-Role": process.env.MULINO_LOCAL_ROLE ?? "OPERATOR"}});
+        const data = await api(path, {headers: {...humanHeaders()}});
         return {content: [{type: "text", text: JSON.stringify(data)}], structuredContent: data};
       }
       case "ask_inventory": {
@@ -173,7 +174,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
         const data = await api("/cases", {
           method: "POST",
           headers: { "Content-Type": "application/json",
-            "X-Mulino-Local-Role": process.env.MULINO_LOCAL_ROLE ?? "OPERATOR",
+            ...humanHeaders(),
             ...(args.requestKey ? { "Idempotency-Key": args.requestKey } : {}) },
           body: JSON.stringify({ objective: args.objective, channel: args.channel ?? "CHAT", ...(args.replenishment ? { replenishment: args.replenishment } : {}) }),
         });
@@ -192,7 +193,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
           throw new Error("status must be OPEN, IN_PROGRESS, WAITING, RESOLVED, or CLOSED");
         }
         const q = args.status ? "?status=" + encodeURIComponent(args.status) : "";
-        const data = await api("/cases" + q);
+        const data = await api("/cases" + q, {headers: humanHeaders()});
         return {
           content: [
             {
@@ -206,7 +207,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
         };
       }
       case "list_attention": {
-        const data = await api("/attention");
+        const data = await api("/attention", {headers: humanHeaders()});
         return {
           content: [
             {
@@ -226,7 +227,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
         };
       }
       case "monitor_status": {
-        const data = await api("/monitor");
+        const data = await api("/monitor", {headers: humanHeaders()});
         return {
           content: [
             {
@@ -247,7 +248,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
     }
   } catch (e) {
     return {
-      content: [{ type: "text", text: "오류: " + e.message }],
+      content: [{ type: "text", text: "오류: " + safeHumanError(e.message) }],
       isError: true,
       ...(requestKey ? {structuredContent: {requestKey}} : {}),
     };

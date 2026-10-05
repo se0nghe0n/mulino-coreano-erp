@@ -161,3 +161,12 @@ Templates live in `.github/`. When creating issues or PRs, the session must foll
 - `research.md` — `[RESEARCH]` · `research` — upfront research (purpose / items / result + sources / design impact / sources)
 
 Check the `config.yml` contact link (project docs) before creating an issue. Blank issues are allowed, but for types that have a template, using the template is the default.
+
+## 로컬 Human gateway 경계 (#33)
+
+local 백엔드와 인간 stdio MCP는 host 전용 `MULINO_LOCAL_HUMAN_SECRET`을
+공유한다. 미설정·잘못된 key는 사용자 조회 전에 401로 거부한다.
+service secret과 다른 값을 사용하고 agent 환경·인자·stdin·context·로그인
+volume에는 전달하지 않는다. key 생성과 보호되는 조회 경로는
+[Human gateway 계약](docs/14_human_purchase_api.md#로컬-human-gateway-경계-33)을 따른다.
+역할 헤더는 공유 로컬 신원이며 개인 인증이나 인간 동의의 증거가 아니다.

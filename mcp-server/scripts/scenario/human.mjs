@@ -9,7 +9,7 @@ const client = new Client({ name: "scenario-human", version: "1" });
 await client.connect(new StdioClientTransport({
   command: process.execPath,
   args: [fileURLToPath(new URL("../../src/index.js", import.meta.url))],
-  env: { PATH: process.env.PATH, MULINO_LOCAL_ROLE: role, MULINO_API_BASE: apiBase },
+  env: { PATH: process.env.PATH, MULINO_LOCAL_HUMAN_SECRET: process.env.MULINO_LOCAL_HUMAN_SECRET ?? "", MULINO_LOCAL_ROLE: role, MULINO_API_BASE: apiBase },
 }));
 try {
   const r = await client.callTool({ name: tool, arguments: JSON.parse(args) });

@@ -19,7 +19,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 /** 목표 2·4: 인간 권한과 중복 없는 업무 접수. 실제 DB·보안 필터를 통과한다. */
-@SpringBootTest
+@SpringBootTest(properties="mulino.local-auth.human-secret=test-human-gateway")
 @AutoConfigureMockMvc
 @ActiveProfiles("local")
 @Transactional
@@ -30,17 +30,17 @@ class LocalActorIntegrationTest {
     @Autowired CaseIntakeService intake;
 
     @Test
-    void onlyPermittedHumansCreateCasesAndReadsRemainOpen() throws Exception {
+    void onlyPermittedHumansCreateCasesAndReadWork() throws Exception {
         long before = count();
         mvc.perform(post("/api/v1/cases").contentType(MediaType.APPLICATION_JSON).content(body("denied")))
                 .andExpect(status().isUnauthorized());
         for (String role : new String[]{"VIEWER", "QC", "ADMIN"}) {
-            mvc.perform(post("/api/v1/cases").header("X-Mulino-Local-Role", role)
+            mvc.perform(post("/api/v1/cases").header("X-Mulino-Local-Human","test-human-gateway").header("X-Mulino-Local-Role",role)
                     .contentType(MediaType.APPLICATION_JSON).content(body("denied"))).andExpect(status().isForbidden());
         }
         assertThat(count()).isEqualTo(before);
         for (String role : new String[]{"MANAGER", "OPERATOR"}) {
-            var response = mvc.perform(post("/api/v1/cases").header("X-Mulino-Local-Role", role)
+            var response = mvc.perform(post("/api/v1/cases").header("X-Mulino-Local-Human","test-human-gateway").header("X-Mulino-Local-Role",role)
                     .contentType(MediaType.APPLICATION_JSON).content(body("allowed")))
                     .andExpect(status().isOk()).andReturn();
             long id = mapper.readTree(response.getResponse().getContentAsString()).get("caseId").asLong();
@@ -49,11 +49,11 @@ class LocalActorIntegrationTest {
             assertThat(jdbc.sql("SELECT count(*) FROM case_participants WHERE case_id=:id AND actor_type='USER'")
                     .param("id",id).query(Long.class).single()).isEqualTo(1);
         }
-        mvc.perform(get("/api/v1/cases")).andExpect(status().isOk());
-        mvc.perform(get("/api/v1/cases").header("X-Mulino-Local-Role", "INVALID")
-                .header("Authorization", "invalid")).andExpect(status().isOk());
+        mvc.perform(get("/api/v1/cases")).andExpect(status().isUnauthorized());
+        mvc.perform(get("/api/v1/cases").header("X-Mulino-Local-Human","test-human-gateway").header("X-Mulino-Local-Role","INVALID")
+                .header("Authorization", "invalid")).andExpect(status().isUnauthorized());
         mvc.perform(get("/api/v1/me")).andExpect(status().isUnauthorized());
-        mvc.perform(get("/api/v1/me").header("X-Mulino-Local-Role", "VIEWER"))
+        mvc.perform(get("/api/v1/me").header("X-Mulino-Local-Human","test-human-gateway").header("X-Mulino-Local-Role","VIEWER"))
                 .andExpect(status().isOk()).andExpect(jsonPath("$.role").value("VIEWER"));
     }
 
@@ -63,7 +63,7 @@ class LocalActorIntegrationTest {
         long before = count();
         String first = create("MANAGER", key, "unique objective");
         assertThat(create("MANAGER", key, "unique objective")).isEqualTo(first);
-        mvc.perform(post("/api/v1/cases").header("X-Mulino-Local-Role","MANAGER")
+        mvc.perform(post("/api/v1/cases").header("X-Mulino-Local-Human","test-human-gateway").header("X-Mulino-Local-Role","MANAGER")
                 .header("Idempotency-Key",key).contentType(MediaType.APPLICATION_JSON)
                 .content(body("different"))).andExpect(status().isConflict());
         assertThat(count()).isEqualTo(before + 1);
@@ -75,7 +75,7 @@ class LocalActorIntegrationTest {
     void failedCreationLeavesNoReceiptAndCanBeRetried() throws Exception {
         String key = UUID.randomUUID().toString();
         jdbc.sql("UPDATE agents SET is_active=false WHERE agent_key='ORCHESTRATOR'").update();
-        mvc.perform(post("/api/v1/cases").header("X-Mulino-Local-Role","MANAGER")
+        mvc.perform(post("/api/v1/cases").header("X-Mulino-Local-Human","test-human-gateway").header("X-Mulino-Local-Role","MANAGER")
                 .header("Idempotency-Key",key).contentType(MediaType.APPLICATION_JSON)
                 .content(body("retry"))).andExpect(status().isServiceUnavailable());
         assertThat(jdbc.sql("SELECT count(*) FROM request_idempotency WHERE request_key=:key")
@@ -117,15 +117,58 @@ class LocalActorIntegrationTest {
     @Test
     void invalidCredentialsCannotFallBackToRole() throws Exception {
         long before = count();
-        mvc.perform(post("/api/v1/cases").header("X-Mulino-Local-Role","MANAGER")
+        mvc.perform(post("/api/v1/cases").header("X-Mulino-Local-Human","test-human-gateway").header("X-Mulino-Local-Role","MANAGER")
                 .header("Authorization","Bearer invalid").contentType(MediaType.APPLICATION_JSON).content(body("denied")))
                 .andExpect(status().isUnauthorized());
-        mvc.perform(post("/api/v1/cases").header("X-Mulino-Local-Role","unknown")
+        mvc.perform(post("/api/v1/cases").header("X-Mulino-Local-Human","test-human-gateway").header("X-Mulino-Local-Role","unknown")
                 .contentType(MediaType.APPLICATION_JSON).content(body("denied"))).andExpect(status().isBadRequest());
         assertThat(count()).isEqualTo(before);
     }
+    @Test
+    void forgedRolesAndWrongKeysCannotCreateIdentityWorkOrReceipts() throws Exception {
+        long users = jdbc.sql("SELECT count(*) FROM users").query(Long.class).single();
+        long cases = count();
+        long receipts = jdbc.sql("SELECT count(*) FROM request_idempotency").query(Long.class).single();
+        for (String role : new String[]{"MANAGER", "QC"}) {
+            for (String key : new String[]{"", "wrong-key"}) {
+                mvc.perform(post("/api/v1/cases").header("X-Mulino-Local-Role",role)
+                        .header("X-Mulino-Local-Human",key).header("Idempotency-Key","forged-"+role+key)
+                        .contentType(MediaType.APPLICATION_JSON).content(body("forged")))
+                        .andExpect(status().isUnauthorized());
+            }
+        }
+        for (String path : new String[]{"/api/v1/cases", "/api/v1/cases/other", "/api/v1/attention", "/api/v1/events", "/api/v1/monitor"})
+            mvc.perform(get(path).header("X-Mulino-Local-Role","MANAGER")).andExpect(status().isUnauthorized());
+        assertThat(count()).isEqualTo(cases);
+        assertThat(jdbc.sql("SELECT count(*) FROM users").query(Long.class).single()).isEqualTo(users);
+        assertThat(jdbc.sql("SELECT count(*) FROM request_idempotency").query(Long.class).single()).isEqualTo(receipts);
+    }
+
+    @Test
+    void mixedCredentialsAreRejectedAcrossTransportBoundaries() throws Exception {
+        for (String path : new String[]{"/api/v1/me", "/api/v1/internal/runs/claim", "/api/v1/agent/cases/other"}) {
+            mvc.perform(get(path).header("X-Mulino-Local-Human","test-human-gateway")
+                    .header("Authorization","Bearer invalid")).andExpect(status().isUnauthorized());
+            mvc.perform(get(path).header("X-Mulino-Local-Human","test-human-gateway")
+                    .header("X-Mulino-Local-Service","service-key")).andExpect(status().isUnauthorized());
+        }
+    }
+
+    @Test
+    void headerCannotRestoreRevokedDatabaseRights() throws Exception {
+        create("MANAGER", UUID.randomUUID().toString(), "bootstrap");
+        jdbc.sql("UPDATE users SET role='VIEWER' WHERE email='local-manager@mulino.local'").update();
+        mvc.perform(post("/api/v1/cases").header("X-Mulino-Local-Human","test-human-gateway")
+                .header("X-Mulino-Local-Role","MANAGER").contentType(MediaType.APPLICATION_JSON).content(body("denied")))
+                .andExpect(status().isForbidden());
+        jdbc.sql("UPDATE users SET is_active=false WHERE email='local-manager@mulino.local'").update();
+        mvc.perform(get("/api/v1/me").header("X-Mulino-Local-Human","test-human-gateway")
+                .header("X-Mulino-Local-Role","MANAGER")).andExpect(status().isForbidden());
+        assertThat(jdbc.sql("SELECT role::text FROM users WHERE email='local-manager@mulino.local'").query(String.class).single()).isEqualTo("VIEWER");
+    }
+
     private String create(String role, String key, String objective) throws Exception {
-        return mvc.perform(post("/api/v1/cases").header("X-Mulino-Local-Role",role)
+        return mvc.perform(post("/api/v1/cases").header("X-Mulino-Local-Human","test-human-gateway").header("X-Mulino-Local-Role",role)
                 .header("Idempotency-Key",key).contentType(MediaType.APPLICATION_JSON).content(body(objective)))
                 .andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
     }

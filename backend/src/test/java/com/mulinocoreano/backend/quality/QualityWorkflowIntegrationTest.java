@@ -20,7 +20,7 @@ import java.time.*;
 import java.util.*;
 
 /** Goals 1,2,6: safe release, source freshness, immutable evidence and exact input balance. */
-@SpringBootTest(properties={"spring.flyway.schemas=quality_workflow_it","spring.flyway.clean-disabled=false","spring.datasource.hikari.schema=quality_workflow_it","spring.flyway.init-sqls=CREATE EXTENSION IF NOT EXISTS btree_gist WITH SCHEMA public","spring.main.allow-bean-definition-overriding=true"})
+@SpringBootTest(properties={"mulino.local-auth.human-secret=test-human-gateway","spring.flyway.schemas=quality_workflow_it","spring.flyway.clean-disabled=false","spring.datasource.hikari.schema=quality_workflow_it","spring.flyway.init-sqls=CREATE EXTENSION IF NOT EXISTS btree_gist WITH SCHEMA public","spring.main.allow-bean-definition-overriding=true"})
 @ActiveProfiles("local") @AutoConfigureMockMvc
 class QualityWorkflowIntegrationTest {
     @Autowired JdbcClient jdbc; @Autowired Flyway flyway; @Autowired MockMvc mvc; @Autowired ObjectMapper mapper;
@@ -36,7 +36,7 @@ class QualityWorkflowIntegrationTest {
         lot=id("SELECT raw_material_lot_id FROM raw_material_lots WHERE lot_number='DEMO-RM-FLOUR-HOLD'");
         record=id("INSERT INTO production_records(lot_id,warehouse_id,operator_id,process_type,start_time) SELECT production_lot_id,warehouse_id,(SELECT user_id FROM users WHERE email='replenishment-demo@example.invalid'),'MIX','2026-09-05 10:00:00' FROM production_lots WHERE lot_number='DEMO-DOUGH-CURRENT' RETURNING production_record_id");
         jdbc.sql("UPDATE production_lots SET production_date='2026-09-05' WHERE lot_number='DEMO-DOUGH-CURRENT'").update();
-        caseRef=mapper.readTree(mvc.perform(post("/api/v1/cases").header("X-Mulino-Local-Role","OPERATOR").header("Idempotency-Key","qc-case").contentType("application/json").content("{\"objective\":\"입고 안전 검사\"}")).andExpect(status().isOk()).andReturn().getResponse().getContentAsString()).path("caseRef").asText();
+        caseRef=mapper.readTree(mvc.perform(post("/api/v1/cases").header("X-Mulino-Local-Human","test-human-gateway").header("X-Mulino-Local-Role","OPERATOR").header("Idempotency-Key","qc-case").contentType("application/json").content("{\"objective\":\"입고 안전 검사\"}")).andExpect(status().isOk()).andReturn().getResponse().getContentAsString()).path("caseRef").asText();
     }
     private long id(String sql){return jdbc.sql(sql).query(Long.class).single();}
     private JsonNode propose(){return service.inspect(inbound,new QualityService.InspectRequest(caseRef),actors.humanForRole("OPERATOR"),null,"inspect");}
@@ -163,7 +163,7 @@ class QualityWorkflowIntegrationTest {
         long inconsistent=id("INSERT INTO production_records(lot_id,warehouse_id,operator_id,process_type,start_time) SELECT "+production+","+original+",user_id,'MIX','2026-09-05 10:00:00' FROM users WHERE email='replenishment-demo@example.invalid' RETURNING production_record_id");
         long foreign=id("INSERT INTO production_records(lot_id,warehouse_id,operator_id,process_type,start_time) SELECT "+production+","+other+",user_id,'MIX','2026-09-05 10:00:00' FROM users WHERE email='replenishment-demo@example.invalid' RETURNING production_record_id");
         for(long invalidRecord:List.of(inconsistent,foreign)) {
-            mvc.perform(post("/api/v1/quality/production-inputs").header("X-Mulino-Local-Role","OPERATOR").header("Idempotency-Key","warehouse-rejected-"+invalidRecord)
+            mvc.perform(post("/api/v1/quality/production-inputs").header("X-Mulino-Local-Human","test-human-gateway").header("X-Mulino-Local-Role","OPERATOR").header("Idempotency-Key","warehouse-rejected-"+invalidRecord)
                 .contentType("application/json").content(mapper.writeValueAsString(new QualityService.ProductionInput(invalidRecord,lot,new java.math.BigDecimal("0.5"))))).andExpect(status().isConflict());
         }
         assertThat(jdbc.sql("SELECT remaining_quantity FROM raw_material_lots WHERE raw_material_lot_id=:id").param("id",lot).query(java.math.BigDecimal.class).single()).isEqualByComparingTo("2");
@@ -174,12 +174,12 @@ class QualityWorkflowIntegrationTest {
     @Test void currentlyExpiredRawLotAndProductionBeforeReceiptLeaveNoInputBalanceOrAudit() throws Exception {
         var p=propose();service.decide(p.path("approvalId").asLong(),decision(p,"APPROVE"),actors.humanForRole("QC"),"approve");
         jdbc.sql("UPDATE raw_material_lots SET expiry_date='2026-09-04' WHERE raw_material_lot_id=:id").param("id",lot).update();
-        mvc.perform(post("/api/v1/quality/production-inputs").header("X-Mulino-Local-Role","OPERATOR").header("Idempotency-Key","expired-lot")
+        mvc.perform(post("/api/v1/quality/production-inputs").header("X-Mulino-Local-Human","test-human-gateway").header("X-Mulino-Local-Role","OPERATOR").header("Idempotency-Key","expired-lot")
             .contentType("application/json").content(mapper.writeValueAsString(new QualityService.ProductionInput(record,lot,new java.math.BigDecimal("0.5"))))).andExpect(status().isConflict());
         jdbc.sql("UPDATE raw_material_lots SET expiry_date='2026-12-31' WHERE raw_material_lot_id=:id").param("id",lot).update();
         long prematureLot=id("INSERT INTO production_lots(product_id,warehouse_id,lot_number,production_date,expiry_date,quantity) SELECT product_id,warehouse_id,'QC-BEFORE-ARRIVAL','2026-09-03','2026-12-31',1 FROM production_lots WHERE lot_number='DEMO-DOUGH-CURRENT' RETURNING production_lot_id");
         long beforeArrival=id("INSERT INTO production_records(lot_id,warehouse_id,operator_id,process_type,start_time) SELECT "+prematureLot+",warehouse_id,(SELECT user_id FROM users WHERE email='replenishment-demo@example.invalid'),'MIX','2026-09-03 10:00:00' FROM inbound WHERE inbound_id="+inbound+" RETURNING production_record_id");
-        mvc.perform(post("/api/v1/quality/production-inputs").header("X-Mulino-Local-Role","OPERATOR").header("Idempotency-Key","before-arrival")
+        mvc.perform(post("/api/v1/quality/production-inputs").header("X-Mulino-Local-Human","test-human-gateway").header("X-Mulino-Local-Role","OPERATOR").header("Idempotency-Key","before-arrival")
             .contentType("application/json").content(mapper.writeValueAsString(new QualityService.ProductionInput(beforeArrival,lot,new java.math.BigDecimal("0.5"))))).andExpect(status().isConflict());
         assertThat(jdbc.sql("SELECT remaining_quantity FROM raw_material_lots WHERE raw_material_lot_id=:id").param("id",lot).query(java.math.BigDecimal.class).single()).isEqualByComparingTo("2");
         assertThat(jdbc.sql("SELECT count(*) FROM production_ingredients WHERE raw_material_lot_id=:id").param("id",lot).query(Long.class).single()).isZero();

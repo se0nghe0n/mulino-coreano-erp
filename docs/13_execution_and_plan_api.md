@@ -8,7 +8,8 @@
 | POST /api/v1/cases/{caseRef}/plans | work:write 인간 | 불변 계획 또는 자료 확인 attention |
 | GET /api/v1/plans/{planRef} | erp:read 인간 | 저장된 계획과 계산 근거 |
 
-호출자는 X-Mulino-Local-Role 헤더와 POST의 Idempotency-Key를 보낸다.
+호출자는 X-Mulino-Local-Human과 X-Mulino-Local-Role 헤더,
+POST의 Idempotency-Key를 보낸다.
 MANAGER·OPERATOR가 계산할 수 있고 VIEWER는 조회만 가능하다.
 기본 프로필에서는 이 경로를 403으로 거부한다. 에이전트 토큰은 아직 없다.
 
@@ -27,7 +28,7 @@ V20은 계획 테이블·수량 NUMERIC(18,6)·유한값 검사·계획의 선�
 created_by_work_item_id FK를 추가한다. 인간 계산의 해당 FK는 NULL이다.
 planning_attempt_sequence와 latest_planning_outcome은 #49 범위다.
 
-MCP는 whoami, get_case, get_plan을 제공한다. 인간 역할 헤더만 보내며
+MCP는 whoami, get_case, get_plan을 제공한다. 인간 gateway와 역할 헤더를 보내며
 service·capability 헤더를 만들지 않는다. 쓰기·승인 도구는 해당 API와
 함께 #52의 다음 단계에서 추가한다.
 
@@ -42,7 +43,7 @@ V22는 lease·에이전트 seed, V23은 계획 attempt 기록을 담당한다.
 
 local 실행기는 X-Mulino-Local-Service를 보낸다. 설정값은
 MULINO_LOCAL_SERVICE_SECRET이며 빈 값은 어떤 실행기도 인증하지 않는다.
-인간 역할 헤더 또는 Authorization과 함께 보내면 401이다.
+인간 gateway·역할 헤더 또는 Authorization과 함께 보내면 401이다.
 
 | API | 호출자 |
 |---|---|
@@ -76,3 +77,12 @@ Run의 시점은 V27·독립 DDL 19의 TIMESTAMPTZ로 통일하며 기존
 Asia/Seoul 벽시계 값을 명시적으로 복원한다. GET /monitor는 조회만
 하고 ASK는 완제품만 반환한다. 재현·전제·검증 범위는
 [Dispatcher 범위와 실행 시점](15_dispatcher_defects.md)을 따른다.
+
+## 로컬 Human gateway 경계 (#33)
+
+local 백엔드와 인간 stdio MCP는 host 전용 `MULINO_LOCAL_HUMAN_SECRET`을
+공유한다. 미설정·잘못된 key는 사용자 조회 전에 401로 거부한다.
+service secret과 다른 값을 사용하고 agent 환경·인자·stdin·context·로그인
+volume에는 전달하지 않는다. key 생성과 보호되는 조회 경로는
+[Human gateway 계약](14_human_purchase_api.md#로컬-human-gateway-경계-33)을 따른다.
+역할 헤더는 공유 로컬 신원이며 개인 인증이나 인간 동의의 증거가 아니다.

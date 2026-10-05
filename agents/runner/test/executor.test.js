@@ -80,3 +80,18 @@ test('Claude Code error result fails the Run', async () => {
   assert.equal((await handle.result).outcome,'DONE');
   assert.deepEqual(handle.usage,{inputTokens:41,outputTokens:13,cacheReadTokens:7});
 });
+
+test('parent Human gateway credential never enters Docker invocation or agent context', async () => {
+  const previous=process.env.MULINO_LOCAL_HUMAN_SECRET;
+  process.env.MULINO_LOCAL_HUMAN_SECRET='host-only-human-sentinel';
+  try {
+    const docker=new DockerExecutor({image:'mulino-runtime:local',authVolume:'mulino-codex-auth'});
+    const spec=docker.buildInvocation(claim);
+    assert.doesNotMatch(JSON.stringify({args:spec.args,env:spec.env,context:claim.context}), /host-only-human-sentinel|MULINO_LOCAL_HUMAN_SECRET/);
+    const result=await executor('env').start(claim).result;
+    assert.doesNotMatch(JSON.stringify(result), /host-only-human-sentinel|MULINO_LOCAL_HUMAN_SECRET/);
+  } finally {
+    if(previous===undefined) delete process.env.MULINO_LOCAL_HUMAN_SECRET;
+    else process.env.MULINO_LOCAL_HUMAN_SECRET=previous;
+  }
+});

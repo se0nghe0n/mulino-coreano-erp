@@ -164,12 +164,13 @@ for (const role of [undefined, "MANAGER"]) {
     });
     const apiBase = await listen(apiServer);
     resources.push(() => closeServer(apiServer));
-    const env = { MULINO_API_BASE: `${apiBase}/api/v1` };
+    const env = { MULINO_API_BASE: `${apiBase}/api/v1`, MULINO_LOCAL_HUMAN_SECRET: "test-human-gateway" };
     if (role) env.MULINO_LOCAL_ROLE = role;
     const client = await connectClient(env);
     const result = await client.callTool({ name: "create_case", arguments: { objective: "work", requestKey: "scope-key", replenishment: { warehouseId: 3, productSkus: ["SKU-A"], targetDate: "2026-09-05" } } });
     assert.equal(result.isError, undefined);
     assert.equal(headers["x-mulino-local-role"], role ?? "OPERATOR");
+    assert.equal(headers["x-mulino-local-human"], "test-human-gateway");
     assert.equal(headers["idempotency-key"], "scope-key");
     assert.deepEqual(body.replenishment,{ warehouseId: 3, productSkus: ["SKU-A"], targetDate: "2026-09-05" });
     assert.equal(headers.authorization, undefined);
@@ -233,4 +234,26 @@ test('purchase decision requires version and hash before any API call', async ()
     const args={approvalId:1,decision:'APPROVE',expectedVersion:1,proposalHash:'a'.repeat(64),reason:'Reviewed'};delete args[omitted];
     assert.equal((await client.callTool({name:'decide_purchase',arguments:args})).isError,true);
   }
+});
+
+test('legacy work reads carry the host gateway and returned errors never expose it', async () => {
+  const sentinel='host-human-transport-sentinel';
+  let requests=0;
+  const apiServer=http.createServer((req,res)=>{
+    requests++;
+    assert.equal(req.headers['x-mulino-local-human'],sentinel);
+    assert.equal(req.headers['x-mulino-local-role'],'VIEWER');
+    assert.equal(req.headers.authorization,undefined);
+    assert.equal(req.headers['x-mulino-local-service'],undefined);
+    res.writeHead(401);res.end('rejected '+sentinel);
+  });
+  const apiBase=await listen(apiServer);resources.push(()=>closeServer(apiServer));
+  const client=await connectClient({MULINO_API_BASE:apiBase+'/api/v1',MULINO_LOCAL_ROLE:'VIEWER',MULINO_LOCAL_HUMAN_SECRET:sentinel});
+  assert.ok(!JSON.stringify(await client.listTools()).includes(sentinel));
+  for(const name of ['list_cases','list_attention','monitor_status']) {
+    const result=await client.callTool({name,arguments:{MULINO_LOCAL_HUMAN_SECRET:'forged-tool-value'}});
+    assert.equal(result.isError,true);
+    assert.ok(!JSON.stringify(result).includes(sentinel));
+  }
+  assert.equal(requests,3);
 });

@@ -29,7 +29,8 @@ npm start   # Mulino Coreano backend (localhost:8080) 기본 상대
 ## 로컬 인간 역할과 결정 (#47·#48·#52)
 
 백엔드는 `SPRING_PROFILES_ACTIVE=local`로 기동한다. 인간 도구는
-`MULINO_LOCAL_ROLE` (기본 OPERATOR)을 `X-Mulino-Local-Role`로 보낸다.
+`MULINO_LOCAL_ROLE` (기본 OPERATOR)을 `X-Mulino-Local-Role`로 보내고,
+`MULINO_LOCAL_HUMAN_SECRET`을 gateway 헤더로 보낸다.
 service/capability/Authorization 헤더와 internal/agent API는 쓰지 않는다.
 역할 헤더는 로컬 PoC 전용이며 외부 인증을 대체하지 않는다.
 
@@ -58,3 +59,12 @@ service/capability/Authorization 헤더와 internal/agent API는 쓰지 않는�
 `MULINO_TEST_CASE_REF`, `MULINO_TEST_ATTENTION_ID`를 지정해야 한다.
 이 script는 실제 ERP 발주를 생성하므로 폐기용 fixture DB에서만 실행한다.
 worker secret·capability를 받지 않으며 모델 실행·UAT를 뜻하지 않는다.
+
+## 로컬 Human gateway 경계 (#33)
+
+local 백엔드와 인간 stdio MCP는 host 전용 `MULINO_LOCAL_HUMAN_SECRET`을
+공유한다. 미설정·잘못된 key는 사용자 조회 전에 401로 거부한다.
+service secret과 다른 값을 사용하고 agent 환경·인자·stdin·context·로그인
+volume에는 전달하지 않는다. key 생성과 보호되는 조회 경로는
+[Human gateway 계약](../docs/14_human_purchase_api.md#로컬-human-gateway-경계-33)을 따른다.
+역할 헤더는 공유 로컬 신원이며 개인 인증이나 인간 동의의 증거가 아니다.

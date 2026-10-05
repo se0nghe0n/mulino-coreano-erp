@@ -21,7 +21,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 /** 목표 4·5: 명시적 인간 보충 위임만 배포 런타임으로 실행을 예약한다. */
-@SpringBootTest(properties={"spring.flyway.schemas=runtime_intake_it", "spring.datasource.hikari.schema=runtime_intake_it", "agent.runtime.default=CLAUDE"})
+@SpringBootTest(properties={"mulino.local-auth.human-secret=test-human-gateway","spring.flyway.schemas=runtime_intake_it", "spring.datasource.hikari.schema=runtime_intake_it", "agent.runtime.default=CLAUDE"})
 @AutoConfigureMockMvc @ActiveProfiles("local") @Transactional
 class RuntimeIntakeIntegrationTest {
     @Autowired MockMvc mvc;
@@ -65,7 +65,7 @@ class RuntimeIntakeIntegrationTest {
     }
     @Test void malformedHumanScopeDoesNotCreateCaseOrRun() throws Exception {
         long before=jdbc.sql("SELECT count(*) FROM cases").query(Long.class).single();
-        mvc.perform(post("/api/v1/cases").header("X-Mulino-Local-Role","MANAGER").contentType("application/json")
+        mvc.perform(post("/api/v1/cases").header("X-Mulino-Local-Human","test-human-gateway").header("X-Mulino-Local-Role","MANAGER").contentType("application/json")
             .content("{\"objective\":\"invalid\",\"replenishment\":{\"productSkus\":[\"missing\"]}}")) .andExpect(status().isBadRequest());
         assertThat(jdbc.sql("SELECT count(*) FROM cases").query(Long.class).single()).isEqualTo(before);
     }
@@ -75,7 +75,7 @@ class RuntimeIntakeIntegrationTest {
         try {
             String first = create(body, "active-conflict-original");
             var before = intakeCounts();
-            mvc.perform(post("/api/v1/cases").header("X-Mulino-Local-Role", "MANAGER")
+            mvc.perform(post("/api/v1/cases").header("X-Mulino-Local-Human","test-human-gateway").header("X-Mulino-Local-Role","MANAGER")
                     .header("Idempotency-Key", "active-conflict-second")
                     .contentType("application/json").content(body)).andExpect(status().isConflict());
             assertThat(intakeCounts()).isEqualTo(before);
@@ -94,7 +94,7 @@ class RuntimeIntakeIntegrationTest {
         try (var executor = Executors.newFixedThreadPool(2)) {
             var requests = java.util.stream.IntStream.range(0, 2).mapToObj(index -> executor.submit(() -> {
                 assertThat(start.await(10, TimeUnit.SECONDS)).isTrue();
-                return mvc.perform(post("/api/v1/cases").header("X-Mulino-Local-Role", "MANAGER")
+                return mvc.perform(post("/api/v1/cases").header("X-Mulino-Local-Human","test-human-gateway").header("X-Mulino-Local-Role","MANAGER")
                         .header("Idempotency-Key", "competing-intake-" + index)
                         .contentType("application/json").content(body)).andReturn().getResponse().getStatus();
             })).toList();
@@ -144,7 +144,7 @@ class RuntimeIntakeIntegrationTest {
     }
 
     private String create(String body,String key) throws Exception {
-        return mvc.perform(post("/api/v1/cases").header("X-Mulino-Local-Role","MANAGER").header("Idempotency-Key",key).contentType("application/json").content(body)).andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
+        return mvc.perform(post("/api/v1/cases").header("X-Mulino-Local-Human","test-human-gateway").header("X-Mulino-Local-Role","MANAGER").header("Idempotency-Key",key).contentType("application/json").content(body)).andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
     }
     private long anonymous(String body) throws Exception {
         org.springframework.security.core.context.SecurityContextHolder.clearContext();

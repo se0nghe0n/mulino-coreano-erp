@@ -18,11 +18,15 @@ import org.springframework.http.HttpMethod;
 public class LocalSecurityConfiguration {
     @Bean
     @Order(3)
-    SecurityFilterChain humanSecurity(HttpSecurity http, LocalActorDirectory directory) throws Exception {
+    SecurityFilterChain humanSecurity(HttpSecurity http, LocalActorDirectory directory, LocalAuthProperties properties) throws Exception {
         var paths = PathPatternRequestMatcher.withDefaults();
         return InterfaceSecurityConfiguration.stateless(http)
                 .securityMatchers(matchers -> matchers
                         .requestMatchers(paths.matcher("/api/v1/quality/**"),
+                                paths.matcher(HttpMethod.GET, "/api/v1/cases/**"),
+                                paths.matcher(HttpMethod.GET, "/api/v1/attention"),
+                                paths.matcher(HttpMethod.GET, "/api/v1/events"),
+                                paths.matcher(HttpMethod.GET, "/api/v1/monitor"),
                                 paths.matcher(HttpMethod.GET, "/api/v1/me"),
                                 paths.matcher(HttpMethod.POST, "/api/v1/cases"),
                                 paths.matcher(HttpMethod.POST, "/api/v1/cases/*/plans"),
@@ -31,7 +35,7 @@ public class LocalSecurityConfiguration {
                                 paths.matcher(HttpMethod.GET, "/api/v1/purchase-orders/*"),
                                 paths.matcher(HttpMethod.POST, "/api/v1/approvals/*/decision"),
                                 paths.matcher(HttpMethod.POST, "/api/v1/attention/*/answer")))
-                .addFilterBefore(new LocalActorFilter(directory), AnonymousAuthenticationFilter.class)
+                .addFilterBefore(new LocalActorFilter(directory, properties), AnonymousAuthenticationFilter.class)
                 .authorizeHttpRequests(requests -> requests.anyRequest().access((authentication, context) -> {
                     var actor = authentication.get().getPrincipal();
                     return new AuthorizationDecision(actor instanceof HumanActor human

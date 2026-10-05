@@ -321,10 +321,11 @@ npm start
 - 기본 프로필은 기존 인터페이스 경로를 무인증으로 허용한다.
   `POST /cases`의 opener는 NULL이고 `Idempotency-Key`는 무시한다.
   `/api/v1/me`와 등록되지 않은 경로는 403이다.
-- `local` 프로필의 인간 필터는 `GET /api/v1/me`와
-  `POST /api/v1/cases`에만 적용한다. 역할 헤더가 없으면 401,
+- `local` 프로필의 인간 필터는 신원·업무·계획·승인·품질 API에
+  적용한다. Human gateway key나 역할 헤더가 없으면 401,
   VIEWER·QC·ADMIN의 Case 생성은 403이다. OPERATOR·MANAGER는
-  생성자로 기록되며 USER 참여자가 추가된다. 조회에는 역할을 요구하지 않는다.
+  생성자로 기록되며 USER 참여자가 추가된다. local 업무 조회에는
+  Human gateway 인증이 필요하다.
 - `Idempotency-Key`는 선택 사항이다. 보내는 경우 인간별 scope에서
   검증·정규화한 요청을 비교한다. 같은 키와 내용은 같은 응답을 반환하고,
   다른 내용은 409다. 키가 없으면 새 Case를 만든다.
@@ -336,7 +337,8 @@ npm start
 
 로컬 실행은 기존 DB 환경 변수에 `SPRING_PROFILES_ACTIVE=local`을
 추가한다. 역할 헤더는 `X-Mulino-Local-Role: MANAGER`처럼 보낸다.
-이는 누구나 보낼 수 있는 PoC 신원이며 외부 사용자 인증이 아니다.
+역할 헤더와 host 전용 `X-Mulino-Local-Human` credential이 함께 필요하다.
+개인 신원 인증은 아니며 [Human gateway 계약](14_human_purchase_api.md)을 따른다.
 기존 Event·Run 경로는 foundation 동작을 유지한다.
 
 검증 환경은 Java 21, PostgreSQL 18.6의 별도 폐기용 DB다.

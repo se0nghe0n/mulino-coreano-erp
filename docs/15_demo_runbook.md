@@ -33,6 +33,8 @@ export MULINO_ACCEPTANCE_EVIDENCE=/tmp/mulino-purchase-acceptance-repeat1
 export MULINO_API_BASE=http://127.0.0.1:55463/api/v1
 # 이 값은 폐기용 로컬 데모 전용이다. 운영 credential을 쓰지 않는다.
 export MULINO_LOCAL_SERVICE_SECRET=purchase-acceptance-local-demo
+# 인간 host terminal에만 보관한다. service/agent subprocess에 전달하지 않는다.
+export MULINO_LOCAL_HUMAN_SECRET="$(openssl rand -hex 32)"
 mkdir -p "$MULINO_ACCEPTANCE_EVIDENCE"
 docker start "$MULINO_ACCEPTANCE_CONTAINER"
 docker exec "$MULINO_ACCEPTANCE_CONTAINER" createdb -U postgres \

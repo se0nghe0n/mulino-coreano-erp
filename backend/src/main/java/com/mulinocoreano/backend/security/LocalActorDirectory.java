@@ -16,9 +16,11 @@ public class LocalActorDirectory {
         this.properties = properties;
     }
 
+    private record StoredRole(String role, boolean active) {}
+
     public HumanActor humanForRole(String role) {
         String normalized = LocalActorCapabilities.normalizeRole(role);
-        var capabilities = LocalActorCapabilities.forRole(normalized);
+        LocalActorCapabilities.forRole(normalized);
         String email = "local-" + normalized.toLowerCase(Locale.ROOT) + "@mulino.local";
         long userId =
                 jdbc.sql(
@@ -33,12 +35,15 @@ public class LocalActorDirectory {
                         .param("role", normalized)
                         .query(Long.class)
                         .single();
+        var stored = jdbc.sql("SELECT role::text, is_active FROM users WHERE user_id=:id")
+                .param("id", userId).query((rs, row) -> new StoredRole(rs.getString(1), rs.getBoolean(2))).single();
+        if (!stored.active()) throw new org.springframework.web.server.ResponseStatusException(org.springframework.http.HttpStatus.FORBIDDEN);
         return new HumanActor(
                 properties.issuer(),
                 "local|" + normalized.toLowerCase(Locale.ROOT),
                 userId,
                 "Local " + normalized,
-                normalized,
-                capabilities);
+                stored.role(),
+                LocalActorCapabilities.forRole(stored.role()));
     }
 }

@@ -35,7 +35,7 @@ import java.util.*;
 import java.util.concurrent.*;
 
 @SpringBootTest(
-        properties = {
+        properties = {"mulino.local-auth.human-secret=test-human-gateway",
             "spring.flyway.schemas=purchase_workflow_it",
             "spring.flyway.clean-disabled=false",
             "spring.flyway.init-sqls=CREATE EXTENSION IF NOT EXISTS btree_gist WITH SCHEMA public",
@@ -353,7 +353,7 @@ class PurchaseWorkflowIntegrationTest {
         var auth = UsernamePasswordAuthenticationToken.authenticated(actor, null,
                 List.of(new SimpleGrantedAuthority("erp:read")));
         String path = "/api/v1/approvals/" + id;
-        var before = exactJson.readTree(mvc.perform(get(path).with(authentication(auth)))
+        var before = exactJson.readTree(mvc.perform(get(path).header("X-Mulino-Local-Human","test-human-gateway").header("X-Mulino-Local-Role","VIEWER"))
                 .andExpect(status().isOk()).andReturn().getResponse().getContentAsString());
         var evidence = before.path("planEvidence");
         assertThat(evidence.path("planRef").asText()).isEqualTo(plan.ref());
@@ -370,7 +370,7 @@ class PurchaseWorkflowIntegrationTest {
         jdbc.sql("UPDATE stock SET quantity=quantity+999").update();
         jdbc.sql("INSERT INTO replenishment_plans(plan_ref,case_id,warehouse_id,version,as_of,horizon_days,target_date,source_snapshot,result,source_hash,plan_hash,created_by_work_item_id) SELECT 'PLAN-LATER-APPROVAL-READ',case_id,warehouse_id,version+1,as_of,horizon_days,target_date,'{}','{}',source_hash,plan_hash,created_by_work_item_id FROM replenishment_plans WHERE plan_ref=:ref")
                 .param("ref", plan.ref()).update();
-        var after = exactJson.readTree(mvc.perform(get(path).with(authentication(auth)))
+        var after = exactJson.readTree(mvc.perform(get(path).header("X-Mulino-Local-Human","test-human-gateway").header("X-Mulino-Local-Role","VIEWER"))
                 .andExpect(status().isOk()).andReturn().getResponse().getContentAsString());
         assertThat(after).isEqualTo(before);
         assertThat(exactJson.write(plans.get(plan.ref()))).isEqualTo(stored);
@@ -880,7 +880,7 @@ CREATE TRIGGER fail_second_purchase_line AFTER INSERT ON purchase_order_items
         jdbc.sql("UPDATE replenishment_followups SET due_at=TIMESTAMPTZ '2026-09-03T15:00:00Z'").update();
         long events = count("events");
         long runsBefore=count("runs"),attentionBefore=count("attention_requests");
-        mvc.perform(get("/api/v1/monitor")).andExpect(status().isOk());
+        mvc.perform(get("/api/v1/monitor").header("X-Mulino-Local-Human","test-human-gateway").header("X-Mulino-Local-Role","VIEWER")).andExpect(status().isOk());
         assertThat(count("events")).isEqualTo(events);assertThat(count("runs")).isEqualTo(runsBefore);
         assertThat(count("attention_requests")).isEqualTo(attentionBefore);
         var changed = dispatcher.dispatchScheduledIfActionable().orElseThrow();
@@ -924,7 +924,7 @@ CREATE TRIGGER fail_second_purchase_line AFTER INSERT ON purchase_order_items
                         actor, null, List.of(new SimpleGrantedAuthority("procurement:decide")));
         return mvc.perform(
                         post("/api/v1/approvals/{id}/decision", id)
-                                .with(authentication(auth))
+                                .header("X-Mulino-Local-Human","test-human-gateway").header("X-Mulino-Local-Role","MANAGER")
                                 .header("Idempotency-Key", key)
                                 .contentType("application/json")
                                 .content(body))
@@ -979,7 +979,7 @@ CREATE TRIGGER fail_second_purchase_line AFTER INSERT ON purchase_order_items
         var result =
                 mvc.perform(
                                 post("/api/v1/approvals/{id}/decision", id)
-                                        .with(authentication(auth))
+                                        .header("X-Mulino-Local-Human","test-human-gateway").header("X-Mulino-Local-Role",role)
                                         .header("Idempotency-Key", key)
                                         .contentType("application/json")
                                         .content(body))
@@ -996,7 +996,7 @@ CREATE TRIGGER fail_second_purchase_line AFTER INSERT ON purchase_order_items
                             + " VALUES(:name,:email,'test-only',CAST(:role AS user_role)) RETURNING"
                             + " user_id")
                 .param("name", name)
-                .param("email", name + "@purchase.test")
+                .param("email", "local-" + name + "@mulino.local")
                 .param("role", role)
                 .query(Long.class)
                 .single();
