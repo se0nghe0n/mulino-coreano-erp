@@ -69,6 +69,29 @@ public final class UatEvidence {
                 && REQUIRED_USAGE.stream().allMatch(k -> event.hasNonNull(k) && event.get(k).isNumber());
     }
 
+    static boolean executionReported(JsonNode event, String runtime) {
+        if (event == null || event.hasNonNull("failure") || event.hasNonNull("nativeSignal")
+                || !event.hasNonNull("nativeExitCode") || !event.get("nativeExitCode").isIntegralNumber()
+                || event.path("nativeExitCode").asInt(-1) != 0
+                || !runtime.equals(event.path("runtime").asText()) || !event.hasNonNull("model")) return false;
+        if ("CLAUDE".equals(runtime)) return completeUsage(event);
+        return "CODEX".equals(runtime) && List.of("inputTokens", "outputTokens", "cacheReadTokens")
+                .stream().allMatch(k -> event.hasNonNull(k) && event.get(k).isNumber());
+    }
+
+    private static boolean executionForRun(String runRef, List<JsonNode> events, String runtime) {
+        var attempts = events.stream().filter(e -> runRef.equals(e.path("runRef").asText())).toList();
+        return !attempts.isEmpty() && attempts.stream().allMatch(e -> executionReported(e, runtime));
+    }
+
+    static boolean finalized(List<BusinessState.RunRecord> runs, List<JsonNode> events, boolean humanStoppedPurchase, String runtime) {
+        return !runs.isEmpty() && runs.stream().allMatch(r ->
+                ("COMPLETED".equals(r.status()) || (humanStoppedPurchase && "ORCHESTRATOR".equals(r.agentKey())
+                    && "ABORTED".equals(r.status()) && "ABORTED".equals(r.outcome())))
+                && r.outcome() != null && !"FAILED".equals(r.outcome())
+                && executionForRun(r.runRef(), events, runtime));
+    }
+
     static Map<String, Object> summarize(List<BusinessState.RunRecord> dbRuns, List<JsonNode> modelFinished) {
         Map<String,List<JsonNode>> byRef=new LinkedHashMap<>();
         for (var event:modelFinished) {
@@ -86,6 +109,8 @@ public final class UatEvidence {
             var last=events.isEmpty() ? null : events.getLast();
             for (String key:List.of("runtime","model","resolvedModel"))
                 run.put(key,last==null ? null : last.path(key).asText(null));
+            for (String key : List.of("nativeResultSubtype", "nativeFrameKind", "nativeErrorCode", "nativeFailureCategory", "nativeExitCode", "nativeSignal", "nativeHttpStatus"))
+                run.put(key, last == null || !last.hasNonNull(key) ? null : last.get(key));
             String failure=null;
             for (var event:events) if (event.hasNonNull("failure")) failure=event.path("failure").asText();
             run.put("failure",failure);

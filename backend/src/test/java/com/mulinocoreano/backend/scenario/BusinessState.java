@@ -47,6 +47,67 @@ public class BusinessState {
                 """).param("caseRef", caseRef).query(Long.class).single();
     }
 
+    /** Allowlisted business facts only: no capability/lease hashes, raw contexts, or credentials. */
+    public java.util.Map<String,Object> finalEvidence(String caseRef) {
+        var evidence = new java.util.LinkedHashMap<String,Object>();
+        evidence.put("decisions", jdbc.sql("""
+                SELECT ga.governance_action_id,ga.status::text AS approval_status,d.decision::text,
+                    d.reason,u.role::text AS human_role,d.is_final
+                FROM governance_actions ga JOIN cases c ON c.case_id=ga.case_id
+                    JOIN governance_decisions d USING(governance_action_id) JOIN users u ON u.user_id=d.decided_by
+                WHERE c.case_ref=:ref ORDER BY d.governance_decision_id
+                """).param("ref",caseRef).query().listOfRows());
+        evidence.put("work", jdbc.sql("""
+                SELECT w.work_item_ref,w.status::text,a.agent_key
+                FROM work_items w JOIN cases c USING(case_id) LEFT JOIN agents a ON a.agent_id=w.assigned_agent_id
+                WHERE c.case_ref=:ref ORDER BY w.work_item_id
+                """).param("ref",caseRef).query().listOfRows());
+        evidence.put("attention", jdbc.sql("""
+                SELECT ar.attention_request_id,w.work_item_ref,ar.status::text,ar.reason_type::text,
+                    ar.question,ar.answer_text
+                FROM attention_requests ar JOIN cases c USING(case_id)
+                    LEFT JOIN work_items w ON w.work_item_id=ar.work_item_id
+                WHERE c.case_ref=:ref ORDER BY ar.attention_request_id
+                """).param("ref",caseRef).query().listOfRows());
+        evidence.put("audit", jdbc.sql("""
+                SELECT l.governance_audit_log_id,l.governance_action_id,l.event_type,l.resource_type,l.resource_id
+                FROM governance_audit_logs l JOIN governance_actions ga USING(governance_action_id)
+                    JOIN cases c ON c.case_id=ga.case_id
+                WHERE c.case_ref=:ref ORDER BY l.governance_audit_log_id
+                """).param("ref",caseRef).query().listOfRows());
+        evidence.put("quality", jdbc.sql("""
+                SELECT q.inbound_id,q.version,ga.status::text AS approval_status,i.status::text AS inbound_status,
+                    l.remaining_quantity
+                FROM inbound_inspections q JOIN cases c ON c.case_id=q.case_id
+                    JOIN governance_actions ga USING(governance_action_id) JOIN inbound i ON i.inbound_id=q.inbound_id
+                    JOIN raw_material_lots l ON l.inbound_id=q.inbound_id
+                WHERE c.case_ref=:ref ORDER BY q.inspection_id
+                """).param("ref",caseRef).query().listOfRows());
+        evidence.put("recall", jdbc.sql("""
+                SELECT q.recall_proposal_id,q.version,ga.status::text AS approval_status,
+                    jsonb_array_length(q.snapshot->'rawLots') AS raw_lots,
+                    jsonb_array_length(q.snapshot->'productionLots') AS production_lots,
+                    jsonb_array_length(q.snapshot->'customers') AS customers,
+                    jsonb_array_length(q.snapshot->'shipments') AS shipments,
+                    (SELECT count(*) FROM recall_scope_lots s WHERE s.recall_proposal_id=q.recall_proposal_id) AS scoped_lots,
+                    (SELECT count(*) FROM recalls r WHERE r.governance_action_id=q.governance_action_id) AS applied_recalls
+                FROM recall_proposals q JOIN cases c ON c.case_id=q.case_id JOIN governance_actions ga USING(governance_action_id)
+                WHERE c.case_ref=:ref ORDER BY q.recall_proposal_id
+                """).param("ref",caseRef).query().listOfRows());
+        return evidence;
+    }
+
+    public boolean humanStoppedPurchase(String caseRef) {
+        return jdbc.sql("""
+                SELECT EXISTS(SELECT 1 FROM governance_actions ga JOIN cases c ON c.case_id=ga.case_id
+                    JOIN governance_decisions d USING(governance_action_id)
+                    JOIN users u ON u.user_id=d.decided_by
+                    WHERE c.case_ref=:ref AND ga.replenishment_plan_id IS NOT NULL
+                        AND ((ga.status='BLOCKED' AND d.decision='BLOCK') OR (ga.status='CANCELLED' AND d.decision='CANCEL'))
+                        AND d.is_final AND u.role='MANAGER')
+                """).param("ref",caseRef).query(Boolean.class).single();
+    }
+
     /** 이 Case의 가장 최근 구매 제안(governance_action) 상태. */
     public String latestApprovalStatus(String caseRef) {
         return jdbc.sql("""

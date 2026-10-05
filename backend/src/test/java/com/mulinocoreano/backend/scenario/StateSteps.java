@@ -16,16 +16,21 @@ public class StateSteps {
     @Then("구매 제안은 승인 대기 상태다")
     public void pending() {
         assertThat(state.latestApprovalStatus(world.caseRef())).isEqualTo("PENDING");
+        assertThat(state.humanStoppedPurchase(world.caseRef())).isFalse();
     }
 
     @Then("구매 제안은 취소 상태다")
     public void cancelled() {
         assertThat(state.latestApprovalStatus(world.caseRef())).isEqualTo("CANCELLED");
+        assertThat(state.humanStoppedPurchase(world.caseRef())).isTrue();
+        assertThat((java.util.List<?>)state.finalEvidence(world.caseRef()).get("decisions")).hasSize(1);
     }
 
     @Then("구매 제안은 반려 상태다")
     public void blocked() {
         assertThat(state.latestApprovalStatus(world.caseRef())).isEqualTo("BLOCKED");
+        assertThat(state.humanStoppedPurchase(world.caseRef())).isTrue();
+        assertThat((java.util.List<?>)state.finalEvidence(world.caseRef()).get("decisions")).hasSize(1);
     }
 
     @Then("구매 제안은 만료 상태다")

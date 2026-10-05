@@ -65,3 +65,47 @@ LOT graph·원재료 잔량·출하 배분·고객 전수성, 승인 역할·sou
 보고 초안이 있으므로 실제 식약처 전송·법정 양식 검증은 완료로 분류하지
 않는다. 고정 planningClock은 업무일이며 보관 최소 기한은 DB 생성 시각을
 따른다. 실제 모델 UAT 증거는 scripted SIT와 별도로 수집한다.
+
+## 2026-10-06 실제 모델 증거 경계 (#25/#26/#27)
+
+공개 고정 scenario key는 실제 UAT의 인간·서비스 인증 근거가 될 수
+없다. per-JVM 난수 key와 DynamicPropertySource로 바꾸고, 같은 JVM의
+backend 재시작에는 동일 key를 유지한다. 기존 재시작 SIT에서 과거 공개
+key와 반대 경계 key의 조회·claim 거절, private host client의 성공을
+검증한다. runner는 CLAUDE·CODEX 모두 parent 인간·서비스 sentinel을
+native argv·환경·context에 전달하지 않음을 확인한다.
+
+QC·리콜의 PENDING 제안은 모델 종료 성공과 다르다. 실제 UAT의 마지막
+hook은 Case의 모든 Run이 COMPLETED 또는 정상 반려 ABORTED이고
+ABORTED는 해당 반려 시나리오의 최종 MANAGER 결정·승인 상태가
+일치하는 원본 Orchestrator에만 허용한다. FAILED가 아니며 정상 native
+종료와 runtime에서 실제 보고하는 model_finished 사용량을 확인한
+뒤에만 업무 인수로 통과한다. Claude의 완전 accounting 기준은 유지한다.
+Codex의 비용·cacheWrite·resolvedModel 미보고는 usageComplete=false와
+accounting PARTIAL로 남기고, business execution readiness와 구분한다. 실패 때에도 원래
+Run·partial 비용·unknown 지표를 JSON에 남긴 뒤 test를 실패시킨다.
+`UatEvidenceTest`는 PENDING 뒤 usage 누락·RUNNING·FAILED·종료 유예
+실패의 거절과 완전한 WAITING·정상 반려 ABORTED의 수용을 검증한다. 이는 Goal 4·5의 실제
+하네스 인수 증거이며 모델 결과 문구나 호출 순서를 고정하지 않는다.
+
+
+native 오류 회귀는 free-form 오류에 host sentinel이 있어도 category만
+남기고 CLI가 보고한 partial 비용을 보존함을 증명한다. quota와 단순
+429 rate limit, 인증과 권한/모델 접근, turn/budget/schema 제한을 서로
+바꾸어 보고하지 않는다. 현재 unknown 실패 원인을 테스트 fixture의
+분류 사례로 소급 확정하지 않는다.
+
+
+Codex readiness 회귀는 terminal 업무와 exit 0·실제 보고 token이 있으면
+business readiness를 수용하면서 비용·미보고 token·resolved model을
+null로 유지함을 검증한다. model_finished 누락·native cancellation·
+실패·nonzero exit는 수용하지 않는다. UatEvidence helper는 7건이다.
+
+
+같은 Run의 이른 정상 model_finished 뒤에 실패·취소·미보고 종료가
+있으면 business readiness를 수용하지 않는다. 이번 UAT는 실패 후
+같은 Run의 의도적 재시도가 아니므로 보수적으로 모든 attempt의 정상
+보고를 요구한다. 오류 이력과 partial/unknown accounting은 지우지
+않는다. Codex native error frame→executor kill→runner failure 로그의
+행동 회귀는 credential과 free-form 오류가 출력되지 않으면서 정해진
+category/status가 유지되는지 확인한다. 현재 runner 76건이 통과했다.

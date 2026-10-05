@@ -25,5 +25,12 @@ else if (mode === 'codex-usage') {
   send({ outcome: 'DONE', summary: 'Finished', resultRef: 'PLAN-1' });
   process.stdout.write(JSON.stringify({type:'turn.completed',usage:{input_tokens:41,cached_input_tokens:7,output_tokens:13}})+'\n');
 }
+else if (mode === 'codex-routing-error') process.stdout.write(JSON.stringify({type:'turn.failed', error:{message:'workspace routing discovery unauthorized (401) cap-secret lease-secret secret-from-stderr'}})+'\n');
+else if (mode === 'claude-quota') {
+  process.stdout.write(JSON.stringify({type:'result', subtype:'error_during_execution', is_error:true,
+    errors:["You've hit your limit cap-secret lease-secret secret-from-stderr"],
+    total_cost_usd:0.05,usage:{input_tokens:2,output_tokens:3}})+'\n');
+  process.exitCode=1;
+}
 else if (mode === 'claude-error') process.stdout.write(JSON.stringify({ type: 'result', subtype: 'error_max_turns', is_error: true }) + '\n');
 else send({ outcome: 'DONE', summary: 'Finished', resultRef: 'PLAN-1' });

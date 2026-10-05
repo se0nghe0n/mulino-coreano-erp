@@ -4,6 +4,7 @@ import { randomUUID } from 'node:crypto';
 import { StringDecoder } from 'node:string_decoder';
 import { redact, runtimes, safeUrl, validateResult } from './protocol.js';
 import { claudeArguments, codexConfiguration } from './runtime-config.js';
+import { claudeDiagnostics, codexDiagnostics } from './native-diagnostics.js';
 
 // Claude Code's --json-schema validator rejects the draft 2020-12 $schema URI; the schema uses no
 // 2020-12-only keywords, so the declaration is dropped for Claude only (Codex reads the file as is).
@@ -33,6 +34,7 @@ export class ProcessExecutor {
     let pending = '';
     let finalText = null;
     let cancellation = null;
+    const diagnostics = {};
     const usage = {}; // Filled from Claude Code's result event; cost and token counts are not secrets.
     const decoder = new StringDecoder('utf8');
     const kill = () => {
@@ -63,9 +65,13 @@ export class ProcessExecutor {
           for (const [key,value] of [['inputTokens',tokens.input_tokens],['outputTokens',tokens.output_tokens],['cacheReadTokens',tokens.cached_input_tokens]])
             if (Number.isFinite(value)) usage[key] = value;
         }
-        if (event.type === 'error' || event.type === 'turn.failed') fail('MODEL_PROCESS_FAILED');
+        if (event.type === 'error' || event.type === 'turn.failed') {
+          Object.assign(diagnostics, codexDiagnostics(event));
+          fail('MODEL_PROCESS_FAILED');
+        }
         // Claude Code --output-format json prints one result object; --json-schema fills structured_output.
         if (event.type === 'result') {
+          Object.assign(diagnostics, claudeDiagnostics(event));
           if (event.is_error || event.subtype !== 'success') fail('MODEL_PROCESS_FAILED');
           else finalText = event.structured_output === undefined ? event.result : JSON.stringify(event.structured_output);
           const resolved = Object.keys(event.modelUsage ?? {});
@@ -98,8 +104,10 @@ export class ProcessExecutor {
     child.stdin.on('error', () => {}); // A child may exit before consuming all input.
     const result = new Promise((resolve, reject) => {
       child.on('error', () => { failure ??= new ExecutionError('MODEL_START_FAILED'); });
-      child.on('close', code => {
+      child.on('close', (code, signal) => {
         closed = true;
+        diagnostics.nativeExitCode = Number.isInteger(code) ? code : null;
+        if (["SIGKILL", "SIGTERM", "SIGINT"].includes(signal)) diagnostics.nativeSignal = signal;
         if (!failure) line(pending + decoder.end());
         if (failure) return reject(failure);
         if (code !== 0) return reject(new ExecutionError('MODEL_PROCESS_FAILED'));
@@ -111,7 +119,7 @@ export class ProcessExecutor {
     });
     result.catch(() => {});
     child.stdin.end(input);
-    return { result, cancel, pid: child.pid, usage };
+    return { result, cancel, pid: child.pid, usage, diagnostics };
   }
 }
 

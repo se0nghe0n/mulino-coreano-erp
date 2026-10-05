@@ -165,7 +165,7 @@ export class Runner {
   recordModelFinished(claim, handle, event, secrets, failure = event.error?.code) {
     // Never retain child output. Missing usage remains unknown, not an invented zero cost.
     this.log('model_finished', { runRef: claim.runRef, runtime: claim.runtime, model: this.executor.model ?? null,
-      ...(/^[A-Z_]{1,64}$/.test(failure ?? '') ? { failure } : {}), ...(handle.usage ?? {}) }, secrets);
+      ...(/^[A-Z_]{1,64}$/.test(failure ?? '') ? { failure } : {}), ...(handle.usage ?? {}), ...(handle.diagnostics ?? {}) }, secrets);
   }
 
   async requestBefore(action, body, key, deadline, signal) {

@@ -5,16 +5,16 @@
 SIT와 실제 모델 UAT에서 실행하고 DB 업무 상태와 Run 증거를 남긴다.
 설계의 원본 이력과 통합 방향은
 [시나리오 설계](superpowers/specs/2026-09-25-scenario-tests-design.md)를
-따른다. 이 문서는 #57 이식 branch의 실행 계약을 설명한다.
+따른다. 이 문서는 #25/#26/#27 통합 source의 실행 계약을 설명한다.
 
 ## 실행 계층
 
 | 명령 | 실행 범위 | 모델 호출 |
 |---|---|---|
 | `./gradlew test bootJar` | 기존 규칙·보안 테스트와 scenario helper | 없음 |
-| `./gradlew sitTest` | MRP→P2P 5개 및 실제 backend 재시작 2건 | 없음 |
-| `./gradlew pendingScenarios` | #27 리콜 3개 dry-run 목록 | 없음 |
-| `./gradlew uatTest` | 같은 Feature의 `@uat` 3개 | 비용 발생 |
+| `./gradlew sitTest` | P2P 6개·QM 6개·RC 6개 및 backend 재시작 2건 | 없음 |
+| `./gradlew pendingScenarios` | 현재 pending 없음; 미구현 목록이 없으면 task 실패 | 없음 |
+| `./gradlew uatTest` | P2P-001/002/004·QM-001·RC-001 5개 | 비용 발생 |
 
 Cucumber 8.0.1을 쓴다. Unit task의 sentinel tag는 업무 시나리오를
 실행하지 않으며 Cucumber가 보고하는 제외 시나리오는 skipped다.
@@ -45,6 +45,12 @@ lease는 고정하지 않는다. fixture 적재는 테스트 코드에서만 수
 승인 ID와 일반 질문은 `list_attention`에서 현재 Case의 기록을
 찾고 `get_approval` 또는 `answer_attention`으로 처리한다.
 일반 `get_case` 응답에 없는 승인 collection을 가정하지 않는다.
+
+시나리오 JVM마다 별도의 예측 불가능한 인간·서비스 key를 생성한다.
+DynamicPropertySource로 서버에 주입하고 같은 JVM의 backend 재시작에도
+유지한다. 인간 key는 host stdio MCP에만, 서비스 key는 host runner에만
+전달한다. 공개된 과거 scenario key와 경계를 바꾼 key는 조회·claim을
+허용하지 않는다. native 환경·argv·context에는 두 key를 넣지 않는다.
 
 host runner에는 테스트 서버와 같은 서비스 secret을 넣고 내부 요청은
 `X-Mulino-Local-Service`를 쓴다. 컨테이너 API 주소는 실제 Spring
@@ -79,7 +85,7 @@ host runner에는 테스트 서버와 같은 서비스 secret을 넣고 내부 �
 증거는 `backend/build/uat/<날짜>/<TC-ID>.json`이다.
 실행 runtime·모델, Claude가 보고한 resolvedModel, Run별 업무 결과·
 실패 코드·비용·토큰과 최종 발주·Case 상태를 저장한다.
-inputTokens는 CLI의 native uncached input이며 cacheReadTokens와
+Claude inputTokens는 CLI의 native uncached input이며 cacheReadTokens와
 cacheWriteTokens를 별도로 보존한다. 누락된 지표는 null이다.
 사용량이 누락되면 usageComplete=false이고 전체 비용을 만들지 않으며
 보고된 비용 합계만 partialCostUsd에 남긴다.
@@ -197,3 +203,129 @@ RC-001~006은 실제 CLI/runner QC 조사·제안과 인간 ADMIN stdio MCP를
 115개 출하 fixture로 전수 추적·승인 전 불변·ADMIN 승인·권한 거절·
 반려·취소를 검증한다. 보고는 OFFLINE/PENDING 초안이며 제출 증거가 아니다.
 SIT는 scripted agent 증거다. 실제 모델 UAT는 별도 실행·비용 게이트다.
+
+## 2026-10-06 현재 source 실제 모델 시도 (#25/#26/#27)
+
+baseline은 `0132e0a62ad9f086e5c70c5c857d4546f5921ef9`다. CLI·role·JAR
+source hash와 새 runtime image ID는
+`/tmp/mulino-project-completion-20261005/native/source-manifest.json`에
+남겼다. private per-JVM key 변경과 종료 gate의 최종 harness hash는
+같은 디렉터리의 `final-harness-hashes.json`이다. 실제 모델이 실행한
+CLI·role·JAR는 그 사이 바꾸지 않았다.
+
+Java 21.0.12.1, Node 24.16.0, PostgreSQL 18.6에서 첫 private-key SIT
+20건이 3분 22초에 통과했다. 종료·권한 근거·snapshot·진단 보강 뒤 새
+`native_diagnostics_sit_scenario`의 20건도 3분 19초에 통과했다. 실패·오류·
+skipped는 없다. runner 76건, UatEvidence helper 7건, 모델 없는 image
+smoke와 `bootJar`도 통과했다. test harness와 host runner의 진단 변경에 대해 전체 Unit 549건은
+반복하지 않았다.
+
+CLAUDE/claude-sonnet-5와 `completion-0132e0a`, 기존
+`mulino-claude-auth`를 명시했다. probe는 새 `native_claude_probe_scenario`,
+나머지 tag는 새 `native_claude_remaining_scenario`를 사용했다.
+
+| Case | 현재 실제 결과 | CLI 보고 비용 USD |
+|---|---|---:|
+| TC-P2P-001 | PASS. 승인 후 발주 1·16,500원, 원본 조정 DONE·Case WAITING, 5 Run 사용량 완전 | 3.0874898 |
+| TC-P2P-002 | PASS. MANAGER BLOCK 뒤 발주·후속 0, 조정 ABORTED·Case OPEN, 5 Run 사용량 완전 | 3.2866446 |
+| TC-P2P-004 | FAIL. 새 발주 1·17,000원이나 마지막 조정 Run MODEL_PROCESS_FAILED | 6.2873046 |
+| TC-QM-001 | FAIL. QC MODEL_PROCESS_FAILED, 검사 제안 없음, resolvedModel 없음 | 0 (CLI 보고값) |
+| TC-RC-001 | INCOMPLETE. 제안 저장과 추적 단언은 통과했으나 native 종료·사용량 누락 | unknown |
+
+002의 인간 요청 reason은 `scenario BLOCK`이고 테스트 경로가 BLOCKED를
+검증했다. 별도 decision/work/Attention DB export는 당시 hook에 없었다.
+이를 직접 export 증거로 바꾸어 쓰지 않는다. Case OPEN과 조정 Run
+ABORTED는 JSON에 남았다. 이후 시도에는 allowlisted decision reason·role,
+work·Attention·audit 및 QM/리콜 상태를 남긴다. 원본 002는 재실행하지
+않았다.
+
+004는 옛 제안 EXPIRED 뒤 명시적 인간 재계산·새 MANAGER APPROVE·발주
+17,000원까지 도달했다. 그러나 마지막 원본 조정 Run의 모델 실패를
+구매 성공으로 숨기지 않는다. 9 Run의 보고 지표와 알려진 비용은
+보존했으나 usageComplete=false다. QM의 0은 CLI가 실제 보고한 값이며
+unknown 값을 0으로 바꾼 것이 아니다. 실패 원인은 현재 실행기의 일반
+MODEL_PROCESS_FAILED 코드만으로 인증·한도·모델 접근 중 하나라고
+확정할 수 없다.
+
+RC의 원래 JSON status=PASSED는 변경하지 않았다. 별도
+`remaining-first-attempt/TC-RC-001-classification.json`에서 INCOMPLETE로
+분류했다. 종료 hook을 수정했지만 이 시점의 유효한 RC 재인수 증거는
+아직 없다. 알려진 보고 비용 합계는 USD 12.661439이고 RC 비용이
+unknown이므로 전체 시도 비용은 확정하지 않는다. raw JSON·XML·실패
+로그·business snapshot·ledger는 같은 `native/` 디렉터리에 보관한다.
+현 단계에서 현재 실제 모델 5개 인수 통과나 Codex parity를 주장하지
+않는다. 이전 2026-10-03 기록은 이전 source의 결과로 유지한다.
+
+### 실패 진단과 runtime metadata 제한
+
+host runner는 Claude 오류를 정해진 subtype·category·HTTP status·native
+exit code로 줄여 기록한다. raw 오류·prompt·credential은 전달하지
+않는다. turn/budget/schema 재시도, 인증, model 접근, 사용량·rate limit,
+provider 오류와 unknown을 구분하고 알려진 partial 비용을 유지한다.
+parser·실제 child 회귀를 포함한 runner 66건이 통과했다.
+
+모델 없는 auth status는 Claude first-party Pro 로그인과 Codex ChatGPT
+로그인 metadata를 보고했다. read-only volume의 Claude 최소 진단은
+exit 1·UNKNOWN_NATIVE_FAILURE·보고 비용/토큰 0·resolvedModel 없음이다.
+이 진단은 실제 runner의 writable named volume과 다르므로 외부 quota나
+인증 gate의 증거로 쓰지 않는다. 004의 과거 오류 원인도 재분류하지
+않았다. 새 전체 Case 재시도는 하지 않았다.
+
+Codex의 read-only model-list 시도는 startup에 실패했다. 실제 실행기의
+writable named volume·UID·tmpfs·workdir 조건으로만 metadata를 다시
+확인하자 model/list가 성공했다. gpt-6-astra(default), gpt-5.6-sol,
+gpt-5.6-terra, gpt-5.6-luna, gpt-5.5, gpt-5.2가 현재 CLI catalog에 있다.
+service tier metadata는 null이며 rateLimits 조회는 -32603으로
+실패했다. 이를 모델 호출 성공이나 잔여 quota 증거로 쓰지 않는다.
+metadata 호출의 modelRequests는 0이다. 로그인 변경·credential 내용
+조회·복사·export는 하지 않았다.
+
+현재 Codex executor의 native usage는 input/output/cacheRead만 남는다.
+비용·cacheWrite·resolvedModel을 추정하거나 0으로 채우지 않는다.
+조정자가 runtime별 인수 증거 기준을 승인했다. Claude는 완전 보고
+사용량을 요구한다. Codex는 정상 종료 nativeExitCode=0, model_finished,
+input/output/cacheRead 보고값을 요구한다. 실패·signal·사용량 이벤트
+누락은 어느 runtime에서도 수용하지 않는다. 모든 DB Run의 기대 업무
+결과도 유지한다. strict usageComplete는 변경하지 않아 Codex의 미보고
+비용·cacheWrite·resolvedModel이 있으면 false다. business PASSED와
+accounting PARTIAL을 별도로 기록한다.
+
+현재 실제 catalog의 gpt-5.6-sol default effort는 low다. 조정자는 이
+기본값으로 단일 TC-P2P-001 parity probe를 승인했다. 별도 effort/tier
+설정을 만들지 않았다. 이전 Claude 결과는 `attempts/claude-initial/`에
+보존하고 새 probe는 별도 DB를 사용한다.
+
+
+### 단일 Codex parity 시도와 현재 접근 gate
+
+CODEX/gpt-5.6-sol(default low)의 TC-P2P-001을 새
+`native_codex_probe_scenario`에서 한 번 실행했다. 첫 Orchestrator
+RUN-2129e629c88a가 MODEL_PROCESS_FAILED로 실패했다. Case OPEN,
+원본 work BLOCKED, OPEN JUDGMENT_REQUIRED Attention이며 발주·decision·
+audit는 0이다. nativeSignal=SIGKILL은 error/turn.failed를 받은 실행기가
+자식을 중단한 증거다. nativeExitCode와 비용·token·resolvedModel은
+null이다. 비용을 0으로 추정하지 않았다. executionReady=false,
+accountingStatus=PARTIAL, usageComplete=false이며 business pass가 아니다.
+raw JSON·XML은 `attempts/codex-probe/`와 `native/codex-probe-attempt/`에
+보존했다. 이전 Claude PASS를 덮어쓰지 않았다. Recovery 3개는 실행하지
+않았다.
+
+현재 모델 없는 account endpoint 검사는 AUTHENTICATION을 보고했다.
+같은 Orchestrator role config와 요청 model을 넣은 strict app-server
+metadata도 model/list는 성공하지만 account/rateLimits/read는 인증
+오류다. native exec help는 실제 사용한 flag를 지원한다. 이 증거를 과거
+probe 오류의 정확한 원인으로 소급 확정하지 않는다. human login 갱신
+명령과 metadata 재검사를 준비했으나 로그인·재인수를 수행하지 않았다.
+
+Codex error/turn.failed는 kill 전에 fixed frame kind·알려진 error code·
+category·HTTP status를 보존한다. workspace routing과 일반 인증,
+model 접근·quota·rate·provider·config·filesystem 문제를 구분하되
+미확인 원인은 unknown이다. raw message·prompt·credential은 저장하거나
+전달하지 않는다. 실제 child→runner의 오류 보존 회귀까지 76건이
+통과했다. helper 7건과 마지막 전체 SIT 20건도 통과했다. 더 이른 성공
+event 뒤의 실패·취소·사용량 누락을 같은 Run의 성공으로 숨기지 않는다.
+
+현재 유효한 실제 업무 인수는 Claude 001·002의 두 PASS다. Claude 004와
+QM-001은 FAIL, RC-001은 INCOMPLETE이고 Codex parity도 FAIL이다.
+현재 account 접근 gate와 Claude unknown 상태가 해소되기 전에는 전체
+5개 인수 또는 모델 간 parity 완료로 보고하지 않는다.

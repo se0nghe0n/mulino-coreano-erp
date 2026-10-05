@@ -42,9 +42,7 @@ import tools.jackson.databind.ObjectMapper;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, properties = {
         "spring.flyway.schemas=scenario", "spring.flyway.clean-disabled=false",
         "spring.flyway.init-sqls=CREATE EXTENSION IF NOT EXISTS btree_gist WITH SCHEMA public",
-        "spring.datasource.hikari.schema=scenario", "spring.main.allow-bean-definition-overriding=true",
-        "mulino.local-auth.human-secret=" + ScenarioContext.HUMAN_SECRET,
-        "mulino.local-auth.service-secret=" + ScenarioContext.SERVICE_SECRET})
+        "spring.datasource.hikari.schema=scenario", "spring.main.allow-bean-definition-overriding=true"})
 class BackendRestartRecoveryTest {
 
     /**
@@ -86,6 +84,7 @@ class BackendRestartRecoveryTest {
     @DynamicPropertySource
     static void guardDatabase(DynamicPropertyRegistry registry) {
         ScenarioGuard.requireDisposable(System.getenv("DB_URL"));
+        ScenarioSecrets.configure(registry);
     }
 
     String apiBase() { return "http://127.0.0.1:" + port + "/api/v1"; }
@@ -97,6 +96,7 @@ class BackendRestartRecoveryTest {
         flyway.clean();
         flyway.migrate();
         ReplenishmentDemoFixture.load(jdbc);
+        verifyHostBoundary();
 
         long warehouse = jdbc.sql("SELECT warehouse_id FROM warehouses WHERE plant_id='DEMO-KR-01'").query(Long.class).single();
         List<Long> products = jdbc.sql("SELECT product_id FROM products WHERE sku IN ('DEMO-AMR','DEMO-BSC') ORDER BY product_id").query(Long.class).list();
@@ -114,7 +114,7 @@ class BackendRestartRecoveryTest {
         try {
             driver.start(Map.of(
                     "MULINO_API_BASE", apiBase(),
-                    "MULINO_LOCAL_SERVICE_SECRET", ScenarioContext.SERVICE_SECRET,
+                    "MULINO_LOCAL_SERVICE_SECRET", ScenarioSecrets.service(),
                     "DEMO_CLI", HumanChannel.ROOT.resolve("agents/cli/zig-out/bin/mulino").toString(),
                     "DEMO_PLAN_INPUT", "{\"warehouseId\":" + warehouse + ",\"productIds\":" + products + "}"));
             driver.awaitState("구매 제안 승인 대기", () -> state.pendingApprovals(caseRef) >= 1, Duration.ofSeconds(60));
@@ -127,6 +127,28 @@ class BackendRestartRecoveryTest {
         assertThat(state.pendingApprovals(caseRef)).as("purchase approval pending before restart").isEqualTo(1);
         assertThat(state.plans(caseRef)).as("plan calculated exactly once before restart").isEqualTo(1);
         previousContextIdentity = contextIdentity;
+    }
+
+    private void verifyHostBoundary() throws Exception {
+        var client = java.net.http.HttpClient.newHttpClient();
+        var humanUri = java.net.URI.create(apiBase() + "/cases");
+        for (String key : List.of("scenario-human-gateway", ScenarioSecrets.service())) {
+            var request = java.net.http.HttpRequest.newBuilder(humanUri)
+                    .header("X-Mulino-Local-Human", key).header("X-Mulino-Local-Role", "OPERATOR").GET().build();
+            assertThat(client.send(request, java.net.http.HttpResponse.BodyHandlers.discarding()).statusCode())
+                    .as("public or service key cannot authorize human lookup").isEqualTo(401);
+        }
+        var claimUri = java.net.URI.create(apiBase() + "/internal/runs/claim");
+        for (String key : List.of("scenario-service-secret", ScenarioSecrets.human(), ScenarioSecrets.service())) {
+            var request = java.net.http.HttpRequest.newBuilder(claimUri)
+                    .header("X-Mulino-Local-Service", key).header("Content-Type", "application/json")
+                    .POST(java.net.http.HttpRequest.BodyPublishers.ofString("{\"workerId\":\"boundary-probe\",\"runtime\":\"CODEX\"}")).build();
+            int status = client.send(request, java.net.http.HttpResponse.BodyHandlers.discarding()).statusCode();
+            assertThat(status).as("only private service client can claim; empty queue remains empty")
+                    .isEqualTo(key.equals(ScenarioSecrets.service()) ? 204 : 401);
+        }
+        assertThat(channel().call("OPERATOR", "list_cases", Map.of()).isError())
+                .as("private human stdio client remains authorized").isFalse();
     }
 
     @Test @Order(2)
