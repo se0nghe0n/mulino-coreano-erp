@@ -1,5 +1,12 @@
 # Mulino Coreano — Dispatcher(디스패처) 이벤트 루프 스펙
 
+> 현재 source `0132e0a`는 native runner·인간 답변·구매/QC/리콜 승인·증거
+> 판단을 포함한다. 아래 foundation/PR #18의 미구현 설명은 당시 이력이다.
+> 현재 실행·쓰기 계약은 `14_cli_and_runtime.md`, `14_human_purchase_api.md`,
+> `18_inbound_quality_api.md`, `19_evidence_claim_api.md`를 따른다.
+> 최신 검증과 미인수 경계는 [포트폴리오 증거](portfolio/README.md)에 기록한다.
+
+
 > 이 문서는 Codex 구현의 **계약(contract)** 이다. `docs/08_interface_overview.md`의 "대기와 디스패처"를 실행 가능한 상태 전이 규칙으로 정형화한 하위 명세다.
 > 관련 문서: `08_interface_overview.md`(인터페이스 철학), `02_flow.md`(업무 흐름 SSOT), `03_erd.md`(스키마)
 > 구현 대상: `backend` (Spring Boot) — `DispatcherService`, `RunService`, `ContextSnapshotService`와 REST 어댑터.
@@ -161,7 +168,7 @@ Dispatcher는 다음 두 경로에서 실행된다.
 |---|---|
 | Run이 WI에 연결되고 WI가 `WAITING→READY`로 재개 | 새 Run 생성 전에 §4 재구성을 수행 |
 | 재구성 실패 시 | Run은 1회 재시도 후 `FAILED`로 기록. 스냅샷에는 마지막 성공 스냅샷 + `stale: true` 플래그를 남겨 차이를 감사 가능하게 |
-| 스냅샷 신선도 지표 | `context_snapshot->>'reconstructed_at'` 타임스탬프를 항상 기록. 대시보드에서 "최근 24h 재구성 못한 Run" 집계 가능 |
+| 스냅샷 신선도 지표 | `context_snapshot->>'reconstructed_at'` 타임스탬프를 항상 기록. 대화 조회에서 "최근 24h 재구성 못한 Run" 집계 후보. 자동 집계 인수는 별도 |
 
 ### 5-3. 현재 구현
 

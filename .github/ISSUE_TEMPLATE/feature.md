@@ -15,7 +15,6 @@ assignees: []
 - [ ] L0 - Backend (Spring Boot, MCP)
 - [ ] L1 - Governance
 - [ ] L2 - Agent
-- [ ] L3 - Dashboard
 
 ## 상세 작업 내용
 - [ ] 

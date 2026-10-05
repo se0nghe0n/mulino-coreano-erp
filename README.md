@@ -10,14 +10,33 @@
 
 ---
 
-## 아키텍처 (4개 레이어)
+## 아키텍처 (3개 레이어)
 
 | 레이어 | 구성 | 역할 |
 |---|---|---|
-| L0 | PostgreSQL 18(30개 테이블) + Spring Boot + MCP Server | ERP 데이터 및 기능을 Tool로 노출 |
-| L1 | Governance Engine | 액션성 Tool Call 가로채기 → 승인/차단/보류 라우팅 + 불변 감사 로그 |
+| L0 | PostgreSQL 18 + Spring Boot REST API | ERP와 Case 상태를 저장하고 CLI·MCP에 노출 |
+| L1 | 백엔드 도메인 승인 게이트 | 구매 MANAGER·입고 QC·리콜 ADMIN 승인과 불변 감사 |
 | L2 | Multi-Agent (Claude Code / Codex) | Orchestrator / Supply Chain / Procurement / QC |
-| L3 | 자연어 대시보드 | Intent Parsing → 결재 큐/품질 알람/추적 차트 자동 생성 |
+
+---
+
+## 구현과 인수 현황
+
+2026-10-06 기준 source `0132e0a`는 로컬 PoC다. Zig CLI와 native runner,
+구매·입고 품질·리콜 승인, 증거 판단, Supplier CRUD를 구현했다.
+현재 Supplier 기준 549건 실행 테스트(567건 발견, 18건 skip)와 scripted
+SIT 20건이 통과했다. 이 수치는 실모델 인수나 운영 배포를 뜻하지 않는다.
+10월 3일 Claude UAT 3건은 과거 source의 기록이며 현재 native UAT는
+진행 중이다. 실제 대화 클라이언트 #35 인수는 아직 남아 있다.
+
+MONITOR는 대화 MCP로 일원화했다. 전용 대시보드와 OAuth는 범위에서
+제외했다. 인증서 필수 유형 전체 검사와 자동 30일 사전 알림은 이슈 등록을
+기다리는 알려진 갭이다. 식약처 실제 전송·법정 양식 검증·개인별 운영 IAM을
+수행하지 않았다. 아래 비교표는 설계 가정과 구현 방향이며 법적 적합성
+인증이나 실제 SAP 연동을 주장하지 않는다.
+
+[범위 결정](docs/16_decisions.md)과
+[발표 자료·증거](docs/portfolio/README.md)에 검증 계층과 한계를 기록했다.
 
 ---
 
@@ -42,22 +61,23 @@
 
 | 항목 | As-Is (EU) | To-Be (한국) |
 |---|---|---|
-| 추적성 법규 | EC No 178/2002 | 식품이력추적관리법 (5일 이내 전송 의무) |
+| 추적성 설계 기준 | EU 기반 추적성 가정 | 한국 이력 추적·제출 기록 모델 |
 | 알레르겐 표시 | EU 14종 | 한국 22종 (19개 법정군 계층 관리) |
 | 인증서 종류 | HACCP/BRC/IFS | HACCP/GMP/이력추적등록 |
-| 리콜 보고 | EFSA, 24시간 | 식약처, 즉시 보고 (`regulatory_submissions`) |
-| 이력 보관 | 5년 | 소비기한 + 2년 (`v_retention_deadlines`) |
+| 리콜 보고 | EU 기반 보고 절차 가정 | 식약처 즉시 보고를 위한 OFFLINE/PENDING 초안 |
+| 이력 보관 | EU 기반 보관 정책 가정 | 소비기한 + 2년 보관 뷰와 리콜 기록 보호 |
 | 세금계산서 | 해당 없음 | 국세청 전자세금계산서 의무 관리 |
 
 ---
 
 ## 기술 스택
 
-- **DB**: PostgreSQL 18 (30개 테이블, 16종 ENUM, 46개 FK)
+- **DB**: PostgreSQL 18 (현재 DDL 61개 테이블. 원래 ERP 30개와 인터페이스
+  13개에 후속 테이블 18개를 추가했다)
 - **Backend**: Spring Boot 4.1.x + Java 21 + Gradle
 - **Tool 노출**: Single Zig CLI (`mulino`) + MCP Server
 - **Agent**: Claude Code / Codex Subagent Architecture (Orchestrator / Supply Chain / Procurement / QC)
-- **Frontend**: React 19 + Vite (자연어 대시보드)
+- **MONITOR**: 대화 MCP의 `monitor_status`·`list_attention`
 
 ---
 

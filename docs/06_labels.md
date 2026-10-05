@@ -21,7 +21,10 @@
 | `L0-backend` | 하늘 (#c5def5) | Spring Boot, MCP |
 | `L1-governance` | 하늘 (#c5def5) | 거버넌스 엔진 |
 | `L2-agent` | 하늘 (#c5def5) | 멀티 에이전트 |
-| `L3-dashboard` | 하늘 (#c5def5) | 대시보드 |
+
+전용 대시보드 범위 제외에 따라 L3 분류는 신규 작업에 사용하지 않는다.
+기존 GitHub 라벨·이슈 이력은 삭제하지 않았다. [결정 기록](16_decisions.md)을
+따른다.
 
 ## 우선순위 라벨
 
@@ -42,7 +45,9 @@
 
 보드는 [Mulino Coreano — ERP & Agent Governance](https://github.com/orgs/mulino-coreano/projects/1) 하나를 사용한다.
 
-- **마일스톤 = Phase.** `docs/00_timeline.md` 의 Phase 가 유일한 목표 단위다. 별도의 Phase 필드를 만들지 않는다.
+- **마일스톤 = Phase.** 현재 목표와 인수 상태는 GitHub milestone·issue가
+  기준이다. `docs/00_timeline.md`는 구현 이력이다. 별도 Phase 필드는
+  만들지 않는다.
 - **이슈 = 목표 1개.** 문서에만 적힌 목표는 추적되지 않는 목표다. 인수 조건은 이슈로 옮긴다.
 - **보드 Status 는 손으로 고치지 않는다.** 이슈·PR 상태에서 워크플로가 자동으로 정한다.
 - **닫는 방식이 의미를 가진다.** completed = 실제로 끝남, not planned = 폐기. 끝나지 않은 일을 not planned 로 닫지 않는다.
