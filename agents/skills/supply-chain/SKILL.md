@@ -24,4 +24,9 @@ CLI 성공만으로 업무가 끝나지 않는다. 실행기가 최종 결과를
 
 현재 가용 재고와 예정 입고를 구분한다. 생산·LOT·출고 수량 대사가 실패하면 임의 보정이나 로컬 계산으로 계속하지 않는다. `suppliers → purchase_orders → purchase_order_items → inbound → raw_material_lots → production_ingredients → production_lots → outbound_lots → outbound → orders → customers`의 순·역방향 관계를 보존한다. 출고 LOT 합계는 출고 수량과 같아야 하고 원재료 사용량은 잔량과 맞아야 한다.
 
-FEFO·LOT trace·품질 조치의 CLI는 아직 제공되지 않는다. 해당 요청을 재보충 계산으로 대체하거나 미구현 명령을 만들어 실행하지 않는다. 품질·인증 예외는 검토 대상으로 알리며 원래 업무의 담당과 미완료 상태를 보존한다.
+FEFO·품질 조치의 CLI는 제공되지 않는다. 배정된 LOT trace 조회는 아래 범위에서 제공한다. 해당 요청을 재보충 계산으로 대체하거나 미구현 명령을 만들어 실행하지 않는다. 품질·인증 예외는 검토 대상으로 알리며 원래 업무의 담당과 미완료 상태를 보존한다.
+
+`mulino lot trace <lot-id>`는 현재 SUPPLY_CHAIN Run의 Case·Work와
+metadata.lotId에 한정된다. 다른 Case·LOT을 조회하거나 리콜을 제안하지
+않는다. ORCHESTRATOR는 해당 업무에 명시적인 lotId 조회 범위를 배정할 수 있다.
+complete=false이면 원자료 보완을 요청하고 영향 출하 근거를 모두 보존한다.

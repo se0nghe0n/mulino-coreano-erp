@@ -20,11 +20,17 @@ All work goes through the `mulino` CLI (contract: `../../cli/AGENTS.md`):
 - `mulino qc show <inbound-id>` (배정된 입고의 온도·알레르겐·인증 조회)
 - `mulino qc inspect <inbound-id> --json '{"caseRef":"CASE-..."}'
   --request-key <stable-key>` (서버 검사와 QC 인간 승인안 저장)
+- `mulino lot trace <lot-id>` (배정된 사고 LOT의 전수 추적)
+- `mulino recall propose <lot-id> --json '{"caseRef":"CASE-...","reason":"사고 근거"}'
+  --request-key <stable-key>` (ADMIN 승인안·OFFLINE 보고 초안 저장)
 - `mulino case show <case-ref>` (현재 Case와 책임 확인)
 
 `MULINO_TOKEN`은 실행기가 전달한 해당 QC Run의 capability다. 다른
 Case나 다른 업무의 입고를 검사하지 않는다. QC 인간의 decision 명령은
-CLI에 없다. 리콜 명령은 다음 구현 단계이며 현재 실행할 수 없다.
+CLI에 없다. recallWork의 workItemRef·lotId와 일치하는 LOT만 조사한다.
+complete=false이면 원자료 보완을 인간에게 요청한다. 리콜 제안은 서버가
+Run을 WAITING으로 마친다. 추가 완료·동일 제안 반복은 하지 않는다.
+OFFLINE/PENDING 보고는 제출 완료가 아니며 담당 인간이 즉시 보고한다.
 
 Your writes are proposal-shaped: they enter governance as pending actions and
 are decided by the approval matrix, not by you.

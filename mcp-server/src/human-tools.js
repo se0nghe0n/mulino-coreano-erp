@@ -70,6 +70,16 @@ const qualityText = d => `입고 품질: ${show(d.approvalId ?? d.receipt?.inbou
 근거: ${show(d.proposal ?? d)}
 결정: ${show(d.decision)}`;
 export const conversationTools = [
+  read("get_lot_trace", "완제품 LOT의 전수 원재료·공급사·영향 LOT·고객 출하와 불완전 근거를 조회합니다.", "lotId", a=>`/recall/lots/${a.lotId}/trace`, d=>`LOT 추적: ${show(d)}`, true),
+  read("get_recall_approval", "ADMIN 리콜 승인안과 OFFLINE/PENDING 보고 초안, 버전·해시·보관 기한을 조회합니다.", "approvalId", a=>`/recall/approvals/${a.approvalId}`, d=>`리콜 승인: ${show(d)}`, true),
+  {name:"request_recall_investigation",scope:"work:write",write:true,description:"OPERATOR 또는 MANAGER가 동일 Case의 QC 작업에 사고 LOT과 조사 사유를 배정합니다.",
+   inputSchema:schema({lotId:identifierSchema,caseRef:refSchema,reason:{type:"string",minLength:1,maxLength:4000},requestKey:keySchema},["lotId","caseRef","reason"]),
+   validate(a){requireIdentifier(a.lotId,"lotId");requireText(a.caseRef,"caseRef",20);requireText(a.reason,"reason",4000);},
+   path:a=>`/recall/lots/${a.lotId}/assign`,body:({caseRef,reason})=>({caseRef,reason}),format:d=>`리콜 조사: ${show(d)}`},
+  {name:"decide_recall",scope:"recall:decide",write:true,description:"ADMIN 인간의 명시적 리콜 승인·반려·취소를 기록합니다. get_recall_approval의 전수 범위·버전·해시를 검토한 인간 선택만 전달하세요. APPROVE는 모든 영향 LOT을 RECALLED로 바꿉니다. OFFLINE 보고 초안은 실제 식약처 제출이 아닙니다. 자동 승인·재시도 금지.",
+   inputSchema:schema({approvalId:identifierSchema,decision:{type:"string",enum:["APPROVE","BLOCK","CANCEL"]},expectedVersion:versionSchema,proposalHash:{type:"string",pattern:"^[0-9a-f]{64}$"},reason:{type:"string",minLength:1,maxLength:4000},requestKey:keySchema},["approvalId","decision","expectedVersion","proposalHash","reason"]),
+   validate(a){requireIdentifier(a.approvalId,"approvalId");requireVersion(a.expectedVersion);requireText(a.reason,"reason",4000);if(!["APPROVE","BLOCK","CANCEL"].includes(a.decision)|| !/^[0-9a-f]{64}$/.test(a.proposalHash))throw new Error("Invalid recall decision");},
+   path:a=>`/recall/approvals/${a.approvalId}/decision`,body:({decision,expectedVersion,proposalHash,reason})=>({decision,expectedVersion,proposalHash,reason}),format:d=>`리콜 결정: ${show(d)}`},
   read("get_quality_approval", "입고 QC 승인안의 안전 근거·버전·해시·결정 상태를 조회합니다.", "approvalId", a => `/quality/approvals/${a.approvalId}`, qualityText, true),
   read("get_inbound_quality", "입고 온도·알레르겐·인증과 생산 적격성을 조회합니다.", "inboundId", a => `/quality/inbound/${a.inboundId}`, qualityText, true),
   { name:"record_production_input",scope:"work:write",write:true,description:"OPERATOR가 QC 승인된 원재료 LOT의 실제 생산 투입을 기록합니다. HOLD·차단·승인 대기는 서버가 거절합니다.",

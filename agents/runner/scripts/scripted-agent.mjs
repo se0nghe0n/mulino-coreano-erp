@@ -121,10 +121,15 @@ if (claim.agentKey === "ORCHESTRATOR") {
     assert.ok(p.executionResult);
     result = p.executionResult;
 } else if (claim.agentKey === "QC") {
-    const work=c.qualityWork.find(w=>w.workItemRef===claim.workItemRef);
-    assert.ok(work);
-    cli("qc","show",String(work.inboundId));
-    result=cli("qc","inspect",String(work.inboundId),"--json",JSON.stringify({caseRef:claim.caseRef}),"--request-key",`${claim.workItemRef}:inspect`).executionResult;
+    const recall=c.recallWork?.find(w=>w.workItemRef===claim.workItemRef);
+    if(recall){
+      const trace=cli("lot","trace",String(recall.lotId));assert.equal(trace.complete,true);
+      result=cli("recall","propose",String(recall.lotId),"--json",JSON.stringify({caseRef:claim.caseRef,reason:"완제품 컴플레인에 따른 전수 회수 조사"}),"--request-key",`${claim.workItemRef}:recall`).executionResult;
+    }else{
+      const work=c.qualityWork.find(w=>w.workItemRef===claim.workItemRef);assert.ok(work);
+      cli("qc","show",String(work.inboundId));
+      result=cli("qc","inspect",String(work.inboundId),"--json",JSON.stringify({caseRef:claim.caseRef}),"--request-key",`${claim.workItemRef}:inspect`).executionResult;
+    }
 } else throw Error("Unexpected role");
 console.log(
   JSON.stringify({

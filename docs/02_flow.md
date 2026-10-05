@@ -312,3 +312,39 @@ WAITING 후속 책임을 남기며 입고·생산을 만들어 Case를 끝내지
 15,2 base 가격과 정확한 구매 금액, version/idempotency, V24~V26과
 독립 DDL 16~18 계약은 [인간 답변·구매 결정](14_human_purchase_api.md)을
 따른다. #33의 나머지 ERP gate와 #34의 실제 데모 DB 검증은 남아 있다.
+
+### 구현된 LOT 전수 조사와 ADMIN 리콜 (#27, #33)
+
+사고 완제품 LOT의 모든 중간제품 조상을 찾아 실제 원재료 LOT·입고·
+purchase_order_items·공급사로 역추적한다. 해당 원재료를 사용한 생산 LOT과
+중간제품 자손을 모두 찾아 outbound_lots·outbound·orders·customers로
+전수 추적한다. 고객은 중복 없이 반환하며 각 고객의 출하는 모두 보존한다.
+수량은 NUMERIC 기본단위 그대로 보존한다. rawLots.incidentRoot는 사고
+LOT의 실제 원재료 조상 여부다. 다른 영향 LOT의 co-input도 근거로 보존하지만
+그 co-input만 쓴 무관한 LOT까지 영향 범위를 확장하지 않는다. 순환, 원재료 잔량, 출하 배분,
+제품·창고·주문 연결의 누락·불일치는 complete=false로 남긴다.
+
+OPERATOR 또는 MANAGER는 Case 안의 QC 작업에 사고 lotId를 배정한다.
+QC Run의 capability와 작업 metadata.lotId가 일치해야 조회·제안할 수 있다.
+공개 인간 조회에는 host Human key와 erp:read가 필요하며 승인 게이트는 없다.
+제안은 불변 source trace/hash와 영향 LOT scope를 저장하고 ADMIN 결정을
+기다린다. 이 시점에는 recalls와 물리 RECALLED 상태를 만들지 않는다.
+대신 영향 원재료·완제품은 derived barrier로 계획·투입·출고에서 제외한다.
+
+ADMIN의 활성 DB 역할과 버전·해시를 확인한 APPROVE만 전수 recalls와
+RECALLED 상태, 최종 결정·감사를 한 트랜잭션에서 기록한다. 원자료가
+바뀌면 EXPIRED와 인간 후속 판단을 남기며 ERP는 변경하지 않는다.
+BLOCK·CANCEL도 ERP를 변경하지 않으며 안전 barrier는 유지한다.
+반복 제안으로 barrier를 해제하지 않는다. EXPIRED·BLOCKED·CANCELLED 뒤에는
+같은 Case의 인간 명시 재배정과 새 Work로 다음 version을 만들 수 있다.
+이전 Work의 에이전트는 자동 재제안할 수 없으며 이전 증거·scope는 보존한다. 조사 책임은 결정 후 완료하지만
+보고·회수 조치 책임을 별도 인간 작업으로 남기므로 Case를 닫지 않는다.
+
+사고 제안과 동시에 OFFLINE/PENDING 식약처 보고 초안과 즉시 due_at을
+기록한다. submitted_at·confirmation은 NULL이며 실제 전송 기능은 없다.
+source trace·수량·고객·공급사·제안자·사유·governance ID를 JSON manifest로
+보관한다. 법정 양식 검증이나 제출 완료를 주장하지 않는다. #27의 과거
+5일 문구를 회수 보고 유예로 구현하지 않는다. 프로젝트 SSOT는 즉시 보고다.
+초안·scope·recalls는 수정·삭제·TRUNCATE를 차단한다. 최소 보관 기한은
+실제 DB 생성 시각 + 2년과 제품 expiry + 2년 중 늦은 시각이다.
+계획의 고정 업무일과 실제 증빙 생성 시각은 구분한다.

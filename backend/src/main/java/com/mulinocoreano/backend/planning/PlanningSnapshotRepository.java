@@ -435,6 +435,7 @@ public class PlanningSnapshotRepository {
                                         STOCK.WAREHOUSE_ID
                                                 .eq(warehouse)
                                                 .and(STOCK.PRODUCT_ID.in(products.keySet()))));
+        require(Boolean.TRUE.equals(dsl.fetchOne("SELECT production_lot_graph_acyclic()").get(0,Boolean.class)), "PRODUCT_INPUT_CYCLE");
         var physical = new HashMap<Long, BigDecimal>();
         for (var lot : lots) {
             long lotId = id(lot, "production_lot_id");
@@ -471,7 +472,7 @@ public class PlanningSnapshotRepository {
                             residual,
                             date(lot, "production_date"),
                             date(lot, "expiry_date"),
-                            status.equals("ACTIVE") ? null : "PRODUCT_" + status,
+                            status.equals("ACTIVE") ? (Boolean.TRUE.equals(dsl.fetchOne("SELECT recall_lot_barrier(?)",lotId).get(0,Boolean.class)) ? "RECALL_PENDING_OR_UNRESOLVED" : null) : "PRODUCT_" + status,
                             false));
         }
         for (long productId : products.keySet()) {
@@ -738,7 +739,7 @@ public class PlanningSnapshotRepository {
                             decimal(lot, "remaining_quantity"),
                             date(lot, "inbound_date"),
                             date(lot, "expiry_date"),
-                            status.equals("RELEASED") ? (qualityEligible ? null : "QUALITY_BARRIER") : "INBOUND_" + status,
+                            status.equals("RELEASED") ? (qualityEligible ? (Boolean.TRUE.equals(dsl.fetchOne("SELECT recall_raw_barrier(?)",lotId).get(0,Boolean.class)) ? "RECALL_PENDING_OR_UNRESOLVED" : null) : "QUALITY_BARRIER") : "INBOUND_" + status,
                             false));
         }
     }

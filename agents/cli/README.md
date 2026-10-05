@@ -95,3 +95,11 @@ mulino plan calculate CASE-EXAMPLE \
 --request-key KEY`로 검사를 요청한다. 결과는 `PENDING_APPROVAL`이며
 `approvalId`, `version`, `proposalHash`가 QC 인간 결정의 근거다. 서버가
 Run을 WAITING으로 마친다. CLI에는 인간 승인·반려·적용 명령이 없다.
+
+## Recall
+
+`mulino lot trace LOT_ID` reads the assigned QC or SUPPLY_CHAIN incident source and affected
+shipments. `mulino recall propose LOT_ID --json '{"caseRef":"CASE-...",
+"reason":"incident evidence"}' --request-key KEY` persists the ADMIN proposal
+and finishes the Run as WAITING. An incomplete trace cannot be proposed.
+The CLI has no human decision or regulatory transmission command.

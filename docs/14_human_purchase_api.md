@@ -150,3 +150,22 @@ local Case·work-item·Attention·Event·Monitor 조회도 gateway 인증이 필
 유지한다. 실행기 부모의 Worker API는 service secret만 사용하고 agent Docker의
 환경·인자·stdin·context에는 Human key를 전달하지 않는다. 로그인 volume에도
 저장하지 않는다. OAuth·외부 provider·운영 IAM은 이 경계의 범위가 아니다.
+
+## ADMIN 리콜 로컬 계약 (#27, #33)
+
+`GET /api/v1/recall/lots/{id}/trace`는 Human key·erp:read로 전수 근거를
+조회한다. `POST .../lots/{id}/assign`은 work:write OPERATOR·MANAGER가
+caseRef·reason과 사고 LOT을 QC 작업에 배정한다. 에이전트는
+`/api/v1/agent/recall/lots/{id}/trace` 및 `.../propose`를 해당 Case·Work·
+lotId의 살아 있는 QC capability로만 제안한다. trace 조회는 같은 배정
+경계의 SUPPLY_CHAIN capability도 허용한다. native job의 배정이며
+실제 모델 subagent 실행이나 규제 제출을 의미하지 않는다.
+
+`GET /api/v1/recall/approvals/{id}`는 version·proposalHash·전수 범위와
+OFFLINE/PENDING 보고 초안을 반환한다. `POST .../{id}/decision`은
+recall:decide ADMIN이 APPROVE·BLOCK·CANCEL, expectedVersion,
+proposalHash, reason을 Idempotency-Key와 함께 보낸다. 동일 key·입력은
+최초 결과를 반환하며 경쟁 결정은 하나만 최종 기록된다. 잘못된 key·
+agent/service 인증은 401, 올바른 Human key의 다른 역할 결정은 403이다.
+MCP 도구는 get_lot_trace, request_recall_investigation,
+get_recall_approval, decide_recall이다. CLI는 결정 명령을 제공하지 않는다.
