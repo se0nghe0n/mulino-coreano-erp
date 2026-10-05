@@ -4,16 +4,20 @@ const Allocator = std.mem.Allocator;
 pub const Command = struct { method: std.http.Method, path: []const u8, body: ?[]const u8, request_key: ?[]const u8 };
 pub fn parse(allocator: Allocator, args: []const []const u8) !Command {
     if (args.len < 2) return error.InvalidArguments;
-    const Route = enum { case_show, plan_show, plan_calculate, work_create, work_transition, material_show, po_show, po_propose, qc_show, qc_inspect, lot_trace, recall_propose };
-    const route: Route = if (eql(args[0], "case") and eql(args[1], "show")) .case_show else if (eql(args[0], "plan") and eql(args[1], "show")) .plan_show else if (eql(args[0], "plan") and eql(args[1], "calculate")) .plan_calculate else if (eql(args[0], "work") and eql(args[1], "create")) .work_create else if (eql(args[0], "work") and eql(args[1], "transition")) .work_transition else if (eql(args[0], "material") and eql(args[1], "show")) .material_show else if (eql(args[0], "po") and eql(args[1], "show")) .po_show else if (eql(args[0], "po") and eql(args[1], "propose")) .po_propose else if (eql(args[0], "qc") and eql(args[1], "show")) .qc_show else if (eql(args[0], "qc") and eql(args[1], "inspect")) .qc_inspect else if (eql(args[0], "lot") and eql(args[1], "trace")) .lot_trace else if (eql(args[0], "recall") and eql(args[1], "propose")) .recall_propose else return error.InvalidArguments;
+    const Route = enum { case_show, plan_show, plan_calculate, work_create, work_transition, material_show, po_show, po_propose, qc_show, qc_inspect, lot_trace, recall_propose, evidence_register, claim_create, claim_link };
+    const route: Route = if (eql(args[0], "case") and eql(args[1], "show")) .case_show else if (eql(args[0], "plan") and eql(args[1], "show")) .plan_show else if (eql(args[0], "plan") and eql(args[1], "calculate")) .plan_calculate else if (eql(args[0], "work") and eql(args[1], "create")) .work_create else if (eql(args[0], "work") and eql(args[1], "transition")) .work_transition else if (eql(args[0], "material") and eql(args[1], "show")) .material_show else if (eql(args[0], "po") and eql(args[1], "show")) .po_show else if (eql(args[0], "po") and eql(args[1], "propose")) .po_propose else if (eql(args[0], "qc") and eql(args[1], "show")) .qc_show else if (eql(args[0], "qc") and eql(args[1], "inspect")) .qc_inspect else if (eql(args[0], "lot") and eql(args[1], "trace")) .lot_trace else if (eql(args[0], "recall") and eql(args[1], "propose")) .recall_propose else if (eql(args[0], "evidence") and eql(args[1], "register")) .evidence_register else if (eql(args[0], "claim") and eql(args[1], "create")) .claim_create else if (eql(args[0], "claim") and eql(args[1], "link")) .claim_link else return error.InvalidArguments;
     const has_ref = route != .work_create;
     const writing = route != .case_show and route != .plan_show and route != .material_show and route != .po_show and route != .qc_show and route != .lot_trace;
-    const positional: usize = if (has_ref) 3 else 2;
+    const positional: usize = if (route == .claim_link) 4 else if (has_ref) 3 else 2;
     if (args.len < positional) return error.InvalidArguments;
     if (has_ref) {
         const ref = args[2];
         if (ref.len == 0 or ref.len > 256 or eql(ref, ".") or eql(ref, "..") or !std.unicode.utf8ValidateSlice(ref)) return error.InvalidArguments;
         for (ref) |byte| if (byte < 0x20 or byte == 0x7f) return error.InvalidArguments;
+    }
+    if (route == .claim_link) {
+        if (args[3].len == 0 or args[3].len > 19) return error.InvalidArguments;
+        for (args[3]) |byte| if (!std.ascii.isDigit(byte)) return error.InvalidArguments;
     }
     var body: ?[]const u8 = null;
     var key: ?[]const u8 = null;
@@ -36,6 +40,12 @@ pub fn parse(allocator: Allocator, args: []const []const u8) !Command {
     const encoded = if (has_ref) try encodeRef(allocator, args[2]) else try allocator.dupe(u8, "");
     defer allocator.free(encoded);
     const path = switch (route) {
+        .evidence_register => try std.fmt.allocPrint(allocator, "/agent/epistemic/cases/{s}/evidence", .{encoded}),
+        .claim_create => try std.fmt.allocPrint(allocator, "/agent/epistemic/cases/{s}/claims", .{encoded}),
+        .claim_link => blk: {
+            // Case and Claim are separate positional identifiers; see parser below.
+            break :blk try std.fmt.allocPrint(allocator, "/agent/epistemic/cases/{s}/claims/{s}/links", .{ encoded, args[3] });
+        },
         .case_show => try std.fmt.allocPrint(allocator, "/agent/cases/{s}", .{encoded}),
         .material_show => try std.fmt.allocPrint(allocator, "/agent/materials/{s}", .{encoded}),
         .lot_trace => try std.fmt.allocPrint(allocator, "/agent/recall/lots/{s}/trace", .{encoded}),
@@ -183,4 +193,12 @@ test "responses keep decimal source bytes but reject malformed or reflected cred
     try std.testing.expectError(error.InvalidResponse, validateResponse(std.testing.allocator, "not-json", "private-token"));
     try std.testing.expectError(error.SensitiveResponse, validateResponse(std.testing.allocator, "{\"error\":\"private-token\"}", "private-token"));
     try std.testing.expectError(error.SensitiveResponse, validateResponse(std.testing.allocator, "{\"nested\":[\"private-\\u0074oken\"]}", "private-token"));
+}
+
+test "evidence and claims retain source JSON while keeping human judgments outside agent CLI" {
+    const command = try parse(std.testing.allocator, &.{ "claim", "link", "CASE-1", "9007199254740993", "--json", "{\"evidenceRef\":\"EV-1\",\"relation\":\"REFUTES\"}", "--request-key", "source-link" });
+    defer std.testing.allocator.free(command.path);
+    try std.testing.expectEqualStrings("/agent/epistemic/cases/CASE-1/claims/9007199254740993/links", command.path);
+    try std.testing.expectError(error.InvalidArguments, parse(std.testing.allocator, &.{ "claim", "judge", "CASE-1", "1", "--json", "{}", "--request-key", "k" }));
+    try std.testing.expectError(error.InvalidArguments, parse(std.testing.allocator, &.{ "claim", "link", "CASE-1", "../2", "--json", "{}", "--request-key", "k" }));
 }

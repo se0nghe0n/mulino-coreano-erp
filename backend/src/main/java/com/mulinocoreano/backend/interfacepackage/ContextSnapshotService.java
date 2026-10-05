@@ -126,6 +126,7 @@ public class ContextSnapshotService {
                                 jsonb_build_object(
                                     'ref', e.evidence_ref,
                                     'source_type', e.source_type,
+                                    'provenance', to_jsonb(e),
                                     'title', e.title,
                                     'content_uri', e.content_uri,
                                     'content_hash', e.content_hash,
@@ -142,6 +143,14 @@ public class ContextSnapshotService {
                                     'subject_ref', claim.subject_ref,
                                     'claim_text', claim.claim_text,
                                     'status', claim.status::text,
+                                    'revision', claim.revision,
+                                    'writer_principal', claim.writer_principal,
+                                    'supersedes_claim_id', claim.supersedes_claim_id,
+                                    'supersession_reason', claim.supersession_reason,
+                                    'judgment_stale', claim.judgment_stale,
+                                    'judgment_fingerprint', claim.judgment_fingerprint,
+                                    'judgments', COALESCE((SELECT jsonb_agg(to_jsonb(j) ORDER BY j.revision)
+                                        FROM claim_judgments j WHERE j.claim_id=claim.claim_id), '[]'::jsonb),
                                     'asserted_by', CASE
                                         WHEN claim.asserted_by_agent_id IS NOT NULL THEN jsonb_build_object(
                                             'actor_type', 'AGENT',
@@ -166,7 +175,8 @@ public class ContextSnapshotService {
                                         SELECT jsonb_agg(
                                             jsonb_build_object(
                                                 'ref', linked_evidence.evidence_ref,
-                                                'relation', ce.relation)
+                                                'relation', ce.relation,
+                                                'provenance', to_jsonb(ce))
                                             ORDER BY linked_evidence.evidence_id, ce.relation)
                                         FROM claim_evidence ce
                                         JOIN evidence linked_evidence

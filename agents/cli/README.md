@@ -103,3 +103,19 @@ shipments. `mulino recall propose LOT_ID --json '{"caseRef":"CASE-...",
 "reason":"incident evidence"}' --request-key KEY` persists the ADMIN proposal
 and finishes the Run as WAITING. An incomplete trace cannot be proposed.
 The CLI has no human decision or regulatory transmission command.
+
+Evidence/Claim (#44): live Run에 Case 참여가 있어야 한다.
+
+```sh
+mulino evidence register CASE_REF --json '{"sourceType":"EMAIL","externalRef":"mail-1","observedAt":"2026-10-05T12:30:00+09:00","title":"납기 관측","content":"내일 도착"}' --request-key source-1
+mulino claim create CASE_REF --json '{"subjectType":"ETA","subjectRef":"PO-1","claimText":"내일 도착한다"}' --request-key claim-1
+mulino claim link CASE_REF CLAIM_ID --json '{"evidenceRef":"EV-...","relation":"SUPPORTS"}' --request-key link-1
+```
+
+정정은 `evidence register`에 `correctsEvidenceRef`와 `correctionReason`을
+추가한다. 기존 원본은 보존한다. 에이전트는 VERIFIED/REFUTED 판단을
+쓰지 않는다. Case 조회의 `epistemic`에는 출처와 정정·판단 이력이 남는다.
+
+기존 CONFLICTED를 지우지 않고 새 해석을 판단할 때는 `claim create` JSON에
+`supersedesClaimId`·`supersessionReason`을 추가한다. Case와 subjectType/ref가
+같아야 한다. 새 ASSERTED에 검토한 현재 원본을 별도로 연결한다.
