@@ -95,8 +95,9 @@ Run 사용량을 별도로 저장한다. 사용량 로그가 없는 Run은
 사용량이 없는 경우도 보고된 사용량으로 취급하지 않는다. 모델 비용은 가격표로 추정하지 않는다.
 
 각 역할은 source Work Item/Run으로 전환한다. 이 증거를 native
-subagent 실행 성공으로 해석하지 않는다. QC·리콜 pending script는
-해당 기능 구현이나 한국 규제 전체의 인수 증거가 아니다.
+subagent 실행 성공으로 해석하지 않는다. 과거 QC·리콜 pending script의
+존재는 구현 증거가 아니었다. 현재 QM·RC는 각각 SIT 6건을 통과했지만,
+실모델의 실패·불완전 인수와 한국 규제 전체의 검증을 대신하지 않는다.
 
 이미 종료된 backend COMPLETED 결과를 heartbeat로 확인하면 runner는
 revoked capability를 갱신하지 않고 최대 60초의 종료 유예만 둔다.
