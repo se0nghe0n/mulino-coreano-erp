@@ -40,11 +40,14 @@
 native 모델이 실행한 production 기준 source는
 `0132e0a62ad9f086e5c70c5c857d4546f5921ef9`다.
 이는 fork의 통합 baseline이며 조직 `main` 병합을 뜻하지 않는다.
-선행 변경의 현재 로컬 proof를 해당 source와 함께 기록한다. native
-인수·runner/test harness의 최종 source는
+선행 변경의 현재 로컬 proof를 해당 source와 함께 기록한다. 원래 native
+인수·runner/test harness의 source는
 `2d2a900b59a8704e27a4462740196b2c4902829b`다. 모델이 실행한 CLI·role·JAR와
 image는 시도 중 변경하지 않았다. `evidence.json`에 각 파일·image·JAR 및
-최종 harness hash를 기록했다.
+최종 harness hash를 기록했다. 후속 recovery 진단 source는
+`e61ded2e93c0e241be62d87347534503652d74dc`이며 이번 발표 수정의 통합
+baseline은 `5a6addae8b60930a65bea7279f8deb82f762ef10`이다. production
+CLI·role·JAR·image를 바꾸지 않은 logging-only 진단 보강이다.
 통합 검증 baseline은
 `fe6a51fadd2493018da59babd4a2eea908c2931f`다. `clean test bootJar sitTest`가
 8분 58초에 끝났고 569건 발견·18건 skip·551건 실행 통과, SIT 20건 통과,
@@ -56,8 +59,8 @@ image는 시도 중 변경하지 않았다. `evidence.json`에 각 파일·image
 
 | 계층 | 실제 관측 | source·한계 |
 |---|---|---|
-| 현재 통합 실행 테스트 | 569 발견, 18 skip, 551 통과, 실패·오류 0 | fe6a51f, clean test bootJar sitTest |
-| 현재 통합 scripted SIT | 20 통과, 실패·오류·skip 0 | fe6a51f, 모델 호출 0 |
+| 통합 실행 테스트 checkpoint | 569 발견, 18 skip, 551 통과, 실패·오류 0 | fe6a51f, clean test bootJar sitTest |
+| 통합 scripted SIT checkpoint | 20 통과, 실패·오류·skip 0 | fe6a51f, 모델 호출 0 |
 | 과거 Supplier 실행 테스트 | 567 발견, 18 skip, 549 통과, 실패 0 | 0132e0a |
 | Supplier scripted SIT checkpoint | P2P 6, QM 6, RC 6, 재시작 2, 합계 20 통과 | Supplier 통합 baseline |
 | 도구 단위·smoke | MCP 26, runner 57, Zig 7, CLI 32 통과 | #44 0ee144c의 별도 기록 |
@@ -67,9 +70,10 @@ image는 시도 중 변경하지 않았다. `evidence.json`에 각 파일·image
 | Supplier 현재 JAR | CRUD 5, Swagger 5, 감사 3, canonical replay | soft delete·version 충돌 확인 |
 | 구매 데모 | 5/5 | #34 d7ce2d8, 실제 인간 stdio, 모델 호출 없음 |
 | 과거 native UAT | 10월 3일 Claude 3건 통과 | cb04403. 현재 source 인수로 이월하지 않음 |
-| 현재 Claude native UAT | PASS 2, FAIL 2, INCOMPLETE 1 | source 2d2a900, 전체 인수 미완료 |
+| 원래 Claude native UAT | PASS 2, FAIL 2, INCOMPLETE 1 | source 2d2a900, 이력 보존 |
+| 후속 Recovery 3 | P2P-004·QM-001·RC-001 모두 FAIL, ERP 쓰기 0 | source e61ded2, 인수 회복 없음 |
 | Codex parity | P2P-001 FAIL, 제안 전 실행 실패 | 비용·tokens·resolvedModel unknown |
-| 최신 runner·helper·SIT | runner 76, helper 7, SIT 20 통과 | SIT는 마지막 logging-only Codex 진단 확장 전 |
+| 최신 logging-only 진단 검증 | runner 82, helper 7 통과 | full Unit·SIT 재실행 없음 |
 | 실제 클라이언트 #35 | 인수 대기 | 로컬 stdio 구현과 별도 |
 | 운영 배포 | 미실시 | 로컬 PoC 범위 |
 
@@ -82,7 +86,7 @@ image는 시도 중 변경하지 않았다. `evidence.json`에 각 파일·image
 
 CLAUDE / `claude-sonnet-5`의 유효한 업무 인수는 두 PASS다.
 
-| Case | 현재 판정과 업무 결과 | CLI 보고 비용 USD |
+| Case | 원래 판정과 업무 결과 | CLI 보고 비용 USD |
 |---|---|---:|
 | P2P-001 | PASS. PO 1·16,500원, coordinator DONE·Case WAITING, 5 Run 사용량 완전 | 3.0874898 |
 | P2P-002 | PASS. MANAGER BLOCK, PO·followup 0, coordinator ABORTED·Case OPEN, 5 Run 사용량 완전 | 3.2866446 |
@@ -98,8 +102,9 @@ QM의 0은 실제 CLI 보고값이며 unknown을 0으로 바꾼 값이 아니다
 JSON의 PASSED는 보존하고 별도 INCOMPLETE 분류를 적용했다. 유효한 RC
 재인수 증거는 없다. 초기 모델 실패의 정확한 원인은 unknown이다.
 
-알려진 CLI 보고 비용 합계는 USD 12.661439다. RC와 Codex 등 미보고
-항목이 있으므로 전체 시도 비용과 불완전한 사용량은 unknown으로 유지한다.
+원래 시도의 알려진 CLI 보고 비용 소계는 USD 12.661439다. 후속 최소
+성공 진단 USD 0.001066을 더한 최신 알려진 소계는 USD 12.662505다.
+RC와 Codex 등 미보고 항목이 있으므로 전체 시도 비용과 불완전한 사용량은 unknown으로 유지한다.
 CODEX / `gpt-5.6-sol` (catalog default low)의 P2P-001은 첫 Run에서
 MODEL_PROCESS_FAILED로 실패했다. proposal 이전이며 비용·tokens·resolvedModel은
 unknown이고 executionReady=false, accountingStatus=PARTIAL이다.
@@ -109,6 +114,28 @@ unknown이고 executionReady=false, accountingStatus=PARTIAL이다.
 인간 login 갱신·metadata 재검사 절차를 준비했지만 실행하지 않았다.
 현재 5개 native 모델 인수·Codex parity·실제 클라이언트 #35는 완료하지
 않았다. 운영 배포·OAuth·개인 IAM·규제 자동화의 증거로 확대하지 않는다.
+
+### 후속 Recovery와 제한된 진단
+
+새 Recovery 3건의 P2P-004·QM-001·RC-001은 모두 첫 Run에서 FAIL이다.
+ERP 쓰기는 0건이며 Case OPEN, executionReady=false,
+accountingStatus=PARTIAL, usageComplete=false다. CLI 보고 비용은 각 0이지만
+전체 비용 unknown을 0으로 바꾸지 않는다. 원래 004·QM FAIL과 RC
+INCOMPLETE, 유효한 001·002 PASS를 별도 이력으로 보존한다.
+
+normal RW mount의 최소 Claude 진단은 USD 0.001066으로 성공했다.
+업무 인수 성공의 증거로 세지 않는다. production schema와 기본 boolean
+schema의 no-tool 진단은 각 USD 0.045 budget에서 모두 FAIL이며 같은
+error fingerprint를 남겼다. USD 0.045는 cap이며 실제 보고 비용이 아니다.
+raw 오류 원문을 폐기한 상태이므로 정확한 원인은 unknown이다.
+
+특정 production schema keyword나 인증 문제를 원인으로 확정하지 않는다.
+tools-disabled와 structured-output/schema·budget 경로의 상호작용,
+최소 성공 진단의 USD 0.05와 probe USD 0.045 조건 차이는 남은 한계다.
+진단 수정의 runner 82건과 helper 7건만 검증했다. fe6a51f의 통합 551건·
+SIT 20건 checkpoint는 유지하며 이 logging-only 변경 뒤 재실행한 결과로
+바꾸지 않는다. 실제 클라이언트 #35, Codex 현재 AUTHENTICATION 접근 gate,
+인간 login 갱신 미실행과 전체 native 인수 미완료는 그대로다.
 
 ## 규제와 권한의 한계
 
