@@ -329,3 +329,67 @@ event 뒤의 실패·취소·사용량 누락을 같은 Run의 성공으로 숨�
 QM-001은 FAIL, RC-001은 INCOMPLETE이고 Codex parity도 FAIL이다.
 현재 account 접근 gate와 Claude unknown 상태가 해소되기 전에는 전체
 5개 인수 또는 모델 간 parity 완료로 보고하지 않는다.
+
+
+### 3차 audit 및 남은 Claude 3개 재시도
+
+정상 writable auth mount의 no-tool 진단은 exit 0·OK이며
+resolvedModel=claude-sonnet-5, input 513·output 4, CLI 보고 USD
+0.001066으로 성공했다. 증거는 `native/third-audit-claude-diagnostic.json`이다.
+이 결과는 이전 read-only 진단과 달라 최소 모델 호출의 현재 접근을
+확인한다. 이전 실패 원인을 인증 문제로 소급 확정하지 않는다.
+
+clean `2d2a900b59a8704e27a4462740196b2c4902829b`에서 기존 image/model/
+auth volume의 정상 mount를 유지하고 새 `native_claude_recovery_third_scenario`
+DB로 TC-P2P-004·TC-QM-001·TC-RC-001만 실행했다. 유효한 001·002는
+재실행하지 않았다. 과거 default build 파일은 clean 뒤 없었으므로
+보존한 raw 증거를 `attempts/pre-third-audit-recovery/`에 복구했다.
+
+20초의 세 업무 task는 모두 첫 Run에서 MODEL_PROCESS_FAILED로 실패했다.
+category는 UNKNOWN_NATIVE_FAILURE이며 resolvedModel은 null이다.
+CLI가 비용·input/output/cache를 각각 0, turns를 1로 보고했다.
+이는 관찰한 보고값이며 실제 사용량이 미보고된 다른 시도를 0으로 만든
+것이 아니다. 모든 Case는 OPEN이고 실행한 work는 BLOCKED,
+JUDGMENT_REQUIRED Attention은 OPEN이다. 발주·decision·audit·QC 검사·
+리콜 제안은 0이다. sanitized work/Attention/audit snapshot을 fixture
+초기화 전에 저장했다. executionReady=false, accountingStatus=PARTIAL,
+usageComplete=false이며 세 건 모두 FAIL이다.
+
+원본 JSON·XML·로그·source/image/CLI/JAR/host harness hash는
+`native/recovery-third-audit/`와 `attempts/third-audit-recovery/`에 보존했다.
+전체 CLI·role·JAR 및 production validation을 변경하지 않았다. 새로운
+로그인·provider/model/tier 대체나 Codex 호출을 하지 않았다.
+
+전체 role과 최소 호출의 차이를 조사한 뒤 조정자가 두 개의 개별 최소
+진단을 승인했다. 둘 다 Sonnet 5·같은 writable mount·no ERP key·no role
+append·tools disabled·USD 0.045 budget·35초 제한을 유지했다. 첫 진단은
+정확한 production schema에서 draft URI만 제거했고, 두 번째는
+`{ok: boolean}` 기본 schema다. 둘 다 exit 1·success subtype/error flag,
+resolvedModel 없음·CLI 보고 비용/토큰 0·turns 1로 실패했다.
+두 error fingerprint는 동일하다.
+
+`8378c30e44e0ccecc1544d814a0fd4ad9f168c645c2716d0c0c49d52c7f111f0`
+
+이는 두 probe 조건에서 특정 production keyword만을 원인으로 삼을
+근거를 약화한다. 그러나 tools-disabled × structured-output 상호작용,
+최소 성공 호출의 USD 0.05와 probe의 USD 0.045 차이, 일반 처리 경로는
+분리하지 못했다. 전체 runtime의 structured-output 불가나 인증 실패를
+증명한 것이 아니다. 도움말은 flag를 지원하고 schema는 유효한 JSON이다.
+배포된 CLI binary에는 Ajv와 해당 keyword marker가 있으나 marker 존재는
+deployed validator/API 지원의 증거가 아니다. 근거 있는 production 수정은
+없어 validation을 약화하지 않았다.
+
+free-form raw 오류는 즉시 버렸으므로 이후 의미 검토에 사용할 수 없다.
+허용된 key 이름·primitive count·fingerprint와 schema/tool/filesystem/config/
+output/context의 fixed category만 증거에 남긴다. 현재 두 probe의 category는
+unknown으로 유지한다. SDK 오류 텍스트나 credential·prompt를 공개하지
+않았으며 더 이상의 paid call을 하지 않았다.
+
+이 logging-only 진단 보강의 runner 82건과 helper 7건을 검증했다.
+기존 business/readiness gate의 전체 SIT 20건은 앞선 기록으로 유지하고
+진단 metadata 변경 때문에 전체 Unit/SIT를 다시 실행하지 않았다.
+유효한 실제 인수는 여전히 Claude 001·002의 두 PASS다. 원래 004/QM FAIL,
+RC INCOMPLETE와 새 Recovery 3건 FAIL, Codex parity FAIL을 모두 보존한다.
+Known 보고 비용은 기존 USD 12.661439에 최소 성공 진단 USD 0.001066을
+더한 USD 12.662505다. 이전 RC·Codex 등 미보고 비용이 있으므로 전체
+시도 비용은 unknown이다. 현재 전체 5개 실제 인수는 완료되지 않았다.

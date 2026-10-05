@@ -109,3 +109,18 @@ null로 유지함을 검증한다. model_finished 누락·native cancellation·
 않는다. Codex native error frame→executor kill→runner failure 로그의
 행동 회귀는 credential과 free-form 오류가 출력되지 않으면서 정해진
 category/status가 유지되는지 확인한다. 현재 runner 76건이 통과했다.
+
+
+### 3차 audit의 진단 증거 보강
+
+whole-role 실패가 최소 no-tool 성공과 다른 조건에서 발생하므로 이를
+인증 실패라고 재분류하지 않는다. parser는 schema/tool/filesystem/config/
+output validation/context 문제를 정해진 category로 줄이고, 허용된 key
+이름·primitive count·error fingerprint만 남긴다. fixture의 raw sentinel과
+오류 문장이 출력되지 않는 회귀까지 runner 82건을 검증한다. business와
+readiness 조건·native schema·반려·ERP approval guard는 바꾸지 않았다.
+
+production/basic schema probe의 동일 fingerprint는 실제 오류 문장이나
+특정 keyword 원인을 제공하지 않는다. raw 원문은 버린 상태다. 최소
+진단을 실제 업무 PASS로 세지 않고 Recovery 3건의 zero-write 실패와
+기존 유효 PASS·실패·INCOMPLETE 이력을 별도로 유지한다.

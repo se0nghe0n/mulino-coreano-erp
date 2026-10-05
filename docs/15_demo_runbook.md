@@ -148,3 +148,18 @@ Run의 보고 사용량까지 확인한다. OFFLINE/PENDING 리콜 초안은 실
 image·volume·UID·격리를 유지하고 credential을 읽거나 export하지
 않는다. 로그인 갱신을 실행하지 않았으며 인간의 선택을 기다린다.
 production OAuth/IAM이나 현재 5개 실제 모델 인수의 완료 증거가 아니다.
+
+### 3차 audit 뒤 Claude 재인수 시도
+
+정상 writable mount의 no-tool Claude 진단은 같은 Sonnet 5에서 exit 0,
+OK, resolvedModel 및 USD 0.001066 보고 사용량으로 성공했다. 이는 최소
+모델 호출의 현재 접근 증거이며 전체 role 실행이나 업무 인수의 증거는
+아니다. 이 확인 뒤 004·QM-001·RC-001만 새 DB에서 재시도했다.
+
+세 업무는 첫 Run에서 실패했고 ERP 쓰기는 없었다. 생산 schema와 기본
+boolean schema의 tools-disabled 최소 진단도 같은 error fingerprint로
+실패했다. 현재 Claude를 인증 불가라고 단정하거나 특정 schema keyword가
+원인이라고 판단하지 않는다. tools-disabled와 structured-output의 상호
+작용 및 budget·일반 처리 경로도 미해결이다. 원래 validation은 유지했고
+추가 호출이나 로그인 변경은 하지 않았다. 상세 증거는 16번 문서를
+따른다.
