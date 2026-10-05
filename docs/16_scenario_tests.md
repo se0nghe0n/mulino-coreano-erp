@@ -189,3 +189,11 @@ Flyway의 schema는 기존 events.external_ref 열 순서를 제외하고 같았
 검사는 pending·QC 승인·MANAGER 거절·반려·취소·생산 잔량·불변 감사와
 현재 만료 LOT 거절을 확인했다. receiving REST와 실제 모델 UAT를
 검증한 것으로 보고하지 않는다.
+
+### 배치 리콜 구현 증거 (#27)
+
+RC-001~006은 실제 CLI/runner QC 조사·제안과 인간 ADMIN stdio MCP를
+사용한다. 2단계 중간제품, 10개 영향 LOT, 원재료 3개, 고객 2명,
+115개 출하 fixture로 전수 추적·승인 전 불변·ADMIN 승인·권한 거절·
+반려·취소를 검증한다. 보고는 OFFLINE/PENDING 초안이며 제출 증거가 아니다.
+SIT는 scripted agent 증거다. 실제 모델 UAT는 별도 실행·비용 게이트다.

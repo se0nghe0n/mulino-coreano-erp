@@ -26,6 +26,16 @@ public final class HumanChannel {
             pb.environment().keySet().retainAll(java.util.Set.of("PATH", "HOME"));
             pb.environment().put("MULINO_LOCAL_HUMAN_SECRET", ScenarioContext.HUMAN_SECRET);
             Process p = pb.start();
+            // Full LOT traces/approval reports can exceed a process pipe buffer. Drain stdout
+            // while the helper is running; waiting first would deadlock a valid large response.
+            // Retain the complete JSON, including every affected customer/shipment row.
+            var stdout = new java.io.ByteArrayOutputStream();
+            Thread stdoutReader = new Thread(() -> {
+                try (var stream = p.getInputStream()) { stream.transferTo(stdout); }
+                catch (java.io.IOException ignored) { /* process ended or pipe was closed */ }
+            }, "human-channel-stdout-" + role);
+            stdoutReader.setDaemon(true);
+            stdoutReader.start();
             // human.mjs's StdioClientTransport inherits stderr from the spawned mcp-server child
             // (its "mulino-erp stdio MCP server running" log and any diagnostics). Left unread,
             // that pipe can fill and stall the whole call until the 30s kill below. Drain it on a
@@ -57,7 +67,9 @@ public final class HumanChannel {
                 throw new AssertionError(role + " " + tool + " timed out" + stderrTail(stderr));
             }
             stderrReader.join(2000);
-            String out = new String(p.getInputStream().readAllBytes()).trim();
+            stdoutReader.join(2000);
+            if (stdoutReader.isAlive()) throw new AssertionError(role + " " + tool + " output did not close");
+            String out = stdout.toString(java.nio.charset.StandardCharsets.UTF_8).trim();
             if (p.exitValue() != 0 || out.isEmpty()) throw new AssertionError(role + " " + tool + " failed to run" + stderrTail(stderr));
             JsonNode line = mapper.readTree(out.substring(out.lastIndexOf('\n') + 1));
             return new ToolResult(line.path("isError").asBoolean(), line.path("content"));

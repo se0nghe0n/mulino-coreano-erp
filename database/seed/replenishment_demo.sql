@@ -37,7 +37,7 @@ DECLARE
     item RECORD;
     day_offset INT;
 BEGIN
-    IF EXISTS (SELECT 1 FROM users WHERE email<>'quality-service@mulino.internal') OR EXISTS (SELECT 1 FROM products)
+    IF EXISTS (SELECT 1 FROM users WHERE email NOT IN ('quality-service@mulino.internal','recall-service@mulino.internal')) OR EXISTS (SELECT 1 FROM products)
        OR EXISTS (SELECT 1 FROM suppliers) OR EXISTS (SELECT 1 FROM raw_materials)
        OR EXISTS (SELECT 1 FROM warehouses) OR EXISTS (SELECT 1 FROM customers)
        OR EXISTS (SELECT 1 FROM orders) OR EXISTS (SELECT 1 FROM purchase_orders)

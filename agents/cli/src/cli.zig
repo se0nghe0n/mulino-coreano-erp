@@ -4,10 +4,10 @@ const Allocator = std.mem.Allocator;
 pub const Command = struct { method: std.http.Method, path: []const u8, body: ?[]const u8, request_key: ?[]const u8 };
 pub fn parse(allocator: Allocator, args: []const []const u8) !Command {
     if (args.len < 2) return error.InvalidArguments;
-    const Route = enum { case_show, plan_show, plan_calculate, work_create, work_transition, material_show, po_show, po_propose, qc_show, qc_inspect };
-    const route: Route = if (eql(args[0], "case") and eql(args[1], "show")) .case_show else if (eql(args[0], "plan") and eql(args[1], "show")) .plan_show else if (eql(args[0], "plan") and eql(args[1], "calculate")) .plan_calculate else if (eql(args[0], "work") and eql(args[1], "create")) .work_create else if (eql(args[0], "work") and eql(args[1], "transition")) .work_transition else if (eql(args[0], "material") and eql(args[1], "show")) .material_show else if (eql(args[0], "po") and eql(args[1], "show")) .po_show else if (eql(args[0], "po") and eql(args[1], "propose")) .po_propose else if (eql(args[0], "qc") and eql(args[1], "show")) .qc_show else if (eql(args[0], "qc") and eql(args[1], "inspect")) .qc_inspect else return error.InvalidArguments;
+    const Route = enum { case_show, plan_show, plan_calculate, work_create, work_transition, material_show, po_show, po_propose, qc_show, qc_inspect, lot_trace, recall_propose };
+    const route: Route = if (eql(args[0], "case") and eql(args[1], "show")) .case_show else if (eql(args[0], "plan") and eql(args[1], "show")) .plan_show else if (eql(args[0], "plan") and eql(args[1], "calculate")) .plan_calculate else if (eql(args[0], "work") and eql(args[1], "create")) .work_create else if (eql(args[0], "work") and eql(args[1], "transition")) .work_transition else if (eql(args[0], "material") and eql(args[1], "show")) .material_show else if (eql(args[0], "po") and eql(args[1], "show")) .po_show else if (eql(args[0], "po") and eql(args[1], "propose")) .po_propose else if (eql(args[0], "qc") and eql(args[1], "show")) .qc_show else if (eql(args[0], "qc") and eql(args[1], "inspect")) .qc_inspect else if (eql(args[0], "lot") and eql(args[1], "trace")) .lot_trace else if (eql(args[0], "recall") and eql(args[1], "propose")) .recall_propose else return error.InvalidArguments;
     const has_ref = route != .work_create;
-    const writing = route != .case_show and route != .plan_show and route != .material_show and route != .po_show and route != .qc_show;
+    const writing = route != .case_show and route != .plan_show and route != .material_show and route != .po_show and route != .qc_show and route != .lot_trace;
     const positional: usize = if (has_ref) 3 else 2;
     if (args.len < positional) return error.InvalidArguments;
     if (has_ref) {
@@ -38,6 +38,8 @@ pub fn parse(allocator: Allocator, args: []const []const u8) !Command {
     const path = switch (route) {
         .case_show => try std.fmt.allocPrint(allocator, "/agent/cases/{s}", .{encoded}),
         .material_show => try std.fmt.allocPrint(allocator, "/agent/materials/{s}", .{encoded}),
+        .lot_trace => try std.fmt.allocPrint(allocator, "/agent/recall/lots/{s}/trace", .{encoded}),
+        .recall_propose => try std.fmt.allocPrint(allocator, "/agent/recall/lots/{s}/propose", .{encoded}),
         .qc_show => try std.fmt.allocPrint(allocator, "/agent/quality/inbound/{s}", .{encoded}),
         .qc_inspect => try std.fmt.allocPrint(allocator, "/agent/quality/inbound/{s}/inspect", .{encoded}),
         .po_show => try std.fmt.allocPrint(allocator, "/agent/purchase-orders/{s}", .{encoded}),
@@ -140,6 +142,8 @@ test "writes require explicit stable keys and preserve exact body bytes" {
 test "supported routes include purchasing reads and proposal but not approval" {
     const allocator = std.testing.allocator;
     const examples = [_]struct { args: []const []const u8, path: []const u8 }{
+        .{ .args = &.{ "lot", "trace", "1" }, .path = "/agent/recall/lots/1/trace" },
+        .{ .args = &.{ "recall", "propose", "1", "--json", "{}", "--request-key", "k" }, .path = "/agent/recall/lots/1/propose" },
         .{ .args = &.{ "qc", "show", "1" }, .path = "/agent/quality/inbound/1" },
         .{ .args = &.{ "qc", "inspect", "1", "--json", "{}", "--request-key", "k" }, .path = "/agent/quality/inbound/1/inspect" },
         .{ .args = &.{ "material", "show", "1" }, .path = "/agent/materials/1" },

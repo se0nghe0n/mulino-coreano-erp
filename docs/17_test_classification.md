@@ -55,3 +55,13 @@ raw LOT 자체 만료 guard의 마지막 변경은 QC 15건과 전체 SIT 14건�
 SIT에서는 P2P 6개·QM 6개·실제 backend 재시작 2개가 통과한다. RC 3개는
 다음 리콜 구현 단계의 pending이다. MCP 18건, runner 56건, Zig smoke
 32건 및 Zig unit/build도 통과했다. 실제 모델 UAT는 실행하지 않았다.
+
+### 리콜 전수 추적과 ADMIN 결정 (#27, #33)
+
+LOT graph·원재료 잔량·출하 배분·고객 전수성, 승인 역할·source freshness,
+경쟁 결정·replay·rollback, 생산·출고·계획 barrier, 불변 초안·기록의 최소
+보관은 Goal 1·2·4·6의 Unit/integration 규칙으로 검증한다. RC-001~006은
+실제 CLI/runner와 인간 stdio MCP를 통과하는 SIT다. OFFLINE/PENDING
+보고 초안이 있으므로 실제 식약처 전송·법정 양식 검증은 완료로 분류하지
+않는다. 고정 planningClock은 업무일이며 보관 최소 기한은 DB 생성 시각을
+따른다. 실제 모델 UAT 증거는 scripted SIT와 별도로 수집한다.

@@ -30,6 +30,9 @@ public class RunExecutionRepository {
     private static final DayToSecond MAX_RUNTIME = DayToSecond.valueOf(Duration.ofSeconds(600));
     private final DSLContext dsl;
 
+    public boolean pendingRecall(long action,long caseId,long work,long agent) {
+        return Boolean.TRUE.equals(dsl.fetchOne("SELECT EXISTS(SELECT 1 FROM recall_proposals q JOIN governance_actions a USING(governance_action_id) WHERE q.governance_action_id=? AND q.case_id=? AND q.work_item_id=? AND q.proposed_by_agent_id=? AND a.status='PENDING')",action,caseId,work,agent).get(0,Boolean.class));
+    }
     public boolean pendingQuality(long action,long caseId,long work,long agent) {
         return Boolean.TRUE.equals(dsl.fetchOne("SELECT EXISTS(SELECT 1 FROM inbound_inspections q JOIN governance_actions a USING(governance_action_id) WHERE q.governance_action_id=? AND q.case_id=? AND q.work_item_id=? AND q.proposed_by_agent_id=? AND a.status='PENDING')",action,caseId,work,agent).get(0,Boolean.class));
     }

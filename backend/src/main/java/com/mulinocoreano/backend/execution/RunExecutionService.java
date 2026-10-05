@@ -207,6 +207,15 @@ public class RunExecutionService {
     }
 
     @Transactional
+    public Receipt awaitRecallApproval(long runId,long actionId,String summary) {
+        RunLeaseRepository.requireTransaction();
+        var row=leases.lock(runId); leases.requireLive(row);
+        if (!"QC".equals(row.agentKey()) || !repository.pendingRecall(actionId,row.caseId(),row.workId(),row.agentId()) || hasActiveWait(row.workId()))
+            throw conflict("QC approval is not pending for this Run");
+        return finishLocked(row,"WAITING",summary,List.of(new Wait("APPROVAL",Map.of("approval_id",Long.toString(actionId)),"ADMIN 리콜 승인 필요")),true);
+    }
+
+    @Transactional
     public Map<String, Object> retry(String runRef, String workerId, String token) {
         var row = workerLease(runRef, workerId, token);
         if (!Set.of("FAILED", "ABORTED").contains(row.status()))
