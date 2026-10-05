@@ -30,6 +30,9 @@ public class HumanSteps {
     @When("MANAGER가 구매 제안을 승인한다")
     public void managerApproves() { decide("MANAGER", "APPROVE", "scenario-approve"); }
 
+    @When("MANAGER가 구매 제안을 취소한다")
+    public void managerCancels() { decide("MANAGER", "CANCEL", "scenario-cancel"); }
+
     @When("MANAGER가 구매 제안을 반려한다")
     public void managerBlocks() { decide("MANAGER", "BLOCK", "scenario-block"); }
 

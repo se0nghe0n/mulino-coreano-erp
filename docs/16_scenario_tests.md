@@ -143,3 +143,31 @@ USD 13.8235666이지만 이전 Procurement 비용이 unknown이므로
 전체 시도 비용은 확정하지 않는다. 전체 ledger와 Run 증거는
 `backend/build/uat/2026-10-03/`에 보존했다. 실제 인수는 source
 역할 Run의 검증이며 native subagent 수행 증거로 바꾸어 말하지 않는다.
+
+## 2026-10-05 #34 CANCEL 검증 기록
+
+PENDING 구매안의 MANAGER CANCEL을 위한 TC-P2P-006을 @sit로 추가했다.
+취소 후 승인 시도가 기존 CANCELLED 상태를 유지하며 발주·후속 업무를
+만들지 않는 업무 결과를 검증한다. @uat로 추가하거나 모델을 호출하지
+않았다. 기존 5개 업무 시나리오와 QM 5개·리콜 3개의 pending 범위는 유지한다.
+
+Java 21.0.12.1, PostgreSQL 18.6, Node 24.16.0에서 새 폐기용 DB로
+`./gradlew clean test bootJar --no-daemon`이 1분 51초에 통과했다.
+Unit 491건, scenario skipped 14건이며 XML 합계 505건의 실패·오류는 0이다.
+`npm test`는 15건 통과했다. `./gradlew sitTest --no-daemon`은 1분 35초에
+업무 6개·실제 backend 재시작 2건을 통과했다. pending 8건은 skipped이며
+SIT XML 합계는 16건이다. 로그와 XML은
+`/tmp/mulino-cancel-34-20261005/`에 보관했다.
+
+새 DDL 00–20와 seeds, 새 Flyway V1–V28 DB의 columns·constraints·
+indexes·enums·functions·triggers는 semantic parity를 통과했다. 물리적
+column 순서는 비교에서 제외했다. 실제 JAR의 HTTP·stdio MCP 인수는
+[새 5/5 기록](reviews/2026-10-05-purchase-acceptance.md)을 따른다.
+기존 실제 모델 UAT 기록은 2026-10-03 source의 결과이며 이번 변경 뒤
+재실행하지 않았다.
+
+마지막 review에서 경합 HTTP 승자와 final decision·상태·application·
+followup 수의 일치를 추가로 확인했다. history 쓰기 실패의 원래 구매 업무
+WAITING·승인 대기 ACTIVE 보존도 보강했다. 영향을 받는 parameterized
+4건을 새 DB에서 다시 실행해 실패 없이 통과했다 (`assertions.log`, 12초).
+production source 변경 없이 assertion만 보강해 전체 검증을 반복하지 않았다.

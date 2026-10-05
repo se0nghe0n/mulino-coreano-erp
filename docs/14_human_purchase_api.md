@@ -38,7 +38,7 @@ API로 처리하지 않는다. 일반 답변의 `Approved` 문자열도
 | `POST /approvals/{id}/decision` | HumanActor의 `procurement:decide`와 DB의 활성 MANAGER가 모두 필요하다. ServiceActor·AgentActor는 금지다. |
 | `GET /purchase-orders/{id}` | 인간 `erp:read`. 실제 발주·품목·입고 수량과 승인 연결을 조회한다. |
 
-결정 본문은 `decision` (`APPROVE` 또는 `BLOCK`),
+결정 본문은 `decision` (`APPROVE`, `BLOCK`, `CANCEL`),
 `expectedVersion`, `proposalHash`, `reason`이다. 필수 key는
 사용자 지시 재전송에만 재사용한다. 새 답변·구매 작업 namespace는
 객체 key 순서와 무관한 canonical hash를 쓴다. 기존 Case·계획 receipt의
@@ -51,7 +51,15 @@ EXPIRED로 남기고 409를 반환한다. 승인 성공은 공급처별 발주 �
 구매 Work Item의 DONE·후속 WAITING과 승인·의존 해소 Event를 함께 기록한다. 일부 실패는 모두
 rollback한다. 동일 승인 재전송은 이미 만든 같은 발주 묶음을 반환한다.
 BLOCK은 발주를 만들지 않고 구매 Work Item을 취소하고 상위 방침
-Attention을 남긴다. terminal 책임에 새 결정을 적용하지 않는다.
+Attention을 남긴다. CANCEL은 같은 version/hash guard 아래 PENDING
+구매안만 CANCELLED로 끝낸다. 최종 CANCEL 결정과 불변 감사 이력을
+별도로 기록하고 구매 업무·승인 대기를 CANCELLED, procurement outcome을
+CANCELLED로 남긴다. 발주·application·후속 업무를 만들거나 자동 재시도하지
+않는다. 상위 방침 Attention은 BLOCK과 같은 경로를 따른다. 이미 승인,
+차단, 만료, 취소된 구매안에는 새 CANCEL을 적용하지 않으며 취소 뒤 승인도
+409다. 같은 key·본문은 저장된 receipt를 재생하고 key를 유지한 본문 변경은
+409다. APPROVE와 CANCEL이 경합하면 잠금으로 직렬화해 하나만 성공한다.
+terminal 책임에 새 결정을 적용하지 않는다.
 
 `purchase_order_items.unit_price`는 기존 NUMERIC(15,2)다.
 base-unit 단가는 `round(purchase_unit_price / conversion, 2)`다.

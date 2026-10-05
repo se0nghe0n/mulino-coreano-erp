@@ -18,7 +18,8 @@
 통합 검증에서 발견한 활성 창고 중복 접수 문제는 #65에서 수정했다.
 `RuntimeIntakeIntegrationTest`의 순차 충돌·replay와 동시 접수 2건은
 추가 유지한다. 수정 후 부모의 `test bootJar`는 475건, 79초로 통과했다.
-현재는 삭제 후 472건에 helper 12건을 더해 Unit 484건이다.
+2026-10-03 #65 통합 기준은 삭제 후 472건에 helper 12건을 더해
+Unit 484건이었다.
 Cucumber가 발견한 업무 시나리오 13건은 Unit에서 제외되어 skipped로
 보고하므로 JUnit XML 합계는 497건이다. 최종 통합 `test bootJar`는
 93초, 실패·오류 0건으로 통과했다. 오래된 stack의 546건이나 402건을
@@ -29,3 +30,12 @@ MRP→P2P 전체 흐름은 새 SIT로 검증한다. 부모에는 `DemoE2eTest`�
 새 helper는 timeout·프로세스 종료·폐기용 DB guard·Run 사용량 합산·
 증거 파일의 업무 결과 보존을 검증한다. source helper의 오류 문구
 단언은 실패·시간 제한·실제 프로세스 종료 검증으로 고쳐 썼다.
+
+## 2026-10-05 #34 추가 검증
+
+CANCEL 권한·version/hash·replay·최종 상태·history 실패 rollback을
+검증하고 기존 APPROVE/BLOCK 경합 테스트에 CANCEL을 추가했다. Goal 2와
+4의 업무 상태를 확인하는 실행 사례가 7건 늘었다. 테스트를 삭제하지
+않았다. 현재 검증은 Unit 491건 통과, scenario 14건 skipped다. MCP 15건,
+SIT 업무 6개와 실제 재시작 2건도 통과했다. 상세 실행 기록은
+[시나리오 문서](16_scenario_tests.md)의 2026-10-05 절에 있다.
