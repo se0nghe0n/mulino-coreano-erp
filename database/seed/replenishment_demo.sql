@@ -37,7 +37,7 @@ DECLARE
     item RECORD;
     day_offset INT;
 BEGIN
-    IF EXISTS (SELECT 1 FROM users) OR EXISTS (SELECT 1 FROM products)
+    IF EXISTS (SELECT 1 FROM users WHERE email<>'quality-service@mulino.internal') OR EXISTS (SELECT 1 FROM products)
        OR EXISTS (SELECT 1 FROM suppliers) OR EXISTS (SELECT 1 FROM raw_materials)
        OR EXISTS (SELECT 1 FROM warehouses) OR EXISTS (SELECT 1 FROM customers)
        OR EXISTS (SELECT 1 FROM orders) OR EXISTS (SELECT 1 FROM purchase_orders)
@@ -100,6 +100,11 @@ BEGIN
     INSERT INTO bom_components(bom_version_id,raw_material_id,quantity_per_batch)
         VALUES (bom_ref,flour,3),(bom_ref,sugar,2);
 
+    INSERT INTO material_quality_declarations(raw_material_id,allergen_classification,declared_by)
+        VALUES (flour,'DECLARED',demo_user),(sugar,'ALLERGEN_FREE',demo_user),(packaging,'ALLERGEN_FREE',demo_user);
+    INSERT INTO raw_material_allergens(raw_material_id,allergen_id)
+        SELECT flour,allergen_id FROM allergens WHERE code='ALLERG-01' AND standard='KR_MFDS' LIMIT 1;
+
     -- 과거 생산까지 추적 가능한 입고. 남은 실재고는 밀가루3KG/설탕1KG/포장재20EA.
     INSERT INTO purchase_orders(supplier_id,created_by,order_date,expected_delivery_date,status)
         VALUES (fast_supplier,demo_user,'2026-05-29','2026-05-31','COMPLETED') RETURNING purchase_order_id INTO received_po;
@@ -117,7 +122,7 @@ BEGIN
                 'RELEASED','DEMO 과거 품질 승인',demo_user,'2026-05-31 09:00:00') RETURNING inbound_id INTO inbound_ref;
         INSERT INTO raw_material_lots(raw_material_id,inbound_id,supplier_lot_number,lot_number,quantity,remaining_quantity,production_date,expiry_date)
             VALUES (item.material_id,inbound_ref,'DEMO-SUP-' || item.tag,'DEMO-RM-' || item.tag,
-                item.quantity,item.remaining,'2026-05-20','2026-12-31') RETURNING raw_material_lot_id INTO item_id;
+                item.quantity,item.quantity,'2026-05-20','2026-12-31') RETURNING raw_material_lot_id INTO item_id;
         CASE item.tag WHEN 'FLOUR' THEN flour_lot := item_id;
             WHEN 'SUGAR' THEN sugar_lot := item_id; WHEN 'PACK' THEN packaging_lot := item_id; END CASE;
     END LOOP;

@@ -194,6 +194,9 @@ for (const [name,args,url] of [["whoami",{},"/me"],["get_case",{caseRef:"CASE-a"
 }
 
 for (const [name,args,url,method] of [
+  ['get_quality_approval',{approvalId:'9007199254740993'},'/quality/approvals/9007199254740993','GET'],
+  ['get_inbound_quality',{inboundId:'9007199254740993'},'/quality/inbound/9007199254740993','GET'],
+  ['decide_quality',{approvalId:'9007199254740993',decision:'APPROVE',expectedVersion:2,proposalHash:'c'.repeat(64),reason:'QC reviewed',requestKey:'qc-once'},'/quality/approvals/9007199254740993/decision','POST'],
   ['get_approval',{approvalId:'9007199254740993'},'/approvals/9007199254740993','GET'],
   ['get_purchase_order',{purchaseOrderId:'9007199254740993'},'/purchase-orders/9007199254740993','GET'],
   ['decide_purchase',{approvalId:'9007199254740993',decision:'APPROVE',expectedVersion:2,proposalHash:'a'.repeat(64),reason:'Reviewed',requestKey:'manager-once'},'/approvals/9007199254740993/decision','POST'],
@@ -204,7 +207,7 @@ for (const [name,args,url,method] of [
     let body='';
     const apiServer=http.createServer((req,res)=>{
       assert.equal(req.url,'/api/v1'+url);assert.equal(req.method,method);
-      assert.equal(req.headers['x-mulino-local-role'],'MANAGER');
+      assert.equal(req.headers['x-mulino-local-role'],name==='decide_quality'?'QC':'MANAGER');
       assert.equal(req.headers.authorization,undefined);
       assert.equal(req.headers['x-mulino-local-service'],undefined);
       assert.equal(req.headers['x-mulino-run-capability'],undefined);
@@ -214,7 +217,7 @@ for (const [name,args,url,method] of [
       });
     });
     const apiBase=await listen(apiServer);resources.push(()=>closeServer(apiServer));
-    const client=await connectClient({MULINO_API_BASE:apiBase+'/api/v1',MULINO_LOCAL_ROLE:'MANAGER'});
+    const client=await connectClient({MULINO_API_BASE:apiBase+'/api/v1',MULINO_LOCAL_ROLE:name==='decide_quality'?'QC':'MANAGER'});
     const result=await client.callTool({name,arguments:args});
     assert.equal(result.isError,undefined);assert.equal(result.structuredContent.id,'9007199254740993');
     assert.equal(result.structuredContent.totalKrw,'9999999999999.99');

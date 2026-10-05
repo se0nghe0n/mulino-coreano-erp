@@ -41,6 +41,7 @@ public class ExecutionContextBuilder {
     public Map<String, Object> build(String caseRef, long caseId) {
         var context = new LinkedHashMap<String, Object>(contexts.build(caseRef));
         context.put("caseRef", caseRef);
+        context.put("qualityWork",json.readTree(repository.qualityWorks(caseId)));
         context.put("followups", followups.forCase(caseId));
         context.put("caseMetadata", json.readTree(repository.caseMetadata(caseId)));
         context.put(

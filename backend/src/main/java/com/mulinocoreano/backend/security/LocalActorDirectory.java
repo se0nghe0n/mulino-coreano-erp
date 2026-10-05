@@ -25,10 +25,7 @@ public class LocalActorDirectory {
                                 """
                                 INSERT INTO users(name, email, password, role)
                                 VALUES (:name, :email, 'local-stub-only', CAST(:role AS user_role))
-                                ON CONFLICT (email) DO UPDATE
-                                  SET name = EXCLUDED.name,
-                                      role = EXCLUDED.role,
-                                      is_active = TRUE
+                                ON CONFLICT (email) DO UPDATE SET email=EXCLUDED.email
                                 RETURNING user_id
                                 """)
                         .param("name", "Local " + normalized)

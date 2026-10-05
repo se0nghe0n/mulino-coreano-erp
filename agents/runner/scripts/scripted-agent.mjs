@@ -120,6 +120,11 @@ if (claim.agentKey === "ORCHESTRATOR") {
     );
     assert.ok(p.executionResult);
     result = p.executionResult;
+} else if (claim.agentKey === "QC") {
+    const work=c.qualityWork.find(w=>w.workItemRef===claim.workItemRef);
+    assert.ok(work);
+    cli("qc","show",String(work.inboundId));
+    result=cli("qc","inspect",String(work.inboundId),"--json",JSON.stringify({caseRef:claim.caseRef}),"--request-key",`${claim.workItemRef}:inspect`).executionResult;
 } else throw Error("Unexpected role");
 console.log(
   JSON.stringify({

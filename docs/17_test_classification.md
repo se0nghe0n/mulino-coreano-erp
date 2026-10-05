@@ -39,3 +39,19 @@ CANCEL 권한·version/hash·replay·최종 상태·history 실패 rollback을
 않았다. 현재 검증은 Unit 491건 통과, scenario 14건 skipped다. MCP 15건,
 SIT 업무 6개와 실제 재시작 2건도 통과했다. 상세 실행 기록은
 [시나리오 문서](16_scenario_tests.md)의 2026-10-05 절에 있다.
+
+## 2026-10-05 #26/#33 입고 품질 검증
+
+기존 Unit을 삭제하지 않고 QC 업무 상태 검증을 15건 추가했다. Goal
+1·2·4·5·6에 대해 안전 RELEASED와 생산 잔량, 역할·활성 DB 신원,
+canonical 알레르겐과 명시적 분류, 인증 만료·30일 Attention, source
+freshness·결정 race·rollback·불변 이력을 확인한다. 생산 감사 실패와
+창고 충돌, 입고 전 생산 및 raw LOT 자체 만료도 입력·잔량·감사 미변경을
+확인한다. 구현 세부 문구를 확인하는 테스트를 추가하지 않았다.
+
+생산 감사와 창고 검증까지 전체 `test bootJar` 505건이 통과했다. 이후
+raw LOT 자체 만료 guard의 마지막 변경은 QC 15건과 전체 SIT 14건으로
+다시 검증했다. Cucumber는 Unit에서 15개 scenario를 skipped로 보고하며
+SIT에서는 P2P 6개·QM 6개·실제 backend 재시작 2개가 통과한다. RC 3개는
+다음 리콜 구현 단계의 pending이다. MCP 18건, runner 56건, Zig smoke
+32건 및 Zig unit/build도 통과했다. 실제 모델 UAT는 실행하지 않았다.

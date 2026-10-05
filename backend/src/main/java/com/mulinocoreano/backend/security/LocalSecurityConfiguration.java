@@ -22,7 +22,8 @@ public class LocalSecurityConfiguration {
         var paths = PathPatternRequestMatcher.withDefaults();
         return InterfaceSecurityConfiguration.stateless(http)
                 .securityMatchers(matchers -> matchers
-                        .requestMatchers(paths.matcher(HttpMethod.GET, "/api/v1/me"),
+                        .requestMatchers(paths.matcher("/api/v1/quality/**"),
+                                paths.matcher(HttpMethod.GET, "/api/v1/me"),
                                 paths.matcher(HttpMethod.POST, "/api/v1/cases"),
                                 paths.matcher(HttpMethod.POST, "/api/v1/cases/*/plans"),
                                 paths.matcher(HttpMethod.GET, "/api/v1/plans/*"),
@@ -35,7 +36,7 @@ public class LocalSecurityConfiguration {
                     var actor = authentication.get().getPrincipal();
                     return new AuthorizationDecision(actor instanceof HumanActor human
                             && human.capabilities().contains(context.getRequest().getMethod().equals("POST")
-                                    ? (context.getRequest().getRequestURI().endsWith("/decision") ? "procurement:decide" : "work:write") : "erp:read"));
+                                    ? (context.getRequest().getRequestURI().endsWith("/decision") ? (context.getRequest().getRequestURI().startsWith("/api/v1/quality/") ? "qc:decide" : "procurement:decide") : "work:write") : "erp:read"));
                 }))
                 .exceptionHandling(errors -> errors
                         .authenticationEntryPoint((request, response, error) -> response.setStatus(401))

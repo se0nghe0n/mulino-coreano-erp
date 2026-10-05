@@ -64,7 +64,30 @@ export function approvalText(data) {
     + `\n${approvalEvidenceText(data.planEvidence)}\n미조치 시: ${show(data.noActionConsequence)}`
     + `\n최종 결정: ${show(data.decision)}\n발주 ID: ${show(data.purchaseOrderIds)}\n다음 행동: 대기 중이면 표시된 버전·해시와 구매 내용을 확인한 인간의 명시적 승인 또는 차단 선택이 필요합니다. 생산·입고의 이행 여부는 별도로 확인해야 합니다.`;
 }
+const qualityText = d => `입고 품질: ${show(d.approvalId ?? d.receipt?.inbound_id)} / ${show(d.status)}
+제안: ${show(d.proposedStatus)} / QC 인간 결정 필요
+버전: ${show(d.version)} / 해시: ${show(d.proposalHash)}
+근거: ${show(d.proposal ?? d)}
+결정: ${show(d.decision)}`;
 export const conversationTools = [
+  read("get_quality_approval", "입고 QC 승인안의 안전 근거·버전·해시·결정 상태를 조회합니다.", "approvalId", a => `/quality/approvals/${a.approvalId}`, qualityText, true),
+  read("get_inbound_quality", "입고 온도·알레르겐·인증과 생산 적격성을 조회합니다.", "inboundId", a => `/quality/inbound/${a.inboundId}`, qualityText, true),
+  { name:"record_production_input",scope:"work:write",write:true,description:"OPERATOR가 QC 승인된 원재료 LOT의 실제 생산 투입을 기록합니다. HOLD·차단·승인 대기는 서버가 거절합니다.",
+    inputSchema:schema({productionRecordId:identifierSchema,rawMaterialLotId:identifierSchema,quantity:{type:"number",exclusiveMinimum:0},requestKey:keySchema},["productionRecordId","rawMaterialLotId","quantity"]),
+    validate(a){requireIdentifier(a.productionRecordId,"productionRecordId");requireIdentifier(a.rawMaterialLotId,"rawMaterialLotId");if(!Number.isFinite(a.quantity)||a.quantity<=0)throw new Error("Invalid quantity");},
+    path:()=>"/quality/production-inputs",body:({productionRecordId,rawMaterialLotId,quantity})=>({productionRecordId,rawMaterialLotId,quantity}),format:qualityText },
+  { name: "request_quality_inspection", scope:"work:write",write:true,description:"OPERATOR 또는 MANAGER가 동일 Case의 QC 에이전트에게 입고 검사를 배정합니다.",
+    inputSchema:schema({inboundId:identifierSchema,caseRef:refSchema,requestKey:keySchema},["inboundId","caseRef"]),
+    validate(a){requireIdentifier(a.inboundId,"inboundId");requireText(a.caseRef,"caseRef",20);},
+    path:a=>`/quality/inbound/${a.inboundId}/assign`,body:({caseRef})=>({caseRef}),format:qualityText },
+  { name: "inspect_inbound", scope: "work:write", write: true, description: "OPERATOR 또는 MANAGER가 입고 검사를 요청합니다. ERP 상태 변경은 QC 승인 뒤 적용됩니다.",
+    inputSchema: schema({inboundId: identifierSchema, caseRef: refSchema, requestKey: keySchema}, ["inboundId","caseRef"]),
+    validate(a) { requireIdentifier(a.inboundId,"inboundId"); requireText(a.caseRef,"caseRef",20); },
+    path: a => `/quality/inbound/${a.inboundId}/inspect`, body: ({caseRef}) => ({caseRef}), format: qualityText },
+  { name: "decide_quality", scope: "qc:decide", write: true, description: "QC 인간의 명시적 승인·반려·취소를 기록합니다. get_quality_approval의 버전·해시와 근거를 확인하고 매번 인간 선택을 받은 뒤 호출하세요. 자동 승인·재시도 금지.",
+    inputSchema: schema({approvalId: identifierSchema, decision: {type:"string",enum:["APPROVE","BLOCK","CANCEL"]}, expectedVersion:versionSchema, proposalHash:{type:"string",pattern:"^[0-9a-f]{64}$"}, reason:{type:"string",minLength:1,maxLength:4000},requestKey:keySchema}, ["approvalId","decision","expectedVersion","proposalHash","reason"]),
+    validate(a) {requireIdentifier(a.approvalId,"approvalId");requireVersion(a.expectedVersion);requireText(a.reason,"reason",4000);if(!["APPROVE","BLOCK","CANCEL"].includes(a.decision)|| !/^[0-9a-f]{64}$/.test(a.proposalHash)) throw new Error("Invalid quality decision");},
+    path: a => `/quality/approvals/${a.approvalId}/decision`, body: ({decision,expectedVersion,proposalHash,reason})=>({decision,expectedVersion,proposalHash,reason}), format:qualityText },
   read("get_approval", "구매 승인안의 정확한 품목·금액·버전·해시, 저장된 계획의 계산·출처·기준 시각, 예상 공급·불확실성·미조치 영향과 MANAGER 권한을 확인합니다.", "approvalId", a => `/approvals/${a.approvalId}`, approvalText, true),
   read("get_purchase_order", "실제 발주 상태와 품목, 수량·단가, 입고 수량 및 승인 근거를 조회합니다.", "purchaseOrderId", a => `/purchase-orders/${a.purchaseOrderId}`, d => `발주 ${show(d.id)}: ${show(d.status)}\n공급사: ${show(d.supplierName)} (${show(d.supplierId)})\nCase: ${show(d.caseRef)} / 계획: ${show(d.planRef)} / 승인: ${show(d.approvalId)}\n${(d.items ?? []).map(line => `${lineText(line)}; 입고 수량 ${show(line.receivedBaseQuantity)} ${show(line.baseUnit)}`).join("\n")}\n다음 행동: 납기·입고와 생산 이행을 별도 확인하세요.`, true),
   { name: "decide_purchase", scope: "procurement:decide", write: true,

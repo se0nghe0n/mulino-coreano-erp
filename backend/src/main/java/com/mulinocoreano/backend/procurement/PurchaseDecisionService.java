@@ -20,6 +20,7 @@ import java.util.Map;
 public class PurchaseDecisionService {
     private final com.mulinocoreano.backend.followup.ReplenishmentFollowupService followups;
     private final PurchaseTransactions transactions;
+    private final com.mulinocoreano.backend.governance.GovernancePolicy governance;
     private final PurchasePlanning planning;
     private final PurchaseRepository repository;
     private final RequestIdempotency idempotency;
@@ -38,7 +39,8 @@ public class PurchaseDecisionService {
             PurchaseQueries queries,
             DispatcherService dispatcher,
             CanonicalJson json,
-            ObjectMapper mapper, com.mulinocoreano.backend.followup.ReplenishmentFollowupService followups) {
+            ObjectMapper mapper, com.mulinocoreano.backend.followup.ReplenishmentFollowupService followups, com.mulinocoreano.backend.governance.GovernancePolicy governance) {
+        this.governance=governance;
         this.followups = followups;
         this.transactions = transactions;
         this.planning = planning;
@@ -63,9 +65,7 @@ public class PurchaseDecisionService {
                     var initial = repository.action(approvalId, false);
                     var plan = planning.load(initial.planRef());
                     idempotency.coordinate("planning.warehouse", Long.toString(plan.warehouse()));
-                    if (!repository.lockActiveManager(human.userId())) {
-                        throw new AccessDeniedException("An active MANAGER is required");
-                    }
+                    governance.requireHuman(human,com.mulinocoreano.backend.governance.GovernancePolicy.Action.PURCHASE_CREATE);
                     repository.lockWorkAndCase(initial);
                     repository.lockPlan(plan.id());
                     var approval = repository.action(approvalId, true);

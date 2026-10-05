@@ -13,7 +13,7 @@ SIT와 실제 모델 UAT에서 실행하고 DB 업무 상태와 Run 증거를 �
 |---|---|---|
 | `./gradlew test bootJar` | 기존 규칙·보안 테스트와 scenario helper | 없음 |
 | `./gradlew sitTest` | MRP→P2P 5개 및 실제 backend 재시작 2건 | 없음 |
-| `./gradlew pendingScenarios` | #26 QM 5개·#27 리콜 3개 dry-run 목록 | 없음 |
+| `./gradlew pendingScenarios` | #27 리콜 3개 dry-run 목록 | 없음 |
 | `./gradlew uatTest` | 같은 Feature의 `@uat` 3개 | 비용 발생 |
 
 Cucumber 8.0.1을 쓴다. Unit task의 sentinel tag는 업무 시나리오를
@@ -171,3 +171,21 @@ followup 수의 일치를 추가로 확인했다. history 쓰기 실패의 원�
 WAITING·승인 대기 ACTIVE 보존도 보강했다. 영향을 받는 parameterized
 4건을 새 DB에서 다시 실행해 실패 없이 통과했다 (`assertions.log`, 12초).
 production source 변경 없이 assertion만 보강해 전체 검증을 반복하지 않았다.
+
+## 입고 QM 구현 (#26/#33)
+
+QM 6개는 pending에서 실제 SIT로 이동했다. 실제 QC runner와 CLI가
+검사를 저장하고 인간 stdio MCP가 QC 승인·반려 및 MANAGER 권한 거절을
+검증한다. 생산 투입 시도는 API를 통하며 SQL은 fixture와 상태 조회에만
+쓴다. RC 3개는 다음 리콜 단계의 pending이다. 계약은
+`docs/18_inbound_quality_api.md`에 기록한다.
+
+최종 QC 검증은 15개 행동 Unit과 P2P 6개·QM 6개·backend 재시작
+2개 SIT다. 생산 입력의 immutable audit·replay·rollback, 창고 충돌,
+입고 전 생산, raw LOT 자체 만료를 추가로 검증했다. standalone DDL과
+Flyway의 schema는 기존 events.external_ref 열 순서를 제외하고 같았다.
+알레르겐 seed를 반복해도 추가 행이 생기지 않았으며 fresh DDL/Flyway
+각각 22개 고유 코드와 19개 법정 군을 유지했다. 로컬 Jar의 인간 stdio
+검사는 pending·QC 승인·MANAGER 거절·반려·취소·생산 잔량·불변 감사와
+현재 만료 LOT 거절을 확인했다. receiving REST와 실제 모델 UAT를
+검증한 것으로 보고하지 않는다.
