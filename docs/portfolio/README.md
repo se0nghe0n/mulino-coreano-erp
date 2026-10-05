@@ -37,20 +37,29 @@
 
 ## source와 검증 계층
 
-기준 source는 `0132e0a62ad9f086e5c70c5c857d4546f5921ef9`다.
+native 모델이 실행한 production 기준 source는
+`0132e0a62ad9f086e5c70c5c857d4546f5921ef9`다.
 이는 fork의 통합 baseline이며 조직 `main` 병합을 뜻하지 않는다.
 선행 변경의 현재 로컬 proof를 해당 source와 함께 기록한다. native
 인수·runner/test harness의 최종 source는
 `2d2a900b59a8704e27a4462740196b2c4902829b`다. 모델이 실행한 CLI·role·JAR와
 image는 시도 중 변경하지 않았다. `evidence.json`에 각 파일·image·JAR 및
 최종 harness hash를 기록했다.
+통합 검증 baseline은
+`fe6a51fadd2493018da59babd4a2eea908c2931f`다. `clean test bootJar sitTest`가
+8분 58초에 끝났고 569건 발견·18건 skip·551건 실행 통과, SIT 20건 통과,
+실패·오류 0건을 기록했다. JAR hash는 기존 값과 같다. 이 baseline은 이번
+발표 자료 갱신 전의 검증 source이며 산출물 자신의 hash를 주장하지 않는다.
+
 모든 수치는 이미 실행한 담당자의 보고서에서 옮겼다. 문서 작업을 위해
 백엔드 테스트나 유료 모델을 다시 실행하지 않았다.
 
 | 계층 | 실제 관측 | source·한계 |
 |---|---|---|
-| Supplier 실행 테스트 | 567 발견, 18 skip, 549 통과, 실패 0 | 0132e0a |
-| 최신 scripted SIT | P2P 6, QM 6, RC 6, 재시작 2, 합계 20 통과 | Supplier 통합 baseline |
+| 현재 통합 실행 테스트 | 569 발견, 18 skip, 551 통과, 실패·오류 0 | fe6a51f, clean test bootJar sitTest |
+| 현재 통합 scripted SIT | 20 통과, 실패·오류·skip 0 | fe6a51f, 모델 호출 0 |
+| 과거 Supplier 실행 테스트 | 567 발견, 18 skip, 549 통과, 실패 0 | 0132e0a |
+| Supplier scripted SIT checkpoint | P2P 6, QM 6, RC 6, 재시작 2, 합계 20 통과 | Supplier 통합 baseline |
 | 도구 단위·smoke | MCP 26, runner 57, Zig 7, CLI 32 통과 | #44 0ee144c의 별도 기록 |
 | 리콜 현재 JAR | 생산 LOT 10, 사고 원료 root 2, 증거 raw LOT 3 | #27 5911721 |
 | 리콜 범위 | 고객 2, 출고 115, 무관 LOT ACTIVE, replay 안정 | OFFLINE/PENDING, submittedAt null |
