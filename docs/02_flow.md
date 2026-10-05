@@ -51,7 +51,15 @@ flowchart TD
 ### STEP 1 — 공급업체 관리
 
 **데이터 처리**
-- 공급업체 기본 정보를 등록한다: `name`, `country`, `contact_*`
+- 공급업체 기본 정보를 등록한다: `name`, `country`, `contact_*`,
+  `address_line`, `city`, `postal_code`, `payment_terms`, `currency`.
+- 인증된 active OPERATOR/MANAGER가 공급업체 master를 변경한다.
+  비활성화는 `is_active=false`로 기록하며 기존 ID·발주·입고 이력을 유지한다.
+  비활성 공급업체는 인간 조회에서 반환하고 새 계획 후보에서는 제외한다.
+- preferred currency는 기존 KRW 계획·발주 금액을 환산하지 않는다.
+  기존 `created_at`은 보존하며 알 수 없는 `updated_at`은 NULL로 유지한다.
+  실제 변경부터 JPA Auditing이 수정 시각을 기록한다.
+  API·멱등성·불변 감사 계약은 [Supplier master API](21_supplier_master_api.md)를 따른다.
 - 공급업체 인증서를 등록한다: `supplier_certifications`
   - 인증 유형: HACCP / ISO22000 / FSSC22000 / GMP / ORGANIC / HALAL / KOSHER / TRACEABILITY
   - 관리 항목: 발급기관, 인증번호, 파일 첨부, 유효기간 (`ck_cert_dates CHECK (issue_date <= expiry_date)`)

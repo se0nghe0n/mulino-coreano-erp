@@ -76,3 +76,13 @@ service secret과 다른 값을 사용하고 agent 환경·인자·stdin·contex
 volume에는 전달하지 않는다. key 생성과 보호되는 조회 경로는
 [Human gateway 계약](docs/14_human_purchase_api.md#로컬-human-gateway-경계-33)을 따른다.
 역할 헤더는 공유 로컬 신원이며 개인 인증이나 인간 동의의 증거가 아니다.
+
+## Supplier 오류 코드
+
+공급업체 master의 경로·신원·감사 계약은
+[Supplier master API](docs/21_supplier_master_api.md)에 정의한다.
+
+| 코드 | HTTP | 의미 |
+|---|---|---|
+| SUP001 | 404 | 공급업체가 없음 |
+| SUP002 | 409 | 공급업체 version이 변경됨 |

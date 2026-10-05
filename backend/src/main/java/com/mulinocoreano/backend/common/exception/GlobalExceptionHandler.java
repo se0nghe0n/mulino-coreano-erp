@@ -21,6 +21,11 @@ import java.util.List;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
+    @ExceptionHandler(com.mulinocoreano.backend.supplier.SupplierException.class)
+    public ResponseEntity<ApiError> handleSupplier(com.mulinocoreano.backend.supplier.SupplierException e) {
+        return ResponseEntity.status(e.code().getStatus()).body(ApiError.of(e.code()));
+    }
+
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ApiError> handleValidation(MethodArgumentNotValidException e) {
         List<FieldError> errors = e.getBindingResult().getFieldErrors().stream()
