@@ -1,0 +1,133 @@
+{
+  "asOf": "2026-10-06",
+  "sourceBaseline": "0132e0a62ad9f086e5c70c5c857d4546f5921ef9",
+  "classification": "local PoC source and recorded acceptance evidence; current native UAT in progress",
+  "supplier": {
+    "commit": "0132e0a62ad9f086e5c70c5c857d4546f5921ef9",
+    "tests": {
+      "tests": 567,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 18
+    },
+    "executablePassed": 549,
+    "sit": {
+      "tests": 20,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "supplierBusinessCases": 7,
+    "jarSha256": "4cc3ed1977f72538b51e025b09937f4b122a19e6305f4d0f5a939d82cfbb3369",
+    "crudFive": true,
+    "swaggerFive": true,
+    "auditCount": 3,
+    "canonicalReplay": true,
+    "softDelete": true,
+    "ddlFlywayEqual": true,
+    "constraints": 756,
+    "triggers": 124
+  },
+  "recall": {
+    "commit": "5911721de4cfb53fa65fc82518df326bd9c49a3a",
+    "jarSha256": "b0dd6ea0f3c9ebfd1af635fa795b1d4852ef0700e7b770a9b0ea286a687a4b11",
+    "productionLots": 10,
+    "incidentRawRoots": 2,
+    "evidenceRawLots": 3,
+    "customers": 2,
+    "shipments": 115,
+    "unrelatedLotExcluded": true,
+    "replayStable": true,
+    "reportStatus": "PENDING",
+    "reportTransport": "OFFLINE",
+    "submittedAt": null
+  },
+  "evidence": {
+    "commit": "0ee144c08a941c679cedcca92b821ed992398c85",
+    "jarSha256": "6a59edb9a6801720f6018c49bf7e32af65b7f45e6da2a1e50a26b73e87c9602a",
+    "sources": 3,
+    "judgments": 7,
+    "explicitSupersessionPreservesOriginalConflict": true,
+    "explicitHumanAttestation": true,
+    "erpWrites": 0,
+    "mcpTests": 26,
+    "runnerTests": 57,
+    "zigTests": 7,
+    "cliSmoke": 32
+  },
+  "purchase": {
+    "commit": "d7ce2d8",
+    "demoPassed": 5,
+    "demoTotal": 5
+  },
+  "nativeUat": {
+    "historical": {
+      "commit": "cb04403",
+      "date": "2026-10-03",
+      "runtime": "Claude Code",
+      "passed": 3,
+      "currentSourceAcceptance": false
+    },
+    "current": {
+      "plannedScenarios": 5,
+      "status": "IN_PROGRESS",
+      "results": null,
+      "cost": null,
+      "tokens": null,
+      "passedCheckpoint": {
+        "testCase": "TC-P2P-001",
+        "status": "PASSED",
+        "runtime": "CLAUDE",
+        "model": "claude-sonnet-5",
+        "imageSha256": "sha256:aa055d76d0c8d44b9707c84726101e551ec123dc0dba714bea4746b02d4d4656",
+        "backendJarSha256": "4cc3ed1977f72538b51e025b09937f4b122a19e6305f4d0f5a939d82cfbb3369",
+        "appliedPurchaseOrders": 1,
+        "appliedPurchaseTotalKrw": 16500,
+        "caseStatus": "WAITING",
+        "coordinatorOutcome": "DONE",
+        "runCount": 5,
+        "usageComplete": true,
+        "cliReportedCostUsd": 3.0874898000000006,
+        "inputTokens": 94,
+        "outputTokens": 18050,
+        "cacheReadTokens": 4165609,
+        "cacheWriteTokens": 518420,
+        "scope": "provisional checkpoint, other four scenarios and final native harness commit pending"
+      }
+    }
+  },
+  "limitations": [
+    "Actual client #35 acceptance pending",
+    "No OAuth, dedicated dashboard, production deployment or individual production IAM",
+    "Certificate required-type coverage and automatic 30-day notices await issue registration",
+    "No actual MFDS transmission or statutory form validation",
+    "VERIFIED means explicit human attestation, not independent truth or ERP authority"
+  ],
+  "provenance": [
+    {
+      "ownerReport": "supplier/final-report.json",
+      "sha256": "f11a67786df8cc268d4c2467a9d83b5136de69bd11da922ab11d8060ade058d8",
+      "storage": "coordinator private acceptance bundle; selected nonsecret results transcribed here"
+    },
+    {
+      "ownerReport": "recall/verification-summary.json",
+      "sha256": "117f14afe9e4a8ccd6f36d3a7173e1d14533fae479703bcf91cfab5f18c3ef51",
+      "storage": "coordinator private acceptance bundle; selected nonsecret results transcribed here"
+    },
+    {
+      "ownerReport": "evidence/result.json",
+      "sha256": "1a7e3d04ac4f59b4960268c64d3e8ae35e77e5d697c97d29bd15fc683e440d5a",
+      "storage": "coordinator private acceptance bundle; selected nonsecret results transcribed here"
+    },
+    {
+      "ownerReport": "human-boundary/worker-report.json",
+      "sha256": "351e6a7a7fd52f5c1add05459b5d6f522f2240027449946ba6364184fcc0d163",
+      "storage": "coordinator private acceptance bundle; selected nonsecret results transcribed here"
+    },
+    {
+      "ownerReport": "native/probe-success/TC-P2P-001.json",
+      "sha256": "b33b31469cd71d0e4f1115e3fb7c15f3bbd3b5d0524bc16696e7c3840b436953",
+      "storage": "coordinator private acceptance bundle; selected nonsecret results transcribed here"
+    }
+  ]
+}
