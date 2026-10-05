@@ -1,3 +1,5 @@
+import {createHash} from 'node:crypto';
+
 /** Reduce native error metadata to fixed categories; never retain free-form child output. */
 export function claudeDiagnostics(event) {
   const knownSubtypes = new Set(['success', 'error_max_turns', 'error_max_budget_usd',
@@ -13,9 +15,16 @@ export function claudeDiagnostics(event) {
     typeof event.error?.type === 'string' ? event.error.type : '',
     ...errors.map(error => typeof error === 'string' ? error : (typeof error?.message === 'string' ? error.message : ''))]
     .join('\n').slice(0, 8192);
+  Object.assign(result, nativeErrorShape(event, text));
   const subtypeCategory = { error_max_turns: 'TURN_LIMIT', error_max_budget_usd: 'BUDGET_LIMIT',
     error_max_structured_output_retries: 'SCHEMA_RETRIES' }[event.subtype];
   result.nativeFailureCategory = subtypeCategory
+    ?? (/(?:json.?schema|structured output).{0,100}(?:invalid|unsupported|not supported|error)|(?:invalid|unsupported).{0,60}(?:json.?schema|structured output)/i.test(text) ? 'SCHEMA_CONFIGURATION' : undefined)
+    ?? (/(?:allowed.?tools|tool configuration|tool choice|permission.mode).{0,80}(?:invalid|unsupported|not supported|error)|(?:invalid|unsupported).{0,60}(?:allowed.?tools|tool choice)/i.test(text) ? 'TOOL_CONFIGURATION' : undefined)
+    ?? (/read.only file system|permission denied|EACCES|EROFS|cannot (?:create|write|open).{0,40}(?:file|directory)/i.test(text) ? 'FILESYSTEM' : undefined)
+    ?? (/unknown (?:field|key)|unrecognized argument|unexpected argument|invalid.{0,40}config|config.{0,40}parse/i.test(text) ? 'CONFIGURATION' : undefined)
+    ?? (/output.{0,50}(?:validation failed|schema mismatch)|structured output.{0,50}validation/i.test(text) ? 'OUTPUT_VALIDATION' : undefined)
+    ?? (/context.{0,40}(?:too long|exceed|limit)|prompt.{0,40}too long|input.{0,40}too (?:long|large)|context_length_exceeded/i.test(text) ? 'CONTEXT_LIMIT' : undefined)
     ?? (/credit balance is too low|insufficient credits|billing_error/i.test(text) ? 'BILLING' : undefined)
     ?? (/hit your (usage )?limit|usage limit (reached|exceeded)|quota exceeded|insufficient_quota/i.test(text) ? 'USAGE_LIMIT' : undefined)
     ?? (/authentication_error|not logged in|invalid api key|oauth token.{0,30}expired/i.test(text) || status === 401 ? 'AUTHENTICATION' : undefined)
@@ -25,6 +34,20 @@ export function claudeDiagnostics(event) {
     ?? (status !== undefined && status >= 500 ? 'PROVIDER_SERVER' : undefined)
     ?? 'UNKNOWN_NATIVE_FAILURE';
   return result;
+}
+
+/** Only known key names, primitive counts and an irreversible error fingerprint leave memory. */
+function nativeErrorShape(event, text) {
+  const allowedKeys = new Set(['type','subtype','is_error','result','error','errors','usage','modelUsage',
+    'total_cost_usd','num_turns','structured_output','stop_reason','duration_ms','duration_api_ms',
+    'session_id','uuid','permission_denials']);
+  const counts = {string:0,number:0,boolean:0,null:0,array:0,object:0};
+  for (const value of Object.values(event)) {
+    const kind = value === null ? 'null' : Array.isArray(value) ? 'array' : typeof value;
+    if (Object.hasOwn(counts,kind)) counts[kind]++;
+  }
+  return {nativeErrorKeys:Object.keys(event).filter(key=>allowedKeys.has(key)).sort(),
+    nativeErrorPrimitiveCounts:counts,nativeErrorFingerprint:createHash('sha256').update(text).digest('hex')};
 }
 
 /** Codex protocol errors are diagnostics, never an agent result or free-form log. */

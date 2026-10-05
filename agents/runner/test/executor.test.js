@@ -112,7 +112,7 @@ test('native quota failure preserves reported partial usage and only fixed safe 
   assert.equal(handle.diagnostics.nativeFailureCategory, 'USAGE_LIMIT');
   assert.ok(handle.diagnostics.nativeExitCode === null || Number.isInteger(handle.diagnostics.nativeExitCode));
   assert.equal(handle.usage.costUsd, 0.05);
-  assert.doesNotMatch(JSON.stringify(handle.diagnostics), /cap-secret|lease-secret|secret-from-stderr|errors/);
+  assert.doesNotMatch(JSON.stringify(handle.diagnostics), /cap-secret|lease-secret|secret-from-stderr/);
 });
 
 for (const [event, category] of [
@@ -126,7 +126,7 @@ for (const [event, category] of [
   [{is_error:true,errors:['cap-secret unknown issue'],subtype:'cap-secret'}, 'UNKNOWN_NATIVE_FAILURE'],
 ]) test(`native ${category} classification does not invent quota or expose messages`, () => {
   assert.equal(claudeDiagnostics(event).nativeFailureCategory, category);
-  assert.doesNotMatch(JSON.stringify(claudeDiagnostics(event)), /cap-secret|unknown issue|errors/);
+  assert.doesNotMatch(JSON.stringify(claudeDiagnostics(event)), /cap-secret|unknown issue/);
 });
 
 
@@ -153,4 +153,21 @@ for (const [error,category] of [
   const d=codexDiagnostics({type:'error',error});
   assert.equal(d.nativeFailureCategory,category);
   assert.doesNotMatch(JSON.stringify(d),/cap-secret|message|unexplained/);
+});
+
+
+for (const [message,category] of [
+  ['Invalid JSON schema: unsupported keyword cap-secret','SCHEMA_CONFIGURATION'],
+  ['allowedTools configuration is invalid cap-secret','TOOL_CONFIGURATION'],
+  ['Cannot write file: read-only file system cap-secret','FILESYSTEM'],
+  ['Unrecognized argument in config cap-secret','CONFIGURATION'],
+  ['Output validation failed cap-secret','OUTPUT_VALIDATION'],
+  ['Prompt is too long for context limit cap-secret','CONTEXT_LIMIT'],
+]) test(`Claude ${category} retains safe shape rather than free-form reason`, () => {
+  const d=claudeDiagnostics({type:'result',subtype:'success',is_error:true,result:message,usage:{input_tokens:0}});
+  assert.equal(d.nativeFailureCategory,category);
+  assert.deepEqual(d.nativeErrorKeys,['is_error','result','subtype','type','usage']);
+  assert.equal(d.nativeErrorPrimitiveCounts.string,3);
+  assert.match(d.nativeErrorFingerprint,/^[a-f0-9]{64}$/);
+  assert.doesNotMatch(JSON.stringify(d),/cap-secret|unsupported keyword|Prompt is too long/);
 });
