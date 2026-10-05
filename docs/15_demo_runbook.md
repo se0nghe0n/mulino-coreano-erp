@@ -2,8 +2,7 @@
 
 #34는 사람이 승인한 구매안만 ERP 발주로 반영되고, 승인 뒤에도 입고를
 기다리는 책임과 Case가 남는지 검증한다. 재계산 전후의 구매안을 하나의
-Case에서 구분하여 확인한다. 거절에 따른 업무 취소를 별도의 인간 취소
-결정으로 해석하지 않는다.
+Case에서 구분하여 확인한다. BLOCK과 CANCEL은 각각 독립적인 최종 인간 결정으로 보존한다.
 
 ## 실행 범위와 전제
 
@@ -18,7 +17,7 @@ Case에서 구분하여 확인한다. 거절에 따른 업무 취소를 별도�
   service header로 수동 claim한다. LLM, 로그인 volume, 유료 모델은
   사용하지 않으므로 실제 모델 UAT의 증거가 아니다.
 - Case 생성은 HTTP, 계획·구매안 생성은 capability HTTP, 인간 최종
-  승인은 stdio MCP다. 공급망·구매 업무 배정과 과거 ERP 데이터는
+  승인과 취소는 stdio MCP다. 공급망·구매 업무 배정과 과거 ERP 데이터는
   폐기용 DB에 fixture SQL로 준비한다. 자율 dispatch의 증거가 아니다.
 
 ## 1. 새 DB와 현재 JAR 준비
@@ -83,7 +82,8 @@ script는 실패하면 nonzero로 종료한다. 기존 fixture를 다시 적용�
 | 후속 책임 | 구매 업무 DONE, 후속 업무 WAITING, Case WAITING |
 | 발주 후 입고·생산 | 새 발주 연결 inbound 0, 생산 LOT 추가 없음 |
 | 감사 로그 변조 | governance_audit_logs UPDATE·DELETE·TRUNCATE 거부, 원행 불변 |
-| 인간 CANCEL 요청 | 현재 HTTP 400, 상태 불변. 지원 기능으로 판정하지 않음 |
+| 인간 CANCEL 및 재전송 | CANCELLED, 최종 CANCEL 이력, 구매 업무·대기 CANCELLED, ERP 쓰기·후속 업무 0 |
+| 취소 뒤 승인 및 새 취소 | HTTP 409, 최종 이력·ERP 상태 불변 |
 
 fixture 원본 기준일은 2026-09-05다. script는 모든 날짜 literal에
 `오늘(Asia/Seoul) - 기준일`을 동일하게 더해 `fixture.sql`로 저장한다.
@@ -100,14 +100,14 @@ JAR hash, source commit은 `summary.json`에 남는다. 오늘 날짜를 넘기�
 ## 4. 증거와 남은 인수 조건
 
 `summary.json`, `history.json`, `orders.json`, `business-state.json`,
-`audit-mutation-denied.json`, `stdio.log`를 보관한다. 각 구매안의 pending
-snapshot과 409/400 응답도 별도 JSON으로 남는다. 토큰과 service secret은
+`audit-mutation-denied.json`, `stdio.log`, `stdio-cancel.log`,
+`cancel-final-history-mutation-denied.json`를 보관한다. 각 구매안의 pending
+snapshot과 409 응답도 별도 JSON으로 남는다. 토큰과 service secret은
 증거 파일에 저장하지 않는다. 전체 발주 수에는 fixture 과거 발주가
 포함되므로 `purchase_application_id IS NOT NULL`인 새 발주를 세어야 한다.
 
-현재 `PurchaseDecisionRequest`의 선택지는 APPROVE와 BLOCK이다.
-BLOCK에 따라 취소되는 구매 업무와 승인 대기는 확인할 수 있지만,
-별도 인간 CANCEL 결정 및 그 version/hash별 이력은 지원하지 않는다.
-#34 전체 완료 판정에는 이 조건의 범위 결정 또는 구현이 추가로 필요하다.
+PENDING 구매안은 MANAGER가 CANCEL할 수 있다. version/hash별 최종
+CANCEL 결정은 BLOCK·APPROVE와 별도다. 새 ERP 쓰기나 후속 업무 없이
+구매 책임만 닫고 상위 방침 확인을 남긴다. 기존 승인 후속 책임은 보존한다.
 날짜별 결과는 [2026-10-05 인수 기록](reviews/2026-10-05-purchase-acceptance.md)에
 기록한다. 실제 harness/model UAT와 운영 발주·세금계산서 발급은 별도다.

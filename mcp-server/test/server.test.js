@@ -197,6 +197,7 @@ for (const [name,args,url,method] of [
   ['get_approval',{approvalId:'9007199254740993'},'/approvals/9007199254740993','GET'],
   ['get_purchase_order',{purchaseOrderId:'9007199254740993'},'/purchase-orders/9007199254740993','GET'],
   ['decide_purchase',{approvalId:'9007199254740993',decision:'APPROVE',expectedVersion:2,proposalHash:'a'.repeat(64),reason:'Reviewed',requestKey:'manager-once'},'/approvals/9007199254740993/decision','POST'],
+  ['decide_purchase',{approvalId:'9007199254740993',decision:'CANCEL',expectedVersion:2,proposalHash:'b'.repeat(64),reason:'Cancel pending proposal',requestKey:'cancel-once'},'/approvals/9007199254740993/decision','POST'],
   ['answer_attention',{attentionRequestId:1,answer:'Friday',expectedVersion:2,scope:'THIS_ACTION',requestKey:'answer-once'},'/attention/1/answer','POST'],
 ]) {
   test(`${name} preserves exact business evidence and uses only human role authority`, async () => {
@@ -208,7 +209,7 @@ for (const [name,args,url,method] of [
       assert.equal(req.headers['x-mulino-local-service'],undefined);
       assert.equal(req.headers['x-mulino-run-capability'],undefined);
       req.on('data',chunk=>body+=chunk);req.on('end',()=>{
-        if(method==='POST') {const actual=JSON.parse(body);assert.equal(actual.expectedVersion,2);assert.equal(actual.proposalHash,args.proposalHash);assert.equal(req.headers['idempotency-key'],args.requestKey);}
+        if(method==='POST') {const actual=JSON.parse(body);assert.equal(actual.expectedVersion,2);assert.equal(actual.decision,args.decision);assert.equal(actual.proposalHash,args.proposalHash);assert.equal(req.headers['idempotency-key'],args.requestKey);}
         res.writeHead(200,{'Content-Type':'application/json'});res.end('{"id":9007199254740993,"totalKrw":9999999999999.99,"status":"APPROVED"}');
       });
     });

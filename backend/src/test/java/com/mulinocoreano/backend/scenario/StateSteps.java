@@ -18,6 +18,11 @@ public class StateSteps {
         assertThat(state.latestApprovalStatus(world.caseRef())).isEqualTo("PENDING");
     }
 
+    @Then("구매 제안은 취소 상태다")
+    public void cancelled() {
+        assertThat(state.latestApprovalStatus(world.caseRef())).isEqualTo("CANCELLED");
+    }
+
     @Then("구매 제안은 반려 상태다")
     public void blocked() {
         assertThat(state.latestApprovalStatus(world.caseRef())).isEqualTo("BLOCKED");

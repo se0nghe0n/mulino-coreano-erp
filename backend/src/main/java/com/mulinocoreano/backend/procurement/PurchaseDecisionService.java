@@ -91,8 +91,9 @@ public class PurchaseDecisionService {
         }
         if (!repository.activeWorkAndCase(approval))
             throw new org.springframework.web.server.ResponseStatusException(org.springframework.http.HttpStatus.CONFLICT, "Purchase responsibility is no longer active");
-        if ("BLOCK".equals(request.decision())) {
-            closeProposal(approval, "BLOCKED", userId, request.reason());
+        if ("BLOCK".equals(request.decision()) || "CANCEL".equals(request.decision())) {
+            closeProposal(approval, "CANCEL".equals(request.decision()) ? "CANCELLED" : "BLOCKED",
+                    userId, request.reason());
             recordDecision(approval, userId, request);
             return queries.approval(approval.id());
         }

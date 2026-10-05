@@ -12,6 +12,8 @@ const planRef=process.env.MULINO_TEST_PLAN_REF;
 const caseRef=process.env.MULINO_TEST_CASE_REF;
 const attentionId=process.env.MULINO_TEST_ATTENTION_ID;
 assert.ok(base && approvalId && planRef && caseRef && attentionId,'Prepared local fixture references are required');
+const decision=process.env.MULINO_TEST_DECISION || 'APPROVE';
+assert.ok(['APPROVE','CANCEL'].includes(decision));
 const clients=[];
 async function client(role) {
   const c=new Client({name:'local-human-sit',version:'1.0.0'});
@@ -30,24 +32,31 @@ try {
   assert.equal((await tool(viewer,'get_plan',{planRef})).ref,planRef);
   const approval=await tool(viewer,'get_approval',{approvalId});
   assert.equal(approval.status,'PENDING');assert.equal(String(approval.proposal.totalKrw),'16500');
-  const args={approvalId,decision:'APPROVE',expectedVersion:approval.version,proposalHash:approval.proposalHash,reason:'Fixture quantities and supplier conditions reviewed',requestKey:'live-purchase-once'};
+  const args={approvalId,decision,expectedVersion:approval.version,proposalHash:approval.proposalHash,reason:'Fixture quantities and supplier conditions reviewed',requestKey:decision==='CANCEL'?'live-cancel-once':'live-purchase-once'};
   assert.equal((await viewer.callTool({name:'decide_purchase',arguments:args})).isError,true);
   assert.equal((await viewer.callTool({name:'answer_attention',arguments:{attentionRequestId:attentionId,answer:'Friday',scope:'THIS_ACTION',expectedVersion:1,requestKey:'viewer-answer'}})).isError,true);
   const manager=await client('MANAGER');
   const approved=await tool(manager,'decide_purchase',args);
-  assert.equal(approved.status,'APPROVED');assert.equal(approved.purchaseOrderIds.length,1);
-  assert.equal((await tool(viewer,'get_case',{caseRef})).status,'WAITING');
   const replay=await tool(manager,'decide_purchase',args);
-  assert.deepEqual(replay.purchaseOrderIds,approved.purchaseOrderIds);
-  const po=await tool(viewer,'get_purchase_order',{purchaseOrderId:String(approved.purchaseOrderIds[0])});
-  assert.equal(po.status,'ORDERED');const totalKrw=po.items.reduce((sum,line)=>sum+BigInt(line.lineAmountKrw),0n).toString();assert.equal(totalKrw,'16500');assert.equal(po.caseRef,caseRef);
-  for(const r of [approval,approved,replay,po]) {
+  assert.deepEqual(replay,approved);
+  let totalKrw='0';
+  if(decision==='CANCEL') {
+    assert.equal(approved.status,'CANCELLED');assert.equal(approved.purchaseOrderIds.length,0);
+    assert.equal((await manager.callTool({name:'decide_purchase',arguments:{...args,decision:'APPROVE',requestKey:'approve-after-cancel'}})).isError,true);
+  } else {
+    assert.equal(approved.status,'APPROVED');assert.equal(approved.purchaseOrderIds.length,1);
+    assert.equal((await tool(viewer,'get_case',{caseRef})).status,'WAITING');
+    const po=await tool(viewer,'get_purchase_order',{purchaseOrderId:String(approved.purchaseOrderIds[0])});
+    assert.equal(po.status,'ORDERED');totalKrw=po.items.reduce((sum,line)=>sum+BigInt(line.lineAmountKrw),0n).toString();assert.equal(totalKrw,'16500');assert.equal(po.caseRef,caseRef);
+    assert.equal(po.capabilityToken,undefined);assert.equal(po.leaseToken,undefined);
+  }
+  for(const r of [approval,approved,replay]) {
     assert.equal(r.capabilityToken,undefined);assert.equal(r.leaseToken,undefined);
   }
   const operator=await client('OPERATOR');
-  const answerArgs={attentionRequestId:attentionId,answer:'Continue only this action',scope:'THIS_ACTION',expectedVersion:1,requestKey:'live-answer-once'};
+  const answerArgs={attentionRequestId:attentionId,answer:'Continue only this action',scope:'THIS_ACTION',expectedVersion:1,requestKey:decision==='CANCEL'?'live-cancel-answer-once':'live-answer-once'};
   const answer=await tool(operator,'answer_attention',answerArgs);
   const sameAnswer=await tool(operator,'answer_attention',answerArgs);
   assert.equal(answer.status,'ANSWERED');assert.equal(answer.version,2);assert.equal(sameAnswer.decisionId,answer.decisionId);
-  console.log(JSON.stringify({tools:7,approvalStatus:approved.status,purchaseOrderIds:approved.purchaseOrderIds,totalKrw,answerStatus:answer.status,answerVersion:answer.version,replay:true,viewerWritesDenied:true,anonymousReadsDenied:true}));
+  console.log(JSON.stringify({decision,approvalStatus:approved.status,purchaseOrderIds:approved.purchaseOrderIds,totalKrw,answerStatus:answer.status,answerVersion:answer.version,replay:true,viewerWritesDenied:true,anonymousReadsDenied:true}));
 } finally {await Promise.all(clients.map(c=>c.close()));}

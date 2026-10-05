@@ -38,7 +38,7 @@ service/capability/Authorization 헤더와 internal/agent API는 쓰지 않는�
 | `whoami` | 현재 인간 역할 조회 |
 | `get_case` / `get_plan` | caseRef / planRef로 업무·계획 조회 |
 | `get_approval` / `get_purchase_order` | approvalId / purchaseOrderId로 승인 근거·실제 발주 조회 |
-| `decide_purchase` | MANAGER의 APPROVE/BLOCK. approvalId, expectedVersion, proposalHash, reason 필수 |
+| `decide_purchase` | MANAGER의 APPROVE/BLOCK/CANCEL. approvalId, expectedVersion, proposalHash, reason 필수 |
 | `answer_attention` | OPERATOR·MANAGER의 일반 답변. attentionRequestId, expectedVersion, answer, scope 필수 |
 
 쓰기 도구의 `requestKey`는 선택적이다. 생략하면 UUID를 생성해 오류에도

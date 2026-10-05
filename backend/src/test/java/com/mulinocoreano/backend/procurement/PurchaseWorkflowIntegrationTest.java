@@ -565,6 +565,75 @@ class PurchaseWorkflowIntegrationTest {
                 409);
     }
 
+    // Goals 2 and 4: cancellation stops this purchase without erasing human history.
+    @Test
+    void managerCancellationIsGuardedFinalReplayableAndDoesNotApply() throws Exception {
+        var proposal = propose();
+        long id = proposal.path("approvalId").asLong();
+        String body = decisionBody(proposal, "CANCEL");
+        for (String field : List.of("expectedVersion", "proposalHash")) {
+            var wrong = (tools.jackson.databind.node.ObjectNode) mapper.readTree(body);
+            if (field.equals("expectedVersion")) wrong.put(field, proposal.path("version").asInt()+1);
+            else wrong.put(field, "0".repeat(64));
+            decide(id, mapper.writeValueAsString(wrong), "wrong-cancel-"+field, managerId, "MANAGER", 409);
+        }
+        for (String role : List.of("OPERATOR", "VIEWER"))
+            decide(id, body, "denied-cancel-"+role, operatorId, role, 403);
+        var request = new PurchaseDecisionRequest("CANCEL", proposal.path("version").asInt(), proposal.path("proposalHash").asText(), "Reviewed");
+        var actor = new com.mulinocoreano.backend.security.AgentActor(claim.runRef(), "CASE-PURCHASE", "WI-PURCHASE", "PROCUREMENT");
+        assertThatThrownBy(() -> purchaseDecisions.decide(id, request, actor, "agent-cancel")).isInstanceOf(org.springframework.security.access.AccessDeniedException.class);
+        assertThat(count("governance_decisions")).isZero();
+        long audits = count("governance_audit_logs");
+        decide(id, body, "cancel-once", managerId, "MANAGER", 200);
+        decide(id, body, "cancel-once", managerId, "MANAGER", 200);
+        decide(id, body, "cancel-new-key", managerId, "MANAGER", 409);
+        decide(id, decisionBody(proposal,"APPROVE"), "cancel-once", managerId, "MANAGER", 409);
+        decide(id, decisionBody(proposal,"APPROVE"), "after-cancel", managerId, "MANAGER", 409);
+        assertThat(count("purchase_orders")).isEqualTo(originalOrders);
+        assertThat(count("purchase_applications")).isZero();
+        assertThat(count("replenishment_followups")).isZero();
+        assertThat(count("governance_decisions")).isEqualTo(1);
+        assertThat(count("governance_audit_logs")).isEqualTo(audits+2);
+        assertThat(jdbc.sql("SELECT decision::text FROM governance_decisions WHERE is_final").query(String.class).single()).isEqualTo("CANCEL");
+        assertThat(jdbc.sql("SELECT status::text FROM governance_actions WHERE governance_action_id=:id").param("id",id).query(String.class).single()).isEqualTo("CANCELLED");
+        assertThat(jdbc.sql("SELECT status::text || ':' || procurement_outcome FROM work_items WHERE work_item_id=:id").param("id",workId).query(String.class).single()).isEqualTo("CANCELLED:CANCELLED");
+        assertThat(jdbc.sql("SELECT count(*) FROM waiting_conditions WHERE work_item_id=:id AND status='ACTIVE'").param("id",workId).query(Long.class).single()).isZero();
+        assertThat(execution.claim("no-cancel-retry")).isEmpty();
+    }
+
+    @org.junit.jupiter.params.ParameterizedTest
+    @org.junit.jupiter.params.provider.ValueSource(strings = {"APPROVED", "BLOCKED", "EXPIRED"})
+    void finalProposalCannotBeCancelled(String state) throws Exception {
+        var proposal = propose();
+        long id = proposal.path("approvalId").asLong();
+        jdbc.sql("UPDATE governance_actions SET status=CAST(:state AS governance_action_status) WHERE governance_action_id=:id").param("state",state).param("id",id).update();
+        decide(id, decisionBody(proposal,"CANCEL"), "cancel-final", managerId,"MANAGER",409);
+        assertThat(count("purchase_orders")).isEqualTo(originalOrders);
+        assertThat(count("governance_decisions")).isZero();
+        assertThat(count("purchase_applications")).isZero();
+        assertThat(count("replenishment_followups")).isZero();
+    }
+
+    @org.junit.jupiter.params.ParameterizedTest
+    @org.junit.jupiter.params.provider.ValueSource(strings = {"governance_decisions", "governance_audit_logs"})
+    void failedCancellationHistoryRollsBackAndSameKeyRetries(String table) throws Exception {
+        var proposal = propose();
+        long id = proposal.path("approvalId").asLong();
+        String body = decisionBody(proposal,"CANCEL");
+        long audits = count("governance_audit_logs");
+        jdbc.sql("CREATE FUNCTION fail_cancel_history() RETURNS TRIGGER AS $$ BEGIN RAISE EXCEPTION 'fixture history failure'; END; $$ LANGUAGE plpgsql; CREATE TRIGGER fail_cancel_history BEFORE INSERT ON "+table+" FOR EACH ROW EXECUTE FUNCTION fail_cancel_history()").update();
+        decide(id,body,"cancel-retry",managerId,"MANAGER",500);
+        assertThat(jdbc.sql("SELECT status::text FROM governance_actions WHERE governance_action_id=:id").param("id",id).query(String.class).single()).isEqualTo("PENDING");
+        assertThat(count("governance_decisions")).isZero();
+        assertThat(count("governance_audit_logs")).isEqualTo(audits);
+        assertThat(jdbc.sql("SELECT count(*) FROM request_idempotency WHERE request_key='cancel-retry'").query(Long.class).single()).isZero();
+        assertThat(jdbc.sql("SELECT procurement_outcome FROM work_items WHERE work_item_id=:id").param("id",workId).query(String.class).single()).isEqualTo("PROPOSED");
+        assertThat(jdbc.sql("SELECT status::text FROM work_items WHERE work_item_id=:id").param("id",workId).query(String.class).single()).isEqualTo("WAITING");
+        assertThat(jdbc.sql("SELECT status::text FROM waiting_conditions WHERE work_item_id=:id AND condition_type='APPROVAL'").param("id",workId).query(String.class).single()).isEqualTo("ACTIVE");
+        jdbc.sql("DROP TRIGGER fail_cancel_history ON "+table+"; DROP FUNCTION fail_cancel_history()").update();
+        decide(id,body,"cancel-retry",managerId,"MANAGER",200);
+    }
+
     @Test
     void proposalAuditDoesNotImpersonateTheHumanRequester() throws Exception {
         JsonNode proposal = propose();
@@ -650,11 +719,13 @@ CREATE TRIGGER fail_second_purchase_line AFTER INSERT ON purchase_order_items
         assertThat(count("purchase_orders")).isEqualTo(originalOrders + 1);
     }
 
-    @Test
-    void approveAndBlockRaceProducesOnlyOneFinalDecision() throws Exception {
+    @org.junit.jupiter.params.ParameterizedTest
+    @org.junit.jupiter.params.provider.ValueSource(strings = {"BLOCK", "CANCEL"})
+    void approveAndClosureRaceProducesOnlyOneFinalDecision(String closure) throws Exception {
         JsonNode proposal = propose();
         long id = proposal.path("approvalId").asLong();
         var start = new CountDownLatch(1);
+        int approveStatus;
         try (var pool = Executors.newFixedThreadPool(2)) {
             var approve =
                     pool.submit(
@@ -668,10 +739,11 @@ CREATE TRIGGER fail_second_purchase_line AFTER INSERT ON purchase_order_items
                             () -> {
                                 start.await();
                                 return decisionStatus(
-                                        id, decisionBody(proposal, "BLOCK"), "race-block");
+                                        id, decisionBody(proposal, closure), "race-close");
                             });
             start.countDown();
-            assertThat(List.of(approve.get(20, TimeUnit.SECONDS), block.get(20, TimeUnit.SECONDS)))
+            approveStatus = approve.get(20, TimeUnit.SECONDS);
+            assertThat(List.of(approveStatus, block.get(20, TimeUnit.SECONDS)))
                     .containsExactlyInAnyOrder(200, 409);
         }
         assertThat(
@@ -680,8 +752,13 @@ CREATE TRIGGER fail_second_purchase_line AFTER INSERT ON purchase_order_items
                                 .single())
                 .isEqualTo(1);
         long applications = count("purchase_applications");
-        assertThat(applications).isBetween(0L, 1L);
+        assertThat(applications).isEqualTo(approveStatus == 200 ? 1L : 0L);
+        String decision = approveStatus == 200 ? "APPROVE" : closure;
+        String finalStatus = approveStatus == 200 ? "APPROVED" : "CANCEL".equals(closure) ? "CANCELLED" : "BLOCKED";
+        assertThat(jdbc.sql("SELECT decision::text FROM governance_decisions WHERE is_final").query(String.class).single()).isEqualTo(decision);
+        assertThat(jdbc.sql("SELECT status::text FROM governance_actions WHERE governance_action_id=:id").param("id",id).query(String.class).single()).isEqualTo(finalStatus);
         assertThat(count("purchase_orders")).isEqualTo(originalOrders + applications);
+        assertThat(count("replenishment_followups")).isEqualTo(applications);
     }
 
     @Test

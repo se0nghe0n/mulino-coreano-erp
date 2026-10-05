@@ -1,5 +1,8 @@
 # 2026-10-05 실제 구매 인수 기록
 
+아래 v6 기록은 CANCEL 구현 전 4/5의 과거 증거다. 수치와 실패를
+그대로 보존하며, 마지막 절의 새 실행 기록이 현재 판정을 대체한다.
+
 MANAGER 승인 이후 로컬 데모 DB에 실제 PO가 생성되고 불변 감사 로그,
 후속 WAITING 책임, 열린 Case가 남는 경로는 통과했다. #34의 별도 인간
 취소 결정 이력은 현재 API에 없어 전체 완료 조건은 충족하지 못했다.
@@ -103,3 +106,55 @@ v2는 빠진 local profile로 claim 403, v3는 다른 Case의 동일 warehouse
 version으로 수정한 v4와 snapshot을 추가한 v5가 통과했다. URL·DB guard와 생산 전후 비교를
 보강한 최종 v6도 통과했다. 이 실패는
 현재 제품의 인수 실패로 분류하지 않았다. 각 DB와 `run*.log`를 보존했다.
+
+## CANCEL 구현 후 새 인수 기록 (5/5)
+
+위 v6의 4/5 기록은 그대로 보존한다. 이번 새 실행은 MANAGER의 독립
+CANCEL 결정을 구현한 source와 새 DB로 다섯 조건을 모두 통과했다.
+원 저장소 issue 종료나 upstream merge를 뜻하지 않는다.
+
+- source baseline: `ed7520ed86efad095997871468ca6d92888c5739`
+- 실행 source diff SHA-256: `a14b3a2903cad0ce9f2d641d172b433fe0a886b7c6fe132b87901473435eb9ed`
+- V28 SHA-256: `0c71d1f1d2ec4ca2e59072a589a1734536c773ea6ce6190691ae9357cf33b286`
+- JAR SHA-256: `a0645a81009b18e79e7413075ac52c1f06eaabe9e3955bd59368106449b4abc9`
+- fixture SHA-256: `c16d9d26ac591685924c56aeb0f84dfdd8c12c8c2731f16809eb05d94ae4906d`
+- 실행 UTC: `2026-10-05T12:08:45.652953+00:00`
+- DB: `mulino_purchase_acceptance_cancel34_v1`
+- 증거: `/tmp/mulino-cancel-34-20261005/acceptance-v1/`
+
+실행 당시 source는 baseline 위의 구현 working tree다. source diff와
+V28 및 실제 JAR hash를 함께 기록했다. 과거 v6 JAR의 결과를 이번
+결과로 바꾸지 않았다.
+
+| #34 조건 | 새 결과 | 직접 증거 |
+|---|---|---|
+| MANAGER 승인 뒤 실제 PO | Pass | orders.json: ORDERED, 합계 16,500원 |
+| 액션 불변 감사 | Pass | audit-mutation-denied.json: UPDATE·DELETE·TRUNCATE 거부 |
+| 후속 WAITING 업무 | Pass | business-state.json: followupStatus WAITING |
+| Case 임의 종결 방지 | Pass | business-state.json: Case WAITING, 구매 업무 DONE |
+| version/hash별 승인·거절·취소 | Pass | history.json: BLOCK·CANCEL·EXPIRED·APPROVE 별도 행 |
+
+같은 Case의 version 1은 BLOCKED/BLOCK, 2는 CANCELLED/CANCEL,
+3은 EXPIRED/인간 결정 없음, 4는 APPROVED/APPROVE다. 각 행의 정확한
+hash와 결정 사용자·시간은 history.json에 있다. final application 1,
+연결 PO 1, 후속 1, 최종 인간 결정 3, audit 11이다.
+
+stdio-cancel.log는 실제 stdio MCP의 MANAGER CANCEL 및 같은 key replay,
+VIEWER 쓰기 거부, 취소 뒤 승인 거부를 증명한다. OPERATOR HTTP 요청도
+403으로 거부됐다. 잘못된 version/hash는 409이며 결정·감사·발주·후속
+수가 같았다. CANCEL 뒤 새 key 취소와 같은 key의 APPROVE 변경도 409다.
+구매 업무와 procurement outcome은 CANCELLED, 활성 승인 대기는 0이다.
+CANCEL의 최종 decision UPDATE·DELETE는 거부됐다. 자동 구매 재시도나
+ERP application·발주·후속은 없었다. 상위 방침 확인 Attention을 남겼다.
+
+뒤의 새 version 승인은 구매 업무 DONE, 후속 WAITING, Case WAITING을
+유지했다. 새 발주 연결 inbound는 0이고 생산 LOT는 전후 8개였다.
+manual agent HTTP와 실제 인간 stdio MCP만 사용했으며 모델·운영 발주·
+세금계산서 발급은 실행하지 않았다.
+
+검증은 새 DB의 backend `clean test bootJar` 491건 통과(14 skipped),
+MCP 15건, SIT 업무 6개·실제 backend 재시작 2건 통과다. DDL 00–20와
+Flyway V1–V28 semantic parity도 통과했다. 정확한 명령과 count는
+[시나리오 기록](../16_scenario_tests.md)에 있다. 초기 unit DB는 V28 작성
+중 checksum 변경으로 validation에 실패했다. repair나 기존 DB 삭제 없이
+새 DB에서 재실행해 통과했고 초기 로그와 DB를 보존했다.

@@ -111,9 +111,6 @@ blocked_case = create('block')
 _, blocked, blocked_work = plan_and_propose(blocked_case, 'block')
 before = state()
 assert before['applications'] == before['linkedOrders'] == before['followups'] == 0
-# Unsupported CANCEL is observed, never counted as supported cancellation.
-decide(blocked, 'CANCEL', 'cancel-unsupported', 400)
-assert state() == before
 blocked_result = decide(blocked, 'BLOCK', 'block-once')
 assert blocked_result['status'] == 'BLOCKED'
 blocked_state = state()
@@ -121,9 +118,38 @@ assert decide(blocked, 'BLOCK', 'block-once') == blocked_result
 assert state() == blocked_state
 assert state()['linkedOrders'] == state()['followups'] == 0
 assert sql(f"SELECT status FROM work_items WHERE work_item_ref='{blocked_work}';") == 'CANCELLED'
-checks += ['BLOCK keeps zero orders/followups; replay has no extra history', 'CANCEL is unsupported (HTTP 400), with no state change']
+checks += ['BLOCK keeps zero orders/followups; replay has no extra history']
 
 case = blocked_case  # Continue the same warehouse responsibility and version history.
+cancel_plan, cancelled, cancelled_work = plan_and_propose(case, 'cancel')
+before = state()
+for role in ['OPERATOR', 'VIEWER']:
+    body = {'decision':'CANCEL','expectedVersion':cancelled['version'],'proposalHash':cancelled['proposalHash'],'reason':'Cancel this pending proposal'}
+    api('/approvals/' + str(cancelled['approvalId']) + '/decision', body,
+        {'X-Mulino-Local-Role':role,'Idempotency-Key':'cancel-denied-'+role},403)
+decide(cancelled,'CANCEL','cancel-wrong-version',409,expectedVersion=cancelled['version']+1)
+decide(cancelled,'CANCEL','cancel-wrong-hash',409,proposalHash='0'*64)
+assert state() == before
+cancel_attention = sql(f"INSERT INTO attention_requests(case_id,reason_type,title,question,suggested_scope) VALUES({case['caseId']},'MISSING_HUMAN_CONTEXT','Cancel scope','Scope?','THIS_ACTION') RETURNING attention_request_id;").splitlines()[0]
+cancel_env = {**os.environ,'MULINO_TEST_APPROVAL_ID':str(cancelled['approvalId']),'MULINO_TEST_PLAN_REF':cancel_plan['ref'],
+              'MULINO_TEST_CASE_REF':case['caseRef'],'MULINO_TEST_ATTENTION_ID':cancel_attention,'MULINO_TEST_DECISION':'CANCEL'}
+cancel_env.pop('MULINO_LOCAL_SERVICE_SECRET',None)
+r = subprocess.run(['node','scripts/local-human-flow.mjs'],cwd=ROOT/'mcp-server',env=cancel_env,text=True,capture_output=True)
+(OUT/'stdio-cancel.log').write_text(r.stdout+r.stderr)
+assert r.returncode == 0,r.stdout+r.stderr
+cancel_state = state()
+decide(cancelled,'CANCEL','cancel-new-key',409)
+decide(cancelled,'APPROVE','live-cancel-once',409)
+assert state() == cancel_state
+assert cancel_state['applications'] == cancel_state['linkedOrders'] == cancel_state['followups'] == 0
+assert sql(f"SELECT status::text || ':' || procurement_outcome FROM work_items WHERE work_item_ref='{cancelled_work}';") == 'CANCELLED:CANCELLED'
+assert sql(f"SELECT count(*) FROM waiting_conditions w JOIN work_items i USING(work_item_id) WHERE i.work_item_ref='{cancelled_work}' AND w.status='ACTIVE';") == '0'
+decision_id = sql(f"SELECT governance_decision_id FROM governance_decisions WHERE governance_action_id={cancelled['approvalId']} AND decision='CANCEL' AND is_final;")
+assert decision_id.isdecimal()
+save('cancel-final-history-mutation-denied.json',{'update':sql(f"UPDATE governance_decisions SET reason='tampered' WHERE governance_decision_id={decision_id};",True),
+     'delete':sql(f"DELETE FROM governance_decisions WHERE governance_decision_id={decision_id};",True)})
+checks += ['Live stdio MANAGER CANCEL is final; VIEWER/OPERATOR denied; version/hash guards and replay preserve counts; no orders/applications/followups']
+
 _, stale, _ = plan_and_propose(case, 'stale')
 before = state()
 decide(stale, 'APPROVE', 'wrong-version', 409, expectedVersion=stale['version'] + 1)
@@ -179,16 +205,18 @@ save('audit-mutation-denied.json', errors)
 checks += ['Action audit UPDATE/DELETE/TRUNCATE denied and row unchanged']
 history = json.loads(sql("SELECT json_agg(row_to_json(t)) FROM (SELECT a.governance_action_id,a.case_id,a.proposal_version,a.proposal_hash,a.status,d.decision,d.decided_by,d.decided_at FROM governance_actions a LEFT JOIN governance_decisions d USING(governance_action_id) WHERE a.replenishment_plan_id IS NOT NULL ORDER BY a.governance_action_id) t;"))
 save('history.json', history)
-assert [h['status'] for h in history] == ['BLOCKED', 'EXPIRED', 'APPROVED']
-assert [h['decision'] for h in history] == ['BLOCK', None, 'APPROVE']
+assert [h['status'] for h in history] == ['BLOCKED', 'CANCELLED', 'EXPIRED', 'APPROVED']
+assert [h['decision'] for h in history] == ['BLOCK', 'CANCEL', None, 'APPROVE']
 summary = {'sourceCommit': subprocess.check_output(['git','rev-parse','HEAD'], cwd=ROOT,text=True).strip(),
+           'sourceDiffSha256': hashlib.sha256(subprocess.check_output(['git','diff','HEAD'],cwd=ROOT)).hexdigest(),
+           'migrationV28Sha256': hashlib.sha256((ROOT/'backend/src/main/resources/db/migration/V28__purchase_cancellation.sql').read_bytes()).hexdigest(),
            'jarSha256': hashlib.sha256((ROOT/'backend/build/libs/backend-0.0.1-SNAPSHOT.jar').read_bytes()).hexdigest(),
            'executedAt': dt.datetime.now(dt.timezone.utc).isoformat(), 'businessDate': str(today), 'database': DB,
            'fixtureSha256': hashlib.sha256(seed.encode()).hexdigest(), 'manualAgentRuns': True, 'modelInvoked': False,
            'checks': checks, 'finalState': final, 'history': history,
-           'issue34': {'passedCriteria': 4, 'totalCriteria': 5, 'complete': False},
+           'issue34': {'passedCriteria': 5, 'totalCriteria': 5, 'complete': True},
            'productionLotsBefore': int(production_count_before),
            'productionLotsAfter': int(sql('SELECT count(*) FROM production_lots;')),
-           'unresolved': 'Issue #34 independent human cancellation history has no supported API; BLOCK work cancellation is not a CANCEL decision.'}
+           'unresolved': None}
 save('summary.json', summary)
 print(json.dumps(summary, ensure_ascii=False, indent=2))
