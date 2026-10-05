@@ -1,7 +1,7 @@
 {
   "asOf": "2026-10-06",
   "sourceBaseline": "0132e0a62ad9f086e5c70c5c857d4546f5921ef9",
-  "classification": "local PoC source and recorded acceptance evidence; current native UAT in progress",
+  "classification": "local PoC production baseline0132; final native acceptance source2d2a900; acceptance incomplete",
   "supplier": {
     "commit": "0132e0a62ad9f086e5c70c5c857d4546f5921ef9",
     "tests": {
@@ -70,10 +70,7 @@
     },
     "current": {
       "plannedScenarios": 5,
-      "status": "IN_PROGRESS",
-      "results": null,
-      "cost": null,
-      "tokens": null,
+      "status": "ACCEPTANCE_INCOMPLETE",
       "passedCheckpoint": {
         "testCase": "TC-P2P-001",
         "status": "PASSED",
@@ -92,7 +89,159 @@
         "outputTokens": 18050,
         "cacheReadTokens": 4165609,
         "cacheWriteTokens": 518420,
-        "scope": "provisional checkpoint, other four scenarios and final native harness commit pending"
+        "scope": "confirmed original P2P001 attempt; final native acceptance source2d2a900 includes two PASS but overall acceptance incomplete"
+      },
+      "acceptanceCommit": "2d2a900b59a8704e27a4462740196b2c4902829b",
+      "productionBaseline": "0132e0a62ad9f086e5c70c5c857d4546f5921ef9",
+      "runtime": "CLAUDE",
+      "model": "claude-sonnet-5",
+      "acceptanceCounts": {
+        "PASSED": 2,
+        "FAILED": 2,
+        "INCOMPLETE": 1
+      },
+      "cases": [
+        {
+          "testCase": "TC-P2P-001",
+          "status": "PASSED",
+          "orders": 1,
+          "totalKrw": 16500,
+          "caseStatus": "WAITING",
+          "coordinatorOutcome": "DONE",
+          "runCount": 5,
+          "usageComplete": true,
+          "cliReportedCostUsd": "3.0874898"
+        },
+        {
+          "testCase": "TC-P2P-002",
+          "status": "PASSED",
+          "orders": 0,
+          "followups": 0,
+          "caseStatus": "OPEN",
+          "coordinatorOutcome": "ABORTED",
+          "humanDecision": "MANAGER BLOCK",
+          "reason": "scenario BLOCK",
+          "runCount": 5,
+          "usageComplete": true,
+          "cliReportedCostUsd": "3.2866446",
+          "evidenceLimit": "reason and BLOCKED assertion from test path; original hook had no standalone decision/work/Attention DB export"
+        },
+        {
+          "testCase": "TC-P2P-004",
+          "status": "FAILED",
+          "orders": 1,
+          "totalKrw": 17000,
+          "caseStatus": "WAITING",
+          "finalCoordinatorFailure": "MODEL_PROCESS_FAILED",
+          "runCount": 9,
+          "usageComplete": false,
+          "cliReportedCostUsd": "6.2873046",
+          "pastFailureCause": "unknown"
+        },
+        {
+          "testCase": "TC-QM-001",
+          "status": "FAILED",
+          "inspectionProposals": 0,
+          "failure": "MODEL_PROCESS_FAILED",
+          "resolvedModel": null,
+          "cliReportedCostUsd": "0",
+          "cliReportedTokens": 0,
+          "pastFailureCause": "unknown"
+        },
+        {
+          "testCase": "TC-RC-001",
+          "status": "INCOMPLETE",
+          "rawStatus": "PASSED",
+          "proposalAndTraceAssertionsPassed": true,
+          "nativeFinalizationAndUsageComplete": false,
+          "cliReportedCostUsd": null,
+          "tokens": null,
+          "evidenceLimit": "raw record preserved; separate classification required; no valid reacceptance"
+        }
+      ],
+      "knownCliReportedCostUsd": "12.661439",
+      "overallCostUsd": null,
+      "overallTokens": null,
+      "codexParity": {
+        "testCase": "TC-P2P-001",
+        "status": "FAILED",
+        "runtime": "CODEX",
+        "requestedModel": "gpt-5.6-sol",
+        "catalogDefaultEffort": "low",
+        "executionReady": false,
+        "accountingStatus": "PARTIAL",
+        "reportedCostUsd": null,
+        "tokens": null,
+        "failure": "MODEL_PROCESS_FAILED",
+        "currentMetadataGate": "AUTHENTICATION",
+        "pastFailureCause": "unknown"
+      },
+      "currentAccessGate": "CODEX account/rateLimits/read AUTHENTICATION",
+      "pastFailureCauses": "unknown; current metadata authentication failure does not establish past model failure cause",
+      "humanLoginRefresh": {
+        "status": "PREPARED_NOT_EXECUTED",
+        "reacceptance": "NOT_EXECUTED"
+      },
+      "checks": {
+        "runner": 76,
+        "UatEvidenceHelper": 7,
+        "SIT": 20,
+        "SITFailures": 0,
+        "SITSkipped": 0,
+        "SITDuration": "3m21s",
+        "lastSITLimit": "before logging-only Codex diagnostics extension",
+        "imageSmoke": "passed; modelRequests=0",
+        "bootJar": "passed/up-to-date",
+        "full549UnitRepeat": false
+      },
+      "productionSourceManifest": {
+        "image": "sha256:aa055d76d0c8d44b9707c84726101e551ec123dc0dba714bea4746b02d4d4656",
+        "files": {
+          "agents/cli/src/cli.zig": "2c67367c817edd76490d687d5cb00044bb003b808f216379a55d9d2e2680f37d",
+          "agents/cli/src/main.zig": "f80aac34914eaedbd1e94669344cb0490161583daa3cc01f498382e4636287a4",
+          "agents/skills/orchestrator/SKILL.md": "0c9ebfc658a032db4251aabd625429abb9bce807bd60457cde2cff1ec57cf240",
+          "agents/skills/procurement/SKILL.md": "418e942a104bef7e81a6c23eec5ac12a956179f9345c4d28c78e591a47372b71",
+          "agents/skills/qc/SKILL.md": "76814c7532cddd131587c2d260ea156cbbfea65deedb66375b5876caf1b8f390",
+          "agents/skills/runtime.md": "7cbc10b5d4b0498f1fda3613b1b0fce11462b8e1a434c7f036b17261603cf200",
+          "agents/skills/supply-chain/SKILL.md": "bf4e4f03fadfcf3923895928d0579a7bc6c95232ac150e5fae77a454ef7c6eef",
+          "backend/build/libs/backend-0.0.1-SNAPSHOT.jar": "4cc3ed1977f72538b51e025b09937f4b122a19e6305f4d0f5a939d82cfbb3369"
+        },
+        "productionCliRolesJarUnchangedDuringAttempts": true
+      },
+      "harnessSourceHashes": {
+        "agents/runner/src/executor.js": "ad9cc70e19391824af55bef5f38d097019efe9eaa05b99593c31a3df7c7bbe48",
+        "agents/runner/src/http.js": "fb96ec2dd318186f3c19dd69469bee68a158687a149270d7f61190ea5f2a61f0",
+        "agents/runner/src/main.js": "59d2c7e473f94403292207f9e0bfbe76c0f0ceb898c6a1ced929c3eaa22c6170",
+        "agents/runner/src/native-diagnostics.js": "e88b19b084a4a7e44f2762bdb9ad6527f5f9539ec776a04b8e9e64a2d29a68f4",
+        "agents/runner/src/protocol.js": "64a5afaadcdd1360e9702b98ac426445138d58b7f28abacd2efb73d493312d37",
+        "agents/runner/src/runner.js": "b9f905776d9b0b8fce7dd1c8ca0d660317ec96255d6055ce911db1db68b3e4c6",
+        "agents/runner/src/runtime-config.js": "94612b493b7abe9b490f931f59e8b5eee86b52dd7527014fb2324e1abe03e4fa",
+        "agents/runner/test/executor.test.js": "c7fc895377dde311c253d86071586a7eae0a9ce0d53ca820cf67a4b57288e74d",
+        "agents/runner/test/fixtures/child.js": "db58532cccae5b08a4b46ac1d70ab98886d09c8eee6995a32cb35bf0249a8b2b",
+        "agents/runner/test/protocol-auth.test.js": "bad81ce2c2a71a626a4b6042d82936bfbb84e65644bf4921cbbcc4a51b63187f",
+        "agents/runner/test/runner.test.js": "e20b93e76f4fb700118b19b8e12284d55904205975bb11ca76a39619bb3f2454",
+        "agents/runner/test/runtime.test.js": "7df85b49e379d50c56604b4228780c4cf8da85647d246a82310511a555adf6e4",
+        "backend/src/test/java/com/mulinocoreano/backend/scenario/AgentDriver.java": "bd68020c92bbd58597e82fecbd491665f1dfa5efb3c69d2c03e506c86abab0a8",
+        "backend/src/test/java/com/mulinocoreano/backend/scenario/AgentDriverTest.java": "4ad03929c13ad381742fc32376b5adc41c3406fc21bb2f73644f9393859a4211",
+        "backend/src/test/java/com/mulinocoreano/backend/scenario/AgentSteps.java": "2d4fb52d7167399658aa41fc15755614bb948decf62f885903348004068b482b",
+        "backend/src/test/java/com/mulinocoreano/backend/scenario/BackendRestartRecoveryTest.java": "a9545c660fed86b6a783e41c80f349b51bd13a9d557c70257515d254b7068393",
+        "backend/src/test/java/com/mulinocoreano/backend/scenario/BusinessState.java": "b6600dd46c4c99d869fb0994d4c8165a314f5df625b5dfe010b0cf1c72f663ec",
+        "backend/src/test/java/com/mulinocoreano/backend/scenario/FixtureSteps.java": "594ce7539d78cda6a26878ceea591a29057b0158df97c5b9d7aa71988d322c1d",
+        "backend/src/test/java/com/mulinocoreano/backend/scenario/HumanChannel.java": "8ee87f3602ef33111fbb77976bbacc5f9c7dc2bec8aff45e96f40cc1930e7c67",
+        "backend/src/test/java/com/mulinocoreano/backend/scenario/HumanSteps.java": "acb49a4f080759a6a5aa7c752e5dbcb1efd21fc217af03b01b854561abcf44d8",
+        "backend/src/test/java/com/mulinocoreano/backend/scenario/QualitySteps.java": "8ee3bd488aa69acff56d9f6e1d5ad16243b4d7e9d8726dea5c91875544fe8d2b",
+        "backend/src/test/java/com/mulinocoreano/backend/scenario/RecallSteps.java": "3b8760f7ef190a0d70d8a129dc9cca2caf2ddc5b0e8f6d78c0f89bd213380697",
+        "backend/src/test/java/com/mulinocoreano/backend/scenario/ScenarioContext.java": "a12f04331b44b7521a085cf1d9281bc5f4afd4cb54e08f6f5eaf539625ee5c49",
+        "backend/src/test/java/com/mulinocoreano/backend/scenario/ScenarioGuard.java": "63aaab3864413cabf75d2e75e7879911cfac6e5611fe95eae4a9cb598b819ba7",
+        "backend/src/test/java/com/mulinocoreano/backend/scenario/ScenarioGuardTest.java": "2465076d9a9472c9ee62aa0de2f0ca5ae5a7cbe5f9950cb1aea4d5b9f2eebdf9",
+        "backend/src/test/java/com/mulinocoreano/backend/scenario/ScenarioSecrets.java": "56a8c790e9b16a492ad4c3dff3c3f2045f3a0f7b1822cf1499379c8e6d8662c7",
+        "backend/src/test/java/com/mulinocoreano/backend/scenario/ScenarioSuite.java": "08d19bb722661e5b5243fc8d1e5d25c178326c4dd58d7452e4514bd12054ad79",
+        "backend/src/test/java/com/mulinocoreano/backend/scenario/ScenarioWorld.java": "e6cd86ba9a8709a77b157ab8fa3f8aea82de3835b08059fa79dccfafa8690f56",
+        "backend/src/test/java/com/mulinocoreano/backend/scenario/ScenarioWorldTest.java": "83656955f37f8a9de32a18b1b2b3e878419894252659eae946ecac4951564a8b",
+        "backend/src/test/java/com/mulinocoreano/backend/scenario/StateSteps.java": "93c7ed8f437d439d69cb54cb9732bd7c8740cb89a4d5bcdc2a763634c3d37c61",
+        "backend/src/test/java/com/mulinocoreano/backend/scenario/UatEvidence.java": "c3e0dfb2464a21663d05210e093bdf8f20ea6ccb349473122dcd0c1fb2f5c78a",
+        "backend/src/test/java/com/mulinocoreano/backend/scenario/UatEvidenceTest.java": "341805f95a65fa6ad34c114b947da6fcb0690d9117a45bfcf3951d7824479965",
+        "backend/src/test/java/com/mulinocoreano/backend/scenario/WorldSteps.java": "6cf69a7c8ee6d5d2e038055818715e38916036c700bacec40cc3c1e2f37318e0"
       }
     }
   },
@@ -101,7 +250,10 @@
     "No OAuth, dedicated dashboard, production deployment or individual production IAM",
     "Certificate required-type coverage and automatic 30-day notices await issue registration",
     "No actual MFDS transmission or statutory form validation",
-    "VERIFIED means explicit human attestation, not independent truth or ERP authority"
+    "VERIFIED means explicit human attestation, not independent truth or ERP authority",
+    "Current native five-case acceptance: two PASS, two FAIL, one INCOMPLETE; Codex parity FAIL",
+    "Known reported CLI cost USD12.661439 only; total cost and incomplete metrics unknown",
+    "Current Codex account metadata authentication gate unresolved; human login refresh prepared but not executed"
   ],
   "provenance": [
     {
@@ -128,6 +280,21 @@
       "ownerReport": "native/probe-success/TC-P2P-001.json",
       "sha256": "b33b31469cd71d0e4f1115e3fb7c15f3bbd3b5d0524bc16696e7c3840b436953",
       "storage": "coordinator private acceptance bundle; selected nonsecret results transcribed here"
+    },
+    {
+      "ownerReport": "native/worker-final-report.json",
+      "sha256": "6e1351a6f402f08534ee467c44e181f67acea00998bd4b3a61adc304f46de3f7",
+      "storage": "coordinator private acceptance bundle; selected nonsecret evidence and source hashes transcribed here"
+    },
+    {
+      "ownerReport": "native/final-source-manifest.json",
+      "sha256": "025aaba39b3f6028bf23fb6fcd58fd0f999c2f722598d6052d9d6737a3b88b23",
+      "storage": "coordinator private acceptance bundle; selected nonsecret evidence and source hashes transcribed here"
+    },
+    {
+      "ownerReport": "native/final-harness-hashes.json",
+      "sha256": "6c3013941c5242d8187b5baaba7a4865935a77a14d3b2b53f7d8fd0abdb79401",
+      "storage": "coordinator private acceptance bundle; selected nonsecret evidence and source hashes transcribed here"
     }
   ]
 }

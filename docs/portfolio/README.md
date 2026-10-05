@@ -39,7 +39,11 @@
 
 기준 source는 `0132e0a62ad9f086e5c70c5c857d4546f5921ef9`다.
 이는 fork의 통합 baseline이며 조직 `main` 병합을 뜻하지 않는다.
-선행 변경의 현재 로컬 proof를 해당 source와 함께 기록한다.
+선행 변경의 현재 로컬 proof를 해당 source와 함께 기록한다. native
+인수·runner/test harness의 최종 source는
+`2d2a900b59a8704e27a4462740196b2c4902829b`다. 모델이 실행한 CLI·role·JAR와
+image는 시도 중 변경하지 않았다. `evidence.json`에 각 파일·image·JAR 및
+최종 harness hash를 기록했다.
 모든 수치는 이미 실행한 담당자의 보고서에서 옮겼다. 문서 작업을 위해
 백엔드 테스트나 유료 모델을 다시 실행하지 않았다.
 
@@ -54,7 +58,9 @@
 | Supplier 현재 JAR | CRUD 5, Swagger 5, 감사 3, canonical replay | soft delete·version 충돌 확인 |
 | 구매 데모 | 5/5 | #34 d7ce2d8, 실제 인간 stdio, 모델 호출 없음 |
 | 과거 native UAT | 10월 3일 Claude 3건 통과 | cb04403. 현재 source 인수로 이월하지 않음 |
-| 현재 native UAT | P2P-001 통과, 나머지 4개 진행 중 | 아래 provisional checkpoint |
+| 현재 Claude native UAT | PASS 2, FAIL 2, INCOMPLETE 1 | source 2d2a900, 전체 인수 미완료 |
+| Codex parity | P2P-001 FAIL, 제안 전 실행 실패 | 비용·tokens·resolvedModel unknown |
+| 최신 runner·helper·SIT | runner 76, helper 7, SIT 20 통과 | SIT는 마지막 logging-only Codex 진단 확장 전 |
 | 실제 클라이언트 #35 | 인수 대기 | 로컬 stdio 구현과 별도 |
 | 운영 배포 | 미실시 | 로컬 PoC 범위 |
 
@@ -63,17 +69,37 @@
 인수 bundle에 보존한다. capability·human/service secret, 인증 volume,
 개인 파일 경로는 발표 원본·노트·source·evidence에 복사하지 않았다.
 
-### 현재 native P2P checkpoint
+### 현재 native 인수 결과와 접근 gate
 
-CLAUDE / `claude-sonnet-5`의 TC-P2P-001은 통과했다. PO 1개와
-16,500원을 적용했고 Case는 WAITING이며 원래 coordinator는 DONE이다.
-5개 Run 모두 usageComplete다. CLI가 보고한 해당 시나리오 비용은
-USD 3.0874898, input 94, output 18,050, cache read 4,165,609,
-cache write 518,420 tokens다. 전체 5건의 합계 비용으로 해석하지 않는다.
+CLAUDE / `claude-sonnet-5`의 유효한 업무 인수는 두 PASS다.
 
-실행 image는 `evidence.json`의 image SHA로 식별한다. production baseline은
-0132e0a이며 private-key test harness의 최종 commit은 인수 통합 때 기록한다.
-나머지 4건과 최종 source 인수는 진행 중이므로 전체 완료를 주장하지 않는다.
+| Case | 현재 판정과 업무 결과 | CLI 보고 비용 USD |
+|---|---|---:|
+| P2P-001 | PASS. PO 1·16,500원, coordinator DONE·Case WAITING, 5 Run 사용량 완전 | 3.0874898 |
+| P2P-002 | PASS. MANAGER BLOCK, PO·followup 0, coordinator ABORTED·Case OPEN, 5 Run 사용량 완전 | 3.2866446 |
+| P2P-004 | FAIL. PO 1·17,000원이지만 마지막 coordinator MODEL_PROCESS_FAILED, usageComplete=false | 6.2873046 |
+| QM-001 | FAIL. 검사 제안 전 QC 실행 실패, resolvedModel 없음 | 0 (실제 CLI 보고값) |
+| RC-001 | INCOMPLETE. 제안·추적 단언 뒤 native 종료·사용량 누락 | unknown |
+
+P2P-002의 인간 reason은 `scenario BLOCK`이며 테스트 경로가 BLOCKED를
+검증했다. 원래 hook에는 별도 decision/work/Attention DB export가 없었다.
+ABORTED는 인간의 authoritative BLOCK 결과이며 machine failure로 해석하지
+않는다. P2P-004는 발주 결과가 있어도 최종 조정 실패이므로 PASS가 아니다.
+QM의 0은 실제 CLI 보고값이며 unknown을 0으로 바꾼 값이 아니다. RC 원본
+JSON의 PASSED는 보존하고 별도 INCOMPLETE 분류를 적용했다. 유효한 RC
+재인수 증거는 없다. 초기 모델 실패의 정확한 원인은 unknown이다.
+
+알려진 CLI 보고 비용 합계는 USD 12.661439다. RC와 Codex 등 미보고
+항목이 있으므로 전체 시도 비용과 불완전한 사용량은 unknown으로 유지한다.
+CODEX / `gpt-5.6-sol` (catalog default low)의 P2P-001은 첫 Run에서
+MODEL_PROCESS_FAILED로 실패했다. proposal 이전이며 비용·tokens·resolvedModel은
+unknown이고 executionReady=false, accountingStatus=PARTIAL이다.
+
+현재 모델 없는 Codex account/rateLimits/read는 AUTHENTICATION을 보고한다.
+이 현재 접근 gate를 과거 probe의 정확한 실패 원인으로 소급하지 않는다.
+인간 login 갱신·metadata 재검사 절차를 준비했지만 실행하지 않았다.
+현재 5개 native 모델 인수·Codex parity·실제 클라이언트 #35는 완료하지
+않았다. 운영 배포·OAuth·개인 IAM·규제 자동화의 증거로 확대하지 않는다.
 
 ## 규제와 권한의 한계
 
