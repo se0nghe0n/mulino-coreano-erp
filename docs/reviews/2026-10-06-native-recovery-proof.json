@@ -1,0 +1,220 @@
+{
+  "acceptanceSourceCommit": "e61ded2e93c0e241be62d87347534503652d74dc",
+  "scope": "logging-only diagnostics; business/readiness/schema validation unchanged",
+  "checks": {
+    "runner": 82,
+    "UatEvidenceHelper": 7,
+    "failures": 0,
+    "fullUnitSITRepeat": false,
+    "previousSIT": 20,
+    "scope": "logging-only diagnostic metadata; readiness/schema/business validation unchanged"
+  },
+  "historyPreserved": {
+    "validClaudePass": [
+      "TC-P2P-001",
+      "TC-P2P-002"
+    ],
+    "originalFailures": [
+      "TC-P2P-004",
+      "TC-QM-001"
+    ],
+    "originalIncomplete": [
+      "TC-RC-001"
+    ],
+    "CodexParity": "FAILED"
+  },
+  "recovery": {
+    "TC-P2P-004": {
+      "status": "FAILED",
+      "caseStatus": "OPEN",
+      "executionReady": false,
+      "accountingStatus": "PARTIAL",
+      "reportedCostUsd": 0,
+      "erpWrites": 0,
+      "runs": [
+        {
+          "agentKey": "ORCHESTRATOR",
+          "status": "FAILED",
+          "runtime": "CLAUDE",
+          "model": "claude-sonnet-5",
+          "resolvedModel": null,
+          "nativeResultSubtype": "success",
+          "nativeFailureCategory": "UNKNOWN_NATIVE_FAILURE",
+          "nativeSignal": "SIGKILL",
+          "failure": "MODEL_PROCESS_FAILED",
+          "usageComplete": false
+        }
+      ]
+    },
+    "TC-QM-001": {
+      "status": "FAILED",
+      "caseStatus": "OPEN",
+      "executionReady": false,
+      "accountingStatus": "PARTIAL",
+      "reportedCostUsd": 0,
+      "erpWrites": 0,
+      "runs": [
+        {
+          "agentKey": "QC",
+          "status": "FAILED",
+          "runtime": "CLAUDE",
+          "model": "claude-sonnet-5",
+          "resolvedModel": null,
+          "nativeResultSubtype": "success",
+          "nativeFailureCategory": "UNKNOWN_NATIVE_FAILURE",
+          "nativeSignal": "SIGKILL",
+          "failure": "MODEL_PROCESS_FAILED",
+          "usageComplete": false
+        }
+      ]
+    },
+    "TC-RC-001": {
+      "status": "FAILED",
+      "caseStatus": "OPEN",
+      "executionReady": false,
+      "accountingStatus": "PARTIAL",
+      "reportedCostUsd": 0,
+      "erpWrites": 0,
+      "runs": [
+        {
+          "agentKey": "QC",
+          "status": "FAILED",
+          "runtime": "CLAUDE",
+          "model": "claude-sonnet-5",
+          "resolvedModel": null,
+          "nativeResultSubtype": "success",
+          "nativeFailureCategory": "UNKNOWN_NATIVE_FAILURE",
+          "nativeSignal": "SIGKILL",
+          "failure": "MODEL_PROCESS_FAILED",
+          "usageComplete": false
+        }
+      ]
+    }
+  },
+  "minimalDiagnostic": {
+    "businessAcceptance": false,
+    "status": "SUCCESS",
+    "reportedCostUsd": "0.001066"
+  },
+  "controlledProbes": {
+    "production": {
+      "runtime": "CLAUDE",
+      "requestedModel": "claude-sonnet-5",
+      "operation": "one authorized schema-only differential",
+      "toolAvailability": "none",
+      "modelRequests": 1,
+      "volumeReadOnly": false,
+      "productionSchemaWithoutDraftUri": true,
+      "roleAppend": false,
+      "erpCredentialAvailability": false,
+      "nativeExitCode": 1,
+      "nativeSignal": null,
+      "timedOut": false,
+      "overflow": false,
+      "nativeResultSubtype": "success",
+      "nativeErrorKeys": [
+        "duration_api_ms",
+        "duration_ms",
+        "is_error",
+        "modelUsage",
+        "num_turns",
+        "permission_denials",
+        "result",
+        "session_id",
+        "stop_reason",
+        "subtype",
+        "total_cost_usd",
+        "type",
+        "usage",
+        "uuid"
+      ],
+      "nativeErrorPrimitiveCounts": {
+        "string": 9,
+        "number": 7,
+        "boolean": 1,
+        "null": 0,
+        "array": 1,
+        "object": 3
+      },
+      "nativeErrorFingerprint": "8378c30e44e0ccecc1544d814a0fd4ad9f168c645c2716d0c0c49d52c7f111f0",
+      "nativeFailureCategory": "UNKNOWN_NATIVE_FAILURE",
+      "resolvedModel": null,
+      "reportedCostUsd": 0,
+      "inputTokens": 0,
+      "outputTokens": 0,
+      "cacheReadTokens": 0,
+      "cacheWriteTokens": 0,
+      "turns": 1,
+      "staticStructuredResultValid": false
+    },
+    "basic": {
+      "runtime": "CLAUDE",
+      "requestedModel": "claude-sonnet-5",
+      "operation": "one authorized basic-schema differential",
+      "toolAvailability": "none",
+      "modelRequests": 1,
+      "volumeReadOnly": false,
+      "productionSchemaWithoutDraftUri": false,
+      "basicBooleanSchema": true,
+      "roleAppend": false,
+      "erpCredentialAvailability": false,
+      "nativeExitCode": 1,
+      "nativeSignal": null,
+      "timedOut": false,
+      "overflow": false,
+      "nativeResultSubtype": "success",
+      "nativeErrorKeys": [
+        "duration_api_ms",
+        "duration_ms",
+        "is_error",
+        "modelUsage",
+        "num_turns",
+        "permission_denials",
+        "result",
+        "session_id",
+        "stop_reason",
+        "subtype",
+        "total_cost_usd",
+        "type",
+        "usage",
+        "uuid"
+      ],
+      "nativeErrorPrimitiveCounts": {
+        "string": 9,
+        "number": 7,
+        "boolean": 1,
+        "null": 0,
+        "array": 1,
+        "object": 3
+      },
+      "nativeErrorFingerprint": "8378c30e44e0ccecc1544d814a0fd4ad9f168c645c2716d0c0c49d52c7f111f0",
+      "nativeFailureCategory": "UNKNOWN_NATIVE_FAILURE",
+      "resolvedModel": null,
+      "reportedCostUsd": 0,
+      "inputTokens": 0,
+      "outputTokens": 0,
+      "cacheReadTokens": 0,
+      "cacheWriteTokens": 0,
+      "turns": 1,
+      "staticStructuredResultValid": false
+    },
+    "sameFingerprint": true,
+    "rawErrorAvailability": "discarded, unavailable",
+    "inference": "tools-disabled structured-output/budget path unresolved; no specific production keyword or auth cause proven"
+  },
+  "knownReportedCostUsd": "12.662505",
+  "allAttemptCostUsd": null,
+  "limits": [
+    "Raw native error text discarded; exact cause unknown",
+    "Tools-disabled x structured-output interaction and budget difference not isolated",
+    "Reported zero metrics do not establish actual zero usage",
+    "Actual ChatGPT/Codex client acceptance not performed",
+    "No login change or validation weakening"
+  ],
+  "sourceArtifacts": {
+    "worker-final-report.json": "86a758e56ef1c276504ef3a039adc326401dd114abb9595323fc0c091ec2c778",
+    "final-source-manifest.json": "0fd84a625e9d18f36bf6f0001a3faecb5c7e4baa74b6940183225cb029a73573",
+    "schema-only-differential.json": "b353d20b14e0736d03f9d7c6ed60a98b9828d3ed180dcae114583c35a8a06efd",
+    "basic-schema-differential.json": "3cd5a72a33e89215cf53003a9b0eb6a245432231d2573e1b6d4761a181cde64e"
+  }
+}

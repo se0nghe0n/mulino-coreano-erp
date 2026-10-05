@@ -15,9 +15,11 @@ DDL contains 61 tables: the original 30 ERP and 13 interface tables plus 18
 later planning, approval, quality, recall, evidence and receipt tables. This is
 source and local verification status, not organization `main` merge or production
 acceptance. Historical native-model UAT is separate from current #24/#25 acceptance.
-Current Claude UAT has 2 PASS, 2 FAIL and 1 INCOMPLETE; Codex parity failed.
-Native retries are stopped at an account-authentication gate, and actual client
-#35 acceptance is pending. MONITOR uses conversation
+Valid Claude UAT remains 2 PASS. The original 2 FAIL and 1 INCOMPLETE are
+preserved; all three subsequent recovery cases failed before ERP writes.
+A minimal Claude call succeeded, but structured-output probes failed with an
+unknown cause. Codex parity failed and its current account-authentication gate
+remains unresolved. Actual client #35 acceptance is pending. MONITOR uses conversation
 MCP tools. Dedicated dashboard and OAuth are excluded. Certificate type coverage
 and automatic 30-day notices remain an untracked gap awaiting issue registration.
 See `docs/16_decisions.md` and `docs/portfolio/README.md`. All business
