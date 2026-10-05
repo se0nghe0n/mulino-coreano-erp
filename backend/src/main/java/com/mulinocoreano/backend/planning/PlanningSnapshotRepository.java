@@ -269,7 +269,7 @@ public class PlanningSnapshotRepository {
         loadProductSupply(facts, warehouseId, products, outbound, supply);
         if (!rawIds.isEmpty()) {
             loadPurchases(facts, warehouseId, rawIds, materials, asOf, end, supply);
-            loadRawSupply(facts, warehouseId, materials, supply);
+            loadRawSupply(facts, warehouseId, materials, supply, asOf);
         }
         var productInputs = loadDemand(facts, roots, products, outbound, asOf);
         var supplierTerms = new TreeMap<Long, List<SupplierSelectionService.SupplierTerm>>();
@@ -595,7 +595,7 @@ public class PlanningSnapshotRepository {
             Map<String, SourceFact> facts,
             long warehouse,
             Map<Long, Map<String, Object>> materials,
-            List<BomPlanner.StockLot> supply) {
+            List<BomPlanner.StockLot> supply, LocalDate asOf) {
         var receipts =
                 rows(
                         facts,
@@ -730,6 +730,7 @@ public class PlanningSnapshotRepository {
                         "RAW_INPUT_WAREHOUSE_MISMATCH: production_ingredients:"
                                 + id(input, "production_ingredient_id"));
             String status = str(lot, "inbound_status");
+            boolean qualityEligible=Boolean.TRUE.equals(dsl.fetchOne("SELECT inbound_quality_eligible(?,?::date)",id(lot,"inbound_id"),asOf).get(0,Boolean.class));
             supply.add(
                     new BomPlanner.StockLot(
                             "raw_material_lots:" + lotId,
@@ -737,7 +738,7 @@ public class PlanningSnapshotRepository {
                             decimal(lot, "remaining_quantity"),
                             date(lot, "inbound_date"),
                             date(lot, "expiry_date"),
-                            status.equals("RELEASED") ? null : "INBOUND_" + status,
+                            status.equals("RELEASED") ? (qualityEligible ? null : "QUALITY_BARRIER") : "INBOUND_" + status,
                             false));
         }
     }

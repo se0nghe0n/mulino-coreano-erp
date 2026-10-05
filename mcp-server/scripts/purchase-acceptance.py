@@ -19,6 +19,7 @@ BASE = os.environ['MULINO_API_BASE']
 DB = os.environ['MULINO_ACCEPTANCE_DB']
 CONTAINER = os.environ.get('MULINO_ACCEPTANCE_CONTAINER', 'mulino-merged-validation-pg')
 SECRET = os.environ['MULINO_LOCAL_SERVICE_SECRET']
+HUMAN_SECRET = os.environ['MULINO_LOCAL_HUMAN_SECRET']
 OUT = Path(os.environ['MULINO_ACCEPTANCE_EVIDENCE'])
 assert re.fullmatch(r'mulino_purchase_acceptance_[a-z0-9_]+', DB), 'A separate acceptance DB is required'
 url = urlsplit(BASE)
@@ -54,7 +55,7 @@ def api(route, body=None, headers=None, status=200):
     return json.loads(raw) if raw else None
 
 service = {'X-Mulino-Local-Service': SECRET}
-manager = {'X-Mulino-Local-Role': 'MANAGER'}
+manager = {'X-Mulino-Local-Human': HUMAN_SECRET, 'X-Mulino-Local-Role': 'MANAGER'}
 
 def agent_work(case, tag, role):
     ref = 'WI-A-' + tag.replace('-SUPPLY', '-S').replace('-PURCHASE', '-P')
@@ -105,7 +106,7 @@ products = json.loads(sql("SELECT json_agg(product_id ORDER BY product_id) FROM 
 
 def create(tag):
     return api('/cases', {'objective': 'Purchase acceptance ' + tag},
-               {'X-Mulino-Local-Role': 'OPERATOR', 'Idempotency-Key': tag + '-case'})
+               {'X-Mulino-Local-Human': HUMAN_SECRET, 'X-Mulino-Local-Role': 'OPERATOR', 'Idempotency-Key': tag + '-case'})
 
 blocked_case = create('block')
 _, blocked, blocked_work = plan_and_propose(blocked_case, 'block')
@@ -126,7 +127,7 @@ before = state()
 for role in ['OPERATOR', 'VIEWER']:
     body = {'decision':'CANCEL','expectedVersion':cancelled['version'],'proposalHash':cancelled['proposalHash'],'reason':'Cancel this pending proposal'}
     api('/approvals/' + str(cancelled['approvalId']) + '/decision', body,
-        {'X-Mulino-Local-Role':role,'Idempotency-Key':'cancel-denied-'+role},403)
+        {'X-Mulino-Local-Human': HUMAN_SECRET, 'X-Mulino-Local-Role':role,'Idempotency-Key':'cancel-denied-'+role},403)
 decide(cancelled,'CANCEL','cancel-wrong-version',409,expectedVersion=cancelled['version']+1)
 decide(cancelled,'CANCEL','cancel-wrong-hash',409,proposalHash='0'*64)
 assert state() == before

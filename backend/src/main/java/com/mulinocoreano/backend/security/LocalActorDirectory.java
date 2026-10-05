@@ -16,19 +16,18 @@ public class LocalActorDirectory {
         this.properties = properties;
     }
 
+    private record StoredRole(String role, boolean active) {}
+
     public HumanActor humanForRole(String role) {
         String normalized = LocalActorCapabilities.normalizeRole(role);
-        var capabilities = LocalActorCapabilities.forRole(normalized);
+        LocalActorCapabilities.forRole(normalized);
         String email = "local-" + normalized.toLowerCase(Locale.ROOT) + "@mulino.local";
         long userId =
                 jdbc.sql(
                                 """
                                 INSERT INTO users(name, email, password, role)
                                 VALUES (:name, :email, 'local-stub-only', CAST(:role AS user_role))
-                                ON CONFLICT (email) DO UPDATE
-                                  SET name = EXCLUDED.name,
-                                      role = EXCLUDED.role,
-                                      is_active = TRUE
+                                ON CONFLICT (email) DO UPDATE SET email=EXCLUDED.email
                                 RETURNING user_id
                                 """)
                         .param("name", "Local " + normalized)
@@ -36,12 +35,15 @@ public class LocalActorDirectory {
                         .param("role", normalized)
                         .query(Long.class)
                         .single();
+        var stored = jdbc.sql("SELECT role::text, is_active FROM users WHERE user_id=:id")
+                .param("id", userId).query((rs, row) -> new StoredRole(rs.getString(1), rs.getBoolean(2))).single();
+        if (!stored.active()) throw new org.springframework.web.server.ResponseStatusException(org.springframework.http.HttpStatus.FORBIDDEN);
         return new HumanActor(
                 properties.issuer(),
                 "local|" + normalized.toLowerCase(Locale.ROOT),
                 userId,
                 "Local " + normalized,
-                normalized,
-                capabilities);
+                stored.role(),
+                LocalActorCapabilities.forRole(stored.role()));
     }
 }

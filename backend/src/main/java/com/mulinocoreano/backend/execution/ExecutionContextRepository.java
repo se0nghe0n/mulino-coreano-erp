@@ -20,6 +20,9 @@ public class ExecutionContextRepository {
         this.dsl = dsl;
     }
 
+    public String qualityWorks(long caseId) {
+        return dsl.fetchOne("SELECT coalesce(jsonb_agg(jsonb_build_object('workItemRef',work_item_ref,'inboundId',metadata->'inboundId','status',status) ORDER BY work_item_id),'[]')::text FROM work_items w JOIN agents a ON a.agent_id=w.assigned_agent_id WHERE case_id=? AND a.agent_key='QC' AND metadata->'inboundId' IS NOT NULL",caseId).get(0,String.class);
+    }
     public String caseMetadata(long caseId) {
         return dsl.select(coalesce(CASES.METADATA, JSONB.valueOf("{}")))
                 .from(CASES)

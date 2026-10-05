@@ -9,7 +9,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@SpringBootTest(properties="mulino.local-auth.service-secret=local-test-secret")
+@SpringBootTest(properties={"mulino.local-auth.service-secret=local-test-secret", "mulino.local-auth.human-secret=test-human-gateway"})
 @AutoConfigureMockMvc
 @ActiveProfiles("local")
 @org.springframework.transaction.annotation.Transactional
@@ -22,11 +22,11 @@ class WorkerBoundaryIntegrationTest {
                     .andExpect(status().isUnauthorized());
         }
         mvc.perform(post("/api/v1/internal/runs/claim").header("X-Mulino-Local-Service","local-test-secret")
-                .header("X-Mulino-Local-Role","MANAGER").contentType("application/json")
+                .header("X-Mulino-Local-Human","test-human-gateway").header("X-Mulino-Local-Role","MANAGER").contentType("application/json")
                 .content("{\"workerId\":\"boundary\"}")).andExpect(status().isUnauthorized());
         mvc.perform(post("/api/v1/plans/missing/purchase-proposal").contentType("application/json").content("{}"))
                 .andExpect(status().isUnauthorized());
-        mvc.perform(post("/api/v1/cases/missing/plans").header("X-Mulino-Local-Role","VIEWER")
+        mvc.perform(post("/api/v1/cases/missing/plans").header("X-Mulino-Local-Human","test-human-gateway").header("X-Mulino-Local-Role","VIEWER")
                 .contentType("application/json").content("{}")).andExpect(status().isForbidden());
     }
 }

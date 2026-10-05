@@ -26,7 +26,8 @@ final class LocalActorCapabilities {
                 capabilities.add("procurement:decide");
             }
             case "OPERATOR" -> capabilities.add("work:write");
-            case "ADMIN", "QC", "VIEWER" -> {}
+            case "QC" -> capabilities.add("qc:decide");
+            case "ADMIN", "VIEWER" -> {}
             default -> throw new IllegalArgumentException("Unsupported local role: " + normalized);
         }
         return Set.copyOf(capabilities);

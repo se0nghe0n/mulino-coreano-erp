@@ -18,7 +18,7 @@ final class LocalServiceFilter extends OncePerRequestFilter {
     @Override protected void doFilterInternal(HttpServletRequest req,HttpServletResponse res,FilterChain chain)
             throws IOException,ServletException {
         String secret=req.getHeader("X-Mulino-Local-Service");
-        if(secret==null||properties.serviceSecret()==null||req.getHeader(LocalActorFilter.ROLE_HEADER)!=null
+        if(secret==null||properties.serviceSecret()==null||req.getHeader(LocalActorFilter.ROLE_HEADER)!=null||req.getHeader(LocalActorFilter.HUMAN_HEADER)!=null
                 ||req.getHeader("Authorization")!=null
                 ||!MessageDigest.isEqual(secret.getBytes(StandardCharsets.UTF_8),properties.serviceSecret().getBytes(StandardCharsets.UTF_8))) {
             res.setStatus(401);return;

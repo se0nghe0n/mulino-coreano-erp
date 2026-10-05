@@ -89,7 +89,8 @@ ACT intake의 초기 Run 예약·재보충 scope 생성과 실제 runtime 연결
 MCP는 `whoami`, `get_case`, `get_plan`, `get_approval`,
 `decide_purchase`, `answer_attention`, `get_purchase_order`를 제공한다.
 인간 도구는 `MULINO_LOCAL_ROLE` (기본 OPERATOR)을
-`X-Mulino-Local-Role`로만 전달한다. service secret, run capability,
+`X-Mulino-Local-Role`로 전달하며 host Human gateway key도 보낸다.
+service secret, run capability,
 `Authorization`, `/internal/runs`, `/agent/**`를 쓰지 않는다.
 결정 도구는 read-only가 아니며 version/hash와 인간의 선택이 필요하다.
 requestKey를 생략하면 UUID를 생성하고 오류에도 반환한다.
@@ -121,3 +122,31 @@ Hikari max 4·min idle 1을 설정했다. production 설정은 바꾸지 않았�
 업무는 WAITING이고 새 입고는 0개였다. VIEWER 쓰기 거부와 무역할
 구매 조회 401도 확인했다. Flyway와 독립 DDL의 schema는 기존
 `events.external_ref` 컬럼 순서만 정규화한 뒤 일치했다.
+
+## 로컬 Human gateway 경계 (#33)
+
+역할 헤더만으로 Human 권한을 얻을 수 없도록 host 전용 credential을
+먼저 검증한다. 백엔드와 인간 stdio MCP에 같은
+`MULINO_LOCAL_HUMAN_SECRET`을 설정한다. MCP는 환경 변수에서만 값을
+읽어 `X-Mulino-Local-Human` 헤더로 전달한다. tool 입력·schema·prompt에는
+포함하지 않는다. `MULINO_LOCAL_ROLE`은 로컬 공유 역할 신원이며 개인
+신원이나 인간의 동의를 증명하지 않는다. 결정 시 version/hash 확인과
+인간의 명시적 선택은 계속 필요하다.
+
+```bash
+# host의 비공개 인간 terminal에서 생성한다. 출력·파일 기록하지 않는다.
+export MULINO_LOCAL_HUMAN_SECRET="$(openssl rand -hex 32)"
+```
+
+같은 비공개 환경에서 local 백엔드와 인간 MCP를 실행한다. service secret과
+다른 값을 사용한다. 미설정·빈 값·잘못된 값은 401이며 사용자 bootstrap,
+Case 및 요청 receipt를 생성하지 않는다. 올바른 key라도 DB의 비활성 상태와
+저장된 역할이 권한을 제한한다. 헤더가 기존 역할이나 활성 상태를 복구하지
+않는다. Human·service·Bearer credential을 함께 보내면 401이다.
+
+local Case·work-item·Attention·Event·Monitor 조회도 gateway 인증이 필요하다.
+이는 조회의 인증 경계이며 업무 승인 절차가 아니다. 재고·health·API 문서는
+공개 조회를 유지한다. `!local`의 기존 익명 foundation 조회·Case 접수는
+유지한다. 실행기 부모의 Worker API는 service secret만 사용하고 agent Docker의
+환경·인자·stdin·context에는 Human key를 전달하지 않는다. 로그인 volume에도
+저장하지 않는다. OAuth·외부 provider·운영 IAM은 이 경계의 범위가 아니다.

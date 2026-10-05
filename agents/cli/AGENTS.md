@@ -1,6 +1,6 @@
 # agents/cli/ — `mulino` CLI (Zig)
 
-Single static binary. Current commands: `case show`, `plan show/calculate`, `work create/transition`, `material show`, `po show/propose`. Exact arguments and DTOs are in [README.md](README.md). Other traceability-chain commands (`lot`, etc.) remain future work; never present them as installed capabilities.
+Single static binary. Current commands: `case show`, `plan show/calculate`, `work create/transition`, `material show`, `po show/propose`, `qc show/inspect`. Exact arguments and DTOs are in [README.md](README.md). Other traceability-chain commands (`lot`, etc.) remain future work; never present them as installed capabilities.
 
 ## Contract (consumers are LLM agents, not humans)
 

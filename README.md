@@ -67,3 +67,12 @@
 - **Batch Management**: LOT 기반 양방향 추적 (역추적/순추적) 및 FEFO 유통기한 관리
 - **Governance Persistence**: 에이전트 액션을 가로채 DB 승인 큐(`governance_actions`) 및 불변 감사 로그(`governance_audit_logs`)로 통제
 - **Extensible Architecture**: 다단계 BOM(반제품), 자재 유형(포장재/첨가물), IoT 시계열 파티셔닝(BRIN)
+
+## 로컬 Human gateway 경계 (#33)
+
+local 백엔드와 인간 stdio MCP는 host 전용 `MULINO_LOCAL_HUMAN_SECRET`을
+공유한다. 미설정·잘못된 key는 사용자 조회 전에 401로 거부한다.
+service secret과 다른 값을 사용하고 agent 환경·인자·stdin·context·로그인
+volume에는 전달하지 않는다. key 생성과 보호되는 조회 경로는
+[Human gateway 계약](docs/14_human_purchase_api.md#로컬-human-gateway-경계-33)을 따른다.
+역할 헤더는 공유 로컬 신원이며 개인 인증이나 인간 동의의 증거가 아니다.

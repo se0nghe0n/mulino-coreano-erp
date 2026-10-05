@@ -3,7 +3,8 @@
 -- (19개 법정 표시의무 군과 22종 실무 관리 품목 계층 매핑)
 -- =============================================================================
 
-INSERT INTO allergens (name, code, legal_category, standard) VALUES
+INSERT INTO allergens (name, code, legal_category, standard)
+SELECT v.* FROM (VALUES
 -- 1. 곡류 및 두류
 ('밀', 'ALLERG-01', '밀', 'KR_MFDS'),
 ('대두', 'ALLERG-02', '대두', 'KR_MFDS'),
@@ -38,4 +39,5 @@ INSERT INTO allergens (name, code, legal_category, standard) VALUES
 ('아황산류', 'ALLERG-19', '아황산류', 'KR_MFDS'),
 
 -- 7. 포괄 조개류 (기타 패류 관리용)
-('기타조개류', 'ALLERG-16-4', '조개류', 'KR_MFDS');
+('기타조개류', 'ALLERG-16-4', '조개류', 'KR_MFDS')) AS v(name,code,legal_category,standard)
+WHERE NOT EXISTS(SELECT 1 FROM allergens a WHERE a.code=v.code AND a.standard=v.standard);

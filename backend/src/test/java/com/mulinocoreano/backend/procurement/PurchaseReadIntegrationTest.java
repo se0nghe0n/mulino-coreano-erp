@@ -17,7 +17,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
-@SpringBootTest
+@SpringBootTest(properties="mulino.local-auth.human-secret=test-human-gateway")
 @org.springframework.test.context.ActiveProfiles("local")
 @AutoConfigureMockMvc
 @Transactional
@@ -84,7 +84,7 @@ class PurchaseReadIntegrationTest {
                 .param("material", material)
                 .update();
         var response =
-                mvc.perform(get("/api/v1/purchase-orders/{id}", order).with(org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.authentication(SecurityContextHolder.getContext().getAuthentication())))
+                mvc.perform(get("/api/v1/purchase-orders/{id}", order).header("X-Mulino-Local-Human","test-human-gateway").header("X-Mulino-Local-Role","VIEWER"))
                         .andExpect(status().isOk())
                         .andExpect(jsonPath("$.id").value(order))
                         .andExpect(jsonPath("$.supplierName").value("구매 조회 시험"))

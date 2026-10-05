@@ -17,7 +17,7 @@ assert.ok(['APPROVE','CANCEL'].includes(decision));
 const clients=[];
 async function client(role) {
   const c=new Client({name:'local-human-sit',version:'1.0.0'});
-  await c.connect(new StdioClientTransport({command:process.execPath,args:['src/index.js'],cwd:path.resolve(path.dirname(fileURLToPath(import.meta.url)),'..'),env:{PATH:process.env.PATH,MULINO_API_BASE:base,MULINO_LOCAL_ROLE:role}}));
+  await c.connect(new StdioClientTransport({command:process.execPath,args:['src/index.js'],cwd:path.resolve(path.dirname(fileURLToPath(import.meta.url)),'..'),env:{PATH:process.env.PATH,MULINO_LOCAL_HUMAN_SECRET:process.env.MULINO_LOCAL_HUMAN_SECRET??"",MULINO_API_BASE:base,MULINO_LOCAL_ROLE:role}}));
   clients.push(c);return c;
 }
 async function tool(c,name,args={}) {

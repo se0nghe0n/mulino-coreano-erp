@@ -87,3 +87,11 @@ mulino plan calculate CASE-EXAMPLE \
 리다이렉트는 따라가지 않으며 HTTP 요청을 자동 재시도하지 않습니다. Timeout 뒤에는 서버에서 쓰기가 이미 반영되었을 수 있습니다. 호출 agent가 현재 상태를 확인하고 같은 내용의 재시도가 필요하다고 판단한 경우 같은 요청 키를 재사용합니다. 업무·Run을 완료한 뒤 capability가 폐기되면 후속 API 호출이 실패하는 것이 정상입니다.
 
 전송 구현은 `std.http.Client.request`를 사용합니다. Zig 0.16.0의 고수준 `fetch`는 부분 chunked 본문 수신 중 취소되면 없는 body error를 강제 해제하여 비정상 종료할 수 있습니다. CLI는 이 경로를 피하고 body error를 안전하게 처리하며 연결을 닫습니다. 실제 부분 본문 정지 시험에서도 timeout JSON과 종료 코드 2를 유지합니다.
+
+## 입고 QC 검사
+
+배정된 QC Run은 `mulino qc show INBOUND_ID`로 근거를 읽고
+`mulino qc inspect INBOUND_ID --json '{"caseRef":"CASE-..."}'
+--request-key KEY`로 검사를 요청한다. 결과는 `PENDING_APPROVAL`이며
+`approvalId`, `version`, `proposalHash`가 QC 인간 결정의 근거다. 서버가
+Run을 WAITING으로 마친다. CLI에는 인간 승인·반려·적용 명령이 없다.

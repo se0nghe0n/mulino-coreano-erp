@@ -15,7 +15,7 @@ final class RunCapabilityFilter extends OncePerRequestFilter {
     private final DatabaseRunCapabilityAccess capabilities;
     RunCapabilityFilter(DatabaseRunCapabilityAccess capabilities) { this.capabilities=capabilities; }
     @Override protected void doFilterInternal(HttpServletRequest request,HttpServletResponse response,FilterChain chain) throws ServletException,IOException {
-        if(request.getHeader("X-Mulino-Local-Service")!=null || request.getHeader("X-Mulino-Local-Role")!=null) { response.setStatus(401);return; }
+        if(request.getHeader("X-Mulino-Local-Service")!=null || request.getHeader("X-Mulino-Local-Role")!=null || request.getHeader(LocalActorFilter.HUMAN_HEADER)!=null) { response.setStatus(401);return; }
         String authorization=request.getHeader("Authorization");
         try {
             if(authorization==null || !authorization.startsWith("Bearer ")) { response.sendError(401);return; }

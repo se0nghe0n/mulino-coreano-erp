@@ -103,9 +103,21 @@ flowchart TD
   - `purchase_order_item_id`로 발주 상세와 연결하여 3-Way Match를 검증한다.
 - 운송 온도를 기록한다: `inbound_temperature_logs` (상차/하차 온도, `sensor_id`)
 - 품질/온도 알람 평가: `alert_rules` 및 `alert_events`
-  - 온도 이탈 발생 시 `alert_events`가 자동 생성된다.
+  - 입고 검사에서 온도·알레르겐·인증 이상을 `alert_events`에 기록한다.
 - QC 검사 및 상태 확정:
-  - QC 담당자 검사 후 `inbound` 상태를 `RELEASED` 또는 `BLOCKED`로 전환한다.
+  - 검사는 `inbound_inspections`에 온도·알레르겐·인증 snapshot과 hash를
+    고정하고 RELEASED 또는 BLOCKED를 제안한다. QC 인간의 최종 승인 뒤
+    `inbound` 상태와 결정 메타데이터를 같은 transaction에서 적용한다.
+  - 누락된 매핑은 무알레르겐으로 해석하지 않는다.
+    `material_quality_declarations`의 ALLERGEN_FREE 선언 또는 DECLARED와
+    실제 매핑, 한국 22종 master, 유효 HACCP가 필요하다. 냉장·냉동에는
+    온도 범위 선언과 센서 기록이 필요하다.
+  - 이미 RELEASED인 입고의 이상은 ERP 상태를 미승인 변경하지 않고
+    derived eligibility와 승인 대기 barrier로 즉시 생산에서 제외한다.
+    반려·취소·만료는 부적격 LOT을 출고 가능하게 만들지 않는다.
+  - 생산 투입 INSERT/UPDATE는 같은 quality predicate를 검사하고
+    `remaining_quantity`에 사용량 delta를 반영한다. DELETE는 사용량을
+    복원한다. 기존 생산 기록은 migration이 수정하지 않는다.
   - 이때 `status_reason`, `status_decided_by`, `status_decided_at` 메타데이터가 필수 기록된다 (`ck_inbound_status_metadata`).
 - 원자재 LOT을 생성한다: `raw_material_lots`
   - `status = 'RELEASED'`인 입고 건에 한해 LOT 생성 및 재고 가용화.

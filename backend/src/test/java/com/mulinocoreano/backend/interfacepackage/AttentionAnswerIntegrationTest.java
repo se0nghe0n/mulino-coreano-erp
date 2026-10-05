@@ -26,7 +26,7 @@ import java.util.*;
 import java.util.concurrent.*;
 
 @SpringBootTest(
-        properties = {
+        properties = {"mulino.local-auth.human-secret=test-human-gateway",
             "spring.flyway.schemas=attention_answer_it",
             "spring.flyway.clean-disabled=false",
             "spring.flyway.init-sqls=CREATE EXTENSION IF NOT EXISTS btree_gist WITH SCHEMA public",
@@ -387,14 +387,14 @@ class AttentionAnswerIntegrationTest {
                                 .header("Idempotency-Key", "policy")
                                 .content(
                                         "{\"answer\":\"Friday\",\"expectedVersion\":1,\"scope\":\"POLICY\"}")
-                                .with(authentication(auth)))
+                                .header("X-Mulino-Local-Human","test-human-gateway").header("X-Mulino-Local-Role","OPERATOR"))
                 .andExpect(status().isBadRequest());
         mvc.perform(
                         post("/api/v1/attention/" + attention + "/answer")
                                 .contentType("application/json")
                                 .header("Idempotency-Key", "missing")
                                 .content("{\"answer\":\"Friday\",\"scope\":\"THIS_CASE\"}")
-                                .with(authentication(auth)))
+                                .header("X-Mulino-Local-Human","test-human-gateway").header("X-Mulino-Local-Role","OPERATOR"))
                 .andExpect(status().isBadRequest());
         mvc.perform(post("/api/v1/attention/" + attention + "/answer"))
                 .andExpect(status().isUnauthorized());
@@ -403,7 +403,7 @@ class AttentionAnswerIntegrationTest {
                                 .contentType("application/json")
                                 .header("Idempotency-Key", "unknown")
                                 .content(mapper.writeValueAsString(request()))
-                                .with(authentication(auth)))
+                                .header("X-Mulino-Local-Human","test-human-gateway").header("X-Mulino-Local-Role","OPERATOR"))
                 .andExpect(status().isNotFound());
         assertThat(count("decisions")).isZero();
     }

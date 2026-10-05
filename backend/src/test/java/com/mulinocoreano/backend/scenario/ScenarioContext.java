@@ -17,8 +17,10 @@ import org.springframework.test.context.DynamicPropertySource;
         "spring.flyway.schemas=scenario", "spring.flyway.clean-disabled=false",
         "spring.flyway.init-sqls=CREATE EXTENSION IF NOT EXISTS btree_gist WITH SCHEMA public",
         "spring.datasource.hikari.schema=scenario", "spring.main.allow-bean-definition-overriding=true",
+        "mulino.local-auth.human-secret=" + ScenarioContext.HUMAN_SECRET,
         "mulino.local-auth.service-secret=" + ScenarioContext.SERVICE_SECRET})
 public class ScenarioContext {
+    public static final String HUMAN_SECRET = "scenario-human-gateway";
     public static final String SERVICE_SECRET = "scenario-service-secret";
     public static final Instant BUSINESS_NOW = Instant.parse("2026-09-05T00:00:00Z");
 
