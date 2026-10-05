@@ -257,3 +257,55 @@ test('legacy work reads carry the host gateway and returned errors never expose 
   }
   assert.equal(requests,3);
 });
+
+for(const [name,args,path] of [
+  ['register_evidence',{caseRef:'CASE-1',sourceType:'EMAIL',externalRef:'message-1',observedAt:'2026-10-05T12:30:00+09:00',title:'Observation',content:'exact 0.1234567890123456789',requestKey:'source'},'/epistemic/cases/CASE-1/evidence'],
+  ['create_claim',{caseRef:'CASE-1',subjectType:'ETA',subjectRef:'PO-1',claimText:'Tomorrow',requestKey:'claim'},'/epistemic/cases/CASE-1/claims'],
+  ['link_claim_evidence',{caseRef:'CASE-1',claimId:'9007199254740993',evidenceRef:'EV-1',relation:'REFUTES',requestKey:'refute'},'/epistemic/cases/CASE-1/claims/9007199254740993/links'],
+  ['judge_claim',{caseRef:'CASE-1',claimId:'9007199254740993',status:'CONFLICTED',expectedRevision:0,evidenceFingerprint:'a'.repeat(64),reason:'Human attestation',requestKey:'judge'},'/epistemic/cases/CASE-1/claims/9007199254740993/judgment'],
+]) {
+  test(`${name} forwards explicit source or judgment input without invented actor and preserves historical numbers`,async()=>{
+    let requests=0;
+    const server=http.createServer((req,res)=>{
+      requests++;assert.equal(req.url,'/api/v1'+path);assert.equal(req.method,'POST');
+      assert.equal(req.headers['x-mulino-local-role'],'OPERATOR');assert.equal(req.headers.authorization,undefined);
+      assert.equal(req.headers['idempotency-key'],args.requestKey);
+      let body='';req.on('data',d=>body+=d);req.on('end',()=>{
+        const sent=JSON.parse(body);for(const key of Object.keys(sent))assert.deepEqual(sent[key],args[key]);
+        assert.equal(sent.userId,undefined);assert.equal(sent.runId,undefined);assert.equal(sent.caseRef,undefined);
+        res.writeHead(200,{'Content-Type':'application/json'});res.end('{"claim_id":9007199254740993,"revision":1,"status":"CONFLICTED","content":"exact 0.1234567890123456789"}');
+      });
+    });
+    const base=await listen(server);resources.push(()=>closeServer(server));
+    const client=await connectClient({MULINO_API_BASE:base+'/api/v1',MULINO_LOCAL_ROLE:'OPERATOR'});
+    const result=await client.callTool({name,arguments:args});assert.equal(result.isError,undefined);
+    assert.equal(result.structuredContent.claim_id,'9007199254740993');assert.equal(result.structuredContent.status,'CONFLICTED');
+    assert.equal(result.structuredContent.content,'exact 0.1234567890123456789');assert.equal(requests,1);
+  });
+}
+
+test('human judgment needs revision fingerprint and rationale before touching the backend',async()=>{
+  const client=await connectClient({MULINO_API_BASE:'http://127.0.0.1:1/api/v1',MULINO_LOCAL_ROLE:'OPERATOR'});
+  for(const field of ['expectedRevision','evidenceFingerprint','reason']) {
+    const args={caseRef:'CASE-1',claimId:1,status:'VERIFIED',expectedRevision:1,evidenceFingerprint:'a'.repeat(64),reason:'Explicit review'};delete args[field];
+    assert.equal((await client.callTool({name:'judge_claim',arguments:args})).isError,true);
+  }
+});
+
+test('new interpretation references its original claim with an explicit rationale and never judges automatically',async()=>{
+  let requests=0;
+  const server=http.createServer((req,res)=>{
+    requests++;assert.equal(req.url,'/api/v1/epistemic/cases/CASE-1/claims');
+    let body='';req.on('data',d=>body+=d);req.on('end',()=>{
+      const sent=JSON.parse(body);assert.equal(sent.supersedesClaimId,'9007199254740993');
+      assert.equal(sent.supersessionReason,'Reassess current corrected source');assert.equal(sent.status,undefined);
+      res.writeHead(200,{'Content-Type':'application/json'});res.end('{"claim_id":2,"supersedes_claim_id":9007199254740993,"status":"ASSERTED"}');
+    });
+  });
+  const base=await listen(server);resources.push(()=>closeServer(server));
+  const client=await connectClient({MULINO_API_BASE:base+'/api/v1',MULINO_LOCAL_ROLE:'OPERATOR'});
+  const args={caseRef:'CASE-1',subjectType:'ETA',subjectRef:'PO-1',claimText:'New interpretation',supersedesClaimId:'9007199254740993',supersessionReason:'Reassess current corrected source'};
+  const result=await client.callTool({name:'create_claim',arguments:args});assert.equal(result.isError,undefined);
+  assert.equal(result.structuredContent.status,'ASSERTED');assert.equal(result.structuredContent.supersedes_claim_id,'9007199254740993');assert.equal(requests,1);
+  delete args.supersessionReason;assert.equal((await client.callTool({name:'create_claim',arguments:args})).isError,true);assert.equal(requests,1);
+});

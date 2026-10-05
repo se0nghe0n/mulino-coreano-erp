@@ -40,3 +40,21 @@ Orchestrator 담당 후속 책임을 저장한다. Procurement 모델을 다시
 인증 만료와 30일 이내 만료는 검토 대상으로 명시한다. 만료 시 입고 차단 판단은 QC 소관이며 현재 직접 실행할 CLI는 없다. 전자세금계산서 필드 `tax_invoice_number` / `tax_invoice_date`를 보존하고 값을 추측하지 않는다.
 
 Procurement DONE은 구매 단계 완료다. 실제 계획·발주 참조와 남은 입고 확인·생산/재고 검토를 설명한다. 검증된 DONE과 함께 서버가 후속 책임을 저장하고 Case를 WAITING으로 유지한다. 후속 참조를 미리 지어내거나 별도 업무로 생성하지 않는다. `NO_PURCHASE_REQUIRED`는 종료된 응답을 그대로 반환하고 무효화된 capability로 후속 조회하지 않는다. 이 경우도 서버가 실제 계획의 생산 필요 여부에 따른 검토 책임을 남기며 가짜 발주·납기를 만들지 않는다. 물리적 생산·입고는 수행하지 않으며 재고 회복이나 Case 전체 완료를 주장하지 않는다.
+
+## Case 증거·Claim (#44)
+
+관측 출처는 `mulino evidence register CASE_REF --json SOURCE --request-key KEY`로
+기록한다. sourceType·externalRef·observedAt·title과 content 또는
+contentUri·contentHash를 제공한다. 원자료를 정정할 때는 동일 명령에
+correctsEvidenceRef·correctionReason을 추가한다. 기존 원본은 삭제하지 않는다.
+주장은 `mulino claim create CASE_REF --json ASSERTION --request-key KEY`로
+ASSERTED 상태를 만들고 `mulino claim link CASE_REF CLAIM_ID --json LINK
+--request-key KEY`로 evidenceRef와 SUPPORTS/REFUTES 관계를 연결한다.
+SUPPORTS는 인간 검증이나 ERP 승인 권한이 아니다. 반박 근거는 지우지 않고
+CONFLICTED 상태와 이력으로 남긴다. VERIFIED/REFUTED는 Case 인간의
+명시적 판단이며, 에이전트는 해당 상태를 쓰지 않는다.
+
+반박 정정으로 이전 Claim의 모순을 지우지 않는다. 새 해석은 claim create의
+supersedesClaimId·supersessionReason으로 같은 Case·subjectType/ref의 이전
+Claim을 참조하며 새 ASSERTED를 만든다. 검토한 현재 원본을 새 Claim에
+명시적으로 연결하고 인간 판단을 기다린다. 이전 상태와 이력은 유지한다.

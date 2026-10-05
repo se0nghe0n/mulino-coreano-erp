@@ -378,3 +378,10 @@ WAITING 후속 책임을 남기며 입고·생산을 만들어 Case를 끝내지
 15,2 base 가격과 정확한 구매 금액, version/idempotency, V24~V26과
 독립 DDL 16~18 계약은 [인간 답변·구매 결정](14_human_purchase_api.md)을
 따른다. #33의 나머지 ERP gate와 #34의 실제 데모 DB 검증은 남아 있다.
+
+### #44 Evidence·Claim 등록과 판단
+
+원본 출처·정정은 immutable Evidence로 남고 주장은 ASSERTED로 시작한다.
+SUPPORTS는 VERIFIED를 자동 부여하지 않는다. 인간 판단과 stale 이력,
+actor·Case·Run·멱등 계약은 [Evidence·Claim API](19_evidence_claim_api.md)를
+따른다. Claim 상태는 ERP write 승인 권한이 아니다.

@@ -70,6 +70,27 @@ const qualityText = d => `입고 품질: ${show(d.approvalId ?? d.receipt?.inbou
 근거: ${show(d.proposal ?? d)}
 결정: ${show(d.decision)}`;
 export const conversationTools = [
+  {name:"get_claim",scope:"erp:read",description:"동일 Case의 원본·정정·관계와 판단 이력, 최신 revision·evidenceFingerprint를 조회합니다. 인간 판단은 외부 사실 검증이나 ERP 승인이 아닙니다.",
+   inputSchema:schema({caseRef:refSchema,claimId:identifierSchema}),
+   validate(a){requireText(a.caseRef,"caseRef",20);requireIdentifier(a.claimId,"claimId");},
+   path:a=>`/epistemic/cases/${encodeURIComponent(a.caseRef)}/claims/${a.claimId}`,format:d=>`Claim: ${show(d)}`},
+  {name:"register_evidence",scope:"work:write",write:true,description:"Case 원본 관측을 등록합니다. 정정은 correctsEvidenceRef와 correctionReason을 가진 새 원본입니다. content SHA-256은 서버가 계산합니다. URI는 수집하지 않습니다.",
+   inputSchema:schema({caseRef:refSchema,sourceType:{type:"string",enum:["EMAIL","EXCEL_3PL","API","SLACK","MANUAL"]},externalRef:{type:"string",minLength:1,maxLength:255},observedAt:{type:"string"},title:{type:"string",minLength:1,maxLength:200},content:{type:"string",maxLength:262144},contentUri:{type:"string",maxLength:500},contentHash:{type:"string",pattern:"^[0-9a-f]{64}$"},correctsEvidenceRef:refSchema,correctionReason:{type:"string",maxLength:4000},requestKey:keySchema},["caseRef","sourceType","externalRef","observedAt","title"]),
+   validate(a){requireText(a.caseRef,"caseRef",20);requireText(a.externalRef,"externalRef",255);requireText(a.title,"title",200);requireText(a.observedAt,"observedAt",100);},
+   path:a=>`/epistemic/cases/${encodeURIComponent(a.caseRef)}/evidence`,body:({caseRef,requestKey,...source})=>source,format:d=>`Evidence: ${show(d)}`},
+  {name:"create_claim",scope:"work:write",write:true,description:"Case에 ASSERTED 주장을 기록합니다. 증거 지지 관계만으로 VERIFIED가 되지 않습니다.",
+   inputSchema:schema({caseRef:refSchema,subjectType:{type:"string",minLength:1,maxLength:50},subjectRef:{type:"string",minLength:1,maxLength:100},claimText:{type:"string",minLength:1,maxLength:16000},supersedesClaimId:identifierSchema,supersessionReason:{type:"string",minLength:1,maxLength:4000},requestKey:keySchema},["caseRef","subjectType","subjectRef","claimText"]),
+   validate(a){requireText(a.caseRef,"caseRef",20);requireText(a.subjectType,"subjectType",50);requireText(a.subjectRef,"subjectRef",100);requireText(a.claimText,"claimText",16000);if(a.supersedesClaimId!==undefined){requireIdentifier(a.supersedesClaimId,"supersedesClaimId");requireText(a.supersessionReason,"supersessionReason",4000);}else if(a.supersessionReason!==undefined)throw new Error("Predecessor required");},
+   path:a=>`/epistemic/cases/${encodeURIComponent(a.caseRef)}/claims`,body:({subjectType,subjectRef,claimText,supersedesClaimId,supersessionReason})=>({subjectType,subjectRef,claimText,supersedesClaimId,supersessionReason}),format:d=>`Claim: ${show(d)}`},
+  {name:"link_claim_evidence",scope:"work:write",write:true,description:"같은 Case 원본을 SUPPORTS 또는 REFUTES로 연결합니다. 새 관계는 이전 판단을 stale로 남기고 반박 근거가 있으면 CONFLICTED로 표시합니다.",
+   inputSchema:schema({caseRef:refSchema,claimId:identifierSchema,evidenceRef:refSchema,relation:{type:"string",enum:["SUPPORTS","REFUTES"]},requestKey:keySchema},["caseRef","claimId","evidenceRef","relation"]),
+   validate(a){requireText(a.caseRef,"caseRef",20);requireIdentifier(a.claimId,"claimId");requireText(a.evidenceRef,"evidenceRef",20);if(!["SUPPORTS","REFUTES"].includes(a.relation))throw new Error("Invalid relation");},
+   path:a=>`/epistemic/cases/${encodeURIComponent(a.caseRef)}/claims/${a.claimId}/links`,body:({evidenceRef,relation})=>({evidenceRef,relation}),format:d=>`Claim: ${show(d)}`},
+  {name:"judge_claim",scope:"work:write",write:true,description:"get_claim의 revision·evidenceFingerprint·모든 정정과 반박을 검토한 인간의 명시적 사실 판단을 기록합니다. 자동 판단·재시도 금지. 인간 attestation이며 독립 외부 검증이나 ERP 승인 권한이 아닙니다.",
+   inputSchema:schema({caseRef:refSchema,claimId:identifierSchema,status:{type:"string",enum:["VERIFIED","REFUTED","CONFLICTED"]},expectedRevision:{type:"integer",minimum:0,maximum:Number.MAX_SAFE_INTEGER},evidenceFingerprint:{type:"string",pattern:"^[0-9a-f]{64}$"},reason:{type:"string",minLength:1,maxLength:4000},requestKey:keySchema},["caseRef","claimId","status","expectedRevision","evidenceFingerprint","reason"]),
+   validate(a){requireText(a.caseRef,"caseRef",20);requireIdentifier(a.claimId,"claimId");requireText(a.reason,"reason",4000);if(!Number.isSafeInteger(a.expectedRevision)||a.expectedRevision<0||!/[0-9a-f]{64}/.test(a.evidenceFingerprint)||!["VERIFIED","REFUTED","CONFLICTED"].includes(a.status))throw new Error("Invalid judgment");},
+   path:a=>`/epistemic/cases/${encodeURIComponent(a.caseRef)}/claims/${a.claimId}/judgment`,body:({status,expectedRevision,evidenceFingerprint,reason})=>({status,expectedRevision,evidenceFingerprint,reason}),format:d=>`인간 판단: ${show(d)}`},
+
   read("get_lot_trace", "완제품 LOT의 전수 원재료·공급사·영향 LOT·고객 출하와 불완전 근거를 조회합니다.", "lotId", a=>`/recall/lots/${a.lotId}/trace`, d=>`LOT 추적: ${show(d)}`, true),
   read("get_recall_approval", "ADMIN 리콜 승인안과 OFFLINE/PENDING 보고 초안, 버전·해시·보관 기한을 조회합니다.", "approvalId", a=>`/recall/approvals/${a.approvalId}`, d=>`리콜 승인: ${show(d)}`, true),
   {name:"request_recall_investigation",scope:"work:write",write:true,description:"OPERATOR 또는 MANAGER가 동일 Case의 QC 작업에 사고 LOT과 조사 사유를 배정합니다.",

@@ -30,3 +30,21 @@ FEFO·품질 조치의 CLI는 제공되지 않는다. 배정된 LOT trace 조회
 metadata.lotId에 한정된다. 다른 Case·LOT을 조회하거나 리콜을 제안하지
 않는다. ORCHESTRATOR는 해당 업무에 명시적인 lotId 조회 범위를 배정할 수 있다.
 complete=false이면 원자료 보완을 요청하고 영향 출하 근거를 모두 보존한다.
+
+## Case 증거·Claim (#44)
+
+관측 출처는 `mulino evidence register CASE_REF --json SOURCE --request-key KEY`로
+기록한다. sourceType·externalRef·observedAt·title과 content 또는
+contentUri·contentHash를 제공한다. 원자료를 정정할 때는 동일 명령에
+correctsEvidenceRef·correctionReason을 추가한다. 기존 원본은 삭제하지 않는다.
+주장은 `mulino claim create CASE_REF --json ASSERTION --request-key KEY`로
+ASSERTED 상태를 만들고 `mulino claim link CASE_REF CLAIM_ID --json LINK
+--request-key KEY`로 evidenceRef와 SUPPORTS/REFUTES 관계를 연결한다.
+SUPPORTS는 인간 검증이나 ERP 승인 권한이 아니다. 반박 근거는 지우지 않고
+CONFLICTED 상태와 이력으로 남긴다. VERIFIED/REFUTED는 Case 인간의
+명시적 판단이며, 에이전트는 해당 상태를 쓰지 않는다.
+
+반박 정정으로 이전 Claim의 모순을 지우지 않는다. 새 해석은 claim create의
+supersedesClaimId·supersessionReason으로 같은 Case·subjectType/ref의 이전
+Claim을 참조하며 새 ASSERTED를 만든다. 검토한 현재 원본을 새 Claim에
+명시적으로 연결하고 인간 판단을 기다린다. 이전 상태와 이력은 유지한다.

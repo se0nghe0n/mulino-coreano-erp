@@ -288,3 +288,11 @@ Run의 시점은 V27·독립 DDL 19의 TIMESTAMPTZ로 통일하며 기존
 Asia/Seoul 벽시계 값을 명시적으로 복원한다. GET /monitor는 조회만
 하고 ASK는 완제품만 반환한다. 재현·전제·검증 범위는
 [Dispatcher 범위와 실행 시점](15_dispatcher_defects.md)을 따른다.
+
+### #44 Claim–Evidence 관계 경계
+
+Dispatcher와 인증된 Evidence·Claim API는 같은 `ClaimEvidenceLinks`
+INSERT와 DB trigger의 동일 Case·판단 invalidation 계약을 사용한다.
+legacy Event 연결·멱등성은 유지한다. 새 managed 원본·Claim은 worker
+Event에서 인간/Run writer를 유도할 수 없으므로 인증된 Case API에서만
+연결한다. 상세 계약은 [Evidence·Claim API](19_evidence_claim_api.md)다.

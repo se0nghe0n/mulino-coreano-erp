@@ -220,3 +220,11 @@ Run의 시점은 V27·독립 DDL 19의 TIMESTAMPTZ로 통일하며 기존
 Asia/Seoul 벽시계 값을 명시적으로 복원한다. GET /monitor는 조회만
 하고 ASK는 완제품만 반환한다. 재현·전제·검증 범위는
 [Dispatcher 범위와 실행 시점](15_dispatcher_defects.md)을 따른다.
+
+## #44 이후의 Evidence·Claim 계약
+
+원본 등록·정정, ASSERTED 주장, SUPPORTS/REFUTES 관계와 명시적 인간
+판단은 [Evidence·Claim API](19_evidence_claim_api.md)에 구현했다.
+V31·독립 DDL23은 원본·관계·판단 이력을 보존하고 같은 Case 관계 및
+새 관계·정정에 따른 stale 판단을 검사한다. 위 미구현 설명은 #43 검토
+시점의 기록이다. 인간 attestation은 외부 검증이나 ERP 승인 원장이 아니다.

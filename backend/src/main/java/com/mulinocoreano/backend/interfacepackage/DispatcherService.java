@@ -775,13 +775,14 @@ public class DispatcherService {
 
         ClaimEvidenceTarget target = jdbc.sql("""
                 SELECT claim.case_id AS claim_case_id, claim_case.case_ref,
-                       ev.evidence_id, ev.case_id AS evidence_case_id
+                       ev.evidence_id, ev.case_id AS evidence_case_id,
+                       (claim.writer_principal IS NOT NULL OR ev.writer_principal IS NOT NULL) AS managed
                 FROM claims claim
                 JOIN cases claim_case ON claim_case.case_id=claim.case_id
                 CROSS JOIN evidence ev
                 WHERE claim.claim_id=:claimId
                   AND ev.evidence_ref=:evidenceRef
-                FOR SHARE OF claim, ev
+                FOR UPDATE OF claim FOR SHARE OF ev
                 """)
                 .param("claimId", claimId)
                 .param("evidenceRef", evidenceRef)
@@ -789,10 +790,13 @@ public class DispatcherService {
                         rs.getLong("claim_case_id"),
                         rs.getString("case_ref"),
                         rs.getLong("evidence_id"),
-                        nullableLong(rs, "evidence_case_id")))
+                        nullableLong(rs, "evidence_case_id"), rs.getBoolean("managed")))
                 .optional()
                 .orElseThrow(() -> new InvalidInterfaceRequestException(
                         "Unknown claimId or evidenceRef"));
+        if (target.managed()) {
+            throw new InvalidInterfaceRequestException("Managed evidence links require authenticated Case writer API");
+        }
         if (target.evidenceCaseId() == null
                 || target.claimCaseId() != target.evidenceCaseId()) {
             throw new InvalidInterfaceRequestException(
@@ -825,15 +829,7 @@ public class DispatcherService {
         if (prepared.claimId() == null) {
             return;
         }
-        jdbc.sql("""
-                INSERT INTO claim_evidence (claim_id, evidence_id, relation)
-                VALUES (:claimId, :evidenceId, :relation)
-                ON CONFLICT (claim_id, evidence_id, relation) DO NOTHING
-                """)
-                .param("claimId", prepared.claimId())
-                .param("evidenceId", prepared.evidenceId())
-                .param("relation", prepared.relation())
-                .update();
+        new ClaimEvidenceLinks(jdbc).insert(prepared.claimId(), prepared.evidenceId(), prepared.relation());
     }
 
     private String normalizedPayloadReference(Map<String, Object> payload, String... aliases) {
@@ -1078,7 +1074,7 @@ public class DispatcherService {
                                          Long evidenceId, String relation) { }
 
     private record ClaimEvidenceTarget(long claimCaseId, String caseRef,
-                                       long evidenceId, Long evidenceCaseId) { }
+                                       long evidenceId, Long evidenceCaseId, boolean managed) { }
 
     private record AnsweredAttention(long caseId, String caseRef, Long workItemId,
                                      String workItemRef, long userId, String answerText) { }

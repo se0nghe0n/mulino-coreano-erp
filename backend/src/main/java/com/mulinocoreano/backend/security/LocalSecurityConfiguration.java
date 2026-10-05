@@ -22,7 +22,7 @@ public class LocalSecurityConfiguration {
         var paths = PathPatternRequestMatcher.withDefaults();
         return InterfaceSecurityConfiguration.stateless(http)
                 .securityMatchers(matchers -> matchers
-                        .requestMatchers(paths.matcher("/api/v1/quality/**"), paths.matcher("/api/v1/recall/**"),
+                        .requestMatchers(paths.matcher("/api/v1/epistemic/**"), paths.matcher("/api/v1/quality/**"), paths.matcher("/api/v1/recall/**"),
                                 paths.matcher(HttpMethod.GET, "/api/v1/cases/**"),
                                 paths.matcher(HttpMethod.GET, "/api/v1/attention"),
                                 paths.matcher(HttpMethod.GET, "/api/v1/events"),
