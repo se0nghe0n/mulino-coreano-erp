@@ -58,6 +58,7 @@ class PurchaseWorkflowIntegrationTest {
     @MockitoSpyBean PlanPersistenceService plans;
     @Autowired PurchaseDecisionService purchaseDecisions;
     @Autowired AgentQueryService agentQueries;
+    @Autowired ExecutionContextBuilder executionContexts;
     @MockitoSpyBean AgentPurchasingReads scopedPurchasing;
     @Autowired CanonicalJson exactJson;
     @MockitoSpyBean ReplenishmentCalculator calculator;
@@ -563,6 +564,50 @@ class PurchaseWorkflowIntegrationTest {
                 managerId,
                 "MANAGER",
                 409);
+    }
+
+    @Test
+    void currentManagerBlockKeepsImmutableActorAndScopeAfterUserRoleChanges() throws Exception {
+        var proposal=propose();
+        decide(proposal.path("approvalId").asLong(),decisionBody(proposal,"BLOCK"),"block-proof",managerId,"MANAGER",200);
+        var before=mapper.valueToTree(executionContexts.build("CASE-PURCHASE",caseId,"WI-ORCH"));
+        var current=before.path("currentCoordinationPurchase");
+        assertThat(ManagerBlockEvidence.matches(current)).isTrue();
+        assertThat(current.path("parentWorkItemRef").asText()).isEqualTo("WI-ORCH");
+        assertThat(current.path("planRef").asText()).isEqualTo(plan.ref());
+        assertThat(current.path("finalGovDecision").path("userId").asLong()).isEqualTo(managerId);
+        assertThat(current.path("finalGovDecision").path("actorRole").asText()).isEqualTo("MANAGER");
+        long auditCount=count("governance_audit_logs");
+        jdbc.sql("UPDATE users SET role='QC' WHERE user_id=:id").param("id",managerId).update();
+        var after=mapper.valueToTree(executionContexts.build("CASE-PURCHASE",caseId,"WI-ORCH"));
+        assertThat(after.path("currentCoordinationPurchase").path("finalGovDecision")).isEqualTo(current.path("finalGovDecision"));
+        assertThat(ManagerBlockEvidence.matches(after.path("currentCoordinationPurchase"))).isTrue();
+        assertThat(mapper.valueToTree(executionContexts.build("CASE-PURCHASE",caseId,"WI-other")).path("currentCoordinationPurchase").isNull()).isTrue();
+        assertThat(count("governance_audit_logs")).isEqualTo(auditCount);
+        assertThat(count("purchase_orders")).isEqualTo(originalOrders);
+    }
+
+    @Test
+    void legacyFinalBlockWithoutActorSnapshotRemainsUnknownAndWrongRoleAddsNoDecisionAuditOrOrder() throws Exception {
+        var proposal=propose();long approval=proposal.path("approvalId").asLong();
+        long audits=count("governance_audit_logs");
+        decide(approval,decisionBody(proposal,"BLOCK"),"wrong-role-proof",operatorId,"OPERATOR",403);
+        assertThat(count("governance_audit_logs")).isEqualTo(audits);
+        assertThat(count("governance_decisions")).isZero();
+        var request=new PurchaseDecisionRequest("BLOCK",proposal.path("version").asInt(),proposal.path("proposalHash").asText(),"Legacy fixture decision");
+        // Simulate an existing immutable row whose old adapter never captured the actor role.
+        jdbc.sql("UPDATE governance_actions SET status='BLOCKED' WHERE governance_action_id=:id").param("id",approval).update();
+        long decision=jdbc.sql("INSERT INTO governance_decisions(governance_action_id,decided_by,decision,reason,is_final) VALUES(:id,:user,'BLOCK','Legacy fixture decision',true) RETURNING governance_decision_id")
+                .param("id",approval).param("user",managerId).query(Long.class).single();
+        var state=(tools.jackson.databind.node.ObjectNode)mapper.valueToTree(request);state.put("governanceDecisionId",decision);
+        jdbc.sql("INSERT INTO governance_audit_logs(governance_action_id,actor_id,event_type,resource_type,resource_id,after_state) VALUES(:id,:user,'PURCHASE_DECIDED','GOVERNANCE_ACTION',:id,CAST(:state AS jsonb))")
+                .param("id",approval).param("user",managerId).param("state",state.toString()).update();
+        var current=mapper.valueToTree(executionContexts.build("CASE-PURCHASE",caseId,"WI-ORCH")).path("currentCoordinationPurchase");
+        assertThat(current.path("finalGovDecision").path("actorRole").isNull()).isTrue();
+        assertThat(current.path("finalGovDecision").path("actorProvenance").asText()).isEqualTo("UNKNOWN");
+        assertThat(ManagerBlockEvidence.matches(current)).isFalse();
+        assertThat(count("purchase_orders")).isEqualTo(originalOrders);
+        assertThat(count("purchase_applications")).isZero();
     }
 
     // Goals 2 and 4: cancellation stops this purchase without erasing human history.

@@ -479,3 +479,36 @@ RC INCOMPLETE와 새 Recovery 3건 FAIL, Codex parity FAIL을 모두 보존한�
 Known 보고 비용은 기존 USD 12.661439에 최소 성공 진단 USD 0.001066을
 더한 USD 12.662505다. 이전 RC·Codex 등 미보고 비용이 있으므로 전체
 시도 비용은 unknown이다. 현재 전체 5개 실제 인수는 완료되지 않았다.
+
+### Compact source 인수와 MANAGER BLOCK outcome 보강
+
+17560f2·compact-final-1006의 실제 CLAUDE/Sonnet 5 인수에서 P2P-001은
+16,500원 발주 1건과 원본 조정 책임 DONE, P2P-004는 옛 제안 EXPIRED·
+발주 0건 이후 명시적 인간 재계산과 새 승인으로 17,000원 발주 1건을
+확인했다. QC-001·RC-001도 native WAITING과 서버 WAITING이 일치하고
+사용량이 완전한 상태로 통과했다.
+
+P2P-002는 MANAGER BLOCK·발주 0건을 유지했으나 최종 Orchestrator가
+FAILED를 선택해 실패했다. 당시 skill이 ABORTED/FAILED를 모두 허용해
+생긴 계약 모호성이다. native 5건은 exit 0·denial 0·사용량 완전이며
+CLI 보고 비용은 USD 0.6262662다. ABORTED만 기다리는 observer는
+이미 끝난 FAILED를 보고하지 않아 owned post-model runner를 정상
+종료해 증거를 수집했다. 이 observer interruption을 native 실패나
+unknown 사용량으로 해석하지 않는다. 당시 기록은
+`native/compact-remaining-1006/TC-P2P-002.json`에 유지한다.
+
+후속 보강은 현재 parent·plan·구매 action·immutable MANAGER 결정의
+출처를 제공하고, 일치하는 의도적 중단을 ABORTED로 명시한다. observer는
+terminal FAILED에 즉시 실패하며 FAILEDtoABORTED 변환이나 gate 약화를
+하지 않는다. 과거 role 미기록은 UNKNOWN으로 유지한다. 보강 source의
+paid 재인수는 별도 단계이며 과거 성공을 새 source의 성공으로 바꾸지
+않는다. 기존 backend ABORTED Attention policy도 유지한다.
+
+보강의 첫 aggregate는 backend 569건(18 scenario 제외)과 JAR가
+통과했으나 SIT 20건 중 취소 1건이 실패했다. 공용 stop observer를
+BLOCK으로만 좁혀 실제 final MANAGER CANCEL도 확인하는 P2P-006을
+막은 helper 오류였다. current immutable CANCEL 증거는 일반 observer에
+유지하고, P2P-002의 특별 ABORTED 검증은 별도 BLOCK-only predicate로
+분리했다. child CANCELLED나 과거 결정으로 이를 대신하지 않는다.
+이 실패 XML과 로그를 보존하며 backend 정책·승인·ERP 쓰기는 바꾸지
+않았다.

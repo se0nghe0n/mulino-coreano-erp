@@ -38,7 +38,7 @@ public class AgentQueryService {
     @Transactional(isolation = Isolation.REPEATABLE_READ)
     public tools.jackson.databind.JsonNode caseView(String token,String agentKey,String caseRef) {
         var scope=capabilities.requireLocked(token,agentKey,caseRef);
-        var result=views.caseView(contexts.build(scope.caseRef(),scope.caseId()));
+        var result=views.caseView(contexts.build(scope.caseRef(),scope.caseId(),"ORCHESTRATOR".equals(scope.agentKey()) ? scope.workItemRef() : null));
         capabilities.requireLocked(token,agentKey,caseRef); return result;
     }
 
@@ -52,7 +52,7 @@ public class AgentQueryService {
     @Transactional(isolation = Isolation.REPEATABLE_READ)
     public Map<String, Object> caseContext(String token, String agentKey, String caseRef) {
         var scope = capabilities.requireLocked(token, agentKey, caseRef);
-        var result = contexts.build(scope.caseRef(), scope.caseId());
+        var result = contexts.build(scope.caseRef(), scope.caseId(),"ORCHESTRATOR".equals(scope.agentKey()) ? scope.workItemRef() : null);
         capabilities.requireLocked(token, agentKey, caseRef);
         return result;
     }

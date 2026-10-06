@@ -102,7 +102,7 @@ public class RunExecutionService {
         Map<String, Object> context;
         repository.createContextSavepoint();
         try {
-            context = contexts.build(row.caseRef(), row.caseId());
+            context = contexts.build(row.caseRef(), row.caseId(),"ORCHESTRATOR".equals(row.agentKey()) ? row.workRef() : null);
             context.put("execution",Map.of("runRef",row.ref(),"workItemRef",row.workRef(),"agentKey",row.agentKey(),"attempt",row.attempt()));
             if(mapper.writeValueAsBytes(context).length>262144) throw new IllegalArgumentException("FULL_CONTEXT_TOO_LARGE");
             repository.releaseContextSavepoint();

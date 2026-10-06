@@ -12,8 +12,9 @@ import org.springframework.stereotype.Component;
 @Component
 public class BusinessState {
     private final JdbcClient jdbc;
+    private final com.mulinocoreano.backend.execution.ExecutionContextBuilder contexts;
 
-    public BusinessState(JdbcClient jdbc) { this.jdbc = jdbc; }
+    public BusinessState(JdbcClient jdbc,com.mulinocoreano.backend.execution.ExecutionContextBuilder contexts) { this.jdbc = jdbc; this.contexts=contexts; }
 
     /** 이 Case의 구매 제안 중 PENDING인 승인 건수. */
     public long pendingApprovals(String caseRef) {
@@ -98,14 +99,18 @@ public class BusinessState {
     }
 
     public boolean humanStoppedPurchase(String caseRef) {
-        return jdbc.sql("""
-                SELECT EXISTS(SELECT 1 FROM governance_actions ga JOIN cases c ON c.case_id=ga.case_id
-                    JOIN governance_decisions d USING(governance_action_id)
-                    JOIN users u ON u.user_id=d.decided_by
-                    WHERE c.case_ref=:ref AND ga.replenishment_plan_id IS NOT NULL
-                        AND ((ga.status='BLOCKED' AND d.decision='BLOCK') OR (ga.status='CANCELLED' AND d.decision='CANCEL'))
-                        AND d.is_final AND u.role='MANAGER')
-                """).param("ref",caseRef).query(Boolean.class).single();
+        return com.mulinocoreano.backend.execution.ManagerBlockEvidence.matchesStop(currentCoordinationPurchase(caseRef));
+    }
+    public boolean humanBlockedPurchase(String caseRef) {
+        return com.mulinocoreano.backend.execution.ManagerBlockEvidence.matches(currentCoordinationPurchase(caseRef));
+    }
+    private tools.jackson.databind.JsonNode currentCoordinationPurchase(String caseRef) {
+        long caseId=jdbc.sql("SELECT case_id FROM cases WHERE case_ref=:ref").param("ref",caseRef).query(Long.class).single();
+        var parent=jdbc.sql("SELECT w.work_item_ref FROM work_items w JOIN agents a ON a.agent_id=w.assigned_agent_id WHERE w.case_id=:id AND a.agent_key='ORCHESTRATOR' ORDER BY w.work_item_id LIMIT 1")
+                .param("id",caseId).query(String.class).optional();
+        if(parent.isEmpty()) return tools.jackson.databind.node.NullNode.getInstance();
+        var current=(tools.jackson.databind.JsonNode)contexts.build(caseRef,caseId,parent.get()).get("currentCoordinationPurchase");
+        return current;
     }
 
     /** 이 Case의 가장 최근 구매 제안(governance_action) 상태. */
