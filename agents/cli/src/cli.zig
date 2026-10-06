@@ -21,6 +21,7 @@ pub fn parse(allocator: Allocator, args: []const []const u8) !Command {
     }
     var body: ?[]const u8 = null;
     var key: ?[]const u8 = null;
+    var full = false;
     if (writing) {
         var index = positional;
         while (index < args.len) : (index += 2) {
@@ -36,7 +37,10 @@ pub fn parse(allocator: Allocator, args: []const []const u8) !Command {
         var parsed = std.json.parseFromSlice(std.json.Value, allocator, body.?, .{ .parse_numbers = false }) catch return error.InvalidArguments;
         defer parsed.deinit();
         if (parsed.value != .object) return error.InvalidArguments;
-    } else if (args.len != positional) return error.InvalidArguments;
+    } else if (args.len != positional) {
+        if ((route == .case_show or route == .plan_show) and args.len == positional + 1 and eql(args[positional], "--full")) full = true
+        else return error.InvalidArguments;
+    }
     const encoded = if (has_ref) try encodeRef(allocator, args[2]) else try allocator.dupe(u8, "");
     defer allocator.free(encoded);
     const path = switch (route) {
@@ -46,7 +50,7 @@ pub fn parse(allocator: Allocator, args: []const []const u8) !Command {
             // Case and Claim are separate positional identifiers; see parser below.
             break :blk try std.fmt.allocPrint(allocator, "/agent/epistemic/cases/{s}/claims/{s}/links", .{ encoded, args[3] });
         },
-        .case_show => try std.fmt.allocPrint(allocator, "/agent/cases/{s}", .{encoded}),
+        .case_show => try std.fmt.allocPrint(allocator, "/agent/cases/{s}{s}", .{ encoded, if (full) "" else "/view" }),
         .material_show => try std.fmt.allocPrint(allocator, "/agent/materials/{s}", .{encoded}),
         .lot_trace => try std.fmt.allocPrint(allocator, "/agent/recall/lots/{s}/trace", .{encoded}),
         .recall_propose => try std.fmt.allocPrint(allocator, "/agent/recall/lots/{s}/propose", .{encoded}),
@@ -54,8 +58,8 @@ pub fn parse(allocator: Allocator, args: []const []const u8) !Command {
         .qc_inspect => try std.fmt.allocPrint(allocator, "/agent/quality/inbound/{s}/inspect", .{encoded}),
         .po_show => try std.fmt.allocPrint(allocator, "/agent/purchase-orders/{s}", .{encoded}),
         .po_propose => try std.fmt.allocPrint(allocator, "/plans/{s}/purchase-proposal", .{encoded}),
-        .plan_show => try std.fmt.allocPrint(allocator, "/agent/plans/{s}", .{encoded}),
-        .plan_calculate => try std.fmt.allocPrint(allocator, "/cases/{s}/plans", .{encoded}),
+        .plan_show => try std.fmt.allocPrint(allocator, "/agent/plans/{s}{s}", .{ encoded, if (full) "" else "/view" }),
+        .plan_calculate => try std.fmt.allocPrint(allocator, "/agent/cases/{s}/plans", .{encoded}),
         .work_create => try allocator.dupe(u8, "/agent/work-items"),
         .work_transition => try std.fmt.allocPrint(allocator, "/agent/work-items/{s}/transition", .{encoded}),
     };
@@ -133,7 +137,7 @@ test "routes encode references as a single path component" {
     const allocator = std.testing.allocator;
     const command = try parse(allocator, &.{ "case", "show", "CASE/one?x#%한" });
     defer allocator.free(command.path);
-    try std.testing.expectEqualStrings("/agent/cases/CASE%2Fone%3Fx%23%25%ED%95%9C", command.path);
+    try std.testing.expectEqualStrings("/agent/cases/CASE%2Fone%3Fx%23%25%ED%95%9C/view", command.path);
     try std.testing.expectEqual(std.http.Method.GET, command.method);
     try std.testing.expectEqual(@as(?[]const u8, null), command.body);
 }
@@ -143,7 +147,7 @@ test "writes require explicit stable keys and preserve exact body bytes" {
     const json = "{\"warehouseId\":9007199254740993,\"productIds\":[1],\"horizonDays\":30}";
     const command = try parse(allocator, &.{ "plan", "calculate", "CASE-1", "--request-key", "key-1", "--json", json });
     defer allocator.free(command.path);
-    try std.testing.expectEqualStrings("/cases/CASE-1/plans", command.path);
+    try std.testing.expectEqualStrings("/agent/cases/CASE-1/plans", command.path);
     try std.testing.expectEqual(std.http.Method.POST, command.method);
     try std.testing.expectEqualStrings(json, command.body.?);
     try std.testing.expectEqualStrings("key-1", command.request_key.?);
@@ -159,7 +163,9 @@ test "supported routes include purchasing reads and proposal but not approval" {
         .{ .args = &.{ "material", "show", "1" }, .path = "/agent/materials/1" },
         .{ .args = &.{ "po", "show", "2" }, .path = "/agent/purchase-orders/2" },
         .{ .args = &.{ "po", "propose", "PLAN/1", "--json", "{}", "--request-key", "k" }, .path = "/plans/PLAN%2F1/purchase-proposal" },
-        .{ .args = &.{ "plan", "show", "PLAN-1" }, .path = "/agent/plans/PLAN-1" },
+        .{ .args = &.{ "plan", "show", "PLAN-1" }, .path = "/agent/plans/PLAN-1/view" },
+        .{ .args = &.{ "plan", "show", "PLAN-1", "--full" }, .path = "/agent/plans/PLAN-1" },
+        .{ .args = &.{ "case", "show", "CASE-1", "--full" }, .path = "/agent/cases/CASE-1" },
         .{ .args = &.{ "work", "create", "--json", "{}", "--request-key", "k" }, .path = "/agent/work-items" },
         .{ .args = &.{ "work", "transition", "WI-1", "--json", "{}", "--request-key", "k" }, .path = "/agent/work-items/WI-1/transition" },
     };

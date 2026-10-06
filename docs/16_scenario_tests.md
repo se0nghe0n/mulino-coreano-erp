@@ -389,6 +389,91 @@ unknown으로 유지한다. SDK 오류 텍스트나 credential·prompt를 공개
 이 logging-only 진단 보강의 runner 82건과 helper 7건을 검증했다.
 기존 business/readiness gate의 전체 SIT 20건은 앞선 기록으로 유지하고
 진단 metadata 변경 때문에 전체 Unit/SIT를 다시 실행하지 않았다.
+
+### 2026-10-06 QC 단독 재개
+
+새 `native_resumed_1006_qm_scenario` DB에서 기존 image·Sonnet 5·정상
+writable auth mount로 TC-QM-001만 실행했다. 첫 launch는 host PATH에
+Docker 경로가 없어 모델 호출 전에 SKIPPED됐다. 이 기록을 보존하고
+`/usr/local/bin`을 추가해 같은 disposable fixture를 초기화했다.
+
+실제 QC Run은 FAILED다. native 결과는 success·exit 0이며
+resolvedModel은 `claude-sonnet-5`다. CLI 보고 비용은 USD 0.1097564,
+uncached input 6·output 1,400·cache read 31,762·cache creation 22,348,
+turns 6이다. usageComplete=true·accountingStatus=COMPLETE지만
+executionReady=false다. native 오류 category·fingerprint는 없다.
+이 결과를 이전 UNKNOWN_NATIVE_FAILURE의 원인 확정으로 해석하지 않는다.
+
+검사·승인안·decision·audit은 0건이고 Case는 OPEN, QC work는 BLOCKED,
+JUDGMENT_REQUIRED Attention은 OPEN이다. 입고는 HOLD이며 원재료 LOT
+잔량은 2다. 모델이 끝나고 Run이 실패한 뒤에도 observer가 제안을
+기다려 owned runner만 정상 종료했다. observer의 early-exit 실패와
+이미 저장된 업무 실패를 구분한다. 증거는
+`/tmp/mulino-project-completion-20261005/native/resumed-qm-1006/`이다.
+
+저장된 모델 업무 summary는 Read로 role 문서를 읽었지만 dontAsk의
+Bash 권한 거부로 mulino 명령을 실행하지 못했다고 보고한다. 배정된
+qualityWork의 inboundId는 4이며 설치된 QC skill은 qc show·inspect를
+안내한다. tool permission 설정·명령 matching을 다음 진단 대상으로
+삼는다. 모델 보고만으로 정확한 권한 거부 원인을 확정하지 않는다.
+
+QC·리콜 proposal wait에 기존 persisted terminal failure 판정을 연결했다.
+성공 조건과 native 사용량 gate는 유지한다. 이 helper 수정 후 paid UAT는
+재실행하지 않았다. 유효한 P2P-001·002와 이전 실패 기록도 유지한다.
+AgentDriver·UatEvidence helper 13건과 QM-001·RC-001 scripted SIT,
+해당 task에 포함되는 backend restart 2건을 검증했다.
+
+후속 observability 수정은 native success에도 permission_denials의 건수,
+알려진 tool 종류별 건수와 고정 command shape별 건수를 남긴다.
+shape는 CANONICAL_CLI_PREFIX·ABSOLUTE_CLI·CUSTOM_ENV_PREFIX·
+COMPOUND_OR_WRAPPER·OTHER다. command·tool input·tool ID·알 수 없는
+tool 이름은 보존하지 않는다. denial 자체를 native 실패로 만들거나
+ERP 승인·업무 종료 gate를 바꾸지 않는다. 과거 QC 증거에는 이 지표가
+없으므로 소급 생성하지 않는다. runner 84건·helper 14건을 검증했다.
+
+canonical CLI와 비허용 scratch write를 분리한 조정자의 후속 probe는
+기존 permission rule에서 CLI 도달·scratch 거부를 확인했다. 따라서
+permission pattern을 바꾸지 않고 한 Bash 호출에 `mulino`로 시작하는
+CLI 명령 하나만 실행하도록 안내했다. URL·capability는 이미 주입돼
+있으므로 env prefix·absolute 경로·wrapper·compound 호출을 쓰지 않는다.
+공통 runtime 문서의 QC 미지원 설명도 실제 registry의 qc show/inspect·
+lot trace·recall propose와 인간 승인·물리적 처리의 경계에 맞췄다.
+이 안내는 이전 QM 실패의 정확한 command shape를 소급 확정하지 않는다.
+
+curated build로 별도 `mulino-agent-runtime:canonical-1006` image를 만들었다.
+image digest는
+`sha256:133e06b32ce36a89585e1c3a6c1ee57e0ce2566ae5f7b5482ad85d31c95ac981`다.
+network=none smoke의 격리·CLI·config·container cancellation은 통과했고
+modelRequests는 0이다. Claude 2.1.282·Codex 0.154.0 executable hash는
+기존 image와 같다. 재빌드한 mulino의 전체 hash는 다르지만 모든
+allocated ELF section은 같고 debug·symbol metadata만 다르다.
+증거는 `native/canonical-runtime-1006/`에 보존했다. 이 image로 paid
+UAT를 실행하지 않았으며 business 인수 결과는 앞선 FAILED로 유지한다.
+수정된 최종 source로 runner 84건·helper 14건과 새
+`native_canonical_1006_sit_scenario` DB의 전체 SIT 20건이 통과했다.
+
+### canonical QC 재시도의 usage 수집 실패
+
+새 `native_canonical_1006_qm_scenario` DB의 단독 QC 재시도는 검사 1건·
+승인안 PENDING을 저장하고 Run COMPLETED/WAITING에 도달했다. 입고는
+HOLD·잔량 2이며 인간 승인·ERP 적용은 없었다. 하지만 native 종료 전에
+cleanup이 실행돼 model_finished가 없고 executionReady=false다.
+status는 FAILED이며 비용·토큰은 모두 null로 유지한다. 이 기록은
+`native/canonical-qm-1006/`에 보존하며 앞선 tool permission 업무 실패나
+UNKNOWN_NATIVE_FAILURE와 구분한다.
+
+설치된 Cucumber 8.0.1은 After hook을 order 내림차순으로 실행한다.
+stopAgent의 default 10000이 evidence hook의 10보다 먼저여서 required
+native finalization wait 전에 실행기를 종료했다. cleanup을 order 0으로
+옮기고 evidence hook의 기존 native·업무 gate와 wait는 유지했다.
+
+실제 Cucumber runtime과 production hook으로 지연된 model_finished를
+받는 회귀 테스트를 추가했다. 성공의 비용 수집, native 실패의 unknown
+usage, 시나리오 실패의 process cleanup을 확인한다. 이전 hook order를
+복원한 control에서는 지연 증거를 수집하는 2건이 실패했다. 이 helper
+수정만으로 과거 UAT를 PASS로 바꾸거나 비용을 소급 추정하지 않는다.
+복원한 최종 helper 17건과 새 `native_lifecycle_1006_sit_scenario` DB의
+전체 SIT 20건이 통과했다. 수정 후 paid 모델 호출은 하지 않았다.
 유효한 실제 인수는 여전히 Claude 001·002의 두 PASS다. 원래 004/QM FAIL,
 RC INCOMPLETE와 새 Recovery 3건 FAIL, Codex parity FAIL을 모두 보존한다.
 Known 보고 비용은 기존 USD 12.661439에 최소 성공 진단 USD 0.001066을

@@ -11,6 +11,36 @@ const executor = (mode, extra = {}) => new ProcessExecutor({
   invocation: () => ({ command: process.execPath, args: [fixture, mode], env: { MULINO_TOKEN: 'cap-secret' } }), ...extra,
 });
 
+test('native success with denied tools retains safe shapes without inventing a native failure', async () => {
+  const handle = executor('claude-permission-denial').start(claim);
+  assert.equal((await handle.result).outcome, 'FAILED');
+  assert.equal(handle.diagnostics.nativeResultSubtype, 'success');
+  assert.equal(handle.diagnostics.nativeExitCode, 0);
+  assert.equal(handle.diagnostics.nativeFailureCategory, undefined);
+  assert.equal(handle.diagnostics.nativeErrorFingerprint, undefined);
+  assert.equal(handle.diagnostics.nativePermissionDenialCount, 1);
+  assert.deepEqual(handle.diagnostics.nativeDeniedToolKinds, {Bash:1});
+  assert.deepEqual(handle.diagnostics.nativeDeniedCommandShapes, {CUSTOM_ENV_PREFIX:1});
+  assert.equal(handle.usage.costUsd, 0.1);
+  assert.doesNotMatch(JSON.stringify(handle.diagnostics), /cap-secret|secret-tool-id|MULINO_TOKEN|qc show/);
+});
+
+test('permission diagnostics retain only known tool counts and conservative fixed command shapes', () => {
+  const commands = ['mulino qc show 4 --request-key secret-key', '/usr/local/bin/mulino qc show 4',
+    'MULINO_TOKEN=secret-token mulino qc show 4', 'env CUSTOM=secret-value mulino qc show 4',
+    'mulino qc show 4 && echo secret-command', 'bash -c "mulino qc show 4"', 'echo secret-other'];
+  const d = claudeDiagnostics({subtype:'success',is_error:false,permission_denials:[
+    ...commands.map(command => ({tool_name:'Bash',tool_use_id:'secret-id',tool_input:{command}})),
+    {tool_name:'Read',tool_input:{file_path:'/secret/path'}}, {tool_name:'secret-tool',tool_input:{secret:'secret-input'}}, null]});
+  assert.equal(d.nativePermissionDenialCount, 10);
+  assert.deepEqual(d.nativeDeniedToolKinds, {Bash:7,Read:1,OTHER:2});
+  assert.deepEqual(d.nativeDeniedCommandShapes, {CANONICAL_CLI_PREFIX:1,ABSOLUTE_CLI:1,CUSTOM_ENV_PREFIX:2,COMPOUND_OR_WRAPPER:2,OTHER:1});
+  assert.doesNotMatch(JSON.stringify(d), /secret|mulino|qc show|CUSTOM=|MULINO_TOKEN/);
+  assert.deepEqual(claudeDiagnostics({subtype:'success',permission_denials:[]}),
+    {nativeResultSubtype:'success',nativePermissionDenialCount:0,nativeDeniedToolKinds:{},nativeDeniedCommandShapes:{}});
+  assert.deepEqual(claudeDiagnostics({subtype:'success'}), {nativeResultSubtype:'success'});
+});
+
 test('real child receives bounded context stdin and structured final result is parsed', async () => {
   const handle = executor('context').start(claim);
   assert.ok(handle);

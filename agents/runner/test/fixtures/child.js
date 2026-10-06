@@ -33,4 +33,8 @@ else if (mode === 'claude-quota') {
   process.exitCode=1;
 }
 else if (mode === 'claude-error') process.stdout.write(JSON.stringify({ type: 'result', subtype: 'error_max_turns', is_error: true }) + '\n');
+else if (mode === 'claude-permission-denial') process.stdout.write(JSON.stringify({type:'result',subtype:'success',is_error:false,
+  permission_denials:[{tool_name:'Bash',tool_use_id:'secret-tool-id',tool_input:{command:'MULINO_TOKEN=cap-secret mulino qc show 4'}}],
+  total_cost_usd:0.1,num_turns:2,modelUsage:{'claude-sonnet-5':{}},usage:{input_tokens:1,output_tokens:2},
+  structured_output:{outcome:'FAILED',summary:'Tool unavailable',waitingConditions:[],resultRef:null}})+'\n');
 else send({ outcome: 'DONE', summary: 'Finished', resultRef: 'PLAN-1' });

@@ -6,6 +6,7 @@ export function claudeDiagnostics(event) {
     'error_max_structured_output_retries', 'error_during_execution']);
   const result = {};
   if (knownSubtypes.has(event.subtype)) result.nativeResultSubtype = event.subtype;
+  Object.assign(result, permissionDenialShape(event.permission_denials));
   if (!event.is_error && event.subtype === 'success') return result;
   const errors = Array.isArray(event.errors) ? event.errors : [];
   const status = [event.error?.status, ...errors.map(error => error?.status)]
@@ -34,6 +35,36 @@ export function claudeDiagnostics(event) {
     ?? (status !== undefined && status >= 500 ? 'PROVIDER_SERVER' : undefined)
     ?? 'UNKNOWN_NATIVE_FAILURE';
   return result;
+}
+
+/** Counts and fixed shapes only: tool IDs, arbitrary names and command inputs never leave memory. */
+function permissionDenialShape(denials) {
+  if (!Array.isArray(denials)) return {};
+  const knownTools = new Set(['Bash','Read','Write','Edit','MultiEdit','Glob','Grep','Task','Agent','WebFetch','WebSearch']);
+  const tools = {};
+  const commands = {};
+  for (const denial of denials) {
+    const tool = knownTools.has(denial?.tool_name) ? denial.tool_name : 'OTHER';
+    tools[tool] = (tools[tool] ?? 0) + 1;
+    if (tool === 'Bash') {
+      const shape = deniedCommandShape(denial?.tool_input?.command);
+      commands[shape] = (commands[shape] ?? 0) + 1;
+    }
+  }
+  return {nativePermissionDenialCount:denials.length,
+    nativeDeniedToolKinds:tools,nativeDeniedCommandShapes:commands};
+}
+
+function deniedCommandShape(command) {
+  if (typeof command !== 'string' || command.length > 8192) return 'OTHER';
+  const text = command.trim();
+  // Conservative shape classification, not a shell parser or a permission decision.
+  if (/[;&|\n\r]|\$\(|`/.test(text)
+      || /^(?:bash|sh|zsh|command|exec|sudo|timeout)\s/.test(text)) return 'COMPOUND_OR_WRAPPER';
+  if (/^(?:env\s+)?[A-Za-z_][A-Za-z0-9_]*=/.test(text)) return 'CUSTOM_ENV_PREFIX';
+  if (/^["']?\/[^\s"']*\/mulino["']?(?:\s|$)/.test(text)) return 'ABSOLUTE_CLI';
+  if (/^mulino(?:\s|$)/.test(text)) return 'CANONICAL_CLI_PREFIX';
+  return 'OTHER';
 }
 
 /** Only known key names, primitive counts and an irreversible error fingerprint leave memory. */

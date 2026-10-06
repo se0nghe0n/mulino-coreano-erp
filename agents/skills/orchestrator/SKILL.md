@@ -23,7 +23,7 @@ mulino work create --json '{"caseRef":"CASE-실제참조","agentKey":"SUPPLY_CHA
 {"outcome":"WAITING","summary":"공급망 계산 결과가 저장되면 같은 업무를 이어갑니다.","waitingConditions":[{"type":"DEPENDENCY_DONE","payload":{"dependentWiRef":"WI-생성응답참조"},"reason":"수요·생산·자재 계획 필요"}],"resultRef":null}
 ```
 
-5. 공급망 DONE 후 Case의 `latestPlan.ref`를 `mulino plan show <ref>`로 읽는다. 최신 저장 계획의 Case·범위·버전과 READY 상태를 확인한다. 공개 Plan DTO에는 원본 Work Item 필드가 없으므로 연결을 읽었다고 주장하지 않는다. 공급망 DONE의 원본 업무·최신 시도 검증은 서버가 수행한다. 최신 실패·NEEDS_ATTENTION을 이전 READY로 대신하지 않는다. 유효한 계획은 구매량이 0이어도 Procurement에 배정하여 서버의 구매 필요 여부 검증으로 이어간다.
+5. 공급망 DONE 후 Case의 `latestPlan.ref`를 `mulino plan show <ref>`로 읽는다. complete=false면 판단을 멈추고 인간 확인을 요청한다. 최신 저장 계획의 Case·범위·버전과 READY 상태를 확인한다. compact GET의 currentAssociation과 Case planningAttempts는 원본 업무·현재 시도 정보이며 저장된 Plan DTO와 구분한다. plan calculate 응답에는 이 현재 연결 정보가 없다. 공급망 DONE의 원본 업무·최신 시도 검증은 서버가 수행한다. 최신 실패·NEEDS_ATTENTION을 이전 READY로 대신하지 않는다. 유효한 계획은 구매량이 0이어도 Procurement에 배정하여 서버의 구매 필요 여부 검증으로 이어간다.
 6. 아래 본문과 키를 부모 Work Item + 정확한 계획 버전별로 고정한다. `metadata.businessRef`에 실제 계획 참조를 넣고 description에도 남긴다. `parentWorkItemRef`는 서버가 현재 부모로 설정한다. 재개 시 같은 요청을 재전송하여 기존 `workItemRef`를 복구할 수 있다. 같은 계획에 새 요청 키·새 제목을 만들어 중복 배정하지 않는다.
 
 ```bash

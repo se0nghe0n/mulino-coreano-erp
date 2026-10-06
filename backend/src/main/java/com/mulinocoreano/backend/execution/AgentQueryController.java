@@ -17,6 +17,18 @@ public class AgentQueryController {
         this.queries = queries;
     }
 
+    @GetMapping("/cases/{ref}/view")
+    public tools.jackson.databind.JsonNode caseView(@PathVariable String ref,
+            @RequestHeader("Authorization") String auth,@AuthenticationPrincipal AgentActor actor) {
+        return queries.caseView(auth.substring(7),actor.agentKey(),ref);
+    }
+
+    @GetMapping("/plans/{ref}/view")
+    public tools.jackson.databind.JsonNode planView(@PathVariable String ref,
+            @RequestHeader("Authorization") String auth,@AuthenticationPrincipal AgentActor actor) {
+        return queries.planView(auth.substring(7),actor.agentKey(),actor.caseRef(),ref);
+    }
+
     @GetMapping("/cases/{ref}")
     public Map<String, Object> caseContext(
             @PathVariable String ref,

@@ -22,6 +22,8 @@ public class ExecutionContextBuilder {
     private final ExecutionContextRepository repository;
     private final CanonicalJson json;
     private final Clock clock;
+    private final com.mulinocoreano.backend.planning.PlanQueryRepository plans;
+    private final tools.jackson.databind.ObjectMapper mapper;
 
     public ExecutionContextBuilder(
             ContextSnapshotService contexts,
@@ -29,7 +31,9 @@ public class ExecutionContextBuilder {
             ExecutionContextRepository repository,
             CanonicalJson json,
             @Qualifier("planningClock") Clock clock,
-            ReplenishmentFollowupRepository followups) {
+            ReplenishmentFollowupRepository followups,
+            com.mulinocoreano.backend.planning.PlanQueryRepository plans,tools.jackson.databind.ObjectMapper mapper) {
+        this.plans=plans;this.mapper=mapper;
         this.followups = followups;
         this.contexts = contexts;
         this.snapshots = snapshots;
@@ -40,6 +44,11 @@ public class ExecutionContextBuilder {
 
     public Map<String, Object> build(String caseRef, long caseId) {
         var context = new LinkedHashMap<String, Object>(contexts.build(caseRef));
+        var basisInstant=clock.instant();
+        var basisDate=basisInstant.atZone(clock.getZone()).toLocalDate();
+        context.put("planningBasis",Map.of("asOf",basisInstant,"date",basisDate,"timezone",clock.getZone().getId(),"authority","SERVER_PLANNING_CLOCK"));
+        context.put("caseStatus",plans.caseStatus(caseRef));
+        context.put("planningAttempts",json.readTree(plans.planningAttempts(caseRef)));
         context.put("caseRef", caseRef);
         context.put("recallWork",json.readTree(repository.recallWorks(caseId)));
         context.put("qualityWork",json.readTree(repository.qualityWorks(caseId)));
@@ -64,23 +73,15 @@ public class ExecutionContextBuilder {
                                             .distinct()
                                             .sorted()
                                             .toList();
-                            context.put(
-                                    "latestPlan",
-                                    Map.of(
-                                            "ref",
-                                            plan.ref(),
-                                            "version",
-                                            plan.version(),
-                                            "sourceSnapshot",
-                                            source,
-                                            "result",
-                                            json.readTree(plan.result())));
+                            var captured=(tools.jackson.databind.node.ObjectNode)mapper.valueToTree(plans.find(plan.ref()).orElseThrow());
+                            captured.set("currentAssociation",json.readTree(plans.currentAssociation(plan.ref())));
+                            context.put("latestPlan",captured);
                             context.put(
                                     "currentBusinessFacts",
                                     snapshots.load(
                                             plan.warehouse(),
                                             productIds,
-                                            LocalDate.now(clock),
+                                            basisDate,
                                             plan.horizon()));
                         });
         return context;
