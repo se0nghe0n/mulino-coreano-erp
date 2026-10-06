@@ -421,6 +421,14 @@ QC·리콜 proposal wait에 기존 persisted terminal failure 판정을 연결�
 재실행하지 않았다. 유효한 P2P-001·002와 이전 실패 기록도 유지한다.
 AgentDriver·UatEvidence helper 13건과 QM-001·RC-001 scripted SIT,
 해당 task에 포함되는 backend restart 2건을 검증했다.
+
+후속 observability 수정은 native success에도 permission_denials의 건수,
+알려진 tool 종류별 건수와 고정 command shape별 건수를 남긴다.
+shape는 CANONICAL_CLI_PREFIX·ABSOLUTE_CLI·CUSTOM_ENV_PREFIX·
+COMPOUND_OR_WRAPPER·OTHER다. command·tool input·tool ID·알 수 없는
+tool 이름은 보존하지 않는다. denial 자체를 native 실패로 만들거나
+ERP 승인·업무 종료 gate를 바꾸지 않는다. 과거 QC 증거에는 이 지표가
+없으므로 소급 생성하지 않는다. runner 84건·helper 14건을 검증했다.
 유효한 실제 인수는 여전히 Claude 001·002의 두 PASS다. 원래 004/QM FAIL,
 RC INCOMPLETE와 새 Recovery 3건 FAIL, Codex parity FAIL을 모두 보존한다.
 Known 보고 비용은 기존 USD 12.661439에 최소 성공 진단 USD 0.001066을

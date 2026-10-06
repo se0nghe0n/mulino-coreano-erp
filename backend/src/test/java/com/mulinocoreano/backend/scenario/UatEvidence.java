@@ -109,7 +109,7 @@ public final class UatEvidence {
             var last=events.isEmpty() ? null : events.getLast();
             for (String key:List.of("runtime","model","resolvedModel"))
                 run.put(key,last==null ? null : last.path(key).asText(null));
-            for (String key : List.of("nativeResultSubtype", "nativeFrameKind", "nativeErrorCode", "nativeErrorKeys", "nativeErrorPrimitiveCounts", "nativeErrorFingerprint", "nativeFailureCategory", "nativeExitCode", "nativeSignal", "nativeHttpStatus"))
+            for (String key : List.of("nativeResultSubtype", "nativeFrameKind", "nativeErrorCode", "nativeErrorKeys", "nativeErrorPrimitiveCounts", "nativeErrorFingerprint", "nativeFailureCategory", "nativeExitCode", "nativeSignal", "nativeHttpStatus", "nativePermissionDenialCount", "nativeDeniedToolKinds", "nativeDeniedCommandShapes"))
                 run.put(key, last == null || !last.hasNonNull(key) ? null : last.get(key));
             String failure=null;
             for (var event:events) if (event.hasNonNull("failure")) failure=event.path("failure").asText();
