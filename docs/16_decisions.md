@@ -36,10 +36,19 @@ CLAUDE.md는 AGENTS.md symlink를 유지한다.
 
 ### 증거와 한계
 
-source baseline은 `0132e0a62ad9f086e5c70c5c857d4546f5921ef9`다.
-조회 도구의 존재·로컬 scripted SIT는 구현 근거다. #24/#25 현재 native UAT와
-#35 실제 클라이언트 인수 전까지 대화 표면 선택은 설계 판단이다.
-10월 3일 과거 모델 UAT를 현재 source의 인수로 재사용하지 않는다.
+역사적 Supplier source baseline은
+`0132e0a62ad9f086e5c70c5c857d4546f5921ef9`다. 현재 accepted production
+source는 `4e6935de693b433755e12b4ffcf0197297a6ae31`이며 backend·read view·
+role 안내 변경을 포함한다. #24/#25 현재 Claude local business UAT는
+5 PASS다. 21개 native Run의 완전 사용량·receipt 일치·denial 0을 확인했다.
+QC·리콜은 인간 승인 대기이고 ERP 적용은 없다. 10월 3일 과거 모델 UAT와
+원래·Recovery·compact 실패를 현재 인수로 덮어쓰지 않는다.
+
+보강 과정의 backend 569건 실행·18건 제외·bootJar 통과 뒤 helper·prose
+CANCEL 교정을 수행했다. 최종 focused 22건·전체 SIT 20건·bootJar·runner
+84건이 통과했으며 최종 교정 뒤 full backend는 재실행하지 않았다.
+조회 도구와 로컬 검증은 구현 근거다. #35 실제 클라이언트 인수와 Codex
+account 인증·parity gate가 남아 있어 실제 대화 표면의 인수는 완료하지 않았다.
 
 개인별 운영 IAM, 실제 ChatGPT workspace 연결, Slack·Email 어댑터,
 능동 알림, 운영 배포를 확인하지 않았다. MFDS 실제 전송·법정 양식 검증도

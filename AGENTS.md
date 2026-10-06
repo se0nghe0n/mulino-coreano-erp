@@ -6,24 +6,23 @@ This file is the operating guide for agent sessions working in this repository, 
 
 A hypothetical ERP + AI agent governance system assuming Mulino Bianco (an Italian food brand) enters the Korean market. A SAP consulting portfolio project that localizes a EU-standard ERP to Korean food regulations (Food Traceability Act, 22 allergens, electronic tax invoices, etc.).
 
-**Current status (2026-10-06, integration baseline `0132e0a`)**: This fork's
+**Current status (2026-10-06, accepted native source `4e6935d`)**: This fork's
 local PoC implements Spring Boot REST APIs, stdio MCP, Zig `mulino`, a native
 Claude Code/Codex runner, durable Case/Run recovery, human purchasing/QC/recall
 approval, evidence judgments and Supplier master CRUD. The backend owns the
 implemented governance gates; `governance/` remains a separate-layer scaffold.
-DDL contains 61 tables: the original 30 ERP and 13 interface tables plus 18
-later planning, approval, quality, recall, evidence and receipt tables. This is
-source and local verification status, not organization `main` merge or production
-acceptance. Historical native-model UAT is separate from current #24/#25 acceptance.
-Valid Claude UAT remains 2 PASS. The original 2 FAIL and 1 INCOMPLETE are
-preserved; all three subsequent recovery cases failed before ERP writes.
-A minimal Claude call succeeded, but structured-output probes failed with an
-unknown cause. Codex parity failed and its current account-authentication gate
-remains unresolved. Actual client #35 acceptance is pending. MONITOR uses conversation
-MCP tools. Dedicated dashboard and OAuth are excluded. Certificate type coverage
-and automatic 30-day notices remain an untracked gap awaiting issue registration.
-See `docs/16_decisions.md` and `docs/portfolio/README.md`. All business
-documentation is written in Korean.
+DDL contains 61 tables. Current CLAUDE / `claude-sonnet-5` local business UAT
+passes all five cases with 21 complete native runs, matching receipts and zero
+permission denials. QC and recall remain at human approval wait, with no ERP
+application. Original 2 PASS / 2 FAIL / 1 INCOMPLETE, Recovery 3 FAIL and later
+compact-source 4 PASS / 1 FAIL remain historical. Codex parity failed earlier;
+the current account-authentication gate and actual client #35 acceptance remain
+unresolved. This is local source and verification evidence, not organization
+`main` merge, regulatory or production acceptance. MONITOR uses conversation
+MCP tools. Dedicated dashboard and OAuth are excluded. Certificate type
+coverage and automatic 30-day notices remain an untracked gap awaiting issue
+registration. See `docs/16_decisions.md` and `docs/portfolio/README.md`. All
+business documentation is written in Korean.
 
 ## Commands
 

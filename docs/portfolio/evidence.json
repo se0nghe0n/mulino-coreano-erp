@@ -1,7 +1,7 @@
 {
   "asOf": "2026-10-06",
   "sourceBaseline": "0132e0a62ad9f086e5c70c5c857d4546f5921ef9",
-  "classification": "local PoC; original and recovery native acceptance history preserved; e61ded2 logging-only recovery evidence; overall acceptance incomplete",
+  "classification": "local PoC; current Claude five-case business UAT accepted at 4e6935d; historical failures preserved; Codex parity and actual client #35 pending",
   "supplier": {
     "commit": "0132e0a62ad9f086e5c70c5c857d4546f5921ef9",
     "tests": {
@@ -384,6 +384,271 @@
         "PASSED": 2,
         "FAILED": 3
       }
+    },
+    "currentAccepted": {
+      "status": "CLAUDE_LOCAL_BUSINESS_UAT_PASSED",
+      "acceptedProductionSource": "4e6935de693b433755e12b4ffcf0197297a6ae31",
+      "sourceClean": true,
+      "runtime": "CLAUDE",
+      "model": "claude-sonnet-5",
+      "acceptanceCounts": {
+        "PASSED": 5,
+        "FAILED": 0,
+        "INCOMPLETE": 0
+      },
+      "runtimeImage": "mulino-agent-runtime:manager-proof-1006",
+      "imageSha256": "sha256:143e19e38f669ecd6bc0f71c4396008140701e7e57a69c52f9e5f88e520f1567",
+      "backendJarSha256": "11d73935589fee336f6011d5a034e497814bbc917f759e829024e02e59604f2d",
+      "displayTotalReportedCostUsd": "2.9853428",
+      "exactJsonDecimalTotalReportedCostUsd": "2.98534280000000011",
+      "costPrecisionNote": "Exact JSON Decimal sum includes float representation; displayed sum rounded to seven decimal places",
+      "unknownCostsThisBatch": 0,
+      "historicalOverallCostUsd": null,
+      "historicalOverallTokens": null,
+      "nativeRuns": 21,
+      "matchingModelFinishedEvents": 21,
+      "allNativeExitCodesZero": true,
+      "allAccountingComplete": true,
+      "allUsageComplete": true,
+      "allReceiptOutcomesMatch": true,
+      "permissionDenials": 0,
+      "cases": [
+        {
+          "testCase": "TC-P2P-001",
+          "status": "PASSED",
+          "runCount": 5,
+          "caseStatus": "WAITING",
+          "displayReportedCostUsd": "0.6780952",
+          "exactJsonDecimalReportedCostUsd": "0.67809520000000002",
+          "usageComplete": true,
+          "accountingStatus": "COMPLETE",
+          "nativeOutcomes": [
+            "WAITING",
+            "DONE",
+            "WAITING",
+            "WAITING",
+            "DONE"
+          ],
+          "receiptOutcomes": [
+            "WAITING",
+            "DONE",
+            "WAITING",
+            "WAITING",
+            "DONE"
+          ],
+          "reportedTokens": {
+            "inputTokens": 56,
+            "outputTokens": 8033,
+            "cacheReadTokens": 624366,
+            "cacheWriteTokens": 118195
+          },
+          "appliedPurchaseOrders": 1,
+          "appliedPurchaseTotalKrw": 16500.0,
+          "originalCoordinationWorkStatus": "DONE"
+        },
+        {
+          "testCase": "TC-P2P-002",
+          "status": "PASSED",
+          "runCount": 5,
+          "caseStatus": "OPEN",
+          "displayReportedCostUsd": "0.7219284",
+          "exactJsonDecimalReportedCostUsd": "0.72192840000000006",
+          "usageComplete": true,
+          "accountingStatus": "COMPLETE",
+          "nativeOutcomes": [
+            "WAITING",
+            "DONE",
+            "WAITING",
+            "WAITING",
+            "ABORTED"
+          ],
+          "receiptOutcomes": [
+            "WAITING",
+            "DONE",
+            "WAITING",
+            "WAITING",
+            "ABORTED"
+          ],
+          "reportedTokens": {
+            "inputTokens": 60,
+            "outputTokens": 8161,
+            "cacheReadTokens": 664752,
+            "cacheWriteTokens": 126812
+          },
+          "appliedPurchaseOrders": 0,
+          "appliedPurchaseTotalKrw": 0,
+          "humanDecision": "final MANAGER BLOCK",
+          "reissue": false,
+          "nativeFinalOutcome": "ABORTED",
+          "receiptFinalOutcome": "ABORTED",
+          "originalCoordinationWorkStatus": "BLOCKED",
+          "backendAttention": "OPEN JUDGMENT_REQUIRED retained",
+          "immutableActorProvenance": "IMMUTABLE_PURCHASE_DECIDED_AUDIT"
+        },
+        {
+          "testCase": "TC-P2P-004",
+          "status": "PASSED",
+          "runCount": 9,
+          "caseStatus": "WAITING",
+          "displayReportedCostUsd": "1.3771636",
+          "exactJsonDecimalReportedCostUsd": "1.37716360000000001",
+          "usageComplete": true,
+          "accountingStatus": "COMPLETE",
+          "nativeOutcomes": [
+            "WAITING",
+            "DONE",
+            "WAITING",
+            "WAITING",
+            "WAITING",
+            "DONE",
+            "WAITING",
+            "WAITING",
+            "DONE"
+          ],
+          "receiptOutcomes": [
+            "WAITING",
+            "DONE",
+            "WAITING",
+            "WAITING",
+            "WAITING",
+            "DONE",
+            "WAITING",
+            "WAITING",
+            "DONE"
+          ],
+          "reportedTokens": {
+            "inputTokens": 106,
+            "outputTokens": 18858,
+            "cacheReadTokens": 1245318,
+            "cacheWriteTokens": 234827
+          },
+          "appliedPurchaseOrders": 1,
+          "appliedPurchaseTotalKrw": 17000.0,
+          "oldProposal": "EXPIRED",
+          "oldProposalPurchaseOrders": 0,
+          "explicitHumanRecalculation": true,
+          "newProposalApproved": true,
+          "originalCoordinationWorkStatus": "DONE"
+        },
+        {
+          "testCase": "TC-QM-001",
+          "status": "PASSED",
+          "runCount": 1,
+          "caseStatus": "OPEN",
+          "displayReportedCostUsd": "0.1040890",
+          "exactJsonDecimalReportedCostUsd": "0.10408900000000001",
+          "usageComplete": true,
+          "accountingStatus": "COMPLETE",
+          "nativeOutcomes": [
+            "WAITING"
+          ],
+          "receiptOutcomes": [
+            "WAITING"
+          ],
+          "reportedTokens": {
+            "inputTokens": 12,
+            "outputTokens": 1156,
+            "cacheReadTokens": 100905,
+            "cacheWriteTokens": 18081
+          },
+          "appliedPurchaseOrders": 0,
+          "appliedPurchaseTotalKrw": 0,
+          "qualityApproval": "PENDING QC",
+          "inboundStatus": "HOLD",
+          "remainingQuantity": 2,
+          "erpApplied": 0
+        },
+        {
+          "testCase": "TC-RC-001",
+          "status": "PASSED",
+          "runCount": 1,
+          "caseStatus": "OPEN",
+          "displayReportedCostUsd": "0.1040666",
+          "exactJsonDecimalReportedCostUsd": "0.10406660000000001",
+          "usageComplete": true,
+          "accountingStatus": "COMPLETE",
+          "nativeOutcomes": [
+            "WAITING"
+          ],
+          "receiptOutcomes": [
+            "WAITING"
+          ],
+          "reportedTokens": {
+            "inputTokens": 14,
+            "outputTokens": 1740,
+            "cacheReadTokens": 129053,
+            "cacheWriteTokens": 15207
+          },
+          "appliedPurchaseOrders": 0,
+          "appliedPurchaseTotalKrw": 0,
+          "recallApproval": "PENDING ADMIN",
+          "rawLots": 3,
+          "productionLots": 10,
+          "customers": 2,
+          "shipments": 115,
+          "erpApplied": 0,
+          "reportTransport": "OFFLINE"
+        }
+      ],
+      "verification": {
+        "fullBackendBeforeHelperProseCancelCorrection": {
+          "discovered": 587,
+          "activePassed": 569,
+          "excluded": 18,
+          "failures": 0,
+          "errors": 0,
+          "bootJar": "PASSED"
+        },
+        "initialScriptedSit": {
+          "passed": 19,
+          "failed": 1,
+          "cause": "Generic stop helper incorrectly accepted BLOCK only and rejected final MANAGER CANCEL; failure preserved"
+        },
+        "afterFinalHelperProseCorrection": {
+          "focusedDiscovered": 40,
+          "focusedActivePassed": 22,
+          "excluded": 18,
+          "fullScriptedSitPassed": 20,
+          "bootJar": "PASSED",
+          "runnerPassed": 84,
+          "noModelImageSmokeAndCancellation": "PASSED",
+          "modelRequests": 0,
+          "fullBackendRerun": false
+        },
+        "compactSourceCheckpoint": {
+          "source": "17560f2",
+          "backendActivePassed": 562,
+          "scriptedSitPassed": 20,
+          "mcpPassed": 26,
+          "cliSmokePassed": 34,
+          "zigPassed": 7,
+          "nativePassed": 4,
+          "nativeFailed": 1
+        },
+        "unchangedVsCompactImage": [
+          "CLI bytes",
+          "Claude native executable bytes",
+          "Codex native executable bytes",
+          "native lock bytes"
+        ],
+        "changedVsHistoricalSupplier0132": [
+          "backend JAR",
+          "agent read views",
+          "role guidance"
+        ],
+        "actorProvenance": "Forward-only immutable actor snapshot; legacy UNKNOWN, no backfill",
+        "policyBoundary": "Backend approval and ABORTED Attention policies unchanged"
+      },
+      "codexCurrentAccessGate": {
+        "supportedAccountReadRefreshToken": true,
+        "account": null,
+        "requiresOpenaiAuth": true,
+        "rateLimits": "AUTHENTICATION",
+        "loginStarted": false,
+        "modelCalls": 0,
+        "pastFailureCause": "unknown"
+      },
+      "scope": "Current Claude local business UAT only; not Codex parity, actual client #35, regulatory or production acceptance"
     }
   },
   "limitations": [
@@ -396,7 +661,8 @@
     "Known reported CLI subtotal USD12.662505 only; total cost and incomplete metrics unknown",
     "Current Codex account metadata authentication gate unresolved; human login refresh prepared but not executed",
     "Recovery3 P2P004/QM001/RC001 all FAIL with zero ERP writes; original history preserved",
-    "Minimal normal writable diagnostic success is not business acceptance; controlled no-tool schema/budget failures have unknown exact cause"
+    "Minimal normal writable diagnostic success is not business acceptance; controlled no-tool schema/budget failures have unknown exact cause",
+    "Current accepted batch: five Claude PASS, 21 complete native runs; USD2.9853428 applies only to this batch; historical totals remain unknown"
   ],
   "provenance": [
     {
@@ -453,6 +719,51 @@
       "ownerReport": "native/recovery-third-audit/final-source-manifest.json",
       "sha256": "0fd84a625e9d18f36bf6f0001a3faecb5c7e4baa74b6940183225cb029a73573",
       "storage": "coordinator private acceptance bundle; selected nonsecret results and source hashes transcribed here"
+    },
+    {
+      "ownerReport": "native/manager-proof-remaining-1006/TC-P2P-001.json",
+      "sha256": "ab00faa605e5b0ac44dc4c13e0dd9221b43699f9744844c1725c2dc5efba12e5",
+      "storage": "coordinator private acceptance bundle; selected nonsecret results transcribed here"
+    },
+    {
+      "ownerReport": "native/manager-proof-p2p002-1006/TC-P2P-002.json",
+      "sha256": "f64a3f30efc3f1f502f6f2dc4165b55ee45db1a92397a574b306aac1395ffbe4",
+      "storage": "coordinator private acceptance bundle; selected nonsecret results transcribed here"
+    },
+    {
+      "ownerReport": "native/manager-proof-remaining-1006/TC-P2P-004.json",
+      "sha256": "7f819fd327228965baf6af4445fce6adabc916267d4fd36d76eab68fc85a85b1",
+      "storage": "coordinator private acceptance bundle; selected nonsecret results transcribed here"
+    },
+    {
+      "ownerReport": "native/manager-proof-remaining-1006/TC-QM-001.json",
+      "sha256": "b502519fbf076ed8f9b3f654c4fce40c4d7d83e88f05af878dfeb6152074a6ff",
+      "storage": "coordinator private acceptance bundle; selected nonsecret results transcribed here"
+    },
+    {
+      "ownerReport": "native/manager-proof-remaining-1006/TC-RC-001.json",
+      "sha256": "8048bbc3c8da414a97dbec30ae9ea09aa8669c9d39a6ee2cdff3108589bcac9a",
+      "storage": "coordinator private acceptance bundle; selected nonsecret results transcribed here"
+    },
+    {
+      "ownerReport": "native/manager-proof-remaining-1006/five-case-summary.json",
+      "sha256": "a58e80d3d766f9b11cdd7305ee5c85267892ea6511f25056cad942be397918ea",
+      "storage": "coordinator private acceptance bundle; selected nonsecret results transcribed here"
+    },
+    {
+      "ownerReport": "native/manager-proof-p2p002-1006/immutable-provenance-work-attention.jsonl",
+      "sha256": "6bb25855efc8833275fcfed0a06b9c2cec5c6daca618874c6c3e619b08436ed3",
+      "storage": "coordinator private acceptance bundle; selected nonsecret results transcribed here"
+    },
+    {
+      "ownerReport": "native/manager-stop-1006/backend-summary.json",
+      "sha256": "d847cbae6cb45a9cee0ce6283106ff8f058b1c053c9962ae2021a13e0044b371",
+      "storage": "coordinator private acceptance bundle; selected nonsecret results transcribed here"
+    },
+    {
+      "ownerReport": "native/manager-stop-1006/final-helper-sit-summary.json",
+      "sha256": "a278bb9d820a96f221710e7d834c59a2c01ec3eb4871d2e095e1805a8bc85fe9",
+      "storage": "coordinator private acceptance bundle; selected nonsecret results transcribed here"
     }
   ],
   "combinedValidation": {

@@ -22,12 +22,19 @@
 
 ## 구현과 인수 현황
 
-2026-10-06 기준 source `0132e0a`는 로컬 PoC다. Zig CLI와 native runner,
-구매·입고 품질·리콜 승인, 증거 판단, Supplier CRUD를 구현했다.
-현재 Supplier 기준 549건 실행 테스트(567건 발견, 18건 skip)와 scripted
-SIT 20건이 통과했다. 이 수치는 실모델 인수나 운영 배포를 뜻하지 않는다.
-10월 3일 Claude UAT 3건은 과거 source의 기록이며 현재 native UAT는
-진행 중이다. 실제 대화 클라이언트 #35 인수는 아직 남아 있다.
+2026-10-06 현재 accepted production source `4e6935d`는 로컬 PoC다.
+Zig CLI와 native runner, 구매·입고 품질·리콜 승인, 증거 판단과 Supplier
+CRUD를 구현했다. 역사적 Supplier baseline `0132e0a`의 549건 실행·
+SIT 20건은 별도 checkpoint로 유지한다.
+
+현재 보강 과정의 backend는 587건 발견·18건 제외·569건 실행과 bootJar가
+통과했다. 이후 helper·prose CANCEL 교정 뒤 focused 22건·전체 SIT 20건·
+bootJar·runner 84건이 통과했다. 최종 교정 뒤 full backend를 다시 실행하지
+않았다. 현재 CLAUDE / `claude-sonnet-5` 실제 업무 UAT는 5 PASS,
+21개 완전 native Run·receipt 일치·permission denial 0이다. QC·리콜은
+인간 승인 대기까지이며 ERP 적용은 없다. 과거 실패와 unknown 비용을 보존한다.
+Codex account 인증 gate·parity와 실제 대화 클라이언트 #35 인수는 남아 있다.
+이 증거는 운영 배포나 규제 인수를 뜻하지 않는다.
 
 MONITOR는 대화 MCP로 일원화했다. 전용 대시보드와 OAuth는 범위에서
 제외했다. 인증서 필수 유형 전체 검사와 자동 30일 사전 알림은 이슈 등록을

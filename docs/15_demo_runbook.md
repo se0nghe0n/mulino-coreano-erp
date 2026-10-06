@@ -147,7 +147,8 @@ Run의 보고 사용량까지 확인한다. OFFLINE/PENDING 리콜 초안은 실
 준비했다. native `login --help`에서 `--device-auth`를 확인했다. 기존
 image·volume·UID·격리를 유지하고 credential을 읽거나 export하지
 않는다. 로그인 갱신을 실행하지 않았으며 인간의 선택을 기다린다.
-production OAuth/IAM이나 현재 5개 실제 모델 인수의 완료 증거가 아니다.
+production OAuth/IAM의 완료 증거가 아니다. 현재 Claude five-case 결과는
+아래 최신 checkpoint에서 별도로 기록한다.
 
 ### 3차 audit 뒤 Claude 재인수 시도
 
@@ -163,3 +164,56 @@ boolean schema의 tools-disabled 최소 진단도 같은 error fingerprint로
 작용 및 budget·일반 처리 경로도 미해결이다. 원래 validation은 유지했고
 추가 호출이나 로그인 변경은 하지 않았다. 상세 증거는 16번 문서를
 따른다.
+
+### 현재 MANAGER provenance source의 five-case 인수 (2026-10-06)
+
+`4e6935de693b433755e12b4ffcf0197297a6ae31`의 clean source와
+`mulino-agent-runtime:manager-proof-1006`에서 CLAUDE / `claude-sonnet-5`
+다섯 시나리오가 모두 PASSED다. image digest는
+`sha256:143e19e38f669ecd6bc0f71c4396008140701e7e57a69c52f9e5f88e520f1567`,
+JAR SHA-256은
+`11d73935589fee336f6011d5a034e497814bbc917f759e829024e02e59604f2d`다.
+
+| Case | 업무·종료 증거 | 보고 비용 USD |
+|---|---|---:|
+| P2P-001 | 승인 PO 1·16,500원, 원본 조정 책임 DONE | 0.6780952 |
+| P2P-002 | final MANAGER BLOCK, PO 0·재발행 없음, native·receipt ABORTED | 0.7219284 |
+| P2P-004 | 옛 제안 EXPIRED·PO 0, 인간 재계산·새 승인 PO 1·17,000원, 원본 조정 DONE | 1.3771636 |
+| QM-001 | QC 승인 PENDING, HOLD·잔량 2, 적용 0 | 0.1040890 |
+| RC-001 | ADMIN 승인 PENDING, raw 3·생산 10·고객 2·출고 115, 적용 0·OFFLINE | 0.1040666 |
+
+21개 고유 Run과 model_finished를 확인했다. 모든 native exit는 0,
+accountingStatus는 COMPLETE, usageComplete는 true이며 native와 stored
+receipt enum이 일치한다. permission denial은 0이다. P2P-002의 원본
+Work Item은 BLOCKED, Case는 OPEN이다. backend JUDGMENT_REQUIRED
+Attention을 유지한다. immutable actor snapshot은 현재 parent·plan·action과
+final MANAGER BLOCK을 연결하며 legacy UNKNOWN을 backfill하지 않는다.
+승인·Attention 정책은 그대로다. QC·리콜의 PASS는 인간 승인 대기까지다.
+
+이번 batch 보고 비용은 USD 2.9853428, unknown 비용은 0건이다.
+원본 Decimal 합계 `2.98534280000000011`은 float 표현을 포함한다.
+원래 2 PASS / 2 FAIL / 1 INCOMPLETE, Recovery 3 FAIL, canonical QC
+finalization 실패와 compact 4 PASS / 1 FAIL을 덮어쓰지 않는다.
+과거 전체 비용·불완전 tokens는 unknown이다. 후속 최소 Claude/schema
+진단 성공은 업무 인수로 세지 않는다.
+
+보강 과정의 full backend는 587건 발견·18건 제외·569건 실행과
+bootJar가 통과했다. 공용 helper가 CANCEL을 거부한 SIT 19/20 실패를
+보존한 뒤 helper·prose만 교정했다. 최종 focused 22건 실행·18건 제외,
+전체 SIT 20건·bootJar·runner 84건을 검증했다. 최종 교정 뒤 full backend를
+다시 실행하지 않았다. image smoke·cancellation은 modelRequests 0으로
+통과했고 CLI·native executable·lock bytes는 compact image와 같다.
+
+현재 Codex account/read(refreshToken=true)는 account=null,
+requiresOpenaiAuth=true이며 rateLimits는 AUTHENTICATION이다. login·새
+모델 호출은 하지 않았다. 이전 parity FAIL 원인은 unknown이다.
+실제 클라이언트 #35·Codex parity·규제·운영 인수는 별도다.
+OAuth·전용 dashboard는 제외한다. 인증서 전체 유형·자동 30일 알림은
+이슈 등록 대기이며 MFDS 실제 전송·법정 양식 검증은 수행하지 않았다.
+
+원본 five-case summary·per-case JSON과 immutable provenance/work/Attention
+export는 private acceptance bundle의 `native/manager-proof-remaining-1006/`,
+`native/manager-proof-p2p002-1006/`에 보존한다. 검증 로그·원래 SIT 실패는
+`native/manager-stop-1006/`에 남긴다. 공개용 hash와 선택 결과는
+[portfolio evidence](portfolio/evidence.json)의 `nativeUat.currentAccepted`에
+기록한다. 이 문서 갱신을 위해 backend나 모델을 재실행하지 않았다.

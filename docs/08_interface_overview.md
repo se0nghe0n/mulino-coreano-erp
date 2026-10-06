@@ -24,11 +24,16 @@ Supplier CRUD를 구현했다. [실행 계약](14_cli_and_runtime.md),
 [증거 계약](19_evidence_claim_api.md), [Supplier 계약](21_supplier_master_api.md)을
 따른다. `RUNNING` 상태 자체는 모델 호출 성공의 증거가 아니다.
 
-ChatGPT·Claude는 대화 표면 설계 대상이다. 로컬 stdio 구현과 scripted SIT,
-10월 3일 과거 native UAT, 현재 진행 중인 #24/#25 UAT, #35 실제 클라이언트
-인수는 별도 계층이다. Slack·Email 예시는 목표 설계이며 실제 어댑터 인수를
-뜻하지 않는다. 전용 대시보드·OAuth는 제외했고 능동 알림은 별도 과제다.
-[결정 기록](16_decisions.md)에 설계 판단과 인수 경계를 남겼다.
+ChatGPT·Claude는 대화 표면 설계 대상이다. 로컬 stdio 구현·scripted SIT와
+실제 모델·클라이언트 인수는 별도 계층이다. #24/#25 현재 accepted source
+`4e6935d`의 Claude 업무 UAT는 5 PASS, 21개 완전 native Run·receipt 일치·
+denial 0이다. QC·리콜은 인간 승인 대기까지다. 역사적 Supplier `0132e0a`와
+과거 실패를 현재 인수로 덮어쓰지 않는다. backend 569건 실행 checkpoint
+이후 최종 helper·prose 교정의 focused 22건·SIT 20건을 검증했으며 full
+backend는 재실행하지 않았다. Codex account 인증·parity와 #35 실제
+클라이언트 인수는 남아 있다. Slack·Email 예시는 목표 설계이며 실제
+어댑터 인수를 뜻하지 않는다. 전용 대시보드·OAuth는 제외했고 능동 알림은
+별도 과제다. [결정 기록](16_decisions.md)에 설계 판단과 인수 경계를 남겼다.
 
 ---
 

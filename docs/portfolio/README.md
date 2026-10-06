@@ -33,47 +33,54 @@
 [데모 runbook](../15_demo_runbook.md),
 [시나리오](../16_scenario_tests.md),
 [테스트 분류](../17_test_classification.md)를 실행 절차의 기준으로 삼는다.
-이 발표 작업은 해당 문서의 현재 native UAT 기록을 변경하지 않았다.
+현재 five-case checkpoint를 해당 문서의 최신 결과에 함께 기록했다.
 
 ## source와 검증 계층
 
-native 모델이 실행한 production 기준 source는
-`0132e0a62ad9f086e5c70c5c857d4546f5921ef9`다.
-이는 fork의 통합 baseline이며 조직 `main` 병합을 뜻하지 않는다.
-선행 변경의 현재 로컬 proof를 해당 source와 함께 기록한다. 원래 native
-인수·runner/test harness의 source는
-`2d2a900b59a8704e27a4462740196b2c4902829b`다. 모델이 실행한 CLI·role·JAR와
-image는 시도 중 변경하지 않았다. `evidence.json`에 각 파일·image·JAR 및
-최종 harness hash를 기록했다. 후속 recovery 진단 source는
-`e61ded2e93c0e241be62d87347534503652d74dc`이며 이번 발표 수정의 통합
-baseline은 `5a6addae8b60930a65bea7279f8deb82f762ef10`이다. production
-CLI·role·JAR·image를 바꾸지 않은 logging-only 진단 보강이다.
-통합 검증 baseline은
-`fe6a51fadd2493018da59babd4a2eea908c2931f`다. `clean test bootJar sitTest`가
-8분 58초에 끝났고 569건 발견·18건 skip·551건 실행 통과, SIT 20건 통과,
-실패·오류 0건을 기록했다. JAR hash는 기존 값과 같다. 이 baseline은 이번
-발표 자료 갱신 전의 검증 source이며 산출물 자신의 hash를 주장하지 않는다.
+역사적 Supplier 통합 baseline은 `0132e0a`이며 `sourceBaseline`으로
+보존한다. 현재 실제 모델이 실행하고 인수한 production source는
+`4e6935de693b433755e12b4ffcf0197297a6ae31`이다. backend JAR와 agent read
+view·role 안내를 보강했으므로 0132의 runtime이 그대로라고 주장하지
+않는다. 현재 JAR SHA-256은
+`11d73935589fee336f6011d5a034e497814bbc917f759e829024e02e59604f2d`다.
+image는 `mulino-agent-runtime:manager-proof-1006`, digest는
+`sha256:143e19e38f669ecd6bc0f71c4396008140701e7e57a69c52f9e5f88e520f1567`다.
+CLI·native executable·lock bytes는 직전 compact image와 같다.
+
+`evidence.json`의 `nativeUat.current`는 원래 2d2a900 인수와 recovery
+이력이다. 새 `nativeUat.currentAccepted`는 현재 five-case checkpoint다.
+기존 기록과 hash를 덮어쓰지 않는다. fe6a51f의 통합 551건·SIT 20건과
+Supplier 0132의 549건은 과거 checkpoint로 유지한다.
+
+4e6935d 보강 과정에서 backend 587건 발견·18건 제외·569건 실행과
+bootJar가 통과했다. 이후 공용 stop helper가 MANAGER CANCEL을 거부한
+SIT 19/20 실패를 보존하고 helper·prose만 교정했다. 최종 focused 22건
+실행·18건 제외, 전체 scripted SIT 20건, bootJar와 runner 84건이
+통과했다. 최종 helper·prose 교정 뒤 full backend를 다시 실행하지 않았다.
+모델 없는 image smoke·cancellation은 요청 0건으로 통과했다.
 
 모든 수치는 이미 실행한 담당자의 보고서에서 옮겼다. 문서 작업을 위해
 백엔드 테스트나 유료 모델을 다시 실행하지 않았다.
 
 | 계층 | 실제 관측 | source·한계 |
 |---|---|---|
-| 통합 실행 테스트 checkpoint | 569 발견, 18 skip, 551 통과, 실패·오류 0 | fe6a51f, clean test bootJar sitTest |
-| 통합 scripted SIT checkpoint | 20 통과, 실패·오류·skip 0 | fe6a51f, 모델 호출 0 |
+| 과거 통합 실행 테스트 checkpoint | 569 발견, 18 skip, 551 통과, 실패·오류 0 | fe6a51f, clean test bootJar sitTest |
+| 과거 통합 scripted SIT checkpoint | 20 통과, 실패·오류·skip 0 | fe6a51f, 모델 호출 0 |
 | 과거 Supplier 실행 테스트 | 567 발견, 18 skip, 549 통과, 실패 0 | 0132e0a |
 | Supplier scripted SIT checkpoint | P2P 6, QM 6, RC 6, 재시작 2, 합계 20 통과 | Supplier 통합 baseline |
 | 도구 단위·smoke | MCP 26, runner 57, Zig 7, CLI 32 통과 | #44 0ee144c의 별도 기록 |
-| 리콜 현재 JAR | 생산 LOT 10, 사고 원료 root 2, 증거 raw LOT 3 | #27 5911721 |
+| 과거 source 리콜 JAR proof | 생산 LOT 10, 사고 원료 root 2, 증거 raw LOT 3 | #27 5911721 |
 | 리콜 범위 | 고객 2, 출고 115, 무관 LOT ACTIVE, replay 안정 | OFFLINE/PENDING, submittedAt null |
-| 증거 현재 JAR | source 3, judgment 7, ERP 쓰기 0 | #44 0ee144c, 충돌·successor 보존 |
-| Supplier 현재 JAR | CRUD 5, Swagger 5, 감사 3, canonical replay | soft delete·version 충돌 확인 |
+| 과거 source 증거 JAR proof | source 3, judgment 7, ERP 쓰기 0 | #44 0ee144c, 충돌·successor 보존 |
+| Supplier baseline JAR proof | CRUD 5, Swagger 5, 감사 3, canonical replay | soft delete·version 충돌 확인 |
 | 구매 데모 | 5/5 | #34 d7ce2d8, 실제 인간 stdio, 모델 호출 없음 |
 | 과거 native UAT | 10월 3일 Claude 3건 통과 | cb04403. 현재 source 인수로 이월하지 않음 |
 | 원래 Claude native UAT | PASS 2, FAIL 2, INCOMPLETE 1 | source 2d2a900, 이력 보존 |
 | 후속 Recovery 3 | P2P-004·QM-001·RC-001 모두 FAIL, ERP 쓰기 0 | source e61ded2, 인수 회복 없음 |
 | Codex parity | P2P-001 FAIL, 제안 전 실행 실패 | 비용·tokens·resolvedModel unknown |
-| 최신 logging-only 진단 검증 | runner 82, helper 7 통과 | full Unit·SIT 재실행 없음 |
+| 현재 source backend checkpoint | 587 발견, 18 제외, 569 실행 통과 | 최종 helper·prose CANCEL 교정 전 |
+| 최종 source focused·SIT·도구 | focused 22, 제외 18, SIT 20, runner 84 통과 | bootJar·요청 0 image smoke 통과 |
+| 현재 Claude native UAT | 5 PASS, 21 complete Run, receipt 일치, denial 0 | 4e6935d, QC·리콜은 승인 대기 |
 | 실제 클라이언트 #35 | 인수 대기 | 로컬 stdio 구현과 별도 |
 | 운영 배포 | 미실시 | 로컬 PoC 범위 |
 
@@ -82,9 +89,38 @@ CLI·role·JAR·image를 바꾸지 않은 logging-only 진단 보강이다.
 인수 bundle에 보존한다. capability·human/service secret, 인증 volume,
 개인 파일 경로는 발표 원본·노트·source·evidence에 복사하지 않았다.
 
-### 현재 native 인수 결과와 접근 gate
+### 현재 Claude five-case 인수와 접근 gate
 
-CLAUDE / `claude-sonnet-5`의 유효한 업무 인수는 두 PASS다.
+CLAUDE / `claude-sonnet-5`는 현재 source에서 다섯 업무를 모두 통과했다.
+
+| Case | 현재 판정과 업무 결과 | 보고 비용 USD |
+|---|---|---:|
+| P2P-001 | PASS. 승인 PO 1·16,500원, 원본 조정 책임 DONE | 0.6780952 |
+| P2P-002 | PASS. final MANAGER BLOCK, PO 0·재발행 없음, native·receipt ABORTED | 0.7219284 |
+| P2P-004 | PASS. 옛 제안 EXPIRED·PO 0, 명시적 인간 재계산·새 승인 PO 1·17,000원 | 1.3771636 |
+| QM-001 | PASS. QC 승인안 PENDING, 입고 HOLD·잔량 2, 적용 0 | 0.1040890 |
+| RC-001 | PASS. ADMIN 승인안 PENDING, raw 3·생산 10·고객 2·출고 115, 적용 0 | 0.1040666 |
+
+21개 고유 Run과 model_finished가 일치한다. native exit 0, COMPLETE
+사용량, native·stored receipt outcome 일치와 permission denial 0을
+확인했다. P2P-002의 원본 조정 Work Item은 BLOCKED, Case는 OPEN이다.
+서버의 JUDGMENT_REQUIRED Attention도 유지한다. immutable actor snapshot은
+현재 parent·plan·action·final MANAGER BLOCK을 연결한다. legacy UNKNOWN은
+소급 보정하지 않는다. backend 승인·ABORTED Attention 정책은 바꾸지 않았다.
+QC·리콜은 인간 승인 대기에 도달한 인수이며 실제 적용·MFDS 전송은 없다.
+
+이번 batch 보고 비용 합계는 USD 2.9853428, unknown 비용은 0건이다.
+원본 JSON Decimal 합계 `2.98534280000000011`은 float 표현을 포함한다.
+과거 미보고 시도의 전체 비용·tokens는 여전히 unknown이다.
+
+Codex의 지원되는 account/read(refreshToken=true)는 account=null,
+requiresOpenaiAuth=true이며 rateLimits는 AUTHENTICATION이다. login이나
+새 모델 호출은 하지 않았다. 현재 gate를 과거 Codex FAIL의 정확한 원인으로
+소급하지 않는다. Codex parity·실제 클라이언트 #35·규제·운영 인수는 남아 있다.
+
+### 원래 native 인수와 비용 이력
+
+원래 source 2d2a900의 CLAUDE / `claude-sonnet-5` 업무 인수는 두 PASS다.
 
 | Case | 원래 판정과 업무 결과 | CLI 보고 비용 USD |
 |---|---|---:|
@@ -99,11 +135,11 @@ P2P-002의 인간 reason은 `scenario BLOCK`이며 테스트 경로가 BLOCKED�
 ABORTED는 인간의 authoritative BLOCK 결과이며 machine failure로 해석하지
 않는다. P2P-004는 발주 결과가 있어도 최종 조정 실패이므로 PASS가 아니다.
 QM의 0은 실제 CLI 보고값이며 unknown을 0으로 바꾼 값이 아니다. RC 원본
-JSON의 PASSED는 보존하고 별도 INCOMPLETE 분류를 적용했다. 유효한 RC
-재인수 증거는 없다. 초기 모델 실패의 정확한 원인은 unknown이다.
+JSON의 PASSED는 보존하고 별도 INCOMPLETE 분류를 적용했다. 원래
+시점에는 유효한 RC 재인수 증거가 없었다. 초기 모델 실패의 정확한 원인은 unknown이다.
 
 원래 시도의 알려진 CLI 보고 비용 소계는 USD 12.661439다. 후속 최소
-성공 진단 USD 0.001066을 더한 최신 알려진 소계는 USD 12.662505다.
+성공 진단 USD 0.001066을 더한 당시 알려진 소계는 USD 12.662505다.
 RC와 Codex 등 미보고 항목이 있으므로 전체 시도 비용과 불완전한 사용량은 unknown으로 유지한다.
 CODEX / `gpt-5.6-sol` (catalog default low)의 P2P-001은 첫 Run에서
 MODEL_PROCESS_FAILED로 실패했다. proposal 이전이며 비용·tokens·resolvedModel은
@@ -112,19 +148,20 @@ unknown이고 executionReady=false, accountingStatus=PARTIAL이다.
 현재 모델 없는 Codex account/rateLimits/read는 AUTHENTICATION을 보고한다.
 이 현재 접근 gate를 과거 probe의 정확한 실패 원인으로 소급하지 않는다.
 인간 login 갱신·metadata 재검사 절차를 준비했지만 실행하지 않았다.
-현재 5개 native 모델 인수·Codex parity·실제 클라이언트 #35는 완료하지
-않았다. 운영 배포·OAuth·개인 IAM·규제 자동화의 증거로 확대하지 않는다.
+이 원래 시점에는 5개 native 인수가 미완료였다. 현재 Claude five-case
+checkpoint와 구분하며 Codex parity·실제 클라이언트 #35는 남아 있다.
+운영 배포·OAuth·개인 IAM·규제 자동화의 증거로 확대하지 않는다.
 
-### 후속 Recovery와 제한된 진단
+### 과거 Recovery와 제한된 진단
 
 새 Recovery 3건의 P2P-004·QM-001·RC-001은 모두 첫 Run에서 FAIL이다.
 ERP 쓰기는 0건이며 Case OPEN, executionReady=false,
 accountingStatus=PARTIAL, usageComplete=false다. CLI 보고 비용은 각 0이지만
 전체 비용 unknown을 0으로 바꾸지 않는다. 원래 004·QM FAIL과 RC
-INCOMPLETE, 유효한 001·002 PASS를 별도 이력으로 보존한다.
+INCOMPLETE, 당시 유효한 001·002 PASS를 별도 이력으로 보존한다.
 
 normal RW mount의 최소 Claude 진단은 USD 0.001066으로 성공했다.
-업무 인수 성공의 증거로 세지 않는다. production schema와 기본 boolean
+업무 인수 성공의 증거로 세지 않는다. 당시 production schema와 기본 boolean
 schema의 no-tool 진단은 각 USD 0.045 budget에서 모두 FAIL이며 같은
 error fingerprint를 남겼다. USD 0.045는 cap이며 실제 보고 비용이 아니다.
 raw 오류 원문을 폐기한 상태이므로 정확한 원인은 unknown이다.
@@ -135,7 +172,8 @@ tools-disabled와 structured-output/schema·budget 경로의 상호작용,
 진단 수정의 runner 82건과 helper 7건만 검증했다. fe6a51f의 통합 551건·
 SIT 20건 checkpoint는 유지하며 이 logging-only 변경 뒤 재실행한 결과로
 바꾸지 않는다. 실제 클라이언트 #35, Codex 현재 AUTHENTICATION 접근 gate,
-인간 login 갱신 미실행과 전체 native 인수 미완료는 그대로다.
+인간 login 갱신 미실행은 유지한다. 이후 최소 Claude/schema 진단은
+성공했으나 업무 인수로 세지 않는다. 현재 업무 인수는 위 five-case 증거다.
 
 ## 규제와 권한의 한계
 

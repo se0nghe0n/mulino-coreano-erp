@@ -7,13 +7,19 @@
 
 ## 현재 구현과 검증 (2026-10-06)
 
-source `0132e0a`의 로컬 PoC는 REST·stdio MCP·Zig CLI·native runner,
-Case 재개, 인간 구매/QC/리콜 승인, 증거 판단, Supplier CRUD를 포함한다.
-현재 549건 실행 테스트와 scripted SIT 20건이 통과했다. 과거 실모델 UAT와
-현재 진행 중인 #24/#25 native UAT는 구분한다. #35 실제 클라이언트 인수와
-운영 배포는 완료하지 않았다. OAuth와 전용 대시보드는 제외했다.
-MONITOR는 대화 MCP가 제공하며 능동 알림은 별도 채널 과제로 남는다.
-인증서 전체 유형·자동 30일 알림 갭은 아직 이슈 등록 전이다.
+현재 accepted production source `4e6935d`의 로컬 PoC는 REST·stdio MCP·
+Zig CLI·native runner, Case 재개, 인간 구매/QC/리콜 승인, 증거 판단과
+Supplier CRUD를 포함한다. 역사적 Supplier `0132e0a`의 실행 549건·SIT
+20건은 별도 checkpoint다. 현재 보강의 backend 569건 실행·18건 제외·
+bootJar가 통과했다. 최종 helper·prose CANCEL 교정 뒤 focused 22건·전체
+SIT 20건·bootJar·runner 84건을 검증했고 full backend는 재실행하지 않았다.
+
+#24/#25 현재 CLAUDE / `claude-sonnet-5` 업무 UAT는 5 PASS다.
+21개 완전 native Run·receipt 일치·denial 0을 확인했다. QC·리콜은 인간
+승인 대기까지다. 과거 native 실패와 unknown 비용은 보존한다.
+Codex account 인증·parity와 #35 실제 클라이언트 인수·운영 배포는 남아 있다.
+OAuth와 전용 대시보드는 제외했다. MONITOR는 대화 MCP가 제공하며 능동
+알림은 별도 채널 과제다. 인증서 전체 유형·자동 30일 알림은 이슈 등록 전이다.
 
 [범위 결정](16_decisions.md)과 [발표 자료](portfolio/README.md)를 따른다.
 Phase 번호는 기존 milestone 이력을 보존하므로 6 다음은 8이다.
