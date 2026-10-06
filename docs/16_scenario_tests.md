@@ -429,6 +429,27 @@ COMPOUND_OR_WRAPPER·OTHER다. command·tool input·tool ID·알 수 없는
 tool 이름은 보존하지 않는다. denial 자체를 native 실패로 만들거나
 ERP 승인·업무 종료 gate를 바꾸지 않는다. 과거 QC 증거에는 이 지표가
 없으므로 소급 생성하지 않는다. runner 84건·helper 14건을 검증했다.
+
+canonical CLI와 비허용 scratch write를 분리한 조정자의 후속 probe는
+기존 permission rule에서 CLI 도달·scratch 거부를 확인했다. 따라서
+permission pattern을 바꾸지 않고 한 Bash 호출에 `mulino`로 시작하는
+CLI 명령 하나만 실행하도록 안내했다. URL·capability는 이미 주입돼
+있으므로 env prefix·absolute 경로·wrapper·compound 호출을 쓰지 않는다.
+공통 runtime 문서의 QC 미지원 설명도 실제 registry의 qc show/inspect·
+lot trace·recall propose와 인간 승인·물리적 처리의 경계에 맞췄다.
+이 안내는 이전 QM 실패의 정확한 command shape를 소급 확정하지 않는다.
+
+curated build로 별도 `mulino-agent-runtime:canonical-1006` image를 만들었다.
+image digest는
+`sha256:133e06b32ce36a89585e1c3a6c1ee57e0ce2566ae5f7b5482ad85d31c95ac981`다.
+network=none smoke의 격리·CLI·config·container cancellation은 통과했고
+modelRequests는 0이다. Claude 2.1.282·Codex 0.154.0 executable hash는
+기존 image와 같다. 재빌드한 mulino의 전체 hash는 다르지만 모든
+allocated ELF section은 같고 debug·symbol metadata만 다르다.
+증거는 `native/canonical-runtime-1006/`에 보존했다. 이 image로 paid
+UAT를 실행하지 않았으며 business 인수 결과는 앞선 FAILED로 유지한다.
+수정된 최종 source로 runner 84건·helper 14건과 새
+`native_canonical_1006_sit_scenario` DB의 전체 SIT 20건이 통과했다.
 유효한 실제 인수는 여전히 Claude 001·002의 두 PASS다. 원래 004/QM FAIL,
 RC INCOMPLETE와 새 Recovery 3건 FAIL, Codex parity FAIL을 모두 보존한다.
 Known 보고 비용은 기존 USD 12.661439에 최소 성공 진단 USD 0.001066을
