@@ -115,14 +115,14 @@ public class AgentSteps {
 
     @After(order = 10)
     public void recordUatEvidence(io.cucumber.java.Scenario scenario) throws Exception {
-        if (!ScenarioContext.live()) return;
+        if (!liveEvidence()) return;
         AssertionError finalizationFailure = null;
         if (driver != null && !scenario.isFailed()) {
             try {
                 driver.awaitState("실제 모델 종료와 모든 Run의 최종 사용량",
                         () -> UatEvidence.finalized(state.runsForCase(world.caseRef()), driver.modelFinished(),
                                 scenario.getSourceTagNames().contains("@TC-P2P-002") && state.humanStoppedPurchase(world.caseRef()),
-                                System.getenv("MULINO_AGENT_RUNTIME")),
+                                evidenceRuntime()),
                         () -> state.latestRunFailed(world.caseRef()), timeout());
             } catch (AssertionError failure) { finalizationFailure = failure; }
         }
@@ -131,7 +131,7 @@ public class AgentSteps {
         record.put("testCase", tc);
         record.put("status", finalizationFailure == null ? scenario.getStatus().name() : "FAILED");
         record.put("finalizationFailure", finalizationFailure == null ? null : finalizationFailure.getMessage());
-        record.put("runtime", System.getenv("MULINO_AGENT_RUNTIME"));
+        record.put("runtime", evidenceRuntime());
         record.put("image", System.getenv("MULINO_RUNTIME_IMAGE"));
         record.put("nativeUsageEvents", driver == null ? List.of() : driver.modelFinished());
         record.put("beforeHumanDecision", world.pendingEvidence());
@@ -142,17 +142,22 @@ public class AgentSteps {
         record.put("executionReady", driver != null && world.caseRef() != null && UatEvidence.finalized(
                 state.runsForCase(world.caseRef()), driver.modelFinished(),
                 scenario.getSourceTagNames().contains("@TC-P2P-002") && state.humanStoppedPurchase(world.caseRef()),
-                System.getenv("MULINO_AGENT_RUNTIME")));
+                evidenceRuntime()));
         record.put("appliedPurchaseOrders", state.appliedPurchaseOrders());
         record.put("appliedPurchaseTotalKrw", state.appliedPurchaseTotal());
         record.put("caseStatus", world.caseRef() == null ? null : state.caseStatus(world.caseRef()));
         record.put("caseRef", world.caseRef());
         record.put("businessEvidence", world.caseRef() == null ? Map.of() : state.finalEvidence(world.caseRef()));
-        Path file = UatEvidence.write(mapper, Path.of("build/uat", java.time.LocalDate.now().toString()), tc, record);
+        Path file = UatEvidence.write(mapper, evidenceDirectory(), tc, record);
         scenario.log("UAT evidence: " + file);
         if (finalizationFailure != null) throw finalizationFailure;
     }
 
-    @After
+    boolean liveEvidence() { return ScenarioContext.live(); }
+    String evidenceRuntime() { return System.getenv("MULINO_AGENT_RUNTIME"); }
+    Path evidenceDirectory() { return Path.of("build/uat", java.time.LocalDate.now().toString()); }
+
+    // Cucumber executes After hooks in descending order: collect final usage before cleanup.
+    @After(order = 0)
     public void stopAgent() { if (driver != null) driver.stop(); }
 }

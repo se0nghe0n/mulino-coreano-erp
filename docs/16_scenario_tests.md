@@ -450,6 +450,29 @@ allocated ELF section은 같고 debug·symbol metadata만 다르다.
 UAT를 실행하지 않았으며 business 인수 결과는 앞선 FAILED로 유지한다.
 수정된 최종 source로 runner 84건·helper 14건과 새
 `native_canonical_1006_sit_scenario` DB의 전체 SIT 20건이 통과했다.
+
+### canonical QC 재시도의 usage 수집 실패
+
+새 `native_canonical_1006_qm_scenario` DB의 단독 QC 재시도는 검사 1건·
+승인안 PENDING을 저장하고 Run COMPLETED/WAITING에 도달했다. 입고는
+HOLD·잔량 2이며 인간 승인·ERP 적용은 없었다. 하지만 native 종료 전에
+cleanup이 실행돼 model_finished가 없고 executionReady=false다.
+status는 FAILED이며 비용·토큰은 모두 null로 유지한다. 이 기록은
+`native/canonical-qm-1006/`에 보존하며 앞선 tool permission 업무 실패나
+UNKNOWN_NATIVE_FAILURE와 구분한다.
+
+설치된 Cucumber 8.0.1은 After hook을 order 내림차순으로 실행한다.
+stopAgent의 default 10000이 evidence hook의 10보다 먼저여서 required
+native finalization wait 전에 실행기를 종료했다. cleanup을 order 0으로
+옮기고 evidence hook의 기존 native·업무 gate와 wait는 유지했다.
+
+실제 Cucumber runtime과 production hook으로 지연된 model_finished를
+받는 회귀 테스트를 추가했다. 성공의 비용 수집, native 실패의 unknown
+usage, 시나리오 실패의 process cleanup을 확인한다. 이전 hook order를
+복원한 control에서는 지연 증거를 수집하는 2건이 실패했다. 이 helper
+수정만으로 과거 UAT를 PASS로 바꾸거나 비용을 소급 추정하지 않는다.
+복원한 최종 helper 17건과 새 `native_lifecycle_1006_sit_scenario` DB의
+전체 SIT 20건이 통과했다. 수정 후 paid 모델 호출은 하지 않았다.
 유효한 실제 인수는 여전히 Claude 001·002의 두 PASS다. 원래 004/QM FAIL,
 RC INCOMPLETE와 새 Recovery 3건 FAIL, Codex parity FAIL을 모두 보존한다.
 Known 보고 비용은 기존 USD 12.661439에 최소 성공 진단 USD 0.001066을
