@@ -113,3 +113,53 @@ CANCEL 결정은 BLOCK·APPROVE와 별도다. 새 ERP 쓰기나 후속 업무 �
 구매 책임만 닫고 상위 방침 확인을 남긴다. 기존 승인 후속 책임은 보존한다.
 날짜별 결과는 [2026-10-05 인수 기록](reviews/2026-10-05-purchase-acceptance.md)에
 기록한다. 실제 harness/model UAT와 운영 발주·세금계산서 발급은 별도다.
+
+## 실제 모델 시나리오 인수와 구분 (#25/#26/#27)
+
+위 구매 demo는 모델 없는 HTTP·stdio 인수다. 현재 source의 실제 모델
+인수는 `backend`에서 `uatTest`로 따로 실행한다. 상세 tag·고정 업무
+시계·폐기 DB guard·비용과 종료 증거 계약은
+[시나리오 문서](16_scenario_tests.md)를 따른다.
+
+2026-10-06 runtime image는 현재 CLI와 role 파일에서 allowlisted
+build context로 새로 만든 `mulino-agent-runtime:completion-0132e0a`다.
+image ID는 `sha256:aa055d76d0c8d44b9707c84726101e551ec123dc0dba714bea4746b02d4d4656`이다.
+모델 없는 smoke를 통과한 뒤 기존 named login volume의 metadata만
+확인하고 CLAUDE/claude-sonnet-5를 명시했다. 로그인 파일을 읽거나
+초기화하지 않았다. 실제 호출은 비용이 발생한다.
+
+scenario 인간·서비스 key는 JVM마다 별도 난수로 생성하고 host client에
+한정한다. 이 값을 명령 인자·모델 context·로그인 volume·증거에 쓰지
+않는다. 테스트용 고정 업무일과 실제 wall-clock lease는 구분한다.
+QC/리콜 PENDING만으로 UAT 성공을 판단하지 않고 모델 종료 및 모든
+Run의 보고 사용량까지 확인한다. OFFLINE/PENDING 리콜 초안은 실제
+식약처 전송 증거가 아니다.
+
+### 현재 Codex 접근 확인의 인간 경계
+
+같은 native runtime의 account/rateLimits/read가 AUTHENTICATION 오류를
+보고한다. 모델 catalog와 cached login 성공만으로 실제 모델 실행 접근을
+판단하지 않는다. Codex P2P parity probe는 첫 Run에서 실패했고 비용과
+사용량은 unknown이다. Claude의 과거 실패 원인과 현재 상태는 별개다.
+
+인간이 검토할 정확한 device login 명령과 갱신 후 모델 없는 확인 절차는
+`/tmp/mulino-project-completion-20261005/native/human-codex-auth-refresh.md`에
+준비했다. native `login --help`에서 `--device-auth`를 확인했다. 기존
+image·volume·UID·격리를 유지하고 credential을 읽거나 export하지
+않는다. 로그인 갱신을 실행하지 않았으며 인간의 선택을 기다린다.
+production OAuth/IAM이나 현재 5개 실제 모델 인수의 완료 증거가 아니다.
+
+### 3차 audit 뒤 Claude 재인수 시도
+
+정상 writable mount의 no-tool Claude 진단은 같은 Sonnet 5에서 exit 0,
+OK, resolvedModel 및 USD 0.001066 보고 사용량으로 성공했다. 이는 최소
+모델 호출의 현재 접근 증거이며 전체 role 실행이나 업무 인수의 증거는
+아니다. 이 확인 뒤 004·QM-001·RC-001만 새 DB에서 재시도했다.
+
+세 업무는 첫 Run에서 실패했고 ERP 쓰기는 없었다. 생산 schema와 기본
+boolean schema의 tools-disabled 최소 진단도 같은 error fingerprint로
+실패했다. 현재 Claude를 인증 불가라고 단정하거나 특정 schema keyword가
+원인이라고 판단하지 않는다. tools-disabled와 structured-output의 상호
+작용 및 budget·일반 처리 경로도 미해결이다. 원래 validation은 유지했고
+추가 호출이나 로그인 변경은 하지 않았다. 상세 증거는 16번 문서를
+따른다.

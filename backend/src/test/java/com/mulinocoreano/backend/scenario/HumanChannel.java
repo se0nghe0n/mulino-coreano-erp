@@ -24,7 +24,7 @@ public final class HumanChannel {
             var pb = new ProcessBuilder("node", ROOT.resolve("mcp-server/scripts/scenario/human.mjs").toString(),
                     apiBase, role, tool, mapper.writeValueAsString(args)).redirectErrorStream(false);
             pb.environment().keySet().retainAll(java.util.Set.of("PATH", "HOME"));
-            pb.environment().put("MULINO_LOCAL_HUMAN_SECRET", ScenarioContext.HUMAN_SECRET);
+            pb.environment().put("MULINO_LOCAL_HUMAN_SECRET", ScenarioSecrets.human());
             Process p = pb.start();
             // Full LOT traces/approval reports can exceed a process pipe buffer. Drain stdout
             // while the helper is running; waiting first would deadlock a valid large response.

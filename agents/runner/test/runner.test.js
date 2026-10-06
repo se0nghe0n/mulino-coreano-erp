@@ -358,3 +358,17 @@ test('model failure code and usage are logged without child output', async t => 
   assert.equal(finished.failure, 'MODEL_PROCESS_FAILED');
   assert.doesNotMatch(JSON.stringify(logs), /secret-from-stderr/);
 });
+
+test('native Codex error diagnostics reach final Run logs while credential text and unknown usage stay absent', async t => {
+  const { runner } = await setup(t, { mode: 'codex-routing-error' });
+  const logs = [];
+  runner.logger = event => logs.push(event);
+  assert.equal((await runner.runOnce()).outcome, 'FAILED');
+  const event = logs.find(event => event.event === 'model_finished');
+  assert.equal(event.nativeFrameKind, 'turn.failed');
+  assert.equal(event.nativeFailureCategory, 'WORKSPACE_ROUTING');
+  assert.equal(event.nativeHttpStatus, 401);
+  assert.equal(event.costUsd, undefined);
+  assert.equal(event.inputTokens, undefined);
+  assert.doesNotMatch(JSON.stringify(logs), /cap-secret|lease-secret|secret-from-stderr|discovery unauthorized/);
+});

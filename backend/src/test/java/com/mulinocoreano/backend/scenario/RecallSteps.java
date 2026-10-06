@@ -15,6 +15,7 @@ public class RecallSteps {
   @Autowired JdbcClient jdbc;
   @Autowired ObjectMapper mapper;
   @Autowired AgentSteps agent;
+  @Autowired BusinessState state;
   long lot, approval;
   JsonNode trace;
 
@@ -62,6 +63,7 @@ public class RecallSteps {
         .awaitState(
             "QC recall pending",
             () -> count("SELECT count(*) FROM recall_proposals") == 1,
+            () -> state.latestRunFailed(world.caseRef()),
             agent.timeout());
     approval = count("SELECT governance_action_id FROM recall_proposals");
     trace = human().call("VIEWER", "get_lot_trace", Map.of("lotId", lot)).content();
