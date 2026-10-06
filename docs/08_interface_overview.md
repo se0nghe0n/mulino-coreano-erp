@@ -426,3 +426,37 @@ context만 모델 transport로 보낸다. 원본 context_snapshot·계획/source
 hash는 바꾸지 않으며 full audit/transport의 256 KiB 제한도 유지한다.
 planningBasis는 planningClock과 저장된 plan asOf에 따른 Asia/Seoul
 기준이며 실제 lease clock이나 native 세션 날짜를 대신 사용하지 않는다.
+
+### 현재 조정 책임과 인간 BLOCK 출처 (#45·#50)
+
+obligation과 purchasing의 parentWorkItemRef는 실제 자식 metadata에서
+읽는다. currentCoordinationPurchase는 현재 Orchestrator Work Item의
+최신 구매 action과 현재 latestPlan 연결이 모두 맞을 때만 선택한다.
+관련 없는 부모·과거 계획·교체된 action으로 fallback하지 않는다. 기존
+purchasing 및 인간 결정 history는 그대로 유지한다. 이 선택과 출처도
+full context에 먼저 캡처하며 모델의 결과나 승인 권한을 바꾸지 않는다.
+
+finalGovDecision은 실제 final governance decision과 정확히 일치하는
+PURCHASE_DECIDED audit을 연결한다. decision ID·action·version·hash·
+user ID·decision을 함께 확인한다. 새 audit after_state는 기존 요청의
+decision/expectedVersion/proposalHash/reason을 유지하고, 기존 role gate와
+lock을 통과한 HumanActor의 userId/role 및 governanceDecisionId만
+추가로 기록한다. 이벤트·transaction·ERP 적용·승인 policy는 유지한다.
+
+actorRole은 이 immutable audit snapshot에서만 읽는다. 이후 users.role이
+바뀌어도 과거 MANAGER 역할을 다시 해석하지 않는다. 기존 snapshot에
+actor가 없거나 정확히 연결되지 않으면 UNKNOWN/null이며 backfill하지
+않는다. actorProvenance=IMMUTABLE_PURCHASE_DECIDED_AUDIT는 해당 출처를
+뜻하며 일반 인간 답변이나 현재 role로 대신하지 않는다.
+
+현재 parent·구매 자식·계획·action에 맞는 실제 final MANAGER BLOCK이고
+후속의 유효한 새 인간 지시가 없으면 Orchestrator는 ABORTED로 의도적
+중단을 반환한다. FAILED를 정규화하거나 이를 BLOCK 통과로 받아들이지
+않는다. EXPIRED·누락·충돌·legacy UNKNOWN과 단순 CANCELLED 자식은
+다른 상태다. 기존 서버의 ABORTED Work/Attention 처리는 바꾸지 않는다.
+
+기존 취소 계약은 동일한 현재 조정 책임의 실제 final MANAGER CANCEL과
+immutable 출처가 모두 맞을 때에만 같은 의도적 중단이다. CANCELLED
+구매 자식만으로 결정 의도를 추론하지 않는다. 일반 stop observer는
+이 확인된 BLOCK/CANCEL을 구분하며 P2P-002의 특별 ABORTED 인수는
+검증된 BLOCK만 허용한다.

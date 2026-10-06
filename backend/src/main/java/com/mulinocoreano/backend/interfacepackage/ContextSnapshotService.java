@@ -31,6 +31,7 @@ public class ContextSnapshotService {
                         SELECT jsonb_agg(
                             jsonb_build_object(
                                 'ref', wi.work_item_ref,
+                                'parentWorkItemRef', wi.metadata->>'parentWorkItemRef',
                                 'title', wi.title,
                                 'description', wi.description,
                                 'status', wi.status::text,

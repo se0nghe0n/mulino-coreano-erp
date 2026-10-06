@@ -43,6 +43,10 @@ public class ExecutionContextBuilder {
     }
 
     public Map<String, Object> build(String caseRef, long caseId) {
+        return build(caseRef,caseId,null);
+    }
+
+    public Map<String,Object> build(String caseRef,long caseId,String currentCoordinationWork) {
         var context = new LinkedHashMap<String, Object>(contexts.build(caseRef));
         var basisInstant=clock.instant();
         var basisDate=basisInstant.atZone(clock.getZone()).toLocalDate();
@@ -84,6 +88,9 @@ public class ExecutionContextBuilder {
                                             basisDate,
                                             plan.horizon()));
                         });
+        var captured=mapper.valueToTree(context);
+        context.put("currentCoordinationWorkItemRef",currentCoordinationWork);
+        context.put("currentCoordinationPurchase",CurrentCoordinationPurchase.select(captured.path("purchasing"),captured.path("obligation"),currentCoordinationWork,captured.path("latestPlan").path("ref").asText("")));
         return context;
     }
 }

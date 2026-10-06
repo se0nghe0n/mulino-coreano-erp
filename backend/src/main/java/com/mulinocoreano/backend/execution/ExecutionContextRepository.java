@@ -53,6 +53,30 @@ public class ExecutionContextRepository {
                         key("proposalHash").value(g.PROPOSAL_HASH),
                         key("planRef").value(p.PLAN_REF),
                         key("workItemRef").value(w.WORK_ITEM_REF),
+                        key("parentWorkItemRef").value(field("{0}->>'parentWorkItemRef'",String.class,w.METADATA)),
+                        key("finalGovDecision").value(field("""
+                            (SELECT jsonb_build_object(
+                                'decisionId',d.governance_decision_id,'decision',d.decision,
+                                'isFinal',d.is_final,'userId',d.decided_by,'decidedAt',d.decided_at,
+                                'actorRole',audit.after_state->'actor'->>'role',
+                                'actorProvenance',CASE WHEN audit.governance_audit_log_id IS NULL THEN 'UNKNOWN' ELSE 'IMMUTABLE_PURCHASE_DECIDED_AUDIT' END,
+                                'actionId',{0},'version',{1},'proposalHash',{2},'planRef',{3})
+                             FROM governance_decisions d
+                             LEFT JOIN LATERAL (
+                                SELECT l.governance_audit_log_id,l.after_state FROM governance_audit_logs l
+                                WHERE l.governance_action_id=d.governance_action_id
+                                  AND l.actor_id=d.decided_by AND l.event_type='PURCHASE_DECIDED'
+                                  AND l.resource_type='GOVERNANCE_ACTION' AND l.resource_id=d.governance_action_id
+                                  AND l.after_state->>'governanceDecisionId'=d.governance_decision_id::text
+                                  AND l.after_state->>'decision'=d.decision::text
+                                  AND l.after_state->>'expectedVersion'={1}::text
+                                  AND l.after_state->>'proposalHash'={2}
+                                  AND l.after_state->'actor'->>'userId'=d.decided_by::text
+                                  AND l.after_state->'actor'->>'role' IN ('MANAGER','OPERATOR','QC','ADMIN')
+                                ORDER BY l.governance_audit_log_id LIMIT 1
+                             ) audit ON true
+                             WHERE d.governance_action_id={0} AND d.is_final)
+                            """,JSONB.class,g.GOVERNANCE_ACTION_ID,g.PROPOSAL_VERSION,g.PROPOSAL_HASH,p.PLAN_REF)),
                         key("applicationId").value(a.PURCHASE_APPLICATION_ID),
                         key("purchaseOrderIds")
                                 .value(coalesce(orders.asField(), val(JSONB.valueOf("[]")))));
