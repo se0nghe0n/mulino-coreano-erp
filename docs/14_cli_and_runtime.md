@@ -86,3 +86,22 @@ network-none smoke의 modelRequests는 0건이다. 실제 MCP stdio와
 HTTP·폐기 가능한 DB를 연결해 보충 범위 저장, CLAUDE 초기 Run
 1건, 같은 키 replay, 일반·익명 접수 Run 0건을 확인했다.
 실모델 호출과 native subagent 검증은 실행하지 않았다.
+
+## Compact reads와 확정된 제안 결과
+
+`mulino case show REF`, `mulino plan show REF`는 compact decision view를
+조회한다. `--full`은 같은 인가 아래 기존 full audit 조회다.
+`mulino plan calculate`도 서버의 원래 idempotent receipt를 projection한다.
+계약과 명시적 unavailable 경계는 [인터페이스 계약](08_interface_overview.md)의
+Agent decision view 절을 따른다. 기본 view는 source/day-level audit을
+읽거나 jq·pipe·redirect를 쓰지 않아도 서버 status·issues·purchases·
+totalAmount를 제공한다. complete=false면 해당 사실로 판단하지 않는다.
+
+PO·입고 검사·리콜 제안의 executionResult는 outcome·summary·
+waitingConditions·resultRef를 바꾸지 않고 그대로 최종 반환한다.
+서버가 이미 Run을 종료했으므로 추가 조회·전이·동일 제안을 하지 않는다.
+PENDING_APPROVAL은 인간 승인·ERP 적용·MFDS 제출 완료가 아니다.
+MODEL_TERMINAL_OUTCOME_MISMATCH는 계속 실패다. model_finished에는
+허용된 enum만 nativeReturnedOutcome/storedReceiptOutcome으로 남기며
+raw final result나 SDK 오류를 기록하지 않는다. 과거 누락된 enum은
+소급 추정하지 않는다.

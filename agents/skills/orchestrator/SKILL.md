@@ -11,7 +11,7 @@ description: Use when an ORCHESTRATOR Run must interpret a Mulino business objec
 
 1. `mulino case show <caseRef>`로 `caseMetadata.replenishment`와 `obligation`을 읽는다. 제품·거점·목표일을 유지하고 누락 정보는 구체적 사유와 FAILED로 반환한다.
 2. 목표 해석이나 공급망 범위 검토가 필요하면 Codex native subagent에게 해당 역할의 분석을 맡긴다. 현재 Run 안의 분석은 현재 권한을 공유한다. 역할 이름을 바꾸어 공급망 계산·발주 API를 실행하지 않는다. 분석 결과를 아래 영속 업무에 반영한다.
-3. 공급망 업무는 아래 고정 본문과 키를 사용해 생성한다. 실제 Case/부모 Work Item 참조만 대입하고 재개 시에도 제목·설명·키를 바꾸지 않는다. 응답 유실이나 기존 자식 식별이 필요하면 같은 요청을 재전송하여 `workItemRef`를 복구한다. `obligation`은 자식 metadata를 노출하지 않으므로 보이지 않는 `parentWorkItemRef`로 필터링했다고 가정하지 않는다.
+3. 공급망 업무는 아래 고정 본문과 키를 사용해 생성한다. 실제 Case/부모 Work Item 참조만 대입하고 재개 시에도 제목·설명·키를 바꾸지 않는다. 응답 유실이나 기존 자식 식별이 필요하면 같은 요청을 재전송하여 `workItemRef`를 복구한다. `obligation`의 실제 자식 ref와 노출된 parentWorkItemRef를 현재 Run의 부모 Work Item 참조와 대조한다. 제목·설명만으로 같은 부모의 자식이라고 추론하지 않는다.
 
 ```bash
 mulino work create --json '{"caseRef":"CASE-실제참조","agentKey":"SUPPLY_CHAIN","title":"재보충 소요량 계산","description":"Case의 확정 범위로 서버 계획을 저장하고 근거를 확인한다."}' --request-key '<workItemRef>:supply-chain:initial'
@@ -23,7 +23,7 @@ mulino work create --json '{"caseRef":"CASE-실제참조","agentKey":"SUPPLY_CHA
 {"outcome":"WAITING","summary":"공급망 계산 결과가 저장되면 같은 업무를 이어갑니다.","waitingConditions":[{"type":"DEPENDENCY_DONE","payload":{"dependentWiRef":"WI-생성응답참조"},"reason":"수요·생산·자재 계획 필요"}],"resultRef":null}
 ```
 
-5. 공급망 DONE 후 Case의 `latestPlan.ref`를 `mulino plan show <ref>`로 읽는다. 최신 저장 계획의 Case·범위·버전과 READY 상태를 확인한다. 공개 Plan DTO에는 원본 Work Item 필드가 없으므로 연결을 읽었다고 주장하지 않는다. 공급망 DONE의 원본 업무·최신 시도 검증은 서버가 수행한다. 최신 실패·NEEDS_ATTENTION을 이전 READY로 대신하지 않는다. 유효한 계획은 구매량이 0이어도 Procurement에 배정하여 서버의 구매 필요 여부 검증으로 이어간다.
+5. 공급망 DONE 후 Case의 `latestPlan.ref`를 `mulino plan show <ref>`로 읽는다. complete=false면 판단을 멈추고 인간 확인을 요청한다. 최신 저장 계획의 Case·범위·버전과 READY 상태를 확인한다. compact GET의 currentAssociation과 Case planningAttempts는 원본 업무·현재 시도 정보이며 저장된 Plan DTO와 구분한다. plan calculate 응답에는 이 현재 연결 정보가 없다. 공급망 DONE의 원본 업무·최신 시도 검증은 서버가 수행한다. 최신 실패·NEEDS_ATTENTION을 이전 READY로 대신하지 않는다. 유효한 계획은 구매량이 0이어도 Procurement에 배정하여 서버의 구매 필요 여부 검증으로 이어간다.
 6. 아래 본문과 키를 부모 Work Item + 정확한 계획 버전별로 고정한다. `metadata.businessRef`에 실제 계획 참조를 넣고 description에도 남긴다. `parentWorkItemRef`는 서버가 현재 부모로 설정한다. 재개 시 같은 요청을 재전송하여 기존 `workItemRef`를 복구할 수 있다. 같은 계획에 새 요청 키·새 제목을 만들어 중복 배정하지 않는다.
 
 ```bash
@@ -44,7 +44,36 @@ mulino work create --json '{"caseRef":"CASE-실제참조","agentKey":"PROCUREMEN
 
 ## 인간 지시에 따른 계획 수정
 
-초기 공급망 키의 `initial`은 최초 계산에만 쓴다. 가격·입고 등 입력 변화나 `EXPIRED` 자체는 재계산 권한이 아니다. `CANCELLED`인 구매 의존성도 부모를 재개시킬 수 있으므로 이를 성공한 구매로 해석하지 않는다. `purchasing.status`의 BLOCKED/EXPIRED와 실제 의무 상태를 확인하고, 새로운 명시적 인간 지시가 없으면 원인과 필요한 방침 검토를 보고하여 ABORTED/FAILED로 끝낸다. 같은 제안·새 요청 키·완료된 의존성 대기로 자동 재발행하지 않는다.
+초기 공급망 키의 `initial`은 최초 계산에만 쓴다. 가격·입고 등 입력 변화나 `EXPIRED` 자체는 재계산 권한이 아니다. `CANCELLED`인 구매 의존성도 부모를 재개시킬 수 있으므로 이를 성공한 구매나 인간 BLOCK의 증거로 해석하지 않는다. 같은 제안·새 요청 키·완료된 의존성 대기로 자동 재발행하지 않는다.
+
+현재 조정 책임의 중단은 currentCoordinationPurchase로 확인한다. 이 항목은
+현재 Work Item과 parentWorkItemRef가 같은 실제 구매 자식의 최신 action이며,
+현재 latestPlan.ref와 연결된다. purchasing의 과거 BLOCK을 임의로 고르지
+않는다. obligation의 구매 자식 ref·parentWorkItemRef와 planRef도 대조한다.
+status=BLOCKED이고 finalGovDecision이 isFinal=true·decision=BLOCK이며,
+actorRole=MANAGER·actorProvenance=IMMUTABLE_PURCHASE_DECIDED_AUDIT인
+실제 결정인지 actionId·version·proposalHash·planRef를 함께 확인한다.
+users의 현재 role이나 일반 인간 답변으로 이 증거를 대신하지 않는다.
+
+이 현재 MANAGER BLOCK과 일치하고 이후의 유효한 명시적 인간 지시가
+없으면 **ABORTED**로 끝낸다. 이는 인간 방침에 따른 의도적 중단이며
+FAILED가 아니다. waitingConditions는 빈 배열, resultRef는 null로 하고
+중단 근거를 summary에 설명한다. 구매 수정·재발행이나 모델의 추가
+JUDGMENT 요청을 하지 않는다. Case를 완료했다고 주장하지 않는다.
+서버의 기존 ABORTED Work/Attention 처리는 유지된다.
+
+기존 취소 계약도 현재 동일한 parent·구매 자식·plan·action의 실제 final
+MANAGER CANCEL과 immutable actor 출처가 모두 맞을 때에만 의도적
+ABORTED 중단으로 처리한다. 구매 자식 상태가 CANCELLED라는 사실만으로
+CANCEL 결정이나 이 중단을 추론하지 않는다. P2P-002의 BLOCK 인수는
+이 별도 취소 계약으로 대신하지 않는다.
+
+EXPIRED, 필요한 자료 누락, 충돌한 출처, UNKNOWN인 과거 actor snapshot은
+이 MANAGER BLOCK 중단과 다르다. 새로운 지시가 없고 업무를 안전하게
+진행할 수 없으면 FAILED와 확인이 필요한 근거를 보고한다. 다른 부모·
+계획의 과거 BLOCK이나 구매 자식의 CANCELLED만으로 ABORTED를 선택하지
+않는다. 명시적으로 허용된 새 인간 지시가 있으면 아래의 scope·출처를
+검증하고 그 지시만 이어서 처리한다. 구매 자동 승인으로 확대하지 않는다.
 
 재계산 지시가 있으면 `epistemic.decisions`의 실제 `decision_id`, `metadata.sourceAttentionId`, `decision_text`, `scope`, `work_item_ref`, `decided_by.user_id`, `decided_at`을 읽어 출처를 확인한다. `metadata.sourceAttentionId`가 있는 인간 답변이고, 답변 내용이 해당 실패 계획/승인과 재계산 범위를 명시해야 한다. THIS_CASE는 현재 Case 안의 지시 범위이며 미래 구매 자동 승인 권한이 아니다. THIS_ACTION은 답변 대상 `work_item_ref`가 현재 조정 업무 또는 해당 조정 업무가 복구한 정확한 대상 업무일 때 그 지시만 적용한다. Case 전체나 다른 작업으로 확대하지 않는다. 일반 답변에 없는 승인 권한을 추론하지 않는다.
 

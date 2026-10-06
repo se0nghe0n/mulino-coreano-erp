@@ -19,24 +19,40 @@ public class AgentQueryService {
     private final PlanPersistenceService plans;
     private final PlanQueryRepository repository;
     private final AgentPurchasingReads purchasing;
+    private final AgentReadViews views;
 
     public AgentQueryService(
             RunCapabilityAccess capabilities,
             ExecutionContextBuilder contexts,
             PlanPersistenceService plans,
             PlanQueryRepository repository,
-            AgentPurchasingReads purchasing) {
+            AgentPurchasingReads purchasing, AgentReadViews views) {
         this.capabilities = capabilities;
         this.contexts = contexts;
         this.plans = plans;
         this.repository = repository;
         this.purchasing = purchasing;
+        this.views=views;
+    }
+
+    @Transactional(isolation = Isolation.REPEATABLE_READ)
+    public tools.jackson.databind.JsonNode caseView(String token,String agentKey,String caseRef) {
+        var scope=capabilities.requireLocked(token,agentKey,caseRef);
+        var result=views.caseView(contexts.build(scope.caseRef(),scope.caseId(),"ORCHESTRATOR".equals(scope.agentKey()) ? scope.workItemRef() : null));
+        capabilities.requireLocked(token,agentKey,caseRef); return result;
+    }
+
+    @Transactional(isolation = Isolation.REPEATABLE_READ)
+    public tools.jackson.databind.JsonNode planView(String token,String agentKey,String caseRef,String ref) {
+        var full=plan(token,agentKey,caseRef,ref);
+        var result=views.planRead(full,repository.currentAssociation(ref));
+        capabilities.requireLocked(token,agentKey,caseRef); return result;
     }
 
     @Transactional(isolation = Isolation.REPEATABLE_READ)
     public Map<String, Object> caseContext(String token, String agentKey, String caseRef) {
         var scope = capabilities.requireLocked(token, agentKey, caseRef);
-        var result = contexts.build(scope.caseRef(), scope.caseId());
+        var result = contexts.build(scope.caseRef(), scope.caseId(),"ORCHESTRATOR".equals(scope.agentKey()) ? scope.workItemRef() : null);
         capabilities.requireLocked(token, agentKey, caseRef);
         return result;
     }

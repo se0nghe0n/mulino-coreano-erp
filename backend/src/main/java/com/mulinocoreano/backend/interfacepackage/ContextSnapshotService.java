@@ -31,6 +31,7 @@ public class ContextSnapshotService {
                         SELECT jsonb_agg(
                             jsonb_build_object(
                                 'ref', wi.work_item_ref,
+                                'parentWorkItemRef', wi.metadata->>'parentWorkItemRef',
                                 'title', wi.title,
                                 'description', wi.description,
                                 'status', wi.status::text,
@@ -227,6 +228,6 @@ public class ContextSnapshotService {
                 .query(String.class)
                 .single();
 
-        return new LinkedHashMap<>(objectMapper.readValue(json, Map.class));
+        return new LinkedHashMap<>(objectMapper.readerFor(Map.class).with(tools.jackson.databind.DeserializationFeature.USE_BIG_DECIMAL_FOR_FLOATS).readValue(json));
     }
 }

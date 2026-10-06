@@ -385,3 +385,78 @@ WAITING 후속 책임을 남기며 입고·생산을 만들어 Case를 끝내지
 SUPPORTS는 VERIFIED를 자동 부여하지 않는다. 인간 판단과 stale 이력,
 actor·Case·Run·멱등 계약은 [Evidence·Claim API](19_evidence_claim_api.md)를
 따른다. Claim 상태는 ERP write 승인 권한이 아니다.
+
+## Agent decision view 계약 (#49·#53·#24)
+
+전체 계획·Case audit을 모델 tool output에 먼저 전달하면 서버의 READY
+결과와 구매 행이 잘려 업무가 실패할 수 있다. Agent 전용 compact view는
+같은 capability·actor·Case scope에서 결정에 필요한 사실을 먼저 제공한다.
+
+| 표면 | 계약 |
+|---|---|
+| GET /api/v1/agent/cases/{ref}/view | 현재 책임·dependency·인간 결정 provenance·구매 상태·QC/recall 배정·Attention·latest plan·planningAttempts |
+| GET /api/v1/agent/plans/{ref}/view | 저장된 계획 facts와 별도 currentAssociation |
+| POST /api/v1/agent/cases/{ref}/plans | 기존 idempotent 계산 service가 반환한 PlanDto의 순수 projection |
+| 기존 GET /agent/cases/{ref}, /agent/plans/{ref} | 같은 인가 아래 full audit 응답 유지 |
+
+viewVersion=1, complete=true인 view는 모든 issues·purchases(선택/대안/
+거부 사유/경고)·totalAmount·범위·기준일·버전·hash를 유지한다. 원자료
+sourceSnapshot, requirements의 production/materials/allocations/exclusions
+배열, forecast dailyDemand/sourceRefs,
+currentBusinessFacts와 2 KiB를 넘는 evidence 본문만 omitted에 명시해 fullRead로
+연결한다. 그 밖의 새로운 결정 필드는 삭제하지 않는다. 숫자는 exact
+Decimal/정수로 보존하고 모델이나 CLI가 MRP·금액을 재계산하지 않는다.
+
+직렬화한 view가 16 KiB를 넘거나 저장된 shape를 해석할 수 없으면
+complete=false·UNAVAILABLE과 fullRead/인간 검토 지침을 반환한다.
+critical 배열을 자르거나 READY 결과 일부를 반환하지 않는다. 해당
+모델은 FAILED를 보고하며 기존 서버 계약으로 Attention을 요청한다.
+읽기 API 자체는 ERP나 governance 기록을 변경하지 않는다.
+
+계산 receipt는 새 조회나 외부 transaction 없이 원래 idempotent 결과를
+projection한다. origin/current attempt는 저장된 PlanDto에 없으므로
+NOT_IN_STORED_DTO로 표시한다. scoped GET의 currentAssociation은
+CURRENT_SCOPED_READ이며 현재 원본 업무·최신 시도 연결이다. Case
+planningAttempts도 현재 정보다. 저장된 plan fact와 혼동하지 않는다.
+최종 완료·최신 시도·승인 검증은 기존 서버 policy가 계속 수행한다.
+
+claim은 Case 상태·planningBasis·현재 계획 연결도 full context에 함께
+캡처한다. full execution_context를 DB audit에 먼저 저장하고 compact
+context만 모델 transport로 보낸다. 원본 context_snapshot·계획/source
+hash는 바꾸지 않으며 full audit/transport의 256 KiB 제한도 유지한다.
+planningBasis는 planningClock과 저장된 plan asOf에 따른 Asia/Seoul
+기준이며 실제 lease clock이나 native 세션 날짜를 대신 사용하지 않는다.
+
+### 현재 조정 책임과 인간 BLOCK 출처 (#45·#50)
+
+obligation과 purchasing의 parentWorkItemRef는 실제 자식 metadata에서
+읽는다. currentCoordinationPurchase는 현재 Orchestrator Work Item의
+최신 구매 action과 현재 latestPlan 연결이 모두 맞을 때만 선택한다.
+관련 없는 부모·과거 계획·교체된 action으로 fallback하지 않는다. 기존
+purchasing 및 인간 결정 history는 그대로 유지한다. 이 선택과 출처도
+full context에 먼저 캡처하며 모델의 결과나 승인 권한을 바꾸지 않는다.
+
+finalGovDecision은 실제 final governance decision과 정확히 일치하는
+PURCHASE_DECIDED audit을 연결한다. decision ID·action·version·hash·
+user ID·decision을 함께 확인한다. 새 audit after_state는 기존 요청의
+decision/expectedVersion/proposalHash/reason을 유지하고, 기존 role gate와
+lock을 통과한 HumanActor의 userId/role 및 governanceDecisionId만
+추가로 기록한다. 이벤트·transaction·ERP 적용·승인 policy는 유지한다.
+
+actorRole은 이 immutable audit snapshot에서만 읽는다. 이후 users.role이
+바뀌어도 과거 MANAGER 역할을 다시 해석하지 않는다. 기존 snapshot에
+actor가 없거나 정확히 연결되지 않으면 UNKNOWN/null이며 backfill하지
+않는다. actorProvenance=IMMUTABLE_PURCHASE_DECIDED_AUDIT는 해당 출처를
+뜻하며 일반 인간 답변이나 현재 role로 대신하지 않는다.
+
+현재 parent·구매 자식·계획·action에 맞는 실제 final MANAGER BLOCK이고
+후속의 유효한 새 인간 지시가 없으면 Orchestrator는 ABORTED로 의도적
+중단을 반환한다. FAILED를 정규화하거나 이를 BLOCK 통과로 받아들이지
+않는다. EXPIRED·누락·충돌·legacy UNKNOWN과 단순 CANCELLED 자식은
+다른 상태다. 기존 서버의 ABORTED Work/Attention 처리는 바꾸지 않는다.
+
+기존 취소 계약은 동일한 현재 조정 책임의 실제 final MANAGER CANCEL과
+immutable 출처가 모두 맞을 때에만 같은 의도적 중단이다. CANCELLED
+구매 자식만으로 결정 의도를 추론하지 않는다. 일반 stop observer는
+이 확인된 BLOCK/CANCEL을 구분하며 P2P-002의 특별 ABORTED 인수는
+검증된 BLOCK만 허용한다.

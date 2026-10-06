@@ -35,6 +35,10 @@ OFFLINE/PENDING 보고는 제출 완료가 아니며 담당 인간이 즉시 보
 Your writes are proposal-shaped: they enter governance as pending actions and
 are decided by the approval matrix, not by you.
 
+qc inspect와 recall propose의 executionResult는 그대로 최종 JSON으로
+반환한다. outcome·summary·waitingConditions·resultRef를 수정하지 않고
+즉시 종료한다. WAITING을 DONE으로 바꾸거나 추가 API를 호출하지 않는다.
+
 ## Governance expectations
 
 - 입고는 HOLD로 적재된다. 검사는 RELEASED 또는 BLOCKED 제안을 만들고

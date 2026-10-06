@@ -4,17 +4,21 @@ let input = "";
 for await (const chunk of process.stdin) input += chunk;
 const claim = JSON.parse(input),
   c = claim.context;
+assert.notEqual(c.complete, false, 'Incomplete business view requires human review');
 assert.deepEqual(
   Object.keys(process.env).filter((k) => /TOKEN|SECRET|AUTH0|DB_/.test(k)),
   ["MULINO_TOKEN"],
 );
-const cli = (...a) =>
-  JSON.parse(
+const cli = (...a) => {
+  const result = JSON.parse(
     execFileSync(process.env.DEMO_CLI, a, {
       encoding: "utf8",
       env: process.env,
     }),
   );
+  assert.notEqual(result.complete, false, 'Incomplete business view requires human review');
+  return result;
+};
 const done = (ref = null) => ({
   outcome: "DONE",
   summary: "CLI verified persisted result",
@@ -34,18 +38,25 @@ const revision = c.epistemic?.decisions?.findLast(
           `Recalculate this Case using the changed supplier price; request a fresh purchase approval. Source plan: ${p.planRef}.`,
     ),
 );
+const currentPurchase=c.currentCoordinationPurchase;
+const finalDecision=currentPurchase?.finalGovDecision;
+const matchingStop=((currentPurchase?.status==='BLOCKED' && finalDecision?.decision==='BLOCK')
+  || (currentPurchase?.status==='CANCELLED' && finalDecision?.decision==='CANCEL')) && finalDecision?.isFinal===true
+  && finalDecision?.actorRole==='MANAGER'
+  && finalDecision?.actorProvenance==='IMMUTABLE_PURCHASE_DECIDED_AUDIT'
+  && finalDecision?.actionId===currentPurchase.approvalId && finalDecision?.version===currentPurchase.version
+  && finalDecision?.proposalHash===currentPurchase.proposalHash && finalDecision?.planRef===currentPurchase.planRef;
 let result;
 if (claim.agentKey === "ORCHESTRATOR") {
-  if (
-    c.purchasing?.some((p) => p.status === "BLOCKED") ||
-    (c.purchasing?.some((p) => p.status === "EXPIRED") && !revision)
-  ) {
+  if (matchingStop && !revision) {
     result = {
       outcome: "ABORTED",
       summary: "Human policy review required after BLOCK; no automatic reissue",
       waitingConditions: [],
       resultRef: null,
     };
+  } else if (['BLOCKED','EXPIRED','CANCELLED'].includes(currentPurchase?.status) && !revision) {
+    result={outcome:'FAILED',summary:'Missing matched manager stop proof or authorised revision',waitingConditions:[],resultRef:null};
   } else if (c.followups?.length) {
     assert.equal(c.followups[0].serverManaged, true);
     assert.ok(c.followups[0].dueAt);

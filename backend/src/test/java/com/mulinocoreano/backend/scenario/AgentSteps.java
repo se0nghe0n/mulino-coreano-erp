@@ -110,7 +110,8 @@ public class AgentSteps {
 
     @When("에이전트가 반려를 확인한다")
     public void agentSeesBlock() {
-        driver().awaitState("반려 후 에이전트 중단", () -> state.abortedOrchestratorRuns(world.caseRef()) >= 1, timeout());
+        driver().awaitState("반려 후 에이전트 중단", () -> state.abortedOrchestratorRuns(world.caseRef()) >= 1,
+                () -> state.latestRunFailed(world.caseRef()), timeout());
     }
 
     @After(order = 10)
@@ -121,7 +122,7 @@ public class AgentSteps {
             try {
                 driver.awaitState("실제 모델 종료와 모든 Run의 최종 사용량",
                         () -> UatEvidence.finalized(state.runsForCase(world.caseRef()), driver.modelFinished(),
-                                scenario.getSourceTagNames().contains("@TC-P2P-002") && state.humanStoppedPurchase(world.caseRef()),
+                                scenario.getSourceTagNames().contains("@TC-P2P-002") && state.humanBlockedPurchase(world.caseRef()),
                                 evidenceRuntime()),
                         () -> state.latestRunFailed(world.caseRef()), timeout());
             } catch (AssertionError failure) { finalizationFailure = failure; }
@@ -141,7 +142,7 @@ public class AgentSteps {
         record.put("accountingStatus", Boolean.TRUE.equals(record.get("usageComplete")) ? "COMPLETE" : "PARTIAL");
         record.put("executionReady", driver != null && world.caseRef() != null && UatEvidence.finalized(
                 state.runsForCase(world.caseRef()), driver.modelFinished(),
-                scenario.getSourceTagNames().contains("@TC-P2P-002") && state.humanStoppedPurchase(world.caseRef()),
+                scenario.getSourceTagNames().contains("@TC-P2P-002") && state.humanBlockedPurchase(world.caseRef()),
                 evidenceRuntime()));
         record.put("appliedPurchaseOrders", state.appliedPurchaseOrders());
         record.put("appliedPurchaseTotalKrw", state.appliedPurchaseTotal());

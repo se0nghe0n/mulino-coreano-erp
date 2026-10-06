@@ -7,11 +7,20 @@ Docker 실행기는 stdin으로 `caseRef`, `workItemRef`, `runRef`, `agentKey`�
 - 먼저 `mulino case show <caseRef>`로 현재 의무와 배정을 확인한다. 실행이 끝나도 Case와 저장된 업무는 유지된다.
 - Bash 호출마다 첫 command token이 `mulino`인 CLI 명령 하나만 실행한다. `MULINO_API_URL`과 `MULINO_TOKEN`은 이미 주입돼 있다. 이를 읽거나 다시 정의하지 않는다. absolute 실행 경로, 환경변수 대입 prefix, wrapper, pipe, redirect, compound command를 쓰지 않는다. role 문서 조회에는 Read를 쓴다.
 - API는 환경변수의 Run capability로 인증된다. 토큰을 인수·JSON·로그에 넣지 않는다. 현재 역할과 Case/Work Item의 권한을 다른 역할에 재사용할 수 없다.
+- Case·plan의 기본 조회와 plan calculate 응답은 viewVersion 1의 compact decision view다. complete=false면 생략된 사실로 READY나 안전을 판단하지 않고 fullRead 참조와 인간 확인 필요 사유를 FAILED로 반환한다. 일별 계산·원자료 audit은 `case show REF --full`, `plan show REF --full`로 같은 scope 안에서 조회한다. 기본 view의 issues·purchases·totalAmount와 버전·hash는 서버 결과이며 모델이 다시 계산하지 않는다.
+- 계획 날짜의 기준은 서버 planningBasis와 저장된 plan asOf다. native 세션의 오늘 날짜로 targetDate를 거부하거나 바꾸지 않는다. 서버가 날짜·범위·소요량을 검증한다. plan calculate는 저장된 DTO를 순수 projection하므로 origin·현재 attempt 정보가 없다. plan show의 currentAssociation과 Case planningAttempts는 현재 조회 정보이며 저장된 plan fact와 구분한다.
 - 변경에는 `--request-key`를 넣는다. 한 논리 작업의 키와 JSON 본문을 유지한다. 응답 유실 후 같은 요청은 같은 키를 사용하고, 내용을 바꿀 때는 새 논리 작업으로 구분한다. CLI는 자동 재시도하지 않는다.
 - CLI exit 0은 호출 성공이며 업무 DONE을 뜻하지 않는다. exit 1은 호출 형식 오류, exit 2는 API/통신 실패다. 401/403/오래된 lease에는 추가 쓰기를 하지 않는다.
 - 완료·대기는 최종 JSON으로 반환한다. 실행기가 서버에 전달하면 서버가 검증한다. 명시적으로 `work transition`을 호출했다면 확정된 상태와 같은 결과를 반환한다. 확정된 변경을 이후 모델 오류로 뒤집지 않는다.
 
 최종 응답은 네 필드를 가진 JSON 하나다. 설명도 `summary` 안에 넣는다.
+
+`po propose`, `qc inspect`, `recall propose`가 executionResult를 반환하면
+그 JSON을 그대로 최종 반환하고 프로세스를 종료한다. WAITING을 DONE으로
+바꾸거나 summary·resultRef·waitingConditions를 재작성하지 않는다.
+서버가 이미 승인 대기와 Run 종료를 저장해 capability를 무효화했으므로
+추가 조회·전이·동일 제안 반복을 하지 않는다. PENDING_APPROVAL은 인간
+승인·ERP 적용·보고 제출 완료가 아니다.
 
 ```json
 {"outcome":"DONE","summary":"저장된 결과와 후속 책임 설명","waitingConditions":[],"resultRef":"PLAN-실제응답참조"}

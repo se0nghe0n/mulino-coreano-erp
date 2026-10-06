@@ -28,7 +28,7 @@ let requests = 0;
 const response = '{"ref":"CASE-SMOKE","quantity":999999999999.999999,"id":9007199254740993}';
 const server = createServer((req, res) => {
   requests++;
-  assert.equal(req.url, '/api/v1/agent/cases/CASE-SMOKE');
+  assert.equal(req.url, '/api/v1/agent/cases/CASE-SMOKE/view');
   assert.equal(req.headers.authorization, 'Bearer smoke-capability-only');
   assert.equal(req.headers['x-mulino-local-service'],undefined);
   assert.equal(req.headers['x-mulino-local-role'],undefined);

@@ -176,6 +176,10 @@ test('late model outcome cannot downgrade the committed business outcome', async
   resolve({ outcome: 'FAILED', summary: 'A later tool was denied' });
   assert.equal((await running).outcome, 'WAITING');
   assert.equal(logs.find(e => e.event === 'model_finished').failure, 'MODEL_TERMINAL_OUTCOME_MISMATCH');
+  const diagnostic=logs.find(e => e.event === 'model_finished');
+  assert.equal(diagnostic.nativeReturnedOutcome,'FAILED');
+  assert.equal(diagnostic.storedReceiptOutcome,'WAITING');
+  assert.doesNotMatch(JSON.stringify(diagnostic), /A later tool was denied/);
 });
 
 test('crash after business commit preserves original finish receipt', async t => {

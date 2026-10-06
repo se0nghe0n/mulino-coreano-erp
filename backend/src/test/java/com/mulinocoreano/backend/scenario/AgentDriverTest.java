@@ -12,6 +12,21 @@ import tools.jackson.databind.ObjectMapper;
 /** 목표 4 보조: 에이전트가 기대 상태에 못 가면 멈추지 않고 이유와 함께 실패하며, 실행기는 반드시 정리된다. */
 class AgentDriverTest {
     @Test
+    void humanBlockObserverDoesNotWaitForAbortedWhenModelPersistedFailed() {
+        var steps=new AgentSteps();steps.world=new ScenarioWorld();steps.world.caseRef("CASE-BLOCK");
+        steps.state=org.mockito.Mockito.mock(BusinessState.class);
+        org.mockito.Mockito.when(steps.state.abortedOrchestratorRuns("CASE-BLOCK")).thenReturn(0L);
+        org.mockito.Mockito.when(steps.state.latestRunFailed("CASE-BLOCK")).thenReturn(true);
+        steps.driver=new AgentDriver(new ObjectMapper(),List.of("node","-e","setInterval(()=>{},1000)"));
+        steps.driver.start(Map.of());
+        try {
+            long start=System.nanoTime();
+            assertThatThrownBy(steps::agentSeesBlock).isInstanceOf(AssertionError.class);
+            assertThat(Duration.ofNanos(System.nanoTime()-start).toMillis()).isLessThan(5000);
+        } finally {steps.stopAgent();}
+        assertThat(steps.driver.isAlive()).isFalse();
+    }
+    @Test
     void persistedBusinessFailureStopsWaitingWhileNativeProcessRemainsAlive() {
         var driver = new AgentDriver(new ObjectMapper(), List.of("node", "-e", "setInterval(()=>{},1000)"));
         driver.start(Map.of());

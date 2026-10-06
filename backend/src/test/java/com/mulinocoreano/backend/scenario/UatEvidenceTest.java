@@ -17,7 +17,7 @@ class UatEvidenceTest {
         var rows = List.of(new BusinessState.RunRecord("QC", "RUN-Q", "FAILED", "FAILED"));
         var event = m.readTree("""
             {"runRef":"RUN-Q","runtime":"CLAUDE","model":"claude-sonnet-5","resolvedModel":"claude-sonnet-5",
-             "nativeExitCode":0,"nativeResultSubtype":"success","costUsd":0.1,"inputTokens":1,"outputTokens":2,
+             "nativeExitCode":0,"nativeResultSubtype":"success","nativeReturnedOutcome":"FAILED","costUsd":0.1,"inputTokens":1,"outputTokens":2,
              "cacheReadTokens":3,"cacheWriteTokens":4,"nativePermissionDenialCount":1,
              "nativeDeniedToolKinds":{"Bash":1},"nativeDeniedCommandShapes":{"CUSTOM_ENV_PREFIX":1},
              "permission_denials":[{"tool_input":{"command":"secret-command"},"tool_use_id":"secret-id"}]}
@@ -30,6 +30,8 @@ class UatEvidenceTest {
         assertThat(safe.toString()).doesNotContain("secret-command", "secret-id", "permission_denials");
         assertThat(summary.get("failures")).isEqualTo(List.of());
         assertThat(summary.get("usageComplete")).isEqualTo(true);
+        assertThat(safe.path("runs").get(0).path("nativeReturnedOutcome").asText()).isEqualTo("FAILED");
+        assertThat(safe.path("runs").get(0).path("storedReceiptOutcome").asText()).isEqualTo("FAILED");
         assertThat(UatEvidence.finalized(rows, List.of(event), false, "CLAUDE")).isFalse();
         // A denied optional tool is diagnostic data, never an invented execution failure.
         assertThat(UatEvidence.finalized(List.of(new BusinessState.RunRecord("QC", "RUN-Q", "COMPLETED", "WAITING")),

@@ -38,6 +38,18 @@ public class PlanQueryRepository {
                                         .and(REPLENISHMENT_PLANS.CASE_ID.eq(caseId))));
     }
 
+    public String currentAssociation(String ref) {
+        return dsl.fetchOne("SELECT jsonb_build_object('originWorkItemRef',w.work_item_ref,'latestAttemptSequence',w.planning_attempt_sequence,'latestAttemptOutcome',w.latest_planning_outcome,'latestAttemptPlanRef',latest.plan_ref,'isLatestPlanForOriginWork',p.replenishment_plan_id=w.latest_planning_plan_id)::text FROM replenishment_plans p LEFT JOIN work_items w ON w.work_item_id=p.created_by_work_item_id LEFT JOIN replenishment_plans latest ON latest.replenishment_plan_id=w.latest_planning_plan_id WHERE p.plan_ref=?",ref).get(0,String.class);
+    }
+
+    public String planningAttempts(String caseRef) {
+        return dsl.fetchOne("SELECT coalesce(jsonb_agg(jsonb_build_object('workItemRef',w.work_item_ref,'sequence',w.planning_attempt_sequence,'outcome',w.latest_planning_outcome,'planRef',p.plan_ref) ORDER BY w.work_item_id),'[]')::text FROM work_items w JOIN cases c USING(case_id) LEFT JOIN replenishment_plans p ON p.replenishment_plan_id=w.latest_planning_plan_id WHERE c.case_ref=? AND w.planning_attempt_sequence>0",caseRef).get(0,String.class);
+    }
+
+    public String caseStatus(String caseRef) {
+        return dsl.select(CASES.STATUS).from(CASES).where(CASES.CASE_REF.eq(caseRef)).fetchSingle(CASES.STATUS).toString();
+    }
+
     public Optional<PlanDto> find(String ref) {
         var p = REPLENISHMENT_PLANS;
         return dsl.select(

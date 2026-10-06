@@ -38,6 +38,7 @@ public class RunExecutionService {
     private final DispatcherService dispatcher;
     private final ObjectMapper mapper;
     private final RunCompletionPolicy completionPolicy;
+    private final AgentReadViews views;
 
     public RunExecutionService(
             RunExecutionRepository repository,
@@ -49,7 +50,8 @@ public class RunExecutionService {
             PlatformTransactionManager transactionManager,
             ObjectProvider<ProcurementCompletionVerifier> procurementCompletion,
             ReplenishmentFollowupService followups,
-            ReplenishmentFollowupRepository followupRepository) {
+            ReplenishmentFollowupRepository followupRepository, AgentReadViews views) {
+        this.views=views;
         this.followups = followups;
         this.followupRepository = followupRepository;
         this.repository = repository;
@@ -100,7 +102,9 @@ public class RunExecutionService {
         Map<String, Object> context;
         repository.createContextSavepoint();
         try {
-            context = contexts.build(row.caseRef(), row.caseId());
+            context = contexts.build(row.caseRef(), row.caseId(),"ORCHESTRATOR".equals(row.agentKey()) ? row.workRef() : null);
+            context.put("execution",Map.of("runRef",row.ref(),"workItemRef",row.workRef(),"agentKey",row.agentKey(),"attempt",row.attempt()));
+            if(mapper.writeValueAsBytes(context).length>262144) throw new IllegalArgumentException("FULL_CONTEXT_TOO_LARGE");
             repository.releaseContextSavepoint();
         } catch (RuntimeException failure) {
             repository.rollbackContextSavepoint();
@@ -111,17 +115,6 @@ public class RunExecutionService {
             recordFinish(row, "FAILED", "Current execution context reconstruction failed");
             return Optional.empty();
         }
-        context.put(
-                "execution",
-                Map.of(
-                        "runRef",
-                        row.ref(),
-                        "workItemRef",
-                        row.workRef(),
-                        "agentKey",
-                        row.agentKey(),
-                        "attempt",
-                        row.attempt()));
         String lease = RunTokens.issue(), cap = RunTokens.issue();
         Instant expiry =
                 repository.claim(
@@ -140,7 +133,7 @@ public class RunExecutionService {
                         row.runtime(),
                         lease,
                         cap,
-                        context,
+                        views.transport(context),
                         expiry,
                         600));
     }

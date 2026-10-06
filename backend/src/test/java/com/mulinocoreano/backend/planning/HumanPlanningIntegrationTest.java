@@ -37,6 +37,7 @@ class HumanPlanningIntegrationTest {
     @Autowired Flyway flyway;
     @Autowired com.mulinocoreano.backend.interfacepackage.RunService runs;
     @Autowired ObjectMapper mapper;
+    @Autowired com.mulinocoreano.backend.execution.AgentQueryService agentQueries;
     long warehouse;
     List<Long> products;
     String caseRef;
@@ -136,6 +137,41 @@ class HumanPlanningIntegrationTest {
         mvc.perform(post("/api/v1/internal/runs/finish").header("X-Mulino-Local-Service","local-test-secret")
                 .contentType("application/json").content(mapper.writeValueAsString(finish))).andExpect(status().isConflict());
         String capability="Bearer "+claim.path("capabilityToken").asString();
+        String beforeCompact=erp();
+        var requestBody=mapper.writeValueAsString(Map.of("warehouseId",warehouse,"productIds",products));
+        var compactResponse=mvc.perform(post("/api/v1/agent/cases/"+caseRef+"/plans").header("Authorization",capability)
+                .header("Idempotency-Key","agent").contentType("application/json").content(requestBody))
+                .andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
+        var compact=mapper.readTree(compactResponse);
+        assertThat(compact.path("result").path("status").asText()).isEqualTo("READY");
+        assertThat(compact.path("result").path("totalAmount").decimalValue()).isEqualByComparingTo("16500");
+        assertThat(compactResponse.getBytes(java.nio.charset.StandardCharsets.UTF_8).length).isLessThan(16384);
+        assertThat(mapper.readTree(mvc.perform(post("/api/v1/agent/cases/"+caseRef+"/plans").header("Authorization",capability)
+                .header("Idempotency-Key","agent").contentType("application/json").content(requestBody))
+                .andExpect(status().isOk()).andReturn().getResponse().getContentAsString())).isEqualTo(compact);
+        assertThat(jdbc.sql("SELECT count(*) FROM replenishment_plans").query(Long.class).single()).isEqualTo(1);
+        String ref=compact.path("ref").asText();
+        var full=mapper.readTree(mvc.perform(get("/api/v1/agent/plans/"+ref).header("Authorization",capability))
+                .andExpect(status().isOk()).andReturn().getResponse().getContentAsString());
+        var read=mapper.readTree(mvc.perform(get("/api/v1/agent/plans/"+ref+"/view").header("Authorization",capability))
+                .andExpect(status().isOk()).andReturn().getResponse().getContentAsString());
+        assertThat(read.path("result").path("purchases")).isEqualTo(full.path("result").path("purchases"));
+        var selectedQuantities=java.util.stream.StreamSupport.stream(read.path("result").path("purchases").spliterator(),false)
+                .map(p -> p.path("selection").path("chosen").path("purchaseQuantity").decimalValue()).toList();
+        assertThat(selectedQuantities).usingElementComparator(java.math.BigDecimal::compareTo)
+                .containsExactlyInAnyOrder(new java.math.BigDecimal("5"),new java.math.BigDecimal("5"),new java.math.BigDecimal("60"));
+        assertThat(read.path("hash")).isEqualTo(full.path("hash"));
+        assertThat(read.path("currentAssociation").path("originWorkItemRef").asText()).isEqualTo("WI-SUPPLY");
+        assertThat(read.path("currentAssociation").path("isLatestPlanForOriginWork").asBoolean()).isTrue();
+        assertThat(full.path("sourceSnapshot").isObject()).isTrue();
+        var caseView=mvc.perform(get("/api/v1/agent/cases/"+caseRef+"/view").header("Authorization",capability))
+                .andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
+        assertThat(caseView.getBytes(java.nio.charset.StandardCharsets.UTF_8).length).isLessThan(16384);
+        assertThat(mapper.readTree(caseView).path("planningAttempts").get(0).path("outcome").asText()).isEqualTo("READY");
+        mvc.perform(get("/api/v1/agent/cases/CASE-other/view").header("Authorization",capability)).andExpect(status().is4xxClientError());
+        assertThatThrownBy(() -> agentQueries.caseView(claim.path("capabilityToken").asText(),"QC",caseRef))
+                .isInstanceOf(org.springframework.web.server.ResponseStatusException.class);
+        assertThat(erp()).isEqualTo(beforeCompact);
         mvc.perform(post("/api/v1/cases/CASE-other/plans").header("Authorization",capability)
                 .header("Idempotency-Key","wrong").contentType("application/json")
                 .content(mapper.writeValueAsString(Map.of("warehouseId",warehouse,"productIds",products))))
@@ -147,6 +183,17 @@ class HumanPlanningIntegrationTest {
         mvc.perform(post("/api/v1/internal/runs/finish").header("X-Mulino-Local-Service","local-test-secret")
                 .contentType("application/json").content(mapper.writeValueAsString(finish))).andExpect(status().isOk());
         assertThat(jdbc.sql("SELECT status::text FROM work_items WHERE work_item_ref='WI-SUPPLY'").query(String.class).single()).isEqualTo("DONE");
+        mvc.perform(get("/api/v1/agent/plans/"+ref+"/view").header("Authorization",capability)).andExpect(status().is4xxClientError());
+        String rootWork=jdbc.sql("SELECT w.work_item_ref FROM work_items w JOIN agents a ON a.agent_id=w.assigned_agent_id WHERE w.case_id=:id AND a.agent_key='ORCHESTRATOR' ORDER BY w.work_item_id LIMIT 1").param("id",caseId).query(String.class).single();
+        runs.createRun(new com.mulinocoreano.backend.interfacepackage.CreateRunRequest("ORCHESTRATOR",caseRef,rootWork,"CODEX"),null);
+        var nextClaim=mapper.readTree(mvc.perform(post("/api/v1/internal/runs/claim").header("X-Mulino-Local-Service","local-test-secret")
+                .contentType("application/json").content("{\"workerId\":\"orchestrator-worker\",\"runtime\":\"CODEX\"}"))
+                .andExpect(status().isOk()).andReturn().getResponse().getContentAsString());
+        assertThat(nextClaim.path("context").path("complete").asBoolean()).isTrue();
+        assertThat(nextClaim.path("context").path("latestPlan").path("result").path("totalAmount").decimalValue()).isEqualByComparingTo("16500");
+        var audit=mapper.readTree(jdbc.sql("SELECT execution_context::text FROM runs WHERE run_ref=:ref").param("ref",nextClaim.path("runRef").asText()).query(String.class).single());
+        assertThat(audit.path("latestPlan").path("sourceSnapshot")).isEqualTo(full.path("sourceSnapshot"));
+        assertThat(audit.path("currentBusinessFacts").isObject()).isTrue();
     }
 
     private JsonNode calculate(String role,String key,int status) throws Exception {

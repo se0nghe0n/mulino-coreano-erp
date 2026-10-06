@@ -74,12 +74,13 @@ public class PurchaseDecisionService {
                             namespace,
                             key,
                             Map.of("approvalId", approvalId, "request", request),
-                            () -> applyDecision(approval, request, human.userId()));
+                            () -> applyDecision(approval, request, human));
                 });
     }
 
     private Object applyDecision(
-            PurchaseApproval approval, PurchaseDecisionRequest request, long userId) {
+            PurchaseApproval approval, PurchaseDecisionRequest request, HumanActor human) {
+        long userId=human.userId();
         if (!approval.matches(request)) {
             return Map.of("error", "PROPOSAL_VERSION_MISMATCH");
         }
@@ -94,14 +95,15 @@ public class PurchaseDecisionService {
         if ("BLOCK".equals(request.decision()) || "CANCEL".equals(request.decision())) {
             closeProposal(approval, "CANCEL".equals(request.decision()) ? "CANCELLED" : "BLOCKED",
                     userId, request.reason());
-            recordDecision(approval, userId, request);
+            recordDecision(approval, human, request);
             return queries.approval(approval.id());
         }
-        return approve(approval, userId, request);
+        return approve(approval, human, request);
     }
 
     private Object approve(
-            PurchaseApproval approval, long userId, PurchaseDecisionRequest request) {
+            PurchaseApproval approval, HumanActor human, PurchaseDecisionRequest request) {
+        long userId=human.userId();
         PurchaseBundle bundle;
         String caseRef;
         try {
@@ -125,7 +127,7 @@ public class PurchaseDecisionService {
         }
 
         repository.updateApprovalStatus(approval.id(), "APPROVED");
-        long decisionId = recordDecision(approval, userId, request);
+        long decisionId = recordDecision(approval, human, request);
         repository.insertApplication(applicationId, approval, decisionId, userId, manifest);
         repository.setOutcome(approval.workId(), approval.planId(), "APPLIED");
         repository.resolveAttention(approval.id(), userId, "승인: " + request.reason(), "ANSWERED");
@@ -154,15 +156,19 @@ public class PurchaseDecisionService {
     }
 
     private long recordDecision(
-            PurchaseApproval approval, long userId, PurchaseDecisionRequest request) {
+            PurchaseApproval approval, HumanActor human, PurchaseDecisionRequest request) {
+        long userId=human.userId();
         long id = repository.recordDecision(approval, userId, request);
+        var snapshot=(tools.jackson.databind.node.ObjectNode)mapper.valueToTree(request);
+        snapshot.put("governanceDecisionId",id);
+        snapshot.set("actor",mapper.valueToTree(Map.of("userId",userId,"role",human.role())));
         repository.audit(
                 approval.id(),
                 userId,
                 "PURCHASE_DECIDED",
                 "GOVERNANCE_ACTION",
                 approval.id(),
-                mapper.valueToTree(request));
+                snapshot);
         return id;
     }
 
