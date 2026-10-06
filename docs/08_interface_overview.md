@@ -385,3 +385,44 @@ WAITING 후속 책임을 남기며 입고·생산을 만들어 Case를 끝내지
 SUPPORTS는 VERIFIED를 자동 부여하지 않는다. 인간 판단과 stale 이력,
 actor·Case·Run·멱등 계약은 [Evidence·Claim API](19_evidence_claim_api.md)를
 따른다. Claim 상태는 ERP write 승인 권한이 아니다.
+
+## Agent decision view 계약 (#49·#53·#24)
+
+전체 계획·Case audit을 모델 tool output에 먼저 전달하면 서버의 READY
+결과와 구매 행이 잘려 업무가 실패할 수 있다. Agent 전용 compact view는
+같은 capability·actor·Case scope에서 결정에 필요한 사실을 먼저 제공한다.
+
+| 표면 | 계약 |
+|---|---|
+| GET /api/v1/agent/cases/{ref}/view | 현재 책임·dependency·인간 결정 provenance·구매 상태·QC/recall 배정·Attention·latest plan·planningAttempts |
+| GET /api/v1/agent/plans/{ref}/view | 저장된 계획 facts와 별도 currentAssociation |
+| POST /api/v1/agent/cases/{ref}/plans | 기존 idempotent 계산 service가 반환한 PlanDto의 순수 projection |
+| 기존 GET /agent/cases/{ref}, /agent/plans/{ref} | 같은 인가 아래 full audit 응답 유지 |
+
+viewVersion=1, complete=true인 view는 모든 issues·purchases(선택/대안/
+거부 사유/경고)·totalAmount·범위·기준일·버전·hash를 유지한다. 원자료
+sourceSnapshot, requirements의 production/materials/allocations/exclusions
+배열, forecast dailyDemand/sourceRefs,
+currentBusinessFacts와 2 KiB를 넘는 evidence 본문만 omitted에 명시해 fullRead로
+연결한다. 그 밖의 새로운 결정 필드는 삭제하지 않는다. 숫자는 exact
+Decimal/정수로 보존하고 모델이나 CLI가 MRP·금액을 재계산하지 않는다.
+
+직렬화한 view가 16 KiB를 넘거나 저장된 shape를 해석할 수 없으면
+complete=false·UNAVAILABLE과 fullRead/인간 검토 지침을 반환한다.
+critical 배열을 자르거나 READY 결과 일부를 반환하지 않는다. 해당
+모델은 FAILED를 보고하며 기존 서버 계약으로 Attention을 요청한다.
+읽기 API 자체는 ERP나 governance 기록을 변경하지 않는다.
+
+계산 receipt는 새 조회나 외부 transaction 없이 원래 idempotent 결과를
+projection한다. origin/current attempt는 저장된 PlanDto에 없으므로
+NOT_IN_STORED_DTO로 표시한다. scoped GET의 currentAssociation은
+CURRENT_SCOPED_READ이며 현재 원본 업무·최신 시도 연결이다. Case
+planningAttempts도 현재 정보다. 저장된 plan fact와 혼동하지 않는다.
+최종 완료·최신 시도·승인 검증은 기존 서버 policy가 계속 수행한다.
+
+claim은 Case 상태·planningBasis·현재 계획 연결도 full context에 함께
+캡처한다. full execution_context를 DB audit에 먼저 저장하고 compact
+context만 모델 transport로 보낸다. 원본 context_snapshot·계획/source
+hash는 바꾸지 않으며 full audit/transport의 256 KiB 제한도 유지한다.
+planningBasis는 planningClock과 저장된 plan asOf에 따른 Asia/Seoul
+기준이며 실제 lease clock이나 native 세션 날짜를 대신 사용하지 않는다.

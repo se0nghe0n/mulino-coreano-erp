@@ -9,10 +9,18 @@ description: Use when a Mulino SUPPLY_CHAIN Run needs a persisted replenishment 
 
 ## 계산 절차
 
+기본 Case·plan view가 complete=false면 계산 결과를 추측하지 않고 인간
+확인이 필요하다고 FAILED로 반환한다. 기준일은 서버 planningBasis와
+plan asOf이며 native 세션 날짜를 대신 쓰지 않는다. sourceSnapshot과
+일별 audit을 읽지 않아도 compact result의 status·issues·purchases·
+totalAmount는 같은 서버 계산의 결과다. 현재 업무 연결은 plan show의
+currentAssociation과 Case planningAttempts로 확인하며 최종 검증은
+서버가 수행한다. fullRead는 원자료 audit이 필요한 경우에만 사용한다.
+
 1. `mulino case show <caseRef>`로 현재 업무와 `caseMetadata.replenishment`를 읽는다. 요청의 `warehouseId`, `productIds`, `targetDate`를 유지한다. 범위가 없거나 모호하면 필요한 값을 구체적으로 설명하고 FAILED를 반환한다.
 2. `mulino plan calculate <caseRef> --json '<본문>' --request-key '<workItemRef>:plan:initial'`을 호출한다. 본문은 `{"warehouseId":1,"productIds":[1,2]}`처럼 정확한 Case 범위를 사용한다. `horizonDays`를 생략하면 서버가 목표 날짜로부터 계산한다. 오늘 기준으로 30일을 다시 더하지 않는다. 단위·소수·날짜 계산은 서버가 수행한다.
 3. 반환된 계획 `ref`로 `mulino plan show <ref>`를 호출해 실제 저장을 확인한다. `result.status`가 READY이고 현재 업무에서 만든 최신 계획일 때만 완료를 제안한다. NEEDS_ATTENTION 또는 계산 거부이면 원인·요구 자료·반환된 참조를 설명하고 FAILED로 끝낸다. 과거 READY 결과를 현재 실패의 완료 근거로 사용하지 않는다.
-4. 최종 JSON의 `resultRef`에 계획 참조를 넣고 수요 기준일, 생산·자재 소요량, 선택 공급처·수량·금액, 검토 사항을 `summary`에 짧게 설명한다. 후속 구매안 준비는 Orchestrator가 Procurement에 배정한다. 구매안을 직접 만들거나 승인하지 않는다.
+4. 최종 JSON의 `resultRef`에 계획 참조를 넣고 compact view에 실제로 있는 기준일·수요 요약·구매 순소요량·선택 공급처·수량·금액·issues를 `summary`에 짧게 설명한다. 생략된 일별 생산·allocation audit을 읽었다고 주장하거나 재계산하지 않는다. READY와 현재 업무 연결은 compact view와 서버 완료 검증으로 확인할 수 있다. 후속 구매안 준비는 Orchestrator가 Procurement에 배정한다. 구매안을 직접 만들거나 승인하지 않는다.
 
 ```json
 {"outcome":"DONE","summary":"서버에 재보충 계획을 저장했습니다. 선택 공급처와 구매량은 계획에 있으며 구매안 검토가 필요합니다.","waitingConditions":[],"resultRef":"PLAN-실제응답참조"}

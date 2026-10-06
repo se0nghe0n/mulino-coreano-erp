@@ -45,6 +45,17 @@ class RunExecutionIntegrationTest {
         assertThat(jdbc.sql("SELECT status::text FROM runs WHERE run_ref=:r").param("r",ref).query(String.class).single()).isEqualTo("QUEUED");
     }
 
+    @Test void oversizedFullAuditCannotBeHiddenByCompactTransport() {
+        String ref=queue("SUPPLY_CHAIN");
+        String before=jdbc.sql("SELECT context_snapshot::text FROM runs WHERE run_ref=:r").param("r",ref).query(String.class).single();
+        org.mockito.Mockito.doReturn(Map.of("objective","test","futureAuditBlob","x".repeat(262144)))
+                .when(contexts).build(org.mockito.ArgumentMatchers.anyString());
+        assertThat(execution.claim("oversized-audit")).isEmpty();
+        assertThat(jdbc.sql("SELECT context_snapshot::text FROM runs WHERE run_ref=:r").param("r",ref).query(String.class).single()).isEqualTo(before);
+        assertThat(jdbc.sql("SELECT execution_context IS NULL AND status='FAILED' FROM runs WHERE run_ref=:r").param("r",ref).query(Boolean.class).single()).isTrue();
+        assertThat(jdbc.sql("SELECT count(*) FROM attention_requests WHERE status='OPEN'").query(Long.class).single()).isEqualTo(1);
+    }
+
     @Test void claimReturnsDistinctTokensAndPreservesQueuedSnapshot() throws Exception {
         String ref = queue("SUPPLY_CHAIN");
         Map<String,Object> claim = claim();

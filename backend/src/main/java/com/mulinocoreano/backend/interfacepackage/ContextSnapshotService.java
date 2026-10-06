@@ -227,6 +227,6 @@ public class ContextSnapshotService {
                 .query(String.class)
                 .single();
 
-        return new LinkedHashMap<>(objectMapper.readValue(json, Map.class));
+        return new LinkedHashMap<>(objectMapper.readerFor(Map.class).with(tools.jackson.databind.DeserializationFeature.USE_BIG_DECIMAL_FOR_FLOATS).readValue(json));
     }
 }

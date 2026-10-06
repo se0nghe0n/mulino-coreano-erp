@@ -92,8 +92,10 @@ function failure(result, exitCode, httpStatus) {
 }
 
 for (const [args, path] of [
-  [['case', 'show', 'CASE-DEMO'], '/api/v1/agent/cases/CASE-DEMO'],
-  [['plan', 'show', 'PLAN-DEMO'], '/api/v1/agent/plans/PLAN-DEMO'],
+  [['case', 'show', 'CASE-DEMO'], '/api/v1/agent/cases/CASE-DEMO/view'],
+  [['plan', 'show', 'PLAN-DEMO'], '/api/v1/agent/plans/PLAN-DEMO/view'],
+  [['case', 'show', 'CASE-DEMO', '--full'], '/api/v1/agent/cases/CASE-DEMO'],
+  [['plan', 'show', 'PLAN-DEMO', '--full'], '/api/v1/agent/plans/PLAN-DEMO'],
   [['material', 'show', '9007199254740993'], '/api/v1/agent/materials/9007199254740993'],
   [['po', 'show', '9007199254740993'], '/api/v1/agent/purchase-orders/9007199254740993'],
 ]) {
@@ -113,14 +115,14 @@ test('reference characters are encoded within one path segment', async t => {
   const reference = 'CASE-a/b?c#d%';
   success(await invoke(['case', 'show', reference], server.base));
   assert.equal(server.requests.length, 1);
-  assert.equal(server.requests[0].url, `/api/v1/agent/cases/${encodeURIComponent(reference)}`);
+  assert.equal(server.requests[0].url, `/api/v1/agent/cases/${encodeURIComponent(reference)}/view`);
 });
 
 for (const { name, args, body, path } of [
   { name: 'po propose', args: ['po', 'propose', 'PLAN/DEMO?x#%한'],
     body: '{ }', path: '/api/v1/plans/PLAN%2FDEMO%3Fx%23%25%ED%95%9C/purchase-proposal' },
   { name: 'plan calculate', args: ['plan', 'calculate', 'CASE-DEMO'],
-    body: '{ "warehouseId": 1, "productIds": [1, 2], "horizonDays": 30 }', path: '/api/v1/cases/CASE-DEMO/plans' },
+    body: '{ "warehouseId": 1, "productIds": [1, 2], "horizonDays": 30 }', path: '/api/v1/agent/cases/CASE-DEMO/plans' },
   { name: 'work create', args: ['work', 'create'],
     body: '{"caseRef":"CASE-DEMO","agentKey":"SUPPLY_CHAIN","title":"소요량 계산","metadata":{"quantity":9007199254740993.123456}}', path: '/api/v1/agent/work-items' },
   { name: 'work transition', args: ['work', 'transition', 'WI-SC'],

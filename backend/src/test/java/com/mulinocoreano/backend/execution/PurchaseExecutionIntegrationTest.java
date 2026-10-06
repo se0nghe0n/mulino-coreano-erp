@@ -50,6 +50,7 @@ class PurchaseExecutionIntegrationTest {
     @Autowired RunLeaseRepository leases;
     @Autowired RunExecutionRepository executionRepository;
     @Autowired ExecutionContextBuilder contexts;
+    @Autowired AgentReadViews views;
     @Autowired DispatcherService dispatcher;
     @Autowired PlatformTransactionManager manager;
     @Autowired ObjectMapper mapper;
@@ -296,7 +297,7 @@ class PurchaseExecutionIntegrationTest {
                         mapper,
                         manager,
                         new StaticListableBeanFactory()
-                                .getBeanProvider(ProcurementCompletionVerifier.class), followups, followupRepository);
+                                .getBeanProvider(ProcurementCompletionVerifier.class), followups, followupRepository, views);
         assertThatThrownBy(
                         () ->
                                 tx.execute(

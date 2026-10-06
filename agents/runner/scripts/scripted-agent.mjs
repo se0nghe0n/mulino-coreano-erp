@@ -4,17 +4,21 @@ let input = "";
 for await (const chunk of process.stdin) input += chunk;
 const claim = JSON.parse(input),
   c = claim.context;
+assert.notEqual(c.complete, false, 'Incomplete business view requires human review');
 assert.deepEqual(
   Object.keys(process.env).filter((k) => /TOKEN|SECRET|AUTH0|DB_/.test(k)),
   ["MULINO_TOKEN"],
 );
-const cli = (...a) =>
-  JSON.parse(
+const cli = (...a) => {
+  const result = JSON.parse(
     execFileSync(process.env.DEMO_CLI, a, {
       encoding: "utf8",
       env: process.env,
     }),
   );
+  assert.notEqual(result.complete, false, 'Incomplete business view requires human review');
+  return result;
+};
 const done = (ref = null) => ({
   outcome: "DONE",
   summary: "CLI verified persisted result",

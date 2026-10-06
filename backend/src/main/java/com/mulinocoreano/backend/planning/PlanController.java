@@ -18,8 +18,16 @@ import tools.jackson.databind.JsonNode;
 @RequestMapping("/api/v1")
 public class PlanController {
     private final PlanPersistenceService plans;
+    private final com.mulinocoreano.backend.execution.AgentReadViews views;
 
-    public PlanController(PlanPersistenceService plans) { this.plans = plans; }
+    public PlanController(PlanPersistenceService plans,com.mulinocoreano.backend.execution.AgentReadViews views) { this.plans = plans; this.views=views; }
+
+    @PostMapping("/agent/cases/{caseRef}/plans")
+    public JsonNode calculateView(@PathVariable String caseRef,@Valid @RequestBody PlanRequest request,
+            @RequestHeader("Idempotency-Key") String key,@AuthenticationPrincipal com.mulinocoreano.backend.security.AgentActor actor,
+            @RequestHeader("Authorization") String authorization) {
+        return views.plan(plans.calculateAgent(caseRef,request,key,authorization.substring(7)));
+    }
 
     @PostMapping("/cases/{caseRef}/plans")
     public PlanDto calculate(@PathVariable String caseRef, @Valid @RequestBody PlanRequest request,

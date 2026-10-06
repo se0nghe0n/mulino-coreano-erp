@@ -49,13 +49,21 @@ mulino work transition WORK_ITEM_REF --json BODY --request-key KEY
 | `material show` | `GET /agent/materials/{id}` |
 | `po show` | `GET /agent/purchase-orders/{id}` |
 | `po propose` | `POST /plans/{ref}/purchase-proposal` |
-| `case show` | `GET /agent/cases/{ref}` |
-| `plan show` | `GET /agent/plans/{ref}` |
-| `plan calculate` | `POST /cases/{ref}/plans` |
+| `case show` | `GET /agent/cases/{ref}/view` |
+| `plan show` | `GET /agent/plans/{ref}/view` |
+| `case show --full` | `GET /agent/cases/{ref}` |
+| `plan show --full` | `GET /agent/plans/{ref}` |
+| `plan calculate` | `POST /agent/cases/{ref}/plans` |
 | `work create` | `POST /agent/work-items` |
 | `work transition` | `POST /agent/work-items/{ref}/transition` |
 
 경로는 `MULINO_API_URL` 뒤에 붙습니다. 참조의 특수문자는 하나의 경로 구성요소 안에서 percent-encode합니다. 쓰기는 1~200자 ASCII `--request-key`가 필수이며 `Idempotency-Key` 헤더로 그대로 전달합니다. JSON 본문은 object여야 하고 256 KiB 이내입니다. CLI는 필드별 업무 검증을 중복하지 않습니다.
+
+case/plan 기본 조회와 plan calculate 응답은 서버의 compact view다.
+`--full`은 case/plan show에서만 사용하며 같은 capability scope의
+전체 원자료를 반환한다. complete=false면 일부 결과로 업무를 결정하지
+않고 fullRead를 인간에게 전달한다. CLI는 숫자를 변환하거나 projection을
+계산하지 않고 응답 JSON bytes를 그대로 전달한다.
 
 요청 DTO의 현재 필드는 다음과 같습니다. 서버가 인가한 역할과 범위 안에서만 처리합니다.
 

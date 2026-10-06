@@ -9,6 +9,12 @@ description: Use when a Mulino PROCUREMENT Run receives a persisted replenishmen
 
 ## 설치된 명령과 범위
 
+Case·plan 기본 view가 complete=false면 누락된 사실로 구매안을 만들지
+않고 인간 확인을 요청한다. compact plan의 모든 purchases·issues·
+totalAmount와 version·hash는 서버 계산 그대로다. 이를 모델이 다시
+계산하거나 native 오늘 날짜로 plan 기준일을 바꾸지 않는다.
+po propose의 executionResult는 수정 없이 그대로 최종 반환하고 종료한다.
+
 - `mulino case show <caseRef>` / `mulino plan show <planRef>`: 현재 의무·계획·구매 상태 확인.
 - `mulino material show <id>`: 현재 Case 최신 계획에 관련된 원재료와 현재 공급·거래조건·인증 조회.
 - `mulino po show <id>`: 현재 Case에 적용된 발주 또는 저장된 계획의 실제 발주 행 근거로 범위가 확인된 PO 조회.

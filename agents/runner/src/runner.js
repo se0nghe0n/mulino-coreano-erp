@@ -137,7 +137,7 @@ export class Runner {
     // collects the CLI's final JSON/usage; it never renews authority or sends another finish.
     if (receipt.status !== 'COMPLETED') {
       await handle.cancel('BACKEND_TERMINATED');
-      this.recordModelFinished(claim, handle, await child, secrets, 'BACKEND_TERMINATED');
+      this.recordModelFinished(claim, handle, await child, secrets, 'BACKEND_TERMINATED', receipt.outcome);
       return this.recordTerminal(claim, receipt);
     }
     const deadline = Math.min(runDeadline, this.clock.now() + this.terminalGraceMs);
@@ -158,14 +158,16 @@ export class Runner {
         if (validateResult(event.value).outcome !== receipt.outcome) failure = 'MODEL_TERMINAL_OUTCOME_MISMATCH';
       } catch { failure = 'INVALID_MODEL_RESULT'; }
     }
-    this.recordModelFinished(claim, handle, event, secrets, failure);
+    this.recordModelFinished(claim, handle, event, secrets, failure, receipt.outcome);
     return this.recordTerminal(claim, receipt);
   }
 
-  recordModelFinished(claim, handle, event, secrets, failure = event.error?.code) {
+  recordModelFinished(claim, handle, event, secrets, failure = event.error?.code, storedOutcome) {
     // Never retain child output. Missing usage remains unknown, not an invented zero cost.
     this.log('model_finished', { runRef: claim.runRef, runtime: claim.runtime, model: this.executor.model ?? null,
-      ...(/^[A-Z_]{1,64}$/.test(failure ?? '') ? { failure } : {}), ...(handle.usage ?? {}), ...(handle.diagnostics ?? {}) }, secrets);
+      ...(/^[A-Z_]{1,64}$/.test(failure ?? '') ? { failure } : {}), ...(handle.usage ?? {}), ...(handle.diagnostics ?? {}),
+      ...(['DONE','WAITING','FAILED','ABORTED'].includes(event.value?.outcome) ? {nativeReturnedOutcome:event.value.outcome} : {}),
+      ...(['DONE','WAITING','FAILED','ABORTED'].includes(storedOutcome) ? {storedReceiptOutcome:storedOutcome} : {}) }, secrets);
   }
 
   async requestBefore(action, body, key, deadline, signal) {
