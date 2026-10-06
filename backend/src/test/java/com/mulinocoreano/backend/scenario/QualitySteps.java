@@ -10,7 +10,7 @@ import java.util.Map;
 
 /** Goals 1,2,4,5,6: real runner/CLI inspection and human stdio decisions. SQL only builds fixtures or reads final ERP evidence. */
 public class QualitySteps {
-    @Autowired ScenarioWorld world; @Autowired JdbcClient jdbc; @Autowired ObjectMapper mapper; @Autowired AgentSteps agent;
+    @Autowired ScenarioWorld world; @Autowired JdbcClient jdbc; @Autowired ObjectMapper mapper; @Autowired AgentSteps agent; @Autowired BusinessState state;
     long inboundId,lotId,recordId,approvalId;
     private HumanChannel human(){return new HumanChannel(mapper,world.apiBase());}
     private void fixture(String kind){
@@ -28,7 +28,7 @@ public class QualitySteps {
     private void inspect(){
         var assigned=human().call("OPERATOR","request_quality_inspection",Map.of("inboundId",inboundId,"caseRef",world.caseRef(),"requestKey","quality-assign"));
         assertThat(assigned.isError()).isFalse();
-        agent.driver().awaitState("QC inspection pending",()->jdbc.sql("SELECT count(*) FROM inbound_inspections WHERE inbound_id=:id").param("id",inboundId).query(Long.class).single()==1,agent.timeout());
+        agent.driver().awaitState("QC inspection pending",()->jdbc.sql("SELECT count(*) FROM inbound_inspections WHERE inbound_id=:id").param("id",inboundId).query(Long.class).single()==1,()->state.latestRunFailed(world.caseRef()),agent.timeout());
         approvalId=jdbc.sql("SELECT governance_action_id FROM inbound_inspections WHERE inbound_id=:id").param("id",inboundId).query(Long.class).single();
     }
     @Given("냉장 원재료 입고의 기록 온도가 허용 범위를 벗어났다") public void temperature(){fixture("temperature");}

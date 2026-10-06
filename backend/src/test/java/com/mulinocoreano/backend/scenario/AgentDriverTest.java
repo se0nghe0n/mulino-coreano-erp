@@ -12,6 +12,19 @@ import tools.jackson.databind.ObjectMapper;
 /** 목표 4 보조: 에이전트가 기대 상태에 못 가면 멈추지 않고 이유와 함께 실패하며, 실행기는 반드시 정리된다. */
 class AgentDriverTest {
     @Test
+    void persistedBusinessFailureStopsWaitingWhileNativeProcessRemainsAlive() {
+        var driver = new AgentDriver(new ObjectMapper(), List.of("node", "-e", "setInterval(()=>{},1000)"));
+        driver.start(Map.of());
+        try {
+            long start = System.nanoTime();
+            assertThatThrownBy(() -> driver.awaitState("QC proposal", () -> false, () -> true, Duration.ofMinutes(15)))
+                    .isInstanceOf(AssertionError.class);
+            assertThat(Duration.ofNanos(System.nanoTime() - start).toMillis()).isLessThan(5000);
+            assertThat(driver.isAlive()).isTrue();
+        } finally { driver.stop(); }
+    }
+
+    @Test
     void unreachedStateFailsWithinTheTimeoutAndTheChildIsKilled() {
         var driver = new AgentDriver(new ObjectMapper(),
                 List.of("node", "-e", "console.log(JSON.stringify({event:'model_finished',failure:'MODEL_OUTPUT_TOO_LARGE'})); setInterval(()=>{},1000)"));
