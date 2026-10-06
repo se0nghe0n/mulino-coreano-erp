@@ -1,0 +1,798 @@
+{
+  "asOf": "2026-10-06",
+  "sourceBaseline": "0132e0a62ad9f086e5c70c5c857d4546f5921ef9",
+  "classification": "local PoC; current Claude five-case business UAT accepted at 4e6935d; historical failures preserved; Codex parity and actual client #35 pending",
+  "supplier": {
+    "commit": "0132e0a62ad9f086e5c70c5c857d4546f5921ef9",
+    "tests": {
+      "tests": 567,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 18
+    },
+    "executablePassed": 549,
+    "sit": {
+      "tests": 20,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "supplierBusinessCases": 7,
+    "jarSha256": "4cc3ed1977f72538b51e025b09937f4b122a19e6305f4d0f5a939d82cfbb3369",
+    "crudFive": true,
+    "swaggerFive": true,
+    "auditCount": 3,
+    "canonicalReplay": true,
+    "softDelete": true,
+    "ddlFlywayEqual": true,
+    "constraints": 756,
+    "triggers": 124
+  },
+  "recall": {
+    "commit": "5911721de4cfb53fa65fc82518df326bd9c49a3a",
+    "jarSha256": "b0dd6ea0f3c9ebfd1af635fa795b1d4852ef0700e7b770a9b0ea286a687a4b11",
+    "productionLots": 10,
+    "incidentRawRoots": 2,
+    "evidenceRawLots": 3,
+    "customers": 2,
+    "shipments": 115,
+    "unrelatedLotExcluded": true,
+    "replayStable": true,
+    "reportStatus": "PENDING",
+    "reportTransport": "OFFLINE",
+    "submittedAt": null
+  },
+  "evidence": {
+    "commit": "0ee144c08a941c679cedcca92b821ed992398c85",
+    "jarSha256": "6a59edb9a6801720f6018c49bf7e32af65b7f45e6da2a1e50a26b73e87c9602a",
+    "sources": 3,
+    "judgments": 7,
+    "explicitSupersessionPreservesOriginalConflict": true,
+    "explicitHumanAttestation": true,
+    "erpWrites": 0,
+    "mcpTests": 26,
+    "runnerTests": 57,
+    "zigTests": 7,
+    "cliSmoke": 32
+  },
+  "purchase": {
+    "commit": "d7ce2d8",
+    "demoPassed": 5,
+    "demoTotal": 5
+  },
+  "nativeUat": {
+    "historical": {
+      "commit": "cb04403",
+      "date": "2026-10-03",
+      "runtime": "Claude Code",
+      "passed": 3,
+      "currentSourceAcceptance": false
+    },
+    "current": {
+      "plannedScenarios": 5,
+      "status": "ACCEPTANCE_INCOMPLETE",
+      "passedCheckpoint": {
+        "testCase": "TC-P2P-001",
+        "status": "PASSED",
+        "runtime": "CLAUDE",
+        "model": "claude-sonnet-5",
+        "imageSha256": "sha256:aa055d76d0c8d44b9707c84726101e551ec123dc0dba714bea4746b02d4d4656",
+        "backendJarSha256": "4cc3ed1977f72538b51e025b09937f4b122a19e6305f4d0f5a939d82cfbb3369",
+        "appliedPurchaseOrders": 1,
+        "appliedPurchaseTotalKrw": 16500,
+        "caseStatus": "WAITING",
+        "coordinatorOutcome": "DONE",
+        "runCount": 5,
+        "usageComplete": true,
+        "cliReportedCostUsd": 3.0874898000000006,
+        "inputTokens": 94,
+        "outputTokens": 18050,
+        "cacheReadTokens": 4165609,
+        "cacheWriteTokens": 518420,
+        "scope": "confirmed original P2P001 attempt; final native acceptance source2d2a900 includes two PASS but overall acceptance incomplete"
+      },
+      "acceptanceCommit": "2d2a900b59a8704e27a4462740196b2c4902829b",
+      "productionBaseline": "0132e0a62ad9f086e5c70c5c857d4546f5921ef9",
+      "runtime": "CLAUDE",
+      "model": "claude-sonnet-5",
+      "acceptanceCounts": {
+        "PASSED": 2,
+        "FAILED": 2,
+        "INCOMPLETE": 1
+      },
+      "cases": [
+        {
+          "testCase": "TC-P2P-001",
+          "status": "PASSED",
+          "orders": 1,
+          "totalKrw": 16500,
+          "caseStatus": "WAITING",
+          "coordinatorOutcome": "DONE",
+          "runCount": 5,
+          "usageComplete": true,
+          "cliReportedCostUsd": "3.0874898"
+        },
+        {
+          "testCase": "TC-P2P-002",
+          "status": "PASSED",
+          "orders": 0,
+          "followups": 0,
+          "caseStatus": "OPEN",
+          "coordinatorOutcome": "ABORTED",
+          "humanDecision": "MANAGER BLOCK",
+          "reason": "scenario BLOCK",
+          "runCount": 5,
+          "usageComplete": true,
+          "cliReportedCostUsd": "3.2866446",
+          "evidenceLimit": "reason and BLOCKED assertion from test path; original hook had no standalone decision/work/Attention DB export"
+        },
+        {
+          "testCase": "TC-P2P-004",
+          "status": "FAILED",
+          "orders": 1,
+          "totalKrw": 17000,
+          "caseStatus": "WAITING",
+          "finalCoordinatorFailure": "MODEL_PROCESS_FAILED",
+          "runCount": 9,
+          "usageComplete": false,
+          "cliReportedCostUsd": "6.2873046",
+          "pastFailureCause": "unknown"
+        },
+        {
+          "testCase": "TC-QM-001",
+          "status": "FAILED",
+          "inspectionProposals": 0,
+          "failure": "MODEL_PROCESS_FAILED",
+          "resolvedModel": null,
+          "cliReportedCostUsd": "0",
+          "cliReportedTokens": 0,
+          "pastFailureCause": "unknown"
+        },
+        {
+          "testCase": "TC-RC-001",
+          "status": "INCOMPLETE",
+          "rawStatus": "PASSED",
+          "proposalAndTraceAssertionsPassed": true,
+          "nativeFinalizationAndUsageComplete": false,
+          "cliReportedCostUsd": null,
+          "tokens": null,
+          "evidenceLimit": "raw record preserved; separate classification required; no valid reacceptance"
+        }
+      ],
+      "knownCliReportedCostUsd": "12.662505",
+      "overallCostUsd": null,
+      "overallTokens": null,
+      "codexParity": {
+        "testCase": "TC-P2P-001",
+        "status": "FAILED",
+        "runtime": "CODEX",
+        "requestedModel": "gpt-5.6-sol",
+        "catalogDefaultEffort": "low",
+        "executionReady": false,
+        "accountingStatus": "PARTIAL",
+        "reportedCostUsd": null,
+        "tokens": null,
+        "failure": "MODEL_PROCESS_FAILED",
+        "currentMetadataGate": "AUTHENTICATION",
+        "pastFailureCause": "unknown"
+      },
+      "currentAccessGate": "CODEX account/rateLimits/read AUTHENTICATION",
+      "pastFailureCauses": "unknown; current metadata authentication failure does not establish past model failure cause",
+      "humanLoginRefresh": {
+        "status": "PREPARED_NOT_EXECUTED",
+        "reacceptance": "NOT_EXECUTED"
+      },
+      "checks": {
+        "runner": 76,
+        "UatEvidenceHelper": 7,
+        "SIT": 20,
+        "SITFailures": 0,
+        "SITSkipped": 0,
+        "SITDuration": "3m21s",
+        "lastSITLimit": "before logging-only Codex diagnostics extension",
+        "imageSmoke": "passed; modelRequests=0",
+        "bootJar": "passed/up-to-date",
+        "full549UnitRepeat": false
+      },
+      "productionSourceManifest": {
+        "image": "sha256:aa055d76d0c8d44b9707c84726101e551ec123dc0dba714bea4746b02d4d4656",
+        "files": {
+          "agents/cli/src/cli.zig": "2c67367c817edd76490d687d5cb00044bb003b808f216379a55d9d2e2680f37d",
+          "agents/cli/src/main.zig": "f80aac34914eaedbd1e94669344cb0490161583daa3cc01f498382e4636287a4",
+          "agents/skills/orchestrator/SKILL.md": "0c9ebfc658a032db4251aabd625429abb9bce807bd60457cde2cff1ec57cf240",
+          "agents/skills/procurement/SKILL.md": "418e942a104bef7e81a6c23eec5ac12a956179f9345c4d28c78e591a47372b71",
+          "agents/skills/qc/SKILL.md": "76814c7532cddd131587c2d260ea156cbbfea65deedb66375b5876caf1b8f390",
+          "agents/skills/runtime.md": "7cbc10b5d4b0498f1fda3613b1b0fce11462b8e1a434c7f036b17261603cf200",
+          "agents/skills/supply-chain/SKILL.md": "bf4e4f03fadfcf3923895928d0579a7bc6c95232ac150e5fae77a454ef7c6eef",
+          "backend/build/libs/backend-0.0.1-SNAPSHOT.jar": "4cc3ed1977f72538b51e025b09937f4b122a19e6305f4d0f5a939d82cfbb3369"
+        },
+        "productionCliRolesJarUnchangedDuringAttempts": true
+      },
+      "harnessSourceHashes": {
+        "agents/runner/src/executor.js": "ad9cc70e19391824af55bef5f38d097019efe9eaa05b99593c31a3df7c7bbe48",
+        "agents/runner/src/http.js": "fb96ec2dd318186f3c19dd69469bee68a158687a149270d7f61190ea5f2a61f0",
+        "agents/runner/src/main.js": "59d2c7e473f94403292207f9e0bfbe76c0f0ceb898c6a1ced929c3eaa22c6170",
+        "agents/runner/src/native-diagnostics.js": "e88b19b084a4a7e44f2762bdb9ad6527f5f9539ec776a04b8e9e64a2d29a68f4",
+        "agents/runner/src/protocol.js": "64a5afaadcdd1360e9702b98ac426445138d58b7f28abacd2efb73d493312d37",
+        "agents/runner/src/runner.js": "b9f905776d9b0b8fce7dd1c8ca0d660317ec96255d6055ce911db1db68b3e4c6",
+        "agents/runner/src/runtime-config.js": "94612b493b7abe9b490f931f59e8b5eee86b52dd7527014fb2324e1abe03e4fa",
+        "agents/runner/test/executor.test.js": "c7fc895377dde311c253d86071586a7eae0a9ce0d53ca820cf67a4b57288e74d",
+        "agents/runner/test/fixtures/child.js": "db58532cccae5b08a4b46ac1d70ab98886d09c8eee6995a32cb35bf0249a8b2b",
+        "agents/runner/test/protocol-auth.test.js": "bad81ce2c2a71a626a4b6042d82936bfbb84e65644bf4921cbbcc4a51b63187f",
+        "agents/runner/test/runner.test.js": "e20b93e76f4fb700118b19b8e12284d55904205975bb11ca76a39619bb3f2454",
+        "agents/runner/test/runtime.test.js": "7df85b49e379d50c56604b4228780c4cf8da85647d246a82310511a555adf6e4",
+        "backend/src/test/java/com/mulinocoreano/backend/scenario/AgentDriver.java": "bd68020c92bbd58597e82fecbd491665f1dfa5efb3c69d2c03e506c86abab0a8",
+        "backend/src/test/java/com/mulinocoreano/backend/scenario/AgentDriverTest.java": "4ad03929c13ad381742fc32376b5adc41c3406fc21bb2f73644f9393859a4211",
+        "backend/src/test/java/com/mulinocoreano/backend/scenario/AgentSteps.java": "2d4fb52d7167399658aa41fc15755614bb948decf62f885903348004068b482b",
+        "backend/src/test/java/com/mulinocoreano/backend/scenario/BackendRestartRecoveryTest.java": "a9545c660fed86b6a783e41c80f349b51bd13a9d557c70257515d254b7068393",
+        "backend/src/test/java/com/mulinocoreano/backend/scenario/BusinessState.java": "b6600dd46c4c99d869fb0994d4c8165a314f5df625b5dfe010b0cf1c72f663ec",
+        "backend/src/test/java/com/mulinocoreano/backend/scenario/FixtureSteps.java": "594ce7539d78cda6a26878ceea591a29057b0158df97c5b9d7aa71988d322c1d",
+        "backend/src/test/java/com/mulinocoreano/backend/scenario/HumanChannel.java": "8ee87f3602ef33111fbb77976bbacc5f9c7dc2bec8aff45e96f40cc1930e7c67",
+        "backend/src/test/java/com/mulinocoreano/backend/scenario/HumanSteps.java": "acb49a4f080759a6a5aa7c752e5dbcb1efd21fc217af03b01b854561abcf44d8",
+        "backend/src/test/java/com/mulinocoreano/backend/scenario/QualitySteps.java": "8ee3bd488aa69acff56d9f6e1d5ad16243b4d7e9d8726dea5c91875544fe8d2b",
+        "backend/src/test/java/com/mulinocoreano/backend/scenario/RecallSteps.java": "3b8760f7ef190a0d70d8a129dc9cca2caf2ddc5b0e8f6d78c0f89bd213380697",
+        "backend/src/test/java/com/mulinocoreano/backend/scenario/ScenarioContext.java": "a12f04331b44b7521a085cf1d9281bc5f4afd4cb54e08f6f5eaf539625ee5c49",
+        "backend/src/test/java/com/mulinocoreano/backend/scenario/ScenarioGuard.java": "63aaab3864413cabf75d2e75e7879911cfac6e5611fe95eae4a9cb598b819ba7",
+        "backend/src/test/java/com/mulinocoreano/backend/scenario/ScenarioGuardTest.java": "2465076d9a9472c9ee62aa0de2f0ca5ae5a7cbe5f9950cb1aea4d5b9f2eebdf9",
+        "backend/src/test/java/com/mulinocoreano/backend/scenario/ScenarioSecrets.java": "56a8c790e9b16a492ad4c3dff3c3f2045f3a0f7b1822cf1499379c8e6d8662c7",
+        "backend/src/test/java/com/mulinocoreano/backend/scenario/ScenarioSuite.java": "08d19bb722661e5b5243fc8d1e5d25c178326c4dd58d7452e4514bd12054ad79",
+        "backend/src/test/java/com/mulinocoreano/backend/scenario/ScenarioWorld.java": "e6cd86ba9a8709a77b157ab8fa3f8aea82de3835b08059fa79dccfafa8690f56",
+        "backend/src/test/java/com/mulinocoreano/backend/scenario/ScenarioWorldTest.java": "83656955f37f8a9de32a18b1b2b3e878419894252659eae946ecac4951564a8b",
+        "backend/src/test/java/com/mulinocoreano/backend/scenario/StateSteps.java": "93c7ed8f437d439d69cb54cb9732bd7c8740cb89a4d5bcdc2a763634c3d37c61",
+        "backend/src/test/java/com/mulinocoreano/backend/scenario/UatEvidence.java": "c3e0dfb2464a21663d05210e093bdf8f20ea6ccb349473122dcd0c1fb2f5c78a",
+        "backend/src/test/java/com/mulinocoreano/backend/scenario/UatEvidenceTest.java": "341805f95a65fa6ad34c114b947da6fcb0690d9117a45bfcf3951d7824479965",
+        "backend/src/test/java/com/mulinocoreano/backend/scenario/WorldSteps.java": "6cf69a7c8ee6d5d2e038055818715e38916036c700bacec40cc3c1e2f37318e0"
+      },
+      "originalKnownCliReportedCostUsd": "12.661439",
+      "recoveryAttempt": {
+        "commit": "e61ded2e93c0e241be62d87347534503652d74dc",
+        "integratedBaseline": "5a6addae8b60930a65bea7279f8deb82f762ef10",
+        "runtime": "CLAUDE",
+        "model": "claude-sonnet-5",
+        "cases": [
+          {
+            "testCase": "TC-P2P-004",
+            "status": "FAILED",
+            "caseStatus": "OPEN",
+            "executionReady": false,
+            "accountingStatus": "PARTIAL",
+            "reportedCostUsd": 0,
+            "erpWrites": 0,
+            "usageComplete": false,
+            "resolvedModel": null,
+            "failure": "MODEL_PROCESS_FAILED",
+            "nativeFailureCategory": "UNKNOWN_NATIVE_FAILURE",
+            "nativeSignal": "SIGKILL",
+            "reasonInference": "unknown; native subtype success does not establish business pass"
+          },
+          {
+            "testCase": "TC-QM-001",
+            "status": "FAILED",
+            "caseStatus": "OPEN",
+            "executionReady": false,
+            "accountingStatus": "PARTIAL",
+            "reportedCostUsd": 0,
+            "erpWrites": 0,
+            "usageComplete": false,
+            "resolvedModel": null,
+            "failure": "MODEL_PROCESS_FAILED",
+            "nativeFailureCategory": "UNKNOWN_NATIVE_FAILURE",
+            "nativeSignal": "SIGKILL",
+            "reasonInference": "unknown; native subtype success does not establish business pass"
+          },
+          {
+            "testCase": "TC-RC-001",
+            "status": "FAILED",
+            "caseStatus": "OPEN",
+            "executionReady": false,
+            "accountingStatus": "PARTIAL",
+            "reportedCostUsd": 0,
+            "erpWrites": 0,
+            "usageComplete": false,
+            "resolvedModel": null,
+            "failure": "MODEL_PROCESS_FAILED",
+            "nativeFailureCategory": "UNKNOWN_NATIVE_FAILURE",
+            "nativeSignal": "SIGKILL",
+            "reasonInference": "unknown; native subtype success does not establish business pass"
+          }
+        ],
+        "erpWrites": 0,
+        "noBusinessAcceptanceRecovery": true,
+        "loggingOnlyChecks": {
+          "runner": 82,
+          "UatEvidenceHelper": 7,
+          "failures": 0,
+          "fullUnitSITRepeat": false,
+          "previousSIT": 20,
+          "scope": "logging-only diagnostic metadata; readiness/schema/business validation unchanged"
+        },
+        "productionJarImageUnchanged": true,
+        "imageSha256": "sha256:aa055d76d0c8d44b9707c84726101e551ec123dc0dba714bea4746b02d4d4656",
+        "jarSha256": "4cc3ed1977f72538b51e025b09937f4b122a19e6305f4d0f5a939d82cfbb3369",
+        "sourceHashes": {
+          "agents/cli/src/cli.zig": "2c67367c817edd76490d687d5cb00044bb003b808f216379a55d9d2e2680f37d",
+          "agents/cli/src/main.zig": "f80aac34914eaedbd1e94669344cb0490161583daa3cc01f498382e4636287a4",
+          "agents/runner/src/executor.js": "ad9cc70e19391824af55bef5f38d097019efe9eaa05b99593c31a3df7c7bbe48",
+          "agents/runner/src/http.js": "fb96ec2dd318186f3c19dd69469bee68a158687a149270d7f61190ea5f2a61f0",
+          "agents/runner/src/main.js": "59d2c7e473f94403292207f9e0bfbe76c0f0ceb898c6a1ced929c3eaa22c6170",
+          "agents/runner/src/native-diagnostics.js": "62fe875a99aea091e5717d265f21c40d389b9fe55975e569b0a04b815e73595b",
+          "agents/runner/src/protocol.js": "64a5afaadcdd1360e9702b98ac426445138d58b7f28abacd2efb73d493312d37",
+          "agents/runner/src/runner.js": "b9f905776d9b0b8fce7dd1c8ca0d660317ec96255d6055ce911db1db68b3e4c6",
+          "agents/runner/src/runtime-config.js": "94612b493b7abe9b490f931f59e8b5eee86b52dd7527014fb2324e1abe03e4fa",
+          "agents/skills/orchestrator/SKILL.md": "0c9ebfc658a032db4251aabd625429abb9bce807bd60457cde2cff1ec57cf240",
+          "agents/skills/procurement/SKILL.md": "418e942a104bef7e81a6c23eec5ac12a956179f9345c4d28c78e591a47372b71",
+          "agents/skills/qc/SKILL.md": "76814c7532cddd131587c2d260ea156cbbfea65deedb66375b5876caf1b8f390",
+          "agents/skills/runtime.md": "7cbc10b5d4b0498f1fda3613b1b0fce11462b8e1a434c7f036b17261603cf200",
+          "agents/skills/supply-chain/SKILL.md": "bf4e4f03fadfcf3923895928d0579a7bc6c95232ac150e5fae77a454ef7c6eef",
+          "backend/build/libs/backend-0.0.1-SNAPSHOT.jar": "4cc3ed1977f72538b51e025b09937f4b122a19e6305f4d0f5a939d82cfbb3369",
+          "backend/src/test/java/com/mulinocoreano/backend/scenario/AgentDriver.java": "bd68020c92bbd58597e82fecbd491665f1dfa5efb3c69d2c03e506c86abab0a8",
+          "backend/src/test/java/com/mulinocoreano/backend/scenario/AgentDriverTest.java": "4ad03929c13ad381742fc32376b5adc41c3406fc21bb2f73644f9393859a4211",
+          "backend/src/test/java/com/mulinocoreano/backend/scenario/AgentSteps.java": "2d4fb52d7167399658aa41fc15755614bb948decf62f885903348004068b482b",
+          "backend/src/test/java/com/mulinocoreano/backend/scenario/BackendRestartRecoveryTest.java": "a9545c660fed86b6a783e41c80f349b51bd13a9d557c70257515d254b7068393",
+          "backend/src/test/java/com/mulinocoreano/backend/scenario/BusinessState.java": "b6600dd46c4c99d869fb0994d4c8165a314f5df625b5dfe010b0cf1c72f663ec",
+          "backend/src/test/java/com/mulinocoreano/backend/scenario/FixtureSteps.java": "594ce7539d78cda6a26878ceea591a29057b0158df97c5b9d7aa71988d322c1d",
+          "backend/src/test/java/com/mulinocoreano/backend/scenario/HumanChannel.java": "8ee87f3602ef33111fbb77976bbacc5f9c7dc2bec8aff45e96f40cc1930e7c67",
+          "backend/src/test/java/com/mulinocoreano/backend/scenario/HumanSteps.java": "acb49a4f080759a6a5aa7c752e5dbcb1efd21fc217af03b01b854561abcf44d8",
+          "backend/src/test/java/com/mulinocoreano/backend/scenario/QualitySteps.java": "8ee3bd488aa69acff56d9f6e1d5ad16243b4d7e9d8726dea5c91875544fe8d2b",
+          "backend/src/test/java/com/mulinocoreano/backend/scenario/RecallSteps.java": "3b8760f7ef190a0d70d8a129dc9cca2caf2ddc5b0e8f6d78c0f89bd213380697",
+          "backend/src/test/java/com/mulinocoreano/backend/scenario/ScenarioContext.java": "a12f04331b44b7521a085cf1d9281bc5f4afd4cb54e08f6f5eaf539625ee5c49",
+          "backend/src/test/java/com/mulinocoreano/backend/scenario/ScenarioGuard.java": "63aaab3864413cabf75d2e75e7879911cfac6e5611fe95eae4a9cb598b819ba7",
+          "backend/src/test/java/com/mulinocoreano/backend/scenario/ScenarioGuardTest.java": "2465076d9a9472c9ee62aa0de2f0ca5ae5a7cbe5f9950cb1aea4d5b9f2eebdf9",
+          "backend/src/test/java/com/mulinocoreano/backend/scenario/ScenarioSecrets.java": "56a8c790e9b16a492ad4c3dff3c3f2045f3a0f7b1822cf1499379c8e6d8662c7",
+          "backend/src/test/java/com/mulinocoreano/backend/scenario/ScenarioSuite.java": "08d19bb722661e5b5243fc8d1e5d25c178326c4dd58d7452e4514bd12054ad79",
+          "backend/src/test/java/com/mulinocoreano/backend/scenario/ScenarioWorld.java": "e6cd86ba9a8709a77b157ab8fa3f8aea82de3835b08059fa79dccfafa8690f56",
+          "backend/src/test/java/com/mulinocoreano/backend/scenario/ScenarioWorldTest.java": "83656955f37f8a9de32a18b1b2b3e878419894252659eae946ecac4951564a8b",
+          "backend/src/test/java/com/mulinocoreano/backend/scenario/StateSteps.java": "93c7ed8f437d439d69cb54cb9732bd7c8740cb89a4d5bcdc2a763634c3d37c61",
+          "backend/src/test/java/com/mulinocoreano/backend/scenario/UatEvidence.java": "b42b6643540481ffd6522e5695552dc812d1eb64e89cf0e3a1667b8cbe9d9965",
+          "backend/src/test/java/com/mulinocoreano/backend/scenario/UatEvidenceTest.java": "341805f95a65fa6ad34c114b947da6fcb0690d9117a45bfcf3951d7824479965",
+          "backend/src/test/java/com/mulinocoreano/backend/scenario/WorldSteps.java": "6cf69a7c8ee6d5d2e038055818715e38916036c700bacec40cc3c1e2f37318e0"
+        }
+      },
+      "diagnostics": {
+        "normalWritableMountMinimal": {
+          "status": "PASSED_DIAGNOSTIC_ONLY",
+          "reportedCostUsd": "0.001066",
+          "businessAcceptance": false,
+          "budgetUsd": "0.05"
+        },
+        "controlledNoToolSchemaProbes": {
+          "productionSchema": "FAILED",
+          "basicBooleanSchema": "FAILED",
+          "toolAvailability": "none",
+          "budgetUsd": "0.045",
+          "budgetInterpretation": "per-probe maximum, not reported cost",
+          "reportedCostUsd": 0,
+          "staticStructuredResultValid": false,
+          "nativeExitCode": 1,
+          "sameFingerprint": true,
+          "errorFingerprint": "8378c30e44e0ccecc1544d814a0fd4ad9f168c645c2716d0c0c49d52c7f111f0",
+          "resolvedModel": null,
+          "rawErrorAvailability": "discarded, unavailable",
+          "exactCause": "unknown",
+          "limits": "tools-disabled x structured-output/schema/budget path unresolved; different USD0.05 vs0.045 budgets; no authentication or specific keyword cause established"
+        }
+      },
+      "acceptanceCountsScope": "original five-case attempt history; later recovery has separate records",
+      "latestCaseAcceptance": {
+        "TC-P2P-001": "PASSED",
+        "TC-P2P-002": "PASSED",
+        "TC-P2P-004": "FAILED",
+        "TC-QM-001": "FAILED",
+        "TC-RC-001": "FAILED"
+      },
+      "latestCaseAcceptanceCounts": {
+        "PASSED": 2,
+        "FAILED": 3
+      }
+    },
+    "currentAccepted": {
+      "status": "CLAUDE_LOCAL_BUSINESS_UAT_PASSED",
+      "acceptedProductionSource": "4e6935de693b433755e12b4ffcf0197297a6ae31",
+      "sourceClean": true,
+      "runtime": "CLAUDE",
+      "model": "claude-sonnet-5",
+      "acceptanceCounts": {
+        "PASSED": 5,
+        "FAILED": 0,
+        "INCOMPLETE": 0
+      },
+      "runtimeImage": "mulino-agent-runtime:manager-proof-1006",
+      "imageSha256": "sha256:143e19e38f669ecd6bc0f71c4396008140701e7e57a69c52f9e5f88e520f1567",
+      "backendJarSha256": "11d73935589fee336f6011d5a034e497814bbc917f759e829024e02e59604f2d",
+      "displayTotalReportedCostUsd": "2.9853428",
+      "exactJsonDecimalTotalReportedCostUsd": "2.98534280000000011",
+      "costPrecisionNote": "Exact JSON Decimal sum includes float representation; displayed sum rounded to seven decimal places",
+      "unknownCostsThisBatch": 0,
+      "historicalOverallCostUsd": null,
+      "historicalOverallTokens": null,
+      "nativeRuns": 21,
+      "matchingModelFinishedEvents": 21,
+      "allNativeExitCodesZero": true,
+      "allAccountingComplete": true,
+      "allUsageComplete": true,
+      "allReceiptOutcomesMatch": true,
+      "permissionDenials": 0,
+      "cases": [
+        {
+          "testCase": "TC-P2P-001",
+          "status": "PASSED",
+          "runCount": 5,
+          "caseStatus": "WAITING",
+          "displayReportedCostUsd": "0.6780952",
+          "exactJsonDecimalReportedCostUsd": "0.67809520000000002",
+          "usageComplete": true,
+          "accountingStatus": "COMPLETE",
+          "nativeOutcomes": [
+            "WAITING",
+            "DONE",
+            "WAITING",
+            "WAITING",
+            "DONE"
+          ],
+          "receiptOutcomes": [
+            "WAITING",
+            "DONE",
+            "WAITING",
+            "WAITING",
+            "DONE"
+          ],
+          "reportedTokens": {
+            "inputTokens": 56,
+            "outputTokens": 8033,
+            "cacheReadTokens": 624366,
+            "cacheWriteTokens": 118195
+          },
+          "appliedPurchaseOrders": 1,
+          "appliedPurchaseTotalKrw": 16500.0,
+          "originalCoordinationWorkStatus": "DONE"
+        },
+        {
+          "testCase": "TC-P2P-002",
+          "status": "PASSED",
+          "runCount": 5,
+          "caseStatus": "OPEN",
+          "displayReportedCostUsd": "0.7219284",
+          "exactJsonDecimalReportedCostUsd": "0.72192840000000006",
+          "usageComplete": true,
+          "accountingStatus": "COMPLETE",
+          "nativeOutcomes": [
+            "WAITING",
+            "DONE",
+            "WAITING",
+            "WAITING",
+            "ABORTED"
+          ],
+          "receiptOutcomes": [
+            "WAITING",
+            "DONE",
+            "WAITING",
+            "WAITING",
+            "ABORTED"
+          ],
+          "reportedTokens": {
+            "inputTokens": 60,
+            "outputTokens": 8161,
+            "cacheReadTokens": 664752,
+            "cacheWriteTokens": 126812
+          },
+          "appliedPurchaseOrders": 0,
+          "appliedPurchaseTotalKrw": 0,
+          "humanDecision": "final MANAGER BLOCK",
+          "reissue": false,
+          "nativeFinalOutcome": "ABORTED",
+          "receiptFinalOutcome": "ABORTED",
+          "originalCoordinationWorkStatus": "BLOCKED",
+          "backendAttention": "OPEN JUDGMENT_REQUIRED retained",
+          "immutableActorProvenance": "IMMUTABLE_PURCHASE_DECIDED_AUDIT"
+        },
+        {
+          "testCase": "TC-P2P-004",
+          "status": "PASSED",
+          "runCount": 9,
+          "caseStatus": "WAITING",
+          "displayReportedCostUsd": "1.3771636",
+          "exactJsonDecimalReportedCostUsd": "1.37716360000000001",
+          "usageComplete": true,
+          "accountingStatus": "COMPLETE",
+          "nativeOutcomes": [
+            "WAITING",
+            "DONE",
+            "WAITING",
+            "WAITING",
+            "WAITING",
+            "DONE",
+            "WAITING",
+            "WAITING",
+            "DONE"
+          ],
+          "receiptOutcomes": [
+            "WAITING",
+            "DONE",
+            "WAITING",
+            "WAITING",
+            "WAITING",
+            "DONE",
+            "WAITING",
+            "WAITING",
+            "DONE"
+          ],
+          "reportedTokens": {
+            "inputTokens": 106,
+            "outputTokens": 18858,
+            "cacheReadTokens": 1245318,
+            "cacheWriteTokens": 234827
+          },
+          "appliedPurchaseOrders": 1,
+          "appliedPurchaseTotalKrw": 17000.0,
+          "oldProposal": "EXPIRED",
+          "oldProposalPurchaseOrders": 0,
+          "explicitHumanRecalculation": true,
+          "newProposalApproved": true,
+          "originalCoordinationWorkStatus": "DONE"
+        },
+        {
+          "testCase": "TC-QM-001",
+          "status": "PASSED",
+          "runCount": 1,
+          "caseStatus": "OPEN",
+          "displayReportedCostUsd": "0.1040890",
+          "exactJsonDecimalReportedCostUsd": "0.10408900000000001",
+          "usageComplete": true,
+          "accountingStatus": "COMPLETE",
+          "nativeOutcomes": [
+            "WAITING"
+          ],
+          "receiptOutcomes": [
+            "WAITING"
+          ],
+          "reportedTokens": {
+            "inputTokens": 12,
+            "outputTokens": 1156,
+            "cacheReadTokens": 100905,
+            "cacheWriteTokens": 18081
+          },
+          "appliedPurchaseOrders": 0,
+          "appliedPurchaseTotalKrw": 0,
+          "qualityApproval": "PENDING QC",
+          "inboundStatus": "HOLD",
+          "remainingQuantity": 2,
+          "erpApplied": 0
+        },
+        {
+          "testCase": "TC-RC-001",
+          "status": "PASSED",
+          "runCount": 1,
+          "caseStatus": "OPEN",
+          "displayReportedCostUsd": "0.1040666",
+          "exactJsonDecimalReportedCostUsd": "0.10406660000000001",
+          "usageComplete": true,
+          "accountingStatus": "COMPLETE",
+          "nativeOutcomes": [
+            "WAITING"
+          ],
+          "receiptOutcomes": [
+            "WAITING"
+          ],
+          "reportedTokens": {
+            "inputTokens": 14,
+            "outputTokens": 1740,
+            "cacheReadTokens": 129053,
+            "cacheWriteTokens": 15207
+          },
+          "appliedPurchaseOrders": 0,
+          "appliedPurchaseTotalKrw": 0,
+          "recallApproval": "PENDING ADMIN",
+          "rawLots": 3,
+          "productionLots": 10,
+          "customers": 2,
+          "shipments": 115,
+          "erpApplied": 0,
+          "reportTransport": "OFFLINE"
+        }
+      ],
+      "verification": {
+        "fullBackendBeforeHelperProseCancelCorrection": {
+          "discovered": 587,
+          "activePassed": 569,
+          "excluded": 18,
+          "failures": 0,
+          "errors": 0,
+          "bootJar": "PASSED"
+        },
+        "initialScriptedSit": {
+          "passed": 19,
+          "failed": 1,
+          "cause": "Generic stop helper incorrectly accepted BLOCK only and rejected final MANAGER CANCEL; failure preserved"
+        },
+        "afterFinalHelperProseCorrection": {
+          "focusedDiscovered": 40,
+          "focusedActivePassed": 22,
+          "excluded": 18,
+          "fullScriptedSitPassed": 20,
+          "bootJar": "PASSED",
+          "runnerPassed": 84,
+          "noModelImageSmokeAndCancellation": "PASSED",
+          "modelRequests": 0,
+          "fullBackendRerun": false
+        },
+        "compactSourceCheckpoint": {
+          "source": "17560f2",
+          "backendActivePassed": 562,
+          "scriptedSitPassed": 20,
+          "mcpPassed": 26,
+          "cliSmokePassed": 34,
+          "zigPassed": 7,
+          "nativePassed": 4,
+          "nativeFailed": 1
+        },
+        "unchangedVsCompactImage": [
+          "CLI bytes",
+          "Claude native executable bytes",
+          "Codex native executable bytes",
+          "native lock bytes"
+        ],
+        "changedVsHistoricalSupplier0132": [
+          "backend JAR",
+          "agent read views",
+          "role guidance"
+        ],
+        "actorProvenance": "Forward-only immutable actor snapshot; legacy UNKNOWN, no backfill",
+        "policyBoundary": "Backend approval and ABORTED Attention policies unchanged"
+      },
+      "codexCurrentAccessGate": {
+        "supportedAccountReadRefreshToken": true,
+        "account": null,
+        "requiresOpenaiAuth": true,
+        "rateLimits": "AUTHENTICATION",
+        "loginStarted": false,
+        "modelCalls": 0,
+        "pastFailureCause": "unknown"
+      },
+      "scope": "Current Claude local business UAT only; not Codex parity, actual client #35, regulatory or production acceptance"
+    }
+  },
+  "limitations": [
+    "Actual client #35 acceptance pending",
+    "No OAuth, dedicated dashboard, production deployment or individual production IAM",
+    "Certificate required-type coverage and automatic 30-day notices await issue registration",
+    "No actual MFDS transmission or statutory form validation",
+    "VERIFIED means explicit human attestation, not independent truth or ERP authority",
+    "Original native attempt history: two PASS, two FAIL, one INCOMPLETE; later Recovery3 all FAIL; Codex parity FAIL",
+    "Known reported CLI subtotal USD12.662505 only; total cost and incomplete metrics unknown",
+    "Current Codex account metadata authentication gate unresolved; human login refresh prepared but not executed",
+    "Recovery3 P2P004/QM001/RC001 all FAIL with zero ERP writes; original history preserved",
+    "Minimal normal writable diagnostic success is not business acceptance; controlled no-tool schema/budget failures have unknown exact cause",
+    "Current accepted batch: five Claude PASS, 21 complete native runs; USD2.9853428 applies only to this batch; historical totals remain unknown"
+  ],
+  "provenance": [
+    {
+      "ownerReport": "supplier/final-report.json",
+      "sha256": "f11a67786df8cc268d4c2467a9d83b5136de69bd11da922ab11d8060ade058d8",
+      "storage": "coordinator private acceptance bundle; selected nonsecret results transcribed here"
+    },
+    {
+      "ownerReport": "recall/verification-summary.json",
+      "sha256": "117f14afe9e4a8ccd6f36d3a7173e1d14533fae479703bcf91cfab5f18c3ef51",
+      "storage": "coordinator private acceptance bundle; selected nonsecret results transcribed here"
+    },
+    {
+      "ownerReport": "evidence/result.json",
+      "sha256": "1a7e3d04ac4f59b4960268c64d3e8ae35e77e5d697c97d29bd15fc683e440d5a",
+      "storage": "coordinator private acceptance bundle; selected nonsecret results transcribed here"
+    },
+    {
+      "ownerReport": "human-boundary/worker-report.json",
+      "sha256": "351e6a7a7fd52f5c1add05459b5d6f522f2240027449946ba6364184fcc0d163",
+      "storage": "coordinator private acceptance bundle; selected nonsecret results transcribed here"
+    },
+    {
+      "ownerReport": "native/probe-success/TC-P2P-001.json",
+      "sha256": "b33b31469cd71d0e4f1115e3fb7c15f3bbd3b5d0524bc16696e7c3840b436953",
+      "storage": "coordinator private acceptance bundle; selected nonsecret results transcribed here"
+    },
+    {
+      "ownerReport": "native/worker-final-report.json",
+      "sha256": "6e1351a6f402f08534ee467c44e181f67acea00998bd4b3a61adc304f46de3f7",
+      "storage": "coordinator private acceptance bundle; selected nonsecret evidence and source hashes transcribed here"
+    },
+    {
+      "ownerReport": "native/final-source-manifest.json",
+      "sha256": "025aaba39b3f6028bf23fb6fcd58fd0f999c2f722598d6052d9d6737a3b88b23",
+      "storage": "coordinator private acceptance bundle; selected nonsecret evidence and source hashes transcribed here"
+    },
+    {
+      "ownerReport": "native/final-harness-hashes.json",
+      "sha256": "6c3013941c5242d8187b5baaba7a4865935a77a14d3b2b53f7d8fd0abdb79401",
+      "storage": "coordinator private acceptance bundle; selected nonsecret evidence and source hashes transcribed here"
+    },
+    {
+      "ownerReport": "combined/summary.json",
+      "sha256": "83c30ac42b2a87b35a89b57d65a32fa4b40f2568c500c7aba94f0da0bd3daf3d",
+      "storage": "coordinator private acceptance bundle; selected nonsecret results transcribed here"
+    },
+    {
+      "ownerReport": "native/recovery-third-audit/worker-final-report.json",
+      "sha256": "86a758e56ef1c276504ef3a039adc326401dd114abb9595323fc0c091ec2c778",
+      "storage": "coordinator private acceptance bundle; selected nonsecret results and source hashes transcribed here"
+    },
+    {
+      "ownerReport": "native/recovery-third-audit/final-source-manifest.json",
+      "sha256": "0fd84a625e9d18f36bf6f0001a3faecb5c7e4baa74b6940183225cb029a73573",
+      "storage": "coordinator private acceptance bundle; selected nonsecret results and source hashes transcribed here"
+    },
+    {
+      "ownerReport": "native/manager-proof-remaining-1006/TC-P2P-001.json",
+      "sha256": "ab00faa605e5b0ac44dc4c13e0dd9221b43699f9744844c1725c2dc5efba12e5",
+      "storage": "coordinator private acceptance bundle; selected nonsecret results transcribed here"
+    },
+    {
+      "ownerReport": "native/manager-proof-p2p002-1006/TC-P2P-002.json",
+      "sha256": "f64a3f30efc3f1f502f6f2dc4165b55ee45db1a92397a574b306aac1395ffbe4",
+      "storage": "coordinator private acceptance bundle; selected nonsecret results transcribed here"
+    },
+    {
+      "ownerReport": "native/manager-proof-remaining-1006/TC-P2P-004.json",
+      "sha256": "7f819fd327228965baf6af4445fce6adabc916267d4fd36d76eab68fc85a85b1",
+      "storage": "coordinator private acceptance bundle; selected nonsecret results transcribed here"
+    },
+    {
+      "ownerReport": "native/manager-proof-remaining-1006/TC-QM-001.json",
+      "sha256": "b502519fbf076ed8f9b3f654c4fce40c4d7d83e88f05af878dfeb6152074a6ff",
+      "storage": "coordinator private acceptance bundle; selected nonsecret results transcribed here"
+    },
+    {
+      "ownerReport": "native/manager-proof-remaining-1006/TC-RC-001.json",
+      "sha256": "8048bbc3c8da414a97dbec30ae9ea09aa8669c9d39a6ee2cdff3108589bcac9a",
+      "storage": "coordinator private acceptance bundle; selected nonsecret results transcribed here"
+    },
+    {
+      "ownerReport": "native/manager-proof-remaining-1006/five-case-summary.json",
+      "sha256": "a58e80d3d766f9b11cdd7305ee5c85267892ea6511f25056cad942be397918ea",
+      "storage": "coordinator private acceptance bundle; selected nonsecret results transcribed here"
+    },
+    {
+      "ownerReport": "native/manager-proof-p2p002-1006/immutable-provenance-work-attention.jsonl",
+      "sha256": "6bb25855efc8833275fcfed0a06b9c2cec5c6daca618874c6c3e619b08436ed3",
+      "storage": "coordinator private acceptance bundle; selected nonsecret results transcribed here"
+    },
+    {
+      "ownerReport": "native/manager-stop-1006/backend-summary.json",
+      "sha256": "d847cbae6cb45a9cee0ce6283106ff8f058b1c053c9962ae2021a13e0044b371",
+      "storage": "coordinator private acceptance bundle; selected nonsecret results transcribed here"
+    },
+    {
+      "ownerReport": "native/manager-stop-1006/final-helper-sit-summary.json",
+      "sha256": "a278bb9d820a96f221710e7d834c59a2c01ec3eb4871d2e095e1805a8bc85fe9",
+      "storage": "coordinator private acceptance bundle; selected nonsecret results transcribed here"
+    }
+  ],
+  "combinedValidation": {
+    "validatedBaseline": "fe6a51fadd2493018da59babd4a2eea908c2931f",
+    "tasks": [
+      "clean",
+      "test",
+      "bootJar",
+      "sitTest"
+    ],
+    "test": {
+      "tests": 569,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 18,
+      "passed": 551
+    },
+    "sitTest": {
+      "tests": 20,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "passed": 20
+    },
+    "duration": "8m58s",
+    "durationSource": "coordinator combined validation completion report",
+    "jarSha256": "4cc3ed1977f72538b51e025b09937f4b122a19e6305f4d0f5a939d82cfbb3369",
+    "modelCalls": 0,
+    "nativeAcceptanceComplete": false,
+    "scope": "combined source validated before this documentation-only artifact refresh; not a circular self-hash or native acceptance claim"
+  }
+}

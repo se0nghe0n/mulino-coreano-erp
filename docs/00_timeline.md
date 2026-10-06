@@ -1,6 +1,28 @@
 # MULINO COREANO — 프로젝트 진행 타임라인
 
 > Mulino Bianco 한국 진출 가상 ERP + AI 에이전트 시스템
+>
+> Phase 0~6 표는 당시 계획·설계 이력이다. 기능 이름만으로 현재 구현이나
+> 인수 완료를 뜻하지 않는다. 현재 목표는 GitHub milestone·issue가 기준이다.
+
+## 현재 구현과 검증 (2026-10-06)
+
+현재 accepted production source `4e6935d`의 로컬 PoC는 REST·stdio MCP·
+Zig CLI·native runner, Case 재개, 인간 구매/QC/리콜 승인, 증거 판단과
+Supplier CRUD를 포함한다. 역사적 Supplier `0132e0a`의 실행 549건·SIT
+20건은 별도 checkpoint다. 현재 보강의 backend 569건 실행·18건 제외·
+bootJar가 통과했다. 최종 helper·prose CANCEL 교정 뒤 focused 22건·전체
+SIT 20건·bootJar·runner 84건을 검증했고 full backend는 재실행하지 않았다.
+
+#24/#25 현재 CLAUDE / `claude-sonnet-5` 업무 UAT는 5 PASS다.
+21개 완전 native Run·receipt 일치·denial 0을 확인했다. QC·리콜은 인간
+승인 대기까지다. 과거 native 실패와 unknown 비용은 보존한다.
+Codex account 인증·parity와 #35 실제 클라이언트 인수·운영 배포는 남아 있다.
+OAuth와 전용 대시보드는 제외했다. MONITOR는 대화 MCP가 제공하며 능동
+알림은 별도 채널 과제다. 인증서 전체 유형·자동 30일 알림은 이슈 등록 전이다.
+
+[범위 결정](16_decisions.md)과 [발표 자료](portfolio/README.md)를 따른다.
+Phase 번호는 기존 milestone 이력을 보존하므로 6 다음은 8이다.
 
 ---
 
@@ -10,7 +32,7 @@
 |---|---|
 | 프로젝트 정체성 | 단순 벤치마킹 재현 → "한국 진출 현지화(Localization)" 시나리오로 전환 |
 | 시나리오 | Mulino Bianco 한국 진출 가정, EU 기준 ERP를 한국 법규로 현지화 |
-| 아키텍처 | L0(ERP+MCP) → L1(Governance) → L2(Multi-Agent) → L3(시각화) |
+| 아키텍처 | L0(ERP+REST) → L1(승인 게이트) → L2(Multi-Agent·CLI·MCP) |
 | ERP 모듈 범위 | MM / WM / PP / SD / QM + FI(세금계산서 부분), HCM/CO/PM 제외 |
 | AI 에이전트 | Supply Chain / Procurement / QC 3종 우선 + Orchestrator |
 | 차별화 포인트 | Localization 설계 + Governance + 3-Way Match + Batch Management |
@@ -81,8 +103,7 @@ mulino-coreano-erp/
 ├── database/                  (DDL 30개 테이블 + seed)
 ├── backend/                   (L0)
 ├── governance/                (L1)
-├── agents/                    (L2)
-└── dashboard/                 (L3)
+└── agents/                    (L2)
 ```
 
 ---
@@ -116,16 +137,6 @@ mulino-coreano-erp/
 | Supply Chain | 유통기한 임박 감지(FEFO) / 재고 소진 예측 / LOT 추적 / 보관기한 모니터링 |
 | Procurement | 납품 지연 감지 / 자동 재발주 / 인증서 만료 감지 |
 | QC | 알레르겐 위반 감지 / 온도 이탈 알람 대응 / 입고 Hold 처리 / 리콜 & 식약처 보고 |
-
----
-
-## Phase 7 — L3: 자연어 대시보드  
-
-| 작업 | 내용 |
-|---|---|
-| Intent Parsing | 자연어 질의 → 의도 분석 |
-| Chart Spec 생성 | 데이터 → 시각화 명세 변환 |
-| 렌더링 | React 19 + Vite 기반 대시보드 (거버넌스 큐, 품질 알람 모니터, 이력추적 그래프) |
 
 ---
 

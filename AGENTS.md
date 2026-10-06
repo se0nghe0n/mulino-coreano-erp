@@ -6,7 +6,23 @@ This file is the operating guide for agent sessions working in this repository, 
 
 A hypothetical ERP + AI agent governance system assuming Mulino Bianco (an Italian food brand) enters the Korean market. A SAP consulting portfolio project that localizes a EU-standard ERP to Korean food regulations (Food Traceability Act, 22 allergens, electronic tax invoices, etc.).
 
-**Current status**: Phase 4 is in progress. The Spring Boot backend implements Case intake, inventory lookup, event dispatch and Run scheduling; `mcp-server/` provides a local stdio connector. PostgreSQL has 30 ERP tables plus 13 interface tables and one request receipt table. On top of that, `main` already has the common response/exception layer and Swagger (#16). `governance/`, `dashboard/` and the Zig CLI remain scaffolds. Actual LLM execution, other ERP approval/write adapters and channel authentication remain future work. The local human-answer and purchasing decision contract is in `docs/14_human_purchase_api.md`; see `docs/08_interface_overview.md` §13 for the wider boundary. What remains in Phase 4, and every Phase after it, lives on the project board rather than only in this file. All business documentation is written in Korean.
+**Current status (2026-10-06, accepted native source `4e6935d`)**: This fork's
+local PoC implements Spring Boot REST APIs, stdio MCP, Zig `mulino`, a native
+Claude Code/Codex runner, durable Case/Run recovery, human purchasing/QC/recall
+approval, evidence judgments and Supplier master CRUD. The backend owns the
+implemented governance gates; `governance/` remains a separate-layer scaffold.
+DDL contains 61 tables. Current CLAUDE / `claude-sonnet-5` local business UAT
+passes all five cases with 21 complete native runs, matching receipts and zero
+permission denials. QC and recall remain at human approval wait, with no ERP
+application. Original 2 PASS / 2 FAIL / 1 INCOMPLETE, Recovery 3 FAIL and later
+compact-source 4 PASS / 1 FAIL remain historical. Codex parity failed earlier;
+the current account-authentication gate and actual client #35 acceptance remain
+unresolved. This is local source and verification evidence, not organization
+`main` merge, regulatory or production acceptance. MONITOR uses conversation
+MCP tools. Dedicated dashboard and OAuth are excluded. Certificate type
+coverage and automatic 30-day notices remain an untracked gap awaiting issue
+registration. See `docs/16_decisions.md` and `docs/portfolio/README.md`. All
+business documentation is written in Korean.
 
 ## Commands
 
@@ -57,16 +73,15 @@ psql -d mulino_coreano -f database/seed/interface.sql
 psql -d mulino_coreano -f database/seed/allergens.sql
 ```
 
-**Planned stack** (new code follows this baseline): Backend is Spring Boot 4.1.x + Java 21 + Gradle exposing a REST API. Agents are Claude Code or Codex sessions (Cowork) driven by per-role skills; the planned agent tool surface is a single Zig CLI (`mulino`) calling the REST API. Dashboard is React 19 + Vite. There is no A2A protocol — the runtime's native subagent dispatch (Claude Code or Codex) replaces it. The implemented `mcp-server/` is a local stdio interface connector using the same REST API; remote HTTP transport and the Zig CLI remain future work.
+**Implemented local stack** (new code follows this baseline): Backend is Spring Boot 4.1.x + Java 21 + Gradle exposing a REST API. Agents are Claude Code or Codex sessions (Cowork) driven by per-role skills; the agent tool surface is a single Zig CLI (`mulino`) calling the REST API. There is no A2A protocol — the runtime's native subagent dispatch (Claude Code or Codex) replaces it. The implemented `mcp-server/` is a local stdio interface connector using the same REST API; remote authenticated multi-client transport remains outside local acceptance.
 
-## Architecture (4 layers = directory mapping)
+## Architecture (3 layers = directory mapping)
 
 | Layer | Directory | Role |
 |---|---|---|
-| L0 | `database/`, `backend/` | PostgreSQL 18 (30 ERP + 13 interface + 1 request receipt tables) + Spring Boot REST API (single entry point for CLI and dashboard) |
-| L1 | `governance/` | Intercept action-bearing API calls → approve / block / hold + audit log. **Reads pass through; only writes are gated** |
+| L0 | `database/`, `backend/` | PostgreSQL 18 (61 tables) + Spring Boot REST API (single entry point for CLI and MCP) |
+| L1 | `backend/`, `governance/` | Backend domain gates implement human approval and immutable audit. Separate `governance/` engine remains a scaffold. **Reads do not request ERP approval; authenticated scope still applies** |
 | L2 | `agents/` | `cli/` (Zig `mulino` binary) + `skills/` (orchestrator / supply-chain / procurement / qc). Claude Code and Codex are both supported agent runtimes; the orchestrator dispatches role subagents. See `agents/AGENTS.md` |
-| L3 | `dashboard/` | Natural-language query → Intent Parsing → chart generation |
 
 ### Governance approval matrix (follow when implementing L1)
 
@@ -112,7 +127,7 @@ Carrying out an issue is the `backlog` skill; changing what the goals are is the
 - Commit message prefixes: `feat` | `chore` | `fix` | `docs` (e.g. `feat(migration): create migration files`)
 
 ## Conventions
-- The issue/PR label scheme is in `docs/06_labels.md` (category + `L0-db`~`L3-dashboard` layer labels)
+- The issue/PR label scheme is in `docs/06_labels.md` (category + `L0-db`~`L2-agent` layer labels)
 - Never commit secrets (`application-local.yml`, `.env`) — already in `.gitignore`
 - On schema changes, keep `docs/02_flow.md` consistent with the ERD (Phase 1 required "flow diagram–ERD 100% consistency" as an acceptance criterion)
 - Skills live in `.agents/skills/` — dev-workflow skills (`backlog` to carry out an issue, `goals` to change what the goals are, `testing` to decide and write tests) as real directories, ERP role skills as symlinks to `agents/skills/`, which stays their SSOT (the L2 product layer). Codex discovers that directory natively.
@@ -159,7 +174,7 @@ Templates live in `.github/`. When creating issues or PRs, the session must foll
 
 **Issues**: pick one of the following by task type (title prefix and label are auto-applied).
 - `bug.md` — `[BUG]` · `bug` — bug report (bug description / reproduction steps / expected & actual behavior / environment)
-- `feature.md` — `[FEAT]` · `feature` — feature development (overview / L0–L3 layer checkboxes / detailed tasks / definition of done / references)
+- `feature.md` — `[FEAT]` · `feature` — feature development (overview / L0–L2 layer checkboxes / detailed tasks / definition of done / references)
 - `qc.md` — `[QC]` · `qc` — QC/test (target / items / method / result Pass·Fail)
 - `research.md` — `[RESEARCH]` · `research` — upfront research (purpose / items / result + sources / design impact / sources)
 

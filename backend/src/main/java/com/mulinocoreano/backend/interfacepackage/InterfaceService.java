@@ -161,7 +161,7 @@ public class InterfaceService {
                 .list();
     }
 
-    // ------------------------------------------------------------------ Monitor (대시보드)
+    // ------------------------------------------------------------------ Monitor (대화 MCP 상태 조회)
     public MonitorDto monitor() {
         Map<String, Long> counts = jdbc.sql("""
                 SELECT

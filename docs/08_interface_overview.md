@@ -7,6 +7,36 @@
 
 ---
 
+## 현재 MONITOR·채널 계약 (2026-10-06, #36)
+
+FR-19에 해당하는 상태 관찰은 `monitor_status`와 `list_attention` 대화
+MCP 도구가 담당한다. 이 저장소에는 이슈가 참조한 `docs/10_requirements.md`가
+없다. 요구사항의 실제 SSOT는 본 문서의 모드·채널표와
+[Case 계약](10_case_table_contract.md)이며 중복 요구사항 문서를 만들지 않는다.
+ASK/MONITOR는 새 Case를 만들지 않는다. MONITOR는 조회 때 상태를 반환하고
+기한·의존 대기를 재판정한다. 조회가 인간 답변·승인을 대신하지 않는다. MONITOR 조회에는 ERP 변경
+승인을 요구하지 않지만 채널 인증과 Case scope를 적용한다.
+
+현재 REST·CLI·stdio MCP·native runner와 Case/Work Item 완료·재대기,
+Run claim/heartbeat/종결·복구, 인간 답변·구매/QC/리콜 승인, 증거 판단,
+Supplier CRUD를 구현했다. [실행 계약](14_cli_and_runtime.md),
+[구매 계약](14_human_purchase_api.md), [품질 계약](18_inbound_quality_api.md),
+[증거 계약](19_evidence_claim_api.md), [Supplier 계약](21_supplier_master_api.md)을
+따른다. `RUNNING` 상태 자체는 모델 호출 성공의 증거가 아니다.
+
+ChatGPT·Claude는 대화 표면 설계 대상이다. 로컬 stdio 구현·scripted SIT와
+실제 모델·클라이언트 인수는 별도 계층이다. #24/#25 현재 accepted source
+`4e6935d`의 Claude 업무 UAT는 5 PASS, 21개 완전 native Run·receipt 일치·
+denial 0이다. QC·리콜은 인간 승인 대기까지다. 역사적 Supplier `0132e0a`와
+과거 실패를 현재 인수로 덮어쓰지 않는다. backend 569건 실행 checkpoint
+이후 최종 helper·prose 교정의 focused 22건·SIT 20건을 검증했으며 full
+backend는 재실행하지 않았다. Codex account 인증·parity와 #35 실제
+클라이언트 인수는 남아 있다. Slack·Email 예시는 목표 설계이며 실제
+어댑터 인수를 뜻하지 않는다. 전용 대시보드·OAuth는 제외했고 능동 알림은
+별도 과제다. [결정 기록](16_decisions.md)에 설계 판단과 인수 경계를 남겼다.
+
+---
+
 ## 1. 핵심 인간 모델: ASK / ACT / MONITOR
 
 사용자는 에이전트 런타임 개념을 몰라도 시스템을 사용할 수 있어야 한다.
@@ -15,7 +45,7 @@
 |---|---|---|---|
 | **ASK** | 비즈니스에 대해 질문 | "Amaretti 재고가 얼마나 있어?" | Query. **단순 질의는 자동으로 업무가 되지 않는다** |
 | **ACT** | 조직에 목표를 위임 | "품절이 나지 않게 해줘" | Case 생성 → 에이전트 배정 → Work Item 동적 생성 |
-| **MONITOR** | 물어보기 전에 알아야 할 것 관찰 | "지금 내 주의가 필요한 것" | 대시보드가 담당 |
+| **MONITOR** | 물어보기 전에 알아야 할 것 관찰 | "지금 내 주의가 필요한 것" | 대화 MCP `monitor_status`·`list_attention`이 집계 상태를 제공 |
 
 ACT에서 인간은 **원하는 결과(outcome)** 를 말한다. 어떤 ERP 트랜잭션을 수행할지가 아니다.
 `GET /api/v1/monitor`는 기한이 도래한 `SCHEDULED_TIME` 또는 종료된 `DEPENDENCY_DONE` 대기가 있을 때만 `DISPATCH_SWEEP_TRIGGERED`(`source=MONITOR`) Event를 기록한다. 실행 가능한 대기가 없는 조회는 상태만 반환하며 합성 Event를 만들지 않는다. 관리·테스트용 `POST /api/v1/dispatch`는 호출 자체를 `DISPATCH_REQUESTED`(`source=MANUAL`)로 항상 기록한다.
@@ -37,7 +67,7 @@ Conversation
 
 월요일 ChatGPT에서 "Amaretti 품절이 나지 않게 해줘" → `CASE-1842` 생성.
 수요일 Slack에서 "Amaretti 어떻게 됐어?" → 동일 Case 해소.
-금요일 대시보드에서 `CASE-1842` 공급사 대기 중 표시.
+금요일 대화 MCP에서 `CASE-1842` 공급사 대기 중 표시.
 **세 표면 모두 동일한 조직 상태를 투영한다.**
 
 채널은 어댑터이다. "Slack 구매 에이전트", "이메일 구매 에이전트" 같은 것은 없다. 오직 하나의 Procurement Agent, 오직 하나의 `CASE-1842`.
@@ -51,7 +81,7 @@ Conversation
 | **ChatGPT / Claude** | 주된 사고(thinking) 인터페이스 | 임의 ERP 질의, 리포트 생성, 목표 발행, 증거 검토, "왜?" 질문, 대안 비교, 승인 |
 | **Slack** | 인간 주의(attention) 인터페이스 | 결정 요구, 예외, 짧은 상태 요청. **결과(consequence)를 노출하고 기계장치(machinery)는 노출하지 않는다** |
 | **Email** | 비대칭 외부 경계 | 인바운드는 에이전트가 자율 소비. 아웃바운드는 에이전트가 초안까지 준비하고 **인간이 Send를 누른다** |
-| **Dashboard** | 상시(ambient) 통제면 | 물어보기 전에 주의할 가치가 있는 것을 보여준다 |
+| **대화 MCP MONITOR** | 조회 시 상태·주의 항목 제공 | `monitor_status`·`list_attention`. 능동 알림은 별도 채널 과제 |
 
 Slack 안티패턴 — 다음은 내부 동작이므로 노출하지 않는다: "에이전트가 재고를 조회했다", "Work Item을 생성했다", "도구 X를 호출했다". 대신: "AMR-200 재보충 승인 필요 / 미조치 시 10월 11일 품절 예상 / 제안 +600케이스 / 증분 약정 ₩8.4M / [승인] [검토] [반려]".
 
@@ -100,7 +130,7 @@ WI-103 긴급 운송 평가            → Logistics Agent
 Procurement ──→ Claim / Evidence / Work Item ──→ Shared Case ──→ Logistics
 ```
 
-`claim_evidence` 연결 테이블은 추론(Claim)과 결정론적 증거(Evidence)를 분리한다. Event가 이 연결을 전달하면 Dispatcher는 Claim·Evidence·Event가 같은 Case인지 먼저 검증한 뒤 같은 트랜잭션에서 `SUPPORTS` 또는 `REFUTES` 관계를 기록한다. Claim은 `ASSERTED / VERIFIED / CONFLICTED / REFUTED` 상태를 갖고, 반증률(refutation rate)은 대시보드의 에이전트 시스템 건강 지표가 된다.
+`claim_evidence` 연결 테이블은 추론(Claim)과 결정론적 증거(Evidence)를 분리한다. Event가 이 연결을 전달하면 Dispatcher는 Claim·Evidence·Event가 같은 Case인지 먼저 검증한 뒤 같은 트랜잭션에서 `SUPPORTS` 또는 `REFUTES` 관계를 기록한다. Claim은 `ASSERTED / VERIFIED / CONFLICTED / REFUTED` 상태를 갖고, 반증률(refutation rate)은 대화에서 조회할 수 있는 시스템 건강 지표의 설계 후보다. 현재 자동 집계 인수를 주장하지 않는다.
 
 직접 대화는 유용한 곳에서 허용되지만, 실질적 결과는 반드시 내구 상태로 승격된다. 회의와 대화는 사라져도, **결정과 의무는 살아남아야 한다.**
 
@@ -201,7 +231,7 @@ Event는 불변 사실이다. 애플리케이션과 무관하게 DB 트리거가
              ┌────────┼────────┐
             ASK      ACT    MONITOR
              │        │        │
-      ChatGPT/Claude  │    Dashboard
+      ChatGPT/Claude  │    대화 MCP
              └────┬───┘
                   ▼
                 CASES
@@ -212,7 +242,7 @@ Event는 불변 사실이다. 애플리케이션과 무관하게 DB 트리거가
         │
     capabilities → ERP → Events
         │
-        ├─► Cases resume  ├─► Slack attention  ├─► Dashboard  └─► Email workflow
+        ├─► Cases resume  ├─► Slack attention  ├─► 대화 MCP  └─► Email workflow
 ```
 
 ### 압축된 인터페이스 철학
@@ -222,7 +252,7 @@ Event는 불변 사실이다. 애플리케이션과 무관하게 DB 트리거가
 3. ChatGPT/Claude가 주된 추론 인터페이스다.
 4. Slack은 인간 주의 인터페이스다.
 5. 이메일은 자율 인바운드, 인간 게이트 아웃바운드 채널이다.
-6. 대시보드는 상시 운영 인지를 제공한다.
+6. MONITOR 조회는 대화 MCP가 제공한다. 능동 알림은 별도 채널 과제다.
 7. 모든 채널은 동일한 Case와 비즈니스 상태를 투영한다.
 8. 에이전트는 영속 채팅이 아니라 내구성 Case 객체로 조율한다.
 9. 논리 에이전트는 지속하고 LLM 실행은 일회용이다.
@@ -234,15 +264,16 @@ Event는 불변 사실이다. 애플리케이션과 무관하게 DB 트리거가
 
 ---
 
-## 13. 구현 현황 (코드 참조)
+## 13. Foundation 당시 구현 현황 (이력)
 
-이 문서는 S1~S6의 목표 아키텍처와 이번 PR의 구현 범위를 함께 기록한다. 현재 실행 가능한 범위는 다음과 같다.
+다음 표와 미구현 설명은 foundation 당시 범위다. 현재 구현은 아래
+최신 계약과 §14 이하의 후속 기록을 따른다.
 
 | 표면(채널) | 구현 |
 |---|---|
 | 백엔드 API | `backend/src/main/java/com/mulinocoreano/backend/interfacepackage/` — `/api/v1/ask|cases|runs|events|dispatch|attention|monitor` |
 | 이벤트 디스패처 | `DispatcherService` — 권위 있는 이벤트 기록·멱등 처리 → 대기조건 충족 → WI READY → Run 스케줄/실패 attention을 단일 트랜잭션으로 수행 |
-| ChatGPT/Claude 커넥터 | `mcp-server/` — MCP 도구 5종 (`ask_inventory`, `create_case`, `list_cases`, `list_attention`, `monitor_status`) |
+| ChatGPT/Claude 커넥터 | `mcp-server/` — foundation MCP 도구 5종 (`ask_inventory`, `create_case`, `list_cases`, `list_attention`, `monitor_status`) |
 | L0 스키마 | `database/ddl/07_case_management.sql` ~ `09_case_fks.sql` |
 
 Event 요청은 알 수 없는 Case/Work Item, 서로 다른 Case의 조합, 해소된 scope와 모순되는 payload identity, 스키마 길이 초과를 `400 Bad Request`로 거부한다. 승인 Event는 완료된 Attention 또는 승인된 Governance Action을 DB에서 다시 해소해 인간 actor를 도출하며, 결정 문자열만으로 대기를 풀 수 없다. Event 멱등 키가 다른 내용에 재사용되거나 동일 Work Item에 활성 Run이 이미 존재하면 `409 Conflict`를 반환한다. Run 요청도 READY 상태·현재 배정·활성 에이전트·Case 소속을 삽입 전에 검증한다.
@@ -260,7 +291,7 @@ Event 요청은 알 수 없는 Case/Work Item, 서로 다른 Case의 조합, 해
 | 채널 간 동일 Case 공유 | REST와 로컬 stdio MCP 조회·목표 생성 | Slack·이메일 인입/Send/승인 어댑터, 원격 MCP 전송 |
 | 인간 판단과 범위 있는 답변 | Attention 조회, 이미 완료된 DB 결정의 승인 이벤트 검증 | Attention 답변·Decision 생성 API 및 승인 UI |
 | 검증된 업무 종결과 거버넌스 | 저장 테이블과 기존 승인 결과 검증 | 결정론적/반론 기반 검증기, Change Request 적용, L1 인증·거버넌스 인터셉터 |
-| MONITOR 운영 통제면 | 상태 집계·열린 Attention·기한/의존 대기 재판정 | 실제 대시보드, 능동 감시·알림 정책 |
+| MONITOR 운영 통제면 | 상태 집계·열린 Attention·기한/의존 대기 재판정 | 능동 감시·외부 알림 정책. 전용 화면은 범위 제외 |
 
 `RUNNING`은 실행 예약 레코드다. 이 PR만으로 LLM이 호출되거나 업무가 자율 종결되지는 않는다. 외부 executor가 Run을 소비하고 종료할 때까지 동일 Work Item의 추가 Run은 차단된다. Attention 목록을 읽는 행위도 인간의 답변이나 승인을 기록하지 않는다.
 

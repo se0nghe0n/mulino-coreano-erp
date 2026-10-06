@@ -8,8 +8,8 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * 인터페이스 메커니즘 REST API — CLI와 대시보드(ChatGPT 커넥터)의 단일 진입점.
- * 모든 쓰기 호출은 추후 L1 거버넌스 인터셉터를 통과한다 (현재는 READ/Case 생성만 개방).
+ * 인터페이스 메커니즘 REST API — CLI와 대화 MCP 커넥터의 단일 진입점.
+ * local 채널 인증과 scope를 적용하며 ERP 쓰기는 각 도메인의 인간 승인 게이트를 따른다.
  */
 @RestController
 @RequestMapping("/api/v1")

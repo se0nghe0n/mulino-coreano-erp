@@ -1,5 +1,12 @@
 # Mulino Coreano — 추적 흐름도
 
+> 현재 source `0132e0a`는 native runner·인간 답변·구매/QC/리콜 승인·증거
+> 판단을 포함한다. 아래 foundation/PR #18의 미구현 설명은 당시 이력이다.
+> 현재 실행·쓰기 계약은 `14_cli_and_runtime.md`, `14_human_purchase_api.md`,
+> `18_inbound_quality_api.md`, `19_evidence_claim_api.md`를 따른다.
+> 최신 검증과 미인수 경계는 [포트폴리오 증거](portfolio/README.md)에 기록한다.
+
+
 > Mulino Bianco KR 가상 ERP 추적 흐름도  
 > 기준: 한국 식품위생법 / 식품이력추적관리법 / 국세청 전자세금계산서
 

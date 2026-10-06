@@ -1,5 +1,12 @@
 # Case 인터페이스 테이블 계약 검토
 
+> 현재 source `0132e0a`는 native runner·인간 답변·구매/QC/리콜 승인·증거
+> 판단을 포함한다. 아래 foundation/PR #18의 미구현 설명은 당시 이력이다.
+> 현재 실행·쓰기 계약은 `14_cli_and_runtime.md`, `14_human_purchase_api.md`,
+> `18_inbound_quality_api.md`, `19_evidence_claim_api.md`를 따른다.
+> 최신 검증과 미인수 경계는 [포트폴리오 증거](portfolio/README.md)에 기록한다.
+
+
 이 문서는 현재 `V8`~`V17` migration, Case DDL, 인터페이스 service를 기준으로 Case 업무 표면의 계약을 기록한다. 문서의 현재 상태는 구현된 DB 제약과 service 동작을 구분해 적는다. 후속 설계 제안은 실행 코드, schema 변경, 확정된 정책이 아니다.
 
 #49 이후 Run 예약은 QUEUED이고 RUNNING은 lease를 claim한 상태다.
