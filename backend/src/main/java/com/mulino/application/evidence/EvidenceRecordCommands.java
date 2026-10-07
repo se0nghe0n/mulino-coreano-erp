@@ -61,6 +61,12 @@ public class EvidenceRecordCommands implements CommandHandler {
     else recorded=records.recordActivity(event(s));
     var output=new LinkedHashMap<>(recorded);
     if("EVENT".equals(type)&&s.get("documentId")!=null){var claim=records.recordClaim(new EvidenceRecords.ClaimInput(output.get("id").toString(),required(s,"documentId"),required(s,"assertion"),string(s,"quantity"),string(s,"unit"),state(s),null));output.put("claimId",claim.get("id"));}
+    if("EVENT".equals(type)&&"EVIDENCE_CONFLICT".equals(output.get("outcome"))&&impact==null) {
+      var original=r.rows("InboxRecords",c.organizationId()).stream().filter(x->"RECEIVED".equals(x.get("state"))&&Objects.equals(s.get("sourceNamespace"),x.get("sourceNamespace"))&&Objects.equals(s.get("externalEventId"),x.get("externalEventId"))&&Objects.equals(s.get("sourceVersion"),x.get("sourceVersion"))).findFirst();
+      var conflictImpact=impacts.getIfAvailable();
+      if(original.isPresent()&&conflictImpact!=null)conflictImpact.apply(c,new EvidenceCorrectionImpact.Correction(original.get().get("eventId").toString(),output.get("id").toString(),Set.of(),Set.of()));
+      else if(original.isPresent()&&r.db().run(com.sap.cds.ql.Select.from("mulino.work.read.Works").where(x->x.get("organizationId").eq(c.organizationId()))).rowCount()>0)throw new DomainError("HELD","POLICY_UNRESOLVED","Evidence conflict impact service unavailable");
+    }
     if(impact!=null){var workIds=new LinkedHashSet<String>();var subject=subject(s);if(subject.kind()==SubjectKind.WORK)workIds.add(subject.id());var old=r.require(switch(type){case "DOCUMENT"->"DocumentVersions";case "CLAIM"->"Claims";default->"Events";},c.organizationId(),required(s,"supersedesId"));if(old.get("workId")!=null)workIds.add(old.get("workId").toString());impact.apply(c,new EvidenceCorrectionImpact.Correction(required(s,"supersedesId"),output.get("id").toString(),workIds,Set.of()));output.put("workReassessment","PENDING");}
     return output;
   }
