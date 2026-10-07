@@ -1,8 +1,8 @@
 {
   "task": "UserStep3/S2 common commands",
-  "testedBaseline": "dcbd556",
+  "testedBaseline": "b89cd5492c19cd4b42eff84ac89a29c7b772e0c3",
   "dependencyBaseline": "4792b95",
-  "command": "./mvnw -q -f backend/pom.xml -Dtest=CommandEnvelopeTest,CommandTransactionTest test",
+  "command": "./mvnw -q -f backend/pom.xml -Dtest=CommandSubjectTest,CommandEnvelopeTest,CommandTransactionTest test",
   "exitCode": 0,
   "versions": {
     "java": "Zulu21",
@@ -14,6 +14,21 @@
   "status": "PASS",
   "tests": [
     {
+      "suite": "com.mulino.commands.CommandSubjectTest",
+      "tests": 5,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "testcases": [
+        "duplicateDeclaredSubjectIsRejected",
+        "requiredSubjectCannotBeOmitted",
+        "wrongPublishedNounAndUnknownNounCannotAliasWork",
+        "actualTargetAndExplicitlyOptionalEmptySubjectsAreAccepted",
+        "unrelatedWorkIsRejectedEvenWhenPresentInAuthorizationScope"
+      ],
+      "reportSha256": "e52dbf6b6435828d2887ab197cd59503204e1fd9552a8075ff7f86cdcb06e8b5"
+    },
+    {
       "suite": "com.mulino.commands.CommandEnvelopeTest",
       "tests": 3,
       "failures": 0,
@@ -24,11 +39,11 @@
         "canonicalizationIgnoresTransportCollectionOrderAndCollectionRequest",
         "actorRoleClockAndRuntimeClaimCannotBePayloadAuthority"
       ],
-      "reportSha256": "66538562eafd0e19a5b529ff568e6afb9e45f8b8a600b57505ca04936c258663"
+      "reportSha256": "878e637aa2d61e36731a6b25eadfede62ed3e985d15fd0e1c4c96f9a635c4ab7"
     },
     {
       "suite": "com.mulino.commands.CommandTransactionTest",
-      "tests": 9,
+      "tests": 10,
       "failures": 0,
       "errors": 0,
       "skipped": 0,
@@ -38,24 +53,25 @@
         "currentGrantIsRequiredOnReplayAndCommit",
         "replayOfConsumingActionUsesSavedScopeInsteadOfConsumedPrerequisites",
         "claimForDifferentCapabilityOrKeyOrWorkCannotExecuteAnotherAction",
+        "terminalRecordAndCrossOrganizationAuditAreProtectedByDatabase",
         "replayAndDifferentPayloadHaveOneRealEffect",
         "postEffectDenialRollsBackEffectAndPersistsOnlySafeDenial",
         "auditFailureRollsBackEffectAndIdempotency",
         "unsupportedPublishedCapabilityAndDefinitionHaveZeroEffects"
       ],
-      "reportSha256": "5451ec51fb3eaed90f7b2b22cfcf8905b3ad276d4102588a6b6ca80cfd519da5"
+      "reportSha256": "dbae85b48d67955bf0b45aa5eceec081babb789a7f3130bf291ac6ff6edd9ecd"
     }
   ],
   "compiledCoreClassSha256": {
-    "com/mulino/application/core/ApplicationCommands.class": "673d7a6a851a932fdeaa668ef729b96e851a793d1be6a32017e8e35f52390836",
+    "com/mulino/application/core/ApplicationCommands.class": "4464d5ef0837f99a9aa72739220296eb5b84cc877f0dd8c26790a279259980af",
     "com/mulino/application/core/ApplicationQueries.class": "9a91b420996f7f42f4c6def48a35daab705f70106edc0adc3968f096c8e2bb36",
-    "com/mulino/application/core/CommandDefinitionResolver.class": "3f3052fcce0beacd76c89208a8b2ff82c614a4729df1906db46e5594872d3b7b",
+    "com/mulino/application/core/CommandDefinitionResolver.class": "3a8b5ca1bfe12c6218ec300c7f4e62decac562c0f9ad26314e1a470c6ce20aa7",
     "com/mulino/application/core/CommandExecution.class": "9585060ef8826c4a091506d4aabe3b98cae75cafd8744f3ba5cd343eb398cc72",
-    "com/mulino/application/core/CommandGuard.class": "8ef6147b07cfa58ff6f9bd0a08a40edc9beef6ca890433f273ad25c3c5d5933a",
-    "com/mulino/application/core/CommandHandler.class": "ad2d888c37775760d33b12a110aca343ea7148ee5a0861fc073d67c64bf8f862",
+    "com/mulino/application/core/CommandGuard.class": "073e11ad6ddbe79ccc155448890d9ec78c04d95ab8b47197cc7d05e0b0bdbf64",
+    "com/mulino/application/core/CommandHandler.class": "64606ce02f83322590c22c462a0c47859b92b39d131e1d351738ac0f93c7baca",
     "com/mulino/application/core/CommandLeasePort.class": "c2cdd44a2f25eada0f0f52f0292e41a6b4c98e773a9e860c4201cee3e40d755b",
     "com/mulino/application/core/CommandPreparation.class": "5ef27c3c1d7d1e3a2ea234570a073df3eeed763973a327a82284d0918854f785",
-    "com/mulino/application/core/CommandRepository.class": "d95087cadb873fbd4640ff0dc842a42ef7fcc1fcd6e88ff2e7eb55fe6c61540f",
+    "com/mulino/application/core/CommandRepository.class": "f6834bb4adcf9fcc337e37917022e1672c2d5584423e29ad3a90ccb5726d3b22",
     "com/mulino/application/core/CommandRequests.class": "15e9e1d21aa1f3efcec8b92f54c1a2b06e809e56aabb241f98415fbf5e0a0b87",
     "com/mulino/application/core/CommandSchemas.class": "53184e5d6ab8ede3729779b2dd7a147596885133bc532ff19a2837f334d61947",
     "com/mulino/application/core/DecimalValue.class": "6dcf7426a16e3dac03847fb874a89dc3b4167b2750d57e169460314e86b2ed79",
@@ -68,6 +84,7 @@
     "com/mulino/application/core/QueryResult.class": "975b82d007808437247c17a121d533ac4e7bf0a9d5c5fe57f3c0faeba374e75a",
     "com/mulino/application/core/ReadAuthorizer.class": "6e19b7c394a07b2b3bd07014f637573aa83ec089b64d409caa6a78a467f9f23d",
     "com/mulino/application/core/ReadCursor.class": "afa5112dc3b9ee6a43471752328bc540aeb3a9198dde189cc24351b3544e475d",
+    "com/mulino/application/core/SubjectBinding.class": "64ffd9128a8ee58110a356e8e8f714ee600ed477e9fdc93cacf1e8b53701f904",
     "com/mulino/application/core/TransactionalOutboxPort.class": "2b8cbed6f0f596192f226b5df4cc37a58dd8626a1536c89f0109508bc342b06f",
     "com/mulino/application/core/TransportValues.class": "a5f6e50a24ceef8f39b79c0b56351cf984d59a6db96a3cc6a7b21ad7529fe88f"
   },
@@ -80,10 +97,13 @@
     "stored canonical actor/owner/key retry applies once",
     "post-effect denial rollback with safe separate denial audit",
     "actual database audit insert failure rolls back effect/idempotency",
-    "cross-capability/key/WORK claim denial plus valid countercall; lease verifier is a test double"
+    "cross-capability/key/WORK claim denial plus valid countercall; lease verifier is a test double",
+    "explicit subject ID/noun/cardinality contract unit counterexamples; real Work lifecycle gateway counterexamples delegated to Work owner",
+    "completed record update/delete and cross-organization audit FK denied by actual PostgreSQL",
+    "revoked-authority and changed-hash replay append denial audits without replacing successful record"
   ],
   "notRun": [
-    "INTAKE canonical claim branch added after focused run",
+    "actual persistent INTAKE claim execution, module-specific subject bindings and ordinary startup spike isolation require combined checks",
     "final schema with subsequent recovery modules",
     "actual integrated policy/identity/lease/outbox/native command channels",
     "whole T41/full domain E2E",

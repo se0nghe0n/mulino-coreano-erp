@@ -47,3 +47,18 @@ MCP는 실제 등록된 handler capability만 tools/list에 게시한다.
 검증한다. identity와 policy 판단의 test double은 실제 권한 인수를
 대신하지 않는다. control/runtime 통합, native HTTP/OData/MCP 명령 인수,
 전체 T41, 실제 model·운영·BTP 인수는 결합 검사에서 따로 판정한다.
+
+subjectRefs는 정확한 noun 이름과 실제 효과 대상을 선언한다. handler의
+`subjectBindings`는 검증된 slot·DB 대상에서 noun별 ID와 최소·최대 개수를
+계산한다. 일반 인가 scope에 ID가 있다는 이유로 subject로 허용하지 않는다.
+정의의 noun·action과 binding을 fence 전후에 확인한다. 빈 선언은 handler가
+최소 개수 0을 명시한 경우에 허용하며, 기본 handler는 빈 선언만 허용한다.
+검증된 binding은 immutable 감사 사실에 남고, canonical intent의 subject도
+같은 hash에 묶인다. 완료된 요청의 replay는 소비된 업무 조건을 재실행하지
+않고 저장된 모든 실제 효과 scope에 현재 인가를 확인한다.
+
+완료된 명령의 권한 철회 또는 다른 hash replay도 별도 거부 감사를 남긴다.
+기존 성공 record·효과·결과는 바꾸지 않는다. CommandRecords의 완료·거부
+상태는 DB trigger로 update·delete를 막고 감사 FK는 같은 조직을 강제한다.
+S0 reserve 기술 검증 경로는 명시한 `platform-spike` profile에서만 활성화한다.
+일반 profile의 generic CAP projection도 별도 role 요건으로 접근을 막는다.
