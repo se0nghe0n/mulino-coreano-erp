@@ -1,0 +1,64 @@
+{
+  "baseline": "c6c910b81c8a61fbdf309da9144022482408d5dc",
+  "userStep": 3,
+  "systemStep": "S3",
+  "command": "JAVA_HOME=/Library/Java/JavaVirtualMachines/zulu-21.jdk/Contents/Home PATH=<Node24-bin>:<Java21-bin>:/opt/homebrew/bin:$PATH ./mvnw -f backend/pom.xml -Dtest=S3RegulatoryActualTest test",
+  "versions": {
+    "java": "21",
+    "node": "24.19.0",
+    "postgresImage": "postgres@sha256:4ef4dbc939d61acea57712655ddb4b4ab27419c913f94cca0cd57cb3ea3c2280"
+  },
+  "attempts": [
+    {
+      "attempt": 1,
+      "status": "FAIL",
+      "stage": "testCompile",
+      "cause": "ambiguous CAP request context lambda"
+    },
+    {
+      "attempt": 2,
+      "status": "FAIL",
+      "stage": "fixture",
+      "tests": 7,
+      "errors": 7,
+      "cause": "BeforeEach regulatory policy seed ran before identity seed"
+    },
+    {
+      "attempt": 3,
+      "status": "FAIL",
+      "stage": "fixture/domain",
+      "tests": 7,
+      "passed": 1,
+      "errors": 6,
+      "cause": "fixture used immutable imported S1 Work; changed to actual createDraft/activateWork"
+    },
+    {
+      "attempt": 4,
+      "status": "FAIL",
+      "stage": "compile",
+      "cause": "dependency cherry-pick conflict; resolved to integration-owned exact TradeImpact source"
+    },
+    {
+      "attempt": 5,
+      "status": "FAIL",
+      "stage": "fixture/domain",
+      "tests": 8,
+      "passed": 3,
+      "errors": 5,
+      "cause": "seeded canonical fixture omitted mandatory reassessmentState; fixed in 5b9b3a9"
+    }
+  ],
+  "limits": [
+    "Seeded canonical evidence component tests do not prove public reconciliation",
+    "Corrected 8-test runtime rerun remains NOT_RUN",
+    "Actual quality/adapter public partial30 acceptance remains independent required gate",
+    "Real regulatory filing, legal acceptance, paid models and deployment NOT_RUN"
+  ],
+  "logHashes": {
+    "maven-3.log.gz": "0971454f2209854a5d36a599505d4579de2a46f09735930d499444d28f592aa5",
+    "maven-1.log.gz": "c3e6117877bf3d43ceb3f1a302422e16b47ccaeee76ac5697266d21c5f6378bf",
+    "maven-5.log.gz": "01e61df817fee1fb63dfc76c7e3ad0025019e680f8b2d29e7ea9f252eb8ca3a6",
+    "maven-2.log.gz": "deeb4f4190c87ee2e4dcc8f7eda70a44bea31c2b5ad1abc0afb74ab0d18fd243",
+    "maven-4.log.gz": "550e914f839cc88adbd33beaf8129c1df0f00c1ca63f921cd25ff579af97f4fc"
+  }
+}
