@@ -154,6 +154,7 @@ CREATE TABLE mulino_trade_sales_DeliveryCorrections (
  unit varchar(40) NOT NULL,
  PRIMARY KEY(organizationId,ID),
  UNIQUE(organizationId,deliveryId,canonicalOccurrenceId),
+ UNIQUE(organizationId,deliveryId,revision),
  CHECK(quantity>=0 AND legitimateQuantity>=0 AND legitimateQuantity<=quantity)
 );
 CREATE TRIGGER sales_deliverycorrections_immutable BEFORE UPDATE OR DELETE ON mulino_trade_sales_DeliveryCorrections

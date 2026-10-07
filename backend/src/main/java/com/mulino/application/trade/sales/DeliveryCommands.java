@@ -24,5 +24,5 @@ public class DeliveryCommands implements CommandHandler,DeliveredCargoPort {
  }
  private Map<String,Object> result(Map<String,Object>d,boolean duplicate){return Map.of("outcome","APPLIED","revision",1,"effects",Map.of("deliveryId",d.get("ID"),"segmentId",d.get("segmentId"),"physicalQuantity",InventoryQuantity.text(d.get("quantity")),"contributedQuantity",InventoryQuantity.text(d.get("legitimateQuantity")),"duplicate",duplicate));}
  public Map<String,Object> requireDelivery(DomainContext c,String id){var d=new LinkedHashMap<>(r.require(c,"Deliveries",id));d.put("customerPlaceId",d.get("placeId"));d.put("currentQuantity",currentDeliveryQuantity(c,id));return d;}
- public BigDecimal currentDeliveryQuantity(DomainContext c,String id){var d=r.require(c,"Deliveries",id);return r.rows(c,"DeliveryCorrections").stream().filter(x->id.equals(x.get("deliveryId"))).max(Comparator.comparing(x->StockPrimitives.instant(x.get("recordedAt")))).map(x->(BigDecimal)x.get("quantity")).orElse((BigDecimal)d.get("quantity"));}
+ public BigDecimal currentDeliveryQuantity(DomainContext c,String id){var d=r.require(c,"Deliveries",id);return r.rows(c,"DeliveryCorrections").stream().filter(x->id.equals(x.get("deliveryId"))).max(Comparator.comparingInt(x->((Number)x.get("revision")).intValue())).map(x->(BigDecimal)x.get("quantity")).orElse((BigDecimal)d.get("quantity"));}
 }
