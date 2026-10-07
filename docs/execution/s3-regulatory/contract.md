@@ -20,8 +20,10 @@ previousVersionId를 명시한다. 시점·knownAt의 과거 근거는 보존한
 표시 확인은 현재 specification/packaging version에 결합한다.
 
 PREPARED와 정상 전체 허용은 잔여 대응 의무를 발명하지 않는다.
-제출 미확인, 부분 허용, 보완/반려/철회에는 현재 REGULATORY_REVIEW 하나와
+제출 미확인, 부분 허용, 보완/반려/철회에는 서로 겹치지 않는 REGULATORY_REVIEW와
 인간 owner·nextAction·nextCheck가 남는다. 실제 확인된 접수는 미확인
 접수 원인만 해소한다. 전체 current 허용의 증거가 있는 경우에만 부분
-허용 또는 보완 원인의 의무를 RESOLVED로 바꾼다. 과거 기록을 지우거나
+허용 또는 보완 원인의 의무를 RESOLVED로 바꾼다. OPEN leaf의 상대 범위를 실제 잔여 구간으로 투영한다. 철회로 다시
+영향받은 부분은 새 source version의 원인으로 열고, 해소된 과거 root를
+재개하지 않는다. 과거 기록을 지우거나
 WAIVED로 감추지 않는다. 모두 같은 gateway transaction에서 처리한다.
