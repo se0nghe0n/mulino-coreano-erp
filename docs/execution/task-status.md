@@ -184,7 +184,7 @@ runner와 전체 coverage assembler에 연결되지 않았다. Step2에서는
 | S1 | core·정의·증거·신원·두 진입점 읽기 | COMPLETE |
 | S2 | 목표·책임·거래·승인·idem·감사·복구 | COMPLETE (구현 core) |
 | S3 | 구매·운송·수입·수령·QC | COMPLETE (개발 fixture) |
-| S4 | 판매·반품·회수·정산·E1 | NOT_RUN |
+| S4 | 판매·반품·회수·정산·E1 | ACTIVE |
 | S5 | MCP·skills/client/model·정의 전환 | NOT_RUN |
 | S6 | 운영·BTP·upgrade·restore·cutover | NOT_RUN |
 
@@ -332,3 +332,8 @@ QC100, 독립 제한, 취소 책임, 실제 응답 유실 뒤 수령60의 단일
 지적을 해소했으며 사용자 Step3 전체 두 모델 review는 아직 남았다.
 S4 판매·반품·회수·정산 구현으로 진행한다. 모델/BTP와 전체 normative
 coverage를 이 완료 판정에 포함하지 않는다.
+
+S4의 [소유권·필수 인수](step-3-s4.md)를 고정했다. 같은 기준선의
+일곱 독립 worktree에서 공통 계약, 판매/인도, 재고 실행, 반품, 회수,
+정산, 실제 종단 adapter를 병렬 구현한다. 공유 계약의 OWN commit을
+먼저 연결하고 모든 결과는 Task branch의 결합 검사로 확인한다.
