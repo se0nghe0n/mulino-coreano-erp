@@ -4,7 +4,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import com.mulino.application.core.*;
 import com.mulino.application.inventory.InventoryQueries;
 import com.mulino.domain.inventory.InventoryRepository;
-import com.mulino.domain.identity.IdentityAuthorization;
+import com.mulino.application.identity.IdentityAuthorization;
 import com.sap.cds.services.runtime.CdsRuntime;
 import java.time.*;
 import java.util.*;
