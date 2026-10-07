@@ -13,8 +13,8 @@ import static com.mulino.domain.evaluation.EvaluationFacts.*;
 /** CQN-backed observation provider. Raw claims and unsupported downstream adapters cannot fulfil a goal. */
 @Component
 public class AssessmentFactProvider {
-  private final AssessmentRepository r; private final LocalBlobStore blobs;private final ObjectProvider<WorkContributionRead> contributionPort;
-  public AssessmentFactProvider(AssessmentRepository r,LocalBlobStore blobs,ObjectProvider<WorkContributionRead> contributionPort){this.r=r;this.blobs=blobs;this.contributionPort=contributionPort;}
+  private final AssessmentRepository r; private final LocalBlobStore blobs;private final ObjectProvider<WorkContributionRead> contributionPort;private final ObjectProvider<CanonicalFactAdmission> admissions;
+  public AssessmentFactProvider(AssessmentRepository r,LocalBlobStore blobs,ObjectProvider<WorkContributionRead> contributionPort,ObjectProvider<CanonicalFactAdmission> admissions){this.r=r;this.blobs=blobs;this.contributionPort=contributionPort;this.admissions=admissions;}
   public EvaluationFacts load(DomainContext c,Map<String,Object> work,Map<String,Object> slots,Definition definition){return load(c,work,slots,definition,null);}
   public EvaluationFacts load(DomainContext c,Map<String,Object> work,Map<String,Object> slots,Definition definition,String goalId) {
     var port=contributionPort.getIfAvailable();var credits=goalId==null||port==null?List.<Map<String,Object>>of():port.contributions(c,work.get("ID").toString(),goalId);
@@ -32,7 +32,10 @@ public class AssessmentFactProvider {
       if(!stateGoal&&(attribute.name().equals("quantity")||attribute.name().equals("occurredAt")))for(var occurrence:occurrences) {
         var allocations=credits.stream().filter(x->Objects.equals(occurrence.get("ID"),x.get("occurrenceId"))).toList();
         if((!Objects.equals(work.get("ID"),occurrence.get("workId"))&&allocations.isEmpty())||!Objects.equals(work.get("itemId"),occurrence.get("itemId")))continue;
-        if(lotScope!=null&&!Objects.equals(lotScope,"LOT".equals(occurrence.get("subjectKind"))?occurrence.get("subjectId"):segments.stream().filter(x->Objects.equals(x.get("ID"),occurrence.get("physicalScopeId"))).map(x->x.get("lotId")).findFirst().orElse(null)))continue;
+        var domainProviders=admissions.stream().filter(p->p.eventKinds().contains(occurrence.get("kind"))).toList();
+        var admission=domainProviders.size()==1?domainProviders.getFirst().admit(c,work.get("ID").toString(),goalId,occurrence):new CanonicalFactAdmission.Admission(!"PHYSICAL_RECEIPT".equals(occurrence.get("kind"))&&domainProviders.isEmpty(),(java.math.BigDecimal)occurrence.get("quantity"),null,List.of());
+        Object factLot=admission.lotId()!=null?admission.lotId():"LOT".equals(occurrence.get("subjectKind"))?occurrence.get("subjectId"):segments.stream().filter(x->Objects.equals(x.get("ID"),occurrence.get("physicalScopeId"))).map(x->x.get("lotId")).findFirst().orElse(null);
+        if(lotScope!=null&&!Objects.equals(lotScope,factLot))continue;
         if(slots.get("eventKind")!=null&&!Objects.equals(slots.get("eventKind"),occurrence.get("kind")))continue;
         if(placeScope!=null&&!Objects.equals(placeScope,occurrence.get("placeId")))continue;
         if(occurrences.stream().anyMatch(x->occurrence.get("ID").equals(x.get("supersedesId"))))continue;
@@ -64,14 +67,16 @@ public class AssessmentFactProvider {
             }
           }
         }
+        verified&=admission.admitted();refs.addAll(admission.evidenceRefs());
+        if(admission.admitted()&&occurrence.get("quantity") instanceof java.math.BigDecimal actual&&(admission.recognizedQuantity()==null||admission.recognizedQuantity().signum()<0||admission.recognizedQuantity().compareTo(actual)>0))verified=false;
         State state=sourceConflict?State.CONFLICT:state(occurrence.get("valueState"));
-        Object value=attribute.name().equals("occurredAt")?effective:occurrence.get("quantity");
+        Object value=attribute.name().equals("occurredAt")?effective:admission.admitted()?admission.recognizedQuantity():occurrence.get("quantity");
         Instant until=instantOrNull(occurrence.get("effectiveUntil"));
         if(Set.of("EXISTS_IN","THROUGHOUT").contains(slots.get("quantityMode"))&&until==null)until=effective.plusNanos(1);
         if(allocations.isEmpty())facts.add(new Fact(occurrence.get("ID").toString(),Objects.toString(occurrence.get("revision")),DefinitionRepository.sha256(occurrence.toString()),occurrence.get("ID").toString(),Objects.toString(occurrence.get("physicalScopeId"),null),value,Objects.toString(occurrence.get("unit"),null),state,verified,effective,until,instant(occurrence.get("recordedAt")),refs));
         else for(var credit:allocations){
           var creditRefs=new ArrayList<>(refs);creditRefs.add(credit.get("ID").toString());
-          boolean validCredit=occurrence.get("physicalScopeId")!=null&&Objects.equals(credit.get("unit"),occurrence.get("unit"));
+          boolean validCredit=occurrence.get("physicalScopeId")!=null&&Objects.equals(credit.get("unit"),occurrence.get("unit"))&&(admission.recognizedQuantity()==null||allocations.stream().map(x->(java.math.BigDecimal)x.get("quantity")).reduce(java.math.BigDecimal.ZERO,java.math.BigDecimal::add).compareTo(admission.recognizedQuantity())<=0);
           facts.add(new Fact(occurrence.get("ID").toString(),Objects.toString(occurrence.get("revision")),DefinitionRepository.sha256(occurrence.toString()),occurrence.get("ID").toString(),occurrence.get("physicalScopeId")+"|"+credit.get("ID"),attribute.name().equals("quantity")?credit.get("quantity"):value,Objects.toString(credit.get("unit")),validCredit?state:State.CONFLICT,verified&&validCredit,effective,until,instant(occurrence.get("recordedAt")),creditRefs));
         }
       }
