@@ -29,12 +29,13 @@ public class TradeImpact {
     var source=repository.requireSource(context.organizationId(),"DECISION",sourceCommandId);
     var target=work.require(context,workId,true);
     if("CLOSED".equals(target.get("status")))target=work.ensureFollowup(context,workId,sourceId,kind,nextAction,nextCheckAt);
-    work.markInvalidation(context,target.get("ID").toString(),true);
     var scope=new TreeMap<String,Object>();scope.put("originalWorkId",workId);scope.put("domainSourceId",sourceId);
     if(physicalScopeId!=null)scope.put("physicalScopeId",physicalScopeId);
     String scopeJson;try{scopeJson=new com.fasterxml.jackson.databind.ObjectMapper().writeValueAsString(scope);}catch(Exception e){throw new IllegalStateException(e);}
     String version=source.get("canonicalHash")!=null?source.get("canonicalHash").toString():String.valueOf(source.getOrDefault("revision",0));
-    return duties.openDuty(context,Map.of("workId",target.get("ID"),"sourceId",sourceCommandId,"sourceKind","DECISION","sourceVersion",version,"kind",kind,"scopeJson",scopeJson,"nextAction",nextAction,"nextCheckAt",nextCheckAt));
+    var result=duties.openDuty(context,Map.of("workId",target.get("ID"),"sourceId",sourceCommandId,"sourceKind","DECISION","sourceVersion",version,"kind",kind,"scopeJson",scopeJson,"nextAction",nextAction,"nextCheckAt",nextCheckAt));
+    if(!result.containsKey("assignments"))work.markInvalidation(context,target.get("ID").toString(),true);
+    return result;
   }
 
   /** Confirmed facts change the assessment input without inventing a response duty. */

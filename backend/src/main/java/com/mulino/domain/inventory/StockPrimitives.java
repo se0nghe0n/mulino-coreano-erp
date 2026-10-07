@@ -122,7 +122,7 @@ public final class StockPrimitives {
       BigDecimal remaining=(BigDecimal)a.get("quantity");
       for(var child:children) {
         String sid=(String)child.get("ID");BigDecimal q=remaining.min(available.get(sid));if(q.signum()<=0)continue;
-        var next=row(c,id(),at);for(String key:List.of("rootId","orderLineId","unit","state"))next.put(key,a.get(key));
+        var next=row(c,id(),at);for(String key:List.of("rootId","orderLineId","unit","state","workId","authorizationActorId","action","nextValidityBoundary"))if(a.containsKey(key))next.put(key,a.get(key));
         next.put("segmentId",sid);next.put("quantity",q);next.put("predecessorId",a.get("ID"));next.put("commandId",command);
         repository.insert("SegmentAllocations",next);remaining=remaining.subtract(q);available.put(sid,available.get(sid).subtract(q));
       }
