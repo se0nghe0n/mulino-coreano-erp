@@ -1,0 +1,250 @@
+{
+  "sourceCommit": "7fb16977dbe4c3087e2f6d5e874352e52e6f0193",
+  "command": "./mvnw -B -ntp -f backend/pom.xml clean test package",
+  "result": "FAIL",
+  "exitCode": 1,
+  "counts": {
+    "tests": 371,
+    "failures": 1,
+    "errors": 13,
+    "skipped": 0
+  },
+  "failedOrErroredTests": [
+    "com.mulino.PlatformIntegrationTest.compilerColumnsMatchFlywaySchema",
+    "com.mulino.PlatformIntegrationTest.cqnActionReplayAndConflict",
+    "com.mulino.PlatformIntegrationTest.grantRevocationCommitPrecedesAction",
+    "com.mulino.PlatformIntegrationTest.effectBeforeRestrictionPreservesHistory",
+    "com.mulino.PlatformIntegrationTest.restrictionPhantomCommitPrecedesAction",
+    "com.mulino.PlatformIntegrationTest.reservationRaceHasOneEffect",
+    "com.mulino.PlatformIntegrationTest.ontologyV1ToV2PreservesProgressAndDefinition",
+    "com.mulino.PlatformIntegrationTest.scopeLockTimeoutReturnsStructuredConflictWithoutEffects",
+    "com.mulino.PlatformIntegrationTest.auditFailureRollsBackAllWrites",
+    "com.mulino.PlatformIntegrationTest.postgresBackupRestorePreservesAtomicEffects",
+    "com.mulino.PlatformIntegrationTest.policyUnknownCommitPrecedesAction",
+    "com.mulino.application.identity.IdentityPersistenceTest.databaseCompositeFkRejectsOtherOrganizationActorAndCqnNoLeak",
+    "com.mulino.application.identity.IdentityPersistenceTest.cqnMappingAndCurrentReadGrantDeniesWriterCapability",
+    "com.mulino.core.S1ReadIntegrationTest.twoEntrypointsSharePhysicalReferencesEvidenceAndResponsibility"
+  ],
+  "reasons": [
+    "13 context errors: launch did not set a private isolated blob-root; default existing directory rejected",
+    "1 stale S1 expectation: S3 now exposes proven eligible zero with UNKNOWN authority and confirmed empty receipt sum"
+  ],
+  "sourceUnchangedDuringRun": true,
+  "artifacts": [
+    {
+      "path": "docs/execution/evidence/step3-s3/aggregate-attempt1/maven.log.gz",
+      "rawSha256": "acf450f578716a09426108eb01f0bd129a40365753a11d10abe495590d9a3eb2",
+      "sha256": "223ae1a600630d3ff3316df64501a3816568213cf45e80aa35b87bf9627ce40a"
+    },
+    {
+      "path": "docs/execution/evidence/step3-s3/aggregate-attempt1/TEST-com.mulino.AssessmentPostgresTest.xml.gz",
+      "rawSha256": "b4d4181ac277aaf5bdf56823918ba80488de8fd4e96d3b00ca693611bb93a7c6",
+      "sha256": "d33642e42d21c79336a79e76ad8e8bf91675e77c25346968f676e7d4a118598c"
+    },
+    {
+      "path": "docs/execution/evidence/step3-s3/aggregate-attempt1/TEST-com.mulino.DefinitionValidatorTest.xml.gz",
+      "rawSha256": "363b01dbdccfa1f243819e6475aba1c54ba24d4818f70e692abcf182725031a9",
+      "sha256": "5af171b7a9c713a4cb1d3d33df2e111de2b9986b7eb1128356d777cf71ad9b24"
+    },
+    {
+      "path": "docs/execution/evidence/step3-s3/aggregate-attempt1/TEST-com.mulino.DefinitionsPersistenceTest.xml.gz",
+      "rawSha256": "7098abc0ef835c08f77386ae01dd3d5d63e48186a6645c5f82169a4ddd88a200",
+      "sha256": "d78eae19e7f1d8c76847cb641201dd757011247ee6134ced5e64b8df1be688e9"
+    },
+    {
+      "path": "docs/execution/evidence/step3-s3/aggregate-attempt1/TEST-com.mulino.PlatformIntegrationTest.xml.gz",
+      "rawSha256": "af19439147b2fcfeae7a579ed60a723fdc294258df1e82f8c4ed8e94630e905b",
+      "sha256": "8c58c3d5f5fa0bbf7b610038945ff78143147b26bfe6c390fe2dfbbf90153f6a"
+    },
+    {
+      "path": "docs/execution/evidence/step3-s3/aggregate-attempt1/TEST-com.mulino.TypedPredicateEvaluatorTest.xml.gz",
+      "rawSha256": "7cede8d266915cc31d275b33ecaa8d21aea00440f22b3dc64740e9fbc413b9f8",
+      "sha256": "0f90c635b148cf168684d062ed2f94d5bca9f5b0c38c2671305f9c5ef44fcf85"
+    },
+    {
+      "path": "docs/execution/evidence/step3-s3/aggregate-attempt1/TEST-com.mulino.application.evidence.CompletionCoverageGatewayTest.xml.gz",
+      "rawSha256": "4f07f11166e7c737e715c4f2ab22f56e0a0bb39736b11dec185a51e665920335",
+      "sha256": "a05228ef225dc63181aa730ecf2b838165f6d4cb9e3b0eb8f6e4c6c288bc6e3a"
+    },
+    {
+      "path": "docs/execution/evidence/step3-s3/aggregate-attempt1/TEST-com.mulino.application.evidence.EvidenceGatewayTest.xml.gz",
+      "rawSha256": "9df11d74ba0a043feac97a2af45352af46e300fdf9a135c9c539bd0d026936f4",
+      "sha256": "d8ab4865eec754c6105f5b8bd518697c160bee65c5e011dccfc7ad1b46e7dec5"
+    },
+    {
+      "path": "docs/execution/evidence/step3-s3/aggregate-attempt1/TEST-com.mulino.application.evidence.EvidencePersistenceTest.xml.gz",
+      "rawSha256": "11e9eb2db878b81204532637c3d4636136205e2200d8aa28aa880686a614177a",
+      "sha256": "82188a112dbf2bc384bb0714e7dca2c3feeb1f993faa56b3984559d22fc0f48c"
+    },
+    {
+      "path": "docs/execution/evidence/step3-s3/aggregate-attempt1/TEST-com.mulino.application.evidence.EvidenceReconciliationTest.xml.gz",
+      "rawSha256": "6fdb9a52823181f5693831dc4859cbae9266095e29c1fcef24ef1fafb38b0896",
+      "sha256": "838c95cb7103c9d29d82da86fb895234d6ee2acbf854e558ddc55f52bbabfc36"
+    },
+    {
+      "path": "docs/execution/evidence/step3-s3/aggregate-attempt1/TEST-com.mulino.application.evidence.ReceiptGatewayPostgresTest.xml.gz",
+      "rawSha256": "9d0827ad3b541d80e9c180f2491b8e045969f0b813ca8c4825931ab200fc354d",
+      "sha256": "b73a42b9075bf7c4bfad84845ed249c82fac1b46fe26ddb8c8e6dab56e59fe0d"
+    },
+    {
+      "path": "docs/execution/evidence/step3-s3/aggregate-attempt1/TEST-com.mulino.application.evidence.ReceiptResidualGatewayPostgresTest.xml.gz",
+      "rawSha256": "df46b16834e0a79deef41ed0b5bdca68f73f252e647270a0818d9b0992a98fde",
+      "sha256": "8ceb5e3134a3d6abeb18f855a3d36719ec59038c3663684cdc2615086a8658e6"
+    },
+    {
+      "path": "docs/execution/evidence/step3-s3/aggregate-attempt1/TEST-com.mulino.application.evidence.S3CanonicalGatePostgresTest.xml.gz",
+      "rawSha256": "51f0536685e3d9cecf1076b667de6ed8781e53eaf08c5d7c86bb1b6113edc25b",
+      "sha256": "da490c3d64019ab8df3ba3f273f0909f3962ab1b30e3169a17540f547296f50d"
+    },
+    {
+      "path": "docs/execution/evidence/step3-s3/aggregate-attempt1/TEST-com.mulino.application.evidence.S3TypedEvidencePostgresTest.xml.gz",
+      "rawSha256": "4025cbaf0e746661f6c02d6ddddc010b03e4a29b524d0c6db55d51c0ef6446bc",
+      "sha256": "ba0283953402604fffd5deee05e733471e8d02efa2c43eb1760ddd5c35967a8f"
+    },
+    {
+      "path": "docs/execution/evidence/step3-s3/aggregate-attempt1/TEST-com.mulino.application.evidence.ShipmentGatewayTest.xml.gz",
+      "rawSha256": "935c793f0f8bc3085582625e22b6addd81b9438e0f7aa11ac472b7d140faf8c6",
+      "sha256": "b8c26878bbda9bd6bf7ee0c07dbfe17db8d2d6aaef2537f13688e644d3bdf5c4"
+    },
+    {
+      "path": "docs/execution/evidence/step3-s3/aggregate-attempt1/TEST-com.mulino.application.identity.AuthorityEvidenceTest.xml.gz",
+      "rawSha256": "1aefdd2336ef24d005ec452c682d5c600917c04a0a796a52a0eb4c50a3ad93dc",
+      "sha256": "254508ad8f834a000127ae34e05af4036a213dd7e10cc7808df621162526c285"
+    },
+    {
+      "path": "docs/execution/evidence/step3-s3/aggregate-attempt1/TEST-com.mulino.application.identity.IdentityAuthorizationTest.xml.gz",
+      "rawSha256": "153215fe6592ff7d01e39d6328d2429ac6cf051813c6d80caabd006481f16d8a",
+      "sha256": "81c486313b2bcca211e66327b3ec1c7cdeb5b2797cb419f3ed2af84ba1b68212"
+    },
+    {
+      "path": "docs/execution/evidence/step3-s3/aggregate-attempt1/TEST-com.mulino.application.identity.IdentityPersistenceTest.xml.gz",
+      "rawSha256": "d16d5e5c72d7db67f9fea5cd689a7280c9d1afd94fcf686ca222f89b83d74e83",
+      "sha256": "5e2adea0e09d952b34f4608bf8887a56c0abea894f4ef571aad078e833a0c9a2"
+    },
+    {
+      "path": "docs/execution/evidence/step3-s3/aggregate-attempt1/TEST-com.mulino.application.policy.ControlPersistenceTest.xml.gz",
+      "rawSha256": "ae5f1797a633f74d4941f948e0b6abf60d17762e9cd4bd7c6e4747b71d933ad1",
+      "sha256": "a6f1fe11f868139feda526a0ed602c0b24baf814f53161b32808a0a859768298"
+    },
+    {
+      "path": "docs/execution/evidence/step3-s3/aggregate-attempt1/TEST-com.mulino.commands.CommandEnvelopeTest.xml.gz",
+      "rawSha256": "ed51d3aa494abcf630e2a9a3a0b3dd194b104f4e5719c1bc8e840731f2fd444e",
+      "sha256": "cb5d6c1dbcbb9e1b19b229ae82e110914299052c2899ce0b0e00fd8ce59e8a81"
+    },
+    {
+      "path": "docs/execution/evidence/step3-s3/aggregate-attempt1/TEST-com.mulino.commands.CommandSubjectTest.xml.gz",
+      "rawSha256": "3b432d027ff8b2cc57b6c14190ed03dfdce35f801d6836a00bf543d23bb07c5b",
+      "sha256": "95019266a5d1e0452f5269b54d82ad2f9045d24cfee37a0469905287b55b72a6"
+    },
+    {
+      "path": "docs/execution/evidence/step3-s3/aggregate-attempt1/TEST-com.mulino.commands.CommandTransactionTest.xml.gz",
+      "rawSha256": "9c3578670f1695e7d592710cf8ed77c8a6f6dcf7fb4c6106d1b7e899cf3f2af3",
+      "sha256": "83645aa90c572bf46669514defdf54a6286455f9a9ddddd7993dff7d9122c5b3"
+    },
+    {
+      "path": "docs/execution/evidence/step3-s3/aggregate-attempt1/TEST-com.mulino.core.PurchaseCommandPostgresTest.xml.gz",
+      "rawSha256": "5c8e164037e4f8e853fd60931582f48e5c34d7f6634af087aa840f74aa9bc223",
+      "sha256": "643db28beff9eb730a73f4789c4916b9695e07ee2a16e4b3c054f3d02a9f39ba"
+    },
+    {
+      "path": "docs/execution/evidence/step3-s3/aggregate-attempt1/TEST-com.mulino.core.ReadContractsTest.xml.gz",
+      "rawSha256": "72a7a2669357aec01c22aaa8bbc5b5afbe1991237ef8d82e7a0a1920d8b422a1",
+      "sha256": "272b768e1d2285e2a2b5a056544d3b9c59b696e7bdbeeea4e1edfbdc315e756a"
+    },
+    {
+      "path": "docs/execution/evidence/step3-s3/aggregate-attempt1/TEST-com.mulino.core.S1ReadIntegrationTest.xml.gz",
+      "rawSha256": "1215e134edcd116d2b8d927b05b1e94810248a08811a584196211109461339b9",
+      "sha256": "95804486b67c7961325290ed12cebe02ec7cbf98018a79cc649facf0a35778d3"
+    },
+    {
+      "path": "docs/execution/evidence/step3-s3/aggregate-attempt1/TEST-com.mulino.core.S2WorkActualIntegrationTest.xml.gz",
+      "rawSha256": "9ed7269ca83db6459b0e32d9b22b066e8d47927356cd7477c0c4a80835988abd",
+      "sha256": "0fe50e75bd464709120a4d6b2a608b7bb94f0c62c3e7d9ec5d1e2eaabd554a71"
+    },
+    {
+      "path": "docs/execution/evidence/step3-s3/aggregate-attempt1/TEST-com.mulino.core.S2WorkLifecyclePostgresTest.xml.gz",
+      "rawSha256": "8e4d81fa0e854621d0f13c24f3e3455b85c7a807950a85c385cf32ece2045d7e",
+      "sha256": "4a1270f12f2de89100e1716cb0deb4fc413eb4c867623e1a4de71fb3315a9e94"
+    },
+    {
+      "path": "docs/execution/evidence/step3-s3/aggregate-attempt1/TEST-com.mulino.core.S3RegulatoryActualTest.xml.gz",
+      "rawSha256": "3368463497c01fa8384148f0b798b5fe6d38fb66f3df59100003c234a7dabab6",
+      "sha256": "e1e81acce1302028d569eda1e5961377cb954359f6ed79cadb20253760da4e09"
+    },
+    {
+      "path": "docs/execution/evidence/step3-s3/aggregate-attempt1/TEST-com.mulino.core.S3SharedIntegrationTest.xml.gz",
+      "rawSha256": "5deb6d94aec279ad1c43ef43e82255cbb312acebc195197121072dde87528b99",
+      "sha256": "f86c5597cb5a465a84370f8133dfadf668ec811b6c150a6386820e037dc4691a"
+    },
+    {
+      "path": "docs/execution/evidence/step3-s3/aggregate-attempt1/TEST-com.mulino.inventory.InventoryPostgresTest.xml.gz",
+      "rawSha256": "7568f6398fe3cadafddc916c1cdbe00c03a1476c88dea167afbadc52feb55b43",
+      "sha256": "697659f9922f2d12b26d7d24e379a7f2354e26f2e5b10b212f88c435167d06ab"
+    },
+    {
+      "path": "docs/execution/evidence/step3-s3/aggregate-attempt1/TEST-com.mulino.inventory.InventoryQuantityTest.xml.gz",
+      "rawSha256": "3c61389560f22704e6f177ecab002f34cd125068b3987f4f662cc98c95fda4c8",
+      "sha256": "44b00cc8f6000827077f81c120038382a33e0d1bc9a52c16f0ae8415df354aca"
+    },
+    {
+      "path": "docs/execution/evidence/step3-s3/aggregate-attempt1/TEST-com.mulino.inventory.InventorySubjectBindingTest.xml.gz",
+      "rawSha256": "71fb649eaad8918cd1be4b1ee4eab90c2ef93b65b718cc34bd66c46b2e97e682",
+      "sha256": "0196b1cf753c31b6aaf2b36ab56e10ef6a3db0a5f52394729dfb5a890746709b"
+    },
+    {
+      "path": "docs/execution/evidence/step3-s3/aggregate-attempt1/TEST-com.mulino.inventory.StockCommandPostgresTest.xml.gz",
+      "rawSha256": "9cd603fb7b1d0980007f349cd0dfc27c6c4b1ce202980e7ededb418795a0b556",
+      "sha256": "4713ab4c4063beff6a39541065b7bc836c115546c05fed380d77e8232c9916f4"
+    },
+    {
+      "path": "docs/execution/evidence/step3-s3/aggregate-attempt1/TEST-com.mulino.quality.QualityPostgresTest.xml.gz",
+      "rawSha256": "6457f60160fc5f091d3b74eb2525e3a162427606886ad9acc941a187616f9d0f",
+      "sha256": "d54a31bc226a7e2e56ab716f20921cdeea8507ad84301232558778da982f7ce5"
+    },
+    {
+      "path": "docs/execution/evidence/step3-s3/aggregate-attempt1/TEST-com.mulino.quality.QualityRangesTest.xml.gz",
+      "rawSha256": "640da6ea4f499c83681ce7ace1de4c2b04ca439ad20c33ab120a1b7d43c2c5b3",
+      "sha256": "1a76f62727632fb4ff76fb9806ce640b747b7a5f43a740902cbba2261483b13d"
+    },
+    {
+      "path": "docs/execution/evidence/step3-s3/aggregate-attempt1/TEST-com.mulino.responsibility.ResponsibilityEvidenceGateTest.xml.gz",
+      "rawSha256": "79fc7b82b285cf0be27e571ba2665caef7569ec2ee4a37ee9d34210a1478c113",
+      "sha256": "be98f0f1f0ff97b56a611345235b9ba5b7a79c60df9d2ee57d22d6816d523f4b"
+    },
+    {
+      "path": "docs/execution/evidence/step3-s3/aggregate-attempt1/TEST-com.mulino.responsibility.ResponsibilityPostgresTest.xml.gz",
+      "rawSha256": "677e8f420998ce05037af6593d4f8af749b1be910c7077f6cb274648cd6b58b2",
+      "sha256": "abf35ac9dfcf8764e9e57d892d4d2e4791235e6cf09d7efd0b3799253d7c29b2"
+    },
+    {
+      "path": "docs/execution/evidence/step3-s3/aggregate-attempt1/TEST-com.mulino.responsibility.ResponsibilityServiceTest.xml.gz",
+      "rawSha256": "66e0ad0ab47d5a198f5933d2b9ce1b958bc8a9779e11c21654b721a08a7fec8c",
+      "sha256": "7bbd9423a814c909bc07495f423f6cbe7cec097571f25d583186f4be58c58f28"
+    },
+    {
+      "path": "docs/execution/evidence/step3-s3/aggregate-attempt1/TEST-com.mulino.responsibility.ResponsibilitySubjectBindingTest.xml.gz",
+      "rawSha256": "6618d0151bd29dd806b640bfe70ecc78d3fd45c072a18d690d3912fcdc0e29aa",
+      "sha256": "da4d39b1e0fb77e4ccffd0825a7bbed58dc7af5858e926827c042f09136a3735"
+    },
+    {
+      "path": "docs/execution/evidence/step3-s3/aggregate-attempt1/TEST-com.mulino.runtime.RuntimeIntakePostgresTest.xml.gz",
+      "rawSha256": "fe565b0cf658e92dbdc84b8e340f78a74ffb36c3fdf5b6f6e38d623b0c8e0090",
+      "sha256": "96ecb7b4a238417617a01a74c01dd5a67277033957357dc71ea5862f9bf0c342"
+    },
+    {
+      "path": "docs/execution/evidence/step3-s3/aggregate-attempt1/TEST-com.mulino.runtime.RuntimePostgresTest.xml.gz",
+      "rawSha256": "bf4fef251cce8d04c467560252f59da658911d21fdf2cfc73eb327c131ba0127",
+      "sha256": "69af541f3c65d78605aa6fad5390fa8bc838eb5e34cab1a53e5850ae53c4bab6"
+    },
+    {
+      "path": "docs/execution/evidence/step3-s3/aggregate-attempt1/TEST-com.mulino.trade.TradeResidualRemedyTest.xml.gz",
+      "rawSha256": "5d78a3a77fc2c3712619c4dd8f56a6dfec50a987ebfeea74dfe0e0c92ae9ee04",
+      "sha256": "fee24deb537a6d78b663134f20fdfce5aeb9907580649570db009013fd1e0064"
+    },
+    {
+      "path": "docs/execution/evidence/step3-s3/aggregate-attempt1/TEST-com.mulino.work.GoalInputTest.xml.gz",
+      "rawSha256": "6f5346e7d7001ad63290954642162592b3395f2688b91c5c8cbb52061bb26a33",
+      "sha256": "0a467312d7e56f6ad70da845768e30cb4c7212afe890e88eeeb2bffb7fad7ab3"
+    }
+  ]
+}
