@@ -1,0 +1,35 @@
+package com.mulino.application.trade.regulatory;
+import com.mulino.application.core.*;
+import com.mulino.application.evidence.EvidenceQueries;
+import com.mulino.domain.evidence.EvidenceRepository;
+import com.mulino.adapters.blob.LocalBlobStore;
+import com.mulino.application.identity.IdentityAuthorization;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.*;
+import org.springframework.stereotype.Component;
+import static com.mulino.domain.evidence.EvidenceTypes.*;
+/** Immutable original content, source policy and current canonical verification agree. */
+@Component
+public class RegulatoryEvidence {
+ private final EvidenceRepository r;private final EvidenceQueries q;private final LocalBlobStore blobs;private final IdentityAuthorization auth;
+ public RegulatoryEvidence(EvidenceRepository r,EvidenceQueries q,LocalBlobStore blobs,IdentityAuthorization auth){this.r=r;this.q=q;this.blobs=blobs;this.auth=auth;}
+ public Map<String,Object> document(DomainContext c,String id,String item){var d=r.require("DocumentVersions",c.organizationId(),id);auth.authorizeScopes(c,"getEvidence",scopes(d));if(!item.equals(d.get("itemId"))||!"AVAILABLE".equals(d.get("availability"))||d.get("blobId")==null||!blobs.available(UUID.fromString(d.get("blobId").toString()),d.get("sha256").toString()))throw held();return d;}
+ public Map<String,Object> require(DomainContext c,String occurrence,String kind,Map<String,Object> procedure,Map<String,Object> policy,Map<String,Object> expected){
+  var fact=r.require("CanonicalOccurrences",c.organizationId(),occurrence);auth.authorizeScopes(c,"getEvidence",scopes(fact));
+  if(!q.verifiedAt(c,occurrence)||!kind.equals(fact.get("kind"))||!procedure.get("itemId").equals(fact.get("itemId"))||!procedure.get("physicalScopeId").equals(fact.get("physicalScopeId")))throw held();
+  for(var v:r.rows("Verifications",c.organizationId())){
+   if(!occurrence.equals(v.get("canonicalOccurrenceId"))||!"VERIFIED".equals(v.get("verdict"))||!policy.get("version").equals(v.get("policyVersion"))||!List.of("sourceMatched","identityMatched","quantityMatched","timeMatched","duplicateChecked").stream().allMatch(k->Boolean.TRUE.equals(v.get(k))))continue;
+   var claim=r.require("Claims",c.organizationId(),v.get("claimId").toString());var event=r.require("Events",c.organizationId(),claim.get("eventId").toString());
+   if(!policy.get("sourceNamespace").equals(event.get("sourceNamespace"))||!kind.equals(event.get("kind"))||!"KNOWN".equals(event.get("valueState"))||!"KNOWN".equals(claim.get("valueState")))continue;
+   var doc=document(c,v.get("basisDocumentId").toString(),procedure.get("itemId").toString());
+   try{
+    var mapper=new ObjectMapper();var original=mapper.readTree(blobs.read(UUID.fromString(doc.get("blobId").toString()),doc.get("sha256").toString()));var payload=mapper.readTree(event.get("payload").toString());
+    var all=new LinkedHashMap<String,Object>(expected);all.put("itemId",procedure.get("itemId"));all.put("lotId",procedure.get("lotId"));all.put("physicalScopeId",procedure.get("physicalScopeId"));all.put("authority",policy.get("authority"));all.put("policyVersion",policy.get("version"));
+    boolean matches=all.entrySet().stream().allMatch(e->Objects.equals(original.path(e.getKey()).asText(),String.valueOf(e.getValue()))&&Objects.equals(payload.path(e.getKey()).asText(),String.valueOf(e.getValue())));
+    if(matches)return fact;
+   }catch(java.io.IOException ignored){}
+  }throw held();
+ }
+ public boolean current(DomainContext c,String occurrence){try{return q.verifiedAt(c,occurrence);}catch(DomainError e){return false;}}
+ static DomainError held(){return new DomainError("HELD","EVIDENCE_UNVERIFIED","Exact regulatory source and original evidence unavailable");}
+}
