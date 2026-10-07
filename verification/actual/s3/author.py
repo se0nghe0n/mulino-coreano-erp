@@ -59,7 +59,7 @@ raw('unidentified-no-stock',[count('mulino_trade_receipt_observations',1,{'ident
 A.append({'id':'unidentified-eligible0','type':'query','capability':'getInventory','request':{'id':'$P','scope':{'organizationId':'$ORG','itemId':'$P'},'asOf':T,'knownAt':T},'assertions':[{'pointer':'/data/eligibleQuantity','operator':'equals','expected':'0'}]})
 receipt('receipt60','0','60')
 A[-1]['type']='lost-response'
-raw('after60',[sums('mulino_inventory_quantitysegments','quantity','60',{'retiredat':None}),sums('mulino_trade_receipt_receipts','contributedquantity','60')])
+raw('after60',[sums('mulino_inventory_quantitysegments','quantity','60',{'retiredat':None}),sums('mulino_trade_receipt_receipts','contributedquantity','60'),sums('mulino_responsibility_assignments','quantity','40',{'kind':'RECEIPT_SHORTFALL','status':'OPEN'}),count('mulino_responsibility_receiptresidualroots',1),sums('mulino_responsibility_receiptresidualroots','initialcontribution','60'),sums('mulino_responsibility_receiptresidualroots','orderedquantity','100')])
 # Same key retry is a new authenticated HTTP call; observation must remain one effect.
 cmd('retry60','confirmReceipt',{'receiptId':'$receipt60.observation','canonicalOccurrenceId':'$receipt60.canonical','lotId':'$L'},revision=0,subject='$receipt60.observation',noun='Receipt',key='receipt60-confirm-stable')
 A[-1]['type']='parallel'
@@ -68,7 +68,7 @@ receipt('sourceB60','0','60',existing='$receipt60.canonical')
 raw('duplicate60',[count('mulino_evidence_canonicaloccurrences',1,{'kind':'PHYSICAL_RECEIPT'}),count('mulino_inventory_quantitymovements',1,{'kind':'RECEIPT'}),sums('mulino_inventory_quantitysegments','quantity','60',{'retiredat':None}),sums('mulino_trade_receipt_receipts','contributedquantity','60')])
 cmd('other-actor-no-replay','confirmReceipt',{'receiptId':'$receipt60.observation','canonicalOccurrenceId':'$receipt60.canonical','lotId':'$L'},revision=0,subject='$receipt60.observation',noun='Receipt',key='receipt60-confirm-stable',outcome='REJECTED',assertions=[{'pointer':'/effects','operator':'equals','expected':{}},{'pointer':'/error/code','operator':'equals','expected':'FORBIDDEN'}]);A[-1]['actor']='outsider'
 receipt('receipt40','0','40')
-raw('after100',[sums('mulino_inventory_quantitysegments','quantity','100',{'retiredat':None}),sums('mulino_trade_receipt_receipts','contributedquantity','100')])
+raw('after100',[sums('mulino_inventory_quantitysegments','quantity','100',{'retiredat':None}),sums('mulino_trade_receipt_receipts','contributedquantity','100'),count('mulino_responsibility_assignments',0,{'kind':'RECEIPT_SHORTFALL','status':'OPEN'}),sums('mulino_responsibility_receiptresidualcredits','quantity','40'),sums('mulino_responsibility_assignments','quantity','40',{'kind':'RECEIPT_SHORTFALL','status':'RESOLVED'})])
 receipt('extra5','0','5')
 raw('extra5-discrepancy',[sums('mulino_trade_receipt_receipts','contributedquantity','100'),sums('mulino_trade_receipt_receipts','excessquantity','5')])
 # Source reply and shipment plan belong before physical receipt.

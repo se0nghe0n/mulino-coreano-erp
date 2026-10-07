@@ -1223,6 +1223,33 @@
           "operator": "sum",
           "column": "contributedquantity",
           "expected": "60"
+        },
+        {
+          "pointer": "/rawRows/mulino_responsibility_assignments",
+          "operator": "sum",
+          "column": "quantity",
+          "expected": "40",
+          "where": {
+            "kind": "RECEIPT_SHORTFALL",
+            "status": "OPEN"
+          }
+        },
+        {
+          "pointer": "/rawRows/mulino_responsibility_receiptresidualroots",
+          "operator": "size",
+          "expected": 1
+        },
+        {
+          "pointer": "/rawRows/mulino_responsibility_receiptresidualroots",
+          "operator": "sum",
+          "column": "initialcontribution",
+          "expected": "60"
+        },
+        {
+          "pointer": "/rawRows/mulino_responsibility_receiptresidualroots",
+          "operator": "sum",
+          "column": "orderedquantity",
+          "expected": "100"
         }
       ]
     },
@@ -1759,6 +1786,31 @@
           "operator": "sum",
           "column": "contributedquantity",
           "expected": "100"
+        },
+        {
+          "pointer": "/rawRows/mulino_responsibility_assignments",
+          "operator": "matchingRows",
+          "expected": 0,
+          "where": {
+            "kind": "RECEIPT_SHORTFALL",
+            "status": "OPEN"
+          }
+        },
+        {
+          "pointer": "/rawRows/mulino_responsibility_receiptresidualcredits",
+          "operator": "sum",
+          "column": "quantity",
+          "expected": "40"
+        },
+        {
+          "pointer": "/rawRows/mulino_responsibility_assignments",
+          "operator": "sum",
+          "column": "quantity",
+          "expected": "40",
+          "where": {
+            "kind": "RECEIPT_SHORTFALL",
+            "status": "RESOLVED"
+          }
         }
       ]
     },
