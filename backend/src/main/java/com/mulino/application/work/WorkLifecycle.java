@@ -18,6 +18,14 @@ public class WorkLifecycle implements CommandHandler,WorkFollowup {
  public WorkLifecycle(WorkRepository repository,IdentityRepository identities,DefinitionRepository definitions,com.mulino.domain.governance.PolicyRepository policies,ObjectProvider<WorkAssessmentGuard> assessments,ObjectProvider<WorkResponsibility> responsibility,ExecutionClock clock){this.repository=repository;this.identities=identities;this.definitions=definitions;this.policies=policies;this.assessments=assessments;this.responsibility=responsibility;this.clock=clock;}
  public Set<String> capabilities(){return Set.of("createWork","createDraft","cancelDraft","activateWork","waitWork","resumeWork","reviseGoal","closeWork","createFollowup","createWorkLink");}
  public Set<String> definitionVersions(){return Set.of("1.0.0","definition-v1");}
+ public List<SubjectBinding> subjectBindings(DomainContext c,Map<String,Object> intent,CommandPreparation preparation){
+  var p=parameters(c,intent);String op=operation(intent);
+  if(op.equals("createDraft")||op.equals("createWork")){var items=Set.of(id(p,"itemId"));return List.of(map(intent.get("slots")).containsKey("goal")?SubjectBinding.optional("TradeItem",items):SubjectBinding.required("TradeItem",items));}
+  String source=id(p,"workId");var targets=new HashSet<String>(Set.of(source));var items=new HashSet<String>(Set.of(String.valueOf(repository.require(c,source,false).get("itemId"))));
+  if(op.equals("createWorkLink")){String target=id(p,"targetWorkId");targets.add(target);items.add(String.valueOf(repository.require(c,target,false).get("itemId")));}
+  if(op.equals("createFollowup"))items.add(id(map(p.get("draft")),"itemId"));
+  return List.of(SubjectBinding.optional("Work",targets),SubjectBinding.optional("TradeItem",items));
+ }
  public CommandPreparation prepare(DomainContext c,Map<String,Object> intent){var p=parameters(c,intent);String op=operation(intent);validateKeys(op,p);if((op.equals("createDraft")||op.equals("createWork"))&&intent.containsKey("definitionVersion")){var pinned=definitions.get(c.organizationId(),id(p,"definitionVersionId"));if(!Objects.equals(pinned.version(),intent.get("definitionVersion"))&&!Objects.equals(pinned.id(),intent.get("definitionVersion")))throw DomainError.unsupported();}if(p.get("goal") instanceof Map<?,?>)GoalInput.validate(map(p.get("goal")),false);
   if(op.equals("createDraft")||op.equals("createWork")){String item=id(p,"itemId");return new CommandPreparation(Map.of("ITEM",List.of(item)),List.of("work-create:"+item),new HashSet<>(List.of(id(p,"ownerId"),id(p,"supervisorId"))),"WORK",null,null,0,null,null);}
   String id=id(p,"workId");var w=repository.require(c,id,false);var works=new ArrayList<String>(List.of(id));var items=new ArrayList<String>(List.of(String.valueOf(w.get("itemId"))));var fences=new ArrayList<String>(List.of("work:"+id));var actors=new HashSet<String>(List.of(String.valueOf(w.get("ownerId")),String.valueOf(w.get("supervisorId"))));
