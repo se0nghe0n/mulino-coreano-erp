@@ -76,7 +76,7 @@ public class InventoryQueries implements QueryHandler {
     return new QueryResult(page,q.scope(),List.of(),List.of(),List.of(),next);
   }
   private QueryResult inventory(DomainContext c, QueryRequest q) {
-    Set<String> allowed=Set.of("itemId","placeId","lotId","objectType","organizationId");
+    Set<String> allowed=Set.of("itemId","placeId","lotId","objectType","organizationId","customerId");
     if (!allowed.containsAll(q.scope().keySet())) throw DomainError.invalid("Unsupported inventory scope");
     String item=(String)q.scope().get("itemId");
     if (item==null) item=q.id();

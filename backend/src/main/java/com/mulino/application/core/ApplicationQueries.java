@@ -63,10 +63,13 @@ public class ApplicationQueries {
     TreeSet<String> unknowns=new TreeSet<>(result.unknowns());
     TreeSet<String> conflicts=new TreeSet<>(result.conflicts());
     Object shared=data;
+    Map<String,Object> snapshotScope=scope;
     if(worldOperations.contains(request.operation())&&data instanceof Map<?,?>&&scope.get("itemId")!=null){
-      Map<String,Object> world=work.world(context,scope);
+      var worldScope=new LinkedHashMap<String,Object>();for(String key:List.of("organizationId","itemId","lotId","placeId","customerId"))if(scope.containsKey(key))worldScope.put(key,scope.get(key));
+      snapshotScope=worldScope;
+      Map<String,Object> world=work.world(context,worldScope);
       if(handlers.containsKey("getInventory")){
-        var inventoryScope=new LinkedHashMap<String,Object>();for(String key:List.of("organizationId","itemId","lotId","placeId"))if(scope.containsKey(key))inventoryScope.put(key,scope.get(key));
+        var inventoryScope=new LinkedHashMap<String,Object>();for(String key:List.of("organizationId","itemId","lotId","placeId","customerId"))if(scope.containsKey(key))inventoryScope.put(key,scope.get(key));
         QueryRequest inventory=new QueryRequest("getInventory",null,inventoryScope,Map.of(),200,null,request.definitionVersion(),asOf,knownAt,null);
         auth.authorize(context,"getInventory",null);
         QueryResult inventoryResult=handlers.get("getInventory").query(context,inventory);
@@ -78,7 +81,7 @@ public class ApplicationQueries {
       world.put("evidenceRefs",List.copyOf(evidence));
       Map<String,Object> merged=new LinkedHashMap<>((Map<String,Object>)data);merged.putAll(world);data=merged;shared=world;
     }
-    String snapshot=snapshot(context,scope,shared);
+    String snapshot=snapshot(context,snapshotScope,shared);
     if(request.snapshotRef()!=null&&!request.snapshotRef().equals(snapshot))throw new DomainError("CONFLICT","SNAPSHOT_CHANGED","Read snapshot changed; repeat the query");
     Map<String,Object> envelope=new LinkedHashMap<>();
     envelope.put("data",TransportValues.normalize(data));envelope.put("snapshotRevision",snapshot);envelope.put("asOf",asOf.toString());envelope.put("knownAt",knownAt.toString());envelope.put("scope",scope);

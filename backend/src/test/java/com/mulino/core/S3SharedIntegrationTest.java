@@ -63,6 +63,19 @@ class S3SharedIntegrationTest extends S1ReadIntegrationTest {
     assertEquals(3,jdbc.queryForObject("SELECT count(*) FROM mulino_responsibility_Roots WHERE organizationId=?",Integer.class,org));
     assertEquals(2,jdbc.queryForObject("SELECT count(*) FROM mulino_responsibility_Roots WHERE organizationId=? AND kind='VALIDITY_EXPIRED'",Integer.class,org));
   }
+  @Test void nounAndVerbShareWorldSnapshotAndPreserveCustomerContext(){
+    Instant now=Instant.now();String customer=id();
+    var base=row("scope",Map.of("itemId",item,"customerId",customer),"asOf",now.toString(),"knownAt",now.toString());
+    var noun=new LinkedHashMap<String,Object>(base);noun.put("id",item);noun.put("scope",Map.of("itemId",item,"customerId",customer,"objectType","TradeItem"));
+    var left=runtime.requestContext().run(c->{return queries.query(QueryRequests.parse("getObject",noun));});
+    var right=runtime.requestContext().run(c->{return queries.query(QueryRequests.parse("getInventory",base));});
+    assertEquals(left.get("snapshotRevision"),right.get("snapshotRevision"));
+    assertEquals(customer,((Map<?,?>)right.get("scope")).get("customerId"));
+    var other=new LinkedHashMap<String,Object>(base);other.put("scope",Map.of("itemId",item,"customerId",id()));
+    var changed=runtime.requestContext().run(c->{return queries.query(QueryRequests.parse("getInventory",other));});
+    assertNotEquals(right.get("snapshotRevision"),changed.get("snapshotRevision"));
+    assertEquals(((Map<?,?>)left.get("data")).get("eligibleQuantity"),((Map<?,?>)right.get("data")).get("eligibleQuantity"));
+  }
   @TestConfiguration static class Configuration {
     @Bean CommandHandler sharedImpactHandler(TradeImpact impact,WorkAccess works){return new CommandHandler(){
       public Set<String> capabilities(){return Set.of("s3SharedImpact");}
