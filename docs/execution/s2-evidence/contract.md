@@ -22,7 +22,8 @@ hash는 CONFLICT다. 임의 source 우선순위로 해소하지 않는다. 각�
 QuantityMovement·예약·배분을 쓰지 않는다. 실제 수령·인도 효과는 이후
 도메인 명령의 원장·배분 guard를 통과해야 한다.
 
-`correctEvidence`는 과거 Event를 바꾸지 않고 supersedes revision을 추가한다.
+`correctEvidence`는 EVENT·DOCUMENT·CLAIM typed selector의 과거 원본을
+바꾸지 않고 supersedes revision을 추가한다.
 필수 EvidenceCorrectionImpact port가 같은 transaction에서 영향받는 Work와
 Goal의 현재 판정·책임을 처리한다. 이 port가 없으면 효과0 보류다.
 과거 assessment와 stock movement를 수정하지 않는다.

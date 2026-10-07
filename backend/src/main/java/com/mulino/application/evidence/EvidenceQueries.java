@@ -89,6 +89,7 @@ public class EvidenceQueries implements QueryHandler {
       if(!auth.permittedScopes(c,"getEvidence",scopes(claim))||!auth.permittedScopes(c,"getEvidence",scopes(event))||!auth.permittedScopes(c,"getEvidence",scopes(basis))
           ||!"AVAILABLE".equals(basis.get("availability"))||basis.get("blobId")==null||!blobs.available(UUID.fromString(basis.get("blobId").toString()),basis.get("sha256").toString()))return false;
       if(r.rows("Events",c.organizationId()).stream().anyMatch(x->visible(x,c)&&(event.get("ID").equals(x.get("invalidatesId"))||event.get("ID").equals(x.get("supersedesId")))))return false;
+      if(r.rows("DocumentVersions",c.organizationId()).stream().anyMatch(x->visible(x,c)&&basis.get("ID").equals(x.get("supersedesId"))))return false;
       if(r.rows("Claims",c.organizationId()).stream().anyMatch(x->visible(x,c)&&claim.get("ID").equals(x.get("supersedesId"))))return false;
       long variants=r.rows("InboxRecords",c.organizationId()).stream().filter(x->visible(x,c)&&Objects.equals(event.get("sourceNamespace"),x.get("sourceNamespace"))&&Objects.equals(event.get("externalEventId"),x.get("externalEventId"))&&Objects.equals(event.get("sourceVersion"),x.get("sourceVersion"))).count();
       return variants==1;
