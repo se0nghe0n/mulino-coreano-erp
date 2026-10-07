@@ -1,0 +1,1275 @@
+{
+  "schemaVersion": "1.0",
+  "sourceFiles": [
+    {
+      "path": "docs/ontology-implementation-plan.md",
+      "sha256": "7f010093b1fba3673f674c78dddc8c407512e037831f093babc87d7421a22a00"
+    },
+    {
+      "path": "docs/ontology-design-philosophy.md",
+      "sha256": "f41ad2861aec491314721b7e9bdb052e09bbd95c88988980372dd5bc71ab5471"
+    },
+    {
+      "path": "docs/ontology-discussion.md",
+      "sha256": "3308b57cb77a17ae17383ff80b70fdd2bf918a25784e32200f39a57eb4cfa69e"
+    },
+    {
+      "path": ".agents/skills/ontology-scenario-testing/references/acceptance-oracles.md",
+      "sha256": "397b7942b397d3f926ebaaabe3b31814e508edb2eebf2ad297d827cc90216347"
+    }
+  ],
+  "requiredCaseIds": [
+    "T01",
+    "T02",
+    "T03",
+    "T04",
+    "T05",
+    "T06",
+    "T07",
+    "T08",
+    "T09",
+    "T10",
+    "T11",
+    "T12",
+    "T13",
+    "T14",
+    "T15",
+    "T16",
+    "T17",
+    "T18",
+    "T19",
+    "T20",
+    "T21",
+    "T22",
+    "T23",
+    "T24",
+    "T25",
+    "T26",
+    "C1",
+    "C2",
+    "C3",
+    "C4",
+    "C5",
+    "V1",
+    "V2",
+    "V3",
+    "V4",
+    "V5",
+    "V6",
+    "V7",
+    "V8",
+    "E1",
+    "E2"
+  ],
+  "requirementIds": [
+    "D01",
+    "D02",
+    "D03",
+    "D04",
+    "D05",
+    "D06",
+    "D07",
+    "D08",
+    "D09",
+    "D10",
+    "D11",
+    "D12",
+    "D13",
+    "D14",
+    "D15",
+    "D16",
+    "D17",
+    "D18",
+    "D19",
+    "D20",
+    "D21",
+    "D22",
+    "D23",
+    "D24",
+    "D25",
+    "D26"
+  ],
+  "oracleContracts": {
+    "T01.two-entrypoints": {
+      "caseId": "T01",
+      "observationNames": [
+        "same-world"
+      ],
+      "contractSha256": "a6fdeadd6e80bacdeec0655e9bd7f241089fbffe179490b8ae5f6ea394728ae6"
+    },
+    "T01.five-competency-questions": {
+      "caseId": "T01",
+      "observationNames": [
+        "answers-grounded"
+      ],
+      "contractSha256": "50f819578b34f1d0ab5a1c6ddd1f733e8ef2939f31e663f8a330930619ea50be"
+    },
+    "T01.excluded-effects": {
+      "caseId": "T01",
+      "observationNames": [
+        "excluded-effects-created",
+        "unsupported-result"
+      ],
+      "contractSha256": "f5460f60c929926a654719b5370a681fa87f7fef49df85e4d2b28107d7fb7553"
+    },
+    "T02.issuer-identity": {
+      "caseId": "T02",
+      "observationNames": [
+        "distinct-item-ids",
+        "distinct-lot-ids",
+        "implicit-merges"
+      ],
+      "contractSha256": "f851d8ae3fe3d026e4a0dfce89e1f6fdcefdec0643ac93810aa7057b5c3d5dbf"
+    },
+    "T02.identifier-period-conflict": {
+      "caseId": "T02",
+      "observationNames": [
+        "code-conflict",
+        "silent-remap",
+        "code-reconciliation"
+      ],
+      "contractSha256": "eee5a430934577e90ca13012745e975a603235ee8d60fb1928077d460442ee9c"
+    },
+    "T02.conversion-not-substitution": {
+      "caseId": "T02",
+      "observationNames": [
+        "converted-content",
+        "conversion-created-inventory",
+        "conversion-created-order-fulfilment",
+        "repackaging-effects",
+        "substitution"
+      ],
+      "contractSha256": "2d6eba9e565b02d2f288a2cb904cbb2d39afec6fc56f22146d781fcc8431ecca"
+    },
+    "T03.split-merge-conservation": {
+      "caseId": "T03",
+      "observationNames": [
+        "active-quantity",
+        "parent",
+        "allocation-transferred",
+        "allocation-copies",
+        "atomic-genealogy"
+      ],
+      "contractSha256": "0bf5aa737b9b6145332b97cb7696b12e23581097c286d402504458c0c3d7aa31"
+    },
+    "T03.logistics-multiple-lots": {
+      "caseId": "T03",
+      "observationNames": [
+        "pallet-quantity",
+        "lot-membership",
+        "cross-lot-segment-merge",
+        "membership-time"
+      ],
+      "contractSha256": "cebb5e6f61227554303bbad7114b2c2c5658f5207440228dbafec9451561885e"
+    },
+    "T03.cycle-and-retired-parent": {
+      "caseId": "T03",
+      "observationNames": [
+        "invalid-quantity-effects",
+        "invalid-allocation-effects",
+        "invalid-results"
+      ],
+      "contractSha256": "bf81effc1a78a92d22cbcf82bf5f1e931fc33e721c34a06926862086c3aa1d7b"
+    },
+    "T03.indistinguishable-mixture": {
+      "caseId": "T03",
+      "observationNames": [
+        "source-affected",
+        "current-candidate-scope",
+        "arbitrary-clean-selection",
+        "trace-certainty"
+      ],
+      "contractSha256": "10b35d7154b1f914a933cee522f79c6a13d40b58b25a06f979912d594cd0ad37"
+    },
+    "T04.decimal-boundary": {
+      "caseId": "T04",
+      "observationNames": [
+        "invalid-decimals",
+        "rounded-effects",
+        "wire-decimals"
+      ],
+      "contractSha256": "ef09be755cc1918d34445ac98306a2e2dddc6cb1763ed6b02857a3ccb66d54f3"
+    },
+    "T04.hold-versus-disposal": {
+      "caseId": "T04",
+      "observationNames": [
+        "held-after-hold",
+        "eligible-after-hold",
+        "held-after-disposal",
+        "physical-disposal",
+        "decrease-evidence"
+      ],
+      "contractSha256": "f2ee74e789855ac94dc1a4cf1b7e061b89180349f6faff786e6f63a6fa22e1c9"
+    },
+    "T04.atomic-ledger": {
+      "caseId": "T04",
+      "observationNames": [
+        "rollback-ledger-effects",
+        "rollback-allocation-effects",
+        "rollback-outbox-effects",
+        "rollback-committed-result",
+        "guarded-primitives"
+      ],
+      "contractSha256": "9e866e0fefbbcde949c5864c7807e49c5798bad74228f9ea346d0276b216c72a"
+    },
+    "T05.ownership-custody-disposition": {
+      "caseId": "T05",
+      "observationNames": [
+        "held",
+        "sell-eligible",
+        "unreserved-eligible",
+        "relations-independent"
+      ],
+      "contractSha256": "c61a653a06e56672d4f6f1f92d39befad785ef3d12572610e17473bf1702cebb"
+    },
+    "T05.planned-location": {
+      "caseId": "T05",
+      "observationNames": [
+        "current-location",
+        "planned-destination",
+        "planned-receipt-effects"
+      ],
+      "contractSha256": "f0938a1e0db707cea7003387a805df7647450f180b6e4991a2c0e99cc2259e8f"
+    },
+    "T06.bitemporal-correction": {
+      "caseId": "T06",
+      "observationNames": [
+        "then-known",
+        "currently-known",
+        "time-preserved",
+        "correction-not-fake-movement"
+      ],
+      "contractSha256": "663a3814f65af31cb8d9a31e9d6977bee81398b122166c487b631c5da6daaaba"
+    },
+    "T06.unknown-state-distinction": {
+      "caseId": "T06",
+      "observationNames": [
+        "state-values",
+        "zero-inference",
+        "conflict-preserved"
+      ],
+      "contractSha256": "7e7b2f3b1f8e6a295b81e2deccfef66724a6a5170b901a241e6ced1915c220bf"
+    },
+    "T07.typed-relations-and-predicates": {
+      "caseId": "T07",
+      "observationNames": [
+        "invalid-types",
+        "invalid-effects",
+        "predicate-three-valued",
+        "relation-created-work",
+        "relation-created-run"
+      ],
+      "contractSha256": "4bc6c278c9161099f47247aa3f51f47f53ebc37d18a38721de3f48ee65f217ed"
+    },
+    "T07.two-documents-one-occurrence": {
+      "caseId": "T07",
+      "observationNames": [
+        "receipt-total",
+        "document-count",
+        "canonical-occurrence-count",
+        "duplicate-physical-effects"
+      ],
+      "contractSha256": "2f0f7679f88b6349cfe4b550b6c2278a48e5048fca0c437e4b8916a099ba2ffb"
+    },
+    "T07.document-availability": {
+      "caseId": "T07",
+      "observationNames": [
+        "unavailable-evidence-contribution",
+        "unreadable-source",
+        "blob-reconciliation"
+      ],
+      "contractSha256": "f56e65eac23da78c93447c0d1798ca1f56aa7b4ebdd8dfd675c941f451bab5f8"
+    },
+    "T08.organization-boundaries": {
+      "caseId": "T08",
+      "observationNames": [
+        "cross-org-effects",
+        "cross-org-identity-leak",
+        "invalid-auth",
+        "fk-scope"
+      ],
+      "contractSha256": "7284769bb4ef0701506efbd1698e2979aef355dea686c32cec8c12d5ea851641"
+    },
+    "T08.control-envelope": {
+      "caseId": "T08",
+      "observationNames": [
+        "role-or-payload-escalation",
+        "grant-exceeding-write",
+        "server-authority"
+      ],
+      "contractSha256": "d2483280641f9907d017e4d0551e554e87985245986eb6f3d09f5846f9971a69"
+    },
+    "T08.grant-control-plane": {
+      "caseId": "T08",
+      "observationNames": [
+        "self-amplification",
+        "out-of-scope-assignment",
+        "grant-revocation",
+        "identity-admin-only"
+      ],
+      "contractSha256": "fdeba1f1440ae335a3cc2e40965c553695b46ff3aae4400fa06410cbc368381b"
+    },
+    "T09.quantity-modes": {
+      "caseId": "T09",
+      "observationNames": [
+        "cumulative-arrived",
+        "state-held",
+        "cumulative-result",
+        "state-result",
+        "goal-mode-fields"
+      ],
+      "contractSha256": "740685edc1fd16cb7f18ed99438c7ff6b9f1bf8a7beeaa5366667bb65fbe7a4f"
+    },
+    "T09.stage-required-lot": {
+      "caseId": "T09",
+      "observationNames": [
+        "stage-requirements",
+        "draft-physical-effects"
+      ],
+      "contractSha256": "980dd208a6ff13b6c09c05a042e8b4a7fdebeecd3d77b7f83fc6a2563e31a68f"
+    },
+    "T09.throughout-observation-gap": {
+      "caseId": "T09",
+      "observationNames": [
+        "gap-result",
+        "inferred-continuity",
+        "interval-policy"
+      ],
+      "contractSha256": "7349063d18f3f973ac773b8329fd73cd31ad08855da0bb17b606b82dcf10f50b"
+    },
+    "T10.handover-acceptance": {
+      "caseId": "T10",
+      "observationNames": [
+        "owner-by-state",
+        "notification-as-acceptance",
+        "active-human-owner"
+      ],
+      "contractSha256": "692312d0f83b8885d3d1a9a31b090394de74420b51e3d03dddd4d85e79cd82b0"
+    },
+    "T10.obligation-transfer-failure": {
+      "caseId": "T10",
+      "observationNames": [
+        "source-assignment",
+        "source-responsibility",
+        "orphan-target-assignment",
+        "transfer-guard"
+      ],
+      "contractSha256": "eec55610c8c7ef4b10a7513d4d281015e1038b1cddc2e6dce51f94e1419a4bf6"
+    },
+    "T10.partial-transfer-atomic": {
+      "caseId": "T10",
+      "observationNames": [
+        "transferred-scope",
+        "remaining-scope",
+        "unresolved-root-total",
+        "current-assignments"
+      ],
+      "contractSha256": "1f98f5c83eeceb882ee0228f11923bdc84afce1f93fbed6488f8aa78446aa877"
+    },
+    "T10.emergency-and-resolution": {
+      "caseId": "T10",
+      "observationNames": [
+        "emergency-evidence",
+        "unauthorized-resolution",
+        "unauthorized-waiver"
+      ],
+      "contractSha256": "8545a9dda8337a07df1e5e9a70d594a4d0f4a1f9b528ad87d08c349f51ba86dc"
+    },
+    "T11.parent-not-child-completion": {
+      "caseId": "T11",
+      "observationNames": [
+        "parent-contribution",
+        "parent-assessment",
+        "false-fulfilled-closure",
+        "alternative-close"
+      ],
+      "contractSha256": "42ee23eca42f5f22c4c191223595631d5832a44a410f36d29405951208798593"
+    },
+    "T11.work-transitions": {
+      "caseId": "T11",
+      "observationNames": [
+        "cancel-draft-physical-effects",
+        "timeout-generated-arrival-or-approval",
+        "unsupported-activation-effects",
+        "stale-revision-effects",
+        "pending-assessment-fulfilled-close",
+        "cancel-preservation"
+      ],
+      "contractSha256": "efdb641812612a9c7af5fee1c5adbed7acdb03d95c8b09fdcf1c7a5472ba25e4"
+    },
+    "T11.dependency-and-followup": {
+      "caseId": "T11",
+      "observationNames": [
+        "dependency-cycle-created",
+        "shared-distinct-contribution",
+        "closed-work-reopen-or-rewrite",
+        "followup-link"
+      ],
+      "contractSha256": "974c864bfcefcf75c56597111f01a0b5e74e81532aceedfe41b9ca29e7479142"
+    },
+    "T12.assessment-evidence-policy": {
+      "caseId": "T12",
+      "observationNames": [
+        "insufficient-evidence",
+        "wrong-place-condition",
+        "assessment-snapshot",
+        "missing-as-zero"
+      ],
+      "contractSha256": "652d79dff288425a11a117eaa0e810f04b526f03f76336df1247fcc658f63975"
+    },
+    "T12.deadline-change-and-correction": {
+      "caseId": "T12",
+      "observationNames": [
+        "historical-violation"
+      ],
+      "contractSha256": "862c442845b9d601bbd7e72990142707d8084b04e3e743e9b304bdc2ca3e0fcf"
+    },
+    "T13.approval-version-binding": {
+      "caseId": "T13",
+      "observationNames": [
+        "old-approval-revised-dispatch",
+        "unauthorized-approved-effects",
+        "approval-bound"
+      ],
+      "contractSha256": "741a1f8545be46471abbd8737ef200e20134ddc23e81918fb235dfccef7c9aff"
+    },
+    "T13.delivery-commitment-arrival-separate": {
+      "caseId": "T13",
+      "observationNames": [
+        "purchase-created-held-inventory",
+        "transmission-created-arrival",
+        "supplier-acceptance-created-arrival",
+        "cancel-scope"
+      ],
+      "contractSha256": "5c9b4db573bab4ee50b0727cda8a17ea6432fd36cee7c6c9bbefcee1d39ab417"
+    },
+    "T13.partial-and-excess-contributions": {
+      "caseId": "T13",
+      "observationNames": [
+        "authorized-arrival-contribution",
+        "excess-reconciliation",
+        "return-added-to-purchase",
+        "relocation-added-to-purchase",
+        "contribution-scope",
+        "excess-owner"
+      ],
+      "contractSha256": "556401e4ffecd225f3ac35e23b6aa4e3f2c18ae3d70d623d6af2eb5634610c3a"
+    },
+    "T14.many-to-many-shipment": {
+      "caseId": "T14",
+      "observationNames": [
+        "distinct-cargo-total",
+        "double-order-allocation",
+        "leg-facts"
+      ],
+      "contractSha256": "f712405f2ef26b615c6db71d37b176a58ad235bffcc4d1b2abcf9d8a3ca67f12"
+    },
+    "T14.arrival-discrepancy-not-loss": {
+      "caseId": "T14",
+      "observationNames": [
+        "received",
+        "transit",
+        "automatic-loss",
+        "separate-observations",
+        "discrepancy-responsibility"
+      ],
+      "contractSha256": "0171da70ddf4aee09a2ebeadd446969f1aecee62970152726e493287a8dcb7c0"
+    },
+    "T14.orphan-temperature-intake": {
+      "caseId": "T14",
+      "observationNames": [
+        "orphan-intake",
+        "notification-closes-intake"
+      ],
+      "contractSha256": "4e717e886de189ef813f1edfb8610fd2c23698ec4cac7897f4a31d1adf5d291b"
+    },
+    "T15.partial-regulatory-eligibility": {
+      "caseId": "T15",
+      "observationNames": [
+        "confirmed-sell-eligible",
+        "remaining-agency",
+        "qc-expanded-agency-allowance",
+        "decision-scope"
+      ],
+      "contractSha256": "5b88a1f2265334ab729198308abb01043e207d043888d3d55d6b8b86334001fb"
+    },
+    "T15.procedure-lifecycle": {
+      "caseId": "T15",
+      "observationNames": [
+        "local-document-state",
+        "unknown-submit-state",
+        "local-document-external-submission",
+        "regulatory-history"
+      ],
+      "contractSha256": "6654979918372caa73c4dbcc548f6eaf6b84c33f330ab9cf8a9e39b2ba3f3ad2"
+    },
+    "T15.unresolved-real-policy": {
+      "caseId": "T15",
+      "observationNames": [
+        "confirmed-eligible",
+        "legal-eligibility",
+        "regulatory-gate"
+      ],
+      "contractSha256": "d097a957795a14c7b12513df1100fadb3502cc75a0d815ac3e76b5f74f374aaa"
+    },
+    "T16.provisional-and-independent-holds": {
+      "caseId": "T16",
+      "observationNames": [
+        "provisional-eligible",
+        "receipt-transit-double-creation",
+        "eligible-after-QC-only-release",
+        "remaining-recall",
+        "hold-authority"
+      ],
+      "contractSha256": "52a4c4d87e8485158b0162f878be807ca2e5ff0d935154242c6d095a0f59cbe9"
+    },
+    "T16.movement-stocktake-adjustment": {
+      "caseId": "T16",
+      "observationNames": [
+        "held-before-adjustment",
+        "held-after-adjustment",
+        "distinct-total-after-internal-move",
+        "adjustment-proof"
+      ],
+      "contractSha256": "c8ccf0c6908c9ae969ad622f4dd471e90d73458f8a928cc4f0900cdb3b0b776b"
+    },
+    "T16.no-event-expiry": {
+      "caseId": "T16",
+      "observationNames": [
+        "allocation-after-boundary",
+        "post-expiry-dispatched",
+        "expiry-duty",
+        "boundary-recheck"
+      ],
+      "contractSha256": "81cf5ecb7e6c6bd5048812935053757eb9668266232fafc239618abeea193fe9"
+    },
+    "T17.reserve-pick-dispatch": {
+      "caseId": "T17",
+      "observationNames": [
+        "held-after-reserve",
+        "eligible-after-reserve",
+        "unreserved-after-reserve",
+        "warehouse-after-dispatch",
+        "dispatch-allocation",
+        "in-transit-after-dispatch",
+        "delivered-before-observation",
+        "second-reservation-same60"
+      ],
+      "contractSha256": "f8e8e400ac522fe03d8e93c3260ffc27dc3d0bcafd042f4268fd707183701ebd"
+    },
+    "T17.normal-consumed-delivery": {
+      "caseId": "T17",
+      "observationNames": [
+        "delivered",
+        "cargo-in-transit",
+        "delivery-assessment",
+        "allocation-still",
+        "delivery-created-new-allocation",
+        "delivery-created-new-warehouse-dispatch"
+      ],
+      "contractSha256": "45a2b9ceca8a8da99d9ce3d604a46441565aaea333d5286f087c6fd6c8404105"
+    },
+    "T17.late-restriction-actual-delivery": {
+      "caseId": "T17",
+      "observationNames": [
+        "actual-delivered",
+        "remaining-transit",
+        "new-warehouse-dispatch",
+        "new-executable-allocation",
+        "fact-not-permission",
+        "late-restriction-duty"
+      ],
+      "contractSha256": "987b2ece0691bda1fea704a0552fd7393c1f7d94ca7528d2a857b8aa48cbdc8a"
+    },
+    "T17.false-or-unmatched-delivery": {
+      "caseId": "T17",
+      "observationNames": [
+        "claim-inventory-effects",
+        "claim-order-fulfilment",
+        "claim-new-dispatch",
+        "claim-not-canonical",
+        "claim-reconciliation",
+        "no-prior-dispatch"
+      ],
+      "contractSha256": "26380849fcc547afa3ced84d0c7552839469b373d089847af13b22ce6aa5298a"
+    },
+    "T17.allocation-replacement-no-revival": {
+      "caseId": "T17",
+      "observationNames": [
+        "old-allocation",
+        "new-allocation",
+        "executable-reserved-total",
+        "old-revival",
+        "replacement-atomic"
+      ],
+      "contractSha256": "6351922b17e45ac912b8cc8b42eda6eba6b43fec9225b7dcf49f6e90e67a9706"
+    },
+    "T17.eligibility-fefo-contract": {
+      "caseId": "T17",
+      "observationNames": [
+        "eligibility-response",
+        "unauthorized-packaging-fulfilment"
+      ],
+      "contractSha256": "4b6759b07cc9b6c019251719cb017c87c59e15a5b656a61e6534459d93362ec5"
+    },
+    "T18.return-new-receipt": {
+      "caseId": "T18",
+      "observationNames": [
+        "historical-delivery",
+        "return-received",
+        "return-eligible",
+        "duplicate-return-effects",
+        "return-added-purchase-contribution",
+        "return-followup"
+      ],
+      "contractSha256": "8cc84630d378b3e26ce7ef4cf2a9af6f0ad3a45f04d89c074c581dfe8a45f2c7"
+    },
+    "T18.trace-and-recall-decisions": {
+      "caseId": "T18",
+      "observationNames": [
+        "bidirectional-trace",
+        "unauthorized-recall-decision",
+        "approval-notice"
+      ],
+      "contractSha256": "6c9771d5f2a2991a2f962dee85b6d8d233817c4641b2fc4a856d1f1fce51befe"
+    },
+    "T18.recall-closure-accounting": {
+      "caseId": "T18",
+      "observationNames": [
+        "recovery-distinct",
+        "processed-distinct",
+        "unknown",
+        "false-closure",
+        "exclusive-endstates"
+      ],
+      "contractSha256": "bb29511f2b26df29debc3120125b6a3bc5a6e90e192724a10d06eb68a405a211"
+    },
+    "T19.invoice-quantity-price-match": {
+      "caseId": "T19",
+      "observationNames": [
+        "logistics-assessment",
+        "original-invoice-difference",
+        "settlement-assessment",
+        "settlement-duty",
+        "matching-links"
+      ],
+      "contractSha256": "289d7af14e64e0da02f5ba2e96f12a23c4b810342272c81c5f3f6606d9a4c2de"
+    },
+    "T19.fx-document-payment-reference": {
+      "caseId": "T19",
+      "observationNames": [
+        "original-amount",
+        "converted-amount",
+        "fx-snapshot",
+        "commercial-as-domestic-tax-document",
+        "payment-reference-bank-transfer",
+        "automatic-tax-issue-or-submit",
+        "qc-pass-payment-authorization"
+      ],
+      "contractSha256": "488ab1613090c4e19f36c7b52e9ab29e5b7a9345856b87f9b105139184adbc33"
+    },
+    "T20.structured-intent-stages": {
+      "caseId": "T20",
+      "observationNames": [
+        "intent-validation",
+        "input-collection-physical-effects",
+        "canonicalization"
+      ],
+      "contractSha256": "54522bd02e1aeb25d01f6cfa6b688d71500be083db23e79acfa2aed478c2340e"
+    },
+    "T20.mcp-stateless-wire": {
+      "caseId": "T20",
+      "observationNames": [
+        "wire-protocol",
+        "domain-parity"
+      ],
+      "contractSha256": "7c6e7e22bd66a5a3930b1c911a4b6836224a7efdaae858e7c093d8cac5a88b12"
+    },
+    "T20.mrtr-bound-state": {
+      "caseId": "T20",
+      "observationNames": [
+        "mrtr-state",
+        "requeststate-as-approval",
+        "accept-string-as-approval",
+        "invalid-continuation-effects"
+      ],
+      "contractSha256": "ca028cf26a8ed7948c2231a446487812ce555c821c0d9fadec207d46bddb6335"
+    },
+    "T20.skills-real-loading-and-meaning": {
+      "caseId": "T20",
+      "observationNames": [
+        "skill-evidence",
+        "skill-hash-as-loading-proof",
+        "allowed-tools-as-server-authorization",
+        "document-instruction-authority"
+      ],
+      "contractSha256": "dfd898c7aa9ed300dfbd594bbed6bf9938a15654b85bcd61c5e467b43acd0878"
+    },
+    "T21.definition-publish-and-impact": {
+      "caseId": "T21",
+      "observationNames": [
+        "definition-lifecycle",
+        "impact-validation",
+        "invalid-payload-published",
+        "definition-generated-new-capability"
+      ],
+      "contractSha256": "a6aaf51443e154ce03b479f0a5acf26cea0b906709939b6865990ab97d45c071"
+    },
+    "T21.pinned-old-current-policy": {
+      "caseId": "T21",
+      "observationNames": [
+        "old-work-endpoint",
+        "new-work-endpoint",
+        "current-sell-policy",
+        "v1-used-to-bypass-current-policy",
+        "v1-correction-reassessment"
+      ],
+      "contractSha256": "a0d49e1c1478bf72119cbf16a75a0457aa9dea749858d2beacdbb8156b42a1ad"
+    },
+    "T21.unsupported-and-explicit-migration": {
+      "caseId": "T21",
+      "observationNames": [
+        "unsupported-version-effects",
+        "unsupported-result",
+        "unsupported-version-duty",
+        "explicit-migration",
+        "active-pointer-rollback-physical-compensation"
+      ],
+      "contractSha256": "08b3893e0eaa2fecc743ce1cf546c5213299dad9dac0174053506093bb916d2e"
+    },
+    "T22.source-duplicate-conflict": {
+      "caseId": "T22",
+      "observationNames": [
+        "accepted-inbox-per-key",
+        "same-key-other-hash",
+        "canonical-receipt",
+        "last-write-wins",
+        "identity-unverified-auto-sum",
+        "source-conflict-owner"
+      ],
+      "contractSha256": "fe09b7d97054b44911f1e1a389c235cc92edb360ac7d912c808a7ff682ce7dc5"
+    },
+    "T22.reconciliation-control-and-source-order": {
+      "caseId": "T22",
+      "observationNames": [
+        "invalid-match-effects",
+        "old-source-overwrites-new-restriction",
+        "unprofiled-connector-activation",
+        "source-profile",
+        "quarantine-owner"
+      ],
+      "contractSha256": "7d5f4ccedbe96913d2e47c8df07b3c8b138fed974b0864a1356a8c6937f69725"
+    },
+    "T22.unknown-external-reconciliation": {
+      "caseId": "T22",
+      "observationNames": [
+        "lost-response-state",
+        "unreconciled-external-reissue",
+        "confirmed-success-reissue",
+        "external-transition",
+        "external-reconciliation-owner"
+      ],
+      "contractSha256": "8c871c6f117f81b5d1bc432a8d4d8dec5b985300a53b920e29f9620494ce69ab"
+    },
+    "T23.archive-and-data-branch": {
+      "caseId": "T23",
+      "observationNames": [
+        "archive-restored",
+        "data-branch",
+        "manufacture-as-import-relabel"
+      ],
+      "contractSha256": "53ed2904fd916ff09b8e84380dfd6a6cd3c2ab471eb550e109f35da59f2a17f3"
+    },
+    "T23.schema-ownership-upgrade-drift": {
+      "caseId": "T23",
+      "observationNames": [
+        "schema-owner",
+        "schema-drift"
+      ],
+      "contractSha256": "8ad6aebdb1415e314fdadf4f4f7a58e7cec5164b2470e69152f1ba99bc4ec516"
+    },
+    "T23.cutover-and-safe-recovery": {
+      "caseId": "T23",
+      "observationNames": [
+        "cutover-order",
+        "recovery-boundaries",
+        "SQLRollbackPretendedPhysicalContractCancel"
+      ],
+      "contractSha256": "4c2806d4f5d89f1d85cd0e7e2796c98eeb8a329c31953ae05c5cbbbf5bd97817"
+    },
+    "T24.all-auth-surfaces": {
+      "caseId": "T24",
+      "observationNames": [
+        "cross-org-data-leak",
+        "forbidden-write-effects",
+        "surface-auth"
+      ],
+      "contractSha256": "2b740257f4db0b854f22314123c2e4780333b040602b7cc5b5bf5125308cbc2f"
+    },
+    "T24.audit-failure-rollback": {
+      "caseId": "T24",
+      "observationNames": [
+        "committed-domain-effects",
+        "committed-ledger-effects",
+        "committed-allocation-effects",
+        "committed-duty-effects",
+        "committed-outbox-effects",
+        "committed-idempotency-result",
+        "audit-fields"
+      ],
+      "contractSha256": "b7583d0de862715cc6695c032e1b63865e53fb4b9e4183aa0b622c238bf91711"
+    },
+    "T24.retention-legalhold-blob-restore": {
+      "caseId": "T24",
+      "observationNames": [
+        "legal-hold-delete",
+        "unresolved-reference-delete",
+        "retention-policy"
+      ],
+      "contractSha256": "dc227f64143bdecafd7a93bb4f0a33c0aa3798d5c79c0d8ae38b46ad43caf362"
+    },
+    "T24.secret-redaction": {
+      "caseId": "T24",
+      "observationNames": [
+        "secret-sentinel-leak",
+        "redaction-purpose"
+      ],
+      "contractSha256": "78f390438321de09b04149e0045aa956b71e4fb8741ed3a503862c3d76c1727b"
+    },
+    "T25.independent-traceability": {
+      "caseId": "T25",
+      "observationNames": [
+        "coverage-link",
+        "result-separation"
+      ],
+      "contractSha256": "b02ff4fd8b5342ebb3f78015b0b5048bda7aecf4b64e4626e0ff4d9f339a5ade"
+    },
+    "T25.evidence-manifest-and-entrypoints": {
+      "caseId": "T25",
+      "observationNames": [
+        "evidence-fields",
+        "wrapper-truth"
+      ],
+      "contractSha256": "375f6b1876e33b9f7caf0063328f1deffbd8db328b5b84682da4b0129bf9147d"
+    },
+    "T25.model-corpus-and-budget": {
+      "caseId": "T25",
+      "observationNames": [
+        "corpus-size",
+        "proposed-acceptance",
+        "usage-and-version-evidence"
+      ],
+      "contractSha256": "2a6dfe1292044cbc98400006d1600c700f0ce4c5e3490f991ba693c30c38a374"
+    },
+    "T26.scheduler-recovery-and-operations": {
+      "caseId": "T26",
+      "observationNames": [
+        "recovery-rediscovery",
+        "operational-results",
+        "notification-resolves-duty"
+      ],
+      "contractSha256": "3e8231cc570fb1e12868b89ca58a6a8f5438a6c9d90f0cb4460f6ad7015a2e85"
+    },
+    "T26.boundary-index-and-emergency-repair": {
+      "caseId": "T26",
+      "observationNames": [
+        "boundary-index",
+        "safe-runbook"
+      ],
+      "contractSha256": "03a2c6b94a71f09bd40f683c6bf326d52e46dfaaa1c8a669e851e35e1d6ef5b2"
+    },
+    "T26.backup-complete-restore": {
+      "caseId": "T26",
+      "observationNames": [
+        "restore-verification"
+      ],
+      "contractSha256": "289b24fdfa2454571f562d38f28287339418f707b8e33fee1101450a26b3bdfb"
+    },
+    "C1.initial-eligibility": {
+      "caseId": "C1",
+      "observationNames": [
+        "held",
+        "sell-eligible",
+        "unreserved-eligible",
+        "customer60-added-by-qc-or-app-write"
+      ],
+      "contractSha256": "de4a05a24acb9956511dacc90f82ae58bb926e9c4f213eaae7ef147760451248"
+    },
+    "C1.revoked-disposition": {
+      "caseId": "C1",
+      "observationNames": [
+        "new-reservation",
+        "new-dispatch",
+        "existing-allocation",
+        "existing-obligation-scope",
+        "revocation-duty"
+      ],
+      "contractSha256": "8c7ada4109a9fc15dc08519fe8dc65980151d07b10af22aa7093298626d4f448"
+    },
+    "C2.cumulative-vs-state": {
+      "caseId": "C2",
+      "observationNames": [
+        "cumulative-arrival",
+        "state-at-held",
+        "cumulative",
+        "state-at",
+        "mode-evidence-scope"
+      ],
+      "contractSha256": "1a2b374710f796f434e7ababf0b2b54bb63c38650b6c24ae13f0e77fa074f64d"
+    },
+    "C3.read-grant-all-writes": {
+      "caseId": "C3",
+      "observationNames": [
+        "work-effects",
+        "inventory-effects",
+        "followup-effects",
+        "allocation-effects",
+        "approval-effects",
+        "external-outbox-effects",
+        "read-audit-permitted"
+      ],
+      "contractSha256": "94e1bcde6c6a2ce3da2895c17dc3e7724dc300f1d7608d6e9c0a78f87a7a2b40"
+    },
+    "C3.model-query-write-boundary": {
+      "caseId": "C3",
+      "observationNames": [
+        "query-intent-write-tool-execution",
+        "query-intent-business-effects",
+        "evaluation-path"
+      ],
+      "contractSha256": "e71637b94ad17ab8c6cf066f729fefc8ed87d80d6d4730ecdaa6659e042a6ee5"
+    },
+    "C4.return-not-correction": {
+      "caseId": "C4",
+      "observationNames": [
+        "historical-delivery",
+        "new-return",
+        "duplicate-return-material-effects",
+        "return-overwrites-delivery-to80",
+        "physical-reference"
+      ],
+      "contractSha256": "4b23734f4205d194f1e936b57b2d696c90c58c1c17fc21b9e4a03265dc9fab57"
+    },
+    "C4.corrected-delivery-98": {
+      "caseId": "C4",
+      "observationNames": [
+        "currently-supported-delivery",
+        "current-unresolved-deficit",
+        "historical-assessment",
+        "deficit-owner"
+      ],
+      "contractSha256": "e6c2373deb6a804ec458b76ddfd0f3476f60e8ba83e4ad3d8e7eb81678a12be4"
+    },
+    "C4.resolved-debt-no-resurrection": {
+      "caseId": "C4",
+      "observationNames": [
+        "new-unresolved-deficit",
+        "resolved-debt-resurrection",
+        "valid-resolution"
+      ],
+      "contractSha256": "d073e93a546a162ed08d8c988934a93b1c96ef8bed1b26d826c17d0e6bcc9da7"
+    },
+    "C5.failed-link-responsibility": {
+      "caseId": "C5",
+      "observationNames": [
+        "intake-owner",
+        "intake-tracking",
+        "alert-delivery-closes-intake",
+        "closed-parent-rewrite",
+        "intake-activation"
+      ],
+      "contractSha256": "93fa1063d04beb263b7e703ab7cb81544ab1f59bb8b1b1d4d6430071f495cfb4"
+    },
+    "C5.retry-once": {
+      "caseId": "C5",
+      "observationNames": [
+        "anomaly-work-count",
+        "anomaly-obligation-count",
+        "connected-work-owner",
+        "normal-observation-work",
+        "normal-observation-run",
+        "intake-close-after-link"
+      ],
+      "contractSha256": "c47c779ba7b5f27df0a27038d30f93f5e8ad7912de8165fe8b76090fef40efd3"
+    },
+    "V1.pinned-meaning-current-policy": {
+      "caseId": "V1",
+      "observationNames": [
+        "v1-endpoint",
+        "new-v2-endpoint",
+        "current-sell-permission",
+        "old-assessment-semantics",
+        "skill-hash-substitutes-runtime-proof"
+      ],
+      "contractSha256": "e7148bd409c767f93dbe899d4abe7099186f9e0e2739c4f23dcfa4f1ba0d26e1"
+    },
+    "V1.unsupported-v1-held": {
+      "caseId": "V1",
+      "observationNames": [
+        "unsupported-command-effects",
+        "unsupported",
+        "unsupported-duty",
+        "no-silent-fallback"
+      ],
+      "contractSha256": "1a46fa87e582af31de03053b0b3db8bd0b23f7807f8fe2a8d0f7a5e2bc9d53b6"
+    },
+    "V2.split-reserve-race": {
+      "caseId": "V2",
+      "observationNames": [
+        "active-physical",
+        "existing-obligation",
+        "new-executable-reservation",
+        "retired-parent-reconsumption",
+        "all-executable-reservations",
+        "allocation-transfer"
+      ],
+      "contractSha256": "2c2645db6e53e0bf48e7cff4ed09f785ea11cfa6ffcc37b89c566553dbcaf21a"
+    },
+    "V2.actual50-correction": {
+      "caseId": "V2",
+      "observationNames": [
+        "active-physical",
+        "executable-allocation",
+        "promised-obligation-total",
+        "minimum-shortage-duty",
+        "shortage-duty",
+        "past-reservation-deletion-to-hide-shortage"
+      ],
+      "contractSha256": "53721bd93c18f5e31f7b25e00f50346a48e95c974cb8d25d1462e3512d7e4b8b"
+    },
+    "V3.hold-before-dispatch": {
+      "caseId": "V3",
+      "observationNames": [
+        "new-dispatched",
+        "allocation",
+        "blocked-dispatch-duty",
+        "scope-lock"
+      ],
+      "contractSha256": "677d06ca9c0fba8d5a077826f9474849e2db2318d5935761ea6621a7692073d0"
+    },
+    "V3.dispatch-before-hold": {
+      "caseId": "V3",
+      "observationNames": [
+        "committed-dispatch-preserved",
+        "allocation",
+        "post-dispatch-hold-response",
+        "history-deletion-or-fake-rollback"
+      ],
+      "contractSha256": "a607c9b7e399d6a9383cdcbb0581add9581ab99bc2d475fe4534d6a553865ff3"
+    },
+    "V3.late-old-qc-release": {
+      "caseId": "V3",
+      "observationNames": [
+        "new-hold",
+        "newly-dispatched",
+        "late-release-overwrites-new-hold",
+        "source-order-reconciliation"
+      ],
+      "contractSha256": "d55ffbe54183daef8f9343585977eec473b4b5769b540f0835d357559a0cda99"
+    },
+    "V4.all-alternate-write-paths": {
+      "caseId": "V4",
+      "observationNames": [
+        "inventory-effects",
+        "allocation-effects",
+        "approval-effects",
+        "outbox-effects",
+        "mixed-batch-allowed-partial-effects",
+        "same-auth-path"
+      ],
+      "contractSha256": "d116e4b28440fa48e58f5b04215ee89cb65a18c8ddafc0a515dfd88f6422b5f5"
+    },
+    "V4.internal-move-cannot-deliver": {
+      "caseId": "V4",
+      "observationNames": [
+        "internal-move-created-customer-dispatch",
+        "internal-move-created-order-fulfilment",
+        "internal-move-created-return-or-disposal",
+        "observed-unauthorized-fact",
+        "unauthorized-move-reconciliation"
+      ],
+      "contractSha256": "8aa9a5a2df619140d7b234ef5887dabce52980b68522e892422791aa27cef31f"
+    },
+    "V5.wait-after-full-restart": {
+      "caseId": "V5",
+      "observationNames": [
+        "resumed-or-escalated-duty-count",
+        "within-test-profile",
+        "duty-after-restart",
+        "queue-success-as-goal-satisfied"
+      ],
+      "contractSha256": "55d85a5b0fdb0affccbe1906ade7bb2a839cbcc8a3b649284ff58b6fcbb8e7b0"
+    },
+    "V5.two-workers-fencing": {
+      "caseId": "V5",
+      "observationNames": [
+        "duplicate-effects",
+        "stale-worker-commit",
+        "fence-state",
+        "exhausted-retry-owner"
+      ],
+      "contractSha256": "3f406519c1d0b27f0e1cb40727037eef55cad3d2fd789b52514f5f0bfddaccf7"
+    },
+    "V6.receipt60-lost-response-retry": {
+      "caseId": "V6",
+      "observationNames": [
+        "physical-receipt-total",
+        "committed-effect-count",
+        "retry-result"
+      ],
+      "contractSha256": "07ac8b30c6976a2a6ad703f7d0ffae8a13d0cd6a85157a473ba5f9272601d62d"
+    },
+    "V6.key-conflicts-owner-and-distinct-order": {
+      "caseId": "V6",
+      "observationNames": [
+        "different-payload",
+        "conflict-new-effects",
+        "other-owner-result-leak",
+        "namespaces"
+      ],
+      "contractSha256": "039b63ffd23b74c98015ccdd73141162edce20ce74ff7cc3ab29cb104b1702aa"
+    },
+    "V6.input-destination-supplement": {
+      "caseId": "V6",
+      "observationNames": [
+        "draft-supplement-physical-effects",
+        "draft-supplement-idempotency-conflict",
+        "completed-intent"
+      ],
+      "contractSha256": "affbddacaedeb98eaaf509b495ac8e0c096828961481e2b56a95d10305197a12"
+    },
+    "V7.enqueue-then-revoke": {
+      "caseId": "V7",
+      "observationNames": [
+        "new-effects-quantity",
+        "blocked-duty",
+        "worker-auth"
+      ],
+      "contractSha256": "a50e09b9b6be9dfab39eb13fd60d2c56c4f01f0dd64e5f27d0bd473723c8102a"
+    },
+    "V7.authorization-then-revoke": {
+      "caseId": "V7",
+      "observationNames": [
+        "effect-if-revoke-commits-first",
+        "preserved-if-effect-commits-first",
+        "effect-after-serialized-revoke",
+        "linearization-evidence",
+        "blocked-or-post-revoke-duty"
+      ],
+      "contractSha256": "ccf3d2cc1515d4c4027cdb4851953e5287f92d2a76f921a96188998184c3f25e"
+    },
+    "V7.restart-after-revocation": {
+      "caseId": "V7",
+      "observationNames": [
+        "unauthorized-recovered-effects",
+        "prior-committed-preserved",
+        "blocked-duty-after-restart",
+        "safe-retry"
+      ],
+      "contractSha256": "fdda6905075fdd36c28c70f80d2ac6767d66a8e9ccc2f8cd68b44f5be21deee9"
+    },
+    "V8.fresh-install": {
+      "caseId": "V8",
+      "observationNames": [
+        "fresh-integration"
+      ],
+      "contractSha256": "9dda555ac9e77c4c000a981bbd1ec87f896ad8a440e699526acca382326ada43"
+    },
+    "V8.ontology-upgrade-preservation": {
+      "caseId": "V8",
+      "observationNames": [
+        "upgrade-preserves",
+        "legacy-migration-substitutes-ontology-upgrade"
+      ],
+      "contractSha256": "c86e32b8b9a19a7931b6a2e2d4449c5b826c7904c62a5a033c1c3ce3435b2976"
+    },
+    "V8.db-blob-definition-restore": {
+      "caseId": "V8",
+      "observationNames": [
+        "restore-artifacts",
+        "missing-blob-restore-complete",
+        "missing-evaluator-restore-complete"
+      ],
+      "contractSha256": "f8014669d0e9388137fe896c477afde1dc19485aabe1ebe02c8a519f50f9fd9a"
+    },
+    "V8.btp-client-separate-gates": {
+      "caseId": "V8",
+      "observationNames": [
+        "btp-acceptance",
+        "result-scope"
+      ],
+      "contractSha256": "7328010aa4af21ed089c56bb0d63bd10b3bb036b73071b5a8dd8bd7b30f3a484"
+    },
+    "E1.full-flow-quantities": {
+      "caseId": "E1",
+      "observationNames": [
+        "purchase-cumulative-arrival",
+        "warehouse-current-held",
+        "historical-delivery",
+        "return-received",
+        "current-sell-eligible",
+        "agency-unverified-held",
+        "QC-held",
+        "return-held",
+        "bank-transfer",
+        "receipt60-doc-duplicate-effects",
+        "return-added-purchase-arrival"
+      ],
+      "contractSha256": "1f8636cef188878fbe033386ab4878a1340e0aefdf2f1319a8ef18eccbeb98b3"
+    },
+    "E1.independent-goals-and-owners": {
+      "caseId": "E1",
+      "observationNames": [
+        "logistics-goal",
+        "invoice-difference",
+        "QC-duty",
+        "return-duty",
+        "settlement-duty",
+        "two-entry-snapshot",
+        "logistics-closes-unrelated-duties"
+      ],
+      "contractSha256": "2a171c7004473fe08784462d79b837ecdfd503a5e11d61c23281810c937f8fa2"
+    },
+    "E1.whole-runtime-and-model-reference": {
+      "caseId": "E1",
+      "observationNames": [
+        "actual-runtime-observation",
+        "model-reference"
+      ],
+      "contractSha256": "276232ca1f6639ae8e279ae98b08278fc14fa4606b3a48173c27920f01a70f68"
+    },
+    "E2.overlapping-holds": {
+      "caseId": "E2",
+      "observationNames": [
+        "physical-held",
+        "dispatched-after-QC-only-release",
+        "recall-hold",
+        "candidate-as-confirmed-contamination",
+        "investigation-duty"
+      ],
+      "contractSha256": "65f78a9ef696a36cc83a9990a3c1f3cefc4e07245e52e02335d44684b06e4aa8"
+    },
+    "E2.same-25-not-50": {
+      "caseId": "E2",
+      "observationNames": [
+        "unique-recovered",
+        "unique-finally-processed",
+        "unknown",
+        "25-plus-25-equals50",
+        "unapproved-unknown-close",
+        "status-axes"
+      ],
+      "contractSha256": "3a03dfb31bcf11ea31857fee4fcba143223e09d958238cbb10c44788d01be1b9"
+    },
+    "E2.exception-responsibility": {
+      "caseId": "E2",
+      "observationNames": [
+        "unauthorized-exception-close",
+        "exception-unresolved-scope",
+        "exception-residual-duty",
+        "exception-evidence"
+      ],
+      "contractSha256": "d30cad556469874221c981d9d986f90d34caa0f04e9f591ee827b2495684d551"
+    }
+  }
+}
