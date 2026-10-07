@@ -4,7 +4,7 @@
   "systemStage": "S2_ACTIVE",
   "baseline": "40a240c3886d3316ba1fd686e9b44bfa1ba6ec2d",
   "runtime": "Java21/CAP5.1.1/PostgreSQL18.6/CQN",
-  "checkedCommit": "1c86cf3",
+  "checkedCommit": "14d704a",
   "dependencyBaseline": "28b224eb68ab06cc2040e4d0284c860eba3faf73",
   "checks": [
     {
@@ -46,6 +46,14 @@
       "observed": "actual coupled PostgreSQL5 PASS; failures0 errors0 skipped0; WorkLifecycle, AssessmentService, ResponsibilityService, authorization, policy and command gateway have no business-port mocks",
       "exitCode": 0,
       "artifact": "s2-work-actual-gateway-pass.log.gz"
+    },
+    {
+      "source": "14d704a",
+      "dependency": "3d44a08",
+      "command": "JAVA_HOME=/Library/Java/JavaVirtualMachines/zulu-21.jdk/Contents/Home PATH=/Users/n30gu1/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin:/Library/Java/JavaVirtualMachines/zulu-21.jdk/Contents/Home/bin:$PATH ./mvnw -f backend/pom.xml -Dtest=S2WorkActualIntegrationTest test",
+      "observed": "actual coupled PostgreSQL gateway6 PASS; failures0 errors0 skipped0; declared Work W1 with selected Work W2 and wrong TradeItem noun reject with TYPE_INVALID before any cancel effect; correct Work, public TradeItem and permitted empty subjects succeed",
+      "exitCode": 0,
+      "artifact": "s2-work-subject-gateway.log.gz"
     }
   ],
   "limitations": [
@@ -56,8 +64,8 @@
   ],
   "files": {
     "backend/src/test/java/com/mulino/core/S2WorkActualIntegrationTest.java": {
-      "sha256": "a16046366e475b40bf727c149634158b455cf42fafcd14e2197c7b105629b26f",
-      "source": "1c86cf3"
+      "sha256": "c3e9996e81f3947afce9f1f8be50f84306e2b7a5a78d55af6b612577324af7a3",
+      "source": "14d704a"
     },
     "backend/src/test/java/com/mulino/core/S2WorkLifecyclePostgresTest.java": {
       "sha256": "b51b13f32777bd502e49c59a190a81531fb37a97c2073b9f3d884af2cc8dbd06",
@@ -66,6 +74,10 @@
     "backend/src/test/java/com/mulino/work/GoalInputTest.java": {
       "sha256": "4991fd233bbf0137a38eb71b81fa4881839d4fe49e04494c6d3740be04db658b",
       "source": "unchanged GoalInputTest"
+    },
+    "backend/src/main/java/com/mulino/application/work/WorkLifecycle.java": {
+      "sha256": "bb91cc604c1df30695dbd9bbfef35bc675c7b1eca34adbb086a4d3e25ab9437d",
+      "source": "14d704a"
     }
   },
   "acceptance": [
@@ -73,6 +85,8 @@
     "Actual canonical credit ranges cannot overlap globally or exceed actual quantity; closed child with parent credited90 never fulfills target100",
     "Public ApplicationCommands createWork persists explicit interval booleans; revision preserves old endpoints and deadline history; public newDueAt/previousGoalVersion creates immutable version3",
     "Actual command gateway draft/cancel/replay yields APPLIED, two committed records and audits, and no unsolicited external delivery",
-    "Closed correction followup is source-idempotent, preserves original CLOSED history and requires explicit independent Goal revision"
-  ]
+    "Closed correction followup is source-idempotent, preserves original CLOSED history and requires explicit independent Goal revision",
+    "Handler-owned typed subjectBindings validate exact published noun, actual target IDs and action cardinality before and after serialized fences; generic authorization scopes do not become declared subjects"
+  ],
+  "subjectBindingDependency": "3d44a08"
 }
