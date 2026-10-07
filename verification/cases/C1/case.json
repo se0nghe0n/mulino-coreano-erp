@@ -2185,6 +2185,108 @@
               "new-reservation"
             ]
           }
+        },
+        {
+          "id": "new-reservation-quantity-primary",
+          "op": "sumEquals",
+          "source": {
+            "actionId": "after-db",
+            "pointer": "/data/rawRows/allocations",
+            "where": {
+              "commandKey": "C1-revoked-basis-new-reserve"
+            },
+            "field": "quantity"
+          },
+          "expected": "0",
+          "requirementRefs": [
+            "D05"
+          ],
+          "evidenceRefs": [
+            "after-db:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseKey": "C1-revoked-basis",
+            "commandKey": "C1-revoked-basis-new-reserve",
+            "physicalRootId": {
+              "$alias": "CON40"
+            }
+          },
+          "oracleExplanation": "실제 독립DB의 해당 명령 효과 원행 quantity 합계는0이며, 같은 실물CON40 원행에서 관찰한 단위는BOX다. 완료된 빈 효과 scope만0으로 합산하며 누락/null/미구현은 거부한다.",
+          "oracleRef": {
+            "oracleId": "C1.revoked-disposition",
+            "observationNames": [
+              "new-reservation"
+            ]
+          },
+          "unit": "BOX",
+          "unitSource": {
+            "actionId": "after-db",
+            "pointer": "/data/rawRows/segments",
+            "where": {
+              "id": {
+                "$alias": "CON40"
+              },
+              "active": true
+            },
+            "field": "unit"
+          }
+        },
+        {
+          "id": "new-dispatch-quantity-primary",
+          "op": "sumEquals",
+          "source": {
+            "actionId": "after-db",
+            "pointer": "/data/rawRows/movements",
+            "where": {
+              "commandKey": "C1-revoked-basis-dispatch"
+            },
+            "field": "quantity"
+          },
+          "expected": "0",
+          "requirementRefs": [
+            "D05"
+          ],
+          "evidenceRefs": [
+            "after-db:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseKey": "C1-revoked-basis",
+            "commandKey": "C1-revoked-basis-dispatch",
+            "physicalRootId": {
+              "$alias": "CON40"
+            }
+          },
+          "oracleExplanation": "실제 독립DB의 해당 명령 효과 원행 quantity 합계는0이며, 같은 실물CON40 원행에서 관찰한 단위는BOX다. 완료된 빈 효과 scope만0으로 합산하며 누락/null/미구현은 거부한다.",
+          "oracleRef": {
+            "oracleId": "C1.revoked-disposition",
+            "observationNames": [
+              "new-dispatch"
+            ]
+          },
+          "unit": "BOX",
+          "unitSource": {
+            "actionId": "after-db",
+            "pointer": "/data/rawRows/segments",
+            "where": {
+              "id": {
+                "$alias": "CON40"
+              },
+              "active": true
+            },
+            "field": "unit"
+          }
         }
       ],
       "oracleExplanation": "실물40은 유지되며 기존 약속20을 삭제하지 않는다. 처분 허용 철회는 앞으로의 배분/출고0과 owner 있는 의무를 남긴다."

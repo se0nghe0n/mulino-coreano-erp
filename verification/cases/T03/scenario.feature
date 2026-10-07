@@ -188,7 +188,7 @@
     만일 "qc" 역할이 "clean-release" 행동을 수행한다
     만일 "warehouse" 역할이 "after-api" 행동을 수행한다
     만일 "시스템" 역할이 "after-db" 행동을 수행한다
-    그러면 "source-affected-1" assertion으로 "문제의 원천 X는40이다."를 확인한다
+    그러면 "source-affected-1" assertion으로 "실제 trace의 문제 원천40과 관찰된 기준 단위BOX를 decimal primary로 직접 대조한다."를 확인한다
     그러면 "source-affected-2" assertion으로 "원천40의 기준 단위를 보존한다."를 확인한다
     그러면 "current-candidate-scope-3" assertion으로 "실물량·단위와 독립 손계산을 대조한다."를 확인한다
     그러면 "current-candidate-scope-4" assertion으로 "실물량·단위와 독립 손계산을 대조한다."를 확인한다

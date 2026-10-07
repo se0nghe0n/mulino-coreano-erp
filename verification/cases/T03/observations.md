@@ -158,7 +158,7 @@ Q100=60+40, 합침100으로 돌아가도 retired 부모는 현재량에 더하�
 
 원천 영향40과 현재 후보100을 구분한다. 구별 근거 없는60 해제는 효과0이다.
 
-- `source-affected-1` → `T03.indistinguishable-mixture / source-affected`: 문제의 원천 X는40이다.
+- `source-affected-1` → `T03.indistinguishable-mixture / source-affected`: 실제 trace의 문제 원천40과 관찰된 기준 단위BOX를 decimal primary로 직접 대조한다.
 - `source-affected-2` → `T03.indistinguishable-mixture / source-affected`: 원천40의 기준 단위를 보존한다.
 - `current-candidate-scope-3` → `T03.indistinguishable-mixture / current-candidate-scope`: 실물량·단위와 독립 손계산을 대조한다.
 - `current-candidate-scope-4` → `T03.indistinguishable-mixture / current-candidate-scope`: 실물량·단위와 독립 손계산을 대조한다.
@@ -181,3 +181,5 @@ Q100=60+40, 합침100으로 돌아가도 retired 부모는 현재량에 더하�
 
 공통 실행 기록은 [inventory 최종 증거](../T03/evidence/inventory-final/README.md)에 있다.
 이 case의 각 subcase RED 원본은 `evidence/contract-red-<case>-<subcase>.json`에 보존했다.
+
+수량 primary 수정의 최신 [실행 증거](../T03/evidence/inventory-primary-fix/README.md)를 보존했다.

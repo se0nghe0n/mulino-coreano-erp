@@ -12,7 +12,7 @@ import static org.junit.jupiter.api.Assertions.*;
 public final class InventoryAssertionContractTest {
     private final Path root=Path.of(System.getProperty("repo.root"));
     private final AssertionEngine engine=new AssertionEngine();
-    private final JsonNode aliases=Json.parse("{\"ORG\":\"org-fixture-id\",\"P\":\"item-fixture-id\",\"S1\":\"sales-work-id\",\"sales\":\"sales-human-id\",\"supervisor\":\"supervisor-human-id\",\"Q100\":\"parent-physical-id\",\"A20\":\"cargo-physical-id\"}");
+    private final JsonNode aliases=Json.parse("{\"ORG\":\"org-fixture-id\",\"P\":\"item-fixture-id\",\"S1\":\"sales-work-id\",\"sales\":\"sales-human-id\",\"supervisor\":\"supervisor-human-id\",\"Q100\":\"parent-physical-id\",\"A20\":\"cargo-physical-id\",\"CON40\":\"consignment-physical-id\"}");
     private JsonNode sub(String caseId,String subId) throws Exception {
         JsonNode c=Json.read(root.resolve("verification/cases/"+caseId+"/case.json"));
         for(JsonNode s:c.path("subcases")) if(s.path("id").asText().equals(subId)) return s;
@@ -103,6 +103,34 @@ public final class InventoryAssertionContractTest {
         ObjectNode r=observation("{\"definitionVersion\":\"ontology-v1\"}",null);Map<String,JsonNode> observations=Map.of("after-api",r);check(a,observations);
         ((ObjectNode)r.path("response")).put("definitionVersion","ontology-v2");assertThrows(AssertionError.class,()->check(a,observations));
         ((ObjectNode)r.path("response")).put("definitionVersion","ontology-v1");((ObjectNode)r.path("provenance")).put("scopeComplete",false);assertThrows(AssertionError.class,()->check(a,observations));
+    }
+    @Test void sourceAffectedQuantityPrimaryRejectsWrongValueUnitAndUnavailable() throws Exception {
+        JsonNode a=assertion("T03","indistinguishable-mixture","source-affected-1");
+        ObjectNode r=observation("{\"data\":{\"sourceAffected\":{\"value\":\"40\",\"unit\":\"BOX\"}}}",null);
+        Map<String,JsonNode> results=Map.of("trace",r);check(a,results);
+        ObjectNode quantity=(ObjectNode)r.at("/response/data/sourceAffected");quantity.put("value","41");assertThrows(AssertionError.class,()->check(a,results));
+        quantity.put("value","40");quantity.put("unit","KG");assertThrows(AssertionError.class,()->check(a,results));
+        quantity.remove("unit");assertThrows(AssertionError.class,()->check(a,results));
+        quantity.put("unit","BOX");r.put("driverStatus","NOT_IMPLEMENTED");assertThrows(AssertionError.class,()->check(a,results));
+    }
+    @Test void revokedNewReservationPrimaryRequiresObservedQuantityScopeAndPhysicalUnit() throws Exception {
+        checkRevokedZeroQuantityPrimary("new-reservation-quantity-primary","new-reservation-3","allocations","new-reserve");
+    }
+    @Test void revokedNewDispatchPrimaryRequiresObservedQuantityScopeAndPhysicalUnit() throws Exception {
+        checkRevokedZeroQuantityPrimary("new-dispatch-quantity-primary","new-dispatch-6","movements","dispatch");
+    }
+    private void checkRevokedZeroQuantityPrimary(String primaryId,String countId,String rowsName,String command) throws Exception {
+        JsonNode primary=assertion("C1","revoked-basis",primaryId),count=assertion("C1","revoked-basis",countId);
+        ObjectNode db=observation(null,"{\"rawRows\":{\""+rowsName+"\":[],\"segments\":[{\"id\":\"consignment-physical-id\",\"active\":true,\"unit\":\"BOX\"}]}}");
+        Map<String,JsonNode> results=Map.of("after-db",db);check(primary,results);check(count,results);
+        ObjectNode rows=(ObjectNode)db.at("/data/rawRows");
+        rows.set(rowsName,Json.parse("[{\"commandKey\":\"C1-revoked-basis-"+command+"\",\"quantity\":\"1\",\"unit\":\"BOX\"}]"));assertThrows(AssertionError.class,()->check(primary,results));
+        ((ObjectNode)rows.path(rowsName).get(0)).put("quantity","0");((ObjectNode)rows.path(rowsName).get(0)).put("unit","KG");check(primary,results);assertThrows(AssertionError.class,()->check(count,results),"Existing count0 rejects even zero-quantity wrong-unit effect rows");
+        rows.set(rowsName,Json.array());ObjectNode physical=(ObjectNode)rows.path("segments").get(0);physical.put("unit","KG");assertThrows(AssertionError.class,()->check(primary,results));
+        physical.remove("unit");assertThrows(AssertionError.class,()->check(primary,results));physical.put("unit","BOX");
+        rows.putNull(rowsName);assertThrows(AssertionError.class,()->check(primary,results));rows.remove(rowsName);assertThrows(AssertionError.class,()->check(primary,results));rows.set(rowsName,Json.array());
+        ((ObjectNode)db.path("provenance")).put("scopeComplete",false);assertThrows(AssertionError.class,()->check(primary,results));
+        ((ObjectNode)db.path("provenance")).put("scopeComplete",true);db.put("driverStatus","NOT_IMPLEMENTED");assertThrows(AssertionError.class,()->check(primary,results));
     }
     @Test void oracleCatalogNamedObservationsAreAllBoundWithoutInventingNames() throws Exception {
         Set<String> ids=Set.of("T03","T04","T05","T16","C1","V2","V3");Set<String> mandatory=new HashSet<>(), actual=new HashSet<>();

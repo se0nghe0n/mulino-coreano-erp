@@ -1,0 +1,87 @@
+{
+  "recordType": "INVENTORY_QUANTITY_PRIMARY_FIX_EVIDENCE",
+  "baselineCommit": "25b634b589ba3d6b59799c8cec713393b6b3b7f0",
+  "workingTreeDirtyAtExecution": true,
+  "fixedPrimaries": [
+    "T03.indistinguishable-mixture/source-affected",
+    "C1.revoked-disposition/new-reservation",
+    "C1.revoked-disposition/new-dispatch"
+  ],
+  "affectedCases": {
+    "T03": {
+      "subcases": 8,
+      "assertions": 118
+    },
+    "C1": {
+      "subcases": 2,
+      "assertions": 38
+    }
+  },
+  "inventoryTotals": {
+    "cases": 7,
+    "subcases": 32,
+    "assertions": 528,
+    "mandatoryObservations": 91
+  },
+  "harness": {
+    "tests": 145,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "inventorySelftests": 15
+  },
+  "red": {
+    "expected": 10,
+    "discovered": 10,
+    "started": 10,
+    "notImplementedAssertionFailures": 10,
+    "skipped": 0,
+    "exitCode": 1
+  },
+  "commands": [
+    {
+      "profile": "harness",
+      "entrypoint": [
+        "./verify",
+        "harness"
+      ],
+      "exitCode": 0,
+      "commandsArtifact": "verification/cases/T03/evidence/inventory-primary-fix/harness-commands.json",
+      "logArtifact": "verification/cases/T03/evidence/inventory-primary-fix/harness.log.gz",
+      "uncompressedLogSha256": "8e24e6e8ae413194703842ac000a03eb7569c267f5c4495459007ff6c38982c1"
+    },
+    {
+      "profile": "validate",
+      "entrypoint": [
+        "./verify",
+        "validate",
+        "verification/cases/T03/case.json",
+        "verification/cases/C1/case.json"
+      ],
+      "exitCode": 0,
+      "commandsArtifact": "verification/cases/T03/evidence/inventory-primary-fix/validate-commands.json",
+      "logArtifact": "verification/cases/T03/evidence/inventory-primary-fix/validate.log.gz",
+      "uncompressedLogSha256": "b673bcc6783d62045852918e5e83f975c3f79d507b5e057ba90780614df2bc48"
+    },
+    {
+      "profile": "contract-red",
+      "entrypoint": [
+        "./verify",
+        "contract-red",
+        "verification/cases/T03/case.json",
+        "verification/cases/C1/case.json"
+      ],
+      "exitCode": 1,
+      "commandsArtifact": "verification/cases/T03/evidence/inventory-primary-fix/contract-red-commands.json",
+      "logArtifact": "verification/cases/T03/evidence/inventory-primary-fix/contract-red.log.gz",
+      "uncompressedLogSha256": "109e13e820e293f6cd11e974df4334420de8706fea5481db77f9231deebc1a6a"
+    }
+  ],
+  "caseHashes": {
+    "T03": "ed87013a37b94d847ef91bf17e082feec1a3c6cd8ac350a0c73802bba60dfaf2",
+    "C1": "af96a6061d6630bef5fe8d398b789566e02579fb2ef59198bee5d6334e8ee60c"
+  },
+  "productRuntimeClaimed": false,
+  "productRuntimeStatus": "NOT_RUN",
+  "wholeRegistryPrepare": "COORDINATOR_AFTER_INTEGRATION"
+}

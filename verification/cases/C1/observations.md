@@ -69,3 +69,16 @@ lockProbeScopeOnly는 fixture가 지정한 segment/allocation/fence 세 scope의
 
 공통 실행 기록은 [inventory 최종 증거](../T03/evidence/inventory-final/README.md)에 있다.
 이 case의 각 subcase RED 원본은 `evidence/contract-red-<case>-<subcase>.json`에 보존했다.
+
+## 수량 primary 보강
+
+- `new-reservation-quantity-primary` → `C1.revoked-disposition / new-reservation`: 해당 명령의 독립 allocation 원행 quantity 합계를0으로 검증한다.
+- `new-dispatch-quantity-primary` → `C1.revoked-disposition / new-dispatch`: 해당 명령의 독립 movement 원행 quantity 합계를0으로 검증한다.
+
+둘 다 같은 관찰 snapshot의 실제 실물CON40 원행 unit을BOX로 확인한다.
+단위는 요청 literal이나 빈 효과 행에서 합성하지 않는다. 완료된 효과
+scope의 관찰 배열만 합산하며 누락/null/NOT_IMPLEMENTED를0으로 바꾸지
+않는다. 기존 command 효과 행count0, 원행 전후 비교, 감사 검사를
+유지하므로0수량의 잘못된 effect 행도 통과하지 못한다.
+
+수량 primary 수정의 최신 [실행 증거](../T03/evidence/inventory-primary-fix/README.md)를 보존했다.

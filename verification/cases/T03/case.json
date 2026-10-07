@@ -6314,7 +6314,7 @@
       "assertions": [
         {
           "id": "source-affected-1",
-          "op": "equals",
+          "op": "decimalEquals",
           "source": {
             "actionId": "trace",
             "pointer": "/response/data/sourceAffected/value"
@@ -6335,12 +6335,17 @@
             },
             "caseKey": "T03-indistinguishable-mixture"
           },
-          "oracleExplanation": "문제의 원천 X는40이다.",
+          "oracleExplanation": "실제 trace의 문제 원천40과 관찰된 기준 단위BOX를 decimal primary로 직접 대조한다.",
           "oracleRef": {
             "oracleId": "T03.indistinguishable-mixture",
             "observationNames": [
               "source-affected"
             ]
+          },
+          "unit": "BOX",
+          "unitSource": {
+            "actionId": "trace",
+            "pointer": "/response/data/sourceAffected/unit"
           }
         },
         {
