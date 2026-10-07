@@ -1,0 +1,295 @@
+{
+  "checkedCommit": "e5fd8310e6682d4c9493de7c0687ffd07521f291",
+  "harness": {
+    "tests": 407,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "status": "PASS"
+  },
+  "preparation": {
+    "caseCount": 41,
+    "subcaseCount": 789,
+    "assertionCount": 20461,
+    "status": "PREPARED"
+  },
+  "productGherkin": {
+    "discovered": 789,
+    "started": 789,
+    "notImplementedFailures": 789,
+    "skipped": 0,
+    "exitCode": 1
+  },
+  "model": {
+    "caseCount": 60,
+    "turnCount": 73,
+    "inputArtifacts": 207,
+    "hashDrift": 0,
+    "sitGherkin": 60,
+    "uatGherkin": 60,
+    "actualModelCalls": 0,
+    "usage": null,
+    "cost": null,
+    "runtimeStatus": "NOT_RUN"
+  },
+  "coverage": {
+    "status": "NOT_RUN",
+    "preparationStatus": "NOT_RUN",
+    "validation": "VALID",
+    "coverageProblems": 0,
+    "preparationProblems": 0,
+    "knownIntegrationIssue": "Producer preparationStatus=PASS versus consumer PREPARED; correction pending. Full evidence retained."
+  },
+  "commands": [
+    {
+      "name": "clean",
+      "command": [
+        "./mvnw",
+        "-B",
+        "-ntp",
+        "-f",
+        "verification/harness/pom.xml",
+        "clean"
+      ],
+      "exitCode": 0,
+      "elapsedSeconds": 1.456
+    },
+    {
+      "name": "harness",
+      "command": [
+        "./verify",
+        "harness"
+      ],
+      "exitCode": 0,
+      "elapsedSeconds": 41.193
+    },
+    {
+      "name": "all-cases-red",
+      "command": [
+        "./verify",
+        "contract-red",
+        "verification/cases/T01/case.json",
+        "verification/cases/T02/case.json",
+        "verification/cases/T03/case.json",
+        "verification/cases/T04/case.json",
+        "verification/cases/T05/case.json",
+        "verification/cases/T06/case.json",
+        "verification/cases/T07/case.json",
+        "verification/cases/T08/case.json",
+        "verification/cases/T09/case.json",
+        "verification/cases/T10/case.json",
+        "verification/cases/T11/case.json",
+        "verification/cases/T12/case.json",
+        "verification/cases/T13/case.json",
+        "verification/cases/T14/case.json",
+        "verification/cases/T15/case.json",
+        "verification/cases/T16/case.json",
+        "verification/cases/T17/case.json",
+        "verification/cases/T18/case.json",
+        "verification/cases/T19/case.json",
+        "verification/cases/T20/case.json",
+        "verification/cases/T21/case.json",
+        "verification/cases/T22/case.json",
+        "verification/cases/T23/case.json",
+        "verification/cases/T24/case.json",
+        "verification/cases/T25/case.json",
+        "verification/cases/T26/case.json",
+        "verification/cases/C1/case.json",
+        "verification/cases/C2/case.json",
+        "verification/cases/C3/case.json",
+        "verification/cases/C4/case.json",
+        "verification/cases/C5/case.json",
+        "verification/cases/V1/case.json",
+        "verification/cases/V2/case.json",
+        "verification/cases/V3/case.json",
+        "verification/cases/V4/case.json",
+        "verification/cases/V5/case.json",
+        "verification/cases/V6/case.json",
+        "verification/cases/V7/case.json",
+        "verification/cases/V8/case.json",
+        "verification/cases/E1/case.json",
+        "verification/cases/E2/case.json"
+      ],
+      "exitCode": 1,
+      "elapsedSeconds": 63.145
+    },
+    {
+      "name": "model-prepare",
+      "command": [
+        "verification/model-binding/run",
+        "prepare"
+      ],
+      "exitCode": 0,
+      "elapsedSeconds": 2.577
+    },
+    {
+      "name": "model-sit-red",
+      "command": [
+        "verification/model-binding/run",
+        "red"
+      ],
+      "exitCode": 2,
+      "elapsedSeconds": 2.041
+    },
+    {
+      "name": "model-uat-red",
+      "command": [
+        "verification/model-binding/run",
+        "red",
+        "UAT"
+      ],
+      "exitCode": 2,
+      "elapsedSeconds": 2.032
+    },
+    {
+      "name": "model-sit-gherkin",
+      "command": [
+        "verification/model-binding/run",
+        "gherkin-red"
+      ],
+      "exitCode": 1,
+      "elapsedSeconds": 2.407
+    },
+    {
+      "name": "model-uat-gherkin",
+      "command": [
+        "verification/model-binding/run",
+        "gherkin-red",
+        "UAT"
+      ],
+      "exitCode": 1,
+      "elapsedSeconds": 2.323
+    },
+    {
+      "name": "coverage-assembly",
+      "command": [
+        "python3",
+        "verification/coverage/assemble.py",
+        "--check-preparation"
+      ],
+      "exitCode": 2,
+      "elapsedSeconds": 18.116
+    },
+    {
+      "name": "coverage-validation",
+      "command": [
+        "python3",
+        "verification/coverage/validate.py"
+      ],
+      "exitCode": 0,
+      "elapsedSeconds": 14.799
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "all-cases-feature-red-summary.json.gz",
+      "sha256": "37263b4f2fc27ce5e78713d7ac8f30dc1af9f32d5879703ccd2cc60eaf0cfb72",
+      "sizeBytes": 1659
+    },
+    {
+      "path": "all-cases-red-wrapper.json.gz",
+      "sha256": "cb03d59ec238660717c4e21c0352222cd3f270b234955aa4e9f6fde21fc7a42f",
+      "sizeBytes": 743
+    },
+    {
+      "path": "all-cases-red.log.gz",
+      "sha256": "636b3b18c65abdc90b6198e632636735d3c4e95270fd1013ed073af1d6f00fe9",
+      "sizeBytes": 198923
+    },
+    {
+      "path": "clean.log.gz",
+      "sha256": "c36c3d6cba8c607f6d237b1acec09c5c7477ae4159939c9550ab842437fb9b0d",
+      "sizeBytes": 315
+    },
+    {
+      "path": "commands.json.gz",
+      "sha256": "b63ee3b0e961b0e5e883e795681bb8846d83d1b890426eb06c36d5e0cc18965e",
+      "sizeBytes": 3561
+    },
+    {
+      "path": "coverage-assembly.log.gz",
+      "sha256": "5c64f66ec091862982317f4cf22edaaf5adbb441e1f9518b15f952c326d134bd",
+      "sizeBytes": 223
+    },
+    {
+      "path": "coverage-validation.log.gz",
+      "sha256": "5109d4c18c638176d1cffd8fdcf9dc6182017879157ccb61412b73d9e8fae56e",
+      "sizeBytes": 113
+    },
+    {
+      "path": "harness-surefire-reports.tar.gz",
+      "sha256": "57e635fee81ae7dedb3db3ebf1ad6f6e47cfdba5d47e168b2b8f72bbd4c6e617",
+      "sizeBytes": 23302
+    },
+    {
+      "path": "harness.log.gz",
+      "sha256": "4e13208ac6815ce58bb6d448199ce46dc1a31f2d27ecc76c541407f8af90121d",
+      "sizeBytes": 2363
+    },
+    {
+      "path": "model-binding-gherkin-red-uat.json.gz",
+      "sha256": "2b6757709aa4ee76577d876fb3cf391c6264afdf9b24907355af9ffff8d6ae6f",
+      "sizeBytes": 11703
+    },
+    {
+      "path": "model-binding-gherkin-red.json.gz",
+      "sha256": "88b179498fa90b134556c4a76886fe60f4505b30405fd6bdb119ec3869ca2822",
+      "sizeBytes": 11699
+    },
+    {
+      "path": "model-binding-preparation.json.gz",
+      "sha256": "bed69cb96a8b5dc06136d4790eb5686451ca1568d4e5643ea13214b77724fb61",
+      "sizeBytes": 11360
+    },
+    {
+      "path": "model-binding-red-uat.json.gz",
+      "sha256": "c601b66b7f47edf6d92eda72c220f8de6e0df5202023d4959851d79b32518f39",
+      "sizeBytes": 17657
+    },
+    {
+      "path": "model-binding-red.json.gz",
+      "sha256": "34eb7e2cb726bfd0f176a7c13c80ad51ea4d61f9f3d16bfea353ce8fcb000928",
+      "sizeBytes": 17653
+    },
+    {
+      "path": "model-prepare.log.gz",
+      "sha256": "728438affa3c2f1b67d581716a235a878fd45cbc33698f98e7199ae5d0d89edb",
+      "sizeBytes": 12010
+    },
+    {
+      "path": "model-sit-gherkin.log.gz",
+      "sha256": "bc5e774d9de5a24d1f631d959820319a624fb10d84d15327c4afc8fe2f4a47f3",
+      "sizeBytes": 1224
+    },
+    {
+      "path": "model-sit-red.log.gz",
+      "sha256": "e613989b48d7567b36584e1f45449c5cb83e700fc23aa9a80d41c68c29bbeeee",
+      "sizeBytes": 18303
+    },
+    {
+      "path": "model-uat-gherkin.log.gz",
+      "sha256": "a04340d3d041067e470b487985c6d79d1e0626424eb4e18316c19353a7888920",
+      "sizeBytes": 1226
+    },
+    {
+      "path": "model-uat-red.log.gz",
+      "sha256": "dc1f083a649190bc664c09ca2be5810a04c3ee1db523ea380201f4faf8765a22",
+      "sizeBytes": 18303
+    },
+    {
+      "path": "prepare.json.gz",
+      "sha256": "1c64d33f03bfb8c615b598bb44ec93c2712638447322492b9ee1e7cb84d174bc",
+      "sizeBytes": 490
+    },
+    {
+      "path": "product-red-evidence.tar.gz",
+      "sha256": "d6c3ed973e62987cbc195e06f61cb617b2cfbb6329fef05fe6504c8e9204e115",
+      "sizeBytes": 169246
+    },
+    {
+      "path": "runtime-manifest.json.gz",
+      "sha256": "9bf5fb6094503766dfbff1f71f8b57f8e6c96f428506625d7082c11931ad48de",
+      "sizeBytes": 480172
+    }
+  ]
+}
