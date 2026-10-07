@@ -1,0 +1,63 @@
+package com.mulino.application.evidence;
+
+import com.mulino.application.core.*;
+import com.mulino.application.trade.shipment.*;
+import com.mulino.application.runtime.RuntimeIntakeService;
+import com.mulino.application.policy.PolicyCommands;
+import com.mulino.domain.definitions.*;
+import com.mulino.domain.evidence.EvidenceTypes.*;
+import java.util.*;
+import java.time.*;
+import org.junit.jupiter.api.*;
+import org.springframework.beans.factory.annotation.Autowired;
+import static com.mulino.application.evidence.EvidenceRecords.*;
+import static org.junit.jupiter.api.Assertions.*;
+
+/** Real PostgreSQL, command gateway, current identity/policy and canonical file fixture. No domain mocks. */
+class ShipmentGatewayTest extends EvidencePersistenceTest {
+ @Autowired EvidenceReconciliation reconciliation;@Autowired ApplicationCommands gateway;@Autowired ShipmentQueries shipmentQueries;@Autowired RuntimeIntakeService intake;
+ String FROM,TO,WORK,DEF,LINE1,LINE2,CUSTODIAN;
+ @BeforeEach void shipmentSeed()throws Exception{
+  for(String cap:List.of("matchSourceIdentity","createShipment","recordLegEvent","recordHandover","getShipment","getObject","searchObjects","searchShipments")){
+   jdbc.update("INSERT INTO mulino_identity_CapabilityAssignments(organizationId,ID,actorId,capabilityId,scopeKind,scopeId,validFrom,validUntil) VALUES(?,?,?,?,'ORGANIZATION',?,CURRENT_TIMESTAMP-INTERVAL '1 day',CURRENT_TIMESTAMP+INTERVAL '1 day')",ORG,uuid(),ACTOR,cap,ORG);jdbc.update("INSERT INTO mulino_identity_GrantActions VALUES(?,?,?)",ORG,GRANT,cap);
+  }
+  FROM=uuid();TO=uuid();WORK=uuid();DEF=uuid();CUSTODIAN=uuid();
+  jdbc.update("INSERT INTO mulino_identity_Actors(organizationId,ID,kind,stableRequestOwner) VALUES(?,?,'HUMAN',?)",ORG,CUSTODIAN,uuid());
+  for(String place:List.of(FROM,TO))jdbc.update("INSERT INTO mulino_inventory_Places(organizationId,ID,name,kind) VALUES(?,?,'Synthetic route','TRANSIT')",ORG,place);
+  var caps=List.of("createShipment","recordLegEvent","recordHandover").stream().map(cap->new Definition.Capability(cap,"1.0.0","core-v1","1.0.0","1.0.0",List.<String>of())).toList();
+  var d=new Definition(ORG,DEF,"shipment-v1",null,"PUBLISHED",null,"core-v1","1.0.0",List.of(new Definition.NounType("Shipment",true)),List.of(),caps.stream().map(x->new Definition.Verb(x.capabilityId(),x.capabilityId().equals("createShipment")?"COMMAND":"RECORD",x.capabilityId(),"ACTIVE",Map.of())).toList(),List.of(),List.of(),caps);
+  String body=new com.fasterxml.jackson.databind.ObjectMapper().writeValueAsString(d);
+  jdbc.update("INSERT INTO mulino_definitions_DefinitionVersions(organizationId,ID,createdAt,version,state,contentHash,content,evaluatorVersion,schemaVersion) VALUES (?,?,CURRENT_TIMESTAMP,?,'PUBLISHED',?,?,?,?)",ORG,DEF,d.version(),DefinitionRepository.sha256(body),body,"core-v1","1.0.0");
+  jdbc.update("INSERT INTO mulino_work_read_Works(organizationId,ID,createdAt,recordedAt,effectiveAt,itemId,definitionVersionId,kind,status,ownerId,supervisorId) VALUES(?,?,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP,?,?,'IMPORT','ACTIVE',?,?)",ORG,WORK,ITEM,DEF,ACTOR,ACTOR);
+  String content="{\"rules\":{\"createShipment\":{\"effectClass\":\"SHIPMENT_PLAN\"},\"recordLegEvent\":{\"effectClass\":\"SHIPMENT_OBSERVATION\"},\"recordHandover\":{\"effectClass\":\"SHIPMENT_OBSERVATION\"}}}";String policy=uuid();
+  jdbc.update("INSERT INTO mulino_governance_PolicyVersions(organizationId,ID,revision,createdAt,version,kind,content,contentHash,effectiveFrom,effectiveUntil) VALUES(?,?,1,CURRENT_TIMESTAMP,'shipment-fixture','COMMAND',?,?,CURRENT_TIMESTAMP-INTERVAL '1 day',CURRENT_TIMESTAMP+INTERVAL '1 day')",ORG,policy,content,PolicyCommands.hash(content));jdbc.update("INSERT INTO mulino_governance_ActivePolicies VALUES(?,'COMMAND',?,1)",ORG,policy);
+  LINE1=line("60");LINE2=line("40");
+ }
+ String line(String quantity){String proposal=uuid(),approval=uuid(),order=uuid(),line=uuid();
+  jdbc.update("INSERT INTO mulino_trade_purchase_Proposals VALUES(?,?,?,1,'APPROVED',CURRENT_TIMESTAMP)",ORG,proposal,WORK);
+  jdbc.update("INSERT INTO mulino_trade_purchase_Approvals VALUES(?,?,?,1,?, ?,?,'APPROVED','{}',CURRENT_TIMESTAMP,CURRENT_TIMESTAMP+INTERVAL '1 day')",ORG,approval,proposal,"a".repeat(64),ACTOR,"b".repeat(64));
+  jdbc.update("INSERT INTO mulino_trade_purchase_Orders VALUES(?,?,?,1,?,?,'SYNTHETIC',?,?,CURRENT_TIMESTAMP)",ORG,order,proposal,"a".repeat(64),approval,uuid(),uuid());
+  jdbc.update("INSERT INTO mulino_trade_purchase_OrderLines VALUES(?,?,?,?,1,?,?,?,?,'BOX','SUPPLIER_ACCEPTED',1)",ORG,line,order,proposal,WORK,ITEM,TO,new java.math.BigDecimal(quantity));return line;
+ }
+ Map<String,Object> envelope(String capability,String key,Map<String,Object>s,Integer revision){var e=new LinkedHashMap<String,Object>();e.put("intentKind",capability.equals("createShipment")?"COMMAND":"RECORD");e.put("definitionVersion","shipment-v1");e.put("capabilityId",capability);e.put("commandIdempotencyKey",key);e.put("subjectRefs",capability.equals("createShipment")?List.of():List.of(Map.of("type","Shipment","id",s.get("shipmentId"))));e.put("slots",s);e.put("provenance",Map.of("sourceNamespace","USER"));if(revision!=null)e.put("expectedRevision",revision);return e;}
+ Map<String,Object> command(String capability,Map<String,Object>s,Integer revision){return request(()->gateway.execute(envelope(capability,uuid(),s,revision)));}
+ Map<String,Object> plan(String q1,String q2){return Map.of("originId",FROM,"destinationId",TO,"carrierRef","synthetic-carrier","cargo",List.of(Map.of("itemId",ITEM,"quantity",new java.math.BigDecimal(q1).add(new java.math.BigDecimal(q2)).toPlainString(),"unit","BOX","allocations",List.of(Map.of("poLineId",LINE1,"quantity",q1),Map.of("poLineId",LINE2,"quantity",q2)))),"legs",List.of(Map.of("originId",FROM,"destinationId",TO,"carrierRef","synthetic-carrier")));}
+ Map<String,Object> created(){var response=command("createShipment",plan("60","40"),null);assertEquals("APPLIED",response.get("outcome"));return (Map<String,Object>)response.get("effects");}
+ Map<String,Object> fact(Map<String,Object>created,String kind,String q,Instant at,String physical)throws Exception{String shipment=created.get("shipmentId").toString(),cargo=((List<?>)created.get("cargoIds")).getFirst().toString(),leg=((List<?>)created.get("legIds")).getFirst().toString(),place=kind.equals("DEPARTURE")?FROM:TO;var s=new LinkedHashMap<String,Object>();s.put("shipmentId",shipment);s.put("cargoId",cargo);s.put("legId",leg);s.put("kind",kind);s.put("placeId",place);s.put("physicalScopeId",physical);s.put("quantity",q);s.put("unit","BOX");s.put("occurredAt",at.toString());
+  String payload=new com.fasterxml.jackson.databind.ObjectMapper().writeValueAsString(s);String doc=request(()->records.attachDocument(new DocumentInput(new Subject(SubjectKind.ITEM,ITEM),"warehouse","shipment","application/json",com.mulino.adapters.blob.LocalBlobStore.hash(payload.getBytes()),"SYNTHETIC",null),payload.getBytes())).get("id").toString();
+  String event=request(()->records.recordActivity(new EventInput(new Subject(SubjectKind.ITEM,ITEM),"SHIPMENT_"+kind,"warehouse",uuid(),"1",new EffectiveTime(at,null,"UTC","SECOND"),ValueState.KNOWN,payload,null,null))).get("id").toString();
+  String claim=request(()->records.recordClaim(new ClaimInput(event,doc,"Synthetic observed shipment",q,"BOX",ValueState.KNOWN,null))).get("id").toString();
+  var context=request(()->auth.context(null,null));String sourceIdentity="warehouse:"+repository.require("Events",ORG,event).get("externalEventId")+":1";
+  var review=request(()->new org.springframework.transaction.support.TransactionTemplate(tx).execute(status->reconciliation.match(context,new EvidenceReconciliation.Review(claim,doc,physical,null,"synthetic-v1",sourceIdentity,q,"BOX",at,"SYNTHETIC source reconciliation"),"matchSourceIdentity")));
+  assertEquals("MATCHED",review.get("decision"));
+  String canonical=request(()->new org.springframework.transaction.support.TransactionTemplate(tx).execute(status->reconciliation.link(context,review.get("ID").toString()))).get("id").toString();
+  s.put("occurrenceId",canonical);return s;
+ }
+ @Test void multiplePurchaseOrdersAcrossShipmentsRetainPlansAndZeroPhysicalStock(){var a=command("createShipment",plan("30","20"),null);var b=command("createShipment",plan("30","20"),null);assertEquals("APPLIED",a.get("outcome"));assertEquals("APPLIED",b.get("outcome"));assertEquals(4,jdbc.queryForObject("SELECT count(*) FROM mulino_trade_shipment_CargoAllocations",Integer.class));assertEquals(0,jdbc.queryForObject("SELECT count(*) FROM mulino_inventory_QuantityMovements",Integer.class));var over=command("createShipment",plan("1","1"),null);assertNotEquals("APPLIED",over.get("outcome"));assertEquals(2,jdbc.queryForObject("SELECT count(*) FROM mulino_trade_shipment_Shipments",Integer.class));}
+ @Test void incorrectSubjectCannotWriteShipment(){var sh=created();var slots=new LinkedHashMap<String,Object>();slots.put("shipmentId",sh.get("shipmentId"));var e=envelope("recordLegEvent",uuid(),slots,1);e.put("subjectRefs",List.of(Map.of("type","Shipment","id",uuid())));var result=request(()->gateway.execute(e));assertNotEquals("APPLIED",result.get("outcome"));assertEquals(0,jdbc.queryForObject("SELECT count(*) FROM mulino_trade_shipment_LegEvents",Integer.class));}
+ @Test void revokedCurrentGrantPreventsPlanReplay(){var input=envelope("createShipment",uuid(),plan("60","40"),null);assertEquals("APPLIED",request(()->gateway.execute(input)).get("outcome"));jdbc.update("UPDATE mulino_identity_Grants SET revokedAt=CURRENT_TIMESTAMP WHERE ID=?",GRANT);assertNotEquals("APPLIED",request(()->gateway.execute(input)).get("outcome"));assertEquals(1,jdbc.queryForObject("SELECT count(*) FROM mulino_trade_shipment_Shipments",Integer.class));}
+ @Test void departure100Arrival98InTransit2IsNotLossAndKeepsLedgerZero()throws Exception{var sh=created();String physical=uuid();var depart=fact(sh,"DEPARTURE","100",OCCURRED,physical);assertEquals("APPLIED",command("recordLegEvent",depart,1).get("outcome"));var arrival=fact(sh,"ARRIVAL","98",OCCURRED.plusSeconds(60),physical);assertEquals("APPLIED",command("recordLegEvent",arrival,2).get("outcome"));var transit=fact(sh,"IN_TRANSIT","2",OCCURRED.plusSeconds(61),uuid());assertEquals("APPLIED",command("recordLegEvent",transit,3).get("outcome"));var context=request(()->auth.context(null,null));var query=new QueryRequest("getShipment",sh.get("shipmentId").toString(),Map.of(),Map.of(),50,null,null,context.asOf(),context.knownAt(),null);var read=(Map<?,?>)request(()->shipmentQueries.query(context,query)).data();var cargo=(Map<?,?>)((List<?>)read.get("cargo")).getFirst();assertEquals("ACCOUNTED_IN_TRANSIT",cargo.get("differenceState"));assertEquals("UNVERIFIED",cargo.get("lossQuantity"));assertEquals("98",cargo.get("arrivalQuantity"));assertEquals(2,jdbc.queryForObject("SELECT count(*) FROM mulino_trade_purchase_ExecutionEffects WHERE kind='SHIPPED'",Integer.class));assertEquals(0,jdbc.queryForObject("SELECT count(*) FROM mulino_inventory_QuantityMovements",Integer.class));}
+ @Test void exactQuantityTimeAndUnauthorizedSourceCannotRecordFact()throws Exception{var sh=created();var fact=fact(sh,"ARRIVAL","98",OCCURRED,uuid());var wrong=new LinkedHashMap<>(fact);wrong.put("quantity","97");assertNotEquals("APPLIED",command("recordLegEvent",wrong,1).get("outcome"));wrong=new LinkedHashMap<>(fact);wrong.put("occurredAt",OCCURRED.minusSeconds(1).toString());assertNotEquals("APPLIED",command("recordLegEvent",wrong,1).get("outcome"));jdbc.update("DELETE FROM mulino_identity_GrantActions WHERE capabilityId='getEvidence' AND grantId=?",GRANT);assertNotEquals("APPLIED",command("recordLegEvent",fact,1).get("outcome"));assertEquals(0,jdbc.queryForObject("SELECT count(*) FROM mulino_trade_shipment_LegEvents",Integer.class));}
+ @Test void orphanAnomalyRetainsConcreteIntakeOwnerDeadlineAndPendingRecovery()throws Exception{var sh=created();var fact=fact(sh,"TEMPERATURE_ANOMALY","100",OCCURRED,uuid());var result=command("recordLegEvent",fact,1);assertEquals("APPLIED",result.get("outcome"));var duty=(Map<?,?>)result.get("responsibility");assertEquals(ACTOR,duty.get("intakeOwnerId"));assertEquals(ACTOR,duty.get("supervisorId"));assertNotNull(duty.get("nextAction"));assertNotNull(duty.get("nextCheckAt"));intake.due();assertEquals(1,jdbc.queryForObject("SELECT count(*) FROM mulino_runtime_IntakeRecoveries WHERE eventId=? AND intakeOwnerId=? AND supervisorId=? AND state='PENDING' AND nextAction IS NOT NULL AND nextCheckAt IS NOT NULL",Integer.class,duty.get("eventId"),ACTOR,ACTOR));assertEquals(0,jdbc.queryForObject("SELECT count(*) FROM mulino_inventory_QuantityMovements",Integer.class));}
+
+}

@@ -12,11 +12,11 @@ import org.springframework.stereotype.Component;
 /** Current exact canonical reconciliation, never a carrier/document truthiness check. */
 @Component
 public class ShipmentEvidence {
- private final EvidenceRepository evidence;private final EvidenceQueries queries;
- public ShipmentEvidence(EvidenceRepository evidence,EvidenceQueries queries){this.evidence=evidence;this.queries=queries;}
+ private final EvidenceRepository evidence;private final EvidenceQueries queries;private final com.mulino.application.trade.TradeEvidence trade;
+ public ShipmentEvidence(EvidenceRepository evidence,EvidenceQueries queries,com.mulino.application.trade.TradeEvidence trade){this.evidence=evidence;this.queries=queries;this.trade=trade;}
  public Map<String,Object> canonical(DomainContext c,String id){return evidence.require("CanonicalOccurrences",c.organizationId(),id);}
  public void require(DomainContext c,String id,String kind,String item,String scope,String place,BigDecimal quantity,String unit,Instant occurred){
-  var r=canonical(c,id);
+  var r=trade.requireCanonical(c,id,kind,item,scope,quantity,unit);
   if(!queries.verifiedAt(c,id)||!"KNOWN".equals(r.get("valueState"))||!kind.equals(r.get("kind"))||!item.equals(r.get("itemId"))||!scope.equals(r.get("physicalScopeId"))||!place.equals(r.get("placeId"))||!unit.equals(r.get("unit"))||!(r.get("quantity") instanceof BigDecimal q)||q.compareTo(quantity)!=0||!occurred.equals(StockPrimitives.instant(r.get("effectiveFrom"))))throw held();
   if(evidence.rows("CanonicalOccurrences",c.organizationId()).stream().anyMatch(x->id.equals(x.get("supersedesId"))&&!StockPrimitives.instant(x.get("recordedAt")).isAfter(c.knownAt())))throw held();
   var verification=evidence.rows("Verifications",c.organizationId()).stream().filter(v->id.equals(v.get("canonicalOccurrenceId"))&&"VERIFIED".equals(v.get("verdict"))&&List.of("sourceMatched","identityMatched","quantityMatched","timeMatched","duplicateChecked").stream().allMatch(k->Boolean.TRUE.equals(v.get(k)))).findFirst().orElseThrow(ShipmentEvidence::held);
