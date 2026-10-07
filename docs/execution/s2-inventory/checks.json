@@ -1,0 +1,120 @@
+{
+  "baseline": "40a240c3886d3316ba1fd686e9b44bfa1ba6ec2d",
+  "sourceCommit": "c9281722e4617720abfc65515c9f7359ea7c7092",
+  "sourceCommittedAfterRunUnchanged": true,
+  "at": "2026-10-07T18:24:59.999508+00:00",
+  "command": "PATH=<pinned Node24 bin>:<Java21 bin>:/opt/homebrew/bin:/usr/bin:/bin JAVA_HOME=/Library/Java/JavaVirtualMachines/zulu-21.jdk/Contents/Home ./mvnw -f backend/pom.xml -Dtest=InventoryQuantityTest,InventoryPostgresTest,StockCommandPostgresTest test",
+  "node": "v24.19.0",
+  "java": "Zulu Java21",
+  "capPlugin": "5.1.1",
+  "postgres": "18.6",
+  "nativePostgres": {
+    "status": "PASS",
+    "exitCode": 0,
+    "tests": 24,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "classes": [
+      {
+        "class": "StockCommandPostgresTest",
+        "tests": 13,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "rawXmlSha256": "da1c8616b5292324a0dc103b067181b925170e7de036959338d6c8a0e192e766",
+        "methods": [
+          "multiSourceGrantMustAuthorizeEveryConsumedParent",
+          "fractionalDecimalAndCrossOrgFailWithoutPhysicalEffect",
+          "stocktakeAdjustmentCannotBeAppliedTwiceUnderNewCommandKey",
+          "internalMoveRejectsCustomerDestinationAndUnconfirmedCustody",
+          "concurrentConsumptionSerializesAndOnlyOneCommits",
+          "allocation40TransfersExactlyOnceAndLeaves60Unallocated",
+          "externalCodeConflictDoesNotMergeItems",
+          "split60and40RetiresParentAndRejectsSecondConsumption",
+          "stocktakeIsObservationDisposalAloneDecreases",
+          "uncertainMixtureNeverBecomesCleanSubset",
+          "restrictionInsertionSharesFenceAndCommittedRestrictionDeniesEffect",
+          "failedLaterWriteRollsBackEveryStockEffect",
+          "splitMergeKeepsConservationAndRejectsCrossPlaceOrControl"
+        ]
+      },
+      {
+        "class": "InventoryPostgresTest",
+        "tests": 9,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "rawXmlSha256": "e27841561f24ac8e60538d31695ee22525b4ea618afb1fe81a02371616685ce7",
+        "methods": [
+          "uncertainMixturePreservesCandidateAndCrossOrgReadDenied",
+          "cqnActiveLeavesIndependentSqlSumAndLineage",
+          "orgCompositeFkAndBaseUnitPrecisionReject",
+          "lineageRejectsHistoricalParentChildOverlap",
+          "namespacedExternalIdTimeAndLotManufacturerContext",
+          "historicalSnapshotAndFilteredSearchKeepServerContext",
+          "logisticsMembershipCannotDoubleCountOrCrossOrg",
+          "publishedTypedRelationsEnforceEndpointsPeriodCardinalityAndCycles",
+          "physicalHistoryCannotBeRewritten"
+        ]
+      },
+      {
+        "class": "InventoryQuantityTest",
+        "tests": 2,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "rawXmlSha256": "1bb4300a55f7b13f7ef2964bf2d25d2c12a56687fdeeffab2bd91dd023368bbd",
+        "methods": [
+          "conversionHasNoInventorySideEffectsAndRejectsUnrepresentableBaseAmount",
+          "decimalRangeAndUnitPrecisionRejectWithoutRounding"
+        ]
+      }
+    ],
+    "logPath": "/tmp/mulino-s2-inventory-maven.log"
+  },
+  "sourceHashes": {
+    "backend/db/inventory.cds": "f2958830d99f5fd158f71e89ffd5cfad9755f161ef24d344f8ef63eb10bf8990",
+    "backend/src/main/java/com/mulino/application/inventory/InventoryCommands.java": "195b22b496abb9944bf07c71ea675d99b5aef111f37af785547abb56294a6e8f",
+    "backend/src/main/java/com/mulino/application/inventory/InventoryQueries.java": "3c2d581138a38293d0ced75c2b19cb3ef2fb53f45780c24e8ce019eac18215d7",
+    "backend/src/main/java/com/mulino/application/inventory/InventoryRestrictionGuard.java": "cf17c056a33b6a4dac223790008b358bd526b3ab36515017b653bc1f192b6f6b",
+    "backend/src/main/java/com/mulino/application/inventory/ItemCommands.java": "1656b728b9c6f95df15fd6a3b26ab9301b880b457c766dab7edf948c0cb70c32",
+    "backend/src/main/java/com/mulino/domain/inventory/InventoryQuantity.java": "8304e92e276a85060c244bc8036ab190fb45ff91281ad9a232b2f9e38122b81b",
+    "backend/src/main/java/com/mulino/domain/inventory/InventoryRepository.java": "90730111dbf7af982d55f71a750cd8845f6f7ccdf0816cc2db908231e7889067",
+    "backend/src/main/java/com/mulino/domain/inventory/ScopeRepository.java": "4cf0c57ba04ec18f04818eb69e97af535a0676716cb113196a4458f4ea501516",
+    "backend/src/main/java/com/mulino/domain/inventory/StockPrimitives.java": "08ddb080fdbec8404e446bdf4ffb9ffb5132ee47b82a157e2dfde124701da06c",
+    "backend/src/test/java/com/mulino/inventory/InventoryPostgresTest.java": "b7e339bb2d99bfb8ce43057e344a36752a0f171ac7014dd2b0e6aa70565e84ee",
+    "backend/src/test/java/com/mulino/inventory/InventoryQuantityTest.java": "f2cb4e053e894dce7066fad2d4c8a63a8b1d0181dd5522226cc8177238004351",
+    "backend/src/test/java/com/mulino/inventory/StockCommandPostgresTest.java": "71b690ec8cc4af51245a5ae81a3d9fb21966656ead3e82df7ae7c107e985f680",
+    "database/migrations/V14__inventory_commands.sql": "4330a3dc79ffe8670d3cd04baed203d86b6451423a6177c2e8f772deb7195176"
+  },
+  "initialFailures": [
+    {
+      "reason": "Fresh worktree lacked locked npm ci/CDS binary",
+      "exitCode": 1
+    },
+    {
+      "reason": "Shared default blob directory not private; tests now use isolated roots",
+      "tests": 24,
+      "errors": 22
+    },
+    {
+      "reason": "S1 fixture SQL stray quote after timestamp parameter",
+      "logPath": "/tmp/mulino-s2-inventory-seed-failure.log",
+      "tests": 24,
+      "errors": 22
+    },
+    {
+      "reason": "Actual authorizer returns structured DomainError FORBIDDEN; expected exception corrected and code/outcome assertions added",
+      "logPath": "/tmp/mulino-s2-inventory-authority-expectation-failure.log",
+      "tests": 24,
+      "failures": 1
+    }
+  ],
+  "authority": "Stock tests use real membership/capability/grant DB rows; only CommandExecution ID is mocked in actual Spring transaction. Existing S1 read tests retain original authorizer mock.",
+  "directJavac": "PASS auxiliary source check",
+  "commonGatewayIntegration": "NOT_RUN worker; coordinator owns aggregate run",
+  "fullV2V3C1": "NOT_RUN: full sales/QC/correction lifecycle remains S3/S4",
+  "paidModelCalls": 0,
+  "btp": "NOT_RUN"
+}
