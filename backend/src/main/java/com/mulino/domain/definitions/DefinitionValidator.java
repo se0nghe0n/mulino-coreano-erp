@@ -7,15 +7,19 @@ import org.springframework.stereotype.Component;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import com.mulino.application.core.CommandHandler;
+import com.mulino.application.core.QueryHandler;
 
 /** Bounded, structural validation. Validation never grants execution authority. */
 @Component
 public class DefinitionValidator {
   private final ObjectProvider<CommandHandler> handlers;
-  public DefinitionValidator(){this.handlers=null;}
-  @Autowired public DefinitionValidator(ObjectProvider<CommandHandler> handlers){this.handlers=handlers;}
+  private final ObjectProvider<QueryHandler> queries;
+  public DefinitionValidator(){this.handlers=null;this.queries=null;}
+  public DefinitionValidator(ObjectProvider<CommandHandler> handlers){this.handlers=handlers;this.queries=null;}
+  @Autowired public DefinitionValidator(ObjectProvider<CommandHandler> handlers,ObjectProvider<QueryHandler> queries){this.handlers=handlers;this.queries=queries;}
   private boolean supportedCapability(Definition.Capability capability){
     if(Set.of("getDefinition","getObject","searchObjects","getWork","searchWorks","getInventory","getEvidence","getAssessment","getObligations","getReconciliation").contains(capability.capabilityId()))return true;
+    if(queries!=null&&"1.0.0".equals(capability.semanticVersion())&&queries.orderedStream().anyMatch(q->q.operations().contains(capability.capabilityId())))return true;
     return handlers!=null&&handlers.orderedStream().anyMatch(h->h.capabilities().contains(capability.capabilityId())&&h.semanticVersion().equals(capability.semanticVersion()));
   }
   private static final Set<String> RESERVED=Set.of("eligible","eligibility","role","roles","remainingquantity","assessment","permissions");
