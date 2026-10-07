@@ -33,7 +33,7 @@ public class OntologyMcp {
         try{Map<String,Object> input=(Map<String,Object>)arguments;
           if(commands.operations().contains(operation)){
             if(!operation.equals(input.get("capabilityId")))throw DomainError.invalid("Tool capability mismatch");
-            var value=commands.execute(input);result=toolResult(value,Set.of("REJECTED","CONFLICT").contains(value.get("outcome")));
+            var value=commands.execute(input);result=toolResult(value,Set.of("REJECTED","CONFLICT","HELD").contains(value.get("outcome")));
           }else{var value=queries.query(QueryRequests.parse(operation,input));result=toolResult(value,false);}
         }
         catch(DomainError failure){result=toolResult(failure.response(),true);}
