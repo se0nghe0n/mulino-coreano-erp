@@ -95,6 +95,39 @@ Sol xhigh와 Astra low의 설계 사전 검토는 관찰/control 미지원의 �
 oracle 목록에 반영해 실행 검증한다. 이 사전 검토는 전체 Step 2 코드의
 최종 review가 아니다. 최종 통합 뒤 같은 두 모델/effort로 다시 검토한다.
 
+## B2의 병렬 작성 소유권
+
+B2는 `feaca0af9673620eff9a5ac0f08a657ce14e9ccd`이며 로컬 tag는
+`step2-b2`다. 아래 worktree를 모두 같은 commit에서 생성했다. 실제
+GPT-6.1 Sol high writer가 각각 독점 경로를 작성하며 coordinator만
+Task branch에 통합한다. 공통 파일은 각 writer가 임의 변경하지 않는다.
+
+| Subtask | branch | 절대 worktree | 소유 범위 |
+|---|---|---|---|
+| definitions | `step2/cases-definitions` | `/Volumes/VideoStore/Developer/mulino-ontology-step2-definitions` | T02·T07·T21·V1 |
+| inventory | `step2/cases-inventory` | `/Volumes/VideoStore/Developer/mulino-ontology-step2-inventory` | T03·T04·T05·T16·C1·V2·V3 |
+| work | `step2/cases-work` | `/Volumes/VideoStore/Developer/mulino-ontology-step2-work` | T09·T10·T11·T12·C2·C5 |
+| supply | `step2/cases-supply` | `/Volumes/VideoStore/Developer/mulino-ontology-step2-supply` | T13·T14·T15·T19 |
+| sales | `step2/cases-sales` | `/Volumes/VideoStore/Developer/mulino-ontology-step2-sales` | T17·T18·C4·E1·E2 |
+| authority | `step2/cases-authority` | `/Volumes/VideoStore/Developer/mulino-ontology-step2-authority` | T08·C3·V4·V6·V7 |
+| evidence | `step2/cases-evidence` | `/Volumes/VideoStore/Developer/mulino-ontology-step2-evidence` | T06·T22·T24 |
+| runtime | `step2/cases-runtime` | `/Volumes/VideoStore/Developer/mulino-ontology-step2-runtime` | T26·V5 |
+| platform | `step2/cases-platform` | `/Volumes/VideoStore/Developer/mulino-ontology-step2-platform` | T23·V8와 platform-tests |
+| channels | `step2/cases-channels` | `/Volumes/VideoStore/Developer/mulino-ontology-step2-channels` | T01·T20·T25와 mcp/skills-tests |
+| model-binding | `step2/model-binding` | `/Volumes/VideoStore/Developer/mulino-ontology-step2-model-binding` | M01–M60 registry·binding·runner |
+| coverage | `step2/coverage-integration` | `/Volumes/VideoStore/Developer/mulino-ontology-step2-coverage` | 전체 준비/실행 evidence manifest assembly |
+
+case writer는 자신의 case 디렉터리와 고유 JUnit package를 소유한다.
+model-binding은 별도 M60 계약과 package, coverage는
+`verification/coverage`와 고유 package만 소유한다. coverage writer는
+runtime manifest를 만들되 registry의 최종 case/subcase 등록은 통합 뒤
+coordinator가 확인한다. 상세 인수 조건은 [작성 인계](step-2-case-handoff.md)다.
+
+공통 runtime manifest의 출력 경로는
+`verification/harness/target/evidence/runtime-manifest.json`이다.
+실제 입력 artifact·hash·실행 여부를 연결하며 부재를 성공이나0으로
+채우지 않는다. 이 기록 시점에는 아직 생성하거나 제품 인수하지 않았다.
+
 ## 시스템 S0–S6의 별도 gate
 
 | 시스템 Step | 인수 범위 | 상태 |
