@@ -231,6 +231,21 @@
       ],
       "contractSha256": "f0938a1e0db707cea7003387a805df7647450f180b6e4991a2c0e99cc2259e8f"
     },
+    "T05.disposition-manager-decision": {
+      "caseId": "T05",
+      "observationNames": [
+        "ordinary-write-confirmed-basis-effects",
+        "eligible-before-manager-confirmation",
+        "proposal-evidence-preserved",
+        "authorized-confirmation-count",
+        "eligible-after-manager-confirmation",
+        "ordinary-authorized-reservation-after-confirmation",
+        "ordinary-authorized-dispatch-after-confirmation",
+        "new-human-approval-added-to-reservation-or-dispatch",
+        "manager-decision-binding"
+      ],
+      "contractSha256": "13df23c52e02450da8d881a73a8a13f5541f1f26c4201c7625cc81cd72ea7375"
+    },
     "T06.bitemporal-correction": {
       "caseId": "T06",
       "observationNames": [
@@ -259,7 +274,7 @@
         "relation-created-work",
         "relation-created-run"
       ],
-      "contractSha256": "4bc6c278c9161099f47247aa3f51f47f53ebc37d18a38721de3f48ee65f217ed"
+      "contractSha256": "4f80839864d58d1dbce3141c10af9b51bd5be6f121579362dc956fdb9c301cbb"
     },
     "T07.two-documents-one-occurrence": {
       "caseId": "T07",
@@ -336,6 +351,28 @@
         "interval-policy"
       ],
       "contractSha256": "7349063d18f3f973ac773b8329fd73cd31ad08855da0bb17b606b82dcf10f50b"
+    },
+    "T09.exists-in-versus-end-state": {
+      "caseId": "T09",
+      "observationNames": [
+        "initial-held",
+        "final-held",
+        "exists-in-result",
+        "end-state-at-result",
+        "throughout-result",
+        "same-trajectory-three-goals"
+      ],
+      "contractSha256": "d7ea092ece35b08677d8080630bc90e325b71e656ba664db0324c054892d8635"
+    },
+    "T09.throughout-fully-observed": {
+      "caseId": "T09",
+      "observationNames": [
+        "initial-held",
+        "final-held",
+        "throughout-result",
+        "sufficient-continuity-evidence"
+      ],
+      "contractSha256": "63cf431b0f7eb01ef85e8178d29a09efa651cd69a44fcc1dc9d54da0966c6e93"
     },
     "T10.handover-acceptance": {
       "caseId": "T10",
@@ -667,6 +704,19 @@
         "qc-pass-payment-authorization"
       ],
       "contractSha256": "488ab1613090c4e19f36c7b52e9ab29e5b7a9345856b87f9b105139184adbc33"
+    },
+    "T19.settlement-manager-decision": {
+      "caseId": "T19",
+      "observationNames": [
+        "ordinary-write-confirmed-settlement-effects",
+        "observations-proposal-preserved",
+        "authorized-confirmation-count",
+        "confirmed-settlement-difference",
+        "preserved-original-difference",
+        "confirmed-difference-bank-transfer",
+        "management-decision-boundary"
+      ],
+      "contractSha256": "119451d62559cdcb1064d67d626f76315f6c6a219fb79b081819bbaab48f4091"
     },
     "T20.structured-intent-stages": {
       "caseId": "T20",
@@ -1271,5 +1321,18 @@
       ],
       "contractSha256": "d30cad556469874221c981d9d986f90d34caa0f04e9f591ee827b2495684d551"
     }
-  }
+  },
+  "reviewUpdates": [
+    {
+      "reason": "Sol xhigh catalog P2 omission review: not unknown/conflict; EXISTS_IN and normal THROUGHOUT; default MANAGER disposition/settlement confirmation boundaries",
+      "sourceSections": [
+        "3.2",
+        "5.1",
+        "7.1"
+      ],
+      "sourceMeaningChanged": false,
+      "runtimeEvidence": "NOT_RUN",
+      "closureReview": "PENDING same reviewer"
+    }
+  ]
 }

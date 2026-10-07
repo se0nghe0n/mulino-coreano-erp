@@ -4,8 +4,8 @@ case 작성자와 구현자가 함께 놓친 조항을 ID 개수 검사로 통�
 않기 위해 구현 계획의 의무를 별도 catalog로 고정한다. 이 디렉터리는
 case registry나 애플리케이션 출력에서 기대값을 만들지 않는다.
 
-`mandatory-oracles.json`은 41개 case, D01–D26의 118개 하위 oracle와
-473개 이름 있는 관찰을 담는다. 상태는 모두 `NOT_RUN`이다. 파일이
+`mandatory-oracles.json`은 41개 case, D01–D26의 122개 하위 oracle와
+499개 이름 있는 관찰을 담는다. 상태는 모두 `NOT_RUN`이다. 파일이
 있거나 validator가 성공했다는 이유로 업무·통합·모델·규제·BTP 인수를
 PASS로 표시할 수 없다. 필수 경로의 실제 assertion 연결과 실행은
 후속 Step의 인수 대상이다.
@@ -99,9 +99,32 @@ lock은 catalog 삭제·약화의 drift fence다. source 완전성을 자동 증
 않는다. 변경 때 source 조항·이유·관련 case/assertion 영향을 review하고
 의도된 변경을 별도 commit에서 승인된 QA 결과와 함께 갱신한다.
 
+## 검토 지적에 따른 누락 보완
+
+Sol xhigh의 catalog P2 검토는 계획에 있던 세 계약의 누락을 확인했다.
+이번 변경은 원문 정책을 확대하지 않고 catalog와 lock을 명시적으로
+갱신한다. 같은 reviewer의 closure 검토와 실제 실행 인수는 남아 있다.
+
+- §3.2: `T07.typed-relations-and-predicates`에 확정 true/false의 부정,
+  `not(UNKNOWN/CONFLICT)=UNVERIFIED`와 conflict flag 보존을 추가했다.
+- §5.1: `T09.exists-in-versus-end-state`는 구간 처음100·끝0의 같은
+  관측에서 EXISTS_IN 충족, 끝 STATE_AT와 THROUGHOUT 미충족을
+  구별한다. `T09.throughout-fully-observed`는 정책상 충분한 관측이
+  유지되는100의 정상 충족을 별도로 검증한다. 기존 관측 공백의
+  미확인 oracle도 유지한다.
+- §7.1: `T05.disposition-manager-decision`과
+  `T19.settlement-manager-decision`은 기본 MANAGER 확인 정책에서
+  일반 WRITE 역할·grant만으로 확정 효과0, 정당한 범위·근거·결정 후
+  정상 효과를 검증한다. 제안·관측 등록은 허용하며 일반 예약/출고에
+  새 인간 승인을 요구하지 않는다.
+
+새 조항·관찰 삭제와 기대값 약화에 대한 mutation 10개를 추가했다.
+`normative-contract-lock.json`의 `reviewUpdates`에 근거 절과 이번
+누락 보완의 이유를 기록했다. source 파일 hash와 의미는 그대로다.
+
 ## 현재 한계
 
-catalog 준비와 14개 자체 검사만 실행했다. 업무 애플리케이션,
+catalog 준비와 24개 자체 검사만 실행했다. 업무 애플리케이션,
 transaction/경합, DB/API/MCP, skill loading, 실제 모델, 법규와 BTP는
 이 디렉터리 작성 과정에서 실행하지 않았다. 전체 인수·coverage는
 `NOT_RUN`이다. catalog의 내용 검토와 case/assertion의 전체 연결은

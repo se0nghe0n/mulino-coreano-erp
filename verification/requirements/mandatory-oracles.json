@@ -1455,6 +1455,181 @@
       "status": "NOT_RUN"
     },
     {
+      "oracleId": "T05.disposition-manager-decision",
+      "caseId": "T05",
+      "requirementIds": [
+        "D05"
+      ],
+      "sourceRefs": [
+        {
+          "path": "docs/ontology-implementation-plan.md",
+          "sha256": "7f010093b1fba3673f674c78dddc8c407512e037831f093babc87d7421a22a00",
+          "section": "7.1;6",
+          "clause": "default deployment policy requires MANAGER confirmation of disposition basis; proposal/observation allowed, ordinary WRITE role/grant alone not confirmation"
+        },
+        {
+          "path": "docs/ontology-implementation-plan.md",
+          "sha256": "7f010093b1fba3673f674c78dddc8c407512e037831f093babc87d7421a22a00",
+          "section": "13.1",
+          "clause": "T05 mandatory acceptance fixture"
+        }
+      ],
+      "fixture": {
+        "physicalConsignment": "40",
+        "supplierCommercialDocument": "fixture verified SELL permission40",
+        "otherEligibilityConditions": "ALLOWED",
+        "ordinaryActor": {
+          "role": "WRITE",
+          "grant": "WRITE scoped40",
+          "managerCapability": false
+        },
+        "managerActor": {
+          "capability": "MANAGER scoped disposition confirmation",
+          "decision": "confirmed canonical proposal/hash/revision and evidence"
+        },
+        "policy": "default-v1 MANAGER confirms disposition basis; reservation/dispatch has no separate new approval",
+        "postConfirmationReserveAndDispatch": "10"
+      },
+      "requiredLayers": [
+        "API",
+        "DB"
+      ],
+      "requiredCapabilities": [
+        "recordActivity",
+        "recordDispositionBasis",
+        "evaluateEligibility",
+        "reserveQuantity",
+        "dispatchQuantity"
+      ],
+      "controlPrerequisites": [
+        "isolated organization and authenticated scoped actor",
+        "definition/evaluator/policy versions and fixture clock pinned",
+        "canonical event IDs and decimal units fixed"
+      ],
+      "expectedObservations": [
+        {
+          "name": "ordinary-write-confirmed-basis-effects",
+          "type": "effect",
+          "scope": "ordinary-write-confirmed-basis-effects",
+          "operator": "eq",
+          "expected": 0,
+          "artifactKinds": [
+            "api_response",
+            "db_snapshot"
+          ]
+        },
+        {
+          "name": "eligible-before-manager-confirmation",
+          "type": "quantity",
+          "scope": "eligible-before-manager-confirmation",
+          "operator": "eq",
+          "expected": {
+            "value": "0",
+            "unit": "BOX"
+          },
+          "artifactKinds": [
+            "api_response",
+            "db_snapshot"
+          ]
+        },
+        {
+          "name": "proposal-evidence-preserved",
+          "type": "evidence",
+          "scope": "proposal-evidence-preserved",
+          "operator": "satisfies",
+          "expected": {
+            "proposalAndVerifiedDocumentPersisted": true,
+            "ordinaryScopedRECORDAllowed": true
+          },
+          "artifactKinds": [
+            "api_response",
+            "db_snapshot"
+          ]
+        },
+        {
+          "name": "authorized-confirmation-count",
+          "type": "effect",
+          "scope": "authorized-confirmation-count",
+          "operator": "eq",
+          "expected": 1,
+          "artifactKinds": [
+            "api_response",
+            "db_snapshot"
+          ]
+        },
+        {
+          "name": "eligible-after-manager-confirmation",
+          "type": "quantity",
+          "scope": "eligible-after-manager-confirmation",
+          "operator": "eq",
+          "expected": {
+            "value": "40",
+            "unit": "BOX"
+          },
+          "artifactKinds": [
+            "api_response",
+            "db_snapshot"
+          ]
+        },
+        {
+          "name": "ordinary-authorized-reservation-after-confirmation",
+          "type": "quantity",
+          "scope": "ordinary-authorized-reservation-after-confirmation",
+          "operator": "eq",
+          "expected": {
+            "value": "10",
+            "unit": "BOX"
+          },
+          "artifactKinds": [
+            "api_response",
+            "db_snapshot"
+          ]
+        },
+        {
+          "name": "ordinary-authorized-dispatch-after-confirmation",
+          "type": "quantity",
+          "scope": "ordinary-authorized-dispatch-after-confirmation",
+          "operator": "eq",
+          "expected": {
+            "value": "10",
+            "unit": "BOX"
+          },
+          "artifactKinds": [
+            "api_response",
+            "db_snapshot"
+          ]
+        },
+        {
+          "name": "new-human-approval-added-to-reservation-or-dispatch",
+          "type": "effect",
+          "scope": "new-human-approval-added-to-reservation-or-dispatch",
+          "operator": "eq",
+          "expected": 0,
+          "artifactKinds": [
+            "api_response",
+            "db_snapshot"
+          ]
+        },
+        {
+          "name": "manager-decision-binding",
+          "type": "constraint",
+          "scope": "manager-decision-binding",
+          "operator": "satisfies",
+          "expected": {
+            "scopeActionQuantityPeriodEvidenceCurrentRevision": true,
+            "ordinaryWriteGrantNotManagementConfirmation": true,
+            "QCRecallAdditionalDecisionsWhenApplicableRemainIndependent": true
+          },
+          "artifactKinds": [
+            "api_response",
+            "db_snapshot"
+          ]
+        }
+      ],
+      "sharedOracleRefs": [],
+      "status": "NOT_RUN"
+    },
+    {
       "oracleId": "T06.bitemporal-correction",
       "caseId": "T06",
       "requirementIds": [
@@ -1659,7 +1834,7 @@
           "path": "docs/ontology-implementation-plan.md",
           "sha256": "7f010093b1fba3673f674c78dddc8c407512e037831f093babc87d7421a22a00",
           "section": "3.2;3.3",
-          "clause": "type/unit/cardinality/stage validation and typed operators"
+          "clause": "type/unit/cardinality/stage validation; all/any/not preserve unknown and conflict, negate only confirmed truth"
         },
         {
           "path": "docs/ontology-implementation-plan.md",
@@ -1676,6 +1851,12 @@
           "unsupportedOperator",
           "extensionOverwriteEligible",
           "extensionOverwriteRole"
+        ],
+        "predicateInputs": [
+          "TRUE",
+          "FALSE",
+          "UNKNOWN",
+          "CONFLICT"
         ]
       },
       "requiredLayers": [
@@ -1727,7 +1908,12 @@
             "anyTrueUnknown": "SATISFIED",
             "anyFalse": "UNSATISFIED",
             "anyFalseUnknown": "UNVERIFIED",
-            "conflictFlagPreserved": true
+            "conflictFlagPreserved": true,
+            "notTrue": "UNSATISFIED",
+            "notFalse": "SATISFIED",
+            "notUnknown": "UNVERIFIED",
+            "notConflict": "UNVERIFIED",
+            "notConflictFlagPreserved": true
           },
           "artifactKinds": [
             "api_response",
@@ -2477,6 +2663,243 @@
           "operator": "satisfies",
           "expected": {
             "windowAndObservabilityPolicyPinned": true
+          },
+          "artifactKinds": [
+            "api_response",
+            "db_snapshot"
+          ]
+        }
+      ],
+      "sharedOracleRefs": [],
+      "status": "NOT_RUN"
+    },
+    {
+      "oracleId": "T09.exists-in-versus-end-state",
+      "caseId": "T09",
+      "requirementIds": [
+        "D09"
+      ],
+      "sourceRefs": [
+        {
+          "path": "docs/ontology-implementation-plan.md",
+          "sha256": "7f010093b1fba3673f674c78dddc8c407512e037831f093babc87d7421a22a00",
+          "section": "5.1",
+          "clause": "EXISTS_IN within interval differs from final STATE_AT and THROUGHOUT across same fully observed physical trajectory"
+        },
+        {
+          "path": "docs/ontology-implementation-plan.md",
+          "sha256": "7f010093b1fba3673f674c78dddc8c407512e037831f093babc87d7421a22a00",
+          "section": "13.1",
+          "clause": "T09 mandatory acceptance fixture"
+        }
+      ],
+      "fixture": {
+        "interval": {
+          "start": "2026-10-07T00:00:00Z",
+          "end": "2026-10-07T02:00:00Z",
+          "endInclusive": true
+        },
+        "initialHeld": "100",
+        "dispatchAllAt": "2026-10-07T01:00:00Z",
+        "finalHeld": "0",
+        "target": "100",
+        "location": "W",
+        "observationPolicy": "fixture-v1 complete initial state + all ledger events + verified final state; no gaps"
+      },
+      "requiredLayers": [
+        "UNIT",
+        "API",
+        "DB"
+      ],
+      "requiredCapabilities": [
+        "createWork",
+        "dispatchQuantity",
+        "getAssessment"
+      ],
+      "controlPrerequisites": [
+        "isolated organization and authenticated scoped actor",
+        "definition/evaluator/policy versions and fixture clock pinned",
+        "canonical event IDs and decimal units fixed"
+      ],
+      "expectedObservations": [
+        {
+          "name": "initial-held",
+          "type": "quantity",
+          "scope": "initial-held",
+          "operator": "eq",
+          "expected": {
+            "value": "100",
+            "unit": "BOX"
+          },
+          "artifactKinds": [
+            "api_response",
+            "db_snapshot"
+          ]
+        },
+        {
+          "name": "final-held",
+          "type": "quantity",
+          "scope": "final-held",
+          "operator": "eq",
+          "expected": {
+            "value": "0",
+            "unit": "BOX"
+          },
+          "artifactKinds": [
+            "api_response",
+            "db_snapshot"
+          ]
+        },
+        {
+          "name": "exists-in-result",
+          "type": "status",
+          "scope": "exists-in-result",
+          "operator": "eq",
+          "expected": "SATISFIED",
+          "artifactKinds": [
+            "api_response",
+            "db_snapshot"
+          ]
+        },
+        {
+          "name": "end-state-at-result",
+          "type": "status",
+          "scope": "end-state-at-result",
+          "operator": "eq",
+          "expected": "UNSATISFIED",
+          "artifactKinds": [
+            "api_response",
+            "db_snapshot"
+          ]
+        },
+        {
+          "name": "throughout-result",
+          "type": "status",
+          "scope": "throughout-result",
+          "operator": "eq",
+          "expected": "UNSATISFIED",
+          "artifactKinds": [
+            "api_response",
+            "db_snapshot"
+          ]
+        },
+        {
+          "name": "same-trajectory-three-goals",
+          "type": "constraint",
+          "scope": "same-trajectory-three-goals",
+          "operator": "satisfies",
+          "expected": {
+            "targetQuantityUnitPlaceIntervalEvidenceSnapshotSame": true,
+            "EXISTS_IN": "one supported qualifying state inside interval",
+            "STATE_AT": "end instant quantity0",
+            "THROUGHOUT": "observed nonqualifying suffix prevents satisfaction",
+            "quantityModesPinned": true
+          },
+          "artifactKinds": [
+            "api_response",
+            "db_snapshot"
+          ]
+        }
+      ],
+      "sharedOracleRefs": [],
+      "status": "NOT_RUN"
+    },
+    {
+      "oracleId": "T09.throughout-fully-observed",
+      "caseId": "T09",
+      "requirementIds": [
+        "D09"
+      ],
+      "sourceRefs": [
+        {
+          "path": "docs/ontology-implementation-plan.md",
+          "sha256": "7f010093b1fba3673f674c78dddc8c407512e037831f093babc87d7421a22a00",
+          "section": "5.1",
+          "clause": "THROUGHOUT normal satisfied only with policy-sufficient observations across fixed interval"
+        },
+        {
+          "path": "docs/ontology-implementation-plan.md",
+          "sha256": "7f010093b1fba3673f674c78dddc8c407512e037831f093babc87d7421a22a00",
+          "section": "13.1",
+          "clause": "T09 mandatory acceptance fixture"
+        }
+      ],
+      "fixture": {
+        "interval": {
+          "start": "2026-10-07T00:00:00Z",
+          "end": "2026-10-07T02:00:00Z",
+          "endInclusive": true
+        },
+        "heldThroughout": "100",
+        "target": "100",
+        "location": "W",
+        "movements": [],
+        "observationPolicy": "fixture-v1 complete initial state + complete ledger continuity + verified final state; no gaps"
+      },
+      "requiredLayers": [
+        "UNIT",
+        "API",
+        "DB"
+      ],
+      "requiredCapabilities": [
+        "createWork",
+        "getAssessment"
+      ],
+      "controlPrerequisites": [
+        "isolated organization and authenticated scoped actor",
+        "definition/evaluator/policy versions and fixture clock pinned",
+        "canonical event IDs and decimal units fixed"
+      ],
+      "expectedObservations": [
+        {
+          "name": "initial-held",
+          "type": "quantity",
+          "scope": "initial-held",
+          "operator": "eq",
+          "expected": {
+            "value": "100",
+            "unit": "BOX"
+          },
+          "artifactKinds": [
+            "api_response",
+            "db_snapshot"
+          ]
+        },
+        {
+          "name": "final-held",
+          "type": "quantity",
+          "scope": "final-held",
+          "operator": "eq",
+          "expected": {
+            "value": "100",
+            "unit": "BOX"
+          },
+          "artifactKinds": [
+            "api_response",
+            "db_snapshot"
+          ]
+        },
+        {
+          "name": "throughout-result",
+          "type": "status",
+          "scope": "throughout-result",
+          "operator": "eq",
+          "expected": "SATISFIED",
+          "artifactKinds": [
+            "api_response",
+            "db_snapshot"
+          ]
+        },
+        {
+          "name": "sufficient-continuity-evidence",
+          "type": "constraint",
+          "scope": "sufficient-continuity-evidence",
+          "operator": "satisfies",
+          "expected": {
+            "fixedIntervalAndPolicyVersion": true,
+            "allRequiredObservationCoveragePresent": true,
+            "allRequiredConditionsQualifyThroughout": true,
+            "noUnobservedIntervalInferred": true
           },
           "artifactKinds": [
             "api_response",
@@ -5821,6 +6244,149 @@
           "scope": "qc-pass-payment-authorization",
           "operator": "eq",
           "expected": 0,
+          "artifactKinds": [
+            "api_response",
+            "db_snapshot"
+          ]
+        }
+      ],
+      "sharedOracleRefs": [],
+      "status": "NOT_RUN"
+    },
+    {
+      "oracleId": "T19.settlement-manager-decision",
+      "caseId": "T19",
+      "requirementIds": [
+        "D19"
+      ],
+      "sourceRefs": [
+        {
+          "path": "docs/ontology-implementation-plan.md",
+          "sha256": "7f010093b1fba3673f674c78dddc8c407512e037831f093babc87d7421a22a00",
+          "section": "7.1;6",
+          "clause": "default MANAGER confirmation for settlement difference; ordinary scoped WRITE/RECORD may record observations/proposals without final confirmation"
+        },
+        {
+          "path": "docs/ontology-implementation-plan.md",
+          "sha256": "7f010093b1fba3673f674c78dddc8c407512e037831f093babc87d7421a22a00",
+          "section": "13.1",
+          "clause": "T19 mandatory acceptance fixture"
+        }
+      ],
+      "fixture": {
+        "originalInvoiceDifference": "5 EUR",
+        "proposedAdjustment": "5 EUR",
+        "ordinaryActor": {
+          "role": "WRITE",
+          "grant": "WRITE scoped invoice",
+          "managerCapability": false
+        },
+        "managerActor": {
+          "capability": "MANAGER scoped settlement confirmation",
+          "decision": "confirmed canonical proposal/revision and evidence"
+        },
+        "policy": "default-v1 MANAGER confirms settlement difference; no external banking capability"
+      },
+      "requiredLayers": [
+        "API",
+        "DB"
+      ],
+      "requiredCapabilities": [
+        "recordInvoice",
+        "matchInvoice",
+        "recordSettlementAdjustment"
+      ],
+      "controlPrerequisites": [
+        "isolated organization and authenticated scoped actor",
+        "definition/evaluator/policy versions and fixture clock pinned",
+        "canonical event IDs and decimal units fixed"
+      ],
+      "expectedObservations": [
+        {
+          "name": "ordinary-write-confirmed-settlement-effects",
+          "type": "effect",
+          "scope": "ordinary-write-confirmed-settlement-effects",
+          "operator": "eq",
+          "expected": 0,
+          "artifactKinds": [
+            "api_response",
+            "db_snapshot"
+          ]
+        },
+        {
+          "name": "observations-proposal-preserved",
+          "type": "evidence",
+          "scope": "observations-proposal-preserved",
+          "operator": "satisfies",
+          "expected": {
+            "invoiceOriginalDifferenceAndProposalPersisted": true,
+            "ordinaryScopedRECORDAllowed": true
+          },
+          "artifactKinds": [
+            "api_response",
+            "db_snapshot"
+          ]
+        },
+        {
+          "name": "authorized-confirmation-count",
+          "type": "effect",
+          "scope": "authorized-confirmation-count",
+          "operator": "eq",
+          "expected": 1,
+          "artifactKinds": [
+            "api_response",
+            "db_snapshot"
+          ]
+        },
+        {
+          "name": "confirmed-settlement-difference",
+          "type": "quantity",
+          "scope": "confirmed-settlement-difference",
+          "operator": "eq",
+          "expected": {
+            "value": "5",
+            "unit": "EUR"
+          },
+          "artifactKinds": [
+            "api_response",
+            "db_snapshot"
+          ]
+        },
+        {
+          "name": "preserved-original-difference",
+          "type": "quantity",
+          "scope": "preserved-original-difference",
+          "operator": "eq",
+          "expected": {
+            "value": "5",
+            "unit": "EUR"
+          },
+          "artifactKinds": [
+            "api_response",
+            "db_snapshot"
+          ]
+        },
+        {
+          "name": "confirmed-difference-bank-transfer",
+          "type": "effect",
+          "scope": "confirmed-difference-bank-transfer",
+          "operator": "eq",
+          "expected": 0,
+          "artifactKinds": [
+            "api_response",
+            "db_snapshot"
+          ]
+        },
+        {
+          "name": "management-decision-boundary",
+          "type": "constraint",
+          "scope": "management-decision-boundary",
+          "operator": "satisfies",
+          "expected": {
+            "scopedMANAGERDecisionEvidenceCurrentRevisionRequired": true,
+            "ordinaryWriteGrantNotFinalConfirmation": true,
+            "confirmationNotAutomaticDutyResolutionWithoutResolutionEvidence": true
+          },
           "artifactKinds": [
             "api_response",
             "db_snapshot"
