@@ -1,0 +1,1356 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://mulino.test/contracts/acceptance-host-observation.schema.json",
+  "type": "object",
+  "properties": {
+    "schemaVersion": {
+      "const": "1.0.0"
+    },
+    "operation": {
+      "enum": [
+        "tickScheduler",
+        "claim",
+        "sweepDue",
+        "awaitRuntimeTask",
+        "archiveInventory",
+        "archiveRestore",
+        "dataInventory",
+        "schemaInstall",
+        "schemaUpgrade",
+        "compileSchema",
+        "compilerSchemaProbe",
+        "backup",
+        "restore",
+        "cutoverStage",
+        "deploymentProbe",
+        "clientProbe",
+        "retentionSweep",
+        "inspectArtifacts",
+        "scanArtifacts",
+        "verifyCoverage",
+        "start",
+        "stop",
+        "restart"
+      ]
+    },
+    "requestedInputs": {
+      "type": "object"
+    },
+    "scope": {
+      "$ref": "#/$defs/scope"
+    },
+    "scopeComplete": {
+      "const": true
+    },
+    "command": {
+      "$ref": "#/$defs/command"
+    },
+    "toolVersions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 1
+          },
+          "version": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "required": [
+          "name",
+          "version"
+        ],
+        "additionalProperties": false
+      },
+      "minItems": 1
+    },
+    "environment": {
+      "type": "object",
+      "properties": {
+        "profile": {
+          "enum": [
+            "LOCAL",
+            "BTP",
+            "CLIENT",
+            "REGULATORY",
+            "MODEL"
+          ]
+        },
+        "hostId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "workspaceId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "isolated": {
+          "const": true
+        }
+      },
+      "required": [
+        "profile",
+        "hostId",
+        "workspaceId",
+        "isolated"
+      ],
+      "additionalProperties": false
+    },
+    "inputArtifacts": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/artifact"
+      },
+      "minItems": 0
+    },
+    "generatedOutputs": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/artifact"
+      },
+      "minItems": 0
+    },
+    "observedArtifacts": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/artifact"
+      },
+      "minItems": 0
+    },
+    "extractor": {
+      "$ref": "#/$defs/extractor"
+    },
+    "operationEvidence": {
+      "type": "object",
+      "minProperties": 1
+    },
+    "reads": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/read"
+      },
+      "minItems": 0
+    },
+    "runtimeTask": {
+      "type": "object",
+      "properties": {
+        "taskId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "invocationHandle": {
+          "type": "string",
+          "minLength": 1
+        },
+        "origin": {
+          "const": "autonomousScheduler"
+        },
+        "terminalStatus": {
+          "enum": [
+            "SUCCEEDED",
+            "FAILED",
+            "CANCELLED"
+          ]
+        },
+        "completedAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "snapshot": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string",
+              "minLength": 1
+            },
+            "capturedAt": {
+              "type": "string",
+              "format": "date-time"
+            },
+            "artifactRef": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "required": [
+            "id",
+            "capturedAt",
+            "artifactRef"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "taskId",
+        "invocationHandle",
+        "origin",
+        "terminalStatus",
+        "completedAt",
+        "snapshot"
+      ],
+      "additionalProperties": false
+    },
+    "evidenceClass": {
+      "enum": [
+        "ACTUAL_HOST",
+        "CAPTURED_SELFTEST"
+      ]
+    },
+    "processObservation": {
+      "type": "object",
+      "properties": {
+        "requestedProcessId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "before": {
+          "$ref": "#/$defs/processState"
+        },
+        "after": {
+          "$ref": "#/$defs/processState"
+        },
+        "terminalStatus": {
+          "enum": [
+            "SUCCEEDED",
+            "FAILED",
+            "CANCELLED"
+          ]
+        },
+        "completedAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "artifactRef": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": [
+        "requestedProcessId",
+        "before",
+        "after",
+        "terminalStatus",
+        "completedAt",
+        "artifactRef"
+      ],
+      "additionalProperties": false
+    }
+  },
+  "required": [
+    "schemaVersion",
+    "operation",
+    "requestedInputs",
+    "scope",
+    "scopeComplete",
+    "command",
+    "toolVersions",
+    "environment",
+    "inputArtifacts",
+    "generatedOutputs",
+    "observedArtifacts",
+    "extractor",
+    "operationEvidence",
+    "evidenceClass"
+  ],
+  "additionalProperties": false,
+  "$defs": {
+    "scope": {
+      "type": "object",
+      "minProperties": 1
+    },
+    "artifact": {
+      "type": "object",
+      "properties": {
+        "path": {
+          "type": "string",
+          "minLength": 1
+        },
+        "sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "sizeBytes": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "scope": {
+          "$ref": "#/$defs/scope"
+        },
+        "completeness": {
+          "const": "COMPLETE"
+        }
+      },
+      "required": [
+        "path",
+        "sha256",
+        "sizeBytes",
+        "scope",
+        "completeness"
+      ],
+      "additionalProperties": false
+    },
+    "command": {
+      "type": "object",
+      "properties": {
+        "argv": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 1
+        },
+        "exitCode": {
+          "type": "integer"
+        },
+        "startedAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "completedAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "transcriptRef": {
+          "type": "string",
+          "minLength": 1
+        },
+        "redacted": {
+          "const": true
+        }
+      },
+      "required": [
+        "argv",
+        "exitCode",
+        "startedAt",
+        "completedAt",
+        "transcriptRef",
+        "redacted"
+      ],
+      "additionalProperties": false
+    },
+    "finding": {
+      "type": "object",
+      "properties": {
+        "patternId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "byteOffset": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "lengthBytes": {
+          "type": "integer",
+          "minimum": 1
+        }
+      },
+      "required": [
+        "patternId",
+        "byteOffset",
+        "lengthBytes"
+      ],
+      "additionalProperties": false
+    },
+    "read": {
+      "type": "object",
+      "properties": {
+        "artifact": {
+          "$ref": "#/$defs/artifact"
+        },
+        "bytesRead": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "digest": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "findings": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/finding"
+          },
+          "minItems": 0
+        }
+      },
+      "required": [
+        "artifact",
+        "bytesRead",
+        "digest",
+        "findings"
+      ],
+      "additionalProperties": false
+    },
+    "extractor": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "version": {
+          "type": "string",
+          "minLength": 1
+        },
+        "source": {
+          "enum": [
+            "FILESYSTEM_READ_ONLY",
+            "HOST_TOOL_READ_ONLY"
+          ]
+        },
+        "independent": {
+          "const": true
+        },
+        "readOnly": {
+          "const": true
+        },
+        "command": {
+          "$ref": "#/$defs/command"
+        },
+        "inputArtifacts": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/artifact"
+          },
+          "minItems": 1
+        },
+        "rawRows": {
+          "type": [
+            "object",
+            "array"
+          ]
+        },
+        "transcriptRefs": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 0
+        },
+        "rawRowsArtifactRef": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": [
+        "name",
+        "version",
+        "source",
+        "independent",
+        "readOnly",
+        "command",
+        "inputArtifacts"
+      ],
+      "additionalProperties": false,
+      "anyOf": [
+        {
+          "required": [
+            "rawRows",
+            "rawRowsArtifactRef"
+          ]
+        },
+        {
+          "properties": {
+            "transcriptRefs": {
+              "minItems": 1
+            }
+          },
+          "required": [
+            "transcriptRefs"
+          ]
+        }
+      ]
+    },
+    "processState": {
+      "type": "object",
+      "properties": {
+        "processId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "instanceId": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "minLength": 1
+        },
+        "status": {
+          "enum": [
+            "RUNNING",
+            "STOPPED",
+            "NOT_PRESENT"
+          ]
+        },
+        "observedAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "processId",
+        "instanceId",
+        "status",
+        "observedAt"
+      ],
+      "additionalProperties": false
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "operation": {
+            "const": "tickScheduler"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "operationEvidence": {
+            "type": "object",
+            "properties": {
+              "schedulerId": {
+                "type": "string",
+                "minLength": 1
+              },
+              "tickId": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "required": [
+              "schedulerId",
+              "tickId"
+            ],
+            "additionalProperties": false
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "operation": {
+            "const": "claim"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "operationEvidence": {
+            "type": "object",
+            "properties": {
+              "schedulerId": {
+                "type": "string",
+                "minLength": 1
+              },
+              "claimId": {
+                "type": "string",
+                "minLength": 1
+              },
+              "leaseId": {
+                "type": "string",
+                "minLength": 1
+              },
+              "fencingToken": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "required": [
+              "schedulerId",
+              "claimId",
+              "leaseId",
+              "fencingToken"
+            ],
+            "additionalProperties": false
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "operation": {
+            "const": "sweepDue"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "operationEvidence": {
+            "type": "object",
+            "properties": {
+              "schedulerId": {
+                "type": "string",
+                "minLength": 1
+              },
+              "sweepId": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "required": [
+              "schedulerId",
+              "sweepId"
+            ],
+            "additionalProperties": false
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "operation": {
+            "const": "awaitRuntimeTask"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "operationEvidence": {
+            "type": "object",
+            "properties": {
+              "schedulerId": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "required": [
+              "schedulerId"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "required": [
+          "runtimeTask"
+        ]
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "operation": {
+            "const": "archiveInventory"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "operationEvidence": {
+            "type": "object",
+            "properties": {
+              "repositoryId": {
+                "type": "string",
+                "minLength": 1
+              },
+              "baselineCommit": {
+                "type": "string",
+                "minLength": 1
+              },
+              "inventoryId": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "required": [
+              "repositoryId",
+              "baselineCommit",
+              "inventoryId"
+            ],
+            "additionalProperties": false
+          },
+          "generatedOutputs": {
+            "minItems": 1
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "operation": {
+            "const": "archiveRestore"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "operationEvidence": {
+            "type": "object",
+            "properties": {
+              "archiveId": {
+                "type": "string",
+                "minLength": 1
+              },
+              "restoreEnvironmentId": {
+                "type": "string",
+                "minLength": 1
+              },
+              "restoredCommit": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "required": [
+              "archiveId",
+              "restoreEnvironmentId",
+              "restoredCommit"
+            ],
+            "additionalProperties": false
+          },
+          "generatedOutputs": {
+            "minItems": 1
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "operation": {
+            "const": "dataInventory"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "operationEvidence": {
+            "type": "object",
+            "properties": {
+              "environmentId": {
+                "type": "string",
+                "minLength": 1
+              },
+              "inventoryId": {
+                "type": "string",
+                "minLength": 1
+              },
+              "authoritativeSourceId": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "required": [
+              "environmentId",
+              "inventoryId",
+              "authoritativeSourceId"
+            ],
+            "additionalProperties": false
+          },
+          "generatedOutputs": {
+            "minItems": 1
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "operation": {
+            "const": "schemaInstall"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "operationEvidence": {
+            "type": "object",
+            "properties": {
+              "environmentId": {
+                "type": "string",
+                "minLength": 1
+              },
+              "schemaVersion": {
+                "type": "string",
+                "minLength": 1
+              },
+              "migrationOwner": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "required": [
+              "environmentId",
+              "schemaVersion",
+              "migrationOwner"
+            ],
+            "additionalProperties": false
+          },
+          "generatedOutputs": {
+            "minItems": 1
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "operation": {
+            "const": "schemaUpgrade"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "operationEvidence": {
+            "type": "object",
+            "properties": {
+              "environmentId": {
+                "type": "string",
+                "minLength": 1
+              },
+              "fromVersion": {
+                "type": "string",
+                "minLength": 1
+              },
+              "toVersion": {
+                "type": "string",
+                "minLength": 1
+              },
+              "migrationOwner": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "required": [
+              "environmentId",
+              "fromVersion",
+              "toVersion",
+              "migrationOwner"
+            ],
+            "additionalProperties": false
+          },
+          "generatedOutputs": {
+            "minItems": 1
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "operation": {
+            "const": "compileSchema"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "operationEvidence": {
+            "type": "object",
+            "properties": {
+              "compilerId": {
+                "type": "string",
+                "minLength": 1
+              },
+              "compilerVersion": {
+                "type": "string",
+                "minLength": 1
+              },
+              "sourceRevision": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "required": [
+              "compilerId",
+              "compilerVersion",
+              "sourceRevision"
+            ],
+            "additionalProperties": false
+          },
+          "generatedOutputs": {
+            "minItems": 1
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "operation": {
+            "const": "compilerSchemaProbe"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "operationEvidence": {
+            "type": "object",
+            "properties": {
+              "compilerId": {
+                "type": "string",
+                "minLength": 1
+              },
+              "compilerVersion": {
+                "type": "string",
+                "minLength": 1
+              },
+              "schemaVersion": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "required": [
+              "compilerId",
+              "compilerVersion",
+              "schemaVersion"
+            ],
+            "additionalProperties": false
+          },
+          "generatedOutputs": {
+            "minItems": 1
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "operation": {
+            "const": "backup"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "operationEvidence": {
+            "type": "object",
+            "properties": {
+              "environmentId": {
+                "type": "string",
+                "minLength": 1
+              },
+              "backupId": {
+                "type": "string",
+                "minLength": 1
+              },
+              "snapshotId": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "required": [
+              "environmentId",
+              "backupId",
+              "snapshotId"
+            ],
+            "additionalProperties": false
+          },
+          "generatedOutputs": {
+            "minItems": 1
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "operation": {
+            "const": "restore"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "operationEvidence": {
+            "type": "object",
+            "properties": {
+              "backupId": {
+                "type": "string",
+                "minLength": 1
+              },
+              "restoreEnvironmentId": {
+                "type": "string",
+                "minLength": 1
+              },
+              "snapshotId": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "required": [
+              "backupId",
+              "restoreEnvironmentId",
+              "snapshotId"
+            ],
+            "additionalProperties": false
+          },
+          "generatedOutputs": {
+            "minItems": 1
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "operation": {
+            "const": "cutoverStage"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "operationEvidence": {
+            "type": "object",
+            "properties": {
+              "environmentId": {
+                "type": "string",
+                "minLength": 1
+              },
+              "cutoverId": {
+                "type": "string",
+                "minLength": 1
+              },
+              "stage": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "required": [
+              "environmentId",
+              "cutoverId",
+              "stage"
+            ],
+            "additionalProperties": false
+          },
+          "generatedOutputs": {
+            "minItems": 1
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "operation": {
+            "const": "deploymentProbe"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "operationEvidence": {
+            "type": "object",
+            "properties": {
+              "deploymentId": {
+                "type": "string",
+                "minLength": 1
+              },
+              "environmentId": {
+                "type": "string",
+                "minLength": 1
+              },
+              "profile": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "required": [
+              "deploymentId",
+              "environmentId",
+              "profile"
+            ],
+            "additionalProperties": false
+          },
+          "generatedOutputs": {
+            "minItems": 1
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "operation": {
+            "const": "clientProbe"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "operationEvidence": {
+            "type": "object",
+            "properties": {
+              "clientId": {
+                "type": "string",
+                "minLength": 1
+              },
+              "clientVersion": {
+                "type": "string",
+                "minLength": 1
+              },
+              "profile": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "required": [
+              "clientId",
+              "clientVersion",
+              "profile"
+            ],
+            "additionalProperties": false
+          },
+          "generatedOutputs": {
+            "minItems": 1
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "operation": {
+            "const": "retentionSweep"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "operationEvidence": {
+            "type": "object",
+            "properties": {
+              "environmentId": {
+                "type": "string",
+                "minLength": 1
+              },
+              "policyVersion": {
+                "type": "string",
+                "minLength": 1
+              },
+              "sweepId": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "required": [
+              "environmentId",
+              "policyVersion",
+              "sweepId"
+            ],
+            "additionalProperties": false
+          },
+          "generatedOutputs": {
+            "minItems": 1
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "operation": {
+            "const": "inspectArtifacts"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "operationEvidence": {
+            "type": "object",
+            "properties": {
+              "inspectionId": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "required": [
+              "inspectionId"
+            ],
+            "additionalProperties": false
+          },
+          "observedArtifacts": {
+            "minItems": 1
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "operation": {
+            "const": "scanArtifacts"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "operationEvidence": {
+            "type": "object",
+            "properties": {
+              "scanId": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "required": [
+              "scanId"
+            ],
+            "additionalProperties": false
+          },
+          "observedArtifacts": {
+            "minItems": 1
+          }
+        },
+        "required": [
+          "reads"
+        ]
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "operation": {
+            "const": "verifyCoverage"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "operationEvidence": {
+            "type": "object",
+            "properties": {
+              "registryHash": {
+                "type": "string",
+                "minLength": 1
+              },
+              "catalogHash": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "required": [
+              "registryHash",
+              "catalogHash"
+            ],
+            "additionalProperties": false
+          },
+          "generatedOutputs": {
+            "minItems": 1
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "operation": {
+            "const": "start"
+          }
+        }
+      },
+      "then": {
+        "required": [
+          "processObservation"
+        ],
+        "properties": {
+          "operationEvidence": {
+            "type": "object",
+            "properties": {
+              "processId": {
+                "type": "string",
+                "minLength": 1
+              },
+              "environmentId": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "required": [
+              "processId",
+              "environmentId"
+            ],
+            "additionalProperties": false
+          },
+          "generatedOutputs": {
+            "minItems": 1
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "operation": {
+            "const": "stop"
+          }
+        }
+      },
+      "then": {
+        "required": [
+          "processObservation"
+        ],
+        "properties": {
+          "operationEvidence": {
+            "type": "object",
+            "properties": {
+              "processId": {
+                "type": "string",
+                "minLength": 1
+              },
+              "environmentId": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "required": [
+              "processId",
+              "environmentId"
+            ],
+            "additionalProperties": false
+          },
+          "generatedOutputs": {
+            "minItems": 1
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "operation": {
+            "const": "restart"
+          }
+        }
+      },
+      "then": {
+        "required": [
+          "processObservation"
+        ],
+        "properties": {
+          "operationEvidence": {
+            "type": "object",
+            "properties": {
+              "processId": {
+                "type": "string",
+                "minLength": 1
+              },
+              "environmentId": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "required": [
+              "processId",
+              "environmentId"
+            ],
+            "additionalProperties": false
+          },
+          "generatedOutputs": {
+            "minItems": 1
+          }
+        }
+      }
+    }
+  ]
+}

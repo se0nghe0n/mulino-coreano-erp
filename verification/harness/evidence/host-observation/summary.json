@@ -1,0 +1,75 @@
+{
+  "schemaVersion": "1.0.0",
+  "baselineCommit": "56a2437fa56468abe9a28a7b6dba2220f34b354b",
+  "scope": "HOST_VALIDATOR_SELFTEST_ONLY",
+  "commands": [
+    {
+      "argv": [
+        "./verify",
+        "harness"
+      ],
+      "exitCode": 0,
+      "artifactRef": "verification/harness/evidence/host-observation/harness.txt"
+    },
+    {
+      "argv": [
+        "./verify",
+        "scenarios"
+      ],
+      "exitCode": 2,
+      "status": "NOT_RUN",
+      "artifactRef": "verification/harness/evidence/host-observation/scenarios-not-run.txt"
+    }
+  ],
+  "hostValidatorJUnit": {
+    "tests": "10",
+    "failures": "0",
+    "errors": "0",
+    "skipped": "0"
+  },
+  "harnessTotalTests": 36,
+  "boundedHostOperations": 23,
+  "resourceHashes": {
+    "verification/harness/src/test/resources/host-observation/archiveInventory-rows.json": "d9e671ffc970b70e5b4be52ed2d25e228fc8c871929f5ade470e43e79fb09cdc",
+    "verification/harness/src/test/resources/host-observation/archiveRestore-rows.json": "a5ab113b00e320f1aaf6de896d3acb209069e8bb05f007bf36a598f270d43cd6",
+    "verification/harness/src/test/resources/host-observation/awaitRuntimeTask-rows.json": "be7fca6f76dbb6df7f1b29799d108bc860df988306c65b5bd2db33cdc9231126",
+    "verification/harness/src/test/resources/host-observation/backup-rows.json": "8c651d84eaa539b0bb38ef9c25d2708bce972e883b304cd6bd7825e159d4fdae",
+    "verification/harness/src/test/resources/host-observation/claim-rows.json": "941c509dabd2fe821e5d6c245623f37150543d9d1dfcc2697a21ee3cae2c0ece",
+    "verification/harness/src/test/resources/host-observation/clientProbe-rows.json": "c3cd13ec99b66e83753813f2212701ae30e815e18d7f2259f3bfaa3501f5aad7",
+    "verification/harness/src/test/resources/host-observation/compileSchema-rows.json": "7bd09aad43ed91d2f7500e96b4e1635bea3c9cec2dbdd6336d1219cab9512b3b",
+    "verification/harness/src/test/resources/host-observation/compilerSchemaProbe-rows.json": "eb32c642484af8989f837f6d7bd3af3ec4e54c25a2fed8def520d139a771d1c5",
+    "verification/harness/src/test/resources/host-observation/cutoverStage-rows.json": "b098a863b012ced5b3e629daf82b92a2032cdae11179094c9025437296a25458",
+    "verification/harness/src/test/resources/host-observation/dataInventory-rows.json": "a647cea46b21986fb1fc046c47c84817e7c0825baf196d05be5140a075e5f52c",
+    "verification/harness/src/test/resources/host-observation/deploymentProbe-rows.json": "60091f6bf999e67c88b57997a2a96a23b69af8a2cc6d6ca26838dfd52ad5ca65",
+    "verification/harness/src/test/resources/host-observation/inspectArtifacts-rows.json": "605fb4ded5363794f7f6b464c0ed07e59d873735ace675b2a14fff56b0352ece",
+    "verification/harness/src/test/resources/host-observation/restart-process-snapshot.json": "538f56f2651d661bd3eb4506acd060afc3b9f3c8ebee1a41f162b7b05b4813fb",
+    "verification/harness/src/test/resources/host-observation/restart-rows.json": "4ea795328c70fa2301bb677550a8753d90014cecb023dfd31bc44dd11ea47ab9",
+    "verification/harness/src/test/resources/host-observation/restore-rows.json": "6dc30cb61998a762dbd7f2a0943e9433d6cc9efb59f88fc497f0907246706c84",
+    "verification/harness/src/test/resources/host-observation/retentionSweep-rows.json": "cc46799635c490d98b3bdba6155760908b043c65030ce8c070074f5bcf2065ac",
+    "verification/harness/src/test/resources/host-observation/runtime-snapshot.json": "8a93d17cc11bc1b78ff3068f5b8f3e4c5ca77389103722a87281a2a53bfbb1e0",
+    "verification/harness/src/test/resources/host-observation/safe.txt": "46aa79802b08255c103f9e690c1e63b82eac986d2149cc5dd1396446036a839f",
+    "verification/harness/src/test/resources/host-observation/scanArtifacts-rows.json": "a81b4ba50490a1ebf000902667621b23d1f1274c713a9fe8c1c12a655217bc7c",
+    "verification/harness/src/test/resources/host-observation/schemaInstall-rows.json": "57740c3fc60f9fc2c2f071d6fd4df2a876e347def3b75c48004404f9600c2195",
+    "verification/harness/src/test/resources/host-observation/schemaUpgrade-rows.json": "51762f2e36accfadba8c8c22d669294d0eb1f567fe86634deeead89aa2c67c47",
+    "verification/harness/src/test/resources/host-observation/sentinel.txt": "1d87d7cd0f3357e7de813be874383b5c5798868171a21cb24995cd56b063dd6c",
+    "verification/harness/src/test/resources/host-observation/start-process-snapshot.json": "74cbc09936534bfe5f96837f8fe4be4f8071713ea2aa9a6e0282873e0d69d429",
+    "verification/harness/src/test/resources/host-observation/start-rows.json": "12d30834315f3aad2c4ae1d31e65321d6a3f94c1f274810392e6f53a16f869a0",
+    "verification/harness/src/test/resources/host-observation/stop-process-snapshot.json": "a14b1171ed0394e7e759d787d5c96a4add35c4adacdedbc03ade33de25d7f196",
+    "verification/harness/src/test/resources/host-observation/stop-rows.json": "8e3459363e73183e3d8036ccc78da9faf321c95088ec0abcd1732bf1bcd6017d",
+    "verification/harness/src/test/resources/host-observation/sweepDue-rows.json": "785c09b55451a8aa81fa5cd4cd36f48e407015c2fc161a638227e8b4df62edf2",
+    "verification/harness/src/test/resources/host-observation/tickScheduler-rows.json": "05c0ead5c3cf3926c1f4c5e14877f8e4f0cbabd32ae734ea7b1308e7934aba24",
+    "verification/harness/src/test/resources/host-observation/transcript.txt": "b376b7add4ef546e5c9f20424c9cb62b81cd9fd4a73da94618eacea8649a5522",
+    "verification/harness/src/test/resources/host-observation/verifyCoverage-rows.json": "6364269313710d7c0e235d4fafc8d8a67475506e4cb9ad1b113dbcec9944e074"
+  },
+  "actualHostAdapter": "NOT_IMPLEMENTED",
+  "actualProcessExecuted": false,
+  "actualHostRuntime": "NOT_RUN",
+  "actualBtpClientModelRegulatory": "NOT_RUN",
+  "productRuntimeClaimed": false,
+  "limitations": [
+    "CaseRunner wiring is owned by common harness author and must be integrated separately.",
+    "Operation-specific business artifact contents and independent DB oracles are separate from host integrity selftests.",
+    "Host authenticity relies on the real read-only adapter; explicit selftest metadata cannot be relabelled into actual evidence."
+  ],
+  "evidenceLogNormalization": "Only trailing whitespace removed from Maven log lines; commands, observed results and exit codes preserved."
+}
