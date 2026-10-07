@@ -23,7 +23,9 @@ import static org.mockito.Mockito.*;
 class InventoryPostgresTest {
  static final PostgreSQLContainer PG=new PostgreSQLContainer("postgres@sha256:4ef4dbc939d61acea57712655ddb4b4ab27419c913f94cca0cd57cb3ea3c2280");
  static {PG.start();}
+ static final String BLOB_ROOT=System.getProperty("java.io.tmpdir")+"/mulino-s2-inventory-"+UUID.randomUUID();
  @DynamicPropertySource static void properties(DynamicPropertyRegistry r) {
+  r.add("mulino.evidence.blob-root",()->BLOB_ROOT);
   r.add("spring.datasource.url",PG::getJdbcUrl);r.add("spring.datasource.username",PG::getUsername);r.add("spring.datasource.password",PG::getPassword);
   r.add("JWT_PUBLIC_KEY",()->System.getenv("JWT_PUBLIC_KEY"));r.add("JWT_ISSUER",()->"https://mulino.local.invalid");r.add("JWT_AUDIENCE",()->"mulino-platform");
  }
@@ -53,7 +55,7 @@ class InventoryPostgresTest {
   when(authorizer.permittedScopes(any(),anyString(),anyMap())).thenReturn(true);
  }
  void segment(String segment,String quantity,boolean retired){
-  jdbc.update("INSERT INTO mulino_inventory_QuantitySegments(organizationId,id,itemId,lotId,identificationStatus,quantity,unit,placeId,controlScope,validFrom,retiredAt,retirementRecordedAt,mixtureStatus,createdAt,recordedAt) VALUES (?,?,?,?,'CONFIRMED',?::numeric,'EA',?,'warehouse',?::timestamptz,?::timestamptz,?::timestamptz,'IDENTIFIED',?::timestamptz,?::timestamptz')",org,segment,item,lot,quantity,place,(segment.equals(left)||segment.equals(right))?"2026-02-01":"2026-01-01",retired?"2026-02-01":null,retired?"2026-02-01":null,(segment.equals(left)||segment.equals(right))?"2026-02-01":"2026-01-01",(segment.equals(left)||segment.equals(right))?"2026-02-01":"2026-01-01");
+  jdbc.update("INSERT INTO mulino_inventory_QuantitySegments(organizationId,id,itemId,lotId,identificationStatus,quantity,unit,placeId,controlScope,validFrom,retiredAt,retirementRecordedAt,mixtureStatus,createdAt,recordedAt) VALUES (?,?,?,?,'CONFIRMED',?::numeric,'EA',?,'warehouse',?::timestamptz,?::timestamptz,?::timestamptz,'IDENTIFIED',?::timestamptz,?::timestamptz)",org,segment,item,lot,quantity,place,(segment.equals(left)||segment.equals(right))?"2026-02-01":"2026-01-01",retired?"2026-02-01":null,retired?"2026-02-01":null,(segment.equals(left)||segment.equals(right))?"2026-02-01":"2026-01-01",(segment.equals(left)||segment.equals(right))?"2026-02-01":"2026-01-01");
  }
  void edge(String edge,String source,String target,String quantity){jdbc.update("INSERT INTO mulino_inventory_GenealogyEdges(organizationId,id,sourceId,targetId,quantity,unit,kind,uncertain,occurredAt,createdAt,recordedAt) VALUES (?,?,?,?,?::numeric,'EA','SPLIT',false,'2026-02-01','2026-02-01','2026-02-01')",org,edge,source,target,quantity);}
  QueryRequest query(String operation,String id,Map<String,Object> scope){return new QueryRequest(operation,id,scope,Map.of(),50,null,"v1",at,at,null);}

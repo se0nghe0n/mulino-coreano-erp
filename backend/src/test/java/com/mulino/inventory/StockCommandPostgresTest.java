@@ -23,7 +23,9 @@ import static org.mockito.Mockito.*;
 class StockCommandPostgresTest {
  static final PostgreSQLContainer PG=new PostgreSQLContainer("postgres@sha256:4ef4dbc939d61acea57712655ddb4b4ab27419c913f94cca0cd57cb3ea3c2280");
  static {PG.start();}
+ static final String BLOB_ROOT=System.getProperty("java.io.tmpdir")+"/mulino-s2-inventory-"+UUID.randomUUID();
  @DynamicPropertySource static void properties(DynamicPropertyRegistry r) {
+  r.add("mulino.evidence.blob-root",()->BLOB_ROOT);
   r.add("spring.datasource.url",PG::getJdbcUrl);r.add("spring.datasource.username",PG::getUsername);r.add("spring.datasource.password",PG::getPassword);
   r.add("JWT_PUBLIC_KEY",()->System.getenv("JWT_PUBLIC_KEY"));r.add("JWT_ISSUER",()->"https://mulino.local.invalid");r.add("JWT_AUDIENCE",()->"mulino-platform");
  }
@@ -36,7 +38,7 @@ class StockCommandPostgresTest {
  @Autowired com.mulino.application.inventory.ItemCommands metadata;
  @Autowired com.mulino.application.inventory.InventoryRestrictionGuard restrictions;
  final String source=id(200);
- @MockitoBean IdentityAuthorization authorizer;
+ @Autowired IdentityAuthorization authorizer;
  @MockitoBean org.springframework.security.oauth2.jwt.JwtDecoder jwtDecoder;
  final String org=id(1),other=id(2),product=id(10),item=id(11),spec=id(12),pack=id(13),manufacturer=id(14),lot=id(15),place=id(16),parent=id(20),left=id(21),right=id(22);
  final Instant at=Instant.parse("2026-10-08T00:00:00Z");
@@ -55,12 +57,21 @@ class StockCommandPostgresTest {
   segment(parent,"100",true);segment(left,"40",false);segment(right,"60",false);segment(source,"100",false);
   jdbc.update("INSERT INTO mulino_identity_Actors(organizationId,id,kind,stableRequestOwner) VALUES (?,?,'HUMAN',?)",org,id(3),id(3));
   jdbc.update("UPDATE mulino_inventory_Places SET kind='INTERNAL_STORAGE' WHERE organizationId=? AND id=?",org,place);
+  jdbc.update("INSERT INTO mulino_identity_Memberships(organizationId,id,actorId,validFrom,validUntil) VALUES (?,?,?,'2020-01-01','2100-01-01')",org,id(350),id(3));
+  jdbc.update("INSERT INTO mulino_identity_AuthorityFences(organizationId,actorId) VALUES (?,?)",org,id(3));
+  jdbc.update("INSERT INTO mulino_identity_Grants(organizationId,id,actorId,delegatorId,validFrom,validUntil) VALUES (?,?,?,?,'2020-01-01','2100-01-01')",org,id(351),id(3),id(3));
+  jdbc.update("INSERT INTO mulino_identity_GrantScopes(organizationId,grantId,scopeKind,scopeId) VALUES (?,?,'ORGANIZATION',?)",org,id(351),org);
+  int grantSequence=360;
+  for(String capability:List.of("splitQuantity","mergeQuantity","moveQuantity","recordStocktake","adjustQuantity","disposeQuantity","registerItem","linkExternalId")) {
+   jdbc.update("INSERT INTO mulino_identity_CapabilityAssignments(organizationId,id,actorId,capabilityId,scopeKind,scopeId,validFrom,validUntil) VALUES (?,?,?,?,'ORGANIZATION',?,'2020-01-01','2100-01-01')",org,id(grantSequence++),id(3),capability,org);
+   jdbc.update("INSERT INTO mulino_identity_GrantActions(organizationId,grantId,capabilityId) VALUES (?,?,?)",org,id(351),capability);
+  }
   edge(id(30),parent,left,"40");edge(id(31),parent,right,"60");
   });
-  when(authorizer.permittedScopes(any(),anyString(),anyMap())).thenReturn(true);
+
  }
  void segment(String segment,String quantity,boolean retired){
-  jdbc.update("INSERT INTO mulino_inventory_QuantitySegments(organizationId,id,itemId,lotId,identificationStatus,quantity,unit,placeId,controlScope,validFrom,retiredAt,retirementRecordedAt,mixtureStatus,createdAt,recordedAt) VALUES (?,?,?,?,'CONFIRMED',?::numeric,'EA',?,'warehouse',?::timestamptz,?::timestamptz,?::timestamptz,'IDENTIFIED',?::timestamptz,?::timestamptz')",org,segment,item,lot,quantity,place,(segment.equals(left)||segment.equals(right))?"2026-02-01":"2026-01-01",retired?"2026-02-01":null,retired?"2026-02-01":null,(segment.equals(left)||segment.equals(right))?"2026-02-01":"2026-01-01",(segment.equals(left)||segment.equals(right))?"2026-02-01":"2026-01-01");
+  jdbc.update("INSERT INTO mulino_inventory_QuantitySegments(organizationId,id,itemId,lotId,identificationStatus,quantity,unit,placeId,controlScope,validFrom,retiredAt,retirementRecordedAt,mixtureStatus,createdAt,recordedAt) VALUES (?,?,?,?,'CONFIRMED',?::numeric,'EA',?,'warehouse',?::timestamptz,?::timestamptz,?::timestamptz,'IDENTIFIED',?::timestamptz,?::timestamptz)",org,segment,item,lot,quantity,place,(segment.equals(left)||segment.equals(right))?"2026-02-01":"2026-01-01",retired?"2026-02-01":null,retired?"2026-02-01":null,(segment.equals(left)||segment.equals(right))?"2026-02-01":"2026-01-01",(segment.equals(left)||segment.equals(right))?"2026-02-01":"2026-01-01");
  }
  void edge(String edge,String source,String target,String quantity){jdbc.update("INSERT INTO mulino_inventory_GenealogyEdges(organizationId,id,sourceId,targetId,quantity,unit,kind,uncertain,occurredAt,createdAt,recordedAt) VALUES (?,?,?,?,?::numeric,'EA','SPLIT',false,'2026-02-01','2026-02-01','2026-02-01')",org,edge,source,target,quantity);}
  QueryRequest query(String operation,String id,Map<String,Object> scope){return new QueryRequest(operation,id,scope,Map.of(),50,null,"v1",at,at,null);}
@@ -163,9 +174,10 @@ class StockCommandPostgresTest {
  }
 
  @Test void multiSourceGrantMustAuthorizeEveryConsumedParent(){
-  doAnswer(call->{Map<String,Collection<String>> scopes=call.getArgument(2);if(scopes.get("TARGET").contains(right))throw new org.springframework.security.access.AccessDeniedException("Unavailable scope");return null;}).when(authorizer).authorizeScopes(any(),eq("mergeQuantity"),anyMap());
+  jdbc.update("DELETE FROM mulino_identity_GrantScopes WHERE organizationId=? AND grantId=?",org,id(351));
+  jdbc.update("INSERT INTO mulino_identity_GrantScopes(organizationId,grantId,scopeKind,scopeId) VALUES (?,?,'TARGET',?)",org,id(351),left);
   var merge=intent("mergeQuantity",Map.of("segmentIds",List.of(left,right),"expectedRevisions",Map.of(left,0,right,0),"occurredAt",at.toString(),"evidenceRef","w"));
-  assertThrows(org.springframework.security.access.AccessDeniedException.class,()->tx(()->commands.execute(context(),merge)));
+  var denied=assertThrows(DomainError.class,()->tx(()->commands.execute(context(),merge)));assertEquals("FORBIDDEN",denied.code());assertEquals("REJECTED",denied.outcome());
   assertEquals(2,jdbc.queryForObject("SELECT COUNT(*) FROM mulino_inventory_QuantitySegments WHERE id IN (?,?) AND retiredAt IS NULL",Integer.class,left,right));
  }
 
