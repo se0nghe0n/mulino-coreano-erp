@@ -16,7 +16,10 @@
 TypeScript SDK `2.3.1`, Inspector `2.9.0`을 확인했다. 설치/실행 인수는
 아직 하지 않았다. Python release note는 modern 요청과 legacy 요청을
 구별한다. S5 후보 client는 Python SDK 2.3.0과 Inspector 2.9.0이다.
-Java SDK의 stateless 옵션만으로 modern 준수를 판정하지 않는다.
+Java SDK2.0.1의 공식 ProtocolVersions.java는 2025-03-26, 2025-06-18,
+2025-11-25만 선언한다. McpSchema에 initialize가 있고 discovery 타입은
+없다. 따라서 이 Java SDK를 modern adapter로 채택하지 않았다.
+[고정 Java protocol constants](https://github.com/modelcontextprotocol/java-sdk/blob/v2.0.1/mcp-core/src/main/java/io/modelcontextprotocol/spec/ProtocolVersions.java)
 
 - [규격](https://modelcontextprotocol.io/specification/2026-07-28)
 - [HTTP binding](https://modelcontextprotocol.io/specification/2026-07-28/basic/transports/streamable-http)
