@@ -45,7 +45,7 @@ public class ApplicationCommands {
     Map<String,Object> intent;
     try{intent=typed(input,true);}catch(DomainError failure){return failure.response();}
     String hash=CommandRequests.hash(intent);
-    if(intent.containsKey("canonicalIntentHash")&&!hash.equals(intent.get("canonicalIntentHash")))return new DomainError("CONFLICT","IDEMPOTENCY_CONFLICT","Canonical intent changed").response();
+    if(intent.containsKey("canonicalIntentHash")&&!hash.equals(intent.get("canonicalIntentHash")))return reject(intent,hash,new DomainError("CONFLICT","IDEMPOTENCY_CONFLICT","Canonical intent changed"),serverExecutionClaim,claimed);
     for(int attempt=0;attempt<3;attempt++)try{return transaction.execute(status->apply(intent,hash,serverExecutionClaim,claimed));}
     catch(DomainError failure){return reject(intent,hash,failure,serverExecutionClaim,claimed);}
     catch(AccessDeniedException failure){return reject(intent,hash,DomainError.forbidden(),serverExecutionClaim,claimed);}
@@ -98,7 +98,7 @@ public class ApplicationCommands {
     Map<String,Object> result=failure.response();
     return denial.execute(status->{DomainContext c;try{c=claimed?leases.getObject().resolveContext(claim,clock.instant()):auth.context(clock.instant(),clock.instant());}catch(AccessDeniedException|DomainError unauthenticated){return result;}
       String cap=(String)intent.get("capabilityId"),key=(String)intent.get("commandIdempotencyKey");repository.fence(c,List.of("command:"+c.stableRequestOwner()+":"+cap+":"+key));var old=repository.find(c,cap,key);
-      if(old.isPresent())return result;String id=repository.begin(c,intent,hash,clock.instant(),null);repository.finish(c,id,intent,hash,result,clock.instant(),Map.of("expectedDenial",true,"definitionVersion",intent.get("definitionVersion"),"capabilityVersion",intent.get("capabilityVersion")));return result;});
+      if(old.isPresent()){repository.audit(c,(String)old.get().get("ID"),intent,hash,result,clock.instant(),Map.of("expectedDenial",true,"replayAttempt",true));return result;}String id=repository.begin(c,intent,hash,clock.instant(),null);repository.finish(c,id,intent,hash,result,clock.instant(),Map.of("expectedDenial",true,"definitionVersion",intent.get("definitionVersion"),"capabilityVersion",intent.get("capabilityVersion")));return result;});
   }
   private boolean transientFailure(RuntimeException failure){Throwable cause=failure;while(cause!=null){if(cause instanceof java.sql.SQLException sql&&Set.of("55P03","40P01","40001").contains(sql.getSQLState()))return true;cause=cause.getCause();}return false;}
 }

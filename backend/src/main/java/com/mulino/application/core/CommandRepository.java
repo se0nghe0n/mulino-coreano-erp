@@ -30,6 +30,10 @@ public class CommandRepository {
   public void finish(DomainContext c,String id,Map<String,Object> intent,String hash,Map<String,Object> result,java.time.Instant now,Map<String,Object> auditFacts){
     String outcome=(String)result.get("outcome");String state=Set.of("REJECTED","CONFLICT","NEEDS_INPUT","WAITING_APPROVAL","HELD").contains(outcome)?"REJECTED":"COMMITTED";
     db.run(Update.entity("mulino.commands.CommandRecords").byId(id).data(Map.of("state",state,"resultJson",encode(result),"completedAt",now)));
+    audit(c,id,intent,hash,result,now,auditFacts);
+  }
+  public void audit(DomainContext c,String id,Map<String,Object> intent,String hash,Map<String,Object> result,java.time.Instant now,Map<String,Object> auditFacts){
+    String outcome=(String)result.get("outcome");
     // Only server identifiers/results, never raw intent, bearer token, or user text.
     db.run(Insert.into("mulino.commands.CommandAudits").entry(Map.of("ID",UUID.randomUUID().toString(),"organizationId",c.organizationId(),"actorId",c.actorId(),"commandId",id,"capabilityId",intent.get("capabilityId"),"canonicalHash",hash,"outcome",outcome,"effectRefs",encode(safeRefs(result)),"auditFactsJson",encode(auditFacts),"createdAt",now)));
   }
