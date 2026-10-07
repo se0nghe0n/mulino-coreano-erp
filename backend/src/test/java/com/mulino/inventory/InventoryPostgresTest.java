@@ -28,6 +28,7 @@ class InventoryPostgresTest {
   r.add("JWT_PUBLIC_KEY",()->System.getenv("JWT_PUBLIC_KEY"));r.add("JWT_ISSUER",()->"https://mulino.local.invalid");r.add("JWT_AUDIENCE",()->"mulino-platform");
  }
  @Autowired JdbcTemplate jdbc;
+ @Autowired org.springframework.transaction.PlatformTransactionManager transactionManager;
  @Autowired CdsRuntime runtime;
  @Autowired InventoryRepository repository;
  @MockitoBean IdentityAuthorization authorizer;
@@ -37,6 +38,7 @@ class InventoryPostgresTest {
  static String id(int n){return "00000000-0000-0000-0000-"+String.format("%012d",n);}
  DomainContext context(){return new DomainContext(org,id(3),id(3),at,at);}
  @BeforeEach void seed(){
+  new org.springframework.transaction.support.TransactionTemplate(transactionManager).executeWithoutResult(status->{
   jdbc.execute("TRUNCATE mulino_identity_Organizations CASCADE");
   jdbc.update("INSERT INTO mulino_identity_Organizations(id,externalAlias) VALUES (?,?),(?,?)",org,"inventory-a",other,"inventory-b");
   jdbc.update("INSERT INTO mulino_inventory_Products(organizationId,id,name,createdAt,recordedAt) VALUES (?,?,?,'2026-01-01','2026-01-01')",org,product,"biscuit");
@@ -46,12 +48,12 @@ class InventoryPostgresTest {
   jdbc.update("INSERT INTO mulino_inventory_ManufacturingLots(organizationId,id,manufacturerId,itemId,originalLot,createdAt,recordedAt) VALUES (?,?,?,?,'LOT-A','2026-01-01','2026-01-01')",org,lot,manufacturer,item);
   jdbc.update("INSERT INTO mulino_inventory_Places(organizationId,id,name,kind,createdAt,recordedAt) VALUES (?,?,'W','WAREHOUSE','2026-01-01','2026-01-01')",org,place);
   segment(parent,"100",true);segment(left,"40",false);segment(right,"60",false);
-  jdbc.update("UPDATE mulino_inventory_QuantitySegments SET validFrom='2026-02-01',createdAt='2026-02-01',recordedAt='2026-02-01' WHERE organizationId=? AND id IN (?,?)",org,left,right);
   edge(id(30),parent,left,"40");edge(id(31),parent,right,"60");
+  });
   when(authorizer.permittedScopes(any(),anyString(),anyMap())).thenReturn(true);
  }
  void segment(String segment,String quantity,boolean retired){
-  jdbc.update("INSERT INTO mulino_inventory_QuantitySegments(organizationId,id,itemId,lotId,identificationStatus,quantity,unit,placeId,controlScope,validFrom,retiredAt,retirementRecordedAt,mixtureStatus,createdAt,recordedAt) VALUES (?,?,?,?,'CONFIRMED',?::numeric,'EA',?,'warehouse','2026-01-01',?::timestamptz,?::timestamptz,'IDENTIFIED','2026-01-01','2026-01-01')",org,segment,item,lot,quantity,place,retired?"2026-02-01":null,retired?"2026-02-01":null);
+  jdbc.update("INSERT INTO mulino_inventory_QuantitySegments(organizationId,id,itemId,lotId,identificationStatus,quantity,unit,placeId,controlScope,validFrom,retiredAt,retirementRecordedAt,mixtureStatus,createdAt,recordedAt) VALUES (?,?,?,?,'CONFIRMED',?::numeric,'EA',?,'warehouse',?::timestamptz,?::timestamptz,?::timestamptz,'IDENTIFIED',?::timestamptz,?::timestamptz')",org,segment,item,lot,quantity,place,(segment.equals(left)||segment.equals(right))?"2026-02-01":"2026-01-01",retired?"2026-02-01":null,retired?"2026-02-01":null,(segment.equals(left)||segment.equals(right))?"2026-02-01":"2026-01-01",(segment.equals(left)||segment.equals(right))?"2026-02-01":"2026-01-01");
  }
  void edge(String edge,String source,String target,String quantity){jdbc.update("INSERT INTO mulino_inventory_GenealogyEdges(organizationId,id,sourceId,targetId,quantity,unit,kind,uncertain,occurredAt,createdAt,recordedAt) VALUES (?,?,?,?,?::numeric,'EA','SPLIT',false,'2026-02-01','2026-02-01','2026-02-01')",org,edge,source,target,quantity);}
  QueryRequest query(String operation,String id,Map<String,Object> scope){return new QueryRequest(operation,id,scope,Map.of(),50,null,"v1",at,at,null);}
@@ -128,6 +130,12 @@ class InventoryPostgresTest {
   assertThrows(RuntimeException.class,()->jdbc.update(insert,org,id(94),container2,left,"2026-02-15","2026-03-01"));
   jdbc.update(insert,org,id(95),container2,left,"2026-03-01",null);
   assertThrows(RuntimeException.class,()->jdbc.update(insert,other,id(96),container,left,"2026-04-01",null));
+ }
+
+ @Test void physicalHistoryCannotBeRewritten(){
+  assertThrows(RuntimeException.class,()->jdbc.update("UPDATE mulino_inventory_QuantitySegments SET quantity=quantity+1 WHERE organizationId=? AND id=?",org,left));
+  assertThrows(RuntimeException.class,()->jdbc.update("UPDATE mulino_inventory_QuantitySegments SET validFrom='2026-01-01' WHERE organizationId=? AND id=?",org,left));
+  assertThrows(RuntimeException.class,()->jdbc.update("UPDATE mulino_inventory_QuantitySegments SET retiredAt=NULL,retirementRecordedAt=NULL WHERE organizationId=? AND id=?",org,parent));
  }
 
  @Test void lineageRejectsHistoricalParentChildOverlap(){
