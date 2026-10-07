@@ -24,7 +24,7 @@ actual='--actual' in extras
 extras=[x for x in extras if x!='--actual']
 if actual and mode in {'contract-red','harness','prepare','coverage','validate','model','deployment'}:
     print('--actual requires a deterministic product profile',file=sys.stderr);finish(3)
-if mode not in {'harness','contract-red','validate','prepare','coverage','schema','contracts','scenarios','recovery','mcp','skills','model','deployment','actual-s1','actual-s2'}:
+if mode not in {'harness','contract-red','validate','prepare','coverage','schema','contracts','scenarios','recovery','mcp','skills','model','deployment','actual-s1','actual-s2','actual-s3'}:
     print('Unknown verification profile: '+mode,file=sys.stderr);finish(3)
 if command(['java','-version']) or command([ROOT/'mvnw','-version']): finish(3)
 maven=[ROOT/'mvnw','-B','-ntp','-f',POM]
@@ -60,7 +60,7 @@ if mode=='contract-red' and extras and '--all' not in extras:
     finish(1)
 if command(maven+['-Dmaven.test.skip=true','package','dependency:build-classpath','-Dmdep.outputFile=target/classpath.txt']): finish(3)
 classpath=str(OUT/'classes')+os.pathsep+(OUT/'classpath.txt').read_text().strip()
-if mode in {'actual-s1','actual-s2'}:
+if mode in {'actual-s1','actual-s2','actual-s3'}:
     if len(extras)>1:
         print(mode+' accepts at most one fresh evidence directory',file=sys.stderr);finish(3)
     finish(command(['sh',ROOT/('verification/actual/'+mode.removeprefix('actual-')+'/run.sh')]+extras))

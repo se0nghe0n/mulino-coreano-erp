@@ -9,10 +9,11 @@ import org.mulino.verification.Json;
 
 /** Disposable test-only typed seed, atomic, with no HTTP fixture surface. */
 public final class FixtureInstaller {
-    private static final Set<String> TYPES=Set.of("Organization","Human","Agent","Product","SpecificationVersion","PackagingVersion","TradeItem","Manufacturer","ManufacturerLot","Place","QuantitySegment","DefinitionVersion","PolicyVersion");
+    private static final Set<String> TYPES=Set.of("Organization","Human","Agent","Product","SpecificationVersion","PackagingVersion","TradeItem","Manufacturer","ManufacturerLot","Place","QuantitySegment","DefinitionVersion","PolicyVersion","Supplier","RegulatoryPolicy","ManagementAuthority");
     private final ActualConfiguration configuration;
     public FixtureInstaller(ActualConfiguration configuration){this.configuration=configuration;}
     public ObjectNode install(JsonNode bundle) throws Exception {
+        if(bundle.path("fixturePhase").asText().equals("S3_ORIGINAL"))return S3OriginalFixtureInstaller.install(configuration,bundle);
         if(bundle.path("fixturePhase").asText().equals("EVIDENCE"))return EvidenceFixtureInstaller.install(configuration,bundle);
         JsonNode fixture=bundle.path("fixture");
         if(!fixture.path("synthetic").asBoolean(false))throw new IllegalArgumentException("Only synthetic fixtures allowed");
@@ -29,7 +30,7 @@ public final class FixtureInstaller {
             c.setAutoCommit(false);
             try {
                 seedTemporal(c,fixture,"INSERT INTO mulino_identity_Organizations(ID,externalAlias) VALUES(?,?)",org,orgAlias);
-                for(String type:List.of("Human","Agent","Product","Manufacturer","Place","SpecificationVersion","PackagingVersion","TradeItem","ManufacturerLot","QuantitySegment","DefinitionVersion","PolicyVersion"))
+                for(String type:List.of("Human","Agent","Product","Manufacturer","Place","SpecificationVersion","PackagingVersion","TradeItem","ManufacturerLot","QuantitySegment","DefinitionVersion","PolicyVersion","Supplier","RegulatoryPolicy","ManagementAuthority"))
                     for(var it=fixture.path("aliases").fields();it.hasNext();) {var entry=it.next();JsonNode a=entry.getValue();if(!type.equals(a.path("type").asText()))continue;
                         String id=aliases.path(entry.getKey()).asText();String name=a.path("name").asText(entry.getKey());
                         switch(type) {
@@ -57,6 +58,9 @@ public final class FixtureInstaller {
                             }
                             case "TradeItem" -> seedTemporal(c,fixture,"INSERT INTO mulino_inventory_TradeItems(organizationId,ID,productId,name,baseUnit,decimalPlaces,specificationVersionId,packagingVersionId) VALUES(?,?,?,?,?,?,?,?)",org,id,ref(aliases,a,"productAlias"),name,Json.required(a,"unit"),0,ref(aliases,a,"specificationVersionAlias"),ref(aliases,a,"packagingVersionAlias"));
                             case "ManufacturerLot" -> seedTemporal(c,fixture,"INSERT INTO mulino_inventory_ManufacturingLots(organizationId,ID,manufacturerId,itemId,originalLot) VALUES(?,?,?,?,?)",org,id,ref(aliases,a,"manufacturerAlias"),ref(aliases,a,"itemAlias"),entry.getKey());
+                            case "Supplier" -> seedTemporal(c,fixture,"INSERT INTO mulino_trade_purchase_Suppliers(organizationId,ID,name) VALUES(?,?,?)",org,id,name);
+                            case "ManagementAuthority" -> seed(c,"INSERT INTO mulino_identity_ManagementAuthorities(organizationId,ID,actorId,capabilityId,scopeKind,scopeId,validFrom,validUntil,revision) VALUES(?,?,?,?,?,?,?,?,?)",org,id,ref(aliases,a,"actorAlias"),Json.required(a,"capabilityId"),"ORGANIZATION",org,time(Json.required(a,"validFrom")),time(Json.required(a,"validUntil")),1);
+                            case "RegulatoryPolicy" -> seed(c,"INSERT INTO mulino_trade_regulatory_Policies(organizationId,ID,revision,createdAt,recordedAt,recordedBy,version,authority,sourceNamespace,action,validFrom,validUntil,fictional,status,requiresLabel) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",org,id,1,time(fixture.path("clock").path("asOf").asText()),time(fixture.path("clock").path("knownAt").asText()),ref(aliases,a,"actorAlias"),Json.required(a,"version"),Json.required(a,"authority"),Json.required(a,"sourceNamespace"),Json.required(a,"action"),time(Json.required(a,"validFrom")),time(Json.required(a,"validUntil")),true,Json.required(a,"status"),a.path("requiresLabel").asBoolean());
                             case "QuantitySegment" -> seed(c,"INSERT INTO mulino_inventory_QuantitySegments(organizationId,ID,itemId,lotId,identificationStatus,quantity,unit,placeId,controlScope,validFrom,mixtureStatus,createdAt,recordedAt) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?)",org,id,ref(aliases,a,"itemAlias"),ref(aliases,a,"lotAlias"),"CONFIRMED",new java.math.BigDecimal(Json.required(a,"quantity")),Json.required(a,"unit"),ref(aliases,a,"locationAlias"),Json.required(a,"physicalScope"),time(fixture.path("clock").path("asOf").asText()),"IDENTIFIED",time(fixture.path("clock").path("asOf").asText()),time(fixture.path("clock").path("knownAt").asText()));
                             default -> throw new IllegalStateException(type);
                         }
