@@ -61,7 +61,7 @@ public class ApplicationCommands {
     Optional<Map<String,Object>> old=repository.find(c,cap,key);
     if(old.isPresent()){
       if(old.get().get("authorizationScopeJson")!=null)auth.authorizeScopes(c,cap,repository.scopes(old.get()));else auth.authorize(c,cap,null);
-      if(!claim.isEmpty())leases.getObject().fenceAndVerify(c,claim);
+      if(!claim.isEmpty()){verifyClaim(intent,claim,repository.scopes(old.get()));leases.getObject().fenceAndVerify(c,claim);}
       if(!hash.equals(old.get().get("canonicalHash")))throw new DomainError("CONFLICT","IDEMPOTENCY_CONFLICT","Idempotency key has different content");
       if(old.get().get("resultJson")==null)throw new DomainError("CONFLICT","COMMAND_IN_PROGRESS","Command unavailable");
       return repository.result(old.get());
@@ -71,7 +71,7 @@ public class ApplicationCommands {
     CommandGuard current=guard.getIfAvailable();if(current==null)throw new DomainError("REJECTED","POLICY_UNRESOLVED","Current command guard unavailable");current.fence(c,initial);
     CommandPreparation prep=h.prepare(c,intent);if(!initial.authorityActors().equals(prep.authorityActors())||!initial.effectClass().equals(prep.effectClass())||!Objects.equals(initial.approvalAction(),prep.approvalAction())||!initial.scopes().equals(prep.scopes())||!new TreeSet<>(initial.fenceKeys()).equals(new TreeSet<>(prep.fenceKeys())))throw new DomainError("CONFLICT","STALE_REVISION","Command scope changed");
     auth.authorizeScopes(c,cap,prep.scopes());
-    if(!claim.isEmpty()){CommandLeasePort lease=leases.getIfAvailable();if(lease==null)throw DomainError.forbidden();lease.fenceAndVerify(c,claim);}
+    if(!claim.isEmpty()){verifyClaim(intent,claim,prep.scopes());CommandLeasePort lease=leases.getIfAvailable();if(lease==null)throw DomainError.forbidden();lease.fenceAndVerify(c,claim);}
     if(prep.currentRevision()!=null&&(!intent.containsKey("expectedRevision")||((Number)intent.get("expectedRevision")).intValue()!=prep.currentRevision()))throw new DomainError("CONFLICT","STALE_REVISION","Expected revision changed");
     if(intent.containsKey("proposalRevision")&&((Number)intent.get("proposalRevision")).intValue()!=(prep.proposalRevision()>0?prep.proposalRevision():1))throw new DomainError("CONFLICT","STALE_REVISION","Proposal revision changed");
     current.verify(c,cap,hash,prep,intent);
@@ -84,6 +84,9 @@ public class ApplicationCommands {
     current.consume(c,prep,intent,id);
     result.put("commandId",id);result.put("canonicalIntentHash",hash);result.put("proposalRevision",prep.proposalRevision()>0?prep.proposalRevision():1);
     result.putIfAbsent("effects",Map.of());if(result.get("revision") instanceof Number)facts.put("afterRevision",result.get("revision"));repository.finish(c,id,intent,hash,result,clock.instant(),facts);return result;
+  }
+  private void verifyClaim(Map<String,Object> intent,Map<String,Object> claim,Map<String,List<String>> scopes){
+    if(!Objects.equals(claim.get("capabilityId"),intent.get("capabilityId"))||!Objects.equals(claim.get("commandId"),intent.get("commandIdempotencyKey"))||!(claim.get("workId") instanceof String workId)||!scopes.getOrDefault("WORK",List.of()).contains(workId))throw DomainError.forbidden();
   }
   /** Expected denial audit is committed separately only after the effect transaction rolled back. */
   private Map<String,Object> reject(Map<String,Object> intent,String hash,DomainError failure,Map<String,Object> claim,boolean claimed){
