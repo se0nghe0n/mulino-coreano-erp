@@ -38,7 +38,7 @@ def count(table,expected,where=None):
 for alias in ['RANGE60','RANGE40','RANGE5']:A.append({'id':alias,'type':'uuid','alias':alias})
 # Receipt raw original is installed before provisional; no canonical or physical stock seed.
 def receipt(name,start,quantity,existing=None,transit=None,physical=None,purchase_line='$LINE'):
-    physical=physical or '$RANGE60' if quantity=='60' else '$RANGE40' if quantity=='40' else '$RANGE5'
+    physical=physical or ('$RANGE60' if quantity=='60' else '$RANGE40' if quantity=='40' else '$RANGE5')
     payload={'rangeRootId':physical,'startQuantity':start,'itemId':'$P','lotId':'$L','placeId':'$W','workId':'$WORK','quantity':quantity,'unit':'BOX','occurredAt':T}
     # Original seed precedes provisional; public reconciliation follows the observation.
     idx=len(A);original(name,'PHYSICAL_RECEIPT',quantity,physical,payload,subject='$P',subject_kind='ITEM',existing=existing)
