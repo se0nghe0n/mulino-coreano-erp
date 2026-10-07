@@ -89,6 +89,7 @@ class S3SharedIntegrationTest {
   @Autowired TradeImpact impact;
   @BeforeEach void commandContract()throws Exception {
     seed();
+    insert("mulino_identity_AuthorityFences",row("organizationId",org,"actorId",actor,"revision",1));
     // Same authoritative COMMAND Work setup as ReceiptGatewayPostgresTest;
     // imported S1 rows remain immutable and are not rewritten by this fixture.
     work=id();
@@ -110,7 +111,7 @@ class S3SharedIntegrationTest {
   Map<String,Object> command(boolean fail,String key){return row("intentKind","COMMAND","definitionVersion","s3-shared-v1","capabilityId","s3SharedImpact","commandIdempotencyKey",key,"subjectRefs",List.of(Map.of("type","Work","id",work)),"slots",Map.of("workId",work,"sourceId","regulatory-version-1","physicalScopeId",segment,"fail",fail),"provenance",Map.of("sourceNamespace","USER"),"expectedRevision",jdbc.queryForObject("SELECT revision FROM mulino_work_read_Works WHERE organizationId=? AND ID=?",Integer.class,org,work));}
   Map<String,Object> execute(Map<String,Object> input){return runtime.requestContext().run(c->{return commands.execute(input);});}
   @Test void gatewayDutyAndAssessmentPendingCommitOnceAndCurrentGrantReplayIsDenied(){
-    var input=command(false,"once");var first=execute(input);assertEquals("APPLIED",first.get("outcome"));assertEquals(first,execute(input));
+    var input=command(false,"once");var first=execute(input);assertEquals("APPLIED",first.get("outcome"),first.toString());assertEquals(first,execute(input));
     assertEquals(1,jdbc.queryForObject("SELECT count(*) FROM mulino_responsibility_Roots WHERE organizationId=?",Integer.class,org));
     assertEquals(1,jdbc.queryForObject("SELECT count(*) FROM mulino_work_read_ObligationReferences WHERE organizationId=? AND rootId IS NOT NULL AND ownerId=? AND nextAction IS NOT NULL AND nextCheckAt IS NOT NULL",Integer.class,org,actor));
     assertEquals(true,jdbc.queryForObject("SELECT pendingInvalidation FROM mulino_work_read_Works WHERE organizationId=? AND ID=?",Boolean.class,org,work));
@@ -120,7 +121,7 @@ class S3SharedIntegrationTest {
     assertEquals("COMMITTED",jdbc.queryForObject("SELECT state FROM mulino_commands_CommandRecords WHERE ID=?",String.class,first.get("commandId")));
   }
   @Test void domainFailureRollsBackDutyPendingAndTransitionsTogether(){
-    var rejected=execute(command(true,"fail"));assertEquals("HELD",rejected.get("outcome"));
+    var rejected=execute(command(true,"fail"));assertEquals("HELD",rejected.get("outcome"),rejected.toString());
     assertEquals(0,jdbc.queryForObject("SELECT count(*) FROM mulino_responsibility_Roots WHERE organizationId=?",Integer.class,org));
     assertEquals(0,jdbc.queryForObject("SELECT count(*) FROM mulino_work_WorkTransitions WHERE organizationId=?",Integer.class,org));
     assertEquals(false,jdbc.queryForObject("SELECT pendingInvalidation FROM mulino_work_read_Works WHERE organizationId=? AND ID=?",Boolean.class,org,work));
@@ -128,7 +129,7 @@ class S3SharedIntegrationTest {
     assertEquals(1,jdbc.queryForObject("SELECT count(*) FROM mulino_commands_CommandAudits WHERE organizationId=? AND outcome='HELD'",Integer.class,org));
   }
   @Test void distinctExpiryBoundariesHaveSeparateStableDuties(){
-    var applied=execute(command(false,"origin"));String source=applied.get("commandId").toString();
+    var applied=execute(command(false,"origin"));assertEquals("APPLIED",applied.get("outcome"),applied.toString());String source=applied.get("commandId").toString();
     var transaction=new org.springframework.transaction.support.TransactionTemplate(transactions);
     for(String boundary:List.of("permission-v1:2026-10-08T00:00:00Z","permission-v1:2026-10-08T00:00:00Z","permission-v2:2026-10-09T00:00:00Z"))transaction.executeWithoutResult(s->runtime.requestContext().run(ctx->{Instant now=Instant.now();impact.recorded(new DomainContext(org,actor,actor,now,now),work,boundary,"VALIDITY_EXPIRED",segment,"Review expiry",now.plusSeconds(3600),source);return null;}));
     assertEquals(3,jdbc.queryForObject("SELECT count(*) FROM mulino_responsibility_Roots WHERE organizationId=?",Integer.class,org));
