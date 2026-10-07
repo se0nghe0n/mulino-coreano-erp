@@ -60,3 +60,14 @@ BEGIN
 END $$;
 CREATE TRIGGER receipt_range_guard BEFORE INSERT ON mulino_trade_receipt_Receipts
  FOR EACH ROW EXECUTE FUNCTION mulino_receipt_range_guard();
+CREATE FUNCTION mulino_receipt_observation_guard() RETURNS trigger LANGUAGE plpgsql AS $$
+BEGIN
+ IF TG_OP='DELETE' THEN RAISE EXCEPTION 'Receipt observation history cannot be deleted'; END IF;
+ IF (to_jsonb(NEW)-'state'-'revision') IS DISTINCT FROM (to_jsonb(OLD)-'state'-'revision')
+ OR OLD.state<>'PROVISIONAL' OR NEW.state<>'CONFIRMED' OR NEW.revision<>OLD.revision+1 THEN
+  RAISE EXCEPTION 'Receipt observation identity is immutable';
+ END IF;
+ RETURN NEW;
+END $$;
+CREATE TRIGGER receipt_observation_guard BEFORE UPDATE OR DELETE ON mulino_trade_receipt_Observations
+ FOR EACH ROW EXECUTE FUNCTION mulino_receipt_observation_guard();
