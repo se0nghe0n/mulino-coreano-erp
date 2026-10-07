@@ -5977,30 +5977,118 @@
           ]
         },
         {
+          "id": "purchase-work",
+          "kind": "query",
+          "actorRef": "reader",
+          "route": "api",
+          "capabilityId": "getWork",
+          "request": {
+            "id": {
+              "$alias": "O1"
+            },
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "lotId": {
+                "$alias": "L"
+              }
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z"
+          },
+          "evidenceRefs": [
+            "purchase-work:actual-response",
+            "purchase-work:wire-or-command"
+          ]
+        },
+        {
           "id": "proposal",
           "kind": "invoke",
           "actorRef": "writer",
           "route": "api",
           "capabilityId": "proposePurchase",
           "request": {
-            "intent": {
-              "$result": {
-                "actionId": "supplement",
-                "pointer": "/response/intent"
+            "intentKind": "COMMAND",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "proposePurchase",
+            "subjectRefs": [
+              {
+                "type": "TradeItem",
+                "id": {
+                  "$alias": "P"
+                }
+              }
+            ],
+            "slots": {
+              "quantity": {
+                "value": "100",
+                "unit": "BOX",
+                "provenance": "USER"
+              },
+              "price": {
+                "value": "2",
+                "currency": "EUR",
+                "provenance": "USER"
+              },
+              "supplierId": {
+                "value": {
+                  "$alias": "SUP"
+                },
+                "provenance": "CONTEXT"
+              },
+              "destinationId": {
+                "value": {
+                  "$alias": "W"
+                },
+                "provenance": "CONTEXT"
+              },
+              "dueAt": {
+                "value": "2026-10-09T09:00:00Z",
+                "provenance": "USER"
+              },
+              "endpoint": {
+                "value": "ARRIVED",
+                "provenance": "USER"
+              },
+              "quantityMode": {
+                "value": "CUMULATIVE_EVENT",
+                "provenance": "USER"
+              },
+              "ownerId": {
+                "value": {
+                  "$alias": "writer"
+                },
+                "provenance": "CONTEXT"
+              },
+              "supervisorId": {
+                "value": {
+                  "$alias": "supervisor"
+                },
+                "provenance": "CONTEXT"
+              },
+              "workId": {
+                "value": {
+                  "$alias": "O1"
+                },
+                "provenance": "CONTEXT"
+              },
+              "goalVersionId": {
+                "value": {
+                  "$result": {
+                    "actionId": "purchase-work",
+                    "pointer": "/response/data/goal/id"
+                  }
+                },
+                "provenance": "CONTEXT"
               }
             },
-            "canonicalHash": {
-              "$result": {
-                "actionId": "supplement",
-                "pointer": "/response/canonicalHash"
-              }
-            },
-            "proposalRevision": {
-              "$result": {
-                "actionId": "supplement",
-                "pointer": "/response/proposalRevision"
-              }
-            },
+            "conditions": [],
+            "evidenceRefs": [],
+            "expectedRevision": 1,
             "commandIdempotencyKey": "T20-effect-proposal-1"
           },
           "evidenceRefs": [
@@ -6015,25 +6103,65 @@
           "route": "api",
           "capabilityId": "approvePurchase",
           "request": {
-            "proposalId": {
-              "$result": {
-                "actionId": "proposal",
-                "pointer": "/response/proposalId"
+            "intentKind": "COMMAND",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "approvePurchase",
+            "subjectRefs": [
+              {
+                "type": "TradeItem",
+                "id": {
+                  "$alias": "P"
+                }
+              }
+            ],
+            "slots": {
+              "proposalId": {
+                "value": {
+                  "$result": {
+                    "actionId": "proposal",
+                    "pointer": "/response/proposalId"
+                  }
+                },
+                "provenance": "CONTEXT"
+              },
+              "proposalHash": {
+                "value": {
+                  "$result": {
+                    "actionId": "proposal",
+                    "pointer": "/response/proposalHash"
+                  }
+                },
+                "provenance": "CONTEXT"
+              },
+              "decision": {
+                "value": "APPROVE",
+                "provenance": "USER"
+              },
+              "decidedAt": {
+                "value": "2026-10-07T09:00:00Z",
+                "provenance": "USER"
+              },
+              "validUntil": {
+                "value": "2026-10-08T09:00:00Z",
+                "provenance": "USER"
+              },
+              "consumptionPolicy": {
+                "value": "SINGLE_ORDER_REVISION",
+                "provenance": "USER"
+              },
+              "conditions": {
+                "value": [],
+                "provenance": "USER"
               }
             },
-            "proposalHash": {
-              "$result": {
-                "actionId": "proposal",
-                "pointer": "/response/proposalHash"
-              }
-            },
+            "conditions": [],
+            "evidenceRefs": [],
             "expectedRevision": {
               "$result": {
                 "actionId": "proposal",
-                "pointer": "/response/revision"
+                "pointer": "/response/proposalRevision"
               }
             },
-            "decision": "APPROVED",
             "commandIdempotencyKey": "T20-manager-decision-1"
           },
           "evidenceRefs": [
@@ -6048,21 +6176,49 @@
           "route": "api",
           "capabilityId": "revisePurchase",
           "request": {
-            "proposalId": {
-              "$result": {
-                "actionId": "proposal",
-                "pointer": "/response/proposalId"
+            "intentKind": "COMMAND",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "revisePurchase",
+            "subjectRefs": [
+              {
+                "type": "TradeItem",
+                "id": {
+                  "$alias": "P"
+                }
+              }
+            ],
+            "slots": {
+              "proposalId": {
+                "value": {
+                  "$result": {
+                    "actionId": "proposal",
+                    "pointer": "/response/proposalId"
+                  }
+                },
+                "provenance": "CONTEXT"
+              },
+              "proposalHash": {
+                "value": {
+                  "$result": {
+                    "actionId": "proposal",
+                    "pointer": "/response/proposalHash"
+                  }
+                },
+                "provenance": "CONTEXT"
+              },
+              "quantity": {
+                "value": "120",
+                "unit": "BOX",
+                "provenance": "USER"
               }
             },
+            "conditions": [],
+            "evidenceRefs": [],
             "expectedRevision": {
               "$result": {
-                "actionId": "approval",
-                "pointer": "/response/revision"
+                "actionId": "proposal",
+                "pointer": "/response/proposalRevision"
               }
-            },
-            "quantity": {
-              "value": "120",
-              "unit": "BOX"
             },
             "commandIdempotencyKey": "T20-effect-revision-2"
           },
@@ -6078,28 +6234,60 @@
           "route": "api",
           "capabilityId": "dispatchPurchaseOrder",
           "request": {
-            "proposalId": {
-              "$result": {
-                "actionId": "revise",
-                "pointer": "/response/proposalId"
+            "intentKind": "COMMAND",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "dispatchPurchaseOrder",
+            "subjectRefs": [
+              {
+                "type": "TradeItem",
+                "id": {
+                  "$alias": "P"
+                }
+              }
+            ],
+            "slots": {
+              "proposalId": {
+                "value": {
+                  "$result": {
+                    "actionId": "revise",
+                    "pointer": "/response/proposalId"
+                  }
+                },
+                "provenance": "CONTEXT"
+              },
+              "proposalHash": {
+                "value": {
+                  "$result": {
+                    "actionId": "revise",
+                    "pointer": "/response/proposalHash"
+                  }
+                },
+                "provenance": "CONTEXT"
+              },
+              "channel": {
+                "value": "SYNTHETIC_SUPPLIER",
+                "provenance": "USER"
+              },
+              "externalOperationId": {
+                "value": "T20-dispatch-2-external",
+                "provenance": "USER"
+              },
+              "approvalId": {
+                "value": {
+                  "$result": {
+                    "actionId": "approval",
+                    "pointer": "/response/approvalId"
+                  }
+                },
+                "provenance": "CONTEXT"
               }
             },
-            "proposalHash": {
-              "$result": {
-                "actionId": "revise",
-                "pointer": "/response/proposalHash"
-              }
-            },
+            "conditions": [],
+            "evidenceRefs": [],
             "expectedRevision": {
               "$result": {
                 "actionId": "revise",
-                "pointer": "/response/revision"
-              }
-            },
-            "approvalId": {
-              "$result": {
-                "actionId": "approval",
-                "pointer": "/response/approvalId"
+                "pointer": "/response/proposalRevision"
               }
             },
             "commandIdempotencyKey": "T20-dispatch-2"
@@ -21504,6 +21692,35 @@
           ]
         },
         {
+          "id": "purchase-work",
+          "kind": "query",
+          "actorRef": "reader",
+          "route": "api",
+          "capabilityId": "getWork",
+          "request": {
+            "id": {
+              "$alias": "O1"
+            },
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "lotId": {
+                "$alias": "L"
+              }
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z"
+          },
+          "evidenceRefs": [
+            "purchase-work:actual-response",
+            "purchase-work:wire-or-command"
+          ]
+        },
+        {
           "id": "proposal",
           "kind": "invoke",
           "actorRef": "writer",
@@ -21512,29 +21729,81 @@
           "request": {
             "intentKind": "COMMAND",
             "definitionVersion": "definition-v1",
-            "itemId": {
-              "$alias": "P"
+            "capabilityId": "proposePurchase",
+            "subjectRefs": [
+              {
+                "type": "TradeItem",
+                "id": {
+                  "$alias": "P"
+                }
+              }
+            ],
+            "slots": {
+              "quantity": {
+                "value": "100",
+                "unit": "BOX",
+                "provenance": "USER"
+              },
+              "price": {
+                "value": "2",
+                "currency": "EUR",
+                "provenance": "USER"
+              },
+              "supplierId": {
+                "value": {
+                  "$alias": "SUP"
+                },
+                "provenance": "CONTEXT"
+              },
+              "destinationId": {
+                "value": {
+                  "$alias": "W"
+                },
+                "provenance": "CONTEXT"
+              },
+              "dueAt": {
+                "value": "2026-10-09T09:00:00Z",
+                "provenance": "USER"
+              },
+              "endpoint": {
+                "value": "ARRIVED",
+                "provenance": "USER"
+              },
+              "quantityMode": {
+                "value": "CUMULATIVE_EVENT",
+                "provenance": "USER"
+              },
+              "ownerId": {
+                "value": {
+                  "$alias": "writer"
+                },
+                "provenance": "CONTEXT"
+              },
+              "supervisorId": {
+                "value": {
+                  "$alias": "supervisor"
+                },
+                "provenance": "CONTEXT"
+              },
+              "workId": {
+                "value": {
+                  "$alias": "O1"
+                },
+                "provenance": "CONTEXT"
+              },
+              "goalVersionId": {
+                "value": {
+                  "$result": {
+                    "actionId": "purchase-work",
+                    "pointer": "/response/data/goal/id"
+                  }
+                },
+                "provenance": "CONTEXT"
+              }
             },
-            "supplierId": {
-              "$alias": "SUP"
-            },
-            "quantity": {
-              "value": "100",
-              "unit": "BOX"
-            },
-            "unitPrice": {
-              "value": "2",
-              "currency": "EUR"
-            },
-            "destinationId": {
-              "$alias": "W"
-            },
-            "dueAt": "2026-10-09T09:00:00Z",
-            "endpoint": "ARRIVED",
-            "quantityMode": "CUMULATIVE_EVENT",
-            "ownerId": {
-              "$alias": "writer"
-            },
+            "conditions": [],
+            "evidenceRefs": [],
+            "expectedRevision": 1,
             "commandIdempotencyKey": "T20-proposal-WAITING_APPROVAL"
           },
           "evidenceRefs": [
@@ -21621,25 +21890,53 @@
           "route": "api",
           "capabilityId": "dispatchPurchaseOrder",
           "request": {
-            "proposalId": {
-              "$result": {
-                "actionId": "proposal",
-                "pointer": "/response/proposalId"
+            "intentKind": "COMMAND",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "dispatchPurchaseOrder",
+            "subjectRefs": [
+              {
+                "type": "TradeItem",
+                "id": {
+                  "$alias": "P"
+                }
+              }
+            ],
+            "slots": {
+              "proposalId": {
+                "value": {
+                  "$result": {
+                    "actionId": "proposal",
+                    "pointer": "/response/proposalId"
+                  }
+                },
+                "provenance": "CONTEXT"
+              },
+              "proposalHash": {
+                "value": {
+                  "$result": {
+                    "actionId": "proposal",
+                    "pointer": "/response/proposalHash"
+                  }
+                },
+                "provenance": "CONTEXT"
+              },
+              "channel": {
+                "value": "SYNTHETIC_SUPPLIER",
+                "provenance": "USER"
+              },
+              "externalOperationId": {
+                "value": "T20-WAITING_APPROVAL-external",
+                "provenance": "USER"
               }
             },
-            "proposalHash": {
-              "$result": {
-                "actionId": "proposal",
-                "pointer": "/response/proposalHash"
-              }
-            },
+            "conditions": [],
+            "evidenceRefs": [],
             "expectedRevision": {
               "$result": {
                 "actionId": "proposal",
-                "pointer": "/response/revision"
+                "pointer": "/response/proposalRevision"
               }
             },
-            "channel": "synthetic-supplier",
             "commandIdempotencyKey": "T20-WAITING_APPROVAL"
           },
           "evidenceRefs": [
@@ -21670,25 +21967,53 @@
               "params": {
                 "name": "dispatchPurchaseOrder",
                 "arguments": {
-                  "proposalId": {
-                    "$result": {
-                      "actionId": "proposal",
-                      "pointer": "/response/proposalId"
+                  "intentKind": "COMMAND",
+                  "definitionVersion": "definition-v1",
+                  "capabilityId": "dispatchPurchaseOrder",
+                  "subjectRefs": [
+                    {
+                      "type": "TradeItem",
+                      "id": {
+                        "$alias": "P"
+                      }
+                    }
+                  ],
+                  "slots": {
+                    "proposalId": {
+                      "value": {
+                        "$result": {
+                          "actionId": "proposal",
+                          "pointer": "/response/proposalId"
+                        }
+                      },
+                      "provenance": "CONTEXT"
+                    },
+                    "proposalHash": {
+                      "value": {
+                        "$result": {
+                          "actionId": "proposal",
+                          "pointer": "/response/proposalHash"
+                        }
+                      },
+                      "provenance": "CONTEXT"
+                    },
+                    "channel": {
+                      "value": "SYNTHETIC_SUPPLIER",
+                      "provenance": "USER"
+                    },
+                    "externalOperationId": {
+                      "value": "T20-WAITING_APPROVAL-external",
+                      "provenance": "USER"
                     }
                   },
-                  "proposalHash": {
-                    "$result": {
-                      "actionId": "proposal",
-                      "pointer": "/response/proposalHash"
-                    }
-                  },
+                  "conditions": [],
+                  "evidenceRefs": [],
                   "expectedRevision": {
                     "$result": {
                       "actionId": "proposal",
-                      "pointer": "/response/revision"
+                      "pointer": "/response/proposalRevision"
                     }
                   },
-                  "channel": "synthetic-supplier",
                   "commandIdempotencyKey": "T20-WAITING_APPROVAL"
                 },
                 "_meta": {
@@ -25570,6 +25895,35 @@
           ]
         },
         {
+          "id": "purchase-work",
+          "kind": "query",
+          "actorRef": "reader",
+          "route": "api",
+          "capabilityId": "getWork",
+          "request": {
+            "id": {
+              "$alias": "O1"
+            },
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "lotId": {
+                "$alias": "L"
+              }
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z"
+          },
+          "evidenceRefs": [
+            "purchase-work:actual-response",
+            "purchase-work:wire-or-command"
+          ]
+        },
+        {
           "id": "proposal",
           "kind": "invoke",
           "actorRef": "writer",
@@ -25578,29 +25932,81 @@
           "request": {
             "intentKind": "COMMAND",
             "definitionVersion": "definition-v1",
-            "itemId": {
-              "$alias": "P"
+            "capabilityId": "proposePurchase",
+            "subjectRefs": [
+              {
+                "type": "TradeItem",
+                "id": {
+                  "$alias": "P"
+                }
+              }
+            ],
+            "slots": {
+              "quantity": {
+                "value": "100",
+                "unit": "BOX",
+                "provenance": "USER"
+              },
+              "price": {
+                "value": "2",
+                "currency": "EUR",
+                "provenance": "USER"
+              },
+              "supplierId": {
+                "value": {
+                  "$alias": "SUP"
+                },
+                "provenance": "CONTEXT"
+              },
+              "destinationId": {
+                "value": {
+                  "$alias": "W"
+                },
+                "provenance": "CONTEXT"
+              },
+              "dueAt": {
+                "value": "2026-10-09T09:00:00Z",
+                "provenance": "USER"
+              },
+              "endpoint": {
+                "value": "ARRIVED",
+                "provenance": "USER"
+              },
+              "quantityMode": {
+                "value": "CUMULATIVE_EVENT",
+                "provenance": "USER"
+              },
+              "ownerId": {
+                "value": {
+                  "$alias": "writer"
+                },
+                "provenance": "CONTEXT"
+              },
+              "supervisorId": {
+                "value": {
+                  "$alias": "supervisor"
+                },
+                "provenance": "CONTEXT"
+              },
+              "workId": {
+                "value": {
+                  "$alias": "O1"
+                },
+                "provenance": "CONTEXT"
+              },
+              "goalVersionId": {
+                "value": {
+                  "$result": {
+                    "actionId": "purchase-work",
+                    "pointer": "/response/data/goal/id"
+                  }
+                },
+                "provenance": "CONTEXT"
+              }
             },
-            "supplierId": {
-              "$alias": "SUP"
-            },
-            "quantity": {
-              "value": "100",
-              "unit": "BOX"
-            },
-            "unitPrice": {
-              "value": "2",
-              "currency": "EUR"
-            },
-            "destinationId": {
-              "$alias": "W"
-            },
-            "dueAt": "2026-10-09T09:00:00Z",
-            "endpoint": "ARRIVED",
-            "quantityMode": "CUMULATIVE_EVENT",
-            "ownerId": {
-              "$alias": "writer"
-            },
+            "conditions": [],
+            "evidenceRefs": [],
+            "expectedRevision": 1,
             "commandIdempotencyKey": "T20-proposal-ACCEPTED_PENDING_EXTERNAL"
           },
           "evidenceRefs": [
@@ -25615,25 +26021,65 @@
           "route": "api",
           "capabilityId": "approvePurchase",
           "request": {
-            "proposalId": {
-              "$result": {
-                "actionId": "proposal",
-                "pointer": "/response/proposalId"
+            "intentKind": "COMMAND",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "approvePurchase",
+            "subjectRefs": [
+              {
+                "type": "TradeItem",
+                "id": {
+                  "$alias": "P"
+                }
+              }
+            ],
+            "slots": {
+              "proposalId": {
+                "value": {
+                  "$result": {
+                    "actionId": "proposal",
+                    "pointer": "/response/proposalId"
+                  }
+                },
+                "provenance": "CONTEXT"
+              },
+              "proposalHash": {
+                "value": {
+                  "$result": {
+                    "actionId": "proposal",
+                    "pointer": "/response/proposalHash"
+                  }
+                },
+                "provenance": "CONTEXT"
+              },
+              "decision": {
+                "value": "APPROVE",
+                "provenance": "USER"
+              },
+              "decidedAt": {
+                "value": "2026-10-07T09:00:00Z",
+                "provenance": "USER"
+              },
+              "validUntil": {
+                "value": "2026-10-08T09:00:00Z",
+                "provenance": "USER"
+              },
+              "consumptionPolicy": {
+                "value": "SINGLE_ORDER_REVISION",
+                "provenance": "USER"
+              },
+              "conditions": {
+                "value": [],
+                "provenance": "USER"
               }
             },
-            "proposalHash": {
-              "$result": {
-                "actionId": "proposal",
-                "pointer": "/response/proposalHash"
-              }
-            },
+            "conditions": [],
+            "evidenceRefs": [],
             "expectedRevision": {
               "$result": {
                 "actionId": "proposal",
-                "pointer": "/response/revision"
+                "pointer": "/response/proposalRevision"
               }
             },
-            "decision": "APPROVED",
             "commandIdempotencyKey": "T20-manager-ACCEPTED_PENDING_EXTERNAL"
           },
           "evidenceRefs": [
@@ -25648,7 +26094,7 @@
             "type": "externalResponder",
             "operation": "loseResponse",
             "parameters": {
-              "sourceNamespace": "synthetic-supplier",
+              "sourceNamespace": "SYNTHETIC_SUPPLIER",
               "capabilityId": "dispatchPurchaseOrder",
               "when": "AFTER_EXTERNAL_EFFECT"
             }
@@ -25736,32 +26182,63 @@
           "route": "api",
           "capabilityId": "dispatchPurchaseOrder",
           "request": {
-            "proposalId": {
-              "$result": {
-                "actionId": "proposal",
-                "pointer": "/response/proposalId"
+            "intentKind": "COMMAND",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "dispatchPurchaseOrder",
+            "subjectRefs": [
+              {
+                "type": "TradeItem",
+                "id": {
+                  "$alias": "P"
+                }
+              }
+            ],
+            "slots": {
+              "proposalId": {
+                "value": {
+                  "$result": {
+                    "actionId": "proposal",
+                    "pointer": "/response/proposalId"
+                  }
+                },
+                "provenance": "CONTEXT"
+              },
+              "proposalHash": {
+                "value": {
+                  "$result": {
+                    "actionId": "proposal",
+                    "pointer": "/response/proposalHash"
+                  }
+                },
+                "provenance": "CONTEXT"
+              },
+              "channel": {
+                "value": "SYNTHETIC_SUPPLIER",
+                "provenance": "USER"
+              },
+              "externalOperationId": {
+                "value": "T20-ACCEPTED_PENDING_EXTERNAL-external",
+                "provenance": "USER"
+              },
+              "approvalId": {
+                "value": {
+                  "$result": {
+                    "actionId": "approval",
+                    "pointer": "/response/approvalId"
+                  }
+                },
+                "provenance": "CONTEXT"
               }
             },
-            "proposalHash": {
-              "$result": {
-                "actionId": "proposal",
-                "pointer": "/response/proposalHash"
-              }
-            },
+            "conditions": [],
+            "evidenceRefs": [],
             "expectedRevision": {
               "$result": {
                 "actionId": "proposal",
-                "pointer": "/response/revision"
+                "pointer": "/response/proposalRevision"
               }
             },
-            "channel": "synthetic-supplier",
-            "commandIdempotencyKey": "T20-ACCEPTED_PENDING_EXTERNAL",
-            "approvalId": {
-              "$result": {
-                "actionId": "approval",
-                "pointer": "/response/approvalId"
-              }
-            }
+            "commandIdempotencyKey": "T20-ACCEPTED_PENDING_EXTERNAL"
           },
           "evidenceRefs": [
             "api-result:actual-response",
@@ -25791,32 +26268,63 @@
               "params": {
                 "name": "dispatchPurchaseOrder",
                 "arguments": {
-                  "proposalId": {
-                    "$result": {
-                      "actionId": "proposal",
-                      "pointer": "/response/proposalId"
+                  "intentKind": "COMMAND",
+                  "definitionVersion": "definition-v1",
+                  "capabilityId": "dispatchPurchaseOrder",
+                  "subjectRefs": [
+                    {
+                      "type": "TradeItem",
+                      "id": {
+                        "$alias": "P"
+                      }
+                    }
+                  ],
+                  "slots": {
+                    "proposalId": {
+                      "value": {
+                        "$result": {
+                          "actionId": "proposal",
+                          "pointer": "/response/proposalId"
+                        }
+                      },
+                      "provenance": "CONTEXT"
+                    },
+                    "proposalHash": {
+                      "value": {
+                        "$result": {
+                          "actionId": "proposal",
+                          "pointer": "/response/proposalHash"
+                        }
+                      },
+                      "provenance": "CONTEXT"
+                    },
+                    "channel": {
+                      "value": "SYNTHETIC_SUPPLIER",
+                      "provenance": "USER"
+                    },
+                    "externalOperationId": {
+                      "value": "T20-ACCEPTED_PENDING_EXTERNAL-external",
+                      "provenance": "USER"
+                    },
+                    "approvalId": {
+                      "value": {
+                        "$result": {
+                          "actionId": "approval",
+                          "pointer": "/response/approvalId"
+                        }
+                      },
+                      "provenance": "CONTEXT"
                     }
                   },
-                  "proposalHash": {
-                    "$result": {
-                      "actionId": "proposal",
-                      "pointer": "/response/proposalHash"
-                    }
-                  },
+                  "conditions": [],
+                  "evidenceRefs": [],
                   "expectedRevision": {
                     "$result": {
                       "actionId": "proposal",
-                      "pointer": "/response/revision"
+                      "pointer": "/response/proposalRevision"
                     }
                   },
-                  "channel": "synthetic-supplier",
-                  "commandIdempotencyKey": "T20-ACCEPTED_PENDING_EXTERNAL",
-                  "approvalId": {
-                    "$result": {
-                      "actionId": "approval",
-                      "pointer": "/response/approvalId"
-                    }
-                  }
+                  "commandIdempotencyKey": "T20-ACCEPTED_PENDING_EXTERNAL"
                 },
                 "_meta": {
                   "io.modelcontextprotocol/protocolVersion": "2026-07-28",
@@ -30278,6 +30786,196 @@
           ]
         },
         {
+          "id": "own-issued",
+          "kind": "invoke",
+          "actorRef": "otherPrincipal",
+          "route": "wire",
+          "protocolOperation": "tools/call",
+          "request": {
+            "transport": "streamable-http",
+            "httpMethod": "POST",
+            "headers": {
+              "MCP-Protocol-Version": "2026-07-28",
+              "Mcp-Method": "tools/call",
+              "Content-Type": "application/json",
+              "Origin": "https://isolated-client.example.invalid",
+              "Mcp-Name": "structureIntent"
+            },
+            "body": {
+              "jsonrpc": "2.0",
+              "id": "own-issued",
+              "method": "tools/call",
+              "params": {
+                "name": "structureIntent",
+                "arguments": {
+                  "intentKind": "COMMAND",
+                  "definitionVersion": "definition-v1",
+                  "capabilityId": "createDraft",
+                  "subjectRefs": [
+                    {
+                      "type": "TradeItem",
+                      "id": {
+                        "$alias": "P"
+                      }
+                    }
+                  ],
+                  "slots": {
+                    "quantity": {
+                      "value": "100",
+                      "unit": "BOX",
+                      "provenance": "USER"
+                    },
+                    "dueAt": {
+                      "value": "2026-10-09T09:00:00Z",
+                      "provenance": "USER"
+                    },
+                    "endpoint": {
+                      "value": "ARRIVED",
+                      "provenance": "CONTEXT"
+                    },
+                    "quantityMode": {
+                      "value": "CUMULATIVE_EVENT",
+                      "provenance": "APPROVED_DEFAULT"
+                    }
+                  },
+                  "conditions": [],
+                  "evidenceRefs": [],
+                  "conversationRequestId": "T20-other-principal-input",
+                  "originalTextRef": "user-input",
+                  "contextRef": "scoped-conversation"
+                },
+                "_meta": {
+                  "io.modelcontextprotocol/protocolVersion": "2026-07-28",
+                  "io.modelcontextprotocol/clientInfo": {
+                    "name": "ontology-channel-contract",
+                    "version": "1.0.0"
+                  },
+                  "io.modelcontextprotocol/clientCapabilities": {
+                    "elicitation": {
+                      "form": {}
+                    }
+                  }
+                }
+              }
+            },
+            "credentialProfileRef": "otherPrincipal"
+          },
+          "evidenceRefs": [
+            "own-issued:redacted-raw-wire",
+            "own-issued:authenticated-context",
+            "own-issued:server-response"
+          ]
+        },
+        {
+          "id": "own-continued",
+          "kind": "invoke",
+          "actorRef": "otherPrincipal",
+          "route": "wire",
+          "protocolOperation": "tools/call",
+          "request": {
+            "transport": "streamable-http",
+            "httpMethod": "POST",
+            "headers": {
+              "MCP-Protocol-Version": "2026-07-28",
+              "Mcp-Method": "tools/call",
+              "Content-Type": "application/json",
+              "Origin": "https://isolated-client.example.invalid",
+              "Mcp-Name": "structureIntent"
+            },
+            "body": {
+              "jsonrpc": "2.0",
+              "id": "own-continued",
+              "method": "tools/call",
+              "params": {
+                "name": "structureIntent",
+                "arguments": {
+                  "intentKind": "COMMAND",
+                  "definitionVersion": "definition-v1",
+                  "capabilityId": "createDraft",
+                  "subjectRefs": [
+                    {
+                      "type": "TradeItem",
+                      "id": {
+                        "$alias": "P"
+                      }
+                    }
+                  ],
+                  "slots": {
+                    "quantity": {
+                      "value": "100",
+                      "unit": "BOX",
+                      "provenance": "USER"
+                    },
+                    "dueAt": {
+                      "value": "2026-10-09T09:00:00Z",
+                      "provenance": "USER"
+                    },
+                    "endpoint": {
+                      "value": "ARRIVED",
+                      "provenance": "CONTEXT"
+                    },
+                    "quantityMode": {
+                      "value": "CUMULATIVE_EVENT",
+                      "provenance": "APPROVED_DEFAULT"
+                    },
+                    "destination": {
+                      "value": {
+                        "$alias": "W"
+                      },
+                      "type": "Place",
+                      "provenance": "USER"
+                    }
+                  },
+                  "conditions": [],
+                  "evidenceRefs": [],
+                  "conversationRequestId": "T20-other-principal-input",
+                  "originalTextRef": "user-input",
+                  "contextRef": "scoped-conversation"
+                },
+                "requestState": {
+                  "$result": {
+                    "actionId": "own-issued",
+                    "pointer": "/response/body/result/requestState"
+                  }
+                },
+                "inputResponses": [
+                  {
+                    "requestId": {
+                      "$result": {
+                        "actionId": "own-issued",
+                        "pointer": "/response/body/result/inputRequests/0/requestId"
+                      }
+                    },
+                    "value": {
+                      "destinationId": {
+                        "$alias": "W"
+                      }
+                    }
+                  }
+                ],
+                "_meta": {
+                  "io.modelcontextprotocol/protocolVersion": "2026-07-28",
+                  "io.modelcontextprotocol/clientInfo": {
+                    "name": "ontology-channel-contract",
+                    "version": "1.0.0"
+                  },
+                  "io.modelcontextprotocol/clientCapabilities": {
+                    "elicitation": {
+                      "form": {}
+                    }
+                  }
+                }
+              }
+            },
+            "credentialProfileRef": "otherPrincipal"
+          },
+          "evidenceRefs": [
+            "own-continued:redacted-raw-wire",
+            "own-continued:authenticated-context",
+            "own-continued:server-response"
+          ]
+        },
+        {
           "id": "after",
           "kind": "query",
           "actorRef": "reader",
@@ -30752,6 +31450,178 @@
           }
         },
         {
+          "id": "wrong-principal-code",
+          "op": "equals",
+          "source": {
+            "actionId": "continued",
+            "pointer": "/response/body/result/structuredContent/error/code"
+          },
+          "expected": "REQUEST_STATE_PRINCIPAL_MISMATCH",
+          "requirementRefs": [
+            "D20"
+          ],
+          "evidenceRefs": [
+            "continued:actual-observation",
+            "continued:source-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "lotId": {
+              "$alias": "L"
+            }
+          },
+          "oracleExplanation": "wrong-principal-code: /response/body/result/structuredContent/error/code의 실제 equals 기대값은 \"REQUEST_STATE_PRINCIPAL_MISMATCH\"다. 미관찰·UNKNOWN은 정상값이 아니다.",
+          "oracleRef": {
+            "oracleId": "T20.mrtr-bound-state",
+            "observationNames": [
+              "mrtr-state"
+            ]
+          }
+        },
+        {
+          "id": "own-issued-input-required",
+          "op": "equals",
+          "source": {
+            "actionId": "own-issued",
+            "pointer": "/response/body/result/resultType"
+          },
+          "expected": "input_required",
+          "requirementRefs": [
+            "D20"
+          ],
+          "evidenceRefs": [
+            "own-issued:actual-observation",
+            "own-issued:source-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "lotId": {
+              "$alias": "L"
+            }
+          },
+          "oracleExplanation": "own-issued-input-required: /response/body/result/resultType의 실제 equals 기대값은 \"input_required\"다. 미관찰·UNKNOWN은 정상값이 아니다.",
+          "oracleRef": {
+            "oracleId": "T20.mrtr-bound-state",
+            "observationNames": [
+              "mrtr-state"
+            ]
+          }
+        },
+        {
+          "id": "own-state-countercall-structured",
+          "op": "equals",
+          "source": {
+            "actionId": "own-continued",
+            "pointer": "/response/body/result/structuredContent/outcome"
+          },
+          "expected": "STRUCTURED",
+          "requirementRefs": [
+            "D20"
+          ],
+          "evidenceRefs": [
+            "own-continued:actual-observation",
+            "own-continued:source-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "lotId": {
+              "$alias": "L"
+            }
+          },
+          "oracleExplanation": "own-state-countercall-structured: /response/body/result/structuredContent/outcome의 실제 equals 기대값은 \"STRUCTURED\"다. 미관찰·UNKNOWN은 정상값이 아니다.",
+          "oracleRef": {
+            "oracleId": "T20.mrtr-bound-state",
+            "observationNames": [
+              "mrtr-state"
+            ]
+          }
+        },
+        {
+          "id": "own-state-destination-applied",
+          "op": "equals",
+          "source": {
+            "actionId": "own-continued",
+            "pointer": "/response/body/result/structuredContent/intent/slots/destination/value"
+          },
+          "expected": {
+            "$alias": "W"
+          },
+          "requirementRefs": [
+            "D20"
+          ],
+          "evidenceRefs": [
+            "own-continued:actual-observation",
+            "own-continued:source-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "lotId": {
+              "$alias": "L"
+            }
+          },
+          "oracleExplanation": "own-state-destination-applied: /response/body/result/structuredContent/intent/slots/destination/value의 실제 equals 기대값은 {\"$alias\": \"W\"}다. 미관찰·UNKNOWN은 정상값이 아니다.",
+          "oracleRef": {
+            "oracleId": "T20.mrtr-bound-state",
+            "observationNames": [
+              "mrtr-state"
+            ]
+          }
+        },
+        {
+          "id": "own-conversation-kept",
+          "op": "equals",
+          "source": {
+            "actionId": "own-continued",
+            "pointer": "/response/body/result/structuredContent/conversationRequestId"
+          },
+          "expected": "T20-other-principal-input",
+          "requirementRefs": [
+            "D20"
+          ],
+          "evidenceRefs": [
+            "own-continued:actual-observation",
+            "own-continued:source-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "lotId": {
+              "$alias": "L"
+            }
+          },
+          "oracleExplanation": "own-conversation-kept: /response/body/result/structuredContent/conversationRequestId의 실제 equals 기대값은 \"T20-other-principal-input\"다. 미관찰·UNKNOWN은 정상값이 아니다.",
+          "oracleRef": {
+            "oracleId": "T20.mrtr-bound-state",
+            "observationNames": [
+              "mrtr-state"
+            ]
+          }
+        },
+        {
           "id": "issued-raw-method",
           "op": "equals",
           "source": {
@@ -31174,6 +32044,436 @@
             }
           },
           "oracleExplanation": "continued-raw-meta: /data/transcript/request/body/params/_meta의 실제 equals 기대값은 {\"io.modelcontextprotocol/protocolVersion\": \"2026-07-28\", \"io.modelcontextprotocol/clientInfo\": {\"name\": \"ontology-channel-contract\", \"version\": \"1.0.0\"}, \"io.modelcontextprotocol/clientCapabilities\": {\"elicitation\": {\"form\": {}}}}다. 미관찰·UNKNOWN은 정상값이 아니다.",
+          "oracleRef": {
+            "oracleId": "T20.mrtr-bound-state",
+            "observationNames": [
+              "mrtr-state"
+            ]
+          }
+        },
+        {
+          "id": "own-issued-raw-method",
+          "op": "equals",
+          "source": {
+            "actionId": "own-issued",
+            "pointer": "/data/transcript/request/body/method"
+          },
+          "expected": "tools/call",
+          "requirementRefs": [
+            "D20"
+          ],
+          "evidenceRefs": [
+            "own-issued:actual-observation",
+            "own-issued:source-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "lotId": {
+              "$alias": "L"
+            }
+          },
+          "oracleExplanation": "own-issued-raw-method: /data/transcript/request/body/method의 실제 equals 기대값은 \"tools/call\"다. 미관찰·UNKNOWN은 정상값이 아니다.",
+          "oracleRef": {
+            "oracleId": "T20.mrtr-bound-state",
+            "observationNames": [
+              "mrtr-state"
+            ]
+          }
+        },
+        {
+          "id": "own-issued-raw-jsonrpc-id",
+          "op": "equals",
+          "source": {
+            "actionId": "own-issued",
+            "pointer": "/data/transcript/request/body/id"
+          },
+          "expected": "own-issued",
+          "requirementRefs": [
+            "D20"
+          ],
+          "evidenceRefs": [
+            "own-issued:actual-observation",
+            "own-issued:source-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "lotId": {
+              "$alias": "L"
+            }
+          },
+          "oracleExplanation": "own-issued-raw-jsonrpc-id: /data/transcript/request/body/id의 실제 equals 기대값은 \"own-issued\"다. 미관찰·UNKNOWN은 정상값이 아니다.",
+          "oracleRef": {
+            "oracleId": "T20.mrtr-bound-state",
+            "observationNames": [
+              "mrtr-state"
+            ]
+          }
+        },
+        {
+          "id": "own-issued-raw-MCP-Protocol-Version",
+          "op": "equals",
+          "source": {
+            "actionId": "own-issued",
+            "pointer": "/data/transcript/request/headers/MCP-Protocol-Version"
+          },
+          "expected": "2026-07-28",
+          "requirementRefs": [
+            "D20"
+          ],
+          "evidenceRefs": [
+            "own-issued:actual-observation",
+            "own-issued:source-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "lotId": {
+              "$alias": "L"
+            }
+          },
+          "oracleExplanation": "own-issued-raw-MCP-Protocol-Version: /data/transcript/request/headers/MCP-Protocol-Version의 실제 equals 기대값은 \"2026-07-28\"다. 미관찰·UNKNOWN은 정상값이 아니다.",
+          "oracleRef": {
+            "oracleId": "T20.mrtr-bound-state",
+            "observationNames": [
+              "mrtr-state"
+            ]
+          }
+        },
+        {
+          "id": "own-issued-raw-Mcp-Method",
+          "op": "equals",
+          "source": {
+            "actionId": "own-issued",
+            "pointer": "/data/transcript/request/headers/Mcp-Method"
+          },
+          "expected": "tools/call",
+          "requirementRefs": [
+            "D20"
+          ],
+          "evidenceRefs": [
+            "own-issued:actual-observation",
+            "own-issued:source-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "lotId": {
+              "$alias": "L"
+            }
+          },
+          "oracleExplanation": "own-issued-raw-Mcp-Method: /data/transcript/request/headers/Mcp-Method의 실제 equals 기대값은 \"tools/call\"다. 미관찰·UNKNOWN은 정상값이 아니다.",
+          "oracleRef": {
+            "oracleId": "T20.mrtr-bound-state",
+            "observationNames": [
+              "mrtr-state"
+            ]
+          }
+        },
+        {
+          "id": "own-issued-raw-Mcp-Name",
+          "op": "equals",
+          "source": {
+            "actionId": "own-issued",
+            "pointer": "/data/transcript/request/headers/Mcp-Name"
+          },
+          "expected": "structureIntent",
+          "requirementRefs": [
+            "D20"
+          ],
+          "evidenceRefs": [
+            "own-issued:actual-observation",
+            "own-issued:source-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "lotId": {
+              "$alias": "L"
+            }
+          },
+          "oracleExplanation": "own-issued-raw-Mcp-Name: /data/transcript/request/headers/Mcp-Name의 실제 equals 기대값은 \"structureIntent\"다. 미관찰·UNKNOWN은 정상값이 아니다.",
+          "oracleRef": {
+            "oracleId": "T20.mrtr-bound-state",
+            "observationNames": [
+              "mrtr-state"
+            ]
+          }
+        },
+        {
+          "id": "own-issued-raw-meta",
+          "op": "equals",
+          "source": {
+            "actionId": "own-issued",
+            "pointer": "/data/transcript/request/body/params/_meta"
+          },
+          "expected": {
+            "io.modelcontextprotocol/protocolVersion": "2026-07-28",
+            "io.modelcontextprotocol/clientInfo": {
+              "name": "ontology-channel-contract",
+              "version": "1.0.0"
+            },
+            "io.modelcontextprotocol/clientCapabilities": {
+              "elicitation": {
+                "form": {}
+              }
+            }
+          },
+          "requirementRefs": [
+            "D20"
+          ],
+          "evidenceRefs": [
+            "own-issued:actual-observation",
+            "own-issued:source-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "lotId": {
+              "$alias": "L"
+            }
+          },
+          "oracleExplanation": "own-issued-raw-meta: /data/transcript/request/body/params/_meta의 실제 equals 기대값은 {\"io.modelcontextprotocol/protocolVersion\": \"2026-07-28\", \"io.modelcontextprotocol/clientInfo\": {\"name\": \"ontology-channel-contract\", \"version\": \"1.0.0\"}, \"io.modelcontextprotocol/clientCapabilities\": {\"elicitation\": {\"form\": {}}}}다. 미관찰·UNKNOWN은 정상값이 아니다.",
+          "oracleRef": {
+            "oracleId": "T20.mrtr-bound-state",
+            "observationNames": [
+              "mrtr-state"
+            ]
+          }
+        },
+        {
+          "id": "own-continued-raw-method",
+          "op": "equals",
+          "source": {
+            "actionId": "own-continued",
+            "pointer": "/data/transcript/request/body/method"
+          },
+          "expected": "tools/call",
+          "requirementRefs": [
+            "D20"
+          ],
+          "evidenceRefs": [
+            "own-continued:actual-observation",
+            "own-continued:source-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "lotId": {
+              "$alias": "L"
+            }
+          },
+          "oracleExplanation": "own-continued-raw-method: /data/transcript/request/body/method의 실제 equals 기대값은 \"tools/call\"다. 미관찰·UNKNOWN은 정상값이 아니다.",
+          "oracleRef": {
+            "oracleId": "T20.mrtr-bound-state",
+            "observationNames": [
+              "mrtr-state"
+            ]
+          }
+        },
+        {
+          "id": "own-continued-raw-jsonrpc-id",
+          "op": "equals",
+          "source": {
+            "actionId": "own-continued",
+            "pointer": "/data/transcript/request/body/id"
+          },
+          "expected": "own-continued",
+          "requirementRefs": [
+            "D20"
+          ],
+          "evidenceRefs": [
+            "own-continued:actual-observation",
+            "own-continued:source-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "lotId": {
+              "$alias": "L"
+            }
+          },
+          "oracleExplanation": "own-continued-raw-jsonrpc-id: /data/transcript/request/body/id의 실제 equals 기대값은 \"own-continued\"다. 미관찰·UNKNOWN은 정상값이 아니다.",
+          "oracleRef": {
+            "oracleId": "T20.mrtr-bound-state",
+            "observationNames": [
+              "mrtr-state"
+            ]
+          }
+        },
+        {
+          "id": "own-continued-raw-MCP-Protocol-Version",
+          "op": "equals",
+          "source": {
+            "actionId": "own-continued",
+            "pointer": "/data/transcript/request/headers/MCP-Protocol-Version"
+          },
+          "expected": "2026-07-28",
+          "requirementRefs": [
+            "D20"
+          ],
+          "evidenceRefs": [
+            "own-continued:actual-observation",
+            "own-continued:source-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "lotId": {
+              "$alias": "L"
+            }
+          },
+          "oracleExplanation": "own-continued-raw-MCP-Protocol-Version: /data/transcript/request/headers/MCP-Protocol-Version의 실제 equals 기대값은 \"2026-07-28\"다. 미관찰·UNKNOWN은 정상값이 아니다.",
+          "oracleRef": {
+            "oracleId": "T20.mrtr-bound-state",
+            "observationNames": [
+              "mrtr-state"
+            ]
+          }
+        },
+        {
+          "id": "own-continued-raw-Mcp-Method",
+          "op": "equals",
+          "source": {
+            "actionId": "own-continued",
+            "pointer": "/data/transcript/request/headers/Mcp-Method"
+          },
+          "expected": "tools/call",
+          "requirementRefs": [
+            "D20"
+          ],
+          "evidenceRefs": [
+            "own-continued:actual-observation",
+            "own-continued:source-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "lotId": {
+              "$alias": "L"
+            }
+          },
+          "oracleExplanation": "own-continued-raw-Mcp-Method: /data/transcript/request/headers/Mcp-Method의 실제 equals 기대값은 \"tools/call\"다. 미관찰·UNKNOWN은 정상값이 아니다.",
+          "oracleRef": {
+            "oracleId": "T20.mrtr-bound-state",
+            "observationNames": [
+              "mrtr-state"
+            ]
+          }
+        },
+        {
+          "id": "own-continued-raw-Mcp-Name",
+          "op": "equals",
+          "source": {
+            "actionId": "own-continued",
+            "pointer": "/data/transcript/request/headers/Mcp-Name"
+          },
+          "expected": "structureIntent",
+          "requirementRefs": [
+            "D20"
+          ],
+          "evidenceRefs": [
+            "own-continued:actual-observation",
+            "own-continued:source-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "lotId": {
+              "$alias": "L"
+            }
+          },
+          "oracleExplanation": "own-continued-raw-Mcp-Name: /data/transcript/request/headers/Mcp-Name의 실제 equals 기대값은 \"structureIntent\"다. 미관찰·UNKNOWN은 정상값이 아니다.",
+          "oracleRef": {
+            "oracleId": "T20.mrtr-bound-state",
+            "observationNames": [
+              "mrtr-state"
+            ]
+          }
+        },
+        {
+          "id": "own-continued-raw-meta",
+          "op": "equals",
+          "source": {
+            "actionId": "own-continued",
+            "pointer": "/data/transcript/request/body/params/_meta"
+          },
+          "expected": {
+            "io.modelcontextprotocol/protocolVersion": "2026-07-28",
+            "io.modelcontextprotocol/clientInfo": {
+              "name": "ontology-channel-contract",
+              "version": "1.0.0"
+            },
+            "io.modelcontextprotocol/clientCapabilities": {
+              "elicitation": {
+                "form": {}
+              }
+            }
+          },
+          "requirementRefs": [
+            "D20"
+          ],
+          "evidenceRefs": [
+            "own-continued:actual-observation",
+            "own-continued:source-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "lotId": {
+              "$alias": "L"
+            }
+          },
+          "oracleExplanation": "own-continued-raw-meta: /data/transcript/request/body/params/_meta의 실제 equals 기대값은 {\"io.modelcontextprotocol/protocolVersion\": \"2026-07-28\", \"io.modelcontextprotocol/clientInfo\": {\"name\": \"ontology-channel-contract\", \"version\": \"1.0.0\"}, \"io.modelcontextprotocol/clientCapabilities\": {\"elicitation\": {\"form\": {}}}}다. 미관찰·UNKNOWN은 정상값이 아니다.",
           "oracleRef": {
             "oracleId": "T20.mrtr-bound-state",
             "observationNames": [
@@ -34742,7 +36042,7 @@
     },
     {
       "id": "mrtr-state-as-approval",
-      "title": "실제 MRTR state state-as-approval와 금지효과0",
+      "title": "유효한 발주 입력의 state-as-approval가 승인 없이 효과를 만들지 않고 MANAGER 결정 후 실행한다",
       "fixtureRef": "verification/cases/T20/fixture.json",
       "requiredAdapters": [
         "fixture",
@@ -34756,6 +36056,126 @@
           "kind": "installFixture",
           "evidenceRefs": [
             "setup:fixture-hash-and-alias-map"
+          ]
+        },
+        {
+          "id": "purchase-work",
+          "kind": "query",
+          "actorRef": "reader",
+          "route": "api",
+          "capabilityId": "getWork",
+          "request": {
+            "id": {
+              "$alias": "O1"
+            },
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "lotId": {
+                "$alias": "L"
+              }
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z"
+          },
+          "evidenceRefs": [
+            "purchase-work:actual-response",
+            "purchase-work:wire-or-command"
+          ]
+        },
+        {
+          "id": "proposal",
+          "kind": "invoke",
+          "actorRef": "writer",
+          "route": "api",
+          "capabilityId": "proposePurchase",
+          "request": {
+            "intentKind": "COMMAND",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "proposePurchase",
+            "subjectRefs": [
+              {
+                "type": "TradeItem",
+                "id": {
+                  "$alias": "P"
+                }
+              }
+            ],
+            "slots": {
+              "quantity": {
+                "value": "100",
+                "unit": "BOX",
+                "provenance": "USER"
+              },
+              "price": {
+                "value": "2",
+                "currency": "EUR",
+                "provenance": "USER"
+              },
+              "supplierId": {
+                "value": {
+                  "$alias": "SUP"
+                },
+                "provenance": "CONTEXT"
+              },
+              "destinationId": {
+                "value": {
+                  "$alias": "W"
+                },
+                "provenance": "CONTEXT"
+              },
+              "dueAt": {
+                "value": "2026-10-09T09:00:00Z",
+                "provenance": "USER"
+              },
+              "endpoint": {
+                "value": "ARRIVED",
+                "provenance": "USER"
+              },
+              "quantityMode": {
+                "value": "CUMULATIVE_EVENT",
+                "provenance": "USER"
+              },
+              "ownerId": {
+                "value": {
+                  "$alias": "writer"
+                },
+                "provenance": "CONTEXT"
+              },
+              "supervisorId": {
+                "value": {
+                  "$alias": "supervisor"
+                },
+                "provenance": "CONTEXT"
+              },
+              "workId": {
+                "value": {
+                  "$alias": "O1"
+                },
+                "provenance": "CONTEXT"
+              },
+              "goalVersionId": {
+                "value": {
+                  "$result": {
+                    "actionId": "purchase-work",
+                    "pointer": "/response/data/goal/id"
+                  }
+                },
+                "provenance": "CONTEXT"
+              }
+            },
+            "conditions": [],
+            "evidenceRefs": [],
+            "expectedRevision": 1,
+            "commandIdempotencyKey": "T20-state-as-approval-proposal"
+          },
+          "evidenceRefs": [
+            "proposal:actual-response",
+            "proposal:wire-or-command"
           ]
         },
         {
@@ -34821,7 +36241,9 @@
               "audit",
               "outbox",
               "commandResults",
-              "claims"
+              "claims",
+              "purchaseOrders",
+              "proposals"
             ]
           },
           "evidenceRefs": [
@@ -34844,18 +36266,18 @@
               "Mcp-Method": "tools/call",
               "Content-Type": "application/json",
               "Origin": "https://isolated-client.example.invalid",
-              "Mcp-Name": "structureIntent"
+              "Mcp-Name": "dispatchPurchaseOrder"
             },
             "body": {
               "jsonrpc": "2.0",
               "id": "issued",
               "method": "tools/call",
               "params": {
-                "name": "structureIntent",
+                "name": "dispatchPurchaseOrder",
                 "arguments": {
                   "intentKind": "COMMAND",
                   "definitionVersion": "definition-v1",
-                  "capabilityId": "createDraft",
+                  "capabilityId": "dispatchPurchaseOrder",
                   "subjectRefs": [
                     {
                       "type": "TradeItem",
@@ -34865,29 +36287,38 @@
                     }
                   ],
                   "slots": {
-                    "quantity": {
-                      "value": "100",
-                      "unit": "BOX",
-                      "provenance": "USER"
-                    },
-                    "dueAt": {
-                      "value": "2026-10-09T09:00:00Z",
-                      "provenance": "USER"
-                    },
-                    "endpoint": {
-                      "value": "ARRIVED",
+                    "proposalId": {
+                      "value": {
+                        "$result": {
+                          "actionId": "proposal",
+                          "pointer": "/response/proposalId"
+                        }
+                      },
                       "provenance": "CONTEXT"
                     },
-                    "quantityMode": {
-                      "value": "CUMULATIVE_EVENT",
-                      "provenance": "APPROVED_DEFAULT"
+                    "proposalHash": {
+                      "value": {
+                        "$result": {
+                          "actionId": "proposal",
+                          "pointer": "/response/proposalHash"
+                        }
+                      },
+                      "provenance": "CONTEXT"
+                    },
+                    "externalOperationId": {
+                      "value": "T20-state-as-approval-dispatch-external",
+                      "provenance": "USER"
                     }
                   },
                   "conditions": [],
                   "evidenceRefs": [],
-                  "conversationRequestId": "T20-input",
-                  "originalTextRef": "user-input",
-                  "contextRef": "scoped-conversation"
+                  "expectedRevision": {
+                    "$result": {
+                      "actionId": "proposal",
+                      "pointer": "/response/proposalRevision"
+                    }
+                  },
+                  "commandIdempotencyKey": "T20-state-as-approval-dispatch"
                 },
                 "_meta": {
                   "io.modelcontextprotocol/protocolVersion": "2026-07-28",
@@ -34936,7 +36367,7 @@
                 "arguments": {
                   "intentKind": "COMMAND",
                   "definitionVersion": "definition-v1",
-                  "capabilityId": "createDraft",
+                  "capabilityId": "dispatchPurchaseOrder",
                   "subjectRefs": [
                     {
                       "type": "TradeItem",
@@ -34946,36 +36377,42 @@
                     }
                   ],
                   "slots": {
-                    "quantity": {
-                      "value": "100",
-                      "unit": "BOX",
-                      "provenance": "USER"
-                    },
-                    "dueAt": {
-                      "value": "2026-10-09T09:00:00Z",
-                      "provenance": "USER"
-                    },
-                    "endpoint": {
-                      "value": "ARRIVED",
+                    "proposalId": {
+                      "value": {
+                        "$result": {
+                          "actionId": "proposal",
+                          "pointer": "/response/proposalId"
+                        }
+                      },
                       "provenance": "CONTEXT"
                     },
-                    "quantityMode": {
-                      "value": "CUMULATIVE_EVENT",
-                      "provenance": "APPROVED_DEFAULT"
-                    },
-                    "destination": {
+                    "proposalHash": {
                       "value": {
-                        "$alias": "W"
+                        "$result": {
+                          "actionId": "proposal",
+                          "pointer": "/response/proposalHash"
+                        }
                       },
-                      "type": "Place",
+                      "provenance": "CONTEXT"
+                    },
+                    "channel": {
+                      "value": "SYNTHETIC_SUPPLIER",
+                      "provenance": "USER"
+                    },
+                    "externalOperationId": {
+                      "value": "T20-state-as-approval-dispatch-external",
                       "provenance": "USER"
                     }
                   },
                   "conditions": [],
                   "evidenceRefs": [],
-                  "conversationRequestId": "T20-input",
-                  "originalTextRef": "user-input",
-                  "contextRef": "scoped-conversation"
+                  "expectedRevision": {
+                    "$result": {
+                      "actionId": "proposal",
+                      "pointer": "/response/proposalRevision"
+                    }
+                  },
+                  "commandIdempotencyKey": "T20-state-as-approval-dispatch"
                 },
                 "requestState": {
                   "$result": {
@@ -34992,9 +36429,7 @@
                       }
                     },
                     "value": {
-                      "destinationId": {
-                        "$alias": "W"
-                      }
+                      "channel": "SYNTHETIC_SUPPLIER"
                     }
                   }
                 ],
@@ -35083,13 +36518,265 @@
               "audit",
               "outbox",
               "commandResults",
-              "claims"
+              "claims",
+              "purchaseOrders",
+              "proposals"
             ]
           },
           "evidenceRefs": [
             "db-after:raw-rows",
             "db-after:source-query",
             "db-after:snapshot"
+          ]
+        },
+        {
+          "id": "approval",
+          "kind": "invoke",
+          "actorRef": "manager",
+          "route": "api",
+          "capabilityId": "approvePurchase",
+          "request": {
+            "intentKind": "COMMAND",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "approvePurchase",
+            "subjectRefs": [
+              {
+                "type": "TradeItem",
+                "id": {
+                  "$alias": "P"
+                }
+              }
+            ],
+            "slots": {
+              "proposalId": {
+                "value": {
+                  "$result": {
+                    "actionId": "proposal",
+                    "pointer": "/response/proposalId"
+                  }
+                },
+                "provenance": "CONTEXT"
+              },
+              "proposalHash": {
+                "value": {
+                  "$result": {
+                    "actionId": "proposal",
+                    "pointer": "/response/proposalHash"
+                  }
+                },
+                "provenance": "CONTEXT"
+              },
+              "decision": {
+                "value": "APPROVE",
+                "provenance": "USER"
+              },
+              "decidedAt": {
+                "value": "2026-10-07T09:00:00Z",
+                "provenance": "USER"
+              },
+              "validUntil": {
+                "value": "2026-10-08T09:00:00Z",
+                "provenance": "USER"
+              },
+              "consumptionPolicy": {
+                "value": "SINGLE_ORDER_REVISION",
+                "provenance": "USER"
+              },
+              "conditions": {
+                "value": [],
+                "provenance": "USER"
+              }
+            },
+            "conditions": [],
+            "evidenceRefs": [],
+            "expectedRevision": {
+              "$result": {
+                "actionId": "proposal",
+                "pointer": "/response/proposalRevision"
+              }
+            },
+            "commandIdempotencyKey": "T20-state-as-approval-manager"
+          },
+          "evidenceRefs": [
+            "approval:actual-response",
+            "approval:wire-or-command"
+          ]
+        },
+        {
+          "id": "approved-dispatch",
+          "kind": "invoke",
+          "actorRef": "writer",
+          "route": "wire",
+          "protocolOperation": "tools/call",
+          "request": {
+            "transport": "streamable-http",
+            "httpMethod": "POST",
+            "headers": {
+              "MCP-Protocol-Version": "2026-07-28",
+              "Mcp-Method": "tools/call",
+              "Content-Type": "application/json",
+              "Origin": "https://isolated-client.example.invalid",
+              "Mcp-Name": "dispatchPurchaseOrder"
+            },
+            "body": {
+              "jsonrpc": "2.0",
+              "id": "approved-dispatch",
+              "method": "tools/call",
+              "params": {
+                "name": "dispatchPurchaseOrder",
+                "arguments": {
+                  "intentKind": "COMMAND",
+                  "definitionVersion": "definition-v1",
+                  "capabilityId": "dispatchPurchaseOrder",
+                  "subjectRefs": [
+                    {
+                      "type": "TradeItem",
+                      "id": {
+                        "$alias": "P"
+                      }
+                    }
+                  ],
+                  "slots": {
+                    "proposalId": {
+                      "value": {
+                        "$result": {
+                          "actionId": "proposal",
+                          "pointer": "/response/proposalId"
+                        }
+                      },
+                      "provenance": "CONTEXT"
+                    },
+                    "proposalHash": {
+                      "value": {
+                        "$result": {
+                          "actionId": "proposal",
+                          "pointer": "/response/proposalHash"
+                        }
+                      },
+                      "provenance": "CONTEXT"
+                    },
+                    "channel": {
+                      "value": "SYNTHETIC_SUPPLIER",
+                      "provenance": "USER"
+                    },
+                    "externalOperationId": {
+                      "value": "T20-state-as-approval-dispatch-external",
+                      "provenance": "USER"
+                    },
+                    "approvalId": {
+                      "value": {
+                        "$result": {
+                          "actionId": "approval",
+                          "pointer": "/response/approvalId"
+                        }
+                      },
+                      "provenance": "CONTEXT"
+                    }
+                  },
+                  "conditions": [],
+                  "evidenceRefs": [],
+                  "expectedRevision": {
+                    "$result": {
+                      "actionId": "proposal",
+                      "pointer": "/response/proposalRevision"
+                    }
+                  },
+                  "commandIdempotencyKey": "T20-state-as-approval-approved-dispatch"
+                },
+                "_meta": {
+                  "io.modelcontextprotocol/protocolVersion": "2026-07-28",
+                  "io.modelcontextprotocol/clientInfo": {
+                    "name": "ontology-channel-contract",
+                    "version": "1.0.0"
+                  },
+                  "io.modelcontextprotocol/clientCapabilities": {
+                    "elicitation": {
+                      "form": {}
+                    }
+                  }
+                }
+              }
+            },
+            "credentialProfileRef": "writer"
+          },
+          "evidenceRefs": [
+            "approved-dispatch:redacted-raw-wire",
+            "approved-dispatch:authenticated-context",
+            "approved-dispatch:server-response"
+          ]
+        },
+        {
+          "id": "positive-inventory",
+          "kind": "query",
+          "actorRef": "reader",
+          "route": "api",
+          "capabilityId": "getInventory",
+          "request": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "lotId": {
+                "$alias": "L"
+              }
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z"
+          },
+          "evidenceRefs": [
+            "positive-inventory:actual-response",
+            "positive-inventory:wire-or-command"
+          ]
+        },
+        {
+          "id": "db-positive",
+          "kind": "observe",
+          "observation": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "lotId": {
+                "$alias": "L"
+              }
+            },
+            "snapshotRef": {
+              "$result": {
+                "actionId": "positive-inventory",
+                "pointer": "/response/snapshotRevision"
+              }
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z",
+            "sources": [
+              "segments",
+              "movements",
+              "allocations",
+              "approvals",
+              "works",
+              "goals",
+              "assessments",
+              "obligations",
+              "evidenceLinks",
+              "relations",
+              "audit",
+              "outbox",
+              "commandResults",
+              "claims",
+              "purchaseOrders",
+              "proposals"
+            ]
+          },
+          "evidenceRefs": [
+            "db-positive:raw-rows",
+            "db-positive:source-query",
+            "db-positive:snapshot"
           ]
         }
       ],
@@ -35135,7 +36822,7 @@
             "actionId": "continued",
             "pointer": "/response/body/result/structuredContent/outcome"
           },
-          "expected": "REJECTED",
+          "expected": "WAITING_APPROVAL",
           "requirementRefs": [
             "D20"
           ],
@@ -35154,11 +36841,79 @@
               "$alias": "L"
             }
           },
-          "oracleExplanation": "continued-outcome: /response/body/result/structuredContent/outcome의 실제 equals 기대값은 \"REJECTED\"다. 미관찰·UNKNOWN은 정상값이 아니다.",
+          "oracleExplanation": "continued-outcome: /response/body/result/structuredContent/outcome의 실제 equals 기대값은 \"WAITING_APPROVAL\"다. 미관찰·UNKNOWN은 정상값이 아니다.",
           "oracleRef": {
             "oracleId": "T20.mrtr-bound-state",
             "observationNames": [
-              "mrtr-state"
+              "requeststate-as-approval"
+            ]
+          }
+        },
+        {
+          "id": "specific-manager-approval-missing",
+          "op": "equals",
+          "source": {
+            "actionId": "continued",
+            "pointer": "/response/body/result/structuredContent/error/code"
+          },
+          "expected": "APPROVAL_REQUIRED",
+          "requirementRefs": [
+            "D20"
+          ],
+          "evidenceRefs": [
+            "continued:actual-observation",
+            "continued:source-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "lotId": {
+              "$alias": "L"
+            }
+          },
+          "oracleExplanation": "specific-manager-approval-missing: /response/body/result/structuredContent/error/code의 실제 equals 기대값은 \"APPROVAL_REQUIRED\"다. 미관찰·UNKNOWN은 정상값이 아니다.",
+          "oracleRef": {
+            "oracleId": "T20.mrtr-bound-state",
+            "observationNames": [
+              "requeststate-as-approval"
+            ]
+          }
+        },
+        {
+          "id": "required-decision-role",
+          "op": "equals",
+          "source": {
+            "actionId": "continued",
+            "pointer": "/response/body/result/structuredContent/error/requiredRole"
+          },
+          "expected": "MANAGER",
+          "requirementRefs": [
+            "D20"
+          ],
+          "evidenceRefs": [
+            "continued:actual-observation",
+            "continued:source-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "lotId": {
+              "$alias": "L"
+            }
+          },
+          "oracleExplanation": "required-decision-role: /response/body/result/structuredContent/error/requiredRole의 실제 equals 기대값은 \"MANAGER\"다. 미관찰·UNKNOWN은 정상값이 아니다.",
+          "oracleRef": {
+            "oracleId": "T20.mrtr-bound-state",
+            "observationNames": [
+              "requeststate-as-approval"
             ]
           }
         },
@@ -35189,6 +36944,173 @@
             }
           },
           "oracleExplanation": "new-rpc-id: /response/body/id의 실제 equals 기대값은 \"T20-new-rpc\"다. 미관찰·UNKNOWN은 정상값이 아니다.",
+          "oracleRef": {
+            "oracleId": "T20.mrtr-bound-state",
+            "observationNames": [
+              "mrtr-state"
+            ]
+          }
+        },
+        {
+          "id": "actual-dispatch-payload",
+          "op": "equals",
+          "source": {
+            "actionId": "continued",
+            "pointer": "/data/transcript/request/body/params/arguments"
+          },
+          "expected": {
+            "intentKind": "COMMAND",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "dispatchPurchaseOrder",
+            "subjectRefs": [
+              {
+                "type": "TradeItem",
+                "id": {
+                  "$alias": "P"
+                }
+              }
+            ],
+            "slots": {
+              "proposalId": {
+                "value": {
+                  "$result": {
+                    "actionId": "proposal",
+                    "pointer": "/response/proposalId"
+                  }
+                },
+                "provenance": "CONTEXT"
+              },
+              "proposalHash": {
+                "value": {
+                  "$result": {
+                    "actionId": "proposal",
+                    "pointer": "/response/proposalHash"
+                  }
+                },
+                "provenance": "CONTEXT"
+              },
+              "channel": {
+                "value": "SYNTHETIC_SUPPLIER",
+                "provenance": "USER"
+              },
+              "externalOperationId": {
+                "value": "T20-state-as-approval-dispatch-external",
+                "provenance": "USER"
+              }
+            },
+            "conditions": [],
+            "evidenceRefs": [],
+            "expectedRevision": {
+              "$result": {
+                "actionId": "proposal",
+                "pointer": "/response/proposalRevision"
+              }
+            },
+            "commandIdempotencyKey": "T20-state-as-approval-dispatch"
+          },
+          "requirementRefs": [
+            "D20"
+          ],
+          "evidenceRefs": [
+            "continued:actual-observation",
+            "continued:source-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "lotId": {
+              "$alias": "L"
+            }
+          },
+          "oracleExplanation": "actual-dispatch-payload: /data/transcript/request/body/params/arguments의 실제 equals 기대값은 {\"intentKind\": \"COMMAND\", \"definitionVersion\": \"definition-v1\", \"capabilityId\": \"dispatchPurchaseOrder\", \"subjectRefs\": [{\"type\": \"TradeItem\", \"id\": {\"$alias\": \"P\"}}], \"slots\": {\"proposalId\": {\"value\": {\"$result\": {\"actionId\": \"proposal\", \"pointer\": \"/response/proposalId\"}}, \"provenance\": \"CONTEXT\"}, \"proposalHash\": {\"value\": {\"$result\": {\"actionId\": \"proposal\", \"pointer\": \"/response/proposalHash\"}}, \"provenance\": \"CONTEXT\"}, \"channel\": {\"value\": \"SYNTHETIC_SUPPLIER\", \"provenance\": \"USER\"}, \"externalOperationId\": {\"value\": \"T20-state-as-approval-dispatch-external\", \"provenance\": \"USER\"}}, \"conditions\": [], \"evidenceRefs\": [], \"expectedRevision\": {\"$result\": {\"actionId\": \"proposal\", \"pointer\": \"/response/proposalRevision\"}}, \"commandIdempotencyKey\": \"T20-state-as-approval-dispatch\"}다. 미관찰·UNKNOWN은 정상값이 아니다.",
+          "oracleRef": {
+            "oracleId": "T20.mrtr-bound-state",
+            "observationNames": [
+              "mrtr-state"
+            ]
+          }
+        },
+        {
+          "id": "actual-issued-state",
+          "op": "sameAs",
+          "source": {
+            "actionId": "continued",
+            "pointer": "/data/transcript/request/body/params/requestState"
+          },
+          "expected": null,
+          "requirementRefs": [
+            "D20"
+          ],
+          "evidenceRefs": [
+            "continued:actual-observation",
+            "continued:source-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "lotId": {
+              "$alias": "L"
+            }
+          },
+          "oracleExplanation": "actual-issued-state: continued의 /data/transcript/request/body/params/requestState와 issued의 /response/body/result/requestState를 같은 scope에서 exact 대조한다.",
+          "oracleRef": {
+            "oracleId": "T20.mrtr-bound-state",
+            "observationNames": [
+              "mrtr-state"
+            ]
+          },
+          "baseline": {
+            "actionId": "issued",
+            "pointer": "/response/body/result/requestState"
+          }
+        },
+        {
+          "id": "matched-channel-input",
+          "op": "equals",
+          "source": {
+            "actionId": "continued",
+            "pointer": "/data/transcript/request/body/params/inputResponses"
+          },
+          "expected": [
+            {
+              "requestId": {
+                "$result": {
+                  "actionId": "issued",
+                  "pointer": "/response/body/result/inputRequests/0/requestId"
+                }
+              },
+              "value": {
+                "channel": "SYNTHETIC_SUPPLIER"
+              }
+            }
+          ],
+          "requirementRefs": [
+            "D20"
+          ],
+          "evidenceRefs": [
+            "continued:actual-observation",
+            "continued:source-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "lotId": {
+              "$alias": "L"
+            }
+          },
+          "oracleExplanation": "matched-channel-input: /data/transcript/request/body/params/inputResponses의 실제 equals 기대값은 [{\"requestId\": {\"$result\": {\"actionId\": \"issued\", \"pointer\": \"/response/body/result/inputRequests/0/requestId\"}}, \"value\": {\"channel\": \"SYNTHETIC_SUPPLIER\"}}]다. 미관찰·UNKNOWN은 정상값이 아니다.",
           "oracleRef": {
             "oracleId": "T20.mrtr-bound-state",
             "observationNames": [
@@ -35495,6 +37417,434 @@
           }
         },
         {
+          "id": "unchanged-purchase-orders",
+          "op": "sameAs",
+          "source": {
+            "actionId": "db-after",
+            "pointer": "/data/rawRows/purchaseOrders"
+          },
+          "expected": null,
+          "requirementRefs": [
+            "D20"
+          ],
+          "evidenceRefs": [
+            "db-after:actual-observation",
+            "db-after:source-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "lotId": {
+              "$alias": "L"
+            }
+          },
+          "oracleExplanation": "unchanged-purchase-orders: db-after의 /data/rawRows/purchaseOrders와 db-before의 /data/rawRows/purchaseOrders를 같은 scope에서 exact 대조한다.",
+          "oracleRef": {
+            "oracleId": "T20.mrtr-bound-state",
+            "observationNames": [
+              "requeststate-as-approval"
+            ]
+          },
+          "baseline": {
+            "actionId": "db-before",
+            "pointer": "/data/rawRows/purchaseOrders"
+          }
+        },
+        {
+          "id": "unchanged-proposals",
+          "op": "sameAs",
+          "source": {
+            "actionId": "db-after",
+            "pointer": "/data/rawRows/proposals"
+          },
+          "expected": null,
+          "requirementRefs": [
+            "D20"
+          ],
+          "evidenceRefs": [
+            "db-after:actual-observation",
+            "db-after:source-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "lotId": {
+              "$alias": "L"
+            }
+          },
+          "oracleExplanation": "unchanged-proposals: db-after의 /data/rawRows/proposals와 db-before의 /data/rawRows/proposals를 같은 scope에서 exact 대조한다.",
+          "oracleRef": {
+            "oracleId": "T20.mrtr-bound-state",
+            "observationNames": [
+              "requeststate-as-approval"
+            ]
+          },
+          "baseline": {
+            "actionId": "db-before",
+            "pointer": "/data/rawRows/proposals"
+          }
+        },
+        {
+          "id": "no-manager-decision-before",
+          "op": "count",
+          "source": {
+            "actionId": "db-before",
+            "pointer": "/data/rawRows/approvals",
+            "where": {
+              "proposalId": {
+                "$result": {
+                  "actionId": "proposal",
+                  "pointer": "/response/proposalId"
+                }
+              }
+            }
+          },
+          "expected": 0,
+          "requirementRefs": [
+            "D20"
+          ],
+          "evidenceRefs": [
+            "db-before:actual-observation",
+            "db-before:source-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "lotId": {
+              "$alias": "L"
+            }
+          },
+          "oracleExplanation": "no-manager-decision-before: /data/rawRows/approvals의 scope·filter를 만족하는 실제 원행은 정확히 0개다.",
+          "oracleRef": {
+            "oracleId": "T20.mrtr-bound-state",
+            "observationNames": [
+              "requeststate-as-approval"
+            ]
+          }
+        },
+        {
+          "id": "no-manager-decision-after",
+          "op": "count",
+          "source": {
+            "actionId": "db-after",
+            "pointer": "/data/rawRows/approvals",
+            "where": {
+              "proposalId": {
+                "$result": {
+                  "actionId": "proposal",
+                  "pointer": "/response/proposalId"
+                }
+              }
+            }
+          },
+          "expected": 0,
+          "requirementRefs": [
+            "D20"
+          ],
+          "evidenceRefs": [
+            "db-after:actual-observation",
+            "db-after:source-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "lotId": {
+              "$alias": "L"
+            }
+          },
+          "oracleExplanation": "no-manager-decision-after: /data/rawRows/approvals의 scope·filter를 만족하는 실제 원행은 정확히 0개다.",
+          "oracleRef": {
+            "oracleId": "T20.mrtr-bound-state",
+            "observationNames": [
+              "requeststate-as-approval"
+            ]
+          }
+        },
+        {
+          "id": "manager-approval-applied",
+          "op": "equals",
+          "source": {
+            "actionId": "approval",
+            "pointer": "/response/outcome"
+          },
+          "expected": "APPLIED",
+          "requirementRefs": [
+            "D20"
+          ],
+          "evidenceRefs": [
+            "approval:actual-observation",
+            "approval:source-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "lotId": {
+              "$alias": "L"
+            }
+          },
+          "oracleExplanation": "manager-approval-applied: /response/outcome의 실제 equals 기대값은 \"APPLIED\"다. 미관찰·UNKNOWN은 정상값이 아니다.",
+          "oracleRef": {
+            "oracleId": "T20.mrtr-bound-state",
+            "observationNames": [
+              "mrtr-state"
+            ]
+          }
+        },
+        {
+          "id": "approved-countercall-applied",
+          "op": "equals",
+          "source": {
+            "actionId": "approved-dispatch",
+            "pointer": "/response/body/result/structuredContent/outcome"
+          },
+          "expected": "ACCEPTED_PENDING_EXTERNAL",
+          "requirementRefs": [
+            "D20"
+          ],
+          "evidenceRefs": [
+            "approved-dispatch:actual-observation",
+            "approved-dispatch:source-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "lotId": {
+              "$alias": "L"
+            }
+          },
+          "oracleExplanation": "approved-countercall-applied: /response/body/result/structuredContent/outcome의 실제 equals 기대값은 \"ACCEPTED_PENDING_EXTERNAL\"다. 미관찰·UNKNOWN은 정상값이 아니다.",
+          "oracleRef": {
+            "oracleId": "T20.mrtr-bound-state",
+            "observationNames": [
+              "mrtr-state"
+            ]
+          }
+        },
+        {
+          "id": "real-manager-decision",
+          "op": "relationSet",
+          "source": {
+            "actionId": "db-positive",
+            "pointer": "/data/rawRows/approvals",
+            "field": [
+              "id",
+              "proposalId",
+              "proposalHash",
+              "proposalRevision",
+              "approverId",
+              "decidedAt",
+              "validUntil",
+              "consumptionPolicy",
+              "decision"
+            ],
+            "where": {
+              "proposalId": {
+                "$result": {
+                  "actionId": "proposal",
+                  "pointer": "/response/proposalId"
+                }
+              }
+            }
+          },
+          "expected": [
+            [
+              {
+                "$result": {
+                  "actionId": "approval",
+                  "pointer": "/response/approvalId"
+                }
+              },
+              {
+                "$result": {
+                  "actionId": "proposal",
+                  "pointer": "/response/proposalId"
+                }
+              },
+              {
+                "$result": {
+                  "actionId": "proposal",
+                  "pointer": "/response/proposalHash"
+                }
+              },
+              {
+                "$result": {
+                  "actionId": "proposal",
+                  "pointer": "/response/proposalRevision"
+                }
+              },
+              {
+                "$alias": "manager"
+              },
+              "2026-10-07T09:00:00Z",
+              "2026-10-08T09:00:00Z",
+              "SINGLE_ORDER_REVISION",
+              "APPROVE"
+            ]
+          ],
+          "requirementRefs": [
+            "D20"
+          ],
+          "evidenceRefs": [
+            "db-positive:actual-observation",
+            "db-positive:source-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "lotId": {
+              "$alias": "L"
+            }
+          },
+          "oracleExplanation": "real-manager-decision: /data/rawRows/approvals의 실제 ['id', 'proposalId', 'proposalHash', 'proposalRevision', 'approverId', 'decidedAt', 'validUntil', 'consumptionPolicy', 'decision']는 고정한 1개 identity/관계와 exact 일치하며 중복·누락을 거부한다.",
+          "oracleRef": {
+            "oracleId": "T20.mrtr-bound-state",
+            "observationNames": [
+              "mrtr-state"
+            ]
+          }
+        },
+        {
+          "id": "approved-countercall-order",
+          "op": "relationSet",
+          "source": {
+            "actionId": "db-positive",
+            "pointer": "/data/rawRows/purchaseOrders",
+            "field": [
+              "id",
+              "proposalId",
+              "proposalHash",
+              "approvalId"
+            ],
+            "where": {
+              "proposalId": {
+                "$result": {
+                  "actionId": "proposal",
+                  "pointer": "/response/proposalId"
+                }
+              }
+            }
+          },
+          "expected": [
+            [
+              {
+                "$result": {
+                  "actionId": "approved-dispatch",
+                  "pointer": "/response/body/result/structuredContent/purchaseOrderId"
+                }
+              },
+              {
+                "$result": {
+                  "actionId": "proposal",
+                  "pointer": "/response/proposalId"
+                }
+              },
+              {
+                "$result": {
+                  "actionId": "proposal",
+                  "pointer": "/response/proposalHash"
+                }
+              },
+              {
+                "$result": {
+                  "actionId": "approval",
+                  "pointer": "/response/approvalId"
+                }
+              }
+            ]
+          ],
+          "requirementRefs": [
+            "D20"
+          ],
+          "evidenceRefs": [
+            "db-positive:actual-observation",
+            "db-positive:source-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "lotId": {
+              "$alias": "L"
+            }
+          },
+          "oracleExplanation": "approved-countercall-order: /data/rawRows/purchaseOrders의 실제 ['id', 'proposalId', 'proposalHash', 'approvalId']는 고정한 1개 identity/관계와 exact 일치하며 중복·누락을 거부한다.",
+          "oracleRef": {
+            "oracleId": "T20.mrtr-bound-state",
+            "observationNames": [
+              "mrtr-state"
+            ]
+          }
+        },
+        {
+          "id": "approved-countercall-effect-once",
+          "op": "count",
+          "source": {
+            "actionId": "db-positive",
+            "pointer": "/data/rawRows/outbox",
+            "where": {
+              "capabilityId": "dispatchPurchaseOrder",
+              "commandKey": "T20-state-as-approval-approved-dispatch"
+            }
+          },
+          "expected": 1,
+          "requirementRefs": [
+            "D20"
+          ],
+          "evidenceRefs": [
+            "db-positive:actual-observation",
+            "db-positive:source-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "lotId": {
+              "$alias": "L"
+            }
+          },
+          "oracleExplanation": "approved-countercall-effect-once: /data/rawRows/outbox의 scope·filter를 만족하는 실제 원행은 정확히 1개다.",
+          "oracleRef": {
+            "oracleId": "T20.mrtr-bound-state",
+            "observationNames": [
+              "mrtr-state"
+            ]
+          }
+        },
+        {
           "id": "issued-raw-method",
           "op": "equals",
           "source": {
@@ -35637,7 +37987,7 @@
             "actionId": "issued",
             "pointer": "/data/transcript/request/headers/Mcp-Name"
           },
-          "expected": "structureIntent",
+          "expected": "dispatchPurchaseOrder",
           "requirementRefs": [
             "D20"
           ],
@@ -35656,7 +38006,7 @@
               "$alias": "L"
             }
           },
-          "oracleExplanation": "issued-raw-Mcp-Name: /data/transcript/request/headers/Mcp-Name의 실제 equals 기대값은 \"structureIntent\"다. 미관찰·UNKNOWN은 정상값이 아니다.",
+          "oracleExplanation": "issued-raw-Mcp-Name: /data/transcript/request/headers/Mcp-Name의 실제 equals 기대값은 \"dispatchPurchaseOrder\"다. 미관찰·UNKNOWN은 정상값이 아니다.",
           "oracleRef": {
             "oracleId": "T20.mrtr-bound-state",
             "observationNames": [
@@ -35923,13 +38273,228 @@
               "mrtr-state"
             ]
           }
+        },
+        {
+          "id": "approved-dispatch-raw-method",
+          "op": "equals",
+          "source": {
+            "actionId": "approved-dispatch",
+            "pointer": "/data/transcript/request/body/method"
+          },
+          "expected": "tools/call",
+          "requirementRefs": [
+            "D20"
+          ],
+          "evidenceRefs": [
+            "approved-dispatch:actual-observation",
+            "approved-dispatch:source-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "lotId": {
+              "$alias": "L"
+            }
+          },
+          "oracleExplanation": "approved-dispatch-raw-method: /data/transcript/request/body/method의 실제 equals 기대값은 \"tools/call\"다. 미관찰·UNKNOWN은 정상값이 아니다.",
+          "oracleRef": {
+            "oracleId": "T20.mrtr-bound-state",
+            "observationNames": [
+              "mrtr-state"
+            ]
+          }
+        },
+        {
+          "id": "approved-dispatch-raw-jsonrpc-id",
+          "op": "equals",
+          "source": {
+            "actionId": "approved-dispatch",
+            "pointer": "/data/transcript/request/body/id"
+          },
+          "expected": "approved-dispatch",
+          "requirementRefs": [
+            "D20"
+          ],
+          "evidenceRefs": [
+            "approved-dispatch:actual-observation",
+            "approved-dispatch:source-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "lotId": {
+              "$alias": "L"
+            }
+          },
+          "oracleExplanation": "approved-dispatch-raw-jsonrpc-id: /data/transcript/request/body/id의 실제 equals 기대값은 \"approved-dispatch\"다. 미관찰·UNKNOWN은 정상값이 아니다.",
+          "oracleRef": {
+            "oracleId": "T20.mrtr-bound-state",
+            "observationNames": [
+              "mrtr-state"
+            ]
+          }
+        },
+        {
+          "id": "approved-dispatch-raw-MCP-Protocol-Version",
+          "op": "equals",
+          "source": {
+            "actionId": "approved-dispatch",
+            "pointer": "/data/transcript/request/headers/MCP-Protocol-Version"
+          },
+          "expected": "2026-07-28",
+          "requirementRefs": [
+            "D20"
+          ],
+          "evidenceRefs": [
+            "approved-dispatch:actual-observation",
+            "approved-dispatch:source-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "lotId": {
+              "$alias": "L"
+            }
+          },
+          "oracleExplanation": "approved-dispatch-raw-MCP-Protocol-Version: /data/transcript/request/headers/MCP-Protocol-Version의 실제 equals 기대값은 \"2026-07-28\"다. 미관찰·UNKNOWN은 정상값이 아니다.",
+          "oracleRef": {
+            "oracleId": "T20.mrtr-bound-state",
+            "observationNames": [
+              "mrtr-state"
+            ]
+          }
+        },
+        {
+          "id": "approved-dispatch-raw-Mcp-Method",
+          "op": "equals",
+          "source": {
+            "actionId": "approved-dispatch",
+            "pointer": "/data/transcript/request/headers/Mcp-Method"
+          },
+          "expected": "tools/call",
+          "requirementRefs": [
+            "D20"
+          ],
+          "evidenceRefs": [
+            "approved-dispatch:actual-observation",
+            "approved-dispatch:source-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "lotId": {
+              "$alias": "L"
+            }
+          },
+          "oracleExplanation": "approved-dispatch-raw-Mcp-Method: /data/transcript/request/headers/Mcp-Method의 실제 equals 기대값은 \"tools/call\"다. 미관찰·UNKNOWN은 정상값이 아니다.",
+          "oracleRef": {
+            "oracleId": "T20.mrtr-bound-state",
+            "observationNames": [
+              "mrtr-state"
+            ]
+          }
+        },
+        {
+          "id": "approved-dispatch-raw-Mcp-Name",
+          "op": "equals",
+          "source": {
+            "actionId": "approved-dispatch",
+            "pointer": "/data/transcript/request/headers/Mcp-Name"
+          },
+          "expected": "dispatchPurchaseOrder",
+          "requirementRefs": [
+            "D20"
+          ],
+          "evidenceRefs": [
+            "approved-dispatch:actual-observation",
+            "approved-dispatch:source-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "lotId": {
+              "$alias": "L"
+            }
+          },
+          "oracleExplanation": "approved-dispatch-raw-Mcp-Name: /data/transcript/request/headers/Mcp-Name의 실제 equals 기대값은 \"dispatchPurchaseOrder\"다. 미관찰·UNKNOWN은 정상값이 아니다.",
+          "oracleRef": {
+            "oracleId": "T20.mrtr-bound-state",
+            "observationNames": [
+              "mrtr-state"
+            ]
+          }
+        },
+        {
+          "id": "approved-dispatch-raw-meta",
+          "op": "equals",
+          "source": {
+            "actionId": "approved-dispatch",
+            "pointer": "/data/transcript/request/body/params/_meta"
+          },
+          "expected": {
+            "io.modelcontextprotocol/protocolVersion": "2026-07-28",
+            "io.modelcontextprotocol/clientInfo": {
+              "name": "ontology-channel-contract",
+              "version": "1.0.0"
+            },
+            "io.modelcontextprotocol/clientCapabilities": {
+              "elicitation": {
+                "form": {}
+              }
+            }
+          },
+          "requirementRefs": [
+            "D20"
+          ],
+          "evidenceRefs": [
+            "approved-dispatch:actual-observation",
+            "approved-dispatch:source-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "lotId": {
+              "$alias": "L"
+            }
+          },
+          "oracleExplanation": "approved-dispatch-raw-meta: /data/transcript/request/body/params/_meta의 실제 equals 기대값은 {\"io.modelcontextprotocol/protocolVersion\": \"2026-07-28\", \"io.modelcontextprotocol/clientInfo\": {\"name\": \"ontology-channel-contract\", \"version\": \"1.0.0\"}, \"io.modelcontextprotocol/clientCapabilities\": {\"elicitation\": {\"form\": {}}}}다. 미관찰·UNKNOWN은 정상값이 아니다.",
+          "oracleRef": {
+            "oracleId": "T20.mrtr-bound-state",
+            "observationNames": [
+              "mrtr-state"
+            ]
+          }
         }
       ],
-      "oracleExplanation": "실제 MRTR state state-as-approval와 금지효과0 — T20.mrtr-bound-state의 named observation을 응답과 독립 원행/host artifact로 검증한다. setup은 실행 coverage가 아니다."
+      "oracleExplanation": "유효한 발주 입력의 state-as-approval가 승인 없이 효과를 만들지 않고 MANAGER 결정 후 실행한다 — T20.mrtr-bound-state의 named observation을 응답과 독립 원행/host artifact로 검증한다. setup은 실행 coverage가 아니다."
     },
     {
       "id": "mrtr-accept-as-approval",
-      "title": "실제 MRTR state accept-as-approval와 금지효과0",
+      "title": "유효한 발주 입력의 accept-as-approval가 승인 없이 효과를 만들지 않고 MANAGER 결정 후 실행한다",
       "fixtureRef": "verification/cases/T20/fixture.json",
       "requiredAdapters": [
         "fixture",
@@ -35943,6 +38508,126 @@
           "kind": "installFixture",
           "evidenceRefs": [
             "setup:fixture-hash-and-alias-map"
+          ]
+        },
+        {
+          "id": "purchase-work",
+          "kind": "query",
+          "actorRef": "reader",
+          "route": "api",
+          "capabilityId": "getWork",
+          "request": {
+            "id": {
+              "$alias": "O1"
+            },
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "lotId": {
+                "$alias": "L"
+              }
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z"
+          },
+          "evidenceRefs": [
+            "purchase-work:actual-response",
+            "purchase-work:wire-or-command"
+          ]
+        },
+        {
+          "id": "proposal",
+          "kind": "invoke",
+          "actorRef": "writer",
+          "route": "api",
+          "capabilityId": "proposePurchase",
+          "request": {
+            "intentKind": "COMMAND",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "proposePurchase",
+            "subjectRefs": [
+              {
+                "type": "TradeItem",
+                "id": {
+                  "$alias": "P"
+                }
+              }
+            ],
+            "slots": {
+              "quantity": {
+                "value": "100",
+                "unit": "BOX",
+                "provenance": "USER"
+              },
+              "price": {
+                "value": "2",
+                "currency": "EUR",
+                "provenance": "USER"
+              },
+              "supplierId": {
+                "value": {
+                  "$alias": "SUP"
+                },
+                "provenance": "CONTEXT"
+              },
+              "destinationId": {
+                "value": {
+                  "$alias": "W"
+                },
+                "provenance": "CONTEXT"
+              },
+              "dueAt": {
+                "value": "2026-10-09T09:00:00Z",
+                "provenance": "USER"
+              },
+              "endpoint": {
+                "value": "ARRIVED",
+                "provenance": "USER"
+              },
+              "quantityMode": {
+                "value": "CUMULATIVE_EVENT",
+                "provenance": "USER"
+              },
+              "ownerId": {
+                "value": {
+                  "$alias": "writer"
+                },
+                "provenance": "CONTEXT"
+              },
+              "supervisorId": {
+                "value": {
+                  "$alias": "supervisor"
+                },
+                "provenance": "CONTEXT"
+              },
+              "workId": {
+                "value": {
+                  "$alias": "O1"
+                },
+                "provenance": "CONTEXT"
+              },
+              "goalVersionId": {
+                "value": {
+                  "$result": {
+                    "actionId": "purchase-work",
+                    "pointer": "/response/data/goal/id"
+                  }
+                },
+                "provenance": "CONTEXT"
+              }
+            },
+            "conditions": [],
+            "evidenceRefs": [],
+            "expectedRevision": 1,
+            "commandIdempotencyKey": "T20-accept-as-approval-proposal"
+          },
+          "evidenceRefs": [
+            "proposal:actual-response",
+            "proposal:wire-or-command"
           ]
         },
         {
@@ -36008,7 +38693,9 @@
               "audit",
               "outbox",
               "commandResults",
-              "claims"
+              "claims",
+              "purchaseOrders",
+              "proposals"
             ]
           },
           "evidenceRefs": [
@@ -36031,18 +38718,18 @@
               "Mcp-Method": "tools/call",
               "Content-Type": "application/json",
               "Origin": "https://isolated-client.example.invalid",
-              "Mcp-Name": "structureIntent"
+              "Mcp-Name": "dispatchPurchaseOrder"
             },
             "body": {
               "jsonrpc": "2.0",
               "id": "issued",
               "method": "tools/call",
               "params": {
-                "name": "structureIntent",
+                "name": "dispatchPurchaseOrder",
                 "arguments": {
                   "intentKind": "COMMAND",
                   "definitionVersion": "definition-v1",
-                  "capabilityId": "createDraft",
+                  "capabilityId": "dispatchPurchaseOrder",
                   "subjectRefs": [
                     {
                       "type": "TradeItem",
@@ -36052,29 +38739,38 @@
                     }
                   ],
                   "slots": {
-                    "quantity": {
-                      "value": "100",
-                      "unit": "BOX",
-                      "provenance": "USER"
-                    },
-                    "dueAt": {
-                      "value": "2026-10-09T09:00:00Z",
-                      "provenance": "USER"
-                    },
-                    "endpoint": {
-                      "value": "ARRIVED",
+                    "proposalId": {
+                      "value": {
+                        "$result": {
+                          "actionId": "proposal",
+                          "pointer": "/response/proposalId"
+                        }
+                      },
                       "provenance": "CONTEXT"
                     },
-                    "quantityMode": {
-                      "value": "CUMULATIVE_EVENT",
-                      "provenance": "APPROVED_DEFAULT"
+                    "proposalHash": {
+                      "value": {
+                        "$result": {
+                          "actionId": "proposal",
+                          "pointer": "/response/proposalHash"
+                        }
+                      },
+                      "provenance": "CONTEXT"
+                    },
+                    "externalOperationId": {
+                      "value": "T20-accept-as-approval-dispatch-external",
+                      "provenance": "USER"
                     }
                   },
                   "conditions": [],
                   "evidenceRefs": [],
-                  "conversationRequestId": "T20-input",
-                  "originalTextRef": "user-input",
-                  "contextRef": "scoped-conversation"
+                  "expectedRevision": {
+                    "$result": {
+                      "actionId": "proposal",
+                      "pointer": "/response/proposalRevision"
+                    }
+                  },
+                  "commandIdempotencyKey": "T20-accept-as-approval-dispatch"
                 },
                 "_meta": {
                   "io.modelcontextprotocol/protocolVersion": "2026-07-28",
@@ -36123,7 +38819,7 @@
                 "arguments": {
                   "intentKind": "COMMAND",
                   "definitionVersion": "definition-v1",
-                  "capabilityId": "createDraft",
+                  "capabilityId": "dispatchPurchaseOrder",
                   "subjectRefs": [
                     {
                       "type": "TradeItem",
@@ -36133,36 +38829,42 @@
                     }
                   ],
                   "slots": {
-                    "quantity": {
-                      "value": "100",
-                      "unit": "BOX",
-                      "provenance": "USER"
-                    },
-                    "dueAt": {
-                      "value": "2026-10-09T09:00:00Z",
-                      "provenance": "USER"
-                    },
-                    "endpoint": {
-                      "value": "ARRIVED",
+                    "proposalId": {
+                      "value": {
+                        "$result": {
+                          "actionId": "proposal",
+                          "pointer": "/response/proposalId"
+                        }
+                      },
                       "provenance": "CONTEXT"
                     },
-                    "quantityMode": {
-                      "value": "CUMULATIVE_EVENT",
-                      "provenance": "APPROVED_DEFAULT"
-                    },
-                    "destination": {
+                    "proposalHash": {
                       "value": {
-                        "$alias": "W"
+                        "$result": {
+                          "actionId": "proposal",
+                          "pointer": "/response/proposalHash"
+                        }
                       },
-                      "type": "Place",
+                      "provenance": "CONTEXT"
+                    },
+                    "channel": {
+                      "value": "SYNTHETIC_SUPPLIER",
+                      "provenance": "USER"
+                    },
+                    "externalOperationId": {
+                      "value": "T20-accept-as-approval-dispatch-external",
                       "provenance": "USER"
                     }
                   },
                   "conditions": [],
                   "evidenceRefs": [],
-                  "conversationRequestId": "T20-input",
-                  "originalTextRef": "user-input",
-                  "contextRef": "scoped-conversation"
+                  "expectedRevision": {
+                    "$result": {
+                      "actionId": "proposal",
+                      "pointer": "/response/proposalRevision"
+                    }
+                  },
+                  "commandIdempotencyKey": "T20-accept-as-approval-dispatch"
                 },
                 "requestState": {
                   "$result": {
@@ -36178,7 +38880,10 @@
                         "pointer": "/response/body/result/inputRequests/0/requestId"
                       }
                     },
-                    "value": "accept"
+                    "value": {
+                      "channel": "SYNTHETIC_SUPPLIER"
+                    },
+                    "action": "accept"
                   }
                 ],
                 "_meta": {
@@ -36266,13 +38971,265 @@
               "audit",
               "outbox",
               "commandResults",
-              "claims"
+              "claims",
+              "purchaseOrders",
+              "proposals"
             ]
           },
           "evidenceRefs": [
             "db-after:raw-rows",
             "db-after:source-query",
             "db-after:snapshot"
+          ]
+        },
+        {
+          "id": "approval",
+          "kind": "invoke",
+          "actorRef": "manager",
+          "route": "api",
+          "capabilityId": "approvePurchase",
+          "request": {
+            "intentKind": "COMMAND",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "approvePurchase",
+            "subjectRefs": [
+              {
+                "type": "TradeItem",
+                "id": {
+                  "$alias": "P"
+                }
+              }
+            ],
+            "slots": {
+              "proposalId": {
+                "value": {
+                  "$result": {
+                    "actionId": "proposal",
+                    "pointer": "/response/proposalId"
+                  }
+                },
+                "provenance": "CONTEXT"
+              },
+              "proposalHash": {
+                "value": {
+                  "$result": {
+                    "actionId": "proposal",
+                    "pointer": "/response/proposalHash"
+                  }
+                },
+                "provenance": "CONTEXT"
+              },
+              "decision": {
+                "value": "APPROVE",
+                "provenance": "USER"
+              },
+              "decidedAt": {
+                "value": "2026-10-07T09:00:00Z",
+                "provenance": "USER"
+              },
+              "validUntil": {
+                "value": "2026-10-08T09:00:00Z",
+                "provenance": "USER"
+              },
+              "consumptionPolicy": {
+                "value": "SINGLE_ORDER_REVISION",
+                "provenance": "USER"
+              },
+              "conditions": {
+                "value": [],
+                "provenance": "USER"
+              }
+            },
+            "conditions": [],
+            "evidenceRefs": [],
+            "expectedRevision": {
+              "$result": {
+                "actionId": "proposal",
+                "pointer": "/response/proposalRevision"
+              }
+            },
+            "commandIdempotencyKey": "T20-accept-as-approval-manager"
+          },
+          "evidenceRefs": [
+            "approval:actual-response",
+            "approval:wire-or-command"
+          ]
+        },
+        {
+          "id": "approved-dispatch",
+          "kind": "invoke",
+          "actorRef": "writer",
+          "route": "wire",
+          "protocolOperation": "tools/call",
+          "request": {
+            "transport": "streamable-http",
+            "httpMethod": "POST",
+            "headers": {
+              "MCP-Protocol-Version": "2026-07-28",
+              "Mcp-Method": "tools/call",
+              "Content-Type": "application/json",
+              "Origin": "https://isolated-client.example.invalid",
+              "Mcp-Name": "dispatchPurchaseOrder"
+            },
+            "body": {
+              "jsonrpc": "2.0",
+              "id": "approved-dispatch",
+              "method": "tools/call",
+              "params": {
+                "name": "dispatchPurchaseOrder",
+                "arguments": {
+                  "intentKind": "COMMAND",
+                  "definitionVersion": "definition-v1",
+                  "capabilityId": "dispatchPurchaseOrder",
+                  "subjectRefs": [
+                    {
+                      "type": "TradeItem",
+                      "id": {
+                        "$alias": "P"
+                      }
+                    }
+                  ],
+                  "slots": {
+                    "proposalId": {
+                      "value": {
+                        "$result": {
+                          "actionId": "proposal",
+                          "pointer": "/response/proposalId"
+                        }
+                      },
+                      "provenance": "CONTEXT"
+                    },
+                    "proposalHash": {
+                      "value": {
+                        "$result": {
+                          "actionId": "proposal",
+                          "pointer": "/response/proposalHash"
+                        }
+                      },
+                      "provenance": "CONTEXT"
+                    },
+                    "channel": {
+                      "value": "SYNTHETIC_SUPPLIER",
+                      "provenance": "USER"
+                    },
+                    "externalOperationId": {
+                      "value": "T20-accept-as-approval-dispatch-external",
+                      "provenance": "USER"
+                    },
+                    "approvalId": {
+                      "value": {
+                        "$result": {
+                          "actionId": "approval",
+                          "pointer": "/response/approvalId"
+                        }
+                      },
+                      "provenance": "CONTEXT"
+                    }
+                  },
+                  "conditions": [],
+                  "evidenceRefs": [],
+                  "expectedRevision": {
+                    "$result": {
+                      "actionId": "proposal",
+                      "pointer": "/response/proposalRevision"
+                    }
+                  },
+                  "commandIdempotencyKey": "T20-accept-as-approval-approved-dispatch"
+                },
+                "_meta": {
+                  "io.modelcontextprotocol/protocolVersion": "2026-07-28",
+                  "io.modelcontextprotocol/clientInfo": {
+                    "name": "ontology-channel-contract",
+                    "version": "1.0.0"
+                  },
+                  "io.modelcontextprotocol/clientCapabilities": {
+                    "elicitation": {
+                      "form": {}
+                    }
+                  }
+                }
+              }
+            },
+            "credentialProfileRef": "writer"
+          },
+          "evidenceRefs": [
+            "approved-dispatch:redacted-raw-wire",
+            "approved-dispatch:authenticated-context",
+            "approved-dispatch:server-response"
+          ]
+        },
+        {
+          "id": "positive-inventory",
+          "kind": "query",
+          "actorRef": "reader",
+          "route": "api",
+          "capabilityId": "getInventory",
+          "request": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "lotId": {
+                "$alias": "L"
+              }
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z"
+          },
+          "evidenceRefs": [
+            "positive-inventory:actual-response",
+            "positive-inventory:wire-or-command"
+          ]
+        },
+        {
+          "id": "db-positive",
+          "kind": "observe",
+          "observation": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "lotId": {
+                "$alias": "L"
+              }
+            },
+            "snapshotRef": {
+              "$result": {
+                "actionId": "positive-inventory",
+                "pointer": "/response/snapshotRevision"
+              }
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z",
+            "sources": [
+              "segments",
+              "movements",
+              "allocations",
+              "approvals",
+              "works",
+              "goals",
+              "assessments",
+              "obligations",
+              "evidenceLinks",
+              "relations",
+              "audit",
+              "outbox",
+              "commandResults",
+              "claims",
+              "purchaseOrders",
+              "proposals"
+            ]
+          },
+          "evidenceRefs": [
+            "db-positive:raw-rows",
+            "db-positive:source-query",
+            "db-positive:snapshot"
           ]
         }
       ],
@@ -36318,7 +39275,7 @@
             "actionId": "continued",
             "pointer": "/response/body/result/structuredContent/outcome"
           },
-          "expected": "REJECTED",
+          "expected": "WAITING_APPROVAL",
           "requirementRefs": [
             "D20"
           ],
@@ -36337,11 +39294,79 @@
               "$alias": "L"
             }
           },
-          "oracleExplanation": "continued-outcome: /response/body/result/structuredContent/outcome의 실제 equals 기대값은 \"REJECTED\"다. 미관찰·UNKNOWN은 정상값이 아니다.",
+          "oracleExplanation": "continued-outcome: /response/body/result/structuredContent/outcome의 실제 equals 기대값은 \"WAITING_APPROVAL\"다. 미관찰·UNKNOWN은 정상값이 아니다.",
           "oracleRef": {
             "oracleId": "T20.mrtr-bound-state",
             "observationNames": [
-              "mrtr-state"
+              "accept-string-as-approval"
+            ]
+          }
+        },
+        {
+          "id": "specific-manager-approval-missing",
+          "op": "equals",
+          "source": {
+            "actionId": "continued",
+            "pointer": "/response/body/result/structuredContent/error/code"
+          },
+          "expected": "APPROVAL_REQUIRED",
+          "requirementRefs": [
+            "D20"
+          ],
+          "evidenceRefs": [
+            "continued:actual-observation",
+            "continued:source-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "lotId": {
+              "$alias": "L"
+            }
+          },
+          "oracleExplanation": "specific-manager-approval-missing: /response/body/result/structuredContent/error/code의 실제 equals 기대값은 \"APPROVAL_REQUIRED\"다. 미관찰·UNKNOWN은 정상값이 아니다.",
+          "oracleRef": {
+            "oracleId": "T20.mrtr-bound-state",
+            "observationNames": [
+              "accept-string-as-approval"
+            ]
+          }
+        },
+        {
+          "id": "required-decision-role",
+          "op": "equals",
+          "source": {
+            "actionId": "continued",
+            "pointer": "/response/body/result/structuredContent/error/requiredRole"
+          },
+          "expected": "MANAGER",
+          "requirementRefs": [
+            "D20"
+          ],
+          "evidenceRefs": [
+            "continued:actual-observation",
+            "continued:source-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "lotId": {
+              "$alias": "L"
+            }
+          },
+          "oracleExplanation": "required-decision-role: /response/body/result/structuredContent/error/requiredRole의 실제 equals 기대값은 \"MANAGER\"다. 미관찰·UNKNOWN은 정상값이 아니다.",
+          "oracleRef": {
+            "oracleId": "T20.mrtr-bound-state",
+            "observationNames": [
+              "accept-string-as-approval"
             ]
           }
         },
@@ -36372,6 +39397,174 @@
             }
           },
           "oracleExplanation": "new-rpc-id: /response/body/id의 실제 equals 기대값은 \"T20-new-rpc\"다. 미관찰·UNKNOWN은 정상값이 아니다.",
+          "oracleRef": {
+            "oracleId": "T20.mrtr-bound-state",
+            "observationNames": [
+              "mrtr-state"
+            ]
+          }
+        },
+        {
+          "id": "actual-dispatch-payload",
+          "op": "equals",
+          "source": {
+            "actionId": "continued",
+            "pointer": "/data/transcript/request/body/params/arguments"
+          },
+          "expected": {
+            "intentKind": "COMMAND",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "dispatchPurchaseOrder",
+            "subjectRefs": [
+              {
+                "type": "TradeItem",
+                "id": {
+                  "$alias": "P"
+                }
+              }
+            ],
+            "slots": {
+              "proposalId": {
+                "value": {
+                  "$result": {
+                    "actionId": "proposal",
+                    "pointer": "/response/proposalId"
+                  }
+                },
+                "provenance": "CONTEXT"
+              },
+              "proposalHash": {
+                "value": {
+                  "$result": {
+                    "actionId": "proposal",
+                    "pointer": "/response/proposalHash"
+                  }
+                },
+                "provenance": "CONTEXT"
+              },
+              "channel": {
+                "value": "SYNTHETIC_SUPPLIER",
+                "provenance": "USER"
+              },
+              "externalOperationId": {
+                "value": "T20-accept-as-approval-dispatch-external",
+                "provenance": "USER"
+              }
+            },
+            "conditions": [],
+            "evidenceRefs": [],
+            "expectedRevision": {
+              "$result": {
+                "actionId": "proposal",
+                "pointer": "/response/proposalRevision"
+              }
+            },
+            "commandIdempotencyKey": "T20-accept-as-approval-dispatch"
+          },
+          "requirementRefs": [
+            "D20"
+          ],
+          "evidenceRefs": [
+            "continued:actual-observation",
+            "continued:source-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "lotId": {
+              "$alias": "L"
+            }
+          },
+          "oracleExplanation": "actual-dispatch-payload: /data/transcript/request/body/params/arguments의 실제 equals 기대값은 {\"intentKind\": \"COMMAND\", \"definitionVersion\": \"definition-v1\", \"capabilityId\": \"dispatchPurchaseOrder\", \"subjectRefs\": [{\"type\": \"TradeItem\", \"id\": {\"$alias\": \"P\"}}], \"slots\": {\"proposalId\": {\"value\": {\"$result\": {\"actionId\": \"proposal\", \"pointer\": \"/response/proposalId\"}}, \"provenance\": \"CONTEXT\"}, \"proposalHash\": {\"value\": {\"$result\": {\"actionId\": \"proposal\", \"pointer\": \"/response/proposalHash\"}}, \"provenance\": \"CONTEXT\"}, \"channel\": {\"value\": \"SYNTHETIC_SUPPLIER\", \"provenance\": \"USER\"}, \"externalOperationId\": {\"value\": \"T20-accept-as-approval-dispatch-external\", \"provenance\": \"USER\"}}, \"conditions\": [], \"evidenceRefs\": [], \"expectedRevision\": {\"$result\": {\"actionId\": \"proposal\", \"pointer\": \"/response/proposalRevision\"}}, \"commandIdempotencyKey\": \"T20-accept-as-approval-dispatch\"}다. 미관찰·UNKNOWN은 정상값이 아니다.",
+          "oracleRef": {
+            "oracleId": "T20.mrtr-bound-state",
+            "observationNames": [
+              "mrtr-state"
+            ]
+          }
+        },
+        {
+          "id": "actual-issued-state",
+          "op": "sameAs",
+          "source": {
+            "actionId": "continued",
+            "pointer": "/data/transcript/request/body/params/requestState"
+          },
+          "expected": null,
+          "requirementRefs": [
+            "D20"
+          ],
+          "evidenceRefs": [
+            "continued:actual-observation",
+            "continued:source-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "lotId": {
+              "$alias": "L"
+            }
+          },
+          "oracleExplanation": "actual-issued-state: continued의 /data/transcript/request/body/params/requestState와 issued의 /response/body/result/requestState를 같은 scope에서 exact 대조한다.",
+          "oracleRef": {
+            "oracleId": "T20.mrtr-bound-state",
+            "observationNames": [
+              "mrtr-state"
+            ]
+          },
+          "baseline": {
+            "actionId": "issued",
+            "pointer": "/response/body/result/requestState"
+          }
+        },
+        {
+          "id": "matched-channel-input",
+          "op": "equals",
+          "source": {
+            "actionId": "continued",
+            "pointer": "/data/transcript/request/body/params/inputResponses"
+          },
+          "expected": [
+            {
+              "requestId": {
+                "$result": {
+                  "actionId": "issued",
+                  "pointer": "/response/body/result/inputRequests/0/requestId"
+                }
+              },
+              "value": {
+                "channel": "SYNTHETIC_SUPPLIER"
+              },
+              "action": "accept"
+            }
+          ],
+          "requirementRefs": [
+            "D20"
+          ],
+          "evidenceRefs": [
+            "continued:actual-observation",
+            "continued:source-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "lotId": {
+              "$alias": "L"
+            }
+          },
+          "oracleExplanation": "matched-channel-input: /data/transcript/request/body/params/inputResponses의 실제 equals 기대값은 [{\"requestId\": {\"$result\": {\"actionId\": \"issued\", \"pointer\": \"/response/body/result/inputRequests/0/requestId\"}}, \"value\": {\"channel\": \"SYNTHETIC_SUPPLIER\"}, \"action\": \"accept\"}]다. 미관찰·UNKNOWN은 정상값이 아니다.",
           "oracleRef": {
             "oracleId": "T20.mrtr-bound-state",
             "observationNames": [
@@ -36678,6 +39871,434 @@
           }
         },
         {
+          "id": "unchanged-purchase-orders",
+          "op": "sameAs",
+          "source": {
+            "actionId": "db-after",
+            "pointer": "/data/rawRows/purchaseOrders"
+          },
+          "expected": null,
+          "requirementRefs": [
+            "D20"
+          ],
+          "evidenceRefs": [
+            "db-after:actual-observation",
+            "db-after:source-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "lotId": {
+              "$alias": "L"
+            }
+          },
+          "oracleExplanation": "unchanged-purchase-orders: db-after의 /data/rawRows/purchaseOrders와 db-before의 /data/rawRows/purchaseOrders를 같은 scope에서 exact 대조한다.",
+          "oracleRef": {
+            "oracleId": "T20.mrtr-bound-state",
+            "observationNames": [
+              "accept-string-as-approval"
+            ]
+          },
+          "baseline": {
+            "actionId": "db-before",
+            "pointer": "/data/rawRows/purchaseOrders"
+          }
+        },
+        {
+          "id": "unchanged-proposals",
+          "op": "sameAs",
+          "source": {
+            "actionId": "db-after",
+            "pointer": "/data/rawRows/proposals"
+          },
+          "expected": null,
+          "requirementRefs": [
+            "D20"
+          ],
+          "evidenceRefs": [
+            "db-after:actual-observation",
+            "db-after:source-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "lotId": {
+              "$alias": "L"
+            }
+          },
+          "oracleExplanation": "unchanged-proposals: db-after의 /data/rawRows/proposals와 db-before의 /data/rawRows/proposals를 같은 scope에서 exact 대조한다.",
+          "oracleRef": {
+            "oracleId": "T20.mrtr-bound-state",
+            "observationNames": [
+              "accept-string-as-approval"
+            ]
+          },
+          "baseline": {
+            "actionId": "db-before",
+            "pointer": "/data/rawRows/proposals"
+          }
+        },
+        {
+          "id": "no-manager-decision-before",
+          "op": "count",
+          "source": {
+            "actionId": "db-before",
+            "pointer": "/data/rawRows/approvals",
+            "where": {
+              "proposalId": {
+                "$result": {
+                  "actionId": "proposal",
+                  "pointer": "/response/proposalId"
+                }
+              }
+            }
+          },
+          "expected": 0,
+          "requirementRefs": [
+            "D20"
+          ],
+          "evidenceRefs": [
+            "db-before:actual-observation",
+            "db-before:source-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "lotId": {
+              "$alias": "L"
+            }
+          },
+          "oracleExplanation": "no-manager-decision-before: /data/rawRows/approvals의 scope·filter를 만족하는 실제 원행은 정확히 0개다.",
+          "oracleRef": {
+            "oracleId": "T20.mrtr-bound-state",
+            "observationNames": [
+              "accept-string-as-approval"
+            ]
+          }
+        },
+        {
+          "id": "no-manager-decision-after",
+          "op": "count",
+          "source": {
+            "actionId": "db-after",
+            "pointer": "/data/rawRows/approvals",
+            "where": {
+              "proposalId": {
+                "$result": {
+                  "actionId": "proposal",
+                  "pointer": "/response/proposalId"
+                }
+              }
+            }
+          },
+          "expected": 0,
+          "requirementRefs": [
+            "D20"
+          ],
+          "evidenceRefs": [
+            "db-after:actual-observation",
+            "db-after:source-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "lotId": {
+              "$alias": "L"
+            }
+          },
+          "oracleExplanation": "no-manager-decision-after: /data/rawRows/approvals의 scope·filter를 만족하는 실제 원행은 정확히 0개다.",
+          "oracleRef": {
+            "oracleId": "T20.mrtr-bound-state",
+            "observationNames": [
+              "accept-string-as-approval"
+            ]
+          }
+        },
+        {
+          "id": "manager-approval-applied",
+          "op": "equals",
+          "source": {
+            "actionId": "approval",
+            "pointer": "/response/outcome"
+          },
+          "expected": "APPLIED",
+          "requirementRefs": [
+            "D20"
+          ],
+          "evidenceRefs": [
+            "approval:actual-observation",
+            "approval:source-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "lotId": {
+              "$alias": "L"
+            }
+          },
+          "oracleExplanation": "manager-approval-applied: /response/outcome의 실제 equals 기대값은 \"APPLIED\"다. 미관찰·UNKNOWN은 정상값이 아니다.",
+          "oracleRef": {
+            "oracleId": "T20.mrtr-bound-state",
+            "observationNames": [
+              "mrtr-state"
+            ]
+          }
+        },
+        {
+          "id": "approved-countercall-applied",
+          "op": "equals",
+          "source": {
+            "actionId": "approved-dispatch",
+            "pointer": "/response/body/result/structuredContent/outcome"
+          },
+          "expected": "ACCEPTED_PENDING_EXTERNAL",
+          "requirementRefs": [
+            "D20"
+          ],
+          "evidenceRefs": [
+            "approved-dispatch:actual-observation",
+            "approved-dispatch:source-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "lotId": {
+              "$alias": "L"
+            }
+          },
+          "oracleExplanation": "approved-countercall-applied: /response/body/result/structuredContent/outcome의 실제 equals 기대값은 \"ACCEPTED_PENDING_EXTERNAL\"다. 미관찰·UNKNOWN은 정상값이 아니다.",
+          "oracleRef": {
+            "oracleId": "T20.mrtr-bound-state",
+            "observationNames": [
+              "mrtr-state"
+            ]
+          }
+        },
+        {
+          "id": "real-manager-decision",
+          "op": "relationSet",
+          "source": {
+            "actionId": "db-positive",
+            "pointer": "/data/rawRows/approvals",
+            "field": [
+              "id",
+              "proposalId",
+              "proposalHash",
+              "proposalRevision",
+              "approverId",
+              "decidedAt",
+              "validUntil",
+              "consumptionPolicy",
+              "decision"
+            ],
+            "where": {
+              "proposalId": {
+                "$result": {
+                  "actionId": "proposal",
+                  "pointer": "/response/proposalId"
+                }
+              }
+            }
+          },
+          "expected": [
+            [
+              {
+                "$result": {
+                  "actionId": "approval",
+                  "pointer": "/response/approvalId"
+                }
+              },
+              {
+                "$result": {
+                  "actionId": "proposal",
+                  "pointer": "/response/proposalId"
+                }
+              },
+              {
+                "$result": {
+                  "actionId": "proposal",
+                  "pointer": "/response/proposalHash"
+                }
+              },
+              {
+                "$result": {
+                  "actionId": "proposal",
+                  "pointer": "/response/proposalRevision"
+                }
+              },
+              {
+                "$alias": "manager"
+              },
+              "2026-10-07T09:00:00Z",
+              "2026-10-08T09:00:00Z",
+              "SINGLE_ORDER_REVISION",
+              "APPROVE"
+            ]
+          ],
+          "requirementRefs": [
+            "D20"
+          ],
+          "evidenceRefs": [
+            "db-positive:actual-observation",
+            "db-positive:source-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "lotId": {
+              "$alias": "L"
+            }
+          },
+          "oracleExplanation": "real-manager-decision: /data/rawRows/approvals의 실제 ['id', 'proposalId', 'proposalHash', 'proposalRevision', 'approverId', 'decidedAt', 'validUntil', 'consumptionPolicy', 'decision']는 고정한 1개 identity/관계와 exact 일치하며 중복·누락을 거부한다.",
+          "oracleRef": {
+            "oracleId": "T20.mrtr-bound-state",
+            "observationNames": [
+              "mrtr-state"
+            ]
+          }
+        },
+        {
+          "id": "approved-countercall-order",
+          "op": "relationSet",
+          "source": {
+            "actionId": "db-positive",
+            "pointer": "/data/rawRows/purchaseOrders",
+            "field": [
+              "id",
+              "proposalId",
+              "proposalHash",
+              "approvalId"
+            ],
+            "where": {
+              "proposalId": {
+                "$result": {
+                  "actionId": "proposal",
+                  "pointer": "/response/proposalId"
+                }
+              }
+            }
+          },
+          "expected": [
+            [
+              {
+                "$result": {
+                  "actionId": "approved-dispatch",
+                  "pointer": "/response/body/result/structuredContent/purchaseOrderId"
+                }
+              },
+              {
+                "$result": {
+                  "actionId": "proposal",
+                  "pointer": "/response/proposalId"
+                }
+              },
+              {
+                "$result": {
+                  "actionId": "proposal",
+                  "pointer": "/response/proposalHash"
+                }
+              },
+              {
+                "$result": {
+                  "actionId": "approval",
+                  "pointer": "/response/approvalId"
+                }
+              }
+            ]
+          ],
+          "requirementRefs": [
+            "D20"
+          ],
+          "evidenceRefs": [
+            "db-positive:actual-observation",
+            "db-positive:source-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "lotId": {
+              "$alias": "L"
+            }
+          },
+          "oracleExplanation": "approved-countercall-order: /data/rawRows/purchaseOrders의 실제 ['id', 'proposalId', 'proposalHash', 'approvalId']는 고정한 1개 identity/관계와 exact 일치하며 중복·누락을 거부한다.",
+          "oracleRef": {
+            "oracleId": "T20.mrtr-bound-state",
+            "observationNames": [
+              "mrtr-state"
+            ]
+          }
+        },
+        {
+          "id": "approved-countercall-effect-once",
+          "op": "count",
+          "source": {
+            "actionId": "db-positive",
+            "pointer": "/data/rawRows/outbox",
+            "where": {
+              "capabilityId": "dispatchPurchaseOrder",
+              "commandKey": "T20-accept-as-approval-approved-dispatch"
+            }
+          },
+          "expected": 1,
+          "requirementRefs": [
+            "D20"
+          ],
+          "evidenceRefs": [
+            "db-positive:actual-observation",
+            "db-positive:source-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "lotId": {
+              "$alias": "L"
+            }
+          },
+          "oracleExplanation": "approved-countercall-effect-once: /data/rawRows/outbox의 scope·filter를 만족하는 실제 원행은 정확히 1개다.",
+          "oracleRef": {
+            "oracleId": "T20.mrtr-bound-state",
+            "observationNames": [
+              "mrtr-state"
+            ]
+          }
+        },
+        {
           "id": "issued-raw-method",
           "op": "equals",
           "source": {
@@ -36820,7 +40441,7 @@
             "actionId": "issued",
             "pointer": "/data/transcript/request/headers/Mcp-Name"
           },
-          "expected": "structureIntent",
+          "expected": "dispatchPurchaseOrder",
           "requirementRefs": [
             "D20"
           ],
@@ -36839,7 +40460,7 @@
               "$alias": "L"
             }
           },
-          "oracleExplanation": "issued-raw-Mcp-Name: /data/transcript/request/headers/Mcp-Name의 실제 equals 기대값은 \"structureIntent\"다. 미관찰·UNKNOWN은 정상값이 아니다.",
+          "oracleExplanation": "issued-raw-Mcp-Name: /data/transcript/request/headers/Mcp-Name의 실제 equals 기대값은 \"dispatchPurchaseOrder\"다. 미관찰·UNKNOWN은 정상값이 아니다.",
           "oracleRef": {
             "oracleId": "T20.mrtr-bound-state",
             "observationNames": [
@@ -37106,9 +40727,224 @@
               "mrtr-state"
             ]
           }
+        },
+        {
+          "id": "approved-dispatch-raw-method",
+          "op": "equals",
+          "source": {
+            "actionId": "approved-dispatch",
+            "pointer": "/data/transcript/request/body/method"
+          },
+          "expected": "tools/call",
+          "requirementRefs": [
+            "D20"
+          ],
+          "evidenceRefs": [
+            "approved-dispatch:actual-observation",
+            "approved-dispatch:source-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "lotId": {
+              "$alias": "L"
+            }
+          },
+          "oracleExplanation": "approved-dispatch-raw-method: /data/transcript/request/body/method의 실제 equals 기대값은 \"tools/call\"다. 미관찰·UNKNOWN은 정상값이 아니다.",
+          "oracleRef": {
+            "oracleId": "T20.mrtr-bound-state",
+            "observationNames": [
+              "mrtr-state"
+            ]
+          }
+        },
+        {
+          "id": "approved-dispatch-raw-jsonrpc-id",
+          "op": "equals",
+          "source": {
+            "actionId": "approved-dispatch",
+            "pointer": "/data/transcript/request/body/id"
+          },
+          "expected": "approved-dispatch",
+          "requirementRefs": [
+            "D20"
+          ],
+          "evidenceRefs": [
+            "approved-dispatch:actual-observation",
+            "approved-dispatch:source-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "lotId": {
+              "$alias": "L"
+            }
+          },
+          "oracleExplanation": "approved-dispatch-raw-jsonrpc-id: /data/transcript/request/body/id의 실제 equals 기대값은 \"approved-dispatch\"다. 미관찰·UNKNOWN은 정상값이 아니다.",
+          "oracleRef": {
+            "oracleId": "T20.mrtr-bound-state",
+            "observationNames": [
+              "mrtr-state"
+            ]
+          }
+        },
+        {
+          "id": "approved-dispatch-raw-MCP-Protocol-Version",
+          "op": "equals",
+          "source": {
+            "actionId": "approved-dispatch",
+            "pointer": "/data/transcript/request/headers/MCP-Protocol-Version"
+          },
+          "expected": "2026-07-28",
+          "requirementRefs": [
+            "D20"
+          ],
+          "evidenceRefs": [
+            "approved-dispatch:actual-observation",
+            "approved-dispatch:source-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "lotId": {
+              "$alias": "L"
+            }
+          },
+          "oracleExplanation": "approved-dispatch-raw-MCP-Protocol-Version: /data/transcript/request/headers/MCP-Protocol-Version의 실제 equals 기대값은 \"2026-07-28\"다. 미관찰·UNKNOWN은 정상값이 아니다.",
+          "oracleRef": {
+            "oracleId": "T20.mrtr-bound-state",
+            "observationNames": [
+              "mrtr-state"
+            ]
+          }
+        },
+        {
+          "id": "approved-dispatch-raw-Mcp-Method",
+          "op": "equals",
+          "source": {
+            "actionId": "approved-dispatch",
+            "pointer": "/data/transcript/request/headers/Mcp-Method"
+          },
+          "expected": "tools/call",
+          "requirementRefs": [
+            "D20"
+          ],
+          "evidenceRefs": [
+            "approved-dispatch:actual-observation",
+            "approved-dispatch:source-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "lotId": {
+              "$alias": "L"
+            }
+          },
+          "oracleExplanation": "approved-dispatch-raw-Mcp-Method: /data/transcript/request/headers/Mcp-Method의 실제 equals 기대값은 \"tools/call\"다. 미관찰·UNKNOWN은 정상값이 아니다.",
+          "oracleRef": {
+            "oracleId": "T20.mrtr-bound-state",
+            "observationNames": [
+              "mrtr-state"
+            ]
+          }
+        },
+        {
+          "id": "approved-dispatch-raw-Mcp-Name",
+          "op": "equals",
+          "source": {
+            "actionId": "approved-dispatch",
+            "pointer": "/data/transcript/request/headers/Mcp-Name"
+          },
+          "expected": "dispatchPurchaseOrder",
+          "requirementRefs": [
+            "D20"
+          ],
+          "evidenceRefs": [
+            "approved-dispatch:actual-observation",
+            "approved-dispatch:source-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "lotId": {
+              "$alias": "L"
+            }
+          },
+          "oracleExplanation": "approved-dispatch-raw-Mcp-Name: /data/transcript/request/headers/Mcp-Name의 실제 equals 기대값은 \"dispatchPurchaseOrder\"다. 미관찰·UNKNOWN은 정상값이 아니다.",
+          "oracleRef": {
+            "oracleId": "T20.mrtr-bound-state",
+            "observationNames": [
+              "mrtr-state"
+            ]
+          }
+        },
+        {
+          "id": "approved-dispatch-raw-meta",
+          "op": "equals",
+          "source": {
+            "actionId": "approved-dispatch",
+            "pointer": "/data/transcript/request/body/params/_meta"
+          },
+          "expected": {
+            "io.modelcontextprotocol/protocolVersion": "2026-07-28",
+            "io.modelcontextprotocol/clientInfo": {
+              "name": "ontology-channel-contract",
+              "version": "1.0.0"
+            },
+            "io.modelcontextprotocol/clientCapabilities": {
+              "elicitation": {
+                "form": {}
+              }
+            }
+          },
+          "requirementRefs": [
+            "D20"
+          ],
+          "evidenceRefs": [
+            "approved-dispatch:actual-observation",
+            "approved-dispatch:source-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "lotId": {
+              "$alias": "L"
+            }
+          },
+          "oracleExplanation": "approved-dispatch-raw-meta: /data/transcript/request/body/params/_meta의 실제 equals 기대값은 {\"io.modelcontextprotocol/protocolVersion\": \"2026-07-28\", \"io.modelcontextprotocol/clientInfo\": {\"name\": \"ontology-channel-contract\", \"version\": \"1.0.0\"}, \"io.modelcontextprotocol/clientCapabilities\": {\"elicitation\": {\"form\": {}}}}다. 미관찰·UNKNOWN은 정상값이 아니다.",
+          "oracleRef": {
+            "oracleId": "T20.mrtr-bound-state",
+            "observationNames": [
+              "mrtr-state"
+            ]
+          }
         }
       ],
-      "oracleExplanation": "실제 MRTR state accept-as-approval와 금지효과0 — T20.mrtr-bound-state의 named observation을 응답과 독립 원행/host artifact로 검증한다. setup은 실행 coverage가 아니다."
+      "oracleExplanation": "유효한 발주 입력의 accept-as-approval가 승인 없이 효과를 만들지 않고 MANAGER 결정 후 실행한다 — T20.mrtr-bound-state의 named observation을 응답과 독립 원행/host artifact로 검증한다. setup은 실행 coverage가 아니다."
     },
     {
       "id": "mrtr-unsupported-client",
@@ -38341,6 +42177,35 @@
           ]
         },
         {
+          "id": "purchase-work",
+          "kind": "query",
+          "actorRef": "reader",
+          "route": "api",
+          "capabilityId": "getWork",
+          "request": {
+            "id": {
+              "$alias": "O1"
+            },
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "lotId": {
+                "$alias": "L"
+              }
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z"
+          },
+          "evidenceRefs": [
+            "purchase-work:actual-response",
+            "purchase-work:wire-or-command"
+          ]
+        },
+        {
           "id": "proposal",
           "kind": "invoke",
           "actorRef": "writer",
@@ -38349,29 +42214,81 @@
           "request": {
             "intentKind": "COMMAND",
             "definitionVersion": "definition-v1",
-            "itemId": {
-              "$alias": "P"
+            "capabilityId": "proposePurchase",
+            "subjectRefs": [
+              {
+                "type": "TradeItem",
+                "id": {
+                  "$alias": "P"
+                }
+              }
+            ],
+            "slots": {
+              "quantity": {
+                "value": "100",
+                "unit": "BOX",
+                "provenance": "USER"
+              },
+              "price": {
+                "value": "2",
+                "currency": "EUR",
+                "provenance": "USER"
+              },
+              "supplierId": {
+                "value": {
+                  "$alias": "SUP"
+                },
+                "provenance": "CONTEXT"
+              },
+              "destinationId": {
+                "value": {
+                  "$alias": "W"
+                },
+                "provenance": "CONTEXT"
+              },
+              "dueAt": {
+                "value": "2026-10-09T09:00:00Z",
+                "provenance": "USER"
+              },
+              "endpoint": {
+                "value": "ARRIVED",
+                "provenance": "USER"
+              },
+              "quantityMode": {
+                "value": "CUMULATIVE_EVENT",
+                "provenance": "USER"
+              },
+              "ownerId": {
+                "value": {
+                  "$alias": "writer"
+                },
+                "provenance": "CONTEXT"
+              },
+              "supervisorId": {
+                "value": {
+                  "$alias": "supervisor"
+                },
+                "provenance": "CONTEXT"
+              },
+              "workId": {
+                "value": {
+                  "$alias": "O1"
+                },
+                "provenance": "CONTEXT"
+              },
+              "goalVersionId": {
+                "value": {
+                  "$result": {
+                    "actionId": "purchase-work",
+                    "pointer": "/response/data/goal/id"
+                  }
+                },
+                "provenance": "CONTEXT"
+              }
             },
-            "supplierId": {
-              "$alias": "SUP"
-            },
-            "quantity": {
-              "value": "100",
-              "unit": "BOX"
-            },
-            "unitPrice": {
-              "value": "2",
-              "currency": "EUR"
-            },
-            "destinationId": {
-              "$alias": "W"
-            },
-            "dueAt": "2026-10-09T09:00:00Z",
-            "endpoint": "ARRIVED",
-            "quantityMode": "CUMULATIVE_EVENT",
-            "ownerId": {
-              "$alias": "writer"
-            },
+            "conditions": [],
+            "evidenceRefs": [],
+            "expectedRevision": 1,
             "commandIdempotencyKey": "T20-mrtr-proposal"
           },
           "evidenceRefs": [
@@ -38474,24 +42391,62 @@
               "params": {
                 "name": "approvePurchase",
                 "arguments": {
-                  "proposalId": {
-                    "$result": {
-                      "actionId": "proposal",
-                      "pointer": "/response/proposalId"
+                  "intentKind": "COMMAND",
+                  "definitionVersion": "definition-v1",
+                  "capabilityId": "approvePurchase",
+                  "subjectRefs": [
+                    {
+                      "type": "TradeItem",
+                      "id": {
+                        "$alias": "P"
+                      }
+                    }
+                  ],
+                  "slots": {
+                    "proposalId": {
+                      "value": {
+                        "$result": {
+                          "actionId": "proposal",
+                          "pointer": "/response/proposalId"
+                        }
+                      },
+                      "provenance": "CONTEXT"
+                    },
+                    "proposalHash": {
+                      "value": {
+                        "$result": {
+                          "actionId": "proposal",
+                          "pointer": "/response/proposalHash"
+                        }
+                      },
+                      "provenance": "CONTEXT"
+                    },
+                    "decidedAt": {
+                      "value": "2026-10-07T09:00:00Z",
+                      "provenance": "USER"
+                    },
+                    "validUntil": {
+                      "value": "2026-10-08T09:00:00Z",
+                      "provenance": "USER"
+                    },
+                    "consumptionPolicy": {
+                      "value": "SINGLE_ORDER_REVISION",
+                      "provenance": "USER"
+                    },
+                    "conditions": {
+                      "value": [],
+                      "provenance": "USER"
                     }
                   },
-                  "proposalHash": {
-                    "$result": {
-                      "actionId": "proposal",
-                      "pointer": "/response/proposalHash"
-                    }
-                  },
+                  "conditions": [],
+                  "evidenceRefs": [],
                   "expectedRevision": {
                     "$result": {
                       "actionId": "proposal",
-                      "pointer": "/response/revision"
+                      "pointer": "/response/proposalRevision"
                     }
-                  }
+                  },
+                  "commandIdempotencyKey": "T20-mrtr-approval-issued"
                 },
                 "_meta": {
                   "io.modelcontextprotocol/protocolVersion": "2026-07-28",
@@ -38541,22 +42496,63 @@
                 "params": {
                   "name": "approvePurchase",
                   "arguments": {
-                    "proposalId": {
-                      "$result": {
-                        "actionId": "proposal",
-                        "pointer": "/response/proposalId"
+                    "intentKind": "COMMAND",
+                    "definitionVersion": "definition-v1",
+                    "capabilityId": "approvePurchase",
+                    "subjectRefs": [
+                      {
+                        "type": "TradeItem",
+                        "id": {
+                          "$alias": "P"
+                        }
+                      }
+                    ],
+                    "slots": {
+                      "proposalId": {
+                        "value": {
+                          "$result": {
+                            "actionId": "proposal",
+                            "pointer": "/response/proposalId"
+                          }
+                        },
+                        "provenance": "CONTEXT"
+                      },
+                      "proposalHash": {
+                        "value": {
+                          "$result": {
+                            "actionId": "proposal",
+                            "pointer": "/response/proposalHash"
+                          }
+                        },
+                        "provenance": "CONTEXT"
+                      },
+                      "decision": {
+                        "value": "APPROVE",
+                        "provenance": "USER"
+                      },
+                      "decidedAt": {
+                        "value": "2026-10-07T09:00:00Z",
+                        "provenance": "USER"
+                      },
+                      "validUntil": {
+                        "value": "2026-10-08T09:00:00Z",
+                        "provenance": "USER"
+                      },
+                      "consumptionPolicy": {
+                        "value": "SINGLE_ORDER_REVISION",
+                        "provenance": "USER"
+                      },
+                      "conditions": {
+                        "value": [],
+                        "provenance": "USER"
                       }
                     },
-                    "proposalHash": {
-                      "$result": {
-                        "actionId": "proposal",
-                        "pointer": "/response/proposalHash"
-                      }
-                    },
+                    "conditions": [],
+                    "evidenceRefs": [],
                     "expectedRevision": {
                       "$result": {
                         "actionId": "proposal",
-                        "pointer": "/response/revision"
+                        "pointer": "/response/proposalRevision"
                       }
                     },
                     "commandIdempotencyKey": "T20-approval-left"
@@ -38576,7 +42572,7 @@
                         }
                       },
                       "value": {
-                        "decision": "APPROVED",
+                        "decision": "APPROVE",
                         "proposalHash": {
                           "$result": {
                             "actionId": "proposal",
@@ -38643,22 +42639,63 @@
                 "params": {
                   "name": "approvePurchase",
                   "arguments": {
-                    "proposalId": {
-                      "$result": {
-                        "actionId": "proposal",
-                        "pointer": "/response/proposalId"
+                    "intentKind": "COMMAND",
+                    "definitionVersion": "definition-v1",
+                    "capabilityId": "approvePurchase",
+                    "subjectRefs": [
+                      {
+                        "type": "TradeItem",
+                        "id": {
+                          "$alias": "P"
+                        }
+                      }
+                    ],
+                    "slots": {
+                      "proposalId": {
+                        "value": {
+                          "$result": {
+                            "actionId": "proposal",
+                            "pointer": "/response/proposalId"
+                          }
+                        },
+                        "provenance": "CONTEXT"
+                      },
+                      "proposalHash": {
+                        "value": {
+                          "$result": {
+                            "actionId": "proposal",
+                            "pointer": "/response/proposalHash"
+                          }
+                        },
+                        "provenance": "CONTEXT"
+                      },
+                      "decision": {
+                        "value": "APPROVE",
+                        "provenance": "USER"
+                      },
+                      "decidedAt": {
+                        "value": "2026-10-07T09:00:00Z",
+                        "provenance": "USER"
+                      },
+                      "validUntil": {
+                        "value": "2026-10-08T09:00:00Z",
+                        "provenance": "USER"
+                      },
+                      "consumptionPolicy": {
+                        "value": "SINGLE_ORDER_REVISION",
+                        "provenance": "USER"
+                      },
+                      "conditions": {
+                        "value": [],
+                        "provenance": "USER"
                       }
                     },
-                    "proposalHash": {
-                      "$result": {
-                        "actionId": "proposal",
-                        "pointer": "/response/proposalHash"
-                      }
-                    },
+                    "conditions": [],
+                    "evidenceRefs": [],
                     "expectedRevision": {
                       "$result": {
                         "actionId": "proposal",
-                        "pointer": "/response/revision"
+                        "pointer": "/response/proposalRevision"
                       }
                     },
                     "commandIdempotencyKey": "T20-approval-right"
@@ -38678,7 +42715,7 @@
                         }
                       },
                       "value": {
-                        "decision": "APPROVED",
+                        "decision": "APPROVE",
                         "proposalHash": {
                           "$result": {
                             "actionId": "proposal",
@@ -39052,7 +43089,7 @@
                   "pointer": "/response/proposalId"
                 }
               },
-              "decision": "APPROVED"
+              "decision": "APPROVE"
             }
           },
           "expected": 1,

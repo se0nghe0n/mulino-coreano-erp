@@ -388,6 +388,86 @@
           ]
         },
         {
+          "id": "before-release",
+          "kind": "query",
+          "actorRef": "observer",
+          "route": "api",
+          "capabilityId": "getObject",
+          "request": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseId": "E2",
+              "scenarioId": "overlapping-holds"
+            },
+            "subjectRefs": [
+              {
+                "type": "TradeItem",
+                "id": {
+                  "$alias": "P"
+                }
+              }
+            ],
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z",
+            "include": [
+              "inventory",
+              "trade",
+              "evidence",
+              "assessments",
+              "obligations",
+              "audit",
+              "outbox"
+            ]
+          },
+          "evidenceRefs": [
+            "before-release:api-response"
+          ]
+        },
+        {
+          "id": "before-release-db",
+          "kind": "observe",
+          "observation": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseId": "E2",
+              "scenarioId": "overlapping-holds"
+            },
+            "snapshotRef": {
+              "$result": {
+                "actionId": "before-release",
+                "pointer": "/response/snapshotRevision"
+              }
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z",
+            "sources": [
+              "segments",
+              "movements",
+              "allocations",
+              "restrictions",
+              "investigations",
+              "obligations",
+              "audit",
+              "outbox"
+            ]
+          },
+          "evidenceRefs": [
+            "before-release-db:raw-rows",
+            "before-release-db:source-query",
+            "before-release-db:snapshot"
+          ]
+        },
+        {
           "id": "qc-release20",
           "kind": "invoke",
           "actorRef": "qc",
@@ -1509,6 +1589,358 @@
               "status",
               "nextAction",
               "nextCheckAt"
+            ]
+          }
+        },
+        {
+          "id": "qc-release-applied",
+          "op": "equals",
+          "source": {
+            "actionId": "qc-release20",
+            "pointer": "/response/outcome"
+          },
+          "expected": "APPLIED",
+          "requirementRefs": [
+            "D03",
+            "D16",
+            "D18"
+          ],
+          "evidenceRefs": [
+            "qc-release20:actual-observation",
+            "qc-release20:source-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "E2",
+            "scenarioId": "overlapping-holds"
+          },
+          "oracleExplanation": "QC20 해제는 응답 APPLIED와 같은 restriction ID·실물20·BOX·RELEASED 원행으로 확인한다. 회수 조사60은 ACTIVE이며 출고 효과0이다.",
+          "oracleRef": {
+            "oracleId": "E2.overlapping-holds",
+            "observationNames": [
+              "dispatched-after-QC-only-release"
+            ]
+          }
+        },
+        {
+          "id": "qc-release-same-restriction",
+          "op": "equals",
+          "source": {
+            "actionId": "qc-release20",
+            "pointer": "/response/restrictionId"
+          },
+          "expected": {
+            "$result": {
+              "actionId": "qc-hold20",
+              "pointer": "/response/restrictionId"
+            }
+          },
+          "requirementRefs": [
+            "D03",
+            "D16",
+            "D18"
+          ],
+          "evidenceRefs": [
+            "qc-release20:actual-observation",
+            "qc-release20:source-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "E2",
+            "scenarioId": "overlapping-holds"
+          },
+          "oracleExplanation": "QC20 해제는 응답 APPLIED와 같은 restriction ID·실물20·BOX·RELEASED 원행으로 확인한다. 회수 조사60은 ACTIVE이며 출고 효과0이다.",
+          "oracleRef": {
+            "oracleId": "E2.overlapping-holds",
+            "observationNames": [
+              "dispatched-after-QC-only-release"
+            ]
+          }
+        },
+        {
+          "id": "qc20-released-before-dispatch",
+          "op": "relationSet",
+          "source": {
+            "actionId": "before-dispatch-db",
+            "pointer": "/data/rawRows/restrictions",
+            "field": [
+              "id",
+              "segmentId",
+              "reason",
+              "status",
+              "quantity",
+              "unit"
+            ],
+            "where": {
+              "id": {
+                "$result": {
+                  "actionId": "qc-hold20",
+                  "pointer": "/response/restrictionId"
+                }
+              }
+            }
+          },
+          "expected": [
+            [
+              {
+                "$result": {
+                  "actionId": "qc-hold20",
+                  "pointer": "/response/restrictionId"
+                }
+              },
+              {
+                "$result": {
+                  "actionId": "split",
+                  "pointer": "/response/children/0/id"
+                }
+              },
+              "QC_REVIEW",
+              "RELEASED",
+              "20",
+              "BOX"
+            ]
+          ],
+          "requirementRefs": [
+            "D03",
+            "D16",
+            "D18"
+          ],
+          "evidenceRefs": [
+            "before-dispatch-db:actual-observation",
+            "before-dispatch-db:source-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "E2",
+            "scenarioId": "overlapping-holds"
+          },
+          "oracleExplanation": "QC20 해제는 응답 APPLIED와 같은 restriction ID·실물20·BOX·RELEASED 원행으로 확인한다. 회수 조사60은 ACTIVE이며 출고 효과0이다.",
+          "oracleRef": {
+            "oracleId": "E2.overlapping-holds",
+            "observationNames": [
+              "dispatched-after-QC-only-release"
+            ]
+          }
+        },
+        {
+          "id": "qc20-remains-released-after-dispatch",
+          "op": "relationSet",
+          "source": {
+            "actionId": "after-dispatch-db",
+            "pointer": "/data/rawRows/restrictions",
+            "field": [
+              "id",
+              "segmentId",
+              "reason",
+              "status",
+              "quantity",
+              "unit"
+            ],
+            "where": {
+              "id": {
+                "$result": {
+                  "actionId": "qc-hold20",
+                  "pointer": "/response/restrictionId"
+                }
+              }
+            }
+          },
+          "expected": [
+            [
+              {
+                "$result": {
+                  "actionId": "qc-hold20",
+                  "pointer": "/response/restrictionId"
+                }
+              },
+              {
+                "$result": {
+                  "actionId": "split",
+                  "pointer": "/response/children/0/id"
+                }
+              },
+              "QC_REVIEW",
+              "RELEASED",
+              "20",
+              "BOX"
+            ]
+          ],
+          "requirementRefs": [
+            "D03",
+            "D16",
+            "D18"
+          ],
+          "evidenceRefs": [
+            "after-dispatch-db:actual-observation",
+            "after-dispatch-db:source-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "E2",
+            "scenarioId": "overlapping-holds"
+          },
+          "oracleExplanation": "QC20 해제는 응답 APPLIED와 같은 restriction ID·실물20·BOX·RELEASED 원행으로 확인한다. 회수 조사60은 ACTIVE이며 출고 효과0이다.",
+          "oracleRef": {
+            "oracleId": "E2.overlapping-holds",
+            "observationNames": [
+              "dispatched-after-QC-only-release"
+            ]
+          }
+        },
+        {
+          "id": "recall60-scope-quantity-remains-active",
+          "op": "relationSet",
+          "source": {
+            "actionId": "after-dispatch-db",
+            "pointer": "/data/rawRows/restrictions",
+            "field": [
+              "id",
+              "lotId",
+              "reason",
+              "status",
+              "quantity",
+              "unit"
+            ],
+            "where": {
+              "id": {
+                "$result": {
+                  "actionId": "recall-hold60",
+                  "pointer": "/response/restrictionId"
+                }
+              }
+            }
+          },
+          "expected": [
+            [
+              {
+                "$result": {
+                  "actionId": "recall-hold60",
+                  "pointer": "/response/restrictionId"
+                }
+              },
+              {
+                "$alias": "L"
+              },
+              "RECALL_INVESTIGATION",
+              "ACTIVE",
+              "60",
+              "BOX"
+            ]
+          ],
+          "requirementRefs": [
+            "D03",
+            "D16",
+            "D18"
+          ],
+          "evidenceRefs": [
+            "after-dispatch-db:actual-observation",
+            "after-dispatch-db:source-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "E2",
+            "scenarioId": "overlapping-holds"
+          },
+          "oracleExplanation": "QC20 해제는 응답 APPLIED와 같은 restriction ID·실물20·BOX·RELEASED 원행으로 확인한다. 회수 조사60은 ACTIVE이며 출고 효과0이다.",
+          "oracleRef": {
+            "oracleId": "E2.overlapping-holds",
+            "observationNames": [
+              "dispatched-after-QC-only-release"
+            ]
+          }
+        },
+        {
+          "id": "qc20-active-before-release",
+          "op": "relationSet",
+          "source": {
+            "actionId": "before-release-db",
+            "pointer": "/data/rawRows/restrictions",
+            "field": [
+              "id",
+              "segmentId",
+              "reason",
+              "status",
+              "quantity",
+              "unit"
+            ],
+            "where": {
+              "id": {
+                "$result": {
+                  "actionId": "qc-hold20",
+                  "pointer": "/response/restrictionId"
+                }
+              }
+            }
+          },
+          "expected": [
+            [
+              {
+                "$result": {
+                  "actionId": "qc-hold20",
+                  "pointer": "/response/restrictionId"
+                }
+              },
+              {
+                "$result": {
+                  "actionId": "split",
+                  "pointer": "/response/children/0/id"
+                }
+              },
+              "QC_REVIEW",
+              "ACTIVE",
+              "20",
+              "BOX"
+            ]
+          ],
+          "requirementRefs": [
+            "D03",
+            "D16",
+            "D18"
+          ],
+          "evidenceRefs": [
+            "before-release-db:actual-observation",
+            "before-release-db:source-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "E2",
+            "scenarioId": "overlapping-holds"
+          },
+          "oracleExplanation": "해제 직전 같은 restriction ID와 분할 물량20·BOX의 QC_REVIEW가 ACTIVE였음을 독립 원행으로 확인한다. 이미 RELEASED였던 행이나 no-op을 실제 해제로 세지 않는다.",
+          "oracleRef": {
+            "oracleId": "E2.overlapping-holds",
+            "observationNames": [
+              "dispatched-after-QC-only-release"
             ]
           }
         }

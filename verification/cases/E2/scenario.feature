@@ -11,6 +11,8 @@
     만일 "qc" 역할이 "qc-hold20" 행동을 수행한다
     만일 "admin" 역할이 "investigate" 행동을 수행한다
     만일 "admin" 역할이 "recall-hold60" 행동을 수행한다
+    만일 "observer" 역할이 "before-release" 행동을 수행한다
+    만일 "시스템" 역할이 "before-release-db" 행동을 수행한다
     만일 "qc" 역할이 "qc-release20" 행동을 수행한다
     만일 "observer" 역할이 "before-dispatch" 행동을 수행한다
     만일 "시스템" 역할이 "before-dispatch-db" 행동을 수행한다
@@ -36,6 +38,12 @@
     그러면 "investigation-duty-17" assertion으로 "investigation-duty"를 확인한다
     그러면 "investigation-duty-18" assertion으로 "investigation-duty"를 확인한다
     그러면 "investigation-duty-19" assertion으로 "investigation-duty"를 확인한다
+    그러면 "qc-release-applied" assertion으로 "QC20 해제는 응답 APPLIED와 같은 restriction ID·실물20·BOX·RELEASED 원행으로 확인한다. 회수 조사60은 ACTIVE이며 출고 효과0이다."를 확인한다
+    그러면 "qc-release-same-restriction" assertion으로 "QC20 해제는 응답 APPLIED와 같은 restriction ID·실물20·BOX·RELEASED 원행으로 확인한다. 회수 조사60은 ACTIVE이며 출고 효과0이다."를 확인한다
+    그러면 "qc20-released-before-dispatch" assertion으로 "QC20 해제는 응답 APPLIED와 같은 restriction ID·실물20·BOX·RELEASED 원행으로 확인한다. 회수 조사60은 ACTIVE이며 출고 효과0이다."를 확인한다
+    그러면 "qc20-remains-released-after-dispatch" assertion으로 "QC20 해제는 응답 APPLIED와 같은 restriction ID·실물20·BOX·RELEASED 원행으로 확인한다. 회수 조사60은 ACTIVE이며 출고 효과0이다."를 확인한다
+    그러면 "recall60-scope-quantity-remains-active" assertion으로 "QC20 해제는 응답 APPLIED와 같은 restriction ID·실물20·BOX·RELEASED 원행으로 확인한다. 회수 조사60은 ACTIVE이며 출고 효과0이다."를 확인한다
+    그러면 "qc20-active-before-release" assertion으로 "해제 직전 같은 restriction ID와 분할 물량20·BOX의 QC_REVIEW가 ACTIVE였음을 독립 원행으로 확인한다. 이미 RELEASED였던 행이나 no-op을 실제 해제로 세지 않는다."를 확인한다
 
   시나리오: 승인50 중 회수25와 동일 실물 폐기25는 최종25이며 미확인25의 종료를 막는다
     먼저 사례 파일 "verification/cases/E2/case.json"의 "same-25-not-50"를 준비한다

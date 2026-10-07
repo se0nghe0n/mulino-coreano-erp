@@ -62,6 +62,11 @@ def fixture(cid):
  actors={}
  for name,caps,grant in [('reader',read,read),('writer',read+writes,read+writes),('manager',read+['approvePurchase'],read+['approvePurchase']),('readAgent',read+writes,read),('otherPrincipal',read,read),('anonymous',[],[])]:
   actors[name]={'issuer':'synthetic-fixture-issuer','subject':'synthetic-'+name,'audience':'isolated-ontology','organizationAlias':'ORG','roleCapabilities':caps,'grant':{'delegatorAlias':'supervisor','actions':grant,'scope':{'organizationAlias':'ORG','itemAliases':['P'],'workAliases':['O1','S1'],'segmentAliases':['A60','B40']},'validFrom':'2026-10-01T00:00:00Z','validUntil':'2026-10-31T23:59:59Z','revision':1}}
+ if cid=='T20':
+  # A separately authenticated principal can perform the same input collection.
+  # Only the requestState subject binding distinguishes its negative call.
+  actors['otherPrincipal']['roleCapabilities']=list(actors['writer']['roleCapabilities'])
+  actors['otherPrincipal']['grant']['actions']=list(actors['writer']['grant']['actions'])
  aliases={'ORG':{'type':'Organization'},'P':{'type':'TradeItem','unit':'BOX'},'P2':{'type':'TradeItem','name':'동명이인 비스킷','unit':'BOX'},'L':{'type':'ManufacturerLot','itemAlias':'P','manufacturerAlias':'M'},'M':{'type':'Manufacturer'},'W':{'type':'Place'},'W2':{'type':'Place'},'C':{'type':'Customer'},'C2':{'type':'Customer'},'SUP':{'type':'Supplier'},'SL1':{'type':'SalesOrderLine','salesWorkAlias':'S1'},'O1':{'type':'Work'},'S1':{'type':'Work'}}
  for a,q in [('A60','60'),('B40','40')]:aliases[a]={'type':'QuantitySegment','itemAlias':'P','lotAlias':'L','locationAlias':'W','quantity':q,'unit':'BOX','physicalScope':cid+'-'+a}
  for e in ['receipt60','receipt40','qc60','hold40','regulatory60','disposition60','customerConditions60','delivery','temperature']:aliases[e]={'type':'DocumentVersion'}
@@ -109,6 +114,27 @@ def typed(kind='COMMAND',destination=True):
  slots={'quantity':{'value':'100','unit':'BOX','provenance':'USER'},'dueAt':{'value':'2026-10-09T09:00:00Z','provenance':'USER'},'endpoint':{'value':'ARRIVED','provenance':'CONTEXT'},'quantityMode':{'value':'CUMULATIVE_EVENT','provenance':'APPROVED_DEFAULT'}}
  if destination:slots['destination']={'value':alias('W'),'type':'Place','provenance':'USER'}
  return {'intentKind':kind,'definitionVersion':'definition-v1','capabilityId':'createDraft','subjectRefs':[{'type':'TradeItem','id':alias('P')}],'slots':slots,'conditions':[],'evidenceRefs':[],'conversationRequestId':'T20-input','originalTextRef':'user-input','contextRef':'scoped-conversation'}
+# API and MCP carry the same typed business command; only transport wrappers differ.
+def purchase_slot(value,provenance='CONTEXT'):
+ return dict(value,provenance=provenance) if isinstance(value,dict) and 'value' in value else {'value':value,'provenance':provenance}
+def purchase_command(cap,key,slots,revision=1):
+ return {'intentKind':'COMMAND','definitionVersion':'definition-v1','capabilityId':cap,'subjectRefs':[{'type':'TradeItem','id':alias('P')}],'slots':slots,'conditions':[],'evidenceRefs':[],'expectedRevision':revision,'commandIdempotencyKey':key}
+def purchase_work():
+ return action('purchase-work','getWork',{'id':alias('O1'),'scope':SCOPE,'asOf':TIME,'knownAt':KNOWN})
+def purchase_proposal(key):
+ slots={'quantity':purchase_slot({'value':'100','unit':'BOX'},'USER'),'price':purchase_slot({'value':'2','currency':'EUR'},'USER'),'supplierId':purchase_slot(alias('SUP')),'destinationId':purchase_slot(alias('W')),'dueAt':purchase_slot('2026-10-09T09:00:00Z','USER'),'endpoint':purchase_slot('ARRIVED','USER'),'quantityMode':purchase_slot('CUMULATIVE_EVENT','USER'),'ownerId':purchase_slot(alias('writer')),'supervisorId':purchase_slot(alias('supervisor')),'workId':purchase_slot(alias('O1')),'goalVersionId':purchase_slot(ref('purchase-work','/response/data/goal/id'))}
+ return purchase_command('proposePurchase',key,slots)
+def purchase_binding(proposalAction='proposal'):
+ return {'proposalId':purchase_slot(ref(proposalAction,'/response/proposalId')),'proposalHash':purchase_slot(ref(proposalAction,'/response/proposalHash'))}
+def purchase_approval(key,collectDecision=False):
+ slots=dict(purchase_binding(),decision=purchase_slot('APPROVE','USER'),decidedAt=purchase_slot(TIME,'USER'),validUntil=purchase_slot('2026-10-08T09:00:00Z','USER'),consumptionPolicy=purchase_slot('SINGLE_ORDER_REVISION','USER'),conditions=purchase_slot([],'USER'))
+ if collectDecision:del slots['decision']
+ return purchase_command('approvePurchase',key,slots,ref('proposal','/response/proposalRevision'))
+def purchase_dispatch(key,approved=False,proposalAction='proposal',collectChannel=False):
+ slots=dict(purchase_binding(proposalAction),channel=purchase_slot('SYNTHETIC_SUPPLIER','USER'),externalOperationId=purchase_slot(key+'-external','USER'))
+ if approved:slots['approvalId']=purchase_slot(ref('approval','/response/approvalId'))
+ if collectChannel:del slots['channel']
+ return purchase_command('dispatchPurchaseOrder',key,slots,ref(proposalAction,'/response/proposalRevision'))
 o='T20.structured-intent-stages'
 for v in ['purchaseDraftNoLot','locationFridayTypeError','ambiguousFriday','ambiguousSameName','missingActiveSlot','queryKind','recordKind','commandKind']:
  req=typed(); outcome='STRUCTURED';code=None
@@ -127,7 +153,7 @@ for v in ['purchaseDraftNoLot','locationFridayTypeError','ambiguousFriday','ambi
   if v=='purchaseDraftNoLot':x.append(assertion('lot-not-stage-required',o,'intent-validation','absent','structured','/response/intent/slots/lot',None))
  T20.append(sub('T20',v,v+'의 구조화·slot·provenance 검증',o,a,x))
 # Destination input collection, proposal approval revision, effect key independence.
-a=[setup(),action('noun','getInventory'),obs('db-before'),action('draft','structureIntent',typed(destination=False),'invoke',actor='writer'),action('supplement','structureIntent',dict(typed(),requestState=ref('draft','/response/requestState')),'invoke',actor='writer'),action('proposal','proposePurchase',{'intent':ref('supplement','/response/intent'),'canonicalHash':ref('supplement','/response/canonicalHash'),'proposalRevision':ref('supplement','/response/proposalRevision'),'commandIdempotencyKey':'T20-effect-proposal-1'},'invoke',actor='writer'),action('approval','approvePurchase',{'proposalId':ref('proposal','/response/proposalId'),'proposalHash':ref('proposal','/response/proposalHash'),'expectedRevision':ref('proposal','/response/revision'),'decision':'APPROVED','commandIdempotencyKey':'T20-manager-decision-1'},'invoke',actor='manager'),action('revise','revisePurchase',{'proposalId':ref('proposal','/response/proposalId'),'expectedRevision':ref('approval','/response/revision'),'quantity':{'value':'120','unit':'BOX'},'commandIdempotencyKey':'T20-effect-revision-2'},'invoke',actor='writer'),action('stale-approval','dispatchPurchaseOrder',{'proposalId':ref('revise','/response/proposalId'),'proposalHash':ref('revise','/response/proposalHash'),'expectedRevision':ref('revise','/response/revision'),'approvalId':ref('approval','/response/approvalId'),'commandIdempotencyKey':'T20-dispatch-2'},'invoke',actor='writer'),action('after','getInventory'),obs('db-after','after')]
+a=[setup(),action('noun','getInventory'),obs('db-before'),action('draft','structureIntent',typed(destination=False),'invoke',actor='writer'),action('supplement','structureIntent',dict(typed(),requestState=ref('draft','/response/requestState')),'invoke',actor='writer'),purchase_work(),action('proposal','proposePurchase',purchase_proposal('T20-effect-proposal-1'),'invoke',actor='writer'),action('approval','approvePurchase',purchase_approval('T20-manager-decision-1'),'invoke',actor='manager'),action('revise','revisePurchase',purchase_command('revisePurchase','T20-effect-revision-2',dict(purchase_binding(),quantity=purchase_slot({'value':'120','unit':'BOX'},'USER')),ref('proposal','/response/proposalRevision')),'invoke',actor='writer'),action('stale-approval','dispatchPurchaseOrder',purchase_dispatch('T20-dispatch-2',True,'revise'),'invoke',actor='writer'),action('after','getInventory'),obs('db-after','after')]
 x=[eq('draft-input',o,'canonicalization','draft','/response/outcome','NEEDS_INPUT'),eq('supplement-structured',o,'canonicalization','supplement','/response/outcome','STRUCTURED'),eq('conversation-same',o,'canonicalization','supplement','/response/conversationRequestId','T20-input'),assertion('hash-revised',o,'canonicalization','notEquals','revise','/response/proposalHash',ref('proposal','/response/proposalHash')),assertion('revision-revised',o,'canonicalization','notEquals','revise','/response/proposalRevision',ref('proposal','/response/proposalRevision')),eq('stale-approval-refused',o,'canonicalization','stale-approval','/response/outcome','WAITING_APPROVAL'),eq('new-effect-key',o,'canonicalization','revise','/response/commandIdempotencyKey','T20-effect-revision-2'),assertion('no-dispatch-outbox',o,'input-collection-physical-effects','count','db-after','/data/rawRows/outbox',0,where={'capabilityId':'dispatchPurchaseOrder'}),same('physical-stays100',o,'input-collection-physical-effects','db-after','/data/rawRows/segments','db-before','/data/rawRows/segments')]
 T20.append(sub('T20','destination-canonical-approval','입력 보완 뒤 새 hash·revision·승인 범위·effect key',o,a,x))
 # Raw protocol variants retain deliberate mismatches and malformed inputs.
@@ -170,13 +196,11 @@ for v in ['NEEDS_INPUT','WAITING_APPROVAL','CONFLICT','REJECTED','FORBIDDEN','AC
  if v=='NEEDS_INPUT':
   cap='structureIntent';request=typed(destination=False)
  elif v in ['WAITING_APPROVAL','ACCEPTED_PENDING_EXTERNAL']:
-  purchase={'intentKind':'COMMAND','definitionVersion':'definition-v1','itemId':alias('P'),'supplierId':alias('SUP'),'quantity':{'value':'100','unit':'BOX'},'unitPrice':{'value':'2','currency':'EUR'},'destinationId':alias('W'),'dueAt':'2026-10-09T09:00:00Z','endpoint':'ARRIVED','quantityMode':'CUMULATIVE_EVENT','ownerId':alias('writer'),'commandIdempotencyKey':'T20-proposal-'+v}
-  a.append(action('proposal','proposePurchase',purchase,'invoke',actor='writer'))
+  a += [purchase_work(),action('proposal','proposePurchase',purchase_proposal('T20-proposal-'+v),'invoke',actor='writer')]
   if v=='ACCEPTED_PENDING_EXTERNAL':
-   a.append(action('approval','approvePurchase',{'proposalId':ref('proposal','/response/proposalId'),'proposalHash':ref('proposal','/response/proposalHash'),'expectedRevision':ref('proposal','/response/revision'),'decision':'APPROVED','commandIdempotencyKey':'T20-manager-'+v},'invoke',actor='manager'))
-   a.append({'id':'external-timeout','kind':'control','control':{'type':'externalResponder','operation':'loseResponse','parameters':{'sourceNamespace':'synthetic-supplier','capabilityId':'dispatchPurchaseOrder','when':'AFTER_EXTERNAL_EFFECT'}},'evidenceRefs':['external-timeout:actual-responder-ack']})
-  cap='dispatchPurchaseOrder';request={'proposalId':ref('proposal','/response/proposalId'),'proposalHash':ref('proposal','/response/proposalHash'),'expectedRevision':ref('proposal','/response/revision'),'channel':'synthetic-supplier','commandIdempotencyKey':'T20-'+v}
-  if v=='ACCEPTED_PENDING_EXTERNAL':request['approvalId']=ref('approval','/response/approvalId')
+   a.append(action('approval','approvePurchase',purchase_approval('T20-manager-'+v),'invoke',actor='manager'))
+   a.append({'id':'external-timeout','kind':'control','control':{'type':'externalResponder','operation':'loseResponse','parameters':{'sourceNamespace':'SYNTHETIC_SUPPLIER','capabilityId':'dispatchPurchaseOrder','when':'AFTER_EXTERNAL_EFFECT'}},'evidenceRefs':['external-timeout:actual-responder-ack']})
+  cap='dispatchPurchaseOrder';request=purchase_dispatch('T20-'+v,v=='ACCEPTED_PENDING_EXTERNAL')
  elif v=='CONFLICT':
   cap='createDraft';request=dict(typed(),commandIdempotencyKey='T20-shared-effect')
   a += [action('first','createDraft',request,'invoke',actor='writer'),wire('cross-route-replay','tools/call',{'name':'createDraft','arguments':request},actor='writer')]
@@ -192,7 +216,7 @@ for v in ['NEEDS_INPUT','WAITING_APPROVAL','CONFLICT','REJECTED','FORBIDDEN','AC
  T20.append(sub('T20','domain-'+v.lower(),'API/MCP 도메인 '+v+' mapping과 동일 command namespace',o,a,x,['fixture','api','db','wire']))
 # MRTR issued state always comes from actual prior response, one bounded corruption only.
 o='T20.mrtr-bound-state'
-mrtr=['continuation','tampered-state','expired-state','other-principal','other-method','other-intent','unmatched-responses','state-as-approval','accept-as-approval','unsupported-client']
+mrtr=['continuation','tampered-state','expired-state','other-principal','other-method','other-intent','unmatched-responses','unsupported-client']
 for v in mrtr:
  issued=wire('issued','tools/call',{'name':'structureIntent','arguments':typed(destination=False)},actor='writer')
  args={'name':'structureIntent','arguments':typed(),'requestState':ref('issued','/response/body/result/requestState'),'inputResponses':[{'requestId':ref('issued','/response/body/result/inputRequests/0/requestId'),'value':{'destinationId':alias('W')}}]}
@@ -204,26 +228,46 @@ for v in mrtr:
  elif v=='other-method':retry['protocolOperation']='resources/read';retry['request']['body']['method']='resources/read';retry['request']['headers']['Mcp-Method']='resources/read';outcome='REJECTED'
  elif v=='other-intent':args['arguments']['capabilityId']='reserveQuantity';outcome='REJECTED'
  elif v=='unmatched-responses':args['inputResponses'][0]['requestId']='unknown-response-id';outcome='REJECTED'
- elif v=='state-as-approval':args['name']='dispatchPurchaseOrder';retry['request']['headers']['Mcp-Name']='dispatchPurchaseOrder';outcome='REJECTED'
- elif v=='accept-as-approval':args['inputResponses'][0]['value']='accept';args['name']='dispatchPurchaseOrder';retry['request']['headers']['Mcp-Name']='dispatchPurchaseOrder';outcome='REJECTED'
  elif v=='unsupported-client':issued['request']['body']['params']['_meta']['io.modelcontextprotocol/clientCapabilities']={};outcome='NEEDS_INPUT';retry=wire('continued','tools/call',{'name':'structureIntent','arguments':typed(destination=False)},actor='writer',meta={'io.modelcontextprotocol/protocolVersion':'2026-07-28','io.modelcontextprotocol/clientInfo':{'name':'without-elicitation','version':'1.0.0'},'io.modelcontextprotocol/clientCapabilities':{}})
  a=[setup(),action('noun','getInventory'),obs('db-before'),issued]
  if v=='expired-state':a.append(clock('expire','2026-10-08T09:00:00Z'))
  a.append(retry)
+ if v=='other-principal':
+  a.append(wire('own-issued','tools/call',{'name':'structureIntent','arguments':dict(typed(destination=False),conversationRequestId='T20-other-principal-input')},actor='otherPrincipal'))
+  a.append(wire('own-continued','tools/call',{'name':'structureIntent','arguments':dict(typed(),conversationRequestId='T20-other-principal-input'),'requestState':ref('own-issued','/response/body/result/requestState'),'inputResponses':[{'requestId':ref('own-issued','/response/body/result/inputRequests/0/requestId'),'value':{'destinationId':alias('W')}}]},actor='otherPrincipal'))
  a += [action('after','getInventory'),obs('db-after','after')]
- name='requeststate-as-approval' if v=='state-as-approval' else 'accept-string-as-approval' if v=='accept-as-approval' else 'invalid-continuation-effects'
+ name='invalid-continuation-effects'
  x=[eq('issued-input-required',o,'mrtr-state','issued','/response/body/result/resultType','input_required'),eq('continued-outcome',o,'mrtr-state','continued','/response/body/result/structuredContent/outcome',outcome),eq('new-rpc-id',o,'mrtr-state','continued','/response/body/id','continued' if v=='unsupported-client' else 'T20-new-rpc')]+no_effect(o,name)
  if v=='continuation':x += [eq('input-destination-applied',o,'mrtr-state','continued','/response/body/result/structuredContent/intent/slots/destination/value',alias('W')),eq('conversation-kept',o,'mrtr-state','continued','/response/body/result/structuredContent/conversationRequestId','T20-input')]
+ if v=='other-principal':x += [eq('wrong-principal-code',o,'mrtr-state','continued','/response/body/result/structuredContent/error/code','REQUEST_STATE_PRINCIPAL_MISMATCH'),eq('own-issued-input-required',o,'mrtr-state','own-issued','/response/body/result/resultType','input_required'),eq('own-state-countercall-structured',o,'mrtr-state','own-continued','/response/body/result/structuredContent/outcome','STRUCTURED'),eq('own-state-destination-applied',o,'mrtr-state','own-continued','/response/body/result/structuredContent/intent/slots/destination/value',alias('W')),eq('own-conversation-kept',o,'mrtr-state','own-continued','/response/body/result/structuredContent/conversationRequestId','T20-other-principal-input')]
  if v=='unsupported-client':x += [eq('fallback-channel',o,'mrtr-state','continued','/response/body/result/structuredContent/additionalInputMethod','EXPLICIT_RETRY'),eq('no-elicitation-requests',o,'mrtr-state','continued','/response/body/result/inputRequests',[])]
  T20.append(sub('T20','mrtr-'+v,'실제 MRTR state '+v+'와 금지효과0',o,a,x,['fixture','api','db','wire']))
+# A valid dispatch-bound continuation is input collection, never a manager decision.
+# The same proposal is dispatched after a real manager approval as a positive countercall.
+o='T20.mrtr-bound-state'
+for v,n in [('state-as-approval','requeststate-as-approval'),('accept-as-approval','accept-string-as-approval')]:
+ purchase=purchase_proposal('T20-'+v+'-proposal')
+ binding={'proposalId':ref('proposal','/response/proposalId'),'proposalHash':ref('proposal','/response/proposalHash')}
+ complete=purchase_dispatch('T20-'+v+'-dispatch')
+ incomplete=purchase_dispatch('T20-'+v+'-dispatch',collectChannel=True)
+ response={'requestId':ref('issued','/response/body/result/inputRequests/0/requestId'),'value':{'channel':'SYNTHETIC_SUPPLIER'}}
+ if v=='accept-as-approval':response['action']='accept'
+ a=[setup(),purchase_work(),action('proposal','proposePurchase',purchase,'invoke',actor='writer'),action('noun','getInventory'),obs('db-before'),wire('issued','tools/call',{'name':'dispatchPurchaseOrder','arguments':incomplete},actor='writer'),wire('continued','tools/call',{'name':'dispatchPurchaseOrder','arguments':complete,'requestState':ref('issued','/response/body/result/requestState'),'inputResponses':[response]},rpc='T20-new-rpc',actor='writer'),action('after','getInventory'),obs('db-after','after')]
+ for observed in ['db-before','db-after']:
+  next(q for q in a if q['id']==observed)['observation']['sources'].extend(['purchaseOrders','proposals'])
+ x=[eq('issued-input-required',o,'mrtr-state','issued','/response/body/result/resultType','input_required'),eq('continued-outcome',o,n,'continued','/response/body/result/structuredContent/outcome','WAITING_APPROVAL'),eq('specific-manager-approval-missing',o,n,'continued','/response/body/result/structuredContent/error/code','APPROVAL_REQUIRED'),eq('required-decision-role',o,n,'continued','/response/body/result/structuredContent/error/requiredRole','MANAGER'),eq('new-rpc-id',o,'mrtr-state','continued','/response/body/id','T20-new-rpc'),eq('actual-dispatch-payload',o,'mrtr-state','continued','/data/transcript/request/body/params/arguments',complete),same('actual-issued-state',o,'mrtr-state','continued','/data/transcript/request/body/params/requestState','issued','/response/body/result/requestState'),eq('matched-channel-input',o,'mrtr-state','continued','/data/transcript/request/body/params/inputResponses',[response])]+no_effect(o,n)
+ x += [same('unchanged-purchase-orders',o,n,'db-after','/data/rawRows/purchaseOrders','db-before','/data/rawRows/purchaseOrders'),same('unchanged-proposals',o,n,'db-after','/data/rawRows/proposals','db-before','/data/rawRows/proposals'),assertion('no-manager-decision-before',o,n,'count','db-before','/data/rawRows/approvals',0,where={'proposalId':ref('proposal','/response/proposalId')}),assertion('no-manager-decision-after',o,n,'count','db-after','/data/rawRows/approvals',0,where={'proposalId':ref('proposal','/response/proposalId')})]
+ approved=json.loads(json.dumps(complete));approved['slots']['approvalId']=purchase_slot(ref('approval','/response/approvalId'));approved['commandIdempotencyKey']='T20-'+v+'-approved-dispatch'
+ a += [action('approval','approvePurchase',purchase_approval('T20-'+v+'-manager'),'invoke',actor='manager'),wire('approved-dispatch','tools/call',{'name':'dispatchPurchaseOrder','arguments':approved},actor='writer'),action('positive-inventory','getInventory'),obs('db-positive','positive-inventory')]
+ a[-1]['observation']['sources'].extend(['purchaseOrders','proposals'])
+ x += [eq('manager-approval-applied',o,'mrtr-state','approval','/response/outcome','APPLIED'),eq('approved-countercall-applied',o,'mrtr-state','approved-dispatch','/response/body/result/structuredContent/outcome','ACCEPTED_PENDING_EXTERNAL'),rowset('real-manager-decision',o,'mrtr-state','db-positive','approvals',['id','proposalId','proposalHash','proposalRevision','approverId','decidedAt','validUntil','consumptionPolicy','decision'],[[ref('approval','/response/approvalId'),binding['proposalId'],binding['proposalHash'],ref('proposal','/response/proposalRevision'),alias('manager'),TIME,'2026-10-08T09:00:00Z','SINGLE_ORDER_REVISION','APPROVE']],where={'proposalId':binding['proposalId']}),rowset('approved-countercall-order',o,'mrtr-state','db-positive','purchaseOrders',['id','proposalId','proposalHash','approvalId'],[[ref('approved-dispatch','/response/body/result/structuredContent/purchaseOrderId'),binding['proposalId'],binding['proposalHash'],ref('approval','/response/approvalId')]],where={'proposalId':binding['proposalId']}),assertion('approved-countercall-effect-once',o,'mrtr-state','count','db-positive','/data/rawRows/outbox',1,where={'capabilityId':'dispatchPurchaseOrder','commandKey':'T20-'+v+'-approved-dispatch'})]
+ T20.append(sub('T20','mrtr-'+v,'유효한 발주 입력의 '+v+'가 승인 없이 효과를 만들지 않고 MANAGER 결정 후 실행한다',o,a,x,['fixture','api','db','wire']))
 # Two real raw-wire calls compete for one issued manager-approval state.
 o='T20.mrtr-bound-state'
-purchase={'intentKind':'COMMAND','definitionVersion':'definition-v1','itemId':alias('P'),'supplierId':alias('SUP'),'quantity':{'value':'100','unit':'BOX'},'unitPrice':{'value':'2','currency':'EUR'},'destinationId':alias('W'),'dueAt':'2026-10-09T09:00:00Z','endpoint':'ARRIVED','quantityMode':'CUMULATIVE_EVENT','ownerId':alias('writer'),'commandIdempotencyKey':'T20-mrtr-proposal'}
-base={'proposalId':ref('proposal','/response/proposalId'),'proposalHash':ref('proposal','/response/proposalHash'),'expectedRevision':ref('proposal','/response/revision')}
-a=[setup(),action('proposal','proposePurchase',purchase,'invoke',actor='writer'),action('noun','getInventory'),obs('db-before'),wire('approval-issued','tools/call',{'name':'approvePurchase','arguments':base},actor='manager')]
+a=[setup(),purchase_work(),action('proposal','proposePurchase',purchase_proposal('T20-mrtr-proposal'),'invoke',actor='writer'),action('noun','getInventory'),obs('db-before'),wire('approval-issued','tools/call',{'name':'approvePurchase','arguments':purchase_approval('T20-mrtr-approval-issued',collectDecision=True)},actor='manager')]
 starts=[]
 for side in ['left','right']:
- args={'name':'approvePurchase','arguments':dict(base,commandIdempotencyKey='T20-approval-'+side),'requestState':ref('approval-issued','/response/body/result/requestState'),'inputResponses':[{'requestId':ref('approval-issued','/response/body/result/inputRequests/0/requestId'),'value':{'decision':'APPROVED','proposalHash':ref('proposal','/response/proposalHash')}}]}
+ args={'name':'approvePurchase','arguments':purchase_approval('T20-approval-'+side),'requestState':ref('approval-issued','/response/body/result/requestState'),'inputResponses':[{'requestId':ref('approval-issued','/response/body/result/inputRequests/0/requestId'),'value':{'decision':'APPROVE','proposalHash':ref('proposal','/response/proposalHash')}}]}
  call=wire('call-'+side,'tools/call',args,rpc='T20-approval-rpc-'+side,actor='manager');call['request']['testBarrier']={'barrierId':'T20-consume-'+side,'participantId':side,'point':'BEFORE_MRTR_APPROVAL_CONSUMPTION'}
  starts.append({'id':side,'actions':[{'id':'start-'+side,'kind':'start','call':call,'evidenceRefs':['start-'+side+':actual-wire-submission']} ]})
 a.extend(branch['actions'][0] for branch in starts)
@@ -234,7 +278,7 @@ a.append({'id':'left-terminal','kind':'await','awaitActionId':'start-left','time
 a.append({'id':'resume-right','kind':'control','control':{'type':'barrier','operation':'resume','parameters':{'barrierId':'T20-consume-right','participantId':'right','transactionId':ref('start-right','/data/transactionId'),'point':'BEFORE_MRTR_APPROVAL_CONSUMPTION','state':'RESUMED'}},'evidenceRefs':['resume-right:actual-barrier-ack']})
 a.append({'id':'right-terminal','kind':'await','awaitActionId':'start-right','timeoutSeconds':30,'evidenceRefs':['right-terminal:actual-terminal-and-commit']})
 a += [action('after','getInventory'),obs('db-after','after')]
-x=[eq('first-input-required',o,'mrtr-state','approval-issued','/response/body/result/resultType','input_required'),eq('winner-approved',o,'mrtr-state','left-terminal','/response/body/result/structuredContent/outcome','APPLIED'),eq('loser-conflict',o,'mrtr-state','right-terminal','/response/body/result/structuredContent/outcome','CONFLICT'),eq('loser-state-consumed',o,'mrtr-state','right-terminal','/response/body/result/structuredContent/error/code','REQUEST_STATE_CONSUMED'),assertion('one-manager-approval',o,'mrtr-state','count','db-after','/data/rawRows/approvals',1,where={'proposalId':ref('proposal','/response/proposalId'),'decision':'APPROVED'}),assertion('one-state-consumption',o,'mrtr-state','count','db-after','/data/rawRows/commandResults',1,where={'kind':'MRTR_APPROVAL_STATE_CONSUMPTION','proposalId':ref('proposal','/response/proposalId')}),same('no-physical-approval-effect',o,'requeststate-as-approval','db-after','/data/rawRows/movements','db-before','/data/rawRows/movements'),same('no-dispatch-approval-effect',o,'accept-string-as-approval','db-after','/data/rawRows/outbox','db-before','/data/rawRows/outbox')]
+x=[eq('first-input-required',o,'mrtr-state','approval-issued','/response/body/result/resultType','input_required'),eq('winner-approved',o,'mrtr-state','left-terminal','/response/body/result/structuredContent/outcome','APPLIED'),eq('loser-conflict',o,'mrtr-state','right-terminal','/response/body/result/structuredContent/outcome','CONFLICT'),eq('loser-state-consumed',o,'mrtr-state','right-terminal','/response/body/result/structuredContent/error/code','REQUEST_STATE_CONSUMED'),assertion('one-manager-approval',o,'mrtr-state','count','db-after','/data/rawRows/approvals',1,where={'proposalId':ref('proposal','/response/proposalId'),'decision':'APPROVE'}),assertion('one-state-consumption',o,'mrtr-state','count','db-after','/data/rawRows/commandResults',1,where={'kind':'MRTR_APPROVAL_STATE_CONSUMPTION','proposalId':ref('proposal','/response/proposalId')}),same('no-physical-approval-effect',o,'requeststate-as-approval','db-after','/data/rawRows/movements','db-before','/data/rawRows/movements'),same('no-dispatch-approval-effect',o,'accept-string-as-approval','db-after','/data/rawRows/outbox','db-before','/data/rawRows/outbox')]
 for side in ['left','right']:
  x += [eq(side+'-raw-new-rpc',o,'mrtr-state',side+'-terminal','/data/transcript/request/body/id','T20-approval-rpc-'+side),eq(side+'-effect-key',o,'mrtr-state',side+'-terminal','/data/transcript/request/body/params/arguments/commandIdempotencyKey','T20-approval-'+side),same(side+'-actual-issued-state',o,'mrtr-state',side+'-terminal','/data/transcript/request/body/params/requestState','approval-issued','/response/body/result/requestState'),eq(side+'-terminal-ack',o,'mrtr-state',side+'-terminal','/data/completed',True),same(side+'-same-handle',o,'mrtr-state',side+'-terminal','/data/invocationHandle','start-'+side,'/data/invocationHandle')]
 T20.append(sub('T20','mrtr-concurrent-approval-consumption','두 실제 wire 거래의 manager 승인 state single-use 소비',o,a,x,['fixture','api','db','wire','barrier']))
@@ -319,6 +363,12 @@ x=[assertion('case-repeat-identities',o,'corpus-size','relationSet','model-recor
 for field in ['ambiguousImproperExecution','unauthorized','duplicate','falseCompletion']:x.append(eq('actual-zero-'+field,o,'proposed-acceptance','model-records',p+'metrics/'+field,0))
 for metric in ['p50LatencyMillis','p95LatencyMillis','clarificationRate','totalCost']:x.append(assertion('metric-'+metric,o,'usage-and-version-evidence','decimalAtLeast','model-records',p+'metrics/'+metric,'0'))
 T25.append(sub('T25','actual-model-usage-required','승인된 실제 M60×3·attempt/retry usage·비용·version 인수',o,a,x,['fixture','host','coverage','model','skills','wire']))
+
+# Keep the MRTR variants in their established authoring order.
+mrtr_order=['continuation','tampered-state','expired-state','other-principal','other-method','other-intent','unmatched-responses','state-as-approval','accept-as-approval','unsupported-client']
+mrtr_rank={'mrtr-'+name:index for index,name in enumerate(mrtr_order)}
+mrtr_start=next(index for index,sc in enumerate(T20) if sc['id'] in mrtr_rank)
+T20[mrtr_start:mrtr_start+len(mrtr_order)]=sorted(T20[mrtr_start:mrtr_start+len(mrtr_order)],key=lambda sc:mrtr_rank[sc['id']])
 
 for sc in T20:
  for a in sc['actions']:

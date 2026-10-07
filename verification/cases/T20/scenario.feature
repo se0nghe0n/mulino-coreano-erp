@@ -164,6 +164,7 @@
     만일 "시스템" 역할이 "db-before" 행동을 수행한다
     만일 "writer" 역할이 "draft" 행동을 수행한다
     만일 "writer" 역할이 "supplement" 행동을 수행한다
+    만일 "reader" 역할이 "purchase-work" 행동을 수행한다
     만일 "writer" 역할이 "proposal" 행동을 수행한다
     만일 "manager" 역할이 "approval" 행동을 수행한다
     만일 "writer" 역할이 "revise" 행동을 수행한다
@@ -588,6 +589,7 @@
     먼저 사례 파일 "verification/cases/T20/case.json"의 "domain-waiting_approval"를 준비한다
     만일 "시스템" 역할이 "setup" 행동을 수행한다
     만일 "reader" 역할이 "noun" 행동을 수행한다
+    만일 "reader" 역할이 "purchase-work" 행동을 수행한다
     만일 "writer" 역할이 "proposal" 행동을 수행한다
     만일 "reader" 역할이 "pre-domain" 행동을 수행한다
     만일 "시스템" 역할이 "db-before" 행동을 수행한다
@@ -699,6 +701,7 @@
     먼저 사례 파일 "verification/cases/T20/case.json"의 "domain-accepted_pending_external"를 준비한다
     만일 "시스템" 역할이 "setup" 행동을 수행한다
     만일 "reader" 역할이 "noun" 행동을 수행한다
+    만일 "reader" 역할이 "purchase-work" 행동을 수행한다
     만일 "writer" 역할이 "proposal" 행동을 수행한다
     만일 "manager" 역할이 "approval" 행동을 수행한다
     만일 "시스템" 역할이 "external-timeout" 행동을 수행한다
@@ -820,6 +823,8 @@
     만일 "시스템" 역할이 "db-before" 행동을 수행한다
     만일 "writer" 역할이 "issued" 행동을 수행한다
     만일 "otherPrincipal" 역할이 "continued" 행동을 수행한다
+    만일 "otherPrincipal" 역할이 "own-issued" 행동을 수행한다
+    만일 "otherPrincipal" 역할이 "own-continued" 행동을 수행한다
     만일 "reader" 역할이 "after" 행동을 수행한다
     만일 "시스템" 역할이 "db-after" 행동을 수행한다
     그러면 "issued-input-required" assertion으로 "issued-input-required: /response/body/result/resultType의 실제 equals 기대값은 'input_required'다. 미관찰·UNKNOWN은 정상값이 아니다."를 확인한다
@@ -831,6 +836,11 @@
     그러면 "unchanged-approvals" assertion으로 "승인·실물·배분·업무·외부효과의 전후 원행을 exact 대조한다. 허용 감사는 이 불변 대상에서 분리한다."를 확인한다
     그러면 "unchanged-works" assertion으로 "승인·실물·배분·업무·외부효과의 전후 원행을 exact 대조한다. 허용 감사는 이 불변 대상에서 분리한다."를 확인한다
     그러면 "unchanged-outbox" assertion으로 "승인·실물·배분·업무·외부효과의 전후 원행을 exact 대조한다. 허용 감사는 이 불변 대상에서 분리한다."를 확인한다
+    그러면 "wrong-principal-code" assertion으로 "wrong-principal-code: /response/body/result/structuredContent/error/code의 실제 equals 기대값은 'REQUEST_STATE_PRINCIPAL_MISMATCH'다. 미관찰·UNKNOWN은 정상값이 아니다."를 확인한다
+    그러면 "own-issued-input-required" assertion으로 "own-issued-input-required: /response/body/result/resultType의 실제 equals 기대값은 'input_required'다. 미관찰·UNKNOWN은 정상값이 아니다."를 확인한다
+    그러면 "own-state-countercall-structured" assertion으로 "own-state-countercall-structured: /response/body/result/structuredContent/outcome의 실제 equals 기대값은 'STRUCTURED'다. 미관찰·UNKNOWN은 정상값이 아니다."를 확인한다
+    그러면 "own-state-destination-applied" assertion으로 "own-state-destination-applied: /response/body/result/structuredContent/intent/slots/destination/value의 실제 equals 기대값은 {'$alias': 'W'}다. 미관찰·UNKNOWN은 정상값이 아니다."를 확인한다
+    그러면 "own-conversation-kept" assertion으로 "own-conversation-kept: /response/body/result/structuredContent/conversationRequestId의 실제 equals 기대값은 'T20-other-principal-input'다. 미관찰·UNKNOWN은 정상값이 아니다."를 확인한다
     그러면 "issued-raw-method" assertion으로 "issued-raw-method: /data/transcript/request/body/method의 실제 equals 기대값은 'tools/call'다. 미관찰·UNKNOWN은 정상값이 아니다."를 확인한다
     그러면 "issued-raw-jsonrpc-id" assertion으로 "issued-raw-jsonrpc-id: /data/transcript/request/body/id의 실제 equals 기대값은 'issued'다. 미관찰·UNKNOWN은 정상값이 아니다."를 확인한다
     그러면 "issued-raw-MCP-Protocol-Version" assertion으로 "issued-raw-MCP-Protocol-Version: /data/transcript/request/headers/MCP-Protocol-Version의 실제 equals 기대값은 '2026-07-28'다. 미관찰·UNKNOWN은 정상값이 아니다."를 확인한다
@@ -843,6 +853,18 @@
     그러면 "continued-raw-Mcp-Method" assertion으로 "continued-raw-Mcp-Method: /data/transcript/request/headers/Mcp-Method의 실제 equals 기대값은 'tools/call'다. 미관찰·UNKNOWN은 정상값이 아니다."를 확인한다
     그러면 "continued-raw-Mcp-Name" assertion으로 "continued-raw-Mcp-Name: /data/transcript/request/headers/Mcp-Name의 실제 equals 기대값은 'structureIntent'다. 미관찰·UNKNOWN은 정상값이 아니다."를 확인한다
     그러면 "continued-raw-meta" assertion으로 "continued-raw-meta: /data/transcript/request/body/params/_meta의 실제 equals 기대값은 {'io.modelcontextprotocol/protocolVersion': '2026-07-28', 'io.modelcontextprotocol/clientInfo': {'name': 'ontology-channel-contract', 'version': '1.0.0'}, 'io.modelcontextprotocol/clientCapabilities': {'elicitation': {'form': {}}}}다. 미관찰·UNKNOWN은 정상값이 아니다."를 확인한다
+    그러면 "own-issued-raw-method" assertion으로 "own-issued-raw-method: /data/transcript/request/body/method의 실제 equals 기대값은 'tools/call'다. 미관찰·UNKNOWN은 정상값이 아니다."를 확인한다
+    그러면 "own-issued-raw-jsonrpc-id" assertion으로 "own-issued-raw-jsonrpc-id: /data/transcript/request/body/id의 실제 equals 기대값은 'own-issued'다. 미관찰·UNKNOWN은 정상값이 아니다."를 확인한다
+    그러면 "own-issued-raw-MCP-Protocol-Version" assertion으로 "own-issued-raw-MCP-Protocol-Version: /data/transcript/request/headers/MCP-Protocol-Version의 실제 equals 기대값은 '2026-07-28'다. 미관찰·UNKNOWN은 정상값이 아니다."를 확인한다
+    그러면 "own-issued-raw-Mcp-Method" assertion으로 "own-issued-raw-Mcp-Method: /data/transcript/request/headers/Mcp-Method의 실제 equals 기대값은 'tools/call'다. 미관찰·UNKNOWN은 정상값이 아니다."를 확인한다
+    그러면 "own-issued-raw-Mcp-Name" assertion으로 "own-issued-raw-Mcp-Name: /data/transcript/request/headers/Mcp-Name의 실제 equals 기대값은 'structureIntent'다. 미관찰·UNKNOWN은 정상값이 아니다."를 확인한다
+    그러면 "own-issued-raw-meta" assertion으로 "own-issued-raw-meta: /data/transcript/request/body/params/_meta의 실제 equals 기대값은 {'io.modelcontextprotocol/protocolVersion': '2026-07-28', 'io.modelcontextprotocol/clientInfo': {'name': 'ontology-channel-contract', 'version': '1.0.0'}, 'io.modelcontextprotocol/clientCapabilities': {'elicitation': {'form': {}}}}다. 미관찰·UNKNOWN은 정상값이 아니다."를 확인한다
+    그러면 "own-continued-raw-method" assertion으로 "own-continued-raw-method: /data/transcript/request/body/method의 실제 equals 기대값은 'tools/call'다. 미관찰·UNKNOWN은 정상값이 아니다."를 확인한다
+    그러면 "own-continued-raw-jsonrpc-id" assertion으로 "own-continued-raw-jsonrpc-id: /data/transcript/request/body/id의 실제 equals 기대값은 'own-continued'다. 미관찰·UNKNOWN은 정상값이 아니다."를 확인한다
+    그러면 "own-continued-raw-MCP-Protocol-Version" assertion으로 "own-continued-raw-MCP-Protocol-Version: /data/transcript/request/headers/MCP-Protocol-Version의 실제 equals 기대값은 '2026-07-28'다. 미관찰·UNKNOWN은 정상값이 아니다."를 확인한다
+    그러면 "own-continued-raw-Mcp-Method" assertion으로 "own-continued-raw-Mcp-Method: /data/transcript/request/headers/Mcp-Method의 실제 equals 기대값은 'tools/call'다. 미관찰·UNKNOWN은 정상값이 아니다."를 확인한다
+    그러면 "own-continued-raw-Mcp-Name" assertion으로 "own-continued-raw-Mcp-Name: /data/transcript/request/headers/Mcp-Name의 실제 equals 기대값은 'structureIntent'다. 미관찰·UNKNOWN은 정상값이 아니다."를 확인한다
+    그러면 "own-continued-raw-meta" assertion으로 "own-continued-raw-meta: /data/transcript/request/body/params/_meta의 실제 equals 기대값은 {'io.modelcontextprotocol/protocolVersion': '2026-07-28', 'io.modelcontextprotocol/clientInfo': {'name': 'ontology-channel-contract', 'version': '1.0.0'}, 'io.modelcontextprotocol/clientCapabilities': {'elicitation': {'form': {}}}}다. 미관찰·UNKNOWN은 정상값이 아니다."를 확인한다
   시나리오: 실제 MRTR state other-method와 금지효과0
     먼저 사례 파일 "verification/cases/T20/case.json"의 "mrtr-other-method"를 준비한다
     만일 "시스템" 역할이 "setup" 행동을 수행한다
@@ -933,29 +955,49 @@
     그러면 "continued-raw-Mcp-Method" assertion으로 "continued-raw-Mcp-Method: /data/transcript/request/headers/Mcp-Method의 실제 equals 기대값은 'tools/call'다. 미관찰·UNKNOWN은 정상값이 아니다."를 확인한다
     그러면 "continued-raw-Mcp-Name" assertion으로 "continued-raw-Mcp-Name: /data/transcript/request/headers/Mcp-Name의 실제 equals 기대값은 'structureIntent'다. 미관찰·UNKNOWN은 정상값이 아니다."를 확인한다
     그러면 "continued-raw-meta" assertion으로 "continued-raw-meta: /data/transcript/request/body/params/_meta의 실제 equals 기대값은 {'io.modelcontextprotocol/protocolVersion': '2026-07-28', 'io.modelcontextprotocol/clientInfo': {'name': 'ontology-channel-contract', 'version': '1.0.0'}, 'io.modelcontextprotocol/clientCapabilities': {'elicitation': {'form': {}}}}다. 미관찰·UNKNOWN은 정상값이 아니다."를 확인한다
-  시나리오: 실제 MRTR state state-as-approval와 금지효과0
+  시나리오: 유효한 발주 입력의 state-as-approval가 승인 없이 효과를 만들지 않고 MANAGER 결정 후 실행한다
     먼저 사례 파일 "verification/cases/T20/case.json"의 "mrtr-state-as-approval"를 준비한다
     만일 "시스템" 역할이 "setup" 행동을 수행한다
+    만일 "reader" 역할이 "purchase-work" 행동을 수행한다
+    만일 "writer" 역할이 "proposal" 행동을 수행한다
     만일 "reader" 역할이 "noun" 행동을 수행한다
     만일 "시스템" 역할이 "db-before" 행동을 수행한다
     만일 "writer" 역할이 "issued" 행동을 수행한다
     만일 "writer" 역할이 "continued" 행동을 수행한다
     만일 "reader" 역할이 "after" 행동을 수행한다
     만일 "시스템" 역할이 "db-after" 행동을 수행한다
+    만일 "manager" 역할이 "approval" 행동을 수행한다
+    만일 "writer" 역할이 "approved-dispatch" 행동을 수행한다
+    만일 "reader" 역할이 "positive-inventory" 행동을 수행한다
+    만일 "시스템" 역할이 "db-positive" 행동을 수행한다
     그러면 "issued-input-required" assertion으로 "issued-input-required: /response/body/result/resultType의 실제 equals 기대값은 'input_required'다. 미관찰·UNKNOWN은 정상값이 아니다."를 확인한다
-    그러면 "continued-outcome" assertion으로 "continued-outcome: /response/body/result/structuredContent/outcome의 실제 equals 기대값은 'REJECTED'다. 미관찰·UNKNOWN은 정상값이 아니다."를 확인한다
+    그러면 "continued-outcome" assertion으로 "continued-outcome: /response/body/result/structuredContent/outcome의 실제 equals 기대값은 'WAITING_APPROVAL'다. 미관찰·UNKNOWN은 정상값이 아니다."를 확인한다
+    그러면 "specific-manager-approval-missing" assertion으로 "specific-manager-approval-missing: /response/body/result/structuredContent/error/code의 실제 equals 기대값은 'APPROVAL_REQUIRED'다. 미관찰·UNKNOWN은 정상값이 아니다."를 확인한다
+    그러면 "required-decision-role" assertion으로 "required-decision-role: /response/body/result/structuredContent/error/requiredRole의 실제 equals 기대값은 'MANAGER'다. 미관찰·UNKNOWN은 정상값이 아니다."를 확인한다
     그러면 "new-rpc-id" assertion으로 "new-rpc-id: /response/body/id의 실제 equals 기대값은 'T20-new-rpc'다. 미관찰·UNKNOWN은 정상값이 아니다."를 확인한다
+    그러면 "actual-dispatch-payload" assertion으로 "actual-dispatch-payload: /data/transcript/request/body/params/arguments의 실제 equals 기대값은 {'intentKind': 'COMMAND', 'definitionVersion': 'definition-v1', 'capabilityId': 'dispatchPurchaseOrder', 'subjectRefs': [{'type': 'TradeItem', 'id': {'$alias': 'P'}}], 'slots': {'proposalId': {'value': {'$result': {'actionId': 'proposal', 'pointer': '/response/proposalId'}}, 'provenance': 'CONTEXT'}, 'proposalHash': {'value': {'$result': {'actionId': 'proposal', 'pointer': '/response/proposalHash'}}, 'provenance': 'CONTEXT'}, 'channel': {'value': 'SYNTHETIC_SUPPLIER', 'provenance': 'USER'}, 'externalOperationId': {'value': 'T20-state-as-approval-dispatch-external', 'provenance': 'USER'}}, 'conditions': [], 'evidenceRefs': [], 'expectedRevision': {'$result': {'actionId': 'proposal', 'pointer': '/response/proposalRevision'}}, 'commandIdempotencyKey': 'T20-state-as-approval-dispatch'}다. 미관찰·UNKNOWN은 정상값이 아니다."를 확인한다
+    그러면 "actual-issued-state" assertion으로 "actual-issued-state: continued의 /data/transcript/request/body/params/requestState와 issued의 /response/body/result/requestState를 같은 scope에서 exact 대조한다."를 확인한다
+    그러면 "matched-channel-input" assertion으로 "matched-channel-input: /data/transcript/request/body/params/inputResponses의 실제 equals 기대값은 [{'requestId': {'$result': {'actionId': 'issued', 'pointer': '/response/body/result/inputRequests/0/requestId'}}, 'value': {'channel': 'SYNTHETIC_SUPPLIER'}}]다. 미관찰·UNKNOWN은 정상값이 아니다."를 확인한다
     그러면 "unchanged-segments" assertion으로 "승인·실물·배분·업무·외부효과의 전후 원행을 exact 대조한다. 허용 감사는 이 불변 대상에서 분리한다."를 확인한다
     그러면 "unchanged-movements" assertion으로 "승인·실물·배분·업무·외부효과의 전후 원행을 exact 대조한다. 허용 감사는 이 불변 대상에서 분리한다."를 확인한다
     그러면 "unchanged-allocations" assertion으로 "승인·실물·배분·업무·외부효과의 전후 원행을 exact 대조한다. 허용 감사는 이 불변 대상에서 분리한다."를 확인한다
     그러면 "unchanged-approvals" assertion으로 "승인·실물·배분·업무·외부효과의 전후 원행을 exact 대조한다. 허용 감사는 이 불변 대상에서 분리한다."를 확인한다
     그러면 "unchanged-works" assertion으로 "승인·실물·배분·업무·외부효과의 전후 원행을 exact 대조한다. 허용 감사는 이 불변 대상에서 분리한다."를 확인한다
     그러면 "unchanged-outbox" assertion으로 "승인·실물·배분·업무·외부효과의 전후 원행을 exact 대조한다. 허용 감사는 이 불변 대상에서 분리한다."를 확인한다
+    그러면 "unchanged-purchase-orders" assertion으로 "unchanged-purchase-orders: db-after의 /data/rawRows/purchaseOrders와 db-before의 /data/rawRows/purchaseOrders를 같은 scope에서 exact 대조한다."를 확인한다
+    그러면 "unchanged-proposals" assertion으로 "unchanged-proposals: db-after의 /data/rawRows/proposals와 db-before의 /data/rawRows/proposals를 같은 scope에서 exact 대조한다."를 확인한다
+    그러면 "no-manager-decision-before" assertion으로 "no-manager-decision-before: /data/rawRows/approvals의 scope·filter를 만족하는 실제 원행은 정확히 0개다."를 확인한다
+    그러면 "no-manager-decision-after" assertion으로 "no-manager-decision-after: /data/rawRows/approvals의 scope·filter를 만족하는 실제 원행은 정확히 0개다."를 확인한다
+    그러면 "manager-approval-applied" assertion으로 "manager-approval-applied: /response/outcome의 실제 equals 기대값은 'APPLIED'다. 미관찰·UNKNOWN은 정상값이 아니다."를 확인한다
+    그러면 "approved-countercall-applied" assertion으로 "approved-countercall-applied: /response/body/result/structuredContent/outcome의 실제 equals 기대값은 'ACCEPTED_PENDING_EXTERNAL'다. 미관찰·UNKNOWN은 정상값이 아니다."를 확인한다
+    그러면 "real-manager-decision" assertion으로 "real-manager-decision: /data/rawRows/approvals의 실제 ['id', 'proposalId', 'proposalHash', 'proposalRevision', 'approverId', 'decidedAt', 'validUntil', 'consumptionPolicy', 'decision']는 고정한 1개 identity/관계와 exact 일치하며 중복·누락을 거부한다."를 확인한다
+    그러면 "approved-countercall-order" assertion으로 "approved-countercall-order: /data/rawRows/purchaseOrders의 실제 ['id', 'proposalId', 'proposalHash', 'approvalId']는 고정한 1개 identity/관계와 exact 일치하며 중복·누락을 거부한다."를 확인한다
+    그러면 "approved-countercall-effect-once" assertion으로 "approved-countercall-effect-once: /data/rawRows/outbox의 scope·filter를 만족하는 실제 원행은 정확히 1개다."를 확인한다
     그러면 "issued-raw-method" assertion으로 "issued-raw-method: /data/transcript/request/body/method의 실제 equals 기대값은 'tools/call'다. 미관찰·UNKNOWN은 정상값이 아니다."를 확인한다
     그러면 "issued-raw-jsonrpc-id" assertion으로 "issued-raw-jsonrpc-id: /data/transcript/request/body/id의 실제 equals 기대값은 'issued'다. 미관찰·UNKNOWN은 정상값이 아니다."를 확인한다
     그러면 "issued-raw-MCP-Protocol-Version" assertion으로 "issued-raw-MCP-Protocol-Version: /data/transcript/request/headers/MCP-Protocol-Version의 실제 equals 기대값은 '2026-07-28'다. 미관찰·UNKNOWN은 정상값이 아니다."를 확인한다
     그러면 "issued-raw-Mcp-Method" assertion으로 "issued-raw-Mcp-Method: /data/transcript/request/headers/Mcp-Method의 실제 equals 기대값은 'tools/call'다. 미관찰·UNKNOWN은 정상값이 아니다."를 확인한다
-    그러면 "issued-raw-Mcp-Name" assertion으로 "issued-raw-Mcp-Name: /data/transcript/request/headers/Mcp-Name의 실제 equals 기대값은 'structureIntent'다. 미관찰·UNKNOWN은 정상값이 아니다."를 확인한다
+    그러면 "issued-raw-Mcp-Name" assertion으로 "issued-raw-Mcp-Name: /data/transcript/request/headers/Mcp-Name의 실제 equals 기대값은 'dispatchPurchaseOrder'다. 미관찰·UNKNOWN은 정상값이 아니다."를 확인한다
     그러면 "issued-raw-meta" assertion으로 "issued-raw-meta: /data/transcript/request/body/params/_meta의 실제 equals 기대값은 {'io.modelcontextprotocol/protocolVersion': '2026-07-28', 'io.modelcontextprotocol/clientInfo': {'name': 'ontology-channel-contract', 'version': '1.0.0'}, 'io.modelcontextprotocol/clientCapabilities': {'elicitation': {'form': {}}}}다. 미관찰·UNKNOWN은 정상값이 아니다."를 확인한다
     그러면 "continued-raw-method" assertion으로 "continued-raw-method: /data/transcript/request/body/method의 실제 equals 기대값은 'tools/call'다. 미관찰·UNKNOWN은 정상값이 아니다."를 확인한다
     그러면 "continued-raw-jsonrpc-id" assertion으로 "continued-raw-jsonrpc-id: /data/transcript/request/body/id의 실제 equals 기대값은 'T20-new-rpc'다. 미관찰·UNKNOWN은 정상값이 아니다."를 확인한다
@@ -963,29 +1005,55 @@
     그러면 "continued-raw-Mcp-Method" assertion으로 "continued-raw-Mcp-Method: /data/transcript/request/headers/Mcp-Method의 실제 equals 기대값은 'tools/call'다. 미관찰·UNKNOWN은 정상값이 아니다."를 확인한다
     그러면 "continued-raw-Mcp-Name" assertion으로 "continued-raw-Mcp-Name: /data/transcript/request/headers/Mcp-Name의 실제 equals 기대값은 'dispatchPurchaseOrder'다. 미관찰·UNKNOWN은 정상값이 아니다."를 확인한다
     그러면 "continued-raw-meta" assertion으로 "continued-raw-meta: /data/transcript/request/body/params/_meta의 실제 equals 기대값은 {'io.modelcontextprotocol/protocolVersion': '2026-07-28', 'io.modelcontextprotocol/clientInfo': {'name': 'ontology-channel-contract', 'version': '1.0.0'}, 'io.modelcontextprotocol/clientCapabilities': {'elicitation': {'form': {}}}}다. 미관찰·UNKNOWN은 정상값이 아니다."를 확인한다
-  시나리오: 실제 MRTR state accept-as-approval와 금지효과0
+    그러면 "approved-dispatch-raw-method" assertion으로 "approved-dispatch-raw-method: /data/transcript/request/body/method의 실제 equals 기대값은 'tools/call'다. 미관찰·UNKNOWN은 정상값이 아니다."를 확인한다
+    그러면 "approved-dispatch-raw-jsonrpc-id" assertion으로 "approved-dispatch-raw-jsonrpc-id: /data/transcript/request/body/id의 실제 equals 기대값은 'approved-dispatch'다. 미관찰·UNKNOWN은 정상값이 아니다."를 확인한다
+    그러면 "approved-dispatch-raw-MCP-Protocol-Version" assertion으로 "approved-dispatch-raw-MCP-Protocol-Version: /data/transcript/request/headers/MCP-Protocol-Version의 실제 equals 기대값은 '2026-07-28'다. 미관찰·UNKNOWN은 정상값이 아니다."를 확인한다
+    그러면 "approved-dispatch-raw-Mcp-Method" assertion으로 "approved-dispatch-raw-Mcp-Method: /data/transcript/request/headers/Mcp-Method의 실제 equals 기대값은 'tools/call'다. 미관찰·UNKNOWN은 정상값이 아니다."를 확인한다
+    그러면 "approved-dispatch-raw-Mcp-Name" assertion으로 "approved-dispatch-raw-Mcp-Name: /data/transcript/request/headers/Mcp-Name의 실제 equals 기대값은 'dispatchPurchaseOrder'다. 미관찰·UNKNOWN은 정상값이 아니다."를 확인한다
+    그러면 "approved-dispatch-raw-meta" assertion으로 "approved-dispatch-raw-meta: /data/transcript/request/body/params/_meta의 실제 equals 기대값은 {'io.modelcontextprotocol/protocolVersion': '2026-07-28', 'io.modelcontextprotocol/clientInfo': {'name': 'ontology-channel-contract', 'version': '1.0.0'}, 'io.modelcontextprotocol/clientCapabilities': {'elicitation': {'form': {}}}}다. 미관찰·UNKNOWN은 정상값이 아니다."를 확인한다
+  시나리오: 유효한 발주 입력의 accept-as-approval가 승인 없이 효과를 만들지 않고 MANAGER 결정 후 실행한다
     먼저 사례 파일 "verification/cases/T20/case.json"의 "mrtr-accept-as-approval"를 준비한다
     만일 "시스템" 역할이 "setup" 행동을 수행한다
+    만일 "reader" 역할이 "purchase-work" 행동을 수행한다
+    만일 "writer" 역할이 "proposal" 행동을 수행한다
     만일 "reader" 역할이 "noun" 행동을 수행한다
     만일 "시스템" 역할이 "db-before" 행동을 수행한다
     만일 "writer" 역할이 "issued" 행동을 수행한다
     만일 "writer" 역할이 "continued" 행동을 수행한다
     만일 "reader" 역할이 "after" 행동을 수행한다
     만일 "시스템" 역할이 "db-after" 행동을 수행한다
+    만일 "manager" 역할이 "approval" 행동을 수행한다
+    만일 "writer" 역할이 "approved-dispatch" 행동을 수행한다
+    만일 "reader" 역할이 "positive-inventory" 행동을 수행한다
+    만일 "시스템" 역할이 "db-positive" 행동을 수행한다
     그러면 "issued-input-required" assertion으로 "issued-input-required: /response/body/result/resultType의 실제 equals 기대값은 'input_required'다. 미관찰·UNKNOWN은 정상값이 아니다."를 확인한다
-    그러면 "continued-outcome" assertion으로 "continued-outcome: /response/body/result/structuredContent/outcome의 실제 equals 기대값은 'REJECTED'다. 미관찰·UNKNOWN은 정상값이 아니다."를 확인한다
+    그러면 "continued-outcome" assertion으로 "continued-outcome: /response/body/result/structuredContent/outcome의 실제 equals 기대값은 'WAITING_APPROVAL'다. 미관찰·UNKNOWN은 정상값이 아니다."를 확인한다
+    그러면 "specific-manager-approval-missing" assertion으로 "specific-manager-approval-missing: /response/body/result/structuredContent/error/code의 실제 equals 기대값은 'APPROVAL_REQUIRED'다. 미관찰·UNKNOWN은 정상값이 아니다."를 확인한다
+    그러면 "required-decision-role" assertion으로 "required-decision-role: /response/body/result/structuredContent/error/requiredRole의 실제 equals 기대값은 'MANAGER'다. 미관찰·UNKNOWN은 정상값이 아니다."를 확인한다
     그러면 "new-rpc-id" assertion으로 "new-rpc-id: /response/body/id의 실제 equals 기대값은 'T20-new-rpc'다. 미관찰·UNKNOWN은 정상값이 아니다."를 확인한다
+    그러면 "actual-dispatch-payload" assertion으로 "actual-dispatch-payload: /data/transcript/request/body/params/arguments의 실제 equals 기대값은 {'intentKind': 'COMMAND', 'definitionVersion': 'definition-v1', 'capabilityId': 'dispatchPurchaseOrder', 'subjectRefs': [{'type': 'TradeItem', 'id': {'$alias': 'P'}}], 'slots': {'proposalId': {'value': {'$result': {'actionId': 'proposal', 'pointer': '/response/proposalId'}}, 'provenance': 'CONTEXT'}, 'proposalHash': {'value': {'$result': {'actionId': 'proposal', 'pointer': '/response/proposalHash'}}, 'provenance': 'CONTEXT'}, 'channel': {'value': 'SYNTHETIC_SUPPLIER', 'provenance': 'USER'}, 'externalOperationId': {'value': 'T20-accept-as-approval-dispatch-external', 'provenance': 'USER'}}, 'conditions': [], 'evidenceRefs': [], 'expectedRevision': {'$result': {'actionId': 'proposal', 'pointer': '/response/proposalRevision'}}, 'commandIdempotencyKey': 'T20-accept-as-approval-dispatch'}다. 미관찰·UNKNOWN은 정상값이 아니다."를 확인한다
+    그러면 "actual-issued-state" assertion으로 "actual-issued-state: continued의 /data/transcript/request/body/params/requestState와 issued의 /response/body/result/requestState를 같은 scope에서 exact 대조한다."를 확인한다
+    그러면 "matched-channel-input" assertion으로 "matched-channel-input: /data/transcript/request/body/params/inputResponses의 실제 equals 기대값은 [{'requestId': {'$result': {'actionId': 'issued', 'pointer': '/response/body/result/inputRequests/0/requestId'}}, 'value': {'channel': 'SYNTHETIC_SUPPLIER'}, 'action': 'accept'}]다. 미관찰·UNKNOWN은 정상값이 아니다."를 확인한다
     그러면 "unchanged-segments" assertion으로 "승인·실물·배분·업무·외부효과의 전후 원행을 exact 대조한다. 허용 감사는 이 불변 대상에서 분리한다."를 확인한다
     그러면 "unchanged-movements" assertion으로 "승인·실물·배분·업무·외부효과의 전후 원행을 exact 대조한다. 허용 감사는 이 불변 대상에서 분리한다."를 확인한다
     그러면 "unchanged-allocations" assertion으로 "승인·실물·배분·업무·외부효과의 전후 원행을 exact 대조한다. 허용 감사는 이 불변 대상에서 분리한다."를 확인한다
     그러면 "unchanged-approvals" assertion으로 "승인·실물·배분·업무·외부효과의 전후 원행을 exact 대조한다. 허용 감사는 이 불변 대상에서 분리한다."를 확인한다
     그러면 "unchanged-works" assertion으로 "승인·실물·배분·업무·외부효과의 전후 원행을 exact 대조한다. 허용 감사는 이 불변 대상에서 분리한다."를 확인한다
     그러면 "unchanged-outbox" assertion으로 "승인·실물·배분·업무·외부효과의 전후 원행을 exact 대조한다. 허용 감사는 이 불변 대상에서 분리한다."를 확인한다
+    그러면 "unchanged-purchase-orders" assertion으로 "unchanged-purchase-orders: db-after의 /data/rawRows/purchaseOrders와 db-before의 /data/rawRows/purchaseOrders를 같은 scope에서 exact 대조한다."를 확인한다
+    그러면 "unchanged-proposals" assertion으로 "unchanged-proposals: db-after의 /data/rawRows/proposals와 db-before의 /data/rawRows/proposals를 같은 scope에서 exact 대조한다."를 확인한다
+    그러면 "no-manager-decision-before" assertion으로 "no-manager-decision-before: /data/rawRows/approvals의 scope·filter를 만족하는 실제 원행은 정확히 0개다."를 확인한다
+    그러면 "no-manager-decision-after" assertion으로 "no-manager-decision-after: /data/rawRows/approvals의 scope·filter를 만족하는 실제 원행은 정확히 0개다."를 확인한다
+    그러면 "manager-approval-applied" assertion으로 "manager-approval-applied: /response/outcome의 실제 equals 기대값은 'APPLIED'다. 미관찰·UNKNOWN은 정상값이 아니다."를 확인한다
+    그러면 "approved-countercall-applied" assertion으로 "approved-countercall-applied: /response/body/result/structuredContent/outcome의 실제 equals 기대값은 'ACCEPTED_PENDING_EXTERNAL'다. 미관찰·UNKNOWN은 정상값이 아니다."를 확인한다
+    그러면 "real-manager-decision" assertion으로 "real-manager-decision: /data/rawRows/approvals의 실제 ['id', 'proposalId', 'proposalHash', 'proposalRevision', 'approverId', 'decidedAt', 'validUntil', 'consumptionPolicy', 'decision']는 고정한 1개 identity/관계와 exact 일치하며 중복·누락을 거부한다."를 확인한다
+    그러면 "approved-countercall-order" assertion으로 "approved-countercall-order: /data/rawRows/purchaseOrders의 실제 ['id', 'proposalId', 'proposalHash', 'approvalId']는 고정한 1개 identity/관계와 exact 일치하며 중복·누락을 거부한다."를 확인한다
+    그러면 "approved-countercall-effect-once" assertion으로 "approved-countercall-effect-once: /data/rawRows/outbox의 scope·filter를 만족하는 실제 원행은 정확히 1개다."를 확인한다
     그러면 "issued-raw-method" assertion으로 "issued-raw-method: /data/transcript/request/body/method의 실제 equals 기대값은 'tools/call'다. 미관찰·UNKNOWN은 정상값이 아니다."를 확인한다
     그러면 "issued-raw-jsonrpc-id" assertion으로 "issued-raw-jsonrpc-id: /data/transcript/request/body/id의 실제 equals 기대값은 'issued'다. 미관찰·UNKNOWN은 정상값이 아니다."를 확인한다
     그러면 "issued-raw-MCP-Protocol-Version" assertion으로 "issued-raw-MCP-Protocol-Version: /data/transcript/request/headers/MCP-Protocol-Version의 실제 equals 기대값은 '2026-07-28'다. 미관찰·UNKNOWN은 정상값이 아니다."를 확인한다
     그러면 "issued-raw-Mcp-Method" assertion으로 "issued-raw-Mcp-Method: /data/transcript/request/headers/Mcp-Method의 실제 equals 기대값은 'tools/call'다. 미관찰·UNKNOWN은 정상값이 아니다."를 확인한다
-    그러면 "issued-raw-Mcp-Name" assertion으로 "issued-raw-Mcp-Name: /data/transcript/request/headers/Mcp-Name의 실제 equals 기대값은 'structureIntent'다. 미관찰·UNKNOWN은 정상값이 아니다."를 확인한다
+    그러면 "issued-raw-Mcp-Name" assertion으로 "issued-raw-Mcp-Name: /data/transcript/request/headers/Mcp-Name의 실제 equals 기대값은 'dispatchPurchaseOrder'다. 미관찰·UNKNOWN은 정상값이 아니다."를 확인한다
     그러면 "issued-raw-meta" assertion으로 "issued-raw-meta: /data/transcript/request/body/params/_meta의 실제 equals 기대값은 {'io.modelcontextprotocol/protocolVersion': '2026-07-28', 'io.modelcontextprotocol/clientInfo': {'name': 'ontology-channel-contract', 'version': '1.0.0'}, 'io.modelcontextprotocol/clientCapabilities': {'elicitation': {'form': {}}}}다. 미관찰·UNKNOWN은 정상값이 아니다."를 확인한다
     그러면 "continued-raw-method" assertion으로 "continued-raw-method: /data/transcript/request/body/method의 실제 equals 기대값은 'tools/call'다. 미관찰·UNKNOWN은 정상값이 아니다."를 확인한다
     그러면 "continued-raw-jsonrpc-id" assertion으로 "continued-raw-jsonrpc-id: /data/transcript/request/body/id의 실제 equals 기대값은 'T20-new-rpc'다. 미관찰·UNKNOWN은 정상값이 아니다."를 확인한다
@@ -993,6 +1061,12 @@
     그러면 "continued-raw-Mcp-Method" assertion으로 "continued-raw-Mcp-Method: /data/transcript/request/headers/Mcp-Method의 실제 equals 기대값은 'tools/call'다. 미관찰·UNKNOWN은 정상값이 아니다."를 확인한다
     그러면 "continued-raw-Mcp-Name" assertion으로 "continued-raw-Mcp-Name: /data/transcript/request/headers/Mcp-Name의 실제 equals 기대값은 'dispatchPurchaseOrder'다. 미관찰·UNKNOWN은 정상값이 아니다."를 확인한다
     그러면 "continued-raw-meta" assertion으로 "continued-raw-meta: /data/transcript/request/body/params/_meta의 실제 equals 기대값은 {'io.modelcontextprotocol/protocolVersion': '2026-07-28', 'io.modelcontextprotocol/clientInfo': {'name': 'ontology-channel-contract', 'version': '1.0.0'}, 'io.modelcontextprotocol/clientCapabilities': {'elicitation': {'form': {}}}}다. 미관찰·UNKNOWN은 정상값이 아니다."를 확인한다
+    그러면 "approved-dispatch-raw-method" assertion으로 "approved-dispatch-raw-method: /data/transcript/request/body/method의 실제 equals 기대값은 'tools/call'다. 미관찰·UNKNOWN은 정상값이 아니다."를 확인한다
+    그러면 "approved-dispatch-raw-jsonrpc-id" assertion으로 "approved-dispatch-raw-jsonrpc-id: /data/transcript/request/body/id의 실제 equals 기대값은 'approved-dispatch'다. 미관찰·UNKNOWN은 정상값이 아니다."를 확인한다
+    그러면 "approved-dispatch-raw-MCP-Protocol-Version" assertion으로 "approved-dispatch-raw-MCP-Protocol-Version: /data/transcript/request/headers/MCP-Protocol-Version의 실제 equals 기대값은 '2026-07-28'다. 미관찰·UNKNOWN은 정상값이 아니다."를 확인한다
+    그러면 "approved-dispatch-raw-Mcp-Method" assertion으로 "approved-dispatch-raw-Mcp-Method: /data/transcript/request/headers/Mcp-Method의 실제 equals 기대값은 'tools/call'다. 미관찰·UNKNOWN은 정상값이 아니다."를 확인한다
+    그러면 "approved-dispatch-raw-Mcp-Name" assertion으로 "approved-dispatch-raw-Mcp-Name: /data/transcript/request/headers/Mcp-Name의 실제 equals 기대값은 'dispatchPurchaseOrder'다. 미관찰·UNKNOWN은 정상값이 아니다."를 확인한다
+    그러면 "approved-dispatch-raw-meta" assertion으로 "approved-dispatch-raw-meta: /data/transcript/request/body/params/_meta의 실제 equals 기대값은 {'io.modelcontextprotocol/protocolVersion': '2026-07-28', 'io.modelcontextprotocol/clientInfo': {'name': 'ontology-channel-contract', 'version': '1.0.0'}, 'io.modelcontextprotocol/clientCapabilities': {'elicitation': {'form': {}}}}다. 미관찰·UNKNOWN은 정상값이 아니다."를 확인한다
   시나리오: 실제 MRTR state unsupported-client와 금지효과0
     먼저 사례 파일 "verification/cases/T20/case.json"의 "mrtr-unsupported-client"를 준비한다
     만일 "시스템" 역할이 "setup" 행동을 수행한다
@@ -1028,6 +1102,7 @@
   시나리오: 두 실제 wire 거래의 manager 승인 state single-use 소비
     먼저 사례 파일 "verification/cases/T20/case.json"의 "mrtr-concurrent-approval-consumption"를 준비한다
     만일 "시스템" 역할이 "setup" 행동을 수행한다
+    만일 "reader" 역할이 "purchase-work" 행동을 수행한다
     만일 "writer" 역할이 "proposal" 행동을 수행한다
     만일 "reader" 역할이 "noun" 행동을 수행한다
     만일 "시스템" 역할이 "db-before" 행동을 수행한다

@@ -1,0 +1,149 @@
+{
+  "schemaVersion": "1.0.0",
+  "evidenceClass": "ASSERTION_SELFTEST_AND_CONTRACT_RED_NOT_RUNTIME",
+  "timestamp": "2026-10-07T15:20:48.749295+00:00",
+  "baselineCommit": "f426712",
+  "commonDependencyCommit": "62d2d541beb8719038acbb89acefa1ec0f753bfa",
+  "testedWorkingTreeHasOwnedEdits": true,
+  "javaVersion": "21.0.5 Zulu21.38+21-CA",
+  "mavenVersion": "3.9.16",
+  "caseIds": [
+    "V3",
+    "T20",
+    "E2"
+  ],
+  "subcases": {
+    "V3": 3,
+    "T20": 56,
+    "E2": 3
+  },
+  "testedInputs": [
+    {
+      "path": "verification/cases/V3/case.json",
+      "sha256": "76f964b5e66e8793996ce929049741ffcd768e342c754b70fc1714cb03027468",
+      "sizeBytes": 93749
+    },
+    {
+      "path": "verification/cases/T20/case.json",
+      "sha256": "eaef5a296870ea88a1d9ec31ca82d0297a357762fcf95a442b4c0aafd874a0da",
+      "sizeBytes": 1690408
+    },
+    {
+      "path": "verification/cases/T20/fixture.json",
+      "sha256": "fccf978508ec62f2cfd162fcd4d40cf2e5c83562c64ec2cd5a53ba00efd1ab27",
+      "sizeBytes": 17625
+    },
+    {
+      "path": "verification/cases/T20/scenario.feature",
+      "sha256": "28bf3f64a6a09ea7093999fce7a001b2ed9151ff82e7b4c22f1a7d4f95ae5a07",
+      "sizeBytes": 265269
+    },
+    {
+      "path": "verification/cases/E2/case.json",
+      "sha256": "735b884d4a1b1fbca7cfdcabface2b00d5ea5f67c3b55e46d13eba8acdcfdfd7",
+      "sizeBytes": 202961
+    },
+    {
+      "path": "verification/cases/E2/scenario.feature",
+      "sha256": "5cbdc575f30c4a2f58acb62b8dbe4ed4106b28bf150f1e974e0690ec23abe737",
+      "sizeBytes": 12629
+    },
+    {
+      "path": "verification/mcp-tests/author_cases.py",
+      "sha256": "1031e2556bbd74141e2ddadce2546199a0092426c9e30866fb65701889790f8c",
+      "sizeBytes": 72027
+    },
+    {
+      "path": "verification/harness/src/test/java/org/mulino/verification/cases/reviewbusiness/BusinessReviewAssertionTest.java",
+      "sha256": "b31bd527a44a7ac45cc131e87e535cda2085b7664413b8ca24733b84ebd9559d",
+      "sizeBytes": 18173
+    }
+  ],
+  "checks": [
+    {
+      "command": [
+        "python3",
+        "-m",
+        "py_compile",
+        "verification/mcp-tests/author_cases.py"
+      ],
+      "exitCode": 0,
+      "status": "PASS"
+    },
+    {
+      "command": [
+        "git",
+        "diff",
+        "--check"
+      ],
+      "exitCode": 0,
+      "status": "PASS"
+    },
+    {
+      "command": [
+        "./mvnw",
+        "-B",
+        "-ntp",
+        "-f",
+        "verification/harness/pom.xml",
+        "-Dtest=BusinessReviewAssertionTest,InventoryAssertionContractTest,SalesAssertionMutationTest,ChannelsContractTest",
+        "test"
+      ],
+      "exitCode": 0,
+      "status": "PASS",
+      "tests": 60,
+      "ownTests": 12,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "artifact": "focused-pass.log.gz"
+    },
+    {
+      "command": [
+        "./verify",
+        "contract-red",
+        "verification/cases/V3/case.json",
+        "verification/cases/T20/case.json",
+        "verification/cases/E2/case.json"
+      ],
+      "exitCode": 1,
+      "status": "EXPECTED_CONTRACT_RED",
+      "expectedScenarios": 62,
+      "discoveredScenarios": 62,
+      "startedScenarios": 62,
+      "notImplementedAssertionFailures": 62,
+      "skipped": 0,
+      "artifact": "feature-red-summary.json"
+    }
+  ],
+  "initialFailure": {
+    "exitCode": 1,
+    "tests": 59,
+    "failures": 0,
+    "errors": 3,
+    "skipped": 0,
+    "artifact": "initial-focused-failure.log.gz",
+    "causes": [
+      "SELFTEST expected identity hash sample was not 64-hex SHA256",
+      "Common strict identity fields lacked purchaseOrderId; two schema tests rejected its reference"
+    ],
+    "resolvedBy": [
+      "Valid SHA256 sample in owned SELFTEST",
+      "Common dependency strict purchaseOrderId identity addition"
+    ],
+    "originalWorkingTreeInputHashesRecorded": false
+  },
+  "schemaAndFeatureChecks": {
+    "status": "PASS",
+    "caseIds": [
+      "V3",
+      "T20",
+      "E2"
+    ],
+    "method": "BusinessReviewAssertionTest.ownedSchemasAndAllFeatureSelectorsRemainValid; existing channel schema/feature factory"
+  },
+  "runtimeStatus": "NOT_RUN",
+  "productCoverageClaimed": false,
+  "paidModelsExecuted": false,
+  "remainingIntegration": "Coordinator must integrate OWN commit and run combined registry preparation/checks."
+}
