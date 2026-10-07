@@ -80,9 +80,11 @@ container_created=true
 port=$(docker port "$container" 5432/tcp | sed 's/.*://')
 export DB_URL="jdbc:postgresql://127.0.0.1:$port/ontology"
 i=0
-until docker exec "$container" pg_isready -U postgres -d ontology > /dev/null 2>&1; do i=$((i+1)); [ "$i" -lt 120 ]; sleep 0.25; done
+# The Docker entrypoint temporary postmaster listens only on its Unix socket.
+# Probe TCP so readiness is reached only by the final server used by JDBC.
+until docker exec "$container" pg_isready -h 127.0.0.1 -U postgres -d ontology > /dev/null 2>&1; do i=$((i+1)); [ "$i" -lt 120 ]; sleep 0.25; done
 docker inspect --format '{{.Image}}' "$container" > "$evidence/postgres-image-id.txt"
-docker exec "$container" psql -U postgres -d ontology -Atc 'SELECT version()' > "$evidence/postgres-version.txt"
+docker exec -e "PGPASSWORD=$DB_PASSWORD" "$container" psql -h 127.0.0.1 -U postgres -d ontology -Atc 'SELECT version()' > "$evidence/postgres-version.txt"
 phase=ephemeral-backend
 java -jar "$fixture/ontology.jar" --spring.profiles.active=local,verification --mulino.verification.instant=2026-10-07T09:00:00Z --server.address=127.0.0.1 --server.port=0 "--mulino.evidence.blob-root=$fixture/blobs" > "$evidence/backend-runtime.log" 2>&1 &
 server_pid=$!
