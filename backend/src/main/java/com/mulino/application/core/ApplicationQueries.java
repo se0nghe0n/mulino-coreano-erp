@@ -14,10 +14,11 @@ public class ApplicationQueries {
   private static final Set<String> WORLD=Set.of("getObject","getWork","getInventory","getObligations","getAssessment","traceLot","getTrace");
   private final Map<String,QueryHandler> handlers=new HashMap<>();
   private final ReadAuthorizer auth;
+  private final ExecutionClock clock;
   private final WorkReadHandler work;
   private final ObjectMapper json=new ObjectMapper();
-  public ApplicationQueries(List<QueryHandler> handlers,ReadAuthorizer auth,WorkReadHandler work){
-    this.auth=auth;this.work=work;
+  public ApplicationQueries(List<QueryHandler> handlers,ReadAuthorizer auth,WorkReadHandler work,ExecutionClock clock){
+    this.auth=auth;this.work=work;this.clock=clock;
     for(QueryHandler handler:handlers)for(String operation:handler.operations())if(this.handlers.put(operation,handler)!=null)throw new IllegalStateException("Duplicate query capability "+operation);
   }
   public Set<String> operations(){return Set.copyOf(handlers.keySet());}
@@ -32,7 +33,7 @@ public class ApplicationQueries {
   private Map<String,Object> queryInternal(QueryRequest request){
     QueryHandler handler=handlers.get(request.operation());
     if(handler==null)throw DomainError.unsupported();
-    Instant now=Instant.now();
+    Instant now=clock.instant();
     Instant asOf=request.asOf()==null?now:request.asOf();
     Instant knownAt=request.knownAt()==null?now:request.knownAt();
     DomainContext context=auth.context(asOf,knownAt);
