@@ -75,18 +75,24 @@
     만일 "시스템" 역할이 "reserve40-reached" 행동을 수행한다
     만일 "시스템" 역할이 "reserve30" 행동을 수행한다
     만일 "시스템" 역할이 "reserve30-reached" 행동을 수행한다
+    만일 "시스템" 역할이 "resume30" 행동을 수행한다
+    만일 "시스템" 역할이 "waiter-before-release" 행동을 수행한다
     만일 "시스템" 역할이 "resume40" 행동을 수행한다
     만일 "시스템" 역할이 "terminal40" 행동을 수행한다
-    만일 "시스템" 역할이 "resume30" 행동을 수행한다
     만일 "시스템" 역할이 "terminal30" 행동을 수행한다
     만일 "시스템" 역할이 "after" 행동을 수행한다
+    그러면 "동시-실제-DB-lock-WAIT" assertion으로 "동시 실제 DB lock WAIT"를 확인한다
+    그러면 "WAIT-시점-holder와-waiter-거래-open" assertion으로 "WAIT 시점 holder와 waiter 거래 open"를 확인한다
+    그러면 "서로다른-실제-DB-transaction" assertion으로 "서로다른 실제 DB transaction"를 확인한다
     그러면 "예약40-commit" assertion으로 "예약40 commit"를 확인한다
     그러면 "예약30-현재revision-거부" assertion으로 "예약30 현재revision 거부"를 확인한다
+    그러면 "waiter-잠금후-현재revision-재검증" assertion으로 "waiter 잠금후 현재revision 재검증"를 확인한다
     그러면 "실물-잠금전후-불변" assertion으로 "실물 잠금전후 불변"를 확인한다
     그러면 "실제-독립-transaction" assertion으로 "실제 독립 transaction"를 확인한다
     그러면 "잠금-fence-원범위" assertion으로 "잠금 fence 원범위"를 확인한다
     그러면 "첫-reserve-40-효과" assertion으로 "첫 reserve 40 효과"를 확인한다
     그러면 "기존20+새40-실행배분60" assertion으로 "기존20+새40 실행배분60"를 확인한다
+    그러면 "기존-부족40-책임보존" assertion으로 "기존 부족40 책임보존"를 확인한다
 
   시나리오: 새 ontology v1에서 v2로 upgrade해 진행 업무 물량 의무와 판정 의미를 보존한다
     먼저 사례 파일 "verification/cases/V8/case.json"의 "ontology-v1-v2-preserves"를 준비한다
@@ -288,9 +294,10 @@
     만일 "시스템" 역할이 "lock-reserve40-reached" 행동을 수행한다
     만일 "시스템" 역할이 "lock-reserve30" 행동을 수행한다
     만일 "시스템" 역할이 "lock-reserve30-reached" 행동을 수행한다
+    만일 "시스템" 역할이 "lock-resume30" 행동을 수행한다
+    만일 "시스템" 역할이 "lock-waiter-before-release" 행동을 수행한다
     만일 "시스템" 역할이 "lock-resume40" 행동을 수행한다
     만일 "시스템" 역할이 "lock-terminal40" 행동을 수행한다
-    만일 "시스템" 역할이 "lock-resume30" 행동을 수행한다
     만일 "시스템" 역할이 "lock-terminal30" 행동을 수행한다
     만일 "시스템" 역할이 "lock-after" 행동을 수행한다
     만일 "시스템" 역할이 "upgrade-final" 행동을 수행한다
@@ -308,11 +315,16 @@
     그러면 "rollback-rollback-실패응답-outbox" assertion으로 "rollback 실패응답 outbox"를 확인한다
     그러면 "rollback-rollback-실패응답-idempotency" assertion으로 "rollback 실패응답 idempotency"를 확인한다
     그러면 "rollback-rollback-수량변화0" assertion으로 "rollback 수량변화0"를 확인한다
+    그러면 "lock-동시-실제-DB-lock-WAIT" assertion으로 "동시 실제 DB lock WAIT"를 확인한다
+    그러면 "lock-WAIT-시점-holder와-waiter-거래-open" assertion으로 "WAIT 시점 holder와 waiter 거래 open"를 확인한다
+    그러면 "lock-서로다른-실제-DB-transaction" assertion으로 "서로다른 실제 DB transaction"를 확인한다
     그러면 "lock-예약40-commit" assertion으로 "예약40 commit"를 확인한다
     그러면 "lock-예약30-현재revision-거부" assertion으로 "예약30 현재revision 거부"를 확인한다
+    그러면 "lock-waiter-잠금후-현재revision-재검증" assertion으로 "waiter 잠금후 현재revision 재검증"를 확인한다
     그러면 "lock-실물-잠금전후-불변" assertion으로 "실물 잠금전후 불변"를 확인한다
     그러면 "lock-실제-독립-transaction" assertion으로 "실제 독립 transaction"를 확인한다
     그러면 "lock-잠금-fence-원범위" assertion으로 "잠금 fence 원범위"를 확인한다
     그러면 "lock-첫-reserve-40-효과" assertion으로 "첫 reserve 40 효과"를 확인한다
     그러면 "lock-기존20+새40-실행배분60" assertion으로 "기존20+새40 실행배분60"를 확인한다
+    그러면 "lock-기존-부족40-책임보존" assertion으로 "기존 부족40 책임보존"를 확인한다
     그러면 "upgrade-outbox-command-일치" assertion으로 "upgrade outbox command 일치"를 확인한다

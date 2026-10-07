@@ -1,0 +1,45 @@
+{
+  "scope": "USER_STEP2_CONTRACT_PREPARATION",
+  "baseline": "f426712fcd1bcfc1ed71a1beb9aa80ec3051e182",
+  "selftestEvidenceClass": "CANNED_CONTRACT_SELFTEST",
+  "productResult": "NOT_RUN",
+  "productCoverageClaimed": false,
+  "subcases": 12,
+  "assertions": 182,
+  "assertionDelta": 10,
+  "newSubcases": 0,
+  "checks": [
+    {
+      "command": "./mvnw -B -ntp -f verification/harness/pom.xml -Dtest=V8LockChoreographySelftestTest,PlatformAssertionTest test",
+      "exitCode": 0,
+      "tests": 25,
+      "ownTests": 6,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "command": "./verify contract-red verification/cases/V8/case.json",
+      "exitCode": 1,
+      "expectedScenarios": 12,
+      "discoveredScenarios": 12,
+      "startedScenarios": 12,
+      "notImplementedAssertionFailures": 12,
+      "skippedScenarios": 0,
+      "expectedRed": true
+    },
+    {
+      "command": "python3 -m py_compile verification/platform-tests/build_cases.py",
+      "exitCode": 0
+    },
+    {
+      "command": "git diff --check",
+      "exitCode": 0
+    }
+  ],
+  "limitations": [
+    "실제 제품 PostgreSQL/API/upgrade adapter는 없다.",
+    "SELFTEST driver의 성공은 제품 인수가 아니다.",
+    "전체 registry 및 aggregate harness 검증은 coordinator 통합 뒤 수행한다."
+  ]
+}

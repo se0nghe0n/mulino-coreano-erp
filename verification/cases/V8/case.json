@@ -2561,6 +2561,77 @@
           ]
         },
         {
+          "id": "resume30",
+          "kind": "control",
+          "control": {
+            "type": "barrier",
+            "operation": "resume",
+            "parameters": {
+              "barrierId": "scope-lock",
+              "participantId": "reserve30",
+              "transactionId": "tx-reserve30",
+              "point": "BEFORE_SCOPE_LOCK",
+              "state": "RESUMED",
+              "scope": {
+                "organizationId": {
+                  "$alias": "ORG"
+                },
+                "environmentId": "V8-real-lock-two-transactions"
+              }
+            }
+          },
+          "evidenceRefs": [
+            "resume30:actual-artifact"
+          ]
+        },
+        {
+          "id": "waiter-before-release",
+          "kind": "observe",
+          "observation": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "environmentId": "V8-real-lock-two-transactions",
+              "segmentId": {
+                "$alias": "A60"
+              },
+              "lockProbe": {
+                "holderTransactionId": {
+                  "$result": {
+                    "actionId": "reserve40-reached",
+                    "pointer": "/data/database/transactionId"
+                  }
+                },
+                "waiterTransactionId": {
+                  "$result": {
+                    "actionId": "reserve30-reached",
+                    "pointer": "/data/database/transactionId"
+                  }
+                },
+                "databaseCatalogs": [
+                  "pg_catalog.pg_locks",
+                  "pg_catalog.pg_stat_activity",
+                  "pg_catalog.pg_blocking_pids"
+                ],
+                "readOnly": true,
+                "waitUntil": "DATABASE_LOCK_WAIT",
+                "timeoutSeconds": 30
+              }
+            },
+            "snapshotRef": "CURRENT_LOCK_WAIT",
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z",
+            "sources": [
+              "lockWaits",
+              "databaseTransactions"
+            ]
+          },
+          "evidenceRefs": [
+            "waiter-before-release:actual-artifact"
+          ]
+        },
+        {
           "id": "resume40",
           "kind": "control",
           "control": {
@@ -2594,30 +2665,6 @@
           ]
         },
         {
-          "id": "resume30",
-          "kind": "control",
-          "control": {
-            "type": "barrier",
-            "operation": "resume",
-            "parameters": {
-              "barrierId": "scope-lock",
-              "participantId": "reserve30",
-              "transactionId": "tx-reserve30",
-              "point": "BEFORE_SCOPE_LOCK",
-              "state": "RESUMED",
-              "scope": {
-                "organizationId": {
-                  "$alias": "ORG"
-                },
-                "environmentId": "V8-real-lock-two-transactions"
-              }
-            }
-          },
-          "evidenceRefs": [
-            "resume30:actual-artifact"
-          ]
-        },
-        {
           "id": "terminal30",
           "kind": "await",
           "awaitActionId": "reserve30",
@@ -2648,7 +2695,21 @@
               ],
               "inventoryMeasurePlaceId": {
                 "$alias": "W"
-              }
+              },
+              "transactionIds": [
+                {
+                  "$result": {
+                    "actionId": "reserve40-reached",
+                    "pointer": "/data/database/transactionId"
+                  }
+                },
+                {
+                  "$result": {
+                    "actionId": "reserve30-reached",
+                    "pointer": "/data/database/transactionId"
+                  }
+                }
+              ]
             },
             "snapshotRef": "CURRENT_COMMITTED",
             "asOf": "2026-10-07T09:00:00Z",
@@ -2671,7 +2732,10 @@
               "externalEffects",
               "schemaCatalog",
               "restoreSessions",
-              "recoveryObligations"
+              "recoveryObligations",
+              "lockEvidence",
+              "lockRevalidations",
+              "newAllocations"
             ]
           },
           "evidenceRefs": [
@@ -2680,6 +2744,221 @@
         }
       ],
       "assertions": [
+        {
+          "id": "동시-실제-DB-lock-WAIT",
+          "op": "relationSet",
+          "source": {
+            "actionId": "waiter-before-release",
+            "pointer": "/data/rawRows/lockWaits",
+            "field": [
+              "scopeId",
+              "transactionId",
+              "blockingTransactionId",
+              "lockResourceId",
+              "lockType",
+              "lockMode",
+              "granted",
+              "holderLockMode",
+              "holderGranted",
+              "waitEventType",
+              "source"
+            ]
+          },
+          "expected": [
+            [
+              {
+                "$alias": "A60"
+              },
+              {
+                "$result": {
+                  "actionId": "reserve30-reached",
+                  "pointer": "/data/database/transactionId"
+                }
+              },
+              {
+                "$result": {
+                  "actionId": "reserve40-reached",
+                  "pointer": "/data/database/transactionId"
+                }
+              },
+              {
+                "$result": {
+                  "actionId": "reserve40-reached",
+                  "pointer": "/data/database/transactionId"
+                }
+              },
+              "transactionid",
+              "ShareLock",
+              false,
+              "ExclusiveLock",
+              true,
+              "Lock",
+              "pg_catalog"
+            ]
+          ],
+          "requirementRefs": [
+            "D23",
+            "D24",
+            "D26"
+          ],
+          "evidenceRefs": [
+            "waiter-before-release:actual-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "environmentId": "V8-real-lock-two-transactions",
+            "segmentId": {
+              "$alias": "A60"
+            },
+            "lockProbe": {
+              "holderTransactionId": {
+                "$result": {
+                  "actionId": "reserve40-reached",
+                  "pointer": "/data/database/transactionId"
+                }
+              },
+              "waiterTransactionId": {
+                "$result": {
+                  "actionId": "reserve30-reached",
+                  "pointer": "/data/database/transactionId"
+                }
+              },
+              "databaseCatalogs": [
+                "pg_catalog.pg_locks",
+                "pg_catalog.pg_stat_activity",
+                "pg_catalog.pg_blocking_pids"
+              ],
+              "readOnly": true,
+              "waitUntil": "DATABASE_LOCK_WAIT",
+              "timeoutSeconds": 30
+            }
+          },
+          "oracleExplanation": "동시 실제 DB lock WAIT",
+          "oracleRef": {
+            "oracleId": "V8.fresh-install",
+            "observationNames": [
+              "fresh-integration"
+            ]
+          }
+        },
+        {
+          "id": "WAIT-시점-holder와-waiter-거래-open",
+          "op": "relationSet",
+          "source": {
+            "actionId": "waiter-before-release",
+            "pointer": "/data/rawRows/databaseTransactions",
+            "field": [
+              "transactionId",
+              "status",
+              "lockState"
+            ]
+          },
+          "expected": [
+            [
+              {
+                "$result": {
+                  "actionId": "reserve40-reached",
+                  "pointer": "/data/database/transactionId"
+                }
+              },
+              "OPEN",
+              "HOLDING_SCOPE_LOCK"
+            ],
+            [
+              {
+                "$result": {
+                  "actionId": "reserve30-reached",
+                  "pointer": "/data/database/transactionId"
+                }
+              },
+              "OPEN",
+              "WAITING_SCOPE_LOCK"
+            ]
+          ],
+          "requirementRefs": [
+            "D23",
+            "D24",
+            "D26"
+          ],
+          "evidenceRefs": [
+            "waiter-before-release:actual-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "environmentId": "V8-real-lock-two-transactions",
+            "segmentId": {
+              "$alias": "A60"
+            },
+            "lockProbe": {
+              "holderTransactionId": {
+                "$result": {
+                  "actionId": "reserve40-reached",
+                  "pointer": "/data/database/transactionId"
+                }
+              },
+              "waiterTransactionId": {
+                "$result": {
+                  "actionId": "reserve30-reached",
+                  "pointer": "/data/database/transactionId"
+                }
+              },
+              "databaseCatalogs": [
+                "pg_catalog.pg_locks",
+                "pg_catalog.pg_stat_activity",
+                "pg_catalog.pg_blocking_pids"
+              ],
+              "readOnly": true,
+              "waitUntil": "DATABASE_LOCK_WAIT",
+              "timeoutSeconds": 30
+            }
+          },
+          "oracleExplanation": "WAIT 시점 holder와 waiter 거래 open",
+          "oracleRef": {
+            "oracleId": "V8.fresh-install",
+            "observationNames": [
+              "fresh-integration"
+            ]
+          }
+        },
+        {
+          "id": "서로다른-실제-DB-transaction",
+          "op": "notEquals",
+          "source": {
+            "actionId": "reserve30-reached",
+            "pointer": "/data/database/transactionId"
+          },
+          "expected": {
+            "$result": {
+              "actionId": "reserve40-reached",
+              "pointer": "/data/database/transactionId"
+            }
+          },
+          "requirementRefs": [
+            "D23",
+            "D24",
+            "D26"
+          ],
+          "evidenceRefs": [
+            "reserve30-reached:actual-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "environmentId": "V8-real-lock-two-transactions"
+          },
+          "oracleExplanation": "서로다른 실제 DB transaction",
+          "oracleRef": {
+            "oracleId": "V8.fresh-install",
+            "observationNames": [
+              "fresh-integration"
+            ]
+          }
+        },
         {
           "id": "예약40-commit",
           "op": "equals",
@@ -2741,6 +3020,88 @@
           }
         },
         {
+          "id": "waiter-잠금후-현재revision-재검증",
+          "op": "relationSet",
+          "source": {
+            "actionId": "after",
+            "pointer": "/data/rawRows/lockRevalidations",
+            "field": [
+              "scopeId",
+              "transactionId",
+              "lockedRevision",
+              "requestedRevision",
+              "point",
+              "result"
+            ]
+          },
+          "expected": [
+            [
+              {
+                "$alias": "A60"
+              },
+              {
+                "$result": {
+                  "actionId": "reserve30-reached",
+                  "pointer": "/data/database/transactionId"
+                }
+              },
+              2,
+              1,
+              "AFTER_SCOPE_LOCK",
+              "STALE_REVISION"
+            ]
+          ],
+          "requirementRefs": [
+            "D23",
+            "D24",
+            "D26"
+          ],
+          "evidenceRefs": [
+            "after:actual-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "environmentId": "V8-real-lock-two-transactions",
+            "itemId": {
+              "$alias": "P"
+            },
+            "placeIds": [
+              {
+                "$alias": "W"
+              },
+              {
+                "$alias": "TRANSIT"
+              }
+            ],
+            "inventoryMeasurePlaceId": {
+              "$alias": "W"
+            },
+            "transactionIds": [
+              {
+                "$result": {
+                  "actionId": "reserve40-reached",
+                  "pointer": "/data/database/transactionId"
+                }
+              },
+              {
+                "$result": {
+                  "actionId": "reserve30-reached",
+                  "pointer": "/data/database/transactionId"
+                }
+              }
+            ]
+          },
+          "oracleExplanation": "waiter 잠금후 현재revision 재검증",
+          "oracleRef": {
+            "oracleId": "V8.fresh-install",
+            "observationNames": [
+              "fresh-integration"
+            ]
+          }
+        },
+        {
           "id": "실물-잠금전후-불변",
           "op": "decimalDelta",
           "source": {
@@ -2774,7 +3135,21 @@
             ],
             "inventoryMeasurePlaceId": {
               "$alias": "W"
-            }
+            },
+            "transactionIds": [
+              {
+                "$result": {
+                  "actionId": "reserve40-reached",
+                  "pointer": "/data/database/transactionId"
+                }
+              },
+              {
+                "$result": {
+                  "actionId": "reserve30-reached",
+                  "pointer": "/data/database/transactionId"
+                }
+              }
+            ]
           },
           "oracleExplanation": "실물 잠금전후 불변",
           "oracleRef": {
@@ -2806,8 +3181,18 @@
             "field": "transactionId"
           },
           "expected": [
-            "tx-reserve40",
-            "tx-reserve30"
+            {
+              "$result": {
+                "actionId": "reserve40-reached",
+                "pointer": "/data/database/transactionId"
+              }
+            },
+            {
+              "$result": {
+                "actionId": "reserve30-reached",
+                "pointer": "/data/database/transactionId"
+              }
+            }
           ],
           "requirementRefs": [
             "D23",
@@ -2835,7 +3220,21 @@
             ],
             "inventoryMeasurePlaceId": {
               "$alias": "W"
-            }
+            },
+            "transactionIds": [
+              {
+                "$result": {
+                  "actionId": "reserve40-reached",
+                  "pointer": "/data/database/transactionId"
+                }
+              },
+              {
+                "$result": {
+                  "actionId": "reserve30-reached",
+                  "pointer": "/data/database/transactionId"
+                }
+              }
+            ]
           },
           "oracleExplanation": "실제 독립 transaction",
           "oracleRef": {
@@ -2862,14 +3261,24 @@
               {
                 "$alias": "A60"
               },
-              "tx-reserve40",
+              {
+                "$result": {
+                  "actionId": "reserve40-reached",
+                  "pointer": "/data/database/transactionId"
+                }
+              },
               "EXCLUSIVE"
             ],
             [
               {
                 "$alias": "A60"
               },
-              "tx-reserve30",
+              {
+                "$result": {
+                  "actionId": "reserve30-reached",
+                  "pointer": "/data/database/transactionId"
+                }
+              },
               "EXCLUSIVE"
             ]
           ],
@@ -2899,7 +3308,21 @@
             ],
             "inventoryMeasurePlaceId": {
               "$alias": "W"
-            }
+            },
+            "transactionIds": [
+              {
+                "$result": {
+                  "actionId": "reserve40-reached",
+                  "pointer": "/data/database/transactionId"
+                }
+              },
+              {
+                "$result": {
+                  "actionId": "reserve30-reached",
+                  "pointer": "/data/database/transactionId"
+                }
+              }
+            ]
           },
           "oracleExplanation": "잠금 fence 원범위",
           "oracleRef": {
@@ -2954,7 +3377,21 @@
             ],
             "inventoryMeasurePlaceId": {
               "$alias": "W"
-            }
+            },
+            "transactionIds": [
+              {
+                "$result": {
+                  "actionId": "reserve40-reached",
+                  "pointer": "/data/database/transactionId"
+                }
+              },
+              {
+                "$result": {
+                  "actionId": "reserve30-reached",
+                  "pointer": "/data/database/transactionId"
+                }
+              }
+            ]
           },
           "oracleExplanation": "첫 reserve 40 효과",
           "oracleRef": {
@@ -2998,7 +3435,21 @@
             ],
             "inventoryMeasurePlaceId": {
               "$alias": "W"
-            }
+            },
+            "transactionIds": [
+              {
+                "$result": {
+                  "actionId": "reserve40-reached",
+                  "pointer": "/data/database/transactionId"
+                }
+              },
+              {
+                "$result": {
+                  "actionId": "reserve30-reached",
+                  "pointer": "/data/database/transactionId"
+                }
+              }
+            ]
           },
           "oracleExplanation": "기존20+새40 실행배분60",
           "oracleRef": {
@@ -3011,6 +3462,87 @@
           "unitSource": {
             "actionId": "after",
             "pointer": "/data/data/inventory/unit"
+          }
+        },
+        {
+          "id": "기존-부족40-책임보존",
+          "op": "relationSet",
+          "source": {
+            "actionId": "after",
+            "pointer": "/data/rawRows/obligations",
+            "field": [
+              "id",
+              "ownerId",
+              "status",
+              "quantity",
+              "unit",
+              "nextAction",
+              "nextCheckAt"
+            ]
+          },
+          "expected": [
+            [
+              {
+                "$alias": "DUTY"
+              },
+              {
+                "$alias": "procurement"
+              },
+              "OPEN",
+              "40",
+              "BOX",
+              "나머지 수령 확인",
+              "2026-10-08T09:00:00Z"
+            ]
+          ],
+          "requirementRefs": [
+            "D23",
+            "D24",
+            "D26"
+          ],
+          "evidenceRefs": [
+            "after:actual-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "environmentId": "V8-real-lock-two-transactions",
+            "itemId": {
+              "$alias": "P"
+            },
+            "placeIds": [
+              {
+                "$alias": "W"
+              },
+              {
+                "$alias": "TRANSIT"
+              }
+            ],
+            "inventoryMeasurePlaceId": {
+              "$alias": "W"
+            },
+            "transactionIds": [
+              {
+                "$result": {
+                  "actionId": "reserve40-reached",
+                  "pointer": "/data/database/transactionId"
+                }
+              },
+              {
+                "$result": {
+                  "actionId": "reserve30-reached",
+                  "pointer": "/data/database/transactionId"
+                }
+              }
+            ]
+          },
+          "oracleExplanation": "기존 부족40 책임보존",
+          "oracleRef": {
+            "oracleId": "V8.fresh-install",
+            "observationNames": [
+              "fresh-integration"
+            ]
           }
         }
       ],
@@ -9956,6 +10488,77 @@
           ]
         },
         {
+          "id": "lock-resume30",
+          "kind": "control",
+          "control": {
+            "type": "barrier",
+            "operation": "resume",
+            "parameters": {
+              "barrierId": "scope-lock",
+              "participantId": "reserve30",
+              "transactionId": "tx-reserve30",
+              "point": "BEFORE_SCOPE_LOCK",
+              "state": "RESUMED",
+              "scope": {
+                "organizationId": {
+                  "$alias": "ORG"
+                },
+                "environmentId": "V8-upgrade-revalidate-transactions"
+              }
+            }
+          },
+          "evidenceRefs": [
+            "lock-resume30:actual-artifact"
+          ]
+        },
+        {
+          "id": "lock-waiter-before-release",
+          "kind": "observe",
+          "observation": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "environmentId": "V8-upgrade-revalidate-transactions",
+              "segmentId": {
+                "$alias": "A60"
+              },
+              "lockProbe": {
+                "holderTransactionId": {
+                  "$result": {
+                    "actionId": "lock-reserve40-reached",
+                    "pointer": "/data/database/transactionId"
+                  }
+                },
+                "waiterTransactionId": {
+                  "$result": {
+                    "actionId": "lock-reserve30-reached",
+                    "pointer": "/data/database/transactionId"
+                  }
+                },
+                "databaseCatalogs": [
+                  "pg_catalog.pg_locks",
+                  "pg_catalog.pg_stat_activity",
+                  "pg_catalog.pg_blocking_pids"
+                ],
+                "readOnly": true,
+                "waitUntil": "DATABASE_LOCK_WAIT",
+                "timeoutSeconds": 30
+              }
+            },
+            "snapshotRef": "CURRENT_LOCK_WAIT",
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z",
+            "sources": [
+              "lockWaits",
+              "databaseTransactions"
+            ]
+          },
+          "evidenceRefs": [
+            "lock-waiter-before-release:actual-artifact"
+          ]
+        },
+        {
           "id": "lock-resume40",
           "kind": "control",
           "control": {
@@ -9989,30 +10592,6 @@
           ]
         },
         {
-          "id": "lock-resume30",
-          "kind": "control",
-          "control": {
-            "type": "barrier",
-            "operation": "resume",
-            "parameters": {
-              "barrierId": "scope-lock",
-              "participantId": "reserve30",
-              "transactionId": "tx-reserve30",
-              "point": "BEFORE_SCOPE_LOCK",
-              "state": "RESUMED",
-              "scope": {
-                "organizationId": {
-                  "$alias": "ORG"
-                },
-                "environmentId": "V8-upgrade-revalidate-transactions"
-              }
-            }
-          },
-          "evidenceRefs": [
-            "lock-resume30:actual-artifact"
-          ]
-        },
-        {
           "id": "lock-terminal30",
           "kind": "await",
           "awaitActionId": "lock-reserve30",
@@ -10043,7 +10622,21 @@
               ],
               "inventoryMeasurePlaceId": {
                 "$alias": "W"
-              }
+              },
+              "transactionIds": [
+                {
+                  "$result": {
+                    "actionId": "lock-reserve40-reached",
+                    "pointer": "/data/database/transactionId"
+                  }
+                },
+                {
+                  "$result": {
+                    "actionId": "lock-reserve30-reached",
+                    "pointer": "/data/database/transactionId"
+                  }
+                }
+              ]
             },
             "snapshotRef": "CURRENT_COMMITTED",
             "asOf": "2026-10-07T09:00:00Z",
@@ -10066,7 +10659,10 @@
               "externalEffects",
               "schemaCatalog",
               "restoreSessions",
-              "recoveryObligations"
+              "recoveryObligations",
+              "lockEvidence",
+              "lockRevalidations",
+              "newAllocations"
             ]
           },
           "evidenceRefs": [
@@ -10746,6 +11342,221 @@
           }
         },
         {
+          "id": "lock-동시-실제-DB-lock-WAIT",
+          "op": "relationSet",
+          "source": {
+            "actionId": "lock-waiter-before-release",
+            "pointer": "/data/rawRows/lockWaits",
+            "field": [
+              "scopeId",
+              "transactionId",
+              "blockingTransactionId",
+              "lockResourceId",
+              "lockType",
+              "lockMode",
+              "granted",
+              "holderLockMode",
+              "holderGranted",
+              "waitEventType",
+              "source"
+            ]
+          },
+          "expected": [
+            [
+              {
+                "$alias": "A60"
+              },
+              {
+                "$result": {
+                  "actionId": "lock-reserve30-reached",
+                  "pointer": "/data/database/transactionId"
+                }
+              },
+              {
+                "$result": {
+                  "actionId": "lock-reserve40-reached",
+                  "pointer": "/data/database/transactionId"
+                }
+              },
+              {
+                "$result": {
+                  "actionId": "lock-reserve40-reached",
+                  "pointer": "/data/database/transactionId"
+                }
+              },
+              "transactionid",
+              "ShareLock",
+              false,
+              "ExclusiveLock",
+              true,
+              "Lock",
+              "pg_catalog"
+            ]
+          ],
+          "requirementRefs": [
+            "D23",
+            "D24",
+            "D26"
+          ],
+          "evidenceRefs": [
+            "lock-waiter-before-release:actual-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "environmentId": "V8-upgrade-revalidate-transactions",
+            "segmentId": {
+              "$alias": "A60"
+            },
+            "lockProbe": {
+              "holderTransactionId": {
+                "$result": {
+                  "actionId": "lock-reserve40-reached",
+                  "pointer": "/data/database/transactionId"
+                }
+              },
+              "waiterTransactionId": {
+                "$result": {
+                  "actionId": "lock-reserve30-reached",
+                  "pointer": "/data/database/transactionId"
+                }
+              },
+              "databaseCatalogs": [
+                "pg_catalog.pg_locks",
+                "pg_catalog.pg_stat_activity",
+                "pg_catalog.pg_blocking_pids"
+              ],
+              "readOnly": true,
+              "waitUntil": "DATABASE_LOCK_WAIT",
+              "timeoutSeconds": 30
+            }
+          },
+          "oracleExplanation": "동시 실제 DB lock WAIT",
+          "oracleRef": {
+            "oracleId": "V8.ontology-upgrade-preservation",
+            "observationNames": [
+              "upgrade-preserves"
+            ]
+          }
+        },
+        {
+          "id": "lock-WAIT-시점-holder와-waiter-거래-open",
+          "op": "relationSet",
+          "source": {
+            "actionId": "lock-waiter-before-release",
+            "pointer": "/data/rawRows/databaseTransactions",
+            "field": [
+              "transactionId",
+              "status",
+              "lockState"
+            ]
+          },
+          "expected": [
+            [
+              {
+                "$result": {
+                  "actionId": "lock-reserve40-reached",
+                  "pointer": "/data/database/transactionId"
+                }
+              },
+              "OPEN",
+              "HOLDING_SCOPE_LOCK"
+            ],
+            [
+              {
+                "$result": {
+                  "actionId": "lock-reserve30-reached",
+                  "pointer": "/data/database/transactionId"
+                }
+              },
+              "OPEN",
+              "WAITING_SCOPE_LOCK"
+            ]
+          ],
+          "requirementRefs": [
+            "D23",
+            "D24",
+            "D26"
+          ],
+          "evidenceRefs": [
+            "lock-waiter-before-release:actual-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "environmentId": "V8-upgrade-revalidate-transactions",
+            "segmentId": {
+              "$alias": "A60"
+            },
+            "lockProbe": {
+              "holderTransactionId": {
+                "$result": {
+                  "actionId": "lock-reserve40-reached",
+                  "pointer": "/data/database/transactionId"
+                }
+              },
+              "waiterTransactionId": {
+                "$result": {
+                  "actionId": "lock-reserve30-reached",
+                  "pointer": "/data/database/transactionId"
+                }
+              },
+              "databaseCatalogs": [
+                "pg_catalog.pg_locks",
+                "pg_catalog.pg_stat_activity",
+                "pg_catalog.pg_blocking_pids"
+              ],
+              "readOnly": true,
+              "waitUntil": "DATABASE_LOCK_WAIT",
+              "timeoutSeconds": 30
+            }
+          },
+          "oracleExplanation": "WAIT 시점 holder와 waiter 거래 open",
+          "oracleRef": {
+            "oracleId": "V8.ontology-upgrade-preservation",
+            "observationNames": [
+              "upgrade-preserves"
+            ]
+          }
+        },
+        {
+          "id": "lock-서로다른-실제-DB-transaction",
+          "op": "notEquals",
+          "source": {
+            "actionId": "lock-reserve30-reached",
+            "pointer": "/data/database/transactionId"
+          },
+          "expected": {
+            "$result": {
+              "actionId": "lock-reserve40-reached",
+              "pointer": "/data/database/transactionId"
+            }
+          },
+          "requirementRefs": [
+            "D23",
+            "D24",
+            "D26"
+          ],
+          "evidenceRefs": [
+            "lock-reserve30-reached:actual-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "environmentId": "V8-upgrade-revalidate-transactions"
+          },
+          "oracleExplanation": "서로다른 실제 DB transaction",
+          "oracleRef": {
+            "oracleId": "V8.ontology-upgrade-preservation",
+            "observationNames": [
+              "upgrade-preserves"
+            ]
+          }
+        },
+        {
           "id": "lock-예약40-commit",
           "op": "equals",
           "source": {
@@ -10806,6 +11617,88 @@
           }
         },
         {
+          "id": "lock-waiter-잠금후-현재revision-재검증",
+          "op": "relationSet",
+          "source": {
+            "actionId": "lock-after",
+            "pointer": "/data/rawRows/lockRevalidations",
+            "field": [
+              "scopeId",
+              "transactionId",
+              "lockedRevision",
+              "requestedRevision",
+              "point",
+              "result"
+            ]
+          },
+          "expected": [
+            [
+              {
+                "$alias": "A60"
+              },
+              {
+                "$result": {
+                  "actionId": "lock-reserve30-reached",
+                  "pointer": "/data/database/transactionId"
+                }
+              },
+              2,
+              1,
+              "AFTER_SCOPE_LOCK",
+              "STALE_REVISION"
+            ]
+          ],
+          "requirementRefs": [
+            "D23",
+            "D24",
+            "D26"
+          ],
+          "evidenceRefs": [
+            "lock-after:actual-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "environmentId": "V8-upgrade-revalidate-transactions",
+            "itemId": {
+              "$alias": "P"
+            },
+            "placeIds": [
+              {
+                "$alias": "W"
+              },
+              {
+                "$alias": "TRANSIT"
+              }
+            ],
+            "inventoryMeasurePlaceId": {
+              "$alias": "W"
+            },
+            "transactionIds": [
+              {
+                "$result": {
+                  "actionId": "lock-reserve40-reached",
+                  "pointer": "/data/database/transactionId"
+                }
+              },
+              {
+                "$result": {
+                  "actionId": "lock-reserve30-reached",
+                  "pointer": "/data/database/transactionId"
+                }
+              }
+            ]
+          },
+          "oracleExplanation": "waiter 잠금후 현재revision 재검증",
+          "oracleRef": {
+            "oracleId": "V8.ontology-upgrade-preservation",
+            "observationNames": [
+              "upgrade-preserves"
+            ]
+          }
+        },
+        {
           "id": "lock-실물-잠금전후-불변",
           "op": "decimalDelta",
           "source": {
@@ -10839,7 +11732,21 @@
             ],
             "inventoryMeasurePlaceId": {
               "$alias": "W"
-            }
+            },
+            "transactionIds": [
+              {
+                "$result": {
+                  "actionId": "lock-reserve40-reached",
+                  "pointer": "/data/database/transactionId"
+                }
+              },
+              {
+                "$result": {
+                  "actionId": "lock-reserve30-reached",
+                  "pointer": "/data/database/transactionId"
+                }
+              }
+            ]
           },
           "oracleExplanation": "실물 잠금전후 불변",
           "oracleRef": {
@@ -10871,8 +11778,18 @@
             "field": "transactionId"
           },
           "expected": [
-            "tx-reserve40",
-            "tx-reserve30"
+            {
+              "$result": {
+                "actionId": "lock-reserve40-reached",
+                "pointer": "/data/database/transactionId"
+              }
+            },
+            {
+              "$result": {
+                "actionId": "lock-reserve30-reached",
+                "pointer": "/data/database/transactionId"
+              }
+            }
           ],
           "requirementRefs": [
             "D23",
@@ -10900,7 +11817,21 @@
             ],
             "inventoryMeasurePlaceId": {
               "$alias": "W"
-            }
+            },
+            "transactionIds": [
+              {
+                "$result": {
+                  "actionId": "lock-reserve40-reached",
+                  "pointer": "/data/database/transactionId"
+                }
+              },
+              {
+                "$result": {
+                  "actionId": "lock-reserve30-reached",
+                  "pointer": "/data/database/transactionId"
+                }
+              }
+            ]
           },
           "oracleExplanation": "실제 독립 transaction",
           "oracleRef": {
@@ -10927,14 +11858,24 @@
               {
                 "$alias": "A60"
               },
-              "tx-reserve40",
+              {
+                "$result": {
+                  "actionId": "lock-reserve40-reached",
+                  "pointer": "/data/database/transactionId"
+                }
+              },
               "EXCLUSIVE"
             ],
             [
               {
                 "$alias": "A60"
               },
-              "tx-reserve30",
+              {
+                "$result": {
+                  "actionId": "lock-reserve30-reached",
+                  "pointer": "/data/database/transactionId"
+                }
+              },
               "EXCLUSIVE"
             ]
           ],
@@ -10964,7 +11905,21 @@
             ],
             "inventoryMeasurePlaceId": {
               "$alias": "W"
-            }
+            },
+            "transactionIds": [
+              {
+                "$result": {
+                  "actionId": "lock-reserve40-reached",
+                  "pointer": "/data/database/transactionId"
+                }
+              },
+              {
+                "$result": {
+                  "actionId": "lock-reserve30-reached",
+                  "pointer": "/data/database/transactionId"
+                }
+              }
+            ]
           },
           "oracleExplanation": "잠금 fence 원범위",
           "oracleRef": {
@@ -11019,7 +11974,21 @@
             ],
             "inventoryMeasurePlaceId": {
               "$alias": "W"
-            }
+            },
+            "transactionIds": [
+              {
+                "$result": {
+                  "actionId": "lock-reserve40-reached",
+                  "pointer": "/data/database/transactionId"
+                }
+              },
+              {
+                "$result": {
+                  "actionId": "lock-reserve30-reached",
+                  "pointer": "/data/database/transactionId"
+                }
+              }
+            ]
           },
           "oracleExplanation": "첫 reserve 40 효과",
           "oracleRef": {
@@ -11063,7 +12032,21 @@
             ],
             "inventoryMeasurePlaceId": {
               "$alias": "W"
-            }
+            },
+            "transactionIds": [
+              {
+                "$result": {
+                  "actionId": "lock-reserve40-reached",
+                  "pointer": "/data/database/transactionId"
+                }
+              },
+              {
+                "$result": {
+                  "actionId": "lock-reserve30-reached",
+                  "pointer": "/data/database/transactionId"
+                }
+              }
+            ]
           },
           "oracleExplanation": "기존20+새40 실행배분60",
           "oracleRef": {
@@ -11076,6 +12059,87 @@
           "unitSource": {
             "actionId": "lock-after",
             "pointer": "/data/data/inventory/unit"
+          }
+        },
+        {
+          "id": "lock-기존-부족40-책임보존",
+          "op": "relationSet",
+          "source": {
+            "actionId": "lock-after",
+            "pointer": "/data/rawRows/obligations",
+            "field": [
+              "id",
+              "ownerId",
+              "status",
+              "quantity",
+              "unit",
+              "nextAction",
+              "nextCheckAt"
+            ]
+          },
+          "expected": [
+            [
+              {
+                "$alias": "DUTY"
+              },
+              {
+                "$alias": "procurement"
+              },
+              "OPEN",
+              "40",
+              "BOX",
+              "나머지 수령 확인",
+              "2026-10-08T09:00:00Z"
+            ]
+          ],
+          "requirementRefs": [
+            "D23",
+            "D24",
+            "D26"
+          ],
+          "evidenceRefs": [
+            "lock-after:actual-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "environmentId": "V8-upgrade-revalidate-transactions",
+            "itemId": {
+              "$alias": "P"
+            },
+            "placeIds": [
+              {
+                "$alias": "W"
+              },
+              {
+                "$alias": "TRANSIT"
+              }
+            ],
+            "inventoryMeasurePlaceId": {
+              "$alias": "W"
+            },
+            "transactionIds": [
+              {
+                "$result": {
+                  "actionId": "lock-reserve40-reached",
+                  "pointer": "/data/database/transactionId"
+                }
+              },
+              {
+                "$result": {
+                  "actionId": "lock-reserve30-reached",
+                  "pointer": "/data/database/transactionId"
+                }
+              }
+            ]
+          },
+          "oracleExplanation": "기존 부족40 책임보존",
+          "oracleRef": {
+            "oracleId": "V8.ontology-upgrade-preservation",
+            "observationNames": [
+              "upgrade-preserves"
+            ]
           }
         },
         {

@@ -256,18 +256,28 @@ for id,qty,tx in [('reserve40','40','tx-reserve40'),('reserve30','30','tx-reserv
  call={'id':id+'-call','kind':'invoke','actorRef':'warehouse','route':'api','capabilityId':'reserveQuantity','request':{'intentKind':'COMMAND','definitionVersion':'definition-v1','capabilityId':'reserveQuantity','subjectRefs':[{'type':'QuantitySegment','id':alias('A60')}],'slots':{'quantity':{'value':qty,'unit':'BOX'},'orderLineId':alias('SO-LINE')},'expectedRevision':1,'commandIdempotencyKey':s.env+'-'+id,'testTransactionId':tx,'testParticipantId':id,'testBarrierId':'scope-lock','testBarrierPoint':'AFTER_SCOPE_LOCK' if id=='reserve40' else 'BEFORE_SCOPE_LOCK'},'evidenceRefs':[id+':actual-transaction']}
  s.action(id,'start',call=call)
  s.action(id+'-reached','control',control={'type':'barrier','operation':'waitReached','parameters':{'barrierId':'scope-lock','participantId':id,'transactionId':tx,'point':'AFTER_SCOPE_LOCK' if id=='reserve40' else 'BEFORE_SCOPE_LOCK','state':'REACHED','scope':s.scope}})
-# First owns fence while second has reached immediately before lock acquisition.
+# The waiter must actually attempt the lock while the first DB transaction holds it.
+s.action('resume30','control',control={'type':'barrier','operation':'resume','parameters':{'barrierId':'scope-lock','participantId':'reserve30','transactionId':'tx-reserve30','point':'BEFORE_SCOPE_LOCK','state':'RESUMED','scope':s.scope}})
+holder=ref('reserve40-reached','/data/database/transactionId')
+waiter=ref('reserve30-reached','/data/database/transactionId')
+s.action('waiter-before-release','observe',observation={'scope':{**s.scope,'segmentId':alias('A60'),'lockProbe':{'holderTransactionId':holder,'waiterTransactionId':waiter,'databaseCatalogs':['pg_catalog.pg_locks','pg_catalog.pg_stat_activity','pg_catalog.pg_blocking_pids'],'readOnly':True,'waitUntil':'DATABASE_LOCK_WAIT','timeoutSeconds':30}},'snapshotRef':'CURRENT_LOCK_WAIT','asOf':T,'knownAt':K,'sources':['lockWaits','databaseTransactions']})
 s.action('resume40','control',control={'type':'barrier','operation':'resume','parameters':{'barrierId':'scope-lock','participantId':'reserve40','transactionId':'tx-reserve40','point':'AFTER_SCOPE_LOCK','state':'RESUMED','scope':s.scope}})
 s.action('terminal40','await',awaitActionId='reserve40',timeoutSeconds=30)
-s.action('resume30','control',control={'type':'barrier','operation':'resume','parameters':{'barrierId':'scope-lock','participantId':'reserve30','transactionId':'tx-reserve30','point':'BEFORE_SCOPE_LOCK','state':'RESUMED','scope':s.scope}})
-s.action('terminal30','await',awaitActionId='reserve30',timeoutSeconds=30);s.observe('after')
+s.action('terminal30','await',awaitActionId='reserve30',timeoutSeconds=30)
+s.observe('after',transactionIds=[holder,waiter])
+next(a for a in s.data['actions'] if a['id']=='after')['observation']['sources']+=['lockEvidence','lockRevalidations','newAllocations']
+s.check('동시-실제-DB-lock-WAIT','waiter-before-release',D+'lockWaits',[[alias('A60'),waiter,holder,holder,'transactionid','ShareLock',False,'ExclusiveLock',True,'Lock','pg_catalog']],'relationSet',field=['scopeId','transactionId','blockingTransactionId','lockResourceId','lockType','lockMode','granted','holderLockMode','holderGranted','waitEventType','source'])
+s.check('WAIT-시점-holder와-waiter-거래-open','waiter-before-release',D+'databaseTransactions',[[holder,'OPEN','HOLDING_SCOPE_LOCK'],[waiter,'OPEN','WAITING_SCOPE_LOCK']],'relationSet',field=['transactionId','status','lockState'])
+s.check('서로다른-실제-DB-transaction','reserve30-reached','/data/database/transactionId',holder,'notEquals')
 s.check('예약40-commit','terminal40','/response/outcome','APPLIED')
 s.check('예약30-현재revision-거부','terminal30','/response/error/code','STALE_REVISION')
+s.check('waiter-잠금후-현재revision-재검증','after',D+'lockRevalidations',[[alias('A60'),waiter,2,1,'AFTER_SCOPE_LOCK','STALE_REVISION']],'relationSet',field=['scopeId','transactionId','lockedRevision','requestedRevision','point','result'])
 s.unit('실물-잠금전후-불변','after','/data/data/inventory/heldQuantity','0','decimalDelta',baseline='before')
-s.check('실제-독립-transaction','after',D+'lockEvidence',['tx-reserve40','tx-reserve30'],'exactSet',field='transactionId')
-s.check('잠금-fence-원범위','after',D+'lockEvidence',[[alias('A60'),'tx-reserve40','EXCLUSIVE'],[alias('A60'),'tx-reserve30','EXCLUSIVE']],'relationSet',field=['scopeId','transactionId','lockMode'])
+s.check('실제-독립-transaction','after',D+'lockEvidence',[holder,waiter],'exactSet',field='transactionId')
+s.check('잠금-fence-원범위','after',D+'lockEvidence',[[alias('A60'),holder,'EXCLUSIVE'],[alias('A60'),waiter,'EXCLUSIVE']],'relationSet',field=['scopeId','transactionId','lockMode'])
 s.check('첫-reserve-40-효과','after',D+'newAllocations',[['40','BOX','EXECUTABLE']],'relationSet',field=['quantity','unit','status'])
 s.unit('기존20+새40-실행배분60','after','/data/data/inventory/reservedQuantity','60')
+s.check('기존-부족40-책임보존','after',D+'obligations',[[alias('DUTY'),alias('procurement'),'OPEN','40','BOX','나머지 수령 확인','2026-10-08T09:00:00Z']],'relationSet',field=['id','ownerId','status','quantity','unit','nextAction','nextCheckAt'])
 
 s=v.sub('ontology-v1-v2-preserves','새 ontology v1에서 v2로 upgrade해 진행 업무 물량 의무와 판정 의미를 보존한다','upgrade')
 s.observe('before');s.query('assessment-before','getAssessment',workId=alias('O1'))
