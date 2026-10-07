@@ -1,0 +1,1020 @@
+{
+  "schemaVersion": "1.0.0",
+  "actions": [
+    {
+      "id": "dispatch-s60-QC",
+      "type": "original",
+      "fixture": {
+        "synthetic": true,
+        "clock": {
+          "asOf": "2026-10-07T09:00:02Z",
+          "knownAt": "2026-10-07T09:00:02Z"
+        },
+        "sourceProfile": {
+          "namespace": "native-s4-dispatch-s60-QC",
+          "policyVersion": "fixture-v1",
+          "nextAction": "원본 범위와 실제 효과 대조",
+          "nextCheckAt": "2026-10-08T09:00:00Z"
+        },
+        "occurrence": {
+          "kind": "QUALITY_DECISION_recordDispositionBasis_QC",
+          "content": {
+            "segmentId": "$receipt60.segment",
+            "operation": "recordDispositionBasis",
+            "action": "DISPATCH",
+            "category": "QC",
+            "startQuantity": "0",
+            "quantity": "60",
+            "unit": "BOX",
+            "validFrom": "2026-10-07T09:00:02Z",
+            "validUntil": "2026-10-31T00:00:00Z",
+            "workId": "$WORK",
+            "sourceDecisionId": "c202fefe-1407-53ce-98b4-7dcd1a61c76c",
+            "sourceVersion": "1"
+          },
+          "externalEventId": "c202fefe-1407-53ce-98b4-7dcd1a61c76c",
+          "quantity": "60",
+          "unit": "BOX",
+          "assertion": "authored synthetic external original"
+        }
+      },
+      "binding": {
+        "organizationId": "$ORG",
+        "workId": "$WORK",
+        "itemId": "$P",
+        "actorId": "$reader",
+        "supervisorId": "$supervisor",
+        "physicalScopeId": "$receipt60.segment",
+        "subjectId": "$receipt60.segment",
+        "subjectKind": "SEGMENT",
+        "placeId": "$W"
+      }
+    },
+    {
+      "id": "dispatch-s60-QC-match",
+      "type": "command",
+      "capability": "matchSourceIdentity",
+      "request": {
+        "intentKind": "COMMAND",
+        "definitionVersion": "definition-v1",
+        "capabilityId": "matchSourceIdentity",
+        "expectedRevision": 1,
+        "commandIdempotencyKey": "dispatch-s60-QC-match",
+        "slots": {
+          "claimId": "$dispatch-s60-QC.claim",
+          "basisDocumentId": "$dispatch-s60-QC.document",
+          "physicalScopeId": "$receipt60.segment",
+          "policyVersion": "fixture-v1",
+          "sourceIdentity": "native-s4-dispatch-s60-QC:c202fefe-1407-53ce-98b4-7dcd1a61c76c:1",
+          "quantity": "60",
+          "unit": "BOX",
+          "effectiveFrom": "2026-10-07T09:00:02Z",
+          "reason": "외부 ORIGINAL과 동일한 범위 대조"
+        },
+        "provenance": {},
+        "subjectRefs": [
+          {
+            "type": "QuantitySegment",
+            "id": "$receipt60.segment"
+          }
+        ]
+      },
+      "outcome": "APPLIED",
+      "bind": {
+        "dispatch-s60-QC.reconciliation": "/id"
+      },
+      "assertions": [
+        {
+          "pointer": "/evidenceStatus",
+          "operator": "equals",
+          "expected": "MATCHED"
+        }
+      ]
+    },
+    {
+      "id": "dispatch-s60-QC-link",
+      "type": "command",
+      "capability": "linkCanonicalOccurrence",
+      "request": {
+        "intentKind": "COMMAND",
+        "definitionVersion": "definition-v1",
+        "capabilityId": "linkCanonicalOccurrence",
+        "expectedRevision": 1,
+        "commandIdempotencyKey": "dispatch-s60-QC-link",
+        "slots": {
+          "reconciliationId": "$dispatch-s60-QC.reconciliation"
+        },
+        "provenance": {},
+        "subjectRefs": [
+          {
+            "type": "QuantitySegment",
+            "id": "$receipt60.segment"
+          }
+        ]
+      },
+      "outcome": "APPLIED",
+      "bind": {
+        "dispatch-s60-QC.canonical": "/id"
+      },
+      "assertions": [
+        {
+          "pointer": "/evidenceStatus",
+          "operator": "equals",
+          "expected": "VERIFIED_RECORD_ONLY"
+        }
+      ]
+    },
+    {
+      "id": "dispatch-s60-QC-decision",
+      "type": "command",
+      "capability": "recordDispositionBasis",
+      "request": {
+        "intentKind": "RECORD",
+        "definitionVersion": "definition-v1",
+        "capabilityId": "recordDispositionBasis",
+        "expectedRevision": 0,
+        "commandIdempotencyKey": "dispatch-s60-QC-decision",
+        "slots": {
+          "segmentId": "$receipt60.segment",
+          "action": "DISPATCH",
+          "category": "QC",
+          "startQuantity": "0",
+          "quantity": "60",
+          "unit": "BOX",
+          "validFrom": "2026-10-07T09:00:02Z",
+          "validUntil": "2026-10-31T00:00:00Z",
+          "workId": "$WORK",
+          "evidenceId": "$dispatch-s60-QC.document",
+          "reason": "원본의 정확한 행동 범위를 판정",
+          "nextCheckAt": "2026-10-08T09:00:00Z"
+        },
+        "provenance": {},
+        "subjectRefs": [
+          {
+            "type": "QuantitySegment",
+            "id": "$receipt60.segment"
+          }
+        ]
+      },
+      "outcome": "APPLIED"
+    },
+    {
+      "id": "dispatch-s60-CUSTOMER",
+      "type": "original",
+      "fixture": {
+        "synthetic": true,
+        "clock": {
+          "asOf": "2026-10-07T09:00:02Z",
+          "knownAt": "2026-10-07T09:00:02Z"
+        },
+        "sourceProfile": {
+          "namespace": "native-s4-dispatch-s60-CUSTOMER",
+          "policyVersion": "fixture-v1",
+          "nextAction": "원본 범위와 실제 효과 대조",
+          "nextCheckAt": "2026-10-08T09:00:00Z"
+        },
+        "occurrence": {
+          "kind": "QUALITY_DECISION_recordDispositionBasis_CUSTOMER",
+          "content": {
+            "segmentId": "$receipt60.segment",
+            "operation": "recordDispositionBasis",
+            "action": "DISPATCH",
+            "category": "CUSTOMER",
+            "startQuantity": "0",
+            "quantity": "60",
+            "unit": "BOX",
+            "validFrom": "2026-10-07T09:00:02Z",
+            "validUntil": "2026-10-31T00:00:00Z",
+            "workId": "$WORK",
+            "sourceDecisionId": "365fa362-2068-5674-adcd-fd479d1dcc4e",
+            "sourceVersion": "1"
+          },
+          "externalEventId": "365fa362-2068-5674-adcd-fd479d1dcc4e",
+          "quantity": "60",
+          "unit": "BOX",
+          "assertion": "authored synthetic external original"
+        }
+      },
+      "binding": {
+        "organizationId": "$ORG",
+        "workId": "$WORK",
+        "itemId": "$P",
+        "actorId": "$reader",
+        "supervisorId": "$supervisor",
+        "physicalScopeId": "$receipt60.segment",
+        "subjectId": "$receipt60.segment",
+        "subjectKind": "SEGMENT",
+        "placeId": "$W"
+      }
+    },
+    {
+      "id": "dispatch-s60-CUSTOMER-match",
+      "type": "command",
+      "capability": "matchSourceIdentity",
+      "request": {
+        "intentKind": "COMMAND",
+        "definitionVersion": "definition-v1",
+        "capabilityId": "matchSourceIdentity",
+        "expectedRevision": 1,
+        "commandIdempotencyKey": "dispatch-s60-CUSTOMER-match",
+        "slots": {
+          "claimId": "$dispatch-s60-CUSTOMER.claim",
+          "basisDocumentId": "$dispatch-s60-CUSTOMER.document",
+          "physicalScopeId": "$receipt60.segment",
+          "policyVersion": "fixture-v1",
+          "sourceIdentity": "native-s4-dispatch-s60-CUSTOMER:365fa362-2068-5674-adcd-fd479d1dcc4e:1",
+          "quantity": "60",
+          "unit": "BOX",
+          "effectiveFrom": "2026-10-07T09:00:02Z",
+          "reason": "외부 ORIGINAL과 동일한 범위 대조"
+        },
+        "provenance": {},
+        "subjectRefs": [
+          {
+            "type": "QuantitySegment",
+            "id": "$receipt60.segment"
+          }
+        ]
+      },
+      "outcome": "APPLIED",
+      "bind": {
+        "dispatch-s60-CUSTOMER.reconciliation": "/id"
+      },
+      "assertions": [
+        {
+          "pointer": "/evidenceStatus",
+          "operator": "equals",
+          "expected": "MATCHED"
+        }
+      ]
+    },
+    {
+      "id": "dispatch-s60-CUSTOMER-link",
+      "type": "command",
+      "capability": "linkCanonicalOccurrence",
+      "request": {
+        "intentKind": "COMMAND",
+        "definitionVersion": "definition-v1",
+        "capabilityId": "linkCanonicalOccurrence",
+        "expectedRevision": 1,
+        "commandIdempotencyKey": "dispatch-s60-CUSTOMER-link",
+        "slots": {
+          "reconciliationId": "$dispatch-s60-CUSTOMER.reconciliation"
+        },
+        "provenance": {},
+        "subjectRefs": [
+          {
+            "type": "QuantitySegment",
+            "id": "$receipt60.segment"
+          }
+        ]
+      },
+      "outcome": "APPLIED",
+      "bind": {
+        "dispatch-s60-CUSTOMER.canonical": "/id"
+      },
+      "assertions": [
+        {
+          "pointer": "/evidenceStatus",
+          "operator": "equals",
+          "expected": "VERIFIED_RECORD_ONLY"
+        }
+      ]
+    },
+    {
+      "id": "dispatch-s60-CUSTOMER-decision",
+      "type": "command",
+      "capability": "recordDispositionBasis",
+      "request": {
+        "intentKind": "RECORD",
+        "definitionVersion": "definition-v1",
+        "capabilityId": "recordDispositionBasis",
+        "expectedRevision": 0,
+        "commandIdempotencyKey": "dispatch-s60-CUSTOMER-decision",
+        "slots": {
+          "segmentId": "$receipt60.segment",
+          "action": "DISPATCH",
+          "category": "CUSTOMER",
+          "startQuantity": "0",
+          "quantity": "60",
+          "unit": "BOX",
+          "validFrom": "2026-10-07T09:00:02Z",
+          "validUntil": "2026-10-31T00:00:00Z",
+          "workId": "$WORK",
+          "evidenceId": "$dispatch-s60-CUSTOMER.document",
+          "reason": "원본의 정확한 행동 범위를 판정",
+          "nextCheckAt": "2026-10-08T09:00:00Z"
+        },
+        "provenance": {},
+        "subjectRefs": [
+          {
+            "type": "QuantitySegment",
+            "id": "$receipt60.segment"
+          }
+        ]
+      },
+      "outcome": "APPLIED"
+    },
+    {
+      "id": "dispatch-s60-COMMERCIAL",
+      "type": "original",
+      "fixture": {
+        "synthetic": true,
+        "clock": {
+          "asOf": "2026-10-07T09:00:02Z",
+          "knownAt": "2026-10-07T09:00:02Z"
+        },
+        "sourceProfile": {
+          "namespace": "native-s4-dispatch-s60-COMMERCIAL",
+          "policyVersion": "fixture-v1",
+          "nextAction": "원본 범위와 실제 효과 대조",
+          "nextCheckAt": "2026-10-08T09:00:00Z"
+        },
+        "occurrence": {
+          "kind": "QUALITY_DECISION_recordDispositionBasis_COMMERCIAL",
+          "content": {
+            "segmentId": "$receipt60.segment",
+            "operation": "recordDispositionBasis",
+            "action": "DISPATCH",
+            "category": "COMMERCIAL",
+            "startQuantity": "0",
+            "quantity": "60",
+            "unit": "BOX",
+            "validFrom": "2026-10-07T09:00:02Z",
+            "validUntil": "2026-10-31T00:00:00Z",
+            "workId": "$WORK",
+            "sourceDecisionId": "028ad842-9d0e-5df4-8b95-50d61194641f",
+            "sourceVersion": "1"
+          },
+          "externalEventId": "028ad842-9d0e-5df4-8b95-50d61194641f",
+          "quantity": "60",
+          "unit": "BOX",
+          "assertion": "authored synthetic external original"
+        }
+      },
+      "binding": {
+        "organizationId": "$ORG",
+        "workId": "$WORK",
+        "itemId": "$P",
+        "actorId": "$reader",
+        "supervisorId": "$supervisor",
+        "physicalScopeId": "$receipt60.segment",
+        "subjectId": "$receipt60.segment",
+        "subjectKind": "SEGMENT",
+        "placeId": "$W"
+      }
+    },
+    {
+      "id": "dispatch-s60-COMMERCIAL-match",
+      "type": "command",
+      "capability": "matchSourceIdentity",
+      "request": {
+        "intentKind": "COMMAND",
+        "definitionVersion": "definition-v1",
+        "capabilityId": "matchSourceIdentity",
+        "expectedRevision": 1,
+        "commandIdempotencyKey": "dispatch-s60-COMMERCIAL-match",
+        "slots": {
+          "claimId": "$dispatch-s60-COMMERCIAL.claim",
+          "basisDocumentId": "$dispatch-s60-COMMERCIAL.document",
+          "physicalScopeId": "$receipt60.segment",
+          "policyVersion": "fixture-v1",
+          "sourceIdentity": "native-s4-dispatch-s60-COMMERCIAL:028ad842-9d0e-5df4-8b95-50d61194641f:1",
+          "quantity": "60",
+          "unit": "BOX",
+          "effectiveFrom": "2026-10-07T09:00:02Z",
+          "reason": "외부 ORIGINAL과 동일한 범위 대조"
+        },
+        "provenance": {},
+        "subjectRefs": [
+          {
+            "type": "QuantitySegment",
+            "id": "$receipt60.segment"
+          }
+        ]
+      },
+      "outcome": "APPLIED",
+      "bind": {
+        "dispatch-s60-COMMERCIAL.reconciliation": "/id"
+      },
+      "assertions": [
+        {
+          "pointer": "/evidenceStatus",
+          "operator": "equals",
+          "expected": "MATCHED"
+        }
+      ]
+    },
+    {
+      "id": "dispatch-s60-COMMERCIAL-link",
+      "type": "command",
+      "capability": "linkCanonicalOccurrence",
+      "request": {
+        "intentKind": "COMMAND",
+        "definitionVersion": "definition-v1",
+        "capabilityId": "linkCanonicalOccurrence",
+        "expectedRevision": 1,
+        "commandIdempotencyKey": "dispatch-s60-COMMERCIAL-link",
+        "slots": {
+          "reconciliationId": "$dispatch-s60-COMMERCIAL.reconciliation"
+        },
+        "provenance": {},
+        "subjectRefs": [
+          {
+            "type": "QuantitySegment",
+            "id": "$receipt60.segment"
+          }
+        ]
+      },
+      "outcome": "APPLIED",
+      "bind": {
+        "dispatch-s60-COMMERCIAL.canonical": "/id"
+      },
+      "assertions": [
+        {
+          "pointer": "/evidenceStatus",
+          "operator": "equals",
+          "expected": "VERIFIED_RECORD_ONLY"
+        }
+      ]
+    },
+    {
+      "id": "dispatch-s60-COMMERCIAL-decision",
+      "type": "command",
+      "capability": "recordDispositionBasis",
+      "request": {
+        "intentKind": "RECORD",
+        "definitionVersion": "definition-v1",
+        "capabilityId": "recordDispositionBasis",
+        "expectedRevision": 0,
+        "commandIdempotencyKey": "dispatch-s60-COMMERCIAL-decision",
+        "slots": {
+          "segmentId": "$receipt60.segment",
+          "action": "DISPATCH",
+          "category": "COMMERCIAL",
+          "startQuantity": "0",
+          "quantity": "60",
+          "unit": "BOX",
+          "validFrom": "2026-10-07T09:00:02Z",
+          "validUntil": "2026-10-31T00:00:00Z",
+          "workId": "$WORK",
+          "evidenceId": "$dispatch-s60-COMMERCIAL.document",
+          "reason": "원본의 정확한 행동 범위를 판정",
+          "nextCheckAt": "2026-10-08T09:00:00Z"
+        },
+        "provenance": {},
+        "subjectRefs": [
+          {
+            "type": "QuantitySegment",
+            "id": "$receipt60.segment"
+          }
+        ]
+      },
+      "outcome": "APPLIED"
+    },
+    {
+      "id": "dispatch-reg-draft",
+      "type": "original",
+      "fixture": {
+        "synthetic": true,
+        "clock": {
+          "asOf": "2026-10-07T09:00:02Z",
+          "knownAt": "2026-10-07T09:00:02Z"
+        },
+        "sourceProfile": {
+          "namespace": "native-s4-dispatch-regulator",
+          "policyVersion": "fixture-v1",
+          "nextAction": "원본 범위와 실제 효과 대조",
+          "nextCheckAt": "2026-10-08T09:00:00Z"
+        },
+        "occurrence": {
+          "kind": "REGULATORY_DRAFT",
+          "content": {
+            "draft": "fictional dossier",
+            "itemId": "$P"
+          },
+          "externalEventId": "dispatch-reg-draft",
+          "quantity": "60",
+          "unit": "BOX",
+          "assertion": "authored synthetic external original"
+        }
+      },
+      "binding": {
+        "organizationId": "$ORG",
+        "workId": "$WORK",
+        "itemId": "$P",
+        "actorId": "$reader",
+        "supervisorId": "$supervisor",
+        "physicalScopeId": "$receipt60.segment",
+        "subjectId": "$receipt60.segment",
+        "subjectKind": "SEGMENT",
+        "placeId": "$W"
+      }
+    },
+    {
+      "id": "dispatch-reg-prepare",
+      "type": "command",
+      "capability": "prepareRegulatoryProcedure",
+      "request": {
+        "intentKind": "COMMAND",
+        "definitionVersion": "definition-v1",
+        "capabilityId": "prepareRegulatoryProcedure",
+        "expectedRevision": 0,
+        "commandIdempotencyKey": "dispatch-reg-prepare",
+        "slots": {
+          "itemId": "$P",
+          "lotId": "$L",
+          "physicalScopeId": "$receipt60.segment",
+          "workId": "$WORK",
+          "policyId": "$REGDISPATCH",
+          "documentVersionId": "$dispatch-reg-draft.document"
+        },
+        "provenance": {},
+        "subjectRefs": [
+          {
+            "type": "QuantitySegment",
+            "id": "$receipt60.segment"
+          }
+        ]
+      },
+      "outcome": "APPLIED",
+      "bind": {
+        "DPROC": "/effects/procedureId",
+        "DPROC_VERSION": "/effects/procedureVersionId",
+        "DPROC_REV": "/revision"
+      },
+      "assertions": [
+        {
+          "pointer": "/status",
+          "operator": "equals",
+          "expected": "PREPARED"
+        }
+      ]
+    },
+    {
+      "id": "dispatch-reg-submitted",
+      "type": "original",
+      "fixture": {
+        "synthetic": true,
+        "clock": {
+          "asOf": "2026-10-07T09:00:02Z",
+          "knownAt": "2026-10-07T09:00:02Z"
+        },
+        "sourceProfile": {
+          "namespace": "native-s4-dispatch-regulator",
+          "policyVersion": "fixture-v1",
+          "nextAction": "원본 범위와 실제 효과 대조",
+          "nextCheckAt": "2026-10-08T09:00:00Z"
+        },
+        "occurrence": {
+          "kind": "REGULATORY_SUBMISSION",
+          "content": {
+            "regulatoryEventId": "4da37d87-2728-51c0-9a66-b306abd83631",
+            "procedureId": "$DPROC",
+            "procedureVersionId": "$DPROC_VERSION",
+            "itemId": "$P",
+            "lotId": "$L",
+            "physicalScopeId": "$receipt60.segment",
+            "authority": "FICTIONAL-AUTHORITY",
+            "policyVersion": "fixture-v1",
+            "occurredAt": "2026-10-07T09:00:02Z"
+          },
+          "externalEventId": "dispatch-reg-submitted",
+          "quantity": null,
+          "unit": null,
+          "assertion": "authored synthetic external original"
+        }
+      },
+      "binding": {
+        "organizationId": "$ORG",
+        "workId": "$WORK",
+        "itemId": "$P",
+        "actorId": "$reader",
+        "supervisorId": "$supervisor",
+        "physicalScopeId": "$receipt60.segment",
+        "subjectId": "$receipt60.segment",
+        "subjectKind": "SEGMENT",
+        "placeId": "$W"
+      }
+    },
+    {
+      "id": "dispatch-reg-submitted-match",
+      "type": "command",
+      "capability": "matchSourceIdentity",
+      "request": {
+        "intentKind": "COMMAND",
+        "definitionVersion": "definition-v1",
+        "capabilityId": "matchSourceIdentity",
+        "expectedRevision": 1,
+        "commandIdempotencyKey": "dispatch-reg-submitted-match",
+        "slots": {
+          "claimId": "$dispatch-reg-submitted.claim",
+          "basisDocumentId": "$dispatch-reg-submitted.document",
+          "physicalScopeId": "$receipt60.segment",
+          "policyVersion": "fixture-v1",
+          "sourceIdentity": "native-s4-dispatch-regulator:dispatch-reg-submitted:1",
+          "effectiveFrom": "2026-10-07T09:00:02Z",
+          "reason": "외부 ORIGINAL과 동일한 범위 대조"
+        },
+        "provenance": {},
+        "subjectRefs": [
+          {
+            "type": "QuantitySegment",
+            "id": "$receipt60.segment"
+          }
+        ]
+      },
+      "outcome": "APPLIED",
+      "bind": {
+        "dispatch-reg-submitted.reconciliation": "/id"
+      },
+      "assertions": [
+        {
+          "pointer": "/evidenceStatus",
+          "operator": "equals",
+          "expected": "MATCHED"
+        }
+      ]
+    },
+    {
+      "id": "dispatch-reg-submitted-link",
+      "type": "command",
+      "capability": "linkCanonicalOccurrence",
+      "request": {
+        "intentKind": "COMMAND",
+        "definitionVersion": "definition-v1",
+        "capabilityId": "linkCanonicalOccurrence",
+        "expectedRevision": 1,
+        "commandIdempotencyKey": "dispatch-reg-submitted-link",
+        "slots": {
+          "reconciliationId": "$dispatch-reg-submitted.reconciliation"
+        },
+        "provenance": {},
+        "subjectRefs": [
+          {
+            "type": "QuantitySegment",
+            "id": "$receipt60.segment"
+          }
+        ]
+      },
+      "outcome": "APPLIED",
+      "bind": {
+        "dispatch-reg-submitted.canonical": "/id"
+      },
+      "assertions": [
+        {
+          "pointer": "/evidenceStatus",
+          "operator": "equals",
+          "expected": "VERIFIED_RECORD_ONLY"
+        }
+      ]
+    },
+    {
+      "id": "dispatch-submit-reg",
+      "type": "command",
+      "capability": "recordSubmission",
+      "request": {
+        "intentKind": "RECORD",
+        "definitionVersion": "definition-v1",
+        "capabilityId": "recordSubmission",
+        "expectedRevision": "$DPROC_REV",
+        "commandIdempotencyKey": "dispatch-submit-reg",
+        "slots": {
+          "procedureId": "$DPROC",
+          "occurredAt": "2026-10-07T09:00:02Z",
+          "occurrenceId": "$dispatch-reg-submitted.canonical"
+        },
+        "provenance": {},
+        "subjectRefs": [
+          {
+            "type": "QuantitySegment",
+            "id": "$receipt60.segment"
+          }
+        ]
+      },
+      "outcome": "APPLIED",
+      "bind": {
+        "DPROC_VERSION": "/effects/procedureVersionId",
+        "DPROC_REV": "/revision"
+      },
+      "assertions": [
+        {
+          "pointer": "/status",
+          "operator": "equals",
+          "expected": "SUBMITTED"
+        }
+      ]
+    },
+    {
+      "id": "dispatch-reg-allow30",
+      "type": "original",
+      "fixture": {
+        "synthetic": true,
+        "clock": {
+          "asOf": "2026-10-07T09:00:02Z",
+          "knownAt": "2026-10-07T09:00:02Z"
+        },
+        "sourceProfile": {
+          "namespace": "native-s4-dispatch-regulator",
+          "policyVersion": "fixture-v1",
+          "nextAction": "원본 범위와 실제 효과 대조",
+          "nextCheckAt": "2026-10-08T09:00:00Z"
+        },
+        "occurrence": {
+          "kind": "REGULATORY_DECISION",
+          "content": {
+            "regulatoryEventId": "ecd3c875-d58c-52f5-91a4-affeb91d6029",
+            "procedureId": "$DPROC",
+            "procedureVersionId": "$DPROC_VERSION",
+            "itemId": "$P",
+            "lotId": "$L",
+            "physicalScopeId": "$receipt60.segment",
+            "authority": "FICTIONAL-AUTHORITY",
+            "policyVersion": "fixture-v1",
+            "decision": "ALLOWED",
+            "action": "DISPATCH",
+            "startQuantity": "0",
+            "quantity": "30",
+            "unit": "BOX",
+            "validFrom": "2026-10-07T09:00:02Z",
+            "validUntil": "2026-10-31T00:00:00Z"
+          },
+          "externalEventId": "dispatch-reg-allow30",
+          "quantity": "30",
+          "unit": "BOX",
+          "assertion": "authored synthetic external original"
+        }
+      },
+      "binding": {
+        "organizationId": "$ORG",
+        "workId": "$WORK",
+        "itemId": "$P",
+        "actorId": "$reader",
+        "supervisorId": "$supervisor",
+        "physicalScopeId": "$receipt60.segment",
+        "subjectId": "$receipt60.segment",
+        "subjectKind": "SEGMENT",
+        "placeId": "$W"
+      }
+    },
+    {
+      "id": "dispatch-reg-allow30-match",
+      "type": "command",
+      "capability": "matchSourceIdentity",
+      "request": {
+        "intentKind": "COMMAND",
+        "definitionVersion": "definition-v1",
+        "capabilityId": "matchSourceIdentity",
+        "expectedRevision": 1,
+        "commandIdempotencyKey": "dispatch-reg-allow30-match",
+        "slots": {
+          "claimId": "$dispatch-reg-allow30.claim",
+          "basisDocumentId": "$dispatch-reg-allow30.document",
+          "physicalScopeId": "$receipt60.segment",
+          "policyVersion": "fixture-v1",
+          "sourceIdentity": "native-s4-dispatch-regulator:dispatch-reg-allow30:1",
+          "quantity": "30",
+          "unit": "BOX",
+          "effectiveFrom": "2026-10-07T09:00:02Z",
+          "reason": "외부 ORIGINAL과 동일한 범위 대조"
+        },
+        "provenance": {},
+        "subjectRefs": [
+          {
+            "type": "QuantitySegment",
+            "id": "$receipt60.segment"
+          }
+        ]
+      },
+      "outcome": "APPLIED",
+      "bind": {
+        "dispatch-reg-allow30.reconciliation": "/id"
+      },
+      "assertions": [
+        {
+          "pointer": "/evidenceStatus",
+          "operator": "equals",
+          "expected": "MATCHED"
+        }
+      ]
+    },
+    {
+      "id": "dispatch-reg-allow30-link",
+      "type": "command",
+      "capability": "linkCanonicalOccurrence",
+      "request": {
+        "intentKind": "COMMAND",
+        "definitionVersion": "definition-v1",
+        "capabilityId": "linkCanonicalOccurrence",
+        "expectedRevision": 1,
+        "commandIdempotencyKey": "dispatch-reg-allow30-link",
+        "slots": {
+          "reconciliationId": "$dispatch-reg-allow30.reconciliation"
+        },
+        "provenance": {},
+        "subjectRefs": [
+          {
+            "type": "QuantitySegment",
+            "id": "$receipt60.segment"
+          }
+        ]
+      },
+      "outcome": "APPLIED",
+      "bind": {
+        "dispatch-reg-allow30.canonical": "/id"
+      },
+      "assertions": [
+        {
+          "pointer": "/evidenceStatus",
+          "operator": "equals",
+          "expected": "VERIFIED_RECORD_ONLY"
+        }
+      ]
+    },
+    {
+      "id": "dispatch-allow30",
+      "type": "command",
+      "capability": "recordRegulatoryDecision",
+      "request": {
+        "intentKind": "RECORD",
+        "definitionVersion": "definition-v1",
+        "capabilityId": "recordRegulatoryDecision",
+        "expectedRevision": "$DPROC_REV",
+        "commandIdempotencyKey": "dispatch-allow30",
+        "slots": {
+          "procedureId": "$DPROC",
+          "occurrenceId": "$dispatch-reg-allow30.canonical",
+          "decision": "ALLOWED",
+          "action": "DISPATCH",
+          "startQuantity": "0",
+          "quantity": "30",
+          "unit": "BOX",
+          "validFrom": "2026-10-07T09:00:02Z",
+          "validUntil": "2026-10-31T00:00:00Z"
+        },
+        "provenance": {},
+        "subjectRefs": [
+          {
+            "type": "QuantitySegment",
+            "id": "$receipt60.segment"
+          }
+        ]
+      },
+      "outcome": "APPLIED",
+      "bind": {
+        "DPROC_REV": "/revision"
+      }
+    },
+    {
+      "id": "dispatch-reg-label",
+      "type": "original",
+      "fixture": {
+        "synthetic": true,
+        "clock": {
+          "asOf": "2026-10-07T09:00:02Z",
+          "knownAt": "2026-10-07T09:00:02Z"
+        },
+        "sourceProfile": {
+          "namespace": "native-s4-dispatch-regulator",
+          "policyVersion": "fixture-v1",
+          "nextAction": "원본 범위와 실제 효과 대조",
+          "nextCheckAt": "2026-10-08T09:00:00Z"
+        },
+        "occurrence": {
+          "kind": "LABEL_VERIFICATION",
+          "content": {
+            "regulatoryEventId": "22259fec-9003-5e5d-b66e-c7f5a677e545",
+            "procedureId": "$DPROC",
+            "procedureVersionId": "$DPROC_VERSION",
+            "itemId": "$P",
+            "lotId": "$L",
+            "physicalScopeId": "$receipt60.segment",
+            "authority": "FICTIONAL-AUTHORITY",
+            "policyVersion": "fixture-v1",
+            "decision": "VERIFIED",
+            "packagingVersionId": "$PACK",
+            "specificationVersionId": "$SPEC",
+            "validFrom": "2026-10-07T09:00:02Z",
+            "validUntil": "2026-10-31T00:00:00Z"
+          },
+          "externalEventId": "dispatch-reg-label",
+          "quantity": null,
+          "unit": null,
+          "assertion": "authored synthetic external original"
+        }
+      },
+      "binding": {
+        "organizationId": "$ORG",
+        "workId": "$WORK",
+        "itemId": "$P",
+        "actorId": "$reader",
+        "supervisorId": "$supervisor",
+        "physicalScopeId": "$receipt60.segment",
+        "subjectId": "$receipt60.segment",
+        "subjectKind": "SEGMENT",
+        "placeId": "$W"
+      }
+    },
+    {
+      "id": "dispatch-reg-label-match",
+      "type": "command",
+      "capability": "matchSourceIdentity",
+      "request": {
+        "intentKind": "COMMAND",
+        "definitionVersion": "definition-v1",
+        "capabilityId": "matchSourceIdentity",
+        "expectedRevision": 1,
+        "commandIdempotencyKey": "dispatch-reg-label-match",
+        "slots": {
+          "claimId": "$dispatch-reg-label.claim",
+          "basisDocumentId": "$dispatch-reg-label.document",
+          "physicalScopeId": "$receipt60.segment",
+          "policyVersion": "fixture-v1",
+          "sourceIdentity": "native-s4-dispatch-regulator:dispatch-reg-label:1",
+          "effectiveFrom": "2026-10-07T09:00:02Z",
+          "reason": "외부 ORIGINAL과 동일한 범위 대조"
+        },
+        "provenance": {},
+        "subjectRefs": [
+          {
+            "type": "QuantitySegment",
+            "id": "$receipt60.segment"
+          }
+        ]
+      },
+      "outcome": "APPLIED",
+      "bind": {
+        "dispatch-reg-label.reconciliation": "/id"
+      },
+      "assertions": [
+        {
+          "pointer": "/evidenceStatus",
+          "operator": "equals",
+          "expected": "MATCHED"
+        }
+      ]
+    },
+    {
+      "id": "dispatch-reg-label-link",
+      "type": "command",
+      "capability": "linkCanonicalOccurrence",
+      "request": {
+        "intentKind": "COMMAND",
+        "definitionVersion": "definition-v1",
+        "capabilityId": "linkCanonicalOccurrence",
+        "expectedRevision": 1,
+        "commandIdempotencyKey": "dispatch-reg-label-link",
+        "slots": {
+          "reconciliationId": "$dispatch-reg-label.reconciliation"
+        },
+        "provenance": {},
+        "subjectRefs": [
+          {
+            "type": "QuantitySegment",
+            "id": "$receipt60.segment"
+          }
+        ]
+      },
+      "outcome": "APPLIED",
+      "bind": {
+        "dispatch-reg-label.canonical": "/id"
+      },
+      "assertions": [
+        {
+          "pointer": "/evidenceStatus",
+          "operator": "equals",
+          "expected": "VERIFIED_RECORD_ONLY"
+        }
+      ]
+    },
+    {
+      "id": "dispatch-label-verified",
+      "type": "command",
+      "capability": "verifyLabel",
+      "request": {
+        "intentKind": "RECORD",
+        "definitionVersion": "definition-v1",
+        "capabilityId": "verifyLabel",
+        "expectedRevision": "$DPROC_REV",
+        "commandIdempotencyKey": "dispatch-label-verified",
+        "slots": {
+          "procedureId": "$DPROC",
+          "occurrenceId": "$dispatch-reg-label.canonical",
+          "decision": "VERIFIED",
+          "packagingVersionId": "$PACK",
+          "specificationVersionId": "$SPEC",
+          "validFrom": "2026-10-07T09:00:02Z",
+          "validUntil": "2026-10-31T00:00:00Z"
+        },
+        "provenance": {},
+        "subjectRefs": [
+          {
+            "type": "QuantitySegment",
+            "id": "$receipt60.segment"
+          }
+        ]
+      },
+      "outcome": "APPLIED"
+    }
+  ]
+}

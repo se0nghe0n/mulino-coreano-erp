@@ -1,0 +1,3438 @@
+{
+  "schemaVersion": "1.0.0",
+  "case": "E1_UPSTREAM_PARTIAL",
+  "fullCaseCoverageClaimed": false,
+  "actions": [
+    {
+      "id": "create-work",
+      "type": "command",
+      "capability": "createWork",
+      "request": {
+        "intentKind": "COMMAND",
+        "definitionVersion": "definition-v1",
+        "capabilityId": "createWork",
+        "expectedRevision": 0,
+        "commandIdempotencyKey": "create-work",
+        "slots": {
+          "workType": "PURCHASE",
+          "quantityMode": "CUMULATIVE_EVENT",
+          "endpoint": "ARRIVED",
+          "dueAt": "2026-10-31T00:00:00Z",
+          "evidencePolicyVersion": "fixture-v1",
+          "ownerId": "$reader",
+          "supervisorId": "$supervisor",
+          "quantity": {
+            "value": "100",
+            "unit": "BOX"
+          },
+          "period": {
+            "start": "2026-10-01T00:00:00Z",
+            "end": "2026-10-31T00:00:00Z",
+            "startInclusive": true,
+            "endInclusive": true
+          },
+          "eventKinds": [
+            "PHYSICAL_RECEIPT"
+          ],
+          "distinctContributionScope": {
+            "itemId": "$P"
+          }
+        },
+        "provenance": {},
+        "subjectRefs": [
+          {
+            "type": "TradeItem",
+            "id": "$P"
+          }
+        ]
+      },
+      "bind": {
+        "WORK": "/effects/workId",
+        "WORK_REV": "/revision"
+      }
+    },
+    {
+      "id": "proposal100",
+      "type": "command",
+      "capability": "proposePurchase",
+      "request": {
+        "intentKind": "COMMAND",
+        "definitionVersion": "definition-v1",
+        "capabilityId": "proposePurchase",
+        "expectedRevision": "$WORK_REV",
+        "commandIdempotencyKey": "proposal100",
+        "slots": {
+          "workId": "$WORK",
+          "quantity": {
+            "value": "100",
+            "unit": "BOX"
+          },
+          "price": {
+            "value": "200",
+            "currency": "EUR"
+          },
+          "supplierId": "$SUP",
+          "destinationId": "$W",
+          "dueAt": "2026-10-31T00:00:00Z",
+          "endpoint": "ARRIVED",
+          "quantityMode": "CUMULATIVE_EVENT"
+        },
+        "provenance": {},
+        "subjectRefs": [
+          {
+            "type": "Work",
+            "id": "$WORK"
+          }
+        ]
+      },
+      "bind": {
+        "PROPOSAL": "/proposalId",
+        "PROPOSAL_HASH": "/proposalHash",
+        "PROPOSAL_REV": "/proposalRevision"
+      }
+    },
+    {
+      "id": "approve100",
+      "type": "command",
+      "capability": "approvePurchase",
+      "request": {
+        "intentKind": "COMMAND",
+        "definitionVersion": "definition-v1",
+        "capabilityId": "approvePurchase",
+        "expectedRevision": "$PROPOSAL_REV",
+        "commandIdempotencyKey": "approve100",
+        "slots": {
+          "proposalId": "$PROPOSAL",
+          "proposalHash": "$PROPOSAL_HASH",
+          "decision": "APPROVE",
+          "validUntil": "2026-10-31T00:00:00Z",
+          "conditions": []
+        },
+        "provenance": {},
+        "subjectRefs": [
+          {
+            "type": "Work",
+            "id": "$WORK"
+          }
+        ]
+      },
+      "bind": {
+        "APPROVAL": "/approvalId"
+      },
+      "actor": "supervisor"
+    },
+    {
+      "id": "dispatch100",
+      "type": "command",
+      "capability": "dispatchPurchaseOrder",
+      "request": {
+        "intentKind": "COMMAND",
+        "definitionVersion": "definition-v1",
+        "capabilityId": "dispatchPurchaseOrder",
+        "expectedRevision": "$PROPOSAL_REV",
+        "commandIdempotencyKey": "dispatch100",
+        "slots": {
+          "proposalId": "$PROPOSAL",
+          "proposalHash": "$PROPOSAL_HASH",
+          "approvalId": "$APPROVAL",
+          "channel": "SYNTHETIC",
+          "externalOperationId": "e65878bd-944a-513b-a12b-34ee4fe0c656"
+        },
+        "provenance": {},
+        "subjectRefs": [
+          {
+            "type": "Work",
+            "id": "$WORK"
+          }
+        ]
+      },
+      "bind": {
+        "ORDER": "/objectId",
+        "LINE": "/poLineId"
+      }
+    },
+    {
+      "id": "supplier-accept",
+      "type": "original",
+      "fixture": {
+        "synthetic": true,
+        "clock": {
+          "asOf": "2026-10-07T09:00:02Z",
+          "knownAt": "2026-10-07T09:00:02Z"
+        },
+        "sourceProfile": {
+          "namespace": "native-s4-supplier-accept",
+          "policyVersion": "fixture-v1",
+          "nextAction": "\uc6d0\ubcf8 \ubc94\uc704\uc640 \uc2e4\uc81c \ud6a8\uacfc \ub300\uc870",
+          "nextCheckAt": "2026-10-08T09:00:00Z"
+        },
+        "occurrence": {
+          "kind": "SUPPLIER_ACCEPT",
+          "content": {
+            "orderId": "$ORDER",
+            "itemId": "$P",
+            "reply": "ACCEPT",
+            "quantity": "100",
+            "unit": "BOX",
+            "proposalRevision": 1
+          },
+          "externalEventId": "supplier-accept",
+          "quantity": "100",
+          "unit": "BOX",
+          "assertion": "authored synthetic external original"
+        }
+      },
+      "binding": {
+        "organizationId": "$ORG",
+        "workId": "$WORK",
+        "itemId": "$P",
+        "actorId": "$reader",
+        "supervisorId": "$supervisor",
+        "physicalScopeId": "$ORDER",
+        "subjectId": "$ORDER",
+        "subjectKind": "PURCHASE_ORDER",
+        "placeId": "$W"
+      }
+    },
+    {
+      "id": "supplier-accept-match",
+      "type": "command",
+      "capability": "matchSourceIdentity",
+      "request": {
+        "intentKind": "COMMAND",
+        "definitionVersion": "definition-v1",
+        "capabilityId": "matchSourceIdentity",
+        "expectedRevision": 1,
+        "commandIdempotencyKey": "supplier-accept-match",
+        "slots": {
+          "claimId": "$supplier-accept.claim",
+          "basisDocumentId": "$supplier-accept.document",
+          "physicalScopeId": "$ORDER",
+          "policyVersion": "fixture-v1",
+          "sourceIdentity": "native-s4-supplier-accept:supplier-accept:1",
+          "quantity": "100",
+          "unit": "BOX",
+          "effectiveFrom": "2026-10-07T09:00:02Z",
+          "reason": "\uc678\ubd80 ORIGINAL\uacfc \ub3d9\uc77c\ud55c \ubc94\uc704 \ub300\uc870"
+        },
+        "provenance": {},
+        "subjectRefs": [
+          {
+            "type": "PurchaseOrder",
+            "id": "$ORDER"
+          }
+        ]
+      },
+      "outcome": "APPLIED",
+      "bind": {
+        "supplier-accept.reconciliation": "/id"
+      },
+      "assertions": [
+        {
+          "pointer": "/evidenceStatus",
+          "operator": "equals",
+          "expected": "MATCHED"
+        }
+      ]
+    },
+    {
+      "id": "supplier-accept-link",
+      "type": "command",
+      "capability": "linkCanonicalOccurrence",
+      "request": {
+        "intentKind": "COMMAND",
+        "definitionVersion": "definition-v1",
+        "capabilityId": "linkCanonicalOccurrence",
+        "expectedRevision": 1,
+        "commandIdempotencyKey": "supplier-accept-link",
+        "slots": {
+          "reconciliationId": "$supplier-accept.reconciliation"
+        },
+        "provenance": {},
+        "subjectRefs": [
+          {
+            "type": "PurchaseOrder",
+            "id": "$ORDER"
+          }
+        ]
+      },
+      "outcome": "APPLIED",
+      "bind": {
+        "supplier-accept.canonical": "/id"
+      },
+      "assertions": [
+        {
+          "pointer": "/evidenceStatus",
+          "operator": "equals",
+          "expected": "VERIFIED_RECORD_ONLY"
+        }
+      ]
+    },
+    {
+      "id": "supplier-accepted",
+      "type": "command",
+      "capability": "recordSupplierReply",
+      "request": {
+        "intentKind": "RECORD",
+        "definitionVersion": "definition-v1",
+        "capabilityId": "recordSupplierReply",
+        "expectedRevision": 1,
+        "commandIdempotencyKey": "supplier-accepted",
+        "slots": {
+          "purchaseId": "$ORDER",
+          "reply": "ACCEPT",
+          "proposedQuantity": {
+            "value": "100",
+            "unit": "BOX"
+          },
+          "evidence": "$supplier-accept.document",
+          "canonicalOccurrenceId": "$supplier-accept.canonical"
+        },
+        "provenance": {},
+        "subjectRefs": [
+          {
+            "type": "PurchaseOrder",
+            "id": "$ORDER"
+          }
+        ]
+      },
+      "outcome": "APPLIED",
+      "bind": {
+        "LINE_REV": "/revision"
+      }
+    },
+    {
+      "id": "shipment-plan",
+      "type": "command",
+      "capability": "createShipment",
+      "request": {
+        "intentKind": "COMMAND",
+        "definitionVersion": "definition-v1",
+        "capabilityId": "createShipment",
+        "expectedRevision": 0,
+        "commandIdempotencyKey": "shipment-plan",
+        "slots": {
+          "originId": "$TRANSIT",
+          "destinationId": "$W",
+          "carrierRef": "synthetic-no-external-send",
+          "workId": "$WORK",
+          "cargo": [
+            {
+              "itemId": "$P",
+              "quantity": "100",
+              "unit": "BOX",
+              "allocations": [
+                {
+                  "poLineId": "$LINE",
+                  "quantity": "100"
+                }
+              ]
+            }
+          ],
+          "legs": [
+            {
+              "originId": "$TRANSIT",
+              "destinationId": "$W",
+              "carrierRef": "synthetic-no-external-send"
+            }
+          ]
+        },
+        "provenance": {},
+        "subjectRefs": []
+      },
+      "outcome": "APPLIED",
+      "bind": {
+        "SHIPMENT": "/effects/shipmentId",
+        "CARGO": "/effects/cargoIds/0",
+        "LEG": "/effects/legIds/0"
+      }
+    },
+    {
+      "id": "shipment-planned-physical0",
+      "type": "observe",
+      "assertions": [
+        {
+          "pointer": "/rawRows/mulino_inventory_quantitysegments",
+          "operator": "size",
+          "expected": 0
+        },
+        {
+          "pointer": "/rawRows/mulino_trade_shipment_shipmentcargo",
+          "operator": "sum",
+          "column": "plannedquantity",
+          "expected": "100"
+        }
+      ]
+    },
+    {
+      "id": "shipment-physical-range",
+      "type": "uuid",
+      "alias": "SHIP_RANGE"
+    },
+    {
+      "id": "ship-departure",
+      "type": "original",
+      "fixture": {
+        "synthetic": true,
+        "clock": {
+          "asOf": "2026-10-07T09:00:02Z",
+          "knownAt": "2026-10-07T09:00:02Z"
+        },
+        "sourceProfile": {
+          "namespace": "native-s4-ship-departure",
+          "policyVersion": "fixture-v1",
+          "nextAction": "\uc6d0\ubcf8 \ubc94\uc704\uc640 \uc2e4\uc81c \ud6a8\uacfc \ub300\uc870",
+          "nextCheckAt": "2026-10-08T09:00:00Z"
+        },
+        "occurrence": {
+          "kind": "SHIPMENT_DEPARTURE",
+          "content": {
+            "shipmentEventId": "c2d9c2b6-a554-5b95-8706-8c12c31705b7",
+            "shipmentId": "$SHIPMENT",
+            "cargoId": "$CARGO",
+            "legId": "$LEG",
+            "placeId": "$TRANSIT",
+            "physicalScopeId": "$SHIP_RANGE",
+            "quantity": "100",
+            "unit": "BOX",
+            "occurredAt": "2026-10-07T09:00:02Z",
+            "kind": "DEPARTURE"
+          },
+          "externalEventId": "ship-departure",
+          "quantity": "100",
+          "unit": "BOX",
+          "assertion": "authored synthetic external original"
+        }
+      },
+      "binding": {
+        "organizationId": "$ORG",
+        "workId": "$WORK",
+        "itemId": "$P",
+        "actorId": "$reader",
+        "supervisorId": "$supervisor",
+        "physicalScopeId": "$SHIP_RANGE",
+        "subjectId": "$P",
+        "subjectKind": "ITEM",
+        "placeId": "$TRANSIT"
+      }
+    },
+    {
+      "id": "ship-departure-match",
+      "type": "command",
+      "capability": "matchSourceIdentity",
+      "request": {
+        "intentKind": "COMMAND",
+        "definitionVersion": "definition-v1",
+        "capabilityId": "matchSourceIdentity",
+        "expectedRevision": 1,
+        "commandIdempotencyKey": "ship-departure-match",
+        "slots": {
+          "claimId": "$ship-departure.claim",
+          "basisDocumentId": "$ship-departure.document",
+          "physicalScopeId": "$SHIP_RANGE",
+          "policyVersion": "fixture-v1",
+          "sourceIdentity": "native-s4-ship-departure:ship-departure:1",
+          "quantity": "100",
+          "unit": "BOX",
+          "effectiveFrom": "2026-10-07T09:00:02Z",
+          "reason": "\uc678\ubd80 ORIGINAL\uacfc \ub3d9\uc77c\ud55c \ubc94\uc704 \ub300\uc870"
+        },
+        "provenance": {},
+        "subjectRefs": [
+          {
+            "type": "TradeItem",
+            "id": "$P"
+          }
+        ]
+      },
+      "outcome": "APPLIED",
+      "bind": {
+        "ship-departure.reconciliation": "/id"
+      },
+      "assertions": [
+        {
+          "pointer": "/evidenceStatus",
+          "operator": "equals",
+          "expected": "MATCHED"
+        }
+      ]
+    },
+    {
+      "id": "ship-departure-link",
+      "type": "command",
+      "capability": "linkCanonicalOccurrence",
+      "request": {
+        "intentKind": "COMMAND",
+        "definitionVersion": "definition-v1",
+        "capabilityId": "linkCanonicalOccurrence",
+        "expectedRevision": 1,
+        "commandIdempotencyKey": "ship-departure-link",
+        "slots": {
+          "reconciliationId": "$ship-departure.reconciliation"
+        },
+        "provenance": {},
+        "subjectRefs": [
+          {
+            "type": "TradeItem",
+            "id": "$P"
+          }
+        ]
+      },
+      "outcome": "APPLIED",
+      "bind": {
+        "ship-departure.canonical": "/id"
+      },
+      "assertions": [
+        {
+          "pointer": "/evidenceStatus",
+          "operator": "equals",
+          "expected": "VERIFIED_RECORD_ONLY"
+        }
+      ]
+    },
+    {
+      "id": "ship-departure-record",
+      "type": "command",
+      "capability": "recordLegEvent",
+      "request": {
+        "intentKind": "RECORD",
+        "definitionVersion": "definition-v1",
+        "capabilityId": "recordLegEvent",
+        "expectedRevision": 1,
+        "commandIdempotencyKey": "ship-departure-record",
+        "slots": {
+          "shipmentId": "$SHIPMENT",
+          "cargoId": "$CARGO",
+          "legId": "$LEG",
+          "kind": "DEPARTURE",
+          "placeId": "$TRANSIT",
+          "physicalScopeId": "$SHIP_RANGE",
+          "occurrenceId": "$ship-departure.canonical",
+          "quantity": "100",
+          "unit": "BOX",
+          "occurredAt": "2026-10-07T09:00:02Z"
+        },
+        "provenance": {},
+        "subjectRefs": [
+          {
+            "type": "Shipment",
+            "id": "$SHIPMENT"
+          }
+        ]
+      },
+      "outcome": "APPLIED",
+      "bind": {
+        "SHIP_REV": "/revision"
+      }
+    },
+    {
+      "id": "ship-arrival",
+      "type": "original",
+      "fixture": {
+        "synthetic": true,
+        "clock": {
+          "asOf": "2026-10-07T09:00:02Z",
+          "knownAt": "2026-10-07T09:00:02Z"
+        },
+        "sourceProfile": {
+          "namespace": "native-s4-ship-arrival",
+          "policyVersion": "fixture-v1",
+          "nextAction": "\uc6d0\ubcf8 \ubc94\uc704\uc640 \uc2e4\uc81c \ud6a8\uacfc \ub300\uc870",
+          "nextCheckAt": "2026-10-08T09:00:00Z"
+        },
+        "occurrence": {
+          "kind": "SHIPMENT_ARRIVAL",
+          "content": {
+            "shipmentEventId": "7b90d684-92ed-523b-9c6d-d294515d0a67",
+            "shipmentId": "$SHIPMENT",
+            "cargoId": "$CARGO",
+            "legId": "$LEG",
+            "placeId": "$W",
+            "physicalScopeId": "$SHIP_RANGE",
+            "quantity": "100",
+            "unit": "BOX",
+            "occurredAt": "2026-10-07T09:00:02Z",
+            "kind": "ARRIVAL"
+          },
+          "externalEventId": "ship-arrival",
+          "quantity": "100",
+          "unit": "BOX",
+          "assertion": "authored synthetic external original"
+        }
+      },
+      "binding": {
+        "organizationId": "$ORG",
+        "workId": "$WORK",
+        "itemId": "$P",
+        "actorId": "$reader",
+        "supervisorId": "$supervisor",
+        "physicalScopeId": "$SHIP_RANGE",
+        "subjectId": "$P",
+        "subjectKind": "ITEM",
+        "placeId": "$W"
+      }
+    },
+    {
+      "id": "ship-arrival-match",
+      "type": "command",
+      "capability": "matchSourceIdentity",
+      "request": {
+        "intentKind": "COMMAND",
+        "definitionVersion": "definition-v1",
+        "capabilityId": "matchSourceIdentity",
+        "expectedRevision": 1,
+        "commandIdempotencyKey": "ship-arrival-match",
+        "slots": {
+          "claimId": "$ship-arrival.claim",
+          "basisDocumentId": "$ship-arrival.document",
+          "physicalScopeId": "$SHIP_RANGE",
+          "policyVersion": "fixture-v1",
+          "sourceIdentity": "native-s4-ship-arrival:ship-arrival:1",
+          "quantity": "100",
+          "unit": "BOX",
+          "effectiveFrom": "2026-10-07T09:00:02Z",
+          "reason": "\uc678\ubd80 ORIGINAL\uacfc \ub3d9\uc77c\ud55c \ubc94\uc704 \ub300\uc870"
+        },
+        "provenance": {},
+        "subjectRefs": [
+          {
+            "type": "TradeItem",
+            "id": "$P"
+          }
+        ]
+      },
+      "outcome": "APPLIED",
+      "bind": {
+        "ship-arrival.reconciliation": "/id"
+      },
+      "assertions": [
+        {
+          "pointer": "/evidenceStatus",
+          "operator": "equals",
+          "expected": "MATCHED"
+        }
+      ]
+    },
+    {
+      "id": "ship-arrival-link",
+      "type": "command",
+      "capability": "linkCanonicalOccurrence",
+      "request": {
+        "intentKind": "COMMAND",
+        "definitionVersion": "definition-v1",
+        "capabilityId": "linkCanonicalOccurrence",
+        "expectedRevision": 1,
+        "commandIdempotencyKey": "ship-arrival-link",
+        "slots": {
+          "reconciliationId": "$ship-arrival.reconciliation"
+        },
+        "provenance": {},
+        "subjectRefs": [
+          {
+            "type": "TradeItem",
+            "id": "$P"
+          }
+        ]
+      },
+      "outcome": "APPLIED",
+      "bind": {
+        "ship-arrival.canonical": "/id"
+      },
+      "assertions": [
+        {
+          "pointer": "/evidenceStatus",
+          "operator": "equals",
+          "expected": "VERIFIED_RECORD_ONLY"
+        }
+      ]
+    },
+    {
+      "id": "ship-arrival-record",
+      "type": "command",
+      "capability": "recordLegEvent",
+      "request": {
+        "intentKind": "RECORD",
+        "definitionVersion": "definition-v1",
+        "capabilityId": "recordLegEvent",
+        "expectedRevision": "$SHIP_REV",
+        "commandIdempotencyKey": "ship-arrival-record",
+        "slots": {
+          "shipmentId": "$SHIPMENT",
+          "cargoId": "$CARGO",
+          "legId": "$LEG",
+          "kind": "ARRIVAL",
+          "placeId": "$W",
+          "physicalScopeId": "$SHIP_RANGE",
+          "occurrenceId": "$ship-arrival.canonical",
+          "quantity": "100",
+          "unit": "BOX",
+          "occurredAt": "2026-10-07T09:00:02Z"
+        },
+        "provenance": {},
+        "subjectRefs": [
+          {
+            "type": "Shipment",
+            "id": "$SHIPMENT"
+          }
+        ]
+      },
+      "outcome": "APPLIED",
+      "bind": {
+        "SHIP_REV": "/revision"
+      }
+    },
+    {
+      "id": "custody-handover",
+      "type": "original",
+      "fixture": {
+        "synthetic": true,
+        "clock": {
+          "asOf": "2026-10-07T09:00:02Z",
+          "knownAt": "2026-10-07T09:00:02Z"
+        },
+        "sourceProfile": {
+          "namespace": "native-s4-custody-handover",
+          "policyVersion": "fixture-v1",
+          "nextAction": "\uc6d0\ubcf8 \ubc94\uc704\uc640 \uc2e4\uc81c \ud6a8\uacfc \ub300\uc870",
+          "nextCheckAt": "2026-10-08T09:00:00Z"
+        },
+        "occurrence": {
+          "kind": "CUSTODY_HANDOVER",
+          "content": {
+            "shipmentEventId": "e7dc9308-7039-5e9b-933b-4f3324f0ae50",
+            "shipmentId": "$SHIPMENT",
+            "cargoId": "$CARGO",
+            "legId": "$LEG",
+            "placeId": "$W",
+            "physicalScopeId": "$SHIP_RANGE",
+            "quantity": "100",
+            "unit": "BOX",
+            "occurredAt": "2026-10-07T09:00:02Z",
+            "fromCustodianId": "$reader",
+            "toCustodianId": "$supervisor"
+          },
+          "externalEventId": "custody-handover",
+          "quantity": "100",
+          "unit": "BOX",
+          "assertion": "authored synthetic external original"
+        }
+      },
+      "binding": {
+        "organizationId": "$ORG",
+        "workId": "$WORK",
+        "itemId": "$P",
+        "actorId": "$reader",
+        "supervisorId": "$supervisor",
+        "physicalScopeId": "$SHIP_RANGE",
+        "subjectId": "$P",
+        "subjectKind": "ITEM",
+        "placeId": "$W"
+      }
+    },
+    {
+      "id": "custody-handover-match",
+      "type": "command",
+      "capability": "matchSourceIdentity",
+      "request": {
+        "intentKind": "COMMAND",
+        "definitionVersion": "definition-v1",
+        "capabilityId": "matchSourceIdentity",
+        "expectedRevision": 1,
+        "commandIdempotencyKey": "custody-handover-match",
+        "slots": {
+          "claimId": "$custody-handover.claim",
+          "basisDocumentId": "$custody-handover.document",
+          "physicalScopeId": "$SHIP_RANGE",
+          "policyVersion": "fixture-v1",
+          "sourceIdentity": "native-s4-custody-handover:custody-handover:1",
+          "quantity": "100",
+          "unit": "BOX",
+          "effectiveFrom": "2026-10-07T09:00:02Z",
+          "reason": "\uc678\ubd80 ORIGINAL\uacfc \ub3d9\uc77c\ud55c \ubc94\uc704 \ub300\uc870"
+        },
+        "provenance": {},
+        "subjectRefs": [
+          {
+            "type": "TradeItem",
+            "id": "$P"
+          }
+        ]
+      },
+      "outcome": "APPLIED",
+      "bind": {
+        "custody-handover.reconciliation": "/id"
+      },
+      "assertions": [
+        {
+          "pointer": "/evidenceStatus",
+          "operator": "equals",
+          "expected": "MATCHED"
+        }
+      ]
+    },
+    {
+      "id": "custody-handover-link",
+      "type": "command",
+      "capability": "linkCanonicalOccurrence",
+      "request": {
+        "intentKind": "COMMAND",
+        "definitionVersion": "definition-v1",
+        "capabilityId": "linkCanonicalOccurrence",
+        "expectedRevision": 1,
+        "commandIdempotencyKey": "custody-handover-link",
+        "slots": {
+          "reconciliationId": "$custody-handover.reconciliation"
+        },
+        "provenance": {},
+        "subjectRefs": [
+          {
+            "type": "TradeItem",
+            "id": "$P"
+          }
+        ]
+      },
+      "outcome": "APPLIED",
+      "bind": {
+        "custody-handover.canonical": "/id"
+      },
+      "assertions": [
+        {
+          "pointer": "/evidenceStatus",
+          "operator": "equals",
+          "expected": "VERIFIED_RECORD_ONLY"
+        }
+      ]
+    },
+    {
+      "id": "handover-record",
+      "type": "command",
+      "capability": "recordHandover",
+      "request": {
+        "intentKind": "RECORD",
+        "definitionVersion": "definition-v1",
+        "capabilityId": "recordHandover",
+        "expectedRevision": "$SHIP_REV",
+        "commandIdempotencyKey": "handover-record",
+        "slots": {
+          "shipmentId": "$SHIPMENT",
+          "cargoId": "$CARGO",
+          "legId": "$LEG",
+          "placeId": "$W",
+          "physicalScopeId": "$SHIP_RANGE",
+          "occurrenceId": "$custody-handover.canonical",
+          "quantity": "100",
+          "unit": "BOX",
+          "occurredAt": "2026-10-07T09:00:02Z",
+          "fromCustodianId": "$reader",
+          "toCustodianId": "$supervisor"
+        },
+        "provenance": {},
+        "subjectRefs": [
+          {
+            "type": "Shipment",
+            "id": "$SHIPMENT"
+          }
+        ]
+      },
+      "outcome": "APPLIED"
+    },
+    {
+      "id": "shipment-actual-no-stock",
+      "type": "observe",
+      "assertions": [
+        {
+          "pointer": "/rawRows/mulino_inventory_quantitysegments",
+          "operator": "size",
+          "expected": 0
+        },
+        {
+          "pointer": "/rawRows/mulino_trade_shipment_legevents",
+          "operator": "size",
+          "expected": 2
+        },
+        {
+          "pointer": "/rawRows/mulino_trade_shipment_custodyhandovers",
+          "operator": "size",
+          "expected": 1
+        }
+      ]
+    },
+    {
+      "id": "RANGE60",
+      "type": "uuid",
+      "alias": "RANGE60"
+    },
+    {
+      "id": "RANGE40",
+      "type": "uuid",
+      "alias": "RANGE40"
+    },
+    {
+      "id": "RANGE5",
+      "type": "uuid",
+      "alias": "RANGE5"
+    },
+    {
+      "id": "unidentified-range",
+      "type": "uuid",
+      "alias": "UNKNOWN_RANGE"
+    },
+    {
+      "id": "unidentified-original",
+      "type": "original",
+      "fixture": {
+        "synthetic": true,
+        "clock": {
+          "asOf": "2026-10-07T09:00:02Z",
+          "knownAt": "2026-10-07T09:00:02Z"
+        },
+        "sourceProfile": {
+          "namespace": "native-s4-unidentified-original",
+          "policyVersion": "fixture-v1",
+          "nextAction": "\uc6d0\ubcf8 \ubc94\uc704\uc640 \uc2e4\uc81c \ud6a8\uacfc \ub300\uc870",
+          "nextCheckAt": "2026-10-08T09:00:00Z"
+        },
+        "occurrence": {
+          "kind": "PHYSICAL_RECEIPT",
+          "content": {
+            "rangeRootId": "$UNKNOWN_RANGE",
+            "startQuantity": "0",
+            "itemId": "$P",
+            "placeId": "$W",
+            "workId": "$WORK",
+            "quantity": "7",
+            "unit": "BOX",
+            "occurredAt": "2026-10-07T09:00:02Z"
+          },
+          "externalEventId": "unidentified-original",
+          "quantity": "7",
+          "unit": "BOX",
+          "assertion": "authored synthetic external original"
+        }
+      },
+      "binding": {
+        "organizationId": "$ORG",
+        "workId": "$WORK",
+        "itemId": "$P",
+        "actorId": "$reader",
+        "supervisorId": "$supervisor",
+        "physicalScopeId": "$UNKNOWN_RANGE",
+        "subjectId": "$P",
+        "subjectKind": "ITEM",
+        "placeId": "$W"
+      }
+    },
+    {
+      "id": "unidentified-provisional",
+      "type": "command",
+      "capability": "receiveProvisional",
+      "request": {
+        "intentKind": "RECORD",
+        "definitionVersion": "definition-v1",
+        "capabilityId": "receiveProvisional",
+        "expectedRevision": 0,
+        "commandIdempotencyKey": "unidentified-provisional",
+        "slots": {
+          "eventId": "$unidentified-original.event",
+          "rangeRootId": "$UNKNOWN_RANGE",
+          "startQuantity": "0",
+          "itemId": "$P",
+          "placeId": "$W",
+          "workId": "$WORK",
+          "quantity": "7",
+          "unit": "BOX",
+          "occurredAt": "2026-10-07T09:00:02Z",
+          "ownerId": "$reader",
+          "supervisorId": "$supervisor",
+          "nextAction": "LOT \ubbf8\uc2dd\ubcc4 \uc2e4\ubb3c \ub300\uc870",
+          "nextCheckAt": "2026-10-08T09:00:00Z"
+        },
+        "provenance": {},
+        "subjectRefs": [
+          {
+            "type": "Work",
+            "id": "$WORK"
+          }
+        ]
+      },
+      "outcome": "APPLIED"
+    },
+    {
+      "id": "unidentified-no-stock",
+      "type": "observe",
+      "assertions": [
+        {
+          "pointer": "/rawRows/mulino_trade_receipt_observations",
+          "operator": "matchingRows",
+          "expected": 1,
+          "where": {
+            "identificationstatus": "UNKNOWN",
+            "state": "PROVISIONAL"
+          }
+        },
+        {
+          "pointer": "/rawRows/mulino_trade_receipt_receipts",
+          "operator": "size",
+          "expected": 0
+        },
+        {
+          "pointer": "/rawRows/mulino_inventory_quantitysegments",
+          "operator": "size",
+          "expected": 0
+        }
+      ]
+    },
+    {
+      "id": "unidentified-eligible0",
+      "type": "query",
+      "capability": "getInventory",
+      "request": {
+        "id": "$P",
+        "scope": {
+          "organizationId": "$ORG",
+          "itemId": "$P"
+        },
+        "asOf": "2026-10-07T09:00:02Z",
+        "knownAt": "2026-10-07T09:00:02Z"
+      },
+      "assertions": [
+        {
+          "pointer": "/data/eligibleQuantity",
+          "operator": "equals",
+          "expected": "0"
+        }
+      ]
+    },
+    {
+      "id": "receipt60",
+      "type": "original",
+      "fixture": {
+        "synthetic": true,
+        "clock": {
+          "asOf": "2026-10-07T09:00:02Z",
+          "knownAt": "2026-10-07T09:00:02Z"
+        },
+        "sourceProfile": {
+          "namespace": "native-s4-receipt60",
+          "policyVersion": "fixture-v1",
+          "nextAction": "\uc6d0\ubcf8 \ubc94\uc704\uc640 \uc2e4\uc81c \ud6a8\uacfc \ub300\uc870",
+          "nextCheckAt": "2026-10-08T09:00:00Z"
+        },
+        "occurrence": {
+          "kind": "PHYSICAL_RECEIPT",
+          "content": {
+            "rangeRootId": "$RANGE60",
+            "startQuantity": "0",
+            "itemId": "$P",
+            "lotId": "$L",
+            "placeId": "$W",
+            "workId": "$WORK",
+            "quantity": "60",
+            "unit": "BOX",
+            "occurredAt": "2026-10-07T09:00:02Z"
+          },
+          "externalEventId": "receipt60",
+          "quantity": "60",
+          "unit": "BOX",
+          "assertion": "authored synthetic external original"
+        }
+      },
+      "binding": {
+        "organizationId": "$ORG",
+        "workId": "$WORK",
+        "itemId": "$P",
+        "actorId": "$reader",
+        "supervisorId": "$supervisor",
+        "physicalScopeId": "$RANGE60",
+        "subjectId": "$P",
+        "subjectKind": "ITEM",
+        "placeId": "$W"
+      }
+    },
+    {
+      "id": "receipt60-provisional",
+      "type": "command",
+      "capability": "receiveProvisional",
+      "request": {
+        "intentKind": "RECORD",
+        "definitionVersion": "definition-v1",
+        "capabilityId": "receiveProvisional",
+        "expectedRevision": 0,
+        "commandIdempotencyKey": "receipt60-provisional",
+        "slots": {
+          "eventId": "$receipt60.event",
+          "rangeRootId": "$RANGE60",
+          "startQuantity": "0",
+          "quantity": "60",
+          "unit": "BOX",
+          "itemId": "$P",
+          "lotId": "$L",
+          "placeId": "$W",
+          "workId": "$WORK",
+          "ownerId": "$reader",
+          "supervisorId": "$supervisor",
+          "nextAction": "\uc2e4\ubb3c\uacfc \uc6d0\ubcf8 \uc0ac\uac74 \ud655\uc778",
+          "nextCheckAt": "2026-10-08T09:00:00Z",
+          "occurredAt": "2026-10-07T09:00:02Z",
+          "purchaseLineId": "$LINE"
+        },
+        "provenance": {},
+        "subjectRefs": [
+          {
+            "type": "Work",
+            "id": "$WORK"
+          }
+        ]
+      },
+      "outcome": "APPLIED",
+      "bind": {
+        "receipt60.observation": "/effects/receiptId"
+      }
+    },
+    {
+      "id": "provisional-physical0",
+      "type": "observe",
+      "assertions": [
+        {
+          "pointer": "/rawRows/mulino_inventory_quantitysegments",
+          "operator": "size",
+          "expected": 0
+        },
+        {
+          "pointer": "/rawRows/mulino_trade_receipt_observations",
+          "operator": "size",
+          "expected": 2
+        }
+      ]
+    },
+    {
+      "id": "receipt60-match",
+      "type": "command",
+      "capability": "matchSourceIdentity",
+      "request": {
+        "intentKind": "COMMAND",
+        "definitionVersion": "definition-v1",
+        "capabilityId": "matchSourceIdentity",
+        "expectedRevision": 1,
+        "commandIdempotencyKey": "receipt60-match",
+        "slots": {
+          "claimId": "$receipt60.claim",
+          "basisDocumentId": "$receipt60.document",
+          "physicalScopeId": "$RANGE60",
+          "policyVersion": "fixture-v1",
+          "sourceIdentity": "native-s4-receipt60:receipt60:1",
+          "quantity": "60",
+          "unit": "BOX",
+          "effectiveFrom": "2026-10-07T09:00:02Z",
+          "reason": "\uc678\ubd80 ORIGINAL\uacfc \ub3d9\uc77c\ud55c \ubc94\uc704 \ub300\uc870"
+        },
+        "provenance": {},
+        "subjectRefs": [
+          {
+            "type": "TradeItem",
+            "id": "$P"
+          }
+        ]
+      },
+      "outcome": "APPLIED",
+      "bind": {
+        "receipt60.reconciliation": "/id"
+      },
+      "assertions": [
+        {
+          "pointer": "/evidenceStatus",
+          "operator": "equals",
+          "expected": "MATCHED"
+        }
+      ]
+    },
+    {
+      "id": "receipt60-link",
+      "type": "command",
+      "capability": "linkCanonicalOccurrence",
+      "request": {
+        "intentKind": "COMMAND",
+        "definitionVersion": "definition-v1",
+        "capabilityId": "linkCanonicalOccurrence",
+        "expectedRevision": 1,
+        "commandIdempotencyKey": "receipt60-link",
+        "slots": {
+          "reconciliationId": "$receipt60.reconciliation"
+        },
+        "provenance": {},
+        "subjectRefs": [
+          {
+            "type": "TradeItem",
+            "id": "$P"
+          }
+        ]
+      },
+      "outcome": "APPLIED",
+      "bind": {
+        "receipt60.canonical": "/id"
+      },
+      "assertions": [
+        {
+          "pointer": "/evidenceStatus",
+          "operator": "equals",
+          "expected": "VERIFIED_RECORD_ONLY"
+        }
+      ]
+    },
+    {
+      "id": "receipt60-confirm",
+      "type": "lost-response",
+      "capability": "confirmReceipt",
+      "request": {
+        "intentKind": "COMMAND",
+        "definitionVersion": "definition-v1",
+        "capabilityId": "confirmReceipt",
+        "expectedRevision": 0,
+        "commandIdempotencyKey": "receipt60-confirm-stable",
+        "slots": {
+          "receiptId": "$receipt60.observation",
+          "canonicalOccurrenceId": "$receipt60.canonical",
+          "lotId": "$L"
+        },
+        "provenance": {},
+        "subjectRefs": [
+          {
+            "type": "Receipt",
+            "id": "$receipt60.observation"
+          }
+        ]
+      },
+      "outcome": "APPLIED",
+      "bind": {
+        "receipt60.segment": "/effects/segmentId"
+      }
+    },
+    {
+      "id": "after60",
+      "type": "observe",
+      "assertions": [
+        {
+          "pointer": "/rawRows/mulino_inventory_quantitysegments",
+          "operator": "sum",
+          "column": "quantity",
+          "expected": "60",
+          "where": {
+            "retiredat": null
+          }
+        },
+        {
+          "pointer": "/rawRows/mulino_trade_receipt_receipts",
+          "operator": "sum",
+          "column": "contributedquantity",
+          "expected": "60"
+        },
+        {
+          "pointer": "/rawRows/mulino_work_read_obligationreferences",
+          "operator": "sum",
+          "column": "quantity",
+          "expected": "40",
+          "where": {
+            "kind": "RECEIPT_SHORTFALL",
+            "status": "OPEN"
+          }
+        },
+        {
+          "pointer": "/rawRows/mulino_responsibility_receiptresidualroots",
+          "operator": "size",
+          "expected": 1
+        },
+        {
+          "pointer": "/rawRows/mulino_responsibility_receiptresidualroots",
+          "operator": "sum",
+          "column": "initialcontribution",
+          "expected": "60"
+        },
+        {
+          "pointer": "/rawRows/mulino_responsibility_receiptresidualroots",
+          "operator": "sum",
+          "column": "orderedquantity",
+          "expected": "100"
+        }
+      ]
+    },
+    {
+      "id": "retry60",
+      "type": "parallel",
+      "capability": "confirmReceipt",
+      "request": {
+        "intentKind": "COMMAND",
+        "definitionVersion": "definition-v1",
+        "capabilityId": "confirmReceipt",
+        "expectedRevision": 0,
+        "commandIdempotencyKey": "receipt60-confirm-stable",
+        "slots": {
+          "receiptId": "$receipt60.observation",
+          "canonicalOccurrenceId": "$receipt60.canonical",
+          "lotId": "$L"
+        },
+        "provenance": {},
+        "subjectRefs": [
+          {
+            "type": "Receipt",
+            "id": "$receipt60.observation"
+          }
+        ]
+      },
+      "outcome": "APPLIED"
+    },
+    {
+      "id": "concurrent-retry-one-effect",
+      "type": "observe",
+      "assertions": [
+        {
+          "pointer": "/rawRows/mulino_commands_commandrecords",
+          "operator": "matchingRows",
+          "expected": 1,
+          "where": {
+            "commandidempotencykey": "receipt60-confirm-stable",
+            "actorid": "$reader",
+            "state": "COMMITTED"
+          }
+        },
+        {
+          "pointer": "/rawRows/mulino_commands_commandaudits",
+          "operator": "matchingRows",
+          "expected": 1,
+          "where": {
+            "capabilityid": "confirmReceipt",
+            "outcome": "APPLIED"
+          }
+        },
+        {
+          "pointer": "/rawRows/mulino_inventory_quantitymovements",
+          "operator": "matchingRows",
+          "expected": 1,
+          "where": {
+            "kind": "RECEIPT"
+          }
+        },
+        {
+          "pointer": "/rawRows/mulino_trade_receipt_receipts",
+          "operator": "size",
+          "expected": 1
+        }
+      ]
+    },
+    {
+      "id": "sourceB60",
+      "type": "original",
+      "fixture": {
+        "synthetic": true,
+        "clock": {
+          "asOf": "2026-10-07T09:00:02Z",
+          "knownAt": "2026-10-07T09:00:02Z"
+        },
+        "sourceProfile": {
+          "namespace": "native-s4-sourceB60",
+          "policyVersion": "fixture-v1",
+          "nextAction": "\uc6d0\ubcf8 \ubc94\uc704\uc640 \uc2e4\uc81c \ud6a8\uacfc \ub300\uc870",
+          "nextCheckAt": "2026-10-08T09:00:00Z"
+        },
+        "occurrence": {
+          "kind": "PHYSICAL_RECEIPT",
+          "content": {
+            "rangeRootId": "$RANGE60",
+            "startQuantity": "0",
+            "itemId": "$P",
+            "lotId": "$L",
+            "placeId": "$W",
+            "workId": "$WORK",
+            "quantity": "60",
+            "unit": "BOX",
+            "occurredAt": "2026-10-07T09:00:02Z"
+          },
+          "externalEventId": "sourceB60",
+          "quantity": "60",
+          "unit": "BOX",
+          "assertion": "authored synthetic external original"
+        }
+      },
+      "binding": {
+        "organizationId": "$ORG",
+        "workId": "$WORK",
+        "itemId": "$P",
+        "actorId": "$reader",
+        "supervisorId": "$supervisor",
+        "physicalScopeId": "$RANGE60",
+        "subjectId": "$P",
+        "subjectKind": "ITEM",
+        "placeId": "$W"
+      }
+    },
+    {
+      "id": "sourceB60-provisional",
+      "type": "command",
+      "capability": "receiveProvisional",
+      "request": {
+        "intentKind": "RECORD",
+        "definitionVersion": "definition-v1",
+        "capabilityId": "receiveProvisional",
+        "expectedRevision": 0,
+        "commandIdempotencyKey": "sourceB60-provisional",
+        "slots": {
+          "eventId": "$sourceB60.event",
+          "rangeRootId": "$RANGE60",
+          "startQuantity": "0",
+          "quantity": "60",
+          "unit": "BOX",
+          "itemId": "$P",
+          "lotId": "$L",
+          "placeId": "$W",
+          "workId": "$WORK",
+          "ownerId": "$reader",
+          "supervisorId": "$supervisor",
+          "nextAction": "\uc2e4\ubb3c\uacfc \uc6d0\ubcf8 \uc0ac\uac74 \ud655\uc778",
+          "nextCheckAt": "2026-10-08T09:00:00Z",
+          "occurredAt": "2026-10-07T09:00:02Z",
+          "purchaseLineId": "$LINE"
+        },
+        "provenance": {},
+        "subjectRefs": [
+          {
+            "type": "Work",
+            "id": "$WORK"
+          }
+        ]
+      },
+      "outcome": "APPLIED",
+      "bind": {
+        "sourceB60.observation": "/effects/receiptId"
+      }
+    },
+    {
+      "id": "sourceB60-match",
+      "type": "command",
+      "capability": "matchSourceIdentity",
+      "request": {
+        "intentKind": "COMMAND",
+        "definitionVersion": "definition-v1",
+        "capabilityId": "matchSourceIdentity",
+        "expectedRevision": 1,
+        "commandIdempotencyKey": "sourceB60-match",
+        "slots": {
+          "claimId": "$sourceB60.claim",
+          "basisDocumentId": "$sourceB60.document",
+          "physicalScopeId": "$RANGE60",
+          "policyVersion": "fixture-v1",
+          "sourceIdentity": "native-s4-sourceB60:sourceB60:1",
+          "quantity": "60",
+          "unit": "BOX",
+          "effectiveFrom": "2026-10-07T09:00:02Z",
+          "reason": "\uc678\ubd80 ORIGINAL\uacfc \ub3d9\uc77c\ud55c \ubc94\uc704 \ub300\uc870",
+          "existingCanonicalId": "$receipt60.canonical"
+        },
+        "provenance": {},
+        "subjectRefs": [
+          {
+            "type": "TradeItem",
+            "id": "$P"
+          }
+        ]
+      },
+      "outcome": "APPLIED",
+      "bind": {
+        "sourceB60.reconciliation": "/id"
+      },
+      "assertions": [
+        {
+          "pointer": "/evidenceStatus",
+          "operator": "equals",
+          "expected": "MATCHED"
+        }
+      ]
+    },
+    {
+      "id": "sourceB60-link",
+      "type": "command",
+      "capability": "linkCanonicalOccurrence",
+      "request": {
+        "intentKind": "COMMAND",
+        "definitionVersion": "definition-v1",
+        "capabilityId": "linkCanonicalOccurrence",
+        "expectedRevision": 1,
+        "commandIdempotencyKey": "sourceB60-link",
+        "slots": {
+          "reconciliationId": "$sourceB60.reconciliation"
+        },
+        "provenance": {},
+        "subjectRefs": [
+          {
+            "type": "TradeItem",
+            "id": "$P"
+          }
+        ]
+      },
+      "outcome": "APPLIED",
+      "bind": {
+        "sourceB60.canonical": "/id"
+      },
+      "assertions": [
+        {
+          "pointer": "/evidenceStatus",
+          "operator": "equals",
+          "expected": "VERIFIED_RECORD_ONLY"
+        }
+      ]
+    },
+    {
+      "id": "sourceB60-confirm",
+      "type": "command",
+      "capability": "confirmReceipt",
+      "request": {
+        "intentKind": "COMMAND",
+        "definitionVersion": "definition-v1",
+        "capabilityId": "confirmReceipt",
+        "expectedRevision": 0,
+        "commandIdempotencyKey": "sourceB60-confirm-stable",
+        "slots": {
+          "receiptId": "$sourceB60.observation",
+          "canonicalOccurrenceId": "$sourceB60.canonical",
+          "lotId": "$L"
+        },
+        "provenance": {},
+        "subjectRefs": [
+          {
+            "type": "Receipt",
+            "id": "$sourceB60.observation"
+          }
+        ]
+      },
+      "outcome": "APPLIED",
+      "bind": {
+        "sourceB60.segment": "/effects/segmentId"
+      }
+    },
+    {
+      "id": "duplicate60",
+      "type": "observe",
+      "assertions": [
+        {
+          "pointer": "/rawRows/mulino_evidence_canonicaloccurrences",
+          "operator": "matchingRows",
+          "expected": 1,
+          "where": {
+            "kind": "PHYSICAL_RECEIPT"
+          }
+        },
+        {
+          "pointer": "/rawRows/mulino_inventory_quantitymovements",
+          "operator": "matchingRows",
+          "expected": 1,
+          "where": {
+            "kind": "RECEIPT"
+          }
+        },
+        {
+          "pointer": "/rawRows/mulino_inventory_quantitysegments",
+          "operator": "sum",
+          "column": "quantity",
+          "expected": "60",
+          "where": {
+            "retiredat": null
+          }
+        },
+        {
+          "pointer": "/rawRows/mulino_trade_receipt_receipts",
+          "operator": "sum",
+          "column": "contributedquantity",
+          "expected": "60"
+        }
+      ]
+    },
+    {
+      "id": "other-actor-no-replay",
+      "type": "command",
+      "capability": "confirmReceipt",
+      "request": {
+        "intentKind": "COMMAND",
+        "definitionVersion": "definition-v1",
+        "capabilityId": "confirmReceipt",
+        "expectedRevision": 0,
+        "commandIdempotencyKey": "receipt60-confirm-stable",
+        "slots": {
+          "receiptId": "$receipt60.observation",
+          "canonicalOccurrenceId": "$receipt60.canonical",
+          "lotId": "$L"
+        },
+        "provenance": {},
+        "subjectRefs": [
+          {
+            "type": "Receipt",
+            "id": "$receipt60.observation"
+          }
+        ]
+      },
+      "outcome": "REJECTED",
+      "assertions": [
+        {
+          "pointer": "/effects",
+          "operator": "equals",
+          "expected": {}
+        },
+        {
+          "pointer": "/error/code",
+          "operator": "equals",
+          "expected": "FORBIDDEN"
+        }
+      ],
+      "actor": "outsider"
+    },
+    {
+      "id": "receipt40",
+      "type": "original",
+      "fixture": {
+        "synthetic": true,
+        "clock": {
+          "asOf": "2026-10-07T09:00:02Z",
+          "knownAt": "2026-10-07T09:00:02Z"
+        },
+        "sourceProfile": {
+          "namespace": "native-s4-receipt40",
+          "policyVersion": "fixture-v1",
+          "nextAction": "\uc6d0\ubcf8 \ubc94\uc704\uc640 \uc2e4\uc81c \ud6a8\uacfc \ub300\uc870",
+          "nextCheckAt": "2026-10-08T09:00:00Z"
+        },
+        "occurrence": {
+          "kind": "PHYSICAL_RECEIPT",
+          "content": {
+            "rangeRootId": "$RANGE40",
+            "startQuantity": "0",
+            "itemId": "$P",
+            "lotId": "$L",
+            "placeId": "$W",
+            "workId": "$WORK",
+            "quantity": "40",
+            "unit": "BOX",
+            "occurredAt": "2026-10-07T09:00:02Z"
+          },
+          "externalEventId": "receipt40",
+          "quantity": "40",
+          "unit": "BOX",
+          "assertion": "authored synthetic external original"
+        }
+      },
+      "binding": {
+        "organizationId": "$ORG",
+        "workId": "$WORK",
+        "itemId": "$P",
+        "actorId": "$reader",
+        "supervisorId": "$supervisor",
+        "physicalScopeId": "$RANGE40",
+        "subjectId": "$P",
+        "subjectKind": "ITEM",
+        "placeId": "$W"
+      }
+    },
+    {
+      "id": "receipt40-provisional",
+      "type": "command",
+      "capability": "receiveProvisional",
+      "request": {
+        "intentKind": "RECORD",
+        "definitionVersion": "definition-v1",
+        "capabilityId": "receiveProvisional",
+        "expectedRevision": 0,
+        "commandIdempotencyKey": "receipt40-provisional",
+        "slots": {
+          "eventId": "$receipt40.event",
+          "rangeRootId": "$RANGE40",
+          "startQuantity": "0",
+          "quantity": "40",
+          "unit": "BOX",
+          "itemId": "$P",
+          "lotId": "$L",
+          "placeId": "$W",
+          "workId": "$WORK",
+          "ownerId": "$reader",
+          "supervisorId": "$supervisor",
+          "nextAction": "\uc2e4\ubb3c\uacfc \uc6d0\ubcf8 \uc0ac\uac74 \ud655\uc778",
+          "nextCheckAt": "2026-10-08T09:00:00Z",
+          "occurredAt": "2026-10-07T09:00:02Z",
+          "purchaseLineId": "$LINE"
+        },
+        "provenance": {},
+        "subjectRefs": [
+          {
+            "type": "Work",
+            "id": "$WORK"
+          }
+        ]
+      },
+      "outcome": "APPLIED",
+      "bind": {
+        "receipt40.observation": "/effects/receiptId"
+      }
+    },
+    {
+      "id": "receipt40-match",
+      "type": "command",
+      "capability": "matchSourceIdentity",
+      "request": {
+        "intentKind": "COMMAND",
+        "definitionVersion": "definition-v1",
+        "capabilityId": "matchSourceIdentity",
+        "expectedRevision": 1,
+        "commandIdempotencyKey": "receipt40-match",
+        "slots": {
+          "claimId": "$receipt40.claim",
+          "basisDocumentId": "$receipt40.document",
+          "physicalScopeId": "$RANGE40",
+          "policyVersion": "fixture-v1",
+          "sourceIdentity": "native-s4-receipt40:receipt40:1",
+          "quantity": "40",
+          "unit": "BOX",
+          "effectiveFrom": "2026-10-07T09:00:02Z",
+          "reason": "\uc678\ubd80 ORIGINAL\uacfc \ub3d9\uc77c\ud55c \ubc94\uc704 \ub300\uc870"
+        },
+        "provenance": {},
+        "subjectRefs": [
+          {
+            "type": "TradeItem",
+            "id": "$P"
+          }
+        ]
+      },
+      "outcome": "APPLIED",
+      "bind": {
+        "receipt40.reconciliation": "/id"
+      },
+      "assertions": [
+        {
+          "pointer": "/evidenceStatus",
+          "operator": "equals",
+          "expected": "MATCHED"
+        }
+      ]
+    },
+    {
+      "id": "receipt40-link",
+      "type": "command",
+      "capability": "linkCanonicalOccurrence",
+      "request": {
+        "intentKind": "COMMAND",
+        "definitionVersion": "definition-v1",
+        "capabilityId": "linkCanonicalOccurrence",
+        "expectedRevision": 1,
+        "commandIdempotencyKey": "receipt40-link",
+        "slots": {
+          "reconciliationId": "$receipt40.reconciliation"
+        },
+        "provenance": {},
+        "subjectRefs": [
+          {
+            "type": "TradeItem",
+            "id": "$P"
+          }
+        ]
+      },
+      "outcome": "APPLIED",
+      "bind": {
+        "receipt40.canonical": "/id"
+      },
+      "assertions": [
+        {
+          "pointer": "/evidenceStatus",
+          "operator": "equals",
+          "expected": "VERIFIED_RECORD_ONLY"
+        }
+      ]
+    },
+    {
+      "id": "receipt40-confirm",
+      "type": "command",
+      "capability": "confirmReceipt",
+      "request": {
+        "intentKind": "COMMAND",
+        "definitionVersion": "definition-v1",
+        "capabilityId": "confirmReceipt",
+        "expectedRevision": 0,
+        "commandIdempotencyKey": "receipt40-confirm-stable",
+        "slots": {
+          "receiptId": "$receipt40.observation",
+          "canonicalOccurrenceId": "$receipt40.canonical",
+          "lotId": "$L"
+        },
+        "provenance": {},
+        "subjectRefs": [
+          {
+            "type": "Receipt",
+            "id": "$receipt40.observation"
+          }
+        ]
+      },
+      "outcome": "APPLIED",
+      "bind": {
+        "receipt40.segment": "/effects/segmentId"
+      }
+    },
+    {
+      "id": "after100",
+      "type": "observe",
+      "assertions": [
+        {
+          "pointer": "/rawRows/mulino_inventory_quantitysegments",
+          "operator": "sum",
+          "column": "quantity",
+          "expected": "100",
+          "where": {
+            "retiredat": null
+          }
+        },
+        {
+          "pointer": "/rawRows/mulino_trade_receipt_receipts",
+          "operator": "sum",
+          "column": "contributedquantity",
+          "expected": "100"
+        },
+        {
+          "pointer": "/rawRows/mulino_work_read_obligationreferences",
+          "operator": "matchingRows",
+          "expected": 0,
+          "where": {
+            "kind": "RECEIPT_SHORTFALL",
+            "status": "OPEN"
+          }
+        },
+        {
+          "pointer": "/rawRows/mulino_responsibility_receiptresidualcredits",
+          "operator": "sum",
+          "column": "quantity",
+          "expected": "40"
+        },
+        {
+          "pointer": "/rawRows/mulino_work_read_obligationreferences",
+          "operator": "sum",
+          "column": "quantity",
+          "expected": "40",
+          "where": {
+            "kind": "RECEIPT_SHORTFALL",
+            "status": "RESOLVED"
+          }
+        }
+      ]
+    },
+    {
+      "id": "before-assessment100",
+      "type": "observe",
+      "assertions": [
+        {
+          "pointer": "/rawRows/mulino_trade_receipt_receipts",
+          "operator": "sum",
+          "column": "contributedquantity",
+          "expected": "100"
+        }
+      ],
+      "bind": {
+        "WORK_REV": "/rawRows/mulino_work_read_works/0/revision"
+      }
+    },
+    {
+      "id": "assess-arrival",
+      "type": "command",
+      "capability": "assessGoal",
+      "request": {
+        "intentKind": "COMMAND",
+        "definitionVersion": "definition-v1",
+        "capabilityId": "assessGoal",
+        "expectedRevision": "$WORK_REV",
+        "commandIdempotencyKey": "assess-arrival",
+        "slots": {
+          "workId": "$WORK"
+        },
+        "provenance": {},
+        "subjectRefs": [
+          {
+            "type": "Work",
+            "id": "$WORK"
+          }
+        ]
+      },
+      "outcome": "APPLIED",
+      "assertions": [
+        {
+          "pointer": "/assessment/outcome",
+          "operator": "equals",
+          "expected": "SATISFIED"
+        }
+      ]
+    },
+    {
+      "id": "reg-draft",
+      "type": "original",
+      "fixture": {
+        "synthetic": true,
+        "clock": {
+          "asOf": "2026-10-07T09:00:02Z",
+          "knownAt": "2026-10-07T09:00:02Z"
+        },
+        "sourceProfile": {
+          "namespace": "native-s4-regulator",
+          "policyVersion": "fixture-v1",
+          "nextAction": "\uc6d0\ubcf8 \ubc94\uc704\uc640 \uc2e4\uc81c \ud6a8\uacfc \ub300\uc870",
+          "nextCheckAt": "2026-10-08T09:00:00Z"
+        },
+        "occurrence": {
+          "kind": "REGULATORY_DRAFT",
+          "content": {
+            "draft": "fictional dossier",
+            "itemId": "$P"
+          },
+          "externalEventId": "reg-draft",
+          "quantity": "60",
+          "unit": "BOX",
+          "assertion": "authored synthetic external original"
+        }
+      },
+      "binding": {
+        "organizationId": "$ORG",
+        "workId": "$WORK",
+        "itemId": "$P",
+        "actorId": "$reader",
+        "supervisorId": "$supervisor",
+        "physicalScopeId": "$receipt60.segment",
+        "subjectId": "$receipt60.segment",
+        "subjectKind": "SEGMENT",
+        "placeId": "$W"
+      }
+    },
+    {
+      "id": "reg-prepare",
+      "type": "command",
+      "capability": "prepareRegulatoryProcedure",
+      "request": {
+        "intentKind": "COMMAND",
+        "definitionVersion": "definition-v1",
+        "capabilityId": "prepareRegulatoryProcedure",
+        "expectedRevision": 0,
+        "commandIdempotencyKey": "reg-prepare",
+        "slots": {
+          "itemId": "$P",
+          "lotId": "$L",
+          "physicalScopeId": "$receipt60.segment",
+          "workId": "$WORK",
+          "policyId": "$REGPOL",
+          "documentVersionId": "$reg-draft.document"
+        },
+        "provenance": {},
+        "subjectRefs": [
+          {
+            "type": "QuantitySegment",
+            "id": "$receipt60.segment"
+          }
+        ]
+      },
+      "outcome": "APPLIED",
+      "bind": {
+        "PROC": "/effects/procedureId",
+        "PROC_VERSION": "/effects/procedureVersionId",
+        "PROC_REV": "/revision"
+      },
+      "assertions": [
+        {
+          "pointer": "/status",
+          "operator": "equals",
+          "expected": "PREPARED"
+        }
+      ]
+    },
+    {
+      "id": "draft-not-submitted",
+      "type": "observe",
+      "assertions": [
+        {
+          "pointer": "/rawRows/mulino_trade_regulatory_procedureversions",
+          "operator": "matchingRows",
+          "expected": 1,
+          "where": {
+            "status": "PREPARED"
+          }
+        },
+        {
+          "pointer": "/rawRows/mulino_trade_regulatory_decisionversions",
+          "operator": "size",
+          "expected": 0
+        }
+      ]
+    },
+    {
+      "id": "reg-submitted",
+      "type": "original",
+      "fixture": {
+        "synthetic": true,
+        "clock": {
+          "asOf": "2026-10-07T09:00:02Z",
+          "knownAt": "2026-10-07T09:00:02Z"
+        },
+        "sourceProfile": {
+          "namespace": "native-s4-regulator",
+          "policyVersion": "fixture-v1",
+          "nextAction": "\uc6d0\ubcf8 \ubc94\uc704\uc640 \uc2e4\uc81c \ud6a8\uacfc \ub300\uc870",
+          "nextCheckAt": "2026-10-08T09:00:00Z"
+        },
+        "occurrence": {
+          "kind": "REGULATORY_SUBMISSION",
+          "content": {
+            "regulatoryEventId": "4da37d87-2728-51c0-9a66-b306abd83631",
+            "procedureId": "$PROC",
+            "procedureVersionId": "$PROC_VERSION",
+            "itemId": "$P",
+            "lotId": "$L",
+            "physicalScopeId": "$receipt60.segment",
+            "authority": "FICTIONAL-AUTHORITY",
+            "policyVersion": "fixture-v1",
+            "occurredAt": "2026-10-07T09:00:02Z"
+          },
+          "externalEventId": "reg-submitted",
+          "quantity": null,
+          "unit": null,
+          "assertion": "authored synthetic external original"
+        }
+      },
+      "binding": {
+        "organizationId": "$ORG",
+        "workId": "$WORK",
+        "itemId": "$P",
+        "actorId": "$reader",
+        "supervisorId": "$supervisor",
+        "physicalScopeId": "$receipt60.segment",
+        "subjectId": "$receipt60.segment",
+        "subjectKind": "SEGMENT",
+        "placeId": "$W"
+      }
+    },
+    {
+      "id": "reg-submitted-match",
+      "type": "command",
+      "capability": "matchSourceIdentity",
+      "request": {
+        "intentKind": "COMMAND",
+        "definitionVersion": "definition-v1",
+        "capabilityId": "matchSourceIdentity",
+        "expectedRevision": 1,
+        "commandIdempotencyKey": "reg-submitted-match",
+        "slots": {
+          "claimId": "$reg-submitted.claim",
+          "basisDocumentId": "$reg-submitted.document",
+          "physicalScopeId": "$receipt60.segment",
+          "policyVersion": "fixture-v1",
+          "sourceIdentity": "native-s4-regulator:reg-submitted:1",
+          "effectiveFrom": "2026-10-07T09:00:02Z",
+          "reason": "\uc678\ubd80 ORIGINAL\uacfc \ub3d9\uc77c\ud55c \ubc94\uc704 \ub300\uc870"
+        },
+        "provenance": {},
+        "subjectRefs": [
+          {
+            "type": "QuantitySegment",
+            "id": "$receipt60.segment"
+          }
+        ]
+      },
+      "outcome": "APPLIED",
+      "bind": {
+        "reg-submitted.reconciliation": "/id"
+      },
+      "assertions": [
+        {
+          "pointer": "/evidenceStatus",
+          "operator": "equals",
+          "expected": "MATCHED"
+        }
+      ]
+    },
+    {
+      "id": "reg-submitted-link",
+      "type": "command",
+      "capability": "linkCanonicalOccurrence",
+      "request": {
+        "intentKind": "COMMAND",
+        "definitionVersion": "definition-v1",
+        "capabilityId": "linkCanonicalOccurrence",
+        "expectedRevision": 1,
+        "commandIdempotencyKey": "reg-submitted-link",
+        "slots": {
+          "reconciliationId": "$reg-submitted.reconciliation"
+        },
+        "provenance": {},
+        "subjectRefs": [
+          {
+            "type": "QuantitySegment",
+            "id": "$receipt60.segment"
+          }
+        ]
+      },
+      "outcome": "APPLIED",
+      "bind": {
+        "reg-submitted.canonical": "/id"
+      },
+      "assertions": [
+        {
+          "pointer": "/evidenceStatus",
+          "operator": "equals",
+          "expected": "VERIFIED_RECORD_ONLY"
+        }
+      ]
+    },
+    {
+      "id": "submit-reg",
+      "type": "command",
+      "capability": "recordSubmission",
+      "request": {
+        "intentKind": "RECORD",
+        "definitionVersion": "definition-v1",
+        "capabilityId": "recordSubmission",
+        "expectedRevision": "$PROC_REV",
+        "commandIdempotencyKey": "submit-reg",
+        "slots": {
+          "procedureId": "$PROC",
+          "occurredAt": "2026-10-07T09:00:02Z",
+          "occurrenceId": "$reg-submitted.canonical"
+        },
+        "provenance": {},
+        "subjectRefs": [
+          {
+            "type": "QuantitySegment",
+            "id": "$receipt60.segment"
+          }
+        ]
+      },
+      "outcome": "APPLIED",
+      "bind": {
+        "PROC_VERSION": "/effects/procedureVersionId",
+        "PROC_REV": "/revision"
+      },
+      "assertions": [
+        {
+          "pointer": "/status",
+          "operator": "equals",
+          "expected": "SUBMITTED"
+        }
+      ]
+    },
+    {
+      "id": "reg-allow30",
+      "type": "original",
+      "fixture": {
+        "synthetic": true,
+        "clock": {
+          "asOf": "2026-10-07T09:00:02Z",
+          "knownAt": "2026-10-07T09:00:02Z"
+        },
+        "sourceProfile": {
+          "namespace": "native-s4-regulator",
+          "policyVersion": "fixture-v1",
+          "nextAction": "\uc6d0\ubcf8 \ubc94\uc704\uc640 \uc2e4\uc81c \ud6a8\uacfc \ub300\uc870",
+          "nextCheckAt": "2026-10-08T09:00:00Z"
+        },
+        "occurrence": {
+          "kind": "REGULATORY_DECISION",
+          "content": {
+            "regulatoryEventId": "ecd3c875-d58c-52f5-91a4-affeb91d6029",
+            "procedureId": "$PROC",
+            "procedureVersionId": "$PROC_VERSION",
+            "itemId": "$P",
+            "lotId": "$L",
+            "physicalScopeId": "$receipt60.segment",
+            "authority": "FICTIONAL-AUTHORITY",
+            "policyVersion": "fixture-v1",
+            "decision": "ALLOWED",
+            "action": "SELL",
+            "startQuantity": "0",
+            "quantity": "30",
+            "unit": "BOX",
+            "validFrom": "2026-10-07T09:00:02Z",
+            "validUntil": "2026-10-31T00:00:00Z"
+          },
+          "externalEventId": "reg-allow30",
+          "quantity": "30",
+          "unit": "BOX",
+          "assertion": "authored synthetic external original"
+        }
+      },
+      "binding": {
+        "organizationId": "$ORG",
+        "workId": "$WORK",
+        "itemId": "$P",
+        "actorId": "$reader",
+        "supervisorId": "$supervisor",
+        "physicalScopeId": "$receipt60.segment",
+        "subjectId": "$receipt60.segment",
+        "subjectKind": "SEGMENT",
+        "placeId": "$W"
+      }
+    },
+    {
+      "id": "reg-allow30-match",
+      "type": "command",
+      "capability": "matchSourceIdentity",
+      "request": {
+        "intentKind": "COMMAND",
+        "definitionVersion": "definition-v1",
+        "capabilityId": "matchSourceIdentity",
+        "expectedRevision": 1,
+        "commandIdempotencyKey": "reg-allow30-match",
+        "slots": {
+          "claimId": "$reg-allow30.claim",
+          "basisDocumentId": "$reg-allow30.document",
+          "physicalScopeId": "$receipt60.segment",
+          "policyVersion": "fixture-v1",
+          "sourceIdentity": "native-s4-regulator:reg-allow30:1",
+          "quantity": "30",
+          "unit": "BOX",
+          "effectiveFrom": "2026-10-07T09:00:02Z",
+          "reason": "\uc678\ubd80 ORIGINAL\uacfc \ub3d9\uc77c\ud55c \ubc94\uc704 \ub300\uc870"
+        },
+        "provenance": {},
+        "subjectRefs": [
+          {
+            "type": "QuantitySegment",
+            "id": "$receipt60.segment"
+          }
+        ]
+      },
+      "outcome": "APPLIED",
+      "bind": {
+        "reg-allow30.reconciliation": "/id"
+      },
+      "assertions": [
+        {
+          "pointer": "/evidenceStatus",
+          "operator": "equals",
+          "expected": "MATCHED"
+        }
+      ]
+    },
+    {
+      "id": "reg-allow30-link",
+      "type": "command",
+      "capability": "linkCanonicalOccurrence",
+      "request": {
+        "intentKind": "COMMAND",
+        "definitionVersion": "definition-v1",
+        "capabilityId": "linkCanonicalOccurrence",
+        "expectedRevision": 1,
+        "commandIdempotencyKey": "reg-allow30-link",
+        "slots": {
+          "reconciliationId": "$reg-allow30.reconciliation"
+        },
+        "provenance": {},
+        "subjectRefs": [
+          {
+            "type": "QuantitySegment",
+            "id": "$receipt60.segment"
+          }
+        ]
+      },
+      "outcome": "APPLIED",
+      "bind": {
+        "reg-allow30.canonical": "/id"
+      },
+      "assertions": [
+        {
+          "pointer": "/evidenceStatus",
+          "operator": "equals",
+          "expected": "VERIFIED_RECORD_ONLY"
+        }
+      ]
+    },
+    {
+      "id": "allow30",
+      "type": "command",
+      "capability": "recordRegulatoryDecision",
+      "request": {
+        "intentKind": "RECORD",
+        "definitionVersion": "definition-v1",
+        "capabilityId": "recordRegulatoryDecision",
+        "expectedRevision": "$PROC_REV",
+        "commandIdempotencyKey": "allow30",
+        "slots": {
+          "procedureId": "$PROC",
+          "occurrenceId": "$reg-allow30.canonical",
+          "decision": "ALLOWED",
+          "action": "SELL",
+          "startQuantity": "0",
+          "quantity": "30",
+          "unit": "BOX",
+          "validFrom": "2026-10-07T09:00:02Z",
+          "validUntil": "2026-10-31T00:00:00Z"
+        },
+        "provenance": {},
+        "subjectRefs": [
+          {
+            "type": "QuantitySegment",
+            "id": "$receipt60.segment"
+          }
+        ]
+      },
+      "outcome": "APPLIED",
+      "bind": {
+        "PROC_REV": "/revision"
+      }
+    },
+    {
+      "id": "reg-label",
+      "type": "original",
+      "fixture": {
+        "synthetic": true,
+        "clock": {
+          "asOf": "2026-10-07T09:00:02Z",
+          "knownAt": "2026-10-07T09:00:02Z"
+        },
+        "sourceProfile": {
+          "namespace": "native-s4-regulator",
+          "policyVersion": "fixture-v1",
+          "nextAction": "\uc6d0\ubcf8 \ubc94\uc704\uc640 \uc2e4\uc81c \ud6a8\uacfc \ub300\uc870",
+          "nextCheckAt": "2026-10-08T09:00:00Z"
+        },
+        "occurrence": {
+          "kind": "LABEL_VERIFICATION",
+          "content": {
+            "regulatoryEventId": "22259fec-9003-5e5d-b66e-c7f5a677e545",
+            "procedureId": "$PROC",
+            "procedureVersionId": "$PROC_VERSION",
+            "itemId": "$P",
+            "lotId": "$L",
+            "physicalScopeId": "$receipt60.segment",
+            "authority": "FICTIONAL-AUTHORITY",
+            "policyVersion": "fixture-v1",
+            "decision": "VERIFIED",
+            "packagingVersionId": "$PACK",
+            "specificationVersionId": "$SPEC",
+            "validFrom": "2026-10-07T09:00:02Z",
+            "validUntil": "2026-10-31T00:00:00Z"
+          },
+          "externalEventId": "reg-label",
+          "quantity": null,
+          "unit": null,
+          "assertion": "authored synthetic external original"
+        }
+      },
+      "binding": {
+        "organizationId": "$ORG",
+        "workId": "$WORK",
+        "itemId": "$P",
+        "actorId": "$reader",
+        "supervisorId": "$supervisor",
+        "physicalScopeId": "$receipt60.segment",
+        "subjectId": "$receipt60.segment",
+        "subjectKind": "SEGMENT",
+        "placeId": "$W"
+      }
+    },
+    {
+      "id": "reg-label-match",
+      "type": "command",
+      "capability": "matchSourceIdentity",
+      "request": {
+        "intentKind": "COMMAND",
+        "definitionVersion": "definition-v1",
+        "capabilityId": "matchSourceIdentity",
+        "expectedRevision": 1,
+        "commandIdempotencyKey": "reg-label-match",
+        "slots": {
+          "claimId": "$reg-label.claim",
+          "basisDocumentId": "$reg-label.document",
+          "physicalScopeId": "$receipt60.segment",
+          "policyVersion": "fixture-v1",
+          "sourceIdentity": "native-s4-regulator:reg-label:1",
+          "effectiveFrom": "2026-10-07T09:00:02Z",
+          "reason": "\uc678\ubd80 ORIGINAL\uacfc \ub3d9\uc77c\ud55c \ubc94\uc704 \ub300\uc870"
+        },
+        "provenance": {},
+        "subjectRefs": [
+          {
+            "type": "QuantitySegment",
+            "id": "$receipt60.segment"
+          }
+        ]
+      },
+      "outcome": "APPLIED",
+      "bind": {
+        "reg-label.reconciliation": "/id"
+      },
+      "assertions": [
+        {
+          "pointer": "/evidenceStatus",
+          "operator": "equals",
+          "expected": "MATCHED"
+        }
+      ]
+    },
+    {
+      "id": "reg-label-link",
+      "type": "command",
+      "capability": "linkCanonicalOccurrence",
+      "request": {
+        "intentKind": "COMMAND",
+        "definitionVersion": "definition-v1",
+        "capabilityId": "linkCanonicalOccurrence",
+        "expectedRevision": 1,
+        "commandIdempotencyKey": "reg-label-link",
+        "slots": {
+          "reconciliationId": "$reg-label.reconciliation"
+        },
+        "provenance": {},
+        "subjectRefs": [
+          {
+            "type": "QuantitySegment",
+            "id": "$receipt60.segment"
+          }
+        ]
+      },
+      "outcome": "APPLIED",
+      "bind": {
+        "reg-label.canonical": "/id"
+      },
+      "assertions": [
+        {
+          "pointer": "/evidenceStatus",
+          "operator": "equals",
+          "expected": "VERIFIED_RECORD_ONLY"
+        }
+      ]
+    },
+    {
+      "id": "label-verified",
+      "type": "command",
+      "capability": "verifyLabel",
+      "request": {
+        "intentKind": "RECORD",
+        "definitionVersion": "definition-v1",
+        "capabilityId": "verifyLabel",
+        "expectedRevision": "$PROC_REV",
+        "commandIdempotencyKey": "label-verified",
+        "slots": {
+          "procedureId": "$PROC",
+          "occurrenceId": "$reg-label.canonical",
+          "decision": "VERIFIED",
+          "packagingVersionId": "$PACK",
+          "specificationVersionId": "$SPEC",
+          "validFrom": "2026-10-07T09:00:02Z",
+          "validUntil": "2026-10-31T00:00:00Z"
+        },
+        "provenance": {},
+        "subjectRefs": [
+          {
+            "type": "QuantitySegment",
+            "id": "$receipt60.segment"
+          }
+        ]
+      },
+      "outcome": "APPLIED"
+    },
+    {
+      "id": "s60-QC",
+      "type": "original",
+      "fixture": {
+        "synthetic": true,
+        "clock": {
+          "asOf": "2026-10-07T09:00:02Z",
+          "knownAt": "2026-10-07T09:00:02Z"
+        },
+        "sourceProfile": {
+          "namespace": "native-s4-s60-QC",
+          "policyVersion": "fixture-v1",
+          "nextAction": "\uc6d0\ubcf8 \ubc94\uc704\uc640 \uc2e4\uc81c \ud6a8\uacfc \ub300\uc870",
+          "nextCheckAt": "2026-10-08T09:00:00Z"
+        },
+        "occurrence": {
+          "kind": "QUALITY_DECISION_recordDispositionBasis_QC",
+          "content": {
+            "segmentId": "$receipt60.segment",
+            "operation": "recordDispositionBasis",
+            "action": "SELL",
+            "category": "QC",
+            "startQuantity": "0",
+            "quantity": "60",
+            "unit": "BOX",
+            "validFrom": "2026-10-07T09:00:02Z",
+            "validUntil": "2026-10-31T00:00:00Z",
+            "workId": "$WORK",
+            "sourceDecisionId": "c202fefe-1407-53ce-98b4-7dcd1a61c76c",
+            "sourceVersion": "1"
+          },
+          "externalEventId": "c202fefe-1407-53ce-98b4-7dcd1a61c76c",
+          "quantity": "60",
+          "unit": "BOX",
+          "assertion": "authored synthetic external original"
+        }
+      },
+      "binding": {
+        "organizationId": "$ORG",
+        "workId": "$WORK",
+        "itemId": "$P",
+        "actorId": "$reader",
+        "supervisorId": "$supervisor",
+        "physicalScopeId": "$receipt60.segment",
+        "subjectId": "$receipt60.segment",
+        "subjectKind": "SEGMENT",
+        "placeId": "$W"
+      }
+    },
+    {
+      "id": "s60-QC-match",
+      "type": "command",
+      "capability": "matchSourceIdentity",
+      "request": {
+        "intentKind": "COMMAND",
+        "definitionVersion": "definition-v1",
+        "capabilityId": "matchSourceIdentity",
+        "expectedRevision": 1,
+        "commandIdempotencyKey": "s60-QC-match",
+        "slots": {
+          "claimId": "$s60-QC.claim",
+          "basisDocumentId": "$s60-QC.document",
+          "physicalScopeId": "$receipt60.segment",
+          "policyVersion": "fixture-v1",
+          "sourceIdentity": "native-s4-s60-QC:c202fefe-1407-53ce-98b4-7dcd1a61c76c:1",
+          "quantity": "60",
+          "unit": "BOX",
+          "effectiveFrom": "2026-10-07T09:00:02Z",
+          "reason": "\uc678\ubd80 ORIGINAL\uacfc \ub3d9\uc77c\ud55c \ubc94\uc704 \ub300\uc870"
+        },
+        "provenance": {},
+        "subjectRefs": [
+          {
+            "type": "QuantitySegment",
+            "id": "$receipt60.segment"
+          }
+        ]
+      },
+      "outcome": "APPLIED",
+      "bind": {
+        "s60-QC.reconciliation": "/id"
+      },
+      "assertions": [
+        {
+          "pointer": "/evidenceStatus",
+          "operator": "equals",
+          "expected": "MATCHED"
+        }
+      ]
+    },
+    {
+      "id": "s60-QC-link",
+      "type": "command",
+      "capability": "linkCanonicalOccurrence",
+      "request": {
+        "intentKind": "COMMAND",
+        "definitionVersion": "definition-v1",
+        "capabilityId": "linkCanonicalOccurrence",
+        "expectedRevision": 1,
+        "commandIdempotencyKey": "s60-QC-link",
+        "slots": {
+          "reconciliationId": "$s60-QC.reconciliation"
+        },
+        "provenance": {},
+        "subjectRefs": [
+          {
+            "type": "QuantitySegment",
+            "id": "$receipt60.segment"
+          }
+        ]
+      },
+      "outcome": "APPLIED",
+      "bind": {
+        "s60-QC.canonical": "/id"
+      },
+      "assertions": [
+        {
+          "pointer": "/evidenceStatus",
+          "operator": "equals",
+          "expected": "VERIFIED_RECORD_ONLY"
+        }
+      ]
+    },
+    {
+      "id": "s60-QC-decision",
+      "type": "command",
+      "capability": "recordDispositionBasis",
+      "request": {
+        "intentKind": "RECORD",
+        "definitionVersion": "definition-v1",
+        "capabilityId": "recordDispositionBasis",
+        "expectedRevision": 0,
+        "commandIdempotencyKey": "s60-QC-decision",
+        "slots": {
+          "segmentId": "$receipt60.segment",
+          "action": "SELL",
+          "category": "QC",
+          "startQuantity": "0",
+          "quantity": "60",
+          "unit": "BOX",
+          "validFrom": "2026-10-07T09:00:02Z",
+          "validUntil": "2026-10-31T00:00:00Z",
+          "workId": "$WORK",
+          "evidenceId": "$s60-QC.document",
+          "reason": "\uc6d0\ubcf8\uc758 \uc815\ud655\ud55c \ud589\ub3d9 \ubc94\uc704\ub97c \ud310\uc815",
+          "nextCheckAt": "2026-10-08T09:00:00Z"
+        },
+        "provenance": {},
+        "subjectRefs": [
+          {
+            "type": "QuantitySegment",
+            "id": "$receipt60.segment"
+          }
+        ]
+      },
+      "outcome": "APPLIED"
+    },
+    {
+      "id": "s60-CUSTOMER",
+      "type": "original",
+      "fixture": {
+        "synthetic": true,
+        "clock": {
+          "asOf": "2026-10-07T09:00:02Z",
+          "knownAt": "2026-10-07T09:00:02Z"
+        },
+        "sourceProfile": {
+          "namespace": "native-s4-s60-CUSTOMER",
+          "policyVersion": "fixture-v1",
+          "nextAction": "\uc6d0\ubcf8 \ubc94\uc704\uc640 \uc2e4\uc81c \ud6a8\uacfc \ub300\uc870",
+          "nextCheckAt": "2026-10-08T09:00:00Z"
+        },
+        "occurrence": {
+          "kind": "QUALITY_DECISION_recordDispositionBasis_CUSTOMER",
+          "content": {
+            "segmentId": "$receipt60.segment",
+            "operation": "recordDispositionBasis",
+            "action": "SELL",
+            "category": "CUSTOMER",
+            "startQuantity": "0",
+            "quantity": "60",
+            "unit": "BOX",
+            "validFrom": "2026-10-07T09:00:02Z",
+            "validUntil": "2026-10-31T00:00:00Z",
+            "workId": "$WORK",
+            "sourceDecisionId": "365fa362-2068-5674-adcd-fd479d1dcc4e",
+            "sourceVersion": "1"
+          },
+          "externalEventId": "365fa362-2068-5674-adcd-fd479d1dcc4e",
+          "quantity": "60",
+          "unit": "BOX",
+          "assertion": "authored synthetic external original"
+        }
+      },
+      "binding": {
+        "organizationId": "$ORG",
+        "workId": "$WORK",
+        "itemId": "$P",
+        "actorId": "$reader",
+        "supervisorId": "$supervisor",
+        "physicalScopeId": "$receipt60.segment",
+        "subjectId": "$receipt60.segment",
+        "subjectKind": "SEGMENT",
+        "placeId": "$W"
+      }
+    },
+    {
+      "id": "s60-CUSTOMER-match",
+      "type": "command",
+      "capability": "matchSourceIdentity",
+      "request": {
+        "intentKind": "COMMAND",
+        "definitionVersion": "definition-v1",
+        "capabilityId": "matchSourceIdentity",
+        "expectedRevision": 1,
+        "commandIdempotencyKey": "s60-CUSTOMER-match",
+        "slots": {
+          "claimId": "$s60-CUSTOMER.claim",
+          "basisDocumentId": "$s60-CUSTOMER.document",
+          "physicalScopeId": "$receipt60.segment",
+          "policyVersion": "fixture-v1",
+          "sourceIdentity": "native-s4-s60-CUSTOMER:365fa362-2068-5674-adcd-fd479d1dcc4e:1",
+          "quantity": "60",
+          "unit": "BOX",
+          "effectiveFrom": "2026-10-07T09:00:02Z",
+          "reason": "\uc678\ubd80 ORIGINAL\uacfc \ub3d9\uc77c\ud55c \ubc94\uc704 \ub300\uc870"
+        },
+        "provenance": {},
+        "subjectRefs": [
+          {
+            "type": "QuantitySegment",
+            "id": "$receipt60.segment"
+          }
+        ]
+      },
+      "outcome": "APPLIED",
+      "bind": {
+        "s60-CUSTOMER.reconciliation": "/id"
+      },
+      "assertions": [
+        {
+          "pointer": "/evidenceStatus",
+          "operator": "equals",
+          "expected": "MATCHED"
+        }
+      ]
+    },
+    {
+      "id": "s60-CUSTOMER-link",
+      "type": "command",
+      "capability": "linkCanonicalOccurrence",
+      "request": {
+        "intentKind": "COMMAND",
+        "definitionVersion": "definition-v1",
+        "capabilityId": "linkCanonicalOccurrence",
+        "expectedRevision": 1,
+        "commandIdempotencyKey": "s60-CUSTOMER-link",
+        "slots": {
+          "reconciliationId": "$s60-CUSTOMER.reconciliation"
+        },
+        "provenance": {},
+        "subjectRefs": [
+          {
+            "type": "QuantitySegment",
+            "id": "$receipt60.segment"
+          }
+        ]
+      },
+      "outcome": "APPLIED",
+      "bind": {
+        "s60-CUSTOMER.canonical": "/id"
+      },
+      "assertions": [
+        {
+          "pointer": "/evidenceStatus",
+          "operator": "equals",
+          "expected": "VERIFIED_RECORD_ONLY"
+        }
+      ]
+    },
+    {
+      "id": "s60-CUSTOMER-decision",
+      "type": "command",
+      "capability": "recordDispositionBasis",
+      "request": {
+        "intentKind": "RECORD",
+        "definitionVersion": "definition-v1",
+        "capabilityId": "recordDispositionBasis",
+        "expectedRevision": 0,
+        "commandIdempotencyKey": "s60-CUSTOMER-decision",
+        "slots": {
+          "segmentId": "$receipt60.segment",
+          "action": "SELL",
+          "category": "CUSTOMER",
+          "startQuantity": "0",
+          "quantity": "60",
+          "unit": "BOX",
+          "validFrom": "2026-10-07T09:00:02Z",
+          "validUntil": "2026-10-31T00:00:00Z",
+          "workId": "$WORK",
+          "evidenceId": "$s60-CUSTOMER.document",
+          "reason": "\uc6d0\ubcf8\uc758 \uc815\ud655\ud55c \ud589\ub3d9 \ubc94\uc704\ub97c \ud310\uc815",
+          "nextCheckAt": "2026-10-08T09:00:00Z"
+        },
+        "provenance": {},
+        "subjectRefs": [
+          {
+            "type": "QuantitySegment",
+            "id": "$receipt60.segment"
+          }
+        ]
+      },
+      "outcome": "APPLIED"
+    },
+    {
+      "id": "s60-COMMERCIAL",
+      "type": "original",
+      "fixture": {
+        "synthetic": true,
+        "clock": {
+          "asOf": "2026-10-07T09:00:02Z",
+          "knownAt": "2026-10-07T09:00:02Z"
+        },
+        "sourceProfile": {
+          "namespace": "native-s4-s60-COMMERCIAL",
+          "policyVersion": "fixture-v1",
+          "nextAction": "\uc6d0\ubcf8 \ubc94\uc704\uc640 \uc2e4\uc81c \ud6a8\uacfc \ub300\uc870",
+          "nextCheckAt": "2026-10-08T09:00:00Z"
+        },
+        "occurrence": {
+          "kind": "QUALITY_DECISION_recordDispositionBasis_COMMERCIAL",
+          "content": {
+            "segmentId": "$receipt60.segment",
+            "operation": "recordDispositionBasis",
+            "action": "SELL",
+            "category": "COMMERCIAL",
+            "startQuantity": "0",
+            "quantity": "60",
+            "unit": "BOX",
+            "validFrom": "2026-10-07T09:00:02Z",
+            "validUntil": "2026-10-31T00:00:00Z",
+            "workId": "$WORK",
+            "sourceDecisionId": "028ad842-9d0e-5df4-8b95-50d61194641f",
+            "sourceVersion": "1"
+          },
+          "externalEventId": "028ad842-9d0e-5df4-8b95-50d61194641f",
+          "quantity": "60",
+          "unit": "BOX",
+          "assertion": "authored synthetic external original"
+        }
+      },
+      "binding": {
+        "organizationId": "$ORG",
+        "workId": "$WORK",
+        "itemId": "$P",
+        "actorId": "$reader",
+        "supervisorId": "$supervisor",
+        "physicalScopeId": "$receipt60.segment",
+        "subjectId": "$receipt60.segment",
+        "subjectKind": "SEGMENT",
+        "placeId": "$W"
+      }
+    },
+    {
+      "id": "s60-COMMERCIAL-match",
+      "type": "command",
+      "capability": "matchSourceIdentity",
+      "request": {
+        "intentKind": "COMMAND",
+        "definitionVersion": "definition-v1",
+        "capabilityId": "matchSourceIdentity",
+        "expectedRevision": 1,
+        "commandIdempotencyKey": "s60-COMMERCIAL-match",
+        "slots": {
+          "claimId": "$s60-COMMERCIAL.claim",
+          "basisDocumentId": "$s60-COMMERCIAL.document",
+          "physicalScopeId": "$receipt60.segment",
+          "policyVersion": "fixture-v1",
+          "sourceIdentity": "native-s4-s60-COMMERCIAL:028ad842-9d0e-5df4-8b95-50d61194641f:1",
+          "quantity": "60",
+          "unit": "BOX",
+          "effectiveFrom": "2026-10-07T09:00:02Z",
+          "reason": "\uc678\ubd80 ORIGINAL\uacfc \ub3d9\uc77c\ud55c \ubc94\uc704 \ub300\uc870"
+        },
+        "provenance": {},
+        "subjectRefs": [
+          {
+            "type": "QuantitySegment",
+            "id": "$receipt60.segment"
+          }
+        ]
+      },
+      "outcome": "APPLIED",
+      "bind": {
+        "s60-COMMERCIAL.reconciliation": "/id"
+      },
+      "assertions": [
+        {
+          "pointer": "/evidenceStatus",
+          "operator": "equals",
+          "expected": "MATCHED"
+        }
+      ]
+    },
+    {
+      "id": "s60-COMMERCIAL-link",
+      "type": "command",
+      "capability": "linkCanonicalOccurrence",
+      "request": {
+        "intentKind": "COMMAND",
+        "definitionVersion": "definition-v1",
+        "capabilityId": "linkCanonicalOccurrence",
+        "expectedRevision": 1,
+        "commandIdempotencyKey": "s60-COMMERCIAL-link",
+        "slots": {
+          "reconciliationId": "$s60-COMMERCIAL.reconciliation"
+        },
+        "provenance": {},
+        "subjectRefs": [
+          {
+            "type": "QuantitySegment",
+            "id": "$receipt60.segment"
+          }
+        ]
+      },
+      "outcome": "APPLIED",
+      "bind": {
+        "s60-COMMERCIAL.canonical": "/id"
+      },
+      "assertions": [
+        {
+          "pointer": "/evidenceStatus",
+          "operator": "equals",
+          "expected": "VERIFIED_RECORD_ONLY"
+        }
+      ]
+    },
+    {
+      "id": "s60-COMMERCIAL-decision",
+      "type": "command",
+      "capability": "recordDispositionBasis",
+      "request": {
+        "intentKind": "RECORD",
+        "definitionVersion": "definition-v1",
+        "capabilityId": "recordDispositionBasis",
+        "expectedRevision": 0,
+        "commandIdempotencyKey": "s60-COMMERCIAL-decision",
+        "slots": {
+          "segmentId": "$receipt60.segment",
+          "action": "SELL",
+          "category": "COMMERCIAL",
+          "startQuantity": "0",
+          "quantity": "60",
+          "unit": "BOX",
+          "validFrom": "2026-10-07T09:00:02Z",
+          "validUntil": "2026-10-31T00:00:00Z",
+          "workId": "$WORK",
+          "evidenceId": "$s60-COMMERCIAL.document",
+          "reason": "\uc6d0\ubcf8\uc758 \uc815\ud655\ud55c \ud589\ub3d9 \ubc94\uc704\ub97c \ud310\uc815",
+          "nextCheckAt": "2026-10-08T09:00:00Z"
+        },
+        "provenance": {},
+        "subjectRefs": [
+          {
+            "type": "QuantitySegment",
+            "id": "$receipt60.segment"
+          }
+        ]
+      },
+      "outcome": "APPLIED"
+    },
+    {
+      "id": "s40-CUSTOMER",
+      "type": "original",
+      "fixture": {
+        "synthetic": true,
+        "clock": {
+          "asOf": "2026-10-07T09:00:02Z",
+          "knownAt": "2026-10-07T09:00:02Z"
+        },
+        "sourceProfile": {
+          "namespace": "native-s4-s40-CUSTOMER",
+          "policyVersion": "fixture-v1",
+          "nextAction": "\uc6d0\ubcf8 \ubc94\uc704\uc640 \uc2e4\uc81c \ud6a8\uacfc \ub300\uc870",
+          "nextCheckAt": "2026-10-08T09:00:00Z"
+        },
+        "occurrence": {
+          "kind": "QUALITY_DECISION_recordDispositionBasis_CUSTOMER",
+          "content": {
+            "segmentId": "$receipt40.segment",
+            "operation": "recordDispositionBasis",
+            "action": "SELL",
+            "category": "CUSTOMER",
+            "startQuantity": "0",
+            "quantity": "40",
+            "unit": "BOX",
+            "validFrom": "2026-10-07T09:00:02Z",
+            "validUntil": "2026-10-31T00:00:00Z",
+            "workId": "$WORK",
+            "sourceDecisionId": "86fe0528-5445-556f-aff5-d97afdb0fd71",
+            "sourceVersion": "1"
+          },
+          "externalEventId": "86fe0528-5445-556f-aff5-d97afdb0fd71",
+          "quantity": "40",
+          "unit": "BOX",
+          "assertion": "authored synthetic external original"
+        }
+      },
+      "binding": {
+        "organizationId": "$ORG",
+        "workId": "$WORK",
+        "itemId": "$P",
+        "actorId": "$reader",
+        "supervisorId": "$supervisor",
+        "physicalScopeId": "$receipt40.segment",
+        "subjectId": "$receipt40.segment",
+        "subjectKind": "SEGMENT",
+        "placeId": "$W"
+      }
+    },
+    {
+      "id": "s40-CUSTOMER-match",
+      "type": "command",
+      "capability": "matchSourceIdentity",
+      "request": {
+        "intentKind": "COMMAND",
+        "definitionVersion": "definition-v1",
+        "capabilityId": "matchSourceIdentity",
+        "expectedRevision": 1,
+        "commandIdempotencyKey": "s40-CUSTOMER-match",
+        "slots": {
+          "claimId": "$s40-CUSTOMER.claim",
+          "basisDocumentId": "$s40-CUSTOMER.document",
+          "physicalScopeId": "$receipt40.segment",
+          "policyVersion": "fixture-v1",
+          "sourceIdentity": "native-s4-s40-CUSTOMER:86fe0528-5445-556f-aff5-d97afdb0fd71:1",
+          "quantity": "40",
+          "unit": "BOX",
+          "effectiveFrom": "2026-10-07T09:00:02Z",
+          "reason": "\uc678\ubd80 ORIGINAL\uacfc \ub3d9\uc77c\ud55c \ubc94\uc704 \ub300\uc870"
+        },
+        "provenance": {},
+        "subjectRefs": [
+          {
+            "type": "QuantitySegment",
+            "id": "$receipt40.segment"
+          }
+        ]
+      },
+      "outcome": "APPLIED",
+      "bind": {
+        "s40-CUSTOMER.reconciliation": "/id"
+      },
+      "assertions": [
+        {
+          "pointer": "/evidenceStatus",
+          "operator": "equals",
+          "expected": "MATCHED"
+        }
+      ]
+    },
+    {
+      "id": "s40-CUSTOMER-link",
+      "type": "command",
+      "capability": "linkCanonicalOccurrence",
+      "request": {
+        "intentKind": "COMMAND",
+        "definitionVersion": "definition-v1",
+        "capabilityId": "linkCanonicalOccurrence",
+        "expectedRevision": 1,
+        "commandIdempotencyKey": "s40-CUSTOMER-link",
+        "slots": {
+          "reconciliationId": "$s40-CUSTOMER.reconciliation"
+        },
+        "provenance": {},
+        "subjectRefs": [
+          {
+            "type": "QuantitySegment",
+            "id": "$receipt40.segment"
+          }
+        ]
+      },
+      "outcome": "APPLIED",
+      "bind": {
+        "s40-CUSTOMER.canonical": "/id"
+      },
+      "assertions": [
+        {
+          "pointer": "/evidenceStatus",
+          "operator": "equals",
+          "expected": "VERIFIED_RECORD_ONLY"
+        }
+      ]
+    },
+    {
+      "id": "s40-CUSTOMER-decision",
+      "type": "command",
+      "capability": "recordDispositionBasis",
+      "request": {
+        "intentKind": "RECORD",
+        "definitionVersion": "definition-v1",
+        "capabilityId": "recordDispositionBasis",
+        "expectedRevision": 0,
+        "commandIdempotencyKey": "s40-CUSTOMER-decision",
+        "slots": {
+          "segmentId": "$receipt40.segment",
+          "action": "SELL",
+          "category": "CUSTOMER",
+          "startQuantity": "0",
+          "quantity": "40",
+          "unit": "BOX",
+          "validFrom": "2026-10-07T09:00:02Z",
+          "validUntil": "2026-10-31T00:00:00Z",
+          "workId": "$WORK",
+          "evidenceId": "$s40-CUSTOMER.document",
+          "reason": "\uc6d0\ubcf8\uc758 \uc815\ud655\ud55c \ud589\ub3d9 \ubc94\uc704\ub97c \ud310\uc815",
+          "nextCheckAt": "2026-10-08T09:00:00Z"
+        },
+        "provenance": {},
+        "subjectRefs": [
+          {
+            "type": "QuantitySegment",
+            "id": "$receipt40.segment"
+          }
+        ]
+      },
+      "outcome": "APPLIED"
+    },
+    {
+      "id": "s40-COMMERCIAL",
+      "type": "original",
+      "fixture": {
+        "synthetic": true,
+        "clock": {
+          "asOf": "2026-10-07T09:00:02Z",
+          "knownAt": "2026-10-07T09:00:02Z"
+        },
+        "sourceProfile": {
+          "namespace": "native-s4-s40-COMMERCIAL",
+          "policyVersion": "fixture-v1",
+          "nextAction": "\uc6d0\ubcf8 \ubc94\uc704\uc640 \uc2e4\uc81c \ud6a8\uacfc \ub300\uc870",
+          "nextCheckAt": "2026-10-08T09:00:00Z"
+        },
+        "occurrence": {
+          "kind": "QUALITY_DECISION_recordDispositionBasis_COMMERCIAL",
+          "content": {
+            "segmentId": "$receipt40.segment",
+            "operation": "recordDispositionBasis",
+            "action": "SELL",
+            "category": "COMMERCIAL",
+            "startQuantity": "0",
+            "quantity": "40",
+            "unit": "BOX",
+            "validFrom": "2026-10-07T09:00:02Z",
+            "validUntil": "2026-10-31T00:00:00Z",
+            "workId": "$WORK",
+            "sourceDecisionId": "4eb22765-c17d-5db4-827a-f47908eb41b1",
+            "sourceVersion": "1"
+          },
+          "externalEventId": "4eb22765-c17d-5db4-827a-f47908eb41b1",
+          "quantity": "40",
+          "unit": "BOX",
+          "assertion": "authored synthetic external original"
+        }
+      },
+      "binding": {
+        "organizationId": "$ORG",
+        "workId": "$WORK",
+        "itemId": "$P",
+        "actorId": "$reader",
+        "supervisorId": "$supervisor",
+        "physicalScopeId": "$receipt40.segment",
+        "subjectId": "$receipt40.segment",
+        "subjectKind": "SEGMENT",
+        "placeId": "$W"
+      }
+    },
+    {
+      "id": "s40-COMMERCIAL-match",
+      "type": "command",
+      "capability": "matchSourceIdentity",
+      "request": {
+        "intentKind": "COMMAND",
+        "definitionVersion": "definition-v1",
+        "capabilityId": "matchSourceIdentity",
+        "expectedRevision": 1,
+        "commandIdempotencyKey": "s40-COMMERCIAL-match",
+        "slots": {
+          "claimId": "$s40-COMMERCIAL.claim",
+          "basisDocumentId": "$s40-COMMERCIAL.document",
+          "physicalScopeId": "$receipt40.segment",
+          "policyVersion": "fixture-v1",
+          "sourceIdentity": "native-s4-s40-COMMERCIAL:4eb22765-c17d-5db4-827a-f47908eb41b1:1",
+          "quantity": "40",
+          "unit": "BOX",
+          "effectiveFrom": "2026-10-07T09:00:02Z",
+          "reason": "\uc678\ubd80 ORIGINAL\uacfc \ub3d9\uc77c\ud55c \ubc94\uc704 \ub300\uc870"
+        },
+        "provenance": {},
+        "subjectRefs": [
+          {
+            "type": "QuantitySegment",
+            "id": "$receipt40.segment"
+          }
+        ]
+      },
+      "outcome": "APPLIED",
+      "bind": {
+        "s40-COMMERCIAL.reconciliation": "/id"
+      },
+      "assertions": [
+        {
+          "pointer": "/evidenceStatus",
+          "operator": "equals",
+          "expected": "MATCHED"
+        }
+      ]
+    },
+    {
+      "id": "s40-COMMERCIAL-link",
+      "type": "command",
+      "capability": "linkCanonicalOccurrence",
+      "request": {
+        "intentKind": "COMMAND",
+        "definitionVersion": "definition-v1",
+        "capabilityId": "linkCanonicalOccurrence",
+        "expectedRevision": 1,
+        "commandIdempotencyKey": "s40-COMMERCIAL-link",
+        "slots": {
+          "reconciliationId": "$s40-COMMERCIAL.reconciliation"
+        },
+        "provenance": {},
+        "subjectRefs": [
+          {
+            "type": "QuantitySegment",
+            "id": "$receipt40.segment"
+          }
+        ]
+      },
+      "outcome": "APPLIED",
+      "bind": {
+        "s40-COMMERCIAL.canonical": "/id"
+      },
+      "assertions": [
+        {
+          "pointer": "/evidenceStatus",
+          "operator": "equals",
+          "expected": "VERIFIED_RECORD_ONLY"
+        }
+      ]
+    },
+    {
+      "id": "s40-COMMERCIAL-decision",
+      "type": "command",
+      "capability": "recordDispositionBasis",
+      "request": {
+        "intentKind": "RECORD",
+        "definitionVersion": "definition-v1",
+        "capabilityId": "recordDispositionBasis",
+        "expectedRevision": 0,
+        "commandIdempotencyKey": "s40-COMMERCIAL-decision",
+        "slots": {
+          "segmentId": "$receipt40.segment",
+          "action": "SELL",
+          "category": "COMMERCIAL",
+          "startQuantity": "0",
+          "quantity": "40",
+          "unit": "BOX",
+          "validFrom": "2026-10-07T09:00:02Z",
+          "validUntil": "2026-10-31T00:00:00Z",
+          "workId": "$WORK",
+          "evidenceId": "$s40-COMMERCIAL.document",
+          "reason": "\uc6d0\ubcf8\uc758 \uc815\ud655\ud55c \ud589\ub3d9 \ubc94\uc704\ub97c \ud310\uc815",
+          "nextCheckAt": "2026-10-08T09:00:00Z"
+        },
+        "provenance": {},
+        "subjectRefs": [
+          {
+            "type": "QuantitySegment",
+            "id": "$receipt40.segment"
+          }
+        ]
+      },
+      "outcome": "APPLIED"
+    },
+    {
+      "id": "e1-qc-hold40",
+      "type": "original",
+      "fixture": {
+        "synthetic": true,
+        "clock": {
+          "asOf": "2026-10-07T09:00:02Z",
+          "knownAt": "2026-10-07T09:00:02Z"
+        },
+        "sourceProfile": {
+          "namespace": "native-s4-e1-qc-hold40",
+          "policyVersion": "fixture-v1",
+          "nextAction": "\uc6d0\ubcf8 \ubc94\uc704\uc640 \uc2e4\uc81c \ud6a8\uacfc \ub300\uc870",
+          "nextCheckAt": "2026-10-08T09:00:00Z"
+        },
+        "occurrence": {
+          "kind": "QUALITY_DECISION_placeHold_QC",
+          "content": {
+            "segmentId": "$receipt40.segment",
+            "operation": "placeHold",
+            "action": "SELL",
+            "category": "QC",
+            "startQuantity": "0",
+            "quantity": "40",
+            "unit": "BOX",
+            "validFrom": "2026-10-07T09:00:02Z",
+            "validUntil": "2026-10-31T00:00:00Z",
+            "workId": "$WORK",
+            "sourceDecisionId": "e9ca95d1-3db5-5500-8156-cf5d4de5f87b",
+            "sourceVersion": "1"
+          },
+          "externalEventId": "e9ca95d1-3db5-5500-8156-cf5d4de5f87b",
+          "quantity": "40",
+          "unit": "BOX",
+          "assertion": "authored synthetic external original"
+        }
+      },
+      "binding": {
+        "organizationId": "$ORG",
+        "workId": "$WORK",
+        "itemId": "$P",
+        "actorId": "$reader",
+        "supervisorId": "$supervisor",
+        "physicalScopeId": "$receipt40.segment",
+        "subjectId": "$receipt40.segment",
+        "subjectKind": "SEGMENT",
+        "placeId": "$W"
+      }
+    },
+    {
+      "id": "e1-qc-hold40-match",
+      "type": "command",
+      "capability": "matchSourceIdentity",
+      "request": {
+        "intentKind": "COMMAND",
+        "definitionVersion": "definition-v1",
+        "capabilityId": "matchSourceIdentity",
+        "expectedRevision": 1,
+        "commandIdempotencyKey": "e1-qc-hold40-match",
+        "slots": {
+          "claimId": "$e1-qc-hold40.claim",
+          "basisDocumentId": "$e1-qc-hold40.document",
+          "physicalScopeId": "$receipt40.segment",
+          "policyVersion": "fixture-v1",
+          "sourceIdentity": "native-s4-e1-qc-hold40:e9ca95d1-3db5-5500-8156-cf5d4de5f87b:1",
+          "quantity": "40",
+          "unit": "BOX",
+          "effectiveFrom": "2026-10-07T09:00:02Z",
+          "reason": "\uc678\ubd80 ORIGINAL\uacfc \ub3d9\uc77c\ud55c \ubc94\uc704 \ub300\uc870"
+        },
+        "provenance": {},
+        "subjectRefs": [
+          {
+            "type": "QuantitySegment",
+            "id": "$receipt40.segment"
+          }
+        ]
+      },
+      "outcome": "APPLIED",
+      "bind": {
+        "e1-qc-hold40.reconciliation": "/id"
+      },
+      "assertions": [
+        {
+          "pointer": "/evidenceStatus",
+          "operator": "equals",
+          "expected": "MATCHED"
+        }
+      ]
+    },
+    {
+      "id": "e1-qc-hold40-link",
+      "type": "command",
+      "capability": "linkCanonicalOccurrence",
+      "request": {
+        "intentKind": "COMMAND",
+        "definitionVersion": "definition-v1",
+        "capabilityId": "linkCanonicalOccurrence",
+        "expectedRevision": 1,
+        "commandIdempotencyKey": "e1-qc-hold40-link",
+        "slots": {
+          "reconciliationId": "$e1-qc-hold40.reconciliation"
+        },
+        "provenance": {},
+        "subjectRefs": [
+          {
+            "type": "QuantitySegment",
+            "id": "$receipt40.segment"
+          }
+        ]
+      },
+      "outcome": "APPLIED",
+      "bind": {
+        "e1-qc-hold40.canonical": "/id"
+      },
+      "assertions": [
+        {
+          "pointer": "/evidenceStatus",
+          "operator": "equals",
+          "expected": "VERIFIED_RECORD_ONLY"
+        }
+      ]
+    },
+    {
+      "id": "e1-qc-hold40-decision",
+      "type": "command",
+      "capability": "placeHold",
+      "request": {
+        "intentKind": "COMMAND",
+        "definitionVersion": "definition-v1",
+        "capabilityId": "placeHold",
+        "expectedRevision": 0,
+        "commandIdempotencyKey": "e1-qc-hold40-decision",
+        "slots": {
+          "segmentId": "$receipt40.segment",
+          "action": "SELL",
+          "category": "QC",
+          "startQuantity": "0",
+          "quantity": "40",
+          "unit": "BOX",
+          "validFrom": "2026-10-07T09:00:02Z",
+          "validUntil": "2026-10-31T00:00:00Z",
+          "workId": "$WORK",
+          "evidenceId": "$e1-qc-hold40.document",
+          "reason": "\uc6d0\ubcf8\uc758 \uc815\ud655\ud55c \ud589\ub3d9 \ubc94\uc704\ub97c \ud310\uc815",
+          "nextCheckAt": "2026-10-08T09:00:00Z"
+        },
+        "provenance": {},
+        "subjectRefs": [
+          {
+            "type": "QuantitySegment",
+            "id": "$receipt40.segment"
+          }
+        ]
+      },
+      "outcome": "APPLIED",
+      "bind": {
+        "e1-qc-hold40.restriction": "/effects/restrictionId"
+      }
+    },
+    {
+      "id": "eligible-max30",
+      "type": "query",
+      "capability": "getInventory",
+      "request": {
+        "id": "$P",
+        "scope": {
+          "organizationId": "$ORG",
+          "itemId": "$P"
+        },
+        "asOf": "2026-10-07T09:00:02Z",
+        "knownAt": "2026-10-07T09:00:02Z"
+      },
+      "assertions": [
+        {
+          "pointer": "/data/eligibleQuantity",
+          "operator": "equals",
+          "expected": "30"
+        }
+      ]
+    },
+    {
+      "id": "e1-upstream-independent",
+      "type": "observe",
+      "assertions": [
+        {
+          "pointer": "/rawRows/mulino_inventory_quantitysegments",
+          "operator": "sum",
+          "column": "quantity",
+          "where": {
+            "retiredat": null
+          },
+          "expected": "100"
+        },
+        {
+          "pointer": "/rawRows/mulino_inventory_dispositionbases",
+          "operator": "sum",
+          "column": "quantity",
+          "where": {
+            "category": "QC",
+            "state": "ACTIVE"
+          },
+          "expected": "60"
+        },
+        {
+          "pointer": "/rawRows/mulino_inventory_restrictions",
+          "operator": "sum",
+          "column": "quantity",
+          "where": {
+            "category": "QC",
+            "state": "ACTIVE"
+          },
+          "expected": "40"
+        },
+        {
+          "pointer": "/rawRows/mulino_trade_regulatory_decisionversions",
+          "operator": "sum",
+          "column": "quantity",
+          "where": {
+            "decision": "ALLOWED"
+          },
+          "expected": "30"
+        }
+      ]
+    }
+  ]
+}

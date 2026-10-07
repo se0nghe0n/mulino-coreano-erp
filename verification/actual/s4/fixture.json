@@ -56,7 +56,18 @@
         "confirmCustomerConditions",
         "confirmCommercialDisposition",
         "decideRecallRestriction",
-        "reconcileEvidence"
+        "reconcileEvidence",
+        "createSalesOrder",
+        "reviseSalesOrder",
+        "recordDelivery",
+        "recordObservedMovement",
+        "reserveQuantity",
+        "replaceAllocation",
+        "pickQuantity",
+        "releaseAllocation",
+        "dispatchQuantity",
+        "authorizeReturn",
+        "receiveReturn"
       ],
       "grant": {
         "delegatorAlias": "supervisor",
@@ -95,7 +106,18 @@
           "confirmCustomerConditions",
           "confirmCommercialDisposition",
           "decideRecallRestriction",
-          "reconcileEvidence"
+          "reconcileEvidence",
+          "createSalesOrder",
+          "reviseSalesOrder",
+          "recordDelivery",
+          "recordObservedMovement",
+          "reserveQuantity",
+          "replaceAllocation",
+          "pickQuantity",
+          "releaseAllocation",
+          "dispatchQuantity",
+          "authorizeReturn",
+          "receiveReturn"
         ],
         "scope": {
           "organizationAlias": "ORG"
@@ -145,7 +167,18 @@
         "confirmCustomerConditions",
         "confirmCommercialDisposition",
         "decideRecallRestriction",
-        "reconcileEvidence"
+        "reconcileEvidence",
+        "createSalesOrder",
+        "reviseSalesOrder",
+        "recordDelivery",
+        "recordObservedMovement",
+        "reserveQuantity",
+        "replaceAllocation",
+        "pickQuantity",
+        "releaseAllocation",
+        "dispatchQuantity",
+        "authorizeReturn",
+        "receiveReturn"
       ],
       "grant": {
         "delegatorAlias": "supervisor",
@@ -184,7 +217,18 @@
           "confirmCustomerConditions",
           "confirmCommercialDisposition",
           "decideRecallRestriction",
-          "reconcileEvidence"
+          "reconcileEvidence",
+          "createSalesOrder",
+          "reviseSalesOrder",
+          "recordDelivery",
+          "recordObservedMovement",
+          "reserveQuantity",
+          "replaceAllocation",
+          "pickQuantity",
+          "releaseAllocation",
+          "dispatchQuantity",
+          "authorizeReturn",
+          "receiveReturn"
         ],
         "scope": {
           "organizationAlias": "ORG"
@@ -264,7 +308,7 @@
     },
     "P": {
       "type": "TradeItem",
-      "name": "S1 \ube44\uc2a4\ud0b7",
+      "name": "S1 비스킷",
       "unit": "BOX",
       "productAlias": "PRD",
       "specificationVersionAlias": "SPEC",
@@ -370,6 +414,26 @@
           },
           {
             "name": "ReceiptObservation",
+            "core": true
+          },
+          {
+            "name": "SalesOrder",
+            "core": true
+          },
+          {
+            "name": "SalesOrderLine",
+            "core": true
+          },
+          {
+            "name": "DeliveryObservation",
+            "core": true
+          },
+          {
+            "name": "Delivery",
+            "core": true
+          },
+          {
+            "name": "Return",
             "core": true
           }
         ],
@@ -596,6 +660,83 @@
             "intentKind": "QUERY",
             "capabilityId": "getEvidence",
             "stage": "READ",
+            "slots": {}
+          },
+          {
+            "name": "createSalesOrder",
+            "intentKind": "COMMAND",
+            "capabilityId": "createSalesOrder",
+            "stage": "DRAFT",
+            "slots": {}
+          },
+          {
+            "name": "reviseSalesOrder",
+            "intentKind": "COMMAND",
+            "capabilityId": "reviseSalesOrder",
+            "stage": "DRAFT",
+            "slots": {}
+          },
+          {
+            "name": "recordDelivery",
+            "intentKind": "RECORD",
+            "capabilityId": "recordDelivery",
+            "stage": "DRAFT",
+            "slots": {}
+          },
+          {
+            "name": "recordObservedMovement",
+            "intentKind": "RECORD",
+            "capabilityId": "recordObservedMovement",
+            "stage": "DRAFT",
+            "slots": {}
+          },
+          {
+            "name": "reserveQuantity",
+            "intentKind": "COMMAND",
+            "capabilityId": "reserveQuantity",
+            "stage": "DRAFT",
+            "slots": {}
+          },
+          {
+            "name": "replaceAllocation",
+            "intentKind": "COMMAND",
+            "capabilityId": "replaceAllocation",
+            "stage": "DRAFT",
+            "slots": {}
+          },
+          {
+            "name": "pickQuantity",
+            "intentKind": "COMMAND",
+            "capabilityId": "pickQuantity",
+            "stage": "DRAFT",
+            "slots": {}
+          },
+          {
+            "name": "releaseAllocation",
+            "intentKind": "COMMAND",
+            "capabilityId": "releaseAllocation",
+            "stage": "DRAFT",
+            "slots": {}
+          },
+          {
+            "name": "dispatchQuantity",
+            "intentKind": "COMMAND",
+            "capabilityId": "dispatchQuantity",
+            "stage": "DRAFT",
+            "slots": {}
+          },
+          {
+            "name": "authorizeReturn",
+            "intentKind": "COMMAND",
+            "capabilityId": "authorizeReturn",
+            "stage": "DRAFT",
+            "slots": {}
+          },
+          {
+            "name": "receiveReturn",
+            "intentKind": "RECORD",
+            "capabilityId": "receiveReturn",
+            "stage": "DRAFT",
             "slots": {}
           }
         ],
@@ -981,6 +1122,39 @@
               "COMMERCIAL": "confirmCommercialDisposition",
               "RECALL": "decideRecallRestriction"
             }
+          },
+          "createSalesOrder": {
+            "effectClass": "SALES_ORDER"
+          },
+          "reviseSalesOrder": {
+            "effectClass": "SALES_ORDER"
+          },
+          "recordDelivery": {
+            "effectClass": "RECORD"
+          },
+          "recordObservedMovement": {
+            "effectClass": "RECORD"
+          },
+          "reserveQuantity": {
+            "effectClass": "RESERVE"
+          },
+          "replaceAllocation": {
+            "effectClass": "RESERVE"
+          },
+          "pickQuantity": {
+            "effectClass": "ALLOCATION"
+          },
+          "releaseAllocation": {
+            "effectClass": "ALLOCATION"
+          },
+          "dispatchQuantity": {
+            "effectClass": "DISPATCH"
+          },
+          "authorizeReturn": {
+            "effectClass": "RETURN"
+          },
+          "receiveReturn": {
+            "effectClass": "RETURN"
           }
         }
       },
@@ -1014,6 +1188,13 @@
               "CUSTOMER",
               "COMMERCIAL"
             ]
+          },
+          "DISPATCH": {
+            "requiredCategories": [
+              "QC",
+              "CUSTOMER",
+              "COMMERCIAL"
+            ]
           }
         }
       },
@@ -1029,7 +1210,7 @@
       "actorAlias": "reader",
       "version": "fixture-v1",
       "authority": "FICTIONAL-AUTHORITY",
-      "sourceNamespace": "native-s3-regulator",
+      "sourceNamespace": "native-s4-regulator",
       "action": "SELL",
       "validFrom": "2026-10-01T00:00:00Z",
       "validUntil": "2026-10-31T23:59:59Z",
@@ -1038,6 +1219,34 @@
     },
     "outsider": {
       "type": "Human"
+    },
+    "C": {
+      "type": "Customer",
+      "name": "가상 B2B 고객"
+    },
+    "CUSTOMER_PLACE": {
+      "type": "Place",
+      "name": "가상 고객 장소",
+      "kind": "CUSTOMER"
+    },
+    "REGDISPATCH": {
+      "type": "RegulatoryPolicy",
+      "actorAlias": "reader",
+      "version": "fixture-v1",
+      "authority": "FICTIONAL-AUTHORITY",
+      "sourceNamespace": "native-s4-dispatch-regulator",
+      "action": "DISPATCH",
+      "validFrom": "2026-10-01T00:00:00Z",
+      "validUntil": "2026-10-31T23:59:59Z",
+      "status": "ACTIVE",
+      "requiresLabel": true
+    },
+    "RETURN_AUTH": {
+      "type": "ManagementAuthority",
+      "actorAlias": "supervisor",
+      "capabilityId": "authorizeReturn",
+      "validFrom": "2026-10-01T00:00:00Z",
+      "validUntil": "2026-10-31T23:59:59Z"
     }
   },
   "baseline": {},

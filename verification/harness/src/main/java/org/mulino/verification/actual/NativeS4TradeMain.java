@@ -40,6 +40,7 @@ public final class NativeS4TradeMain {
     private void execute(JsonNode a)throws Exception {
         String id=Json.required(a,"id"),type=Json.required(a,"type");
         switch(type) {
+            case "include" -> {for(JsonNode nested:Json.read(root.resolve(Json.required(a,"scriptRef"))).path("actions"))execute(nested);}
             case "require-contract" -> throw new Unavailable(a.path("reason").asText());
             case "setup" -> {
                 String ref=Json.required(a,"fixtureRef");var fixture=Json.read(root.resolve(ref));var bundle=Json.object();bundle.set("fixture",fixture);bundle.set("bases",Json.array());bundle.put("fixtureHash",Json.sha256(root.resolve(ref)));var result=driver.installFixture(id,bundle);capture(result);available(result);bindings.setAll((ObjectNode)result.data().path("aliasMap"));if(a.has("organizationAlias"))bindings.set("ORG",result.data().path("aliasMap").path(Json.required(a,"organizationAlias")));actor=fixture.path("actors").path("reader");
