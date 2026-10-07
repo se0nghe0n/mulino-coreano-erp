@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class DefinitionValidator {
   private static final Set<String> RESERVED=Set.of("eligible","eligibility","role","roles","remainingquantity","assessment","permissions");
-  private static final Set<String> OPERATORS=Set.of("equals","in","compare","range","exists","cardinality","timeIn","all","any","not");
+  private static final Set<String> OPERATORS=Set.of("equals","in","compare","range","exists","cardinality","timeIn","all","any","not","quantitySum","stateQuantity");
   public record Problem(String path,String code) {}
   public record Result(String outcome,List<Problem> problems) {
     public Result { problems=List.copyOf(problems); }
@@ -132,21 +132,30 @@ public class DefinitionValidator {
     if(s.equals("cardinality")) {
       var r=d.relations().stream().filter(x->x.name().equals(node.get("relation"))).findFirst();
       if(r.isEmpty()) p.add(new Problem(path,"UNKNOWN_RELATION"));
-      else if(!(node.get("maximum") instanceof Integer max)||max>r.get().maximumCount()||max<r.get().minimumCount()) p.add(new Problem(path,"CARDINALITY"));
+      else {
+        if(!(node.get("minimum") instanceof Integer min)||min<r.get().minimumCount()) p.add(new Problem(path,"CARDINALITY"));
+        if(!(node.get("maximum") instanceof Integer max)||max>r.get().maximumCount()||max<r.get().minimumCount()) p.add(new Problem(path,"CARDINALITY"));
+        if(node.get("minimum") instanceof Integer min&&node.get("maximum") instanceof Integer max&&min>max)p.add(new Problem(path,"REVERSED_BOUNDS"));
+      }
       return;
     }
     var a=d.attributes().stream().filter(x->(x.nounType()+"."+x.name()).equals(node.get("property"))).findFirst();
     if(a.isEmpty()) {p.add(new Problem(path,"UNKNOWN_PROPERTY"));return;}
-    if(Set.of("compare","range").contains(s)&&a.get().type()!=Definition.ValueType.DECIMAL) p.add(new Problem(path,"NUMERIC_TYPE"));
+    if(Set.of("compare","range","quantitySum","stateQuantity").contains(s)&&a.get().type()!=Definition.ValueType.DECIMAL) p.add(new Problem(path,"NUMERIC_TYPE"));
     if(s.equals("timeIn")&&(a.get().type()!=Definition.ValueType.INSTANT||!(node.get("timezone") instanceof String tz)||!validZone(tz)||!(node.get("inclusiveStart") instanceof Boolean)||!(node.get("inclusiveEnd") instanceof Boolean))) p.add(new Problem(path,"TIME_SEMANTICS"));
     if(node.containsKey("evidenceSelector")&&!Set.of("VERIFIED_DISTINCT","CURRENT_STATE").contains(node.get("evidenceSelector"))) p.add(new Problem(path,"EVIDENCE_SELECTOR"));
     if(node.containsKey("unit")&&!Objects.equals(a.get().unit(),node.get("unit"))) p.add(new Problem(path,"UNIT_MISMATCH"));
+    if(Set.of("quantitySum","stateQuantity").contains(s)) {
+      String selector=s.equals("quantitySum")?"VERIFIED_DISTINCT":"CURRENT_STATE";
+      if(!selector.equals(node.get("evidenceSelector"))) p.add(new Problem(path,"EVIDENCE_SELECTOR_REQUIRED"));
+      if(!Objects.equals(a.get().unit(),node.get("unit"))) p.add(new Problem(path,"UNIT_REQUIRED"));
+    }
     if(s.equals("equals")) p.addAll(validateValue(a.get(),node.get("value")).problems());
     if(s.equals("in")) {
       if(!(node.get("values") instanceof List<?> values)||values.isEmpty()||values.size()>100) p.add(new Problem(path,"TYPE"));
       else for(Object value:values) p.addAll(validateValue(a.get(),value).problems());
     }
-    if(s.equals("compare")||s.equals("range")||s.equals("timeIn")) {
+    if(Set.of("compare","range","quantitySum","stateQuantity","timeIn").contains(s)) {
       if(!node.containsKey("minimum")&&!node.containsKey("maximum")) p.add(new Problem(path,"BOUNDS_REQUIRED"));
       for(String bound:List.of("minimum","maximum")) if(node.containsKey(bound)) p.addAll(validateValue(a.get(),node.get(bound)).problems());
       if(node.containsKey("minimum")&&node.containsKey("maximum")&&validateValue(a.get(),node.get("minimum")).problems().isEmpty()&&validateValue(a.get(),node.get("maximum")).problems().isEmpty()) {
