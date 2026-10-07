@@ -20,3 +20,16 @@ entity WorkTransitions {
  recordedAt : Timestamp not null;
  snapshotJson : LargeString not null;
 }
+entity WorkContributions {
+ key organizationId : UUID;
+ key ID : UUID;
+ linkId : UUID not null;
+ occurrenceId : UUID not null;
+ targetWorkId : UUID not null;
+ goalId : UUID not null;
+ conditionId : String(100) not null;
+ startQuantity : Decimal(38,12) not null;
+ quantity : Decimal(38,12) not null;
+ unit : String(20) not null;
+ recordedAt : Timestamp not null;
+}

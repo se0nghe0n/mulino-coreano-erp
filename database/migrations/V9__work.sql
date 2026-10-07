@@ -51,3 +51,26 @@ BEGIN
 END $$;
 CREATE TRIGGER work_lifecycle_guard BEFORE UPDATE ON mulino_work_read_Works FOR EACH ROW EXECUTE FUNCTION mulino_work_lifecycle_guard();
 CREATE TRIGGER goal_read_delete_immutable BEFORE DELETE ON mulino_work_read_GoalReferences FOR EACH ROW EXECUTE FUNCTION mulino_work_read_immutable();
+
+CREATE TABLE mulino_work_WorkContributions (
+ organizationId VARCHAR(36) NOT NULL,ID VARCHAR(36) NOT NULL,
+ linkId VARCHAR(36) NOT NULL,occurrenceId VARCHAR(36) NOT NULL,
+ targetWorkId VARCHAR(36) NOT NULL,goalId VARCHAR(36) NOT NULL,
+ conditionId VARCHAR(100) NOT NULL,startQuantity NUMERIC(38,12) NOT NULL,
+ quantity NUMERIC(38,12) NOT NULL,unit VARCHAR(20) NOT NULL,
+ recordedAt TIMESTAMPTZ NOT NULL,PRIMARY KEY(organizationId,ID),
+ FOREIGN KEY(organizationId,linkId) REFERENCES mulino_work_WorkLinks(organizationId,ID),
+ FOREIGN KEY(organizationId,occurrenceId) REFERENCES mulino_evidence_CanonicalOccurrences(organizationId,ID),
+ FOREIGN KEY(organizationId,goalId,targetWorkId) REFERENCES mulino_work_read_GoalReferences(organizationId,ID,workId),
+ CHECK(startQuantity>=0 AND quantity>0));
+CREATE TRIGGER work_contribution_immutable BEFORE UPDATE OR DELETE ON mulino_work_WorkContributions FOR EACH ROW EXECUTE FUNCTION mulino_work_read_immutable();
+CREATE FUNCTION mulino_work_contribution_range() RETURNS trigger LANGUAGE plpgsql AS $$
+DECLARE actual NUMERIC(38,12); actual_unit VARCHAR(20);
+BEGIN
+ PERFORM pg_advisory_xact_lock(hashtextextended(NEW.organizationId||'|contribution|'||NEW.occurrenceId,0));
+ SELECT quantity,unit INTO actual,actual_unit FROM mulino_evidence_CanonicalOccurrences WHERE organizationId=NEW.organizationId AND ID=NEW.occurrenceId FOR UPDATE;
+ IF actual IS NULL OR NEW.unit<>actual_unit OR NEW.startQuantity+NEW.quantity>actual THEN RAISE EXCEPTION 'Contribution exceeds actual occurrence'; END IF;
+ IF EXISTS(SELECT 1 FROM mulino_work_WorkContributions c WHERE c.organizationId=NEW.organizationId AND c.occurrenceId=NEW.occurrenceId AND c.conditionId=NEW.conditionId AND c.startQuantity<NEW.startQuantity+NEW.quantity AND NEW.startQuantity<c.startQuantity+c.quantity) THEN RAISE EXCEPTION 'Actual contribution range already credited'; END IF;
+ RETURN NEW;
+END $$;
+CREATE TRIGGER work_contribution_range BEFORE INSERT ON mulino_work_WorkContributions FOR EACH ROW EXECUTE FUNCTION mulino_work_contribution_range();
