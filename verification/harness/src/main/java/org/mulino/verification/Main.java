@@ -58,35 +58,26 @@ public final class Main {
     }
     private static int prepare(ContractValidator validator,List<Path> paths,String mode) throws Exception {
         Set<String> expected=new LinkedHashSet<>();for(int i=1;i<=26;i++) expected.add(String.format("T%02d",i));for(int i=1;i<=5;i++) expected.add("C"+i);for(int i=1;i<=8;i++) expected.add("V"+i);expected.add("E1");expected.add("E2");
+        PreparationValidator preparation=new PreparationValidator(validator.root());
+        Map<String,Path> casePaths=new LinkedHashMap<>();
         Map<String,JsonNode> cases=new LinkedHashMap<>();Set<String> covered=new HashSet<>();int subcases=0,assertions=0;
         List<String> problems=new ArrayList<>();
         for(Path path:paths) {
             JsonNode c=validator.caseFile(path);String id=Json.required(c,"caseId");
             if(cases.put(id,c)!=null) problems.add("Duplicate caseId "+id);
+            casePaths.put(id,path);
             subcases+=c.path("subcases").size();
             for(JsonNode sub:c.path("subcases")) for(JsonNode assertion:sub.path("assertions")) {
                 assertions++;for(JsonNode r:assertion.path("requirementRefs")) covered.add(r.asText());
             }
-            Path feature=path.resolveSibling("scenario.feature");
-            if(!Files.isRegularFile(feature)) problems.add("Missing feature "+id);
-            else {
-                String text=Files.readString(feature); if(!text.startsWith("# language: ko")) problems.add("Feature is not Korean "+id);
-                for(JsonNode sub:c.path("subcases")) {
-                    if(!text.contains("\""+sub.path("id").asText()+"\"")) problems.add("Feature omits subcase "+id+"/"+sub.path("id").asText());
-                    for(JsonNode action:sub.path("actions")) if(!text.contains("\""+action.path("id").asText()+"\"")) problems.add("Feature omits action "+id+"/"+action.path("id").asText());
-                    for(JsonNode assertion:sub.path("assertions")) if(!text.contains("\""+assertion.path("id").asText()+"\"")) problems.add("Feature omits assertion "+id+"/"+assertion.path("id").asText());
-                }
-            }
+            problems.addAll(preparation.feature(path,c));
         }
         for(String id:expected) if(!cases.containsKey(id)) problems.add("Missing required case "+id);
         for(int i=1;i<=26;i++) if(!covered.contains(String.format("D%02d",i))) problems.add("Missing requirement assertion "+String.format("D%02d",i));
         Path registry=validator.path("verification/cases/registry.json");
         if(!Files.isRegularFile(registry)) problems.add("Missing independent expected scenario/subcase registry");
         else {
-            JsonNode r=Json.read(registry); if(r.path("expectedCases").asInt(-1)!=cases.size() || r.path("expectedSubcases").asInt(-1)!=subcases) problems.add("Case/subcase discovery count differs from registry");
-            for(JsonNode entry:r.path("cases")) {JsonNode c=cases.get(entry.path("caseId").asText()); if(c==null) {problems.add("Undiscovered registry case "+entry.path("caseId"));continue;}
-                Set<String> registered=new HashSet<>();entry.path("subcaseIds").forEach(n->registered.add(n.asText()));Set<String> actual=new HashSet<>();c.path("subcases").forEach(n->actual.add(n.path("id").asText()));if(!registered.equals(actual)) problems.add("Subcase registry mismatch "+entry.path("caseId"));
-            }
+            problems.addAll(preparation.registry(Json.read(registry),cases,casePaths,expected));
         }
         Path catalog=validator.path("verification/requirements/mandatory-oracles.json");
         if(!Files.isRegularFile(catalog)) problems.add("Missing independent normative oracle catalog");

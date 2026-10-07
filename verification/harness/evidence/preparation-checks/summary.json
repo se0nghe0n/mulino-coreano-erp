@@ -1,0 +1,62 @@
+{
+  "recordType": "PREPARATION_SELFTEST_EVIDENCE",
+  "timestamp": "2026-10-07T13:20:42.092388+00:00",
+  "baselineCommit": "134d5c566825ee44b94c25806afe1b10b907cd2d",
+  "workingTreeDirty": true,
+  "sourceAndFixtureSha256": {
+    "verification/harness/src/main/java/org/mulino/verification/Main.java": "5f331bf2b2dda30a4df5f1fd173f47af9ef9d8fb220f9bf3c6b33423a8ae72ff",
+    "verification/harness/src/main/java/org/mulino/verification/PreparationValidator.java": "37a91fdb790fe509ab0af35fc28e39126f1fa3025eafb87e8e893f2162d91924",
+    "verification/harness/src/test/java/org/mulino/verification/PreparationValidatorTest.java": "1b1fc66b34fa9dfd64027ac5c96ef936b3862e098fcda6794193e5e4a636a90e",
+    "verification/harness/pom.xml": "644deefa3a0b4bd16a703959fa0abcb14f2da8f476e8b21f787da20778e83687",
+    "verification/harness/src/test/resources/examples/HARNESS-EXAMPLE/case.json": "4c9df9fb061258be4cb9291ad72417c56888fe60f9812ead023ea070569ceb0f",
+    "verification/harness/src/test/resources/examples/HARNESS-EXAMPLE/fixture.json": "657b13656457e4aa6328628eadf9a06683a5f35111504c0e86e373a27c00a03f",
+    "verification/harness/src/test/resources/examples/HARNESS-EXAMPLE/scenario.feature": "949d9c42e73181e1bd93d18f7dcdd277b9f039187d3eebd91d1640141079a8f0",
+    "verification/requirements/mandatory-oracles.json": "61968b22cde1f35922df323d964599228d8dfbbe71b0ee32192b59de0a9f5ed9"
+  },
+  "java": "21.0.5+11-LTS",
+  "maven": "3.9.16",
+  "gherkin": "42.0.1",
+  "messages": "34.2.1 (cucumber-bom 8.0.4 dependencyManagement)",
+  "checks": [
+    {
+      "command": "./verify harness",
+      "exitCode": 0,
+      "status": "PASS",
+      "tests": 57,
+      "preparationTests": 39,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "artifact": "harness.txt"
+    },
+    {
+      "command": "./verify contract-red",
+      "exitCode": 1,
+      "status": "EXPECTED_RED",
+      "tests": 1,
+      "failures": 1,
+      "skipped": 0,
+      "reason": "NOT_IMPLEMENTED: no real product adapters installed",
+      "artifact": "contract-red.txt"
+    },
+    {
+      "command": "./verify scenarios",
+      "exitCode": 2,
+      "status": "NOT_RUN",
+      "artifact": "scenarios.json"
+    },
+    {
+      "command": "python3 verification/requirements/validate_catalog.py",
+      "exitCode": 0,
+      "status": "STRUCTURE_VALID",
+      "oracleCount": 122,
+      "observationCount": 499,
+      "caseCount": 41,
+      "runtimeCoverage": "NOT_RUN"
+    }
+  ],
+  "runtimeComplete": false,
+  "productRuntimeClaimed": false,
+  "step2CompleteClaimed": false,
+  "fullProductPrepare": "NOT_RUN: isolated baseline has no 41 product case files; helper fixtures and full harness are checked"
+}
