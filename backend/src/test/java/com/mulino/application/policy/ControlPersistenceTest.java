@@ -98,6 +98,7 @@ class ControlPersistenceTest {
     tx(()->{guard.fence(ctx,preparation());assertThrows(DomainError.class,()->guard.verify(ctx,"reserveQuantity","hash",preparation(),Map.of()));});
    }finally{release.countDown();pool.shutdownNow();}
  }
+ @AfterAll static void cleanup() throws Exception {PG.stop();try(var paths=java.nio.file.Files.walk(BLOB)){for(var path:paths.sorted(Comparator.reverseOrder()).toList())java.nio.file.Files.deleteIfExists(path);}}
  private static java.sql.Timestamp ts(Instant at){return java.sql.Timestamp.from(at);}
  private static String id(){return UUID.randomUUID().toString();}
 }
