@@ -81,3 +81,33 @@ ReceiptRepository의 final 선언이 Spring proxy 생성을 막았다.
 PURCHASE_ORDER subject DB 제약과 같은 물량에 대한 후속 기관 결정의
 canonical identity를 보완한다. 실제 수령 뒤 부족 책임을 현재 잔여량과
 맞추는 동작도 검증 중이다. 이 항목과 native 경로가 남아 S3는 ACTIVE다.
+
+## 결합 인수 완료
+
+위 항목과 후속 원천·책임 계약을 통합한 뒤 S3의 개발 fixture 인수를
+완료했다. [결합 manifest](evidence/step3-s3/final/summary.json)에 전체
+backend 결과, native source 동일성, 실제 JAR와 package의 연결을 남겼다.
+
+- Backend 전체371 실행에서370 PASS와 identity 회수 시각 기대 실패
+  하나를 관찰했다. DB 시각과 서버 시각의 일치를 가정하던 fixture를
+  고쳤다. 원래 실패의 정확한 clock 차이는 미측정이다. 같은 인가
+  clock으로 회수를 기록하고 효력 발생과 즉시 거부를 확인한 identity
+  두 검사가 통과했다. 변경한 파일이 이 test 하나임을 대조해 전체
+  371개 결과를 결합했다. Production source는 바뀌지 않았다.
+- Harness427 PASS, 준비41 case·789 subcase·20473 assertion이며 준비
+  문제0이다. 준비 성공은 전체 제품 runtime 성공을 뜻하지 않는다.
+- 실제 서명 HTTP·독립 JDBC154 actions와594 assertions가 통과했다.
+  구매100→60+40, 같은60 중복 제외, 초과5 차이, 잔여 책임40→0,
+  기관30·QC100, 독립 제한, 취소 책임과 수령60 응답 유실/재시도
+  단일 효과를 검증했다. 세 실패 시도와 최종 성공을 함께 보존했다.
+- Native의 product/schema217개와 runner/fixture51개 hash가 통합
+  source와 일치한다. 새 package와 실행 JAR는 ZIP metadata가 다르지만
+  내부496개 파일 내용이 모두 같다. 불필요한 동일 실행은 반복하지 않았다.
+- CDS/Flyway1432 columns의 구조·PK 차이0이다. Timestamp widening과
+  NOT NULL 강화는 명시한 compatibility 목록과 일치한다.
+
+[좁은 review 세 지적](s3-review/early-review.md)은 CLOSED다. Native
+병렬 요청은 transaction barrier 검증이 아니며, 기존 TRANSIT fixture는
+최초 취득을 증명하지 않는다. 전체 T/C/V/E, 실모델·운영 규제·BTP,
+사용자 Step3 전체 두 모델 review는 별도 미완료 gate로 유지한다.
+다음 순차 시스템 Step는 S4다.

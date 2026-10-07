@@ -183,29 +183,30 @@ runner와 전체 coverage assembler에 연결되지 않았다. Step2에서는
 | S0 | 추적·stack spike·schema/auth/MCP 기준선 | COMPLETE |
 | S1 | core·정의·증거·신원·두 진입점 읽기 | COMPLETE |
 | S2 | 목표·책임·거래·승인·idem·감사·복구 | COMPLETE (구현 core) |
-| S3 | 구매·운송·수입·수령·QC | ACTIVE |
+| S3 | 구매·운송·수입·수령·QC | COMPLETE (개발 fixture) |
 | S4 | 판매·반품·회수·정산·E1 | NOT_RUN |
 | S5 | MCP·skills/client/model·정의 전환 | NOT_RUN |
 | S6 | 운영·BTP·upgrade·restore·cutover | NOT_RUN |
 
 사용자 Step 1의 skills 파일은 S5 인수의 준비물이다. 문서와 manifest
 존재는 서버 구현·client loading·실제 호출·운영 인수를 대신하지 않는다.
-Java21/CAP/Maven/PostgreSQL은 후보이며 exact 조합은 S0에서 검증한다.
-`./verify harness`의 실행을 확인했고 실제 제품 profile은 adapter 부재로
-`NOT_RUN`이다. startup과 운영 인수는 아직 확인하지 않았다. 운영
-매뉴얼은 사용자 Step 6의 검증 후 산출물이다.
+Java21/CAP/Maven/PostgreSQL의 로컬 조합과 startup은 S0에서 검증했다.
+S1–S3 native adapter의 실제 서명 HTTP·DB 실행 증거를 각 기록에
+연결했다. 전체 normative case와 운영 인수는 아직 완료하지 않았다.
+운영 매뉴얼은 사용자 Step 6의 검증 후 산출물이다.
 
 ## 필수 인수와 미결정값
 
-D01–D26, T01–T26, C1–C5, V1–V8, E1/E2 모두 구현/실행 `NOT_RUN`이다.
+D01–D26, T01–T26, C1–C5, V1–V8, E1/E2의 전체 인수는 미완료다.
+완료한 S0–S3의 한정 실행 근거를 전체 coverage로 확대하지 않는다.
 세부 oracle과 해당 S gate는 계획 §13을 따른다. 실모델·규제·BTP
 인수를 로컬 결정적 tests나 논리 review로 대신하지 않는다.
 
-R2는 [결정 기록](decisions.md)에서 로컬 추적으로 확정했다. R1 stack,
-R3 실자료, R4/R6 정책, R5 실제 신원, R7 BTP, R8 모델 비용과 수용치는
-각 gate의 실제 증거로 확정해야 한다. R8의 추가 UAT 비용 질문은 아직
+R2는 [결정 기록](decisions.md)에서 로컬 추적으로 확정했다. R1의 로컬
+stack과 R3의 실자료 없음도 확정했다. R4/R6 운영 정책, R5 실제 신원,
+R7 BTP, R8 모델 비용과 수용치는 각 gate의 증거가 필요하다. R8 질문은 아직
 답변 대기다. 경과 시간을 동의로 취급하지 않는다. 이와 독립적인
-Step 2 테스트 작성은 계속한다. 알려지지 않은 정책을 임의 허용하지
+구현과 결정적 검증은 계속한다. 알려지지 않은 정책을 임의 허용하지
 않으며 필수 gate를 비대상으로 바꾸지 않는다.
 
 ## 실행 증거와 다음 행동
@@ -316,3 +317,18 @@ backend는 `e249df7`의 235 PASS 이후 변경이 없고 최종 JAR hash가
 
 S3의 [소유권·결합 기록](step-3-s3.md)을 기준으로 독립 Subtask를
 병렬 실행한다. 개별 PASS는 S3 통합 완료가 아니다.
+
+## S3 개발 fixture 인수 완료
+
+[S3 통합 기록](step-3-s3.md)과 [결합 manifest](evidence/step3-s3/final/summary.json)를
+기준으로 S3를 닫았다. Backend 371개는 전체 실행과 수정한 identity
+suite의 결합 결과이며 failure/error/skip 0이다. 제품 source는 그대로다.
+Harness 427개와 native HTTP/JDBC 594개 assertion이 통과했다. 새
+패키지와 native 실행 JAR의 내부 파일 496개가 모두 같은 내용이다.
+
+구매100→실수령60+40, 중복·초과 수령, 잔여 책임40→0, 기관허용30과
+QC100, 독립 제한, 취소 책임, 실제 응답 유실 뒤 수령60의 단일 효과를
+확인했다. 기존 TRANSIT60 사례는 이동만 검증했다. 세 좁은 review
+지적을 해소했으며 사용자 Step3 전체 두 모델 review는 아직 남았다.
+S4 판매·반품·회수·정산 구현으로 진행한다. 모델/BTP와 전체 normative
+coverage를 이 완료 판정에 포함하지 않는다.
