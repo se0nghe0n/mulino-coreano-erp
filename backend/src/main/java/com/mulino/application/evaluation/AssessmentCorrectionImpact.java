@@ -19,7 +19,11 @@ public class AssessmentCorrectionImpact implements EvidenceCorrectionImpact {
   for(String id:ids){
     service.invalidate(c,id);
     var duty=duties.getIfAvailable();if(duty==null)throw new DomainError("HELD","FOLLOWUP_UNAVAILABLE","Correction requires retained responsibility");
-    if(occurrences.isEmpty())throw new DomainError("HELD","SOURCE_UNVERIFIED","Correction impact requires canonical source reconciliation");
+    if(occurrences.isEmpty()){
+      var raw=rawEvidence(c,correction.currentId());
+      var profile=profile(c,raw.row.get("sourceProfileId"));
+      duty.ensureEvidenceCorrectionDuty(c,id,correction.currentId(),raw.kind,profile.get("nextAction").toString(),instant(profile.get("nextCheckAt")));continue;
+    }
     for(var occurrence:occurrences){
       var profile=repository.rows(c,"mulino.evidence.SourceProfiles").stream().filter(p->Objects.equals(p.get("ID"),occurrence.get("sourceProfileId"))).findFirst().orElseThrow(()->new DomainError("HELD","SOURCE_UNVERIFIED","Source follow-up profile missing"));
       if(profile.get("nextAction")==null||profile.get("nextCheckAt")==null)throw new DomainError("HELD","FOLLOWUP_UNAVAILABLE","Source next action and check required");
