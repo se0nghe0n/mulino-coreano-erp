@@ -18,7 +18,12 @@ class S3SharedIntegrationTest extends S1ReadIntegrationTest {
   @Autowired ApplicationCommands commands;
   @Autowired TradeImpact impact;
   @BeforeEach void commandContract()throws Exception {
-    jdbc.update("UPDATE mulino_work_read_Works SET status='ACTIVE',waitJson=NULL WHERE organizationId=? AND ID=?",org,work);
+    // Same authoritative COMMAND Work setup as ReceiptGatewayPostgresTest;
+    // imported S1 rows remain immutable and are not rewritten by this fixture.
+    work=id();
+    var authoritative=workRow(work);
+    authoritative.putAll(row("itemId",item,"lotId",lot,"definitionVersionId",definition,"kind","REVIEW","status","ACTIVE","ownerId",actor,"supervisorId",actor,"lifecycleMode","COMMAND"));
+    insert("mulino_work_read_Works",authoritative);
     String grant=jdbc.queryForObject("SELECT ID FROM mulino_identity_Grants WHERE organizationId=?",String.class,org);
     insert("mulino_identity_CapabilityAssignments",row("organizationId",org,"ID",id(),"actorId",actor,"capabilityId","s3SharedImpact","scopeKind","ORGANIZATION","scopeId",org,"validFrom",Timestamp(Instant.now().minusSeconds(3600)),"validUntil",Timestamp(Instant.now().plusSeconds(3600))));
     insert("mulino_identity_GrantActions",row("organizationId",org,"grantId",grant,"capabilityId","s3SharedImpact"));

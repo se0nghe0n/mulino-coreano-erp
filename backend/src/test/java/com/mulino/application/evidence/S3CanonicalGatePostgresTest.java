@@ -27,11 +27,10 @@ class S3CanonicalGatePostgresTest extends EvidencePersistenceTest {
     assertEquals("EVIDENCE_UNVERIFIED",assertThrows(DomainError.class,()->require(canonical,physical,OCCURRED.plusSeconds(1),Instant.now().plusSeconds(1))).code());
     assertEquals(1,jdbc.queryForObject("SELECT count(*) FROM mulino_evidence_CanonicalOccurrences",Integer.class));assertEquals(0,jdbc.queryForObject("SELECT count(*) FROM mulino_inventory_QuantityMovements",Integer.class));
   }
-  @Test void sourcePolicyDriftAndSupersededOriginalCannotAuthorizeEffect(){
+  @Test void sourcePolicyIsImmutableAndSupersededOriginalCannotAuthorizeEffect(){
     String physical=uuid(),canonical=reviewed(physical);assertEquals(canonical,require(canonical,physical,OCCURRED.plusSeconds(1),Instant.now()).get("ID"));
-    jdbc.update("UPDATE mulino_evidence_SourceProfiles SET policyVersion='synthetic-v2',revision=2 WHERE organizationId=? AND ID=?",ORG,SOURCE);
-    assertEquals("EVIDENCE_UNVERIFIED",assertThrows(DomainError.class,()->require(canonical,physical,OCCURRED.plusSeconds(1),Instant.now())).code());
-    jdbc.update("UPDATE mulino_evidence_SourceProfiles SET policyVersion='synthetic-v1',revision=3 WHERE organizationId=? AND ID=?",ORG,SOURCE);
+    assertThrows(org.springframework.dao.DataAccessException.class,()->jdbc.update("UPDATE mulino_evidence_SourceProfiles SET policyVersion='synthetic-v2',revision=2 WHERE organizationId=? AND ID=?",ORG,SOURCE));
+    assertEquals(canonical,require(canonical,physical,OCCURRED.plusSeconds(1),Instant.now()).get("ID"));
     String doc=jdbc.queryForObject("SELECT basisDocumentId FROM mulino_evidence_Verifications WHERE canonicalOccurrenceId=?",String.class,canonical);Instant previous=Instant.now();
     request(()->records.attachDocument(document(doc),"original".getBytes()));
     assertEquals(canonical,require(canonical,physical,OCCURRED.plusSeconds(1),previous).get("ID"));
