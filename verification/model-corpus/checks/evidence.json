@@ -1,0 +1,38 @@
+{
+  "schemaVersion": "model-corpus-integrity-evidence-v1",
+  "baselineCommit": "cef526e9f77679d8429fb517184f018d64824443",
+  "checkedAt": "2026-10-07T12:49:27.518042+00:00",
+  "runtimeVersion": "Python 3.14.7",
+  "fixtureCorpusSha256": "a3f72484db73fe83c76794f244ac95e643b0729bf9e486e1e51b8d70ae081b1d",
+  "schemaSha256": "22868adaea9fc323d9c767fdf5775a45ecd3780df8da333231a6ab1140c91789",
+  "checks": [
+    {
+      "kind": "CORPUS_INTEGRITY",
+      "command": "python3 verification/model-corpus/validate.py",
+      "exitCode": 0,
+      "artifactRef": "verification/model-corpus/checks/corpus-integrity.json",
+      "result": "VALID"
+    },
+    {
+      "kind": "VALIDATOR_UNIT",
+      "command": "python3 -m unittest discover -s verification/model-corpus -p test_*.py -v",
+      "exitCode": 0,
+      "artifactRef": "verification/model-corpus/checks/validator-tests.txt",
+      "result": "PASSED"
+    }
+  ],
+  "caseCount": 60,
+  "foreignOrMixedCaseCount": 21,
+  "plannedAttempts": 180,
+  "actualModelAttempts": 0,
+  "actualModelAcceptance": "NOT_RUN",
+  "actualDbApiMcpAcceptance": "NOT_RUN",
+  "usage": null,
+  "totalCost": null,
+  "r8Approval": "NOT_AUTHORIZED",
+  "limitations": [
+    "Only corpus structure, critical oracle integrity and validator fault rejection were executed.",
+    "No semantic observation path is bound to a real server in this artifact.",
+    "No model/client/skill loading or actual business effect was executed."
+  ]
+}

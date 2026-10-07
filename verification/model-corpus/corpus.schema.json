@@ -1,0 +1,711 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:mulino:verification:model-corpus:v1",
+  "title": "독립 실모델 인수 corpus — runtime NOT_RUN",
+  "type": "object",
+  "properties": {
+    "schemaVersion": {
+      "const": "model-corpus-v1"
+    },
+    "baselineCommit": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{40}$"
+    },
+    "status": {
+      "const": "NOT_RUN"
+    },
+    "commonFixture": {
+      "type": "object",
+      "required": [
+        "organizationId",
+        "ids",
+        "businessClock",
+        "authentication",
+        "actors",
+        "grants",
+        "definition",
+        "policy",
+        "objects",
+        "sources",
+        "evidence",
+        "approvalFacts"
+      ]
+    },
+    "executionPlan": {
+      "$ref": "#/$defs/executionPlan"
+    },
+    "acceptanceProposal": {
+      "$ref": "#/$defs/acceptanceProposal"
+    },
+    "modelInputContract": {
+      "type": "object",
+      "required": [
+        "allowedFields",
+        "prohibitedFields",
+        "fixtureDelivery",
+        "evaluationSeparation"
+      ]
+    },
+    "observationContract": {
+      "type": "object",
+      "required": [
+        "description",
+        "operators",
+        "effectScope",
+        "obligationsScope",
+        "denialScope",
+        "slotScope",
+        "fixtureScope"
+      ]
+    },
+    "cases": {
+      "type": "array",
+      "minItems": 60,
+      "maxItems": 60,
+      "items": {
+        "$ref": "#/$defs/case"
+      }
+    }
+  },
+  "required": [
+    "schemaVersion",
+    "baselineCommit",
+    "status",
+    "commonFixture",
+    "executionPlan",
+    "acceptanceProposal",
+    "modelInputContract",
+    "observationContract",
+    "cases"
+  ],
+  "additionalProperties": false,
+  "$defs": {
+    "slot": {
+      "type": "object",
+      "properties": {
+        "value": {},
+        "provenance": {
+          "enum": [
+            "USER",
+            "CONTEXT",
+            "APPROVED_DEFAULT"
+          ]
+        },
+        "sourceRef": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": [
+        "value",
+        "provenance",
+        "sourceRef"
+      ],
+      "additionalProperties": false
+    },
+    "assertion": {
+      "type": "object",
+      "properties": {
+        "path": {
+          "type": "string",
+          "pattern": "^(response|state|effects)\\."
+        },
+        "operator": {
+          "enum": [
+            "eq",
+            "lte",
+            "gte",
+            "contains"
+          ]
+        },
+        "expected": {}
+      },
+      "required": [
+        "path",
+        "operator",
+        "expected"
+      ],
+      "additionalProperties": false
+    },
+    "effect": {
+      "type": "object",
+      "properties": {
+        "class": {
+          "type": "string",
+          "minLength": 1
+        },
+        "maxNew": {
+          "type": "integer",
+          "minimum": 0
+        }
+      },
+      "required": [
+        "class",
+        "maxNew"
+      ],
+      "additionalProperties": false
+    },
+    "obligation": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "type": "string",
+          "minLength": 1
+        },
+        "scopeRef": {
+          "type": "string",
+          "minLength": 1
+        },
+        "ownerRef": {
+          "type": "string",
+          "minLength": 1
+        },
+        "status": {
+          "const": "OPEN"
+        },
+        "nextAction": {
+          "type": "string",
+          "minLength": 1
+        },
+        "nextCheckAt": {
+          "type": "string",
+          "minLength": 1
+        },
+        "quantity": {
+          "type": "object",
+          "properties": {
+            "value": {
+              "type": "string",
+              "pattern": "^[0-9]+(\\.[0-9]+)?$"
+            },
+            "unit": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "required": [
+            "value",
+            "unit"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "kind",
+        "scopeRef",
+        "ownerRef",
+        "status",
+        "nextAction",
+        "nextCheckAt"
+      ],
+      "additionalProperties": false
+    },
+    "input": {
+      "type": "object",
+      "properties": {
+        "utterance": {
+          "type": "string",
+          "minLength": 1
+        },
+        "fixtureRef": {
+          "type": "string",
+          "pattern": "^M(0[1-9]|[1-5][0-9]|60)$"
+        },
+        "priorUserTurnRefs": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 0
+        },
+        "contextPolicy": {
+          "const": "PERMITTED_CONTEXT_ONLY"
+        }
+      },
+      "required": [
+        "utterance",
+        "fixtureRef",
+        "priorUserTurnRefs",
+        "contextPolicy"
+      ],
+      "additionalProperties": false
+    },
+    "intent": {
+      "type": "object",
+      "properties": {
+        "status": {
+          "enum": [
+            "STRUCTURED",
+            "NEEDS_INPUT"
+          ]
+        },
+        "intentKind": {
+          "enum": [
+            "QUERY",
+            "RECORD",
+            "COMMAND"
+          ]
+        },
+        "capabilityId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "definitionVersion": {
+          "type": "string",
+          "minLength": 1
+        },
+        "slots": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/$defs/slot"
+          }
+        },
+        "missingSlots": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 0
+        }
+      },
+      "required": [
+        "status",
+        "intentKind",
+        "capabilityId",
+        "definitionVersion",
+        "slots",
+        "missingSlots"
+      ],
+      "additionalProperties": false
+    },
+    "oracle": {
+      "type": "object",
+      "properties": {
+        "outcome": {
+          "enum": [
+            "READ",
+            "APPLIED",
+            "NEEDS_INPUT",
+            "WAITING_APPROVAL",
+            "FORBIDDEN",
+            "REJECTED",
+            "ACCEPTED_PENDING_RECONCILIATION",
+            "CONFLICT"
+          ]
+        },
+        "assertions": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/assertion"
+          },
+          "minItems": 1
+        },
+        "allowedEffects": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/effect"
+          },
+          "minItems": 1
+        },
+        "forbiddenEffects": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 0
+        },
+        "obligations": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/obligation"
+          },
+          "minItems": 0
+        },
+        "clarification": {
+          "type": "object",
+          "properties": {
+            "required": {
+              "type": "boolean"
+            },
+            "slots": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1
+              },
+              "minItems": 0
+            },
+            "newBusinessEffectBeforeAnswer": {
+              "const": 0
+            },
+            "approvalByAnswer": {
+              "const": false
+            }
+          },
+          "required": [
+            "required",
+            "slots",
+            "newBusinessEffectBeforeAnswer",
+            "approvalByAnswer"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "outcome",
+        "assertions",
+        "allowedEffects",
+        "forbiddenEffects",
+        "obligations",
+        "clarification"
+      ],
+      "additionalProperties": false
+    },
+    "turn": {
+      "type": "object",
+      "properties": {
+        "input": {
+          "$ref": "#/$defs/input"
+        },
+        "expectedIntent": {
+          "$ref": "#/$defs/intent"
+        },
+        "oracle": {
+          "$ref": "#/$defs/oracle"
+        }
+      },
+      "required": [
+        "input",
+        "expectedIntent",
+        "oracle"
+      ],
+      "additionalProperties": false
+    },
+    "execution": {
+      "type": "object",
+      "properties": {
+        "status": {
+          "const": "NOT_RUN"
+        },
+        "plannedRepeats": {
+          "const": 3
+        },
+        "attempts": {
+          "type": "array",
+          "maxItems": 0
+        },
+        "observed": {
+          "type": "null"
+        },
+        "reason": {
+          "type": "string",
+          "minLength": 1
+        },
+        "usage": {
+          "type": "null"
+        },
+        "totalCost": {
+          "type": "null"
+        },
+        "latencyMs": {
+          "type": "null"
+        }
+      },
+      "required": [
+        "status",
+        "plannedRepeats",
+        "attempts",
+        "observed",
+        "reason",
+        "usage",
+        "totalCost",
+        "latencyMs"
+      ],
+      "additionalProperties": false
+    },
+    "case": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^M(0[1-9]|[1-5][0-9]|60)$"
+        },
+        "category": {
+          "enum": [
+            "clear_synonyms",
+            "ambiguity_target_conflict",
+            "query_write_boundary",
+            "version_authority_document",
+            "business_exception_responsibility"
+          ]
+        },
+        "title": {
+          "type": "string",
+          "minLength": 1
+        },
+        "languages": {
+          "type": "array",
+          "items": {
+            "enum": [
+              "ko",
+              "it",
+              "en"
+            ]
+          },
+          "minItems": 1
+        },
+        "requirementRefs": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^(T(0[1-9]|1[0-9]|2[0-6])|C[1-5]|V[1-8]|E[12])$"
+          },
+          "minItems": 1
+        },
+        "semanticFocus": {
+          "type": "string",
+          "minLength": 1
+        },
+        "fixture": {
+          "type": "object"
+        },
+        "turns": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/turn"
+          },
+          "minItems": 1
+        },
+        "execution": {
+          "$ref": "#/$defs/execution"
+        }
+      },
+      "required": [
+        "id",
+        "category",
+        "title",
+        "languages",
+        "requirementRefs",
+        "semanticFocus",
+        "fixture",
+        "turns",
+        "execution"
+      ],
+      "additionalProperties": false
+    },
+    "executionPlan": {
+      "type": "object",
+      "properties": {
+        "client": {
+          "type": "object",
+          "properties": {
+            "name": {
+              "type": "null"
+            },
+            "exactVersion": {
+              "type": "null"
+            },
+            "status": {
+              "const": "NOT_RUN"
+            }
+          },
+          "required": [
+            "name",
+            "exactVersion",
+            "status"
+          ],
+          "additionalProperties": false
+        },
+        "model": {
+          "type": "object",
+          "properties": {
+            "provider": {
+              "type": "null"
+            },
+            "exactId": {
+              "type": "null"
+            },
+            "reasoningEffort": {
+              "type": "null"
+            },
+            "status": {
+              "const": "NOT_RUN"
+            }
+          },
+          "required": [
+            "provider",
+            "exactId",
+            "reasoningEffort",
+            "status"
+          ],
+          "additionalProperties": false
+        },
+        "prompt": {
+          "type": "object",
+          "properties": {
+            "version": {
+              "type": "null"
+            },
+            "sha256": {
+              "type": "null"
+            },
+            "status": {
+              "const": "NOT_RUN"
+            }
+          },
+          "required": [
+            "version",
+            "sha256",
+            "status"
+          ],
+          "additionalProperties": false
+        },
+        "skillPackage": {
+          "type": "object",
+          "properties": {
+            "version": {
+              "type": "null"
+            },
+            "sha256": {
+              "type": "null"
+            },
+            "loadingEvidence": {
+              "type": "null"
+            },
+            "status": {
+              "const": "NOT_RUN"
+            }
+          },
+          "required": [
+            "version",
+            "sha256",
+            "loadingEvidence",
+            "status"
+          ],
+          "additionalProperties": false
+        },
+        "server": {
+          "type": "object",
+          "properties": {
+            "commit": {
+              "type": "null"
+            },
+            "schemaVersion": {
+              "type": "null"
+            },
+            "toolVersion": {
+              "type": "null"
+            },
+            "status": {
+              "const": "NOT_RUN"
+            }
+          },
+          "required": [
+            "commit",
+            "schemaVersion",
+            "toolVersion",
+            "status"
+          ],
+          "additionalProperties": false
+        },
+        "repeatCount": {
+          "const": 3
+        },
+        "plannedAttempts": {
+          "const": 180
+        },
+        "approval": {
+          "type": "object",
+          "properties": {
+            "decisionRef": {
+              "const": "R8"
+            },
+            "status": {
+              "const": "NOT_AUTHORIZED"
+            },
+            "approvedCostCap": {
+              "type": "null"
+            },
+            "currency": {
+              "type": "null"
+            },
+            "approvedClientModel": {
+              "type": "null"
+            }
+          },
+          "required": [
+            "decisionRef",
+            "status",
+            "approvedCostCap",
+            "currency",
+            "approvedClientModel"
+          ],
+          "additionalProperties": false
+        },
+        "usage": {
+          "type": "null"
+        },
+        "totalCost": {
+          "type": "null"
+        },
+        "metricMissingReason": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": [
+        "client",
+        "model",
+        "prompt",
+        "skillPackage",
+        "server",
+        "repeatCount",
+        "plannedAttempts",
+        "approval",
+        "usage",
+        "totalCost",
+        "metricMissingReason"
+      ],
+      "additionalProperties": false
+    },
+    "acceptanceProposal": {
+      "type": "object",
+      "properties": {
+        "status": {
+          "const": "PROPOSAL_NOT_BUSINESS_SLA"
+        },
+        "clearStructuredMinimumRatio": {
+          "const": "0.95"
+        },
+        "ambiguousImproperExecutionMaximum": {
+          "const": 0
+        },
+        "unauthorizedEffectMaximum": {
+          "const": 0
+        },
+        "duplicateEffectMaximum": {
+          "const": 0
+        },
+        "falseFulfillmentMaximum": {
+          "const": 0
+        },
+        "approvedInR8": {
+          "const": false
+        }
+      },
+      "required": [
+        "status",
+        "clearStructuredMinimumRatio",
+        "ambiguousImproperExecutionMaximum",
+        "unauthorizedEffectMaximum",
+        "duplicateEffectMaximum",
+        "falseFulfillmentMaximum",
+        "approvedInR8"
+      ],
+      "additionalProperties": false
+    }
+  }
+}
