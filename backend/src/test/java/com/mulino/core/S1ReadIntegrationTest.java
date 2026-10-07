@@ -145,16 +145,28 @@ class S1ReadIntegrationTest {
   Map<String,String> primaryKeys(Connection connection,String schema)throws Exception{
     Map<String,String> result=new TreeMap<>();try(var statement=connection.prepareStatement("SELECT tc.table_name,string_agg(k.column_name,',' ORDER BY k.ordinal_position) FROM information_schema.table_constraints tc JOIN information_schema.key_column_usage k ON tc.constraint_name=k.constraint_name AND tc.table_schema=k.table_schema WHERE tc.table_schema=? AND tc.constraint_type='PRIMARY KEY' AND tc.table_name LIKE 'mulino_%' GROUP BY tc.table_name")){statement.setString(1,schema);try(var rows=statement.executeQuery()){while(rows.next())result.put(rows.getString(1),rows.getString(2));}}return result;
   }
+  @Test void ordinaryStartupCannotReachSpikeWritesOrDefaultCapProjection()throws Exception{
+    String forgedRoleToken=token(true);var client=HttpClient.newHttpClient();
+    for(String path:List.of("/api/platform/actions/reserve","/mcp","/odata/v4/platform/reserve")){
+      var response=client.send(HttpRequest.newBuilder(URI.create("http://localhost:"+port+path)).header("Authorization","Bearer "+forgedRoleToken).header("Content-Type","application/json").POST(HttpRequest.BodyPublishers.ofString("{}" )).build(),HttpResponse.BodyHandlers.ofString());
+      assertTrue(Set.of(403,404).contains(response.statusCode()),path+" must be unavailable outside platform-spike: "+response.statusCode()+" "+response.body());
+    }
+    var projected=client.send(HttpRequest.newBuilder(URI.create("http://localhost:"+port+"/odata/v4/platform/Scopes")).header("Authorization","Bearer "+forgedRoleToken).GET().build(),HttpResponse.BodyHandlers.ofString());
+    assertTrue(Set.of(403,404).contains(projected.statusCode()),"Default CAP projection must remain inaccessible: "+projected.statusCode());
+    assertEquals(200,http("/api/ontology/queries/getObject",request("getObject",item,null),true,false).statusCode());
+  }
   @Test @SuppressWarnings("unchecked") void signedEvidenceSelectorsStayTypedAndOrganizationScoped()throws Exception{
     var request=row("id",document,"scope",Map.of("organizationId",org,"kind","DOCUMENT","subjectKind","ITEM","subjectId",item),"asOf",AS_OF.toString(),"knownAt",KNOWN.toString());
     var allowed=http("/api/ontology/queries/getEvidence",request,true,false);assertEquals(200,allowed.statusCode(),allowed.body());var result=json.readValue(allowed.body(),Map.class);assertEquals(document,((Map<?,?>)result.get("data")).get("ID"));assertEquals("UNKNOWN",((Map<?,?>)result.get("data")).get("availability"));
     request.put("scope",Map.of("organizationId",id(),"kind","DOCUMENT","subjectKind","ITEM","subjectId",item));assertEquals(403,http("/api/ontology/queries/getEvidence",request,true,false).statusCode());
     request.put("scope",Map.of("organizationId",org,"kind","SQL","subjectKind","ITEM","subjectId",item));assertEquals(400,http("/api/ontology/queries/getEvidence",request,true,false).statusCode());
   }
-  String token() throws Exception {
+  String token() throws Exception {return token(false);}
+  String token(boolean spikeRole) throws Exception {
     long now=Instant.now().getEpochSecond();var encode=Base64.getUrlEncoder().withoutPadding();
     String header=encode.encodeToString(json.writeValueAsBytes(Map.of("alg","RS256","typ","JWT")));
-    String claims=encode.encodeToString(json.writeValueAsBytes(row("iss","https://mulino.local.invalid","aud",List.of("mulino-platform"),"sub","writer-a","organizationId",org,"stableRequestOwner","forged-owner-ignored","iat",now,"nbf",now-5,"exp",now+3600)));
+    var tokenClaims=row("iss","https://mulino.local.invalid","aud",List.of("mulino-platform"),"sub","writer-a","organizationId",org,"stableRequestOwner","forged-owner-ignored","iat",now,"nbf",now-5,"exp",now+3600);if(spikeRole)tokenClaims.put("roles",List.of("platform-spike"));
+    String claims=encode.encodeToString(json.writeValueAsBytes(tokenClaims));
     String body=header+"."+claims;var signer=java.security.Signature.getInstance("SHA256withRSA");signer.initSign(KEY.getPrivate());signer.update(body.getBytes(java.nio.charset.StandardCharsets.US_ASCII));return body+"."+encode.encodeToString(signer.sign());
   }
   HttpResponse<String> http(String path,Map<String,Object> body,boolean signed,boolean mcp)throws Exception{
