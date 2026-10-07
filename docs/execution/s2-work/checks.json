@@ -4,7 +4,7 @@
   "systemStage": "S2_ACTIVE",
   "baseline": "40a240c3886d3316ba1fd686e9b44bfa1ba6ec2d",
   "runtime": "Java21/CAP5.1.1/PostgreSQL18.6/CQN",
-  "checkedCommit": "14d704a",
+  "checkedCommit": "f9c5e8b",
   "dependencyBaseline": "28b224eb68ab06cc2040e4d0284c860eba3faf73",
   "checks": [
     {
@@ -54,6 +54,13 @@
       "observed": "actual coupled PostgreSQL gateway6 PASS; failures0 errors0 skipped0; declared Work W1 with selected Work W2 and wrong TradeItem noun reject with TYPE_INVALID before any cancel effect; correct Work, public TradeItem and permitted empty subjects succeed",
       "exitCode": 0,
       "artifact": "s2-work-subject-gateway.log.gz"
+    },
+    {
+      "source": "f9c5e8b",
+      "command": "JAVA_HOME=/Library/Java/JavaVirtualMachines/zulu-21.jdk/Contents/Home PATH=/Users/n30gu1/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin:/Library/Java/JavaVirtualMachines/zulu-21.jdk/Contents/Home/bin:$PATH ./mvnw -f backend/pom.xml -Dtest=S2WorkActualIntegrationTest test",
+      "observed": "actual coupled PostgreSQL gateway7 PASS; failures0 errors0 skipped0; authorized W1/W3 with same-item verified A2 from unauthorized W2 rejects contradictory source TYPE_INVALID and truthful unauthorized source FORBIDDEN with zero links/credits/revision effects and persisted denial; actual A1 from W1 applies",
+      "exitCode": 0,
+      "artifact": "s2-work-activity-source.log.gz"
     }
   ],
   "limitations": [
@@ -64,8 +71,8 @@
   ],
   "files": {
     "backend/src/test/java/com/mulino/core/S2WorkActualIntegrationTest.java": {
-      "sha256": "c3e9996e81f3947afce9f1f8be50f84306e2b7a5a78d55af6b612577324af7a3",
-      "source": "14d704a"
+      "sha256": "f8339b20ac45a889c629da77b8ae49e2fd12b13ef20b0a47ec1267c962226118",
+      "source": "f9c5e8b"
     },
     "backend/src/test/java/com/mulino/core/S2WorkLifecyclePostgresTest.java": {
       "sha256": "b51b13f32777bd502e49c59a190a81531fb37a97c2073b9f3d884af2cc8dbd06",
@@ -76,8 +83,8 @@
       "source": "unchanged GoalInputTest"
     },
     "backend/src/main/java/com/mulino/application/work/WorkLifecycle.java": {
-      "sha256": "bb91cc604c1df30695dbd9bbfef35bc675c7b1eca34adbb086a4d3e25ab9437d",
-      "source": "14d704a"
+      "sha256": "88cfc571edd58747d57d3b01e52470c265cf43e401a7917a68343848dad7d72e",
+      "source": "f9c5e8b"
     }
   },
   "acceptance": [
@@ -86,7 +93,8 @@
     "Public ApplicationCommands createWork persists explicit interval booleans; revision preserves old endpoints and deadline history; public newDueAt/previousGoalVersion creates immutable version3",
     "Actual command gateway draft/cancel/replay yields APPLIED, two committed records and audits, and no unsolicited external delivery",
     "Closed correction followup is source-idempotent, preserves original CLOSED history and requires explicit independent Goal revision",
-    "Handler-owned typed subjectBindings validate exact published noun, actual target IDs and action cardinality before and after serialized fences; generic authorization scopes do not become declared subjects"
+    "Handler-owned typed subjectBindings validate exact published noun, actual target IDs and action cardinality before and after serialized fences; generic authorization scopes do not become declared subjects",
+    "Verified activity authoritative source is resolved before subject binding, authorization, serialized Work fences and execute; contradictory supplied source rejects, execute and dependency cycle guard recheck/use identical canonical source"
   ],
   "subjectBindingDependency": "3d44a08"
 }
