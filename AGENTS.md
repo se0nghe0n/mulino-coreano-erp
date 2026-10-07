@@ -79,6 +79,9 @@ worktree는 통합됐거나 복구 가능함을 확인한 뒤 정리한다.
 새 fork Task의 추적 위치와 이슈 연결은 사용자와 확정한다. 원본 #57은
 방법론 참고이며 새 전체 구현 이슈가 아니다. 기존 원본 board·Phase
 규칙으로 새 fork 범위를 제한하거나 scope를 임의 변경하지 않는다.
+2026-10-07 사용자가 `track locally.`로 로컬 추적을 확정했다.
+[R2 결정](docs/execution/decisions.md)에 따라 로컬 실행 기록을 사용하며
+원격 issue 없이 사용자 Step 2 이후의 구현 작업을 진행한다.
 [구현 이슈 초안](docs/execution/implementation-issue.md)은 게시된
 이슈가 아니다. 추적 결정과 무관한 문서·조사·skills 준비는 계속한다.
 원격 이슈 게시나 repository 설정 변경의 권한을 추정하지 않는다.

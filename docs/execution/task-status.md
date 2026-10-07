@@ -15,9 +15,9 @@
 - 옛 구현은 새 작업 트리에서 제거했다. Git 이력은 보존하며
   옛 코드·tests·schema·skills·운영 문서를 읽거나 재사용하지 않는다.
   원본 #57의 테스트 방법론만 새 업무에 맞게 참고한다.
-- 새 fork 구현 이슈: 미확정이다. fork의 issue 기능이 비활성 상태로
-  확인됐다. [이슈 초안](implementation-issue.md)을 준비하고 추적
-  위치를 사용자와 결정한다. 원본 board/Phase를 새 Task로 간주하지 않는다.
+- 새 Task는 사용자 답변 `track locally.`에 따라 로컬 Git과 이 기록으로
+  추적한다. [R2 결정](decisions.md)을 확정했고 [이슈 초안](implementation-issue.md)은
+  로컬 범위 기록으로 유지한다. 원본 board/Phase를 새 Task로 간주하지 않는다.
 - 실제 authoritative DB·blob·외부 효과·미해결 업무 유무는 S0의
   별도 inventory 대상이다. 파일 제거로 자료가 없음을 추론하지 않는다.
 
@@ -26,7 +26,7 @@
 | Step | 작업 | 실행 모델 / effort | 상태 |
 |---|---|---|---|
 | 1 | 새 skills와 실행 지침 | GPT-6.1 Sol / high | COMPLETE |
-| 2 | 전체 계획의 tests | GPT-6.1 Sol / high | PENDING |
+| 2 | 전체 계획의 tests | GPT-6.1 Sol / high | ACTIVE |
 | 3 | 새 시스템 구현 | GPT-6.1 Sol / medium | PENDING |
 | 4 | 실제 E2E | GPT-6.1 Sol / low | PENDING |
 | 5 | 패턴 분석·refactor | GPT-6 Astra / high | PENDING |
@@ -37,8 +37,8 @@
 모든 산출물 통합·지적 수정·결합 checks까지 끝나야 Step를 닫는다.
 Step 1의 정적 checks와 두 실제 reviewer의 closure가 `fe0d8df`에서
 통과했다. 필수 지적이 모두 해결돼 Step 1은 `COMPLETE`다. 이 기록의
-통합·최종 일치 검사는 coordinator가 수행한다. Step 2는 R2 추적 결정
-대기로 `PENDING`이다. [Step 1 검토 기록](step-1-review.md)을 따른다.
+통합·최종 일치 검사는 coordinator가 수행했다. R2는 로컬 추적으로
+확정했으며 Step 2를 시작한다. [Step 1 검토 기록](step-1-review.md)을 따른다.
 
 ## Step 1 소유권과 통합
 
@@ -97,14 +97,12 @@ D01–D26, T01–T26, C1–C5, V1–V8, E1/E2 모두 구현/실행 `NOT_RUN`이�
 세부 oracle과 해당 S gate는 계획 §13을 따른다. 실모델·규제·BTP
 인수를 로컬 결정적 tests나 논리 review로 대신하지 않는다.
 
-R1–R9의 실제 결정 register는 아직 작성하지 않았다. 특히 R2 추적,
-R3 실자료, R4/R6 정책, R5 실제 신원, R7 BTP, R8 모델 비용과 수용치를
-미확정으로 유지한다. R2는 fork issue 기능 활성화와 이슈 게시 또는
-로컬 추적 유지의 선택 질문이 pending이다. R8은 추가 UAT 비용 상한
-20/50 또는 견적 준비의 선택 질문이 pending이다. 답변은 아직 없으며
-경과 시간을 동의로 취급하지 않는다. 이 질문과 무관한 Step 1 통합·
-review·checks는 계속한다. 알려지지 않은 정책을 임의 허용하지 않으며
-필수 gate를 비대상으로 바꾸지 않는다.
+R2는 [결정 기록](decisions.md)에서 로컬 추적으로 확정했다. R1 stack,
+R3 실자료, R4/R6 정책, R5 실제 신원, R7 BTP, R8 모델 비용과 수용치는
+각 gate의 실제 증거로 확정해야 한다. R8의 추가 UAT 비용 질문은 아직
+답변 대기다. 경과 시간을 동의로 취급하지 않는다. 이와 독립적인
+Step 2 테스트 작성은 계속한다. 알려지지 않은 정책을 임의 허용하지
+않으며 필수 gate를 비대상으로 바꾸지 않는다.
 
 ## 실행 증거와 다음 행동
 
@@ -128,9 +126,9 @@ coordinator가 3개 skill의 `quick_validate.py`를 uv+PyYAML 환경에서
 fresh 검사 결과는 [정적 검사 증거](evidence/step1-static-checks.txt)에
 기록했다. 두 실제 reviewer의 최종 범위 내 판정도 PASS다.
 
-다음은 이 기록을 Task branch에 통합해 최종 일치를 확인하고 R2 추적
-위치 답변에 따라 Step 2에 착수하는 일이다. 아직 Step 2는 시작하지
-않았다. startup·도메인·DB·MCP/client·모델·BTP 인수는 NOT_RUN이다.
+다음은 공통 테스트 harness와 계약을 검증·통합하고 같은 기준선에서
+사례별 테스트를 작성하는 일이다. startup·도메인·DB·MCP/client·모델·
+BTP 인수는 NOT_RUN이다.
 
 Step 1 기록 통합과 최종 일치 검사는 `393cb5c`에서 완료했다. 이후
 R2와 독립적인 읽기 조사를 실제 GPT-6.1 Sol high 두 worker가 수행했다.
@@ -140,6 +138,6 @@ R2와 독립적인 읽기 조사를 실제 GPT-6.1 Sol high 두 worker가 수행
 `d6d60b3`, `d42f159`에서 통합했다. 제안 계약은 아직 동결하지 않았다.
 이 조사에서 앱·test 코드와 DB를 만들거나 실행하지 않았다.
 
-2026-10-07의 후속 GitHub 조회에서도 fork의 `has_issues=false`를
-확인했다. R2 질문에는 아직 답변이 없으며 원격 설정·이슈 게시를
-수행하지 않았다. Step 2 코드 작성은 계속 `PENDING_R2`다.
+2026-10-07의 후속 GitHub 조회에서 fork의 `has_issues=false`를 확인했다.
+이후 사용자가 로컬 추적을 선택해 R2 대기를 해소했다. 조사 문서의
+`PENDING_R2`는 당시 snapshot이며 현재 상태는 이 기록을 따른다.
