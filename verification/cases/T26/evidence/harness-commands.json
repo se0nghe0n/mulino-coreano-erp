@@ -1,0 +1,38 @@
+{
+  "entrypoint": [
+    "./verify",
+    "harness"
+  ],
+  "timestamp": "2026-10-07T14:36:15Z",
+  "commands": [
+    {
+      "command": [
+        "java",
+        "-version"
+      ],
+      "exitCode": 0,
+      "elapsedSeconds": 0.045
+    },
+    {
+      "command": [
+        "/Volumes/VideoStore/Developer/mulino-ontology-step2-runtime/mvnw",
+        "-version"
+      ],
+      "exitCode": 0,
+      "elapsedSeconds": 0.238
+    },
+    {
+      "command": [
+        "/Volumes/VideoStore/Developer/mulino-ontology-step2-runtime/mvnw",
+        "-B",
+        "-ntp",
+        "-f",
+        "/Volumes/VideoStore/Developer/mulino-ontology-step2-runtime/verification/harness/pom.xml",
+        "test"
+      ],
+      "exitCode": 0,
+      "elapsedSeconds": 2.922
+    }
+  ],
+  "exitCode": 0
+}

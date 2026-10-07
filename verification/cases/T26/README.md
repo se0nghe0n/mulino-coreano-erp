@@ -1,0 +1,73 @@
+# T26 지속 복구·운영·복원 인수 계약
+
+queue 전달 성공은 업무 원장이 아니다. 이 계약은 실제 명령 뒤 발생한
+장애를 DB에서 다시 찾고, 기술 재시도·현재 인가·물량·인간 책임을
+각각 확인한다. 복구 완료 상태를 fixture에 넣지 않는다.
+
+기준선은 `step2-b2`=`feaca0af9673620eff9a5ac0f08a657ce14e9ccd`다.
+Step 2는 제품 구현 전 계약 작성이다. 실제 제품 API·PostgreSQL·worker·
+host 복원 adapter는 `NOT_RUN`이다. 고정 JUnit 표본은 실제
+`AssertionEngine`을 검사하며 제품 worker나 상태 전이를 구현하지 않는다.
+
+| subcase | 실제로 만드는 장애와 관찰 |
+|---|---|
+| due-wait-db-rediscovery | create/activate/wait 뒤 queue를 비운다. 전체 process를 중지하고 clock을 전진시킨 뒤 DB due index에서 같은 의무를 찾는다. |
+| orphan-intake-recovered | 역사적 종료 부모의 새 온도 이상을 RECORD한다. link commit fault 뒤 접수 책임을 확인하고 실제 자율 재시도에서 업무·의무 각1을 연결한다. |
+| outbox-exhaustion-alert-dedupe | 구매 proposal·MANAGER 승인·발주 전달을 실행한다. 세 번의 확인된 retryable 실패를 backoff clock으로 소진시키고 알림 성공 뒤에도 의무 OPEN과 owner를 확인한다. |
+| operational-nine-categories | 명령·명시적 복구 손상 drill로 아홉 종류의 문제를 만든다. API 문제 ID·stateVersion·owner·다음 행동과 해당 DB 원 행을 대조한다. |
+| safe-retry-canonical-current-grant | move commit fault로 효과0을 만든다. OPERATIONS retry의 원 actor·canonical hash/key·현재 grant·claim fence와 실제 이동20 한 번을 확인한다. |
+| safe-retry-revoked-blocked | 같은 rollback 뒤 grant를 철회하고 재시작한다. retry의 FORBIDDEN·허용 denial audit와 금지된 물량 효과0·남은 인간 책임을 구별한다. |
+| unknown-external-reconcile-before-retry | 상대 문서 commit 뒤 응답을 버린다. status 조회도 unavailable로 둔다. 대조 전 retry 거부, 담당 대조 성공 뒤 외부 전달1 유지와 로컬 연결을 확인한다. |
+| lot-expiry-no-event | LOT 만료20의 boundary를 기록한다. sweeper 중지·clock 전진·실제 출고 거부 뒤 sweep 정지·의무 생성을 확인한다. |
+| disposition-expiry-no-event | 처분 허용의 만료를 같은 순서로 확인한다. |
+| grant-expiry-no-event | warehouse grant 만료를 같은 순서로 확인한다. |
+| policy-expiry-no-event | 현재 정책 만료를 같은 순서로 확인한다. |
+| planned-transition-reindexes | 과거 승인·발행된 v2 artifact를 실제 activate 명령으로 전환한다. 영향 scope 경계 갱신과 기존 Work v1 의미 보존을 확인한다. |
+| emergency-repair-dryrun-apply | 실제 projection 손상 drill 뒤 마지막 확정 명령·scope를 찾는다. dry-run diff·조회 주체 apply 거부·인가된 apply·근거/audit·원장 재대조를 수행한다. |
+| restore-complete | 실제 split8+12·증거 연결·Work 대기 뒤 DB/blob/정의/capability/evaluator/skills/config/배포 bundle을 백업하고 새 환경에 복원한다. |
+| restore-missing-blob | 백업 뒤 복원 reader의 원문 part 읽기 실패를 주입한다. DB 기록이 있어도 원문 가용성 MISSING·복원 INCOMPLETE를 확인한다. |
+| restore-missing-v1-evaluator | 백업 뒤 evaluator v1 part의 복원 읽기 실패를 주입한다. 과거 v1 판정은 남지만 복원 완료나 신규 실행 허용으로 표시하지 않는다. |
+
+## 관찰과 손계산
+
+fixture의 실물은 구별된20BOX 하나다. 임의 wildcard·자동 승인이나
+현재 복구 결과를 seed하지 않는다. 실제 source document bytes와 hash는
+`fixtures/artifacts/`에 있으며 개별 fixture의 `baseline.fixtureArtifacts`가
+그 path/hash/bytes를 고정한다. v2의 과거 발행·승인은 boundary 전환의
+baseline이며 실제 activation 효과를 대신하지 않는다.
+
+만료·출고 거부·권한 철회는 보유20을 감소시키지 않는다. guard가
+SUSPENDED·대조 의무를 기록할 수 있으므로 모든 DB 행의 불변을 요구하지
+않는다. 전후 실물·계보·이동은 같고 배분 CONSUMED0, 원 배분 ID/수량은
+유지돼야 한다. sweep 뒤 실행 배분0·미해결 의무1·현재 인간 assignment1을
+검사한다. split 후 active8+12=20이고 retired 부모20을 더하지 않는다.
+
+각 `observe`는 명시된 organization·case/subcase·추가 대상 범위와 실제
+API snapshot token을 사용한다. `sources`의 모든 원 행은 read-only
+query/parameters/mapping version·source artifact·완전성·snapshot으로
+연결한다. adapter가 API projection을 복사하거나 빈 결과를 만들어서는
+안 된다. `movements`, `dutyTransitions`, `externalDeliveries` 등은 새 S0
+persistence 선택 후 실제 저장소의 대응 행을 읽는 논리 source 이름이다.
+
+process start/stop/restart는 api/scheduler/worker-a/worker-b 각각의 실제
+instance와 terminal을 관찰한다. `tickScheduler`는 실제 자율 task ID/handle을
+반환하고 `awaitRuntimeTask`는 같은 handle의 terminal 및 완료 이후
+snapshot을 기다린다. `resumeWork`나 fake worker로 대신하지 않는다.
+backup/restore 뒤에는 생성된 actual output descriptor를 strict result
+ref로 `inspectArtifacts`에 전달한다. 실제 secret은 bundle에 넣지 않고
+별도 secret manager 경로를 관찰한다.
+
+## 추적과 실행 상태
+
+16 subcase와297 assertion이 세 T26 oracle의 여섯 named observation을
+연결한다. 상세 연결은 `oracle-bindings.json`이다. 이는 선언 추적이며
+실행 coverage를 증명하지 않는다. 실행 명령·exit·검증 수·fixture hash는
+`evidence/`에 별도 기록한다. 환경/형식 오류 exit3은 의도된 RED가 아니다.
+
+최종 준비 검증은 `./verify validate` exit0과 `./verify harness`
+149 PASS(이 폴더 관련 selftest19: mutant17·구조2, 실패/오류/skip0)다.
+두 case의 실제 Gherkin selector RED는 발견/시작20·NOT_IMPLEMENTED
+실패20·scenario skip0, exit1이다. 각 scenario의 첫 필수 assertion이
+실패한 뒤 남은 assertion은 실행되지 않았다. 제품 recovery는 exit2
+`NOT_RUN`이며 297개 assertion의 관찰 source가 미실행이다.
+`evidence/authoring-summary.json`에 실제 입력 hash와 명령을 기록했다.

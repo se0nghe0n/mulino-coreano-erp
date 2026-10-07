@@ -1,0 +1,1807 @@
+{
+  "caseId": "T26",
+  "evidenceClass": "DECLARED_CONTRACT_ONLY",
+  "productStatus": "NOT_RUN",
+  "bindings": {
+    "T26.scheduler-recovery-and-operations": {
+      "recovery-rediscovery": [
+        {
+          "subcaseId": "due-wait-db-rediscovery",
+          "assertionId": "terminal-origin",
+          "actionId": "terminal",
+          "pointer": "/data/hostObservation/runtimeTask/origin"
+        },
+        {
+          "subcaseId": "due-wait-db-rediscovery",
+          "assertionId": "terminal-terminal",
+          "actionId": "terminal",
+          "pointer": "/data/hostObservation/runtimeTask/terminalStatus"
+        },
+        {
+          "subcaseId": "due-wait-db-rediscovery",
+          "assertionId": "db-current-assignment-one",
+          "actionId": "db",
+          "pointer": "/data/rawRows/assignments"
+        },
+        {
+          "subcaseId": "due-wait-db-rediscovery",
+          "assertionId": "db-owner",
+          "actionId": "db",
+          "pointer": "/data/rawRows/assignments"
+        },
+        {
+          "subcaseId": "due-wait-db-rediscovery",
+          "assertionId": "db-duty-status",
+          "actionId": "db",
+          "pointer": "/data/rawRows/obligations"
+        },
+        {
+          "subcaseId": "due-wait-db-rediscovery",
+          "assertionId": "db-next-action",
+          "actionId": "db",
+          "pointer": "/data/rawRows/assignments"
+        },
+        {
+          "subcaseId": "due-wait-db-rediscovery",
+          "assertionId": "db-next-check",
+          "actionId": "db",
+          "pointer": "/data/rawRows/assignments"
+        },
+        {
+          "subcaseId": "due-wait-db-rediscovery",
+          "assertionId": "api-owner",
+          "actionId": "api",
+          "pointer": "/response/data/responsibility/ownerId"
+        },
+        {
+          "subcaseId": "due-wait-db-rediscovery",
+          "assertionId": "api-action",
+          "actionId": "api",
+          "pointer": "/response/data/responsibility/nextAction"
+        },
+        {
+          "subcaseId": "due-wait-db-rediscovery",
+          "assertionId": "api-check",
+          "actionId": "api",
+          "pointer": "/response/data/responsibility/nextCheckAt"
+        },
+        {
+          "subcaseId": "due-wait-db-rediscovery",
+          "assertionId": "durable-wait-before",
+          "actionId": "before-db",
+          "pointer": "/data/rawRows/works"
+        },
+        {
+          "subcaseId": "due-wait-db-rediscovery",
+          "assertionId": "empty-message-queue",
+          "actionId": "before-db",
+          "pointer": "/data/rawRows/queueMessages"
+        },
+        {
+          "subcaseId": "due-wait-db-rediscovery",
+          "assertionId": "discovery-source-db",
+          "actionId": "db",
+          "pointer": "/data/rawRows/attempts"
+        },
+        {
+          "subcaseId": "due-wait-db-rediscovery",
+          "assertionId": "attempt-cause-due",
+          "actionId": "db",
+          "pointer": "/data/rawRows/attempts"
+        },
+        {
+          "subcaseId": "due-wait-db-rediscovery",
+          "assertionId": "due-obligation-discovered",
+          "actionId": "db",
+          "pointer": "/data/rawRows/obligations"
+        },
+        {
+          "subcaseId": "due-wait-db-rediscovery",
+          "assertionId": "no-fake-receipt",
+          "actionId": "db",
+          "pointer": "/data/rawRows/movements"
+        },
+        {
+          "subcaseId": "due-wait-db-rediscovery",
+          "assertionId": "timeout-never-satisfied",
+          "actionId": "api",
+          "pointer": "/response/data/assessment/result"
+        },
+        {
+          "subcaseId": "orphan-intake-recovered",
+          "assertionId": "terminal-origin",
+          "actionId": "terminal",
+          "pointer": "/data/hostObservation/runtimeTask/origin"
+        },
+        {
+          "subcaseId": "orphan-intake-recovered",
+          "assertionId": "terminal-terminal",
+          "actionId": "terminal",
+          "pointer": "/data/hostObservation/runtimeTask/terminalStatus"
+        },
+        {
+          "subcaseId": "orphan-intake-recovered",
+          "assertionId": "db-current-assignment-one",
+          "actionId": "db",
+          "pointer": "/data/rawRows/assignments"
+        },
+        {
+          "subcaseId": "orphan-intake-recovered",
+          "assertionId": "db-owner",
+          "actionId": "db",
+          "pointer": "/data/rawRows/assignments"
+        },
+        {
+          "subcaseId": "orphan-intake-recovered",
+          "assertionId": "db-duty-status",
+          "actionId": "db",
+          "pointer": "/data/rawRows/obligations"
+        },
+        {
+          "subcaseId": "orphan-intake-recovered",
+          "assertionId": "db-next-action",
+          "actionId": "db",
+          "pointer": "/data/rawRows/assignments"
+        },
+        {
+          "subcaseId": "orphan-intake-recovered",
+          "assertionId": "db-next-check",
+          "actionId": "db",
+          "pointer": "/data/rawRows/assignments"
+        },
+        {
+          "subcaseId": "orphan-intake-recovered",
+          "assertionId": "api-owner",
+          "actionId": "api",
+          "pointer": "/response/data/responsibility/ownerId"
+        },
+        {
+          "subcaseId": "orphan-intake-recovered",
+          "assertionId": "api-action",
+          "actionId": "api",
+          "pointer": "/response/data/responsibility/nextAction"
+        },
+        {
+          "subcaseId": "orphan-intake-recovered",
+          "assertionId": "api-check",
+          "actionId": "api",
+          "pointer": "/response/data/responsibility/nextCheckAt"
+        },
+        {
+          "subcaseId": "orphan-intake-recovered",
+          "assertionId": "before-new-work-zero",
+          "actionId": "before-db",
+          "pointer": "/data/rawRows/works"
+        },
+        {
+          "subcaseId": "orphan-intake-recovered",
+          "assertionId": "before-link-pending",
+          "actionId": "before-db",
+          "pointer": "/data/rawRows/intake"
+        },
+        {
+          "subcaseId": "orphan-intake-recovered",
+          "assertionId": "before-intake-owner",
+          "actionId": "before-db",
+          "pointer": "/data/rawRows/intake"
+        },
+        {
+          "subcaseId": "orphan-intake-recovered",
+          "assertionId": "before-intake-action",
+          "actionId": "before-db",
+          "pointer": "/data/rawRows/intake"
+        },
+        {
+          "subcaseId": "orphan-intake-recovered",
+          "assertionId": "before-intake-check",
+          "actionId": "before-db",
+          "pointer": "/data/rawRows/intake"
+        },
+        {
+          "subcaseId": "orphan-intake-recovered",
+          "assertionId": "after-work-one",
+          "actionId": "db",
+          "pointer": "/data/rawRows/works"
+        },
+        {
+          "subcaseId": "orphan-intake-recovered",
+          "assertionId": "after-duty-one",
+          "actionId": "db",
+          "pointer": "/data/rawRows/obligations"
+        },
+        {
+          "subcaseId": "orphan-intake-recovered",
+          "assertionId": "intake-link-confirmed",
+          "actionId": "db",
+          "pointer": "/data/rawRows/intake"
+        },
+        {
+          "subcaseId": "orphan-intake-recovered",
+          "assertionId": "canonical-intake-linked-duty",
+          "actionId": "db",
+          "pointer": "/data/rawRows/intake/0/obligationId"
+        },
+        {
+          "subcaseId": "outbox-exhaustion-alert-dedupe",
+          "assertionId": "terminal-0-origin",
+          "actionId": "terminal-0",
+          "pointer": "/data/hostObservation/runtimeTask/origin"
+        },
+        {
+          "subcaseId": "outbox-exhaustion-alert-dedupe",
+          "assertionId": "terminal-0-terminal",
+          "actionId": "terminal-0",
+          "pointer": "/data/hostObservation/runtimeTask/terminalStatus"
+        },
+        {
+          "subcaseId": "outbox-exhaustion-alert-dedupe",
+          "assertionId": "terminal-1-origin",
+          "actionId": "terminal-1",
+          "pointer": "/data/hostObservation/runtimeTask/origin"
+        },
+        {
+          "subcaseId": "outbox-exhaustion-alert-dedupe",
+          "assertionId": "terminal-1-terminal",
+          "actionId": "terminal-1",
+          "pointer": "/data/hostObservation/runtimeTask/terminalStatus"
+        },
+        {
+          "subcaseId": "outbox-exhaustion-alert-dedupe",
+          "assertionId": "terminal-2-origin",
+          "actionId": "terminal-2",
+          "pointer": "/data/hostObservation/runtimeTask/origin"
+        },
+        {
+          "subcaseId": "outbox-exhaustion-alert-dedupe",
+          "assertionId": "terminal-2-terminal",
+          "actionId": "terminal-2",
+          "pointer": "/data/hostObservation/runtimeTask/terminalStatus"
+        },
+        {
+          "subcaseId": "outbox-exhaustion-alert-dedupe",
+          "assertionId": "repeat-terminal-origin",
+          "actionId": "repeat-terminal",
+          "pointer": "/data/hostObservation/runtimeTask/origin"
+        },
+        {
+          "subcaseId": "outbox-exhaustion-alert-dedupe",
+          "assertionId": "repeat-terminal-terminal",
+          "actionId": "repeat-terminal",
+          "pointer": "/data/hostObservation/runtimeTask/terminalStatus"
+        },
+        {
+          "subcaseId": "outbox-exhaustion-alert-dedupe",
+          "assertionId": "db-current-assignment-one",
+          "actionId": "db",
+          "pointer": "/data/rawRows/assignments"
+        },
+        {
+          "subcaseId": "outbox-exhaustion-alert-dedupe",
+          "assertionId": "db-owner",
+          "actionId": "db",
+          "pointer": "/data/rawRows/assignments"
+        },
+        {
+          "subcaseId": "outbox-exhaustion-alert-dedupe",
+          "assertionId": "db-duty-status",
+          "actionId": "db",
+          "pointer": "/data/rawRows/obligations"
+        },
+        {
+          "subcaseId": "outbox-exhaustion-alert-dedupe",
+          "assertionId": "db-next-action",
+          "actionId": "db",
+          "pointer": "/data/rawRows/assignments"
+        },
+        {
+          "subcaseId": "outbox-exhaustion-alert-dedupe",
+          "assertionId": "db-next-check",
+          "actionId": "db",
+          "pointer": "/data/rawRows/assignments"
+        },
+        {
+          "subcaseId": "outbox-exhaustion-alert-dedupe",
+          "assertionId": "api-owner",
+          "actionId": "api",
+          "pointer": "/response/data/responsibility/ownerId"
+        },
+        {
+          "subcaseId": "outbox-exhaustion-alert-dedupe",
+          "assertionId": "api-action",
+          "actionId": "api",
+          "pointer": "/response/data/responsibility/nextAction"
+        },
+        {
+          "subcaseId": "outbox-exhaustion-alert-dedupe",
+          "assertionId": "api-check",
+          "actionId": "api",
+          "pointer": "/response/data/responsibility/nextCheckAt"
+        },
+        {
+          "subcaseId": "outbox-exhaustion-alert-dedupe",
+          "assertionId": "outbox-exhausted",
+          "actionId": "db",
+          "pointer": "/data/rawRows/outbox"
+        },
+        {
+          "subcaseId": "outbox-exhaustion-alert-dedupe",
+          "assertionId": "outbox-attempts-three",
+          "actionId": "db",
+          "pointer": "/data/rawRows/outbox"
+        },
+        {
+          "subcaseId": "outbox-exhaustion-alert-dedupe",
+          "assertionId": "no-delivered-document",
+          "actionId": "db",
+          "pointer": "/data/rawRows/externalDeliveries"
+        },
+        {
+          "subcaseId": "outbox-exhaustion-alert-dedupe",
+          "assertionId": "one-alert-before",
+          "actionId": "db",
+          "pointer": "/data/rawRows/alerts"
+        },
+        {
+          "subcaseId": "outbox-exhaustion-alert-dedupe",
+          "assertionId": "one-alert-after",
+          "actionId": "after-db",
+          "pointer": "/data/rawRows/alerts"
+        },
+        {
+          "subcaseId": "safe-retry-canonical-current-grant",
+          "assertionId": "before-movement-zero",
+          "actionId": "before-db",
+          "pointer": "/data/rawRows/movements"
+        },
+        {
+          "subcaseId": "safe-retry-canonical-current-grant",
+          "assertionId": "movement-once",
+          "actionId": "db",
+          "pointer": "/data/rawRows/movements"
+        },
+        {
+          "subcaseId": "safe-retry-canonical-current-grant",
+          "assertionId": "canonical-key-kept",
+          "actionId": "db",
+          "pointer": "/data/rawRows/commands"
+        },
+        {
+          "subcaseId": "safe-retry-canonical-current-grant",
+          "assertionId": "current-grant-rechecked",
+          "actionId": "db",
+          "pointer": "/data/rawRows/audit"
+        },
+        {
+          "subcaseId": "safe-retry-canonical-current-grant",
+          "assertionId": "safe-retry-fence-used",
+          "actionId": "db",
+          "pointer": "/data/rawRows/commands/0/fencingToken"
+        },
+        {
+          "subcaseId": "safe-retry-canonical-current-grant",
+          "assertionId": "safe-retry-original-actor",
+          "actionId": "db",
+          "pointer": "/data/rawRows/commands"
+        },
+        {
+          "subcaseId": "safe-retry-canonical-current-grant",
+          "assertionId": "retry-canonical-hash",
+          "actionId": "db",
+          "pointer": "/data/rawRows/commands"
+        },
+        {
+          "subcaseId": "safe-retry-canonical-current-grant",
+          "assertionId": "moved-20",
+          "actionId": "db",
+          "pointer": "/data/rawRows/movements"
+        },
+        {
+          "subcaseId": "safe-retry-revoked-blocked",
+          "assertionId": "db-segments-unchanged",
+          "actionId": "db",
+          "pointer": "/data/rawRows/segments"
+        },
+        {
+          "subcaseId": "safe-retry-revoked-blocked",
+          "assertionId": "db-genealogy-unchanged",
+          "actionId": "db",
+          "pointer": "/data/rawRows/genealogy"
+        },
+        {
+          "subcaseId": "safe-retry-revoked-blocked",
+          "assertionId": "db-movements-unchanged",
+          "actionId": "db",
+          "pointer": "/data/rawRows/movements"
+        },
+        {
+          "subcaseId": "safe-retry-revoked-blocked",
+          "assertionId": "db-allocations-unchanged",
+          "actionId": "db",
+          "pointer": "/data/rawRows/allocations"
+        },
+        {
+          "subcaseId": "safe-retry-revoked-blocked",
+          "assertionId": "db-quantity-delta-zero",
+          "actionId": "db",
+          "pointer": "/data/data/heldQuantity"
+        },
+        {
+          "subcaseId": "safe-retry-revoked-blocked",
+          "assertionId": "retry-denial-audit",
+          "actionId": "db",
+          "pointer": "/data/rawRows/audit"
+        },
+        {
+          "subcaseId": "safe-retry-revoked-blocked",
+          "assertionId": "retry-forbidden",
+          "actionId": "retry",
+          "pointer": "/response/error/code"
+        },
+        {
+          "subcaseId": "safe-retry-revoked-blocked",
+          "assertionId": "db-current-assignment-one",
+          "actionId": "db",
+          "pointer": "/data/rawRows/assignments"
+        },
+        {
+          "subcaseId": "safe-retry-revoked-blocked",
+          "assertionId": "db-owner",
+          "actionId": "db",
+          "pointer": "/data/rawRows/assignments"
+        },
+        {
+          "subcaseId": "safe-retry-revoked-blocked",
+          "assertionId": "db-duty-status",
+          "actionId": "db",
+          "pointer": "/data/rawRows/obligations"
+        },
+        {
+          "subcaseId": "safe-retry-revoked-blocked",
+          "assertionId": "db-next-action",
+          "actionId": "db",
+          "pointer": "/data/rawRows/assignments"
+        },
+        {
+          "subcaseId": "safe-retry-revoked-blocked",
+          "assertionId": "db-next-check",
+          "actionId": "db",
+          "pointer": "/data/rawRows/assignments"
+        },
+        {
+          "subcaseId": "safe-retry-revoked-blocked",
+          "assertionId": "api-owner",
+          "actionId": "api",
+          "pointer": "/response/data/responsibility/ownerId"
+        },
+        {
+          "subcaseId": "safe-retry-revoked-blocked",
+          "assertionId": "api-action",
+          "actionId": "api",
+          "pointer": "/response/data/responsibility/nextAction"
+        },
+        {
+          "subcaseId": "safe-retry-revoked-blocked",
+          "assertionId": "api-check",
+          "actionId": "api",
+          "pointer": "/response/data/responsibility/nextCheckAt"
+        },
+        {
+          "subcaseId": "unknown-external-reconcile-before-retry",
+          "assertionId": "terminal-origin",
+          "actionId": "terminal",
+          "pointer": "/data/hostObservation/runtimeTask/origin"
+        },
+        {
+          "subcaseId": "unknown-external-reconcile-before-retry",
+          "assertionId": "terminal-terminal",
+          "actionId": "terminal",
+          "pointer": "/data/hostObservation/runtimeTask/terminalStatus"
+        },
+        {
+          "subcaseId": "unknown-external-reconcile-before-retry",
+          "assertionId": "before-external-unknown",
+          "actionId": "before-db",
+          "pointer": "/data/rawRows/outbox"
+        },
+        {
+          "subcaseId": "unknown-external-reconcile-before-retry",
+          "assertionId": "unsafe-retry-rejected",
+          "actionId": "unsafe-retry",
+          "pointer": "/response/error/code"
+        },
+        {
+          "subcaseId": "unknown-external-reconcile-before-retry",
+          "assertionId": "external-once-before",
+          "actionId": "before-db",
+          "pointer": "/data/rawRows/externalDeliveries"
+        },
+        {
+          "subcaseId": "unknown-external-reconcile-before-retry",
+          "assertionId": "external-once-after",
+          "actionId": "db",
+          "pointer": "/data/rawRows/externalDeliveries"
+        },
+        {
+          "subcaseId": "unknown-external-reconcile-before-retry",
+          "assertionId": "same-external-id",
+          "actionId": "db",
+          "pointer": "/data/rawRows/outbox/0/externalOperationId"
+        },
+        {
+          "subcaseId": "unknown-external-reconcile-before-retry",
+          "assertionId": "confirmed-result",
+          "actionId": "db",
+          "pointer": "/data/rawRows/reconciliations"
+        },
+        {
+          "subcaseId": "unknown-external-reconcile-before-retry",
+          "assertionId": "actual-external-status",
+          "actionId": "manual-status-query",
+          "pointer": "/data/result"
+        },
+        {
+          "subcaseId": "unknown-external-reconcile-before-retry",
+          "assertionId": "external-reconcile-evidence-hash",
+          "actionId": "db",
+          "pointer": "/data/rawRows/reconciliations/0/evidenceHash"
+        },
+        {
+          "subcaseId": "unknown-external-reconcile-before-retry",
+          "assertionId": "local-outbox-linked",
+          "actionId": "db",
+          "pointer": "/data/rawRows/outbox"
+        }
+      ],
+      "operational-results": [
+        {
+          "subcaseId": "outbox-exhaustion-alert-dedupe",
+          "assertionId": "alert-key",
+          "actionId": "after-db",
+          "pointer": "/data/rawRows/alerts"
+        },
+        {
+          "subcaseId": "operational-nine-categories",
+          "assertionId": "failure-terminal-0-origin",
+          "actionId": "failure-terminal-0",
+          "pointer": "/data/hostObservation/runtimeTask/origin"
+        },
+        {
+          "subcaseId": "operational-nine-categories",
+          "assertionId": "failure-terminal-0-terminal",
+          "actionId": "failure-terminal-0",
+          "pointer": "/data/hostObservation/runtimeTask/terminalStatus"
+        },
+        {
+          "subcaseId": "operational-nine-categories",
+          "assertionId": "failure-terminal-1-origin",
+          "actionId": "failure-terminal-1",
+          "pointer": "/data/hostObservation/runtimeTask/origin"
+        },
+        {
+          "subcaseId": "operational-nine-categories",
+          "assertionId": "failure-terminal-1-terminal",
+          "actionId": "failure-terminal-1",
+          "pointer": "/data/hostObservation/runtimeTask/terminalStatus"
+        },
+        {
+          "subcaseId": "operational-nine-categories",
+          "assertionId": "failure-terminal-2-origin",
+          "actionId": "failure-terminal-2",
+          "pointer": "/data/hostObservation/runtimeTask/origin"
+        },
+        {
+          "subcaseId": "operational-nine-categories",
+          "assertionId": "failure-terminal-2-terminal",
+          "actionId": "failure-terminal-2",
+          "pointer": "/data/hostObservation/runtimeTask/terminalStatus"
+        },
+        {
+          "subcaseId": "operational-nine-categories",
+          "assertionId": "api-all-nine",
+          "actionId": "api",
+          "pointer": "/response/data/issues"
+        },
+        {
+          "subcaseId": "operational-nine-categories",
+          "assertionId": "db-all-nine",
+          "actionId": "db",
+          "pointer": "/data/rawRows/operationalIssues"
+        },
+        {
+          "subcaseId": "operational-nine-categories",
+          "assertionId": "issue-owner-supervisor",
+          "actionId": "api",
+          "pointer": "/response/data/issues"
+        },
+        {
+          "subcaseId": "operational-nine-categories",
+          "assertionId": "ownerless-issue-supervisor",
+          "actionId": "db",
+          "pointer": "/data/rawRows/operationalIssues"
+        },
+        {
+          "subcaseId": "operational-nine-categories",
+          "assertionId": "issue-id-state-relations",
+          "actionId": "db",
+          "pointer": "/data/rawRows/operationalIssues"
+        },
+        {
+          "subcaseId": "operational-nine-categories",
+          "assertionId": "ownerless-active-raw",
+          "actionId": "db",
+          "pointer": "/data/rawRows/works"
+        },
+        {
+          "subcaseId": "operational-nine-categories",
+          "assertionId": "allocation-suspended",
+          "actionId": "db",
+          "pointer": "/data/rawRows/allocations"
+        },
+        {
+          "subcaseId": "operational-nine-categories",
+          "assertionId": "raw-intake-unmatched",
+          "actionId": "db",
+          "pointer": "/data/rawRows/intake"
+        },
+        {
+          "subcaseId": "operational-nine-categories",
+          "assertionId": "raw-evidence-conflict",
+          "actionId": "db",
+          "pointer": "/data/rawRows/inbox"
+        },
+        {
+          "subcaseId": "operational-nine-categories",
+          "assertionId": "raw-stale-claim",
+          "actionId": "db",
+          "pointer": "/data/rawRows/claims"
+        },
+        {
+          "subcaseId": "operational-nine-categories",
+          "assertionId": "raw-exhausted",
+          "actionId": "db",
+          "pointer": "/data/rawRows/outbox"
+        },
+        {
+          "subcaseId": "operational-nine-categories",
+          "assertionId": "raw-external-unknown",
+          "actionId": "db",
+          "pointer": "/data/rawRows/outbox"
+        },
+        {
+          "subcaseId": "operational-nine-categories",
+          "assertionId": "projection-stale-revision",
+          "actionId": "db",
+          "pointer": "/data/rawRows/projections/0/sourceRevision"
+        }
+      ],
+      "notification-resolves-duty": [
+        {
+          "subcaseId": "outbox-exhaustion-alert-dedupe",
+          "assertionId": "notification-duty-still-open",
+          "actionId": "after-db",
+          "pointer": "/data/rawRows/obligations"
+        },
+        {
+          "subcaseId": "outbox-exhaustion-alert-dedupe",
+          "assertionId": "notification-assignment-unchanged",
+          "actionId": "after-db",
+          "pointer": "/data/rawRows/assignments"
+        },
+        {
+          "subcaseId": "outbox-exhaustion-alert-dedupe",
+          "assertionId": "no-alert-resolution",
+          "actionId": "after-db",
+          "pointer": "/data/rawRows/obligationResolutions"
+        }
+      ]
+    },
+    "T26.boundary-index-and-emergency-repair": {
+      "boundary-index": [
+        {
+          "subcaseId": "lot-expiry-no-event",
+          "assertionId": "sweep-terminal-origin",
+          "actionId": "sweep-terminal",
+          "pointer": "/data/hostObservation/runtimeTask/origin"
+        },
+        {
+          "subcaseId": "lot-expiry-no-event",
+          "assertionId": "sweep-terminal-terminal",
+          "actionId": "sweep-terminal",
+          "pointer": "/data/hostObservation/runtimeTask/terminalStatus"
+        },
+        {
+          "subcaseId": "lot-expiry-no-event",
+          "assertionId": "boundary-index-deadline",
+          "actionId": "before-db",
+          "pointer": "/data/rawRows/validityBoundaries"
+        },
+        {
+          "subcaseId": "lot-expiry-no-event",
+          "assertionId": "boundary-cause",
+          "actionId": "before-db",
+          "pointer": "/data/rawRows/validityBoundaries"
+        },
+        {
+          "subcaseId": "lot-expiry-no-event",
+          "assertionId": "guard-db-segments-unchanged",
+          "actionId": "guard-db",
+          "pointer": "/data/rawRows/segments"
+        },
+        {
+          "subcaseId": "lot-expiry-no-event",
+          "assertionId": "guard-db-genealogy-unchanged",
+          "actionId": "guard-db",
+          "pointer": "/data/rawRows/genealogy"
+        },
+        {
+          "subcaseId": "lot-expiry-no-event",
+          "assertionId": "guard-db-movements-unchanged",
+          "actionId": "guard-db",
+          "pointer": "/data/rawRows/movements"
+        },
+        {
+          "subcaseId": "lot-expiry-no-event",
+          "assertionId": "guard-db-quantity-delta-zero",
+          "actionId": "guard-db",
+          "pointer": "/data/data/heldQuantity"
+        },
+        {
+          "subcaseId": "lot-expiry-no-event",
+          "assertionId": "guard-no-consumed-allocation",
+          "actionId": "guard-db",
+          "pointer": "/data/rawRows/allocations"
+        },
+        {
+          "subcaseId": "lot-expiry-no-event",
+          "assertionId": "guard-original-allocation-kept",
+          "actionId": "guard-db",
+          "pointer": "/data/rawRows/allocations/0/id"
+        },
+        {
+          "subcaseId": "lot-expiry-no-event",
+          "assertionId": "guard-allocation-quantity-kept",
+          "actionId": "guard-db",
+          "pointer": "/data/rawRows/allocations/0/quantity"
+        },
+        {
+          "subcaseId": "lot-expiry-no-event",
+          "assertionId": "no-new-event",
+          "actionId": "db",
+          "pointer": "/data/rawRows/events"
+        },
+        {
+          "subcaseId": "lot-expiry-no-event",
+          "assertionId": "dispatch-outbox-zero",
+          "actionId": "db",
+          "pointer": "/data/rawRows/outbox"
+        },
+        {
+          "subcaseId": "lot-expiry-no-event",
+          "assertionId": "guard-outcome",
+          "actionId": "dispatch",
+          "pointer": "/response/outcome"
+        },
+        {
+          "subcaseId": "lot-expiry-no-event",
+          "assertionId": "allocation-suspended",
+          "actionId": "db",
+          "pointer": "/data/rawRows/allocations"
+        },
+        {
+          "subcaseId": "lot-expiry-no-event",
+          "assertionId": "expiry-duty-one",
+          "actionId": "db",
+          "pointer": "/data/rawRows/obligations"
+        },
+        {
+          "subcaseId": "lot-expiry-no-event",
+          "assertionId": "db-current-assignment-one",
+          "actionId": "db",
+          "pointer": "/data/rawRows/assignments"
+        },
+        {
+          "subcaseId": "lot-expiry-no-event",
+          "assertionId": "db-owner",
+          "actionId": "db",
+          "pointer": "/data/rawRows/assignments"
+        },
+        {
+          "subcaseId": "lot-expiry-no-event",
+          "assertionId": "db-duty-status",
+          "actionId": "db",
+          "pointer": "/data/rawRows/obligations"
+        },
+        {
+          "subcaseId": "lot-expiry-no-event",
+          "assertionId": "db-next-action",
+          "actionId": "db",
+          "pointer": "/data/rawRows/assignments"
+        },
+        {
+          "subcaseId": "lot-expiry-no-event",
+          "assertionId": "db-next-check",
+          "actionId": "db",
+          "pointer": "/data/rawRows/assignments"
+        },
+        {
+          "subcaseId": "lot-expiry-no-event",
+          "assertionId": "api-owner",
+          "actionId": "api",
+          "pointer": "/response/data/responsibility/ownerId"
+        },
+        {
+          "subcaseId": "lot-expiry-no-event",
+          "assertionId": "api-action",
+          "actionId": "api",
+          "pointer": "/response/data/responsibility/nextAction"
+        },
+        {
+          "subcaseId": "lot-expiry-no-event",
+          "assertionId": "api-check",
+          "actionId": "api",
+          "pointer": "/response/data/responsibility/nextCheckAt"
+        },
+        {
+          "subcaseId": "lot-expiry-no-event",
+          "assertionId": "held-20",
+          "actionId": "db",
+          "pointer": "/data/rawRows/segments"
+        },
+        {
+          "subcaseId": "lot-expiry-no-event",
+          "assertionId": "api-executable-zero",
+          "actionId": "api",
+          "pointer": "/response/data/executableAllocationQuantity"
+        },
+        {
+          "subcaseId": "disposition-expiry-no-event",
+          "assertionId": "sweep-terminal-origin",
+          "actionId": "sweep-terminal",
+          "pointer": "/data/hostObservation/runtimeTask/origin"
+        },
+        {
+          "subcaseId": "disposition-expiry-no-event",
+          "assertionId": "sweep-terminal-terminal",
+          "actionId": "sweep-terminal",
+          "pointer": "/data/hostObservation/runtimeTask/terminalStatus"
+        },
+        {
+          "subcaseId": "disposition-expiry-no-event",
+          "assertionId": "boundary-index-deadline",
+          "actionId": "before-db",
+          "pointer": "/data/rawRows/validityBoundaries"
+        },
+        {
+          "subcaseId": "disposition-expiry-no-event",
+          "assertionId": "boundary-cause",
+          "actionId": "before-db",
+          "pointer": "/data/rawRows/validityBoundaries"
+        },
+        {
+          "subcaseId": "disposition-expiry-no-event",
+          "assertionId": "guard-db-segments-unchanged",
+          "actionId": "guard-db",
+          "pointer": "/data/rawRows/segments"
+        },
+        {
+          "subcaseId": "disposition-expiry-no-event",
+          "assertionId": "guard-db-genealogy-unchanged",
+          "actionId": "guard-db",
+          "pointer": "/data/rawRows/genealogy"
+        },
+        {
+          "subcaseId": "disposition-expiry-no-event",
+          "assertionId": "guard-db-movements-unchanged",
+          "actionId": "guard-db",
+          "pointer": "/data/rawRows/movements"
+        },
+        {
+          "subcaseId": "disposition-expiry-no-event",
+          "assertionId": "guard-db-quantity-delta-zero",
+          "actionId": "guard-db",
+          "pointer": "/data/data/heldQuantity"
+        },
+        {
+          "subcaseId": "disposition-expiry-no-event",
+          "assertionId": "guard-no-consumed-allocation",
+          "actionId": "guard-db",
+          "pointer": "/data/rawRows/allocations"
+        },
+        {
+          "subcaseId": "disposition-expiry-no-event",
+          "assertionId": "guard-original-allocation-kept",
+          "actionId": "guard-db",
+          "pointer": "/data/rawRows/allocations/0/id"
+        },
+        {
+          "subcaseId": "disposition-expiry-no-event",
+          "assertionId": "guard-allocation-quantity-kept",
+          "actionId": "guard-db",
+          "pointer": "/data/rawRows/allocations/0/quantity"
+        },
+        {
+          "subcaseId": "disposition-expiry-no-event",
+          "assertionId": "no-new-event",
+          "actionId": "db",
+          "pointer": "/data/rawRows/events"
+        },
+        {
+          "subcaseId": "disposition-expiry-no-event",
+          "assertionId": "dispatch-outbox-zero",
+          "actionId": "db",
+          "pointer": "/data/rawRows/outbox"
+        },
+        {
+          "subcaseId": "disposition-expiry-no-event",
+          "assertionId": "guard-outcome",
+          "actionId": "dispatch",
+          "pointer": "/response/outcome"
+        },
+        {
+          "subcaseId": "disposition-expiry-no-event",
+          "assertionId": "allocation-suspended",
+          "actionId": "db",
+          "pointer": "/data/rawRows/allocations"
+        },
+        {
+          "subcaseId": "disposition-expiry-no-event",
+          "assertionId": "expiry-duty-one",
+          "actionId": "db",
+          "pointer": "/data/rawRows/obligations"
+        },
+        {
+          "subcaseId": "disposition-expiry-no-event",
+          "assertionId": "db-current-assignment-one",
+          "actionId": "db",
+          "pointer": "/data/rawRows/assignments"
+        },
+        {
+          "subcaseId": "disposition-expiry-no-event",
+          "assertionId": "db-owner",
+          "actionId": "db",
+          "pointer": "/data/rawRows/assignments"
+        },
+        {
+          "subcaseId": "disposition-expiry-no-event",
+          "assertionId": "db-duty-status",
+          "actionId": "db",
+          "pointer": "/data/rawRows/obligations"
+        },
+        {
+          "subcaseId": "disposition-expiry-no-event",
+          "assertionId": "db-next-action",
+          "actionId": "db",
+          "pointer": "/data/rawRows/assignments"
+        },
+        {
+          "subcaseId": "disposition-expiry-no-event",
+          "assertionId": "db-next-check",
+          "actionId": "db",
+          "pointer": "/data/rawRows/assignments"
+        },
+        {
+          "subcaseId": "disposition-expiry-no-event",
+          "assertionId": "api-owner",
+          "actionId": "api",
+          "pointer": "/response/data/responsibility/ownerId"
+        },
+        {
+          "subcaseId": "disposition-expiry-no-event",
+          "assertionId": "api-action",
+          "actionId": "api",
+          "pointer": "/response/data/responsibility/nextAction"
+        },
+        {
+          "subcaseId": "disposition-expiry-no-event",
+          "assertionId": "api-check",
+          "actionId": "api",
+          "pointer": "/response/data/responsibility/nextCheckAt"
+        },
+        {
+          "subcaseId": "disposition-expiry-no-event",
+          "assertionId": "held-20",
+          "actionId": "db",
+          "pointer": "/data/rawRows/segments"
+        },
+        {
+          "subcaseId": "disposition-expiry-no-event",
+          "assertionId": "api-executable-zero",
+          "actionId": "api",
+          "pointer": "/response/data/executableAllocationQuantity"
+        },
+        {
+          "subcaseId": "grant-expiry-no-event",
+          "assertionId": "sweep-terminal-origin",
+          "actionId": "sweep-terminal",
+          "pointer": "/data/hostObservation/runtimeTask/origin"
+        },
+        {
+          "subcaseId": "grant-expiry-no-event",
+          "assertionId": "sweep-terminal-terminal",
+          "actionId": "sweep-terminal",
+          "pointer": "/data/hostObservation/runtimeTask/terminalStatus"
+        },
+        {
+          "subcaseId": "grant-expiry-no-event",
+          "assertionId": "boundary-index-deadline",
+          "actionId": "before-db",
+          "pointer": "/data/rawRows/validityBoundaries"
+        },
+        {
+          "subcaseId": "grant-expiry-no-event",
+          "assertionId": "boundary-cause",
+          "actionId": "before-db",
+          "pointer": "/data/rawRows/validityBoundaries"
+        },
+        {
+          "subcaseId": "grant-expiry-no-event",
+          "assertionId": "guard-db-segments-unchanged",
+          "actionId": "guard-db",
+          "pointer": "/data/rawRows/segments"
+        },
+        {
+          "subcaseId": "grant-expiry-no-event",
+          "assertionId": "guard-db-genealogy-unchanged",
+          "actionId": "guard-db",
+          "pointer": "/data/rawRows/genealogy"
+        },
+        {
+          "subcaseId": "grant-expiry-no-event",
+          "assertionId": "guard-db-movements-unchanged",
+          "actionId": "guard-db",
+          "pointer": "/data/rawRows/movements"
+        },
+        {
+          "subcaseId": "grant-expiry-no-event",
+          "assertionId": "guard-db-quantity-delta-zero",
+          "actionId": "guard-db",
+          "pointer": "/data/data/heldQuantity"
+        },
+        {
+          "subcaseId": "grant-expiry-no-event",
+          "assertionId": "guard-no-consumed-allocation",
+          "actionId": "guard-db",
+          "pointer": "/data/rawRows/allocations"
+        },
+        {
+          "subcaseId": "grant-expiry-no-event",
+          "assertionId": "guard-original-allocation-kept",
+          "actionId": "guard-db",
+          "pointer": "/data/rawRows/allocations/0/id"
+        },
+        {
+          "subcaseId": "grant-expiry-no-event",
+          "assertionId": "guard-allocation-quantity-kept",
+          "actionId": "guard-db",
+          "pointer": "/data/rawRows/allocations/0/quantity"
+        },
+        {
+          "subcaseId": "grant-expiry-no-event",
+          "assertionId": "no-new-event",
+          "actionId": "db",
+          "pointer": "/data/rawRows/events"
+        },
+        {
+          "subcaseId": "grant-expiry-no-event",
+          "assertionId": "dispatch-outbox-zero",
+          "actionId": "db",
+          "pointer": "/data/rawRows/outbox"
+        },
+        {
+          "subcaseId": "grant-expiry-no-event",
+          "assertionId": "guard-outcome",
+          "actionId": "dispatch",
+          "pointer": "/response/outcome"
+        },
+        {
+          "subcaseId": "grant-expiry-no-event",
+          "assertionId": "allocation-suspended",
+          "actionId": "db",
+          "pointer": "/data/rawRows/allocations"
+        },
+        {
+          "subcaseId": "grant-expiry-no-event",
+          "assertionId": "expiry-duty-one",
+          "actionId": "db",
+          "pointer": "/data/rawRows/obligations"
+        },
+        {
+          "subcaseId": "grant-expiry-no-event",
+          "assertionId": "db-current-assignment-one",
+          "actionId": "db",
+          "pointer": "/data/rawRows/assignments"
+        },
+        {
+          "subcaseId": "grant-expiry-no-event",
+          "assertionId": "db-owner",
+          "actionId": "db",
+          "pointer": "/data/rawRows/assignments"
+        },
+        {
+          "subcaseId": "grant-expiry-no-event",
+          "assertionId": "db-duty-status",
+          "actionId": "db",
+          "pointer": "/data/rawRows/obligations"
+        },
+        {
+          "subcaseId": "grant-expiry-no-event",
+          "assertionId": "db-next-action",
+          "actionId": "db",
+          "pointer": "/data/rawRows/assignments"
+        },
+        {
+          "subcaseId": "grant-expiry-no-event",
+          "assertionId": "db-next-check",
+          "actionId": "db",
+          "pointer": "/data/rawRows/assignments"
+        },
+        {
+          "subcaseId": "grant-expiry-no-event",
+          "assertionId": "api-owner",
+          "actionId": "api",
+          "pointer": "/response/data/responsibility/ownerId"
+        },
+        {
+          "subcaseId": "grant-expiry-no-event",
+          "assertionId": "api-action",
+          "actionId": "api",
+          "pointer": "/response/data/responsibility/nextAction"
+        },
+        {
+          "subcaseId": "grant-expiry-no-event",
+          "assertionId": "api-check",
+          "actionId": "api",
+          "pointer": "/response/data/responsibility/nextCheckAt"
+        },
+        {
+          "subcaseId": "grant-expiry-no-event",
+          "assertionId": "held-20",
+          "actionId": "db",
+          "pointer": "/data/rawRows/segments"
+        },
+        {
+          "subcaseId": "grant-expiry-no-event",
+          "assertionId": "api-executable-zero",
+          "actionId": "api",
+          "pointer": "/response/data/executableAllocationQuantity"
+        },
+        {
+          "subcaseId": "policy-expiry-no-event",
+          "assertionId": "sweep-terminal-origin",
+          "actionId": "sweep-terminal",
+          "pointer": "/data/hostObservation/runtimeTask/origin"
+        },
+        {
+          "subcaseId": "policy-expiry-no-event",
+          "assertionId": "sweep-terminal-terminal",
+          "actionId": "sweep-terminal",
+          "pointer": "/data/hostObservation/runtimeTask/terminalStatus"
+        },
+        {
+          "subcaseId": "policy-expiry-no-event",
+          "assertionId": "boundary-index-deadline",
+          "actionId": "before-db",
+          "pointer": "/data/rawRows/validityBoundaries"
+        },
+        {
+          "subcaseId": "policy-expiry-no-event",
+          "assertionId": "boundary-cause",
+          "actionId": "before-db",
+          "pointer": "/data/rawRows/validityBoundaries"
+        },
+        {
+          "subcaseId": "policy-expiry-no-event",
+          "assertionId": "guard-db-segments-unchanged",
+          "actionId": "guard-db",
+          "pointer": "/data/rawRows/segments"
+        },
+        {
+          "subcaseId": "policy-expiry-no-event",
+          "assertionId": "guard-db-genealogy-unchanged",
+          "actionId": "guard-db",
+          "pointer": "/data/rawRows/genealogy"
+        },
+        {
+          "subcaseId": "policy-expiry-no-event",
+          "assertionId": "guard-db-movements-unchanged",
+          "actionId": "guard-db",
+          "pointer": "/data/rawRows/movements"
+        },
+        {
+          "subcaseId": "policy-expiry-no-event",
+          "assertionId": "guard-db-quantity-delta-zero",
+          "actionId": "guard-db",
+          "pointer": "/data/data/heldQuantity"
+        },
+        {
+          "subcaseId": "policy-expiry-no-event",
+          "assertionId": "guard-no-consumed-allocation",
+          "actionId": "guard-db",
+          "pointer": "/data/rawRows/allocations"
+        },
+        {
+          "subcaseId": "policy-expiry-no-event",
+          "assertionId": "guard-original-allocation-kept",
+          "actionId": "guard-db",
+          "pointer": "/data/rawRows/allocations/0/id"
+        },
+        {
+          "subcaseId": "policy-expiry-no-event",
+          "assertionId": "guard-allocation-quantity-kept",
+          "actionId": "guard-db",
+          "pointer": "/data/rawRows/allocations/0/quantity"
+        },
+        {
+          "subcaseId": "policy-expiry-no-event",
+          "assertionId": "no-new-event",
+          "actionId": "db",
+          "pointer": "/data/rawRows/events"
+        },
+        {
+          "subcaseId": "policy-expiry-no-event",
+          "assertionId": "dispatch-outbox-zero",
+          "actionId": "db",
+          "pointer": "/data/rawRows/outbox"
+        },
+        {
+          "subcaseId": "policy-expiry-no-event",
+          "assertionId": "guard-outcome",
+          "actionId": "dispatch",
+          "pointer": "/response/outcome"
+        },
+        {
+          "subcaseId": "policy-expiry-no-event",
+          "assertionId": "allocation-suspended",
+          "actionId": "db",
+          "pointer": "/data/rawRows/allocations"
+        },
+        {
+          "subcaseId": "policy-expiry-no-event",
+          "assertionId": "expiry-duty-one",
+          "actionId": "db",
+          "pointer": "/data/rawRows/obligations"
+        },
+        {
+          "subcaseId": "policy-expiry-no-event",
+          "assertionId": "db-current-assignment-one",
+          "actionId": "db",
+          "pointer": "/data/rawRows/assignments"
+        },
+        {
+          "subcaseId": "policy-expiry-no-event",
+          "assertionId": "db-owner",
+          "actionId": "db",
+          "pointer": "/data/rawRows/assignments"
+        },
+        {
+          "subcaseId": "policy-expiry-no-event",
+          "assertionId": "db-duty-status",
+          "actionId": "db",
+          "pointer": "/data/rawRows/obligations"
+        },
+        {
+          "subcaseId": "policy-expiry-no-event",
+          "assertionId": "db-next-action",
+          "actionId": "db",
+          "pointer": "/data/rawRows/assignments"
+        },
+        {
+          "subcaseId": "policy-expiry-no-event",
+          "assertionId": "db-next-check",
+          "actionId": "db",
+          "pointer": "/data/rawRows/assignments"
+        },
+        {
+          "subcaseId": "policy-expiry-no-event",
+          "assertionId": "api-owner",
+          "actionId": "api",
+          "pointer": "/response/data/responsibility/ownerId"
+        },
+        {
+          "subcaseId": "policy-expiry-no-event",
+          "assertionId": "api-action",
+          "actionId": "api",
+          "pointer": "/response/data/responsibility/nextAction"
+        },
+        {
+          "subcaseId": "policy-expiry-no-event",
+          "assertionId": "api-check",
+          "actionId": "api",
+          "pointer": "/response/data/responsibility/nextCheckAt"
+        },
+        {
+          "subcaseId": "policy-expiry-no-event",
+          "assertionId": "held-20",
+          "actionId": "db",
+          "pointer": "/data/rawRows/segments"
+        },
+        {
+          "subcaseId": "policy-expiry-no-event",
+          "assertionId": "api-executable-zero",
+          "actionId": "api",
+          "pointer": "/response/data/executableAllocationQuantity"
+        },
+        {
+          "subcaseId": "planned-transition-reindexes",
+          "assertionId": "boundary-before",
+          "actionId": "before-db",
+          "pointer": "/data/rawRows/validityBoundaries"
+        },
+        {
+          "subcaseId": "planned-transition-reindexes",
+          "assertionId": "boundary-after",
+          "actionId": "db",
+          "pointer": "/data/rawRows/validityBoundaries"
+        },
+        {
+          "subcaseId": "planned-transition-reindexes",
+          "assertionId": "boundary-transition-set",
+          "actionId": "db",
+          "pointer": "/data/rawRows/boundaryCauses"
+        },
+        {
+          "subcaseId": "planned-transition-reindexes",
+          "assertionId": "old-work-stays-v1",
+          "actionId": "db",
+          "pointer": "/data/rawRows/works"
+        },
+        {
+          "subcaseId": "planned-transition-reindexes",
+          "assertionId": "no-execution-on-activation",
+          "actionId": "db",
+          "pointer": "/data/rawRows/movements"
+        }
+      ],
+      "safe-runbook": [
+        {
+          "subcaseId": "emergency-repair-dryrun-apply",
+          "assertionId": "dryrun-diff",
+          "actionId": "dry-run",
+          "pointer": "/response/data/diff"
+        },
+        {
+          "subcaseId": "emergency-repair-dryrun-apply",
+          "assertionId": "denied-db-segments-unchanged",
+          "actionId": "denied-db",
+          "pointer": "/data/rawRows/segments"
+        },
+        {
+          "subcaseId": "emergency-repair-dryrun-apply",
+          "assertionId": "denied-db-genealogy-unchanged",
+          "actionId": "denied-db",
+          "pointer": "/data/rawRows/genealogy"
+        },
+        {
+          "subcaseId": "emergency-repair-dryrun-apply",
+          "assertionId": "denied-db-movements-unchanged",
+          "actionId": "denied-db",
+          "pointer": "/data/rawRows/movements"
+        },
+        {
+          "subcaseId": "emergency-repair-dryrun-apply",
+          "assertionId": "denied-db-allocations-unchanged",
+          "actionId": "denied-db",
+          "pointer": "/data/rawRows/allocations"
+        },
+        {
+          "subcaseId": "emergency-repair-dryrun-apply",
+          "assertionId": "denied-db-quantity-delta-zero",
+          "actionId": "denied-db",
+          "pointer": "/data/data/heldQuantity"
+        },
+        {
+          "subcaseId": "emergency-repair-dryrun-apply",
+          "assertionId": "repair-denied",
+          "actionId": "unauthorized-apply",
+          "pointer": "/response/error/code"
+        },
+        {
+          "subcaseId": "emergency-repair-dryrun-apply",
+          "assertionId": "repair-applied-audit",
+          "actionId": "db",
+          "pointer": "/data/rawRows/audit"
+        },
+        {
+          "subcaseId": "emergency-repair-dryrun-apply",
+          "assertionId": "repair-evidence",
+          "actionId": "db",
+          "pointer": "/data/rawRows/audit"
+        },
+        {
+          "subcaseId": "emergency-repair-dryrun-apply",
+          "assertionId": "repair-diff-hash-audit",
+          "actionId": "db",
+          "pointer": "/data/rawRows/audit"
+        },
+        {
+          "subcaseId": "emergency-repair-dryrun-apply",
+          "assertionId": "projection-repaired",
+          "actionId": "db",
+          "pointer": "/data/rawRows/projections/0/sourceRevision"
+        },
+        {
+          "subcaseId": "emergency-repair-dryrun-apply",
+          "assertionId": "no-direct-sql-recovery",
+          "actionId": "db",
+          "pointer": "/data/rawRows/audit"
+        },
+        {
+          "subcaseId": "emergency-repair-dryrun-apply",
+          "assertionId": "repair-discovery-scope",
+          "actionId": "before",
+          "pointer": "/response/data/issues/0/targetId"
+        },
+        {
+          "subcaseId": "emergency-repair-dryrun-apply",
+          "assertionId": "repair-last-committed-command",
+          "actionId": "before",
+          "pointer": "/response/data/issues/0/lastCommittedCommandId"
+        },
+        {
+          "subcaseId": "emergency-repair-dryrun-apply",
+          "assertionId": "repair-last-commit-db",
+          "actionId": "before-db",
+          "pointer": "/data/rawRows/operationalIssues/0/lastCommittedCommandId"
+        },
+        {
+          "subcaseId": "emergency-repair-dryrun-apply",
+          "assertionId": "repair-held-20",
+          "actionId": "db",
+          "pointer": "/data/rawRows/segments"
+        },
+        {
+          "subcaseId": "emergency-repair-dryrun-apply",
+          "assertionId": "repair-owner-kept",
+          "actionId": "db",
+          "pointer": "/data/rawRows/assignments"
+        }
+      ]
+    },
+    "T26.backup-complete-restore": {
+      "restore-verification": [
+        {
+          "subcaseId": "restore-complete",
+          "assertionId": "backup-parts",
+          "actionId": "backup",
+          "pointer": "/data/hostObservation/rawRows/backupParts"
+        },
+        {
+          "subcaseId": "restore-complete",
+          "assertionId": "backup-no-secret",
+          "actionId": "backup",
+          "pointer": "/data/hostObservation/rawRows/configEntries"
+        },
+        {
+          "subcaseId": "restore-complete",
+          "assertionId": "isolated-restore",
+          "actionId": "restore",
+          "pointer": "/data/hostObservation/environment/isolated"
+        },
+        {
+          "subcaseId": "restore-complete",
+          "assertionId": "restore-completeness",
+          "actionId": "restore",
+          "pointer": "/data/hostObservation/rawRows/restoreResult/status"
+        },
+        {
+          "subcaseId": "restore-complete",
+          "assertionId": "restore-required-gap",
+          "actionId": "restore",
+          "pointer": "/data/hostObservation/rawRows/missingParts"
+        },
+        {
+          "subcaseId": "restore-complete",
+          "assertionId": "restore-quantity-20",
+          "actionId": "db",
+          "pointer": "/data/rawRows/segments"
+        },
+        {
+          "subcaseId": "restore-complete",
+          "assertionId": "restore-genealogy",
+          "actionId": "db",
+          "pointer": "/data/rawRows/genealogy"
+        },
+        {
+          "subcaseId": "restore-complete",
+          "assertionId": "restore-duties",
+          "actionId": "db",
+          "pointer": "/data/rawRows/assignments"
+        },
+        {
+          "subcaseId": "restore-complete",
+          "assertionId": "v1-work",
+          "actionId": "db",
+          "pointer": "/data/rawRows/works"
+        },
+        {
+          "subcaseId": "restore-complete",
+          "assertionId": "v1-evaluator",
+          "actionId": "db",
+          "pointer": "/data/rawRows/assessments"
+        },
+        {
+          "subcaseId": "restore-complete",
+          "assertionId": "past-assessment-preserved",
+          "actionId": "db",
+          "pointer": "/data/rawRows/assessments"
+        },
+        {
+          "subcaseId": "restore-complete",
+          "assertionId": "blob-hash",
+          "actionId": "restore",
+          "pointer": "/data/hostObservation/rawRows/evidenceBlobs"
+        },
+        {
+          "subcaseId": "restore-complete",
+          "assertionId": "cross-org-denied",
+          "actionId": "cross-org",
+          "pointer": "/response/error/code"
+        },
+        {
+          "subcaseId": "restore-complete",
+          "assertionId": "no-cross-org-grant",
+          "actionId": "db",
+          "pointer": "/data/rawRows/grants"
+        },
+        {
+          "subcaseId": "restore-complete",
+          "assertionId": "secret-manager-channel",
+          "actionId": "restore",
+          "pointer": "/data/hostObservation/rawRows/secretRecovery/channel"
+        },
+        {
+          "subcaseId": "restore-complete",
+          "assertionId": "db-evidence-hash",
+          "actionId": "db",
+          "pointer": "/data/rawRows/documents"
+        },
+        {
+          "subcaseId": "restore-complete",
+          "assertionId": "api-evidence-hash",
+          "actionId": "restored-evidence",
+          "pointer": "/response/data/hash"
+        },
+        {
+          "subcaseId": "restore-complete",
+          "assertionId": "api-evidence-availability",
+          "actionId": "restored-evidence",
+          "pointer": "/response/data/availability"
+        },
+        {
+          "subcaseId": "restore-complete",
+          "assertionId": "restore-execution-state",
+          "actionId": "api",
+          "pointer": "/response/data/executionState"
+        },
+        {
+          "subcaseId": "restore-missing-blob",
+          "assertionId": "backup-parts",
+          "actionId": "backup",
+          "pointer": "/data/hostObservation/rawRows/backupParts"
+        },
+        {
+          "subcaseId": "restore-missing-blob",
+          "assertionId": "backup-no-secret",
+          "actionId": "backup",
+          "pointer": "/data/hostObservation/rawRows/configEntries"
+        },
+        {
+          "subcaseId": "restore-missing-blob",
+          "assertionId": "isolated-restore",
+          "actionId": "restore",
+          "pointer": "/data/hostObservation/environment/isolated"
+        },
+        {
+          "subcaseId": "restore-missing-blob",
+          "assertionId": "restore-completeness",
+          "actionId": "restore",
+          "pointer": "/data/hostObservation/rawRows/restoreResult/status"
+        },
+        {
+          "subcaseId": "restore-missing-blob",
+          "assertionId": "restore-required-gap",
+          "actionId": "restore",
+          "pointer": "/data/hostObservation/rawRows/missingParts"
+        },
+        {
+          "subcaseId": "restore-missing-blob",
+          "assertionId": "restore-quantity-20",
+          "actionId": "db",
+          "pointer": "/data/rawRows/segments"
+        },
+        {
+          "subcaseId": "restore-missing-blob",
+          "assertionId": "restore-genealogy",
+          "actionId": "db",
+          "pointer": "/data/rawRows/genealogy"
+        },
+        {
+          "subcaseId": "restore-missing-blob",
+          "assertionId": "restore-duties",
+          "actionId": "db",
+          "pointer": "/data/rawRows/assignments"
+        },
+        {
+          "subcaseId": "restore-missing-blob",
+          "assertionId": "v1-work",
+          "actionId": "db",
+          "pointer": "/data/rawRows/works"
+        },
+        {
+          "subcaseId": "restore-missing-blob",
+          "assertionId": "v1-evaluator",
+          "actionId": "db",
+          "pointer": "/data/rawRows/assessments"
+        },
+        {
+          "subcaseId": "restore-missing-blob",
+          "assertionId": "past-assessment-preserved",
+          "actionId": "db",
+          "pointer": "/data/rawRows/assessments"
+        },
+        {
+          "subcaseId": "restore-missing-blob",
+          "assertionId": "blob-hash",
+          "actionId": "restore",
+          "pointer": "/data/hostObservation/rawRows/evidenceBlobs"
+        },
+        {
+          "subcaseId": "restore-missing-blob",
+          "assertionId": "cross-org-denied",
+          "actionId": "cross-org",
+          "pointer": "/response/error/code"
+        },
+        {
+          "subcaseId": "restore-missing-blob",
+          "assertionId": "no-cross-org-grant",
+          "actionId": "db",
+          "pointer": "/data/rawRows/grants"
+        },
+        {
+          "subcaseId": "restore-missing-blob",
+          "assertionId": "secret-manager-channel",
+          "actionId": "restore",
+          "pointer": "/data/hostObservation/rawRows/secretRecovery/channel"
+        },
+        {
+          "subcaseId": "restore-missing-blob",
+          "assertionId": "db-evidence-hash",
+          "actionId": "db",
+          "pointer": "/data/rawRows/documents"
+        },
+        {
+          "subcaseId": "restore-missing-blob",
+          "assertionId": "api-evidence-hash",
+          "actionId": "restored-evidence",
+          "pointer": "/response/data/hash"
+        },
+        {
+          "subcaseId": "restore-missing-blob",
+          "assertionId": "api-evidence-availability",
+          "actionId": "restored-evidence",
+          "pointer": "/response/data/availability"
+        },
+        {
+          "subcaseId": "restore-missing-blob",
+          "assertionId": "restore-execution-state",
+          "actionId": "api",
+          "pointer": "/response/data/executionState"
+        },
+        {
+          "subcaseId": "restore-missing-v1-evaluator",
+          "assertionId": "backup-parts",
+          "actionId": "backup",
+          "pointer": "/data/hostObservation/rawRows/backupParts"
+        },
+        {
+          "subcaseId": "restore-missing-v1-evaluator",
+          "assertionId": "backup-no-secret",
+          "actionId": "backup",
+          "pointer": "/data/hostObservation/rawRows/configEntries"
+        },
+        {
+          "subcaseId": "restore-missing-v1-evaluator",
+          "assertionId": "isolated-restore",
+          "actionId": "restore",
+          "pointer": "/data/hostObservation/environment/isolated"
+        },
+        {
+          "subcaseId": "restore-missing-v1-evaluator",
+          "assertionId": "restore-completeness",
+          "actionId": "restore",
+          "pointer": "/data/hostObservation/rawRows/restoreResult/status"
+        },
+        {
+          "subcaseId": "restore-missing-v1-evaluator",
+          "assertionId": "restore-required-gap",
+          "actionId": "restore",
+          "pointer": "/data/hostObservation/rawRows/missingParts"
+        },
+        {
+          "subcaseId": "restore-missing-v1-evaluator",
+          "assertionId": "restore-quantity-20",
+          "actionId": "db",
+          "pointer": "/data/rawRows/segments"
+        },
+        {
+          "subcaseId": "restore-missing-v1-evaluator",
+          "assertionId": "restore-genealogy",
+          "actionId": "db",
+          "pointer": "/data/rawRows/genealogy"
+        },
+        {
+          "subcaseId": "restore-missing-v1-evaluator",
+          "assertionId": "restore-duties",
+          "actionId": "db",
+          "pointer": "/data/rawRows/assignments"
+        },
+        {
+          "subcaseId": "restore-missing-v1-evaluator",
+          "assertionId": "v1-work",
+          "actionId": "db",
+          "pointer": "/data/rawRows/works"
+        },
+        {
+          "subcaseId": "restore-missing-v1-evaluator",
+          "assertionId": "v1-evaluator",
+          "actionId": "db",
+          "pointer": "/data/rawRows/assessments"
+        },
+        {
+          "subcaseId": "restore-missing-v1-evaluator",
+          "assertionId": "past-assessment-preserved",
+          "actionId": "db",
+          "pointer": "/data/rawRows/assessments"
+        },
+        {
+          "subcaseId": "restore-missing-v1-evaluator",
+          "assertionId": "blob-hash",
+          "actionId": "restore",
+          "pointer": "/data/hostObservation/rawRows/evidenceBlobs"
+        },
+        {
+          "subcaseId": "restore-missing-v1-evaluator",
+          "assertionId": "cross-org-denied",
+          "actionId": "cross-org",
+          "pointer": "/response/error/code"
+        },
+        {
+          "subcaseId": "restore-missing-v1-evaluator",
+          "assertionId": "no-cross-org-grant",
+          "actionId": "db",
+          "pointer": "/data/rawRows/grants"
+        },
+        {
+          "subcaseId": "restore-missing-v1-evaluator",
+          "assertionId": "secret-manager-channel",
+          "actionId": "restore",
+          "pointer": "/data/hostObservation/rawRows/secretRecovery/channel"
+        },
+        {
+          "subcaseId": "restore-missing-v1-evaluator",
+          "assertionId": "db-evidence-hash",
+          "actionId": "db",
+          "pointer": "/data/rawRows/documents"
+        },
+        {
+          "subcaseId": "restore-missing-v1-evaluator",
+          "assertionId": "api-evidence-hash",
+          "actionId": "restored-evidence",
+          "pointer": "/response/data/hash"
+        },
+        {
+          "subcaseId": "restore-missing-v1-evaluator",
+          "assertionId": "api-evidence-availability",
+          "actionId": "restored-evidence",
+          "pointer": "/response/data/availability"
+        },
+        {
+          "subcaseId": "restore-missing-v1-evaluator",
+          "assertionId": "restore-execution-state",
+          "actionId": "api",
+          "pointer": "/response/data/executionState"
+        }
+      ]
+    }
+  }
+}

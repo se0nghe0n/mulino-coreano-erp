@@ -1,0 +1,573 @@
+{
+  "caseId": "V5",
+  "evidenceClass": "DECLARED_CONTRACT_ONLY",
+  "productStatus": "NOT_RUN",
+  "bindings": {
+    "V5.wait-after-full-restart": {
+      "resumed-or-escalated-duty-count": [
+        {
+          "subcaseId": "waiting-full-restart",
+          "assertionId": "initial-terminal-origin",
+          "actionId": "initial-terminal",
+          "pointer": "/data/hostObservation/runtimeTask/origin"
+        },
+        {
+          "subcaseId": "waiting-full-restart",
+          "assertionId": "initial-terminal-terminal",
+          "actionId": "initial-terminal",
+          "pointer": "/data/hostObservation/runtimeTask/terminalStatus"
+        },
+        {
+          "subcaseId": "waiting-full-restart",
+          "assertionId": "terminal-origin",
+          "actionId": "terminal",
+          "pointer": "/data/hostObservation/runtimeTask/origin"
+        },
+        {
+          "subcaseId": "waiting-full-restart",
+          "assertionId": "terminal-terminal",
+          "actionId": "terminal",
+          "pointer": "/data/hostObservation/runtimeTask/terminalStatus"
+        },
+        {
+          "subcaseId": "waiting-full-restart",
+          "assertionId": "before-empty-queue",
+          "actionId": "before-db",
+          "pointer": "/data/rawRows/queueMessages"
+        },
+        {
+          "subcaseId": "waiting-full-restart",
+          "assertionId": "before-waiting",
+          "actionId": "before-db",
+          "pointer": "/data/rawRows/works"
+        },
+        {
+          "subcaseId": "waiting-full-restart",
+          "assertionId": "same-duty-id",
+          "actionId": "db",
+          "pointer": "/data/rawRows/obligations/0/id"
+        },
+        {
+          "subcaseId": "waiting-full-restart",
+          "assertionId": "resumed-once",
+          "actionId": "db",
+          "pointer": "/data/rawRows/dutyTransitions"
+        },
+        {
+          "subcaseId": "waiting-full-restart",
+          "assertionId": "all-process-running",
+          "actionId": "restart-all-worker-b",
+          "pointer": "/data/hostObservation/processObservation/after/status"
+        }
+      ],
+      "duty-after-restart": [
+        {
+          "subcaseId": "waiting-full-restart",
+          "assertionId": "db-current-assignment-one",
+          "actionId": "db",
+          "pointer": "/data/rawRows/assignments"
+        },
+        {
+          "subcaseId": "waiting-full-restart",
+          "assertionId": "db-owner",
+          "actionId": "db",
+          "pointer": "/data/rawRows/assignments"
+        },
+        {
+          "subcaseId": "waiting-full-restart",
+          "assertionId": "db-duty-status",
+          "actionId": "db",
+          "pointer": "/data/rawRows/obligations"
+        },
+        {
+          "subcaseId": "waiting-full-restart",
+          "assertionId": "db-next-action",
+          "actionId": "db",
+          "pointer": "/data/rawRows/assignments"
+        },
+        {
+          "subcaseId": "waiting-full-restart",
+          "assertionId": "db-next-check",
+          "actionId": "db",
+          "pointer": "/data/rawRows/assignments"
+        },
+        {
+          "subcaseId": "waiting-full-restart",
+          "assertionId": "api-owner",
+          "actionId": "api",
+          "pointer": "/response/data/responsibility/ownerId"
+        },
+        {
+          "subcaseId": "waiting-full-restart",
+          "assertionId": "api-action",
+          "actionId": "api",
+          "pointer": "/response/data/responsibility/nextAction"
+        },
+        {
+          "subcaseId": "waiting-full-restart",
+          "assertionId": "api-check",
+          "actionId": "api",
+          "pointer": "/response/data/responsibility/nextCheckAt"
+        }
+      ],
+      "within-test-profile": [
+        {
+          "subcaseId": "waiting-full-restart",
+          "assertionId": "restart-within30",
+          "actionId": "terminal",
+          "pointer": "/data/hostObservation/runtimeTask/completedAt"
+        }
+      ],
+      "queue-success-as-goal-satisfied": [
+        {
+          "subcaseId": "waiting-full-restart",
+          "assertionId": "api-assessment-unsatisfied",
+          "actionId": "api",
+          "pointer": "/response/data/assessment/result"
+        },
+        {
+          "subcaseId": "waiting-full-restart",
+          "assertionId": "no-satisfied-assessment",
+          "actionId": "db",
+          "pointer": "/data/rawRows/assessments"
+        },
+        {
+          "subcaseId": "waiting-full-restart",
+          "assertionId": "no-fulfilled-close",
+          "actionId": "db",
+          "pointer": "/data/rawRows/workClosures"
+        }
+      ]
+    },
+    "V5.two-workers-fencing": {
+      "fence-state": [
+        {
+          "subcaseId": "two-workers-expired-fence",
+          "assertionId": "terminal-b-origin",
+          "actionId": "terminal-b",
+          "pointer": "/data/hostObservation/runtimeTask/origin"
+        },
+        {
+          "subcaseId": "two-workers-expired-fence",
+          "assertionId": "terminal-b-terminal",
+          "actionId": "terminal-b",
+          "pointer": "/data/hostObservation/runtimeTask/terminalStatus"
+        },
+        {
+          "subcaseId": "two-workers-expired-fence",
+          "assertionId": "terminal-a-origin",
+          "actionId": "terminal-a",
+          "pointer": "/data/hostObservation/runtimeTask/origin"
+        },
+        {
+          "subcaseId": "two-workers-expired-fence",
+          "assertionId": "terminal-a-terminal",
+          "actionId": "terminal-a",
+          "pointer": "/data/hostObservation/runtimeTask/terminalStatus"
+        },
+        {
+          "subcaseId": "two-workers-expired-fence",
+          "assertionId": "live-claim-one",
+          "actionId": "takeover-db",
+          "pointer": "/data/rawRows/claims"
+        },
+        {
+          "subcaseId": "two-workers-expired-fence",
+          "assertionId": "new-live-worker",
+          "actionId": "takeover-db",
+          "pointer": "/data/rawRows/claims"
+        },
+        {
+          "subcaseId": "two-workers-expired-fence",
+          "assertionId": "after-terminal-live-claims-zero",
+          "actionId": "db",
+          "pointer": "/data/rawRows/claims"
+        },
+        {
+          "subcaseId": "two-workers-expired-fence",
+          "assertionId": "claim-exact-TTL",
+          "actionId": "claim-a",
+          "pointer": "/data/hostObservation/rawRows/claims/0/expiresAt"
+        },
+        {
+          "subcaseId": "two-workers-expired-fence",
+          "assertionId": "claim-scope-unique",
+          "actionId": "takeover-db",
+          "pointer": "/data/rawRows/claims"
+        },
+        {
+          "subcaseId": "two-workers-expired-fence",
+          "assertionId": "old-claim-expired",
+          "actionId": "db",
+          "pointer": "/data/rawRows/claims"
+        },
+        {
+          "subcaseId": "two-workers-expired-fence",
+          "assertionId": "lease-five-seconds",
+          "actionId": "claim-a",
+          "pointer": "/data/hostObservation/rawRows/claims/0/expiresAt"
+        },
+        {
+          "subcaseId": "two-workers-expired-fence",
+          "assertionId": "new-fence-used-at-commit",
+          "actionId": "db",
+          "pointer": "/data/rawRows/attempts/1/fencingToken"
+        },
+        {
+          "subcaseId": "two-workers-expired-fence",
+          "assertionId": "distinct-version-attempt-tuple",
+          "actionId": "db",
+          "pointer": "/data/rawRows/attempts"
+        }
+      ],
+      "duplicate-effects": [
+        {
+          "subcaseId": "two-workers-expired-fence",
+          "assertionId": "one-command-commit",
+          "actionId": "db",
+          "pointer": "/data/rawRows/commands"
+        },
+        {
+          "subcaseId": "two-workers-expired-fence",
+          "assertionId": "one-duty-transition",
+          "actionId": "db",
+          "pointer": "/data/rawRows/dutyTransitions"
+        },
+        {
+          "subcaseId": "two-workers-expired-fence",
+          "assertionId": "single-escalation-outbox",
+          "actionId": "db",
+          "pointer": "/data/rawRows/outbox"
+        },
+        {
+          "subcaseId": "two-workers-expired-fence",
+          "assertionId": "unique-escalation-operation",
+          "actionId": "db",
+          "pointer": "/data/rawRows/outbox"
+        },
+        {
+          "subcaseId": "repeated-crash-no-duplicate",
+          "assertionId": "terminal-0-origin",
+          "actionId": "terminal-0",
+          "pointer": "/data/hostObservation/runtimeTask/origin"
+        },
+        {
+          "subcaseId": "repeated-crash-no-duplicate",
+          "assertionId": "terminal-0-terminal",
+          "actionId": "terminal-0",
+          "pointer": "/data/hostObservation/runtimeTask/terminalStatus"
+        },
+        {
+          "subcaseId": "repeated-crash-no-duplicate",
+          "assertionId": "terminal-1-origin",
+          "actionId": "terminal-1",
+          "pointer": "/data/hostObservation/runtimeTask/origin"
+        },
+        {
+          "subcaseId": "repeated-crash-no-duplicate",
+          "assertionId": "terminal-1-terminal",
+          "actionId": "terminal-1",
+          "pointer": "/data/hostObservation/runtimeTask/terminalStatus"
+        },
+        {
+          "subcaseId": "repeated-crash-no-duplicate",
+          "assertionId": "final-terminal-origin",
+          "actionId": "final-terminal",
+          "pointer": "/data/hostObservation/runtimeTask/origin"
+        },
+        {
+          "subcaseId": "repeated-crash-no-duplicate",
+          "assertionId": "final-terminal-terminal",
+          "actionId": "final-terminal",
+          "pointer": "/data/hostObservation/runtimeTask/terminalStatus"
+        },
+        {
+          "subcaseId": "repeated-crash-no-duplicate",
+          "assertionId": "exactly-one-commit",
+          "actionId": "db",
+          "pointer": "/data/rawRows/commands"
+        },
+        {
+          "subcaseId": "repeated-crash-no-duplicate",
+          "assertionId": "exactly-one-transition",
+          "actionId": "db",
+          "pointer": "/data/rawRows/dutyTransitions"
+        },
+        {
+          "subcaseId": "repeated-crash-no-duplicate",
+          "assertionId": "single-escalation-outbox",
+          "actionId": "db",
+          "pointer": "/data/rawRows/outbox"
+        },
+        {
+          "subcaseId": "repeated-crash-no-duplicate",
+          "assertionId": "unique-escalation-operation",
+          "actionId": "db",
+          "pointer": "/data/rawRows/outbox"
+        },
+        {
+          "subcaseId": "repeated-crash-no-duplicate",
+          "assertionId": "attempt-key-first-retry",
+          "actionId": "db",
+          "pointer": "/data/rawRows/attempts/1/commandIdempotencyKey"
+        },
+        {
+          "subcaseId": "repeated-crash-no-duplicate",
+          "assertionId": "attempt-key-final-replay",
+          "actionId": "db",
+          "pointer": "/data/rawRows/attempts/2/commandIdempotencyKey"
+        },
+        {
+          "subcaseId": "repeated-crash-no-duplicate",
+          "assertionId": "three-observed-attempts",
+          "actionId": "db",
+          "pointer": "/data/rawRows/attempts"
+        },
+        {
+          "subcaseId": "repeated-crash-no-duplicate",
+          "assertionId": "no-physical-duplication",
+          "actionId": "db",
+          "pointer": "/data/rawRows/segments"
+        },
+        {
+          "subcaseId": "repeated-crash-no-duplicate",
+          "assertionId": "held-remains20",
+          "actionId": "db",
+          "pointer": "/data/rawRows/segments"
+        },
+        {
+          "subcaseId": "bounded-retry-exhausted-owner",
+          "assertionId": "no-committed-effect",
+          "actionId": "db",
+          "pointer": "/data/rawRows/commands"
+        },
+        {
+          "subcaseId": "bounded-retry-exhausted-owner",
+          "assertionId": "no-duty-duplicate",
+          "actionId": "db",
+          "pointer": "/data/rawRows/obligations"
+        }
+      ],
+      "stale-worker-commit": [
+        {
+          "subcaseId": "two-workers-expired-fence",
+          "assertionId": "no-stale-commit",
+          "actionId": "db",
+          "pointer": "/data/rawRows/commands"
+        },
+        {
+          "subcaseId": "two-workers-expired-fence",
+          "assertionId": "stale-attempt-rejected",
+          "actionId": "db",
+          "pointer": "/data/rawRows/attempts"
+        },
+        {
+          "subcaseId": "two-workers-expired-fence",
+          "assertionId": "api-attempt-results",
+          "actionId": "api",
+          "pointer": "/response/data/attempts"
+        }
+      ],
+      "exhausted-retry-owner": [
+        {
+          "subcaseId": "two-workers-expired-fence",
+          "assertionId": "db-current-assignment-one",
+          "actionId": "db",
+          "pointer": "/data/rawRows/assignments"
+        },
+        {
+          "subcaseId": "two-workers-expired-fence",
+          "assertionId": "db-owner",
+          "actionId": "db",
+          "pointer": "/data/rawRows/assignments"
+        },
+        {
+          "subcaseId": "two-workers-expired-fence",
+          "assertionId": "db-duty-status",
+          "actionId": "db",
+          "pointer": "/data/rawRows/obligations"
+        },
+        {
+          "subcaseId": "two-workers-expired-fence",
+          "assertionId": "db-next-action",
+          "actionId": "db",
+          "pointer": "/data/rawRows/assignments"
+        },
+        {
+          "subcaseId": "two-workers-expired-fence",
+          "assertionId": "db-next-check",
+          "actionId": "db",
+          "pointer": "/data/rawRows/assignments"
+        },
+        {
+          "subcaseId": "two-workers-expired-fence",
+          "assertionId": "api-owner",
+          "actionId": "api",
+          "pointer": "/response/data/responsibility/ownerId"
+        },
+        {
+          "subcaseId": "two-workers-expired-fence",
+          "assertionId": "api-action",
+          "actionId": "api",
+          "pointer": "/response/data/responsibility/nextAction"
+        },
+        {
+          "subcaseId": "two-workers-expired-fence",
+          "assertionId": "api-check",
+          "actionId": "api",
+          "pointer": "/response/data/responsibility/nextCheckAt"
+        },
+        {
+          "subcaseId": "repeated-crash-no-duplicate",
+          "assertionId": "db-current-assignment-one",
+          "actionId": "db",
+          "pointer": "/data/rawRows/assignments"
+        },
+        {
+          "subcaseId": "repeated-crash-no-duplicate",
+          "assertionId": "db-owner",
+          "actionId": "db",
+          "pointer": "/data/rawRows/assignments"
+        },
+        {
+          "subcaseId": "repeated-crash-no-duplicate",
+          "assertionId": "db-duty-status",
+          "actionId": "db",
+          "pointer": "/data/rawRows/obligations"
+        },
+        {
+          "subcaseId": "repeated-crash-no-duplicate",
+          "assertionId": "db-next-action",
+          "actionId": "db",
+          "pointer": "/data/rawRows/assignments"
+        },
+        {
+          "subcaseId": "repeated-crash-no-duplicate",
+          "assertionId": "db-next-check",
+          "actionId": "db",
+          "pointer": "/data/rawRows/assignments"
+        },
+        {
+          "subcaseId": "repeated-crash-no-duplicate",
+          "assertionId": "api-owner",
+          "actionId": "api",
+          "pointer": "/response/data/responsibility/ownerId"
+        },
+        {
+          "subcaseId": "repeated-crash-no-duplicate",
+          "assertionId": "api-action",
+          "actionId": "api",
+          "pointer": "/response/data/responsibility/nextAction"
+        },
+        {
+          "subcaseId": "repeated-crash-no-duplicate",
+          "assertionId": "api-check",
+          "actionId": "api",
+          "pointer": "/response/data/responsibility/nextCheckAt"
+        },
+        {
+          "subcaseId": "bounded-retry-exhausted-owner",
+          "assertionId": "terminal-0-origin",
+          "actionId": "terminal-0",
+          "pointer": "/data/hostObservation/runtimeTask/origin"
+        },
+        {
+          "subcaseId": "bounded-retry-exhausted-owner",
+          "assertionId": "terminal-0-terminal",
+          "actionId": "terminal-0",
+          "pointer": "/data/hostObservation/runtimeTask/terminalStatus"
+        },
+        {
+          "subcaseId": "bounded-retry-exhausted-owner",
+          "assertionId": "terminal-1-origin",
+          "actionId": "terminal-1",
+          "pointer": "/data/hostObservation/runtimeTask/origin"
+        },
+        {
+          "subcaseId": "bounded-retry-exhausted-owner",
+          "assertionId": "terminal-1-terminal",
+          "actionId": "terminal-1",
+          "pointer": "/data/hostObservation/runtimeTask/terminalStatus"
+        },
+        {
+          "subcaseId": "bounded-retry-exhausted-owner",
+          "assertionId": "terminal-2-origin",
+          "actionId": "terminal-2",
+          "pointer": "/data/hostObservation/runtimeTask/origin"
+        },
+        {
+          "subcaseId": "bounded-retry-exhausted-owner",
+          "assertionId": "terminal-2-terminal",
+          "actionId": "terminal-2",
+          "pointer": "/data/hostObservation/runtimeTask/terminalStatus"
+        },
+        {
+          "subcaseId": "bounded-retry-exhausted-owner",
+          "assertionId": "db-current-assignment-one",
+          "actionId": "db",
+          "pointer": "/data/rawRows/assignments"
+        },
+        {
+          "subcaseId": "bounded-retry-exhausted-owner",
+          "assertionId": "db-owner",
+          "actionId": "db",
+          "pointer": "/data/rawRows/assignments"
+        },
+        {
+          "subcaseId": "bounded-retry-exhausted-owner",
+          "assertionId": "db-duty-status",
+          "actionId": "db",
+          "pointer": "/data/rawRows/obligations"
+        },
+        {
+          "subcaseId": "bounded-retry-exhausted-owner",
+          "assertionId": "db-next-action",
+          "actionId": "db",
+          "pointer": "/data/rawRows/assignments"
+        },
+        {
+          "subcaseId": "bounded-retry-exhausted-owner",
+          "assertionId": "db-next-check",
+          "actionId": "db",
+          "pointer": "/data/rawRows/assignments"
+        },
+        {
+          "subcaseId": "bounded-retry-exhausted-owner",
+          "assertionId": "api-owner",
+          "actionId": "api",
+          "pointer": "/response/data/responsibility/ownerId"
+        },
+        {
+          "subcaseId": "bounded-retry-exhausted-owner",
+          "assertionId": "api-action",
+          "actionId": "api",
+          "pointer": "/response/data/responsibility/nextAction"
+        },
+        {
+          "subcaseId": "bounded-retry-exhausted-owner",
+          "assertionId": "api-check",
+          "actionId": "api",
+          "pointer": "/response/data/responsibility/nextCheckAt"
+        },
+        {
+          "subcaseId": "bounded-retry-exhausted-owner",
+          "assertionId": "three-attempts",
+          "actionId": "db",
+          "pointer": "/data/rawRows/attempts"
+        },
+        {
+          "subcaseId": "bounded-retry-exhausted-owner",
+          "assertionId": "retry-exhausted-state",
+          "actionId": "db",
+          "pointer": "/data/rawRows/works"
+        },
+        {
+          "subcaseId": "bounded-retry-exhausted-owner",
+          "assertionId": "no-satisfied-goal",
+          "actionId": "db",
+          "pointer": "/data/rawRows/assessments"
+        }
+      ]
+    }
+  }
+}

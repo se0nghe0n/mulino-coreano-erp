@@ -1,0 +1,6396 @@
+{
+  "schemaVersion": "1.0.0",
+  "caseId": "V5",
+  "title": "전체 재시작·두 worker·lease fence 인수 계약",
+  "requirementRefs": [
+    "D10",
+    "D26"
+  ],
+  "profiles": [
+    "recovery",
+    "scenarios"
+  ],
+  "subcases": [
+    {
+      "id": "waiting-full-restart",
+      "title": "queue 성공 뒤 WAITING만 남겨 모든 process를 재시작하고 같은 의무 하나를 재개한다",
+      "fixtureRef": "verification/cases/V5/fixtures/waiting-full-restart.json",
+      "requiredAdapters": [
+        "fixture",
+        "api",
+        "db",
+        "clock",
+        "fault",
+        "process",
+        "host-extractor",
+        "scheduler",
+        "actual-workers",
+        "externalResponder"
+      ],
+      "actions": [
+        {
+          "id": "setup",
+          "kind": "installFixture",
+          "evidenceRefs": [
+            "setup:actual-artifact"
+          ]
+        },
+        {
+          "id": "start-app-api",
+          "kind": "control",
+          "control": {
+            "type": "process",
+            "operation": "start",
+            "parameters": {
+              "scope": {
+                "organizationId": {
+                  "$alias": "ORG"
+                },
+                "caseId": "V5",
+                "subcaseId": "waiting-full-restart"
+              },
+              "processId": "api",
+              "environmentId": "runtime-V5-waiting-full-restart-source"
+            }
+          },
+          "evidenceRefs": [
+            "start-app-api:actual-artifact"
+          ]
+        },
+        {
+          "id": "start-app-scheduler",
+          "kind": "control",
+          "control": {
+            "type": "process",
+            "operation": "start",
+            "parameters": {
+              "scope": {
+                "organizationId": {
+                  "$alias": "ORG"
+                },
+                "caseId": "V5",
+                "subcaseId": "waiting-full-restart"
+              },
+              "processId": "scheduler",
+              "environmentId": "runtime-V5-waiting-full-restart-source"
+            }
+          },
+          "evidenceRefs": [
+            "start-app-scheduler:actual-artifact"
+          ]
+        },
+        {
+          "id": "start-app-worker-a",
+          "kind": "control",
+          "control": {
+            "type": "process",
+            "operation": "start",
+            "parameters": {
+              "scope": {
+                "organizationId": {
+                  "$alias": "ORG"
+                },
+                "caseId": "V5",
+                "subcaseId": "waiting-full-restart"
+              },
+              "processId": "worker-a",
+              "environmentId": "runtime-V5-waiting-full-restart-source"
+            }
+          },
+          "evidenceRefs": [
+            "start-app-worker-a:actual-artifact"
+          ]
+        },
+        {
+          "id": "start-app-worker-b",
+          "kind": "control",
+          "control": {
+            "type": "process",
+            "operation": "start",
+            "parameters": {
+              "scope": {
+                "organizationId": {
+                  "$alias": "ORG"
+                },
+                "caseId": "V5",
+                "subcaseId": "waiting-full-restart"
+              },
+              "processId": "worker-b",
+              "environmentId": "runtime-V5-waiting-full-restart-source"
+            }
+          },
+          "evidenceRefs": [
+            "start-app-worker-b:actual-artifact"
+          ]
+        },
+        {
+          "id": "create",
+          "kind": "invoke",
+          "actorRef": "owner",
+          "route": "api",
+          "capabilityId": "createWork",
+          "request": {
+            "intentKind": "COMMAND",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "createWork",
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "caseId": "V5",
+              "subcaseId": "waiting-full-restart"
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:00Z",
+            "workKind": "check",
+            "subjectRefs": [
+              {
+                "type": "TradeItem",
+                "id": {
+                  "$alias": "P"
+                }
+              }
+            ],
+            "goal": {
+              "quantity": "20",
+              "unit": "BOX",
+              "quantityMode": "STATE_AT",
+              "endpoint": "VERIFIED",
+              "destinationId": {
+                "$alias": "W"
+              },
+              "dueAt": "2026-10-07T09:00:10Z",
+              "deadlineInclusive": true,
+              "timezone": "Asia/Seoul",
+              "evidencePolicyVersion": "synthetic-evidence-v1"
+            },
+            "ownerId": {
+              "$alias": "owner"
+            },
+            "supervisorId": {
+              "$alias": "supervisor"
+            },
+            "nextAction": "조사·재인가·안전 재시도",
+            "nextCheckAt": "2026-10-07T09:01:00Z",
+            "commandIdempotencyKey": "V5-waiting-full-restart-create"
+          },
+          "evidenceRefs": [
+            "create:actual-artifact"
+          ]
+        },
+        {
+          "id": "create-activate",
+          "kind": "invoke",
+          "actorRef": "owner",
+          "route": "api",
+          "capabilityId": "activateWork",
+          "request": {
+            "intentKind": "COMMAND",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "activateWork",
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "caseId": "V5",
+              "subcaseId": "waiting-full-restart"
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:00Z",
+            "workId": {
+              "$result": {
+                "actionId": "create",
+                "pointer": "/response/workId"
+              }
+            },
+            "expectedRevision": {
+              "$result": {
+                "actionId": "create",
+                "pointer": "/response/revision"
+              }
+            },
+            "commandIdempotencyKey": "V5-waiting-full-restart-create-activate"
+          },
+          "evidenceRefs": [
+            "create-activate:actual-artifact"
+          ]
+        },
+        {
+          "id": "wait",
+          "kind": "invoke",
+          "actorRef": "owner",
+          "route": "api",
+          "capabilityId": "waitWork",
+          "request": {
+            "intentKind": "COMMAND",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "waitWork",
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "caseId": "V5",
+              "subcaseId": "waiting-full-restart"
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:00Z",
+            "workId": {
+              "$result": {
+                "actionId": "create",
+                "pointer": "/response/workId"
+              }
+            },
+            "expectedRevision": {
+              "$result": {
+                "actionId": "create-activate",
+                "pointer": "/response/revision"
+              }
+            },
+            "reason": "AWAITING_VERIFIED_EVIDENCE",
+            "targetId": {
+              "$alias": "Q20"
+            },
+            "resumePredicate": {
+              "kind": "evidenceAvailable",
+              "eventId": "EV-READY",
+              "expectedRevision": 1
+            },
+            "verifierId": {
+              "$alias": "owner"
+            },
+            "nextCheckAt": "2026-10-07T09:00:10Z",
+            "overdueAction": "ESCALATE_EXISTING_DUTY",
+            "commandIdempotencyKey": "V5-waiting-full-restart-wait"
+          },
+          "evidenceRefs": [
+            "wait:actual-artifact"
+          ]
+        },
+        {
+          "id": "queue-success",
+          "kind": "control",
+          "control": {
+            "type": "externalResponder",
+            "operation": "configure",
+            "parameters": {
+              "scope": {
+                "organizationId": {
+                  "$alias": "ORG"
+                },
+                "caseId": "V5",
+                "subcaseId": "waiting-full-restart"
+              },
+              "sourceProfile": "local-queue",
+              "responseMode": "ACK_AND_DELETE_MESSAGE"
+            }
+          },
+          "evidenceRefs": [
+            "queue-success:actual-artifact"
+          ]
+        },
+        {
+          "id": "initial-tick",
+          "kind": "control",
+          "control": {
+            "type": "process",
+            "operation": "tickScheduler",
+            "parameters": {
+              "scope": {
+                "organizationId": {
+                  "$alias": "ORG"
+                },
+                "caseId": "V5",
+                "subcaseId": "waiting-full-restart"
+              },
+              "schedulerId": "scheduler-waiting-full-restart",
+              "clockInstant": "2026-10-07T09:00:00Z",
+              "queueMode": "EMPTY_NO_REPLAY"
+            }
+          },
+          "evidenceRefs": [
+            "initial-tick:actual-artifact"
+          ]
+        },
+        {
+          "id": "initial-terminal",
+          "kind": "control",
+          "control": {
+            "type": "process",
+            "operation": "awaitRuntimeTask",
+            "parameters": {
+              "scope": {
+                "organizationId": {
+                  "$alias": "ORG"
+                },
+                "caseId": "V5",
+                "subcaseId": "waiting-full-restart"
+              },
+              "schedulerId": "scheduler-waiting-full-restart",
+              "taskId": {
+                "$result": {
+                  "actionId": "initial-tick",
+                  "pointer": "/data/hostObservation/rawRows/tasks/0/taskId"
+                }
+              },
+              "invocationHandle": {
+                "$result": {
+                  "actionId": "initial-tick",
+                  "pointer": "/data/hostObservation/rawRows/tasks/0/invocationHandle"
+                }
+              },
+              "timeoutSeconds": 30
+            }
+          },
+          "evidenceRefs": [
+            "initial-terminal:actual-artifact"
+          ]
+        },
+        {
+          "id": "before",
+          "kind": "query",
+          "actorRef": "operations",
+          "route": "api",
+          "capabilityId": "getWork",
+          "request": {
+            "intentKind": "QUERY",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "getWork",
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "caseId": "V5",
+              "subcaseId": "waiting-full-restart"
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:00Z",
+            "workId": {
+              "$result": {
+                "actionId": "create",
+                "pointer": "/response/workId"
+              }
+            }
+          },
+          "evidenceRefs": [
+            "before:actual-artifact"
+          ]
+        },
+        {
+          "id": "before-db",
+          "kind": "observe",
+          "observation": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "caseId": "V5",
+              "subcaseId": "waiting-full-restart"
+            },
+            "snapshotRef": {
+              "$result": {
+                "actionId": "before",
+                "pointer": "/response/snapshotRevision"
+              }
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:00Z",
+            "sources": [
+              "movements",
+              "queueMessages",
+              "events",
+              "externalDeliveries",
+              "obligationResolutions",
+              "dutyTransitions",
+              "workClosures",
+              "operationalIssues",
+              "boundaryCauses",
+              "works",
+              "goals",
+              "assessments",
+              "obligations",
+              "assignments",
+              "intake",
+              "claims",
+              "attempts",
+              "commands",
+              "segments",
+              "genealogy",
+              "allocations",
+              "restrictions",
+              "validityBoundaries",
+              "inbox",
+              "outbox",
+              "audit",
+              "alerts",
+              "definitions",
+              "policies",
+              "grants",
+              "documents",
+              "reconciliations",
+              "projections"
+            ]
+          },
+          "evidenceRefs": [
+            "before-db:actual-artifact"
+          ]
+        },
+        {
+          "id": "stop-all-api",
+          "kind": "control",
+          "control": {
+            "type": "process",
+            "operation": "stop",
+            "parameters": {
+              "scope": {
+                "organizationId": {
+                  "$alias": "ORG"
+                },
+                "caseId": "V5",
+                "subcaseId": "waiting-full-restart"
+              },
+              "processId": "api",
+              "environmentId": "runtime-V5-waiting-full-restart-source"
+            }
+          },
+          "evidenceRefs": [
+            "stop-all-api:actual-artifact"
+          ]
+        },
+        {
+          "id": "stop-all-scheduler",
+          "kind": "control",
+          "control": {
+            "type": "process",
+            "operation": "stop",
+            "parameters": {
+              "scope": {
+                "organizationId": {
+                  "$alias": "ORG"
+                },
+                "caseId": "V5",
+                "subcaseId": "waiting-full-restart"
+              },
+              "processId": "scheduler",
+              "environmentId": "runtime-V5-waiting-full-restart-source"
+            }
+          },
+          "evidenceRefs": [
+            "stop-all-scheduler:actual-artifact"
+          ]
+        },
+        {
+          "id": "stop-all-worker-a",
+          "kind": "control",
+          "control": {
+            "type": "process",
+            "operation": "stop",
+            "parameters": {
+              "scope": {
+                "organizationId": {
+                  "$alias": "ORG"
+                },
+                "caseId": "V5",
+                "subcaseId": "waiting-full-restart"
+              },
+              "processId": "worker-a",
+              "environmentId": "runtime-V5-waiting-full-restart-source"
+            }
+          },
+          "evidenceRefs": [
+            "stop-all-worker-a:actual-artifact"
+          ]
+        },
+        {
+          "id": "stop-all-worker-b",
+          "kind": "control",
+          "control": {
+            "type": "process",
+            "operation": "stop",
+            "parameters": {
+              "scope": {
+                "organizationId": {
+                  "$alias": "ORG"
+                },
+                "caseId": "V5",
+                "subcaseId": "waiting-full-restart"
+              },
+              "processId": "worker-b",
+              "environmentId": "runtime-V5-waiting-full-restart-source"
+            }
+          },
+          "evidenceRefs": [
+            "stop-all-worker-b:actual-artifact"
+          ]
+        },
+        {
+          "id": "advance",
+          "kind": "control",
+          "control": {
+            "type": "clock",
+            "operation": "advanceTo",
+            "parameters": {
+              "scope": {
+                "organizationId": {
+                  "$alias": "ORG"
+                },
+                "caseId": "V5",
+                "subcaseId": "waiting-full-restart"
+              },
+              "instant": "2026-10-07T09:00:10Z",
+              "knownAt": "2026-10-07T09:00:10Z",
+              "timezone": "Asia/Seoul"
+            }
+          },
+          "evidenceRefs": [
+            "advance:actual-artifact"
+          ]
+        },
+        {
+          "id": "restart-all-api",
+          "kind": "control",
+          "control": {
+            "type": "process",
+            "operation": "restart",
+            "parameters": {
+              "scope": {
+                "organizationId": {
+                  "$alias": "ORG"
+                },
+                "caseId": "V5",
+                "subcaseId": "waiting-full-restart"
+              },
+              "processId": "api",
+              "environmentId": "runtime-V5-waiting-full-restart-source"
+            }
+          },
+          "evidenceRefs": [
+            "restart-all-api:actual-artifact"
+          ]
+        },
+        {
+          "id": "restart-all-scheduler",
+          "kind": "control",
+          "control": {
+            "type": "process",
+            "operation": "restart",
+            "parameters": {
+              "scope": {
+                "organizationId": {
+                  "$alias": "ORG"
+                },
+                "caseId": "V5",
+                "subcaseId": "waiting-full-restart"
+              },
+              "processId": "scheduler",
+              "environmentId": "runtime-V5-waiting-full-restart-source"
+            }
+          },
+          "evidenceRefs": [
+            "restart-all-scheduler:actual-artifact"
+          ]
+        },
+        {
+          "id": "restart-all-worker-a",
+          "kind": "control",
+          "control": {
+            "type": "process",
+            "operation": "restart",
+            "parameters": {
+              "scope": {
+                "organizationId": {
+                  "$alias": "ORG"
+                },
+                "caseId": "V5",
+                "subcaseId": "waiting-full-restart"
+              },
+              "processId": "worker-a",
+              "environmentId": "runtime-V5-waiting-full-restart-source"
+            }
+          },
+          "evidenceRefs": [
+            "restart-all-worker-a:actual-artifact"
+          ]
+        },
+        {
+          "id": "restart-all-worker-b",
+          "kind": "control",
+          "control": {
+            "type": "process",
+            "operation": "restart",
+            "parameters": {
+              "scope": {
+                "organizationId": {
+                  "$alias": "ORG"
+                },
+                "caseId": "V5",
+                "subcaseId": "waiting-full-restart"
+              },
+              "processId": "worker-b",
+              "environmentId": "runtime-V5-waiting-full-restart-source"
+            }
+          },
+          "evidenceRefs": [
+            "restart-all-worker-b:actual-artifact"
+          ]
+        },
+        {
+          "id": "tick",
+          "kind": "control",
+          "control": {
+            "type": "process",
+            "operation": "tickScheduler",
+            "parameters": {
+              "scope": {
+                "organizationId": {
+                  "$alias": "ORG"
+                },
+                "caseId": "V5",
+                "subcaseId": "waiting-full-restart"
+              },
+              "schedulerId": "scheduler-waiting-full-restart",
+              "clockInstant": "2026-10-07T09:00:10Z",
+              "queueMode": "EMPTY_NO_REPLAY"
+            }
+          },
+          "evidenceRefs": [
+            "tick:actual-artifact"
+          ]
+        },
+        {
+          "id": "terminal",
+          "kind": "control",
+          "control": {
+            "type": "process",
+            "operation": "awaitRuntimeTask",
+            "parameters": {
+              "scope": {
+                "organizationId": {
+                  "$alias": "ORG"
+                },
+                "caseId": "V5",
+                "subcaseId": "waiting-full-restart"
+              },
+              "schedulerId": "scheduler-waiting-full-restart",
+              "taskId": {
+                "$result": {
+                  "actionId": "tick",
+                  "pointer": "/data/hostObservation/rawRows/tasks/0/taskId"
+                }
+              },
+              "invocationHandle": {
+                "$result": {
+                  "actionId": "tick",
+                  "pointer": "/data/hostObservation/rawRows/tasks/0/invocationHandle"
+                }
+              },
+              "timeoutSeconds": 30
+            }
+          },
+          "evidenceRefs": [
+            "terminal:actual-artifact"
+          ]
+        },
+        {
+          "id": "api",
+          "kind": "query",
+          "actorRef": "operations",
+          "route": "api",
+          "capabilityId": "getWork",
+          "request": {
+            "intentKind": "QUERY",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "getWork",
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "caseId": "V5",
+              "subcaseId": "waiting-full-restart"
+            },
+            "asOf": "2026-10-07T09:00:10Z",
+            "knownAt": "2026-10-07T09:00:10Z",
+            "workId": {
+              "$result": {
+                "actionId": "create",
+                "pointer": "/response/workId"
+              }
+            }
+          },
+          "evidenceRefs": [
+            "api:actual-artifact"
+          ]
+        },
+        {
+          "id": "db",
+          "kind": "observe",
+          "observation": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "caseId": "V5",
+              "subcaseId": "waiting-full-restart"
+            },
+            "snapshotRef": {
+              "$result": {
+                "actionId": "api",
+                "pointer": "/response/snapshotRevision"
+              }
+            },
+            "asOf": "2026-10-07T09:00:10Z",
+            "knownAt": "2026-10-07T09:00:10Z",
+            "sources": [
+              "movements",
+              "queueMessages",
+              "events",
+              "externalDeliveries",
+              "obligationResolutions",
+              "dutyTransitions",
+              "workClosures",
+              "operationalIssues",
+              "boundaryCauses",
+              "works",
+              "goals",
+              "assessments",
+              "obligations",
+              "assignments",
+              "intake",
+              "claims",
+              "attempts",
+              "commands",
+              "segments",
+              "genealogy",
+              "allocations",
+              "restrictions",
+              "validityBoundaries",
+              "inbox",
+              "outbox",
+              "audit",
+              "alerts",
+              "definitions",
+              "policies",
+              "grants",
+              "documents",
+              "reconciliations",
+              "projections"
+            ]
+          },
+          "evidenceRefs": [
+            "db:actual-artifact"
+          ]
+        }
+      ],
+      "assertions": [
+        {
+          "id": "initial-terminal-origin",
+          "op": "equals",
+          "source": {
+            "actionId": "initial-terminal",
+            "pointer": "/data/hostObservation/runtimeTask/origin"
+          },
+          "expected": "autonomousScheduler",
+          "requirementRefs": [
+            "D10",
+            "D26"
+          ],
+          "evidenceRefs": [
+            "initial-terminal:actual-artifact",
+            "initial-terminal:source-rows"
+          ],
+          "scope": {
+            "normativeScope": "same-duty",
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "V5",
+            "subcaseId": "waiting-full-restart"
+          },
+          "oracleExplanation": "실제 scheduler가 자율 생성한 task의 종료를 관찰한다.",
+          "oracleRef": {
+            "oracleId": "V5.wait-after-full-restart",
+            "observationNames": [
+              "resumed-or-escalated-duty-count"
+            ]
+          }
+        },
+        {
+          "id": "initial-terminal-terminal",
+          "op": "equals",
+          "source": {
+            "actionId": "initial-terminal",
+            "pointer": "/data/hostObservation/runtimeTask/terminalStatus"
+          },
+          "expected": "SUCCEEDED",
+          "requirementRefs": [
+            "D10",
+            "D26"
+          ],
+          "evidenceRefs": [
+            "initial-terminal:actual-artifact",
+            "initial-terminal:source-rows"
+          ],
+          "scope": {
+            "normativeScope": "same-duty",
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "V5",
+            "subcaseId": "waiting-full-restart"
+          },
+          "oracleExplanation": "제출 ACK가 아니라 실제 task terminal을 확인한다.",
+          "oracleRef": {
+            "oracleId": "V5.wait-after-full-restart",
+            "observationNames": [
+              "resumed-or-escalated-duty-count"
+            ]
+          }
+        },
+        {
+          "id": "terminal-origin",
+          "op": "equals",
+          "source": {
+            "actionId": "terminal",
+            "pointer": "/data/hostObservation/runtimeTask/origin"
+          },
+          "expected": "autonomousScheduler",
+          "requirementRefs": [
+            "D10",
+            "D26"
+          ],
+          "evidenceRefs": [
+            "terminal:actual-artifact",
+            "terminal:source-rows"
+          ],
+          "scope": {
+            "normativeScope": "same-duty",
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "V5",
+            "subcaseId": "waiting-full-restart"
+          },
+          "oracleExplanation": "실제 scheduler가 자율 생성한 task의 종료를 관찰한다.",
+          "oracleRef": {
+            "oracleId": "V5.wait-after-full-restart",
+            "observationNames": [
+              "resumed-or-escalated-duty-count"
+            ]
+          }
+        },
+        {
+          "id": "terminal-terminal",
+          "op": "equals",
+          "source": {
+            "actionId": "terminal",
+            "pointer": "/data/hostObservation/runtimeTask/terminalStatus"
+          },
+          "expected": "SUCCEEDED",
+          "requirementRefs": [
+            "D10",
+            "D26"
+          ],
+          "evidenceRefs": [
+            "terminal:actual-artifact",
+            "terminal:source-rows"
+          ],
+          "scope": {
+            "normativeScope": "same-duty",
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "V5",
+            "subcaseId": "waiting-full-restart"
+          },
+          "oracleExplanation": "제출 ACK가 아니라 실제 task terminal을 확인한다.",
+          "oracleRef": {
+            "oracleId": "V5.wait-after-full-restart",
+            "observationNames": [
+              "resumed-or-escalated-duty-count"
+            ]
+          }
+        },
+        {
+          "id": "before-empty-queue",
+          "op": "count",
+          "source": {
+            "actionId": "before-db",
+            "pointer": "/data/rawRows/queueMessages"
+          },
+          "expected": 0,
+          "requirementRefs": [
+            "D10",
+            "D26"
+          ],
+          "evidenceRefs": [
+            "before-db:actual-artifact",
+            "before-db:source-rows"
+          ],
+          "scope": {
+            "normativeScope": "same-duty",
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "V5",
+            "subcaseId": "waiting-full-restart"
+          },
+          "oracleExplanation": "독립 DB 원 행을 정확한 대상 scope로 세어 중복·누락을 거부한다.",
+          "oracleRef": {
+            "oracleId": "V5.wait-after-full-restart",
+            "observationNames": [
+              "resumed-or-escalated-duty-count"
+            ]
+          }
+        },
+        {
+          "id": "before-waiting",
+          "op": "exactSet",
+          "source": {
+            "actionId": "before-db",
+            "pointer": "/data/rawRows/works",
+            "field": "status"
+          },
+          "expected": [
+            "WAITING"
+          ],
+          "requirementRefs": [
+            "D10",
+            "D26"
+          ],
+          "evidenceRefs": [
+            "before-db:actual-artifact",
+            "before-db:source-rows"
+          ],
+          "scope": {
+            "normativeScope": "same-duty",
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "V5",
+            "subcaseId": "waiting-full-restart"
+          },
+          "oracleExplanation": "해당 scope의 각 실제 원 행 값과 고정 기대값을 대조한다.",
+          "oracleRef": {
+            "oracleId": "V5.wait-after-full-restart",
+            "observationNames": [
+              "resumed-or-escalated-duty-count"
+            ]
+          }
+        },
+        {
+          "id": "same-duty-id",
+          "op": "sameAs",
+          "source": {
+            "actionId": "db",
+            "pointer": "/data/rawRows/obligations/0/id"
+          },
+          "expected": true,
+          "requirementRefs": [
+            "D10",
+            "D26"
+          ],
+          "evidenceRefs": [
+            "db:actual-artifact",
+            "db:source-rows"
+          ],
+          "scope": {
+            "normativeScope": "same-duty",
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "V5",
+            "subcaseId": "waiting-full-restart"
+          },
+          "oracleExplanation": "전체 재시작 뒤에도 원 stable obligation root 하나를 재개한다.",
+          "oracleRef": {
+            "oracleId": "V5.wait-after-full-restart",
+            "observationNames": [
+              "resumed-or-escalated-duty-count"
+            ]
+          },
+          "baseline": {
+            "actionId": "before-db",
+            "pointer": "/data/rawRows/obligations/0/id"
+          }
+        },
+        {
+          "id": "resumed-once",
+          "op": "count",
+          "source": {
+            "actionId": "db",
+            "pointer": "/data/rawRows/dutyTransitions",
+            "where": {
+              "cause": "DUE_WAIT",
+              "transition": "ESCALATED"
+            }
+          },
+          "expected": 1,
+          "requirementRefs": [
+            "D10",
+            "D26"
+          ],
+          "evidenceRefs": [
+            "db:actual-artifact",
+            "db:source-rows"
+          ],
+          "scope": {
+            "normativeScope": "same-duty",
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "V5",
+            "subcaseId": "waiting-full-restart"
+          },
+          "oracleExplanation": "독립 DB 원 행을 정확한 대상 scope로 세어 중복·누락을 거부한다.",
+          "oracleRef": {
+            "oracleId": "V5.wait-after-full-restart",
+            "observationNames": [
+              "resumed-or-escalated-duty-count"
+            ]
+          }
+        },
+        {
+          "id": "db-current-assignment-one",
+          "op": "count",
+          "source": {
+            "actionId": "db",
+            "pointer": "/data/rawRows/assignments",
+            "where": {
+              "current": true
+            }
+          },
+          "expected": 1,
+          "requirementRefs": [
+            "D10",
+            "D26"
+          ],
+          "evidenceRefs": [
+            "db:actual-artifact",
+            "db:source-rows"
+          ],
+          "scope": {
+            "normativeScope": "duty-after-restart",
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "V5",
+            "subcaseId": "waiting-full-restart"
+          },
+          "oracleExplanation": "독립 DB 원 행을 정확한 대상 scope로 세어 중복·누락을 거부한다.",
+          "oracleRef": {
+            "oracleId": "V5.wait-after-full-restart",
+            "observationNames": [
+              "duty-after-restart"
+            ]
+          }
+        },
+        {
+          "id": "db-owner",
+          "op": "exactSet",
+          "source": {
+            "actionId": "db",
+            "pointer": "/data/rawRows/assignments",
+            "field": "ownerId",
+            "where": {
+              "current": true
+            }
+          },
+          "expected": [
+            {
+              "$alias": "owner"
+            }
+          ],
+          "requirementRefs": [
+            "D10",
+            "D26"
+          ],
+          "evidenceRefs": [
+            "db:actual-artifact",
+            "db:source-rows"
+          ],
+          "scope": {
+            "normativeScope": "duty-after-restart",
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "V5",
+            "subcaseId": "waiting-full-restart"
+          },
+          "oracleExplanation": "해당 scope의 각 실제 원 행 값과 고정 기대값을 대조한다.",
+          "oracleRef": {
+            "oracleId": "V5.wait-after-full-restart",
+            "observationNames": [
+              "duty-after-restart"
+            ]
+          }
+        },
+        {
+          "id": "db-duty-status",
+          "op": "exactSet",
+          "source": {
+            "actionId": "db",
+            "pointer": "/data/rawRows/obligations",
+            "field": "status"
+          },
+          "expected": [
+            "OPEN"
+          ],
+          "requirementRefs": [
+            "D10",
+            "D26"
+          ],
+          "evidenceRefs": [
+            "db:actual-artifact",
+            "db:source-rows"
+          ],
+          "scope": {
+            "normativeScope": "duty-after-restart",
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "V5",
+            "subcaseId": "waiting-full-restart"
+          },
+          "oracleExplanation": "해당 scope의 각 실제 원 행 값과 고정 기대값을 대조한다.",
+          "oracleRef": {
+            "oracleId": "V5.wait-after-full-restart",
+            "observationNames": [
+              "duty-after-restart"
+            ]
+          }
+        },
+        {
+          "id": "db-next-action",
+          "op": "exactSet",
+          "source": {
+            "actionId": "db",
+            "pointer": "/data/rawRows/assignments",
+            "field": "nextAction",
+            "where": {
+              "current": true
+            }
+          },
+          "expected": [
+            "조사·재인가·안전 재시도"
+          ],
+          "requirementRefs": [
+            "D10",
+            "D26"
+          ],
+          "evidenceRefs": [
+            "db:actual-artifact",
+            "db:source-rows"
+          ],
+          "scope": {
+            "normativeScope": "duty-after-restart",
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "V5",
+            "subcaseId": "waiting-full-restart"
+          },
+          "oracleExplanation": "해당 scope의 각 실제 원 행 값과 고정 기대값을 대조한다.",
+          "oracleRef": {
+            "oracleId": "V5.wait-after-full-restart",
+            "observationNames": [
+              "duty-after-restart"
+            ]
+          }
+        },
+        {
+          "id": "db-next-check",
+          "op": "exactSet",
+          "source": {
+            "actionId": "db",
+            "pointer": "/data/rawRows/assignments",
+            "field": "nextCheckAt",
+            "where": {
+              "current": true
+            }
+          },
+          "expected": [
+            "2026-10-07T09:01:00Z"
+          ],
+          "requirementRefs": [
+            "D10",
+            "D26"
+          ],
+          "evidenceRefs": [
+            "db:actual-artifact",
+            "db:source-rows"
+          ],
+          "scope": {
+            "normativeScope": "duty-after-restart",
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "V5",
+            "subcaseId": "waiting-full-restart"
+          },
+          "oracleExplanation": "해당 scope의 각 실제 원 행 값과 고정 기대값을 대조한다.",
+          "oracleRef": {
+            "oracleId": "V5.wait-after-full-restart",
+            "observationNames": [
+              "duty-after-restart"
+            ]
+          }
+        },
+        {
+          "id": "api-owner",
+          "op": "equals",
+          "source": {
+            "actionId": "api",
+            "pointer": "/response/data/responsibility/ownerId"
+          },
+          "expected": {
+            "$alias": "owner"
+          },
+          "requirementRefs": [
+            "D10",
+            "D26"
+          ],
+          "evidenceRefs": [
+            "api:actual-artifact",
+            "api:source-rows"
+          ],
+          "scope": {
+            "normativeScope": "duty-after-restart",
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "V5",
+            "subcaseId": "waiting-full-restart"
+          },
+          "oracleExplanation": "API가 DB와 같은 인간 주 책임자를 반환한다.",
+          "oracleRef": {
+            "oracleId": "V5.wait-after-full-restart",
+            "observationNames": [
+              "duty-after-restart"
+            ]
+          }
+        },
+        {
+          "id": "api-action",
+          "op": "equals",
+          "source": {
+            "actionId": "api",
+            "pointer": "/response/data/responsibility/nextAction"
+          },
+          "expected": "조사·재인가·안전 재시도",
+          "requirementRefs": [
+            "D10",
+            "D26"
+          ],
+          "evidenceRefs": [
+            "api:actual-artifact",
+            "api:source-rows"
+          ],
+          "scope": {
+            "normativeScope": "duty-after-restart",
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "V5",
+            "subcaseId": "waiting-full-restart"
+          },
+          "oracleExplanation": "이름이 같은 Boolean 대신 실제 다음 행동을 확인한다.",
+          "oracleRef": {
+            "oracleId": "V5.wait-after-full-restart",
+            "observationNames": [
+              "duty-after-restart"
+            ]
+          }
+        },
+        {
+          "id": "api-check",
+          "op": "timeEquals",
+          "source": {
+            "actionId": "api",
+            "pointer": "/response/data/responsibility/nextCheckAt"
+          },
+          "expected": "2026-10-07T09:01:00Z",
+          "requirementRefs": [
+            "D10",
+            "D26"
+          ],
+          "evidenceRefs": [
+            "api:actual-artifact",
+            "api:source-rows"
+          ],
+          "scope": {
+            "normativeScope": "duty-after-restart",
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "V5",
+            "subcaseId": "waiting-full-restart"
+          },
+          "oracleExplanation": "고정 업무 시계의 다음 확인 시점을 검사한다.",
+          "oracleRef": {
+            "oracleId": "V5.wait-after-full-restart",
+            "observationNames": [
+              "duty-after-restart"
+            ]
+          }
+        },
+        {
+          "id": "restart-within30",
+          "op": "timeAtMostSeconds",
+          "source": {
+            "actionId": "terminal",
+            "pointer": "/data/hostObservation/runtimeTask/completedAt"
+          },
+          "expected": "30",
+          "requirementRefs": [
+            "D10",
+            "D26"
+          ],
+          "evidenceRefs": [
+            "terminal:actual-artifact",
+            "terminal:source-rows"
+          ],
+          "scope": {
+            "normativeScope": "restart-to-observation",
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "V5",
+            "subcaseId": "waiting-full-restart"
+          },
+          "oracleExplanation": "실제 마지막 process 기동 완료→task terminal까지 wall-clock30초 이내다. 업무 시계와 구분한다.",
+          "oracleRef": {
+            "oracleId": "V5.wait-after-full-restart",
+            "observationNames": [
+              "within-test-profile"
+            ]
+          },
+          "baseline": {
+            "actionId": "restart-all-worker-b",
+            "pointer": "/data/hostObservation/processObservation/completedAt"
+          }
+        },
+        {
+          "id": "api-assessment-unsatisfied",
+          "op": "equals",
+          "source": {
+            "actionId": "api",
+            "pointer": "/response/data/assessment/result"
+          },
+          "expected": "UNVERIFIED",
+          "requirementRefs": [
+            "D10",
+            "D26"
+          ],
+          "evidenceRefs": [
+            "api:actual-artifact",
+            "api:source-rows"
+          ],
+          "scope": {
+            "normativeScope": "queue-success-as-goal-satisfied",
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "V5",
+            "subcaseId": "waiting-full-restart"
+          },
+          "oracleExplanation": "queue 성공은 목표 충족0이다.",
+          "oracleRef": {
+            "oracleId": "V5.wait-after-full-restart",
+            "observationNames": [
+              "queue-success-as-goal-satisfied"
+            ]
+          }
+        },
+        {
+          "id": "no-satisfied-assessment",
+          "op": "count",
+          "source": {
+            "actionId": "db",
+            "pointer": "/data/rawRows/assessments",
+            "where": {
+              "result": "SATISFIED"
+            }
+          },
+          "expected": 0,
+          "requirementRefs": [
+            "D10",
+            "D26"
+          ],
+          "evidenceRefs": [
+            "db:actual-artifact",
+            "db:source-rows"
+          ],
+          "scope": {
+            "normativeScope": "queue-success-as-goal-satisfied",
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "V5",
+            "subcaseId": "waiting-full-restart"
+          },
+          "oracleExplanation": "독립 DB 원 행을 정확한 대상 scope로 세어 중복·누락을 거부한다.",
+          "oracleRef": {
+            "oracleId": "V5.wait-after-full-restart",
+            "observationNames": [
+              "queue-success-as-goal-satisfied"
+            ]
+          }
+        },
+        {
+          "id": "no-fulfilled-close",
+          "op": "count",
+          "source": {
+            "actionId": "db",
+            "pointer": "/data/rawRows/workClosures",
+            "where": {
+              "reason": "FULFILLED"
+            }
+          },
+          "expected": 0,
+          "requirementRefs": [
+            "D10",
+            "D26"
+          ],
+          "evidenceRefs": [
+            "db:actual-artifact",
+            "db:source-rows"
+          ],
+          "scope": {
+            "normativeScope": "queue-success-as-goal-satisfied",
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "V5",
+            "subcaseId": "waiting-full-restart"
+          },
+          "oracleExplanation": "독립 DB 원 행을 정확한 대상 scope로 세어 중복·누락을 거부한다.",
+          "oracleRef": {
+            "oracleId": "V5.wait-after-full-restart",
+            "observationNames": [
+              "queue-success-as-goal-satisfied"
+            ]
+          }
+        },
+        {
+          "id": "all-process-running",
+          "op": "equals",
+          "source": {
+            "actionId": "restart-all-worker-b",
+            "pointer": "/data/hostObservation/processObservation/after/status"
+          },
+          "expected": "RUNNING",
+          "requirementRefs": [
+            "D10",
+            "D26"
+          ],
+          "evidenceRefs": [
+            "restart-all-worker-b:actual-artifact",
+            "restart-all-worker-b:source-rows"
+          ],
+          "scope": {
+            "normativeScope": "same-duty",
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "V5",
+            "subcaseId": "waiting-full-restart"
+          },
+          "oracleExplanation": "실제 restart lifecycle validator가 전후 instance 차이와 terminal을 검사한다.",
+          "oracleRef": {
+            "oracleId": "V5.wait-after-full-restart",
+            "observationNames": [
+              "resumed-or-escalated-duty-count"
+            ]
+          }
+        }
+      ],
+      "oracleExplanation": "queue 성공 뒤 WAITING만 남겨 모든 process를 재시작하고 같은 의무 하나를 재개한다。복구 완료·재개 결과를 fixture에 seed하지 않는다. 실제 command/fault/lifecycle/clock/terminal과 독립 원 행을 관찰한다."
+    },
+    {
+      "id": "two-workers-expired-fence",
+      "title": "두 실제 worker의 claim 경합·lease 만료·늦은 이전 token의 commit을 검증한다",
+      "fixtureRef": "verification/cases/V5/fixtures/two-workers-expired-fence.json",
+      "requiredAdapters": [
+        "fixture",
+        "api",
+        "db",
+        "clock",
+        "fault",
+        "process",
+        "host-extractor",
+        "scheduler",
+        "actual-workers",
+        "externalResponder"
+      ],
+      "actions": [
+        {
+          "id": "setup",
+          "kind": "installFixture",
+          "evidenceRefs": [
+            "setup:actual-artifact"
+          ]
+        },
+        {
+          "id": "start-api",
+          "kind": "control",
+          "control": {
+            "type": "process",
+            "operation": "start",
+            "parameters": {
+              "scope": {
+                "organizationId": {
+                  "$alias": "ORG"
+                },
+                "caseId": "V5",
+                "subcaseId": "two-workers-expired-fence"
+              },
+              "processId": "api",
+              "environmentId": "runtime-V5-two-workers-expired-fence-source"
+            }
+          },
+          "evidenceRefs": [
+            "start-api:actual-artifact"
+          ]
+        },
+        {
+          "id": "start-scheduler",
+          "kind": "control",
+          "control": {
+            "type": "process",
+            "operation": "start",
+            "parameters": {
+              "scope": {
+                "organizationId": {
+                  "$alias": "ORG"
+                },
+                "caseId": "V5",
+                "subcaseId": "two-workers-expired-fence"
+              },
+              "processId": "scheduler",
+              "environmentId": "runtime-V5-two-workers-expired-fence-source"
+            }
+          },
+          "evidenceRefs": [
+            "start-scheduler:actual-artifact"
+          ]
+        },
+        {
+          "id": "start-worker-a",
+          "kind": "control",
+          "control": {
+            "type": "process",
+            "operation": "start",
+            "parameters": {
+              "scope": {
+                "organizationId": {
+                  "$alias": "ORG"
+                },
+                "caseId": "V5",
+                "subcaseId": "two-workers-expired-fence"
+              },
+              "processId": "worker-a",
+              "environmentId": "runtime-V5-two-workers-expired-fence-source"
+            }
+          },
+          "evidenceRefs": [
+            "start-worker-a:actual-artifact"
+          ]
+        },
+        {
+          "id": "start-worker-b",
+          "kind": "control",
+          "control": {
+            "type": "process",
+            "operation": "start",
+            "parameters": {
+              "scope": {
+                "organizationId": {
+                  "$alias": "ORG"
+                },
+                "caseId": "V5",
+                "subcaseId": "two-workers-expired-fence"
+              },
+              "processId": "worker-b",
+              "environmentId": "runtime-V5-two-workers-expired-fence-source"
+            }
+          },
+          "evidenceRefs": [
+            "start-worker-b:actual-artifact"
+          ]
+        },
+        {
+          "id": "create",
+          "kind": "invoke",
+          "actorRef": "owner",
+          "route": "api",
+          "capabilityId": "createWork",
+          "request": {
+            "intentKind": "COMMAND",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "createWork",
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "caseId": "V5",
+              "subcaseId": "two-workers-expired-fence"
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:00Z",
+            "workKind": "check",
+            "subjectRefs": [
+              {
+                "type": "TradeItem",
+                "id": {
+                  "$alias": "P"
+                }
+              }
+            ],
+            "goal": {
+              "quantity": "20",
+              "unit": "BOX",
+              "quantityMode": "STATE_AT",
+              "endpoint": "VERIFIED",
+              "destinationId": {
+                "$alias": "W"
+              },
+              "dueAt": "2026-10-07T09:00:10Z",
+              "deadlineInclusive": true,
+              "timezone": "Asia/Seoul",
+              "evidencePolicyVersion": "synthetic-evidence-v1"
+            },
+            "ownerId": {
+              "$alias": "owner"
+            },
+            "supervisorId": {
+              "$alias": "supervisor"
+            },
+            "nextAction": "조사·재인가·안전 재시도",
+            "nextCheckAt": "2026-10-07T09:01:00Z",
+            "commandIdempotencyKey": "V5-two-workers-expired-fence-create"
+          },
+          "evidenceRefs": [
+            "create:actual-artifact"
+          ]
+        },
+        {
+          "id": "create-activate",
+          "kind": "invoke",
+          "actorRef": "owner",
+          "route": "api",
+          "capabilityId": "activateWork",
+          "request": {
+            "intentKind": "COMMAND",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "activateWork",
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "caseId": "V5",
+              "subcaseId": "two-workers-expired-fence"
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:00Z",
+            "workId": {
+              "$result": {
+                "actionId": "create",
+                "pointer": "/response/workId"
+              }
+            },
+            "expectedRevision": {
+              "$result": {
+                "actionId": "create",
+                "pointer": "/response/revision"
+              }
+            },
+            "commandIdempotencyKey": "V5-two-workers-expired-fence-create-activate"
+          },
+          "evidenceRefs": [
+            "create-activate:actual-artifact"
+          ]
+        },
+        {
+          "id": "wait",
+          "kind": "invoke",
+          "actorRef": "owner",
+          "route": "api",
+          "capabilityId": "waitWork",
+          "request": {
+            "intentKind": "COMMAND",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "waitWork",
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "caseId": "V5",
+              "subcaseId": "two-workers-expired-fence"
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:00Z",
+            "workId": {
+              "$result": {
+                "actionId": "create",
+                "pointer": "/response/workId"
+              }
+            },
+            "expectedRevision": {
+              "$result": {
+                "actionId": "create-activate",
+                "pointer": "/response/revision"
+              }
+            },
+            "reason": "AWAITING_VERIFIED_EVIDENCE",
+            "targetId": {
+              "$alias": "Q20"
+            },
+            "resumePredicate": {
+              "kind": "evidenceAvailable",
+              "eventId": "EV-READY",
+              "expectedRevision": 1
+            },
+            "verifierId": {
+              "$alias": "owner"
+            },
+            "nextCheckAt": "2026-10-07T09:00:10Z",
+            "overdueAction": "ESCALATE_EXISTING_DUTY",
+            "commandIdempotencyKey": "V5-two-workers-expired-fence-wait"
+          },
+          "evidenceRefs": [
+            "wait:actual-artifact"
+          ]
+        },
+        {
+          "id": "advance",
+          "kind": "control",
+          "control": {
+            "type": "clock",
+            "operation": "advanceTo",
+            "parameters": {
+              "scope": {
+                "organizationId": {
+                  "$alias": "ORG"
+                },
+                "caseId": "V5",
+                "subcaseId": "two-workers-expired-fence"
+              },
+              "instant": "2026-10-07T09:00:10Z",
+              "knownAt": "2026-10-07T09:00:10Z",
+              "timezone": "Asia/Seoul"
+            }
+          },
+          "evidenceRefs": [
+            "advance:actual-artifact"
+          ]
+        },
+        {
+          "id": "pause-a",
+          "kind": "control",
+          "control": {
+            "type": "fault",
+            "operation": "arm",
+            "parameters": {
+              "scope": {
+                "organizationId": {
+                  "$alias": "ORG"
+                },
+                "caseId": "V5",
+                "subcaseId": "two-workers-expired-fence"
+              },
+              "point": "worker.afterClaimBeforeCommit",
+              "workerId": "worker-a",
+              "disableHeartbeat": true,
+              "times": 1
+            }
+          },
+          "evidenceRefs": [
+            "pause-a:actual-artifact"
+          ]
+        },
+        {
+          "id": "tick-a",
+          "kind": "control",
+          "control": {
+            "type": "process",
+            "operation": "tickScheduler",
+            "parameters": {
+              "scope": {
+                "organizationId": {
+                  "$alias": "ORG"
+                },
+                "caseId": "V5",
+                "subcaseId": "two-workers-expired-fence"
+              },
+              "schedulerId": "scheduler-two-workers-expired-fence",
+              "clockInstant": "2026-10-07T09:00:10Z",
+              "queueMode": "EMPTY_NO_REPLAY",
+              "workerIds": [
+                "worker-a"
+              ]
+            }
+          },
+          "evidenceRefs": [
+            "tick-a:actual-artifact"
+          ]
+        },
+        {
+          "id": "claim-a",
+          "kind": "control",
+          "control": {
+            "type": "process",
+            "operation": "claim",
+            "parameters": {
+              "scope": {
+                "organizationId": {
+                  "$alias": "ORG"
+                },
+                "caseId": "V5",
+                "subcaseId": "two-workers-expired-fence"
+              },
+              "schedulerId": "scheduler-two-workers-expired-fence",
+              "taskId": {
+                "$result": {
+                  "actionId": "tick-a",
+                  "pointer": "/data/hostObservation/rawRows/tasks/0/taskId"
+                }
+              }
+            }
+          },
+          "evidenceRefs": [
+            "claim-a:actual-artifact"
+          ]
+        },
+        {
+          "id": "barrier-a",
+          "kind": "control",
+          "control": {
+            "type": "barrier",
+            "operation": "waitReached",
+            "parameters": {
+              "scope": {
+                "organizationId": {
+                  "$alias": "ORG"
+                },
+                "caseId": "V5",
+                "subcaseId": "two-workers-expired-fence"
+              },
+              "barrierId": {
+                "$result": {
+                  "actionId": "claim-a",
+                  "pointer": "/data/hostObservation/rawRows/claims/0/barrierId"
+                }
+              },
+              "participantId": {
+                "$result": {
+                  "actionId": "claim-a",
+                  "pointer": "/data/hostObservation/rawRows/claims/0/workerId"
+                }
+              },
+              "transactionId": {
+                "$result": {
+                  "actionId": "claim-a",
+                  "pointer": "/data/hostObservation/rawRows/claims/0/transactionId"
+                }
+              },
+              "point": "afterClaimBeforeCommit",
+              "state": "REACHED"
+            }
+          },
+          "evidenceRefs": [
+            "barrier-a:actual-artifact"
+          ]
+        },
+        {
+          "id": "before",
+          "kind": "query",
+          "actorRef": "operations",
+          "route": "api",
+          "capabilityId": "getWork",
+          "request": {
+            "intentKind": "QUERY",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "getWork",
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "caseId": "V5",
+              "subcaseId": "two-workers-expired-fence"
+            },
+            "asOf": "2026-10-07T09:00:10Z",
+            "knownAt": "2026-10-07T09:00:10Z",
+            "workId": {
+              "$result": {
+                "actionId": "create",
+                "pointer": "/response/workId"
+              }
+            }
+          },
+          "evidenceRefs": [
+            "before:actual-artifact"
+          ]
+        },
+        {
+          "id": "before-db",
+          "kind": "observe",
+          "observation": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "caseId": "V5",
+              "subcaseId": "two-workers-expired-fence"
+            },
+            "snapshotRef": {
+              "$result": {
+                "actionId": "before",
+                "pointer": "/response/snapshotRevision"
+              }
+            },
+            "asOf": "2026-10-07T09:00:10Z",
+            "knownAt": "2026-10-07T09:00:10Z",
+            "sources": [
+              "movements",
+              "queueMessages",
+              "events",
+              "externalDeliveries",
+              "obligationResolutions",
+              "dutyTransitions",
+              "workClosures",
+              "operationalIssues",
+              "boundaryCauses",
+              "works",
+              "goals",
+              "assessments",
+              "obligations",
+              "assignments",
+              "intake",
+              "claims",
+              "attempts",
+              "commands",
+              "segments",
+              "genealogy",
+              "allocations",
+              "restrictions",
+              "validityBoundaries",
+              "inbox",
+              "outbox",
+              "audit",
+              "alerts",
+              "definitions",
+              "policies",
+              "grants",
+              "documents",
+              "reconciliations",
+              "projections"
+            ]
+          },
+          "evidenceRefs": [
+            "before-db:actual-artifact"
+          ]
+        },
+        {
+          "id": "expire-lease",
+          "kind": "control",
+          "control": {
+            "type": "clock",
+            "operation": "advanceTo",
+            "parameters": {
+              "scope": {
+                "organizationId": {
+                  "$alias": "ORG"
+                },
+                "caseId": "V5",
+                "subcaseId": "two-workers-expired-fence"
+              },
+              "instant": "2026-10-07T09:00:20Z",
+              "knownAt": "2026-10-07T09:00:20Z",
+              "timezone": "Asia/Seoul"
+            }
+          },
+          "evidenceRefs": [
+            "expire-lease:actual-artifact"
+          ]
+        },
+        {
+          "id": "pause-b",
+          "kind": "control",
+          "control": {
+            "type": "fault",
+            "operation": "arm",
+            "parameters": {
+              "scope": {
+                "organizationId": {
+                  "$alias": "ORG"
+                },
+                "caseId": "V5",
+                "subcaseId": "two-workers-expired-fence"
+              },
+              "point": "worker.afterClaimBeforeCommit",
+              "workerId": "worker-b",
+              "disableHeartbeat": true,
+              "times": 1
+            }
+          },
+          "evidenceRefs": [
+            "pause-b:actual-artifact"
+          ]
+        },
+        {
+          "id": "tick-b",
+          "kind": "control",
+          "control": {
+            "type": "process",
+            "operation": "tickScheduler",
+            "parameters": {
+              "scope": {
+                "organizationId": {
+                  "$alias": "ORG"
+                },
+                "caseId": "V5",
+                "subcaseId": "two-workers-expired-fence"
+              },
+              "schedulerId": "scheduler-two-workers-expired-fence",
+              "clockInstant": "2026-10-07T09:00:20Z",
+              "queueMode": "EMPTY_NO_REPLAY",
+              "workerIds": [
+                "worker-b"
+              ]
+            }
+          },
+          "evidenceRefs": [
+            "tick-b:actual-artifact"
+          ]
+        },
+        {
+          "id": "claim-b",
+          "kind": "control",
+          "control": {
+            "type": "process",
+            "operation": "claim",
+            "parameters": {
+              "scope": {
+                "organizationId": {
+                  "$alias": "ORG"
+                },
+                "caseId": "V5",
+                "subcaseId": "two-workers-expired-fence"
+              },
+              "schedulerId": "scheduler-two-workers-expired-fence",
+              "taskId": {
+                "$result": {
+                  "actionId": "tick-b",
+                  "pointer": "/data/hostObservation/rawRows/tasks/0/taskId"
+                }
+              }
+            }
+          },
+          "evidenceRefs": [
+            "claim-b:actual-artifact"
+          ]
+        },
+        {
+          "id": "barrier-b",
+          "kind": "control",
+          "control": {
+            "type": "barrier",
+            "operation": "waitReached",
+            "parameters": {
+              "scope": {
+                "organizationId": {
+                  "$alias": "ORG"
+                },
+                "caseId": "V5",
+                "subcaseId": "two-workers-expired-fence"
+              },
+              "barrierId": {
+                "$result": {
+                  "actionId": "claim-b",
+                  "pointer": "/data/hostObservation/rawRows/claims/0/barrierId"
+                }
+              },
+              "participantId": {
+                "$result": {
+                  "actionId": "claim-b",
+                  "pointer": "/data/hostObservation/rawRows/claims/0/workerId"
+                }
+              },
+              "transactionId": {
+                "$result": {
+                  "actionId": "claim-b",
+                  "pointer": "/data/hostObservation/rawRows/claims/0/transactionId"
+                }
+              },
+              "point": "afterClaimBeforeCommit",
+              "state": "REACHED"
+            }
+          },
+          "evidenceRefs": [
+            "barrier-b:actual-artifact"
+          ]
+        },
+        {
+          "id": "takeover-api",
+          "kind": "query",
+          "actorRef": "operations",
+          "route": "api",
+          "capabilityId": "getWork",
+          "request": {
+            "intentKind": "QUERY",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "getWork",
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "caseId": "V5",
+              "subcaseId": "two-workers-expired-fence"
+            },
+            "asOf": "2026-10-07T09:00:20Z",
+            "knownAt": "2026-10-07T09:00:20Z",
+            "workId": {
+              "$result": {
+                "actionId": "create",
+                "pointer": "/response/workId"
+              }
+            }
+          },
+          "evidenceRefs": [
+            "takeover-api:actual-artifact"
+          ]
+        },
+        {
+          "id": "takeover-db",
+          "kind": "observe",
+          "observation": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "caseId": "V5",
+              "subcaseId": "two-workers-expired-fence"
+            },
+            "snapshotRef": {
+              "$result": {
+                "actionId": "takeover-api",
+                "pointer": "/response/snapshotRevision"
+              }
+            },
+            "asOf": "2026-10-07T09:00:20Z",
+            "knownAt": "2026-10-07T09:00:20Z",
+            "sources": [
+              "movements",
+              "queueMessages",
+              "events",
+              "externalDeliveries",
+              "obligationResolutions",
+              "dutyTransitions",
+              "workClosures",
+              "operationalIssues",
+              "boundaryCauses",
+              "works",
+              "goals",
+              "assessments",
+              "obligations",
+              "assignments",
+              "intake",
+              "claims",
+              "attempts",
+              "commands",
+              "segments",
+              "genealogy",
+              "allocations",
+              "restrictions",
+              "validityBoundaries",
+              "inbox",
+              "outbox",
+              "audit",
+              "alerts",
+              "definitions",
+              "policies",
+              "grants",
+              "documents",
+              "reconciliations",
+              "projections"
+            ]
+          },
+          "evidenceRefs": [
+            "takeover-db:actual-artifact"
+          ]
+        },
+        {
+          "id": "resume-b",
+          "kind": "control",
+          "control": {
+            "type": "barrier",
+            "operation": "resume",
+            "parameters": {
+              "scope": {
+                "organizationId": {
+                  "$alias": "ORG"
+                },
+                "caseId": "V5",
+                "subcaseId": "two-workers-expired-fence"
+              },
+              "barrierId": {
+                "$result": {
+                  "actionId": "claim-b",
+                  "pointer": "/data/hostObservation/rawRows/claims/0/barrierId"
+                }
+              },
+              "participantId": {
+                "$result": {
+                  "actionId": "claim-b",
+                  "pointer": "/data/hostObservation/rawRows/claims/0/workerId"
+                }
+              },
+              "transactionId": {
+                "$result": {
+                  "actionId": "claim-b",
+                  "pointer": "/data/hostObservation/rawRows/claims/0/transactionId"
+                }
+              },
+              "point": "afterClaimBeforeCommit",
+              "state": "RESUMED"
+            }
+          },
+          "evidenceRefs": [
+            "resume-b:actual-artifact"
+          ]
+        },
+        {
+          "id": "terminal-b",
+          "kind": "control",
+          "control": {
+            "type": "process",
+            "operation": "awaitRuntimeTask",
+            "parameters": {
+              "scope": {
+                "organizationId": {
+                  "$alias": "ORG"
+                },
+                "caseId": "V5",
+                "subcaseId": "two-workers-expired-fence"
+              },
+              "schedulerId": "scheduler-two-workers-expired-fence",
+              "taskId": {
+                "$result": {
+                  "actionId": "tick-b",
+                  "pointer": "/data/hostObservation/rawRows/tasks/0/taskId"
+                }
+              },
+              "invocationHandle": {
+                "$result": {
+                  "actionId": "tick-b",
+                  "pointer": "/data/hostObservation/rawRows/tasks/0/invocationHandle"
+                }
+              },
+              "timeoutSeconds": 30
+            }
+          },
+          "evidenceRefs": [
+            "terminal-b:actual-artifact"
+          ]
+        },
+        {
+          "id": "resume-a",
+          "kind": "control",
+          "control": {
+            "type": "barrier",
+            "operation": "resume",
+            "parameters": {
+              "scope": {
+                "organizationId": {
+                  "$alias": "ORG"
+                },
+                "caseId": "V5",
+                "subcaseId": "two-workers-expired-fence"
+              },
+              "barrierId": {
+                "$result": {
+                  "actionId": "claim-a",
+                  "pointer": "/data/hostObservation/rawRows/claims/0/barrierId"
+                }
+              },
+              "participantId": {
+                "$result": {
+                  "actionId": "claim-a",
+                  "pointer": "/data/hostObservation/rawRows/claims/0/workerId"
+                }
+              },
+              "transactionId": {
+                "$result": {
+                  "actionId": "claim-a",
+                  "pointer": "/data/hostObservation/rawRows/claims/0/transactionId"
+                }
+              },
+              "point": "afterClaimBeforeCommit",
+              "state": "RESUMED"
+            }
+          },
+          "evidenceRefs": [
+            "resume-a:actual-artifact"
+          ]
+        },
+        {
+          "id": "terminal-a",
+          "kind": "control",
+          "control": {
+            "type": "process",
+            "operation": "awaitRuntimeTask",
+            "parameters": {
+              "scope": {
+                "organizationId": {
+                  "$alias": "ORG"
+                },
+                "caseId": "V5",
+                "subcaseId": "two-workers-expired-fence"
+              },
+              "schedulerId": "scheduler-two-workers-expired-fence",
+              "taskId": {
+                "$result": {
+                  "actionId": "tick-a",
+                  "pointer": "/data/hostObservation/rawRows/tasks/0/taskId"
+                }
+              },
+              "invocationHandle": {
+                "$result": {
+                  "actionId": "tick-a",
+                  "pointer": "/data/hostObservation/rawRows/tasks/0/invocationHandle"
+                }
+              },
+              "timeoutSeconds": 30
+            }
+          },
+          "evidenceRefs": [
+            "terminal-a:actual-artifact"
+          ]
+        },
+        {
+          "id": "api",
+          "kind": "query",
+          "actorRef": "operations",
+          "route": "api",
+          "capabilityId": "getWork",
+          "request": {
+            "intentKind": "QUERY",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "getWork",
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "caseId": "V5",
+              "subcaseId": "two-workers-expired-fence"
+            },
+            "asOf": "2026-10-07T09:00:20Z",
+            "knownAt": "2026-10-07T09:00:20Z",
+            "workId": {
+              "$result": {
+                "actionId": "create",
+                "pointer": "/response/workId"
+              }
+            }
+          },
+          "evidenceRefs": [
+            "api:actual-artifact"
+          ]
+        },
+        {
+          "id": "db",
+          "kind": "observe",
+          "observation": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "caseId": "V5",
+              "subcaseId": "two-workers-expired-fence"
+            },
+            "snapshotRef": {
+              "$result": {
+                "actionId": "api",
+                "pointer": "/response/snapshotRevision"
+              }
+            },
+            "asOf": "2026-10-07T09:00:20Z",
+            "knownAt": "2026-10-07T09:00:20Z",
+            "sources": [
+              "movements",
+              "queueMessages",
+              "events",
+              "externalDeliveries",
+              "obligationResolutions",
+              "dutyTransitions",
+              "workClosures",
+              "operationalIssues",
+              "boundaryCauses",
+              "works",
+              "goals",
+              "assessments",
+              "obligations",
+              "assignments",
+              "intake",
+              "claims",
+              "attempts",
+              "commands",
+              "segments",
+              "genealogy",
+              "allocations",
+              "restrictions",
+              "validityBoundaries",
+              "inbox",
+              "outbox",
+              "audit",
+              "alerts",
+              "definitions",
+              "policies",
+              "grants",
+              "documents",
+              "reconciliations",
+              "projections"
+            ]
+          },
+          "evidenceRefs": [
+            "db:actual-artifact"
+          ]
+        }
+      ],
+      "assertions": [
+        {
+          "id": "terminal-b-origin",
+          "op": "equals",
+          "source": {
+            "actionId": "terminal-b",
+            "pointer": "/data/hostObservation/runtimeTask/origin"
+          },
+          "expected": "autonomousScheduler",
+          "requirementRefs": [
+            "D10",
+            "D26"
+          ],
+          "evidenceRefs": [
+            "terminal-b:actual-artifact",
+            "terminal-b:source-rows"
+          ],
+          "scope": {
+            "normativeScope": "fence-state",
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "V5",
+            "subcaseId": "two-workers-expired-fence"
+          },
+          "oracleExplanation": "실제 scheduler가 자율 생성한 task의 종료를 관찰한다.",
+          "oracleRef": {
+            "oracleId": "V5.two-workers-fencing",
+            "observationNames": [
+              "fence-state"
+            ]
+          }
+        },
+        {
+          "id": "terminal-b-terminal",
+          "op": "equals",
+          "source": {
+            "actionId": "terminal-b",
+            "pointer": "/data/hostObservation/runtimeTask/terminalStatus"
+          },
+          "expected": "SUCCEEDED",
+          "requirementRefs": [
+            "D10",
+            "D26"
+          ],
+          "evidenceRefs": [
+            "terminal-b:actual-artifact",
+            "terminal-b:source-rows"
+          ],
+          "scope": {
+            "normativeScope": "fence-state",
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "V5",
+            "subcaseId": "two-workers-expired-fence"
+          },
+          "oracleExplanation": "제출 ACK가 아니라 실제 task terminal을 확인한다.",
+          "oracleRef": {
+            "oracleId": "V5.two-workers-fencing",
+            "observationNames": [
+              "fence-state"
+            ]
+          }
+        },
+        {
+          "id": "terminal-a-origin",
+          "op": "equals",
+          "source": {
+            "actionId": "terminal-a",
+            "pointer": "/data/hostObservation/runtimeTask/origin"
+          },
+          "expected": "autonomousScheduler",
+          "requirementRefs": [
+            "D10",
+            "D26"
+          ],
+          "evidenceRefs": [
+            "terminal-a:actual-artifact",
+            "terminal-a:source-rows"
+          ],
+          "scope": {
+            "normativeScope": "fence-state",
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "V5",
+            "subcaseId": "two-workers-expired-fence"
+          },
+          "oracleExplanation": "실제 scheduler가 자율 생성한 task의 종료를 관찰한다.",
+          "oracleRef": {
+            "oracleId": "V5.two-workers-fencing",
+            "observationNames": [
+              "fence-state"
+            ]
+          }
+        },
+        {
+          "id": "terminal-a-terminal",
+          "op": "equals",
+          "source": {
+            "actionId": "terminal-a",
+            "pointer": "/data/hostObservation/runtimeTask/terminalStatus"
+          },
+          "expected": "FAILED",
+          "requirementRefs": [
+            "D10",
+            "D26"
+          ],
+          "evidenceRefs": [
+            "terminal-a:actual-artifact",
+            "terminal-a:source-rows"
+          ],
+          "scope": {
+            "normativeScope": "fence-state",
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "V5",
+            "subcaseId": "two-workers-expired-fence"
+          },
+          "oracleExplanation": "제출 ACK가 아니라 실제 task terminal을 확인한다.",
+          "oracleRef": {
+            "oracleId": "V5.two-workers-fencing",
+            "observationNames": [
+              "fence-state"
+            ]
+          }
+        },
+        {
+          "id": "live-claim-one",
+          "op": "count",
+          "source": {
+            "actionId": "takeover-db",
+            "pointer": "/data/rawRows/claims",
+            "where": {
+              "status": "ACTIVE"
+            }
+          },
+          "expected": 1,
+          "requirementRefs": [
+            "D10",
+            "D26"
+          ],
+          "evidenceRefs": [
+            "takeover-db:actual-artifact",
+            "takeover-db:source-rows"
+          ],
+          "scope": {
+            "normativeScope": "fence-state",
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "V5",
+            "subcaseId": "two-workers-expired-fence"
+          },
+          "oracleExplanation": "독립 DB 원 행을 정확한 대상 scope로 세어 중복·누락을 거부한다.",
+          "oracleRef": {
+            "oracleId": "V5.two-workers-fencing",
+            "observationNames": [
+              "fence-state"
+            ]
+          }
+        },
+        {
+          "id": "new-live-worker",
+          "op": "exactSet",
+          "source": {
+            "actionId": "takeover-db",
+            "pointer": "/data/rawRows/claims",
+            "field": "workerId",
+            "where": {
+              "status": "ACTIVE"
+            }
+          },
+          "expected": [
+            "worker-b"
+          ],
+          "requirementRefs": [
+            "D10",
+            "D26"
+          ],
+          "evidenceRefs": [
+            "takeover-db:actual-artifact",
+            "takeover-db:source-rows"
+          ],
+          "scope": {
+            "normativeScope": "fence-state",
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "V5",
+            "subcaseId": "two-workers-expired-fence"
+          },
+          "oracleExplanation": "해당 scope의 각 실제 원 행 값과 고정 기대값을 대조한다.",
+          "oracleRef": {
+            "oracleId": "V5.two-workers-fencing",
+            "observationNames": [
+              "fence-state"
+            ]
+          }
+        },
+        {
+          "id": "after-terminal-live-claims-zero",
+          "op": "count",
+          "source": {
+            "actionId": "db",
+            "pointer": "/data/rawRows/claims",
+            "where": {
+              "status": "ACTIVE"
+            }
+          },
+          "expected": 0,
+          "requirementRefs": [
+            "D10",
+            "D26"
+          ],
+          "evidenceRefs": [
+            "db:actual-artifact",
+            "db:source-rows"
+          ],
+          "scope": {
+            "normativeScope": "fence-state",
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "V5",
+            "subcaseId": "two-workers-expired-fence"
+          },
+          "oracleExplanation": "독립 DB 원 행을 정확한 대상 scope로 세어 중복·누락을 거부한다.",
+          "oracleRef": {
+            "oracleId": "V5.two-workers-fencing",
+            "observationNames": [
+              "fence-state"
+            ]
+          }
+        },
+        {
+          "id": "claim-exact-TTL",
+          "op": "timeEquals",
+          "source": {
+            "actionId": "claim-a",
+            "pointer": "/data/hostObservation/rawRows/claims/0/expiresAt"
+          },
+          "expected": "2026-10-07T09:00:15Z",
+          "requirementRefs": [
+            "D10",
+            "D26"
+          ],
+          "evidenceRefs": [
+            "claim-a:actual-artifact",
+            "claim-a:source-rows"
+          ],
+          "scope": {
+            "normativeScope": "fence-state",
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "V5",
+            "subcaseId": "two-workers-expired-fence"
+          },
+          "oracleExplanation": "실제 claim은 통제된09:00:10에 취득하고 TTL5초인09:00:15에 만료한다.",
+          "oracleRef": {
+            "oracleId": "V5.two-workers-fencing",
+            "observationNames": [
+              "fence-state"
+            ]
+          }
+        },
+        {
+          "id": "claim-scope-unique",
+          "op": "unique",
+          "source": {
+            "actionId": "takeover-db",
+            "pointer": "/data/rawRows/claims",
+            "field": [
+              "organizationId",
+              "scopeKey"
+            ],
+            "where": {
+              "status": "ACTIVE"
+            }
+          },
+          "expected": true,
+          "requirementRefs": [
+            "D10",
+            "D26"
+          ],
+          "evidenceRefs": [
+            "takeover-db:actual-artifact",
+            "takeover-db:source-rows"
+          ],
+          "scope": {
+            "normativeScope": "fence-state",
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "V5",
+            "subcaseId": "two-workers-expired-fence"
+          },
+          "oracleExplanation": "인계 시점에 동일 scope의 유효 claim은 하나다.",
+          "oracleRef": {
+            "oracleId": "V5.two-workers-fencing",
+            "observationNames": [
+              "fence-state"
+            ]
+          }
+        },
+        {
+          "id": "old-claim-expired",
+          "op": "exactSet",
+          "source": {
+            "actionId": "db",
+            "pointer": "/data/rawRows/claims",
+            "field": "status",
+            "where": {
+              "workerId": "worker-a"
+            }
+          },
+          "expected": [
+            "EXPIRED"
+          ],
+          "requirementRefs": [
+            "D10",
+            "D26"
+          ],
+          "evidenceRefs": [
+            "db:actual-artifact",
+            "db:source-rows"
+          ],
+          "scope": {
+            "normativeScope": "fence-state",
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "V5",
+            "subcaseId": "two-workers-expired-fence"
+          },
+          "oracleExplanation": "해당 scope의 각 실제 원 행 값과 고정 기대값을 대조한다.",
+          "oracleRef": {
+            "oracleId": "V5.two-workers-fencing",
+            "observationNames": [
+              "fence-state"
+            ]
+          }
+        },
+        {
+          "id": "lease-five-seconds",
+          "op": "timeAtMostSeconds",
+          "source": {
+            "actionId": "claim-a",
+            "pointer": "/data/hostObservation/rawRows/claims/0/expiresAt"
+          },
+          "expected": "5",
+          "requirementRefs": [
+            "D10",
+            "D26"
+          ],
+          "evidenceRefs": [
+            "claim-a:actual-artifact",
+            "claim-a:source-rows"
+          ],
+          "scope": {
+            "normativeScope": "fence-state",
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "V5",
+            "subcaseId": "two-workers-expired-fence"
+          },
+          "oracleExplanation": "고정 test profile TTL5초를 실제 lease 시각으로 검증한다.",
+          "oracleRef": {
+            "oracleId": "V5.two-workers-fencing",
+            "observationNames": [
+              "fence-state"
+            ]
+          },
+          "baseline": {
+            "actionId": "claim-a",
+            "pointer": "/data/hostObservation/rawRows/claims/0/claimedAt"
+          }
+        },
+        {
+          "id": "new-fence-used-at-commit",
+          "op": "sameAs",
+          "source": {
+            "actionId": "db",
+            "pointer": "/data/rawRows/attempts/1/fencingToken"
+          },
+          "expected": true,
+          "requirementRefs": [
+            "D10",
+            "D26"
+          ],
+          "evidenceRefs": [
+            "db:actual-artifact",
+            "db:source-rows"
+          ],
+          "scope": {
+            "normativeScope": "fence-state",
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "V5",
+            "subcaseId": "two-workers-expired-fence"
+          },
+          "oracleExplanation": "신규 worker commit은 실제 현재 claim의 token을 사용한다.",
+          "oracleRef": {
+            "oracleId": "V5.two-workers-fencing",
+            "observationNames": [
+              "fence-state"
+            ]
+          },
+          "baseline": {
+            "actionId": "db",
+            "pointer": "/data/rawRows/claims/1/fencingToken"
+          }
+        },
+        {
+          "id": "one-command-commit",
+          "op": "count",
+          "source": {
+            "actionId": "db",
+            "pointer": "/data/rawRows/commands",
+            "where": {
+              "status": "COMMITTED",
+              "effectClass": "DUE_WAIT_CONTINUATION"
+            }
+          },
+          "expected": 1,
+          "requirementRefs": [
+            "D10",
+            "D26"
+          ],
+          "evidenceRefs": [
+            "db:actual-artifact",
+            "db:source-rows"
+          ],
+          "scope": {
+            "normativeScope": "duplicate-effects",
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "V5",
+            "subcaseId": "two-workers-expired-fence"
+          },
+          "oracleExplanation": "독립 DB 원 행을 정확한 대상 scope로 세어 중복·누락을 거부한다.",
+          "oracleRef": {
+            "oracleId": "V5.two-workers-fencing",
+            "observationNames": [
+              "duplicate-effects"
+            ]
+          }
+        },
+        {
+          "id": "no-stale-commit",
+          "op": "count",
+          "source": {
+            "actionId": "db",
+            "pointer": "/data/rawRows/commands",
+            "where": {
+              "committingWorkerId": "worker-a",
+              "status": "COMMITTED",
+              "effectClass": "DUE_WAIT_CONTINUATION"
+            }
+          },
+          "expected": 0,
+          "requirementRefs": [
+            "D10",
+            "D26"
+          ],
+          "evidenceRefs": [
+            "db:actual-artifact",
+            "db:source-rows"
+          ],
+          "scope": {
+            "normativeScope": "stale-worker-commit",
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "V5",
+            "subcaseId": "two-workers-expired-fence"
+          },
+          "oracleExplanation": "독립 DB 원 행을 정확한 대상 scope로 세어 중복·누락을 거부한다.",
+          "oracleRef": {
+            "oracleId": "V5.two-workers-fencing",
+            "observationNames": [
+              "stale-worker-commit"
+            ]
+          }
+        },
+        {
+          "id": "stale-attempt-rejected",
+          "op": "exactSet",
+          "source": {
+            "actionId": "db",
+            "pointer": "/data/rawRows/attempts",
+            "field": "result",
+            "where": {
+              "workerId": "worker-a"
+            }
+          },
+          "expected": [
+            "STALE_LEASE_REJECTED"
+          ],
+          "requirementRefs": [
+            "D10",
+            "D26"
+          ],
+          "evidenceRefs": [
+            "db:actual-artifact",
+            "db:source-rows"
+          ],
+          "scope": {
+            "normativeScope": "stale-worker-commit",
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "V5",
+            "subcaseId": "two-workers-expired-fence"
+          },
+          "oracleExplanation": "해당 scope의 각 실제 원 행 값과 고정 기대값을 대조한다.",
+          "oracleRef": {
+            "oracleId": "V5.two-workers-fencing",
+            "observationNames": [
+              "stale-worker-commit"
+            ]
+          }
+        },
+        {
+          "id": "api-attempt-results",
+          "op": "relationSet",
+          "source": {
+            "actionId": "api",
+            "pointer": "/response/data/attempts",
+            "field": [
+              "workerId",
+              "result"
+            ]
+          },
+          "expected": [
+            [
+              "worker-a",
+              "STALE_LEASE_REJECTED"
+            ],
+            [
+              "worker-b",
+              "COMMITTED"
+            ]
+          ],
+          "requirementRefs": [
+            "D10",
+            "D26"
+          ],
+          "evidenceRefs": [
+            "api:actual-artifact",
+            "api:source-rows"
+          ],
+          "scope": {
+            "normativeScope": "stale-worker-commit",
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "V5",
+            "subcaseId": "two-workers-expired-fence"
+          },
+          "oracleExplanation": "실제 API에서 조회한 두 worker attempt의 terminal 결과를 DB 거부·commit 행과 대조한다.",
+          "oracleRef": {
+            "oracleId": "V5.two-workers-fencing",
+            "observationNames": [
+              "stale-worker-commit"
+            ]
+          }
+        },
+        {
+          "id": "distinct-version-attempt-tuple",
+          "op": "relationSet",
+          "source": {
+            "actionId": "db",
+            "pointer": "/data/rawRows/attempts",
+            "field": [
+              "deliveryAttempt",
+              "eventRevision",
+              "definitionVersion"
+            ]
+          },
+          "expected": [
+            [
+              1,
+              1,
+              "definition-v1"
+            ],
+            [
+              2,
+              1,
+              "definition-v1"
+            ]
+          ],
+          "requirementRefs": [
+            "D10",
+            "D26"
+          ],
+          "evidenceRefs": [
+            "db:actual-artifact",
+            "db:source-rows"
+          ],
+          "scope": {
+            "normativeScope": "fence-state",
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "V5",
+            "subcaseId": "two-workers-expired-fence"
+          },
+          "oracleExplanation": "deliveryAttempt은1→2, causal eventRevision은1, 업무 definitionVersion은v1로 별개다.",
+          "oracleRef": {
+            "oracleId": "V5.two-workers-fencing",
+            "observationNames": [
+              "fence-state"
+            ]
+          }
+        },
+        {
+          "id": "one-duty-transition",
+          "op": "count",
+          "source": {
+            "actionId": "db",
+            "pointer": "/data/rawRows/dutyTransitions",
+            "where": {
+              "transition": "ESCALATED"
+            }
+          },
+          "expected": 1,
+          "requirementRefs": [
+            "D10",
+            "D26"
+          ],
+          "evidenceRefs": [
+            "db:actual-artifact",
+            "db:source-rows"
+          ],
+          "scope": {
+            "normativeScope": "duplicate-effects",
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "V5",
+            "subcaseId": "two-workers-expired-fence"
+          },
+          "oracleExplanation": "독립 DB 원 행을 정확한 대상 scope로 세어 중복·누락을 거부한다.",
+          "oracleRef": {
+            "oracleId": "V5.two-workers-fencing",
+            "observationNames": [
+              "duplicate-effects"
+            ]
+          }
+        },
+        {
+          "id": "single-escalation-outbox",
+          "op": "count",
+          "source": {
+            "actionId": "db",
+            "pointer": "/data/rawRows/outbox",
+            "where": {
+              "effectClass": "DUE_WAIT_ESCALATION_NOTIFICATION"
+            }
+          },
+          "expected": 1,
+          "requirementRefs": [
+            "D10",
+            "D26"
+          ],
+          "evidenceRefs": [
+            "db:actual-artifact",
+            "db:source-rows"
+          ],
+          "scope": {
+            "normativeScope": "duplicate-effects",
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "V5",
+            "subcaseId": "two-workers-expired-fence"
+          },
+          "oracleExplanation": "독립 DB 원 행을 정확한 대상 scope로 세어 중복·누락을 거부한다.",
+          "oracleRef": {
+            "oracleId": "V5.two-workers-fencing",
+            "observationNames": [
+              "duplicate-effects"
+            ]
+          }
+        },
+        {
+          "id": "unique-escalation-operation",
+          "op": "unique",
+          "source": {
+            "actionId": "db",
+            "pointer": "/data/rawRows/outbox",
+            "field": "externalOperationId",
+            "where": {
+              "effectClass": "DUE_WAIT_ESCALATION_NOTIFICATION"
+            }
+          },
+          "expected": true,
+          "requirementRefs": [
+            "D10",
+            "D26"
+          ],
+          "evidenceRefs": [
+            "db:actual-artifact",
+            "db:source-rows"
+          ],
+          "scope": {
+            "normativeScope": "duplicate-effects",
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "V5",
+            "subcaseId": "two-workers-expired-fence"
+          },
+          "oracleExplanation": "의무 escalation의 동일 외부 요청은 하나다.",
+          "oracleRef": {
+            "oracleId": "V5.two-workers-fencing",
+            "observationNames": [
+              "duplicate-effects"
+            ]
+          }
+        },
+        {
+          "id": "db-current-assignment-one",
+          "op": "count",
+          "source": {
+            "actionId": "db",
+            "pointer": "/data/rawRows/assignments",
+            "where": {
+              "current": true
+            }
+          },
+          "expected": 1,
+          "requirementRefs": [
+            "D10",
+            "D26"
+          ],
+          "evidenceRefs": [
+            "db:actual-artifact",
+            "db:source-rows"
+          ],
+          "scope": {
+            "normativeScope": "exhausted-retry-owner",
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "V5",
+            "subcaseId": "two-workers-expired-fence"
+          },
+          "oracleExplanation": "독립 DB 원 행을 정확한 대상 scope로 세어 중복·누락을 거부한다.",
+          "oracleRef": {
+            "oracleId": "V5.two-workers-fencing",
+            "observationNames": [
+              "exhausted-retry-owner"
+            ]
+          }
+        },
+        {
+          "id": "db-owner",
+          "op": "exactSet",
+          "source": {
+            "actionId": "db",
+            "pointer": "/data/rawRows/assignments",
+            "field": "ownerId",
+            "where": {
+              "current": true
+            }
+          },
+          "expected": [
+            {
+              "$alias": "owner"
+            }
+          ],
+          "requirementRefs": [
+            "D10",
+            "D26"
+          ],
+          "evidenceRefs": [
+            "db:actual-artifact",
+            "db:source-rows"
+          ],
+          "scope": {
+            "normativeScope": "exhausted-retry-owner",
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "V5",
+            "subcaseId": "two-workers-expired-fence"
+          },
+          "oracleExplanation": "해당 scope의 각 실제 원 행 값과 고정 기대값을 대조한다.",
+          "oracleRef": {
+            "oracleId": "V5.two-workers-fencing",
+            "observationNames": [
+              "exhausted-retry-owner"
+            ]
+          }
+        },
+        {
+          "id": "db-duty-status",
+          "op": "exactSet",
+          "source": {
+            "actionId": "db",
+            "pointer": "/data/rawRows/obligations",
+            "field": "status"
+          },
+          "expected": [
+            "OPEN"
+          ],
+          "requirementRefs": [
+            "D10",
+            "D26"
+          ],
+          "evidenceRefs": [
+            "db:actual-artifact",
+            "db:source-rows"
+          ],
+          "scope": {
+            "normativeScope": "exhausted-retry-owner",
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "V5",
+            "subcaseId": "two-workers-expired-fence"
+          },
+          "oracleExplanation": "해당 scope의 각 실제 원 행 값과 고정 기대값을 대조한다.",
+          "oracleRef": {
+            "oracleId": "V5.two-workers-fencing",
+            "observationNames": [
+              "exhausted-retry-owner"
+            ]
+          }
+        },
+        {
+          "id": "db-next-action",
+          "op": "exactSet",
+          "source": {
+            "actionId": "db",
+            "pointer": "/data/rawRows/assignments",
+            "field": "nextAction",
+            "where": {
+              "current": true
+            }
+          },
+          "expected": [
+            "조사·재인가·안전 재시도"
+          ],
+          "requirementRefs": [
+            "D10",
+            "D26"
+          ],
+          "evidenceRefs": [
+            "db:actual-artifact",
+            "db:source-rows"
+          ],
+          "scope": {
+            "normativeScope": "exhausted-retry-owner",
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "V5",
+            "subcaseId": "two-workers-expired-fence"
+          },
+          "oracleExplanation": "해당 scope의 각 실제 원 행 값과 고정 기대값을 대조한다.",
+          "oracleRef": {
+            "oracleId": "V5.two-workers-fencing",
+            "observationNames": [
+              "exhausted-retry-owner"
+            ]
+          }
+        },
+        {
+          "id": "db-next-check",
+          "op": "exactSet",
+          "source": {
+            "actionId": "db",
+            "pointer": "/data/rawRows/assignments",
+            "field": "nextCheckAt",
+            "where": {
+              "current": true
+            }
+          },
+          "expected": [
+            "2026-10-07T09:01:00Z"
+          ],
+          "requirementRefs": [
+            "D10",
+            "D26"
+          ],
+          "evidenceRefs": [
+            "db:actual-artifact",
+            "db:source-rows"
+          ],
+          "scope": {
+            "normativeScope": "exhausted-retry-owner",
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "V5",
+            "subcaseId": "two-workers-expired-fence"
+          },
+          "oracleExplanation": "해당 scope의 각 실제 원 행 값과 고정 기대값을 대조한다.",
+          "oracleRef": {
+            "oracleId": "V5.two-workers-fencing",
+            "observationNames": [
+              "exhausted-retry-owner"
+            ]
+          }
+        },
+        {
+          "id": "api-owner",
+          "op": "equals",
+          "source": {
+            "actionId": "api",
+            "pointer": "/response/data/responsibility/ownerId"
+          },
+          "expected": {
+            "$alias": "owner"
+          },
+          "requirementRefs": [
+            "D10",
+            "D26"
+          ],
+          "evidenceRefs": [
+            "api:actual-artifact",
+            "api:source-rows"
+          ],
+          "scope": {
+            "normativeScope": "exhausted-retry-owner",
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "V5",
+            "subcaseId": "two-workers-expired-fence"
+          },
+          "oracleExplanation": "API가 DB와 같은 인간 주 책임자를 반환한다.",
+          "oracleRef": {
+            "oracleId": "V5.two-workers-fencing",
+            "observationNames": [
+              "exhausted-retry-owner"
+            ]
+          }
+        },
+        {
+          "id": "api-action",
+          "op": "equals",
+          "source": {
+            "actionId": "api",
+            "pointer": "/response/data/responsibility/nextAction"
+          },
+          "expected": "조사·재인가·안전 재시도",
+          "requirementRefs": [
+            "D10",
+            "D26"
+          ],
+          "evidenceRefs": [
+            "api:actual-artifact",
+            "api:source-rows"
+          ],
+          "scope": {
+            "normativeScope": "exhausted-retry-owner",
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "V5",
+            "subcaseId": "two-workers-expired-fence"
+          },
+          "oracleExplanation": "이름이 같은 Boolean 대신 실제 다음 행동을 확인한다.",
+          "oracleRef": {
+            "oracleId": "V5.two-workers-fencing",
+            "observationNames": [
+              "exhausted-retry-owner"
+            ]
+          }
+        },
+        {
+          "id": "api-check",
+          "op": "timeEquals",
+          "source": {
+            "actionId": "api",
+            "pointer": "/response/data/responsibility/nextCheckAt"
+          },
+          "expected": "2026-10-07T09:01:00Z",
+          "requirementRefs": [
+            "D10",
+            "D26"
+          ],
+          "evidenceRefs": [
+            "api:actual-artifact",
+            "api:source-rows"
+          ],
+          "scope": {
+            "normativeScope": "exhausted-retry-owner",
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "V5",
+            "subcaseId": "two-workers-expired-fence"
+          },
+          "oracleExplanation": "고정 업무 시계의 다음 확인 시점을 검사한다.",
+          "oracleRef": {
+            "oracleId": "V5.two-workers-fencing",
+            "observationNames": [
+              "exhausted-retry-owner"
+            ]
+          }
+        }
+      ],
+      "oracleExplanation": "두 실제 worker의 claim 경합·lease 만료·늦은 이전 token의 commit을 검증한다。복구 완료·재개 결과를 fixture에 seed하지 않는다. 실제 command/fault/lifecycle/clock/terminal과 독립 원 행을 관찰한다."
+    },
+    {
+      "id": "repeated-crash-no-duplicate",
+      "title": "commit 전후 반복 crash와 전체 restart에도 확정 효과 한 번을 유지한다",
+      "fixtureRef": "verification/cases/V5/fixtures/repeated-crash-no-duplicate.json",
+      "requiredAdapters": [
+        "fixture",
+        "api",
+        "db",
+        "clock",
+        "fault",
+        "process",
+        "host-extractor",
+        "scheduler",
+        "actual-workers",
+        "externalResponder"
+      ],
+      "actions": [
+        {
+          "id": "setup",
+          "kind": "installFixture",
+          "evidenceRefs": [
+            "setup:actual-artifact"
+          ]
+        },
+        {
+          "id": "start-app-api",
+          "kind": "control",
+          "control": {
+            "type": "process",
+            "operation": "start",
+            "parameters": {
+              "scope": {
+                "organizationId": {
+                  "$alias": "ORG"
+                },
+                "caseId": "V5",
+                "subcaseId": "repeated-crash-no-duplicate"
+              },
+              "processId": "api",
+              "environmentId": "runtime-V5-repeated-crash-no-duplicate-source"
+            }
+          },
+          "evidenceRefs": [
+            "start-app-api:actual-artifact"
+          ]
+        },
+        {
+          "id": "start-app-scheduler",
+          "kind": "control",
+          "control": {
+            "type": "process",
+            "operation": "start",
+            "parameters": {
+              "scope": {
+                "organizationId": {
+                  "$alias": "ORG"
+                },
+                "caseId": "V5",
+                "subcaseId": "repeated-crash-no-duplicate"
+              },
+              "processId": "scheduler",
+              "environmentId": "runtime-V5-repeated-crash-no-duplicate-source"
+            }
+          },
+          "evidenceRefs": [
+            "start-app-scheduler:actual-artifact"
+          ]
+        },
+        {
+          "id": "start-app-worker-a",
+          "kind": "control",
+          "control": {
+            "type": "process",
+            "operation": "start",
+            "parameters": {
+              "scope": {
+                "organizationId": {
+                  "$alias": "ORG"
+                },
+                "caseId": "V5",
+                "subcaseId": "repeated-crash-no-duplicate"
+              },
+              "processId": "worker-a",
+              "environmentId": "runtime-V5-repeated-crash-no-duplicate-source"
+            }
+          },
+          "evidenceRefs": [
+            "start-app-worker-a:actual-artifact"
+          ]
+        },
+        {
+          "id": "start-app-worker-b",
+          "kind": "control",
+          "control": {
+            "type": "process",
+            "operation": "start",
+            "parameters": {
+              "scope": {
+                "organizationId": {
+                  "$alias": "ORG"
+                },
+                "caseId": "V5",
+                "subcaseId": "repeated-crash-no-duplicate"
+              },
+              "processId": "worker-b",
+              "environmentId": "runtime-V5-repeated-crash-no-duplicate-source"
+            }
+          },
+          "evidenceRefs": [
+            "start-app-worker-b:actual-artifact"
+          ]
+        },
+        {
+          "id": "create",
+          "kind": "invoke",
+          "actorRef": "owner",
+          "route": "api",
+          "capabilityId": "createWork",
+          "request": {
+            "intentKind": "COMMAND",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "createWork",
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "caseId": "V5",
+              "subcaseId": "repeated-crash-no-duplicate"
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:00Z",
+            "workKind": "check",
+            "subjectRefs": [
+              {
+                "type": "TradeItem",
+                "id": {
+                  "$alias": "P"
+                }
+              }
+            ],
+            "goal": {
+              "quantity": "20",
+              "unit": "BOX",
+              "quantityMode": "STATE_AT",
+              "endpoint": "VERIFIED",
+              "destinationId": {
+                "$alias": "W"
+              },
+              "dueAt": "2026-10-07T09:00:10Z",
+              "deadlineInclusive": true,
+              "timezone": "Asia/Seoul",
+              "evidencePolicyVersion": "synthetic-evidence-v1"
+            },
+            "ownerId": {
+              "$alias": "owner"
+            },
+            "supervisorId": {
+              "$alias": "supervisor"
+            },
+            "nextAction": "조사·재인가·안전 재시도",
+            "nextCheckAt": "2026-10-07T09:01:00Z",
+            "commandIdempotencyKey": "V5-repeated-crash-no-duplicate-create"
+          },
+          "evidenceRefs": [
+            "create:actual-artifact"
+          ]
+        },
+        {
+          "id": "create-activate",
+          "kind": "invoke",
+          "actorRef": "owner",
+          "route": "api",
+          "capabilityId": "activateWork",
+          "request": {
+            "intentKind": "COMMAND",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "activateWork",
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "caseId": "V5",
+              "subcaseId": "repeated-crash-no-duplicate"
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:00Z",
+            "workId": {
+              "$result": {
+                "actionId": "create",
+                "pointer": "/response/workId"
+              }
+            },
+            "expectedRevision": {
+              "$result": {
+                "actionId": "create",
+                "pointer": "/response/revision"
+              }
+            },
+            "commandIdempotencyKey": "V5-repeated-crash-no-duplicate-create-activate"
+          },
+          "evidenceRefs": [
+            "create-activate:actual-artifact"
+          ]
+        },
+        {
+          "id": "wait",
+          "kind": "invoke",
+          "actorRef": "owner",
+          "route": "api",
+          "capabilityId": "waitWork",
+          "request": {
+            "intentKind": "COMMAND",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "waitWork",
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "caseId": "V5",
+              "subcaseId": "repeated-crash-no-duplicate"
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:00Z",
+            "workId": {
+              "$result": {
+                "actionId": "create",
+                "pointer": "/response/workId"
+              }
+            },
+            "expectedRevision": {
+              "$result": {
+                "actionId": "create-activate",
+                "pointer": "/response/revision"
+              }
+            },
+            "reason": "AWAITING_VERIFIED_EVIDENCE",
+            "targetId": {
+              "$alias": "Q20"
+            },
+            "resumePredicate": {
+              "kind": "evidenceAvailable",
+              "eventId": "EV-READY",
+              "expectedRevision": 1
+            },
+            "verifierId": {
+              "$alias": "owner"
+            },
+            "nextCheckAt": "2026-10-07T09:00:10Z",
+            "overdueAction": "ESCALATE_EXISTING_DUTY",
+            "commandIdempotencyKey": "V5-repeated-crash-no-duplicate-wait"
+          },
+          "evidenceRefs": [
+            "wait:actual-artifact"
+          ]
+        },
+        {
+          "id": "advance",
+          "kind": "control",
+          "control": {
+            "type": "clock",
+            "operation": "advanceTo",
+            "parameters": {
+              "scope": {
+                "organizationId": {
+                  "$alias": "ORG"
+                },
+                "caseId": "V5",
+                "subcaseId": "repeated-crash-no-duplicate"
+              },
+              "instant": "2026-10-07T09:00:10Z",
+              "knownAt": "2026-10-07T09:00:10Z",
+              "timezone": "Asia/Seoul"
+            }
+          },
+          "evidenceRefs": [
+            "advance:actual-artifact"
+          ]
+        },
+        {
+          "id": "crash-0",
+          "kind": "control",
+          "control": {
+            "type": "fault",
+            "operation": "arm",
+            "parameters": {
+              "scope": {
+                "organizationId": {
+                  "$alias": "ORG"
+                },
+                "caseId": "V5",
+                "subcaseId": "repeated-crash-no-duplicate"
+              },
+              "point": "worker.beforeCommit",
+              "workerId": "worker-a",
+              "times": 1,
+              "mode": "PROCESS_CRASH"
+            }
+          },
+          "evidenceRefs": [
+            "crash-0:actual-artifact"
+          ]
+        },
+        {
+          "id": "tick-0",
+          "kind": "control",
+          "control": {
+            "type": "process",
+            "operation": "tickScheduler",
+            "parameters": {
+              "scope": {
+                "organizationId": {
+                  "$alias": "ORG"
+                },
+                "caseId": "V5",
+                "subcaseId": "repeated-crash-no-duplicate"
+              },
+              "schedulerId": "scheduler-repeated-crash-no-duplicate",
+              "clockInstant": "2026-10-07T09:00:10Z",
+              "queueMode": "EMPTY_NO_REPLAY",
+              "workerIds": [
+                "worker-a"
+              ]
+            }
+          },
+          "evidenceRefs": [
+            "tick-0:actual-artifact"
+          ]
+        },
+        {
+          "id": "terminal-0",
+          "kind": "control",
+          "control": {
+            "type": "process",
+            "operation": "awaitRuntimeTask",
+            "parameters": {
+              "scope": {
+                "organizationId": {
+                  "$alias": "ORG"
+                },
+                "caseId": "V5",
+                "subcaseId": "repeated-crash-no-duplicate"
+              },
+              "schedulerId": "scheduler-repeated-crash-no-duplicate",
+              "taskId": {
+                "$result": {
+                  "actionId": "tick-0",
+                  "pointer": "/data/hostObservation/rawRows/tasks/0/taskId"
+                }
+              },
+              "invocationHandle": {
+                "$result": {
+                  "actionId": "tick-0",
+                  "pointer": "/data/hostObservation/rawRows/tasks/0/invocationHandle"
+                }
+              },
+              "timeoutSeconds": 30
+            }
+          },
+          "evidenceRefs": [
+            "terminal-0:actual-artifact"
+          ]
+        },
+        {
+          "id": "restart-0-api",
+          "kind": "control",
+          "control": {
+            "type": "process",
+            "operation": "restart",
+            "parameters": {
+              "scope": {
+                "organizationId": {
+                  "$alias": "ORG"
+                },
+                "caseId": "V5",
+                "subcaseId": "repeated-crash-no-duplicate"
+              },
+              "processId": "api",
+              "environmentId": "runtime-V5-repeated-crash-no-duplicate-source"
+            }
+          },
+          "evidenceRefs": [
+            "restart-0-api:actual-artifact"
+          ]
+        },
+        {
+          "id": "restart-0-scheduler",
+          "kind": "control",
+          "control": {
+            "type": "process",
+            "operation": "restart",
+            "parameters": {
+              "scope": {
+                "organizationId": {
+                  "$alias": "ORG"
+                },
+                "caseId": "V5",
+                "subcaseId": "repeated-crash-no-duplicate"
+              },
+              "processId": "scheduler",
+              "environmentId": "runtime-V5-repeated-crash-no-duplicate-source"
+            }
+          },
+          "evidenceRefs": [
+            "restart-0-scheduler:actual-artifact"
+          ]
+        },
+        {
+          "id": "restart-0-worker-a",
+          "kind": "control",
+          "control": {
+            "type": "process",
+            "operation": "restart",
+            "parameters": {
+              "scope": {
+                "organizationId": {
+                  "$alias": "ORG"
+                },
+                "caseId": "V5",
+                "subcaseId": "repeated-crash-no-duplicate"
+              },
+              "processId": "worker-a",
+              "environmentId": "runtime-V5-repeated-crash-no-duplicate-source"
+            }
+          },
+          "evidenceRefs": [
+            "restart-0-worker-a:actual-artifact"
+          ]
+        },
+        {
+          "id": "restart-0-worker-b",
+          "kind": "control",
+          "control": {
+            "type": "process",
+            "operation": "restart",
+            "parameters": {
+              "scope": {
+                "organizationId": {
+                  "$alias": "ORG"
+                },
+                "caseId": "V5",
+                "subcaseId": "repeated-crash-no-duplicate"
+              },
+              "processId": "worker-b",
+              "environmentId": "runtime-V5-repeated-crash-no-duplicate-source"
+            }
+          },
+          "evidenceRefs": [
+            "restart-0-worker-b:actual-artifact"
+          ]
+        },
+        {
+          "id": "expire-0",
+          "kind": "control",
+          "control": {
+            "type": "clock",
+            "operation": "advanceTo",
+            "parameters": {
+              "scope": {
+                "organizationId": {
+                  "$alias": "ORG"
+                },
+                "caseId": "V5",
+                "subcaseId": "repeated-crash-no-duplicate"
+              },
+              "instant": "2026-10-07T09:00:16Z",
+              "knownAt": "2026-10-07T09:00:16Z",
+              "timezone": "Asia/Seoul"
+            }
+          },
+          "evidenceRefs": [
+            "expire-0:actual-artifact"
+          ]
+        },
+        {
+          "id": "crash-1",
+          "kind": "control",
+          "control": {
+            "type": "fault",
+            "operation": "arm",
+            "parameters": {
+              "scope": {
+                "organizationId": {
+                  "$alias": "ORG"
+                },
+                "caseId": "V5",
+                "subcaseId": "repeated-crash-no-duplicate"
+              },
+              "point": "worker.afterCommitBeforeAcknowledgement",
+              "workerId": "worker-a",
+              "times": 1,
+              "mode": "PROCESS_CRASH"
+            }
+          },
+          "evidenceRefs": [
+            "crash-1:actual-artifact"
+          ]
+        },
+        {
+          "id": "tick-1",
+          "kind": "control",
+          "control": {
+            "type": "process",
+            "operation": "tickScheduler",
+            "parameters": {
+              "scope": {
+                "organizationId": {
+                  "$alias": "ORG"
+                },
+                "caseId": "V5",
+                "subcaseId": "repeated-crash-no-duplicate"
+              },
+              "schedulerId": "scheduler-repeated-crash-no-duplicate",
+              "clockInstant": "2026-10-07T09:00:16Z",
+              "queueMode": "EMPTY_NO_REPLAY",
+              "workerIds": [
+                "worker-a"
+              ]
+            }
+          },
+          "evidenceRefs": [
+            "tick-1:actual-artifact"
+          ]
+        },
+        {
+          "id": "terminal-1",
+          "kind": "control",
+          "control": {
+            "type": "process",
+            "operation": "awaitRuntimeTask",
+            "parameters": {
+              "scope": {
+                "organizationId": {
+                  "$alias": "ORG"
+                },
+                "caseId": "V5",
+                "subcaseId": "repeated-crash-no-duplicate"
+              },
+              "schedulerId": "scheduler-repeated-crash-no-duplicate",
+              "taskId": {
+                "$result": {
+                  "actionId": "tick-1",
+                  "pointer": "/data/hostObservation/rawRows/tasks/0/taskId"
+                }
+              },
+              "invocationHandle": {
+                "$result": {
+                  "actionId": "tick-1",
+                  "pointer": "/data/hostObservation/rawRows/tasks/0/invocationHandle"
+                }
+              },
+              "timeoutSeconds": 30
+            }
+          },
+          "evidenceRefs": [
+            "terminal-1:actual-artifact"
+          ]
+        },
+        {
+          "id": "restart-1-api",
+          "kind": "control",
+          "control": {
+            "type": "process",
+            "operation": "restart",
+            "parameters": {
+              "scope": {
+                "organizationId": {
+                  "$alias": "ORG"
+                },
+                "caseId": "V5",
+                "subcaseId": "repeated-crash-no-duplicate"
+              },
+              "processId": "api",
+              "environmentId": "runtime-V5-repeated-crash-no-duplicate-source"
+            }
+          },
+          "evidenceRefs": [
+            "restart-1-api:actual-artifact"
+          ]
+        },
+        {
+          "id": "restart-1-scheduler",
+          "kind": "control",
+          "control": {
+            "type": "process",
+            "operation": "restart",
+            "parameters": {
+              "scope": {
+                "organizationId": {
+                  "$alias": "ORG"
+                },
+                "caseId": "V5",
+                "subcaseId": "repeated-crash-no-duplicate"
+              },
+              "processId": "scheduler",
+              "environmentId": "runtime-V5-repeated-crash-no-duplicate-source"
+            }
+          },
+          "evidenceRefs": [
+            "restart-1-scheduler:actual-artifact"
+          ]
+        },
+        {
+          "id": "restart-1-worker-a",
+          "kind": "control",
+          "control": {
+            "type": "process",
+            "operation": "restart",
+            "parameters": {
+              "scope": {
+                "organizationId": {
+                  "$alias": "ORG"
+                },
+                "caseId": "V5",
+                "subcaseId": "repeated-crash-no-duplicate"
+              },
+              "processId": "worker-a",
+              "environmentId": "runtime-V5-repeated-crash-no-duplicate-source"
+            }
+          },
+          "evidenceRefs": [
+            "restart-1-worker-a:actual-artifact"
+          ]
+        },
+        {
+          "id": "restart-1-worker-b",
+          "kind": "control",
+          "control": {
+            "type": "process",
+            "operation": "restart",
+            "parameters": {
+              "scope": {
+                "organizationId": {
+                  "$alias": "ORG"
+                },
+                "caseId": "V5",
+                "subcaseId": "repeated-crash-no-duplicate"
+              },
+              "processId": "worker-b",
+              "environmentId": "runtime-V5-repeated-crash-no-duplicate-source"
+            }
+          },
+          "evidenceRefs": [
+            "restart-1-worker-b:actual-artifact"
+          ]
+        },
+        {
+          "id": "expire-1",
+          "kind": "control",
+          "control": {
+            "type": "clock",
+            "operation": "advanceTo",
+            "parameters": {
+              "scope": {
+                "organizationId": {
+                  "$alias": "ORG"
+                },
+                "caseId": "V5",
+                "subcaseId": "repeated-crash-no-duplicate"
+              },
+              "instant": "2026-10-07T09:00:22Z",
+              "knownAt": "2026-10-07T09:00:22Z",
+              "timezone": "Asia/Seoul"
+            }
+          },
+          "evidenceRefs": [
+            "expire-1:actual-artifact"
+          ]
+        },
+        {
+          "id": "final-clock",
+          "kind": "control",
+          "control": {
+            "type": "clock",
+            "operation": "advanceTo",
+            "parameters": {
+              "scope": {
+                "organizationId": {
+                  "$alias": "ORG"
+                },
+                "caseId": "V5",
+                "subcaseId": "repeated-crash-no-duplicate"
+              },
+              "instant": "2026-10-07T09:00:22Z",
+              "knownAt": "2026-10-07T09:00:22Z",
+              "timezone": "Asia/Seoul"
+            }
+          },
+          "evidenceRefs": [
+            "final-clock:actual-artifact"
+          ]
+        },
+        {
+          "id": "final-tick",
+          "kind": "control",
+          "control": {
+            "type": "process",
+            "operation": "tickScheduler",
+            "parameters": {
+              "scope": {
+                "organizationId": {
+                  "$alias": "ORG"
+                },
+                "caseId": "V5",
+                "subcaseId": "repeated-crash-no-duplicate"
+              },
+              "schedulerId": "scheduler-repeated-crash-no-duplicate",
+              "clockInstant": "2026-10-07T09:00:22Z",
+              "queueMode": "EMPTY_NO_REPLAY",
+              "workerIds": [
+                "worker-a",
+                "worker-b"
+              ]
+            }
+          },
+          "evidenceRefs": [
+            "final-tick:actual-artifact"
+          ]
+        },
+        {
+          "id": "final-terminal",
+          "kind": "control",
+          "control": {
+            "type": "process",
+            "operation": "awaitRuntimeTask",
+            "parameters": {
+              "scope": {
+                "organizationId": {
+                  "$alias": "ORG"
+                },
+                "caseId": "V5",
+                "subcaseId": "repeated-crash-no-duplicate"
+              },
+              "schedulerId": "scheduler-repeated-crash-no-duplicate",
+              "taskId": {
+                "$result": {
+                  "actionId": "final-tick",
+                  "pointer": "/data/hostObservation/rawRows/tasks/0/taskId"
+                }
+              },
+              "invocationHandle": {
+                "$result": {
+                  "actionId": "final-tick",
+                  "pointer": "/data/hostObservation/rawRows/tasks/0/invocationHandle"
+                }
+              },
+              "timeoutSeconds": 30
+            }
+          },
+          "evidenceRefs": [
+            "final-terminal:actual-artifact"
+          ]
+        },
+        {
+          "id": "api",
+          "kind": "query",
+          "actorRef": "operations",
+          "route": "api",
+          "capabilityId": "getWork",
+          "request": {
+            "intentKind": "QUERY",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "getWork",
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "caseId": "V5",
+              "subcaseId": "repeated-crash-no-duplicate"
+            },
+            "asOf": "2026-10-07T09:00:22Z",
+            "knownAt": "2026-10-07T09:00:22Z",
+            "workId": {
+              "$result": {
+                "actionId": "create",
+                "pointer": "/response/workId"
+              }
+            }
+          },
+          "evidenceRefs": [
+            "api:actual-artifact"
+          ]
+        },
+        {
+          "id": "db",
+          "kind": "observe",
+          "observation": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "caseId": "V5",
+              "subcaseId": "repeated-crash-no-duplicate"
+            },
+            "snapshotRef": {
+              "$result": {
+                "actionId": "api",
+                "pointer": "/response/snapshotRevision"
+              }
+            },
+            "asOf": "2026-10-07T09:00:22Z",
+            "knownAt": "2026-10-07T09:00:22Z",
+            "sources": [
+              "movements",
+              "queueMessages",
+              "events",
+              "externalDeliveries",
+              "obligationResolutions",
+              "dutyTransitions",
+              "workClosures",
+              "operationalIssues",
+              "boundaryCauses",
+              "works",
+              "goals",
+              "assessments",
+              "obligations",
+              "assignments",
+              "intake",
+              "claims",
+              "attempts",
+              "commands",
+              "segments",
+              "genealogy",
+              "allocations",
+              "restrictions",
+              "validityBoundaries",
+              "inbox",
+              "outbox",
+              "audit",
+              "alerts",
+              "definitions",
+              "policies",
+              "grants",
+              "documents",
+              "reconciliations",
+              "projections"
+            ]
+          },
+          "evidenceRefs": [
+            "db:actual-artifact"
+          ]
+        }
+      ],
+      "assertions": [
+        {
+          "id": "terminal-0-origin",
+          "op": "equals",
+          "source": {
+            "actionId": "terminal-0",
+            "pointer": "/data/hostObservation/runtimeTask/origin"
+          },
+          "expected": "autonomousScheduler",
+          "requirementRefs": [
+            "D10",
+            "D26"
+          ],
+          "evidenceRefs": [
+            "terminal-0:actual-artifact",
+            "terminal-0:source-rows"
+          ],
+          "scope": {
+            "normativeScope": "duplicate-effects",
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "V5",
+            "subcaseId": "repeated-crash-no-duplicate"
+          },
+          "oracleExplanation": "실제 scheduler가 자율 생성한 task의 종료를 관찰한다.",
+          "oracleRef": {
+            "oracleId": "V5.two-workers-fencing",
+            "observationNames": [
+              "duplicate-effects"
+            ]
+          }
+        },
+        {
+          "id": "terminal-0-terminal",
+          "op": "equals",
+          "source": {
+            "actionId": "terminal-0",
+            "pointer": "/data/hostObservation/runtimeTask/terminalStatus"
+          },
+          "expected": "FAILED",
+          "requirementRefs": [
+            "D10",
+            "D26"
+          ],
+          "evidenceRefs": [
+            "terminal-0:actual-artifact",
+            "terminal-0:source-rows"
+          ],
+          "scope": {
+            "normativeScope": "duplicate-effects",
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "V5",
+            "subcaseId": "repeated-crash-no-duplicate"
+          },
+          "oracleExplanation": "제출 ACK가 아니라 실제 task terminal을 확인한다.",
+          "oracleRef": {
+            "oracleId": "V5.two-workers-fencing",
+            "observationNames": [
+              "duplicate-effects"
+            ]
+          }
+        },
+        {
+          "id": "terminal-1-origin",
+          "op": "equals",
+          "source": {
+            "actionId": "terminal-1",
+            "pointer": "/data/hostObservation/runtimeTask/origin"
+          },
+          "expected": "autonomousScheduler",
+          "requirementRefs": [
+            "D10",
+            "D26"
+          ],
+          "evidenceRefs": [
+            "terminal-1:actual-artifact",
+            "terminal-1:source-rows"
+          ],
+          "scope": {
+            "normativeScope": "duplicate-effects",
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "V5",
+            "subcaseId": "repeated-crash-no-duplicate"
+          },
+          "oracleExplanation": "실제 scheduler가 자율 생성한 task의 종료를 관찰한다.",
+          "oracleRef": {
+            "oracleId": "V5.two-workers-fencing",
+            "observationNames": [
+              "duplicate-effects"
+            ]
+          }
+        },
+        {
+          "id": "terminal-1-terminal",
+          "op": "equals",
+          "source": {
+            "actionId": "terminal-1",
+            "pointer": "/data/hostObservation/runtimeTask/terminalStatus"
+          },
+          "expected": "FAILED",
+          "requirementRefs": [
+            "D10",
+            "D26"
+          ],
+          "evidenceRefs": [
+            "terminal-1:actual-artifact",
+            "terminal-1:source-rows"
+          ],
+          "scope": {
+            "normativeScope": "duplicate-effects",
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "V5",
+            "subcaseId": "repeated-crash-no-duplicate"
+          },
+          "oracleExplanation": "제출 ACK가 아니라 실제 task terminal을 확인한다.",
+          "oracleRef": {
+            "oracleId": "V5.two-workers-fencing",
+            "observationNames": [
+              "duplicate-effects"
+            ]
+          }
+        },
+        {
+          "id": "final-terminal-origin",
+          "op": "equals",
+          "source": {
+            "actionId": "final-terminal",
+            "pointer": "/data/hostObservation/runtimeTask/origin"
+          },
+          "expected": "autonomousScheduler",
+          "requirementRefs": [
+            "D10",
+            "D26"
+          ],
+          "evidenceRefs": [
+            "final-terminal:actual-artifact",
+            "final-terminal:source-rows"
+          ],
+          "scope": {
+            "normativeScope": "duplicate-effects",
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "V5",
+            "subcaseId": "repeated-crash-no-duplicate"
+          },
+          "oracleExplanation": "실제 scheduler가 자율 생성한 task의 종료를 관찰한다.",
+          "oracleRef": {
+            "oracleId": "V5.two-workers-fencing",
+            "observationNames": [
+              "duplicate-effects"
+            ]
+          }
+        },
+        {
+          "id": "final-terminal-terminal",
+          "op": "equals",
+          "source": {
+            "actionId": "final-terminal",
+            "pointer": "/data/hostObservation/runtimeTask/terminalStatus"
+          },
+          "expected": "SUCCEEDED",
+          "requirementRefs": [
+            "D10",
+            "D26"
+          ],
+          "evidenceRefs": [
+            "final-terminal:actual-artifact",
+            "final-terminal:source-rows"
+          ],
+          "scope": {
+            "normativeScope": "duplicate-effects",
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "V5",
+            "subcaseId": "repeated-crash-no-duplicate"
+          },
+          "oracleExplanation": "제출 ACK가 아니라 실제 task terminal을 확인한다.",
+          "oracleRef": {
+            "oracleId": "V5.two-workers-fencing",
+            "observationNames": [
+              "duplicate-effects"
+            ]
+          }
+        },
+        {
+          "id": "exactly-one-commit",
+          "op": "count",
+          "source": {
+            "actionId": "db",
+            "pointer": "/data/rawRows/commands",
+            "where": {
+              "status": "COMMITTED",
+              "effectClass": "DUE_WAIT_CONTINUATION"
+            }
+          },
+          "expected": 1,
+          "requirementRefs": [
+            "D10",
+            "D26"
+          ],
+          "evidenceRefs": [
+            "db:actual-artifact",
+            "db:source-rows"
+          ],
+          "scope": {
+            "normativeScope": "duplicate-effects",
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "V5",
+            "subcaseId": "repeated-crash-no-duplicate"
+          },
+          "oracleExplanation": "독립 DB 원 행을 정확한 대상 scope로 세어 중복·누락을 거부한다.",
+          "oracleRef": {
+            "oracleId": "V5.two-workers-fencing",
+            "observationNames": [
+              "duplicate-effects"
+            ]
+          }
+        },
+        {
+          "id": "exactly-one-transition",
+          "op": "count",
+          "source": {
+            "actionId": "db",
+            "pointer": "/data/rawRows/dutyTransitions",
+            "where": {
+              "transition": "ESCALATED"
+            }
+          },
+          "expected": 1,
+          "requirementRefs": [
+            "D10",
+            "D26"
+          ],
+          "evidenceRefs": [
+            "db:actual-artifact",
+            "db:source-rows"
+          ],
+          "scope": {
+            "normativeScope": "duplicate-effects",
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "V5",
+            "subcaseId": "repeated-crash-no-duplicate"
+          },
+          "oracleExplanation": "독립 DB 원 행을 정확한 대상 scope로 세어 중복·누락을 거부한다.",
+          "oracleRef": {
+            "oracleId": "V5.two-workers-fencing",
+            "observationNames": [
+              "duplicate-effects"
+            ]
+          }
+        },
+        {
+          "id": "single-escalation-outbox",
+          "op": "count",
+          "source": {
+            "actionId": "db",
+            "pointer": "/data/rawRows/outbox",
+            "where": {
+              "effectClass": "DUE_WAIT_ESCALATION_NOTIFICATION"
+            }
+          },
+          "expected": 1,
+          "requirementRefs": [
+            "D10",
+            "D26"
+          ],
+          "evidenceRefs": [
+            "db:actual-artifact",
+            "db:source-rows"
+          ],
+          "scope": {
+            "normativeScope": "duplicate-effects",
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "V5",
+            "subcaseId": "repeated-crash-no-duplicate"
+          },
+          "oracleExplanation": "독립 DB 원 행을 정확한 대상 scope로 세어 중복·누락을 거부한다.",
+          "oracleRef": {
+            "oracleId": "V5.two-workers-fencing",
+            "observationNames": [
+              "duplicate-effects"
+            ]
+          }
+        },
+        {
+          "id": "unique-escalation-operation",
+          "op": "unique",
+          "source": {
+            "actionId": "db",
+            "pointer": "/data/rawRows/outbox",
+            "field": "externalOperationId",
+            "where": {
+              "effectClass": "DUE_WAIT_ESCALATION_NOTIFICATION"
+            }
+          },
+          "expected": true,
+          "requirementRefs": [
+            "D10",
+            "D26"
+          ],
+          "evidenceRefs": [
+            "db:actual-artifact",
+            "db:source-rows"
+          ],
+          "scope": {
+            "normativeScope": "duplicate-effects",
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "V5",
+            "subcaseId": "repeated-crash-no-duplicate"
+          },
+          "oracleExplanation": "반복 restart에서 알림 outbox의 동일 externalOperationId도 복제되지 않는다.",
+          "oracleRef": {
+            "oracleId": "V5.two-workers-fencing",
+            "observationNames": [
+              "duplicate-effects"
+            ]
+          }
+        },
+        {
+          "id": "attempt-key-first-retry",
+          "op": "sameAs",
+          "source": {
+            "actionId": "db",
+            "pointer": "/data/rawRows/attempts/1/commandIdempotencyKey"
+          },
+          "expected": true,
+          "requirementRefs": [
+            "D10",
+            "D26"
+          ],
+          "evidenceRefs": [
+            "db:actual-artifact",
+            "db:source-rows"
+          ],
+          "scope": {
+            "normativeScope": "duplicate-effects",
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "V5",
+            "subcaseId": "repeated-crash-no-duplicate"
+          },
+          "oracleExplanation": "worker retry 번호·restart는 같은 logical command key를 바꾸지 않는다.",
+          "oracleRef": {
+            "oracleId": "V5.two-workers-fencing",
+            "observationNames": [
+              "duplicate-effects"
+            ]
+          },
+          "baseline": {
+            "actionId": "db",
+            "pointer": "/data/rawRows/attempts/0/commandIdempotencyKey"
+          }
+        },
+        {
+          "id": "attempt-key-final-replay",
+          "op": "sameAs",
+          "source": {
+            "actionId": "db",
+            "pointer": "/data/rawRows/attempts/2/commandIdempotencyKey"
+          },
+          "expected": true,
+          "requirementRefs": [
+            "D10",
+            "D26"
+          ],
+          "evidenceRefs": [
+            "db:actual-artifact",
+            "db:source-rows"
+          ],
+          "scope": {
+            "normativeScope": "duplicate-effects",
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "V5",
+            "subcaseId": "repeated-crash-no-duplicate"
+          },
+          "oracleExplanation": "commit 후 응답 유실 재시도도 같은 key다.",
+          "oracleRef": {
+            "oracleId": "V5.two-workers-fencing",
+            "observationNames": [
+              "duplicate-effects"
+            ]
+          },
+          "baseline": {
+            "actionId": "db",
+            "pointer": "/data/rawRows/attempts/0/commandIdempotencyKey"
+          }
+        },
+        {
+          "id": "three-observed-attempts",
+          "op": "count",
+          "source": {
+            "actionId": "db",
+            "pointer": "/data/rawRows/attempts"
+          },
+          "expected": 3,
+          "requirementRefs": [
+            "D10",
+            "D26"
+          ],
+          "evidenceRefs": [
+            "db:actual-artifact",
+            "db:source-rows"
+          ],
+          "scope": {
+            "normativeScope": "duplicate-effects",
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "V5",
+            "subcaseId": "repeated-crash-no-duplicate"
+          },
+          "oracleExplanation": "독립 DB 원 행을 정확한 대상 scope로 세어 중복·누락을 거부한다.",
+          "oracleRef": {
+            "oracleId": "V5.two-workers-fencing",
+            "observationNames": [
+              "duplicate-effects"
+            ]
+          }
+        },
+        {
+          "id": "no-physical-duplication",
+          "op": "unique",
+          "source": {
+            "actionId": "db",
+            "pointer": "/data/rawRows/segments",
+            "field": "physicalScope"
+          },
+          "expected": true,
+          "requirementRefs": [
+            "D10",
+            "D26"
+          ],
+          "evidenceRefs": [
+            "db:actual-artifact",
+            "db:source-rows"
+          ],
+          "scope": {
+            "normativeScope": "duplicate-effects",
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "V5",
+            "subcaseId": "repeated-crash-no-duplicate"
+          },
+          "oracleExplanation": "같은 physicalScope가 반복 장애에서 복제되지 않는다.",
+          "oracleRef": {
+            "oracleId": "V5.two-workers-fencing",
+            "observationNames": [
+              "duplicate-effects"
+            ]
+          }
+        },
+        {
+          "id": "held-remains20",
+          "op": "sumEquals",
+          "source": {
+            "actionId": "db",
+            "pointer": "/data/rawRows/segments",
+            "field": "quantity"
+          },
+          "expected": "20",
+          "requirementRefs": [
+            "D10",
+            "D26"
+          ],
+          "evidenceRefs": [
+            "db:actual-artifact",
+            "db:source-rows"
+          ],
+          "scope": {
+            "normativeScope": "duplicate-effects",
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "V5",
+            "subcaseId": "repeated-crash-no-duplicate"
+          },
+          "oracleExplanation": "기술 retry는 별도 물량을 생성하지 않는다.20BOX다.",
+          "oracleRef": {
+            "oracleId": "V5.two-workers-fencing",
+            "observationNames": [
+              "duplicate-effects"
+            ]
+          },
+          "unit": "BOX",
+          "unitSource": {
+            "actionId": "db",
+            "pointer": "/data/rawRows/segments",
+            "field": "unit"
+          }
+        },
+        {
+          "id": "db-current-assignment-one",
+          "op": "count",
+          "source": {
+            "actionId": "db",
+            "pointer": "/data/rawRows/assignments",
+            "where": {
+              "current": true
+            }
+          },
+          "expected": 1,
+          "requirementRefs": [
+            "D10",
+            "D26"
+          ],
+          "evidenceRefs": [
+            "db:actual-artifact",
+            "db:source-rows"
+          ],
+          "scope": {
+            "normativeScope": "exhausted-retry-owner",
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "V5",
+            "subcaseId": "repeated-crash-no-duplicate"
+          },
+          "oracleExplanation": "독립 DB 원 행을 정확한 대상 scope로 세어 중복·누락을 거부한다.",
+          "oracleRef": {
+            "oracleId": "V5.two-workers-fencing",
+            "observationNames": [
+              "exhausted-retry-owner"
+            ]
+          }
+        },
+        {
+          "id": "db-owner",
+          "op": "exactSet",
+          "source": {
+            "actionId": "db",
+            "pointer": "/data/rawRows/assignments",
+            "field": "ownerId",
+            "where": {
+              "current": true
+            }
+          },
+          "expected": [
+            {
+              "$alias": "owner"
+            }
+          ],
+          "requirementRefs": [
+            "D10",
+            "D26"
+          ],
+          "evidenceRefs": [
+            "db:actual-artifact",
+            "db:source-rows"
+          ],
+          "scope": {
+            "normativeScope": "exhausted-retry-owner",
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "V5",
+            "subcaseId": "repeated-crash-no-duplicate"
+          },
+          "oracleExplanation": "해당 scope의 각 실제 원 행 값과 고정 기대값을 대조한다.",
+          "oracleRef": {
+            "oracleId": "V5.two-workers-fencing",
+            "observationNames": [
+              "exhausted-retry-owner"
+            ]
+          }
+        },
+        {
+          "id": "db-duty-status",
+          "op": "exactSet",
+          "source": {
+            "actionId": "db",
+            "pointer": "/data/rawRows/obligations",
+            "field": "status"
+          },
+          "expected": [
+            "OPEN"
+          ],
+          "requirementRefs": [
+            "D10",
+            "D26"
+          ],
+          "evidenceRefs": [
+            "db:actual-artifact",
+            "db:source-rows"
+          ],
+          "scope": {
+            "normativeScope": "exhausted-retry-owner",
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "V5",
+            "subcaseId": "repeated-crash-no-duplicate"
+          },
+          "oracleExplanation": "해당 scope의 각 실제 원 행 값과 고정 기대값을 대조한다.",
+          "oracleRef": {
+            "oracleId": "V5.two-workers-fencing",
+            "observationNames": [
+              "exhausted-retry-owner"
+            ]
+          }
+        },
+        {
+          "id": "db-next-action",
+          "op": "exactSet",
+          "source": {
+            "actionId": "db",
+            "pointer": "/data/rawRows/assignments",
+            "field": "nextAction",
+            "where": {
+              "current": true
+            }
+          },
+          "expected": [
+            "조사·재인가·안전 재시도"
+          ],
+          "requirementRefs": [
+            "D10",
+            "D26"
+          ],
+          "evidenceRefs": [
+            "db:actual-artifact",
+            "db:source-rows"
+          ],
+          "scope": {
+            "normativeScope": "exhausted-retry-owner",
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "V5",
+            "subcaseId": "repeated-crash-no-duplicate"
+          },
+          "oracleExplanation": "해당 scope의 각 실제 원 행 값과 고정 기대값을 대조한다.",
+          "oracleRef": {
+            "oracleId": "V5.two-workers-fencing",
+            "observationNames": [
+              "exhausted-retry-owner"
+            ]
+          }
+        },
+        {
+          "id": "db-next-check",
+          "op": "exactSet",
+          "source": {
+            "actionId": "db",
+            "pointer": "/data/rawRows/assignments",
+            "field": "nextCheckAt",
+            "where": {
+              "current": true
+            }
+          },
+          "expected": [
+            "2026-10-07T09:01:00Z"
+          ],
+          "requirementRefs": [
+            "D10",
+            "D26"
+          ],
+          "evidenceRefs": [
+            "db:actual-artifact",
+            "db:source-rows"
+          ],
+          "scope": {
+            "normativeScope": "exhausted-retry-owner",
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "V5",
+            "subcaseId": "repeated-crash-no-duplicate"
+          },
+          "oracleExplanation": "해당 scope의 각 실제 원 행 값과 고정 기대값을 대조한다.",
+          "oracleRef": {
+            "oracleId": "V5.two-workers-fencing",
+            "observationNames": [
+              "exhausted-retry-owner"
+            ]
+          }
+        },
+        {
+          "id": "api-owner",
+          "op": "equals",
+          "source": {
+            "actionId": "api",
+            "pointer": "/response/data/responsibility/ownerId"
+          },
+          "expected": {
+            "$alias": "owner"
+          },
+          "requirementRefs": [
+            "D10",
+            "D26"
+          ],
+          "evidenceRefs": [
+            "api:actual-artifact",
+            "api:source-rows"
+          ],
+          "scope": {
+            "normativeScope": "exhausted-retry-owner",
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "V5",
+            "subcaseId": "repeated-crash-no-duplicate"
+          },
+          "oracleExplanation": "API가 DB와 같은 인간 주 책임자를 반환한다.",
+          "oracleRef": {
+            "oracleId": "V5.two-workers-fencing",
+            "observationNames": [
+              "exhausted-retry-owner"
+            ]
+          }
+        },
+        {
+          "id": "api-action",
+          "op": "equals",
+          "source": {
+            "actionId": "api",
+            "pointer": "/response/data/responsibility/nextAction"
+          },
+          "expected": "조사·재인가·안전 재시도",
+          "requirementRefs": [
+            "D10",
+            "D26"
+          ],
+          "evidenceRefs": [
+            "api:actual-artifact",
+            "api:source-rows"
+          ],
+          "scope": {
+            "normativeScope": "exhausted-retry-owner",
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "V5",
+            "subcaseId": "repeated-crash-no-duplicate"
+          },
+          "oracleExplanation": "이름이 같은 Boolean 대신 실제 다음 행동을 확인한다.",
+          "oracleRef": {
+            "oracleId": "V5.two-workers-fencing",
+            "observationNames": [
+              "exhausted-retry-owner"
+            ]
+          }
+        },
+        {
+          "id": "api-check",
+          "op": "timeEquals",
+          "source": {
+            "actionId": "api",
+            "pointer": "/response/data/responsibility/nextCheckAt"
+          },
+          "expected": "2026-10-07T09:01:00Z",
+          "requirementRefs": [
+            "D10",
+            "D26"
+          ],
+          "evidenceRefs": [
+            "api:actual-artifact",
+            "api:source-rows"
+          ],
+          "scope": {
+            "normativeScope": "exhausted-retry-owner",
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "V5",
+            "subcaseId": "repeated-crash-no-duplicate"
+          },
+          "oracleExplanation": "고정 업무 시계의 다음 확인 시점을 검사한다.",
+          "oracleRef": {
+            "oracleId": "V5.two-workers-fencing",
+            "observationNames": [
+              "exhausted-retry-owner"
+            ]
+          }
+        }
+      ],
+      "oracleExplanation": "commit 전후 반복 crash와 전체 restart에도 확정 효과 한 번을 유지한다。복구 완료·재개 결과를 fixture에 seed하지 않는다. 실제 command/fault/lifecycle/clock/terminal과 독립 원 행을 관찰한다."
+    },
+    {
+      "id": "bounded-retry-exhausted-owner",
+      "title": "세 번의 실제 worker 실패 소진 뒤 인간 책임과 다음 확인을 유지한다",
+      "fixtureRef": "verification/cases/V5/fixtures/bounded-retry-exhausted-owner.json",
+      "requiredAdapters": [
+        "fixture",
+        "api",
+        "db",
+        "clock",
+        "fault",
+        "process",
+        "host-extractor",
+        "scheduler",
+        "actual-workers",
+        "externalResponder"
+      ],
+      "actions": [
+        {
+          "id": "setup",
+          "kind": "installFixture",
+          "evidenceRefs": [
+            "setup:actual-artifact"
+          ]
+        },
+        {
+          "id": "start-app-api",
+          "kind": "control",
+          "control": {
+            "type": "process",
+            "operation": "start",
+            "parameters": {
+              "scope": {
+                "organizationId": {
+                  "$alias": "ORG"
+                },
+                "caseId": "V5",
+                "subcaseId": "bounded-retry-exhausted-owner"
+              },
+              "processId": "api",
+              "environmentId": "runtime-V5-bounded-retry-exhausted-owner-source"
+            }
+          },
+          "evidenceRefs": [
+            "start-app-api:actual-artifact"
+          ]
+        },
+        {
+          "id": "start-app-scheduler",
+          "kind": "control",
+          "control": {
+            "type": "process",
+            "operation": "start",
+            "parameters": {
+              "scope": {
+                "organizationId": {
+                  "$alias": "ORG"
+                },
+                "caseId": "V5",
+                "subcaseId": "bounded-retry-exhausted-owner"
+              },
+              "processId": "scheduler",
+              "environmentId": "runtime-V5-bounded-retry-exhausted-owner-source"
+            }
+          },
+          "evidenceRefs": [
+            "start-app-scheduler:actual-artifact"
+          ]
+        },
+        {
+          "id": "start-app-worker-a",
+          "kind": "control",
+          "control": {
+            "type": "process",
+            "operation": "start",
+            "parameters": {
+              "scope": {
+                "organizationId": {
+                  "$alias": "ORG"
+                },
+                "caseId": "V5",
+                "subcaseId": "bounded-retry-exhausted-owner"
+              },
+              "processId": "worker-a",
+              "environmentId": "runtime-V5-bounded-retry-exhausted-owner-source"
+            }
+          },
+          "evidenceRefs": [
+            "start-app-worker-a:actual-artifact"
+          ]
+        },
+        {
+          "id": "start-app-worker-b",
+          "kind": "control",
+          "control": {
+            "type": "process",
+            "operation": "start",
+            "parameters": {
+              "scope": {
+                "organizationId": {
+                  "$alias": "ORG"
+                },
+                "caseId": "V5",
+                "subcaseId": "bounded-retry-exhausted-owner"
+              },
+              "processId": "worker-b",
+              "environmentId": "runtime-V5-bounded-retry-exhausted-owner-source"
+            }
+          },
+          "evidenceRefs": [
+            "start-app-worker-b:actual-artifact"
+          ]
+        },
+        {
+          "id": "create",
+          "kind": "invoke",
+          "actorRef": "owner",
+          "route": "api",
+          "capabilityId": "createWork",
+          "request": {
+            "intentKind": "COMMAND",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "createWork",
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "caseId": "V5",
+              "subcaseId": "bounded-retry-exhausted-owner"
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:00Z",
+            "workKind": "check",
+            "subjectRefs": [
+              {
+                "type": "TradeItem",
+                "id": {
+                  "$alias": "P"
+                }
+              }
+            ],
+            "goal": {
+              "quantity": "20",
+              "unit": "BOX",
+              "quantityMode": "STATE_AT",
+              "endpoint": "VERIFIED",
+              "destinationId": {
+                "$alias": "W"
+              },
+              "dueAt": "2026-10-07T09:00:10Z",
+              "deadlineInclusive": true,
+              "timezone": "Asia/Seoul",
+              "evidencePolicyVersion": "synthetic-evidence-v1"
+            },
+            "ownerId": {
+              "$alias": "owner"
+            },
+            "supervisorId": {
+              "$alias": "supervisor"
+            },
+            "nextAction": "조사·재인가·안전 재시도",
+            "nextCheckAt": "2026-10-07T09:01:00Z",
+            "commandIdempotencyKey": "V5-bounded-retry-exhausted-owner-create"
+          },
+          "evidenceRefs": [
+            "create:actual-artifact"
+          ]
+        },
+        {
+          "id": "create-activate",
+          "kind": "invoke",
+          "actorRef": "owner",
+          "route": "api",
+          "capabilityId": "activateWork",
+          "request": {
+            "intentKind": "COMMAND",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "activateWork",
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "caseId": "V5",
+              "subcaseId": "bounded-retry-exhausted-owner"
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:00Z",
+            "workId": {
+              "$result": {
+                "actionId": "create",
+                "pointer": "/response/workId"
+              }
+            },
+            "expectedRevision": {
+              "$result": {
+                "actionId": "create",
+                "pointer": "/response/revision"
+              }
+            },
+            "commandIdempotencyKey": "V5-bounded-retry-exhausted-owner-create-activate"
+          },
+          "evidenceRefs": [
+            "create-activate:actual-artifact"
+          ]
+        },
+        {
+          "id": "wait",
+          "kind": "invoke",
+          "actorRef": "owner",
+          "route": "api",
+          "capabilityId": "waitWork",
+          "request": {
+            "intentKind": "COMMAND",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "waitWork",
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "caseId": "V5",
+              "subcaseId": "bounded-retry-exhausted-owner"
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:00Z",
+            "workId": {
+              "$result": {
+                "actionId": "create",
+                "pointer": "/response/workId"
+              }
+            },
+            "expectedRevision": {
+              "$result": {
+                "actionId": "create-activate",
+                "pointer": "/response/revision"
+              }
+            },
+            "reason": "AWAITING_VERIFIED_EVIDENCE",
+            "targetId": {
+              "$alias": "Q20"
+            },
+            "resumePredicate": {
+              "kind": "evidenceAvailable",
+              "eventId": "EV-READY",
+              "expectedRevision": 1
+            },
+            "verifierId": {
+              "$alias": "owner"
+            },
+            "nextCheckAt": "2026-10-07T09:00:10Z",
+            "overdueAction": "ESCALATE_EXISTING_DUTY",
+            "commandIdempotencyKey": "V5-bounded-retry-exhausted-owner-wait"
+          },
+          "evidenceRefs": [
+            "wait:actual-artifact"
+          ]
+        },
+        {
+          "id": "advance",
+          "kind": "control",
+          "control": {
+            "type": "clock",
+            "operation": "advanceTo",
+            "parameters": {
+              "scope": {
+                "organizationId": {
+                  "$alias": "ORG"
+                },
+                "caseId": "V5",
+                "subcaseId": "bounded-retry-exhausted-owner"
+              },
+              "instant": "2026-10-07T09:00:10Z",
+              "knownAt": "2026-10-07T09:00:10Z",
+              "timezone": "Asia/Seoul"
+            }
+          },
+          "evidenceRefs": [
+            "advance:actual-artifact"
+          ]
+        },
+        {
+          "id": "permanent-failure",
+          "kind": "control",
+          "control": {
+            "type": "fault",
+            "operation": "arm",
+            "parameters": {
+              "scope": {
+                "organizationId": {
+                  "$alias": "ORG"
+                },
+                "caseId": "V5",
+                "subcaseId": "bounded-retry-exhausted-owner"
+              },
+              "point": "worker.beforeCommit",
+              "times": 3,
+              "error": "TRANSIENT_DATABASE_UNAVAILABLE"
+            }
+          },
+          "evidenceRefs": [
+            "permanent-failure:actual-artifact"
+          ]
+        },
+        {
+          "id": "retry-clock-0",
+          "kind": "control",
+          "control": {
+            "type": "clock",
+            "operation": "advanceTo",
+            "parameters": {
+              "scope": {
+                "organizationId": {
+                  "$alias": "ORG"
+                },
+                "caseId": "V5",
+                "subcaseId": "bounded-retry-exhausted-owner"
+              },
+              "instant": "2026-10-07T09:00:10Z",
+              "knownAt": "2026-10-07T09:00:10Z",
+              "timezone": "Asia/Seoul"
+            }
+          },
+          "evidenceRefs": [
+            "retry-clock-0:actual-artifact"
+          ]
+        },
+        {
+          "id": "tick-0",
+          "kind": "control",
+          "control": {
+            "type": "process",
+            "operation": "tickScheduler",
+            "parameters": {
+              "scope": {
+                "organizationId": {
+                  "$alias": "ORG"
+                },
+                "caseId": "V5",
+                "subcaseId": "bounded-retry-exhausted-owner"
+              },
+              "schedulerId": "scheduler-bounded-retry-exhausted-owner",
+              "clockInstant": "2026-10-07T09:00:10Z",
+              "queueMode": "EMPTY_NO_REPLAY"
+            }
+          },
+          "evidenceRefs": [
+            "tick-0:actual-artifact"
+          ]
+        },
+        {
+          "id": "terminal-0",
+          "kind": "control",
+          "control": {
+            "type": "process",
+            "operation": "awaitRuntimeTask",
+            "parameters": {
+              "scope": {
+                "organizationId": {
+                  "$alias": "ORG"
+                },
+                "caseId": "V5",
+                "subcaseId": "bounded-retry-exhausted-owner"
+              },
+              "schedulerId": "scheduler-bounded-retry-exhausted-owner",
+              "taskId": {
+                "$result": {
+                  "actionId": "tick-0",
+                  "pointer": "/data/hostObservation/rawRows/tasks/0/taskId"
+                }
+              },
+              "invocationHandle": {
+                "$result": {
+                  "actionId": "tick-0",
+                  "pointer": "/data/hostObservation/rawRows/tasks/0/invocationHandle"
+                }
+              },
+              "timeoutSeconds": 30
+            }
+          },
+          "evidenceRefs": [
+            "terminal-0:actual-artifact"
+          ]
+        },
+        {
+          "id": "retry-clock-1",
+          "kind": "control",
+          "control": {
+            "type": "clock",
+            "operation": "advanceTo",
+            "parameters": {
+              "scope": {
+                "organizationId": {
+                  "$alias": "ORG"
+                },
+                "caseId": "V5",
+                "subcaseId": "bounded-retry-exhausted-owner"
+              },
+              "instant": "2026-10-07T09:00:12Z",
+              "knownAt": "2026-10-07T09:00:12Z",
+              "timezone": "Asia/Seoul"
+            }
+          },
+          "evidenceRefs": [
+            "retry-clock-1:actual-artifact"
+          ]
+        },
+        {
+          "id": "tick-1",
+          "kind": "control",
+          "control": {
+            "type": "process",
+            "operation": "tickScheduler",
+            "parameters": {
+              "scope": {
+                "organizationId": {
+                  "$alias": "ORG"
+                },
+                "caseId": "V5",
+                "subcaseId": "bounded-retry-exhausted-owner"
+              },
+              "schedulerId": "scheduler-bounded-retry-exhausted-owner",
+              "clockInstant": "2026-10-07T09:00:12Z",
+              "queueMode": "EMPTY_NO_REPLAY"
+            }
+          },
+          "evidenceRefs": [
+            "tick-1:actual-artifact"
+          ]
+        },
+        {
+          "id": "terminal-1",
+          "kind": "control",
+          "control": {
+            "type": "process",
+            "operation": "awaitRuntimeTask",
+            "parameters": {
+              "scope": {
+                "organizationId": {
+                  "$alias": "ORG"
+                },
+                "caseId": "V5",
+                "subcaseId": "bounded-retry-exhausted-owner"
+              },
+              "schedulerId": "scheduler-bounded-retry-exhausted-owner",
+              "taskId": {
+                "$result": {
+                  "actionId": "tick-1",
+                  "pointer": "/data/hostObservation/rawRows/tasks/0/taskId"
+                }
+              },
+              "invocationHandle": {
+                "$result": {
+                  "actionId": "tick-1",
+                  "pointer": "/data/hostObservation/rawRows/tasks/0/invocationHandle"
+                }
+              },
+              "timeoutSeconds": 30
+            }
+          },
+          "evidenceRefs": [
+            "terminal-1:actual-artifact"
+          ]
+        },
+        {
+          "id": "retry-clock-2",
+          "kind": "control",
+          "control": {
+            "type": "clock",
+            "operation": "advanceTo",
+            "parameters": {
+              "scope": {
+                "organizationId": {
+                  "$alias": "ORG"
+                },
+                "caseId": "V5",
+                "subcaseId": "bounded-retry-exhausted-owner"
+              },
+              "instant": "2026-10-07T09:00:16Z",
+              "knownAt": "2026-10-07T09:00:16Z",
+              "timezone": "Asia/Seoul"
+            }
+          },
+          "evidenceRefs": [
+            "retry-clock-2:actual-artifact"
+          ]
+        },
+        {
+          "id": "tick-2",
+          "kind": "control",
+          "control": {
+            "type": "process",
+            "operation": "tickScheduler",
+            "parameters": {
+              "scope": {
+                "organizationId": {
+                  "$alias": "ORG"
+                },
+                "caseId": "V5",
+                "subcaseId": "bounded-retry-exhausted-owner"
+              },
+              "schedulerId": "scheduler-bounded-retry-exhausted-owner",
+              "clockInstant": "2026-10-07T09:00:16Z",
+              "queueMode": "EMPTY_NO_REPLAY"
+            }
+          },
+          "evidenceRefs": [
+            "tick-2:actual-artifact"
+          ]
+        },
+        {
+          "id": "terminal-2",
+          "kind": "control",
+          "control": {
+            "type": "process",
+            "operation": "awaitRuntimeTask",
+            "parameters": {
+              "scope": {
+                "organizationId": {
+                  "$alias": "ORG"
+                },
+                "caseId": "V5",
+                "subcaseId": "bounded-retry-exhausted-owner"
+              },
+              "schedulerId": "scheduler-bounded-retry-exhausted-owner",
+              "taskId": {
+                "$result": {
+                  "actionId": "tick-2",
+                  "pointer": "/data/hostObservation/rawRows/tasks/0/taskId"
+                }
+              },
+              "invocationHandle": {
+                "$result": {
+                  "actionId": "tick-2",
+                  "pointer": "/data/hostObservation/rawRows/tasks/0/invocationHandle"
+                }
+              },
+              "timeoutSeconds": 30
+            }
+          },
+          "evidenceRefs": [
+            "terminal-2:actual-artifact"
+          ]
+        },
+        {
+          "id": "api",
+          "kind": "query",
+          "actorRef": "operations",
+          "route": "api",
+          "capabilityId": "getWork",
+          "request": {
+            "intentKind": "QUERY",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "getWork",
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "caseId": "V5",
+              "subcaseId": "bounded-retry-exhausted-owner"
+            },
+            "asOf": "2026-10-07T09:00:16Z",
+            "knownAt": "2026-10-07T09:00:16Z",
+            "workId": {
+              "$result": {
+                "actionId": "create",
+                "pointer": "/response/workId"
+              }
+            }
+          },
+          "evidenceRefs": [
+            "api:actual-artifact"
+          ]
+        },
+        {
+          "id": "db",
+          "kind": "observe",
+          "observation": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "caseId": "V5",
+              "subcaseId": "bounded-retry-exhausted-owner"
+            },
+            "snapshotRef": {
+              "$result": {
+                "actionId": "api",
+                "pointer": "/response/snapshotRevision"
+              }
+            },
+            "asOf": "2026-10-07T09:00:16Z",
+            "knownAt": "2026-10-07T09:00:16Z",
+            "sources": [
+              "movements",
+              "queueMessages",
+              "events",
+              "externalDeliveries",
+              "obligationResolutions",
+              "dutyTransitions",
+              "workClosures",
+              "operationalIssues",
+              "boundaryCauses",
+              "works",
+              "goals",
+              "assessments",
+              "obligations",
+              "assignments",
+              "intake",
+              "claims",
+              "attempts",
+              "commands",
+              "segments",
+              "genealogy",
+              "allocations",
+              "restrictions",
+              "validityBoundaries",
+              "inbox",
+              "outbox",
+              "audit",
+              "alerts",
+              "definitions",
+              "policies",
+              "grants",
+              "documents",
+              "reconciliations",
+              "projections"
+            ]
+          },
+          "evidenceRefs": [
+            "db:actual-artifact"
+          ]
+        }
+      ],
+      "assertions": [
+        {
+          "id": "terminal-0-origin",
+          "op": "equals",
+          "source": {
+            "actionId": "terminal-0",
+            "pointer": "/data/hostObservation/runtimeTask/origin"
+          },
+          "expected": "autonomousScheduler",
+          "requirementRefs": [
+            "D10",
+            "D26"
+          ],
+          "evidenceRefs": [
+            "terminal-0:actual-artifact",
+            "terminal-0:source-rows"
+          ],
+          "scope": {
+            "normativeScope": "exhausted-retry-owner",
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "V5",
+            "subcaseId": "bounded-retry-exhausted-owner"
+          },
+          "oracleExplanation": "실제 scheduler가 자율 생성한 task의 종료를 관찰한다.",
+          "oracleRef": {
+            "oracleId": "V5.two-workers-fencing",
+            "observationNames": [
+              "exhausted-retry-owner"
+            ]
+          }
+        },
+        {
+          "id": "terminal-0-terminal",
+          "op": "equals",
+          "source": {
+            "actionId": "terminal-0",
+            "pointer": "/data/hostObservation/runtimeTask/terminalStatus"
+          },
+          "expected": "FAILED",
+          "requirementRefs": [
+            "D10",
+            "D26"
+          ],
+          "evidenceRefs": [
+            "terminal-0:actual-artifact",
+            "terminal-0:source-rows"
+          ],
+          "scope": {
+            "normativeScope": "exhausted-retry-owner",
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "V5",
+            "subcaseId": "bounded-retry-exhausted-owner"
+          },
+          "oracleExplanation": "제출 ACK가 아니라 실제 task terminal을 확인한다.",
+          "oracleRef": {
+            "oracleId": "V5.two-workers-fencing",
+            "observationNames": [
+              "exhausted-retry-owner"
+            ]
+          }
+        },
+        {
+          "id": "terminal-1-origin",
+          "op": "equals",
+          "source": {
+            "actionId": "terminal-1",
+            "pointer": "/data/hostObservation/runtimeTask/origin"
+          },
+          "expected": "autonomousScheduler",
+          "requirementRefs": [
+            "D10",
+            "D26"
+          ],
+          "evidenceRefs": [
+            "terminal-1:actual-artifact",
+            "terminal-1:source-rows"
+          ],
+          "scope": {
+            "normativeScope": "exhausted-retry-owner",
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "V5",
+            "subcaseId": "bounded-retry-exhausted-owner"
+          },
+          "oracleExplanation": "실제 scheduler가 자율 생성한 task의 종료를 관찰한다.",
+          "oracleRef": {
+            "oracleId": "V5.two-workers-fencing",
+            "observationNames": [
+              "exhausted-retry-owner"
+            ]
+          }
+        },
+        {
+          "id": "terminal-1-terminal",
+          "op": "equals",
+          "source": {
+            "actionId": "terminal-1",
+            "pointer": "/data/hostObservation/runtimeTask/terminalStatus"
+          },
+          "expected": "FAILED",
+          "requirementRefs": [
+            "D10",
+            "D26"
+          ],
+          "evidenceRefs": [
+            "terminal-1:actual-artifact",
+            "terminal-1:source-rows"
+          ],
+          "scope": {
+            "normativeScope": "exhausted-retry-owner",
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "V5",
+            "subcaseId": "bounded-retry-exhausted-owner"
+          },
+          "oracleExplanation": "제출 ACK가 아니라 실제 task terminal을 확인한다.",
+          "oracleRef": {
+            "oracleId": "V5.two-workers-fencing",
+            "observationNames": [
+              "exhausted-retry-owner"
+            ]
+          }
+        },
+        {
+          "id": "terminal-2-origin",
+          "op": "equals",
+          "source": {
+            "actionId": "terminal-2",
+            "pointer": "/data/hostObservation/runtimeTask/origin"
+          },
+          "expected": "autonomousScheduler",
+          "requirementRefs": [
+            "D10",
+            "D26"
+          ],
+          "evidenceRefs": [
+            "terminal-2:actual-artifact",
+            "terminal-2:source-rows"
+          ],
+          "scope": {
+            "normativeScope": "exhausted-retry-owner",
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "V5",
+            "subcaseId": "bounded-retry-exhausted-owner"
+          },
+          "oracleExplanation": "실제 scheduler가 자율 생성한 task의 종료를 관찰한다.",
+          "oracleRef": {
+            "oracleId": "V5.two-workers-fencing",
+            "observationNames": [
+              "exhausted-retry-owner"
+            ]
+          }
+        },
+        {
+          "id": "terminal-2-terminal",
+          "op": "equals",
+          "source": {
+            "actionId": "terminal-2",
+            "pointer": "/data/hostObservation/runtimeTask/terminalStatus"
+          },
+          "expected": "FAILED",
+          "requirementRefs": [
+            "D10",
+            "D26"
+          ],
+          "evidenceRefs": [
+            "terminal-2:actual-artifact",
+            "terminal-2:source-rows"
+          ],
+          "scope": {
+            "normativeScope": "exhausted-retry-owner",
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "V5",
+            "subcaseId": "bounded-retry-exhausted-owner"
+          },
+          "oracleExplanation": "제출 ACK가 아니라 실제 task terminal을 확인한다.",
+          "oracleRef": {
+            "oracleId": "V5.two-workers-fencing",
+            "observationNames": [
+              "exhausted-retry-owner"
+            ]
+          }
+        },
+        {
+          "id": "db-current-assignment-one",
+          "op": "count",
+          "source": {
+            "actionId": "db",
+            "pointer": "/data/rawRows/assignments",
+            "where": {
+              "current": true
+            }
+          },
+          "expected": 1,
+          "requirementRefs": [
+            "D10",
+            "D26"
+          ],
+          "evidenceRefs": [
+            "db:actual-artifact",
+            "db:source-rows"
+          ],
+          "scope": {
+            "normativeScope": "exhausted-retry-owner",
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "V5",
+            "subcaseId": "bounded-retry-exhausted-owner"
+          },
+          "oracleExplanation": "독립 DB 원 행을 정확한 대상 scope로 세어 중복·누락을 거부한다.",
+          "oracleRef": {
+            "oracleId": "V5.two-workers-fencing",
+            "observationNames": [
+              "exhausted-retry-owner"
+            ]
+          }
+        },
+        {
+          "id": "db-owner",
+          "op": "exactSet",
+          "source": {
+            "actionId": "db",
+            "pointer": "/data/rawRows/assignments",
+            "field": "ownerId",
+            "where": {
+              "current": true
+            }
+          },
+          "expected": [
+            {
+              "$alias": "owner"
+            }
+          ],
+          "requirementRefs": [
+            "D10",
+            "D26"
+          ],
+          "evidenceRefs": [
+            "db:actual-artifact",
+            "db:source-rows"
+          ],
+          "scope": {
+            "normativeScope": "exhausted-retry-owner",
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "V5",
+            "subcaseId": "bounded-retry-exhausted-owner"
+          },
+          "oracleExplanation": "해당 scope의 각 실제 원 행 값과 고정 기대값을 대조한다.",
+          "oracleRef": {
+            "oracleId": "V5.two-workers-fencing",
+            "observationNames": [
+              "exhausted-retry-owner"
+            ]
+          }
+        },
+        {
+          "id": "db-duty-status",
+          "op": "exactSet",
+          "source": {
+            "actionId": "db",
+            "pointer": "/data/rawRows/obligations",
+            "field": "status"
+          },
+          "expected": [
+            "OPEN"
+          ],
+          "requirementRefs": [
+            "D10",
+            "D26"
+          ],
+          "evidenceRefs": [
+            "db:actual-artifact",
+            "db:source-rows"
+          ],
+          "scope": {
+            "normativeScope": "exhausted-retry-owner",
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "V5",
+            "subcaseId": "bounded-retry-exhausted-owner"
+          },
+          "oracleExplanation": "해당 scope의 각 실제 원 행 값과 고정 기대값을 대조한다.",
+          "oracleRef": {
+            "oracleId": "V5.two-workers-fencing",
+            "observationNames": [
+              "exhausted-retry-owner"
+            ]
+          }
+        },
+        {
+          "id": "db-next-action",
+          "op": "exactSet",
+          "source": {
+            "actionId": "db",
+            "pointer": "/data/rawRows/assignments",
+            "field": "nextAction",
+            "where": {
+              "current": true
+            }
+          },
+          "expected": [
+            "조사·재인가·안전 재시도"
+          ],
+          "requirementRefs": [
+            "D10",
+            "D26"
+          ],
+          "evidenceRefs": [
+            "db:actual-artifact",
+            "db:source-rows"
+          ],
+          "scope": {
+            "normativeScope": "exhausted-retry-owner",
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "V5",
+            "subcaseId": "bounded-retry-exhausted-owner"
+          },
+          "oracleExplanation": "해당 scope의 각 실제 원 행 값과 고정 기대값을 대조한다.",
+          "oracleRef": {
+            "oracleId": "V5.two-workers-fencing",
+            "observationNames": [
+              "exhausted-retry-owner"
+            ]
+          }
+        },
+        {
+          "id": "db-next-check",
+          "op": "exactSet",
+          "source": {
+            "actionId": "db",
+            "pointer": "/data/rawRows/assignments",
+            "field": "nextCheckAt",
+            "where": {
+              "current": true
+            }
+          },
+          "expected": [
+            "2026-10-07T09:01:00Z"
+          ],
+          "requirementRefs": [
+            "D10",
+            "D26"
+          ],
+          "evidenceRefs": [
+            "db:actual-artifact",
+            "db:source-rows"
+          ],
+          "scope": {
+            "normativeScope": "exhausted-retry-owner",
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "V5",
+            "subcaseId": "bounded-retry-exhausted-owner"
+          },
+          "oracleExplanation": "해당 scope의 각 실제 원 행 값과 고정 기대값을 대조한다.",
+          "oracleRef": {
+            "oracleId": "V5.two-workers-fencing",
+            "observationNames": [
+              "exhausted-retry-owner"
+            ]
+          }
+        },
+        {
+          "id": "api-owner",
+          "op": "equals",
+          "source": {
+            "actionId": "api",
+            "pointer": "/response/data/responsibility/ownerId"
+          },
+          "expected": {
+            "$alias": "owner"
+          },
+          "requirementRefs": [
+            "D10",
+            "D26"
+          ],
+          "evidenceRefs": [
+            "api:actual-artifact",
+            "api:source-rows"
+          ],
+          "scope": {
+            "normativeScope": "exhausted-retry-owner",
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "V5",
+            "subcaseId": "bounded-retry-exhausted-owner"
+          },
+          "oracleExplanation": "API가 DB와 같은 인간 주 책임자를 반환한다.",
+          "oracleRef": {
+            "oracleId": "V5.two-workers-fencing",
+            "observationNames": [
+              "exhausted-retry-owner"
+            ]
+          }
+        },
+        {
+          "id": "api-action",
+          "op": "equals",
+          "source": {
+            "actionId": "api",
+            "pointer": "/response/data/responsibility/nextAction"
+          },
+          "expected": "조사·재인가·안전 재시도",
+          "requirementRefs": [
+            "D10",
+            "D26"
+          ],
+          "evidenceRefs": [
+            "api:actual-artifact",
+            "api:source-rows"
+          ],
+          "scope": {
+            "normativeScope": "exhausted-retry-owner",
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "V5",
+            "subcaseId": "bounded-retry-exhausted-owner"
+          },
+          "oracleExplanation": "이름이 같은 Boolean 대신 실제 다음 행동을 확인한다.",
+          "oracleRef": {
+            "oracleId": "V5.two-workers-fencing",
+            "observationNames": [
+              "exhausted-retry-owner"
+            ]
+          }
+        },
+        {
+          "id": "api-check",
+          "op": "timeEquals",
+          "source": {
+            "actionId": "api",
+            "pointer": "/response/data/responsibility/nextCheckAt"
+          },
+          "expected": "2026-10-07T09:01:00Z",
+          "requirementRefs": [
+            "D10",
+            "D26"
+          ],
+          "evidenceRefs": [
+            "api:actual-artifact",
+            "api:source-rows"
+          ],
+          "scope": {
+            "normativeScope": "exhausted-retry-owner",
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "V5",
+            "subcaseId": "bounded-retry-exhausted-owner"
+          },
+          "oracleExplanation": "고정 업무 시계의 다음 확인 시점을 검사한다.",
+          "oracleRef": {
+            "oracleId": "V5.two-workers-fencing",
+            "observationNames": [
+              "exhausted-retry-owner"
+            ]
+          }
+        },
+        {
+          "id": "three-attempts",
+          "op": "count",
+          "source": {
+            "actionId": "db",
+            "pointer": "/data/rawRows/attempts"
+          },
+          "expected": 3,
+          "requirementRefs": [
+            "D10",
+            "D26"
+          ],
+          "evidenceRefs": [
+            "db:actual-artifact",
+            "db:source-rows"
+          ],
+          "scope": {
+            "normativeScope": "exhausted-retry-owner",
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "V5",
+            "subcaseId": "bounded-retry-exhausted-owner"
+          },
+          "oracleExplanation": "독립 DB 원 행을 정확한 대상 scope로 세어 중복·누락을 거부한다.",
+          "oracleRef": {
+            "oracleId": "V5.two-workers-fencing",
+            "observationNames": [
+              "exhausted-retry-owner"
+            ]
+          }
+        },
+        {
+          "id": "retry-exhausted-state",
+          "op": "exactSet",
+          "source": {
+            "actionId": "db",
+            "pointer": "/data/rawRows/works",
+            "field": "executionState"
+          },
+          "expected": [
+            "RETRY_EXHAUSTED"
+          ],
+          "requirementRefs": [
+            "D10",
+            "D26"
+          ],
+          "evidenceRefs": [
+            "db:actual-artifact",
+            "db:source-rows"
+          ],
+          "scope": {
+            "normativeScope": "exhausted-retry-owner",
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "V5",
+            "subcaseId": "bounded-retry-exhausted-owner"
+          },
+          "oracleExplanation": "해당 scope의 각 실제 원 행 값과 고정 기대값을 대조한다.",
+          "oracleRef": {
+            "oracleId": "V5.two-workers-fencing",
+            "observationNames": [
+              "exhausted-retry-owner"
+            ]
+          }
+        },
+        {
+          "id": "no-committed-effect",
+          "op": "count",
+          "source": {
+            "actionId": "db",
+            "pointer": "/data/rawRows/commands",
+            "where": {
+              "status": "COMMITTED",
+              "effectClass": "DUE_WAIT_CONTINUATION"
+            }
+          },
+          "expected": 0,
+          "requirementRefs": [
+            "D10",
+            "D26"
+          ],
+          "evidenceRefs": [
+            "db:actual-artifact",
+            "db:source-rows"
+          ],
+          "scope": {
+            "normativeScope": "duplicate-effects",
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "V5",
+            "subcaseId": "bounded-retry-exhausted-owner"
+          },
+          "oracleExplanation": "독립 DB 원 행을 정확한 대상 scope로 세어 중복·누락을 거부한다.",
+          "oracleRef": {
+            "oracleId": "V5.two-workers-fencing",
+            "observationNames": [
+              "duplicate-effects"
+            ]
+          }
+        },
+        {
+          "id": "no-duty-duplicate",
+          "op": "count",
+          "source": {
+            "actionId": "db",
+            "pointer": "/data/rawRows/obligations"
+          },
+          "expected": 1,
+          "requirementRefs": [
+            "D10",
+            "D26"
+          ],
+          "evidenceRefs": [
+            "db:actual-artifact",
+            "db:source-rows"
+          ],
+          "scope": {
+            "normativeScope": "duplicate-effects",
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "V5",
+            "subcaseId": "bounded-retry-exhausted-owner"
+          },
+          "oracleExplanation": "독립 DB 원 행을 정확한 대상 scope로 세어 중복·누락을 거부한다.",
+          "oracleRef": {
+            "oracleId": "V5.two-workers-fencing",
+            "observationNames": [
+              "duplicate-effects"
+            ]
+          }
+        },
+        {
+          "id": "no-satisfied-goal",
+          "op": "count",
+          "source": {
+            "actionId": "db",
+            "pointer": "/data/rawRows/assessments",
+            "where": {
+              "result": "SATISFIED"
+            }
+          },
+          "expected": 0,
+          "requirementRefs": [
+            "D10",
+            "D26"
+          ],
+          "evidenceRefs": [
+            "db:actual-artifact",
+            "db:source-rows"
+          ],
+          "scope": {
+            "normativeScope": "exhausted-retry-owner",
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "V5",
+            "subcaseId": "bounded-retry-exhausted-owner"
+          },
+          "oracleExplanation": "독립 DB 원 행을 정확한 대상 scope로 세어 중복·누락을 거부한다.",
+          "oracleRef": {
+            "oracleId": "V5.two-workers-fencing",
+            "observationNames": [
+              "exhausted-retry-owner"
+            ]
+          }
+        }
+      ],
+      "oracleExplanation": "세 번의 실제 worker 실패 소진 뒤 인간 책임과 다음 확인을 유지한다。복구 완료·재개 결과를 fixture에 seed하지 않는다. 실제 command/fault/lifecycle/clock/terminal과 독립 원 행을 관찰한다."
+    }
+  ]
+}
