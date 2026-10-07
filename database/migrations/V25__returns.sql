@@ -143,3 +143,4 @@ ALTER TABLE mulino_trade_returns_Dispositions
  ALTER commandId SET NOT NULL, ADD CHECK(decision IN ('REVIEW','RESALE','EXCHANGE','REFUND','DISPOSE')),
  ADD FOREIGN KEY(organizationId,returnId) REFERENCES mulino_trade_returns_Receipts(organizationId,ID),
  ADD FOREIGN KEY(organizationId,evidenceId) REFERENCES mulino_evidence_CanonicalOccurrences(organizationId,ID);
+CREATE UNIQUE INDEX returns_disposition_evidence_once ON mulino_trade_returns_Dispositions(organizationId,evidenceId);
