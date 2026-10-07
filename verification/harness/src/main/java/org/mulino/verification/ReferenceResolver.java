@@ -38,7 +38,7 @@ public final class ReferenceResolver {
     private static final Set<String> ID_FIELDS=Set.of(
         "id","objectId","itemId","lotId","segmentId","workId","activityId","obligationId",
         "ownerId","actorId","principalId","subjectId","organizationId","tenantId","commandId",
-        "requestId","proposalId","approvalId","restrictionId","allocationId","movementId","evidenceId",
+        "requestId","proposalId","approvalId","reviewId","restrictionId","allocationId","movementId","evidenceId",
         "occurrenceId","definitionId","evaluatorId","policyId","grantId","taskId","runId","workLinkId",
         "parentWorkId","childWorkId","supplierId","customerId","purchaseOrderId","shipmentId","invoiceId","externalId",
         "runtimeTaskId","invocationHandle","transactionId","goalVersionId");

@@ -166,7 +166,8 @@
             "P"
           ],
           "workAliases": [
-            "WORK"
+            "WORK",
+            "WORK2"
           ],
           "placeAliases": [
             "W",
@@ -422,7 +423,8 @@
             "P"
           ],
           "workAliases": [
-            "WORK"
+            "WORK",
+            "WORK2"
           ],
           "placeAliases": [
             "W",
@@ -480,7 +482,8 @@
             "P"
           ],
           "workAliases": [
-            "WORK"
+            "WORK",
+            "WORK2"
           ],
           "placeAliases": [
             "W",
@@ -1728,6 +1731,10 @@
     "invalidAudience": {
       "type": "Human",
       "organizationAlias": "ORG-A"
+    },
+    "RECIPIENT-ACCEPTANCE": {
+      "type": "DocumentVersion",
+      "organizationAlias": "ORG-A"
     }
   },
   "baseline": {
@@ -1813,7 +1820,10 @@
         "endpoint": "ARRIVED",
         "destinationAlias": "W",
         "dueAt": "2026-10-09T18:00:00+09:00"
-      }
+      },
+      "revision": 1,
+      "nextAction": "인수할 의무의 실물 범위를 확인한다",
+      "nextCheckAt": "2026-10-07T10:00:00Z"
     },
     "priorEntities": {
       "PO": {
@@ -1895,10 +1905,15 @@
         "scope": {
           "segmentAlias": "A20"
         },
-        "ownerAlias": "warehouse",
+        "ownerAlias": "delegator",
         "status": "OPEN",
         "nextAction": "출고 권한과 현재 조건을 재확인한다",
-        "nextCheckAt": "2026-10-07T10:00:00Z"
+        "nextCheckAt": "2026-10-07T10:00:00Z",
+        "revision": 1,
+        "rootAlias": "DUTY",
+        "workAlias": "WORK2",
+        "quantity": "20",
+        "unit": "BOX"
       },
       "DEFINITION-DRAFT": {
         "state": "IN_REVIEW",
@@ -1991,6 +2006,21 @@
         "cargoScopeAlias": "CARGO",
         "quantity": "20",
         "unit": "BOX"
+      },
+      "WORK2": {
+        "revision": 1,
+        "state": "ACTIVE",
+        "ownerAlias": "delegator",
+        "definitionVersion": "definition-v1",
+        "supervisorAlias": "supervisor",
+        "nextAction": "의무 이전 전 수신자 수락을 검증한다",
+        "nextCheckAt": "2026-10-07T10:00:00Z",
+        "goal": {
+          "quantity": "20",
+          "unit": "BOX",
+          "endpoint": "ARRIVED",
+          "destinationAlias": "W"
+        }
       }
     },
     "policies": {
@@ -2016,6 +2046,13 @@
         "mediaType": "text/plain",
         "immutable": true,
         "sha256": "4b398be9cfce00b636b953a9438da62d83df1a18c49cd62a6cddcfbc797cfe1a"
+      },
+      {
+        "alias": "RECIPIENT-ACCEPTANCE",
+        "path": "verification/cases/C3/recipient-acceptance.json",
+        "mediaType": "application/json",
+        "immutable": true,
+        "sha256": "1a73ec3f02d4c54fe953f700905c887161b0e80dbed1315a86d297186c52bda7"
       }
     ],
     "sourceProfiles": [
@@ -2042,7 +2079,43 @@
       "nextCheckAt": "2026-10-07T10:00:00Z"
     },
     "fixtureClassification": "SYNTHETIC_INPUT_AND_PRIOR_FACTS",
-    "operationUnderTest": "transferObligation"
+    "operationUnderTest": "transferObligation",
+    "recipientAcceptances": [
+      {
+        "alias": "RECIPIENT-ACCEPTANCE",
+        "decision": "ACCEPTED",
+        "issuedByAlias": "warehouse",
+        "verifiedIdentity": {
+          "issuer": "https://fixture.invalid/issuer",
+          "subject": "fixture-warehouse",
+          "audience": "mulino-acceptance",
+          "organizationAlias": "ORG-A"
+        },
+        "rootObligationAlias": "DUTY",
+        "sourceObligationAlias": "DUTY",
+        "sourceWorkAlias": "WORK2",
+        "targetWorkAlias": "WORK",
+        "acceptingOwnerAlias": "warehouse",
+        "expectedSourceRevision": 1,
+        "expectedTargetRevision": 1,
+        "quantity": "20",
+        "unit": "BOX",
+        "scope": {
+          "organizationAlias": "ORG-A",
+          "segmentAlias": "A20",
+          "quantity": "20",
+          "unit": "BOX"
+        },
+        "acceptedAt": "2026-10-07T08:00:00Z",
+        "validFrom": "2026-10-07T08:00:00Z",
+        "validUntil": "2026-10-08T00:00:00Z",
+        "consumptionPolicy": "ONE_TRANSFER",
+        "consumed": false,
+        "revokedAt": null,
+        "sha256": "1a73ec3f02d4c54fe953f700905c887161b0e80dbed1315a86d297186c52bda7",
+        "verificationStatus": "VERIFIED"
+      }
+    ]
   },
   "evidence": [
     {
@@ -2053,6 +2126,15 @@
       "sourceVersion": "1",
       "occurredAt": "2026-10-07T09:00:00Z",
       "recordedAt": "2026-10-07T09:00:00Z"
+    },
+    {
+      "alias": "RECIPIENT-ACCEPTANCE",
+      "sha256": "1a73ec3f02d4c54fe953f700905c887161b0e80dbed1315a86d297186c52bda7",
+      "sourceNamespace": "synthetic-recipient-decisions",
+      "externalEventId": "C3-warehouse-accept-transfer20",
+      "sourceVersion": "1",
+      "occurredAt": "2026-10-07T08:00:00Z",
+      "recordedAt": "2026-10-07T08:00:01Z"
     }
   ],
   "responsibilities": [
@@ -2064,6 +2146,16 @@
       "ownerAlias": "warehouse",
       "supervisorAlias": "supervisor",
       "nextAction": "권한과 실물 범위를 확인하고 미해결 물량을 대조한다",
+      "nextCheckAt": "2026-10-07T10:00:00Z"
+    },
+    {
+      "scope": {
+        "workAlias": "WORK2",
+        "itemAlias": "P"
+      },
+      "ownerAlias": "delegator",
+      "supervisorAlias": "supervisor",
+      "nextAction": "의무 이전 전 수신자 수락을 검증한다",
       "nextCheckAt": "2026-10-07T10:00:00Z"
     }
   ]

@@ -1854,7 +1854,22 @@
         "destinationAlias": "W",
         "price": "2.50",
         "currency": "EUR",
-        "canonicalHash": "3bd0ecac96e706c25912e884a2ad656dea1b2e672ad8f13058e1f116ec082471"
+        "canonicalHash": "ab6d204a27cdd70dc0a738bbb25df1d6d565069edab118d5ad62d9694c65019b",
+        "supplierAlias": "SUPPLIER",
+        "workAlias": "WORK",
+        "dueAt": "2026-10-09T09:00:00Z",
+        "canonicalPayload": {
+          "quantity": "100",
+          "unit": "BOX",
+          "itemAlias": "P",
+          "destinationAlias": "W",
+          "price": "2.50",
+          "currency": "EUR",
+          "supplierAlias": "SUPPLIER",
+          "workAlias": "WORK",
+          "dueAt": "2026-10-09T09:00:00Z"
+        },
+        "proposalRevision": 1
       },
       "GRANT": {
         "revision": 1,
@@ -2026,6 +2041,14 @@
           "P"
         ],
         "reconciliationOwnerAlias": "warehouse"
+      },
+      {
+        "namespace": "fixture-local-outbox",
+        "operations": [
+          "dispatchPurchaseOrder"
+        ],
+        "externalWriteMode": "LOCAL_OUTBOX_ONLY",
+        "synthetic": true
       }
     ],
     "entityRevisions": {

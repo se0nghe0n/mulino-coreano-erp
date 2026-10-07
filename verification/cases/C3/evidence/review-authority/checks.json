@@ -1,0 +1,146 @@
+{
+  "recordType": "STEP2_AUTHORITY_PREREQUISITE_REVIEW_FIX",
+  "baselineCommit": "f426712fcd1bcfc1ed71a1beb9aa80ec3051e182",
+  "codeCommitAtExecution": "62d2d541beb8719038acbb89acefa1ec0f753bfa",
+  "workingTreeDirtyAtExecution": true,
+  "runtimeStatus": "NOT_RUN",
+  "productRuntimeClaimed": false,
+  "javaVersion": "Zulu OpenJDK 21.0.5",
+  "mavenVersion": "3.9.16",
+  "modifiedSubcases": [
+    "api-transferObligation",
+    "api-dispatchPurchaseOrder",
+    "api-migrateWorkDefinition",
+    "mcp-transferObligation",
+    "mcp-dispatchPurchaseOrder",
+    "mcp-migrateWorkDefinition",
+    "worker-transferObligation",
+    "worker-dispatchPurchaseOrder",
+    "worker-migrateWorkDefinition"
+  ],
+  "checks": [
+    {
+      "command": [
+        "./mvnw",
+        "-B",
+        "-ntp",
+        "-f",
+        "verification/harness/pom.xml",
+        "-Dtest=AuthorityPrerequisiteAssertionsTest,AuthorityAssertionsTest",
+        "test"
+      ],
+      "exitCode": 0,
+      "status": "PASS",
+      "tests": 18,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "schemaAndKoreanFeatureValidation": "C3 whole declaration PASS"
+    },
+    {
+      "command": [
+        "./mvnw",
+        "-B",
+        "-ntp",
+        "-f",
+        "verification/harness/pom.xml",
+        "-Dtest=CaseFeatureTest",
+        "-Dverification.mode=contract-red",
+        "-Dverification.command=C3 focused nine-subcase prerequisite contract RED",
+        "-Dverification.caseFiles=verification/harness/target/review-authority/C3/case.json",
+        "test"
+      ],
+      "exitCode": 1,
+      "status": "EXPECTED_RED",
+      "expectedScenarios": 9,
+      "discoveredScenarios": 9,
+      "startedScenarios": 9,
+      "notImplementedAssertionFailures": 9,
+      "skippedScenarios": 0
+    },
+    {
+      "command": [
+        "python3",
+        "verification/cases/C3/author_prerequisites.py"
+      ],
+      "exitCode": 0,
+      "status": "PASS",
+      "check": "idempotent authoring; nine literal same-input business requests; binding case hash"
+    },
+    {
+      "command": [
+        "git",
+        "diff",
+        "--check"
+      ],
+      "exitCode": 0,
+      "status": "PASS"
+    }
+  ],
+  "initialFailure": "First focused JUnit run had three missing captured aliases and missing reviewId identity allowlist; corrected and retested. Initial log retained.",
+  "scopeExtension": "Only reviewId added to ReferenceResolver strict ID_FIELDS with opaque string and invalid type regression.",
+  "testedSources": [
+    {
+      "path": "verification/cases/C3/case.json",
+      "sha256": "16bded8deaa7e0689f6751bd3ac0f340621bc16b9e3c28eb2adf45caca61bf2d",
+      "sizeBytes": 9719692
+    },
+    {
+      "path": "verification/cases/C3/scenario.feature",
+      "sha256": "6edbc6c9d645abdeb188711b2d0bd86b414b7f82d04235d232e285ebe2d27e8a",
+      "sizeBytes": 1633835
+    },
+    {
+      "path": "verification/cases/C3/fixture-dispatchPurchaseOrder.json",
+      "sha256": "b6e58fcf99a82e7c1fc3c33e66e2d2154d46acbba9a1e29ef6309927fb1bc9a1",
+      "sizeBytes": 53800
+    },
+    {
+      "path": "verification/cases/C3/fixture-migrateWorkDefinition.json",
+      "sha256": "5061682328374faa693293408d2d135189a909ceeb37341eeb70bef51a70f015",
+      "sizeBytes": 62386
+    },
+    {
+      "path": "verification/cases/C3/fixture-transferObligation.json",
+      "sha256": "4e2d1381344e2c8fcdb70ecba1bc293ebd10289b52309a0bf8fd5120fdf5ddb1",
+      "sizeBytes": 56179
+    },
+    {
+      "path": "verification/cases/C3/recipient-acceptance.json",
+      "sha256": "1a73ec3f02d4c54fe953f700905c887161b0e80dbed1315a86d297186c52bda7",
+      "sizeBytes": 696
+    },
+    {
+      "path": "verification/cases/C3/observation-bindings.json",
+      "sha256": "658a515ca5127dccbe2517a74c9161decb56ca7746881840b1b5b228cbc8b0d5",
+      "sizeBytes": 1800484
+    },
+    {
+      "path": "verification/cases/C3/author_prerequisites.py",
+      "sha256": "2fe4064225f817540a5bb594eeaca1a68632e40a29aeb2d5bb95476940475b65",
+      "sizeBytes": 23418
+    },
+    {
+      "path": "verification/harness/src/main/java/org/mulino/verification/ReferenceResolver.java",
+      "sha256": "35c619e82f6e9a1783d58f749e3cc0c9ba53bfef8907cbacb0208e296888394d",
+      "sizeBytes": 8841
+    },
+    {
+      "path": "verification/harness/src/test/java/org/mulino/verification/cases/authority/AuthorityPrerequisiteAssertionsTest.java",
+      "sha256": "8359ef1fbda93eb156ce0838aae8638803a5418b4df27901541aac06037e7a73",
+      "sizeBytes": 13000
+    }
+  ],
+  "remaining": "No actual product DB/API/MCP/worker or paid model execution. Full integrated prepare, harness and review closure remain coordinator gates.",
+  "artifactRefs": [
+    "verification/cases/C3/evidence/review-authority/junit.log.gz",
+    "verification/cases/C3/evidence/review-authority/junit-initial-failure.log.gz",
+    "verification/cases/C3/evidence/review-authority/contract-red.log.gz",
+    "verification/cases/C3/evidence/review-authority/AuthorityAssertionsTest.xml",
+    "verification/cases/C3/evidence/review-authority/AuthorityPrerequisiteAssertionsTest.xml",
+    "verification/cases/C3/evidence/review-authority/feature-red-summary.json",
+    "verification/cases/C3/evidence/review-authority/feature-red-cucumber.json.gz",
+    "verification/cases/C3/evidence/review-authority/case.json.gz",
+    "verification/cases/C3/evidence/review-authority/scenario.feature.gz"
+  ]
+}

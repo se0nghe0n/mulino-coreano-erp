@@ -795,14 +795,20 @@
       "roleCapabilities": [
         "createDefinitionDraft",
         "getDefinition",
-        "getInventory"
+        "getInventory",
+        "validateDefinition",
+        "submitDefinitionReview",
+        "publishDefinition"
       ],
       "grant": {
         "delegatorAlias": "delegator",
         "actions": [
           "createDefinitionDraft",
           "getDefinition",
-          "getInventory"
+          "getInventory",
+          "validateDefinition",
+          "submitDefinitionReview",
+          "publishDefinition"
         ],
         "scope": {
           "organizationAlias": "ORG-A",
@@ -1462,6 +1468,40 @@
         "validUntil": "2026-10-08T00:00:00Z",
         "revision": 1
       }
+    },
+    "configApprover": {
+      "issuer": "https://fixture.invalid/issuer",
+      "subject": "fixture-config-approver",
+      "audience": "mulino-acceptance",
+      "organizationAlias": "ORG-A",
+      "roleCapabilities": [
+        "approveDefinition",
+        "getDefinition"
+      ],
+      "grant": {
+        "delegatorAlias": "delegator",
+        "actions": [
+          "approveDefinition",
+          "getDefinition"
+        ],
+        "scope": {
+          "organizationAlias": "ORG-A",
+          "itemAliases": [
+            "P"
+          ],
+          "workAliases": [
+            "WORK"
+          ],
+          "placeAliases": [
+            "W",
+            "W2",
+            "CUSTOMER-PLACE"
+          ]
+        },
+        "validFrom": "2026-10-07T00:00:00Z",
+        "validUntil": "2026-10-08T00:00:00Z",
+        "revision": 1
+      }
     }
   },
   "aliases": {
@@ -1728,6 +1768,14 @@
     "invalidAudience": {
       "type": "Human",
       "organizationAlias": "ORG-A"
+    },
+    "configApprover": {
+      "type": "Human",
+      "organizationAlias": "ORG-A"
+    },
+    "GOAL-V1": {
+      "type": "GoalVersion",
+      "organizationAlias": "ORG-A"
     }
   },
   "baseline": {
@@ -1803,7 +1851,7 @@
     "work": {
       "alias": "WORK",
       "state": "ACTIVE",
-      "ownerAlias": "warehouse",
+      "ownerAlias": "delegator",
       "supervisorAlias": "supervisor",
       "definitionVersion": "definition-v1",
       "goal": {
@@ -1813,7 +1861,10 @@
         "endpoint": "ARRIVED",
         "destinationAlias": "W",
         "dueAt": "2026-10-09T18:00:00+09:00"
-      }
+      },
+      "revision": 1,
+      "goalVersionAlias": "GOAL-V1",
+      "evaluatorVersion": "arrival-v1"
     },
     "priorEntities": {
       "PO": {
@@ -2042,7 +2093,262 @@
       "nextCheckAt": "2026-10-07T10:00:00Z"
     },
     "fixtureClassification": "SYNTHETIC_INPUT_AND_PRIOR_FACTS",
-    "operationUnderTest": "migrateWorkDefinition"
+    "operationUnderTest": "migrateWorkDefinition",
+    "definitionPackages": [
+      {
+        "alias": "DEFINITION",
+        "version": "definition-v1",
+        "state": "ACTIVE",
+        "hash": "c7e55c21d07627838689f5e12abdc078bc33ff3af67a2e174c0812efd777cd5b",
+        "goalTemplate": {
+          "endpoint": "ARRIVED",
+          "quantityMode": "CUMULATIVE_EVENT",
+          "evaluatorVersion": "arrival-v1",
+          "requiredSlots": [
+            "item",
+            "quantity",
+            "unit",
+            "destination",
+            "dueAt"
+          ]
+        }
+      }
+    ],
+    "supportManifest": [
+      {
+        "definitionVersion": "definition-v1",
+        "capabilityId": "createDefinitionDraft",
+        "semanticVersion": "core-v1",
+        "evaluatorVersion": "arrival-v1",
+        "inputSchemaVersion": "1.0.0",
+        "outputSchemaVersion": "1.0.0",
+        "supportedWorkMigration": []
+      },
+      {
+        "definitionVersion": "definition-v1",
+        "capabilityId": "validateDefinition",
+        "semanticVersion": "core-v1",
+        "evaluatorVersion": "arrival-v1",
+        "inputSchemaVersion": "1.0.0",
+        "outputSchemaVersion": "1.0.0",
+        "supportedWorkMigration": []
+      },
+      {
+        "definitionVersion": "definition-v1",
+        "capabilityId": "submitDefinitionReview",
+        "semanticVersion": "core-v1",
+        "evaluatorVersion": "arrival-v1",
+        "inputSchemaVersion": "1.0.0",
+        "outputSchemaVersion": "1.0.0",
+        "supportedWorkMigration": []
+      },
+      {
+        "definitionVersion": "definition-v1",
+        "capabilityId": "approveDefinition",
+        "semanticVersion": "core-v1",
+        "evaluatorVersion": "arrival-v1",
+        "inputSchemaVersion": "1.0.0",
+        "outputSchemaVersion": "1.0.0",
+        "supportedWorkMigration": []
+      },
+      {
+        "definitionVersion": "definition-v1",
+        "capabilityId": "publishDefinition",
+        "semanticVersion": "core-v1",
+        "evaluatorVersion": "arrival-v1",
+        "inputSchemaVersion": "1.0.0",
+        "outputSchemaVersion": "1.0.0",
+        "supportedWorkMigration": []
+      },
+      {
+        "definitionVersion": "definition-v1",
+        "capabilityId": "migrateWorkDefinition",
+        "semanticVersion": "core-v1",
+        "evaluatorVersion": "arrival-v1",
+        "inputSchemaVersion": "1.0.0",
+        "outputSchemaVersion": "1.0.0",
+        "supportedWorkMigration": []
+      },
+      {
+        "definitionVersion": "definition-v1",
+        "capabilityId": "getWork",
+        "semanticVersion": "core-v1",
+        "evaluatorVersion": "arrival-v1",
+        "inputSchemaVersion": "1.0.0",
+        "outputSchemaVersion": "1.0.0",
+        "supportedWorkMigration": []
+      },
+      {
+        "definitionVersion": "definition-v1",
+        "capabilityId": "getInventory",
+        "semanticVersion": "core-v1",
+        "evaluatorVersion": "arrival-v1",
+        "inputSchemaVersion": "1.0.0",
+        "outputSchemaVersion": "1.0.0",
+        "supportedWorkMigration": []
+      },
+      {
+        "definitionVersion": "definition-v1",
+        "capabilityId": "getObject",
+        "semanticVersion": "core-v1",
+        "evaluatorVersion": "arrival-v1",
+        "inputSchemaVersion": "1.0.0",
+        "outputSchemaVersion": "1.0.0",
+        "supportedWorkMigration": []
+      },
+      {
+        "definitionVersion": "definition-v1",
+        "capabilityId": "getAccessContext",
+        "semanticVersion": "core-v1",
+        "evaluatorVersion": "arrival-v1",
+        "inputSchemaVersion": "1.0.0",
+        "outputSchemaVersion": "1.0.0",
+        "supportedWorkMigration": []
+      },
+      {
+        "definitionVersion": "definition-v1",
+        "capabilityId": "getDefinition",
+        "semanticVersion": "core-v1",
+        "evaluatorVersion": "arrival-v1",
+        "inputSchemaVersion": "1.0.0",
+        "outputSchemaVersion": "1.0.0",
+        "supportedWorkMigration": []
+      },
+      {
+        "definitionVersion": "definition-v2",
+        "capabilityId": "createDefinitionDraft",
+        "semanticVersion": "core-v1",
+        "evaluatorVersion": "arrival-v1",
+        "inputSchemaVersion": "1.0.0",
+        "outputSchemaVersion": "1.0.0",
+        "supportedWorkMigration": [
+          "C3-v1-to-v2"
+        ]
+      },
+      {
+        "definitionVersion": "definition-v2",
+        "capabilityId": "validateDefinition",
+        "semanticVersion": "core-v1",
+        "evaluatorVersion": "arrival-v1",
+        "inputSchemaVersion": "1.0.0",
+        "outputSchemaVersion": "1.0.0",
+        "supportedWorkMigration": [
+          "C3-v1-to-v2"
+        ]
+      },
+      {
+        "definitionVersion": "definition-v2",
+        "capabilityId": "submitDefinitionReview",
+        "semanticVersion": "core-v1",
+        "evaluatorVersion": "arrival-v1",
+        "inputSchemaVersion": "1.0.0",
+        "outputSchemaVersion": "1.0.0",
+        "supportedWorkMigration": [
+          "C3-v1-to-v2"
+        ]
+      },
+      {
+        "definitionVersion": "definition-v2",
+        "capabilityId": "approveDefinition",
+        "semanticVersion": "core-v1",
+        "evaluatorVersion": "arrival-v1",
+        "inputSchemaVersion": "1.0.0",
+        "outputSchemaVersion": "1.0.0",
+        "supportedWorkMigration": [
+          "C3-v1-to-v2"
+        ]
+      },
+      {
+        "definitionVersion": "definition-v2",
+        "capabilityId": "publishDefinition",
+        "semanticVersion": "core-v1",
+        "evaluatorVersion": "arrival-v1",
+        "inputSchemaVersion": "1.0.0",
+        "outputSchemaVersion": "1.0.0",
+        "supportedWorkMigration": [
+          "C3-v1-to-v2"
+        ]
+      },
+      {
+        "definitionVersion": "definition-v2",
+        "capabilityId": "migrateWorkDefinition",
+        "semanticVersion": "core-v1",
+        "evaluatorVersion": "arrival-v1",
+        "inputSchemaVersion": "1.0.0",
+        "outputSchemaVersion": "1.0.0",
+        "supportedWorkMigration": [
+          "C3-v1-to-v2"
+        ]
+      },
+      {
+        "definitionVersion": "definition-v2",
+        "capabilityId": "getWork",
+        "semanticVersion": "core-v1",
+        "evaluatorVersion": "arrival-v1",
+        "inputSchemaVersion": "1.0.0",
+        "outputSchemaVersion": "1.0.0",
+        "supportedWorkMigration": [
+          "C3-v1-to-v2"
+        ]
+      },
+      {
+        "definitionVersion": "definition-v2",
+        "capabilityId": "getInventory",
+        "semanticVersion": "core-v1",
+        "evaluatorVersion": "arrival-v1",
+        "inputSchemaVersion": "1.0.0",
+        "outputSchemaVersion": "1.0.0",
+        "supportedWorkMigration": [
+          "C3-v1-to-v2"
+        ]
+      },
+      {
+        "definitionVersion": "definition-v2",
+        "capabilityId": "getObject",
+        "semanticVersion": "core-v1",
+        "evaluatorVersion": "arrival-v1",
+        "inputSchemaVersion": "1.0.0",
+        "outputSchemaVersion": "1.0.0",
+        "supportedWorkMigration": [
+          "C3-v1-to-v2"
+        ]
+      },
+      {
+        "definitionVersion": "definition-v2",
+        "capabilityId": "getAccessContext",
+        "semanticVersion": "core-v1",
+        "evaluatorVersion": "arrival-v1",
+        "inputSchemaVersion": "1.0.0",
+        "outputSchemaVersion": "1.0.0",
+        "supportedWorkMigration": [
+          "C3-v1-to-v2"
+        ]
+      },
+      {
+        "definitionVersion": "definition-v2",
+        "capabilityId": "getDefinition",
+        "semanticVersion": "core-v1",
+        "evaluatorVersion": "arrival-v1",
+        "inputSchemaVersion": "1.0.0",
+        "outputSchemaVersion": "1.0.0",
+        "supportedWorkMigration": [
+          "C3-v1-to-v2"
+        ]
+      }
+    ],
+    "goalVersions": [
+      {
+        "alias": "GOAL-V1",
+        "workAlias": "WORK",
+        "definitionVersion": "definition-v1",
+        "quantity": "100",
+        "unit": "BOX",
+        "quantityMode": "CUMULATIVE_EVENT",
+        "endpoint": "ARRIVED",
+        "destinationAlias": "W",
+        "dueAt": "2026-10-09T18:00:00+09:00"
+      }
+    ]
   },
   "evidence": [
     {
@@ -2061,7 +2367,7 @@
         "workAlias": "WORK",
         "itemAlias": "P"
       },
-      "ownerAlias": "warehouse",
+      "ownerAlias": "delegator",
       "supervisorAlias": "supervisor",
       "nextAction": "권한과 실물 범위를 확인하고 미해결 물량을 대조한다",
       "nextCheckAt": "2026-10-07T10:00:00Z"

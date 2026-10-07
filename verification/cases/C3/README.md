@@ -32,3 +32,21 @@ NOT_RUN이다. scripted runner로 의미 성능을 대체하지 않는다.
 구체 subcase/action/assertion 및 JSON pointer에 연결한다.
 고정 수량 oracle의 primary와 보조 관계/assertion을 함께 보존한다.
 이 연결은 작성 증거이며 실제 제품 효과를 관측한 결과가 아니다.
+
+발주·정의 전환·의무 이전의 정상 counter-call은 업무 전제를 별도로
+충족한다. 발주는 MANAGER의 실제 approvePurchase 결과를 먼저 얻고
+그 approval/hash와 같은 externalOperationId의 outbox 한 행을 대조한다.
+정의 전환은 FDE의 검증·발행과 CONFIG_APPROVER의 발행/전환 승인을
+먼저 수행하고 v2 업무·전환 기록·기존 목표 이력을 확인한다. 의무 이전은
+WORK2에서 WORK로20BOX를 맡겠다는 warehouse의 identity·revision·scope·
+유효기간이 결합된 가상 prior acceptance 원문을 사용한다. 일반 DOC나
+발신자의 acceptingOwnerId 주장만으로 수신자 수락을 대체하지 않는다.
+
+각 API/MCP/worker 거부와 정상 호출의 request는 같은 payload와 revision을
+사용한다. 승인·수락·전환 guard가 없는 입력의 실패를 인가 증거로 세지
+않는다. `author_prerequisites.py`는 이9개 사례의 선언을 재작성하며 실제
+제품 행동을 실행하지 않는다. `AuthorityPrerequisiteAssertionsTest`의
+mutation 검사는 관찰 assertion의 작성 검증이며 제품 인수는 NOT_RUN이다.
+
+수정 후18개 JUnit PASS와9개 의미 RED, skip0의 실행 기록과 검증한
+source/fixture hash는 `evidence/review-authority/checks.json`에 남겼다.

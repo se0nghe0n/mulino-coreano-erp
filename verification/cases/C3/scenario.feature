@@ -925,8 +925,12 @@
     그러면 "current-read-actions" assertion으로 "read-audit-permitted current-read-actions"를 확인한다
     그러면 "authorized-committed-once" assertion으로 "read-audit-permitted authorized-committed-once"를 확인한다
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
+    그러면 "precondition-recipient-acceptance" assertion으로 "read-audit-permitted precondition-recipient-acceptance"를 확인한다
+    그러면 "precondition-recipient-binding" assertion으로 "read-audit-permitted precondition-recipient-binding"를 확인한다
+    그러면 "authorized-business-transfer-once" assertion으로 "read-audit-permitted authorized-business-transfer-once"를 확인한다
+    그러면 "precondition-denial-unchanged-recipientAcceptances" assertion으로 "read-audit-permitted precondition-denial-unchanged-recipientAcceptances"를 확인한다
+    그러면 "precondition-denial-unchanged-obligationTransfers" assertion으로 "read-audit-permitted precondition-denial-unchanged-obligationTransfers"를 확인한다
 
-  @sit
   시나리오: WRITE 역할·READ 위임에서 api/registerItem 업무 효과0
     먼저 사례 파일 "verification/cases/C3/case.json"의 "api-registerItem"를 준비한다
     만일 "시스템" 역할이 "setup" 행동을 수행한다
@@ -1238,6 +1242,8 @@
   시나리오: WRITE 역할·READ 위임에서 api/dispatchPurchaseOrder 업무 효과0
     먼저 사례 파일 "verification/cases/C3/case.json"의 "api-dispatchPurchaseOrder"를 준비한다
     만일 "시스템" 역할이 "setup" 행동을 수행한다
+    만일 "delegator" 역할이 "precondition-proposal" 행동을 수행한다
+    만일 "manager" 역할이 "precondition-approval" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
     만일 "reader" 역할이 "access-before" 행동을 수행한다
@@ -1277,8 +1283,10 @@
     그러면 "current-read-actions" assertion으로 "read-audit-permitted current-read-actions"를 확인한다
     그러면 "authorized-committed-once" assertion으로 "read-audit-permitted authorized-committed-once"를 확인한다
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
+    그러면 "precondition-approved" assertion으로 "read-audit-permitted precondition-approved"를 확인한다
+    그러면 "precondition-approval-record" assertion으로 "read-audit-permitted precondition-approval-record"를 확인한다
+    그러면 "authorized-business-outbox-once" assertion으로 "read-audit-permitted authorized-business-outbox-once"를 확인한다
 
-  @sit
   시나리오: WRITE 역할·READ 위임에서 api/recordSupplierReply 업무 효과0
     먼저 사례 파일 "verification/cases/C3/case.json"의 "api-recordSupplierReply"를 준비한다
     만일 "시스템" 역할이 "setup" 행동을 수행한다
@@ -3790,6 +3798,13 @@
   시나리오: WRITE 역할·READ 위임에서 api/migrateWorkDefinition 업무 효과0
     먼저 사례 파일 "verification/cases/C3/case.json"의 "api-migrateWorkDefinition"를 준비한다
     만일 "시스템" 역할이 "setup" 행동을 수행한다
+    만일 "fde" 역할이 "precondition-draft" 행동을 수행한다
+    만일 "fde" 역할이 "precondition-validate" 행동을 수행한다
+    만일 "fde" 역할이 "precondition-review" 행동을 수행한다
+    만일 "configApprover" 역할이 "precondition-publish-approval" 행동을 수행한다
+    만일 "fde" 역할이 "precondition-publish" 행동을 수행한다
+    만일 "fde" 역할이 "precondition-migration-review" 행동을 수행한다
+    만일 "configApprover" 역할이 "precondition-migration-approval" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
     만일 "reader" 역할이 "access-before" 행동을 수행한다
@@ -3829,8 +3844,24 @@
     그러면 "current-read-actions" assertion으로 "read-audit-permitted current-read-actions"를 확인한다
     그러면 "authorized-committed-once" assertion으로 "read-audit-permitted authorized-committed-once"를 확인한다
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
+    그러면 "precondition-draft-applied" assertion으로 "read-audit-permitted precondition-draft-applied"를 확인한다
+    그러면 "precondition-validate-applied" assertion으로 "read-audit-permitted precondition-validate-applied"를 확인한다
+    그러면 "precondition-review-applied" assertion으로 "read-audit-permitted precondition-review-applied"를 확인한다
+    그러면 "precondition-publish-approval-applied" assertion으로 "read-audit-permitted precondition-publish-approval-applied"를 확인한다
+    그러면 "precondition-publish-applied" assertion으로 "read-audit-permitted precondition-publish-applied"를 확인한다
+    그러면 "precondition-migration-review-applied" assertion으로 "read-audit-permitted precondition-migration-review-applied"를 확인한다
+    그러면 "precondition-migration-approval-applied" assertion으로 "read-audit-permitted precondition-migration-approval-applied"를 확인한다
+    그러면 "precondition-published" assertion으로 "read-audit-permitted precondition-published"를 확인한다
+    그러면 "authorized-business-work-version" assertion으로 "read-audit-permitted authorized-business-work-version"를 확인한다
+    그러면 "authorized-business-migration-once" assertion으로 "read-audit-permitted authorized-business-migration-once"를 확인한다
+    그러면 "precondition-migration-approval-record" assertion으로 "read-audit-permitted precondition-migration-approval-record"를 확인한다
+    그러면 "authorized-business-goal-history" assertion으로 "read-audit-permitted authorized-business-goal-history"를 확인한다
+    그러면 "authorized-business-migration-goal-link" assertion으로 "read-audit-permitted authorized-business-migration-goal-link"를 확인한다
+    그러면 "precondition-denial-unchanged-workDefinitionMigrations" assertion으로 "read-audit-permitted precondition-denial-unchanged-workDefinitionMigrations"를 확인한다
+    그러면 "precondition-denial-unchanged-migrationMappings" assertion으로 "read-audit-permitted precondition-denial-unchanged-migrationMappings"를 확인한다
+    그러면 "precondition-denial-unchanged-migrationRegressions" assertion으로 "read-audit-permitted precondition-denial-unchanged-migrationRegressions"를 확인한다
+    그러면 "precondition-denial-unchanged-goalVersions" assertion으로 "read-audit-permitted precondition-denial-unchanged-goalVersions"를 확인한다
 
-  @sit
   시나리오: WRITE 역할·READ 위임에서 api/createWork 업무 효과0
     먼저 사례 파일 "verification/cases/C3/case.json"의 "api-createWork"를 준비한다
     만일 "시스템" 역할이 "setup" 행동을 수행한다
@@ -5017,8 +5048,12 @@
     그러면 "current-read-actions" assertion으로 "read-audit-permitted current-read-actions"를 확인한다
     그러면 "authorized-committed-once" assertion으로 "read-audit-permitted authorized-committed-once"를 확인한다
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
+    그러면 "precondition-recipient-acceptance" assertion으로 "read-audit-permitted precondition-recipient-acceptance"를 확인한다
+    그러면 "precondition-recipient-binding" assertion으로 "read-audit-permitted precondition-recipient-binding"를 확인한다
+    그러면 "authorized-business-transfer-once" assertion으로 "read-audit-permitted authorized-business-transfer-once"를 확인한다
+    그러면 "precondition-denial-unchanged-recipientAcceptances" assertion으로 "read-audit-permitted precondition-denial-unchanged-recipientAcceptances"를 확인한다
+    그러면 "precondition-denial-unchanged-obligationTransfers" assertion으로 "read-audit-permitted precondition-denial-unchanged-obligationTransfers"를 확인한다
 
-  @sit
   시나리오: WRITE 역할·READ 위임에서 mcp/registerItem 업무 효과0
     먼저 사례 파일 "verification/cases/C3/case.json"의 "mcp-registerItem"를 준비한다
     만일 "시스템" 역할이 "setup" 행동을 수행한다
@@ -5330,6 +5365,8 @@
   시나리오: WRITE 역할·READ 위임에서 mcp/dispatchPurchaseOrder 업무 효과0
     먼저 사례 파일 "verification/cases/C3/case.json"의 "mcp-dispatchPurchaseOrder"를 준비한다
     만일 "시스템" 역할이 "setup" 행동을 수행한다
+    만일 "delegator" 역할이 "precondition-proposal" 행동을 수행한다
+    만일 "manager" 역할이 "precondition-approval" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
     만일 "reader" 역할이 "access-before" 행동을 수행한다
@@ -5369,8 +5406,10 @@
     그러면 "current-read-actions" assertion으로 "read-audit-permitted current-read-actions"를 확인한다
     그러면 "authorized-committed-once" assertion으로 "read-audit-permitted authorized-committed-once"를 확인한다
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
+    그러면 "precondition-approved" assertion으로 "read-audit-permitted precondition-approved"를 확인한다
+    그러면 "precondition-approval-record" assertion으로 "read-audit-permitted precondition-approval-record"를 확인한다
+    그러면 "authorized-business-outbox-once" assertion으로 "read-audit-permitted authorized-business-outbox-once"를 확인한다
 
-  @sit
   시나리오: WRITE 역할·READ 위임에서 mcp/recordSupplierReply 업무 효과0
     먼저 사례 파일 "verification/cases/C3/case.json"의 "mcp-recordSupplierReply"를 준비한다
     만일 "시스템" 역할이 "setup" 행동을 수행한다
@@ -7882,6 +7921,13 @@
   시나리오: WRITE 역할·READ 위임에서 mcp/migrateWorkDefinition 업무 효과0
     먼저 사례 파일 "verification/cases/C3/case.json"의 "mcp-migrateWorkDefinition"를 준비한다
     만일 "시스템" 역할이 "setup" 행동을 수행한다
+    만일 "fde" 역할이 "precondition-draft" 행동을 수행한다
+    만일 "fde" 역할이 "precondition-validate" 행동을 수행한다
+    만일 "fde" 역할이 "precondition-review" 행동을 수행한다
+    만일 "configApprover" 역할이 "precondition-publish-approval" 행동을 수행한다
+    만일 "fde" 역할이 "precondition-publish" 행동을 수행한다
+    만일 "fde" 역할이 "precondition-migration-review" 행동을 수행한다
+    만일 "configApprover" 역할이 "precondition-migration-approval" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
     만일 "reader" 역할이 "access-before" 행동을 수행한다
@@ -7921,8 +7967,24 @@
     그러면 "current-read-actions" assertion으로 "read-audit-permitted current-read-actions"를 확인한다
     그러면 "authorized-committed-once" assertion으로 "read-audit-permitted authorized-committed-once"를 확인한다
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
+    그러면 "precondition-draft-applied" assertion으로 "read-audit-permitted precondition-draft-applied"를 확인한다
+    그러면 "precondition-validate-applied" assertion으로 "read-audit-permitted precondition-validate-applied"를 확인한다
+    그러면 "precondition-review-applied" assertion으로 "read-audit-permitted precondition-review-applied"를 확인한다
+    그러면 "precondition-publish-approval-applied" assertion으로 "read-audit-permitted precondition-publish-approval-applied"를 확인한다
+    그러면 "precondition-publish-applied" assertion으로 "read-audit-permitted precondition-publish-applied"를 확인한다
+    그러면 "precondition-migration-review-applied" assertion으로 "read-audit-permitted precondition-migration-review-applied"를 확인한다
+    그러면 "precondition-migration-approval-applied" assertion으로 "read-audit-permitted precondition-migration-approval-applied"를 확인한다
+    그러면 "precondition-published" assertion으로 "read-audit-permitted precondition-published"를 확인한다
+    그러면 "authorized-business-work-version" assertion으로 "read-audit-permitted authorized-business-work-version"를 확인한다
+    그러면 "authorized-business-migration-once" assertion으로 "read-audit-permitted authorized-business-migration-once"를 확인한다
+    그러면 "precondition-migration-approval-record" assertion으로 "read-audit-permitted precondition-migration-approval-record"를 확인한다
+    그러면 "authorized-business-goal-history" assertion으로 "read-audit-permitted authorized-business-goal-history"를 확인한다
+    그러면 "authorized-business-migration-goal-link" assertion으로 "read-audit-permitted authorized-business-migration-goal-link"를 확인한다
+    그러면 "precondition-denial-unchanged-workDefinitionMigrations" assertion으로 "read-audit-permitted precondition-denial-unchanged-workDefinitionMigrations"를 확인한다
+    그러면 "precondition-denial-unchanged-migrationMappings" assertion으로 "read-audit-permitted precondition-denial-unchanged-migrationMappings"를 확인한다
+    그러면 "precondition-denial-unchanged-migrationRegressions" assertion으로 "read-audit-permitted precondition-denial-unchanged-migrationRegressions"를 확인한다
+    그러면 "precondition-denial-unchanged-goalVersions" assertion으로 "read-audit-permitted precondition-denial-unchanged-goalVersions"를 확인한다
 
-  @sit
   시나리오: WRITE 역할·READ 위임에서 mcp/createWork 업무 효과0
     먼저 사례 파일 "verification/cases/C3/case.json"의 "mcp-createWork"를 준비한다
     만일 "시스템" 역할이 "setup" 행동을 수행한다
@@ -9109,8 +9171,12 @@
     그러면 "current-read-actions" assertion으로 "read-audit-permitted current-read-actions"를 확인한다
     그러면 "authorized-committed-once" assertion으로 "read-audit-permitted authorized-committed-once"를 확인한다
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
+    그러면 "precondition-recipient-acceptance" assertion으로 "read-audit-permitted precondition-recipient-acceptance"를 확인한다
+    그러면 "precondition-recipient-binding" assertion으로 "read-audit-permitted precondition-recipient-binding"를 확인한다
+    그러면 "authorized-business-transfer-once" assertion으로 "read-audit-permitted authorized-business-transfer-once"를 확인한다
+    그러면 "precondition-denial-unchanged-recipientAcceptances" assertion으로 "read-audit-permitted precondition-denial-unchanged-recipientAcceptances"를 확인한다
+    그러면 "precondition-denial-unchanged-obligationTransfers" assertion으로 "read-audit-permitted precondition-denial-unchanged-obligationTransfers"를 확인한다
 
-  @sit
   시나리오: WRITE 역할·READ 위임에서 worker/registerItem 업무 효과0
     먼저 사례 파일 "verification/cases/C3/case.json"의 "worker-registerItem"를 준비한다
     만일 "시스템" 역할이 "setup" 행동을 수행한다
@@ -9422,6 +9488,8 @@
   시나리오: WRITE 역할·READ 위임에서 worker/dispatchPurchaseOrder 업무 효과0
     먼저 사례 파일 "verification/cases/C3/case.json"의 "worker-dispatchPurchaseOrder"를 준비한다
     만일 "시스템" 역할이 "setup" 행동을 수행한다
+    만일 "delegator" 역할이 "precondition-proposal" 행동을 수행한다
+    만일 "manager" 역할이 "precondition-approval" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
     만일 "reader" 역할이 "access-before" 행동을 수행한다
@@ -9461,8 +9529,10 @@
     그러면 "current-read-actions" assertion으로 "read-audit-permitted current-read-actions"를 확인한다
     그러면 "authorized-committed-once" assertion으로 "read-audit-permitted authorized-committed-once"를 확인한다
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
+    그러면 "precondition-approved" assertion으로 "read-audit-permitted precondition-approved"를 확인한다
+    그러면 "precondition-approval-record" assertion으로 "read-audit-permitted precondition-approval-record"를 확인한다
+    그러면 "authorized-business-outbox-once" assertion으로 "read-audit-permitted authorized-business-outbox-once"를 확인한다
 
-  @sit
   시나리오: WRITE 역할·READ 위임에서 worker/recordSupplierReply 업무 효과0
     먼저 사례 파일 "verification/cases/C3/case.json"의 "worker-recordSupplierReply"를 준비한다
     만일 "시스템" 역할이 "setup" 행동을 수행한다
@@ -11974,6 +12044,13 @@
   시나리오: WRITE 역할·READ 위임에서 worker/migrateWorkDefinition 업무 효과0
     먼저 사례 파일 "verification/cases/C3/case.json"의 "worker-migrateWorkDefinition"를 준비한다
     만일 "시스템" 역할이 "setup" 행동을 수행한다
+    만일 "fde" 역할이 "precondition-draft" 행동을 수행한다
+    만일 "fde" 역할이 "precondition-validate" 행동을 수행한다
+    만일 "fde" 역할이 "precondition-review" 행동을 수행한다
+    만일 "configApprover" 역할이 "precondition-publish-approval" 행동을 수행한다
+    만일 "fde" 역할이 "precondition-publish" 행동을 수행한다
+    만일 "fde" 역할이 "precondition-migration-review" 행동을 수행한다
+    만일 "configApprover" 역할이 "precondition-migration-approval" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
     만일 "reader" 역할이 "access-before" 행동을 수행한다
@@ -12013,8 +12090,24 @@
     그러면 "current-read-actions" assertion으로 "read-audit-permitted current-read-actions"를 확인한다
     그러면 "authorized-committed-once" assertion으로 "read-audit-permitted authorized-committed-once"를 확인한다
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
+    그러면 "precondition-draft-applied" assertion으로 "read-audit-permitted precondition-draft-applied"를 확인한다
+    그러면 "precondition-validate-applied" assertion으로 "read-audit-permitted precondition-validate-applied"를 확인한다
+    그러면 "precondition-review-applied" assertion으로 "read-audit-permitted precondition-review-applied"를 확인한다
+    그러면 "precondition-publish-approval-applied" assertion으로 "read-audit-permitted precondition-publish-approval-applied"를 확인한다
+    그러면 "precondition-publish-applied" assertion으로 "read-audit-permitted precondition-publish-applied"를 확인한다
+    그러면 "precondition-migration-review-applied" assertion으로 "read-audit-permitted precondition-migration-review-applied"를 확인한다
+    그러면 "precondition-migration-approval-applied" assertion으로 "read-audit-permitted precondition-migration-approval-applied"를 확인한다
+    그러면 "precondition-published" assertion으로 "read-audit-permitted precondition-published"를 확인한다
+    그러면 "authorized-business-work-version" assertion으로 "read-audit-permitted authorized-business-work-version"를 확인한다
+    그러면 "authorized-business-migration-once" assertion으로 "read-audit-permitted authorized-business-migration-once"를 확인한다
+    그러면 "precondition-migration-approval-record" assertion으로 "read-audit-permitted precondition-migration-approval-record"를 확인한다
+    그러면 "authorized-business-goal-history" assertion으로 "read-audit-permitted authorized-business-goal-history"를 확인한다
+    그러면 "authorized-business-migration-goal-link" assertion으로 "read-audit-permitted authorized-business-migration-goal-link"를 확인한다
+    그러면 "precondition-denial-unchanged-workDefinitionMigrations" assertion으로 "read-audit-permitted precondition-denial-unchanged-workDefinitionMigrations"를 확인한다
+    그러면 "precondition-denial-unchanged-migrationMappings" assertion으로 "read-audit-permitted precondition-denial-unchanged-migrationMappings"를 확인한다
+    그러면 "precondition-denial-unchanged-migrationRegressions" assertion으로 "read-audit-permitted precondition-denial-unchanged-migrationRegressions"를 확인한다
+    그러면 "precondition-denial-unchanged-goalVersions" assertion으로 "read-audit-permitted precondition-denial-unchanged-goalVersions"를 확인한다
 
-  @sit
   시나리오: WRITE 역할·READ 위임에서 worker/createWork 업무 효과0
     먼저 사례 파일 "verification/cases/C3/case.json"의 "worker-createWork"를 준비한다
     만일 "시스템" 역할이 "setup" 행동을 수행한다
