@@ -13,6 +13,7 @@ public class PolicyCommands implements CommandHandler {
  private final PolicyRepository repo;private final IdentityAuthorization auth;private final com.mulino.domain.identity.IdentityRepository identity;
  public PolicyCommands(PolicyRepository repo,IdentityAuthorization auth,com.mulino.domain.identity.IdentityRepository identity){this.repo=repo;this.auth=auth;this.identity=identity;}
  public Set<String> capabilities(){return Set.of("createPolicyDraft","approvePolicy","activatePolicy","retirePolicy");}
+ public boolean mutatesAuthorization(String capability){return Set.of("activatePolicy","retirePolicy").contains(capability);}
  public CommandPreparation prepare(DomainContext c,Map<String,Object> i){
    var p=payload(i);var row=op(i).equals("createPolicyDraft")?null:draft(c,text(p,"id"));
    var actors=new HashSet<String>();if(row!=null)for(var a:repo.rows("PolicyApprovals",c.organizationId()))if(row.get("ID").equals(a.get("draftId")))actors.add((String)a.get("approverId"));
@@ -44,7 +45,7 @@ public class PolicyCommands implements CommandHandler {
        repo.insert("PolicyVersions",published);repo.activate(c.organizationId(),(String)row.get("kind"),id);repo.update("PolicyDrafts",c.organizationId(),id,Map.of("status","ACTIVE","revision",revision));boundary(c,id,instant(row.get("effectiveFrom")),"ACTIVATE");if(row.get("effectiveUntil")!=null)boundary(c,id,instant(row.get("effectiveUntil")),"EXPIRE");
      }else{
        if(!status.equals("ACTIVE"))throw DomainError.invalid("Policy is not active");text(p,"terminationBasis");
-       if(Boolean.TRUE.equals(row.get("legallyRestrictive"))&&(row.get("effectiveUntil")==null||now.isBefore(instant(row.get("effectiveUntil")))){
+       if(Boolean.TRUE.equals(row.get("legallyRestrictive"))&&(row.get("effectiveUntil")==null||now.isBefore(instant(row.get("effectiveUntil"))))){
          String replacement=text(p,"replacementPolicyId");if(repo.current(c.organizationId(),(String)row.get("kind"),now).stream().noneMatch(r->replacement.equals(r.get("ID"))&&!id.equals(replacement)))throw new DomainError("HELD","LEGAL_RESTRICTION_ACTIVE","Replacement policy is required");
        }
        repo.retire(c.organizationId(),id);repo.update("PolicyDrafts",c.organizationId(),id,Map.of("status","RETIRED","revision",revision));boundary(c,id,now,"RETIRE");

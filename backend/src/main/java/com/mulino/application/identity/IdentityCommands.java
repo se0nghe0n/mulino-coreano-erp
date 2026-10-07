@@ -9,6 +9,7 @@ public class IdentityCommands implements CommandHandler {
  private final IdentityRepository repo;private final IdentityAuthorization auth;private final IdentityControlGuard guard;
  public IdentityCommands(IdentityRepository repo,IdentityAuthorization auth,IdentityControlGuard guard){this.repo=repo;this.auth=auth;this.guard=guard;}
  public Set<String> capabilities(){return Set.of("createGrant","revokeGrant","assignCapability","revokeCapability");}
+ public boolean mutatesAuthorization(String capability){return capabilities().contains(capability);}
  public CommandPreparation prepare(DomainContext c,Map<String,Object> i){
    var p=payload(i);String op=op(i),recipient;
    Map<String,Object> row=null;

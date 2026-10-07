@@ -52,9 +52,13 @@ V12는 V4 policy의 timestamp를 UTC 의미의 `TIMESTAMPTZ`로 변환한다.
 caller의 역사 시점과 독립된 expiry, published policy 불변,
 조직 간 active pointer FK 차단, 병렬 철회와 실행 fence의 직렬화다.
 
-이 기록 시점의 `git diff --check`는 PASS다. Maven slot 조정 때문에
-새 targeted JUnit 실행은 아직 `NOT_RUN`이다. 통합 실행 결과는 별도
-후속 기록으로 남긴다. 전체 C3/V4/V7 경로, MCP·실모델·운영 R5 identity,
+이 기록 시점의 `git diff --check`는 PASS다. Maven slot 조정 후
+targeted JUnit 실행은 11 tests PASS다. PostgreSQL/CQN tests 5개와
+기존 identity unit tests 6개가 failures/errors/skips 0으로 통과했다.
+자기 grant 철회와 더 엄격한 COMMAND policy 활성화를 실제
+`ApplicationCommands`로 실행하고 다음 행동 차단을 확인했다.
+검사 중 공유 srv의 미통합 모듈 imports 4개를 임시 제외한 뒤 복구했다.
+전체 통합 srv compile과 domain 결합은 root gate에서 다시 확인한다. 전체 C3/V4/V7 경로, MCP·실모델·운영 R5 identity,
 규제 인증, BTP는 이 구현으로 PASS가 되지 않는다.
 
 policy draft는 `fixtureOnly=true`를 요구한다. synthetic source·회귀 증거는
@@ -62,3 +66,11 @@ policy draft는 `fixtureOnly=true`를 요구한다. synthetic source·회귀 증
 실제 운영 정책 근거와 승인자 mapping은 미확정이므로 활성화 gate를
 유지한다. sweeper가 invalidation/boundary를 소비하는 실행 인수는
 runtime integration에서 확인한다.
+
+권한·정책을 변경하는 명령의 commit guard는 서버 handler의 명시
+`mutatesAuthorization` 선언에 한정한다. pre-effect 인가와 같은
+transaction의 fence를 유지하며 원 membership/grant/assignment/정책/
+승인 만료 경계를 current clock으로 다시 검사한다. 자기 철회나 의도한
+정책 강화 때문에 원 명령을 rollback하지 않는다. 일반 업무 command는
+post-effect 현재 인가를 다시 확인한다. payload의 effect class로 이 경로를
+선택하지 않는다.
