@@ -13,15 +13,19 @@ export PATH NODE24_BIN
 fixture=$(mktemp -d /tmp/mulino-platform-fixture.XXXXXX)
 container="mulino-platform-verify-$$"
 server_pid=
+container_created=false
 cleanup() {
   if [ -n "$server_pid" ]; then kill "$server_pid" 2>/dev/null || true; wait "$server_pid" 2>/dev/null || true; fi
-  docker rm -f "$container" >/dev/null 2>&1 || true
+  if [ "$container_created" = true ]; then docker rm -f "$container" >/dev/null 2>&1 || true; fi
   rm -rf "$fixture"
 }
 trap cleanup EXIT HUP INT TERM
 "$NODE24_BIN" verification/platform/security/security-smoke.mjs prepare "$fixture"
 export JWT_PUBLIC_KEY="$fixture/public.pem"
 export JWT_ISSUER=https://mulino.local.invalid JWT_AUDIENCE=mulino-platform
+npm --version > "$evidence/npm-version.txt"
+[ "$(cat "$evidence/npm-version.txt")" = 11.19.1 ]
+(cd backend && npm ci --ignore-scripts --no-audit --no-fund) > "$evidence/npm-ci.log" 2>&1
 (cd backend && ../mvnw -B -ntp test package) > "$evidence/integration.log" 2>&1
 shasum -a 256 backend/target/ontology-0.1.0-SNAPSHOT.jar > "$evidence/executed-jar.sha256"
 python3 - "$evidence" <<'PY'
@@ -32,6 +36,7 @@ rows={str(p):hashlib.sha256(p.read_bytes()).hexdigest() for p in files}
 Path(sys.argv[1],'backend-input-hashes.json').write_text(json.dumps(rows,indent=2)+'\n')
 PY
 docker run -d --name "$container" -e POSTGRES_PASSWORD=local-fixture-only -e POSTGRES_DB=ontology -p 127.0.0.1::5432 postgres@sha256:4ef4dbc939d61acea57712655ddb4b4ab27419c913f94cca0cd57cb3ea3c2280 > "$evidence/container-id.txt"
+container_created=true
 port=$(docker port "$container" 5432/tcp | sed 's/.*://')
 export DB_URL="jdbc:postgresql://127.0.0.1:$port/ontology" DB_USERNAME=postgres DB_PASSWORD=local-fixture-only
 java -jar backend/target/ontology-0.1.0-SNAPSHOT.jar --spring.profiles.active=local > "$evidence/runtime.log" 2>&1 &

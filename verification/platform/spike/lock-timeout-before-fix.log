@@ -1,0 +1,254 @@
+[INFO] Scanning for projects...
+[INFO]
+[INFO] ------------------------< com.mulino:ontology >-------------------------
+[INFO] Building ontology 0.1.0-SNAPSHOT
+[INFO]   from pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO]
+[INFO] --- cds:5.1.1:cds (cds) @ ontology ---
+[INFO] CdsMojo: Identified /Volumes/VideoStore/Developer/mulino-ontology-step3-s0-platform/backend as reactor base directory.
+[INFO] CdsMojo: Using directory containing a package.json as working directory: /Volumes/VideoStore/Developer/mulino-ontology-step3-s0-platform/backend
+[INFO] CdsMojo: Using globally installed npx
+[INFO] CdsMojo: Executing [npx, -c, cds version --json] in working directory /Volumes/VideoStore/Developer/mulino-ontology-step3-s0-platform/backend
+[INFO] CdsMojo: Using configured working directory: /Volumes/VideoStore/Developer/mulino-ontology-step3-s0-platform/backend
+[INFO] CdsMojo: Executing [npx, -c, cds compile srv --to csn --dest src/main/resources/edmx] in working directory /Volumes/VideoStore/Developer/mulino-ontology-step3-s0-platform/backend
+[INFO] CdsMojo: /Volumes/VideoStore/Developer/mulino-ontology-step3-s0-platform/backend/src/main/resources/edmx/srv.csn
+[INFO] CdsMojo: Executing [npx, -c, cds compile srv --to edmx --dest src/main/resources/edmx] in working directory /Volumes/VideoStore/Developer/mulino-ontology-step3-s0-platform/backend
+[INFO] CdsMojo: /Volumes/VideoStore/Developer/mulino-ontology-step3-s0-platform/backend/src/main/resources/edmx/PlatformService.xml
+[INFO]
+[INFO] --- antrun:3.2.0:run (default) @ ontology ---
+[INFO] Executing tasks
+[INFO]      [copy] Copying 1 file to /Volumes/VideoStore/Developer/mulino-ontology-step3-s0-platform/backend/src/main/resources/edmx
+[INFO] Executed tasks
+[INFO]
+[INFO] --- resources:3.5.0:resources (default-resources) @ ontology ---
+[INFO] Copying 4 resources from src/main/resources to target/classes
+[INFO] Copying 2 resources from ../database/migrations to target/classes/db/migration
+[INFO]
+[INFO] --- compiler:3.15.0:compile (default-compile) @ ontology ---
+[INFO] Recompiling the module because of changed source code.
+[INFO] Compiling 9 source files with javac [debug parameters release 21] to target/classes
+[INFO] /Volumes/VideoStore/Developer/mulino-ontology-step3-s0-platform/backend/src/main/java/com/mulino/application/PlatformCommands.java: Some input files use unchecked or unsafe operations.
+[INFO] /Volumes/VideoStore/Developer/mulino-ontology-step3-s0-platform/backend/src/main/java/com/mulino/application/PlatformCommands.java: Recompile with -Xlint:unchecked for details.
+[INFO]
+[INFO] --- resources:3.5.0:testResources (default-testResources) @ ontology ---
+[INFO] skip non existing resourceDirectory /Volumes/VideoStore/Developer/mulino-ontology-step3-s0-platform/backend/src/test/resources
+[INFO]
+[INFO] --- compiler:3.15.0:testCompile (default-testCompile) @ ontology ---
+[INFO] Recompiling the module because of changed dependency.
+[INFO] Compiling 1 source file with javac [debug parameters release 21] to target/test-classes
+[INFO]
+[INFO] --- surefire:3.5.6:test (default-test) @ ontology ---
+[INFO] Using auto detected provider org.apache.maven.surefire.junitplatform.JUnitPlatformProvider
+[INFO]
+[INFO] -------------------------------------------------------
+[INFO]  T E S T S
+[INFO] -------------------------------------------------------
+[INFO] Running com.mulino.PlatformIntegrationTest
+01:45:49.804 [main] INFO org.springframework.test.context.support.AnnotationConfigContextLoaderUtils -- Could not detect default configuration classes for test class [com.mulino.PlatformIntegrationTest]: PlatformIntegrationTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+01:45:49.848 [main] INFO org.springframework.boot.test.context.SpringBootTestContextBootstrapper -- Found @SpringBootConfiguration com.mulino.OntologyApplication for test class com.mulino.PlatformIntegrationTest
+01:45:49.880 [main] INFO org.springframework.test.context.support.AnnotationConfigContextLoaderUtils -- Could not detect default configuration classes for test class [com.mulino.PlatformIntegrationTest]: PlatformIntegrationTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+01:45:49.881 [main] INFO org.springframework.boot.test.context.SpringBootTestContextBootstrapper -- Found @SpringBootConfiguration com.mulino.OntologyApplication for test class com.mulino.PlatformIntegrationTest
+01:45:49.902 [main] INFO org.testcontainers.images.PullPolicy -- Image pull policy will be performed by: DefaultPullPolicy()
+01:45:49.903 [main] INFO org.testcontainers.utility.ImageNameSubstitutor -- Image name substitution will be performed by: DefaultImageNameSubstitutor (composite of 'ConfigurationFileImageNameSubstitutor' and 'PrefixingImageNameSubstitutor')
+01:45:49.920 [main] INFO org.testcontainers.DockerClientFactory -- Testcontainers version: 2.0.5
+01:45:50.023 [main] INFO org.testcontainers.dockerclient.DockerClientProviderStrategy -- Loaded org.testcontainers.dockerclient.UnixSocketClientProviderStrategy from ~/.testcontainers.properties, will try it first
+01:45:50.226 [main] INFO org.testcontainers.dockerclient.DockerClientProviderStrategy -- Found Docker environment with local Unix socket (unix:///var/run/docker.sock)
+01:45:50.227 [main] INFO org.testcontainers.DockerClientFactory -- Docker host IP address is localhost
+01:45:50.236 [main] INFO org.testcontainers.DockerClientFactory -- Connected to docker:
+  Server Version: 29.4.0
+  API Version: 1.54
+  Operating System: OrbStack
+  Total Memory: 8004 MB
+01:45:50.247 [main] INFO tc.testcontainers/ryuk:0.14.0 -- Creating container for image: testcontainers/ryuk:0.14.0
+01:45:50.267 [main] INFO org.testcontainers.utility.RegistryAuthLocator -- Credential helper/store (docker-credential-osxkeychain) does not have credentials for https://index.docker.io/v1/
+01:45:50.327 [main] INFO tc.testcontainers/ryuk:0.14.0 -- Container testcontainers/ryuk:0.14.0 is starting: 2170888f30aa1237f09045260815a64c5d928008c6b3bd680caa290b180afacb
+01:45:50.529 [main] INFO tc.testcontainers/ryuk:0.14.0 -- Container testcontainers/ryuk:0.14.0 started in PT0.281831S
+01:45:50.532 [main] INFO org.testcontainers.utility.RyukResourceReaper -- Ryuk started - will monitor and terminate Testcontainers containers on JVM exit
+01:45:50.532 [main] INFO org.testcontainers.DockerClientFactory -- Checking the system...
+01:45:50.532 [main] INFO org.testcontainers.DockerClientFactory -- ✔︎ Docker server version should be at least 1.6.0
+01:45:50.535 [main] INFO tc.postgres@sha256:4ef4db... -- Creating container for image: postgres@sha256:4ef4dbc939d61acea57712655ddb4b4ab27419c913f94cca0cd57cb3ea3c2280
+01:45:50.559 [main] INFO tc.postgres@sha256:4ef4db... -- Container postgres@sha256:4ef4dbc939d61acea57712655ddb4b4ab27419c913f94cca0cd57cb3ea3c2280 is starting: c1dc870305cb85c2368eee42219e410b3180750e6dd6454a74e0486855f3b010
+01:45:51.992 [main] INFO tc.postgres@sha256:4ef4db... -- Container postgres@sha256:4ef4dbc939d61acea57712655ddb4b4ab27419c913f94cca0cd57cb3ea3c2280 started in PT1.457213S
+01:45:51.993 [main] INFO tc.postgres@sha256:4ef4db... -- Container is started (JDBC URL: jdbc:postgresql://localhost:32776/test?loggerLevel=OFF)
+   _________    ____         __
+  / ____/   |  / __ \       / /___ __   ______ _
+ / /   / /| | / /_/ /  __  / / __ `/ | / / __ `/
+/ /___/ ___ |/ ____/  / /_/ / /_/ /| |/ / /_/ /
+\____/_/  |_/_/       \____/\__,_/ |___/\__,_/      5.1.1
+
+Powered by Spring Boot 4.1.1
+
+2026-10-08T01:45:52.153+09:00  WARN 43948 --- [mulino-ontology] [           main] ory$DuplicateJsonObjectContextCustomizer :
+
+Found multiple occurrences of org.json.JSONObject on the class path:
+
+	jar:file:/Users/n30gu1/.m2/repository/org/json/json/20260719/json-20260719.jar!/org/json/JSONObject.class
+	jar:file:/Users/n30gu1/.m2/repository/com/vaadin/external/google/android-json/0.0.20131108.vaadin1/android-json-0.0.20131108.vaadin1.jar!/org/json/JSONObject.class
+
+You may wish to exclude one of them to ensure predictable runtime behavior
+
+2026-10-08T01:45:52.158+09:00  INFO 43948 --- [mulino-ontology] [           main] com.mulino.PlatformIntegrationTest       : Starting PlatformIntegrationTest using Java 21.0.5 with PID 43948 (started by n30gu1 in /Volumes/VideoStore/Developer/mulino-ontology-step3-s0-platform/backend)
+2026-10-08T01:45:52.158+09:00  INFO 43948 --- [mulino-ontology] [           main] com.mulino.PlatformIntegrationTest       : The following 1 profile is active: "local"
+2026-10-08T01:45:52.344+09:00  INFO 43948 --- [mulino-ontology] [           main] c.s.c.s.u.t.DevTelemetryConfiguration    : Dev telemetry output enabled
+2026-10-08T01:45:52.430+09:00  INFO 43948 --- [mulino-ontology] [           main] c.s.c.services.impl.utils.CdsModelUtils  : Loaded CDS model from CSN resource path 'edmx/csn.json'
+2026-10-08T01:45:52.437+09:00  INFO 43948 --- [mulino-ontology] [           main] c.s.c.services.impl.ServiceCatalogImpl   : Registered service OutboxService$InMemory
+2026-10-08T01:45:52.438+09:00  INFO 43948 --- [mulino-ontology] [           main] c.s.c.services.impl.ServiceCatalogImpl   : Registered service ApplicationLifecycleService$Default
+2026-10-08T01:45:52.438+09:00  INFO 43948 --- [mulino-ontology] [           main] c.s.c.services.impl.ServiceCatalogImpl   : Registered service AuthorizationService$Default
+2026-10-08T01:45:52.439+09:00  INFO 43948 --- [mulino-ontology] [           main] c.s.c.services.impl.ServiceCatalogImpl   : Registered service TenantProviderService$Default
+2026-10-08T01:45:52.440+09:00  INFO 43948 --- [mulino-ontology] [           main] c.s.c.services.impl.ServiceCatalogImpl   : Registered service DeploymentService$Default
+2026-10-08T01:45:52.442+09:00  INFO 43948 --- [mulino-ontology] [           main] c.s.c.services.impl.ServiceCatalogImpl   : Registered service AuditLogService$Default
+2026-10-08T01:45:52.450+09:00  INFO 43948 --- [mulino-ontology] [           main] c.s.c.services.impl.ServiceCatalogImpl   : Registered service PlatformService
+2026-10-08T01:45:52.450+09:00  INFO 43948 --- [mulino-ontology] [           main] .s.c.r.CdsRuntimeBeanDefinitionRegistrar : Found 'spring.datasource.url' configuration: Auto-configuration of DataSource beans is disabled.
+2026-10-08T01:45:52.742+09:00  INFO 43948 --- [mulino-ontology] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2026-10-08T01:45:52.818+09:00  INFO 43948 --- [mulino-ontology] [           main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@7ee3a2ed
+2026-10-08T01:45:52.818+09:00  INFO 43948 --- [mulino-ontology] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2026-10-08T01:45:52.828+09:00  INFO 43948 --- [mulino-ontology] [           main] org.flywaydb.core.FlywayExecutor         : Database: jdbc:postgresql://localhost:32776/test?loggerLevel=OFF (PostgreSQL 18.6)
+2026-10-08T01:45:52.852+09:00  INFO 43948 --- [mulino-ontology] [           main] o.f.c.i.s.JdbcTableSchemaHistory         : Schema history table "public"."flyway_schema_history" does not exist yet
+2026-10-08T01:45:52.853+09:00  INFO 43948 --- [mulino-ontology] [           main] o.f.core.internal.command.DbValidate     : Successfully validated 2 migrations (execution time 00:00.006s)
+2026-10-08T01:45:52.861+09:00  INFO 43948 --- [mulino-ontology] [           main] o.f.c.i.s.JdbcTableSchemaHistory         : Creating Schema History table "public"."flyway_schema_history" ...
+2026-10-08T01:45:52.921+09:00  INFO 43948 --- [mulino-ontology] [           main] o.f.core.internal.command.DbMigrate      : Current version of schema "public": << Empty Schema >>
+2026-10-08T01:45:52.928+09:00  INFO 43948 --- [mulino-ontology] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "public" to version "1 - platform"
+2026-10-08T01:45:52.951+09:00  INFO 43948 --- [mulino-ontology] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "public" to version "2 - preserved upgrade"
+2026-10-08T01:45:52.959+09:00  INFO 43948 --- [mulino-ontology] [           main] o.f.core.internal.command.DbMigrate      : Successfully applied 2 migrations to schema "public", now at version v2 (execution time 00:00.017s)
+2026-10-08T01:45:52.981+09:00  INFO 43948 --- [mulino-ontology] [           main] c.s.c.services.impl.ServiceCatalogImpl   : Registered service PersistenceService$Default
+2026-10-08T01:45:53.145+09:00  INFO 43948 --- [mulino-ontology] [           main] c.s.c.f.s.c.adapter.AdapterBeanFactory   : Servlet CdsODataV4Servlet mapped to /odata/v4
+2026-10-08T01:45:53.147+09:00  INFO 43948 --- [mulino-ontology] [           main] c.s.c.f.s.c.adapter.AdapterBeanFactory   : Servlet IndexPageServlet mapped to /
+2026-10-08T01:45:53.148+09:00  INFO 43948 --- [mulino-ontology] [           main] c.s.c.f.s.c.adapter.AdapterBeanFactory   : Servlet CdsFioriPreviewServlet mapped to /$fiori-preview
+2026-10-08T01:45:53.273+09:00  INFO 43948 --- [mulino-ontology] [           main] c.s.c.s.impl.runtime.CdsRuntimeImpl      : Registered handler class com.mulino.adapters.PlatformCap
+2026-10-08T01:45:53.283+09:00  INFO 43948 --- [mulino-ontology] [           main] .s.c.a.o.v.m.p.EdmxProviderConfiguration : Initialized Default EDMX V4 Provider
+2026-10-08T01:45:53.284+09:00  INFO 43948 --- [mulino-ontology] [           main] .s.c.a.o.v.m.p.EdmxProviderConfiguration : Initialized Default EDMX I18n Provider
+2026-10-08T01:45:53.297+09:00  INFO 43948 --- [mulino-ontology] [           main] c.s.c.s.impl.runtime.CdsRuntimeImpl      : Registered provider class com.mulino.domain.identity.CapIdentityProvider for CdsProvider com.sap.cds.services.runtime.UserInfoProvider
+2026-10-08T01:45:53.300+09:00  INFO 43948 --- [mulino-ontology] [           main] c.sap.cds.services.impl.utils.BuildInfo  : git.commit.id: 1f282829429207a6719a6da418f061b6112a51a8
+2026-10-08T01:45:53.300+09:00  INFO 43948 --- [mulino-ontology] [           main] c.sap.cds.services.impl.utils.BuildInfo  : maven.version: 5.1.1
+2026-10-08T01:45:53.312+09:00  WARN 43948 --- [mulino-ontology] [           main] o.s.core.annotation.MergedAnnotation     : Failed to introspect meta-annotation @ConditionalOnMissingBean on public static org.springframework.beans.factory.config.BeanPostProcessor com.sap.cds.framework.spring.config.runtime.SqliteInitializerConfiguration.sqliteDataSourceInitializer(): java.lang.TypeNotPresentException: Type com.sap.cds.feature.mt.lib.runtime.TenantAwareDataSource not present
+2026-10-08T01:45:53.371+09:00  INFO 43948 --- [mulino-ontology] [           main] com.mulino.PlatformIntegrationTest       : Started PlatformIntegrationTest in 1.34 seconds (process running for 3.903)
+Mockito is currently self-attaching to enable the inline-mock-maker. This will no longer work in future releases of the JDK. Please add Mockito as an agent to your build as described in Mockito's documentation: https://javadoc.io/doc/org.mockito/mockito-core/latest/org.mockito/org/mockito/Mockito.html#0.3
+OpenJDK 64-Bit Server VM warning: Sharing is only supported for boot loader classes because bootstrap classpath has been appended
+WARNING: A Java agent has been loaded dynamically (/Users/n30gu1/.m2/repository/net/bytebuddy/byte-buddy-agent/1.18.11/byte-buddy-agent-1.18.11.jar)
+WARNING: If a serviceability tool is in use, please run with -XX:+EnableDynamicAgentLoading to hide this warning
+WARNING: If a serviceability tool is not in use, please run with -Djdk.instrument.traceUsage for more information
+WARNING: Dynamic loading of agents will be disallowed by default in a future release
+2026-10-08T01:45:53.952+09:00  INFO 43948 --- [mulino-ontology] [           main] c.s.c.s.u.t.TraceTreeSpanProcessor       : elapsed times (trace 25b9d394...):     0.00 →   21.84 =   21.84 ms  CQN SELECT Scopes
+2026-10-08T01:45:53.956+09:00  INFO 43948 --- [mulino-ontology] [           main] c.s.c.s.u.t.TraceTreeSpanProcessor       : elapsed times (trace 699ab1f3...):     0.00 →    2.16 =    2.16 ms  CQN SELECT Grants
+2026-10-08T01:45:53.958+09:00  INFO 43948 --- [mulino-ontology] [           main] c.s.c.s.u.t.TraceTreeSpanProcessor       : elapsed times (trace aaa4098e...):     0.00 →    1.27 =    1.27 ms  CQN SELECT Policies
+2026-10-08T01:45:53.960+09:00  INFO 43948 --- [mulino-ontology] [           main] c.s.c.s.u.t.TraceTreeSpanProcessor       : elapsed times (trace 677d2bfe...):     0.00 →    1.32 =    1.32 ms  CQN SELECT Restrictions
+2026-10-08T01:45:53.963+09:00  INFO 43948 --- [mulino-ontology] [           main] c.s.c.s.u.t.TraceTreeSpanProcessor       : elapsed times (trace a0a1b9bc...):     0.00 →    1.64 =    1.64 ms  CQN SELECT Idempotency
+2026-10-08T01:45:53.978+09:00  INFO 43948 --- [mulino-ontology] [           main] c.s.c.s.u.t.TraceTreeSpanProcessor       : elapsed times (trace b0f2733c...):     0.00 →    8.90 =    8.90 ms  CQN UPDATE Scopes
+2026-10-08T01:45:53.982+09:00  INFO 43948 --- [mulino-ontology] [           main] c.s.c.s.u.t.TraceTreeSpanProcessor       : elapsed times (trace 2bebab43...):     0.00 →    2.95 =    2.95 ms  CQN INSERT Audit
+2026-10-08T01:45:53.984+09:00  INFO 43948 --- [mulino-ontology] [           main] c.s.c.s.u.t.TraceTreeSpanProcessor       : elapsed times (trace 7e56da67...):     0.00 →    0.90 =    0.90 ms  CQN INSERT Outbox
+2026-10-08T01:45:53.993+09:00  INFO 43948 --- [mulino-ontology] [           main] c.s.c.s.u.t.TraceTreeSpanProcessor       : elapsed times (trace d82cf512...):     0.00 →    1.37 =    1.37 ms  CQN INSERT Idempotency
+2026-10-08T01:45:53.997+09:00  INFO 43948 --- [mulino-ontology] [           main] c.s.c.s.u.t.TraceTreeSpanProcessor       : elapsed times (trace 4043c11a...):     0.00 →    1.46 =    1.46 ms  CQN SELECT Scopes
+2026-10-08T01:45:53.998+09:00  INFO 43948 --- [mulino-ontology] [           main] c.s.c.s.u.t.TraceTreeSpanProcessor       : elapsed times (trace 1de7d57a...):     0.00 →    1.31 =    1.31 ms  CQN SELECT Grants
+2026-10-08T01:45:54.000+09:00  INFO 43948 --- [mulino-ontology] [           main] c.s.c.s.u.t.TraceTreeSpanProcessor       : elapsed times (trace f2813b58...):     0.00 →    1.07 =    1.07 ms  CQN SELECT Policies
+2026-10-08T01:45:54.002+09:00  INFO 43948 --- [mulino-ontology] [           main] c.s.c.s.u.t.TraceTreeSpanProcessor       : elapsed times (trace d72734f0...):     0.00 →    1.08 =    1.08 ms  CQN SELECT Restrictions
+2026-10-08T01:45:54.004+09:00  INFO 43948 --- [mulino-ontology] [           main] c.s.c.s.u.t.TraceTreeSpanProcessor       : elapsed times (trace b877728b...):     0.00 →    1.42 =    1.42 ms  CQN SELECT Idempotency
+2026-10-08T01:45:54.009+09:00  INFO 43948 --- [mulino-ontology] [           main] c.s.c.s.u.t.TraceTreeSpanProcessor       : elapsed times (trace 571e3a8e...):     0.00 →    1.23 =    1.23 ms  CQN SELECT Scopes
+2026-10-08T01:45:54.011+09:00  INFO 43948 --- [mulino-ontology] [           main] c.s.c.s.u.t.TraceTreeSpanProcessor       : elapsed times (trace 316fc62c...):     0.00 →    1.35 =    1.35 ms  CQN SELECT Grants
+2026-10-08T01:45:54.013+09:00  INFO 43948 --- [mulino-ontology] [           main] c.s.c.s.u.t.TraceTreeSpanProcessor       : elapsed times (trace 5f46cdf0...):     0.00 →    1.08 =    1.08 ms  CQN SELECT Policies
+2026-10-08T01:45:54.015+09:00  INFO 43948 --- [mulino-ontology] [           main] c.s.c.s.u.t.TraceTreeSpanProcessor       : elapsed times (trace 8d93681a...):     0.00 →    1.30 =    1.30 ms  CQN SELECT Restrictions
+2026-10-08T01:45:54.016+09:00  INFO 43948 --- [mulino-ontology] [           main] c.s.c.s.u.t.TraceTreeSpanProcessor       : elapsed times (trace 9a09182f...):     0.00 →    1.22 =    1.22 ms  CQN SELECT Idempotency
+2026-10-08T01:45:54.034+09:00  INFO 43948 --- [mulino-ontology] [pool-4-thread-1] c.s.c.s.u.t.TraceTreeSpanProcessor       : elapsed times (trace 0380c25a...):     0.00 →    1.33 =    1.33 ms  CQN SELECT Scopes
+2026-10-08T01:45:54.036+09:00  INFO 43948 --- [mulino-ontology] [pool-4-thread-1] c.s.c.s.u.t.TraceTreeSpanProcessor       : elapsed times (trace b84e9782...):     0.00 →    1.27 =    1.27 ms  CQN SELECT Grants
+2026-10-08T01:45:54.048+09:00  INFO 43948 --- [mulino-ontology] [           main] c.s.c.s.u.t.TraceTreeSpanProcessor       : elapsed times (trace 56da4b96...):     0.00 →    1.52 =    1.52 ms  CQN SELECT Scopes
+2026-10-08T01:45:54.050+09:00  INFO 43948 --- [mulino-ontology] [           main] c.s.c.s.u.t.TraceTreeSpanProcessor       : elapsed times (trace da65edb8...):     0.00 →    1.27 =    1.27 ms  CQN SELECT Grants
+2026-10-08T01:45:54.051+09:00  INFO 43948 --- [mulino-ontology] [           main] c.s.c.s.u.t.TraceTreeSpanProcessor       : elapsed times (trace 774585f4...):     0.00 →    1.03 =    1.03 ms  CQN SELECT Policies
+2026-10-08T01:45:54.053+09:00  INFO 43948 --- [mulino-ontology] [           main] c.s.c.s.u.t.TraceTreeSpanProcessor       : elapsed times (trace a7f0ecb8...):     0.00 →    1.05 =    1.05 ms  CQN SELECT Restrictions
+2026-10-08T01:45:54.055+09:00  INFO 43948 --- [mulino-ontology] [           main] c.s.c.s.u.t.TraceTreeSpanProcessor       : elapsed times (trace 74403b41...):     0.00 →    1.19 =    1.19 ms  CQN SELECT Idempotency
+2026-10-08T01:45:54.057+09:00  INFO 43948 --- [mulino-ontology] [           main] c.s.c.s.u.t.TraceTreeSpanProcessor       : elapsed times (trace 17e338a8...):     0.00 →    1.31 =    1.31 ms  CQN UPDATE Scopes
+2026-10-08T01:45:54.058+09:00  INFO 43948 --- [mulino-ontology] [           main] c.s.c.s.u.t.TraceTreeSpanProcessor       : elapsed times (trace 0e19632e...):     0.00 →    0.92 =    0.92 ms  CQN INSERT Audit
+2026-10-08T01:45:54.060+09:00  INFO 43948 --- [mulino-ontology] [           main] c.s.c.s.u.t.TraceTreeSpanProcessor       : elapsed times (trace efe43b45...):     0.00 →    0.80 =    0.80 ms  CQN INSERT Outbox
+2026-10-08T01:45:54.062+09:00  INFO 43948 --- [mulino-ontology] [           main] c.s.c.s.u.t.TraceTreeSpanProcessor       : elapsed times (trace d54237ff...):     0.00 →    0.84 =    0.84 ms  CQN INSERT Idempotency
+2026-10-08T01:45:54.065+09:00  INFO 43948 --- [mulino-ontology] [           main] c.s.c.s.u.t.TraceTreeSpanProcessor       : elapsed times (trace 84956f2c...):     0.00 →    1.14 =    1.14 ms  CQN SELECT Scopes
+2026-10-08T01:45:54.066+09:00  INFO 43948 --- [mulino-ontology] [           main] c.s.c.s.u.t.TraceTreeSpanProcessor       : elapsed times (trace 19e5398a...):     0.00 →    1.13 =    1.13 ms  CQN SELECT Grants
+2026-10-08T01:45:54.068+09:00  INFO 43948 --- [mulino-ontology] [           main] c.s.c.s.u.t.TraceTreeSpanProcessor       : elapsed times (trace fd81b90d...):     0.00 →    0.97 =    0.97 ms  CQN INSERT Restrictions
+2026-10-08T01:45:54.072+09:00  INFO 43948 --- [mulino-ontology] [           main] c.s.c.s.u.t.TraceTreeSpanProcessor       : elapsed times (trace ed0b1f4e...):     0.00 →    1.59 =    1.59 ms  CQN SELECT Scopes
+2026-10-08T01:45:54.074+09:00  INFO 43948 --- [mulino-ontology] [           main] c.s.c.s.u.t.TraceTreeSpanProcessor       : elapsed times (trace ed424ee6...):     0.00 →    1.25 =    1.25 ms  CQN SELECT Grants
+2026-10-08T01:45:54.076+09:00  INFO 43948 --- [mulino-ontology] [           main] c.s.c.s.u.t.TraceTreeSpanProcessor       : elapsed times (trace a40972a8...):     0.00 →    1.12 =    1.12 ms  CQN SELECT Policies
+2026-10-08T01:45:54.078+09:00  INFO 43948 --- [mulino-ontology] [           main] c.s.c.s.u.t.TraceTreeSpanProcessor       : elapsed times (trace 53c72cdc...):     0.00 →    1.22 =    1.22 ms  CQN SELECT Restrictions
+2026-10-08T01:45:54.096+09:00  INFO 43948 --- [mulino-ontology] [pool-5-thread-1] c.s.c.s.u.t.TraceTreeSpanProcessor       : elapsed times (trace e41a192f...):     0.00 →    1.47 =    1.47 ms  CQN SELECT Scopes
+2026-10-08T01:45:54.098+09:00  INFO 43948 --- [mulino-ontology] [pool-5-thread-1] c.s.c.s.u.t.TraceTreeSpanProcessor       : elapsed times (trace 10ae741f...):     0.00 →    1.37 =    1.37 ms  CQN SELECT Grants
+2026-10-08T01:45:54.100+09:00  INFO 43948 --- [mulino-ontology] [pool-5-thread-1] c.s.c.s.u.t.TraceTreeSpanProcessor       : elapsed times (trace e02d641d...):     0.00 →    0.98 =    0.98 ms  CQN SELECT Policies
+2026-10-08T01:45:54.101+09:00  INFO 43948 --- [mulino-ontology] [pool-5-thread-1] c.s.c.s.u.t.TraceTreeSpanProcessor       : elapsed times (trace 908130a3...):     0.00 →    1.02 =    1.02 ms  CQN SELECT Restrictions
+2026-10-08T01:45:54.111+09:00  INFO 43948 --- [mulino-ontology] [pool-6-thread-2] c.s.c.s.u.t.TraceTreeSpanProcessor       : elapsed times (trace cb91f4bc...):     0.00 →    1.01 =    1.01 ms  CQN SELECT Scopes
+2026-10-08T01:45:54.113+09:00  INFO 43948 --- [mulino-ontology] [pool-6-thread-2] c.s.c.s.u.t.TraceTreeSpanProcessor       : elapsed times (trace 87d33612...):     0.00 →    0.98 =    0.98 ms  CQN SELECT Grants
+2026-10-08T01:45:54.114+09:00  INFO 43948 --- [mulino-ontology] [pool-6-thread-2] c.s.c.s.u.t.TraceTreeSpanProcessor       : elapsed times (trace ada204a3...):     0.00 →    1.16 =    1.16 ms  CQN SELECT Policies
+2026-10-08T01:45:54.116+09:00  INFO 43948 --- [mulino-ontology] [pool-6-thread-2] c.s.c.s.u.t.TraceTreeSpanProcessor       : elapsed times (trace 1b9e6542...):     0.00 →    0.93 =    0.93 ms  CQN SELECT Restrictions
+2026-10-08T01:45:54.117+09:00  INFO 43948 --- [mulino-ontology] [pool-6-thread-2] c.s.c.s.u.t.TraceTreeSpanProcessor       : elapsed times (trace 6ebdc937...):     0.00 →    1.05 =    1.05 ms  CQN SELECT Idempotency
+2026-10-08T01:45:54.119+09:00  INFO 43948 --- [mulino-ontology] [pool-6-thread-2] c.s.c.s.u.t.TraceTreeSpanProcessor       : elapsed times (trace 6a9650e4...):     0.00 →    0.98 =    0.98 ms  CQN UPDATE Scopes
+2026-10-08T01:45:54.120+09:00  INFO 43948 --- [mulino-ontology] [pool-6-thread-2] c.s.c.s.u.t.TraceTreeSpanProcessor       : elapsed times (trace c9429f59...):     0.00 →    0.70 =    0.70 ms  CQN INSERT Audit
+2026-10-08T01:45:54.122+09:00  INFO 43948 --- [mulino-ontology] [pool-6-thread-2] c.s.c.s.u.t.TraceTreeSpanProcessor       : elapsed times (trace 94265a30...):     0.00 →    0.68 =    0.68 ms  CQN INSERT Outbox
+2026-10-08T01:45:54.123+09:00  INFO 43948 --- [mulino-ontology] [pool-6-thread-2] c.s.c.s.u.t.TraceTreeSpanProcessor       : elapsed times (trace 55c998da...):     0.00 →    0.76 =    0.76 ms  CQN INSERT Idempotency
+2026-10-08T01:45:54.125+09:00  INFO 43948 --- [mulino-ontology] [pool-6-thread-1] c.s.c.s.u.t.TraceTreeSpanProcessor       : elapsed times (trace c28c5eba...):     0.00 →    1.09 =    1.09 ms  CQN SELECT Scopes
+2026-10-08T01:45:54.127+09:00  INFO 43948 --- [mulino-ontology] [pool-6-thread-1] c.s.c.s.u.t.TraceTreeSpanProcessor       : elapsed times (trace adfb3b25...):     0.00 →    1.07 =    1.07 ms  CQN SELECT Grants
+2026-10-08T01:45:54.128+09:00  INFO 43948 --- [mulino-ontology] [pool-6-thread-1] c.s.c.s.u.t.TraceTreeSpanProcessor       : elapsed times (trace 1c876b13...):     0.00 →    0.84 =    0.84 ms  CQN SELECT Policies
+2026-10-08T01:45:54.130+09:00  INFO 43948 --- [mulino-ontology] [pool-6-thread-1] c.s.c.s.u.t.TraceTreeSpanProcessor       : elapsed times (trace 7299a7c8...):     0.00 →    0.90 =    0.90 ms  CQN SELECT Restrictions
+2026-10-08T01:45:54.131+09:00  INFO 43948 --- [mulino-ontology] [pool-6-thread-1] c.s.c.s.u.t.TraceTreeSpanProcessor       : elapsed times (trace 73fcbf05...):     0.00 →    1.09 =    1.09 ms  CQN SELECT Idempotency
+2026-10-08T01:45:54.186+09:00  INFO 43948 --- [mulino-ontology] [           main] org.flywaydb.core.FlywayExecutor         : Database: jdbc:postgresql://localhost:32776/upgrade_proof?loggerLevel=OFF (PostgreSQL 18.6)
+2026-10-08T01:45:54.192+09:00  INFO 43948 --- [mulino-ontology] [           main] o.f.c.i.s.JdbcTableSchemaHistory         : Schema history table "public"."flyway_schema_history" does not exist yet
+2026-10-08T01:45:54.192+09:00  INFO 43948 --- [mulino-ontology] [           main] o.f.core.internal.command.DbValidate     : Successfully validated 2 migrations (execution time 00:00.001s)
+2026-10-08T01:45:54.195+09:00  INFO 43948 --- [mulino-ontology] [           main] o.f.c.i.s.JdbcTableSchemaHistory         : Creating Schema History table "public"."flyway_schema_history" ...
+2026-10-08T01:45:54.204+09:00  INFO 43948 --- [mulino-ontology] [           main] o.f.core.internal.command.DbMigrate      : Current version of schema "public": << Empty Schema >>
+2026-10-08T01:45:54.206+09:00  INFO 43948 --- [mulino-ontology] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "public" to version "1 - platform"
+2026-10-08T01:45:54.215+09:00  INFO 43948 --- [mulino-ontology] [           main] o.f.core.internal.command.DbMigrate      : Successfully applied 1 migration to schema "public", now at version v1 (execution time 00:00.006s)
+2026-10-08T01:45:54.232+09:00  INFO 43948 --- [mulino-ontology] [           main] org.flywaydb.core.FlywayExecutor         : Database: jdbc:postgresql://localhost:32776/upgrade_proof?loggerLevel=OFF (PostgreSQL 18.6)
+2026-10-08T01:45:54.238+09:00  INFO 43948 --- [mulino-ontology] [           main] o.f.core.internal.command.DbValidate     : Successfully validated 2 migrations (execution time 00:00.002s)
+2026-10-08T01:45:54.244+09:00  INFO 43948 --- [mulino-ontology] [           main] o.f.core.internal.command.DbMigrate      : Current version of schema "public": 1
+2026-10-08T01:45:54.246+09:00  INFO 43948 --- [mulino-ontology] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "public" to version "2 - preserved upgrade"
+2026-10-08T01:45:54.250+09:00  INFO 43948 --- [mulino-ontology] [           main] o.f.core.internal.command.DbMigrate      : Successfully applied 1 migration to schema "public", now at version v2 (execution time 00:00.001s)
+2026-10-08T01:45:54.255+09:00  INFO 43948 --- [mulino-ontology] [           main] org.flywaydb.core.FlywayExecutor         : Database: jdbc:postgresql://localhost:32776/upgrade_proof?loggerLevel=OFF (PostgreSQL 18.6)
+2026-10-08T01:45:54.261+09:00  INFO 43948 --- [mulino-ontology] [           main] o.f.core.internal.command.DbValidate     : Successfully validated 2 migrations (execution time 00:00.001s)
+2026-10-08T01:45:56.324+09:00  INFO 43948 --- [mulino-ontology] [           main] c.s.c.s.u.t.TraceTreeSpanProcessor       : elapsed times (trace 430d4ef0...):     0.00 →    1.76 =    1.76 ms  CQN SELECT Scopes
+2026-10-08T01:45:56.326+09:00  INFO 43948 --- [mulino-ontology] [           main] c.s.c.s.u.t.TraceTreeSpanProcessor       : elapsed times (trace cf1b0ccb...):     0.00 →    1.45 =    1.45 ms  CQN SELECT Grants
+2026-10-08T01:45:56.328+09:00  INFO 43948 --- [mulino-ontology] [           main] c.s.c.s.u.t.TraceTreeSpanProcessor       : elapsed times (trace f93ba294...):     0.00 →    1.10 =    1.10 ms  CQN SELECT Policies
+2026-10-08T01:45:56.329+09:00  INFO 43948 --- [mulino-ontology] [           main] c.s.c.s.u.t.TraceTreeSpanProcessor       : elapsed times (trace c61d03d1...):     0.00 →    1.12 =    1.12 ms  CQN SELECT Restrictions
+2026-10-08T01:45:56.331+09:00  INFO 43948 --- [mulino-ontology] [           main] c.s.c.s.u.t.TraceTreeSpanProcessor       : elapsed times (trace b96ef7c4...):     0.00 →    1.43 =    1.43 ms  CQN SELECT Idempotency
+2026-10-08T01:45:56.333+09:00  INFO 43948 --- [mulino-ontology] [           main] c.s.c.s.u.t.TraceTreeSpanProcessor       : elapsed times (trace d15643ba...):     0.00 →    1.19 =    1.19 ms  CQN UPDATE Scopes
+2026-10-08T01:45:56.336+09:00  INFO 43948 --- [mulino-ontology] [           main] c.s.c.s.u.t.TraceTreeSpanProcessor       : elapsed times (trace b05887fe...):     0.00 →    1.76 =    1.76 ms  CQN INSERT Audit
+2026-10-08T01:45:56.347+09:00  INFO 43948 --- [mulino-ontology] [           main] c.s.c.s.u.t.TraceTreeSpanProcessor       : elapsed times (trace 35464031...):     0.00 →    1.24 =    1.24 ms  CQN SELECT Scopes
+2026-10-08T01:45:56.349+09:00  INFO 43948 --- [mulino-ontology] [           main] c.s.c.s.u.t.TraceTreeSpanProcessor       : elapsed times (trace 07625a5c...):     0.00 →    1.45 =    1.45 ms  CQN SELECT Grants
+2026-10-08T01:45:56.351+09:00  INFO 43948 --- [mulino-ontology] [           main] c.s.c.s.u.t.TraceTreeSpanProcessor       : elapsed times (trace f9893655...):     0.00 →    0.94 =    0.94 ms  CQN SELECT Policies
+2026-10-08T01:45:56.352+09:00  INFO 43948 --- [mulino-ontology] [           main] c.s.c.s.u.t.TraceTreeSpanProcessor       : elapsed times (trace d5edf58e...):     0.00 →    0.96 =    0.96 ms  CQN SELECT Restrictions
+2026-10-08T01:45:56.354+09:00  INFO 43948 --- [mulino-ontology] [           main] c.s.c.s.u.t.TraceTreeSpanProcessor       : elapsed times (trace 7c2b0c32...):     0.00 →    1.02 =    1.02 ms  CQN SELECT Idempotency
+2026-10-08T01:45:56.355+09:00  INFO 43948 --- [mulino-ontology] [           main] c.s.c.s.u.t.TraceTreeSpanProcessor       : elapsed times (trace bb597c85...):     0.00 →    1.08 =    1.08 ms  CQN UPDATE Scopes
+2026-10-08T01:45:56.357+09:00  INFO 43948 --- [mulino-ontology] [           main] c.s.c.s.u.t.TraceTreeSpanProcessor       : elapsed times (trace 306fc22a...):     0.00 →    0.83 =    0.83 ms  CQN INSERT Audit
+2026-10-08T01:45:56.358+09:00  INFO 43948 --- [mulino-ontology] [           main] c.s.c.s.u.t.TraceTreeSpanProcessor       : elapsed times (trace db8e9275...):     0.00 →    0.65 =    0.65 ms  CQN INSERT Outbox
+2026-10-08T01:45:56.360+09:00  INFO 43948 --- [mulino-ontology] [           main] c.s.c.s.u.t.TraceTreeSpanProcessor       : elapsed times (trace 24380631...):     0.00 →    0.70 =    0.70 ms  CQN INSERT Idempotency
+2026-10-08T01:45:56.587+09:00  INFO 43948 --- [mulino-ontology] [pool-8-thread-1] c.s.c.s.u.t.TraceTreeSpanProcessor       : elapsed times (trace a68f664d...):     0.00 →    1.63 =    1.63 ms  CQN SELECT Scopes
+2026-10-08T01:45:56.589+09:00  INFO 43948 --- [mulino-ontology] [pool-8-thread-1] c.s.c.s.u.t.TraceTreeSpanProcessor       : elapsed times (trace d718b920...):     0.00 →    1.68 =    1.68 ms  CQN SELECT Grants
+2026-10-08T01:45:56.590+09:00  INFO 43948 --- [mulino-ontology] [pool-8-thread-1] c.s.c.s.u.t.TraceTreeSpanProcessor       : elapsed times (trace 49f900b1...):     0.00 →    0.80 =    0.80 ms  CQN SELECT Policies
+[ERROR] Tests run: 11, Failures: 1, Errors: 0, Skipped: 0, Time elapsed: 6.847 s <<< FAILURE! -- in com.mulino.PlatformIntegrationTest
+[ERROR] com.mulino.PlatformIntegrationTest.scopeLockTimeoutReturnsStructuredConflictWithoutEffects -- Time elapsed: 2.034 s <<< FAILURE!
+org.opentest4j.AssertionFailedError: Unexpected type, expected: <com.mulino.application.PlatformCommands.Conflict> but was: <org.springframework.jdbc.UncategorizedSQLException>
+	at org.junit.jupiter.api.AssertionFailureBuilder.build(AssertionFailureBuilder.java:158)
+	at org.junit.jupiter.api.AssertionFailureBuilder.buildAndThrow(AssertionFailureBuilder.java:139)
+	at org.junit.jupiter.api.AssertInstanceOf.assertInstanceOf(AssertInstanceOf.java:58)
+	at org.junit.jupiter.api.AssertInstanceOf.assertInstanceOf(AssertInstanceOf.java:35)
+	at org.junit.jupiter.api.Assertions.assertInstanceOf(Assertions.java:3688)
+	at com.mulino.PlatformIntegrationTest.scopeLockTimeoutReturnsStructuredConflictWithoutEffects(PlatformIntegrationTest.java:329)
+
+[INFO]
+[INFO] Results:
+[INFO]
+[ERROR] Failures:
+[ERROR]   PlatformIntegrationTest.scopeLockTimeoutReturnsStructuredConflictWithoutEffects:329 Unexpected type, expected: <com.mulino.application.PlatformCommands.Conflict> but was: <org.springframework.jdbc.UncategorizedSQLException>
+[INFO]
+[ERROR] Tests run: 11, Failures: 1, Errors: 0, Skipped: 0
+[INFO]
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD FAILURE
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  10.059 s
+[INFO] Finished at: 2026-10-08T01:45:56+09:00
+[INFO] ------------------------------------------------------------------------
+[ERROR] Failed to execute goal org.apache.maven.plugins:maven-surefire-plugin:3.5.6:test (default-test) on project ontology: There are test failures.
+[ERROR]
+[ERROR] See /Volumes/VideoStore/Developer/mulino-ontology-step3-s0-platform/backend/target/surefire-reports for the individual test results.
+[ERROR] See dump files (if any exist) [date].dump, [date]-jvmRun[N].dump and [date].dumpstream.
+[ERROR] -> [Help 1]
+[ERROR]
+[ERROR] To see the full stack trace of the errors, re-run Maven with the -e switch.
+[ERROR] Re-run Maven using the -X switch to enable full debug logging.
+[ERROR]
+[ERROR] For more information about the errors and possible solutions, please read the following articles:
+[ERROR] [Help 1] http://cwiki.apache.org/confluence/display/MAVEN/MojoFailureException

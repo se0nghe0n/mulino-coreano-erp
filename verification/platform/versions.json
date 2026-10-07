@@ -1,0 +1,113 @@
+{
+  "schemaVersion": "1.0.0",
+  "scope": "S0 isolated technical vertical slice; not full ontology domain acceptance",
+  "baseline": "4280a750dca0aef35abaf10b6797881181dd88d7",
+  "implementationCommit": "83101200cb8cc317a5ae47b49109edc23eb54ef8",
+  "recordedAt": "2026-10-07T16:51:05.926045+00:00",
+  "decision": "CAP_LOCAL_ACCEPTED_PENDING_INTEGRATED_RECHECK",
+  "stack": {
+    "java": "Zulu OpenJDK 21.0.5+11",
+    "maven": "3.9.16",
+    "mavenWrapper": "3.3.4 only-script",
+    "capJava": "5.1.1",
+    "springBoot": "4.1.1",
+    "springFramework": "7.0.9",
+    "springSecurity": "7.1.1",
+    "postgresql": "18.6",
+    "jdbc": "42.7.13",
+    "flyway": "12.4.0",
+    "node": "24.19.0",
+    "cdsRuntime": "10.1.1",
+    "cdsDk": "10.1.0",
+    "cdsCompiler": "7.1.1",
+    "cdsPg": "3.1.1",
+    "junit": "6.0.3",
+    "testcontainers": "2.0.5",
+    "surefire": "3.5.6",
+    "docker": "29.4.0",
+    "mcpProtocol": "2026-07-28",
+    "mcpSdk": null,
+    "mcpProbeClient": "mulino-s0-wire-probe 1.0.0 Python stdlib",
+    "buildpack": null,
+    "btpRuntime": null,
+    "domainSchema": null,
+    "spikeSchema": "ontology-platform-v2",
+    "definitionEvaluator": "NOT_IMPLEMENTED_S0",
+    "npm": "11.19.1"
+  },
+  "postgresImage": {
+    "reference": "postgres@sha256:4ef4dbc939d61acea57712655ddb4b4ab27419c913f94cca0cd57cb3ea3c2280",
+    "imageId": "sha256:47fcd92135b73f3b3ba0761ef77c305c4263093b999559505afec11a7ed8cbdc",
+    "architecture": "arm64",
+    "os": "linux",
+    "priorResearchDigest": "fc973eb97c9fd04bfa1840e0f510719a584ccb3be8debfe6a4144637a9dfe8cf",
+    "note": "Runtime uses actual pulled digest; earlier research tag manifest is not substituted for runtime evidence."
+  },
+  "hashes": {
+    "backend/pom.xml": "6d58780a1298a42ebf3ddf24bea9ca928f368f5c6281278d3df37c825c4d7d29",
+    "backend/package-lock.json": "00eb2647e2478c4f8c8f6bc036fd7c80937674b1c941cd1a843267a23dd90b45",
+    "backend/db/schema.cds": "54495b27f2f5f0b3ed3f8bec66ecb9d32fabc68d8b4026a49ce33fbfaf2183e8",
+    "backend/srv/platform.cds": "fe90f8084f3b9913af9c8f19fc078524cd6f047e00795a352fa776b9dc7c54ce",
+    "database/migrations/V1__platform.sql": "df0a6a0060910b286a3656fff132a2fd4c74ece44fc5c5afb5dba557a966f646",
+    "database/migrations/V2__preserved_upgrade.sql": "4d667eb07f88990b0df776005725f8ec5bb51eb8ab5bea01d652282e5d125668",
+    "verification/platform/spike/expected-v2.sql": "5dba02b01a6afda44611fea983888e96a6857b44d10b407b975496123fb419b6",
+    "deploy/local/platform-fixture.sql": "e455b32d3b3ee3f8b4f1166637501562ed842028f48b9aa7e8d81846e34291f0"
+  },
+  "workerBuild": {
+    "jarSha256": "c8e5766a46500501e4be241d2e4201552c6cbb62d971b8210d84b08a2e5e0d93",
+    "note": "11-test worker build; loopback YAML added afterward. Final root runner recompiles and binds fresh security/protocol evidence to executed JAR and source input hashes."
+  },
+  "customSchemaDifferences": [
+    "scope_quantity CHECK",
+    "grant_scope_fk",
+    "policy_scope_fk",
+    "restriction_scope_fk",
+    "idem_owner_key UNIQUE",
+    "ontology-v2 upgradeMarker NOT NULL/default"
+  ],
+  "verification": {
+    "integration": {
+      "status": "PASS",
+      "tests": 11,
+      "artifact": "verification/platform/spike/integration.log"
+    },
+    "security": {
+      "status": "PASS",
+      "assertions": 23,
+      "artifact": "verification/platform/security/http-evidence.json",
+      "workerWireJarParity": "NOT_RECORDED; final integrated run required"
+    },
+    "protocol": {
+      "status": "PASS",
+      "assertions": 118,
+      "httpRequests": 29,
+      "artifact": "verification/platform/protocol/wire-evidence.json",
+      "workerWireJarParity": "NOT_RECORDED; final integrated run required"
+    },
+    "officialSources": {
+      "status": "VERIFIED_CURRENT_CURL",
+      "sources": [
+        {
+          "url": "https://cap.cloud.sap/docs/java/cqn-services/persistence-services",
+          "sha256": "2f132b246b357eab65fec82ae4fa9e9cdcea68e32e5d6334b61edc171ce78d17"
+        },
+        {
+          "url": "https://cap.cloud.sap/docs/java/security",
+          "sha256": "ae633066ac9d64394801bc513e4fcd91c3dcc8fe9c1e02ea822428652917799c"
+        },
+        {
+          "url": "https://cap.cloud.sap/docs/guides/databases/postgres",
+          "sha256": "2a9b3b69259f18d3217421e3cd991cfb2a67a5b6c4c4c52aec28e4de446aebc9"
+        }
+      ]
+    },
+    "operationalIdentity": "BLOCKED_NOT_IMPLEMENTED",
+    "btpBindingTls": "NOT_RUN",
+    "modelClientSkillAcceptance": "NOT_RUN",
+    "fullV1V8DomainOracles": "NOT_RUN",
+    "cleanBootstrap": {
+      "status": "FAIL_FIXED_PENDING_INTEGRATED_RECHECK",
+      "failure": "First root run lacked npm ci; npx could not find cds. Runner now requires npm11.19.1 and bootstraps exact package-lock under Node24.19.0."
+    }
+  }
+}

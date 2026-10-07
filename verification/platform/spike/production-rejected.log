@@ -1,0 +1,86 @@
+   _________    ____         __
+  / ____/   |  / __ \       / /___ __   ______ _
+ / /   / /| | / /_/ /  __  / / __ `/ | / / __ `/
+/ /___/ ___ |/ ____/  / /_/ / /_/ /| |/ / /_/ /
+\____/_/  |_/_/       \____/\__,_/ |___/\__,_/      5.1.1
+
+Powered by Spring Boot 4.1.1
+
+2026-10-08T01:42:44.904+09:00  INFO 42571 --- [mulino-ontology] [           main] com.mulino.OntologyApplication           : Starting OntologyApplication v0.1.0-SNAPSHOT using Java 21.0.5 with PID 42571 (/Volumes/VideoStore/Developer/mulino-ontology-step3-s0-platform/backend/target/ontology-0.1.0-SNAPSHOT.jar started by n30gu1 in /Volumes/VideoStore/Developer/mulino-ontology-step3-s0-platform)
+2026-10-08T01:42:44.906+09:00  INFO 42571 --- [mulino-ontology] [           main] com.mulino.OntologyApplication           : The following 1 profile is active: "production"
+2026-10-08T01:42:45.279+09:00  INFO 42571 --- [mulino-ontology] [           main] c.s.c.s.u.t.DevTelemetryConfiguration    : Dev telemetry output enabled
+2026-10-08T01:42:45.412+09:00  INFO 42571 --- [mulino-ontology] [           main] c.s.c.services.impl.utils.CdsModelUtils  : Loaded CDS model from CSN resource path 'edmx/csn.json'
+2026-10-08T01:42:45.421+09:00  INFO 42571 --- [mulino-ontology] [           main] c.s.c.services.impl.ServiceCatalogImpl   : Registered service OutboxService$InMemory
+2026-10-08T01:42:45.423+09:00  INFO 42571 --- [mulino-ontology] [           main] c.s.c.services.impl.ServiceCatalogImpl   : Registered service ApplicationLifecycleService$Default
+2026-10-08T01:42:45.423+09:00  INFO 42571 --- [mulino-ontology] [           main] c.s.c.services.impl.ServiceCatalogImpl   : Registered service AuthorizationService$Default
+2026-10-08T01:42:45.424+09:00  INFO 42571 --- [mulino-ontology] [           main] c.s.c.services.impl.ServiceCatalogImpl   : Registered service TenantProviderService$Default
+2026-10-08T01:42:45.425+09:00  INFO 42571 --- [mulino-ontology] [           main] c.s.c.services.impl.ServiceCatalogImpl   : Registered service DeploymentService$Default
+2026-10-08T01:42:45.428+09:00  INFO 42571 --- [mulino-ontology] [           main] c.s.c.services.impl.ServiceCatalogImpl   : Registered service AuditLogService$Default
+2026-10-08T01:42:45.436+09:00  INFO 42571 --- [mulino-ontology] [           main] c.s.c.services.impl.ServiceCatalogImpl   : Registered service PlatformService
+2026-10-08T01:42:45.436+09:00  INFO 42571 --- [mulino-ontology] [           main] .s.c.r.CdsRuntimeBeanDefinitionRegistrar : Found 'spring.datasource.url' configuration: Auto-configuration of DataSource beans is disabled.
+2026-10-08T01:42:45.836+09:00  INFO 42571 --- [mulino-ontology] [           main] o.s.boot.tomcat.TomcatWebServer          : Tomcat initialized with port 0 (http)
+2026-10-08T01:42:45.844+09:00  INFO 42571 --- [mulino-ontology] [           main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2026-10-08T01:42:45.844+09:00  INFO 42571 --- [mulino-ontology] [           main] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/11.0.24]
+2026-10-08T01:42:45.857+09:00  INFO 42571 --- [mulino-ontology] [           main] b.w.c.s.WebApplicationContextInitializer : Root WebApplicationContext: initialization completed in 919 ms
+2026-10-08T01:42:46.036+09:00  INFO 42571 --- [mulino-ontology] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2026-10-08T01:42:46.161+09:00  INFO 42571 --- [mulino-ontology] [           main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@faec277
+2026-10-08T01:42:46.162+09:00  INFO 42571 --- [mulino-ontology] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2026-10-08T01:42:46.174+09:00  INFO 42571 --- [mulino-ontology] [           main] org.flywaydb.core.FlywayExecutor         : Database: jdbc:postgresql://127.0.0.1:32768/ontology (PostgreSQL 18.6)
+2026-10-08T01:42:46.217+09:00  INFO 42571 --- [mulino-ontology] [           main] o.f.core.internal.command.DbValidate     : Successfully validated 2 migrations (execution time 00:00.016s)
+2026-10-08T01:42:46.255+09:00  INFO 42571 --- [mulino-ontology] [           main] o.f.core.internal.command.DbMigrate      : Current version of schema "public": 2
+2026-10-08T01:42:46.257+09:00  INFO 42571 --- [mulino-ontology] [           main] o.f.core.internal.command.DbMigrate      : Schema "public" is up to date. No migration necessary.
+2026-10-08T01:42:46.280+09:00  INFO 42571 --- [mulino-ontology] [           main] c.s.c.services.impl.ServiceCatalogImpl   : Registered service PersistenceService$Default
+2026-10-08T01:42:46.310+09:00  WARN 42571 --- [mulino-ontology] [           main] ConfigServletWebServerApplicationContext : Exception encountered during context initialization - cancelling refresh attempt: org.springframework.beans.factory.BeanCreationException: Error creating bean with name 'jwtDecoder' defined in class path resource [com/mulino/domain/identity/SecurityConfiguration.class]: Failed to instantiate [org.springframework.security.oauth2.jwt.JwtDecoder]: Factory method 'jwtDecoder' threw exception with message: Operational identity binding is required
+2026-10-08T01:42:46.310+09:00  INFO 42571 --- [mulino-ontology] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown initiated...
+2026-10-08T01:42:46.338+09:00  INFO 42571 --- [mulino-ontology] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown completed.
+2026-10-08T01:42:46.340+09:00  INFO 42571 --- [mulino-ontology] [           main] o.apache.catalina.core.StandardService   : Stopping service [Tomcat]
+2026-10-08T01:42:46.348+09:00  INFO 42571 --- [mulino-ontology] [           main] .s.b.a.l.ConditionEvaluationReportLogger :
+
+Error starting ApplicationContext. To display the condition evaluation report re-run your application with 'debug' enabled.
+2026-10-08T01:42:46.357+09:00 ERROR 42571 --- [mulino-ontology] [           main] o.s.boot.SpringApplication               : Application run failed
+
+org.springframework.beans.factory.BeanCreationException: Error creating bean with name 'jwtDecoder' defined in class path resource [com/mulino/domain/identity/SecurityConfiguration.class]: Failed to instantiate [org.springframework.security.oauth2.jwt.JwtDecoder]: Factory method 'jwtDecoder' threw exception with message: Operational identity binding is required
+	at org.springframework.beans.factory.support.ConstructorResolver.instantiate(ConstructorResolver.java:657) ~[spring-beans-7.0.9.jar!/:7.0.9]
+	at org.springframework.beans.factory.support.ConstructorResolver.instantiateUsingFactoryMethod(ConstructorResolver.java:645) ~[spring-beans-7.0.9.jar!/:7.0.9]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.instantiateUsingFactoryMethod(AbstractAutowireCapableBeanFactory.java:1360) ~[spring-beans-7.0.9.jar!/:7.0.9]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBeanInstance(AbstractAutowireCapableBeanFactory.java:1192) ~[spring-beans-7.0.9.jar!/:7.0.9]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.doCreateBean(AbstractAutowireCapableBeanFactory.java:565) ~[spring-beans-7.0.9.jar!/:7.0.9]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBean(AbstractAutowireCapableBeanFactory.java:525) ~[spring-beans-7.0.9.jar!/:7.0.9]
+	at org.springframework.beans.factory.support.AbstractBeanFactory.lambda$doGetBean$0(AbstractBeanFactory.java:333) ~[spring-beans-7.0.9.jar!/:7.0.9]
+	at org.springframework.beans.factory.support.DefaultSingletonBeanRegistry.getSingleton(DefaultSingletonBeanRegistry.java:371) ~[spring-beans-7.0.9.jar!/:7.0.9]
+	at org.springframework.beans.factory.support.AbstractBeanFactory.doGetBean(AbstractBeanFactory.java:331) ~[spring-beans-7.0.9.jar!/:7.0.9]
+	at org.springframework.beans.factory.support.AbstractBeanFactory.getBean(AbstractBeanFactory.java:196) ~[spring-beans-7.0.9.jar!/:7.0.9]
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.instantiateSingleton(DefaultListableBeanFactory.java:1225) ~[spring-beans-7.0.9.jar!/:7.0.9]
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.preInstantiateSingleton(DefaultListableBeanFactory.java:1191) ~[spring-beans-7.0.9.jar!/:7.0.9]
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.preInstantiateSingletons(DefaultListableBeanFactory.java:1121) ~[spring-beans-7.0.9.jar!/:7.0.9]
+	at org.springframework.context.support.AbstractApplicationContext.finishBeanFactoryInitialization(AbstractApplicationContext.java:994) ~[spring-context-7.0.9.jar!/:7.0.9]
+	at org.springframework.context.support.AbstractApplicationContext.refresh(AbstractApplicationContext.java:621) ~[spring-context-7.0.9.jar!/:7.0.9]
+	at org.springframework.boot.web.server.servlet.context.ServletWebServerApplicationContext.refresh(ServletWebServerApplicationContext.java:143) ~[spring-boot-web-server-4.1.1.jar!/:4.1.1]
+	at org.springframework.boot.SpringApplication.refresh(SpringApplication.java:756) ~[spring-boot-4.1.1.jar!/:4.1.1]
+	at org.springframework.boot.SpringApplication.refreshContext(SpringApplication.java:445) ~[spring-boot-4.1.1.jar!/:4.1.1]
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:321) ~[spring-boot-4.1.1.jar!/:4.1.1]
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1365) ~[spring-boot-4.1.1.jar!/:4.1.1]
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1354) ~[spring-boot-4.1.1.jar!/:4.1.1]
+	at com.mulino.OntologyApplication.main(OntologyApplication.java:9) ~[!/:0.1.0-SNAPSHOT]
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:103) ~[na:na]
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580) ~[na:na]
+	at org.springframework.boot.loader.launch.Launcher.launch(Launcher.java:106) ~[ontology-0.1.0-SNAPSHOT.jar:0.1.0-SNAPSHOT]
+	at org.springframework.boot.loader.launch.Launcher.launch(Launcher.java:64) ~[ontology-0.1.0-SNAPSHOT.jar:0.1.0-SNAPSHOT]
+	at org.springframework.boot.loader.launch.JarLauncher.main(JarLauncher.java:40) ~[ontology-0.1.0-SNAPSHOT.jar:0.1.0-SNAPSHOT]
+Caused by: org.springframework.beans.BeanInstantiationException: Failed to instantiate [org.springframework.security.oauth2.jwt.JwtDecoder]: Factory method 'jwtDecoder' threw exception with message: Operational identity binding is required
+	at org.springframework.beans.factory.support.SimpleInstantiationStrategy.lambda$instantiate$0(SimpleInstantiationStrategy.java:183) ~[spring-beans-7.0.9.jar!/:7.0.9]
+	at org.springframework.beans.factory.support.SimpleInstantiationStrategy.instantiateWithFactoryMethod(SimpleInstantiationStrategy.java:72) ~[spring-beans-7.0.9.jar!/:7.0.9]
+	at org.springframework.beans.factory.support.SimpleInstantiationStrategy.instantiate(SimpleInstantiationStrategy.java:152) ~[spring-beans-7.0.9.jar!/:7.0.9]
+	at org.springframework.beans.factory.support.ConstructorResolver.instantiate(ConstructorResolver.java:653) ~[spring-beans-7.0.9.jar!/:7.0.9]
+	... 26 common frames omitted
+Caused by: java.lang.IllegalStateException: Operational identity binding is required
+	at com.mulino.domain.identity.SecurityConfiguration.jwtDecoder(SecurityConfiguration.java:21) ~[!/:0.1.0-SNAPSHOT]
+	at com.mulino.domain.identity.SecurityConfiguration$$SpringCGLIB$$0.CGLIB$jwtDecoder$0(<generated>) ~[!/:0.1.0-SNAPSHOT]
+	at com.mulino.domain.identity.SecurityConfiguration$$SpringCGLIB$$FastClass$$1.invoke(<generated>) ~[!/:0.1.0-SNAPSHOT]
+	at org.springframework.cglib.proxy.MethodProxy.invokeSuper(MethodProxy.java:258) ~[spring-core-7.0.9.jar!/:7.0.9]
+	at org.springframework.context.annotation.ConfigurationClassEnhancer$BeanMethodInterceptor.intercept(ConfigurationClassEnhancer.java:398) ~[spring-context-7.0.9.jar!/:7.0.9]
+	at com.mulino.domain.identity.SecurityConfiguration$$SpringCGLIB$$0.jwtDecoder(<generated>) ~[!/:0.1.0-SNAPSHOT]
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:103) ~[na:na]
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580) ~[na:na]
+	at org.springframework.beans.factory.support.SimpleInstantiationStrategy.lambda$instantiate$0(SimpleInstantiationStrategy.java:155) ~[spring-beans-7.0.9.jar!/:7.0.9]
+	... 29 common frames omitted
