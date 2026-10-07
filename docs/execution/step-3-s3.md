@@ -21,6 +21,7 @@ branch는 `step3/s3-<suffix>`다. 기존 ERP 코드·tests를 재사용하지 �
 | regulatory | domain/trade/regulatory·application/trade/regulatory, regulatory.cds·regulatory-model.cds·V18, 작성/제출/기관 결정/표시 확인과 version·부분 범위, T15 |
 | receipt | domain/trade/receipt·application/trade/receipt 및 새 ReceiptStockPrimitives, receipt.cds·receipt-model.cds·V19, provisional/실수령/운송 물량 이동/PO 기여, 중복·60+40·초과·V6 |
 | quality | domain/inventory의 새 Quality 계열·application/quality, inventory.cds의 제한/처분 확장·quality.cds·quality-model.cds·V20, hold/release/disposition/현재 적격량·무이벤트 만료 sweeper, T16·C1 |
+| remedy | 새 TradeResidualRemedy와 최소 responsibility hook, 실제 후속 수령에 따른 부족 책임 잔여량 대조·부분 해소·이력 보존 |
 | adapter | verification/actual/s3·S3 고유 harness·실제 transport/fixture/SQL 확장·verify entrypoint, 공개 API와 독립 DB를 통한 S3 인수 |
 
 각 worker의 고유 tests와 `docs/execution/s3-<suffix>`도 해당 worker가
