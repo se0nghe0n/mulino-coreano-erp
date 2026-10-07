@@ -7,6 +7,7 @@ CREATE TABLE mulino_commands_CommandRecords (
  state VARCHAR(30) NOT NULL CHECK(state IN ('IN_PROGRESS','COMMITTED','REJECTED','UNKNOWN_EXTERNAL')),
  resultJson TEXT, createdAt TIMESTAMPTZ NOT NULL, completedAt TIMESTAMPTZ,
  UNIQUE(organizationId,stableRequestOwner,capabilityId,commandIdempotencyKey),
+ UNIQUE(organizationId,ID),
  FOREIGN KEY(organizationId) REFERENCES mulino_identity_Organizations(ID),
  FOREIGN KEY(organizationId,actorId) REFERENCES mulino_identity_Actors(organizationId,ID)
 );
@@ -16,7 +17,7 @@ CREATE TABLE mulino_commands_CommandAudits (
  canonicalHash VARCHAR(64) NOT NULL, outcome VARCHAR(40) NOT NULL,
  effectRefs TEXT NOT NULL, auditFactsJson TEXT NOT NULL, createdAt TIMESTAMPTZ NOT NULL,
  FOREIGN KEY(organizationId,actorId) REFERENCES mulino_identity_Actors(organizationId,ID),
- FOREIGN KEY(commandId) REFERENCES mulino_commands_CommandRecords(ID)
+ FOREIGN KEY(organizationId,commandId) REFERENCES mulino_commands_CommandRecords(organizationId,ID)
 );
 CREATE FUNCTION mulino_commands_immutable_audit() RETURNS trigger LANGUAGE plpgsql AS $$
 BEGIN RAISE EXCEPTION 'Command audit is immutable'; END $$;
@@ -36,9 +37,19 @@ CREATE TABLE mulino_commands_ApprovalConsumptions (
  ID VARCHAR(36) PRIMARY KEY,organizationId VARCHAR(36) NOT NULL,approvalId VARCHAR(36) NOT NULL,commandId VARCHAR(36) NOT NULL,
  consumedAt TIMESTAMPTZ NOT NULL,UNIQUE(organizationId,approvalId),
  FOREIGN KEY(organizationId,approvalId) REFERENCES mulino_commands_Approvals(organizationId,ID),
- FOREIGN KEY(commandId) REFERENCES mulino_commands_CommandRecords(ID)
+ FOREIGN KEY(organizationId,commandId) REFERENCES mulino_commands_CommandRecords(organizationId,ID)
 );
 CREATE TRIGGER approvals_immutable BEFORE UPDATE OR DELETE ON mulino_commands_Approvals
  FOR EACH ROW EXECUTE FUNCTION mulino_commands_immutable_audit();
 CREATE TRIGGER approval_consumptions_immutable BEFORE UPDATE OR DELETE ON mulino_commands_ApprovalConsumptions
  FOR EACH ROW EXECUTE FUNCTION mulino_commands_immutable_audit();
+
+CREATE FUNCTION mulino_commands_terminal_record() RETURNS trigger LANGUAGE plpgsql AS $$
+BEGIN
+ IF OLD.state IN ('COMMITTED','REJECTED') THEN
+  RAISE EXCEPTION 'Terminal command records are immutable';
+ END IF;
+ RETURN NEW;
+END $$;
+CREATE TRIGGER command_records_terminal_immutable BEFORE UPDATE OR DELETE ON mulino_commands_CommandRecords
+ FOR EACH ROW EXECUTE FUNCTION mulino_commands_terminal_record();
