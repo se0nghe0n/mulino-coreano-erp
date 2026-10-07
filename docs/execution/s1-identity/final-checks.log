@@ -1,0 +1,187 @@
+[INFO] Scanning for projects...
+[INFO] 
+[INFO] ------------------------< com.mulino:ontology >-------------------------
+[INFO] Building ontology 0.1.0-SNAPSHOT
+[INFO]   from pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] --- cds:5.1.1:cds (cds) @ ontology ---
+[INFO] CdsMojo: Identified /Volumes/VideoStore/Developer/mulino-ontology-step3-s1-identity/backend as reactor base directory.
+[INFO] CdsMojo: Using directory containing a package.json as working directory: /Volumes/VideoStore/Developer/mulino-ontology-step3-s1-identity/backend
+[INFO] CdsMojo: Using globally installed npx
+[INFO] CdsMojo: Executing [npx, -c, cds version --json] in working directory /Volumes/VideoStore/Developer/mulino-ontology-step3-s1-identity/backend
+[INFO] CdsMojo: Using configured working directory: /Volumes/VideoStore/Developer/mulino-ontology-step3-s1-identity/backend
+[INFO] CdsMojo: Executing [npx, -c, cds compile srv --to csn --dest src/main/resources/edmx] in working directory /Volumes/VideoStore/Developer/mulino-ontology-step3-s1-identity/backend
+[INFO] CdsMojo: /Volumes/VideoStore/Developer/mulino-ontology-step3-s1-identity/backend/src/main/resources/edmx/srv.csn
+[INFO] CdsMojo: Executing [npx, -c, cds compile srv --to edmx --dest src/main/resources/edmx] in working directory /Volumes/VideoStore/Developer/mulino-ontology-step3-s1-identity/backend
+[INFO] CdsMojo: /Volumes/VideoStore/Developer/mulino-ontology-step3-s1-identity/backend/src/main/resources/edmx/PlatformService.xml
+[INFO] 
+[INFO] --- antrun:3.2.0:run (default) @ ontology ---
+[INFO] Executing tasks
+[INFO]      [copy] Copying 1 file to /Volumes/VideoStore/Developer/mulino-ontology-step3-s1-identity/backend/src/main/resources/edmx
+[INFO] Executed tasks
+[INFO] 
+[INFO] --- resources:3.5.0:resources (default-resources) @ ontology ---
+[INFO] Copying 4 resources from src/main/resources to target/classes
+[INFO] Copying 3 resources from ../database/migrations to target/classes/db/migration
+[INFO] 
+[INFO] --- compiler:3.15.0:compile (default-compile) @ ontology ---
+[INFO] Recompiling the module because of changed source code.
+[INFO] Compiling 24 source files with javac [debug parameters release 21] to target/classes
+[INFO] /Volumes/VideoStore/Developer/mulino-ontology-step3-s1-identity/backend/src/main/java/com/mulino/application/PlatformCommands.java: Some input files use unchecked or unsafe operations.
+[INFO] /Volumes/VideoStore/Developer/mulino-ontology-step3-s1-identity/backend/src/main/java/com/mulino/application/PlatformCommands.java: Recompile with -Xlint:unchecked for details.
+[INFO] 
+[INFO] --- resources:3.5.0:testResources (default-testResources) @ ontology ---
+[INFO] skip non existing resourceDirectory /Volumes/VideoStore/Developer/mulino-ontology-step3-s1-identity/backend/src/test/resources
+[INFO] 
+[INFO] --- compiler:3.15.0:testCompile (default-testCompile) @ ontology ---
+[INFO] Recompiling the module because of changed dependency.
+[INFO] Compiling 3 source files with javac [debug parameters release 21] to target/test-classes
+[INFO] 
+[INFO] --- surefire:3.5.6:test (default-test) @ ontology ---
+[INFO] Using auto detected provider org.apache.maven.surefire.junitplatform.JUnitPlatformProvider
+[INFO] 
+[INFO] -------------------------------------------------------
+[INFO]  T E S T S
+[INFO] -------------------------------------------------------
+[INFO] Running com.mulino.application.identity.IdentityAuthorizationTest
+Mockito is currently self-attaching to enable the inline-mock-maker. This will no longer work in future releases of the JDK. Please add Mockito as an agent to your build as described in Mockito's documentation: https://javadoc.io/doc/org.mockito/mockito-core/latest/org.mockito/org/mockito/Mockito.html#0.3
+WARNING: A Java agent has been loaded dynamically (/Users/n30gu1/.m2/repository/net/bytebuddy/byte-buddy-agent/1.18.11/byte-buddy-agent-1.18.11.jar)
+WARNING: If a serviceability tool is in use, please run with -XX:+EnableDynamicAgentLoading to hide this warning
+WARNING: If a serviceability tool is not in use, please run with -Djdk.instrument.traceUsage for more information
+WARNING: Dynamic loading of agents will be disallowed by default in a future release
+OpenJDK 64-Bit Server VM warning: Sharing is only supported for boot loader classes because bootstrap classpath has been appended
+[INFO] Tests run: 6, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.538 s -- in com.mulino.application.identity.IdentityAuthorizationTest
+[INFO] Running com.mulino.application.identity.IdentityPersistenceTest
+02:13:29.170 [main] INFO org.springframework.test.context.support.AnnotationConfigContextLoaderUtils -- Could not detect default configuration classes for test class [com.mulino.application.identity.IdentityPersistenceTest]: IdentityPersistenceTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+02:13:29.237 [main] INFO org.springframework.boot.test.context.SpringBootTestContextBootstrapper -- Found @SpringBootConfiguration com.mulino.OntologyApplication for test class com.mulino.application.identity.IdentityPersistenceTest
+02:13:29.289 [main] INFO org.springframework.test.context.support.AnnotationConfigContextLoaderUtils -- Could not detect default configuration classes for test class [com.mulino.application.identity.IdentityPersistenceTest]: IdentityPersistenceTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+02:13:29.290 [main] INFO org.springframework.boot.test.context.SpringBootTestContextBootstrapper -- Found @SpringBootConfiguration com.mulino.OntologyApplication for test class com.mulino.application.identity.IdentityPersistenceTest
+02:13:29.318 [main] INFO org.testcontainers.images.PullPolicy -- Image pull policy will be performed by: DefaultPullPolicy()
+02:13:29.320 [main] INFO org.testcontainers.utility.ImageNameSubstitutor -- Image name substitution will be performed by: DefaultImageNameSubstitutor (composite of 'ConfigurationFileImageNameSubstitutor' and 'PrefixingImageNameSubstitutor')
+02:13:29.323 [main] INFO org.testcontainers.DockerClientFactory -- Testcontainers version: 2.0.5
+02:13:29.444 [main] INFO org.testcontainers.dockerclient.DockerClientProviderStrategy -- Loaded org.testcontainers.dockerclient.UnixSocketClientProviderStrategy from ~/.testcontainers.properties, will try it first
+02:13:29.669 [main] INFO org.testcontainers.dockerclient.DockerClientProviderStrategy -- Found Docker environment with local Unix socket (unix:///var/run/docker.sock)
+02:13:29.670 [main] INFO org.testcontainers.DockerClientFactory -- Docker host IP address is localhost
+02:13:29.693 [main] INFO org.testcontainers.DockerClientFactory -- Connected to docker: 
+  Server Version: 29.4.0
+  API Version: 1.54
+  Operating System: OrbStack
+  Total Memory: 8004 MB
+02:13:29.704 [main] INFO tc.testcontainers/ryuk:0.14.0 -- Creating container for image: testcontainers/ryuk:0.14.0
+02:13:29.737 [main] INFO org.testcontainers.utility.RegistryAuthLocator -- Credential helper/store (docker-credential-osxkeychain) does not have credentials for https://index.docker.io/v1/
+02:13:29.810 [main] INFO tc.testcontainers/ryuk:0.14.0 -- Container testcontainers/ryuk:0.14.0 is starting: 44842f89ceeaebbc871ecb3fb028efe471ad9b3c32818069fa3b9bfb4d475ae1
+02:13:29.978 [main] INFO tc.testcontainers/ryuk:0.14.0 -- Container testcontainers/ryuk:0.14.0 started in PT0.273815S
+02:13:29.981 [testcontainers-ryuk] WARN org.testcontainers.utility.RyukResourceReaper -- Can not connect to Ryuk at localhost:32785
+java.net.ConnectException: Connection refused
+	at java.base/sun.nio.ch.Net.pollConnect(Native Method)
+	at java.base/sun.nio.ch.Net.pollConnectNow(Net.java:682)
+	at java.base/sun.nio.ch.NioSocketImpl.timedFinishConnect(NioSocketImpl.java:542)
+	at java.base/sun.nio.ch.NioSocketImpl.connect(NioSocketImpl.java:592)
+	at java.base/java.net.SocksSocketImpl.connect(SocksSocketImpl.java:327)
+	at java.base/java.net.Socket.connect(Socket.java:757)
+	at org.testcontainers.utility.RyukResourceReaper.lambda$maybeStart$0(RyukResourceReaper.java:92)
+	at org.rnorth.ducttape.ratelimits.RateLimiter.doWhenReady(RateLimiter.java:27)
+	at org.testcontainers.utility.RyukResourceReaper.lambda$maybeStart$1(RyukResourceReaper.java:88)
+	at java.base/java.lang.Thread.run(Thread.java:1583)
+02:13:30.253 [main] INFO org.testcontainers.utility.RyukResourceReaper -- Ryuk started - will monitor and terminate Testcontainers containers on JVM exit
+02:13:30.254 [main] INFO org.testcontainers.DockerClientFactory -- Checking the system...
+02:13:30.255 [main] INFO org.testcontainers.DockerClientFactory -- ✔︎ Docker server version should be at least 1.6.0
+02:13:30.262 [main] INFO tc.postgres@sha256:4ef4db... -- Creating container for image: postgres@sha256:4ef4dbc939d61acea57712655ddb4b4ab27419c913f94cca0cd57cb3ea3c2280
+02:13:30.306 [main] INFO tc.postgres@sha256:4ef4db... -- Container postgres@sha256:4ef4dbc939d61acea57712655ddb4b4ab27419c913f94cca0cd57cb3ea3c2280 is starting: 070f1837184a2e0a9f6d4a70d5b7261f3d5c31089c4d121c00da3a225e9594e3
+02:13:31.813 [main] INFO tc.postgres@sha256:4ef4db... -- Container postgres@sha256:4ef4dbc939d61acea57712655ddb4b4ab27419c913f94cca0cd57cb3ea3c2280 started in PT1.550796S
+02:13:31.814 [main] INFO tc.postgres@sha256:4ef4db... -- Container is started (JDBC URL: jdbc:postgresql://localhost:32786/test?loggerLevel=OFF)
+   _________    ____         __
+  / ____/   |  / __ \       / /___ __   ______ _
+ / /   / /| | / /_/ /  __  / / __ `/ | / / __ `/
+/ /___/ ___ |/ ____/  / /_/ / /_/ /| |/ / /_/ /
+\____/_/  |_/_/       \____/\__,_/ |___/\__,_/      5.1.1
+
+Powered by Spring Boot 4.1.1
+
+2026-10-08T02:13:31.981+09:00  WARN 64364 --- [mulino-ontology] [           main] ory$DuplicateJsonObjectContextCustomizer : 
+
+Found multiple occurrences of org.json.JSONObject on the class path:
+
+	jar:file:/Users/n30gu1/.m2/repository/org/json/json/20260719/json-20260719.jar!/org/json/JSONObject.class
+	jar:file:/Users/n30gu1/.m2/repository/com/vaadin/external/google/android-json/0.0.20131108.vaadin1/android-json-0.0.20131108.vaadin1.jar!/org/json/JSONObject.class
+
+You may wish to exclude one of them to ensure predictable runtime behavior
+
+2026-10-08T02:13:31.988+09:00  INFO 64364 --- [mulino-ontology] [           main] c.m.a.identity.IdentityPersistenceTest   : Starting IdentityPersistenceTest using Java 21.0.5 with PID 64364 (started by n30gu1 in /Volumes/VideoStore/Developer/mulino-ontology-step3-s1-identity/backend)
+2026-10-08T02:13:31.989+09:00  INFO 64364 --- [mulino-ontology] [           main] c.m.a.identity.IdentityPersistenceTest   : The following 1 profile is active: "local"
+2026-10-08T02:13:32.264+09:00  INFO 64364 --- [mulino-ontology] [           main] c.s.c.s.u.t.DevTelemetryConfiguration    : Dev telemetry output enabled
+2026-10-08T02:13:32.367+09:00  INFO 64364 --- [mulino-ontology] [           main] c.s.c.services.impl.utils.CdsModelUtils  : Loaded CDS model from CSN resource path 'edmx/csn.json'
+2026-10-08T02:13:32.377+09:00  INFO 64364 --- [mulino-ontology] [           main] c.s.c.services.impl.ServiceCatalogImpl   : Registered service OutboxService$InMemory
+2026-10-08T02:13:32.378+09:00  INFO 64364 --- [mulino-ontology] [           main] c.s.c.services.impl.ServiceCatalogImpl   : Registered service ApplicationLifecycleService$Default
+2026-10-08T02:13:32.379+09:00  INFO 64364 --- [mulino-ontology] [           main] c.s.c.services.impl.ServiceCatalogImpl   : Registered service AuthorizationService$Default
+2026-10-08T02:13:32.380+09:00  INFO 64364 --- [mulino-ontology] [           main] c.s.c.services.impl.ServiceCatalogImpl   : Registered service TenantProviderService$Default
+2026-10-08T02:13:32.381+09:00  INFO 64364 --- [mulino-ontology] [           main] c.s.c.services.impl.ServiceCatalogImpl   : Registered service DeploymentService$Default
+2026-10-08T02:13:32.384+09:00  INFO 64364 --- [mulino-ontology] [           main] c.s.c.services.impl.ServiceCatalogImpl   : Registered service AuditLogService$Default
+2026-10-08T02:13:32.393+09:00  INFO 64364 --- [mulino-ontology] [           main] c.s.c.services.impl.ServiceCatalogImpl   : Registered service PlatformService
+2026-10-08T02:13:32.393+09:00  INFO 64364 --- [mulino-ontology] [           main] .s.c.r.CdsRuntimeBeanDefinitionRegistrar : Found 'spring.datasource.url' configuration: Auto-configuration of DataSource beans is disabled.
+2026-10-08T02:13:32.789+09:00  INFO 64364 --- [mulino-ontology] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2026-10-08T02:13:32.898+09:00  INFO 64364 --- [mulino-ontology] [           main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@7acf07b2
+2026-10-08T02:13:32.899+09:00  INFO 64364 --- [mulino-ontology] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2026-10-08T02:13:32.913+09:00  INFO 64364 --- [mulino-ontology] [           main] org.flywaydb.core.FlywayExecutor         : Database: jdbc:postgresql://localhost:32786/test?loggerLevel=OFF (PostgreSQL 18.6)
+2026-10-08T02:13:32.946+09:00  INFO 64364 --- [mulino-ontology] [           main] o.f.c.i.s.JdbcTableSchemaHistory         : Schema history table "public"."flyway_schema_history" does not exist yet
+2026-10-08T02:13:32.947+09:00  INFO 64364 --- [mulino-ontology] [           main] o.f.core.internal.command.DbValidate     : Successfully validated 3 migrations (execution time 00:00.010s)
+2026-10-08T02:13:32.958+09:00  INFO 64364 --- [mulino-ontology] [           main] o.f.c.i.s.JdbcTableSchemaHistory         : Creating Schema History table "public"."flyway_schema_history" ...
+2026-10-08T02:13:33.013+09:00  INFO 64364 --- [mulino-ontology] [           main] o.f.core.internal.command.DbMigrate      : Current version of schema "public": << Empty Schema >>
+2026-10-08T02:13:33.020+09:00  INFO 64364 --- [mulino-ontology] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "public" to version "1 - platform"
+2026-10-08T02:13:33.042+09:00  INFO 64364 --- [mulino-ontology] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "public" to version "2 - preserved upgrade"
+2026-10-08T02:13:33.051+09:00  INFO 64364 --- [mulino-ontology] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "public" to version "3 - identity"
+2026-10-08T02:13:33.067+09:00  INFO 64364 --- [mulino-ontology] [           main] o.f.core.internal.command.DbMigrate      : Successfully applied 3 migrations to schema "public", now at version v3 (execution time 00:00.027s)
+2026-10-08T02:13:33.090+09:00  INFO 64364 --- [mulino-ontology] [           main] c.s.c.services.impl.ServiceCatalogImpl   : Registered service PersistenceService$Default
+2026-10-08T02:13:33.299+09:00  INFO 64364 --- [mulino-ontology] [           main] c.s.c.f.s.c.adapter.AdapterBeanFactory   : Servlet CdsODataV4Servlet mapped to /odata/v4
+2026-10-08T02:13:33.301+09:00  INFO 64364 --- [mulino-ontology] [           main] c.s.c.f.s.c.adapter.AdapterBeanFactory   : Servlet IndexPageServlet mapped to /
+2026-10-08T02:13:33.302+09:00  INFO 64364 --- [mulino-ontology] [           main] c.s.c.f.s.c.adapter.AdapterBeanFactory   : Servlet CdsFioriPreviewServlet mapped to /$fiori-preview
+2026-10-08T02:13:33.442+09:00  INFO 64364 --- [mulino-ontology] [           main] c.s.c.s.impl.runtime.CdsRuntimeImpl      : Registered handler class com.mulino.adapters.PlatformCap
+2026-10-08T02:13:33.457+09:00  INFO 64364 --- [mulino-ontology] [           main] .s.c.a.o.v.m.p.EdmxProviderConfiguration : Initialized Default EDMX V4 Provider
+2026-10-08T02:13:33.458+09:00  INFO 64364 --- [mulino-ontology] [           main] .s.c.a.o.v.m.p.EdmxProviderConfiguration : Initialized Default EDMX I18n Provider
+2026-10-08T02:13:33.474+09:00  INFO 64364 --- [mulino-ontology] [           main] c.s.c.s.impl.runtime.CdsRuntimeImpl      : Registered provider class com.mulino.domain.identity.CapIdentityProvider for CdsProvider com.sap.cds.services.runtime.UserInfoProvider
+2026-10-08T02:13:33.477+09:00  INFO 64364 --- [mulino-ontology] [           main] c.sap.cds.services.impl.utils.BuildInfo  : git.commit.id: 1f282829429207a6719a6da418f061b6112a51a8
+2026-10-08T02:13:33.477+09:00  INFO 64364 --- [mulino-ontology] [           main] c.sap.cds.services.impl.utils.BuildInfo  : maven.version: 5.1.1
+2026-10-08T02:13:33.491+09:00  WARN 64364 --- [mulino-ontology] [           main] o.s.core.annotation.MergedAnnotation     : Failed to introspect meta-annotation @ConditionalOnMissingBean on public static org.springframework.beans.factory.config.BeanPostProcessor com.sap.cds.framework.spring.config.runtime.SqliteInitializerConfiguration.sqliteDataSourceInitializer(): java.lang.TypeNotPresentException: Type com.sap.cds.feature.mt.lib.runtime.TenantAwareDataSource not present
+2026-10-08T02:13:33.566+09:00  INFO 64364 --- [mulino-ontology] [           main] c.m.a.identity.IdentityPersistenceTest   : Started IdentityPersistenceTest in 1.735 seconds (process running for 5.293)
+2026-10-08T02:13:33.717+09:00  INFO 64364 --- [mulino-ontology] [           main] c.s.c.s.u.t.TraceTreeSpanProcessor       : elapsed times (trace ff6540e7...):     0.00 →   42.72 =   42.72 ms  CQN SELECT Actors
+2026-10-08T02:13:33.745+09:00  INFO 64364 --- [mulino-ontology] [           main] c.s.c.s.u.t.TraceTreeSpanProcessor       : elapsed times (trace 28fd0b60...):     0.00 →    8.05 =    8.05 ms  CQN SELECT ExternalIdentities
+2026-10-08T02:13:33.749+09:00  INFO 64364 --- [mulino-ontology] [           main] c.s.c.s.u.t.TraceTreeSpanProcessor       : elapsed times (trace 0e122ca8...):     0.00 →    2.61 =    2.61 ms  CQN SELECT Actors
+2026-10-08T02:13:33.752+09:00  INFO 64364 --- [mulino-ontology] [           main] c.s.c.s.u.t.TraceTreeSpanProcessor       : elapsed times (trace 7eac450d...):     0.00 →    3.02 =    3.02 ms  CQN SELECT Memberships
+2026-10-08T02:13:33.755+09:00  INFO 64364 --- [mulino-ontology] [           main] c.s.c.s.u.t.TraceTreeSpanProcessor       : elapsed times (trace 45f266cb...):     0.00 →    2.13 =    2.13 ms  CQN SELECT Memberships
+2026-10-08T02:13:33.758+09:00  INFO 64364 --- [mulino-ontology] [           main] c.s.c.s.u.t.TraceTreeSpanProcessor       : elapsed times (trace cdf7dfb3...):     0.00 →    2.04 =    2.04 ms  CQN SELECT CapabilityAssignments
+2026-10-08T02:13:33.760+09:00  INFO 64364 --- [mulino-ontology] [           main] c.s.c.s.u.t.TraceTreeSpanProcessor       : elapsed times (trace 2dc04a11...):     0.00 →    1.70 =    1.70 ms  CQN SELECT GrantActions
+2026-10-08T02:13:33.762+09:00  INFO 64364 --- [mulino-ontology] [           main] c.s.c.s.u.t.TraceTreeSpanProcessor       : elapsed times (trace 9066a261...):     0.00 →    1.43 =    1.43 ms  CQN SELECT GrantScopes
+2026-10-08T02:13:33.764+09:00  INFO 64364 --- [mulino-ontology] [           main] c.s.c.s.u.t.TraceTreeSpanProcessor       : elapsed times (trace d32b4b5e...):     0.00 →    1.48 =    1.48 ms  CQN SELECT Grants
+2026-10-08T02:13:33.765+09:00  INFO 64364 --- [mulino-ontology] [           main] c.s.c.s.u.t.TraceTreeSpanProcessor       : elapsed times (trace f33d4f8e...):     0.00 →    1.27 =    1.27 ms  CQN SELECT Memberships
+2026-10-08T02:13:33.767+09:00  INFO 64364 --- [mulino-ontology] [           main] c.s.c.s.u.t.TraceTreeSpanProcessor       : elapsed times (trace d79ff0d6...):     0.00 →    1.47 =    1.47 ms  CQN SELECT CapabilityAssignments
+2026-10-08T02:13:33.769+09:00  INFO 64364 --- [mulino-ontology] [           main] c.s.c.s.u.t.TraceTreeSpanProcessor       : elapsed times (trace 84d108b1...):     0.00 →    1.25 =    1.25 ms  CQN SELECT GrantActions
+2026-10-08T02:13:33.771+09:00  INFO 64364 --- [mulino-ontology] [           main] c.s.c.s.u.t.TraceTreeSpanProcessor       : elapsed times (trace b27a93f9...):     0.00 →    1.36 =    1.36 ms  CQN SELECT GrantScopes
+2026-10-08T02:13:33.772+09:00  INFO 64364 --- [mulino-ontology] [           main] c.s.c.s.u.t.TraceTreeSpanProcessor       : elapsed times (trace d749ff12...):     0.00 →    1.35 =    1.35 ms  CQN SELECT Grants
+2026-10-08T02:13:33.774+09:00  INFO 64364 --- [mulino-ontology] [           main] c.s.c.s.u.t.TraceTreeSpanProcessor       : elapsed times (trace dff13d2e...):     0.00 →    1.38 =    1.38 ms  CQN SELECT Memberships
+2026-10-08T02:13:33.776+09:00  INFO 64364 --- [mulino-ontology] [           main] c.s.c.s.u.t.TraceTreeSpanProcessor       : elapsed times (trace 6ec5738f...):     0.00 →    1.52 =    1.52 ms  CQN SELECT CapabilityAssignments
+2026-10-08T02:13:33.778+09:00  INFO 64364 --- [mulino-ontology] [           main] c.s.c.s.u.t.TraceTreeSpanProcessor       : elapsed times (trace 10bfcbe9...):     0.00 →    1.30 =    1.30 ms  CQN SELECT GrantActions
+2026-10-08T02:13:33.779+09:00  INFO 64364 --- [mulino-ontology] [           main] c.s.c.s.u.t.TraceTreeSpanProcessor       : elapsed times (trace 017a9466...):     0.00 →    1.09 =    1.09 ms  CQN SELECT GrantScopes
+2026-10-08T02:13:33.781+09:00  INFO 64364 --- [mulino-ontology] [           main] c.s.c.s.u.t.TraceTreeSpanProcessor       : elapsed times (trace c28d1164...):     0.00 →    1.63 =    1.63 ms  CQN SELECT Grants
+2026-10-08T02:13:33.784+09:00  INFO 64364 --- [mulino-ontology] [           main] c.s.c.s.u.t.TraceTreeSpanProcessor       : elapsed times (trace dd1d2f5d...):     0.00 →    2.32 =    2.32 ms  CQN SELECT Memberships
+2026-10-08T02:13:33.787+09:00  INFO 64364 --- [mulino-ontology] [           main] c.s.c.s.u.t.TraceTreeSpanProcessor       : elapsed times (trace 8dff15fc...):     0.00 →    2.34 =    2.34 ms  CQN SELECT CapabilityAssignments
+2026-10-08T02:13:33.789+09:00  INFO 64364 --- [mulino-ontology] [           main] c.s.c.s.u.t.TraceTreeSpanProcessor       : elapsed times (trace 67a9c177...):     0.00 →    1.31 =    1.31 ms  CQN SELECT GrantActions
+2026-10-08T02:13:33.791+09:00  INFO 64364 --- [mulino-ontology] [           main] c.s.c.s.u.t.TraceTreeSpanProcessor       : elapsed times (trace 9106969f...):     0.00 →    1.27 =    1.27 ms  CQN SELECT GrantScopes
+2026-10-08T02:13:33.793+09:00  INFO 64364 --- [mulino-ontology] [           main] c.s.c.s.u.t.TraceTreeSpanProcessor       : elapsed times (trace 77efeb55...):     0.00 →    1.54 =    1.54 ms  CQN SELECT Grants
+2026-10-08T02:13:33.795+09:00  INFO 64364 --- [mulino-ontology] [           main] c.s.c.s.u.t.TraceTreeSpanProcessor       : elapsed times (trace f4b3f378...):     0.00 →    1.19 =    1.19 ms  CQN SELECT Memberships
+2026-10-08T02:13:33.797+09:00  INFO 64364 --- [mulino-ontology] [           main] c.s.c.s.u.t.TraceTreeSpanProcessor       : elapsed times (trace 75c9569c...):     0.00 →    1.35 =    1.35 ms  CQN SELECT CapabilityAssignments
+2026-10-08T02:13:33.798+09:00  INFO 64364 --- [mulino-ontology] [           main] c.s.c.s.u.t.TraceTreeSpanProcessor       : elapsed times (trace a3be4627...):     0.00 →    1.10 =    1.10 ms  CQN SELECT GrantActions
+2026-10-08T02:13:33.800+09:00  INFO 64364 --- [mulino-ontology] [           main] c.s.c.s.u.t.TraceTreeSpanProcessor       : elapsed times (trace 062d09f6...):     0.00 →    1.23 =    1.23 ms  CQN SELECT GrantScopes
+2026-10-08T02:13:33.802+09:00  INFO 64364 --- [mulino-ontology] [           main] c.s.c.s.u.t.TraceTreeSpanProcessor       : elapsed times (trace 15665282...):     0.00 →    1.35 =    1.35 ms  CQN SELECT Grants
+[INFO] Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 4.703 s -- in com.mulino.application.identity.IdentityPersistenceTest
+[INFO] 
+[INFO] Results:
+[INFO] 
+[INFO] Tests run: 8, Failures: 0, Errors: 0, Skipped: 0
+[INFO] 
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  9.212 s
+[INFO] Finished at: 2026-10-08T02:13:33+09:00
+[INFO] ------------------------------------------------------------------------

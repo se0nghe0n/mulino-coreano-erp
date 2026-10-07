@@ -64,7 +64,9 @@ mapping, 서버 owner, 조직 composite FK, 직접/검색 범위 거부,
 PostgreSQL 테스트의 JWT는 in-process authenticated fixture이므로
 signed HTTP acceptance 증거가 아니다. 새 scope 차원 교집합 assertion은
 unit 6 tests·failure0·error0으로 별도 통과한 뒤 최종 PG 포함
-8 tests를 다시 통과했다. `final-checks.log`가 최종 증거다.
+8 tests를 다시 통과했다. `final-checks.log`가 DB 포함 증거다.
+마지막 transaction precheck 추가 뒤 source는 unit 6 tests로 compile과
+회귀를 확인했다. `final-source-unit-checks.log`에 남긴다.
 
 최초 unit 실패는 fixture JwtAuthenticationToken의 authenticated 상태가
 빠진 원인이며, 최초 PG test compile 실패는 CAP requestContext run의

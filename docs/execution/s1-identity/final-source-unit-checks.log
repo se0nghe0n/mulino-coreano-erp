@@ -1,0 +1,65 @@
+[INFO] Scanning for projects...
+[INFO] 
+[INFO] ------------------------< com.mulino:ontology >-------------------------
+[INFO] Building ontology 0.1.0-SNAPSHOT
+[INFO]   from pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] --- cds:5.1.1:cds (cds) @ ontology ---
+[INFO] CdsMojo: Identified /Volumes/VideoStore/Developer/mulino-ontology-step3-s1-identity/backend as reactor base directory.
+[INFO] CdsMojo: Using directory containing a package.json as working directory: /Volumes/VideoStore/Developer/mulino-ontology-step3-s1-identity/backend
+[INFO] CdsMojo: Using globally installed npx
+[INFO] CdsMojo: Executing [npx, -c, cds version --json] in working directory /Volumes/VideoStore/Developer/mulino-ontology-step3-s1-identity/backend
+[INFO] CdsMojo: Using configured working directory: /Volumes/VideoStore/Developer/mulino-ontology-step3-s1-identity/backend
+[INFO] CdsMojo: Executing [npx, -c, cds compile srv --to csn --dest src/main/resources/edmx] in working directory /Volumes/VideoStore/Developer/mulino-ontology-step3-s1-identity/backend
+[INFO] CdsMojo: /Volumes/VideoStore/Developer/mulino-ontology-step3-s1-identity/backend/src/main/resources/edmx/srv.csn
+[INFO] CdsMojo: Executing [npx, -c, cds compile srv --to edmx --dest src/main/resources/edmx] in working directory /Volumes/VideoStore/Developer/mulino-ontology-step3-s1-identity/backend
+[INFO] CdsMojo: /Volumes/VideoStore/Developer/mulino-ontology-step3-s1-identity/backend/src/main/resources/edmx/PlatformService.xml
+[INFO] 
+[INFO] --- antrun:3.2.0:run (default) @ ontology ---
+[INFO] Executing tasks
+[INFO]      [copy] Copying 1 file to /Volumes/VideoStore/Developer/mulino-ontology-step3-s1-identity/backend/src/main/resources/edmx
+[INFO] Executed tasks
+[INFO] 
+[INFO] --- resources:3.5.0:resources (default-resources) @ ontology ---
+[INFO] Copying 4 resources from src/main/resources to target/classes
+[INFO] Copying 3 resources from ../database/migrations to target/classes/db/migration
+[INFO] 
+[INFO] --- compiler:3.15.0:compile (default-compile) @ ontology ---
+[INFO] Recompiling the module because of changed source code.
+[INFO] Compiling 24 source files with javac [debug parameters release 21] to target/classes
+[INFO] /Volumes/VideoStore/Developer/mulino-ontology-step3-s1-identity/backend/src/main/java/com/mulino/application/PlatformCommands.java: Some input files use unchecked or unsafe operations.
+[INFO] /Volumes/VideoStore/Developer/mulino-ontology-step3-s1-identity/backend/src/main/java/com/mulino/application/PlatformCommands.java: Recompile with -Xlint:unchecked for details.
+[INFO] 
+[INFO] --- resources:3.5.0:testResources (default-testResources) @ ontology ---
+[INFO] skip non existing resourceDirectory /Volumes/VideoStore/Developer/mulino-ontology-step3-s1-identity/backend/src/test/resources
+[INFO] 
+[INFO] --- compiler:3.15.0:testCompile (default-testCompile) @ ontology ---
+[INFO] Recompiling the module because of changed dependency.
+[INFO] Compiling 3 source files with javac [debug parameters release 21] to target/test-classes
+[INFO] 
+[INFO] --- surefire:3.5.6:test (default-test) @ ontology ---
+[INFO] Using auto detected provider org.apache.maven.surefire.junitplatform.JUnitPlatformProvider
+[INFO] 
+[INFO] -------------------------------------------------------
+[INFO]  T E S T S
+[INFO] -------------------------------------------------------
+[INFO] Running com.mulino.application.identity.IdentityAuthorizationTest
+Mockito is currently self-attaching to enable the inline-mock-maker. This will no longer work in future releases of the JDK. Please add Mockito as an agent to your build as described in Mockito's documentation: https://javadoc.io/doc/org.mockito/mockito-core/latest/org.mockito/org/mockito/Mockito.html#0.3
+WARNING: A Java agent has been loaded dynamically (/Users/n30gu1/.m2/repository/net/bytebuddy/byte-buddy-agent/1.18.11/byte-buddy-agent-1.18.11.jar)
+WARNING: If a serviceability tool is in use, please run with -XX:+EnableDynamicAgentLoading to hide this warning
+WARNING: If a serviceability tool is not in use, please run with -Djdk.instrument.traceUsage for more information
+WARNING: Dynamic loading of agents will be disallowed by default in a future release
+OpenJDK 64-Bit Server VM warning: Sharing is only supported for boot loader classes because bootstrap classpath has been appended
+[INFO] Tests run: 6, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.548 s -- in com.mulino.application.identity.IdentityAuthorizationTest
+[INFO] 
+[INFO] Results:
+[INFO] 
+[INFO] Tests run: 6, Failures: 0, Errors: 0, Skipped: 0
+[INFO] 
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  4.875 s
+[INFO] Finished at: 2026-10-08T02:14:53+09:00
+[INFO] ------------------------------------------------------------------------
