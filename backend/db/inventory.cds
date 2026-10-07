@@ -171,3 +171,18 @@ entity QuantityMovements {
   commandId : UUID;
   evidenceRef : String(240);
 }
+entity ObjectRelations {
+  key organizationId : UUID;
+  key ID : UUID;
+  revision : Integer;
+  createdAt : Timestamp;
+  recordedAt : Timestamp;
+  definitionVersionId : UUID;
+  relationDefinitionId : UUID;
+  sourceType : String(80);
+  sourceId : UUID;
+  targetType : String(80);
+  targetId : UUID;
+  validFrom : Timestamp;
+  validUntil : Timestamp;
+}

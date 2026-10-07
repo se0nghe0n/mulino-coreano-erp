@@ -30,6 +30,7 @@ class InventoryPostgresTest {
  @Autowired CdsRuntime runtime;
  @Autowired InventoryRepository repository;
  @MockitoBean ReadAuthorizer authorizer;
+ @MockitoBean org.springframework.security.oauth2.jwt.JwtDecoder jwtDecoder;
  final String org=id(1),other=id(2),product=id(10),item=id(11),spec=id(12),pack=id(13),manufacturer=id(14),lot=id(15),place=id(16),parent=id(20),left=id(21),right=id(22);
  final Instant at=Instant.parse("2026-10-08T00:00:00Z");
  static String id(int n){return "00000000-0000-0000-0000-"+String.format("%012d",n);}
@@ -44,6 +45,7 @@ class InventoryPostgresTest {
   jdbc.update("INSERT INTO mulino_inventory_ManufacturingLots(organizationId,id,manufacturerId,itemId,originalLot,createdAt,recordedAt) VALUES (?,?,?,?,'LOT-A','2026-01-01','2026-01-01')",org,lot,manufacturer,item);
   jdbc.update("INSERT INTO mulino_inventory_Places(organizationId,id,name,kind,createdAt,recordedAt) VALUES (?,?,'W','WAREHOUSE','2026-01-01','2026-01-01')",org,place);
   segment(parent,"100",true);segment(left,"40",false);segment(right,"60",false);
+  jdbc.update("UPDATE mulino_inventory_QuantitySegments SET validFrom='2026-02-01',createdAt='2026-02-01',recordedAt='2026-02-01' WHERE organizationId=? AND id IN (?,?)",org,left,right);
   edge(id(30),parent,left,"40");edge(id(31),parent,right,"60");
   when(authorizer.permittedScopes(any(),anyString(),anyMap())).thenReturn(true);
  }
@@ -87,4 +89,44 @@ class InventoryPostgresTest {
    assertThrows(DomainError.class,()->repository.object(new DomainContext(other,id(3),id(3),at,at),"TradeItems",item));return null;
   });
  }
+ @Test void publishedTypedRelationsEnforceEndpointsPeriodCardinalityAndCycles(){
+  String version=id(70),relation=id(71),hierarchy=id(72),secondPlace=id(73);
+  jdbc.update("INSERT INTO mulino_definitions_DefinitionVersions(organizationId,id,version,state,contentHash,content,evaluatorVersion,schemaVersion) VALUES (?,?,'inventory-relations-v1','DRAFT',?,'{}','core-v1','1.0.0')",org,version,"a".repeat(64));
+  jdbc.update("INSERT INTO mulino_definitions_RelationDefinitions(organizationId,id,definitionVersionId,name,sourceType,targetType,minimumCount,maximumCount,cycleAllowed) VALUES (?,?,?,'locatedAt','QuantitySegment','Place',0,1,false)",org,relation,version);
+  jdbc.update("INSERT INTO mulino_definitions_RelationDefinitions(organizationId,id,definitionVersionId,name,sourceType,targetType,minimumCount,maximumCount,cycleAllowed) VALUES (?,?,?,'within','Place','Place',0,1,false)",org,hierarchy,version);
+  jdbc.update("UPDATE mulino_definitions_DefinitionVersions SET state='PUBLISHED' WHERE organizationId=? AND id=?",org,version);
+  jdbc.update("INSERT INTO mulino_inventory_Places(organizationId,id,name,kind) VALUES (?,?,'W2','WAREHOUSE')",org,secondPlace);
+  String insert="INSERT INTO mulino_inventory_ObjectRelations(organizationId,id,definitionVersionId,relationDefinitionId,sourceType,sourceId,targetType,targetId,validFrom,validUntil) VALUES (?,?,?,?,?,?,?,?,?::timestamptz,?::timestamptz)";
+  jdbc.update(insert,org,id(74),version,relation,"QuantitySegment",left,"Place",place,"2026-01-01","2026-02-01");
+  jdbc.update(insert,org,id(75),version,relation,"QuantitySegment",left,"Place",place,"2026-02-01","2026-03-01");
+  assertThrows(RuntimeException.class,()->jdbc.update(insert,org,id(76),version,relation,"QuantitySegment",left,"Place",place,"2026-01-15","2026-02-15"));
+  assertThrows(RuntimeException.class,()->jdbc.update(insert,org,id(77),version,relation,"QuantitySegment",right,"Place",secondPlace,"2026-01-01",null));
+  assertThrows(RuntimeException.class,()->jdbc.update(insert,org,id(78),version,relation,"Place",place,"QuantitySegment",left,"2026-01-01",null));
+  assertThrows(RuntimeException.class,()->jdbc.update(insert,org,id(79),version,hierarchy,"Place",place,"Place",id(999),"2026-01-01",null));
+  jdbc.update(insert,org,id(80),version,hierarchy,"Place",place,"Place",secondPlace,"2026-01-01",null);
+  assertThrows(RuntimeException.class,()->jdbc.update(insert,org,id(81),version,hierarchy,"Place",secondPlace,"Place",place,"2026-01-01",null));
+ }
+
+ @Test void historicalSnapshotAndFilteredSearchKeepServerContext(){runtime.requestContext().run(ctx->{
+  var queries=new InventoryQueries(repository,authorizer);
+  Instant january=Instant.parse("2026-01-15T00:00:00Z");
+  var historical=new DomainContext(org,id(3),id(3),january,january);
+  Map<String,Object> before=(Map<String,Object>)queries.query(historical,query("getInventory",item,Map.of())).data();
+  assertEquals("100",before.get("heldQuantity"));assertEquals(List.of(parent),before.get("segmentIds"));
+  when(authorizer.permittedScopes(any(),anyString(),anyMap())).thenAnswer(call->{Map<String,Collection<String>> scopes=call.getArgument(2);return scopes.get("TARGET").contains(left);});
+  Map<String,Object> visible=(Map<String,Object>)queries.query(context(),query("getInventory",item,Map.of())).data();
+  assertEquals("40",visible.get("heldQuantity"));assertEquals(List.of(left),visible.get("segmentIds"));
+  return null;
+ });}
+ @Test void logisticsMembershipCannotDoubleCountOrCrossOrg(){
+  String container=id(90),container2=id(91);
+  jdbc.update("INSERT INTO mulino_inventory_LogisticsUnits(organizationId,id,name) VALUES (?,?,'pallet'),(?,?,'pallet2')",org,container,org,container2);
+  String insert="INSERT INTO mulino_inventory_LogisticsMemberships(organizationId,id,logisticsUnitId,segmentId,validFrom,validUntil) VALUES (?,?,?,?,?::timestamptz,?::timestamptz)";
+  jdbc.update(insert,org,id(92),container,left,"2026-02-01","2026-03-01");
+  jdbc.update(insert,org,id(93),container,right,"2026-02-01","2026-03-01");
+  assertThrows(RuntimeException.class,()->jdbc.update(insert,org,id(94),container2,left,"2026-02-15","2026-03-01"));
+  jdbc.update(insert,org,id(95),container2,left,"2026-03-01",null);
+  assertThrows(RuntimeException.class,()->jdbc.update(insert,other,id(96),container,left,"2026-04-01",null));
+ }
+
 }

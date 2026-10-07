@@ -9,7 +9,7 @@ import org.springframework.stereotype.Repository;
 /** Org predicates are applied in CQN, including every lineage and object lookup. */
 @Repository
 public class InventoryRepository {
-  public static final Set<String> ENTITIES = Set.of("Products", "TradeItems", "SpecificationVersions", "PackagingVersions", "UnitConversions", "ExternalIdentifiers", "Manufacturers", "ManufacturingLots", "Places", "QuantitySegments", "LogisticsUnits", "LogisticsMemberships", "GenealogyEdges", "QuantityMovements");
+  public static final Set<String> ENTITIES = Set.of("Products", "TradeItems", "SpecificationVersions", "PackagingVersions", "UnitConversions", "ExternalIdentifiers", "Manufacturers", "ManufacturingLots", "Places", "QuantitySegments", "LogisticsUnits", "LogisticsMemberships", "GenealogyEdges", "QuantityMovements", "ObjectRelations");
   private final PersistenceService db;
   public InventoryRepository(PersistenceService db) { this.db = db; }
   public List<Map<String,Object>> rows(DomainContext c, String entity) {

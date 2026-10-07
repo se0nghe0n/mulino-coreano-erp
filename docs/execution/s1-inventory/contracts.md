@@ -30,3 +30,18 @@ eligibleQuantity/reservedQuantity/unreservedEligibleQuantity/cumulativeArrival�
 null과 명시 UNKNOWN 사유를 반환한다. T02의 confirmReceipt와 T03 배분이관,
 T04 QC/제한, T05 처분 결정 및 V2/V3 전체 경합은 S2–S4 통합 전 NOT_RUN이다.
 수량 primitive와 보호된 trade 명령은 뒤 단계에서 원자적 구현한다.
+
+ObjectRelations는 발행된 RelationDefinition의 source/target type과 조직 내
+실제 endpoint를 검사한다. 지원 endpoint는 위 inventory core 유형뿐이다.
+유효기간별 maximumCount와 금지된 cycle을 DB에서 검사하며 locatedAt은
+QuantitySegment.placeId와 모순될 수 없다. minimumCount의 필수 입력 stage 및
+관계 생성/폐기 lifecycle은 S2 공개 command에서 구현할 범위다.
+
+실행 검사는 `evidence/maven-test.log`와 두 Surefire report에 남겼다.
+`./mvnw -f backend/pom.xml -Dtest=InventoryQuantityTest,InventoryPostgresTest test`
+결과는 9 tests, 0 failure, 0 error다. PostgreSQL18 Testcontainers와 CAP CQN,
+Flyway V1–V5를 실제 실행했다. JwtDecoder와 ReadAuthorizer는 mock이다.
+현재 identity/grant end-to-end 증거는 별도 identity 인수에 의존한다.
+단독 worker 실행은 임시 `backend/srv/inventory-test-import.cds`로 identity,
+definitions, inventory model을 compile했고 완료 후 파일을 제거했다.
+통합 branch에서는 공통 srv import가 같은 model을 compile해야 한다.

@@ -270,6 +270,7 @@ CREATE TRIGGER inventory_quantity_precision BEFORE INSERT OR UPDATE ON mulino_in
 
 CREATE FUNCTION inventory_genealogy_cycle() RETURNS TRIGGER LANGUAGE plpgsql AS $$
 BEGIN
+ PERFORM pg_advisory_xact_lock(hashtextextended(NEW.organizationId||'inventory-genealogy',0));
  IF EXISTS (WITH RECURSIVE descendants(id) AS (SELECT NEW.targetId UNION SELECT g.targetId FROM mulino_inventory_GenealogyEdges g JOIN descendants d ON g.sourceId=d.id WHERE g.organizationId=NEW.organizationId) SELECT 1 FROM descendants WHERE id=NEW.sourceId) THEN RAISE EXCEPTION 'genealogy cycle' USING ERRCODE='23514'; END IF;
  RETURN NEW;
 END $$;
@@ -303,3 +304,54 @@ END $$;
 CREATE CONSTRAINT TRIGGER inventory_retired_parent AFTER INSERT OR UPDATE ON mulino_inventory_GenealogyEdges DEFERRABLE INITIALLY DEFERRED FOR EACH ROW EXECUTE FUNCTION inventory_retired_parent();
 CREATE INDEX inventory_segments_scope ON mulino_inventory_QuantitySegments(organizationId,itemId,placeId,validFrom,retiredAt);
 CREATE INDEX inventory_genealogy_target ON mulino_inventory_GenealogyEdges(organizationId,targetId);
+
+CREATE TABLE mulino_inventory_ObjectRelations (
+ organizationId VARCHAR(36) NOT NULL, ID VARCHAR(36) NOT NULL,
+ revision INTEGER NOT NULL DEFAULT 0,
+ createdAt TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+ recordedAt TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+ definitionVersionId VARCHAR(36) NOT NULL, relationDefinitionId VARCHAR(36) NOT NULL,
+ sourceType VARCHAR(80) NOT NULL, sourceId VARCHAR(36) NOT NULL,
+ targetType VARCHAR(80) NOT NULL, targetId VARCHAR(36) NOT NULL,
+ validFrom TIMESTAMPTZ NOT NULL, validUntil TIMESTAMPTZ,
+ PRIMARY KEY(organizationId,ID),
+ FOREIGN KEY(organizationId) REFERENCES mulino_identity_Organizations(ID),
+ FOREIGN KEY(organizationId,definitionVersionId) REFERENCES mulino_definitions_DefinitionVersions(organizationId,ID),
+ FOREIGN KEY(organizationId,relationDefinitionId) REFERENCES mulino_definitions_RelationDefinitions(organizationId,ID),
+ CHECK(validUntil IS NULL OR validUntil > validFrom)
+);
+
+-- Fixed whitelist of core endpoint types: client type strings never become SQL names.
+CREATE FUNCTION inventory_endpoint_exists(org VARCHAR, typ VARCHAR, objectId VARCHAR) RETURNS BOOLEAN LANGUAGE plpgsql AS $$
+BEGIN
+ CASE typ
+ WHEN 'Product' THEN RETURN EXISTS(SELECT 1 FROM mulino_inventory_Products WHERE organizationId=org AND ID=objectId);
+ WHEN 'TradeItem' THEN RETURN EXISTS(SELECT 1 FROM mulino_inventory_TradeItems WHERE organizationId=org AND ID=objectId);
+ WHEN 'ManufacturingLot' THEN RETURN EXISTS(SELECT 1 FROM mulino_inventory_ManufacturingLots WHERE organizationId=org AND ID=objectId);
+ WHEN 'Manufacturer' THEN RETURN EXISTS(SELECT 1 FROM mulino_inventory_Manufacturers WHERE organizationId=org AND ID=objectId);
+ WHEN 'QuantitySegment' THEN RETURN EXISTS(SELECT 1 FROM mulino_inventory_QuantitySegments WHERE organizationId=org AND ID=objectId);
+ WHEN 'Place' THEN RETURN EXISTS(SELECT 1 FROM mulino_inventory_Places WHERE organizationId=org AND ID=objectId);
+ WHEN 'LogisticsUnit' THEN RETURN EXISTS(SELECT 1 FROM mulino_inventory_LogisticsUnits WHERE organizationId=org AND ID=objectId);
+ ELSE RETURN FALSE;
+ END CASE;
+END $$;
+CREATE FUNCTION inventory_relation_valid() RETURNS TRIGGER LANGUAGE plpgsql AS $$
+DECLARE meta RECORD; boundary TIMESTAMPTZ; countAt INTEGER;
+BEGIN
+ SELECT r.*,v.state INTO meta FROM mulino_definitions_RelationDefinitions r JOIN mulino_definitions_DefinitionVersions v ON v.organizationId=r.organizationId AND v.ID=r.definitionVersionId
+ WHERE r.organizationId=NEW.organizationId AND r.ID=NEW.relationDefinitionId AND r.definitionVersionId=NEW.definitionVersionId;
+ IF NOT FOUND OR meta.state <> 'PUBLISHED' OR meta.sourceType IS DISTINCT FROM NEW.sourceType OR meta.targetType IS DISTINCT FROM NEW.targetType OR meta.maximumCount IS NULL OR meta.minimumCount IS NULL OR meta.cycleAllowed IS NULL THEN RAISE EXCEPTION 'relation definition/type invalid' USING ERRCODE='23514'; END IF;
+ IF NOT inventory_endpoint_exists(NEW.organizationId,NEW.sourceType,NEW.sourceId) OR NOT inventory_endpoint_exists(NEW.organizationId,NEW.targetType,NEW.targetId) THEN RAISE EXCEPTION 'relation endpoint unavailable' USING ERRCODE='23503'; END IF;
+ IF meta.name='locatedAt' AND (NEW.sourceType <> 'QuantitySegment' OR NEW.targetType <> 'Place' OR NOT EXISTS(SELECT 1 FROM mulino_inventory_QuantitySegments s WHERE s.organizationId=NEW.organizationId AND s.ID=NEW.sourceId AND s.placeId=NEW.targetId)) THEN RAISE EXCEPTION 'locatedAt contradicts physical location' USING ERRCODE='23514'; END IF;
+ -- Same source/definition fence serializes concurrent cardinality validation.
+ PERFORM pg_advisory_xact_lock(hashtextextended(NEW.organizationId||NEW.relationDefinitionId,0));
+ FOR boundary IN SELECT NEW.validFrom UNION SELECT r.validFrom FROM mulino_inventory_ObjectRelations r WHERE r.organizationId=NEW.organizationId AND r.relationDefinitionId=NEW.relationDefinitionId AND r.sourceId=NEW.sourceId AND r.ID<>NEW.ID AND r.validFrom >= NEW.validFrom AND (NEW.validUntil IS NULL OR r.validFrom < NEW.validUntil)
+ LOOP
+ SELECT COUNT(*) INTO countAt FROM mulino_inventory_ObjectRelations r WHERE r.organizationId=NEW.organizationId AND r.relationDefinitionId=NEW.relationDefinitionId AND r.sourceId=NEW.sourceId AND r.ID<>NEW.ID AND r.validFrom <= boundary AND (r.validUntil IS NULL OR r.validUntil > boundary);
+ IF countAt+1 > meta.maximumCount THEN RAISE EXCEPTION 'relation cardinality exceeded' USING ERRCODE='23514'; END IF;
+ END LOOP;
+ IF NOT meta.cycleAllowed AND EXISTS(WITH RECURSIVE path(typ,id,span) AS (SELECT NEW.targetType,NEW.targetId,tstzrange(NEW.validFrom,NEW.validUntil,'[)') UNION SELECT r.targetType,r.targetId,p.span*tstzrange(r.validFrom,r.validUntil,'[)') FROM mulino_inventory_ObjectRelations r JOIN path p ON r.sourceType=p.typ AND r.sourceId=p.id WHERE r.organizationId=NEW.organizationId AND r.relationDefinitionId=NEW.relationDefinitionId AND r.ID<>NEW.ID AND tstzrange(r.validFrom,r.validUntil,'[)') && p.span) SELECT 1 FROM path WHERE typ=NEW.sourceType AND id=NEW.sourceId) THEN RAISE EXCEPTION 'relation cycle' USING ERRCODE='23514'; END IF;
+ RETURN NEW;
+END $$;
+CREATE TRIGGER inventory_relation_valid BEFORE INSERT OR UPDATE ON mulino_inventory_ObjectRelations FOR EACH ROW EXECUTE FUNCTION inventory_relation_valid();
+CREATE INDEX inventory_relations_source ON mulino_inventory_ObjectRelations(organizationId,sourceType,sourceId,validFrom,validUntil);

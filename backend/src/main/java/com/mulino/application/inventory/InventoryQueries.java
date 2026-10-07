@@ -13,19 +13,24 @@ public class InventoryQueries implements QueryHandler {
   private final InventoryRepository repository;
   private final ReadAuthorizer authorizer;
   public InventoryQueries(InventoryRepository repository, ReadAuthorizer authorizer) { this.repository=repository; this.authorizer=authorizer; }
-  public Set<String> operations() { return Set.of("getObject","searchObjects","getInventory","getTrace"); }
+  public Set<String> operations() { return Set.of("getObject","searchObjects","getInventory","getTrace","traceLot"); }
   public QueryResult query(DomainContext c, QueryRequest q) {
-    if (!q.filters().isEmpty()) throw DomainError.invalid("Unsupported inventory filter");
+    if (!Set.of("type","sort").containsAll(q.filters().keySet())) throw DomainError.invalid("Unsupported inventory filter");
+    if (q.filters().containsKey("sort")&&!"ID".equals(q.filters().get("sort"))) throw DomainError.invalid("Unsupported inventory sort");
+    if(q.scope().containsKey("organizationId")&&!c.organizationId().equals(q.scope().get("organizationId"))) throw DomainError.forbidden();
     return switch(q.operation()) {
       case "getObject" -> object(c,q);
       case "searchObjects" -> search(c,q);
       case "getInventory" -> inventory(c,q);
       case "getTrace" -> trace(c,q);
+      case "traceLot" -> {var scope=new LinkedHashMap<String,Object>(q.scope()); scope.put("objectType","ManufacturingLot"); yield trace(c,new QueryRequest(q.operation(),q.id()==null?(String)scope.get("lotId"):q.id(),scope,q.filters(),q.limit(),q.cursor(),q.definitionVersion(),q.asOf(),q.knownAt(),q.snapshotRef()));}
       default -> throw DomainError.unsupported();
     };
   }
   private String entity(QueryRequest q) {
     String type = (String)q.scope().get("objectType");
+    if(type==null) type=(String)q.filters().get("type");
+    else if(q.filters().containsKey("type")&&!type.equals(q.filters().get("type"))) throw DomainError.invalid("Conflicting object types");
     if (type == null) type="TradeItem";
     String entity=TYPES.get(type);
     if (entity==null) throw DomainError.invalid("Unsupported object type");
@@ -47,6 +52,7 @@ public class InventoryQueries implements QueryHandler {
       var members=repository.rows(c,"LogisticsMemberships").stream().filter(r -> q.id().equals(r.get("logisticsUnitId")) && interval(r,c)).toList();
       data.put("memberships",members.stream().filter(r -> permitted(c,q.operation(),repository.object(c,"QuantitySegments",(String)r.get("segmentId")))).map(this::dto).toList());
     }
+    data.put("relations",repository.rows(c,"ObjectRelations").stream().filter(r -> q.id().equals(r.get("sourceId")) && interval(r,c)).filter(r -> permitted(c,q.operation(),repository.object(c,TYPES.get((String)r.get("targetType")),(String)r.get("targetId")))).map(this::dto).toList());
     return result(data,q,List.of());
   }
   private QueryResult search(DomainContext c, QueryRequest q) {
@@ -58,7 +64,7 @@ public class InventoryQueries implements QueryHandler {
     return new QueryResult(page,q.scope(),List.of(),List.of(),List.of(),next);
   }
   private QueryResult inventory(DomainContext c, QueryRequest q) {
-    Set<String> allowed=Set.of("itemId","placeId","lotId","objectType");
+    Set<String> allowed=Set.of("itemId","placeId","lotId","objectType","organizationId");
     if (!allowed.containsAll(q.scope().keySet())) throw DomainError.invalid("Unsupported inventory scope");
     String item=(String)q.scope().get("itemId");
     if (item==null) item=q.id();
@@ -115,5 +121,5 @@ public class InventoryQueries implements QueryHandler {
   private void authorize(DomainContext c,String operation,Map<String,Object> row) {authorizer.authorizeScopes(c,operation,scopes(row));}
   private boolean permitted(DomainContext c,String operation,Map<String,Object> row) {return authorizer.permittedScopes(c,operation,scopes(row));}
   private Map<String,Object> dto(Map<String,Object> row) {Map<String,Object> result=new LinkedHashMap<>(); row.forEach((k,v)->result.put(k,v instanceof BigDecimal ? InventoryQuantity.text(v) : v)); return result;}
-  private QueryResult result(Object data,QueryRequest q,List<String> unknowns) {return new QueryResult(data,q.scope(),unknowns,List.of(),List.of(),null);}
+  private QueryResult result(Object data,QueryRequest q,List<String> unknowns) {var scope=new LinkedHashMap<String,Object>(q.scope());if(data instanceof Map<?,?> map&&map.get("itemId")!=null)scope.put("itemId",map.get("itemId"));return new QueryResult(data,scope,unknowns,List.of(),List.of(),null);}
 }

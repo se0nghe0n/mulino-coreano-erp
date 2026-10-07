@@ -1,0 +1,34 @@
+{
+  "stage": "S1 partial inventory",
+  "baseline": "164414418b6c3ce2959979939388d59cf2068e2c",
+  "command": "./mvnw -f backend/pom.xml -Dtest=InventoryQuantityTest,InventoryPostgresTest test",
+  "exitCode": 0,
+  "observed": {
+    "tests": 9,
+    "failures": 0,
+    "errors": 0
+  },
+  "status": "PASS",
+  "scope": [
+    "D02 namespace+LOT context+conversion precision",
+    "D03 active leaf+lineage schema+uncertain mixture",
+    "D04 decimal and base unit precision",
+    "D05 independent custody/owner/location schema",
+    "D07 typed relations+period cardinality+cycles"
+  ],
+  "notRun": [
+    "T02 full confirmReceipt",
+    "T03 split/merge/active allocation transfer public commands",
+    "T04 QC/disposal commands",
+    "T05 C1 disposition authority",
+    "V2/V3 full concurrent mutation authorization",
+    "public registerItem/linkExternalId actions",
+    "minimum relation stage lifecycle"
+  ],
+  "authorization": "Mocked decoder/ReadAuthorizer; real CQN and PostgreSQL; identity end-to-end separate",
+  "hashes": {
+    "backend/src/test/java/com/mulino/inventory/InventoryPostgresTest.java": "9358edbe01ecbddb2297ec7e53dd361d44e86962227084cab122c2f8bdf31eaa",
+    "backend/src/test/java/com/mulino/inventory/InventoryQuantityTest.java": "f2cb4e053e894dce7066fad2d4c8a63a8b1d0181dd5522226cc8177238004351",
+    "database/migrations/V5__inventory.sql": "824a95f75610e417ba024d638640dd816d0a722506678d47f57965de64cbfe38"
+  }
+}
