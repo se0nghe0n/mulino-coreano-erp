@@ -1,0 +1,103 @@
+{
+  "task": "새 온톨로지 전체 구현",
+  "userStep": 3,
+  "systemGate": "S3",
+  "baseline": "c6c910b81c8a61fbdf309da9144022482408d5dc",
+  "executedCommit": "a87e1cf1d0723cdcd7f92cd45155f0f7925942c8",
+  "command": "JAVA_HOME=/Library/Java/JavaVirtualMachines/zulu-21.jdk/Contents/Home PATH=<Java21>:<Node24>:/opt/homebrew/bin:$PATH JWT_PUBLIC_KEY=<temporary synthetic public key> ./mvnw -f backend/pom.xml -Dtest=ShipmentGatewayTest test",
+  "timestamp": null,
+  "status": "PASS",
+  "tests": 25,
+  "failures": 0,
+  "errors": 0,
+  "skipped": 0,
+  "exitCode": 0,
+  "versions": {
+    "java": "21.0.5 Zulu21.38+21-CA (21.0.5+11-LTS)",
+    "node": "24.19.0",
+    "springBoot": "4.1.1",
+    "capJava": "5.1.1",
+    "databaseImage": "postgres@sha256:4ef4dbc939d61acea57712655ddb4b4ab27419c913f94cca0cd57cb3ea3c2280"
+  },
+  "assertions": [
+    "unavailableUriNeverFetchesOriginal",
+    "sourceScopedGrantCannotReadOtherSourceAndInvalidQuantityCannotBeRecorded",
+    "duplicateSourceKeyReplaysOnceAndCompetingHashPreservesConflict",
+    "twoDocumentsOneCanonicalReceiptCountsOnlyOneAndHasNoInventoryEffects",
+    "foreignOrganizationActorReferenceAndTypedDateAsPlaceFailClosed",
+    "concurrentSourceReplayHasExactlyOneInboxAndEvent",
+    "dateOnlyRangeAndUtcInstantRoundTripPreserveTemporalBounds",
+    "stagingHashMismatchAndDatabaseRollbackLeaveNoReferencesOrObjects",
+    "pageMetadataBelongsOnlyToCurrentPageAndCursorCannotChangeQuery",
+    "originalFileHashAndAuthorizedDownloadAreImmutable",
+    "stagedAndCommittedFilesHaveOwnerOnlyPermissions",
+    "supersedesPreservesKnowledgeTimeAndFourUnknownStates",
+    "lateCompetingSourceHashPreservesHistoricalVerificationAndBlocksCurrentConfirmation",
+    "sourceConflictCannotBecomeCanonicalVerified",
+    "orphanCleanupPreservesReferencedFilesAndMissingFileReturnsUnknown",
+    "multiplePurchaseOrdersAcrossShipmentsRetainPlansAndZeroPhysicalStock",
+    "revokedCurrentGrantPreventsPlanReplay",
+    "twoIndependentSourceReportsOfSameShipmentOccurrenceRecordOnce",
+    "realHandoverPreservesPhysicalIdentityAndReplayHasOneEffect",
+    "partialPhysicalDeparturesCannotOverAttributeOnePurchaseLine",
+    "incorrectSubjectCannotWriteShipment",
+    "orphanAnomalyRetainsConcreteIntakeOwnerDeadlineAndPendingRecovery",
+    "temporalArrivalBeforeActualDepartureHasZeroShipmentEffect",
+    "exactQuantityTimeAndUnauthorizedSourceCannotRecordFact",
+    "departure100Arrival98InTransit2IsNotLossAndKeepsLedgerZero"
+  ],
+  "shipmentScenarioCount": 10,
+  "inheritedEvidenceScenarioCount": 15,
+  "priorAttempts": [
+    {
+      "artifact": "s3-shipment-compile.log.gz",
+      "status": "FAIL"
+    },
+    {
+      "artifact": "s3-shipment-compile2.log.gz",
+      "status": "PASS"
+    },
+    {
+      "artifact": "s3-shipment-test-compile.log.gz",
+      "status": "FAIL"
+    },
+    {
+      "artifact": "s3-shipment-pg1.log.gz",
+      "status": "FAIL"
+    },
+    {
+      "artifact": "s3-shipment-pg2.log.gz",
+      "status": "FAIL"
+    },
+    {
+      "artifact": "s3-shipment-pg3.log.gz",
+      "status": "PASS"
+    }
+  ],
+  "artifacts": {
+    "junit": "evidence/junit.xml.gz",
+    "rawMaven": "evidence/s3-shipment-pg3.log.gz"
+  },
+  "hashes": {
+    "backend/src/main/java/com/mulino/application/trade/shipment/ShipmentEvidenceScope.java": "71afe1683a8fdc25205b6f7a32efa14e764aebe91d61e33aa7552549d25b61fd",
+    "backend/src/main/java/com/mulino/application/trade/shipment/ShipmentQueries.java": "d263d0ec02997e160839a594c2e6dbbde5281ec031db34ab9829f2ee1b736bb5",
+    "backend/src/main/java/com/mulino/application/trade/shipment/ShipmentCommands.java": "bed7aaebdd10db4c2fa5a3b6e8fecc91992d7d891846303b922e6f0b299247f4",
+    "backend/src/main/java/com/mulino/application/trade/shipment/ShipmentEvidence.java": "1a8c03cac99868461318cb183c4f830f56737fcbe73abe139d87ffda4d7b5399",
+    "backend/src/main/java/com/mulino/domain/trade/shipment/ShipmentRepository.java": "8e56f167083453f307120b8c45a41871b382239f2bc7b68ef725b4f0eba3cec9",
+    "backend/src/test/java/com/mulino/application/evidence/ShipmentGatewayTest.java": "1e17de5553f934f806a3b015c1198994deb462ad0c8cb62fd659f41470802206",
+    "backend/db/shipment.cds": "c3ec50e869e0acc97b2215d749267ba7313cde4373d5373d40fa377f76d8f85d",
+    "database/migrations/V17__shipment.sql": "8cccbd8fdcfa1f7025c378a044b76678af19541e701550fb848afbce66355f5b",
+    "backend/target/classes/com/mulino/application/trade/shipment/ShipmentEvidenceScope.class": "1a6b673c6d651f189726feef8b7186ddce830fea87cc426801987ec87a072361",
+    "backend/target/classes/com/mulino/application/trade/shipment/ShipmentEvidence.class": "f3409361f861fbb00bc4e35cf0e72f4377541f7d30d1c133ca927c38f82041b2",
+    "backend/target/classes/com/mulino/application/trade/shipment/ShipmentQueries.class": "c12ef40052b2d54db145cccb16f27f777212619f4e0f822efc53fcdd34f4cb61",
+    "backend/target/classes/com/mulino/application/trade/shipment/ShipmentCommands.class": "d9364c53f3d4d65faf42f787e28aaa0adb0fea194cac1f4a23c2568fe2cd33a0"
+  },
+  "runtimeBoundaries": {
+    "physicalStockWrites": "NONE by shipment; receipt/inventory owns physical changes",
+    "orphanAnomaly": "Durable source inbox + recovery row retains owner/supervisor/nextAction/deadline; configured response linkage/retry is combined runtime acceptance",
+    "paidModels": "NOT_RUN",
+    "realSupplierCarrierCalls": "NOT_RUN",
+    "BTP": "NOT_RUN",
+    "fullS3": "Root aggregate gate remains open"
+  }
+}

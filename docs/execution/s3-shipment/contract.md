@@ -49,3 +49,20 @@ V21의 semantic fingerprint는 같은 UUID의 다른 cargo/수량/시점을 상�
 `DepartureAllocations`는 실제 최초 출하의 PO 귀속을 immutable하게 남긴다.
 부분 출하를 여러 번 기록해도 각 PO line의 cargo 계획을 넘지 않고,
 뒤 구간의 같은 물리 범위는 최초 귀속을 변경하거나 다시 기여하지 않는다.
+
+## 실제 집중 검사
+
+Java21.0.5/Node24.19.0과 고정 PostgreSQL container에서 실제 command
+pipeline 25개 검사(운송10·기존 evidence15)가 모두 통과했다. failure,
+error, skip은0이다. 결과와 원문·compiled hash는 `checks.json`에 있다.
+
+초기 검사에서 UUID 외의 occurrenceIdentity, 보관 인계의 null kind,
+수량 문자열의 잔여 scale을 발견했다. 실패 로그를 삭제하지 않고 수정 뒤
+같은 public gateway 인수를 재실행했다. 실제 source 접수→match→link→
+운송 기록이 통과하며 mock domain/policy를 사용하지 않았다.
+
+C5의 orphan 운송 이상은 durable inbox와 recovery row의 owner,
+supervisor, nextAction, nextCheck 유지까지 확인했다. 정책으로 새 대응
+Work/의무를 실제 연결하는 재시도 인수는 공통 runtime 결합 범위다.
+기존 연결 Work의 의무와 종료 Work의 followup은 기존 IntakeDutyPort를
+사용한다. 전체 S3·Step3 완료나 실제 외부 전송의 성공을 뜻하지 않는다.
