@@ -141,3 +141,9 @@ CREATE TABLE mulino_trade_regulatory_LabelVerifications(
  FOREIGN KEY(organizationId,specificationVersionId) REFERENCES mulino_inventory_SpecificationVersions(organizationId,ID)
 );
 CREATE TRIGGER regulatory_labelverifications_immutable BEFORE UPDATE OR DELETE ON mulino_trade_regulatory_LabelVerifications FOR EACH ROW EXECUTE FUNCTION mulino_evidence_reject_mutation();
+-- The mutable head is a version of this exact procedure, not merely any org version.
+ALTER TABLE mulino_trade_regulatory_ProcedureVersions
+ ADD UNIQUE(organizationId,procedureId,ID);
+ALTER TABLE mulino_trade_regulatory_Procedures
+ ADD FOREIGN KEY(organizationId,ID,currentVersionId)
+ REFERENCES mulino_trade_regulatory_ProcedureVersions(organizationId,procedureId,ID);
