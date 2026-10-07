@@ -1,0 +1,20 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:mulino:security:auth-context:v1",
+  "title": "Verified AuthContext v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["version", "issuer", "subject", "audience", "organizationId", "stableRequestOwner", "source"],
+  "properties": {
+    "version": {"const": 1},
+    "issuer": {"type": "string", "format": "uri"},
+    "subject": {"type": "string", "minLength": 1},
+    "audience": {"type": "string", "minLength": 1},
+    "organizationId": {"type": "string", "minLength": 1},
+    "stableRequestOwner": {"type": "string", "minLength": 1},
+    "source": {"enum": ["LOCAL_SIGNED_FIXTURE", "VERIFIED_IDP_MAPPING"]},
+    "delegator": {"type": "string", "minLength": 1},
+    "grantId": {"type": "string", "minLength": 1},
+    "grantRevision": {"type": "integer", "minimum": 0}
+  }
+}
