@@ -54,14 +54,12 @@ ALTER TABLE mulino_trade_returns_Authorizations ADD FOREIGN KEY(organizationId,c
 ALTER TABLE mulino_trade_returns_Authorizations ADD FOREIGN KEY(organizationId,rangeRootId) REFERENCES mulino_inventory_QuantitySegments(organizationId,ID) DEFERRABLE INITIALLY DEFERRED;
 ALTER TABLE mulino_trade_returns_Observations ADD FOREIGN KEY(organizationId,deliveryId) REFERENCES mulino_trade_sales_Deliveries(organizationId,ID) DEFERRABLE INITIALLY DEFERRED;
 ALTER TABLE mulino_trade_returns_Observations ADD FOREIGN KEY(organizationId,customerId) REFERENCES mulino_trade_sales_Customers(organizationId,ID) DEFERRABLE INITIALLY DEFERRED;
-ALTER TABLE mulino_trade_returns_Observations ADD FOREIGN KEY(organizationId,eventId) REFERENCES mulino_evidence_Events(organizationId,ID) DEFERRABLE INITIALLY DEFERRED;
 ALTER TABLE mulino_trade_returns_Observations ADD FOREIGN KEY(organizationId,rangeRootId) REFERENCES mulino_inventory_QuantitySegments(organizationId,ID) DEFERRABLE INITIALLY DEFERRED;
 ALTER TABLE mulino_trade_returns_Receipts ADD FOREIGN KEY(organizationId,deliveryId) REFERENCES mulino_trade_sales_Deliveries(organizationId,ID) DEFERRABLE INITIALLY DEFERRED;
 ALTER TABLE mulino_trade_returns_Receipts ADD FOREIGN KEY(organizationId,customerId) REFERENCES mulino_trade_sales_Customers(organizationId,ID) DEFERRABLE INITIALLY DEFERRED;
-ALTER TABLE mulino_trade_returns_Receipts ADD FOREIGN KEY(organizationId,eventId) REFERENCES mulino_evidence_Events(organizationId,ID) DEFERRABLE INITIALLY DEFERRED;
 ALTER TABLE mulino_trade_returns_Receipts ADD FOREIGN KEY(organizationId,rangeRootId) REFERENCES mulino_inventory_QuantitySegments(organizationId,ID) DEFERRABLE INITIALLY DEFERRED;
 ALTER TABLE mulino_trade_recall_Actions ADD FOREIGN KEY(organizationId,returnId) REFERENCES mulino_trade_returns_Receipts(organizationId,ID) DEFERRABLE INITIALLY DEFERRED;
-ALTER TABLE mulino_trade_recall_Actions ADD FOREIGN KEY(organizationId,residualDutyId) REFERENCES mulino_responsibility_Assignments(organizationId,ID) DEFERRABLE INITIALLY DEFERRED;
+ALTER TABLE mulino_trade_recall_Actions ADD FOREIGN KEY(organizationId,residualDutyId) REFERENCES mulino_work_read_ObligationReferences(organizationId,ID) DEFERRABLE INITIALLY DEFERRED;
 
 -- New subject vocabulary does not permit dynamic entity names or cross-tenant references.
 DO $$

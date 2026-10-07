@@ -21,7 +21,7 @@ public final class SettlementFactsAdapter implements SettlementTradeFacts {
     this.purchase=purchase;this.repository=repository;this.sales=sales;this.deliveries=deliveries;this.execution=execution;
   }
   public Map<String,Object> line(DomainContext c,String kind,String id){
-    if("SALES".equals(kind))return sales.requireLine(c,id);
+    if("SALE".equals(kind))return sales.requireLine(c,id);
     purchaseKind(kind);
     var line=new LinkedHashMap<>(purchase.requireLine(c,id));
     var revision=repository.rows(c,"ProposalRevisions").stream()
@@ -31,14 +31,14 @@ public final class SettlementFactsAdapter implements SettlementTradeFacts {
     return line;
   }
   public Map<String,Object> contribution(DomainContext c,String kind,String lineId,String referenceId){
-    if("SALES".equals(kind))return deliveries.deliveryCredit(c,lineId,referenceId);
+    if("SALE".equals(kind)){var credit=deliveries.deliveryCredit(c,lineId,referenceId);return Map.of("quantity",credit.get("actualQuantity"),"recognizedQuantity",credit.get("contributedQuantity"),"unit",credit.get("unit"),"occurrenceId",credit.get("canonicalOccurrenceId"),"referenceId",referenceId);}
     purchaseKind(kind);
     var credit=purchase.receiptCredit(c,lineId,referenceId);
-    return Map.of("quantity",credit.get("contributedQuantity"),"unit",credit.get("unit"),
+    return Map.of("quantity",credit.get("actualQuantity"),"recognizedQuantity",credit.get("contributedQuantity"),"unit",credit.get("unit"),
       "occurrenceId",credit.get("occurrenceId"),"referenceId",referenceId);
   }
   public void invoiced(DomainContext c,String kind,String lineId,String invoiceId,BigDecimal q,String unit){
-    if("SALES".equals(kind))execution.recordExecutionEffect(c,lineId,"INVOICED",invoiceId,q,unit);
+    if("SALE".equals(kind))execution.recordExecutionEffect(c,lineId,"INVOICED",invoiceId,q,unit);
     else {purchaseKind(kind);purchase.recordExecutionEffect(c,lineId,"INVOICED",invoiceId,q,unit);}
   }
   private static void purchaseKind(String kind){if(!"PURCHASE".equals(kind))throw DomainError.invalid("Unknown settlement trade scope");}

@@ -18,8 +18,9 @@ PhysicalRanges.project의 genealogy source/target offset으로 변환한다.
 - SalesOrderLinePort.requireLine은 ID, organizationId, orderId, revisionId,
   workId, customerId, itemId, quantity, unit, destinationId, dueAt,
   deliveryEndpoint, qualityTerms, packageTerms, price, currency, revision을
-  반환한다. 남은 수량은 유효 주문 수량에서 현재 인정된 인도 기여량을
-  한 번만 뺀다. 반품을 인도 미이행으로 되돌리지 않는다.
+  반환한다. 남은 수량은 유효 주문 수량에서 irrevocable DISPATCH 실행량을
+  한 번만 뺀다. inventory가 EXECUTABLE/SUSPENDED 예약량을 별도로
+  차감한다. 인도 목표 잔량과 구별하고 반품을 새 예약 여력으로 바꾸지 않는다.
 - DispatchCargoPort.requireDispatch는 ID, organizationId, workId,
   salesLineId, customerId, occurredAt, revision을 반환한다.
   requireCargoScope는 ID, dispatchId, organizationId, salesLineId, workId,
@@ -44,11 +45,13 @@ PhysicalRanges.project의 genealogy source/target offset으로 변환한다.
 
 ## 정산 연결
 
-SettlementTradeFacts의 scopeKind는 PURCHASE 또는 SALES다.
+SettlementTradeFacts의 scopeKind는 PURCHASE 또는 SALE다.
 Purchase 가격·통화·supplier는 line의 proposalRevision과 일치하는
-immutable ProposalRevision에서 읽는다. receipt contribution은
-ReceiptCredits.contributedQuantity이며 초과 실제 수량을 주문 완료로
-승격하지 않는다. sales contribution은 SalesDeliveryCreditPort를 쓴다.
+immutable ProposalRevision에서 읽는다. receipt 비교량은
+ReceiptCredits.actualQuantity이며 recognizedQuantity는 contributedQuantity다.
+실제 송장 수량 대조와 주문의 기여량을 구별하고 초과를 완료로 승격하지 않는다. sales 비교량은 SalesDeliveryCreditPort.actualQuantity이며 legitimate
+기여량을 recognizedQuantity로 별도 제공한다. QC·기한 위반이 실제
+인도량을 지우지 않는다. 이 물리 대조는 지급 승인으로 해석하지 않는다.
 INVOICED effect는 기존 purchase/sales 실행 port로 같은 transaction에
 기록한다. 외부 은행 효과는 없다.
 
