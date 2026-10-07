@@ -143,10 +143,16 @@ public class EvidenceRecords {
   }
   Map<String,Object> source(DomainContext c,String namespace) {
     text(namespace,160);
-    var profile=r.rows("SourceProfiles",c.organizationId()).stream().filter(x->namespace.equals(x.get("namespace"))).findFirst().orElseThrow(()->new DomainError("REJECTED","POLICY_UNRESOLVED","Source profile or intake responsibility unresolved"));
+    var profiles=r.rows("SourceProfiles",c.organizationId()).stream().filter(x->namespace.equals(x.get("namespace"))).toList();
+    if(profiles.size()!=1)throw new DomainError("REJECTED","POLICY_UNRESOLVED","Source profile or intake responsibility unresolved");
+    var profile=profiles.getFirst();text(Objects.toString(profile.get("policyVersion"),null),160);
     for(String role:List.of("intakeOwnerId","supervisorId")) {
       var actor=r.db().run(Select.from("mulino.identity.Actors").where(x->x.get("organizationId").eq(c.organizationId()).and(x.get("ID").eq(profile.get(role))))).first().orElseThrow(DomainError::forbidden);
       if(!"HUMAN".equals(actor.get("kind")))throw new DomainError("REJECTED","POLICY_UNRESOLVED","Intake responsibility requires humans");
+      Instant now=Instant.now();
+      boolean active=r.db().run(Select.from("mulino.identity.Memberships").where(x->x.get("organizationId").eq(c.organizationId()).and(x.get("actorId").eq(profile.get(role))))).listOf(Map.class).stream()
+        .anyMatch(m->m.get("revokedAt")==null&&m.get("validFrom")!=null&&!instant(m.get("validFrom")).isAfter(now)&&(m.get("validUntil")==null||now.isBefore(instant(m.get("validUntil")))));
+      if(!active)throw new DomainError("REJECTED","POLICY_UNRESOLVED","Intake responsibility requires active humans");
     }
     text(Objects.toString(profile.get("nextAction"),null),320);
     if(profile.get("nextCheckAt")==null)throw new DomainError("REJECTED","POLICY_UNRESOLVED","Intake next check unresolved");
