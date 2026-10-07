@@ -37,7 +37,7 @@ ObjectRelations는 발행된 RelationDefinition의 source/target type과 조직 
 QuantitySegment.placeId와 모순될 수 없다. minimumCount의 필수 입력 stage 및
 관계 생성/폐기 lifecycle은 S2 공개 command에서 구현할 범위다.
 
-실행 검사는 `evidence/maven-test.log`와 두 Surefire report에 남겼다.
+실행 검사는 `evidence/maven-test.log.gz`와 두 Surefire report에 남겼다.
 `./mvnw -f backend/pom.xml -Dtest=InventoryQuantityTest,InventoryPostgresTest test`
 결과는 9 tests, 0 failure, 0 error다. PostgreSQL18 Testcontainers와 CAP CQN,
 Flyway V1–V5를 실제 실행했다. JwtDecoder와 ReadAuthorizer는 mock이다.
