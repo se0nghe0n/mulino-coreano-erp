@@ -122,7 +122,8 @@ class EvidenceReconciliationTest {
   @Test void correctionRequiresAtomicImpactImplementation(){
     String previous=event();
     var slots=new LinkedHashMap<String,Object>();slots.put("subject",Map.of("kind","ITEM","id",ITEM));slots.put("kind","RECEIPT");slots.put("sourceNamespace","warehouse");slots.put("externalEventId","R60");slots.put("sourceVersion","2");slots.put("effectiveFrom",OCCURRED.toString());slots.put("timeZone","Asia/Seoul");slots.put("timePrecision","SECOND");slots.put("valueState","KNOWN");slots.put("payload","actual58");slots.put("supersedesId",previous);
-    assertThrows(DomainError.class,()->request(()->commands.execute(auth.context(null,null),Map.of("capabilityId","correctEvidence","slots",slots))));
+    var unavailable=new EvidenceRecordCommands(repository,records,auth,new org.springframework.beans.factory.support.DefaultListableBeanFactory().getBeanProvider(EvidenceCorrectionImpact.class));
+    assertThrows(DomainError.class,()->request(()->unavailable.execute(auth.context(null,null),Map.of("capabilityId","correctEvidence","slots",slots))));
     assertEquals(1,jdbc.queryForObject("SELECT count(*) FROM mulino_evidence_Events",Integer.class));
   }
 }
