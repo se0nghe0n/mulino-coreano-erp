@@ -15,6 +15,7 @@ public final class RecallStockPrimitives {
   for(String action:List.of("SELL","PICK","DISPATCH")){var v=new LinkedHashMap<String,Object>();v.putAll(Map.of("segmentId",root,"controlScope",s.get("controlScope"),"startQuantity",start,"quantity",q,"unit",s.get("unit"),"category","RECALL_INVESTIGATION","action",action,"state","ACTIVE","validFrom",c.asOf()));v.putAll(Map.of("evidenceRef",evidence,"workId",work,"nextCheckAt",next,"commandId",CommandExecution.commandId(),"policyHash",policyHash,"validUntil",Instant.parse("9999-12-31T23:59:59Z")));ids.add(quality.record(c,"Restrictions",v).get("ID").toString());}
   for(var leaf:r.currentRows(c,"QuantitySegments"))if(leaf.get("retiredAt")==null&&!ranges.project(c,root,leaf.get("ID").toString(),start,q).isEmpty())quality.suspend(c,leaf.get("ID").toString(),"RECALL_INVESTIGATION");return ids;
  }
+ public void existingRecovery(DomainContext c,String root,BigDecimal start,BigDecimal q,String segment,String place){requireRange(c,root,start,q,segment);if(!Objects.equals(r.current(c,"QuantitySegments",segment).get("placeId"),place))throw DomainError.invalid("Recovery current location mismatch");}
  public String recover(DomainContext c,String root,BigDecimal start,BigDecimal q,String segment,String place,Instant at,String evidence){
   var projected=requireRange(c,root,start,q,segment);return stock.transferRange(c,segment,projected.start(),q,place,at,evidence,CommandExecution.commandId(),"RECALL_RECOVERY");
  }
