@@ -1,0 +1,4431 @@
+{
+  "schemaVersion": "1.0.0",
+  "caseId": "T06",
+  "title": "과거에 알던 사실과 현재 정정·시간·미확인 상태를 구별한다",
+  "requirementRefs": [
+    "D06"
+  ],
+  "profiles": [
+    "contracts",
+    "scenarios",
+    "recovery"
+  ],
+  "subcases": [
+    {
+      "id": "known-at-correction",
+      "title": "100 기록을98로 정정해 당시100과 현재98을 읽는다",
+      "fixtureRef": "verification/cases/T06/fixtures/known-at-correction.json",
+      "requiredAdapters": [
+        "fixture",
+        "api",
+        "db"
+      ],
+      "actions": [
+        {
+          "id": "setup",
+          "kind": "installFixture",
+          "evidenceRefs": [
+            "setup:actual-artifact"
+          ]
+        },
+        {
+          "id": "record-original",
+          "kind": "invoke",
+          "evidenceRefs": [
+            "record-original:actual-artifact"
+          ],
+          "actorRef": "recorder",
+          "route": "api",
+          "capabilityId": "recordActivity",
+          "request": {
+            "intentKind": "RECORD",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "recordActivity",
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG-A"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseId": "T06",
+              "subcaseId": "known-at-correction"
+            },
+            "expectedRevision": 1,
+            "commandIdempotencyKey": "T06-known-at-correction-record-original",
+            "kind": "RECEIPT_OBSERVATION",
+            "targetId": {
+              "$alias": "Q100"
+            },
+            "quantity": "100",
+            "unit": "BOX",
+            "source": {
+              "documentId": {
+                "$alias": "receipt100"
+              },
+              "sha256": "d6a675cd2ab78e824ce9a85d25640c66bf6fe53bb577a25f3e44c270b6a5c0fc",
+              "sourceNamespace": "warehouse",
+              "externalEventId": "receipt100",
+              "sourceVersion": "v1",
+              "occurredAt": "2026-10-05T00:00:00Z",
+              "originalOccurredAt": "2026-10-05T09:00:00+09:00",
+              "originalOffset": "+09:00",
+              "timezone": "Asia/Seoul",
+              "precision": "SECOND",
+              "recordedAt": "2026-10-07T00:00:00Z"
+            }
+          }
+        },
+        {
+          "id": "then",
+          "kind": "query",
+          "evidenceRefs": [
+            "then:actual-artifact"
+          ],
+          "actorRef": "recorder",
+          "route": "api",
+          "capabilityId": "getEvidence",
+          "request": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG-A"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseId": "T06",
+              "subcaseId": "known-at-correction"
+            },
+            "subjectRefs": [
+              {
+                "type": "TradeItem",
+                "id": {
+                  "$alias": "P"
+                }
+              }
+            ],
+            "asOf": "2026-10-07T00:00:00Z",
+            "knownAt": "2026-10-07T00:00:00Z",
+            "activityId": {
+              "$result": {
+                "actionId": "record-original",
+                "pointer": "/response/activityId"
+              }
+            }
+          }
+        },
+        {
+          "id": "db-before",
+          "kind": "observe",
+          "evidenceRefs": [
+            "db-before:actual-artifact"
+          ],
+          "observation": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG-A"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseId": "T06",
+              "subcaseId": "known-at-correction"
+            },
+            "snapshotRef": {
+              "$result": {
+                "actionId": "then",
+                "pointer": "/response/snapshotRevision"
+              }
+            },
+            "asOf": "2026-10-07T00:00:00Z",
+            "knownAt": "2026-10-07T00:00:00Z",
+            "sources": [
+              "events",
+              "evidence_revisions",
+              "movements",
+              "assessments"
+            ]
+          }
+        },
+        {
+          "id": "later",
+          "kind": "control",
+          "evidenceRefs": [
+            "later:actual-artifact"
+          ],
+          "control": {
+            "type": "clock",
+            "operation": "set",
+            "parameters": {
+              "scope": {
+                "organizationId": {
+                  "$alias": "ORG-A"
+                },
+                "itemId": {
+                  "$alias": "P"
+                },
+                "caseId": "T06",
+                "subcaseId": "known-at-correction"
+              },
+              "asOf": "2026-10-07T01:00:00Z",
+              "knownAt": "2026-10-07T01:00:00Z"
+            }
+          }
+        },
+        {
+          "id": "correct",
+          "kind": "invoke",
+          "evidenceRefs": [
+            "correct:actual-artifact"
+          ],
+          "actorRef": "recorder",
+          "route": "api",
+          "capabilityId": "correctEvidence",
+          "request": {
+            "intentKind": "RECORD",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "correctEvidence",
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG-A"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseId": "T06",
+              "subcaseId": "known-at-correction"
+            },
+            "expectedRevision": {
+              "$result": {
+                "actionId": "record-original",
+                "pointer": "/response/revision"
+              }
+            },
+            "commandIdempotencyKey": "T06-known-at-correction-correct",
+            "activityId": {
+              "$result": {
+                "actionId": "record-original",
+                "pointer": "/response/activityId"
+              }
+            },
+            "quantity": "98",
+            "unit": "BOX",
+            "source": {
+              "documentId": {
+                "$alias": "receipt98"
+              },
+              "sha256": "1d80edd248fee500f9e77c1ebef4c7a0ee639f0b029883a393121436464c6055",
+              "sourceNamespace": "warehouse",
+              "externalEventId": "receipt100",
+              "sourceVersion": "v2",
+              "occurredAt": "2026-10-05T00:00:00Z",
+              "originalOccurredAt": "2026-10-05T09:00:00+09:00",
+              "originalOffset": "+09:00",
+              "timezone": "Asia/Seoul",
+              "precision": "SECOND",
+              "recordedAt": "2026-10-07T01:00:00Z"
+            },
+            "supersedes": {
+              "$result": {
+                "actionId": "record-original",
+                "pointer": "/response/activityId"
+              }
+            },
+            "reason": "확인 수량 정정"
+          }
+        },
+        {
+          "id": "then-again",
+          "kind": "query",
+          "evidenceRefs": [
+            "then-again:actual-artifact"
+          ],
+          "actorRef": "recorder",
+          "route": "api",
+          "capabilityId": "getEvidence",
+          "request": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG-A"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseId": "T06",
+              "subcaseId": "known-at-correction"
+            },
+            "subjectRefs": [
+              {
+                "type": "TradeItem",
+                "id": {
+                  "$alias": "P"
+                }
+              }
+            ],
+            "asOf": "2026-10-07T00:00:00Z",
+            "knownAt": "2026-10-07T00:00:00Z",
+            "activityId": {
+              "$result": {
+                "actionId": "record-original",
+                "pointer": "/response/activityId"
+              }
+            }
+          }
+        },
+        {
+          "id": "current",
+          "kind": "query",
+          "evidenceRefs": [
+            "current:actual-artifact"
+          ],
+          "actorRef": "recorder",
+          "route": "api",
+          "capabilityId": "getEvidence",
+          "request": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG-A"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseId": "T06",
+              "subcaseId": "known-at-correction"
+            },
+            "subjectRefs": [
+              {
+                "type": "TradeItem",
+                "id": {
+                  "$alias": "P"
+                }
+              }
+            ],
+            "asOf": "2026-10-07T00:00:00Z",
+            "knownAt": "2026-10-07T01:00:00Z",
+            "activityId": {
+              "$result": {
+                "actionId": "record-original",
+                "pointer": "/response/activityId"
+              }
+            }
+          }
+        },
+        {
+          "id": "db-after",
+          "kind": "observe",
+          "evidenceRefs": [
+            "db-after:actual-artifact"
+          ],
+          "observation": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG-A"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseId": "T06",
+              "subcaseId": "known-at-correction"
+            },
+            "snapshotRef": {
+              "$result": {
+                "actionId": "current",
+                "pointer": "/response/snapshotRevision"
+              }
+            },
+            "asOf": "2026-10-07T00:00:00Z",
+            "knownAt": "2026-10-07T01:00:00Z",
+            "sources": [
+              "events",
+              "evidence_revisions",
+              "movements",
+              "assessments"
+            ]
+          }
+        }
+      ],
+      "assertions": [
+        {
+          "id": "then-again-quantity",
+          "op": "decimalEquals",
+          "source": {
+            "actionId": "then-again",
+            "pointer": "/response/data/quantity"
+          },
+          "expected": "100",
+          "requirementRefs": [
+            "D06"
+          ],
+          "evidenceRefs": [
+            "then-again:actual-artifact",
+            "then-again:raw-source"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG-A"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "T06",
+            "subcaseId": "known-at-correction"
+          },
+          "oracleExplanation": "then again quantity의 실제 값과 범위를 대조한다",
+          "oracleRef": {
+            "oracleId": "T06.bitemporal-correction",
+            "observationNames": [
+              "then-known"
+            ]
+          },
+          "unit": "BOX",
+          "unitSource": {
+            "actionId": "then-again",
+            "pointer": "/response/data/unit"
+          }
+        },
+        {
+          "id": "current-quantity",
+          "op": "decimalEquals",
+          "source": {
+            "actionId": "current",
+            "pointer": "/response/data/quantity"
+          },
+          "expected": "98",
+          "requirementRefs": [
+            "D06"
+          ],
+          "evidenceRefs": [
+            "current:actual-artifact",
+            "current:raw-source"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG-A"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "T06",
+            "subcaseId": "known-at-correction"
+          },
+          "oracleExplanation": "current quantity의 실제 값과 범위를 대조한다",
+          "oracleRef": {
+            "oracleId": "T06.bitemporal-correction",
+            "observationNames": [
+              "currently-known"
+            ]
+          },
+          "unit": "BOX",
+          "unitSource": {
+            "actionId": "current",
+            "pointer": "/response/data/unit"
+          }
+        },
+        {
+          "id": "original-immutable",
+          "op": "sameAs",
+          "source": {
+            "actionId": "then-again",
+            "pointer": "/response/data"
+          },
+          "expected": true,
+          "requirementRefs": [
+            "D06"
+          ],
+          "evidenceRefs": [
+            "then-again:actual-artifact",
+            "then-again:raw-source"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG-A"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "T06",
+            "subcaseId": "known-at-correction"
+          },
+          "oracleExplanation": "original immutable의 실제 값과 범위를 대조한다",
+          "oracleRef": {
+            "oracleId": "T06.bitemporal-correction",
+            "observationNames": [
+              "time-preserved"
+            ]
+          },
+          "baseline": {
+            "actionId": "then",
+            "pointer": "/response/data"
+          }
+        },
+        {
+          "id": "utc-instant",
+          "op": "timeEquals",
+          "source": {
+            "actionId": "current",
+            "pointer": "/response/data/occurredAt"
+          },
+          "expected": "2026-10-05T00:00:00Z",
+          "requirementRefs": [
+            "D06"
+          ],
+          "evidenceRefs": [
+            "current:actual-artifact",
+            "current:raw-source"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG-A"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "T06",
+            "subcaseId": "known-at-correction"
+          },
+          "oracleExplanation": "utc instant의 실제 값과 범위를 대조한다",
+          "oracleRef": {
+            "oracleId": "T06.bitemporal-correction",
+            "observationNames": [
+              "time-preserved"
+            ]
+          }
+        },
+        {
+          "id": "preserve-originalOffset",
+          "op": "equals",
+          "source": {
+            "actionId": "current",
+            "pointer": "/response/data/originalOffset"
+          },
+          "expected": "+09:00",
+          "requirementRefs": [
+            "D06"
+          ],
+          "evidenceRefs": [
+            "current:actual-artifact",
+            "current:raw-source"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG-A"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "T06",
+            "subcaseId": "known-at-correction"
+          },
+          "oracleExplanation": "preserve originalOffset의 실제 값과 범위를 대조한다",
+          "oracleRef": {
+            "oracleId": "T06.bitemporal-correction",
+            "observationNames": [
+              "time-preserved"
+            ]
+          }
+        },
+        {
+          "id": "preserve-timezone",
+          "op": "equals",
+          "source": {
+            "actionId": "current",
+            "pointer": "/response/data/timezone"
+          },
+          "expected": "Asia/Seoul",
+          "requirementRefs": [
+            "D06"
+          ],
+          "evidenceRefs": [
+            "current:actual-artifact",
+            "current:raw-source"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG-A"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "T06",
+            "subcaseId": "known-at-correction"
+          },
+          "oracleExplanation": "preserve timezone의 실제 값과 범위를 대조한다",
+          "oracleRef": {
+            "oracleId": "T06.bitemporal-correction",
+            "observationNames": [
+              "time-preserved"
+            ]
+          }
+        },
+        {
+          "id": "preserve-precision",
+          "op": "equals",
+          "source": {
+            "actionId": "current",
+            "pointer": "/response/data/precision"
+          },
+          "expected": "SECOND",
+          "requirementRefs": [
+            "D06"
+          ],
+          "evidenceRefs": [
+            "current:actual-artifact",
+            "current:raw-source"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG-A"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "T06",
+            "subcaseId": "known-at-correction"
+          },
+          "oracleExplanation": "preserve precision의 실제 값과 범위를 대조한다",
+          "oracleRef": {
+            "oracleId": "T06.bitemporal-correction",
+            "observationNames": [
+              "time-preserved"
+            ]
+          }
+        },
+        {
+          "id": "revision-pair",
+          "op": "relationSet",
+          "source": {
+            "actionId": "db-after",
+            "pointer": "/data/rawRows/evidence_revisions",
+            "field": [
+              "quantity",
+              "unit",
+              "revision"
+            ]
+          },
+          "expected": [
+            [
+              "100",
+              "BOX",
+              1
+            ],
+            [
+              "98",
+              "BOX",
+              2
+            ]
+          ],
+          "requirementRefs": [
+            "D06"
+          ],
+          "evidenceRefs": [
+            "db-after:actual-artifact",
+            "db-after:raw-source"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG-A"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "T06",
+            "subcaseId": "known-at-correction"
+          },
+          "oracleExplanation": "revision pair의 실제 값과 범위를 대조한다",
+          "oracleRef": {
+            "oracleId": "T06.bitemporal-correction",
+            "observationNames": [
+              "currently-known"
+            ]
+          }
+        },
+        {
+          "id": "occurrence-recording-time-pair",
+          "op": "relationSet",
+          "source": {
+            "actionId": "db-after",
+            "pointer": "/data/rawRows/evidence_revisions",
+            "field": [
+              "revision",
+              "occurredAt",
+              "recordedAt"
+            ]
+          },
+          "expected": [
+            [
+              1,
+              "2026-10-05T00:00:00Z",
+              "2026-10-07T00:00:00Z"
+            ],
+            [
+              2,
+              "2026-10-05T00:00:00Z",
+              "2026-10-07T01:00:00Z"
+            ]
+          ],
+          "requirementRefs": [
+            "D06"
+          ],
+          "evidenceRefs": [
+            "db-after:actual-artifact",
+            "db-after:raw-source"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG-A"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "T06",
+            "subcaseId": "known-at-correction"
+          },
+          "oracleExplanation": "occurrence recording time pair의 실제 값과 범위를 대조한다",
+          "oracleRef": {
+            "oracleId": "T06.bitemporal-correction",
+            "observationNames": [
+              "time-preserved"
+            ]
+          }
+        },
+        {
+          "id": "movements-unchanged",
+          "op": "sameAs",
+          "source": {
+            "actionId": "db-after",
+            "pointer": "/data/rawRows/movements"
+          },
+          "expected": true,
+          "requirementRefs": [
+            "D06"
+          ],
+          "evidenceRefs": [
+            "db-after:actual-artifact",
+            "db-after:raw-source"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG-A"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "T06",
+            "subcaseId": "known-at-correction"
+          },
+          "oracleExplanation": "movements unchanged의 실제 값과 범위를 대조한다",
+          "oracleRef": {
+            "oracleId": "T06.bitemporal-correction",
+            "observationNames": [
+              "correction-not-fake-movement"
+            ]
+          },
+          "baseline": {
+            "actionId": "db-before",
+            "pointer": "/data/rawRows/movements"
+          }
+        }
+      ],
+      "oracleExplanation": "원천·시간·인가 범위와 전후 실제 효과를 대조한다. fixture의 과거 사실은 이번 행동의 실행 증거가 아니다."
+    },
+    {
+      "id": "inconsistent-after-dispatch",
+      "title": "기출고100의98 정정은 가짜 과거 이동 없이 대조로 남는다",
+      "fixtureRef": "verification/cases/T06/fixtures/inconsistent-after-dispatch.json",
+      "requiredAdapters": [
+        "fixture",
+        "api",
+        "db"
+      ],
+      "actions": [
+        {
+          "id": "setup",
+          "kind": "installFixture",
+          "evidenceRefs": [
+            "setup:actual-artifact"
+          ]
+        },
+        {
+          "id": "view-before",
+          "kind": "query",
+          "evidenceRefs": [
+            "view-before:actual-artifact"
+          ],
+          "actorRef": "recorder",
+          "route": "api",
+          "capabilityId": "getObject",
+          "request": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG-A"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseId": "T06",
+              "subcaseId": "inconsistent-after-dispatch"
+            },
+            "subjectRefs": [
+              {
+                "type": "TradeItem",
+                "id": {
+                  "$alias": "P"
+                }
+              }
+            ],
+            "asOf": "2026-10-07T00:00:00Z",
+            "knownAt": "2026-10-07T00:00:00Z"
+          }
+        },
+        {
+          "id": "db-before",
+          "kind": "observe",
+          "evidenceRefs": [
+            "db-before:actual-artifact"
+          ],
+          "observation": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG-A"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseId": "T06",
+              "subcaseId": "inconsistent-after-dispatch"
+            },
+            "snapshotRef": {
+              "$result": {
+                "actionId": "view-before",
+                "pointer": "/response/snapshotRevision"
+              }
+            },
+            "asOf": "2026-10-07T00:00:00Z",
+            "knownAt": "2026-10-07T00:00:00Z",
+            "sources": [
+              "events",
+              "evidence_revisions",
+              "claims",
+              "inbox",
+              "identity_matches",
+              "canonical_links",
+              "movements",
+              "segments",
+              "allocations",
+              "assessments",
+              "obligations",
+              "assignments",
+              "audit",
+              "outbox",
+              "command_records",
+              "restrictions",
+              "source_profiles",
+              "policies",
+              "documents",
+              "tombstones",
+              "deletion_log",
+              "domain_records"
+            ]
+          }
+        },
+        {
+          "id": "correct",
+          "kind": "invoke",
+          "evidenceRefs": [
+            "correct:actual-artifact"
+          ],
+          "actorRef": "recorder",
+          "route": "api",
+          "capabilityId": "correctEvidence",
+          "request": {
+            "intentKind": "RECORD",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "correctEvidence",
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG-A"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseId": "T06",
+              "subcaseId": "inconsistent-after-dispatch"
+            },
+            "expectedRevision": 1,
+            "commandIdempotencyKey": "T06-inconsistent-after-dispatch-correct",
+            "activityId": {
+              "$alias": "old-event"
+            },
+            "quantity": "98",
+            "unit": "BOX",
+            "source": {
+              "documentId": {
+                "$alias": "correction98"
+              },
+              "sha256": "75eb175b70b03b72e07c1294dff1824f4dd71c75a95d2d7177fa5a081840cbfb",
+              "sourceNamespace": "warehouse",
+              "externalEventId": "correction98",
+              "sourceVersion": "v1",
+              "occurredAt": "2026-10-05T00:00:00Z",
+              "originalOccurredAt": "2026-10-05T09:00:00+09:00",
+              "originalOffset": "+09:00",
+              "timezone": "Asia/Seoul",
+              "precision": "SECOND",
+              "recordedAt": "2026-10-07T00:00:00Z"
+            },
+            "reason": "이미 출고된 원 수량의 정정"
+          }
+        },
+        {
+          "id": "view-after",
+          "kind": "query",
+          "evidenceRefs": [
+            "view-after:actual-artifact"
+          ],
+          "actorRef": "recorder",
+          "route": "api",
+          "capabilityId": "getObject",
+          "request": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG-A"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseId": "T06",
+              "subcaseId": "inconsistent-after-dispatch"
+            },
+            "subjectRefs": [
+              {
+                "type": "TradeItem",
+                "id": {
+                  "$alias": "P"
+                }
+              }
+            ],
+            "asOf": "2026-10-07T00:00:00Z",
+            "knownAt": "2026-10-07T00:00:00Z"
+          }
+        },
+        {
+          "id": "db-after",
+          "kind": "observe",
+          "evidenceRefs": [
+            "db-after:actual-artifact"
+          ],
+          "observation": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG-A"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseId": "T06",
+              "subcaseId": "inconsistent-after-dispatch"
+            },
+            "snapshotRef": {
+              "$result": {
+                "actionId": "view-after",
+                "pointer": "/response/snapshotRevision"
+              }
+            },
+            "asOf": "2026-10-07T00:00:00Z",
+            "knownAt": "2026-10-07T00:00:00Z",
+            "sources": [
+              "events",
+              "evidence_revisions",
+              "claims",
+              "inbox",
+              "identity_matches",
+              "canonical_links",
+              "movements",
+              "segments",
+              "allocations",
+              "assessments",
+              "obligations",
+              "assignments",
+              "audit",
+              "outbox",
+              "command_records",
+              "restrictions",
+              "source_profiles",
+              "policies",
+              "documents",
+              "tombstones",
+              "deletion_log",
+              "domain_records"
+            ]
+          }
+        },
+        {
+          "id": "api-duty-STOCK_RECONCILIATION",
+          "kind": "query",
+          "evidenceRefs": [
+            "api-duty-STOCK_RECONCILIATION:actual-artifact"
+          ],
+          "actorRef": "intake",
+          "route": "api",
+          "capabilityId": "getObligations",
+          "request": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG-A"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseId": "T06",
+              "subcaseId": "inconsistent-after-dispatch"
+            },
+            "subjectRefs": [
+              {
+                "type": "TradeItem",
+                "id": {
+                  "$alias": "P"
+                }
+              }
+            ],
+            "asOf": "2026-10-07T00:00:00Z",
+            "knownAt": "2026-10-07T00:00:00Z",
+            "kind": "STOCK_RECONCILIATION"
+          }
+        },
+        {
+          "id": "dispatch-pending",
+          "kind": "invoke",
+          "evidenceRefs": [
+            "dispatch-pending:actual-artifact"
+          ],
+          "actorRef": "warehouse",
+          "route": "api",
+          "capabilityId": "dispatchQuantity",
+          "request": {
+            "intentKind": "COMMAND",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "dispatchQuantity",
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG-A"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseId": "T06",
+              "subcaseId": "inconsistent-after-dispatch"
+            },
+            "expectedRevision": 1,
+            "commandIdempotencyKey": "T06-inconsistent-after-dispatch-dispatch-pending",
+            "segmentId": {
+              "$alias": "Q100"
+            },
+            "quantity": "2",
+            "unit": "BOX"
+          }
+        },
+        {
+          "id": "pending-check",
+          "kind": "query",
+          "evidenceRefs": [
+            "pending-check:actual-artifact"
+          ],
+          "actorRef": "recorder",
+          "route": "api",
+          "capabilityId": "getObject",
+          "request": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG-A"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseId": "T06",
+              "subcaseId": "inconsistent-after-dispatch"
+            },
+            "subjectRefs": [
+              {
+                "type": "TradeItem",
+                "id": {
+                  "$alias": "P"
+                }
+              }
+            ],
+            "asOf": "2026-10-07T00:00:00Z",
+            "knownAt": "2026-10-07T00:00:00Z"
+          }
+        },
+        {
+          "id": "pending-db",
+          "kind": "observe",
+          "evidenceRefs": [
+            "pending-db:actual-artifact"
+          ],
+          "observation": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG-A"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseId": "T06",
+              "subcaseId": "inconsistent-after-dispatch"
+            },
+            "snapshotRef": {
+              "$result": {
+                "actionId": "pending-check",
+                "pointer": "/response/snapshotRevision"
+              }
+            },
+            "asOf": "2026-10-07T00:00:00Z",
+            "knownAt": "2026-10-07T00:00:00Z",
+            "sources": [
+              "movements",
+              "allocations",
+              "outbox"
+            ]
+          }
+        }
+      ],
+      "assertions": [
+        {
+          "id": "movements-unchanged",
+          "op": "sameAs",
+          "source": {
+            "actionId": "db-after",
+            "pointer": "/data/rawRows/movements"
+          },
+          "expected": true,
+          "requirementRefs": [
+            "D06"
+          ],
+          "evidenceRefs": [
+            "db-after:actual-artifact",
+            "db-after:raw-source"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG-A"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "T06",
+            "subcaseId": "inconsistent-after-dispatch"
+          },
+          "oracleExplanation": "movements unchanged의 실제 값과 범위를 대조한다",
+          "oracleRef": {
+            "oracleId": "T06.bitemporal-correction",
+            "observationNames": [
+              "correction-not-fake-movement"
+            ]
+          },
+          "baseline": {
+            "actionId": "db-before",
+            "pointer": "/data/rawRows/movements"
+          }
+        },
+        {
+          "id": "segments-unchanged",
+          "op": "sameAs",
+          "source": {
+            "actionId": "db-after",
+            "pointer": "/data/rawRows/segments"
+          },
+          "expected": true,
+          "requirementRefs": [
+            "D06"
+          ],
+          "evidenceRefs": [
+            "db-after:actual-artifact",
+            "db-after:raw-source"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG-A"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "T06",
+            "subcaseId": "inconsistent-after-dispatch"
+          },
+          "oracleExplanation": "segments unchanged의 실제 값과 범위를 대조한다",
+          "oracleRef": {
+            "oracleId": "T06.bitemporal-correction",
+            "observationNames": [
+              "correction-not-fake-movement"
+            ]
+          },
+          "baseline": {
+            "actionId": "db-before",
+            "pointer": "/data/rawRows/segments"
+          }
+        },
+        {
+          "id": "allocations-unchanged",
+          "op": "sameAs",
+          "source": {
+            "actionId": "db-after",
+            "pointer": "/data/rawRows/allocations"
+          },
+          "expected": true,
+          "requirementRefs": [
+            "D06"
+          ],
+          "evidenceRefs": [
+            "db-after:actual-artifact",
+            "db-after:raw-source"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG-A"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "T06",
+            "subcaseId": "inconsistent-after-dispatch"
+          },
+          "oracleExplanation": "allocations unchanged의 실제 값과 범위를 대조한다",
+          "oracleRef": {
+            "oracleId": "T06.bitemporal-correction",
+            "observationNames": [
+              "correction-not-fake-movement"
+            ]
+          },
+          "baseline": {
+            "actionId": "db-before",
+            "pointer": "/data/rawRows/allocations"
+          }
+        },
+        {
+          "id": "projection-pending",
+          "op": "equals",
+          "source": {
+            "actionId": "view-after",
+            "pointer": "/response/data/projectionStatus"
+          },
+          "expected": "PENDING",
+          "requirementRefs": [
+            "D06"
+          ],
+          "evidenceRefs": [
+            "view-after:actual-artifact",
+            "view-after:raw-source"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG-A"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "T06",
+            "subcaseId": "inconsistent-after-dispatch"
+          },
+          "oracleExplanation": "projection pending의 실제 값과 범위를 대조한다",
+          "oracleRef": {
+            "oracleId": "T06.bitemporal-correction",
+            "observationNames": [
+              "correction-not-fake-movement"
+            ]
+          }
+        },
+        {
+          "id": "STOCK_RECONCILIATION-one-assignment",
+          "op": "count",
+          "source": {
+            "actionId": "db-after",
+            "pointer": "/data/rawRows/assignments",
+            "where": {
+              "kind": "STOCK_RECONCILIATION",
+              "status": "OPEN"
+            }
+          },
+          "expected": 1,
+          "requirementRefs": [
+            "D06"
+          ],
+          "evidenceRefs": [
+            "db-after:actual-artifact",
+            "db-after:raw-source"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG-A"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "T06",
+            "subcaseId": "inconsistent-after-dispatch"
+          },
+          "oracleExplanation": "STOCK_RECONCILIATION one assignment의 실제 값과 범위를 대조한다",
+          "oracleRef": {
+            "oracleId": "T06.bitemporal-correction",
+            "observationNames": [
+              "correction-not-fake-movement"
+            ]
+          }
+        },
+        {
+          "id": "STOCK_RECONCILIATION-responsibility",
+          "op": "relationSet",
+          "source": {
+            "actionId": "db-after",
+            "pointer": "/data/rawRows/assignments",
+            "field": [
+              "ownerId",
+              "nextAction",
+              "nextCheckAt"
+            ],
+            "where": {
+              "kind": "STOCK_RECONCILIATION",
+              "status": "OPEN"
+            }
+          },
+          "expected": [
+            [
+              {
+                "$alias": "intake"
+              },
+              "원천·실물 범위 대조",
+              "2026-10-07T02:00:00Z"
+            ]
+          ],
+          "requirementRefs": [
+            "D06"
+          ],
+          "evidenceRefs": [
+            "db-after:actual-artifact",
+            "db-after:raw-source"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG-A"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "T06",
+            "subcaseId": "inconsistent-after-dispatch"
+          },
+          "oracleExplanation": "STOCK_RECONCILIATION responsibility의 실제 값과 범위를 대조한다",
+          "oracleRef": {
+            "oracleId": "T06.bitemporal-correction",
+            "observationNames": [
+              "correction-not-fake-movement"
+            ]
+          }
+        },
+        {
+          "id": "STOCK_RECONCILIATION-human-owner",
+          "op": "exactSet",
+          "source": {
+            "actionId": "db-after",
+            "pointer": "/data/rawRows/assignments",
+            "field": "ownerType",
+            "where": {
+              "kind": "STOCK_RECONCILIATION",
+              "status": "OPEN"
+            }
+          },
+          "expected": [
+            "HUMAN"
+          ],
+          "requirementRefs": [
+            "D06"
+          ],
+          "evidenceRefs": [
+            "db-after:actual-artifact",
+            "db-after:raw-source"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG-A"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "T06",
+            "subcaseId": "inconsistent-after-dispatch"
+          },
+          "oracleExplanation": "STOCK_RECONCILIATION human owner의 실제 값과 범위를 대조한다",
+          "oracleRef": {
+            "oracleId": "T06.bitemporal-correction",
+            "observationNames": [
+              "correction-not-fake-movement"
+            ]
+          }
+        },
+        {
+          "id": "STOCK_RECONCILIATION-api-responsibility",
+          "op": "relationSet",
+          "source": {
+            "actionId": "api-duty-STOCK_RECONCILIATION",
+            "pointer": "/response/data/items",
+            "field": [
+              "ownerId",
+              "nextAction",
+              "nextCheckAt"
+            ],
+            "where": {
+              "kind": "STOCK_RECONCILIATION",
+              "status": "OPEN"
+            }
+          },
+          "expected": [
+            [
+              {
+                "$alias": "intake"
+              },
+              "원천·실물 범위 대조",
+              "2026-10-07T02:00:00Z"
+            ]
+          ],
+          "requirementRefs": [
+            "D06"
+          ],
+          "evidenceRefs": [
+            "api-duty-STOCK_RECONCILIATION:actual-artifact",
+            "api-duty-STOCK_RECONCILIATION:raw-source"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG-A"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "T06",
+            "subcaseId": "inconsistent-after-dispatch"
+          },
+          "oracleExplanation": "STOCK_RECONCILIATION api responsibility의 실제 값과 범위를 대조한다",
+          "oracleRef": {
+            "oracleId": "T06.bitemporal-correction",
+            "observationNames": [
+              "correction-not-fake-movement"
+            ]
+          }
+        },
+        {
+          "id": "pending-rejection",
+          "op": "equals",
+          "source": {
+            "actionId": "dispatch-pending",
+            "pointer": "/response/outcome"
+          },
+          "expected": "REJECTED",
+          "requirementRefs": [
+            "D06"
+          ],
+          "evidenceRefs": [
+            "dispatch-pending:actual-artifact",
+            "dispatch-pending:raw-source"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG-A"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "T06",
+            "subcaseId": "inconsistent-after-dispatch"
+          },
+          "oracleExplanation": "pending rejection의 실제 값과 범위를 대조한다",
+          "oracleRef": {
+            "oracleId": "T06.bitemporal-correction",
+            "observationNames": [
+              "correction-not-fake-movement"
+            ]
+          }
+        },
+        {
+          "id": "pending-movements",
+          "op": "sameAs",
+          "source": {
+            "actionId": "pending-db",
+            "pointer": "/data/rawRows/movements"
+          },
+          "expected": true,
+          "requirementRefs": [
+            "D06"
+          ],
+          "evidenceRefs": [
+            "pending-db:actual-artifact",
+            "pending-db:raw-source"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG-A"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "T06",
+            "subcaseId": "inconsistent-after-dispatch"
+          },
+          "oracleExplanation": "pending movements의 실제 값과 범위를 대조한다",
+          "oracleRef": {
+            "oracleId": "T06.bitemporal-correction",
+            "observationNames": [
+              "correction-not-fake-movement"
+            ]
+          },
+          "baseline": {
+            "actionId": "db-after",
+            "pointer": "/data/rawRows/movements"
+          }
+        },
+        {
+          "id": "pending-allocations",
+          "op": "sameAs",
+          "source": {
+            "actionId": "pending-db",
+            "pointer": "/data/rawRows/allocations"
+          },
+          "expected": true,
+          "requirementRefs": [
+            "D06"
+          ],
+          "evidenceRefs": [
+            "pending-db:actual-artifact",
+            "pending-db:raw-source"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG-A"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "T06",
+            "subcaseId": "inconsistent-after-dispatch"
+          },
+          "oracleExplanation": "pending allocations의 실제 값과 범위를 대조한다",
+          "oracleRef": {
+            "oracleId": "T06.bitemporal-correction",
+            "observationNames": [
+              "correction-not-fake-movement"
+            ]
+          },
+          "baseline": {
+            "actionId": "db-after",
+            "pointer": "/data/rawRows/allocations"
+          }
+        },
+        {
+          "id": "pending-outbox",
+          "op": "sameAs",
+          "source": {
+            "actionId": "pending-db",
+            "pointer": "/data/rawRows/outbox"
+          },
+          "expected": true,
+          "requirementRefs": [
+            "D06"
+          ],
+          "evidenceRefs": [
+            "pending-db:actual-artifact",
+            "pending-db:raw-source"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG-A"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "T06",
+            "subcaseId": "inconsistent-after-dispatch"
+          },
+          "oracleExplanation": "pending outbox의 실제 값과 범위를 대조한다",
+          "oracleRef": {
+            "oracleId": "T06.bitemporal-correction",
+            "observationNames": [
+              "correction-not-fake-movement"
+            ]
+          },
+          "baseline": {
+            "actionId": "db-after",
+            "pointer": "/data/rawRows/outbox"
+          }
+        }
+      ],
+      "oracleExplanation": "원천·시간·인가 범위와 전후 실제 효과를 대조한다. fixture의 과거 사실은 이번 행동의 실행 증거가 아니다."
+    },
+    {
+      "id": "inclusive-deadline",
+      "title": "기한과 같은 사건 시각의 포함 끝점을 검증한다",
+      "fixtureRef": "verification/cases/T06/fixtures/inclusive-deadline.json",
+      "requiredAdapters": [
+        "fixture",
+        "api",
+        "db"
+      ],
+      "actions": [
+        {
+          "id": "setup",
+          "kind": "installFixture",
+          "evidenceRefs": [
+            "setup:actual-artifact"
+          ]
+        },
+        {
+          "id": "record",
+          "kind": "invoke",
+          "evidenceRefs": [
+            "record:actual-artifact"
+          ],
+          "actorRef": "recorder",
+          "route": "api",
+          "capabilityId": "recordActivity",
+          "request": {
+            "intentKind": "RECORD",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "recordActivity",
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG-A"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseId": "T06",
+              "subcaseId": "inclusive-deadline"
+            },
+            "expectedRevision": 1,
+            "commandIdempotencyKey": "T06-inclusive-deadline-record",
+            "kind": "RECEIPT_OBSERVATION",
+            "quantity": "100",
+            "unit": "BOX",
+            "targetId": {
+              "$alias": "Q100"
+            },
+            "source": {
+              "documentId": {
+                "$alias": "at-deadline"
+              },
+              "sha256": "c7596b7f07eef6382125a2e51fffa8bd3094cb4029004f0060de369fc823de26",
+              "sourceNamespace": "warehouse",
+              "externalEventId": "at-deadline",
+              "sourceVersion": "v1",
+              "occurredAt": "2026-10-05T15:00:00Z",
+              "originalOccurredAt": "2026-10-06T00:00:00+09:00",
+              "originalOffset": "+09:00",
+              "timezone": "Asia/Seoul",
+              "precision": "SECOND",
+              "recordedAt": "2026-10-07T00:00:00Z"
+            }
+          }
+        },
+        {
+          "id": "match",
+          "kind": "invoke",
+          "evidenceRefs": [
+            "match:actual-artifact"
+          ],
+          "actorRef": "reconciler",
+          "route": "api",
+          "capabilityId": "matchSourceIdentity",
+          "request": {
+            "intentKind": "COMMAND",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "matchSourceIdentity",
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG-A"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseId": "T06",
+              "subcaseId": "inclusive-deadline"
+            },
+            "expectedRevision": 1,
+            "commandIdempotencyKey": "T06-inclusive-deadline-match",
+            "activityId": {
+              "$result": {
+                "actionId": "record",
+                "pointer": "/response/activityId"
+              }
+            },
+            "targetId": {
+              "$alias": "Q100"
+            },
+            "basis": {
+              "$alias": "at-deadline"
+            }
+          }
+        },
+        {
+          "id": "link",
+          "kind": "invoke",
+          "evidenceRefs": [
+            "link:actual-artifact"
+          ],
+          "actorRef": "reconciler",
+          "route": "api",
+          "capabilityId": "linkCanonicalOccurrence",
+          "request": {
+            "intentKind": "COMMAND",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "linkCanonicalOccurrence",
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG-A"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseId": "T06",
+              "subcaseId": "inclusive-deadline"
+            },
+            "expectedRevision": 1,
+            "commandIdempotencyKey": "T06-inclusive-deadline-link",
+            "activityId": {
+              "$result": {
+                "actionId": "record",
+                "pointer": "/response/activityId"
+              }
+            },
+            "targetId": {
+              "$alias": "Q100"
+            },
+            "identityMatchId": {
+              "$result": {
+                "actionId": "match",
+                "pointer": "/response/id"
+              }
+            },
+            "basis": {
+              "$alias": "at-deadline"
+            }
+          }
+        },
+        {
+          "id": "confirm",
+          "kind": "invoke",
+          "evidenceRefs": [
+            "confirm:actual-artifact"
+          ],
+          "actorRef": "recorder",
+          "route": "api",
+          "capabilityId": "confirmReceipt",
+          "request": {
+            "intentKind": "COMMAND",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "confirmReceipt",
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG-A"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseId": "T06",
+              "subcaseId": "inclusive-deadline"
+            },
+            "expectedRevision": 1,
+            "commandIdempotencyKey": "T06-inclusive-deadline-confirm",
+            "occurrenceId": {
+              "$result": {
+                "actionId": "link",
+                "pointer": "/response/occurrenceId"
+              }
+            },
+            "segmentId": {
+              "$alias": "Q100"
+            },
+            "quantity": "100",
+            "unit": "BOX",
+            "placeId": {
+              "$alias": "W"
+            }
+          }
+        },
+        {
+          "id": "assessment",
+          "kind": "query",
+          "evidenceRefs": [
+            "assessment:actual-artifact"
+          ],
+          "actorRef": "recorder",
+          "route": "api",
+          "capabilityId": "getAssessment",
+          "request": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG-A"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseId": "T06",
+              "subcaseId": "inclusive-deadline"
+            },
+            "subjectRefs": [
+              {
+                "type": "TradeItem",
+                "id": {
+                  "$alias": "P"
+                }
+              }
+            ],
+            "asOf": "2026-10-07T00:00:00Z",
+            "knownAt": "2026-10-07T00:00:00Z",
+            "workId": {
+              "$alias": "O1"
+            }
+          }
+        },
+        {
+          "id": "db-after",
+          "kind": "observe",
+          "evidenceRefs": [
+            "db-after:actual-artifact"
+          ],
+          "observation": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG-A"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseId": "T06",
+              "subcaseId": "inclusive-deadline"
+            },
+            "snapshotRef": {
+              "$result": {
+                "actionId": "assessment",
+                "pointer": "/response/snapshotRevision"
+              }
+            },
+            "asOf": "2026-10-07T00:00:00Z",
+            "knownAt": "2026-10-07T00:00:00Z",
+            "sources": [
+              "events",
+              "assessments"
+            ]
+          }
+        }
+      ],
+      "assertions": [
+        {
+          "id": "deadline-status",
+          "op": "equals",
+          "source": {
+            "actionId": "assessment",
+            "pointer": "/response/data/result"
+          },
+          "expected": "SATISFIED",
+          "requirementRefs": [
+            "D06"
+          ],
+          "evidenceRefs": [
+            "assessment:actual-artifact",
+            "assessment:raw-source"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG-A"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "T06",
+            "subcaseId": "inclusive-deadline"
+          },
+          "oracleExplanation": "deadline status의 실제 값과 범위를 대조한다",
+          "oracleRef": {
+            "oracleId": "T06.bitemporal-correction",
+            "observationNames": [
+              "time-preserved"
+            ]
+          }
+        },
+        {
+          "id": "deadline-meaning",
+          "op": "relationSet",
+          "source": {
+            "actionId": "db-after",
+            "pointer": "/data/rawRows/assessments",
+            "field": [
+              "result",
+              "deadlineInclusive",
+              "dueAt",
+              "timezone"
+            ]
+          },
+          "expected": [
+            [
+              "SATISFIED",
+              true,
+              "2026-10-05T15:00:00Z",
+              "Asia/Seoul"
+            ]
+          ],
+          "requirementRefs": [
+            "D06"
+          ],
+          "evidenceRefs": [
+            "db-after:actual-artifact",
+            "db-after:raw-source"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG-A"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "T06",
+            "subcaseId": "inclusive-deadline"
+          },
+          "oracleExplanation": "deadline meaning의 실제 값과 범위를 대조한다",
+          "oracleRef": {
+            "oracleId": "T06.bitemporal-correction",
+            "observationNames": [
+              "time-preserved"
+            ]
+          }
+        }
+      ],
+      "oracleExplanation": "원천·시간·인가 범위와 전후 실제 효과를 대조한다. fixture의 과거 사실은 이번 행동의 실행 증거가 아니다."
+    },
+    {
+      "id": "exclusive-deadline",
+      "title": "기한과 같은 사건 시각의 제외 끝점을 검증한다",
+      "fixtureRef": "verification/cases/T06/fixtures/exclusive-deadline.json",
+      "requiredAdapters": [
+        "fixture",
+        "api",
+        "db"
+      ],
+      "actions": [
+        {
+          "id": "setup",
+          "kind": "installFixture",
+          "evidenceRefs": [
+            "setup:actual-artifact"
+          ]
+        },
+        {
+          "id": "record",
+          "kind": "invoke",
+          "evidenceRefs": [
+            "record:actual-artifact"
+          ],
+          "actorRef": "recorder",
+          "route": "api",
+          "capabilityId": "recordActivity",
+          "request": {
+            "intentKind": "RECORD",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "recordActivity",
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG-A"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseId": "T06",
+              "subcaseId": "exclusive-deadline"
+            },
+            "expectedRevision": 1,
+            "commandIdempotencyKey": "T06-exclusive-deadline-record",
+            "kind": "RECEIPT_OBSERVATION",
+            "quantity": "100",
+            "unit": "BOX",
+            "targetId": {
+              "$alias": "Q100"
+            },
+            "source": {
+              "documentId": {
+                "$alias": "at-deadline"
+              },
+              "sha256": "c7596b7f07eef6382125a2e51fffa8bd3094cb4029004f0060de369fc823de26",
+              "sourceNamespace": "warehouse",
+              "externalEventId": "at-deadline",
+              "sourceVersion": "v1",
+              "occurredAt": "2026-10-05T15:00:00Z",
+              "originalOccurredAt": "2026-10-06T00:00:00+09:00",
+              "originalOffset": "+09:00",
+              "timezone": "Asia/Seoul",
+              "precision": "SECOND",
+              "recordedAt": "2026-10-07T00:00:00Z"
+            }
+          }
+        },
+        {
+          "id": "match",
+          "kind": "invoke",
+          "evidenceRefs": [
+            "match:actual-artifact"
+          ],
+          "actorRef": "reconciler",
+          "route": "api",
+          "capabilityId": "matchSourceIdentity",
+          "request": {
+            "intentKind": "COMMAND",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "matchSourceIdentity",
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG-A"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseId": "T06",
+              "subcaseId": "exclusive-deadline"
+            },
+            "expectedRevision": 1,
+            "commandIdempotencyKey": "T06-exclusive-deadline-match",
+            "activityId": {
+              "$result": {
+                "actionId": "record",
+                "pointer": "/response/activityId"
+              }
+            },
+            "targetId": {
+              "$alias": "Q100"
+            },
+            "basis": {
+              "$alias": "at-deadline"
+            }
+          }
+        },
+        {
+          "id": "link",
+          "kind": "invoke",
+          "evidenceRefs": [
+            "link:actual-artifact"
+          ],
+          "actorRef": "reconciler",
+          "route": "api",
+          "capabilityId": "linkCanonicalOccurrence",
+          "request": {
+            "intentKind": "COMMAND",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "linkCanonicalOccurrence",
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG-A"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseId": "T06",
+              "subcaseId": "exclusive-deadline"
+            },
+            "expectedRevision": 1,
+            "commandIdempotencyKey": "T06-exclusive-deadline-link",
+            "activityId": {
+              "$result": {
+                "actionId": "record",
+                "pointer": "/response/activityId"
+              }
+            },
+            "targetId": {
+              "$alias": "Q100"
+            },
+            "identityMatchId": {
+              "$result": {
+                "actionId": "match",
+                "pointer": "/response/id"
+              }
+            },
+            "basis": {
+              "$alias": "at-deadline"
+            }
+          }
+        },
+        {
+          "id": "confirm",
+          "kind": "invoke",
+          "evidenceRefs": [
+            "confirm:actual-artifact"
+          ],
+          "actorRef": "recorder",
+          "route": "api",
+          "capabilityId": "confirmReceipt",
+          "request": {
+            "intentKind": "COMMAND",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "confirmReceipt",
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG-A"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseId": "T06",
+              "subcaseId": "exclusive-deadline"
+            },
+            "expectedRevision": 1,
+            "commandIdempotencyKey": "T06-exclusive-deadline-confirm",
+            "occurrenceId": {
+              "$result": {
+                "actionId": "link",
+                "pointer": "/response/occurrenceId"
+              }
+            },
+            "segmentId": {
+              "$alias": "Q100"
+            },
+            "quantity": "100",
+            "unit": "BOX",
+            "placeId": {
+              "$alias": "W"
+            }
+          }
+        },
+        {
+          "id": "assessment",
+          "kind": "query",
+          "evidenceRefs": [
+            "assessment:actual-artifact"
+          ],
+          "actorRef": "recorder",
+          "route": "api",
+          "capabilityId": "getAssessment",
+          "request": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG-A"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseId": "T06",
+              "subcaseId": "exclusive-deadline"
+            },
+            "subjectRefs": [
+              {
+                "type": "TradeItem",
+                "id": {
+                  "$alias": "P"
+                }
+              }
+            ],
+            "asOf": "2026-10-07T00:00:00Z",
+            "knownAt": "2026-10-07T00:00:00Z",
+            "workId": {
+              "$alias": "O1"
+            }
+          }
+        },
+        {
+          "id": "db-after",
+          "kind": "observe",
+          "evidenceRefs": [
+            "db-after:actual-artifact"
+          ],
+          "observation": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG-A"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseId": "T06",
+              "subcaseId": "exclusive-deadline"
+            },
+            "snapshotRef": {
+              "$result": {
+                "actionId": "assessment",
+                "pointer": "/response/snapshotRevision"
+              }
+            },
+            "asOf": "2026-10-07T00:00:00Z",
+            "knownAt": "2026-10-07T00:00:00Z",
+            "sources": [
+              "events",
+              "assessments"
+            ]
+          }
+        }
+      ],
+      "assertions": [
+        {
+          "id": "deadline-status",
+          "op": "equals",
+          "source": {
+            "actionId": "assessment",
+            "pointer": "/response/data/result"
+          },
+          "expected": "UNSATISFIED",
+          "requirementRefs": [
+            "D06"
+          ],
+          "evidenceRefs": [
+            "assessment:actual-artifact",
+            "assessment:raw-source"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG-A"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "T06",
+            "subcaseId": "exclusive-deadline"
+          },
+          "oracleExplanation": "deadline status의 실제 값과 범위를 대조한다",
+          "oracleRef": {
+            "oracleId": "T06.bitemporal-correction",
+            "observationNames": [
+              "time-preserved"
+            ]
+          }
+        },
+        {
+          "id": "deadline-meaning",
+          "op": "relationSet",
+          "source": {
+            "actionId": "db-after",
+            "pointer": "/data/rawRows/assessments",
+            "field": [
+              "result",
+              "deadlineInclusive",
+              "dueAt",
+              "timezone"
+            ]
+          },
+          "expected": [
+            [
+              "UNSATISFIED",
+              false,
+              "2026-10-05T15:00:00Z",
+              "Asia/Seoul"
+            ]
+          ],
+          "requirementRefs": [
+            "D06"
+          ],
+          "evidenceRefs": [
+            "db-after:actual-artifact",
+            "db-after:raw-source"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG-A"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "T06",
+            "subcaseId": "exclusive-deadline"
+          },
+          "oracleExplanation": "deadline meaning의 실제 값과 범위를 대조한다",
+          "oracleRef": {
+            "oracleId": "T06.bitemporal-correction",
+            "observationNames": [
+              "time-preserved"
+            ]
+          }
+        }
+      ],
+      "oracleExplanation": "원천·시간·인가 범위와 전후 실제 효과를 대조한다. fixture의 과거 사실은 이번 행동의 실행 증거가 아니다."
+    },
+    {
+      "id": "date-only-range",
+      "title": "날짜만 알려진 사건이 기한을 걸치면 미확인이다",
+      "fixtureRef": "verification/cases/T06/fixtures/date-only-range.json",
+      "requiredAdapters": [
+        "fixture",
+        "api",
+        "db"
+      ],
+      "actions": [
+        {
+          "id": "setup",
+          "kind": "installFixture",
+          "evidenceRefs": [
+            "setup:actual-artifact"
+          ]
+        },
+        {
+          "id": "record",
+          "kind": "invoke",
+          "evidenceRefs": [
+            "record:actual-artifact"
+          ],
+          "actorRef": "recorder",
+          "route": "api",
+          "capabilityId": "recordActivity",
+          "request": {
+            "intentKind": "RECORD",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "recordActivity",
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG-A"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseId": "T06",
+              "subcaseId": "date-only-range"
+            },
+            "expectedRevision": 1,
+            "commandIdempotencyKey": "T06-date-only-range-record",
+            "kind": "RECEIPT_OBSERVATION",
+            "quantity": "100",
+            "unit": "BOX",
+            "targetId": {
+              "$alias": "Q100"
+            },
+            "source": {
+              "documentId": {
+                "$alias": "date-only"
+              },
+              "sha256": "c976087ea9c48f50e4b184124b13802a918fc080a102ed3c862b4669615e868b",
+              "sourceNamespace": "warehouse",
+              "externalEventId": "date-only",
+              "sourceVersion": "v1",
+              "originalOffset": "+09:00",
+              "timezone": "Asia/Seoul",
+              "precision": "DATE",
+              "recordedAt": "2026-10-07T00:00:00Z",
+              "occurredDate": "2026-10-05",
+              "occurredRange": {
+                "start": "2026-10-04T15:00:00Z",
+                "end": "2026-10-05T15:00:00Z",
+                "endInclusive": false
+              }
+            }
+          }
+        },
+        {
+          "id": "match",
+          "kind": "invoke",
+          "evidenceRefs": [
+            "match:actual-artifact"
+          ],
+          "actorRef": "reconciler",
+          "route": "api",
+          "capabilityId": "matchSourceIdentity",
+          "request": {
+            "intentKind": "COMMAND",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "matchSourceIdentity",
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG-A"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseId": "T06",
+              "subcaseId": "date-only-range"
+            },
+            "expectedRevision": 1,
+            "commandIdempotencyKey": "T06-date-only-range-match",
+            "activityId": {
+              "$result": {
+                "actionId": "record",
+                "pointer": "/response/activityId"
+              }
+            },
+            "targetId": {
+              "$alias": "Q100"
+            },
+            "basis": {
+              "$alias": "date-only"
+            }
+          }
+        },
+        {
+          "id": "link",
+          "kind": "invoke",
+          "evidenceRefs": [
+            "link:actual-artifact"
+          ],
+          "actorRef": "reconciler",
+          "route": "api",
+          "capabilityId": "linkCanonicalOccurrence",
+          "request": {
+            "intentKind": "COMMAND",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "linkCanonicalOccurrence",
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG-A"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseId": "T06",
+              "subcaseId": "date-only-range"
+            },
+            "expectedRevision": 1,
+            "commandIdempotencyKey": "T06-date-only-range-link",
+            "activityId": {
+              "$result": {
+                "actionId": "record",
+                "pointer": "/response/activityId"
+              }
+            },
+            "targetId": {
+              "$alias": "Q100"
+            },
+            "identityMatchId": {
+              "$result": {
+                "actionId": "match",
+                "pointer": "/response/id"
+              }
+            },
+            "basis": {
+              "$alias": "date-only"
+            }
+          }
+        },
+        {
+          "id": "confirm",
+          "kind": "invoke",
+          "evidenceRefs": [
+            "confirm:actual-artifact"
+          ],
+          "actorRef": "recorder",
+          "route": "api",
+          "capabilityId": "confirmReceipt",
+          "request": {
+            "intentKind": "COMMAND",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "confirmReceipt",
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG-A"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseId": "T06",
+              "subcaseId": "date-only-range"
+            },
+            "expectedRevision": 1,
+            "commandIdempotencyKey": "T06-date-only-range-confirm",
+            "occurrenceId": {
+              "$result": {
+                "actionId": "link",
+                "pointer": "/response/occurrenceId"
+              }
+            },
+            "segmentId": {
+              "$alias": "Q100"
+            },
+            "quantity": "100",
+            "unit": "BOX",
+            "placeId": {
+              "$alias": "W"
+            },
+            "occurredRange": {
+              "start": "2026-10-04T15:00:00Z",
+              "end": "2026-10-05T15:00:00Z",
+              "endInclusive": false
+            },
+            "precision": "DATE"
+          }
+        },
+        {
+          "id": "evidence",
+          "kind": "query",
+          "evidenceRefs": [
+            "evidence:actual-artifact"
+          ],
+          "actorRef": "recorder",
+          "route": "api",
+          "capabilityId": "getEvidence",
+          "request": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG-A"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseId": "T06",
+              "subcaseId": "date-only-range"
+            },
+            "subjectRefs": [
+              {
+                "type": "TradeItem",
+                "id": {
+                  "$alias": "P"
+                }
+              }
+            ],
+            "asOf": "2026-10-07T00:00:00Z",
+            "knownAt": "2026-10-07T00:00:00Z",
+            "activityId": {
+              "$result": {
+                "actionId": "record",
+                "pointer": "/response/activityId"
+              }
+            }
+          }
+        },
+        {
+          "id": "assessment",
+          "kind": "query",
+          "evidenceRefs": [
+            "assessment:actual-artifact"
+          ],
+          "actorRef": "recorder",
+          "route": "api",
+          "capabilityId": "getAssessment",
+          "request": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG-A"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseId": "T06",
+              "subcaseId": "date-only-range"
+            },
+            "subjectRefs": [
+              {
+                "type": "TradeItem",
+                "id": {
+                  "$alias": "P"
+                }
+              }
+            ],
+            "asOf": "2026-10-07T00:00:00Z",
+            "knownAt": "2026-10-07T00:00:00Z",
+            "workId": {
+              "$alias": "O1"
+            }
+          }
+        },
+        {
+          "id": "db-after",
+          "kind": "observe",
+          "evidenceRefs": [
+            "db-after:actual-artifact"
+          ],
+          "observation": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG-A"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseId": "T06",
+              "subcaseId": "date-only-range"
+            },
+            "snapshotRef": {
+              "$result": {
+                "actionId": "assessment",
+                "pointer": "/response/snapshotRevision"
+              }
+            },
+            "asOf": "2026-10-07T00:00:00Z",
+            "knownAt": "2026-10-07T00:00:00Z",
+            "sources": [
+              "events",
+              "assessments",
+              "movements"
+            ]
+          }
+        }
+      ],
+      "assertions": [
+        {
+          "id": "date-range",
+          "op": "equals",
+          "source": {
+            "actionId": "evidence",
+            "pointer": "/response/data/occurredRange"
+          },
+          "expected": {
+            "start": "2026-10-04T15:00:00Z",
+            "end": "2026-10-05T15:00:00Z",
+            "endInclusive": false
+          },
+          "requirementRefs": [
+            "D06"
+          ],
+          "evidenceRefs": [
+            "evidence:actual-artifact",
+            "evidence:raw-source"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG-A"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "T06",
+            "subcaseId": "date-only-range"
+          },
+          "oracleExplanation": "date range의 실제 값과 범위를 대조한다",
+          "oracleRef": {
+            "oracleId": "T06.bitemporal-correction",
+            "observationNames": [
+              "time-preserved"
+            ]
+          }
+        },
+        {
+          "id": "date-precision",
+          "op": "equals",
+          "source": {
+            "actionId": "evidence",
+            "pointer": "/response/data/precision"
+          },
+          "expected": "DATE",
+          "requirementRefs": [
+            "D06"
+          ],
+          "evidenceRefs": [
+            "evidence:actual-artifact",
+            "evidence:raw-source"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG-A"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "T06",
+            "subcaseId": "date-only-range"
+          },
+          "oracleExplanation": "date precision의 실제 값과 범위를 대조한다",
+          "oracleRef": {
+            "oracleId": "T06.bitemporal-correction",
+            "observationNames": [
+              "time-preserved"
+            ]
+          }
+        },
+        {
+          "id": "date-unverified",
+          "op": "equals",
+          "source": {
+            "actionId": "assessment",
+            "pointer": "/response/data/result"
+          },
+          "expected": "UNVERIFIED",
+          "requirementRefs": [
+            "D06"
+          ],
+          "evidenceRefs": [
+            "assessment:actual-artifact",
+            "assessment:raw-source"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG-A"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "T06",
+            "subcaseId": "date-only-range"
+          },
+          "oracleExplanation": "date unverified의 실제 값과 범위를 대조한다",
+          "oracleRef": {
+            "oracleId": "T06.bitemporal-correction",
+            "observationNames": [
+              "time-preserved"
+            ]
+          }
+        },
+        {
+          "id": "date-known-receipt-100",
+          "op": "sumEquals",
+          "source": {
+            "actionId": "db-after",
+            "pointer": "/data/rawRows/movements",
+            "field": "quantity",
+            "where": {
+              "kind": "RECEIPT"
+            }
+          },
+          "expected": "100",
+          "requirementRefs": [
+            "D06"
+          ],
+          "evidenceRefs": [
+            "db-after:actual-artifact",
+            "db-after:raw-source"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG-A"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "T06",
+            "subcaseId": "date-only-range"
+          },
+          "oracleExplanation": "date known receipt 100의 실제 값과 범위를 대조한다",
+          "oracleRef": {
+            "oracleId": "T06.bitemporal-correction",
+            "observationNames": [
+              "time-preserved"
+            ]
+          },
+          "unit": "BOX",
+          "unitSource": {
+            "actionId": "db-after",
+            "pointer": "/data/rawRows/movements",
+            "where": {
+              "kind": "RECEIPT"
+            },
+            "field": "unit"
+          }
+        }
+      ],
+      "oracleExplanation": "원천·시간·인가 범위와 전후 실제 효과를 대조한다. fixture의 과거 사실은 이번 행동의 실행 증거가 아니다."
+    },
+    {
+      "id": "four-states",
+      "title": "미입력·조사전·적용안됨·상충을0으로 합치지 않는다",
+      "fixtureRef": "verification/cases/T06/fixtures/four-states.json",
+      "requiredAdapters": [
+        "fixture",
+        "api",
+        "db"
+      ],
+      "actions": [
+        {
+          "id": "setup",
+          "kind": "installFixture",
+          "evidenceRefs": [
+            "setup:actual-artifact"
+          ]
+        },
+        {
+          "id": "view-before",
+          "kind": "query",
+          "evidenceRefs": [
+            "view-before:actual-artifact"
+          ],
+          "actorRef": "recorder",
+          "route": "api",
+          "capabilityId": "getObject",
+          "request": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG-A"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseId": "T06",
+              "subcaseId": "four-states"
+            },
+            "subjectRefs": [
+              {
+                "type": "TradeItem",
+                "id": {
+                  "$alias": "P"
+                }
+              }
+            ],
+            "asOf": "2026-10-07T00:00:00Z",
+            "knownAt": "2026-10-07T00:00:00Z"
+          }
+        },
+        {
+          "id": "db-before",
+          "kind": "observe",
+          "evidenceRefs": [
+            "db-before:actual-artifact"
+          ],
+          "observation": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG-A"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseId": "T06",
+              "subcaseId": "four-states"
+            },
+            "snapshotRef": {
+              "$result": {
+                "actionId": "view-before",
+                "pointer": "/response/snapshotRevision"
+              }
+            },
+            "asOf": "2026-10-07T00:00:00Z",
+            "knownAt": "2026-10-07T00:00:00Z",
+            "sources": [
+              "claims",
+              "movements",
+              "segments",
+              "allocations"
+            ]
+          }
+        },
+        {
+          "id": "states",
+          "kind": "query",
+          "evidenceRefs": [
+            "states:actual-artifact"
+          ],
+          "actorRef": "recorder",
+          "route": "api",
+          "capabilityId": "getObject",
+          "request": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG-A"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseId": "T06",
+              "subcaseId": "four-states"
+            },
+            "subjectRefs": [
+              {
+                "type": "TradeItem",
+                "id": {
+                  "$alias": "P"
+                }
+              }
+            ],
+            "asOf": "2026-10-07T00:00:00Z",
+            "knownAt": "2026-10-07T00:00:00Z"
+          }
+        },
+        {
+          "id": "view-after",
+          "kind": "query",
+          "evidenceRefs": [
+            "view-after:actual-artifact"
+          ],
+          "actorRef": "recorder",
+          "route": "api",
+          "capabilityId": "getObject",
+          "request": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG-A"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseId": "T06",
+              "subcaseId": "four-states"
+            },
+            "subjectRefs": [
+              {
+                "type": "TradeItem",
+                "id": {
+                  "$alias": "P"
+                }
+              }
+            ],
+            "asOf": "2026-10-07T00:00:00Z",
+            "knownAt": "2026-10-07T00:00:00Z"
+          }
+        },
+        {
+          "id": "db-after",
+          "kind": "observe",
+          "evidenceRefs": [
+            "db-after:actual-artifact"
+          ],
+          "observation": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG-A"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseId": "T06",
+              "subcaseId": "four-states"
+            },
+            "snapshotRef": {
+              "$result": {
+                "actionId": "view-after",
+                "pointer": "/response/snapshotRevision"
+              }
+            },
+            "asOf": "2026-10-07T00:00:00Z",
+            "knownAt": "2026-10-07T00:00:00Z",
+            "sources": [
+              "claims",
+              "movements",
+              "segments",
+              "allocations"
+            ]
+          }
+        }
+      ],
+      "assertions": [
+        {
+          "id": "response-states",
+          "op": "exactSet",
+          "source": {
+            "actionId": "states",
+            "pointer": "/response/data/observedAttributes",
+            "field": "state"
+          },
+          "expected": [
+            "MISSING",
+            "UNKNOWN",
+            "NOT_APPLICABLE",
+            "CONFLICT"
+          ],
+          "requirementRefs": [
+            "D06"
+          ],
+          "evidenceRefs": [
+            "states:actual-artifact",
+            "states:raw-source"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG-A"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "T06",
+            "subcaseId": "four-states"
+          },
+          "oracleExplanation": "response states의 실제 값과 범위를 대조한다",
+          "oracleRef": {
+            "oracleId": "T06.unknown-state-distinction",
+            "observationNames": [
+              "state-values"
+            ]
+          }
+        },
+        {
+          "id": "raw-states",
+          "op": "exactSet",
+          "source": {
+            "actionId": "db-after",
+            "pointer": "/data/rawRows/claims",
+            "field": "state"
+          },
+          "expected": [
+            "MISSING",
+            "UNKNOWN",
+            "NOT_APPLICABLE",
+            "CONFLICT"
+          ],
+          "requirementRefs": [
+            "D06"
+          ],
+          "evidenceRefs": [
+            "db-after:actual-artifact",
+            "db-after:raw-source"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG-A"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "T06",
+            "subcaseId": "four-states"
+          },
+          "oracleExplanation": "raw states의 실제 값과 범위를 대조한다",
+          "oracleRef": {
+            "oracleId": "T06.unknown-state-distinction",
+            "observationNames": [
+              "state-values"
+            ]
+          }
+        },
+        {
+          "id": "claims-unchanged",
+          "op": "sameAs",
+          "source": {
+            "actionId": "db-after",
+            "pointer": "/data/rawRows/claims"
+          },
+          "expected": true,
+          "requirementRefs": [
+            "D06"
+          ],
+          "evidenceRefs": [
+            "db-after:actual-artifact",
+            "db-after:raw-source"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG-A"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "T06",
+            "subcaseId": "four-states"
+          },
+          "oracleExplanation": "claims unchanged의 실제 값과 범위를 대조한다",
+          "oracleRef": {
+            "oracleId": "T06.unknown-state-distinction",
+            "observationNames": [
+              "zero-inference"
+            ]
+          },
+          "baseline": {
+            "actionId": "db-before",
+            "pointer": "/data/rawRows/claims"
+          }
+        },
+        {
+          "id": "movements-unchanged",
+          "op": "sameAs",
+          "source": {
+            "actionId": "db-after",
+            "pointer": "/data/rawRows/movements"
+          },
+          "expected": true,
+          "requirementRefs": [
+            "D06"
+          ],
+          "evidenceRefs": [
+            "db-after:actual-artifact",
+            "db-after:raw-source"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG-A"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "T06",
+            "subcaseId": "four-states"
+          },
+          "oracleExplanation": "movements unchanged의 실제 값과 범위를 대조한다",
+          "oracleRef": {
+            "oracleId": "T06.unknown-state-distinction",
+            "observationNames": [
+              "zero-inference"
+            ]
+          },
+          "baseline": {
+            "actionId": "db-before",
+            "pointer": "/data/rawRows/movements"
+          }
+        },
+        {
+          "id": "segments-unchanged",
+          "op": "sameAs",
+          "source": {
+            "actionId": "db-after",
+            "pointer": "/data/rawRows/segments"
+          },
+          "expected": true,
+          "requirementRefs": [
+            "D06"
+          ],
+          "evidenceRefs": [
+            "db-after:actual-artifact",
+            "db-after:raw-source"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG-A"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "T06",
+            "subcaseId": "four-states"
+          },
+          "oracleExplanation": "segments unchanged의 실제 값과 범위를 대조한다",
+          "oracleRef": {
+            "oracleId": "T06.unknown-state-distinction",
+            "observationNames": [
+              "zero-inference"
+            ]
+          },
+          "baseline": {
+            "actionId": "db-before",
+            "pointer": "/data/rawRows/segments"
+          }
+        },
+        {
+          "id": "allocations-unchanged",
+          "op": "sameAs",
+          "source": {
+            "actionId": "db-after",
+            "pointer": "/data/rawRows/allocations"
+          },
+          "expected": true,
+          "requirementRefs": [
+            "D06"
+          ],
+          "evidenceRefs": [
+            "db-after:actual-artifact",
+            "db-after:raw-source"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG-A"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "T06",
+            "subcaseId": "four-states"
+          },
+          "oracleExplanation": "allocations unchanged의 실제 값과 범위를 대조한다",
+          "oracleRef": {
+            "oracleId": "T06.unknown-state-distinction",
+            "observationNames": [
+              "zero-inference"
+            ]
+          },
+          "baseline": {
+            "actionId": "db-before",
+            "pointer": "/data/rawRows/allocations"
+          }
+        },
+        {
+          "id": "state-0-not-known-zero",
+          "op": "absent",
+          "source": {
+            "actionId": "states",
+            "pointer": "/response/data/observedAttributes/0/knownQuantity"
+          },
+          "expected": true,
+          "requirementRefs": [
+            "D06"
+          ],
+          "evidenceRefs": [
+            "states:actual-artifact",
+            "states:raw-source"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG-A"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "T06",
+            "subcaseId": "four-states"
+          },
+          "oracleExplanation": "state 0 not known zero의 실제 값과 범위를 대조한다",
+          "oracleRef": {
+            "oracleId": "T06.unknown-state-distinction",
+            "observationNames": [
+              "zero-inference"
+            ]
+          }
+        },
+        {
+          "id": "state-1-not-known-zero",
+          "op": "absent",
+          "source": {
+            "actionId": "states",
+            "pointer": "/response/data/observedAttributes/1/knownQuantity"
+          },
+          "expected": true,
+          "requirementRefs": [
+            "D06"
+          ],
+          "evidenceRefs": [
+            "states:actual-artifact",
+            "states:raw-source"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG-A"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "T06",
+            "subcaseId": "four-states"
+          },
+          "oracleExplanation": "state 1 not known zero의 실제 값과 범위를 대조한다",
+          "oracleRef": {
+            "oracleId": "T06.unknown-state-distinction",
+            "observationNames": [
+              "zero-inference"
+            ]
+          }
+        },
+        {
+          "id": "state-2-not-known-zero",
+          "op": "absent",
+          "source": {
+            "actionId": "states",
+            "pointer": "/response/data/observedAttributes/2/knownQuantity"
+          },
+          "expected": true,
+          "requirementRefs": [
+            "D06"
+          ],
+          "evidenceRefs": [
+            "states:actual-artifact",
+            "states:raw-source"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG-A"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "T06",
+            "subcaseId": "four-states"
+          },
+          "oracleExplanation": "state 2 not known zero의 실제 값과 범위를 대조한다",
+          "oracleRef": {
+            "oracleId": "T06.unknown-state-distinction",
+            "observationNames": [
+              "zero-inference"
+            ]
+          }
+        },
+        {
+          "id": "state-3-not-known-zero",
+          "op": "absent",
+          "source": {
+            "actionId": "states",
+            "pointer": "/response/data/observedAttributes/3/knownQuantity"
+          },
+          "expected": true,
+          "requirementRefs": [
+            "D06"
+          ],
+          "evidenceRefs": [
+            "states:actual-artifact",
+            "states:raw-source"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG-A"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "T06",
+            "subcaseId": "four-states"
+          },
+          "oracleExplanation": "state 3 not known zero의 실제 값과 범위를 대조한다",
+          "oracleRef": {
+            "oracleId": "T06.unknown-state-distinction",
+            "observationNames": [
+              "zero-inference"
+            ]
+          }
+        },
+        {
+          "id": "conflict-values",
+          "op": "exactSet",
+          "source": {
+            "actionId": "states",
+            "pointer": "/response/data/conflicts/0/claimValues"
+          },
+          "expected": [
+            "98",
+            "100"
+          ],
+          "requirementRefs": [
+            "D06"
+          ],
+          "evidenceRefs": [
+            "states:actual-artifact",
+            "states:raw-source"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG-A"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "T06",
+            "subcaseId": "four-states"
+          },
+          "oracleExplanation": "conflict values의 실제 값과 범위를 대조한다",
+          "oracleRef": {
+            "oracleId": "T06.unknown-state-distinction",
+            "observationNames": [
+              "conflict-preserved"
+            ]
+          }
+        }
+      ],
+      "oracleExplanation": "원천·시간·인가 범위와 전후 실제 효과를 대조한다. fixture의 과거 사실은 이번 행동의 실행 증거가 아니다."
+    },
+    {
+      "id": "all-false-conflict",
+      "title": "typed all 판정과 상충 flag를 독립 검증한다",
+      "fixtureRef": "verification/cases/T06/fixtures/all-false-conflict.json",
+      "requiredAdapters": [
+        "fixture",
+        "api",
+        "db"
+      ],
+      "actions": [
+        {
+          "id": "setup",
+          "kind": "installFixture",
+          "evidenceRefs": [
+            "setup:actual-artifact"
+          ]
+        },
+        {
+          "id": "create-goal",
+          "kind": "invoke",
+          "evidenceRefs": [
+            "create-goal:actual-artifact"
+          ],
+          "actorRef": "recorder",
+          "route": "api",
+          "capabilityId": "createWork",
+          "request": {
+            "intentKind": "COMMAND",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "createWork",
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG-A"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseId": "T06",
+              "subcaseId": "all-false-conflict"
+            },
+            "expectedRevision": 1,
+            "commandIdempotencyKey": "T06-all-false-conflict-create-goal",
+            "verb": "inspect",
+            "goalPredicate": {
+              "operator": "all",
+              "predicates": [
+                {
+                  "operator": "compare",
+                  "propertyRef": "quantity-0",
+                  "comparison": "GTE",
+                  "value": "100",
+                  "unit": "BOX",
+                  "evidenceSelector": "verified-scoped-events"
+                },
+                {
+                  "operator": "compare",
+                  "propertyRef": "quantity-1",
+                  "comparison": "GTE",
+                  "value": "100",
+                  "unit": "BOX",
+                  "evidenceSelector": "verified-scoped-events"
+                }
+              ]
+            },
+            "ownerId": {
+              "$alias": "intake"
+            },
+            "targetId": {
+              "$alias": "Q100"
+            }
+          }
+        },
+        {
+          "id": "assessment",
+          "kind": "query",
+          "evidenceRefs": [
+            "assessment:actual-artifact"
+          ],
+          "actorRef": "recorder",
+          "route": "api",
+          "capabilityId": "getAssessment",
+          "request": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG-A"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseId": "T06",
+              "subcaseId": "all-false-conflict"
+            },
+            "subjectRefs": [
+              {
+                "type": "TradeItem",
+                "id": {
+                  "$alias": "P"
+                }
+              }
+            ],
+            "asOf": "2026-10-07T00:00:00Z",
+            "knownAt": "2026-10-07T00:00:00Z",
+            "workId": {
+              "$result": {
+                "actionId": "create-goal",
+                "pointer": "/response/workId"
+              }
+            }
+          }
+        },
+        {
+          "id": "db-after",
+          "kind": "observe",
+          "evidenceRefs": [
+            "db-after:actual-artifact"
+          ],
+          "observation": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG-A"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseId": "T06",
+              "subcaseId": "all-false-conflict"
+            },
+            "snapshotRef": {
+              "$result": {
+                "actionId": "assessment",
+                "pointer": "/response/snapshotRevision"
+              }
+            },
+            "asOf": "2026-10-07T00:00:00Z",
+            "knownAt": "2026-10-07T00:00:00Z",
+            "sources": [
+              "assessments",
+              "movements",
+              "allocations"
+            ]
+          }
+        }
+      ],
+      "assertions": [
+        {
+          "id": "predicate-result",
+          "op": "equals",
+          "source": {
+            "actionId": "assessment",
+            "pointer": "/response/data/result"
+          },
+          "expected": "UNSATISFIED",
+          "requirementRefs": [
+            "D06"
+          ],
+          "evidenceRefs": [
+            "assessment:actual-artifact",
+            "assessment:raw-source"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG-A"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "T06",
+            "subcaseId": "all-false-conflict"
+          },
+          "oracleExplanation": "predicate result의 실제 값과 범위를 대조한다",
+          "oracleRef": {
+            "oracleId": "T06.unknown-state-distinction",
+            "observationNames": [
+              "conflict-preserved"
+            ]
+          }
+        },
+        {
+          "id": "predicate-conflict",
+          "op": "equals",
+          "source": {
+            "actionId": "assessment",
+            "pointer": "/response/data/conflict"
+          },
+          "expected": true,
+          "requirementRefs": [
+            "D06"
+          ],
+          "evidenceRefs": [
+            "assessment:actual-artifact",
+            "assessment:raw-source"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG-A"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "T06",
+            "subcaseId": "all-false-conflict"
+          },
+          "oracleExplanation": "predicate conflict의 실제 값과 범위를 대조한다",
+          "oracleRef": {
+            "oracleId": "T06.unknown-state-distinction",
+            "observationNames": [
+              "conflict-preserved"
+            ]
+          }
+        },
+        {
+          "id": "raw-predicate",
+          "op": "relationSet",
+          "source": {
+            "actionId": "db-after",
+            "pointer": "/data/rawRows/assessments",
+            "field": [
+              "result",
+              "conflict",
+              "evaluatorVersion"
+            ]
+          },
+          "expected": [
+            [
+              "UNSATISFIED",
+              true,
+              "evaluator-v1"
+            ]
+          ],
+          "requirementRefs": [
+            "D06"
+          ],
+          "evidenceRefs": [
+            "db-after:actual-artifact",
+            "db-after:raw-source"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG-A"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "T06",
+            "subcaseId": "all-false-conflict"
+          },
+          "oracleExplanation": "raw predicate의 실제 값과 범위를 대조한다",
+          "oracleRef": {
+            "oracleId": "T06.unknown-state-distinction",
+            "observationNames": [
+              "conflict-preserved"
+            ]
+          }
+        },
+        {
+          "id": "no-physical-inference",
+          "op": "count",
+          "source": {
+            "actionId": "db-after",
+            "pointer": "/data/rawRows/movements"
+          },
+          "expected": 0,
+          "requirementRefs": [
+            "D06"
+          ],
+          "evidenceRefs": [
+            "db-after:actual-artifact",
+            "db-after:raw-source"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG-A"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "T06",
+            "subcaseId": "all-false-conflict"
+          },
+          "oracleExplanation": "no physical inference의 실제 값과 범위를 대조한다",
+          "oracleRef": {
+            "oracleId": "T06.unknown-state-distinction",
+            "observationNames": [
+              "zero-inference"
+            ]
+          }
+        }
+      ],
+      "oracleExplanation": "원천·시간·인가 범위와 전후 실제 효과를 대조한다. fixture의 과거 사실은 이번 행동의 실행 증거가 아니다."
+    },
+    {
+      "id": "all-true-conflict",
+      "title": "typed all 판정과 상충 flag를 독립 검증한다",
+      "fixtureRef": "verification/cases/T06/fixtures/all-true-conflict.json",
+      "requiredAdapters": [
+        "fixture",
+        "api",
+        "db"
+      ],
+      "actions": [
+        {
+          "id": "setup",
+          "kind": "installFixture",
+          "evidenceRefs": [
+            "setup:actual-artifact"
+          ]
+        },
+        {
+          "id": "create-goal",
+          "kind": "invoke",
+          "evidenceRefs": [
+            "create-goal:actual-artifact"
+          ],
+          "actorRef": "recorder",
+          "route": "api",
+          "capabilityId": "createWork",
+          "request": {
+            "intentKind": "COMMAND",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "createWork",
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG-A"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseId": "T06",
+              "subcaseId": "all-true-conflict"
+            },
+            "expectedRevision": 1,
+            "commandIdempotencyKey": "T06-all-true-conflict-create-goal",
+            "verb": "inspect",
+            "goalPredicate": {
+              "operator": "all",
+              "predicates": [
+                {
+                  "operator": "compare",
+                  "propertyRef": "quantity-0",
+                  "comparison": "GTE",
+                  "value": "100",
+                  "unit": "BOX",
+                  "evidenceSelector": "verified-scoped-events"
+                },
+                {
+                  "operator": "compare",
+                  "propertyRef": "quantity-1",
+                  "comparison": "GTE",
+                  "value": "100",
+                  "unit": "BOX",
+                  "evidenceSelector": "verified-scoped-events"
+                }
+              ]
+            },
+            "ownerId": {
+              "$alias": "intake"
+            },
+            "targetId": {
+              "$alias": "Q100"
+            }
+          }
+        },
+        {
+          "id": "assessment",
+          "kind": "query",
+          "evidenceRefs": [
+            "assessment:actual-artifact"
+          ],
+          "actorRef": "recorder",
+          "route": "api",
+          "capabilityId": "getAssessment",
+          "request": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG-A"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseId": "T06",
+              "subcaseId": "all-true-conflict"
+            },
+            "subjectRefs": [
+              {
+                "type": "TradeItem",
+                "id": {
+                  "$alias": "P"
+                }
+              }
+            ],
+            "asOf": "2026-10-07T00:00:00Z",
+            "knownAt": "2026-10-07T00:00:00Z",
+            "workId": {
+              "$result": {
+                "actionId": "create-goal",
+                "pointer": "/response/workId"
+              }
+            }
+          }
+        },
+        {
+          "id": "db-after",
+          "kind": "observe",
+          "evidenceRefs": [
+            "db-after:actual-artifact"
+          ],
+          "observation": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG-A"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseId": "T06",
+              "subcaseId": "all-true-conflict"
+            },
+            "snapshotRef": {
+              "$result": {
+                "actionId": "assessment",
+                "pointer": "/response/snapshotRevision"
+              }
+            },
+            "asOf": "2026-10-07T00:00:00Z",
+            "knownAt": "2026-10-07T00:00:00Z",
+            "sources": [
+              "assessments",
+              "movements",
+              "allocations"
+            ]
+          }
+        }
+      ],
+      "assertions": [
+        {
+          "id": "predicate-result",
+          "op": "equals",
+          "source": {
+            "actionId": "assessment",
+            "pointer": "/response/data/result"
+          },
+          "expected": "UNVERIFIED",
+          "requirementRefs": [
+            "D06"
+          ],
+          "evidenceRefs": [
+            "assessment:actual-artifact",
+            "assessment:raw-source"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG-A"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "T06",
+            "subcaseId": "all-true-conflict"
+          },
+          "oracleExplanation": "predicate result의 실제 값과 범위를 대조한다",
+          "oracleRef": {
+            "oracleId": "T06.unknown-state-distinction",
+            "observationNames": [
+              "conflict-preserved"
+            ]
+          }
+        },
+        {
+          "id": "predicate-conflict",
+          "op": "equals",
+          "source": {
+            "actionId": "assessment",
+            "pointer": "/response/data/conflict"
+          },
+          "expected": true,
+          "requirementRefs": [
+            "D06"
+          ],
+          "evidenceRefs": [
+            "assessment:actual-artifact",
+            "assessment:raw-source"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG-A"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "T06",
+            "subcaseId": "all-true-conflict"
+          },
+          "oracleExplanation": "predicate conflict의 실제 값과 범위를 대조한다",
+          "oracleRef": {
+            "oracleId": "T06.unknown-state-distinction",
+            "observationNames": [
+              "conflict-preserved"
+            ]
+          }
+        },
+        {
+          "id": "raw-predicate",
+          "op": "relationSet",
+          "source": {
+            "actionId": "db-after",
+            "pointer": "/data/rawRows/assessments",
+            "field": [
+              "result",
+              "conflict",
+              "evaluatorVersion"
+            ]
+          },
+          "expected": [
+            [
+              "UNVERIFIED",
+              true,
+              "evaluator-v1"
+            ]
+          ],
+          "requirementRefs": [
+            "D06"
+          ],
+          "evidenceRefs": [
+            "db-after:actual-artifact",
+            "db-after:raw-source"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG-A"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "T06",
+            "subcaseId": "all-true-conflict"
+          },
+          "oracleExplanation": "raw predicate의 실제 값과 범위를 대조한다",
+          "oracleRef": {
+            "oracleId": "T06.unknown-state-distinction",
+            "observationNames": [
+              "conflict-preserved"
+            ]
+          }
+        },
+        {
+          "id": "no-physical-inference",
+          "op": "count",
+          "source": {
+            "actionId": "db-after",
+            "pointer": "/data/rawRows/movements"
+          },
+          "expected": 0,
+          "requirementRefs": [
+            "D06"
+          ],
+          "evidenceRefs": [
+            "db-after:actual-artifact",
+            "db-after:raw-source"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG-A"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "T06",
+            "subcaseId": "all-true-conflict"
+          },
+          "oracleExplanation": "no physical inference의 실제 값과 범위를 대조한다",
+          "oracleRef": {
+            "oracleId": "T06.unknown-state-distinction",
+            "observationNames": [
+              "zero-inference"
+            ]
+          }
+        }
+      ],
+      "oracleExplanation": "원천·시간·인가 범위와 전후 실제 효과를 대조한다. fixture의 과거 사실은 이번 행동의 실행 증거가 아니다."
+    },
+    {
+      "id": "any-true-conflict",
+      "title": "typed any 판정과 상충 flag를 독립 검증한다",
+      "fixtureRef": "verification/cases/T06/fixtures/any-true-conflict.json",
+      "requiredAdapters": [
+        "fixture",
+        "api",
+        "db"
+      ],
+      "actions": [
+        {
+          "id": "setup",
+          "kind": "installFixture",
+          "evidenceRefs": [
+            "setup:actual-artifact"
+          ]
+        },
+        {
+          "id": "create-goal",
+          "kind": "invoke",
+          "evidenceRefs": [
+            "create-goal:actual-artifact"
+          ],
+          "actorRef": "recorder",
+          "route": "api",
+          "capabilityId": "createWork",
+          "request": {
+            "intentKind": "COMMAND",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "createWork",
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG-A"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseId": "T06",
+              "subcaseId": "any-true-conflict"
+            },
+            "expectedRevision": 1,
+            "commandIdempotencyKey": "T06-any-true-conflict-create-goal",
+            "verb": "inspect",
+            "goalPredicate": {
+              "operator": "any",
+              "predicates": [
+                {
+                  "operator": "compare",
+                  "propertyRef": "quantity-0",
+                  "comparison": "GTE",
+                  "value": "100",
+                  "unit": "BOX",
+                  "evidenceSelector": "verified-scoped-events"
+                },
+                {
+                  "operator": "compare",
+                  "propertyRef": "quantity-1",
+                  "comparison": "GTE",
+                  "value": "100",
+                  "unit": "BOX",
+                  "evidenceSelector": "verified-scoped-events"
+                }
+              ]
+            },
+            "ownerId": {
+              "$alias": "intake"
+            },
+            "targetId": {
+              "$alias": "Q100"
+            }
+          }
+        },
+        {
+          "id": "assessment",
+          "kind": "query",
+          "evidenceRefs": [
+            "assessment:actual-artifact"
+          ],
+          "actorRef": "recorder",
+          "route": "api",
+          "capabilityId": "getAssessment",
+          "request": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG-A"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseId": "T06",
+              "subcaseId": "any-true-conflict"
+            },
+            "subjectRefs": [
+              {
+                "type": "TradeItem",
+                "id": {
+                  "$alias": "P"
+                }
+              }
+            ],
+            "asOf": "2026-10-07T00:00:00Z",
+            "knownAt": "2026-10-07T00:00:00Z",
+            "workId": {
+              "$result": {
+                "actionId": "create-goal",
+                "pointer": "/response/workId"
+              }
+            }
+          }
+        },
+        {
+          "id": "db-after",
+          "kind": "observe",
+          "evidenceRefs": [
+            "db-after:actual-artifact"
+          ],
+          "observation": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG-A"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseId": "T06",
+              "subcaseId": "any-true-conflict"
+            },
+            "snapshotRef": {
+              "$result": {
+                "actionId": "assessment",
+                "pointer": "/response/snapshotRevision"
+              }
+            },
+            "asOf": "2026-10-07T00:00:00Z",
+            "knownAt": "2026-10-07T00:00:00Z",
+            "sources": [
+              "assessments",
+              "movements",
+              "allocations"
+            ]
+          }
+        }
+      ],
+      "assertions": [
+        {
+          "id": "predicate-result",
+          "op": "equals",
+          "source": {
+            "actionId": "assessment",
+            "pointer": "/response/data/result"
+          },
+          "expected": "SATISFIED",
+          "requirementRefs": [
+            "D06"
+          ],
+          "evidenceRefs": [
+            "assessment:actual-artifact",
+            "assessment:raw-source"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG-A"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "T06",
+            "subcaseId": "any-true-conflict"
+          },
+          "oracleExplanation": "predicate result의 실제 값과 범위를 대조한다",
+          "oracleRef": {
+            "oracleId": "T06.unknown-state-distinction",
+            "observationNames": [
+              "conflict-preserved"
+            ]
+          }
+        },
+        {
+          "id": "predicate-conflict",
+          "op": "equals",
+          "source": {
+            "actionId": "assessment",
+            "pointer": "/response/data/conflict"
+          },
+          "expected": true,
+          "requirementRefs": [
+            "D06"
+          ],
+          "evidenceRefs": [
+            "assessment:actual-artifact",
+            "assessment:raw-source"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG-A"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "T06",
+            "subcaseId": "any-true-conflict"
+          },
+          "oracleExplanation": "predicate conflict의 실제 값과 범위를 대조한다",
+          "oracleRef": {
+            "oracleId": "T06.unknown-state-distinction",
+            "observationNames": [
+              "conflict-preserved"
+            ]
+          }
+        },
+        {
+          "id": "raw-predicate",
+          "op": "relationSet",
+          "source": {
+            "actionId": "db-after",
+            "pointer": "/data/rawRows/assessments",
+            "field": [
+              "result",
+              "conflict",
+              "evaluatorVersion"
+            ]
+          },
+          "expected": [
+            [
+              "SATISFIED",
+              true,
+              "evaluator-v1"
+            ]
+          ],
+          "requirementRefs": [
+            "D06"
+          ],
+          "evidenceRefs": [
+            "db-after:actual-artifact",
+            "db-after:raw-source"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG-A"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "T06",
+            "subcaseId": "any-true-conflict"
+          },
+          "oracleExplanation": "raw predicate의 실제 값과 범위를 대조한다",
+          "oracleRef": {
+            "oracleId": "T06.unknown-state-distinction",
+            "observationNames": [
+              "conflict-preserved"
+            ]
+          }
+        },
+        {
+          "id": "no-physical-inference",
+          "op": "count",
+          "source": {
+            "actionId": "db-after",
+            "pointer": "/data/rawRows/movements"
+          },
+          "expected": 0,
+          "requirementRefs": [
+            "D06"
+          ],
+          "evidenceRefs": [
+            "db-after:actual-artifact",
+            "db-after:raw-source"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG-A"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "T06",
+            "subcaseId": "any-true-conflict"
+          },
+          "oracleExplanation": "no physical inference의 실제 값과 범위를 대조한다",
+          "oracleRef": {
+            "oracleId": "T06.unknown-state-distinction",
+            "observationNames": [
+              "zero-inference"
+            ]
+          }
+        }
+      ],
+      "oracleExplanation": "원천·시간·인가 범위와 전후 실제 효과를 대조한다. fixture의 과거 사실은 이번 행동의 실행 증거가 아니다."
+    },
+    {
+      "id": "not-unknown",
+      "title": "typed not 판정과 상충 flag를 독립 검증한다",
+      "fixtureRef": "verification/cases/T06/fixtures/not-unknown.json",
+      "requiredAdapters": [
+        "fixture",
+        "api",
+        "db"
+      ],
+      "actions": [
+        {
+          "id": "setup",
+          "kind": "installFixture",
+          "evidenceRefs": [
+            "setup:actual-artifact"
+          ]
+        },
+        {
+          "id": "create-goal",
+          "kind": "invoke",
+          "evidenceRefs": [
+            "create-goal:actual-artifact"
+          ],
+          "actorRef": "recorder",
+          "route": "api",
+          "capabilityId": "createWork",
+          "request": {
+            "intentKind": "COMMAND",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "createWork",
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG-A"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseId": "T06",
+              "subcaseId": "not-unknown"
+            },
+            "expectedRevision": 1,
+            "commandIdempotencyKey": "T06-not-unknown-create-goal",
+            "verb": "inspect",
+            "goalPredicate": {
+              "operator": "not",
+              "predicates": [
+                {
+                  "operator": "compare",
+                  "propertyRef": "quantity-0",
+                  "comparison": "GTE",
+                  "value": "100",
+                  "unit": "BOX",
+                  "evidenceSelector": "verified-scoped-events"
+                }
+              ]
+            },
+            "ownerId": {
+              "$alias": "intake"
+            },
+            "targetId": {
+              "$alias": "Q100"
+            }
+          }
+        },
+        {
+          "id": "assessment",
+          "kind": "query",
+          "evidenceRefs": [
+            "assessment:actual-artifact"
+          ],
+          "actorRef": "recorder",
+          "route": "api",
+          "capabilityId": "getAssessment",
+          "request": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG-A"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseId": "T06",
+              "subcaseId": "not-unknown"
+            },
+            "subjectRefs": [
+              {
+                "type": "TradeItem",
+                "id": {
+                  "$alias": "P"
+                }
+              }
+            ],
+            "asOf": "2026-10-07T00:00:00Z",
+            "knownAt": "2026-10-07T00:00:00Z",
+            "workId": {
+              "$result": {
+                "actionId": "create-goal",
+                "pointer": "/response/workId"
+              }
+            }
+          }
+        },
+        {
+          "id": "db-after",
+          "kind": "observe",
+          "evidenceRefs": [
+            "db-after:actual-artifact"
+          ],
+          "observation": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG-A"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseId": "T06",
+              "subcaseId": "not-unknown"
+            },
+            "snapshotRef": {
+              "$result": {
+                "actionId": "assessment",
+                "pointer": "/response/snapshotRevision"
+              }
+            },
+            "asOf": "2026-10-07T00:00:00Z",
+            "knownAt": "2026-10-07T00:00:00Z",
+            "sources": [
+              "assessments",
+              "movements",
+              "allocations"
+            ]
+          }
+        }
+      ],
+      "assertions": [
+        {
+          "id": "predicate-result",
+          "op": "equals",
+          "source": {
+            "actionId": "assessment",
+            "pointer": "/response/data/result"
+          },
+          "expected": "UNVERIFIED",
+          "requirementRefs": [
+            "D06"
+          ],
+          "evidenceRefs": [
+            "assessment:actual-artifact",
+            "assessment:raw-source"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG-A"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "T06",
+            "subcaseId": "not-unknown"
+          },
+          "oracleExplanation": "predicate result의 실제 값과 범위를 대조한다",
+          "oracleRef": {
+            "oracleId": "T06.unknown-state-distinction",
+            "observationNames": [
+              "conflict-preserved"
+            ]
+          }
+        },
+        {
+          "id": "predicate-conflict",
+          "op": "equals",
+          "source": {
+            "actionId": "assessment",
+            "pointer": "/response/data/conflict"
+          },
+          "expected": false,
+          "requirementRefs": [
+            "D06"
+          ],
+          "evidenceRefs": [
+            "assessment:actual-artifact",
+            "assessment:raw-source"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG-A"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "T06",
+            "subcaseId": "not-unknown"
+          },
+          "oracleExplanation": "predicate conflict의 실제 값과 범위를 대조한다",
+          "oracleRef": {
+            "oracleId": "T06.unknown-state-distinction",
+            "observationNames": [
+              "conflict-preserved"
+            ]
+          }
+        },
+        {
+          "id": "raw-predicate",
+          "op": "relationSet",
+          "source": {
+            "actionId": "db-after",
+            "pointer": "/data/rawRows/assessments",
+            "field": [
+              "result",
+              "conflict",
+              "evaluatorVersion"
+            ]
+          },
+          "expected": [
+            [
+              "UNVERIFIED",
+              false,
+              "evaluator-v1"
+            ]
+          ],
+          "requirementRefs": [
+            "D06"
+          ],
+          "evidenceRefs": [
+            "db-after:actual-artifact",
+            "db-after:raw-source"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG-A"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "T06",
+            "subcaseId": "not-unknown"
+          },
+          "oracleExplanation": "raw predicate의 실제 값과 범위를 대조한다",
+          "oracleRef": {
+            "oracleId": "T06.unknown-state-distinction",
+            "observationNames": [
+              "conflict-preserved"
+            ]
+          }
+        },
+        {
+          "id": "no-physical-inference",
+          "op": "count",
+          "source": {
+            "actionId": "db-after",
+            "pointer": "/data/rawRows/movements"
+          },
+          "expected": 0,
+          "requirementRefs": [
+            "D06"
+          ],
+          "evidenceRefs": [
+            "db-after:actual-artifact",
+            "db-after:raw-source"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG-A"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "T06",
+            "subcaseId": "not-unknown"
+          },
+          "oracleExplanation": "no physical inference의 실제 값과 범위를 대조한다",
+          "oracleRef": {
+            "oracleId": "T06.unknown-state-distinction",
+            "observationNames": [
+              "zero-inference"
+            ]
+          }
+        }
+      ],
+      "oracleExplanation": "원천·시간·인가 범위와 전후 실제 효과를 대조한다. fixture의 과거 사실은 이번 행동의 실행 증거가 아니다."
+    }
+  ]
+}

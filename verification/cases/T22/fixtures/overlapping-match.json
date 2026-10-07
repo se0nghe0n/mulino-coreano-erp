@@ -1,0 +1,1195 @@
+{
+  "schemaVersion": "1.0.0",
+  "fixtureId": "T22-overlapping-match",
+  "synthetic": true,
+  "baseRefs": [],
+  "clock": {
+    "asOf": "2026-10-07T00:00:00Z",
+    "knownAt": "2026-10-07T00:00:00Z",
+    "timezone": "Asia/Seoul",
+    "precision": "SECOND",
+    "deadlineInclusive": true
+  },
+  "versions": {
+    "definition": "definition-v1",
+    "evaluator": "evaluator-v1",
+    "policy": "SYNTHETIC-policy-v1"
+  },
+  "actors": {
+    "recorder": {
+      "issuer": "synthetic-test-issuer",
+      "subject": "recorder",
+      "audience": "isolated-ontology",
+      "organizationAlias": "ORG-A",
+      "roleCapabilities": [
+        "getObject",
+        "getEvidence",
+        "getAssessment",
+        "getInventory",
+        "getObligations",
+        "getInbox",
+        "getReconciliation",
+        "getWork",
+        "searchObjects",
+        "searchOperationalIssues",
+        "getPolicy",
+        "recordActivity",
+        "attachEvidence",
+        "correctEvidence",
+        "confirmReceipt",
+        "createWork"
+      ],
+      "grant": {
+        "delegatorAlias": "supervisor",
+        "actions": [
+          "getObject",
+          "getEvidence",
+          "getAssessment",
+          "getInventory",
+          "getObligations",
+          "getInbox",
+          "getReconciliation",
+          "getWork",
+          "searchObjects",
+          "searchOperationalIssues",
+          "getPolicy",
+          "recordActivity",
+          "attachEvidence",
+          "correctEvidence",
+          "confirmReceipt",
+          "createWork"
+        ],
+        "scope": {
+          "organizationAlias": "ORG-A",
+          "itemAliases": [
+            "P"
+          ],
+          "segmentAliases": [
+            "Q100",
+            "A60",
+            "B40"
+          ],
+          "workAliases": [
+            "O1",
+            "S1"
+          ],
+          "sourceNamespaces": [
+            "carrier",
+            "warehouse",
+            "purchase-peer"
+          ],
+          "managementOrganizationAliases": [
+            "ORG-A"
+          ],
+          "documentAliases": [
+            "physical-membership"
+          ]
+        },
+        "validFrom": "2026-10-01T00:00:00Z",
+        "validUntil": "2026-10-31T00:00:00Z",
+        "revision": 1
+      }
+    },
+    "reconciler": {
+      "issuer": "synthetic-test-issuer",
+      "subject": "reconciler",
+      "audience": "isolated-ontology",
+      "organizationAlias": "ORG-A",
+      "roleCapabilities": [
+        "getObject",
+        "getEvidence",
+        "getAssessment",
+        "getInventory",
+        "getObligations",
+        "getInbox",
+        "getReconciliation",
+        "getWork",
+        "searchObjects",
+        "searchOperationalIssues",
+        "getPolicy",
+        "matchSourceIdentity",
+        "linkCanonicalOccurrence",
+        "resolveEvidenceConflict",
+        "recordExternalReconciliation"
+      ],
+      "grant": {
+        "delegatorAlias": "supervisor",
+        "actions": [
+          "getObject",
+          "getEvidence",
+          "getAssessment",
+          "getInventory",
+          "getObligations",
+          "getInbox",
+          "getReconciliation",
+          "getWork",
+          "searchObjects",
+          "searchOperationalIssues",
+          "getPolicy",
+          "matchSourceIdentity",
+          "linkCanonicalOccurrence",
+          "resolveEvidenceConflict",
+          "recordExternalReconciliation"
+        ],
+        "scope": {
+          "organizationAlias": "ORG-A",
+          "itemAliases": [
+            "P"
+          ],
+          "segmentAliases": [
+            "Q100",
+            "A60",
+            "B40"
+          ],
+          "workAliases": [
+            "O1",
+            "S1"
+          ],
+          "sourceNamespaces": [
+            "carrier",
+            "warehouse",
+            "purchase-peer"
+          ],
+          "managementOrganizationAliases": [
+            "ORG-A"
+          ],
+          "documentAliases": [
+            "physical-membership"
+          ]
+        },
+        "validFrom": "2026-10-01T00:00:00Z",
+        "validUntil": "2026-10-31T00:00:00Z",
+        "revision": 1
+      }
+    },
+    "operations": {
+      "issuer": "synthetic-test-issuer",
+      "subject": "operations",
+      "audience": "isolated-ontology",
+      "organizationAlias": "ORG-A",
+      "roleCapabilities": [
+        "getObject",
+        "getEvidence",
+        "getAssessment",
+        "getInventory",
+        "getObligations",
+        "getInbox",
+        "getReconciliation",
+        "getWork",
+        "searchObjects",
+        "searchOperationalIssues",
+        "getPolicy",
+        "retrySafeCommand",
+        "dispatchPurchaseOrder",
+        "cancelPurchase"
+      ],
+      "grant": {
+        "delegatorAlias": "supervisor",
+        "actions": [
+          "getObject",
+          "getEvidence",
+          "getAssessment",
+          "getInventory",
+          "getObligations",
+          "getInbox",
+          "getReconciliation",
+          "getWork",
+          "searchObjects",
+          "searchOperationalIssues",
+          "getPolicy",
+          "retrySafeCommand",
+          "dispatchPurchaseOrder",
+          "cancelPurchase"
+        ],
+        "scope": {
+          "organizationAlias": "ORG-A",
+          "itemAliases": [
+            "P"
+          ],
+          "segmentAliases": [
+            "Q100",
+            "A60",
+            "B40"
+          ],
+          "workAliases": [
+            "O1",
+            "S1"
+          ],
+          "sourceNamespaces": [
+            "carrier",
+            "warehouse",
+            "purchase-peer"
+          ],
+          "managementOrganizationAliases": [
+            "ORG-A"
+          ],
+          "documentAliases": [
+            "physical-membership"
+          ]
+        },
+        "validFrom": "2026-10-01T00:00:00Z",
+        "validUntil": "2026-10-31T00:00:00Z",
+        "revision": 1
+      }
+    },
+    "warehouse": {
+      "issuer": "synthetic-test-issuer",
+      "subject": "warehouse",
+      "audience": "isolated-ontology",
+      "organizationAlias": "ORG-A",
+      "roleCapabilities": [
+        "getObject",
+        "getEvidence",
+        "getAssessment",
+        "getInventory",
+        "getObligations",
+        "getInbox",
+        "getReconciliation",
+        "getWork",
+        "searchObjects",
+        "searchOperationalIssues",
+        "getPolicy",
+        "reserveQuantity",
+        "dispatchQuantity",
+        "placeHold",
+        "releaseHold"
+      ],
+      "grant": {
+        "delegatorAlias": "supervisor",
+        "actions": [
+          "getObject",
+          "getEvidence",
+          "getAssessment",
+          "getInventory",
+          "getObligations",
+          "getInbox",
+          "getReconciliation",
+          "getWork",
+          "searchObjects",
+          "searchOperationalIssues",
+          "getPolicy",
+          "reserveQuantity",
+          "dispatchQuantity",
+          "placeHold",
+          "releaseHold"
+        ],
+        "scope": {
+          "organizationAlias": "ORG-A",
+          "itemAliases": [
+            "P"
+          ],
+          "segmentAliases": [
+            "Q100",
+            "A60",
+            "B40"
+          ],
+          "workAliases": [
+            "O1",
+            "S1"
+          ],
+          "sourceNamespaces": [
+            "carrier",
+            "warehouse",
+            "purchase-peer"
+          ],
+          "managementOrganizationAliases": [
+            "ORG-A"
+          ],
+          "documentAliases": [
+            "physical-membership"
+          ]
+        },
+        "validFrom": "2026-10-01T00:00:00Z",
+        "validUntil": "2026-10-31T00:00:00Z",
+        "revision": 1
+      }
+    },
+    "readAgent": {
+      "issuer": "synthetic-test-issuer",
+      "subject": "readAgent",
+      "audience": "isolated-ontology",
+      "organizationAlias": "ORG-A",
+      "roleCapabilities": [
+        "getObject",
+        "getEvidence",
+        "getAssessment",
+        "getInventory",
+        "getObligations",
+        "getInbox",
+        "getReconciliation",
+        "getWork",
+        "searchObjects",
+        "searchOperationalIssues",
+        "getPolicy",
+        "dispatchQuantity",
+        "placeHold",
+        "assignCapability"
+      ],
+      "grant": {
+        "delegatorAlias": "supervisor",
+        "actions": [
+          "getObject",
+          "getEvidence",
+          "getAssessment",
+          "getInventory",
+          "getObligations",
+          "getInbox",
+          "getReconciliation",
+          "getWork",
+          "searchObjects",
+          "searchOperationalIssues",
+          "getPolicy"
+        ],
+        "scope": {
+          "organizationAlias": "ORG-A",
+          "itemAliases": [
+            "P"
+          ],
+          "segmentAliases": [
+            "Q100",
+            "A60",
+            "B40"
+          ],
+          "workAliases": [
+            "O1",
+            "S1"
+          ],
+          "sourceNamespaces": [
+            "carrier",
+            "warehouse",
+            "purchase-peer"
+          ],
+          "managementOrganizationAliases": [
+            "ORG-A"
+          ],
+          "documentAliases": [
+            "physical-membership"
+          ]
+        },
+        "validFrom": "2026-10-01T00:00:00Z",
+        "validUntil": "2026-10-31T00:00:00Z",
+        "revision": 1
+      }
+    },
+    "admin": {
+      "issuer": "synthetic-test-issuer",
+      "subject": "admin",
+      "audience": "isolated-ontology",
+      "organizationAlias": "ORG-A",
+      "roleCapabilities": [
+        "getObject",
+        "getEvidence",
+        "getAssessment",
+        "getInventory",
+        "getObligations",
+        "getInbox",
+        "getReconciliation",
+        "getWork",
+        "searchObjects",
+        "searchOperationalIssues",
+        "getPolicy",
+        "assignCapability"
+      ],
+      "grant": {
+        "delegatorAlias": "supervisor",
+        "actions": [
+          "getObject",
+          "getEvidence",
+          "getAssessment",
+          "getInventory",
+          "getObligations",
+          "getInbox",
+          "getReconciliation",
+          "getWork",
+          "searchObjects",
+          "searchOperationalIssues",
+          "getPolicy",
+          "assignCapability"
+        ],
+        "scope": {
+          "organizationAlias": "ORG-A",
+          "itemAliases": [
+            "P"
+          ],
+          "segmentAliases": [
+            "Q100",
+            "A60",
+            "B40"
+          ],
+          "workAliases": [
+            "O1",
+            "S1"
+          ],
+          "sourceNamespaces": [
+            "carrier",
+            "warehouse",
+            "purchase-peer"
+          ],
+          "managementOrganizationAliases": [
+            "ORG-A"
+          ],
+          "documentAliases": [
+            "physical-membership"
+          ]
+        },
+        "validFrom": "2026-10-01T00:00:00Z",
+        "validUntil": "2026-10-31T00:00:00Z",
+        "revision": 1
+      }
+    },
+    "worker": {
+      "issuer": "synthetic-test-issuer",
+      "subject": "worker",
+      "audience": "isolated-ontology",
+      "organizationAlias": "ORG-A",
+      "roleCapabilities": [
+        "getObject",
+        "getEvidence",
+        "getAssessment",
+        "getInventory",
+        "getObligations",
+        "getInbox",
+        "getReconciliation",
+        "getWork",
+        "searchObjects",
+        "searchOperationalIssues",
+        "getPolicy",
+        "dispatchQuantity",
+        "retrySafeCommand"
+      ],
+      "grant": {
+        "delegatorAlias": "supervisor",
+        "actions": [
+          "getObject",
+          "getEvidence",
+          "getAssessment",
+          "getInventory",
+          "getObligations",
+          "getInbox",
+          "getReconciliation",
+          "getWork",
+          "searchObjects",
+          "searchOperationalIssues",
+          "getPolicy"
+        ],
+        "scope": {
+          "organizationAlias": "ORG-A",
+          "itemAliases": [
+            "P"
+          ],
+          "segmentAliases": [
+            "Q100",
+            "A60",
+            "B40"
+          ],
+          "workAliases": [
+            "O1",
+            "S1"
+          ],
+          "sourceNamespaces": [
+            "carrier",
+            "warehouse",
+            "purchase-peer"
+          ],
+          "managementOrganizationAliases": [
+            "ORG-A"
+          ],
+          "documentAliases": [
+            "physical-membership"
+          ]
+        },
+        "validFrom": "2026-10-01T00:00:00Z",
+        "validUntil": "2026-10-31T00:00:00Z",
+        "revision": 1
+      }
+    },
+    "config": {
+      "issuer": "synthetic-test-issuer",
+      "subject": "config",
+      "audience": "isolated-ontology",
+      "organizationAlias": "ORG-A",
+      "roleCapabilities": [
+        "getObject",
+        "getEvidence",
+        "getAssessment",
+        "getInventory",
+        "getObligations",
+        "getInbox",
+        "getReconciliation",
+        "getWork",
+        "searchObjects",
+        "searchOperationalIssues",
+        "getPolicy",
+        "createPolicyDraft",
+        "approvePolicy",
+        "activatePolicy"
+      ],
+      "grant": {
+        "delegatorAlias": "supervisor",
+        "actions": [
+          "getObject",
+          "getEvidence",
+          "getAssessment",
+          "getInventory",
+          "getObligations",
+          "getInbox",
+          "getReconciliation",
+          "getWork",
+          "searchObjects",
+          "searchOperationalIssues",
+          "getPolicy",
+          "createPolicyDraft",
+          "approvePolicy",
+          "activatePolicy"
+        ],
+        "scope": {
+          "organizationAlias": "ORG-A",
+          "itemAliases": [
+            "P"
+          ],
+          "segmentAliases": [
+            "Q100",
+            "A60",
+            "B40"
+          ],
+          "workAliases": [
+            "O1",
+            "S1"
+          ],
+          "sourceNamespaces": [
+            "carrier",
+            "warehouse",
+            "purchase-peer"
+          ],
+          "managementOrganizationAliases": [
+            "ORG-A"
+          ],
+          "documentAliases": [
+            "physical-membership"
+          ]
+        },
+        "validFrom": "2026-10-01T00:00:00Z",
+        "validUntil": "2026-10-31T00:00:00Z",
+        "revision": 1
+      }
+    },
+    "intake": {
+      "issuer": "synthetic-test-issuer",
+      "subject": "intake",
+      "audience": "isolated-ontology",
+      "organizationAlias": "ORG-A",
+      "roleCapabilities": [
+        "getObject",
+        "getEvidence",
+        "getAssessment",
+        "getInventory",
+        "getObligations",
+        "getInbox",
+        "getReconciliation",
+        "getWork",
+        "searchObjects",
+        "searchOperationalIssues",
+        "getPolicy"
+      ],
+      "grant": {
+        "delegatorAlias": "supervisor",
+        "actions": [
+          "getObject",
+          "getEvidence",
+          "getAssessment",
+          "getInventory",
+          "getObligations",
+          "getInbox",
+          "getReconciliation",
+          "getWork",
+          "searchObjects",
+          "searchOperationalIssues",
+          "getPolicy"
+        ],
+        "scope": {
+          "organizationAlias": "ORG-A",
+          "itemAliases": [
+            "P"
+          ],
+          "segmentAliases": [
+            "Q100",
+            "A60",
+            "B40"
+          ],
+          "workAliases": [
+            "O1",
+            "S1"
+          ],
+          "sourceNamespaces": [
+            "carrier",
+            "warehouse",
+            "purchase-peer"
+          ],
+          "managementOrganizationAliases": [
+            "ORG-A"
+          ],
+          "documentAliases": [
+            "physical-membership"
+          ]
+        },
+        "validFrom": "2026-10-01T00:00:00Z",
+        "validUntil": "2026-10-31T00:00:00Z",
+        "revision": 1
+      }
+    },
+    "supervisor": {
+      "issuer": "synthetic-test-issuer",
+      "subject": "supervisor",
+      "audience": "isolated-ontology",
+      "organizationAlias": "ORG-A",
+      "roleCapabilities": [
+        "getObject",
+        "getEvidence",
+        "getAssessment",
+        "getInventory",
+        "getObligations",
+        "getInbox",
+        "getReconciliation",
+        "getWork",
+        "searchObjects",
+        "searchOperationalIssues",
+        "getPolicy"
+      ],
+      "grant": {
+        "delegatorAlias": "supervisor",
+        "actions": [
+          "getObject",
+          "getEvidence",
+          "getAssessment",
+          "getInventory",
+          "getObligations",
+          "getInbox",
+          "getReconciliation",
+          "getWork",
+          "searchObjects",
+          "searchOperationalIssues",
+          "getPolicy"
+        ],
+        "scope": {
+          "organizationAlias": "ORG-A",
+          "itemAliases": [
+            "P"
+          ],
+          "segmentAliases": [
+            "Q100",
+            "A60",
+            "B40"
+          ],
+          "workAliases": [
+            "O1",
+            "S1"
+          ],
+          "sourceNamespaces": [
+            "carrier",
+            "warehouse",
+            "purchase-peer"
+          ],
+          "managementOrganizationAliases": [
+            "ORG-A"
+          ],
+          "documentAliases": [
+            "physical-membership"
+          ]
+        },
+        "validFrom": "2026-10-01T00:00:00Z",
+        "validUntil": "2026-10-31T00:00:00Z",
+        "revision": 1
+      }
+    }
+  },
+  "aliases": {
+    "ORG-A": {
+      "type": "Organization"
+    },
+    "ORG-B": {
+      "type": "Organization"
+    },
+    "P": {
+      "type": "TradeItem",
+      "unit": "BOX"
+    },
+    "W": {
+      "type": "Place",
+      "organizationAlias": "ORG-A"
+    },
+    "C": {
+      "type": "Customer",
+      "organizationAlias": "ORG-A"
+    },
+    "L": {
+      "type": "ManufacturingLot",
+      "itemAlias": "P",
+      "manufacturer": "synthetic-manufacturer"
+    },
+    "O1": {
+      "type": "Work",
+      "ownerAlias": "intake",
+      "revision": 1
+    },
+    "S1": {
+      "type": "Work",
+      "ownerAlias": "warehouse",
+      "revision": 1
+    },
+    "Q100": {
+      "type": "QuantitySegment",
+      "unit": "BOX",
+      "itemAlias": "P",
+      "lotAlias": "L",
+      "locationAlias": "W",
+      "physicalScope": "Q100-physical",
+      "revision": 1
+    },
+    "A60": {
+      "type": "QuantitySegment",
+      "unit": "BOX",
+      "itemAlias": "P",
+      "lotAlias": "L",
+      "locationAlias": "W",
+      "physicalScope": "A60-physical",
+      "revision": 1
+    },
+    "B40": {
+      "type": "QuantitySegment",
+      "unit": "BOX",
+      "itemAlias": "P",
+      "lotAlias": "L",
+      "locationAlias": "W",
+      "physicalScope": "B40-physical",
+      "revision": 1
+    },
+    "B-human": {
+      "type": "Human",
+      "organizationAlias": "ORG-B"
+    },
+    "B60": {
+      "type": "QuantitySegment",
+      "organizationAlias": "ORG-B",
+      "itemAlias": "P-B",
+      "unit": "BOX",
+      "physicalScope": "B60-physical",
+      "revision": 1
+    },
+    "P-B": {
+      "type": "TradeItem",
+      "organizationAlias": "ORG-B",
+      "unit": "BOX"
+    },
+    "B-secret": {
+      "type": "DocumentVersion",
+      "organizationAlias": "ORG-B",
+      "content": "other-organization-only"
+    },
+    "old-event": {
+      "type": "Event",
+      "revision": 1
+    },
+    "old-assessment": {
+      "type": "Assessment"
+    },
+    "old-allocation": {
+      "type": "Allocation",
+      "revision": 1
+    },
+    "receipt-occurrence": {
+      "type": "CanonicalOccurrence"
+    },
+    "doc": {
+      "type": "DocumentVersion"
+    },
+    "policy-v1": {
+      "type": "PolicyVersion"
+    },
+    "recorder": {
+      "type": "Human"
+    },
+    "reconciler": {
+      "type": "Human"
+    },
+    "operations": {
+      "type": "Human"
+    },
+    "warehouse": {
+      "type": "Human"
+    },
+    "readAgent": {
+      "type": "Human"
+    },
+    "admin": {
+      "type": "Human"
+    },
+    "config": {
+      "type": "Human"
+    },
+    "intake": {
+      "type": "Human"
+    },
+    "supervisor": {
+      "type": "Human"
+    },
+    "worker": {
+      "type": "ServicePrincipal"
+    },
+    "candidate-occurrence": {
+      "type": "CanonicalOccurrence",
+      "candidateOnly": true
+    },
+    "physical-membership": {
+      "type": "DocumentVersion",
+      "organizationAlias": "ORG-A"
+    }
+  },
+  "baseline": {
+    "setupIsExecutionCoverage": false,
+    "independentDatabase": true,
+    "hostOperatorAlias": "config",
+    "hostAuthorizations": [
+      {
+        "actorAlias": "config",
+        "actions": [
+          "backup",
+          "restore",
+          "retentionSweep",
+          "dataInventory",
+          "inspectArtifacts",
+          "scanArtifacts",
+          "tickScheduler",
+          "awaitRuntimeTask"
+        ],
+        "environmentIds": [
+          "retention-isolated",
+          "restored-isolated",
+          "redaction-isolated",
+          "source-isolated"
+        ],
+        "organizationAliases": [
+          "ORG-A"
+        ],
+        "basis": "reviewed synthetic maintenance installation manifest",
+        "validFrom": "2026-10-01T00:00:00Z",
+        "validUntil": "2026-10-31T00:00:00Z",
+        "revision": 1
+      }
+    ],
+    "quantities": [],
+    "goals": [
+      {
+        "workAlias": "O1",
+        "quantity": "100",
+        "unit": "BOX",
+        "quantityMode": "CUMULATIVE_EVENT",
+        "endpoint": "ARRIVED",
+        "placeAlias": "W",
+        "dueAt": "2026-10-06T00:00:00+09:00",
+        "deadlineInclusive": true,
+        "ownerAlias": "intake"
+      }
+    ],
+    "syntheticPolicyBasis": {
+      "basis": "internal deterministic test policy only",
+      "reviewerAlias": "config",
+      "effectiveDate": "2026-10-01",
+      "officialRegulatoryAcceptance": false
+    },
+    "pendingSource": {
+      "sourceNamespace": "carrier",
+      "eventAlias": "old-event",
+      "quantity": "40",
+      "unit": "BOX",
+      "physicalMembers": [
+        "physical-box-041",
+        "physical-box-042",
+        "physical-box-043",
+        "physical-box-044",
+        "physical-box-045",
+        "physical-box-046",
+        "physical-box-047",
+        "physical-box-048",
+        "physical-box-049",
+        "physical-box-050",
+        "physical-box-051",
+        "physical-box-052",
+        "physical-box-053",
+        "physical-box-054",
+        "physical-box-055",
+        "physical-box-056",
+        "physical-box-057",
+        "physical-box-058",
+        "physical-box-059",
+        "physical-box-060",
+        "physical-box-061",
+        "physical-box-062",
+        "physical-box-063",
+        "physical-box-064",
+        "physical-box-065",
+        "physical-box-066",
+        "physical-box-067",
+        "physical-box-068",
+        "physical-box-069",
+        "physical-box-070",
+        "physical-box-071",
+        "physical-box-072",
+        "physical-box-073",
+        "physical-box-074",
+        "physical-box-075",
+        "physical-box-076",
+        "physical-box-077",
+        "physical-box-078",
+        "physical-box-079",
+        "physical-box-080"
+      ],
+      "status": "QUARANTINED"
+    },
+    "sourceProfiles": [
+      {
+        "namespace": "carrier",
+        "mapping": "scoped-item-lot-physical-v1",
+        "basis": "synthetic-reviewed-profile",
+        "revisionOrdering": "VERIFIED_MONOTONIC",
+        "timeTrust": "ORIGINAL_OFFSET",
+        "schema": "source-v1",
+        "dedupKey": [
+          "namespace",
+          "eventId",
+          "version"
+        ],
+        "conflictOwnerAlias": "intake",
+        "retryPolicy": "bounded-no-external-write",
+        "externalWrites": false
+      }
+    ],
+    "physicalMembership": [
+      {
+        "segmentAlias": "A60",
+        "members": [
+          "physical-box-001",
+          "physical-box-002",
+          "physical-box-003",
+          "physical-box-004",
+          "physical-box-005",
+          "physical-box-006",
+          "physical-box-007",
+          "physical-box-008",
+          "physical-box-009",
+          "physical-box-010",
+          "physical-box-011",
+          "physical-box-012",
+          "physical-box-013",
+          "physical-box-014",
+          "physical-box-015",
+          "physical-box-016",
+          "physical-box-017",
+          "physical-box-018",
+          "physical-box-019",
+          "physical-box-020",
+          "physical-box-021",
+          "physical-box-022",
+          "physical-box-023",
+          "physical-box-024",
+          "physical-box-025",
+          "physical-box-026",
+          "physical-box-027",
+          "physical-box-028",
+          "physical-box-029",
+          "physical-box-030",
+          "physical-box-031",
+          "physical-box-032",
+          "physical-box-033",
+          "physical-box-034",
+          "physical-box-035",
+          "physical-box-036",
+          "physical-box-037",
+          "physical-box-038",
+          "physical-box-039",
+          "physical-box-040",
+          "physical-box-041",
+          "physical-box-042",
+          "physical-box-043",
+          "physical-box-044",
+          "physical-box-045",
+          "physical-box-046",
+          "physical-box-047",
+          "physical-box-048",
+          "physical-box-049",
+          "physical-box-050",
+          "physical-box-051",
+          "physical-box-052",
+          "physical-box-053",
+          "physical-box-054",
+          "physical-box-055",
+          "physical-box-056",
+          "physical-box-057",
+          "physical-box-058",
+          "physical-box-059",
+          "physical-box-060"
+        ]
+      },
+      {
+        "segmentAlias": "B40",
+        "members": [
+          "physical-box-041",
+          "physical-box-042",
+          "physical-box-043",
+          "physical-box-044",
+          "physical-box-045",
+          "physical-box-046",
+          "physical-box-047",
+          "physical-box-048",
+          "physical-box-049",
+          "physical-box-050",
+          "physical-box-051",
+          "physical-box-052",
+          "physical-box-053",
+          "physical-box-054",
+          "physical-box-055",
+          "physical-box-056",
+          "physical-box-057",
+          "physical-box-058",
+          "physical-box-059",
+          "physical-box-060",
+          "physical-box-061",
+          "physical-box-062",
+          "physical-box-063",
+          "physical-box-064",
+          "physical-box-065",
+          "physical-box-066",
+          "physical-box-067",
+          "physical-box-068",
+          "physical-box-069",
+          "physical-box-070",
+          "physical-box-071",
+          "physical-box-072",
+          "physical-box-073",
+          "physical-box-074",
+          "physical-box-075",
+          "physical-box-076",
+          "physical-box-077",
+          "physical-box-078",
+          "physical-box-079",
+          "physical-box-080"
+        ]
+      }
+    ],
+    "canonicalOccurrences": [
+      {
+        "occurrenceAlias": "receipt-occurrence",
+        "segmentAlias": "A60",
+        "physicalMembers": [
+          "physical-box-001",
+          "physical-box-002",
+          "physical-box-003",
+          "physical-box-004",
+          "physical-box-005",
+          "physical-box-006",
+          "physical-box-007",
+          "physical-box-008",
+          "physical-box-009",
+          "physical-box-010",
+          "physical-box-011",
+          "physical-box-012",
+          "physical-box-013",
+          "physical-box-014",
+          "physical-box-015",
+          "physical-box-016",
+          "physical-box-017",
+          "physical-box-018",
+          "physical-box-019",
+          "physical-box-020",
+          "physical-box-021",
+          "physical-box-022",
+          "physical-box-023",
+          "physical-box-024",
+          "physical-box-025",
+          "physical-box-026",
+          "physical-box-027",
+          "physical-box-028",
+          "physical-box-029",
+          "physical-box-030",
+          "physical-box-031",
+          "physical-box-032",
+          "physical-box-033",
+          "physical-box-034",
+          "physical-box-035",
+          "physical-box-036",
+          "physical-box-037",
+          "physical-box-038",
+          "physical-box-039",
+          "physical-box-040",
+          "physical-box-041",
+          "physical-box-042",
+          "physical-box-043",
+          "physical-box-044",
+          "physical-box-045",
+          "physical-box-046",
+          "physical-box-047",
+          "physical-box-048",
+          "physical-box-049",
+          "physical-box-050",
+          "physical-box-051",
+          "physical-box-052",
+          "physical-box-053",
+          "physical-box-054",
+          "physical-box-055",
+          "physical-box-056",
+          "physical-box-057",
+          "physical-box-058",
+          "physical-box-059",
+          "physical-box-060"
+        ],
+        "quantity": "60",
+        "unit": "BOX",
+        "verified": true
+      }
+    ],
+    "pastMovements": [
+      {
+        "kind": "RECEIPT",
+        "occurrenceAlias": "receipt-occurrence",
+        "segmentAlias": "A60",
+        "quantity": "60",
+        "unit": "BOX",
+        "occurredAt": "2026-10-05T00:00:00Z"
+      }
+    ],
+    "documentInputs": [
+      {
+        "alias": "physical-membership",
+        "path": "verification/cases/T22/payloads/overlapping-match/physical-membership.json",
+        "sha256": "b9ed5adeba69b8162018219d12f9b1ffe2fef28cbdf502c525983dfce406d972",
+        "mediaType": "application/json",
+        "itemAlias": "P",
+        "workAlias": "O1",
+        "organizationAlias": "ORG-A",
+        "immutable": true
+      }
+    ]
+  },
+  "evidence": [
+    {
+      "alias": "physical-membership",
+      "sha256": "b9ed5adeba69b8162018219d12f9b1ffe2fef28cbdf502c525983dfce406d972",
+      "sourceNamespace": "carrier",
+      "externalEventId": "PHYSICAL40",
+      "sourceVersion": "v1",
+      "occurredAt": "2026-10-05T00:00:00Z",
+      "recordedAt": "2026-10-07T00:00:00Z"
+    }
+  ],
+  "responsibilities": [
+    {
+      "scope": {
+        "workAlias": "O1",
+        "itemAlias": "P"
+      },
+      "ownerAlias": "intake",
+      "supervisorAlias": "supervisor",
+      "nextAction": "원천·실물 범위 대조",
+      "nextCheckAt": "2026-10-07T02:00:00Z"
+    }
+  ]
+}

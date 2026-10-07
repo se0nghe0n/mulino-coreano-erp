@@ -1,0 +1,3608 @@
+{
+  "recordType": "STEP2_CASE_EVIDENCE_PREPARATION",
+  "generatedAt": "2026-10-07T14:37:25.788830+00:00",
+  "baseline": "feaca0af9673620eff9a5ac0f08a657ce14e9ccd",
+  "commonDependencyHead": "77c2df3440b6d8b362bfb52fed677e441c372b4c",
+  "workingTreeAtExecution": "owned contracts uncommitted, case hashes recorded below",
+  "caseCounts": [
+    {
+      "caseId": "T06",
+      "subcases": 10,
+      "assertions": 57,
+      "catalogObservations": 7,
+      "sha256": "550b9515352fb4391fd902f793f8a8997e62ce7a87097aec0384ddfdf664a4c3"
+    },
+    {
+      "caseId": "T22",
+      "subcases": 15,
+      "assertions": 127,
+      "catalogObservations": 16,
+      "sha256": "9e2914d461fdf6bf00d2a262d2c86c6cb59d9f894afb021ae6d3d0bddd474cb4"
+    },
+    {
+      "caseId": "T24",
+      "subcases": 13,
+      "assertions": 124,
+      "catalogObservations": 15,
+      "sha256": "10b3991babecda974cedcfbd25ab7be02894910324eb1487af935a189895c046"
+    }
+  ],
+  "totals": {
+    "cases": 3,
+    "subcases": 38,
+    "assertions": 308,
+    "oracles": 9,
+    "catalogObservations": 38
+  },
+  "commands": [
+    {
+      "command": "./verify validate verification/cases/T06/case.json verification/cases/T22/case.json verification/cases/T24/case.json",
+      "exitCode": 0,
+      "result": "3 PREPARATION_SCHEMA_VALID",
+      "log": "verification/cases/T06/checks/schema.json"
+    },
+    {
+      "command": "./verify harness",
+      "exitCode": 0,
+      "result": {
+        "tests": 149,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "ownedAssertionSelftests": 19
+      },
+      "log": "verification/cases/T06/checks/harness.json"
+    },
+    {
+      "command": "./verify contract-red verification/cases/T06/case.json verification/cases/T22/case.json verification/cases/T24/case.json",
+      "exitCode": 1,
+      "result": {
+        "expectedScenarios": 38,
+        "discoveredScenarios": 38,
+        "startedScenarios": 38,
+        "skippedScenarios": 0,
+        "failedScenarios": 38,
+        "notImplementedAssertionFailures": 38,
+        "status": "FAIL",
+        "productCoverageClaimed": false,
+        "failureReasons": [
+          "java.lang.AssertionError: source then-again is NOT_IMPLEMENTED: NOT_IMPLEMENTED: no real product adapters installed",
+          "java.lang.AssertionError: source db-after is NOT_IMPLEMENTED: NOT_IMPLEMENTED: no real product adapters installed",
+          "java.lang.AssertionError: source assessment is NOT_IMPLEMENTED: NOT_IMPLEMENTED: no real product adapters installed",
+          "java.lang.AssertionError: source assessment is NOT_IMPLEMENTED: NOT_IMPLEMENTED: no real product adapters installed",
+          "java.lang.AssertionError: source evidence is NOT_IMPLEMENTED: NOT_IMPLEMENTED: no real product adapters installed",
+          "java.lang.AssertionError: source states is NOT_IMPLEMENTED: NOT_IMPLEMENTED: no real product adapters installed",
+          "java.lang.AssertionError: source assessment is NOT_IMPLEMENTED: NOT_IMPLEMENTED: no real product adapters installed",
+          "java.lang.AssertionError: source assessment is NOT_IMPLEMENTED: NOT_IMPLEMENTED: no real product adapters installed",
+          "java.lang.AssertionError: source assessment is NOT_IMPLEMENTED: NOT_IMPLEMENTED: no real product adapters installed",
+          "java.lang.AssertionError: source assessment is NOT_IMPLEMENTED: NOT_IMPLEMENTED: no real product adapters installed",
+          "java.lang.AssertionError: source db-after is NOT_IMPLEMENTED: NOT_IMPLEMENTED: no real product adapters installed",
+          "java.lang.AssertionError: source db-unverified is NOT_IMPLEMENTED: NOT_IMPLEMENTED: no real product adapters installed",
+          "java.lang.AssertionError: source invalid is NOT_IMPLEMENTED: NOT_IMPLEMENTED: no real product adapters installed",
+          "java.lang.AssertionError: source invalid is NOT_IMPLEMENTED: NOT_IMPLEMENTED: no real product adapters installed",
+          "java.lang.AssertionError: source invalid is NOT_IMPLEMENTED: NOT_IMPLEMENTED: no real product adapters installed",
+          "java.lang.AssertionError: source invalid is NOT_IMPLEMENTED: NOT_IMPLEMENTED: no real product adapters installed",
+          "java.lang.AssertionError: source db-after is NOT_IMPLEMENTED: NOT_IMPLEMENTED: no real product adapters installed",
+          "java.lang.AssertionError: source db-after is NOT_IMPLEMENTED: NOT_IMPLEMENTED: no real product adapters installed",
+          "java.lang.AssertionError: source db-after is NOT_IMPLEMENTED: NOT_IMPLEMENTED: no real product adapters installed",
+          "java.lang.AssertionError: source unknown is NOT_IMPLEMENTED: NOT_IMPLEMENTED: no real product adapters installed",
+          "java.lang.AssertionError: source unknown is NOT_IMPLEMENTED: NOT_IMPLEMENTED: no real product adapters installed",
+          "java.lang.AssertionError: source unknown is NOT_IMPLEMENTED: NOT_IMPLEMENTED: no real product adapters installed",
+          "java.lang.AssertionError: source unknown is NOT_IMPLEMENTED: NOT_IMPLEMENTED: no real product adapters installed",
+          "java.lang.AssertionError: source unknown is NOT_IMPLEMENTED: NOT_IMPLEMENTED: no real product adapters installed",
+          "java.lang.AssertionError: source unknown is NOT_IMPLEMENTED: NOT_IMPLEMENTED: no real product adapters installed",
+          "java.lang.AssertionError: source attack is NOT_IMPLEMENTED: NOT_IMPLEMENTED: no real product adapters installed",
+          "java.lang.AssertionError: source attack is NOT_IMPLEMENTED: NOT_IMPLEMENTED: no real product adapters installed",
+          "java.lang.AssertionError: source attack is NOT_IMPLEMENTED: NOT_IMPLEMENTED: no real product adapters installed",
+          "java.lang.AssertionError: source attack is NOT_IMPLEMENTED: NOT_IMPLEMENTED: no real product adapters installed",
+          "java.lang.AssertionError: source attack is NOT_IMPLEMENTED: NOT_IMPLEMENTED: no real product adapters installed",
+          "java.lang.AssertionError: source inspect is NOT_IMPLEMENTED: NOT_IMPLEMENTED: no real product adapters installed",
+          "java.lang.AssertionError: source db-after is NOT_IMPLEMENTED: NOT_IMPLEMENTED: no real product adapters installed",
+          "java.lang.AssertionError: source sweep is NOT_IMPLEMENTED: NOT_IMPLEMENTED: no real product adapters installed",
+          "java.lang.AssertionError: source sweep is NOT_IMPLEMENTED: NOT_IMPLEMENTED: no real product adapters installed",
+          "java.lang.AssertionError: source sweep is NOT_IMPLEMENTED: NOT_IMPLEMENTED: no real product adapters installed",
+          "java.lang.AssertionError: source sweep is NOT_IMPLEMENTED: NOT_IMPLEMENTED: no real product adapters installed",
+          "java.lang.AssertionError: source sweep is NOT_IMPLEMENTED: NOT_IMPLEMENTED: no real product adapters installed",
+          "java.lang.AssertionError: source inventory is NOT_IMPLEMENTED: NOT_IMPLEMENTED: no real product adapters installed"
+        ]
+      },
+      "log": "verification/cases/T06/checks/contract-red.json"
+    },
+    {
+      "command": "./verify scenarios verification/cases/T06/case.json",
+      "exitCode": 2,
+      "result": "NOT_RUN, all 10 selected subcases, unavailable real adapters",
+      "log": "verification/cases/T06/checks/scenarios-not-run.json"
+    }
+  ],
+  "productRuntimeClaimed": false,
+  "actualDatabaseBlobHostExternalModelAcceptance": "NOT_RUN",
+  "remainingGate": "coordinator integration, two-model review and combined checks; real product adapters unavailable",
+  "observationTraceability": {
+    "T06.bitemporal-correction": {
+      "then-known": [
+        {
+          "subcaseId": "known-at-correction",
+          "assertionId": "then-again-quantity",
+          "source": {
+            "actionId": "then-again",
+            "pointer": "/response/data/quantity"
+          },
+          "operator": "decimalEquals"
+        }
+      ],
+      "currently-known": [
+        {
+          "subcaseId": "known-at-correction",
+          "assertionId": "current-quantity",
+          "source": {
+            "actionId": "current",
+            "pointer": "/response/data/quantity"
+          },
+          "operator": "decimalEquals"
+        },
+        {
+          "subcaseId": "known-at-correction",
+          "assertionId": "revision-pair",
+          "source": {
+            "actionId": "db-after",
+            "pointer": "/data/rawRows/evidence_revisions",
+            "field": [
+              "quantity",
+              "unit",
+              "revision"
+            ]
+          },
+          "operator": "relationSet"
+        }
+      ],
+      "time-preserved": [
+        {
+          "subcaseId": "known-at-correction",
+          "assertionId": "original-immutable",
+          "source": {
+            "actionId": "then-again",
+            "pointer": "/response/data"
+          },
+          "operator": "sameAs"
+        },
+        {
+          "subcaseId": "known-at-correction",
+          "assertionId": "utc-instant",
+          "source": {
+            "actionId": "current",
+            "pointer": "/response/data/occurredAt"
+          },
+          "operator": "timeEquals"
+        },
+        {
+          "subcaseId": "known-at-correction",
+          "assertionId": "preserve-originalOffset",
+          "source": {
+            "actionId": "current",
+            "pointer": "/response/data/originalOffset"
+          },
+          "operator": "equals"
+        },
+        {
+          "subcaseId": "known-at-correction",
+          "assertionId": "preserve-timezone",
+          "source": {
+            "actionId": "current",
+            "pointer": "/response/data/timezone"
+          },
+          "operator": "equals"
+        },
+        {
+          "subcaseId": "known-at-correction",
+          "assertionId": "preserve-precision",
+          "source": {
+            "actionId": "current",
+            "pointer": "/response/data/precision"
+          },
+          "operator": "equals"
+        },
+        {
+          "subcaseId": "known-at-correction",
+          "assertionId": "occurrence-recording-time-pair",
+          "source": {
+            "actionId": "db-after",
+            "pointer": "/data/rawRows/evidence_revisions",
+            "field": [
+              "revision",
+              "occurredAt",
+              "recordedAt"
+            ]
+          },
+          "operator": "relationSet"
+        },
+        {
+          "subcaseId": "inclusive-deadline",
+          "assertionId": "deadline-status",
+          "source": {
+            "actionId": "assessment",
+            "pointer": "/response/data/result"
+          },
+          "operator": "equals"
+        },
+        {
+          "subcaseId": "inclusive-deadline",
+          "assertionId": "deadline-meaning",
+          "source": {
+            "actionId": "db-after",
+            "pointer": "/data/rawRows/assessments",
+            "field": [
+              "result",
+              "deadlineInclusive",
+              "dueAt",
+              "timezone"
+            ]
+          },
+          "operator": "relationSet"
+        },
+        {
+          "subcaseId": "exclusive-deadline",
+          "assertionId": "deadline-status",
+          "source": {
+            "actionId": "assessment",
+            "pointer": "/response/data/result"
+          },
+          "operator": "equals"
+        },
+        {
+          "subcaseId": "exclusive-deadline",
+          "assertionId": "deadline-meaning",
+          "source": {
+            "actionId": "db-after",
+            "pointer": "/data/rawRows/assessments",
+            "field": [
+              "result",
+              "deadlineInclusive",
+              "dueAt",
+              "timezone"
+            ]
+          },
+          "operator": "relationSet"
+        },
+        {
+          "subcaseId": "date-only-range",
+          "assertionId": "date-range",
+          "source": {
+            "actionId": "evidence",
+            "pointer": "/response/data/occurredRange"
+          },
+          "operator": "equals"
+        },
+        {
+          "subcaseId": "date-only-range",
+          "assertionId": "date-precision",
+          "source": {
+            "actionId": "evidence",
+            "pointer": "/response/data/precision"
+          },
+          "operator": "equals"
+        },
+        {
+          "subcaseId": "date-only-range",
+          "assertionId": "date-unverified",
+          "source": {
+            "actionId": "assessment",
+            "pointer": "/response/data/result"
+          },
+          "operator": "equals"
+        },
+        {
+          "subcaseId": "date-only-range",
+          "assertionId": "date-known-receipt-100",
+          "source": {
+            "actionId": "db-after",
+            "pointer": "/data/rawRows/movements",
+            "field": "quantity",
+            "where": {
+              "kind": "RECEIPT"
+            }
+          },
+          "operator": "sumEquals"
+        }
+      ],
+      "correction-not-fake-movement": [
+        {
+          "subcaseId": "known-at-correction",
+          "assertionId": "movements-unchanged",
+          "source": {
+            "actionId": "db-after",
+            "pointer": "/data/rawRows/movements"
+          },
+          "operator": "sameAs"
+        },
+        {
+          "subcaseId": "inconsistent-after-dispatch",
+          "assertionId": "movements-unchanged",
+          "source": {
+            "actionId": "db-after",
+            "pointer": "/data/rawRows/movements"
+          },
+          "operator": "sameAs"
+        },
+        {
+          "subcaseId": "inconsistent-after-dispatch",
+          "assertionId": "segments-unchanged",
+          "source": {
+            "actionId": "db-after",
+            "pointer": "/data/rawRows/segments"
+          },
+          "operator": "sameAs"
+        },
+        {
+          "subcaseId": "inconsistent-after-dispatch",
+          "assertionId": "allocations-unchanged",
+          "source": {
+            "actionId": "db-after",
+            "pointer": "/data/rawRows/allocations"
+          },
+          "operator": "sameAs"
+        },
+        {
+          "subcaseId": "inconsistent-after-dispatch",
+          "assertionId": "projection-pending",
+          "source": {
+            "actionId": "view-after",
+            "pointer": "/response/data/projectionStatus"
+          },
+          "operator": "equals"
+        },
+        {
+          "subcaseId": "inconsistent-after-dispatch",
+          "assertionId": "STOCK_RECONCILIATION-one-assignment",
+          "source": {
+            "actionId": "db-after",
+            "pointer": "/data/rawRows/assignments",
+            "where": {
+              "kind": "STOCK_RECONCILIATION",
+              "status": "OPEN"
+            }
+          },
+          "operator": "count"
+        },
+        {
+          "subcaseId": "inconsistent-after-dispatch",
+          "assertionId": "STOCK_RECONCILIATION-responsibility",
+          "source": {
+            "actionId": "db-after",
+            "pointer": "/data/rawRows/assignments",
+            "field": [
+              "ownerId",
+              "nextAction",
+              "nextCheckAt"
+            ],
+            "where": {
+              "kind": "STOCK_RECONCILIATION",
+              "status": "OPEN"
+            }
+          },
+          "operator": "relationSet"
+        },
+        {
+          "subcaseId": "inconsistent-after-dispatch",
+          "assertionId": "STOCK_RECONCILIATION-human-owner",
+          "source": {
+            "actionId": "db-after",
+            "pointer": "/data/rawRows/assignments",
+            "field": "ownerType",
+            "where": {
+              "kind": "STOCK_RECONCILIATION",
+              "status": "OPEN"
+            }
+          },
+          "operator": "exactSet"
+        },
+        {
+          "subcaseId": "inconsistent-after-dispatch",
+          "assertionId": "STOCK_RECONCILIATION-api-responsibility",
+          "source": {
+            "actionId": "api-duty-STOCK_RECONCILIATION",
+            "pointer": "/response/data/items",
+            "field": [
+              "ownerId",
+              "nextAction",
+              "nextCheckAt"
+            ],
+            "where": {
+              "kind": "STOCK_RECONCILIATION",
+              "status": "OPEN"
+            }
+          },
+          "operator": "relationSet"
+        },
+        {
+          "subcaseId": "inconsistent-after-dispatch",
+          "assertionId": "pending-rejection",
+          "source": {
+            "actionId": "dispatch-pending",
+            "pointer": "/response/outcome"
+          },
+          "operator": "equals"
+        },
+        {
+          "subcaseId": "inconsistent-after-dispatch",
+          "assertionId": "pending-movements",
+          "source": {
+            "actionId": "pending-db",
+            "pointer": "/data/rawRows/movements"
+          },
+          "operator": "sameAs"
+        },
+        {
+          "subcaseId": "inconsistent-after-dispatch",
+          "assertionId": "pending-allocations",
+          "source": {
+            "actionId": "pending-db",
+            "pointer": "/data/rawRows/allocations"
+          },
+          "operator": "sameAs"
+        },
+        {
+          "subcaseId": "inconsistent-after-dispatch",
+          "assertionId": "pending-outbox",
+          "source": {
+            "actionId": "pending-db",
+            "pointer": "/data/rawRows/outbox"
+          },
+          "operator": "sameAs"
+        }
+      ]
+    },
+    "T06.unknown-state-distinction": {
+      "state-values": [
+        {
+          "subcaseId": "four-states",
+          "assertionId": "response-states",
+          "source": {
+            "actionId": "states",
+            "pointer": "/response/data/observedAttributes",
+            "field": "state"
+          },
+          "operator": "exactSet"
+        },
+        {
+          "subcaseId": "four-states",
+          "assertionId": "raw-states",
+          "source": {
+            "actionId": "db-after",
+            "pointer": "/data/rawRows/claims",
+            "field": "state"
+          },
+          "operator": "exactSet"
+        }
+      ],
+      "zero-inference": [
+        {
+          "subcaseId": "four-states",
+          "assertionId": "claims-unchanged",
+          "source": {
+            "actionId": "db-after",
+            "pointer": "/data/rawRows/claims"
+          },
+          "operator": "sameAs"
+        },
+        {
+          "subcaseId": "four-states",
+          "assertionId": "movements-unchanged",
+          "source": {
+            "actionId": "db-after",
+            "pointer": "/data/rawRows/movements"
+          },
+          "operator": "sameAs"
+        },
+        {
+          "subcaseId": "four-states",
+          "assertionId": "segments-unchanged",
+          "source": {
+            "actionId": "db-after",
+            "pointer": "/data/rawRows/segments"
+          },
+          "operator": "sameAs"
+        },
+        {
+          "subcaseId": "four-states",
+          "assertionId": "allocations-unchanged",
+          "source": {
+            "actionId": "db-after",
+            "pointer": "/data/rawRows/allocations"
+          },
+          "operator": "sameAs"
+        },
+        {
+          "subcaseId": "four-states",
+          "assertionId": "state-0-not-known-zero",
+          "source": {
+            "actionId": "states",
+            "pointer": "/response/data/observedAttributes/0/knownQuantity"
+          },
+          "operator": "absent"
+        },
+        {
+          "subcaseId": "four-states",
+          "assertionId": "state-1-not-known-zero",
+          "source": {
+            "actionId": "states",
+            "pointer": "/response/data/observedAttributes/1/knownQuantity"
+          },
+          "operator": "absent"
+        },
+        {
+          "subcaseId": "four-states",
+          "assertionId": "state-2-not-known-zero",
+          "source": {
+            "actionId": "states",
+            "pointer": "/response/data/observedAttributes/2/knownQuantity"
+          },
+          "operator": "absent"
+        },
+        {
+          "subcaseId": "four-states",
+          "assertionId": "state-3-not-known-zero",
+          "source": {
+            "actionId": "states",
+            "pointer": "/response/data/observedAttributes/3/knownQuantity"
+          },
+          "operator": "absent"
+        },
+        {
+          "subcaseId": "all-false-conflict",
+          "assertionId": "no-physical-inference",
+          "source": {
+            "actionId": "db-after",
+            "pointer": "/data/rawRows/movements"
+          },
+          "operator": "count"
+        },
+        {
+          "subcaseId": "all-true-conflict",
+          "assertionId": "no-physical-inference",
+          "source": {
+            "actionId": "db-after",
+            "pointer": "/data/rawRows/movements"
+          },
+          "operator": "count"
+        },
+        {
+          "subcaseId": "any-true-conflict",
+          "assertionId": "no-physical-inference",
+          "source": {
+            "actionId": "db-after",
+            "pointer": "/data/rawRows/movements"
+          },
+          "operator": "count"
+        },
+        {
+          "subcaseId": "not-unknown",
+          "assertionId": "no-physical-inference",
+          "source": {
+            "actionId": "db-after",
+            "pointer": "/data/rawRows/movements"
+          },
+          "operator": "count"
+        }
+      ],
+      "conflict-preserved": [
+        {
+          "subcaseId": "four-states",
+          "assertionId": "conflict-values",
+          "source": {
+            "actionId": "states",
+            "pointer": "/response/data/conflicts/0/claimValues"
+          },
+          "operator": "exactSet"
+        },
+        {
+          "subcaseId": "all-false-conflict",
+          "assertionId": "predicate-result",
+          "source": {
+            "actionId": "assessment",
+            "pointer": "/response/data/result"
+          },
+          "operator": "equals"
+        },
+        {
+          "subcaseId": "all-false-conflict",
+          "assertionId": "predicate-conflict",
+          "source": {
+            "actionId": "assessment",
+            "pointer": "/response/data/conflict"
+          },
+          "operator": "equals"
+        },
+        {
+          "subcaseId": "all-false-conflict",
+          "assertionId": "raw-predicate",
+          "source": {
+            "actionId": "db-after",
+            "pointer": "/data/rawRows/assessments",
+            "field": [
+              "result",
+              "conflict",
+              "evaluatorVersion"
+            ]
+          },
+          "operator": "relationSet"
+        },
+        {
+          "subcaseId": "all-true-conflict",
+          "assertionId": "predicate-result",
+          "source": {
+            "actionId": "assessment",
+            "pointer": "/response/data/result"
+          },
+          "operator": "equals"
+        },
+        {
+          "subcaseId": "all-true-conflict",
+          "assertionId": "predicate-conflict",
+          "source": {
+            "actionId": "assessment",
+            "pointer": "/response/data/conflict"
+          },
+          "operator": "equals"
+        },
+        {
+          "subcaseId": "all-true-conflict",
+          "assertionId": "raw-predicate",
+          "source": {
+            "actionId": "db-after",
+            "pointer": "/data/rawRows/assessments",
+            "field": [
+              "result",
+              "conflict",
+              "evaluatorVersion"
+            ]
+          },
+          "operator": "relationSet"
+        },
+        {
+          "subcaseId": "any-true-conflict",
+          "assertionId": "predicate-result",
+          "source": {
+            "actionId": "assessment",
+            "pointer": "/response/data/result"
+          },
+          "operator": "equals"
+        },
+        {
+          "subcaseId": "any-true-conflict",
+          "assertionId": "predicate-conflict",
+          "source": {
+            "actionId": "assessment",
+            "pointer": "/response/data/conflict"
+          },
+          "operator": "equals"
+        },
+        {
+          "subcaseId": "any-true-conflict",
+          "assertionId": "raw-predicate",
+          "source": {
+            "actionId": "db-after",
+            "pointer": "/data/rawRows/assessments",
+            "field": [
+              "result",
+              "conflict",
+              "evaluatorVersion"
+            ]
+          },
+          "operator": "relationSet"
+        },
+        {
+          "subcaseId": "not-unknown",
+          "assertionId": "predicate-result",
+          "source": {
+            "actionId": "assessment",
+            "pointer": "/response/data/result"
+          },
+          "operator": "equals"
+        },
+        {
+          "subcaseId": "not-unknown",
+          "assertionId": "predicate-conflict",
+          "source": {
+            "actionId": "assessment",
+            "pointer": "/response/data/conflict"
+          },
+          "operator": "equals"
+        },
+        {
+          "subcaseId": "not-unknown",
+          "assertionId": "raw-predicate",
+          "source": {
+            "actionId": "db-after",
+            "pointer": "/data/rawRows/assessments",
+            "field": [
+              "result",
+              "conflict",
+              "evaluatorVersion"
+            ]
+          },
+          "operator": "relationSet"
+        }
+      ]
+    },
+    "T22.source-duplicate-conflict": {
+      "accepted-inbox-per-key": [
+        {
+          "subcaseId": "source-key-hash-conflict",
+          "assertionId": "accepted-once",
+          "source": {
+            "actionId": "db-after",
+            "pointer": "/data/rawRows/inbox",
+            "where": {
+              "sourceNamespace": "carrier",
+              "externalEventId": "EV60",
+              "sourceVersion": "v1",
+              "status": "ACCEPTED"
+            }
+          },
+          "operator": "count"
+        }
+      ],
+      "same-key-other-hash": [
+        {
+          "subcaseId": "source-key-hash-conflict",
+          "assertionId": "hash-conflict",
+          "source": {
+            "actionId": "conflict",
+            "pointer": "/response/error/code"
+          },
+          "operator": "equals"
+        },
+        {
+          "subcaseId": "source-key-hash-conflict",
+          "assertionId": "conflicting-raw-hash",
+          "source": {
+            "actionId": "db-after",
+            "pointer": "/data/rawRows/claims",
+            "field": "payloadHash",
+            "where": {
+              "state": "CONFLICT"
+            }
+          },
+          "operator": "exactSet"
+        }
+      ],
+      "last-write-wins": [
+        {
+          "subcaseId": "source-key-hash-conflict",
+          "assertionId": "accepted-original-hash",
+          "source": {
+            "actionId": "db-after",
+            "pointer": "/data/rawRows/inbox",
+            "field": "payloadHash",
+            "where": {
+              "status": "ACCEPTED"
+            }
+          },
+          "operator": "exactSet"
+        },
+        {
+          "subcaseId": "source-key-hash-conflict",
+          "assertionId": "movements-unchanged",
+          "source": {
+            "actionId": "db-after",
+            "pointer": "/data/rawRows/movements"
+          },
+          "operator": "sameAs"
+        },
+        {
+          "subcaseId": "source-key-hash-conflict",
+          "assertionId": "preserved-carrier-A-bytes",
+          "source": {
+            "actionId": "inspect-carrier-A",
+            "pointer": "/data/hostObservation/observedArtifacts/0/sha256"
+          },
+          "operator": "equals"
+        },
+        {
+          "subcaseId": "source-key-hash-conflict",
+          "assertionId": "preserved-carrier-B-bytes",
+          "source": {
+            "actionId": "inspect-carrier-B",
+            "pointer": "/data/hostObservation/observedArtifacts/0/sha256"
+          },
+          "operator": "equals"
+        }
+      ],
+      "identity-unverified-auto-sum": [
+        {
+          "subcaseId": "source-key-hash-conflict",
+          "assertionId": "canonical_links-unchanged",
+          "source": {
+            "actionId": "db-after",
+            "pointer": "/data/rawRows/canonical_links"
+          },
+          "operator": "sameAs"
+        },
+        {
+          "subcaseId": "two-sources-one-occurrence",
+          "assertionId": "unverified-movements",
+          "source": {
+            "actionId": "db-unverified",
+            "pointer": "/data/rawRows/movements"
+          },
+          "operator": "sameAs"
+        },
+        {
+          "subcaseId": "two-sources-one-occurrence",
+          "assertionId": "unverified-segments",
+          "source": {
+            "actionId": "db-unverified",
+            "pointer": "/data/rawRows/segments"
+          },
+          "operator": "sameAs"
+        }
+      ],
+      "source-conflict-owner": [
+        {
+          "subcaseId": "source-key-hash-conflict",
+          "assertionId": "EVIDENCE_CONFLICT-one-assignment",
+          "source": {
+            "actionId": "db-after",
+            "pointer": "/data/rawRows/assignments",
+            "where": {
+              "kind": "EVIDENCE_CONFLICT",
+              "status": "OPEN"
+            }
+          },
+          "operator": "count"
+        },
+        {
+          "subcaseId": "source-key-hash-conflict",
+          "assertionId": "EVIDENCE_CONFLICT-responsibility",
+          "source": {
+            "actionId": "db-after",
+            "pointer": "/data/rawRows/assignments",
+            "field": [
+              "ownerId",
+              "nextAction",
+              "nextCheckAt"
+            ],
+            "where": {
+              "kind": "EVIDENCE_CONFLICT",
+              "status": "OPEN"
+            }
+          },
+          "operator": "relationSet"
+        },
+        {
+          "subcaseId": "source-key-hash-conflict",
+          "assertionId": "EVIDENCE_CONFLICT-human-owner",
+          "source": {
+            "actionId": "db-after",
+            "pointer": "/data/rawRows/assignments",
+            "field": "ownerType",
+            "where": {
+              "kind": "EVIDENCE_CONFLICT",
+              "status": "OPEN"
+            }
+          },
+          "operator": "exactSet"
+        },
+        {
+          "subcaseId": "source-key-hash-conflict",
+          "assertionId": "EVIDENCE_CONFLICT-api-responsibility",
+          "source": {
+            "actionId": "api-duty-EVIDENCE_CONFLICT",
+            "pointer": "/response/data/items",
+            "field": [
+              "ownerId",
+              "nextAction",
+              "nextCheckAt"
+            ],
+            "where": {
+              "kind": "EVIDENCE_CONFLICT",
+              "status": "OPEN"
+            }
+          },
+          "operator": "relationSet"
+        }
+      ],
+      "canonical-receipt": [
+        {
+          "subcaseId": "two-sources-one-occurrence",
+          "assertionId": "receipt-sum",
+          "source": {
+            "actionId": "db-after",
+            "pointer": "/data/rawRows/movements",
+            "field": "quantity",
+            "where": {
+              "kind": "RECEIPT"
+            }
+          },
+          "operator": "sumEquals"
+        },
+        {
+          "subcaseId": "two-sources-one-occurrence",
+          "assertionId": "arrival-api-60",
+          "source": {
+            "actionId": "arrival-api",
+            "pointer": "/response/data/arrivalQuantity"
+          },
+          "operator": "decimalEquals"
+        },
+        {
+          "subcaseId": "two-sources-one-occurrence",
+          "assertionId": "one-physical-receipt",
+          "source": {
+            "actionId": "db-after",
+            "pointer": "/data/rawRows/movements",
+            "where": {
+              "kind": "RECEIPT"
+            }
+          },
+          "operator": "count"
+        },
+        {
+          "subcaseId": "two-sources-one-occurrence",
+          "assertionId": "one-canonical-two-reports",
+          "source": {
+            "actionId": "db-after",
+            "pointer": "/data/rawRows/canonical_links",
+            "field": [
+              "activityId",
+              "occurrenceId"
+            ]
+          },
+          "operator": "relationSet"
+        }
+      ]
+    },
+    "T22.reconciliation-control-and-source-order": {
+      "invalid-match-effects": [
+        {
+          "subcaseId": "cross-org-match",
+          "assertionId": "invalid-outcome",
+          "source": {
+            "actionId": "invalid",
+            "pointer": "/response/outcome"
+          },
+          "operator": "equals"
+        },
+        {
+          "subcaseId": "cross-org-match",
+          "assertionId": "identity_matches-unchanged",
+          "source": {
+            "actionId": "db-after",
+            "pointer": "/data/rawRows/identity_matches"
+          },
+          "operator": "sameAs"
+        },
+        {
+          "subcaseId": "cross-org-match",
+          "assertionId": "canonical_links-unchanged",
+          "source": {
+            "actionId": "db-after",
+            "pointer": "/data/rawRows/canonical_links"
+          },
+          "operator": "sameAs"
+        },
+        {
+          "subcaseId": "cross-org-match",
+          "assertionId": "movements-unchanged",
+          "source": {
+            "actionId": "db-after",
+            "pointer": "/data/rawRows/movements"
+          },
+          "operator": "sameAs"
+        },
+        {
+          "subcaseId": "cross-org-match",
+          "assertionId": "segments-unchanged",
+          "source": {
+            "actionId": "db-after",
+            "pointer": "/data/rawRows/segments"
+          },
+          "operator": "sameAs"
+        },
+        {
+          "subcaseId": "cross-org-match",
+          "assertionId": "assessments-unchanged",
+          "source": {
+            "actionId": "db-after",
+            "pointer": "/data/rawRows/assessments"
+          },
+          "operator": "sameAs"
+        },
+        {
+          "subcaseId": "overlapping-match",
+          "assertionId": "invalid-outcome",
+          "source": {
+            "actionId": "invalid",
+            "pointer": "/response/outcome"
+          },
+          "operator": "equals"
+        },
+        {
+          "subcaseId": "overlapping-match",
+          "assertionId": "identity_matches-unchanged",
+          "source": {
+            "actionId": "db-after",
+            "pointer": "/data/rawRows/identity_matches"
+          },
+          "operator": "sameAs"
+        },
+        {
+          "subcaseId": "overlapping-match",
+          "assertionId": "canonical_links-unchanged",
+          "source": {
+            "actionId": "db-after",
+            "pointer": "/data/rawRows/canonical_links"
+          },
+          "operator": "sameAs"
+        },
+        {
+          "subcaseId": "overlapping-match",
+          "assertionId": "movements-unchanged",
+          "source": {
+            "actionId": "db-after",
+            "pointer": "/data/rawRows/movements"
+          },
+          "operator": "sameAs"
+        },
+        {
+          "subcaseId": "overlapping-match",
+          "assertionId": "segments-unchanged",
+          "source": {
+            "actionId": "db-after",
+            "pointer": "/data/rawRows/segments"
+          },
+          "operator": "sameAs"
+        },
+        {
+          "subcaseId": "overlapping-match",
+          "assertionId": "assessments-unchanged",
+          "source": {
+            "actionId": "db-after",
+            "pointer": "/data/rawRows/assessments"
+          },
+          "operator": "sameAs"
+        },
+        {
+          "subcaseId": "overlapping-match",
+          "assertionId": "existing-receipt-stays-60",
+          "source": {
+            "actionId": "db-after",
+            "pointer": "/data/rawRows/movements",
+            "field": "quantity",
+            "where": {
+              "kind": "RECEIPT"
+            }
+          },
+          "operator": "sumEquals"
+        },
+        {
+          "subcaseId": "arbitrary-priority",
+          "assertionId": "invalid-outcome",
+          "source": {
+            "actionId": "invalid",
+            "pointer": "/response/outcome"
+          },
+          "operator": "equals"
+        },
+        {
+          "subcaseId": "arbitrary-priority",
+          "assertionId": "identity_matches-unchanged",
+          "source": {
+            "actionId": "db-after",
+            "pointer": "/data/rawRows/identity_matches"
+          },
+          "operator": "sameAs"
+        },
+        {
+          "subcaseId": "arbitrary-priority",
+          "assertionId": "canonical_links-unchanged",
+          "source": {
+            "actionId": "db-after",
+            "pointer": "/data/rawRows/canonical_links"
+          },
+          "operator": "sameAs"
+        },
+        {
+          "subcaseId": "arbitrary-priority",
+          "assertionId": "movements-unchanged",
+          "source": {
+            "actionId": "db-after",
+            "pointer": "/data/rawRows/movements"
+          },
+          "operator": "sameAs"
+        },
+        {
+          "subcaseId": "arbitrary-priority",
+          "assertionId": "segments-unchanged",
+          "source": {
+            "actionId": "db-after",
+            "pointer": "/data/rawRows/segments"
+          },
+          "operator": "sameAs"
+        },
+        {
+          "subcaseId": "arbitrary-priority",
+          "assertionId": "assessments-unchanged",
+          "source": {
+            "actionId": "db-after",
+            "pointer": "/data/rawRows/assessments"
+          },
+          "operator": "sameAs"
+        },
+        {
+          "subcaseId": "unauthorized-match",
+          "assertionId": "invalid-outcome",
+          "source": {
+            "actionId": "invalid",
+            "pointer": "/response/outcome"
+          },
+          "operator": "equals"
+        },
+        {
+          "subcaseId": "unauthorized-match",
+          "assertionId": "identity_matches-unchanged",
+          "source": {
+            "actionId": "db-after",
+            "pointer": "/data/rawRows/identity_matches"
+          },
+          "operator": "sameAs"
+        },
+        {
+          "subcaseId": "unauthorized-match",
+          "assertionId": "canonical_links-unchanged",
+          "source": {
+            "actionId": "db-after",
+            "pointer": "/data/rawRows/canonical_links"
+          },
+          "operator": "sameAs"
+        },
+        {
+          "subcaseId": "unauthorized-match",
+          "assertionId": "movements-unchanged",
+          "source": {
+            "actionId": "db-after",
+            "pointer": "/data/rawRows/movements"
+          },
+          "operator": "sameAs"
+        },
+        {
+          "subcaseId": "unauthorized-match",
+          "assertionId": "segments-unchanged",
+          "source": {
+            "actionId": "db-after",
+            "pointer": "/data/rawRows/segments"
+          },
+          "operator": "sameAs"
+        },
+        {
+          "subcaseId": "unauthorized-match",
+          "assertionId": "assessments-unchanged",
+          "source": {
+            "actionId": "db-after",
+            "pointer": "/data/rawRows/assessments"
+          },
+          "operator": "sameAs"
+        }
+      ],
+      "quarantine-owner": [
+        {
+          "subcaseId": "cross-org-match",
+          "assertionId": "SOURCE_QUARANTINE-one-assignment",
+          "source": {
+            "actionId": "db-after",
+            "pointer": "/data/rawRows/assignments",
+            "where": {
+              "kind": "SOURCE_QUARANTINE",
+              "status": "OPEN"
+            }
+          },
+          "operator": "count"
+        },
+        {
+          "subcaseId": "cross-org-match",
+          "assertionId": "SOURCE_QUARANTINE-responsibility",
+          "source": {
+            "actionId": "db-after",
+            "pointer": "/data/rawRows/assignments",
+            "field": [
+              "ownerId",
+              "nextAction",
+              "nextCheckAt"
+            ],
+            "where": {
+              "kind": "SOURCE_QUARANTINE",
+              "status": "OPEN"
+            }
+          },
+          "operator": "relationSet"
+        },
+        {
+          "subcaseId": "cross-org-match",
+          "assertionId": "SOURCE_QUARANTINE-human-owner",
+          "source": {
+            "actionId": "db-after",
+            "pointer": "/data/rawRows/assignments",
+            "field": "ownerType",
+            "where": {
+              "kind": "SOURCE_QUARANTINE",
+              "status": "OPEN"
+            }
+          },
+          "operator": "exactSet"
+        },
+        {
+          "subcaseId": "cross-org-match",
+          "assertionId": "SOURCE_QUARANTINE-api-responsibility",
+          "source": {
+            "actionId": "api-duty-SOURCE_QUARANTINE",
+            "pointer": "/response/data/items",
+            "field": [
+              "ownerId",
+              "nextAction",
+              "nextCheckAt"
+            ],
+            "where": {
+              "kind": "SOURCE_QUARANTINE",
+              "status": "OPEN"
+            }
+          },
+          "operator": "relationSet"
+        },
+        {
+          "subcaseId": "overlapping-match",
+          "assertionId": "SOURCE_QUARANTINE-one-assignment",
+          "source": {
+            "actionId": "db-after",
+            "pointer": "/data/rawRows/assignments",
+            "where": {
+              "kind": "SOURCE_QUARANTINE",
+              "status": "OPEN"
+            }
+          },
+          "operator": "count"
+        },
+        {
+          "subcaseId": "overlapping-match",
+          "assertionId": "SOURCE_QUARANTINE-responsibility",
+          "source": {
+            "actionId": "db-after",
+            "pointer": "/data/rawRows/assignments",
+            "field": [
+              "ownerId",
+              "nextAction",
+              "nextCheckAt"
+            ],
+            "where": {
+              "kind": "SOURCE_QUARANTINE",
+              "status": "OPEN"
+            }
+          },
+          "operator": "relationSet"
+        },
+        {
+          "subcaseId": "overlapping-match",
+          "assertionId": "SOURCE_QUARANTINE-human-owner",
+          "source": {
+            "actionId": "db-after",
+            "pointer": "/data/rawRows/assignments",
+            "field": "ownerType",
+            "where": {
+              "kind": "SOURCE_QUARANTINE",
+              "status": "OPEN"
+            }
+          },
+          "operator": "exactSet"
+        },
+        {
+          "subcaseId": "overlapping-match",
+          "assertionId": "SOURCE_QUARANTINE-api-responsibility",
+          "source": {
+            "actionId": "api-duty-SOURCE_QUARANTINE",
+            "pointer": "/response/data/items",
+            "field": [
+              "ownerId",
+              "nextAction",
+              "nextCheckAt"
+            ],
+            "where": {
+              "kind": "SOURCE_QUARANTINE",
+              "status": "OPEN"
+            }
+          },
+          "operator": "relationSet"
+        },
+        {
+          "subcaseId": "arbitrary-priority",
+          "assertionId": "SOURCE_QUARANTINE-one-assignment",
+          "source": {
+            "actionId": "db-after",
+            "pointer": "/data/rawRows/assignments",
+            "where": {
+              "kind": "SOURCE_QUARANTINE",
+              "status": "OPEN"
+            }
+          },
+          "operator": "count"
+        },
+        {
+          "subcaseId": "arbitrary-priority",
+          "assertionId": "SOURCE_QUARANTINE-responsibility",
+          "source": {
+            "actionId": "db-after",
+            "pointer": "/data/rawRows/assignments",
+            "field": [
+              "ownerId",
+              "nextAction",
+              "nextCheckAt"
+            ],
+            "where": {
+              "kind": "SOURCE_QUARANTINE",
+              "status": "OPEN"
+            }
+          },
+          "operator": "relationSet"
+        },
+        {
+          "subcaseId": "arbitrary-priority",
+          "assertionId": "SOURCE_QUARANTINE-human-owner",
+          "source": {
+            "actionId": "db-after",
+            "pointer": "/data/rawRows/assignments",
+            "field": "ownerType",
+            "where": {
+              "kind": "SOURCE_QUARANTINE",
+              "status": "OPEN"
+            }
+          },
+          "operator": "exactSet"
+        },
+        {
+          "subcaseId": "arbitrary-priority",
+          "assertionId": "SOURCE_QUARANTINE-api-responsibility",
+          "source": {
+            "actionId": "api-duty-SOURCE_QUARANTINE",
+            "pointer": "/response/data/items",
+            "field": [
+              "ownerId",
+              "nextAction",
+              "nextCheckAt"
+            ],
+            "where": {
+              "kind": "SOURCE_QUARANTINE",
+              "status": "OPEN"
+            }
+          },
+          "operator": "relationSet"
+        },
+        {
+          "subcaseId": "unauthorized-match",
+          "assertionId": "SOURCE_QUARANTINE-one-assignment",
+          "source": {
+            "actionId": "db-after",
+            "pointer": "/data/rawRows/assignments",
+            "where": {
+              "kind": "SOURCE_QUARANTINE",
+              "status": "OPEN"
+            }
+          },
+          "operator": "count"
+        },
+        {
+          "subcaseId": "unauthorized-match",
+          "assertionId": "SOURCE_QUARANTINE-responsibility",
+          "source": {
+            "actionId": "db-after",
+            "pointer": "/data/rawRows/assignments",
+            "field": [
+              "ownerId",
+              "nextAction",
+              "nextCheckAt"
+            ],
+            "where": {
+              "kind": "SOURCE_QUARANTINE",
+              "status": "OPEN"
+            }
+          },
+          "operator": "relationSet"
+        },
+        {
+          "subcaseId": "unauthorized-match",
+          "assertionId": "SOURCE_QUARANTINE-human-owner",
+          "source": {
+            "actionId": "db-after",
+            "pointer": "/data/rawRows/assignments",
+            "field": "ownerType",
+            "where": {
+              "kind": "SOURCE_QUARANTINE",
+              "status": "OPEN"
+            }
+          },
+          "operator": "exactSet"
+        },
+        {
+          "subcaseId": "unauthorized-match",
+          "assertionId": "SOURCE_QUARANTINE-api-responsibility",
+          "source": {
+            "actionId": "api-duty-SOURCE_QUARANTINE",
+            "pointer": "/response/data/items",
+            "field": [
+              "ownerId",
+              "nextAction",
+              "nextCheckAt"
+            ],
+            "where": {
+              "kind": "SOURCE_QUARANTINE",
+              "status": "OPEN"
+            }
+          },
+          "operator": "relationSet"
+        },
+        {
+          "subcaseId": "late-old-release",
+          "assertionId": "SOURCE_QUARANTINE-one-assignment",
+          "source": {
+            "actionId": "db-after",
+            "pointer": "/data/rawRows/assignments",
+            "where": {
+              "kind": "SOURCE_QUARANTINE",
+              "status": "OPEN"
+            }
+          },
+          "operator": "count"
+        },
+        {
+          "subcaseId": "late-old-release",
+          "assertionId": "SOURCE_QUARANTINE-responsibility",
+          "source": {
+            "actionId": "db-after",
+            "pointer": "/data/rawRows/assignments",
+            "field": [
+              "ownerId",
+              "nextAction",
+              "nextCheckAt"
+            ],
+            "where": {
+              "kind": "SOURCE_QUARANTINE",
+              "status": "OPEN"
+            }
+          },
+          "operator": "relationSet"
+        },
+        {
+          "subcaseId": "late-old-release",
+          "assertionId": "SOURCE_QUARANTINE-human-owner",
+          "source": {
+            "actionId": "db-after",
+            "pointer": "/data/rawRows/assignments",
+            "field": "ownerType",
+            "where": {
+              "kind": "SOURCE_QUARANTINE",
+              "status": "OPEN"
+            }
+          },
+          "operator": "exactSet"
+        },
+        {
+          "subcaseId": "late-old-release",
+          "assertionId": "SOURCE_QUARANTINE-api-responsibility",
+          "source": {
+            "actionId": "api-duty-SOURCE_QUARANTINE",
+            "pointer": "/response/data/items",
+            "field": [
+              "ownerId",
+              "nextAction",
+              "nextCheckAt"
+            ],
+            "where": {
+              "kind": "SOURCE_QUARANTINE",
+              "status": "OPEN"
+            }
+          },
+          "operator": "relationSet"
+        },
+        {
+          "subcaseId": "unprofiled-automatic-source",
+          "assertionId": "SOURCE_QUARANTINE-one-assignment",
+          "source": {
+            "actionId": "db-after",
+            "pointer": "/data/rawRows/assignments",
+            "where": {
+              "kind": "SOURCE_QUARANTINE",
+              "status": "OPEN"
+            }
+          },
+          "operator": "count"
+        },
+        {
+          "subcaseId": "unprofiled-automatic-source",
+          "assertionId": "SOURCE_QUARANTINE-responsibility",
+          "source": {
+            "actionId": "db-after",
+            "pointer": "/data/rawRows/assignments",
+            "field": [
+              "ownerId",
+              "nextAction",
+              "nextCheckAt"
+            ],
+            "where": {
+              "kind": "SOURCE_QUARANTINE",
+              "status": "OPEN"
+            }
+          },
+          "operator": "relationSet"
+        },
+        {
+          "subcaseId": "unprofiled-automatic-source",
+          "assertionId": "SOURCE_QUARANTINE-human-owner",
+          "source": {
+            "actionId": "db-after",
+            "pointer": "/data/rawRows/assignments",
+            "field": "ownerType",
+            "where": {
+              "kind": "SOURCE_QUARANTINE",
+              "status": "OPEN"
+            }
+          },
+          "operator": "exactSet"
+        },
+        {
+          "subcaseId": "unprofiled-automatic-source",
+          "assertionId": "SOURCE_QUARANTINE-api-responsibility",
+          "source": {
+            "actionId": "api-duty-SOURCE_QUARANTINE",
+            "pointer": "/response/data/items",
+            "field": [
+              "ownerId",
+              "nextAction",
+              "nextCheckAt"
+            ],
+            "where": {
+              "kind": "SOURCE_QUARANTINE",
+              "status": "OPEN"
+            }
+          },
+          "operator": "relationSet"
+        }
+      ],
+      "old-source-overwrites-new-restriction": [
+        {
+          "subcaseId": "late-old-release",
+          "assertionId": "restrictions-unchanged",
+          "source": {
+            "actionId": "db-after",
+            "pointer": "/data/rawRows/restrictions"
+          },
+          "operator": "sameAs"
+        },
+        {
+          "subcaseId": "late-old-release",
+          "assertionId": "new-hold-active",
+          "source": {
+            "actionId": "db-after",
+            "pointer": "/data/rawRows/restrictions",
+            "field": [
+              "id",
+              "status",
+              "revision",
+              "quantity",
+              "unit"
+            ]
+          },
+          "operator": "relationSet"
+        }
+      ],
+      "unprofiled-connector-activation": [
+        {
+          "subcaseId": "unprofiled-automatic-source",
+          "assertionId": "source_profiles-unchanged",
+          "source": {
+            "actionId": "db-after",
+            "pointer": "/data/rawRows/source_profiles"
+          },
+          "operator": "sameAs"
+        },
+        {
+          "subcaseId": "unprofiled-automatic-source",
+          "assertionId": "movements-unchanged",
+          "source": {
+            "actionId": "db-after",
+            "pointer": "/data/rawRows/movements"
+          },
+          "operator": "sameAs"
+        },
+        {
+          "subcaseId": "unprofiled-automatic-source",
+          "assertionId": "automatic-connector-disabled",
+          "source": {
+            "actionId": "connector-config",
+            "pointer": "/data/hostObservation/extractor/rawRows/enabledSourceNamespaces"
+          },
+          "operator": "exactSet"
+        }
+      ],
+      "source-profile": [
+        {
+          "subcaseId": "reviewed-source-profile",
+          "assertionId": "profile-fields",
+          "source": {
+            "actionId": "db-after",
+            "pointer": "/data/rawRows/source_profiles",
+            "field": [
+              "namespace",
+              "basis",
+              "mappingVersion",
+              "revisionOrdering",
+              "timeTrust",
+              "schemaVersion",
+              "dedupPolicy",
+              "conflictOwnerId",
+              "retryPolicy",
+              "externalWrites"
+            ]
+          },
+          "operator": "relationSet"
+        },
+        {
+          "subcaseId": "reviewed-source-profile",
+          "assertionId": "original-hash",
+          "source": {
+            "actionId": "db-after",
+            "pointer": "/data/rawRows/inbox",
+            "field": "payloadHash"
+          },
+          "operator": "exactSet"
+        },
+        {
+          "subcaseId": "reviewed-source-profile",
+          "assertionId": "explicit-pending",
+          "source": {
+            "actionId": "pending-inbox",
+            "pointer": "/response/data/processingState"
+          },
+          "operator": "equals"
+        },
+        {
+          "subcaseId": "reviewed-source-profile",
+          "assertionId": "original-bytes-hash",
+          "source": {
+            "actionId": "inspect-original",
+            "pointer": "/data/hostObservation/observedArtifacts/0/sha256"
+          },
+          "operator": "equals"
+        },
+        {
+          "subcaseId": "reviewed-source-profile",
+          "assertionId": "SOURCE_QUARANTINE-one-assignment",
+          "source": {
+            "actionId": "db-after",
+            "pointer": "/data/rawRows/assignments",
+            "where": {
+              "kind": "SOURCE_QUARANTINE",
+              "status": "OPEN"
+            }
+          },
+          "operator": "count"
+        },
+        {
+          "subcaseId": "reviewed-source-profile",
+          "assertionId": "SOURCE_QUARANTINE-responsibility",
+          "source": {
+            "actionId": "db-after",
+            "pointer": "/data/rawRows/assignments",
+            "field": [
+              "ownerId",
+              "nextAction",
+              "nextCheckAt"
+            ],
+            "where": {
+              "kind": "SOURCE_QUARANTINE",
+              "status": "OPEN"
+            }
+          },
+          "operator": "relationSet"
+        },
+        {
+          "subcaseId": "reviewed-source-profile",
+          "assertionId": "SOURCE_QUARANTINE-human-owner",
+          "source": {
+            "actionId": "db-after",
+            "pointer": "/data/rawRows/assignments",
+            "field": "ownerType",
+            "where": {
+              "kind": "SOURCE_QUARANTINE",
+              "status": "OPEN"
+            }
+          },
+          "operator": "exactSet"
+        },
+        {
+          "subcaseId": "reviewed-source-profile",
+          "assertionId": "SOURCE_QUARANTINE-api-responsibility",
+          "source": {
+            "actionId": "api-duty-SOURCE_QUARANTINE",
+            "pointer": "/response/data/items",
+            "field": [
+              "ownerId",
+              "nextAction",
+              "nextCheckAt"
+            ],
+            "where": {
+              "kind": "SOURCE_QUARANTINE",
+              "status": "OPEN"
+            }
+          },
+          "operator": "relationSet"
+        }
+      ]
+    },
+    "T22.unknown-external-reconciliation": {
+      "lost-response-state": [
+        {
+          "subcaseId": "external-unknown",
+          "assertionId": "unknown-state",
+          "source": {
+            "actionId": "unknown",
+            "pointer": "/response/data/issues/0/state"
+          },
+          "operator": "equals"
+        },
+        {
+          "subcaseId": "external-unknown",
+          "assertionId": "raw-unknown",
+          "source": {
+            "actionId": "db-after",
+            "pointer": "/data/rawRows/outbox",
+            "field": "state"
+          },
+          "operator": "exactSet"
+        },
+        {
+          "subcaseId": "external-success",
+          "assertionId": "unknown-state",
+          "source": {
+            "actionId": "unknown",
+            "pointer": "/response/data/issues/0/state"
+          },
+          "operator": "equals"
+        },
+        {
+          "subcaseId": "external-success",
+          "assertionId": "raw-unknown",
+          "source": {
+            "actionId": "db-after",
+            "pointer": "/data/rawRows/outbox",
+            "field": "state"
+          },
+          "operator": "exactSet"
+        },
+        {
+          "subcaseId": "external-failure-retry",
+          "assertionId": "unknown-state",
+          "source": {
+            "actionId": "unknown",
+            "pointer": "/response/data/issues/0/state"
+          },
+          "operator": "equals"
+        },
+        {
+          "subcaseId": "external-failure-retry",
+          "assertionId": "raw-unknown",
+          "source": {
+            "actionId": "db-after",
+            "pointer": "/data/rawRows/outbox",
+            "field": "state"
+          },
+          "operator": "exactSet"
+        },
+        {
+          "subcaseId": "external-failure-no-retry",
+          "assertionId": "unknown-state",
+          "source": {
+            "actionId": "unknown",
+            "pointer": "/response/data/issues/0/state"
+          },
+          "operator": "equals"
+        },
+        {
+          "subcaseId": "external-failure-no-retry",
+          "assertionId": "raw-unknown",
+          "source": {
+            "actionId": "db-after",
+            "pointer": "/data/rawRows/outbox",
+            "field": "state"
+          },
+          "operator": "exactSet"
+        },
+        {
+          "subcaseId": "external-no-lookup",
+          "assertionId": "unknown-state",
+          "source": {
+            "actionId": "unknown",
+            "pointer": "/response/data/issues/0/state"
+          },
+          "operator": "equals"
+        },
+        {
+          "subcaseId": "external-no-lookup",
+          "assertionId": "raw-unknown",
+          "source": {
+            "actionId": "db-after",
+            "pointer": "/data/rawRows/outbox",
+            "field": "state"
+          },
+          "operator": "exactSet"
+        },
+        {
+          "subcaseId": "external-local-cancel",
+          "assertionId": "unknown-state",
+          "source": {
+            "actionId": "unknown",
+            "pointer": "/response/data/issues/0/state"
+          },
+          "operator": "equals"
+        },
+        {
+          "subcaseId": "external-local-cancel",
+          "assertionId": "raw-unknown",
+          "source": {
+            "actionId": "db-after",
+            "pointer": "/data/rawRows/outbox",
+            "field": "state"
+          },
+          "operator": "exactSet"
+        }
+      ],
+      "unreconciled-external-reissue": [
+        {
+          "subcaseId": "external-unknown",
+          "assertionId": "remote-request-count",
+          "source": {
+            "actionId": "remote-after",
+            "pointer": "/data/requests"
+          },
+          "operator": "count"
+        },
+        {
+          "subcaseId": "external-unknown",
+          "assertionId": "unknown-kept",
+          "source": {
+            "actionId": "db-after",
+            "pointer": "/data/rawRows/outbox",
+            "field": "state"
+          },
+          "operator": "exactSet"
+        },
+        {
+          "subcaseId": "external-no-lookup",
+          "assertionId": "remote-request-count",
+          "source": {
+            "actionId": "remote-after",
+            "pointer": "/data/requests"
+          },
+          "operator": "count"
+        },
+        {
+          "subcaseId": "external-no-lookup",
+          "assertionId": "unknown-kept",
+          "source": {
+            "actionId": "db-after",
+            "pointer": "/data/rawRows/outbox",
+            "field": "state"
+          },
+          "operator": "exactSet"
+        }
+      ],
+      "external-transition": [
+        {
+          "subcaseId": "external-unknown",
+          "assertionId": "same-external-operation-0",
+          "source": {
+            "actionId": "remote-after",
+            "pointer": "/data/requests/0/externalOperationId"
+          },
+          "operator": "sameAs"
+        },
+        {
+          "subcaseId": "external-success",
+          "assertionId": "same-external-operation-0",
+          "source": {
+            "actionId": "remote-after",
+            "pointer": "/data/requests/0/externalOperationId"
+          },
+          "operator": "sameAs"
+        },
+        {
+          "subcaseId": "external-success",
+          "assertionId": "success-existing-result",
+          "source": {
+            "actionId": "db-after",
+            "pointer": "/data/rawRows/outbox",
+            "field": [
+              "state",
+              "remoteResultId"
+            ]
+          },
+          "operator": "relationSet"
+        },
+        {
+          "subcaseId": "external-failure-retry",
+          "assertionId": "confirmed-failure-before-retry",
+          "source": {
+            "actionId": "db-reconciled",
+            "pointer": "/data/rawRows/outbox",
+            "field": "state"
+          },
+          "operator": "exactSet"
+        },
+        {
+          "subcaseId": "external-failure-retry",
+          "assertionId": "remote-request-count",
+          "source": {
+            "actionId": "remote-after",
+            "pointer": "/data/requests"
+          },
+          "operator": "count"
+        },
+        {
+          "subcaseId": "external-failure-retry",
+          "assertionId": "same-external-operation-0",
+          "source": {
+            "actionId": "remote-after",
+            "pointer": "/data/requests/0/externalOperationId"
+          },
+          "operator": "sameAs"
+        },
+        {
+          "subcaseId": "external-failure-retry",
+          "assertionId": "same-external-operation-1",
+          "source": {
+            "actionId": "remote-after",
+            "pointer": "/data/requests/1/externalOperationId"
+          },
+          "operator": "sameAs"
+        },
+        {
+          "subcaseId": "external-failure-retry",
+          "assertionId": "failure-retry-policy",
+          "source": {
+            "actionId": "db-reconciled",
+            "pointer": "/data/rawRows/outbox",
+            "field": "retryEligible"
+          },
+          "operator": "exactSet"
+        },
+        {
+          "subcaseId": "external-failure-retry",
+          "assertionId": "new-attempt-unknown-blocks-next-retry",
+          "source": {
+            "actionId": "db-after",
+            "pointer": "/data/rawRows/outbox",
+            "field": [
+              "retryEligible",
+              "state"
+            ]
+          },
+          "operator": "relationSet"
+        },
+        {
+          "subcaseId": "external-failure-no-retry",
+          "assertionId": "confirmed-failure-before-retry",
+          "source": {
+            "actionId": "db-reconciled",
+            "pointer": "/data/rawRows/outbox",
+            "field": "state"
+          },
+          "operator": "exactSet"
+        },
+        {
+          "subcaseId": "external-failure-no-retry",
+          "assertionId": "remote-request-count",
+          "source": {
+            "actionId": "remote-after",
+            "pointer": "/data/requests"
+          },
+          "operator": "count"
+        },
+        {
+          "subcaseId": "external-failure-no-retry",
+          "assertionId": "same-external-operation-0",
+          "source": {
+            "actionId": "remote-after",
+            "pointer": "/data/requests/0/externalOperationId"
+          },
+          "operator": "sameAs"
+        },
+        {
+          "subcaseId": "external-failure-no-retry",
+          "assertionId": "failure-retry-policy",
+          "source": {
+            "actionId": "db-reconciled",
+            "pointer": "/data/rawRows/outbox",
+            "field": "retryEligible"
+          },
+          "operator": "exactSet"
+        },
+        {
+          "subcaseId": "external-no-lookup",
+          "assertionId": "same-external-operation-0",
+          "source": {
+            "actionId": "remote-after",
+            "pointer": "/data/requests/0/externalOperationId"
+          },
+          "operator": "sameAs"
+        },
+        {
+          "subcaseId": "external-local-cancel",
+          "assertionId": "remote-request-count",
+          "source": {
+            "actionId": "remote-after",
+            "pointer": "/data/requests"
+          },
+          "operator": "count"
+        },
+        {
+          "subcaseId": "external-local-cancel",
+          "assertionId": "same-external-operation-0",
+          "source": {
+            "actionId": "remote-after",
+            "pointer": "/data/requests/0/externalOperationId"
+          },
+          "operator": "sameAs"
+        },
+        {
+          "subcaseId": "external-local-cancel",
+          "assertionId": "remote-cancel-not-sent",
+          "source": {
+            "actionId": "remote-after",
+            "pointer": "/data/requests",
+            "where": {
+              "kind": "CANCEL"
+            }
+          },
+          "operator": "count"
+        },
+        {
+          "subcaseId": "external-local-cancel",
+          "assertionId": "local-cancel-pending",
+          "source": {
+            "actionId": "db-after",
+            "pointer": "/data/rawRows/domain_records",
+            "field": "state"
+          },
+          "operator": "exactSet"
+        }
+      ],
+      "external-reconciliation-owner": [
+        {
+          "subcaseId": "external-unknown",
+          "assertionId": "EXTERNAL_RECONCILIATION-one-assignment",
+          "source": {
+            "actionId": "db-after",
+            "pointer": "/data/rawRows/assignments",
+            "where": {
+              "kind": "EXTERNAL_RECONCILIATION",
+              "status": "OPEN"
+            }
+          },
+          "operator": "count"
+        },
+        {
+          "subcaseId": "external-unknown",
+          "assertionId": "EXTERNAL_RECONCILIATION-responsibility",
+          "source": {
+            "actionId": "db-after",
+            "pointer": "/data/rawRows/assignments",
+            "field": [
+              "ownerId",
+              "nextAction",
+              "nextCheckAt"
+            ],
+            "where": {
+              "kind": "EXTERNAL_RECONCILIATION",
+              "status": "OPEN"
+            }
+          },
+          "operator": "relationSet"
+        },
+        {
+          "subcaseId": "external-unknown",
+          "assertionId": "EXTERNAL_RECONCILIATION-human-owner",
+          "source": {
+            "actionId": "db-after",
+            "pointer": "/data/rawRows/assignments",
+            "field": "ownerType",
+            "where": {
+              "kind": "EXTERNAL_RECONCILIATION",
+              "status": "OPEN"
+            }
+          },
+          "operator": "exactSet"
+        },
+        {
+          "subcaseId": "external-unknown",
+          "assertionId": "EXTERNAL_RECONCILIATION-api-responsibility",
+          "source": {
+            "actionId": "api-duty-EXTERNAL_RECONCILIATION",
+            "pointer": "/response/data/items",
+            "field": [
+              "ownerId",
+              "nextAction",
+              "nextCheckAt"
+            ],
+            "where": {
+              "kind": "EXTERNAL_RECONCILIATION",
+              "status": "OPEN"
+            }
+          },
+          "operator": "relationSet"
+        },
+        {
+          "subcaseId": "external-no-lookup",
+          "assertionId": "EXTERNAL_RECONCILIATION-one-assignment",
+          "source": {
+            "actionId": "db-after",
+            "pointer": "/data/rawRows/assignments",
+            "where": {
+              "kind": "EXTERNAL_RECONCILIATION",
+              "status": "OPEN"
+            }
+          },
+          "operator": "count"
+        },
+        {
+          "subcaseId": "external-no-lookup",
+          "assertionId": "EXTERNAL_RECONCILIATION-responsibility",
+          "source": {
+            "actionId": "db-after",
+            "pointer": "/data/rawRows/assignments",
+            "field": [
+              "ownerId",
+              "nextAction",
+              "nextCheckAt"
+            ],
+            "where": {
+              "kind": "EXTERNAL_RECONCILIATION",
+              "status": "OPEN"
+            }
+          },
+          "operator": "relationSet"
+        },
+        {
+          "subcaseId": "external-no-lookup",
+          "assertionId": "EXTERNAL_RECONCILIATION-human-owner",
+          "source": {
+            "actionId": "db-after",
+            "pointer": "/data/rawRows/assignments",
+            "field": "ownerType",
+            "where": {
+              "kind": "EXTERNAL_RECONCILIATION",
+              "status": "OPEN"
+            }
+          },
+          "operator": "exactSet"
+        },
+        {
+          "subcaseId": "external-no-lookup",
+          "assertionId": "EXTERNAL_RECONCILIATION-api-responsibility",
+          "source": {
+            "actionId": "api-duty-EXTERNAL_RECONCILIATION",
+            "pointer": "/response/data/items",
+            "field": [
+              "ownerId",
+              "nextAction",
+              "nextCheckAt"
+            ],
+            "where": {
+              "kind": "EXTERNAL_RECONCILIATION",
+              "status": "OPEN"
+            }
+          },
+          "operator": "relationSet"
+        },
+        {
+          "subcaseId": "external-local-cancel",
+          "assertionId": "EXTERNAL_RECONCILIATION-one-assignment",
+          "source": {
+            "actionId": "db-after",
+            "pointer": "/data/rawRows/assignments",
+            "where": {
+              "kind": "EXTERNAL_RECONCILIATION",
+              "status": "OPEN"
+            }
+          },
+          "operator": "count"
+        },
+        {
+          "subcaseId": "external-local-cancel",
+          "assertionId": "EXTERNAL_RECONCILIATION-responsibility",
+          "source": {
+            "actionId": "db-after",
+            "pointer": "/data/rawRows/assignments",
+            "field": [
+              "ownerId",
+              "nextAction",
+              "nextCheckAt"
+            ],
+            "where": {
+              "kind": "EXTERNAL_RECONCILIATION",
+              "status": "OPEN"
+            }
+          },
+          "operator": "relationSet"
+        },
+        {
+          "subcaseId": "external-local-cancel",
+          "assertionId": "EXTERNAL_RECONCILIATION-human-owner",
+          "source": {
+            "actionId": "db-after",
+            "pointer": "/data/rawRows/assignments",
+            "field": "ownerType",
+            "where": {
+              "kind": "EXTERNAL_RECONCILIATION",
+              "status": "OPEN"
+            }
+          },
+          "operator": "exactSet"
+        },
+        {
+          "subcaseId": "external-local-cancel",
+          "assertionId": "EXTERNAL_RECONCILIATION-api-responsibility",
+          "source": {
+            "actionId": "api-duty-EXTERNAL_RECONCILIATION",
+            "pointer": "/response/data/items",
+            "field": [
+              "ownerId",
+              "nextAction",
+              "nextCheckAt"
+            ],
+            "where": {
+              "kind": "EXTERNAL_RECONCILIATION",
+              "status": "OPEN"
+            }
+          },
+          "operator": "relationSet"
+        }
+      ],
+      "confirmed-success-reissue": [
+        {
+          "subcaseId": "external-success",
+          "assertionId": "remote-request-count",
+          "source": {
+            "actionId": "remote-after",
+            "pointer": "/data/requests"
+          },
+          "operator": "count"
+        }
+      ]
+    },
+    "T24.all-auth-surfaces": {
+      "cross-org-data-leak": [
+        {
+          "subcaseId": "deny-search",
+          "assertionId": "search-data-empty",
+          "source": {
+            "actionId": "attack",
+            "pointer": "/response/data/items"
+          },
+          "operator": "count"
+        },
+        {
+          "subcaseId": "deny-blob",
+          "assertionId": "no-secret-reference",
+          "source": {
+            "actionId": "attack",
+            "pointer": "/response/error/targetId"
+          },
+          "operator": "absent"
+        },
+        {
+          "subcaseId": "deny-batch",
+          "assertionId": "no-secret-reference",
+          "source": {
+            "actionId": "attack",
+            "pointer": "/response/error/targetId"
+          },
+          "operator": "absent"
+        },
+        {
+          "subcaseId": "deny-worker",
+          "assertionId": "no-secret-reference",
+          "source": {
+            "actionId": "attack",
+            "pointer": "/response/error/targetId"
+          },
+          "operator": "absent"
+        },
+        {
+          "subcaseId": "deny-admin",
+          "assertionId": "no-secret-reference",
+          "source": {
+            "actionId": "attack",
+            "pointer": "/response/error/targetId"
+          },
+          "operator": "absent"
+        }
+      ],
+      "forbidden-write-effects": [
+        {
+          "subcaseId": "deny-search",
+          "assertionId": "domain_records-unchanged",
+          "source": {
+            "actionId": "db-after",
+            "pointer": "/data/rawRows/domain_records"
+          },
+          "operator": "sameAs"
+        },
+        {
+          "subcaseId": "deny-search",
+          "assertionId": "movements-unchanged",
+          "source": {
+            "actionId": "db-after",
+            "pointer": "/data/rawRows/movements"
+          },
+          "operator": "sameAs"
+        },
+        {
+          "subcaseId": "deny-search",
+          "assertionId": "segments-unchanged",
+          "source": {
+            "actionId": "db-after",
+            "pointer": "/data/rawRows/segments"
+          },
+          "operator": "sameAs"
+        },
+        {
+          "subcaseId": "deny-search",
+          "assertionId": "allocations-unchanged",
+          "source": {
+            "actionId": "db-after",
+            "pointer": "/data/rawRows/allocations"
+          },
+          "operator": "sameAs"
+        },
+        {
+          "subcaseId": "deny-search",
+          "assertionId": "outbox-unchanged",
+          "source": {
+            "actionId": "db-after",
+            "pointer": "/data/rawRows/outbox"
+          },
+          "operator": "sameAs"
+        },
+        {
+          "subcaseId": "deny-search",
+          "assertionId": "command_records-unchanged",
+          "source": {
+            "actionId": "db-after",
+            "pointer": "/data/rawRows/command_records"
+          },
+          "operator": "sameAs"
+        },
+        {
+          "subcaseId": "deny-blob",
+          "assertionId": "domain_records-unchanged",
+          "source": {
+            "actionId": "db-after",
+            "pointer": "/data/rawRows/domain_records"
+          },
+          "operator": "sameAs"
+        },
+        {
+          "subcaseId": "deny-blob",
+          "assertionId": "movements-unchanged",
+          "source": {
+            "actionId": "db-after",
+            "pointer": "/data/rawRows/movements"
+          },
+          "operator": "sameAs"
+        },
+        {
+          "subcaseId": "deny-blob",
+          "assertionId": "segments-unchanged",
+          "source": {
+            "actionId": "db-after",
+            "pointer": "/data/rawRows/segments"
+          },
+          "operator": "sameAs"
+        },
+        {
+          "subcaseId": "deny-blob",
+          "assertionId": "allocations-unchanged",
+          "source": {
+            "actionId": "db-after",
+            "pointer": "/data/rawRows/allocations"
+          },
+          "operator": "sameAs"
+        },
+        {
+          "subcaseId": "deny-blob",
+          "assertionId": "outbox-unchanged",
+          "source": {
+            "actionId": "db-after",
+            "pointer": "/data/rawRows/outbox"
+          },
+          "operator": "sameAs"
+        },
+        {
+          "subcaseId": "deny-blob",
+          "assertionId": "command_records-unchanged",
+          "source": {
+            "actionId": "db-after",
+            "pointer": "/data/rawRows/command_records"
+          },
+          "operator": "sameAs"
+        },
+        {
+          "subcaseId": "deny-batch",
+          "assertionId": "domain_records-unchanged",
+          "source": {
+            "actionId": "db-after",
+            "pointer": "/data/rawRows/domain_records"
+          },
+          "operator": "sameAs"
+        },
+        {
+          "subcaseId": "deny-batch",
+          "assertionId": "movements-unchanged",
+          "source": {
+            "actionId": "db-after",
+            "pointer": "/data/rawRows/movements"
+          },
+          "operator": "sameAs"
+        },
+        {
+          "subcaseId": "deny-batch",
+          "assertionId": "segments-unchanged",
+          "source": {
+            "actionId": "db-after",
+            "pointer": "/data/rawRows/segments"
+          },
+          "operator": "sameAs"
+        },
+        {
+          "subcaseId": "deny-batch",
+          "assertionId": "allocations-unchanged",
+          "source": {
+            "actionId": "db-after",
+            "pointer": "/data/rawRows/allocations"
+          },
+          "operator": "sameAs"
+        },
+        {
+          "subcaseId": "deny-batch",
+          "assertionId": "outbox-unchanged",
+          "source": {
+            "actionId": "db-after",
+            "pointer": "/data/rawRows/outbox"
+          },
+          "operator": "sameAs"
+        },
+        {
+          "subcaseId": "deny-batch",
+          "assertionId": "command_records-unchanged",
+          "source": {
+            "actionId": "db-after",
+            "pointer": "/data/rawRows/command_records"
+          },
+          "operator": "sameAs"
+        },
+        {
+          "subcaseId": "deny-worker",
+          "assertionId": "domain_records-unchanged",
+          "source": {
+            "actionId": "db-after",
+            "pointer": "/data/rawRows/domain_records"
+          },
+          "operator": "sameAs"
+        },
+        {
+          "subcaseId": "deny-worker",
+          "assertionId": "movements-unchanged",
+          "source": {
+            "actionId": "db-after",
+            "pointer": "/data/rawRows/movements"
+          },
+          "operator": "sameAs"
+        },
+        {
+          "subcaseId": "deny-worker",
+          "assertionId": "segments-unchanged",
+          "source": {
+            "actionId": "db-after",
+            "pointer": "/data/rawRows/segments"
+          },
+          "operator": "sameAs"
+        },
+        {
+          "subcaseId": "deny-worker",
+          "assertionId": "allocations-unchanged",
+          "source": {
+            "actionId": "db-after",
+            "pointer": "/data/rawRows/allocations"
+          },
+          "operator": "sameAs"
+        },
+        {
+          "subcaseId": "deny-worker",
+          "assertionId": "outbox-unchanged",
+          "source": {
+            "actionId": "db-after",
+            "pointer": "/data/rawRows/outbox"
+          },
+          "operator": "sameAs"
+        },
+        {
+          "subcaseId": "deny-worker",
+          "assertionId": "command_records-unchanged",
+          "source": {
+            "actionId": "db-after",
+            "pointer": "/data/rawRows/command_records"
+          },
+          "operator": "sameAs"
+        },
+        {
+          "subcaseId": "deny-admin",
+          "assertionId": "domain_records-unchanged",
+          "source": {
+            "actionId": "db-after",
+            "pointer": "/data/rawRows/domain_records"
+          },
+          "operator": "sameAs"
+        },
+        {
+          "subcaseId": "deny-admin",
+          "assertionId": "movements-unchanged",
+          "source": {
+            "actionId": "db-after",
+            "pointer": "/data/rawRows/movements"
+          },
+          "operator": "sameAs"
+        },
+        {
+          "subcaseId": "deny-admin",
+          "assertionId": "segments-unchanged",
+          "source": {
+            "actionId": "db-after",
+            "pointer": "/data/rawRows/segments"
+          },
+          "operator": "sameAs"
+        },
+        {
+          "subcaseId": "deny-admin",
+          "assertionId": "allocations-unchanged",
+          "source": {
+            "actionId": "db-after",
+            "pointer": "/data/rawRows/allocations"
+          },
+          "operator": "sameAs"
+        },
+        {
+          "subcaseId": "deny-admin",
+          "assertionId": "outbox-unchanged",
+          "source": {
+            "actionId": "db-after",
+            "pointer": "/data/rawRows/outbox"
+          },
+          "operator": "sameAs"
+        },
+        {
+          "subcaseId": "deny-admin",
+          "assertionId": "command_records-unchanged",
+          "source": {
+            "actionId": "db-after",
+            "pointer": "/data/rawRows/command_records"
+          },
+          "operator": "sameAs"
+        }
+      ],
+      "surface-auth": [
+        {
+          "subcaseId": "deny-search",
+          "assertionId": "denial-audit",
+          "source": {
+            "actionId": "db-after",
+            "pointer": "/data/rawRows/audit",
+            "where": {
+              "kind": "DENIAL",
+              "action": "searchObjects"
+            }
+          },
+          "operator": "count"
+        },
+        {
+          "subcaseId": "deny-blob",
+          "assertionId": "forbidden-code",
+          "source": {
+            "actionId": "attack",
+            "pointer": "/response/error/code"
+          },
+          "operator": "equals"
+        },
+        {
+          "subcaseId": "deny-blob",
+          "assertionId": "denial-audit",
+          "source": {
+            "actionId": "db-after",
+            "pointer": "/data/rawRows/audit",
+            "where": {
+              "kind": "DENIAL",
+              "action": "getEvidence"
+            }
+          },
+          "operator": "count"
+        },
+        {
+          "subcaseId": "deny-blob",
+          "assertionId": "no-download-ref",
+          "source": {
+            "actionId": "attack",
+            "pointer": "/response/downloadReference"
+          },
+          "operator": "absent"
+        },
+        {
+          "subcaseId": "deny-batch",
+          "assertionId": "forbidden-code",
+          "source": {
+            "actionId": "attack",
+            "pointer": "/response/error/code"
+          },
+          "operator": "equals"
+        },
+        {
+          "subcaseId": "deny-batch",
+          "assertionId": "denial-audit",
+          "source": {
+            "actionId": "db-after",
+            "pointer": "/data/rawRows/audit",
+            "where": {
+              "kind": "DENIAL",
+              "action": "dispatchQuantity"
+            }
+          },
+          "operator": "count"
+        },
+        {
+          "subcaseId": "deny-batch",
+          "assertionId": "restrictions-unchanged",
+          "source": {
+            "actionId": "db-after",
+            "pointer": "/data/rawRows/restrictions"
+          },
+          "operator": "sameAs"
+        },
+        {
+          "subcaseId": "deny-batch",
+          "assertionId": "permitted-first-applied",
+          "source": {
+            "actionId": "permitted-first",
+            "pointer": "/response/outcome"
+          },
+          "operator": "equals"
+        },
+        {
+          "subcaseId": "deny-batch",
+          "assertionId": "first-hold-survives-batch",
+          "source": {
+            "actionId": "db-after",
+            "pointer": "/data/rawRows/restrictions"
+          },
+          "operator": "count"
+        },
+        {
+          "subcaseId": "deny-worker",
+          "assertionId": "forbidden-code",
+          "source": {
+            "actionId": "attack",
+            "pointer": "/response/error/code"
+          },
+          "operator": "equals"
+        },
+        {
+          "subcaseId": "deny-worker",
+          "assertionId": "denial-audit",
+          "source": {
+            "actionId": "db-after",
+            "pointer": "/data/rawRows/audit",
+            "where": {
+              "kind": "DENIAL",
+              "action": "dispatchQuantity"
+            }
+          },
+          "operator": "count"
+        },
+        {
+          "subcaseId": "deny-worker",
+          "assertionId": "worker-delegated-actor",
+          "source": {
+            "actionId": "db-after",
+            "pointer": "/data/rawRows/audit",
+            "field": "actorId",
+            "where": {
+              "kind": "DENIAL"
+            }
+          },
+          "operator": "exactSet"
+        },
+        {
+          "subcaseId": "deny-admin",
+          "assertionId": "forbidden-code",
+          "source": {
+            "actionId": "attack",
+            "pointer": "/response/error/code"
+          },
+          "operator": "equals"
+        },
+        {
+          "subcaseId": "deny-admin",
+          "assertionId": "denial-audit",
+          "source": {
+            "actionId": "db-after",
+            "pointer": "/data/rawRows/audit",
+            "where": {
+              "kind": "DENIAL",
+              "action": "assignCapability"
+            }
+          },
+          "operator": "count"
+        },
+        {
+          "subcaseId": "authorized-blob",
+          "assertionId": "own-download-digest",
+          "source": {
+            "actionId": "inspect",
+            "pointer": "/data/hostObservation/observedArtifacts/0/sha256"
+          },
+          "operator": "equals"
+        },
+        {
+          "subcaseId": "authorized-blob",
+          "assertionId": "short-reference-expiry",
+          "source": {
+            "actionId": "download",
+            "pointer": "/response/downloadReference/expiresAt"
+          },
+          "operator": "timeEquals"
+        },
+        {
+          "subcaseId": "authorized-blob",
+          "assertionId": "short-reference-object",
+          "source": {
+            "actionId": "download",
+            "pointer": "/response/downloadReference/evidenceId"
+          },
+          "operator": "equals"
+        }
+      ]
+    },
+    "T24.audit-failure-rollback": {
+      "committed-domain-effects": [
+        {
+          "subcaseId": "audit-rollback-and-retry",
+          "assertionId": "domain_records-unchanged",
+          "source": {
+            "actionId": "db-after",
+            "pointer": "/data/rawRows/domain_records"
+          },
+          "operator": "sameAs"
+        },
+        {
+          "subcaseId": "audit-rollback-and-retry",
+          "assertionId": "audit-error",
+          "source": {
+            "actionId": "fail",
+            "pointer": "/response/error/code"
+          },
+          "operator": "equals"
+        }
+      ],
+      "committed-ledger-effects": [
+        {
+          "subcaseId": "audit-rollback-and-retry",
+          "assertionId": "movements-unchanged",
+          "source": {
+            "actionId": "db-after",
+            "pointer": "/data/rawRows/movements"
+          },
+          "operator": "sameAs"
+        }
+      ],
+      "committed-allocation-effects": [
+        {
+          "subcaseId": "audit-rollback-and-retry",
+          "assertionId": "allocations-unchanged",
+          "source": {
+            "actionId": "db-after",
+            "pointer": "/data/rawRows/allocations"
+          },
+          "operator": "sameAs"
+        }
+      ],
+      "committed-duty-effects": [
+        {
+          "subcaseId": "audit-rollback-and-retry",
+          "assertionId": "obligations-unchanged",
+          "source": {
+            "actionId": "db-after",
+            "pointer": "/data/rawRows/obligations"
+          },
+          "operator": "sameAs"
+        },
+        {
+          "subcaseId": "audit-rollback-and-retry",
+          "assertionId": "assignments-unchanged",
+          "source": {
+            "actionId": "db-after",
+            "pointer": "/data/rawRows/assignments"
+          },
+          "operator": "sameAs"
+        }
+      ],
+      "committed-outbox-effects": [
+        {
+          "subcaseId": "audit-rollback-and-retry",
+          "assertionId": "outbox-unchanged",
+          "source": {
+            "actionId": "db-after",
+            "pointer": "/data/rawRows/outbox"
+          },
+          "operator": "sameAs"
+        }
+      ],
+      "committed-idempotency-result": [
+        {
+          "subcaseId": "audit-rollback-and-retry",
+          "assertionId": "command_records-unchanged",
+          "source": {
+            "actionId": "db-after",
+            "pointer": "/data/rawRows/command_records"
+          },
+          "operator": "sameAs"
+        }
+      ],
+      "audit-fields": [
+        {
+          "subcaseId": "audit-rollback-and-retry",
+          "assertionId": "retry-applied",
+          "source": {
+            "actionId": "retry",
+            "pointer": "/response/outcome"
+          },
+          "operator": "equals"
+        },
+        {
+          "subcaseId": "audit-rollback-and-retry",
+          "assertionId": "audit-complete",
+          "source": {
+            "actionId": "retry-db",
+            "pointer": "/data/rawRows/audit",
+            "field": [
+              "actorId",
+              "delegatorId",
+              "workId",
+              "targetId",
+              "action",
+              "definitionVersion",
+              "policyVersion",
+              "result",
+              "commandIdempotencyKey"
+            ],
+            "where": {
+              "kind": "MUTATION"
+            }
+          },
+          "operator": "relationSet"
+        },
+        {
+          "subcaseId": "audit-rollback-and-retry",
+          "assertionId": "audit-before-after",
+          "source": {
+            "actionId": "retry-db",
+            "pointer": "/data/rawRows/audit",
+            "field": "before",
+            "where": {
+              "kind": "MUTATION"
+            }
+          },
+          "operator": "equals"
+        },
+        {
+          "subcaseId": "audit-rollback-and-retry",
+          "assertionId": "audit-after",
+          "source": {
+            "actionId": "retry-db",
+            "pointer": "/data/rawRows/audit",
+            "field": "after",
+            "where": {
+              "kind": "MUTATION"
+            }
+          },
+          "operator": "equals"
+        },
+        {
+          "subcaseId": "audit-rollback-and-retry",
+          "assertionId": "audit-effect-reference",
+          "source": {
+            "actionId": "retry-db",
+            "pointer": "/data/rawRows/audit",
+            "field": "movementId",
+            "where": {
+              "kind": "MUTATION"
+            }
+          },
+          "operator": "equals"
+        },
+        {
+          "subcaseId": "audit-rollback-and-retry",
+          "assertionId": "audit-request-ref",
+          "source": {
+            "actionId": "retry-db",
+            "pointer": "/data/rawRows/audit",
+            "field": "requestId",
+            "where": {
+              "kind": "MUTATION"
+            }
+          },
+          "operator": "equals"
+        },
+        {
+          "subcaseId": "audit-rollback-and-retry",
+          "assertionId": "audit-no-extra-approval",
+          "source": {
+            "actionId": "db-after",
+            "pointer": "/data/rawRows/audit",
+            "field": "approvalRefs",
+            "where": {
+              "kind": "MUTATION"
+            }
+          },
+          "operator": "equals"
+        },
+        {
+          "subcaseId": "audit-rollback-and-retry",
+          "assertionId": "audit-evidence",
+          "source": {
+            "actionId": "db-after",
+            "pointer": "/data/rawRows/audit",
+            "field": "evidenceIds",
+            "where": {
+              "kind": "MUTATION"
+            }
+          },
+          "operator": "equals"
+        },
+        {
+          "subcaseId": "audit-rollback-and-retry",
+          "assertionId": "retry-one-movement",
+          "source": {
+            "actionId": "db-after",
+            "pointer": "/data/rawRows/movements",
+            "where": {
+              "commandIdempotencyKey": "T24-audit-effect",
+              "evidenceRefs": [
+                {
+                  "$alias": "dispatch-basis"
+                }
+              ]
+            }
+          },
+          "operator": "count"
+        }
+      ]
+    },
+    "T24.retention-legalhold-blob-restore": {
+      "retention-policy": [
+        {
+          "subcaseId": "legal-hold",
+          "assertionId": "sweep-authenticated-reviewer",
+          "source": {
+            "actionId": "sweep",
+            "pointer": "/provenance/authenticatedActor/subject"
+          },
+          "operator": "equals"
+        },
+        {
+          "subcaseId": "legal-hold",
+          "assertionId": "different-artifact-policies",
+          "source": {
+            "actionId": "db-after",
+            "pointer": "/data/rawRows/policies",
+            "field": [
+              "artifactType",
+              "retentionDays",
+              "basis",
+              "effectiveDate",
+              "deletionMethod",
+              "reviewerId"
+            ]
+          },
+          "operator": "relationSet"
+        },
+        {
+          "subcaseId": "active-reference",
+          "assertionId": "sweep-authenticated-reviewer",
+          "source": {
+            "actionId": "sweep",
+            "pointer": "/provenance/authenticatedActor/subject"
+          },
+          "operator": "equals"
+        },
+        {
+          "subcaseId": "active-reference",
+          "assertionId": "different-artifact-policies",
+          "source": {
+            "actionId": "db-after",
+            "pointer": "/data/rawRows/policies",
+            "field": [
+              "artifactType",
+              "retentionDays",
+              "basis",
+              "effectiveDate",
+              "deletionMethod",
+              "reviewerId"
+            ]
+          },
+          "operator": "relationSet"
+        },
+        {
+          "subcaseId": "R6-unconfirmed",
+          "assertionId": "sweep-authenticated-reviewer",
+          "source": {
+            "actionId": "sweep",
+            "pointer": "/provenance/authenticatedActor/subject"
+          },
+          "operator": "equals"
+        },
+        {
+          "subcaseId": "R6-unconfirmed",
+          "assertionId": "different-artifact-policies",
+          "source": {
+            "actionId": "db-after",
+            "pointer": "/data/rawRows/policies",
+            "field": [
+              "artifactType",
+              "retentionDays",
+              "basis",
+              "effectiveDate",
+              "deletionMethod",
+              "reviewerId"
+            ]
+          },
+          "operator": "relationSet"
+        },
+        {
+          "subcaseId": "R6-unconfirmed",
+          "assertionId": "documents-unchanged",
+          "source": {
+            "actionId": "db-after",
+            "pointer": "/data/rawRows/documents"
+          },
+          "operator": "sameAs"
+        },
+        {
+          "subcaseId": "R6-unconfirmed",
+          "assertionId": "tombstones-unchanged",
+          "source": {
+            "actionId": "db-after",
+            "pointer": "/data/rawRows/tombstones"
+          },
+          "operator": "sameAs"
+        },
+        {
+          "subcaseId": "R6-unconfirmed",
+          "assertionId": "deletion_log-unchanged",
+          "source": {
+            "actionId": "db-after",
+            "pointer": "/data/rawRows/deletion_log"
+          },
+          "operator": "sameAs"
+        },
+        {
+          "subcaseId": "R6-unconfirmed",
+          "assertionId": "obligations-unchanged",
+          "source": {
+            "actionId": "db-after",
+            "pointer": "/data/rawRows/obligations"
+          },
+          "operator": "sameAs"
+        },
+        {
+          "subcaseId": "R6-unconfirmed",
+          "assertionId": "assignments-unchanged",
+          "source": {
+            "actionId": "db-after",
+            "pointer": "/data/rawRows/assignments"
+          },
+          "operator": "sameAs"
+        },
+        {
+          "subcaseId": "R6-unconfirmed",
+          "assertionId": "blob-preserved",
+          "source": {
+            "actionId": "inspect-sweep",
+            "pointer": "/data/hostObservation/extractor/rawRows/blobs",
+            "field": [
+              "documentId",
+              "sha256",
+              "state"
+            ]
+          },
+          "operator": "relationSet"
+        },
+        {
+          "subcaseId": "authorized-delete",
+          "assertionId": "sweep-authenticated-reviewer",
+          "source": {
+            "actionId": "sweep",
+            "pointer": "/provenance/authenticatedActor/subject"
+          },
+          "operator": "equals"
+        },
+        {
+          "subcaseId": "authorized-delete",
+          "assertionId": "different-artifact-policies",
+          "source": {
+            "actionId": "db-after",
+            "pointer": "/data/rawRows/policies",
+            "field": [
+              "artifactType",
+              "retentionDays",
+              "basis",
+              "effectiveDate",
+              "deletionMethod",
+              "reviewerId"
+            ]
+          },
+          "operator": "relationSet"
+        },
+        {
+          "subcaseId": "authorized-delete",
+          "assertionId": "tombstone-one",
+          "source": {
+            "actionId": "db-after",
+            "pointer": "/data/rawRows/tombstones"
+          },
+          "operator": "count"
+        },
+        {
+          "subcaseId": "authorized-delete",
+          "assertionId": "delete-reconciliation",
+          "source": {
+            "actionId": "db-after",
+            "pointer": "/data/rawRows/deletion_log",
+            "field": [
+              "documentId",
+              "originalHash",
+              "blobState",
+              "policyVersion",
+              "reviewerId"
+            ]
+          },
+          "operator": "relationSet"
+        },
+        {
+          "subcaseId": "authorized-delete",
+          "assertionId": "actual-blob-deleted",
+          "source": {
+            "actionId": "inspect-sweep",
+            "pointer": "/data/hostObservation/extractor/rawRows/blobs",
+            "field": [
+              "documentId",
+              "state"
+            ]
+          },
+          "operator": "relationSet"
+        },
+        {
+          "subcaseId": "restore-deleted",
+          "assertionId": "sweep-authenticated-reviewer",
+          "source": {
+            "actionId": "sweep",
+            "pointer": "/provenance/authenticatedActor/subject"
+          },
+          "operator": "equals"
+        },
+        {
+          "subcaseId": "restore-deleted",
+          "assertionId": "different-artifact-policies",
+          "source": {
+            "actionId": "db-after",
+            "pointer": "/data/rawRows/policies",
+            "field": [
+              "artifactType",
+              "retentionDays",
+              "basis",
+              "effectiveDate",
+              "deletionMethod",
+              "reviewerId"
+            ]
+          },
+          "operator": "relationSet"
+        },
+        {
+          "subcaseId": "restore-deleted",
+          "assertionId": "tombstone-one",
+          "source": {
+            "actionId": "db-after",
+            "pointer": "/data/rawRows/tombstones"
+          },
+          "operator": "count"
+        },
+        {
+          "subcaseId": "restore-deleted",
+          "assertionId": "delete-reconciliation",
+          "source": {
+            "actionId": "db-after",
+            "pointer": "/data/rawRows/deletion_log",
+            "field": [
+              "documentId",
+              "originalHash",
+              "blobState",
+              "policyVersion",
+              "reviewerId"
+            ]
+          },
+          "operator": "relationSet"
+        },
+        {
+          "subcaseId": "restore-deleted",
+          "assertionId": "actual-blob-deleted",
+          "source": {
+            "actionId": "inspect-sweep",
+            "pointer": "/data/hostObservation/extractor/rawRows/blobs",
+            "field": [
+              "documentId",
+              "state"
+            ]
+          },
+          "operator": "relationSet"
+        },
+        {
+          "subcaseId": "restore-deleted",
+          "assertionId": "restored-blob-not-resurrected",
+          "source": {
+            "actionId": "inspect-restore",
+            "pointer": "/data/hostObservation/extractor/rawRows/blobs",
+            "field": [
+              "documentId",
+              "state"
+            ]
+          },
+          "operator": "relationSet"
+        },
+        {
+          "subcaseId": "restore-deleted",
+          "assertionId": "backup-components",
+          "source": {
+            "actionId": "inspect-restore",
+            "pointer": "/data/hostObservation/extractor/rawRows/restoredComponents",
+            "field": "kind"
+          },
+          "operator": "exactSet"
+        },
+        {
+          "subcaseId": "restore-deleted",
+          "assertionId": "restored-tombstone",
+          "source": {
+            "actionId": "inspect-restore",
+            "pointer": "/data/hostObservation/extractor/rawRows/tombstones",
+            "field": "documentId"
+          },
+          "operator": "exactSet"
+        },
+        {
+          "subcaseId": "restore-deleted",
+          "assertionId": "restore-deletion-policy",
+          "source": {
+            "actionId": "inspect-restore",
+            "pointer": "/data/hostObservation/extractor/rawRows/deletion_log",
+            "field": [
+              "policyVersion",
+              "blobState"
+            ]
+          },
+          "operator": "relationSet"
+        }
+      ],
+      "legal-hold-delete": [
+        {
+          "subcaseId": "legal-hold",
+          "assertionId": "documents-unchanged",
+          "source": {
+            "actionId": "db-after",
+            "pointer": "/data/rawRows/documents"
+          },
+          "operator": "sameAs"
+        },
+        {
+          "subcaseId": "legal-hold",
+          "assertionId": "tombstones-unchanged",
+          "source": {
+            "actionId": "db-after",
+            "pointer": "/data/rawRows/tombstones"
+          },
+          "operator": "sameAs"
+        },
+        {
+          "subcaseId": "legal-hold",
+          "assertionId": "deletion_log-unchanged",
+          "source": {
+            "actionId": "db-after",
+            "pointer": "/data/rawRows/deletion_log"
+          },
+          "operator": "sameAs"
+        },
+        {
+          "subcaseId": "legal-hold",
+          "assertionId": "obligations-unchanged",
+          "source": {
+            "actionId": "db-after",
+            "pointer": "/data/rawRows/obligations"
+          },
+          "operator": "sameAs"
+        },
+        {
+          "subcaseId": "legal-hold",
+          "assertionId": "assignments-unchanged",
+          "source": {
+            "actionId": "db-after",
+            "pointer": "/data/rawRows/assignments"
+          },
+          "operator": "sameAs"
+        },
+        {
+          "subcaseId": "legal-hold",
+          "assertionId": "blob-preserved",
+          "source": {
+            "actionId": "inspect-sweep",
+            "pointer": "/data/hostObservation/extractor/rawRows/blobs",
+            "field": [
+              "documentId",
+              "sha256",
+              "state"
+            ]
+          },
+          "operator": "relationSet"
+        }
+      ],
+      "unresolved-reference-delete": [
+        {
+          "subcaseId": "active-reference",
+          "assertionId": "documents-unchanged",
+          "source": {
+            "actionId": "db-after",
+            "pointer": "/data/rawRows/documents"
+          },
+          "operator": "sameAs"
+        },
+        {
+          "subcaseId": "active-reference",
+          "assertionId": "tombstones-unchanged",
+          "source": {
+            "actionId": "db-after",
+            "pointer": "/data/rawRows/tombstones"
+          },
+          "operator": "sameAs"
+        },
+        {
+          "subcaseId": "active-reference",
+          "assertionId": "deletion_log-unchanged",
+          "source": {
+            "actionId": "db-after",
+            "pointer": "/data/rawRows/deletion_log"
+          },
+          "operator": "sameAs"
+        },
+        {
+          "subcaseId": "active-reference",
+          "assertionId": "obligations-unchanged",
+          "source": {
+            "actionId": "db-after",
+            "pointer": "/data/rawRows/obligations"
+          },
+          "operator": "sameAs"
+        },
+        {
+          "subcaseId": "active-reference",
+          "assertionId": "assignments-unchanged",
+          "source": {
+            "actionId": "db-after",
+            "pointer": "/data/rawRows/assignments"
+          },
+          "operator": "sameAs"
+        },
+        {
+          "subcaseId": "active-reference",
+          "assertionId": "blob-preserved",
+          "source": {
+            "actionId": "inspect-sweep",
+            "pointer": "/data/hostObservation/extractor/rawRows/blobs",
+            "field": [
+              "documentId",
+              "sha256",
+              "state"
+            ]
+          },
+          "operator": "relationSet"
+        }
+      ]
+    },
+    "T24.secret-redaction": {
+      "secret-sentinel-leak": [
+        {
+          "subcaseId": "sentinel-artifact-scan",
+          "assertionId": "scan-six-surfaces",
+          "source": {
+            "actionId": "inventory",
+            "pointer": "/data/hostObservation/extractor/rawRows/artifactInventory",
+            "field": "artifactType"
+          },
+          "operator": "exactSet"
+        },
+        {
+          "subcaseId": "sentinel-artifact-scan",
+          "assertionId": "all-files-scanned",
+          "source": {
+            "actionId": "scan",
+            "pointer": "/data/hostObservation/reads"
+          },
+          "operator": "count"
+        },
+        {
+          "subcaseId": "sentinel-artifact-scan",
+          "assertionId": "surface-0-no-sentinel",
+          "source": {
+            "actionId": "scan",
+            "pointer": "/data/hostObservation/reads/0/findings"
+          },
+          "operator": "count"
+        },
+        {
+          "subcaseId": "sentinel-artifact-scan",
+          "assertionId": "surface-1-no-sentinel",
+          "source": {
+            "actionId": "scan",
+            "pointer": "/data/hostObservation/reads/1/findings"
+          },
+          "operator": "count"
+        },
+        {
+          "subcaseId": "sentinel-artifact-scan",
+          "assertionId": "surface-2-no-sentinel",
+          "source": {
+            "actionId": "scan",
+            "pointer": "/data/hostObservation/reads/2/findings"
+          },
+          "operator": "count"
+        },
+        {
+          "subcaseId": "sentinel-artifact-scan",
+          "assertionId": "surface-3-no-sentinel",
+          "source": {
+            "actionId": "scan",
+            "pointer": "/data/hostObservation/reads/3/findings"
+          },
+          "operator": "count"
+        },
+        {
+          "subcaseId": "sentinel-artifact-scan",
+          "assertionId": "surface-4-no-sentinel",
+          "source": {
+            "actionId": "scan",
+            "pointer": "/data/hostObservation/reads/4/findings"
+          },
+          "operator": "count"
+        },
+        {
+          "subcaseId": "sentinel-artifact-scan",
+          "assertionId": "surface-5-no-sentinel",
+          "source": {
+            "actionId": "scan",
+            "pointer": "/data/hostObservation/reads/5/findings"
+          },
+          "operator": "count"
+        }
+      ],
+      "redaction-purpose": [
+        {
+          "subcaseId": "sentinel-artifact-scan",
+          "assertionId": "movements-unchanged",
+          "source": {
+            "actionId": "db-after",
+            "pointer": "/data/rawRows/movements"
+          },
+          "operator": "sameAs"
+        },
+        {
+          "subcaseId": "sentinel-artifact-scan",
+          "assertionId": "allocations-unchanged",
+          "source": {
+            "actionId": "db-after",
+            "pointer": "/data/rawRows/allocations"
+          },
+          "operator": "sameAs"
+        },
+        {
+          "subcaseId": "sentinel-artifact-scan",
+          "assertionId": "segments-unchanged",
+          "source": {
+            "actionId": "db-after",
+            "pointer": "/data/rawRows/segments"
+          },
+          "operator": "sameAs"
+        },
+        {
+          "subcaseId": "sentinel-artifact-scan",
+          "assertionId": "domain_records-unchanged",
+          "source": {
+            "actionId": "db-after",
+            "pointer": "/data/rawRows/domain_records"
+          },
+          "operator": "sameAs"
+        },
+        {
+          "subcaseId": "sentinel-artifact-scan",
+          "assertionId": "outbox-unchanged",
+          "source": {
+            "actionId": "db-after",
+            "pointer": "/data/rawRows/outbox"
+          },
+          "operator": "sameAs"
+        },
+        {
+          "subcaseId": "sentinel-artifact-scan",
+          "assertionId": "query-audit-exists",
+          "source": {
+            "actionId": "db-after",
+            "pointer": "/data/rawRows/audit",
+            "where": {
+              "kind": "QUERY",
+              "actorId": {
+                "$alias": "readAgent"
+              }
+            }
+          },
+          "operator": "count"
+        },
+        {
+          "subcaseId": "sentinel-artifact-scan",
+          "assertionId": "necessary-refs-preserved",
+          "source": {
+            "actionId": "db-after",
+            "pointer": "/data/rawRows/audit",
+            "field": [
+              "actorId",
+              "targetId",
+              "action",
+              "result"
+            ],
+            "where": {
+              "kind": "QUERY"
+            }
+          },
+          "operator": "relationSet"
+        },
+        {
+          "subcaseId": "sentinel-artifact-scan",
+          "assertionId": "separate-secret-restore",
+          "source": {
+            "actionId": "inventory",
+            "pointer": "/data/hostObservation/extractor/rawRows/backupConfiguration/secretRestoreProcedure"
+          },
+          "operator": "equals"
+        },
+        {
+          "subcaseId": "sentinel-artifact-scan",
+          "assertionId": "no-secret-config-content",
+          "source": {
+            "actionId": "inventory",
+            "pointer": "/data/hostObservation/extractor/rawRows/backupConfiguration/credentials"
+          },
+          "operator": "absent"
+        }
+      ]
+    }
+  },
+  "evidenceEncoding": "Command output is encoded as a JSON string without changing raw bytes; original whitespace and exact raw-output SHA-256 are preserved."
+}

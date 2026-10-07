@@ -1,0 +1,111 @@
+{
+  "schemaVersion" : "1.0.0",
+  "caseId" : "T06",
+  "subcaseId" : "not-unknown",
+  "status" : "FAIL",
+  "runtimeComplete" : false,
+  "startedAt" : "2026-10-07T14:36:04.514985Z",
+  "finishedAt" : "2026-10-07T14:36:04.522602Z",
+  "command" : "./verify contract-red verification/cases/T06/case.json verification/cases/T22/case.json verification/cases/T24/case.json",
+  "caseHash" : "550b9515352fb4391fd902f793f8a8997e62ce7a87097aec0384ddfdf664a4c3",
+  "fixtureRef" : "verification/cases/T06/fixtures/not-unknown.json",
+  "fixtureHash" : "47cac1493804ddba17d31ecca89fe647a9b01c0568e09e46aa81d52569320760",
+  "versions" : {
+    "definition" : "definition-v1",
+    "evaluator" : "evaluator-v1",
+    "policy" : "SYNTHETIC-policy-v1"
+  },
+  "requiredAdapters" : [ "fixture", "api", "db" ],
+  "actions" : {
+    "assessment" : {
+      "actionId" : "assessment",
+      "driverStatus" : "NOT_IMPLEMENTED",
+      "data" : null,
+      "response" : null,
+      "reason" : "NOT_IMPLEMENTED: no real product adapters installed",
+      "provenance" : {
+        "adapter" : "unimplemented",
+        "adapterVersion" : "1.0.0",
+        "buildVersion" : "NONE",
+        "authenticatedActor" : null,
+        "source" : "NONE",
+        "independent" : false,
+        "scopeComplete" : false,
+        "sourceQuery" : null,
+        "snapshot" : null
+      },
+      "artifactRefs" : [ ]
+    },
+    "db-after" : {
+      "actionId" : "db-after",
+      "driverStatus" : "NOT_IMPLEMENTED",
+      "data" : null,
+      "response" : null,
+      "reason" : "NOT_IMPLEMENTED: no real product adapters installed",
+      "provenance" : {
+        "adapter" : "unimplemented",
+        "adapterVersion" : "1.0.0",
+        "buildVersion" : "NONE",
+        "authenticatedActor" : null,
+        "source" : "NONE",
+        "independent" : false,
+        "scopeComplete" : false,
+        "sourceQuery" : null,
+        "snapshot" : null
+      },
+      "artifactRefs" : [ ]
+    },
+    "setup" : {
+      "actionId" : "setup",
+      "driverStatus" : "NOT_IMPLEMENTED",
+      "data" : null,
+      "response" : null,
+      "reason" : "NOT_IMPLEMENTED: no real product adapters installed",
+      "provenance" : {
+        "adapter" : "unimplemented",
+        "adapterVersion" : "1.0.0",
+        "buildVersion" : "NONE",
+        "authenticatedActor" : null,
+        "source" : "NONE",
+        "independent" : false,
+        "scopeComplete" : false,
+        "sourceQuery" : null,
+        "snapshot" : null
+      },
+      "artifactRefs" : [ ]
+    },
+    "create-goal" : {
+      "actionId" : "create-goal",
+      "driverStatus" : "NOT_IMPLEMENTED",
+      "data" : null,
+      "response" : null,
+      "reason" : "NOT_IMPLEMENTED: no real product adapters installed",
+      "provenance" : {
+        "adapter" : "unimplemented",
+        "adapterVersion" : "1.0.0",
+        "buildVersion" : "NONE",
+        "authenticatedActor" : null,
+        "source" : "NONE",
+        "independent" : false,
+        "scopeComplete" : false,
+        "sourceQuery" : null,
+        "snapshot" : null
+      },
+      "artifactRefs" : [ ]
+    }
+  },
+  "assertions" : [ {
+    "assertionId" : "predicate-result",
+    "expected" : "UNVERIFIED",
+    "source" : {
+      "actionId" : "assessment",
+      "pointer" : "/response/data/result"
+    },
+    "requirementRefs" : [ "D06" ],
+    "evidenceRefs" : [ "assessment:actual-artifact", "assessment:raw-source" ],
+    "status" : "FAIL",
+    "reason" : "source assessment is NOT_IMPLEMENTED: NOT_IMPLEMENTED: no real product adapters installed"
+  } ],
+  "missingAssertions" : 3,
+  "productCoverageClaimed" : false
+}
