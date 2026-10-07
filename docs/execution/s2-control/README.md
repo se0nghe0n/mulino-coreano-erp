@@ -100,3 +100,20 @@ PostgreSQL/CQN을 썼고 업무 효과 handler만 테스트 fixture다.
 APPLIED와 REJECTED 감사 2개, 안전한 denial facts와 빈 effect refs를
 요구하도록 맞췄다. 이 마지막 assertion 변경은 `NOT_RUN`이며 root의
 combined native 회귀에서 확인한다.
+
+control subject binding은 payload의 선언 ID를 실제 slot/DB target과
+대조한다. grant 생성·capability 배정은 실제 recipient의 Human/Agent
+ID에, 철회는 Grant/CapabilityAssignment 행과 해당 recipient에 연결한다.
+정책 승인·활성화·종료는 실제 draft ID를 PolicyVersion noun으로 연결한다.
+optional 선언을 생략한 기존 입력은 허용한다. 선언한 noun은 발행 정의와
+행동에 있어야 하며 ID·cardinality·case가 다르면 공통 gateway가 거부한다.
+
+createPolicyDraft의 ID는 서버가 만든다. 현재 handler에 typed item policy
+scope가 없으므로 임의 TradeItem/조직 scope를 생성될 정책 subject로
+간주하지 않는다. 이 command의 nonempty subject는 차단한다. T13 등
+향후 품목별 정책 scope는 S3 typed 계약과 함께 구현해야 한다.
+
+기존 실제 gateway test에 잘못된 Grant/PolicyVersion subject가 철회·승인
+효과를 만들지 않고 올바른 PolicyVersion subject는 승인되는 assertion을
+추가했다. 이 후속 변경은 아직 NOT_RUN이며 root의 combined 회귀에서
+확인한다. 공통 dependency는 `3d44a08`과 `b89cd54`다.

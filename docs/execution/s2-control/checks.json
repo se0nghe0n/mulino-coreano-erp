@@ -68,5 +68,25 @@
     ],
     "resultAppliesTo": "Before final denial-audit assertion change",
     "finalDenialAuditAssertions": "NOT_RUN"
+  },
+  "subjectBindingFollowup": {
+    "status": "NOT_RUN",
+    "dependency": [
+      "3d44a08",
+      "b89cd54"
+    ],
+    "coverage": [
+      "createGrant/assignCapability recipient Human/Agent canonical DB ID",
+      "revokeGrant Grant DB ID and recipient",
+      "revokeCapability CapabilityAssignment DB ID and recipient",
+      "approvePolicy/activatePolicy/retirePolicy PolicyVersion canonical draft ID",
+      "new draft server-generated ID keeps empty-only subject declarations"
+    ],
+    "assertions": [
+      "wrong Grant declaration leaves revision/revokedAt unchanged",
+      "wrong PolicyVersion declaration leaves draft DRAFT and no approval",
+      "correct PolicyVersion declaration approves draft"
+    ],
+    "limitation": "Typed item-scoped policy creation is not implemented by current control handler; arbitrary TradeItem subjects fail closed"
   }
 }

@@ -22,6 +22,23 @@ public class IdentityCommands implements CommandHandler {
    else scopes.put((String)row.get("scopeKind"),List.of((String)row.get("scopeId")));
    return new CommandPreparation(scopes,List.of(),Set.of(recipient),"IDENTITY_CONTROL",null,null,0,row==null?recipient:(String)row.get("ID"),row==null?null:((Number)row.get("revision")).intValue());
  }
+ public List<SubjectBinding> subjectBindings(DomainContext c,Map<String,Object> intent,CommandPreparation preparation){
+   var p=payload(intent);String action=op(intent);var bindings=new ArrayList<SubjectBinding>();
+   String recipient;
+   if(action.equals("revokeGrant")||action.equals("revokeCapability")){
+     var row=find(action.equals("revokeGrant")?"Grants":"CapabilityAssignments",c,text(p,"id"));recipient=(String)row.get("actorId");
+     bindings.add(SubjectBinding.optional(action.equals("revokeGrant")?"Grant":"CapabilityAssignment",Set.of((String)row.get("ID"))));
+   }else recipient=text(p,"actorId");
+   var actor=repo.actor(c.organizationId(),recipient).orElseThrow(DomainError::forbidden);
+   String noun=switch(Objects.toString(actor.get("kind"),"")){case "HUMAN"->"Human";case "AGENT"->"Agent";case "EXTERNAL"->"ExternalActor";default->throw DomainError.forbidden();};
+   bindings.add(SubjectBinding.optional(noun,Set.of((String)actor.get("ID"))));
+   return declaredBindings(intent,bindings);
+ }
+ public static List<SubjectBinding> declaredBindings(Map<String,Object> intent,List<SubjectBinding> trustedBindings){
+   var declared=new HashSet<String>();if(intent.get("subjectRefs") instanceof List<?> refs)for(Object ref:refs)if(ref instanceof Map<?,?> value&&value.get("type") instanceof String noun)declared.add(noun);
+   // Omitted optional declarations remain valid; an unknown declared noun has no matching binding and fails in the gateway.
+   return trustedBindings.stream().filter(binding->declared.contains(binding.nounType())).toList();
+ }
  public Map<String,Object> execute(DomainContext c,Map<String,Object> i){
    var p=payload(i);String op=op(i),id;String actor;Instant now=auth.now();
    if(op.equals("createGrant")){

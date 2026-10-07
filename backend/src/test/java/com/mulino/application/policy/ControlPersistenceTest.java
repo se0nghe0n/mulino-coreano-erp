@@ -55,7 +55,9 @@ class ControlPersistenceTest {
    jdbc.update("INSERT INTO mulino_identity_ExternalIdentities(organizationId,ID,actorId,issuer,subject,organizationAlias) VALUES(?,?,?,'https://fixture.invalid',?,?)",org,id(),actor,actor,org);
    try {
      var capabilities=List.of("revokeGrant","createPolicyDraft","approvePolicy","activatePolicy","fixtureTwoWorks").stream().map(cap->new com.mulino.domain.definitions.Definition.Capability(cap,"1.0.0","core-v1","1.0.0","1.0.0",List.of())).toList();
-     var d=new com.mulino.domain.definitions.Definition(org,id(),"1.0.0",null,"PUBLISHED",null,"core-v1","1.0.0",List.of(),List.of(),List.of(),List.of(),List.of(),capabilities);
+     var nouns=List.of("Human","Agent","Grant","CapabilityAssignment","PolicyVersion").stream().map(noun->new com.mulino.domain.definitions.Definition.NounType(noun,true)).toList();
+     var verbs=capabilities.stream().map(cap->new com.mulino.domain.definitions.Definition.Verb(cap.capabilityId(),"COMMAND",cap.capabilityId(),"CONTROL",Map.of())).toList();
+     var d=new com.mulino.domain.definitions.Definition(org,id(),"1.0.0",null,"PUBLISHED",null,"core-v1","1.0.0",nouns,List.of(),verbs,List.of(),List.of(),capabilities);
      String definition=new com.fasterxml.jackson.databind.ObjectMapper().writeValueAsString(d);
      jdbc.update("INSERT INTO mulino_definitions_DefinitionVersions(organizationId,ID,createdAt,version,state,contentHash,content,evaluatorVersion,schemaVersion) VALUES(?,?,CURRENT_TIMESTAMP,'1.0.0','PUBLISHED',?,?,'core-v1','1.0.0')",org,d.id(),com.mulino.domain.definitions.DefinitionRepository.sha256(definition),definition);
    }catch(Exception failure){throw new IllegalStateException(failure);}
@@ -71,6 +73,15 @@ class ControlPersistenceTest {
    assertEquals(1,policy.current(org,"COMMAND",now).size());assertTrue(policy.current(org,"COMMAND",now.plusSeconds(61)).isEmpty());
  });}
 
+ @Test void conflictingGrantAndPolicySubjectsHaveZeroControlEffects(){
+   var badGrant=command("revokeGrant",Map.of("id",grant),1);badGrant.put("subjectRefs",List.of(Map.of("type","Grant","id",id())));assertEquals("REJECTED",execute(badGrant).get("outcome"));
+   assertEquals(1,jdbc.queryForObject("SELECT revision FROM mulino_identity_Grants WHERE organizationId=? AND ID=?",Integer.class,org,grant));assertNull(jdbc.queryForObject("SELECT revokedAt FROM mulino_identity_Grants WHERE organizationId=? AND ID=?",java.sql.Timestamp.class,org,grant));
+   String draft=id(),content="{\"rules\":{}}";tx(()->policy.insert("PolicyDrafts",IdentityCommands.fields("organizationId",org,"ID",draft,"kind","COMMAND","version","subject-fixture","content",content,"contentHash",PolicyCommands.hash(content),"source","synthetic-local","regressionEvidence","subject-counterexample","effectiveFrom",now.minusSeconds(1),"effectiveUntil",now.plusSeconds(30),"legallyRestrictive",false,"fixtureOnly",true,"status","DRAFT","revision",1)));
+   var badPolicy=command("approvePolicy",Map.of("id",draft,"contentHash",PolicyCommands.hash(content)),1);badPolicy.put("subjectRefs",List.of(Map.of("type","PolicyVersion","id",pid)));assertEquals("REJECTED",execute(badPolicy).get("outcome"));
+   assertEquals("DRAFT",jdbc.queryForObject("SELECT status FROM mulino_governance_PolicyDrafts WHERE organizationId=? AND ID=?",String.class,org,draft));assertEquals(0,jdbc.queryForObject("SELECT count(*) FROM mulino_governance_PolicyApprovals WHERE organizationId=?",Integer.class,org));
+   var valid=command("approvePolicy",Map.of("id",draft,"contentHash",PolicyCommands.hash(content)),1);valid.put("subjectRefs",List.of(Map.of("type","PolicyVersion","id",draft)));assertEquals("APPLIED",execute(valid).get("outcome"));
+   assertEquals("APPROVED",jdbc.queryForObject("SELECT status FROM mulino_governance_PolicyDrafts WHERE organizationId=? AND ID=?",String.class,org,draft));
+ }
  @Test void replayRequiresEverySavedWorkAfterPartialGrantRevocation() throws Exception {
    String w1=id(),w2=id(),g1=id(),g2=id(),cap="fixtureTwoWorks";
    for(var entry:Map.of(w1,g1,w2,g2).entrySet()){

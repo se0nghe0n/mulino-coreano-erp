@@ -19,6 +19,12 @@ public class PolicyCommands implements CommandHandler {
    var actors=new HashSet<String>();if(row!=null)for(var a:repo.rows("PolicyApprovals",c.organizationId()))if(row.get("ID").equals(a.get("draftId")))actors.add((String)a.get("approverId"));
    return new CommandPreparation(Map.of("ORGANIZATION",List.of(c.organizationId())),List.of(),actors,"POLICY_CONTROL",null,null,0,row==null?null:(String)row.get("ID"),row==null?null:((Number)row.get("revision")).intValue());
  }
+ public List<SubjectBinding> subjectBindings(DomainContext c,Map<String,Object> intent,CommandPreparation preparation){
+   // A new draft's ID is server-generated: no payload subject can predeclare that resource.
+   if(op(intent).equals("createPolicyDraft"))return List.of();
+   var row=draft(c,text(payload(intent),"id"));
+   return declaredBindings(intent,List.of(SubjectBinding.optional("PolicyVersion",Set.of((String)row.get("ID")))));
+ }
  public Map<String,Object> execute(DomainContext c,Map<String,Object> i){
    var p=payload(i);String operation=op(i),id;int revision;Instant now=auth.now();
    if(operation.equals("createPolicyDraft")){
