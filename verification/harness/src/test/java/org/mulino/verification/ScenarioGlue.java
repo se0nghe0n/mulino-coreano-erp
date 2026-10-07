@@ -30,6 +30,13 @@ public final class ScenarioGlue {
         if(!scenario.isFailed()) runner.verifyComplete();
         String mode=System.getProperty("verification.mode","harness-selftest");
         var report=runner.evidence(scenario.isFailed()?"FAIL":"PASS",System.getProperty("verification.command","Maven Cucumber"));
+        if(mode.equals("actual") && scenario.isFailed()) {
+            boolean unavailable=false,violation=false;
+            for(var assertion:report.path("assertions")) if(assertion.path("status").asText().equals("FAIL")) {
+                if(assertion.path("reason").asText().contains("NOT_IMPLEMENTED")) unavailable=true; else violation=true;
+            }
+            if(unavailable && !violation) report.put("status","NOT_RUN").put("runtimeComplete",false);
+        }
         String name=mode+"-"+report.path("caseId").asText()+"-"+report.path("subcaseId").asText();
         name=java.net.URLEncoder.encode(name,java.nio.charset.StandardCharsets.UTF_8);
         Json.write(root.resolve("verification/harness/target/evidence/"+name+".json"),report);

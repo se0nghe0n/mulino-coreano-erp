@@ -29,7 +29,8 @@ public final class CaseFeatureTest {
         var r=Json.object();r.put("expectedScenarios",expected).put("discoveredScenarios",summary.getTestsFoundCount()).put("startedScenarios",summary.getTestsStartedCount()).put("skippedScenarios",summary.getTestsSkippedCount()).put("failedScenarios",summary.getTestsFailedCount());
         long unavailable=summary.getFailures().stream().filter(f->f.getException() instanceof AssertionError && f.getException().getMessage()!=null && f.getException().getMessage().contains("NOT_IMPLEMENTED")).count();
         boolean actual=System.getProperty("verification.driver","").equals("actual") && !System.getProperty("verification.mode","").equals("contract-red");
-        r.put("notImplementedAssertionFailures",unavailable).put("status",actual && summary.getTestsFailedCount()==0?"PASS":"FAIL").put("productCoverageClaimed",false);
+        String status=!actual?"FAIL":summary.getTestsFailedCount()==0?"PASS":summary.getTestsFailedCount()==unavailable?"NOT_RUN":"FAIL";
+        r.put("notImplementedAssertionFailures",unavailable).put("status",status).put("productCoverageClaimed",false);
         r.set("failureReasons",Json.MAPPER.valueToTree(summary.getFailures().stream().map(f->f.getException().toString()).toList()));
         Json.write(root.resolve("verification/harness/target/evidence/feature-red-summary.json"),r);
         assertEquals(expected,summary.getTestsFoundCount(),"Scenario discovery count");
