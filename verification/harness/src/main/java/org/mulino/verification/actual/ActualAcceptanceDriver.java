@@ -90,12 +90,15 @@ public final class ActualAcceptanceDriver implements AcceptanceDriver, Independe
             var result=http.send(call,HttpResponse.BodyHandlers.ofString());
             if(result.statusCode()==404)return StepResult.missing(id,"NOT_IMPLEMENTED: verification clock profile not installed");
             var response=Json.parse(result.body());
-            if(result.statusCode()!=200||!response.path("authorityClock").asBoolean()||!Instant.parse(body.path("instant").asText()).equals(Instant.parse(response.path("instant").asText())))throw new IllegalStateException("Verification clock control did not prove applied authority clock");
-            var data=Json.object();data.put("controlType","clock").put("operation","advanceTo").put("acknowledgedAt",Instant.now().toString());data.set("instant",response.path("instant"));data.set("serverObservation",response);
+            var data=clockAcknowledgment(result.statusCode(),body.path("instant").asText(),response);
             var receipt=Json.object();receipt.put("httpStatus",result.statusCode()).put("path",uri.getPath());receipt.set("requestedControl",request);receipt.set("wireRequest",body);receipt.set("serverResponse",response);
             return executed(id,data,response,provenance(null,"HTTP_VERIFICATION_CLOCK",false,null,null),receipt);
         }catch(InterruptedException failure){Thread.currentThread().interrupt();throw new IllegalStateException("Actual clock interrupted",failure);}
         catch(Exception failure){throw new IllegalStateException("Actual clock environment/response failure",failure);}
+    }
+    static ObjectNode clockAcknowledgment(int httpStatus,String requestedInstant,JsonNode serverResponse) {
+        if(httpStatus!=200||!serverResponse.path("authorityClock").asBoolean()||!"verification".equals(serverResponse.path("profile").asText())||!Instant.parse(requestedInstant).equals(Instant.parse(serverResponse.path("instant").asText())))throw new IllegalStateException("Verification clock control did not prove applied authority clock");
+        var data=Json.object();data.put("acknowledged",true).put("controlType","clock").put("operation","advanceTo").put("acknowledgedAt",Instant.now().toString());data.set("instant",serverResponse.path("instant"));data.set("serverObservation",serverResponse);return data;
     }
     @Override public StepResult start(String id,String route,JsonNode actor,String capability,JsonNode request) {
         if(!route.equals("api"))return StepResult.missing(id,"NOT_IMPLEMENTED: actual async route "+route);
