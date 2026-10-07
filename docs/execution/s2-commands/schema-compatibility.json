@@ -22,6 +22,8 @@
     "mulino_evidence_claims.effectivefrom",
     "mulino_evidence_claims.effectiveuntil",
     "mulino_evidence_claims.recordedat",
+    "mulino_evidence_completioncoverages.createdat",
+    "mulino_evidence_completioncoverages.recordedat",
     "mulino_evidence_documentversions.createdat",
     "mulino_evidence_documentversions.recordedat",
     "mulino_evidence_events.createdat",
@@ -139,10 +141,14 @@
     "mulino_inventory_unitconversions.recordedat",
     "mulino_inventory_unitconversions.validfrom",
     "mulino_inventory_unitconversions.validuntil",
+    "mulino_responsibility_completionbindings.createdat",
+    "mulino_responsibility_completionbindings.recordedat",
     "mulino_responsibility_handovers.createdat",
     "mulino_responsibility_handovers.expiresat",
     "mulino_responsibility_handovers.nextcheckat",
     "mulino_responsibility_handovers.recordedat",
+    "mulino_responsibility_resolutioncredits.createdat",
+    "mulino_responsibility_resolutioncredits.recordedat",
     "mulino_responsibility_roots.createdat",
     "mulino_responsibility_roots.recordedat",
     "mulino_responsibility_scopes.createdat",
@@ -152,9 +158,12 @@
     "mulino_runtime_executionattempts.leaseexpiresat",
     "mulino_runtime_executionattempts.startedat",
     "mulino_runtime_externalreconciliations.recordedat",
+    "mulino_runtime_intakerecoveries.leaseexpiresat",
+    "mulino_runtime_intakerecoveries.nextcheckat",
     "mulino_runtime_outbox.createdat",
     "mulino_runtime_outbox.leaseexpiresat",
     "mulino_runtime_outbox.nextcheckat",
+    "mulino_runtime_recoveryschedules.lastcheckedat",
     "mulino_runtime_recoveryschedules.nextcheckat",
     "mulino_runtime_recoveryschedules.nextvalidityboundary",
     "mulino_work_read_assessmentreferences.asof",
@@ -274,6 +283,22 @@
     "mulino_evidence_claims.revision",
     "mulino_evidence_claims.sourceprofileid",
     "mulino_evidence_claims.valuestate",
+    "mulino_evidence_completioncoverages.claimid",
+    "mulino_evidence_completioncoverages.createdat",
+    "mulino_evidence_completioncoverages.documentversionid",
+    "mulino_evidence_completioncoverages.eventid",
+    "mulino_evidence_completioncoverages.occurrenceid",
+    "mulino_evidence_completioncoverages.organizationid",
+    "mulino_evidence_completioncoverages.originalhash",
+    "mulino_evidence_completioncoverages.policyversion",
+    "mulino_evidence_completioncoverages.quantity",
+    "mulino_evidence_completioncoverages.recordedat",
+    "mulino_evidence_completioncoverages.recordedby",
+    "mulino_evidence_completioncoverages.revision",
+    "mulino_evidence_completioncoverages.rootid",
+    "mulino_evidence_completioncoverages.sourcepayloadhash",
+    "mulino_evidence_completioncoverages.startquantity",
+    "mulino_evidence_completioncoverages.verificationid",
     "mulino_evidence_documentversions.availability",
     "mulino_evidence_documentversions.bytelength",
     "mulino_evidence_documentversions.createdat",
@@ -592,10 +617,10 @@
     "mulino_inventory_unitconversions.validfrom",
     "mulino_platform_preserved.upgrademarker"
   ],
-  "baseline": "c88d527",
-  "observedColumnCount": 933,
-  "observedArtifactSha256": "2c548dd92ec360b920d740c08ce1109914d958911921ba06befba39a66542571",
-  "scope": "Observed combined V1–V15 at c88d527. Later recovery fields require a new exact observation; this is not the final S2 gate.",
+  "baseline": "a2e3bbc",
+  "observedColumnCount": 1002,
+  "observedArtifactSha256": "74ba5fd95ef68c4ef2214b803c215488fbc1cff8d0a0ca28aa9450cb58fa7f02",
+  "scope": "Combined V1–V15 at a2e3bbc: 1002 columns, 187 explicit timestamp widenings, 422 explicit NOT NULL strengthenings; observed structural and primary-key differences are zero. Includes immutable completion bindings/credits/coverages and server intake/schedule recovery. Exact manifest updated after per-column CDS/Flyway review; final gate requires rerun with this inventory.",
   "reviewedAdditions": {
     "mulino_commands_approvalconsumptions.consumedat": {
       "migration": "database/migrations/V8__commands.sql",
@@ -1539,6 +1564,123 @@
       "migration": "database/migrations/V14__inventory_commands.sql",
       "cds": "backend/db/inventory.cds",
       "notNullStrengtheningReason": "관측 수량·단위·원 segment·근거·실제/기록 시점·원 명령을 연결한다."
+    },
+    "mulino_evidence_completioncoverages.claimid": {
+      "migration": "database/migrations/V15__evidence_commands.sql",
+      "cds": "backend/db/evidence.cds",
+      "notNullStrengtheningReason": "원 claim FK를 필수로 보존해 검증 대상 주장을 연결한다."
+    },
+    "mulino_evidence_completioncoverages.createdat": {
+      "migration": "database/migrations/V15__evidence_commands.sql",
+      "cds": "backend/db/evidence.cds",
+      "timestampWideningReason": "immutable 완료 증거 binding·credit·coverage의 생성 시점을 절대 instant로 보존한다.",
+      "notNullStrengtheningReason": "coverage의 최초 생성 시점을 필수로 보존한다."
+    },
+    "mulino_evidence_completioncoverages.documentversionid": {
+      "migration": "database/migrations/V15__evidence_commands.sql",
+      "cds": "backend/db/evidence.cds",
+      "notNullStrengtheningReason": "검증 근거의 immutable document version FK를 필수로 보존한다."
+    },
+    "mulino_evidence_completioncoverages.eventid": {
+      "migration": "database/migrations/V15__evidence_commands.sql",
+      "cds": "backend/db/evidence.cds",
+      "notNullStrengtheningReason": "원 event FK를 필수로 보존해 실제 출처 사건을 연결한다."
+    },
+    "mulino_evidence_completioncoverages.occurrenceid": {
+      "migration": "database/migrations/V15__evidence_commands.sql",
+      "cds": "backend/db/evidence.cds",
+      "notNullStrengtheningReason": "같은 조직의 canonical occurrence FK와 단일 coverage를 필수로 결합한다."
+    },
+    "mulino_evidence_completioncoverages.organizationid": {
+      "migration": "database/migrations/V15__evidence_commands.sql",
+      "cds": "backend/db/evidence.cds",
+      "notNullStrengtheningReason": "증거 coverage의 조직 경계를 필수로 보존한다."
+    },
+    "mulino_evidence_completioncoverages.originalhash": {
+      "migration": "database/migrations/V15__evidence_commands.sql",
+      "cds": "backend/db/evidence.cds",
+      "notNullStrengtheningReason": "원문 증거 hash를 필수로 보존해 내용 바꿔치기를 막는다."
+    },
+    "mulino_evidence_completioncoverages.policyversion": {
+      "migration": "database/migrations/V15__evidence_commands.sql",
+      "cds": "backend/db/evidence.cds",
+      "notNullStrengtheningReason": "실제 검증 정책 version을 필수로 보존해 coverage 판단 기준을 고정한다."
+    },
+    "mulino_evidence_completioncoverages.quantity": {
+      "migration": "database/migrations/V15__evidence_commands.sql",
+      "cds": "backend/db/evidence.cds",
+      "notNullStrengtheningReason": "검증된 완료 범위의 양수 수량을 필수로 보존한다."
+    },
+    "mulino_evidence_completioncoverages.recordedat": {
+      "migration": "database/migrations/V15__evidence_commands.sql",
+      "cds": "backend/db/evidence.cds",
+      "timestampWideningReason": "immutable 완료 증거 binding·credit·coverage의 기록 시점을 절대 instant로 보존한다.",
+      "notNullStrengtheningReason": "coverage의 실제 기록 시점을 필수로 보존한다."
+    },
+    "mulino_evidence_completioncoverages.recordedby": {
+      "migration": "database/migrations/V15__evidence_commands.sql",
+      "cds": "backend/db/evidence.cds",
+      "notNullStrengtheningReason": "같은 조직의 실제 기록 actor FK를 필수로 보존한다."
+    },
+    "mulino_evidence_completioncoverages.revision": {
+      "migration": "database/migrations/V15__evidence_commands.sql",
+      "cds": "backend/db/evidence.cds",
+      "notNullStrengtheningReason": "immutable coverage 기록의 양수 revision을 필수로 보존한다."
+    },
+    "mulino_evidence_completioncoverages.rootid": {
+      "migration": "database/migrations/V15__evidence_commands.sql",
+      "cds": "backend/db/evidence.cds",
+      "notNullStrengtheningReason": "실제 duty root FK를 필수로 결합해 다른 의무에 완료를 재사용하지 않는다."
+    },
+    "mulino_evidence_completioncoverages.sourcepayloadhash": {
+      "migration": "database/migrations/V15__evidence_commands.sql",
+      "cds": "backend/db/evidence.cds",
+      "notNullStrengtheningReason": "실제 출처 payload hash를 필수로 보존해 출처 내용을 결합한다."
+    },
+    "mulino_evidence_completioncoverages.startquantity": {
+      "migration": "database/migrations/V15__evidence_commands.sql",
+      "cds": "backend/db/evidence.cds",
+      "notNullStrengtheningReason": "검증된 완료 범위의 음수 불가 시작 위치를 필수로 보존한다."
+    },
+    "mulino_evidence_completioncoverages.verificationid": {
+      "migration": "database/migrations/V15__evidence_commands.sql",
+      "cds": "backend/db/evidence.cds",
+      "notNullStrengtheningReason": "실제 verification FK를 필수로 결합해 임의 완료 주장을 막는다."
+    },
+    "mulino_responsibility_completionbindings.createdat": {
+      "migration": "database/migrations/V10__responsibility.sql",
+      "cds": "backend/db/responsibility.cds",
+      "timestampWideningReason": "immutable 완료 증거 binding·credit·coverage의 생성 시점을 절대 instant로 보존한다."
+    },
+    "mulino_responsibility_completionbindings.recordedat": {
+      "migration": "database/migrations/V10__responsibility.sql",
+      "cds": "backend/db/responsibility.cds",
+      "timestampWideningReason": "immutable 완료 증거 binding·credit·coverage의 기록 시점을 절대 instant로 보존한다."
+    },
+    "mulino_responsibility_resolutioncredits.createdat": {
+      "migration": "database/migrations/V10__responsibility.sql",
+      "cds": "backend/db/responsibility.cds",
+      "timestampWideningReason": "immutable 완료 증거 binding·credit·coverage의 생성 시점을 절대 instant로 보존한다."
+    },
+    "mulino_responsibility_resolutioncredits.recordedat": {
+      "migration": "database/migrations/V10__responsibility.sql",
+      "cds": "backend/db/responsibility.cds",
+      "timestampWideningReason": "immutable 완료 증거 binding·credit·coverage의 기록 시점을 절대 instant로 보존한다."
+    },
+    "mulino_runtime_intakerecoveries.leaseexpiresat": {
+      "migration": "database/migrations/V13__runtime.sql",
+      "cds": "backend/db/runtime.cds",
+      "timestampWideningReason": "원 intake 소유자의 server lease 만료를 시간대와 무관한 절대 instant로 판단한다."
+    },
+    "mulino_runtime_intakerecoveries.nextcheckat": {
+      "migration": "database/migrations/V13__runtime.sql",
+      "cds": "backend/db/runtime.cds",
+      "timestampWideningReason": "담당자 있는 intake 재검사 due 시각을 절대 instant로 비교한다."
+    },
+    "mulino_runtime_recoveryschedules.lastcheckedat": {
+      "migration": "database/migrations/V13__runtime.sql",
+      "cds": "backend/db/runtime.cds",
+      "timestampWideningReason": "recovery schedule의 실제 마지막 검사 시점을 절대 instant로 기록한다."
     }
   }
 }
