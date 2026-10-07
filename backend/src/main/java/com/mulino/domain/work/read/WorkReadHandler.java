@@ -26,7 +26,7 @@ public class WorkReadHandler implements QueryHandler {
       data.put("goals",linked(c,"GoalReferences",Set.of(q.id())));
       data.put("assessments",linked(c,"AssessmentReferences",Set.of(q.id())));
       data.put("obligations",obligations(c,Set.of(q.id())));
-      if(assessmentRead.getIfAvailable()!=null)data.put("assessmentInputSnapshots",assessmentRead.getIfAvailable().snapshots(c,q.id()));
+      if(assessmentRead.getIfAvailable()!=null)data.put("assessmentInputSnapshots",assessmentSnapshots(c,q.id()));
       if(work.get("waitJson")!=null)data.put("wait",decode(work.get("waitJson")));
       data.remove("waitJson");
       return QueryResult.of(data,scope(c,q.scope(),work));
@@ -52,7 +52,7 @@ public class WorkReadHandler implements QueryHandler {
     Map<String,Object> data=new LinkedHashMap<>();
     data.put("workIds",List.copyOf(ids));data.put("ownerIds",List.copyOf(owners));data.put("nextActions",List.copyOf(next));data.put("evidenceRefs",List.copyOf(evidence));data.put("obligations",obligations);
     data.put("workReferences",works);data.put("goalReferences",linked(c,"GoalReferences",ids));data.put("assessmentReferences",linked(c,"AssessmentReferences",ids));
-    if(assessmentRead.getIfAvailable()!=null)data.put("assessmentInputSnapshots",ids.stream().flatMap(id->assessmentRead.getIfAvailable().snapshots(c,id).stream()).toList());
+    if(assessmentRead.getIfAvailable()!=null)data.put("assessmentInputSnapshots",ids.stream().flatMap(id->assessmentSnapshots(c,id).stream()).toList());
     return data;
   }
   private List<Map<String,Object>> authorizedWorks(DomainContext c,Map<String,Object> scope,Map<String,Object> filters,String capability){
@@ -66,7 +66,9 @@ public class WorkReadHandler implements QueryHandler {
     if(filter.containsKey("workId")&&!Objects.equals(w.get("ID"),filter.get("workId")))return false;
     return true;
   }
-  private List<Map<String,Object>> linked(DomainContext c,String entity,Set<String> ids){return repository.rows(entity,c).stream().filter(r->ids.contains(String.valueOf(r.get("workId")))).toList();}
+  private List<Map<String,Object>> linked(DomainContext c,String entity,Set<String> ids){return repository.rows(entity,c).stream().filter(r->ids.contains(String.valueOf(r.get("workId")))).map(r->{var data=new LinkedHashMap<String,Object>(r);if(entity.equals("GoalReferences")){if(data.get("slotsJson")!=null)data.put("slots",decode(data.remove("slotsJson")));if(data.get("provenanceJson")!=null)data.put("provenance",decode(data.remove("provenanceJson")));data.put("scope",decode(data.remove("scopeJson")));}if(entity.equals("AssessmentReferences")&&data.get("conditionsJson")!=null)data.put("conditionResults",decodeAny(data.remove("conditionsJson")));return (Map<String,Object>)data;}).toList();}
+  private List<Map<String,Object>> assessmentSnapshots(DomainContext c,String workId){try{return assessmentRead.getIfAvailable().snapshots(c,workId);}catch(DomainError denied){if(!denied.code().equals("FORBIDDEN"))throw denied;return List.of();}}
+  private Object decodeAny(Object value){try{return json.readValue(String.valueOf(value),Object.class);}catch(Exception failure){throw new IllegalStateException("Invalid assessment condition results",failure);}}
   private List<Map<String,Object>> obligations(DomainContext c,Set<String> ids){return linked(c,"ObligationReferences",ids).stream().map(r->{Map<String,Object> result=new LinkedHashMap<>(r);result.put("scope",decode(result.remove("scopeJson")));return result;}).toList();}
   private Object decode(Object value){try{return json.readValue(String.valueOf(value),Map.class);}catch(Exception failure){throw new IllegalStateException("Invalid stored read reference",failure);}}
   private Map<String,Object> scope(DomainContext c,Map<String,Object> input,Map<String,Object> work){Map<String,Object> scope=new LinkedHashMap<>(input);scope.put("organizationId",c.organizationId());if(work!=null){scope.putIfAbsent("itemId",work.get("itemId"));if(work.get("lotId")!=null)scope.putIfAbsent("lotId",work.get("lotId"));}return scope;}

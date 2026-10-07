@@ -58,7 +58,7 @@ public class WorkLifecycle implements CommandHandler,WorkFollowup {
  private WorkAssessmentGuard guard(){var guard=assessments.getIfAvailable();if(guard==null)throw DomainError.unsupported();return guard;}
  private WorkResponsibility duties(){var duties=responsibility.getIfAvailable();if(duties==null)throw DomainError.unsupported();return duties;}
  private void state(String state,String required){if(!state.equals(required))throw DomainError.invalid("Invalid lifecycle transition");}
- private Map<String,Object> result(String id,String goal,int revision,String outcome){return Map.of("outcome",outcome,"revision",revision,"effects",Map.of("workId",id,"goalVersionId",goal),"quantityEffects",List.of());}
+ private Map<String,Object> result(String id,String goal,int revision,String outcome){return Map.of("outcome",outcome,"revision",revision,"effects",Map.of("workId",id,"goalVersionId",goal),"workId",id,"goalVersionId",goal,"id",id,"quantityEffects",List.of());}
  private String operation(Map<String,Object> intent){return GoalInput.text(intent,"capabilityId");}
  private Map<String,Object> parameters(DomainContext c,Map<String,Object> intent){var slots=map(intent.get("slots"));var result=new LinkedHashMap<String,Object>();slots.forEach((k,v)->{if(v instanceof Map<?,?> typed&&typed.containsKey("value")&&typed.containsKey("type"))result.put(k,typed.get("value"));else if(v instanceof Map<?,?> reference&&reference.containsKey("type")&&reference.containsKey("id"))result.put(k,reference.get("id"));else result.put(k,v);});
   String op=operation(intent);
