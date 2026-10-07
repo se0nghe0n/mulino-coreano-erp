@@ -25,3 +25,8 @@ allocation은 원 GoalVersion의 출처를 보존하고 targetWork의 현재 목
 동일 실제 사건을 평가할 때 읽는다. 목표 변경이 과거 실제 기여를 삭제하지
 않으며 evaluator가 현재 사건 종류·기간·정책·단위를 다시 적용한다.
 기여량을 자식 업무 종료 상태에서 만들지 않는다.
+
+종료된 업무의 새 source로 만든 자동 followup은 원 목표를 참고 자료로
+보존하지만 goalRevisionRequired=true다. 현재 사건의 목표를 명시적으로
+reviseGoal하기 전에는 평가가 원 목표를 충족하더라도 FULFILLED 종료가
+불가능하다. 목표 변경과 판정 재평가, 현재 의무 해소를 각각 확인한다.
