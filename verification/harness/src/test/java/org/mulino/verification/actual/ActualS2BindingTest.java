@@ -13,6 +13,7 @@ final class ActualS2BindingTest {
         assertEquals("PUBLISHED",definition.path("state").asText());
         assertEquals("2026-10-07T09:00:00Z",fixture.path("clock").path("asOf").asText());
         assertFalse(definition.path("goals").isEmpty());
+        for(var noun:definition.path("nouns")){assertTrue(noun.isObject());assertTrue(noun.path("name").isTextual());assertTrue(noun.path("core").isBoolean());}
         for(var capability:definition.path("capabilities"))assertEquals("1.0.0",capability.path("semanticVersion").asText());
         assertFalse(fixture.has("expected"));assertFalse(fixture.has("assertions"));
     }
