@@ -1,8 +1,8 @@
 # Step 2 영역별 테스트 작성 인계
 
-현재는 공통 runner의 review 수정 중이다. B2가 명시되고 coordinator가
-별도 worktree를 지정하기 전에는 읽기 조사만 수행한다. 이후 각 writer는
-같은 B2에서 시작하며 아래 소유 범위의 테스트만 작성한다.
+공통 계약과 결합 검사91개를 통과한 로컬 tag `step2-b2`를 B2로 쓴다.
+coordinator가 지정한 별도 worktree에서 같은 B2를 시작점으로 사용하며
+아래 소유 범위의 테스트만 작성한다. 제품 실행 gate는 NOT_RUN이다.
 
 사용자 Step 2의 실제 모델은 GPT-6.1 Sol high다. 전체 Step 2의 tests
 납품·두 모델 review·지적 수정·통합 검사가 끝나야 Step 3으로 넘어간다.

@@ -80,13 +80,14 @@ Step 2의 최초 공통 baseline은 `cef526e9f77679d8429fb517184f018d64824443`�
 
 | Subtask | branch / 절대 worktree | 소유 범위 | 상태 |
 |---|---|---|---|
-| 공통 harness | `step2/test-harness` / `/Volumes/VideoStore/Developer/mulino-ontology-step2-harness` | `contracts`, harness·base fixture·wrapper | `32c446f` 통합, review P2 수정 중 |
-| 실모델 corpus | `step2/model-corpus` / `/Volumes/VideoStore/Developer/mulino-ontology-step2-model-corpus` | `verification/model-corpus` | `b8ee1ae` 통합, 경로별 oracle 수정 중 |
+| 공통 harness | `step2/test-harness` / `/Volumes/VideoStore/Developer/mulino-ontology-step2-harness` | `contracts`, harness·base fixture·wrapper | `611330d`까지 통합, 공통 gate PASS |
+| 실모델 corpus | `step2/model-corpus` / `/Volumes/VideoStore/Developer/mulino-ontology-step2-model-corpus` | `verification/model-corpus` | `c7aad7e` 통합, scoped closure PASS |
 | 독립 oracle 목록 | `step2/oracle-catalog` / `/Volumes/VideoStore/Developer/mulino-ontology-step2-oracles` | `verification/requirements` | `7f972dd` 통합, scoped closure PASS |
 
-공통 계약과 독립 oracle 목록을 먼저 검증·통합한 commit을 B2로 기록한다.
-그 뒤 사례별 writer에게 같은 B2를 배정한다. 공통 interface가 준비되기
-전에 작성자별 호출 형식을 각각 만들지 않는다.
+공통 계약과 독립 oracle 목록·host 관찰·준비 검사를 통합했다.
+`611330d`의 결합 harness91개가 통과했다. 이 결과와 인계 기록을 담은
+로컬 tag `step2-b2`를 B2로 고정하고 모든 사례별 writer와 model-binding
+writer에 같은 기준점의 독립 worktree를 배정한다. 원격 tag는 만들지 않는다.
 
 Sol xhigh와 Astra low의 설계 사전 검토는 관찰/control 미지원의 효과0
 오인, 비동기 경합의 순차 실행 오인, snapshot 불일치, UAT 정답 주입,
@@ -148,8 +149,8 @@ coordinator가 3개 skill의 `quick_validate.py`를 uv+PyYAML 환경에서
 fresh 검사 결과는 [정적 검사 증거](evidence/step1-static-checks.txt)에
 기록했다. 두 실제 reviewer의 최종 범위 내 판정도 PASS다.
 
-다음은 공통 runner review의 P2를 해소한 뒤 B2를 기록하고 같은
-기준선에서 사례별 테스트를 작성하는 일이다. [공통 계약 검토 기록](step-2-common-review.md)에
+다음은 B2의 공통 계약으로 전체 사례별 테스트와 모델 평가 바인딩을
+작성하고 registry·coverage를 통합하는 일이다. [공통 계약 검토 기록](step-2-common-review.md)에
 부분 검토·실행 검사·미해결 항목을 남긴다. startup·도메인·DB·
 MCP/client·모델·BTP 인수는 NOT_RUN이다.
 
