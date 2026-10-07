@@ -30,6 +30,6 @@ public class ShipmentEvidenceScope implements TradeEvidenceScopePort {
    var fields=new LinkedHashMap<String,Object>();fields.put("itemId",ca.get("itemId"));fields.put("placeId",place);var scopes=new LinkedHashMap<String,List<String>>();var targets=new ArrayList<String>(List.of(shipment,cargo,physical));for(var a:r.cargoAllocations(c,cargo))targets.add(a.get("poLineId").toString());scopes.put("TARGET",targets);scopes.put("ITEM",List.of(ca.get("itemId").toString()));scopes.put("PLACE",List.of(place));if(sh.get("workId")!=null){fields.put("workId",sh.get("workId"));scopes.put("WORK",List.of(sh.get("workId").toString()));}return new Scope(fields,scopes);
   }catch(java.io.IOException|java.time.format.DateTimeParseException malformed){throw held();}
  }
- private static String id(JsonNode node,String key){return CommandRequests.uuid(node.path(key).asText());}
+ private static String id(JsonNode node,String key){String id=node.path(key).asText();CommandRequests.uuid(id);return id;}
  private static DomainError held(){return new DomainError("HELD","EVIDENCE_UNVERIFIED","Original shipment bytes and exact cargo scope differ");}
 }

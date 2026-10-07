@@ -28,6 +28,7 @@ public class ShipmentEvidence {
  public void requireObservationShape(DomainContext c,String id,Map<String,Object>slots){
   try {var event=event(c,id);var payload=new com.fasterxml.jackson.databind.ObjectMapper().readTree(event.get("payload").toString());
    for(String key:List.of("shipmentId","cargoId","legId","placeId","physicalScopeId"))if(!slots.get(key).equals(payload.path(key).asText()))throw held();
+   if(slots.containsKey("lineAllocations")&&!new com.fasterxml.jackson.databind.ObjectMapper().valueToTree(slots.get("lineAllocations")).equals(payload.path("lineAllocations")))throw held();
    if(slots.containsKey("fromCustodianId"))for(String key:List.of("fromCustodianId","toCustodianId"))if(!slots.get(key).equals(payload.path(key).asText()))throw held();
   }catch(java.io.IOException malformed){throw held();}
  }
