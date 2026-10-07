@@ -33,5 +33,24 @@
     "compressedSha256": "dae378fc813ffcdd9cb13ffffde4576cda9b218383177b57a7d290ec7b50fbc4",
     "rawSha256": "c015691eedd6aecd20b88a779406817510368ec076c17f302e5dd4157f416488",
     "sameCompressedBytesAsOriginal": true
+  },
+  "identityRevocationFollowup": {
+    "testedOwnSourceCommit": "2e7a6b8b",
+    "dependencyRoot": "cc5010ac",
+    "productionChanged": false,
+    "tests": 2,
+    "failures": 0,
+    "errors": 0,
+    "command": "./mvnw -f backend/pom.xml -Dtest=IdentityPersistenceTest -Dmulino.evidence.blob-root=/tmp/mulino-s3-identity-blob test",
+    "privateBlobPermissions": "0700",
+    "rawLog": "attempts/identity-current-revocation-pass.log.gz",
+    "junit": "attempts/identity-current-revocation-junit.xml.gz",
+    "sourceSha256": {
+      "backend/src/test/java/com/mulino/application/identity/IdentityPersistenceTest.java": "26c8d4e6676346562de040613a9597855f48b79e18c9b6be1b1ecd8d875a3f29",
+      "backend/src/main/java/com/mulino/application/identity/IdentityAuthorization.java": "33906e5b16bcf53987bade871646c70fba093515a6dbfa93bb07a0622bc78697",
+      "backend/src/main/java/com/mulino/domain/identity/IdentityRepository.java": "3010303b92eded46e3311e5729f320dfa4a15da2b5f6b355018762b10b4fa50f"
+    },
+    "rawLogSha256": "13244ea6f55e843b65d4b40f26208ec003d2562a4bf32b61b89d84de3db65c96",
+    "limitation": "Original aggregate did not record both clocks at failure; precise skew magnitude is unobserved. Fixture now proves persisted revocation already effective at server clock, then checks current denial in same context."
   }
 }

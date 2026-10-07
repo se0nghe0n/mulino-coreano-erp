@@ -41,3 +41,21 @@ V22까지의 CDS/Flyway parity는 1,432개 column, primary key와 구조가
 `attempts/shared-gateway-pass.log.gz`와 JUnit XML에 증거를 보존했다.
 도메인 전체 gateway 및 HTTP 흐름 검증은 Task 통합 branch에서 별도로
 확인한다. worker 완료를 S3 완료로 취급하지 않는다.
+
+## 현재 권한 회수 fixture 보정
+
+최종 결합 검증은 371건 중 IdentityPersistenceTest의 회수 검사 1건이
+실패했다. fixture는 PostgreSQL CURRENT_TIMESTAMP로 revokedAt을
+기록한 직후 Java ExecutionClock에서 이미 유효하다고 가정했다.
+IdentityAuthorization은 현재 server clock보다 미래인 revokedAt에는
+기존 권한을 유지하며 매번 CQN을 조회한다. 원본 실패 시 두 clock을
+기록하지 않았으므로 정확한 차이를 측정했다고 주장하지 않는다.
+
+OWN `2e7a6b8b`는 fixture만 수정했다. 실제 authority clock으로
+revokedAt을 기록하고 persisted 값이 현재 clock보다 늦지 않음을
+검사한 뒤 같은 context에서 즉시 권한 거부를 요구한다. sleep이나
+거부 조건 완화는 없다. Java 21과 private 0700 blob 경로에서
+IdentityPersistenceTest 2건이 통과했다. 원본 Maven 로그와 JUnit은
+`attempts/identity-current-revocation-pass.log.gz`와
+`attempts/identity-current-revocation-junit.xml.gz`에 보존했다.
+Production IdentityAuthorization/Repository는 바꾸지 않았다.
