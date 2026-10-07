@@ -8,13 +8,13 @@
   "dependencyBaseline": "de5d587",
   "checks": [
     {
-      "command": "JAVA_HOME=/Library/Java/JavaVirtualMachines/zulu-21.jdk/Contents/Home PATH=Node24:Java21:PATH ./mvnw -f backend/pom.xml -Dtest=GoalInputTest,S2WorkLifecyclePostgresTest,S2WorkActualIntegrationTest test",
+      "command": "JAVA_HOME=/Library/Java/JavaVirtualMachines/zulu-21.jdk/Contents/Home PATH=/Users/n30gu1/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin:/Library/Java/JavaVirtualMachines/zulu-21.jdk/Contents/Home/bin:$PATH ./mvnw -f backend/pom.xml -Dtest=GoalInputTest,S2WorkLifecyclePostgresTest,S2WorkActualIntegrationTest test",
       "observed": "pure4 PASS; partial PostgreSQL5 PASS with primary interface guards; actual integration1 ERROR missing object ID",
       "exitCode": 1,
       "artifact": "s2-work-actual-focused.log.gz"
     },
     {
-      "command": "JAVA_HOME=/Library/Java/JavaVirtualMachines/zulu-21.jdk/Contents/Home PATH=Node24:Java21:PATH ./mvnw -f backend/pom.xml -Dtest=S2WorkActualIntegrationTest test",
+      "command": "JAVA_HOME=/Library/Java/JavaVirtualMachines/zulu-21.jdk/Contents/Home PATH=/Users/n30gu1/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin:/Library/Java/JavaVirtualMachines/zulu-21.jdk/Contents/Home/bin:$PATH ./mvnw -f backend/pom.xml -Dtest=S2WorkActualIntegrationTest test",
       "observed": "actual WorkLifecycle/AssessmentService/ResponsibilityService PostgreSQL integration1 PASS; no business-port mocks",
       "exitCode": 0,
       "artifact": "s2-work-actual-final.log.gz"
