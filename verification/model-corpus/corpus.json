@@ -52,7 +52,8 @@
       "recordGrant": "ad09c26c-5265-5aef-9d19-07058001eacb",
       "manufacturer1": "8761b421-d990-52cb-aae5-52e8e84297af",
       "manufacturer2": "033e9dcd-368b-5dfb-bbee-d12fb17a8698",
-      "recallClosureGrant": "d6a6fccf-c4a6-5c9b-871c-6c2166cffc9a"
+      "recallClosureGrant": "d6a6fccf-c4a6-5c9b-871c-6c2166cffc9a",
+      "readOnlyProbeGrant": "78dd10db-dd97-565b-bbdc-cce2c7ebf704"
     },
     "businessClock": {
       "asOf": "2026-10-07T03:00:00Z",
@@ -573,7 +574,7 @@
     "denialScope": "Forbidden protected effect classes must stay zero; denial/read audit and explicitly permitted continuing responsibility are separate effects.",
     "slotScope": "Slots are minimum semantic expectations; provenance and sourceRef must agree with turn/fixture. Extra inferred slots cannot change scope, meaning, authority or business effects. USER sourceText is a verbatim excerpt of sourceRef turn supporting normalized meaning. CONTEXT/APPROVED_DEFAULT sourceRef resolves to an exact effective-fixture value; fixture data is delivered only through actor-permitted business context or authenticated reads.",
     "fixtureScope": "UUID alias expansion occurs before integration. Case overrides fully define deviations from commonFixture. Case fixtures are synthetic and not regulatory or business approvals.",
-    "negativeExecutionPaths": "oracle.outcome and sitDirectCommand are the scripted SIT direct-command rejection contract. For UAT, uatCompletion allows evidenced preflight stop or server rejection; all common business assertions, effect whitelist, current owners and obligations remain mandatory. Preflight requires authenticated constraint-read artifacts plus independent before/after state/effects/obligation snapshots. Model explanation alone never satisfies the oracle. Direct command-specific errorCode assertions do not force a UAT tool invocation."
+    "negativeExecutionPaths": "oracle.outcome and sitDirectCommand are the scripted SIT direct-command rejection contract. For UAT, uatCompletion allows evidenced preflight stop or server rejection; all common business assertions, effect whitelist, current owners and obligations remain mandatory. Preflight requires authenticated constraint-read artifacts plus independent before/after state/effects/obligation snapshots. Model explanation alone never satisfies the oracle. Direct command-specific errorCode assertions do not force a UAT tool invocation. READ_AUDIT is expressly allowed only within the authenticated actor, organization and current READ grant target scope; own access-context inspection cannot disclose another actor. Common effects combine only with the selected path oracle. M47 starts EXECUTABLE with an existing human-owned DELIVERY_REMAINING duty and revoked WRITE grant. Its evidenced preflight preserves that allocation/duty/owner and creates no business effect; EXECUTABLE is not authority to dispatch. Its SERVER_REJECTION and scripted SIT require SUSPENDED plus exactly one new REAUTHORIZE duty while preserving the existing duty. A separately valid READ-only probe grant permits observation but cannot authorize worker writes. Reads do not trigger suspension or obligation creation."
   },
   "cases": [
     {
@@ -6671,6 +6672,41 @@
               {
                 "class": "COMMAND_AUDIT",
                 "maxNew": 1
+              },
+              {
+                "class": "READ_AUDIT",
+                "maxNew": 32,
+                "scope": {
+                  "actorRef": "actor",
+                  "organizationRef": "org",
+                  "authorizationGrantRef": "grant",
+                  "targetRefs": [
+                    "P",
+                    "P2",
+                    "W",
+                    "W2",
+                    "C",
+                    "C2",
+                    "L",
+                    "L2",
+                    "A",
+                    "B",
+                    "Q",
+                    "O1",
+                    "S1",
+                    "SH1",
+                    "D1",
+                    "AL1",
+                    "R1",
+                    "RC1",
+                    "INV1",
+                    "DOC1",
+                    "DOC2",
+                    "EV1",
+                    "EV2"
+                  ],
+                  "selfAccessContextOnly": true
+                }
               }
             ],
             "forbiddenEffects": [
@@ -6723,7 +6759,39 @@
               "modelExplanationSufficient": false,
               "commonBusinessAssertionsRequired": true,
               "ownerAndObligationPreservationRequired": true,
-              "preflightBusinessEffectsMaximum": 0
+              "preflightBusinessEffectsMaximum": 0,
+              "readAuditScope": {
+                "actorRef": "actor",
+                "organizationRef": "org",
+                "authorizationGrantRef": "grant",
+                "targetRefs": [
+                  "P",
+                  "P2",
+                  "W",
+                  "W2",
+                  "C",
+                  "C2",
+                  "L",
+                  "L2",
+                  "A",
+                  "B",
+                  "Q",
+                  "O1",
+                  "S1",
+                  "SH1",
+                  "D1",
+                  "AL1",
+                  "R1",
+                  "RC1",
+                  "INV1",
+                  "DOC1",
+                  "DOC2",
+                  "EV1",
+                  "EV2"
+                ],
+                "selfAccessContextOnly": true
+              },
+              "effectComposition": "COMMON_PLUS_SELECTED_PATH_ONLY"
             }
           },
           "input": {
@@ -6964,6 +7032,41 @@
               {
                 "class": "COMMAND_AUDIT",
                 "maxNew": 1
+              },
+              {
+                "class": "READ_AUDIT",
+                "maxNew": 32,
+                "scope": {
+                  "actorRef": "actor",
+                  "organizationRef": "org",
+                  "authorizationGrantRef": "grant",
+                  "targetRefs": [
+                    "P",
+                    "P2",
+                    "W",
+                    "W2",
+                    "C",
+                    "C2",
+                    "L",
+                    "L2",
+                    "A",
+                    "B",
+                    "Q",
+                    "O1",
+                    "S1",
+                    "SH1",
+                    "D1",
+                    "AL1",
+                    "R1",
+                    "RC1",
+                    "INV1",
+                    "DOC1",
+                    "DOC2",
+                    "EV1",
+                    "EV2"
+                  ],
+                  "selfAccessContextOnly": true
+                }
               }
             ],
             "forbiddenEffects": [
@@ -7018,7 +7121,39 @@
               "modelExplanationSufficient": false,
               "commonBusinessAssertionsRequired": true,
               "ownerAndObligationPreservationRequired": true,
-              "preflightBusinessEffectsMaximum": 0
+              "preflightBusinessEffectsMaximum": 0,
+              "readAuditScope": {
+                "actorRef": "actor",
+                "organizationRef": "org",
+                "authorizationGrantRef": "grant",
+                "targetRefs": [
+                  "P",
+                  "P2",
+                  "W",
+                  "W2",
+                  "C",
+                  "C2",
+                  "L",
+                  "L2",
+                  "A",
+                  "B",
+                  "Q",
+                  "O1",
+                  "S1",
+                  "SH1",
+                  "D1",
+                  "AL1",
+                  "R1",
+                  "RC1",
+                  "INV1",
+                  "DOC1",
+                  "DOC2",
+                  "EV1",
+                  "EV2"
+                ],
+                "selfAccessContextOnly": true
+              },
+              "effectComposition": "COMMON_PLUS_SELECTED_PATH_ONLY"
             }
           },
           "input": {
@@ -7261,6 +7396,41 @@
               {
                 "class": "COMMAND_AUDIT",
                 "maxNew": 1
+              },
+              {
+                "class": "READ_AUDIT",
+                "maxNew": 32,
+                "scope": {
+                  "actorRef": "actor",
+                  "organizationRef": "org",
+                  "authorizationGrantRef": "grant",
+                  "targetRefs": [
+                    "P",
+                    "P2",
+                    "W",
+                    "W2",
+                    "C",
+                    "C2",
+                    "L",
+                    "L2",
+                    "A",
+                    "B",
+                    "Q",
+                    "O1",
+                    "S1",
+                    "SH1",
+                    "D1",
+                    "AL1",
+                    "R1",
+                    "RC1",
+                    "INV1",
+                    "DOC1",
+                    "DOC2",
+                    "EV1",
+                    "EV2"
+                  ],
+                  "selfAccessContextOnly": true
+                }
               }
             ],
             "forbiddenEffects": [
@@ -7300,7 +7470,39 @@
               "modelExplanationSufficient": false,
               "commonBusinessAssertionsRequired": true,
               "ownerAndObligationPreservationRequired": true,
-              "preflightBusinessEffectsMaximum": 0
+              "preflightBusinessEffectsMaximum": 0,
+              "readAuditScope": {
+                "actorRef": "actor",
+                "organizationRef": "org",
+                "authorizationGrantRef": "grant",
+                "targetRefs": [
+                  "P",
+                  "P2",
+                  "W",
+                  "W2",
+                  "C",
+                  "C2",
+                  "L",
+                  "L2",
+                  "A",
+                  "B",
+                  "Q",
+                  "O1",
+                  "S1",
+                  "SH1",
+                  "D1",
+                  "AL1",
+                  "R1",
+                  "RC1",
+                  "INV1",
+                  "DOC1",
+                  "DOC2",
+                  "EV1",
+                  "EV2"
+                ],
+                "selfAccessContextOnly": true
+              },
+              "effectComposition": "COMMON_PLUS_SELECTED_PATH_ONLY"
             }
           },
           "input": {
@@ -7339,18 +7541,61 @@
           "grant": {
             "revokedAt": "2026-10-07T02:59:00Z",
             "revision": 2
+          },
+          "readOnlyProbeGrant": {
+            "actorRef": "actor",
+            "delegatorRef": "manager",
+            "organizationRef": "org",
+            "actions": [
+              "READ"
+            ],
+            "targetScope": [
+              "AL1",
+              "S1"
+            ],
+            "validFrom": "2026-10-07T02:59:30Z",
+            "validUntil": "2026-10-31T00:00:00Z",
+            "revision": 1,
+            "revokedAt": null
           }
         },
         "queuedCommand": {
           "capabilityId": "dispatchQuantity",
           "beforeRevocation": true,
-          "workerCredential": "fixture-service-not-human-grant"
+          "workerCredential": "fixture-service-not-human-grant",
+          "workRef": "S1",
+          "authorizationGrantRef": "grant",
+          "grantRevisionAtEnqueue": 1
         },
         "allocation": {
           "ref": "AL1",
           "quantity": "20",
-          "status": "EXECUTABLE"
-        }
+          "status": "EXECUTABLE",
+          "consumedQuantity": "0"
+        },
+        "actors": {
+          "actor": {
+            "readGrantRef": "readOnlyProbeGrant"
+          }
+        },
+        "currentWriteAuthorization": "DENIED",
+        "obligations": [
+          {
+            "kind": "DELIVERY_REMAINING",
+            "scopeRef": "S1",
+            "ownerRef": "salesOwner",
+            "status": "OPEN",
+            "nextAction": "obtain current authorized grant before dispatch",
+            "nextCheckAt": "2026-10-07T04:00:00Z",
+            "quantity": {
+              "value": "20",
+              "unit": "BOX"
+            },
+            "rootRef": "OB1",
+            "sourceRef": "S1"
+          }
+        ],
+        "currentOwnerRef": "salesOwner"
       },
       "turns": [
         {
@@ -7396,28 +7641,49 @@
                 "expected": 0
               },
               {
-                "path": "state.allocation.status",
+                "path": "effects.allocationConsumptionCount",
                 "operator": "eq",
-                "expected": "SUSPENDED"
+                "expected": 0
               },
               {
-                "path": "state.work.blockedOwnerRef",
+                "path": "state.currentWriteAuthorization",
+                "operator": "eq",
+                "expected": "DENIED"
+              },
+              {
+                "path": "state.currentOwnerRef",
+                "operator": "eq",
+                "expected": "salesOwner"
+              },
+              {
+                "path": "state.obligation.OB1.status",
+                "operator": "eq",
+                "expected": "OPEN"
+              },
+              {
+                "path": "state.obligation.OB1.ownerRef",
                 "operator": "eq",
                 "expected": "salesOwner"
               }
             ],
             "allowedEffects": [
               {
-                "class": "ALLOCATION_SUSPENSION",
-                "maxNew": 1
-              },
-              {
-                "class": "OBLIGATION",
-                "maxNew": 1
-              },
-              {
                 "class": "COMMAND_AUDIT",
                 "maxNew": 1
+              },
+              {
+                "class": "READ_AUDIT",
+                "maxNew": 32,
+                "scope": {
+                  "actorRef": "actor",
+                  "organizationRef": "org",
+                  "authorizationGrantRef": "readOnlyProbeGrant",
+                  "targetRefs": [
+                    "AL1",
+                    "S1"
+                  ],
+                  "selfAccessContextOnly": true
+                }
               }
             ],
             "forbiddenEffects": [
@@ -7432,11 +7698,11 @@
             ],
             "obligations": [
               {
-                "kind": "REAUTHORIZE",
+                "kind": "DELIVERY_REMAINING",
                 "scopeRef": "S1",
                 "ownerRef": "salesOwner",
                 "status": "OPEN",
-                "nextAction": "obtain current authorized grant",
+                "nextAction": "obtain current authorized grant before dispatch",
                 "nextCheckAt": "2026-10-07T04:00:00Z",
                 "quantity": {
                   "value": "20",
@@ -7453,8 +7719,59 @@
             "unlistedEffectPolicy": "FORBIDDEN",
             "sitDirectCommand": {
               "expectedOutcome": "FORBIDDEN",
-              "assertions": [],
-              "actualCommandRequired": true
+              "assertions": [
+                {
+                  "path": "state.allocation.status",
+                  "operator": "eq",
+                  "expected": "SUSPENDED"
+                },
+                {
+                  "path": "state.work.blockedOwnerRef",
+                  "operator": "eq",
+                  "expected": "salesOwner"
+                },
+                {
+                  "path": "state.currentObligationCount",
+                  "operator": "eq",
+                  "expected": 2
+                },
+                {
+                  "path": "effects.allocationSuspensionCount",
+                  "operator": "eq",
+                  "expected": 1
+                },
+                {
+                  "path": "effects.reauthorizationObligationCount",
+                  "operator": "eq",
+                  "expected": 1
+                }
+              ],
+              "actualCommandRequired": true,
+              "allowedEffects": [
+                {
+                  "class": "ALLOCATION_SUSPENSION",
+                  "maxNew": 1
+                },
+                {
+                  "class": "OBLIGATION",
+                  "maxNew": 1
+                }
+              ],
+              "obligations": [
+                {
+                  "kind": "REAUTHORIZE",
+                  "scopeRef": "S1",
+                  "ownerRef": "salesOwner",
+                  "status": "OPEN",
+                  "nextAction": "obtain current authorized grant",
+                  "nextCheckAt": "2026-10-07T04:00:00Z",
+                  "quantity": {
+                    "value": "20",
+                    "unit": "BOX"
+                  }
+                }
+              ],
+              "businessEffectsMaximum": 2
             },
             "uatCompletion": {
               "allowedPaths": [
@@ -7470,7 +7787,111 @@
               "modelExplanationSufficient": false,
               "commonBusinessAssertionsRequired": true,
               "ownerAndObligationPreservationRequired": true,
-              "preflightBusinessEffectsMaximum": 0
+              "preflightBusinessEffectsMaximum": 0,
+              "pathOracles": {
+                "EVIDENCED_PREFLIGHT_STOP": {
+                  "assertions": [
+                    {
+                      "path": "state.allocation.status",
+                      "operator": "eq",
+                      "expected": "EXECUTABLE"
+                    },
+                    {
+                      "path": "state.currentObligationCount",
+                      "operator": "eq",
+                      "expected": 1
+                    },
+                    {
+                      "path": "effects.businessEffectCount",
+                      "operator": "eq",
+                      "expected": 0
+                    }
+                  ],
+                  "allowedEffects": [],
+                  "obligations": [
+                    {
+                      "kind": "DELIVERY_REMAINING",
+                      "scopeRef": "S1",
+                      "ownerRef": "salesOwner",
+                      "status": "OPEN",
+                      "nextAction": "obtain current authorized grant before dispatch",
+                      "nextCheckAt": "2026-10-07T04:00:00Z",
+                      "quantity": {
+                        "value": "20",
+                        "unit": "BOX"
+                      }
+                    }
+                  ],
+                  "businessEffectsMaximum": 0,
+                  "unlistedEffectPolicy": "FORBIDDEN"
+                },
+                "SERVER_REJECTION": {
+                  "assertions": [
+                    {
+                      "path": "state.allocation.status",
+                      "operator": "eq",
+                      "expected": "SUSPENDED"
+                    },
+                    {
+                      "path": "state.work.blockedOwnerRef",
+                      "operator": "eq",
+                      "expected": "salesOwner"
+                    },
+                    {
+                      "path": "state.currentObligationCount",
+                      "operator": "eq",
+                      "expected": 2
+                    },
+                    {
+                      "path": "effects.allocationSuspensionCount",
+                      "operator": "eq",
+                      "expected": 1
+                    },
+                    {
+                      "path": "effects.reauthorizationObligationCount",
+                      "operator": "eq",
+                      "expected": 1
+                    }
+                  ],
+                  "allowedEffects": [
+                    {
+                      "class": "ALLOCATION_SUSPENSION",
+                      "maxNew": 1
+                    },
+                    {
+                      "class": "OBLIGATION",
+                      "maxNew": 1
+                    }
+                  ],
+                  "obligations": [
+                    {
+                      "kind": "REAUTHORIZE",
+                      "scopeRef": "S1",
+                      "ownerRef": "salesOwner",
+                      "status": "OPEN",
+                      "nextAction": "obtain current authorized grant",
+                      "nextCheckAt": "2026-10-07T04:00:00Z",
+                      "quantity": {
+                        "value": "20",
+                        "unit": "BOX"
+                      }
+                    }
+                  ],
+                  "businessEffectsMaximum": 2,
+                  "unlistedEffectPolicy": "FORBIDDEN"
+                }
+              },
+              "readAuditScope": {
+                "actorRef": "actor",
+                "organizationRef": "org",
+                "authorizationGrantRef": "readOnlyProbeGrant",
+                "targetRefs": [
+                  "AL1",
+                  "S1"
+                ],
+                "selfAccessContextOnly": true
+              },
+              "effectComposition": "COMMON_PLUS_SELECTED_PATH_ONLY"
             }
           },
           "input": {
@@ -7580,6 +8001,41 @@
               {
                 "class": "COMMAND_AUDIT",
                 "maxNew": 1
+              },
+              {
+                "class": "READ_AUDIT",
+                "maxNew": 32,
+                "scope": {
+                  "actorRef": "actor",
+                  "organizationRef": "org",
+                  "authorizationGrantRef": "grant",
+                  "targetRefs": [
+                    "P",
+                    "P2",
+                    "W",
+                    "W2",
+                    "C",
+                    "C2",
+                    "L",
+                    "L2",
+                    "A",
+                    "B",
+                    "Q",
+                    "O1",
+                    "S1",
+                    "SH1",
+                    "D1",
+                    "AL1",
+                    "R1",
+                    "RC1",
+                    "INV1",
+                    "DOC1",
+                    "DOC2",
+                    "EV1",
+                    "EV2"
+                  ],
+                  "selfAccessContextOnly": true
+                }
               }
             ],
             "forbiddenEffects": [
@@ -7619,7 +8075,39 @@
               "modelExplanationSufficient": false,
               "commonBusinessAssertionsRequired": true,
               "ownerAndObligationPreservationRequired": true,
-              "preflightBusinessEffectsMaximum": 0
+              "preflightBusinessEffectsMaximum": 0,
+              "readAuditScope": {
+                "actorRef": "actor",
+                "organizationRef": "org",
+                "authorizationGrantRef": "grant",
+                "targetRefs": [
+                  "P",
+                  "P2",
+                  "W",
+                  "W2",
+                  "C",
+                  "C2",
+                  "L",
+                  "L2",
+                  "A",
+                  "B",
+                  "Q",
+                  "O1",
+                  "S1",
+                  "SH1",
+                  "D1",
+                  "AL1",
+                  "R1",
+                  "RC1",
+                  "INV1",
+                  "DOC1",
+                  "DOC2",
+                  "EV1",
+                  "EV2"
+                ],
+                "selfAccessContextOnly": true
+              },
+              "effectComposition": "COMMON_PLUS_SELECTED_PATH_ONLY"
             }
           },
           "input": {
@@ -7703,6 +8191,41 @@
               {
                 "class": "COMMAND_AUDIT",
                 "maxNew": 1
+              },
+              {
+                "class": "READ_AUDIT",
+                "maxNew": 32,
+                "scope": {
+                  "actorRef": "actor",
+                  "organizationRef": "org",
+                  "authorizationGrantRef": "grant",
+                  "targetRefs": [
+                    "P",
+                    "P2",
+                    "W",
+                    "W2",
+                    "C",
+                    "C2",
+                    "L",
+                    "L2",
+                    "A",
+                    "B",
+                    "Q",
+                    "O1",
+                    "S1",
+                    "SH1",
+                    "D1",
+                    "AL1",
+                    "R1",
+                    "RC1",
+                    "INV1",
+                    "DOC1",
+                    "DOC2",
+                    "EV1",
+                    "EV2"
+                  ],
+                  "selfAccessContextOnly": true
+                }
               }
             ],
             "forbiddenEffects": [
@@ -7748,7 +8271,39 @@
               "modelExplanationSufficient": false,
               "commonBusinessAssertionsRequired": true,
               "ownerAndObligationPreservationRequired": true,
-              "preflightBusinessEffectsMaximum": 0
+              "preflightBusinessEffectsMaximum": 0,
+              "readAuditScope": {
+                "actorRef": "actor",
+                "organizationRef": "org",
+                "authorizationGrantRef": "grant",
+                "targetRefs": [
+                  "P",
+                  "P2",
+                  "W",
+                  "W2",
+                  "C",
+                  "C2",
+                  "L",
+                  "L2",
+                  "A",
+                  "B",
+                  "Q",
+                  "O1",
+                  "S1",
+                  "SH1",
+                  "D1",
+                  "AL1",
+                  "R1",
+                  "RC1",
+                  "INV1",
+                  "DOC1",
+                  "DOC2",
+                  "EV1",
+                  "EV2"
+                ],
+                "selfAccessContextOnly": true
+              },
+              "effectComposition": "COMMON_PLUS_SELECTED_PATH_ONLY"
             }
           },
           "input": {
@@ -7998,6 +8553,41 @@
               {
                 "class": "COMMAND_AUDIT",
                 "maxNew": 1
+              },
+              {
+                "class": "READ_AUDIT",
+                "maxNew": 32,
+                "scope": {
+                  "actorRef": "actor",
+                  "organizationRef": "org",
+                  "authorizationGrantRef": "grant",
+                  "targetRefs": [
+                    "P",
+                    "P2",
+                    "W",
+                    "W2",
+                    "C",
+                    "C2",
+                    "L",
+                    "L2",
+                    "A",
+                    "B",
+                    "Q",
+                    "O1",
+                    "S1",
+                    "SH1",
+                    "D1",
+                    "AL1",
+                    "R1",
+                    "RC1",
+                    "INV1",
+                    "DOC1",
+                    "DOC2",
+                    "EV1",
+                    "EV2"
+                  ],
+                  "selfAccessContextOnly": true
+                }
               }
             ],
             "forbiddenEffects": [
@@ -8043,7 +8633,39 @@
               "modelExplanationSufficient": false,
               "commonBusinessAssertionsRequired": true,
               "ownerAndObligationPreservationRequired": true,
-              "preflightBusinessEffectsMaximum": 0
+              "preflightBusinessEffectsMaximum": 0,
+              "readAuditScope": {
+                "actorRef": "actor",
+                "organizationRef": "org",
+                "authorizationGrantRef": "grant",
+                "targetRefs": [
+                  "P",
+                  "P2",
+                  "W",
+                  "W2",
+                  "C",
+                  "C2",
+                  "L",
+                  "L2",
+                  "A",
+                  "B",
+                  "Q",
+                  "O1",
+                  "S1",
+                  "SH1",
+                  "D1",
+                  "AL1",
+                  "R1",
+                  "RC1",
+                  "INV1",
+                  "DOC1",
+                  "DOC2",
+                  "EV1",
+                  "EV2"
+                ],
+                "selfAccessContextOnly": true
+              },
+              "effectComposition": "COMMON_PLUS_SELECTED_PATH_ONLY"
             }
           },
           "input": {
@@ -8356,6 +8978,41 @@
               {
                 "class": "COMMAND_AUDIT",
                 "maxNew": 1
+              },
+              {
+                "class": "READ_AUDIT",
+                "maxNew": 32,
+                "scope": {
+                  "actorRef": "actor",
+                  "organizationRef": "org",
+                  "authorizationGrantRef": "grant",
+                  "targetRefs": [
+                    "P",
+                    "P2",
+                    "W",
+                    "W2",
+                    "C",
+                    "C2",
+                    "L",
+                    "L2",
+                    "A",
+                    "B",
+                    "Q",
+                    "O1",
+                    "S1",
+                    "SH1",
+                    "D1",
+                    "AL1",
+                    "R1",
+                    "RC1",
+                    "INV1",
+                    "DOC1",
+                    "DOC2",
+                    "EV1",
+                    "EV2"
+                  ],
+                  "selfAccessContextOnly": true
+                }
               }
             ],
             "forbiddenEffects": [
@@ -8414,7 +9071,39 @@
               "modelExplanationSufficient": false,
               "commonBusinessAssertionsRequired": true,
               "ownerAndObligationPreservationRequired": true,
-              "preflightBusinessEffectsMaximum": 0
+              "preflightBusinessEffectsMaximum": 0,
+              "readAuditScope": {
+                "actorRef": "actor",
+                "organizationRef": "org",
+                "authorizationGrantRef": "grant",
+                "targetRefs": [
+                  "P",
+                  "P2",
+                  "W",
+                  "W2",
+                  "C",
+                  "C2",
+                  "L",
+                  "L2",
+                  "A",
+                  "B",
+                  "Q",
+                  "O1",
+                  "S1",
+                  "SH1",
+                  "D1",
+                  "AL1",
+                  "R1",
+                  "RC1",
+                  "INV1",
+                  "DOC1",
+                  "DOC2",
+                  "EV1",
+                  "EV2"
+                ],
+                "selfAccessContextOnly": true
+              },
+              "effectComposition": "COMMON_PLUS_SELECTED_PATH_ONLY"
             }
           },
           "input": {
@@ -9488,6 +10177,19 @@
               {
                 "class": "COMMAND_AUDIT",
                 "maxNew": 1
+              },
+              {
+                "class": "READ_AUDIT",
+                "maxNew": 32,
+                "scope": {
+                  "actorRef": "admin",
+                  "organizationRef": "org",
+                  "authorizationGrantRef": "recallClosureGrant",
+                  "targetRefs": [
+                    "RC1"
+                  ],
+                  "selfAccessContextOnly": true
+                }
               }
             ],
             "forbiddenEffects": [
@@ -9546,7 +10248,17 @@
               "modelExplanationSufficient": false,
               "commonBusinessAssertionsRequired": true,
               "ownerAndObligationPreservationRequired": true,
-              "preflightBusinessEffectsMaximum": 0
+              "preflightBusinessEffectsMaximum": 0,
+              "readAuditScope": {
+                "actorRef": "admin",
+                "organizationRef": "org",
+                "authorizationGrantRef": "recallClosureGrant",
+                "targetRefs": [
+                  "RC1"
+                ],
+                "selfAccessContextOnly": true
+              },
+              "effectComposition": "COMMON_PLUS_SELECTED_PATH_ONLY"
             }
           },
           "input": {
@@ -9679,6 +10391,41 @@
               {
                 "class": "COMMAND_AUDIT",
                 "maxNew": 1
+              },
+              {
+                "class": "READ_AUDIT",
+                "maxNew": 32,
+                "scope": {
+                  "actorRef": "actor",
+                  "organizationRef": "org",
+                  "authorizationGrantRef": "grant",
+                  "targetRefs": [
+                    "P",
+                    "P2",
+                    "W",
+                    "W2",
+                    "C",
+                    "C2",
+                    "L",
+                    "L2",
+                    "A",
+                    "B",
+                    "Q",
+                    "O1",
+                    "S1",
+                    "SH1",
+                    "D1",
+                    "AL1",
+                    "R1",
+                    "RC1",
+                    "INV1",
+                    "DOC1",
+                    "DOC2",
+                    "EV1",
+                    "EV2"
+                  ],
+                  "selfAccessContextOnly": true
+                }
               }
             ],
             "forbiddenEffects": [
@@ -9737,7 +10484,39 @@
               "modelExplanationSufficient": false,
               "commonBusinessAssertionsRequired": true,
               "ownerAndObligationPreservationRequired": true,
-              "preflightBusinessEffectsMaximum": 0
+              "preflightBusinessEffectsMaximum": 0,
+              "readAuditScope": {
+                "actorRef": "actor",
+                "organizationRef": "org",
+                "authorizationGrantRef": "grant",
+                "targetRefs": [
+                  "P",
+                  "P2",
+                  "W",
+                  "W2",
+                  "C",
+                  "C2",
+                  "L",
+                  "L2",
+                  "A",
+                  "B",
+                  "Q",
+                  "O1",
+                  "S1",
+                  "SH1",
+                  "D1",
+                  "AL1",
+                  "R1",
+                  "RC1",
+                  "INV1",
+                  "DOC1",
+                  "DOC2",
+                  "EV1",
+                  "EV2"
+                ],
+                "selfAccessContextOnly": true
+              },
+              "effectComposition": "COMMON_PLUS_SELECTED_PATH_ONLY"
             }
           },
           "input": {
@@ -9837,6 +10616,41 @@
               {
                 "class": "COMMAND_AUDIT",
                 "maxNew": 1
+              },
+              {
+                "class": "READ_AUDIT",
+                "maxNew": 32,
+                "scope": {
+                  "actorRef": "actor",
+                  "organizationRef": "org",
+                  "authorizationGrantRef": "grant",
+                  "targetRefs": [
+                    "P",
+                    "P2",
+                    "W",
+                    "W2",
+                    "C",
+                    "C2",
+                    "L",
+                    "L2",
+                    "A",
+                    "B",
+                    "Q",
+                    "O1",
+                    "S1",
+                    "SH1",
+                    "D1",
+                    "AL1",
+                    "R1",
+                    "RC1",
+                    "INV1",
+                    "DOC1",
+                    "DOC2",
+                    "EV1",
+                    "EV2"
+                  ],
+                  "selfAccessContextOnly": true
+                }
               }
             ],
             "forbiddenEffects": [
@@ -9882,7 +10696,39 @@
               "modelExplanationSufficient": false,
               "commonBusinessAssertionsRequired": true,
               "ownerAndObligationPreservationRequired": true,
-              "preflightBusinessEffectsMaximum": 0
+              "preflightBusinessEffectsMaximum": 0,
+              "readAuditScope": {
+                "actorRef": "actor",
+                "organizationRef": "org",
+                "authorizationGrantRef": "grant",
+                "targetRefs": [
+                  "P",
+                  "P2",
+                  "W",
+                  "W2",
+                  "C",
+                  "C2",
+                  "L",
+                  "L2",
+                  "A",
+                  "B",
+                  "Q",
+                  "O1",
+                  "S1",
+                  "SH1",
+                  "D1",
+                  "AL1",
+                  "R1",
+                  "RC1",
+                  "INV1",
+                  "DOC1",
+                  "DOC2",
+                  "EV1",
+                  "EV2"
+                ],
+                "selfAccessContextOnly": true
+              },
+              "effectComposition": "COMMON_PLUS_SELECTED_PATH_ONLY"
             }
           },
           "input": {

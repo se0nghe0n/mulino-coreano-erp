@@ -413,6 +413,88 @@ def validate(data):
                 require(not any(a.get('path') == 'response.errorCode'
                                 for a in oracle.get('assertions', [])),
                         f'{loc}: UAT common oracle must not force direct server error')
+                read_scope = uat.get('readAuditScope', {})
+                auth_actor_ref = effective.get('authentication', {}).get('actorRef')
+                auth_actor = effective.get('actors', {}).get(auth_actor_ref, {})
+                read_grant_ref = auth_actor.get('readGrantRef', auth_actor.get('grantRef'))
+                read_grant = effective.get('grants', {}).get(read_grant_ref, {})
+                expected_read_scope = {
+                    'actorRef': auth_actor_ref, 'organizationRef': 'org',
+                    'authorizationGrantRef': read_grant_ref,
+                    'targetRefs': read_grant.get('targetScope'),
+                    'selfAccessContextOnly': True}
+                require(read_scope == expected_read_scope
+                        and read_grant.get('actorRef') == auth_actor_ref
+                        and 'READ' in read_grant.get('actions', [])
+                        and read_grant.get('revokedAt') is None
+                        and read_grant.get('validFrom', '') <= effective['businessClock']['asOf']
+                        < read_grant.get('validUntil', ''),
+                        f'{loc}: constraint reads need current actor-scoped READ authorization')
+                read_effects = [e for e in oracle.get('allowedEffects', []) if e.get('class') == 'READ_AUDIT']
+                require(len(read_effects) == 1 and read_effects[0].get('maxNew', 0) > 0
+                        and read_effects[0].get('scope') == read_scope,
+                        f'{loc}: grounded negative path must allow scoped READ_AUDIT')
+                require(uat.get('effectComposition') == 'COMMON_PLUS_SELECTED_PATH_ONLY',
+                        f'{loc}: only selected completion path effects can apply')
+                if cid == 'M47':
+                    require(effective.get('allocation', {}).get('status') == 'EXECUTABLE',
+                            'M47: preserve initial EXECUTABLE baseline')
+                    require(read_grant.get('actions') == ['READ']
+                            and read_grant.get('targetScope') == ['AL1', 'S1']
+                            and effective.get('grants', {}).get('grant', {}).get('revokedAt'),
+                            'M47: observation grant must not revive revoked WRITE authorization')
+                    baseline_duties = effective.get('obligations', [])
+                    require(len(baseline_duties) == 1
+                            and baseline_duties[0].get('rootRef') == 'OB1'
+                            and baseline_duties[0].get('kind') == 'DELIVERY_REMAINING'
+                            and baseline_duties[0].get('ownerRef') == 'salesOwner',
+                            'M47: preflight baseline needs existing human delivery responsibility')
+                    paths = uat.get('pathOracles', {})
+                    preflight = paths.get('EVIDENCED_PREFLIGHT_STOP', {})
+                    rejection = paths.get('SERVER_REJECTION', {})
+                    def path_values(path):
+                        return {a.get('path'): a.get('expected') for a in path.get('assertions', [])
+                                if a.get('operator') == 'eq'}
+                    pv, rv = path_values(preflight), path_values(rejection)
+                    require(preflight.get('businessEffectsMaximum') == 0
+                            and preflight.get('allowedEffects') == []
+                            and preflight.get('unlistedEffectPolicy') == 'FORBIDDEN'
+                            and pv.get('state.allocation.status') == 'EXECUTABLE'
+                            and pv.get('state.currentObligationCount') == 1
+                            and pv.get('effects.businessEffectCount') == 0
+                            and preflight.get('obligations') == oracle.get('obligations'),
+                            'M47: preflight must preserve allocation/duty and create no business effects')
+                    expected_rejection_effects = [
+                        {'class': 'ALLOCATION_SUSPENSION', 'maxNew': 1},
+                        {'class': 'OBLIGATION', 'maxNew': 1}]
+                    require(rejection.get('businessEffectsMaximum') == 2
+                            and rejection.get('allowedEffects') == expected_rejection_effects
+                            and rejection.get('unlistedEffectPolicy') == 'FORBIDDEN'
+                            and rv.get('state.allocation.status') == 'SUSPENDED'
+                            and rv.get('state.currentObligationCount') == 2
+                            and rv.get('effects.allocationSuspensionCount') == 1
+                            and rv.get('effects.reauthorizationObligationCount') == 1,
+                            'M47: server rejection must suspend and create exactly one reauthorization duty')
+                    rd = rejection.get('obligations', [])
+                    require(len(rd) == 1 and rd[0].get('kind') == 'REAUTHORIZE'
+                            and rd[0].get('ownerRef') == 'salesOwner'
+                            and rd[0].get('nextAction') and rd[0].get('nextCheckAt'),
+                            'M47: server rejection must retain new duty owner/action/check')
+                    require(all(sit.get(k) == rejection.get(k)
+                                for k in ('assertions', 'allowedEffects', 'obligations', 'businessEffectsMaximum')),
+                            'M47: SIT must retain the same mandatory server rejection oracle')
+                    require({e.get('class') for e in oracle.get('allowedEffects', [])}
+                            <= {'READ_AUDIT', 'COMMAND_AUDIT'},
+                            'M47: safety transitions cannot be common preflight effects')
+                    cv = {a.get('path'): a.get('expected') for a in oracle.get('assertions', [])}
+                    require(cv.get('effects.dispatchCount') == 0
+                            and cv.get('effects.allocationConsumptionCount') == 0
+                            and cv.get('state.currentWriteAuthorization') == 'DENIED'
+                            and cv.get('state.currentOwnerRef') == 'salesOwner'
+                            and cv.get('state.obligation.OB1.status') == 'OPEN'
+                            and cv.get('state.obligation.OB1.ownerRef') == 'salesOwner',
+                            'M47: both paths must retain no unauthorized execution and original responsibility')
+
 
             assertions = oracle.get('assertions', [])
             require(bool(assertions), f'{loc}: no independent assertion')

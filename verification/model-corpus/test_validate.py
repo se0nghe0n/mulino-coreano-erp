@@ -240,5 +240,95 @@ class CorpusValidationTests(unittest.TestCase):
             'actors', {'readAgent': {'roles': ['READ']}}), 'WRITE role must remain distinct')
 
 
+    def test_all_negative_paths_allow_scoped_read_audit(self):
+        negatives = [t['oracle'] for c in self.data['cases'] for t in c['turns']
+                     if 'uatCompletion' in t['oracle']]
+        self.assertEqual(11, len(negatives))
+        for oracle in negatives:
+            audits = [e for e in oracle['allowedEffects'] if e['class'] == 'READ_AUDIT']
+            self.assertEqual(1, len(audits))
+            self.assertEqual(oracle['uatCompletion']['readAuditScope'], audits[0]['scope'])
+            self.assertGreater(audits[0]['maxNew'], 0)
+        self.assertEqual([], VALIDATOR.validate(self.data))
+
+    def test_negative_preflight_without_read_audit_fails(self):
+        def mutate(d):
+            oracle = d['cases'][56]['turns'][0]['oracle']
+            oracle['allowedEffects'] = [e for e in oracle['allowedEffects'] if e['class'] != 'READ_AUDIT']
+        self.reject(mutate, 'must allow scoped READ_AUDIT')
+
+    def test_read_audit_cannot_read_another_actor_scope(self):
+        def mutate(d):
+            oracle = d['cases'][56]['turns'][0]['oracle']
+            oracle['uatCompletion']['readAuditScope']['actorRef'] = 'actor'
+        self.reject(mutate, 'current actor-scoped READ authorization')
+
+    def test_read_audit_cannot_expand_targets(self):
+        def mutate(d):
+            oracle = d['cases'][56]['turns'][0]['oracle']
+            oracle['uatCompletion']['readAuditScope']['targetRefs'].append('otherOrg')
+        self.reject(mutate, 'current actor-scoped READ authorization')
+
+    def test_m47_preflight_preserves_existing_allocation_and_human_duty(self):
+        case = self.data['cases'][46]
+        paths = case['turns'][0]['oracle']['uatCompletion']['pathOracles']
+        preflight = paths['EVIDENCED_PREFLIGHT_STOP']
+        values = {a['path']: a['expected'] for a in preflight['assertions']}
+        self.assertEqual(case['fixture']['allocation']['status'], values['state.allocation.status'])
+        self.assertEqual(len(case['fixture']['obligations']), values['state.currentObligationCount'])
+        self.assertEqual(0, preflight['businessEffectsMaximum'])
+        self.assertEqual([], preflight['allowedEffects'])
+        self.assertEqual('salesOwner', case['fixture']['obligations'][0]['ownerRef'])
+        self.assertEqual([], VALIDATOR.validate(self.data))
+
+    def test_m47_preflight_cannot_silently_create_suspension(self):
+        self.reject(lambda d: d['cases'][46]['turns'][0]['oracle']['uatCompletion']['pathOracles'][
+            'EVIDENCED_PREFLIGHT_STOP']['allowedEffects'].append(
+                {'class': 'ALLOCATION_SUSPENSION', 'maxNew': 1}),
+            'preflight must preserve allocation/duty')
+
+    def test_m47_preflight_cannot_expect_suspension_from_read(self):
+        def mutate(d):
+            assertions = d['cases'][46]['turns'][0]['oracle']['uatCompletion']['pathOracles'][
+                'EVIDENCED_PREFLIGHT_STOP']['assertions']
+            for a in assertions:
+                if a['path'] == 'state.allocation.status':
+                    a['expected'] = 'SUSPENDED'
+        self.reject(mutate, 'preflight must preserve allocation/duty')
+
+    def test_m47_requires_existing_responsibility_before_preflight(self):
+        self.reject(lambda d: d['cases'][46]['fixture'].__setitem__('obligations', []),
+                    'existing human delivery responsibility')
+
+    def test_m47_read_probe_cannot_restore_write_permission(self):
+        self.reject(lambda d: d['cases'][46]['fixture']['grants']['readOnlyProbeGrant'][
+            'actions'].append('DISPATCH'), 'must not revive revoked WRITE authorization')
+
+    def test_m47_server_rejection_still_requires_new_reauthorization(self):
+        self.reject(lambda d: d['cases'][46]['turns'][0]['oracle']['uatCompletion']['pathOracles'][
+            'SERVER_REJECTION'].__setitem__('obligations', []),
+            'server rejection must retain new duty')
+
+    def test_m47_sit_cannot_drop_suspension_or_duty(self):
+        self.reject(lambda d: d['cases'][46]['turns'][0]['oracle']['sitDirectCommand'].__setitem__(
+            'assertions', []), 'SIT must retain the same mandatory server rejection oracle')
+
+    def test_m47_safety_mutations_are_not_common_preflight_effects(self):
+        self.reject(lambda d: d['cases'][46]['turns'][0]['oracle']['allowedEffects'].append(
+            {'class': 'OBLIGATION', 'maxNew': 1}), 'safety transitions cannot be common preflight')
+
+    def test_m47_cannot_drop_allocation_consumption_zero(self):
+        def mutate(d):
+            assertions = d['cases'][46]['turns'][0]['oracle']['assertions']
+            for a in assertions:
+                if a['path'] == 'effects.allocationConsumptionCount':
+                    a['expected'] = 1
+        self.reject(mutate, 'no unauthorized execution and original responsibility')
+
+    def test_completion_cannot_union_both_path_effects(self):
+        self.reject(lambda d: d['cases'][46]['turns'][0]['oracle']['uatCompletion'].__setitem__(
+            'effectComposition', 'ALL_PATHS_COMBINED'), 'only selected completion path effects')
+
+
 if __name__ == '__main__':
     unittest.main()

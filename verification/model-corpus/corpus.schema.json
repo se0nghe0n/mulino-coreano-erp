@@ -142,6 +142,42 @@
         "maxNew": {
           "type": "integer",
           "minimum": 0
+        },
+        "scope": {
+          "type": "object",
+          "properties": {
+            "actorRef": {
+              "type": "string",
+              "minLength": 1
+            },
+            "organizationRef": {
+              "type": "string",
+              "minLength": 1
+            },
+            "authorizationGrantRef": {
+              "type": "string",
+              "minLength": 1
+            },
+            "targetRefs": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1
+              },
+              "minItems": 1
+            },
+            "selfAccessContextOnly": {
+              "const": true
+            }
+          },
+          "required": [
+            "actorRef",
+            "organizationRef",
+            "authorizationGrantRef",
+            "targetRefs",
+            "selfAccessContextOnly"
+          ],
+          "additionalProperties": false
         }
       },
       "required": [
@@ -376,6 +412,22 @@
             },
             "actualCommandRequired": {
               "const": true
+            },
+            "allowedEffects": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/effect"
+              }
+            },
+            "obligations": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/obligation"
+              }
+            },
+            "businessEffectsMaximum": {
+              "type": "integer",
+              "minimum": 0
             }
           },
           "required": [
@@ -418,6 +470,135 @@
             },
             "preflightBusinessEffectsMaximum": {
               "const": 0
+            },
+            "readAuditScope": {
+              "type": "object",
+              "properties": {
+                "actorRef": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "organizationRef": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "authorizationGrantRef": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "targetRefs": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "minItems": 1
+                },
+                "selfAccessContextOnly": {
+                  "const": true
+                }
+              },
+              "required": [
+                "actorRef",
+                "organizationRef",
+                "authorizationGrantRef",
+                "targetRefs",
+                "selfAccessContextOnly"
+              ],
+              "additionalProperties": false
+            },
+            "effectComposition": {
+              "const": "COMMON_PLUS_SELECTED_PATH_ONLY"
+            },
+            "pathOracles": {
+              "type": "object",
+              "properties": {
+                "EVIDENCED_PREFLIGHT_STOP": {
+                  "type": "object",
+                  "properties": {
+                    "assertions": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/$defs/assertion"
+                      },
+                      "minItems": 1
+                    },
+                    "allowedEffects": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/$defs/effect"
+                      }
+                    },
+                    "obligations": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/$defs/obligation"
+                      },
+                      "minItems": 1
+                    },
+                    "businessEffectsMaximum": {
+                      "type": "integer",
+                      "minimum": 0
+                    },
+                    "unlistedEffectPolicy": {
+                      "const": "FORBIDDEN"
+                    }
+                  },
+                  "required": [
+                    "assertions",
+                    "allowedEffects",
+                    "obligations",
+                    "businessEffectsMaximum",
+                    "unlistedEffectPolicy"
+                  ],
+                  "additionalProperties": false
+                },
+                "SERVER_REJECTION": {
+                  "type": "object",
+                  "properties": {
+                    "assertions": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/$defs/assertion"
+                      },
+                      "minItems": 1
+                    },
+                    "allowedEffects": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/$defs/effect"
+                      }
+                    },
+                    "obligations": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/$defs/obligation"
+                      },
+                      "minItems": 1
+                    },
+                    "businessEffectsMaximum": {
+                      "type": "integer",
+                      "minimum": 0
+                    },
+                    "unlistedEffectPolicy": {
+                      "const": "FORBIDDEN"
+                    }
+                  },
+                  "required": [
+                    "assertions",
+                    "allowedEffects",
+                    "obligations",
+                    "businessEffectsMaximum",
+                    "unlistedEffectPolicy"
+                  ],
+                  "additionalProperties": false
+                }
+              },
+              "required": [
+                "EVIDENCED_PREFLIGHT_STOP",
+                "SERVER_REJECTION"
+              ],
+              "additionalProperties": false
             }
           },
           "required": [
@@ -426,7 +607,9 @@
             "modelExplanationSufficient",
             "commonBusinessAssertionsRequired",
             "ownerAndObligationPreservationRequired",
-            "preflightBusinessEffectsMaximum"
+            "preflightBusinessEffectsMaximum",
+            "readAuditScope",
+            "effectComposition"
           ],
           "additionalProperties": false
         }
