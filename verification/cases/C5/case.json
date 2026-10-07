@@ -1,0 +1,3188 @@
+{
+  "schemaVersion": "1.0.0",
+  "caseId": "C5",
+  "title": "목표·의무·판정·접수 책임의 독립 계약 C5",
+  "requirementRefs": [
+    "D10",
+    "D14",
+    "D26"
+  ],
+  "profiles": [
+    "scenarios",
+    "recovery"
+  ],
+  "subcases": [
+    {
+      "id": "failed-link",
+      "title": "종료된 부모 뒤 이상 접수의 책임 failed-link",
+      "fixtureRef": "verification/cases/C5/fixtures/failed-link.json",
+      "requiredAdapters": [
+        "fixture",
+        "api",
+        "db",
+        "control",
+        "host"
+      ],
+      "actions": [
+        {
+          "id": "setup",
+          "kind": "installFixture",
+          "evidenceRefs": [
+            "setup:actual-artifact"
+          ],
+          "fixtureRef": "verification/cases/C5/fixtures/failed-link.json"
+        },
+        {
+          "id": "before-db-snapshot",
+          "kind": "query",
+          "evidenceRefs": [
+            "before-db-snapshot:actual-artifact"
+          ],
+          "actorRef": "A",
+          "route": "api",
+          "capabilityId": "getInventory",
+          "request": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "caseId": "C5",
+              "itemId": {
+                "$alias": "P"
+              }
+            },
+            "asOf": "2026-10-07T02:00:00Z",
+            "knownAt": "2026-10-07T04:00:00Z"
+          }
+        },
+        {
+          "id": "before-db",
+          "kind": "observe",
+          "evidenceRefs": [
+            "before-db:actual-artifact"
+          ],
+          "observation": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "caseId": "C5",
+              "itemId": {
+                "$alias": "P"
+              }
+            },
+            "asOf": "2026-10-07T02:00:00Z",
+            "knownAt": "2026-10-07T04:00:00Z",
+            "snapshotRef": {
+              "$result": {
+                "actionId": "before-db-snapshot",
+                "pointer": "/response/snapshotRevision"
+              }
+            },
+            "sources": [
+              "works",
+              "goalVersions",
+              "assessments",
+              "conditionResults",
+              "assessmentInputs",
+              "obligations",
+              "assignments",
+              "handovers",
+              "workLinks",
+              "segments",
+              "movements",
+              "contributions",
+              "activities",
+              "inbox",
+              "audit",
+              "outbox",
+              "executionAttempts",
+              "approvals",
+              "contracts",
+              "claims",
+              "observationCoverage",
+              "supervisionIssues"
+            ]
+          }
+        },
+        {
+          "id": "anomaly",
+          "kind": "invoke",
+          "evidenceRefs": [
+            "anomaly:actual-artifact"
+          ],
+          "actorRef": "intake",
+          "route": "api",
+          "capabilityId": "recordActivity",
+          "request": {
+            "intentKind": "RECORD",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "recordActivity",
+            "subjectRefs": [
+              {
+                "type": "TradeItem",
+                "id": {
+                  "$alias": "P"
+                }
+              }
+            ],
+            "slots": {
+              "activityKind": "TEMPERATURE_OBSERVATION",
+              "segmentId": {
+                "$alias": "Q"
+              },
+              "temperature": {
+                "value": "12",
+                "unit": "CELSIUS"
+              },
+              "occurredAt": "2026-10-07T01:00:00Z",
+              "sourceNamespace": "synthetic-warehouse",
+              "externalEventId": "anomaly-no-parent",
+              "sourceVersion": "1",
+              "parentWorkId": {
+                "$alias": "PARENT"
+              }
+            },
+            "expectedRevision": 1,
+            "commandIdempotencyKey": "C5-failed-link-anomaly",
+            "evidenceRefs": [
+              {
+                "$alias": "DOC"
+              }
+            ]
+          }
+        },
+        {
+          "id": "link-fault",
+          "kind": "control",
+          "evidenceRefs": [
+            "link-fault:actual-artifact"
+          ],
+          "control": {
+            "type": "fault",
+            "operation": "arm",
+            "parameters": {
+              "point": "intake.afterObligationBeforeWorkLink",
+              "once": true
+            }
+          }
+        },
+        {
+          "id": "followup",
+          "kind": "invoke",
+          "evidenceRefs": [
+            "followup:actual-artifact"
+          ],
+          "actorRef": "intake",
+          "route": "api",
+          "capabilityId": "createFollowup",
+          "request": {
+            "intentKind": "COMMAND",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "createFollowup",
+            "subjectRefs": [
+              {
+                "type": "TradeItem",
+                "id": {
+                  "$alias": "P"
+                }
+              }
+            ],
+            "slots": {
+              "sourceOccurrenceId": {
+                "$result": {
+                  "actionId": "anomaly",
+                  "pointer": "/response/occurrenceId"
+                }
+              },
+              "parentWorkId": {
+                "$alias": "PARENT"
+              },
+              "ownerId": {
+                "$alias": "A"
+              },
+              "supervisorId": {
+                "$alias": "supervisor"
+              },
+              "nextAction": "온도 이상 원자료 확인",
+              "nextCheckAt": "2026-10-08T09:00:00Z"
+            },
+            "expectedRevision": 1,
+            "commandIdempotencyKey": "C5-failed-link-followup",
+            "evidenceRefs": [
+              {
+                "$alias": "DOC"
+              }
+            ]
+          }
+        },
+        {
+          "id": "alert",
+          "kind": "control",
+          "evidenceRefs": [
+            "alert:actual-artifact"
+          ],
+          "control": {
+            "type": "externalResponder",
+            "operation": "deliverNotification",
+            "parameters": {
+              "occurrenceId": {
+                "$result": {
+                  "actionId": "anomaly",
+                  "pointer": "/response/occurrenceId"
+                }
+              },
+              "deliveryResult": "DELIVERED",
+              "recipientId": {
+                "$alias": "intake"
+              }
+            }
+          }
+        },
+        {
+          "id": "intake-query",
+          "kind": "query",
+          "evidenceRefs": [
+            "intake-query:actual-artifact"
+          ],
+          "actorRef": "A",
+          "route": "api",
+          "capabilityId": "getInbox",
+          "request": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "caseId": "C5",
+              "itemId": {
+                "$alias": "P"
+              }
+            },
+            "asOf": "2026-10-07T02:00:00Z",
+            "knownAt": "2026-10-07T04:00:00Z",
+            "occurrenceId": {
+              "$result": {
+                "actionId": "anomaly",
+                "pointer": "/response/occurrenceId"
+              }
+            }
+          }
+        },
+        {
+          "id": "after-db",
+          "kind": "observe",
+          "evidenceRefs": [
+            "after-db:actual-artifact"
+          ],
+          "observation": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "caseId": "C5",
+              "itemId": {
+                "$alias": "P"
+              }
+            },
+            "asOf": "2026-10-07T02:00:00Z",
+            "knownAt": "2026-10-07T04:00:00Z",
+            "snapshotRef": {
+              "$result": {
+                "actionId": "intake-query",
+                "pointer": "/response/snapshotRevision"
+              }
+            },
+            "sources": [
+              "works",
+              "goalVersions",
+              "assessments",
+              "conditionResults",
+              "assessmentInputs",
+              "obligations",
+              "assignments",
+              "handovers",
+              "workLinks",
+              "segments",
+              "movements",
+              "contributions",
+              "activities",
+              "inbox",
+              "audit",
+              "outbox",
+              "executionAttempts",
+              "approvals",
+              "contracts",
+              "claims",
+              "observationCoverage",
+              "supervisionIssues"
+            ]
+          }
+        }
+      ],
+      "assertions": [
+        {
+          "id": "failed-followup",
+          "op": "equals",
+          "source": {
+            "actionId": "followup",
+            "pointer": "/response/outcome"
+          },
+          "expected": "REJECTED",
+          "requirementRefs": [
+            "D10",
+            "D14",
+            "D26"
+          ],
+          "evidenceRefs": [
+            "followup:actual-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "C5",
+            "itemId": {
+              "$alias": "P"
+            }
+          },
+          "oracleExplanation": "종료된 부모 뒤 이상 접수의 책임 failed-link. intake-tracking의 독립 고정 기대값을 대조한다.",
+          "oracleRef": {
+            "oracleId": "C5.failed-link-responsibility",
+            "observationNames": [
+              "intake-tracking"
+            ]
+          }
+        },
+        {
+          "id": "intake-open",
+          "op": "equals",
+          "source": {
+            "actionId": "after-db",
+            "pointer": "/data/rawRows/inbox",
+            "where": {
+              "occurrenceId": {
+                "$result": {
+                  "actionId": "anomaly",
+                  "pointer": "/response/occurrenceId"
+                }
+              }
+            },
+            "field": "trackingStatus"
+          },
+          "expected": [
+            "OPEN"
+          ],
+          "requirementRefs": [
+            "D10",
+            "D14",
+            "D26"
+          ],
+          "evidenceRefs": [
+            "after-db:actual-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "C5",
+            "itemId": {
+              "$alias": "P"
+            }
+          },
+          "oracleExplanation": "종료된 부모 뒤 이상 접수의 책임 failed-link. intake-tracking의 독립 고정 기대값을 대조한다.",
+          "oracleRef": {
+            "oracleId": "C5.failed-link-responsibility",
+            "observationNames": [
+              "intake-tracking"
+            ]
+          }
+        },
+        {
+          "id": "intake-owner-human",
+          "op": "relationSet",
+          "source": {
+            "actionId": "after-db",
+            "pointer": "/data/rawRows/inbox",
+            "where": {
+              "occurrenceId": {
+                "$result": {
+                  "actionId": "anomaly",
+                  "pointer": "/response/occurrenceId"
+                }
+              }
+            },
+            "field": [
+              "ownerId",
+              "supervisorId",
+              "nextAction",
+              "nextCheckAt"
+            ]
+          },
+          "expected": [
+            [
+              {
+                "$alias": "intake"
+              },
+              {
+                "$alias": "supervisor"
+              },
+              "온도 이상 원자료 확인",
+              "2026-10-08T09:00:00Z"
+            ]
+          ],
+          "requirementRefs": [
+            "D10",
+            "D14",
+            "D26"
+          ],
+          "evidenceRefs": [
+            "after-db:actual-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "C5",
+            "itemId": {
+              "$alias": "P"
+            }
+          },
+          "oracleExplanation": "종료된 부모 뒤 이상 접수의 책임 failed-link. intake-owner의 독립 고정 기대값을 대조한다.",
+          "oracleRef": {
+            "oracleId": "C5.failed-link-responsibility",
+            "observationNames": [
+              "intake-owner"
+            ]
+          }
+        },
+        {
+          "id": "intake-one",
+          "op": "count",
+          "source": {
+            "actionId": "after-db",
+            "pointer": "/data/rawRows/inbox",
+            "where": {
+              "occurrenceId": {
+                "$result": {
+                  "actionId": "anomaly",
+                  "pointer": "/response/occurrenceId"
+                }
+              },
+              "trackingStatus": "OPEN"
+            }
+          },
+          "expected": 1,
+          "requirementRefs": [
+            "D10",
+            "D14",
+            "D26"
+          ],
+          "evidenceRefs": [
+            "after-db:actual-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "C5",
+            "itemId": {
+              "$alias": "P"
+            }
+          },
+          "oracleExplanation": "종료된 부모 뒤 이상 접수의 책임 failed-link. intake-owner의 독립 고정 기대값을 대조한다.",
+          "oracleRef": {
+            "oracleId": "C5.failed-link-responsibility",
+            "observationNames": [
+              "intake-owner"
+            ]
+          }
+        },
+        {
+          "id": "intake-current-assignment1",
+          "op": "count",
+          "source": {
+            "actionId": "after-db",
+            "pointer": "/data/rawRows/assignments",
+            "where": {
+              "sourceOccurrenceId": {
+                "$result": {
+                  "actionId": "anomaly",
+                  "pointer": "/response/occurrenceId"
+                }
+              },
+              "ownerId": {
+                "$alias": "intake"
+              },
+              "status": "OPEN"
+            }
+          },
+          "expected": 1,
+          "requirementRefs": [
+            "D10",
+            "D14",
+            "D26"
+          ],
+          "evidenceRefs": [
+            "after-db:actual-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "C5",
+            "itemId": {
+              "$alias": "P"
+            }
+          },
+          "oracleExplanation": "종료된 부모 뒤 이상 접수의 책임 failed-link. intake-owner의 독립 고정 기대값을 대조한다.",
+          "oracleRef": {
+            "oracleId": "C5.failed-link-responsibility",
+            "observationNames": [
+              "intake-owner"
+            ]
+          }
+        },
+        {
+          "id": "alert-not-closure",
+          "op": "count",
+          "source": {
+            "actionId": "after-db",
+            "pointer": "/data/rawRows/inbox",
+            "where": {
+              "occurrenceId": {
+                "$result": {
+                  "actionId": "anomaly",
+                  "pointer": "/response/occurrenceId"
+                }
+              },
+              "trackingStatus": "CLOSED"
+            }
+          },
+          "expected": 0,
+          "requirementRefs": [
+            "D10",
+            "D14",
+            "D26"
+          ],
+          "evidenceRefs": [
+            "after-db:actual-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "C5",
+            "itemId": {
+              "$alias": "P"
+            }
+          },
+          "oracleExplanation": "종료된 부모 뒤 이상 접수의 책임 failed-link. alert-delivery-closes-intake의 독립 고정 기대값을 대조한다.",
+          "oracleRef": {
+            "oracleId": "C5.failed-link-responsibility",
+            "observationNames": [
+              "alert-delivery-closes-intake"
+            ]
+          }
+        },
+        {
+          "id": "parent-not-rewritten",
+          "op": "sameAs",
+          "source": {
+            "actionId": "after-db",
+            "pointer": "/data/rawRows/works",
+            "where": {
+              "id": {
+                "$alias": "PARENT"
+              }
+            }
+          },
+          "expected": true,
+          "requirementRefs": [
+            "D10",
+            "D14",
+            "D26"
+          ],
+          "evidenceRefs": [
+            "after-db:actual-artifact",
+            "before-db:actual-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "C5",
+            "itemId": {
+              "$alias": "P"
+            }
+          },
+          "oracleExplanation": "같은 대상의 독립 전후 원행을 비교한다. 조회/거부 감사의 추가는 별도 허용한다.",
+          "oracleRef": {
+            "oracleId": "C5.failed-link-responsibility",
+            "observationNames": [
+              "closed-parent-rewrite"
+            ]
+          },
+          "baseline": {
+            "actionId": "before-db",
+            "pointer": "/data/rawRows/works",
+            "where": {
+              "id": {
+                "$alias": "PARENT"
+              }
+            }
+          }
+        },
+        {
+          "id": "parent-assessment-not-rewritten",
+          "op": "sameAs",
+          "source": {
+            "actionId": "after-db",
+            "pointer": "/data/rawRows/assessments",
+            "where": {
+              "id": {
+                "$alias": "OLDASSESS"
+              }
+            }
+          },
+          "expected": true,
+          "requirementRefs": [
+            "D10",
+            "D14",
+            "D26"
+          ],
+          "evidenceRefs": [
+            "after-db:actual-artifact",
+            "before-db:actual-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "C5",
+            "itemId": {
+              "$alias": "P"
+            }
+          },
+          "oracleExplanation": "같은 대상의 독립 전후 원행을 비교한다. 조회/거부 감사의 추가는 별도 허용한다.",
+          "oracleRef": {
+            "oracleId": "C5.failed-link-responsibility",
+            "observationNames": [
+              "closed-parent-rewrite"
+            ]
+          },
+          "baseline": {
+            "actionId": "before-db",
+            "pointer": "/data/rawRows/assessments",
+            "where": {
+              "id": {
+                "$alias": "OLDASSESS"
+              }
+            }
+          }
+        }
+      ],
+      "oracleExplanation": "가상 fixture의 입력과 실제 명령을 구별한다. 수량은 BOX decimal 문자열과 식별된 실물 범위로 손계산한다. 원행 관찰은 API projection을 복사하지 않는다. 종료된 부모 뒤 이상 접수의 책임 failed-link"
+    },
+    {
+      "id": "missing-intake-owner",
+      "title": "종료된 부모 뒤 이상 접수의 책임 missing-intake-owner",
+      "fixtureRef": "verification/cases/C5/fixtures/missing-intake-owner.json",
+      "requiredAdapters": [
+        "fixture",
+        "api",
+        "db"
+      ],
+      "actions": [
+        {
+          "id": "setup",
+          "kind": "installFixture",
+          "evidenceRefs": [
+            "setup:actual-artifact"
+          ],
+          "fixtureRef": "verification/cases/C5/fixtures/missing-intake-owner.json"
+        },
+        {
+          "id": "before-db-snapshot",
+          "kind": "query",
+          "evidenceRefs": [
+            "before-db-snapshot:actual-artifact"
+          ],
+          "actorRef": "A",
+          "route": "api",
+          "capabilityId": "getInventory",
+          "request": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "caseId": "C5",
+              "itemId": {
+                "$alias": "P"
+              }
+            },
+            "asOf": "2026-10-07T02:00:00Z",
+            "knownAt": "2026-10-07T04:00:00Z"
+          }
+        },
+        {
+          "id": "before-db",
+          "kind": "observe",
+          "evidenceRefs": [
+            "before-db:actual-artifact"
+          ],
+          "observation": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "caseId": "C5",
+              "itemId": {
+                "$alias": "P"
+              }
+            },
+            "asOf": "2026-10-07T02:00:00Z",
+            "knownAt": "2026-10-07T04:00:00Z",
+            "snapshotRef": {
+              "$result": {
+                "actionId": "before-db-snapshot",
+                "pointer": "/response/snapshotRevision"
+              }
+            },
+            "sources": [
+              "works",
+              "goalVersions",
+              "assessments",
+              "conditionResults",
+              "assessmentInputs",
+              "obligations",
+              "assignments",
+              "handovers",
+              "workLinks",
+              "segments",
+              "movements",
+              "contributions",
+              "activities",
+              "inbox",
+              "audit",
+              "outbox",
+              "executionAttempts",
+              "approvals",
+              "contracts",
+              "claims",
+              "observationCoverage",
+              "supervisionIssues"
+            ]
+          }
+        },
+        {
+          "id": "anomaly",
+          "kind": "invoke",
+          "evidenceRefs": [
+            "anomaly:actual-artifact"
+          ],
+          "actorRef": "intake",
+          "route": "api",
+          "capabilityId": "recordActivity",
+          "request": {
+            "intentKind": "RECORD",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "recordActivity",
+            "subjectRefs": [
+              {
+                "type": "TradeItem",
+                "id": {
+                  "$alias": "P"
+                }
+              }
+            ],
+            "slots": {
+              "activityKind": "TEMPERATURE_OBSERVATION",
+              "segmentId": {
+                "$alias": "Q"
+              },
+              "temperature": {
+                "value": "12",
+                "unit": "CELSIUS"
+              },
+              "occurredAt": "2026-10-07T01:00:00Z",
+              "sourceNamespace": "synthetic-warehouse",
+              "externalEventId": "anomaly-no-parent",
+              "sourceVersion": "1",
+              "parentWorkId": {
+                "$alias": "PARENT"
+              }
+            },
+            "expectedRevision": 1,
+            "commandIdempotencyKey": "C5-missing-intake-owner-anomaly",
+            "evidenceRefs": [
+              {
+                "$alias": "DOC"
+              }
+            ]
+          }
+        },
+        {
+          "id": "after-db-snapshot",
+          "kind": "query",
+          "evidenceRefs": [
+            "after-db-snapshot:actual-artifact"
+          ],
+          "actorRef": "A",
+          "route": "api",
+          "capabilityId": "getInventory",
+          "request": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "caseId": "C5",
+              "itemId": {
+                "$alias": "P"
+              }
+            },
+            "asOf": "2026-10-07T02:00:00Z",
+            "knownAt": "2026-10-07T04:00:00Z"
+          }
+        },
+        {
+          "id": "after-db",
+          "kind": "observe",
+          "evidenceRefs": [
+            "after-db:actual-artifact"
+          ],
+          "observation": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "caseId": "C5",
+              "itemId": {
+                "$alias": "P"
+              }
+            },
+            "asOf": "2026-10-07T02:00:00Z",
+            "knownAt": "2026-10-07T04:00:00Z",
+            "snapshotRef": {
+              "$result": {
+                "actionId": "after-db-snapshot",
+                "pointer": "/response/snapshotRevision"
+              }
+            },
+            "sources": [
+              "works",
+              "goalVersions",
+              "assessments",
+              "conditionResults",
+              "assessmentInputs",
+              "obligations",
+              "assignments",
+              "handovers",
+              "workLinks",
+              "segments",
+              "movements",
+              "contributions",
+              "activities",
+              "inbox",
+              "audit",
+              "outbox",
+              "executionAttempts",
+              "approvals",
+              "contracts",
+              "claims",
+              "observationCoverage",
+              "supervisionIssues"
+            ]
+          }
+        }
+      ],
+      "assertions": [
+        {
+          "id": "anomaly-outcome",
+          "op": "equals",
+          "source": {
+            "actionId": "anomaly",
+            "pointer": "/response/outcome"
+          },
+          "expected": "REJECTED",
+          "requirementRefs": [
+            "D10",
+            "D14",
+            "D26"
+          ],
+          "evidenceRefs": [
+            "anomaly:actual-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "C5",
+            "itemId": {
+              "$alias": "P"
+            }
+          },
+          "oracleExplanation": "종료된 부모 뒤 이상 접수의 책임 missing-intake-owner. intake-activation의 독립 고정 기대값을 대조한다.",
+          "oracleRef": {
+            "oracleId": "C5.failed-link-responsibility",
+            "observationNames": [
+              "intake-activation"
+            ]
+          }
+        },
+        {
+          "id": "anomaly-works-unchanged",
+          "op": "sameAs",
+          "source": {
+            "actionId": "after-db",
+            "pointer": "/data/rawRows/works"
+          },
+          "expected": true,
+          "requirementRefs": [
+            "D10",
+            "D14",
+            "D26"
+          ],
+          "evidenceRefs": [
+            "after-db:actual-artifact",
+            "before-db:actual-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "C5",
+            "itemId": {
+              "$alias": "P"
+            }
+          },
+          "oracleExplanation": "같은 대상의 독립 전후 원행을 비교한다. 조회/거부 감사의 추가는 별도 허용한다.",
+          "oracleRef": {
+            "oracleId": "C5.failed-link-responsibility",
+            "observationNames": [
+              "intake-activation"
+            ]
+          },
+          "baseline": {
+            "actionId": "before-db",
+            "pointer": "/data/rawRows/works"
+          }
+        },
+        {
+          "id": "anomaly-obligations-unchanged",
+          "op": "sameAs",
+          "source": {
+            "actionId": "after-db",
+            "pointer": "/data/rawRows/obligations"
+          },
+          "expected": true,
+          "requirementRefs": [
+            "D10",
+            "D14",
+            "D26"
+          ],
+          "evidenceRefs": [
+            "after-db:actual-artifact",
+            "before-db:actual-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "C5",
+            "itemId": {
+              "$alias": "P"
+            }
+          },
+          "oracleExplanation": "같은 대상의 독립 전후 원행을 비교한다. 조회/거부 감사의 추가는 별도 허용한다.",
+          "oracleRef": {
+            "oracleId": "C5.failed-link-responsibility",
+            "observationNames": [
+              "intake-activation"
+            ]
+          },
+          "baseline": {
+            "actionId": "before-db",
+            "pointer": "/data/rawRows/obligations"
+          }
+        },
+        {
+          "id": "anomaly-assignments-unchanged",
+          "op": "sameAs",
+          "source": {
+            "actionId": "after-db",
+            "pointer": "/data/rawRows/assignments"
+          },
+          "expected": true,
+          "requirementRefs": [
+            "D10",
+            "D14",
+            "D26"
+          ],
+          "evidenceRefs": [
+            "after-db:actual-artifact",
+            "before-db:actual-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "C5",
+            "itemId": {
+              "$alias": "P"
+            }
+          },
+          "oracleExplanation": "같은 대상의 독립 전후 원행을 비교한다. 조회/거부 감사의 추가는 별도 허용한다.",
+          "oracleRef": {
+            "oracleId": "C5.failed-link-responsibility",
+            "observationNames": [
+              "intake-activation"
+            ]
+          },
+          "baseline": {
+            "actionId": "before-db",
+            "pointer": "/data/rawRows/assignments"
+          }
+        },
+        {
+          "id": "anomaly-outbox-unchanged",
+          "op": "sameAs",
+          "source": {
+            "actionId": "after-db",
+            "pointer": "/data/rawRows/outbox"
+          },
+          "expected": true,
+          "requirementRefs": [
+            "D10",
+            "D14",
+            "D26"
+          ],
+          "evidenceRefs": [
+            "after-db:actual-artifact",
+            "before-db:actual-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "C5",
+            "itemId": {
+              "$alias": "P"
+            }
+          },
+          "oracleExplanation": "같은 대상의 독립 전후 원행을 비교한다. 조회/거부 감사의 추가는 별도 허용한다.",
+          "oracleRef": {
+            "oracleId": "C5.failed-link-responsibility",
+            "observationNames": [
+              "intake-activation"
+            ]
+          },
+          "baseline": {
+            "actionId": "before-db",
+            "pointer": "/data/rawRows/outbox"
+          }
+        },
+        {
+          "id": "anomaly-denial-audit",
+          "op": "count",
+          "source": {
+            "actionId": "after-db",
+            "pointer": "/data/rawRows/audit",
+            "where": {
+              "commandKey": "C5-missing-intake-owner-anomaly",
+              "outcome": "REJECTED"
+            }
+          },
+          "expected": 1,
+          "requirementRefs": [
+            "D10",
+            "D14",
+            "D26"
+          ],
+          "evidenceRefs": [
+            "after-db:actual-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "C5",
+            "itemId": {
+              "$alias": "P"
+            }
+          },
+          "oracleExplanation": "종료된 부모 뒤 이상 접수의 책임 missing-intake-owner. intake-activation의 독립 고정 기대값을 대조한다.",
+          "oracleRef": {
+            "oracleId": "C5.failed-link-responsibility",
+            "observationNames": [
+              "intake-activation"
+            ]
+          }
+        },
+        {
+          "id": "intake-not-activated",
+          "op": "count",
+          "source": {
+            "actionId": "after-db",
+            "pointer": "/data/rawRows/inbox"
+          },
+          "expected": 0,
+          "requirementRefs": [
+            "D10",
+            "D14",
+            "D26"
+          ],
+          "evidenceRefs": [
+            "after-db:actual-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "C5",
+            "itemId": {
+              "$alias": "P"
+            }
+          },
+          "oracleExplanation": "종료된 부모 뒤 이상 접수의 책임 missing-intake-owner. intake-activation의 독립 고정 기대값을 대조한다.",
+          "oracleRef": {
+            "oracleId": "C5.failed-link-responsibility",
+            "observationNames": [
+              "intake-activation"
+            ]
+          }
+        },
+        {
+          "id": "parent-not-rewritten",
+          "op": "sameAs",
+          "source": {
+            "actionId": "after-db",
+            "pointer": "/data/rawRows/works",
+            "where": {
+              "id": {
+                "$alias": "PARENT"
+              }
+            }
+          },
+          "expected": true,
+          "requirementRefs": [
+            "D10",
+            "D14",
+            "D26"
+          ],
+          "evidenceRefs": [
+            "after-db:actual-artifact",
+            "before-db:actual-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "C5",
+            "itemId": {
+              "$alias": "P"
+            }
+          },
+          "oracleExplanation": "같은 대상의 독립 전후 원행을 비교한다. 조회/거부 감사의 추가는 별도 허용한다.",
+          "oracleRef": {
+            "oracleId": "C5.failed-link-responsibility",
+            "observationNames": [
+              "closed-parent-rewrite"
+            ]
+          },
+          "baseline": {
+            "actionId": "before-db",
+            "pointer": "/data/rawRows/works",
+            "where": {
+              "id": {
+                "$alias": "PARENT"
+              }
+            }
+          }
+        },
+        {
+          "id": "parent-assessment-not-rewritten",
+          "op": "sameAs",
+          "source": {
+            "actionId": "after-db",
+            "pointer": "/data/rawRows/assessments",
+            "where": {
+              "id": {
+                "$alias": "OLDASSESS"
+              }
+            }
+          },
+          "expected": true,
+          "requirementRefs": [
+            "D10",
+            "D14",
+            "D26"
+          ],
+          "evidenceRefs": [
+            "after-db:actual-artifact",
+            "before-db:actual-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "C5",
+            "itemId": {
+              "$alias": "P"
+            }
+          },
+          "oracleExplanation": "같은 대상의 독립 전후 원행을 비교한다. 조회/거부 감사의 추가는 별도 허용한다.",
+          "oracleRef": {
+            "oracleId": "C5.failed-link-responsibility",
+            "observationNames": [
+              "closed-parent-rewrite"
+            ]
+          },
+          "baseline": {
+            "actionId": "before-db",
+            "pointer": "/data/rawRows/assessments",
+            "where": {
+              "id": {
+                "$alias": "OLDASSESS"
+              }
+            }
+          }
+        }
+      ],
+      "oracleExplanation": "가상 fixture의 입력과 실제 명령을 구별한다. 수량은 BOX decimal 문자열과 식별된 실물 범위로 손계산한다. 원행 관찰은 API projection을 복사하지 않는다. 종료된 부모 뒤 이상 접수의 책임 missing-intake-owner"
+    },
+    {
+      "id": "missing-supervisor",
+      "title": "종료된 부모 뒤 이상 접수의 책임 missing-supervisor",
+      "fixtureRef": "verification/cases/C5/fixtures/missing-supervisor.json",
+      "requiredAdapters": [
+        "fixture",
+        "api",
+        "db"
+      ],
+      "actions": [
+        {
+          "id": "setup",
+          "kind": "installFixture",
+          "evidenceRefs": [
+            "setup:actual-artifact"
+          ],
+          "fixtureRef": "verification/cases/C5/fixtures/missing-supervisor.json"
+        },
+        {
+          "id": "before-db-snapshot",
+          "kind": "query",
+          "evidenceRefs": [
+            "before-db-snapshot:actual-artifact"
+          ],
+          "actorRef": "A",
+          "route": "api",
+          "capabilityId": "getInventory",
+          "request": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "caseId": "C5",
+              "itemId": {
+                "$alias": "P"
+              }
+            },
+            "asOf": "2026-10-07T02:00:00Z",
+            "knownAt": "2026-10-07T04:00:00Z"
+          }
+        },
+        {
+          "id": "before-db",
+          "kind": "observe",
+          "evidenceRefs": [
+            "before-db:actual-artifact"
+          ],
+          "observation": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "caseId": "C5",
+              "itemId": {
+                "$alias": "P"
+              }
+            },
+            "asOf": "2026-10-07T02:00:00Z",
+            "knownAt": "2026-10-07T04:00:00Z",
+            "snapshotRef": {
+              "$result": {
+                "actionId": "before-db-snapshot",
+                "pointer": "/response/snapshotRevision"
+              }
+            },
+            "sources": [
+              "works",
+              "goalVersions",
+              "assessments",
+              "conditionResults",
+              "assessmentInputs",
+              "obligations",
+              "assignments",
+              "handovers",
+              "workLinks",
+              "segments",
+              "movements",
+              "contributions",
+              "activities",
+              "inbox",
+              "audit",
+              "outbox",
+              "executionAttempts",
+              "approvals",
+              "contracts",
+              "claims",
+              "observationCoverage",
+              "supervisionIssues"
+            ]
+          }
+        },
+        {
+          "id": "anomaly",
+          "kind": "invoke",
+          "evidenceRefs": [
+            "anomaly:actual-artifact"
+          ],
+          "actorRef": "intake",
+          "route": "api",
+          "capabilityId": "recordActivity",
+          "request": {
+            "intentKind": "RECORD",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "recordActivity",
+            "subjectRefs": [
+              {
+                "type": "TradeItem",
+                "id": {
+                  "$alias": "P"
+                }
+              }
+            ],
+            "slots": {
+              "activityKind": "TEMPERATURE_OBSERVATION",
+              "segmentId": {
+                "$alias": "Q"
+              },
+              "temperature": {
+                "value": "12",
+                "unit": "CELSIUS"
+              },
+              "occurredAt": "2026-10-07T01:00:00Z",
+              "sourceNamespace": "synthetic-warehouse",
+              "externalEventId": "anomaly-no-parent",
+              "sourceVersion": "1",
+              "parentWorkId": {
+                "$alias": "PARENT"
+              }
+            },
+            "expectedRevision": 1,
+            "commandIdempotencyKey": "C5-missing-supervisor-anomaly",
+            "evidenceRefs": [
+              {
+                "$alias": "DOC"
+              }
+            ]
+          }
+        },
+        {
+          "id": "after-db-snapshot",
+          "kind": "query",
+          "evidenceRefs": [
+            "after-db-snapshot:actual-artifact"
+          ],
+          "actorRef": "A",
+          "route": "api",
+          "capabilityId": "getInventory",
+          "request": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "caseId": "C5",
+              "itemId": {
+                "$alias": "P"
+              }
+            },
+            "asOf": "2026-10-07T02:00:00Z",
+            "knownAt": "2026-10-07T04:00:00Z"
+          }
+        },
+        {
+          "id": "after-db",
+          "kind": "observe",
+          "evidenceRefs": [
+            "after-db:actual-artifact"
+          ],
+          "observation": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "caseId": "C5",
+              "itemId": {
+                "$alias": "P"
+              }
+            },
+            "asOf": "2026-10-07T02:00:00Z",
+            "knownAt": "2026-10-07T04:00:00Z",
+            "snapshotRef": {
+              "$result": {
+                "actionId": "after-db-snapshot",
+                "pointer": "/response/snapshotRevision"
+              }
+            },
+            "sources": [
+              "works",
+              "goalVersions",
+              "assessments",
+              "conditionResults",
+              "assessmentInputs",
+              "obligations",
+              "assignments",
+              "handovers",
+              "workLinks",
+              "segments",
+              "movements",
+              "contributions",
+              "activities",
+              "inbox",
+              "audit",
+              "outbox",
+              "executionAttempts",
+              "approvals",
+              "contracts",
+              "claims",
+              "observationCoverage",
+              "supervisionIssues"
+            ]
+          }
+        }
+      ],
+      "assertions": [
+        {
+          "id": "anomaly-outcome",
+          "op": "equals",
+          "source": {
+            "actionId": "anomaly",
+            "pointer": "/response/outcome"
+          },
+          "expected": "REJECTED",
+          "requirementRefs": [
+            "D10",
+            "D14",
+            "D26"
+          ],
+          "evidenceRefs": [
+            "anomaly:actual-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "C5",
+            "itemId": {
+              "$alias": "P"
+            }
+          },
+          "oracleExplanation": "종료된 부모 뒤 이상 접수의 책임 missing-supervisor. intake-activation의 독립 고정 기대값을 대조한다.",
+          "oracleRef": {
+            "oracleId": "C5.failed-link-responsibility",
+            "observationNames": [
+              "intake-activation"
+            ]
+          }
+        },
+        {
+          "id": "anomaly-works-unchanged",
+          "op": "sameAs",
+          "source": {
+            "actionId": "after-db",
+            "pointer": "/data/rawRows/works"
+          },
+          "expected": true,
+          "requirementRefs": [
+            "D10",
+            "D14",
+            "D26"
+          ],
+          "evidenceRefs": [
+            "after-db:actual-artifact",
+            "before-db:actual-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "C5",
+            "itemId": {
+              "$alias": "P"
+            }
+          },
+          "oracleExplanation": "같은 대상의 독립 전후 원행을 비교한다. 조회/거부 감사의 추가는 별도 허용한다.",
+          "oracleRef": {
+            "oracleId": "C5.failed-link-responsibility",
+            "observationNames": [
+              "intake-activation"
+            ]
+          },
+          "baseline": {
+            "actionId": "before-db",
+            "pointer": "/data/rawRows/works"
+          }
+        },
+        {
+          "id": "anomaly-obligations-unchanged",
+          "op": "sameAs",
+          "source": {
+            "actionId": "after-db",
+            "pointer": "/data/rawRows/obligations"
+          },
+          "expected": true,
+          "requirementRefs": [
+            "D10",
+            "D14",
+            "D26"
+          ],
+          "evidenceRefs": [
+            "after-db:actual-artifact",
+            "before-db:actual-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "C5",
+            "itemId": {
+              "$alias": "P"
+            }
+          },
+          "oracleExplanation": "같은 대상의 독립 전후 원행을 비교한다. 조회/거부 감사의 추가는 별도 허용한다.",
+          "oracleRef": {
+            "oracleId": "C5.failed-link-responsibility",
+            "observationNames": [
+              "intake-activation"
+            ]
+          },
+          "baseline": {
+            "actionId": "before-db",
+            "pointer": "/data/rawRows/obligations"
+          }
+        },
+        {
+          "id": "anomaly-assignments-unchanged",
+          "op": "sameAs",
+          "source": {
+            "actionId": "after-db",
+            "pointer": "/data/rawRows/assignments"
+          },
+          "expected": true,
+          "requirementRefs": [
+            "D10",
+            "D14",
+            "D26"
+          ],
+          "evidenceRefs": [
+            "after-db:actual-artifact",
+            "before-db:actual-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "C5",
+            "itemId": {
+              "$alias": "P"
+            }
+          },
+          "oracleExplanation": "같은 대상의 독립 전후 원행을 비교한다. 조회/거부 감사의 추가는 별도 허용한다.",
+          "oracleRef": {
+            "oracleId": "C5.failed-link-responsibility",
+            "observationNames": [
+              "intake-activation"
+            ]
+          },
+          "baseline": {
+            "actionId": "before-db",
+            "pointer": "/data/rawRows/assignments"
+          }
+        },
+        {
+          "id": "anomaly-outbox-unchanged",
+          "op": "sameAs",
+          "source": {
+            "actionId": "after-db",
+            "pointer": "/data/rawRows/outbox"
+          },
+          "expected": true,
+          "requirementRefs": [
+            "D10",
+            "D14",
+            "D26"
+          ],
+          "evidenceRefs": [
+            "after-db:actual-artifact",
+            "before-db:actual-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "C5",
+            "itemId": {
+              "$alias": "P"
+            }
+          },
+          "oracleExplanation": "같은 대상의 독립 전후 원행을 비교한다. 조회/거부 감사의 추가는 별도 허용한다.",
+          "oracleRef": {
+            "oracleId": "C5.failed-link-responsibility",
+            "observationNames": [
+              "intake-activation"
+            ]
+          },
+          "baseline": {
+            "actionId": "before-db",
+            "pointer": "/data/rawRows/outbox"
+          }
+        },
+        {
+          "id": "anomaly-denial-audit",
+          "op": "count",
+          "source": {
+            "actionId": "after-db",
+            "pointer": "/data/rawRows/audit",
+            "where": {
+              "commandKey": "C5-missing-supervisor-anomaly",
+              "outcome": "REJECTED"
+            }
+          },
+          "expected": 1,
+          "requirementRefs": [
+            "D10",
+            "D14",
+            "D26"
+          ],
+          "evidenceRefs": [
+            "after-db:actual-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "C5",
+            "itemId": {
+              "$alias": "P"
+            }
+          },
+          "oracleExplanation": "종료된 부모 뒤 이상 접수의 책임 missing-supervisor. intake-activation의 독립 고정 기대값을 대조한다.",
+          "oracleRef": {
+            "oracleId": "C5.failed-link-responsibility",
+            "observationNames": [
+              "intake-activation"
+            ]
+          }
+        },
+        {
+          "id": "intake-not-activated",
+          "op": "count",
+          "source": {
+            "actionId": "after-db",
+            "pointer": "/data/rawRows/inbox"
+          },
+          "expected": 0,
+          "requirementRefs": [
+            "D10",
+            "D14",
+            "D26"
+          ],
+          "evidenceRefs": [
+            "after-db:actual-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "C5",
+            "itemId": {
+              "$alias": "P"
+            }
+          },
+          "oracleExplanation": "종료된 부모 뒤 이상 접수의 책임 missing-supervisor. intake-activation의 독립 고정 기대값을 대조한다.",
+          "oracleRef": {
+            "oracleId": "C5.failed-link-responsibility",
+            "observationNames": [
+              "intake-activation"
+            ]
+          }
+        },
+        {
+          "id": "parent-not-rewritten",
+          "op": "sameAs",
+          "source": {
+            "actionId": "after-db",
+            "pointer": "/data/rawRows/works",
+            "where": {
+              "id": {
+                "$alias": "PARENT"
+              }
+            }
+          },
+          "expected": true,
+          "requirementRefs": [
+            "D10",
+            "D14",
+            "D26"
+          ],
+          "evidenceRefs": [
+            "after-db:actual-artifact",
+            "before-db:actual-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "C5",
+            "itemId": {
+              "$alias": "P"
+            }
+          },
+          "oracleExplanation": "같은 대상의 독립 전후 원행을 비교한다. 조회/거부 감사의 추가는 별도 허용한다.",
+          "oracleRef": {
+            "oracleId": "C5.failed-link-responsibility",
+            "observationNames": [
+              "closed-parent-rewrite"
+            ]
+          },
+          "baseline": {
+            "actionId": "before-db",
+            "pointer": "/data/rawRows/works",
+            "where": {
+              "id": {
+                "$alias": "PARENT"
+              }
+            }
+          }
+        },
+        {
+          "id": "parent-assessment-not-rewritten",
+          "op": "sameAs",
+          "source": {
+            "actionId": "after-db",
+            "pointer": "/data/rawRows/assessments",
+            "where": {
+              "id": {
+                "$alias": "OLDASSESS"
+              }
+            }
+          },
+          "expected": true,
+          "requirementRefs": [
+            "D10",
+            "D14",
+            "D26"
+          ],
+          "evidenceRefs": [
+            "after-db:actual-artifact",
+            "before-db:actual-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "C5",
+            "itemId": {
+              "$alias": "P"
+            }
+          },
+          "oracleExplanation": "같은 대상의 독립 전후 원행을 비교한다. 조회/거부 감사의 추가는 별도 허용한다.",
+          "oracleRef": {
+            "oracleId": "C5.failed-link-responsibility",
+            "observationNames": [
+              "closed-parent-rewrite"
+            ]
+          },
+          "baseline": {
+            "actionId": "before-db",
+            "pointer": "/data/rawRows/assessments",
+            "where": {
+              "id": {
+                "$alias": "OLDASSESS"
+              }
+            }
+          }
+        }
+      ],
+      "oracleExplanation": "가상 fixture의 입력과 실제 명령을 구별한다. 수량은 BOX decimal 문자열과 식별된 실물 범위로 손계산한다. 원행 관찰은 API projection을 복사하지 않는다. 종료된 부모 뒤 이상 접수의 책임 missing-supervisor"
+    },
+    {
+      "id": "same-anomaly-three-retries",
+      "title": "같은 이상 재처리3회는 후속 업무와 의무 각각1개로 연결한다",
+      "fixtureRef": "verification/cases/C5/fixtures/same-anomaly-three-retries.json",
+      "requiredAdapters": [
+        "fixture",
+        "api",
+        "db",
+        "control",
+        "host"
+      ],
+      "actions": [
+        {
+          "id": "setup",
+          "kind": "installFixture",
+          "evidenceRefs": [
+            "setup:actual-artifact"
+          ],
+          "fixtureRef": "verification/cases/C5/fixtures/same-anomaly-three-retries.json"
+        },
+        {
+          "id": "anomaly",
+          "kind": "invoke",
+          "evidenceRefs": [
+            "anomaly:actual-artifact"
+          ],
+          "actorRef": "intake",
+          "route": "api",
+          "capabilityId": "recordActivity",
+          "request": {
+            "intentKind": "RECORD",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "recordActivity",
+            "subjectRefs": [
+              {
+                "type": "TradeItem",
+                "id": {
+                  "$alias": "P"
+                }
+              }
+            ],
+            "slots": {
+              "activityKind": "TEMPERATURE_OBSERVATION",
+              "segmentId": {
+                "$alias": "Q"
+              },
+              "temperature": {
+                "value": "12",
+                "unit": "CELSIUS"
+              },
+              "occurredAt": "2026-10-07T01:00:00Z",
+              "sourceNamespace": "synthetic-warehouse",
+              "externalEventId": "stable-temp-anomaly",
+              "sourceVersion": "1",
+              "parentWorkId": {
+                "$alias": "PARENT"
+              }
+            },
+            "expectedRevision": 1,
+            "commandIdempotencyKey": "C5-same-anomaly-three-retries-anomaly",
+            "evidenceRefs": [
+              {
+                "$alias": "DOC"
+              }
+            ]
+          }
+        },
+        {
+          "id": "link-fault",
+          "kind": "control",
+          "evidenceRefs": [
+            "link-fault:actual-artifact"
+          ],
+          "control": {
+            "type": "fault",
+            "operation": "arm",
+            "parameters": {
+              "point": "intake.afterObligationBeforeWorkLink",
+              "once": true
+            }
+          }
+        },
+        {
+          "id": "failed-followup",
+          "kind": "invoke",
+          "evidenceRefs": [
+            "failed-followup:actual-artifact"
+          ],
+          "actorRef": "intake",
+          "route": "api",
+          "capabilityId": "createFollowup",
+          "request": {
+            "intentKind": "COMMAND",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "createFollowup",
+            "subjectRefs": [
+              {
+                "type": "TradeItem",
+                "id": {
+                  "$alias": "P"
+                }
+              }
+            ],
+            "slots": {
+              "sourceOccurrenceId": {
+                "$result": {
+                  "actionId": "anomaly",
+                  "pointer": "/response/occurrenceId"
+                }
+              },
+              "parentWorkId": {
+                "$alias": "PARENT"
+              },
+              "ownerId": {
+                "$alias": "A"
+              },
+              "supervisorId": {
+                "$alias": "supervisor"
+              },
+              "nextAction": "온도 이상 원자료 확인",
+              "nextCheckAt": "2026-10-08T09:00:00Z"
+            },
+            "expectedRevision": 1,
+            "commandIdempotencyKey": "C5-same-anomaly-three-retries-failed-followup",
+            "evidenceRefs": [
+              {
+                "$alias": "DOC"
+              }
+            ]
+          }
+        },
+        {
+          "id": "release-link-fault",
+          "kind": "control",
+          "evidenceRefs": [
+            "release-link-fault:actual-artifact"
+          ],
+          "control": {
+            "type": "fault",
+            "operation": "release",
+            "parameters": {
+              "point": "intake.afterObligationBeforeWorkLink"
+            }
+          }
+        },
+        {
+          "id": "retry-1-advance",
+          "kind": "control",
+          "evidenceRefs": [
+            "retry-1-advance:actual-artifact"
+          ],
+          "control": {
+            "type": "clock",
+            "operation": "advanceTo",
+            "parameters": {
+              "instant": "2026-10-07T03:00:00Z"
+            }
+          }
+        },
+        {
+          "id": "retry-1",
+          "kind": "control",
+          "evidenceRefs": [
+            "retry-1:actual-artifact"
+          ],
+          "control": {
+            "type": "process",
+            "operation": "tickScheduler",
+            "parameters": {
+              "schedulerId": "ontology-scheduler",
+              "tickId": "C5-same-anomaly-three-retries-retry-1",
+              "scope": {
+                "organizationId": {
+                  "$alias": "ORG"
+                },
+                "caseId": "C5",
+                "itemId": {
+                  "$alias": "P"
+                },
+                "occurrenceId": {
+                  "$result": {
+                    "actionId": "anomaly",
+                    "pointer": "/response/occurrenceId"
+                  }
+                }
+              },
+              "clock": "2026-10-07T03:00:00Z"
+            }
+          }
+        },
+        {
+          "id": "retry-1-terminal",
+          "kind": "control",
+          "evidenceRefs": [
+            "retry-1-terminal:actual-artifact"
+          ],
+          "control": {
+            "type": "process",
+            "operation": "awaitRuntimeTask",
+            "parameters": {
+              "schedulerId": "ontology-scheduler",
+              "taskId": {
+                "$result": {
+                  "actionId": "retry-1",
+                  "pointer": "/data/hostObservation/operationEvidence/taskId"
+                }
+              },
+              "scope": {
+                "organizationId": {
+                  "$alias": "ORG"
+                },
+                "caseId": "C5",
+                "itemId": {
+                  "$alias": "P"
+                },
+                "occurrenceId": {
+                  "$result": {
+                    "actionId": "anomaly",
+                    "pointer": "/response/occurrenceId"
+                  }
+                }
+              },
+              "timeoutSeconds": 30
+            }
+          }
+        },
+        {
+          "id": "retry-2-advance",
+          "kind": "control",
+          "evidenceRefs": [
+            "retry-2-advance:actual-artifact"
+          ],
+          "control": {
+            "type": "clock",
+            "operation": "advanceTo",
+            "parameters": {
+              "instant": "2026-10-07T03:00:00Z"
+            }
+          }
+        },
+        {
+          "id": "retry-2",
+          "kind": "control",
+          "evidenceRefs": [
+            "retry-2:actual-artifact"
+          ],
+          "control": {
+            "type": "process",
+            "operation": "tickScheduler",
+            "parameters": {
+              "schedulerId": "ontology-scheduler",
+              "tickId": "C5-same-anomaly-three-retries-retry-2",
+              "scope": {
+                "organizationId": {
+                  "$alias": "ORG"
+                },
+                "caseId": "C5",
+                "itemId": {
+                  "$alias": "P"
+                },
+                "occurrenceId": {
+                  "$result": {
+                    "actionId": "anomaly",
+                    "pointer": "/response/occurrenceId"
+                  }
+                }
+              },
+              "clock": "2026-10-07T03:00:00Z"
+            }
+          }
+        },
+        {
+          "id": "retry-2-terminal",
+          "kind": "control",
+          "evidenceRefs": [
+            "retry-2-terminal:actual-artifact"
+          ],
+          "control": {
+            "type": "process",
+            "operation": "awaitRuntimeTask",
+            "parameters": {
+              "schedulerId": "ontology-scheduler",
+              "taskId": {
+                "$result": {
+                  "actionId": "retry-2",
+                  "pointer": "/data/hostObservation/operationEvidence/taskId"
+                }
+              },
+              "scope": {
+                "organizationId": {
+                  "$alias": "ORG"
+                },
+                "caseId": "C5",
+                "itemId": {
+                  "$alias": "P"
+                },
+                "occurrenceId": {
+                  "$result": {
+                    "actionId": "anomaly",
+                    "pointer": "/response/occurrenceId"
+                  }
+                }
+              },
+              "timeoutSeconds": 30
+            }
+          }
+        },
+        {
+          "id": "retry-3-advance",
+          "kind": "control",
+          "evidenceRefs": [
+            "retry-3-advance:actual-artifact"
+          ],
+          "control": {
+            "type": "clock",
+            "operation": "advanceTo",
+            "parameters": {
+              "instant": "2026-10-07T03:00:00Z"
+            }
+          }
+        },
+        {
+          "id": "retry-3",
+          "kind": "control",
+          "evidenceRefs": [
+            "retry-3:actual-artifact"
+          ],
+          "control": {
+            "type": "process",
+            "operation": "tickScheduler",
+            "parameters": {
+              "schedulerId": "ontology-scheduler",
+              "tickId": "C5-same-anomaly-three-retries-retry-3",
+              "scope": {
+                "organizationId": {
+                  "$alias": "ORG"
+                },
+                "caseId": "C5",
+                "itemId": {
+                  "$alias": "P"
+                },
+                "occurrenceId": {
+                  "$result": {
+                    "actionId": "anomaly",
+                    "pointer": "/response/occurrenceId"
+                  }
+                }
+              },
+              "clock": "2026-10-07T03:00:00Z"
+            }
+          }
+        },
+        {
+          "id": "retry-3-terminal",
+          "kind": "control",
+          "evidenceRefs": [
+            "retry-3-terminal:actual-artifact"
+          ],
+          "control": {
+            "type": "process",
+            "operation": "awaitRuntimeTask",
+            "parameters": {
+              "schedulerId": "ontology-scheduler",
+              "taskId": {
+                "$result": {
+                  "actionId": "retry-3",
+                  "pointer": "/data/hostObservation/operationEvidence/taskId"
+                }
+              },
+              "scope": {
+                "organizationId": {
+                  "$alias": "ORG"
+                },
+                "caseId": "C5",
+                "itemId": {
+                  "$alias": "P"
+                },
+                "occurrenceId": {
+                  "$result": {
+                    "actionId": "anomaly",
+                    "pointer": "/response/occurrenceId"
+                  }
+                }
+              },
+              "timeoutSeconds": 30
+            }
+          }
+        },
+        {
+          "id": "connected",
+          "kind": "query",
+          "evidenceRefs": [
+            "connected:actual-artifact"
+          ],
+          "actorRef": "A",
+          "route": "api",
+          "capabilityId": "getInbox",
+          "request": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "caseId": "C5",
+              "itemId": {
+                "$alias": "P"
+              }
+            },
+            "asOf": "2026-10-07T03:00:00Z",
+            "knownAt": "2026-10-07T04:00:00Z",
+            "occurrenceId": {
+              "$result": {
+                "actionId": "anomaly",
+                "pointer": "/response/occurrenceId"
+              }
+            }
+          }
+        },
+        {
+          "id": "after-db",
+          "kind": "observe",
+          "evidenceRefs": [
+            "after-db:actual-artifact"
+          ],
+          "observation": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "caseId": "C5",
+              "itemId": {
+                "$alias": "P"
+              }
+            },
+            "asOf": "2026-10-07T03:00:00Z",
+            "knownAt": "2026-10-07T04:00:00Z",
+            "snapshotRef": {
+              "$result": {
+                "actionId": "connected",
+                "pointer": "/response/snapshotRevision"
+              }
+            },
+            "sources": [
+              "works",
+              "goalVersions",
+              "assessments",
+              "conditionResults",
+              "assessmentInputs",
+              "obligations",
+              "assignments",
+              "handovers",
+              "workLinks",
+              "segments",
+              "movements",
+              "contributions",
+              "activities",
+              "inbox",
+              "audit",
+              "outbox",
+              "executionAttempts",
+              "approvals",
+              "contracts",
+              "claims",
+              "observationCoverage",
+              "supervisionIssues"
+            ]
+          }
+        }
+      ],
+      "assertions": [
+        {
+          "id": "one-anomaly-work",
+          "op": "count",
+          "source": {
+            "actionId": "after-db",
+            "pointer": "/data/rawRows/works",
+            "where": {
+              "sourceOccurrenceId": {
+                "$result": {
+                  "actionId": "anomaly",
+                  "pointer": "/response/occurrenceId"
+                }
+              }
+            }
+          },
+          "expected": 1,
+          "requirementRefs": [
+            "D10",
+            "D14",
+            "D26"
+          ],
+          "evidenceRefs": [
+            "after-db:actual-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "C5",
+            "itemId": {
+              "$alias": "P"
+            }
+          },
+          "oracleExplanation": "같은 이상 재처리3회는 후속 업무와 의무 각각1개로 연결한다. anomaly-work-count의 독립 고정 기대값을 대조한다.",
+          "oracleRef": {
+            "oracleId": "C5.retry-once",
+            "observationNames": [
+              "anomaly-work-count"
+            ]
+          }
+        },
+        {
+          "id": "one-anomaly-obligation",
+          "op": "count",
+          "source": {
+            "actionId": "after-db",
+            "pointer": "/data/rawRows/obligations",
+            "where": {
+              "sourceOccurrenceId": {
+                "$result": {
+                  "actionId": "anomaly",
+                  "pointer": "/response/occurrenceId"
+                }
+              }
+            }
+          },
+          "expected": 1,
+          "requirementRefs": [
+            "D10",
+            "D14",
+            "D26"
+          ],
+          "evidenceRefs": [
+            "after-db:actual-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "C5",
+            "itemId": {
+              "$alias": "P"
+            }
+          },
+          "oracleExplanation": "같은 이상 재처리3회는 후속 업무와 의무 각각1개로 연결한다. anomaly-obligation-count의 독립 고정 기대값을 대조한다.",
+          "oracleRef": {
+            "oracleId": "C5.retry-once",
+            "observationNames": [
+              "anomaly-obligation-count"
+            ]
+          }
+        },
+        {
+          "id": "connected-owner",
+          "op": "relationSet",
+          "source": {
+            "actionId": "after-db",
+            "pointer": "/data/rawRows/works",
+            "where": {
+              "sourceOccurrenceId": {
+                "$result": {
+                  "actionId": "anomaly",
+                  "pointer": "/response/occurrenceId"
+                }
+              }
+            },
+            "field": [
+              "ownerId",
+              "supervisorId",
+              "nextAction",
+              "nextCheckAt"
+            ]
+          },
+          "expected": [
+            [
+              {
+                "$alias": "A"
+              },
+              {
+                "$alias": "supervisor"
+              },
+              "온도 이상 원자료 확인",
+              "2026-10-08T09:00:00Z"
+            ]
+          ],
+          "requirementRefs": [
+            "D10",
+            "D14",
+            "D26"
+          ],
+          "evidenceRefs": [
+            "after-db:actual-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "C5",
+            "itemId": {
+              "$alias": "P"
+            }
+          },
+          "oracleExplanation": "같은 이상 재처리3회는 후속 업무와 의무 각각1개로 연결한다. connected-work-owner의 독립 고정 기대값을 대조한다.",
+          "oracleRef": {
+            "oracleId": "C5.retry-once",
+            "observationNames": [
+              "connected-work-owner"
+            ]
+          }
+        },
+        {
+          "id": "one-current-assignment",
+          "op": "count",
+          "source": {
+            "actionId": "after-db",
+            "pointer": "/data/rawRows/assignments",
+            "where": {
+              "sourceOccurrenceId": {
+                "$result": {
+                  "actionId": "anomaly",
+                  "pointer": "/response/occurrenceId"
+                }
+              },
+              "status": "OPEN"
+            }
+          },
+          "expected": 1,
+          "requirementRefs": [
+            "D10",
+            "D14",
+            "D26"
+          ],
+          "evidenceRefs": [
+            "after-db:actual-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "C5",
+            "itemId": {
+              "$alias": "P"
+            }
+          },
+          "oracleExplanation": "같은 이상 재처리3회는 후속 업무와 의무 각각1개로 연결한다. connected-work-owner의 독립 고정 기대값을 대조한다.",
+          "oracleRef": {
+            "oracleId": "C5.retry-once",
+            "observationNames": [
+              "connected-work-owner"
+            ]
+          }
+        },
+        {
+          "id": "assignment-owner",
+          "op": "relationSet",
+          "source": {
+            "actionId": "after-db",
+            "pointer": "/data/rawRows/assignments",
+            "where": {
+              "sourceOccurrenceId": {
+                "$result": {
+                  "actionId": "anomaly",
+                  "pointer": "/response/occurrenceId"
+                }
+              },
+              "status": "OPEN"
+            },
+            "field": [
+              "ownerId",
+              "nextAction",
+              "nextCheckAt"
+            ]
+          },
+          "expected": [
+            [
+              {
+                "$alias": "A"
+              },
+              "온도 이상 원자료 확인",
+              "2026-10-08T09:00:00Z"
+            ]
+          ],
+          "requirementRefs": [
+            "D10",
+            "D14",
+            "D26"
+          ],
+          "evidenceRefs": [
+            "after-db:actual-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "C5",
+            "itemId": {
+              "$alias": "P"
+            }
+          },
+          "oracleExplanation": "같은 이상 재처리3회는 후속 업무와 의무 각각1개로 연결한다. connected-work-owner의 독립 고정 기대값을 대조한다.",
+          "oracleRef": {
+            "oracleId": "C5.retry-once",
+            "observationNames": [
+              "connected-work-owner"
+            ]
+          }
+        },
+        {
+          "id": "intake-closed-after-link",
+          "op": "equals",
+          "source": {
+            "actionId": "after-db",
+            "pointer": "/data/rawRows/inbox",
+            "where": {
+              "occurrenceId": {
+                "$result": {
+                  "actionId": "anomaly",
+                  "pointer": "/response/occurrenceId"
+                }
+              }
+            },
+            "field": "trackingStatus"
+          },
+          "expected": [
+            "CLOSED"
+          ],
+          "requirementRefs": [
+            "D10",
+            "D14",
+            "D26"
+          ],
+          "evidenceRefs": [
+            "after-db:actual-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "C5",
+            "itemId": {
+              "$alias": "P"
+            }
+          },
+          "oracleExplanation": "같은 이상 재처리3회는 후속 업무와 의무 각각1개로 연결한다. intake-close-after-link의 독립 고정 기대값을 대조한다.",
+          "oracleRef": {
+            "oracleId": "C5.retry-once",
+            "observationNames": [
+              "intake-close-after-link"
+            ]
+          }
+        },
+        {
+          "id": "work-link-identity",
+          "op": "sameAs",
+          "source": {
+            "actionId": "after-db",
+            "pointer": "/data/rawRows/inbox",
+            "where": {
+              "occurrenceId": {
+                "$result": {
+                  "actionId": "anomaly",
+                  "pointer": "/response/occurrenceId"
+                }
+              }
+            },
+            "field": "connectedWorkId"
+          },
+          "expected": true,
+          "requirementRefs": [
+            "D10",
+            "D14",
+            "D26"
+          ],
+          "evidenceRefs": [
+            "after-db:actual-artifact",
+            "after-db:actual-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "C5",
+            "itemId": {
+              "$alias": "P"
+            }
+          },
+          "oracleExplanation": "같은 이상 재처리3회는 후속 업무와 의무 각각1개로 연결한다. intake-close-after-link의 독립 고정 기대값을 대조한다.",
+          "oracleRef": {
+            "oracleId": "C5.retry-once",
+            "observationNames": [
+              "intake-close-after-link"
+            ]
+          },
+          "baseline": {
+            "actionId": "after-db",
+            "pointer": "/data/rawRows/works",
+            "where": {
+              "sourceOccurrenceId": {
+                "$result": {
+                  "actionId": "anomaly",
+                  "pointer": "/response/occurrenceId"
+                }
+              }
+            },
+            "field": "id"
+          }
+        },
+        {
+          "id": "duty-work-link",
+          "op": "equals",
+          "source": {
+            "actionId": "after-db",
+            "pointer": "/data/rawRows/obligations",
+            "where": {
+              "sourceOccurrenceId": {
+                "$result": {
+                  "actionId": "anomaly",
+                  "pointer": "/response/occurrenceId"
+                }
+              }
+            },
+            "field": "responsibleWorkId"
+          },
+          "expected": [
+            {
+              "$result": {
+                "actionId": "connected",
+                "pointer": "/response/data/workId"
+              }
+            }
+          ],
+          "requirementRefs": [
+            "D10",
+            "D14",
+            "D26"
+          ],
+          "evidenceRefs": [
+            "after-db:actual-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "C5",
+            "itemId": {
+              "$alias": "P"
+            }
+          },
+          "oracleExplanation": "같은 이상 재처리3회는 후속 업무와 의무 각각1개로 연결한다. intake-close-after-link의 독립 고정 기대값을 대조한다.",
+          "oracleRef": {
+            "oracleId": "C5.retry-once",
+            "observationNames": [
+              "intake-close-after-link"
+            ]
+          }
+        }
+      ],
+      "oracleExplanation": "가상 fixture의 입력과 실제 명령을 구별한다. 수량은 BOX decimal 문자열과 식별된 실물 범위로 손계산한다. 원행 관찰은 API projection을 복사하지 않는다. 같은 이상 재처리3회는 후속 업무와 의무 각각1개로 연결한다"
+    },
+    {
+      "id": "normal-observation-no-work",
+      "title": "정상 관측은 근거를 보존하고 새 업무와 실행 시도를 만들지 않는다",
+      "fixtureRef": "verification/cases/C5/fixtures/normal-observation-no-work.json",
+      "requiredAdapters": [
+        "fixture",
+        "api",
+        "db",
+        "control",
+        "host"
+      ],
+      "actions": [
+        {
+          "id": "setup",
+          "kind": "installFixture",
+          "evidenceRefs": [
+            "setup:actual-artifact"
+          ],
+          "fixtureRef": "verification/cases/C5/fixtures/normal-observation-no-work.json"
+        },
+        {
+          "id": "before-db-snapshot",
+          "kind": "query",
+          "evidenceRefs": [
+            "before-db-snapshot:actual-artifact"
+          ],
+          "actorRef": "A",
+          "route": "api",
+          "capabilityId": "getInventory",
+          "request": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "caseId": "C5",
+              "itemId": {
+                "$alias": "P"
+              }
+            },
+            "asOf": "2026-10-07T02:00:00Z",
+            "knownAt": "2026-10-07T04:00:00Z"
+          }
+        },
+        {
+          "id": "before-db",
+          "kind": "observe",
+          "evidenceRefs": [
+            "before-db:actual-artifact"
+          ],
+          "observation": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "caseId": "C5",
+              "itemId": {
+                "$alias": "P"
+              }
+            },
+            "asOf": "2026-10-07T02:00:00Z",
+            "knownAt": "2026-10-07T04:00:00Z",
+            "snapshotRef": {
+              "$result": {
+                "actionId": "before-db-snapshot",
+                "pointer": "/response/snapshotRevision"
+              }
+            },
+            "sources": [
+              "works",
+              "goalVersions",
+              "assessments",
+              "conditionResults",
+              "assessmentInputs",
+              "obligations",
+              "assignments",
+              "handovers",
+              "workLinks",
+              "segments",
+              "movements",
+              "contributions",
+              "activities",
+              "inbox",
+              "audit",
+              "outbox",
+              "executionAttempts",
+              "approvals",
+              "contracts",
+              "claims",
+              "observationCoverage",
+              "supervisionIssues"
+            ]
+          }
+        },
+        {
+          "id": "normal",
+          "kind": "invoke",
+          "evidenceRefs": [
+            "normal:actual-artifact"
+          ],
+          "actorRef": "intake",
+          "route": "api",
+          "capabilityId": "recordActivity",
+          "request": {
+            "intentKind": "RECORD",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "recordActivity",
+            "subjectRefs": [
+              {
+                "type": "TradeItem",
+                "id": {
+                  "$alias": "P"
+                }
+              }
+            ],
+            "slots": {
+              "activityKind": "TEMPERATURE_OBSERVATION",
+              "segmentId": {
+                "$alias": "Q"
+              },
+              "temperature": {
+                "value": "5",
+                "unit": "CELSIUS"
+              },
+              "occurredAt": "2026-10-07T01:00:00Z",
+              "sourceNamespace": "synthetic-warehouse",
+              "externalEventId": "normal-temp",
+              "sourceVersion": "1"
+            },
+            "expectedRevision": 1,
+            "commandIdempotencyKey": "C5-normal-observation-no-work-normal",
+            "evidenceRefs": [
+              {
+                "$alias": "DOC"
+              }
+            ]
+          }
+        },
+        {
+          "id": "normal-tick-advance",
+          "kind": "control",
+          "evidenceRefs": [
+            "normal-tick-advance:actual-artifact"
+          ],
+          "control": {
+            "type": "clock",
+            "operation": "advanceTo",
+            "parameters": {
+              "instant": "2026-10-07T03:00:00Z"
+            }
+          }
+        },
+        {
+          "id": "normal-tick",
+          "kind": "control",
+          "evidenceRefs": [
+            "normal-tick:actual-artifact"
+          ],
+          "control": {
+            "type": "process",
+            "operation": "tickScheduler",
+            "parameters": {
+              "schedulerId": "ontology-scheduler",
+              "tickId": "C5-normal-observation-no-work-normal-tick",
+              "scope": {
+                "organizationId": {
+                  "$alias": "ORG"
+                },
+                "caseId": "C5",
+                "itemId": {
+                  "$alias": "P"
+                },
+                "occurrenceId": {
+                  "$result": {
+                    "actionId": "normal",
+                    "pointer": "/response/occurrenceId"
+                  }
+                }
+              },
+              "clock": "2026-10-07T03:00:00Z"
+            }
+          }
+        },
+        {
+          "id": "normal-tick-terminal",
+          "kind": "control",
+          "evidenceRefs": [
+            "normal-tick-terminal:actual-artifact"
+          ],
+          "control": {
+            "type": "process",
+            "operation": "awaitRuntimeTask",
+            "parameters": {
+              "schedulerId": "ontology-scheduler",
+              "taskId": {
+                "$result": {
+                  "actionId": "normal-tick",
+                  "pointer": "/data/hostObservation/operationEvidence/taskId"
+                }
+              },
+              "scope": {
+                "organizationId": {
+                  "$alias": "ORG"
+                },
+                "caseId": "C5",
+                "itemId": {
+                  "$alias": "P"
+                },
+                "occurrenceId": {
+                  "$result": {
+                    "actionId": "normal",
+                    "pointer": "/response/occurrenceId"
+                  }
+                }
+              },
+              "timeoutSeconds": 30
+            }
+          }
+        },
+        {
+          "id": "after-db-snapshot",
+          "kind": "query",
+          "evidenceRefs": [
+            "after-db-snapshot:actual-artifact"
+          ],
+          "actorRef": "A",
+          "route": "api",
+          "capabilityId": "getInventory",
+          "request": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "caseId": "C5",
+              "itemId": {
+                "$alias": "P"
+              }
+            },
+            "asOf": "2026-10-07T03:00:00Z",
+            "knownAt": "2026-10-07T04:00:00Z"
+          }
+        },
+        {
+          "id": "after-db",
+          "kind": "observe",
+          "evidenceRefs": [
+            "after-db:actual-artifact"
+          ],
+          "observation": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "caseId": "C5",
+              "itemId": {
+                "$alias": "P"
+              }
+            },
+            "asOf": "2026-10-07T03:00:00Z",
+            "knownAt": "2026-10-07T04:00:00Z",
+            "snapshotRef": {
+              "$result": {
+                "actionId": "after-db-snapshot",
+                "pointer": "/response/snapshotRevision"
+              }
+            },
+            "sources": [
+              "works",
+              "goalVersions",
+              "assessments",
+              "conditionResults",
+              "assessmentInputs",
+              "obligations",
+              "assignments",
+              "handovers",
+              "workLinks",
+              "segments",
+              "movements",
+              "contributions",
+              "activities",
+              "inbox",
+              "audit",
+              "outbox",
+              "executionAttempts",
+              "approvals",
+              "contracts",
+              "claims",
+              "observationCoverage",
+              "supervisionIssues"
+            ]
+          }
+        }
+      ],
+      "assertions": [
+        {
+          "id": "no-normal-work",
+          "op": "count",
+          "source": {
+            "actionId": "after-db",
+            "pointer": "/data/rawRows/works",
+            "where": {
+              "sourceOccurrenceId": {
+                "$result": {
+                  "actionId": "normal",
+                  "pointer": "/response/occurrenceId"
+                }
+              }
+            }
+          },
+          "expected": 0,
+          "requirementRefs": [
+            "D10",
+            "D14",
+            "D26"
+          ],
+          "evidenceRefs": [
+            "after-db:actual-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "C5",
+            "itemId": {
+              "$alias": "P"
+            }
+          },
+          "oracleExplanation": "정상 관측은 근거를 보존하고 새 업무와 실행 시도를 만들지 않는다. normal-observation-work의 독립 고정 기대값을 대조한다.",
+          "oracleRef": {
+            "oracleId": "C5.retry-once",
+            "observationNames": [
+              "normal-observation-work"
+            ]
+          }
+        },
+        {
+          "id": "work-set-unchanged",
+          "op": "sameAs",
+          "source": {
+            "actionId": "after-db",
+            "pointer": "/data/rawRows/works"
+          },
+          "expected": true,
+          "requirementRefs": [
+            "D10",
+            "D14",
+            "D26"
+          ],
+          "evidenceRefs": [
+            "after-db:actual-artifact",
+            "before-db:actual-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "C5",
+            "itemId": {
+              "$alias": "P"
+            }
+          },
+          "oracleExplanation": "같은 대상의 독립 전후 원행을 비교한다. 조회/거부 감사의 추가는 별도 허용한다.",
+          "oracleRef": {
+            "oracleId": "C5.retry-once",
+            "observationNames": [
+              "normal-observation-work"
+            ]
+          },
+          "baseline": {
+            "actionId": "before-db",
+            "pointer": "/data/rawRows/works"
+          }
+        },
+        {
+          "id": "no-normal-execution",
+          "op": "count",
+          "source": {
+            "actionId": "after-db",
+            "pointer": "/data/rawRows/executionAttempts",
+            "where": {
+              "sourceOccurrenceId": {
+                "$result": {
+                  "actionId": "normal",
+                  "pointer": "/response/occurrenceId"
+                }
+              }
+            }
+          },
+          "expected": 0,
+          "requirementRefs": [
+            "D10",
+            "D14",
+            "D26"
+          ],
+          "evidenceRefs": [
+            "after-db:actual-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "C5",
+            "itemId": {
+              "$alias": "P"
+            }
+          },
+          "oracleExplanation": "정상 관측은 근거를 보존하고 새 업무와 실행 시도를 만들지 않는다. normal-observation-run의 독립 고정 기대값을 대조한다.",
+          "oracleRef": {
+            "oracleId": "C5.retry-once",
+            "observationNames": [
+              "normal-observation-run"
+            ]
+          }
+        },
+        {
+          "id": "no-normal-obligation",
+          "op": "count",
+          "source": {
+            "actionId": "after-db",
+            "pointer": "/data/rawRows/obligations",
+            "where": {
+              "sourceOccurrenceId": {
+                "$result": {
+                  "actionId": "normal",
+                  "pointer": "/response/occurrenceId"
+                }
+              }
+            }
+          },
+          "expected": 0,
+          "requirementRefs": [
+            "D10",
+            "D14",
+            "D26"
+          ],
+          "evidenceRefs": [
+            "after-db:actual-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "C5",
+            "itemId": {
+              "$alias": "P"
+            }
+          },
+          "oracleExplanation": "정상 관측은 근거를 보존하고 새 업무와 실행 시도를 만들지 않는다. intake-close-after-link의 독립 고정 기대값을 대조한다.",
+          "oracleRef": {
+            "oracleId": "C5.retry-once",
+            "observationNames": [
+              "intake-close-after-link"
+            ]
+          }
+        },
+        {
+          "id": "normal-intake-reason",
+          "op": "relationSet",
+          "source": {
+            "actionId": "after-db",
+            "pointer": "/data/rawRows/inbox",
+            "where": {
+              "occurrenceId": {
+                "$result": {
+                  "actionId": "normal",
+                  "pointer": "/response/occurrenceId"
+                }
+              }
+            },
+            "field": [
+              "trackingStatus",
+              "policyVersion",
+              "decisionReason"
+            ]
+          },
+          "expected": [
+            [
+              "CLOSED",
+              "SYNTHETIC-policy-v1",
+              "TEMPERATURE_WITHIN_2_8_NO_RESPONSE_DUTY"
+            ]
+          ],
+          "requirementRefs": [
+            "D10",
+            "D14",
+            "D26"
+          ],
+          "evidenceRefs": [
+            "after-db:actual-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "C5",
+            "itemId": {
+              "$alias": "P"
+            }
+          },
+          "oracleExplanation": "정상 관측은 근거를 보존하고 새 업무와 실행 시도를 만들지 않는다. intake-close-after-link의 독립 고정 기대값을 대조한다.",
+          "oracleRef": {
+            "oracleId": "C5.retry-once",
+            "observationNames": [
+              "intake-close-after-link"
+            ]
+          }
+        }
+      ],
+      "oracleExplanation": "가상 fixture의 입력과 실제 명령을 구별한다. 수량은 BOX decimal 문자열과 식별된 실물 범위로 손계산한다. 원행 관찰은 API projection을 복사하지 않는다. 정상 관측은 근거를 보존하고 새 업무와 실행 시도를 만들지 않는다"
+    }
+  ]
+}

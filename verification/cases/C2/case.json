@@ -1,0 +1,1871 @@
+{
+  "schemaVersion": "1.0.0",
+  "caseId": "C2",
+  "title": "목표·의무·판정·접수 책임의 독립 계약 C2",
+  "requirementRefs": [
+    "D09",
+    "D12"
+  ],
+  "profiles": [
+    "scenarios"
+  ],
+  "subcases": [
+    {
+      "id": "cumulative-versus-state",
+      "title": "월60 수령·화60 출고·수40 수령의 누적100과 현재40을 구별한다",
+      "fixtureRef": "verification/cases/C2/fixtures/cumulative-versus-state.json",
+      "requiredAdapters": [
+        "fixture",
+        "api",
+        "db"
+      ],
+      "actions": [
+        {
+          "id": "setup",
+          "kind": "installFixture",
+          "evidenceRefs": [
+            "setup:actual-artifact"
+          ],
+          "fixtureRef": "verification/cases/C2/fixtures/cumulative-versus-state.json"
+        },
+        {
+          "id": "cumulative",
+          "kind": "invoke",
+          "evidenceRefs": [
+            "cumulative:actual-artifact"
+          ],
+          "actorRef": "A",
+          "route": "api",
+          "capabilityId": "createWork",
+          "request": {
+            "intentKind": "COMMAND",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "createWork",
+            "subjectRefs": [
+              {
+                "type": "TradeItem",
+                "id": {
+                  "$alias": "P"
+                }
+              }
+            ],
+            "slots": {
+              "workType": "PURCHASE_ARRIVAL",
+              "quantity": {
+                "value": "100",
+                "unit": "BOX",
+                "provenance": "USER"
+              },
+              "destinationId": {
+                "$alias": "W"
+              },
+              "dueAt": "2026-10-07T02:00:00Z",
+              "endpoint": "ARRIVED",
+              "quantityMode": "CUMULATIVE_EVENT",
+              "period": {
+                "start": "2026-10-05T09:00:00Z",
+                "end": "2026-10-07T01:30:00Z",
+                "endInclusive": true
+              },
+              "eventKinds": [
+                "CONFIRMED_RECEIPT"
+              ],
+              "distinctContributionScope": "CANONICAL_PHYSICAL_FULFILMENT",
+              "evidencePolicyVersion": "SYNTHETIC-policy-v1",
+              "evaluationTime": "2026-10-07T02:00:00Z",
+              "placeId": {
+                "$alias": "W"
+              },
+              "eligibilityAction": "PHYSICAL_HELD",
+              "includeReservations": true,
+              "ownerId": {
+                "$alias": "A"
+              },
+              "supervisorId": {
+                "$alias": "supervisor"
+              }
+            },
+            "expectedRevision": 1,
+            "commandIdempotencyKey": "C2-cumulative-versus-state-cumulative",
+            "evidenceRefs": [
+              {
+                "$alias": "DOC"
+              }
+            ]
+          }
+        },
+        {
+          "id": "state",
+          "kind": "invoke",
+          "evidenceRefs": [
+            "state:actual-artifact"
+          ],
+          "actorRef": "A",
+          "route": "api",
+          "capabilityId": "createWork",
+          "request": {
+            "intentKind": "COMMAND",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "createWork",
+            "subjectRefs": [
+              {
+                "type": "TradeItem",
+                "id": {
+                  "$alias": "P"
+                }
+              }
+            ],
+            "slots": {
+              "workType": "PURCHASE_ARRIVAL",
+              "quantity": {
+                "value": "100",
+                "unit": "BOX",
+                "provenance": "USER"
+              },
+              "destinationId": {
+                "$alias": "W"
+              },
+              "dueAt": "2026-10-07T02:00:00Z",
+              "endpoint": "ARRIVED",
+              "quantityMode": "STATE_AT",
+              "period": {
+                "start": "2026-10-05T09:00:00Z",
+                "end": "2026-10-07T01:30:00Z",
+                "endInclusive": true
+              },
+              "eventKinds": [
+                "CONFIRMED_RECEIPT"
+              ],
+              "distinctContributionScope": "CANONICAL_PHYSICAL_FULFILMENT",
+              "evidencePolicyVersion": "SYNTHETIC-policy-v1",
+              "evaluationTime": "2026-10-07T02:00:00Z",
+              "placeId": {
+                "$alias": "W"
+              },
+              "eligibilityAction": "PHYSICAL_HELD",
+              "includeReservations": true,
+              "ownerId": {
+                "$alias": "A"
+              },
+              "supervisorId": {
+                "$alias": "supervisor"
+              }
+            },
+            "expectedRevision": 1,
+            "commandIdempotencyKey": "C2-cumulative-versus-state-state",
+            "evidenceRefs": [
+              {
+                "$alias": "DOC"
+              }
+            ]
+          }
+        },
+        {
+          "id": "receive60",
+          "kind": "invoke",
+          "evidenceRefs": [
+            "receive60:actual-artifact"
+          ],
+          "actorRef": "warehouse",
+          "route": "api",
+          "capabilityId": "confirmReceipt",
+          "request": {
+            "intentKind": "COMMAND",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "confirmReceipt",
+            "subjectRefs": [
+              {
+                "type": "TradeItem",
+                "id": {
+                  "$alias": "P"
+                }
+              }
+            ],
+            "slots": {
+              "quantity": {
+                "value": "60",
+                "unit": "BOX"
+              },
+              "segmentId": {
+                "$alias": "A60"
+              },
+              "lotId": {
+                "$alias": "LOT"
+              },
+              "placeId": {
+                "$alias": "W"
+              },
+              "occurredAt": "2026-10-05T09:00:00Z",
+              "canonicalOccurrenceKey": "receipt-A60",
+              "purchaseOrderId": {
+                "$alias": "PO"
+              }
+            },
+            "expectedRevision": 1,
+            "commandIdempotencyKey": "C2-cumulative-versus-state-receive60",
+            "evidenceRefs": [
+              {
+                "$alias": "DOC"
+              }
+            ]
+          }
+        },
+        {
+          "id": "sale60",
+          "kind": "invoke",
+          "evidenceRefs": [
+            "sale60:actual-artifact"
+          ],
+          "actorRef": "A",
+          "route": "api",
+          "capabilityId": "createSalesOrder",
+          "request": {
+            "intentKind": "COMMAND",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "createSalesOrder",
+            "subjectRefs": [
+              {
+                "type": "TradeItem",
+                "id": {
+                  "$alias": "P"
+                }
+              }
+            ],
+            "slots": {
+              "quantity": {
+                "value": "60",
+                "unit": "BOX"
+              },
+              "customerId": {
+                "$alias": "CUSTOMER"
+              },
+              "destinationId": {
+                "$alias": "CUSTOMER"
+              },
+              "dueAt": "2026-10-06T09:00:00Z",
+              "endpoint": "CUSTOMER_ACCEPTED"
+            },
+            "expectedRevision": 1,
+            "commandIdempotencyKey": "C2-cumulative-versus-state-sale60",
+            "evidenceRefs": [
+              {
+                "$alias": "DOC"
+              }
+            ]
+          }
+        },
+        {
+          "id": "reserve60",
+          "kind": "invoke",
+          "evidenceRefs": [
+            "reserve60:actual-artifact"
+          ],
+          "actorRef": "warehouse",
+          "route": "api",
+          "capabilityId": "reserveQuantity",
+          "request": {
+            "intentKind": "COMMAND",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "reserveQuantity",
+            "subjectRefs": [
+              {
+                "type": "TradeItem",
+                "id": {
+                  "$alias": "P"
+                }
+              }
+            ],
+            "slots": {
+              "quantity": {
+                "value": "60",
+                "unit": "BOX"
+              },
+              "segmentId": {
+                "$result": {
+                  "actionId": "receive60",
+                  "pointer": "/response/segmentId"
+                }
+              },
+              "orderId": {
+                "$result": {
+                  "actionId": "sale60",
+                  "pointer": "/response/id"
+                }
+              }
+            },
+            "expectedRevision": 1,
+            "commandIdempotencyKey": "C2-cumulative-versus-state-reserve60",
+            "evidenceRefs": [
+              {
+                "$alias": "DOC"
+              }
+            ]
+          }
+        },
+        {
+          "id": "pick60",
+          "kind": "invoke",
+          "evidenceRefs": [
+            "pick60:actual-artifact"
+          ],
+          "actorRef": "warehouse",
+          "route": "api",
+          "capabilityId": "pickQuantity",
+          "request": {
+            "intentKind": "COMMAND",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "pickQuantity",
+            "subjectRefs": [
+              {
+                "type": "TradeItem",
+                "id": {
+                  "$alias": "P"
+                }
+              }
+            ],
+            "slots": {
+              "allocationId": {
+                "$result": {
+                  "actionId": "reserve60",
+                  "pointer": "/response/allocationId"
+                }
+              }
+            },
+            "expectedRevision": {
+              "$result": {
+                "actionId": "reserve60",
+                "pointer": "/response/revision"
+              }
+            },
+            "commandIdempotencyKey": "C2-cumulative-versus-state-pick60",
+            "evidenceRefs": [
+              {
+                "$alias": "DOC"
+              }
+            ]
+          }
+        },
+        {
+          "id": "dispatch60",
+          "kind": "invoke",
+          "evidenceRefs": [
+            "dispatch60:actual-artifact"
+          ],
+          "actorRef": "warehouse",
+          "route": "api",
+          "capabilityId": "dispatchQuantity",
+          "request": {
+            "intentKind": "COMMAND",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "dispatchQuantity",
+            "subjectRefs": [
+              {
+                "type": "TradeItem",
+                "id": {
+                  "$alias": "P"
+                }
+              }
+            ],
+            "slots": {
+              "allocationId": {
+                "$result": {
+                  "actionId": "reserve60",
+                  "pointer": "/response/allocationId"
+                }
+              },
+              "quantity": {
+                "value": "60",
+                "unit": "BOX"
+              },
+              "occurredAt": "2026-10-06T09:00:00Z",
+              "destinationId": {
+                "$alias": "CUSTOMER"
+              }
+            },
+            "expectedRevision": {
+              "$result": {
+                "actionId": "pick60",
+                "pointer": "/response/revision"
+              }
+            },
+            "commandIdempotencyKey": "C2-cumulative-versus-state-dispatch60",
+            "evidenceRefs": [
+              {
+                "$alias": "DOC"
+              }
+            ]
+          }
+        },
+        {
+          "id": "receive40",
+          "kind": "invoke",
+          "evidenceRefs": [
+            "receive40:actual-artifact"
+          ],
+          "actorRef": "warehouse",
+          "route": "api",
+          "capabilityId": "confirmReceipt",
+          "request": {
+            "intentKind": "COMMAND",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "confirmReceipt",
+            "subjectRefs": [
+              {
+                "type": "TradeItem",
+                "id": {
+                  "$alias": "P"
+                }
+              }
+            ],
+            "slots": {
+              "quantity": {
+                "value": "40",
+                "unit": "BOX"
+              },
+              "segmentId": {
+                "$alias": "B40"
+              },
+              "lotId": {
+                "$alias": "LOT"
+              },
+              "placeId": {
+                "$alias": "W"
+              },
+              "occurredAt": "2026-10-07T01:30:00Z",
+              "canonicalOccurrenceKey": "receipt-B40",
+              "purchaseOrderId": {
+                "$alias": "PO"
+              }
+            },
+            "expectedRevision": 1,
+            "commandIdempotencyKey": "C2-cumulative-versus-state-receive40",
+            "evidenceRefs": [
+              {
+                "$alias": "DOC"
+              }
+            ]
+          }
+        },
+        {
+          "id": "cumulative-assessment",
+          "kind": "query",
+          "evidenceRefs": [
+            "cumulative-assessment:actual-artifact"
+          ],
+          "actorRef": "A",
+          "route": "api",
+          "capabilityId": "getAssessment",
+          "request": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "caseId": "C2",
+              "itemId": {
+                "$alias": "P"
+              }
+            },
+            "asOf": "2026-10-07T02:00:00Z",
+            "knownAt": "2026-10-07T04:00:00Z",
+            "workId": {
+              "$result": {
+                "actionId": "cumulative",
+                "pointer": "/response/workId"
+              }
+            },
+            "evaluationTime": "2026-10-07T02:00:00Z"
+          }
+        },
+        {
+          "id": "state-assessment",
+          "kind": "query",
+          "evidenceRefs": [
+            "state-assessment:actual-artifact"
+          ],
+          "actorRef": "A",
+          "route": "api",
+          "capabilityId": "getAssessment",
+          "request": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "caseId": "C2",
+              "itemId": {
+                "$alias": "P"
+              }
+            },
+            "asOf": "2026-10-07T02:00:00Z",
+            "knownAt": "2026-10-07T04:00:00Z",
+            "workId": {
+              "$result": {
+                "actionId": "state",
+                "pointer": "/response/workId"
+              }
+            },
+            "evaluationTime": "2026-10-07T02:00:00Z"
+          }
+        },
+        {
+          "id": "inventory",
+          "kind": "query",
+          "evidenceRefs": [
+            "inventory:actual-artifact"
+          ],
+          "actorRef": "A",
+          "route": "api",
+          "capabilityId": "getInventory",
+          "request": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "caseId": "C2",
+              "itemId": {
+                "$alias": "P"
+              }
+            },
+            "asOf": "2026-10-07T02:00:00Z",
+            "knownAt": "2026-10-07T04:00:00Z"
+          }
+        },
+        {
+          "id": "after-db",
+          "kind": "observe",
+          "evidenceRefs": [
+            "after-db:actual-artifact"
+          ],
+          "observation": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "caseId": "C2",
+              "itemId": {
+                "$alias": "P"
+              }
+            },
+            "asOf": "2026-10-07T02:00:00Z",
+            "knownAt": "2026-10-07T04:00:00Z",
+            "snapshotRef": {
+              "$result": {
+                "actionId": "inventory",
+                "pointer": "/response/snapshotRevision"
+              }
+            },
+            "sources": [
+              "works",
+              "goalVersions",
+              "assessments",
+              "conditionResults",
+              "assessmentInputs",
+              "obligations",
+              "assignments",
+              "handovers",
+              "workLinks",
+              "segments",
+              "movements",
+              "contributions",
+              "activities",
+              "inbox",
+              "audit",
+              "outbox",
+              "executionAttempts",
+              "approvals",
+              "contracts",
+              "claims",
+              "observationCoverage",
+              "supervisionIssues"
+            ]
+          }
+        }
+      ],
+      "assertions": [
+        {
+          "id": "api-arrived100",
+          "op": "decimalEquals",
+          "source": {
+            "actionId": "cumulative-assessment",
+            "pointer": "/response/data/evaluatedQuantity"
+          },
+          "expected": "100",
+          "requirementRefs": [
+            "D09",
+            "D12"
+          ],
+          "evidenceRefs": [
+            "cumulative-assessment:actual-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "C2",
+            "itemId": {
+              "$alias": "P"
+            }
+          },
+          "oracleExplanation": "월60 수령·화60 출고·수40 수령의 누적100과 현재40을 구별한다. cumulative-arrival의 독립 고정 기대값을 대조한다.",
+          "oracleRef": {
+            "oracleId": "C2.cumulative-vs-state",
+            "observationNames": [
+              "cumulative-arrival"
+            ]
+          },
+          "unit": "BOX",
+          "unitSource": {
+            "actionId": "cumulative-assessment",
+            "pointer": "/response/data/unit"
+          }
+        },
+        {
+          "id": "raw-receipt-sum100",
+          "op": "sumEquals",
+          "source": {
+            "actionId": "after-db",
+            "pointer": "/data/rawRows/contributions",
+            "where": {
+              "workId": {
+                "$result": {
+                  "actionId": "cumulative",
+                  "pointer": "/response/workId"
+                }
+              }
+            },
+            "field": "quantity"
+          },
+          "expected": "100",
+          "requirementRefs": [
+            "D09",
+            "D12"
+          ],
+          "evidenceRefs": [
+            "after-db:actual-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "C2",
+            "itemId": {
+              "$alias": "P"
+            }
+          },
+          "oracleExplanation": "월60 수령·화60 출고·수40 수령의 누적100과 현재40을 구별한다. cumulative-arrival의 독립 고정 기대값을 대조한다.",
+          "oracleRef": {
+            "oracleId": "C2.cumulative-vs-state",
+            "observationNames": [
+              "cumulative-arrival"
+            ]
+          },
+          "unit": "BOX",
+          "unitSource": {
+            "actionId": "after-db",
+            "pointer": "/data/rawRows/contributions",
+            "where": {
+              "workId": {
+                "$result": {
+                  "actionId": "cumulative",
+                  "pointer": "/response/workId"
+                }
+              }
+            },
+            "field": "unit"
+          }
+        },
+        {
+          "id": "api-held40",
+          "op": "decimalEquals",
+          "source": {
+            "actionId": "inventory",
+            "pointer": "/response/data/heldQuantity"
+          },
+          "expected": "40",
+          "requirementRefs": [
+            "D09",
+            "D12"
+          ],
+          "evidenceRefs": [
+            "inventory:actual-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "C2",
+            "itemId": {
+              "$alias": "P"
+            }
+          },
+          "oracleExplanation": "월60 수령·화60 출고·수40 수령의 누적100과 현재40을 구별한다. state-at-held의 독립 고정 기대값을 대조한다.",
+          "oracleRef": {
+            "oracleId": "C2.cumulative-vs-state",
+            "observationNames": [
+              "state-at-held"
+            ]
+          },
+          "unit": "BOX",
+          "unitSource": {
+            "actionId": "inventory",
+            "pointer": "/response/data/unit"
+          }
+        },
+        {
+          "id": "raw-current-leaf-sum40",
+          "op": "sumEquals",
+          "source": {
+            "actionId": "after-db",
+            "pointer": "/data/rawRows/segments",
+            "where": {
+              "locationId": {
+                "$alias": "W"
+              },
+              "active": true
+            },
+            "field": "quantity"
+          },
+          "expected": "40",
+          "requirementRefs": [
+            "D09",
+            "D12"
+          ],
+          "evidenceRefs": [
+            "after-db:actual-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "C2",
+            "itemId": {
+              "$alias": "P"
+            }
+          },
+          "oracleExplanation": "월60 수령·화60 출고·수40 수령의 누적100과 현재40을 구별한다. state-at-held의 독립 고정 기대값을 대조한다.",
+          "oracleRef": {
+            "oracleId": "C2.cumulative-vs-state",
+            "observationNames": [
+              "state-at-held"
+            ]
+          },
+          "unit": "BOX",
+          "unitSource": {
+            "actionId": "after-db",
+            "pointer": "/data/rawRows/segments",
+            "where": {
+              "locationId": {
+                "$alias": "W"
+              },
+              "active": true
+            },
+            "field": "unit"
+          }
+        },
+        {
+          "id": "arrival-distinct-identities",
+          "op": "exactSet",
+          "source": {
+            "actionId": "after-db",
+            "pointer": "/data/rawRows/contributions",
+            "where": {
+              "workId": {
+                "$result": {
+                  "actionId": "cumulative",
+                  "pointer": "/response/workId"
+                }
+              }
+            },
+            "field": "occurrenceId"
+          },
+          "expected": [
+            {
+              "$result": {
+                "actionId": "receive60",
+                "pointer": "/response/occurrenceId"
+              }
+            },
+            {
+              "$result": {
+                "actionId": "receive40",
+                "pointer": "/response/occurrenceId"
+              }
+            }
+          ],
+          "requirementRefs": [
+            "D09",
+            "D12"
+          ],
+          "evidenceRefs": [
+            "after-db:actual-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "C2",
+            "itemId": {
+              "$alias": "P"
+            }
+          },
+          "oracleExplanation": "월60 수령·화60 출고·수40 수령의 누적100과 현재40을 구별한다. mode-evidence-scope의 독립 고정 기대값을 대조한다.",
+          "oracleRef": {
+            "oracleId": "C2.cumulative-vs-state",
+            "observationNames": [
+              "mode-evidence-scope"
+            ]
+          }
+        },
+        {
+          "id": "cumulative-assessment-api-result",
+          "op": "equals",
+          "source": {
+            "actionId": "cumulative-assessment",
+            "pointer": "/response/data/result"
+          },
+          "expected": "SATISFIED",
+          "requirementRefs": [
+            "D09",
+            "D12"
+          ],
+          "evidenceRefs": [
+            "cumulative-assessment:actual-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "C2",
+            "itemId": {
+              "$alias": "P"
+            }
+          },
+          "oracleExplanation": "월60 수령·화60 출고·수40 수령의 누적100과 현재40을 구별한다. cumulative의 독립 고정 기대값을 대조한다.",
+          "oracleRef": {
+            "oracleId": "C2.cumulative-vs-state",
+            "observationNames": [
+              "cumulative"
+            ]
+          }
+        },
+        {
+          "id": "cumulative-assessment-db-result",
+          "op": "equals",
+          "source": {
+            "actionId": "after-db",
+            "pointer": "/data/rawRows/assessments",
+            "where": {
+              "workId": {
+                "$result": {
+                  "actionId": "cumulative",
+                  "pointer": "/response/workId"
+                }
+              },
+              "id": {
+                "$result": {
+                  "actionId": "cumulative-assessment",
+                  "pointer": "/response/id"
+                }
+              }
+            },
+            "field": "result"
+          },
+          "expected": [
+            "SATISFIED"
+          ],
+          "requirementRefs": [
+            "D09",
+            "D12"
+          ],
+          "evidenceRefs": [
+            "after-db:actual-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "C2",
+            "itemId": {
+              "$alias": "P"
+            }
+          },
+          "oracleExplanation": "월60 수령·화60 출고·수40 수령의 누적100과 현재40을 구별한다. cumulative의 독립 고정 기대값을 대조한다.",
+          "oracleRef": {
+            "oracleId": "C2.cumulative-vs-state",
+            "observationNames": [
+              "cumulative"
+            ]
+          }
+        },
+        {
+          "id": "state-assessment-api-result",
+          "op": "equals",
+          "source": {
+            "actionId": "state-assessment",
+            "pointer": "/response/data/result"
+          },
+          "expected": "UNSATISFIED",
+          "requirementRefs": [
+            "D09",
+            "D12"
+          ],
+          "evidenceRefs": [
+            "state-assessment:actual-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "C2",
+            "itemId": {
+              "$alias": "P"
+            }
+          },
+          "oracleExplanation": "월60 수령·화60 출고·수40 수령의 누적100과 현재40을 구별한다. state-at의 독립 고정 기대값을 대조한다.",
+          "oracleRef": {
+            "oracleId": "C2.cumulative-vs-state",
+            "observationNames": [
+              "state-at"
+            ]
+          }
+        },
+        {
+          "id": "state-assessment-db-result",
+          "op": "equals",
+          "source": {
+            "actionId": "after-db",
+            "pointer": "/data/rawRows/assessments",
+            "where": {
+              "workId": {
+                "$result": {
+                  "actionId": "state",
+                  "pointer": "/response/workId"
+                }
+              },
+              "id": {
+                "$result": {
+                  "actionId": "state-assessment",
+                  "pointer": "/response/id"
+                }
+              }
+            },
+            "field": "result"
+          },
+          "expected": [
+            "UNSATISFIED"
+          ],
+          "requirementRefs": [
+            "D09",
+            "D12"
+          ],
+          "evidenceRefs": [
+            "after-db:actual-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "C2",
+            "itemId": {
+              "$alias": "P"
+            }
+          },
+          "oracleExplanation": "월60 수령·화60 출고·수40 수령의 누적100과 현재40을 구별한다. state-at의 독립 고정 기대값을 대조한다.",
+          "oracleRef": {
+            "oracleId": "C2.cumulative-vs-state",
+            "observationNames": [
+              "state-at"
+            ]
+          }
+        },
+        {
+          "id": "cumulative_event-goal-mode",
+          "op": "equals",
+          "source": {
+            "actionId": "after-db",
+            "pointer": "/data/rawRows/goalVersions",
+            "where": {
+              "workId": {
+                "$result": {
+                  "actionId": "cumulative",
+                  "pointer": "/response/workId"
+                }
+              }
+            },
+            "field": "quantityMode"
+          },
+          "expected": [
+            "CUMULATIVE_EVENT"
+          ],
+          "requirementRefs": [
+            "D09",
+            "D12"
+          ],
+          "evidenceRefs": [
+            "after-db:actual-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "C2",
+            "itemId": {
+              "$alias": "P"
+            }
+          },
+          "oracleExplanation": "월60 수령·화60 출고·수40 수령의 누적100과 현재40을 구별한다. mode-evidence-scope의 독립 고정 기대값을 대조한다.",
+          "oracleRef": {
+            "oracleId": "C2.cumulative-vs-state",
+            "observationNames": [
+              "mode-evidence-scope"
+            ]
+          }
+        },
+        {
+          "id": "cumulative_event-field-quantity",
+          "op": "equals",
+          "source": {
+            "actionId": "after-db",
+            "pointer": "/data/rawRows/goalVersions",
+            "where": {
+              "workId": {
+                "$result": {
+                  "actionId": "cumulative",
+                  "pointer": "/response/workId"
+                }
+              }
+            },
+            "field": "quantity"
+          },
+          "expected": [
+            "100"
+          ],
+          "requirementRefs": [
+            "D09",
+            "D12"
+          ],
+          "evidenceRefs": [
+            "after-db:actual-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "C2",
+            "itemId": {
+              "$alias": "P"
+            }
+          },
+          "oracleExplanation": "월60 수령·화60 출고·수40 수령의 누적100과 현재40을 구별한다. mode-evidence-scope의 독립 고정 기대값을 대조한다.",
+          "oracleRef": {
+            "oracleId": "C2.cumulative-vs-state",
+            "observationNames": [
+              "mode-evidence-scope"
+            ]
+          }
+        },
+        {
+          "id": "cumulative_event-field-unit",
+          "op": "equals",
+          "source": {
+            "actionId": "after-db",
+            "pointer": "/data/rawRows/goalVersions",
+            "where": {
+              "workId": {
+                "$result": {
+                  "actionId": "cumulative",
+                  "pointer": "/response/workId"
+                }
+              }
+            },
+            "field": "unit"
+          },
+          "expected": [
+            "BOX"
+          ],
+          "requirementRefs": [
+            "D09",
+            "D12"
+          ],
+          "evidenceRefs": [
+            "after-db:actual-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "C2",
+            "itemId": {
+              "$alias": "P"
+            }
+          },
+          "oracleExplanation": "월60 수령·화60 출고·수40 수령의 누적100과 현재40을 구별한다. mode-evidence-scope의 독립 고정 기대값을 대조한다.",
+          "oracleRef": {
+            "oracleId": "C2.cumulative-vs-state",
+            "observationNames": [
+              "mode-evidence-scope"
+            ]
+          }
+        },
+        {
+          "id": "cumulative_event-field-placeId",
+          "op": "equals",
+          "source": {
+            "actionId": "after-db",
+            "pointer": "/data/rawRows/goalVersions",
+            "where": {
+              "workId": {
+                "$result": {
+                  "actionId": "cumulative",
+                  "pointer": "/response/workId"
+                }
+              }
+            },
+            "field": "placeId"
+          },
+          "expected": [
+            {
+              "$alias": "W"
+            }
+          ],
+          "requirementRefs": [
+            "D09",
+            "D12"
+          ],
+          "evidenceRefs": [
+            "after-db:actual-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "C2",
+            "itemId": {
+              "$alias": "P"
+            }
+          },
+          "oracleExplanation": "월60 수령·화60 출고·수40 수령의 누적100과 현재40을 구별한다. mode-evidence-scope의 독립 고정 기대값을 대조한다.",
+          "oracleRef": {
+            "oracleId": "C2.cumulative-vs-state",
+            "observationNames": [
+              "mode-evidence-scope"
+            ]
+          }
+        },
+        {
+          "id": "cumulative_event-field-endpoint",
+          "op": "equals",
+          "source": {
+            "actionId": "after-db",
+            "pointer": "/data/rawRows/goalVersions",
+            "where": {
+              "workId": {
+                "$result": {
+                  "actionId": "cumulative",
+                  "pointer": "/response/workId"
+                }
+              }
+            },
+            "field": "endpoint"
+          },
+          "expected": [
+            "ARRIVED"
+          ],
+          "requirementRefs": [
+            "D09",
+            "D12"
+          ],
+          "evidenceRefs": [
+            "after-db:actual-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "C2",
+            "itemId": {
+              "$alias": "P"
+            }
+          },
+          "oracleExplanation": "월60 수령·화60 출고·수40 수령의 누적100과 현재40을 구별한다. mode-evidence-scope의 독립 고정 기대값을 대조한다.",
+          "oracleRef": {
+            "oracleId": "C2.cumulative-vs-state",
+            "observationNames": [
+              "mode-evidence-scope"
+            ]
+          }
+        },
+        {
+          "id": "cumulative_event-field-evidencePolicyVersion",
+          "op": "equals",
+          "source": {
+            "actionId": "after-db",
+            "pointer": "/data/rawRows/goalVersions",
+            "where": {
+              "workId": {
+                "$result": {
+                  "actionId": "cumulative",
+                  "pointer": "/response/workId"
+                }
+              }
+            },
+            "field": "evidencePolicyVersion"
+          },
+          "expected": [
+            "SYNTHETIC-policy-v1"
+          ],
+          "requirementRefs": [
+            "D09",
+            "D12"
+          ],
+          "evidenceRefs": [
+            "after-db:actual-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "C2",
+            "itemId": {
+              "$alias": "P"
+            }
+          },
+          "oracleExplanation": "월60 수령·화60 출고·수40 수령의 누적100과 현재40을 구별한다. mode-evidence-scope의 독립 고정 기대값을 대조한다.",
+          "oracleRef": {
+            "oracleId": "C2.cumulative-vs-state",
+            "observationNames": [
+              "mode-evidence-scope"
+            ]
+          }
+        },
+        {
+          "id": "cumulative_event-field-periodStart",
+          "op": "equals",
+          "source": {
+            "actionId": "after-db",
+            "pointer": "/data/rawRows/goalVersions",
+            "where": {
+              "workId": {
+                "$result": {
+                  "actionId": "cumulative",
+                  "pointer": "/response/workId"
+                }
+              }
+            },
+            "field": "periodStart"
+          },
+          "expected": [
+            "2026-10-05T09:00:00Z"
+          ],
+          "requirementRefs": [
+            "D09",
+            "D12"
+          ],
+          "evidenceRefs": [
+            "after-db:actual-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "C2",
+            "itemId": {
+              "$alias": "P"
+            }
+          },
+          "oracleExplanation": "월60 수령·화60 출고·수40 수령의 누적100과 현재40을 구별한다. mode-evidence-scope의 독립 고정 기대값을 대조한다.",
+          "oracleRef": {
+            "oracleId": "C2.cumulative-vs-state",
+            "observationNames": [
+              "mode-evidence-scope"
+            ]
+          }
+        },
+        {
+          "id": "cumulative_event-field-periodEnd",
+          "op": "equals",
+          "source": {
+            "actionId": "after-db",
+            "pointer": "/data/rawRows/goalVersions",
+            "where": {
+              "workId": {
+                "$result": {
+                  "actionId": "cumulative",
+                  "pointer": "/response/workId"
+                }
+              }
+            },
+            "field": "periodEnd"
+          },
+          "expected": [
+            "2026-10-07T01:30:00Z"
+          ],
+          "requirementRefs": [
+            "D09",
+            "D12"
+          ],
+          "evidenceRefs": [
+            "after-db:actual-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "C2",
+            "itemId": {
+              "$alias": "P"
+            }
+          },
+          "oracleExplanation": "월60 수령·화60 출고·수40 수령의 누적100과 현재40을 구별한다. mode-evidence-scope의 독립 고정 기대값을 대조한다.",
+          "oracleRef": {
+            "oracleId": "C2.cumulative-vs-state",
+            "observationNames": [
+              "mode-evidence-scope"
+            ]
+          }
+        },
+        {
+          "id": "cumulative_event-field-eventKinds",
+          "op": "equals",
+          "source": {
+            "actionId": "after-db",
+            "pointer": "/data/rawRows/goalVersions",
+            "where": {
+              "workId": {
+                "$result": {
+                  "actionId": "cumulative",
+                  "pointer": "/response/workId"
+                }
+              }
+            },
+            "field": "eventKinds"
+          },
+          "expected": [
+            [
+              "CONFIRMED_RECEIPT"
+            ]
+          ],
+          "requirementRefs": [
+            "D09",
+            "D12"
+          ],
+          "evidenceRefs": [
+            "after-db:actual-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "C2",
+            "itemId": {
+              "$alias": "P"
+            }
+          },
+          "oracleExplanation": "월60 수령·화60 출고·수40 수령의 누적100과 현재40을 구별한다. mode-evidence-scope의 독립 고정 기대값을 대조한다.",
+          "oracleRef": {
+            "oracleId": "C2.cumulative-vs-state",
+            "observationNames": [
+              "mode-evidence-scope"
+            ]
+          }
+        },
+        {
+          "id": "cumulative_event-field-distinctContributionScope",
+          "op": "equals",
+          "source": {
+            "actionId": "after-db",
+            "pointer": "/data/rawRows/goalVersions",
+            "where": {
+              "workId": {
+                "$result": {
+                  "actionId": "cumulative",
+                  "pointer": "/response/workId"
+                }
+              }
+            },
+            "field": "distinctContributionScope"
+          },
+          "expected": [
+            "CANONICAL_PHYSICAL_FULFILMENT"
+          ],
+          "requirementRefs": [
+            "D09",
+            "D12"
+          ],
+          "evidenceRefs": [
+            "after-db:actual-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "C2",
+            "itemId": {
+              "$alias": "P"
+            }
+          },
+          "oracleExplanation": "월60 수령·화60 출고·수40 수령의 누적100과 현재40을 구별한다. mode-evidence-scope의 독립 고정 기대값을 대조한다.",
+          "oracleRef": {
+            "oracleId": "C2.cumulative-vs-state",
+            "observationNames": [
+              "mode-evidence-scope"
+            ]
+          }
+        },
+        {
+          "id": "state_at-goal-mode",
+          "op": "equals",
+          "source": {
+            "actionId": "after-db",
+            "pointer": "/data/rawRows/goalVersions",
+            "where": {
+              "workId": {
+                "$result": {
+                  "actionId": "state",
+                  "pointer": "/response/workId"
+                }
+              }
+            },
+            "field": "quantityMode"
+          },
+          "expected": [
+            "STATE_AT"
+          ],
+          "requirementRefs": [
+            "D09",
+            "D12"
+          ],
+          "evidenceRefs": [
+            "after-db:actual-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "C2",
+            "itemId": {
+              "$alias": "P"
+            }
+          },
+          "oracleExplanation": "월60 수령·화60 출고·수40 수령의 누적100과 현재40을 구별한다. mode-evidence-scope의 독립 고정 기대값을 대조한다.",
+          "oracleRef": {
+            "oracleId": "C2.cumulative-vs-state",
+            "observationNames": [
+              "mode-evidence-scope"
+            ]
+          }
+        },
+        {
+          "id": "state_at-field-quantity",
+          "op": "equals",
+          "source": {
+            "actionId": "after-db",
+            "pointer": "/data/rawRows/goalVersions",
+            "where": {
+              "workId": {
+                "$result": {
+                  "actionId": "state",
+                  "pointer": "/response/workId"
+                }
+              }
+            },
+            "field": "quantity"
+          },
+          "expected": [
+            "100"
+          ],
+          "requirementRefs": [
+            "D09",
+            "D12"
+          ],
+          "evidenceRefs": [
+            "after-db:actual-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "C2",
+            "itemId": {
+              "$alias": "P"
+            }
+          },
+          "oracleExplanation": "월60 수령·화60 출고·수40 수령의 누적100과 현재40을 구별한다. mode-evidence-scope의 독립 고정 기대값을 대조한다.",
+          "oracleRef": {
+            "oracleId": "C2.cumulative-vs-state",
+            "observationNames": [
+              "mode-evidence-scope"
+            ]
+          }
+        },
+        {
+          "id": "state_at-field-unit",
+          "op": "equals",
+          "source": {
+            "actionId": "after-db",
+            "pointer": "/data/rawRows/goalVersions",
+            "where": {
+              "workId": {
+                "$result": {
+                  "actionId": "state",
+                  "pointer": "/response/workId"
+                }
+              }
+            },
+            "field": "unit"
+          },
+          "expected": [
+            "BOX"
+          ],
+          "requirementRefs": [
+            "D09",
+            "D12"
+          ],
+          "evidenceRefs": [
+            "after-db:actual-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "C2",
+            "itemId": {
+              "$alias": "P"
+            }
+          },
+          "oracleExplanation": "월60 수령·화60 출고·수40 수령의 누적100과 현재40을 구별한다. mode-evidence-scope의 독립 고정 기대값을 대조한다.",
+          "oracleRef": {
+            "oracleId": "C2.cumulative-vs-state",
+            "observationNames": [
+              "mode-evidence-scope"
+            ]
+          }
+        },
+        {
+          "id": "state_at-field-placeId",
+          "op": "equals",
+          "source": {
+            "actionId": "after-db",
+            "pointer": "/data/rawRows/goalVersions",
+            "where": {
+              "workId": {
+                "$result": {
+                  "actionId": "state",
+                  "pointer": "/response/workId"
+                }
+              }
+            },
+            "field": "placeId"
+          },
+          "expected": [
+            {
+              "$alias": "W"
+            }
+          ],
+          "requirementRefs": [
+            "D09",
+            "D12"
+          ],
+          "evidenceRefs": [
+            "after-db:actual-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "C2",
+            "itemId": {
+              "$alias": "P"
+            }
+          },
+          "oracleExplanation": "월60 수령·화60 출고·수40 수령의 누적100과 현재40을 구별한다. mode-evidence-scope의 독립 고정 기대값을 대조한다.",
+          "oracleRef": {
+            "oracleId": "C2.cumulative-vs-state",
+            "observationNames": [
+              "mode-evidence-scope"
+            ]
+          }
+        },
+        {
+          "id": "state_at-field-endpoint",
+          "op": "equals",
+          "source": {
+            "actionId": "after-db",
+            "pointer": "/data/rawRows/goalVersions",
+            "where": {
+              "workId": {
+                "$result": {
+                  "actionId": "state",
+                  "pointer": "/response/workId"
+                }
+              }
+            },
+            "field": "endpoint"
+          },
+          "expected": [
+            "ARRIVED"
+          ],
+          "requirementRefs": [
+            "D09",
+            "D12"
+          ],
+          "evidenceRefs": [
+            "after-db:actual-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "C2",
+            "itemId": {
+              "$alias": "P"
+            }
+          },
+          "oracleExplanation": "월60 수령·화60 출고·수40 수령의 누적100과 현재40을 구별한다. mode-evidence-scope의 독립 고정 기대값을 대조한다.",
+          "oracleRef": {
+            "oracleId": "C2.cumulative-vs-state",
+            "observationNames": [
+              "mode-evidence-scope"
+            ]
+          }
+        },
+        {
+          "id": "state_at-field-evidencePolicyVersion",
+          "op": "equals",
+          "source": {
+            "actionId": "after-db",
+            "pointer": "/data/rawRows/goalVersions",
+            "where": {
+              "workId": {
+                "$result": {
+                  "actionId": "state",
+                  "pointer": "/response/workId"
+                }
+              }
+            },
+            "field": "evidencePolicyVersion"
+          },
+          "expected": [
+            "SYNTHETIC-policy-v1"
+          ],
+          "requirementRefs": [
+            "D09",
+            "D12"
+          ],
+          "evidenceRefs": [
+            "after-db:actual-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "C2",
+            "itemId": {
+              "$alias": "P"
+            }
+          },
+          "oracleExplanation": "월60 수령·화60 출고·수40 수령의 누적100과 현재40을 구별한다. mode-evidence-scope의 독립 고정 기대값을 대조한다.",
+          "oracleRef": {
+            "oracleId": "C2.cumulative-vs-state",
+            "observationNames": [
+              "mode-evidence-scope"
+            ]
+          }
+        },
+        {
+          "id": "state_at-field-evaluationTime",
+          "op": "equals",
+          "source": {
+            "actionId": "after-db",
+            "pointer": "/data/rawRows/goalVersions",
+            "where": {
+              "workId": {
+                "$result": {
+                  "actionId": "state",
+                  "pointer": "/response/workId"
+                }
+              }
+            },
+            "field": "evaluationTime"
+          },
+          "expected": [
+            "2026-10-07T02:00:00Z"
+          ],
+          "requirementRefs": [
+            "D09",
+            "D12"
+          ],
+          "evidenceRefs": [
+            "after-db:actual-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "C2",
+            "itemId": {
+              "$alias": "P"
+            }
+          },
+          "oracleExplanation": "월60 수령·화60 출고·수40 수령의 누적100과 현재40을 구별한다. mode-evidence-scope의 독립 고정 기대값을 대조한다.",
+          "oracleRef": {
+            "oracleId": "C2.cumulative-vs-state",
+            "observationNames": [
+              "mode-evidence-scope"
+            ]
+          }
+        },
+        {
+          "id": "state_at-field-eligibilityAction",
+          "op": "equals",
+          "source": {
+            "actionId": "after-db",
+            "pointer": "/data/rawRows/goalVersions",
+            "where": {
+              "workId": {
+                "$result": {
+                  "actionId": "state",
+                  "pointer": "/response/workId"
+                }
+              }
+            },
+            "field": "eligibilityAction"
+          },
+          "expected": [
+            "PHYSICAL_HELD"
+          ],
+          "requirementRefs": [
+            "D09",
+            "D12"
+          ],
+          "evidenceRefs": [
+            "after-db:actual-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "C2",
+            "itemId": {
+              "$alias": "P"
+            }
+          },
+          "oracleExplanation": "월60 수령·화60 출고·수40 수령의 누적100과 현재40을 구별한다. mode-evidence-scope의 독립 고정 기대값을 대조한다.",
+          "oracleRef": {
+            "oracleId": "C2.cumulative-vs-state",
+            "observationNames": [
+              "mode-evidence-scope"
+            ]
+          }
+        },
+        {
+          "id": "state_at-field-includeReservations",
+          "op": "equals",
+          "source": {
+            "actionId": "after-db",
+            "pointer": "/data/rawRows/goalVersions",
+            "where": {
+              "workId": {
+                "$result": {
+                  "actionId": "state",
+                  "pointer": "/response/workId"
+                }
+              }
+            },
+            "field": "includeReservations"
+          },
+          "expected": [
+            true
+          ],
+          "requirementRefs": [
+            "D09",
+            "D12"
+          ],
+          "evidenceRefs": [
+            "after-db:actual-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "C2",
+            "itemId": {
+              "$alias": "P"
+            }
+          },
+          "oracleExplanation": "월60 수령·화60 출고·수40 수령의 누적100과 현재40을 구별한다. mode-evidence-scope의 독립 고정 기대값을 대조한다.",
+          "oracleRef": {
+            "oracleId": "C2.cumulative-vs-state",
+            "observationNames": [
+              "mode-evidence-scope"
+            ]
+          }
+        },
+        {
+          "id": "fixed-asof",
+          "op": "timeEquals",
+          "source": {
+            "actionId": "inventory",
+            "pointer": "/response/asOf"
+          },
+          "expected": "2026-10-07T02:00:00Z",
+          "requirementRefs": [
+            "D09",
+            "D12"
+          ],
+          "evidenceRefs": [
+            "inventory:actual-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "C2",
+            "itemId": {
+              "$alias": "P"
+            }
+          },
+          "oracleExplanation": "월60 수령·화60 출고·수40 수령의 누적100과 현재40을 구별한다. mode-evidence-scope의 독립 고정 기대값을 대조한다.",
+          "oracleRef": {
+            "oracleId": "C2.cumulative-vs-state",
+            "observationNames": [
+              "mode-evidence-scope"
+            ]
+          }
+        },
+        {
+          "id": "fixed-knownat",
+          "op": "timeEquals",
+          "source": {
+            "actionId": "inventory",
+            "pointer": "/response/knownAt"
+          },
+          "expected": "2026-10-07T04:00:00Z",
+          "requirementRefs": [
+            "D09",
+            "D12"
+          ],
+          "evidenceRefs": [
+            "inventory:actual-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "C2",
+            "itemId": {
+              "$alias": "P"
+            }
+          },
+          "oracleExplanation": "월60 수령·화60 출고·수40 수령의 누적100과 현재40을 구별한다. mode-evidence-scope의 독립 고정 기대값을 대조한다.",
+          "oracleRef": {
+            "oracleId": "C2.cumulative-vs-state",
+            "observationNames": [
+              "mode-evidence-scope"
+            ]
+          }
+        }
+      ],
+      "oracleExplanation": "가상 fixture의 입력과 실제 명령을 구별한다. 수량은 BOX decimal 문자열과 식별된 실물 범위로 손계산한다. 원행 관찰은 API projection을 복사하지 않는다. 월60 수령·화60 출고·수40 수령의 누적100과 현재40을 구별한다"
+    }
+  ]
+}

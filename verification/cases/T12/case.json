@@ -1,0 +1,4944 @@
+{
+  "schemaVersion": "1.0.0",
+  "caseId": "T12",
+  "title": "목표·의무·판정·접수 책임의 독립 계약 T12",
+  "requirementRefs": [
+    "D12"
+  ],
+  "profiles": [
+    "scenarios"
+  ],
+  "subcases": [
+    {
+      "id": "no-receipt-evidence",
+      "title": "판정 근거와 장소·상충을 구별한다 no-receipt-evidence",
+      "fixtureRef": "verification/cases/T12/fixtures/no-receipt-evidence.json",
+      "requiredAdapters": [
+        "fixture",
+        "api",
+        "db"
+      ],
+      "actions": [
+        {
+          "id": "setup",
+          "kind": "installFixture",
+          "evidenceRefs": [
+            "setup:actual-artifact"
+          ],
+          "fixtureRef": "verification/cases/T12/fixtures/no-receipt-evidence.json"
+        },
+        {
+          "id": "work",
+          "kind": "invoke",
+          "evidenceRefs": [
+            "work:actual-artifact"
+          ],
+          "actorRef": "A",
+          "route": "api",
+          "capabilityId": "createWork",
+          "request": {
+            "intentKind": "COMMAND",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "createWork",
+            "subjectRefs": [
+              {
+                "type": "TradeItem",
+                "id": {
+                  "$alias": "P"
+                }
+              }
+            ],
+            "slots": {
+              "workType": "PURCHASE_ARRIVAL",
+              "quantity": {
+                "value": "100",
+                "unit": "BOX",
+                "provenance": "USER"
+              },
+              "destinationId": {
+                "$alias": "W"
+              },
+              "dueAt": "2026-10-07T02:00:00Z",
+              "endpoint": "ARRIVED",
+              "quantityMode": "CUMULATIVE_EVENT",
+              "period": {
+                "start": "2026-10-05T09:00:00Z",
+                "end": "2026-10-07T01:30:00Z",
+                "endInclusive": true
+              },
+              "eventKinds": [
+                "CONFIRMED_RECEIPT"
+              ],
+              "distinctContributionScope": "CANONICAL_PHYSICAL_FULFILMENT",
+              "evidencePolicyVersion": "SYNTHETIC-policy-v1",
+              "evaluationTime": "2026-10-07T02:00:00Z",
+              "placeId": {
+                "$alias": "W"
+              },
+              "eligibilityAction": "PHYSICAL_HELD",
+              "includeReservations": true,
+              "ownerId": {
+                "$alias": "A"
+              },
+              "supervisorId": {
+                "$alias": "supervisor"
+              }
+            },
+            "expectedRevision": 1,
+            "commandIdempotencyKey": "T12-no-receipt-evidence-work",
+            "evidenceRefs": [
+              {
+                "$alias": "DOC"
+              }
+            ]
+          }
+        },
+        {
+          "id": "initial-assessment",
+          "kind": "query",
+          "evidenceRefs": [
+            "initial-assessment:actual-artifact"
+          ],
+          "actorRef": "A",
+          "route": "api",
+          "capabilityId": "getAssessment",
+          "request": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "caseId": "T12",
+              "itemId": {
+                "$alias": "P"
+              }
+            },
+            "asOf": "2026-10-07T02:00:00Z",
+            "knownAt": "2026-10-07T04:00:00Z",
+            "workId": {
+              "$result": {
+                "actionId": "work",
+                "pointer": "/response/workId"
+              }
+            },
+            "evaluationTime": "2026-10-07T02:00:00Z"
+          }
+        },
+        {
+          "id": "before-db-snapshot",
+          "kind": "query",
+          "evidenceRefs": [
+            "before-db-snapshot:actual-artifact"
+          ],
+          "actorRef": "A",
+          "route": "api",
+          "capabilityId": "getInventory",
+          "request": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "caseId": "T12",
+              "itemId": {
+                "$alias": "P"
+              }
+            },
+            "asOf": "2026-10-07T02:00:00Z",
+            "knownAt": "2026-10-07T04:00:00Z"
+          }
+        },
+        {
+          "id": "before-db",
+          "kind": "observe",
+          "evidenceRefs": [
+            "before-db:actual-artifact"
+          ],
+          "observation": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "caseId": "T12",
+              "itemId": {
+                "$alias": "P"
+              }
+            },
+            "asOf": "2026-10-07T02:00:00Z",
+            "knownAt": "2026-10-07T04:00:00Z",
+            "snapshotRef": {
+              "$result": {
+                "actionId": "before-db-snapshot",
+                "pointer": "/response/snapshotRevision"
+              }
+            },
+            "sources": [
+              "works",
+              "goalVersions",
+              "assessments",
+              "conditionResults",
+              "assessmentInputs",
+              "obligations",
+              "assignments",
+              "handovers",
+              "workLinks",
+              "segments",
+              "movements",
+              "contributions",
+              "activities",
+              "inbox",
+              "audit",
+              "outbox",
+              "executionAttempts",
+              "approvals",
+              "contracts",
+              "claims",
+              "observationCoverage",
+              "supervisionIssues"
+            ]
+          }
+        },
+        {
+          "id": "claim",
+          "kind": "invoke",
+          "evidenceRefs": [
+            "claim:actual-artifact"
+          ],
+          "actorRef": "A",
+          "route": "api",
+          "capabilityId": "recordActivity",
+          "request": {
+            "intentKind": "RECORD",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "recordActivity",
+            "subjectRefs": [
+              {
+                "type": "TradeItem",
+                "id": {
+                  "$alias": "P"
+                }
+              }
+            ],
+            "slots": {
+              "activityKind": "RECEIPT_CLAIM",
+              "workId": {
+                "$result": {
+                  "actionId": "work",
+                  "pointer": "/response/workId"
+                }
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "lotId": {
+                "$alias": "LOT"
+              },
+              "quantity": {
+                "value": "100",
+                "unit": "BOX"
+              },
+              "placeId": {
+                "$alias": "W"
+              },
+              "occurredAt": "2026-10-07T01:00:00Z",
+              "sourceNamespace": "synthetic-warehouse",
+              "externalEventId": "no-receipt-evidence",
+              "sourceVersion": "1",
+              "evidenceIds": []
+            },
+            "expectedRevision": 1,
+            "commandIdempotencyKey": "T12-no-receipt-evidence-claim",
+            "evidenceRefs": [
+              {
+                "$alias": "DOC"
+              }
+            ]
+          }
+        },
+        {
+          "id": "assessment",
+          "kind": "query",
+          "evidenceRefs": [
+            "assessment:actual-artifact"
+          ],
+          "actorRef": "A",
+          "route": "api",
+          "capabilityId": "getAssessment",
+          "request": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "caseId": "T12",
+              "itemId": {
+                "$alias": "P"
+              }
+            },
+            "asOf": "2026-10-07T02:00:00Z",
+            "knownAt": "2026-10-07T04:00:00Z",
+            "workId": {
+              "$result": {
+                "actionId": "work",
+                "pointer": "/response/workId"
+              }
+            },
+            "evaluationTime": "2026-10-07T02:00:00Z"
+          }
+        },
+        {
+          "id": "after-db-snapshot",
+          "kind": "query",
+          "evidenceRefs": [
+            "after-db-snapshot:actual-artifact"
+          ],
+          "actorRef": "A",
+          "route": "api",
+          "capabilityId": "getInventory",
+          "request": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "caseId": "T12",
+              "itemId": {
+                "$alias": "P"
+              }
+            },
+            "asOf": "2026-10-07T02:00:00Z",
+            "knownAt": "2026-10-07T04:00:00Z"
+          }
+        },
+        {
+          "id": "after-db",
+          "kind": "observe",
+          "evidenceRefs": [
+            "after-db:actual-artifact"
+          ],
+          "observation": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "caseId": "T12",
+              "itemId": {
+                "$alias": "P"
+              }
+            },
+            "asOf": "2026-10-07T02:00:00Z",
+            "knownAt": "2026-10-07T04:00:00Z",
+            "snapshotRef": {
+              "$result": {
+                "actionId": "after-db-snapshot",
+                "pointer": "/response/snapshotRevision"
+              }
+            },
+            "sources": [
+              "works",
+              "goalVersions",
+              "assessments",
+              "conditionResults",
+              "assessmentInputs",
+              "obligations",
+              "assignments",
+              "handovers",
+              "workLinks",
+              "segments",
+              "movements",
+              "contributions",
+              "activities",
+              "inbox",
+              "audit",
+              "outbox",
+              "executionAttempts",
+              "approvals",
+              "contracts",
+              "claims",
+              "observationCoverage",
+              "supervisionIssues"
+            ]
+          }
+        }
+      ],
+      "assertions": [
+        {
+          "id": "assessment-api-result",
+          "op": "equals",
+          "source": {
+            "actionId": "assessment",
+            "pointer": "/response/data/result"
+          },
+          "expected": "UNVERIFIED",
+          "requirementRefs": [
+            "D12"
+          ],
+          "evidenceRefs": [
+            "assessment:actual-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "T12",
+            "itemId": {
+              "$alias": "P"
+            }
+          },
+          "oracleExplanation": "판정 근거와 장소·상충을 구별한다 no-receipt-evidence. insufficient-evidence의 독립 고정 기대값을 대조한다.",
+          "oracleRef": {
+            "oracleId": "T12.assessment-evidence-policy",
+            "observationNames": [
+              "insufficient-evidence"
+            ]
+          }
+        },
+        {
+          "id": "assessment-db-result",
+          "op": "equals",
+          "source": {
+            "actionId": "after-db",
+            "pointer": "/data/rawRows/assessments",
+            "where": {
+              "workId": {
+                "$result": {
+                  "actionId": "work",
+                  "pointer": "/response/workId"
+                }
+              },
+              "id": {
+                "$result": {
+                  "actionId": "assessment",
+                  "pointer": "/response/id"
+                }
+              }
+            },
+            "field": "result"
+          },
+          "expected": [
+            "UNVERIFIED"
+          ],
+          "requirementRefs": [
+            "D12"
+          ],
+          "evidenceRefs": [
+            "after-db:actual-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "T12",
+            "itemId": {
+              "$alias": "P"
+            }
+          },
+          "oracleExplanation": "판정 근거와 장소·상충을 구별한다 no-receipt-evidence. insufficient-evidence의 독립 고정 기대값을 대조한다.",
+          "oracleRef": {
+            "oracleId": "T12.assessment-evidence-policy",
+            "observationNames": [
+              "insufficient-evidence"
+            ]
+          }
+        },
+        {
+          "id": "versions-pinned",
+          "op": "relationSet",
+          "source": {
+            "actionId": "after-db",
+            "pointer": "/data/rawRows/assessments",
+            "where": {
+              "id": {
+                "$result": {
+                  "actionId": "assessment",
+                  "pointer": "/response/id"
+                }
+              }
+            },
+            "field": [
+              "definitionVersion",
+              "policyVersion",
+              "evaluatorVersion"
+            ]
+          },
+          "expected": [
+            [
+              "definition-v1",
+              "SYNTHETIC-policy-v1",
+              "evaluator-v1"
+            ]
+          ],
+          "requirementRefs": [
+            "D12"
+          ],
+          "evidenceRefs": [
+            "after-db:actual-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "T12",
+            "itemId": {
+              "$alias": "P"
+            }
+          },
+          "oracleExplanation": "판정 근거와 장소·상충을 구별한다 no-receipt-evidence. assessment-snapshot의 독립 고정 기대값을 대조한다.",
+          "oracleRef": {
+            "oracleId": "T12.assessment-evidence-policy",
+            "observationNames": [
+              "assessment-snapshot"
+            ]
+          }
+        },
+        {
+          "id": "goal-version-linked",
+          "op": "sameAs",
+          "source": {
+            "actionId": "after-db",
+            "pointer": "/data/rawRows/assessments",
+            "where": {
+              "id": {
+                "$result": {
+                  "actionId": "assessment",
+                  "pointer": "/response/id"
+                }
+              }
+            },
+            "field": "goalVersionId"
+          },
+          "expected": true,
+          "requirementRefs": [
+            "D12"
+          ],
+          "evidenceRefs": [
+            "after-db:actual-artifact",
+            "after-db:actual-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "T12",
+            "itemId": {
+              "$alias": "P"
+            }
+          },
+          "oracleExplanation": "판정 근거와 장소·상충을 구별한다 no-receipt-evidence. assessment-snapshot의 독립 고정 기대값을 대조한다.",
+          "oracleRef": {
+            "oracleId": "T12.assessment-evidence-policy",
+            "observationNames": [
+              "assessment-snapshot"
+            ]
+          },
+          "baseline": {
+            "actionId": "after-db",
+            "pointer": "/data/rawRows/goalVersions",
+            "where": {
+              "workId": {
+                "$result": {
+                  "actionId": "work",
+                  "pointer": "/response/workId"
+                }
+              }
+            },
+            "field": "id"
+          }
+        },
+        {
+          "id": "condition-result-detail",
+          "op": "relationSet",
+          "source": {
+            "actionId": "after-db",
+            "pointer": "/data/rawRows/conditionResults",
+            "where": {
+              "assessmentId": {
+                "$result": {
+                  "actionId": "assessment",
+                  "pointer": "/response/id"
+                }
+              },
+              "conditionId": "arrived-at-W"
+            },
+            "field": [
+              "conditionId",
+              "result",
+              "conflict",
+              "evaluatorVersion"
+            ]
+          },
+          "expected": [
+            [
+              "arrived-at-W",
+              "UNVERIFIED",
+              false,
+              "evaluator-v1"
+            ]
+          ],
+          "requirementRefs": [
+            "D12"
+          ],
+          "evidenceRefs": [
+            "after-db:actual-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "T12",
+            "itemId": {
+              "$alias": "P"
+            }
+          },
+          "oracleExplanation": "판정 근거와 장소·상충을 구별한다 no-receipt-evidence. assessment-snapshot의 독립 고정 기대값을 대조한다.",
+          "oracleRef": {
+            "oracleId": "T12.assessment-evidence-policy",
+            "observationNames": [
+              "assessment-snapshot"
+            ]
+          }
+        },
+        {
+          "id": "condition-evidence-input-match",
+          "op": "sameAs",
+          "source": {
+            "actionId": "after-db",
+            "pointer": "/data/rawRows/conditionResults",
+            "where": {
+              "assessmentId": {
+                "$result": {
+                  "actionId": "assessment",
+                  "pointer": "/response/id"
+                }
+              },
+              "conditionId": "arrived-at-W"
+            },
+            "field": "evidenceIds"
+          },
+          "expected": true,
+          "requirementRefs": [
+            "D12"
+          ],
+          "evidenceRefs": [
+            "after-db:actual-artifact",
+            "after-db:actual-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "T12",
+            "itemId": {
+              "$alias": "P"
+            }
+          },
+          "oracleExplanation": "판정 근거와 장소·상충을 구별한다 no-receipt-evidence. assessment-snapshot의 독립 고정 기대값을 대조한다.",
+          "oracleRef": {
+            "oracleId": "T12.assessment-evidence-policy",
+            "observationNames": [
+              "assessment-snapshot"
+            ]
+          },
+          "baseline": {
+            "actionId": "after-db",
+            "pointer": "/data/rawRows/assessmentInputs",
+            "where": {
+              "assessmentId": {
+                "$result": {
+                  "actionId": "assessment",
+                  "pointer": "/response/id"
+                }
+              },
+              "conditionId": "arrived-at-W"
+            },
+            "field": "evidenceIds"
+          }
+        },
+        {
+          "id": "previous-assessment-link",
+          "op": "equals",
+          "source": {
+            "actionId": "after-db",
+            "pointer": "/data/rawRows/assessments",
+            "where": {
+              "id": {
+                "$result": {
+                  "actionId": "assessment",
+                  "pointer": "/response/id"
+                }
+              }
+            },
+            "field": "previousAssessmentId"
+          },
+          "expected": [
+            {
+              "$result": {
+                "actionId": "initial-assessment",
+                "pointer": "/response/id"
+              }
+            }
+          ],
+          "requirementRefs": [
+            "D12"
+          ],
+          "evidenceRefs": [
+            "after-db:actual-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "T12",
+            "itemId": {
+              "$alias": "P"
+            }
+          },
+          "oracleExplanation": "판정 근거와 장소·상충을 구별한다 no-receipt-evidence. assessment-snapshot의 독립 고정 기대값을 대조한다.",
+          "oracleRef": {
+            "oracleId": "T12.assessment-evidence-policy",
+            "observationNames": [
+              "assessment-snapshot"
+            ]
+          }
+        },
+        {
+          "id": "assessment-asof",
+          "op": "timeEquals",
+          "source": {
+            "actionId": "assessment",
+            "pointer": "/response/asOf"
+          },
+          "expected": "2026-10-07T02:00:00Z",
+          "requirementRefs": [
+            "D12"
+          ],
+          "evidenceRefs": [
+            "assessment:actual-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "T12",
+            "itemId": {
+              "$alias": "P"
+            }
+          },
+          "oracleExplanation": "판정 근거와 장소·상충을 구별한다 no-receipt-evidence. assessment-snapshot의 독립 고정 기대값을 대조한다.",
+          "oracleRef": {
+            "oracleId": "T12.assessment-evidence-policy",
+            "observationNames": [
+              "assessment-snapshot"
+            ]
+          }
+        },
+        {
+          "id": "assessment-knownat",
+          "op": "timeEquals",
+          "source": {
+            "actionId": "assessment",
+            "pointer": "/response/knownAt"
+          },
+          "expected": "2026-10-07T04:00:00Z",
+          "requirementRefs": [
+            "D12"
+          ],
+          "evidenceRefs": [
+            "assessment:actual-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "T12",
+            "itemId": {
+              "$alias": "P"
+            }
+          },
+          "oracleExplanation": "판정 근거와 장소·상충을 구별한다 no-receipt-evidence. assessment-snapshot의 독립 고정 기대값을 대조한다.",
+          "oracleRef": {
+            "oracleId": "T12.assessment-evidence-policy",
+            "observationNames": [
+              "assessment-snapshot"
+            ]
+          }
+        },
+        {
+          "id": "input-snapshot-rows",
+          "op": "count",
+          "source": {
+            "actionId": "after-db",
+            "pointer": "/data/rawRows/assessmentInputs",
+            "where": {
+              "assessmentId": {
+                "$result": {
+                  "actionId": "assessment",
+                  "pointer": "/response/id"
+                }
+              },
+              "conditionId": "arrived-at-W"
+            }
+          },
+          "expected": 1,
+          "requirementRefs": [
+            "D12"
+          ],
+          "evidenceRefs": [
+            "after-db:actual-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "T12",
+            "itemId": {
+              "$alias": "P"
+            }
+          },
+          "oracleExplanation": "판정 근거와 장소·상충을 구별한다 no-receipt-evidence. assessment-snapshot의 독립 고정 기대값을 대조한다.",
+          "oracleRef": {
+            "oracleId": "T12.assessment-evidence-policy",
+            "observationNames": [
+              "assessment-snapshot"
+            ]
+          }
+        },
+        {
+          "id": "unknown-quantity-not-zero",
+          "op": "equals",
+          "source": {
+            "actionId": "after-db",
+            "pointer": "/data/rawRows/conditionResults",
+            "where": {
+              "assessmentId": {
+                "$result": {
+                  "actionId": "assessment",
+                  "pointer": "/response/id"
+                }
+              },
+              "conditionId": "arrived-at-W"
+            },
+            "field": "quantityKnowledge"
+          },
+          "expected": [
+            "UNKNOWN"
+          ],
+          "requirementRefs": [
+            "D12"
+          ],
+          "evidenceRefs": [
+            "after-db:actual-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "T12",
+            "itemId": {
+              "$alias": "P"
+            }
+          },
+          "oracleExplanation": "판정 근거와 장소·상충을 구별한다 no-receipt-evidence. missing-as-zero의 독립 고정 기대값을 대조한다.",
+          "oracleRef": {
+            "oracleId": "T12.assessment-evidence-policy",
+            "observationNames": [
+              "missing-as-zero"
+            ]
+          }
+        },
+        {
+          "id": "no-fabricated-contribution",
+          "op": "sameAs",
+          "source": {
+            "actionId": "after-db",
+            "pointer": "/data/rawRows/contributions"
+          },
+          "expected": true,
+          "requirementRefs": [
+            "D12"
+          ],
+          "evidenceRefs": [
+            "after-db:actual-artifact",
+            "before-db:actual-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "T12",
+            "itemId": {
+              "$alias": "P"
+            }
+          },
+          "oracleExplanation": "같은 대상의 독립 전후 원행을 비교한다. 조회/거부 감사의 추가는 별도 허용한다.",
+          "oracleRef": {
+            "oracleId": "T12.assessment-evidence-policy",
+            "observationNames": [
+              "missing-as-zero"
+            ]
+          },
+          "baseline": {
+            "actionId": "before-db",
+            "pointer": "/data/rawRows/contributions"
+          }
+        },
+        {
+          "id": "no-fabricated-movement",
+          "op": "sameAs",
+          "source": {
+            "actionId": "after-db",
+            "pointer": "/data/rawRows/movements"
+          },
+          "expected": true,
+          "requirementRefs": [
+            "D12"
+          ],
+          "evidenceRefs": [
+            "after-db:actual-artifact",
+            "before-db:actual-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "T12",
+            "itemId": {
+              "$alias": "P"
+            }
+          },
+          "oracleExplanation": "같은 대상의 독립 전후 원행을 비교한다. 조회/거부 감사의 추가는 별도 허용한다.",
+          "oracleRef": {
+            "oracleId": "T12.assessment-evidence-policy",
+            "observationNames": [
+              "missing-as-zero"
+            ]
+          },
+          "baseline": {
+            "actionId": "before-db",
+            "pointer": "/data/rawRows/movements"
+          }
+        }
+      ],
+      "oracleExplanation": "가상 fixture의 입력과 실제 명령을 구별한다. 수량은 BOX decimal 문자열과 식별된 실물 범위로 손계산한다. 원행 관찰은 API projection을 복사하지 않는다. 판정 근거와 장소·상충을 구별한다 no-receipt-evidence"
+    },
+    {
+      "id": "insufficient-source-scope",
+      "title": "판정 근거와 장소·상충을 구별한다 insufficient-source-scope",
+      "fixtureRef": "verification/cases/T12/fixtures/insufficient-source-scope.json",
+      "requiredAdapters": [
+        "fixture",
+        "api",
+        "db"
+      ],
+      "actions": [
+        {
+          "id": "setup",
+          "kind": "installFixture",
+          "evidenceRefs": [
+            "setup:actual-artifact"
+          ],
+          "fixtureRef": "verification/cases/T12/fixtures/insufficient-source-scope.json"
+        },
+        {
+          "id": "work",
+          "kind": "invoke",
+          "evidenceRefs": [
+            "work:actual-artifact"
+          ],
+          "actorRef": "A",
+          "route": "api",
+          "capabilityId": "createWork",
+          "request": {
+            "intentKind": "COMMAND",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "createWork",
+            "subjectRefs": [
+              {
+                "type": "TradeItem",
+                "id": {
+                  "$alias": "P"
+                }
+              }
+            ],
+            "slots": {
+              "workType": "PURCHASE_ARRIVAL",
+              "quantity": {
+                "value": "100",
+                "unit": "BOX",
+                "provenance": "USER"
+              },
+              "destinationId": {
+                "$alias": "W"
+              },
+              "dueAt": "2026-10-07T02:00:00Z",
+              "endpoint": "ARRIVED",
+              "quantityMode": "CUMULATIVE_EVENT",
+              "period": {
+                "start": "2026-10-05T09:00:00Z",
+                "end": "2026-10-07T01:30:00Z",
+                "endInclusive": true
+              },
+              "eventKinds": [
+                "CONFIRMED_RECEIPT"
+              ],
+              "distinctContributionScope": "CANONICAL_PHYSICAL_FULFILMENT",
+              "evidencePolicyVersion": "SYNTHETIC-policy-v1",
+              "evaluationTime": "2026-10-07T02:00:00Z",
+              "placeId": {
+                "$alias": "W"
+              },
+              "eligibilityAction": "PHYSICAL_HELD",
+              "includeReservations": true,
+              "ownerId": {
+                "$alias": "A"
+              },
+              "supervisorId": {
+                "$alias": "supervisor"
+              }
+            },
+            "expectedRevision": 1,
+            "commandIdempotencyKey": "T12-insufficient-source-scope-work",
+            "evidenceRefs": [
+              {
+                "$alias": "DOC"
+              }
+            ]
+          }
+        },
+        {
+          "id": "initial-assessment",
+          "kind": "query",
+          "evidenceRefs": [
+            "initial-assessment:actual-artifact"
+          ],
+          "actorRef": "A",
+          "route": "api",
+          "capabilityId": "getAssessment",
+          "request": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "caseId": "T12",
+              "itemId": {
+                "$alias": "P"
+              }
+            },
+            "asOf": "2026-10-07T02:00:00Z",
+            "knownAt": "2026-10-07T04:00:00Z",
+            "workId": {
+              "$result": {
+                "actionId": "work",
+                "pointer": "/response/workId"
+              }
+            },
+            "evaluationTime": "2026-10-07T02:00:00Z"
+          }
+        },
+        {
+          "id": "before-db-snapshot",
+          "kind": "query",
+          "evidenceRefs": [
+            "before-db-snapshot:actual-artifact"
+          ],
+          "actorRef": "A",
+          "route": "api",
+          "capabilityId": "getInventory",
+          "request": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "caseId": "T12",
+              "itemId": {
+                "$alias": "P"
+              }
+            },
+            "asOf": "2026-10-07T02:00:00Z",
+            "knownAt": "2026-10-07T04:00:00Z"
+          }
+        },
+        {
+          "id": "before-db",
+          "kind": "observe",
+          "evidenceRefs": [
+            "before-db:actual-artifact"
+          ],
+          "observation": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "caseId": "T12",
+              "itemId": {
+                "$alias": "P"
+              }
+            },
+            "asOf": "2026-10-07T02:00:00Z",
+            "knownAt": "2026-10-07T04:00:00Z",
+            "snapshotRef": {
+              "$result": {
+                "actionId": "before-db-snapshot",
+                "pointer": "/response/snapshotRevision"
+              }
+            },
+            "sources": [
+              "works",
+              "goalVersions",
+              "assessments",
+              "conditionResults",
+              "assessmentInputs",
+              "obligations",
+              "assignments",
+              "handovers",
+              "workLinks",
+              "segments",
+              "movements",
+              "contributions",
+              "activities",
+              "inbox",
+              "audit",
+              "outbox",
+              "executionAttempts",
+              "approvals",
+              "contracts",
+              "claims",
+              "observationCoverage",
+              "supervisionIssues"
+            ]
+          }
+        },
+        {
+          "id": "claim",
+          "kind": "invoke",
+          "evidenceRefs": [
+            "claim:actual-artifact"
+          ],
+          "actorRef": "A",
+          "route": "api",
+          "capabilityId": "recordActivity",
+          "request": {
+            "intentKind": "RECORD",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "recordActivity",
+            "subjectRefs": [
+              {
+                "type": "TradeItem",
+                "id": {
+                  "$alias": "P"
+                }
+              }
+            ],
+            "slots": {
+              "activityKind": "RECEIPT_CLAIM",
+              "workId": {
+                "$result": {
+                  "actionId": "work",
+                  "pointer": "/response/workId"
+                }
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "lotId": {
+                "$alias": "LOT"
+              },
+              "quantity": {
+                "value": "100",
+                "unit": "BOX"
+              },
+              "placeId": {
+                "$alias": "W"
+              },
+              "occurredAt": "2026-10-07T01:00:00Z",
+              "sourceNamespace": "synthetic-warehouse",
+              "externalEventId": "insufficient-source-scope",
+              "sourceVersion": "1",
+              "reportedScope": {
+                "itemId": {
+                  "$alias": "P"
+                },
+                "lotId": {
+                  "$alias": "LOT"
+                },
+                "placeId": {
+                  "$alias": "PORT"
+                }
+              }
+            },
+            "expectedRevision": 1,
+            "commandIdempotencyKey": "T12-insufficient-source-scope-claim",
+            "evidenceRefs": [
+              {
+                "$alias": "DOC"
+              }
+            ]
+          }
+        },
+        {
+          "id": "assessment",
+          "kind": "query",
+          "evidenceRefs": [
+            "assessment:actual-artifact"
+          ],
+          "actorRef": "A",
+          "route": "api",
+          "capabilityId": "getAssessment",
+          "request": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "caseId": "T12",
+              "itemId": {
+                "$alias": "P"
+              }
+            },
+            "asOf": "2026-10-07T02:00:00Z",
+            "knownAt": "2026-10-07T04:00:00Z",
+            "workId": {
+              "$result": {
+                "actionId": "work",
+                "pointer": "/response/workId"
+              }
+            },
+            "evaluationTime": "2026-10-07T02:00:00Z"
+          }
+        },
+        {
+          "id": "after-db-snapshot",
+          "kind": "query",
+          "evidenceRefs": [
+            "after-db-snapshot:actual-artifact"
+          ],
+          "actorRef": "A",
+          "route": "api",
+          "capabilityId": "getInventory",
+          "request": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "caseId": "T12",
+              "itemId": {
+                "$alias": "P"
+              }
+            },
+            "asOf": "2026-10-07T02:00:00Z",
+            "knownAt": "2026-10-07T04:00:00Z"
+          }
+        },
+        {
+          "id": "after-db",
+          "kind": "observe",
+          "evidenceRefs": [
+            "after-db:actual-artifact"
+          ],
+          "observation": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "caseId": "T12",
+              "itemId": {
+                "$alias": "P"
+              }
+            },
+            "asOf": "2026-10-07T02:00:00Z",
+            "knownAt": "2026-10-07T04:00:00Z",
+            "snapshotRef": {
+              "$result": {
+                "actionId": "after-db-snapshot",
+                "pointer": "/response/snapshotRevision"
+              }
+            },
+            "sources": [
+              "works",
+              "goalVersions",
+              "assessments",
+              "conditionResults",
+              "assessmentInputs",
+              "obligations",
+              "assignments",
+              "handovers",
+              "workLinks",
+              "segments",
+              "movements",
+              "contributions",
+              "activities",
+              "inbox",
+              "audit",
+              "outbox",
+              "executionAttempts",
+              "approvals",
+              "contracts",
+              "claims",
+              "observationCoverage",
+              "supervisionIssues"
+            ]
+          }
+        }
+      ],
+      "assertions": [
+        {
+          "id": "assessment-api-result",
+          "op": "equals",
+          "source": {
+            "actionId": "assessment",
+            "pointer": "/response/data/result"
+          },
+          "expected": "UNVERIFIED",
+          "requirementRefs": [
+            "D12"
+          ],
+          "evidenceRefs": [
+            "assessment:actual-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "T12",
+            "itemId": {
+              "$alias": "P"
+            }
+          },
+          "oracleExplanation": "판정 근거와 장소·상충을 구별한다 insufficient-source-scope. insufficient-evidence의 독립 고정 기대값을 대조한다.",
+          "oracleRef": {
+            "oracleId": "T12.assessment-evidence-policy",
+            "observationNames": [
+              "insufficient-evidence"
+            ]
+          }
+        },
+        {
+          "id": "assessment-db-result",
+          "op": "equals",
+          "source": {
+            "actionId": "after-db",
+            "pointer": "/data/rawRows/assessments",
+            "where": {
+              "workId": {
+                "$result": {
+                  "actionId": "work",
+                  "pointer": "/response/workId"
+                }
+              },
+              "id": {
+                "$result": {
+                  "actionId": "assessment",
+                  "pointer": "/response/id"
+                }
+              }
+            },
+            "field": "result"
+          },
+          "expected": [
+            "UNVERIFIED"
+          ],
+          "requirementRefs": [
+            "D12"
+          ],
+          "evidenceRefs": [
+            "after-db:actual-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "T12",
+            "itemId": {
+              "$alias": "P"
+            }
+          },
+          "oracleExplanation": "판정 근거와 장소·상충을 구별한다 insufficient-source-scope. insufficient-evidence의 독립 고정 기대값을 대조한다.",
+          "oracleRef": {
+            "oracleId": "T12.assessment-evidence-policy",
+            "observationNames": [
+              "insufficient-evidence"
+            ]
+          }
+        },
+        {
+          "id": "versions-pinned",
+          "op": "relationSet",
+          "source": {
+            "actionId": "after-db",
+            "pointer": "/data/rawRows/assessments",
+            "where": {
+              "id": {
+                "$result": {
+                  "actionId": "assessment",
+                  "pointer": "/response/id"
+                }
+              }
+            },
+            "field": [
+              "definitionVersion",
+              "policyVersion",
+              "evaluatorVersion"
+            ]
+          },
+          "expected": [
+            [
+              "definition-v1",
+              "SYNTHETIC-policy-v1",
+              "evaluator-v1"
+            ]
+          ],
+          "requirementRefs": [
+            "D12"
+          ],
+          "evidenceRefs": [
+            "after-db:actual-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "T12",
+            "itemId": {
+              "$alias": "P"
+            }
+          },
+          "oracleExplanation": "판정 근거와 장소·상충을 구별한다 insufficient-source-scope. assessment-snapshot의 독립 고정 기대값을 대조한다.",
+          "oracleRef": {
+            "oracleId": "T12.assessment-evidence-policy",
+            "observationNames": [
+              "assessment-snapshot"
+            ]
+          }
+        },
+        {
+          "id": "goal-version-linked",
+          "op": "sameAs",
+          "source": {
+            "actionId": "after-db",
+            "pointer": "/data/rawRows/assessments",
+            "where": {
+              "id": {
+                "$result": {
+                  "actionId": "assessment",
+                  "pointer": "/response/id"
+                }
+              }
+            },
+            "field": "goalVersionId"
+          },
+          "expected": true,
+          "requirementRefs": [
+            "D12"
+          ],
+          "evidenceRefs": [
+            "after-db:actual-artifact",
+            "after-db:actual-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "T12",
+            "itemId": {
+              "$alias": "P"
+            }
+          },
+          "oracleExplanation": "판정 근거와 장소·상충을 구별한다 insufficient-source-scope. assessment-snapshot의 독립 고정 기대값을 대조한다.",
+          "oracleRef": {
+            "oracleId": "T12.assessment-evidence-policy",
+            "observationNames": [
+              "assessment-snapshot"
+            ]
+          },
+          "baseline": {
+            "actionId": "after-db",
+            "pointer": "/data/rawRows/goalVersions",
+            "where": {
+              "workId": {
+                "$result": {
+                  "actionId": "work",
+                  "pointer": "/response/workId"
+                }
+              }
+            },
+            "field": "id"
+          }
+        },
+        {
+          "id": "condition-result-detail",
+          "op": "relationSet",
+          "source": {
+            "actionId": "after-db",
+            "pointer": "/data/rawRows/conditionResults",
+            "where": {
+              "assessmentId": {
+                "$result": {
+                  "actionId": "assessment",
+                  "pointer": "/response/id"
+                }
+              },
+              "conditionId": "arrived-at-W"
+            },
+            "field": [
+              "conditionId",
+              "result",
+              "conflict",
+              "evaluatorVersion"
+            ]
+          },
+          "expected": [
+            [
+              "arrived-at-W",
+              "UNVERIFIED",
+              false,
+              "evaluator-v1"
+            ]
+          ],
+          "requirementRefs": [
+            "D12"
+          ],
+          "evidenceRefs": [
+            "after-db:actual-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "T12",
+            "itemId": {
+              "$alias": "P"
+            }
+          },
+          "oracleExplanation": "판정 근거와 장소·상충을 구별한다 insufficient-source-scope. assessment-snapshot의 독립 고정 기대값을 대조한다.",
+          "oracleRef": {
+            "oracleId": "T12.assessment-evidence-policy",
+            "observationNames": [
+              "assessment-snapshot"
+            ]
+          }
+        },
+        {
+          "id": "condition-evidence-input-match",
+          "op": "sameAs",
+          "source": {
+            "actionId": "after-db",
+            "pointer": "/data/rawRows/conditionResults",
+            "where": {
+              "assessmentId": {
+                "$result": {
+                  "actionId": "assessment",
+                  "pointer": "/response/id"
+                }
+              },
+              "conditionId": "arrived-at-W"
+            },
+            "field": "evidenceIds"
+          },
+          "expected": true,
+          "requirementRefs": [
+            "D12"
+          ],
+          "evidenceRefs": [
+            "after-db:actual-artifact",
+            "after-db:actual-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "T12",
+            "itemId": {
+              "$alias": "P"
+            }
+          },
+          "oracleExplanation": "판정 근거와 장소·상충을 구별한다 insufficient-source-scope. assessment-snapshot의 독립 고정 기대값을 대조한다.",
+          "oracleRef": {
+            "oracleId": "T12.assessment-evidence-policy",
+            "observationNames": [
+              "assessment-snapshot"
+            ]
+          },
+          "baseline": {
+            "actionId": "after-db",
+            "pointer": "/data/rawRows/assessmentInputs",
+            "where": {
+              "assessmentId": {
+                "$result": {
+                  "actionId": "assessment",
+                  "pointer": "/response/id"
+                }
+              },
+              "conditionId": "arrived-at-W"
+            },
+            "field": "evidenceIds"
+          }
+        },
+        {
+          "id": "previous-assessment-link",
+          "op": "equals",
+          "source": {
+            "actionId": "after-db",
+            "pointer": "/data/rawRows/assessments",
+            "where": {
+              "id": {
+                "$result": {
+                  "actionId": "assessment",
+                  "pointer": "/response/id"
+                }
+              }
+            },
+            "field": "previousAssessmentId"
+          },
+          "expected": [
+            {
+              "$result": {
+                "actionId": "initial-assessment",
+                "pointer": "/response/id"
+              }
+            }
+          ],
+          "requirementRefs": [
+            "D12"
+          ],
+          "evidenceRefs": [
+            "after-db:actual-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "T12",
+            "itemId": {
+              "$alias": "P"
+            }
+          },
+          "oracleExplanation": "판정 근거와 장소·상충을 구별한다 insufficient-source-scope. assessment-snapshot의 독립 고정 기대값을 대조한다.",
+          "oracleRef": {
+            "oracleId": "T12.assessment-evidence-policy",
+            "observationNames": [
+              "assessment-snapshot"
+            ]
+          }
+        },
+        {
+          "id": "assessment-asof",
+          "op": "timeEquals",
+          "source": {
+            "actionId": "assessment",
+            "pointer": "/response/asOf"
+          },
+          "expected": "2026-10-07T02:00:00Z",
+          "requirementRefs": [
+            "D12"
+          ],
+          "evidenceRefs": [
+            "assessment:actual-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "T12",
+            "itemId": {
+              "$alias": "P"
+            }
+          },
+          "oracleExplanation": "판정 근거와 장소·상충을 구별한다 insufficient-source-scope. assessment-snapshot의 독립 고정 기대값을 대조한다.",
+          "oracleRef": {
+            "oracleId": "T12.assessment-evidence-policy",
+            "observationNames": [
+              "assessment-snapshot"
+            ]
+          }
+        },
+        {
+          "id": "assessment-knownat",
+          "op": "timeEquals",
+          "source": {
+            "actionId": "assessment",
+            "pointer": "/response/knownAt"
+          },
+          "expected": "2026-10-07T04:00:00Z",
+          "requirementRefs": [
+            "D12"
+          ],
+          "evidenceRefs": [
+            "assessment:actual-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "T12",
+            "itemId": {
+              "$alias": "P"
+            }
+          },
+          "oracleExplanation": "판정 근거와 장소·상충을 구별한다 insufficient-source-scope. assessment-snapshot의 독립 고정 기대값을 대조한다.",
+          "oracleRef": {
+            "oracleId": "T12.assessment-evidence-policy",
+            "observationNames": [
+              "assessment-snapshot"
+            ]
+          }
+        },
+        {
+          "id": "input-snapshot-rows",
+          "op": "count",
+          "source": {
+            "actionId": "after-db",
+            "pointer": "/data/rawRows/assessmentInputs",
+            "where": {
+              "assessmentId": {
+                "$result": {
+                  "actionId": "assessment",
+                  "pointer": "/response/id"
+                }
+              },
+              "conditionId": "arrived-at-W"
+            }
+          },
+          "expected": 1,
+          "requirementRefs": [
+            "D12"
+          ],
+          "evidenceRefs": [
+            "after-db:actual-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "T12",
+            "itemId": {
+              "$alias": "P"
+            }
+          },
+          "oracleExplanation": "판정 근거와 장소·상충을 구별한다 insufficient-source-scope. assessment-snapshot의 독립 고정 기대값을 대조한다.",
+          "oracleRef": {
+            "oracleId": "T12.assessment-evidence-policy",
+            "observationNames": [
+              "assessment-snapshot"
+            ]
+          }
+        },
+        {
+          "id": "unknown-quantity-not-zero",
+          "op": "equals",
+          "source": {
+            "actionId": "after-db",
+            "pointer": "/data/rawRows/conditionResults",
+            "where": {
+              "assessmentId": {
+                "$result": {
+                  "actionId": "assessment",
+                  "pointer": "/response/id"
+                }
+              },
+              "conditionId": "arrived-at-W"
+            },
+            "field": "quantityKnowledge"
+          },
+          "expected": [
+            "UNKNOWN"
+          ],
+          "requirementRefs": [
+            "D12"
+          ],
+          "evidenceRefs": [
+            "after-db:actual-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "T12",
+            "itemId": {
+              "$alias": "P"
+            }
+          },
+          "oracleExplanation": "판정 근거와 장소·상충을 구별한다 insufficient-source-scope. missing-as-zero의 독립 고정 기대값을 대조한다.",
+          "oracleRef": {
+            "oracleId": "T12.assessment-evidence-policy",
+            "observationNames": [
+              "missing-as-zero"
+            ]
+          }
+        },
+        {
+          "id": "no-fabricated-contribution",
+          "op": "sameAs",
+          "source": {
+            "actionId": "after-db",
+            "pointer": "/data/rawRows/contributions"
+          },
+          "expected": true,
+          "requirementRefs": [
+            "D12"
+          ],
+          "evidenceRefs": [
+            "after-db:actual-artifact",
+            "before-db:actual-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "T12",
+            "itemId": {
+              "$alias": "P"
+            }
+          },
+          "oracleExplanation": "같은 대상의 독립 전후 원행을 비교한다. 조회/거부 감사의 추가는 별도 허용한다.",
+          "oracleRef": {
+            "oracleId": "T12.assessment-evidence-policy",
+            "observationNames": [
+              "missing-as-zero"
+            ]
+          },
+          "baseline": {
+            "actionId": "before-db",
+            "pointer": "/data/rawRows/contributions"
+          }
+        },
+        {
+          "id": "no-fabricated-movement",
+          "op": "sameAs",
+          "source": {
+            "actionId": "after-db",
+            "pointer": "/data/rawRows/movements"
+          },
+          "expected": true,
+          "requirementRefs": [
+            "D12"
+          ],
+          "evidenceRefs": [
+            "after-db:actual-artifact",
+            "before-db:actual-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "T12",
+            "itemId": {
+              "$alias": "P"
+            }
+          },
+          "oracleExplanation": "같은 대상의 독립 전후 원행을 비교한다. 조회/거부 감사의 추가는 별도 허용한다.",
+          "oracleRef": {
+            "oracleId": "T12.assessment-evidence-policy",
+            "observationNames": [
+              "missing-as-zero"
+            ]
+          },
+          "baseline": {
+            "actionId": "before-db",
+            "pointer": "/data/rawRows/movements"
+          }
+        }
+      ],
+      "oracleExplanation": "가상 fixture의 입력과 실제 명령을 구별한다. 수량은 BOX decimal 문자열과 식별된 실물 범위로 손계산한다. 원행 관찰은 API projection을 복사하지 않는다. 판정 근거와 장소·상충을 구별한다 insufficient-source-scope"
+    },
+    {
+      "id": "wrong-warehouse",
+      "title": "판정 근거와 장소·상충을 구별한다 wrong-warehouse",
+      "fixtureRef": "verification/cases/T12/fixtures/wrong-warehouse.json",
+      "requiredAdapters": [
+        "fixture",
+        "api",
+        "db"
+      ],
+      "actions": [
+        {
+          "id": "setup",
+          "kind": "installFixture",
+          "evidenceRefs": [
+            "setup:actual-artifact"
+          ],
+          "fixtureRef": "verification/cases/T12/fixtures/wrong-warehouse.json"
+        },
+        {
+          "id": "work",
+          "kind": "invoke",
+          "evidenceRefs": [
+            "work:actual-artifact"
+          ],
+          "actorRef": "A",
+          "route": "api",
+          "capabilityId": "createWork",
+          "request": {
+            "intentKind": "COMMAND",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "createWork",
+            "subjectRefs": [
+              {
+                "type": "TradeItem",
+                "id": {
+                  "$alias": "P"
+                }
+              }
+            ],
+            "slots": {
+              "workType": "PURCHASE_ARRIVAL",
+              "quantity": {
+                "value": "100",
+                "unit": "BOX",
+                "provenance": "USER"
+              },
+              "destinationId": {
+                "$alias": "W"
+              },
+              "dueAt": "2026-10-07T02:00:00Z",
+              "endpoint": "ARRIVED",
+              "quantityMode": "CUMULATIVE_EVENT",
+              "period": {
+                "start": "2026-10-05T09:00:00Z",
+                "end": "2026-10-07T01:30:00Z",
+                "endInclusive": true
+              },
+              "eventKinds": [
+                "CONFIRMED_RECEIPT"
+              ],
+              "distinctContributionScope": "CANONICAL_PHYSICAL_FULFILMENT",
+              "evidencePolicyVersion": "SYNTHETIC-policy-v1",
+              "evaluationTime": "2026-10-07T02:00:00Z",
+              "placeId": {
+                "$alias": "W"
+              },
+              "eligibilityAction": "PHYSICAL_HELD",
+              "includeReservations": true,
+              "ownerId": {
+                "$alias": "A"
+              },
+              "supervisorId": {
+                "$alias": "supervisor"
+              }
+            },
+            "expectedRevision": 1,
+            "commandIdempotencyKey": "T12-wrong-warehouse-work",
+            "evidenceRefs": [
+              {
+                "$alias": "DOC"
+              }
+            ]
+          }
+        },
+        {
+          "id": "initial-assessment",
+          "kind": "query",
+          "evidenceRefs": [
+            "initial-assessment:actual-artifact"
+          ],
+          "actorRef": "A",
+          "route": "api",
+          "capabilityId": "getAssessment",
+          "request": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "caseId": "T12",
+              "itemId": {
+                "$alias": "P"
+              }
+            },
+            "asOf": "2026-10-07T02:00:00Z",
+            "knownAt": "2026-10-07T04:00:00Z",
+            "workId": {
+              "$result": {
+                "actionId": "work",
+                "pointer": "/response/workId"
+              }
+            },
+            "evaluationTime": "2026-10-07T02:00:00Z"
+          }
+        },
+        {
+          "id": "before-db-snapshot",
+          "kind": "query",
+          "evidenceRefs": [
+            "before-db-snapshot:actual-artifact"
+          ],
+          "actorRef": "A",
+          "route": "api",
+          "capabilityId": "getInventory",
+          "request": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "caseId": "T12",
+              "itemId": {
+                "$alias": "P"
+              }
+            },
+            "asOf": "2026-10-07T02:00:00Z",
+            "knownAt": "2026-10-07T04:00:00Z"
+          }
+        },
+        {
+          "id": "before-db",
+          "kind": "observe",
+          "evidenceRefs": [
+            "before-db:actual-artifact"
+          ],
+          "observation": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "caseId": "T12",
+              "itemId": {
+                "$alias": "P"
+              }
+            },
+            "asOf": "2026-10-07T02:00:00Z",
+            "knownAt": "2026-10-07T04:00:00Z",
+            "snapshotRef": {
+              "$result": {
+                "actionId": "before-db-snapshot",
+                "pointer": "/response/snapshotRevision"
+              }
+            },
+            "sources": [
+              "works",
+              "goalVersions",
+              "assessments",
+              "conditionResults",
+              "assessmentInputs",
+              "obligations",
+              "assignments",
+              "handovers",
+              "workLinks",
+              "segments",
+              "movements",
+              "contributions",
+              "activities",
+              "inbox",
+              "audit",
+              "outbox",
+              "executionAttempts",
+              "approvals",
+              "contracts",
+              "claims",
+              "observationCoverage",
+              "supervisionIssues"
+            ]
+          }
+        },
+        {
+          "id": "receipt",
+          "kind": "invoke",
+          "evidenceRefs": [
+            "receipt:actual-artifact"
+          ],
+          "actorRef": "A",
+          "route": "api",
+          "capabilityId": "confirmReceipt",
+          "request": {
+            "intentKind": "COMMAND",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "confirmReceipt",
+            "subjectRefs": [
+              {
+                "type": "TradeItem",
+                "id": {
+                  "$alias": "P"
+                }
+              }
+            ],
+            "slots": {
+              "quantity": {
+                "value": "100",
+                "unit": "BOX"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "lotId": {
+                "$alias": "LOT"
+              },
+              "placeId": {
+                "$alias": "PORT"
+              },
+              "occurredAt": "2026-10-07T01:00:00Z",
+              "workId": {
+                "$result": {
+                  "actionId": "work",
+                  "pointer": "/response/workId"
+                }
+              }
+            },
+            "expectedRevision": 1,
+            "commandIdempotencyKey": "T12-wrong-warehouse-receipt",
+            "evidenceRefs": [
+              {
+                "$alias": "DOC"
+              }
+            ]
+          }
+        },
+        {
+          "id": "assessment",
+          "kind": "query",
+          "evidenceRefs": [
+            "assessment:actual-artifact"
+          ],
+          "actorRef": "A",
+          "route": "api",
+          "capabilityId": "getAssessment",
+          "request": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "caseId": "T12",
+              "itemId": {
+                "$alias": "P"
+              }
+            },
+            "asOf": "2026-10-07T02:00:00Z",
+            "knownAt": "2026-10-07T04:00:00Z",
+            "workId": {
+              "$result": {
+                "actionId": "work",
+                "pointer": "/response/workId"
+              }
+            },
+            "evaluationTime": "2026-10-07T02:00:00Z"
+          }
+        },
+        {
+          "id": "after-db-snapshot",
+          "kind": "query",
+          "evidenceRefs": [
+            "after-db-snapshot:actual-artifact"
+          ],
+          "actorRef": "A",
+          "route": "api",
+          "capabilityId": "getInventory",
+          "request": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "caseId": "T12",
+              "itemId": {
+                "$alias": "P"
+              }
+            },
+            "asOf": "2026-10-07T02:00:00Z",
+            "knownAt": "2026-10-07T04:00:00Z"
+          }
+        },
+        {
+          "id": "after-db",
+          "kind": "observe",
+          "evidenceRefs": [
+            "after-db:actual-artifact"
+          ],
+          "observation": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "caseId": "T12",
+              "itemId": {
+                "$alias": "P"
+              }
+            },
+            "asOf": "2026-10-07T02:00:00Z",
+            "knownAt": "2026-10-07T04:00:00Z",
+            "snapshotRef": {
+              "$result": {
+                "actionId": "after-db-snapshot",
+                "pointer": "/response/snapshotRevision"
+              }
+            },
+            "sources": [
+              "works",
+              "goalVersions",
+              "assessments",
+              "conditionResults",
+              "assessmentInputs",
+              "obligations",
+              "assignments",
+              "handovers",
+              "workLinks",
+              "segments",
+              "movements",
+              "contributions",
+              "activities",
+              "inbox",
+              "audit",
+              "outbox",
+              "executionAttempts",
+              "approvals",
+              "contracts",
+              "claims",
+              "observationCoverage",
+              "supervisionIssues"
+            ]
+          }
+        }
+      ],
+      "assertions": [
+        {
+          "id": "assessment-api-result",
+          "op": "equals",
+          "source": {
+            "actionId": "assessment",
+            "pointer": "/response/data/result"
+          },
+          "expected": "UNSATISFIED",
+          "requirementRefs": [
+            "D12"
+          ],
+          "evidenceRefs": [
+            "assessment:actual-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "T12",
+            "itemId": {
+              "$alias": "P"
+            }
+          },
+          "oracleExplanation": "판정 근거와 장소·상충을 구별한다 wrong-warehouse. wrong-place-condition의 독립 고정 기대값을 대조한다.",
+          "oracleRef": {
+            "oracleId": "T12.assessment-evidence-policy",
+            "observationNames": [
+              "wrong-place-condition"
+            ]
+          }
+        },
+        {
+          "id": "assessment-db-result",
+          "op": "equals",
+          "source": {
+            "actionId": "after-db",
+            "pointer": "/data/rawRows/assessments",
+            "where": {
+              "workId": {
+                "$result": {
+                  "actionId": "work",
+                  "pointer": "/response/workId"
+                }
+              },
+              "id": {
+                "$result": {
+                  "actionId": "assessment",
+                  "pointer": "/response/id"
+                }
+              }
+            },
+            "field": "result"
+          },
+          "expected": [
+            "UNSATISFIED"
+          ],
+          "requirementRefs": [
+            "D12"
+          ],
+          "evidenceRefs": [
+            "after-db:actual-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "T12",
+            "itemId": {
+              "$alias": "P"
+            }
+          },
+          "oracleExplanation": "판정 근거와 장소·상충을 구별한다 wrong-warehouse. wrong-place-condition의 독립 고정 기대값을 대조한다.",
+          "oracleRef": {
+            "oracleId": "T12.assessment-evidence-policy",
+            "observationNames": [
+              "wrong-place-condition"
+            ]
+          }
+        },
+        {
+          "id": "versions-pinned",
+          "op": "relationSet",
+          "source": {
+            "actionId": "after-db",
+            "pointer": "/data/rawRows/assessments",
+            "where": {
+              "id": {
+                "$result": {
+                  "actionId": "assessment",
+                  "pointer": "/response/id"
+                }
+              }
+            },
+            "field": [
+              "definitionVersion",
+              "policyVersion",
+              "evaluatorVersion"
+            ]
+          },
+          "expected": [
+            [
+              "definition-v1",
+              "SYNTHETIC-policy-v1",
+              "evaluator-v1"
+            ]
+          ],
+          "requirementRefs": [
+            "D12"
+          ],
+          "evidenceRefs": [
+            "after-db:actual-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "T12",
+            "itemId": {
+              "$alias": "P"
+            }
+          },
+          "oracleExplanation": "판정 근거와 장소·상충을 구별한다 wrong-warehouse. assessment-snapshot의 독립 고정 기대값을 대조한다.",
+          "oracleRef": {
+            "oracleId": "T12.assessment-evidence-policy",
+            "observationNames": [
+              "assessment-snapshot"
+            ]
+          }
+        },
+        {
+          "id": "goal-version-linked",
+          "op": "sameAs",
+          "source": {
+            "actionId": "after-db",
+            "pointer": "/data/rawRows/assessments",
+            "where": {
+              "id": {
+                "$result": {
+                  "actionId": "assessment",
+                  "pointer": "/response/id"
+                }
+              }
+            },
+            "field": "goalVersionId"
+          },
+          "expected": true,
+          "requirementRefs": [
+            "D12"
+          ],
+          "evidenceRefs": [
+            "after-db:actual-artifact",
+            "after-db:actual-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "T12",
+            "itemId": {
+              "$alias": "P"
+            }
+          },
+          "oracleExplanation": "판정 근거와 장소·상충을 구별한다 wrong-warehouse. assessment-snapshot의 독립 고정 기대값을 대조한다.",
+          "oracleRef": {
+            "oracleId": "T12.assessment-evidence-policy",
+            "observationNames": [
+              "assessment-snapshot"
+            ]
+          },
+          "baseline": {
+            "actionId": "after-db",
+            "pointer": "/data/rawRows/goalVersions",
+            "where": {
+              "workId": {
+                "$result": {
+                  "actionId": "work",
+                  "pointer": "/response/workId"
+                }
+              }
+            },
+            "field": "id"
+          }
+        },
+        {
+          "id": "condition-result-detail",
+          "op": "relationSet",
+          "source": {
+            "actionId": "after-db",
+            "pointer": "/data/rawRows/conditionResults",
+            "where": {
+              "assessmentId": {
+                "$result": {
+                  "actionId": "assessment",
+                  "pointer": "/response/id"
+                }
+              },
+              "conditionId": "arrived-at-W"
+            },
+            "field": [
+              "conditionId",
+              "result",
+              "conflict",
+              "evaluatorVersion"
+            ]
+          },
+          "expected": [
+            [
+              "arrived-at-W",
+              "UNSATISFIED",
+              false,
+              "evaluator-v1"
+            ]
+          ],
+          "requirementRefs": [
+            "D12"
+          ],
+          "evidenceRefs": [
+            "after-db:actual-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "T12",
+            "itemId": {
+              "$alias": "P"
+            }
+          },
+          "oracleExplanation": "판정 근거와 장소·상충을 구별한다 wrong-warehouse. assessment-snapshot의 독립 고정 기대값을 대조한다.",
+          "oracleRef": {
+            "oracleId": "T12.assessment-evidence-policy",
+            "observationNames": [
+              "assessment-snapshot"
+            ]
+          }
+        },
+        {
+          "id": "condition-evidence-input-match",
+          "op": "sameAs",
+          "source": {
+            "actionId": "after-db",
+            "pointer": "/data/rawRows/conditionResults",
+            "where": {
+              "assessmentId": {
+                "$result": {
+                  "actionId": "assessment",
+                  "pointer": "/response/id"
+                }
+              },
+              "conditionId": "arrived-at-W"
+            },
+            "field": "evidenceIds"
+          },
+          "expected": true,
+          "requirementRefs": [
+            "D12"
+          ],
+          "evidenceRefs": [
+            "after-db:actual-artifact",
+            "after-db:actual-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "T12",
+            "itemId": {
+              "$alias": "P"
+            }
+          },
+          "oracleExplanation": "판정 근거와 장소·상충을 구별한다 wrong-warehouse. assessment-snapshot의 독립 고정 기대값을 대조한다.",
+          "oracleRef": {
+            "oracleId": "T12.assessment-evidence-policy",
+            "observationNames": [
+              "assessment-snapshot"
+            ]
+          },
+          "baseline": {
+            "actionId": "after-db",
+            "pointer": "/data/rawRows/assessmentInputs",
+            "where": {
+              "assessmentId": {
+                "$result": {
+                  "actionId": "assessment",
+                  "pointer": "/response/id"
+                }
+              },
+              "conditionId": "arrived-at-W"
+            },
+            "field": "evidenceIds"
+          }
+        },
+        {
+          "id": "previous-assessment-link",
+          "op": "equals",
+          "source": {
+            "actionId": "after-db",
+            "pointer": "/data/rawRows/assessments",
+            "where": {
+              "id": {
+                "$result": {
+                  "actionId": "assessment",
+                  "pointer": "/response/id"
+                }
+              }
+            },
+            "field": "previousAssessmentId"
+          },
+          "expected": [
+            {
+              "$result": {
+                "actionId": "initial-assessment",
+                "pointer": "/response/id"
+              }
+            }
+          ],
+          "requirementRefs": [
+            "D12"
+          ],
+          "evidenceRefs": [
+            "after-db:actual-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "T12",
+            "itemId": {
+              "$alias": "P"
+            }
+          },
+          "oracleExplanation": "판정 근거와 장소·상충을 구별한다 wrong-warehouse. assessment-snapshot의 독립 고정 기대값을 대조한다.",
+          "oracleRef": {
+            "oracleId": "T12.assessment-evidence-policy",
+            "observationNames": [
+              "assessment-snapshot"
+            ]
+          }
+        },
+        {
+          "id": "assessment-asof",
+          "op": "timeEquals",
+          "source": {
+            "actionId": "assessment",
+            "pointer": "/response/asOf"
+          },
+          "expected": "2026-10-07T02:00:00Z",
+          "requirementRefs": [
+            "D12"
+          ],
+          "evidenceRefs": [
+            "assessment:actual-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "T12",
+            "itemId": {
+              "$alias": "P"
+            }
+          },
+          "oracleExplanation": "판정 근거와 장소·상충을 구별한다 wrong-warehouse. assessment-snapshot의 독립 고정 기대값을 대조한다.",
+          "oracleRef": {
+            "oracleId": "T12.assessment-evidence-policy",
+            "observationNames": [
+              "assessment-snapshot"
+            ]
+          }
+        },
+        {
+          "id": "assessment-knownat",
+          "op": "timeEquals",
+          "source": {
+            "actionId": "assessment",
+            "pointer": "/response/knownAt"
+          },
+          "expected": "2026-10-07T04:00:00Z",
+          "requirementRefs": [
+            "D12"
+          ],
+          "evidenceRefs": [
+            "assessment:actual-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "T12",
+            "itemId": {
+              "$alias": "P"
+            }
+          },
+          "oracleExplanation": "판정 근거와 장소·상충을 구별한다 wrong-warehouse. assessment-snapshot의 독립 고정 기대값을 대조한다.",
+          "oracleRef": {
+            "oracleId": "T12.assessment-evidence-policy",
+            "observationNames": [
+              "assessment-snapshot"
+            ]
+          }
+        },
+        {
+          "id": "input-snapshot-rows",
+          "op": "count",
+          "source": {
+            "actionId": "after-db",
+            "pointer": "/data/rawRows/assessmentInputs",
+            "where": {
+              "assessmentId": {
+                "$result": {
+                  "actionId": "assessment",
+                  "pointer": "/response/id"
+                }
+              },
+              "conditionId": "arrived-at-W"
+            }
+          },
+          "expected": 1,
+          "requirementRefs": [
+            "D12"
+          ],
+          "evidenceRefs": [
+            "after-db:actual-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "T12",
+            "itemId": {
+              "$alias": "P"
+            }
+          },
+          "oracleExplanation": "판정 근거와 장소·상충을 구별한다 wrong-warehouse. assessment-snapshot의 독립 고정 기대값을 대조한다.",
+          "oracleRef": {
+            "oracleId": "T12.assessment-evidence-policy",
+            "observationNames": [
+              "assessment-snapshot"
+            ]
+          }
+        }
+      ],
+      "oracleExplanation": "가상 fixture의 입력과 실제 명령을 구별한다. 수량은 BOX decimal 문자열과 식별된 실물 범위로 손계산한다. 원행 관찰은 API projection을 복사하지 않는다. 판정 근거와 장소·상충을 구별한다 wrong-warehouse"
+    },
+    {
+      "id": "conflicting-claims",
+      "title": "판정 근거와 장소·상충을 구별한다 conflicting-claims",
+      "fixtureRef": "verification/cases/T12/fixtures/conflicting-claims.json",
+      "requiredAdapters": [
+        "fixture",
+        "api",
+        "db"
+      ],
+      "actions": [
+        {
+          "id": "setup",
+          "kind": "installFixture",
+          "evidenceRefs": [
+            "setup:actual-artifact"
+          ],
+          "fixtureRef": "verification/cases/T12/fixtures/conflicting-claims.json"
+        },
+        {
+          "id": "work",
+          "kind": "invoke",
+          "evidenceRefs": [
+            "work:actual-artifact"
+          ],
+          "actorRef": "A",
+          "route": "api",
+          "capabilityId": "createWork",
+          "request": {
+            "intentKind": "COMMAND",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "createWork",
+            "subjectRefs": [
+              {
+                "type": "TradeItem",
+                "id": {
+                  "$alias": "P"
+                }
+              }
+            ],
+            "slots": {
+              "workType": "PURCHASE_ARRIVAL",
+              "quantity": {
+                "value": "100",
+                "unit": "BOX",
+                "provenance": "USER"
+              },
+              "destinationId": {
+                "$alias": "W"
+              },
+              "dueAt": "2026-10-07T02:00:00Z",
+              "endpoint": "ARRIVED",
+              "quantityMode": "CUMULATIVE_EVENT",
+              "period": {
+                "start": "2026-10-05T09:00:00Z",
+                "end": "2026-10-07T01:30:00Z",
+                "endInclusive": true
+              },
+              "eventKinds": [
+                "CONFIRMED_RECEIPT"
+              ],
+              "distinctContributionScope": "CANONICAL_PHYSICAL_FULFILMENT",
+              "evidencePolicyVersion": "SYNTHETIC-policy-v1",
+              "evaluationTime": "2026-10-07T02:00:00Z",
+              "placeId": {
+                "$alias": "W"
+              },
+              "eligibilityAction": "PHYSICAL_HELD",
+              "includeReservations": true,
+              "ownerId": {
+                "$alias": "A"
+              },
+              "supervisorId": {
+                "$alias": "supervisor"
+              }
+            },
+            "expectedRevision": 1,
+            "commandIdempotencyKey": "T12-conflicting-claims-work",
+            "evidenceRefs": [
+              {
+                "$alias": "DOC"
+              }
+            ]
+          }
+        },
+        {
+          "id": "initial-assessment",
+          "kind": "query",
+          "evidenceRefs": [
+            "initial-assessment:actual-artifact"
+          ],
+          "actorRef": "A",
+          "route": "api",
+          "capabilityId": "getAssessment",
+          "request": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "caseId": "T12",
+              "itemId": {
+                "$alias": "P"
+              }
+            },
+            "asOf": "2026-10-07T02:00:00Z",
+            "knownAt": "2026-10-07T04:00:00Z",
+            "workId": {
+              "$result": {
+                "actionId": "work",
+                "pointer": "/response/workId"
+              }
+            },
+            "evaluationTime": "2026-10-07T02:00:00Z"
+          }
+        },
+        {
+          "id": "before-db-snapshot",
+          "kind": "query",
+          "evidenceRefs": [
+            "before-db-snapshot:actual-artifact"
+          ],
+          "actorRef": "A",
+          "route": "api",
+          "capabilityId": "getInventory",
+          "request": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "caseId": "T12",
+              "itemId": {
+                "$alias": "P"
+              }
+            },
+            "asOf": "2026-10-07T02:00:00Z",
+            "knownAt": "2026-10-07T04:00:00Z"
+          }
+        },
+        {
+          "id": "before-db",
+          "kind": "observe",
+          "evidenceRefs": [
+            "before-db:actual-artifact"
+          ],
+          "observation": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "caseId": "T12",
+              "itemId": {
+                "$alias": "P"
+              }
+            },
+            "asOf": "2026-10-07T02:00:00Z",
+            "knownAt": "2026-10-07T04:00:00Z",
+            "snapshotRef": {
+              "$result": {
+                "actionId": "before-db-snapshot",
+                "pointer": "/response/snapshotRevision"
+              }
+            },
+            "sources": [
+              "works",
+              "goalVersions",
+              "assessments",
+              "conditionResults",
+              "assessmentInputs",
+              "obligations",
+              "assignments",
+              "handovers",
+              "workLinks",
+              "segments",
+              "movements",
+              "contributions",
+              "activities",
+              "inbox",
+              "audit",
+              "outbox",
+              "executionAttempts",
+              "approvals",
+              "contracts",
+              "claims",
+              "observationCoverage",
+              "supervisionIssues"
+            ]
+          }
+        },
+        {
+          "id": "claim",
+          "kind": "invoke",
+          "evidenceRefs": [
+            "claim:actual-artifact"
+          ],
+          "actorRef": "A",
+          "route": "api",
+          "capabilityId": "recordActivity",
+          "request": {
+            "intentKind": "RECORD",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "recordActivity",
+            "subjectRefs": [
+              {
+                "type": "TradeItem",
+                "id": {
+                  "$alias": "P"
+                }
+              }
+            ],
+            "slots": {
+              "activityKind": "RECEIPT_CLAIM",
+              "workId": {
+                "$result": {
+                  "actionId": "work",
+                  "pointer": "/response/workId"
+                }
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "lotId": {
+                "$alias": "LOT"
+              },
+              "quantity": {
+                "value": "100",
+                "unit": "BOX"
+              },
+              "placeId": {
+                "$alias": "W"
+              },
+              "occurredAt": "2026-10-07T01:00:00Z",
+              "sourceNamespace": "synthetic-warehouse",
+              "externalEventId": "conflicting-claims",
+              "sourceVersion": "1"
+            },
+            "expectedRevision": 1,
+            "commandIdempotencyKey": "T12-conflicting-claims-claim",
+            "evidenceRefs": [
+              {
+                "$alias": "DOC"
+              }
+            ]
+          }
+        },
+        {
+          "id": "conflicting-claim",
+          "kind": "invoke",
+          "evidenceRefs": [
+            "conflicting-claim:actual-artifact"
+          ],
+          "actorRef": "A",
+          "route": "api",
+          "capabilityId": "recordActivity",
+          "request": {
+            "intentKind": "RECORD",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "recordActivity",
+            "subjectRefs": [
+              {
+                "type": "TradeItem",
+                "id": {
+                  "$alias": "P"
+                }
+              }
+            ],
+            "slots": {
+              "activityKind": "RECEIPT_CLAIM",
+              "workId": {
+                "$result": {
+                  "actionId": "work",
+                  "pointer": "/response/workId"
+                }
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "lotId": {
+                "$alias": "LOT"
+              },
+              "quantity": {
+                "value": "98",
+                "unit": "BOX"
+              },
+              "placeId": {
+                "$alias": "W"
+              },
+              "occurredAt": "2026-10-07T01:00:00Z",
+              "sourceNamespace": "synthetic-carrier",
+              "externalEventId": "contradicting-source",
+              "sourceVersion": "1",
+              "samePhysicalReceiptCandidate": {
+                "$result": {
+                  "actionId": "claim",
+                  "pointer": "/response/occurrenceId"
+                }
+              }
+            },
+            "expectedRevision": 1,
+            "commandIdempotencyKey": "T12-conflicting-claims-conflicting-claim",
+            "evidenceRefs": [
+              {
+                "$alias": "DOC"
+              }
+            ]
+          }
+        },
+        {
+          "id": "assessment",
+          "kind": "query",
+          "evidenceRefs": [
+            "assessment:actual-artifact"
+          ],
+          "actorRef": "A",
+          "route": "api",
+          "capabilityId": "getAssessment",
+          "request": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "caseId": "T12",
+              "itemId": {
+                "$alias": "P"
+              }
+            },
+            "asOf": "2026-10-07T02:00:00Z",
+            "knownAt": "2026-10-07T04:00:00Z",
+            "workId": {
+              "$result": {
+                "actionId": "work",
+                "pointer": "/response/workId"
+              }
+            },
+            "evaluationTime": "2026-10-07T02:00:00Z"
+          }
+        },
+        {
+          "id": "after-db-snapshot",
+          "kind": "query",
+          "evidenceRefs": [
+            "after-db-snapshot:actual-artifact"
+          ],
+          "actorRef": "A",
+          "route": "api",
+          "capabilityId": "getInventory",
+          "request": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "caseId": "T12",
+              "itemId": {
+                "$alias": "P"
+              }
+            },
+            "asOf": "2026-10-07T02:00:00Z",
+            "knownAt": "2026-10-07T04:00:00Z"
+          }
+        },
+        {
+          "id": "after-db",
+          "kind": "observe",
+          "evidenceRefs": [
+            "after-db:actual-artifact"
+          ],
+          "observation": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "caseId": "T12",
+              "itemId": {
+                "$alias": "P"
+              }
+            },
+            "asOf": "2026-10-07T02:00:00Z",
+            "knownAt": "2026-10-07T04:00:00Z",
+            "snapshotRef": {
+              "$result": {
+                "actionId": "after-db-snapshot",
+                "pointer": "/response/snapshotRevision"
+              }
+            },
+            "sources": [
+              "works",
+              "goalVersions",
+              "assessments",
+              "conditionResults",
+              "assessmentInputs",
+              "obligations",
+              "assignments",
+              "handovers",
+              "workLinks",
+              "segments",
+              "movements",
+              "contributions",
+              "activities",
+              "inbox",
+              "audit",
+              "outbox",
+              "executionAttempts",
+              "approvals",
+              "contracts",
+              "claims",
+              "observationCoverage",
+              "supervisionIssues"
+            ]
+          }
+        }
+      ],
+      "assertions": [
+        {
+          "id": "assessment-api-result",
+          "op": "equals",
+          "source": {
+            "actionId": "assessment",
+            "pointer": "/response/data/result"
+          },
+          "expected": "UNVERIFIED",
+          "requirementRefs": [
+            "D12"
+          ],
+          "evidenceRefs": [
+            "assessment:actual-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "T12",
+            "itemId": {
+              "$alias": "P"
+            }
+          },
+          "oracleExplanation": "판정 근거와 장소·상충을 구별한다 conflicting-claims. insufficient-evidence의 독립 고정 기대값을 대조한다.",
+          "oracleRef": {
+            "oracleId": "T12.assessment-evidence-policy",
+            "observationNames": [
+              "insufficient-evidence"
+            ]
+          }
+        },
+        {
+          "id": "assessment-db-result",
+          "op": "equals",
+          "source": {
+            "actionId": "after-db",
+            "pointer": "/data/rawRows/assessments",
+            "where": {
+              "workId": {
+                "$result": {
+                  "actionId": "work",
+                  "pointer": "/response/workId"
+                }
+              },
+              "id": {
+                "$result": {
+                  "actionId": "assessment",
+                  "pointer": "/response/id"
+                }
+              }
+            },
+            "field": "result"
+          },
+          "expected": [
+            "UNVERIFIED"
+          ],
+          "requirementRefs": [
+            "D12"
+          ],
+          "evidenceRefs": [
+            "after-db:actual-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "T12",
+            "itemId": {
+              "$alias": "P"
+            }
+          },
+          "oracleExplanation": "판정 근거와 장소·상충을 구별한다 conflicting-claims. insufficient-evidence의 독립 고정 기대값을 대조한다.",
+          "oracleRef": {
+            "oracleId": "T12.assessment-evidence-policy",
+            "observationNames": [
+              "insufficient-evidence"
+            ]
+          }
+        },
+        {
+          "id": "versions-pinned",
+          "op": "relationSet",
+          "source": {
+            "actionId": "after-db",
+            "pointer": "/data/rawRows/assessments",
+            "where": {
+              "id": {
+                "$result": {
+                  "actionId": "assessment",
+                  "pointer": "/response/id"
+                }
+              }
+            },
+            "field": [
+              "definitionVersion",
+              "policyVersion",
+              "evaluatorVersion"
+            ]
+          },
+          "expected": [
+            [
+              "definition-v1",
+              "SYNTHETIC-policy-v1",
+              "evaluator-v1"
+            ]
+          ],
+          "requirementRefs": [
+            "D12"
+          ],
+          "evidenceRefs": [
+            "after-db:actual-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "T12",
+            "itemId": {
+              "$alias": "P"
+            }
+          },
+          "oracleExplanation": "판정 근거와 장소·상충을 구별한다 conflicting-claims. assessment-snapshot의 독립 고정 기대값을 대조한다.",
+          "oracleRef": {
+            "oracleId": "T12.assessment-evidence-policy",
+            "observationNames": [
+              "assessment-snapshot"
+            ]
+          }
+        },
+        {
+          "id": "goal-version-linked",
+          "op": "sameAs",
+          "source": {
+            "actionId": "after-db",
+            "pointer": "/data/rawRows/assessments",
+            "where": {
+              "id": {
+                "$result": {
+                  "actionId": "assessment",
+                  "pointer": "/response/id"
+                }
+              }
+            },
+            "field": "goalVersionId"
+          },
+          "expected": true,
+          "requirementRefs": [
+            "D12"
+          ],
+          "evidenceRefs": [
+            "after-db:actual-artifact",
+            "after-db:actual-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "T12",
+            "itemId": {
+              "$alias": "P"
+            }
+          },
+          "oracleExplanation": "판정 근거와 장소·상충을 구별한다 conflicting-claims. assessment-snapshot의 독립 고정 기대값을 대조한다.",
+          "oracleRef": {
+            "oracleId": "T12.assessment-evidence-policy",
+            "observationNames": [
+              "assessment-snapshot"
+            ]
+          },
+          "baseline": {
+            "actionId": "after-db",
+            "pointer": "/data/rawRows/goalVersions",
+            "where": {
+              "workId": {
+                "$result": {
+                  "actionId": "work",
+                  "pointer": "/response/workId"
+                }
+              }
+            },
+            "field": "id"
+          }
+        },
+        {
+          "id": "condition-result-detail",
+          "op": "relationSet",
+          "source": {
+            "actionId": "after-db",
+            "pointer": "/data/rawRows/conditionResults",
+            "where": {
+              "assessmentId": {
+                "$result": {
+                  "actionId": "assessment",
+                  "pointer": "/response/id"
+                }
+              },
+              "conditionId": "arrived-at-W"
+            },
+            "field": [
+              "conditionId",
+              "result",
+              "conflict",
+              "evaluatorVersion"
+            ]
+          },
+          "expected": [
+            [
+              "arrived-at-W",
+              "UNVERIFIED",
+              true,
+              "evaluator-v1"
+            ]
+          ],
+          "requirementRefs": [
+            "D12"
+          ],
+          "evidenceRefs": [
+            "after-db:actual-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "T12",
+            "itemId": {
+              "$alias": "P"
+            }
+          },
+          "oracleExplanation": "판정 근거와 장소·상충을 구별한다 conflicting-claims. assessment-snapshot의 독립 고정 기대값을 대조한다.",
+          "oracleRef": {
+            "oracleId": "T12.assessment-evidence-policy",
+            "observationNames": [
+              "assessment-snapshot"
+            ]
+          }
+        },
+        {
+          "id": "condition-evidence-input-match",
+          "op": "sameAs",
+          "source": {
+            "actionId": "after-db",
+            "pointer": "/data/rawRows/conditionResults",
+            "where": {
+              "assessmentId": {
+                "$result": {
+                  "actionId": "assessment",
+                  "pointer": "/response/id"
+                }
+              },
+              "conditionId": "arrived-at-W"
+            },
+            "field": "evidenceIds"
+          },
+          "expected": true,
+          "requirementRefs": [
+            "D12"
+          ],
+          "evidenceRefs": [
+            "after-db:actual-artifact",
+            "after-db:actual-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "T12",
+            "itemId": {
+              "$alias": "P"
+            }
+          },
+          "oracleExplanation": "판정 근거와 장소·상충을 구별한다 conflicting-claims. assessment-snapshot의 독립 고정 기대값을 대조한다.",
+          "oracleRef": {
+            "oracleId": "T12.assessment-evidence-policy",
+            "observationNames": [
+              "assessment-snapshot"
+            ]
+          },
+          "baseline": {
+            "actionId": "after-db",
+            "pointer": "/data/rawRows/assessmentInputs",
+            "where": {
+              "assessmentId": {
+                "$result": {
+                  "actionId": "assessment",
+                  "pointer": "/response/id"
+                }
+              },
+              "conditionId": "arrived-at-W"
+            },
+            "field": "evidenceIds"
+          }
+        },
+        {
+          "id": "previous-assessment-link",
+          "op": "equals",
+          "source": {
+            "actionId": "after-db",
+            "pointer": "/data/rawRows/assessments",
+            "where": {
+              "id": {
+                "$result": {
+                  "actionId": "assessment",
+                  "pointer": "/response/id"
+                }
+              }
+            },
+            "field": "previousAssessmentId"
+          },
+          "expected": [
+            {
+              "$result": {
+                "actionId": "initial-assessment",
+                "pointer": "/response/id"
+              }
+            }
+          ],
+          "requirementRefs": [
+            "D12"
+          ],
+          "evidenceRefs": [
+            "after-db:actual-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "T12",
+            "itemId": {
+              "$alias": "P"
+            }
+          },
+          "oracleExplanation": "판정 근거와 장소·상충을 구별한다 conflicting-claims. assessment-snapshot의 독립 고정 기대값을 대조한다.",
+          "oracleRef": {
+            "oracleId": "T12.assessment-evidence-policy",
+            "observationNames": [
+              "assessment-snapshot"
+            ]
+          }
+        },
+        {
+          "id": "assessment-asof",
+          "op": "timeEquals",
+          "source": {
+            "actionId": "assessment",
+            "pointer": "/response/asOf"
+          },
+          "expected": "2026-10-07T02:00:00Z",
+          "requirementRefs": [
+            "D12"
+          ],
+          "evidenceRefs": [
+            "assessment:actual-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "T12",
+            "itemId": {
+              "$alias": "P"
+            }
+          },
+          "oracleExplanation": "판정 근거와 장소·상충을 구별한다 conflicting-claims. assessment-snapshot의 독립 고정 기대값을 대조한다.",
+          "oracleRef": {
+            "oracleId": "T12.assessment-evidence-policy",
+            "observationNames": [
+              "assessment-snapshot"
+            ]
+          }
+        },
+        {
+          "id": "assessment-knownat",
+          "op": "timeEquals",
+          "source": {
+            "actionId": "assessment",
+            "pointer": "/response/knownAt"
+          },
+          "expected": "2026-10-07T04:00:00Z",
+          "requirementRefs": [
+            "D12"
+          ],
+          "evidenceRefs": [
+            "assessment:actual-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "T12",
+            "itemId": {
+              "$alias": "P"
+            }
+          },
+          "oracleExplanation": "판정 근거와 장소·상충을 구별한다 conflicting-claims. assessment-snapshot의 독립 고정 기대값을 대조한다.",
+          "oracleRef": {
+            "oracleId": "T12.assessment-evidence-policy",
+            "observationNames": [
+              "assessment-snapshot"
+            ]
+          }
+        },
+        {
+          "id": "input-snapshot-rows",
+          "op": "count",
+          "source": {
+            "actionId": "after-db",
+            "pointer": "/data/rawRows/assessmentInputs",
+            "where": {
+              "assessmentId": {
+                "$result": {
+                  "actionId": "assessment",
+                  "pointer": "/response/id"
+                }
+              },
+              "conditionId": "arrived-at-W"
+            }
+          },
+          "expected": 1,
+          "requirementRefs": [
+            "D12"
+          ],
+          "evidenceRefs": [
+            "after-db:actual-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "T12",
+            "itemId": {
+              "$alias": "P"
+            }
+          },
+          "oracleExplanation": "판정 근거와 장소·상충을 구별한다 conflicting-claims. assessment-snapshot의 독립 고정 기대값을 대조한다.",
+          "oracleRef": {
+            "oracleId": "T12.assessment-evidence-policy",
+            "observationNames": [
+              "assessment-snapshot"
+            ]
+          }
+        },
+        {
+          "id": "unknown-quantity-not-zero",
+          "op": "equals",
+          "source": {
+            "actionId": "after-db",
+            "pointer": "/data/rawRows/conditionResults",
+            "where": {
+              "assessmentId": {
+                "$result": {
+                  "actionId": "assessment",
+                  "pointer": "/response/id"
+                }
+              },
+              "conditionId": "arrived-at-W"
+            },
+            "field": "quantityKnowledge"
+          },
+          "expected": [
+            "CONFLICT"
+          ],
+          "requirementRefs": [
+            "D12"
+          ],
+          "evidenceRefs": [
+            "after-db:actual-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "T12",
+            "itemId": {
+              "$alias": "P"
+            }
+          },
+          "oracleExplanation": "판정 근거와 장소·상충을 구별한다 conflicting-claims. missing-as-zero의 독립 고정 기대값을 대조한다.",
+          "oracleRef": {
+            "oracleId": "T12.assessment-evidence-policy",
+            "observationNames": [
+              "missing-as-zero"
+            ]
+          }
+        },
+        {
+          "id": "no-fabricated-contribution",
+          "op": "sameAs",
+          "source": {
+            "actionId": "after-db",
+            "pointer": "/data/rawRows/contributions"
+          },
+          "expected": true,
+          "requirementRefs": [
+            "D12"
+          ],
+          "evidenceRefs": [
+            "after-db:actual-artifact",
+            "before-db:actual-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "T12",
+            "itemId": {
+              "$alias": "P"
+            }
+          },
+          "oracleExplanation": "같은 대상의 독립 전후 원행을 비교한다. 조회/거부 감사의 추가는 별도 허용한다.",
+          "oracleRef": {
+            "oracleId": "T12.assessment-evidence-policy",
+            "observationNames": [
+              "missing-as-zero"
+            ]
+          },
+          "baseline": {
+            "actionId": "before-db",
+            "pointer": "/data/rawRows/contributions"
+          }
+        },
+        {
+          "id": "no-fabricated-movement",
+          "op": "sameAs",
+          "source": {
+            "actionId": "after-db",
+            "pointer": "/data/rawRows/movements"
+          },
+          "expected": true,
+          "requirementRefs": [
+            "D12"
+          ],
+          "evidenceRefs": [
+            "after-db:actual-artifact",
+            "before-db:actual-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "T12",
+            "itemId": {
+              "$alias": "P"
+            }
+          },
+          "oracleExplanation": "같은 대상의 독립 전후 원행을 비교한다. 조회/거부 감사의 추가는 별도 허용한다.",
+          "oracleRef": {
+            "oracleId": "T12.assessment-evidence-policy",
+            "observationNames": [
+              "missing-as-zero"
+            ]
+          },
+          "baseline": {
+            "actionId": "before-db",
+            "pointer": "/data/rawRows/movements"
+          }
+        }
+      ],
+      "oracleExplanation": "가상 fixture의 입력과 실제 명령을 구별한다. 수량은 BOX decimal 문자열과 식별된 실물 범위로 손계산한다. 원행 관찰은 API projection을 복사하지 않는다. 판정 근거와 장소·상충을 구별한다 conflicting-claims"
+    },
+    {
+      "id": "deadline-revision-and-correction",
+      "title": "기한 변경과 실제100→98 정정은 과거 위반을 지우지 않는다",
+      "fixtureRef": "verification/cases/T12/fixtures/deadline-revision-and-correction.json",
+      "requiredAdapters": [
+        "fixture",
+        "api",
+        "db"
+      ],
+      "actions": [
+        {
+          "id": "setup",
+          "kind": "installFixture",
+          "evidenceRefs": [
+            "setup:actual-artifact"
+          ],
+          "fixtureRef": "verification/cases/T12/fixtures/deadline-revision-and-correction.json"
+        },
+        {
+          "id": "work",
+          "kind": "invoke",
+          "evidenceRefs": [
+            "work:actual-artifact"
+          ],
+          "actorRef": "A",
+          "route": "api",
+          "capabilityId": "createWork",
+          "request": {
+            "intentKind": "COMMAND",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "createWork",
+            "subjectRefs": [
+              {
+                "type": "TradeItem",
+                "id": {
+                  "$alias": "P"
+                }
+              }
+            ],
+            "slots": {
+              "workType": "PURCHASE_ARRIVAL",
+              "quantity": {
+                "value": "100",
+                "unit": "BOX",
+                "provenance": "USER"
+              },
+              "destinationId": {
+                "$alias": "W"
+              },
+              "dueAt": "2026-10-07T01:00:00Z",
+              "endpoint": "ARRIVED",
+              "quantityMode": "CUMULATIVE_EVENT",
+              "period": {
+                "start": "2026-10-05T09:00:00Z",
+                "end": "2026-10-07T01:30:00Z",
+                "endInclusive": true
+              },
+              "eventKinds": [
+                "CONFIRMED_RECEIPT"
+              ],
+              "distinctContributionScope": "CANONICAL_PHYSICAL_FULFILMENT",
+              "evidencePolicyVersion": "SYNTHETIC-policy-v1",
+              "evaluationTime": "2026-10-07T02:00:00Z",
+              "placeId": {
+                "$alias": "W"
+              },
+              "eligibilityAction": "PHYSICAL_HELD",
+              "includeReservations": true,
+              "ownerId": {
+                "$alias": "A"
+              },
+              "supervisorId": {
+                "$alias": "supervisor"
+              }
+            },
+            "expectedRevision": 1,
+            "commandIdempotencyKey": "T12-deadline-revision-and-correction-work",
+            "evidenceRefs": [
+              {
+                "$alias": "DOC"
+              }
+            ]
+          }
+        },
+        {
+          "id": "receipt",
+          "kind": "invoke",
+          "evidenceRefs": [
+            "receipt:actual-artifact"
+          ],
+          "actorRef": "A",
+          "route": "api",
+          "capabilityId": "confirmReceipt",
+          "request": {
+            "intentKind": "COMMAND",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "confirmReceipt",
+            "subjectRefs": [
+              {
+                "type": "TradeItem",
+                "id": {
+                  "$alias": "P"
+                }
+              }
+            ],
+            "slots": {
+              "quantity": {
+                "value": "100",
+                "unit": "BOX"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "lotId": {
+                "$alias": "LOT"
+              },
+              "placeId": {
+                "$alias": "W"
+              },
+              "occurredAt": "2026-10-07T02:00:00Z",
+              "workId": {
+                "$result": {
+                  "actionId": "work",
+                  "pointer": "/response/workId"
+                }
+              },
+              "canonicalOccurrenceKey": "late-100"
+            },
+            "expectedRevision": 1,
+            "commandIdempotencyKey": "T12-deadline-revision-and-correction-receipt",
+            "evidenceRefs": [
+              {
+                "$alias": "DOC"
+              }
+            ]
+          }
+        },
+        {
+          "id": "late-assessment",
+          "kind": "query",
+          "evidenceRefs": [
+            "late-assessment:actual-artifact"
+          ],
+          "actorRef": "A",
+          "route": "api",
+          "capabilityId": "getAssessment",
+          "request": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "caseId": "T12",
+              "itemId": {
+                "$alias": "P"
+              }
+            },
+            "asOf": "2026-10-07T02:00:00Z",
+            "knownAt": "2026-10-07T04:00:00Z",
+            "workId": {
+              "$result": {
+                "actionId": "work",
+                "pointer": "/response/workId"
+              }
+            },
+            "evaluationTime": "2026-10-07T02:00:00Z"
+          }
+        },
+        {
+          "id": "late-db-snapshot",
+          "kind": "query",
+          "evidenceRefs": [
+            "late-db-snapshot:actual-artifact"
+          ],
+          "actorRef": "A",
+          "route": "api",
+          "capabilityId": "getInventory",
+          "request": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "caseId": "T12",
+              "itemId": {
+                "$alias": "P"
+              }
+            },
+            "asOf": "2026-10-07T02:00:00Z",
+            "knownAt": "2026-10-07T04:00:00Z"
+          }
+        },
+        {
+          "id": "late-db",
+          "kind": "observe",
+          "evidenceRefs": [
+            "late-db:actual-artifact"
+          ],
+          "observation": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "caseId": "T12",
+              "itemId": {
+                "$alias": "P"
+              }
+            },
+            "asOf": "2026-10-07T02:00:00Z",
+            "knownAt": "2026-10-07T04:00:00Z",
+            "snapshotRef": {
+              "$result": {
+                "actionId": "late-db-snapshot",
+                "pointer": "/response/snapshotRevision"
+              }
+            },
+            "sources": [
+              "works",
+              "goalVersions",
+              "assessments",
+              "conditionResults",
+              "assessmentInputs",
+              "obligations",
+              "assignments",
+              "handovers",
+              "workLinks",
+              "segments",
+              "movements",
+              "contributions",
+              "activities",
+              "inbox",
+              "audit",
+              "outbox",
+              "executionAttempts",
+              "approvals",
+              "contracts",
+              "claims",
+              "observationCoverage",
+              "supervisionIssues"
+            ]
+          }
+        },
+        {
+          "id": "resolve-quantity-duty",
+          "kind": "invoke",
+          "evidenceRefs": [
+            "resolve-quantity-duty:actual-artifact"
+          ],
+          "actorRef": "A",
+          "route": "api",
+          "capabilityId": "resolveObligation",
+          "request": {
+            "intentKind": "COMMAND",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "resolveObligation",
+            "subjectRefs": [
+              {
+                "type": "TradeItem",
+                "id": {
+                  "$alias": "P"
+                }
+              }
+            ],
+            "slots": {
+              "obligationId": {
+                "$result": {
+                  "actionId": "late-assessment",
+                  "pointer": "/response/obligationId"
+                }
+              },
+              "resolutionEvidenceId": {
+                "$result": {
+                  "actionId": "receipt",
+                  "pointer": "/response/evidenceId"
+                }
+              },
+              "resolutionKind": "QUANTITY_ARRIVED",
+              "reason": "늦은 실제 도착100으로 수량 의무 해소. 납기 위반은 남긴다."
+            },
+            "expectedRevision": 1,
+            "commandIdempotencyKey": "T12-deadline-revision-and-correction-resolve-quantity-duty",
+            "evidenceRefs": [
+              {
+                "$alias": "DOC"
+              }
+            ]
+          }
+        },
+        {
+          "id": "before-revision",
+          "kind": "query",
+          "evidenceRefs": [
+            "before-revision:actual-artifact"
+          ],
+          "actorRef": "A",
+          "route": "api",
+          "capabilityId": "getWork",
+          "request": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "caseId": "T12",
+              "itemId": {
+                "$alias": "P"
+              }
+            },
+            "asOf": "2026-10-07T02:00:00Z",
+            "knownAt": "2026-10-07T04:00:00Z",
+            "workId": {
+              "$result": {
+                "actionId": "work",
+                "pointer": "/response/workId"
+              }
+            }
+          }
+        },
+        {
+          "id": "revision",
+          "kind": "invoke",
+          "evidenceRefs": [
+            "revision:actual-artifact"
+          ],
+          "actorRef": "A",
+          "route": "api",
+          "capabilityId": "reviseGoal",
+          "request": {
+            "intentKind": "COMMAND",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "reviseGoal",
+            "subjectRefs": [
+              {
+                "type": "TradeItem",
+                "id": {
+                  "$alias": "P"
+                }
+              }
+            ],
+            "slots": {
+              "workId": {
+                "$result": {
+                  "actionId": "work",
+                  "pointer": "/response/workId"
+                }
+              },
+              "newDueAt": "2026-10-07T03:00:00Z",
+              "reason": "현재 계획 기한을 변경하며 과거 납기 위반은 보존",
+              "previousGoalVersion": {
+                "$result": {
+                  "actionId": "before-revision",
+                  "pointer": "/response/data/currentGoal/version"
+                }
+              }
+            },
+            "expectedRevision": {
+              "$result": {
+                "actionId": "resolve-quantity-duty",
+                "pointer": "/response/workRevision"
+              }
+            },
+            "commandIdempotencyKey": "T12-deadline-revision-and-correction-revision",
+            "evidenceRefs": [
+              {
+                "$alias": "DOC"
+              }
+            ]
+          }
+        },
+        {
+          "id": "revised-assessment",
+          "kind": "query",
+          "evidenceRefs": [
+            "revised-assessment:actual-artifact"
+          ],
+          "actorRef": "A",
+          "route": "api",
+          "capabilityId": "getAssessment",
+          "request": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "caseId": "T12",
+              "itemId": {
+                "$alias": "P"
+              }
+            },
+            "asOf": "2026-10-07T02:00:00Z",
+            "knownAt": "2026-10-07T04:00:00Z",
+            "workId": {
+              "$result": {
+                "actionId": "work",
+                "pointer": "/response/workId"
+              }
+            },
+            "evaluationTime": "2026-10-07T02:00:00Z"
+          }
+        },
+        {
+          "id": "revised-db-snapshot",
+          "kind": "query",
+          "evidenceRefs": [
+            "revised-db-snapshot:actual-artifact"
+          ],
+          "actorRef": "A",
+          "route": "api",
+          "capabilityId": "getInventory",
+          "request": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "caseId": "T12",
+              "itemId": {
+                "$alias": "P"
+              }
+            },
+            "asOf": "2026-10-07T02:00:00Z",
+            "knownAt": "2026-10-07T04:00:00Z"
+          }
+        },
+        {
+          "id": "revised-db",
+          "kind": "observe",
+          "evidenceRefs": [
+            "revised-db:actual-artifact"
+          ],
+          "observation": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "caseId": "T12",
+              "itemId": {
+                "$alias": "P"
+              }
+            },
+            "asOf": "2026-10-07T02:00:00Z",
+            "knownAt": "2026-10-07T04:00:00Z",
+            "snapshotRef": {
+              "$result": {
+                "actionId": "revised-db-snapshot",
+                "pointer": "/response/snapshotRevision"
+              }
+            },
+            "sources": [
+              "works",
+              "goalVersions",
+              "assessments",
+              "conditionResults",
+              "assessmentInputs",
+              "obligations",
+              "assignments",
+              "handovers",
+              "workLinks",
+              "segments",
+              "movements",
+              "contributions",
+              "activities",
+              "inbox",
+              "audit",
+              "outbox",
+              "executionAttempts",
+              "approvals",
+              "contracts",
+              "claims",
+              "observationCoverage",
+              "supervisionIssues"
+            ]
+          }
+        },
+        {
+          "id": "correction",
+          "kind": "invoke",
+          "evidenceRefs": [
+            "correction:actual-artifact"
+          ],
+          "actorRef": "A",
+          "route": "api",
+          "capabilityId": "correctEvidence",
+          "request": {
+            "intentKind": "RECORD",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "correctEvidence",
+            "subjectRefs": [
+              {
+                "type": "TradeItem",
+                "id": {
+                  "$alias": "P"
+                }
+              }
+            ],
+            "slots": {
+              "originalEvidenceId": {
+                "$result": {
+                  "actionId": "receipt",
+                  "pointer": "/response/evidenceId"
+                }
+              },
+              "supersedesOccurrenceId": {
+                "$result": {
+                  "actionId": "receipt",
+                  "pointer": "/response/occurrenceId"
+                }
+              },
+              "correctedQuantity": {
+                "value": "98",
+                "unit": "BOX"
+              },
+              "occurredAt": "2026-10-07T02:00:00Z",
+              "recordedAt": "2026-10-07T04:00:00Z",
+              "reason": "원 수령 기록100은 실제98이었다"
+            },
+            "expectedRevision": 1,
+            "commandIdempotencyKey": "T12-deadline-revision-and-correction-correction",
+            "evidenceRefs": [
+              {
+                "$alias": "DOC"
+              }
+            ]
+          }
+        },
+        {
+          "id": "corrected-assessment",
+          "kind": "query",
+          "evidenceRefs": [
+            "corrected-assessment:actual-artifact"
+          ],
+          "actorRef": "A",
+          "route": "api",
+          "capabilityId": "getAssessment",
+          "request": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "caseId": "T12",
+              "itemId": {
+                "$alias": "P"
+              }
+            },
+            "asOf": "2026-10-07T02:00:00Z",
+            "knownAt": "2026-10-07T04:00:00Z",
+            "workId": {
+              "$result": {
+                "actionId": "work",
+                "pointer": "/response/workId"
+              }
+            },
+            "evaluationTime": "2026-10-07T02:00:00Z"
+          }
+        },
+        {
+          "id": "after-db-snapshot",
+          "kind": "query",
+          "evidenceRefs": [
+            "after-db-snapshot:actual-artifact"
+          ],
+          "actorRef": "A",
+          "route": "api",
+          "capabilityId": "getInventory",
+          "request": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "caseId": "T12",
+              "itemId": {
+                "$alias": "P"
+              }
+            },
+            "asOf": "2026-10-07T02:00:00Z",
+            "knownAt": "2026-10-07T04:00:00Z"
+          }
+        },
+        {
+          "id": "after-db",
+          "kind": "observe",
+          "evidenceRefs": [
+            "after-db:actual-artifact"
+          ],
+          "observation": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "caseId": "T12",
+              "itemId": {
+                "$alias": "P"
+              }
+            },
+            "asOf": "2026-10-07T02:00:00Z",
+            "knownAt": "2026-10-07T04:00:00Z",
+            "snapshotRef": {
+              "$result": {
+                "actionId": "after-db-snapshot",
+                "pointer": "/response/snapshotRevision"
+              }
+            },
+            "sources": [
+              "works",
+              "goalVersions",
+              "assessments",
+              "conditionResults",
+              "assessmentInputs",
+              "obligations",
+              "assignments",
+              "handovers",
+              "workLinks",
+              "segments",
+              "movements",
+              "contributions",
+              "activities",
+              "inbox",
+              "audit",
+              "outbox",
+              "executionAttempts",
+              "approvals",
+              "contracts",
+              "claims",
+              "observationCoverage",
+              "supervisionIssues"
+            ]
+          }
+        }
+      ],
+      "assertions": [
+        {
+          "id": "late-assessment-api-result",
+          "op": "equals",
+          "source": {
+            "actionId": "late-assessment",
+            "pointer": "/response/data/result"
+          },
+          "expected": "UNSATISFIED",
+          "requirementRefs": [
+            "D12"
+          ],
+          "evidenceRefs": [
+            "late-assessment:actual-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "T12",
+            "itemId": {
+              "$alias": "P"
+            }
+          },
+          "oracleExplanation": "기한 변경과 실제100→98 정정은 과거 위반을 지우지 않는다. historical-violation의 독립 고정 기대값을 대조한다.",
+          "oracleRef": {
+            "oracleId": "T12.deadline-change-and-correction",
+            "observationNames": [
+              "historical-violation"
+            ]
+          }
+        },
+        {
+          "id": "late-assessment-db-result",
+          "op": "equals",
+          "source": {
+            "actionId": "late-db",
+            "pointer": "/data/rawRows/assessments",
+            "where": {
+              "workId": {
+                "$result": {
+                  "actionId": "work",
+                  "pointer": "/response/workId"
+                }
+              },
+              "id": {
+                "$result": {
+                  "actionId": "late-assessment",
+                  "pointer": "/response/id"
+                }
+              }
+            },
+            "field": "result"
+          },
+          "expected": [
+            "UNSATISFIED"
+          ],
+          "requirementRefs": [
+            "D12"
+          ],
+          "evidenceRefs": [
+            "late-db:actual-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "T12",
+            "itemId": {
+              "$alias": "P"
+            }
+          },
+          "oracleExplanation": "기한 변경과 실제100→98 정정은 과거 위반을 지우지 않는다. historical-violation의 독립 고정 기대값을 대조한다.",
+          "oracleRef": {
+            "oracleId": "T12.deadline-change-and-correction",
+            "observationNames": [
+              "historical-violation"
+            ]
+          }
+        },
+        {
+          "id": "revised-assessment-api-result",
+          "op": "equals",
+          "source": {
+            "actionId": "revised-assessment",
+            "pointer": "/response/data/result"
+          },
+          "expected": "SATISFIED",
+          "requirementRefs": [
+            "D12"
+          ],
+          "evidenceRefs": [
+            "revised-assessment:actual-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "T12",
+            "itemId": {
+              "$alias": "P"
+            }
+          },
+          "oracleExplanation": "기한 변경과 실제100→98 정정은 과거 위반을 지우지 않는다. historical-violation의 독립 고정 기대값을 대조한다.",
+          "oracleRef": {
+            "oracleId": "T12.deadline-change-and-correction",
+            "observationNames": [
+              "historical-violation"
+            ]
+          }
+        },
+        {
+          "id": "revised-assessment-db-result",
+          "op": "equals",
+          "source": {
+            "actionId": "revised-db",
+            "pointer": "/data/rawRows/assessments",
+            "where": {
+              "workId": {
+                "$result": {
+                  "actionId": "work",
+                  "pointer": "/response/workId"
+                }
+              },
+              "id": {
+                "$result": {
+                  "actionId": "revised-assessment",
+                  "pointer": "/response/id"
+                }
+              }
+            },
+            "field": "result"
+          },
+          "expected": [
+            "SATISFIED"
+          ],
+          "requirementRefs": [
+            "D12"
+          ],
+          "evidenceRefs": [
+            "revised-db:actual-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "T12",
+            "itemId": {
+              "$alias": "P"
+            }
+          },
+          "oracleExplanation": "기한 변경과 실제100→98 정정은 과거 위반을 지우지 않는다. historical-violation의 독립 고정 기대값을 대조한다.",
+          "oracleRef": {
+            "oracleId": "T12.deadline-change-and-correction",
+            "observationNames": [
+              "historical-violation"
+            ]
+          }
+        },
+        {
+          "id": "corrected-assessment-api-result",
+          "op": "equals",
+          "source": {
+            "actionId": "corrected-assessment",
+            "pointer": "/response/data/result"
+          },
+          "expected": "UNSATISFIED",
+          "requirementRefs": [
+            "D12"
+          ],
+          "evidenceRefs": [
+            "corrected-assessment:actual-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "T12",
+            "itemId": {
+              "$alias": "P"
+            }
+          },
+          "oracleExplanation": "기한 변경과 실제100→98 정정은 과거 위반을 지우지 않는다. historical-violation의 독립 고정 기대값을 대조한다.",
+          "oracleRef": {
+            "oracleId": "T12.deadline-change-and-correction",
+            "observationNames": [
+              "historical-violation"
+            ]
+          }
+        },
+        {
+          "id": "corrected-assessment-db-result",
+          "op": "equals",
+          "source": {
+            "actionId": "after-db",
+            "pointer": "/data/rawRows/assessments",
+            "where": {
+              "workId": {
+                "$result": {
+                  "actionId": "work",
+                  "pointer": "/response/workId"
+                }
+              },
+              "id": {
+                "$result": {
+                  "actionId": "corrected-assessment",
+                  "pointer": "/response/id"
+                }
+              }
+            },
+            "field": "result"
+          },
+          "expected": [
+            "UNSATISFIED"
+          ],
+          "requirementRefs": [
+            "D12"
+          ],
+          "evidenceRefs": [
+            "after-db:actual-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "T12",
+            "itemId": {
+              "$alias": "P"
+            }
+          },
+          "oracleExplanation": "기한 변경과 실제100→98 정정은 과거 위반을 지우지 않는다. historical-violation의 독립 고정 기대값을 대조한다.",
+          "oracleRef": {
+            "oracleId": "T12.deadline-change-and-correction",
+            "observationNames": [
+              "historical-violation"
+            ]
+          }
+        },
+        {
+          "id": "old-assessment-immutable",
+          "op": "sameAs",
+          "source": {
+            "actionId": "after-db",
+            "pointer": "/data/rawRows/assessments",
+            "where": {
+              "id": {
+                "$result": {
+                  "actionId": "late-assessment",
+                  "pointer": "/response/id"
+                }
+              }
+            }
+          },
+          "expected": true,
+          "requirementRefs": [
+            "D12"
+          ],
+          "evidenceRefs": [
+            "after-db:actual-artifact",
+            "late-db:actual-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "T12",
+            "itemId": {
+              "$alias": "P"
+            }
+          },
+          "oracleExplanation": "같은 대상의 독립 전후 원행을 비교한다. 조회/거부 감사의 추가는 별도 허용한다.",
+          "oracleRef": {
+            "oracleId": "T12.deadline-change-and-correction",
+            "observationNames": [
+              "historical-violation"
+            ]
+          },
+          "baseline": {
+            "actionId": "late-db",
+            "pointer": "/data/rawRows/assessments",
+            "where": {
+              "id": {
+                "$result": {
+                  "actionId": "late-assessment",
+                  "pointer": "/response/id"
+                }
+              }
+            }
+          }
+        },
+        {
+          "id": "old-goal-immutable",
+          "op": "sameAs",
+          "source": {
+            "actionId": "after-db",
+            "pointer": "/data/rawRows/goalVersions",
+            "where": {
+              "workId": {
+                "$result": {
+                  "actionId": "work",
+                  "pointer": "/response/workId"
+                }
+              },
+              "version": 1
+            }
+          },
+          "expected": true,
+          "requirementRefs": [
+            "D12"
+          ],
+          "evidenceRefs": [
+            "after-db:actual-artifact",
+            "late-db:actual-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "T12",
+            "itemId": {
+              "$alias": "P"
+            }
+          },
+          "oracleExplanation": "같은 대상의 독립 전후 원행을 비교한다. 조회/거부 감사의 추가는 별도 허용한다.",
+          "oracleRef": {
+            "oracleId": "T12.deadline-change-and-correction",
+            "observationNames": [
+              "historical-violation"
+            ]
+          },
+          "baseline": {
+            "actionId": "late-db",
+            "pointer": "/data/rawRows/goalVersions",
+            "where": {
+              "workId": {
+                "$result": {
+                  "actionId": "work",
+                  "pointer": "/response/workId"
+                }
+              },
+              "version": 1
+            }
+          }
+        },
+        {
+          "id": "revised-assessment-immutable",
+          "op": "sameAs",
+          "source": {
+            "actionId": "after-db",
+            "pointer": "/data/rawRows/assessments",
+            "where": {
+              "id": {
+                "$result": {
+                  "actionId": "revised-assessment",
+                  "pointer": "/response/id"
+                }
+              }
+            }
+          },
+          "expected": true,
+          "requirementRefs": [
+            "D12"
+          ],
+          "evidenceRefs": [
+            "after-db:actual-artifact",
+            "revised-db:actual-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "T12",
+            "itemId": {
+              "$alias": "P"
+            }
+          },
+          "oracleExplanation": "같은 대상의 독립 전후 원행을 비교한다. 조회/거부 감사의 추가는 별도 허용한다.",
+          "oracleRef": {
+            "oracleId": "T12.deadline-change-and-correction",
+            "observationNames": [
+              "historical-violation"
+            ]
+          },
+          "baseline": {
+            "actionId": "revised-db",
+            "pointer": "/data/rawRows/assessments",
+            "where": {
+              "id": {
+                "$result": {
+                  "actionId": "revised-assessment",
+                  "pointer": "/response/id"
+                }
+              }
+            }
+          }
+        },
+        {
+          "id": "old-due-preserved",
+          "op": "equals",
+          "source": {
+            "actionId": "after-db",
+            "pointer": "/data/rawRows/goalVersions",
+            "where": {
+              "workId": {
+                "$result": {
+                  "actionId": "work",
+                  "pointer": "/response/workId"
+                }
+              },
+              "version": 1
+            },
+            "field": "dueAt"
+          },
+          "expected": [
+            "2026-10-07T01:00:00Z"
+          ],
+          "requirementRefs": [
+            "D12"
+          ],
+          "evidenceRefs": [
+            "after-db:actual-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "T12",
+            "itemId": {
+              "$alias": "P"
+            }
+          },
+          "oracleExplanation": "기한 변경과 실제100→98 정정은 과거 위반을 지우지 않는다. historical-violation의 독립 고정 기대값을 대조한다.",
+          "oracleRef": {
+            "oracleId": "T12.deadline-change-and-correction",
+            "observationNames": [
+              "historical-violation"
+            ]
+          }
+        },
+        {
+          "id": "new-due-added",
+          "op": "equals",
+          "source": {
+            "actionId": "after-db",
+            "pointer": "/data/rawRows/goalVersions",
+            "where": {
+              "workId": {
+                "$result": {
+                  "actionId": "work",
+                  "pointer": "/response/workId"
+                }
+              },
+              "dueAt": "2026-10-07T03:00:00Z"
+            },
+            "field": "dueAt"
+          },
+          "expected": [
+            "2026-10-07T03:00:00Z"
+          ],
+          "requirementRefs": [
+            "D12"
+          ],
+          "evidenceRefs": [
+            "after-db:actual-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "T12",
+            "itemId": {
+              "$alias": "P"
+            }
+          },
+          "oracleExplanation": "기한 변경과 실제100→98 정정은 과거 위반을 지우지 않는다. historical-violation의 독립 고정 기대값을 대조한다.",
+          "oracleRef": {
+            "oracleId": "T12.deadline-change-and-correction",
+            "observationNames": [
+              "historical-violation"
+            ]
+          }
+        },
+        {
+          "id": "quantity-duty-resolved",
+          "op": "equals",
+          "source": {
+            "actionId": "after-db",
+            "pointer": "/data/rawRows/obligations",
+            "where": {
+              "id": {
+                "$result": {
+                  "actionId": "late-assessment",
+                  "pointer": "/response/obligationId"
+                }
+              }
+            },
+            "field": "status"
+          },
+          "expected": [
+            "RESOLVED"
+          ],
+          "requirementRefs": [
+            "D12"
+          ],
+          "evidenceRefs": [
+            "after-db:actual-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "T12",
+            "itemId": {
+              "$alias": "P"
+            }
+          },
+          "oracleExplanation": "기한 변경과 실제100→98 정정은 과거 위반을 지우지 않는다. historical-violation의 독립 고정 기대값을 대조한다.",
+          "oracleRef": {
+            "oracleId": "T12.deadline-change-and-correction",
+            "observationNames": [
+              "historical-violation"
+            ]
+          }
+        },
+        {
+          "id": "past-deadline-condition",
+          "op": "equals",
+          "source": {
+            "actionId": "after-db",
+            "pointer": "/data/rawRows/conditionResults",
+            "where": {
+              "assessmentId": {
+                "$result": {
+                  "actionId": "late-assessment",
+                  "pointer": "/response/id"
+                }
+              },
+              "conditionId": "due-by-T"
+            },
+            "field": "result"
+          },
+          "expected": [
+            "UNSATISFIED"
+          ],
+          "requirementRefs": [
+            "D12"
+          ],
+          "evidenceRefs": [
+            "after-db:actual-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "T12",
+            "itemId": {
+              "$alias": "P"
+            }
+          },
+          "oracleExplanation": "기한 변경과 실제100→98 정정은 과거 위반을 지우지 않는다. historical-violation의 독립 고정 기대값을 대조한다.",
+          "oracleRef": {
+            "oracleId": "T12.deadline-change-and-correction",
+            "observationNames": [
+              "historical-violation"
+            ]
+          }
+        },
+        {
+          "id": "correction-assessment-appended",
+          "op": "equals",
+          "source": {
+            "actionId": "after-db",
+            "pointer": "/data/rawRows/assessments",
+            "where": {
+              "id": {
+                "$result": {
+                  "actionId": "corrected-assessment",
+                  "pointer": "/response/id"
+                }
+              }
+            },
+            "field": "previousAssessmentId"
+          },
+          "expected": [
+            {
+              "$result": {
+                "actionId": "revised-assessment",
+                "pointer": "/response/id"
+              }
+            }
+          ],
+          "requirementRefs": [
+            "D12"
+          ],
+          "evidenceRefs": [
+            "after-db:actual-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "T12",
+            "itemId": {
+              "$alias": "P"
+            }
+          },
+          "oracleExplanation": "기한 변경과 실제100→98 정정은 과거 위반을 지우지 않는다. historical-violation의 독립 고정 기대값을 대조한다.",
+          "oracleRef": {
+            "oracleId": "T12.deadline-change-and-correction",
+            "observationNames": [
+              "historical-violation"
+            ]
+          }
+        },
+        {
+          "id": "supersedes-preserved",
+          "op": "equals",
+          "source": {
+            "actionId": "after-db",
+            "pointer": "/data/rawRows/activities",
+            "where": {
+              "id": {
+                "$result": {
+                  "actionId": "correction",
+                  "pointer": "/response/activityId"
+                }
+              }
+            },
+            "field": "supersedesOccurrenceId"
+          },
+          "expected": [
+            {
+              "$result": {
+                "actionId": "receipt",
+                "pointer": "/response/occurrenceId"
+              }
+            }
+          ],
+          "requirementRefs": [
+            "D12"
+          ],
+          "evidenceRefs": [
+            "after-db:actual-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "T12",
+            "itemId": {
+              "$alias": "P"
+            }
+          },
+          "oracleExplanation": "기한 변경과 실제100→98 정정은 과거 위반을 지우지 않는다. historical-violation의 독립 고정 기대값을 대조한다.",
+          "oracleRef": {
+            "oracleId": "T12.deadline-change-and-correction",
+            "observationNames": [
+              "historical-violation"
+            ]
+          }
+        },
+        {
+          "id": "corrected-debt2",
+          "op": "equals",
+          "source": {
+            "actionId": "after-db",
+            "pointer": "/data/rawRows/obligations",
+            "where": {
+              "workId": {
+                "$result": {
+                  "actionId": "work",
+                  "pointer": "/response/workId"
+                }
+              },
+              "kind": "QUANTITY_SHORTFALL",
+              "status": "OPEN"
+            },
+            "field": "quantity"
+          },
+          "expected": [
+            "2"
+          ],
+          "requirementRefs": [
+            "D12"
+          ],
+          "evidenceRefs": [
+            "after-db:actual-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "T12",
+            "itemId": {
+              "$alias": "P"
+            }
+          },
+          "oracleExplanation": "기한 변경과 실제100→98 정정은 과거 위반을 지우지 않는다. historical-violation의 독립 고정 기대값을 대조한다.",
+          "oracleRef": {
+            "oracleId": "T12.deadline-change-and-correction",
+            "observationNames": [
+              "historical-violation"
+            ]
+          },
+          "unit": "BOX",
+          "unitSource": {
+            "actionId": "after-db",
+            "pointer": "/data/rawRows/obligations",
+            "where": {
+              "workId": {
+                "$result": {
+                  "actionId": "work",
+                  "pointer": "/response/workId"
+                }
+              },
+              "kind": "QUANTITY_SHORTFALL",
+              "status": "OPEN"
+            },
+            "field": "unit"
+          }
+        }
+      ],
+      "oracleExplanation": "가상 fixture의 입력과 실제 명령을 구별한다. 수량은 BOX decimal 문자열과 식별된 실물 범위로 손계산한다. 원행 관찰은 API projection을 복사하지 않는다. 기한 변경과 실제100→98 정정은 과거 위반을 지우지 않는다"
+    }
+  ]
+}
