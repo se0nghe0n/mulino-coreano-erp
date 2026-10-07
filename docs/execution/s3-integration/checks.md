@@ -18,9 +18,12 @@
   덮어쓰지 않음을 확인했다.
 - 같은 실행의 나머지 4건은 불변 S1 Work와 SourceProfiles를 수정하는
   fixture가 거부되어 오류로 끝났다. 실패 로그를
-  `attempts/shared-immutable-fixture-error.log.gz`에 보존했다.
+  `attempts/shared-source-and-work-immutability-error.log.gz`에 보존했다.
   `bedb9321`은 검증된 receipt fixture처럼 새 COMMAND Work를 만들며
-  source policy 수정이 거부됨을 검사한다. 이후 source guard 2건은 실제 PostgreSQL에서 통과했다.
+  source policy 수정이 거부됨을 검사한다. 이후 source guard 2건은
+  실제 PostgreSQL에서 통과했다.
+  이 파일은 OWN `e5c6783b`의 실패 원본을 새 통합 경로에 그대로
+  보존한 것이다. 실행 결과를 새로 만들거나 수정하지 않았다.
 
 ## 결합 검증
 
