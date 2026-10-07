@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import com.mulino.application.core.*;
 import com.mulino.application.inventory.InventoryQueries;
 import com.mulino.domain.inventory.InventoryRepository;
+import com.mulino.domain.identity.IdentityAuthorization;
 import com.sap.cds.services.runtime.CdsRuntime;
 import java.time.*;
 import java.util.*;
@@ -29,7 +30,7 @@ class InventoryPostgresTest {
  @Autowired JdbcTemplate jdbc;
  @Autowired CdsRuntime runtime;
  @Autowired InventoryRepository repository;
- @MockitoBean ReadAuthorizer authorizer;
+ @MockitoBean IdentityAuthorization authorizer;
  @MockitoBean org.springframework.security.oauth2.jwt.JwtDecoder jwtDecoder;
  final String org=id(1),other=id(2),product=id(10),item=id(11),spec=id(12),pack=id(13),manufacturer=id(14),lot=id(15),place=id(16),parent=id(20),left=id(21),right=id(22);
  final Instant at=Instant.parse("2026-10-08T00:00:00Z");
