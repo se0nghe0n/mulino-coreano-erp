@@ -3,6 +3,8 @@ DROP TRIGGER work_read_immutable ON mulino_work_read_Works;
 ALTER TABLE mulino_work_read_Works ADD COLUMN currentGoalVersionId VARCHAR(36),
  ADD COLUMN closeReason VARCHAR(40),
  ADD COLUMN pendingInvalidation BOOLEAN NOT NULL DEFAULT FALSE,
+ ADD COLUMN originalText TEXT,
+ ADD COLUMN conversationRequestId VARCHAR(240),
  ADD COLUMN lifecycleMode VARCHAR(20) NOT NULL DEFAULT 'IMPORTED';
 ALTER TABLE mulino_work_read_Works DROP CONSTRAINT mulino_work_read_works_status_check;
 ALTER TABLE mulino_work_read_Works ADD CHECK(status IN ('DRAFT','ACTIVE','READY','RUNNING','WAITING','FULFILLED','CANCELLED','FAILED','CLOSED')),

@@ -20,6 +20,8 @@ entity Works : scopedRead {
   currentGoalVersionId : UUID;
   closeReason : String(40);
   pendingInvalidation : Boolean not null default false;
+  originalText : LargeString;
+  conversationRequestId : String(240);
   lifecycleMode : String(20) not null default 'IMPORTED';
 }
 entity GoalReferences : scopedRead {
