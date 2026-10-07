@@ -19,6 +19,10 @@ public class RuntimeCommands implements CommandHandler {
   if(!Set.of("CONFIRMED_SUCCESS","CONFIRMED_FAILURE","UNRESOLVED").contains(text(slots,"decision")))throw DomainError.invalid("Invalid reconciliation decision");text(slots,"evidenceId");
   return CommandPreparation.ordinary(Map.of("WORK",List.of(work),"TARGET",List.of(id)),List.of("external-operation:"+row.get("externaloperationid"),"work:"+work),"RECONCILIATION",id,null);
  }
+ public List<SubjectBinding> subjectBindings(DomainContext c,Map<String,Object> intent,CommandPreparation prep){
+  var row=repository.db().queryForMap("SELECT payloadJson FROM mulino_runtime_Outbox WHERE organizationId=? AND ID=?",c.organizationId(),text(slots(intent),"outboxId"));
+  String work=json.readValue(row.get("payloadjson").toString(),Map.class).get("workId").toString();return List.of(SubjectBinding.optional("Work",Set.of(work)));
+ }
  public Map<String,Object> execute(DomainContext c,Map<String,Object> intent){
   var slots=slots(intent);String decision=text(slots,"decision");var result=decision.equals("CONFIRMED_SUCCESS")?ExternalDeliveryAdapter.Result.CONFIRMED_SUCCESS:decision.equals("CONFIRMED_FAILURE")?ExternalDeliveryAdapter.Result.CONFIRMED_FAILURE:ExternalDeliveryAdapter.Result.UNKNOWN;
   service.recordExternalReconciliation(c,text(slots,"outboxId"),result,text(slots,"evidenceId"));

@@ -20,6 +20,7 @@ public class RuntimeFixtureCommands implements CommandHandler {
   if(!Set.of("ACTIVE","WAITING").contains(actual.get("status")))throw DomainError.invalid("Fixture requires active Work");
   return CommandPreparation.ordinary(Map.of("WORK",List.of(work)),List.of("work:"+work),"EXTERNAL_FIXTURE",work,((Number)actual.get("revision")).intValue());
  }
+ public List<SubjectBinding> subjectBindings(DomainContext c,Map<String,Object> intent,CommandPreparation prep){return List.of(SubjectBinding.optional("Work",Set.of((String)slots(intent).get("workId"))));}
  public Map<String,Object> execute(DomainContext c,Map<String,Object> intent){
   var payload=slots(intent);String command=CommandExecution.commandId();String external=UUID.nameUUIDFromBytes((c.organizationId()+":"+command+":fixtureExternalEffect").getBytes(StandardCharsets.UTF_8)).toString();
   String outbox=repository.enqueue(c,command,external,"fixtureExternalEffect",payload);
