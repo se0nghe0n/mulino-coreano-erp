@@ -26,3 +26,17 @@ INTERNAL_MOVE 제한과 SELL 예약, 중첩된 유효 근거 중 하나의 철�
 
 범위 계산과 특정 제한 해제에서는 추가 확정 결함을 찾지 못했다.
 검토자는 테스트를 실행하지 않았고 전체 S3 review로 표시하지 않는다.
+
+## 좁은 지적의 해소 확인
+
+실제 GPT-6 Astra low가 `7fb16977`의 수정과 보존된 JUnit 결과를
+대조했다. 표시의 현재 revision 선택, 표시 시작/만료 경계, 예약별
+행동·고객·물량 범위 재평가가 원래 반례를 해결함을 확인했다.
+Regulatory 9건과 Quality PostgreSQL 9건의 성공 기록 및 관련
+production source hash가 검토 기준선과 일치했다. 세 지적은 이
+범위에서 CLOSED이며 연결된 추가 확정 결함은 없었다.
+
+표시 만료에서 QC sweeper까지 이어지는 전체 종단 실행은 이 좁은
+회귀의 검증 범위가 아니다. reviewer는 테스트를 재실행하지 않았다.
+Task branch의 전체 backend와 native 결합 검사, 사용자 Step3 전체
+두 모델 review는 별도 gate로 유지한다.
