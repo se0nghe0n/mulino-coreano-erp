@@ -41,3 +41,13 @@ CREATE TABLE mulino_work_WorkTransitions (
  FOREIGN KEY(organizationId,actorId) REFERENCES mulino_identity_Actors(organizationId,ID),
  UNIQUE(organizationId,workId,revision), CHECK(jsonb_typeof(snapshotJson::jsonb)='object'));
 CREATE TRIGGER work_transition_immutable BEFORE UPDATE OR DELETE ON mulino_work_WorkTransitions FOR EACH ROW EXECUTE FUNCTION mulino_work_read_immutable();
+
+CREATE FUNCTION mulino_work_lifecycle_guard() RETURNS trigger LANGUAGE plpgsql AS $$
+BEGIN
+ IF OLD.lifecycleMode='IMPORTED' THEN RAISE EXCEPTION 'Imported S1 work remains immutable'; END IF;
+ IF OLD.status='CLOSED' AND NEW.status<>'CLOSED' THEN RAISE EXCEPTION 'Closed Work cannot reopen'; END IF;
+ IF NEW.itemId<>OLD.itemId OR NEW.definitionVersionId<>OLD.definitionVersionId THEN RAISE EXCEPTION 'Pinned Work identity cannot change'; END IF;
+ RETURN NEW;
+END $$;
+CREATE TRIGGER work_lifecycle_guard BEFORE UPDATE ON mulino_work_read_Works FOR EACH ROW EXECUTE FUNCTION mulino_work_lifecycle_guard();
+CREATE TRIGGER goal_read_delete_immutable BEFORE DELETE ON mulino_work_read_GoalReferences FOR EACH ROW EXECUTE FUNCTION mulino_work_read_immutable();
