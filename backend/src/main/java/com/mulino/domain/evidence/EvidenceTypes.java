@@ -8,7 +8,7 @@ import java.util.*;
 public final class EvidenceTypes {
   private EvidenceTypes() {}
   public enum ValueState { KNOWN, MISSING, UNKNOWN, NOT_APPLICABLE, CONFLICT }
-  public enum SubjectKind { ITEM, LOT, SEGMENT, WORK, PLACE, PURCHASE_ORDER, SALES_ORDER, SALES_ORDER_LINE, DISPATCH, CARGO_SCOPE, DELIVERY, DELIVERY_OBSERVATION, RETURN, RECALL, RECALL_SCOPE, SETTLEMENT }
+  public enum SubjectKind { ITEM, LOT, SEGMENT, WORK, PLACE, PURCHASE_ORDER, SALES_ORDER, SALES_ORDER_LINE, DISPATCH, CARGO_SCOPE, DELIVERY, DELIVERY_OBSERVATION, RETURN, RECALL, RECALL_SCOPE, SETTLEMENT, INVOICE, PURCHASE_ORDER_LINE }
   public enum SelectorKind { DOCUMENT, EVENT, CLAIM, CANONICAL }
   public record Subject(SubjectKind kind,String id) {
     public Subject { Objects.requireNonNull(kind); uuid(id); }
