@@ -1,0 +1,21 @@
+{
+  "capturedAt": "2026-10-07T16:33:55.948021+00:00",
+  "baseline": "4280a750dca0aef35abaf10b6797881181dd88d7",
+  "command": "python3 verification/platform/inventory/check.py",
+  "exitCode": 0,
+  "expected": "metadata/hash consistency; R3 NONE only from user declaration",
+  "observed": {
+    "status": "PASS",
+    "checks": [
+      "file-inventory-fields",
+      "archive-commit-reachability",
+      "seven-document-sha256",
+      "owned-file-sha256",
+      "R3-user-declaration-separate-from-docker",
+      "no-legacy-live-migration-new-upgrade-still-required"
+    ],
+    "runtimeRestore": "NOT_RUN"
+  },
+  "status": "PASS",
+  "scope": "S0 metadata only; not V8 full restore"
+}
