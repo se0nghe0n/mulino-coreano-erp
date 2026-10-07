@@ -154,7 +154,7 @@ receipt('independent5','0','5',physical='$RANGESEP',purchase_line='$SEPARATE_LIN
 raw('separate-order-separate-key',[sums('mulino_trade_receipt_receipts','contributedquantity','100',{'purchaselineid':'$LINE'}),sums('mulino_trade_receipt_receipts','contributedquantity','5',{'purchaselineid':'$SEPARATE_LINE'}),sums('mulino_inventory_quantitysegments','quantity','110',{'retiredat':None})])
 
 # Separate organization proves movement of a pre-existing transit input only.
-A.append({'id':'transit-input-setup','type':'setup','fixtureRef':'verification/actual/s3/transit-fixture.json'})
+A.append({'id':'transit-input-setup','type':'setup','fixtureRef':'verification/actual/s3/transit-fixture.json','organizationAlias':'TRANSIT_ORG'})
 raw('transit-input60',[sums('mulino_inventory_quantitysegments','quantity','60',{'retiredat':None,'placeid':'$TRANSIT'}),count('mulino_inventory_quantitymovements',1,{'kind':'INITIAL_BALANCE'})])
 create=json.loads((ROOT/'flow.json').read_text())['actions'][0]
 create['id']='transit-work';create['request']['commandIdempotencyKey']='transit-work';create['request']['slots']['quantity']['value']='60';A.append(create)

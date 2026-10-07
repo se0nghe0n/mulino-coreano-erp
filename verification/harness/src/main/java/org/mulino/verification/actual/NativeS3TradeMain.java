@@ -41,7 +41,7 @@ public final class NativeS3TradeMain {
         String id=Json.required(a,"id"),type=Json.required(a,"type");
         switch(type) {
             case "setup" -> {
-                String ref=Json.required(a,"fixtureRef");var fixture=Json.read(root.resolve(ref));var bundle=Json.object();bundle.set("fixture",fixture);bundle.set("bases",Json.array());bundle.put("fixtureHash",Json.sha256(root.resolve(ref)));var result=driver.installFixture(id,bundle);capture(result);available(result);bindings.setAll((ObjectNode)result.data().path("aliasMap"));actor=fixture.path("actors").path("reader");
+                String ref=Json.required(a,"fixtureRef");var fixture=Json.read(root.resolve(ref));var bundle=Json.object();bundle.set("fixture",fixture);bundle.set("bases",Json.array());bundle.put("fixtureHash",Json.sha256(root.resolve(ref)));var result=driver.installFixture(id,bundle);capture(result);available(result);bindings.setAll((ObjectNode)result.data().path("aliasMap"));if(a.has("organizationAlias"))bindings.set("ORG",result.data().path("aliasMap").path(Json.required(a,"organizationAlias")));actor=fixture.path("actors").path("reader");
             }
             case "clock" -> clock(a.path("instant").asText());
             case "uuid" -> bindings.put(Json.required(a,"alias"),UUID.randomUUID().toString());
