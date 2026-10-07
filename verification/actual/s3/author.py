@@ -47,9 +47,16 @@ def receipt(name,start,quantity,existing=None,transit=None,physical=None,purchas
     if purchase_line is None:slots.pop('purchaseLineId')
     if transit:slots['transitSegmentId']=transit
     cmd(name+'-provisional','receiveProvisional',slots,revision=0,bind={name+'.observation':'/effects/receiptId'})
-    if name=='receipt60':raw('provisional-physical0',[count('mulino_inventory_quantitysegments',0),count('mulino_trade_receipt_observations',1)])
+    if name=='receipt60':raw('provisional-physical0',[count('mulino_inventory_quantitysegments',0),count('mulino_trade_receipt_observations',2)])
     A.extend(review)
     cmd(name+'-confirm','confirmReceipt',{'receiptId':'$'+name+'.observation','canonicalOccurrenceId':'$'+name+'.canonical','lotId':'$L'},revision=0,subject='$'+name+'.observation',noun='Receipt',bind={name+'.segment':'/effects/segmentId'},key=name+'-confirm-stable')
+# Unidentified provisional input remains responsibility only, with no stock/eligibility.
+A.append({'id':'unidentified-range','type':'uuid','alias':'UNKNOWN_RANGE'})
+unknown={'rangeRootId':'$UNKNOWN_RANGE','startQuantity':'0','itemId':'$P','placeId':'$W','workId':'$WORK','quantity':'7','unit':'BOX','occurredAt':T}
+original('unidentified-original','PHYSICAL_RECEIPT','7','$UNKNOWN_RANGE',unknown,subject='$P',subject_kind='ITEM',publish=False)
+cmd('unidentified-provisional','receiveProvisional',{'eventId':'$unidentified-original.event',**unknown,'ownerId':'$reader','supervisorId':'$supervisor','nextAction':'LOT 미식별 실물 대조','nextCheckAt':'2026-10-08T09:00:00Z'},revision=0)
+raw('unidentified-no-stock',[count('mulino_trade_receipt_observations',1,{'identificationstatus':'UNKNOWN','state':'PROVISIONAL'}),count('mulino_trade_receipt_receipts',0),count('mulino_inventory_quantitysegments',0)])
+A.append({'id':'unidentified-eligible0','type':'query','capability':'getInventory','request':{'id':'$P','scope':{'organizationId':'$ORG','itemId':'$P'},'asOf':T,'knownAt':T},'assertions':[{'pointer':'/data/eligibleQuantity','operator':'equals','expected':'0'}]})
 receipt('receipt60','0','60')
 A[-1]['type']='lost-response'
 raw('after60',[sums('mulino_inventory_quantitysegments','quantity','60',{'retiredat':None}),sums('mulino_trade_receipt_receipts','contributedquantity','60')])

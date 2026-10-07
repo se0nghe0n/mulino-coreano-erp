@@ -871,6 +871,137 @@
       "alias": "RANGE5"
     },
     {
+      "id": "unidentified-range",
+      "type": "uuid",
+      "alias": "UNKNOWN_RANGE"
+    },
+    {
+      "id": "unidentified-original",
+      "type": "original",
+      "fixture": {
+        "synthetic": true,
+        "clock": {
+          "asOf": "2026-10-07T09:00:02Z",
+          "knownAt": "2026-10-07T09:00:02Z"
+        },
+        "sourceProfile": {
+          "namespace": "native-s3-unidentified-original",
+          "policyVersion": "fixture-v1",
+          "nextAction": "원본 범위와 실제 효과 대조",
+          "nextCheckAt": "2026-10-08T09:00:00Z"
+        },
+        "occurrence": {
+          "kind": "PHYSICAL_RECEIPT",
+          "content": {
+            "rangeRootId": "$UNKNOWN_RANGE",
+            "startQuantity": "0",
+            "itemId": "$P",
+            "placeId": "$W",
+            "workId": "$WORK",
+            "quantity": "7",
+            "unit": "BOX",
+            "occurredAt": "2026-10-07T09:00:02Z"
+          },
+          "externalEventId": "unidentified-original",
+          "quantity": "7",
+          "unit": "BOX",
+          "assertion": "authored synthetic external original"
+        }
+      },
+      "binding": {
+        "organizationId": "$ORG",
+        "workId": "$WORK",
+        "itemId": "$P",
+        "actorId": "$reader",
+        "supervisorId": "$supervisor",
+        "physicalScopeId": "$UNKNOWN_RANGE",
+        "subjectId": "$P",
+        "subjectKind": "ITEM",
+        "placeId": "$W"
+      }
+    },
+    {
+      "id": "unidentified-provisional",
+      "type": "command",
+      "capability": "receiveProvisional",
+      "request": {
+        "intentKind": "RECORD",
+        "definitionVersion": "definition-v1",
+        "capabilityId": "receiveProvisional",
+        "expectedRevision": 0,
+        "commandIdempotencyKey": "unidentified-provisional",
+        "slots": {
+          "eventId": "$unidentified-original.event",
+          "rangeRootId": "$UNKNOWN_RANGE",
+          "startQuantity": "0",
+          "itemId": "$P",
+          "placeId": "$W",
+          "workId": "$WORK",
+          "quantity": "7",
+          "unit": "BOX",
+          "occurredAt": "2026-10-07T09:00:02Z",
+          "ownerId": "$reader",
+          "supervisorId": "$supervisor",
+          "nextAction": "LOT 미식별 실물 대조",
+          "nextCheckAt": "2026-10-08T09:00:00Z"
+        },
+        "provenance": {},
+        "subjectRefs": [
+          {
+            "type": "Work",
+            "id": "$WORK"
+          }
+        ]
+      },
+      "outcome": "APPLIED"
+    },
+    {
+      "id": "unidentified-no-stock",
+      "type": "observe",
+      "assertions": [
+        {
+          "pointer": "/rawRows/mulino_trade_receipt_observations",
+          "operator": "matchingRows",
+          "expected": 1,
+          "where": {
+            "identificationstatus": "UNKNOWN",
+            "state": "PROVISIONAL"
+          }
+        },
+        {
+          "pointer": "/rawRows/mulino_trade_receipt_receipts",
+          "operator": "size",
+          "expected": 0
+        },
+        {
+          "pointer": "/rawRows/mulino_inventory_quantitysegments",
+          "operator": "size",
+          "expected": 0
+        }
+      ]
+    },
+    {
+      "id": "unidentified-eligible0",
+      "type": "query",
+      "capability": "getInventory",
+      "request": {
+        "id": "$P",
+        "scope": {
+          "organizationId": "$ORG",
+          "itemId": "$P"
+        },
+        "asOf": "2026-10-07T09:00:02Z",
+        "knownAt": "2026-10-07T09:00:02Z"
+      },
+      "assertions": [
+        {
+          "pointer": "/data/eligibleQuantity",
+          "operator": "equals",
+          "expected": "0"
+        }
+      ]
+    },
+    {
       "id": "receipt60",
       "type": "original",
       "fixture": {
@@ -968,7 +1099,7 @@
         {
           "pointer": "/rawRows/mulino_trade_receipt_observations",
           "operator": "size",
-          "expected": 1
+          "expected": 2
         }
       ]
     },

@@ -23,7 +23,11 @@ snapshot으로 읽고 table별 SQL·boundValues·rowPointer를 기록한다.
 미지원 table·누락 수량을0으로 치환하지 않는다.
 
 2026-10-08 focused harness compile와 `ActualS3FixtureSafetyTest`는2개
-검사를 모두 통과했다. product 종단 실행은 아직 NOT_RUN이다.
+검사를 모두 통과했다. 첫 실제 실행은79개 bounded assertion 이후
+recordHandover HTTP500으로 FAIL했다. ShipmentCommands의 null kind
+guard 문제이며 수정은 shipment 담당자가 소유한다. 실행 증거는
+`/tmp/mulino-s3-actual-20261008-run1`에 보존했다. 전체 gate 통과를
+주장하지 않는다.
 유료 모델·BTP·실제 supplier/regulator 전송은 실행 범위에 포함하지 않는다.
 
 V6 native 경로는 receipt60을 실제 loopback proxy를 통해 backend에
@@ -38,3 +42,8 @@ INITIAL_BALANCE 원장을 명시적인 입력으로 설치한다. 이는 운송 
 취득/생성을 검증하지 않는다. 실제 confirmReceipt가 leaf를 이동한 뒤
 보유60·운송중0·창고60·RECEIPT_MOVE1을 검증한다. main 구매→신규 수령
 fixture는 실물 seed를 포함하지 않는다.
+
+미식별 provisional7은 LOT 없이 실제 receiveProvisional로 기록한다.
+독립 SQL의 UNKNOWN/PROVISIONAL1·확정 수령0·재고0과 실제 inventory
+eligible0을 검사한다. 이 원본은 canonical publication이나 확정
+수령에 사용하지 않는다.
