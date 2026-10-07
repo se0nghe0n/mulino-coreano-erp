@@ -22,8 +22,13 @@ Fast를 사용하되 도구가 노출하지 않는 service tier를 변경했다�
 | recall | `application/trade/recall`, `domain/trade/recall`, `recall.cds`, `recall-model.cds`, V26, 필요 시 신규 RecallStockPrimitives |
 | settlement | `application/trade/settlement`, `domain/trade/settlement`, `settlement.cds`, `settlement-model.cds`, V27 |
 | adapter | `verification/actual/s4`, S4 native runner와 고유 tests, 기존 실제 adapter의 필요한 연결, `./verify actual-s4` |
+| e2 | `verification/actual/s4/e2*.json`, `e2-author.py`, 고유 검증 기록; 회수 종단 입력·독립 관찰 |
+| c4 | `verification/actual/s4/c4*.json`, `c4-author.py`, 고유 검증 기록; 인도 정정·관측 종단 입력·독립 관찰 |
 
 각 worker는 자신의 고유 tests와 `docs/execution/s4-<suffix>`도 소유한다.
+E2/C4는 같은 `step3-s4-baseline`에서 만든 추가 worktree에 `d9ec350a`까지의
+Task 통합 결과를 dependency로 반영했다. Adapter 담당자와 두 고유 입력
+경로의 소유권을 분리했고 shared fixture·runner의 소유권은 유지한다.
 다른 worker의 파일은 임의로 수정하지 않는다. Integration은 다른
 소유 package 아래 파일을 바꾸기 전 담당자와 계약을 정한다. 기존 S3
 기능을 삭제하거나 대체 stub으로 검증을 통과시키지 않는다.
