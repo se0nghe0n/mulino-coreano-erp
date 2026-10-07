@@ -1,0 +1,150 @@
+{
+  "sourceCommit": "18d9deff0333d0aa49fd6929311a04dbd08ed5b3",
+  "command": "./mvnw -B -ntp -f backend/pom.xml -Dtest=ReadContractsTest,S1ReadIntegrationTest test",
+  "environment": {
+    "JAVA_HOME": "/Library/Java/JavaVirtualMachines/zulu-21.jdk/Contents/Home",
+    "NODE24_BIN": "/Users/n30gu1/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node",
+    "blobRoot": "Per-test private ephemeral 0700 directory; removed after tests",
+    "JWT": "Per-test ephemeral RSA key pair; public key path only; no token/private key artifact"
+  },
+  "runtimeStatus": "PASS",
+  "gateComplete": false,
+  "tests": 11,
+  "failures": 0,
+  "errors": 0,
+  "skipped": 0,
+  "exitCode": 0,
+  "versions": {
+    "Java": "21",
+    "CAP": "5.1.1",
+    "SpringBoot": "4.1.1",
+    "PostgreSQL": "18.6",
+    "Node": "24.19.0",
+    "CDSCompiler": "7.1.1"
+  },
+  "compatibility": {
+    "columns": 568,
+    "timestampWidenings": 110,
+    "notNullStrengthenings": 259,
+    "primaryKeys": "Exact entity and key-column ordering"
+  },
+  "notRun": [
+    "Whole T01 eligibility/cumulative/S3 effects",
+    "S2 lifecycle/evaluator/handover",
+    "Full T20/S5 MCP acceptance",
+    "Operational identity/BTP/model acceptance",
+    "Root final fresh deployment and whole-backend run"
+  ],
+  "artifacts": [
+    {
+      "path": "docs/execution/s1-integration/evidence/native-focused-final.log.gz",
+      "sha256": "ce21d1b3ace9dcb310b8164a238d1a8b5b9d6b7b2b81edd9f1b25e7d7ea03f4f",
+      "uncompressedSha256": "4e8690408941208c6423afcbd08b02af77a15e9033ed31158c9b43e58429b420"
+    },
+    {
+      "path": "docs/execution/s1-integration/evidence/native-TEST-com.mulino.core.S1ReadIntegrationTest.xml.gz",
+      "sha256": "fa0b829399fdcbeea236a4ef9a54a173a5d80ff259df45388d99e9222b13e694",
+      "uncompressedSha256": "c8bc4e7e992c62d1d9346407429840a6723b51e99136037a9a59d5dae55a80cb"
+    },
+    {
+      "path": "docs/execution/s1-integration/evidence/contract-TEST-com.mulino.core.ReadContractsTest.xml.gz",
+      "sha256": "9e37d4bcb92d0477c754843dbed55ea4d7c92810358339af33114039fd77b619",
+      "uncompressedSha256": "c24d1ef6f6ed96716a93aed594186d1216b92a3a9457ff92e00114f341f08350"
+    },
+    {
+      "path": "docs/execution/s1-integration/evidence/initial-seed-failure.log.gz",
+      "sha256": "5935ed76dc8784733bdcf32091d77cf23e0e0d36d7ed90e41868a61bcff76c9d",
+      "uncompressedSha256": "a6e53fa05b08c31714a930afea2d57d898719599ec92c343bfff630ef4f37459"
+    },
+    {
+      "path": "docs/execution/s1-integration/evidence/initial-auth-and-compatibility-failure.log.gz",
+      "sha256": "f84a17c8ee42309b37c85b72cf922f2a156ffd5f8a6eafb65e8cadacf9804e76",
+      "uncompressedSha256": "cf59a3bacf5e9ad0167819cee24838900c83e878929b50faedfe2d00c2d4ce38"
+    },
+    {
+      "path": "docs/execution/s1-integration/evidence/combined-inventory-mock-failure.log.gz",
+      "sha256": "8052bae06277edddd7f3730b1b6da28fcb33e05aa4d564822d83adb06b5fb3e6",
+      "uncompressedSha256": "72844966c4143bcfc3d1217f76401f46a10358c8939ac875aaecd6ff88a08284"
+    },
+    {
+      "path": "docs/execution/s1-integration/evidence/evidence-final-shape-seed-failure.log.gz",
+      "sha256": "a41ebf4c5d188e0b0498193fee8fe28565243ce029ec7b7d120e5432f1515f11",
+      "uncompressedSha256": "daa0b5e5c7f75f3ea6b6b40602e4700a4a8f5f3419572f3de7a2e5c979b4a4d1"
+    }
+  ],
+  "inputHashes": {
+    "backend/src/main/java/com/mulino/OntologyApplication.java": "616c2eefb54549fe1a0db7364f51c41770f71a0c63e4028a679f914bd88bff28",
+    "backend/src/main/java/com/mulino/adapters/OntologyCap.java": "b4e903ba90b5790e6c83e24a88eecab549f6cd74b67f4456af3ab16282c5e5fc",
+    "backend/src/main/java/com/mulino/adapters/OntologyMcp.java": "7b5f5f913f58d121415dd6e6cb70115ba5f9ba82796755c75d91c68dc1ca51c8",
+    "backend/src/main/java/com/mulino/adapters/OntologyRest.java": "4369f1afbc24d07553dfa9c663cf9693b0fa6f79dc21881d08c795be220e9bc4",
+    "backend/src/main/java/com/mulino/adapters/PlatformCap.java": "1eae57f0e43f3cb9dc3a823970ad39786516af3631f069556681b7556afd7af7",
+    "backend/src/main/java/com/mulino/adapters/PlatformMcp.java": "88f472f38fbcec07127053351bd121fe1f579587b1253b52e65056fe01188a4e",
+    "backend/src/main/java/com/mulino/adapters/PlatformRest.java": "a20a06c7a1a08bed464cb99bc7932cd8cfc62dad9ae199637e202a5874261177",
+    "backend/src/main/java/com/mulino/adapters/blob/EvidenceDownload.java": "b57e227d721609cf986800927a6f28e74ae31712a79adf35c9e97eed5c7c366f",
+    "backend/src/main/java/com/mulino/adapters/blob/LocalBlobStore.java": "191f483daf9739830fa125d0000d475c98f56db9408e39770d24ef18f5f1b9d8",
+    "backend/src/main/java/com/mulino/application/PlatformCommands.java": "b62b8ee36052bc46e775b5bd9b10ef80bad40607bb583fe1a365be26ee21a33f",
+    "backend/src/main/java/com/mulino/application/core/ApplicationQueries.java": "21824666619b6f8283b1130ed37665df5f02c48972018c77ead64ae7ac89e55d",
+    "backend/src/main/java/com/mulino/application/core/CommandHandler.java": "a8d8067b028f04d2a02f7d1f9c5d0f190adf163c24b5be19d4c3f5fb55887b66",
+    "backend/src/main/java/com/mulino/application/core/DecimalValue.java": "8916e1191f3e0ed4be03e922d168f5c0d705e32f2fc760956cdd4f05b98f7982",
+    "backend/src/main/java/com/mulino/application/core/DomainContext.java": "9bc6b93843cfb7e1e4b5ff7cc54ddea54a74e4688993803dc15fa1407f72c92d",
+    "backend/src/main/java/com/mulino/application/core/DomainError.java": "aca7602676359b5fe9e571f934ff2c75419ba7de0fa9a8c0f602acacff76347a",
+    "backend/src/main/java/com/mulino/application/core/QueryHandler.java": "4c9d74b528b5adb75557668c26fb3f26d24145944026faf262dd10b7cede90d9",
+    "backend/src/main/java/com/mulino/application/core/QueryRequest.java": "558a5ad08de0413732099b94073f056bf04b9f645d1b205325e40e389a5f83cd",
+    "backend/src/main/java/com/mulino/application/core/QueryRequests.java": "1dc456ae626b13f68338b599ad37d85d6be2d6a16ff5735dc5c53a25f2b6b3ce",
+    "backend/src/main/java/com/mulino/application/core/QueryResult.java": "92d300113c42ba7c256a06f3fa9183718ebda59631ee90606cf97c1b9a2f5783",
+    "backend/src/main/java/com/mulino/application/core/ReadAuthorizer.java": "9f981968bc960de3e222e1fc06d38373ba990ff570a55c728d4ce23752f96b47",
+    "backend/src/main/java/com/mulino/application/core/ReadCursor.java": "06999e6c21f8c7a6e3bf80aabc1bc70014edd98e19adcf6165f32146e4b61133",
+    "backend/src/main/java/com/mulino/application/core/TransportValues.java": "50a422c2951d041fa1b04ee60abba7e63c805e95490440a2deed51377e73a858",
+    "backend/src/main/java/com/mulino/application/definitions/DefinitionQueries.java": "f3caa6e60ebc680284fba361e4f4467416a7553a76f1d0ca718f41243304e45c",
+    "backend/src/main/java/com/mulino/application/evidence/EvidenceQueries.java": "56b84d4ae5821aa9357ca317fbc0ba78fe638e9b01f127fee9c160c6ec803f8d",
+    "backend/src/main/java/com/mulino/application/evidence/EvidenceRecords.java": "e901d9f30048b14b492efaa8e0a0a51db6a38fc39a2c4f5e12eb6e39cd6155c1",
+    "backend/src/main/java/com/mulino/application/identity/IdentityAuthorization.java": "a6b72bc2c77035a7cb491dba6ca837a96b52ab3d57882cc63ae2ccf68610fb2d",
+    "backend/src/main/java/com/mulino/application/identity/IdentityControlGuard.java": "f915cdbd0ece9ac4d2570c2c935936e8cdb9302fb4e79ec36e28b1a9416229d2",
+    "backend/src/main/java/com/mulino/application/identity/IdentityQueries.java": "a3317dbf1fe5047170daef1f932740f4bf8cc725fc95b55293ea806fd269f912",
+    "backend/src/main/java/com/mulino/application/inventory/InventoryQueries.java": "3c2d581138a38293d0ced75c2b19cb3ef2fb53f45780c24e8ce019eac18215d7",
+    "backend/src/main/java/com/mulino/application/inventory/ItemRegistration.java": "3971128640275a370129e1d41bf86e028353f685354b076a36ad55f8ebe4458f",
+    "backend/src/main/java/com/mulino/domain/definitions/Definition.java": "129343fb114a0b709833601f0bade8512dfc83987d9eb3b5d0365fad7c21f917",
+    "backend/src/main/java/com/mulino/domain/definitions/DefinitionRepository.java": "81102f12fcbea4cc92bfa7fb2641acd2fa9772d679e9b9be73a62503fd7bc69d",
+    "backend/src/main/java/com/mulino/domain/definitions/DefinitionValidator.java": "698486cf3e662511a51455fb71f4c007225d0e079c784ac2434326de0dad2978",
+    "backend/src/main/java/com/mulino/domain/definitions/PredicateTruth.java": "d3bbdb901c7529fc4082bba33ea43ed1ba312514280fed05bc63d5d086dbe58b",
+    "backend/src/main/java/com/mulino/domain/evidence/EvidenceRepository.java": "a7cc0303c76fcb89ba078a4c85477e344afafa9d4dc36b04f153135a79d853c0",
+    "backend/src/main/java/com/mulino/domain/evidence/EvidenceTypes.java": "ed4e625e4577e09b04eeaae2d00f343334d2e580aa132293f4a0e8549f766331",
+    "backend/src/main/java/com/mulino/domain/governance/PolicyRepository.java": "e632d89c4a0f96b08c8ecf4d59f42c8600ff37849cc30221fbc702d309c3f838",
+    "backend/src/main/java/com/mulino/domain/identity/CapIdentityProvider.java": "cb63bbb64b6c5293e1fbec03efc56686d44d80c93475fd66ef74e1cec9c452bf",
+    "backend/src/main/java/com/mulino/domain/identity/CurrentIdentity.java": "f23d1e1c58ac84feb562a77d709b276e7692e53c07ee3ebfc2b0cf97a6783e65",
+    "backend/src/main/java/com/mulino/domain/identity/IdentityRepository.java": "9416ba27e14b03a552c62e24abed211bdbe5a8c958fede1d89f9d8297c7e7155",
+    "backend/src/main/java/com/mulino/domain/identity/SecurityConfiguration.java": "585ac4e0f3fe473416751bc6ab74463e5d1229439b3ec06cb9f750806b9b7713",
+    "backend/src/main/java/com/mulino/domain/inventory/InventoryQuantity.java": "bb58f0fd0a0b732bf71e3302ad71a9a18e95716d75511a4954071405258bb41d",
+    "backend/src/main/java/com/mulino/domain/inventory/InventoryRepository.java": "ab81af037774727a37b3fbe4626605a90868261116a39006732423a99e3f275b",
+    "backend/src/main/java/com/mulino/domain/inventory/ScopeRepository.java": "4cf0c57ba04ec18f04818eb69e97af535a0676716cb113196a4458f4ea501516",
+    "backend/src/main/java/com/mulino/domain/work/read/WorkReadHandler.java": "c22b8217e91918594685f9f70af4bc7b7c347a7100182e056588adf77428ea8b",
+    "backend/src/main/java/com/mulino/domain/work/read/WorkReadRepository.java": "740685f3ec199b610aaeecaf7266e8f163a32057c6d57fad97afa69c3b230ba3",
+    "backend/src/main/resources/application.yaml": "9c3e6e300aba284c04d107e0f6be9fa16dc7d703565bf6eb2dc9ff152c4a684e",
+    "backend/src/test/java/com/mulino/DefinitionValidatorTest.java": "737c752f0b6518e2082c6dcd3ef2f3df2de370fccd4a8fa1f7bfc9e949c8446b",
+    "backend/src/test/java/com/mulino/DefinitionsPersistenceTest.java": "10455c0e18ba8f29258330adfba70502a284273379b4d5268af07467afe0e6ed",
+    "backend/src/test/java/com/mulino/PlatformIntegrationTest.java": "f4925e6f3b1361a0588057837e64c7ba617bd99dcfa6ce5d2b035a14fde3a05a",
+    "backend/src/test/java/com/mulino/application/evidence/EvidencePersistenceTest.java": "317321db489a70e53267dd2e085956e4fcdf43322e09d44d62d2307d15f511a1",
+    "backend/src/test/java/com/mulino/application/identity/IdentityAuthorizationTest.java": "4de79549f92cfeddd20fa249255b16fdff4ee1f43ad7aa3bb5b9b68ca2fcace9",
+    "backend/src/test/java/com/mulino/application/identity/IdentityPersistenceTest.java": "ef84038857975505fbc3d9b5a135ac33ff581b007ed12d6bd5bc8bd75f657516",
+    "backend/src/test/java/com/mulino/core/ReadContractsTest.java": "ee7562581e4cdadd0fdf9216447e5b700195b41cc4a6cfbf3322fd2c47604bcb",
+    "backend/src/test/java/com/mulino/core/S1ReadIntegrationTest.java": "dc83bc2da765747d9757bb2b1e4d051fc0f8ddb46df4342d27a3d74a93fb8716",
+    "backend/src/test/java/com/mulino/inventory/InventoryPostgresTest.java": "29c047d932c930b281b0159dac5c6409a8bfd2e5887c48a31201846902a87c9b",
+    "backend/src/test/java/com/mulino/inventory/InventoryQuantityTest.java": "f2cb4e053e894dce7066fad2d4c8a63a8b1d0181dd5522226cc8177238004351",
+    "backend/db/definitions.cds": "32b09679fe945c4da150de322b52d6366953c29d0787065d9ce649c1ca959930",
+    "backend/db/evidence.cds": "c096c9ae3e6b80779fe430b86759ac2d721b2d4ace3a5f6fca6e61fac0c4e00a",
+    "backend/db/identity.cds": "e93b3c2b38ce4867cf8df748f59bac644a0d4a072ec79ca16e1ecdc990ac2a26",
+    "backend/db/inventory.cds": "df48c0610ba393bf498716c78f596ca2ceb48534c1f4071dd2833726ae50473e",
+    "backend/db/policies.cds": "d0c931f73e244ed9fd77c23fc56bdc6cc92d669f99625a881207dbc23f1ae3b9",
+    "backend/db/schema.cds": "54495b27f2f5f0b3ed3f8bec66ecb9d32fabc68d8b4026a49ce33fbfaf2183e8",
+    "backend/db/work-read.cds": "5a84aa74c1d5b655d490b0b94208c85293faec9a5b2334d21aaa2f37c1c2ffdb",
+    "backend/srv/ontology.cds": "dba51cf6363382b57fc6c7d6095c000e305615b1a0ec59e2060f12f8521c0f20",
+    "backend/srv/platform.cds": "fe90f8084f3b9913af9c8f19fc078524cd6f047e00795a352fa776b9dc7c54ce",
+    "database/migrations/V1__platform.sql": "df0a6a0060910b286a3656fff132a2fd4c74ece44fc5c5afb5dba557a966f646",
+    "database/migrations/V2__preserved_upgrade.sql": "4d667eb07f88990b0df776005725f8ec5bb51eb8ab5bea01d652282e5d125668",
+    "database/migrations/V3__identity.sql": "d45474a28db0a4f351f5f0063dc4b19e0fac33df82e2b3c9551fc0cbaa8eb2ec",
+    "database/migrations/V4__definitions.sql": "0a5060bdef54a8d3f021d38810dc587cf72c9a8b71a89b901ab30808658639fa",
+    "database/migrations/V5__inventory.sql": "b903d96e19df575ccaae9e088d6ff700e5ca1e95369f1cd9da8da562827f8586",
+    "database/migrations/V6__evidence.sql": "71458b9e3f5955f55d284796102dbfc561cb6e77b8482f957693206518a96d1e",
+    "database/migrations/V7__core_read_links.sql": "b9e8ba09901f47ca8deefcb8b8520cf4c69cc0e6db183a0819a62154ef55723e"
+  }
+}
