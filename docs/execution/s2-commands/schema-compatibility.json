@@ -5,6 +5,15 @@
     "notNullStrengthening": "Flyway enforces mandatory domain facts above nullable CDS default. Database nullability never weakens compiler requirements; only enumerated mandatory columns may differ."
   },
   "timestampWidening": [
+    "mulino_commands_approvalconsumptions.consumedat",
+    "mulino_commands_approvals.decidedat",
+    "mulino_commands_approvals.expiresat",
+    "mulino_commands_commandaudits.createdat",
+    "mulino_commands_commandrecords.completedat",
+    "mulino_commands_commandrecords.createdat",
+    "mulino_evaluation_inputsnapshots.asof",
+    "mulino_evaluation_inputsnapshots.knownat",
+    "mulino_evaluation_inputsnapshots.recordedat",
     "mulino_evidence_canonicaloccurrences.createdat",
     "mulino_evidence_canonicaloccurrences.effectivefrom",
     "mulino_evidence_canonicaloccurrences.effectiveuntil",
@@ -24,13 +33,25 @@
     "mulino_evidence_inboxrecords.createdat",
     "mulino_evidence_inboxrecords.nextcheckat",
     "mulino_evidence_inboxrecords.recordedat",
+    "mulino_evidence_reconciliations.createdat",
+    "mulino_evidence_reconciliations.effectivefrom",
+    "mulino_evidence_reconciliations.nextcheckat",
+    "mulino_evidence_reconciliations.recordedat",
     "mulino_evidence_sourceprofiles.createdat",
     "mulino_evidence_sourceprofiles.nextcheckat",
     "mulino_evidence_sourceprofiles.recordedat",
     "mulino_evidence_verifications.createdat",
     "mulino_evidence_verifications.recordedat",
+    "mulino_governance_policyapprovals.approvedat",
+    "mulino_governance_policyboundaries.nextcheckat",
+    "mulino_governance_policydrafts.effectivefrom",
+    "mulino_governance_policydrafts.effectiveuntil",
+    "mulino_governance_policyversions.createdat",
+    "mulino_governance_policyversions.effectivefrom",
+    "mulino_governance_policyversions.effectiveuntil",
     "mulino_identity_actors.createdat",
     "mulino_identity_actors.recordedat",
+    "mulino_identity_authorityinvalidations.nextcheckat",
     "mulino_identity_capabilityassignments.createdat",
     "mulino_identity_capabilityassignments.recordedat",
     "mulino_identity_capabilityassignments.revokedat",
@@ -43,6 +64,9 @@
     "mulino_identity_grants.revokedat",
     "mulino_identity_grants.validfrom",
     "mulino_identity_grants.validuntil",
+    "mulino_identity_managementauthorities.revokedat",
+    "mulino_identity_managementauthorities.validfrom",
+    "mulino_identity_managementauthorities.validuntil",
     "mulino_identity_memberships.createdat",
     "mulino_identity_memberships.recordedat",
     "mulino_identity_memberships.revokedat",
@@ -50,6 +74,10 @@
     "mulino_identity_memberships.validuntil",
     "mulino_identity_organizations.createdat",
     "mulino_identity_organizations.recordedat",
+    "mulino_inventory_dispositionbases.createdat",
+    "mulino_inventory_dispositionbases.recordedat",
+    "mulino_inventory_dispositionbases.validfrom",
+    "mulino_inventory_dispositionbases.validuntil",
     "mulino_inventory_externalidentifiers.createdat",
     "mulino_inventory_externalidentifiers.recordedat",
     "mulino_inventory_externalidentifiers.validfrom",
@@ -57,6 +85,10 @@
     "mulino_inventory_genealogyedges.createdat",
     "mulino_inventory_genealogyedges.occurredat",
     "mulino_inventory_genealogyedges.recordedat",
+    "mulino_inventory_identifierconflicts.createdat",
+    "mulino_inventory_identifierconflicts.recordedat",
+    "mulino_inventory_identifierconflicts.validfrom",
+    "mulino_inventory_identifierconflicts.validuntil",
     "mulino_inventory_logisticsmemberships.createdat",
     "mulino_inventory_logisticsmemberships.recordedat",
     "mulino_inventory_logisticsmemberships.validfrom",
@@ -87,22 +119,55 @@
     "mulino_inventory_quantitysegments.retiredat",
     "mulino_inventory_quantitysegments.retirementrecordedat",
     "mulino_inventory_quantitysegments.validfrom",
+    "mulino_inventory_restrictions.createdat",
+    "mulino_inventory_restrictions.recordedat",
+    "mulino_inventory_restrictions.validfrom",
+    "mulino_inventory_restrictions.validuntil",
+    "mulino_inventory_segmentallocations.createdat",
+    "mulino_inventory_segmentallocations.recordedat",
     "mulino_inventory_specificationversions.createdat",
     "mulino_inventory_specificationversions.recordedat",
+    "mulino_inventory_stockadjustments.createdat",
+    "mulino_inventory_stockadjustments.occurredat",
+    "mulino_inventory_stockadjustments.recordedat",
+    "mulino_inventory_stocktakes.createdat",
+    "mulino_inventory_stocktakes.occurredat",
+    "mulino_inventory_stocktakes.recordedat",
     "mulino_inventory_tradeitems.createdat",
     "mulino_inventory_tradeitems.recordedat",
     "mulino_inventory_unitconversions.createdat",
     "mulino_inventory_unitconversions.recordedat",
     "mulino_inventory_unitconversions.validfrom",
     "mulino_inventory_unitconversions.validuntil",
+    "mulino_responsibility_handovers.createdat",
+    "mulino_responsibility_handovers.expiresat",
+    "mulino_responsibility_handovers.nextcheckat",
+    "mulino_responsibility_handovers.recordedat",
+    "mulino_responsibility_roots.createdat",
+    "mulino_responsibility_roots.recordedat",
+    "mulino_responsibility_scopes.createdat",
+    "mulino_responsibility_scopes.recordedat",
+    "mulino_runtime_executionattempts.finishedat",
+    "mulino_runtime_executionattempts.heartbeatat",
+    "mulino_runtime_executionattempts.leaseexpiresat",
+    "mulino_runtime_executionattempts.startedat",
+    "mulino_runtime_externalreconciliations.recordedat",
+    "mulino_runtime_outbox.createdat",
+    "mulino_runtime_outbox.leaseexpiresat",
+    "mulino_runtime_outbox.nextcheckat",
+    "mulino_runtime_recoveryschedules.nextcheckat",
+    "mulino_runtime_recoveryschedules.nextvalidityboundary",
+    "mulino_work_read_assessmentreferences.asof",
     "mulino_work_read_assessmentreferences.assessedat",
     "mulino_work_read_assessmentreferences.createdat",
     "mulino_work_read_assessmentreferences.effectiveat",
+    "mulino_work_read_assessmentreferences.knownat",
     "mulino_work_read_assessmentreferences.recordedat",
     "mulino_work_read_evidencereferences.createdat",
     "mulino_work_read_evidencereferences.effectiveat",
     "mulino_work_read_evidencereferences.recordedat",
     "mulino_work_read_goalreferences.createdat",
+    "mulino_work_read_goalreferences.dueat",
     "mulino_work_read_goalreferences.effectiveat",
     "mulino_work_read_goalreferences.recordedat",
     "mulino_work_read_obligationreferences.createdat",
@@ -114,9 +179,48 @@
     "mulino_work_read_subjectlinks.recordedat",
     "mulino_work_read_works.createdat",
     "mulino_work_read_works.effectiveat",
-    "mulino_work_read_works.recordedat"
+    "mulino_work_read_works.recordedat",
+    "mulino_work_workcontributions.recordedat",
+    "mulino_work_worklinks.createdat",
+    "mulino_work_worktransitions.recordedat"
   ],
   "notNullStrengthening": [
+    "mulino_commands_approvalconsumptions.approvalid",
+    "mulino_commands_approvalconsumptions.commandid",
+    "mulino_commands_approvalconsumptions.consumedat",
+    "mulino_commands_approvalconsumptions.organizationid",
+    "mulino_commands_approvals.action",
+    "mulino_commands_approvals.approverid",
+    "mulino_commands_approvals.canonicalhash",
+    "mulino_commands_approvals.decidedat",
+    "mulino_commands_approvals.decision",
+    "mulino_commands_approvals.decisioncapability",
+    "mulino_commands_approvals.expiresat",
+    "mulino_commands_approvals.organizationid",
+    "mulino_commands_approvals.policyhash",
+    "mulino_commands_approvals.proposalid",
+    "mulino_commands_approvals.proposalrevision",
+    "mulino_commands_approvals.scopehash",
+    "mulino_commands_approvals.singleuse",
+    "mulino_commands_commandaudits.actorid",
+    "mulino_commands_commandaudits.auditfactsjson",
+    "mulino_commands_commandaudits.canonicalhash",
+    "mulino_commands_commandaudits.capabilityid",
+    "mulino_commands_commandaudits.commandid",
+    "mulino_commands_commandaudits.createdat",
+    "mulino_commands_commandaudits.effectrefs",
+    "mulino_commands_commandaudits.organizationid",
+    "mulino_commands_commandaudits.outcome",
+    "mulino_commands_commandrecords.actorid",
+    "mulino_commands_commandrecords.canonicalhash",
+    "mulino_commands_commandrecords.capabilityid",
+    "mulino_commands_commandrecords.capabilityversion",
+    "mulino_commands_commandrecords.commandidempotencykey",
+    "mulino_commands_commandrecords.createdat",
+    "mulino_commands_commandrecords.definitionversion",
+    "mulino_commands_commandrecords.organizationid",
+    "mulino_commands_commandrecords.stablerequestowner",
+    "mulino_commands_commandrecords.state",
     "mulino_definitions_attributedefinitions.createdat",
     "mulino_definitions_attributedefinitions.definitionversionid",
     "mulino_definitions_attributedefinitions.name",
@@ -213,6 +317,25 @@
     "mulino_evidence_inboxrecords.sourceprofileid",
     "mulino_evidence_inboxrecords.state",
     "mulino_evidence_inboxrecords.supervisorid",
+    "mulino_evidence_reconciliations.basisdocumentid",
+    "mulino_evidence_reconciliations.claimid",
+    "mulino_evidence_reconciliations.createdat",
+    "mulino_evidence_reconciliations.decision",
+    "mulino_evidence_reconciliations.effectivefrom",
+    "mulino_evidence_reconciliations.intakeownerid",
+    "mulino_evidence_reconciliations.nextaction",
+    "mulino_evidence_reconciliations.nextcheckat",
+    "mulino_evidence_reconciliations.organizationid",
+    "mulino_evidence_reconciliations.policyversion",
+    "mulino_evidence_reconciliations.reason",
+    "mulino_evidence_reconciliations.recordedat",
+    "mulino_evidence_reconciliations.recordedby",
+    "mulino_evidence_reconciliations.revision",
+    "mulino_evidence_reconciliations.sourceidentity",
+    "mulino_evidence_reconciliations.sourceprofileid",
+    "mulino_evidence_reconciliations.subjectid",
+    "mulino_evidence_reconciliations.subjectkind",
+    "mulino_evidence_reconciliations.supervisorid",
     "mulino_evidence_sourceprofiles.createdat",
     "mulino_evidence_sourceprofiles.organizationid",
     "mulino_evidence_sourceprofiles.recordedat",
@@ -227,6 +350,27 @@
     "mulino_evidence_verifications.recordedby",
     "mulino_evidence_verifications.revision",
     "mulino_evidence_verifications.verdict",
+    "mulino_governance_activepolicies.policyid",
+    "mulino_governance_activepolicies.revision",
+    "mulino_governance_policyapprovals.approvedat",
+    "mulino_governance_policyapprovals.approverid",
+    "mulino_governance_policyapprovals.contenthash",
+    "mulino_governance_policyapprovals.draftid",
+    "mulino_governance_policyboundaries.nextcheckat",
+    "mulino_governance_policyboundaries.policyid",
+    "mulino_governance_policyboundaries.reason",
+    "mulino_governance_policydrafts.content",
+    "mulino_governance_policydrafts.contenthash",
+    "mulino_governance_policydrafts.effectivefrom",
+    "mulino_governance_policydrafts.fixtureonly",
+    "mulino_governance_policydrafts.kind",
+    "mulino_governance_policydrafts.legallyrestrictive",
+    "mulino_governance_policydrafts.regressionevidence",
+    "mulino_governance_policydrafts.revision",
+    "mulino_governance_policydrafts.source",
+    "mulino_governance_policydrafts.status",
+    "mulino_governance_policydrafts.version",
+    "mulino_governance_policyfences.revision",
     "mulino_governance_policyversions.content",
     "mulino_governance_policyversions.contenthash",
     "mulino_governance_policyversions.createdat",
@@ -240,6 +384,10 @@
     "mulino_identity_actors.revision",
     "mulino_identity_actors.stablerequestowner",
     "mulino_identity_authorityfences.revision",
+    "mulino_identity_authorityinvalidations.actorid",
+    "mulino_identity_authorityinvalidations.nextcheckat",
+    "mulino_identity_authorityinvalidations.reason",
+    "mulino_identity_authorityinvalidations.revision",
     "mulino_identity_capabilityassignments.actorid",
     "mulino_identity_capabilityassignments.capabilityid",
     "mulino_identity_capabilityassignments.createdat",
@@ -263,6 +411,13 @@
     "mulino_identity_grants.revision",
     "mulino_identity_grants.validfrom",
     "mulino_identity_grants.validuntil",
+    "mulino_identity_managementauthorities.actorid",
+    "mulino_identity_managementauthorities.capabilityid",
+    "mulino_identity_managementauthorities.revision",
+    "mulino_identity_managementauthorities.scopeid",
+    "mulino_identity_managementauthorities.scopekind",
+    "mulino_identity_managementauthorities.validfrom",
+    "mulino_identity_managementauthorities.validuntil",
     "mulino_identity_memberships.actorid",
     "mulino_identity_memberships.createdat",
     "mulino_identity_memberships.recordedat",
@@ -273,6 +428,16 @@
     "mulino_identity_organizations.externalalias",
     "mulino_identity_organizations.recordedat",
     "mulino_identity_organizations.revision",
+    "mulino_inventory_dispositionbases.action",
+    "mulino_inventory_dispositionbases.controlscope",
+    "mulino_inventory_dispositionbases.createdat",
+    "mulino_inventory_dispositionbases.decisionid",
+    "mulino_inventory_dispositionbases.evidenceref",
+    "mulino_inventory_dispositionbases.recordedat",
+    "mulino_inventory_dispositionbases.revision",
+    "mulino_inventory_dispositionbases.state",
+    "mulino_inventory_dispositionbases.validfrom",
+    "mulino_inventory_dispositionbases.validuntil",
     "mulino_inventory_externalidentifiers.createdat",
     "mulino_inventory_externalidentifiers.issuer",
     "mulino_inventory_externalidentifiers.itemid",
@@ -289,6 +454,16 @@
     "mulino_inventory_genealogyedges.revision",
     "mulino_inventory_genealogyedges.uncertain",
     "mulino_inventory_genealogyedges.unit",
+    "mulino_inventory_identifierconflicts.createdat",
+    "mulino_inventory_identifierconflicts.existingidentifierid",
+    "mulino_inventory_identifierconflicts.issuer",
+    "mulino_inventory_identifierconflicts.itemid",
+    "mulino_inventory_identifierconflicts.namespace",
+    "mulino_inventory_identifierconflicts.recordedat",
+    "mulino_inventory_identifierconflicts.revision",
+    "mulino_inventory_identifierconflicts.state",
+    "mulino_inventory_identifierconflicts.validfrom",
+    "mulino_inventory_identifierconflicts.value",
     "mulino_inventory_logisticsmemberships.createdat",
     "mulino_inventory_logisticsmemberships.logisticsunitid",
     "mulino_inventory_logisticsmemberships.recordedat",
@@ -352,12 +527,52 @@
     "mulino_inventory_quantitysegments.revision",
     "mulino_inventory_quantitysegments.unit",
     "mulino_inventory_quantitysegments.validfrom",
+    "mulino_inventory_restrictions.action",
+    "mulino_inventory_restrictions.controlscope",
+    "mulino_inventory_restrictions.createdat",
+    "mulino_inventory_restrictions.decisionid",
+    "mulino_inventory_restrictions.evidenceref",
+    "mulino_inventory_restrictions.recordedat",
+    "mulino_inventory_restrictions.revision",
+    "mulino_inventory_restrictions.state",
+    "mulino_inventory_restrictions.validfrom",
+    "mulino_inventory_segmentallocations.commandid",
+    "mulino_inventory_segmentallocations.createdat",
+    "mulino_inventory_segmentallocations.orderlineid",
+    "mulino_inventory_segmentallocations.quantity",
+    "mulino_inventory_segmentallocations.recordedat",
+    "mulino_inventory_segmentallocations.revision",
+    "mulino_inventory_segmentallocations.rootid",
+    "mulino_inventory_segmentallocations.segmentid",
+    "mulino_inventory_segmentallocations.state",
+    "mulino_inventory_segmentallocations.unit",
     "mulino_inventory_specificationversions.contenthash",
     "mulino_inventory_specificationversions.createdat",
     "mulino_inventory_specificationversions.productid",
     "mulino_inventory_specificationversions.recordedat",
     "mulino_inventory_specificationversions.revision",
     "mulino_inventory_specificationversions.version",
+    "mulino_inventory_stockadjustments.commandid",
+    "mulino_inventory_stockadjustments.createdat",
+    "mulino_inventory_stockadjustments.direction",
+    "mulino_inventory_stockadjustments.evidenceref",
+    "mulino_inventory_stockadjustments.occurredat",
+    "mulino_inventory_stockadjustments.quantity",
+    "mulino_inventory_stockadjustments.reason",
+    "mulino_inventory_stockadjustments.recordedat",
+    "mulino_inventory_stockadjustments.revision",
+    "mulino_inventory_stockadjustments.segmentid",
+    "mulino_inventory_stockadjustments.stocktakeid",
+    "mulino_inventory_stockadjustments.unit",
+    "mulino_inventory_stocktakes.commandid",
+    "mulino_inventory_stocktakes.createdat",
+    "mulino_inventory_stocktakes.evidenceref",
+    "mulino_inventory_stocktakes.observedquantity",
+    "mulino_inventory_stocktakes.occurredat",
+    "mulino_inventory_stocktakes.recordedat",
+    "mulino_inventory_stocktakes.revision",
+    "mulino_inventory_stocktakes.segmentid",
+    "mulino_inventory_stocktakes.unit",
     "mulino_inventory_tradeitems.baseunit",
     "mulino_inventory_tradeitems.createdat",
     "mulino_inventory_tradeitems.decimalplaces",
@@ -377,5 +592,953 @@
     "mulino_inventory_unitconversions.validfrom",
     "mulino_platform_preserved.upgrademarker"
   ],
-  "baseline": "S2 combined V1\u2013V15 candidate; S1 historical inventory retained separately"
+  "baseline": "c88d527",
+  "observedColumnCount": 933,
+  "observedArtifactSha256": "2c548dd92ec360b920d740c08ce1109914d958911921ba06befba39a66542571",
+  "scope": "Observed combined V1–V15 at c88d527. Later recovery fields require a new exact observation; this is not the final S2 gate.",
+  "reviewedAdditions": {
+    "mulino_commands_approvalconsumptions.consumedat": {
+      "migration": "database/migrations/V8__commands.sql",
+      "cds": "backend/db/commands.cds",
+      "timestampWideningReason": "실제 발생·기록·승인·실행 시각을 절대 instant로 보존한다.",
+      "notNullStrengtheningReason": "단일 소비 승인과 실제 원 명령의 연결 및 소비 시점을 보존한다."
+    },
+    "mulino_commands_approvals.decidedat": {
+      "migration": "database/migrations/V8__commands.sql",
+      "cds": "backend/db/commands.cds",
+      "timestampWideningReason": "실제 발생·기록·승인·실행 시각을 절대 instant로 보존한다.",
+      "notNullStrengtheningReason": "승인 내용·scope hash·revision·결정 권한·기간·소비 정책을 모두 결합한다."
+    },
+    "mulino_commands_approvals.expiresat": {
+      "migration": "database/migrations/V8__commands.sql",
+      "cds": "backend/db/commands.cds",
+      "timestampWideningReason": "승인·handover·worker lease 만료를 절대 instant로 판정한다.",
+      "notNullStrengtheningReason": "승인 내용·scope hash·revision·결정 권한·기간·소비 정책을 모두 결합한다."
+    },
+    "mulino_commands_commandaudits.createdat": {
+      "migration": "database/migrations/V8__commands.sql",
+      "cds": "backend/db/commands.cds",
+      "timestampWideningReason": "실제 발생·기록·승인·실행 시각을 절대 instant로 보존한다.",
+      "notNullStrengtheningReason": "실행 주체·원 명령·효과 참조·범위/정책 결정 근거와 결과를 불변 감사로 보존한다."
+    },
+    "mulino_commands_commandrecords.completedat": {
+      "migration": "database/migrations/V8__commands.sql",
+      "cds": "backend/db/commands.cds",
+      "timestampWideningReason": "실제 발생·기록·승인·실행 시각을 절대 instant로 보존한다."
+    },
+    "mulino_commands_commandrecords.createdat": {
+      "migration": "database/migrations/V8__commands.sql",
+      "cds": "backend/db/commands.cds",
+      "timestampWideningReason": "실제 발생·기록·승인·실행 시각을 절대 instant로 보존한다.",
+      "notNullStrengtheningReason": "검증된 주체와 멱등 namespace, 의도 hash·지원 version·거래 상태를 빠짐없이 보존한다."
+    },
+    "mulino_evaluation_inputsnapshots.asof": {
+      "migration": "database/migrations/V11__evaluation.sql",
+      "cds": "backend/db/evaluation.cds",
+      "timestampWideningReason": "판정의 effective/knownAt snapshot을 절대 instant로 보존한다."
+    },
+    "mulino_evaluation_inputsnapshots.knownat": {
+      "migration": "database/migrations/V11__evaluation.sql",
+      "cds": "backend/db/evaluation.cds",
+      "timestampWideningReason": "판정의 effective/knownAt snapshot을 절대 instant로 보존한다."
+    },
+    "mulino_evaluation_inputsnapshots.recordedat": {
+      "migration": "database/migrations/V11__evaluation.sql",
+      "cds": "backend/db/evaluation.cds",
+      "timestampWideningReason": "실제 발생·기록·승인·실행 시각을 절대 instant로 보존한다."
+    },
+    "mulino_evidence_reconciliations.createdat": {
+      "migration": "database/migrations/V15__evidence_commands.sql",
+      "cds": "backend/db/evidence.cds",
+      "timestampWideningReason": "실제 발생·기록·승인·실행 시각을 절대 instant로 보존한다.",
+      "notNullStrengtheningReason": "원 주장·출처·근거 문서·대조 결정 및 담당자·다음 확인을 함께 보존한다."
+    },
+    "mulino_evidence_reconciliations.effectivefrom": {
+      "migration": "database/migrations/V15__evidence_commands.sql",
+      "cds": "backend/db/evidence.cds",
+      "timestampWideningReason": "권한·정책·물량 제한의 유효 경계를 timezone과 무관한 절대 instant로 비교한다.",
+      "notNullStrengtheningReason": "원 주장·출처·근거 문서·대조 결정 및 담당자·다음 확인을 함께 보존한다."
+    },
+    "mulino_evidence_reconciliations.nextcheckat": {
+      "migration": "database/migrations/V15__evidence_commands.sql",
+      "cds": "backend/db/evidence.cds",
+      "timestampWideningReason": "책임·대조·복구의 다음 확인 시점을 절대 instant로 보존한다.",
+      "notNullStrengtheningReason": "원 주장·출처·근거 문서·대조 결정 및 담당자·다음 확인을 함께 보존한다."
+    },
+    "mulino_evidence_reconciliations.recordedat": {
+      "migration": "database/migrations/V15__evidence_commands.sql",
+      "cds": "backend/db/evidence.cds",
+      "timestampWideningReason": "실제 발생·기록·승인·실행 시각을 절대 instant로 보존한다.",
+      "notNullStrengtheningReason": "원 주장·출처·근거 문서·대조 결정 및 담당자·다음 확인을 함께 보존한다."
+    },
+    "mulino_governance_policyapprovals.approvedat": {
+      "migration": "database/migrations/V12__control.sql",
+      "cds": "backend/db/policies.cds",
+      "timestampWideningReason": "실제 발생·기록·승인·실행 시각을 절대 instant로 보존한다.",
+      "notNullStrengtheningReason": "불변 내용 hash와 결정자를 승인 기록에 결합한다."
+    },
+    "mulino_governance_policyboundaries.nextcheckat": {
+      "migration": "database/migrations/V12__control.sql",
+      "cds": "backend/db/policies.cds",
+      "timestampWideningReason": "책임·대조·복구의 다음 확인 시점을 절대 instant로 보존한다.",
+      "notNullStrengtheningReason": "정책 경계와 다음 확인 이유를 scheduler가 재발견할 수 있게 저장한다."
+    },
+    "mulino_governance_policydrafts.effectivefrom": {
+      "migration": "database/migrations/V12__control.sql",
+      "cds": "backend/db/policies.cds",
+      "timestampWideningReason": "권한·정책·물량 제한의 유효 경계를 timezone과 무관한 절대 instant로 비교한다.",
+      "notNullStrengtheningReason": "내용·근거·회귀 증거·상태와 정책 적용 성격을 누락 없이 저장한다."
+    },
+    "mulino_governance_policydrafts.effectiveuntil": {
+      "migration": "database/migrations/V12__control.sql",
+      "cds": "backend/db/policies.cds",
+      "timestampWideningReason": "권한·정책·물량 제한의 유효 경계를 timezone과 무관한 절대 instant로 비교한다."
+    },
+    "mulino_governance_policyversions.createdat": {
+      "migration": "database/migrations/V12__control.sql",
+      "cds": "backend/db/policies.cds",
+      "timestampWideningReason": "실제 발생·기록·승인·실행 시각을 절대 instant로 보존한다."
+    },
+    "mulino_governance_policyversions.effectivefrom": {
+      "migration": "database/migrations/V12__control.sql",
+      "cds": "backend/db/policies.cds",
+      "timestampWideningReason": "권한·정책·물량 제한의 유효 경계를 timezone과 무관한 절대 instant로 비교한다."
+    },
+    "mulino_governance_policyversions.effectiveuntil": {
+      "migration": "database/migrations/V12__control.sql",
+      "cds": "backend/db/policies.cds",
+      "timestampWideningReason": "권한·정책·물량 제한의 유효 경계를 timezone과 무관한 절대 instant로 비교한다."
+    },
+    "mulino_identity_authorityinvalidations.nextcheckat": {
+      "migration": "database/migrations/V12__control.sql",
+      "cds": "backend/db/identity.cds",
+      "timestampWideningReason": "책임·대조·복구의 다음 확인 시점을 절대 instant로 보존한다.",
+      "notNullStrengtheningReason": "권한 변경 대상과 재확인 시점·이유·revision을 보존한다."
+    },
+    "mulino_identity_managementauthorities.revokedat": {
+      "migration": "database/migrations/V12__control.sql",
+      "cds": "backend/db/identity.cds",
+      "timestampWideningReason": "권한·정책·물량 제한의 유효 경계를 timezone과 무관한 절대 instant로 비교한다."
+    },
+    "mulino_identity_managementauthorities.validfrom": {
+      "migration": "database/migrations/V12__control.sql",
+      "cds": "backend/db/identity.cds",
+      "timestampWideningReason": "권한·정책·물량 제한의 유효 경계를 timezone과 무관한 절대 instant로 비교한다.",
+      "notNullStrengtheningReason": "현재 관리 권한의 actor·capability·scope·기간·revision을 보존한다."
+    },
+    "mulino_identity_managementauthorities.validuntil": {
+      "migration": "database/migrations/V12__control.sql",
+      "cds": "backend/db/identity.cds",
+      "timestampWideningReason": "권한·정책·물량 제한의 유효 경계를 timezone과 무관한 절대 instant로 비교한다.",
+      "notNullStrengtheningReason": "현재 관리 권한의 actor·capability·scope·기간·revision을 보존한다."
+    },
+    "mulino_inventory_dispositionbases.createdat": {
+      "migration": "database/migrations/V14__inventory_commands.sql",
+      "cds": "backend/db/inventory.cds",
+      "timestampWideningReason": "실제 발생·기록·승인·실행 시각을 절대 instant로 보존한다.",
+      "notNullStrengtheningReason": "행동별 처분 허용의 scope·근거·결정·기간·상태를 보존한다."
+    },
+    "mulino_inventory_dispositionbases.recordedat": {
+      "migration": "database/migrations/V14__inventory_commands.sql",
+      "cds": "backend/db/inventory.cds",
+      "timestampWideningReason": "실제 발생·기록·승인·실행 시각을 절대 instant로 보존한다.",
+      "notNullStrengtheningReason": "행동별 처분 허용의 scope·근거·결정·기간·상태를 보존한다."
+    },
+    "mulino_inventory_dispositionbases.validfrom": {
+      "migration": "database/migrations/V14__inventory_commands.sql",
+      "cds": "backend/db/inventory.cds",
+      "timestampWideningReason": "권한·정책·물량 제한의 유효 경계를 timezone과 무관한 절대 instant로 비교한다.",
+      "notNullStrengtheningReason": "행동별 처분 허용의 scope·근거·결정·기간·상태를 보존한다."
+    },
+    "mulino_inventory_dispositionbases.validuntil": {
+      "migration": "database/migrations/V14__inventory_commands.sql",
+      "cds": "backend/db/inventory.cds",
+      "timestampWideningReason": "권한·정책·물량 제한의 유효 경계를 timezone과 무관한 절대 instant로 비교한다.",
+      "notNullStrengtheningReason": "행동별 처분 허용의 scope·근거·결정·기간·상태를 보존한다."
+    },
+    "mulino_inventory_identifierconflicts.createdat": {
+      "migration": "database/migrations/V14__inventory_commands.sql",
+      "cds": "backend/db/inventory.cds",
+      "timestampWideningReason": "실제 발생·기록·승인·실행 시각을 절대 instant로 보존한다.",
+      "notNullStrengtheningReason": "기존 외부 식별자와 충돌한 품목·namespace·값·시점을 보존한다."
+    },
+    "mulino_inventory_identifierconflicts.recordedat": {
+      "migration": "database/migrations/V14__inventory_commands.sql",
+      "cds": "backend/db/inventory.cds",
+      "timestampWideningReason": "실제 발생·기록·승인·실행 시각을 절대 instant로 보존한다.",
+      "notNullStrengtheningReason": "기존 외부 식별자와 충돌한 품목·namespace·값·시점을 보존한다."
+    },
+    "mulino_inventory_identifierconflicts.validfrom": {
+      "migration": "database/migrations/V14__inventory_commands.sql",
+      "cds": "backend/db/inventory.cds",
+      "timestampWideningReason": "권한·정책·물량 제한의 유효 경계를 timezone과 무관한 절대 instant로 비교한다.",
+      "notNullStrengtheningReason": "기존 외부 식별자와 충돌한 품목·namespace·값·시점을 보존한다."
+    },
+    "mulino_inventory_identifierconflicts.validuntil": {
+      "migration": "database/migrations/V14__inventory_commands.sql",
+      "cds": "backend/db/inventory.cds",
+      "timestampWideningReason": "권한·정책·물량 제한의 유효 경계를 timezone과 무관한 절대 instant로 비교한다."
+    },
+    "mulino_inventory_restrictions.createdat": {
+      "migration": "database/migrations/V14__inventory_commands.sql",
+      "cds": "backend/db/inventory.cds",
+      "timestampWideningReason": "실제 발생·기록·승인·실행 시각을 절대 instant로 보존한다.",
+      "notNullStrengtheningReason": "행동별 제한의 scope·근거·결정·기간·상태를 보존한다."
+    },
+    "mulino_inventory_restrictions.recordedat": {
+      "migration": "database/migrations/V14__inventory_commands.sql",
+      "cds": "backend/db/inventory.cds",
+      "timestampWideningReason": "실제 발생·기록·승인·실행 시각을 절대 instant로 보존한다.",
+      "notNullStrengtheningReason": "행동별 제한의 scope·근거·결정·기간·상태를 보존한다."
+    },
+    "mulino_inventory_restrictions.validfrom": {
+      "migration": "database/migrations/V14__inventory_commands.sql",
+      "cds": "backend/db/inventory.cds",
+      "timestampWideningReason": "권한·정책·물량 제한의 유효 경계를 timezone과 무관한 절대 instant로 비교한다.",
+      "notNullStrengtheningReason": "행동별 제한의 scope·근거·결정·기간·상태를 보존한다."
+    },
+    "mulino_inventory_restrictions.validuntil": {
+      "migration": "database/migrations/V14__inventory_commands.sql",
+      "cds": "backend/db/inventory.cds",
+      "timestampWideningReason": "권한·정책·물량 제한의 유효 경계를 timezone과 무관한 절대 instant로 비교한다."
+    },
+    "mulino_inventory_segmentallocations.createdat": {
+      "migration": "database/migrations/V14__inventory_commands.sql",
+      "cds": "backend/db/inventory.cds",
+      "timestampWideningReason": "실제 발생·기록·승인·실행 시각을 절대 instant로 보존한다.",
+      "notNullStrengtheningReason": "배분의 수량·단위·원 segment·주문·원 명령·상태를 함께 보존한다."
+    },
+    "mulino_inventory_segmentallocations.recordedat": {
+      "migration": "database/migrations/V14__inventory_commands.sql",
+      "cds": "backend/db/inventory.cds",
+      "timestampWideningReason": "실제 발생·기록·승인·실행 시각을 절대 instant로 보존한다.",
+      "notNullStrengtheningReason": "배분의 수량·단위·원 segment·주문·원 명령·상태를 함께 보존한다."
+    },
+    "mulino_inventory_stockadjustments.createdat": {
+      "migration": "database/migrations/V14__inventory_commands.sql",
+      "cds": "backend/db/inventory.cds",
+      "timestampWideningReason": "실제 발생·기록·승인·실행 시각을 절대 instant로 보존한다.",
+      "notNullStrengtheningReason": "원 실사와 segment·증감 방향·수량·단위·근거·원 명령을 연결한다."
+    },
+    "mulino_inventory_stockadjustments.occurredat": {
+      "migration": "database/migrations/V14__inventory_commands.sql",
+      "cds": "backend/db/inventory.cds",
+      "timestampWideningReason": "실제 발생·기록·승인·실행 시각을 절대 instant로 보존한다.",
+      "notNullStrengtheningReason": "원 실사와 segment·증감 방향·수량·단위·근거·원 명령을 연결한다."
+    },
+    "mulino_inventory_stockadjustments.recordedat": {
+      "migration": "database/migrations/V14__inventory_commands.sql",
+      "cds": "backend/db/inventory.cds",
+      "timestampWideningReason": "실제 발생·기록·승인·실행 시각을 절대 instant로 보존한다.",
+      "notNullStrengtheningReason": "원 실사와 segment·증감 방향·수량·단위·근거·원 명령을 연결한다."
+    },
+    "mulino_inventory_stocktakes.createdat": {
+      "migration": "database/migrations/V14__inventory_commands.sql",
+      "cds": "backend/db/inventory.cds",
+      "timestampWideningReason": "실제 발생·기록·승인·실행 시각을 절대 instant로 보존한다.",
+      "notNullStrengtheningReason": "관측 수량·단위·원 segment·근거·실제/기록 시점·원 명령을 연결한다."
+    },
+    "mulino_inventory_stocktakes.occurredat": {
+      "migration": "database/migrations/V14__inventory_commands.sql",
+      "cds": "backend/db/inventory.cds",
+      "timestampWideningReason": "실제 발생·기록·승인·실행 시각을 절대 instant로 보존한다.",
+      "notNullStrengtheningReason": "관측 수량·단위·원 segment·근거·실제/기록 시점·원 명령을 연결한다."
+    },
+    "mulino_inventory_stocktakes.recordedat": {
+      "migration": "database/migrations/V14__inventory_commands.sql",
+      "cds": "backend/db/inventory.cds",
+      "timestampWideningReason": "실제 발생·기록·승인·실행 시각을 절대 instant로 보존한다.",
+      "notNullStrengtheningReason": "관측 수량·단위·원 segment·근거·실제/기록 시점·원 명령을 연결한다."
+    },
+    "mulino_responsibility_handovers.createdat": {
+      "migration": "database/migrations/V10__responsibility.sql",
+      "cds": "backend/db/responsibility.cds",
+      "timestampWideningReason": "실제 발생·기록·승인·실행 시각을 절대 instant로 보존한다."
+    },
+    "mulino_responsibility_handovers.expiresat": {
+      "migration": "database/migrations/V10__responsibility.sql",
+      "cds": "backend/db/responsibility.cds",
+      "timestampWideningReason": "승인·handover·worker lease 만료를 절대 instant로 판정한다."
+    },
+    "mulino_responsibility_handovers.nextcheckat": {
+      "migration": "database/migrations/V10__responsibility.sql",
+      "cds": "backend/db/responsibility.cds",
+      "timestampWideningReason": "책임·대조·복구의 다음 확인 시점을 절대 instant로 보존한다."
+    },
+    "mulino_responsibility_handovers.recordedat": {
+      "migration": "database/migrations/V10__responsibility.sql",
+      "cds": "backend/db/responsibility.cds",
+      "timestampWideningReason": "실제 발생·기록·승인·실행 시각을 절대 instant로 보존한다."
+    },
+    "mulino_responsibility_roots.createdat": {
+      "migration": "database/migrations/V10__responsibility.sql",
+      "cds": "backend/db/responsibility.cds",
+      "timestampWideningReason": "실제 발생·기록·승인·실행 시각을 절대 instant로 보존한다."
+    },
+    "mulino_responsibility_roots.recordedat": {
+      "migration": "database/migrations/V10__responsibility.sql",
+      "cds": "backend/db/responsibility.cds",
+      "timestampWideningReason": "실제 발생·기록·승인·실행 시각을 절대 instant로 보존한다."
+    },
+    "mulino_responsibility_scopes.createdat": {
+      "migration": "database/migrations/V10__responsibility.sql",
+      "cds": "backend/db/responsibility.cds",
+      "timestampWideningReason": "실제 발생·기록·승인·실행 시각을 절대 instant로 보존한다."
+    },
+    "mulino_responsibility_scopes.recordedat": {
+      "migration": "database/migrations/V10__responsibility.sql",
+      "cds": "backend/db/responsibility.cds",
+      "timestampWideningReason": "실제 발생·기록·승인·실행 시각을 절대 instant로 보존한다."
+    },
+    "mulino_runtime_executionattempts.finishedat": {
+      "migration": "database/migrations/V13__runtime.sql",
+      "cds": "backend/db/runtime.cds",
+      "timestampWideningReason": "실제 발생·기록·승인·실행 시각을 절대 instant로 보존한다."
+    },
+    "mulino_runtime_executionattempts.heartbeatat": {
+      "migration": "database/migrations/V13__runtime.sql",
+      "cds": "backend/db/runtime.cds",
+      "timestampWideningReason": "실제 발생·기록·승인·실행 시각을 절대 instant로 보존한다."
+    },
+    "mulino_runtime_executionattempts.leaseexpiresat": {
+      "migration": "database/migrations/V13__runtime.sql",
+      "cds": "backend/db/runtime.cds",
+      "timestampWideningReason": "승인·handover·worker lease 만료를 절대 instant로 판정한다."
+    },
+    "mulino_runtime_executionattempts.startedat": {
+      "migration": "database/migrations/V13__runtime.sql",
+      "cds": "backend/db/runtime.cds",
+      "timestampWideningReason": "실제 발생·기록·승인·실행 시각을 절대 instant로 보존한다."
+    },
+    "mulino_runtime_externalreconciliations.recordedat": {
+      "migration": "database/migrations/V13__runtime.sql",
+      "cds": "backend/db/runtime.cds",
+      "timestampWideningReason": "실제 발생·기록·승인·실행 시각을 절대 instant로 보존한다."
+    },
+    "mulino_runtime_outbox.createdat": {
+      "migration": "database/migrations/V13__runtime.sql",
+      "cds": "backend/db/runtime.cds",
+      "timestampWideningReason": "실제 발생·기록·승인·실행 시각을 절대 instant로 보존한다."
+    },
+    "mulino_runtime_outbox.leaseexpiresat": {
+      "migration": "database/migrations/V13__runtime.sql",
+      "cds": "backend/db/runtime.cds",
+      "timestampWideningReason": "승인·handover·worker lease 만료를 절대 instant로 판정한다."
+    },
+    "mulino_runtime_outbox.nextcheckat": {
+      "migration": "database/migrations/V13__runtime.sql",
+      "cds": "backend/db/runtime.cds",
+      "timestampWideningReason": "책임·대조·복구의 다음 확인 시점을 절대 instant로 보존한다."
+    },
+    "mulino_runtime_recoveryschedules.nextcheckat": {
+      "migration": "database/migrations/V13__runtime.sql",
+      "cds": "backend/db/runtime.cds",
+      "timestampWideningReason": "책임·대조·복구의 다음 확인 시점을 절대 instant로 보존한다."
+    },
+    "mulino_runtime_recoveryschedules.nextvalidityboundary": {
+      "migration": "database/migrations/V13__runtime.sql",
+      "cds": "backend/db/runtime.cds",
+      "timestampWideningReason": "권한·정책·물량 제한의 유효 경계를 timezone과 무관한 절대 instant로 비교한다."
+    },
+    "mulino_work_read_assessmentreferences.asof": {
+      "migration": "database/migrations/V11__evaluation.sql",
+      "cds": "backend/db/work-read.cds",
+      "timestampWideningReason": "판정의 effective/knownAt snapshot을 절대 instant로 보존한다."
+    },
+    "mulino_work_read_assessmentreferences.knownat": {
+      "migration": "database/migrations/V11__evaluation.sql",
+      "cds": "backend/db/work-read.cds",
+      "timestampWideningReason": "판정의 effective/knownAt snapshot을 절대 instant로 보존한다."
+    },
+    "mulino_work_read_goalreferences.dueat": {
+      "migration": "database/migrations/V9__work.sql",
+      "cds": "backend/db/work-read.cds",
+      "timestampWideningReason": "목표 기한의 절대 instant와 별도 시간대·끝점 의미를 보존한다."
+    },
+    "mulino_work_workcontributions.recordedat": {
+      "migration": "database/migrations/V9__work.sql",
+      "cds": "backend/db/work.cds",
+      "timestampWideningReason": "실제 발생·기록·승인·실행 시각을 절대 instant로 보존한다."
+    },
+    "mulino_work_worklinks.createdat": {
+      "migration": "database/migrations/V9__work.sql",
+      "cds": "backend/db/work.cds",
+      "timestampWideningReason": "실제 발생·기록·승인·실행 시각을 절대 instant로 보존한다."
+    },
+    "mulino_work_worktransitions.recordedat": {
+      "migration": "database/migrations/V9__work.sql",
+      "cds": "backend/db/work.cds",
+      "timestampWideningReason": "실제 발생·기록·승인·실행 시각을 절대 instant로 보존한다."
+    },
+    "mulino_commands_approvalconsumptions.approvalid": {
+      "migration": "database/migrations/V8__commands.sql",
+      "cds": "backend/db/commands.cds",
+      "notNullStrengtheningReason": "단일 소비 승인과 실제 원 명령의 연결 및 소비 시점을 보존한다."
+    },
+    "mulino_commands_approvalconsumptions.commandid": {
+      "migration": "database/migrations/V8__commands.sql",
+      "cds": "backend/db/commands.cds",
+      "notNullStrengtheningReason": "단일 소비 승인과 실제 원 명령의 연결 및 소비 시점을 보존한다."
+    },
+    "mulino_commands_approvalconsumptions.organizationid": {
+      "migration": "database/migrations/V8__commands.sql",
+      "cds": "backend/db/commands.cds",
+      "notNullStrengtheningReason": "단일 소비 승인과 실제 원 명령의 연결 및 소비 시점을 보존한다."
+    },
+    "mulino_commands_approvals.action": {
+      "migration": "database/migrations/V8__commands.sql",
+      "cds": "backend/db/commands.cds",
+      "notNullStrengtheningReason": "승인 내용·scope hash·revision·결정 권한·기간·소비 정책을 모두 결합한다."
+    },
+    "mulino_commands_approvals.approverid": {
+      "migration": "database/migrations/V8__commands.sql",
+      "cds": "backend/db/commands.cds",
+      "notNullStrengtheningReason": "승인 내용·scope hash·revision·결정 권한·기간·소비 정책을 모두 결합한다."
+    },
+    "mulino_commands_approvals.canonicalhash": {
+      "migration": "database/migrations/V8__commands.sql",
+      "cds": "backend/db/commands.cds",
+      "notNullStrengtheningReason": "승인 내용·scope hash·revision·결정 권한·기간·소비 정책을 모두 결합한다."
+    },
+    "mulino_commands_approvals.decision": {
+      "migration": "database/migrations/V8__commands.sql",
+      "cds": "backend/db/commands.cds",
+      "notNullStrengtheningReason": "승인 내용·scope hash·revision·결정 권한·기간·소비 정책을 모두 결합한다."
+    },
+    "mulino_commands_approvals.decisioncapability": {
+      "migration": "database/migrations/V8__commands.sql",
+      "cds": "backend/db/commands.cds",
+      "notNullStrengtheningReason": "승인 내용·scope hash·revision·결정 권한·기간·소비 정책을 모두 결합한다."
+    },
+    "mulino_commands_approvals.organizationid": {
+      "migration": "database/migrations/V8__commands.sql",
+      "cds": "backend/db/commands.cds",
+      "notNullStrengtheningReason": "승인 내용·scope hash·revision·결정 권한·기간·소비 정책을 모두 결합한다."
+    },
+    "mulino_commands_approvals.policyhash": {
+      "migration": "database/migrations/V8__commands.sql",
+      "cds": "backend/db/commands.cds",
+      "notNullStrengtheningReason": "승인 내용·scope hash·revision·결정 권한·기간·소비 정책을 모두 결합한다."
+    },
+    "mulino_commands_approvals.proposalid": {
+      "migration": "database/migrations/V8__commands.sql",
+      "cds": "backend/db/commands.cds",
+      "notNullStrengtheningReason": "승인 내용·scope hash·revision·결정 권한·기간·소비 정책을 모두 결합한다."
+    },
+    "mulino_commands_approvals.proposalrevision": {
+      "migration": "database/migrations/V8__commands.sql",
+      "cds": "backend/db/commands.cds",
+      "notNullStrengtheningReason": "승인 내용·scope hash·revision·결정 권한·기간·소비 정책을 모두 결합한다."
+    },
+    "mulino_commands_approvals.scopehash": {
+      "migration": "database/migrations/V8__commands.sql",
+      "cds": "backend/db/commands.cds",
+      "notNullStrengtheningReason": "승인 내용·scope hash·revision·결정 권한·기간·소비 정책을 모두 결합한다."
+    },
+    "mulino_commands_approvals.singleuse": {
+      "migration": "database/migrations/V8__commands.sql",
+      "cds": "backend/db/commands.cds",
+      "notNullStrengtheningReason": "승인 내용·scope hash·revision·결정 권한·기간·소비 정책을 모두 결합한다."
+    },
+    "mulino_commands_commandaudits.actorid": {
+      "migration": "database/migrations/V8__commands.sql",
+      "cds": "backend/db/commands.cds",
+      "notNullStrengtheningReason": "실행 주체·원 명령·효과 참조·범위/정책 결정 근거와 결과를 불변 감사로 보존한다."
+    },
+    "mulino_commands_commandaudits.auditfactsjson": {
+      "migration": "database/migrations/V8__commands.sql",
+      "cds": "backend/db/commands.cds",
+      "notNullStrengtheningReason": "실행 주체·원 명령·효과 참조·범위/정책 결정 근거와 결과를 불변 감사로 보존한다."
+    },
+    "mulino_commands_commandaudits.canonicalhash": {
+      "migration": "database/migrations/V8__commands.sql",
+      "cds": "backend/db/commands.cds",
+      "notNullStrengtheningReason": "실행 주체·원 명령·효과 참조·범위/정책 결정 근거와 결과를 불변 감사로 보존한다."
+    },
+    "mulino_commands_commandaudits.capabilityid": {
+      "migration": "database/migrations/V8__commands.sql",
+      "cds": "backend/db/commands.cds",
+      "notNullStrengtheningReason": "실행 주체·원 명령·효과 참조·범위/정책 결정 근거와 결과를 불변 감사로 보존한다."
+    },
+    "mulino_commands_commandaudits.commandid": {
+      "migration": "database/migrations/V8__commands.sql",
+      "cds": "backend/db/commands.cds",
+      "notNullStrengtheningReason": "실행 주체·원 명령·효과 참조·범위/정책 결정 근거와 결과를 불변 감사로 보존한다."
+    },
+    "mulino_commands_commandaudits.effectrefs": {
+      "migration": "database/migrations/V8__commands.sql",
+      "cds": "backend/db/commands.cds",
+      "notNullStrengtheningReason": "실행 주체·원 명령·효과 참조·범위/정책 결정 근거와 결과를 불변 감사로 보존한다."
+    },
+    "mulino_commands_commandaudits.organizationid": {
+      "migration": "database/migrations/V8__commands.sql",
+      "cds": "backend/db/commands.cds",
+      "notNullStrengtheningReason": "실행 주체·원 명령·효과 참조·범위/정책 결정 근거와 결과를 불변 감사로 보존한다."
+    },
+    "mulino_commands_commandaudits.outcome": {
+      "migration": "database/migrations/V8__commands.sql",
+      "cds": "backend/db/commands.cds",
+      "notNullStrengtheningReason": "실행 주체·원 명령·효과 참조·범위/정책 결정 근거와 결과를 불변 감사로 보존한다."
+    },
+    "mulino_commands_commandrecords.actorid": {
+      "migration": "database/migrations/V8__commands.sql",
+      "cds": "backend/db/commands.cds",
+      "notNullStrengtheningReason": "검증된 주체와 멱등 namespace, 의도 hash·지원 version·거래 상태를 빠짐없이 보존한다."
+    },
+    "mulino_commands_commandrecords.canonicalhash": {
+      "migration": "database/migrations/V8__commands.sql",
+      "cds": "backend/db/commands.cds",
+      "notNullStrengtheningReason": "검증된 주체와 멱등 namespace, 의도 hash·지원 version·거래 상태를 빠짐없이 보존한다."
+    },
+    "mulino_commands_commandrecords.capabilityid": {
+      "migration": "database/migrations/V8__commands.sql",
+      "cds": "backend/db/commands.cds",
+      "notNullStrengtheningReason": "검증된 주체와 멱등 namespace, 의도 hash·지원 version·거래 상태를 빠짐없이 보존한다."
+    },
+    "mulino_commands_commandrecords.capabilityversion": {
+      "migration": "database/migrations/V8__commands.sql",
+      "cds": "backend/db/commands.cds",
+      "notNullStrengtheningReason": "검증된 주체와 멱등 namespace, 의도 hash·지원 version·거래 상태를 빠짐없이 보존한다."
+    },
+    "mulino_commands_commandrecords.commandidempotencykey": {
+      "migration": "database/migrations/V8__commands.sql",
+      "cds": "backend/db/commands.cds",
+      "notNullStrengtheningReason": "검증된 주체와 멱등 namespace, 의도 hash·지원 version·거래 상태를 빠짐없이 보존한다."
+    },
+    "mulino_commands_commandrecords.definitionversion": {
+      "migration": "database/migrations/V8__commands.sql",
+      "cds": "backend/db/commands.cds",
+      "notNullStrengtheningReason": "검증된 주체와 멱등 namespace, 의도 hash·지원 version·거래 상태를 빠짐없이 보존한다."
+    },
+    "mulino_commands_commandrecords.organizationid": {
+      "migration": "database/migrations/V8__commands.sql",
+      "cds": "backend/db/commands.cds",
+      "notNullStrengtheningReason": "검증된 주체와 멱등 namespace, 의도 hash·지원 version·거래 상태를 빠짐없이 보존한다."
+    },
+    "mulino_commands_commandrecords.stablerequestowner": {
+      "migration": "database/migrations/V8__commands.sql",
+      "cds": "backend/db/commands.cds",
+      "notNullStrengtheningReason": "검증된 주체와 멱등 namespace, 의도 hash·지원 version·거래 상태를 빠짐없이 보존한다."
+    },
+    "mulino_commands_commandrecords.state": {
+      "migration": "database/migrations/V8__commands.sql",
+      "cds": "backend/db/commands.cds",
+      "notNullStrengtheningReason": "검증된 주체와 멱등 namespace, 의도 hash·지원 version·거래 상태를 빠짐없이 보존한다."
+    },
+    "mulino_evidence_reconciliations.basisdocumentid": {
+      "migration": "database/migrations/V15__evidence_commands.sql",
+      "cds": "backend/db/evidence.cds",
+      "notNullStrengtheningReason": "원 주장·출처·근거 문서·대조 결정 및 담당자·다음 확인을 함께 보존한다."
+    },
+    "mulino_evidence_reconciliations.claimid": {
+      "migration": "database/migrations/V15__evidence_commands.sql",
+      "cds": "backend/db/evidence.cds",
+      "notNullStrengtheningReason": "원 주장·출처·근거 문서·대조 결정 및 담당자·다음 확인을 함께 보존한다."
+    },
+    "mulino_evidence_reconciliations.decision": {
+      "migration": "database/migrations/V15__evidence_commands.sql",
+      "cds": "backend/db/evidence.cds",
+      "notNullStrengtheningReason": "원 주장·출처·근거 문서·대조 결정 및 담당자·다음 확인을 함께 보존한다."
+    },
+    "mulino_evidence_reconciliations.intakeownerid": {
+      "migration": "database/migrations/V15__evidence_commands.sql",
+      "cds": "backend/db/evidence.cds",
+      "notNullStrengtheningReason": "원 주장·출처·근거 문서·대조 결정 및 담당자·다음 확인을 함께 보존한다."
+    },
+    "mulino_evidence_reconciliations.nextaction": {
+      "migration": "database/migrations/V15__evidence_commands.sql",
+      "cds": "backend/db/evidence.cds",
+      "notNullStrengtheningReason": "원 주장·출처·근거 문서·대조 결정 및 담당자·다음 확인을 함께 보존한다."
+    },
+    "mulino_evidence_reconciliations.organizationid": {
+      "migration": "database/migrations/V15__evidence_commands.sql",
+      "cds": "backend/db/evidence.cds",
+      "notNullStrengtheningReason": "원 주장·출처·근거 문서·대조 결정 및 담당자·다음 확인을 함께 보존한다."
+    },
+    "mulino_evidence_reconciliations.policyversion": {
+      "migration": "database/migrations/V15__evidence_commands.sql",
+      "cds": "backend/db/evidence.cds",
+      "notNullStrengtheningReason": "원 주장·출처·근거 문서·대조 결정 및 담당자·다음 확인을 함께 보존한다."
+    },
+    "mulino_evidence_reconciliations.reason": {
+      "migration": "database/migrations/V15__evidence_commands.sql",
+      "cds": "backend/db/evidence.cds",
+      "notNullStrengtheningReason": "원 주장·출처·근거 문서·대조 결정 및 담당자·다음 확인을 함께 보존한다."
+    },
+    "mulino_evidence_reconciliations.recordedby": {
+      "migration": "database/migrations/V15__evidence_commands.sql",
+      "cds": "backend/db/evidence.cds",
+      "notNullStrengtheningReason": "원 주장·출처·근거 문서·대조 결정 및 담당자·다음 확인을 함께 보존한다."
+    },
+    "mulino_evidence_reconciliations.revision": {
+      "migration": "database/migrations/V15__evidence_commands.sql",
+      "cds": "backend/db/evidence.cds",
+      "notNullStrengtheningReason": "원 주장·출처·근거 문서·대조 결정 및 담당자·다음 확인을 함께 보존한다."
+    },
+    "mulino_evidence_reconciliations.sourceidentity": {
+      "migration": "database/migrations/V15__evidence_commands.sql",
+      "cds": "backend/db/evidence.cds",
+      "notNullStrengtheningReason": "원 주장·출처·근거 문서·대조 결정 및 담당자·다음 확인을 함께 보존한다."
+    },
+    "mulino_evidence_reconciliations.sourceprofileid": {
+      "migration": "database/migrations/V15__evidence_commands.sql",
+      "cds": "backend/db/evidence.cds",
+      "notNullStrengtheningReason": "원 주장·출처·근거 문서·대조 결정 및 담당자·다음 확인을 함께 보존한다."
+    },
+    "mulino_evidence_reconciliations.subjectid": {
+      "migration": "database/migrations/V15__evidence_commands.sql",
+      "cds": "backend/db/evidence.cds",
+      "notNullStrengtheningReason": "원 주장·출처·근거 문서·대조 결정 및 담당자·다음 확인을 함께 보존한다."
+    },
+    "mulino_evidence_reconciliations.subjectkind": {
+      "migration": "database/migrations/V15__evidence_commands.sql",
+      "cds": "backend/db/evidence.cds",
+      "notNullStrengtheningReason": "원 주장·출처·근거 문서·대조 결정 및 담당자·다음 확인을 함께 보존한다."
+    },
+    "mulino_evidence_reconciliations.supervisorid": {
+      "migration": "database/migrations/V15__evidence_commands.sql",
+      "cds": "backend/db/evidence.cds",
+      "notNullStrengtheningReason": "원 주장·출처·근거 문서·대조 결정 및 담당자·다음 확인을 함께 보존한다."
+    },
+    "mulino_governance_activepolicies.policyid": {
+      "migration": "database/migrations/V12__control.sql",
+      "cds": "backend/db/policies.cds",
+      "notNullStrengtheningReason": "활성 정책 포인터와 revision을 함께 저장한다."
+    },
+    "mulino_governance_activepolicies.revision": {
+      "migration": "database/migrations/V12__control.sql",
+      "cds": "backend/db/policies.cds",
+      "notNullStrengtheningReason": "활성 정책 포인터와 revision을 함께 저장한다."
+    },
+    "mulino_governance_policyapprovals.approverid": {
+      "migration": "database/migrations/V12__control.sql",
+      "cds": "backend/db/policies.cds",
+      "notNullStrengtheningReason": "불변 내용 hash와 결정자를 승인 기록에 결합한다."
+    },
+    "mulino_governance_policyapprovals.contenthash": {
+      "migration": "database/migrations/V12__control.sql",
+      "cds": "backend/db/policies.cds",
+      "notNullStrengtheningReason": "불변 내용 hash와 결정자를 승인 기록에 결합한다."
+    },
+    "mulino_governance_policyapprovals.draftid": {
+      "migration": "database/migrations/V12__control.sql",
+      "cds": "backend/db/policies.cds",
+      "notNullStrengtheningReason": "불변 내용 hash와 결정자를 승인 기록에 결합한다."
+    },
+    "mulino_governance_policyboundaries.policyid": {
+      "migration": "database/migrations/V12__control.sql",
+      "cds": "backend/db/policies.cds",
+      "notNullStrengtheningReason": "정책 경계와 다음 확인 이유를 scheduler가 재발견할 수 있게 저장한다."
+    },
+    "mulino_governance_policyboundaries.reason": {
+      "migration": "database/migrations/V12__control.sql",
+      "cds": "backend/db/policies.cds",
+      "notNullStrengtheningReason": "정책 경계와 다음 확인 이유를 scheduler가 재발견할 수 있게 저장한다."
+    },
+    "mulino_governance_policydrafts.content": {
+      "migration": "database/migrations/V12__control.sql",
+      "cds": "backend/db/policies.cds",
+      "notNullStrengtheningReason": "내용·근거·회귀 증거·상태와 정책 적용 성격을 누락 없이 저장한다."
+    },
+    "mulino_governance_policydrafts.contenthash": {
+      "migration": "database/migrations/V12__control.sql",
+      "cds": "backend/db/policies.cds",
+      "notNullStrengtheningReason": "내용·근거·회귀 증거·상태와 정책 적용 성격을 누락 없이 저장한다."
+    },
+    "mulino_governance_policydrafts.fixtureonly": {
+      "migration": "database/migrations/V12__control.sql",
+      "cds": "backend/db/policies.cds",
+      "notNullStrengtheningReason": "내용·근거·회귀 증거·상태와 정책 적용 성격을 누락 없이 저장한다."
+    },
+    "mulino_governance_policydrafts.kind": {
+      "migration": "database/migrations/V12__control.sql",
+      "cds": "backend/db/policies.cds",
+      "notNullStrengtheningReason": "내용·근거·회귀 증거·상태와 정책 적용 성격을 누락 없이 저장한다."
+    },
+    "mulino_governance_policydrafts.legallyrestrictive": {
+      "migration": "database/migrations/V12__control.sql",
+      "cds": "backend/db/policies.cds",
+      "notNullStrengtheningReason": "내용·근거·회귀 증거·상태와 정책 적용 성격을 누락 없이 저장한다."
+    },
+    "mulino_governance_policydrafts.regressionevidence": {
+      "migration": "database/migrations/V12__control.sql",
+      "cds": "backend/db/policies.cds",
+      "notNullStrengtheningReason": "내용·근거·회귀 증거·상태와 정책 적용 성격을 누락 없이 저장한다."
+    },
+    "mulino_governance_policydrafts.revision": {
+      "migration": "database/migrations/V12__control.sql",
+      "cds": "backend/db/policies.cds",
+      "notNullStrengtheningReason": "내용·근거·회귀 증거·상태와 정책 적용 성격을 누락 없이 저장한다."
+    },
+    "mulino_governance_policydrafts.source": {
+      "migration": "database/migrations/V12__control.sql",
+      "cds": "backend/db/policies.cds",
+      "notNullStrengtheningReason": "내용·근거·회귀 증거·상태와 정책 적용 성격을 누락 없이 저장한다."
+    },
+    "mulino_governance_policydrafts.status": {
+      "migration": "database/migrations/V12__control.sql",
+      "cds": "backend/db/policies.cds",
+      "notNullStrengtheningReason": "내용·근거·회귀 증거·상태와 정책 적용 성격을 누락 없이 저장한다."
+    },
+    "mulino_governance_policydrafts.version": {
+      "migration": "database/migrations/V12__control.sql",
+      "cds": "backend/db/policies.cds",
+      "notNullStrengtheningReason": "내용·근거·회귀 증거·상태와 정책 적용 성격을 누락 없이 저장한다."
+    },
+    "mulino_governance_policyfences.revision": {
+      "migration": "database/migrations/V12__control.sql",
+      "cds": "backend/db/policies.cds",
+      "notNullStrengtheningReason": "정책 변경과 실행을 직렬화할 revision을 보존한다."
+    },
+    "mulino_identity_authorityinvalidations.actorid": {
+      "migration": "database/migrations/V12__control.sql",
+      "cds": "backend/db/identity.cds",
+      "notNullStrengtheningReason": "권한 변경 대상과 재확인 시점·이유·revision을 보존한다."
+    },
+    "mulino_identity_authorityinvalidations.reason": {
+      "migration": "database/migrations/V12__control.sql",
+      "cds": "backend/db/identity.cds",
+      "notNullStrengtheningReason": "권한 변경 대상과 재확인 시점·이유·revision을 보존한다."
+    },
+    "mulino_identity_authorityinvalidations.revision": {
+      "migration": "database/migrations/V12__control.sql",
+      "cds": "backend/db/identity.cds",
+      "notNullStrengtheningReason": "권한 변경 대상과 재확인 시점·이유·revision을 보존한다."
+    },
+    "mulino_identity_managementauthorities.actorid": {
+      "migration": "database/migrations/V12__control.sql",
+      "cds": "backend/db/identity.cds",
+      "notNullStrengtheningReason": "현재 관리 권한의 actor·capability·scope·기간·revision을 보존한다."
+    },
+    "mulino_identity_managementauthorities.capabilityid": {
+      "migration": "database/migrations/V12__control.sql",
+      "cds": "backend/db/identity.cds",
+      "notNullStrengtheningReason": "현재 관리 권한의 actor·capability·scope·기간·revision을 보존한다."
+    },
+    "mulino_identity_managementauthorities.revision": {
+      "migration": "database/migrations/V12__control.sql",
+      "cds": "backend/db/identity.cds",
+      "notNullStrengtheningReason": "현재 관리 권한의 actor·capability·scope·기간·revision을 보존한다."
+    },
+    "mulino_identity_managementauthorities.scopeid": {
+      "migration": "database/migrations/V12__control.sql",
+      "cds": "backend/db/identity.cds",
+      "notNullStrengtheningReason": "현재 관리 권한의 actor·capability·scope·기간·revision을 보존한다."
+    },
+    "mulino_identity_managementauthorities.scopekind": {
+      "migration": "database/migrations/V12__control.sql",
+      "cds": "backend/db/identity.cds",
+      "notNullStrengtheningReason": "현재 관리 권한의 actor·capability·scope·기간·revision을 보존한다."
+    },
+    "mulino_inventory_dispositionbases.action": {
+      "migration": "database/migrations/V14__inventory_commands.sql",
+      "cds": "backend/db/inventory.cds",
+      "notNullStrengtheningReason": "행동별 처분 허용의 scope·근거·결정·기간·상태를 보존한다."
+    },
+    "mulino_inventory_dispositionbases.controlscope": {
+      "migration": "database/migrations/V14__inventory_commands.sql",
+      "cds": "backend/db/inventory.cds",
+      "notNullStrengtheningReason": "행동별 처분 허용의 scope·근거·결정·기간·상태를 보존한다."
+    },
+    "mulino_inventory_dispositionbases.decisionid": {
+      "migration": "database/migrations/V14__inventory_commands.sql",
+      "cds": "backend/db/inventory.cds",
+      "notNullStrengtheningReason": "행동별 처분 허용의 scope·근거·결정·기간·상태를 보존한다."
+    },
+    "mulino_inventory_dispositionbases.evidenceref": {
+      "migration": "database/migrations/V14__inventory_commands.sql",
+      "cds": "backend/db/inventory.cds",
+      "notNullStrengtheningReason": "행동별 처분 허용의 scope·근거·결정·기간·상태를 보존한다."
+    },
+    "mulino_inventory_dispositionbases.revision": {
+      "migration": "database/migrations/V14__inventory_commands.sql",
+      "cds": "backend/db/inventory.cds",
+      "notNullStrengtheningReason": "행동별 처분 허용의 scope·근거·결정·기간·상태를 보존한다."
+    },
+    "mulino_inventory_dispositionbases.state": {
+      "migration": "database/migrations/V14__inventory_commands.sql",
+      "cds": "backend/db/inventory.cds",
+      "notNullStrengtheningReason": "행동별 처분 허용의 scope·근거·결정·기간·상태를 보존한다."
+    },
+    "mulino_inventory_identifierconflicts.existingidentifierid": {
+      "migration": "database/migrations/V14__inventory_commands.sql",
+      "cds": "backend/db/inventory.cds",
+      "notNullStrengtheningReason": "기존 외부 식별자와 충돌한 품목·namespace·값·시점을 보존한다."
+    },
+    "mulino_inventory_identifierconflicts.issuer": {
+      "migration": "database/migrations/V14__inventory_commands.sql",
+      "cds": "backend/db/inventory.cds",
+      "notNullStrengtheningReason": "기존 외부 식별자와 충돌한 품목·namespace·값·시점을 보존한다."
+    },
+    "mulino_inventory_identifierconflicts.itemid": {
+      "migration": "database/migrations/V14__inventory_commands.sql",
+      "cds": "backend/db/inventory.cds",
+      "notNullStrengtheningReason": "기존 외부 식별자와 충돌한 품목·namespace·값·시점을 보존한다."
+    },
+    "mulino_inventory_identifierconflicts.namespace": {
+      "migration": "database/migrations/V14__inventory_commands.sql",
+      "cds": "backend/db/inventory.cds",
+      "notNullStrengtheningReason": "기존 외부 식별자와 충돌한 품목·namespace·값·시점을 보존한다."
+    },
+    "mulino_inventory_identifierconflicts.revision": {
+      "migration": "database/migrations/V14__inventory_commands.sql",
+      "cds": "backend/db/inventory.cds",
+      "notNullStrengtheningReason": "기존 외부 식별자와 충돌한 품목·namespace·값·시점을 보존한다."
+    },
+    "mulino_inventory_identifierconflicts.state": {
+      "migration": "database/migrations/V14__inventory_commands.sql",
+      "cds": "backend/db/inventory.cds",
+      "notNullStrengtheningReason": "기존 외부 식별자와 충돌한 품목·namespace·값·시점을 보존한다."
+    },
+    "mulino_inventory_identifierconflicts.value": {
+      "migration": "database/migrations/V14__inventory_commands.sql",
+      "cds": "backend/db/inventory.cds",
+      "notNullStrengtheningReason": "기존 외부 식별자와 충돌한 품목·namespace·값·시점을 보존한다."
+    },
+    "mulino_inventory_restrictions.action": {
+      "migration": "database/migrations/V14__inventory_commands.sql",
+      "cds": "backend/db/inventory.cds",
+      "notNullStrengtheningReason": "행동별 제한의 scope·근거·결정·기간·상태를 보존한다."
+    },
+    "mulino_inventory_restrictions.controlscope": {
+      "migration": "database/migrations/V14__inventory_commands.sql",
+      "cds": "backend/db/inventory.cds",
+      "notNullStrengtheningReason": "행동별 제한의 scope·근거·결정·기간·상태를 보존한다."
+    },
+    "mulino_inventory_restrictions.decisionid": {
+      "migration": "database/migrations/V14__inventory_commands.sql",
+      "cds": "backend/db/inventory.cds",
+      "notNullStrengtheningReason": "행동별 제한의 scope·근거·결정·기간·상태를 보존한다."
+    },
+    "mulino_inventory_restrictions.evidenceref": {
+      "migration": "database/migrations/V14__inventory_commands.sql",
+      "cds": "backend/db/inventory.cds",
+      "notNullStrengtheningReason": "행동별 제한의 scope·근거·결정·기간·상태를 보존한다."
+    },
+    "mulino_inventory_restrictions.revision": {
+      "migration": "database/migrations/V14__inventory_commands.sql",
+      "cds": "backend/db/inventory.cds",
+      "notNullStrengtheningReason": "행동별 제한의 scope·근거·결정·기간·상태를 보존한다."
+    },
+    "mulino_inventory_restrictions.state": {
+      "migration": "database/migrations/V14__inventory_commands.sql",
+      "cds": "backend/db/inventory.cds",
+      "notNullStrengtheningReason": "행동별 제한의 scope·근거·결정·기간·상태를 보존한다."
+    },
+    "mulino_inventory_segmentallocations.commandid": {
+      "migration": "database/migrations/V14__inventory_commands.sql",
+      "cds": "backend/db/inventory.cds",
+      "notNullStrengtheningReason": "배분의 수량·단위·원 segment·주문·원 명령·상태를 함께 보존한다."
+    },
+    "mulino_inventory_segmentallocations.orderlineid": {
+      "migration": "database/migrations/V14__inventory_commands.sql",
+      "cds": "backend/db/inventory.cds",
+      "notNullStrengtheningReason": "배분의 수량·단위·원 segment·주문·원 명령·상태를 함께 보존한다."
+    },
+    "mulino_inventory_segmentallocations.quantity": {
+      "migration": "database/migrations/V14__inventory_commands.sql",
+      "cds": "backend/db/inventory.cds",
+      "notNullStrengtheningReason": "배분의 수량·단위·원 segment·주문·원 명령·상태를 함께 보존한다."
+    },
+    "mulino_inventory_segmentallocations.revision": {
+      "migration": "database/migrations/V14__inventory_commands.sql",
+      "cds": "backend/db/inventory.cds",
+      "notNullStrengtheningReason": "배분의 수량·단위·원 segment·주문·원 명령·상태를 함께 보존한다."
+    },
+    "mulino_inventory_segmentallocations.rootid": {
+      "migration": "database/migrations/V14__inventory_commands.sql",
+      "cds": "backend/db/inventory.cds",
+      "notNullStrengtheningReason": "배분의 수량·단위·원 segment·주문·원 명령·상태를 함께 보존한다."
+    },
+    "mulino_inventory_segmentallocations.segmentid": {
+      "migration": "database/migrations/V14__inventory_commands.sql",
+      "cds": "backend/db/inventory.cds",
+      "notNullStrengtheningReason": "배분의 수량·단위·원 segment·주문·원 명령·상태를 함께 보존한다."
+    },
+    "mulino_inventory_segmentallocations.state": {
+      "migration": "database/migrations/V14__inventory_commands.sql",
+      "cds": "backend/db/inventory.cds",
+      "notNullStrengtheningReason": "배분의 수량·단위·원 segment·주문·원 명령·상태를 함께 보존한다."
+    },
+    "mulino_inventory_segmentallocations.unit": {
+      "migration": "database/migrations/V14__inventory_commands.sql",
+      "cds": "backend/db/inventory.cds",
+      "notNullStrengtheningReason": "배분의 수량·단위·원 segment·주문·원 명령·상태를 함께 보존한다."
+    },
+    "mulino_inventory_stockadjustments.commandid": {
+      "migration": "database/migrations/V14__inventory_commands.sql",
+      "cds": "backend/db/inventory.cds",
+      "notNullStrengtheningReason": "원 실사와 segment·증감 방향·수량·단위·근거·원 명령을 연결한다."
+    },
+    "mulino_inventory_stockadjustments.direction": {
+      "migration": "database/migrations/V14__inventory_commands.sql",
+      "cds": "backend/db/inventory.cds",
+      "notNullStrengtheningReason": "원 실사와 segment·증감 방향·수량·단위·근거·원 명령을 연결한다."
+    },
+    "mulino_inventory_stockadjustments.evidenceref": {
+      "migration": "database/migrations/V14__inventory_commands.sql",
+      "cds": "backend/db/inventory.cds",
+      "notNullStrengtheningReason": "원 실사와 segment·증감 방향·수량·단위·근거·원 명령을 연결한다."
+    },
+    "mulino_inventory_stockadjustments.quantity": {
+      "migration": "database/migrations/V14__inventory_commands.sql",
+      "cds": "backend/db/inventory.cds",
+      "notNullStrengtheningReason": "원 실사와 segment·증감 방향·수량·단위·근거·원 명령을 연결한다."
+    },
+    "mulino_inventory_stockadjustments.reason": {
+      "migration": "database/migrations/V14__inventory_commands.sql",
+      "cds": "backend/db/inventory.cds",
+      "notNullStrengtheningReason": "원 실사와 segment·증감 방향·수량·단위·근거·원 명령을 연결한다."
+    },
+    "mulino_inventory_stockadjustments.revision": {
+      "migration": "database/migrations/V14__inventory_commands.sql",
+      "cds": "backend/db/inventory.cds",
+      "notNullStrengtheningReason": "원 실사와 segment·증감 방향·수량·단위·근거·원 명령을 연결한다."
+    },
+    "mulino_inventory_stockadjustments.segmentid": {
+      "migration": "database/migrations/V14__inventory_commands.sql",
+      "cds": "backend/db/inventory.cds",
+      "notNullStrengtheningReason": "원 실사와 segment·증감 방향·수량·단위·근거·원 명령을 연결한다."
+    },
+    "mulino_inventory_stockadjustments.stocktakeid": {
+      "migration": "database/migrations/V14__inventory_commands.sql",
+      "cds": "backend/db/inventory.cds",
+      "notNullStrengtheningReason": "원 실사와 segment·증감 방향·수량·단위·근거·원 명령을 연결한다."
+    },
+    "mulino_inventory_stockadjustments.unit": {
+      "migration": "database/migrations/V14__inventory_commands.sql",
+      "cds": "backend/db/inventory.cds",
+      "notNullStrengtheningReason": "원 실사와 segment·증감 방향·수량·단위·근거·원 명령을 연결한다."
+    },
+    "mulino_inventory_stocktakes.commandid": {
+      "migration": "database/migrations/V14__inventory_commands.sql",
+      "cds": "backend/db/inventory.cds",
+      "notNullStrengtheningReason": "관측 수량·단위·원 segment·근거·실제/기록 시점·원 명령을 연결한다."
+    },
+    "mulino_inventory_stocktakes.evidenceref": {
+      "migration": "database/migrations/V14__inventory_commands.sql",
+      "cds": "backend/db/inventory.cds",
+      "notNullStrengtheningReason": "관측 수량·단위·원 segment·근거·실제/기록 시점·원 명령을 연결한다."
+    },
+    "mulino_inventory_stocktakes.observedquantity": {
+      "migration": "database/migrations/V14__inventory_commands.sql",
+      "cds": "backend/db/inventory.cds",
+      "notNullStrengtheningReason": "관측 수량·단위·원 segment·근거·실제/기록 시점·원 명령을 연결한다."
+    },
+    "mulino_inventory_stocktakes.revision": {
+      "migration": "database/migrations/V14__inventory_commands.sql",
+      "cds": "backend/db/inventory.cds",
+      "notNullStrengtheningReason": "관측 수량·단위·원 segment·근거·실제/기록 시점·원 명령을 연결한다."
+    },
+    "mulino_inventory_stocktakes.segmentid": {
+      "migration": "database/migrations/V14__inventory_commands.sql",
+      "cds": "backend/db/inventory.cds",
+      "notNullStrengtheningReason": "관측 수량·단위·원 segment·근거·실제/기록 시점·원 명령을 연결한다."
+    },
+    "mulino_inventory_stocktakes.unit": {
+      "migration": "database/migrations/V14__inventory_commands.sql",
+      "cds": "backend/db/inventory.cds",
+      "notNullStrengtheningReason": "관측 수량·단위·원 segment·근거·실제/기록 시점·원 명령을 연결한다."
+    }
+  }
 }
