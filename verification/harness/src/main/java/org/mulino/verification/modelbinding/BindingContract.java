@@ -91,7 +91,7 @@ public final class BindingContract {
         require(ids.size()==60 && turns==73 && assertions==221 && commonPaths.size()==154,"Corpus coverage count drift");
         Set<String> mappedCommon=new HashSet<>();for(JsonNode m:pathRegistry.path("paths"))if(m.path("common").asBoolean())mappedCommon.add(m.path("semanticPath").asText());require(mappedCommon.equals(commonPaths),"Common mapping set differs from actual corpus paths");
         for(int i=1;i<=60;i++) require(ids.contains(String.format("M%02d",i)),"Missing case");
-        ObjectNode r=report("PREPARED","NOT_RUN");r.put("preparationStatus","PASS");return r;
+        ObjectNode r=report("PREPARED","NOT_RUN");r.put("preparationStatus","PREPARED");return r;
     }
     void actorMatches(JsonNode profile,JsonNode principal,JsonNode grant,String alias,boolean readOnly){
         for(String key:List.of("issuer","subject","audience"))require(profile.path(key).equals(principal.path(key)),"Actor identity drift "+key);

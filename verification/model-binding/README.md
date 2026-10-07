@@ -113,6 +113,10 @@ verification/model-binding/run gherkin-red UAT
 ```
 
 selftest와 preparation의 exit0은 바인딩·assertion 자체의 검증이다.
+준비 성공은 coverage schema와 같은 `preparationStatus=PREPARED`로
+기록한다. `PASS`는 실제 case/runtime 판정에 쓰며 준비 enum을 대체하지
+않는다. 준비가 끝난 RED 보고서도 `preparationStatus=PREPARED`와
+`runtimeStatus=NOT_RUN`을 함께 유지한다.
 `red`의 exit2는 실제 adapter 부재로 인한 제품 NOT_RUN이다. gherkin-red는
 60개 scenario를 discovery/실행하며 NOT_IMPLEMENTED assertion으로
 의도적으로 exit1이다. 구문·환경 오류를 제품 RED로 세지 않는다.
