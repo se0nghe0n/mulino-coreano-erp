@@ -2,6 +2,7 @@ package com.mulino.application.inventory;
 
 import com.mulino.application.core.*;
 import com.mulino.domain.inventory.*;
+import com.mulino.application.trade.InventoryReadFacts;
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.*;
@@ -12,9 +13,18 @@ public class InventoryQueries implements QueryHandler {
   private static final Map<String,String> TYPES = Map.ofEntries(Map.entry("Product","Products"),Map.entry("TradeItem","TradeItems"),Map.entry("ManufacturingLot","ManufacturingLots"),Map.entry("QuantitySegment","QuantitySegments"),Map.entry("LogisticsUnit","LogisticsUnits"),Map.entry("Place","Places"),Map.entry("Manufacturer","Manufacturers"));
   private final InventoryRepository repository;
   private final ReadAuthorizer authorizer;
-  public InventoryQueries(InventoryRepository repository, ReadAuthorizer authorizer) { this.repository=repository; this.authorizer=authorizer; }
+  private final List<InventoryReadFacts> facts;
+  private final Map<String,ObjectReadProvider> objects=new HashMap<>();
+  public InventoryQueries(InventoryRepository repository, ReadAuthorizer authorizer) { this(repository,authorizer,List.of(),List.of()); }
+  @org.springframework.beans.factory.annotation.Autowired
+  public InventoryQueries(InventoryRepository repository, ReadAuthorizer authorizer,List<InventoryReadFacts> facts,List<ObjectReadProvider> providers) {
+    this.repository=repository; this.authorizer=authorizer;this.facts=List.copyOf(facts);
+    for(var provider:providers)for(String type:provider.objectTypes())if(TYPES.containsKey(type)||objects.put(type,provider)!=null)throw new IllegalStateException("Duplicate noun read provider "+type);
+    var owned=new HashSet<String>();for(var provider:facts)for(String metric:provider.metrics())if(!Set.of("eligibleQuantity","reservedQuantity","unreservedEligibleQuantity","cumulativeArrival","eligibilityStatus").contains(metric)||!owned.add(metric))throw new IllegalStateException("Invalid or duplicate inventory metric "+metric);
+  }
   public Set<String> operations() { return Set.of("getObject","searchObjects","getInventory","getTrace","traceLot"); }
   public QueryResult query(DomainContext c, QueryRequest q) {
+    if(Set.of("getObject","searchObjects").contains(q.operation())){Object type=q.scope().getOrDefault("objectType",q.filters().get("type"));var provider=objects.get(type);if(provider!=null)return provider.query(c,q);}
     if (!Set.of("type","sort").containsAll(q.filters().keySet())) throw DomainError.invalid("Unsupported inventory filter");
     if (q.filters().containsKey("sort")&&!"ID".equals(q.filters().get("sort"))) throw DomainError.invalid("Unsupported inventory sort");
     if(q.scope().containsKey("organizationId")&&!c.organizationId().equals(q.scope().get("organizationId"))) throw DomainError.forbidden();
@@ -78,7 +88,13 @@ public class InventoryQueries implements QueryHandler {
     data.put("itemId",item); data.put("heldQuantity",held.stripTrailingZeros().toPlainString()); data.put("unit",itemRow.get("baseUnit"));
     data.put("eligibleQuantity",null); data.put("reservedQuantity",null); data.put("unreservedEligibleQuantity",null); data.put("cumulativeArrival",null);
     data.put("eligibilityStatus","UNKNOWN"); data.put("segmentIds",rows.stream().map(r -> r.get("ID")).toList()); data.put("segments",rows.stream().map(this::dto).toList());
-    return result(data,q,List.of("ELIGIBILITY_NOT_IMPLEMENTED_S1","ALLOCATION_NOT_IMPLEMENTED_S1","CUMULATIVE_ARRIVAL_REQUIRES_CONFIRMED_RECEIPT_S3"));
+    var unknowns=new ArrayList<String>();var conflicts=new ArrayList<String>();var evidence=new ArrayList<String>();var implemented=new HashSet<String>();
+    for(var provider:facts){var extra=provider.read(c,q.operation(),item,q.scope(),rows);if(!extra.values().keySet().equals(provider.metrics()))throw new IllegalStateException("Inventory metric contract differs from installed provider");data.putAll(extra.values());implemented.addAll(provider.metrics());unknowns.addAll(extra.unknowns());conflicts.addAll(extra.conflicts());evidence.addAll(extra.evidenceRefs());}
+    if(!implemented.contains("eligibleQuantity"))unknowns.add("ELIGIBILITY_NOT_IMPLEMENTED_S1");
+    if(!implemented.containsAll(Set.of("reservedQuantity","unreservedEligibleQuantity")))unknowns.add("ALLOCATION_NOT_IMPLEMENTED_S1");
+    if(!implemented.contains("cumulativeArrival"))unknowns.add("CUMULATIVE_ARRIVAL_REQUIRES_CONFIRMED_RECEIPT_S3");
+    var scope=new LinkedHashMap<String,Object>(q.scope());scope.put("itemId",item);
+    return new QueryResult(data,scope,unknowns,conflicts,evidence,null);
   }
   private QueryResult trace(DomainContext c, QueryRequest q) {
     if (q.id()==null) throw DomainError.invalid("Trace ID required");

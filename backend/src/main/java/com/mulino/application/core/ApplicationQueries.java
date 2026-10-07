@@ -13,12 +13,16 @@ import org.springframework.transaction.annotation.*;
 public class ApplicationQueries {
   private static final Set<String> WORLD=Set.of("getObject","getWork","getInventory","getObligations","getAssessment","traceLot","getTrace");
   private final Map<String,QueryHandler> handlers=new HashMap<>();
+  private final Set<String> objectTypes=new HashSet<>(Set.of("Product","TradeItem","ManufacturingLot","QuantitySegment","LogisticsUnit","Place","Manufacturer"));
   private final ReadAuthorizer auth;
   private final ExecutionClock clock;
   private final WorkReadHandler work;
   private final ObjectMapper json=new ObjectMapper();
-  public ApplicationQueries(List<QueryHandler> handlers,ReadAuthorizer auth,WorkReadHandler work,ExecutionClock clock){
+  public ApplicationQueries(List<QueryHandler> handlers,ReadAuthorizer auth,WorkReadHandler work,ExecutionClock clock){this(handlers,auth,work,clock,List.of());}
+  @org.springframework.beans.factory.annotation.Autowired
+  public ApplicationQueries(List<QueryHandler> handlers,ReadAuthorizer auth,WorkReadHandler work,ExecutionClock clock,List<ObjectReadProvider> objects){
     this.auth=auth;this.work=work;this.clock=clock;
+    for(var provider:objects)for(String type:provider.objectTypes())if(!objectTypes.add(type))throw new IllegalStateException("Duplicate noun read provider "+type);
     for(QueryHandler handler:handlers)for(String operation:handler.operations())if(this.handlers.put(operation,handler)!=null)throw new IllegalStateException("Duplicate query capability "+operation);
   }
   public Set<String> operations(){return Set.copyOf(handlers.keySet());}
@@ -42,7 +46,7 @@ public class ApplicationQueries {
     Set<String> allowedScope=evidenceOperation?Set.of("organizationId","kind","subjectKind","subjectId"):Set.of("organizationId","itemId","lotId","workId","placeId","customerId","objectType");
     if(!allowedScope.containsAll(request.scope().keySet()))throw DomainError.invalid("Unsupported scope key");
     request.scope().forEach((key,value)->{
-      Set<String> enumValues=switch(key){case "objectType"->Set.of("Product","TradeItem","ManufacturingLot","QuantitySegment","LogisticsUnit","Place","Manufacturer");case "kind"->Set.of("DOCUMENT","EVENT","CLAIM","CANONICAL");case "subjectKind"->Set.of("ITEM","LOT","SEGMENT","WORK","PLACE");default->null;};
+      Set<String> enumValues=switch(key){case "objectType"->objectTypes;case "kind"->Set.of("DOCUMENT","EVENT","CLAIM","CANONICAL");case "subjectKind"->Set.of("ITEM","LOT","SEGMENT","WORK","PLACE");default->null;};
       if(enumValues!=null){if(!(value instanceof String)||!enumValues.contains(value))throw DomainError.invalid("Invalid typed selector");return;}
       if(!(value instanceof String))throw DomainError.invalid("Typed scope ID required");try{UUID.fromString((String)value);}catch(IllegalArgumentException invalid){throw DomainError.invalid("UUID scope ID required");}
     });
@@ -55,15 +59,17 @@ public class ApplicationQueries {
     if(request.operation().equals("getObject")&&data instanceof Map<?,?> object&&object.get("itemId")!=null)scope.putIfAbsent("itemId",object.get("itemId"));
     TreeSet<String> evidence=new TreeSet<>(result.evidenceRefs());
     TreeSet<String> unknowns=new TreeSet<>(result.unknowns());
+    TreeSet<String> conflicts=new TreeSet<>(result.conflicts());
     Object shared=data;
     if(WORLD.contains(request.operation())&&data instanceof Map<?,?>&&scope.get("itemId")!=null){
       Map<String,Object> world=work.world(context,scope);
       if(handlers.containsKey("getInventory")){
-        QueryRequest inventory=new QueryRequest("getInventory",null,scope,Map.of(),200,null,request.definitionVersion(),asOf,knownAt,null);
+        var inventoryScope=new LinkedHashMap<String,Object>();for(String key:List.of("organizationId","itemId","lotId","placeId"))if(scope.containsKey(key))inventoryScope.put(key,scope.get(key));
+        QueryRequest inventory=new QueryRequest("getInventory",null,inventoryScope,Map.of(),200,null,request.definitionVersion(),asOf,knownAt,null);
         auth.authorize(context,"getInventory",null);
         QueryResult inventoryResult=handlers.get("getInventory").query(context,inventory);
         if(inventoryResult.data() instanceof Map<?,?> inventoryData)world.putAll((Map<String,Object>)inventoryData);
-        evidence.addAll(inventoryResult.evidenceRefs());unknowns.addAll(inventoryResult.unknowns());
+        evidence.addAll(inventoryResult.evidenceRefs());unknowns.addAll(inventoryResult.unknowns());conflicts.addAll(inventoryResult.conflicts());
       }
       if(scope.get("itemId")!=null)world.put("itemId",scope.get("itemId"));
       evidence.addAll((List<String>)world.getOrDefault("evidenceRefs",List.of()));
@@ -74,7 +80,7 @@ public class ApplicationQueries {
     if(request.snapshotRef()!=null&&!request.snapshotRef().equals(snapshot))throw new DomainError("CONFLICT","SNAPSHOT_CHANGED","Read snapshot changed; repeat the query");
     Map<String,Object> envelope=new LinkedHashMap<>();
     envelope.put("data",TransportValues.normalize(data));envelope.put("snapshotRevision",snapshot);envelope.put("asOf",asOf.toString());envelope.put("knownAt",knownAt.toString());envelope.put("scope",scope);
-    envelope.put("unknowns",List.copyOf(unknowns));envelope.put("conflicts",result.conflicts());envelope.put("evidenceRefs",List.copyOf(evidence));envelope.put("nextCursor",result.nextCursor());
+    envelope.put("unknowns",List.copyOf(unknowns));envelope.put("conflicts",List.copyOf(conflicts));envelope.put("evidenceRefs",List.copyOf(evidence));envelope.put("nextCursor",result.nextCursor());
     return envelope;
   }
   private String snapshot(DomainContext c,Map<String,Object> scope,Object state){
