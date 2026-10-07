@@ -85,7 +85,7 @@ public final class InventoryCommands implements CommandHandler {
       default->throw DomainError.unsupported();
     };
     var effects=new LinkedHashMap<String,Object>();effects.put(capability.equals("recordStocktake")?"stocktakeIds":"segmentIds",ids);effects.put("quantityEffects",capability.equals("recordStocktake")?List.of():ids.stream().map(id->repository.current(c,"QuantitySegments",id)).map(r->Map.of("segmentId",r.get("ID"),"quantity",InventoryQuantity.text(r.get("quantity")),"unit",r.get("unit"))).toList());
-    return Map.of("outcome","ACCEPTED","revision",capability.equals("recordStocktake")?0:1,"effects",effects);
+    return Map.of("outcome","APPLIED","revision",capability.equals("recordStocktake")?0:1,"effects",effects);
   }
   @SuppressWarnings("unchecked") public static Map<String,Object> slots(Map<String,Object> intent) {if(!(intent.get("slots") instanceof Map<?,?> m)||m.keySet().stream().anyMatch(k->!(k instanceof String)))throw DomainError.invalid("Typed slots required");return (Map<String,Object>)m;}
   public static String text(Map<String,Object> m,String k,int max){if(!(m.get(k) instanceof String s)||s.isBlank()||s.length()>max)throw DomainError.invalid("Invalid "+k);return s;}

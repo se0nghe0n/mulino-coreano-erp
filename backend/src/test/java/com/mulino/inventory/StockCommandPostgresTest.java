@@ -137,7 +137,7 @@ class StockCommandPostgresTest {
   var base=new HashMap<String,Object>(Map.of("itemId",item,"issuer","supplier","namespace","SKU","value","SAME","validFrom","2026-01-01T00:00:00Z"));
   tx(()->metadata.execute(context(),intent("linkExternalId",base)));base.put("itemId",second);
   var conflict=tx(()->metadata.execute(context(),intent("linkExternalId",base)));
-  assertEquals("ACCEPTED_PENDING_RECONCILIATION",conflict.get("outcome"));assertEquals(1,jdbc.queryForObject("SELECT COUNT(*) FROM mulino_inventory_ExternalIdentifiers",Integer.class));
+  assertEquals("APPLIED",conflict.get("outcome"));assertEquals("PENDING_RECONCILIATION",((Map<?,?>)conflict.get("effects")).get("reconciliationState"));assertEquals("RECONCILE_EXTERNAL_IDENTIFIER",conflict.get("nextAction"));assertEquals(1,jdbc.queryForObject("SELECT COUNT(*) FROM mulino_inventory_ExternalIdentifiers",Integer.class));
  }
 
  @Test void restrictionInsertionSharesFenceAndCommittedRestrictionDeniesEffect() throws Exception {

@@ -16,6 +16,9 @@ inventory domain/application과 이 문서·전용 tests를 소유한다.
 `mergeQuantity`, `moveQuantity`, `recordStocktake`, `adjustQuantity`,
 `disposeQuantity`다. semanticVersion과 definitionVersion은 별도다.
 공통 envelope의 `slots`는 typed 값이고 발생 시각은 UTC Instant다.
+commit되는 handler 결과는 APPLIED다. 외부 코드 상충도 대조 기록의
+저장은 APPLIED이며 effects.reconciliationState=PENDING_RECONCILIATION과
+nextAction을 남긴다. 실물/품목 병합이 실행됐다는 뜻은 아니다.
 stocktake만 RECORD이며 나머지는 COMMAND다.
 
 - `splitQuantity`: segmentId·quantities[]·unit·occurredAt·evidenceRef를

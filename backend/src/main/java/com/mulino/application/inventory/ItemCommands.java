@@ -40,20 +40,20 @@ public final class ItemCommands implements CommandHandler {
    var specRow=StockPrimitives.row(c,spec,c.knownAt());specRow.put("productId",product);specRow.put("version","1");specRow.put("contentHash",p.get("specificationHash"));specRow.put("description",p.getOrDefault("specificationDescription",""));repository.register("SpecificationVersions",specRow);
    var packRow=StockPrimitives.row(c,pack,c.knownAt());packRow.put("productId",product);packRow.put("version","1");packRow.put("contentHash",p.get("packagingHash"));packRow.put("description",p.getOrDefault("packagingDescription",""));repository.register("PackagingVersions",packRow);
    var itemRow=StockPrimitives.row(c,item,c.knownAt());for(String key:List.of("name","baseUnit","decimalPlaces"))itemRow.put(key,p.get(key));itemRow.put("productId",product);itemRow.put("specificationVersionId",spec);itemRow.put("packagingVersionId",pack);repository.register("TradeItems",itemRow);
-   return Map.of("outcome","ACCEPTED","revision",0,"effects",Map.of("itemId",item,"productId",product,"specificationVersionId",spec,"packagingVersionId",pack),"quantityEffects",List.of());
+   return Map.of("outcome","APPLIED","revision",0,"effects",Map.of("itemId",item,"productId",product,"specificationVersionId",spec,"packagingVersionId",pack),"quantityEffects",List.of());
   }
   String item=InventoryCommands.uuid(p,"itemId");Instant[] interval=interval(p);
   var overlaps=repository.currentRows(c,"ExternalIdentifiers").stream().filter(r->Objects.equals(r.get("issuer"),p.get("issuer"))&&Objects.equals(r.get("namespace"),p.get("namespace"))&&Objects.equals(r.get("value"),p.get("value"))).filter(r->(interval[1]==null||StockPrimitives.instant(r.get("validFrom")).isBefore(interval[1]))&&(r.get("validUntil")==null||interval[0].isBefore(StockPrimitives.instant(r.get("validUntil"))))).toList();
   for(var existing:overlaps) {
    boolean covers=!StockPrimitives.instant(existing.get("validFrom")).isAfter(interval[0])&&(existing.get("validUntil")==null||(interval[1]!=null&&!StockPrimitives.instant(existing.get("validUntil")).isBefore(interval[1])));
-   if(item.equals(existing.get("itemId"))&&covers)return Map.of("outcome","ACCEPTED","revision",0,"effects",Map.of("externalIdentifierId",existing.get("ID"),"alreadyLinked",true));
+   if(item.equals(existing.get("itemId"))&&covers)return Map.of("outcome","APPLIED","revision",0,"effects",Map.of("externalIdentifierId",existing.get("ID"),"alreadyLinked",true));
    String id=StockPrimitives.id();var conflict=StockPrimitives.row(c,id,c.knownAt());for(String key:List.of("issuer","namespace","value"))conflict.put(key,p.get(key));conflict.put("itemId",item);conflict.put("existingIdentifierId",existing.get("ID"));conflict.put("validFrom",interval[0]);conflict.put("validUntil",interval[1]);conflict.put("state","RECONCILIATION_REQUIRED");
    // Persist the conflict through a bounded metadata-only method.
    repository.recordIdentifierConflict(conflict);
-   return Map.of("outcome","ACCEPTED_PENDING_RECONCILIATION","revision",0,"effects",Map.of("conflictId",id),"nextAction","RECONCILE_EXTERNAL_IDENTIFIER");
+   return Map.of("outcome","APPLIED","revision",0,"effects",Map.of("conflictId",id,"reconciliationState","PENDING_RECONCILIATION"),"nextAction","RECONCILE_EXTERNAL_IDENTIFIER");
   }
   String id=StockPrimitives.id();var row=StockPrimitives.row(c,id,c.knownAt());for(String key:List.of("issuer","namespace","value"))row.put(key,p.get(key));row.put("itemId",item);row.put("validFrom",interval[0]);row.put("validUntil",interval[1]);repository.register("ExternalIdentifiers",row);
-  return Map.of("outcome","ACCEPTED","revision",0,"effects",Map.of("externalIdentifierId",id));
+  return Map.of("outcome","APPLIED","revision",0,"effects",Map.of("externalIdentifierId",id));
  }
  private static Instant[] interval(Map<String,Object> p){try{Instant from=Instant.parse(InventoryCommands.text(p,"validFrom",80)),until=p.containsKey("validUntil")?Instant.parse(InventoryCommands.text(p,"validUntil",80)):null;if(until!=null&&!until.isAfter(from))throw DomainError.invalid("External identity interval invalid");return new Instant[]{from,until};}catch(java.time.format.DateTimeParseException e){throw DomainError.invalid("UTC identity interval required");}}
  private static String hash(List<String> values){try{var digest=MessageDigest.getInstance("SHA-256");for(String value:values){digest.update(Integer.toString(value.length()).getBytes(StandardCharsets.UTF_8));digest.update((byte)':');digest.update(value.getBytes(StandardCharsets.UTF_8));}return HexFormat.of().formatHex(digest.digest());}catch(java.security.NoSuchAlgorithmException impossible){throw new IllegalStateException(impossible);}}
