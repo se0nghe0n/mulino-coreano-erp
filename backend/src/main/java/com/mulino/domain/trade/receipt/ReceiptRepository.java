@@ -5,7 +5,7 @@ import com.sap.cds.services.persistence.PersistenceService;
 import java.util.*;
 import org.springframework.stereotype.Repository;
 @Repository
-public final class ReceiptRepository {
+public class ReceiptRepository {
  private final PersistenceService db;
  public ReceiptRepository(PersistenceService db){this.db=db;}
  private String entity(String e){if(!Set.of("Observations","Receipts").contains(e))throw DomainError.unsupported();return "mulino.trade.receipt."+e;}
