@@ -1,0 +1,40 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:mulino:command-response:1",
+  "type": "object",
+  "required": [
+    "outcome",
+    "effects"
+  ],
+  "properties": {
+    "outcome": {
+      "enum": [
+        "APPLIED",
+        "ACCEPTED_PENDING_EXTERNAL",
+        "PENDING_EXTERNAL",
+        "WAITING_APPROVAL",
+        "NEEDS_INPUT",
+        "REJECTED",
+        "CONFLICT"
+      ]
+    },
+    "commandId": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "canonicalIntentHash": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "proposalRevision": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "effects": {
+      "type": "object"
+    },
+    "error": {
+      "type": "object"
+    }
+  }
+}

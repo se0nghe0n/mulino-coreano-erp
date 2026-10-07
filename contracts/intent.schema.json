@@ -110,6 +110,14 @@
     "expectedRevision": {
       "type": "integer",
       "minimum": 0
+    },
+    "capabilityVersion": {
+      "type": "string",
+      "minLength": 1
+    },
+    "approvalId": {
+      "type": "string",
+      "format": "uuid"
     }
   },
   "$defs": {
@@ -154,6 +162,26 @@
               "type": "string",
               "format": "uuid"
             }
+          }
+        },
+        {
+          "type": "object",
+          "description": "Handler-specific bounded typed aggregate value; validated by the registered capability schema.",
+          "not": {
+            "anyOf": [
+              {
+                "required": [
+                  "value",
+                  "unit"
+                ]
+              },
+              {
+                "required": [
+                  "type",
+                  "id"
+                ]
+              }
+            ]
           }
         }
       ]

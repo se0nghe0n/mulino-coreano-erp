@@ -12,8 +12,9 @@ import org.springframework.http.ResponseEntity;
 public class OntologyMcp {
   private static final String VERSION="2026-07-28";
   private final ApplicationQueries queries;
+  private final ApplicationCommands commands;
   private final ObjectMapper json=new ObjectMapper();
-  public OntologyMcp(ApplicationQueries queries){this.queries=queries;}
+  public OntologyMcp(ApplicationQueries queries,ApplicationCommands commands){this.queries=queries;this.commands=commands;}
   @PostMapping(value="/mcp/ontology",consumes="application/json",produces="application/json")
   @SuppressWarnings("unchecked")
   public ResponseEntity<Map<String,Object>> rpc(@RequestBody Map<String,Object> body,HttpServletRequest request){
@@ -26,10 +27,15 @@ public class OntologyMcp {
     Map<String,Object> result;
     switch(method){
       case "server/discover" -> result=Map.of("supportedVersions",List.of(VERSION),"capabilities",Map.of("tools",Map.of()),"_meta",Map.of("io.modelcontextprotocol/serverInfo",Map.of("name","mulino-ontology","version","1.0.0")));
-      case "tools/list" -> result=Map.of("tools",queries.operations().stream().sorted().map(this::tool).toList());
+      case "tools/list" -> result=Map.of("tools",java.util.stream.Stream.concat(queries.operations().stream().sorted().map(this::tool),commands.operations().stream().sorted().map(this::commandTool)).toList());
       case "tools/call" -> {
         if(!(params.get("name")instanceof String operation)||!operation.equals(request.getHeader("Mcp-Name"))||!(params.get("arguments")instanceof Map<?,?> arguments))return rpcError(id,400,-32602,"Invalid tool arguments");
-        try{var value=queries.query(QueryRequests.parse(operation,(Map<String,Object>)arguments));result=toolResult(value,false);}
+        try{Map<String,Object> input=(Map<String,Object>)arguments;
+          if(commands.operations().contains(operation)){
+            if(!operation.equals(input.get("capabilityId")))throw DomainError.invalid("Tool capability mismatch");
+            var value=commands.execute(input);result=toolResult(value,Set.of("REJECTED","CONFLICT").contains(value.get("outcome")));
+          }else{var value=queries.query(QueryRequests.parse(operation,input));result=toolResult(value,false);}
+        }
         catch(DomainError failure){result=toolResult(failure.response(),true);}
       }
       default -> {return rpcError(id,404,-32601,"Method not found");}
@@ -37,6 +43,7 @@ public class OntologyMcp {
     Map<String,Object> complete=new LinkedHashMap<>(result);complete.put("resultType","complete");
     return ResponseEntity.ok(Map.of("jsonrpc","2.0","id",id,"result",complete));
   }
+  private Map<String,Object> commandTool(String operation){return Map.of("name",operation,"description","Typed authorized ontology command", "inputSchema",CommandSchemas.input(operation));}
   private Map<String,Object> tool(String operation){
     Map<String,Object> properties=new LinkedHashMap<>();
     for(String field:List.of("id","workId","itemId","lotId","customerId"))properties.put(field,Map.of("type","string","format","uuid"));

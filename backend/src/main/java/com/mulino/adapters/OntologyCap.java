@@ -12,8 +12,18 @@ import org.springframework.stereotype.Component;
 @ServiceName("OntologyService")
 public class OntologyCap implements EventHandler {
   private final ApplicationQueries queries;
+  private final ApplicationCommands commands;
   private final ObjectMapper json=new ObjectMapper();
-  public OntologyCap(ApplicationQueries queries){this.queries=queries;}
+  public OntologyCap(ApplicationQueries queries,ApplicationCommands commands){this.queries=queries;this.commands=commands;}
+  @On(event={"command","validateCommand"})
+  public void command(EventContext context){
+    try{
+      Map<String,Object> input=json.readValue((String)context.get("requestJson"),Map.class);
+      var result="validateCommand".equals(context.getEvent())?commands.validate(input):commands.execute(input);
+      context.put("result",json.writeValueAsString(result));context.setCompleted();
+    }catch(DomainError failure){try{context.put("result",json.writeValueAsString(failure.response()));context.setCompleted();}catch(Exception serialization){throw new IllegalStateException(serialization);}}
+    catch(Exception failure){throw new ServiceException(ErrorStatuses.BAD_REQUEST,"Invalid ontology command");}
+  }
   @On(event="query")
   public void query(EventContext context){
     try{

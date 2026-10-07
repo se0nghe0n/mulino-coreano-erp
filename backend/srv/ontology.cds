@@ -1,3 +1,4 @@
+using {mulino.commands} from '../db/commands';
 using {mulino.identity} from '../db/identity';
 using {mulino.definitions} from '../db/definitions';
 using {mulino.governance} from '../db/policies';
@@ -9,4 +10,6 @@ using {mulino.work.read} from '../db/work-read';
 @path: '/ontology'
 service OntologyService {
   action query(operation : String, requestJson : LargeString) returns LargeString;
+  action command(requestJson : LargeString) returns LargeString;
+  action validateCommand(requestJson : LargeString) returns LargeString;
 }
