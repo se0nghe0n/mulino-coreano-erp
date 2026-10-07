@@ -12,6 +12,7 @@ public final class StockPrimitives {
   private final InventoryRepository repository;
   public StockPrimitives(InventoryRepository repository) {this.repository=repository;}
   public Map<String,Object> leaf(DomainContext c,String id,Instant at) {
+    if(at.isAfter(c.knownAt()))throw DomainError.invalid("Future actual occurrence rejected");
     var s=repository.current(c,"QuantitySegments",id);
     if(s.get("retiredAt")!=null || instant(s.get("validFrom")).isAfter(at)) throw conflict("Physical parent already consumed or not effective");
     return s;
@@ -36,6 +37,13 @@ public final class StockPrimitives {
     lockSources(c,parents);var sources=parents.stream().sorted().map(id->leaf(c,id,at)).toList();var first=sources.getFirst();
     for(var s:sources) for(String key:List.of("itemId","lotId","unit","placeId","controlScope","custodianId","ownerId","identificationStatus"))
       if(!Objects.equals(first.get(key),s.get(key)))throw DomainError.invalid("Incompatible merge "+key);
+    var memberships=repository.currentRows(c,"LogisticsMemberships");
+    var currentContainers=new HashSet<String>();
+    for(var source:sources) {
+      var active=memberships.stream().filter(m->source.get("ID").equals(m.get("segmentId"))&&!instant(m.get("validFrom")).isAfter(at)&&(m.get("validUntil")==null||at.isBefore(instant(m.get("validUntil"))))).map(m->(String)m.get("logisticsUnitId")).toList();
+      currentContainers.add(active.isEmpty()?"UNCONTAINED":active.getFirst());
+    }
+    if(currentContainers.size()>1)throw DomainError.invalid("Resolve incompatible logistics membership before merge");
     BigDecimal total=sources.stream().map(StockPrimitives::amount).reduce(BigDecimal.ZERO,BigDecimal::add);
     quantity(c,first,total.toPlainString(),(String)first.get("unit"));
     return replace(c,sources,List.of(total),(String)first.get("placeId"),at,evidence,command,"MERGE").getFirst();
@@ -65,6 +73,7 @@ public final class StockPrimitives {
     var keys=new TreeSet<>(fences(repository.current(c,"QuantitySegments",parent)));keys.add("inventory/stocktake/"+stocktakeId);repository.fence(c,keys);
     var s=leaf(c,parent,at);var count=repository.current(c,"Stocktakes",stocktakeId);var delta=quantity(c,s,value,unit);
     if(repository.currentRows(c,"StockAdjustments").stream().anyMatch(a->stocktakeId.equals(a.get("stocktakeId"))))throw conflict("Stocktake difference already applied");
+    if(at.isBefore(instant(count.get("occurredAt"))))throw DomainError.invalid("Adjustment precedes stocktake occurrence");
     BigDecimal difference=((BigDecimal)count.get("observedQuantity")).subtract(amount(s));
     if(!parent.equals(count.get("segmentId"))||!unit.equals(count.get("unit"))||difference.abs().compareTo(delta)!=0||difference.signum()!=(direction.equals("INCREASE")?1:-1))throw DomainError.invalid("Adjustment must reconcile this stocktake difference");
     var r=row(c,id(),at);r.put("stocktakeId",stocktakeId);r.put("segmentId",parent);r.put("direction",direction);r.put("quantity",delta);r.put("unit",unit);r.put("occurredAt",at);r.put("reason",reason);r.put("evidenceRef",evidence);r.put("commandId",command);repository.insert("StockAdjustments",r);
@@ -122,12 +131,12 @@ public final class StockPrimitives {
     }
   }
   private void closeMembership(DomainContext c,Map<String,Object> source,List<Map<String,Object>> children,Instant at) {
-    for(var membership:repository.currentRows(c,"LogisticsMemberships"))if(source.get("ID").equals(membership.get("segmentId"))&&membership.get("validUntil")==null) {
+    for(var membership:repository.currentRows(c,"LogisticsMemberships"))if(source.get("ID").equals(membership.get("segmentId"))&&!instant(membership.get("validFrom")).isAfter(at)&&(membership.get("validUntil")==null||at.isBefore(instant(membership.get("validUntil"))))) {
       if(!at.isAfter(instant(membership.get("validFrom"))))throw DomainError.invalid("Membership transition must follow its start");
-      repository.update(c,"LogisticsMemberships",(String)membership.get("ID"),Map.of("validUntil",at));
+      repository.update(c,"LogisticsMemberships",(String)membership.get("ID"),Map.of("validUntil",at,"revision",((Number)membership.get("revision")).intValue()+1));
       for(var child:children) {
         boolean exists=repository.currentRows(c,"LogisticsMemberships").stream().anyMatch(m->child.get("ID").equals(m.get("segmentId"))&&m.get("validUntil")==null);
-        if(!exists) {var r=row(c,id(),at);r.put("segmentId",child.get("ID"));r.put("logisticsUnitId",membership.get("logisticsUnitId"));r.put("validFrom",at);repository.insert("LogisticsMemberships",r);}
+        if(!exists) {var r=row(c,id(),at);r.put("segmentId",child.get("ID"));r.put("logisticsUnitId",membership.get("logisticsUnitId"));r.put("validFrom",at);r.put("validUntil",membership.get("validUntil"));repository.insert("LogisticsMemberships",r);}
       }
     }
   }

@@ -62,6 +62,7 @@ public final class InventoryCommands implements CommandHandler {
         String direction=text(slots,"direction",40);if(!Set.of("INCREASE","DECREASE").contains(direction))throw DomainError.invalid("Adjustment direction required");
         var count=repository.current(c,"Stocktakes",uuid(slots,"stocktakeId"));
         if(repository.currentRows(c,"StockAdjustments").stream().anyMatch(a->count.get("ID").equals(a.get("stocktakeId"))))throw new DomainError("REJECTED","REVISION_CONFLICT","Stocktake difference already applied");
+        if(at.isBefore(StockPrimitives.instant(count.get("occurredAt"))))throw DomainError.invalid("Adjustment precedes stocktake occurrence");
         BigDecimal difference=((BigDecimal)count.get("observedQuantity")).subtract(StockPrimitives.amount(first));
         if(!first.get("ID").equals(count.get("segmentId"))||!first.get("unit").equals(count.get("unit"))||difference.abs().compareTo(q)!=0||difference.signum()!=(direction.equals("INCREASE")?1:-1))throw DomainError.invalid("Adjustment must reconcile this stocktake difference");
         fences.add("inventory/stocktake/"+count.get("ID"));
