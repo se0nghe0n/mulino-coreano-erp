@@ -4,7 +4,7 @@
   "status": "ACTIVE",
   "subtask": "S3 purchase",
   "baseline": "c6c910b81c8a61fbdf309da9144022482408d5dc",
-  "testedCommit": "48d8707",
+  "testedCommit": "86bacecdb06d91a3da8ecf2a14700b6ed7361194",
   "model": "gpt-6.1-sol",
   "effort": "medium",
   "serviceTier": "tool exposes no tier selection or confirmation",
@@ -12,28 +12,35 @@
     "PATH=<fixed Node24> npm ci (backend)",
     "JAVA_HOME=/Library/Java/JavaVirtualMachines/zulu-21.jdk/Contents/Home PATH=<fixed Node24> ./mvnw -f backend/pom.xml -Dtest=PurchaseCommandPostgresTest test"
   ],
-  "finalAttempt": 7,
+  "finalAttempt": 10,
   "exitCode": 0,
-  "tests": 7,
+  "tests": 22,
   "failures": 0,
   "errors": 0,
   "skipped": 0,
   "statusRuntime": "PASS",
-  "durationSeconds": 14.517,
-  "timestamp": "2026-10-08T05:09:17+09:00",
+  "durationSeconds": 18.568,
+  "timestamp": "2026-10-08T05:32:01+09:00",
   "hashes": {
-    "backend/src/main/java/com/mulino/application/trade/purchase/PurchaseCommands.java": "11360cfcc6eaf8a853565e156547f7b42aeef34824176d197f2c95fb2c2cad13",
+    "backend/src/main/java/com/mulino/application/trade/purchase/PurchaseCommands.java": "0a9482727b098cea93cbeb26b6824c9e46e3dc58aa5f20f849d80eeafe8dda95",
     "backend/src/main/java/com/mulino/application/trade/purchase/PurchaseEvidence.java": "3c7a7b0e560397b9c874bddfd898467dd3d0d130f212a94963a9c04ab32fa237",
-    "backend/src/test/java/com/mulino/core/PurchaseCommandPostgresTest.java": "0805d91417b067d441186a1a9b42670b92318441e5818a2135bd248f43151b8c",
-    "database/migrations/V16__purchase_lifecycle.sql": "0bb494b93e2ae96750dd9c760f7eb0302a9498fc8bd8ddb61bddfe1c35bb7bfb"
+    "backend/src/test/java/com/mulino/core/PurchaseCommandPostgresTest.java": "6cf82edd07060516b30de1ba5fbf08ea6dbadcff5d6104043db597183b225ef0",
+    "database/migrations/V16__purchase_lifecycle.sql": "dfdf13ce3de97d90b569963fc2e578bbc5b7d7486170c8ae1ec79b8a684601ea",
+    "backend/src/main/java/com/mulino/application/trade/purchase/PurchaseConditions.java": "580f9555720672d535d26a8386b42ad4099bc53e31593af61159d35f41cbba2d",
+    "backend/src/main/java/com/mulino/application/trade/purchase/PurchaseLinePort.java": "f61dd091f54a48db1905551d2104c397f077256150385c82854fa277f2a94fb4"
   },
   "notRun": [
-    "supplier public evidence chain pending shared V21",
-    "multiple PO receipt allocation actual gateway",
-    "conditional predicate auto fulfillment",
+    "supplier public evidence chain on combined current V21 graph (native adapter owns validation)",
+    "multiple PO receipt allocation actual gateway (receipt/native adapter owns validation)",
     "external supplier network",
     "real model",
     "BTP"
   ],
-  "remaining": "root integration and required review remain open"
+  "remaining": "root integration and required review remain open",
+  "attempts": {
+    "7": "7 PASS",
+    "8": "22: 20 pass, conditional serializer failure and invalid physical fixture error",
+    "9": "2 focused: 1 pass, absent Jackson2 Instant serializer diagnosed",
+    "10": "22 PASS; explicit snapshot normalization and confidence fixture correction"
+  }
 }
