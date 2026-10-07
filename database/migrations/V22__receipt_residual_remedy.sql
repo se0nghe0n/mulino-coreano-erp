@@ -1,3 +1,15 @@
+-- Database credit provenance uses real PHYSICAL_RECEIPT, never RESPONSE_COMPLETED.
+CREATE FUNCTION mulino_receipt_remedy_verified(org varchar, receipt_id varchar) RETURNS boolean LANGUAGE sql STABLE AS $$
+ SELECT EXISTS(SELECT 1 FROM mulino_trade_receipt_Receipts r
+ JOIN mulino_evidence_CanonicalOccurrences o ON o.organizationId=r.organizationId AND o.ID=r.canonicalOccurrenceId
+ JOIN mulino_evidence_Verifications v ON v.organizationId=o.organizationId AND v.canonicalOccurrenceId=o.ID
+ WHERE r.organizationId=org AND r.ID=receipt_id AND o.kind='PHYSICAL_RECEIPT'
+ AND o.valueState='KNOWN' AND o.reassessmentState='COMPLETE' AND o.itemId=r.itemId
+ AND o.physicalScopeId=r.rangeRootId AND o.quantity=r.quantity AND o.unit=r.unit
+ AND o.effectiveFrom=r.occurredAt AND v.verdict='VERIFIED' AND v.sourceMatched
+ AND v.identityMatched AND v.quantityMatched AND v.timeMatched AND v.duplicateChecked
+ AND v.basisDocumentId IS NOT NULL);
+$$;
 CREATE TABLE mulino_responsibility_ReceiptResidualRoots (
  organizationId varchar(36) NOT NULL, ID varchar(36) NOT NULL, revision integer NOT NULL DEFAULT 0,
  createdAt timestamptz NOT NULL, recordedAt timestamptz NOT NULL,
@@ -34,11 +46,13 @@ BEGIN
  SELECT COALESCE(sum(contributedQuantity),0) INTO total FROM mulino_trade_purchase_ReceiptCredits WHERE organizationId=binding.organizationId AND lineId=binding.lineId;
  IF TG_TABLE_NAME='mulino_responsibility_receiptresidualroots' THEN
   SELECT * INTO receipt FROM mulino_trade_receipt_Receipts WHERE organizationId=binding.organizationId AND ID=binding.initialReceiptId;
+  IF root.scopeJson::jsonb->>'domainSourceId' IS DISTINCT FROM receipt.canonicalOccurrenceId OR root.scopeJson::jsonb->>'physicalScopeId' IS DISTINCT FROM receipt.rangeRootId THEN RAISE EXCEPTION 'Receipt residual initial identity mismatch'; END IF;
   IF total<>binding.initialContribution THEN RAISE EXCEPTION 'Receipt residual initial contribution mismatch'; END IF;
  ELSE
   SELECT * INTO receipt FROM mulino_trade_receipt_Receipts WHERE organizationId=NEW.organizationId AND ID=NEW.receiptId;
   IF NEW.startQuantity+NEW.quantity>total-binding.initialContribution OR NOT EXISTS(SELECT 1 FROM mulino_responsibility_Scopes s JOIN mulino_work_read_ObligationReferences a ON a.organizationId=s.organizationId AND a.scopeId=s.ID WHERE s.organizationId=NEW.organizationId AND s.ID=NEW.scopeId AND s.rootId=NEW.rootId AND s.leaf AND s.startQuantity=NEW.startQuantity AND s.quantity=NEW.quantity AND a.ID=NEW.assignmentId AND a.rootId=NEW.rootId AND a.valid AND a.status='RESOLVED' AND a.evidenceId=receipt.canonicalOccurrenceId AND a.basis='VERIFIED_RECEIPT_CONTRIBUTION') THEN RAISE EXCEPTION 'Receipt credit requires exact current covered duty range'; END IF;
  END IF;
+ IF NOT mulino_receipt_remedy_verified(receipt.organizationId,receipt.ID) THEN RAISE EXCEPTION 'Receipt remedy requires verified physical canonical occurrence'; END IF;
  IF receipt.purchaseLineId IS DISTINCT FROM line.ID OR receipt.workId IS DISTINCT FROM line.workId OR receipt.itemId IS DISTINCT FROM line.itemId OR receipt.placeId IS DISTINCT FROM line.destinationId OR receipt.unit IS DISTINCT FROM line.unit OR NOT EXISTS(SELECT 1 FROM mulino_trade_purchase_ReceiptCredits c WHERE c.organizationId=receipt.organizationId AND c.lineId=line.ID AND c.occurrenceId=receipt.canonicalOccurrenceId AND c.actualQuantity=receipt.quantity AND c.contributedQuantity=receipt.contributedQuantity AND c.unit=receipt.unit) THEN RAISE EXCEPTION 'Receipt contribution provenance mismatch'; END IF;
  RETURN NEW;
 END $$;
@@ -62,6 +76,7 @@ BEGIN
  SELECT * INTO root FROM mulino_responsibility_Roots WHERE organizationId=NEW.organizationId AND ID=NEW.rootId;
  SELECT * INTO observation FROM mulino_trade_receipt_Observations WHERE organizationId=NEW.organizationId AND ID=NEW.observationId;
  SELECT * INTO receipt FROM mulino_trade_receipt_Receipts WHERE organizationId=NEW.organizationId AND ID=NEW.receiptId;
+ IF NOT mulino_receipt_remedy_verified(receipt.organizationId,receipt.ID) THEN RAISE EXCEPTION 'Observation remedy requires verified physical canonical occurrence'; END IF;
  IF root.kind<>'RECEIPT_RECONCILIATION' OR root.quantity IS NOT NULL OR root.scopeJson::jsonb->>'domainSourceId' IS DISTINCT FROM observation.ID OR root.scopeJson::jsonb->>'originalWorkId' IS DISTINCT FROM observation.workId OR root.scopeJson::jsonb->>'physicalScopeId' IS DISTINCT FROM observation.rangeRootId OR observation.state<>'CONFIRMED' OR observation.workId IS DISTINCT FROM receipt.workId OR observation.itemId IS DISTINCT FROM receipt.itemId OR observation.placeId IS DISTINCT FROM receipt.placeId OR observation.purchaseLineId IS DISTINCT FROM receipt.purchaseLineId OR observation.rangeRootId IS DISTINCT FROM receipt.rangeRootId OR observation.startQuantity IS DISTINCT FROM receipt.startQuantity OR observation.quantity IS DISTINCT FROM receipt.quantity OR observation.unit IS DISTINCT FROM receipt.unit OR (observation.lotId IS NOT NULL AND observation.lotId IS DISTINCT FROM receipt.lotId) THEN RAISE EXCEPTION 'Observation reconciliation receipt provenance mismatch'; END IF;
  IF NOT EXISTS(SELECT 1 FROM mulino_work_read_ObligationReferences a JOIN mulino_responsibility_Scopes s ON s.organizationId=a.organizationId AND s.ID=a.scopeId WHERE a.organizationId=NEW.organizationId AND a.ID=NEW.assignmentId AND a.rootId=NEW.rootId AND a.valid AND a.status='RESOLVED' AND a.evidenceId=receipt.canonicalOccurrenceId AND a.basis='VERIFIED_RECEIPT_OBSERVATION' AND s.leaf AND s.startQuantity=0 AND s.quantity=1) THEN RAISE EXCEPTION 'Observation credit requires exact current resolved duty'; END IF;
  RETURN NEW;
