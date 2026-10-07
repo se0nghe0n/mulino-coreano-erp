@@ -29,6 +29,11 @@ import org.testcontainers.postgresql.PostgreSQLContainer;
 @SpringBootTest(webEnvironment=SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("local")
 class S2WorkLifecyclePostgresTest {
+  @org.springframework.boot.test.context.TestConfiguration
+  static class PortDoubles {
+    @org.springframework.context.annotation.Bean @org.springframework.context.annotation.Primary com.mulino.application.work.WorkAssessmentGuard workAssessmentDouble(){return mock(com.mulino.application.work.WorkAssessmentGuard.class);}
+    @org.springframework.context.annotation.Bean @org.springframework.context.annotation.Primary com.mulino.application.work.WorkResponsibility workDutyDouble(){return mock(com.mulino.application.work.WorkResponsibility.class);}
+  }
   static final PostgreSQLContainer PG=new PostgreSQLContainer("postgres@sha256:4ef4dbc939d61acea57712655ddb4b4ab27419c913f94cca0cd57cb3ea3c2280");
   static final java.security.KeyPair KEY;
   static final Path KEY_PATH;
@@ -37,8 +42,8 @@ class S2WorkLifecyclePostgresTest {
   @DynamicPropertySource static void properties(DynamicPropertyRegistry r){r.add("spring.datasource.url",PG::getJdbcUrl);r.add("spring.datasource.username",PG::getUsername);r.add("spring.datasource.password",PG::getPassword);r.add("JWT_PUBLIC_KEY",KEY_PATH::toString);r.add("JWT_ISSUER",()->"https://mulino.local.invalid");r.add("JWT_AUDIENCE",()->"mulino-platform");r.add("mulino.evidence.blob-root",BLOB_PATH::toString);}
   @Autowired com.mulino.application.work.WorkLifecycle lifecycle;
   @Autowired com.mulino.domain.work.WorkRepository workRepository;
-  @org.springframework.test.context.bean.override.mockito.MockitoBean com.mulino.application.work.WorkAssessmentGuard assessmentGuard;
-  @org.springframework.test.context.bean.override.mockito.MockitoBean com.mulino.application.work.WorkResponsibility dutyGuard;
+  @Autowired @org.springframework.beans.factory.annotation.Qualifier("workAssessmentDouble") com.mulino.application.work.WorkAssessmentGuard assessmentGuard;
+  @Autowired @org.springframework.beans.factory.annotation.Qualifier("workDutyDouble") com.mulino.application.work.WorkResponsibility dutyGuard;
   @Autowired JdbcTemplate jdbc;
   @Autowired ApplicationQueries queries;
   @Autowired PersistenceService persistence;
@@ -53,7 +58,7 @@ class S2WorkLifecyclePostgresTest {
   Map<String,Object> row(Object... values){var m=new LinkedHashMap<String,Object>();for(int i=0;i<values.length;i+=2)m.put((String)values[i],values[i+1]);return m;}
   Map<String,Object> scoped(String id){return row("organizationId",org,"ID",id,"revision",0,"createdAt",Timestamp.from(AS_OF.minusSeconds(10)),"recordedAt",Timestamp.from(KNOWN.minusSeconds(10)));}
   Map<String,Object> workRow(String id){var r=scoped(id);r.put("effectiveAt",Timestamp.from(AS_OF));return r;}
-  @BeforeEach void seed(){
+  @BeforeEach void seed(){reset(assessmentGuard,dutyGuard);
     org=id();actor=id();product=id();item=id();spec=id();pack=id();manufacturer=id();lot=id();place=id();segment=id();definition=id();work=id();goal=id();obligation=id();document=id();
     insert("mulino_identity_Organizations",row("ID",org,"externalAlias",org));
     insert("mulino_identity_Actors",row("organizationId",org,"ID",actor,"kind","HUMAN","stableRequestOwner",id()));
