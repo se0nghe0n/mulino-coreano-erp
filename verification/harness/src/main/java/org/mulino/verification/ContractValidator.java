@@ -33,11 +33,20 @@ public final class ContractValidator {
             fixture(Json.required(sub,"fixtureRef"));
             Set<String> ids=new HashSet<>(); List<JsonNode> all=new ArrayList<>(); collect(sub.path("actions"),all);
             for(JsonNode a:all) { require(ids.add(Json.required(a,"id")),"Duplicate action ID"); checkAction(a); }
+            Set<String> starts=new HashSet<>(), awaited=new HashSet<>();
+            for(JsonNode a:all) if(a.path("kind").asText().equals("start")) starts.add(Json.required(a,"id"));
+            for(JsonNode a:all) if(a.path("kind").asText().equals("await")) {
+                String source=Json.required(a,"awaitActionId");
+                require(starts.contains(source),"awaitActionId must reference start");
+                require(awaited.add(source),"start must have exactly one terminal await");
+            }
+            require(awaited.equals(starts),"Every start requires terminal await, including parallel children");
             Set<String> assertionIds=new HashSet<>();
             for(JsonNode assertion:sub.path("assertions")) {
                 require(assertionIds.add(Json.required(assertion,"id")),"Duplicate assertion ID");
                 require(ids.contains(Json.required(assertion.path("source"),"actionId")),"Unknown assertion source");
                 if(assertion.has("unitSource")) require(ids.contains(Json.required(assertion.path("unitSource"),"actionId")),"Unknown assertion unit source");
+                if(assertion.has("baselineUnitSource")) require(ids.contains(Json.required(assertion.path("baselineUnitSource"),"actionId")),"Unknown assertion baseline unit source");
                 if(assertion.has("baseline")) require(ids.contains(Json.required(assertion.path("baseline"),"actionId")),"Unknown assertion baseline");
                 if(!example) require(assertion.has("oracleRef"),"Product assertion requires independent oracleRef");
                 for(JsonNode ref:assertion.path("evidenceRefs")) require(!ref.asText().isBlank(),"Empty evidence requirement");

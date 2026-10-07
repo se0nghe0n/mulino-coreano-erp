@@ -1,0 +1,190 @@
+{
+  "baselineCommit": "5aec49eccd07e30f9c3ba0e3be5e38a8bedadee3",
+  "sourceState": "DIRTY_WORKTREE_WITH_REVIEW_FIXES",
+  "scope": "Astra six P2 contract fixes; preparation and registry fixes owned by separate worker",
+  "harness": {
+    "status": "PASS",
+    "exitCode": 0,
+    "tests": 26,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "koreanSmokeScenarios": 1
+  },
+  "contractRed": {
+    "exitCode": 1,
+    "meaningfulRed": true,
+    "discoveredScenarios": 1,
+    "notImplementedAssertionFailures": 1,
+    "environmentOrSyntaxFailure": false
+  },
+  "fileSelectorRed": {
+    "expectedScenarios": 1,
+    "discoveredScenarios": 1,
+    "startedScenarios": 1,
+    "skippedScenarios": 0,
+    "failedScenarios": 1,
+    "notImplementedAssertionFailures": 1,
+    "status": "FAIL",
+    "productCoverageClaimed": false,
+    "failureReasons": [
+      "java.lang.AssertionError: source after is NOT_IMPLEMENTED: NOT_IMPLEMENTED: no real product adapters installed"
+    ]
+  },
+  "productGateComplete": false,
+  "productProfiles": {
+    "schema": {
+      "status": "NOT_RUN",
+      "exitCode": 2,
+      "gateComplete": false
+    },
+    "contracts": {
+      "status": "NOT_RUN",
+      "exitCode": 2,
+      "gateComplete": false
+    },
+    "scenarios": {
+      "status": "NOT_RUN",
+      "exitCode": 2,
+      "gateComplete": false
+    },
+    "recovery": {
+      "status": "NOT_RUN",
+      "exitCode": 2,
+      "gateComplete": false
+    },
+    "mcp": {
+      "status": "NOT_RUN",
+      "exitCode": 2,
+      "gateComplete": false
+    },
+    "skills": {
+      "status": "NOT_RUN",
+      "exitCode": 2,
+      "gateComplete": false
+    },
+    "model": {
+      "status": "NOT_RUN",
+      "exitCode": 2,
+      "gateComplete": false
+    },
+    "deployment": {
+      "status": "NOT_RUN",
+      "exitCode": 2,
+      "gateComplete": false
+    }
+  },
+  "sourceFilesSha256": {
+    "contracts/acceptance-capabilities.json": "44cb6334720e2fd9fd03d78762bfb42723b30c51c46bf540a18d04326a492e4b",
+    "contracts/acceptance-case.schema.json": "5498eb96c981bcdd5c142049f9dd020d7ebebe1a637666a52bace8939b4bf209",
+    "contracts/acceptance-driver.schema.json": "a8bfef0ad687f35d4171edff1ab5bfa043481db69de7eb1f382c5d76e053967b",
+    "contracts/acceptance-fixture.schema.json": "e95fa18285217c96702ff144d78c586ea930e04c09cc8b273005ab0e2a6376c1",
+    "contracts/acceptance-observation.schema.json": "2d24c63272ab020e76cc8d42642d4797c2a1a68d476b55284cd1d1510e973c8c",
+    "verification/harness/src/main/java/org/mulino/verification/AcceptanceDriver.java": "e6424c4e16050a905d7d71b7640cbadc3bdb2376874ee3fc4d7a585e58f0adf6",
+    "verification/harness/src/main/java/org/mulino/verification/AgentRunner.java": "fc8cf6fbb6f555a1f81adb24be235a526a5573b77f269f9d662bf15d815b6c5d",
+    "verification/harness/src/main/java/org/mulino/verification/AssertionEngine.java": "6bb1bdfdee0da943a0fd4b3e488d0dba03e458eea3aa93765312e19822b37a04",
+    "verification/harness/src/main/java/org/mulino/verification/CaseRunner.java": "12b03a6cf89a0ce29e539fb2eddf955b33e5c6e330dd6c1e0783233469510c82",
+    "verification/harness/src/main/java/org/mulino/verification/ContractValidator.java": "d4a88833f737494b88444e6673e88aff28ed6a96d5fd6598634a575d1654e567",
+    "verification/harness/src/main/java/org/mulino/verification/IndependentDbObserver.java": "a9237ef22fabf08e625d717dc4c2a55da6219b5e9c43bef77f9c475d51279cfa",
+    "verification/harness/src/main/java/org/mulino/verification/Json.java": "b189215c7baa811c338a141e135aa82eb231ec707f056717dceedd08393e48a9",
+    "verification/harness/src/main/java/org/mulino/verification/Main.java": "7a0f1d31e9a8649b8400b62f7b493cdccbb0a9fd014c985525d3fecf6b9eb140",
+    "verification/harness/src/main/java/org/mulino/verification/StepResult.java": "702650247fef5e33d3bd92a88834ff6548bb1024125ccf32f554cfd04b1a26b9",
+    "verification/harness/src/main/java/org/mulino/verification/UnimplementedDriver.java": "318ab8793c983b9ca8d54c151a2596b89e390688e6b7b8c4b00ba1858806889d",
+    "verification/harness/src/test/java/org/mulino/verification/AssertionEngineTest.java": "68d1806f27923f29e21f5e11677c677ea4a6b69f39230d7b8d78ccf88fdd2dd5",
+    "verification/harness/src/test/java/org/mulino/verification/CaseFeatureTest.java": "d675f59fca67bc62e13dc5291a57b20e26fd2d390d85b837ca5855bcf60f153e",
+    "verification/harness/src/test/java/org/mulino/verification/ContractRedTest.java": "d9036100146f2e51ada50d612834a29c1e80b72670a6284d5dca05ba7d4cb529",
+    "verification/harness/src/test/java/org/mulino/verification/ContractValidatorTest.java": "ed8568caa8c70f8267bcdb4a8b85504a4d4d179fa6081ef289be45ff22dfd779",
+    "verification/harness/src/test/java/org/mulino/verification/HarnessTest.java": "672b231eb1392a96531076421c6bd6c812a31318f63ce0d35df685701d958ebe",
+    "verification/harness/src/test/java/org/mulino/verification/ReviewContractTest.java": "274ab30471eaf1aca3ce432ae601a15f74f1d5eeae89b399ca971c2237eae04f",
+    "verification/harness/src/test/java/org/mulino/verification/RunnerPortTest.java": "4e86630db9b7e4a23108fde00ef6ef6252039594b476e7f935e0bf594d7ba508",
+    "verification/harness/src/test/java/org/mulino/verification/ScenarioGlue.java": "91cb5fe0190abc94f9975fa008cf64f895bf6fd85ee2a0d8a5cfe02e03d71734",
+    "verification/harness/src/test/resources/examples/HARNESS-EXAMPLE/canned-observations.json": "24ae56249538141f927620ae32c100bc2803d757335f9ce59da5f31ebe7d6b91",
+    "verification/harness/src/test/resources/examples/HARNESS-EXAMPLE/case.json": "57a70a013b1fe05d04d4d18385ef9fc746944994538bbf2a3b85927cf4a19fd3",
+    "verification/harness/src/test/resources/examples/HARNESS-EXAMPLE/fixture.json": "657b13656457e4aa6328628eadf9a06683a5f35111504c0e86e373a27c00a03f",
+    "verification/harness/src/test/resources/examples/HARNESS-EXAMPLE/scenario.feature": "949d9c42e73181e1bd93d18f7dcdd277b9f039187d3eebd91d1640141079a8f0",
+    "verification/harness/src/test/resources/features/harness-smoke.feature": "982b4de209bb43e8a708369fe1aee95d2197d810b6568092aff4d480dfc54ec8",
+    "verification/harness-guide.md": "7a493f926f590b28a924fbff47c66dac7b87acc88537a8a8a24383be96d802f6",
+    "verification/harness/pom.xml": "4789a6d730a14d78acfab7226196c62489eee634adbfd8677d80fddbfb4b5523",
+    "verify": "695136009a07325f1771fea2db8d7594e5ef95ad39949e0fa6ca5870f8acce97"
+  },
+  "logNormalization": [
+    {
+      "file": "verification/harness/evidence/review-fixes/review-fixes-contract-red-explicit.log",
+      "rawSha256": "b2c649a2e095f282de39c70c3dda12808abe3a72cb5abd925060a00ec996e6e6",
+      "sha256": "24d0cbb9b4fe1fd03fe23225a2e954bff06c10d36d1e49cd4c68b9caa9500189",
+      "normalization": "Tabs expanded/trailing whitespace removed only"
+    },
+    {
+      "file": "verification/harness/evidence/review-fixes/review-fixes-contract-red.log",
+      "rawSha256": "637e7da920a68315d49aa538bdf1889e5e47cf14747664da506d9b68b133d45f",
+      "sha256": "493b5070f6b65b62da17d5cb01c503330961f7b64a20a9a8a8cdff673a0c717f",
+      "normalization": "Tabs expanded/trailing whitespace removed only"
+    },
+    {
+      "file": "verification/harness/evidence/review-fixes/review-fixes-contracts.log",
+      "rawSha256": "6b76bd24220c163b424fdf56dcd65ea23d66016bc76464ed4463422ab18d293e",
+      "sha256": "79a1682108dee934deb40946c356689d3301eee75ceb8b0243c9124f43d5cd4f",
+      "normalization": "Tabs expanded/trailing whitespace removed only"
+    },
+    {
+      "file": "verification/harness/evidence/review-fixes/review-fixes-deployment.log",
+      "rawSha256": "9b0db4c4b53b10122a4c762ef3797e460d960746749be7ef1d28d05776415fa1",
+      "sha256": "35c8ae4b87d18fd15fcbbe8231b9ef11148f7050d818448a58d268e93c15ac13",
+      "normalization": "Tabs expanded/trailing whitespace removed only"
+    },
+    {
+      "file": "verification/harness/evidence/review-fixes/review-fixes-harness.log",
+      "rawSha256": "f218334e2cc1853007a4aa214f9150b7ee0f353d9cc5d6515e406f725334c89f",
+      "sha256": "d4d925a28cb2ce289243fd0d46b1fa7ac88c636d614d6a1d53e97de8949ecd2d",
+      "normalization": "Tabs expanded/trailing whitespace removed only"
+    },
+    {
+      "file": "verification/harness/evidence/review-fixes/review-fixes-mcp.log",
+      "rawSha256": "4080b24c1dd725bbc550ef9f0ee9ba58fc584f9d44f1e0d30a6318520a0cde84",
+      "sha256": "aee8c55d74b35e42213ed36960ed37d200833d586c49b4337b744e2d14c73fab",
+      "normalization": "Tabs expanded/trailing whitespace removed only"
+    },
+    {
+      "file": "verification/harness/evidence/review-fixes/review-fixes-model.log",
+      "rawSha256": "e1e9d506ea8608faaea28027fc1cd839201f72ea0dc87ab0d7c7272ca992bb4c",
+      "sha256": "9a9d0136a76e3db25205d22ce2b6e663cca909cfd8aa2102d30c4ef0ee353654",
+      "normalization": "Tabs expanded/trailing whitespace removed only"
+    },
+    {
+      "file": "verification/harness/evidence/review-fixes/review-fixes-recovery.log",
+      "rawSha256": "abe18fcd1ccf9bfb77553610a832eb0117aeb04443a751355c3656a686860395",
+      "sha256": "c56e588525aea1b9e3fc3ff505077b03441a6fa2e3e67fd6e68ef35d63078066",
+      "normalization": "Tabs expanded/trailing whitespace removed only"
+    },
+    {
+      "file": "verification/harness/evidence/review-fixes/review-fixes-scenarios.log",
+      "rawSha256": "f4e35e7828a82fa6ae3b6d32ca47572d86552e9dc0eae87bd55075cbf01658ea",
+      "sha256": "4f1fc8b65b79bc41ef6c9f0f5ec982b9fbd0a41128be57b548587a31d7cf6b33",
+      "normalization": "Tabs expanded/trailing whitespace removed only"
+    },
+    {
+      "file": "verification/harness/evidence/review-fixes/review-fixes-schema.log",
+      "rawSha256": "b231b6273ce137a590551f38ff0dcc1ad2c26d08b57c370f4e7ae64aac3c21d8",
+      "sha256": "e23d2f4a667e5e4b6d9dd06bfe705e56c84ba8bd09df28285138f8f005ffe2ab",
+      "normalization": "Tabs expanded/trailing whitespace removed only"
+    },
+    {
+      "file": "verification/harness/evidence/review-fixes/review-fixes-skills.log",
+      "rawSha256": "257b0f3602caaab0d61a40e09a0aba18dbe4b4517731c6fc3e8662a94ea4a9a4",
+      "sha256": "ff1a4a32baa3528188e66828bca9fdbbb20aeb333bbbccd2b369aa9f802182a3",
+      "normalization": "Tabs expanded/trailing whitespace removed only"
+    },
+    {
+      "file": "verification/harness/evidence/review-fixes/review-fixes-validate.log",
+      "rawSha256": "88689fc654722c59980a48eae867211c1efa00116ffec664f4ac4a206803149d",
+      "sha256": "87ea2db581890a75d5ea2772f23b1a949fcc5d4782b489eebd12b04a9b5d4a3a",
+      "normalization": "Tabs expanded/trailing whitespace removed only"
+    }
+  ],
+  "knownLimits": [
+    "Captured contract selftest observations and mechanical ACKs are not product evidence or business simulation.",
+    "Actual product adapters absent; all eight product profiles remain NOT_RUN/exit2.",
+    "Separate per-scenario Gherkin and exact-registry fixes await coordinator integration and combined checks.",
+    "No paid models, BTP, CAP/PostgreSQL or real transaction execution."
+  ]
+}

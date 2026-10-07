@@ -15,8 +15,7 @@ public final class AssertionEngine {
         JsonNode value=select(assertion.get("source"),results,op.equals("absent"));
         if(assertion.has("unit")) {
             JsonNode observedUnit=select(assertion.get("unitSource"),results,false);
-            if(observedUnit.isArray()) { require(!observedUnit.isEmpty(),"Unit-bearing rows are empty");for(JsonNode u:observedUnit) require(u.equals(assertion.get("unit")),"Observed unit differs from fixed expected unit"); }
-            else require(observedUnit.equals(assertion.get("unit")),"Observed unit differs from fixed expected unit");
+            checkUnit(observedUnit,assertion.get("unit"));
         }
         switch(op) {
             case "equals" -> require(value.equals(expected),"expected "+expected+", observed "+value);
@@ -32,6 +31,7 @@ public final class AssertionEngine {
                 require(sum.compareTo(decimal(expected))==0,"sum mismatch: "+sum+" != "+expected);
             }
             case "decimalDelta" -> {
+                if(assertion.has("unit")) checkUnit(select(assertion.get("baselineUnitSource"),results,false),assertion.get("unit"));
                 BigDecimal baseline=decimal(select(assertion.get("baseline"),results,false));
                 require(decimal(value).subtract(baseline).compareTo(decimal(expected))==0,"delta mismatch");
             }
@@ -70,7 +70,8 @@ public final class AssertionEngine {
         JsonNode value=result.at(pointer);
         if (value.isMissingNode() && allowAbsent) {
             int slash=pointer.lastIndexOf('/');
-            require(slash>=0 && !result.at(pointer.substring(0,slash)).isMissingNode(),"absence parent scope not observed");
+            JsonNode parent=slash<0 ? null : result.at(pointer.substring(0,slash));
+            require(parent!=null && (parent.isObject() || parent.isArray()),"absence parent scope not observed as object/array");
             return value;
         }
         require(!value.isMissingNode() && !value.isNull(),"Missing/null observed value at "+actionId+pointer);
@@ -96,6 +97,10 @@ public final class AssertionEngine {
             value=values;
         }
         return value;
+    }
+    private static void checkUnit(JsonNode observed,JsonNode expected) {
+        if(observed.isArray()) { require(!observed.isEmpty(),"Unit-bearing rows are empty"); for(JsonNode u:observed) require(u.equals(expected),"Observed unit differs from fixed expected unit"); }
+        else require(observed.equals(expected),"Observed unit differs from fixed expected unit");
     }
     private static JsonNode requiredField(JsonNode row,String field) {
         JsonNode value=row.get(field); require(value!=null && !value.isNull(),"projected field missing: "+field); return value;

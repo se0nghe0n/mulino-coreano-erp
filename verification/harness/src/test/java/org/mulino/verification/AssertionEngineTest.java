@@ -27,4 +27,21 @@ public class AssertionEngineTest {
     @Test void unknownQuantityCannotCoerceToZero() { ((ObjectNode)results.get("after").path("response").path("data")).put("heldQuantity","UNKNOWN");assertThrows(AssertionError.class,()->engine.check(assertions.get("held-100"),results)); }
     @Test void scopeIncompleteFailsBeforeAnyBusinessAssertion() { ((ObjectNode)results.get("after").path("provenance")).put("scopeComplete",false);assertThrows(AssertionError.class,()->engine.check(assertions.get("held-100"),results)); }
     @Test void wrongDeadlineFails() { ((ObjectNode)results.get("db-after").path("data").path("data").path("obligations").get(0)).put("nextCheckAt","2026-10-08T10:00:00Z");assertThrows(AssertionError.class,()->engine.check(assertions.get("next-check"),results)); }
+    @Test void absentNeedsObservedContainerParentNotNullOrScalar() {
+        var a=Json.parse("{\"op\":\"absent\",\"source\":{\"actionId\":\"after\",\"pointer\":\"/response/parent/missing\"},\"expected\":true}");
+        ObjectNode response=(ObjectNode)results.get("after").path("response");
+        response.set("parent",Json.object());assertDoesNotThrow(()->engine.check(a,results));
+        for(JsonNode invalid:List.of(Json.MAPPER.nullNode(),Json.MAPPER.valueToTree("scalar"),Json.MAPPER.valueToTree(0))) {
+            response.set("parent",invalid);assertThrows(AssertionError.class,()->engine.check(a,results));
+        }
+    }
+    @Test void deltaMustCompareActualBaselineUnitEvenForZeroDelta() {
+        ObjectNode a=(ObjectNode)assertions.values().stream().filter(x->x.path("op").asText().equals("decimalDelta")).findFirst().orElseThrow().deepCopy();
+        a.put("expected","0");
+        JsonNode current=engine.select(a.path("source"),results,false);
+        var baseline=a.path("baselineUnitSource");ObjectNode parent=(ObjectNode)results.get(baseline.path("actionId").asText()).at("/response/data");
+        String quantityField=a.path("baseline").path("pointer").asText().substring("/response/data/".length());parent.set(quantityField,current);
+        assertDoesNotThrow(()->engine.check(a,results));
+        parent.put("unit","KG");assertThrows(AssertionError.class,()->engine.check(a,results));
+    }
 }

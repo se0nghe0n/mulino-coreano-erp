@@ -13,6 +13,7 @@ public interface AcceptanceDriver {
     StepResult control(String actionId, JsonNode control);
     /** ACK only after a real asynchronous invocation is submitted. data.invocationHandle is opaque. */
     StepResult start(String actionId, String route, JsonNode authenticatedActor, String capabilityId, JsonNode request);
-    /** Wait for the real invocation result/commit ACK, preserving its actual response and artifact. */
+    /** Terminal ACK: completed=true, identical invocationHandle, terminalStatus SUCCEEDED/FAILED/CANCELLED.
+     * Preserve the actual result/commit response and artifact; submission alone is not completion. */
     StepResult await(String actionId, JsonNode invocationHandle, int timeoutSeconds);
 }

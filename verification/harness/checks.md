@@ -43,3 +43,32 @@ JSON Schema validator1.5.9의 resolution과 Java21 compile/discovery를
 이 worktree에는 D/T/C/V/E case와 독립 registry/catalog가 없다. `prepare`
 전체 성공이나 runtime coverage를 주장하지 않는다. coordinator가 다른
 산출물과 통합하고 필수 assertion/observation/registry를 대조해야 한다.
+
+## 공통 계약 리뷰 보완
+
+baseline `5aec49eccd07e30f9c3ba0e3be5e38a8bedadee3` 이후 Astra 리뷰에서
+여섯 가지 false PASS/실패 은폐 가능성을 발견해 수정했다. observe의
+scope·실제 snapshot token과 barrier ACK의 거래/참여자/point/state를
+요청과 대조한다. 실행한 source의 assertion FAIL을 미실행 source가
+덮지 않는다. absent는 관찰한 container 부모를 요구하며, start는 같은
+handle의 terminal await까지 요구한다. decimalDelta는 실제 baseline
+단위도 검사한다. 이에 맞춰 schema/example/guide를 보완했다.
+
+| 실제 command | 관찰 | exit |
+|---|---|---|
+| `./verify harness` | 26 tests, 실패0·오류0·skip0. 한국어 Gherkin1 실행 | 0 |
+| `./verify validate verification/harness/src/test/resources/examples/HARNESS-EXAMPLE/case.json` | 새 baselineUnitSource 계약 포함 유효 | 0 |
+| `./verify contract-red` | scenario1 발견/실행, NOT_IMPLEMENTED assertion FAIL1 | 1 |
+| `./verify contract-red verification/harness/src/test/resources/examples/HARNESS-EXAMPLE/case.json` | expected/discovered/started/NOT_IMPLEMENTED 각1, skip0 | 1 |
+| 제품 schema/contracts/scenarios/recovery/mcp/skills/model/deployment | 실제 adapter 부재, 각 NOT_RUN·gate 미완료 | 각2 |
+
+[리뷰 보완 실행 증거](evidence/review-fixes/summary.json)에 source hash와
+JUnit/Cucumber/console/profile artifact를 남겼다. wrong scope/revision/
+physical snapshot/provenance, barrier 다섯 identity field 변조, 다른
+source 미실행 때의 확인된 위반, await 누락/다른 handle/status 누락,
+null/scalar absent 부모, 단위가 다른 zero delta와 schema 누락을
+selftest에서 거부했다. 표본과 mechanical ACK는 제품 실행 증거가 아니다.
+
+per-scenario Gherkin과 exact registry 보완은 다른 worker가 소유한다.
+coordinator 통합 검사가 남았으므로 이 commit만으로 B2나 Step2 완료를
+주장하지 않는다. 실제 서비스·DB·경합·host/model·BTP 검증은 NOT_RUN이다.

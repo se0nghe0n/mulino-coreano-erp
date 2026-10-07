@@ -112,7 +112,10 @@ version·효과·종료 조건의 conjunction을 검증했다고 주장하지 �
 `exactSet`, `relationSet`, `unique`, `sameAs`, `fieldsPresent`, `timeEquals`,
 `timeBefore`, `timeAtMostSeconds`다. decimal expected는 정확한 문자열이다.
 단위 있는 assertion은 `unitSource`로 실제 관찰 단위도 검사한다.
-`decimalDelta`/`sameAs`는 별도 `baseline` source를 요구한다. set/관계는
+`decimalDelta`/`sameAs`는 별도 `baseline` source를 요구한다.
+단위 있는 `decimalDelta`는 `baselineUnitSource`도 필수다. baseline과
+후속 관찰의 단위가 모두 고정 `unit`과 같아야 한다. 수치가 같아도
+100KG와100BOX의 차이를0BOX로 판정하지 않는다. set/관계는
 순서를 무시하되 중복 ID/tuple을 거부한다. `absent`도 실제로 관찰된 부모
 scope가 필요하며 explicit null은 absence가 아니다. `fieldsPresent`는
 필수 row가0개이면 실패한다. 효과0도 실제 전후 관찰을 요구한다.
@@ -145,6 +148,11 @@ Scenario Outline의 example도 독립 subcase로 선언해 기대 수를 맞춘�
 
 명사/동사 조회는 snapshot token, scope, asOf와 knownAt을 함께 비교한다.
 같은 knownAt 문자열만으로 같은 DB snapshot이라고 주장하지 않는다.
+observe의 요청 `scope`/`asOf`/`knownAt`은 결과의 같은 필드와 정확히
+같아야 한다. 요청 `snapshotRef`는 실제 결과 `data.snapshotRevision`을
+지칭하며 `data.snapshot.id`도 같은 실제 DB snapshot token이어야 한다.
+logical version이나 시각만 같은 다른 DB snapshot을 대신하지 않는다.
+`data.snapshot`/`sourceQuery`는 provenance의 실제 값과 같아야 한다.
 거부 사례는 대상 원장/배분/승인/업무 outbox의 금지 delta와 허용된 denial
 감사·inbox/대조 책임을 별도 assertion으로 둔다. 전체 DB 불변을 가정하지
 않는다. baseline 물량도 현재/누적 oracle의 scope에 포함하되 setup 자체를
@@ -193,8 +201,14 @@ ACK/commit·잠금/fence 증거가 필요하다. `control`은
 `parameters`를 받는다. EXECUTED control은 actual artifact와
 `data.acknowledged=true`, 요청과 같은 `controlType`/`operation`,
 `acknowledgedAt`을 요구한다. barrier ACK는 barrierId/participantId/
-transactionId/point/state도 필요하다. await는 `data.completed=true`의
-실제 terminal ACK가 필요하다. barrier/no-op나 sleep 우연을 경합
+transactionId/point/state도 필요하며 요청 `control.parameters`의
+각 값과 정확히 같아야 한다. 따라서 barrier 요청에도 다섯 필드를
+모두 명시한다. await는 `data.completed=true`, start와 동일한
+`data.invocationHandle`, `data.terminalStatus=SUCCEEDED|FAILED|CANCELLED`의
+실제 terminal ACK가 필요하다. terminalStatus는 실행 종료 상태이며
+별도 업무 assertion의 기대 outcome을 대신하지 않는다. 모든 start는
+parallel child를 포함해 정확히 하나의 awaitActionId로 연결해야 한다.
+제출 ACK와 DB 효과0만으로 case가 완료되지 않는다. barrier/no-op나 sleep 우연을 경합
 PASS로 세지 않는다. `parallel.branches`는 실제 async start/control/query를
 각각 실행하고 제출 ACK를 모은다. 이는 거래 완료를 주장하지 않는다.
 각 invocation의 `await`와 post-commit 독립 관찰을 별도로 둔다. 모든
@@ -235,6 +249,11 @@ UNAVAILABLE`, data/response, reason, provenance, artifactRefs를 가진다.
 반환한다. 관찰/설치/control/await/parallel child 중 하나라도 미실행이면
 전체 제품 case는 `NOT_RUN`이고 확인한 위반이 있으면 `FAIL`이다.
 첫 availability assertion만 통과시키고 이후 미관찰을0으로 읽지 않는다.
+각 assertion은 source/baseline/unitSource/baselineUnitSource의 실행
+상태를 따로 검사한다. 실행된 source의 위반은 다른 source의 미실행에도
+FAIL로 보존하고, 미실행 source의 assertion만 NOT_RUN으로 기록한다.
+`absent`는 관찰한 object/array 부모에서만 판정한다. null·scalar 부모는
+실제 관찰 scope가 아니므로 absence PASS를 만들지 않는다.
 
 `AgentRunner.Scripted`는 선언 typed intent를 실제 도구에 전달한다.
 `AgentRunner.ActualClientPort`는 raw userUtterance/permittedContext만 받는다.

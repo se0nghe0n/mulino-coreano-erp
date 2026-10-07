@@ -619,6 +619,44 @@
             "pointer"
           ],
           "additionalProperties": false
+        },
+        "baselineUnitSource": {
+          "type": "object",
+          "properties": {
+            "actionId": {
+              "type": "string",
+              "minLength": 1
+            },
+            "pointer": {
+              "type": "string",
+              "pattern": "^(/.*)?$"
+            },
+            "where": {
+              "type": "object",
+              "minProperties": 1
+            },
+            "field": {
+              "oneOf": [
+                {
+                  "type": "string",
+                  "minLength": 1
+                },
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "minItems": 1
+                }
+              ]
+            }
+          },
+          "required": [
+            "actionId",
+            "pointer"
+          ],
+          "additionalProperties": false
         }
       },
       "required": [
@@ -693,6 +731,23 @@
           "then": {
             "required": [
               "unitSource"
+            ]
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "op": {
+                "const": "decimalDelta"
+              }
+            },
+            "required": [
+              "unit"
+            ]
+          },
+          "then": {
+            "required": [
+              "baselineUnitSource"
             ]
           }
         }

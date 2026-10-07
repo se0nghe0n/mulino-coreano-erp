@@ -16,6 +16,8 @@ public final class CaseRunner {
     private final String caseHash;
     private final Map<String,JsonNode> results=new ConcurrentHashMap<>();
     private final Set<String> asserted=new HashSet<>();
+    private final Map<String,JsonNode> startedHandles=new ConcurrentHashMap<>();
+    private final Set<String> terminalStarts=ConcurrentHashMap.newKeySet();
     private final Map<String,JsonNode> actionIndex=new LinkedHashMap<>();
     private final Map<String,JsonNode> assertionIndex=new LinkedHashMap<>();
     private final List<ObjectNode> assertionResults=new ArrayList<>();
@@ -66,14 +68,27 @@ public final class CaseRunner {
                 if(!result.data().path("controlType").asText().equals(a.path("control").path("type").asText()) || !result.data().path("operation").asText().equals(a.path("control").path("operation").asText()))
                     throw new IllegalArgumentException("Control ACK does not match requested control type/operation");
                 if(!result.data().hasNonNull("acknowledgedAt")) throw new IllegalArgumentException("Control ACK time absent");
-                if(a.path("control").path("type").asText().equals("barrier")) for(String field:List.of("barrierId","participantId","transactionId","point","state"))
-                    if(!result.data().hasNonNull(field)) throw new IllegalArgumentException("Barrier real ACK missing "+field);
+                JsonNode requested=resolve(a.path("control"));
+                if(requested.path("type").asText().equals("barrier")) for(String field:List.of("barrierId","participantId","transactionId","point","state"))
+                    if(!requested.path("parameters").hasNonNull(field) || !result.data().hasNonNull(field) || !result.data().path(field).equals(requested.path("parameters").path(field)))
+                        throw new IllegalArgumentException("Barrier ACK differs from requested "+field);
             }
-            if(result.driverStatus()==StepResult.DriverStatus.EXECUTED && kind.equals("await") && !result.data().path("completed").asBoolean(false))
-                throw new IllegalArgumentException("await requires actual terminal invocation ACK, not only submission ACK");
+            if(result.driverStatus()==StepResult.DriverStatus.EXECUTED && kind.equals("start")) startedHandles.put(id,result.data().path("invocationHandle"));
+            if(result.driverStatus()==StepResult.DriverStatus.EXECUTED && kind.equals("await")) {
+                String source=Json.required(a,"awaitActionId");
+                if(!result.data().path("completed").asBoolean(false) || !Set.of("SUCCEEDED","FAILED","CANCELLED").contains(result.data().path("terminalStatus").asText()))
+                    throw new IllegalArgumentException("await requires actual terminal invocation ACK/status, not only submission ACK");
+                if(!result.data().path("invocationHandle").equals(startedHandles.get(source))) throw new IllegalArgumentException("await terminal ACK handle differs from submitted invocation");
+                terminalStarts.add(source);
+            }
             if(result.driverStatus()==StepResult.DriverStatus.EXECUTED && kind.equals("observe")) {
-                if(!result.data().path("asOf").equals(resolve(a.path("observation").path("asOf"))) || !result.data().path("knownAt").equals(resolve(a.path("observation").path("knownAt"))))
-                    throw new IllegalArgumentException("Observer time context differs from requested context");
+                JsonNode requested=resolve(a.path("observation"));
+                for(String field:List.of("asOf","knownAt","scope")) if(!result.data().path(field).equals(requested.path(field)))
+                    throw new IllegalArgumentException("Observer "+field+" differs from requested context");
+                if(!result.data().path("snapshotRevision").equals(requested.path("snapshotRef")) || !result.data().path("snapshot").path("id").equals(requested.path("snapshotRef")))
+                    throw new IllegalArgumentException("Observer actual snapshot id/snapshotRevision differs from requested snapshotRef");
+                if(!result.data().path("snapshot").equals(result.provenance().path("snapshot")) || !result.data().path("sourceQuery").equals(result.provenance().path("sourceQuery")))
+                    throw new IllegalArgumentException("Observer data snapshot/sourceQuery differ from actual provenance");
             }
             results.put(id,result.toJson());
             if(kind.equals("installFixture") && result.driverStatus()==StepResult.DriverStatus.EXECUTED) {
@@ -140,17 +155,27 @@ public final class CaseRunner {
     public String run(boolean contractRed) throws IOException {
         for(String id:actionIndex.keySet()) execute(id);
         boolean missing=results.values().stream().anyMatch(r->!"EXECUTED".equals(r.path("driverStatus").asText()));
-        if(missing && !contractRed) {
-            for(JsonNode assertion:assertionIndex.values()) { ObjectNode e=Json.object();e.put("assertionId",assertion.path("id").asText()).put("status","NOT_RUN").put("reason","Required action/observer unavailable; no zero effects inferred");e.set("expected",assertion.path("expected"));e.set("source",assertion.path("source"));e.putNull("observed");assertionResults.add(e); }
-            return "NOT_RUN";
-        }
         boolean failed=false;
-        for(String id:assertionIndex.keySet()) try { assertId(id); } catch(AssertionError e) { failed=true; }
-        return failed ? "FAIL" : missing ? "NOT_RUN" : "PASS";
+        for(String id:assertionIndex.keySet()) {
+            JsonNode assertion=assertionIndex.get(id);
+            if(!contractRed && !sourcesExecuted(assertion)) {
+                ObjectNode e=Json.object();e.put("assertionId",id).put("status","NOT_RUN").put("reason","Assertion source unavailable; no zero effects inferred");e.set("expected",assertion.path("expected"));e.set("source",assertion.path("source"));e.putNull("observed");assertionResults.add(e);
+            } else try { assertId(id); } catch(AssertionError e) { failed=true; }
+        }
+        boolean incomplete=!terminalStarts.containsAll(startedHandles.keySet());
+        return failed ? "FAIL" : missing || incomplete ? "NOT_RUN" : "PASS";
+    }
+    private boolean sourcesExecuted(JsonNode assertion) {
+        for(String key:List.of("source","baseline","unitSource","baselineUnitSource")) if(assertion.has(key)) {
+            JsonNode r=results.get(assertion.path(key).path("actionId").asText());
+            if(r==null || !r.path("driverStatus").asText().equals("EXECUTED")) return false;
+        }
+        return true;
     }
     public void verifyComplete() {
         if(!results.keySet().containsAll(actionIndex.keySet())) throw new AssertionError("Feature omitted required actions");
         if(!asserted.containsAll(assertionIndex.keySet())) throw new AssertionError("Feature omitted substantive assertions");
+        if(!terminalStarts.containsAll(startedHandles.keySet())) throw new AssertionError("Started invocation lacks terminal await ACK");
         if(results.values().stream().anyMatch(r->!"EXECUTED".equals(r.path("driverStatus").asText()))) throw new AssertionError("Required adapter action NOT_IMPLEMENTED/UNAVAILABLE");
     }
     public ObjectNode evidence(String status,String command) throws IOException {

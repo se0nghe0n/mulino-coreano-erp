@@ -1,0 +1,85 @@
+[
+  {
+    "command": [
+      "./verify",
+      "validate",
+      "verification/harness/src/test/resources/examples/HARNESS-EXAMPLE/case.json"
+    ],
+    "exitCode": 0,
+    "log": "verification/harness/target/review-fixes-validate.log"
+  },
+  {
+    "command": [
+      "./verify",
+      "contract-red",
+      "verification/harness/src/test/resources/examples/HARNESS-EXAMPLE/case.json"
+    ],
+    "exitCode": 1,
+    "log": "verification/harness/target/review-fixes-contract-red-explicit.log"
+  },
+  {
+    "command": [
+      "./verify",
+      "schema"
+    ],
+    "exitCode": 2,
+    "log": "verification/harness/target/review-fixes-schema.log"
+  },
+  {
+    "command": [
+      "./verify",
+      "contracts"
+    ],
+    "exitCode": 2,
+    "log": "verification/harness/target/review-fixes-contracts.log"
+  },
+  {
+    "command": [
+      "./verify",
+      "scenarios",
+      "verification/harness/src/test/resources/examples/HARNESS-EXAMPLE/case.json"
+    ],
+    "exitCode": 2,
+    "log": "verification/harness/target/review-fixes-scenarios.log"
+  },
+  {
+    "command": [
+      "./verify",
+      "recovery"
+    ],
+    "exitCode": 2,
+    "log": "verification/harness/target/review-fixes-recovery.log"
+  },
+  {
+    "command": [
+      "./verify",
+      "mcp"
+    ],
+    "exitCode": 2,
+    "log": "verification/harness/target/review-fixes-mcp.log"
+  },
+  {
+    "command": [
+      "./verify",
+      "skills"
+    ],
+    "exitCode": 2,
+    "log": "verification/harness/target/review-fixes-skills.log"
+  },
+  {
+    "command": [
+      "./verify",
+      "model"
+    ],
+    "exitCode": 2,
+    "log": "verification/harness/target/review-fixes-model.log"
+  },
+  {
+    "command": [
+      "./verify",
+      "deployment"
+    ],
+    "exitCode": 2,
+    "log": "verification/harness/target/review-fixes-deployment.log"
+  }
+]

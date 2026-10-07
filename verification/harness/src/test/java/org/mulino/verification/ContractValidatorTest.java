@@ -1,6 +1,7 @@
 package org.mulino.verification;
 
 import org.junit.jupiter.api.*;
+import com.fasterxml.jackson.databind.JsonNode;
 import java.nio.file.*;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -21,5 +22,10 @@ public class ContractValidatorTest {
         var v=new ContractValidator(root);var path=root.resolve("verification/harness/src/test/resources/examples/HARNESS-EXAMPLE/case.json");
         assertEquals("NOT_RUN",new CaseRunner(v,new UnimplementedDriver(),new AgentRunner.Scripted(),path,"hold-preserves-physical").run(false));
         assertEquals("FAIL",new CaseRunner(v,new UnimplementedDriver(),new AgentRunner.Scripted(),path,"hold-preserves-physical").run(true));
+    }
+    @Test void unitBearingDeltaRequiresExplicitBaselineUnitSource() throws Exception {
+        JsonNode c=Json.read(root.resolve("verification/harness/src/test/resources/examples/HARNESS-EXAMPLE/case.json"));
+        for(JsonNode a:c.path("subcases").get(0).path("assertions")) if(a.path("op").asText().equals("decimalDelta")) ((com.fasterxml.jackson.databind.node.ObjectNode)a).remove("baselineUnitSource");
+        assertThrows(IllegalArgumentException.class,()->new ContractValidator(root).schema("contracts/acceptance-case.schema.json",c));
     }
 }
