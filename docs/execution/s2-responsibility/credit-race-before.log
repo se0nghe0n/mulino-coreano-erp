@@ -1,0 +1,316 @@
+04:08:04.708 [main] INFO org.testcontainers.images.PullPolicy -- Image pull policy will be performed by: DefaultPullPolicy()
+04:08:04.710 [main] INFO org.testcontainers.utility.ImageNameSubstitutor -- Image name substitution will be performed by: DefaultImageNameSubstitutor (composite of 'ConfigurationFileImageNameSubstitutor' and 'PrefixingImageNameSubstitutor')
+04:08:04.728 [main] INFO org.testcontainers.DockerClientFactory -- Testcontainers version: 2.0.5
+04:08:04.845 [main] INFO org.testcontainers.dockerclient.DockerClientProviderStrategy -- Loaded org.testcontainers.dockerclient.UnixSocketClientProviderStrategy from ~/.testcontainers.properties, will try it first
+04:08:05.194 [main] INFO org.testcontainers.dockerclient.DockerClientProviderStrategy -- Found Docker environment with local Unix socket (unix:///var/run/docker.sock)
+04:08:05.194 [main] INFO org.testcontainers.DockerClientFactory -- Docker host IP address is localhost
+04:08:05.203 [main] INFO org.testcontainers.DockerClientFactory -- Connected to docker: 
+  Server Version: 29.4.0
+  API Version: 1.54
+  Operating System: OrbStack
+  Total Memory: 8004 MB
+04:08:05.217 [main] INFO tc.testcontainers/ryuk:0.14.0 -- Creating container for image: testcontainers/ryuk:0.14.0
+04:08:05.250 [main] INFO org.testcontainers.utility.RegistryAuthLocator -- Credential helper/store (docker-credential-osxkeychain) does not have credentials for https://index.docker.io/v1/
+04:08:05.320 [main] INFO tc.testcontainers/ryuk:0.14.0 -- Container testcontainers/ryuk:0.14.0 is starting: a0b7602ba7efad1695b4447bc7d4992ad90c1c5a694e1baea5d588c730e3f68a
+04:08:05.608 [main] INFO tc.testcontainers/ryuk:0.14.0 -- Container testcontainers/ryuk:0.14.0 started in PT0.391316S
+04:08:05.612 [testcontainers-ryuk] WARN org.testcontainers.utility.RyukResourceReaper -- Can not connect to Ryuk at localhost:32999
+java.net.ConnectException: Connection refused
+	at java.base/sun.nio.ch.Net.pollConnect(Native Method)
+	at java.base/sun.nio.ch.Net.pollConnectNow(Net.java:682)
+	at java.base/sun.nio.ch.NioSocketImpl.timedFinishConnect(NioSocketImpl.java:542)
+	at java.base/sun.nio.ch.NioSocketImpl.connect(NioSocketImpl.java:592)
+	at java.base/java.net.SocksSocketImpl.connect(SocksSocketImpl.java:327)
+	at java.base/java.net.Socket.connect(Socket.java:757)
+	at org.testcontainers.utility.RyukResourceReaper.lambda$maybeStart$0(RyukResourceReaper.java:92)
+	at org.rnorth.ducttape.ratelimits.RateLimiter.doWhenReady(RateLimiter.java:27)
+	at org.testcontainers.utility.RyukResourceReaper.lambda$maybeStart$1(RyukResourceReaper.java:88)
+	at java.base/java.lang.Thread.run(Thread.java:1583)
+04:08:05.879 [main] INFO org.testcontainers.utility.RyukResourceReaper -- Ryuk started - will monitor and terminate Testcontainers containers on JVM exit
+04:08:05.879 [main] INFO org.testcontainers.DockerClientFactory -- Checking the system...
+04:08:05.880 [main] INFO org.testcontainers.DockerClientFactory -- ✔︎ Docker server version should be at least 1.6.0
+04:08:05.889 [main] INFO tc.postgres@sha256:4ef4db... -- Creating container for image: postgres@sha256:4ef4dbc939d61acea57712655ddb4b4ab27419c913f94cca0cd57cb3ea3c2280
+04:08:05.941 [main] INFO tc.postgres@sha256:4ef4db... -- Container postgres@sha256:4ef4dbc939d61acea57712655ddb4b4ab27419c913f94cca0cd57cb3ea3c2280 is starting: 04dad10d273c9dd5b167a892442d33a8fa701a70cc6205b189244390ab6e0637
+04:08:08.041 [main] INFO tc.postgres@sha256:4ef4db... -- Container postgres@sha256:4ef4dbc939d61acea57712655ddb4b4ab27419c913f94cca0cd57cb3ea3c2280 started in PT2.15226S
+04:08:08.042 [main] INFO tc.postgres@sha256:4ef4db... -- Container is started (JDBC URL: jdbc:postgresql://localhost:33000/test?loggerLevel=OFF)
+Completion credit race: valid=CreditAttempt[applied=false, sqlState=40P01, message=ERROR: deadlock detected
+  Detail: Process 83 waits for ShareLock on transaction 780; blocked by process 84.
+Process 84 waits for ShareLock on transaction 781; blocked by process 83.
+  Hint: See server log for query details.
+  Where: while locking tuple (0,1) in relation "mulino_responsibility_completionbindings"
+SQL statement "SELECT *              FROM mulino_responsibility_CompletionBindings WHERE organizationId=NEW.organizationId AND ID=NEW.bindingId FOR UPDATE"
+PL/pgSQL function mulino_responsibility_credit_validate() line 4 at SQL statement] invalid=CreditAttempt[applied=false, sqlState=P0001, message=ERROR: Completion credit requires exact covered duty leaf range
+  Where: PL/pgSQL function mulino_responsibility_credit_validate() line 12 at RAISE]
+Completion credit race: valid=CreditAttempt[applied=false, sqlState=40P01, message=ERROR: deadlock detected
+  Detail: Process 90 waits for ShareLock on transaction 791; blocked by process 89.
+Process 89 waits for ShareLock on transaction 792; blocked by process 90.
+  Hint: See server log for query details.
+  Where: while locking tuple (0,2) in relation "mulino_responsibility_completionbindings"
+SQL statement "SELECT *              FROM mulino_responsibility_CompletionBindings WHERE organizationId=NEW.organizationId AND ID=NEW.bindingId FOR UPDATE"
+PL/pgSQL function mulino_responsibility_credit_validate() line 4 at SQL statement] invalid=CreditAttempt[applied=false, sqlState=P0001, message=ERROR: Completion credit requires exact covered duty leaf range
+  Where: PL/pgSQL function mulino_responsibility_credit_validate() line 12 at RAISE]
+Completion credit race: valid=CreditAttempt[applied=false, sqlState=40P01, message=ERROR: deadlock detected
+  Detail: Process 96 waits for ShareLock on transaction 802; blocked by process 95.
+Process 95 waits for ShareLock on transaction 803; blocked by process 96.
+  Hint: See server log for query details.
+  Where: while locking tuple (0,3) in relation "mulino_responsibility_completionbindings"
+SQL statement "SELECT *              FROM mulino_responsibility_CompletionBindings WHERE organizationId=NEW.organizationId AND ID=NEW.bindingId FOR UPDATE"
+PL/pgSQL function mulino_responsibility_credit_validate() line 4 at SQL statement] invalid=CreditAttempt[applied=false, sqlState=P0001, message=ERROR: Completion credit requires exact covered duty leaf range
+  Where: PL/pgSQL function mulino_responsibility_credit_validate() line 12 at RAISE]
+Completion credit race: valid=CreditAttempt[applied=false, sqlState=40P01, message=ERROR: deadlock detected
+  Detail: Process 102 waits for ShareLock on transaction 813; blocked by process 101.
+Process 101 waits for ShareLock on transaction 814; blocked by process 102.
+  Hint: See server log for query details.
+  Where: while locking tuple (0,4) in relation "mulino_responsibility_completionbindings"
+SQL statement "SELECT *              FROM mulino_responsibility_CompletionBindings WHERE organizationId=NEW.organizationId AND ID=NEW.bindingId FOR UPDATE"
+PL/pgSQL function mulino_responsibility_credit_validate() line 4 at SQL statement] invalid=CreditAttempt[applied=false, sqlState=P0001, message=ERROR: Completion credit requires exact covered duty leaf range
+  Where: PL/pgSQL function mulino_responsibility_credit_validate() line 12 at RAISE]
+Completion credit race: valid=CreditAttempt[applied=true, sqlState=null, message=null] invalid=CreditAttempt[applied=false, sqlState=40P01, message=ERROR: deadlock detected
+  Detail: Process 107 waits for ShareLock on transaction 825; blocked by process 108.
+Process 108 waits for ShareLock on transaction 824; blocked by process 107.
+  Hint: See server log for query details.
+  Where: while locking tuple (0,5) in relation "mulino_responsibility_completionbindings"
+SQL statement "SELECT *              FROM mulino_responsibility_CompletionBindings WHERE organizationId=NEW.organizationId AND ID=NEW.bindingId FOR UPDATE"
+PL/pgSQL function mulino_responsibility_credit_validate() line 4 at SQL statement]
+Completion credit race: valid=CreditAttempt[applied=false, sqlState=40P01, message=ERROR: deadlock detected
+  Detail: Process 113 waits for ShareLock on transaction 836; blocked by process 114.
+Process 114 waits for ShareLock on transaction 835; blocked by process 113.
+  Hint: See server log for query details.
+  Where: while locking tuple (0,6) in relation "mulino_responsibility_completionbindings"
+SQL statement "SELECT *              FROM mulino_responsibility_CompletionBindings WHERE organizationId=NEW.organizationId AND ID=NEW.bindingId FOR UPDATE"
+PL/pgSQL function mulino_responsibility_credit_validate() line 4 at SQL statement] invalid=CreditAttempt[applied=false, sqlState=P0001, message=ERROR: Completion credit requires exact covered duty leaf range
+  Where: PL/pgSQL function mulino_responsibility_credit_validate() line 12 at RAISE]
+Completion credit race: valid=CreditAttempt[applied=true, sqlState=null, message=null] invalid=CreditAttempt[applied=false, sqlState=40P01, message=ERROR: deadlock detected
+  Detail: Process 119 waits for ShareLock on transaction 847; blocked by process 120.
+Process 120 waits for ShareLock on transaction 846; blocked by process 119.
+  Hint: See server log for query details.
+  Where: while locking tuple (0,7) in relation "mulino_responsibility_completionbindings"
+SQL statement "SELECT *              FROM mulino_responsibility_CompletionBindings WHERE organizationId=NEW.organizationId AND ID=NEW.bindingId FOR UPDATE"
+PL/pgSQL function mulino_responsibility_credit_validate() line 4 at SQL statement]
+Completion credit race: valid=CreditAttempt[applied=false, sqlState=40P01, message=ERROR: deadlock detected
+  Detail: Process 126 waits for ShareLock on transaction 857; blocked by process 125.
+Process 125 waits for ShareLock on transaction 858; blocked by process 126.
+  Hint: See server log for query details.
+  Where: while locking tuple (0,8) in relation "mulino_responsibility_completionbindings"
+SQL statement "SELECT *              FROM mulino_responsibility_CompletionBindings WHERE organizationId=NEW.organizationId AND ID=NEW.bindingId FOR UPDATE"
+PL/pgSQL function mulino_responsibility_credit_validate() line 4 at SQL statement] invalid=CreditAttempt[applied=false, sqlState=P0001, message=ERROR: Completion credit requires exact covered duty leaf range
+  Where: PL/pgSQL function mulino_responsibility_credit_validate() line 12 at RAISE]
+Completion credit race: valid=CreditAttempt[applied=false, sqlState=40P01, message=ERROR: deadlock detected
+  Detail: Process 132 waits for ShareLock on transaction 868; blocked by process 131.
+Process 131 waits for ShareLock on transaction 869; blocked by process 132.
+  Hint: See server log for query details.
+  Where: while locking tuple (0,9) in relation "mulino_responsibility_completionbindings"
+SQL statement "SELECT *              FROM mulino_responsibility_CompletionBindings WHERE organizationId=NEW.organizationId AND ID=NEW.bindingId FOR UPDATE"
+PL/pgSQL function mulino_responsibility_credit_validate() line 4 at SQL statement] invalid=CreditAttempt[applied=false, sqlState=P0001, message=ERROR: Completion credit requires exact covered duty leaf range
+  Where: PL/pgSQL function mulino_responsibility_credit_validate() line 12 at RAISE]
+Completion credit race: valid=CreditAttempt[applied=true, sqlState=null, message=null] invalid=CreditAttempt[applied=false, sqlState=40P01, message=ERROR: deadlock detected
+  Detail: Process 138 waits for ShareLock on transaction 880; blocked by process 137.
+Process 137 waits for ShareLock on transaction 879; blocked by process 138.
+  Hint: See server log for query details.
+  Where: while locking tuple (0,10) in relation "mulino_responsibility_completionbindings"
+SQL statement "SELECT *              FROM mulino_responsibility_CompletionBindings WHERE organizationId=NEW.organizationId AND ID=NEW.bindingId FOR UPDATE"
+PL/pgSQL function mulino_responsibility_credit_validate() line 4 at SQL statement]
+[ERROR] Tests run: 10, Failures: 10, Errors: 0, Skipped: 0, Time elapsed: 15.02 s <<< FAILURE! -- in com.mulino.responsibility.ResponsibilityPostgresTest
+[ERROR] com.mulino.responsibility.ResponsibilityPostgresTest.concurrentPartialCompletionCreditNeverDischargesHundred()[1] -- Time elapsed: 1.174 s <<< FAILURE!
+org.opentest4j.AssertionFailedError: 
+Valid covered range rejected: CreditAttempt[applied=false, sqlState=40P01, message=ERROR: deadlock detected
+  Detail: Process 83 waits for ShareLock on transaction 780; blocked by process 84.
+Process 84 waits for ShareLock on transaction 781; blocked by process 83.
+  Hint: See server log for query details.
+  Where: while locking tuple (0,1) in relation "mulino_responsibility_completionbindings"
+SQL statement "SELECT *              FROM mulino_responsibility_CompletionBindings WHERE organizationId=NEW.organizationId AND ID=NEW.bindingId FOR UPDATE"
+PL/pgSQL function mulino_responsibility_credit_validate() line 4 at SQL statement] ==> expected: <true> but was: <false>
+	at org.junit.jupiter.api.AssertionFailureBuilder.build(AssertionFailureBuilder.java:158)
+	at org.junit.jupiter.api.AssertionFailureBuilder.buildAndThrow(AssertionFailureBuilder.java:139)
+	at org.junit.jupiter.api.AssertTrue.failNotTrue(AssertTrue.java:69)
+	at org.junit.jupiter.api.AssertTrue.assertTrue(AssertTrue.java:41)
+	at org.junit.jupiter.api.Assertions.assertTrue(Assertions.java:228)
+	at com.mulino.responsibility.ResponsibilityPostgresTest.concurrentPartialCompletionCreditNeverDischargesHundred(ResponsibilityPostgresTest.java:46)
+
+[ERROR] com.mulino.responsibility.ResponsibilityPostgresTest.concurrentPartialCompletionCreditNeverDischargesHundred()[2] -- Time elapsed: 1.075 s <<< FAILURE!
+org.opentest4j.AssertionFailedError: 
+Valid covered range rejected: CreditAttempt[applied=false, sqlState=40P01, message=ERROR: deadlock detected
+  Detail: Process 90 waits for ShareLock on transaction 791; blocked by process 89.
+Process 89 waits for ShareLock on transaction 792; blocked by process 90.
+  Hint: See server log for query details.
+  Where: while locking tuple (0,2) in relation "mulino_responsibility_completionbindings"
+SQL statement "SELECT *              FROM mulino_responsibility_CompletionBindings WHERE organizationId=NEW.organizationId AND ID=NEW.bindingId FOR UPDATE"
+PL/pgSQL function mulino_responsibility_credit_validate() line 4 at SQL statement] ==> expected: <true> but was: <false>
+	at org.junit.jupiter.api.AssertionFailureBuilder.build(AssertionFailureBuilder.java:158)
+	at org.junit.jupiter.api.AssertionFailureBuilder.buildAndThrow(AssertionFailureBuilder.java:139)
+	at org.junit.jupiter.api.AssertTrue.failNotTrue(AssertTrue.java:69)
+	at org.junit.jupiter.api.AssertTrue.assertTrue(AssertTrue.java:41)
+	at org.junit.jupiter.api.Assertions.assertTrue(Assertions.java:228)
+	at com.mulino.responsibility.ResponsibilityPostgresTest.concurrentPartialCompletionCreditNeverDischargesHundred(ResponsibilityPostgresTest.java:46)
+
+[ERROR] com.mulino.responsibility.ResponsibilityPostgresTest.concurrentPartialCompletionCreditNeverDischargesHundred()[3] -- Time elapsed: 1.084 s <<< FAILURE!
+org.opentest4j.AssertionFailedError: 
+Valid covered range rejected: CreditAttempt[applied=false, sqlState=40P01, message=ERROR: deadlock detected
+  Detail: Process 96 waits for ShareLock on transaction 802; blocked by process 95.
+Process 95 waits for ShareLock on transaction 803; blocked by process 96.
+  Hint: See server log for query details.
+  Where: while locking tuple (0,3) in relation "mulino_responsibility_completionbindings"
+SQL statement "SELECT *              FROM mulino_responsibility_CompletionBindings WHERE organizationId=NEW.organizationId AND ID=NEW.bindingId FOR UPDATE"
+PL/pgSQL function mulino_responsibility_credit_validate() line 4 at SQL statement] ==> expected: <true> but was: <false>
+	at org.junit.jupiter.api.AssertionFailureBuilder.build(AssertionFailureBuilder.java:158)
+	at org.junit.jupiter.api.AssertionFailureBuilder.buildAndThrow(AssertionFailureBuilder.java:139)
+	at org.junit.jupiter.api.AssertTrue.failNotTrue(AssertTrue.java:69)
+	at org.junit.jupiter.api.AssertTrue.assertTrue(AssertTrue.java:41)
+	at org.junit.jupiter.api.Assertions.assertTrue(Assertions.java:228)
+	at com.mulino.responsibility.ResponsibilityPostgresTest.concurrentPartialCompletionCreditNeverDischargesHundred(ResponsibilityPostgresTest.java:46)
+
+[ERROR] com.mulino.responsibility.ResponsibilityPostgresTest.concurrentPartialCompletionCreditNeverDischargesHundred()[4] -- Time elapsed: 1.103 s <<< FAILURE!
+org.opentest4j.AssertionFailedError: 
+Valid covered range rejected: CreditAttempt[applied=false, sqlState=40P01, message=ERROR: deadlock detected
+  Detail: Process 102 waits for ShareLock on transaction 813; blocked by process 101.
+Process 101 waits for ShareLock on transaction 814; blocked by process 102.
+  Hint: See server log for query details.
+  Where: while locking tuple (0,4) in relation "mulino_responsibility_completionbindings"
+SQL statement "SELECT *              FROM mulino_responsibility_CompletionBindings WHERE organizationId=NEW.organizationId AND ID=NEW.bindingId FOR UPDATE"
+PL/pgSQL function mulino_responsibility_credit_validate() line 4 at SQL statement] ==> expected: <true> but was: <false>
+	at org.junit.jupiter.api.AssertionFailureBuilder.build(AssertionFailureBuilder.java:158)
+	at org.junit.jupiter.api.AssertionFailureBuilder.buildAndThrow(AssertionFailureBuilder.java:139)
+	at org.junit.jupiter.api.AssertTrue.failNotTrue(AssertTrue.java:69)
+	at org.junit.jupiter.api.AssertTrue.assertTrue(AssertTrue.java:41)
+	at org.junit.jupiter.api.Assertions.assertTrue(Assertions.java:228)
+	at com.mulino.responsibility.ResponsibilityPostgresTest.concurrentPartialCompletionCreditNeverDischargesHundred(ResponsibilityPostgresTest.java:46)
+
+[ERROR] com.mulino.responsibility.ResponsibilityPostgresTest.concurrentPartialCompletionCreditNeverDischargesHundred()[5] -- Time elapsed: 1.090 s <<< FAILURE!
+org.opentest4j.AssertionFailedError: Expected explicit quantity/range constraint rejection, not deadlock or unrelated failure ==> expected: <P0001> but was: <40P01>
+	at org.junit.jupiter.api.AssertionFailureBuilder.build(AssertionFailureBuilder.java:158)
+	at org.junit.jupiter.api.AssertionFailureBuilder.buildAndThrow(AssertionFailureBuilder.java:139)
+	at org.junit.jupiter.api.AssertEquals.failNotEqual(AssertEquals.java:201)
+	at org.junit.jupiter.api.AssertEquals.assertEquals(AssertEquals.java:184)
+	at org.junit.jupiter.api.Assertions.assertEquals(Assertions.java:1199)
+	at com.mulino.responsibility.ResponsibilityPostgresTest.concurrentPartialCompletionCreditNeverDischargesHundred(ResponsibilityPostgresTest.java:46)
+
+[ERROR] com.mulino.responsibility.ResponsibilityPostgresTest.concurrentPartialCompletionCreditNeverDischargesHundred()[6] -- Time elapsed: 1.086 s <<< FAILURE!
+org.opentest4j.AssertionFailedError: 
+Valid covered range rejected: CreditAttempt[applied=false, sqlState=40P01, message=ERROR: deadlock detected
+  Detail: Process 113 waits for ShareLock on transaction 836; blocked by process 114.
+Process 114 waits for ShareLock on transaction 835; blocked by process 113.
+  Hint: See server log for query details.
+  Where: while locking tuple (0,6) in relation "mulino_responsibility_completionbindings"
+SQL statement "SELECT *              FROM mulino_responsibility_CompletionBindings WHERE organizationId=NEW.organizationId AND ID=NEW.bindingId FOR UPDATE"
+PL/pgSQL function mulino_responsibility_credit_validate() line 4 at SQL statement] ==> expected: <true> but was: <false>
+	at org.junit.jupiter.api.AssertionFailureBuilder.build(AssertionFailureBuilder.java:158)
+	at org.junit.jupiter.api.AssertionFailureBuilder.buildAndThrow(AssertionFailureBuilder.java:139)
+	at org.junit.jupiter.api.AssertTrue.failNotTrue(AssertTrue.java:69)
+	at org.junit.jupiter.api.AssertTrue.assertTrue(AssertTrue.java:41)
+	at org.junit.jupiter.api.Assertions.assertTrue(Assertions.java:228)
+	at com.mulino.responsibility.ResponsibilityPostgresTest.concurrentPartialCompletionCreditNeverDischargesHundred(ResponsibilityPostgresTest.java:46)
+
+[ERROR] com.mulino.responsibility.ResponsibilityPostgresTest.concurrentPartialCompletionCreditNeverDischargesHundred()[7] -- Time elapsed: 1.087 s <<< FAILURE!
+org.opentest4j.AssertionFailedError: Expected explicit quantity/range constraint rejection, not deadlock or unrelated failure ==> expected: <P0001> but was: <40P01>
+	at org.junit.jupiter.api.AssertionFailureBuilder.build(AssertionFailureBuilder.java:158)
+	at org.junit.jupiter.api.AssertionFailureBuilder.buildAndThrow(AssertionFailureBuilder.java:139)
+	at org.junit.jupiter.api.AssertEquals.failNotEqual(AssertEquals.java:201)
+	at org.junit.jupiter.api.AssertEquals.assertEquals(AssertEquals.java:184)
+	at org.junit.jupiter.api.Assertions.assertEquals(Assertions.java:1199)
+	at com.mulino.responsibility.ResponsibilityPostgresTest.concurrentPartialCompletionCreditNeverDischargesHundred(ResponsibilityPostgresTest.java:46)
+
+[ERROR] com.mulino.responsibility.ResponsibilityPostgresTest.concurrentPartialCompletionCreditNeverDischargesHundred()[8] -- Time elapsed: 1.083 s <<< FAILURE!
+org.opentest4j.AssertionFailedError: 
+Valid covered range rejected: CreditAttempt[applied=false, sqlState=40P01, message=ERROR: deadlock detected
+  Detail: Process 126 waits for ShareLock on transaction 857; blocked by process 125.
+Process 125 waits for ShareLock on transaction 858; blocked by process 126.
+  Hint: See server log for query details.
+  Where: while locking tuple (0,8) in relation "mulino_responsibility_completionbindings"
+SQL statement "SELECT *              FROM mulino_responsibility_CompletionBindings WHERE organizationId=NEW.organizationId AND ID=NEW.bindingId FOR UPDATE"
+PL/pgSQL function mulino_responsibility_credit_validate() line 4 at SQL statement] ==> expected: <true> but was: <false>
+	at org.junit.jupiter.api.AssertionFailureBuilder.build(AssertionFailureBuilder.java:158)
+	at org.junit.jupiter.api.AssertionFailureBuilder.buildAndThrow(AssertionFailureBuilder.java:139)
+	at org.junit.jupiter.api.AssertTrue.failNotTrue(AssertTrue.java:69)
+	at org.junit.jupiter.api.AssertTrue.assertTrue(AssertTrue.java:41)
+	at org.junit.jupiter.api.Assertions.assertTrue(Assertions.java:228)
+	at com.mulino.responsibility.ResponsibilityPostgresTest.concurrentPartialCompletionCreditNeverDischargesHundred(ResponsibilityPostgresTest.java:46)
+
+[ERROR] com.mulino.responsibility.ResponsibilityPostgresTest.concurrentPartialCompletionCreditNeverDischargesHundred()[9] -- Time elapsed: 1.085 s <<< FAILURE!
+org.opentest4j.AssertionFailedError: 
+Valid covered range rejected: CreditAttempt[applied=false, sqlState=40P01, message=ERROR: deadlock detected
+  Detail: Process 132 waits for ShareLock on transaction 868; blocked by process 131.
+Process 131 waits for ShareLock on transaction 869; blocked by process 132.
+  Hint: See server log for query details.
+  Where: while locking tuple (0,9) in relation "mulino_responsibility_completionbindings"
+SQL statement "SELECT *              FROM mulino_responsibility_CompletionBindings WHERE organizationId=NEW.organizationId AND ID=NEW.bindingId FOR UPDATE"
+PL/pgSQL function mulino_responsibility_credit_validate() line 4 at SQL statement] ==> expected: <true> but was: <false>
+	at org.junit.jupiter.api.AssertionFailureBuilder.build(AssertionFailureBuilder.java:158)
+	at org.junit.jupiter.api.AssertionFailureBuilder.buildAndThrow(AssertionFailureBuilder.java:139)
+	at org.junit.jupiter.api.AssertTrue.failNotTrue(AssertTrue.java:69)
+	at org.junit.jupiter.api.AssertTrue.assertTrue(AssertTrue.java:41)
+	at org.junit.jupiter.api.Assertions.assertTrue(Assertions.java:228)
+	at com.mulino.responsibility.ResponsibilityPostgresTest.concurrentPartialCompletionCreditNeverDischargesHundred(ResponsibilityPostgresTest.java:46)
+
+[ERROR] com.mulino.responsibility.ResponsibilityPostgresTest.concurrentPartialCompletionCreditNeverDischargesHundred()[10] -- Time elapsed: 1.098 s <<< FAILURE!
+org.opentest4j.AssertionFailedError: Expected explicit quantity/range constraint rejection, not deadlock or unrelated failure ==> expected: <P0001> but was: <40P01>
+	at org.junit.jupiter.api.AssertionFailureBuilder.build(AssertionFailureBuilder.java:158)
+	at org.junit.jupiter.api.AssertionFailureBuilder.buildAndThrow(AssertionFailureBuilder.java:139)
+	at org.junit.jupiter.api.AssertEquals.failNotEqual(AssertEquals.java:201)
+	at org.junit.jupiter.api.AssertEquals.assertEquals(AssertEquals.java:184)
+	at org.junit.jupiter.api.Assertions.assertEquals(Assertions.java:1199)
+	at com.mulino.responsibility.ResponsibilityPostgresTest.concurrentPartialCompletionCreditNeverDischargesHundred(ResponsibilityPostgresTest.java:46)
+
+[ERROR] Failures: 
+[ERROR]   ResponsibilityPostgresTest.concurrentPartialCompletionCreditNeverDischargesHundred:46 Expected explicit quantity/range constraint rejection, not deadlock or unrelated failure ==> expected: <P0001> but was: <40P01>
+[ERROR]   ResponsibilityPostgresTest.concurrentPartialCompletionCreditNeverDischargesHundred:46 Valid covered range rejected: CreditAttempt[applied=false, sqlState=40P01, message=ERROR: deadlock detected
+  Detail: Process 83 waits for ShareLock on transaction 780; blocked by process 84.
+Process 84 waits for ShareLock on transaction 781; blocked by process 83.
+  Hint: See server log for query details.
+  Where: while locking tuple (0,1) in relation "mulino_responsibility_completionbindings"
+SQL statement "SELECT *              FROM mulino_responsibility_CompletionBindings WHERE organizationId=NEW.organizationId AND ID=NEW.bindingId FOR UPDATE"
+PL/pgSQL function mulino_responsibility_credit_validate() line 4 at SQL statement] ==> expected: <true> but was: <false>
+[ERROR]   ResponsibilityPostgresTest.concurrentPartialCompletionCreditNeverDischargesHundred:46 Valid covered range rejected: CreditAttempt[applied=false, sqlState=40P01, message=ERROR: deadlock detected
+  Detail: Process 90 waits for ShareLock on transaction 791; blocked by process 89.
+Process 89 waits for ShareLock on transaction 792; blocked by process 90.
+  Hint: See server log for query details.
+  Where: while locking tuple (0,2) in relation "mulino_responsibility_completionbindings"
+SQL statement "SELECT *              FROM mulino_responsibility_CompletionBindings WHERE organizationId=NEW.organizationId AND ID=NEW.bindingId FOR UPDATE"
+PL/pgSQL function mulino_responsibility_credit_validate() line 4 at SQL statement] ==> expected: <true> but was: <false>
+[ERROR]   ResponsibilityPostgresTest.concurrentPartialCompletionCreditNeverDischargesHundred:46 Valid covered range rejected: CreditAttempt[applied=false, sqlState=40P01, message=ERROR: deadlock detected
+  Detail: Process 96 waits for ShareLock on transaction 802; blocked by process 95.
+Process 95 waits for ShareLock on transaction 803; blocked by process 96.
+  Hint: See server log for query details.
+  Where: while locking tuple (0,3) in relation "mulino_responsibility_completionbindings"
+SQL statement "SELECT *              FROM mulino_responsibility_CompletionBindings WHERE organizationId=NEW.organizationId AND ID=NEW.bindingId FOR UPDATE"
+PL/pgSQL function mulino_responsibility_credit_validate() line 4 at SQL statement] ==> expected: <true> but was: <false>
+[ERROR]   ResponsibilityPostgresTest.concurrentPartialCompletionCreditNeverDischargesHundred:46 Valid covered range rejected: CreditAttempt[applied=false, sqlState=40P01, message=ERROR: deadlock detected
+  Detail: Process 102 waits for ShareLock on transaction 813; blocked by process 101.
+Process 101 waits for ShareLock on transaction 814; blocked by process 102.
+  Hint: See server log for query details.
+  Where: while locking tuple (0,4) in relation "mulino_responsibility_completionbindings"
+SQL statement "SELECT *              FROM mulino_responsibility_CompletionBindings WHERE organizationId=NEW.organizationId AND ID=NEW.bindingId FOR UPDATE"
+PL/pgSQL function mulino_responsibility_credit_validate() line 4 at SQL statement] ==> expected: <true> but was: <false>
+[ERROR]   ResponsibilityPostgresTest.concurrentPartialCompletionCreditNeverDischargesHundred:46 Expected explicit quantity/range constraint rejection, not deadlock or unrelated failure ==> expected: <P0001> but was: <40P01>
+[ERROR]   ResponsibilityPostgresTest.concurrentPartialCompletionCreditNeverDischargesHundred:46 Valid covered range rejected: CreditAttempt[applied=false, sqlState=40P01, message=ERROR: deadlock detected
+  Detail: Process 113 waits for ShareLock on transaction 836; blocked by process 114.
+Process 114 waits for ShareLock on transaction 835; blocked by process 113.
+  Hint: See server log for query details.
+  Where: while locking tuple (0,6) in relation "mulino_responsibility_completionbindings"
+SQL statement "SELECT *              FROM mulino_responsibility_CompletionBindings WHERE organizationId=NEW.organizationId AND ID=NEW.bindingId FOR UPDATE"
+PL/pgSQL function mulino_responsibility_credit_validate() line 4 at SQL statement] ==> expected: <true> but was: <false>
+[ERROR]   ResponsibilityPostgresTest.concurrentPartialCompletionCreditNeverDischargesHundred:46 Expected explicit quantity/range constraint rejection, not deadlock or unrelated failure ==> expected: <P0001> but was: <40P01>
+[ERROR]   ResponsibilityPostgresTest.concurrentPartialCompletionCreditNeverDischargesHundred:46 Valid covered range rejected: CreditAttempt[applied=false, sqlState=40P01, message=ERROR: deadlock detected
+  Detail: Process 126 waits for ShareLock on transaction 857; blocked by process 125.
+Process 125 waits for ShareLock on transaction 858; blocked by process 126.
+  Hint: See server log for query details.
+  Where: while locking tuple (0,8) in relation "mulino_responsibility_completionbindings"
+SQL statement "SELECT *              FROM mulino_responsibility_CompletionBindings WHERE organizationId=NEW.organizationId AND ID=NEW.bindingId FOR UPDATE"
+PL/pgSQL function mulino_responsibility_credit_validate() line 4 at SQL statement] ==> expected: <true> but was: <false>
+[ERROR]   ResponsibilityPostgresTest.concurrentPartialCompletionCreditNeverDischargesHundred:46 Valid covered range rejected: CreditAttempt[applied=false, sqlState=40P01, message=ERROR: deadlock detected
+  Detail: Process 132 waits for ShareLock on transaction 868; blocked by process 131.
+Process 131 waits for ShareLock on transaction 869; blocked by process 132.
+  Hint: See server log for query details.
+  Where: while locking tuple (0,9) in relation "mulino_responsibility_completionbindings"
+SQL statement "SELECT *              FROM mulino_responsibility_CompletionBindings WHERE organizationId=NEW.organizationId AND ID=NEW.bindingId FOR UPDATE"
+PL/pgSQL function mulino_responsibility_credit_validate() line 4 at SQL statement] ==> expected: <true> but was: <false>
+[ERROR] Tests run: 10, Failures: 10, Errors: 0, Skipped: 0
+[ERROR] Failed to execute goal org.apache.maven.plugins:maven-surefire-plugin:3.5.6:test (default-cli) on project ontology: There are test failures.
+[ERROR] 
+[ERROR] See /Volumes/VideoStore/Developer/mulino-ontology-step3-s2-responsibility/backend/target/surefire-reports for the individual test results.
+[ERROR] See dump files (if any exist) [date].dump, [date]-jvmRun[N].dump and [date].dumpstream.
+[ERROR] -> [Help 1]
+[ERROR] 
+[ERROR] To see the full stack trace of the errors, re-run Maven with the -e switch.
+[ERROR] Re-run Maven using the -X switch to enable full debug logging.
+[ERROR] 
+[ERROR] For more information about the errors and possible solutions, please read the following articles:
+[ERROR] [Help 1] http://cwiki.apache.org/confluence/display/MAVEN/MojoFailureException

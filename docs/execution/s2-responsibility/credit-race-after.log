@@ -1,0 +1,54 @@
+04:09:10.633 [main] INFO org.testcontainers.images.PullPolicy -- Image pull policy will be performed by: DefaultPullPolicy()
+04:09:10.636 [main] INFO org.testcontainers.utility.ImageNameSubstitutor -- Image name substitution will be performed by: DefaultImageNameSubstitutor (composite of 'ConfigurationFileImageNameSubstitutor' and 'PrefixingImageNameSubstitutor')
+04:09:10.656 [main] INFO org.testcontainers.DockerClientFactory -- Testcontainers version: 2.0.5
+04:09:10.785 [main] INFO org.testcontainers.dockerclient.DockerClientProviderStrategy -- Loaded org.testcontainers.dockerclient.UnixSocketClientProviderStrategy from ~/.testcontainers.properties, will try it first
+04:09:11.035 [main] INFO org.testcontainers.dockerclient.DockerClientProviderStrategy -- Found Docker environment with local Unix socket (unix:///var/run/docker.sock)
+04:09:11.036 [main] INFO org.testcontainers.DockerClientFactory -- Docker host IP address is localhost
+04:09:11.049 [main] INFO org.testcontainers.DockerClientFactory -- Connected to docker: 
+  Server Version: 29.4.0
+  API Version: 1.54
+  Operating System: OrbStack
+  Total Memory: 8004 MB
+04:09:11.064 [main] INFO tc.testcontainers/ryuk:0.14.0 -- Creating container for image: testcontainers/ryuk:0.14.0
+04:09:11.097 [main] INFO org.testcontainers.utility.RegistryAuthLocator -- Credential helper/store (docker-credential-osxkeychain) does not have credentials for https://index.docker.io/v1/
+04:09:11.196 [main] INFO tc.testcontainers/ryuk:0.14.0 -- Container testcontainers/ryuk:0.14.0 is starting: 278053915f1f20c48170d43d58b214e3eee27aeff6a622409de81c988138db6b
+04:09:11.397 [main] INFO tc.testcontainers/ryuk:0.14.0 -- Container testcontainers/ryuk:0.14.0 started in PT0.333764S
+04:09:11.402 [testcontainers-ryuk] WARN org.testcontainers.utility.RyukResourceReaper -- Can not connect to Ryuk at localhost:33001
+java.net.ConnectException: Connection refused
+	at java.base/sun.nio.ch.Net.pollConnect(Native Method)
+	at java.base/sun.nio.ch.Net.pollConnectNow(Net.java:682)
+	at java.base/sun.nio.ch.NioSocketImpl.timedFinishConnect(NioSocketImpl.java:542)
+	at java.base/sun.nio.ch.NioSocketImpl.connect(NioSocketImpl.java:592)
+	at java.base/java.net.SocksSocketImpl.connect(SocksSocketImpl.java:327)
+	at java.base/java.net.Socket.connect(Socket.java:757)
+	at org.testcontainers.utility.RyukResourceReaper.lambda$maybeStart$0(RyukResourceReaper.java:92)
+	at org.rnorth.ducttape.ratelimits.RateLimiter.doWhenReady(RateLimiter.java:27)
+	at org.testcontainers.utility.RyukResourceReaper.lambda$maybeStart$1(RyukResourceReaper.java:88)
+	at java.base/java.lang.Thread.run(Thread.java:1583)
+04:09:11.663 [main] INFO org.testcontainers.utility.RyukResourceReaper -- Ryuk started - will monitor and terminate Testcontainers containers on JVM exit
+04:09:11.664 [main] INFO org.testcontainers.DockerClientFactory -- Checking the system...
+04:09:11.664 [main] INFO org.testcontainers.DockerClientFactory -- ✔︎ Docker server version should be at least 1.6.0
+04:09:11.670 [main] INFO tc.postgres@sha256:4ef4db... -- Creating container for image: postgres@sha256:4ef4dbc939d61acea57712655ddb4b4ab27419c913f94cca0cd57cb3ea3c2280
+04:09:11.711 [main] INFO tc.postgres@sha256:4ef4db... -- Container postgres@sha256:4ef4dbc939d61acea57712655ddb4b4ab27419c913f94cca0cd57cb3ea3c2280 is starting: 85b3b88dfab8963fbe26080befe14bba6d200401d9aa5778e4bd0ea9707524cd
+04:09:13.575 [main] INFO tc.postgres@sha256:4ef4db... -- Container postgres@sha256:4ef4dbc939d61acea57712655ddb4b4ab27419c913f94cca0cd57cb3ea3c2280 started in PT1.9043S
+04:09:13.575 [main] INFO tc.postgres@sha256:4ef4db... -- Container is started (JDBC URL: jdbc:postgresql://localhost:33002/test?loggerLevel=OFF)
+Completion credit race: valid=CreditAttempt[applied=true, sqlState=null, message=null] invalid=CreditAttempt[applied=false, sqlState=P0001, message=ERROR: Completion credit requires exact covered duty leaf range
+  Where: PL/pgSQL function mulino_responsibility_credit_validate() line 12 at RAISE]
+Completion credit race: valid=CreditAttempt[applied=true, sqlState=null, message=null] invalid=CreditAttempt[applied=false, sqlState=P0001, message=ERROR: Completion evidence quantity already consumed
+  Where: PL/pgSQL function mulino_responsibility_credit_validate() line 9 at RAISE]
+Completion credit race: valid=CreditAttempt[applied=true, sqlState=null, message=null] invalid=CreditAttempt[applied=false, sqlState=P0001, message=ERROR: Completion evidence quantity already consumed
+  Where: PL/pgSQL function mulino_responsibility_credit_validate() line 9 at RAISE]
+Completion credit race: valid=CreditAttempt[applied=true, sqlState=null, message=null] invalid=CreditAttempt[applied=false, sqlState=P0001, message=ERROR: Completion evidence quantity already consumed
+  Where: PL/pgSQL function mulino_responsibility_credit_validate() line 9 at RAISE]
+Completion credit race: valid=CreditAttempt[applied=true, sqlState=null, message=null] invalid=CreditAttempt[applied=false, sqlState=P0001, message=ERROR: Completion credit requires exact covered duty leaf range
+  Where: PL/pgSQL function mulino_responsibility_credit_validate() line 12 at RAISE]
+Completion credit race: valid=CreditAttempt[applied=true, sqlState=null, message=null] invalid=CreditAttempt[applied=false, sqlState=P0001, message=ERROR: Completion evidence quantity already consumed
+  Where: PL/pgSQL function mulino_responsibility_credit_validate() line 9 at RAISE]
+Completion credit race: valid=CreditAttempt[applied=true, sqlState=null, message=null] invalid=CreditAttempt[applied=false, sqlState=P0001, message=ERROR: Completion credit requires exact covered duty leaf range
+  Where: PL/pgSQL function mulino_responsibility_credit_validate() line 12 at RAISE]
+Completion credit race: valid=CreditAttempt[applied=true, sqlState=null, message=null] invalid=CreditAttempt[applied=false, sqlState=P0001, message=ERROR: Completion evidence quantity already consumed
+  Where: PL/pgSQL function mulino_responsibility_credit_validate() line 9 at RAISE]
+Completion credit race: valid=CreditAttempt[applied=true, sqlState=null, message=null] invalid=CreditAttempt[applied=false, sqlState=P0001, message=ERROR: Completion evidence quantity already consumed
+  Where: PL/pgSQL function mulino_responsibility_credit_validate() line 9 at RAISE]
+Completion credit race: valid=CreditAttempt[applied=true, sqlState=null, message=null] invalid=CreditAttempt[applied=false, sqlState=P0001, message=ERROR: Completion evidence quantity already consumed
+  Where: PL/pgSQL function mulino_responsibility_credit_validate() line 9 at RAISE]
