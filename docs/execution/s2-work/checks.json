@@ -1,0 +1,43 @@
+{
+  "status": "PARTIAL_PASS",
+  "userStep": 3,
+  "systemStage": "S2_ACTIVE",
+  "baseline": "40a240c3886d3316ba1fd686e9b44bfa1ba6ec2d",
+  "runtime": "Java21/CAP5.1.1/PostgreSQL18.6/CQN",
+  "checkedCommit": "03f55eb",
+  "dependencyBaseline": "de5d587",
+  "checks": [
+    {
+      "command": "JAVA_HOME=/Library/Java/JavaVirtualMachines/zulu-21.jdk/Contents/Home PATH=Node24:Java21:PATH ./mvnw -f backend/pom.xml -Dtest=GoalInputTest,S2WorkLifecyclePostgresTest,S2WorkActualIntegrationTest test",
+      "observed": "pure4 PASS; partial PostgreSQL5 PASS with primary interface guards; actual integration1 ERROR missing object ID",
+      "exitCode": 1,
+      "artifact": "s2-work-actual-focused.log.gz"
+    },
+    {
+      "command": "JAVA_HOME=/Library/Java/JavaVirtualMachines/zulu-21.jdk/Contents/Home PATH=Node24:Java21:PATH ./mvnw -f backend/pom.xml -Dtest=S2WorkActualIntegrationTest test",
+      "observed": "actual WorkLifecycle/AssessmentService/ResponsibilityService PostgreSQL integration1 PASS; no business-port mocks",
+      "exitCode": 0,
+      "artifact": "s2-work-actual-final.log.gz"
+    }
+  ],
+  "limitations": [
+    "Signed REST/OData/MCP lifecycle not executed in this worker",
+    "Full normative T09-T12/C2/C5 cases NOT_RUN; S3 receipts and canonical physical scope binding not substituted by synthetic fixture",
+    "New contribution-range test pending execution",
+    "Paid model, regulatory, BTP NOT_RUN"
+  ],
+  "files": {
+    "backend/src/test/java/com/mulino/core/S2WorkActualIntegrationTest.java": {
+      "sha256": "71701184e64df8c8bd26534a0efff4cb212ca5d6d6caa84851abf62d16ac1364",
+      "source": "03f55eb"
+    },
+    "backend/src/test/java/com/mulino/core/S2WorkLifecyclePostgresTest.java": {
+      "sha256": "999a9490f54247841f81a41064da0145df9d5f83aa2bbc0bb83448b506e49c0c",
+      "source": "03f55eb"
+    },
+    "backend/src/test/java/com/mulino/work/GoalInputTest.java": {
+      "sha256": "4991fd233bbf0137a38eb71b81fa4881839d4fe49e04494c6d3740be04db658b",
+      "source": "03f55eb"
+    }
+  }
+}
