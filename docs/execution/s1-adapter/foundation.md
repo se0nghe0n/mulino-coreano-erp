@@ -67,3 +67,41 @@ Maven 3.9.16이다. [JUnit XML](adapter-contract-tests.xml)은 adapter
 검증이며 실제 backend/DB 실행 증거가 아니다. native runtime은 아직
 통합 backend에서 실행하지 않았다. 이후 fixture timestamp mapping을
 asOf/knownAt으로 보완했으므로 통합 실행에서 다시 확인해야 한다.
+
+## disposable native runner
+
+`./verify actual-s1 [새 evidence directory]`는 harness를 compile한 뒤
+`verification/actual/s1/run.sh`를 실행한다. backend JAR는 현재 source에서
+이미 build되어 있어야 한다. runner는 backend를 다시 build하지 않는다.
+
+runner는 `verification/platform/versions.json`의 pinned PostgreSQL image로
+새 container와 anonymous volume을 만들고 ephemeral loopback port를
+사용한다. 새 RSA key와 disposable DB password를 임시 directory에만
+둔다. 실행 JAR는 임시 directory에 복사하고 원본과 hash가 같은지
+확인한다. backend는 `server.port=0`으로 시작하며 실제 할당 port에서
+HTTP 인증 응답을 확인한 후 native HTTP/JDBC 인수를 실행한다.
+
+native fixture는 authority wall clock을 한 번 캡처해 membership와
+grant를 그 시점의 60초 전부터 15분 뒤까지 유효하게 만든다. 고정
+physical `asOf`·`knownAt`은 바꾸지 않는다. template hash와 실제 derived
+fixture hash, authority wall clock과 유효 기간을 모두 receipt에 남긴다.
+이는 새 synthetic native fixture만의 처리이며 normative fixture나
+backend 현재 인가 규칙을 바꾸지 않는다.
+
+`run-receipt.json`은 clean commit, 모든 tracked source input의 실행
+전·후 hash와 dirty 상태, 실제 실행한 복사 JAR hash, fixture hash,
+HTTP response·독립 JDBC rows artifact hash, cleanup 결과를 기록한다.
+source/JAR drift 또는 cleanup 실패는 native PASS가 있어도 FAIL이다.
+미지원 단계는 NOT_RUN이지만 이미 관찰한 업무 위반을 숨기지 않는다.
+
+trap은 자신이 만든 backend PID, container와 그 anonymous volume,
+임시 key directory만 정리한다. raw HTTP·DB·runtime log와 receipt는
+남긴다. token·private key·password를 evidence에 복사하지 않는다.
+실제 TCP HTTP 실행은 통합 backend에서 root가 수행할 미실행 check다.
+
+추가 check에서 `javac --release 21`로 변경 source와 tests를 compile하고
+JUnit Platform launcher로 adapter contract 6개를 실행해 모두 통과했다.
+기존 4개와 현재 authority clock·FAIL 우선순위 2개다. shell syntax와
+Python compile이 통과했고, 임시 Git fixture의 source drift가 native
+PASS를 FAIL로 바꾸는 receipt check도 통과했다. Maven slot은 사용하지
+않았다. 이 결과는 실제 PostgreSQL/HTTP 실행 성공을 뜻하지 않는다.

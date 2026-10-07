@@ -61,6 +61,8 @@ if mode=='contract-red' and extras and '--all' not in extras:
 if command(maven+['-Dmaven.test.skip=true','package','dependency:build-classpath','-Dmdep.outputFile=target/classpath.txt']): finish(3)
 classpath=str(OUT/'classes')+os.pathsep+(OUT/'classpath.txt').read_text().strip()
 if mode=='actual-s1':
-    finish(command(['java',f'-Drepo.root={ROOT}',f'-Dverification.command=./verify actual-s1','-cp',classpath,'org.mulino.verification.actual.NativeS1ReadMain']))
+    if len(extras)>1:
+        print('actual-s1 accepts at most one fresh evidence directory',file=sys.stderr);finish(3)
+    finish(command(['sh',ROOT/'verification/actual/s1/run.sh']+extras))
 args=['red']+extras if mode=='contract-red' else [mode]+extras if mode in {'validate','prepare','coverage'} else ['profile',mode]+extras
 finish(command(['java',f'-Dverification.driver={"actual" if actual else "unimplemented"}',f'-Drepo.root={ROOT}',f'-Dverification.command={shlex.join(["./verify",mode]+extras)}','-cp',classpath,'org.mulino.verification.Main']+args))

@@ -39,7 +39,8 @@ public final class ActualAcceptanceDriver implements AcceptanceDriver, Independe
             var receipt=Json.object();receipt.put("method","POST").put("path",uri.getPath()).put("httpStatus",result.statusCode()).put("capturedAt",Instant.now().toString());
             receipt.set("request",request);receipt.set("response",response);
             var identity=Json.object();identity.put("issuer",configuration.issuer()).put("subject",Json.required(actor,"subject")).put("organizationAlias",Json.required(actor,"organizationAlias"));
-            return executed(id,null,response,provenance(identity,"HTTP",false,null,null),receipt);
+            var transport=Json.object();transport.put("httpStatus",result.statusCode());
+            return executed(id,transport,response,provenance(identity,"HTTP",false,null,null),receipt);
         } catch(InterruptedException interrupted){Thread.currentThread().interrupt();throw new IllegalStateException("Actual HTTP interrupted",interrupted);}
         catch(Exception failure){throw new IllegalStateException("Actual HTTP environment/response failure",failure);}
     }

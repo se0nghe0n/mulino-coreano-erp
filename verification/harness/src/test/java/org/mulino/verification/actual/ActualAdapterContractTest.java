@@ -9,6 +9,20 @@ import static org.junit.jupiter.api.Assertions.*;
 
 /** Adapter plumbing tests; no product runtime/acceptance coverage is claimed. */
 public final class ActualAdapterContractTest {
+    @Test void observedViolationRemainsFailEvenWhenOtherActionsUnavailable() {
+        assertEquals("FAIL",ActualAttemptStatus.classify(true,true,false));
+        assertEquals("FAIL",ActualAttemptStatus.classify(true,true,true));
+        assertEquals("NOT_RUN",ActualAttemptStatus.classify(false,true,false));
+        assertEquals("ENVIRONMENT_OR_CONTRACT_FAILURE",ActualAttemptStatus.classify(false,true,true));
+        assertEquals("PASS",ActualAttemptStatus.classify(false,false,false));
+    }
+    @Test void authorityFixtureUsesCurrentValidityWithoutChangingFactClock() {
+        var template=Json.parse("{\"clock\":{\"asOf\":\"2026-10-07T09:00:00Z\"},\"actors\":{\"reader\":{\"grant\":{\"validFrom\":\"old\",\"validUntil\":\"old\"}}}}");
+        var now=java.time.Instant.parse("2030-01-01T00:00:00Z");var effective=NativeFixtureAuthority.current(template,now);
+        assertEquals(template.path("clock"),effective.path("clock"));assertEquals("old",template.path("actors").path("reader").path("grant").path("validFrom").asText());
+        assertTrue(java.time.Instant.parse(effective.path("actors").path("reader").path("grant").path("validFrom").asText()).isBefore(now));
+        assertTrue(java.time.Instant.parse(effective.path("actors").path("reader").path("grant").path("validUntil").asText()).isAfter(now));
+    }
     @Test void defaultAndRedNeverEnableActualRuntime() {
         String prior=System.getProperty("verification.driver");
         try {
