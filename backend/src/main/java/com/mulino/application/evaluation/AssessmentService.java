@@ -82,7 +82,13 @@ public class AssessmentService implements CommandHandler,WorkAssessmentGuard {
   private Definition.Goal template(Definition d,Map<String,Object> slots){var candidates=d.goals().stream().filter(g->Objects.equals(g.endpoint(),slots.get("endpoint"))&&Objects.equals(g.quantityMode(),slots.get("quantityMode"))).toList();if(candidates.size()!=1)throw new DomainError("HELD","VERSION_UNSUPPORTED","Unique pinned goal template required");return candidates.getFirst();}
   private Calculation held(Map<String,Object> goal,Map<String,Object> slots,String reason){String payload=encode(Map.of("goalId",goal.get("ID"),"slots",slots,"unknown",reason));return new Calculation(new TypedPredicateEvaluator.Result(new PredicateTruth(PredicateTruth.State.UNVERIFIED,false),List.of()),DefinitionRepository.sha256(payload),payload,null,true);}
   private boolean deadline(DomainContext c,Map<String,Object> w,Map<String,Object> goal,Calculation current){var slots=decode(goal.get("slotsJson"));if(slots.get("dueAt")==null||c.asOf().isBefore(instant(slots.get("dueAt")))||current.held)return false;var deadlineContext=new DomainContext(c.organizationId(),c.actorId(),c.stableRequestOwner(),instant(slots.get("dueAt")),c.knownAt());var atDeadline=calculate(deadlineContext,w,goal);return !atDeadline.held&&atDeadline.result.truth().state()==PredicateTruth.State.UNSATISFIED;}
-  private Map<String,Object> latest(DomainContext c,String workId,String goalId){return repository.rows(c,"mulino.work.read.AssessmentReferences").stream().filter(a->workId.equals(a.get("workId"))&&(goalId==null||goalId.equals(a.get("goalId")))).max(Comparator.comparing(a->instant(a.get("assessedAt")))).orElse(null);}
+  private Map<String,Object> latest(DomainContext c,String workId,String goalId){
+    var all=repository.rows(c,"mulino.work.read.AssessmentReferences").stream().filter(a->workId.equals(a.get("workId"))).toList();
+    var previousIds=new HashSet<Object>();all.forEach(a->{if(a.get("previousAssessmentId")!=null)previousIds.add(a.get("previousAssessmentId"));});
+    var current=all.stream().filter(a->!previousIds.contains(a.get("ID"))&&a.get("inputSnapshotHash")!=null&&(goalId==null||goalId.equals(a.get("goalId")))).toList();
+    if(current.size()>1)throw new DomainError("HELD","ASSESSMENT_CONFLICT","Immutable assessment chain has multiple current heads");
+    return current.isEmpty()?null:current.getFirst();
+  }
   private Object normalize(Object o){
     if(o==null)return null;
     if(o.getClass().isRecord()){var out=new TreeMap<String,Object>();for(var field:o.getClass().getRecordComponents())try{out.put(field.getName(),normalize(field.getAccessor().invoke(o)));}catch(ReflectiveOperationException e){throw DomainError.invalid("Assessment snapshot type unavailable");}return out;}

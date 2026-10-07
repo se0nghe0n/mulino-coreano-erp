@@ -23,6 +23,9 @@ import org.testcontainers.postgresql.PostgreSQLContainer;
 /** Actual CQN/PostgreSQL assessment against an independent SQL physical-scope oracle. */
 @SpringBootTest @ActiveProfiles("local")
 class AssessmentPostgresTest {
+ @org.springframework.boot.test.context.TestConfiguration static class FixedTime {
+  @org.springframework.context.annotation.Bean @org.springframework.context.annotation.Primary ExecutionClock fixedEvaluationClock(){return new ExecutionClock(Clock.fixed(Instant.parse("2026-10-08T00:10:00Z"),ZoneOffset.UTC));}
+ }
  static final PostgreSQLContainer PG=new PostgreSQLContainer("postgres@sha256:4ef4dbc939d61acea57712655ddb4b4ab27419c913f94cca0cd57cb3ea3c2280");
  static final Path KEY,BLOBS;
  static {try{PG.start();var g=java.security.KeyPairGenerator.getInstance("RSA");g.initialize(2048);KEY=Files.createTempFile("eval-public-",".pem");Files.writeString(KEY,"-----BEGIN PUBLIC KEY-----\n"+Base64.getMimeEncoder(64,new byte[]{10}).encodeToString(g.generateKeyPair().getPublic().getEncoded())+"\n-----END PUBLIC KEY-----\n");BLOBS=Files.createTempDirectory("eval-blobs-");}catch(Exception e){throw new ExceptionInInitializerError(e);}}
