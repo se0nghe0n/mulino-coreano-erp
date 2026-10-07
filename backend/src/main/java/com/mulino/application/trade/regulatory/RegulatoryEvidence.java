@@ -30,6 +30,7 @@ public class RegulatoryEvidence {
    }catch(java.io.IOException ignored){}
   }throw held();
  }
+ public String source(DomainContext c,String kind,String id){var row=r.require(kind,c.organizationId(),id);return row.get("sourceProfileId").toString();}
  public boolean current(DomainContext c,String occurrence){try{return q.verifiedAt(c,occurrence);}catch(DomainError e){return false;}}
  static DomainError held(){return new DomainError("HELD","EVIDENCE_UNVERIFIED","Exact regulatory source and original evidence unavailable");}
 }
