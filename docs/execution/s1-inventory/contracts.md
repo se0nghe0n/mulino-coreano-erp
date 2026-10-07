@@ -45,3 +45,11 @@ Flyway V1–V5를 실제 실행했다. JwtDecoder와 ReadAuthorizer는 mock이�
 단독 worker 실행은 임시 `backend/srv/inventory-test-import.cds`로 identity,
 definitions, inventory model을 compile했고 완료 후 파일을 제거했다.
 통합 branch에서는 공통 srv import가 같은 model을 compile해야 한다.
+
+추가 hardening은 계보 부모의 retiredAt이 자식 validFrom 이후이거나
+retirementRecordedAt이 자식 recordedAt 이후인 입력을 거부한다. 그렇지 않으면
+과거 snapshot에서 부모와 자식이 함께 active로 보일 수 있다.
+`lineageRejectsHistoricalParentChildOverlap` regression을 추가했다.
+이 추가 regression은 worker의 위 9 PASS 실행 뒤 작성했다. Maven slot을
+통합 작업에 넘겼으므로 최신 source의 10-test 결과는 coordinator의 통합
+실행에서 확인해야 하며 worker 기록만으로 PASS를 주장하지 않는다.

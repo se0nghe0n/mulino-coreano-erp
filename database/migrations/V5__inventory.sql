@@ -291,11 +291,12 @@ CREATE TRIGGER inventory_package_immutable BEFORE UPDATE OR DELETE ON mulino_inv
 
 -- Every structural decomposition consumes the parent; checked at transaction end.
 CREATE FUNCTION inventory_retired_parent() RETURNS TRIGGER LANGUAGE plpgsql AS $$
-DECLARE parent_qty NUMERIC(38,12); parent_retired TIMESTAMPTZ; total NUMERIC; source_item VARCHAR(36); source_lot VARCHAR(36); target_item VARCHAR(36); target_lot VARCHAR(36);
+DECLARE parent_qty NUMERIC(38,12); parent_retired TIMESTAMPTZ; total NUMERIC; source_item VARCHAR(36); source_lot VARCHAR(36); target_item VARCHAR(36); target_lot VARCHAR(36); target_valid TIMESTAMPTZ; target_recorded TIMESTAMPTZ; retired_recorded TIMESTAMPTZ;
 BEGIN
- SELECT quantity,retiredAt,itemId,lotId INTO parent_qty,parent_retired,source_item,source_lot FROM mulino_inventory_QuantitySegments WHERE organizationId=NEW.organizationId AND ID=NEW.sourceId;
- SELECT itemId,lotId INTO target_item,target_lot FROM mulino_inventory_QuantitySegments WHERE organizationId=NEW.organizationId AND ID=NEW.targetId;
+ SELECT quantity,retiredAt,itemId,lotId,retirementRecordedAt INTO parent_qty,parent_retired,source_item,source_lot,retired_recorded FROM mulino_inventory_QuantitySegments WHERE organizationId=NEW.organizationId AND ID=NEW.sourceId;
+ SELECT itemId,lotId,validFrom,recordedAt INTO target_item,target_lot,target_valid,target_recorded FROM mulino_inventory_QuantitySegments WHERE organizationId=NEW.organizationId AND ID=NEW.targetId;
  IF parent_retired IS NULL THEN RAISE EXCEPTION 'lineage source must be retired' USING ERRCODE='23514'; END IF;
+ IF parent_retired > target_valid OR retired_recorded > target_recorded THEN RAISE EXCEPTION 'lineage timeline overlaps active parent and child' USING ERRCODE='23514'; END IF;
  IF source_item <> target_item OR source_lot IS DISTINCT FROM target_lot THEN RAISE EXCEPTION 'lineage item/LOT mismatch' USING ERRCODE='23514'; END IF;
  SELECT SUM(quantity) INTO total FROM mulino_inventory_GenealogyEdges WHERE organizationId=NEW.organizationId AND sourceId=NEW.sourceId;
  IF total > parent_qty THEN RAISE EXCEPTION 'lineage exceeds source quantity' USING ERRCODE='23514'; END IF;

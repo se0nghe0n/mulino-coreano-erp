@@ -129,4 +129,10 @@ class InventoryPostgresTest {
   assertThrows(RuntimeException.class,()->jdbc.update(insert,other,id(96),container,left,"2026-04-01",null));
  }
 
+ @Test void lineageRejectsHistoricalParentChildOverlap(){
+  segment(id(97),"1",false);
+  assertThrows(RuntimeException.class,()->edge(id(98),parent,id(97),"1"));
+  assertEquals(2,jdbc.queryForObject("SELECT COUNT(*) FROM mulino_inventory_GenealogyEdges",Integer.class));
+ }
+
 }
