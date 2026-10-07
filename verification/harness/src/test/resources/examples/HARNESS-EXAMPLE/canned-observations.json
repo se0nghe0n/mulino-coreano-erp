@@ -1,0 +1,110 @@
+{
+  "before": {
+    "actionId": "before",
+    "driverStatus": "EXECUTED",
+    "data": null,
+    "response": {
+      "data": {
+        "heldQuantity": "100",
+        "eligibleQuantity": "100",
+        "unit": "BOX"
+      }
+    },
+    "reason": null,
+    "provenance": {
+      "adapter": "CANNED_ASSERTION_SELFTEST",
+      "adapterVersion": "1.0.0",
+      "buildVersion": "NONE",
+      "authenticatedActor": null,
+      "source": "CANNED_ASSERTION_SELFTEST_NOT_PRODUCT",
+      "independent": false,
+      "scopeComplete": true,
+      "sourceQuery": null,
+      "snapshot": null
+    },
+    "artifactRefs": [
+      "CANNED_SELFTEST_ONLY"
+    ]
+  },
+  "after": {
+    "actionId": "after",
+    "driverStatus": "EXECUTED",
+    "data": null,
+    "response": {
+      "data": {
+        "heldQuantity": "100",
+        "eligibleQuantity": "80",
+        "unit": "BOX"
+      },
+      "definitionVersion": "definition-v1"
+    },
+    "reason": null,
+    "provenance": {
+      "adapter": "CANNED_ASSERTION_SELFTEST",
+      "adapterVersion": "1.0.0",
+      "buildVersion": "NONE",
+      "authenticatedActor": null,
+      "source": "CANNED_ASSERTION_SELFTEST_NOT_PRODUCT",
+      "independent": false,
+      "scopeComplete": true,
+      "sourceQuery": null,
+      "snapshot": null
+    },
+    "artifactRefs": [
+      "CANNED_SELFTEST_ONLY"
+    ]
+  },
+  "db-after": {
+    "actionId": "db-after",
+    "driverStatus": "EXECUTED",
+    "data": {
+      "data": {
+        "segments": [
+          {
+            "alias": "A60",
+            "physicalScope": "A60-physical",
+            "quantity": "60",
+            "unit": "BOX"
+          },
+          {
+            "alias": "B40",
+            "physicalScope": "B40-physical",
+            "quantity": "40",
+            "unit": "BOX"
+          }
+        ],
+        "restrictions": [
+          {
+            "segmentAlias": "A60",
+            "quantity": "20",
+            "action": "SELL",
+            "sourceCommandKey": "HARNESS-hold-1"
+          }
+        ],
+        "obligations": [
+          {
+            "ownerAlias": "qc",
+            "nextAction": "검사 근거 확인",
+            "nextCheckAt": "2026-10-07T10:00:00Z"
+          }
+        ]
+      }
+    },
+    "response": null,
+    "reason": null,
+    "provenance": {
+      "adapter": "CANNED_ASSERTION_SELFTEST",
+      "adapterVersion": "1.0.0",
+      "buildVersion": "NONE",
+      "authenticatedActor": null,
+      "source": "CANNED_ASSERTION_SELFTEST_NOT_PRODUCT",
+      "independent": false,
+      "scopeComplete": true,
+      "sourceQuery": null,
+      "snapshot": null
+    },
+    "artifactRefs": [
+      "CANNED_SELFTEST_ONLY"
+    ]
+  }
+}

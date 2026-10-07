@@ -1,0 +1,130 @@
+{
+  "schemaVersion" : "1.0.0",
+  "caseId" : "HARNESS-EXAMPLE",
+  "subcaseId" : "hold-preserves-physical",
+  "status" : "FAIL",
+  "runtimeComplete" : false,
+  "startedAt" : "2026-10-07T13:05:06.632653Z",
+  "finishedAt" : "2026-10-07T13:05:06.656834Z",
+  "command" : "./verify contract-red verification/harness/src/test/resources/examples/HARNESS-EXAMPLE/case.json",
+  "caseHash" : "4c9df9fb061258be4cb9291ad72417c56888fe60f9812ead023ea070569ceb0f",
+  "fixtureRef" : "verification/harness/src/test/resources/examples/HARNESS-EXAMPLE/fixture.json",
+  "fixtureHash" : "657b13656457e4aa6328628eadf9a06683a5f35111504c0e86e373a27c00a03f",
+  "versions" : {
+    "definition" : "definition-v1",
+    "evaluator" : "evaluator-v1",
+    "policy" : "SYNTHETIC-policy-v1"
+  },
+  "requiredAdapters" : [ "fixture", "api", "db" ],
+  "actions" : {
+    "db-after" : {
+      "actionId" : "db-after",
+      "driverStatus" : "NOT_IMPLEMENTED",
+      "data" : null,
+      "response" : null,
+      "reason" : "NOT_IMPLEMENTED: no real product adapters installed",
+      "provenance" : {
+        "adapter" : "unimplemented",
+        "adapterVersion" : "1.0.0",
+        "buildVersion" : "NONE",
+        "authenticatedActor" : null,
+        "source" : "NONE",
+        "independent" : false,
+        "scopeComplete" : false,
+        "sourceQuery" : null,
+        "snapshot" : null
+      },
+      "artifactRefs" : [ ]
+    },
+    "before" : {
+      "actionId" : "before",
+      "driverStatus" : "NOT_IMPLEMENTED",
+      "data" : null,
+      "response" : null,
+      "reason" : "NOT_IMPLEMENTED: no real product adapters installed",
+      "provenance" : {
+        "adapter" : "unimplemented",
+        "adapterVersion" : "1.0.0",
+        "buildVersion" : "NONE",
+        "authenticatedActor" : null,
+        "source" : "NONE",
+        "independent" : false,
+        "scopeComplete" : false,
+        "sourceQuery" : null,
+        "snapshot" : null
+      },
+      "artifactRefs" : [ ]
+    },
+    "setup" : {
+      "actionId" : "setup",
+      "driverStatus" : "NOT_IMPLEMENTED",
+      "data" : null,
+      "response" : null,
+      "reason" : "NOT_IMPLEMENTED: no real product adapters installed",
+      "provenance" : {
+        "adapter" : "unimplemented",
+        "adapterVersion" : "1.0.0",
+        "buildVersion" : "NONE",
+        "authenticatedActor" : null,
+        "source" : "NONE",
+        "independent" : false,
+        "scopeComplete" : false,
+        "sourceQuery" : null,
+        "snapshot" : null
+      },
+      "artifactRefs" : [ ]
+    },
+    "after" : {
+      "actionId" : "after",
+      "driverStatus" : "NOT_IMPLEMENTED",
+      "data" : null,
+      "response" : null,
+      "reason" : "NOT_IMPLEMENTED: no real product adapters installed",
+      "provenance" : {
+        "adapter" : "unimplemented",
+        "adapterVersion" : "1.0.0",
+        "buildVersion" : "NONE",
+        "authenticatedActor" : null,
+        "source" : "NONE",
+        "independent" : false,
+        "scopeComplete" : false,
+        "sourceQuery" : null,
+        "snapshot" : null
+      },
+      "artifactRefs" : [ ]
+    },
+    "hold" : {
+      "actionId" : "hold",
+      "driverStatus" : "NOT_IMPLEMENTED",
+      "data" : null,
+      "response" : null,
+      "reason" : "NOT_IMPLEMENTED: no real product adapters installed",
+      "provenance" : {
+        "adapter" : "unimplemented",
+        "adapterVersion" : "1.0.0",
+        "buildVersion" : "NONE",
+        "authenticatedActor" : null,
+        "source" : "NONE",
+        "independent" : false,
+        "scopeComplete" : false,
+        "sourceQuery" : null,
+        "snapshot" : null
+      },
+      "artifactRefs" : [ ]
+    }
+  },
+  "assertions" : [ {
+    "assertionId" : "held-100",
+    "expected" : "100",
+    "source" : {
+      "actionId" : "after",
+      "pointer" : "/response/data/heldQuantity"
+    },
+    "requirementRefs" : [ "HARNESS-EXAMPLE" ],
+    "evidenceRefs" : [ "after:actual-adapter-artifact" ],
+    "status" : "FAIL",
+    "reason" : "source after is NOT_IMPLEMENTED: NOT_IMPLEMENTED: no real product adapters installed"
+  } ],
+  "missingAssertions" : 10,
+  "productCoverageClaimed" : false
+}

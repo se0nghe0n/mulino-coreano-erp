@@ -1,0 +1,267 @@
+{
+  "type": "object",
+  "properties": {
+    "schemaVersion": {
+      "const": "1.0.0"
+    },
+    "fixtureId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "synthetic": {
+      "const": true
+    },
+    "baseRefs": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "minItems": 0
+    },
+    "clock": {
+      "type": "object",
+      "properties": {
+        "asOf": {
+          "type": "string",
+          "minLength": 1
+        },
+        "knownAt": {
+          "type": "string",
+          "minLength": 1
+        },
+        "timezone": {
+          "type": "string",
+          "minLength": 1
+        },
+        "precision": {
+          "type": "string",
+          "minLength": 1
+        },
+        "deadlineInclusive": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "asOf",
+        "knownAt",
+        "timezone",
+        "precision",
+        "deadlineInclusive"
+      ],
+      "additionalProperties": false
+    },
+    "versions": {
+      "type": "object",
+      "properties": {
+        "definition": {
+          "type": "string",
+          "minLength": 1
+        },
+        "evaluator": {
+          "type": "string",
+          "minLength": 1
+        },
+        "policy": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": [
+        "definition",
+        "evaluator",
+        "policy"
+      ],
+      "additionalProperties": true
+    },
+    "actors": {
+      "type": "object",
+      "minProperties": 1,
+      "additionalProperties": {
+        "type": "object",
+        "properties": {
+          "issuer": {
+            "type": "string",
+            "minLength": 1
+          },
+          "subject": {
+            "type": "string",
+            "minLength": 1
+          },
+          "audience": {
+            "type": "string",
+            "minLength": 1
+          },
+          "organizationAlias": {
+            "type": "string",
+            "minLength": 1
+          },
+          "roleCapabilities": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1
+            },
+            "minItems": 0
+          },
+          "grant": {
+            "type": "object",
+            "properties": {
+              "delegatorAlias": {
+                "type": "string",
+                "minLength": 1
+              },
+              "actions": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "minItems": 0
+              },
+              "scope": {
+                "type": "object"
+              },
+              "validFrom": {
+                "type": "string",
+                "minLength": 1
+              },
+              "validUntil": {
+                "type": "string",
+                "minLength": 1
+              },
+              "revision": {
+                "type": "integer",
+                "minimum": 1
+              }
+            },
+            "required": [
+              "delegatorAlias",
+              "actions",
+              "scope",
+              "validFrom",
+              "validUntil",
+              "revision"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "required": [
+          "issuer",
+          "subject",
+          "audience",
+          "organizationAlias",
+          "roleCapabilities",
+          "grant"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "aliases": {
+      "type": "object",
+      "minProperties": 1
+    },
+    "baseline": {
+      "type": "object"
+    },
+    "evidence": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "alias": {
+            "type": "string",
+            "minLength": 1
+          },
+          "sha256": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{64}$"
+          },
+          "sourceNamespace": {
+            "type": "string",
+            "minLength": 1
+          },
+          "externalEventId": {
+            "type": "string",
+            "minLength": 1
+          },
+          "sourceVersion": {
+            "type": "string",
+            "minLength": 1
+          },
+          "occurredAt": {
+            "type": "string",
+            "minLength": 1
+          },
+          "recordedAt": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "required": [
+          "alias",
+          "sha256",
+          "sourceNamespace",
+          "externalEventId",
+          "sourceVersion",
+          "occurredAt",
+          "recordedAt"
+        ],
+        "additionalProperties": false
+      },
+      "minItems": 0
+    },
+    "responsibilities": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "scope": {
+            "type": "object"
+          },
+          "ownerAlias": {
+            "type": "string",
+            "minLength": 1
+          },
+          "supervisorAlias": {
+            "type": "string",
+            "minLength": 1
+          },
+          "nextAction": {
+            "type": "string",
+            "minLength": 1
+          },
+          "nextCheckAt": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "required": [
+          "scope",
+          "ownerAlias",
+          "supervisorAlias",
+          "nextAction",
+          "nextCheckAt"
+        ],
+        "additionalProperties": false
+      },
+      "minItems": 0
+    }
+  },
+  "required": [
+    "schemaVersion",
+    "fixtureId",
+    "synthetic",
+    "baseRefs",
+    "clock",
+    "versions",
+    "actors",
+    "aliases",
+    "baseline",
+    "evidence",
+    "responsibilities"
+  ],
+  "additionalProperties": false,
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://mulino.test/contracts/acceptance-fixture.schema.json"
+}

@@ -1,0 +1,99 @@
+{
+  "type": "object",
+  "properties": {
+    "snapshotRevision": {
+      "type": "string",
+      "minLength": 1
+    },
+    "asOf": {
+      "type": "string",
+      "minLength": 1
+    },
+    "knownAt": {
+      "type": "string",
+      "minLength": 1
+    },
+    "scope": {
+      "type": "object",
+      "minProperties": 1
+    },
+    "scopeComplete": {
+      "const": true
+    },
+    "sourceQuery": {
+      "type": "object",
+      "properties": {
+        "statementId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "sql": {
+          "type": "string",
+          "minLength": 1
+        },
+        "parameters": {
+          "type": "object"
+        },
+        "mappingVersion": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": [
+        "statementId",
+        "sql",
+        "parameters",
+        "mappingVersion"
+      ],
+      "additionalProperties": false
+    },
+    "snapshot": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "isolation": {
+          "type": "string",
+          "minLength": 1
+        },
+        "capturedAt": {
+          "type": "string",
+          "minLength": 1
+        },
+        "artifactRef": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": [
+        "id",
+        "isolation",
+        "capturedAt",
+        "artifactRef"
+      ],
+      "additionalProperties": false
+    },
+    "rawRows": {
+      "type": "object"
+    },
+    "data": {
+      "type": "object"
+    }
+  },
+  "required": [
+    "snapshotRevision",
+    "asOf",
+    "knownAt",
+    "scope",
+    "scopeComplete",
+    "sourceQuery",
+    "snapshot",
+    "rawRows",
+    "data"
+  ],
+  "additionalProperties": false,
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://mulino.test/contracts/acceptance-observation.schema.json"
+}

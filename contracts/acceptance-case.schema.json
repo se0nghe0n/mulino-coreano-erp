@@ -1,0 +1,742 @@
+{
+  "type": "object",
+  "properties": {
+    "schemaVersion": {
+      "const": "1.0.0"
+    },
+    "caseId": {
+      "type": "string",
+      "pattern": "^(T[0-9]{2}|C[1-5]|V[1-8]|E[12]|HARNESS-[A-Z0-9-]+)$"
+    },
+    "title": {
+      "type": "string",
+      "minLength": 1
+    },
+    "requirementRefs": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "minItems": 1
+    },
+    "profiles": {
+      "type": "array",
+      "items": {
+        "enum": [
+          "schema",
+          "contracts",
+          "scenarios",
+          "recovery",
+          "mcp",
+          "skills",
+          "model",
+          "deployment"
+        ]
+      },
+      "minItems": 1
+    },
+    "subcases": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "title": {
+            "type": "string",
+            "minLength": 1
+          },
+          "fixtureRef": {
+            "type": "string",
+            "minLength": 1
+          },
+          "requiredAdapters": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1
+            },
+            "minItems": 1
+          },
+          "actions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/$defs/action"
+            },
+            "minItems": 1
+          },
+          "assertions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/$defs/assertion"
+            },
+            "minItems": 1
+          },
+          "oracleExplanation": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "required": [
+          "id",
+          "title",
+          "fixtureRef",
+          "requiredAdapters",
+          "actions",
+          "assertions",
+          "oracleExplanation"
+        ],
+        "additionalProperties": false
+      },
+      "minItems": 1
+    }
+  },
+  "required": [
+    "schemaVersion",
+    "caseId",
+    "title",
+    "requirementRefs",
+    "profiles",
+    "subcases"
+  ],
+  "additionalProperties": false,
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://mulino.test/contracts/acceptance-case.schema.json",
+  "$defs": {
+    "action": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "kind": {
+          "enum": [
+            "installFixture",
+            "invoke",
+            "query",
+            "observe",
+            "control",
+            "agent",
+            "parallel",
+            "await",
+            "start"
+          ]
+        },
+        "actorRef": {
+          "type": "string",
+          "minLength": 1
+        },
+        "route": {
+          "enum": [
+            "api",
+            "odata",
+            "mcp",
+            "worker",
+            "direct",
+            "nested",
+            "batch",
+            "projection",
+            "blob",
+            "management",
+            "client",
+            "db",
+            "platform",
+            "wire"
+          ]
+        },
+        "capabilityId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "request": {
+          "type": "object"
+        },
+        "observation": {
+          "type": "object",
+          "properties": {
+            "scope": {
+              "type": "object",
+              "minProperties": 1
+            },
+            "snapshotRef": {
+              "oneOf": [
+                {
+                  "type": "string",
+                  "minLength": 1
+                },
+                {
+                  "$ref": "#/$defs/resultReference"
+                }
+              ]
+            },
+            "asOf": {
+              "type": "string",
+              "minLength": 1
+            },
+            "knownAt": {
+              "type": "string",
+              "minLength": 1
+            },
+            "sources": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1
+              },
+              "minItems": 1
+            }
+          },
+          "required": [
+            "scope",
+            "snapshotRef",
+            "asOf",
+            "knownAt",
+            "sources"
+          ],
+          "additionalProperties": false
+        },
+        "control": {
+          "type": "object",
+          "properties": {
+            "type": {
+              "enum": [
+                "clock",
+                "barrier",
+                "fault",
+                "process",
+                "externalResponder"
+              ]
+            },
+            "operation": {
+              "type": "string",
+              "minLength": 1
+            },
+            "parameters": {
+              "type": "object"
+            }
+          },
+          "required": [
+            "type",
+            "operation",
+            "parameters"
+          ],
+          "additionalProperties": false
+        },
+        "intent": {
+          "type": "object"
+        },
+        "branches": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "minLength": 1
+              },
+              "actions": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/$defs/action"
+                },
+                "minItems": 1
+              }
+            },
+            "required": [
+              "id",
+              "actions"
+            ],
+            "additionalProperties": false
+          },
+          "minItems": 2
+        },
+        "awaitActionId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "fixtureRef": {
+          "type": "string",
+          "minLength": 1
+        },
+        "evidenceRefs": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 1
+        },
+        "call": {
+          "$ref": "#/$defs/action"
+        },
+        "userUtterance": {
+          "type": "string",
+          "minLength": 1
+        },
+        "permittedContext": {
+          "type": "object"
+        },
+        "timeoutSeconds": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 300
+        }
+      },
+      "required": [
+        "id",
+        "kind",
+        "evidenceRefs"
+      ],
+      "additionalProperties": false,
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "kind": {
+                "enum": [
+                  "invoke",
+                  "query"
+                ]
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "actorRef",
+              "route",
+              "capabilityId",
+              "request"
+            ]
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "kind": {
+                "enum": [
+                  "observe"
+                ]
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "observation"
+            ]
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "kind": {
+                "enum": [
+                  "control"
+                ]
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "control"
+            ]
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "kind": {
+                "enum": [
+                  "agent"
+                ]
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "actorRef",
+              "route",
+              "intent"
+            ]
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "kind": {
+                "enum": [
+                  "parallel"
+                ]
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "branches"
+            ]
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "kind": {
+                "enum": [
+                  "await"
+                ]
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "awaitActionId"
+            ]
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "kind": {
+                "const": "start"
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "call"
+            ]
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "kind": {
+                "const": "agent"
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "userUtterance",
+              "permittedContext"
+            ]
+          }
+        }
+      ]
+    },
+    "assertion": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "op": {
+          "enum": [
+            "equals",
+            "notEquals",
+            "present",
+            "absent",
+            "decimalEquals",
+            "decimalAtMost",
+            "decimalAtLeast",
+            "sumEquals",
+            "decimalDelta",
+            "count",
+            "exactSet",
+            "relationSet",
+            "unique",
+            "sameAs",
+            "fieldsPresent",
+            "timeEquals",
+            "timeBefore",
+            "timeAtMostSeconds"
+          ]
+        },
+        "source": {
+          "type": "object",
+          "properties": {
+            "actionId": {
+              "type": "string",
+              "minLength": 1
+            },
+            "pointer": {
+              "type": "string",
+              "pattern": "^(/.*)?$"
+            },
+            "where": {
+              "type": "object",
+              "minProperties": 1
+            },
+            "field": {
+              "oneOf": [
+                {
+                  "type": "string",
+                  "minLength": 1
+                },
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "minItems": 1
+                }
+              ]
+            }
+          },
+          "required": [
+            "actionId",
+            "pointer"
+          ],
+          "additionalProperties": false
+        },
+        "baseline": {
+          "type": "object",
+          "properties": {
+            "actionId": {
+              "type": "string",
+              "minLength": 1
+            },
+            "pointer": {
+              "type": "string",
+              "pattern": "^(/.*)?$"
+            },
+            "where": {
+              "type": "object",
+              "minProperties": 1
+            },
+            "field": {
+              "oneOf": [
+                {
+                  "type": "string",
+                  "minLength": 1
+                },
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "minItems": 1
+                }
+              ]
+            }
+          },
+          "required": [
+            "actionId",
+            "pointer"
+          ],
+          "additionalProperties": false
+        },
+        "expected": {},
+        "unit": {
+          "type": "string",
+          "minLength": 1
+        },
+        "requirementRefs": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 1
+        },
+        "evidenceRefs": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 1
+        },
+        "scope": {
+          "type": "object",
+          "minProperties": 1
+        },
+        "oracleExplanation": {
+          "type": "string",
+          "minLength": 1
+        },
+        "oracleRef": {
+          "type": "object",
+          "required": [
+            "oracleId",
+            "observationNames"
+          ],
+          "properties": {
+            "oracleId": {
+              "type": "string",
+              "minLength": 1
+            },
+            "observationNames": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          },
+          "additionalProperties": false
+        },
+        "unitSource": {
+          "type": "object",
+          "properties": {
+            "actionId": {
+              "type": "string",
+              "minLength": 1
+            },
+            "pointer": {
+              "type": "string",
+              "pattern": "^(/.*)?$"
+            },
+            "where": {
+              "type": "object",
+              "minProperties": 1
+            },
+            "field": {
+              "oneOf": [
+                {
+                  "type": "string",
+                  "minLength": 1
+                },
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "minItems": 1
+                }
+              ]
+            }
+          },
+          "required": [
+            "actionId",
+            "pointer"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "id",
+        "op",
+        "source",
+        "expected",
+        "requirementRefs",
+        "evidenceRefs",
+        "scope",
+        "oracleExplanation"
+      ],
+      "additionalProperties": false,
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "op": {
+                "const": "decimalDelta"
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "baseline"
+            ]
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "op": {
+                "const": "sameAs"
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "baseline"
+            ]
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "op": {
+                "enum": [
+                  "decimalEquals",
+                  "decimalAtMost",
+                  "decimalAtLeast",
+                  "sumEquals",
+                  "decimalDelta"
+                ]
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "expected": {
+                "type": "string",
+                "pattern": "^-?(0|[1-9][0-9]*)(\\.[0-9]+)?$"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "required": [
+              "unit"
+            ]
+          },
+          "then": {
+            "required": [
+              "unitSource"
+            ]
+          }
+        }
+      ]
+    },
+    "resultReference": {
+      "type": "object",
+      "required": [
+        "$result"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "$result": {
+          "type": "object",
+          "required": [
+            "actionId",
+            "pointer"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "actionId": {
+              "type": "string",
+              "minLength": 1
+            },
+            "pointer": {
+              "type": "string",
+              "pattern": "^/.*"
+            }
+          }
+        }
+      }
+    },
+    "aliasReference": {
+      "type": "object",
+      "required": [
+        "$alias"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "$alias": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    }
+  }
+}

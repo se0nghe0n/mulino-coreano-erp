@@ -1,0 +1,93 @@
+[
+  {
+    "check": "contract-red",
+    "command": [
+      "./verify",
+      "contract-red"
+    ],
+    "exitCode": 1
+  },
+  {
+    "check": "feature-red",
+    "command": [
+      "./verify",
+      "contract-red",
+      "verification/harness/src/test/resources/examples/HARNESS-EXAMPLE/case.json"
+    ],
+    "exitCode": 1
+  },
+  {
+    "check": "validate",
+    "command": [
+      "./verify",
+      "validate",
+      "verification/harness/src/test/resources/examples/HARNESS-EXAMPLE/case.json"
+    ],
+    "exitCode": 0
+  },
+  {
+    "check": "schema",
+    "command": [
+      "./verify",
+      "schema"
+    ],
+    "exitCode": 2
+  },
+  {
+    "check": "contracts",
+    "command": [
+      "./verify",
+      "contracts"
+    ],
+    "exitCode": 2
+  },
+  {
+    "check": "scenarios",
+    "command": [
+      "./verify",
+      "scenarios",
+      "verification/harness/src/test/resources/examples/HARNESS-EXAMPLE/case.json"
+    ],
+    "exitCode": 2
+  },
+  {
+    "check": "recovery",
+    "command": [
+      "./verify",
+      "recovery"
+    ],
+    "exitCode": 2
+  },
+  {
+    "check": "mcp",
+    "command": [
+      "./verify",
+      "mcp"
+    ],
+    "exitCode": 2
+  },
+  {
+    "check": "skills",
+    "command": [
+      "./verify",
+      "skills"
+    ],
+    "exitCode": 2
+  },
+  {
+    "check": "model",
+    "command": [
+      "./verify",
+      "model"
+    ],
+    "exitCode": 2
+  },
+  {
+    "check": "deployment",
+    "command": [
+      "./verify",
+      "deployment"
+    ],
+    "exitCode": 2
+  }
+]

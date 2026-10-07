@@ -1,0 +1,62 @@
+{
+  "schemaVersion": "1.0.0",
+  "fixtureId": "BASE-IDENTITY-CLOCK",
+  "synthetic": true,
+  "baseRefs": [],
+  "clock": {
+    "asOf": "2026-10-07T09:00:00Z",
+    "knownAt": "2026-10-07T09:00:01Z",
+    "timezone": "Asia/Seoul",
+    "precision": "SECOND",
+    "deadlineInclusive": true
+  },
+  "versions": {
+    "definition": "definition-v1",
+    "evaluator": "evaluator-v1",
+    "policy": "SYNTHETIC-policy-v1"
+  },
+  "actors": {
+    "qc": {
+      "issuer": "fixture-issuer",
+      "subject": "qa-human",
+      "audience": "isolated-test-product",
+      "organizationAlias": "ORG",
+      "roleCapabilities": [
+        "getInventory",
+        "placeHold",
+        "getObligations"
+      ],
+      "grant": {
+        "delegatorAlias": "supervisor",
+        "actions": [
+          "getInventory",
+          "placeHold",
+          "getObligations"
+        ],
+        "scope": {
+          "organizationAlias": "ORG",
+          "segments": [
+            "A60",
+            "B40"
+          ]
+        },
+        "validFrom": "2026-10-01T00:00:00Z",
+        "validUntil": "2026-10-31T23:59:59Z",
+        "revision": 1
+      }
+    }
+  },
+  "aliases": {
+    "ORG": {
+      "type": "Organization"
+    },
+    "supervisor": {
+      "type": "Human"
+    }
+  },
+  "baseline": {
+    "setupIsExecutionCoverage": false
+  },
+  "evidence": [],
+  "responsibilities": []
+}

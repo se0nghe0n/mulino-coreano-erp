@@ -1,0 +1,254 @@
+{
+  "schemaVersion" : "1.0.0",
+  "recordType" : "ACCEPTANCE_HARNESS_REPORT",
+  "profile" : "scenarios",
+  "status" : "NOT_RUN",
+  "exitCode" : 2,
+  "timestamp" : "2026-10-07T13:05:13.793967Z",
+  "command" : "./verify scenarios verification/harness/src/test/resources/examples/HARNESS-EXAMPLE/case.json",
+  "codeCommit" : "cef526e9f77679d8429fb517184f018d64824443",
+  "workingTreeDirty" : true,
+  "harnessMainClassSha256" : "cc3668790a9f31ae3f5d18b8e04453355b8bcdcc587b86333cefc39dc6a97c2d",
+  "javaVersion" : "21.0.5+11-LTS",
+  "harnessVersion" : "1.0.0",
+  "productRuntimeClaimed" : false,
+  "discoveredSubcases" : 1,
+  "selectedSubcases" : 1,
+  "gateComplete" : false,
+  "cases" : [ {
+    "schemaVersion" : "1.0.0",
+    "caseId" : "HARNESS-EXAMPLE",
+    "subcaseId" : "hold-preserves-physical",
+    "status" : "NOT_RUN",
+    "runtimeComplete" : false,
+    "startedAt" : "2026-10-07T13:05:13.757041Z",
+    "finishedAt" : "2026-10-07T13:05:13.791192Z",
+    "command" : "./verify scenarios verification/harness/src/test/resources/examples/HARNESS-EXAMPLE/case.json",
+    "caseHash" : "4c9df9fb061258be4cb9291ad72417c56888fe60f9812ead023ea070569ceb0f",
+    "fixtureRef" : "verification/harness/src/test/resources/examples/HARNESS-EXAMPLE/fixture.json",
+    "fixtureHash" : "657b13656457e4aa6328628eadf9a06683a5f35111504c0e86e373a27c00a03f",
+    "versions" : {
+      "definition" : "definition-v1",
+      "evaluator" : "evaluator-v1",
+      "policy" : "SYNTHETIC-policy-v1"
+    },
+    "requiredAdapters" : [ "fixture", "api", "db" ],
+    "actions" : {
+      "db-after" : {
+        "actionId" : "db-after",
+        "driverStatus" : "NOT_IMPLEMENTED",
+        "data" : null,
+        "response" : null,
+        "reason" : "NOT_IMPLEMENTED: no real product adapters installed",
+        "provenance" : {
+          "adapter" : "unimplemented",
+          "adapterVersion" : "1.0.0",
+          "buildVersion" : "NONE",
+          "authenticatedActor" : null,
+          "source" : "NONE",
+          "independent" : false,
+          "scopeComplete" : false,
+          "sourceQuery" : null,
+          "snapshot" : null
+        },
+        "artifactRefs" : [ ]
+      },
+      "before" : {
+        "actionId" : "before",
+        "driverStatus" : "NOT_IMPLEMENTED",
+        "data" : null,
+        "response" : null,
+        "reason" : "NOT_IMPLEMENTED: no real product adapters installed",
+        "provenance" : {
+          "adapter" : "unimplemented",
+          "adapterVersion" : "1.0.0",
+          "buildVersion" : "NONE",
+          "authenticatedActor" : null,
+          "source" : "NONE",
+          "independent" : false,
+          "scopeComplete" : false,
+          "sourceQuery" : null,
+          "snapshot" : null
+        },
+        "artifactRefs" : [ ]
+      },
+      "setup" : {
+        "actionId" : "setup",
+        "driverStatus" : "NOT_IMPLEMENTED",
+        "data" : null,
+        "response" : null,
+        "reason" : "NOT_IMPLEMENTED: no real product adapters installed",
+        "provenance" : {
+          "adapter" : "unimplemented",
+          "adapterVersion" : "1.0.0",
+          "buildVersion" : "NONE",
+          "authenticatedActor" : null,
+          "source" : "NONE",
+          "independent" : false,
+          "scopeComplete" : false,
+          "sourceQuery" : null,
+          "snapshot" : null
+        },
+        "artifactRefs" : [ ]
+      },
+      "after" : {
+        "actionId" : "after",
+        "driverStatus" : "NOT_IMPLEMENTED",
+        "data" : null,
+        "response" : null,
+        "reason" : "NOT_IMPLEMENTED: no real product adapters installed",
+        "provenance" : {
+          "adapter" : "unimplemented",
+          "adapterVersion" : "1.0.0",
+          "buildVersion" : "NONE",
+          "authenticatedActor" : null,
+          "source" : "NONE",
+          "independent" : false,
+          "scopeComplete" : false,
+          "sourceQuery" : null,
+          "snapshot" : null
+        },
+        "artifactRefs" : [ ]
+      },
+      "hold" : {
+        "actionId" : "hold",
+        "driverStatus" : "NOT_IMPLEMENTED",
+        "data" : null,
+        "response" : null,
+        "reason" : "NOT_IMPLEMENTED: no real product adapters installed",
+        "provenance" : {
+          "adapter" : "unimplemented",
+          "adapterVersion" : "1.0.0",
+          "buildVersion" : "NONE",
+          "authenticatedActor" : null,
+          "source" : "NONE",
+          "independent" : false,
+          "scopeComplete" : false,
+          "sourceQuery" : null,
+          "snapshot" : null
+        },
+        "artifactRefs" : [ ]
+      }
+    },
+    "assertions" : [ {
+      "assertionId" : "held-100",
+      "status" : "NOT_RUN",
+      "reason" : "Required action/observer unavailable; no zero effects inferred",
+      "expected" : "100",
+      "source" : {
+        "actionId" : "after",
+        "pointer" : "/response/data/heldQuantity"
+      },
+      "observed" : null
+    }, {
+      "assertionId" : "eligible-80",
+      "status" : "NOT_RUN",
+      "reason" : "Required action/observer unavailable; no zero effects inferred",
+      "expected" : "80",
+      "source" : {
+        "actionId" : "after",
+        "pointer" : "/response/data/eligibleQuantity"
+      },
+      "observed" : null
+    }, {
+      "assertionId" : "eligible-delta",
+      "status" : "NOT_RUN",
+      "reason" : "Required action/observer unavailable; no zero effects inferred",
+      "expected" : "-20",
+      "source" : {
+        "actionId" : "after",
+        "pointer" : "/response/data/eligibleQuantity"
+      },
+      "observed" : null
+    }, {
+      "assertionId" : "physical-unique",
+      "status" : "NOT_RUN",
+      "reason" : "Required action/observer unavailable; no zero effects inferred",
+      "expected" : true,
+      "source" : {
+        "actionId" : "db-after",
+        "pointer" : "/data/data/segments",
+        "field" : "physicalScope"
+      },
+      "observed" : null
+    }, {
+      "assertionId" : "segment-set",
+      "status" : "NOT_RUN",
+      "reason" : "Required action/observer unavailable; no zero effects inferred",
+      "expected" : [ "A60", "B40" ],
+      "source" : {
+        "actionId" : "db-after",
+        "pointer" : "/data/data/segments",
+        "field" : "alias"
+      },
+      "observed" : null
+    }, {
+      "assertionId" : "relation-set",
+      "status" : "NOT_RUN",
+      "reason" : "Required action/observer unavailable; no zero effects inferred",
+      "expected" : [ [ "HARNESS-hold-1", "A60", "20", "SELL" ] ],
+      "source" : {
+        "actionId" : "db-after",
+        "pointer" : "/data/data/restrictions",
+        "field" : [ "sourceCommandKey", "segmentAlias", "quantity", "action" ]
+      },
+      "observed" : null
+    }, {
+      "assertionId" : "owner-qc",
+      "status" : "NOT_RUN",
+      "reason" : "Required action/observer unavailable; no zero effects inferred",
+      "expected" : "qc",
+      "source" : {
+        "actionId" : "db-after",
+        "pointer" : "/data/data/obligations/0/ownerAlias"
+      },
+      "observed" : null
+    }, {
+      "assertionId" : "next-check",
+      "status" : "NOT_RUN",
+      "reason" : "Required action/observer unavailable; no zero effects inferred",
+      "expected" : "2026-10-07T10:00:00Z",
+      "source" : {
+        "actionId" : "db-after",
+        "pointer" : "/data/data/obligations/0/nextCheckAt"
+      },
+      "observed" : null
+    }, {
+      "assertionId" : "version-v1",
+      "status" : "NOT_RUN",
+      "reason" : "Required action/observer unavailable; no zero effects inferred",
+      "expected" : "definition-v1",
+      "source" : {
+        "actionId" : "after",
+        "pointer" : "/response/definitionVersion"
+      },
+      "observed" : null
+    }, {
+      "assertionId" : "obligation-fields",
+      "status" : "NOT_RUN",
+      "reason" : "Required action/observer unavailable; no zero effects inferred",
+      "expected" : [ "ownerAlias", "nextAction", "nextCheckAt" ],
+      "source" : {
+        "actionId" : "db-after",
+        "pointer" : "/data/data/obligations"
+      },
+      "observed" : null
+    }, {
+      "assertionId" : "raw-segment-sum",
+      "status" : "NOT_RUN",
+      "reason" : "Required action/observer unavailable; no zero effects inferred",
+      "expected" : "100",
+      "source" : {
+        "actionId" : "db-after",
+        "pointer" : "/data/data/segments",
+        "field" : "quantity"
+      },
+      "observed" : null
+    } ],
+    "missingAssertions" : 11,
+    "productCoverageClaimed" : false
+  } ],
+  "reason" : "Required actions and observers must execute; unavailable adapters do not establish zero effects",
+  "prerequisiteProfiles" : [ "schema", "contracts" ],
+  "prerequisiteRuntimeComplete" : false
+}

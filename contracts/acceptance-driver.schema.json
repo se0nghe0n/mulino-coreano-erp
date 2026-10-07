@@ -1,0 +1,146 @@
+{
+  "type": "object",
+  "properties": {
+    "actionId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "driverStatus": {
+      "enum": [
+        "EXECUTED",
+        "NOT_IMPLEMENTED",
+        "UNAVAILABLE"
+      ]
+    },
+    "data": {},
+    "response": {},
+    "reason": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "provenance": {
+      "type": "object",
+      "properties": {
+        "adapter": {
+          "type": "string",
+          "minLength": 1
+        },
+        "adapterVersion": {
+          "type": "string",
+          "minLength": 1
+        },
+        "buildVersion": {
+          "type": "string",
+          "minLength": 1
+        },
+        "authenticatedActor": {
+          "type": [
+            "object",
+            "null"
+          ]
+        },
+        "source": {
+          "type": "string",
+          "minLength": 1
+        },
+        "independent": {
+          "type": "boolean"
+        },
+        "scopeComplete": {
+          "type": "boolean"
+        },
+        "sourceQuery": {
+          "type": [
+            "object",
+            "null"
+          ]
+        },
+        "snapshot": {
+          "type": [
+            "object",
+            "null"
+          ]
+        }
+      },
+      "required": [
+        "adapter",
+        "adapterVersion",
+        "buildVersion",
+        "authenticatedActor",
+        "source",
+        "independent",
+        "scopeComplete",
+        "sourceQuery",
+        "snapshot"
+      ],
+      "additionalProperties": false
+    },
+    "artifactRefs": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "minItems": 0
+    }
+  },
+  "required": [
+    "actionId",
+    "driverStatus",
+    "data",
+    "response",
+    "reason",
+    "provenance",
+    "artifactRefs"
+  ],
+  "additionalProperties": false,
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://mulino.test/contracts/acceptance-driver.schema.json",
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "driverStatus": {
+            "enum": [
+              "NOT_IMPLEMENTED",
+              "UNAVAILABLE"
+            ]
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "data": {
+            "type": "null"
+          },
+          "response": {
+            "type": "null"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "driverStatus": {
+            "const": "EXECUTED"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "artifactRefs": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1
+            },
+            "minItems": 1
+          }
+        }
+      }
+    }
+  ]
+}

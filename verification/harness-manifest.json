@@ -1,0 +1,44 @@
+{
+  "schemaVersion": "1.0.0",
+  "kind": "HARNESS_STACK_NOT_PRODUCT_STACK",
+  "userStep": 2,
+  "baselineCommit": "cef526e9f77679d8429fb517184f018d64824443",
+  "versions": {
+    "javaRelease": 21,
+    "observedJava": "Zulu21.0.5+11",
+    "maven": "3.9.16",
+    "mavenWrapper": "3.3.4",
+    "cucumber": "8.0.4",
+    "junit": "6.1.2",
+    "surefire": "3.5.6",
+    "jacksonDatabind": "2.21.2",
+    "jacksonJdk8": "2.21.2",
+    "jsonSchemaValidator": "1.5.9",
+    "compilerPlugin": "3.14.1",
+    "resourcesPlugin": "3.4.0",
+    "jarPlugin": "3.5.0",
+    "dependencyPlugin": "3.9.0"
+  },
+  "selectedProductStack": false,
+  "productAdapterStatus": "NOT_IMPLEMENTED",
+  "runtimeGates": {
+    "schema": "NOT_RUN",
+    "contracts": "NOT_RUN",
+    "scenarios": "NOT_RUN",
+    "recovery": "NOT_RUN",
+    "mcp": "NOT_RUN",
+    "skills": "NOT_RUN",
+    "model": "NOT_RUN",
+    "deployment": "NOT_RUN",
+    "regulatory": "NOT_RUN"
+  },
+  "gateComplete": false,
+  "supportLimits": [
+    "CAP/PostgreSQL candidate compatibility is not validated by the independent harness.",
+    "Cucumber8 JSON reporting requires jackson-datatype-jdk8 alongside Jackson2 databind.",
+    "JUnit6 uses explicit resource/file selectors; cucumber.features duplication is not used.",
+    "Actual client/model, database observer, barriers/process control and deployment adapters are absent.",
+    "Harness selftests use clearly labeled canned observations, never a simulated product.",
+    "Preparation/source/catalog linkage does not establish semantic completeness or runtime artifact coverage."
+  ]
+}

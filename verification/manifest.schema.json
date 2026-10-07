@@ -1,0 +1,94 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://mulino.test/verification/manifest.schema.json",
+  "type": "object",
+  "required": [
+    "schemaVersion",
+    "recordType",
+    "profile",
+    "status",
+    "exitCode",
+    "timestamp",
+    "command",
+    "codeCommit",
+    "gateComplete"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "const": "1.0.0"
+    },
+    "recordType": {
+      "const": "ACCEPTANCE_HARNESS_REPORT"
+    },
+    "profile": {
+      "type": "string",
+      "minLength": 1
+    },
+    "status": {
+      "enum": [
+        "PASS",
+        "FAIL",
+        "NOT_RUN",
+        "PREPARED"
+      ]
+    },
+    "exitCode": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 3
+    },
+    "timestamp": {
+      "type": "string"
+    },
+    "command": {
+      "type": "string",
+      "minLength": 1
+    },
+    "codeCommit": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{40}$"
+    },
+    "gateComplete": {
+      "type": "boolean"
+    },
+    "cases": {
+      "type": "array"
+    },
+    "productRuntimeClaimed": {
+      "type": "boolean"
+    },
+    "runtimeComplete": {
+      "type": "boolean"
+    },
+    "artifactCoverageStatus": {
+      "enum": [
+        "PASS",
+        "FAIL",
+        "NOT_RUN"
+      ]
+    }
+  },
+  "additionalProperties": true,
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "status": {
+            "enum": [
+              "FAIL",
+              "NOT_RUN",
+              "PREPARED"
+            ]
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "gateComplete": {
+            "const": false
+          }
+        }
+      }
+    }
+  ]
+}

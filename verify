@@ -1,0 +1,60 @@
+#!/usr/bin/env python3
+"""Thin argument-safe launcher; harness/preparation and actual product gates remain distinct."""
+import json, os, pathlib, shlex, subprocess, sys, time
+ROOT=pathlib.Path(__file__).resolve().parent
+POM=ROOT/'verification/harness/pom.xml'
+OUT=ROOT/'verification/harness/target'
+OUT.mkdir(parents=True,exist_ok=True)
+records=[]
+def command(argv):
+    print('+ '+shlex.join(str(x) for x in argv),flush=True)
+    started=time.time()
+    p=subprocess.run([str(x) for x in argv],cwd=ROOT)
+    records.append({'command':[str(x) for x in argv],'exitCode':p.returncode,'elapsedSeconds':round(time.time()-started,3)})
+    print('exitCode='+str(p.returncode),flush=True)
+    return p.returncode
+def finish(code):
+    (OUT/'wrapper-commands.json').write_text(json.dumps({'entrypoint':['./verify']+sys.argv[1:],'timestamp':time.strftime('%Y-%m-%dT%H:%M:%SZ',time.gmtime()),'commands':records,'exitCode':code},indent=2)+'\n')
+    sys.exit(code)
+if len(sys.argv)<2:
+    print('Usage: ./verify harness|contract-red|validate <case.json...>|prepare|coverage|schema|contracts|scenarios|recovery|mcp|skills|model|deployment',file=sys.stderr)
+    finish(3)
+mode=sys.argv[1]; extras=sys.argv[2:]
+if mode not in {'harness','contract-red','validate','prepare','coverage','schema','contracts','scenarios','recovery','mcp','skills','model','deployment'}:
+    print('Unknown verification profile: '+mode,file=sys.stderr);finish(3)
+if command(['java','-version']) or command([ROOT/'mvnw','-version']): finish(3)
+maven=[ROOT/'mvnw','-B','-ntp','-f',POM]
+if mode=='harness':
+    code=command(maven+['test'])
+    if code: finish(code)
+    smoke=OUT/'cucumber.json'
+    if not smoke.exists() or sum(len(f.get('elements',[])) for f in json.loads(smoke.read_text()))!=1:
+        print('FAIL: expected one Korean harness smoke scenario; empty suite is invalid',file=sys.stderr);finish(1)
+    finish(0)
+if mode=='contract-red' and not extras:
+    report=OUT/'evidence/contract-red-example.json'
+    if report.exists(): report.unlink()
+    feature=ROOT/'verification/harness/src/test/resources/examples/HARNESS-EXAMPLE/scenario.feature'
+    code=command(maven+['-Dtest=ContractRedTest','-Dverification.mode=contract-red','-Dverification.command=./verify contract-red','test'])
+    if not report.exists():
+        print('ENVIRONMENT_OR_DISCOVERY_FAILURE: no contract evidence emitted',file=sys.stderr);finish(3)
+    evidence=json.loads(report.read_text())
+    fail=evidence.get('status')=='FAIL' and any(a.get('status')=='FAIL' and 'NOT_IMPLEMENTED' in a.get('reason','') for a in evidence.get('assertions',[]))
+    discovery=OUT/'contract-red-cucumber.json'
+    scenarios=[e for f in json.loads(discovery.read_text()) for e in f.get('elements',[]) if e.get('type')=='scenario'] if discovery.exists() else []
+    actual_failed=sum(any(st.get('result',{}).get('status')=='failed' and 'NOT_IMPLEMENTED' in st.get('result',{}).get('error_message','') for st in e.get('steps',[])) for e in scenarios)
+    if code!=1 or not fail or len(scenarios)!=1 or actual_failed!=1:
+        print('FAIL: RED must be business availability assertion NOT_IMPLEMENTED, not syntax/environment error',file=sys.stderr);finish(3)
+    finish(1)
+if mode=='contract-red' and extras and '--all' not in extras:
+    summary=OUT/'evidence/feature-red-summary.json'
+    if summary.exists(): summary.unlink()
+    code=command(maven+['-Dtest=CaseFeatureTest','-Dverification.mode=contract-red','-Dverification.command='+shlex.join(['./verify',mode]+extras),'-Dverification.caseFiles='+'|'.join(extras),'test'])
+    if not summary.exists(): finish(3)
+    result=json.loads(summary.read_text())
+    if code!=1 or result['expectedScenarios']!=result['discoveredScenarios'] or result['expectedScenarios']!=result['notImplementedAssertionFailures'] or result['skippedScenarios']!=0: finish(3)
+    finish(1)
+if command(maven+['-Dmaven.test.skip=true','package','dependency:build-classpath','-Dmdep.outputFile=target/classpath.txt']): finish(3)
+classpath=str(OUT/'classes')+os.pathsep+(OUT/'classpath.txt').read_text().strip()
+args=['red']+extras if mode=='contract-red' else [mode]+extras if mode in {'validate','prepare','coverage'} else ['profile',mode]+extras
+finish(command(['java',f'-Drepo.root={ROOT}',f'-Dverification.command={shlex.join(["./verify",mode]+extras)}','-cp',classpath,'org.mulino.verification.Main']+args))

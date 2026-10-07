@@ -1,0 +1,127 @@
+{
+  "schemaVersion": "1.0.0",
+  "fixtureId": "HARNESS-EXAMPLE-BASELINE",
+  "synthetic": true,
+  "baseRefs": [
+    "verification/fixtures/base/identity-clock.json"
+  ],
+  "clock": {
+    "asOf": "2026-10-07T09:00:00Z",
+    "knownAt": "2026-10-07T09:00:01Z",
+    "timezone": "Asia/Seoul",
+    "precision": "SECOND",
+    "deadlineInclusive": true
+  },
+  "versions": {
+    "definition": "definition-v1",
+    "evaluator": "evaluator-v1",
+    "policy": "SYNTHETIC-policy-v1"
+  },
+  "actors": {
+    "qc": {
+      "issuer": "fixture-issuer",
+      "subject": "qa-human",
+      "audience": "isolated-test-product",
+      "organizationAlias": "ORG",
+      "roleCapabilities": [
+        "getInventory",
+        "placeHold",
+        "getObligations"
+      ],
+      "grant": {
+        "delegatorAlias": "supervisor",
+        "actions": [
+          "getInventory",
+          "placeHold",
+          "getObligations"
+        ],
+        "scope": {
+          "organizationAlias": "ORG",
+          "segments": [
+            "A60",
+            "B40"
+          ]
+        },
+        "validFrom": "2026-10-01T00:00:00Z",
+        "validUntil": "2026-10-31T23:59:59Z",
+        "revision": 1
+      }
+    }
+  },
+  "aliases": {
+    "ORG": {
+      "type": "Organization"
+    },
+    "P": {
+      "type": "TradeItem",
+      "unit": "BOX"
+    },
+    "W": {
+      "type": "Place"
+    },
+    "A60": {
+      "type": "QuantitySegment",
+      "itemAlias": "P",
+      "locationAlias": "W",
+      "quantity": "60",
+      "unit": "BOX",
+      "physicalScope": "A60-physical"
+    },
+    "B40": {
+      "type": "QuantitySegment",
+      "itemAlias": "P",
+      "locationAlias": "W",
+      "quantity": "40",
+      "unit": "BOX",
+      "physicalScope": "B40-physical"
+    },
+    "qc": {
+      "type": "Human"
+    },
+    "supervisor": {
+      "type": "Human"
+    }
+  },
+  "baseline": {
+    "segments": [
+      {
+        "alias": "A60",
+        "quantity": "60",
+        "unit": "BOX"
+      },
+      {
+        "alias": "B40",
+        "quantity": "40",
+        "unit": "BOX"
+      }
+    ],
+    "heldQuantity": "100",
+    "eligibleQuantity": "100",
+    "allowanceExplanation": "Both distinguishable setup scopes have synthetic test QC/regulatory/disposition evidence. This is not a legal policy.",
+    "setupIsExecutionCoverage": false
+  },
+  "evidence": [
+    {
+      "alias": "temperature-claim",
+      "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "sourceNamespace": "synthetic-warehouse",
+      "externalEventId": "TEMP-1",
+      "sourceVersion": "1",
+      "occurredAt": "2026-10-07T08:59:59Z",
+      "recordedAt": "2026-10-07T09:00:01Z"
+    }
+  ],
+  "responsibilities": [
+    {
+      "scope": {
+        "segments": [
+          "A60"
+        ]
+      },
+      "ownerAlias": "qc",
+      "supervisorAlias": "supervisor",
+      "nextAction": "검사 근거 확인",
+      "nextCheckAt": "2026-10-07T10:00:00Z"
+    }
+  ]
+}

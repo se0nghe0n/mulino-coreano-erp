@@ -1,0 +1,430 @@
+{
+  "schemaVersion": "1.0.0",
+  "caseId": "HARNESS-EXAMPLE",
+  "title": "구별된 물량의 보류는 실물량을 줄이지 않는다",
+  "requirementRefs": [
+    "HARNESS-EXAMPLE"
+  ],
+  "profiles": [
+    "scenarios"
+  ],
+  "subcases": [
+    {
+      "id": "hold-preserves-physical",
+      "title": "100 중20 보류 뒤 보유100/적격80과 인간 책임을 대조한다",
+      "fixtureRef": "verification/harness/src/test/resources/examples/HARNESS-EXAMPLE/fixture.json",
+      "requiredAdapters": [
+        "fixture",
+        "api",
+        "db"
+      ],
+      "actions": [
+        {
+          "id": "setup",
+          "kind": "installFixture",
+          "evidenceRefs": [
+            "setup:actual-adapter-artifact"
+          ]
+        },
+        {
+          "id": "before",
+          "kind": "query",
+          "actorRef": "qc",
+          "route": "api",
+          "capabilityId": "getInventory",
+          "request": {
+            "scope": {
+              "itemAlias": "P",
+              "placeAlias": "W"
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z"
+          },
+          "evidenceRefs": [
+            "before:actual-adapter-artifact"
+          ]
+        },
+        {
+          "id": "hold",
+          "kind": "invoke",
+          "actorRef": "qc",
+          "route": "api",
+          "capabilityId": "placeHold",
+          "request": {
+            "intentKind": "COMMAND",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "placeHold",
+            "subjectRefs": [
+              {
+                "type": "QuantitySegment",
+                "id": {
+                  "$alias": "A60"
+                }
+              }
+            ],
+            "slots": {
+              "quantity": {
+                "value": "20",
+                "unit": "BOX",
+                "provenance": "USER"
+              },
+              "action": {
+                "value": "SELL",
+                "provenance": "USER"
+              }
+            },
+            "expectedRevision": 1,
+            "commandIdempotencyKey": "HARNESS-hold-1",
+            "evidenceRefs": [
+              "temperature-claim"
+            ]
+          },
+          "evidenceRefs": [
+            "hold:actual-adapter-artifact"
+          ]
+        },
+        {
+          "id": "after",
+          "kind": "query",
+          "actorRef": "qc",
+          "route": "api",
+          "capabilityId": "getInventory",
+          "request": {
+            "scope": {
+              "itemAlias": "P",
+              "placeAlias": "W"
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z",
+            "snapshotRef": {
+              "$result": {
+                "actionId": "hold",
+                "pointer": "/response/snapshotRevision"
+              }
+            }
+          },
+          "evidenceRefs": [
+            "after:actual-adapter-artifact"
+          ]
+        },
+        {
+          "id": "db-after",
+          "kind": "observe",
+          "observation": {
+            "scope": {
+              "organizationAlias": "ORG",
+              "itemAlias": "P",
+              "placeAlias": "W",
+              "restrictionId": {
+                "$result": {
+                  "actionId": "hold",
+                  "pointer": "/response/restrictionId"
+                }
+              }
+            },
+            "snapshotRef": {
+              "$result": {
+                "actionId": "hold",
+                "pointer": "/response/snapshotRevision"
+              }
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z",
+            "sources": [
+              "segments",
+              "restrictions",
+              "obligations",
+              "audit",
+              "outbox"
+            ]
+          },
+          "evidenceRefs": [
+            "db-after:actual-adapter-artifact"
+          ]
+        }
+      ],
+      "assertions": [
+        {
+          "id": "held-100",
+          "op": "decimalEquals",
+          "source": {
+            "actionId": "after",
+            "pointer": "/response/data/heldQuantity"
+          },
+          "expected": "100",
+          "requirementRefs": [
+            "HARNESS-EXAMPLE"
+          ],
+          "evidenceRefs": [
+            "after:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationAlias": "ORG",
+            "itemAlias": "P",
+            "placeAlias": "W"
+          },
+          "oracleExplanation": "Setup60+40=100. A hold changes availability without physical reduction.",
+          "unit": "BOX",
+          "unitSource": {
+            "actionId": "after",
+            "pointer": "/response/data/unit"
+          }
+        },
+        {
+          "id": "eligible-80",
+          "op": "decimalEquals",
+          "source": {
+            "actionId": "after",
+            "pointer": "/response/data/eligibleQuantity"
+          },
+          "expected": "80",
+          "requirementRefs": [
+            "HARNESS-EXAMPLE"
+          ],
+          "evidenceRefs": [
+            "after:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationAlias": "ORG",
+            "itemAlias": "P",
+            "placeAlias": "W"
+          },
+          "oracleExplanation": "100−20=80, using fixed synthetic distinct scope.",
+          "unit": "BOX",
+          "unitSource": {
+            "actionId": "after",
+            "pointer": "/response/data/unit"
+          }
+        },
+        {
+          "id": "eligible-delta",
+          "op": "decimalDelta",
+          "source": {
+            "actionId": "after",
+            "pointer": "/response/data/eligibleQuantity"
+          },
+          "expected": "-20",
+          "requirementRefs": [
+            "HARNESS-EXAMPLE"
+          ],
+          "evidenceRefs": [
+            "after:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationAlias": "ORG",
+            "itemAlias": "P",
+            "placeAlias": "W"
+          },
+          "oracleExplanation": "After80−before100=−20.",
+          "baseline": {
+            "actionId": "before",
+            "pointer": "/response/data/eligibleQuantity"
+          },
+          "unit": "BOX",
+          "unitSource": {
+            "actionId": "after",
+            "pointer": "/response/data/unit"
+          }
+        },
+        {
+          "id": "physical-unique",
+          "op": "unique",
+          "source": {
+            "actionId": "db-after",
+            "pointer": "/data/data/segments",
+            "field": "physicalScope"
+          },
+          "expected": true,
+          "requirementRefs": [
+            "HARNESS-EXAMPLE"
+          ],
+          "evidenceRefs": [
+            "db-after:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationAlias": "ORG",
+            "itemAlias": "P",
+            "placeAlias": "W"
+          },
+          "oracleExplanation": "No physical scope counted twice."
+        },
+        {
+          "id": "segment-set",
+          "op": "exactSet",
+          "source": {
+            "actionId": "db-after",
+            "pointer": "/data/data/segments",
+            "field": "alias"
+          },
+          "expected": [
+            "A60",
+            "B40"
+          ],
+          "requirementRefs": [
+            "HARNESS-EXAMPLE"
+          ],
+          "evidenceRefs": [
+            "db-after:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationAlias": "ORG",
+            "itemAlias": "P",
+            "placeAlias": "W"
+          },
+          "oracleExplanation": "No parent or unexplained segment counted."
+        },
+        {
+          "id": "relation-set",
+          "op": "relationSet",
+          "source": {
+            "actionId": "db-after",
+            "pointer": "/data/data/restrictions",
+            "field": [
+              "sourceCommandKey",
+              "segmentAlias",
+              "quantity",
+              "action"
+            ]
+          },
+          "expected": [
+            [
+              "HARNESS-hold-1",
+              "A60",
+              "20",
+              "SELL"
+            ]
+          ],
+          "requirementRefs": [
+            "HARNESS-EXAMPLE"
+          ],
+          "evidenceRefs": [
+            "db-after:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationAlias": "ORG",
+            "itemAlias": "P",
+            "placeAlias": "W"
+          },
+          "oracleExplanation": "Hold relation applies to exactly20 withinA60."
+        },
+        {
+          "id": "owner-qc",
+          "op": "equals",
+          "source": {
+            "actionId": "db-after",
+            "pointer": "/data/data/obligations/0/ownerAlias"
+          },
+          "expected": "qc",
+          "requirementRefs": [
+            "HARNESS-EXAMPLE"
+          ],
+          "evidenceRefs": [
+            "db-after:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationAlias": "ORG",
+            "itemAlias": "P",
+            "placeAlias": "W"
+          },
+          "oracleExplanation": "Open restriction responsibility stays with configured human qc."
+        },
+        {
+          "id": "next-check",
+          "op": "timeEquals",
+          "source": {
+            "actionId": "db-after",
+            "pointer": "/data/data/obligations/0/nextCheckAt"
+          },
+          "expected": "2026-10-07T10:00:00Z",
+          "requirementRefs": [
+            "HARNESS-EXAMPLE"
+          ],
+          "evidenceRefs": [
+            "db-after:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationAlias": "ORG",
+            "itemAlias": "P",
+            "placeAlias": "W"
+          },
+          "oracleExplanation": "Deadline uses a fixed UTC instant."
+        },
+        {
+          "id": "version-v1",
+          "op": "equals",
+          "source": {
+            "actionId": "after",
+            "pointer": "/response/definitionVersion"
+          },
+          "expected": "definition-v1",
+          "requirementRefs": [
+            "HARNESS-EXAMPLE"
+          ],
+          "evidenceRefs": [
+            "after:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationAlias": "ORG",
+            "itemAlias": "P",
+            "placeAlias": "W"
+          },
+          "oracleExplanation": "Current response preserves the active scenario definition."
+        },
+        {
+          "id": "obligation-fields",
+          "op": "fieldsPresent",
+          "source": {
+            "actionId": "db-after",
+            "pointer": "/data/data/obligations"
+          },
+          "expected": [
+            "ownerAlias",
+            "nextAction",
+            "nextCheckAt"
+          ],
+          "requirementRefs": [
+            "HARNESS-EXAMPLE"
+          ],
+          "evidenceRefs": [
+            "db-after:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationAlias": "ORG",
+            "itemAlias": "P",
+            "placeAlias": "W"
+          },
+          "oracleExplanation": "Responsibility has no owner/action/deadline gap."
+        },
+        {
+          "id": "raw-segment-sum",
+          "op": "sumEquals",
+          "source": {
+            "actionId": "db-after",
+            "pointer": "/data/data/segments",
+            "field": "quantity"
+          },
+          "expected": "100",
+          "requirementRefs": [
+            "HARNESS-EXAMPLE"
+          ],
+          "evidenceRefs": [
+            "db-after:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationAlias": "ORG",
+            "itemAlias": "P",
+            "placeAlias": "W"
+          },
+          "oracleExplanation": "Independent rows60+40=100.",
+          "unit": "BOX",
+          "unitSource": {
+            "actionId": "db-after",
+            "pointer": "/data/data/segments",
+            "field": "unit"
+          }
+        }
+      ],
+      "oracleExplanation": "Setup60+40 includes baseline quantities. Hold20 changes eligible100→80, keeps held100. No product behavior is simulated in harness."
+    }
+  ]
+}

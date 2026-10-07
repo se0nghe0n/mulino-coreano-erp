@@ -1,0 +1,258 @@
+# Step2 공통 인수 harness 계약
+
+업무 oracle를 구현 결과에 맞춰 바꾸지 않기 위해 Java21/Maven의 독립
+harness를 먼저 둔다. CAP dependency와 제품 schema는 없다. 이 harness의
+PASS는 assertion·parser·입력 계약의 검증이다. 실제 제품 DB/API/MCP,
+복구, client, 모델, 규제와 배포 인수는 별도로 `NOT_RUN`이다.
+
+## 작성자 실행 명령
+
+저장소 루트에서 실행한다. `./verify`는 실제 command, Java/Maven version과
+exit code를 출력하며 `verification/harness/target/wrapper-commands.json`에
+기록한다. `target/`은 commit하지 않는 실행 산출물이다.
+
+```sh
+./verify harness
+./verify validate verification/cases/T17/case.json
+./verify contract-red verification/cases/T17/case.json
+./verify contract-red
+./verify prepare
+./verify coverage
+./verify scenarios
+```
+
+- `harness`: 한국어 Cucumber smoke와 assertion/계약 selftest만 실행한다.
+- `validate <case.json...>`: 실제 JSON Schema와 semantic 검증이다. 파일이
+  없거나 빈 입력이면 실패한다. 제품 행동·Gherkin 실행 PASS가 아니다.
+- `contract-red <case.json...>`: 각 파일 옆 `scenario.feature`를 실제 JUnit6
+  file selector로 발견하고 실행한다. 기대 수는 JSON의 subcase 수다.
+  발견/시작/NOT_IMPLEMENTED assertion 실패 수가 모두 같고 skip0이어야
+  의미 있는 RED다. 정상 의도된 RED의 exit code는1이다.
+- 인수 파일 없는 `contract-red`는 `HARNESS-EXAMPLE`의 한국어 scenario
+  하나를 실행한다. `contract-red --all`은 모든 case의 JSON 행동과 모든
+  substantive assertion을 실행한다. 이 모드는 Gherkin discovery와
+  구별하며 `red.json`의 미구현 assertion들을 기록한다.
+- `prepare`/`coverage`: case/assertion/Gherkin 연결, 독립 registry와 규범
+  catalog를 검사한다. 준비 PASS는 `PREPARED`, runtime/artifact는
+  `NOT_RUN`이며 제품 gate는 닫히지 않는다. semantic oracle equivalence는
+  case review가 필요하다. JSON pointer 존재만으로 이를 증명하지 않는다.
+- `schema`, `contracts`, `scenarios`, `recovery`, `mcp`, `skills`, `model`,
+  `deployment`: 실제 adapter가 없는 현재는 `NOT_RUN`, exit2다. 선행
+  profile과 미완료 gate를 보고한다. 모델·유료 배포를 호출하지 않는다.
+
+exit0은 harness/준비 검증의 성공, exit1은 assertion/인수 계약 실패,
+exit2는 필수 경로 `NOT_RUN`, exit3은 환경·형식·discovery 오류다.
+컴파일 오류와 미발견 suite를 의미 있는 RED로 세지 않는다.
+
+## 파일과 소유 경계
+
+```text
+contracts/acceptance-case.schema.json
+contracts/acceptance-fixture.schema.json
+contracts/acceptance-driver.schema.json
+contracts/acceptance-observation.schema.json
+contracts/acceptance-capabilities.json
+verification/fixtures/base/identity-clock.json
+verification/cases/<Txx|Cx|Vx|Ex>/{case.json,fixture.json,scenario.feature}
+verification/cases/registry.json
+verification/requirements/mandatory-oracles.json
+```
+
+case 작성자는 자신에게 배정된 case 디렉터리만 쓴다. 공통 schema/runner,
+registry와 독립 규범 catalog는 각 소유자가 통합한다. registry 형식은
+`{schemaVersion, expectedCases:41, expectedSubcases, cases:[{caseId,path,
+feature,subcaseIds:[...]}]}`다. 모든 실제 필수 subcase를 미리 등록한다.
+독립 catalog의 모든 named observation을 assertion에 연결한다. 요구와
+case를 같이 삭제해 coverage를 통과시키지 않는다.
+
+전체 예제는 `verification/harness/src/test/resources/examples/`
+`HARNESS-EXAMPLE/`에 있다. 업무 case ID가 아닌 harness 예제이며 실제
+제품 효과를 만드는 fake service가 아니다. `canned-observations.json`은
+assertion selftest 전용이다. 해당 표본에 `EXECUTED` 문자열이 있어도
+제품 실행/독립 DB 증거로 사용하지 않는다.
+
+## case JSON
+
+`schemaVersion=1.0.0`, `caseId`, `title`, `requirementRefs`, `profiles`,
+`subcases[]`를 둔다. subcase는 `id`, `title`, `fixtureRef`,
+`requiredAdapters`, `actions`, `assertions`, `oracleExplanation`이 필수다.
+SIT/UAT는 같은 파일·fixture·oracle를 사용하며 runner만 교체한다.
+
+각 assertion은 다음을 반드시 가진다.
+
+```json
+{
+  "id": "warehouse-held-80",
+  "op": "decimalEquals",
+  "source": {"actionId": "after-db", "pointer": "/data/data/heldQuantity"},
+  "expected": "80",
+  "unit": "BOX",
+  "unitSource": {"actionId":"after-db", "pointer":"/data/data/unit"},
+  "requirementRefs": ["D17"],
+  "evidenceRefs": ["after-db:rawRows", "after-db:sourceQuery", "after-db:snapshot"],
+  "scope": {"itemAlias": "P", "placeAlias": "W"},
+  "oracleExplanation": "실제 수령100−출고30+반품10=80이다.",
+  "oracleRef": {"oracleId": "<독립 catalog의 ID>", "observationNames": ["<named observation>"]}
+}
+```
+
+위 snippet의 placeholder를 실제 catalog 항목으로 바꾼다. 제품 assertion의
+`oracleRef`는 필수다. 단일 assertion이 여러 observation을 참조하더라도
+각 규범 기대값과 의미를 유지해야 한다. presence만으로 수량·owner·
+version·효과·종료 조건의 conjunction을 검증했다고 주장하지 않는다.
+
+`source`는 StepResult JSON부터 읽는 RFC6901 pointer다. API 응답은
+`/response/...`, DB observation은 `/data/data/...`다. 배열 선택에는
+`where:{field:fixedValue}`와 `field:"quantity"`를 쓴다. `field:["id",
+"parentId","quantity"]`는 관계 tuple을 만든다. 필드가 누락되면 실패하며
+누락·UNKNOWN·CONFLICT를0이나 빈 배열로 바꾸지 않는다.
+
+지원 op는 `equals`, `notEquals`, `present`, `absent`, `decimalEquals`,
+`decimalAtMost`, `decimalAtLeast`, `sumEquals`, `decimalDelta`, `count`,
+`exactSet`, `relationSet`, `unique`, `sameAs`, `fieldsPresent`, `timeEquals`,
+`timeBefore`, `timeAtMostSeconds`다. decimal expected는 정확한 문자열이다.
+단위 있는 assertion은 `unitSource`로 실제 관찰 단위도 검사한다.
+`decimalDelta`/`sameAs`는 별도 `baseline` source를 요구한다. set/관계는
+순서를 무시하되 중복 ID/tuple을 거부한다. `absent`도 실제로 관찰된 부모
+scope가 필요하며 explicit null은 absence가 아니다. `fieldsPresent`는
+필수 row가0개이면 실패한다. 효과0도 실제 전후 관찰을 요구한다.
+
+## 단계와 한국어 Gherkin
+
+행동 하나마다 `id`, `kind`, `evidenceRefs`를 둔다. `invoke`/`query`는
+`actorRef`, `route`, `capabilityId`, `request`가 필수이며 capability는
+계획 §3–§8의 공통 registry에 있어야 한다. 새 업무 의미가 필요하면
+임의 case-local capability를 만들지 않고 공통 소유자에게 전달한다.
+
+```gherkin
+# language: ko
+@T17 @D17 @sit @uat
+기능: 출고 사실과 실제 인도 책임을 대조한다
+  시나리오: CONSUMED 배분의 실제 인도
+    먼저 사례 파일 "verification/cases/T17/case.json"의 "normal-delivery"를 준비한다
+    만일 "시스템" 역할이 "setup" 행동을 수행한다
+    만일 "warehouse" 역할이 "dispatch" 행동을 수행한다
+    만일 "receiver" 역할이 "delivery" 행동을 수행한다
+    만일 "시스템" 역할이 "after-db" 행동을 수행한다
+    그러면 "warehouse-held-80" assertion으로 "현재 W 보유량"를 확인한다
+```
+
+fixture는 준비하되 `installFixture`도 명시적 action으로 실행한다.
+시나리오에는 해당 subcase의 모든 top-level action과 모든 assertion을
+각각 표현한다. action 순서는 JSON의 선언 순서와 같다. 한 opaque Given에
+전체 업무를 숨기지 않는다. 한 subcase는 한 discovered scenario에 대응한다.
+Scenario Outline의 example도 독립 subcase로 선언해 기대 수를 맞춘다.
+
+명사/동사 조회는 snapshot token, scope, asOf와 knownAt을 함께 비교한다.
+같은 knownAt 문자열만으로 같은 DB snapshot이라고 주장하지 않는다.
+거부 사례는 대상 원장/배분/승인/업무 outbox의 금지 delta와 허용된 denial
+감사·inbox/대조 책임을 별도 assertion으로 둔다. 전체 DB 불변을 가정하지
+않는다. baseline 물량도 현재/누적 oracle의 scope에 포함하되 setup 자체를
+실행 coverage로 세지 않는다.
+
+## 서버 ID와 이전 단계 결과의 연결
+
+fixture 설치 결과는 실제 `data.aliasMap`과 `fixtureHash`를 반환한다.
+이후 요청에서 `{"$alias":"A60"}`는 그 서버 발급 ID로 치환한다.
+새로 실행한 명령의 결과는 아래와 같이 명시적으로 연결한다.
+
+```json
+{
+  "proposalId": {"$result":{"actionId":"proposal","pointer":"/response/proposalId"}},
+  "proposalHash": {"$result":{"actionId":"proposal","pointer":"/response/proposalHash"}},
+  "expectedRevision": {"$result":{"actionId":"proposal","pointer":"/response/revision"}}
+}
+```
+
+`$result`는 actionId/pointer만 받는다. 실제 실행·완전한 scope·non-null
+값이 없으면 사용할 수 없다. 임의 eval, SQL, 업무 선택/계산 로직은 없다.
+fixture ID와 신규 명령 결과를 구별하며 adapter가 승인·수령·예약을
+암묵적으로 생성하지 않는다. 예제는 hold의 실제 snapshotRevision과
+restrictionId를 후속 query/observe request에 연결한다.
+
+## 경합·장애·raw wire
+
+`start`는 `call`로 명시한 invoke/query를 실제 비동기 실행한다. nested
+call에도 id/kind/actorRef/route/capabilityId/request/evidenceRefs를 둔다.
+start 결과의 `data.invocationHandle`은 실제 제출 ACK다. `await`는
+`awaitActionId`와 `timeoutSeconds`로 그 실행의 실제 결과/commit을 기다린다.
+
+```text
+start(dispatch)
+control(barrier, waitReached, transaction/point/participant)
+invoke(placeHold) + 실제 commit artifact
+control(barrier, resume, 동일 barrier/participant)
+await(dispatch-start)
+observe(after-hold-before-dispatch 또는 실제 최종 snapshot)
+assert(출고 delta0·배분 미소비·책임 유지)
+```
+
+반대 직렬화 순서도 별도 subcase로 작성한다. V2/V3/V7는 실제 두 거래의
+ACK/commit·잠금/fence 증거가 필요하다. `control`은
+`type=clock|barrier|fault|process|externalResponder`, `operation`,
+`parameters`를 받는다. EXECUTED control은 actual artifact와
+`data.acknowledged=true`, 요청과 같은 `controlType`/`operation`,
+`acknowledgedAt`을 요구한다. barrier ACK는 barrierId/participantId/
+transactionId/point/state도 필요하다. await는 `data.completed=true`의
+실제 terminal ACK가 필요하다. barrier/no-op나 sleep 우연을 경합
+PASS로 세지 않는다. `parallel.branches`는 실제 async start/control/query를
+각각 실행하고 제출 ACK를 모은다. 이는 거래 완료를 주장하지 않는다.
+각 invocation의 `await`와 post-commit 독립 관찰을 별도로 둔다. 모든
+child도 실행 상태·scope·artifact 검증 대상이다.
+
+`route=wire`의 request는 raw HTTP header/body, content type, protocol,
+JSON-RPC ID, MRTR state/inputResponses/effect key를 그대로 전달할 수 있다.
+harness가 공격 입력을 정상화하거나 header/body mismatch를 수선하지
+않는다. 이전 wire result의 state도 `$result`로 추출한다. adapter의 실제
+artifact는 Authorization/Cookie/token/비밀을 redact하고 원문 hash와
+검증된 인증 metadata를 따로 둔다. committed artifact에 credential 원문을
+저장하지 않는다.
+
+## fixture와 실제 실행 port
+
+fixture는 전체 `acceptance-fixture.schema.json`을 따른다. 가상 정책임을
+`synthetic:true`로 표시한다. clock에는 asOf/knownAt/시간대/정밀도/기한
+끝점, versions에는 definition/evaluator/policy를 고정한다. 조직·주체·
+issuer/audience, 구체 role capability/grant actions·scope·유효기간·revision,
+구별 가능한 실물 alias, 단위 있는 decimal baseline, evidence hash·원천
+사건/시간, 인간 owner/supervisor/nextAction/nextCheck를 작성한다.
+baseRefs는 별도 hash와 문서로 installation bundle에 전달한다. 묵시적
+policy allow, wildcard 권한, 합의되지 않은 실제 규제값을 만들지 않는다.
+승인 fixture가 필요한 경우 proposal hash/revision·scope·결정자·시각·
+유효기간·소비 정책을 baseline에 명시한다. 검증할 승인을 setup으로
+대신하지 않는다.
+
+`AcceptanceDriver`의 public Java port는 installFixture/invoke/query/observe/
+control/start/await다. 구현체는 실제 서비스·인증·DB/프로세스에 연결하며
+수량·적격성·목표/승인 계산이나 업무 상태 저장을 하지 않는다.
+`IndependentDbObserver`는 read-only 원 행/실제 query·parameter·mapping
+version·snapshot token/isolation·artifact와 완전한 scope를 요구한다.
+API projection을 복사한 관찰은 독립 DB 증거가 아니다.
+
+모든 결과는 StepResult의 `driverStatus=EXECUTED|NOT_IMPLEMENTED|
+UNAVAILABLE`, data/response, reason, provenance, artifactRefs를 가진다.
+이 상태와 서버 업무 outcome은 별개다. 미구현 결과는 data/response=null만
+반환한다. 관찰/설치/control/await/parallel child 중 하나라도 미실행이면
+전체 제품 case는 `NOT_RUN`이고 확인한 위반이 있으면 `FAIL`이다.
+첫 availability assertion만 통과시키고 이후 미관찰을0으로 읽지 않는다.
+
+`AgentRunner.Scripted`는 선언 typed intent를 실제 도구에 전달한다.
+`AgentRunner.ActualClientPort`는 raw userUtterance/permittedContext만 받는다.
+actual prompt에 기대 capability/slot/typed intent/oracle를 넣지 않는다.
+문장·tool 순서는 고정 답안이 아니며 실제 milestone·효과·책임을 같은
+observer/oracle로 검사한다. 현재 actual client 구현과 비용 승인은 없으며
+모델 실행은 `NOT_RUN`이다.
+
+## 현재 확인과 제한
+
+Cucumber8.0.4/JUnit6.1.2는 독립 Maven 모듈의 실제 compile/discovery 실행으로
+확인한다. Cucumber8 JSON report에는 Jackson2 databind뿐 아니라
+jackson-datatype-jdk8가 필요하여 둘 다2.21.2로 고정했다. Cucumber.features
+property는 JUnit6 discovery를 중복시키는 관찰이 있어 file/resource selector를
+사용한다. dependency install 성공만으로 discovery를 주장하지 않는다.
+
+제품 adapter는 사용자 Step3/S0 이후 연결한다. CAP 후보, PostgreSQL18,
+transaction/barrier/worker, source/기관 제출, actual host/model, BTP와 규제
+인수는 이 harness selftest가 대신하지 않는다. source 없는 법규나 비용을
+fixture/manifest에 확정하지 않는다. runtime artifact가 없으면 준비된
+assertion 수와 별개로 제품 gate를 미완료로 남긴다.
