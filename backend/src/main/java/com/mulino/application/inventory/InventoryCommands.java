@@ -10,8 +10,10 @@ import org.springframework.stereotype.Component;
 /** All command adapters dispatch here through the common envelope transaction. */
 @Component
 public final class InventoryCommands implements CommandHandler {
-  private final InventoryRepository repository; private final StockPrimitives stock; private final ReadAuthorizer authorizer; private final InventoryRestrictionGuard restrictions;
-  public InventoryCommands(InventoryRepository repository,StockPrimitives stock,ReadAuthorizer authorizer,InventoryRestrictionGuard restrictions){this.repository=repository;this.stock=stock;this.authorizer=authorizer;this.restrictions=restrictions;}
+  private final InventoryRepository repository; private final StockPrimitives stock; private final ReadAuthorizer authorizer; private final InventoryRestrictionGuard restrictions; private final com.mulino.application.trade.TradeImpact impact;
+  public InventoryCommands(InventoryRepository repository,StockPrimitives stock,ReadAuthorizer authorizer,InventoryRestrictionGuard restrictions){this.repository=repository;this.stock=stock;this.authorizer=authorizer;this.restrictions=restrictions;this.impact=null;}
+  @org.springframework.beans.factory.annotation.Autowired
+  public InventoryCommands(InventoryRepository repository,StockPrimitives stock,ReadAuthorizer authorizer,InventoryRestrictionGuard restrictions,com.mulino.application.trade.TradeImpact impact){this.repository=repository;this.stock=stock;this.authorizer=authorizer;this.restrictions=restrictions;this.impact=impact;}
   public Set<String> capabilities(){return Set.of("splitQuantity","mergeQuantity","moveQuantity","recordStocktake","adjustQuantity","disposeQuantity");}
   @Override public List<SubjectBinding> subjectBindings(DomainContext c,Map<String,Object> intent,CommandPreparation preparation) {
     String capability=text(intent,"capabilityId",100);if(!capabilities().contains(capability))throw DomainError.unsupported();
@@ -93,6 +95,7 @@ public final class InventoryCommands implements CommandHandler {
       case "disposeQuantity"->stock.decrease(c,uuid(s,"segmentId"),s.get("quantity"),text(s,"unit",40),at,evidence,command,"DISPOSE");
       default->throw DomainError.unsupported();
     };
+    if(impact!=null&&capability.equals("adjustQuantity"))for(var a:repository.currentRows(c,"SegmentAllocations"))if(command.equals(a.get("commandId"))&&"PHYSICAL_SHORTAGE".equals(a.get("suspensionReason"))&&a.get("workId")!=null)impact.recorded(c,(String)a.get("workId"),(String)a.get("ID"),"ALLOCATION_SHORTAGE",(String)a.get("segmentId"),"Reconcile missing physical allocation",c.knownAt().plusSeconds(60),Map.of("allocationId",a.get("ID"),"startQuantity",InventoryQuantity.text(a.get("startQuantity"))),(BigDecimal)a.get("quantity"),(String)a.get("unit"));
     var effects=new LinkedHashMap<String,Object>();effects.put(capability.equals("recordStocktake")?"stocktakeIds":"segmentIds",ids);effects.put("quantityEffects",capability.equals("recordStocktake")?List.of():ids.stream().map(id->repository.current(c,"QuantitySegments",id)).map(r->Map.of("segmentId",r.get("ID"),"quantity",InventoryQuantity.text(r.get("quantity")),"unit",r.get("unit"))).toList());
     return Map.of("outcome","APPLIED","revision",capability.equals("recordStocktake")?0:1,"effects",effects);
   }
