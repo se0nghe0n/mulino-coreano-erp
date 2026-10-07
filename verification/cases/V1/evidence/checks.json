@@ -1,0 +1,151 @@
+{
+  "recordType": "STEP2_DEFINITIONS_CASE_CHECKS",
+  "caseId": "V1",
+  "scope": "PREPARATION_AND_ASSERTION_SELFTEST_ONLY",
+  "b2Baseline": "feaca0af9673620eff9a5ac0f08a657ce14e9ccd",
+  "checkedCommonHead": "77c2df3440b6d8b362bfb52fed677e441c372b4c",
+  "workingTreeDirtyAtCheck": true,
+  "productRuntimeClaimed": false,
+  "case": {
+    "path": "verification/cases/V1/case.json",
+    "sha256": "2f81619d3503fc8cc489d8d76e8a603470ac152e7a89d8672d0168eb499c416f"
+  },
+  "feature": {
+    "path": "verification/cases/V1/scenario.feature",
+    "sha256": "51cea45ce35bfd0b1544c3902714066909074d84630a975d0b8ac54de4f2d5c0"
+  },
+  "selftestSource": {
+    "path": "verification/harness/src/test/java/org/mulino/verification/cases/definitions/DefinitionsAssertionTest.java",
+    "sha256": "ae6daa0a1a767866c697355148caa9e6af3d5da7eee019ed2120500d5ce07ca6"
+  },
+  "counts": {
+    "subcases": 3,
+    "actions": 39,
+    "assertions": 52,
+    "oracles": 2,
+    "namedObservations": 9
+  },
+  "subcases": [
+    {
+      "id": "pinned-meaning-current-policy",
+      "actions": 25,
+      "assertions": 25,
+      "fixture": {
+        "path": "verification/cases/V1/fixtures/pinned-meaning-current-policy.json",
+        "sha256": "13e1e3a4d478e6a09035393e0b3e7ac4f430563c412f3bb2d3647f8692b3b7c9"
+      },
+      "contractRed": {
+        "path": "verification/cases/V1/evidence/contract-red/pinned-meaning-current-policy.json",
+        "sha256": "b0e156c6b2d020922bbfa2f6d35220ff6ccd7b3fe6602f374b5767d033c04cd0"
+      },
+      "productStatus": "NOT_RUN"
+    },
+    {
+      "id": "unsupported-v1-held",
+      "actions": 8,
+      "assertions": 19,
+      "fixture": {
+        "path": "verification/cases/V1/fixtures/unsupported-v1-held.json",
+        "sha256": "fadcd9c8f43e880f6311dff109ba8b98f3f0648003f4c58d7612a171298557d7"
+      },
+      "contractRed": {
+        "path": "verification/cases/V1/evidence/contract-red/unsupported-v1-held.json",
+        "sha256": "efe66d424c37fce420d79af6a8dd4de96fa407339349aa86143e56b99c32e931"
+      },
+      "productStatus": "NOT_RUN"
+    },
+    {
+      "id": "skill-hash-no-runtime-proof",
+      "actions": 6,
+      "assertions": 8,
+      "fixture": {
+        "path": "verification/cases/V1/fixtures/skill-hash-no-runtime-proof.json",
+        "sha256": "fe327413c8a600394b07fc9d7a560acb64a6be82c8f4fb6d547d9fc1179b799d"
+      },
+      "contractRed": {
+        "path": "verification/cases/V1/evidence/contract-red/skill-hash-no-runtime-proof.json",
+        "sha256": "abdf4ccf7f875c702ffb4b4090fd2f16f8bf865e3468769535d2e17f4a191eb0"
+      },
+      "productStatus": "NOT_RUN"
+    }
+  ],
+  "checks": {
+    "validate": {
+      "exitCode": 0,
+      "status": "PREPARATION_SCHEMA_VALID"
+    },
+    "harness": {
+      "exitCode": 0,
+      "tests": 145,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "ownTests": 15
+    },
+    "gherkinFileSelectors": {
+      "exitCode": 1,
+      "expected": 3,
+      "discovered": 3,
+      "started": 3,
+      "notImplementedAssertionFailures": 3,
+      "skippedScenarios": 0,
+      "status": "INTENTIONAL_NOT_IMPLEMENTED_RED"
+    },
+    "scenarios": {
+      "exitCode": 2,
+      "status": "NOT_RUN",
+      "productRuntimeClaimed": false
+    }
+  },
+  "groupArtifacts": [
+    {
+      "path": "verification/cases/T21/evidence/group/validate.log.json",
+      "sha256": "e9c6c1e84ca51403144c4470c90463db2907bccc160a9f4eb3eb1cbd9157148f"
+    },
+    {
+      "path": "verification/cases/T21/evidence/group/harness.log.json",
+      "sha256": "c53deccf877c134b76a462e34e41c9d91f353544cb59c3fc2ac0357bc8003ccf"
+    },
+    {
+      "path": "verification/cases/T21/evidence/group/contract-red.log.json",
+      "sha256": "a95d07378a02cb479b55ac6fc1a6751d847f8b7f5b0c55b6d4189c0854cadad2"
+    },
+    {
+      "path": "verification/cases/T21/evidence/group/validate-wrapper.json",
+      "sha256": "c44416e05237166653a65ed55983282ac528c035ffc721fcc05a707142ffab26"
+    },
+    {
+      "path": "verification/cases/T21/evidence/group/harness-wrapper.json",
+      "sha256": "935c8772f68082a3d1fb1be5be181180a24e8c583a254b707ca414b94d9fcca3"
+    },
+    {
+      "path": "verification/cases/T21/evidence/group/contract-red-wrapper.json",
+      "sha256": "5a95f253877ae13e0ac481f551d8600fe2dc481c7030c2b1ac73992ea5a4adee"
+    },
+    {
+      "path": "verification/cases/T21/evidence/group/scenarios-wrapper.json",
+      "sha256": "a0b3135c1bf24873a52f8cdfbaf9a540ddcdbc63ef3ca6430666092be25dd192"
+    },
+    {
+      "path": "verification/cases/T21/evidence/group/feature-red-summary.json",
+      "sha256": "528fa1aabf9e554a6b95a43ad46f38d3531805a3ce5cb5ea29ade1348ebd01b5"
+    },
+    {
+      "path": "verification/cases/T21/evidence/group/feature-red-cucumber.json",
+      "sha256": "0611ef60c2f13eda7903ca85396376435de523785c209d8670ead594296981d3"
+    },
+    {
+      "path": "verification/cases/T21/evidence/group/scenarios-not-run.json",
+      "sha256": "0de8e399e3074f23babeb90ae0f5ff6f25a4428176d69576a9315e3beedde720"
+    },
+    {
+      "path": "verification/cases/T21/evidence/group/DefinitionsAssertionTest.xml",
+      "sha256": "61112c1be0c4195388b0e6ef8a5803126891994c6d77e3fc4ef6f93bfb367b0d"
+    }
+  ],
+  "limitations": [
+    "제품 API·DB·blob·control adapter가 미구현이므로 실제 업무 효과는 NOT_RUN이다.",
+    "고정 관찰 표본은 실제 AssertionEngine의 인수 assertion만 검사하며 제품 workflow를 구현하지 않는다.",
+    "공통 runner 수정 전 goalVersionId schema 오류 검사는 최종 결과에 포함하지 않는다."
+  ]
+}

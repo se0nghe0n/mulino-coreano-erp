@@ -1,0 +1,46 @@
+{
+  "entrypoint": [
+    "./verify",
+    "contract-red",
+    "verification/cases/T02/case.json",
+    "verification/cases/T07/case.json",
+    "verification/cases/T21/case.json",
+    "verification/cases/V1/case.json"
+  ],
+  "timestamp": "2026-10-07T14:30:22Z",
+  "commands": [
+    {
+      "command": [
+        "java",
+        "-version"
+      ],
+      "exitCode": 0,
+      "elapsedSeconds": 0.045
+    },
+    {
+      "command": [
+        "/Volumes/VideoStore/Developer/mulino-ontology-step2-definitions/mvnw",
+        "-version"
+      ],
+      "exitCode": 0,
+      "elapsedSeconds": 0.231
+    },
+    {
+      "command": [
+        "/Volumes/VideoStore/Developer/mulino-ontology-step2-definitions/mvnw",
+        "-B",
+        "-ntp",
+        "-f",
+        "/Volumes/VideoStore/Developer/mulino-ontology-step2-definitions/verification/harness/pom.xml",
+        "-Dtest=CaseFeatureTest",
+        "-Dverification.mode=contract-red",
+        "-Dverification.command=./verify contract-red verification/cases/T02/case.json verification/cases/T07/case.json verification/cases/T21/case.json verification/cases/V1/case.json",
+        "-Dverification.caseFiles=verification/cases/T02/case.json|verification/cases/T07/case.json|verification/cases/T21/case.json|verification/cases/V1/case.json",
+        "test"
+      ],
+      "exitCode": 1,
+      "elapsedSeconds": 2.25
+    }
+  ],
+  "exitCode": 1
+}

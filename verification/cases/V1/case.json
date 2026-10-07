@@ -1,0 +1,3303 @@
+{
+  "schemaVersion": "1.0.0",
+  "caseId": "V1",
+  "title": "과거 정의 의미와 현재 정책을 함께 적용한다",
+  "requirementRefs": [
+    "D21",
+    "D09",
+    "D17"
+  ],
+  "profiles": [
+    "contracts",
+    "scenarios"
+  ],
+  "subcases": [
+    {
+      "id": "pinned-meaning-current-policy",
+      "title": "v1 도착60 목표를 보존하고 v2 신규 의미·현재 QC 제한·정정58을 함께 검증한다",
+      "fixtureRef": "verification/cases/V1/fixtures/pinned-meaning-current-policy.json",
+      "requiredAdapters": [
+        "fixture",
+        "api",
+        "db"
+      ],
+      "actions": [
+        {
+          "id": "setup",
+          "kind": "installFixture",
+          "evidenceRefs": [
+            "setup:actual-artifact"
+          ]
+        },
+        {
+          "id": "draft",
+          "kind": "invoke",
+          "evidenceRefs": [
+            "draft:actual-artifact"
+          ],
+          "actorRef": "fde",
+          "route": "api",
+          "capabilityId": "createDefinitionDraft",
+          "request": {
+            "intentKind": "COMMAND",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "createDefinitionDraft",
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "caseNamespace": "V1-pinned-meaning-current-policy"
+            },
+            "subjectRefs": [],
+            "slots": {
+              "parentDefinitionId": {
+                "$alias": "DEF1"
+              },
+              "version": "definition-v2",
+              "package": {
+                "nounTypes": [
+                  {
+                    "name": "QuantitySegment",
+                    "coreRef": "QuantitySegment"
+                  }
+                ],
+                "verbDefinitions": [
+                  {
+                    "name": "arrive",
+                    "kind": "WORK",
+                    "slotTypes": {
+                      "item": "TradeItem",
+                      "destination": "Place",
+                      "quantity": "DecimalWithUnit"
+                    },
+                    "endpoint": "SELL_ELIGIBLE"
+                  }
+                ],
+                "goalTemplates": [
+                  {
+                    "name": "default",
+                    "quantity": "60",
+                    "unit": "BOX",
+                    "quantityMode": "STATE_AT",
+                    "endpoint": "SELL_ELIGIBLE",
+                    "evaluatorId": "eligibility-v2",
+                    "evaluatorVersion": "eligibility-v2",
+                    "evidencePolicyVersion": "synthetic-policy-v1",
+                    "evaluationTime": "2026-10-07T09:00:00Z",
+                    "dueAt": "2026-10-09T09:00:00Z"
+                  }
+                ],
+                "compatibilityManifest": [
+                  {
+                    "capabilityId": "resumeWork",
+                    "semanticVersion": "sell-eligible-v2",
+                    "evaluatorVersion": "eligibility-v2",
+                    "inputSchemaVersion": "2.0.0",
+                    "outputSchemaVersion": "2.0.0",
+                    "supportedWorkMigration": [
+                      "v1-to-v2"
+                    ]
+                  }
+                ],
+                "regressionFixtureRefs": [
+                  "T02",
+                  "T07",
+                  "T21",
+                  "V1"
+                ],
+                "organizationId": {
+                  "$alias": "ORG"
+                }
+              }
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z",
+            "expectedRevision": 1,
+            "commandIdempotencyKey": "V1-pinned-meaning-current-policy-draft"
+          }
+        },
+        {
+          "id": "validate",
+          "kind": "invoke",
+          "evidenceRefs": [
+            "validate:actual-artifact"
+          ],
+          "actorRef": "fde",
+          "route": "api",
+          "capabilityId": "validateDefinition",
+          "request": {
+            "intentKind": "COMMAND",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "validateDefinition",
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "caseNamespace": "V1-pinned-meaning-current-policy"
+            },
+            "subjectRefs": [],
+            "slots": {
+              "definitionId": {
+                "$result": {
+                  "actionId": "draft",
+                  "pointer": "/response/definitionId"
+                }
+              },
+              "hash": {
+                "$result": {
+                  "actionId": "draft",
+                  "pointer": "/response/hash"
+                }
+              }
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z",
+            "expectedRevision": {
+              "$result": {
+                "actionId": "draft",
+                "pointer": "/response/revision"
+              }
+            },
+            "commandIdempotencyKey": "V1-pinned-meaning-current-policy-validate"
+          }
+        },
+        {
+          "id": "submit",
+          "kind": "invoke",
+          "evidenceRefs": [
+            "submit:actual-artifact"
+          ],
+          "actorRef": "fde",
+          "route": "api",
+          "capabilityId": "submitDefinitionReview",
+          "request": {
+            "intentKind": "COMMAND",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "submitDefinitionReview",
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "caseNamespace": "V1-pinned-meaning-current-policy"
+            },
+            "subjectRefs": [],
+            "slots": {
+              "definitionId": {
+                "$result": {
+                  "actionId": "draft",
+                  "pointer": "/response/definitionId"
+                }
+              },
+              "hash": {
+                "$result": {
+                  "actionId": "draft",
+                  "pointer": "/response/hash"
+                }
+              },
+              "validationId": {
+                "$result": {
+                  "actionId": "validate",
+                  "pointer": "/response/validationId"
+                }
+              }
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z",
+            "expectedRevision": {
+              "$result": {
+                "actionId": "validate",
+                "pointer": "/response/revision"
+              }
+            },
+            "commandIdempotencyKey": "V1-pinned-meaning-current-policy-submit"
+          }
+        },
+        {
+          "id": "approve",
+          "kind": "invoke",
+          "evidenceRefs": [
+            "approve:actual-artifact"
+          ],
+          "actorRef": "approver",
+          "route": "api",
+          "capabilityId": "approveDefinition",
+          "request": {
+            "intentKind": "COMMAND",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "approveDefinition",
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "caseNamespace": "V1-pinned-meaning-current-policy"
+            },
+            "subjectRefs": [],
+            "slots": {
+              "definitionId": {
+                "$result": {
+                  "actionId": "draft",
+                  "pointer": "/response/definitionId"
+                }
+              },
+              "hash": {
+                "$result": {
+                  "actionId": "draft",
+                  "pointer": "/response/hash"
+                }
+              },
+              "decision": "APPROVED",
+              "validFrom": "2026-10-07T09:00:00Z",
+              "validUntil": "2026-10-31T23:59:59Z",
+              "consumptionPolicy": "ONE_PACKAGE_PUBLISH"
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z",
+            "expectedRevision": {
+              "$result": {
+                "actionId": "submit",
+                "pointer": "/response/revision"
+              }
+            },
+            "commandIdempotencyKey": "V1-pinned-meaning-current-policy-approve"
+          }
+        },
+        {
+          "id": "publish",
+          "kind": "invoke",
+          "evidenceRefs": [
+            "publish:actual-artifact"
+          ],
+          "actorRef": "fde",
+          "route": "api",
+          "capabilityId": "publishDefinition",
+          "request": {
+            "intentKind": "COMMAND",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "publishDefinition",
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "caseNamespace": "V1-pinned-meaning-current-policy"
+            },
+            "subjectRefs": [],
+            "slots": {
+              "definitionId": {
+                "$result": {
+                  "actionId": "draft",
+                  "pointer": "/response/definitionId"
+                }
+              },
+              "hash": {
+                "$result": {
+                  "actionId": "draft",
+                  "pointer": "/response/hash"
+                }
+              },
+              "approvalId": {
+                "$result": {
+                  "actionId": "approve",
+                  "pointer": "/response/approvalId"
+                }
+              }
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z",
+            "expectedRevision": {
+              "$result": {
+                "actionId": "approve",
+                "pointer": "/response/revision"
+              }
+            },
+            "commandIdempotencyKey": "V1-pinned-meaning-current-policy-publish"
+          }
+        },
+        {
+          "id": "activate",
+          "kind": "invoke",
+          "evidenceRefs": [
+            "activate:actual-artifact"
+          ],
+          "actorRef": "fde",
+          "route": "api",
+          "capabilityId": "activateDefinition",
+          "request": {
+            "intentKind": "COMMAND",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "activateDefinition",
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "caseNamespace": "V1-pinned-meaning-current-policy"
+            },
+            "subjectRefs": [],
+            "slots": {
+              "definitionId": {
+                "$result": {
+                  "actionId": "draft",
+                  "pointer": "/response/definitionId"
+                }
+              },
+              "hash": {
+                "$result": {
+                  "actionId": "publish",
+                  "pointer": "/response/hash"
+                }
+              },
+              "effectiveAt": "2026-10-07T09:00:00Z"
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z",
+            "expectedRevision": {
+              "$result": {
+                "actionId": "publish",
+                "pointer": "/response/revision"
+              }
+            },
+            "commandIdempotencyKey": "V1-pinned-meaning-current-policy-activate"
+          }
+        },
+        {
+          "id": "new-work",
+          "kind": "invoke",
+          "evidenceRefs": [
+            "new-work:actual-artifact"
+          ],
+          "actorRef": "owner",
+          "route": "api",
+          "capabilityId": "createDraft",
+          "request": {
+            "intentKind": "COMMAND",
+            "definitionVersion": "definition-v2",
+            "capabilityId": "createDraft",
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "caseNamespace": "V1-pinned-meaning-current-policy"
+            },
+            "subjectRefs": [],
+            "slots": {
+              "itemId": {
+                "$alias": "P"
+              },
+              "quantity": {
+                "value": "60",
+                "unit": "BOX",
+                "provenance": "USER"
+              },
+              "destinationId": {
+                "$alias": "W"
+              },
+              "dueAt": "2026-10-09T09:00:00Z",
+              "endpoint": "SELL_ELIGIBLE",
+              "quantityMode": "STATE_AT",
+              "evaluationTime": "2026-10-07T09:00:00Z",
+              "eligibilityAction": "SELL",
+              "customerId": {
+                "$alias": "C"
+              },
+              "includeReservations": false,
+              "evidencePolicyVersion": "synthetic-policy-v1",
+              "ownerId": {
+                "$alias": "owner"
+              },
+              "supervisorId": {
+                "$alias": "supervisor"
+              }
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z",
+            "expectedRevision": 1,
+            "commandIdempotencyKey": "V1-pinned-meaning-current-policy-new-work"
+          }
+        },
+        {
+          "id": "new-active",
+          "kind": "invoke",
+          "evidenceRefs": [
+            "new-active:actual-artifact"
+          ],
+          "actorRef": "owner",
+          "route": "api",
+          "capabilityId": "activateWork",
+          "request": {
+            "intentKind": "COMMAND",
+            "definitionVersion": "definition-v2",
+            "capabilityId": "activateWork",
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "caseNamespace": "V1-pinned-meaning-current-policy"
+            },
+            "subjectRefs": [],
+            "slots": {
+              "workId": {
+                "$result": {
+                  "actionId": "new-work",
+                  "pointer": "/response/workId"
+                }
+              },
+              "goalVersionId": {
+                "$result": {
+                  "actionId": "new-work",
+                  "pointer": "/response/goalVersionId"
+                }
+              }
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z",
+            "expectedRevision": {
+              "$result": {
+                "actionId": "new-work",
+                "pointer": "/response/revision"
+              }
+            },
+            "commandIdempotencyKey": "V1-pinned-meaning-current-policy-new-active"
+          }
+        },
+        {
+          "id": "current-hold",
+          "kind": "invoke",
+          "evidenceRefs": [
+            "current-hold:actual-artifact"
+          ],
+          "actorRef": "qc",
+          "route": "api",
+          "capabilityId": "placeHold",
+          "request": {
+            "intentKind": "COMMAND",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "placeHold",
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "caseNamespace": "V1-pinned-meaning-current-policy"
+            },
+            "subjectRefs": [],
+            "slots": {
+              "segmentId": {
+                "$alias": "A40"
+              },
+              "quantity": {
+                "value": "40",
+                "unit": "BOX"
+              },
+              "action": "SELL",
+              "reason": "synthetic-QC-hold",
+              "decisionEvidenceHash": "7f9e4a22a2724081747e6f487d9322b519afe9f88bd0e9de32d8d63c9e0a4830"
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z",
+            "expectedRevision": 1,
+            "commandIdempotencyKey": "V1-pinned-meaning-current-policy-current-hold"
+          }
+        },
+        {
+          "id": "old-assessment",
+          "kind": "query",
+          "evidenceRefs": [
+            "old-assessment:actual-artifact"
+          ],
+          "actorRef": "owner",
+          "route": "api",
+          "capabilityId": "getAssessment",
+          "request": {
+            "intentKind": "QUERY",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "getAssessment",
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "caseNamespace": "V1-pinned-meaning-current-policy"
+            },
+            "subjectRefs": [],
+            "slots": {
+              "workId": {
+                "$alias": "WORK1"
+              }
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z"
+          }
+        },
+        {
+          "id": "new-assessment",
+          "kind": "query",
+          "evidenceRefs": [
+            "new-assessment:actual-artifact"
+          ],
+          "actorRef": "owner",
+          "route": "api",
+          "capabilityId": "getAssessment",
+          "request": {
+            "intentKind": "QUERY",
+            "definitionVersion": "definition-v2",
+            "capabilityId": "getAssessment",
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "caseNamespace": "V1-pinned-meaning-current-policy"
+            },
+            "subjectRefs": [],
+            "slots": {
+              "workId": {
+                "$result": {
+                  "actionId": "new-work",
+                  "pointer": "/response/workId"
+                }
+              }
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z"
+          }
+        },
+        {
+          "id": "current-eligibility",
+          "kind": "query",
+          "evidenceRefs": [
+            "current-eligibility:actual-artifact"
+          ],
+          "actorRef": "owner",
+          "route": "api",
+          "capabilityId": "evaluateEligibility",
+          "request": {
+            "intentKind": "QUERY",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "evaluateEligibility",
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "caseNamespace": "V1-pinned-meaning-current-policy"
+            },
+            "subjectRefs": [],
+            "slots": {
+              "action": "SELL",
+              "segmentId": {
+                "$alias": "A40"
+              },
+              "customerId": {
+                "$alias": "C"
+              },
+              "evaluationTime": "2026-10-07T09:00:00Z"
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z"
+          }
+        },
+        {
+          "id": "before-command",
+          "kind": "query",
+          "evidenceRefs": [
+            "before-command:actual-artifact"
+          ],
+          "actorRef": "steward",
+          "route": "api",
+          "capabilityId": "getInventory",
+          "request": {
+            "intentKind": "QUERY",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "getInventory",
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "caseNamespace": "V1-pinned-meaning-current-policy"
+            },
+            "subjectRefs": [],
+            "slots": {},
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z"
+          }
+        },
+        {
+          "id": "db-before-command",
+          "kind": "observe",
+          "evidenceRefs": [
+            "db-before-command:actual-artifact"
+          ],
+          "observation": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "caseNamespace": "V1-pinned-meaning-current-policy"
+            },
+            "snapshotRef": {
+              "$result": {
+                "actionId": "before-command",
+                "pointer": "/response/snapshotRevision"
+              }
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z",
+            "sources": [
+              "segments",
+              "movements",
+              "allocations",
+              "businessOutbox"
+            ]
+          }
+        },
+        {
+          "id": "try-v1-reserve",
+          "kind": "invoke",
+          "evidenceRefs": [
+            "try-v1-reserve:actual-artifact"
+          ],
+          "actorRef": "owner",
+          "route": "api",
+          "capabilityId": "reserveQuantity",
+          "request": {
+            "intentKind": "COMMAND",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "reserveQuantity",
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "caseNamespace": "V1-pinned-meaning-current-policy"
+            },
+            "subjectRefs": [],
+            "slots": {
+              "segmentId": {
+                "$alias": "A40"
+              },
+              "quantity": {
+                "value": "1",
+                "unit": "BOX"
+              },
+              "workId": {
+                "$alias": "WORK1"
+              },
+              "action": "SELL"
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z",
+            "expectedRevision": 1,
+            "commandIdempotencyKey": "V1-pinned-meaning-current-policy-try-v1-reserve"
+          }
+        },
+        {
+          "id": "after-command",
+          "kind": "query",
+          "evidenceRefs": [
+            "after-command:actual-artifact"
+          ],
+          "actorRef": "steward",
+          "route": "api",
+          "capabilityId": "getInventory",
+          "request": {
+            "intentKind": "QUERY",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "getInventory",
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "caseNamespace": "V1-pinned-meaning-current-policy"
+            },
+            "subjectRefs": [],
+            "slots": {},
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z"
+          }
+        },
+        {
+          "id": "db-after-command",
+          "kind": "observe",
+          "evidenceRefs": [
+            "db-after-command:actual-artifact"
+          ],
+          "observation": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "caseNamespace": "V1-pinned-meaning-current-policy"
+            },
+            "snapshotRef": {
+              "$result": {
+                "actionId": "after-command",
+                "pointer": "/response/snapshotRevision"
+              }
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z",
+            "sources": [
+              "segments",
+              "movements",
+              "allocations",
+              "businessOutbox",
+              "works",
+              "goalVersions",
+              "assessments",
+              "restrictions",
+              "audit"
+            ]
+          }
+        },
+        {
+          "id": "receipt20-evidence",
+          "kind": "invoke",
+          "evidenceRefs": [
+            "receipt20-evidence:actual-artifact"
+          ],
+          "actorRef": "steward",
+          "route": "api",
+          "capabilityId": "attachEvidence",
+          "request": {
+            "intentKind": "RECORD",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "attachEvidence",
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "caseNamespace": "V1-pinned-meaning-current-policy"
+            },
+            "subjectRefs": [],
+            "slots": {
+              "document": {
+                "content": "receipt20 original BOX",
+                "sha256": "ea391b671123ee1ce3f0aeaddf45f12a284562bee5dfc0d0b6c613a3dfb08fe8",
+                "mediaType": "text/plain",
+                "uploadCompleted": true
+              },
+              "sourceNamespace": "synthetic-warehouse",
+              "externalEventId": "receipt20",
+              "sourceVersion": "1",
+              "claim": {
+                "physicalScopeId": {
+                  "$alias": "PHYS20"
+                },
+                "quantity": {
+                  "value": "20",
+                  "unit": "BOX"
+                },
+                "locationId": {
+                  "$alias": "W"
+                },
+                "occurredAt": "2026-10-07T09:00:00Z"
+              }
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z",
+            "expectedRevision": 1,
+            "commandIdempotencyKey": "V1-pinned-meaning-current-policy-receipt20-evidence"
+          }
+        },
+        {
+          "id": "receipt20",
+          "kind": "invoke",
+          "evidenceRefs": [
+            "receipt20:actual-artifact"
+          ],
+          "actorRef": "steward",
+          "route": "api",
+          "capabilityId": "confirmReceipt",
+          "request": {
+            "intentKind": "COMMAND",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "confirmReceipt",
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "caseNamespace": "V1-pinned-meaning-current-policy"
+            },
+            "subjectRefs": [],
+            "slots": {
+              "workId": {
+                "$alias": "WORK1"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "lotId": {
+                "$alias": "L"
+              },
+              "quantity": {
+                "value": "20",
+                "unit": "BOX"
+              },
+              "locationId": {
+                "$alias": "W"
+              },
+              "physicalScopeId": {
+                "$alias": "PHYS20"
+              },
+              "occurredAt": "2026-10-07T09:00:00Z",
+              "sourceNamespace": "synthetic-warehouse",
+              "externalEventId": "receipt20",
+              "sourceVersion": "1",
+              "evidenceIds": [
+                {
+                  "$result": {
+                    "actionId": "receipt20-evidence",
+                    "pointer": "/response/evidenceId"
+                  }
+                }
+              ]
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z",
+            "expectedRevision": 1,
+            "commandIdempotencyKey": "V1-pinned-meaning-current-policy-receipt20"
+          }
+        },
+        {
+          "id": "arrival60",
+          "kind": "query",
+          "evidenceRefs": [
+            "arrival60:actual-artifact"
+          ],
+          "actorRef": "owner",
+          "route": "api",
+          "capabilityId": "getAssessment",
+          "request": {
+            "intentKind": "QUERY",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "getAssessment",
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "caseNamespace": "V1-pinned-meaning-current-policy"
+            },
+            "subjectRefs": [],
+            "slots": {
+              "workId": {
+                "$alias": "WORK1"
+              }
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z"
+          }
+        },
+        {
+          "id": "correct18",
+          "kind": "invoke",
+          "evidenceRefs": [
+            "correct18:actual-artifact"
+          ],
+          "actorRef": "steward",
+          "route": "api",
+          "capabilityId": "correctEvidence",
+          "request": {
+            "intentKind": "RECORD",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "correctEvidence",
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "caseNamespace": "V1-pinned-meaning-current-policy"
+            },
+            "subjectRefs": [],
+            "slots": {
+              "occurrenceId": {
+                "$result": {
+                  "actionId": "receipt20",
+                  "pointer": "/response/occurrenceId"
+                }
+              },
+              "supersedesVersion": "1",
+              "sourceVersion": "2",
+              "correctedQuantity": {
+                "value": "18",
+                "unit": "BOX"
+              },
+              "document": {
+                "content": "receipt18 corrected BOX",
+                "sha256": "60d1c0293930f9f7b522cb7e49236daf5683df293c709ce5c7282952f2e4d280",
+                "mediaType": "text/plain",
+                "uploadCompleted": true
+              },
+              "correctedContentHash": "60d1c0293930f9f7b522cb7e49236daf5683df293c709ce5c7282952f2e4d280",
+              "reason": "실제 수령18을 확인한다",
+              "workId": {
+                "$alias": "WORK1"
+              }
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z",
+            "expectedRevision": {
+              "$result": {
+                "actionId": "receipt20",
+                "pointer": "/response/revision"
+              }
+            },
+            "commandIdempotencyKey": "V1-pinned-meaning-current-policy-correct18"
+          }
+        },
+        {
+          "id": "reassessment",
+          "kind": "query",
+          "evidenceRefs": [
+            "reassessment:actual-artifact"
+          ],
+          "actorRef": "owner",
+          "route": "api",
+          "capabilityId": "getAssessment",
+          "request": {
+            "intentKind": "QUERY",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "getAssessment",
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "caseNamespace": "V1-pinned-meaning-current-policy"
+            },
+            "subjectRefs": [],
+            "slots": {
+              "workId": {
+                "$alias": "WORK1"
+              }
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z"
+          }
+        },
+        {
+          "id": "policy-after-correction",
+          "kind": "query",
+          "evidenceRefs": [
+            "policy-after-correction:actual-artifact"
+          ],
+          "actorRef": "owner",
+          "route": "api",
+          "capabilityId": "evaluateEligibility",
+          "request": {
+            "intentKind": "QUERY",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "evaluateEligibility",
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "caseNamespace": "V1-pinned-meaning-current-policy"
+            },
+            "subjectRefs": [],
+            "slots": {
+              "action": "SELL",
+              "segmentId": {
+                "$alias": "A40"
+              }
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z"
+          }
+        },
+        {
+          "id": "db-correction",
+          "kind": "observe",
+          "evidenceRefs": [
+            "db-correction:actual-artifact"
+          ],
+          "observation": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "caseNamespace": "V1-pinned-meaning-current-policy",
+              "assessmentIds": [
+                {
+                  "$result": {
+                    "actionId": "arrival60",
+                    "pointer": "/response/data/id"
+                  }
+                },
+                {
+                  "$result": {
+                    "actionId": "reassessment",
+                    "pointer": "/response/data/id"
+                  }
+                }
+              ]
+            },
+            "snapshotRef": {
+              "$result": {
+                "actionId": "reassessment",
+                "pointer": "/response/snapshotRevision"
+              }
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z",
+            "sources": [
+              "assessments",
+              "conditionResults",
+              "receiptContributions",
+              "goalVersions",
+              "restrictions",
+              "obligations"
+            ]
+          }
+        }
+      ],
+      "assertions": [
+        {
+          "id": "old-endpoint",
+          "op": "equals",
+          "source": {
+            "actionId": "old-assessment",
+            "pointer": "/response/data/goal/endpoint"
+          },
+          "expected": "ARRIVED",
+          "requirementRefs": [
+            "D21",
+            "D09",
+            "D17"
+          ],
+          "evidenceRefs": [
+            "old-assessment:actual-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseNamespace": "V1-pinned-meaning-current-policy"
+          },
+          "oracleExplanation": "이 사례의 실제 원 행과 응답을 고정 기대값에 대조한다.",
+          "oracleRef": {
+            "oracleId": "V1.pinned-meaning-current-policy",
+            "observationNames": [
+              "v1-endpoint"
+            ]
+          }
+        },
+        {
+          "id": "new-endpoint",
+          "op": "equals",
+          "source": {
+            "actionId": "new-assessment",
+            "pointer": "/response/data/goal/endpoint"
+          },
+          "expected": "SELL_ELIGIBLE",
+          "requirementRefs": [
+            "D21",
+            "D09",
+            "D17"
+          ],
+          "evidenceRefs": [
+            "new-assessment:actual-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseNamespace": "V1-pinned-meaning-current-policy"
+          },
+          "oracleExplanation": "이 사례의 실제 원 행과 응답을 고정 기대값에 대조한다.",
+          "oracleRef": {
+            "oracleId": "V1.pinned-meaning-current-policy",
+            "observationNames": [
+              "new-v2-endpoint"
+            ]
+          }
+        },
+        {
+          "id": "old-definition",
+          "op": "equals",
+          "source": {
+            "actionId": "old-assessment",
+            "pointer": "/response/data/definitionVersion"
+          },
+          "expected": "definition-v1",
+          "requirementRefs": [
+            "D21",
+            "D09",
+            "D17"
+          ],
+          "evidenceRefs": [
+            "old-assessment:actual-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseNamespace": "V1-pinned-meaning-current-policy"
+          },
+          "oracleExplanation": "이 사례의 실제 원 행과 응답을 고정 기대값에 대조한다.",
+          "oracleRef": {
+            "oracleId": "V1.pinned-meaning-current-policy",
+            "observationNames": [
+              "old-assessment-semantics"
+            ]
+          }
+        },
+        {
+          "id": "old-evaluator",
+          "op": "equals",
+          "source": {
+            "actionId": "old-assessment",
+            "pointer": "/response/data/evaluatorVersion"
+          },
+          "expected": "arrival-v1",
+          "requirementRefs": [
+            "D21",
+            "D09",
+            "D17"
+          ],
+          "evidenceRefs": [
+            "old-assessment:actual-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseNamespace": "V1-pinned-meaning-current-policy"
+          },
+          "oracleExplanation": "이 사례의 실제 원 행과 응답을 고정 기대값에 대조한다.",
+          "oracleRef": {
+            "oracleId": "V1.pinned-meaning-current-policy",
+            "observationNames": [
+              "old-assessment-semantics"
+            ]
+          }
+        },
+        {
+          "id": "sell-current-denied",
+          "op": "equals",
+          "source": {
+            "actionId": "current-eligibility",
+            "pointer": "/response/data/conditions/qc/result"
+          },
+          "expected": "DENIED",
+          "requirementRefs": [
+            "D21",
+            "D09",
+            "D17"
+          ],
+          "evidenceRefs": [
+            "current-eligibility:actual-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseNamespace": "V1-pinned-meaning-current-policy"
+          },
+          "oracleExplanation": "이 사례의 실제 원 행과 응답을 고정 기대값에 대조한다.",
+          "oracleRef": {
+            "oracleId": "V1.pinned-meaning-current-policy",
+            "observationNames": [
+              "current-sell-permission"
+            ]
+          }
+        },
+        {
+          "id": "v1-reserve-forbidden",
+          "op": "equals",
+          "source": {
+            "actionId": "try-v1-reserve",
+            "pointer": "/response/error/code"
+          },
+          "expected": "INSUFFICIENT_ELIGIBLE_QUANTITY",
+          "requirementRefs": [
+            "D21",
+            "D09",
+            "D17"
+          ],
+          "evidenceRefs": [
+            "try-v1-reserve:actual-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseNamespace": "V1-pinned-meaning-current-policy"
+          },
+          "oracleExplanation": "이 사례의 실제 원 행과 응답을 고정 기대값에 대조한다.",
+          "oracleRef": {
+            "oracleId": "V1.pinned-meaning-current-policy",
+            "observationNames": [
+              "current-sell-permission"
+            ]
+          }
+        },
+        {
+          "id": "v1-reserve-no-effects",
+          "op": "equals",
+          "source": {
+            "actionId": "try-v1-reserve",
+            "pointer": "/response/effects"
+          },
+          "expected": [],
+          "requirementRefs": [
+            "D21",
+            "D09",
+            "D17"
+          ],
+          "evidenceRefs": [
+            "try-v1-reserve:actual-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseNamespace": "V1-pinned-meaning-current-policy"
+          },
+          "oracleExplanation": "이 사례의 실제 원 행과 응답을 고정 기대값에 대조한다.",
+          "oracleRef": {
+            "oracleId": "V1.pinned-meaning-current-policy",
+            "observationNames": [
+              "old-assessment-semantics"
+            ]
+          }
+        },
+        {
+          "id": "unchanged-segments",
+          "op": "sameAs",
+          "source": {
+            "actionId": "db-after-command",
+            "pointer": "/data/rawRows/segments"
+          },
+          "expected": null,
+          "requirementRefs": [
+            "D21",
+            "D09",
+            "D17"
+          ],
+          "evidenceRefs": [
+            "db-after-command:rawRows",
+            "db-before-command:actual-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseNamespace": "V1-pinned-meaning-current-policy"
+          },
+          "oracleExplanation": "segments의 실제 전후 원 행이 동일하므로 해당 scope의 금지된 효과는0이다. 감사·대조 의무는 이 비교에서 제외한다.",
+          "oracleRef": {
+            "oracleId": "V1.pinned-meaning-current-policy",
+            "observationNames": [
+              "old-assessment-semantics"
+            ]
+          },
+          "baseline": {
+            "actionId": "db-before-command",
+            "pointer": "/data/rawRows/segments"
+          }
+        },
+        {
+          "id": "unchanged-movements",
+          "op": "sameAs",
+          "source": {
+            "actionId": "db-after-command",
+            "pointer": "/data/rawRows/movements"
+          },
+          "expected": null,
+          "requirementRefs": [
+            "D21",
+            "D09",
+            "D17"
+          ],
+          "evidenceRefs": [
+            "db-after-command:rawRows",
+            "db-before-command:actual-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseNamespace": "V1-pinned-meaning-current-policy"
+          },
+          "oracleExplanation": "movements의 실제 전후 원 행이 동일하므로 해당 scope의 금지된 효과는0이다. 감사·대조 의무는 이 비교에서 제외한다.",
+          "oracleRef": {
+            "oracleId": "V1.pinned-meaning-current-policy",
+            "observationNames": [
+              "old-assessment-semantics"
+            ]
+          },
+          "baseline": {
+            "actionId": "db-before-command",
+            "pointer": "/data/rawRows/movements"
+          }
+        },
+        {
+          "id": "unchanged-allocations",
+          "op": "sameAs",
+          "source": {
+            "actionId": "db-after-command",
+            "pointer": "/data/rawRows/allocations"
+          },
+          "expected": null,
+          "requirementRefs": [
+            "D21",
+            "D09",
+            "D17"
+          ],
+          "evidenceRefs": [
+            "db-after-command:rawRows",
+            "db-before-command:actual-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseNamespace": "V1-pinned-meaning-current-policy"
+          },
+          "oracleExplanation": "allocations의 실제 전후 원 행이 동일하므로 해당 scope의 금지된 효과는0이다. 감사·대조 의무는 이 비교에서 제외한다.",
+          "oracleRef": {
+            "oracleId": "V1.pinned-meaning-current-policy",
+            "observationNames": [
+              "old-assessment-semantics"
+            ]
+          },
+          "baseline": {
+            "actionId": "db-before-command",
+            "pointer": "/data/rawRows/allocations"
+          }
+        },
+        {
+          "id": "unchanged-businessOutbox",
+          "op": "sameAs",
+          "source": {
+            "actionId": "db-after-command",
+            "pointer": "/data/rawRows/businessOutbox"
+          },
+          "expected": null,
+          "requirementRefs": [
+            "D21",
+            "D09",
+            "D17"
+          ],
+          "evidenceRefs": [
+            "db-after-command:rawRows",
+            "db-before-command:actual-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseNamespace": "V1-pinned-meaning-current-policy"
+          },
+          "oracleExplanation": "businessOutbox의 실제 전후 원 행이 동일하므로 해당 scope의 금지된 효과는0이다. 감사·대조 의무는 이 비교에서 제외한다.",
+          "oracleRef": {
+            "oracleId": "V1.pinned-meaning-current-policy",
+            "observationNames": [
+              "old-assessment-semantics"
+            ]
+          },
+          "baseline": {
+            "actionId": "db-before-command",
+            "pointer": "/data/rawRows/businessOutbox"
+          }
+        },
+        {
+          "id": "db-old-work-pinned",
+          "op": "relationSet",
+          "source": {
+            "actionId": "db-after-command",
+            "pointer": "/data/rawRows/works",
+            "field": [
+              "id",
+              "definitionVersion",
+              "evaluatorVersion"
+            ],
+            "where": {
+              "id": {
+                "$alias": "WORK1"
+              }
+            }
+          },
+          "expected": [
+            [
+              {
+                "$alias": "WORK1"
+              },
+              "definition-v1",
+              "arrival-v1"
+            ]
+          ],
+          "requirementRefs": [
+            "D21",
+            "D09",
+            "D17"
+          ],
+          "evidenceRefs": [
+            "db-after-command:rawRows"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseNamespace": "V1-pinned-meaning-current-policy"
+          },
+          "oracleExplanation": "이 사례의 실제 원 행과 응답을 고정 기대값에 대조한다.",
+          "oracleRef": {
+            "oracleId": "V1.pinned-meaning-current-policy",
+            "observationNames": [
+              "old-assessment-semantics"
+            ]
+          }
+        },
+        {
+          "id": "db-old-goal-endpoint",
+          "op": "exactSet",
+          "source": {
+            "actionId": "db-after-command",
+            "pointer": "/data/rawRows/goalVersions",
+            "field": "endpoint",
+            "where": {
+              "workId": {
+                "$alias": "WORK1"
+              }
+            }
+          },
+          "expected": [
+            "ARRIVED"
+          ],
+          "requirementRefs": [
+            "D21",
+            "D09",
+            "D17"
+          ],
+          "evidenceRefs": [
+            "db-after-command:rawRows"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseNamespace": "V1-pinned-meaning-current-policy"
+          },
+          "oracleExplanation": "이 사례의 실제 원 행과 응답을 고정 기대값에 대조한다.",
+          "oracleRef": {
+            "oracleId": "V1.pinned-meaning-current-policy",
+            "observationNames": [
+              "v1-endpoint"
+            ]
+          }
+        },
+        {
+          "id": "db-new-goal-endpoint",
+          "op": "exactSet",
+          "source": {
+            "actionId": "db-after-command",
+            "pointer": "/data/rawRows/goalVersions",
+            "field": "endpoint",
+            "where": {
+              "workId": {
+                "$result": {
+                  "actionId": "new-work",
+                  "pointer": "/response/workId"
+                }
+              }
+            }
+          },
+          "expected": [
+            "SELL_ELIGIBLE"
+          ],
+          "requirementRefs": [
+            "D21",
+            "D09",
+            "D17"
+          ],
+          "evidenceRefs": [
+            "db-after-command:rawRows"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseNamespace": "V1-pinned-meaning-current-policy"
+          },
+          "oracleExplanation": "이 사례의 실제 원 행과 응답을 고정 기대값에 대조한다.",
+          "oracleRef": {
+            "oracleId": "V1.pinned-meaning-current-policy",
+            "observationNames": [
+              "new-v2-endpoint"
+            ]
+          }
+        },
+        {
+          "id": "db-current-qc-restriction",
+          "op": "relationSet",
+          "source": {
+            "actionId": "db-after-command",
+            "pointer": "/data/rawRows/restrictions",
+            "field": [
+              "id",
+              "segmentId",
+              "kind",
+              "action",
+              "status"
+            ]
+          },
+          "expected": [
+            [
+              {
+                "$result": {
+                  "actionId": "current-hold",
+                  "pointer": "/response/restrictionId"
+                }
+              },
+              {
+                "$alias": "A40"
+              },
+              "QC",
+              "SELL",
+              "ACTIVE"
+            ]
+          ],
+          "requirementRefs": [
+            "D21",
+            "D09",
+            "D17"
+          ],
+          "evidenceRefs": [
+            "db-after-command:rawRows"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseNamespace": "V1-pinned-meaning-current-policy"
+          },
+          "oracleExplanation": "이 사례의 실제 원 행과 응답을 고정 기대값에 대조한다.",
+          "oracleRef": {
+            "oracleId": "V1.pinned-meaning-current-policy",
+            "observationNames": [
+              "current-sell-permission"
+            ]
+          }
+        },
+        {
+          "id": "arrival60-result",
+          "op": "equals",
+          "source": {
+            "actionId": "arrival60",
+            "pointer": "/response/data/result"
+          },
+          "expected": "SATISFIED",
+          "requirementRefs": [
+            "D21",
+            "D09",
+            "D17"
+          ],
+          "evidenceRefs": [
+            "arrival60:actual-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseNamespace": "V1-pinned-meaning-current-policy"
+          },
+          "oracleExplanation": "이 사례의 실제 원 행과 응답을 고정 기대값에 대조한다.",
+          "oracleRef": {
+            "oracleId": "V1.pinned-meaning-current-policy",
+            "observationNames": [
+              "old-assessment-semantics"
+            ]
+          }
+        },
+        {
+          "id": "corrected58-result",
+          "op": "equals",
+          "source": {
+            "actionId": "reassessment",
+            "pointer": "/response/data/result"
+          },
+          "expected": "UNSATISFIED",
+          "requirementRefs": [
+            "D21",
+            "D09",
+            "D17"
+          ],
+          "evidenceRefs": [
+            "reassessment:actual-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseNamespace": "V1-pinned-meaning-current-policy"
+          },
+          "oracleExplanation": "이 사례의 실제 원 행과 응답을 고정 기대값에 대조한다.",
+          "oracleRef": {
+            "oracleId": "V1.pinned-meaning-current-policy",
+            "observationNames": [
+              "old-assessment-semantics"
+            ]
+          }
+        },
+        {
+          "id": "correction-definition-v1",
+          "op": "equals",
+          "source": {
+            "actionId": "reassessment",
+            "pointer": "/response/data/definitionVersion"
+          },
+          "expected": "definition-v1",
+          "requirementRefs": [
+            "D21",
+            "D09",
+            "D17"
+          ],
+          "evidenceRefs": [
+            "reassessment:actual-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseNamespace": "V1-pinned-meaning-current-policy"
+          },
+          "oracleExplanation": "이 사례의 실제 원 행과 응답을 고정 기대값에 대조한다.",
+          "oracleRef": {
+            "oracleId": "V1.pinned-meaning-current-policy",
+            "observationNames": [
+              "old-assessment-semantics"
+            ]
+          }
+        },
+        {
+          "id": "correction-evaluator-v1",
+          "op": "equals",
+          "source": {
+            "actionId": "reassessment",
+            "pointer": "/response/data/evaluatorVersion"
+          },
+          "expected": "arrival-v1",
+          "requirementRefs": [
+            "D21",
+            "D09",
+            "D17"
+          ],
+          "evidenceRefs": [
+            "reassessment:actual-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseNamespace": "V1-pinned-meaning-current-policy"
+          },
+          "oracleExplanation": "이 사례의 실제 원 행과 응답을 고정 기대값에 대조한다.",
+          "oracleRef": {
+            "oracleId": "V1.pinned-meaning-current-policy",
+            "observationNames": [
+              "old-assessment-semantics"
+            ]
+          }
+        },
+        {
+          "id": "correction-still-arrived",
+          "op": "equals",
+          "source": {
+            "actionId": "reassessment",
+            "pointer": "/response/data/goal/endpoint"
+          },
+          "expected": "ARRIVED",
+          "requirementRefs": [
+            "D21",
+            "D09",
+            "D17"
+          ],
+          "evidenceRefs": [
+            "reassessment:actual-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseNamespace": "V1-pinned-meaning-current-policy"
+          },
+          "oracleExplanation": "이 사례의 실제 원 행과 응답을 고정 기대값에 대조한다.",
+          "oracleRef": {
+            "oracleId": "V1.pinned-meaning-current-policy",
+            "observationNames": [
+              "old-assessment-semantics"
+            ]
+          }
+        },
+        {
+          "id": "current-qc-still-denied",
+          "op": "equals",
+          "source": {
+            "actionId": "policy-after-correction",
+            "pointer": "/response/data/conditions/qc/result"
+          },
+          "expected": "DENIED",
+          "requirementRefs": [
+            "D21",
+            "D09",
+            "D17"
+          ],
+          "evidenceRefs": [
+            "policy-after-correction:actual-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseNamespace": "V1-pinned-meaning-current-policy"
+          },
+          "oracleExplanation": "이 사례의 실제 원 행과 응답을 고정 기대값에 대조한다.",
+          "oracleRef": {
+            "oracleId": "V1.pinned-meaning-current-policy",
+            "observationNames": [
+              "old-assessment-semantics"
+            ]
+          }
+        },
+        {
+          "id": "corrected-receipt-58",
+          "op": "decimalEquals",
+          "source": {
+            "actionId": "reassessment",
+            "pointer": "/response/data/contributedQuantity"
+          },
+          "expected": "58",
+          "requirementRefs": [
+            "D21",
+            "D09",
+            "D17"
+          ],
+          "evidenceRefs": [
+            "reassessment:actual-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseNamespace": "V1-pinned-meaning-current-policy"
+          },
+          "oracleExplanation": "원40+정정18=58 BOX로 목표60에 미달한다. v1 도착 evaluator를 유지한다.",
+          "oracleRef": {
+            "oracleId": "V1.pinned-meaning-current-policy",
+            "observationNames": [
+              "old-assessment-semantics"
+            ]
+          },
+          "unit": "BOX",
+          "unitSource": {
+            "actionId": "reassessment",
+            "pointer": "/response/data/unit"
+          }
+        },
+        {
+          "id": "immutable-assessment-history",
+          "op": "relationSet",
+          "source": {
+            "actionId": "db-correction",
+            "pointer": "/data/rawRows/assessments",
+            "field": [
+              "id",
+              "result",
+              "definitionVersion",
+              "evaluatorVersion"
+            ]
+          },
+          "expected": [
+            [
+              {
+                "$result": {
+                  "actionId": "arrival60",
+                  "pointer": "/response/data/id"
+                }
+              },
+              "SATISFIED",
+              "definition-v1",
+              "arrival-v1"
+            ],
+            [
+              {
+                "$result": {
+                  "actionId": "reassessment",
+                  "pointer": "/response/data/id"
+                }
+              },
+              "UNSATISFIED",
+              "definition-v1",
+              "arrival-v1"
+            ]
+          ],
+          "requirementRefs": [
+            "D21",
+            "D09",
+            "D17"
+          ],
+          "evidenceRefs": [
+            "db-correction:rawRows"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseNamespace": "V1-pinned-meaning-current-policy"
+          },
+          "oracleExplanation": "이 사례의 실제 원 행과 응답을 고정 기대값에 대조한다.",
+          "oracleRef": {
+            "oracleId": "V1.pinned-meaning-current-policy",
+            "observationNames": [
+              "old-assessment-semantics"
+            ]
+          }
+        },
+        {
+          "id": "db-current-arrival58",
+          "op": "sumEquals",
+          "source": {
+            "actionId": "db-correction",
+            "pointer": "/data/rawRows/receiptContributions",
+            "field": "quantity",
+            "where": {
+              "current": true
+            }
+          },
+          "expected": "58",
+          "requirementRefs": [
+            "D21",
+            "D09",
+            "D17"
+          ],
+          "evidenceRefs": [
+            "db-correction:rawRows"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseNamespace": "V1-pinned-meaning-current-policy"
+          },
+          "oracleExplanation": "원천 current 기여40+정정18=58 BOX다. 이전20과 현재18을 함께 더하지 않는다.",
+          "oracleRef": {
+            "oracleId": "V1.pinned-meaning-current-policy",
+            "observationNames": [
+              "old-assessment-semantics"
+            ]
+          },
+          "unit": "BOX",
+          "unitSource": {
+            "actionId": "db-correction",
+            "pointer": "/data/rawRows/receiptContributions",
+            "field": "unit",
+            "where": {
+              "current": true
+            }
+          }
+        },
+        {
+          "id": "previous-assessment-linked",
+          "op": "equals",
+          "source": {
+            "actionId": "reassessment",
+            "pointer": "/response/data/previousAssessmentId"
+          },
+          "expected": {
+            "$result": {
+              "actionId": "arrival60",
+              "pointer": "/response/data/id"
+            }
+          },
+          "requirementRefs": [
+            "D21",
+            "D09",
+            "D17"
+          ],
+          "evidenceRefs": [
+            "reassessment:actual-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseNamespace": "V1-pinned-meaning-current-policy"
+          },
+          "oracleExplanation": "이 사례의 실제 원 행과 응답을 고정 기대값에 대조한다.",
+          "oracleRef": {
+            "oracleId": "V1.pinned-meaning-current-policy",
+            "observationNames": [
+              "old-assessment-semantics"
+            ]
+          }
+        }
+      ],
+      "oracleExplanation": "v1 도착60 목표를 보존하고 v2 신규 의미·현재 QC 제한·정정58을 함께 검증한다. fixture는 가상값이며 실제 API와 독립 DB의 같은 scope/snapshot으로 검증한다. 미구현 adapter는 NOT_RUN이다."
+    },
+    {
+      "id": "unsupported-v1-held",
+      "title": "v1 handler/evaluator가 없으면 최신 의미로 대체하지 않고 인간 책임의 보류를 남긴다",
+      "fixtureRef": "verification/cases/V1/fixtures/unsupported-v1-held.json",
+      "requiredAdapters": [
+        "fixture",
+        "api",
+        "db"
+      ],
+      "actions": [
+        {
+          "id": "setup",
+          "kind": "installFixture",
+          "evidenceRefs": [
+            "setup:actual-artifact"
+          ]
+        },
+        {
+          "id": "before",
+          "kind": "query",
+          "evidenceRefs": [
+            "before:actual-artifact"
+          ],
+          "actorRef": "steward",
+          "route": "api",
+          "capabilityId": "getInventory",
+          "request": {
+            "intentKind": "QUERY",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "getInventory",
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "caseNamespace": "V1-unsupported-v1-held"
+            },
+            "subjectRefs": [],
+            "slots": {},
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z"
+          }
+        },
+        {
+          "id": "db-before",
+          "kind": "observe",
+          "evidenceRefs": [
+            "db-before:actual-artifact"
+          ],
+          "observation": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "caseNamespace": "V1-unsupported-v1-held"
+            },
+            "snapshotRef": {
+              "$result": {
+                "actionId": "before",
+                "pointer": "/response/snapshotRevision"
+              }
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z",
+            "sources": [
+              "segments",
+              "movements",
+              "allocations",
+              "goalVersions",
+              "businessOutbox"
+            ]
+          }
+        },
+        {
+          "id": "resume",
+          "kind": "invoke",
+          "evidenceRefs": [
+            "resume:actual-artifact"
+          ],
+          "actorRef": "owner",
+          "route": "api",
+          "capabilityId": "resumeWork",
+          "request": {
+            "intentKind": "COMMAND",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "resumeWork",
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "caseNamespace": "V1-unsupported-v1-held"
+            },
+            "subjectRefs": [],
+            "slots": {
+              "workId": {
+                "$alias": "WORK1"
+              },
+              "resumeEvidenceRefs": [
+                "verified-source-receipt40"
+              ]
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z",
+            "expectedRevision": 1,
+            "commandIdempotencyKey": "V1-unsupported-v1-held-resume"
+          }
+        },
+        {
+          "id": "assessment",
+          "kind": "query",
+          "evidenceRefs": [
+            "assessment:actual-artifact"
+          ],
+          "actorRef": "owner",
+          "route": "api",
+          "capabilityId": "getAssessment",
+          "request": {
+            "intentKind": "QUERY",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "getAssessment",
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "caseNamespace": "V1-unsupported-v1-held"
+            },
+            "subjectRefs": [],
+            "slots": {
+              "workId": {
+                "$alias": "WORK1"
+              }
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z"
+          }
+        },
+        {
+          "id": "after",
+          "kind": "query",
+          "evidenceRefs": [
+            "after:actual-artifact"
+          ],
+          "actorRef": "owner",
+          "route": "api",
+          "capabilityId": "getWork",
+          "request": {
+            "intentKind": "QUERY",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "getWork",
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "caseNamespace": "V1-unsupported-v1-held"
+            },
+            "subjectRefs": [],
+            "slots": {
+              "workId": {
+                "$alias": "WORK1"
+              }
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z"
+          }
+        },
+        {
+          "id": "db-after",
+          "kind": "observe",
+          "evidenceRefs": [
+            "db-after:actual-artifact"
+          ],
+          "observation": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "caseNamespace": "V1-unsupported-v1-held"
+            },
+            "snapshotRef": {
+              "$result": {
+                "actionId": "after",
+                "pointer": "/response/snapshotRevision"
+              }
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z",
+            "sources": [
+              "segments",
+              "movements",
+              "allocations",
+              "goalVersions",
+              "businessOutbox",
+              "works",
+              "obligations",
+              "compatibilityManifests",
+              "audit"
+            ]
+          }
+        },
+        {
+          "id": "duties",
+          "kind": "query",
+          "evidenceRefs": [
+            "duties:actual-artifact"
+          ],
+          "actorRef": "owner",
+          "route": "api",
+          "capabilityId": "getObligations",
+          "request": {
+            "intentKind": "QUERY",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "getObligations",
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "caseNamespace": "V1-unsupported-v1-held"
+            },
+            "subjectRefs": [],
+            "slots": {
+              "workId": {
+                "$alias": "WORK1"
+              },
+              "kind": "VERSION_UNSUPPORTED",
+              "current": true
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z",
+            "snapshotRef": {
+              "$result": {
+                "actionId": "after",
+                "pointer": "/response/snapshotRevision"
+              }
+            }
+          }
+        }
+      ],
+      "assertions": [
+        {
+          "id": "unsupported-error",
+          "op": "equals",
+          "source": {
+            "actionId": "resume",
+            "pointer": "/response/error/code"
+          },
+          "expected": "VERSION_UNSUPPORTED",
+          "requirementRefs": [
+            "D21",
+            "D09",
+            "D17"
+          ],
+          "evidenceRefs": [
+            "resume:actual-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseNamespace": "V1-unsupported-v1-held"
+          },
+          "oracleExplanation": "이 사례의 실제 원 행과 응답을 고정 기대값에 대조한다.",
+          "oracleRef": {
+            "oracleId": "V1.unsupported-v1-held",
+            "observationNames": [
+              "unsupported"
+            ]
+          }
+        },
+        {
+          "id": "unsupported-assessment-no-fallback",
+          "op": "equals",
+          "source": {
+            "actionId": "assessment",
+            "pointer": "/response/error/code"
+          },
+          "expected": "VERSION_UNSUPPORTED",
+          "requirementRefs": [
+            "D21",
+            "D09",
+            "D17"
+          ],
+          "evidenceRefs": [
+            "assessment:actual-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseNamespace": "V1-unsupported-v1-held"
+          },
+          "oracleExplanation": "이 사례의 실제 원 행과 응답을 고정 기대값에 대조한다.",
+          "oracleRef": {
+            "oracleId": "V1.unsupported-v1-held",
+            "observationNames": [
+              "no-silent-fallback"
+            ]
+          }
+        },
+        {
+          "id": "unsupported-effects0",
+          "op": "equals",
+          "source": {
+            "actionId": "resume",
+            "pointer": "/response/effects"
+          },
+          "expected": [],
+          "requirementRefs": [
+            "D21",
+            "D09",
+            "D17"
+          ],
+          "evidenceRefs": [
+            "resume:actual-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseNamespace": "V1-unsupported-v1-held"
+          },
+          "oracleExplanation": "이 사례의 실제 원 행과 응답을 고정 기대값에 대조한다.",
+          "oracleRef": {
+            "oracleId": "V1.unsupported-v1-held",
+            "observationNames": [
+              "unsupported-command-effects"
+            ]
+          }
+        },
+        {
+          "id": "unchanged-segments",
+          "op": "sameAs",
+          "source": {
+            "actionId": "db-after",
+            "pointer": "/data/rawRows/segments"
+          },
+          "expected": null,
+          "requirementRefs": [
+            "D21",
+            "D09",
+            "D17"
+          ],
+          "evidenceRefs": [
+            "db-after:rawRows",
+            "db-before:actual-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseNamespace": "V1-unsupported-v1-held"
+          },
+          "oracleExplanation": "segments의 실제 전후 원 행이 동일하므로 해당 scope의 금지된 효과는0이다. 감사·대조 의무는 이 비교에서 제외한다.",
+          "oracleRef": {
+            "oracleId": "V1.unsupported-v1-held",
+            "observationNames": [
+              "unsupported-command-effects"
+            ]
+          },
+          "baseline": {
+            "actionId": "db-before",
+            "pointer": "/data/rawRows/segments"
+          }
+        },
+        {
+          "id": "unchanged-movements",
+          "op": "sameAs",
+          "source": {
+            "actionId": "db-after",
+            "pointer": "/data/rawRows/movements"
+          },
+          "expected": null,
+          "requirementRefs": [
+            "D21",
+            "D09",
+            "D17"
+          ],
+          "evidenceRefs": [
+            "db-after:rawRows",
+            "db-before:actual-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseNamespace": "V1-unsupported-v1-held"
+          },
+          "oracleExplanation": "movements의 실제 전후 원 행이 동일하므로 해당 scope의 금지된 효과는0이다. 감사·대조 의무는 이 비교에서 제외한다.",
+          "oracleRef": {
+            "oracleId": "V1.unsupported-v1-held",
+            "observationNames": [
+              "unsupported-command-effects"
+            ]
+          },
+          "baseline": {
+            "actionId": "db-before",
+            "pointer": "/data/rawRows/movements"
+          }
+        },
+        {
+          "id": "unchanged-allocations",
+          "op": "sameAs",
+          "source": {
+            "actionId": "db-after",
+            "pointer": "/data/rawRows/allocations"
+          },
+          "expected": null,
+          "requirementRefs": [
+            "D21",
+            "D09",
+            "D17"
+          ],
+          "evidenceRefs": [
+            "db-after:rawRows",
+            "db-before:actual-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseNamespace": "V1-unsupported-v1-held"
+          },
+          "oracleExplanation": "allocations의 실제 전후 원 행이 동일하므로 해당 scope의 금지된 효과는0이다. 감사·대조 의무는 이 비교에서 제외한다.",
+          "oracleRef": {
+            "oracleId": "V1.unsupported-v1-held",
+            "observationNames": [
+              "unsupported-command-effects"
+            ]
+          },
+          "baseline": {
+            "actionId": "db-before",
+            "pointer": "/data/rawRows/allocations"
+          }
+        },
+        {
+          "id": "unchanged-goalVersions",
+          "op": "sameAs",
+          "source": {
+            "actionId": "db-after",
+            "pointer": "/data/rawRows/goalVersions"
+          },
+          "expected": null,
+          "requirementRefs": [
+            "D21",
+            "D09",
+            "D17"
+          ],
+          "evidenceRefs": [
+            "db-after:rawRows",
+            "db-before:actual-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseNamespace": "V1-unsupported-v1-held"
+          },
+          "oracleExplanation": "goalVersions의 실제 전후 원 행이 동일하므로 해당 scope의 금지된 효과는0이다. 감사·대조 의무는 이 비교에서 제외한다.",
+          "oracleRef": {
+            "oracleId": "V1.unsupported-v1-held",
+            "observationNames": [
+              "unsupported-command-effects"
+            ]
+          },
+          "baseline": {
+            "actionId": "db-before",
+            "pointer": "/data/rawRows/goalVersions"
+          }
+        },
+        {
+          "id": "unchanged-businessOutbox",
+          "op": "sameAs",
+          "source": {
+            "actionId": "db-after",
+            "pointer": "/data/rawRows/businessOutbox"
+          },
+          "expected": null,
+          "requirementRefs": [
+            "D21",
+            "D09",
+            "D17"
+          ],
+          "evidenceRefs": [
+            "db-after:rawRows",
+            "db-before:actual-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseNamespace": "V1-unsupported-v1-held"
+          },
+          "oracleExplanation": "businessOutbox의 실제 전후 원 행이 동일하므로 해당 scope의 금지된 효과는0이다. 감사·대조 의무는 이 비교에서 제외한다.",
+          "oracleRef": {
+            "oracleId": "V1.unsupported-v1-held",
+            "observationNames": [
+              "unsupported-command-effects"
+            ]
+          },
+          "baseline": {
+            "actionId": "db-before",
+            "pointer": "/data/rawRows/businessOutbox"
+          }
+        },
+        {
+          "id": "work-held",
+          "op": "equals",
+          "source": {
+            "actionId": "after",
+            "pointer": "/response/data/state"
+          },
+          "expected": "WAITING",
+          "requirementRefs": [
+            "D21",
+            "D09",
+            "D17"
+          ],
+          "evidenceRefs": [
+            "after:actual-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseNamespace": "V1-unsupported-v1-held"
+          },
+          "oracleExplanation": "이 사례의 실제 원 행과 응답을 고정 기대값에 대조한다.",
+          "oracleRef": {
+            "oracleId": "V1.unsupported-v1-held",
+            "observationNames": [
+              "unsupported-duty"
+            ]
+          }
+        },
+        {
+          "id": "current-duty-count",
+          "op": "count",
+          "source": {
+            "actionId": "db-after",
+            "pointer": "/data/rawRows/obligations",
+            "where": {
+              "current": true,
+              "kind": "VERSION_UNSUPPORTED"
+            }
+          },
+          "expected": 1,
+          "requirementRefs": [
+            "D21",
+            "D09",
+            "D17"
+          ],
+          "evidenceRefs": [
+            "db-after:rawRows"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseNamespace": "V1-unsupported-v1-held"
+          },
+          "oracleExplanation": "이 사례의 실제 원 행과 응답을 고정 기대값에 대조한다.",
+          "oracleRef": {
+            "oracleId": "V1.unsupported-v1-held",
+            "observationNames": [
+              "unsupported-duty"
+            ]
+          }
+        },
+        {
+          "id": "current-duty-owner",
+          "op": "exactSet",
+          "source": {
+            "actionId": "db-after",
+            "pointer": "/data/rawRows/obligations",
+            "field": "ownerId",
+            "where": {
+              "current": true,
+              "kind": "VERSION_UNSUPPORTED"
+            }
+          },
+          "expected": [
+            {
+              "$alias": "owner"
+            }
+          ],
+          "requirementRefs": [
+            "D21",
+            "D09",
+            "D17"
+          ],
+          "evidenceRefs": [
+            "db-after:rawRows"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseNamespace": "V1-unsupported-v1-held"
+          },
+          "oracleExplanation": "이 사례의 실제 원 행과 응답을 고정 기대값에 대조한다.",
+          "oracleRef": {
+            "oracleId": "V1.unsupported-v1-held",
+            "observationNames": [
+              "unsupported-duty"
+            ]
+          }
+        },
+        {
+          "id": "current-duty-action",
+          "op": "exactSet",
+          "source": {
+            "actionId": "db-after",
+            "pointer": "/data/rawRows/obligations",
+            "field": "nextAction",
+            "where": {
+              "current": true,
+              "kind": "VERSION_UNSUPPORTED"
+            }
+          },
+          "expected": [
+            "식별·버전·원천 근거를 대조한다"
+          ],
+          "requirementRefs": [
+            "D21",
+            "D09",
+            "D17"
+          ],
+          "evidenceRefs": [
+            "db-after:rawRows"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseNamespace": "V1-unsupported-v1-held"
+          },
+          "oracleExplanation": "이 사례의 실제 원 행과 응답을 고정 기대값에 대조한다.",
+          "oracleRef": {
+            "oracleId": "V1.unsupported-v1-held",
+            "observationNames": [
+              "unsupported-duty"
+            ]
+          }
+        },
+        {
+          "id": "current-duty-time",
+          "op": "exactSet",
+          "source": {
+            "actionId": "db-after",
+            "pointer": "/data/rawRows/obligations",
+            "field": "nextCheckAt",
+            "where": {
+              "current": true,
+              "kind": "VERSION_UNSUPPORTED"
+            }
+          },
+          "expected": [
+            "2026-10-07T10:00:00Z"
+          ],
+          "requirementRefs": [
+            "D21",
+            "D09",
+            "D17"
+          ],
+          "evidenceRefs": [
+            "db-after:rawRows"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseNamespace": "V1-unsupported-v1-held"
+          },
+          "oracleExplanation": "이 사례의 실제 원 행과 응답을 고정 기대값에 대조한다.",
+          "oracleRef": {
+            "oracleId": "V1.unsupported-v1-held",
+            "observationNames": [
+              "unsupported-duty"
+            ]
+          }
+        },
+        {
+          "id": "current-duty-state",
+          "op": "exactSet",
+          "source": {
+            "actionId": "db-after",
+            "pointer": "/data/rawRows/obligations",
+            "field": "status",
+            "where": {
+              "current": true,
+              "kind": "VERSION_UNSUPPORTED"
+            }
+          },
+          "expected": [
+            "OPEN"
+          ],
+          "requirementRefs": [
+            "D21",
+            "D09",
+            "D17"
+          ],
+          "evidenceRefs": [
+            "db-after:rawRows"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseNamespace": "V1-unsupported-v1-held"
+          },
+          "oracleExplanation": "이 사례의 실제 원 행과 응답을 고정 기대값에 대조한다.",
+          "oracleRef": {
+            "oracleId": "V1.unsupported-v1-held",
+            "observationNames": [
+              "unsupported-duty"
+            ]
+          }
+        },
+        {
+          "id": "duty-supervisor",
+          "op": "exactSet",
+          "source": {
+            "actionId": "db-after",
+            "pointer": "/data/rawRows/obligations",
+            "field": "supervisorId",
+            "where": {
+              "current": true,
+              "kind": "VERSION_UNSUPPORTED"
+            }
+          },
+          "expected": [
+            {
+              "$alias": "supervisor"
+            }
+          ],
+          "requirementRefs": [
+            "D21",
+            "D09",
+            "D17"
+          ],
+          "evidenceRefs": [
+            "db-after:rawRows"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseNamespace": "V1-unsupported-v1-held"
+          },
+          "oracleExplanation": "이 사례의 실제 원 행과 응답을 고정 기대값에 대조한다.",
+          "oracleRef": {
+            "oracleId": "V1.unsupported-v1-held",
+            "observationNames": [
+              "unsupported-duty"
+            ]
+          }
+        },
+        {
+          "id": "api-duty-count",
+          "op": "count",
+          "source": {
+            "actionId": "duties",
+            "pointer": "/response/data/obligations"
+          },
+          "expected": 1,
+          "requirementRefs": [
+            "D21",
+            "D09",
+            "D17"
+          ],
+          "evidenceRefs": [
+            "duties:actual-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseNamespace": "V1-unsupported-v1-held"
+          },
+          "oracleExplanation": "이 사례의 실제 원 행과 응답을 고정 기대값에 대조한다.",
+          "oracleRef": {
+            "oracleId": "V1.unsupported-v1-held",
+            "observationNames": [
+              "unsupported-duty"
+            ]
+          }
+        },
+        {
+          "id": "api-duty-details",
+          "op": "relationSet",
+          "source": {
+            "actionId": "duties",
+            "pointer": "/response/data/obligations",
+            "field": [
+              "ownerId",
+              "nextAction",
+              "nextCheckAt",
+              "status"
+            ]
+          },
+          "expected": [
+            [
+              {
+                "$alias": "owner"
+              },
+              "식별·버전·원천 근거를 대조한다",
+              "2026-10-07T10:00:00Z",
+              "OPEN"
+            ]
+          ],
+          "requirementRefs": [
+            "D21",
+            "D09",
+            "D17"
+          ],
+          "evidenceRefs": [
+            "duties:actual-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseNamespace": "V1-unsupported-v1-held"
+          },
+          "oracleExplanation": "이 사례의 실제 원 행과 응답을 고정 기대값에 대조한다.",
+          "oracleRef": {
+            "oracleId": "V1.unsupported-v1-held",
+            "observationNames": [
+              "unsupported-duty"
+            ]
+          }
+        },
+        {
+          "id": "old-work-no-fallback",
+          "op": "relationSet",
+          "source": {
+            "actionId": "db-after",
+            "pointer": "/data/rawRows/works",
+            "field": [
+              "id",
+              "definitionVersion",
+              "evaluatorVersion"
+            ]
+          },
+          "expected": [
+            [
+              {
+                "$alias": "WORK1"
+              },
+              "definition-v1",
+              "arrival-v1"
+            ]
+          ],
+          "requirementRefs": [
+            "D21",
+            "D09",
+            "D17"
+          ],
+          "evidenceRefs": [
+            "db-after:rawRows"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseNamespace": "V1-unsupported-v1-held"
+          },
+          "oracleExplanation": "이 사례의 실제 원 행과 응답을 고정 기대값에 대조한다.",
+          "oracleRef": {
+            "oracleId": "V1.unsupported-v1-held",
+            "observationNames": [
+              "unsupported",
+              "unsupported-command-effects",
+              "unsupported-duty",
+              "no-silent-fallback"
+            ]
+          }
+        },
+        {
+          "id": "unsupported-assessment0",
+          "op": "count",
+          "source": {
+            "actionId": "db-after",
+            "pointer": "/data/rawRows/compatibilityManifests",
+            "where": {
+              "definitionVersion": "definition-v1",
+              "capabilityId": "resumeWork"
+            }
+          },
+          "expected": 0,
+          "requirementRefs": [
+            "D21",
+            "D09",
+            "D17"
+          ],
+          "evidenceRefs": [
+            "db-after:rawRows"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseNamespace": "V1-unsupported-v1-held"
+          },
+          "oracleExplanation": "이 사례의 실제 원 행과 응답을 고정 기대값에 대조한다.",
+          "oracleRef": {
+            "oracleId": "V1.unsupported-v1-held",
+            "observationNames": [
+              "unsupported",
+              "unsupported-command-effects",
+              "unsupported-duty",
+              "no-silent-fallback"
+            ]
+          }
+        }
+      ],
+      "oracleExplanation": "v1 handler/evaluator가 없으면 최신 의미로 대체하지 않고 인간 책임의 보류를 남긴다. fixture는 가상값이며 실제 API와 독립 DB의 같은 scope/snapshot으로 검증한다. 미구현 adapter는 NOT_RUN이다."
+    },
+    {
+      "id": "skill-hash-no-runtime-proof",
+      "title": "skill hash 제시는 미지원v1의 실행 대응이나 올바른 해석의 증명이 아니다",
+      "fixtureRef": "verification/cases/V1/fixtures/skill-hash-no-runtime-proof.json",
+      "requiredAdapters": [
+        "fixture",
+        "api",
+        "db"
+      ],
+      "actions": [
+        {
+          "id": "setup",
+          "kind": "installFixture",
+          "evidenceRefs": [
+            "setup:actual-artifact"
+          ]
+        },
+        {
+          "id": "before",
+          "kind": "query",
+          "evidenceRefs": [
+            "before:actual-artifact"
+          ],
+          "actorRef": "steward",
+          "route": "api",
+          "capabilityId": "getInventory",
+          "request": {
+            "intentKind": "QUERY",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "getInventory",
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "caseNamespace": "V1-skill-hash-no-runtime-proof"
+            },
+            "subjectRefs": [],
+            "slots": {},
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z"
+          }
+        },
+        {
+          "id": "db-before",
+          "kind": "observe",
+          "evidenceRefs": [
+            "db-before:actual-artifact"
+          ],
+          "observation": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "caseNamespace": "V1-skill-hash-no-runtime-proof"
+            },
+            "snapshotRef": {
+              "$result": {
+                "actionId": "before",
+                "pointer": "/response/snapshotRevision"
+              }
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z",
+            "sources": [
+              "segments",
+              "movements",
+              "allocations",
+              "businessOutbox",
+              "goalVersions"
+            ]
+          }
+        },
+        {
+          "id": "claimed-skill",
+          "kind": "invoke",
+          "evidenceRefs": [
+            "claimed-skill:actual-artifact"
+          ],
+          "actorRef": "owner",
+          "route": "api",
+          "capabilityId": "resumeWork",
+          "request": {
+            "intentKind": "COMMAND",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "resumeWork",
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "caseNamespace": "V1-skill-hash-no-runtime-proof"
+            },
+            "subjectRefs": [],
+            "slots": {
+              "workId": {
+                "$alias": "WORK1"
+              },
+              "clientMetadata": {
+                "skillName": "ontology-work-coordinator",
+                "skillVersion": "v2",
+                "skillHash": "db0f159e1c1fdfc1a626c2d4c9aee3d861f1fa24d441d88792594e9bdf6f9bd9",
+                "claimsSupportedDefinition": "definition-v1"
+              }
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z",
+            "expectedRevision": 1,
+            "commandIdempotencyKey": "V1-skill-hash-no-runtime-proof-claimed-skill"
+          }
+        },
+        {
+          "id": "after",
+          "kind": "query",
+          "evidenceRefs": [
+            "after:actual-artifact"
+          ],
+          "actorRef": "owner",
+          "route": "api",
+          "capabilityId": "getWork",
+          "request": {
+            "intentKind": "QUERY",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "getWork",
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "caseNamespace": "V1-skill-hash-no-runtime-proof"
+            },
+            "subjectRefs": [],
+            "slots": {
+              "workId": {
+                "$alias": "WORK1"
+              }
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z"
+          }
+        },
+        {
+          "id": "db-after",
+          "kind": "observe",
+          "evidenceRefs": [
+            "db-after:actual-artifact"
+          ],
+          "observation": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "caseNamespace": "V1-skill-hash-no-runtime-proof"
+            },
+            "snapshotRef": {
+              "$result": {
+                "actionId": "after",
+                "pointer": "/response/snapshotRevision"
+              }
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z",
+            "sources": [
+              "segments",
+              "movements",
+              "allocations",
+              "businessOutbox",
+              "goalVersions",
+              "works",
+              "obligations",
+              "audit"
+            ]
+          }
+        }
+      ],
+      "assertions": [
+        {
+          "id": "hash-cannot-prove-support",
+          "op": "equals",
+          "source": {
+            "actionId": "claimed-skill",
+            "pointer": "/response/error/code"
+          },
+          "expected": "VERSION_UNSUPPORTED",
+          "requirementRefs": [
+            "D21",
+            "D09",
+            "D17"
+          ],
+          "evidenceRefs": [
+            "claimed-skill:actual-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseNamespace": "V1-skill-hash-no-runtime-proof"
+          },
+          "oracleExplanation": "이 사례의 실제 원 행과 응답을 고정 기대값에 대조한다.",
+          "oracleRef": {
+            "oracleId": "V1.pinned-meaning-current-policy",
+            "observationNames": [
+              "skill-hash-substitutes-runtime-proof"
+            ]
+          }
+        },
+        {
+          "id": "hash-effects0",
+          "op": "equals",
+          "source": {
+            "actionId": "claimed-skill",
+            "pointer": "/response/effects"
+          },
+          "expected": [],
+          "requirementRefs": [
+            "D21",
+            "D09",
+            "D17"
+          ],
+          "evidenceRefs": [
+            "claimed-skill:actual-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseNamespace": "V1-skill-hash-no-runtime-proof"
+          },
+          "oracleExplanation": "이 사례의 실제 원 행과 응답을 고정 기대값에 대조한다.",
+          "oracleRef": {
+            "oracleId": "V1.pinned-meaning-current-policy",
+            "observationNames": [
+              "skill-hash-substitutes-runtime-proof"
+            ]
+          }
+        },
+        {
+          "id": "unchanged-segments",
+          "op": "sameAs",
+          "source": {
+            "actionId": "db-after",
+            "pointer": "/data/rawRows/segments"
+          },
+          "expected": null,
+          "requirementRefs": [
+            "D21",
+            "D09",
+            "D17"
+          ],
+          "evidenceRefs": [
+            "db-after:rawRows",
+            "db-before:actual-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseNamespace": "V1-skill-hash-no-runtime-proof"
+          },
+          "oracleExplanation": "segments의 실제 전후 원 행이 동일하므로 해당 scope의 금지된 효과는0이다. 감사·대조 의무는 이 비교에서 제외한다.",
+          "oracleRef": {
+            "oracleId": "V1.pinned-meaning-current-policy",
+            "observationNames": [
+              "skill-hash-substitutes-runtime-proof"
+            ]
+          },
+          "baseline": {
+            "actionId": "db-before",
+            "pointer": "/data/rawRows/segments"
+          }
+        },
+        {
+          "id": "unchanged-movements",
+          "op": "sameAs",
+          "source": {
+            "actionId": "db-after",
+            "pointer": "/data/rawRows/movements"
+          },
+          "expected": null,
+          "requirementRefs": [
+            "D21",
+            "D09",
+            "D17"
+          ],
+          "evidenceRefs": [
+            "db-after:rawRows",
+            "db-before:actual-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseNamespace": "V1-skill-hash-no-runtime-proof"
+          },
+          "oracleExplanation": "movements의 실제 전후 원 행이 동일하므로 해당 scope의 금지된 효과는0이다. 감사·대조 의무는 이 비교에서 제외한다.",
+          "oracleRef": {
+            "oracleId": "V1.pinned-meaning-current-policy",
+            "observationNames": [
+              "skill-hash-substitutes-runtime-proof"
+            ]
+          },
+          "baseline": {
+            "actionId": "db-before",
+            "pointer": "/data/rawRows/movements"
+          }
+        },
+        {
+          "id": "unchanged-allocations",
+          "op": "sameAs",
+          "source": {
+            "actionId": "db-after",
+            "pointer": "/data/rawRows/allocations"
+          },
+          "expected": null,
+          "requirementRefs": [
+            "D21",
+            "D09",
+            "D17"
+          ],
+          "evidenceRefs": [
+            "db-after:rawRows",
+            "db-before:actual-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseNamespace": "V1-skill-hash-no-runtime-proof"
+          },
+          "oracleExplanation": "allocations의 실제 전후 원 행이 동일하므로 해당 scope의 금지된 효과는0이다. 감사·대조 의무는 이 비교에서 제외한다.",
+          "oracleRef": {
+            "oracleId": "V1.pinned-meaning-current-policy",
+            "observationNames": [
+              "skill-hash-substitutes-runtime-proof"
+            ]
+          },
+          "baseline": {
+            "actionId": "db-before",
+            "pointer": "/data/rawRows/allocations"
+          }
+        },
+        {
+          "id": "unchanged-businessOutbox",
+          "op": "sameAs",
+          "source": {
+            "actionId": "db-after",
+            "pointer": "/data/rawRows/businessOutbox"
+          },
+          "expected": null,
+          "requirementRefs": [
+            "D21",
+            "D09",
+            "D17"
+          ],
+          "evidenceRefs": [
+            "db-after:rawRows",
+            "db-before:actual-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseNamespace": "V1-skill-hash-no-runtime-proof"
+          },
+          "oracleExplanation": "businessOutbox의 실제 전후 원 행이 동일하므로 해당 scope의 금지된 효과는0이다. 감사·대조 의무는 이 비교에서 제외한다.",
+          "oracleRef": {
+            "oracleId": "V1.pinned-meaning-current-policy",
+            "observationNames": [
+              "skill-hash-substitutes-runtime-proof"
+            ]
+          },
+          "baseline": {
+            "actionId": "db-before",
+            "pointer": "/data/rawRows/businessOutbox"
+          }
+        },
+        {
+          "id": "unchanged-goalVersions",
+          "op": "sameAs",
+          "source": {
+            "actionId": "db-after",
+            "pointer": "/data/rawRows/goalVersions"
+          },
+          "expected": null,
+          "requirementRefs": [
+            "D21",
+            "D09",
+            "D17"
+          ],
+          "evidenceRefs": [
+            "db-after:rawRows",
+            "db-before:actual-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseNamespace": "V1-skill-hash-no-runtime-proof"
+          },
+          "oracleExplanation": "goalVersions의 실제 전후 원 행이 동일하므로 해당 scope의 금지된 효과는0이다. 감사·대조 의무는 이 비교에서 제외한다.",
+          "oracleRef": {
+            "oracleId": "V1.pinned-meaning-current-policy",
+            "observationNames": [
+              "skill-hash-substitutes-runtime-proof"
+            ]
+          },
+          "baseline": {
+            "actionId": "db-before",
+            "pointer": "/data/rawRows/goalVersions"
+          }
+        },
+        {
+          "id": "meaning-stays-v1",
+          "op": "relationSet",
+          "source": {
+            "actionId": "db-after",
+            "pointer": "/data/rawRows/works",
+            "field": [
+              "id",
+              "definitionVersion",
+              "evaluatorVersion",
+              "state"
+            ]
+          },
+          "expected": [
+            [
+              {
+                "$alias": "WORK1"
+              },
+              "definition-v1",
+              "arrival-v1",
+              "WAITING"
+            ]
+          ],
+          "requirementRefs": [
+            "D21",
+            "D09",
+            "D17"
+          ],
+          "evidenceRefs": [
+            "db-after:rawRows"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseNamespace": "V1-skill-hash-no-runtime-proof"
+          },
+          "oracleExplanation": "이 사례의 실제 원 행과 응답을 고정 기대값에 대조한다.",
+          "oracleRef": {
+            "oracleId": "V1.pinned-meaning-current-policy",
+            "observationNames": [
+              "skill-hash-substitutes-runtime-proof"
+            ]
+          }
+        }
+      ],
+      "oracleExplanation": "skill hash 제시는 미지원v1의 실행 대응이나 올바른 해석의 증명이 아니다. fixture는 가상값이며 실제 API와 독립 DB의 같은 scope/snapshot으로 검증한다. 미구현 adapter는 NOT_RUN이다."
+    }
+  ]
+}

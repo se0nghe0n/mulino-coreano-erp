@@ -1,0 +1,1228 @@
+{
+  "schemaVersion": "1.0.0",
+  "fixtureId": "T07-predicate-truth-and-conflict",
+  "synthetic": true,
+  "baseRefs": [],
+  "clock": {
+    "asOf": "2026-10-07T09:00:00Z",
+    "knownAt": "2026-10-07T09:00:01Z",
+    "timezone": "Asia/Seoul",
+    "precision": "SECOND",
+    "deadlineInclusive": true
+  },
+  "versions": {
+    "definition": "definition-v1",
+    "evaluator": "arrival-v1",
+    "policy": "synthetic-policy-v1"
+  },
+  "actors": {
+    "fde": {
+      "issuer": "synthetic-local-issuer",
+      "subject": "T07-predicate-truth-and-conflict-fde",
+      "audience": "isolated-ontology-test",
+      "organizationAlias": "ORG",
+      "roleCapabilities": [
+        "createDefinitionDraft",
+        "validateDefinition",
+        "submitDefinitionReview",
+        "publishDefinition",
+        "activateDefinition",
+        "retireDefinition",
+        "getDefinition",
+        "getWork",
+        "getAssessment",
+        "getObject",
+        "getInventory",
+        "getObligations"
+      ],
+      "grant": {
+        "delegatorAlias": "supervisor",
+        "actions": [
+          "createDefinitionDraft",
+          "validateDefinition",
+          "submitDefinitionReview",
+          "publishDefinition",
+          "activateDefinition",
+          "retireDefinition",
+          "getDefinition",
+          "getWork",
+          "getAssessment",
+          "getObject",
+          "getInventory",
+          "getObligations"
+        ],
+        "scope": {
+          "organizationAlias": "ORG",
+          "items": [
+            "P",
+            "P_EA",
+            "P_BUNDLE"
+          ],
+          "places": [
+            "W"
+          ],
+          "works": [
+            "WORK1"
+          ],
+          "definitionPackages": [
+            "DEF1"
+          ],
+          "caseNamespace": "T07-predicate-truth-and-conflict"
+        },
+        "validFrom": "2026-10-01T00:00:00Z",
+        "validUntil": "2026-10-31T23:59:59Z",
+        "revision": 1
+      }
+    },
+    "approver": {
+      "issuer": "synthetic-local-issuer",
+      "subject": "T07-predicate-truth-and-conflict-approver",
+      "audience": "isolated-ontology-test",
+      "organizationAlias": "ORG",
+      "roleCapabilities": [
+        "approveDefinition",
+        "getDefinition",
+        "getWork"
+      ],
+      "grant": {
+        "delegatorAlias": "supervisor",
+        "actions": [
+          "approveDefinition",
+          "getDefinition",
+          "getWork"
+        ],
+        "scope": {
+          "organizationAlias": "ORG",
+          "items": [
+            "P",
+            "P_EA",
+            "P_BUNDLE"
+          ],
+          "places": [
+            "W"
+          ],
+          "works": [
+            "WORK1"
+          ],
+          "definitionPackages": [
+            "DEF1"
+          ],
+          "caseNamespace": "T07-predicate-truth-and-conflict"
+        },
+        "validFrom": "2026-10-01T00:00:00Z",
+        "validUntil": "2026-10-31T23:59:59Z",
+        "revision": 1
+      }
+    },
+    "steward": {
+      "issuer": "synthetic-local-issuer",
+      "subject": "T07-predicate-truth-and-conflict-steward",
+      "audience": "isolated-ontology-test",
+      "organizationAlias": "ORG",
+      "roleCapabilities": [
+        "registerItem",
+        "linkExternalId",
+        "confirmReceipt",
+        "attachEvidence",
+        "correctEvidence",
+        "linkCanonicalOccurrence",
+        "recordActivity",
+        "recordRelation",
+        "convertUnit",
+        "getObject",
+        "searchObjects",
+        "getInventory",
+        "evaluateEligibility",
+        "getEvidence",
+        "getReconciliation",
+        "getAssessment",
+        "getWork",
+        "getObligations"
+      ],
+      "grant": {
+        "delegatorAlias": "supervisor",
+        "actions": [
+          "registerItem",
+          "linkExternalId",
+          "confirmReceipt",
+          "attachEvidence",
+          "correctEvidence",
+          "linkCanonicalOccurrence",
+          "recordActivity",
+          "recordRelation",
+          "convertUnit",
+          "getObject",
+          "searchObjects",
+          "getInventory",
+          "evaluateEligibility",
+          "getEvidence",
+          "getReconciliation",
+          "getAssessment",
+          "getWork",
+          "getObligations"
+        ],
+        "scope": {
+          "organizationAlias": "ORG",
+          "items": [
+            "P",
+            "P_EA",
+            "P_BUNDLE"
+          ],
+          "places": [
+            "W"
+          ],
+          "works": [
+            "WORK1"
+          ],
+          "definitionPackages": [
+            "DEF1"
+          ],
+          "caseNamespace": "T07-predicate-truth-and-conflict"
+        },
+        "validFrom": "2026-10-01T00:00:00Z",
+        "validUntil": "2026-10-31T23:59:59Z",
+        "revision": 1
+      }
+    },
+    "qc": {
+      "issuer": "synthetic-local-issuer",
+      "subject": "T07-predicate-truth-and-conflict-qc",
+      "audience": "isolated-ontology-test",
+      "organizationAlias": "ORG",
+      "roleCapabilities": [
+        "placeHold",
+        "getInventory",
+        "getWork",
+        "getObligations",
+        "evaluateEligibility"
+      ],
+      "grant": {
+        "delegatorAlias": "supervisor",
+        "actions": [
+          "placeHold",
+          "getInventory",
+          "getWork",
+          "getObligations",
+          "evaluateEligibility"
+        ],
+        "scope": {
+          "organizationAlias": "ORG",
+          "items": [
+            "P",
+            "P_EA",
+            "P_BUNDLE"
+          ],
+          "places": [
+            "W"
+          ],
+          "works": [
+            "WORK1"
+          ],
+          "definitionPackages": [
+            "DEF1"
+          ],
+          "caseNamespace": "T07-predicate-truth-and-conflict"
+        },
+        "validFrom": "2026-10-01T00:00:00Z",
+        "validUntil": "2026-10-31T23:59:59Z",
+        "revision": 1
+      }
+    },
+    "owner": {
+      "issuer": "synthetic-local-issuer",
+      "subject": "T07-predicate-truth-and-conflict-owner",
+      "audience": "isolated-ontology-test",
+      "organizationAlias": "ORG",
+      "roleCapabilities": [
+        "createDraft",
+        "activateWork",
+        "waitWork",
+        "resumeWork",
+        "reviseGoal",
+        "migrateWorkDefinition",
+        "reserveQuantity",
+        "getWork",
+        "getAssessment",
+        "getInventory",
+        "getObligations",
+        "evaluateEligibility",
+        "getDefinition"
+      ],
+      "grant": {
+        "delegatorAlias": "supervisor",
+        "actions": [
+          "createDraft",
+          "activateWork",
+          "waitWork",
+          "resumeWork",
+          "reviseGoal",
+          "migrateWorkDefinition",
+          "reserveQuantity",
+          "getWork",
+          "getAssessment",
+          "getInventory",
+          "getObligations",
+          "evaluateEligibility",
+          "getDefinition"
+        ],
+        "scope": {
+          "organizationAlias": "ORG",
+          "items": [
+            "P",
+            "P_EA",
+            "P_BUNDLE"
+          ],
+          "places": [
+            "W"
+          ],
+          "works": [
+            "WORK1"
+          ],
+          "definitionPackages": [
+            "DEF1"
+          ],
+          "caseNamespace": "T07-predicate-truth-and-conflict"
+        },
+        "validFrom": "2026-10-01T00:00:00Z",
+        "validUntil": "2026-10-31T23:59:59Z",
+        "revision": 1
+      }
+    },
+    "reader": {
+      "issuer": "synthetic-local-issuer",
+      "subject": "T07-predicate-truth-and-conflict-reader",
+      "audience": "isolated-ontology-test",
+      "organizationAlias": "ORG",
+      "roleCapabilities": [
+        "getDefinition",
+        "getWork",
+        "getAssessment",
+        "getInventory",
+        "getEvidence",
+        "getObject",
+        "getObligations"
+      ],
+      "grant": {
+        "delegatorAlias": "supervisor",
+        "actions": [
+          "getDefinition",
+          "getWork",
+          "getAssessment",
+          "getInventory",
+          "getEvidence",
+          "getObject",
+          "getObligations"
+        ],
+        "scope": {
+          "organizationAlias": "ORG",
+          "items": [
+            "P",
+            "P_EA",
+            "P_BUNDLE"
+          ],
+          "places": [
+            "W"
+          ],
+          "works": [
+            "WORK1"
+          ],
+          "definitionPackages": [
+            "DEF1"
+          ],
+          "caseNamespace": "T07-predicate-truth-and-conflict"
+        },
+        "validFrom": "2026-10-01T00:00:00Z",
+        "validUntil": "2026-10-31T23:59:59Z",
+        "revision": 1
+      }
+    },
+    "outsider": {
+      "issuer": "synthetic-local-issuer",
+      "subject": "T07-predicate-truth-and-conflict-outsider",
+      "audience": "isolated-ontology-test",
+      "organizationAlias": "ORG",
+      "roleCapabilities": [
+        "getEvidence"
+      ],
+      "grant": {
+        "delegatorAlias": "supervisor",
+        "actions": [
+          "getEvidence"
+        ],
+        "scope": {
+          "organizationAlias": "ORG",
+          "evidenceIds": [],
+          "caseNamespace": "T07-predicate-truth-and-conflict"
+        },
+        "validFrom": "2026-10-01T00:00:00Z",
+        "validUntil": "2026-10-31T23:59:59Z",
+        "revision": 1
+      }
+    }
+  },
+  "aliases": {
+    "ORG": {
+      "type": "Organization"
+    },
+    "P": {
+      "type": "TradeItem",
+      "baseUnit": "BOX"
+    },
+    "P_EA": {
+      "type": "TradeItem",
+      "baseUnit": "EA"
+    },
+    "P_BUNDLE": {
+      "type": "TradeItem",
+      "baseUnit": "BUNDLE"
+    },
+    "W": {
+      "type": "Place"
+    },
+    "C": {
+      "type": "Customer"
+    },
+    "L": {
+      "type": "ManufacturingLot",
+      "manufacturerAlias": "M1",
+      "itemAlias": "P",
+      "externalLotText": "L"
+    },
+    "M1": {
+      "type": "Manufacturer"
+    },
+    "M2": {
+      "type": "Manufacturer"
+    },
+    "DEF1": {
+      "type": "DefinitionVersion"
+    },
+    "WORK1": {
+      "type": "Work"
+    },
+    "GOAL1": {
+      "type": "GoalVersion"
+    },
+    "PHYS60": {
+      "type": "PhysicalScope",
+      "canonicalIdentity": "receipt-60"
+    },
+    "PHYS20": {
+      "type": "PhysicalScope",
+      "canonicalIdentity": "receipt-20"
+    },
+    "CONVERSION": {
+      "type": "UnitConversion"
+    },
+    "QC_HOLD": {
+      "type": "Restriction"
+    },
+    "owner": {
+      "type": "Human"
+    },
+    "supervisor": {
+      "type": "Human"
+    },
+    "fde": {
+      "type": "Human"
+    },
+    "approver": {
+      "type": "Human"
+    },
+    "steward": {
+      "type": "Human"
+    },
+    "qc": {
+      "type": "Human"
+    },
+    "reader": {
+      "type": "Human"
+    },
+    "outsider": {
+      "type": "Human"
+    }
+  },
+  "baseline": {
+    "setupIsExecutionCoverage": false,
+    "definitionPackages": [
+      {
+        "alias": "DEF1",
+        "version": "definition-v1",
+        "state": "ACTIVE",
+        "hash": "347608ca1425f25be3c36fb6a6a4158739d5546d06e7bdddc5cdaabb9af895c3",
+        "goalTemplate": {
+          "endpoint": "ARRIVED",
+          "quantityMode": "CUMULATIVE_EVENT",
+          "evaluatorVersion": "arrival-v1",
+          "requiredSlots": [
+            "item",
+            "quantity",
+            "unit",
+            "destination",
+            "dueAt"
+          ],
+          "receiptLotRequiredAt": "CONFIRM_RECEIPT"
+        },
+        "attributeDefinitions": [
+          {
+            "name": "synthetic-condition-0",
+            "targetType": "Work",
+            "type": "Boolean",
+            "cardinality": 1,
+            "requiredAt": "ASSESSMENT",
+            "knowledgePolicy": "MISSING/UNKNOWN/CONFLICT-preserved"
+          },
+          {
+            "name": "synthetic-condition-1",
+            "targetType": "Work",
+            "type": "Boolean",
+            "cardinality": 1,
+            "requiredAt": "ASSESSMENT",
+            "knowledgePolicy": "MISSING/UNKNOWN/CONFLICT-preserved"
+          }
+        ]
+      }
+    ],
+    "supportManifest": [
+      {
+        "definitionVersion": "definition-v2",
+        "capabilityId": "resumeWork",
+        "semanticVersion": "sell-eligible-v2",
+        "evaluatorVersion": "eligibility-v2",
+        "inputSchemaVersion": "2.0.0",
+        "outputSchemaVersion": "2.0.0",
+        "supportedWorkMigration": [
+          "v1-to-v2"
+        ]
+      },
+      {
+        "definitionVersion": "definition-v1",
+        "capabilityId": "getAssessment",
+        "semanticVersion": "core-v1",
+        "evaluatorVersion": "core-v1",
+        "inputSchemaVersion": "1.0.0",
+        "outputSchemaVersion": "1.0.0",
+        "supportedWorkMigration": []
+      },
+      {
+        "definitionVersion": "definition-v1",
+        "capabilityId": "createDraft",
+        "semanticVersion": "core-v1",
+        "evaluatorVersion": "core-v1",
+        "inputSchemaVersion": "1.0.0",
+        "outputSchemaVersion": "1.0.0",
+        "supportedWorkMigration": []
+      },
+      {
+        "definitionVersion": "definition-v1",
+        "capabilityId": "activateWork",
+        "semanticVersion": "core-v1",
+        "evaluatorVersion": "core-v1",
+        "inputSchemaVersion": "1.0.0",
+        "outputSchemaVersion": "1.0.0",
+        "supportedWorkMigration": []
+      },
+      {
+        "definitionVersion": "definition-v1",
+        "capabilityId": "activateWork",
+        "semanticVersion": "typed-predicate-v1",
+        "evaluatorVersion": "predicate-v1",
+        "inputSchemaVersion": "1.0.0",
+        "outputSchemaVersion": "1.0.0",
+        "supportedWorkMigration": []
+      }
+    ],
+    "units": [
+      {
+        "unit": "BOX",
+        "decimalPlaces": 0
+      },
+      {
+        "unit": "EA",
+        "decimalPlaces": 0
+      },
+      {
+        "unit": "BUNDLE",
+        "decimalPlaces": 0
+      }
+    ],
+    "unitConversions": [
+      {
+        "alias": "CONVERSION",
+        "fromItemAlias": "P_BUNDLE",
+        "fromUnit": "BUNDLE",
+        "fromValue": "1",
+        "toItemAlias": "P_EA",
+        "toUnit": "EA",
+        "toValue": "12",
+        "version": "conversion-v1",
+        "basis": "synthetic-confirmed-content-spec",
+        "substitutionPermission": "MISSING"
+      }
+    ],
+    "typedRelations": [
+      {
+        "name": "locatedAt",
+        "sourceType": "QuantitySegment",
+        "targetType": "Place",
+        "maxTargetsAtInstant": 1,
+        "cycleAllowed": false
+      }
+    ],
+    "predicates": {
+      "operators": [
+        "equals",
+        "in",
+        "compare",
+        "range",
+        "exists",
+        "cardinality",
+        "timeIn",
+        "all",
+        "any",
+        "not",
+        "distinctEventQuantity",
+        "stateQuantity"
+      ],
+      "unknownPolicy": "PRESERVE",
+      "conflictPolicy": "PRESERVE_FLAG"
+    },
+    "segments": [],
+    "works": [],
+    "syntheticPolicies": [
+      {
+        "version": "synthetic-policy-v1",
+        "kind": "DECLARATIVE_TEST_RULES",
+        "source": "fixture-only",
+        "effectiveFrom": "2026-10-01T00:00:00Z",
+        "effectiveUntil": "2026-10-31T23:59:59Z",
+        "requiresConfigApprover": true,
+        "regulatedOperations": "NOT_LEGAL_ACCEPTANCE",
+        "defaultTolerance": "0",
+        "packagingSubstitution": "MISSING",
+        "recordSourceMatch": "source/physicalScope/quantity/time-required"
+      }
+    ],
+    "sourceProfiles": [
+      {
+        "namespace": "synthetic-warehouse",
+        "actorAlias": "steward",
+        "recordCapabilities": [
+          "attachEvidence",
+          "confirmReceipt",
+          "correctEvidence",
+          "linkCanonicalOccurrence"
+        ],
+        "schemaVersion": "1.0.0",
+        "occurrenceKinds": [
+          "RECEIPT"
+        ],
+        "identityPolicy": "item/manufacturer/lot/physicalScope/location/quantity/time-must-match",
+        "revisionPolicy": "verified-source-version",
+        "duplicatePolicy": "same-canonical-physical-scope-no-new-effect",
+        "hashPolicy": "sha256-original-content-must-match",
+        "intakeOwnerAlias": "steward",
+        "nextCheckAt": "2026-10-07T10:00:00Z"
+      },
+      {
+        "namespace": "synthetic-warehouse-a",
+        "actorAlias": "steward",
+        "recordCapabilities": [
+          "attachEvidence",
+          "confirmReceipt",
+          "correctEvidence",
+          "linkCanonicalOccurrence"
+        ],
+        "schemaVersion": "1.0.0",
+        "occurrenceKinds": [
+          "RECEIPT"
+        ],
+        "identityPolicy": "item/manufacturer/lot/physicalScope/location/quantity/time-must-match",
+        "revisionPolicy": "verified-source-version",
+        "duplicatePolicy": "same-canonical-physical-scope-no-new-effect",
+        "hashPolicy": "sha256-original-content-must-match",
+        "intakeOwnerAlias": "steward",
+        "nextCheckAt": "2026-10-07T10:00:00Z"
+      },
+      {
+        "namespace": "synthetic-warehouse-b",
+        "actorAlias": "steward",
+        "recordCapabilities": [
+          "attachEvidence",
+          "confirmReceipt",
+          "correctEvidence",
+          "linkCanonicalOccurrence"
+        ],
+        "schemaVersion": "1.0.0",
+        "occurrenceKinds": [
+          "RECEIPT"
+        ],
+        "identityPolicy": "item/manufacturer/lot/physicalScope/location/quantity/time-must-match",
+        "revisionPolicy": "verified-source-version",
+        "duplicatePolicy": "same-canonical-physical-scope-no-new-effect",
+        "hashPolicy": "sha256-original-content-must-match",
+        "intakeOwnerAlias": "steward",
+        "nextCheckAt": "2026-10-07T10:00:00Z"
+      },
+      {
+        "namespace": "synthetic-carrier",
+        "actorAlias": "steward",
+        "recordCapabilities": [
+          "attachEvidence",
+          "confirmReceipt",
+          "correctEvidence",
+          "linkCanonicalOccurrence"
+        ],
+        "schemaVersion": "1.0.0",
+        "occurrenceKinds": [
+          "RECEIPT"
+        ],
+        "identityPolicy": "item/manufacturer/lot/physicalScope/location/quantity/time-must-match",
+        "revisionPolicy": "verified-source-version",
+        "duplicatePolicy": "same-canonical-physical-scope-no-new-effect",
+        "hashPolicy": "sha256-original-content-must-match",
+        "intakeOwnerAlias": "steward",
+        "nextCheckAt": "2026-10-07T10:00:00Z"
+      }
+    ],
+    "identitySources": [
+      {
+        "issuer": "IT-A",
+        "namespace": "SKU"
+      },
+      {
+        "issuer": "IT-B",
+        "namespace": "SKU"
+      }
+    ],
+    "intakeOwnerAlias": "steward",
+    "supervisorAlias": "supervisor",
+    "nextAction": "식별·버전·원천 근거를 대조한다",
+    "nextCheckAt": "2026-10-07T10:00:00Z",
+    "predicateFactSets": [
+      {
+        "inputKey": "all-false-unknown",
+        "facts": [
+          {
+            "conditionId": "all-false-unknown-operand-0",
+            "property": "synthetic-condition-0",
+            "sourceRef": "all-false-unknown-fixture-condition-source-0",
+            "state": "KNOWN",
+            "value": false,
+            "conflictingClaims": []
+          },
+          {
+            "conditionId": "all-false-unknown-operand-1",
+            "property": "synthetic-condition-1",
+            "sourceRef": "all-false-unknown-fixture-condition-source-1",
+            "state": "UNKNOWN",
+            "value": null,
+            "conflictingClaims": []
+          }
+        ]
+      },
+      {
+        "inputKey": "all-true",
+        "facts": [
+          {
+            "conditionId": "all-true-operand-0",
+            "property": "synthetic-condition-0",
+            "sourceRef": "all-true-fixture-condition-source-0",
+            "state": "KNOWN",
+            "value": true,
+            "conflictingClaims": []
+          },
+          {
+            "conditionId": "all-true-operand-1",
+            "property": "synthetic-condition-1",
+            "sourceRef": "all-true-fixture-condition-source-1",
+            "state": "KNOWN",
+            "value": true,
+            "conflictingClaims": []
+          }
+        ]
+      },
+      {
+        "inputKey": "all-true-unknown",
+        "facts": [
+          {
+            "conditionId": "all-true-unknown-operand-0",
+            "property": "synthetic-condition-0",
+            "sourceRef": "all-true-unknown-fixture-condition-source-0",
+            "state": "KNOWN",
+            "value": true,
+            "conflictingClaims": []
+          },
+          {
+            "conditionId": "all-true-unknown-operand-1",
+            "property": "synthetic-condition-1",
+            "sourceRef": "all-true-unknown-fixture-condition-source-1",
+            "state": "UNKNOWN",
+            "value": null,
+            "conflictingClaims": []
+          }
+        ]
+      },
+      {
+        "inputKey": "any-true-unknown",
+        "facts": [
+          {
+            "conditionId": "any-true-unknown-operand-0",
+            "property": "synthetic-condition-0",
+            "sourceRef": "any-true-unknown-fixture-condition-source-0",
+            "state": "KNOWN",
+            "value": true,
+            "conflictingClaims": []
+          },
+          {
+            "conditionId": "any-true-unknown-operand-1",
+            "property": "synthetic-condition-1",
+            "sourceRef": "any-true-unknown-fixture-condition-source-1",
+            "state": "UNKNOWN",
+            "value": null,
+            "conflictingClaims": []
+          }
+        ]
+      },
+      {
+        "inputKey": "any-false",
+        "facts": [
+          {
+            "conditionId": "any-false-operand-0",
+            "property": "synthetic-condition-0",
+            "sourceRef": "any-false-fixture-condition-source-0",
+            "state": "KNOWN",
+            "value": false,
+            "conflictingClaims": []
+          },
+          {
+            "conditionId": "any-false-operand-1",
+            "property": "synthetic-condition-1",
+            "sourceRef": "any-false-fixture-condition-source-1",
+            "state": "KNOWN",
+            "value": false,
+            "conflictingClaims": []
+          }
+        ]
+      },
+      {
+        "inputKey": "any-false-unknown",
+        "facts": [
+          {
+            "conditionId": "any-false-unknown-operand-0",
+            "property": "synthetic-condition-0",
+            "sourceRef": "any-false-unknown-fixture-condition-source-0",
+            "state": "KNOWN",
+            "value": false,
+            "conflictingClaims": []
+          },
+          {
+            "conditionId": "any-false-unknown-operand-1",
+            "property": "synthetic-condition-1",
+            "sourceRef": "any-false-unknown-fixture-condition-source-1",
+            "state": "UNKNOWN",
+            "value": null,
+            "conflictingClaims": []
+          }
+        ]
+      },
+      {
+        "inputKey": "all-false-conflict",
+        "facts": [
+          {
+            "conditionId": "all-false-conflict-operand-0",
+            "property": "synthetic-condition-0",
+            "sourceRef": "all-false-conflict-fixture-condition-source-0",
+            "state": "KNOWN",
+            "value": false,
+            "conflictingClaims": []
+          },
+          {
+            "conditionId": "all-false-conflict-operand-1",
+            "property": "synthetic-condition-1",
+            "sourceRef": "all-false-conflict-fixture-condition-source-1",
+            "state": "CONFLICT",
+            "value": null,
+            "conflictingClaims": [
+              true,
+              false
+            ]
+          }
+        ]
+      },
+      {
+        "inputKey": "any-true-conflict",
+        "facts": [
+          {
+            "conditionId": "any-true-conflict-operand-0",
+            "property": "synthetic-condition-0",
+            "sourceRef": "any-true-conflict-fixture-condition-source-0",
+            "state": "KNOWN",
+            "value": true,
+            "conflictingClaims": []
+          },
+          {
+            "conditionId": "any-true-conflict-operand-1",
+            "property": "synthetic-condition-1",
+            "sourceRef": "any-true-conflict-fixture-condition-source-1",
+            "state": "CONFLICT",
+            "value": null,
+            "conflictingClaims": [
+              true,
+              false
+            ]
+          }
+        ]
+      },
+      {
+        "inputKey": "not-true",
+        "facts": [
+          {
+            "conditionId": "not-true-operand-0",
+            "property": "synthetic-condition-0",
+            "sourceRef": "not-true-fixture-condition-source-0",
+            "state": "KNOWN",
+            "value": true,
+            "conflictingClaims": []
+          }
+        ]
+      },
+      {
+        "inputKey": "not-false",
+        "facts": [
+          {
+            "conditionId": "not-false-operand-0",
+            "property": "synthetic-condition-0",
+            "sourceRef": "not-false-fixture-condition-source-0",
+            "state": "KNOWN",
+            "value": false,
+            "conflictingClaims": []
+          }
+        ]
+      },
+      {
+        "inputKey": "not-unknown",
+        "facts": [
+          {
+            "conditionId": "not-unknown-operand-0",
+            "property": "synthetic-condition-0",
+            "sourceRef": "not-unknown-fixture-condition-source-0",
+            "state": "UNKNOWN",
+            "value": null,
+            "conflictingClaims": []
+          }
+        ]
+      },
+      {
+        "inputKey": "not-conflict",
+        "facts": [
+          {
+            "conditionId": "not-conflict-operand-0",
+            "property": "synthetic-condition-0",
+            "sourceRef": "not-conflict-fixture-condition-source-0",
+            "state": "CONFLICT",
+            "value": null,
+            "conflictingClaims": [
+              true,
+              false
+            ]
+          }
+        ]
+      }
+    ],
+    "predicateAssessmentInputs": [
+      {
+        "id": "all-false-unknown",
+        "predicate": {
+          "operator": "all",
+          "operands": [
+            {
+              "operator": "equals",
+              "conditionId": "all-false-unknown-operand-0",
+              "propertyRef": "synthetic-condition-0",
+              "type": "Boolean",
+              "compareValue": true,
+              "evidenceSelector": "all-false-unknown-fixture-condition-source-0"
+            },
+            {
+              "operator": "equals",
+              "conditionId": "all-false-unknown-operand-1",
+              "propertyRef": "synthetic-condition-1",
+              "type": "Boolean",
+              "compareValue": true,
+              "evidenceSelector": "all-false-unknown-fixture-condition-source-1"
+            }
+          ]
+        },
+        "definitionVersion": "definition-v1",
+        "evaluatorVersion": "predicate-v1"
+      },
+      {
+        "id": "all-true",
+        "predicate": {
+          "operator": "all",
+          "operands": [
+            {
+              "operator": "equals",
+              "conditionId": "all-true-operand-0",
+              "propertyRef": "synthetic-condition-0",
+              "type": "Boolean",
+              "compareValue": true,
+              "evidenceSelector": "all-true-fixture-condition-source-0"
+            },
+            {
+              "operator": "equals",
+              "conditionId": "all-true-operand-1",
+              "propertyRef": "synthetic-condition-1",
+              "type": "Boolean",
+              "compareValue": true,
+              "evidenceSelector": "all-true-fixture-condition-source-1"
+            }
+          ]
+        },
+        "definitionVersion": "definition-v1",
+        "evaluatorVersion": "predicate-v1"
+      },
+      {
+        "id": "all-true-unknown",
+        "predicate": {
+          "operator": "all",
+          "operands": [
+            {
+              "operator": "equals",
+              "conditionId": "all-true-unknown-operand-0",
+              "propertyRef": "synthetic-condition-0",
+              "type": "Boolean",
+              "compareValue": true,
+              "evidenceSelector": "all-true-unknown-fixture-condition-source-0"
+            },
+            {
+              "operator": "equals",
+              "conditionId": "all-true-unknown-operand-1",
+              "propertyRef": "synthetic-condition-1",
+              "type": "Boolean",
+              "compareValue": true,
+              "evidenceSelector": "all-true-unknown-fixture-condition-source-1"
+            }
+          ]
+        },
+        "definitionVersion": "definition-v1",
+        "evaluatorVersion": "predicate-v1"
+      },
+      {
+        "id": "any-true-unknown",
+        "predicate": {
+          "operator": "any",
+          "operands": [
+            {
+              "operator": "equals",
+              "conditionId": "any-true-unknown-operand-0",
+              "propertyRef": "synthetic-condition-0",
+              "type": "Boolean",
+              "compareValue": true,
+              "evidenceSelector": "any-true-unknown-fixture-condition-source-0"
+            },
+            {
+              "operator": "equals",
+              "conditionId": "any-true-unknown-operand-1",
+              "propertyRef": "synthetic-condition-1",
+              "type": "Boolean",
+              "compareValue": true,
+              "evidenceSelector": "any-true-unknown-fixture-condition-source-1"
+            }
+          ]
+        },
+        "definitionVersion": "definition-v1",
+        "evaluatorVersion": "predicate-v1"
+      },
+      {
+        "id": "any-false",
+        "predicate": {
+          "operator": "any",
+          "operands": [
+            {
+              "operator": "equals",
+              "conditionId": "any-false-operand-0",
+              "propertyRef": "synthetic-condition-0",
+              "type": "Boolean",
+              "compareValue": true,
+              "evidenceSelector": "any-false-fixture-condition-source-0"
+            },
+            {
+              "operator": "equals",
+              "conditionId": "any-false-operand-1",
+              "propertyRef": "synthetic-condition-1",
+              "type": "Boolean",
+              "compareValue": true,
+              "evidenceSelector": "any-false-fixture-condition-source-1"
+            }
+          ]
+        },
+        "definitionVersion": "definition-v1",
+        "evaluatorVersion": "predicate-v1"
+      },
+      {
+        "id": "any-false-unknown",
+        "predicate": {
+          "operator": "any",
+          "operands": [
+            {
+              "operator": "equals",
+              "conditionId": "any-false-unknown-operand-0",
+              "propertyRef": "synthetic-condition-0",
+              "type": "Boolean",
+              "compareValue": true,
+              "evidenceSelector": "any-false-unknown-fixture-condition-source-0"
+            },
+            {
+              "operator": "equals",
+              "conditionId": "any-false-unknown-operand-1",
+              "propertyRef": "synthetic-condition-1",
+              "type": "Boolean",
+              "compareValue": true,
+              "evidenceSelector": "any-false-unknown-fixture-condition-source-1"
+            }
+          ]
+        },
+        "definitionVersion": "definition-v1",
+        "evaluatorVersion": "predicate-v1"
+      },
+      {
+        "id": "all-false-conflict",
+        "predicate": {
+          "operator": "all",
+          "operands": [
+            {
+              "operator": "equals",
+              "conditionId": "all-false-conflict-operand-0",
+              "propertyRef": "synthetic-condition-0",
+              "type": "Boolean",
+              "compareValue": true,
+              "evidenceSelector": "all-false-conflict-fixture-condition-source-0"
+            },
+            {
+              "operator": "equals",
+              "conditionId": "all-false-conflict-operand-1",
+              "propertyRef": "synthetic-condition-1",
+              "type": "Boolean",
+              "compareValue": true,
+              "evidenceSelector": "all-false-conflict-fixture-condition-source-1"
+            }
+          ]
+        },
+        "definitionVersion": "definition-v1",
+        "evaluatorVersion": "predicate-v1"
+      },
+      {
+        "id": "any-true-conflict",
+        "predicate": {
+          "operator": "any",
+          "operands": [
+            {
+              "operator": "equals",
+              "conditionId": "any-true-conflict-operand-0",
+              "propertyRef": "synthetic-condition-0",
+              "type": "Boolean",
+              "compareValue": true,
+              "evidenceSelector": "any-true-conflict-fixture-condition-source-0"
+            },
+            {
+              "operator": "equals",
+              "conditionId": "any-true-conflict-operand-1",
+              "propertyRef": "synthetic-condition-1",
+              "type": "Boolean",
+              "compareValue": true,
+              "evidenceSelector": "any-true-conflict-fixture-condition-source-1"
+            }
+          ]
+        },
+        "definitionVersion": "definition-v1",
+        "evaluatorVersion": "predicate-v1"
+      },
+      {
+        "id": "not-true",
+        "predicate": {
+          "operator": "not",
+          "operands": [
+            {
+              "operator": "equals",
+              "conditionId": "not-true-operand-0",
+              "propertyRef": "synthetic-condition-0",
+              "type": "Boolean",
+              "compareValue": true,
+              "evidenceSelector": "not-true-fixture-condition-source-0"
+            }
+          ]
+        },
+        "definitionVersion": "definition-v1",
+        "evaluatorVersion": "predicate-v1"
+      },
+      {
+        "id": "not-false",
+        "predicate": {
+          "operator": "not",
+          "operands": [
+            {
+              "operator": "equals",
+              "conditionId": "not-false-operand-0",
+              "propertyRef": "synthetic-condition-0",
+              "type": "Boolean",
+              "compareValue": true,
+              "evidenceSelector": "not-false-fixture-condition-source-0"
+            }
+          ]
+        },
+        "definitionVersion": "definition-v1",
+        "evaluatorVersion": "predicate-v1"
+      },
+      {
+        "id": "not-unknown",
+        "predicate": {
+          "operator": "not",
+          "operands": [
+            {
+              "operator": "equals",
+              "conditionId": "not-unknown-operand-0",
+              "propertyRef": "synthetic-condition-0",
+              "type": "Boolean",
+              "compareValue": true,
+              "evidenceSelector": "not-unknown-fixture-condition-source-0"
+            }
+          ]
+        },
+        "definitionVersion": "definition-v1",
+        "evaluatorVersion": "predicate-v1"
+      },
+      {
+        "id": "not-conflict",
+        "predicate": {
+          "operator": "not",
+          "operands": [
+            {
+              "operator": "equals",
+              "conditionId": "not-conflict-operand-0",
+              "propertyRef": "synthetic-condition-0",
+              "type": "Boolean",
+              "compareValue": true,
+              "evidenceSelector": "not-conflict-fixture-condition-source-0"
+            }
+          ]
+        },
+        "definitionVersion": "definition-v1",
+        "evaluatorVersion": "predicate-v1"
+      }
+    ]
+  },
+  "evidence": [],
+  "responsibilities": [
+    {
+      "scope": {
+        "caseNamespace": "T07-predicate-truth-and-conflict"
+      },
+      "ownerAlias": "steward",
+      "supervisorAlias": "supervisor",
+      "nextAction": "식별·버전·원천 근거를 대조한다",
+      "nextCheckAt": "2026-10-07T10:00:00Z"
+    }
+  ]
+}

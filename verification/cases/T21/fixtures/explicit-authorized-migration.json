@@ -1,0 +1,881 @@
+{
+  "schemaVersion": "1.0.0",
+  "fixtureId": "T21-explicit-authorized-migration",
+  "synthetic": true,
+  "baseRefs": [],
+  "clock": {
+    "asOf": "2026-10-07T09:00:00Z",
+    "knownAt": "2026-10-07T09:00:01Z",
+    "timezone": "Asia/Seoul",
+    "precision": "SECOND",
+    "deadlineInclusive": true
+  },
+  "versions": {
+    "definition": "definition-v1",
+    "evaluator": "arrival-v1",
+    "policy": "synthetic-policy-v1"
+  },
+  "actors": {
+    "fde": {
+      "issuer": "synthetic-local-issuer",
+      "subject": "T21-explicit-authorized-migration-fde",
+      "audience": "isolated-ontology-test",
+      "organizationAlias": "ORG",
+      "roleCapabilities": [
+        "createDefinitionDraft",
+        "validateDefinition",
+        "submitDefinitionReview",
+        "publishDefinition",
+        "activateDefinition",
+        "retireDefinition",
+        "getDefinition",
+        "getWork",
+        "getAssessment",
+        "getObject",
+        "getInventory",
+        "getObligations"
+      ],
+      "grant": {
+        "delegatorAlias": "supervisor",
+        "actions": [
+          "createDefinitionDraft",
+          "validateDefinition",
+          "submitDefinitionReview",
+          "publishDefinition",
+          "activateDefinition",
+          "retireDefinition",
+          "getDefinition",
+          "getWork",
+          "getAssessment",
+          "getObject",
+          "getInventory",
+          "getObligations"
+        ],
+        "scope": {
+          "organizationAlias": "ORG",
+          "items": [
+            "P",
+            "P_EA",
+            "P_BUNDLE"
+          ],
+          "places": [
+            "W"
+          ],
+          "works": [
+            "WORK1"
+          ],
+          "definitionPackages": [
+            "DEF1"
+          ],
+          "caseNamespace": "T21-explicit-authorized-migration"
+        },
+        "validFrom": "2026-10-01T00:00:00Z",
+        "validUntil": "2026-10-31T23:59:59Z",
+        "revision": 1
+      }
+    },
+    "approver": {
+      "issuer": "synthetic-local-issuer",
+      "subject": "T21-explicit-authorized-migration-approver",
+      "audience": "isolated-ontology-test",
+      "organizationAlias": "ORG",
+      "roleCapabilities": [
+        "approveDefinition",
+        "getDefinition",
+        "getWork"
+      ],
+      "grant": {
+        "delegatorAlias": "supervisor",
+        "actions": [
+          "approveDefinition",
+          "getDefinition",
+          "getWork"
+        ],
+        "scope": {
+          "organizationAlias": "ORG",
+          "items": [
+            "P",
+            "P_EA",
+            "P_BUNDLE"
+          ],
+          "places": [
+            "W"
+          ],
+          "works": [
+            "WORK1"
+          ],
+          "definitionPackages": [
+            "DEF1"
+          ],
+          "caseNamespace": "T21-explicit-authorized-migration"
+        },
+        "validFrom": "2026-10-01T00:00:00Z",
+        "validUntil": "2026-10-31T23:59:59Z",
+        "revision": 1
+      }
+    },
+    "steward": {
+      "issuer": "synthetic-local-issuer",
+      "subject": "T21-explicit-authorized-migration-steward",
+      "audience": "isolated-ontology-test",
+      "organizationAlias": "ORG",
+      "roleCapabilities": [
+        "registerItem",
+        "linkExternalId",
+        "confirmReceipt",
+        "attachEvidence",
+        "correctEvidence",
+        "linkCanonicalOccurrence",
+        "recordActivity",
+        "recordRelation",
+        "convertUnit",
+        "getObject",
+        "searchObjects",
+        "getInventory",
+        "evaluateEligibility",
+        "getEvidence",
+        "getReconciliation",
+        "getAssessment",
+        "getWork",
+        "getObligations"
+      ],
+      "grant": {
+        "delegatorAlias": "supervisor",
+        "actions": [
+          "registerItem",
+          "linkExternalId",
+          "confirmReceipt",
+          "attachEvidence",
+          "correctEvidence",
+          "linkCanonicalOccurrence",
+          "recordActivity",
+          "recordRelation",
+          "convertUnit",
+          "getObject",
+          "searchObjects",
+          "getInventory",
+          "evaluateEligibility",
+          "getEvidence",
+          "getReconciliation",
+          "getAssessment",
+          "getWork",
+          "getObligations"
+        ],
+        "scope": {
+          "organizationAlias": "ORG",
+          "items": [
+            "P",
+            "P_EA",
+            "P_BUNDLE"
+          ],
+          "places": [
+            "W"
+          ],
+          "works": [
+            "WORK1"
+          ],
+          "definitionPackages": [
+            "DEF1"
+          ],
+          "caseNamespace": "T21-explicit-authorized-migration"
+        },
+        "validFrom": "2026-10-01T00:00:00Z",
+        "validUntil": "2026-10-31T23:59:59Z",
+        "revision": 1
+      }
+    },
+    "qc": {
+      "issuer": "synthetic-local-issuer",
+      "subject": "T21-explicit-authorized-migration-qc",
+      "audience": "isolated-ontology-test",
+      "organizationAlias": "ORG",
+      "roleCapabilities": [
+        "placeHold",
+        "getInventory",
+        "getWork",
+        "getObligations",
+        "evaluateEligibility"
+      ],
+      "grant": {
+        "delegatorAlias": "supervisor",
+        "actions": [
+          "placeHold",
+          "getInventory",
+          "getWork",
+          "getObligations",
+          "evaluateEligibility"
+        ],
+        "scope": {
+          "organizationAlias": "ORG",
+          "items": [
+            "P",
+            "P_EA",
+            "P_BUNDLE"
+          ],
+          "places": [
+            "W"
+          ],
+          "works": [
+            "WORK1"
+          ],
+          "definitionPackages": [
+            "DEF1"
+          ],
+          "caseNamespace": "T21-explicit-authorized-migration"
+        },
+        "validFrom": "2026-10-01T00:00:00Z",
+        "validUntil": "2026-10-31T23:59:59Z",
+        "revision": 1
+      }
+    },
+    "owner": {
+      "issuer": "synthetic-local-issuer",
+      "subject": "T21-explicit-authorized-migration-owner",
+      "audience": "isolated-ontology-test",
+      "organizationAlias": "ORG",
+      "roleCapabilities": [
+        "createDraft",
+        "activateWork",
+        "waitWork",
+        "resumeWork",
+        "reviseGoal",
+        "migrateWorkDefinition",
+        "reserveQuantity",
+        "getWork",
+        "getAssessment",
+        "getInventory",
+        "getObligations",
+        "evaluateEligibility",
+        "getDefinition"
+      ],
+      "grant": {
+        "delegatorAlias": "supervisor",
+        "actions": [
+          "createDraft",
+          "activateWork",
+          "waitWork",
+          "resumeWork",
+          "reviseGoal",
+          "migrateWorkDefinition",
+          "reserveQuantity",
+          "getWork",
+          "getAssessment",
+          "getInventory",
+          "getObligations",
+          "evaluateEligibility",
+          "getDefinition"
+        ],
+        "scope": {
+          "organizationAlias": "ORG",
+          "items": [
+            "P",
+            "P_EA",
+            "P_BUNDLE"
+          ],
+          "places": [
+            "W"
+          ],
+          "works": [
+            "WORK1"
+          ],
+          "definitionPackages": [
+            "DEF1"
+          ],
+          "caseNamespace": "T21-explicit-authorized-migration"
+        },
+        "validFrom": "2026-10-01T00:00:00Z",
+        "validUntil": "2026-10-31T23:59:59Z",
+        "revision": 1
+      }
+    },
+    "reader": {
+      "issuer": "synthetic-local-issuer",
+      "subject": "T21-explicit-authorized-migration-reader",
+      "audience": "isolated-ontology-test",
+      "organizationAlias": "ORG",
+      "roleCapabilities": [
+        "getDefinition",
+        "getWork",
+        "getAssessment",
+        "getInventory",
+        "getEvidence",
+        "getObject",
+        "getObligations"
+      ],
+      "grant": {
+        "delegatorAlias": "supervisor",
+        "actions": [
+          "getDefinition",
+          "getWork",
+          "getAssessment",
+          "getInventory",
+          "getEvidence",
+          "getObject",
+          "getObligations"
+        ],
+        "scope": {
+          "organizationAlias": "ORG",
+          "items": [
+            "P",
+            "P_EA",
+            "P_BUNDLE"
+          ],
+          "places": [
+            "W"
+          ],
+          "works": [
+            "WORK1"
+          ],
+          "definitionPackages": [
+            "DEF1"
+          ],
+          "caseNamespace": "T21-explicit-authorized-migration"
+        },
+        "validFrom": "2026-10-01T00:00:00Z",
+        "validUntil": "2026-10-31T23:59:59Z",
+        "revision": 1
+      }
+    },
+    "outsider": {
+      "issuer": "synthetic-local-issuer",
+      "subject": "T21-explicit-authorized-migration-outsider",
+      "audience": "isolated-ontology-test",
+      "organizationAlias": "ORG",
+      "roleCapabilities": [
+        "getEvidence"
+      ],
+      "grant": {
+        "delegatorAlias": "supervisor",
+        "actions": [
+          "getEvidence"
+        ],
+        "scope": {
+          "organizationAlias": "ORG",
+          "evidenceIds": [],
+          "caseNamespace": "T21-explicit-authorized-migration"
+        },
+        "validFrom": "2026-10-01T00:00:00Z",
+        "validUntil": "2026-10-31T23:59:59Z",
+        "revision": 1
+      }
+    }
+  },
+  "aliases": {
+    "ORG": {
+      "type": "Organization"
+    },
+    "P": {
+      "type": "TradeItem",
+      "baseUnit": "BOX"
+    },
+    "P_EA": {
+      "type": "TradeItem",
+      "baseUnit": "EA"
+    },
+    "P_BUNDLE": {
+      "type": "TradeItem",
+      "baseUnit": "BUNDLE"
+    },
+    "W": {
+      "type": "Place"
+    },
+    "C": {
+      "type": "Customer"
+    },
+    "L": {
+      "type": "ManufacturingLot",
+      "manufacturerAlias": "M1",
+      "itemAlias": "P",
+      "externalLotText": "L"
+    },
+    "M1": {
+      "type": "Manufacturer"
+    },
+    "M2": {
+      "type": "Manufacturer"
+    },
+    "DEF1": {
+      "type": "DefinitionVersion"
+    },
+    "WORK1": {
+      "type": "Work"
+    },
+    "GOAL1": {
+      "type": "GoalVersion"
+    },
+    "A40": {
+      "type": "QuantitySegment",
+      "quantity": "40",
+      "unit": "BOX",
+      "itemAlias": "P",
+      "lotAlias": "L",
+      "locationAlias": "W",
+      "physicalScope": "initial-40"
+    },
+    "PHYS60": {
+      "type": "PhysicalScope",
+      "canonicalIdentity": "receipt-60"
+    },
+    "PHYS20": {
+      "type": "PhysicalScope",
+      "canonicalIdentity": "receipt-20"
+    },
+    "CONVERSION": {
+      "type": "UnitConversion"
+    },
+    "QC_HOLD": {
+      "type": "Restriction"
+    },
+    "owner": {
+      "type": "Human"
+    },
+    "supervisor": {
+      "type": "Human"
+    },
+    "fde": {
+      "type": "Human"
+    },
+    "approver": {
+      "type": "Human"
+    },
+    "steward": {
+      "type": "Human"
+    },
+    "qc": {
+      "type": "Human"
+    },
+    "reader": {
+      "type": "Human"
+    },
+    "outsider": {
+      "type": "Human"
+    },
+    "INITIAL_RECEIPT40": {
+      "type": "Activity"
+    }
+  },
+  "baseline": {
+    "setupIsExecutionCoverage": false,
+    "definitionPackages": [
+      {
+        "alias": "DEF1",
+        "version": "definition-v1",
+        "state": "ACTIVE",
+        "hash": "347608ca1425f25be3c36fb6a6a4158739d5546d06e7bdddc5cdaabb9af895c3",
+        "goalTemplate": {
+          "endpoint": "ARRIVED",
+          "quantityMode": "CUMULATIVE_EVENT",
+          "evaluatorVersion": "arrival-v1",
+          "requiredSlots": [
+            "item",
+            "quantity",
+            "unit",
+            "destination",
+            "dueAt"
+          ],
+          "receiptLotRequiredAt": "CONFIRM_RECEIPT"
+        }
+      }
+    ],
+    "supportManifest": [
+      {
+        "definitionVersion": "definition-v2",
+        "capabilityId": "resumeWork",
+        "semanticVersion": "sell-eligible-v2",
+        "evaluatorVersion": "eligibility-v2",
+        "inputSchemaVersion": "2.0.0",
+        "outputSchemaVersion": "2.0.0",
+        "supportedWorkMigration": [
+          "v1-to-v2"
+        ]
+      },
+      {
+        "definitionVersion": "definition-v1",
+        "capabilityId": "getWork",
+        "semanticVersion": "core-v1",
+        "evaluatorVersion": "core-v1",
+        "inputSchemaVersion": "1.0.0",
+        "outputSchemaVersion": "1.0.0",
+        "supportedWorkMigration": []
+      },
+      {
+        "definitionVersion": "definition-v1",
+        "capabilityId": "createDefinitionDraft",
+        "semanticVersion": "core-v1",
+        "evaluatorVersion": "core-v1",
+        "inputSchemaVersion": "1.0.0",
+        "outputSchemaVersion": "1.0.0",
+        "supportedWorkMigration": []
+      },
+      {
+        "definitionVersion": "definition-v1",
+        "capabilityId": "validateDefinition",
+        "semanticVersion": "core-v1",
+        "evaluatorVersion": "core-v1",
+        "inputSchemaVersion": "1.0.0",
+        "outputSchemaVersion": "1.0.0",
+        "supportedWorkMigration": []
+      },
+      {
+        "definitionVersion": "definition-v1",
+        "capabilityId": "submitDefinitionReview",
+        "semanticVersion": "core-v1",
+        "evaluatorVersion": "core-v1",
+        "inputSchemaVersion": "1.0.0",
+        "outputSchemaVersion": "1.0.0",
+        "supportedWorkMigration": []
+      },
+      {
+        "definitionVersion": "definition-v1",
+        "capabilityId": "approveDefinition",
+        "semanticVersion": "core-v1",
+        "evaluatorVersion": "core-v1",
+        "inputSchemaVersion": "1.0.0",
+        "outputSchemaVersion": "1.0.0",
+        "supportedWorkMigration": []
+      },
+      {
+        "definitionVersion": "definition-v1",
+        "capabilityId": "publishDefinition",
+        "semanticVersion": "core-v1",
+        "evaluatorVersion": "core-v1",
+        "inputSchemaVersion": "1.0.0",
+        "outputSchemaVersion": "1.0.0",
+        "supportedWorkMigration": []
+      },
+      {
+        "definitionVersion": "definition-v1",
+        "capabilityId": "activateDefinition",
+        "semanticVersion": "core-v1",
+        "evaluatorVersion": "core-v1",
+        "inputSchemaVersion": "1.0.0",
+        "outputSchemaVersion": "1.0.0",
+        "supportedWorkMigration": []
+      },
+      {
+        "definitionVersion": "definition-v1",
+        "capabilityId": "migrateWorkDefinition",
+        "semanticVersion": "core-v1",
+        "evaluatorVersion": "core-v1",
+        "inputSchemaVersion": "1.0.0",
+        "outputSchemaVersion": "1.0.0",
+        "supportedWorkMigration": []
+      }
+    ],
+    "units": [
+      {
+        "unit": "BOX",
+        "decimalPlaces": 0
+      },
+      {
+        "unit": "EA",
+        "decimalPlaces": 0
+      },
+      {
+        "unit": "BUNDLE",
+        "decimalPlaces": 0
+      }
+    ],
+    "unitConversions": [
+      {
+        "alias": "CONVERSION",
+        "fromItemAlias": "P_BUNDLE",
+        "fromUnit": "BUNDLE",
+        "fromValue": "1",
+        "toItemAlias": "P_EA",
+        "toUnit": "EA",
+        "toValue": "12",
+        "version": "conversion-v1",
+        "basis": "synthetic-confirmed-content-spec",
+        "substitutionPermission": "MISSING"
+      }
+    ],
+    "typedRelations": [
+      {
+        "name": "locatedAt",
+        "sourceType": "QuantitySegment",
+        "targetType": "Place",
+        "maxTargetsAtInstant": 1,
+        "cycleAllowed": false
+      }
+    ],
+    "predicates": {
+      "operators": [
+        "equals",
+        "in",
+        "compare",
+        "range",
+        "exists",
+        "cardinality",
+        "timeIn",
+        "all",
+        "any",
+        "not",
+        "distinctEventQuantity",
+        "stateQuantity"
+      ],
+      "unknownPolicy": "PRESERVE",
+      "conflictPolicy": "PRESERVE_FLAG"
+    },
+    "segments": [
+      {
+        "alias": "A40",
+        "quantity": "40",
+        "unit": "BOX",
+        "itemAlias": "P",
+        "lotAlias": "L",
+        "locationAlias": "W",
+        "physicalScope": "initial-40"
+      }
+    ],
+    "works": [
+      {
+        "alias": "WORK1",
+        "definitionVersion": "definition-v1",
+        "evaluatorVersion": "arrival-v1",
+        "state": "WAITING",
+        "ownerAlias": "owner",
+        "supervisorAlias": "supervisor",
+        "revision": 1,
+        "goalVersionAlias": "GOAL1",
+        "goal": {
+          "endpoint": "ARRIVED",
+          "quantity": "60",
+          "unit": "BOX",
+          "quantityMode": "CUMULATIVE_EVENT",
+          "destinationAlias": "W",
+          "dueAt": "2026-10-09T09:00:00Z",
+          "deadlineInclusive": true,
+          "evidencePolicyVersion": "synthetic-policy-v1",
+          "windowFrom": "2026-10-01T00:00:00Z",
+          "windowUntil": "2026-10-09T09:00:00Z",
+          "allowedOccurrenceKinds": [
+            "CONFIRMED_RECEIPT"
+          ],
+          "distinctContributionKey": "canonical-physical-scope",
+          "contributionScope": {
+            "itemAlias": "P",
+            "locationAlias": "W"
+          }
+        },
+        "wait": {
+          "reason": "잔여20 도착 근거를 기다린다",
+          "nextCheckAt": "2026-10-07T10:00:00Z",
+          "verifierAlias": "steward",
+          "resumePredicate": "verifiedArrivalContribution",
+          "overdueAction": "owner-check"
+        },
+        "obligation": {
+          "kind": "ARRIVAL_REMAINDER",
+          "quantity": "20",
+          "unit": "BOX",
+          "ownerAlias": "owner",
+          "nextAction": "잔여20 도착 근거를 확인한다",
+          "nextCheckAt": "2026-10-07T10:00:00Z"
+        }
+      }
+    ],
+    "syntheticPolicies": [
+      {
+        "version": "synthetic-policy-v1",
+        "kind": "DECLARATIVE_TEST_RULES",
+        "source": "fixture-only",
+        "effectiveFrom": "2026-10-01T00:00:00Z",
+        "effectiveUntil": "2026-10-31T23:59:59Z",
+        "requiresConfigApprover": true,
+        "regulatedOperations": "NOT_LEGAL_ACCEPTANCE",
+        "defaultTolerance": "0",
+        "packagingSubstitution": "MISSING",
+        "recordSourceMatch": "source/physicalScope/quantity/time-required"
+      }
+    ],
+    "sourceProfiles": [
+      {
+        "namespace": "synthetic-warehouse",
+        "actorAlias": "steward",
+        "recordCapabilities": [
+          "attachEvidence",
+          "confirmReceipt",
+          "correctEvidence",
+          "linkCanonicalOccurrence"
+        ],
+        "schemaVersion": "1.0.0",
+        "occurrenceKinds": [
+          "RECEIPT"
+        ],
+        "identityPolicy": "item/manufacturer/lot/physicalScope/location/quantity/time-must-match",
+        "revisionPolicy": "verified-source-version",
+        "duplicatePolicy": "same-canonical-physical-scope-no-new-effect",
+        "hashPolicy": "sha256-original-content-must-match",
+        "intakeOwnerAlias": "steward",
+        "nextCheckAt": "2026-10-07T10:00:00Z"
+      },
+      {
+        "namespace": "synthetic-warehouse-a",
+        "actorAlias": "steward",
+        "recordCapabilities": [
+          "attachEvidence",
+          "confirmReceipt",
+          "correctEvidence",
+          "linkCanonicalOccurrence"
+        ],
+        "schemaVersion": "1.0.0",
+        "occurrenceKinds": [
+          "RECEIPT"
+        ],
+        "identityPolicy": "item/manufacturer/lot/physicalScope/location/quantity/time-must-match",
+        "revisionPolicy": "verified-source-version",
+        "duplicatePolicy": "same-canonical-physical-scope-no-new-effect",
+        "hashPolicy": "sha256-original-content-must-match",
+        "intakeOwnerAlias": "steward",
+        "nextCheckAt": "2026-10-07T10:00:00Z"
+      },
+      {
+        "namespace": "synthetic-warehouse-b",
+        "actorAlias": "steward",
+        "recordCapabilities": [
+          "attachEvidence",
+          "confirmReceipt",
+          "correctEvidence",
+          "linkCanonicalOccurrence"
+        ],
+        "schemaVersion": "1.0.0",
+        "occurrenceKinds": [
+          "RECEIPT"
+        ],
+        "identityPolicy": "item/manufacturer/lot/physicalScope/location/quantity/time-must-match",
+        "revisionPolicy": "verified-source-version",
+        "duplicatePolicy": "same-canonical-physical-scope-no-new-effect",
+        "hashPolicy": "sha256-original-content-must-match",
+        "intakeOwnerAlias": "steward",
+        "nextCheckAt": "2026-10-07T10:00:00Z"
+      },
+      {
+        "namespace": "synthetic-carrier",
+        "actorAlias": "steward",
+        "recordCapabilities": [
+          "attachEvidence",
+          "confirmReceipt",
+          "correctEvidence",
+          "linkCanonicalOccurrence"
+        ],
+        "schemaVersion": "1.0.0",
+        "occurrenceKinds": [
+          "RECEIPT"
+        ],
+        "identityPolicy": "item/manufacturer/lot/physicalScope/location/quantity/time-must-match",
+        "revisionPolicy": "verified-source-version",
+        "duplicatePolicy": "same-canonical-physical-scope-no-new-effect",
+        "hashPolicy": "sha256-original-content-must-match",
+        "intakeOwnerAlias": "steward",
+        "nextCheckAt": "2026-10-07T10:00:00Z"
+      }
+    ],
+    "identitySources": [
+      {
+        "issuer": "IT-A",
+        "namespace": "SKU"
+      },
+      {
+        "issuer": "IT-B",
+        "namespace": "SKU"
+      }
+    ],
+    "intakeOwnerAlias": "steward",
+    "supervisorAlias": "supervisor",
+    "nextAction": "식별·버전·원천 근거를 대조한다",
+    "nextCheckAt": "2026-10-07T10:00:00Z",
+    "sourceDocuments": [
+      {
+        "alias": "initial-receipt40-document",
+        "content": "baseline original receipt40 BOX",
+        "sha256": "65be9c005597d2c53ac0fa03623d8e249e6b765d2053d31c12eb91de6bb1e877",
+        "mediaType": "text/plain",
+        "uploadCompleted": true,
+        "sourceNamespace": "synthetic-warehouse",
+        "externalEventId": "initial-receipt40",
+        "sourceVersion": "1"
+      }
+    ],
+    "canonicalOccurrences": [
+      {
+        "alias": "INITIAL_RECEIPT40",
+        "kind": "CONFIRMED_RECEIPT",
+        "physicalScope": "initial-40",
+        "segmentAlias": "A40",
+        "quantity": "40",
+        "unit": "BOX",
+        "locationAlias": "W",
+        "sourceDocumentAlias": "initial-receipt40-document",
+        "sourceNamespace": "synthetic-warehouse",
+        "externalEventId": "initial-receipt40",
+        "sourceVersion": "1",
+        "occurredAt": "2026-10-06T09:00:00Z",
+        "recordedAt": "2026-10-06T09:00:01Z"
+      }
+    ],
+    "receiptContributions": [
+      {
+        "current": true,
+        "kind": "CONFIRMED_RECEIPT",
+        "workAlias": "WORK1",
+        "occurrenceKey": "initial-receipt40",
+        "physicalScope": "initial-40",
+        "quantity": "40",
+        "unit": "BOX",
+        "sourceNamespace": "synthetic-warehouse",
+        "sourceVersion": "1",
+        "occurredAt": "2026-10-06T09:00:00Z",
+        "recordedAt": "2026-10-06T09:00:01Z"
+      }
+    ],
+    "migrationPlan": {
+      "migrationId": "v1-to-v2",
+      "affectedWorkAliases": [
+        "WORK1"
+      ],
+      "affectedDataAliases": [
+        "GOAL1"
+      ],
+      "mapping": {
+        "quantity": {
+          "from": "60",
+          "to": "80",
+          "unit": "BOX"
+        },
+        "endpoint": {
+          "from": "ARRIVED",
+          "to": "SELL_ELIGIBLE"
+        }
+      },
+      "unsupportedValues": [],
+      "regressionFixtureRefs": [
+        "T07",
+        "T21",
+        "V1"
+      ]
+    }
+  },
+  "evidence": [
+    {
+      "alias": "initial-receipt40-document",
+      "sha256": "65be9c005597d2c53ac0fa03623d8e249e6b765d2053d31c12eb91de6bb1e877",
+      "sourceNamespace": "synthetic-warehouse",
+      "externalEventId": "initial-receipt40",
+      "sourceVersion": "1",
+      "occurredAt": "2026-10-06T09:00:00Z",
+      "recordedAt": "2026-10-06T09:00:01Z"
+    }
+  ],
+  "responsibilities": [
+    {
+      "scope": {
+        "caseNamespace": "T21-explicit-authorized-migration"
+      },
+      "ownerAlias": "steward",
+      "supervisorAlias": "supervisor",
+      "nextAction": "식별·버전·원천 근거를 대조한다",
+      "nextCheckAt": "2026-10-07T10:00:00Z"
+    }
+  ]
+}

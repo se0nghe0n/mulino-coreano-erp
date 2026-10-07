@@ -1,0 +1,2608 @@
+{
+  "schemaVersion": "1.0.0",
+  "caseId": "T02",
+  "title": "품목 식별과 환산의 업무 효과를 구별한다",
+  "requirementRefs": [
+    "D02"
+  ],
+  "profiles": [
+    "contracts",
+    "scenarios"
+  ],
+  "subcases": [
+    {
+      "id": "issuer-and-lot-context",
+      "title": "같은 SKU와 LOT 표기를 발급자·제조자·품목 문맥별로 구별한다",
+      "fixtureRef": "verification/cases/T02/fixtures/issuer-and-lot-context.json",
+      "requiredAdapters": [
+        "fixture",
+        "api",
+        "db"
+      ],
+      "actions": [
+        {
+          "id": "setup",
+          "kind": "installFixture",
+          "evidenceRefs": [
+            "setup:actual-artifact"
+          ]
+        },
+        {
+          "id": "before",
+          "kind": "query",
+          "evidenceRefs": [
+            "before:actual-artifact"
+          ],
+          "actorRef": "steward",
+          "route": "api",
+          "capabilityId": "getInventory",
+          "request": {
+            "intentKind": "QUERY",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "getInventory",
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "caseNamespace": "T02-issuer-and-lot-context"
+            },
+            "subjectRefs": [],
+            "slots": {},
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z"
+          }
+        },
+        {
+          "id": "db-before",
+          "kind": "observe",
+          "evidenceRefs": [
+            "db-before:actual-artifact"
+          ],
+          "observation": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "caseNamespace": "T02-issuer-and-lot-context"
+            },
+            "snapshotRef": {
+              "$result": {
+                "actionId": "before",
+                "pointer": "/response/snapshotRevision"
+              }
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z",
+            "sources": [
+              "items",
+              "lots",
+              "movements",
+              "mergeRecords"
+            ]
+          }
+        },
+        {
+          "id": "register-a",
+          "kind": "invoke",
+          "evidenceRefs": [
+            "register-a:actual-artifact"
+          ],
+          "actorRef": "steward",
+          "route": "api",
+          "capabilityId": "registerItem",
+          "request": {
+            "intentKind": "COMMAND",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "registerItem",
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "caseNamespace": "T02-issuer-and-lot-context"
+            },
+            "subjectRefs": [],
+            "slots": {
+              "name": {
+                "value": "같은 이름 비스킷",
+                "provenance": "USER"
+              },
+              "baseUnit": {
+                "value": "BOX",
+                "provenance": "USER"
+              },
+              "specification": {
+                "value": {
+                  "packaging": "sealed-box",
+                  "content": "biscuit"
+                },
+                "provenance": "USER"
+              }
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z",
+            "expectedRevision": 1,
+            "commandIdempotencyKey": "T02-issuer-and-lot-context-register-a"
+          }
+        },
+        {
+          "id": "identifier-a",
+          "kind": "invoke",
+          "evidenceRefs": [
+            "identifier-a:actual-artifact"
+          ],
+          "actorRef": "steward",
+          "route": "api",
+          "capabilityId": "linkExternalId",
+          "request": {
+            "intentKind": "COMMAND",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "linkExternalId",
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "caseNamespace": "T02-issuer-and-lot-context"
+            },
+            "subjectRefs": [],
+            "slots": {
+              "itemId": {
+                "$result": {
+                  "actionId": "register-a",
+                  "pointer": "/response/itemId"
+                }
+              },
+              "issuer": "IT-A",
+              "namespace": "SKU",
+              "code": "SAME",
+              "validFrom": "2026-10-01T00:00:00Z",
+              "validUntil": "2026-10-31T23:59:59Z"
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z",
+            "expectedRevision": {
+              "$result": {
+                "actionId": "register-a",
+                "pointer": "/response/revision"
+              }
+            },
+            "commandIdempotencyKey": "T02-issuer-and-lot-context-identifier-a"
+          }
+        },
+        {
+          "id": "evidence-a",
+          "kind": "invoke",
+          "evidenceRefs": [
+            "evidence-a:actual-artifact"
+          ],
+          "actorRef": "steward",
+          "route": "api",
+          "capabilityId": "attachEvidence",
+          "request": {
+            "intentKind": "RECORD",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "attachEvidence",
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "caseNamespace": "T02-issuer-and-lot-context"
+            },
+            "subjectRefs": [],
+            "slots": {
+              "document": {
+                "content": "T02 issuer IT-A observed1 BOX lot L",
+                "sha256": "54f3f8122ff5358a5b6f97071eb758528333e7473410c5d268f86b7fbc70e608",
+                "mediaType": "text/plain",
+                "uploadCompleted": true
+              },
+              "sourceNamespace": "synthetic-warehouse-a",
+              "externalEventId": "receipt-a",
+              "sourceVersion": "1",
+              "claim": {
+                "itemId": {
+                  "$result": {
+                    "actionId": "register-a",
+                    "pointer": "/response/itemId"
+                  }
+                },
+                "manufacturerId": {
+                  "$alias": "M1"
+                },
+                "lotText": "L",
+                "physicalScopeId": {
+                  "$alias": "PHYS60"
+                },
+                "quantity": {
+                  "value": "1",
+                  "unit": "BOX"
+                },
+                "locationId": {
+                  "$alias": "W"
+                },
+                "occurredAt": "2026-10-07T09:00:00Z"
+              }
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z",
+            "expectedRevision": 1,
+            "commandIdempotencyKey": "T02-issuer-and-lot-context-evidence-a"
+          }
+        },
+        {
+          "id": "receipt-a",
+          "kind": "invoke",
+          "evidenceRefs": [
+            "receipt-a:actual-artifact"
+          ],
+          "actorRef": "steward",
+          "route": "api",
+          "capabilityId": "confirmReceipt",
+          "request": {
+            "intentKind": "COMMAND",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "confirmReceipt",
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "caseNamespace": "T02-issuer-and-lot-context"
+            },
+            "subjectRefs": [],
+            "slots": {
+              "itemId": {
+                "$result": {
+                  "actionId": "register-a",
+                  "pointer": "/response/itemId"
+                }
+              },
+              "manufacturerId": {
+                "$alias": "M1"
+              },
+              "lotText": "L",
+              "physicalScopeId": {
+                "$alias": "PHYS60"
+              },
+              "quantity": {
+                "value": "1",
+                "unit": "BOX",
+                "provenance": "USER"
+              },
+              "locationId": {
+                "$alias": "W"
+              },
+              "occurredAt": "2026-10-07T09:00:00Z",
+              "sourceNamespace": "synthetic-warehouse-a",
+              "externalEventId": "receipt-a",
+              "sourceVersion": "1",
+              "evidenceIds": [
+                {
+                  "$result": {
+                    "actionId": "evidence-a",
+                    "pointer": "/response/evidenceId"
+                  }
+                }
+              ]
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z",
+            "expectedRevision": {
+              "$result": {
+                "actionId": "identifier-a",
+                "pointer": "/response/revision"
+              }
+            },
+            "commandIdempotencyKey": "T02-issuer-and-lot-context-receipt-a"
+          }
+        },
+        {
+          "id": "register-b",
+          "kind": "invoke",
+          "evidenceRefs": [
+            "register-b:actual-artifact"
+          ],
+          "actorRef": "steward",
+          "route": "api",
+          "capabilityId": "registerItem",
+          "request": {
+            "intentKind": "COMMAND",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "registerItem",
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "caseNamespace": "T02-issuer-and-lot-context"
+            },
+            "subjectRefs": [],
+            "slots": {
+              "name": {
+                "value": "같은 이름 비스킷",
+                "provenance": "USER"
+              },
+              "baseUnit": {
+                "value": "BOX",
+                "provenance": "USER"
+              },
+              "specification": {
+                "value": {
+                  "packaging": "sealed-box",
+                  "content": "biscuit"
+                },
+                "provenance": "USER"
+              }
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z",
+            "expectedRevision": 1,
+            "commandIdempotencyKey": "T02-issuer-and-lot-context-register-b"
+          }
+        },
+        {
+          "id": "identifier-b",
+          "kind": "invoke",
+          "evidenceRefs": [
+            "identifier-b:actual-artifact"
+          ],
+          "actorRef": "steward",
+          "route": "api",
+          "capabilityId": "linkExternalId",
+          "request": {
+            "intentKind": "COMMAND",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "linkExternalId",
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "caseNamespace": "T02-issuer-and-lot-context"
+            },
+            "subjectRefs": [],
+            "slots": {
+              "itemId": {
+                "$result": {
+                  "actionId": "register-b",
+                  "pointer": "/response/itemId"
+                }
+              },
+              "issuer": "IT-B",
+              "namespace": "SKU",
+              "code": "SAME",
+              "validFrom": "2026-10-01T00:00:00Z",
+              "validUntil": "2026-10-31T23:59:59Z"
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z",
+            "expectedRevision": {
+              "$result": {
+                "actionId": "register-b",
+                "pointer": "/response/revision"
+              }
+            },
+            "commandIdempotencyKey": "T02-issuer-and-lot-context-identifier-b"
+          }
+        },
+        {
+          "id": "evidence-b",
+          "kind": "invoke",
+          "evidenceRefs": [
+            "evidence-b:actual-artifact"
+          ],
+          "actorRef": "steward",
+          "route": "api",
+          "capabilityId": "attachEvidence",
+          "request": {
+            "intentKind": "RECORD",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "attachEvidence",
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "caseNamespace": "T02-issuer-and-lot-context"
+            },
+            "subjectRefs": [],
+            "slots": {
+              "document": {
+                "content": "T02 issuer IT-B observed1 BOX lot L",
+                "sha256": "51e3dd71f29a80b8e560ec27f0c9fc5d9af4939b75ef1ece9d0dabb571362bd8",
+                "mediaType": "text/plain",
+                "uploadCompleted": true
+              },
+              "sourceNamespace": "synthetic-warehouse-b",
+              "externalEventId": "receipt-b",
+              "sourceVersion": "1",
+              "claim": {
+                "itemId": {
+                  "$result": {
+                    "actionId": "register-b",
+                    "pointer": "/response/itemId"
+                  }
+                },
+                "manufacturerId": {
+                  "$alias": "M2"
+                },
+                "lotText": "L",
+                "physicalScopeId": {
+                  "$alias": "PHYS20"
+                },
+                "quantity": {
+                  "value": "1",
+                  "unit": "BOX"
+                },
+                "locationId": {
+                  "$alias": "W"
+                },
+                "occurredAt": "2026-10-07T09:00:00Z"
+              }
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z",
+            "expectedRevision": 1,
+            "commandIdempotencyKey": "T02-issuer-and-lot-context-evidence-b"
+          }
+        },
+        {
+          "id": "receipt-b",
+          "kind": "invoke",
+          "evidenceRefs": [
+            "receipt-b:actual-artifact"
+          ],
+          "actorRef": "steward",
+          "route": "api",
+          "capabilityId": "confirmReceipt",
+          "request": {
+            "intentKind": "COMMAND",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "confirmReceipt",
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "caseNamespace": "T02-issuer-and-lot-context"
+            },
+            "subjectRefs": [],
+            "slots": {
+              "itemId": {
+                "$result": {
+                  "actionId": "register-b",
+                  "pointer": "/response/itemId"
+                }
+              },
+              "manufacturerId": {
+                "$alias": "M2"
+              },
+              "lotText": "L",
+              "physicalScopeId": {
+                "$alias": "PHYS20"
+              },
+              "quantity": {
+                "value": "1",
+                "unit": "BOX",
+                "provenance": "USER"
+              },
+              "locationId": {
+                "$alias": "W"
+              },
+              "occurredAt": "2026-10-07T09:00:00Z",
+              "sourceNamespace": "synthetic-warehouse-b",
+              "externalEventId": "receipt-b",
+              "sourceVersion": "1",
+              "evidenceIds": [
+                {
+                  "$result": {
+                    "actionId": "evidence-b",
+                    "pointer": "/response/evidenceId"
+                  }
+                }
+              ]
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z",
+            "expectedRevision": {
+              "$result": {
+                "actionId": "identifier-b",
+                "pointer": "/response/revision"
+              }
+            },
+            "commandIdempotencyKey": "T02-issuer-and-lot-context-receipt-b"
+          }
+        },
+        {
+          "id": "after",
+          "kind": "query",
+          "evidenceRefs": [
+            "after:actual-artifact"
+          ],
+          "actorRef": "steward",
+          "route": "api",
+          "capabilityId": "searchObjects",
+          "request": {
+            "intentKind": "QUERY",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "searchObjects",
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "caseNamespace": "T02-issuer-and-lot-context"
+            },
+            "subjectRefs": [],
+            "slots": {
+              "types": [
+                "TradeItem",
+                "ManufacturingLot"
+              ]
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z"
+          }
+        },
+        {
+          "id": "db-after",
+          "kind": "observe",
+          "evidenceRefs": [
+            "db-after:actual-artifact"
+          ],
+          "observation": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "caseNamespace": "T02-issuer-and-lot-context",
+              "itemIds": [
+                {
+                  "$result": {
+                    "actionId": "register-a",
+                    "pointer": "/response/itemId"
+                  }
+                },
+                {
+                  "$result": {
+                    "actionId": "register-b",
+                    "pointer": "/response/itemId"
+                  }
+                }
+              ]
+            },
+            "snapshotRef": {
+              "$result": {
+                "actionId": "after",
+                "pointer": "/response/snapshotRevision"
+              }
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z",
+            "sources": [
+              "items",
+              "lots",
+              "externalIdentifiers",
+              "mergeRecords",
+              "audit"
+            ]
+          }
+        }
+      ],
+      "assertions": [
+        {
+          "id": "api-distinct-item-ids",
+          "op": "notEquals",
+          "source": {
+            "actionId": "register-a",
+            "pointer": "/response/itemId"
+          },
+          "expected": {
+            "$result": {
+              "actionId": "register-b",
+              "pointer": "/response/itemId"
+            }
+          },
+          "requirementRefs": [
+            "D02"
+          ],
+          "evidenceRefs": [
+            "register-a:actual-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseNamespace": "T02-issuer-and-lot-context"
+          },
+          "oracleExplanation": "이 사례의 실제 원 행과 응답을 고정 기대값에 대조한다.",
+          "oracleRef": {
+            "oracleId": "T02.issuer-identity",
+            "observationNames": [
+              "distinct-item-ids"
+            ]
+          }
+        },
+        {
+          "id": "db-item-count",
+          "op": "count",
+          "source": {
+            "actionId": "db-after",
+            "pointer": "/data/rawRows/items"
+          },
+          "expected": 2,
+          "requirementRefs": [
+            "D02"
+          ],
+          "evidenceRefs": [
+            "db-after:rawRows"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseNamespace": "T02-issuer-and-lot-context"
+          },
+          "oracleExplanation": "이 사례의 실제 원 행과 응답을 고정 기대값에 대조한다.",
+          "oracleRef": {
+            "oracleId": "T02.issuer-identity",
+            "observationNames": [
+              "distinct-item-ids"
+            ]
+          }
+        },
+        {
+          "id": "db-item-set",
+          "op": "exactSet",
+          "source": {
+            "actionId": "db-after",
+            "pointer": "/data/rawRows/items",
+            "field": "id"
+          },
+          "expected": [
+            {
+              "$result": {
+                "actionId": "register-a",
+                "pointer": "/response/itemId"
+              }
+            },
+            {
+              "$result": {
+                "actionId": "register-b",
+                "pointer": "/response/itemId"
+              }
+            }
+          ],
+          "requirementRefs": [
+            "D02"
+          ],
+          "evidenceRefs": [
+            "db-after:rawRows"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseNamespace": "T02-issuer-and-lot-context"
+          },
+          "oracleExplanation": "이 사례의 실제 원 행과 응답을 고정 기대값에 대조한다.",
+          "oracleRef": {
+            "oracleId": "T02.issuer-identity",
+            "observationNames": [
+              "distinct-item-ids"
+            ]
+          }
+        },
+        {
+          "id": "db-lot-count",
+          "op": "count",
+          "source": {
+            "actionId": "db-after",
+            "pointer": "/data/rawRows/lots"
+          },
+          "expected": 2,
+          "requirementRefs": [
+            "D02"
+          ],
+          "evidenceRefs": [
+            "db-after:rawRows"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseNamespace": "T02-issuer-and-lot-context"
+          },
+          "oracleExplanation": "이 사례의 실제 원 행과 응답을 고정 기대값에 대조한다.",
+          "oracleRef": {
+            "oracleId": "T02.issuer-identity",
+            "observationNames": [
+              "distinct-lot-ids"
+            ]
+          }
+        },
+        {
+          "id": "db-lot-set",
+          "op": "exactSet",
+          "source": {
+            "actionId": "db-after",
+            "pointer": "/data/rawRows/lots",
+            "field": "id"
+          },
+          "expected": [
+            {
+              "$result": {
+                "actionId": "receipt-a",
+                "pointer": "/response/lotId"
+              }
+            },
+            {
+              "$result": {
+                "actionId": "receipt-b",
+                "pointer": "/response/lotId"
+              }
+            }
+          ],
+          "requirementRefs": [
+            "D02"
+          ],
+          "evidenceRefs": [
+            "db-after:rawRows"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseNamespace": "T02-issuer-and-lot-context"
+          },
+          "oracleExplanation": "이 사례의 실제 원 행과 응답을 고정 기대값에 대조한다.",
+          "oracleRef": {
+            "oracleId": "T02.issuer-identity",
+            "observationNames": [
+              "distinct-lot-ids"
+            ]
+          }
+        },
+        {
+          "id": "issuer-item-relations",
+          "op": "relationSet",
+          "source": {
+            "actionId": "db-after",
+            "pointer": "/data/rawRows/externalIdentifiers",
+            "field": [
+              "itemId",
+              "issuer",
+              "namespace",
+              "code"
+            ]
+          },
+          "expected": [
+            [
+              {
+                "$result": {
+                  "actionId": "register-a",
+                  "pointer": "/response/itemId"
+                }
+              },
+              "IT-A",
+              "SKU",
+              "SAME"
+            ],
+            [
+              {
+                "$result": {
+                  "actionId": "register-b",
+                  "pointer": "/response/itemId"
+                }
+              },
+              "IT-B",
+              "SKU",
+              "SAME"
+            ]
+          ],
+          "requirementRefs": [
+            "D02"
+          ],
+          "evidenceRefs": [
+            "db-after:rawRows"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseNamespace": "T02-issuer-and-lot-context"
+          },
+          "oracleExplanation": "이 사례의 실제 원 행과 응답을 고정 기대값에 대조한다.",
+          "oracleRef": {
+            "oracleId": "T02.issuer-identity",
+            "observationNames": [
+              "distinct-item-ids"
+            ]
+          }
+        },
+        {
+          "id": "manufacturer-lot-relations",
+          "op": "relationSet",
+          "source": {
+            "actionId": "db-after",
+            "pointer": "/data/rawRows/lots",
+            "field": [
+              "id",
+              "manufacturerId",
+              "itemId",
+              "externalLotText"
+            ]
+          },
+          "expected": [
+            [
+              {
+                "$result": {
+                  "actionId": "receipt-a",
+                  "pointer": "/response/lotId"
+                }
+              },
+              {
+                "$alias": "M1"
+              },
+              {
+                "$result": {
+                  "actionId": "register-a",
+                  "pointer": "/response/itemId"
+                }
+              },
+              "L"
+            ],
+            [
+              {
+                "$result": {
+                  "actionId": "receipt-b",
+                  "pointer": "/response/lotId"
+                }
+              },
+              {
+                "$alias": "M2"
+              },
+              {
+                "$result": {
+                  "actionId": "register-b",
+                  "pointer": "/response/itemId"
+                }
+              },
+              "L"
+            ]
+          ],
+          "requirementRefs": [
+            "D02"
+          ],
+          "evidenceRefs": [
+            "db-after:rawRows"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseNamespace": "T02-issuer-and-lot-context"
+          },
+          "oracleExplanation": "이 사례의 실제 원 행과 응답을 고정 기대값에 대조한다.",
+          "oracleRef": {
+            "oracleId": "T02.issuer-identity",
+            "observationNames": [
+              "distinct-lot-ids"
+            ]
+          }
+        },
+        {
+          "id": "unchanged-mergeRecords",
+          "op": "sameAs",
+          "source": {
+            "actionId": "db-after",
+            "pointer": "/data/rawRows/mergeRecords"
+          },
+          "expected": null,
+          "requirementRefs": [
+            "D02"
+          ],
+          "evidenceRefs": [
+            "db-after:rawRows",
+            "db-before:actual-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseNamespace": "T02-issuer-and-lot-context"
+          },
+          "oracleExplanation": "mergeRecords의 실제 전후 원 행이 동일하므로 해당 scope의 금지된 효과는0이다. 감사·대조 의무는 이 비교에서 제외한다.",
+          "oracleRef": {
+            "oracleId": "T02.issuer-identity",
+            "observationNames": [
+              "implicit-merges"
+            ]
+          },
+          "baseline": {
+            "actionId": "db-before",
+            "pointer": "/data/rawRows/mergeRecords"
+          }
+        }
+      ],
+      "oracleExplanation": "같은 SKU와 LOT 표기를 발급자·제조자·품목 문맥별로 구별한다. fixture는 가상값이며 실제 API와 독립 DB의 같은 scope/snapshot으로 검증한다. 미구현 adapter는 NOT_RUN이다."
+    },
+    {
+      "id": "period-overlap",
+      "title": "동일 issuer 코드의 유효기간을 대조하고 이전 mapping을 보존한다",
+      "fixtureRef": "verification/cases/T02/fixtures/period-overlap.json",
+      "requiredAdapters": [
+        "fixture",
+        "api",
+        "db"
+      ],
+      "actions": [
+        {
+          "id": "setup",
+          "kind": "installFixture",
+          "evidenceRefs": [
+            "setup:actual-artifact"
+          ]
+        },
+        {
+          "id": "first-link",
+          "kind": "invoke",
+          "evidenceRefs": [
+            "first-link:actual-artifact"
+          ],
+          "actorRef": "steward",
+          "route": "api",
+          "capabilityId": "linkExternalId",
+          "request": {
+            "intentKind": "COMMAND",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "linkExternalId",
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "caseNamespace": "T02-period-overlap"
+            },
+            "subjectRefs": [],
+            "slots": {
+              "itemId": {
+                "$alias": "P"
+              },
+              "issuer": "IT-A",
+              "namespace": "A",
+              "code": "SKU1",
+              "validFrom": "2026-10-01T00:00:00Z",
+              "validUntil": "2026-10-07T09:00:00Z",
+              "endInclusive": false
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z",
+            "expectedRevision": 1,
+            "commandIdempotencyKey": "T02-period-overlap-first-link"
+          }
+        },
+        {
+          "id": "before",
+          "kind": "query",
+          "evidenceRefs": [
+            "before:actual-artifact"
+          ],
+          "actorRef": "steward",
+          "route": "api",
+          "capabilityId": "getObject",
+          "request": {
+            "intentKind": "QUERY",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "getObject",
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "caseNamespace": "T02-period-overlap"
+            },
+            "subjectRefs": [],
+            "slots": {},
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z"
+          }
+        },
+        {
+          "id": "db-before",
+          "kind": "observe",
+          "evidenceRefs": [
+            "db-before:actual-artifact"
+          ],
+          "observation": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "caseNamespace": "T02-period-overlap"
+            },
+            "snapshotRef": {
+              "$result": {
+                "actionId": "before",
+                "pointer": "/response/snapshotRevision"
+              }
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z",
+            "sources": [
+              "externalIdentifiers",
+              "mergeRecords",
+              "segments",
+              "businessOutbox"
+            ]
+          }
+        },
+        {
+          "id": "second-link",
+          "kind": "invoke",
+          "evidenceRefs": [
+            "second-link:actual-artifact"
+          ],
+          "actorRef": "steward",
+          "route": "api",
+          "capabilityId": "linkExternalId",
+          "request": {
+            "intentKind": "COMMAND",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "linkExternalId",
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "caseNamespace": "T02-period-overlap"
+            },
+            "subjectRefs": [],
+            "slots": {
+              "itemId": {
+                "$alias": "P2"
+              },
+              "issuer": "IT-A",
+              "namespace": "A",
+              "code": "SKU1",
+              "validFrom": "2026-10-07T08:59:59Z",
+              "validUntil": "2026-10-31T23:59:59Z",
+              "endInclusive": false
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z",
+            "expectedRevision": 1,
+            "commandIdempotencyKey": "T02-period-overlap-second-link"
+          }
+        },
+        {
+          "id": "after",
+          "kind": "query",
+          "evidenceRefs": [
+            "after:actual-artifact"
+          ],
+          "actorRef": "steward",
+          "route": "api",
+          "capabilityId": "getObject",
+          "request": {
+            "intentKind": "QUERY",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "getObject",
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "caseNamespace": "T02-period-overlap"
+            },
+            "subjectRefs": [],
+            "slots": {
+              "externalIdentifier": {
+                "issuer": "IT-A",
+                "namespace": "A",
+                "code": "SKU1"
+              },
+              "effectiveAt": "2026-10-07T09:00:00Z"
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z"
+          }
+        },
+        {
+          "id": "db-after",
+          "kind": "observe",
+          "evidenceRefs": [
+            "db-after:actual-artifact"
+          ],
+          "observation": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "caseNamespace": "T02-period-overlap"
+            },
+            "snapshotRef": {
+              "$result": {
+                "actionId": "after",
+                "pointer": "/response/snapshotRevision"
+              }
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z",
+            "sources": [
+              "externalIdentifiers",
+              "mergeRecords",
+              "segments",
+              "businessOutbox",
+              "reconciliations",
+              "obligations",
+              "audit"
+            ]
+          }
+        }
+      ],
+      "assertions": [
+        {
+          "id": "overlap-outcome",
+          "op": "equals",
+          "source": {
+            "actionId": "second-link",
+            "pointer": "/response/outcome"
+          },
+          "expected": "CONFLICT",
+          "requirementRefs": [
+            "D02"
+          ],
+          "evidenceRefs": [
+            "second-link:actual-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseNamespace": "T02-period-overlap"
+          },
+          "oracleExplanation": "이 사례의 실제 원 행과 응답을 고정 기대값에 대조한다.",
+          "oracleRef": {
+            "oracleId": "T02.identifier-period-conflict",
+            "observationNames": [
+              "code-conflict"
+            ]
+          }
+        },
+        {
+          "id": "overlap-api-effects",
+          "op": "equals",
+          "source": {
+            "actionId": "second-link",
+            "pointer": "/response/effects"
+          },
+          "expected": [],
+          "requirementRefs": [
+            "D02"
+          ],
+          "evidenceRefs": [
+            "second-link:actual-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseNamespace": "T02-period-overlap"
+          },
+          "oracleExplanation": "이 사례의 실제 원 행과 응답을 고정 기대값에 대조한다.",
+          "oracleRef": {
+            "oracleId": "T02.identifier-period-conflict",
+            "observationNames": [
+              "silent-remap"
+            ]
+          }
+        },
+        {
+          "id": "unchanged-externalIdentifiers",
+          "op": "sameAs",
+          "source": {
+            "actionId": "db-after",
+            "pointer": "/data/rawRows/externalIdentifiers"
+          },
+          "expected": null,
+          "requirementRefs": [
+            "D02"
+          ],
+          "evidenceRefs": [
+            "db-after:rawRows",
+            "db-before:actual-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseNamespace": "T02-period-overlap"
+          },
+          "oracleExplanation": "externalIdentifiers의 실제 전후 원 행이 동일하므로 해당 scope의 금지된 효과는0이다. 감사·대조 의무는 이 비교에서 제외한다.",
+          "oracleRef": {
+            "oracleId": "T02.identifier-period-conflict",
+            "observationNames": [
+              "silent-remap"
+            ]
+          },
+          "baseline": {
+            "actionId": "db-before",
+            "pointer": "/data/rawRows/externalIdentifiers"
+          }
+        },
+        {
+          "id": "unchanged-mergeRecords",
+          "op": "sameAs",
+          "source": {
+            "actionId": "db-after",
+            "pointer": "/data/rawRows/mergeRecords"
+          },
+          "expected": null,
+          "requirementRefs": [
+            "D02"
+          ],
+          "evidenceRefs": [
+            "db-after:rawRows",
+            "db-before:actual-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseNamespace": "T02-period-overlap"
+          },
+          "oracleExplanation": "mergeRecords의 실제 전후 원 행이 동일하므로 해당 scope의 금지된 효과는0이다. 감사·대조 의무는 이 비교에서 제외한다.",
+          "oracleRef": {
+            "oracleId": "T02.identifier-period-conflict",
+            "observationNames": [
+              "silent-remap"
+            ]
+          },
+          "baseline": {
+            "actionId": "db-before",
+            "pointer": "/data/rawRows/mergeRecords"
+          }
+        },
+        {
+          "id": "unchanged-segments",
+          "op": "sameAs",
+          "source": {
+            "actionId": "db-after",
+            "pointer": "/data/rawRows/segments"
+          },
+          "expected": null,
+          "requirementRefs": [
+            "D02"
+          ],
+          "evidenceRefs": [
+            "db-after:rawRows",
+            "db-before:actual-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseNamespace": "T02-period-overlap"
+          },
+          "oracleExplanation": "segments의 실제 전후 원 행이 동일하므로 해당 scope의 금지된 효과는0이다. 감사·대조 의무는 이 비교에서 제외한다.",
+          "oracleRef": {
+            "oracleId": "T02.identifier-period-conflict",
+            "observationNames": [
+              "silent-remap"
+            ]
+          },
+          "baseline": {
+            "actionId": "db-before",
+            "pointer": "/data/rawRows/segments"
+          }
+        },
+        {
+          "id": "unchanged-businessOutbox",
+          "op": "sameAs",
+          "source": {
+            "actionId": "db-after",
+            "pointer": "/data/rawRows/businessOutbox"
+          },
+          "expected": null,
+          "requirementRefs": [
+            "D02"
+          ],
+          "evidenceRefs": [
+            "db-after:rawRows",
+            "db-before:actual-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseNamespace": "T02-period-overlap"
+          },
+          "oracleExplanation": "businessOutbox의 실제 전후 원 행이 동일하므로 해당 scope의 금지된 효과는0이다. 감사·대조 의무는 이 비교에서 제외한다.",
+          "oracleRef": {
+            "oracleId": "T02.identifier-period-conflict",
+            "observationNames": [
+              "silent-remap"
+            ]
+          },
+          "baseline": {
+            "actionId": "db-before",
+            "pointer": "/data/rawRows/businessOutbox"
+          }
+        },
+        {
+          "id": "current-duty-count",
+          "op": "count",
+          "source": {
+            "actionId": "db-after",
+            "pointer": "/data/rawRows/obligations",
+            "where": {
+              "current": true
+            }
+          },
+          "expected": 1,
+          "requirementRefs": [
+            "D02"
+          ],
+          "evidenceRefs": [
+            "db-after:rawRows"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseNamespace": "T02-period-overlap"
+          },
+          "oracleExplanation": "이 사례의 실제 원 행과 응답을 고정 기대값에 대조한다.",
+          "oracleRef": {
+            "oracleId": "T02.identifier-period-conflict",
+            "observationNames": [
+              "code-reconciliation"
+            ]
+          }
+        },
+        {
+          "id": "current-duty-owner",
+          "op": "exactSet",
+          "source": {
+            "actionId": "db-after",
+            "pointer": "/data/rawRows/obligations",
+            "field": "ownerId",
+            "where": {
+              "current": true
+            }
+          },
+          "expected": [
+            {
+              "$alias": "steward"
+            }
+          ],
+          "requirementRefs": [
+            "D02"
+          ],
+          "evidenceRefs": [
+            "db-after:rawRows"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseNamespace": "T02-period-overlap"
+          },
+          "oracleExplanation": "이 사례의 실제 원 행과 응답을 고정 기대값에 대조한다.",
+          "oracleRef": {
+            "oracleId": "T02.identifier-period-conflict",
+            "observationNames": [
+              "code-reconciliation"
+            ]
+          }
+        },
+        {
+          "id": "current-duty-action",
+          "op": "exactSet",
+          "source": {
+            "actionId": "db-after",
+            "pointer": "/data/rawRows/obligations",
+            "field": "nextAction",
+            "where": {
+              "current": true
+            }
+          },
+          "expected": [
+            "식별·버전·원천 근거를 대조한다"
+          ],
+          "requirementRefs": [
+            "D02"
+          ],
+          "evidenceRefs": [
+            "db-after:rawRows"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseNamespace": "T02-period-overlap"
+          },
+          "oracleExplanation": "이 사례의 실제 원 행과 응답을 고정 기대값에 대조한다.",
+          "oracleRef": {
+            "oracleId": "T02.identifier-period-conflict",
+            "observationNames": [
+              "code-reconciliation"
+            ]
+          }
+        },
+        {
+          "id": "current-duty-time",
+          "op": "exactSet",
+          "source": {
+            "actionId": "db-after",
+            "pointer": "/data/rawRows/obligations",
+            "field": "nextCheckAt",
+            "where": {
+              "current": true
+            }
+          },
+          "expected": [
+            "2026-10-07T10:00:00Z"
+          ],
+          "requirementRefs": [
+            "D02"
+          ],
+          "evidenceRefs": [
+            "db-after:rawRows"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseNamespace": "T02-period-overlap"
+          },
+          "oracleExplanation": "이 사례의 실제 원 행과 응답을 고정 기대값에 대조한다.",
+          "oracleRef": {
+            "oracleId": "T02.identifier-period-conflict",
+            "observationNames": [
+              "code-reconciliation"
+            ]
+          }
+        },
+        {
+          "id": "current-duty-state",
+          "op": "exactSet",
+          "source": {
+            "actionId": "db-after",
+            "pointer": "/data/rawRows/obligations",
+            "field": "status",
+            "where": {
+              "current": true
+            }
+          },
+          "expected": [
+            "OPEN"
+          ],
+          "requirementRefs": [
+            "D02"
+          ],
+          "evidenceRefs": [
+            "db-after:rawRows"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseNamespace": "T02-period-overlap"
+          },
+          "oracleExplanation": "이 사례의 실제 원 행과 응답을 고정 기대값에 대조한다.",
+          "oracleRef": {
+            "oracleId": "T02.identifier-period-conflict",
+            "observationNames": [
+              "code-reconciliation"
+            ]
+          }
+        },
+        {
+          "id": "duty-supervisor",
+          "op": "exactSet",
+          "source": {
+            "actionId": "db-after",
+            "pointer": "/data/rawRows/obligations",
+            "field": "supervisorId",
+            "where": {
+              "current": true
+            }
+          },
+          "expected": [
+            {
+              "$alias": "supervisor"
+            }
+          ],
+          "requirementRefs": [
+            "D02"
+          ],
+          "evidenceRefs": [
+            "db-after:rawRows"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseNamespace": "T02-period-overlap"
+          },
+          "oracleExplanation": "이 사례의 실제 원 행과 응답을 고정 기대값에 대조한다.",
+          "oracleRef": {
+            "oracleId": "T02.identifier-period-conflict",
+            "observationNames": [
+              "code-reconciliation"
+            ]
+          }
+        },
+        {
+          "id": "conflict-candidate-items",
+          "op": "relationSet",
+          "source": {
+            "actionId": "db-after",
+            "pointer": "/data/rawRows/reconciliations",
+            "field": [
+              "existingItemId",
+              "candidateItemId",
+              "issuer",
+              "namespace",
+              "code",
+              "status"
+            ]
+          },
+          "expected": [
+            [
+              {
+                "$alias": "P"
+              },
+              {
+                "$alias": "P2"
+              },
+              "IT-A",
+              "A",
+              "SKU1",
+              "CONFLICT"
+            ]
+          ],
+          "requirementRefs": [
+            "D02"
+          ],
+          "evidenceRefs": [
+            "db-after:rawRows"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseNamespace": "T02-period-overlap"
+          },
+          "oracleExplanation": "이 사례의 실제 원 행과 응답을 고정 기대값에 대조한다.",
+          "oracleRef": {
+            "oracleId": "T02.identifier-period-conflict",
+            "observationNames": [
+              "code-conflict"
+            ]
+          }
+        }
+      ],
+      "oracleExplanation": "동일 issuer 코드의 유효기간을 대조하고 이전 mapping을 보존한다. fixture는 가상값이며 실제 API와 독립 DB의 같은 scope/snapshot으로 검증한다. 미구현 adapter는 NOT_RUN이다."
+    },
+    {
+      "id": "period-boundary-nonoverlap",
+      "title": "동일 issuer 코드의 유효기간을 대조하고 이전 mapping을 보존한다",
+      "fixtureRef": "verification/cases/T02/fixtures/period-boundary-nonoverlap.json",
+      "requiredAdapters": [
+        "fixture",
+        "api",
+        "db"
+      ],
+      "actions": [
+        {
+          "id": "setup",
+          "kind": "installFixture",
+          "evidenceRefs": [
+            "setup:actual-artifact"
+          ]
+        },
+        {
+          "id": "first-link",
+          "kind": "invoke",
+          "evidenceRefs": [
+            "first-link:actual-artifact"
+          ],
+          "actorRef": "steward",
+          "route": "api",
+          "capabilityId": "linkExternalId",
+          "request": {
+            "intentKind": "COMMAND",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "linkExternalId",
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "caseNamespace": "T02-period-boundary-nonoverlap"
+            },
+            "subjectRefs": [],
+            "slots": {
+              "itemId": {
+                "$alias": "P"
+              },
+              "issuer": "IT-A",
+              "namespace": "A",
+              "code": "SKU1",
+              "validFrom": "2026-10-01T00:00:00Z",
+              "validUntil": "2026-10-07T09:00:00Z",
+              "endInclusive": false
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z",
+            "expectedRevision": 1,
+            "commandIdempotencyKey": "T02-period-boundary-nonoverlap-first-link"
+          }
+        },
+        {
+          "id": "before",
+          "kind": "query",
+          "evidenceRefs": [
+            "before:actual-artifact"
+          ],
+          "actorRef": "steward",
+          "route": "api",
+          "capabilityId": "getObject",
+          "request": {
+            "intentKind": "QUERY",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "getObject",
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "caseNamespace": "T02-period-boundary-nonoverlap"
+            },
+            "subjectRefs": [],
+            "slots": {},
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z"
+          }
+        },
+        {
+          "id": "db-before",
+          "kind": "observe",
+          "evidenceRefs": [
+            "db-before:actual-artifact"
+          ],
+          "observation": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "caseNamespace": "T02-period-boundary-nonoverlap"
+            },
+            "snapshotRef": {
+              "$result": {
+                "actionId": "before",
+                "pointer": "/response/snapshotRevision"
+              }
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z",
+            "sources": [
+              "externalIdentifiers",
+              "mergeRecords",
+              "segments",
+              "businessOutbox"
+            ]
+          }
+        },
+        {
+          "id": "second-link",
+          "kind": "invoke",
+          "evidenceRefs": [
+            "second-link:actual-artifact"
+          ],
+          "actorRef": "steward",
+          "route": "api",
+          "capabilityId": "linkExternalId",
+          "request": {
+            "intentKind": "COMMAND",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "linkExternalId",
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "caseNamespace": "T02-period-boundary-nonoverlap"
+            },
+            "subjectRefs": [],
+            "slots": {
+              "itemId": {
+                "$alias": "P2"
+              },
+              "issuer": "IT-A",
+              "namespace": "A",
+              "code": "SKU1",
+              "validFrom": "2026-10-07T09:00:00Z",
+              "validUntil": "2026-10-31T23:59:59Z",
+              "endInclusive": false
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z",
+            "expectedRevision": 1,
+            "commandIdempotencyKey": "T02-period-boundary-nonoverlap-second-link"
+          }
+        },
+        {
+          "id": "after",
+          "kind": "query",
+          "evidenceRefs": [
+            "after:actual-artifact"
+          ],
+          "actorRef": "steward",
+          "route": "api",
+          "capabilityId": "getObject",
+          "request": {
+            "intentKind": "QUERY",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "getObject",
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "caseNamespace": "T02-period-boundary-nonoverlap"
+            },
+            "subjectRefs": [],
+            "slots": {
+              "externalIdentifier": {
+                "issuer": "IT-A",
+                "namespace": "A",
+                "code": "SKU1"
+              },
+              "effectiveAt": "2026-10-07T09:00:00Z"
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z"
+          }
+        },
+        {
+          "id": "db-after",
+          "kind": "observe",
+          "evidenceRefs": [
+            "db-after:actual-artifact"
+          ],
+          "observation": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "caseNamespace": "T02-period-boundary-nonoverlap"
+            },
+            "snapshotRef": {
+              "$result": {
+                "actionId": "after",
+                "pointer": "/response/snapshotRevision"
+              }
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z",
+            "sources": [
+              "externalIdentifiers",
+              "mergeRecords",
+              "segments",
+              "businessOutbox",
+              "reconciliations",
+              "obligations",
+              "audit"
+            ]
+          }
+        }
+      ],
+      "assertions": [
+        {
+          "id": "nonoverlap-applied",
+          "op": "equals",
+          "source": {
+            "actionId": "second-link",
+            "pointer": "/response/outcome"
+          },
+          "expected": "APPLIED",
+          "requirementRefs": [
+            "D02"
+          ],
+          "evidenceRefs": [
+            "second-link:actual-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseNamespace": "T02-period-boundary-nonoverlap"
+          },
+          "oracleExplanation": "이 사례의 실제 원 행과 응답을 고정 기대값에 대조한다.",
+          "oracleRef": {
+            "oracleId": "T02.identifier-period-conflict",
+            "observationNames": [
+              "silent-remap"
+            ]
+          }
+        },
+        {
+          "id": "historical-mappings-preserved",
+          "op": "relationSet",
+          "source": {
+            "actionId": "db-after",
+            "pointer": "/data/rawRows/externalIdentifiers",
+            "field": [
+              "itemId",
+              "validFrom",
+              "validUntil",
+              "endInclusive"
+            ]
+          },
+          "expected": [
+            [
+              {
+                "$alias": "P"
+              },
+              "2026-10-01T00:00:00Z",
+              "2026-10-07T09:00:00Z",
+              false
+            ],
+            [
+              {
+                "$alias": "P2"
+              },
+              "2026-10-07T09:00:00Z",
+              "2026-10-31T23:59:59Z",
+              false
+            ]
+          ],
+          "requirementRefs": [
+            "D02"
+          ],
+          "evidenceRefs": [
+            "db-after:rawRows"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseNamespace": "T02-period-boundary-nonoverlap"
+          },
+          "oracleExplanation": "이 사례의 실제 원 행과 응답을 고정 기대값에 대조한다.",
+          "oracleRef": {
+            "oracleId": "T02.identifier-period-conflict",
+            "observationNames": [
+              "silent-remap"
+            ]
+          }
+        },
+        {
+          "id": "boundary-current-item",
+          "op": "equals",
+          "source": {
+            "actionId": "after",
+            "pointer": "/response/data/itemId"
+          },
+          "expected": {
+            "$alias": "P2"
+          },
+          "requirementRefs": [
+            "D02"
+          ],
+          "evidenceRefs": [
+            "after:actual-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseNamespace": "T02-period-boundary-nonoverlap"
+          },
+          "oracleExplanation": "이 사례의 실제 원 행과 응답을 고정 기대값에 대조한다.",
+          "oracleRef": {
+            "oracleId": "T02.identifier-period-conflict",
+            "observationNames": [
+              "silent-remap"
+            ]
+          }
+        },
+        {
+          "id": "unchanged-mergeRecords",
+          "op": "sameAs",
+          "source": {
+            "actionId": "db-after",
+            "pointer": "/data/rawRows/mergeRecords"
+          },
+          "expected": null,
+          "requirementRefs": [
+            "D02"
+          ],
+          "evidenceRefs": [
+            "db-after:rawRows",
+            "db-before:actual-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseNamespace": "T02-period-boundary-nonoverlap"
+          },
+          "oracleExplanation": "mergeRecords의 실제 전후 원 행이 동일하므로 해당 scope의 금지된 효과는0이다. 감사·대조 의무는 이 비교에서 제외한다.",
+          "oracleRef": {
+            "oracleId": "T02.identifier-period-conflict",
+            "observationNames": [
+              "silent-remap"
+            ]
+          },
+          "baseline": {
+            "actionId": "db-before",
+            "pointer": "/data/rawRows/mergeRecords"
+          }
+        },
+        {
+          "id": "unchanged-segments",
+          "op": "sameAs",
+          "source": {
+            "actionId": "db-after",
+            "pointer": "/data/rawRows/segments"
+          },
+          "expected": null,
+          "requirementRefs": [
+            "D02"
+          ],
+          "evidenceRefs": [
+            "db-after:rawRows",
+            "db-before:actual-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseNamespace": "T02-period-boundary-nonoverlap"
+          },
+          "oracleExplanation": "segments의 실제 전후 원 행이 동일하므로 해당 scope의 금지된 효과는0이다. 감사·대조 의무는 이 비교에서 제외한다.",
+          "oracleRef": {
+            "oracleId": "T02.identifier-period-conflict",
+            "observationNames": [
+              "silent-remap"
+            ]
+          },
+          "baseline": {
+            "actionId": "db-before",
+            "pointer": "/data/rawRows/segments"
+          }
+        },
+        {
+          "id": "unchanged-businessOutbox",
+          "op": "sameAs",
+          "source": {
+            "actionId": "db-after",
+            "pointer": "/data/rawRows/businessOutbox"
+          },
+          "expected": null,
+          "requirementRefs": [
+            "D02"
+          ],
+          "evidenceRefs": [
+            "db-after:rawRows",
+            "db-before:actual-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseNamespace": "T02-period-boundary-nonoverlap"
+          },
+          "oracleExplanation": "businessOutbox의 실제 전후 원 행이 동일하므로 해당 scope의 금지된 효과는0이다. 감사·대조 의무는 이 비교에서 제외한다.",
+          "oracleRef": {
+            "oracleId": "T02.identifier-period-conflict",
+            "observationNames": [
+              "silent-remap"
+            ]
+          },
+          "baseline": {
+            "actionId": "db-before",
+            "pointer": "/data/rawRows/businessOutbox"
+          }
+        }
+      ],
+      "oracleExplanation": "동일 issuer 코드의 유효기간을 대조하고 이전 mapping을 보존한다. fixture는 가상값이며 실제 API와 독립 DB의 같은 scope/snapshot으로 검증한다. 미구현 adapter는 NOT_RUN이다."
+    },
+    {
+      "id": "conversion-no-substitution",
+      "title": "1 BUNDLE의 내용량12 EA는 실물이나 주문 이행을 만들지 않는다",
+      "fixtureRef": "verification/cases/T02/fixtures/conversion-no-substitution.json",
+      "requiredAdapters": [
+        "fixture",
+        "api",
+        "db"
+      ],
+      "actions": [
+        {
+          "id": "setup",
+          "kind": "installFixture",
+          "evidenceRefs": [
+            "setup:actual-artifact"
+          ]
+        },
+        {
+          "id": "before",
+          "kind": "query",
+          "evidenceRefs": [
+            "before:actual-artifact"
+          ],
+          "actorRef": "steward",
+          "route": "api",
+          "capabilityId": "getInventory",
+          "request": {
+            "intentKind": "QUERY",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "getInventory",
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "caseNamespace": "T02-conversion-no-substitution"
+            },
+            "subjectRefs": [],
+            "slots": {
+              "itemId": {
+                "$alias": "P_BUNDLE"
+              },
+              "placeId": {
+                "$alias": "W"
+              }
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z"
+          }
+        },
+        {
+          "id": "db-before",
+          "kind": "observe",
+          "evidenceRefs": [
+            "db-before:actual-artifact"
+          ],
+          "observation": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "caseNamespace": "T02-conversion-no-substitution"
+            },
+            "snapshotRef": {
+              "$result": {
+                "actionId": "before",
+                "pointer": "/response/snapshotRevision"
+              }
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z",
+            "sources": [
+              "segments",
+              "movements",
+              "fulfilments",
+              "activities",
+              "businessOutbox"
+            ]
+          }
+        },
+        {
+          "id": "convert",
+          "kind": "query",
+          "evidenceRefs": [
+            "convert:actual-artifact"
+          ],
+          "actorRef": "steward",
+          "route": "api",
+          "capabilityId": "convertUnit",
+          "request": {
+            "intentKind": "QUERY",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "convertUnit",
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "caseNamespace": "T02-conversion-no-substitution"
+            },
+            "subjectRefs": [],
+            "slots": {
+              "conversionId": {
+                "$alias": "CONVERSION"
+              },
+              "from": {
+                "value": "1",
+                "unit": "BUNDLE"
+              },
+              "toUnit": "EA",
+              "conversionVersion": "conversion-v1",
+              "itemId": {
+                "$alias": "P_BUNDLE"
+              }
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z"
+          }
+        },
+        {
+          "id": "substitution",
+          "kind": "query",
+          "evidenceRefs": [
+            "substitution:actual-artifact"
+          ],
+          "actorRef": "steward",
+          "route": "api",
+          "capabilityId": "evaluateEligibility",
+          "request": {
+            "intentKind": "QUERY",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "evaluateEligibility",
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "caseNamespace": "T02-conversion-no-substitution"
+            },
+            "subjectRefs": [],
+            "slots": {
+              "action": "FULFIL_ORDER",
+              "candidateItemId": {
+                "$alias": "P_BUNDLE"
+              },
+              "requestedItemId": {
+                "$alias": "P_EA"
+              },
+              "quantity": {
+                "value": "12",
+                "unit": "EA"
+              },
+              "substitutionPermission": "MISSING"
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z"
+          }
+        },
+        {
+          "id": "after",
+          "kind": "query",
+          "evidenceRefs": [
+            "after:actual-artifact"
+          ],
+          "actorRef": "steward",
+          "route": "api",
+          "capabilityId": "getInventory",
+          "request": {
+            "intentKind": "QUERY",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "getInventory",
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "caseNamespace": "T02-conversion-no-substitution"
+            },
+            "subjectRefs": [],
+            "slots": {
+              "itemId": {
+                "$alias": "P_BUNDLE"
+              },
+              "placeId": {
+                "$alias": "W"
+              }
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z"
+          }
+        },
+        {
+          "id": "db-after",
+          "kind": "observe",
+          "evidenceRefs": [
+            "db-after:actual-artifact"
+          ],
+          "observation": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "caseNamespace": "T02-conversion-no-substitution"
+            },
+            "snapshotRef": {
+              "$result": {
+                "actionId": "after",
+                "pointer": "/response/snapshotRevision"
+              }
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z",
+            "sources": [
+              "segments",
+              "movements",
+              "fulfilments",
+              "activities",
+              "businessOutbox",
+              "unitConversions",
+              "audit"
+            ]
+          }
+        }
+      ],
+      "assertions": [
+        {
+          "id": "conversion-source-row",
+          "op": "relationSet",
+          "source": {
+            "actionId": "db-after",
+            "pointer": "/data/rawRows/unitConversions",
+            "field": [
+              "id",
+              "fromItemId",
+              "fromValue",
+              "fromUnit",
+              "toItemId",
+              "toValue",
+              "toUnit",
+              "version"
+            ]
+          },
+          "expected": [
+            [
+              {
+                "$alias": "CONVERSION"
+              },
+              {
+                "$alias": "P_BUNDLE"
+              },
+              "1",
+              "BUNDLE",
+              {
+                "$alias": "P_EA"
+              },
+              "12",
+              "EA",
+              "conversion-v1"
+            ]
+          ],
+          "requirementRefs": [
+            "D02"
+          ],
+          "evidenceRefs": [
+            "db-after:rawRows"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseNamespace": "T02-conversion-no-substitution"
+          },
+          "oracleExplanation": "이 사례의 실제 원 행과 응답을 고정 기대값에 대조한다.",
+          "oracleRef": {
+            "oracleId": "T02.conversion-not-substitution",
+            "observationNames": [
+              "converted-content"
+            ]
+          }
+        },
+        {
+          "id": "converted-content-12",
+          "op": "decimalEquals",
+          "source": {
+            "actionId": "convert",
+            "pointer": "/response/data/quantity/value"
+          },
+          "expected": "12",
+          "requirementRefs": [
+            "D02"
+          ],
+          "evidenceRefs": [
+            "convert:actual-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseNamespace": "T02-conversion-no-substitution"
+          },
+          "oracleExplanation": "독립 계산1 BUNDLE×12 EA/BUNDLE=12 EA다. 이는 내용량 표시이며12개 실물 생성이 아니다.",
+          "oracleRef": {
+            "oracleId": "T02.conversion-not-substitution",
+            "observationNames": [
+              "converted-content"
+            ]
+          },
+          "unit": "EA",
+          "unitSource": {
+            "actionId": "convert",
+            "pointer": "/response/data/quantity/unit"
+          }
+        },
+        {
+          "id": "reverse-original-unit",
+          "op": "equals",
+          "source": {
+            "actionId": "convert",
+            "pointer": "/response/data/sourceQuantity"
+          },
+          "expected": {
+            "value": "1",
+            "unit": "BUNDLE"
+          },
+          "requirementRefs": [
+            "D02"
+          ],
+          "evidenceRefs": [
+            "convert:actual-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseNamespace": "T02-conversion-no-substitution"
+          },
+          "oracleExplanation": "이 사례의 실제 원 행과 응답을 고정 기대값에 대조한다.",
+          "oracleRef": {
+            "oracleId": "T02.conversion-not-substitution",
+            "observationNames": [
+              "converted-content"
+            ]
+          }
+        },
+        {
+          "id": "substitution-unverified",
+          "op": "equals",
+          "source": {
+            "actionId": "substitution",
+            "pointer": "/response/data/substitution/result"
+          },
+          "expected": "UNVERIFIED",
+          "requirementRefs": [
+            "D02"
+          ],
+          "evidenceRefs": [
+            "substitution:actual-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseNamespace": "T02-conversion-no-substitution"
+          },
+          "oracleExplanation": "이 사례의 실제 원 행과 응답을 고정 기대값에 대조한다.",
+          "oracleRef": {
+            "oracleId": "T02.conversion-not-substitution",
+            "observationNames": [
+              "substitution"
+            ]
+          }
+        },
+        {
+          "id": "substitution-missing",
+          "op": "equals",
+          "source": {
+            "actionId": "substitution",
+            "pointer": "/response/data/substitution/basisState"
+          },
+          "expected": "MISSING",
+          "requirementRefs": [
+            "D02"
+          ],
+          "evidenceRefs": [
+            "substitution:actual-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseNamespace": "T02-conversion-no-substitution"
+          },
+          "oracleExplanation": "이 사례의 실제 원 행과 응답을 고정 기대값에 대조한다.",
+          "oracleRef": {
+            "oracleId": "T02.conversion-not-substitution",
+            "observationNames": [
+              "substitution"
+            ]
+          }
+        },
+        {
+          "id": "unchanged-segments",
+          "op": "sameAs",
+          "source": {
+            "actionId": "db-after",
+            "pointer": "/data/rawRows/segments"
+          },
+          "expected": null,
+          "requirementRefs": [
+            "D02"
+          ],
+          "evidenceRefs": [
+            "db-after:rawRows",
+            "db-before:actual-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseNamespace": "T02-conversion-no-substitution"
+          },
+          "oracleExplanation": "segments의 실제 전후 원 행이 동일하므로 해당 scope의 금지된 효과는0이다. 감사·대조 의무는 이 비교에서 제외한다.",
+          "oracleRef": {
+            "oracleId": "T02.conversion-not-substitution",
+            "observationNames": [
+              "conversion-created-inventory"
+            ]
+          },
+          "baseline": {
+            "actionId": "db-before",
+            "pointer": "/data/rawRows/segments"
+          }
+        },
+        {
+          "id": "unchanged-movements",
+          "op": "sameAs",
+          "source": {
+            "actionId": "db-after",
+            "pointer": "/data/rawRows/movements"
+          },
+          "expected": null,
+          "requirementRefs": [
+            "D02"
+          ],
+          "evidenceRefs": [
+            "db-after:rawRows",
+            "db-before:actual-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseNamespace": "T02-conversion-no-substitution"
+          },
+          "oracleExplanation": "movements의 실제 전후 원 행이 동일하므로 해당 scope의 금지된 효과는0이다. 감사·대조 의무는 이 비교에서 제외한다.",
+          "oracleRef": {
+            "oracleId": "T02.conversion-not-substitution",
+            "observationNames": [
+              "conversion-created-inventory"
+            ]
+          },
+          "baseline": {
+            "actionId": "db-before",
+            "pointer": "/data/rawRows/movements"
+          }
+        },
+        {
+          "id": "unchanged-fulfilments",
+          "op": "sameAs",
+          "source": {
+            "actionId": "db-after",
+            "pointer": "/data/rawRows/fulfilments"
+          },
+          "expected": null,
+          "requirementRefs": [
+            "D02"
+          ],
+          "evidenceRefs": [
+            "db-after:rawRows",
+            "db-before:actual-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseNamespace": "T02-conversion-no-substitution"
+          },
+          "oracleExplanation": "fulfilments의 실제 전후 원 행이 동일하므로 해당 scope의 금지된 효과는0이다. 감사·대조 의무는 이 비교에서 제외한다.",
+          "oracleRef": {
+            "oracleId": "T02.conversion-not-substitution",
+            "observationNames": [
+              "conversion-created-order-fulfilment"
+            ]
+          },
+          "baseline": {
+            "actionId": "db-before",
+            "pointer": "/data/rawRows/fulfilments"
+          }
+        },
+        {
+          "id": "unchanged-activities",
+          "op": "sameAs",
+          "source": {
+            "actionId": "db-after",
+            "pointer": "/data/rawRows/activities"
+          },
+          "expected": null,
+          "requirementRefs": [
+            "D02"
+          ],
+          "evidenceRefs": [
+            "db-after:rawRows",
+            "db-before:actual-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseNamespace": "T02-conversion-no-substitution"
+          },
+          "oracleExplanation": "activities의 실제 전후 원 행이 동일하므로 해당 scope의 금지된 효과는0이다. 감사·대조 의무는 이 비교에서 제외한다.",
+          "oracleRef": {
+            "oracleId": "T02.conversion-not-substitution",
+            "observationNames": [
+              "repackaging-effects"
+            ]
+          },
+          "baseline": {
+            "actionId": "db-before",
+            "pointer": "/data/rawRows/activities"
+          }
+        },
+        {
+          "id": "unchanged-businessOutbox",
+          "op": "sameAs",
+          "source": {
+            "actionId": "db-after",
+            "pointer": "/data/rawRows/businessOutbox"
+          },
+          "expected": null,
+          "requirementRefs": [
+            "D02"
+          ],
+          "evidenceRefs": [
+            "db-after:rawRows",
+            "db-before:actual-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseNamespace": "T02-conversion-no-substitution"
+          },
+          "oracleExplanation": "businessOutbox의 실제 전후 원 행이 동일하므로 해당 scope의 금지된 효과는0이다. 감사·대조 의무는 이 비교에서 제외한다.",
+          "oracleRef": {
+            "oracleId": "T02.conversion-not-substitution",
+            "observationNames": [
+              "repackaging-effects"
+            ]
+          },
+          "baseline": {
+            "actionId": "db-before",
+            "pointer": "/data/rawRows/businessOutbox"
+          }
+        },
+        {
+          "id": "held-bundle-delta",
+          "op": "decimalDelta",
+          "source": {
+            "actionId": "after",
+            "pointer": "/response/data/heldQuantity"
+          },
+          "expected": "0",
+          "requirementRefs": [
+            "D02"
+          ],
+          "evidenceRefs": [
+            "after:actual-artifact",
+            "before:actual-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseNamespace": "T02-conversion-no-substitution"
+          },
+          "oracleExplanation": "이 사례의 실제 원 행과 응답을 고정 기대값에 대조한다.",
+          "oracleRef": {
+            "oracleId": "T02.conversion-not-substitution",
+            "observationNames": [
+              "conversion-created-inventory"
+            ]
+          },
+          "baseline": {
+            "actionId": "before",
+            "pointer": "/response/data/heldQuantity"
+          },
+          "unit": "BUNDLE",
+          "unitSource": {
+            "actionId": "after",
+            "pointer": "/response/data/unit"
+          },
+          "baselineUnitSource": {
+            "actionId": "before",
+            "pointer": "/response/data/unit"
+          }
+        }
+      ],
+      "oracleExplanation": "1 BUNDLE의 내용량12 EA는 실물이나 주문 이행을 만들지 않는다. fixture는 가상값이며 실제 API와 독립 DB의 같은 scope/snapshot으로 검증한다. 미구현 adapter는 NOT_RUN이다."
+    }
+  ]
+}
