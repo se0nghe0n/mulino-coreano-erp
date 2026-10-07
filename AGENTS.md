@@ -36,6 +36,12 @@ Step로 넘어간다.
 runtime control로 지정한다. prompt에 이름을 쓰는 것으로 대신하지
 않는다. 이 선택이 이전 모델 기본값보다 우선한다.
 
+2026-10-08 사용자의 추가 지시에 따라 모든 에이전트는 지원되는 경우
+Ultrafast를 우선하고, 그렇지 않으면 Fast를 사용한다. 모델과 reasoning
+effort는 아래 지정을 유지한다. 속도는 실제 service tier 설정이며 prompt
+문구로 변경했다고 주장하지 않는다. 도구가 tier 변경이나 확인을 노출하지
+않으면 그 제한을 밝힌다. `priority`는 공식 Fast와 같은 tier다.
+
 | 사용자 Step | 작업 | 모델 | effort |
 |---|---|---|---|
 | 1 | 새 개발·업무 skills 구성 | GPT-6.1 Sol | high |
