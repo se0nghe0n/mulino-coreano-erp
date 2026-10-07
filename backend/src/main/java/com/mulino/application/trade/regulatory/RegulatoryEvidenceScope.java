@@ -1,0 +1,28 @@
+package com.mulino.application.trade.regulatory;
+import com.mulino.application.core.*;
+import com.mulino.application.trade.TradeEvidenceScopePort;
+import com.mulino.domain.trade.regulatory.RegulatoryRepository;
+import com.mulino.domain.inventory.InventoryRepository;
+import com.fasterxml.jackson.databind.*;
+import java.util.*;
+import java.math.BigDecimal;
+import org.springframework.stereotype.Component;
+import static com.mulino.application.trade.regulatory.RegulatoryInputs.*;
+@Component
+public class RegulatoryEvidenceScope implements TradeEvidenceScopePort {
+ private final RegulatoryRepository r;private final InventoryRepository stock;
+ public RegulatoryEvidenceScope(RegulatoryRepository r,InventoryRepository stock){this.r=r;this.stock=stock;}
+ public Set<String> eventKinds(){return Set.of("REGULATORY_DECISION","REGULATORY_SUBMISSION","LABEL_VERIFICATION");}
+ public Scope require(DomainContext c,String physical,Map<String,Object> claim,Map<String,Object> event,Map<String,Object> document,byte[] original){try{
+  var mapper=new ObjectMapper();JsonNode originalJson=mapper.readTree(original),payload=mapper.readTree(event.get("payload").toString());if(!originalJson.isObject()||!payload.isObject())throw RegulatoryEvidence.held();
+  var fields=mapper.convertValue(payload,new com.fasterxml.jackson.core.type.TypeReference<Map<String,Object>>(){});String pid=id(fields,"procedureId"),versionId=id(fields,"procedureVersionId");var proc=r.require(c,"Procedures",pid);var version=r.require(c,"ProcedureVersions",versionId);var policy=r.require(c,"Policies",proc.get("policyId").toString());var seg=stock.current(c,"QuantitySegments",physical);
+  if(!pid.equals(version.get("procedureId"))||!physical.equals(proc.get("physicalScopeId"))||!Objects.equals(seg.get("itemId"),proc.get("itemId"))||!Objects.equals(seg.get("lotId"),proc.get("lotId"))||!"IDENTIFIED".equals(seg.get("mixtureStatus"))||!"CONFIRMED".equals(seg.get("identificationStatus")))throw RegulatoryEvidence.held();
+  var expected=new LinkedHashMap<String,Object>();for(String key:List.of("itemId","lotId","physicalScopeId"))expected.put(key,proc.get(key));expected.put("procedureId",pid);expected.put("procedureVersionId",versionId);expected.put("authority",policy.get("authority"));expected.put("policyVersion",policy.get("version"));
+  String kind=event.get("kind").toString();if(!policy.get("sourceNamespace").equals(event.get("sourceNamespace")))throw RegulatoryEvidence.held();
+  if(kind.equals("REGULATORY_DECISION")){if(!"SUBMITTED".equals(version.get("status"))||!Set.of("ALLOWED","REJECTED","SUPPLEMENTARY_REQUIRED","REVOKED").contains(text(fields,"decision"))||!policy.get("action").equals(text(fields,"action")))throw RegulatoryEvidence.held();BigDecimal start=quantity(fields,"startQuantity"),amount=quantity(fields,"quantity");if(start.add(amount).compareTo(new BigDecimal(seg.get("quantity").toString()))>0||claim.get("quantity")==null||amount.compareTo(new BigDecimal(claim.get("quantity").toString()))!=0||!seg.get("unit").equals(fields.get("unit"))||!seg.get("unit").equals(claim.get("unit")))throw RegulatoryEvidence.held();for(String k:List.of("decision","action","startQuantity","quantity","unit","validFrom"))expected.put(k,text(fields,k));}
+  else if(kind.equals("REGULATORY_SUBMISSION")){if(!Set.of("PREPARED","SUBMISSION_UNCONFIRMED").contains(version.get("status"))||claim.get("quantity")!=null)throw RegulatoryEvidence.held();expected.put("occurredAt",text(fields,"occurredAt"));}
+  else{if(!Set.of("VERIFIED","REJECTED").contains(text(fields,"decision"))||claim.get("quantity")!=null)throw RegulatoryEvidence.held();var item=stock.current(c,"TradeItems",proc.get("itemId").toString());for(String k:List.of("packagingVersionId","specificationVersionId")){if(!item.get(k).equals(id(fields,k)))throw RegulatoryEvidence.held();expected.put(k,fields.get(k));}expected.put("decision",text(fields,"decision"));expected.put("validFrom",text(fields,"validFrom"));}
+  if(fields.containsKey("validUntil"))expected.put("validUntil",text(fields,"validUntil"));for(var e:expected.entrySet())if(!String.valueOf(e.getValue()).equals(originalJson.path(e.getKey()).asText())||!String.valueOf(e.getValue()).equals(payload.path(e.getKey()).asText()))throw RegulatoryEvidence.held();
+  var trusted=new LinkedHashMap<String,Object>();trusted.put("itemId",proc.get("itemId"));trusted.put("workId",proc.get("workId"));if(seg.get("placeId")!=null)trusted.put("placeId",seg.get("placeId"));return new Scope(trusted,Map.of("ITEM",List.of(proc.get("itemId").toString()),"WORK",List.of(proc.get("workId").toString()),"TARGET",List.of(pid,physical),"SOURCE",List.of(event.get("sourceProfileId").toString())));
+ }catch(java.io.IOException|IllegalArgumentException invalid){throw RegulatoryEvidence.held();}}
+}
