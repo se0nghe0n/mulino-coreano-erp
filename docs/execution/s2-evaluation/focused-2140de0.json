@@ -1,0 +1,79 @@
+{
+  "sourceCommit": "2140de0",
+  "stepBaseline": "40a240c3886d3316ba1fd686e9b44bfa1ba6ec2d",
+  "command": "PATH=<bundled-node24>:$PATH ./mvnw -B -ntp -f backend/pom.xml -Dtest=AssessmentPostgresTest,DefinitionValidatorTest,TypedPredicateEvaluatorTest test",
+  "temporaryLocalModelImports": [
+    "mulino.evaluation",
+    "mulino.work",
+    "mulino.responsibility"
+  ],
+  "result": "PASS",
+  "tests": 22,
+  "failures": 0,
+  "errors": 0,
+  "skipped": 0,
+  "elapsedSeconds": 12.06,
+  "finishedAt": "2026-10-08T03:36:02+09:00",
+  "businessClock": "2026-10-08T00:10:00Z",
+  "fixtureBusinessBase": "2026-10-08T00:00:00Z",
+  "fixtureKnownAt": "2026-10-08T00:16:40Z",
+  "postgresImage": "postgres@sha256:4ef4dbc939d61acea57712655ddb4b4ab27419c913f94cca0cd57cb3ea3c2280",
+  "scope": "Direct Spring+CQN/PostgreSQL service + pure evaluator/definition validation; not public HTTP/MCP/paid UAT",
+  "logSha256": "4463931deb1e4695cfe381e33485a0f7274c7e7819b9338332e71d56b441ca85",
+  "fixtures": {
+    "backend/src/test/java/com/mulino/AssessmentPostgresTest.java": "cd33dea505fb6f73c2fdd16313a62c860d5bb1ef9def4d513c7fd3fbb24ec7aa",
+    "backend/src/test/java/com/mulino/TypedPredicateEvaluatorTest.java": "b93df3df3933e6ee20f5f7424e263f18cb6026d3ea9cbb71939ffad95bce3594",
+    "backend/src/test/java/com/mulino/DefinitionValidatorTest.java": "652928e92ef11b03cc1a1b5068631b64409f8132068cb91bb39d7bbbfd0c345b"
+  },
+  "classes": [
+    {
+      "name": "com.mulino.AssessmentPostgresTest",
+      "tests": 3,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "testcases": [
+        "immutableGoalPeriodEndpointsControlActualCanonicalContribution",
+        "unknownAndUnsupportedPinnedEvaluatorRemainHeld",
+        "physicalDedupTargetLateArrivalAndImmutablePastAreActual"
+      ]
+    },
+    {
+      "name": "com.mulino.TypedPredicateEvaluatorTest",
+      "tests": 10,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "testcases": [
+        "throughputGapIsUnknownEvenWithSatisfiedEndpoints",
+        "rawClaimsAndMissingDataRemainUnknown",
+        "conflictDoesNotDisappearUnderAny",
+        "parentHundredWithOnlyNinetyIsNotFulfilled",
+        "cardinalityUsesDistinctCurrentTargetsAndKnowledgeBoundary",
+        "samePhysicalReceiptAcrossSourcesIsCountedOnce",
+        "equalInRangeAndNotPreserveTypedFacts",
+        "intervalEndpointsUseExplicitGoalInclusivity",
+        "currentStateRetiredParentAndActiveChildrenAreNotDoubleCounted",
+        "exactTimeEndpointsRespectInclusivity"
+      ]
+    },
+    {
+      "name": "com.mulino.DefinitionValidatorTest",
+      "tests": 9,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "testcases": [
+        "stageAndReservedExtensionFailClosed",
+        "publishedFixtureHasValidTypesCardinalityAndManifest",
+        "recursivePredicateAndOperandSizesAreBounded",
+        "storedFixtureHashAndSemanticManifestMatch",
+        "quantitiesRequirePinnedTypedUnitBoundsAndVerifiedSelector",
+        "unknownAndConflictSurviveLogicalOperations",
+        "decimalRequiresExactStringCompatibleUnitAndNoRounding",
+        "datesCannotBePlacesAndCardinalityIsEnforced",
+        "injectedOperatorsAndPropertiesFailClosed"
+      ]
+    }
+  ]
+}
