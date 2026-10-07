@@ -121,3 +121,30 @@ CompletionBindings, ResolutionCredits는 fixture로 저장하지 않는다.
 credit을 확인한다. 각 source phase의 namespace는 고유하다.
 
 이 확장의 native 실행은 combined backend JAR에서 아직 수행하지 않았다.
+
+### 실제 통합 실행 결과 — 2026-10-08
+
+최신 S2 backend를 adapter worktree에 병합한 dependency commit은
+`dc12ba3`이다. root는 이 merge를 가져오지 않고 adapter OWN commit만
+통합한다. typed noun 객체, 실제 supervisor 위임 root의 권한,
+COMMAND policy, 명시적인 기간 양쪽 경계, 독립 SQL 관찰 receipt,
+현재 Work revision으로 native fixture의 누락을 수정했다.
+
+`412a750`의 clean source에서 만든 JAR로 실행한 `native10`은 48개의
+bounded assertion을 통과했다. 실제 createWork, 90 BOX UNSATISFIED,
+100 BOX SATISFIED, 미해결 duty의 종료 거절, 원본 응답의 HTTP review와
+link, 재판정, duty resolve, FULFILLED close, 독립 SQL과 동일 snapshot
+noun/verb read를 확인했다. 요청 interval이 겹쳤지만 server barrier를
+통제한 증거는 아니다. focused harness test는 14개를 통과했다.
+
+`checks/2026-10-08-native-loop/manifest.json`에 실패한 native5–9와
+성공한 native10의 source/JAR/archive/file hash와 cleanup을 보존했다.
+archive에는 원본 action artifact, actual SQL과 bound parameter,
+원본 blob의 hash, fixture read receipt, backend/PostgreSQL log가 있다.
+모든 disposable server/container/key/blob cleanup이 완료되었다.
+첫 build의 CDS dependency 누락도 별도 log로 남겼다.
+
+full normative gate는 여전히 false이다. 이 결과는 whole T11 또는
+41 case 전체 PASS를 뜻하지 않는다. independent shared-world API hash
+재구성, worker kill/restart·external effect, Host M47, paid model/BTP
+실행은 이 native subset의 검증 범위 밖이다.
