@@ -1,0 +1,77 @@
++ java -version
+openjdk version "21.0.5" 2024-10-15 LTS
+OpenJDK Runtime Environment Zulu21.38+21-CA (build 21.0.5+11-LTS)
+OpenJDK 64-Bit Server VM Zulu21.38+21-CA (build 21.0.5+11-LTS, mixed mode, sharing)
+exitCode=0
++ /Volumes/VideoStore/Developer/mulino-ontology-step2-harness/mvnw -version
+Apache Maven 3.9.16 (2bdd9fddda4b155ebf8000e807eb73fd829a51d5)
+Maven home: /Users/n30gu1/.m2/wrapper/dists/apache-maven-3.9.16/56ba1f9f
+Java version: 21.0.5, vendor: Azul Systems, Inc., runtime: /Library/Java/JavaVirtualMachines/zulu-21.jdk/Contents/Home
+Default locale: en_KR, platform encoding: UTF-8
+OS name: "mac os x", version: "27.0.1", arch: "aarch64", family: "mac"
+exitCode=0
++ /Volumes/VideoStore/Developer/mulino-ontology-step2-harness/mvnw -B -ntp -f /Volumes/VideoStore/Developer/mulino-ontology-step2-harness/verification/harness/pom.xml test
+[INFO] Scanning for projects...
+[INFO]
+[INFO] -------------------< org.mulino:acceptance-harness >--------------------
+[INFO] Building acceptance-harness 1.0.0
+[INFO]   from pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO]
+[INFO] --- resources:3.4.0:resources (default-resources) @ acceptance-harness ---
+[INFO] skip non existing resourceDirectory /Volumes/VideoStore/Developer/mulino-ontology-step2-harness/verification/harness/src/main/resources
+[INFO]
+[INFO] --- compiler:3.14.1:compile (default-compile) @ acceptance-harness ---
+[INFO] Recompiling the module because of changed source code.
+[INFO] Compiling 11 source files with javac [debug release 21] to target/classes
+[INFO] /Volumes/VideoStore/Developer/mulino-ontology-step2-harness/verification/harness/src/main/java/org/mulino/verification/AssertionEngine.java: Some input files use or override a deprecated API.
+[INFO] /Volumes/VideoStore/Developer/mulino-ontology-step2-harness/verification/harness/src/main/java/org/mulino/verification/AssertionEngine.java: Recompile with -Xlint:deprecation for details.
+[INFO]
+[INFO] --- resources:3.4.0:testResources (default-testResources) @ acceptance-harness ---
+[INFO] Copying 6 resources from src/test/resources to target/test-classes
+[INFO]
+[INFO] --- compiler:3.14.1:testCompile (default-testCompile) @ acceptance-harness ---
+[INFO] Recompiling the module because of changed dependency.
+[INFO] Compiling 9 source files with javac [debug release 21] to target/test-classes
+[INFO] /Volumes/VideoStore/Developer/mulino-ontology-step2-harness/verification/harness/src/test/java/org/mulino/verification/AssertionEngineTest.java: Some input files use or override a deprecated API.
+[INFO] /Volumes/VideoStore/Developer/mulino-ontology-step2-harness/verification/harness/src/test/java/org/mulino/verification/AssertionEngineTest.java: Recompile with -Xlint:deprecation for details.
+[INFO]
+[INFO] --- surefire:3.5.6:test (default-test) @ acceptance-harness ---
+[INFO] Using auto detected provider org.apache.maven.surefire.junitplatform.JUnitPlatformProvider
+[INFO]
+[INFO] -------------------------------------------------------
+[INFO]  T E S T S
+[INFO] -------------------------------------------------------
+[INFO] Running org.mulino.verification.ReviewContractTest
+SLF4J(W): No SLF4J providers were found.
+SLF4J(W): Defaulting to no-operation (NOP) logger implementation
+SLF4J(W): See https://www.slf4j.org/codes.html#noProviders for further details.
+[INFO] Tests run: 7, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.249 s -- in org.mulino.verification.ReviewContractTest
+[INFO] Running org.mulino.verification.ReferenceResolverTest
+[INFO] Tests run: 7, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.007 s -- in org.mulino.verification.ReferenceResolverTest
+[INFO] Running org.mulino.verification.AssertionEngineTest
+[INFO] Tests run: 13, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.014 s -- in org.mulino.verification.AssertionEngineTest
+[INFO] Running org.mulino.verification.ContractValidatorTest
+[INFO] Tests run: 7, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.027 s -- in org.mulino.verification.ContractValidatorTest
+[INFO] Running org.mulino.verification.RunnerPortTest
+[INFO] Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.007 s -- in org.mulino.verification.RunnerPortTest
+[INFO] Running org.mulino.verification.HarnessTest
+
+@harness-selftest
+시나리오: 고정 표본은 제품 실행 증거가 아니다                       # classpath:features/harness-smoke.feature:4
+  ✔ 먼저 고정 관찰 표본과 독립 기대값을 읽는다                     # org.mulino.verification.ScenarioGlue.canned()
+  ✔ 만일 표본 수량과 책임을 assertion으로 검사한다               # org.mulino.verification.ScenarioGlue.checkCanned()
+  ✔ 그러면 제품 실행 coverage 없이 11개 assertion 자체가 통과한다 # org.mulino.verification.ScenarioGlue.count(int)
+[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.088 s -- in org.mulino.verification.HarnessTest
+[INFO]
+[INFO] Results:
+[INFO]
+[INFO] Tests run: 37, Failures: 0, Errors: 0, Skipped: 0
+[INFO]
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  1.839 s
+[INFO] Finished at: 2026-10-07T22:31:51+09:00
+[INFO] ------------------------------------------------------------------------
+exitCode=0

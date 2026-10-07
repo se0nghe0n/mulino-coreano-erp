@@ -1,0 +1,37 @@
+[
+  {
+    "command": [
+      "./verify",
+      "validate",
+      "verification/harness/src/test/resources/examples/HARNESS-EXAMPLE/case.json"
+    ],
+    "exitCode": 0,
+    "log": "verification/harness/target/case-author-contract-validate.log"
+  },
+  {
+    "command": [
+      "./verify",
+      "contract-red"
+    ],
+    "exitCode": 1,
+    "log": "verification/harness/target/case-author-contract-contract-red.log"
+  },
+  {
+    "command": [
+      "./verify",
+      "contract-red",
+      "verification/harness/src/test/resources/examples/HARNESS-EXAMPLE/case.json"
+    ],
+    "exitCode": 1,
+    "log": "verification/harness/target/case-author-contract-contract-red-explicit.log"
+  },
+  {
+    "command": [
+      "./verify",
+      "scenarios",
+      "verification/harness/src/test/resources/examples/HARNESS-EXAMPLE/case.json"
+    ],
+    "exitCode": 2,
+    "log": "verification/harness/target/case-author-contract-scenarios.log"
+  }
+]

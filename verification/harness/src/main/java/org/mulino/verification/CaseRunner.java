@@ -44,8 +44,8 @@ public final class CaseRunner {
         try {
             result=driver.availableAdapters().isEmpty() && !kind.equals("parallel") ? StepResult.missing(id,"NOT_IMPLEMENTED: no real product adapters installed") : switch(kind) {
                 case "installFixture" -> driver.installFixture(id,fixtureBundle());
-                case "invoke" -> driver.invoke(id,Json.required(a,"route"),actor(a),Json.required(a,"capabilityId"),resolve(a.path("request")));
-                case "query" -> driver.query(id,Json.required(a,"route"),actor(a),Json.required(a,"capabilityId"),resolve(a.path("request")));
+                case "invoke" -> a.has("protocolOperation") ? driver.wire(id,actor(a),Json.required(a,"protocolOperation"),resolve(a.path("request"))) : driver.invoke(id,Json.required(a,"route"),actor(a),Json.required(a,"capabilityId"),resolve(a.path("request")));
+                case "query" -> a.has("protocolOperation") ? driver.wire(id,actor(a),Json.required(a,"protocolOperation"),resolve(a.path("request"))) : driver.query(id,Json.required(a,"route"),actor(a),Json.required(a,"capabilityId"),resolve(a.path("request")));
                 case "observe" -> driver.observe(id,resolve(a.path("observation")));
                 case "control" -> driver.control(id,resolve(a.path("control")));
                 case "agent" -> agentRunner.run(id,Json.required(a,"route"),actor(a),resolve(a),driver);
@@ -87,6 +87,13 @@ public final class CaseRunner {
                     throw new IllegalArgumentException("Observer "+field+" differs from requested context");
                 if(!result.data().path("snapshotRevision").equals(requested.path("snapshotRef")) || !result.data().path("snapshot").path("id").equals(requested.path("snapshotRef")))
                     throw new IllegalArgumentException("Observer actual snapshot id/snapshotRevision differs from requested snapshotRef");
+                for(JsonNode source:requested.path("sources")) {
+                    String name=source.asText();JsonNode rows=result.data().path("rawRows").path(name),evidence=result.data().path("sourceEvidence").path(name);
+                    if(!rows.isArray() || !evidence.path("complete").asBoolean(false) || !evidence.path("rowPointer").asText().equals("/rawRows/"+name.replace("~","~0").replace("/","~1")))
+                        throw new IllegalArgumentException("Requested raw source incomplete/missing: "+name);
+                    String artifact=Json.required(evidence,"artifactRef");
+                    if(!result.artifactRefs().contains(artifact) || !java.nio.file.Files.isRegularFile(validator.path(artifact))) throw new IllegalArgumentException("Requested raw source artifact missing: "+name);
+                }
                 if(!result.data().path("snapshot").equals(result.provenance().path("snapshot")) || !result.data().path("sourceQuery").equals(result.provenance().path("sourceQuery")))
                     throw new IllegalArgumentException("Observer data snapshot/sourceQuery differ from actual provenance");
             }
@@ -133,22 +140,11 @@ public final class CaseRunner {
         }
         bundle.set("bases",bases);return bundle;
     }
-    private JsonNode resolve(JsonNode node) {
-        if(node.isObject() && node.has("$alias")) {
-            JsonNode value=aliases.get(node.path("$alias").asText());
-            if(value==null || value.isNull()) throw new IllegalArgumentException("Unresolved server fixture alias "+node.path("$alias")); return value;
-        }
-        if(node.isObject() && node.has("$result")) {
-            JsonNode source=node.path("$result");return new AssertionEngine().select(source,results,false);
-        }
-        if(node.isObject()) { ObjectNode out=Json.object();node.fields().forEachRemaining(e->out.set(e.getKey(),resolve(e.getValue())));return out; }
-        if(node.isArray()) { var out=Json.array();node.forEach(n->out.add(resolve(n)));return out; }
-        return node;
-    }
+    private JsonNode resolve(JsonNode node) { return new ReferenceResolver(results,aliases).resolve(node); }
     public void assertId(String id) {
         JsonNode assertion=assertionIndex.get(id); if(assertion==null) throw new IllegalArgumentException("Undeclared assertion "+id);
         asserted.add(id);ObjectNode evidence=Json.object(); evidence.put("assertionId",id);evidence.set("expected",assertion.path("expected"));evidence.set("source",assertion.path("source"));evidence.set("requirementRefs",assertion.path("requirementRefs"));evidence.set("evidenceRefs",assertion.path("evidenceRefs"));
-        try { new AssertionEngine().check(assertion,results); evidence.put("status","PASS"); }
+        try { new AssertionEngine().check(assertion,results,aliases); evidence.put("status","PASS"); }
         catch(AssertionError e) { evidence.put("status","FAIL").put("reason",e.getMessage());assertionResults.add(evidence);throw e; }
         assertionResults.add(evidence);
     }
@@ -170,6 +166,13 @@ public final class CaseRunner {
             JsonNode r=results.get(assertion.path(key).path("actionId").asText());
             if(r==null || !r.path("driverStatus").asText().equals("EXECUTED")) return false;
         }
+        return referenceSourcesExecuted(assertion);
+    }
+    private boolean referenceSourcesExecuted(JsonNode node) {
+        if(node.isObject() && node.has("$result")) {
+            JsonNode r=results.get(node.path("$result").path("actionId").asText());return r!=null && r.path("driverStatus").asText().equals("EXECUTED");
+        }
+        if(node.isContainerNode()) for(JsonNode child:node) if(!referenceSourcesExecuted(child)) return false;
         return true;
     }
     public void verifyComplete() {

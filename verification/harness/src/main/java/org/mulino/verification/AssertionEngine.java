@@ -8,7 +8,11 @@ import java.util.*;
 
 /** Independent fixed expectations. No application state transitions or evaluator simulation. */
 public final class AssertionEngine {
-    public void check(JsonNode assertion, Map<String,JsonNode> results) {
+    public void check(JsonNode assertion, Map<String,JsonNode> results) { check(assertion,results,Json.object()); }
+    public void check(JsonNode declared, Map<String,JsonNode> results,JsonNode aliases) {
+        var assertion=declared.deepCopy();var resolver=new ReferenceResolver(results,aliases);
+        for(String field:List.of("expected","scope")) if(assertion.has(field)) ((com.fasterxml.jackson.databind.node.ObjectNode)assertion).set(field,resolver.identity(assertion.path(field)));
+        for(String field:List.of("source","baseline","unitSource","baselineUnitSource")) if(assertion.path(field).has("where")) ((com.fasterxml.jackson.databind.node.ObjectNode)assertion.path(field)).set("where",resolver.identity(assertion.path(field).path("where")));
         String op=Json.required(assertion,"op");
         JsonNode expected=assertion.get("expected");
         if (expected == null) fail("expected is missing");

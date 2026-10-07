@@ -1,0 +1,18 @@
+{
+  "kind":"DECLARATIVE_FORMAT_EXAMPLE_NOT_PRODUCT_EVIDENCE",
+  "identityAssertion":{
+    "op":"relationSet",
+    "source":{"actionId":"db-after","pointer":"/data/rawRows/relations","where":{"sourceId":{"$alias":"LOT-A"}},"field":["sourceId","targetId"]},
+    "expected":[[{"$alias":"LOT-A"},{"$result":{"actionId":"create-work","pointer":"/response/workId"}}]],
+    "scope":{"workId":{"$result":{"actionId":"create-work","pointer":"/response/workId"}}}
+  },
+  "wireAttack":{
+    "id":"tampered-state","kind":"invoke","actorRef":"qc","route":"wire","protocolOperation":"tools/call",
+    "request":{"headers":{"Content-Type":"application/json","MCP-Protocol-Version":"INTENTIONALLY_MISMATCHED"},"body":{"jsonrpc":"2.0","id":"new-rpc-id","method":"tools/call","params":{"state":{"$transform":{"source":{"$result":{"actionId":"issued","pointer":"/response/state"}},"operation":"opaqueByteXor","index":0,"xor":1}},"effectKey":"same-effect-key"}}},
+    "evidenceRefs":["wire:rawRequest","wire:redactedTransportArtifact"]
+  },
+  "jsonStateAttack":{"$transform":{"source":{"$result":{"actionId":"issued-json","pointer":"/response/state"}},"operation":"jsonPointerRemove","pointer":"/inputResponses/0"}},
+  "inspectGeneratedOutputs":{
+    "id":"inspect-output","kind":"control","control":{"type":"process","operation":"inspectArtifacts","parameters":{"scope":{"case":"AUTHORING-EXAMPLE"},"artifacts":{"$result":{"actionId":"backup","pointer":"/data/hostObservation/generatedOutputs"}}}},"evidenceRefs":["host:actualHashAndBytes"]
+  }
+}

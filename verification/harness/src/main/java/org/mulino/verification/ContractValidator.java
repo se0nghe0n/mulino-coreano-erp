@@ -49,6 +49,9 @@ public final class ContractValidator {
                 if(assertion.has("baselineUnitSource")) require(ids.contains(Json.required(assertion.path("baselineUnitSource"),"actionId")),"Unknown assertion baseline unit source");
                 if(assertion.has("baseline")) require(ids.contains(Json.required(assertion.path("baseline"),"actionId")),"Unknown assertion baseline");
                 if(!example) require(assertion.has("oracleRef"),"Product assertion requires independent oracleRef");
+                references(assertion,ids);
+                for(String field:List.of("expected","scope")) identityReferences(assertion.path(field));
+                for(String field:List.of("source","baseline","unitSource","baselineUnitSource")) identityReferences(assertion.path(field).path("where"));
                 for(JsonNode ref:assertion.path("evidenceRefs")) require(!ref.asText().isBlank(),"Empty evidence requirement");
             }
             require(!sub.path("assertions").isEmpty(),"No substantive assertions");
@@ -62,12 +65,30 @@ public final class ContractValidator {
             require(ref.isObject() && ref.size()==2 && ref.has("actionId") && ref.has("pointer"),"Result reference requires only actionId/pointer");
             require(ids.contains(Json.required(ref,"actionId")),"Unknown result reference action");
             require(Json.required(ref,"pointer").startsWith("/"),"Result reference must use RFC6901 pointer");
+        } else if(node.isObject() && node.has("$transform")) {
+            require(node.size()==1,"Transform reference allows only $transform");
+            validateTransformDeclaration(node.path("$transform"));references(node.path("$transform").path("source"),ids);
         } else if(node.isObject() && node.has("$alias")) { require(node.size()==1 && node.path("$alias").isTextual(),"Alias reference requires only textual $alias"); }
         else if(node.isContainerNode()) node.forEach(n->references(n,ids));
     }
+    private void identityReferences(JsonNode node) {
+        if(node.isObject() && node.has("$transform")) require(false,"Assertion identity bindings cannot transform expected values");
+        if(node.isObject() && node.has("$result")) require(ReferenceResolver.identityPointer(node.path("$result").path("pointer").asText()),"Assertion references must bind identity, not observed business values");
+        else if(node.isContainerNode()) node.forEach(this::identityReferences);
+    }
+    private void validateTransformDeclaration(JsonNode t) {
+        try {
+            JsonNode schema=Json.read(path("contracts/acceptance-case.schema.json"));
+            schema=((com.fasterxml.jackson.databind.node.ObjectNode)schema).deepCopy();((com.fasterxml.jackson.databind.node.ObjectNode)schema).put("$ref","#/$defs/transformReference");
+            ((com.fasterxml.jackson.databind.node.ObjectNode)schema).remove(List.of("type","properties","required","additionalProperties"));
+            Set<ValidationMessage> errors=JsonSchemaFactory.getInstance(SpecVersion.VersionFlag.V202012).getSchema(schema).validate(Json.object().set("$transform",t));
+            require(errors.isEmpty(),"Invalid bounded transform declaration: "+errors);
+        } catch(IOException e) {throw new IllegalArgumentException(e);}
+    }
     private void checkAction(JsonNode action) {
         String kind=Json.required(action,"kind");
-        if(Set.of("invoke","query").contains(kind)) require(capabilities.contains(Json.required(action,"capabilityId")),"Unknown public capability "+action.path("capabilityId"));
+        if(Set.of("invoke","query").contains(kind) && !action.has("protocolOperation")) require(capabilities.contains(Json.required(action,"capabilityId")),"Unknown public capability "+action.path("capabilityId"));
+        if(kind.equals("start")) require(!action.path("call").has("protocolOperation"),"Async protocol calls need separate actual transport adapter; not supported by start");
         if(kind.equals("start")) { String child=action.path("call").path("kind").asText(); require(Set.of("invoke","query").contains(child),"start call must be invoke/query"); checkAction(action.path("call")); }
         if(kind.equals("agent")) {
             JsonNode context=action.path("permittedContext");

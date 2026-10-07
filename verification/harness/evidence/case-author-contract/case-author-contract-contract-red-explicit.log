@@ -1,0 +1,101 @@
++ java -version
+exitCode=0
++ /Volumes/VideoStore/Developer/mulino-ontology-step2-harness/mvnw -version
+Apache Maven 3.9.16 (2bdd9fddda4b155ebf8000e807eb73fd829a51d5)
+Maven home: /Users/n30gu1/.m2/wrapper/dists/apache-maven-3.9.16/56ba1f9f
+Java version: 21.0.5, vendor: Azul Systems, Inc., runtime: /Library/Java/JavaVirtualMachines/zulu-21.jdk/Contents/Home
+Default locale: en_KR, platform encoding: UTF-8
+OS name: "mac os x", version: "27.0.1", arch: "aarch64", family: "mac"
+exitCode=0
++ /Volumes/VideoStore/Developer/mulino-ontology-step2-harness/mvnw -B -ntp -f /Volumes/VideoStore/Developer/mulino-ontology-step2-harness/verification/harness/pom.xml -Dtest=CaseFeatureTest -Dverification.mode=contract-red '-Dverification.command=./verify contract-red verification/harness/src/test/resources/examples/HARNESS-EXAMPLE/case.json' -Dverification.caseFiles=verification/harness/src/test/resources/examples/HARNESS-EXAMPLE/case.json test
+[INFO] Scanning for projects...
+[INFO]
+[INFO] -------------------< org.mulino:acceptance-harness >--------------------
+[INFO] Building acceptance-harness 1.0.0
+[INFO]   from pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO]
+[INFO] --- resources:3.4.0:resources (default-resources) @ acceptance-harness ---
+[INFO] skip non existing resourceDirectory /Volumes/VideoStore/Developer/mulino-ontology-step2-harness/verification/harness/src/main/resources
+[INFO]
+[INFO] --- compiler:3.14.1:compile (default-compile) @ acceptance-harness ---
+[INFO] Nothing to compile - all classes are up to date.
+[INFO]
+[INFO] --- resources:3.4.0:testResources (default-testResources) @ acceptance-harness ---
+[INFO] Copying 6 resources from src/test/resources to target/test-classes
+[INFO]
+[INFO] --- compiler:3.14.1:testCompile (default-testCompile) @ acceptance-harness ---
+[INFO] Nothing to compile - all classes are up to date.
+[INFO]
+[INFO] --- surefire:3.5.6:test (default-test) @ acceptance-harness ---
+[INFO] Using auto detected provider org.apache.maven.surefire.junitplatform.JUnitPlatformProvider
+[INFO]
+[INFO] -------------------------------------------------------
+[INFO]  T E S T S
+[INFO] -------------------------------------------------------
+[INFO] Running org.mulino.verification.CaseFeatureTest
+
+@harness-example @contract-red
+시나리오: 보류는 실물 감소가 아니다                                                                                                       # src/test/resources/examples/HARNESS-EXAMPLE/scenario.feature:4
+  ✔ 먼저 사례 파일 "verification/harness/src/test/resources/examples/HARNESS-EXAMPLE/case.json"의 "hold-preserves-physical"를 준비한다 # org.mulino.verification.ScenarioGlue.prepare(java.lang.String,java.lang.String)
+  ✔ 만일 "시스템" 역할이 "setup" 행동을 수행한다                                                                                          # org.mulino.verification.ScenarioGlue.action(java.lang.String,java.lang.String)
+  ✔ 만일 "qc" 역할이 "before" 행동을 수행한다                                                                                          # org.mulino.verification.ScenarioGlue.action(java.lang.String,java.lang.String)
+  ✔ 만일 "qc" 역할이 "hold" 행동을 수행한다                                                                                            # org.mulino.verification.ScenarioGlue.action(java.lang.String,java.lang.String)
+  ✔ 만일 "qc" 역할이 "after" 행동을 수행한다                                                                                           # org.mulino.verification.ScenarioGlue.action(java.lang.String,java.lang.String)
+  ✔ 만일 "시스템" 역할이 "db-after" 행동을 수행한다                                                                                       # org.mulino.verification.ScenarioGlue.action(java.lang.String,java.lang.String)
+  ✘ 그러면 "held-100" assertion으로 "Setup60+40=100. A hold changes availability without physical reduction."를 확인한다             # org.mulino.verification.ScenarioGlue.assertion(java.lang.String,java.lang.String)
+        java.lang.AssertionError: source after is NOT_IMPLEMENTED: NOT_IMPLEMENTED: no real product adapters installed
+                at org.mulino.verification.AssertionEngine.fail(AssertionEngine.java:125)
+                at org.mulino.verification.AssertionEngine.require(AssertionEngine.java:124)
+                at org.mulino.verification.AssertionEngine.select(AssertionEngine.java:71)
+                at org.mulino.verification.AssertionEngine.check(AssertionEngine.java:19)
+                at org.mulino.verification.CaseRunner.assertId(CaseRunner.java:147)
+                at org.mulino.verification.ScenarioGlue.assertion(ScenarioGlue.java:26)
+                at ✽."held-100" assertion으로 "Setup60+40=100. A hold changes availability without physical reduction."를 확인한다(file:///Volumes/VideoStore/Developer/mulino-ontology-step2-harness/verification/harness/src/test/resources/examples/HARNESS-EXAMPLE/scenario.feature:11)
+  ↷ 그러면 "eligible-80" assertion으로 "100−20=80, using fixed synthetic distinct scope."를 확인한다                                 # org.mulino.verification.ScenarioGlue.assertion(java.lang.String,java.lang.String)
+  ↷ 그러면 "eligible-delta" assertion으로 "After80−before100=−20."를 확인한다                                                        # org.mulino.verification.ScenarioGlue.assertion(java.lang.String,java.lang.String)
+  ↷ 그러면 "physical-unique" assertion으로 "No physical scope counted twice."를 확인한다                                             # org.mulino.verification.ScenarioGlue.assertion(java.lang.String,java.lang.String)
+  ↷ 그러면 "segment-set" assertion으로 "No parent or unexplained segment counted."를 확인한다                                        # org.mulino.verification.ScenarioGlue.assertion(java.lang.String,java.lang.String)
+  ↷ 그러면 "relation-set" assertion으로 "Hold relation applies to exactly20 withinA60."를 확인한다                                   # org.mulino.verification.ScenarioGlue.assertion(java.lang.String,java.lang.String)
+  ↷ 그러면 "owner-qc" assertion으로 "Open restriction responsibility stays with configured human qc."를 확인한다                     # org.mulino.verification.ScenarioGlue.assertion(java.lang.String,java.lang.String)
+  ↷ 그러면 "next-check" assertion으로 "Deadline uses a fixed UTC instant."를 확인한다                                                # org.mulino.verification.ScenarioGlue.assertion(java.lang.String,java.lang.String)
+  ↷ 그러면 "version-v1" assertion으로 "Current response preserves the active scenario definition."를 확인한다                        # org.mulino.verification.ScenarioGlue.assertion(java.lang.String,java.lang.String)
+  ↷ 그러면 "obligation-fields" assertion으로 "Responsibility has no owner/action/deadline gap."를 확인한다                           # org.mulino.verification.ScenarioGlue.assertion(java.lang.String,java.lang.String)
+  ↷ 그러면 "raw-segment-sum" assertion으로 "Independent rows60+40=100."를 확인한다                                                   # org.mulino.verification.ScenarioGlue.assertion(java.lang.String,java.lang.String)
+[ERROR] Tests run: 1, Failures: 1, Errors: 0, Skipped: 0, Time elapsed: 0.315 s <<< FAILURE! -- in org.mulino.verification.CaseFeatureTest
+[ERROR] org.mulino.verification.CaseFeatureTest.executeEveryDeclaredKoreanScenario -- Time elapsed: 0.306 s <<< FAILURE!
+java.lang.AssertionError: NOT_IMPLEMENTED: 1 independently discovered Korean scenarios failed required product assertions
+        at org.mulino.verification.CaseFeatureTest.executeEveryDeclaredKoreanScenario(CaseFeatureTest.java:38)
+
+[INFO]
+[INFO] Results:
+[INFO]
+[ERROR] Failures:
+[ERROR]   CaseFeatureTest.executeEveryDeclaredKoreanScenario:38 NOT_IMPLEMENTED: 1 independently discovered Korean scenarios failed required product assertions
+[INFO]
+[ERROR] Tests run: 1, Failures: 1, Errors: 0, Skipped: 0
+[INFO]
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD FAILURE
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  0.978 s
+[INFO] Finished at: 2026-10-07T22:32:14+09:00
+[INFO] ------------------------------------------------------------------------
+[ERROR] Failed to execute goal org.apache.maven.plugins:maven-surefire-plugin:3.5.6:test (default-test) on project acceptance-harness: There are test failures.
+[ERROR]
+[ERROR] See /Volumes/VideoStore/Developer/mulino-ontology-step2-harness/verification/harness/target/surefire-reports for the individual test results.
+[ERROR] See dump files (if any exist) [date].dump, [date]-jvmRun[N].dump and [date].dumpstream.
+[ERROR] -> [Help 1]
+[ERROR]
+[ERROR] To see the full stack trace of the errors, re-run Maven with the -e switch.
+[ERROR] Re-run Maven using the -X switch to enable full debug logging.
+[ERROR]
+[ERROR] For more information about the errors and possible solutions, please read the following articles:
+[ERROR] [Help 1] http://cwiki.apache.org/confluence/display/MAVEN/MojoFailureException
+exitCode=1
+openjdk version "21.0.5" 2024-10-15 LTS
+OpenJDK Runtime Environment Zulu21.38+21-CA (build 21.0.5+11-LTS)
+OpenJDK 64-Bit Server VM Zulu21.38+21-CA (build 21.0.5+11-LTS, mixed mode, sharing)
+SLF4J(W): No SLF4J providers were found.
+SLF4J(W): Defaulting to no-operation (NOP) logger implementation
+SLF4J(W): See https://www.slf4j.org/codes.html#noProviders for further details.

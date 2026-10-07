@@ -275,3 +275,102 @@ transaction/barrier/worker, source/기관 제출, actual host/model, BTP와 규�
 인수는 이 harness selftest가 대신하지 않는다. source 없는 법규나 비용을
 fixture/manifest에 확정하지 않는다. runtime artifact가 없으면 준비된
 assertion 수와 별개로 제품 gate를 미완료로 남긴다.
+
+## case 작성에 필요한 identity·원행·protocol 계약
+
+`expected`, `scope`, `source.where`, `baseline.where`와 단위 source의
+where에는 기존 strict `$alias`/`$result`를 재귀적으로 쓸 수 있다.
+fixture alias는 설치 결과의 실제 ID이고 새 object의 ID/revision/hash는
+선행 명령 결과에서 가져온다. 선언 자체는 바뀌지 않는다.
+
+```json
+{
+  "source": {
+    "actionId":"after-db", "pointer":"/data/rawRows/relations",
+    "where":{"sourceId":{"$alias":"LOT-A"}}, "field":"targetId"
+  },
+  "expected":[{"$result":{"actionId":"create-work","pointer":"/response/workId"}}],
+  "scope":{"workId":{"$result":{"actionId":"create-work","pointer":"/response/workId"}}}
+}
+```
+
+이 참조는 identity 연결용이다. 관찰 수량·상태·효과를 자기 expected로
+복사하면 independent oracle가 무력화된다. expected/where/scope의
+`$result` pointer 끝 필드는 ID/IDs/revision/hash/version/token 또는
+owner/subject/principal 계열만 허용한다. 수량·효과·시간·단위의 기대값은
+독립 고정값으로 둔다. field 이름 검사는 의미 완전성의 증명이 아니며
+잘못 이름 붙인 업무 결과로 oracle를 우회해서는 안 된다. 미실행 source는
+NOT_RUN이며 missing/null reference를0이나 임의 ID로 대체하지 않는다.
+unknown action과 identity가 아닌 result 참조는 준비 단계에서 거부한다.
+
+observe의 `sources`는 중복 없는 원천 이름 배열이다. 요청한 각 이름의
+`data.rawRows[name]`은 실제 원행 object 배열이어야 한다. 빈 배열도
+scope 완료와 query 증거가 있어야 한다. 결과의
+`data.sourceEvidence[name]`은 다음 계약을 따른다.
+
+```json
+{
+  "complete":true,
+  "rowPointer":"/rawRows/movements",
+  "sourceQuery":{
+    "statementId":"movement-scope-v1",
+    "sql":"SELECT movement_id FROM movement_source WHERE work_id = :workId",
+    "parameters":{"workId":"ACTUAL_WORK_ID"},
+    "mappingVersion":"observer-v1"
+  },
+  "artifactRef":"verification/harness/target/evidence/movement-query.json"
+}
+```
+
+artifactRef는 실제 파일이며 StepResult.artifactRefs에도 있어야 한다.
+요청 movements/allocations 중 allocations 원행/완료/query mapping이
+빠졌으면 movements가 비어 있어도 전체 관찰이 완료되지 않는다.
+위 SQL/ID는 형식 표본이며 실행된 SQL이나 제품 상태가 아니다.
+
+`route=wire`의 invoke/query는 업무 `capabilityId` 대신
+`protocolOperation`을 선언할 수 있다. 둘을 동시에 쓰지 않는다.
+`protocolOperation="server/discover"` 같은 값은 protocol 분류이며
+업무 권한이나 공개 business capability가 아니다. public driver의
+`wire(actionId, authenticatedActor, protocolOperation, rawRequest)`는
+선언과 다른 실제 method/header/body도 그대로 전달한다. harness가 raw
+request를 정상화하거나 일치하도록 수선하지 않는다. 미구현 wire port는
+NOT_IMPLEMENTED/null이며 actual transport나 모델을 호출하지 않는다.
+
+실제로 발급된 MRTR state는 `$result`로 재사용하거나 `$transform`으로
+한 번 변조한다. transform은 실제 strict result reference에서만 시작한다.
+
+```json
+{"$transform":{
+  "source":{"$result":{"actionId":"issued","pointer":"/response/state"}},
+  "operation":"opaqueByteXor", "index":0, "xor":1
+}}
+```
+
+opaqueByteXor는 최대65536 UTF-8 bytes 중 printable ASCII 한 byte를
+1..127 mask로 XOR하고 printable ASCII를 유지한다. index 범위 오류,
+mask0, 가짜 고정 source를 거부한다. JSON state에는
+`jsonPointerReplace`+`pointer`+bounded literal `value` 또는
+`jsonPointerRemove`+`pointer`를 쓴다. 비어 있지 않은 RFC6901 pointer의
+기존 target만 바꾸며 원본 result는 보존한다. input JSON과 replacement는
+최대65536 bytes, pointer는1024 characters다. missing target, unknown
+operation, 추가 field, nested reference value를 거부한다. 임의 eval/SQL/
+업무 계산과 assertion expected 변조는 지원하지 않는다.
+
+registry에는 계획의 최소 공개 행동을 추가했다. `recordRelation`은 허용된
+structural typed source/target/relationType/cardinality/evidence만 다루며
+WorkLink·ledger·approval 불변식의 우회통로가 아니다. `createWorkLink`는
+DEPENDS_ON/CONTRIBUTES_TO/SHARES_ACTIVITY 관계와 cycle·물량 기여 불변식을 검증한다.
+`convertUnit`은 승인된 item/from/to unit value의 read이며 stock/order
+효과0이다. 독립 catalog의 UnitConversion/WorkLink 의미를 각각 이
+capability로 연결한다. `getCommandResult`는 현재 principal/org 권한을
+검증한다. `structureIntent`는 해석/NEEDS_INPUT만 반환한다.
+`emergencyRepair`는 explicit dryRun/diff·권한/근거·apply/recheck를 요구한다.
+endpoint나 production service는 구현하지 않았다. typed predicate는
+기존 `getAssessment`의 goal/scope/asOf/knownAt/definition/evaluator
+identity로 검증하며 별도 evaluatePredicate surface를 만들지 않는다.
+
+host/runtime 검사는 `control(type=process)`의 명시 operation으로 선언한다.
+[host 관찰 계약](host-observation-guide.md)은 input artifact와 생성 output,
+실제 process/command/exit/version, 독립 artifact scan과 자율 runtime task
+완료 증거를 구분한다. server/discover·skillLoading·modelEvaluation 등의
+pseudo label을 public business capability로 추가하지 않는다.

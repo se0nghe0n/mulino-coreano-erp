@@ -31,7 +31,7 @@ public final class ReviewContractTest {
         return new StepResult(id,StepResult.DriverStatus.EXECUTED,data,response,null,p,List.of(artifact));
     }
     private CaseRunner runner(Path file,Map<String,StepResult> captures) throws Exception { return new CaseRunner(new ContractValidator(root),new Captures(captures),new AgentRunner.Scripted(),file,subcase); }
-    private static final class Captures implements AcceptanceDriver {
+    private static class Captures implements AcceptanceDriver {
         private final Map<String,StepResult> captures; Captures(Map<String,StepResult> captures){this.captures=captures;}
         private StepResult get(String id){return captures.getOrDefault(id,StepResult.missing(id,"NOT_IMPLEMENTED: selftest capture absent"));}
         public Set<String> availableAdapters(){return Set.of("CAPTURED_CONTRACT_SELFTEST_ONLY");}
@@ -40,8 +40,19 @@ public final class ReviewContractTest {
         public StepResult control(String id,JsonNode q){return get(id);} public StepResult start(String id,String r,JsonNode a,String c,JsonNode q){return get(id);}
         public StepResult await(String id,JsonNode h,int t){return get(id);}
     }
+    @Test void protocolOperationPreservesHostileRawRequestRatherThanRepairingIt() throws Exception {
+        ObjectNode a=invocation("wire","query");a.remove("capabilityId");a.put("route","wire").put("protocolOperation","server/discover");
+        JsonNode raw=Json.parse("{\"headers\":{\"Content-Type\":\"text/plain\",\"MCP-Protocol-Version\":\"invalid\"},\"body\":\"{\\\"method\\\":\\\"different/method\\\"}\"}");a.set("request",raw);
+        Path file=caseFile(List.of(a),List.of(assertion("denied","wire","/response/status",Json.MAPPER.valueToTree(415))));
+        var capturedRequest=new java.util.concurrent.atomic.AtomicReference<JsonNode>();var capturedOperation=new java.util.concurrent.atomic.AtomicReference<String>();
+        var d=new Captures(Map.of()) {public StepResult wire(String id,JsonNode actor,String operation,JsonNode request) {capturedRequest.set(request);capturedOperation.set(operation);return captured(id,Json.object(),Json.parse("{\"status\":415}"),false);}};
+        assertEquals("PASS",new CaseRunner(new ContractValidator(root),d,new AgentRunner.Scripted(),file,subcase).run(false));
+        assertEquals(raw,capturedRequest.get());assertEquals("server/discover",capturedOperation.get());
+        a.put("route","api");Path invalid=caseFile(List.of(a),List.of(assertion("denied","wire","/response/status",Json.MAPPER.valueToTree(415))));
+        assertThrows(IllegalArgumentException.class,()->new ContractValidator(root).caseFile(invalid));
+    }
     private ObjectNode observation() {
-        return (ObjectNode)Json.parse("{\"snapshotRevision\":\"revision-W\",\"asOf\":\"2026-10-07T00:00:00Z\",\"knownAt\":\"2026-10-07T00:00:00Z\",\"scope\":{\"work\":\"W\"},\"scopeComplete\":true,\"sourceQuery\":{\"statementId\":\"capture\",\"sql\":\"SELECT * FROM captured_rows WHERE work = :work\",\"parameters\":{\"work\":\"W\"},\"mappingVersion\":\"v1\"},\"snapshot\":{\"id\":\"revision-W\",\"isolation\":\"REPEATABLE_READ\",\"capturedAt\":\"2026-10-07T00:00:00Z\",\"artifactRef\":\""+artifact+"\"},\"rawRows\":{},\"data\":{\"effects\":0}}");
+        return (ObjectNode)Json.parse("{\"snapshotRevision\":\"revision-W\",\"asOf\":\"2026-10-07T00:00:00Z\",\"knownAt\":\"2026-10-07T00:00:00Z\",\"scope\":{\"work\":\"W\"},\"scopeComplete\":true,\"sourceQuery\":{\"statementId\":\"capture\",\"sql\":\"SELECT * FROM captured_rows WHERE work = :work\",\"parameters\":{\"work\":\"W\"},\"mappingVersion\":\"v1\"},\"snapshot\":{\"id\":\"revision-W\",\"isolation\":\"REPEATABLE_READ\",\"capturedAt\":\"2026-10-07T00:00:00Z\",\"artifactRef\":\""+artifact+"\"},\"rawRows\":{\"effects\":[]},\"sourceEvidence\":{\"effects\":{\"complete\":true,\"rowPointer\":\"/rawRows/effects\",\"sourceQuery\":{\"statementId\":\"capture-effects\",\"sql\":\"SELECT * FROM captured_effects WHERE work = :work\",\"parameters\":{\"work\":\"W\"},\"mappingVersion\":\"v1\"},\"artifactRef\":\""+artifact+"\"}},\"data\":{\"effects\":0}}");
     }
     @Test void observerMustMatchRequestedScopeSnapshotAndActualProvenance() throws Exception {
         ObjectNode a=(ObjectNode)action("observe","observe");a.set("observation",Json.parse("{\"scope\":{\"work\":\"W\"},\"snapshotRef\":\"revision-W\",\"asOf\":\"2026-10-07T00:00:00Z\",\"knownAt\":\"2026-10-07T00:00:00Z\",\"sources\":[\"effects\"]}"));
@@ -55,6 +66,16 @@ public final class ReviewContractTest {
         assertTrue(assertThrows(IllegalArgumentException.class,()->runner(file,Map.of("observe",captured("observe",wrongToken,null,true))).run(false)).getMessage().contains("actual snapshot"));
         StepResult mismatch=captured("observe",observation(),null,true);((ObjectNode)mismatch.provenance()).set("snapshot",Json.parse("{\"id\":\"OTHER\"}"));
         assertTrue(assertThrows(IllegalArgumentException.class,()->runner(file,Map.of("observe",mismatch)).run(false)).getMessage().contains("provenance"));
+    }
+    @Test void everyRequestedRawSourceNeedsRowsAndIndependentQueryEvidence() throws Exception {
+        ObjectNode a=(ObjectNode)action("observe","observe");a.set("observation",Json.parse("{\"scope\":{\"work\":\"W\"},\"snapshotRef\":\"revision-W\",\"asOf\":\"2026-10-07T00:00:00Z\",\"knownAt\":\"2026-10-07T00:00:00Z\",\"sources\":[\"movements\",\"allocations\"]}"));
+        Path file=caseFile(List.of(a),List.of(assertion("zero","observe","/data/data/effects",Json.MAPPER.valueToTree(0))));
+        ObjectNode data=observation();ObjectNode rows=Json.object(),evidence=Json.object();
+        for(String source:List.of("movements","allocations")) {rows.set(source,Json.array());ObjectNode e=(ObjectNode)data.path("sourceEvidence").path("effects").deepCopy();e.put("rowPointer","/rawRows/"+source);evidence.set(source,e);}
+        data.set("rawRows",rows);data.set("sourceEvidence",evidence);
+        assertEquals("PASS",runner(file,Map.of("observe",captured("observe",data,null,true))).run(false));
+        rows.remove("allocations");assertTrue(assertThrows(IllegalArgumentException.class,()->runner(file,Map.of("observe",captured("observe",data,null,true))).run(false)).getMessage().contains("allocations"));
+        rows.set("allocations",Json.array());evidence.remove("allocations");assertThrows(IllegalArgumentException.class,()->runner(file,Map.of("observe",captured("observe",data,null,true))).run(false));
     }
     @Test void barrierRequiresEveryRequestedIdentityAndStateRatherThanFieldPresence() throws Exception {
         JsonNode params=Json.parse("{\"barrierId\":\"b1\",\"participantId\":\"dispatch\",\"transactionId\":\"tx1\",\"point\":\"before-commit\",\"state\":\"REACHED\"}");

@@ -9,6 +9,10 @@ public interface AcceptanceDriver {
     StepResult installFixture(String actionId, JsonNode fixture);
     StepResult invoke(String actionId, String route, JsonNode authenticatedActor, String capabilityId, JsonNode request);
     StepResult query(String actionId, String route, JsonNode authenticatedActor, String queryName, JsonNode request);
+    /** Declared protocol operation is classification only. Preserve hostile raw headers/body unchanged. */
+    default StepResult wire(String actionId,JsonNode authenticatedActor,String protocolOperation,JsonNode rawRequest) {
+        return StepResult.missing(actionId,"NOT_IMPLEMENTED: actual raw protocol transport adapter absent");
+    }
     StepResult observe(String actionId, JsonNode scopeSnapshotAndTimes);
     StepResult control(String actionId, JsonNode control);
     /** ACK only after a real asynchronous invocation is submitted. data.invocationHandle is opaque. */

@@ -1,7 +1,7 @@
 {
   "schemaVersion": "1.0.0",
   "kind": "PUBLIC_ACCEPTANCE_CONTRACT_NOT_IMPLEMENTATION",
-  "source": "docs/ontology-implementation-plan.md §3–§8",
+  "source": "docs/ontology-implementation-plan.md \u00a73\u2013\u00a78",
   "capabilities": [
     {
       "id": "getObject",
@@ -751,6 +751,54 @@
       "implemented": false,
       "schemaVersion": "1.0.0",
       "semanticVersion": "PLAN-1.0"
+    },
+    {
+      "id": "recordRelation",
+      "kind": "COMMAND",
+      "implemented": false,
+      "schemaVersion": "1.0.0",
+      "semanticVersion": "PLAN-1.0",
+      "contract": "Allowed structural typed relation source/target/type/cardinality/evidence only; cannot bypass WorkLink, ledger, approval or domain invariants."
+    },
+    {
+      "id": "convertUnit",
+      "kind": "QUERY",
+      "implemented": false,
+      "schemaVersion": "1.0.0",
+      "semanticVersion": "PLAN-1.0",
+      "contract": "Approved item-specific from/to unit value conversion; no stock/order effect. Abstract UnitConversion oracle maps here."
+    },
+    {
+      "id": "createWorkLink",
+      "kind": "COMMAND",
+      "implemented": false,
+      "schemaVersion": "1.0.0",
+      "semanticVersion": "PLAN-1.0",
+      "contract": "Explicit DEPENDS_ON/CONTRIBUTES_TO/SHARES_ACTIVITY links with cycle and contribution invariants. Abstract WorkLink oracle maps here."
+    },
+    {
+      "id": "getCommandResult",
+      "kind": "QUERY",
+      "implemented": false,
+      "schemaVersion": "1.0.0",
+      "semanticVersion": "PLAN-1.0",
+      "contract": "Current authenticated principal and organization authorize command-result lookup."
+    },
+    {
+      "id": "structureIntent",
+      "kind": "QUERY",
+      "implemented": false,
+      "schemaVersion": "1.0.0",
+      "semanticVersion": "PLAN-1.0",
+      "contract": "Interpretation or NEEDS_INPUT only; no business effect."
+    },
+    {
+      "id": "emergencyRepair",
+      "kind": "COMMAND",
+      "implemented": false,
+      "schemaVersion": "1.0.0",
+      "semanticVersion": "PLAN-1.0",
+      "contract": "Explicit dryRun/diff/authorized evidence/apply/recheck; no hidden bypass."
     }
   ]
 }

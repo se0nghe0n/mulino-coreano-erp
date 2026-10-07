@@ -76,10 +76,70 @@
       "additionalProperties": false
     },
     "rawRows": {
-      "type": "object"
+      "type": "object",
+      "additionalProperties": {
+        "type": "array",
+        "items": {
+          "type": "object"
+        }
+      }
     },
     "data": {
       "type": "object"
+    },
+    "sourceEvidence": {
+      "type": "object",
+      "minProperties": 1,
+      "additionalProperties": {
+        "type": "object",
+        "required": [
+          "complete",
+          "rowPointer",
+          "sourceQuery",
+          "artifactRef"
+        ],
+        "properties": {
+          "complete": {
+            "const": true
+          },
+          "rowPointer": {
+            "type": "string",
+            "pattern": "^/rawRows/.+"
+          },
+          "sourceQuery": {
+            "type": "object",
+            "properties": {
+              "statementId": {
+                "type": "string",
+                "minLength": 1
+              },
+              "sql": {
+                "type": "string",
+                "minLength": 1
+              },
+              "parameters": {
+                "type": "object"
+              },
+              "mappingVersion": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "required": [
+              "statementId",
+              "sql",
+              "parameters",
+              "mappingVersion"
+            ],
+            "additionalProperties": false
+          },
+          "artifactRef": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "additionalProperties": false
+      }
     }
   },
   "required": [
@@ -91,7 +151,8 @@
     "sourceQuery",
     "snapshot",
     "rawRows",
-    "data"
+    "data",
+    "sourceEvidence"
   ],
   "additionalProperties": false,
   "$schema": "https://json-schema.org/draft/2020-12/schema",

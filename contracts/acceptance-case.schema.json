@@ -187,7 +187,8 @@
                 "type": "string",
                 "minLength": 1
               },
-              "minItems": 1
+              "minItems": 1,
+              "uniqueItems": true
             }
           },
           "required": [
@@ -284,6 +285,10 @@
           "type": "integer",
           "minimum": 1,
           "maximum": 300
+        },
+        "protocolOperation": {
+          "type": "string",
+          "minLength": 1
         }
       },
       "required": [
@@ -308,8 +313,34 @@
             "required": [
               "actorRef",
               "route",
-              "capabilityId",
               "request"
+            ],
+            "oneOf": [
+              {
+                "required": [
+                  "capabilityId"
+                ],
+                "not": {
+                  "required": [
+                    "protocolOperation"
+                  ]
+                }
+              },
+              {
+                "required": [
+                  "protocolOperation"
+                ],
+                "properties": {
+                  "route": {
+                    "const": "wire"
+                  }
+                },
+                "not": {
+                  "required": [
+                    "capabilityId"
+                  ]
+                }
+              }
             ]
           }
         },
@@ -421,6 +452,29 @@
             "required": [
               "userUtterance",
               "permittedContext"
+            ]
+          }
+        },
+        {
+          "if": {
+            "required": [
+              "protocolOperation"
+            ]
+          },
+          "then": {
+            "properties": {
+              "route": {
+                "const": "wire"
+              },
+              "kind": {
+                "enum": [
+                  "invoke",
+                  "query"
+                ]
+              }
+            },
+            "required": [
+              "route"
             ]
           }
         }
@@ -790,6 +844,133 @@
         "$alias": {
           "type": "string",
           "minLength": 1
+        }
+      }
+    },
+    "transformReference": {
+      "type": "object",
+      "required": [
+        "$transform"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "$transform": {
+          "type": "object",
+          "properties": {
+            "source": {
+              "$ref": "#/$defs/resultReference"
+            },
+            "operation": {
+              "enum": [
+                "opaqueByteXor",
+                "jsonPointerReplace",
+                "jsonPointerRemove"
+              ]
+            },
+            "index": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 65535
+            },
+            "xor": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 127
+            },
+            "pointer": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 1024,
+              "pattern": "^/"
+            },
+            "value": {}
+          },
+          "required": [
+            "source",
+            "operation"
+          ],
+          "additionalProperties": false,
+          "oneOf": [
+            {
+              "properties": {
+                "operation": {
+                  "const": "opaqueByteXor"
+                }
+              },
+              "required": [
+                "index",
+                "xor"
+              ],
+              "not": {
+                "anyOf": [
+                  {
+                    "required": [
+                      "pointer"
+                    ]
+                  },
+                  {
+                    "required": [
+                      "value"
+                    ]
+                  }
+                ]
+              }
+            },
+            {
+              "properties": {
+                "operation": {
+                  "const": "jsonPointerReplace"
+                }
+              },
+              "required": [
+                "pointer",
+                "value"
+              ],
+              "not": {
+                "anyOf": [
+                  {
+                    "required": [
+                      "index"
+                    ]
+                  },
+                  {
+                    "required": [
+                      "xor"
+                    ]
+                  }
+                ]
+              }
+            },
+            {
+              "properties": {
+                "operation": {
+                  "const": "jsonPointerRemove"
+                }
+              },
+              "required": [
+                "pointer"
+              ],
+              "not": {
+                "anyOf": [
+                  {
+                    "required": [
+                      "index"
+                    ]
+                  },
+                  {
+                    "required": [
+                      "xor"
+                    ]
+                  },
+                  {
+                    "required": [
+                      "value"
+                    ]
+                  }
+                ]
+              }
+            }
+          ]
         }
       }
     }

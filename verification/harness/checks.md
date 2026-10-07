@@ -72,3 +72,32 @@ selftest에서 거부했다. 표본과 mechanical ACK는 제품 실행 증거가
 per-scenario Gherkin과 exact registry 보완은 다른 worker가 소유한다.
 coordinator 통합 검사가 남았으므로 이 commit만으로 B2나 Step2 완료를
 주장하지 않는다. 실제 서비스·DB·경합·host/model·BTP 검증은 NOT_RUN이다.
+
+## case 작성 계약 보완
+
+실제 case 작성에서 드러난 원행 누락·동적 ID·발급 state 변조 필요를
+공통 계약에 반영했다. 요청 sources별 rawRows 배열/완료/query mapping과
+실제 artifact를 요구한다. assertion where/expected/scope의 identity를
+strict alias/result로 연결하며 수량 자기복사 참조를 거부한다. bounded
+MRTR 입력 변조와 wire 전용 protocolOperation port를 추가했다.
+recordRelation/convertUnit/createWorkLink/getCommandResult/structureIntent/
+emergencyRepair 여섯 registry entry만 추가했고 endpoint는 구현하지 않았다.
+
+| 실제 command | 관찰 | exit |
+|---|---|---|
+| `./verify harness` | 37 tests, 실패0·오류0·skip0, 한국어 Gherkin1 실행 | 0 |
+| example `./verify validate .../HARNESS-EXAMPLE/case.json` | schema/semantic 유효 | 0 |
+| `./verify contract-red` | unique scenario1, NOT_IMPLEMENTED assertion FAIL1 | 1 |
+| example file selector `./verify contract-red .../case.json` | expected/discovered/started/NOT_IMPLEMENTED 각1, skip0 | 1 |
+| example `./verify scenarios .../case.json` | 실제 adapter 부재, NOT_RUN | 2 |
+
+[case 작성 계약 증거](evidence/case-author-contract/summary.json)에 source
+hash·JUnit/Cucumber·실제 command/exit와 log를 남겼다. 누락 raw source,
+wrong dynamic work/owner, quantity 자기 expected 복사, unknown reference,
+발급 state 변조의 잘못된 index/mask/target/op/추가 field/가짜 source,
+wire header/body mismatch 보존을 selftest로 확인했다. fixed capture는
+제품 상태 계산이나 actual wire/model 실행을 하지 않는다.
+
+host 계약은 별도 worker의 schema/validator/guide를 연결한 뒤 typed wiring과
+결합 검사를 수행한다. 준비/registry 보완도 coordinator에서 통합한다.
+이 commit의37 selftests로 제품 runtime이나 B2/Step2 완료를 주장하지 않는다.
