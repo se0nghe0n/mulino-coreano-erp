@@ -23,8 +23,9 @@ public class EvidenceReconciliation {
   private final IdentityAuthorization auth;
   private final LocalBlobStore blobs;
   private final ObjectProvider<EvidenceCorrectionImpact> impacts;
-  public EvidenceReconciliation(EvidenceRepository r,EvidenceRecords records,IdentityAuthorization auth,LocalBlobStore blobs,ObjectProvider<EvidenceCorrectionImpact> impacts) {
-    this.r=r;this.records=records;this.auth=auth;this.blobs=blobs;this.impacts=impacts;
+  private final ObjectProvider<ExternalOperationScopePort> externalOperations;
+  public EvidenceReconciliation(EvidenceRepository r,EvidenceRecords records,IdentityAuthorization auth,LocalBlobStore blobs,ObjectProvider<EvidenceCorrectionImpact> impacts,ObjectProvider<ExternalOperationScopePort> externalOperations) {
+    this.r=r;this.records=records;this.auth=auth;this.blobs=blobs;this.impacts=impacts;this.externalOperations=externalOperations;
   }
   public Map<String,Object> claim(DomainContext c,String id){return r.require("Claims",c.organizationId(),uuid(id));}
   public Map<String,Object> review(DomainContext c,String id){return r.require("Reconciliations",c.organizationId(),uuid(id));}
@@ -50,10 +51,27 @@ public class EvidenceReconciliation {
       &&!r.rows("Events",c.organizationId()).stream().anyMatch(x->event.get("ID").equals(x.get("supersedesId"))||event.get("ID").equals(x.get("invalidatesId")));
     long variants=r.rows("InboxRecords",c.organizationId()).stream().filter(x->Objects.equals(event.get("sourceNamespace"),x.get("sourceNamespace"))&&Objects.equals(event.get("externalEventId"),x.get("externalEventId"))&&Objects.equals(event.get("sourceVersion"),x.get("sourceVersion"))).count();
     BigDecimal quantity=quantity(input.quantity(),input.unit(),ValueState.KNOWN);
-    boolean sameQuantity=quantity!=null&&claim.get("quantity") instanceof BigDecimal q&&quantity.compareTo(q)==0&&Objects.equals(input.unit(),claim.get("unit"));
+    boolean external="EXTERNAL_RESULT".equals(event.get("kind"));
+    boolean sameQuantity=external?quantity==null&&claim.get("quantity")==null:quantity!=null&&claim.get("quantity") instanceof BigDecimal q&&quantity.compareTo(q)==0&&Objects.equals(input.unit(),claim.get("unit"));
     boolean original=!r.rows("DocumentVersions",c.organizationId()).stream().anyMatch(x->doc.get("ID").equals(x.get("supersedesId")))&&"AVAILABLE".equals(doc.get("availability"))&&doc.get("blobId")!=null&&blobs.available(UUID.fromString(doc.get("blobId").toString()),doc.get("sha256").toString());
     boolean identity=false;
-    if(input.physicalScopeId()!=null) {
+    if(external&&input.physicalScopeId()!=null) {
+      var operations=externalOperations.getIfAvailable();
+      if(operations==null)throw new DomainError("HELD","POLICY_UNRESOLVED","External operation scope adapter unavailable");
+      var operation=operations.require(c,uuid(input.physicalScopeId()));
+      identity="WORK".equals(claim.get("subjectKind"))&&Objects.equals(operation.get("workId"),claim.get("subjectId"))&&Objects.equals(operation.get("ID"),input.physicalScopeId());
+      var operationScopes=new LinkedHashMap<String,Collection<String>>(scopes(claim));operationScopes.put("TARGET",List.of(input.physicalScopeId()));
+      auth.authorizeScopes(c,capability,operationScopes);
+      if(original)try {
+        var mapper=new com.fasterxml.jackson.databind.ObjectMapper();
+        var originalPayload=mapper.readTree(blobs.read(UUID.fromString(doc.get("blobId").toString()),doc.get("sha256").toString()));
+        var eventPayload=mapper.readTree(event.get("payload").toString());
+        String outcome=originalPayload.path("outcome").asText();
+        identity&=input.physicalScopeId().equals(originalPayload.path("externalOperationId").asText())
+          &&input.physicalScopeId().equals(eventPayload.path("externalOperationId").asText())&&outcome.equals(eventPayload.path("outcome").asText())
+          &&Set.of("CONFIRMED_SUCCESS","CONFIRMED_FAILURE").contains(outcome);
+      }catch(java.io.IOException malformedOriginal){identity=false;}
+    }else if(input.physicalScopeId()!=null) {
       var physical=r.subject(c.organizationId(),"SEGMENT",uuid(input.physicalScopeId()));
       var physicalScopes=new LinkedHashMap<String,Collection<String>>(scopes(claim));physicalScopes.put("TARGET",List.of(input.physicalScopeId()));physicalScopes.put("ITEM",List.of(physical.get("itemId").toString()));
       if(physical.get("placeId")!=null)physicalScopes.put("PLACE",List.of(physical.get("placeId").toString()));
@@ -73,7 +91,7 @@ public class EvidenceReconciliation {
       var relatedClaims=r.rows("Claims",c.organizationId()).stream().filter(x->Objects.equals(claim.get("eventId"),x.get("eventId"))).map(x->x.get("ID").toString()).collect(java.util.stream.Collectors.toSet());
       var canonicalIds=r.rows("Verifications",c.organizationId()).stream().filter(x->relatedClaims.contains(x.get("claimId"))&&"VERIFIED".equals(x.get("verdict"))).map(x->x.get("canonicalOccurrenceId").toString()).collect(java.util.stream.Collectors.toSet());
       if(r.rows("CanonicalOccurrences",c.organizationId()).stream().anyMatch(x->canonicalIds.contains(x.get("ID"))&&!input.physicalScopeId().equals(x.get("physicalScopeId"))))decision="CONFLICT";
-      Set<String> overlapping=r.overlappingScopes(c.organizationId(),input.physicalScopeId());
+      Set<String> overlapping=external?Set.of(input.physicalScopeId()):r.overlappingScopes(c.organizationId(),input.physicalScopeId());
       if(r.rows("CanonicalOccurrences",c.organizationId()).stream().anyMatch(x->!input.physicalScopeId().equals(x.get("physicalScopeId"))&&overlapping.contains(x.get("physicalScopeId"))&&event.get("kind").equals(x.get("kind"))))decision="CONFLICT";
     }
     if(input.physicalScopeId()!=null && r.rows("CanonicalOccurrences",c.organizationId()).stream().anyMatch(x->input.physicalScopeId().equals(x.get("physicalScopeId"))&&event.get("kind").equals(x.get("kind"))&&!input.effectiveFrom().equals(instant(x.get("effectiveFrom")))))decision="CONFLICT";
@@ -81,7 +99,7 @@ public class EvidenceReconciliation {
     if(input.existingCanonicalId()!=null) {
       var canonical=r.require("CanonicalOccurrences",c.organizationId(),uuid(input.existingCanonicalId()));auth.authorizeScopes(c,capability,scopes(canonical));
       if(!Objects.equals(input.physicalScopeId(),canonical.get("physicalScopeId"))||!Objects.equals(claim.get("subjectId"),canonical.get("subjectId"))||!Objects.equals(event.get("kind"),canonical.get("kind"))
-          ||!(canonical.get("quantity") instanceof BigDecimal q)||quantity==null||quantity.compareTo(q)!=0||!Objects.equals(input.unit(),canonical.get("unit"))||!input.effectiveFrom().equals(instant(canonical.get("effectiveFrom"))))decision="CONFLICT";
+          ||!sameQuantity(quantity,canonical.get("quantity"))||!Objects.equals(input.unit(),canonical.get("unit"))||!input.effectiveFrom().equals(instant(canonical.get("effectiveFrom"))))decision="CONFLICT";
     }
     var row=new LinkedHashMap<String,Object>();row.put("ID",UUID.randomUUID().toString());row.put("organizationId",c.organizationId());row.put("revision",1);row.put("createdAt",Instant.now());row.put("recordedAt",Instant.now());row.put("recordedBy",c.actorId());
     for(String field:List.of("subjectKind","subjectId","itemId","placeId","workId","sourceProfileId"))if(claim.get(field)!=null)row.put(field,claim.get(field));
@@ -93,13 +111,16 @@ public class EvidenceReconciliation {
     r.insert("Reconciliations",row);
     return Map.of("id",row.get("ID"),"revision",1,"outcome",decision,"inventoryEffects","NONE");
   }
+  private static boolean sameQuantity(BigDecimal requested,Object stored) {
+    return requested==null?stored==null:stored instanceof BigDecimal quantity&&requested.compareTo(quantity)==0;
+  }
   @Transactional
   public Map<String,Object> link(DomainContext c,String reconciliationId) {
     var review=review(c,reconciliationId);var claim=claim(c,review.get("claimId").toString());authorizeReviewer(c,"linkCanonicalOccurrence",claim);
     if(!"MATCHED".equals(review.get("decision")))throw new DomainError("HELD","EVIDENCE_UNVERIFIED","Reconciliation remains unresolved");
     // Recheck all source, policy, original, identity and quantity checks at the current commit fence.
     var checked=match(c,new Review(review.get("claimId").toString(),review.get("basisDocumentId").toString(),review.get("physicalScopeId").toString(),Objects.toString(review.get("existingCanonicalId"),null),
-      review.get("policyVersion").toString(),review.get("sourceIdentity").toString(),review.get("quantity").toString(),review.get("unit").toString(),instant(review.get("effectiveFrom")),review.get("reason").toString()),"linkCanonicalOccurrence");
+      review.get("policyVersion").toString(),review.get("sourceIdentity").toString(),Objects.toString(review.get("quantity"),null),Objects.toString(review.get("unit"),null),instant(review.get("effectiveFrom")),review.get("reason").toString()),"linkCanonicalOccurrence");
     if(!"MATCHED".equals(checked.get("outcome")))throw new DomainError("HELD","EVIDENCE_UNVERIFIED","Current review checks failed");
     String physical=review.get("physicalScopeId").toString();String existing=Objects.toString(review.get("existingCanonicalId"),null);
     var event=r.require("Events",c.organizationId(),claim.get("eventId").toString());
