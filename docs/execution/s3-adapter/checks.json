@@ -1,0 +1,122 @@
+{
+  "status": "PASS",
+  "gateComplete": false,
+  "fullNormativeCoverageClaimed": false,
+  "fixtureSynthetic": true,
+  "actualExternalCalls": false,
+  "focusedHarnessTests": {
+    "run": 3,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "attempts": [
+    {
+      "attempt": 1,
+      "status": "FAIL",
+      "failure": "AssertionError: handover-record HTTP status 500",
+      "boundedAssertions": 79,
+      "sourceCommit": "3a40218db4f525656510076bf58e4aeff26ebe80",
+      "jarSha256": "cd85f15519047d0ad01e695ad5725c45cde44e9e490e0bc05908c23a21c19645",
+      "nativeArtifactPath": "/tmp/mulino-s3-actual-20261008-run1/actual-s3-native.json",
+      "nativeSha256": "8859156d401210eafc33c0df673f2c2580eb8721ee44ffa191e1890691293a66",
+      "receiptSha256": "9f69bf514f768d63a278cd82908c98ae950c8919e7c0da7869ed000f5a70980b",
+      "cleanSourceBefore": true,
+      "cleanSourceAfter": true,
+      "sourceDrift": false,
+      "cleanup": {
+        "backendStopped": true,
+        "createdContainerRemoved": true,
+        "ephemeralKeyDirectoryRemoved": true,
+        "ephemeralBlobDirectoryRemoved": true
+      },
+      "archivePath": "docs/execution/s3-adapter/attempts/native-1.tar.gz",
+      "archiveSha256": "df819d19f39ef97246362267b94459b752fc3445e044b08be5cdd9603e079413"
+    },
+    {
+      "attempt": 2,
+      "status": "FAIL",
+      "failure": "AssertionError: after60 missing observation \"/rawRows/mulino_responsibility_assignments\"",
+      "boundedAssertions": 126,
+      "sourceCommit": "9446eb05e8ef4868063af8f1a5e251bb2b818279",
+      "jarSha256": "3509481f5065558933c311dbda2a2e702cc383debc9be96aadda94094e55e3ac",
+      "nativeArtifactPath": "/tmp/mulino-s3-actual-20261008-run2/actual-s3-native.json",
+      "nativeSha256": "cb84bb4d81dd822948bb95d17bf864b75f3e936c81bc54ed9d4d7e62c0f49dca",
+      "receiptSha256": "6928466aa5b893bdbf3239e5843b20d95644ec3a719e851f7cb87d3e01f6b944",
+      "cleanSourceBefore": true,
+      "cleanSourceAfter": true,
+      "sourceDrift": false,
+      "cleanup": {
+        "backendStopped": true,
+        "createdContainerRemoved": true,
+        "ephemeralKeyDirectoryRemoved": true,
+        "ephemeralBlobDirectoryRemoved": true
+      },
+      "archivePath": "docs/execution/s3-adapter/attempts/native-2.tar.gz",
+      "archiveSha256": "0b22120cff28b84126be85b851c7e96eed6e19f8824d41c2ab076fb14a1c4218"
+    },
+    {
+      "attempt": 3,
+      "status": "NOT_RUN",
+      "failure": "IllegalStateException: Actual fixture transaction failed: PSQLException SQLSTATE=23505 table=mulino_identity_organizations constraint=mulino_identity_organizations_externalalias_key column=UNKNOWN",
+      "boundedAssertions": 548,
+      "sourceCommit": "89140e68bde24cbdffeff6c9de735588a27b62a9",
+      "jarSha256": "3509481f5065558933c311dbda2a2e702cc383debc9be96aadda94094e55e3ac",
+      "nativeArtifactPath": "/tmp/mulino-s3-actual-20261008-run3/actual-s3-native.json",
+      "nativeSha256": "2f91efc2e3a6e90c7876967c7b27349af2fc57567ffa223db3f48ea020c4aa6c",
+      "receiptSha256": "6bf56635fd1016f0feb7891e5e8b4dc4199935d1579d9dcf2cf875204e7bcbde",
+      "cleanSourceBefore": true,
+      "cleanSourceAfter": true,
+      "sourceDrift": false,
+      "cleanup": {
+        "backendStopped": true,
+        "createdContainerRemoved": true,
+        "ephemeralKeyDirectoryRemoved": true,
+        "ephemeralBlobDirectoryRemoved": true
+      },
+      "archivePath": "docs/execution/s3-adapter/attempts/native-3.tar.gz",
+      "archiveSha256": "84b825a34ab1ef79c9ae543a285b618cf47ffd796cf0eb638160f26b69200574"
+    },
+    {
+      "attempt": 4,
+      "status": "PASS",
+      "failure": null,
+      "boundedAssertions": 594,
+      "sourceCommit": "798541c69ed7ab4f668cba4858583e3a6a0a4781",
+      "jarSha256": "3509481f5065558933c311dbda2a2e702cc383debc9be96aadda94094e55e3ac",
+      "nativeArtifactPath": "/tmp/mulino-s3-actual-20261008-run4/actual-s3-native.json",
+      "nativeSha256": "ffe2e2332601e529678b7c5e4f0aff9c9c23fa5255cf4210e14a8fbfc445293d",
+      "receiptSha256": "d1bac998cf0fe4aa4920fbddaf5ed491ea2d877df34cac00af6eed85d0e88346",
+      "cleanSourceBefore": true,
+      "cleanSourceAfter": true,
+      "sourceDrift": false,
+      "cleanup": {
+        "backendStopped": true,
+        "createdContainerRemoved": true,
+        "ephemeralKeyDirectoryRemoved": true,
+        "ephemeralBlobDirectoryRemoved": true
+      },
+      "archivePath": "docs/execution/s3-adapter/attempts/native-4.tar.gz",
+      "archiveSha256": "f5b3316ee816b76c58666f7add696ddbe026a5d257df5a5de0334387c4b031f0"
+    }
+  ],
+  "covered": [
+    "purchase100 and hash-bound approval/dispatch",
+    "public supplier and shipment original reconciliation",
+    "unidentified provisional7 eligible0",
+    "receipt60+40, same60 sourceA/sourceB dedup, excess5",
+    "V6 actual upstream commit/client response loss, freshJWT/newRPC parallel retry, changedpayload conflict, otheractor effects denial, separateorder/key",
+    "regulatory30 intersect QC100/customer/commercial permission",
+    "overlap QC/RECALL independent QC release",
+    "purchase cancellation pendingexternal retains OPEN duty",
+    "receiptshortfall40→0 via immutable receipt credits",
+    "isolated preexistingtransit60 move preserves heldtotal60 and retry once"
+  ],
+  "limitations": [
+    "Full T13–T16/C1/C5/V6 normative corpus not claimed",
+    "Concurrent RPC starts have no transaction-stage barrier; controlled in-flight transaction overlap not proved",
+    "Preexisting transit baseline fixture proves movement only, not transit acquisition",
+    "Original sources, supplier response, regulatory policy and decisions are synthetic; no legal/regulatory validation",
+    "Root integrated source aggregate replay remains coordinator responsibility"
+  ]
+}

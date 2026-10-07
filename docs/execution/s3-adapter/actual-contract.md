@@ -16,7 +16,7 @@ committed source hash, 실행 JAR/class hash와 PostgreSQL image digest를
 생성한 자원만 정리한다. server verification clock ACK를 확인한다.
 
 fixture는 typed 정의·현재 COMMAND 정책·권한·기초 명사와 외부 ORIGINAL
-문서·사건·주장만 설치한다. S3 QuantitySegment seed는 금지한다.
+문서·사건·주장만 설치한다. main S3 QuantitySegment seed는 금지한다.
 검증·canonical publication·업무 효과는 공개 API에서 수행한다.
 독립 SQL은 organization 전체의 실제 table을 하나의 REPEATABLE_READ
 snapshot으로 읽고 table별 SQL·boundValues·rowPointer를 기록한다.
@@ -47,3 +47,15 @@ fixture는 실물 seed를 포함하지 않는다.
 독립 SQL의 UNKNOWN/PROVISIONAL1·확정 수령0·재고0과 실제 inventory
 eligible0을 검사한다. 이 원본은 canonical publication이나 확정
 수령에 사용하지 않는다.
+
+최종 native4는 `./verify actual-s3`에서154개 실제 action과594개
+bounded assertion을 통과했다. source798541c6과 JAR3509481f50655589
+전체 hash, table별 SQL·bind·snapshot, 원본 hash, 요청·응답, clock ACK,
+cleanup은 `checks.json`과 `attempts/native-4.tar.gz`에 보존했다.
+앞선3회 실패도 같은 archive 구조로 보존했다. 새 임시 backend·DB·
+키·blob root의 cleanup은 모두 true다. focused harness3개도 PASS다.
+
+V6의 두 RPC는 실제로 새 인증과 동시에 시작하지만 transaction 단계의
+barrier는 없다. 이미 commit된 결과를 병렬 재시도하는 검증이며
+진행 중인 transaction 내부의 controlled overlap을 입증하지 않는다.
+전체 normative case corpus와 coordinator aggregate replay는 별도다.
