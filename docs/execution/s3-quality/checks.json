@@ -1,0 +1,174 @@
+{
+  "task": "new mulino-coreano-ontology",
+  "userStep": 3,
+  "systemStage": "S3",
+  "subtask": "quality",
+  "testedCommit": "469aa4d7fc8f5ec6c81855ccb195b54556a42ffa",
+  "finishedAt": "2026-10-08T05:32:02+09:00",
+  "command": "JAVA_HOME=<Java21> PATH=<Node24>:<Java21>:/opt/homebrew/bin:/usr/bin:/bin ./mvnw -f backend/pom.xml -Dtest=QualityPostgresTest,QualityRangesTest test",
+  "exitCode": 0,
+  "observed": {
+    "tests": 13,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "build": "SUCCESS",
+    "seconds": 33.693
+  },
+  "suites": [
+    {
+      "suite": "com.mulino.quality.QualityPostgresTest",
+      "tests": 9,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "seconds": "30.814",
+      "cases": [
+        "partialHoldSuspendsOnlyIntersectingAllocation",
+        "c1Consignment40AndCustomerCustody60OnlyCommercial40IsEligible",
+        "regulatory30IntersectQc100AndCommercialCustomer100Is30",
+        "ownerCustodianAndQcAloneDoNotPermitSale",
+        "noEventExpirySuspends20AndKeepsOwnerNextCheckExactlyOnce",
+        "qcDecisionRoleCannotRecordCommercialDisposition",
+        "overlappingHoldsReleaseOnlyReferencedRestriction",
+        "revokingOverlappingBasisKeepsStillAuthorizedAllocation",
+        "unrelatedActionHoldKeepsSaleAllocationExecutable"
+      ]
+    },
+    {
+      "suite": "com.mulino.quality.QualityRangesTest",
+      "tests": 4,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "seconds": "0.032",
+      "cases": [
+        "decimalsRemainExact",
+        "fullClosedTimeIntervalReleasesAtDecisionInstant",
+        "overlapIsUnionedAndIndependentHoldsSubtract",
+        "partialIntersectionCannotAddDisjointAuthorizations"
+      ]
+    }
+  ],
+  "versions": {
+    "java": "21",
+    "node": "24",
+    "postgres": "18.6",
+    "postgresImage": "postgres@sha256:4ef4dbc939d61acea57712655ddb4b4ab27419c913f94cca0cd57cb3ea3c2280"
+  },
+  "fixture": "JWT decoder and ExecutionClock mocks only; actual ApplicationCommands, identity, current policy, original blobs, reconciliation, regulatory, quality, TradeImpact, responsibility and disposable PostgreSQL. VERIFIED results are not SQL seeded. Work created/activated through gateway.",
+  "notRun": [
+    {
+      "test": "decimalRegulatoryIntersectionRemainsExactThroughGateway",
+      "introducedCommit": "2c6a9461",
+      "status": "NOT_RUN",
+      "reason": "Added after exact tenth PASS; root aggregate verification pending."
+    },
+    "S4 sales/dispatch",
+    "live external services",
+    "paid models"
+  ],
+  "hashManifest": "source-class-hashes.json",
+  "artifacts": [
+    {
+      "path": "raw/maven-tenth-pass.log.gz",
+      "rawBytes": 11352549,
+      "gzipBytes": 665744,
+      "rawSha256": "ceb01a05b36ee8d7cb0434de9f6017612e469cf399f3ae3eed339237a11eb6d8",
+      "gzipSha256": "9ef96f2011246ff1785ff3f7a2db1f84e866a9a8d73e2185c1aa07669fe0c9e7"
+    },
+    {
+      "path": "raw/TEST-com.mulino.quality.QualityPostgresTest.xml.gz",
+      "rawBytes": 11394133,
+      "gzipBytes": 671417,
+      "rawSha256": "faa812cd78e43927b70074f10690afe9bc93542cc6e75b68dd68b0e1c79d7983",
+      "gzipSha256": "ad82445e6616ebc4de064d6bf1aafd74774f96c1f23a0fd7b4c95cf2def099b7"
+    },
+    {
+      "path": "raw/TEST-com.mulino.quality.QualityRangesTest.xml.gz",
+      "rawBytes": 43619,
+      "gzipBytes": 4695,
+      "rawSha256": "bba8cbc5ab56d39953d498744267a699ccedff7602e364ab1b32d4f6e0df6faf",
+      "gzipSha256": "97a3c162a7dfee6b7351d0a7a8ca5c69ce5f58b84e69e6e5769f482d8f48ea78"
+    },
+    {
+      "path": "raw/com.mulino.quality.QualityPostgresTest.txt.gz",
+      "rawBytes": 326,
+      "gzipBytes": 136,
+      "rawSha256": "3e0eb1a3824b009b51d2cd153ae5a0096673e41c4b34d23c27da992c67e62261",
+      "gzipSha256": "508e8f3c72eff62ed16db2106bfaf365647bbf3c616a43ea67290da3f74430f4"
+    },
+    {
+      "path": "raw/com.mulino.quality.QualityRangesTest.txt.gz",
+      "rawBytes": 322,
+      "gzipBytes": 133,
+      "rawSha256": "1d2116532c9540184ba7cda51c6d863218ea9ea29308d3b3e358f059036ae2bd",
+      "gzipSha256": "8c91d796ad1d87de179f81dc9f66cb692bc4cf365362e63c3facc3c63463dd24"
+    },
+    {
+      "path": "raw/mulino-s3-quality-tests-eighth.log.gz",
+      "rawBytes": 261665,
+      "gzipBytes": 21960,
+      "rawSha256": "019058c8dbde06a90e940c84f0db27fac834d711d3b8aeac5e7ea7e2b8ff3995",
+      "gzipSha256": "bb7a28d17d7457eb5d574bd3566f87659baa52e9103c7f25446de82991d6a64a"
+    },
+    {
+      "path": "raw/mulino-s3-quality-tests-fifth.log.gz",
+      "rawBytes": 4887,
+      "gzipBytes": 1234,
+      "rawSha256": "1834dd614ed81f207e43d13deace8a8c3cef3b5dc5e9c05ad61800fc48484a2f",
+      "gzipSha256": "ec1641ef4f29abff827f3ce46ce3ae8f19312668c7fde93db0f91d1918e75bb1"
+    },
+    {
+      "path": "raw/mulino-s3-quality-tests-fourth.log.gz",
+      "rawBytes": 27866,
+      "gzipBytes": 5639,
+      "rawSha256": "0174b5c076c968ac80303f632f9abde68e34e311c63b90c1c9e7e5591ac72b58",
+      "gzipSha256": "6438e610f3ce0393c9aa51354c764370e4c494c21db7fc5846e04eb7e40d8bec"
+    },
+    {
+      "path": "raw/mulino-s3-quality-tests-ninth.log.gz",
+      "rawBytes": 6309857,
+      "gzipBytes": 362398,
+      "rawSha256": "123ccf3ffaf193d74bfb86943a4fa1321a0fae5d35f96faa8aa99ef1b81eaf64",
+      "gzipSha256": "4ab115c724b741d4729339fb368c4e4ecc71a0cfef1337016ce634e9ad5d9f85"
+    },
+    {
+      "path": "raw/mulino-s3-quality-tests-second.log.gz",
+      "rawBytes": 11024,
+      "gzipBytes": 1506,
+      "rawSha256": "8c14e02797700cc610944beae7406d2b14cfd5b995f861fadfac9917b228e38d",
+      "gzipSha256": "300c7cf190ea4dc6e1ecf354af310ee5c02ae5b16ca7d6b789b4595cc2311b0b"
+    },
+    {
+      "path": "raw/mulino-s3-quality-tests-seventh.log.gz",
+      "rawBytes": 57490,
+      "gzipBytes": 8313,
+      "rawSha256": "a086da266594030dda723419dc020e5ae613c56997399e0c44428448f609b566",
+      "gzipSha256": "e935098b50ee1cc5deeae1aa322bea27ec466e62d316ff4ad0718570b545f703"
+    },
+    {
+      "path": "raw/mulino-s3-quality-tests-sixth.log.gz",
+      "rawBytes": 1322769,
+      "gzipBytes": 82629,
+      "rawSha256": "1cf71dbb43b31b5b7035ba55040a09d37b8ce6d3c3239a4656c0d7867f43f235",
+      "gzipSha256": "a23857f98755dbb149bf3535f11de8d0a1d70a9db450bc63154fe79552fdd6b3"
+    },
+    {
+      "path": "raw/mulino-s3-quality-tests-third.log.gz",
+      "rawBytes": 269187,
+      "gzipBytes": 21035,
+      "rawSha256": "c67f2defde89f2fac3b356c43adceabbedd38b4c814521f01909f70c6097465a",
+      "gzipSha256": "57ca722f9e73548aefd205be9cf243170f93609d4ecd19ae6bd2860d39e441ed"
+    },
+    {
+      "path": "raw/mulino-s3-quality-tests.log.gz",
+      "rawBytes": 39321,
+      "gzipBytes": 6704,
+      "rawSha256": "2811294860f4e51986c4df573ce349a6b547d494daa6db28177808a6077bc0c5",
+      "gzipSha256": "4c939ac3848a2c07c943da14e9b4ea17ca9b7ad1fbdf90b9fe4e5aa44a14c56e"
+    }
+  ],
+  "failedRuns": "Archived exactly; prior fixture, compile, context and schema failures remain separate from tenth PASS.",
+  "hashManifestSha256": "bb654f9d12341f4154cc90e7de6dc19ff619a3d4b3d65af2899bee42aa7d6435"
+}

@@ -57,3 +57,16 @@ pure4와 actual PG/gateway9 모두 PASS다. 총13, failure0, error0다.
 추가 actual decimal 교집합 검사는 별도 실행 대기다. 그 외 13개 결과를
 소급 변경하지 않는다. 전체 Step 통합과 native adapter 검증은 coordinator가
 별도 source에서 실행한다.
+
+## 보존된 원문과 source 결합
+
+이 디렉터리의 `checks.json`은 정확한 tenth source
+`469aa4d7fc8f5ec6c81855ccb195b54556a42ffa`의 13 PASS를 기록한다.
+`raw/maven-tenth-pass.log.gz`와 두 JUnit XML/TXT gzip에 실제 출력이
+있다. 이전 9개 실패 Maven 로그도 raw에 보존한다. gzip마다 압축 전후
+SHA-256을 기록하고 해제한 내용의 hash를 다시 확인했다.
+
+`source-class-hashes.json`은 해당 commit의 source·fixture 245개와
+그 실행 뒤 보존된 class 216개의 SHA-256이다. 현재 decimal 추가 fixture를
+소급 결합하지 않는다. 추가 decimal case는 checks.json에 NOT_RUN으로
+명시하며 전체 Step 통합 검증이 이를 갱신할 때까지 PASS가 아니다.
