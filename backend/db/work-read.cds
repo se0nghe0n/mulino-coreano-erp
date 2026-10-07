@@ -16,15 +16,26 @@ entity Works : scopedRead {
   ownerId : UUID not null;
   supervisorId : UUID not null;
   waitJson : LargeString;
+  currentGoalVersionId : UUID;
+  closeReason : String(40);
+  pendingInvalidation : Boolean not null default false;
+  lifecycleMode : String(20) not null default 'IMPORTED';
 }
 entity GoalReferences : scopedRead {
   workId : UUID not null;
   definitionVersionId : UUID not null;
-  quantityMode : String(40) not null;
+  quantityMode : String(40);
   targetQuantity : Decimal(38,12);
   unit : String(20);
   endpoint : String(80);
   scopeJson : LargeString not null;
+  slotsJson : LargeString;
+  provenanceJson : LargeString;
+  evidencePolicyVersion : String(80);
+  timezone : String(80);
+  dueAt : Timestamp;
+  previousGoalId : UUID;
+  goalVersion : Integer not null default 1;
 }
 entity AssessmentReferences : scopedRead {
   workId : UUID not null;
@@ -33,6 +44,14 @@ entity AssessmentReferences : scopedRead {
   evaluatorVersion : String(80) not null;
   assessedAt : Timestamp not null;
   conditionsJson : LargeString not null;
+  definitionVersionId : UUID;
+  policyVersionId : UUID;
+  knownAt : Timestamp;
+  asOf : Timestamp;
+  previousAssessmentId : UUID;
+  inputSnapshotHash : String(64);
+  deadlineViolated : Boolean not null default false;
+  held : Boolean not null default false;
 }
 entity ObligationReferences : scopedRead {
   workId : UUID not null;
