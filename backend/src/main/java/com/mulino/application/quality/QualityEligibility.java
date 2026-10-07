@@ -13,8 +13,8 @@ import org.springframework.stereotype.Component;
 /** Conditions intersect exact physical coordinates; ownership and custody are never permissions. */
 @Component
 public class QualityEligibility implements InventoryReadFacts,QueryHandler {
- private final InventoryRepository r;private final QualityEvidence evidence;private final RegulatoryEligibility regulatory;private final PolicyRepository policies;private final IdentityAuthorization auth;
- public QualityEligibility(InventoryRepository r,QualityEvidence evidence,RegulatoryEligibility regulatory,PolicyRepository policies,IdentityAuthorization auth){this.r=r;this.evidence=evidence;this.regulatory=regulatory;this.policies=policies;this.auth=auth;}
+ private final InventoryRepository r;private final StockPrimitives stock;private final QualityEvidence evidence;private final RegulatoryEligibility regulatory;private final PolicyRepository policies;private final IdentityAuthorization auth;
+ public QualityEligibility(InventoryRepository r,StockPrimitives stock,QualityEvidence evidence,RegulatoryEligibility regulatory,PolicyRepository policies,IdentityAuthorization auth){this.r=r;this.stock=stock;this.evidence=evidence;this.regulatory=regulatory;this.policies=policies;this.auth=auth;}
  public Set<String>metrics(){return Set.of("eligibleQuantity","reservedQuantity","unreservedEligibleQuantity","eligibilityStatus");}
  public Set<String>operations(){return Set.of("evaluateEligibility");}
  public record Result(String state,BigDecimal eligibleQuantity,List<QualityRanges.Range>ranges,List<Map<String,Object>>conditions,List<String>evidenceRefs,List<String>unknowns,Instant nextValidityBoundary){}
@@ -31,7 +31,7 @@ public class QualityEligibility implements InventoryReadFacts,QueryHandler {
   for(String category:List.of("QC","CUSTOMER","COMMERCIAL")){
    var ranges=new ArrayList<QualityRanges.Range>();
    for(var b:bases)if(id.equals(b.get("segmentId"))&&category.equals(b.get("category"))&&action.equals(b.get("action"))&&(b.get("customerId")==null||Objects.equals(customerId,b.get("customerId")))){
-    next=permissionBoundary(next,b,at);if(active(b,at)&&evidence.valid(c,(String)b.get("evidenceRef"),id)){ranges.add(range(b));refs.add((String)b.get("evidenceRef"));}
+    next=permissionBoundary(next,b,at);if(active(b,at,c.knownAt())&&evidence.valid(c,(String)b.get("evidenceRef"),id)){ranges.add(range(b));refs.add((String)b.get("evidenceRef"));}
    }
    String state=ranges.isEmpty()?"UNKNOWN":"ALLOWED";if(ranges.isEmpty())unknowns.add(category+"_AUTHORITY_UNCONFIRMED");conditions.add(Map.of("condition",category,"state",state,"allowedRanges",dto(ranges)));
    allowed=QualityRanges.intersect(allowed,ranges);
@@ -40,7 +40,7 @@ public class QualityEligibility implements InventoryReadFacts,QueryHandler {
   conditions.add(Map.of("condition","REGULATORY","state",reg.state()));unknowns.addAll(reg.unknowns());refs.addAll(reg.evidenceRefs());next=minimum(next,reg.nextValidityBoundary());allowed=QualityRanges.intersect(allowed,reg.allowedRanges().stream().map(x->new QualityRanges.Range(x.start(),x.end())).toList());
   var blocks=new ArrayList<QualityRanges.Range>();boolean blocked=false;
   for(var hold:r.rows(c,"Restrictions"))if(Objects.equals(segment.get("controlScope"),hold.get("controlScope"))&&Set.of(action,"ALL").contains(hold.get("action"))){
-   next=permissionBoundary(next,hold,at);if(active(hold,at)){
+   next=permissionBoundary(next,hold,at);if(active(hold,at,c.knownAt())){
     if(hold.get("segmentId")==null){blocks.add(new QualityRanges.Range(BigDecimal.ZERO,quantity));blocked=true;}
     else if(id.equals(hold.get("segmentId"))){blocks.add(range(hold));blocked=true;refs.add((String)hold.get("evidenceRef"));}
     else if(overlap(c,id,(String)hold.get("segmentId"))){blocks.add(new QualityRanges.Range(BigDecimal.ZERO,quantity));blocked=true;unknowns.add("ANCESTOR_SCOPE_REQUIRES_PHYSICAL_RECONCILIATION");}
@@ -52,7 +52,8 @@ public class QualityEligibility implements InventoryReadFacts,QueryHandler {
  }
  private boolean overlap(DomainContext c,String a,String b){var all=new HashSet<String>();all.add(b);boolean changed;do{changed=false;for(var edge:r.rows(c,"GenealogyEdges"))if(all.contains(edge.get("sourceId")))changed|=all.add((String)edge.get("targetId"));}while(changed);return all.contains(a);}
  /** Time permissions use full closed [validFrom,validUntil]; release is effective at releasedAt. */
- public static boolean active(Map<String,Object>b,Instant at){if(b.get("validFrom")==null||at.isBefore(StockPrimitives.instant(b.get("validFrom")))||(b.get("validUntil")!=null&&at.isAfter(StockPrimitives.instant(b.get("validUntil")))))return false;return b.get("releasedAt")!=null?at.isBefore(StockPrimitives.instant(b.get("releasedAt"))):"ACTIVE".equals(b.get("state"));}
+ public static boolean active(Map<String,Object>b,Instant at){return active(b,at,Instant.MAX);}
+ public static boolean active(Map<String,Object>b,Instant at,Instant known){if(b.get("validFrom")==null||at.isBefore(StockPrimitives.instant(b.get("validFrom")))||(b.get("validUntil")!=null&&at.isAfter(StockPrimitives.instant(b.get("validUntil")))))return false;return b.get("releasedAt")!=null?(StockPrimitives.instant(b.get("releasedAt")).isAfter(known)||at.isBefore(StockPrimitives.instant(b.get("releasedAt")))):"ACTIVE".equals(b.get("state"));}
  public static QualityRanges.Range range(Map<String,Object>b){var start=b.get("startQuantity") instanceof BigDecimal x?x:BigDecimal.ZERO;return new QualityRanges.Range(start,start.add((BigDecimal)b.get("quantity")));}
  private static Instant permissionBoundary(Instant next,Map<String,Object>b,Instant at){if("ACTIVE".equals(b.get("state"))&&b.get("validUntil")!=null)next=minimumFuture(next,StockPrimitives.instant(b.get("validUntil")).plusNanos(1000),at);if(b.get("validFrom")!=null)next=minimumFuture(next,StockPrimitives.instant(b.get("validFrom")),at);return next;}
  private static Instant minimumFuture(Instant a,Instant b,Instant at){return b.isAfter(at)?minimum(a,b):a;}
@@ -65,6 +66,13 @@ public class QualityEligibility implements InventoryReadFacts,QueryHandler {
    unreserved=unreserved.add(QualityRanges.quantity(QualityRanges.subtract(result.ranges(),ranges)).subtract(unidentified).max(BigDecimal.ZERO));
   }
   return new Facts(Map.of("eligibleQuantity",InventoryQuantity.text(eligible),"reservedQuantity",InventoryQuantity.text(reserved),"unreservedEligibleQuantity",InventoryQuantity.text(unreserved),"eligibilityStatus",eligible.signum()>0?(partial?"PARTIAL":"ALLOWED"):(unknowns.isEmpty()?"DENIED":"UNKNOWN")),List.copyOf(unknowns),List.of(),List.copyOf(refs));
+ }
+ /** S4 consumers use this inside their gateway transaction; a delayed sweep grants no execution. */
+ public Result requireExecutableAllocation(DomainContext c,String allocationId,String capability,String action,String customerId){
+  var allocation=r.current(c,"SegmentAllocations",allocationId);var segment=r.current(c,"QuantitySegments",allocation.get("segmentId").toString());r.fence(c,stock.fences(segment));policies.fence(c.organizationId());auth.fence(c,List.of(c.actorId()));allocation=r.current(c,"SegmentAllocations",allocationId);
+  if(!"EXECUTABLE".equals(allocation.get("state")))throw new DomainError("REJECTED","SCOPE_INELIGIBLE","Allocation is not executable");
+  var current=new DomainContext(c.organizationId(),c.actorId(),c.stableRequestOwner(),auth.now(),auth.now());var result=assess(current,segment,action,customerId);BigDecimal required=(BigDecimal)allocation.get("quantity");boolean enough=allocation.get("startQuantity") instanceof BigDecimal start?QualityRanges.quantity(QualityRanges.intersect(result.ranges(),List.of(new QualityRanges.Range(start,start.add(required))))).compareTo(required)>=0:"ALLOWED".equals(result.state())&&result.eligibleQuantity().compareTo(StockPrimitives.amount(segment))>=0;
+  if(!enough)throw new DomainError("REJECTED","SCOPE_INELIGIBLE","Current exact allocation intersection is insufficient");auth.authorizeScopes(c,capability,Map.of("TARGET",List.of((String)segment.get("ID")),"ITEM",List.of((String)segment.get("itemId")),"PLACE",List.of((String)segment.get("placeId"))));return result;
  }
  public QueryResult query(DomainContext c,QueryRequest q){if(!Set.of("action","customerId","itemId").containsAll(q.filters().keySet()))throw DomainError.invalid("Unsupported eligibility filter");String id=q.id();if(id==null)throw DomainError.invalid("Segment ID required");var segment=r.object(c,"QuantitySegments",id);auth.authorizeScopes(c,q.operation(),Map.of("TARGET",List.of(id),"ITEM",List.of((String)segment.get("itemId")),"PLACE",List.of((String)segment.get("placeId"))));String action=q.filters().getOrDefault("action","SELL").toString();if(!Set.of("SELL","DISPATCH","DISPOSE","INTERNAL_MOVE").contains(action))throw DomainError.invalid("Unsupported eligibility action");var result=assess(c,segment,action,Objects.toString(q.filters().get("customerId"),null));var data=new LinkedHashMap<String,Object>();data.putAll(Map.of("segmentId",id,"itemId",segment.get("itemId"),"action",action,"unit",segment.get("unit"),"eligibleQuantity",InventoryQuantity.text(result.eligibleQuantity()),"eligibilityStatus",result.state(),"conditions",result.conditions(),"allowedRanges",dto(result.ranges())));data.put("nextValidityBoundary",result.nextValidityBoundary());return new QueryResult(data,q.scope(),result.unknowns(),List.of(),result.evidenceRefs(),null);}
 }
