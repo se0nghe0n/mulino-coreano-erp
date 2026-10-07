@@ -32,5 +32,11 @@ cases.push({id:'mcp-reader-denial',route:mcp,token:'reader',headers,status:[200]
  'io.modelcontextprotocol/clientInfo':{name:'security-probe',version:'1.0.0'},'io.modelcontextprotocol/clientCapabilities':{}}}}});
 // The valid same-input write is deliberately last so rejected writes all see revision0.
 cases.push({id:'rest-authorized-counter-call',route:rest,token:'writer',payload:payload('security-authorized-rest'),status:[200]});
+cases.push({id:'odata-authorized-counter-call',route:odata,token:'writer',payload:{...payload('security-authorized-odata'),expectedRevision:1},status:[200]});
+const mcpCounter=structuredClone(cases.find(test=>test.id==='mcp-reader-denial'));
+mcpCounter.id='mcp-authorized-counter-call';mcpCounter.token='writer';mcpCounter.snapshot=false;
+mcpCounter.bodyEquals={'/result/isError':false};mcpCounter.payload.id='security-authorized-mcp';
+mcpCounter.payload.params.arguments={...payload('security-authorized-mcp'),expectedRevision:2};
+cases.push(mcpCounter);
 writeFileSync(outputPath,JSON.stringify({baseUrl,tokenPath,snapshot:get,cases},null,2)+'\n',{mode:0o600});
 console.log(JSON.stringify({cases:cases.length,configPath:outputPath}));

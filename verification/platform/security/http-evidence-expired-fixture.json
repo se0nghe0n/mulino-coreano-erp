@@ -1,0 +1,486 @@
+{
+  "contractVersion": 1,
+  "at": "2026-10-07T16:41:13.002Z",
+  "node": "v26.10.0",
+  "command": "node verification/platform/security/security-smoke.mjs run <local-config> <evidence>",
+  "scope": "S0 public HTTP authentication and sequential grant/policy boundary only",
+  "observations": [
+    {
+      "id": "rest-auth-anonymous",
+      "method": "GET",
+      "path": "/api/platform/scopes/00000000-0000-0000-0000-000000000001",
+      "status": 401,
+      "expectedStatus": [
+        401
+      ],
+      "responseHash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "expectedCode": null,
+      "expectedBody": null,
+      "bodyCodeMatches": true,
+      "snapshotBefore": null,
+      "snapshotAfter": null,
+      "publicSnapshotUnchanged": true,
+      "result": "PASS"
+    },
+    {
+      "id": "rest-auth-wrongSignature",
+      "method": "GET",
+      "path": "/api/platform/scopes/00000000-0000-0000-0000-000000000001",
+      "status": 401,
+      "expectedStatus": [
+        401
+      ],
+      "responseHash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "expectedCode": null,
+      "expectedBody": null,
+      "bodyCodeMatches": true,
+      "snapshotBefore": null,
+      "snapshotAfter": null,
+      "publicSnapshotUnchanged": true,
+      "result": "PASS"
+    },
+    {
+      "id": "rest-auth-wrongIssuer",
+      "method": "GET",
+      "path": "/api/platform/scopes/00000000-0000-0000-0000-000000000001",
+      "status": 401,
+      "expectedStatus": [
+        401
+      ],
+      "responseHash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "expectedCode": null,
+      "expectedBody": null,
+      "bodyCodeMatches": true,
+      "snapshotBefore": null,
+      "snapshotAfter": null,
+      "publicSnapshotUnchanged": true,
+      "result": "PASS"
+    },
+    {
+      "id": "rest-auth-wrongAudience",
+      "method": "GET",
+      "path": "/api/platform/scopes/00000000-0000-0000-0000-000000000001",
+      "status": 401,
+      "expectedStatus": [
+        401
+      ],
+      "responseHash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "expectedCode": null,
+      "expectedBody": null,
+      "bodyCodeMatches": true,
+      "snapshotBefore": null,
+      "snapshotAfter": null,
+      "publicSnapshotUnchanged": true,
+      "result": "PASS"
+    },
+    {
+      "id": "rest-auth-expired",
+      "method": "GET",
+      "path": "/api/platform/scopes/00000000-0000-0000-0000-000000000001",
+      "status": 401,
+      "expectedStatus": [
+        401
+      ],
+      "responseHash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "expectedCode": null,
+      "expectedBody": null,
+      "bodyCodeMatches": true,
+      "snapshotBefore": null,
+      "snapshotAfter": null,
+      "publicSnapshotUnchanged": true,
+      "result": "PASS"
+    },
+    {
+      "id": "rest-auth-notYetValid",
+      "method": "GET",
+      "path": "/api/platform/scopes/00000000-0000-0000-0000-000000000001",
+      "status": 200,
+      "expectedStatus": [
+        401
+      ],
+      "responseHash": "72b770618613a66b6064c538ab3356ae0238558ef02decb7183a76b135d02208",
+      "expectedCode": null,
+      "expectedBody": null,
+      "bodyCodeMatches": true,
+      "snapshotBefore": null,
+      "snapshotAfter": null,
+      "publicSnapshotUnchanged": true,
+      "result": "FAIL"
+    },
+    {
+      "id": "rest-auth-missingOrganization",
+      "method": "GET",
+      "path": "/api/platform/scopes/00000000-0000-0000-0000-000000000001",
+      "status": 401,
+      "expectedStatus": [
+        401
+      ],
+      "responseHash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "expectedCode": null,
+      "expectedBody": null,
+      "bodyCodeMatches": true,
+      "snapshotBefore": null,
+      "snapshotAfter": null,
+      "publicSnapshotUnchanged": true,
+      "result": "PASS"
+    },
+    {
+      "id": "rest-auth-missingOwner",
+      "method": "GET",
+      "path": "/api/platform/scopes/00000000-0000-0000-0000-000000000001",
+      "status": 401,
+      "expectedStatus": [
+        401
+      ],
+      "responseHash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "expectedCode": null,
+      "expectedBody": null,
+      "bodyCodeMatches": true,
+      "snapshotBefore": null,
+      "snapshotAfter": null,
+      "publicSnapshotUnchanged": true,
+      "result": "PASS"
+    },
+    {
+      "id": "rest-no-grant-read",
+      "method": "GET",
+      "path": "/api/platform/scopes/00000000-0000-0000-0000-000000000001",
+      "status": 403,
+      "expectedStatus": [
+        403
+      ],
+      "responseHash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "expectedCode": null,
+      "expectedBody": null,
+      "bodyCodeMatches": true,
+      "snapshotBefore": null,
+      "snapshotAfter": null,
+      "publicSnapshotUnchanged": true,
+      "result": "PASS"
+    },
+    {
+      "id": "odata-no-grant-list",
+      "method": "GET",
+      "path": "/odata/v4/platform/Scopes",
+      "status": 200,
+      "expectedStatus": [
+        200
+      ],
+      "responseHash": "7547988a083327698b7515d7ff3e21db5042ae6814814655a79c60052c4757fe",
+      "expectedCode": null,
+      "expectedBody": {
+        "/value": []
+      },
+      "bodyCodeMatches": true,
+      "snapshotBefore": null,
+      "snapshotAfter": null,
+      "publicSnapshotUnchanged": true,
+      "result": "PASS"
+    },
+    {
+      "id": "odata-other-org-list",
+      "method": "GET",
+      "path": "/odata/v4/platform/Scopes",
+      "status": 200,
+      "expectedStatus": [
+        200
+      ],
+      "responseHash": "7547988a083327698b7515d7ff3e21db5042ae6814814655a79c60052c4757fe",
+      "expectedCode": null,
+      "expectedBody": {
+        "/value": []
+      },
+      "bodyCodeMatches": true,
+      "snapshotBefore": null,
+      "snapshotAfter": null,
+      "publicSnapshotUnchanged": true,
+      "result": "PASS"
+    },
+    {
+      "id": "rest-valid-read",
+      "method": "GET",
+      "path": "/api/platform/scopes/00000000-0000-0000-0000-000000000001",
+      "status": 200,
+      "expectedStatus": [
+        200
+      ],
+      "responseHash": "72b770618613a66b6064c538ab3356ae0238558ef02decb7183a76b135d02208",
+      "expectedCode": null,
+      "expectedBody": null,
+      "bodyCodeMatches": true,
+      "snapshotBefore": null,
+      "snapshotAfter": null,
+      "publicSnapshotUnchanged": true,
+      "result": "PASS"
+    },
+    {
+      "id": "rest-other-org",
+      "method": "GET",
+      "path": "/api/platform/scopes/00000000-0000-0000-0000-000000000001",
+      "status": 403,
+      "expectedStatus": [
+        403
+      ],
+      "responseHash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "expectedCode": null,
+      "expectedBody": null,
+      "bodyCodeMatches": true,
+      "snapshotBefore": null,
+      "snapshotAfter": null,
+      "publicSnapshotUnchanged": true,
+      "result": "PASS"
+    },
+    {
+      "id": "rest-reader-denial",
+      "method": "POST",
+      "path": "/api/platform/actions/reserve",
+      "status": 403,
+      "expectedStatus": [
+        403
+      ],
+      "responseHash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "expectedCode": null,
+      "expectedBody": null,
+      "bodyCodeMatches": true,
+      "snapshotBefore": {
+        "organizationId": "org-a",
+        "ID": "00000000-0000-0000-0000-000000000001",
+        "quantity": 60,
+        "blocked": false,
+        "reserved": 0,
+        "revision": 0
+      },
+      "snapshotAfter": {
+        "organizationId": "org-a",
+        "ID": "00000000-0000-0000-0000-000000000001",
+        "quantity": 60,
+        "blocked": false,
+        "reserved": 0,
+        "revision": 0
+      },
+      "publicSnapshotUnchanged": true,
+      "result": "PASS"
+    },
+    {
+      "id": "rest-revoked-denial",
+      "method": "POST",
+      "path": "/api/platform/actions/reserve",
+      "status": 403,
+      "expectedStatus": [
+        403
+      ],
+      "responseHash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "expectedCode": null,
+      "expectedBody": null,
+      "bodyCodeMatches": true,
+      "snapshotBefore": {
+        "organizationId": "org-a",
+        "ID": "00000000-0000-0000-0000-000000000001",
+        "quantity": 60,
+        "blocked": false,
+        "reserved": 0,
+        "revision": 0
+      },
+      "snapshotAfter": {
+        "organizationId": "org-a",
+        "ID": "00000000-0000-0000-0000-000000000001",
+        "quantity": 60,
+        "blocked": false,
+        "reserved": 0,
+        "revision": 0
+      },
+      "publicSnapshotUnchanged": true,
+      "result": "PASS"
+    },
+    {
+      "id": "rest-payload-role-forgery",
+      "method": "POST",
+      "path": "/api/platform/actions/reserve",
+      "status": 403,
+      "expectedStatus": [
+        403
+      ],
+      "responseHash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "expectedCode": null,
+      "expectedBody": null,
+      "bodyCodeMatches": true,
+      "snapshotBefore": {
+        "organizationId": "org-a",
+        "ID": "00000000-0000-0000-0000-000000000001",
+        "quantity": 60,
+        "blocked": false,
+        "reserved": 0,
+        "revision": 0
+      },
+      "snapshotAfter": {
+        "organizationId": "org-a",
+        "ID": "00000000-0000-0000-0000-000000000001",
+        "quantity": 60,
+        "blocked": false,
+        "reserved": 0,
+        "revision": 0
+      },
+      "publicSnapshotUnchanged": true,
+      "result": "PASS"
+    },
+    {
+      "id": "anonymous-/odata/v4/platform/reserve",
+      "method": "POST",
+      "path": "/odata/v4/platform/reserve",
+      "status": 401,
+      "expectedStatus": [
+        401
+      ],
+      "responseHash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "expectedCode": null,
+      "expectedBody": null,
+      "bodyCodeMatches": true,
+      "snapshotBefore": null,
+      "snapshotAfter": null,
+      "publicSnapshotUnchanged": true,
+      "result": "PASS"
+    },
+    {
+      "id": "anonymous-/mcp",
+      "method": "POST",
+      "path": "/mcp",
+      "status": 401,
+      "expectedStatus": [
+        401
+      ],
+      "responseHash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "expectedCode": null,
+      "expectedBody": null,
+      "bodyCodeMatches": true,
+      "snapshotBefore": null,
+      "snapshotAfter": null,
+      "publicSnapshotUnchanged": true,
+      "result": "PASS"
+    },
+    {
+      "id": "odata-reader-denial",
+      "method": "POST",
+      "path": "/odata/v4/platform/reserve",
+      "status": 403,
+      "expectedStatus": [
+        403
+      ],
+      "responseHash": "4cceb48addc7abcdab36f9d7843e070aa25797dab6806efebda02ba380a8a921",
+      "expectedCode": null,
+      "expectedBody": null,
+      "bodyCodeMatches": true,
+      "snapshotBefore": {
+        "organizationId": "org-a",
+        "ID": "00000000-0000-0000-0000-000000000001",
+        "quantity": 60,
+        "blocked": false,
+        "reserved": 0,
+        "revision": 0
+      },
+      "snapshotAfter": {
+        "organizationId": "org-a",
+        "ID": "00000000-0000-0000-0000-000000000001",
+        "quantity": 60,
+        "blocked": false,
+        "reserved": 0,
+        "revision": 0
+      },
+      "publicSnapshotUnchanged": true,
+      "result": "PASS"
+    },
+    {
+      "id": "mcp-reader-denial",
+      "method": "POST",
+      "path": "/mcp",
+      "status": 200,
+      "expectedStatus": [
+        200
+      ],
+      "responseHash": "d83c7e0146e457594a032cd04c3bc8fffd87c0dcf766e44d8fa315670cf05971",
+      "expectedCode": null,
+      "expectedBody": {
+        "/result/isError": true,
+        "/result/structuredContent/outcome": "DENIED"
+      },
+      "bodyCodeMatches": true,
+      "snapshotBefore": {
+        "organizationId": "org-a",
+        "ID": "00000000-0000-0000-0000-000000000001",
+        "quantity": 60,
+        "blocked": false,
+        "reserved": 0,
+        "revision": 0
+      },
+      "snapshotAfter": {
+        "organizationId": "org-a",
+        "ID": "00000000-0000-0000-0000-000000000001",
+        "quantity": 60,
+        "blocked": false,
+        "reserved": 0,
+        "revision": 0
+      },
+      "publicSnapshotUnchanged": true,
+      "result": "PASS"
+    },
+    {
+      "id": "rest-authorized-counter-call",
+      "method": "POST",
+      "path": "/api/platform/actions/reserve",
+      "status": 200,
+      "expectedStatus": [
+        200
+      ],
+      "responseHash": "6c8c1ffb7d715b931f703cbe1981a6a0e19bd3cf39154fc605e43fe1447cde65",
+      "expectedCode": null,
+      "expectedBody": null,
+      "bodyCodeMatches": true,
+      "snapshotBefore": null,
+      "snapshotAfter": null,
+      "publicSnapshotUnchanged": true,
+      "result": "PASS"
+    },
+    {
+      "id": "odata-authorized-counter-call",
+      "method": "POST",
+      "path": "/odata/v4/platform/reserve",
+      "status": 200,
+      "expectedStatus": [
+        200
+      ],
+      "responseHash": "e031d64cfe49c8feb42e316de37dbd91bde46e41fa5892f4b37b44c3ba855013",
+      "expectedCode": null,
+      "expectedBody": null,
+      "bodyCodeMatches": true,
+      "snapshotBefore": null,
+      "snapshotAfter": null,
+      "publicSnapshotUnchanged": true,
+      "result": "PASS"
+    },
+    {
+      "id": "mcp-authorized-counter-call",
+      "method": "POST",
+      "path": "/mcp",
+      "status": 200,
+      "expectedStatus": [
+        200
+      ],
+      "responseHash": "44508a3d477f73ab8b8d3278f409b84c1ff765b1e2f881f46da4dddffce38473",
+      "expectedCode": null,
+      "expectedBody": {
+        "/result/isError": false
+      },
+      "bodyCodeMatches": true,
+      "snapshotBefore": null,
+      "snapshotAfter": null,
+      "publicSnapshotUnchanged": true,
+      "result": "PASS"
+    }
+  ],
+  "result": "FAIL",
+  "notRun": [
+    "full T08/C3/V4",
+    "V6 receipt response loss/retry",
+    "V7 concurrency/restart",
+    "production IAS/IdP mapping"
+  ]
+}

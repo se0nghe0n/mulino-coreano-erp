@@ -33,3 +33,21 @@ V6의 응답 유실/새 token/RPC/동시 replay를 대신하지 않는다. 아�
 R5 실제 조직 관리자, identity provider claim mapping, 사용자 capability,
 intake owner와 supervisor는 운영 입력 미확보다. 해당 운영 scope는
 BLOCKED이며 LOCAL_SIGNED_FIXTURE의 PASS가 운영 접근을 활성화하지 않는다.
+
+최종 실행은 `http-evidence.json`의23개 HTTP assertion이 PASS다.
+익명·잘못된 서명/issuer/audience·만료·미래 nbf·필수 claim 누락은401,
+타 조직 direct 조회와 grant 없는 direct 조회는403이다. 타 조직/미배정
+주체의 OData 목록은 빈 결과다. REST/OData/MCP의 READ grant 쓰기는
+거부되고 같은 공개 경로의 writer counter-call은 성공한다. API error와
+MCP tool denial의 응답 차이를 각각 assertion으로 검사한다.
+
+`http-evidence-initial-failure.json`은 OData500과 MCP metadata400을
+보존한다. `http-evidence-expired-fixture.json`의 nbf 실패는 최초 발급의
+5분 미래 시각이 대기 중 지난 fixture 오류다. 마지막 발급은1시간 미래
+nbf를 사용했고 같은 oracle로 모두 통과했다. 실패 기록을 삭제하지 않았다.
+
+최종 PASS도 full DB/outbox/worker effect0, 모든 도메인 C3/V4,
+V6 수령 replay, V7 동시 철회/restart와 실제 운영 R5를 대신하지 않는다.
+policy UNKNOWN과 동시 fence 증거는 플랫폼 담당의 DB/transaction 검증과
+결합해야 한다. 운영 profile은 실제 IdP binding 구현 전 모두 startup을
+거부하며 dummy binding marker도 허용하지 않는다.

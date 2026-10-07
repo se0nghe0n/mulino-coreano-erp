@@ -17,7 +17,7 @@ if (mode === 'prepare') {
   const tokens = {};
   for (const [name, patch] of Object.entries({writer:{},reader:{sub:'reader-a',role:'WRITE'},
       wrongIssuer:{iss:'https://untrusted.invalid'},wrongAudience:{aud:'another-api'},
-      expired:{exp:now-300,nbf:now-600},notYetValid:{nbf:now+300},
+      expired:{exp:now-300,nbf:now-600},notYetValid:{nbf:now+3600},
       otherOrganization:{organizationId:'org-b',stableRequestOwner:'owner-b'},
       revoked:{sub:'revoked-a'},noGrant:{sub:'unassigned-a'},missingOrganization:{organizationId:null},
       missingOwner:{stableRequestOwner:null}})) tokens[name] = jwt({...base,...patch});
