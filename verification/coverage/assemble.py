@@ -11,6 +11,10 @@ import re
 import subprocess
 import sys
 
+_model_spec = importlib.util.spec_from_file_location('coverage_model_validation', pathlib.Path(__file__).with_name('model_validation.py'))
+model_validation = importlib.util.module_from_spec(_model_spec)
+_model_spec.loader.exec_module(model_validation)
+
 CASE_IDS = [f'T{i:02}' for i in range(1, 27)] + [f'C{i}' for i in range(1, 6)] + [f'V{i}' for i in range(1, 9)] + ['E1', 'E2']
 PROFILES = ['schema', 'contracts', 'scenarios', 'recovery', 'mcp', 'skills', 'model', 'local-deployment', 'btp-deployment', 'regulatory']
 PREREQUISITES = {p: [] for p in PROFILES}
@@ -438,6 +442,8 @@ class Assembly:
     def model_bindings(self, corpus, registry, report):
         """Read each immutable corpus assertion pointer, not only report totals."""
         bindings = {}
+        self.model_turn_bindings = {}
+        all_ids = set()
         required_inputs = {'verification/model-corpus/corpus.json', 'verification/model-binding/registry.json',
                            'verification/model-binding/semantic-paths.json'}
         entries = registry.get('cases', [])
@@ -470,6 +476,7 @@ class Assembly:
                     if len(common) != len(actual_turn['oracle']['assertions']):
                         raise ValueError('Common corpus assertion omitted')
                     pointers = set()
+                    turn_binding = {'common': {}, 'paths': {}}
                     expected_pointer_prefix = turn['corpusTurnPointer'] + '/oracle/assertions/'
                     for assertion in common:
                         aid, ap = assertion['assertionId'], assertion['corpusAssertionPointer']
@@ -480,8 +487,38 @@ class Assembly:
                             raise ValueError('Common assertion semantic path differs from source')
                         pointers.add(ap)
                         bindings[aid] = {'caseId': cid, 'turnId': turn['id'], 'semanticPath': assertion['semanticPath']}
+                        turn_binding['common'][aid] = bindings[aid]
+                        if aid in all_ids:
+                            raise ValueError('Duplicate model assertion identity')
+                        all_ids.add(aid)
                     if pointers != {expected_pointer_prefix + str(i) for i in range(len(common))}:
                         raise ValueError('Common corpus assertion pointer set incomplete')
+                    oracle = actual_turn['oracle']
+                    source_paths = {'SIT_DIRECT_COMMAND': (oracle.get('sitDirectCommand', {}), '/oracle/sitDirectCommand')}
+                    source_paths.update({key: (value, '/oracle/uatCompletion/pathOracles/' + key)
+                                         for key, value in oracle.get('uatCompletion', {}).get('pathOracles', {}).items()})
+                    declared_paths = turn.get('oracleAssertions', {})
+                    if set(declared_paths) != set(source_paths):
+                        raise ValueError('Binding oracle branch membership differs from source')
+                    path_assertions = {}
+                    for branch, (source, suffix) in source_paths.items():
+                        refs = declared_paths[branch]
+                        prefix = turn['corpusTurnPointer'] + suffix + '/assertions/'
+                        expected_pointers = {prefix + str(i) for i in range(len(source.get('assertions', [])))}
+                        if len(refs) != len(expected_pointers) or {a['corpusAssertionPointer'] for a in refs} != expected_pointers:
+                            raise ValueError('Selected-path corpus assertion pointers incomplete')
+                        path_assertions[branch] = {}
+                        for assertion in refs:
+                            aid = assertion['assertionId']
+                            if aid in all_ids or pointer(corpus, assertion['corpusAssertionPointer']).get('path') != assertion.get('semanticPath'):
+                                raise ValueError('Duplicate or wrong selected-path assertion')
+                            all_ids.add(aid)
+                            path_assertions[branch][aid] = {'caseId': cid, 'turnId': turn['id'], 'semanticPath': assertion['semanticPath']}
+                    allowed = oracle.get('uatCompletion', {}).get('allowedPaths', ['DIRECT'])
+                    for selected in allowed:
+                        # Runner falls back to sitDirectCommand only for SERVER_REJECTION.
+                        turn_binding['paths'][selected] = path_assertions.get(selected, path_assertions['SIT_DIRECT_COMMAND'] if selected == 'SERVER_REJECTION' else {})
+                    self.model_turn_bindings[(cid, turn['id'])] = turn_binding
                 except (KeyError, IndexError, ValueError, TypeError) as error:
                     self.issue('FAIL', 'Model assertion source mismatch: ' + str(error), True)
         declared = {d.get('path'): d for d in report.get('inputArtifacts', [])}
@@ -530,8 +567,18 @@ class Assembly:
         calls = runtime.get('actualModelCalls') if runtime else None
         state = profiles.get('model', {}).get('status', 'NOT_RUN')
         attempts = runtime.get('attempts', [])
+        if not isinstance(attempts, list) or any(not isinstance(a, dict) for a in attempts):
+            self.issue('FAIL', 'Model attempts must be an array of objects')
+            state, attempts = 'FAIL', []
         wanted = {(f'M{i:02}', n) for i in range(1, 61) for n in range(1, 4)}
-        actual = {(a.get('caseId'), a.get('repeat')) for a in attempts}
+        actual = set()
+        for attempt in attempts:
+            pair = (attempt.get('caseId'), attempt.get('repeat'))
+            if type(pair[1]) is not int or not isinstance(pair[0], str) or pair not in wanted or pair in actual:
+                self.issue('FAIL', 'Duplicate or invalid model attempt identity')
+                state = 'FAIL'
+            else:
+                actual.add(pair)
         complete = case_count == 60 and prepared == 'PREPARED' and receipt and actual == wanted and len(attempts) == 180 and type(calls) is int and calls >= 219
         for attempt in attempts:
             if attempt.get('status') == 'FAIL' or any(a.get('status') == 'FAIL' for a in attempt.get('assertionResults', [])):
@@ -540,28 +587,39 @@ class Assembly:
                 complete = False
             expected_turns = {b['turnId'] for b in bindings.values() if b['caseId'] == attempt.get('caseId')}
             turns = attempt.get('turnResults', [])
-            if not expected_turns or {t.get('turnId') for t in turns} != expected_turns or len(turns) != len(expected_turns):
+            if not isinstance(turns, list) or any(not isinstance(t, dict) for t in turns):
+                self.issue('FAIL', 'Model turnResults must be an array of objects')
+                state = 'FAIL'
+                continue
+            turn_ids = [t.get('turnId') for t in turns]
+            if any(not isinstance(tid, str) for tid in turn_ids) or len(turn_ids) != len(set(turn_ids)) or not set(turn_ids) <= expected_turns:
+                self.issue('FAIL', 'Duplicate or wrong model turn identity')
+                state = 'FAIL'
+                continue
+            if not expected_turns or set(turn_ids) != expected_turns:
                 complete = False
-            expected_assertions = {aid: b for aid, b in bindings.items() if b['caseId'] == attempt.get('caseId')}
-            actual_assertions = [a for t in turns for a in t.get('assertionResults', [])]
-            if {a.get('assertionId') for a in actual_assertions} != set(expected_assertions) or len(actual_assertions) != len(expected_assertions):
-                complete = False
-            for assertion in actual_assertions:
-                if assertion.get('status') == 'FAIL':
-                    state = 'FAIL'
-                if assertion.get('status') != 'PASS' or expected_assertions.get(assertion.get('assertionId'), {}).get('semanticPath') != assertion.get('semanticPath'):
-                    complete = False
             if receipt and not any(document.get('modelAttempts') == attempts for document in receipt['_artifactDocuments']):
                 complete = False
             for turn in turns:
-                if turn.get('status') == 'FAIL':
+                if turn.get('status') == 'FAIL' or any(a.get('status') == 'FAIL' for a in turn.get('assertionResults', [])):
                     state = 'FAIL'
-                if turn.get('status') != 'PASS' or any(expected_assertions.get(a.get('assertionId'), {}).get('turnId') != turn.get('turnId') for a in turn.get('assertionResults', [])):
-                    complete = False
+                binding = getattr(self, 'model_turn_bindings', {}).get((attempt.get('caseId'), turn.get('turnId')))
+                try:
+                    if turn.get('status') != 'PASS' or not binding or not model_validation.selected_assertions(turn, binding):
+                        complete = False
+                except (KeyError, TypeError, ValueError) as error:
+                    self.issue('FAIL', 'Invalid selected model path/assertions: ' + str(error))
+                    state = 'FAIL'
             if receipt and any(ref not in receipt['_artifactPaths'] for ref in attempt.get('artifactRefs', [])):
                 self.issue('FAIL', 'Model attempt artifact not tied to actual receipt')
                 state = 'FAIL'
-        if not isinstance(usage, dict) or any(type(usage.get(k)) is not int or usage[k] < 0 for k in ['inputTokens', 'outputTokens']) or not isinstance(cost, dict) or any(not nonempty(cost.get(k)) for k in ['amount', 'currency', 'pricingRef']):
+        if runtime:
+            try:
+                complete = model_validation.accounting(runtime, receipt) and complete
+            except (KeyError, TypeError, ValueError, AttributeError) as error:
+                self.issue('FAIL', 'Invalid actual model accounting: ' + str(error))
+                state = 'FAIL'
+        else:
             complete = False
         if not complete and state != 'FAIL':
             state = 'NOT_RUN'
@@ -572,7 +630,7 @@ class Assembly:
 
     def assemble(self, index=None, check_preparation=False):
         index = {} if index is None else index
-        for ref in ['verification/coverage/assemble.py', 'verification/coverage/validate.py', 'verification/coverage/runtime-manifest.schema.json', 'verification/coverage/runtime-evidence-index.schema.json', 'verification/coverage/execution-receipt.schema.json', 'verification/manifest.schema.json']:
+        for ref in ['verification/coverage/model_validation.py', 'verification/coverage/assemble.py', 'verification/coverage/validate.py', 'verification/coverage/runtime-manifest.schema.json', 'verification/coverage/runtime-evidence-index.schema.json', 'verification/coverage/execution-receipt.schema.json', 'verification/manifest.schema.json']:
             if (self.root / ref).is_file():
                 self.descriptor(ref)
         _, observations = self.catalog()

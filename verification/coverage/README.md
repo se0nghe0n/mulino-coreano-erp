@@ -129,13 +129,30 @@ fixture, feature, semantic path 및 runner/schema source hash도 직접 읽는�
 기존 binding parser/schema 검사는 해당 작성자의 준비 report가 맡는다.
 
 실제 runtime은60 case×3회=180 unique attempt와73 turn×3회를 별도
-검사한다. turnResults의 turnId와 각 assertionId/semanticPath가 준비된
-공통 assertion에 정확히 대응해야 한다. 실제 모델 호출은 최소219이며
-partial/skipped attempt, assertion 실패, artifact 불일치와 usage/cost
-누락은 전체 MODEL gate를 닫지 못한다. provider의 input/output token,
-cost의 amount/currency/pricingRef가 필요하다. 없는 실제 usage·cost·call
-수는 null과 missingReason으로 남긴다. 준비/RED report의 calls0을 실제
-모델 실행 관찰로 복사하지 않는다.
+검사한다. 각 turn의 `selectedPathId`를 corpus의 allowedPaths와 대조한다.
+기존 runner의 `selectedPath`도 지원하며 두 필드가 있으면 같아야 한다.
+assertionResults는 공통 assertion과 선택된 경로 assertion의 정확한 합집합이다.
+다른 경로 assertion, 중복·누락·추가 ID나 semanticPath 변조를 거부한다.
+SERVER_REJECTION에 별도 pathOracle이 없으면 runner와 같이
+SIT_DIRECT_COMMAND refs를 쓴다. preflight에는 이 fallback을 적용하지 않는다.
+negative 경로의 binding pointer/hash도 원 corpus와 대조한다.
+
+실제 모델 호출은 최소219이며 turnResults[].modelCalls[]에 provider call별
+callId/caseId/turnId/repeat/provider/model/artifactRefs/usage/cost를 기록한다.
+callId는 전체 report에서 유일하고 case/turn/repeat와 receipt의 model
+version이 일치해야 한다. artifactRefs는 실제 receipt의 파일만 참조한다.
+각 call의 inputTokens/outputTokens는 음수가 아닌 정수이며 관찰된 실제
+call의 inputTokens는 양수다. cost amount는 음수가 아닌 유한 decimal,
+currency는 대문자3자, pricingRef는 비어 있지 않은 실제 가격 참조다.
+현재 단일 가격 계약에서는 모든 집계의 currency/pricingRef가 leaf와 같다.
+turn→attempt→전체 report의 usage/cost 및 actualModelCalls를 실제 leaf의
+합과 정확히 대조한다. 비용은 Decimal로 더하며 token 수를 추정하지 않는다.
+
+partial/skipped attempt, assertion 실패, source payload byte 불일치와
+usage/cost/call 관찰 누락은 전체 MODEL gate를 닫지 못한다. 미관찰은
+NOT_RUN, 관찰된 음수·nonnumeric·잘못된 집계나 identity는 FAIL이다.
+없는 실제 usage·cost·call 수는 null과 missingReason으로 남긴다. 준비/RED
+report의 calls0을 실제 모델 실행 관찰로 복사하지 않는다.
 
 ## selftest와 현재 제한
 

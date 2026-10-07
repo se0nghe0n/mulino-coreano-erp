@@ -567,15 +567,23 @@
           "minimum": 0
         },
         "usage": {
-          "type": [
-            "object",
-            "null"
+          "anyOf": [
+            {
+              "$ref": "#/$defs/usage"
+            },
+            {
+              "type": "null"
+            }
           ]
         },
         "cost": {
-          "type": [
-            "object",
-            "null"
+          "anyOf": [
+            {
+              "$ref": "#/$defs/cost"
+            },
+            {
+              "type": "null"
+            }
           ]
         },
         "missingReason": {
@@ -606,6 +614,53 @@
         }
       },
       "additionalProperties": false
+    },
+    "usage": {
+      "type": "object",
+      "required": [
+        "inputTokens",
+        "outputTokens"
+      ],
+      "properties": {
+        "inputTokens": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "outputTokens": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    },
+    "cost": {
+      "type": "object",
+      "required": [
+        "amount",
+        "currency",
+        "pricingRef"
+      ],
+      "properties": {
+        "amount": {
+          "anyOf": [
+            {
+              "type": "string",
+              "pattern": "^\\d+(?:\\.\\d+)?$"
+            },
+            {
+              "type": "number",
+              "minimum": 0
+            }
+          ]
+        },
+        "currency": {
+          "type": "string",
+          "pattern": "^[A-Z]{3}$"
+        },
+        "pricingRef": {
+          "type": "string",
+          "pattern": "\\S"
+        }
+      }
     }
   },
   "allOf": [

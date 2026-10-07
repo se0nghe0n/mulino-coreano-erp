@@ -217,16 +217,11 @@ class CoverageSelftest(unittest.TestCase):
         ch = self.write('verification/model-corpus/corpus.json', corpus)
         entries, descriptors = [], []
         for ci, case in enumerate(corpus['cases']):
-            turns = []
-            for ti, turn in enumerate(case['turns']):
-                tid = f'turn-{ti + 1}'
-                turns.append({'id': tid, 'corpusTurnPointer': f'/cases/{ci}/turns/{ti}',
-                              'commonAssertions': [{'assertionId': f'{case["id"]}/{tid}/common-{ai + 1}',
-                                                    'corpusAssertionPointer': f'/cases/{ci}/turns/{ti}/oracle/assertions/{ai}',
-                                                    'semanticPath': assertion['path']} for ai, assertion in enumerate(turn['oracle']['assertions'])]})
+            binding = json.loads((HERE.parents[1] / f'verification/model-binding/cases/{case["id"]}/binding.json').read_text())
+            turns = binding['turns']
             ref = f'verification/model-binding/cases/{case["id"]}/binding.json'
             entries.append({'caseId': case['id'], 'bindingRef': ref, 'turnIds': [t['id'] for t in turns]})
-            descriptors += [self.write(ref, {'caseId': case['id'], 'turns': turns}),
+            descriptors += [self.write(ref, binding),
                             self.write(ref.replace('binding.json', 'scenario.feature'), {'evidenceClass': 'SELFTEST'}),
                             self.write(ref.replace('binding.json', 'fixture.json'), {'synthetic': True})]
         registry = {'plannedRepeats': 3, 'cases': entries}
@@ -234,6 +229,163 @@ class CoverageSelftest(unittest.TestCase):
         descriptors += [ch, self.write('verification/model-binding/registry.json', registry),
                         self.write('verification/model-binding/semantic-paths.json', {'corpusSha256': ch['sha256'], 'paths': [{'semanticPath': p, 'common': True} for p in paths]})]
         return corpus, registry, {'inputArtifacts': descriptors}
+
+    def model_runtime_fixture(self, selected='SERVER_REJECTION'):
+        # SELFTEST protocol only, no real provider/model execution or product gate.
+        corpus, registry, prep = self.binding_fixture()
+        prep.update(corpusSha256=self.a.descriptor('verification/model-corpus/corpus.json')['sha256'],
+                    bindingRegistrySha256=self.a.descriptor('verification/model-binding/registry.json')['sha256'],
+                    caseCount=60, turnCount=73, semanticPathCount=154, preparationStatus='PREPARED')
+        self.write('verification/harness/target/evidence/model-binding-preparation.json', prep)
+        self.a.model_bindings(corpus, registry, prep)
+        attempts = []
+        for entry in registry['cases']:
+            for repeat in range(1, 4):
+                turns = []
+                for tid in entry['turnIds']:
+                    binding = self.a.model_turn_bindings[(entry['caseId'], tid)]
+                    path = selected if selected in binding['paths'] else 'DIRECT'
+                    assertions = dict(binding['common'], **binding['paths'][path])
+                    metric = dict(usage=dict(inputTokens=10, outputTokens=2), cost=dict(amount='0.01', currency='USD', pricingRef='pricing-v1'))
+                    call = dict(callId=f'{entry["caseId"]}/{repeat}/{tid}', caseId=entry['caseId'], repeat=repeat,
+                                turnId=tid, provider='test-provider', model='model-v1', artifactRefs=['raw.json'], **copy.deepcopy(metric))
+                    turns.append(dict(turnId=tid, selectedPathId=path, status='PASS', actualModelCalls=1,
+                                      assertionResults=[dict(assertionId=aid, semanticPath=b['semanticPath'], status='PASS') for aid, b in assertions.items()],
+                                      modelCalls=[call], **metric))
+                n = len(turns)
+                attempts.append(dict(caseId=entry['caseId'], repeat=repeat, status='PASS', skipped=0, artifactRefs=['raw.json'],
+                                     actualModelCalls=n, turnResults=turns, usage=dict(inputTokens=n*10, outputTokens=n*2),
+                                     cost=dict(amount=str(n/100), currency='USD', pricingRef='pricing-v1')))
+        runtime = dict(status='PASS', actualModelCalls=219, attempts=attempts,
+                       usage=dict(inputTokens=2190, outputTokens=438), cost=dict(amount='2.19', currency='USD', pricingRef='pricing-v1'))
+        receipt = dict(_artifactPaths={'raw.json'}, _artifactDocuments=[{'modelAttempts': copy.deepcopy(attempts)}], versions={'model': 'model-v1'})
+        return runtime, receipt
+
+    def model_check(self, runtime, receipt, recapture=True):
+        if recapture:
+            receipt['_artifactDocuments'] = [{'modelAttempts': copy.deepcopy(runtime['attempts'])}]
+        return self.a.model({}, {'model': {'status': 'PASS', '_report': runtime, '_receipt': receipt}})
+
+    def test_full_common_plus_selected_negative_path_protocol_is_accepted(self):
+        for selected in ['SERVER_REJECTION', 'EVIDENCED_PREFLIGHT_STOP']:
+            with self.subTest(selected=selected):
+                runtime, receipt = self.model_runtime_fixture(selected)
+                self.assertEqual('PASS', self.model_check(runtime, receipt)['status'])
+                turn = next(a for a in runtime['attempts'] if a['caseId'] == 'M47')['turnResults'][0]
+                self.assertEqual(5 if selected == 'SERVER_REJECTION' else 3,
+                                 sum('/common-' not in a['assertionId'] for a in turn['assertionResults']))
+
+    def test_selected_path_missing_extra_wrong_duplicate_and_alias_conflicts_fail(self):
+        mutations = [lambda t: t['assertionResults'].pop(),
+                     lambda t: t['assertionResults'].append(dict(assertionId='extra', semanticPath='response.errorCode', status='PASS')),
+                     lambda t: t.update(selectedPathId='DIRECT'),
+                     lambda t: t.update(selectedPath='EVIDENCED_PREFLIGHT_STOP'),
+                     lambda t: t['assertionResults'].append(copy.deepcopy(t['assertionResults'][0])),
+                     lambda t: t['assertionResults'][0].update(semanticPath='wrong.path')]
+        for mutate in mutations:
+            with self.subTest(mutate=mutate):
+                runtime, receipt = self.model_runtime_fixture()
+                turn = next(a for a in runtime['attempts'] if a['caseId'] == 'M47')['turnResults'][0]
+                mutate(turn)
+                self.assertEqual('FAIL', self.model_check(runtime, receipt)['status'])
+
+    def test_runner_selected_path_alias_and_server_fallback_are_supported(self):
+        runtime, receipt = self.model_runtime_fixture()
+        for attempt in runtime['attempts']:
+            for turn in attempt['turnResults']:
+                turn['selectedPath'] = turn.pop('selectedPathId')
+        self.assertEqual('PASS', self.model_check(runtime, receipt)['status'])
+        fallback = next(a for a in runtime['attempts'] if a['caseId'] == 'M44')['turnResults'][0]
+        self.assertTrue(any('/SIT_DIRECT_COMMAND-' in a['assertionId'] for a in fallback['assertionResults']))
+
+    def test_model_usage_cost_and_identity_mutations_fail(self):
+        mutations = [lambda r,a,t,c: c['usage'].update(inputTokens=-1),
+                     lambda r,a,t,c: c['usage'].update(outputTokens='2'),
+                     lambda r,a,t,c: c['usage'].update(inputTokens=True),
+                     lambda r,a,t,c: c['usage'].update(inputTokens=0),
+                     lambda r,a,t,c: c['cost'].update(amount='-0.01'),
+                     lambda r,a,t,c: c['cost'].update(amount='NaN'),
+                     lambda r,a,t,c: c['cost'].update(amount='unknown'),
+                     lambda r,a,t,c: c['cost'].update(currency='usd'),
+                     lambda r,a,t,c: c['cost'].update(pricingRef=''),
+                     lambda r,a,t,c: c.update(turnId='another-turn'),
+                     lambda r,a,t,c: c.update(repeat=2),
+                     lambda r,a,t,c: c.update(repeat=True),
+                     lambda r,a,t,c: c.update(model='other-model'),
+                     lambda r,a,t,c: c.update(callId=r['attempts'][1]['turnResults'][0]['modelCalls'][0]['callId']),
+                     lambda r,a,t,c: t['usage'].update(inputTokens=11),
+                     lambda r,a,t,c: a['cost'].update(amount='1'),
+                     lambda r,a,t,c: r['usage'].update(outputTokens=0),
+                     lambda r,a,t,c: r['cost'].update(amount='0'),
+                     lambda r,a,t,c: r['cost'].update(pricingRef='other-price'),
+                     lambda r,a,t,c: t.update(actualModelCalls=2),
+                     lambda r,a,t,c: a.update(actualModelCalls=0),
+                     lambda r,a,t,c: r.update(actualModelCalls=220)]
+        runtime, receipt = self.model_runtime_fixture()
+        for mutate in mutations:
+            with self.subTest(mutate=mutate):
+                changed = copy.deepcopy(runtime)
+                attempt = changed['attempts'][0]; turn = attempt['turnResults'][0]; call = turn['modelCalls'][0]
+                mutate(changed, attempt, turn, call)
+                self.assertEqual('FAIL', self.model_check(changed, receipt)['status'])
+
+    def test_missing_provider_usage_stays_not_run_and_failed_assertion_stays_fail(self):
+        runtime, receipt = self.model_runtime_fixture()
+        runtime['attempts'][0]['turnResults'][0]['modelCalls'][0]['usage'] = None
+        self.assertEqual('NOT_RUN', self.model_check(runtime, receipt)['status'])
+        runtime['attempts'][0]['turnResults'][0]['assertionResults'][0]['status'] = 'FAIL'
+        self.assertEqual('FAIL', self.model_check(runtime, receipt)['status'])
+
+    def test_model_capture_bytes_cannot_be_replaced_by_report_metadata(self):
+        runtime, receipt = self.model_runtime_fixture()
+        receipt['_artifactDocuments'][0]['modelAttempts'][0]['usage']['inputTokens'] += 1
+        self.assertEqual('NOT_RUN', self.model_check(runtime, receipt, recapture=False)['status'])
+
+    def test_missing_provider_calls_and_identity_are_not_filled_with_zero(self):
+        runtime, receipt = self.model_runtime_fixture()
+        runtime['attempts'][0]['turnResults'][0].pop('modelCalls')
+        self.assertEqual('NOT_RUN', self.model_check(runtime, receipt)['status'])
+        runtime, receipt = self.model_runtime_fixture()
+        runtime['attempts'][0]['turnResults'][0]['modelCalls'][0].pop('provider')
+        self.assertEqual('NOT_RUN', self.model_check(runtime, receipt)['status'])
+
+    def test_negative_branch_binding_pointers_cannot_be_changed_with_fresh_hash(self):
+        corpus, registry, report = self.binding_fixture()
+        ref = 'verification/model-binding/cases/M47/binding.json'
+        binding = json.loads((self.root / ref).read_text())
+        branch = binding['turns'][0]['oracleAssertions']['SERVER_REJECTION']
+        branch[0]['corpusAssertionPointer'] = binding['turns'][0]['commonAssertions'][0]['corpusAssertionPointer']
+        descriptor = self.write(ref, binding)
+        report['inputArtifacts'] = [descriptor if d['path'] == ref else d for d in report['inputArtifacts']]
+        self.a.model_bindings(corpus, registry, report)
+        self.assertTrue(any('Selected-path corpus assertion pointers' in p['reason'] for p in self.a.preparation_problems))
+
+    def test_missing_metric_cannot_hide_an_observed_invalid_metric(self):
+        for record in [dict(usage=None, cost=dict(amount='-1', currency='USD', pricingRef='pricing-v1')),
+                       dict(usage=dict(inputTokens=-1), cost=None),
+                       dict(usage=dict(inputTokens='unknown', outputTokens=0), cost=None)]:
+            with self.subTest(record=record), self.assertRaises(ValueError):
+                m.model_validation.metrics(record)
+
+    def test_decimal_cost_sum_is_exact_beyond_default_precision(self):
+        amount = '123456789012345678901234567890.123456789'
+        leaf = dict(usage=dict(inputTokens=1, outputTokens=0), cost=dict(amount=amount, currency='USD', pricingRef='price'))
+        total = dict(usage=dict(inputTokens=2, outputTokens=0), cost=dict(amount='246913578024691357802469135780.246913578', currency='USD', pricingRef='price'))
+        self.assertTrue(m.model_validation.aggregate(total, [leaf, leaf]))
+
+    def test_small_numeric_provider_cost_is_not_rejected_as_nonnumeric(self):
+        metric = dict(usage=dict(inputTokens=1, outputTokens=0), cost=dict(amount=0.00000001, currency='USD', pricingRef='price'))
+        self.assertEqual('1E-8', str(m.model_validation.metrics(metric)[2]))
+
+    def test_wrong_or_duplicate_model_turn_identity_fails(self):
+        for duplicate in [False, True]:
+            runtime, receipt = self.model_runtime_fixture()
+            turns = runtime['attempts'][0]['turnResults']
+            if duplicate:
+                turns.append(copy.deepcopy(turns[0]))
+            else:
+                turns[0]['turnId'] = 'unknown-turn'
+            self.assertEqual('FAIL', self.model_check(runtime, receipt)['status'])
 
     def test_all_221_assertions_and_154_paths_are_read_from_real_corpus(self):
         corpus, registry, report = self.binding_fixture()

@@ -1,0 +1,144 @@
+{
+  "schemaVersion": "1.0.0",
+  "evidenceClass": "SELFTEST",
+  "selftestIsProductEvidence": false,
+  "baselineCommit": "f426712fcd1bcfc1ed71a1beb9aa80ec3051e182",
+  "sourceSnapshot": "WORKING_TREE_WITH_OWN_COVERAGE_CHANGES",
+  "recordedAt": "2026-10-07T15:14:13.967826+00:00",
+  "pythonVersion": "3.14.7",
+  "javaVersion": "Zulu OpenJDK 21.0.5+11-LTS",
+  "commands": [
+    {
+      "argv": [
+        "python3",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "verification/coverage",
+        "-p",
+        "test_coverage.py",
+        "-v"
+      ],
+      "exitCode": 0,
+      "tests": 43,
+      "durationSeconds": 100.207,
+      "logRef": "verification/coverage/checks/review-selftest.txt"
+    },
+    {
+      "argv": [
+        "./mvnw",
+        "-B",
+        "-ntp",
+        "-f",
+        "verification/harness/pom.xml",
+        "-Dtest=org.mulino.verification.coverage.CoverageSchemaTest",
+        "test"
+      ],
+      "exitCode": 0,
+      "tests": 3,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "durationSeconds": 30.176,
+      "logRef": "verification/coverage/checks/review-schema-junit.txt",
+      "note": "Schema unchanged after this command; final pure Python refinements verified by all 43 checks."
+    },
+    {
+      "argv": [
+        "python3",
+        "verification/coverage/assemble.py"
+      ],
+      "exitCode": 2,
+      "logRef": "verification/coverage/checks/review-assembly.txt"
+    },
+    {
+      "argv": [
+        "python3",
+        "verification/coverage/validate.py"
+      ],
+      "exitCode": 0,
+      "logRef": "verification/coverage/checks/review-saved-validation.txt"
+    }
+  ],
+  "observedManifest": {
+    "status": "NOT_RUN",
+    "preparationStatus": "NOT_RUN",
+    "runtimeStatus": "NOT_RUN",
+    "gateComplete": false,
+    "runtimeComplete": false,
+    "productRuntimeClaimed": false,
+    "oracleCount": 122,
+    "observationCount": 499
+  },
+  "modelRuntime": {
+    "caseCount": 60,
+    "turnCount": 73,
+    "plannedRepeats": 3,
+    "preparationStatus": "NOT_RUN",
+    "status": "NOT_RUN",
+    "actualModelCalls": null,
+    "usage": null,
+    "cost": null,
+    "missingReason": "Actual per-case repeats, per-turn assertions, usage/cost and versioned artifacts incomplete"
+  },
+  "sourceArtifacts": [
+    {
+      "path": "verification/coverage/assemble.py",
+      "sha256": "28570e2cffa5bd06fab69cc6847a25b209bd08145932f452b6cde59234116126",
+      "sizeBytes": 55168
+    },
+    {
+      "path": "verification/coverage/model_validation.py",
+      "sha256": "1fc6fd0e3af8910c9019c95ae3b58ccceb429b7efe3896488087893ff7d64e3d",
+      "sizeBytes": 7930
+    },
+    {
+      "path": "verification/coverage/runtime-manifest.schema.json",
+      "sha256": "665977c651393759b4b5d11457abbdf5bf46282bcd7831a2570a78e90f47d698",
+      "sizeBytes": 15303
+    },
+    {
+      "path": "verification/coverage/test_coverage.py",
+      "sha256": "393c63c8a5a8562e73d8408e21b9943d77394a494b5e3e82f649af6419e6ef7e",
+      "sizeBytes": 31993
+    }
+  ],
+  "selftestLogArtifacts": [
+    {
+      "path": "verification/coverage/checks/review-selftest.txt",
+      "sha256": "405531d9d039b77b69088b720861dde9f5268cf029eb6da549a37a63e79d9abf",
+      "sizeBytes": 6471
+    },
+    {
+      "path": "verification/coverage/checks/review-accounting-selftest.txt",
+      "sha256": "bf0498deedc81f4c0aa88cbd63f01f28ef9d31b544e03a6953eb32484debf4e1",
+      "sizeBytes": 1102
+    },
+    {
+      "path": "verification/coverage/checks/review-path-and-missing-selftest.txt",
+      "sha256": "181c58b399e75d5503bbe6ad7aa7e39f903bc2a2848ebd2b52e185e13b2aec49",
+      "sizeBytes": 1484
+    },
+    {
+      "path": "verification/coverage/checks/review-schema-junit.txt",
+      "sha256": "bc4bfa92422918a8a8d7aca23b2bea35062dd935b68682258cc94b7bbe637496",
+      "sizeBytes": 3126
+    },
+    {
+      "path": "verification/coverage/checks/review-assembly.txt",
+      "sha256": "210f1c7276c425fb0825b817538688b14ea989f8a0939aec20d56c0eb45b4374",
+      "sizeBytes": 288
+    },
+    {
+      "path": "verification/coverage/checks/review-saved-validation.txt",
+      "sha256": "7adeb2b38617d3e61b6dae057aeaa65842b414e6368c0b286a2f1b4e5fa76dd3",
+      "sizeBytes": 75
+    }
+  ],
+  "limits": [
+    "No actual provider, paid model, BTP or product adapter execution.",
+    "No full prepare rerun: coordinator already verified 41 cases / 785 subcases / 19996 assertions at baseline.",
+    "Current accounting contract uses one currency and pricingRef across provider leaf calls and aggregates."
+  ]
+}
