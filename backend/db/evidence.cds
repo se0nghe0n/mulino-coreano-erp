@@ -211,3 +211,25 @@ entity Reconciliations {
   nextAction : String(320);
   nextCheckAt : Timestamp;
 }
+
+// Typed completion scope is derived from immutable source bytes only after scoped review.
+entity CompletionCoverages {
+ key ID : UUID;
+ organizationId : UUID;
+ revision : Integer;
+ createdAt : Timestamp;
+ recordedAt : Timestamp;
+ recordedBy : UUID;
+ occurrenceId : UUID;
+ claimId : UUID;
+ eventId : UUID;
+ verificationId : UUID;
+ documentVersionId : UUID;
+ rootId : UUID;
+ startQuantity : Decimal(38,12);
+ quantity : Decimal(38,12);
+ unit : String(24);
+ originalHash : String(64);
+ sourcePayloadHash : String(64);
+ policyVersion : String(160);
+}

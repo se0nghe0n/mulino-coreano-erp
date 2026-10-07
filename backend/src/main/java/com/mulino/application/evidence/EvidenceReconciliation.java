@@ -23,10 +23,11 @@ public class EvidenceReconciliation {
   private final IdentityAuthorization auth;
   private final LocalBlobStore blobs;
   private final ExecutionClock clock;
+  private final VerifiedResponsibilityCompletionEvidence completion;
   private final ObjectProvider<EvidenceCorrectionImpact> impacts;
   private final ObjectProvider<ExternalOperationScopePort> externalOperations;
-  public EvidenceReconciliation(EvidenceRepository r,EvidenceRecords records,IdentityAuthorization auth,LocalBlobStore blobs,ObjectProvider<EvidenceCorrectionImpact> impacts,ObjectProvider<ExternalOperationScopePort> externalOperations,ExecutionClock clock) {
-    this.r=r;this.records=records;this.auth=auth;this.blobs=blobs;this.impacts=impacts;this.externalOperations=externalOperations;this.clock=clock;
+  public EvidenceReconciliation(EvidenceRepository r,EvidenceRecords records,IdentityAuthorization auth,LocalBlobStore blobs,ObjectProvider<EvidenceCorrectionImpact> impacts,ObjectProvider<ExternalOperationScopePort> externalOperations,ExecutionClock clock,VerifiedResponsibilityCompletionEvidence completion) {
+    this.r=r;this.records=records;this.auth=auth;this.blobs=blobs;this.impacts=impacts;this.externalOperations=externalOperations;this.clock=clock;this.completion=completion;
   }
   public Map<String,Object> claim(DomainContext c,String id){return r.require("Claims",c.organizationId(),uuid(id));}
   public Map<String,Object> review(DomainContext c,String id){return r.require("Reconciliations",c.organizationId(),uuid(id));}
@@ -53,10 +54,13 @@ public class EvidenceReconciliation {
     long variants=r.rows("InboxRecords",c.organizationId()).stream().filter(x->Objects.equals(event.get("sourceNamespace"),x.get("sourceNamespace"))&&Objects.equals(event.get("externalEventId"),x.get("externalEventId"))&&Objects.equals(event.get("sourceVersion"),x.get("sourceVersion"))).count();
     BigDecimal quantity=quantity(input.quantity(),input.unit(),ValueState.KNOWN);
     boolean external="EXTERNAL_RESULT".equals(event.get("kind"));
+    boolean response="RESPONSE_COMPLETED".equals(event.get("kind"));
     boolean sameQuantity=external?quantity==null&&claim.get("quantity")==null:quantity!=null&&claim.get("quantity") instanceof BigDecimal q&&quantity.compareTo(q)==0&&Objects.equals(input.unit(),claim.get("unit"));
     boolean original=!r.rows("DocumentVersions",c.organizationId()).stream().anyMatch(x->doc.get("ID").equals(x.get("supersedesId")))&&"AVAILABLE".equals(doc.get("availability"))&&doc.get("blobId")!=null&&blobs.available(UUID.fromString(doc.get("blobId").toString()),doc.get("sha256").toString());
     boolean identity=false;
-    if(external&&input.physicalScopeId()!=null) {
+    if(response&&input.physicalScopeId()!=null&&original) {
+      try{completion.sourceRange(c,claim,event,doc,uuid(input.physicalScopeId()));identity=true;}catch(DomainError unavailable){if(!"EVIDENCE_UNVERIFIED".equals(unavailable.code()))throw unavailable;}
+    }else if(external&&input.physicalScopeId()!=null) {
       var operations=externalOperations.getIfAvailable();
       if(operations==null)throw new DomainError("HELD","POLICY_UNRESOLVED","External operation scope adapter unavailable");
       var operation=operations.require(c,uuid(input.physicalScopeId()));
@@ -92,7 +96,7 @@ public class EvidenceReconciliation {
       var relatedClaims=r.rows("Claims",c.organizationId()).stream().filter(x->Objects.equals(claim.get("eventId"),x.get("eventId"))).map(x->x.get("ID").toString()).collect(java.util.stream.Collectors.toSet());
       var canonicalIds=r.rows("Verifications",c.organizationId()).stream().filter(x->relatedClaims.contains(x.get("claimId"))&&"VERIFIED".equals(x.get("verdict"))).map(x->x.get("canonicalOccurrenceId").toString()).collect(java.util.stream.Collectors.toSet());
       if(r.rows("CanonicalOccurrences",c.organizationId()).stream().anyMatch(x->canonicalIds.contains(x.get("ID"))&&!input.physicalScopeId().equals(x.get("physicalScopeId"))))decision="CONFLICT";
-      Set<String> overlapping=external?Set.of(input.physicalScopeId()):r.overlappingScopes(c.organizationId(),input.physicalScopeId());
+      Set<String> overlapping=external||response?Set.of(input.physicalScopeId()):r.overlappingScopes(c.organizationId(),input.physicalScopeId());
       if(r.rows("CanonicalOccurrences",c.organizationId()).stream().anyMatch(x->!input.physicalScopeId().equals(x.get("physicalScopeId"))&&overlapping.contains(x.get("physicalScopeId"))&&event.get("kind").equals(x.get("kind"))))decision="CONFLICT";
     }
     if(input.physicalScopeId()!=null && r.rows("CanonicalOccurrences",c.organizationId()).stream().anyMatch(x->input.physicalScopeId().equals(x.get("physicalScopeId"))&&event.get("kind").equals(x.get("kind"))&&!input.effectiveFrom().equals(instant(x.get("effectiveFrom")))))decision="CONFLICT";
@@ -133,7 +137,8 @@ public class EvidenceReconciliation {
       if(candidates.size()==1)existing=candidates.getFirst().get("ID").toString();
       if(candidates.size()>1)throw new DomainError("HELD","EVIDENCE_CONFLICT","Canonical scope has competing revisions");
     }
-    var result=records.verifyCanonical(new EvidenceRecords.CanonicalInput(claim.get("ID").toString(),physical,review.get("basisDocumentId").toString(),review.get("policyVersion").toString(),true,true,true,true,true,existing,null,review.get("reason").toString()));
+    var result=records.verifyReviewedCanonical(new EvidenceRecords.CanonicalInput(claim.get("ID").toString(),physical,review.get("basisDocumentId").toString(),review.get("policyVersion").toString(),true,true,true,true,true,existing,null,review.get("reason").toString()));
+    completion.publish(c,result.get("id").toString(),claim.get("ID").toString(),review.get("basisDocumentId").toString());
     var impact=impacts.getIfAvailable();
     if(impact!=null)impact.evidenceLinked(c,claim.get("ID").toString(),result.get("id").toString());
     else {

@@ -97,7 +97,10 @@ public class EvidenceRecords {
     link(c,doc.get("ID").toString(),null,row.get("ID").toString(),null,"CLAIM_SOURCE"); return result(row,"RECORDED");
   }
   @Transactional
-  public Map<String,Object> verifyCanonical(CanonicalInput input) {
+  public Map<String,Object> verifyCanonical(CanonicalInput input) { return verifyCanonical(input,false); }
+  @Transactional
+  Map<String,Object> verifyReviewedCanonical(CanonicalInput input) { return verifyCanonical(input,true); }
+  private Map<String,Object> verifyCanonical(CanonicalInput input,boolean reviewed) {
     var c=now(); var claim=r.require("Claims",c.organizationId(),uuid(input.claimId())); var event=r.require("Events",c.organizationId(),claim.get("eventId").toString());
     auth.authorizeScopes(c,"linkCanonicalOccurrence",scopes(event));
     if(r.rows("Events",c.organizationId()).stream().anyMatch(x->event.get("ID").equals(x.get("supersedesId"))||event.get("ID").equals(x.get("invalidatesId")))||r.rows("Claims",c.organizationId()).stream().anyMatch(x->claim.get("ID").equals(x.get("supersedesId"))))throw new DomainError("CONFLICT","EVIDENCE_CONFLICT","Superseded or invalidated evidence cannot become current canonical evidence");
@@ -119,7 +122,7 @@ public class EvidenceRecords {
     } else {
       var existing=r.rows("CanonicalOccurrences",c.organizationId()).stream().filter(x->physical.equals(x.get("physicalScopeId"))&&Objects.equals(event.get("kind"),x.get("kind"))&&instant(claim.get("effectiveFrom")).equals(instant(x.get("effectiveFrom")))).toList();
       if(!existing.isEmpty()&&input.supersedesId()==null)throw new DomainError("CONFLICT","EVIDENCE_CONFLICT","Canonical occurrence already exists; explicit reconciliation needed");
-      canonical=base(c); copySubject(claim,canonical);copyTime(claim,canonical);canonical.put("sourceProfileId",event.get("sourceProfileId"));canonical.put("kind",event.get("kind"));canonical.put("physicalScopeId",physical);canonical.put("valueState","KNOWN");canonical.put("reassessmentState","NOT_IMPLEMENTED");
+      canonical=base(c); copySubject(claim,canonical);copyTime(claim,canonical);canonical.put("sourceProfileId",event.get("sourceProfileId"));canonical.put("kind",event.get("kind"));canonical.put("physicalScopeId",physical);canonical.put("valueState","KNOWN");canonical.put("reassessmentState",reviewed?"COMPLETE":"NOT_IMPLEMENTED");
       if(claim.get("quantity")!=null){canonical.put("quantity",claim.get("quantity"));canonical.put("unit",claim.get("unit"));}
       supersedes(c,"CanonicalOccurrences",canonical,input.supersedesId()); r.insert("CanonicalOccurrences",canonical);
     }
@@ -170,7 +173,11 @@ public class EvidenceRecords {
   }
   private void supersedes(DomainContext c,String entity,Map<String,Object> row,String previous) {
     if(previous==null)return;
-    var old=r.require(entity,c.organizationId(),uuid(previous));sameSubject(old,row);auth.authorizeScopes(c,"correctEvidence",scopes(old));
+    var old=r.require(entity,c.organizationId(),uuid(previous));
+    if("Events".equals(entity))r.sourceFence(c.organizationId(),old.get("sourceNamespace").toString(),old.get("externalEventId").toString(),old.get("sourceVersion").toString());
+    if("Claims".equals(entity))r.sourceFence(c.organizationId(),"claim",previous,"revision");
+    if("DocumentVersions".equals(entity))r.sourceFence(c.organizationId(),"document",previous,"revision");
+    sameSubject(old,row);auth.authorizeScopes(c,"correctEvidence",scopes(old));
     row.put("supersedesId",previous);row.put("revision",((Number)old.get("revision")).intValue()+1);
   }
   private static void sameSubject(Map<String,Object> a,Map<String,Object> b) {
