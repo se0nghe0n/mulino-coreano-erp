@@ -13,7 +13,7 @@ public class PolicyCommandGuard implements CommandGuard {
  public PolicyCommandGuard(IdentityAuthorization auth,IdentityRepository identity,PolicyRepository policy,ApprovalRepository approvals){this.auth=auth;this.identity=identity;this.policy=policy;this.approvals=approvals;}
  public void fence(DomainContext c,CommandPreparation p){policy.fence(c.organizationId());auth.fence(c,p.authorityActors());}
  public void verify(DomainContext c,String capability,String hash,CommandPreparation p,Map<String,Object> intent){
-   if(!auth.permittedScopes(c,capability,p.scopes().isEmpty()?null:p.scopes()))throw DomainError.forbidden();
+   if(!everyScope(c,capability,p.scopes()))throw DomainError.forbidden();
    var selection=rule(c,capability);var rule=selection.rule();
    if(!p.effectClass().equals(rule.get("effectClass")))throw held("Effect class is unresolved");
    String action=(String)rule.get("approvalAction");
@@ -23,7 +23,7 @@ public class PolicyCommandGuard implements CommandGuard {
    String decision=(String)rule.get("decisionCapability");if(decision==null)throw held("Decision capability is unresolved");
    var actor=identity.actor(c.organizationId(),approver).orElseThrow(DomainError::forbidden);if(!"HUMAN".equals(actor.get("kind")))throw DomainError.forbidden();
    var ac=new DomainContext(c.organizationId(),approver,(String)actor.get("stableRequestOwner"),c.asOf(),c.knownAt());
-   if(!auth.permittedScopes(ac,decision,p.scopes())||!decision.equals(a.get("decisionCapability")))throw DomainError.forbidden();
+   if(!everyScope(ac,decision,p.scopes())||!decision.equals(a.get("decisionCapability")))throw DomainError.forbidden();
    Instant now=auth.now();
    if(!"APPROVED".equals(a.get("decision"))||!action.equals(a.get("action"))||!hash.equals(a.get("canonicalHash"))||!scopeHash(p.scopes()).equals(a.get("scopeHash"))||!Objects.equals(p.proposalId(),a.get("proposalId"))||p.proposalRevision()!=number(a.get("proposalRevision"))||!Objects.equals(p.targetId(),a.get("targetId"))||!Objects.equals(p.currentRevision(),a.get("targetRevision"))||!selection.policyHash().equals(a.get("policyHash"))||now.isBefore(instant(a.get("decidedAt")))||!now.isBefore(instant(a.get("expiresAt")))||(Boolean.TRUE.equals(a.get("singleUse"))&&approvals.consumed(c,(String)a.get("ID"))))throw DomainError.forbidden();
  }
@@ -33,6 +33,17 @@ public class PolicyCommandGuard implements CommandGuard {
    try{var document=new ObjectMapper().readValue((String)selected.get("content"),Map.class);var rules=(Map<?,?>)document.get("rules");Object found=rules==null?null:rules.get(capability);if(!(found instanceof Map<?,?> rule))throw held("Action policy is unresolved");return new Selection((Map<String,Object>)rule,(String)selected.get("contentHash"));}catch(DomainError e){throw e;}catch(Exception e){throw held("Current policy is invalid");}
  }
  public record Selection(Map<String,Object> rule,String policyHash){}
+ private boolean everyScope(DomainContext c,String capability,Map<String,List<String>> scopes){
+   if(scopes.isEmpty())return auth.permittedScopes(c,capability,null);
+   List<Map<String,List<String>>> combinations=new ArrayList<>();combinations.add(Map.of());
+   for(var dimension:new TreeMap<>(scopes).entrySet()){
+     if(dimension.getValue().isEmpty()||(long)combinations.size()*dimension.getValue().size()>256)return false;
+     var expanded=new ArrayList<Map<String,List<String>>>();
+     for(var candidate:combinations)for(String id:dimension.getValue()){var copy=new HashMap<>(candidate);copy.put(dimension.getKey(),List.of(id));expanded.add(copy);}combinations=expanded;
+   }
+   return combinations.stream().allMatch(candidate->auth.permittedScopes(c,capability,candidate));
+ }
+
  private Map<String,Object> approval(DomainContext c,Map<String,Object> i){Object id=i.get("approvalId");if(id==null)id=IdentityCommands.payload(i).get("approvalId");if(!(id instanceof String s))throw DomainError.forbidden();return approvals.find(c,s).orElseThrow(DomainError::forbidden);}
  public static String scopeHash(Map<String,? extends Collection<String>> scopes){return CommandRequests.hash(Map.of("scope",scopes));}
 
