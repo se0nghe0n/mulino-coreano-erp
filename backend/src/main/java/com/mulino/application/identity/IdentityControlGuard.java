@@ -45,6 +45,7 @@ public class IdentityControlGuard {
     return result;
   }
   public void revokingGrant(DomainContext context,String grantId,long expectedRevision) {
+    if(!"HUMAN".equals(repository.actor(context.organizationId(),context.actorId()).orElseThrow(IdentityAuthorization::denied).get("kind")))throw IdentityAuthorization.denied();
     var grant=repository.rows("Grants",context.organizationId()).stream().filter(r -> grantId.equals(r.get("ID"))).findFirst().orElseThrow(IdentityAuthorization::denied);
     auth.fence(context,List.of((String)grant.get("actorId")));
     auth.authorize(context,"revokeGrant",null);

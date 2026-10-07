@@ -34,7 +34,8 @@ public class PolicyCommandGuard implements CommandGuard {
  }
  public record Selection(Map<String,Object> rule,String policyHash){}
  private Map<String,Object> approval(DomainContext c,Map<String,Object> i){Object id=i.get("approvalId");if(id==null)id=IdentityCommands.payload(i).get("approvalId");if(!(id instanceof String s))throw DomainError.forbidden();return approvals.find(c,s).orElseThrow(DomainError::forbidden);}
- public static String scopeHash(Map<String,? extends Collection<String>> scopes){var sorted=new TreeMap<String,List<String>>();scopes.forEach((k,v)->sorted.put(k,v.stream().distinct().sorted().toList()));try{return PolicyCommands.hash(new ObjectMapper().writeValueAsString(sorted));}catch(Exception e){throw new IllegalStateException(e);}}
+ public static String scopeHash(Map<String,? extends Collection<String>> scopes){return CommandRequests.hash(Map.of("scope",scopes));}
+
  private static DomainError held(String message){return new DomainError("HELD","POLICY_UNRESOLVED",message);}
  private static int number(Object x){return x instanceof Number n?n.intValue():-1;}
  private static Instant instant(Object v){return v instanceof Instant t?t:Instant.parse(v.toString());}

@@ -1,3 +1,8 @@
+-- R3 fresh fixture path: historical policy Timestamp columns are interpreted as UTC.
+ALTER TABLE mulino_governance_PolicyVersions
+ ALTER COLUMN createdAt TYPE TIMESTAMPTZ USING createdAt AT TIME ZONE 'UTC',
+ ALTER COLUMN effectiveFrom TYPE TIMESTAMPTZ USING effectiveFrom AT TIME ZONE 'UTC',
+ ALTER COLUMN effectiveUntil TYPE TIMESTAMPTZ USING effectiveUntil AT TIME ZONE 'UTC';
 CREATE TABLE mulino_identity_ManagementAuthorities (
  organizationId VARCHAR(36) NOT NULL, ID VARCHAR(36) NOT NULL, actorId VARCHAR(36) NOT NULL,
  capabilityId VARCHAR(100) NOT NULL, scopeKind VARCHAR(20) NOT NULL, scopeId VARCHAR(36) NOT NULL,

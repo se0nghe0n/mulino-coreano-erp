@@ -10,8 +10,8 @@ import org.springframework.stereotype.Component;
 import static com.mulino.application.identity.IdentityCommands.*;
 @Component
 public class PolicyCommands implements CommandHandler {
- private final PolicyRepository repo;private final IdentityAuthorization auth;
- public PolicyCommands(PolicyRepository repo,IdentityAuthorization auth){this.repo=repo;this.auth=auth;}
+ private final PolicyRepository repo;private final IdentityAuthorization auth;private final com.mulino.domain.identity.IdentityRepository identity;
+ public PolicyCommands(PolicyRepository repo,IdentityAuthorization auth,com.mulino.domain.identity.IdentityRepository identity){this.repo=repo;this.auth=auth;this.identity=identity;}
  public Set<String> capabilities(){return Set.of("createPolicyDraft","approvePolicy","activatePolicy","retirePolicy");}
  public CommandPreparation prepare(DomainContext c,Map<String,Object> i){
    var p=payload(i);var row=op(i).equals("createPolicyDraft")?null:draft(c,text(p,"id"));
@@ -30,7 +30,7 @@ public class PolicyCommands implements CommandHandler {
    }else{
      id=text(p,"id");var row=draft(c,id);String status=(String)row.get("status");revision=((Number)row.get("revision")).intValue()+1;
      if(operation.equals("approvePolicy")){
-       // Current exact approval capability is checked by the common guard; identity kind remains server-owned.
+       if(!"HUMAN".equals(identity.actor(c.organizationId(),c.actorId()).orElseThrow(DomainError::forbidden).get("kind")))throw DomainError.forbidden();
        if(!status.equals("DRAFT"))throw DomainError.invalid("Policy is not draft");
        if(!text(p,"contentHash").equals(row.get("contentHash")))throw DomainError.invalid("Policy content changed");
        repo.insert("PolicyApprovals",Map.of("organizationId",c.organizationId(),"ID",UUID.randomUUID().toString(),"draftId",id,"contentHash",row.get("contentHash"),"approverId",c.actorId(),"approvedAt",now));
