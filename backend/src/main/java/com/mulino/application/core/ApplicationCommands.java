@@ -86,7 +86,12 @@ public class ApplicationCommands {
     result.putIfAbsent("effects",Map.of());if(result.get("revision") instanceof Number)facts.put("afterRevision",result.get("revision"));repository.finish(c,id,intent,hash,result,clock.instant(),facts);return result;
   }
   private void verifyClaim(Map<String,Object> intent,Map<String,Object> claim,Map<String,List<String>> scopes){
-    if(!Objects.equals(claim.get("capabilityId"),intent.get("capabilityId"))||!Objects.equals(claim.get("commandId"),intent.get("commandIdempotencyKey"))||!(claim.get("workId") instanceof String workId)||!scopes.getOrDefault("WORK",List.of()).contains(workId))throw DomainError.forbidden();
+    if(!Objects.equals(claim.get("capabilityId"),intent.get("capabilityId"))||!Objects.equals(claim.get("commandId"),intent.get("commandIdempotencyKey")))throw DomainError.forbidden();
+    if("INTAKE".equals(claim.get("scopeKind"))){
+      if(!"createDraft".equals(intent.get("capabilityId"))||!(claim.get("intakeId") instanceof String intakeId)||!CommandRequests.hash(intent).equals(claim.get("canonicalIntentHash")))throw DomainError.forbidden();
+      CommandRequests.uuid(intakeId);return; // Runtime verifies the persisted immutable intake owner/template/hash fence.
+    }
+    if(!(claim.get("workId") instanceof String workId)||!scopes.getOrDefault("WORK",List.of()).contains(workId))throw DomainError.forbidden();
   }
   /** Expected denial audit is committed separately only after the effect transaction rolled back. */
   private Map<String,Object> reject(Map<String,Object> intent,String hash,DomainError failure,Map<String,Object> claim,boolean claimed){
