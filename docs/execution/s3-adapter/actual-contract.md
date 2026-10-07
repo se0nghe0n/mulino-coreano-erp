@@ -25,3 +25,16 @@ snapshot으로 읽고 table별 SQL·boundValues·rowPointer를 기록한다.
 2026-10-08 focused harness compile와 `ActualS3FixtureSafetyTest`는2개
 검사를 모두 통과했다. product 종단 실행은 아직 NOT_RUN이다.
 유료 모델·BTP·실제 supplier/regulator 전송은 실행 범위에 포함하지 않는다.
+
+V6 native 경로는 receipt60을 실제 loopback proxy를 통해 backend에
+보내고 upstream APPLIED 응답을 관찰한 뒤 client socket을 응답 없이
+닫는다. SQL로 commit된60을 확인하고 새 jti의 JWT와 새 RPC 두 개로
+동시에 재시도한다. token 원문은 저장하지 않고 SHA-256 fingerprint만
+기록한다. 변경 payload와 같은 effect key는 conflict이며 READ grant만
+있는 다른 actor에게 기존 effect 결과를 주지 않는다.
+
+별도 organization의 `transit-fixture.json`은 이미 존재하는 운송중60과
+INITIAL_BALANCE 원장을 명시적인 입력으로 설치한다. 이는 운송 재고의
+취득/생성을 검증하지 않는다. 실제 confirmReceipt가 leaf를 이동한 뒤
+보유60·운송중0·창고60·RECEIPT_MOVE1을 검증한다. main 구매→신규 수령
+fixture는 실물 seed를 포함하지 않는다.

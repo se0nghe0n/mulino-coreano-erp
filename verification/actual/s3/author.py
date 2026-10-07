@@ -71,6 +71,17 @@ cmd('shipment-plan','createShipment',{'originId':'$TRANSIT','destinationId':'$W'
 A[-1]['request']['subjectRefs']=[]
 # Planned shipment makes no physical inventory. Independent snapshot verifies this.
 raw('shipment-planned-physical0',[count('mulino_inventory_quantitysegments',0),sums('mulino_trade_shipment_shipmentcargo','plannedquantity','100')])
+A.append({'id':'shipment-physical-range','type':'uuid','alias':'SHIP_RANGE'})
+for name,kind,place in [('ship-departure','DEPARTURE','$TRANSIT'),('ship-arrival','ARRIVAL','$W')]:
+    payload={'shipmentEventId':str(uuid.uuid5(uuid.NAMESPACE_URL,'mulino-shipment:'+name)),'shipmentId':'$SHIPMENT','cargoId':'$CARGO','legId':'$LEG','placeId':place,'physicalScopeId':'$SHIP_RANGE','quantity':'100','unit':'BOX','occurredAt':T,'kind':kind}
+    original(name,'SHIPMENT_'+kind,'100','$SHIP_RANGE',payload,subject='$P',subject_kind='ITEM',place=place)
+    cmd(name+'-record','recordLegEvent',{'shipmentId':'$SHIPMENT','cargoId':'$CARGO','legId':'$LEG','kind':kind,'placeId':place,'physicalScopeId':'$SHIP_RANGE','occurrenceId':'$'+name+'.canonical','quantity':'100','unit':'BOX','occurredAt':T},revision=1 if kind=='DEPARTURE' else '$SHIP_REV',subject='$SHIPMENT',noun='Shipment',bind={'SHIP_REV':'/revision'})
+name='custody-handover'
+payload={'shipmentEventId':str(uuid.uuid5(uuid.NAMESPACE_URL,'mulino-shipment:'+name)),'shipmentId':'$SHIPMENT','cargoId':'$CARGO','legId':'$LEG','placeId':'$W','physicalScopeId':'$SHIP_RANGE','quantity':'100','unit':'BOX','occurredAt':T,'fromCustodianId':'$reader','toCustodianId':'$supervisor'}
+original(name,'CUSTODY_HANDOVER','100','$SHIP_RANGE',payload,subject='$P',subject_kind='ITEM')
+cmd('handover-record','recordHandover',{'shipmentId':'$SHIPMENT','cargoId':'$CARGO','legId':'$LEG','placeId':'$W','physicalScopeId':'$SHIP_RANGE','occurrenceId':'$custody-handover.canonical','quantity':'100','unit':'BOX','occurredAt':T,'fromCustodianId':'$reader','toCustodianId':'$supervisor'},revision='$SHIP_REV',subject='$SHIPMENT',noun='Shipment')
+raw('shipment-actual-no-stock',[count('mulino_inventory_quantitysegments',0),count('mulino_trade_shipment_legevents',2),count('mulino_trade_shipment_custodyhandovers',1)])
+
 planned=A[start_index:];del A[start_index:];A[4:4]=planned
 # Current revision is observed after each assessment/invalidation.
 raw('before-assessment100',[sums('mulino_trade_receipt_receipts','contributedquantity','100')],bind={'WORK_REV':'/rawRows/mulino_work_read_works/0/revision'})
@@ -96,7 +107,7 @@ def quality(name,segment,quantity,category,operation='recordDispositionBasis'):
     original(name,'QUALITY_DECISION_'+operation+'_'+category,quantity,segment,{**fields,'sourceDecisionId':external,'sourceVersion':'1'},subject=segment,subject_kind='SEGMENT',external=external)
     slots={k:v for k,v in fields.items() if k!='operation'}
     slots.update(evidenceId='$'+name+'.document',reason='원본의 정확한 행동 범위를 판정',nextCheckAt='2026-10-08T09:00:00Z')
-    cmd(name+'-decision',operation,slots,subject=segment,noun='QuantitySegment',bind={name+'.restriction':'/effects/restrictionId'} if operation=='placeHold' else None)
+    cmd(name+'-decision',operation,slots,revision=0,subject=segment,noun='QuantitySegment',bind={name+'.restriction':'/effects/restrictionId'} if operation=='placeHold' else None)
 for segment,quantity,prefix in [('$receipt60.segment','60','s60'),('$receipt40.segment','40','s40')]:
     for category in ['QC','CUSTOMER','COMMERCIAL']:quality(prefix+'-'+category,segment,quantity,category)
 def inventory(name,expected):
@@ -107,7 +118,7 @@ quality('qc-hold20','$receipt60.segment','20','QC','placeHold')
 quality('recall-hold60','$receipt60.segment','60','RECALL','placeHold')
 inventory('overlap-holds0','0')
 original('qc-release','QUALITY_RELEASE','60','$receipt60.segment',{'segmentId':'$receipt60.segment','operation':'releaseHold','restrictionId':'$qc-hold20.restriction'},subject='$receipt60.segment',subject_kind='SEGMENT')
-cmd('release-qc-only','releaseHold',{'restrictionId':'$qc-hold20.restriction','evidenceId':'$qc-release.document','reason':'QC 범위 해제만 기록'},subject='$receipt60.segment',noun='QuantitySegment')
+cmd('release-qc-only','releaseHold',{'restrictionId':'$qc-hold20.restriction','evidenceId':'$qc-release.document','reason':'QC 범위 해제만 기록'},revision=0,subject='$receipt60.segment',noun='QuantitySegment')
 inventory('recall-retained0','0')
 raw('independent-overlap-release',[count('mulino_inventory_restrictions',1,{'state':'ACTIVE','category':'RECALL'}),count('mulino_inventory_restrictions',1,{'state':'RELEASED','category':'QC'}),sums('mulino_inventory_quantitysegments','quantity','105',{'retiredat':None})])
 
@@ -126,6 +137,13 @@ purchase('stale100','100')
 cmd('revise120','revisePurchase',{'proposalId':'$stale100.proposal','changes':{'quantity':{'value':'120','unit':'BOX'}},'reason':'원승인을 새 수량에 재사용할 수 없다'},bind={'REVISED_HASH':'/proposalHash'})
 cmd('stale100-dispatch','dispatchPurchaseOrder',{'proposalId':'$stale100.proposal','proposalHash':'$stale100.hash','approvalId':'$stale100.approval','channel':'SYNTHETIC','externalOperationId':str(uuid.uuid5(uuid.NAMESPACE_URL,'mulino:s3-stale-must-not-send'))},revision=2,outcome='HELD',assertions=[{'pointer':'/error/code','operator':'equals','expected':'APPROVAL_HASH_MISMATCH'}])
 raw('stale-dispatch-effect0',[count('mulino_trade_purchase_orders',0,{'externaloperationid':str(uuid.uuid5(uuid.NAMESPACE_URL,'mulino:s3-stale-must-not-send'))}),sums('mulino_inventory_quantitysegments','quantity','105',{'retiredat':None})])
+
+raw('before-independent-order',[],bind={'WORK_REV':'/rawRows/mulino_work_read_works/0/revision'})
+purchase('independent5','5')
+cmd('independent5-dispatch','dispatchPurchaseOrder',{'proposalId':'$independent5.proposal','proposalHash':'$independent5.hash','approvalId':'$independent5.approval','channel':'SYNTHETIC','externalOperationId':str(uuid.uuid5(uuid.NAMESPACE_URL,'mulino:s3-independent5'))},bind={'SEPARATE_LINE':'/poLineId'})
+A.append({'id':'independent-range','type':'uuid','alias':'RANGESEP'})
+receipt('independent5','0','5',physical='$RANGESEP',purchase_line='$SEPARATE_LINE')
+raw('separate-order-separate-key',[sums('mulino_trade_receipt_receipts','contributedquantity','100',{'purchaselineid':'$LINE'}),sums('mulino_trade_receipt_receipts','contributedquantity','5',{'purchaselineid':'$SEPARATE_LINE'}),sums('mulino_inventory_quantitysegments','quantity','110',{'retiredat':None})])
 
 # Separate organization proves movement of a pre-existing transit input only.
 A.append({'id':'transit-input-setup','type':'setup','fixtureRef':'verification/actual/s3/transit-fixture.json'})

@@ -363,6 +363,499 @@
       ]
     },
     {
+      "id": "shipment-physical-range",
+      "type": "uuid",
+      "alias": "SHIP_RANGE"
+    },
+    {
+      "id": "ship-departure",
+      "type": "original",
+      "fixture": {
+        "synthetic": true,
+        "clock": {
+          "asOf": "2026-10-07T09:00:02Z",
+          "knownAt": "2026-10-07T09:00:02Z"
+        },
+        "sourceProfile": {
+          "namespace": "native-s3-ship-departure",
+          "policyVersion": "fixture-v1",
+          "nextAction": "원본 범위와 실제 효과 대조",
+          "nextCheckAt": "2026-10-08T09:00:00Z"
+        },
+        "occurrence": {
+          "kind": "SHIPMENT_DEPARTURE",
+          "content": {
+            "shipmentEventId": "c2d9c2b6-a554-5b95-8706-8c12c31705b7",
+            "shipmentId": "$SHIPMENT",
+            "cargoId": "$CARGO",
+            "legId": "$LEG",
+            "placeId": "$TRANSIT",
+            "physicalScopeId": "$SHIP_RANGE",
+            "quantity": "100",
+            "unit": "BOX",
+            "occurredAt": "2026-10-07T09:00:02Z",
+            "kind": "DEPARTURE"
+          },
+          "externalEventId": "ship-departure",
+          "quantity": "100",
+          "unit": "BOX",
+          "assertion": "authored synthetic external original"
+        }
+      },
+      "binding": {
+        "organizationId": "$ORG",
+        "workId": "$WORK",
+        "itemId": "$P",
+        "actorId": "$reader",
+        "supervisorId": "$supervisor",
+        "physicalScopeId": "$SHIP_RANGE",
+        "subjectId": "$P",
+        "subjectKind": "ITEM",
+        "placeId": "$TRANSIT"
+      }
+    },
+    {
+      "id": "ship-departure-match",
+      "type": "command",
+      "capability": "matchSourceIdentity",
+      "request": {
+        "intentKind": "COMMAND",
+        "definitionVersion": "definition-v1",
+        "capabilityId": "matchSourceIdentity",
+        "expectedRevision": 1,
+        "commandIdempotencyKey": "ship-departure-match",
+        "slots": {
+          "claimId": "$ship-departure.claim",
+          "basisDocumentId": "$ship-departure.document",
+          "physicalScopeId": "$SHIP_RANGE",
+          "policyVersion": "fixture-v1",
+          "sourceIdentity": "native-s3-ship-departure:ship-departure:1",
+          "quantity": "100",
+          "unit": "BOX",
+          "effectiveFrom": "2026-10-07T09:00:02Z",
+          "reason": "외부 ORIGINAL과 동일한 범위 대조"
+        },
+        "provenance": {},
+        "subjectRefs": [
+          {
+            "type": "TradeItem",
+            "id": "$P"
+          }
+        ]
+      },
+      "outcome": "APPLIED",
+      "bind": {
+        "ship-departure.reconciliation": "/id"
+      },
+      "assertions": [
+        {
+          "pointer": "/evidenceStatus",
+          "operator": "equals",
+          "expected": "MATCHED"
+        }
+      ]
+    },
+    {
+      "id": "ship-departure-link",
+      "type": "command",
+      "capability": "linkCanonicalOccurrence",
+      "request": {
+        "intentKind": "COMMAND",
+        "definitionVersion": "definition-v1",
+        "capabilityId": "linkCanonicalOccurrence",
+        "expectedRevision": 1,
+        "commandIdempotencyKey": "ship-departure-link",
+        "slots": {
+          "reconciliationId": "$ship-departure.reconciliation"
+        },
+        "provenance": {},
+        "subjectRefs": [
+          {
+            "type": "TradeItem",
+            "id": "$P"
+          }
+        ]
+      },
+      "outcome": "APPLIED",
+      "bind": {
+        "ship-departure.canonical": "/id"
+      },
+      "assertions": [
+        {
+          "pointer": "/evidenceStatus",
+          "operator": "equals",
+          "expected": "VERIFIED_RECORD_ONLY"
+        }
+      ]
+    },
+    {
+      "id": "ship-departure-record",
+      "type": "command",
+      "capability": "recordLegEvent",
+      "request": {
+        "intentKind": "RECORD",
+        "definitionVersion": "definition-v1",
+        "capabilityId": "recordLegEvent",
+        "expectedRevision": 1,
+        "commandIdempotencyKey": "ship-departure-record",
+        "slots": {
+          "shipmentId": "$SHIPMENT",
+          "cargoId": "$CARGO",
+          "legId": "$LEG",
+          "kind": "DEPARTURE",
+          "placeId": "$TRANSIT",
+          "physicalScopeId": "$SHIP_RANGE",
+          "occurrenceId": "$ship-departure.canonical",
+          "quantity": "100",
+          "unit": "BOX",
+          "occurredAt": "2026-10-07T09:00:02Z"
+        },
+        "provenance": {},
+        "subjectRefs": [
+          {
+            "type": "Shipment",
+            "id": "$SHIPMENT"
+          }
+        ]
+      },
+      "outcome": "APPLIED",
+      "bind": {
+        "SHIP_REV": "/revision"
+      }
+    },
+    {
+      "id": "ship-arrival",
+      "type": "original",
+      "fixture": {
+        "synthetic": true,
+        "clock": {
+          "asOf": "2026-10-07T09:00:02Z",
+          "knownAt": "2026-10-07T09:00:02Z"
+        },
+        "sourceProfile": {
+          "namespace": "native-s3-ship-arrival",
+          "policyVersion": "fixture-v1",
+          "nextAction": "원본 범위와 실제 효과 대조",
+          "nextCheckAt": "2026-10-08T09:00:00Z"
+        },
+        "occurrence": {
+          "kind": "SHIPMENT_ARRIVAL",
+          "content": {
+            "shipmentEventId": "7b90d684-92ed-523b-9c6d-d294515d0a67",
+            "shipmentId": "$SHIPMENT",
+            "cargoId": "$CARGO",
+            "legId": "$LEG",
+            "placeId": "$W",
+            "physicalScopeId": "$SHIP_RANGE",
+            "quantity": "100",
+            "unit": "BOX",
+            "occurredAt": "2026-10-07T09:00:02Z",
+            "kind": "ARRIVAL"
+          },
+          "externalEventId": "ship-arrival",
+          "quantity": "100",
+          "unit": "BOX",
+          "assertion": "authored synthetic external original"
+        }
+      },
+      "binding": {
+        "organizationId": "$ORG",
+        "workId": "$WORK",
+        "itemId": "$P",
+        "actorId": "$reader",
+        "supervisorId": "$supervisor",
+        "physicalScopeId": "$SHIP_RANGE",
+        "subjectId": "$P",
+        "subjectKind": "ITEM",
+        "placeId": "$W"
+      }
+    },
+    {
+      "id": "ship-arrival-match",
+      "type": "command",
+      "capability": "matchSourceIdentity",
+      "request": {
+        "intentKind": "COMMAND",
+        "definitionVersion": "definition-v1",
+        "capabilityId": "matchSourceIdentity",
+        "expectedRevision": 1,
+        "commandIdempotencyKey": "ship-arrival-match",
+        "slots": {
+          "claimId": "$ship-arrival.claim",
+          "basisDocumentId": "$ship-arrival.document",
+          "physicalScopeId": "$SHIP_RANGE",
+          "policyVersion": "fixture-v1",
+          "sourceIdentity": "native-s3-ship-arrival:ship-arrival:1",
+          "quantity": "100",
+          "unit": "BOX",
+          "effectiveFrom": "2026-10-07T09:00:02Z",
+          "reason": "외부 ORIGINAL과 동일한 범위 대조"
+        },
+        "provenance": {},
+        "subjectRefs": [
+          {
+            "type": "TradeItem",
+            "id": "$P"
+          }
+        ]
+      },
+      "outcome": "APPLIED",
+      "bind": {
+        "ship-arrival.reconciliation": "/id"
+      },
+      "assertions": [
+        {
+          "pointer": "/evidenceStatus",
+          "operator": "equals",
+          "expected": "MATCHED"
+        }
+      ]
+    },
+    {
+      "id": "ship-arrival-link",
+      "type": "command",
+      "capability": "linkCanonicalOccurrence",
+      "request": {
+        "intentKind": "COMMAND",
+        "definitionVersion": "definition-v1",
+        "capabilityId": "linkCanonicalOccurrence",
+        "expectedRevision": 1,
+        "commandIdempotencyKey": "ship-arrival-link",
+        "slots": {
+          "reconciliationId": "$ship-arrival.reconciliation"
+        },
+        "provenance": {},
+        "subjectRefs": [
+          {
+            "type": "TradeItem",
+            "id": "$P"
+          }
+        ]
+      },
+      "outcome": "APPLIED",
+      "bind": {
+        "ship-arrival.canonical": "/id"
+      },
+      "assertions": [
+        {
+          "pointer": "/evidenceStatus",
+          "operator": "equals",
+          "expected": "VERIFIED_RECORD_ONLY"
+        }
+      ]
+    },
+    {
+      "id": "ship-arrival-record",
+      "type": "command",
+      "capability": "recordLegEvent",
+      "request": {
+        "intentKind": "RECORD",
+        "definitionVersion": "definition-v1",
+        "capabilityId": "recordLegEvent",
+        "expectedRevision": "$SHIP_REV",
+        "commandIdempotencyKey": "ship-arrival-record",
+        "slots": {
+          "shipmentId": "$SHIPMENT",
+          "cargoId": "$CARGO",
+          "legId": "$LEG",
+          "kind": "ARRIVAL",
+          "placeId": "$W",
+          "physicalScopeId": "$SHIP_RANGE",
+          "occurrenceId": "$ship-arrival.canonical",
+          "quantity": "100",
+          "unit": "BOX",
+          "occurredAt": "2026-10-07T09:00:02Z"
+        },
+        "provenance": {},
+        "subjectRefs": [
+          {
+            "type": "Shipment",
+            "id": "$SHIPMENT"
+          }
+        ]
+      },
+      "outcome": "APPLIED",
+      "bind": {
+        "SHIP_REV": "/revision"
+      }
+    },
+    {
+      "id": "custody-handover",
+      "type": "original",
+      "fixture": {
+        "synthetic": true,
+        "clock": {
+          "asOf": "2026-10-07T09:00:02Z",
+          "knownAt": "2026-10-07T09:00:02Z"
+        },
+        "sourceProfile": {
+          "namespace": "native-s3-custody-handover",
+          "policyVersion": "fixture-v1",
+          "nextAction": "원본 범위와 실제 효과 대조",
+          "nextCheckAt": "2026-10-08T09:00:00Z"
+        },
+        "occurrence": {
+          "kind": "CUSTODY_HANDOVER",
+          "content": {
+            "shipmentEventId": "e7dc9308-7039-5e9b-933b-4f3324f0ae50",
+            "shipmentId": "$SHIPMENT",
+            "cargoId": "$CARGO",
+            "legId": "$LEG",
+            "placeId": "$W",
+            "physicalScopeId": "$SHIP_RANGE",
+            "quantity": "100",
+            "unit": "BOX",
+            "occurredAt": "2026-10-07T09:00:02Z",
+            "fromCustodianId": "$reader",
+            "toCustodianId": "$supervisor"
+          },
+          "externalEventId": "custody-handover",
+          "quantity": "100",
+          "unit": "BOX",
+          "assertion": "authored synthetic external original"
+        }
+      },
+      "binding": {
+        "organizationId": "$ORG",
+        "workId": "$WORK",
+        "itemId": "$P",
+        "actorId": "$reader",
+        "supervisorId": "$supervisor",
+        "physicalScopeId": "$SHIP_RANGE",
+        "subjectId": "$P",
+        "subjectKind": "ITEM",
+        "placeId": "$W"
+      }
+    },
+    {
+      "id": "custody-handover-match",
+      "type": "command",
+      "capability": "matchSourceIdentity",
+      "request": {
+        "intentKind": "COMMAND",
+        "definitionVersion": "definition-v1",
+        "capabilityId": "matchSourceIdentity",
+        "expectedRevision": 1,
+        "commandIdempotencyKey": "custody-handover-match",
+        "slots": {
+          "claimId": "$custody-handover.claim",
+          "basisDocumentId": "$custody-handover.document",
+          "physicalScopeId": "$SHIP_RANGE",
+          "policyVersion": "fixture-v1",
+          "sourceIdentity": "native-s3-custody-handover:custody-handover:1",
+          "quantity": "100",
+          "unit": "BOX",
+          "effectiveFrom": "2026-10-07T09:00:02Z",
+          "reason": "외부 ORIGINAL과 동일한 범위 대조"
+        },
+        "provenance": {},
+        "subjectRefs": [
+          {
+            "type": "TradeItem",
+            "id": "$P"
+          }
+        ]
+      },
+      "outcome": "APPLIED",
+      "bind": {
+        "custody-handover.reconciliation": "/id"
+      },
+      "assertions": [
+        {
+          "pointer": "/evidenceStatus",
+          "operator": "equals",
+          "expected": "MATCHED"
+        }
+      ]
+    },
+    {
+      "id": "custody-handover-link",
+      "type": "command",
+      "capability": "linkCanonicalOccurrence",
+      "request": {
+        "intentKind": "COMMAND",
+        "definitionVersion": "definition-v1",
+        "capabilityId": "linkCanonicalOccurrence",
+        "expectedRevision": 1,
+        "commandIdempotencyKey": "custody-handover-link",
+        "slots": {
+          "reconciliationId": "$custody-handover.reconciliation"
+        },
+        "provenance": {},
+        "subjectRefs": [
+          {
+            "type": "TradeItem",
+            "id": "$P"
+          }
+        ]
+      },
+      "outcome": "APPLIED",
+      "bind": {
+        "custody-handover.canonical": "/id"
+      },
+      "assertions": [
+        {
+          "pointer": "/evidenceStatus",
+          "operator": "equals",
+          "expected": "VERIFIED_RECORD_ONLY"
+        }
+      ]
+    },
+    {
+      "id": "handover-record",
+      "type": "command",
+      "capability": "recordHandover",
+      "request": {
+        "intentKind": "RECORD",
+        "definitionVersion": "definition-v1",
+        "capabilityId": "recordHandover",
+        "expectedRevision": "$SHIP_REV",
+        "commandIdempotencyKey": "handover-record",
+        "slots": {
+          "shipmentId": "$SHIPMENT",
+          "cargoId": "$CARGO",
+          "legId": "$LEG",
+          "placeId": "$W",
+          "physicalScopeId": "$SHIP_RANGE",
+          "occurrenceId": "$custody-handover.canonical",
+          "quantity": "100",
+          "unit": "BOX",
+          "occurredAt": "2026-10-07T09:00:02Z",
+          "fromCustodianId": "$reader",
+          "toCustodianId": "$supervisor"
+        },
+        "provenance": {},
+        "subjectRefs": [
+          {
+            "type": "Shipment",
+            "id": "$SHIPMENT"
+          }
+        ]
+      },
+      "outcome": "APPLIED"
+    },
+    {
+      "id": "shipment-actual-no-stock",
+      "type": "observe",
+      "assertions": [
+        {
+          "pointer": "/rawRows/mulino_inventory_quantitysegments",
+          "operator": "size",
+          "expected": 0
+        },
+        {
+          "pointer": "/rawRows/mulino_trade_shipment_legevents",
+          "operator": "size",
+          "expected": 2
+        },
+        {
+          "pointer": "/rawRows/mulino_trade_shipment_custodyhandovers",
+          "operator": "size",
+          "expected": 1
+        }
+      ]
+    },
+    {
       "id": "RANGE60",
       "type": "uuid",
       "alias": "RANGE60"
@@ -2029,7 +2522,7 @@
         "intentKind": "RECORD",
         "definitionVersion": "definition-v1",
         "capabilityId": "recordDispositionBasis",
-        "expectedRevision": 1,
+        "expectedRevision": 0,
         "commandIdempotencyKey": "s60-QC-decision",
         "slots": {
           "segmentId": "$receipt60.segment",
@@ -2186,7 +2679,7 @@
         "intentKind": "RECORD",
         "definitionVersion": "definition-v1",
         "capabilityId": "recordDispositionBasis",
-        "expectedRevision": 1,
+        "expectedRevision": 0,
         "commandIdempotencyKey": "s60-CUSTOMER-decision",
         "slots": {
           "segmentId": "$receipt60.segment",
@@ -2343,7 +2836,7 @@
         "intentKind": "RECORD",
         "definitionVersion": "definition-v1",
         "capabilityId": "recordDispositionBasis",
-        "expectedRevision": 1,
+        "expectedRevision": 0,
         "commandIdempotencyKey": "s60-COMMERCIAL-decision",
         "slots": {
           "segmentId": "$receipt60.segment",
@@ -2500,7 +2993,7 @@
         "intentKind": "RECORD",
         "definitionVersion": "definition-v1",
         "capabilityId": "recordDispositionBasis",
-        "expectedRevision": 1,
+        "expectedRevision": 0,
         "commandIdempotencyKey": "s40-QC-decision",
         "slots": {
           "segmentId": "$receipt40.segment",
@@ -2657,7 +3150,7 @@
         "intentKind": "RECORD",
         "definitionVersion": "definition-v1",
         "capabilityId": "recordDispositionBasis",
-        "expectedRevision": 1,
+        "expectedRevision": 0,
         "commandIdempotencyKey": "s40-CUSTOMER-decision",
         "slots": {
           "segmentId": "$receipt40.segment",
@@ -2814,7 +3307,7 @@
         "intentKind": "RECORD",
         "definitionVersion": "definition-v1",
         "capabilityId": "recordDispositionBasis",
-        "expectedRevision": 1,
+        "expectedRevision": 0,
         "commandIdempotencyKey": "s40-COMMERCIAL-decision",
         "slots": {
           "segmentId": "$receipt40.segment",
@@ -3026,7 +3519,7 @@
         "intentKind": "COMMAND",
         "definitionVersion": "definition-v1",
         "capabilityId": "placeHold",
-        "expectedRevision": 1,
+        "expectedRevision": 0,
         "commandIdempotencyKey": "qc-hold20-decision",
         "slots": {
           "segmentId": "$receipt60.segment",
@@ -3186,7 +3679,7 @@
         "intentKind": "COMMAND",
         "definitionVersion": "definition-v1",
         "capabilityId": "placeHold",
-        "expectedRevision": 1,
+        "expectedRevision": 0,
         "commandIdempotencyKey": "recall-hold60-decision",
         "slots": {
           "segmentId": "$receipt60.segment",
@@ -3358,7 +3851,7 @@
         "intentKind": "COMMAND",
         "definitionVersion": "definition-v1",
         "capabilityId": "releaseHold",
-        "expectedRevision": 1,
+        "expectedRevision": 0,
         "commandIdempotencyKey": "release-qc-only",
         "slots": {
           "restrictionId": "$qc-hold20.restriction",
@@ -3795,6 +4288,341 @@
           "operator": "sum",
           "column": "quantity",
           "expected": "105",
+          "where": {
+            "retiredat": null
+          }
+        }
+      ]
+    },
+    {
+      "id": "before-independent-order",
+      "type": "observe",
+      "assertions": [],
+      "bind": {
+        "WORK_REV": "/rawRows/mulino_work_read_works/0/revision"
+      }
+    },
+    {
+      "id": "independent5-proposal",
+      "type": "command",
+      "capability": "proposePurchase",
+      "request": {
+        "intentKind": "COMMAND",
+        "definitionVersion": "definition-v1",
+        "capabilityId": "proposePurchase",
+        "expectedRevision": "$WORK_REV",
+        "commandIdempotencyKey": "independent5-proposal",
+        "slots": {
+          "workId": "$WORK",
+          "quantity": {
+            "value": "5",
+            "unit": "BOX"
+          },
+          "price": {
+            "value": "20",
+            "currency": "EUR"
+          },
+          "supplierId": "$SUP",
+          "destinationId": "$W",
+          "dueAt": "2026-10-31T00:00:00Z",
+          "endpoint": "ARRIVED",
+          "quantityMode": "CUMULATIVE_EVENT"
+        },
+        "provenance": {},
+        "subjectRefs": [
+          {
+            "type": "Work",
+            "id": "$WORK"
+          }
+        ]
+      },
+      "outcome": "APPLIED",
+      "bind": {
+        "independent5.proposal": "/proposalId",
+        "independent5.hash": "/proposalHash"
+      }
+    },
+    {
+      "id": "independent5-approval",
+      "type": "command",
+      "capability": "approvePurchase",
+      "request": {
+        "intentKind": "COMMAND",
+        "definitionVersion": "definition-v1",
+        "capabilityId": "approvePurchase",
+        "expectedRevision": 1,
+        "commandIdempotencyKey": "independent5-approval",
+        "slots": {
+          "proposalId": "$independent5.proposal",
+          "proposalHash": "$independent5.hash",
+          "decision": "APPROVE",
+          "validUntil": "2026-10-31T00:00:00Z",
+          "conditions": []
+        },
+        "provenance": {},
+        "subjectRefs": [
+          {
+            "type": "Work",
+            "id": "$WORK"
+          }
+        ]
+      },
+      "outcome": "APPLIED",
+      "bind": {
+        "independent5.approval": "/approvalId"
+      },
+      "actor": "supervisor"
+    },
+    {
+      "id": "independent5-dispatch",
+      "type": "command",
+      "capability": "dispatchPurchaseOrder",
+      "request": {
+        "intentKind": "COMMAND",
+        "definitionVersion": "definition-v1",
+        "capabilityId": "dispatchPurchaseOrder",
+        "expectedRevision": 1,
+        "commandIdempotencyKey": "independent5-dispatch",
+        "slots": {
+          "proposalId": "$independent5.proposal",
+          "proposalHash": "$independent5.hash",
+          "approvalId": "$independent5.approval",
+          "channel": "SYNTHETIC",
+          "externalOperationId": "ef440c28-6614-5538-a5a2-e0b1c1c09f75"
+        },
+        "provenance": {},
+        "subjectRefs": [
+          {
+            "type": "Work",
+            "id": "$WORK"
+          }
+        ]
+      },
+      "outcome": "APPLIED",
+      "bind": {
+        "SEPARATE_LINE": "/poLineId"
+      }
+    },
+    {
+      "id": "independent-range",
+      "type": "uuid",
+      "alias": "RANGESEP"
+    },
+    {
+      "id": "independent5",
+      "type": "original",
+      "fixture": {
+        "synthetic": true,
+        "clock": {
+          "asOf": "2026-10-07T09:00:02Z",
+          "knownAt": "2026-10-07T09:00:02Z"
+        },
+        "sourceProfile": {
+          "namespace": "native-s3-independent5",
+          "policyVersion": "fixture-v1",
+          "nextAction": "원본 범위와 실제 효과 대조",
+          "nextCheckAt": "2026-10-08T09:00:00Z"
+        },
+        "occurrence": {
+          "kind": "PHYSICAL_RECEIPT",
+          "content": {
+            "rangeRootId": "$RANGE5",
+            "startQuantity": "0",
+            "itemId": "$P",
+            "lotId": "$L",
+            "placeId": "$W",
+            "workId": "$WORK",
+            "quantity": "5",
+            "unit": "BOX",
+            "occurredAt": "2026-10-07T09:00:02Z"
+          },
+          "externalEventId": "independent5",
+          "quantity": "5",
+          "unit": "BOX",
+          "assertion": "authored synthetic external original"
+        }
+      },
+      "binding": {
+        "organizationId": "$ORG",
+        "workId": "$WORK",
+        "itemId": "$P",
+        "actorId": "$reader",
+        "supervisorId": "$supervisor",
+        "physicalScopeId": "$RANGE5",
+        "subjectId": "$P",
+        "subjectKind": "ITEM",
+        "placeId": "$W"
+      }
+    },
+    {
+      "id": "independent5-provisional",
+      "type": "command",
+      "capability": "receiveProvisional",
+      "request": {
+        "intentKind": "RECORD",
+        "definitionVersion": "definition-v1",
+        "capabilityId": "receiveProvisional",
+        "expectedRevision": 0,
+        "commandIdempotencyKey": "independent5-provisional",
+        "slots": {
+          "eventId": "$independent5.event",
+          "rangeRootId": "$RANGE5",
+          "startQuantity": "0",
+          "quantity": "5",
+          "unit": "BOX",
+          "itemId": "$P",
+          "lotId": "$L",
+          "placeId": "$W",
+          "workId": "$WORK",
+          "ownerId": "$reader",
+          "supervisorId": "$supervisor",
+          "nextAction": "실물과 원본 사건 확인",
+          "nextCheckAt": "2026-10-08T09:00:00Z",
+          "occurredAt": "2026-10-07T09:00:02Z",
+          "purchaseLineId": "$SEPARATE_LINE"
+        },
+        "provenance": {},
+        "subjectRefs": [
+          {
+            "type": "Work",
+            "id": "$WORK"
+          }
+        ]
+      },
+      "outcome": "APPLIED",
+      "bind": {
+        "independent5.observation": "/effects/receiptId"
+      }
+    },
+    {
+      "id": "independent5-match",
+      "type": "command",
+      "capability": "matchSourceIdentity",
+      "request": {
+        "intentKind": "COMMAND",
+        "definitionVersion": "definition-v1",
+        "capabilityId": "matchSourceIdentity",
+        "expectedRevision": 1,
+        "commandIdempotencyKey": "independent5-match",
+        "slots": {
+          "claimId": "$independent5.claim",
+          "basisDocumentId": "$independent5.document",
+          "physicalScopeId": "$RANGE5",
+          "policyVersion": "fixture-v1",
+          "sourceIdentity": "native-s3-independent5:independent5:1",
+          "quantity": "5",
+          "unit": "BOX",
+          "effectiveFrom": "2026-10-07T09:00:02Z",
+          "reason": "외부 ORIGINAL과 동일한 범위 대조"
+        },
+        "provenance": {},
+        "subjectRefs": [
+          {
+            "type": "TradeItem",
+            "id": "$P"
+          }
+        ]
+      },
+      "outcome": "APPLIED",
+      "bind": {
+        "independent5.reconciliation": "/id"
+      },
+      "assertions": [
+        {
+          "pointer": "/evidenceStatus",
+          "operator": "equals",
+          "expected": "MATCHED"
+        }
+      ]
+    },
+    {
+      "id": "independent5-link",
+      "type": "command",
+      "capability": "linkCanonicalOccurrence",
+      "request": {
+        "intentKind": "COMMAND",
+        "definitionVersion": "definition-v1",
+        "capabilityId": "linkCanonicalOccurrence",
+        "expectedRevision": 1,
+        "commandIdempotencyKey": "independent5-link",
+        "slots": {
+          "reconciliationId": "$independent5.reconciliation"
+        },
+        "provenance": {},
+        "subjectRefs": [
+          {
+            "type": "TradeItem",
+            "id": "$P"
+          }
+        ]
+      },
+      "outcome": "APPLIED",
+      "bind": {
+        "independent5.canonical": "/id"
+      },
+      "assertions": [
+        {
+          "pointer": "/evidenceStatus",
+          "operator": "equals",
+          "expected": "VERIFIED_RECORD_ONLY"
+        }
+      ]
+    },
+    {
+      "id": "independent5-confirm",
+      "type": "command",
+      "capability": "confirmReceipt",
+      "request": {
+        "intentKind": "COMMAND",
+        "definitionVersion": "definition-v1",
+        "capabilityId": "confirmReceipt",
+        "expectedRevision": 0,
+        "commandIdempotencyKey": "independent5-confirm-stable",
+        "slots": {
+          "receiptId": "$independent5.observation",
+          "canonicalOccurrenceId": "$independent5.canonical",
+          "lotId": "$L"
+        },
+        "provenance": {},
+        "subjectRefs": [
+          {
+            "type": "Receipt",
+            "id": "$independent5.observation"
+          }
+        ]
+      },
+      "outcome": "APPLIED",
+      "bind": {
+        "independent5.segment": "/effects/segmentId"
+      }
+    },
+    {
+      "id": "separate-order-separate-key",
+      "type": "observe",
+      "assertions": [
+        {
+          "pointer": "/rawRows/mulino_trade_receipt_receipts",
+          "operator": "sum",
+          "column": "contributedquantity",
+          "expected": "100",
+          "where": {
+            "purchaselineid": "$LINE"
+          }
+        },
+        {
+          "pointer": "/rawRows/mulino_trade_receipt_receipts",
+          "operator": "sum",
+          "column": "contributedquantity",
+          "expected": "5",
+          "where": {
+            "purchaselineid": "$SEPARATE_LINE"
+          }
+        },
+        {
+          "pointer": "/rawRows/mulino_inventory_quantitysegments",
+          "operator": "sum",
+          "column": "quantity",
+          "expected": "110",
           "where": {
             "retiredat": null
           }
