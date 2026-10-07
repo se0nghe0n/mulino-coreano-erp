@@ -42,13 +42,14 @@ public class QualityEligibility implements InventoryReadFacts,QueryHandler {
   for(var hold:r.rows(c,"Restrictions"))if(Objects.equals(segment.get("controlScope"),hold.get("controlScope"))&&Set.of(action,"ALL").contains(hold.get("action"))){
    next=permissionBoundary(next,hold,at);if(active(hold,at,c.knownAt())){
     if(hold.get("segmentId")==null){blocks.add(new QualityRanges.Range(BigDecimal.ZERO,quantity));blocked=true;}
-    else {var projected=PhysicalRanges.project(r.rows(c,"GenealogyEdges"),(String)hold.get("segmentId"),id,range(hold).start(),(BigDecimal)hold.get("quantity"));if(!projected.isEmpty()){blocks.addAll(projected);blocked=true;refs.add((String)hold.get("evidenceRef"));}else if(overlap(c,id,(String)hold.get("segmentId"))){blocks.add(new QualityRanges.Range(BigDecimal.ZERO,quantity));blocked=true;unknowns.add("ANCESTOR_SCOPE_REQUIRES_PHYSICAL_RECONCILIATION");}}
+    else {var projected=PhysicalRanges.project(r.rows(c,"GenealogyEdges"),(String)hold.get("segmentId"),id,range(hold).start(),(BigDecimal)hold.get("quantity"));if(!projected.isEmpty()){blocks.addAll(projected);blocked=true;refs.add((String)hold.get("evidenceRef"));}else if(overlap(c,id,(String)hold.get("segmentId"))&&!exactAncestry(c,(String)hold.get("segmentId"),segment)){blocks.add(new QualityRanges.Range(BigDecimal.ZERO,quantity));blocked=true;unknowns.add("ANCESTOR_SCOPE_REQUIRES_PHYSICAL_RECONCILIATION");}}
    }
   }
   allowed=QualityRanges.subtract(allowed,blocks);conditions.add(Map.of("condition","RESTRICTIONS","state",blocked?"DENIED":"ALLOWED","blockedRanges",dto(blocks)));
   BigDecimal eligible=QualityRanges.quantity(allowed);String state=eligible.signum()>0?(eligible.compareTo(quantity)==0?"ALLOWED":"PARTIAL"):(unknowns.isEmpty()?"DENIED":"UNKNOWN");
   return new Result(state,eligible,allowed,List.copyOf(conditions),List.copyOf(refs),List.copyOf(unknowns),next);
  }
+ private boolean exactAncestry(DomainContext c,String ancestor,Map<String,Object> segment){var root=r.object(c,"QuantitySegments",ancestor);return QualityRanges.quantity(PhysicalRanges.project(r.rows(c,"GenealogyEdges"),ancestor,(String)segment.get("ID"),BigDecimal.ZERO,StockPrimitives.amount(root))).compareTo(StockPrimitives.amount(segment))==0;}
  private boolean overlap(DomainContext c,String a,String b){var all=new HashSet<String>();all.add(b);boolean changed;do{changed=false;for(var edge:r.rows(c,"GenealogyEdges"))if(all.contains(edge.get("sourceId")))changed|=all.add((String)edge.get("targetId"));}while(changed);return all.contains(a);}
  /** Time permissions use full closed [validFrom,validUntil]; release is effective at releasedAt. */
  public static boolean active(Map<String,Object>b,Instant at){return active(b,at,Instant.MAX);}

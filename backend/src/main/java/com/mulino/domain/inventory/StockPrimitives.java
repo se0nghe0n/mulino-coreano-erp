@@ -90,18 +90,21 @@ public final class StockPrimitives {
   }
   /** Relocates an identified interval and retains exact prefix/suffix identities. */
   public String transferRange(DomainContext c,String segmentId,BigDecimal start,BigDecimal q,String destination,Instant at,String evidence,String command,String kind){
-    return replaceRange(c,segmentId,start,q,destination,at,evidence,command,kind,false);
+    return replaceRange(c,segmentId,start,q,destination,at,evidence,command,kind,false,null);
+  }
+  public String transferRange(DomainContext c,String segmentId,BigDecimal start,BigDecimal q,String destination,String custodian,Instant at,String evidence,String command,String kind){
+    if(!repository.internalCustodian(c,custodian))throw DomainError.invalid("Confirmed internal custodian required");return replaceRange(c,segmentId,start,q,destination,at,evidence,command,kind,false,custodian);
   }
   public void disposeRange(DomainContext c,String segmentId,BigDecimal start,BigDecimal q,Instant at,String evidence,String command){
-    replaceRange(c,segmentId,start,q,null,at,evidence,command,"DISPOSE",true);
+    replaceRange(c,segmentId,start,q,null,at,evidence,command,"DISPOSE",true,null);
   }
-  private String replaceRange(DomainContext c,String segmentId,BigDecimal start,BigDecimal q,String destination,Instant at,String evidence,String command,String kind,boolean discard){
+  private String replaceRange(DomainContext c,String segmentId,BigDecimal start,BigDecimal q,String destination,Instant at,String evidence,String command,String kind,boolean discard,String custodian){
     lockSources(c,List.of(segmentId));var source=leaf(c,segmentId,at);quantity(c,source,q.toPlainString(),(String)source.get("unit"));
     if(start.signum()<0||start.add(q).compareTo(amount(source))>0||"UNCERTAIN_MIXTURE".equals(source.get("mixtureStatus")))throw DomainError.invalid("Identified exact physical interval required");
     if(destination!=null)repository.current(c,"Places",destination);
     var children=new ArrayList<Map<String,Object>>();String selected=null;
     BigDecimal end=start.add(q);var intervals=new ArrayList<QualityRanges.Range>();if(start.signum()>0)intervals.add(new QualityRanges.Range(BigDecimal.ZERO,start));if(!discard)intervals.add(new QualityRanges.Range(start,end));if(end.compareTo(amount(source))<0)intervals.add(new QualityRanges.Range(end,amount(source)));
-    for(var range:intervals){boolean chosen=!discard&&range.start().compareTo(start)==0&&range.end().compareTo(end)==0;var child=child(c,source,range.end().subtract(range.start()),chosen?destination:(String)source.get("placeId"),at,evidence);repository.insert("QuantitySegments",child);children.add(child);edge(c,source,child,amount(child),range.start(),BigDecimal.ZERO,chosen?kind:"RETAINED",false,at,evidence,command);if(chosen)selected=(String)child.get("ID");}
+    for(var range:intervals){boolean chosen=!discard&&range.start().compareTo(start)==0&&range.end().compareTo(end)==0;var child=child(c,source,range.end().subtract(range.start()),chosen?destination:(String)source.get("placeId"),at,evidence);if(chosen&&custodian!=null)child.put("custodianId",custodian);repository.insert("QuantitySegments",child);children.add(child);edge(c,source,child,amount(child),range.start(),BigDecimal.ZERO,chosen?kind:"RETAINED",false,at,evidence,command);if(chosen)selected=(String)child.get("ID");}
     repository.update(c,"QuantitySegments",segmentId,Map.of("retiredAt",at,"retirementRecordedAt",c.knownAt(),"revision",((Number)source.get("revision")).intValue()+1));
     transferAllocations(c,source,children,at,command);closeMembership(c,source,children,at);if(discard)movement(c,source,null,q,kind,at,evidence,command);return selected;
   }
@@ -123,7 +126,7 @@ public final class StockPrimitives {
     for(BigDecimal q:amounts) {var child=child(c,first,q,place,at,evidence);if(uncertain)child.put("mixtureStatus","UNCERTAIN_MIXTURE");children.add(child);repository.insert("QuantitySegments",child);}
     for(var source:sources) {
       repository.update(c,"QuantitySegments",(String)source.get("ID"),Map.of("retiredAt",at,"retirementRecordedAt",c.knownAt(),"revision",((Number)source.get("revision")).intValue()+1));
-      if(sources.size()==1) {BigDecimal offset=BigDecimal.ZERO;for(var target:children){edge(c,source,target,amount(target),offset,BigDecimal.ZERO,kind,uncertain,at,evidence,command);offset=offset.add(amount(target));}}
+      if(sources.size()==1) {BigDecimal offset=BigDecimal.ZERO;for(var target:children){edge(c,source,target,amount(target),offset,BigDecimal.ZERO,Set.of("DISPOSE","ADJUST_DECREASE").contains(kind)?"RETAINED":kind,uncertain,at,evidence,command);offset=offset.add(amount(target));}}
       else {BigDecimal offset=BigDecimal.ZERO;for(var prior:sources){if(prior==source)break;offset=offset.add(amount(prior));}edge(c,source,children.getFirst(),amount(source),BigDecimal.ZERO,offset,kind,uncertain,at,evidence,command);}
       transferAllocations(c,source,children,at,command);
       closeMembership(c,source,children,at);
