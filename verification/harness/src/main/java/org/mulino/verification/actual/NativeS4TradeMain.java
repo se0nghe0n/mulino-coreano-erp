@@ -1,0 +1,108 @@
+package org.mulino.verification.actual;
+
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import java.nio.file.*;
+import java.time.Instant;
+import java.util.*;
+import java.math.BigDecimal;
+import org.mulino.verification.*;
+
+/** Authored S4 public-HTTP script plus independent SQL; no normative full-case claim. */
+public final class NativeS4TradeMain {
+    private final Path root;
+    private final ObjectNode actions=Json.object(),bindings=Json.object(),report=Json.object();
+    private ActualAcceptanceDriver driver;
+    private JsonNode actor;
+    private String work;
+    private int checks;
+    private NativeS4TradeMain(Path root){this.root=root;}
+    public static void main(String[] args)throws Exception {new NativeS4TradeMain(Path.of(System.getProperty("repo.root",".")).toAbsolutePath().normalize()).run();}
+    private void run()throws Exception {
+        int exit=3;report.put("recordType","S4_ACTUAL_NATIVE_TRADE_RECEIPT").put("status","NOT_RUN").put("gateComplete",false).put("fullCaseCoverageClaimed",false).put("startedAt",Instant.now().toString());report.set("actions",actions);
+        try {
+            driver=new ActualAcceptanceDriver(root,ActualConfiguration.environment(System.getenv()));
+            String ref="verification/actual/s4/fixture.json";JsonNode fixture=Json.read(root.resolve(ref));
+            var bundle=Json.object();bundle.set("fixture",fixture);bundle.set("bases",Json.array());bundle.put("fixtureHash",Json.sha256(root.resolve(ref)));
+            var installed=driver.installFixture("setup",bundle);capture(installed);available(installed);bindings.setAll((ObjectNode)installed.data().path("aliasMap"));actor=fixture.path("actors").path("reader");
+            clock("2026-10-07T09:00:02Z");
+            var script=Json.read(root.resolve("verification/actual/s4/flow.json"));
+            for(JsonNode action:script.path("actions"))execute(action);
+            report.put("status","PASS").put("boundedAssertions",checks).put("fixtureHash",Json.sha256(root.resolve(ref))).put("flowHash",Json.sha256(root.resolve("verification/actual/s4/flow.json"))).put("buildCommit",ActualConfiguration.environment(System.getenv()).buildVersion()).put("limitation","Bounded S4 HTTP/JDBC assertions only; normative T17-T19/C1/C4/E1/E2 full case coverage, paid model, regulatory and BTP acceptance remain separate");exit=0;
+        }catch(Throwable failure){boolean assertion=failure instanceof AssertionError,unavailable=failure instanceof Unavailable;report.put("status",assertion?"FAIL":"NOT_RUN").put("failure",failure.getClass().getSimpleName()+": "+failure.getMessage());exit=assertion?1:unavailable?2:3;}
+        finally {
+            report.put("finishedAt",Instant.now().toString()).put("exitCode",exit).put("boundedAssertions",checks);
+            Path out=Path.of(System.getProperty("verification.actual.output",root.resolve("verification/harness/target/evidence/actual-s4-native").toString())).toAbsolutePath().normalize();Files.createDirectories(out);Json.write(out.resolve("actual-s4-native.json"),report);
+            for(JsonNode action:actions)for(JsonNode artifact:action.path("artifactRefs")){Path source=root.resolve(artifact.asText()).normalize(),target=out.resolve(artifact.asText()).normalize();if(!source.startsWith(root)||!target.startsWith(out))throw new IllegalArgumentException("Artifact escapes custody");Files.createDirectories(target.getParent());Files.copy(source,target,StandardCopyOption.REPLACE_EXISTING);}
+            System.out.println(report.toPrettyString());
+        }System.exit(exit);
+    }
+    private void execute(JsonNode a)throws Exception {
+        String id=Json.required(a,"id"),type=Json.required(a,"type");
+        switch(type) {
+            case "require-contract" -> throw new Unavailable(a.path("reason").asText());
+            case "setup" -> {
+                String ref=Json.required(a,"fixtureRef");var fixture=Json.read(root.resolve(ref));var bundle=Json.object();bundle.set("fixture",fixture);bundle.set("bases",Json.array());bundle.put("fixtureHash",Json.sha256(root.resolve(ref)));var result=driver.installFixture(id,bundle);capture(result);available(result);bindings.setAll((ObjectNode)result.data().path("aliasMap"));if(a.has("organizationAlias"))bindings.set("ORG",result.data().path("aliasMap").path(Json.required(a,"organizationAlias")));actor=fixture.path("actors").path("reader");
+            }
+            case "clock" -> clock(a.path("instant").asText());
+            case "uuid" -> bindings.put(Json.required(a,"alias"),UUID.randomUUID().toString());
+            case "original" -> original(id,resolve(a.path("fixture")),resolve(a.path("binding")));
+            case "command" -> {
+                JsonNode request=resolve(a.path("request"));var result=driver.invoke(id,"api",a.hasNonNull("actor")?resolveActor(a.path("actor").asText()):actor,Json.required(a,"capability"),request);capture(result);available(result);
+                require(result.data().path("httpStatus").asInt()==a.path("httpStatus").asInt(200),id+" HTTP status "+result.data().path("httpStatus"));
+                require(result.response().path("outcome").asText().equals(a.path("outcome").asText("APPLIED")),id+" expected business outcome "+a.path("outcome").asText("APPLIED")+" observed "+result.response());
+                for(var it=a.path("bind").fields();it.hasNext();){var e=it.next();JsonNode value=result.response().at(e.getValue().asText());require(!value.isMissingNode(),id+" missing response binding "+e.getValue());bindings.set(e.getKey(),value);if(e.getKey().equals("WORK"))work=value.asText();}
+                assertions(id,result.response(),a.path("assertions"));
+            }
+            case "lost-response" -> {
+                var config=ActualConfiguration.environment(System.getenv());JsonNode request=resolve(a.path("request"));JsonNode proof;
+                try(var proxy=new S3ResponseLossProxy(config.baseUri())) {
+                    var lossy=new ActualAcceptanceDriver(root,new ActualConfiguration(proxy.uri(),config.jdbcUrl(),config.username(),config.password(),config.signingKey(),config.issuer(),config.audience(),config.buildVersion()));boolean responseLost=false;
+                    try{lossy.invoke(id,"api",actor,Json.required(a,"capability"),request);}catch(IllegalStateException expected){responseLost=true;}
+                    require(responseLost,id+" client must lose its actual HTTP response");proof=proxy.receipt();require(proof.path("upstreamHttpStatus").asInt()==200&&proof.path("response").path("outcome").asText().equals("APPLIED"),id+" upstream must commit APPLIED before response loss");
+                }
+                String ref="verification/harness/target/evidence/actual/response-loss-"+UUID.randomUUID()+".json";Json.write(root.resolve(ref),proof);var control=Json.object();control.put("driverStatus","EXECUTED").put("source","REAL_LOOPBACK_RESPONSE_LOSS_PROXY");control.set("response",proof);control.set("artifactRefs",Json.MAPPER.valueToTree(List.of(ref)));actions.set(id,control);
+                for(var it=a.path("bind").fields();it.hasNext();){var e=it.next();JsonNode value=proof.path("response").at(e.getValue().asText());require(!value.isMissingNode(),id+" missing upstream binding");bindings.set(e.getKey(),value);}
+            }
+            case "parallel" -> {
+                JsonNode request=resolve(a.path("request"));var first=driver.start(id+"-start1","api",actor,Json.required(a,"capability"),request);var second=driver.start(id+"-start2","api",actor,Json.required(a,"capability"),request);capture(first);capture(second);available(first);available(second);
+                var r1=driver.await(id+"-result1",first.data().path("invocationHandle"),30);var r2=driver.await(id+"-result2",second.data().path("invocationHandle"),30);capture(r1);capture(r2);available(r1);available(r2);require(r1.response().path("outcome").asText().equals("APPLIED")&&r2.response().path("outcome").asText().equals("APPLIED"),id+" retries must return APPLIED business outcome");require(r1.response().path("effects").equals(r2.response().path("effects")),id+" retry effects differ");var p1=Json.read(root.resolve(r1.artifactRefs().getFirst()));var p2=Json.read(root.resolve(r2.artifactRefs().getFirst()));require(!p1.path("credentialSha256").equals(p2.path("credentialSha256")),id+" retries must use refreshed distinct JWT credentials");
+            }
+            case "query" -> {
+                var result=driver.query(id,"api",actor,Json.required(a,"capability"),resolve(a.path("request")));capture(result);available(result);require(result.data().path("httpStatus").asInt()==a.path("httpStatus").asInt(200),id+" query HTTP failed");assertions(id,result.response(),a.path("assertions"));
+                for(var it=a.path("bind").fields();it.hasNext();){var e=it.next();JsonNode value=result.response().at(e.getValue().asText());require(!value.isMissingNode(),id+" missing query binding "+e.getValue());bindings.set(e.getKey(),value);}
+            }
+            case "observe" -> {
+                var request=Json.object();request.put("profile","S4").put("asOf",a.path("asOf").asText("2026-10-07T09:00:02Z")).put("knownAt",a.path("knownAt").asText("2026-10-07T09:00:02Z"));var scope=Json.object();scope.set("organizationId",bindings.path("ORG"));request.set("scope",scope);request.set("sources",Json.parse("[\"s4\"]"));
+                var result=driver.observe(id,request);capture(result);available(result);new ContractValidator(root).result(result,"observe");assertions(id,result.data(),a.path("assertions"));
+                for(var it=a.path("bind").fields();it.hasNext();){var e=it.next();JsonNode value=result.data().at(e.getValue().asText());require(!value.isMissingNode(),id+" missing SQL binding "+e.getValue());bindings.set(e.getKey(),value);}
+            }
+            default -> throw new IllegalArgumentException("Unsupported authored S4 action "+type);
+        }
+    }
+    private JsonNode resolveActor(String name)throws Exception{return Json.read(root.resolve("verification/actual/s4/fixture.json")).path("actors").path(name);}
+    private void assertions(String id,JsonNode data,JsonNode assertions) {
+        for(JsonNode assertion:assertions) {
+            JsonNode value=data.at(Json.required(assertion,"pointer"));require(!value.isMissingNode(),id+" missing observation "+assertion.path("pointer"));
+            switch(Json.required(assertion,"operator")) {
+                case "equals" -> require(value.equals(resolve(assertion.path("expected"))),id+" expected "+resolve(assertion.path("expected"))+" observed "+value);
+                case "size" -> require(value.size()==assertion.path("expected").asInt(),id+" expected rows "+assertion.path("expected")+" observed "+value.size());
+                case "sum" -> {BigDecimal sum=BigDecimal.ZERO;for(JsonNode row:value){if(assertion.has("where")&&!matches(row,resolve(assertion.path("where"))))continue;JsonNode quantity=row.path(Json.required(assertion,"column"));require(quantity.isTextual()||quantity.isNumber(),id+" missing/non-numeric amount "+row);sum=sum.add(new BigDecimal(quantity.asText()));}require(sum.compareTo(new BigDecimal(assertion.path("expected").asText()))==0,id+" expected sum "+assertion.path("expected")+" observed "+sum);}
+                case "matchingRows" -> {int count=0;for(JsonNode row:value)if(matches(row,resolve(assertion.path("where"))))count++;require(count==assertion.path("expected").asInt(),id+" expected matching rows "+assertion.path("expected")+" observed "+count);}
+                default -> throw new IllegalArgumentException("Unsupported independent assertion operator");
+            }
+        }
+    }
+    private boolean matches(JsonNode row,JsonNode expected){for(var it=expected.fields();it.hasNext();){var e=it.next();if(!row.path(e.getKey()).equals(e.getValue()))return false;}return true;}
+    private void original(String id,JsonNode fixture,JsonNode binding)throws Exception {
+        var bundle=Json.object();bundle.put("fixturePhase","S4_ORIGINAL").put("fixtureHash",java.util.HexFormat.of().formatHex(java.security.MessageDigest.getInstance("SHA-256").digest(fixture.toString().getBytes(java.nio.charset.StandardCharsets.UTF_8))));bundle.set("fixture",fixture);bundle.set("binding",binding);
+        var result=driver.installFixture(id,bundle);capture(result);available(result);require(result.data().path("sourceContentSha256").equals(result.data().path("blobReadbackSha256")),"Original blob custody mismatch");
+        for(var it=result.data().path("aliasMap").fields();it.hasNext();){var e=it.next();bindings.set(id+"."+e.getKey(),e.getValue());}bindings.set(id+".hash",result.data().path("sourceContentSha256"));
+    }
+    private JsonNode resolve(JsonNode node){if(node.isTextual()&&node.asText().contains("${")){String value=node.asText();for(var it=bindings.fields();it.hasNext();){var entry=it.next();value=value.replace("${"+entry.getKey()+"}",entry.getValue().asText());}if(value.contains("${"))throw new IllegalArgumentException("Unbound template "+value);return Json.MAPPER.valueToTree(value);}if(node.isTextual()&&node.asText().startsWith("$")){String key=node.asText().substring(1);if(!bindings.has(key))throw new IllegalArgumentException("Unbound action alias "+key);return bindings.path(key).deepCopy();}if(node.isArray()){var result=Json.array();for(JsonNode item:node)result.add(resolve(item));return result;}if(node.isObject()){var result=Json.object();node.fields().forEachRemaining(e->result.set(e.getKey(),resolve(e.getValue())));return result;}return node.deepCopy();}
+    private void clock(String instant){var control=Json.object();control.put("type","clock").put("operation","advanceTo");var parameters=Json.object();parameters.put("instant",instant);control.set("parameters",parameters);var result=driver.control("clock-"+actions.size(),control);capture(result);available(result);}
+    private void capture(StepResult result){actions.set(result.actionId(),result.toJson());}
+    private static void available(StepResult result){if(result.driverStatus()!=StepResult.DriverStatus.EXECUTED)throw new Unavailable(result.reason());}
+    private void require(boolean condition,String message){if(!condition)throw new AssertionError(message);checks++;}
+    private static final class Unavailable extends RuntimeException {Unavailable(String message){super(message);}}
+}

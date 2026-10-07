@@ -13,12 +13,12 @@ public final class FixtureInstaller {
     private final ActualConfiguration configuration;
     public FixtureInstaller(ActualConfiguration configuration){this.configuration=configuration;}
     public ObjectNode install(JsonNode bundle) throws Exception {
-        if(bundle.path("fixturePhase").asText().equals("S3_ORIGINAL"))return S3OriginalFixtureInstaller.install(configuration,bundle);
+        if(Set.of("S3_ORIGINAL","S4_ORIGINAL").contains(bundle.path("fixturePhase").asText()))return S3OriginalFixtureInstaller.install(configuration,bundle);
         if(bundle.path("fixturePhase").asText().equals("EVIDENCE"))return EvidenceFixtureInstaller.install(configuration,bundle);
         JsonNode fixture=bundle.path("fixture");
         if(!fixture.path("synthetic").asBoolean(false))throw new IllegalArgumentException("Only synthetic fixtures allowed");
         if(!bundle.path("bases").isEmpty()||!fixture.path("baseRefs").isEmpty())throw new UnsupportedOperationException("Fixture inheritance not installed in S1");
-        if(fixture.path("fixtureId").asText().startsWith("S3-"))for(JsonNode alias:fixture.path("aliases"))if(alias.path("type").asText().equals("QuantitySegment")) {
+        if(fixture.path("fixtureId").asText().startsWith("S4-")||fixture.path("fixtureId").asText().startsWith("S3-"))for(JsonNode alias:fixture.path("aliases"))if(alias.path("type").asText().equals("QuantitySegment")) {
             if(!fixture.path("preexistingTransitBaseline").asBoolean()||!"60".equals(alias.path("quantity").asText())||!"TRANSIT".equals(fixture.path("aliases").path(alias.path("locationAlias").asText()).path("kind").asText()))throw new IllegalArgumentException("S3 final physical quantity must be created through public product commands");
         }
         for(JsonNode alias:fixture.path("aliases")) if(!TYPES.contains(alias.path("type").asText()))throw new UnsupportedOperationException("S1 fixture alias type "+alias.path("type").asText());

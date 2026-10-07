@@ -1,0 +1,15 @@
+{
+  "schemaVersion": "1.0.0",
+  "gateComplete": false,
+  "status": "NOT_RUN",
+  "cases": {
+    "E1": {"purchaseCumulative": "100", "warehouseCurrent": "80", "historicalDelivered": "30", "returned": "10", "currentEligible": "0", "invoiceDifference": "5", "bankEffects": 0, "unresolvedHumanDuties": ["QC", "RETURN", "SETTLEMENT"], "entrypointParity": "same ID and snapshot"},
+    "E2": {"physical": "60", "qcHold": "20", "recallHold": "60", "adminScope": "50", "recovered": "25", "disposedSameRecovered": "25", "uniqueProcessed": "25", "unknownResidual": "25", "normalCloseAllowed": false, "exceptionRetainsResponsibility": true},
+    "C1": {"newReservationAfterRevoke": "0", "newDispatchAfterRevoke": "0", "existingResponsibilityRetained": true},
+    "C4": {"historicalDelivered": "100", "actualReturn": "20", "separateCorrectedActual": "98", "newResidualDuty": "2", "resolvedOrWaivedDutyRevival": "0"},
+    "postDispatchRecall": {"actualDelivered": "20", "inTransit": "10", "newDispatch": "0", "falseOrUnmatchedNormalEffect": "0"},
+    "V2": {"evidenceOwner": "inventory", "requiredPath": "real PostgreSQL deterministic transaction barrier"},
+    "V3": {"evidenceOwner": "inventory", "requiredPath": "real PostgreSQL deterministic transaction barrier"}
+  },
+  "limitations": ["Contract expectations are not runtime observations", "No paid model, regulatory or BTP acceptance"]
+}

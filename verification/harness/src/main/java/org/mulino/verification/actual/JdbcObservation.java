@@ -11,6 +11,7 @@ public final class JdbcObservation {
     private final ActualConfiguration configuration;
     public JdbcObservation(ActualConfiguration configuration){this.configuration=configuration;}
     public ObjectNode capture(JsonNode request) throws Exception {
+        if(request.path("profile").asText().equals("S4"))return S4JdbcObservation.capture(configuration,request);
         if(request.path("profile").asText().equals("S3"))return S3JdbcObservation.capture(configuration,request);
         if(request.hasNonNull("snapshotRef"))throw new UnsupportedOperationException("Independent API projection snapshot reconstruction pending; requested token is not a PostgreSQL snapshot");
         if(request.path("sources").isEmpty())throw new IllegalArgumentException("Raw sources required");
