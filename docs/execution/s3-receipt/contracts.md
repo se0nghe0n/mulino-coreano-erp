@@ -18,7 +18,9 @@ root별 구간 중복은 transaction fence와 DB trigger에서 거부한다.
 
 최초 접수는 실물과 RECEIPT 원장을 만든다. transitSegmentId가 있으면
 정확히 같은 item·LOT·수량·단위의 TRANSIT leaf를 retire하고 수령 leaf로
-옮긴다. 부분 운송량은 먼저 split해야 한다. 동일 transaction에서
+옮긴다. 기존 controlScope·혼합 불확실성·법적 소유·보관 주체를
+보존한다. 최초 접수의 소유·보관 주체는 미확인으로 남기며 책임을
+맡은 인간 owner로 대신하지 않는다. 부분 운송량은 먼저 split해야 한다. 동일 transaction에서
 구매 기여·초과 대조 책임·판정 pending·감사·멱등 결과를 기록한다.
 초과5는 별도 실물로 보존하며 주문100의 기여를105로 늘리지 않는다.
 
