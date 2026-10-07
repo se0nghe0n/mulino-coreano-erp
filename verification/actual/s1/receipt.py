@@ -30,7 +30,7 @@ def main():
             'sourceInputHashesAfter':after,'sourceDrift':receipt['sourceInputHashesBefore']!=after or bool(status_after),
             'jarSha256After':sha(root/'backend/target/ontology-0.1.0-SNAPSHOT.jar'),
             'exitCode':int(sys.argv[4]),'phase':sys.argv[5],
-            'cleanup':{'backendStopped':sys.argv[6]=='true','createdContainerRemoved':sys.argv[7]=='true','ephemeralKeyDirectoryRemoved':sys.argv[8]=='true'}})
+            'cleanup':{'backendStopped':sys.argv[6]=='true','createdContainerRemoved':sys.argv[7]=='true','ephemeralKeyDirectoryRemoved':sys.argv[8]=='true','ephemeralBlobDirectoryRemoved':sys.argv[8]=='true'}})
         native=out/'actual-s1-native.json'
         if native.exists():
             result=json.loads(native.read_text());receipt['nativeStatus']=result.get('status');receipt['authorityWallClock']=result.get('authorityWallClock');receipt['authorityValidity']=result.get('authorityValidity');receipt['effectiveFixtureSha256']=result.get('effectiveFixtureHash')

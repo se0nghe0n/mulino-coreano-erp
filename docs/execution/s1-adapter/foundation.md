@@ -122,3 +122,9 @@ normative fixture issuer 추상 계약은 바꾸지 않는다.
 skipped 0, BUILD SUCCESS(2.727초)를 확인했다.
 [JUnit XML](issuer-contract-tests.xml)과 [probe 관찰](issuer-probe.txt)을
 남긴다. 실제 backend TCP 인수는 여전히 root 통합 실행 대상이다.
+
+
+backend의 `mulino.evidence.blob-root`도 자신이 생성한 0700 fixture
+안의 `blobs`로 지정한다. BlobStore가 새 0700 directory를 만들며
+trap의 fixture cleanup으로 blob와 key가 함께 정리된다. 기존 기본
+`/tmp/mulino-evidence-blobs`는 확인하거나 수정하지 않는다.

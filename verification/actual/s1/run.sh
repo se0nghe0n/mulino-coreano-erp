@@ -84,7 +84,7 @@ until docker exec "$container" pg_isready -U postgres -d ontology > /dev/null 2>
 docker inspect --format '{{.Image}}' "$container" > "$evidence/postgres-image-id.txt"
 docker exec "$container" psql -U postgres -d ontology -Atc 'SELECT version()' > "$evidence/postgres-version.txt"
 phase=ephemeral-backend
-java -jar "$fixture/ontology.jar" --spring.profiles.active=local --server.address=127.0.0.1 --server.port=0 > "$evidence/backend-runtime.log" 2>&1 &
+java -jar "$fixture/ontology.jar" --spring.profiles.active=local --server.address=127.0.0.1 --server.port=0 "--mulino.evidence.blob-root=$fixture/blobs" > "$evidence/backend-runtime.log" 2>&1 &
 server_pid=$!
 i=0
 while :; do
