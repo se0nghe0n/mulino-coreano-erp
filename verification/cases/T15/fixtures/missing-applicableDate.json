@@ -1,0 +1,1195 @@
+{
+  "schemaVersion": "1.0.0",
+  "fixtureId": "T15-missing-applicableDate",
+  "synthetic": true,
+  "baseRefs": [
+    "verification/fixtures/base/identity-clock.json"
+  ],
+  "clock": {
+    "asOf": "2026-10-07T09:00:00Z",
+    "knownAt": "2026-10-07T09:00:01Z",
+    "timezone": "Asia/Seoul",
+    "precision": "SECOND",
+    "deadlineInclusive": true
+  },
+  "versions": {
+    "definition": "definition-v1",
+    "evaluator": "evaluator-v1",
+    "policy": "SYNTHETIC-policy-v1"
+  },
+  "actors": {
+    "procurement": {
+      "issuer": "synthetic-test-issuer",
+      "subject": "procurement-human",
+      "audience": "isolated-ontology-test",
+      "organizationAlias": "ORG",
+      "roleCapabilities": [
+        "proposePurchase",
+        "revisePurchase",
+        "dispatchPurchaseOrder",
+        "cancelPurchase",
+        "createShipment",
+        "createDraft",
+        "activateWork",
+        "reviseGoal",
+        "getObject",
+        "getWork",
+        "getAssessment",
+        "getInventory",
+        "getObligations",
+        "getEvidence"
+      ],
+      "grant": {
+        "delegatorAlias": "supervisor",
+        "actions": [
+          "proposePurchase",
+          "revisePurchase",
+          "dispatchPurchaseOrder",
+          "cancelPurchase",
+          "createShipment",
+          "createDraft",
+          "activateWork",
+          "reviseGoal",
+          "getObject",
+          "getWork",
+          "getAssessment",
+          "getInventory",
+          "getObligations",
+          "getEvidence"
+        ],
+        "scope": {
+          "organizationAlias": "ORG",
+          "caseId": "T15",
+          "subcaseId": "missing-applicableDate",
+          "items": [
+            "P",
+            "P-alt"
+          ],
+          "places": [
+            "IT-origin",
+            "IT-port",
+            "KR-port",
+            "W",
+            "W-alt",
+            "TRANSIT"
+          ],
+          "supplierAliases": [
+            "SUP",
+            "SUP-alt"
+          ],
+          "customerAliases": [
+            "C"
+          ]
+        },
+        "validFrom": "2026-10-01T00:00:00Z",
+        "validUntil": "2026-10-31T23:59:59Z",
+        "revision": 1
+      }
+    },
+    "manager": {
+      "issuer": "synthetic-test-issuer",
+      "subject": "manager-human",
+      "audience": "isolated-ontology-test",
+      "organizationAlias": "ORG",
+      "roleCapabilities": [
+        "approvePurchase",
+        "reviseGoal",
+        "recordSettlementAdjustment",
+        "getObject",
+        "getWork",
+        "getAssessment",
+        "getObligations"
+      ],
+      "grant": {
+        "delegatorAlias": "supervisor",
+        "actions": [
+          "approvePurchase",
+          "reviseGoal",
+          "recordSettlementAdjustment",
+          "getObject",
+          "getWork",
+          "getAssessment",
+          "getObligations"
+        ],
+        "scope": {
+          "organizationAlias": "ORG",
+          "caseId": "T15",
+          "subcaseId": "missing-applicableDate",
+          "items": [
+            "P",
+            "P-alt"
+          ],
+          "places": [
+            "IT-origin",
+            "IT-port",
+            "KR-port",
+            "W",
+            "W-alt",
+            "TRANSIT"
+          ],
+          "supplierAliases": [
+            "SUP",
+            "SUP-alt"
+          ],
+          "customerAliases": [
+            "C"
+          ],
+          "settlementModes": [
+            "PROPOSE",
+            "CONFIRM"
+          ],
+          "basisKinds": [
+            "OWNER_PERMISSION",
+            "MANAGEMENT_CONFIRMATION"
+          ]
+        },
+        "validFrom": "2026-10-01T00:00:00Z",
+        "validUntil": "2026-10-31T23:59:59Z",
+        "revision": 1
+      }
+    },
+    "ordinary": {
+      "issuer": "synthetic-test-issuer",
+      "subject": "ordinary-human",
+      "audience": "isolated-ontology-test",
+      "organizationAlias": "ORG",
+      "roleCapabilities": [
+        "recordInvoice",
+        "recordCharge",
+        "matchInvoice",
+        "recordSettlementAdjustment",
+        "recordPaymentReference",
+        "getObject",
+        "getAssessment",
+        "getObligations"
+      ],
+      "grant": {
+        "delegatorAlias": "supervisor",
+        "actions": [
+          "recordInvoice",
+          "recordCharge",
+          "matchInvoice",
+          "recordSettlementAdjustment",
+          "recordPaymentReference",
+          "getObject",
+          "getAssessment",
+          "getObligations"
+        ],
+        "scope": {
+          "organizationAlias": "ORG",
+          "caseId": "T15",
+          "subcaseId": "missing-applicableDate",
+          "items": [
+            "P",
+            "P-alt"
+          ],
+          "places": [
+            "IT-origin",
+            "IT-port",
+            "KR-port",
+            "W",
+            "W-alt",
+            "TRANSIT"
+          ],
+          "supplierAliases": [
+            "SUP",
+            "SUP-alt"
+          ],
+          "customerAliases": [
+            "C"
+          ],
+          "settlementModes": [
+            "PROPOSE",
+            "REVISE_PROPOSAL",
+            "CONFIRM"
+          ]
+        },
+        "validFrom": "2026-10-01T00:00:00Z",
+        "validUntil": "2026-10-31T23:59:59Z",
+        "revision": 1
+      }
+    },
+    "warehouse": {
+      "issuer": "synthetic-test-issuer",
+      "subject": "warehouse-human",
+      "audience": "isolated-ontology-test",
+      "organizationAlias": "ORG",
+      "roleCapabilities": [
+        "confirmReceipt",
+        "splitQuantity",
+        "moveQuantity",
+        "recordLegEvent",
+        "recordHandover",
+        "receiveReturn",
+        "getInventory",
+        "getObject",
+        "getAssessment",
+        "getObligations"
+      ],
+      "grant": {
+        "delegatorAlias": "supervisor",
+        "actions": [
+          "confirmReceipt",
+          "splitQuantity",
+          "moveQuantity",
+          "recordLegEvent",
+          "recordHandover",
+          "receiveReturn",
+          "getInventory",
+          "getObject",
+          "getAssessment",
+          "getObligations"
+        ],
+        "scope": {
+          "organizationAlias": "ORG",
+          "caseId": "T15",
+          "subcaseId": "missing-applicableDate",
+          "items": [
+            "P",
+            "P-alt"
+          ],
+          "places": [
+            "IT-origin",
+            "IT-port",
+            "KR-port",
+            "W",
+            "W-alt",
+            "TRANSIT"
+          ],
+          "supplierAliases": [
+            "SUP",
+            "SUP-alt"
+          ],
+          "customerAliases": [
+            "C"
+          ]
+        },
+        "validFrom": "2026-10-01T00:00:00Z",
+        "validUntil": "2026-10-31T23:59:59Z",
+        "revision": 1
+      }
+    },
+    "source": {
+      "issuer": "synthetic-test-issuer",
+      "subject": "source-human",
+      "audience": "isolated-ontology-test",
+      "organizationAlias": "ORG",
+      "roleCapabilities": [
+        "recordSupplierReply",
+        "recordActivity",
+        "recordLegEvent",
+        "recordHandover",
+        "recordDelivery",
+        "getInbox",
+        "getObject",
+        "getWork",
+        "getAssessment",
+        "getInventory",
+        "getObligations",
+        "recordExternalReconciliation"
+      ],
+      "grant": {
+        "delegatorAlias": "supervisor",
+        "actions": [
+          "recordSupplierReply",
+          "recordActivity",
+          "recordLegEvent",
+          "recordHandover",
+          "recordDelivery",
+          "getInbox",
+          "getObject",
+          "getWork",
+          "getAssessment",
+          "getInventory",
+          "getObligations",
+          "recordExternalReconciliation"
+        ],
+        "scope": {
+          "organizationAlias": "ORG",
+          "caseId": "T15",
+          "subcaseId": "missing-applicableDate",
+          "items": [
+            "P",
+            "P-alt"
+          ],
+          "places": [
+            "IT-origin",
+            "IT-port",
+            "KR-port",
+            "W",
+            "W-alt",
+            "TRANSIT"
+          ],
+          "supplierAliases": [
+            "SUP",
+            "SUP-alt"
+          ],
+          "customerAliases": [
+            "C"
+          ]
+        },
+        "validFrom": "2026-10-01T00:00:00Z",
+        "validUntil": "2026-10-31T23:59:59Z",
+        "revision": 1
+      }
+    },
+    "intake": {
+      "issuer": "synthetic-test-issuer",
+      "subject": "intake-human",
+      "audience": "isolated-ontology-test",
+      "organizationAlias": "ORG",
+      "roleCapabilities": [
+        "recordActivity",
+        "createFollowup",
+        "getInbox",
+        "getReconciliation",
+        "getObject",
+        "getObligations"
+      ],
+      "grant": {
+        "delegatorAlias": "supervisor",
+        "actions": [
+          "recordActivity",
+          "createFollowup",
+          "getInbox",
+          "getReconciliation",
+          "getObject",
+          "getObligations"
+        ],
+        "scope": {
+          "organizationAlias": "ORG",
+          "caseId": "T15",
+          "subcaseId": "missing-applicableDate",
+          "items": [
+            "P",
+            "P-alt"
+          ],
+          "places": [
+            "IT-origin",
+            "IT-port",
+            "KR-port",
+            "W",
+            "W-alt",
+            "TRANSIT"
+          ],
+          "supplierAliases": [
+            "SUP",
+            "SUP-alt"
+          ],
+          "customerAliases": [
+            "C"
+          ]
+        },
+        "validFrom": "2026-10-01T00:00:00Z",
+        "validUntil": "2026-10-31T23:59:59Z",
+        "revision": 1
+      }
+    },
+    "regulator": {
+      "issuer": "synthetic-test-issuer",
+      "subject": "regulator-human",
+      "audience": "isolated-ontology-test",
+      "organizationAlias": "ORG",
+      "roleCapabilities": [
+        "prepareRegulatoryProcedure",
+        "recordSubmission",
+        "recordRegulatoryDecision",
+        "verifyLabel",
+        "evaluateEligibility",
+        "getObject",
+        "getEvidence",
+        "getObligations",
+        "getInventory"
+      ],
+      "grant": {
+        "delegatorAlias": "supervisor",
+        "actions": [
+          "prepareRegulatoryProcedure",
+          "recordSubmission",
+          "recordRegulatoryDecision",
+          "verifyLabel",
+          "evaluateEligibility",
+          "getObject",
+          "getEvidence",
+          "getObligations",
+          "getInventory"
+        ],
+        "scope": {
+          "organizationAlias": "ORG",
+          "caseId": "T15",
+          "subcaseId": "missing-applicableDate",
+          "items": [
+            "P",
+            "P-alt"
+          ],
+          "places": [
+            "IT-origin",
+            "IT-port",
+            "KR-port",
+            "W",
+            "W-alt",
+            "TRANSIT"
+          ],
+          "supplierAliases": [
+            "SUP",
+            "SUP-alt"
+          ],
+          "customerAliases": [
+            "C"
+          ]
+        },
+        "validFrom": "2026-10-01T00:00:00Z",
+        "validUntil": "2026-10-31T23:59:59Z",
+        "revision": 1
+      }
+    },
+    "qc": {
+      "issuer": "synthetic-test-issuer",
+      "subject": "qc-human",
+      "audience": "isolated-ontology-test",
+      "organizationAlias": "ORG",
+      "roleCapabilities": [
+        "placeHold",
+        "releaseHold",
+        "recordDispositionBasis",
+        "evaluateEligibility",
+        "getObject",
+        "getInventory",
+        "getObligations"
+      ],
+      "grant": {
+        "delegatorAlias": "supervisor",
+        "actions": [
+          "placeHold",
+          "releaseHold",
+          "recordDispositionBasis",
+          "evaluateEligibility",
+          "getObject",
+          "getInventory",
+          "getObligations"
+        ],
+        "scope": {
+          "organizationAlias": "ORG",
+          "caseId": "T15",
+          "subcaseId": "missing-applicableDate",
+          "items": [
+            "P",
+            "P-alt"
+          ],
+          "places": [
+            "IT-origin",
+            "IT-port",
+            "KR-port",
+            "W",
+            "W-alt",
+            "TRANSIT"
+          ],
+          "supplierAliases": [
+            "SUP",
+            "SUP-alt"
+          ],
+          "customerAliases": [
+            "C"
+          ],
+          "basisKinds": [
+            "QC"
+          ]
+        },
+        "validFrom": "2026-10-01T00:00:00Z",
+        "validUntil": "2026-10-31T23:59:59Z",
+        "revision": 1
+      }
+    },
+    "sales": {
+      "issuer": "synthetic-test-issuer",
+      "subject": "sales-human",
+      "audience": "isolated-ontology-test",
+      "organizationAlias": "ORG",
+      "roleCapabilities": [
+        "createSalesOrder",
+        "reserveQuantity",
+        "dispatchQuantity",
+        "authorizeReturn",
+        "recordDelivery",
+        "getObject",
+        "getInventory",
+        "getObligations"
+      ],
+      "grant": {
+        "delegatorAlias": "supervisor",
+        "actions": [
+          "createSalesOrder",
+          "reserveQuantity",
+          "dispatchQuantity",
+          "authorizeReturn",
+          "recordDelivery",
+          "getObject",
+          "getInventory",
+          "getObligations"
+        ],
+        "scope": {
+          "organizationAlias": "ORG",
+          "caseId": "T15",
+          "subcaseId": "missing-applicableDate",
+          "items": [
+            "P",
+            "P-alt"
+          ],
+          "places": [
+            "IT-origin",
+            "IT-port",
+            "KR-port",
+            "W",
+            "W-alt",
+            "TRANSIT"
+          ],
+          "supplierAliases": [
+            "SUP",
+            "SUP-alt"
+          ],
+          "customerAliases": [
+            "C"
+          ]
+        },
+        "validFrom": "2026-10-01T00:00:00Z",
+        "validUntil": "2026-10-31T23:59:59Z",
+        "revision": 1
+      }
+    },
+    "config": {
+      "issuer": "synthetic-test-issuer",
+      "subject": "config-human",
+      "audience": "isolated-ontology-test",
+      "organizationAlias": "ORG",
+      "roleCapabilities": [
+        "createPolicyDraft",
+        "approvePolicy",
+        "activatePolicy",
+        "getPolicy",
+        "evaluateEligibility"
+      ],
+      "grant": {
+        "delegatorAlias": "supervisor",
+        "actions": [
+          "createPolicyDraft",
+          "approvePolicy",
+          "activatePolicy",
+          "getPolicy",
+          "evaluateEligibility"
+        ],
+        "scope": {
+          "organizationAlias": "ORG",
+          "caseId": "T15",
+          "subcaseId": "missing-applicableDate",
+          "items": [
+            "P",
+            "P-alt"
+          ],
+          "places": [
+            "IT-origin",
+            "IT-port",
+            "KR-port",
+            "W",
+            "W-alt",
+            "TRANSIT"
+          ],
+          "supplierAliases": [
+            "SUP",
+            "SUP-alt"
+          ],
+          "customerAliases": [
+            "C"
+          ]
+        },
+        "validFrom": "2026-10-01T00:00:00Z",
+        "validUntil": "2026-10-31T23:59:59Z",
+        "revision": 1
+      }
+    },
+    "unauthorized": {
+      "issuer": "synthetic-test-issuer",
+      "subject": "unauthorized-human",
+      "audience": "isolated-ontology-test",
+      "organizationAlias": "ORG",
+      "roleCapabilities": [
+        "getObject",
+        "getWork",
+        "getAssessment",
+        "getInventory",
+        "getObligations"
+      ],
+      "grant": {
+        "delegatorAlias": "supervisor",
+        "actions": [
+          "getObject",
+          "getWork",
+          "getAssessment",
+          "getInventory",
+          "getObligations"
+        ],
+        "scope": {
+          "organizationAlias": "ORG",
+          "caseId": "T15",
+          "subcaseId": "missing-applicableDate",
+          "items": [
+            "P",
+            "P-alt"
+          ],
+          "places": [
+            "IT-origin",
+            "IT-port",
+            "KR-port",
+            "W",
+            "W-alt",
+            "TRANSIT"
+          ],
+          "supplierAliases": [
+            "SUP",
+            "SUP-alt"
+          ],
+          "customerAliases": [
+            "C"
+          ]
+        },
+        "validFrom": "2026-10-01T00:00:00Z",
+        "validUntil": "2026-10-31T23:59:59Z",
+        "revision": 1
+      }
+    }
+  },
+  "aliases": {
+    "ORG": {
+      "type": "Organization"
+    },
+    "P": {
+      "type": "TradeItem",
+      "unit": "BOX"
+    },
+    "P-alt": {
+      "type": "TradeItem",
+      "unit": "BOX"
+    },
+    "L": {
+      "type": "ManufacturingLot",
+      "itemAlias": "P",
+      "manufacturerAlias": "M",
+      "externalCode": "BISCUIT-LOT-1"
+    },
+    "M": {
+      "type": "Manufacturer"
+    },
+    "W": {
+      "type": "Place",
+      "kind": "WAREHOUSE"
+    },
+    "W-alt": {
+      "type": "Place",
+      "kind": "WAREHOUSE"
+    },
+    "IT-port": {
+      "type": "Place",
+      "kind": "PORT"
+    },
+    "KR-port": {
+      "type": "Place",
+      "kind": "PORT"
+    },
+    "IT-origin": {
+      "type": "Place",
+      "kind": "SUPPLIER"
+    },
+    "TRANSIT": {
+      "type": "Place",
+      "kind": "TRANSPORT"
+    },
+    "C": {
+      "type": "Customer"
+    },
+    "SUP": {
+      "type": "Supplier"
+    },
+    "SUP-alt": {
+      "type": "Supplier"
+    },
+    "supervisor": {
+      "type": "Human"
+    },
+    "procurement": {
+      "type": "Human"
+    },
+    "manager": {
+      "type": "Human"
+    },
+    "ordinary": {
+      "type": "Human"
+    },
+    "warehouse": {
+      "type": "Human"
+    },
+    "source": {
+      "type": "Human"
+    },
+    "intake": {
+      "type": "Human"
+    },
+    "regulator": {
+      "type": "Human"
+    },
+    "qc": {
+      "type": "Human"
+    },
+    "sales": {
+      "type": "Human"
+    },
+    "config": {
+      "type": "Human"
+    },
+    "unauthorized": {
+      "type": "Human"
+    },
+    "Q100": {
+      "type": "QuantitySegment",
+      "quantity": "100",
+      "unit": "BOX",
+      "physicalScope": "Q100-physical",
+      "itemAlias": "P",
+      "lotAlias": "L",
+      "locationAlias": "W"
+    }
+  },
+  "baseline": {
+    "inputOnly": true,
+    "setupIsExecutionCoverage": false,
+    "precision": {
+      "quantityScale": 0,
+      "amountScale": 2,
+      "quantityTolerance": "0"
+    },
+    "policies": {
+      "version": "SYNTHETIC-policy-v1",
+      "synthetic": true,
+      "purchaseApproval": "MANAGER",
+      "settlementConfirmation": "MANAGER",
+      "automaticBanking": false,
+      "automaticTaxSubmission": false,
+      "receiptRequires": [
+        "item",
+        "lot",
+        "physicalScope",
+        "place",
+        "quantity",
+        "source",
+        "canonicalOccurrence"
+      ],
+      "SELLRequires": [
+        "QC",
+        "AGENCY",
+        "LABEL",
+        "DISPOSITION",
+        "CUSTOMER"
+      ],
+      "allGrantedActionsRequireCurrentGrant": true
+    },
+    "responsePolicies": {
+      "temperature": {
+        "threshold": "30",
+        "unit": "CELSIUS",
+        "ownerAlias": "intake",
+        "nextAction": "원천 물량과 근거를 대조한다",
+        "nextCheckAt": "2026-10-07T10:00:00Z"
+      }
+    },
+    "sources": {
+      "warehouse-receipt": {
+        "canonicalIdentityRequired": true
+      },
+      "supplier-ship": {
+        "claimNotReceipt": true
+      },
+      "agency-decision": {
+        "receiptRequiredForSubmitted": true
+      },
+      "notification": {
+        "deliveredNotResolved": true
+      }
+    },
+    "evidenceFiles": [
+      "verification/cases/T15/fixtures/missing-applicableDate/need.json",
+      "verification/cases/T15/fixtures/missing-applicableDate/supplier-ship.json",
+      "verification/cases/T15/fixtures/missing-applicableDate/warehouse-receipt.json",
+      "verification/cases/T15/fixtures/missing-applicableDate/agency-receipt.json",
+      "verification/cases/T15/fixtures/missing-applicableDate/agency-decision.json",
+      "verification/cases/T15/fixtures/missing-applicableDate/label.json",
+      "verification/cases/T15/fixtures/missing-applicableDate/qc-result.json",
+      "verification/cases/T15/fixtures/missing-applicableDate/custody.json",
+      "verification/cases/T15/fixtures/missing-applicableDate/invoice.json",
+      "verification/cases/T15/fixtures/missing-applicableDate/fx.json",
+      "verification/cases/T15/fixtures/missing-applicableDate/adjustment.json",
+      "verification/cases/T15/fixtures/missing-applicableDate/payment-reference.json",
+      "verification/cases/T15/fixtures/missing-applicableDate/temperature.json",
+      "verification/cases/T15/fixtures/missing-applicableDate/delivery.json",
+      "verification/cases/T15/fixtures/missing-applicableDate/return.json",
+      "verification/cases/T15/fixtures/missing-applicableDate/policy-source.json",
+      "verification/cases/T15/fixtures/missing-applicableDate/notification.json"
+    ],
+    "segments": [
+      {
+        "alias": "Q100",
+        "quantity": "100",
+        "unit": "BOX",
+        "physicalScope": "Q100-physical",
+        "itemAlias": "P",
+        "lotAlias": "L",
+        "locationAlias": "W",
+        "ownerAlias": "SUP"
+      }
+    ],
+    "evidenceConditions": {
+      "AGENCY": "UNKNOWN",
+      "QC": "UNKNOWN",
+      "LABEL": "ALLOWED",
+      "DISPOSITION": "ALLOWED",
+      "CUSTOMER": "ALLOWED"
+    },
+    "otherConditionsEvidence": [
+      "label",
+      "custody",
+      "need"
+    ],
+    "realPolicy": {
+      "status": "MISSING",
+      "productJurisdictionEffectiveDate": "UNCONFIRMED",
+      "missingField": "applicableDate",
+      "syntheticFixtureNotLegalAcceptance": true
+    },
+    "policyAssignments": {
+      "customerCondition": {
+        "itemAlias": "P",
+        "customerAlias": "C",
+        "result": "ALLOWED",
+        "synthetic": true,
+        "evidenceAliases": [
+          "need"
+        ]
+      },
+      "conditionalPurchase": {
+        "conditionId": "supplierCertificateRequired",
+        "predicate": {
+          "operator": "exists",
+          "evidenceType": "SUPPLIER_CERTIFICATE"
+        },
+        "certificateInputState": "MISSING"
+      }
+    },
+    "roleAssignments": [
+      {
+        "actorAlias": "procurement",
+        "roles": [
+          "PROCUREMENT"
+        ],
+        "organizationAlias": "ORG",
+        "validFrom": "2026-10-01T00:00:00Z",
+        "validUntil": "2026-10-31T23:59:59Z",
+        "revision": 1,
+        "bootstrapSource": "reviewed-synthetic-fixture-manifest"
+      },
+      {
+        "actorAlias": "manager",
+        "roles": [
+          "MANAGER"
+        ],
+        "organizationAlias": "ORG",
+        "validFrom": "2026-10-01T00:00:00Z",
+        "validUntil": "2026-10-31T23:59:59Z",
+        "revision": 1,
+        "bootstrapSource": "reviewed-synthetic-fixture-manifest"
+      },
+      {
+        "actorAlias": "ordinary",
+        "roles": [
+          "WRITE",
+          "RECORD"
+        ],
+        "organizationAlias": "ORG",
+        "validFrom": "2026-10-01T00:00:00Z",
+        "validUntil": "2026-10-31T23:59:59Z",
+        "revision": 1,
+        "bootstrapSource": "reviewed-synthetic-fixture-manifest"
+      },
+      {
+        "actorAlias": "warehouse",
+        "roles": [
+          "WAREHOUSE",
+          "RECORD"
+        ],
+        "organizationAlias": "ORG",
+        "validFrom": "2026-10-01T00:00:00Z",
+        "validUntil": "2026-10-31T23:59:59Z",
+        "revision": 1,
+        "bootstrapSource": "reviewed-synthetic-fixture-manifest"
+      },
+      {
+        "actorAlias": "source",
+        "roles": [
+          "RECORD",
+          "RECONCILIATION"
+        ],
+        "organizationAlias": "ORG",
+        "validFrom": "2026-10-01T00:00:00Z",
+        "validUntil": "2026-10-31T23:59:59Z",
+        "revision": 1,
+        "bootstrapSource": "reviewed-synthetic-fixture-manifest"
+      },
+      {
+        "actorAlias": "intake",
+        "roles": [
+          "INTAKE",
+          "RECONCILIATION"
+        ],
+        "organizationAlias": "ORG",
+        "validFrom": "2026-10-01T00:00:00Z",
+        "validUntil": "2026-10-31T23:59:59Z",
+        "revision": 1,
+        "bootstrapSource": "reviewed-synthetic-fixture-manifest"
+      },
+      {
+        "actorAlias": "regulator",
+        "roles": [
+          "REGULATORY_RECORD",
+          "LABEL_VERIFIER"
+        ],
+        "organizationAlias": "ORG",
+        "validFrom": "2026-10-01T00:00:00Z",
+        "validUntil": "2026-10-31T23:59:59Z",
+        "revision": 1,
+        "bootstrapSource": "reviewed-synthetic-fixture-manifest"
+      },
+      {
+        "actorAlias": "qc",
+        "roles": [
+          "QC"
+        ],
+        "organizationAlias": "ORG",
+        "validFrom": "2026-10-01T00:00:00Z",
+        "validUntil": "2026-10-31T23:59:59Z",
+        "revision": 1,
+        "bootstrapSource": "reviewed-synthetic-fixture-manifest"
+      },
+      {
+        "actorAlias": "sales",
+        "roles": [
+          "SALES",
+          "WAREHOUSE",
+          "RECORD"
+        ],
+        "organizationAlias": "ORG",
+        "validFrom": "2026-10-01T00:00:00Z",
+        "validUntil": "2026-10-31T23:59:59Z",
+        "revision": 1,
+        "bootstrapSource": "reviewed-synthetic-fixture-manifest"
+      },
+      {
+        "actorAlias": "config",
+        "roles": [
+          "FDE",
+          "CONFIG_APPROVER"
+        ],
+        "organizationAlias": "ORG",
+        "validFrom": "2026-10-01T00:00:00Z",
+        "validUntil": "2026-10-31T23:59:59Z",
+        "revision": 1,
+        "bootstrapSource": "reviewed-synthetic-fixture-manifest"
+      },
+      {
+        "actorAlias": "unauthorized",
+        "roles": [
+          "READ"
+        ],
+        "organizationAlias": "ORG",
+        "validFrom": "2026-10-01T00:00:00Z",
+        "validUntil": "2026-10-31T23:59:59Z",
+        "revision": 1,
+        "bootstrapSource": "reviewed-synthetic-fixture-manifest"
+      }
+    ],
+    "managementDecisionAssignments": [
+      {
+        "actorAlias": "manager",
+        "actionId": "recordSettlementAdjustment",
+        "decisionMode": "CONFIRM",
+        "organizationAlias": "ORG",
+        "source": "SYNTHETIC-policy-v1 MANAGER decision assignment",
+        "validFrom": "2026-10-01T00:00:00Z",
+        "validUntil": "2026-10-31T23:59:59Z",
+        "revision": 1
+      }
+    ]
+  },
+  "evidence": [
+    {
+      "alias": "need",
+      "sha256": "08d1cc9b9e0d479cdad1a01e36ce0e814df6c3467c12adeb27b1d30a30c30e93",
+      "sourceNamespace": "synthetic-need",
+      "externalEventId": "T15-missing-applicableDate-need",
+      "sourceVersion": "1",
+      "occurredAt": "2026-10-07T09:00:00Z",
+      "recordedAt": "2026-10-07T09:00:01Z"
+    },
+    {
+      "alias": "supplier-ship",
+      "sha256": "da76b2455126abdb727e39233bd807b7724f018338f72c4cd90ed13576e07f57",
+      "sourceNamespace": "synthetic-supplier-ship",
+      "externalEventId": "T15-missing-applicableDate-supplier-ship",
+      "sourceVersion": "1",
+      "occurredAt": "2026-10-07T09:00:00Z",
+      "recordedAt": "2026-10-07T09:00:01Z"
+    },
+    {
+      "alias": "warehouse-receipt",
+      "sha256": "b160e9f3c4626ba79cbf8cb8e1e37cdcb59881e3dd58da150789b6b72c26cdc0",
+      "sourceNamespace": "synthetic-warehouse-receipt",
+      "externalEventId": "T15-missing-applicableDate-warehouse-receipt",
+      "sourceVersion": "1",
+      "occurredAt": "2026-10-07T09:00:00Z",
+      "recordedAt": "2026-10-07T09:00:01Z"
+    },
+    {
+      "alias": "agency-receipt",
+      "sha256": "c4db619069521edbe70b2cc1141c6e26ec529d79b630c55b62e32d4d14e61bb5",
+      "sourceNamespace": "synthetic-agency-receipt",
+      "externalEventId": "T15-missing-applicableDate-agency-receipt",
+      "sourceVersion": "1",
+      "occurredAt": "2026-10-07T09:00:00Z",
+      "recordedAt": "2026-10-07T09:00:01Z"
+    },
+    {
+      "alias": "agency-decision",
+      "sha256": "3e0424a18ebb6e52f24cbe1f33b49a04605dee263c785e8eb610c4ccfc96bcad",
+      "sourceNamespace": "synthetic-agency-decision",
+      "externalEventId": "T15-missing-applicableDate-agency-decision",
+      "sourceVersion": "1",
+      "occurredAt": "2026-10-07T09:00:00Z",
+      "recordedAt": "2026-10-07T09:00:01Z"
+    },
+    {
+      "alias": "label",
+      "sha256": "304b5b7fc6ece69c29b4688f0356f6167102423322e6d88d0ed08c356fb6766d",
+      "sourceNamespace": "synthetic-label",
+      "externalEventId": "T15-missing-applicableDate-label",
+      "sourceVersion": "1",
+      "occurredAt": "2026-10-07T09:00:00Z",
+      "recordedAt": "2026-10-07T09:00:01Z"
+    },
+    {
+      "alias": "qc-result",
+      "sha256": "c74b9c35944032a8074d7db7b2d0e5857bc97e32e8b16e5372e4aa3b5fc9aeb0",
+      "sourceNamespace": "synthetic-qc-result",
+      "externalEventId": "T15-missing-applicableDate-qc-result",
+      "sourceVersion": "1",
+      "occurredAt": "2026-10-07T09:00:00Z",
+      "recordedAt": "2026-10-07T09:00:01Z"
+    },
+    {
+      "alias": "custody",
+      "sha256": "e0af0c0e7fb102527a7249b103e6cc9e3645b1e6ff2a719a96880b2f54460e92",
+      "sourceNamespace": "synthetic-custody",
+      "externalEventId": "T15-missing-applicableDate-custody",
+      "sourceVersion": "1",
+      "occurredAt": "2026-10-07T09:00:00Z",
+      "recordedAt": "2026-10-07T09:00:01Z"
+    },
+    {
+      "alias": "invoice",
+      "sha256": "c3c7332e68e61367c5a7d32098d20425294f72dcb85bc6db1bf11944440c5354",
+      "sourceNamespace": "synthetic-invoice",
+      "externalEventId": "T15-missing-applicableDate-invoice",
+      "sourceVersion": "1",
+      "occurredAt": "2026-10-07T09:00:00Z",
+      "recordedAt": "2026-10-07T09:00:01Z"
+    },
+    {
+      "alias": "fx",
+      "sha256": "14e6fbc3efb6f3e38751b617838a2233f829ba0b6a13a94c5f48776454e32a52",
+      "sourceNamespace": "synthetic-fx",
+      "externalEventId": "T15-missing-applicableDate-fx",
+      "sourceVersion": "1",
+      "occurredAt": "2026-10-07T09:00:00Z",
+      "recordedAt": "2026-10-07T09:00:01Z"
+    },
+    {
+      "alias": "adjustment",
+      "sha256": "cf9c393b8ff102822fcf39fdea4ab2585b58e0100e1e0fe38bedc9a407a293ce",
+      "sourceNamespace": "synthetic-adjustment",
+      "externalEventId": "T15-missing-applicableDate-adjustment",
+      "sourceVersion": "1",
+      "occurredAt": "2026-10-07T09:00:00Z",
+      "recordedAt": "2026-10-07T09:00:01Z"
+    },
+    {
+      "alias": "payment-reference",
+      "sha256": "7014263e8bad3cc40ee28e0179ec08f60b7a3917e0a0454e78dc39d834a0b450",
+      "sourceNamespace": "synthetic-payment-reference",
+      "externalEventId": "T15-missing-applicableDate-payment-reference",
+      "sourceVersion": "1",
+      "occurredAt": "2026-10-07T09:00:00Z",
+      "recordedAt": "2026-10-07T09:00:01Z"
+    },
+    {
+      "alias": "temperature",
+      "sha256": "32173aa5029a990f14b2063f8944ed7436f29162e2e3d0e335e0f0dc8fea6907",
+      "sourceNamespace": "synthetic-temperature",
+      "externalEventId": "T15-missing-applicableDate-temperature",
+      "sourceVersion": "1",
+      "occurredAt": "2026-10-07T09:00:00Z",
+      "recordedAt": "2026-10-07T09:00:01Z"
+    },
+    {
+      "alias": "delivery",
+      "sha256": "1069b71e419ee505a92a5fa0a439b05fbb0218224f49f488dec3ffa809384ae6",
+      "sourceNamespace": "synthetic-delivery",
+      "externalEventId": "T15-missing-applicableDate-delivery",
+      "sourceVersion": "1",
+      "occurredAt": "2026-10-07T09:00:00Z",
+      "recordedAt": "2026-10-07T09:00:01Z"
+    },
+    {
+      "alias": "return",
+      "sha256": "191b5db9efed63439cbcf433090eccad1f0117c8787925dc8d925ed69464f182",
+      "sourceNamespace": "synthetic-return",
+      "externalEventId": "T15-missing-applicableDate-return",
+      "sourceVersion": "1",
+      "occurredAt": "2026-10-07T09:00:00Z",
+      "recordedAt": "2026-10-07T09:00:01Z"
+    },
+    {
+      "alias": "policy-source",
+      "sha256": "391632303c526fd16215e416070205cdbb3ea07789043aa437c93707a23ffb22",
+      "sourceNamespace": "synthetic-policy-source",
+      "externalEventId": "T15-missing-applicableDate-policy-source",
+      "sourceVersion": "1",
+      "occurredAt": "2026-10-07T09:00:00Z",
+      "recordedAt": "2026-10-07T09:00:01Z"
+    },
+    {
+      "alias": "notification",
+      "sha256": "915a69b87974fced5e3b3a6e651da19415eead581f65b0a0a53ef8a5ad1a6adf",
+      "sourceNamespace": "synthetic-notification",
+      "externalEventId": "T15-missing-applicableDate-notification",
+      "sourceVersion": "1",
+      "occurredAt": "2026-10-07T09:00:00Z",
+      "recordedAt": "2026-10-07T09:00:01Z"
+    }
+  ],
+  "responsibilities": [
+    {
+      "scope": {
+        "caseId": "T15",
+        "subcaseId": "missing-applicableDate"
+      },
+      "ownerAlias": "intake",
+      "supervisorAlias": "supervisor",
+      "nextAction": "원천 물량과 근거를 대조한다",
+      "nextCheckAt": "2026-10-07T10:00:00Z"
+    }
+  ]
+}

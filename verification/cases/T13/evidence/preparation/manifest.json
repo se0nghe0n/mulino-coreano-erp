@@ -1,0 +1,728 @@
+{
+  "recordType": "SUPPLY_PREPARATION_EVIDENCE",
+  "caseId": "T13",
+  "status": "PREPARED",
+  "runtimeStatus": "NOT_RUN",
+  "runtimeComplete": false,
+  "productCoverageClaimed": false,
+  "b2Commit": "feaca0af9673620eff9a5ac0f08a657ce14e9ccd",
+  "verifiedCommonCommit": "77c2df3440b6d8b362bfb52fed677e441c372b4c",
+  "workingTreeDirtyDuringExecution": true,
+  "caseSha256": "64a44d1d4898d348818719c499d9606e97bf9a8633f372011f13d8081c31c413",
+  "featureSha256": "25ec505a29ab41c9c8333819cea65b88ca0031db9e53596f1732c29105c5882a",
+  "normativeCatalogSha256": "61968b22cde1f35922df323d964599228d8dfbbe71b0ee32192b59de0a9f5ed9",
+  "baseFixtureSha256": "166d7320c289dbe025af5a9bed0973d8738f81b5289bc9ce0df6f5ff33e45cc2",
+  "subcases": 17,
+  "actions": 199,
+  "assertions": 115,
+  "oracleCount": 3,
+  "observationCount": 13,
+  "fixtures": [
+    {
+      "subcaseId": "changed-quantity",
+      "fixtureRef": "verification/cases/T13/fixtures/changed-quantity.json",
+      "fixtureSha256": "1cac053d0bcdb4b380fdbb524cc9156ba64f00f216cfea369fc1ae1f52a59316"
+    },
+    {
+      "subcaseId": "changed-price",
+      "fixtureRef": "verification/cases/T13/fixtures/changed-price.json",
+      "fixtureSha256": "e008c43e2cfe3e2fb5f49c0195346b7b6a3a8bdb9934627b834d798eddbac0ad"
+    },
+    {
+      "subcaseId": "changed-itemId",
+      "fixtureRef": "verification/cases/T13/fixtures/changed-itemId.json",
+      "fixtureSha256": "1df3d958495dfc9164919d353d83f3089bc88e5b90fbb6ee941db1ab72651806"
+    },
+    {
+      "subcaseId": "changed-supplierId",
+      "fixtureRef": "verification/cases/T13/fixtures/changed-supplierId.json",
+      "fixtureSha256": "006d5a9ed72f5216a74badbfdc5620ec8ef3d98177adb42252df7249dd232f6c"
+    },
+    {
+      "subcaseId": "changed-dueAt",
+      "fixtureRef": "verification/cases/T13/fixtures/changed-dueAt.json",
+      "fixtureSha256": "5cad49eea04a8e6ff703174e012eb48b90e6377d9bb29c8458efccf3e9d020e7"
+    },
+    {
+      "subcaseId": "changed-destinationId",
+      "fixtureRef": "verification/cases/T13/fixtures/changed-destinationId.json",
+      "fixtureSha256": "8493f570db20d50ffbe03c1f6457dcbf896212261525856fd05085dc90a98f22"
+    },
+    {
+      "subcaseId": "changed-endpoint",
+      "fixtureRef": "verification/cases/T13/fixtures/changed-endpoint.json",
+      "fixtureSha256": "3d26955676d30e1bccb58aec5dc3477dbd7c101fea13d7b28ef0bf7b05cc3350"
+    },
+    {
+      "subcaseId": "decision-reject",
+      "fixtureRef": "verification/cases/T13/fixtures/decision-reject.json",
+      "fixtureSha256": "5bd18e413211ccfabef59e4be38c9cf19a690bfa3959b6529148bf201125f0f0"
+    },
+    {
+      "subcaseId": "decision-conditional",
+      "fixtureRef": "verification/cases/T13/fixtures/decision-conditional.json",
+      "fixtureSha256": "94300f17de38c707305312ebc1522e908e739097c9772ddeee0d43f598243734"
+    },
+    {
+      "subcaseId": "decision-unauthorized",
+      "fixtureRef": "verification/cases/T13/fixtures/decision-unauthorized.json",
+      "fixtureSha256": "ac7551dfd1ad07574aefd92223ab4b574017a2f3bbdefcad82bc319e2cfd3b84"
+    },
+    {
+      "subcaseId": "decision-expired",
+      "fixtureRef": "verification/cases/T13/fixtures/decision-expired.json",
+      "fixtureSha256": "a4533a3455941a5271e8339a740495193f1d79866c15875c99c90442a09a67ef"
+    },
+    {
+      "subcaseId": "policy-rechecked",
+      "fixtureRef": "verification/cases/T13/fixtures/policy-rechecked.json",
+      "fixtureSha256": "4c62dec8900f92077a336921f4de32a7fd93c8c2fe7f8a72f2a8d628399e720e"
+    },
+    {
+      "subcaseId": "supplier-accept",
+      "fixtureRef": "verification/cases/T13/fixtures/supplier-accept.json",
+      "fixtureSha256": "327978768a2298b864deebd6aba57611f876dc91151b8faad58d19fd9fdf5e0b"
+    },
+    {
+      "subcaseId": "supplier-reject",
+      "fixtureRef": "verification/cases/T13/fixtures/supplier-reject.json",
+      "fixtureSha256": "ef357060b5a85a3193f2ef76d8f61c2dd0e48e66a031ce3c4e1e8e241433bd79"
+    },
+    {
+      "subcaseId": "supplier-change",
+      "fixtureRef": "verification/cases/T13/fixtures/supplier-change.json",
+      "fixtureSha256": "54278b2ad4c0cd46afcecb407081769893aaa849dd0eae972b8e7544c30efdbb"
+    },
+    {
+      "subcaseId": "cancel-unexecuted",
+      "fixtureRef": "verification/cases/T13/fixtures/cancel-unexecuted.json",
+      "fixtureSha256": "9cc4525f516becef7a00aa88a0823c710c03f026b796296df5f46d8ff4ebd500"
+    },
+    {
+      "subcaseId": "partial-excess-return-relocation",
+      "fixtureRef": "verification/cases/T13/fixtures/partial-excess-return-relocation.json",
+      "fixtureSha256": "0176412dd47eb3166e70ab0aeb721914880d29794ddd93e6eba8066d15ef3fee"
+    }
+  ],
+  "checks": [
+    {
+      "command": "./verify validate verification/cases/T13/case.json verification/cases/T14/case.json verification/cases/T15/case.json verification/cases/T19/case.json",
+      "exitCode": 0,
+      "result": "PREPARATION_SCHEMA_VALID all 4 cases"
+    },
+    {
+      "command": "./verify harness",
+      "exitCode": 0,
+      "tests": 148,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "supplyAssertionMutantTests": 18,
+      "result": "ASSERTION_SELFTEST_PASS; no product runtime claimed"
+    },
+    {
+      "command": "./verify contract-red verification/cases/T13/case.json verification/cases/T14/case.json verification/cases/T15/case.json verification/cases/T19/case.json",
+      "exitCode": 1,
+      "expected": 35,
+      "discovered": 35,
+      "started": 35,
+      "notImplementedAssertionFailures": 35,
+      "skipped": 0,
+      "result": "EXPECTED_CONTRACT_RED"
+    },
+    {
+      "command": "./verify scenarios",
+      "exitCode": 2,
+      "discoveredSubcases": 35,
+      "runtimeComplete": false,
+      "result": "NOT_RUN missing real adapters"
+    }
+  ],
+  "aggregateEvidenceRef": "verification/cases/T13/evidence/preparation",
+  "unexecuted": [
+    "real API adapter",
+    "independent product DB observer",
+    "host/runtime adapter",
+    "regulatory-policy-review adapter",
+    "regulatory real-world acceptance",
+    "live or paid model",
+    "external submission or payment"
+  ],
+  "namedObservationLinks": [
+    {
+      "oracleId": "T13.approval-version-binding",
+      "name": "approval-bound",
+      "normativeExpected": {
+        "immutableHashRevisionApproverTimeValidityConsumptionPolicy": true,
+        "rejectConditionalDecisionsPreserved": true,
+        "changedPolicyRechecked": true,
+        "supplierChangeNotItemSubstitution": true
+      },
+      "assertions": [
+        {
+          "subcaseId": "changed-quantity",
+          "assertionId": "changed-field-value"
+        },
+        {
+          "subcaseId": "changed-quantity",
+          "assertionId": "approval-binding"
+        },
+        {
+          "subcaseId": "changed-price",
+          "assertionId": "changed-field-value"
+        },
+        {
+          "subcaseId": "changed-price",
+          "assertionId": "approval-binding"
+        },
+        {
+          "subcaseId": "changed-itemId",
+          "assertionId": "changed-field-value"
+        },
+        {
+          "subcaseId": "changed-itemId",
+          "assertionId": "approval-binding"
+        },
+        {
+          "subcaseId": "changed-supplierId",
+          "assertionId": "changed-field-value"
+        },
+        {
+          "subcaseId": "changed-supplierId",
+          "assertionId": "approval-binding"
+        },
+        {
+          "subcaseId": "changed-supplierId",
+          "assertionId": "supplier-not-item"
+        },
+        {
+          "subcaseId": "changed-dueAt",
+          "assertionId": "changed-field-value"
+        },
+        {
+          "subcaseId": "changed-dueAt",
+          "assertionId": "approval-binding"
+        },
+        {
+          "subcaseId": "changed-destinationId",
+          "assertionId": "changed-field-value"
+        },
+        {
+          "subcaseId": "changed-destinationId",
+          "assertionId": "approval-binding"
+        },
+        {
+          "subcaseId": "changed-endpoint",
+          "assertionId": "changed-field-value"
+        },
+        {
+          "subcaseId": "changed-endpoint",
+          "assertionId": "approval-binding"
+        },
+        {
+          "subcaseId": "decision-reject",
+          "assertionId": "purchaseOrders-zero"
+        },
+        {
+          "subcaseId": "decision-reject",
+          "assertionId": "outbox-zero"
+        },
+        {
+          "subcaseId": "decision-reject",
+          "assertionId": "decision-kept"
+        },
+        {
+          "subcaseId": "decision-reject",
+          "assertionId": "denial-audit-one"
+        },
+        {
+          "subcaseId": "decision-conditional",
+          "assertionId": "purchaseOrders-zero"
+        },
+        {
+          "subcaseId": "decision-conditional",
+          "assertionId": "outbox-zero"
+        },
+        {
+          "subcaseId": "decision-conditional",
+          "assertionId": "decision-kept"
+        },
+        {
+          "subcaseId": "decision-conditional",
+          "assertionId": "conditions-kept"
+        },
+        {
+          "subcaseId": "decision-conditional",
+          "assertionId": "denial-audit-one"
+        },
+        {
+          "subcaseId": "decision-expired",
+          "assertionId": "purchaseOrders-zero"
+        },
+        {
+          "subcaseId": "decision-expired",
+          "assertionId": "outbox-zero"
+        },
+        {
+          "subcaseId": "decision-expired",
+          "assertionId": "decision-kept"
+        },
+        {
+          "subcaseId": "decision-expired",
+          "assertionId": "denial-audit-one"
+        },
+        {
+          "subcaseId": "policy-rechecked",
+          "assertionId": "current-policy-rejected"
+        },
+        {
+          "subcaseId": "policy-rechecked",
+          "assertionId": "new-policy-used"
+        }
+      ]
+    },
+    {
+      "oracleId": "T13.approval-version-binding",
+      "name": "old-approval-revised-dispatch",
+      "normativeExpected": 0,
+      "assertions": [
+        {
+          "subcaseId": "changed-quantity",
+          "assertionId": "old-approval-rejected"
+        },
+        {
+          "subcaseId": "changed-quantity",
+          "assertionId": "purchaseOrders-zero"
+        },
+        {
+          "subcaseId": "changed-quantity",
+          "assertionId": "outbox-zero"
+        },
+        {
+          "subcaseId": "changed-quantity",
+          "assertionId": "segments-zero"
+        },
+        {
+          "subcaseId": "changed-quantity",
+          "assertionId": "denial-audit"
+        },
+        {
+          "subcaseId": "changed-price",
+          "assertionId": "old-approval-rejected"
+        },
+        {
+          "subcaseId": "changed-price",
+          "assertionId": "purchaseOrders-zero"
+        },
+        {
+          "subcaseId": "changed-price",
+          "assertionId": "outbox-zero"
+        },
+        {
+          "subcaseId": "changed-price",
+          "assertionId": "segments-zero"
+        },
+        {
+          "subcaseId": "changed-price",
+          "assertionId": "denial-audit"
+        },
+        {
+          "subcaseId": "changed-itemId",
+          "assertionId": "old-approval-rejected"
+        },
+        {
+          "subcaseId": "changed-itemId",
+          "assertionId": "purchaseOrders-zero"
+        },
+        {
+          "subcaseId": "changed-itemId",
+          "assertionId": "outbox-zero"
+        },
+        {
+          "subcaseId": "changed-itemId",
+          "assertionId": "segments-zero"
+        },
+        {
+          "subcaseId": "changed-itemId",
+          "assertionId": "denial-audit"
+        },
+        {
+          "subcaseId": "changed-supplierId",
+          "assertionId": "old-approval-rejected"
+        },
+        {
+          "subcaseId": "changed-supplierId",
+          "assertionId": "purchaseOrders-zero"
+        },
+        {
+          "subcaseId": "changed-supplierId",
+          "assertionId": "outbox-zero"
+        },
+        {
+          "subcaseId": "changed-supplierId",
+          "assertionId": "segments-zero"
+        },
+        {
+          "subcaseId": "changed-supplierId",
+          "assertionId": "denial-audit"
+        },
+        {
+          "subcaseId": "changed-dueAt",
+          "assertionId": "old-approval-rejected"
+        },
+        {
+          "subcaseId": "changed-dueAt",
+          "assertionId": "purchaseOrders-zero"
+        },
+        {
+          "subcaseId": "changed-dueAt",
+          "assertionId": "outbox-zero"
+        },
+        {
+          "subcaseId": "changed-dueAt",
+          "assertionId": "segments-zero"
+        },
+        {
+          "subcaseId": "changed-dueAt",
+          "assertionId": "denial-audit"
+        },
+        {
+          "subcaseId": "changed-destinationId",
+          "assertionId": "old-approval-rejected"
+        },
+        {
+          "subcaseId": "changed-destinationId",
+          "assertionId": "purchaseOrders-zero"
+        },
+        {
+          "subcaseId": "changed-destinationId",
+          "assertionId": "outbox-zero"
+        },
+        {
+          "subcaseId": "changed-destinationId",
+          "assertionId": "segments-zero"
+        },
+        {
+          "subcaseId": "changed-destinationId",
+          "assertionId": "denial-audit"
+        },
+        {
+          "subcaseId": "changed-endpoint",
+          "assertionId": "old-approval-rejected"
+        },
+        {
+          "subcaseId": "changed-endpoint",
+          "assertionId": "purchaseOrders-zero"
+        },
+        {
+          "subcaseId": "changed-endpoint",
+          "assertionId": "outbox-zero"
+        },
+        {
+          "subcaseId": "changed-endpoint",
+          "assertionId": "segments-zero"
+        },
+        {
+          "subcaseId": "changed-endpoint",
+          "assertionId": "denial-audit"
+        },
+        {
+          "subcaseId": "decision-reject",
+          "assertionId": "dispatch-not-approved"
+        },
+        {
+          "subcaseId": "decision-conditional",
+          "assertionId": "dispatch-not-approved"
+        },
+        {
+          "subcaseId": "decision-expired",
+          "assertionId": "dispatch-not-approved"
+        },
+        {
+          "subcaseId": "policy-rechecked",
+          "assertionId": "po-zero"
+        },
+        {
+          "subcaseId": "policy-rechecked",
+          "assertionId": "external-zero"
+        }
+      ]
+    },
+    {
+      "oracleId": "T13.approval-version-binding",
+      "name": "unauthorized-approved-effects",
+      "normativeExpected": 0,
+      "assertions": [
+        {
+          "subcaseId": "decision-unauthorized",
+          "assertionId": "purchaseOrders-zero"
+        },
+        {
+          "subcaseId": "decision-unauthorized",
+          "assertionId": "outbox-zero"
+        },
+        {
+          "subcaseId": "decision-unauthorized",
+          "assertionId": "unauthorized-rejected"
+        },
+        {
+          "subcaseId": "decision-unauthorized",
+          "assertionId": "unauthorized-rejected-error"
+        },
+        {
+          "subcaseId": "decision-unauthorized",
+          "assertionId": "approvals-zero"
+        },
+        {
+          "subcaseId": "decision-unauthorized",
+          "assertionId": "denial-audit-one"
+        }
+      ]
+    },
+    {
+      "oracleId": "T13.delivery-commitment-arrival-separate",
+      "name": "cancel-scope",
+      "normativeExpected": {
+        "unexecutedRequestOnly": true,
+        "shipmentReceiptInvoicePreserved": true,
+        "unconfirmedExternalCancellationHasOwner": true
+      },
+      "assertions": [
+        {
+          "subcaseId": "cancel-unexecuted",
+          "assertionId": "only40-cancel"
+        },
+        {
+          "subcaseId": "cancel-unexecuted",
+          "assertionId": "unconfirmed-cancel-owner-one"
+        },
+        {
+          "subcaseId": "cancel-unexecuted",
+          "assertionId": "unconfirmed-cancel-owner-owner"
+        },
+        {
+          "subcaseId": "cancel-unexecuted",
+          "assertionId": "segments-preserved"
+        },
+        {
+          "subcaseId": "cancel-unexecuted",
+          "assertionId": "shipments-preserved"
+        },
+        {
+          "subcaseId": "cancel-unexecuted",
+          "assertionId": "receipts-preserved"
+        },
+        {
+          "subcaseId": "cancel-unexecuted",
+          "assertionId": "invoices-preserved"
+        }
+      ]
+    },
+    {
+      "oracleId": "T13.delivery-commitment-arrival-separate",
+      "name": "purchase-created-held-inventory",
+      "normativeExpected": 0,
+      "assertions": [
+        {
+          "subcaseId": "supplier-accept",
+          "assertionId": "proposal-inventory-zero"
+        },
+        {
+          "subcaseId": "supplier-reject",
+          "assertionId": "proposal-inventory-zero"
+        },
+        {
+          "subcaseId": "supplier-change",
+          "assertionId": "proposal-inventory-zero"
+        }
+      ]
+    },
+    {
+      "oracleId": "T13.delivery-commitment-arrival-separate",
+      "name": "supplier-acceptance-created-arrival",
+      "normativeExpected": 0,
+      "assertions": [
+        {
+          "subcaseId": "supplier-accept",
+          "assertionId": "supplier-arrival-zero"
+        },
+        {
+          "subcaseId": "supplier-accept",
+          "assertionId": "supplier-inventory-zero"
+        },
+        {
+          "subcaseId": "supplier-accept",
+          "assertionId": "reply-distinct"
+        },
+        {
+          "subcaseId": "supplier-reject",
+          "assertionId": "supplier-arrival-zero"
+        },
+        {
+          "subcaseId": "supplier-reject",
+          "assertionId": "supplier-inventory-zero"
+        },
+        {
+          "subcaseId": "supplier-reject",
+          "assertionId": "reply-distinct"
+        },
+        {
+          "subcaseId": "supplier-change",
+          "assertionId": "supplier-arrival-zero"
+        },
+        {
+          "subcaseId": "supplier-change",
+          "assertionId": "supplier-inventory-zero"
+        },
+        {
+          "subcaseId": "supplier-change",
+          "assertionId": "reply-distinct"
+        }
+      ]
+    },
+    {
+      "oracleId": "T13.delivery-commitment-arrival-separate",
+      "name": "transmission-created-arrival",
+      "normativeExpected": 0,
+      "assertions": [
+        {
+          "subcaseId": "supplier-accept",
+          "assertionId": "transmission-arrival-zero"
+        },
+        {
+          "subcaseId": "supplier-accept",
+          "assertionId": "transmission-inventory-zero"
+        },
+        {
+          "subcaseId": "supplier-reject",
+          "assertionId": "transmission-arrival-zero"
+        },
+        {
+          "subcaseId": "supplier-reject",
+          "assertionId": "transmission-inventory-zero"
+        },
+        {
+          "subcaseId": "supplier-change",
+          "assertionId": "transmission-arrival-zero"
+        },
+        {
+          "subcaseId": "supplier-change",
+          "assertionId": "transmission-inventory-zero"
+        }
+      ]
+    },
+    {
+      "oracleId": "T13.partial-and-excess-contributions",
+      "name": "authorized-arrival-contribution",
+      "normativeExpected": {
+        "value": "100",
+        "unit": "BOX"
+      },
+      "assertions": [
+        {
+          "subcaseId": "partial-excess-return-relocation",
+          "assertionId": "arrival-api100"
+        },
+        {
+          "subcaseId": "partial-excess-return-relocation",
+          "assertionId": "arrival-db100"
+        }
+      ]
+    },
+    {
+      "oracleId": "T13.partial-and-excess-contributions",
+      "name": "contribution-scope",
+      "normativeExpected": {
+        "canonicalPhysicalFulfilmentScope": true,
+        "splitPlan60Plus40NotGoalRevision": true,
+        "reduceTarget100To80IsGoalRevision": true
+      },
+      "assertions": [
+        {
+          "subcaseId": "partial-excess-return-relocation",
+          "assertionId": "plan-original-goal"
+        },
+        {
+          "subcaseId": "partial-excess-return-relocation",
+          "assertionId": "plan-original-goal-version"
+        },
+        {
+          "subcaseId": "partial-excess-return-relocation",
+          "assertionId": "distinct-contributions"
+        },
+        {
+          "subcaseId": "partial-excess-return-relocation",
+          "assertionId": "canonical-contributions"
+        },
+        {
+          "subcaseId": "partial-excess-return-relocation",
+          "assertionId": "new-goal80"
+        },
+        {
+          "subcaseId": "partial-excess-return-relocation",
+          "assertionId": "new-goal-revision"
+        }
+      ]
+    },
+    {
+      "oracleId": "T13.partial-and-excess-contributions",
+      "name": "excess-owner",
+      "normativeExpected": {
+        "owner": "assigned-human",
+        "nextAction": "nonempty",
+        "nextCheckAt": "fixed-or-controlled-clock",
+        "currentAssignmentCount": 1
+      },
+      "assertions": [
+        {
+          "subcaseId": "partial-excess-return-relocation",
+          "assertionId": "excess-owner-one"
+        },
+        {
+          "subcaseId": "partial-excess-return-relocation",
+          "assertionId": "excess-owner-owner"
+        }
+      ]
+    },
+    {
+      "oracleId": "T13.partial-and-excess-contributions",
+      "name": "excess-reconciliation",
+      "normativeExpected": {
+        "value": "5",
+        "unit": "BOX"
+      },
+      "assertions": [
+        {
+          "subcaseId": "partial-excess-return-relocation",
+          "assertionId": "held-db105"
+        },
+        {
+          "subcaseId": "partial-excess-return-relocation",
+          "assertionId": "excess5"
+        }
+      ]
+    },
+    {
+      "oracleId": "T13.partial-and-excess-contributions",
+      "name": "relocation-added-to-purchase",
+      "normativeExpected": 0,
+      "assertions": [
+        {
+          "subcaseId": "partial-excess-return-relocation",
+          "assertionId": "relocation-no-new-contribution"
+        }
+      ]
+    },
+    {
+      "oracleId": "T13.partial-and-excess-contributions",
+      "name": "return-added-to-purchase",
+      "normativeExpected": 0,
+      "assertions": [
+        {
+          "subcaseId": "partial-excess-return-relocation",
+          "assertionId": "return-no-new-contribution"
+        }
+      ]
+    }
+  ]
+}

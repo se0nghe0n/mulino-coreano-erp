@@ -1,0 +1,352 @@
+{
+  "recordType": "SUPPLY_PREPARATION_EVIDENCE",
+  "caseId": "T14",
+  "status": "PREPARED",
+  "runtimeStatus": "NOT_RUN",
+  "runtimeComplete": false,
+  "productCoverageClaimed": false,
+  "b2Commit": "feaca0af9673620eff9a5ac0f08a657ce14e9ccd",
+  "verifiedCommonCommit": "77c2df3440b6d8b362bfb52fed677e441c372b4c",
+  "workingTreeDirtyDuringExecution": true,
+  "caseSha256": "b6382019c81a84a7ec39a094b110c1ee271687c8a3e69a6b039f19b7b89e718e",
+  "featureSha256": "d714144f0f8d38eab1c732c29fa40ba22d7a7ad9c6cf26462c8fe8972dff2bdd",
+  "normativeCatalogSha256": "61968b22cde1f35922df323d964599228d8dfbbe71b0ee32192b59de0a9f5ed9",
+  "baseFixtureSha256": "166d7320c289dbe025af5a9bed0973d8738f81b5289bc9ce0df6f5ff33e45cc2",
+  "subcases": 4,
+  "actions": 45,
+  "assertions": 41,
+  "oracleCount": 3,
+  "observationCount": 10,
+  "fixtures": [
+    {
+      "subcaseId": "many-to-many",
+      "fixtureRef": "verification/cases/T14/fixtures/many-to-many.json",
+      "fixtureSha256": "3f4f679112a4cad5c7e4eae7425cc41c38e59053507c3c16a5719c29f5f7ca5c"
+    },
+    {
+      "subcaseId": "discrepancy-transit2",
+      "fixtureRef": "verification/cases/T14/fixtures/discrepancy-transit2.json",
+      "fixtureSha256": "d6b6ed5032b797375004ce4731e602b3312f668afce85d79cbb3cfea98acc9ee"
+    },
+    {
+      "subcaseId": "discrepancy-unobserved2",
+      "fixtureRef": "verification/cases/T14/fixtures/discrepancy-unobserved2.json",
+      "fixtureSha256": "e2db6f19b35461ebe4614523a5f1a9a8c4a5a245c69a42a6c26633260f74ee0b"
+    },
+    {
+      "subcaseId": "orphan-temperature",
+      "fixtureRef": "verification/cases/T14/fixtures/orphan-temperature.json",
+      "fixtureSha256": "d543641a21b2ae34cfa2d3bd0aef2dadcb0416437370df3ddcf8571e056d94c1"
+    }
+  ],
+  "checks": [
+    {
+      "command": "./verify validate verification/cases/T13/case.json verification/cases/T14/case.json verification/cases/T15/case.json verification/cases/T19/case.json",
+      "exitCode": 0,
+      "result": "PREPARATION_SCHEMA_VALID all 4 cases"
+    },
+    {
+      "command": "./verify harness",
+      "exitCode": 0,
+      "tests": 148,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "supplyAssertionMutantTests": 18,
+      "result": "ASSERTION_SELFTEST_PASS; no product runtime claimed"
+    },
+    {
+      "command": "./verify contract-red verification/cases/T13/case.json verification/cases/T14/case.json verification/cases/T15/case.json verification/cases/T19/case.json",
+      "exitCode": 1,
+      "expected": 35,
+      "discovered": 35,
+      "started": 35,
+      "notImplementedAssertionFailures": 35,
+      "skipped": 0,
+      "result": "EXPECTED_CONTRACT_RED"
+    },
+    {
+      "command": "./verify scenarios",
+      "exitCode": 2,
+      "discoveredSubcases": 35,
+      "runtimeComplete": false,
+      "result": "NOT_RUN missing real adapters"
+    }
+  ],
+  "aggregateEvidenceRef": "verification/cases/T13/evidence/preparation",
+  "unexecuted": [
+    "real API adapter",
+    "independent product DB observer",
+    "host/runtime adapter",
+    "regulatory-policy-review adapter",
+    "regulatory real-world acceptance",
+    "live or paid model",
+    "external submission or payment"
+  ],
+  "namedObservationLinks": [
+    {
+      "oracleId": "T14.arrival-discrepancy-not-loss",
+      "name": "automatic-loss",
+      "normativeExpected": {
+        "value": "0",
+        "unit": "BOX"
+      },
+      "assertions": [
+        {
+          "subcaseId": "discrepancy-transit2",
+          "assertionId": "loss-api0"
+        },
+        {
+          "subcaseId": "discrepancy-transit2",
+          "assertionId": "no-loss-movement"
+        },
+        {
+          "subcaseId": "discrepancy-transit2",
+          "assertionId": "loss-before-after"
+        },
+        {
+          "subcaseId": "discrepancy-unobserved2",
+          "assertionId": "loss-api0"
+        },
+        {
+          "subcaseId": "discrepancy-unobserved2",
+          "assertionId": "no-loss-movement"
+        },
+        {
+          "subcaseId": "discrepancy-unobserved2",
+          "assertionId": "loss-before-after"
+        }
+      ]
+    },
+    {
+      "oracleId": "T14.arrival-discrepancy-not-loss",
+      "name": "discrepancy-responsibility",
+      "normativeExpected": {
+        "owner": "assigned-human",
+        "nextAction": "nonempty",
+        "nextCheckAt": "fixed-or-controlled-clock",
+        "currentAssignmentCount": 1
+      },
+      "assertions": [
+        {
+          "subcaseId": "discrepancy-transit2",
+          "assertionId": "discrepancy-owner-one"
+        },
+        {
+          "subcaseId": "discrepancy-transit2",
+          "assertionId": "discrepancy-owner-owner"
+        },
+        {
+          "subcaseId": "discrepancy-unobserved2",
+          "assertionId": "discrepancy-owner-one"
+        },
+        {
+          "subcaseId": "discrepancy-unobserved2",
+          "assertionId": "discrepancy-owner-owner"
+        }
+      ]
+    },
+    {
+      "oracleId": "T14.arrival-discrepancy-not-loss",
+      "name": "received",
+      "normativeExpected": {
+        "value": "98",
+        "unit": "BOX"
+      },
+      "assertions": [
+        {
+          "subcaseId": "discrepancy-transit2",
+          "assertionId": "received-api98"
+        },
+        {
+          "subcaseId": "discrepancy-transit2",
+          "assertionId": "received98"
+        },
+        {
+          "subcaseId": "discrepancy-transit2",
+          "assertionId": "receipt98"
+        },
+        {
+          "subcaseId": "discrepancy-unobserved2",
+          "assertionId": "received-api98"
+        },
+        {
+          "subcaseId": "discrepancy-unobserved2",
+          "assertionId": "received98"
+        },
+        {
+          "subcaseId": "discrepancy-unobserved2",
+          "assertionId": "receipt98"
+        }
+      ]
+    },
+    {
+      "oracleId": "T14.arrival-discrepancy-not-loss",
+      "name": "separate-observations",
+      "normativeExpected": {
+        "supplierClaimAndReceiptNotOverwrite": true,
+        "unobservedNotZero": true
+      },
+      "assertions": [
+        {
+          "subcaseId": "discrepancy-transit2",
+          "assertionId": "shipclaim100"
+        },
+        {
+          "subcaseId": "discrepancy-transit2",
+          "assertionId": "physical-total100"
+        },
+        {
+          "subcaseId": "discrepancy-unobserved2",
+          "assertionId": "shipclaim100"
+        },
+        {
+          "subcaseId": "discrepancy-unobserved2",
+          "assertionId": "physical-total100"
+        },
+        {
+          "subcaseId": "discrepancy-unobserved2",
+          "assertionId": "unobserved-is-unknown"
+        },
+        {
+          "subcaseId": "discrepancy-unobserved2",
+          "assertionId": "unobserved-not-zero"
+        }
+      ]
+    },
+    {
+      "oracleId": "T14.arrival-discrepancy-not-loss",
+      "name": "transit",
+      "normativeExpected": {
+        "value": "2",
+        "unit": "BOX"
+      },
+      "assertions": [
+        {
+          "subcaseId": "discrepancy-transit2",
+          "assertionId": "transit-api2"
+        },
+        {
+          "subcaseId": "discrepancy-transit2",
+          "assertionId": "transit2"
+        }
+      ]
+    },
+    {
+      "oracleId": "T14.many-to-many-shipment",
+      "name": "distinct-cargo-total",
+      "normativeExpected": {
+        "value": "100",
+        "unit": "BOX"
+      },
+      "assertions": [
+        {
+          "subcaseId": "many-to-many",
+          "assertionId": "physical100"
+        },
+        {
+          "subcaseId": "many-to-many",
+          "assertionId": "physical-unique"
+        }
+      ]
+    },
+    {
+      "oracleId": "T14.many-to-many-shipment",
+      "name": "double-order-allocation",
+      "normativeExpected": 0,
+      "assertions": [
+        {
+          "subcaseId": "many-to-many",
+          "assertionId": "double-rejected"
+        },
+        {
+          "subcaseId": "many-to-many",
+          "assertionId": "cargo-no-double"
+        },
+        {
+          "subcaseId": "many-to-many",
+          "assertionId": "double-denial-audit"
+        }
+      ]
+    },
+    {
+      "oracleId": "T14.many-to-many-shipment",
+      "name": "leg-facts",
+      "normativeExpected": {
+        "plannedActualSeparate": true,
+        "custodyHandoverNotOwnership": true,
+        "portArrivalNotWArrival": true,
+        "allocationAndOriginalSourcePreserved": true
+      },
+      "assertions": [
+        {
+          "subcaseId": "many-to-many",
+          "assertionId": "po-cargo-tuples"
+        },
+        {
+          "subcaseId": "many-to-many",
+          "assertionId": "port-not-W"
+        },
+        {
+          "subcaseId": "many-to-many",
+          "assertionId": "handover-custodian"
+        },
+        {
+          "subcaseId": "many-to-many",
+          "assertionId": "ownership-unchanged"
+        },
+        {
+          "subcaseId": "many-to-many",
+          "assertionId": "planned-actual-legs"
+        },
+        {
+          "subcaseId": "many-to-many",
+          "assertionId": "source-genealogy4"
+        },
+        {
+          "subcaseId": "many-to-many",
+          "assertionId": "genealogy-original-source"
+        }
+      ]
+    },
+    {
+      "oracleId": "T14.orphan-temperature-intake",
+      "name": "notification-closes-intake",
+      "normativeExpected": 0,
+      "assertions": [
+        {
+          "subcaseId": "orphan-temperature",
+          "assertionId": "no-notification-resolution"
+        },
+        {
+          "subcaseId": "orphan-temperature",
+          "assertionId": "links-still0"
+        },
+        {
+          "subcaseId": "orphan-temperature",
+          "assertionId": "notification-delivered"
+        }
+      ]
+    },
+    {
+      "oracleId": "T14.orphan-temperature-intake",
+      "name": "orphan-intake",
+      "normativeExpected": {
+        "owner": "intake-human",
+        "nextAction": "nonempty",
+        "nextCheckAt": "fixed-or-controlled-clock",
+        "currentAssignmentCount": 1
+      },
+      "assertions": [
+        {
+          "subcaseId": "orphan-temperature",
+          "assertionId": "intake-human-one"
+        },
+        {
+          "subcaseId": "orphan-temperature",
+          "assertionId": "intake-human-owner"
+        }
+      ]
+    }
+  ]
+}

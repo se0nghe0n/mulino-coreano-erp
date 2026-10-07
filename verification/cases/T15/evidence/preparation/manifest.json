@@ -1,0 +1,358 @@
+{
+  "recordType": "SUPPLY_PREPARATION_EVIDENCE",
+  "caseId": "T15",
+  "status": "PREPARED",
+  "runtimeStatus": "NOT_RUN",
+  "runtimeComplete": false,
+  "productCoverageClaimed": false,
+  "b2Commit": "feaca0af9673620eff9a5ac0f08a657ce14e9ccd",
+  "verifiedCommonCommit": "77c2df3440b6d8b362bfb52fed677e441c372b4c",
+  "workingTreeDirtyDuringExecution": true,
+  "caseSha256": "28e072adb18b5c1bef5d406f465f41adf6b450f09dba2318aa83698b7b0a84dd",
+  "featureSha256": "53d9d746170314f3186835cb7c3eff1d957f261c84d19947d13ce9152c23d48a",
+  "normativeCatalogSha256": "61968b22cde1f35922df323d964599228d8dfbbe71b0ee32192b59de0a9f5ed9",
+  "baseFixtureSha256": "166d7320c289dbe025af5a9bed0973d8738f81b5289bc9ce0df6f5ff33e45cc2",
+  "subcases": 5,
+  "actions": 52,
+  "assertions": 43,
+  "oracleCount": 3,
+  "observationCount": 11,
+  "fixtures": [
+    {
+      "subcaseId": "agency30-qc100",
+      "fixtureRef": "verification/cases/T15/fixtures/agency30-qc100.json",
+      "fixtureSha256": "e9e3f9c510b34d68e977bc38ecda237c28775366ad00234c27e8417308db09a3"
+    },
+    {
+      "subcaseId": "procedure-lifecycle",
+      "fixtureRef": "verification/cases/T15/fixtures/procedure-lifecycle.json",
+      "fixtureSha256": "84d623086387a2693d6a1f4bf7f77631d470f8428063b97fd96ba1687fba49d8"
+    },
+    {
+      "subcaseId": "missing-officialSource",
+      "fixtureRef": "verification/cases/T15/fixtures/missing-officialSource.json",
+      "fixtureSha256": "36b54def57fc75fe3ff7dff565fedca94f209c7b1068f5eaeab9702b7e721a33"
+    },
+    {
+      "subcaseId": "missing-applicableDate",
+      "fixtureRef": "verification/cases/T15/fixtures/missing-applicableDate.json",
+      "fixtureSha256": "798eb84d430ac967d29145ec1ecbea6dede497f5c464c56831a506d12402e299"
+    },
+    {
+      "subcaseId": "missing-reviewer",
+      "fixtureRef": "verification/cases/T15/fixtures/missing-reviewer.json",
+      "fixtureSha256": "8402947d55b279f069ecc4dbc9635189091efa696d08a92fb3ecf8281084c8b3"
+    }
+  ],
+  "checks": [
+    {
+      "command": "./verify validate verification/cases/T13/case.json verification/cases/T14/case.json verification/cases/T15/case.json verification/cases/T19/case.json",
+      "exitCode": 0,
+      "result": "PREPARATION_SCHEMA_VALID all 4 cases"
+    },
+    {
+      "command": "./verify harness",
+      "exitCode": 0,
+      "tests": 148,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "supplyAssertionMutantTests": 18,
+      "result": "ASSERTION_SELFTEST_PASS; no product runtime claimed"
+    },
+    {
+      "command": "./verify contract-red verification/cases/T13/case.json verification/cases/T14/case.json verification/cases/T15/case.json verification/cases/T19/case.json",
+      "exitCode": 1,
+      "expected": 35,
+      "discovered": 35,
+      "started": 35,
+      "notImplementedAssertionFailures": 35,
+      "skipped": 0,
+      "result": "EXPECTED_CONTRACT_RED"
+    },
+    {
+      "command": "./verify scenarios",
+      "exitCode": 2,
+      "discoveredSubcases": 35,
+      "runtimeComplete": false,
+      "result": "NOT_RUN missing real adapters"
+    }
+  ],
+  "aggregateEvidenceRef": "verification/cases/T13/evidence/preparation",
+  "unexecuted": [
+    "real API adapter",
+    "independent product DB observer",
+    "host/runtime adapter",
+    "regulatory-policy-review adapter",
+    "regulatory real-world acceptance",
+    "live or paid model",
+    "external submission or payment"
+  ],
+  "namedObservationLinks": [
+    {
+      "oracleId": "T15.partial-regulatory-eligibility",
+      "name": "confirmed-sell-eligible",
+      "normativeExpected": {
+        "value": "30",
+        "unit": "BOX"
+      },
+      "assertions": [
+        {
+          "subcaseId": "agency30-qc100",
+          "assertionId": "eligible-api30"
+        },
+        {
+          "subcaseId": "agency30-qc100",
+          "assertionId": "confirmed-leaf30"
+        },
+        {
+          "subcaseId": "agency30-qc100",
+          "assertionId": "eligible-db30"
+        }
+      ]
+    },
+    {
+      "oracleId": "T15.partial-regulatory-eligibility",
+      "name": "decision-scope",
+      "normativeExpected": {
+        "itemLotPhysicalQuantityVersionEvidence": true
+      },
+      "assertions": [
+        {
+          "subcaseId": "agency30-qc100",
+          "assertionId": "decision-scope-raw"
+        }
+      ]
+    },
+    {
+      "oracleId": "T15.partial-regulatory-eligibility",
+      "name": "qc-expanded-agency-allowance",
+      "normativeExpected": 0,
+      "assertions": [
+        {
+          "subcaseId": "agency30-qc100",
+          "assertionId": "QC100-scope"
+        },
+        {
+          "subcaseId": "agency30-qc100",
+          "assertionId": "qc-no-agency-expansion"
+        }
+      ]
+    },
+    {
+      "oracleId": "T15.partial-regulatory-eligibility",
+      "name": "remaining-agency",
+      "normativeExpected": "UNKNOWN",
+      "assertions": [
+        {
+          "subcaseId": "agency30-qc100",
+          "assertionId": "unknown70-agency"
+        }
+      ]
+    },
+    {
+      "oracleId": "T15.procedure-lifecycle",
+      "name": "local-document-external-submission",
+      "normativeExpected": 0,
+      "assertions": [
+        {
+          "subcaseId": "procedure-lifecycle",
+          "assertionId": "local-external-zero"
+        },
+        {
+          "subcaseId": "procedure-lifecycle",
+          "assertionId": "local-outbox-zero"
+        },
+        {
+          "subcaseId": "procedure-lifecycle",
+          "assertionId": "no-local-submit"
+        },
+        {
+          "subcaseId": "procedure-lifecycle",
+          "assertionId": "no-local-submit-outbox"
+        }
+      ]
+    },
+    {
+      "oracleId": "T15.procedure-lifecycle",
+      "name": "local-document-state",
+      "normativeExpected": "PREPARED",
+      "assertions": [
+        {
+          "subcaseId": "procedure-lifecycle",
+          "assertionId": "local-PREPARED"
+        },
+        {
+          "subcaseId": "procedure-lifecycle",
+          "assertionId": "local-db-PREPARED"
+        }
+      ]
+    },
+    {
+      "oracleId": "T15.procedure-lifecycle",
+      "name": "regulatory-history",
+      "normativeExpected": {
+        "externalReceiptRequiredForSubmitted": true,
+        "supplementRejectionResubmitLinkOriginal": true,
+        "partialDecisionDoesNotCoverWhole": true,
+        "labelScopeSeparate": true
+      },
+      "assertions": [
+        {
+          "subcaseId": "procedure-lifecycle",
+          "assertionId": "submitted-requires-receipt"
+        },
+        {
+          "subcaseId": "procedure-lifecycle",
+          "assertionId": "immutable-v1-v2"
+        },
+        {
+          "subcaseId": "procedure-lifecycle",
+          "assertionId": "decision-history"
+        },
+        {
+          "subcaseId": "procedure-lifecycle",
+          "assertionId": "labels-not-agency"
+        }
+      ]
+    },
+    {
+      "oracleId": "T15.procedure-lifecycle",
+      "name": "unknown-submit-state",
+      "normativeExpected": "SUBMISSION_UNCONFIRMED",
+      "assertions": [
+        {
+          "subcaseId": "procedure-lifecycle",
+          "assertionId": "submit-unconfirmed"
+        },
+        {
+          "subcaseId": "procedure-lifecycle",
+          "assertionId": "submit-unconfirmed-raw"
+        }
+      ]
+    },
+    {
+      "oracleId": "T15.unresolved-real-policy",
+      "name": "confirmed-eligible",
+      "normativeExpected": {
+        "value": "0",
+        "unit": "BOX"
+      },
+      "assertions": [
+        {
+          "subcaseId": "missing-officialSource",
+          "assertionId": "unverified-eligible0"
+        },
+        {
+          "subcaseId": "missing-applicableDate",
+          "assertionId": "unverified-eligible0"
+        },
+        {
+          "subcaseId": "missing-reviewer",
+          "assertionId": "unverified-eligible0"
+        }
+      ]
+    },
+    {
+      "oracleId": "T15.unresolved-real-policy",
+      "name": "legal-eligibility",
+      "normativeExpected": "UNVERIFIED",
+      "assertions": [
+        {
+          "subcaseId": "missing-officialSource",
+          "assertionId": "legal-UNVERIFIED"
+        },
+        {
+          "subcaseId": "missing-officialSource",
+          "assertionId": "agency-unknown"
+        },
+        {
+          "subcaseId": "missing-applicableDate",
+          "assertionId": "legal-UNVERIFIED"
+        },
+        {
+          "subcaseId": "missing-applicableDate",
+          "assertionId": "agency-unknown"
+        },
+        {
+          "subcaseId": "missing-reviewer",
+          "assertionId": "legal-UNVERIFIED"
+        },
+        {
+          "subcaseId": "missing-reviewer",
+          "assertionId": "agency-unknown"
+        }
+      ]
+    },
+    {
+      "oracleId": "T15.unresolved-real-policy",
+      "name": "regulatory-gate",
+      "normativeExpected": {
+        "officialSourceApplicableDateReviewerRequired": true,
+        "fixtureNotRegulatoryAcceptance": true
+      },
+      "assertions": [
+        {
+          "subcaseId": "missing-officialSource",
+          "assertionId": "activation-effect0"
+        },
+        {
+          "subcaseId": "missing-officialSource",
+          "assertionId": "official-active0"
+        },
+        {
+          "subcaseId": "missing-officialSource",
+          "assertionId": "activation-blocked"
+        },
+        {
+          "subcaseId": "missing-officialSource",
+          "assertionId": "activation-blocked-error"
+        },
+        {
+          "subcaseId": "missing-officialSource",
+          "assertionId": "fixture-not-official"
+        },
+        {
+          "subcaseId": "missing-applicableDate",
+          "assertionId": "activation-effect0"
+        },
+        {
+          "subcaseId": "missing-applicableDate",
+          "assertionId": "official-active0"
+        },
+        {
+          "subcaseId": "missing-applicableDate",
+          "assertionId": "activation-blocked"
+        },
+        {
+          "subcaseId": "missing-applicableDate",
+          "assertionId": "activation-blocked-error"
+        },
+        {
+          "subcaseId": "missing-applicableDate",
+          "assertionId": "fixture-not-official"
+        },
+        {
+          "subcaseId": "missing-reviewer",
+          "assertionId": "activation-effect0"
+        },
+        {
+          "subcaseId": "missing-reviewer",
+          "assertionId": "official-active0"
+        },
+        {
+          "subcaseId": "missing-reviewer",
+          "assertionId": "activation-blocked"
+        },
+        {
+          "subcaseId": "missing-reviewer",
+          "assertionId": "activation-blocked-error"
+        },
+        {
+          "subcaseId": "missing-reviewer",
+          "assertionId": "fixture-not-official"
+        }
+      ]
+    }
+  ]
+}

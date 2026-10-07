@@ -1,0 +1,3842 @@
+{
+  "schemaVersion": "1.0.0",
+  "caseId": "T14",
+  "title": "선적 배분 구간 인계와 원천 관측을 보존한다",
+  "requirementRefs": [
+    "D14"
+  ],
+  "profiles": [
+    "contracts",
+    "scenarios"
+  ],
+  "subcases": [
+    {
+      "id": "many-to-many",
+      "title": "두 발주와 두 선적은 같은 실물을 중복 배정하지 않는다",
+      "fixtureRef": "verification/cases/T14/fixtures/many-to-many.json",
+      "requiredAdapters": [
+        "api",
+        "independent-db-observer"
+      ],
+      "actions": [
+        {
+          "id": "setup",
+          "kind": "installFixture",
+          "fixtureRef": "verification/cases/T14/fixtures/many-to-many.json",
+          "evidenceRefs": [
+            "setup:actual-adapter-artifact"
+          ]
+        },
+        {
+          "id": "split",
+          "kind": "invoke",
+          "actorRef": "warehouse",
+          "route": "api",
+          "capabilityId": "splitQuantity",
+          "request": {
+            "intentKind": "COMMAND",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "splitQuantity",
+            "subjectRefs": [
+              {
+                "type": "TradeItem",
+                "id": {
+                  "$alias": "P"
+                }
+              }
+            ],
+            "slots": {
+              "segmentId": {
+                "value": {
+                  "$alias": "Q100"
+                },
+                "provenance": "CONTEXT"
+              },
+              "children": {
+                "value": [
+                  {
+                    "alias": "A40",
+                    "quantity": "40",
+                    "unit": "BOX"
+                  },
+                  {
+                    "alias": "B10",
+                    "quantity": "10",
+                    "unit": "BOX"
+                  },
+                  {
+                    "alias": "A20",
+                    "quantity": "20",
+                    "unit": "BOX"
+                  },
+                  {
+                    "alias": "B30",
+                    "quantity": "30",
+                    "unit": "BOX"
+                  }
+                ],
+                "provenance": "USER"
+              }
+            },
+            "expectedRevision": 1,
+            "commandIdempotencyKey": "T14-many-to-many-split",
+            "evidenceRefs": [
+              "need"
+            ]
+          },
+          "evidenceRefs": [
+            "split:actual-adapter-artifact"
+          ]
+        },
+        {
+          "id": "S1",
+          "kind": "invoke",
+          "actorRef": "procurement",
+          "route": "api",
+          "capabilityId": "createShipment",
+          "request": {
+            "intentKind": "COMMAND",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "createShipment",
+            "subjectRefs": [
+              {
+                "type": "TradeItem",
+                "id": {
+                  "$alias": "P"
+                }
+              }
+            ],
+            "slots": {
+              "originId": {
+                "value": {
+                  "$alias": "IT-origin"
+                },
+                "provenance": "CONTEXT"
+              },
+              "destinationId": {
+                "value": {
+                  "$alias": "W"
+                },
+                "provenance": "CONTEXT"
+              },
+              "cargo": {
+                "value": [
+                  {
+                    "purchaseLineId": {
+                      "$alias": "PO-A"
+                    },
+                    "segmentId": {
+                      "$result": {
+                        "actionId": "split",
+                        "pointer": "/response/children/A40/segmentId"
+                      }
+                    },
+                    "quantity": {
+                      "value": "40",
+                      "unit": "BOX"
+                    }
+                  },
+                  {
+                    "purchaseLineId": {
+                      "$alias": "PO-B"
+                    },
+                    "segmentId": {
+                      "$result": {
+                        "actionId": "split",
+                        "pointer": "/response/children/B10/segmentId"
+                      }
+                    },
+                    "quantity": {
+                      "value": "10",
+                      "unit": "BOX"
+                    }
+                  }
+                ],
+                "provenance": "USER"
+              },
+              "legs": {
+                "value": [
+                  {
+                    "originId": {
+                      "$alias": "IT-origin"
+                    },
+                    "destinationId": {
+                      "$alias": "IT-port"
+                    }
+                  },
+                  {
+                    "originId": {
+                      "$alias": "IT-port"
+                    },
+                    "destinationId": {
+                      "$alias": "KR-port"
+                    }
+                  },
+                  {
+                    "originId": {
+                      "$alias": "KR-port"
+                    },
+                    "destinationId": {
+                      "$alias": "W"
+                    }
+                  }
+                ],
+                "provenance": "USER"
+              }
+            },
+            "expectedRevision": 1,
+            "commandIdempotencyKey": "T14-many-to-many-S1",
+            "evidenceRefs": [
+              "need"
+            ]
+          },
+          "evidenceRefs": [
+            "S1:actual-adapter-artifact"
+          ]
+        },
+        {
+          "id": "S2",
+          "kind": "invoke",
+          "actorRef": "procurement",
+          "route": "api",
+          "capabilityId": "createShipment",
+          "request": {
+            "intentKind": "COMMAND",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "createShipment",
+            "subjectRefs": [
+              {
+                "type": "TradeItem",
+                "id": {
+                  "$alias": "P"
+                }
+              }
+            ],
+            "slots": {
+              "originId": {
+                "value": {
+                  "$alias": "IT-origin"
+                },
+                "provenance": "CONTEXT"
+              },
+              "destinationId": {
+                "value": {
+                  "$alias": "W"
+                },
+                "provenance": "CONTEXT"
+              },
+              "cargo": {
+                "value": [
+                  {
+                    "purchaseLineId": {
+                      "$alias": "PO-A"
+                    },
+                    "segmentId": {
+                      "$result": {
+                        "actionId": "split",
+                        "pointer": "/response/children/A20/segmentId"
+                      }
+                    },
+                    "quantity": {
+                      "value": "20",
+                      "unit": "BOX"
+                    }
+                  },
+                  {
+                    "purchaseLineId": {
+                      "$alias": "PO-B"
+                    },
+                    "segmentId": {
+                      "$result": {
+                        "actionId": "split",
+                        "pointer": "/response/children/B30/segmentId"
+                      }
+                    },
+                    "quantity": {
+                      "value": "30",
+                      "unit": "BOX"
+                    }
+                  }
+                ],
+                "provenance": "USER"
+              },
+              "legs": {
+                "value": [
+                  {
+                    "originId": {
+                      "$alias": "IT-origin"
+                    },
+                    "destinationId": {
+                      "$alias": "IT-port"
+                    }
+                  },
+                  {
+                    "originId": {
+                      "$alias": "IT-port"
+                    },
+                    "destinationId": {
+                      "$alias": "KR-port"
+                    }
+                  },
+                  {
+                    "originId": {
+                      "$alias": "KR-port"
+                    },
+                    "destinationId": {
+                      "$alias": "W"
+                    }
+                  }
+                ],
+                "provenance": "USER"
+              }
+            },
+            "expectedRevision": 1,
+            "commandIdempotencyKey": "T14-many-to-many-S2",
+            "evidenceRefs": [
+              "need"
+            ]
+          },
+          "evidenceRefs": [
+            "S2:actual-adapter-artifact"
+          ]
+        },
+        {
+          "id": "before-double",
+          "kind": "query",
+          "actorRef": "procurement",
+          "route": "api",
+          "capabilityId": "getObject",
+          "request": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "caseId": "T14",
+              "subcaseId": "many-to-many",
+              "itemId": {
+                "$alias": "P"
+              }
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z"
+          },
+          "evidenceRefs": [
+            "before-double:actual-adapter-artifact"
+          ]
+        },
+        {
+          "id": "before-double-db",
+          "kind": "observe",
+          "observation": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "caseId": "T14",
+              "subcaseId": "many-to-many",
+              "itemId": {
+                "$alias": "P"
+              }
+            },
+            "snapshotRef": {
+              "$result": {
+                "actionId": "before-double",
+                "pointer": "/response/snapshotRevision"
+              }
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z",
+            "sources": [
+              "cargoAllocations",
+              "segments"
+            ]
+          },
+          "evidenceRefs": [
+            "before-double-db:actual-adapter-artifact"
+          ]
+        },
+        {
+          "id": "double",
+          "kind": "invoke",
+          "actorRef": "procurement",
+          "route": "api",
+          "capabilityId": "createShipment",
+          "request": {
+            "intentKind": "COMMAND",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "createShipment",
+            "subjectRefs": [
+              {
+                "type": "TradeItem",
+                "id": {
+                  "$alias": "P"
+                }
+              }
+            ],
+            "slots": {
+              "originId": {
+                "value": {
+                  "$alias": "IT-origin"
+                },
+                "provenance": "CONTEXT"
+              },
+              "destinationId": {
+                "value": {
+                  "$alias": "W"
+                },
+                "provenance": "CONTEXT"
+              },
+              "cargo": {
+                "value": [
+                  {
+                    "purchaseLineId": {
+                      "$alias": "PO-B"
+                    },
+                    "segmentId": {
+                      "$result": {
+                        "actionId": "split",
+                        "pointer": "/response/children/A40/segmentId"
+                      }
+                    },
+                    "quantity": {
+                      "value": "40",
+                      "unit": "BOX"
+                    }
+                  }
+                ],
+                "provenance": "USER"
+              }
+            },
+            "expectedRevision": 1,
+            "commandIdempotencyKey": "T14-many-to-many-double",
+            "evidenceRefs": [
+              "need"
+            ]
+          },
+          "evidenceRefs": [
+            "double:actual-adapter-artifact"
+          ]
+        },
+        {
+          "id": "after-double",
+          "kind": "query",
+          "actorRef": "procurement",
+          "route": "api",
+          "capabilityId": "getObject",
+          "request": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "caseId": "T14",
+              "subcaseId": "many-to-many",
+              "itemId": {
+                "$alias": "P"
+              }
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z"
+          },
+          "evidenceRefs": [
+            "after-double:actual-adapter-artifact"
+          ]
+        },
+        {
+          "id": "after-double-db",
+          "kind": "observe",
+          "observation": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "caseId": "T14",
+              "subcaseId": "many-to-many",
+              "itemId": {
+                "$alias": "P"
+              }
+            },
+            "snapshotRef": {
+              "$result": {
+                "actionId": "after-double",
+                "pointer": "/response/snapshotRevision"
+              }
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z",
+            "sources": [
+              "cargoAllocations",
+              "segments",
+              "audit"
+            ]
+          },
+          "evidenceRefs": [
+            "after-double-db:actual-adapter-artifact"
+          ]
+        },
+        {
+          "id": "S1-port",
+          "kind": "invoke",
+          "actorRef": "source",
+          "route": "api",
+          "capabilityId": "recordLegEvent",
+          "request": {
+            "intentKind": "RECORD",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "recordLegEvent",
+            "subjectRefs": [
+              {
+                "type": "TradeItem",
+                "id": {
+                  "$alias": "P"
+                }
+              }
+            ],
+            "slots": {
+              "shipmentId": {
+                "value": {
+                  "$result": {
+                    "actionId": "S1",
+                    "pointer": "/response/shipmentId"
+                  }
+                },
+                "provenance": "CONTEXT"
+              },
+              "legIndex": {
+                "value": 1,
+                "provenance": "USER"
+              },
+              "eventKind": {
+                "value": "ARRIVED",
+                "provenance": "USER"
+              },
+              "placeId": {
+                "value": {
+                  "$alias": "KR-port"
+                },
+                "provenance": "CONTEXT"
+              },
+              "occurredAt": {
+                "value": "2026-10-07T09:00:00Z",
+                "provenance": "USER"
+              },
+              "eventClass": {
+                "value": "ACTUAL",
+                "provenance": "USER"
+              },
+              "evidence": {
+                "value": "supplier-ship",
+                "provenance": "USER"
+              }
+            },
+            "expectedRevision": 1,
+            "commandIdempotencyKey": "T14-many-to-many-S1-port",
+            "evidenceRefs": [
+              "need"
+            ]
+          },
+          "evidenceRefs": [
+            "S1-port:actual-adapter-artifact"
+          ]
+        },
+        {
+          "id": "S2-port",
+          "kind": "invoke",
+          "actorRef": "source",
+          "route": "api",
+          "capabilityId": "recordLegEvent",
+          "request": {
+            "intentKind": "RECORD",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "recordLegEvent",
+            "subjectRefs": [
+              {
+                "type": "TradeItem",
+                "id": {
+                  "$alias": "P"
+                }
+              }
+            ],
+            "slots": {
+              "shipmentId": {
+                "value": {
+                  "$result": {
+                    "actionId": "S2",
+                    "pointer": "/response/shipmentId"
+                  }
+                },
+                "provenance": "CONTEXT"
+              },
+              "legIndex": {
+                "value": 1,
+                "provenance": "USER"
+              },
+              "eventKind": {
+                "value": "ARRIVED",
+                "provenance": "USER"
+              },
+              "placeId": {
+                "value": {
+                  "$alias": "KR-port"
+                },
+                "provenance": "CONTEXT"
+              },
+              "occurredAt": {
+                "value": "2026-10-07T09:00:00Z",
+                "provenance": "USER"
+              },
+              "eventClass": {
+                "value": "ACTUAL",
+                "provenance": "USER"
+              },
+              "evidence": {
+                "value": "supplier-ship",
+                "provenance": "USER"
+              }
+            },
+            "expectedRevision": 1,
+            "commandIdempotencyKey": "T14-many-to-many-S2-port",
+            "evidenceRefs": [
+              "need"
+            ]
+          },
+          "evidenceRefs": [
+            "S2-port:actual-adapter-artifact"
+          ]
+        },
+        {
+          "id": "port-view",
+          "kind": "query",
+          "actorRef": "warehouse",
+          "route": "api",
+          "capabilityId": "getInventory",
+          "request": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "caseId": "T14",
+              "subcaseId": "many-to-many",
+              "itemId": {
+                "$alias": "P"
+              }
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z"
+          },
+          "evidenceRefs": [
+            "port-view:actual-adapter-artifact"
+          ]
+        },
+        {
+          "id": "port-db",
+          "kind": "observe",
+          "observation": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "caseId": "T14",
+              "subcaseId": "many-to-many",
+              "itemId": {
+                "$alias": "P"
+              }
+            },
+            "snapshotRef": {
+              "$result": {
+                "actionId": "port-view",
+                "pointer": "/response/snapshotRevision"
+              }
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z",
+            "sources": [
+              "segments",
+              "legs",
+              "cargoAllocations",
+              "custodyHandovers"
+            ]
+          },
+          "evidenceRefs": [
+            "port-db:actual-adapter-artifact"
+          ]
+        },
+        {
+          "id": "S1-handover",
+          "kind": "invoke",
+          "actorRef": "source",
+          "route": "api",
+          "capabilityId": "recordHandover",
+          "request": {
+            "intentKind": "RECORD",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "recordHandover",
+            "subjectRefs": [
+              {
+                "type": "TradeItem",
+                "id": {
+                  "$alias": "P"
+                }
+              }
+            ],
+            "slots": {
+              "shipmentId": {
+                "value": {
+                  "$result": {
+                    "actionId": "S1",
+                    "pointer": "/response/shipmentId"
+                  }
+                },
+                "provenance": "CONTEXT"
+              },
+              "fromCustodianId": {
+                "value": {
+                  "$alias": "SUP"
+                },
+                "provenance": "CONTEXT"
+              },
+              "toCustodianId": {
+                "value": {
+                  "$alias": "warehouse"
+                },
+                "provenance": "CONTEXT"
+              },
+              "placeId": {
+                "value": {
+                  "$alias": "KR-port"
+                },
+                "provenance": "CONTEXT"
+              },
+              "occurredAt": {
+                "value": "2026-10-07T09:00:00Z",
+                "provenance": "USER"
+              },
+              "ownerTransfer": {
+                "value": false,
+                "provenance": "USER"
+              },
+              "evidence": {
+                "value": "custody",
+                "provenance": "USER"
+              }
+            },
+            "expectedRevision": 1,
+            "commandIdempotencyKey": "T14-many-to-many-S1-handover",
+            "evidenceRefs": [
+              "need"
+            ]
+          },
+          "evidenceRefs": [
+            "S1-handover:actual-adapter-artifact"
+          ]
+        },
+        {
+          "id": "S1-W",
+          "kind": "invoke",
+          "actorRef": "source",
+          "route": "api",
+          "capabilityId": "recordLegEvent",
+          "request": {
+            "intentKind": "RECORD",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "recordLegEvent",
+            "subjectRefs": [
+              {
+                "type": "TradeItem",
+                "id": {
+                  "$alias": "P"
+                }
+              }
+            ],
+            "slots": {
+              "shipmentId": {
+                "value": {
+                  "$result": {
+                    "actionId": "S1",
+                    "pointer": "/response/shipmentId"
+                  }
+                },
+                "provenance": "CONTEXT"
+              },
+              "legIndex": {
+                "value": 2,
+                "provenance": "USER"
+              },
+              "eventKind": {
+                "value": "ARRIVED",
+                "provenance": "USER"
+              },
+              "placeId": {
+                "value": {
+                  "$alias": "W"
+                },
+                "provenance": "CONTEXT"
+              },
+              "occurredAt": {
+                "value": "2026-10-07T09:00:00Z",
+                "provenance": "USER"
+              },
+              "eventClass": {
+                "value": "ACTUAL",
+                "provenance": "USER"
+              },
+              "evidence": {
+                "value": "warehouse-receipt",
+                "provenance": "USER"
+              }
+            },
+            "expectedRevision": 1,
+            "commandIdempotencyKey": "T14-many-to-many-S1-W",
+            "evidenceRefs": [
+              "need"
+            ]
+          },
+          "evidenceRefs": [
+            "S1-W:actual-adapter-artifact"
+          ]
+        },
+        {
+          "id": "S2-handover",
+          "kind": "invoke",
+          "actorRef": "source",
+          "route": "api",
+          "capabilityId": "recordHandover",
+          "request": {
+            "intentKind": "RECORD",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "recordHandover",
+            "subjectRefs": [
+              {
+                "type": "TradeItem",
+                "id": {
+                  "$alias": "P"
+                }
+              }
+            ],
+            "slots": {
+              "shipmentId": {
+                "value": {
+                  "$result": {
+                    "actionId": "S2",
+                    "pointer": "/response/shipmentId"
+                  }
+                },
+                "provenance": "CONTEXT"
+              },
+              "fromCustodianId": {
+                "value": {
+                  "$alias": "SUP"
+                },
+                "provenance": "CONTEXT"
+              },
+              "toCustodianId": {
+                "value": {
+                  "$alias": "warehouse"
+                },
+                "provenance": "CONTEXT"
+              },
+              "placeId": {
+                "value": {
+                  "$alias": "KR-port"
+                },
+                "provenance": "CONTEXT"
+              },
+              "occurredAt": {
+                "value": "2026-10-07T09:00:00Z",
+                "provenance": "USER"
+              },
+              "ownerTransfer": {
+                "value": false,
+                "provenance": "USER"
+              },
+              "evidence": {
+                "value": "custody",
+                "provenance": "USER"
+              }
+            },
+            "expectedRevision": 1,
+            "commandIdempotencyKey": "T14-many-to-many-S2-handover",
+            "evidenceRefs": [
+              "need"
+            ]
+          },
+          "evidenceRefs": [
+            "S2-handover:actual-adapter-artifact"
+          ]
+        },
+        {
+          "id": "S2-W",
+          "kind": "invoke",
+          "actorRef": "source",
+          "route": "api",
+          "capabilityId": "recordLegEvent",
+          "request": {
+            "intentKind": "RECORD",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "recordLegEvent",
+            "subjectRefs": [
+              {
+                "type": "TradeItem",
+                "id": {
+                  "$alias": "P"
+                }
+              }
+            ],
+            "slots": {
+              "shipmentId": {
+                "value": {
+                  "$result": {
+                    "actionId": "S2",
+                    "pointer": "/response/shipmentId"
+                  }
+                },
+                "provenance": "CONTEXT"
+              },
+              "legIndex": {
+                "value": 2,
+                "provenance": "USER"
+              },
+              "eventKind": {
+                "value": "ARRIVED",
+                "provenance": "USER"
+              },
+              "placeId": {
+                "value": {
+                  "$alias": "W"
+                },
+                "provenance": "CONTEXT"
+              },
+              "occurredAt": {
+                "value": "2026-10-07T09:00:00Z",
+                "provenance": "USER"
+              },
+              "eventClass": {
+                "value": "ACTUAL",
+                "provenance": "USER"
+              },
+              "evidence": {
+                "value": "warehouse-receipt",
+                "provenance": "USER"
+              }
+            },
+            "expectedRevision": 1,
+            "commandIdempotencyKey": "T14-many-to-many-S2-W",
+            "evidenceRefs": [
+              "need"
+            ]
+          },
+          "evidenceRefs": [
+            "S2-W:actual-adapter-artifact"
+          ]
+        },
+        {
+          "id": "W-view",
+          "kind": "query",
+          "actorRef": "warehouse",
+          "route": "api",
+          "capabilityId": "getInventory",
+          "request": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "caseId": "T14",
+              "subcaseId": "many-to-many",
+              "itemId": {
+                "$alias": "P"
+              }
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z"
+          },
+          "evidenceRefs": [
+            "W-view:actual-adapter-artifact"
+          ]
+        },
+        {
+          "id": "W-db",
+          "kind": "observe",
+          "observation": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "caseId": "T14",
+              "subcaseId": "many-to-many",
+              "itemId": {
+                "$alias": "P"
+              }
+            },
+            "snapshotRef": {
+              "$result": {
+                "actionId": "W-view",
+                "pointer": "/response/snapshotRevision"
+              }
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z",
+            "sources": [
+              "segments",
+              "legs",
+              "custodyHandovers",
+              "genealogy"
+            ]
+          },
+          "evidenceRefs": [
+            "W-db:actual-adapter-artifact"
+          ]
+        }
+      ],
+      "assertions": [
+        {
+          "id": "double-rejected",
+          "op": "equals",
+          "source": {
+            "actionId": "double",
+            "pointer": "/response/outcome"
+          },
+          "expected": "REJECTED",
+          "requirementRefs": [
+            "D14"
+          ],
+          "evidenceRefs": [
+            "double:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "T14",
+            "subcaseId": "many-to-many",
+            "itemId": {
+              "$alias": "P"
+            }
+          },
+          "oracleExplanation": "고정 oracle double-order-allocation의 실제 값과 범위를 확인한다",
+          "oracleRef": {
+            "oracleId": "T14.many-to-many-shipment",
+            "observationNames": [
+              "double-order-allocation"
+            ]
+          }
+        },
+        {
+          "id": "cargo-no-double",
+          "op": "sameAs",
+          "source": {
+            "actionId": "after-double-db",
+            "pointer": "/data/rawRows/cargoAllocations"
+          },
+          "expected": true,
+          "requirementRefs": [
+            "D14"
+          ],
+          "evidenceRefs": [
+            "after-double-db:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "T14",
+            "subcaseId": "many-to-many",
+            "itemId": {
+              "$alias": "P"
+            }
+          },
+          "oracleExplanation": "실제 전후 원행이 같아 금지 효과가 없다",
+          "oracleRef": {
+            "oracleId": "T14.many-to-many-shipment",
+            "observationNames": [
+              "double-order-allocation"
+            ]
+          },
+          "baseline": {
+            "actionId": "before-double-db",
+            "pointer": "/data/rawRows/cargoAllocations"
+          }
+        },
+        {
+          "id": "double-denial-audit",
+          "op": "count",
+          "source": {
+            "actionId": "after-double-db",
+            "pointer": "/data/rawRows/audit",
+            "where": {
+              "action": "createShipment",
+              "outcome": "REJECTED"
+            }
+          },
+          "expected": 1,
+          "requirementRefs": [
+            "D14"
+          ],
+          "evidenceRefs": [
+            "after-double-db:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "T14",
+            "subcaseId": "many-to-many",
+            "itemId": {
+              "$alias": "P"
+            }
+          },
+          "oracleExplanation": "고정 oracle double-order-allocation의 실제 값과 범위를 확인한다",
+          "oracleRef": {
+            "oracleId": "T14.many-to-many-shipment",
+            "observationNames": [
+              "double-order-allocation"
+            ]
+          }
+        },
+        {
+          "id": "physical100",
+          "op": "sumEquals",
+          "source": {
+            "actionId": "port-db",
+            "pointer": "/data/rawRows/segments",
+            "field": "quantity"
+          },
+          "expected": "100",
+          "requirementRefs": [
+            "D14"
+          ],
+          "evidenceRefs": [
+            "port-db:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "T14",
+            "subcaseId": "many-to-many",
+            "itemId": {
+              "$alias": "P"
+            }
+          },
+          "oracleExplanation": "고정 oracle distinct-cargo-total의 실제 값과 범위를 확인한다",
+          "oracleRef": {
+            "oracleId": "T14.many-to-many-shipment",
+            "observationNames": [
+              "distinct-cargo-total"
+            ]
+          },
+          "unit": "BOX",
+          "unitSource": {
+            "actionId": "port-db",
+            "pointer": "/data/rawRows/segments",
+            "field": "unit"
+          }
+        },
+        {
+          "id": "physical-unique",
+          "op": "unique",
+          "source": {
+            "actionId": "port-db",
+            "pointer": "/data/rawRows/segments",
+            "field": "physicalScope"
+          },
+          "expected": true,
+          "requirementRefs": [
+            "D14"
+          ],
+          "evidenceRefs": [
+            "port-db:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "T14",
+            "subcaseId": "many-to-many",
+            "itemId": {
+              "$alias": "P"
+            }
+          },
+          "oracleExplanation": "고정 oracle distinct-cargo-total의 실제 값과 범위를 확인한다",
+          "oracleRef": {
+            "oracleId": "T14.many-to-many-shipment",
+            "observationNames": [
+              "distinct-cargo-total"
+            ]
+          }
+        },
+        {
+          "id": "po-cargo-tuples",
+          "op": "relationSet",
+          "source": {
+            "actionId": "port-db",
+            "pointer": "/data/rawRows/cargoAllocations",
+            "field": [
+              "purchaseLineId",
+              "shipmentId",
+              "segmentId",
+              "quantity",
+              "unit"
+            ]
+          },
+          "expected": [
+            [
+              {
+                "$alias": "PO-A"
+              },
+              {
+                "$result": {
+                  "actionId": "S1",
+                  "pointer": "/response/shipmentId"
+                }
+              },
+              {
+                "$result": {
+                  "actionId": "split",
+                  "pointer": "/response/children/A40/segmentId"
+                }
+              },
+              "40",
+              "BOX"
+            ],
+            [
+              {
+                "$alias": "PO-B"
+              },
+              {
+                "$result": {
+                  "actionId": "S1",
+                  "pointer": "/response/shipmentId"
+                }
+              },
+              {
+                "$result": {
+                  "actionId": "split",
+                  "pointer": "/response/children/B10/segmentId"
+                }
+              },
+              "10",
+              "BOX"
+            ],
+            [
+              {
+                "$alias": "PO-A"
+              },
+              {
+                "$result": {
+                  "actionId": "S2",
+                  "pointer": "/response/shipmentId"
+                }
+              },
+              {
+                "$result": {
+                  "actionId": "split",
+                  "pointer": "/response/children/A20/segmentId"
+                }
+              },
+              "20",
+              "BOX"
+            ],
+            [
+              {
+                "$alias": "PO-B"
+              },
+              {
+                "$result": {
+                  "actionId": "S2",
+                  "pointer": "/response/shipmentId"
+                }
+              },
+              {
+                "$result": {
+                  "actionId": "split",
+                  "pointer": "/response/children/B30/segmentId"
+                }
+              },
+              "30",
+              "BOX"
+            ]
+          ],
+          "requirementRefs": [
+            "D14"
+          ],
+          "evidenceRefs": [
+            "port-db:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "T14",
+            "subcaseId": "many-to-many",
+            "itemId": {
+              "$alias": "P"
+            }
+          },
+          "oracleExplanation": "고정 oracle leg-facts의 실제 값과 범위를 확인한다",
+          "oracleRef": {
+            "oracleId": "T14.many-to-many-shipment",
+            "observationNames": [
+              "leg-facts"
+            ]
+          }
+        },
+        {
+          "id": "port-not-W",
+          "op": "count",
+          "source": {
+            "actionId": "port-db",
+            "pointer": "/data/rawRows/segments",
+            "where": {
+              "locationId": {
+                "$alias": "W"
+              }
+            }
+          },
+          "expected": 0,
+          "requirementRefs": [
+            "D14"
+          ],
+          "evidenceRefs": [
+            "port-db:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "T14",
+            "subcaseId": "many-to-many",
+            "itemId": {
+              "$alias": "P"
+            }
+          },
+          "oracleExplanation": "고정 oracle leg-facts의 실제 값과 범위를 확인한다",
+          "oracleRef": {
+            "oracleId": "T14.many-to-many-shipment",
+            "observationNames": [
+              "leg-facts"
+            ]
+          }
+        },
+        {
+          "id": "handover-custodian",
+          "op": "relationSet",
+          "source": {
+            "actionId": "W-db",
+            "pointer": "/data/rawRows/custodyHandovers",
+            "field": [
+              "shipmentId",
+              "fromCustodianId",
+              "toCustodianId",
+              "placeId"
+            ]
+          },
+          "expected": [
+            [
+              {
+                "$result": {
+                  "actionId": "S1",
+                  "pointer": "/response/shipmentId"
+                }
+              },
+              {
+                "$alias": "SUP"
+              },
+              {
+                "$alias": "warehouse"
+              },
+              {
+                "$alias": "KR-port"
+              }
+            ],
+            [
+              {
+                "$result": {
+                  "actionId": "S2",
+                  "pointer": "/response/shipmentId"
+                }
+              },
+              {
+                "$alias": "SUP"
+              },
+              {
+                "$alias": "warehouse"
+              },
+              {
+                "$alias": "KR-port"
+              }
+            ]
+          ],
+          "requirementRefs": [
+            "D14"
+          ],
+          "evidenceRefs": [
+            "W-db:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "T14",
+            "subcaseId": "many-to-many",
+            "itemId": {
+              "$alias": "P"
+            }
+          },
+          "oracleExplanation": "고정 oracle leg-facts의 실제 값과 범위를 확인한다",
+          "oracleRef": {
+            "oracleId": "T14.many-to-many-shipment",
+            "observationNames": [
+              "leg-facts"
+            ]
+          }
+        },
+        {
+          "id": "ownership-unchanged",
+          "op": "relationSet",
+          "source": {
+            "actionId": "W-db",
+            "pointer": "/data/rawRows/segments",
+            "field": [
+              "id",
+              "ownerId"
+            ]
+          },
+          "expected": [
+            [
+              {
+                "$result": {
+                  "actionId": "split",
+                  "pointer": "/response/children/A40/segmentId"
+                }
+              },
+              {
+                "$alias": "SUP"
+              }
+            ],
+            [
+              {
+                "$result": {
+                  "actionId": "split",
+                  "pointer": "/response/children/B10/segmentId"
+                }
+              },
+              {
+                "$alias": "SUP"
+              }
+            ],
+            [
+              {
+                "$result": {
+                  "actionId": "split",
+                  "pointer": "/response/children/A20/segmentId"
+                }
+              },
+              {
+                "$alias": "SUP"
+              }
+            ],
+            [
+              {
+                "$result": {
+                  "actionId": "split",
+                  "pointer": "/response/children/B30/segmentId"
+                }
+              },
+              {
+                "$alias": "SUP"
+              }
+            ]
+          ],
+          "requirementRefs": [
+            "D14"
+          ],
+          "evidenceRefs": [
+            "W-db:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "T14",
+            "subcaseId": "many-to-many",
+            "itemId": {
+              "$alias": "P"
+            }
+          },
+          "oracleExplanation": "고정 oracle leg-facts의 실제 값과 범위를 확인한다",
+          "oracleRef": {
+            "oracleId": "T14.many-to-many-shipment",
+            "observationNames": [
+              "leg-facts"
+            ]
+          }
+        },
+        {
+          "id": "planned-actual-legs",
+          "op": "relationSet",
+          "source": {
+            "actionId": "W-db",
+            "pointer": "/data/rawRows/legs",
+            "field": [
+              "shipmentId",
+              "legIndex",
+              "plannedDestinationId",
+              "actualPlaceId",
+              "eventKind"
+            ],
+            "where": {
+              "eventKind": "ARRIVED"
+            }
+          },
+          "expected": [
+            [
+              {
+                "$result": {
+                  "actionId": "S1",
+                  "pointer": "/response/shipmentId"
+                }
+              },
+              1,
+              {
+                "$alias": "KR-port"
+              },
+              {
+                "$alias": "KR-port"
+              },
+              "ARRIVED"
+            ],
+            [
+              {
+                "$result": {
+                  "actionId": "S2",
+                  "pointer": "/response/shipmentId"
+                }
+              },
+              1,
+              {
+                "$alias": "KR-port"
+              },
+              {
+                "$alias": "KR-port"
+              },
+              "ARRIVED"
+            ],
+            [
+              {
+                "$result": {
+                  "actionId": "S1",
+                  "pointer": "/response/shipmentId"
+                }
+              },
+              2,
+              {
+                "$alias": "W"
+              },
+              {
+                "$alias": "W"
+              },
+              "ARRIVED"
+            ],
+            [
+              {
+                "$result": {
+                  "actionId": "S2",
+                  "pointer": "/response/shipmentId"
+                }
+              },
+              2,
+              {
+                "$alias": "W"
+              },
+              {
+                "$alias": "W"
+              },
+              "ARRIVED"
+            ]
+          ],
+          "requirementRefs": [
+            "D14"
+          ],
+          "evidenceRefs": [
+            "W-db:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "T14",
+            "subcaseId": "many-to-many",
+            "itemId": {
+              "$alias": "P"
+            }
+          },
+          "oracleExplanation": "고정 oracle leg-facts의 실제 값과 범위를 확인한다",
+          "oracleRef": {
+            "oracleId": "T14.many-to-many-shipment",
+            "observationNames": [
+              "leg-facts"
+            ]
+          }
+        },
+        {
+          "id": "source-genealogy4",
+          "op": "count",
+          "source": {
+            "actionId": "W-db",
+            "pointer": "/data/rawRows/genealogy"
+          },
+          "expected": 4,
+          "requirementRefs": [
+            "D14"
+          ],
+          "evidenceRefs": [
+            "W-db:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "T14",
+            "subcaseId": "many-to-many",
+            "itemId": {
+              "$alias": "P"
+            }
+          },
+          "oracleExplanation": "고정 oracle leg-facts의 실제 값과 범위를 확인한다",
+          "oracleRef": {
+            "oracleId": "T14.many-to-many-shipment",
+            "observationNames": [
+              "leg-facts"
+            ]
+          }
+        },
+        {
+          "id": "genealogy-original-source",
+          "op": "relationSet",
+          "source": {
+            "actionId": "W-db",
+            "pointer": "/data/rawRows/genealogy",
+            "field": [
+              "sourceSegmentId",
+              "targetSegmentId",
+              "quantity",
+              "unit"
+            ]
+          },
+          "expected": [
+            [
+              {
+                "$alias": "Q100"
+              },
+              {
+                "$result": {
+                  "actionId": "split",
+                  "pointer": "/response/children/A40/segmentId"
+                }
+              },
+              "40",
+              "BOX"
+            ],
+            [
+              {
+                "$alias": "Q100"
+              },
+              {
+                "$result": {
+                  "actionId": "split",
+                  "pointer": "/response/children/B10/segmentId"
+                }
+              },
+              "10",
+              "BOX"
+            ],
+            [
+              {
+                "$alias": "Q100"
+              },
+              {
+                "$result": {
+                  "actionId": "split",
+                  "pointer": "/response/children/A20/segmentId"
+                }
+              },
+              "20",
+              "BOX"
+            ],
+            [
+              {
+                "$alias": "Q100"
+              },
+              {
+                "$result": {
+                  "actionId": "split",
+                  "pointer": "/response/children/B30/segmentId"
+                }
+              },
+              "30",
+              "BOX"
+            ]
+          ],
+          "requirementRefs": [
+            "D14"
+          ],
+          "evidenceRefs": [
+            "W-db:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "T14",
+            "subcaseId": "many-to-many",
+            "itemId": {
+              "$alias": "P"
+            }
+          },
+          "oracleExplanation": "고정 oracle leg-facts의 실제 값과 범위를 확인한다",
+          "oracleRef": {
+            "oracleId": "T14.many-to-many-shipment",
+            "observationNames": [
+              "leg-facts"
+            ]
+          }
+        }
+      ],
+      "oracleExplanation": "가상 입력 fixture에서 모든 명령을 실제 서버에 전달하고 원행·단위·증거·인간 책임을 독립 대조한다. 미구현은 NOT_RUN이며 표본 검사는 제품 PASS가 아니다."
+    },
+    {
+      "id": "discrepancy-transit2",
+      "title": "출하100 수령98의 나머지2는 운송중이다",
+      "fixtureRef": "verification/cases/T14/fixtures/discrepancy-transit2.json",
+      "requiredAdapters": [
+        "api",
+        "independent-db-observer"
+      ],
+      "actions": [
+        {
+          "id": "setup",
+          "kind": "installFixture",
+          "fixtureRef": "verification/cases/T14/fixtures/discrepancy-transit2.json",
+          "evidenceRefs": [
+            "setup:actual-adapter-artifact"
+          ]
+        },
+        {
+          "id": "before",
+          "kind": "query",
+          "actorRef": "warehouse",
+          "route": "api",
+          "capabilityId": "getInventory",
+          "request": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "caseId": "T14",
+              "subcaseId": "discrepancy-transit2",
+              "itemId": {
+                "$alias": "P"
+              }
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z"
+          },
+          "evidenceRefs": [
+            "before:actual-adapter-artifact"
+          ]
+        },
+        {
+          "id": "before-db",
+          "kind": "observe",
+          "observation": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "caseId": "T14",
+              "subcaseId": "discrepancy-transit2",
+              "itemId": {
+                "$alias": "P"
+              }
+            },
+            "snapshotRef": {
+              "$result": {
+                "actionId": "before",
+                "pointer": "/response/snapshotRevision"
+              }
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z",
+            "sources": [
+              "movements",
+              "segments"
+            ]
+          },
+          "evidenceRefs": [
+            "before-db:actual-adapter-artifact"
+          ]
+        },
+        {
+          "id": "shipped",
+          "kind": "invoke",
+          "actorRef": "source",
+          "route": "api",
+          "capabilityId": "recordLegEvent",
+          "request": {
+            "intentKind": "RECORD",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "recordLegEvent",
+            "subjectRefs": [
+              {
+                "type": "TradeItem",
+                "id": {
+                  "$alias": "P"
+                }
+              }
+            ],
+            "slots": {
+              "purchaseId": {
+                "value": {
+                  "$alias": "PO-A"
+                },
+                "provenance": "CONTEXT"
+              },
+              "segmentId": {
+                "value": {
+                  "$alias": "Q100"
+                },
+                "provenance": "CONTEXT"
+              },
+              "eventKind": {
+                "value": "SHIPPED_CLAIM",
+                "provenance": "USER"
+              },
+              "quantity": {
+                "value": "100",
+                "unit": "BOX",
+                "provenance": "CONTEXT"
+              },
+              "placeId": {
+                "value": {
+                  "$alias": "IT-origin"
+                },
+                "provenance": "CONTEXT"
+              },
+              "evidence": {
+                "value": "supplier-ship",
+                "provenance": "USER"
+              }
+            },
+            "expectedRevision": 1,
+            "commandIdempotencyKey": "T14-discrepancy-transit2-shipped",
+            "evidenceRefs": [
+              "need"
+            ]
+          },
+          "evidenceRefs": [
+            "shipped:actual-adapter-artifact"
+          ]
+        },
+        {
+          "id": "receive98",
+          "kind": "invoke",
+          "actorRef": "warehouse",
+          "route": "api",
+          "capabilityId": "confirmReceipt",
+          "request": {
+            "intentKind": "COMMAND",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "confirmReceipt",
+            "subjectRefs": [
+              {
+                "type": "TradeItem",
+                "id": {
+                  "$alias": "P"
+                }
+              }
+            ],
+            "slots": {
+              "purchaseId": {
+                "value": {
+                  "$alias": "PO-A"
+                },
+                "provenance": "CONTEXT"
+              },
+              "existingSegmentId": {
+                "value": {
+                  "$alias": "Q100"
+                },
+                "provenance": "CONTEXT"
+              },
+              "itemId": {
+                "value": {
+                  "$alias": "P"
+                },
+                "provenance": "CONTEXT"
+              },
+              "lotId": {
+                "value": {
+                  "$alias": "L"
+                },
+                "provenance": "CONTEXT"
+              },
+              "quantity": {
+                "value": "98",
+                "unit": "BOX",
+                "provenance": "CONTEXT"
+              },
+              "placeId": {
+                "value": {
+                  "$alias": "W"
+                },
+                "provenance": "CONTEXT"
+              },
+              "physicalScope": {
+                "value": "Q100-received98",
+                "provenance": "USER"
+              },
+              "sourceEventId": {
+                "value": "RECEIVE98",
+                "provenance": "USER"
+              },
+              "evidence": {
+                "value": "warehouse-receipt",
+                "provenance": "USER"
+              }
+            },
+            "expectedRevision": 1,
+            "commandIdempotencyKey": "T14-discrepancy-transit2-receive98",
+            "evidenceRefs": [
+              "need"
+            ]
+          },
+          "evidenceRefs": [
+            "receive98:actual-adapter-artifact"
+          ]
+        },
+        {
+          "id": "transit2",
+          "kind": "invoke",
+          "actorRef": "source",
+          "route": "api",
+          "capabilityId": "recordLegEvent",
+          "request": {
+            "intentKind": "RECORD",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "recordLegEvent",
+            "subjectRefs": [
+              {
+                "type": "TradeItem",
+                "id": {
+                  "$alias": "P"
+                }
+              }
+            ],
+            "slots": {
+              "purchaseId": {
+                "value": {
+                  "$alias": "PO-A"
+                },
+                "provenance": "CONTEXT"
+              },
+              "segmentId": {
+                "value": {
+                  "$result": {
+                    "actionId": "receive98",
+                    "pointer": "/response/remainder/segmentId"
+                  }
+                },
+                "provenance": "CONTEXT"
+              },
+              "eventKind": {
+                "value": "IN_TRANSIT_CONFIRMED",
+                "provenance": "USER"
+              },
+              "quantity": {
+                "value": "2",
+                "unit": "BOX",
+                "provenance": "CONTEXT"
+              },
+              "placeId": {
+                "value": {
+                  "$alias": "TRANSIT"
+                },
+                "provenance": "CONTEXT"
+              },
+              "evidence": {
+                "value": "custody",
+                "provenance": "USER"
+              }
+            },
+            "expectedRevision": 1,
+            "commandIdempotencyKey": "T14-discrepancy-transit2-transit2",
+            "evidenceRefs": [
+              "need"
+            ]
+          },
+          "evidenceRefs": [
+            "transit2:actual-adapter-artifact"
+          ]
+        },
+        {
+          "id": "view",
+          "kind": "query",
+          "actorRef": "warehouse",
+          "route": "api",
+          "capabilityId": "getInventory",
+          "request": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "caseId": "T14",
+              "subcaseId": "discrepancy-transit2",
+              "itemId": {
+                "$alias": "P"
+              }
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z"
+          },
+          "evidenceRefs": [
+            "view:actual-adapter-artifact"
+          ]
+        },
+        {
+          "id": "db",
+          "kind": "observe",
+          "observation": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "caseId": "T14",
+              "subcaseId": "discrepancy-transit2",
+              "itemId": {
+                "$alias": "P"
+              }
+            },
+            "snapshotRef": {
+              "$result": {
+                "actionId": "view",
+                "pointer": "/response/snapshotRevision"
+              }
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z",
+            "sources": [
+              "segments",
+              "claims",
+              "receipts",
+              "movements",
+              "obligations"
+            ]
+          },
+          "evidenceRefs": [
+            "db:actual-adapter-artifact"
+          ]
+        }
+      ],
+      "assertions": [
+        {
+          "id": "received-api98",
+          "op": "decimalEquals",
+          "source": {
+            "actionId": "view",
+            "pointer": "/response/data/receivedQuantity"
+          },
+          "expected": "98",
+          "requirementRefs": [
+            "D14"
+          ],
+          "evidenceRefs": [
+            "view:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "T14",
+            "subcaseId": "discrepancy-transit2",
+            "itemId": {
+              "$alias": "P"
+            }
+          },
+          "oracleExplanation": "고정 oracle received의 실제 값과 범위를 확인한다",
+          "oracleRef": {
+            "oracleId": "T14.arrival-discrepancy-not-loss",
+            "observationNames": [
+              "received"
+            ]
+          },
+          "unit": "BOX",
+          "unitSource": {
+            "actionId": "view",
+            "pointer": "/response/data/unit"
+          }
+        },
+        {
+          "id": "loss-api0",
+          "op": "decimalEquals",
+          "source": {
+            "actionId": "view",
+            "pointer": "/response/data/lossQuantity"
+          },
+          "expected": "0",
+          "requirementRefs": [
+            "D14"
+          ],
+          "evidenceRefs": [
+            "view:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "T14",
+            "subcaseId": "discrepancy-transit2",
+            "itemId": {
+              "$alias": "P"
+            }
+          },
+          "oracleExplanation": "고정 oracle automatic-loss의 실제 값과 범위를 확인한다",
+          "oracleRef": {
+            "oracleId": "T14.arrival-discrepancy-not-loss",
+            "observationNames": [
+              "automatic-loss"
+            ]
+          },
+          "unit": "BOX",
+          "unitSource": {
+            "actionId": "view",
+            "pointer": "/response/data/unit"
+          }
+        },
+        {
+          "id": "received98",
+          "op": "sumEquals",
+          "source": {
+            "actionId": "db",
+            "pointer": "/data/rawRows/segments",
+            "field": "quantity",
+            "where": {
+              "locationId": {
+                "$alias": "W"
+              }
+            }
+          },
+          "expected": "98",
+          "requirementRefs": [
+            "D14"
+          ],
+          "evidenceRefs": [
+            "db:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "T14",
+            "subcaseId": "discrepancy-transit2",
+            "itemId": {
+              "$alias": "P"
+            }
+          },
+          "oracleExplanation": "고정 oracle received의 실제 값과 범위를 확인한다",
+          "oracleRef": {
+            "oracleId": "T14.arrival-discrepancy-not-loss",
+            "observationNames": [
+              "received"
+            ]
+          },
+          "unit": "BOX",
+          "unitSource": {
+            "actionId": "db",
+            "pointer": "/data/rawRows/segments",
+            "field": "unit",
+            "where": {
+              "locationId": {
+                "$alias": "W"
+              }
+            }
+          }
+        },
+        {
+          "id": "receipt98",
+          "op": "relationSet",
+          "source": {
+            "actionId": "db",
+            "pointer": "/data/rawRows/receipts",
+            "field": [
+              "quantity",
+              "unit",
+              "occurrenceId"
+            ]
+          },
+          "expected": [
+            [
+              "98",
+              "BOX",
+              {
+                "$result": {
+                  "actionId": "receive98",
+                  "pointer": "/response/occurrenceId"
+                }
+              }
+            ]
+          ],
+          "requirementRefs": [
+            "D14"
+          ],
+          "evidenceRefs": [
+            "db:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "T14",
+            "subcaseId": "discrepancy-transit2",
+            "itemId": {
+              "$alias": "P"
+            }
+          },
+          "oracleExplanation": "고정 oracle received의 실제 값과 범위를 확인한다",
+          "oracleRef": {
+            "oracleId": "T14.arrival-discrepancy-not-loss",
+            "observationNames": [
+              "received"
+            ]
+          }
+        },
+        {
+          "id": "shipclaim100",
+          "op": "relationSet",
+          "source": {
+            "actionId": "db",
+            "pointer": "/data/rawRows/claims",
+            "field": [
+              "kind",
+              "quantity",
+              "unit"
+            ]
+          },
+          "expected": [
+            [
+              "SHIPPED_CLAIM",
+              "100",
+              "BOX"
+            ]
+          ],
+          "requirementRefs": [
+            "D14"
+          ],
+          "evidenceRefs": [
+            "db:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "T14",
+            "subcaseId": "discrepancy-transit2",
+            "itemId": {
+              "$alias": "P"
+            }
+          },
+          "oracleExplanation": "고정 oracle separate-observations의 실제 값과 범위를 확인한다",
+          "oracleRef": {
+            "oracleId": "T14.arrival-discrepancy-not-loss",
+            "observationNames": [
+              "separate-observations"
+            ]
+          }
+        },
+        {
+          "id": "no-loss-movement",
+          "op": "count",
+          "source": {
+            "actionId": "db",
+            "pointer": "/data/rawRows/movements",
+            "where": {
+              "kind": "LOSS"
+            }
+          },
+          "expected": 0,
+          "requirementRefs": [
+            "D14"
+          ],
+          "evidenceRefs": [
+            "db:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "T14",
+            "subcaseId": "discrepancy-transit2",
+            "itemId": {
+              "$alias": "P"
+            }
+          },
+          "oracleExplanation": "고정 oracle automatic-loss의 실제 값과 범위를 확인한다",
+          "oracleRef": {
+            "oracleId": "T14.arrival-discrepancy-not-loss",
+            "observationNames": [
+              "automatic-loss"
+            ]
+          }
+        },
+        {
+          "id": "loss-before-after",
+          "op": "sameAs",
+          "source": {
+            "actionId": "db",
+            "pointer": "/data/rawRows/movements",
+            "where": {
+              "kind": "LOSS"
+            }
+          },
+          "expected": true,
+          "requirementRefs": [
+            "D14"
+          ],
+          "evidenceRefs": [
+            "db:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "T14",
+            "subcaseId": "discrepancy-transit2",
+            "itemId": {
+              "$alias": "P"
+            }
+          },
+          "oracleExplanation": "고정 oracle automatic-loss의 실제 값과 범위를 확인한다",
+          "oracleRef": {
+            "oracleId": "T14.arrival-discrepancy-not-loss",
+            "observationNames": [
+              "automatic-loss"
+            ]
+          },
+          "baseline": {
+            "actionId": "before-db",
+            "pointer": "/data/rawRows/movements",
+            "where": {
+              "kind": "LOSS"
+            }
+          }
+        },
+        {
+          "id": "physical-total100",
+          "op": "sumEquals",
+          "source": {
+            "actionId": "db",
+            "pointer": "/data/rawRows/segments",
+            "field": "quantity"
+          },
+          "expected": "100",
+          "requirementRefs": [
+            "D14"
+          ],
+          "evidenceRefs": [
+            "db:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "T14",
+            "subcaseId": "discrepancy-transit2",
+            "itemId": {
+              "$alias": "P"
+            }
+          },
+          "oracleExplanation": "고정 oracle separate-observations의 실제 값과 범위를 확인한다",
+          "oracleRef": {
+            "oracleId": "T14.arrival-discrepancy-not-loss",
+            "observationNames": [
+              "separate-observations"
+            ]
+          },
+          "unit": "BOX",
+          "unitSource": {
+            "actionId": "db",
+            "pointer": "/data/rawRows/segments",
+            "field": "unit"
+          }
+        },
+        {
+          "id": "transit-api2",
+          "op": "decimalEquals",
+          "source": {
+            "actionId": "view",
+            "pointer": "/response/data/transitQuantity"
+          },
+          "expected": "2",
+          "requirementRefs": [
+            "D14"
+          ],
+          "evidenceRefs": [
+            "view:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "T14",
+            "subcaseId": "discrepancy-transit2",
+            "itemId": {
+              "$alias": "P"
+            }
+          },
+          "oracleExplanation": "고정 oracle transit의 실제 값과 범위를 확인한다",
+          "oracleRef": {
+            "oracleId": "T14.arrival-discrepancy-not-loss",
+            "observationNames": [
+              "transit"
+            ]
+          },
+          "unit": "BOX",
+          "unitSource": {
+            "actionId": "view",
+            "pointer": "/response/data/unit"
+          }
+        },
+        {
+          "id": "transit2",
+          "op": "sumEquals",
+          "source": {
+            "actionId": "db",
+            "pointer": "/data/rawRows/segments",
+            "field": "quantity",
+            "where": {
+              "locationId": {
+                "$alias": "TRANSIT"
+              }
+            }
+          },
+          "expected": "2",
+          "requirementRefs": [
+            "D14"
+          ],
+          "evidenceRefs": [
+            "db:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "T14",
+            "subcaseId": "discrepancy-transit2",
+            "itemId": {
+              "$alias": "P"
+            }
+          },
+          "oracleExplanation": "고정 oracle transit의 실제 값과 범위를 확인한다",
+          "oracleRef": {
+            "oracleId": "T14.arrival-discrepancy-not-loss",
+            "observationNames": [
+              "transit"
+            ]
+          },
+          "unit": "BOX",
+          "unitSource": {
+            "actionId": "db",
+            "pointer": "/data/rawRows/segments",
+            "field": "unit",
+            "where": {
+              "locationId": {
+                "$alias": "TRANSIT"
+              }
+            }
+          }
+        },
+        {
+          "id": "discrepancy-owner-one",
+          "op": "count",
+          "source": {
+            "actionId": "db",
+            "pointer": "/data/rawRows/obligations",
+            "where": {
+              "status": "OPEN",
+              "kind": "TRANSPORT_DISCREPANCY"
+            }
+          },
+          "expected": 1,
+          "requirementRefs": [
+            "D14"
+          ],
+          "evidenceRefs": [
+            "db:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "T14",
+            "subcaseId": "discrepancy-transit2",
+            "itemId": {
+              "$alias": "P"
+            }
+          },
+          "oracleExplanation": "고정 oracle discrepancy-responsibility의 실제 값과 범위를 확인한다",
+          "oracleRef": {
+            "oracleId": "T14.arrival-discrepancy-not-loss",
+            "observationNames": [
+              "discrepancy-responsibility"
+            ]
+          }
+        },
+        {
+          "id": "discrepancy-owner-owner",
+          "op": "relationSet",
+          "source": {
+            "actionId": "db",
+            "pointer": "/data/rawRows/obligations",
+            "field": [
+              "status",
+              "ownerId",
+              "nextAction",
+              "nextCheckAt"
+            ],
+            "where": {
+              "status": "OPEN",
+              "kind": "TRANSPORT_DISCREPANCY"
+            }
+          },
+          "expected": [
+            [
+              "OPEN",
+              {
+                "$alias": "intake"
+              },
+              "원천 물량과 근거를 대조한다",
+              "2026-10-07T10:00:00Z"
+            ]
+          ],
+          "requirementRefs": [
+            "D14"
+          ],
+          "evidenceRefs": [
+            "db:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "T14",
+            "subcaseId": "discrepancy-transit2",
+            "itemId": {
+              "$alias": "P"
+            }
+          },
+          "oracleExplanation": "고정 oracle discrepancy-responsibility의 실제 값과 범위를 확인한다",
+          "oracleRef": {
+            "oracleId": "T14.arrival-discrepancy-not-loss",
+            "observationNames": [
+              "discrepancy-responsibility"
+            ]
+          }
+        }
+      ],
+      "oracleExplanation": "가상 입력 fixture에서 모든 명령을 실제 서버에 전달하고 원행·단위·증거·인간 책임을 독립 대조한다. 미구현은 NOT_RUN이며 표본 검사는 제품 PASS가 아니다."
+    },
+    {
+      "id": "discrepancy-unobserved2",
+      "title": "출하100 수령98의 나머지2는 미확인이다",
+      "fixtureRef": "verification/cases/T14/fixtures/discrepancy-unobserved2.json",
+      "requiredAdapters": [
+        "api",
+        "independent-db-observer"
+      ],
+      "actions": [
+        {
+          "id": "setup",
+          "kind": "installFixture",
+          "fixtureRef": "verification/cases/T14/fixtures/discrepancy-unobserved2.json",
+          "evidenceRefs": [
+            "setup:actual-adapter-artifact"
+          ]
+        },
+        {
+          "id": "before",
+          "kind": "query",
+          "actorRef": "warehouse",
+          "route": "api",
+          "capabilityId": "getInventory",
+          "request": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "caseId": "T14",
+              "subcaseId": "discrepancy-unobserved2",
+              "itemId": {
+                "$alias": "P"
+              }
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z"
+          },
+          "evidenceRefs": [
+            "before:actual-adapter-artifact"
+          ]
+        },
+        {
+          "id": "before-db",
+          "kind": "observe",
+          "observation": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "caseId": "T14",
+              "subcaseId": "discrepancy-unobserved2",
+              "itemId": {
+                "$alias": "P"
+              }
+            },
+            "snapshotRef": {
+              "$result": {
+                "actionId": "before",
+                "pointer": "/response/snapshotRevision"
+              }
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z",
+            "sources": [
+              "movements",
+              "segments"
+            ]
+          },
+          "evidenceRefs": [
+            "before-db:actual-adapter-artifact"
+          ]
+        },
+        {
+          "id": "shipped",
+          "kind": "invoke",
+          "actorRef": "source",
+          "route": "api",
+          "capabilityId": "recordLegEvent",
+          "request": {
+            "intentKind": "RECORD",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "recordLegEvent",
+            "subjectRefs": [
+              {
+                "type": "TradeItem",
+                "id": {
+                  "$alias": "P"
+                }
+              }
+            ],
+            "slots": {
+              "purchaseId": {
+                "value": {
+                  "$alias": "PO-A"
+                },
+                "provenance": "CONTEXT"
+              },
+              "segmentId": {
+                "value": {
+                  "$alias": "Q100"
+                },
+                "provenance": "CONTEXT"
+              },
+              "eventKind": {
+                "value": "SHIPPED_CLAIM",
+                "provenance": "USER"
+              },
+              "quantity": {
+                "value": "100",
+                "unit": "BOX",
+                "provenance": "CONTEXT"
+              },
+              "placeId": {
+                "value": {
+                  "$alias": "IT-origin"
+                },
+                "provenance": "CONTEXT"
+              },
+              "evidence": {
+                "value": "supplier-ship",
+                "provenance": "USER"
+              }
+            },
+            "expectedRevision": 1,
+            "commandIdempotencyKey": "T14-discrepancy-unobserved2-shipped",
+            "evidenceRefs": [
+              "need"
+            ]
+          },
+          "evidenceRefs": [
+            "shipped:actual-adapter-artifact"
+          ]
+        },
+        {
+          "id": "receive98",
+          "kind": "invoke",
+          "actorRef": "warehouse",
+          "route": "api",
+          "capabilityId": "confirmReceipt",
+          "request": {
+            "intentKind": "COMMAND",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "confirmReceipt",
+            "subjectRefs": [
+              {
+                "type": "TradeItem",
+                "id": {
+                  "$alias": "P"
+                }
+              }
+            ],
+            "slots": {
+              "purchaseId": {
+                "value": {
+                  "$alias": "PO-A"
+                },
+                "provenance": "CONTEXT"
+              },
+              "existingSegmentId": {
+                "value": {
+                  "$alias": "Q100"
+                },
+                "provenance": "CONTEXT"
+              },
+              "itemId": {
+                "value": {
+                  "$alias": "P"
+                },
+                "provenance": "CONTEXT"
+              },
+              "lotId": {
+                "value": {
+                  "$alias": "L"
+                },
+                "provenance": "CONTEXT"
+              },
+              "quantity": {
+                "value": "98",
+                "unit": "BOX",
+                "provenance": "CONTEXT"
+              },
+              "placeId": {
+                "value": {
+                  "$alias": "W"
+                },
+                "provenance": "CONTEXT"
+              },
+              "physicalScope": {
+                "value": "Q100-received98",
+                "provenance": "USER"
+              },
+              "sourceEventId": {
+                "value": "RECEIVE98",
+                "provenance": "USER"
+              },
+              "evidence": {
+                "value": "warehouse-receipt",
+                "provenance": "USER"
+              }
+            },
+            "expectedRevision": 1,
+            "commandIdempotencyKey": "T14-discrepancy-unobserved2-receive98",
+            "evidenceRefs": [
+              "need"
+            ]
+          },
+          "evidenceRefs": [
+            "receive98:actual-adapter-artifact"
+          ]
+        },
+        {
+          "id": "view",
+          "kind": "query",
+          "actorRef": "warehouse",
+          "route": "api",
+          "capabilityId": "getInventory",
+          "request": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "caseId": "T14",
+              "subcaseId": "discrepancy-unobserved2",
+              "itemId": {
+                "$alias": "P"
+              }
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z"
+          },
+          "evidenceRefs": [
+            "view:actual-adapter-artifact"
+          ]
+        },
+        {
+          "id": "db",
+          "kind": "observe",
+          "observation": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "caseId": "T14",
+              "subcaseId": "discrepancy-unobserved2",
+              "itemId": {
+                "$alias": "P"
+              }
+            },
+            "snapshotRef": {
+              "$result": {
+                "actionId": "view",
+                "pointer": "/response/snapshotRevision"
+              }
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z",
+            "sources": [
+              "segments",
+              "claims",
+              "receipts",
+              "movements",
+              "obligations"
+            ]
+          },
+          "evidenceRefs": [
+            "db:actual-adapter-artifact"
+          ]
+        }
+      ],
+      "assertions": [
+        {
+          "id": "received-api98",
+          "op": "decimalEquals",
+          "source": {
+            "actionId": "view",
+            "pointer": "/response/data/receivedQuantity"
+          },
+          "expected": "98",
+          "requirementRefs": [
+            "D14"
+          ],
+          "evidenceRefs": [
+            "view:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "T14",
+            "subcaseId": "discrepancy-unobserved2",
+            "itemId": {
+              "$alias": "P"
+            }
+          },
+          "oracleExplanation": "고정 oracle received의 실제 값과 범위를 확인한다",
+          "oracleRef": {
+            "oracleId": "T14.arrival-discrepancy-not-loss",
+            "observationNames": [
+              "received"
+            ]
+          },
+          "unit": "BOX",
+          "unitSource": {
+            "actionId": "view",
+            "pointer": "/response/data/unit"
+          }
+        },
+        {
+          "id": "loss-api0",
+          "op": "decimalEquals",
+          "source": {
+            "actionId": "view",
+            "pointer": "/response/data/lossQuantity"
+          },
+          "expected": "0",
+          "requirementRefs": [
+            "D14"
+          ],
+          "evidenceRefs": [
+            "view:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "T14",
+            "subcaseId": "discrepancy-unobserved2",
+            "itemId": {
+              "$alias": "P"
+            }
+          },
+          "oracleExplanation": "고정 oracle automatic-loss의 실제 값과 범위를 확인한다",
+          "oracleRef": {
+            "oracleId": "T14.arrival-discrepancy-not-loss",
+            "observationNames": [
+              "automatic-loss"
+            ]
+          },
+          "unit": "BOX",
+          "unitSource": {
+            "actionId": "view",
+            "pointer": "/response/data/unit"
+          }
+        },
+        {
+          "id": "received98",
+          "op": "sumEquals",
+          "source": {
+            "actionId": "db",
+            "pointer": "/data/rawRows/segments",
+            "field": "quantity",
+            "where": {
+              "locationId": {
+                "$alias": "W"
+              }
+            }
+          },
+          "expected": "98",
+          "requirementRefs": [
+            "D14"
+          ],
+          "evidenceRefs": [
+            "db:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "T14",
+            "subcaseId": "discrepancy-unobserved2",
+            "itemId": {
+              "$alias": "P"
+            }
+          },
+          "oracleExplanation": "고정 oracle received의 실제 값과 범위를 확인한다",
+          "oracleRef": {
+            "oracleId": "T14.arrival-discrepancy-not-loss",
+            "observationNames": [
+              "received"
+            ]
+          },
+          "unit": "BOX",
+          "unitSource": {
+            "actionId": "db",
+            "pointer": "/data/rawRows/segments",
+            "field": "unit",
+            "where": {
+              "locationId": {
+                "$alias": "W"
+              }
+            }
+          }
+        },
+        {
+          "id": "receipt98",
+          "op": "relationSet",
+          "source": {
+            "actionId": "db",
+            "pointer": "/data/rawRows/receipts",
+            "field": [
+              "quantity",
+              "unit",
+              "occurrenceId"
+            ]
+          },
+          "expected": [
+            [
+              "98",
+              "BOX",
+              {
+                "$result": {
+                  "actionId": "receive98",
+                  "pointer": "/response/occurrenceId"
+                }
+              }
+            ]
+          ],
+          "requirementRefs": [
+            "D14"
+          ],
+          "evidenceRefs": [
+            "db:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "T14",
+            "subcaseId": "discrepancy-unobserved2",
+            "itemId": {
+              "$alias": "P"
+            }
+          },
+          "oracleExplanation": "고정 oracle received의 실제 값과 범위를 확인한다",
+          "oracleRef": {
+            "oracleId": "T14.arrival-discrepancy-not-loss",
+            "observationNames": [
+              "received"
+            ]
+          }
+        },
+        {
+          "id": "shipclaim100",
+          "op": "relationSet",
+          "source": {
+            "actionId": "db",
+            "pointer": "/data/rawRows/claims",
+            "field": [
+              "kind",
+              "quantity",
+              "unit"
+            ]
+          },
+          "expected": [
+            [
+              "SHIPPED_CLAIM",
+              "100",
+              "BOX"
+            ]
+          ],
+          "requirementRefs": [
+            "D14"
+          ],
+          "evidenceRefs": [
+            "db:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "T14",
+            "subcaseId": "discrepancy-unobserved2",
+            "itemId": {
+              "$alias": "P"
+            }
+          },
+          "oracleExplanation": "고정 oracle separate-observations의 실제 값과 범위를 확인한다",
+          "oracleRef": {
+            "oracleId": "T14.arrival-discrepancy-not-loss",
+            "observationNames": [
+              "separate-observations"
+            ]
+          }
+        },
+        {
+          "id": "no-loss-movement",
+          "op": "count",
+          "source": {
+            "actionId": "db",
+            "pointer": "/data/rawRows/movements",
+            "where": {
+              "kind": "LOSS"
+            }
+          },
+          "expected": 0,
+          "requirementRefs": [
+            "D14"
+          ],
+          "evidenceRefs": [
+            "db:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "T14",
+            "subcaseId": "discrepancy-unobserved2",
+            "itemId": {
+              "$alias": "P"
+            }
+          },
+          "oracleExplanation": "고정 oracle automatic-loss의 실제 값과 범위를 확인한다",
+          "oracleRef": {
+            "oracleId": "T14.arrival-discrepancy-not-loss",
+            "observationNames": [
+              "automatic-loss"
+            ]
+          }
+        },
+        {
+          "id": "loss-before-after",
+          "op": "sameAs",
+          "source": {
+            "actionId": "db",
+            "pointer": "/data/rawRows/movements",
+            "where": {
+              "kind": "LOSS"
+            }
+          },
+          "expected": true,
+          "requirementRefs": [
+            "D14"
+          ],
+          "evidenceRefs": [
+            "db:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "T14",
+            "subcaseId": "discrepancy-unobserved2",
+            "itemId": {
+              "$alias": "P"
+            }
+          },
+          "oracleExplanation": "고정 oracle automatic-loss의 실제 값과 범위를 확인한다",
+          "oracleRef": {
+            "oracleId": "T14.arrival-discrepancy-not-loss",
+            "observationNames": [
+              "automatic-loss"
+            ]
+          },
+          "baseline": {
+            "actionId": "before-db",
+            "pointer": "/data/rawRows/movements",
+            "where": {
+              "kind": "LOSS"
+            }
+          }
+        },
+        {
+          "id": "physical-total100",
+          "op": "sumEquals",
+          "source": {
+            "actionId": "db",
+            "pointer": "/data/rawRows/segments",
+            "field": "quantity"
+          },
+          "expected": "100",
+          "requirementRefs": [
+            "D14"
+          ],
+          "evidenceRefs": [
+            "db:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "T14",
+            "subcaseId": "discrepancy-unobserved2",
+            "itemId": {
+              "$alias": "P"
+            }
+          },
+          "oracleExplanation": "고정 oracle separate-observations의 실제 값과 범위를 확인한다",
+          "oracleRef": {
+            "oracleId": "T14.arrival-discrepancy-not-loss",
+            "observationNames": [
+              "separate-observations"
+            ]
+          },
+          "unit": "BOX",
+          "unitSource": {
+            "actionId": "db",
+            "pointer": "/data/rawRows/segments",
+            "field": "unit"
+          }
+        },
+        {
+          "id": "unobserved-is-unknown",
+          "op": "equals",
+          "source": {
+            "actionId": "view",
+            "pointer": "/response/data/unobservedRemainder/status"
+          },
+          "expected": "UNKNOWN",
+          "requirementRefs": [
+            "D14"
+          ],
+          "evidenceRefs": [
+            "view:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "T14",
+            "subcaseId": "discrepancy-unobserved2",
+            "itemId": {
+              "$alias": "P"
+            }
+          },
+          "oracleExplanation": "고정 oracle separate-observations의 실제 값과 범위를 확인한다",
+          "oracleRef": {
+            "oracleId": "T14.arrival-discrepancy-not-loss",
+            "observationNames": [
+              "separate-observations"
+            ]
+          }
+        },
+        {
+          "id": "unobserved-not-zero",
+          "op": "equals",
+          "source": {
+            "actionId": "view",
+            "pointer": "/response/data/unobservedRemainder/quantityState"
+          },
+          "expected": "UNKNOWN",
+          "requirementRefs": [
+            "D14"
+          ],
+          "evidenceRefs": [
+            "view:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "T14",
+            "subcaseId": "discrepancy-unobserved2",
+            "itemId": {
+              "$alias": "P"
+            }
+          },
+          "oracleExplanation": "고정 oracle separate-observations의 실제 값과 범위를 확인한다",
+          "oracleRef": {
+            "oracleId": "T14.arrival-discrepancy-not-loss",
+            "observationNames": [
+              "separate-observations"
+            ]
+          }
+        },
+        {
+          "id": "discrepancy-owner-one",
+          "op": "count",
+          "source": {
+            "actionId": "db",
+            "pointer": "/data/rawRows/obligations",
+            "where": {
+              "status": "OPEN",
+              "kind": "TRANSPORT_DISCREPANCY"
+            }
+          },
+          "expected": 1,
+          "requirementRefs": [
+            "D14"
+          ],
+          "evidenceRefs": [
+            "db:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "T14",
+            "subcaseId": "discrepancy-unobserved2",
+            "itemId": {
+              "$alias": "P"
+            }
+          },
+          "oracleExplanation": "고정 oracle discrepancy-responsibility의 실제 값과 범위를 확인한다",
+          "oracleRef": {
+            "oracleId": "T14.arrival-discrepancy-not-loss",
+            "observationNames": [
+              "discrepancy-responsibility"
+            ]
+          }
+        },
+        {
+          "id": "discrepancy-owner-owner",
+          "op": "relationSet",
+          "source": {
+            "actionId": "db",
+            "pointer": "/data/rawRows/obligations",
+            "field": [
+              "status",
+              "ownerId",
+              "nextAction",
+              "nextCheckAt"
+            ],
+            "where": {
+              "status": "OPEN",
+              "kind": "TRANSPORT_DISCREPANCY"
+            }
+          },
+          "expected": [
+            [
+              "OPEN",
+              {
+                "$alias": "intake"
+              },
+              "원천 물량과 근거를 대조한다",
+              "2026-10-07T10:00:00Z"
+            ]
+          ],
+          "requirementRefs": [
+            "D14"
+          ],
+          "evidenceRefs": [
+            "db:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "T14",
+            "subcaseId": "discrepancy-unobserved2",
+            "itemId": {
+              "$alias": "P"
+            }
+          },
+          "oracleExplanation": "고정 oracle discrepancy-responsibility의 실제 값과 범위를 확인한다",
+          "oracleRef": {
+            "oracleId": "T14.arrival-discrepancy-not-loss",
+            "observationNames": [
+              "discrepancy-responsibility"
+            ]
+          }
+        }
+      ],
+      "oracleExplanation": "가상 입력 fixture에서 모든 명령을 실제 서버에 전달하고 원행·단위·증거·인간 책임을 독립 대조한다. 미구현은 NOT_RUN이며 표본 검사는 제품 PASS가 아니다."
+    },
+    {
+      "id": "orphan-temperature",
+      "title": "종료된 부모의 온도 이상은 연결 실패와 알림 뒤에도 접수 책임을 유지한다",
+      "fixtureRef": "verification/cases/T14/fixtures/orphan-temperature.json",
+      "requiredAdapters": [
+        "api",
+        "independent-db-observer",
+        "process-control"
+      ],
+      "actions": [
+        {
+          "id": "setup",
+          "kind": "installFixture",
+          "fixtureRef": "verification/cases/T14/fixtures/orphan-temperature.json",
+          "evidenceRefs": [
+            "setup:actual-adapter-artifact"
+          ]
+        },
+        {
+          "id": "link-failure",
+          "kind": "control",
+          "control": {
+            "type": "fault",
+            "operation": "enable",
+            "parameters": {
+              "faultId": "followup-link",
+              "point": "work-link-before-commit",
+              "failures": 2,
+              "scope": {
+                "organizationId": {
+                  "$alias": "ORG"
+                },
+                "caseId": "T14",
+                "subcaseId": "orphan-temperature"
+              }
+            }
+          },
+          "evidenceRefs": [
+            "link-failure:actual-adapter-artifact"
+          ]
+        },
+        {
+          "id": "temperature",
+          "kind": "invoke",
+          "actorRef": "source",
+          "route": "api",
+          "capabilityId": "recordActivity",
+          "request": {
+            "intentKind": "RECORD",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "recordActivity",
+            "subjectRefs": [
+              {
+                "type": "TradeItem",
+                "id": {
+                  "$alias": "P"
+                }
+              }
+            ],
+            "slots": {
+              "parentWorkId": {
+                "value": {
+                  "$alias": "OLD-WORK"
+                },
+                "provenance": "CONTEXT"
+              },
+              "segmentId": {
+                "value": {
+                  "$alias": "B40"
+                },
+                "provenance": "CONTEXT"
+              },
+              "kind": {
+                "value": "TEMPERATURE_ABNORMAL",
+                "provenance": "USER"
+              },
+              "value": {
+                "value": "35",
+                "provenance": "USER"
+              },
+              "unit": {
+                "value": "CELSIUS",
+                "provenance": "USER"
+              },
+              "evidence": {
+                "value": "temperature",
+                "provenance": "USER"
+              }
+            },
+            "expectedRevision": 1,
+            "commandIdempotencyKey": "T14-orphan-temperature-temperature",
+            "evidenceRefs": [
+              "need"
+            ]
+          },
+          "evidenceRefs": [
+            "temperature:actual-adapter-artifact"
+          ]
+        },
+        {
+          "id": "followup",
+          "kind": "invoke",
+          "actorRef": "intake",
+          "route": "api",
+          "capabilityId": "createFollowup",
+          "request": {
+            "intentKind": "COMMAND",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "createFollowup",
+            "subjectRefs": [
+              {
+                "type": "TradeItem",
+                "id": {
+                  "$alias": "P"
+                }
+              }
+            ],
+            "slots": {
+              "sourceActivityId": {
+                "value": {
+                  "$result": {
+                    "actionId": "temperature",
+                    "pointer": "/response/activityId"
+                  }
+                },
+                "provenance": "CONTEXT"
+              },
+              "parentWorkId": {
+                "value": {
+                  "$alias": "OLD-WORK"
+                },
+                "provenance": "CONTEXT"
+              },
+              "ownerId": {
+                "value": {
+                  "$alias": "intake"
+                },
+                "provenance": "CONTEXT"
+              },
+              "nextAction": {
+                "value": "원천 물량과 근거를 대조한다",
+                "provenance": "USER"
+              },
+              "nextCheckAt": {
+                "value": "2026-10-07T10:00:00Z",
+                "provenance": "USER"
+              }
+            },
+            "expectedRevision": 1,
+            "commandIdempotencyKey": "T14-orphan-temperature-followup",
+            "evidenceRefs": [
+              "need"
+            ]
+          },
+          "evidenceRefs": [
+            "followup:actual-adapter-artifact"
+          ]
+        },
+        {
+          "id": "before-notify",
+          "kind": "query",
+          "actorRef": "intake",
+          "route": "api",
+          "capabilityId": "getInbox",
+          "request": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "caseId": "T14",
+              "subcaseId": "orphan-temperature",
+              "itemId": {
+                "$alias": "P"
+              }
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z"
+          },
+          "evidenceRefs": [
+            "before-notify:actual-adapter-artifact"
+          ]
+        },
+        {
+          "id": "before-notify-db",
+          "kind": "observe",
+          "observation": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "caseId": "T14",
+              "subcaseId": "orphan-temperature",
+              "itemId": {
+                "$alias": "P"
+              }
+            },
+            "snapshotRef": {
+              "$result": {
+                "actionId": "before-notify",
+                "pointer": "/response/snapshotRevision"
+              }
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z",
+            "sources": [
+              "inbox",
+              "obligations",
+              "workLinks"
+            ]
+          },
+          "evidenceRefs": [
+            "before-notify-db:actual-adapter-artifact"
+          ]
+        },
+        {
+          "id": "notification-response",
+          "kind": "control",
+          "control": {
+            "type": "externalResponder",
+            "operation": "setResponse",
+            "parameters": {
+              "channel": "synthetic-notification",
+              "operationId": {
+                "$result": {
+                  "actionId": "temperature",
+                  "pointer": "/response/activityId"
+                }
+              },
+              "response": {
+                "status": "DELIVERED"
+              }
+            }
+          },
+          "evidenceRefs": [
+            "notification-response:actual-adapter-artifact"
+          ]
+        },
+        {
+          "id": "notification-tick",
+          "kind": "control",
+          "control": {
+            "type": "process",
+            "operation": "tickScheduler",
+            "parameters": {
+              "schedulerId": "notification-scheduler",
+              "tickId": "T14-notification-tick",
+              "clock": "2026-10-07T09:00:00Z",
+              "scope": {
+                "organizationId": {
+                  "$alias": "ORG"
+                },
+                "caseId": "T14",
+                "subcaseId": "orphan-temperature"
+              }
+            }
+          },
+          "evidenceRefs": [
+            "notification-tick:actual-adapter-artifact"
+          ]
+        },
+        {
+          "id": "notification-terminal",
+          "kind": "control",
+          "control": {
+            "type": "process",
+            "operation": "awaitRuntimeTask",
+            "parameters": {
+              "schedulerId": "notification-scheduler",
+              "taskId": {
+                "$result": {
+                  "actionId": "notification-tick",
+                  "pointer": "/data/hostObservation/rawRows/tasks/0/taskId"
+                }
+              },
+              "scope": {
+                "organizationId": {
+                  "$alias": "ORG"
+                },
+                "caseId": "T14",
+                "subcaseId": "orphan-temperature"
+              }
+            }
+          },
+          "evidenceRefs": [
+            "notification-terminal:actual-adapter-artifact"
+          ]
+        },
+        {
+          "id": "after-notify",
+          "kind": "query",
+          "actorRef": "intake",
+          "route": "api",
+          "capabilityId": "getInbox",
+          "request": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "caseId": "T14",
+              "subcaseId": "orphan-temperature",
+              "itemId": {
+                "$alias": "P"
+              }
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z"
+          },
+          "evidenceRefs": [
+            "after-notify:actual-adapter-artifact"
+          ]
+        },
+        {
+          "id": "after-notify-db",
+          "kind": "observe",
+          "observation": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "caseId": "T14",
+              "subcaseId": "orphan-temperature",
+              "itemId": {
+                "$alias": "P"
+              }
+            },
+            "snapshotRef": {
+              "$result": {
+                "actionId": "after-notify",
+                "pointer": "/response/snapshotRevision"
+              }
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z",
+            "sources": [
+              "inbox",
+              "obligations",
+              "workLinks",
+              "notifications"
+            ]
+          },
+          "evidenceRefs": [
+            "after-notify-db:actual-adapter-artifact"
+          ]
+        }
+      ],
+      "assertions": [
+        {
+          "id": "intake-human-one",
+          "op": "count",
+          "source": {
+            "actionId": "after-notify-db",
+            "pointer": "/data/rawRows/inbox",
+            "where": {
+              "status": "OPEN"
+            }
+          },
+          "expected": 1,
+          "requirementRefs": [
+            "D14"
+          ],
+          "evidenceRefs": [
+            "after-notify-db:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "T14",
+            "subcaseId": "orphan-temperature",
+            "itemId": {
+              "$alias": "P"
+            }
+          },
+          "oracleExplanation": "고정 oracle orphan-intake의 실제 값과 범위를 확인한다",
+          "oracleRef": {
+            "oracleId": "T14.orphan-temperature-intake",
+            "observationNames": [
+              "orphan-intake"
+            ]
+          }
+        },
+        {
+          "id": "intake-human-owner",
+          "op": "relationSet",
+          "source": {
+            "actionId": "after-notify-db",
+            "pointer": "/data/rawRows/inbox",
+            "field": [
+              "status",
+              "ownerId",
+              "nextAction",
+              "nextCheckAt"
+            ],
+            "where": {
+              "status": "OPEN"
+            }
+          },
+          "expected": [
+            [
+              "OPEN",
+              {
+                "$alias": "intake"
+              },
+              "원천 물량과 근거를 대조한다",
+              "2026-10-07T10:00:00Z"
+            ]
+          ],
+          "requirementRefs": [
+            "D14"
+          ],
+          "evidenceRefs": [
+            "after-notify-db:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "T14",
+            "subcaseId": "orphan-temperature",
+            "itemId": {
+              "$alias": "P"
+            }
+          },
+          "oracleExplanation": "고정 oracle orphan-intake의 실제 값과 범위를 확인한다",
+          "oracleRef": {
+            "oracleId": "T14.orphan-temperature-intake",
+            "observationNames": [
+              "orphan-intake"
+            ]
+          }
+        },
+        {
+          "id": "no-notification-resolution",
+          "op": "sameAs",
+          "source": {
+            "actionId": "after-notify-db",
+            "pointer": "/data/rawRows/obligations"
+          },
+          "expected": true,
+          "requirementRefs": [
+            "D14"
+          ],
+          "evidenceRefs": [
+            "after-notify-db:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "T14",
+            "subcaseId": "orphan-temperature",
+            "itemId": {
+              "$alias": "P"
+            }
+          },
+          "oracleExplanation": "실제 전후 원행이 같아 금지 효과가 없다",
+          "oracleRef": {
+            "oracleId": "T14.orphan-temperature-intake",
+            "observationNames": [
+              "notification-closes-intake"
+            ]
+          },
+          "baseline": {
+            "actionId": "before-notify-db",
+            "pointer": "/data/rawRows/obligations"
+          }
+        },
+        {
+          "id": "links-still0",
+          "op": "count",
+          "source": {
+            "actionId": "after-notify-db",
+            "pointer": "/data/rawRows/workLinks"
+          },
+          "expected": 0,
+          "requirementRefs": [
+            "D14"
+          ],
+          "evidenceRefs": [
+            "after-notify-db:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "T14",
+            "subcaseId": "orphan-temperature",
+            "itemId": {
+              "$alias": "P"
+            }
+          },
+          "oracleExplanation": "고정 oracle notification-closes-intake의 실제 값과 범위를 확인한다",
+          "oracleRef": {
+            "oracleId": "T14.orphan-temperature-intake",
+            "observationNames": [
+              "notification-closes-intake"
+            ]
+          }
+        },
+        {
+          "id": "notification-delivered",
+          "op": "relationSet",
+          "source": {
+            "actionId": "after-notify-db",
+            "pointer": "/data/rawRows/notifications",
+            "field": [
+              "status"
+            ]
+          },
+          "expected": [
+            [
+              "DELIVERED"
+            ]
+          ],
+          "requirementRefs": [
+            "D14"
+          ],
+          "evidenceRefs": [
+            "after-notify-db:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "T14",
+            "subcaseId": "orphan-temperature",
+            "itemId": {
+              "$alias": "P"
+            }
+          },
+          "oracleExplanation": "고정 oracle notification-closes-intake의 실제 값과 범위를 확인한다",
+          "oracleRef": {
+            "oracleId": "T14.orphan-temperature-intake",
+            "observationNames": [
+              "notification-closes-intake"
+            ]
+          }
+        }
+      ],
+      "oracleExplanation": "가상 입력 fixture에서 모든 명령을 실제 서버에 전달하고 원행·단위·증거·인간 책임을 독립 대조한다. 미구현은 NOT_RUN이며 표본 검사는 제품 PASS가 아니다."
+    }
+  ]
+}

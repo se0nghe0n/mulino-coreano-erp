@@ -1,0 +1,3996 @@
+{
+  "schemaVersion": "1.0.0",
+  "caseId": "T15",
+  "title": "기관 제출 부분 허용과 내부 QC를 구별한다",
+  "requirementRefs": [
+    "D15"
+  ],
+  "profiles": [
+    "contracts",
+    "scenarios"
+  ],
+  "subcases": [
+    {
+      "id": "agency30-qc100",
+      "title": "기관30 내부QC100의 교집합은 판매30이다",
+      "fixtureRef": "verification/cases/T15/fixtures/agency30-qc100.json",
+      "requiredAdapters": [
+        "api",
+        "independent-db-observer"
+      ],
+      "actions": [
+        {
+          "id": "setup",
+          "kind": "installFixture",
+          "fixtureRef": "verification/cases/T15/fixtures/agency30-qc100.json",
+          "evidenceRefs": [
+            "setup:actual-adapter-artifact"
+          ]
+        },
+        {
+          "id": "split",
+          "kind": "invoke",
+          "actorRef": "warehouse",
+          "route": "api",
+          "capabilityId": "splitQuantity",
+          "request": {
+            "intentKind": "COMMAND",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "splitQuantity",
+            "subjectRefs": [
+              {
+                "type": "TradeItem",
+                "id": {
+                  "$alias": "P"
+                }
+              }
+            ],
+            "slots": {
+              "segmentId": {
+                "value": {
+                  "$alias": "Q100"
+                },
+                "provenance": "CONTEXT"
+              },
+              "children": {
+                "value": [
+                  {
+                    "alias": "ALLOW30",
+                    "quantity": "30",
+                    "unit": "BOX"
+                  },
+                  {
+                    "alias": "UNKNOWN70",
+                    "quantity": "70",
+                    "unit": "BOX"
+                  }
+                ],
+                "provenance": "USER"
+              }
+            },
+            "expectedRevision": 1,
+            "commandIdempotencyKey": "T15-agency30-qc100-split",
+            "evidenceRefs": [
+              "need"
+            ]
+          },
+          "evidenceRefs": [
+            "split:actual-adapter-artifact"
+          ]
+        },
+        {
+          "id": "procedure",
+          "kind": "invoke",
+          "actorRef": "regulator",
+          "route": "api",
+          "capabilityId": "prepareRegulatoryProcedure",
+          "request": {
+            "intentKind": "COMMAND",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "prepareRegulatoryProcedure",
+            "subjectRefs": [
+              {
+                "type": "TradeItem",
+                "id": {
+                  "$alias": "P"
+                }
+              }
+            ],
+            "slots": {
+              "itemId": {
+                "value": {
+                  "$alias": "P"
+                },
+                "provenance": "CONTEXT"
+              },
+              "lotId": {
+                "value": {
+                  "$alias": "L"
+                },
+                "provenance": "CONTEXT"
+              },
+              "segmentIds": {
+                "value": [
+                  {
+                    "$result": {
+                      "actionId": "split",
+                      "pointer": "/response/children/ALLOW30/segmentId"
+                    }
+                  },
+                  {
+                    "$result": {
+                      "actionId": "split",
+                      "pointer": "/response/children/UNKNOWN70/segmentId"
+                    }
+                  }
+                ],
+                "provenance": "USER"
+              },
+              "quantity": {
+                "value": "100",
+                "unit": "BOX",
+                "provenance": "USER"
+              },
+              "policyVersion": {
+                "value": "SYNTHETIC-policy-v1",
+                "provenance": "USER"
+              },
+              "evidence": {
+                "value": "need",
+                "provenance": "USER"
+              }
+            },
+            "expectedRevision": 1,
+            "commandIdempotencyKey": "T15-agency30-qc100-procedure",
+            "evidenceRefs": [
+              "need"
+            ]
+          },
+          "evidenceRefs": [
+            "procedure:actual-adapter-artifact"
+          ]
+        },
+        {
+          "id": "submitted",
+          "kind": "invoke",
+          "actorRef": "regulator",
+          "route": "api",
+          "capabilityId": "recordSubmission",
+          "request": {
+            "intentKind": "RECORD",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "recordSubmission",
+            "subjectRefs": [
+              {
+                "type": "TradeItem",
+                "id": {
+                  "$alias": "P"
+                }
+              }
+            ],
+            "slots": {
+              "procedureId": {
+                "value": {
+                  "$result": {
+                    "actionId": "procedure",
+                    "pointer": "/response/objectId"
+                  }
+                },
+                "provenance": "CONTEXT"
+              },
+              "documentHash": {
+                "value": {
+                  "$result": {
+                    "actionId": "procedure",
+                    "pointer": "/response/evidenceHash"
+                  }
+                },
+                "provenance": "CONTEXT"
+              },
+              "externalReceiptEvidence": {
+                "value": "agency-receipt",
+                "provenance": "USER"
+              },
+              "externalReceiptId": {
+                "value": "AGENCY-ACK30",
+                "provenance": "USER"
+              }
+            },
+            "expectedRevision": 1,
+            "commandIdempotencyKey": "T15-agency30-qc100-submitted",
+            "evidenceRefs": [
+              "need"
+            ]
+          },
+          "evidenceRefs": [
+            "submitted:actual-adapter-artifact"
+          ]
+        },
+        {
+          "id": "allow30",
+          "kind": "invoke",
+          "actorRef": "regulator",
+          "route": "api",
+          "capabilityId": "recordRegulatoryDecision",
+          "request": {
+            "intentKind": "RECORD",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "recordRegulatoryDecision",
+            "subjectRefs": [
+              {
+                "type": "TradeItem",
+                "id": {
+                  "$alias": "P"
+                }
+              }
+            ],
+            "slots": {
+              "procedureId": {
+                "value": {
+                  "$result": {
+                    "actionId": "procedure",
+                    "pointer": "/response/objectId"
+                  }
+                },
+                "provenance": "CONTEXT"
+              },
+              "segmentId": {
+                "value": {
+                  "$result": {
+                    "actionId": "split",
+                    "pointer": "/response/children/ALLOW30/segmentId"
+                  }
+                },
+                "provenance": "CONTEXT"
+              },
+              "itemId": {
+                "value": {
+                  "$alias": "P"
+                },
+                "provenance": "CONTEXT"
+              },
+              "lotId": {
+                "value": {
+                  "$alias": "L"
+                },
+                "provenance": "CONTEXT"
+              },
+              "quantity": {
+                "value": "30",
+                "unit": "BOX",
+                "provenance": "USER"
+              },
+              "decision": {
+                "value": "ALLOW",
+                "provenance": "USER"
+              },
+              "decisionVersion": {
+                "value": "agency-v1",
+                "provenance": "USER"
+              },
+              "evidence": {
+                "value": "agency-decision",
+                "provenance": "USER"
+              }
+            },
+            "expectedRevision": 1,
+            "commandIdempotencyKey": "T15-agency30-qc100-allow30",
+            "evidenceRefs": [
+              "need"
+            ]
+          },
+          "evidenceRefs": [
+            "allow30:actual-adapter-artifact"
+          ]
+        },
+        {
+          "id": "before-qc",
+          "kind": "query",
+          "actorRef": "regulator",
+          "route": "api",
+          "capabilityId": "evaluateEligibility",
+          "request": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "caseId": "T15",
+              "subcaseId": "agency30-qc100",
+              "itemId": {
+                "$alias": "P"
+              }
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z",
+            "action": "SELL",
+            "itemId": {
+              "$alias": "P"
+            },
+            "placeId": {
+              "$alias": "W"
+            }
+          },
+          "evidenceRefs": [
+            "before-qc:actual-adapter-artifact"
+          ]
+        },
+        {
+          "id": "before-qc-db",
+          "kind": "observe",
+          "observation": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "caseId": "T15",
+              "subcaseId": "agency30-qc100",
+              "itemId": {
+                "$alias": "P"
+              }
+            },
+            "snapshotRef": {
+              "$result": {
+                "actionId": "before-qc",
+                "pointer": "/response/snapshotRevision"
+              }
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z",
+            "sources": [
+              "regulatoryDecisions",
+              "segments"
+            ]
+          },
+          "evidenceRefs": [
+            "before-qc-db:actual-adapter-artifact"
+          ]
+        },
+        {
+          "id": "qc100",
+          "kind": "invoke",
+          "actorRef": "qc",
+          "route": "api",
+          "capabilityId": "recordDispositionBasis",
+          "request": {
+            "intentKind": "RECORD",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "recordDispositionBasis",
+            "subjectRefs": [
+              {
+                "type": "TradeItem",
+                "id": {
+                  "$alias": "P"
+                }
+              }
+            ],
+            "slots": {
+              "segmentIds": {
+                "value": [
+                  {
+                    "$result": {
+                      "actionId": "split",
+                      "pointer": "/response/children/ALLOW30/segmentId"
+                    }
+                  },
+                  {
+                    "$result": {
+                      "actionId": "split",
+                      "pointer": "/response/children/UNKNOWN70/segmentId"
+                    }
+                  }
+                ],
+                "provenance": "USER"
+              },
+              "quantity": {
+                "value": "100",
+                "unit": "BOX",
+                "provenance": "USER"
+              },
+              "basisKind": {
+                "value": "QC",
+                "provenance": "USER"
+              },
+              "action": {
+                "value": "SELL",
+                "provenance": "USER"
+              },
+              "decision": {
+                "value": "PASS",
+                "provenance": "USER"
+              },
+              "evidence": {
+                "value": "qc-result",
+                "provenance": "USER"
+              }
+            },
+            "expectedRevision": 1,
+            "commandIdempotencyKey": "T15-agency30-qc100-qc100",
+            "evidenceRefs": [
+              "need"
+            ]
+          },
+          "evidenceRefs": [
+            "qc100:actual-adapter-artifact"
+          ]
+        },
+        {
+          "id": "eligibility",
+          "kind": "query",
+          "actorRef": "regulator",
+          "route": "api",
+          "capabilityId": "evaluateEligibility",
+          "request": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "caseId": "T15",
+              "subcaseId": "agency30-qc100",
+              "itemId": {
+                "$alias": "P"
+              }
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z",
+            "action": "SELL",
+            "itemId": {
+              "$alias": "P"
+            },
+            "placeId": {
+              "$alias": "W"
+            }
+          },
+          "evidenceRefs": [
+            "eligibility:actual-adapter-artifact"
+          ]
+        },
+        {
+          "id": "db",
+          "kind": "observe",
+          "observation": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "caseId": "T15",
+              "subcaseId": "agency30-qc100",
+              "itemId": {
+                "$alias": "P"
+              }
+            },
+            "snapshotRef": {
+              "$result": {
+                "actionId": "eligibility",
+                "pointer": "/response/snapshotRevision"
+              }
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z",
+            "sources": [
+              "segments",
+              "eligibilityComponents",
+              "regulatoryDecisions",
+              "qcDecisions"
+            ]
+          },
+          "evidenceRefs": [
+            "db:actual-adapter-artifact"
+          ]
+        }
+      ],
+      "assertions": [
+        {
+          "id": "eligible-api30",
+          "op": "decimalEquals",
+          "source": {
+            "actionId": "eligibility",
+            "pointer": "/response/data/confirmedEligibleQuantity"
+          },
+          "expected": "30",
+          "requirementRefs": [
+            "D15"
+          ],
+          "evidenceRefs": [
+            "eligibility:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "T15",
+            "subcaseId": "agency30-qc100",
+            "itemId": {
+              "$alias": "P"
+            }
+          },
+          "oracleExplanation": "고정 oracle confirmed-sell-eligible의 실제 값과 범위를 확인한다",
+          "oracleRef": {
+            "oracleId": "T15.partial-regulatory-eligibility",
+            "observationNames": [
+              "confirmed-sell-eligible"
+            ]
+          },
+          "unit": "BOX",
+          "unitSource": {
+            "actionId": "eligibility",
+            "pointer": "/response/data/unit"
+          }
+        },
+        {
+          "id": "confirmed-leaf30",
+          "op": "relationSet",
+          "source": {
+            "actionId": "db",
+            "pointer": "/data/rawRows/segments",
+            "field": [
+              "id",
+              "quantity",
+              "unit"
+            ],
+            "where": {
+              "id": {
+                "$result": {
+                  "actionId": "split",
+                  "pointer": "/response/children/ALLOW30/segmentId"
+                }
+              }
+            }
+          },
+          "expected": [
+            [
+              {
+                "$result": {
+                  "actionId": "split",
+                  "pointer": "/response/children/ALLOW30/segmentId"
+                }
+              },
+              "30",
+              "BOX"
+            ]
+          ],
+          "requirementRefs": [
+            "D15"
+          ],
+          "evidenceRefs": [
+            "db:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "T15",
+            "subcaseId": "agency30-qc100",
+            "itemId": {
+              "$alias": "P"
+            }
+          },
+          "oracleExplanation": "고정 oracle confirmed-sell-eligible의 실제 값과 범위를 확인한다",
+          "oracleRef": {
+            "oracleId": "T15.partial-regulatory-eligibility",
+            "observationNames": [
+              "confirmed-sell-eligible"
+            ]
+          }
+        },
+        {
+          "id": "eligible-db30",
+          "op": "sumEquals",
+          "source": {
+            "actionId": "db",
+            "pointer": "/data/rawRows/segments",
+            "field": "quantity",
+            "where": {
+              "id": {
+                "$result": {
+                  "actionId": "split",
+                  "pointer": "/response/children/ALLOW30/segmentId"
+                }
+              }
+            }
+          },
+          "expected": "30",
+          "requirementRefs": [
+            "D15"
+          ],
+          "evidenceRefs": [
+            "db:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "T15",
+            "subcaseId": "agency30-qc100",
+            "itemId": {
+              "$alias": "P"
+            }
+          },
+          "oracleExplanation": "고정 oracle confirmed-sell-eligible의 실제 값과 범위를 확인한다",
+          "oracleRef": {
+            "oracleId": "T15.partial-regulatory-eligibility",
+            "observationNames": [
+              "confirmed-sell-eligible"
+            ]
+          },
+          "unit": "BOX",
+          "unitSource": {
+            "actionId": "db",
+            "pointer": "/data/rawRows/segments",
+            "field": "unit",
+            "where": {
+              "id": {
+                "$result": {
+                  "actionId": "split",
+                  "pointer": "/response/children/ALLOW30/segmentId"
+                }
+              }
+            }
+          }
+        },
+        {
+          "id": "unknown70-agency",
+          "op": "relationSet",
+          "source": {
+            "actionId": "db",
+            "pointer": "/data/rawRows/eligibilityComponents",
+            "field": [
+              "segmentId",
+              "condition",
+              "result"
+            ],
+            "where": {
+              "segmentId": {
+                "$result": {
+                  "actionId": "split",
+                  "pointer": "/response/children/UNKNOWN70/segmentId"
+                }
+              },
+              "condition": "AGENCY"
+            }
+          },
+          "expected": [
+            [
+              {
+                "$result": {
+                  "actionId": "split",
+                  "pointer": "/response/children/UNKNOWN70/segmentId"
+                }
+              },
+              "AGENCY",
+              "UNKNOWN"
+            ]
+          ],
+          "requirementRefs": [
+            "D15"
+          ],
+          "evidenceRefs": [
+            "db:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "T15",
+            "subcaseId": "agency30-qc100",
+            "itemId": {
+              "$alias": "P"
+            }
+          },
+          "oracleExplanation": "고정 oracle remaining-agency의 실제 값과 범위를 확인한다",
+          "oracleRef": {
+            "oracleId": "T15.partial-regulatory-eligibility",
+            "observationNames": [
+              "remaining-agency"
+            ]
+          }
+        },
+        {
+          "id": "QC100-scope",
+          "op": "relationSet",
+          "source": {
+            "actionId": "db",
+            "pointer": "/data/rawRows/qcDecisions",
+            "field": [
+              "segmentIds",
+              "quantity",
+              "unit",
+              "decision"
+            ]
+          },
+          "expected": [
+            [
+              [
+                {
+                  "$result": {
+                    "actionId": "split",
+                    "pointer": "/response/children/ALLOW30/segmentId"
+                  }
+                },
+                {
+                  "$result": {
+                    "actionId": "split",
+                    "pointer": "/response/children/UNKNOWN70/segmentId"
+                  }
+                }
+              ],
+              "100",
+              "BOX",
+              "PASS"
+            ]
+          ],
+          "requirementRefs": [
+            "D15"
+          ],
+          "evidenceRefs": [
+            "db:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "T15",
+            "subcaseId": "agency30-qc100",
+            "itemId": {
+              "$alias": "P"
+            }
+          },
+          "oracleExplanation": "고정 oracle qc-expanded-agency-allowance의 실제 값과 범위를 확인한다",
+          "oracleRef": {
+            "oracleId": "T15.partial-regulatory-eligibility",
+            "observationNames": [
+              "qc-expanded-agency-allowance"
+            ]
+          }
+        },
+        {
+          "id": "qc-no-agency-expansion",
+          "op": "sameAs",
+          "source": {
+            "actionId": "db",
+            "pointer": "/data/rawRows/regulatoryDecisions"
+          },
+          "expected": true,
+          "requirementRefs": [
+            "D15"
+          ],
+          "evidenceRefs": [
+            "db:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "T15",
+            "subcaseId": "agency30-qc100",
+            "itemId": {
+              "$alias": "P"
+            }
+          },
+          "oracleExplanation": "실제 전후 원행이 같아 금지 효과가 없다",
+          "oracleRef": {
+            "oracleId": "T15.partial-regulatory-eligibility",
+            "observationNames": [
+              "qc-expanded-agency-allowance"
+            ]
+          },
+          "baseline": {
+            "actionId": "before-qc-db",
+            "pointer": "/data/rawRows/regulatoryDecisions"
+          }
+        },
+        {
+          "id": "decision-scope-raw",
+          "op": "relationSet",
+          "source": {
+            "actionId": "db",
+            "pointer": "/data/rawRows/regulatoryDecisions",
+            "field": [
+              "procedureId",
+              "itemId",
+              "lotId",
+              "segmentId",
+              "quantity",
+              "unit",
+              "decisionVersion",
+              "evidenceHash"
+            ]
+          },
+          "expected": [
+            [
+              {
+                "$result": {
+                  "actionId": "procedure",
+                  "pointer": "/response/objectId"
+                }
+              },
+              {
+                "$alias": "P"
+              },
+              {
+                "$alias": "L"
+              },
+              {
+                "$result": {
+                  "actionId": "split",
+                  "pointer": "/response/children/ALLOW30/segmentId"
+                }
+              },
+              "30",
+              "BOX",
+              "agency-v1",
+              "d83162b8d7b9192ff8f3390da99422405ce78f6082f40ed390d696695eddd59c"
+            ]
+          ],
+          "requirementRefs": [
+            "D15"
+          ],
+          "evidenceRefs": [
+            "db:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "T15",
+            "subcaseId": "agency30-qc100",
+            "itemId": {
+              "$alias": "P"
+            }
+          },
+          "oracleExplanation": "고정 oracle decision-scope의 실제 값과 범위를 확인한다",
+          "oracleRef": {
+            "oracleId": "T15.partial-regulatory-eligibility",
+            "observationNames": [
+              "decision-scope"
+            ]
+          }
+        }
+      ],
+      "oracleExplanation": "가상 입력 fixture에서 모든 명령을 실제 서버에 전달하고 원행·단위·증거·인간 책임을 독립 대조한다. 미구현은 NOT_RUN이며 표본 검사는 제품 PASS가 아니다."
+    },
+    {
+      "id": "procedure-lifecycle",
+      "title": "로컬 작성 미확인 제출 접수 보완 반려 재제출의 version을 보존한다",
+      "fixtureRef": "verification/cases/T15/fixtures/procedure-lifecycle.json",
+      "requiredAdapters": [
+        "api",
+        "independent-db-observer"
+      ],
+      "actions": [
+        {
+          "id": "setup",
+          "kind": "installFixture",
+          "fixtureRef": "verification/cases/T15/fixtures/procedure-lifecycle.json",
+          "evidenceRefs": [
+            "setup:actual-adapter-artifact"
+          ]
+        },
+        {
+          "id": "split-life",
+          "kind": "invoke",
+          "actorRef": "warehouse",
+          "route": "api",
+          "capabilityId": "splitQuantity",
+          "request": {
+            "intentKind": "COMMAND",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "splitQuantity",
+            "subjectRefs": [
+              {
+                "type": "TradeItem",
+                "id": {
+                  "$alias": "P"
+                }
+              }
+            ],
+            "slots": {
+              "segmentId": {
+                "value": {
+                  "$alias": "Q100"
+                },
+                "provenance": "CONTEXT"
+              },
+              "children": {
+                "value": [
+                  {
+                    "alias": "PART30",
+                    "quantity": "30",
+                    "unit": "BOX"
+                  },
+                  {
+                    "alias": "REST70",
+                    "quantity": "70",
+                    "unit": "BOX"
+                  }
+                ],
+                "provenance": "USER"
+              }
+            },
+            "expectedRevision": 1,
+            "commandIdempotencyKey": "T15-procedure-lifecycle-split-life",
+            "evidenceRefs": [
+              "need"
+            ]
+          },
+          "evidenceRefs": [
+            "split-life:actual-adapter-artifact"
+          ]
+        },
+        {
+          "id": "before-local",
+          "kind": "query",
+          "actorRef": "regulator",
+          "route": "api",
+          "capabilityId": "getObject",
+          "request": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "caseId": "T15",
+              "subcaseId": "procedure-lifecycle",
+              "itemId": {
+                "$alias": "P"
+              }
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z"
+          },
+          "evidenceRefs": [
+            "before-local:actual-adapter-artifact"
+          ]
+        },
+        {
+          "id": "before-local-db",
+          "kind": "observe",
+          "observation": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "caseId": "T15",
+              "subcaseId": "procedure-lifecycle",
+              "itemId": {
+                "$alias": "P"
+              }
+            },
+            "snapshotRef": {
+              "$result": {
+                "actionId": "before-local",
+                "pointer": "/response/snapshotRevision"
+              }
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z",
+            "sources": [
+              "externalSubmissions",
+              "outbox"
+            ]
+          },
+          "evidenceRefs": [
+            "before-local-db:actual-adapter-artifact"
+          ]
+        },
+        {
+          "id": "prepare",
+          "kind": "invoke",
+          "actorRef": "regulator",
+          "route": "api",
+          "capabilityId": "prepareRegulatoryProcedure",
+          "request": {
+            "intentKind": "COMMAND",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "prepareRegulatoryProcedure",
+            "subjectRefs": [
+              {
+                "type": "TradeItem",
+                "id": {
+                  "$alias": "P"
+                }
+              }
+            ],
+            "slots": {
+              "itemId": {
+                "value": {
+                  "$alias": "P"
+                },
+                "provenance": "CONTEXT"
+              },
+              "lotId": {
+                "value": {
+                  "$alias": "L"
+                },
+                "provenance": "CONTEXT"
+              },
+              "segmentIds": {
+                "value": [
+                  {
+                    "$result": {
+                      "actionId": "split-life",
+                      "pointer": "/response/children/PART30/segmentId"
+                    }
+                  },
+                  {
+                    "$result": {
+                      "actionId": "split-life",
+                      "pointer": "/response/children/REST70/segmentId"
+                    }
+                  }
+                ],
+                "provenance": "USER"
+              },
+              "quantity": {
+                "value": "100",
+                "unit": "BOX",
+                "provenance": "USER"
+              },
+              "procedureVersion": {
+                "value": "procedure-v1",
+                "provenance": "USER"
+              },
+              "policyVersion": {
+                "value": "SYNTHETIC-policy-v1",
+                "provenance": "USER"
+              },
+              "documentKind": {
+                "value": "IMPORT_DECLARATION",
+                "provenance": "USER"
+              },
+              "evidence": {
+                "value": "need",
+                "provenance": "USER"
+              }
+            },
+            "expectedRevision": 1,
+            "commandIdempotencyKey": "T15-procedure-lifecycle-prepare",
+            "evidenceRefs": [
+              "need"
+            ]
+          },
+          "evidenceRefs": [
+            "prepare:actual-adapter-artifact"
+          ]
+        },
+        {
+          "id": "local",
+          "kind": "query",
+          "actorRef": "regulator",
+          "route": "api",
+          "capabilityId": "getObject",
+          "request": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "caseId": "T15",
+              "subcaseId": "procedure-lifecycle",
+              "itemId": {
+                "$alias": "P"
+              }
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z",
+            "objectId": {
+              "$result": {
+                "actionId": "prepare",
+                "pointer": "/response/objectId"
+              }
+            }
+          },
+          "evidenceRefs": [
+            "local:actual-adapter-artifact"
+          ]
+        },
+        {
+          "id": "local-db",
+          "kind": "observe",
+          "observation": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "caseId": "T15",
+              "subcaseId": "procedure-lifecycle",
+              "itemId": {
+                "$alias": "P"
+              }
+            },
+            "snapshotRef": {
+              "$result": {
+                "actionId": "local",
+                "pointer": "/response/snapshotRevision"
+              }
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z",
+            "sources": [
+              "procedures",
+              "externalSubmissions",
+              "outbox"
+            ]
+          },
+          "evidenceRefs": [
+            "local-db:actual-adapter-artifact"
+          ]
+        },
+        {
+          "id": "unknown-submit",
+          "kind": "invoke",
+          "actorRef": "regulator",
+          "route": "api",
+          "capabilityId": "recordSubmission",
+          "request": {
+            "intentKind": "RECORD",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "recordSubmission",
+            "subjectRefs": [
+              {
+                "type": "TradeItem",
+                "id": {
+                  "$alias": "P"
+                }
+              }
+            ],
+            "slots": {
+              "procedureId": {
+                "value": {
+                  "$result": {
+                    "actionId": "prepare",
+                    "pointer": "/response/objectId"
+                  }
+                },
+                "provenance": "CONTEXT"
+              },
+              "submissionStatus": {
+                "value": "UNCONFIRMED",
+                "provenance": "USER"
+              },
+              "evidence": {
+                "value": "need",
+                "provenance": "USER"
+              }
+            },
+            "expectedRevision": 1,
+            "commandIdempotencyKey": "T15-procedure-lifecycle-unknown-submit",
+            "evidenceRefs": [
+              "need"
+            ]
+          },
+          "evidenceRefs": [
+            "unknown-submit:actual-adapter-artifact"
+          ]
+        },
+        {
+          "id": "unknown",
+          "kind": "query",
+          "actorRef": "regulator",
+          "route": "api",
+          "capabilityId": "getObject",
+          "request": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "caseId": "T15",
+              "subcaseId": "procedure-lifecycle",
+              "itemId": {
+                "$alias": "P"
+              }
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z",
+            "objectId": {
+              "$result": {
+                "actionId": "prepare",
+                "pointer": "/response/objectId"
+              }
+            }
+          },
+          "evidenceRefs": [
+            "unknown:actual-adapter-artifact"
+          ]
+        },
+        {
+          "id": "unknown-db",
+          "kind": "observe",
+          "observation": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "caseId": "T15",
+              "subcaseId": "procedure-lifecycle",
+              "itemId": {
+                "$alias": "P"
+              }
+            },
+            "snapshotRef": {
+              "$result": {
+                "actionId": "unknown",
+                "pointer": "/response/snapshotRevision"
+              }
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z",
+            "sources": [
+              "procedures",
+              "submissions"
+            ]
+          },
+          "evidenceRefs": [
+            "unknown-db:actual-adapter-artifact"
+          ]
+        },
+        {
+          "id": "received-submit",
+          "kind": "invoke",
+          "actorRef": "regulator",
+          "route": "api",
+          "capabilityId": "recordSubmission",
+          "request": {
+            "intentKind": "RECORD",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "recordSubmission",
+            "subjectRefs": [
+              {
+                "type": "TradeItem",
+                "id": {
+                  "$alias": "P"
+                }
+              }
+            ],
+            "slots": {
+              "procedureId": {
+                "value": {
+                  "$result": {
+                    "actionId": "prepare",
+                    "pointer": "/response/objectId"
+                  }
+                },
+                "provenance": "CONTEXT"
+              },
+              "externalReceiptId": {
+                "value": "EXT-AGENCY-1",
+                "provenance": "USER"
+              },
+              "externalReceiptEvidence": {
+                "value": "agency-receipt",
+                "provenance": "USER"
+              }
+            },
+            "expectedRevision": {
+              "$result": {
+                "actionId": "unknown-submit",
+                "pointer": "/response/revision"
+              }
+            },
+            "commandIdempotencyKey": "T15-procedure-lifecycle-received-submit",
+            "evidenceRefs": [
+              "need"
+            ]
+          },
+          "evidenceRefs": [
+            "received-submit:actual-adapter-artifact"
+          ]
+        },
+        {
+          "id": "submitted",
+          "kind": "query",
+          "actorRef": "regulator",
+          "route": "api",
+          "capabilityId": "getObject",
+          "request": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "caseId": "T15",
+              "subcaseId": "procedure-lifecycle",
+              "itemId": {
+                "$alias": "P"
+              }
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z",
+            "objectId": {
+              "$result": {
+                "actionId": "prepare",
+                "pointer": "/response/objectId"
+              }
+            }
+          },
+          "evidenceRefs": [
+            "submitted:actual-adapter-artifact"
+          ]
+        },
+        {
+          "id": "submitted-db",
+          "kind": "observe",
+          "observation": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "caseId": "T15",
+              "subcaseId": "procedure-lifecycle",
+              "itemId": {
+                "$alias": "P"
+              }
+            },
+            "snapshotRef": {
+              "$result": {
+                "actionId": "submitted",
+                "pointer": "/response/snapshotRevision"
+              }
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z",
+            "sources": [
+              "procedures",
+              "submissions"
+            ]
+          },
+          "evidenceRefs": [
+            "submitted-db:actual-adapter-artifact"
+          ]
+        },
+        {
+          "id": "partial",
+          "kind": "invoke",
+          "actorRef": "regulator",
+          "route": "api",
+          "capabilityId": "recordRegulatoryDecision",
+          "request": {
+            "intentKind": "RECORD",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "recordRegulatoryDecision",
+            "subjectRefs": [
+              {
+                "type": "TradeItem",
+                "id": {
+                  "$alias": "P"
+                }
+              }
+            ],
+            "slots": {
+              "procedureId": {
+                "value": {
+                  "$result": {
+                    "actionId": "prepare",
+                    "pointer": "/response/objectId"
+                  }
+                },
+                "provenance": "CONTEXT"
+              },
+              "procedureVersion": {
+                "value": "procedure-v1",
+                "provenance": "USER"
+              },
+              "segmentId": {
+                "value": {
+                  "$result": {
+                    "actionId": "split-life",
+                    "pointer": "/response/children/PART30/segmentId"
+                  }
+                },
+                "provenance": "CONTEXT"
+              },
+              "itemId": {
+                "value": {
+                  "$alias": "P"
+                },
+                "provenance": "CONTEXT"
+              },
+              "lotId": {
+                "value": {
+                  "$alias": "L"
+                },
+                "provenance": "CONTEXT"
+              },
+              "quantity": {
+                "value": "30",
+                "unit": "BOX",
+                "provenance": "USER"
+              },
+              "decision": {
+                "value": "ALLOW",
+                "provenance": "USER"
+              },
+              "decisionVersion": {
+                "value": "partial-v1",
+                "provenance": "USER"
+              },
+              "evidence": {
+                "value": "agency-decision",
+                "provenance": "USER"
+              }
+            },
+            "expectedRevision": {
+              "$result": {
+                "actionId": "received-submit",
+                "pointer": "/response/revision"
+              }
+            },
+            "commandIdempotencyKey": "T15-procedure-lifecycle-partial",
+            "evidenceRefs": [
+              "need"
+            ]
+          },
+          "evidenceRefs": [
+            "partial:actual-adapter-artifact"
+          ]
+        },
+        {
+          "id": "supplement",
+          "kind": "invoke",
+          "actorRef": "regulator",
+          "route": "api",
+          "capabilityId": "recordRegulatoryDecision",
+          "request": {
+            "intentKind": "RECORD",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "recordRegulatoryDecision",
+            "subjectRefs": [
+              {
+                "type": "TradeItem",
+                "id": {
+                  "$alias": "P"
+                }
+              }
+            ],
+            "slots": {
+              "procedureId": {
+                "value": {
+                  "$result": {
+                    "actionId": "prepare",
+                    "pointer": "/response/objectId"
+                  }
+                },
+                "provenance": "CONTEXT"
+              },
+              "procedureVersion": {
+                "value": "procedure-v1",
+                "provenance": "USER"
+              },
+              "segmentId": {
+                "value": {
+                  "$result": {
+                    "actionId": "split-life",
+                    "pointer": "/response/children/REST70/segmentId"
+                  }
+                },
+                "provenance": "CONTEXT"
+              },
+              "itemId": {
+                "value": {
+                  "$alias": "P"
+                },
+                "provenance": "CONTEXT"
+              },
+              "lotId": {
+                "value": {
+                  "$alias": "L"
+                },
+                "provenance": "CONTEXT"
+              },
+              "quantity": {
+                "value": "70",
+                "unit": "BOX",
+                "provenance": "USER"
+              },
+              "decision": {
+                "value": "SUPPLEMENT_REQUIRED",
+                "provenance": "USER"
+              },
+              "decisionVersion": {
+                "value": "supplement-v1",
+                "provenance": "USER"
+              },
+              "evidence": {
+                "value": "agency-decision",
+                "provenance": "USER"
+              }
+            },
+            "expectedRevision": {
+              "$result": {
+                "actionId": "partial",
+                "pointer": "/response/revision"
+              }
+            },
+            "commandIdempotencyKey": "T15-procedure-lifecycle-supplement",
+            "evidenceRefs": [
+              "need"
+            ]
+          },
+          "evidenceRefs": [
+            "supplement:actual-adapter-artifact"
+          ]
+        },
+        {
+          "id": "reject",
+          "kind": "invoke",
+          "actorRef": "regulator",
+          "route": "api",
+          "capabilityId": "recordRegulatoryDecision",
+          "request": {
+            "intentKind": "RECORD",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "recordRegulatoryDecision",
+            "subjectRefs": [
+              {
+                "type": "TradeItem",
+                "id": {
+                  "$alias": "P"
+                }
+              }
+            ],
+            "slots": {
+              "procedureId": {
+                "value": {
+                  "$result": {
+                    "actionId": "prepare",
+                    "pointer": "/response/objectId"
+                  }
+                },
+                "provenance": "CONTEXT"
+              },
+              "procedureVersion": {
+                "value": "procedure-v1",
+                "provenance": "USER"
+              },
+              "segmentId": {
+                "value": {
+                  "$result": {
+                    "actionId": "split-life",
+                    "pointer": "/response/children/REST70/segmentId"
+                  }
+                },
+                "provenance": "CONTEXT"
+              },
+              "itemId": {
+                "value": {
+                  "$alias": "P"
+                },
+                "provenance": "CONTEXT"
+              },
+              "lotId": {
+                "value": {
+                  "$alias": "L"
+                },
+                "provenance": "CONTEXT"
+              },
+              "quantity": {
+                "value": "70",
+                "unit": "BOX",
+                "provenance": "USER"
+              },
+              "decision": {
+                "value": "REJECTED",
+                "provenance": "USER"
+              },
+              "decisionVersion": {
+                "value": "reject-v1",
+                "provenance": "USER"
+              },
+              "evidence": {
+                "value": "agency-decision",
+                "provenance": "USER"
+              }
+            },
+            "expectedRevision": {
+              "$result": {
+                "actionId": "supplement",
+                "pointer": "/response/revision"
+              }
+            },
+            "commandIdempotencyKey": "T15-procedure-lifecycle-reject",
+            "evidenceRefs": [
+              "need"
+            ]
+          },
+          "evidenceRefs": [
+            "reject:actual-adapter-artifact"
+          ]
+        },
+        {
+          "id": "resubmit-prepare",
+          "kind": "invoke",
+          "actorRef": "regulator",
+          "route": "api",
+          "capabilityId": "prepareRegulatoryProcedure",
+          "request": {
+            "intentKind": "COMMAND",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "prepareRegulatoryProcedure",
+            "subjectRefs": [
+              {
+                "type": "TradeItem",
+                "id": {
+                  "$alias": "P"
+                }
+              }
+            ],
+            "slots": {
+              "previousProcedureId": {
+                "value": {
+                  "$result": {
+                    "actionId": "prepare",
+                    "pointer": "/response/objectId"
+                  }
+                },
+                "provenance": "CONTEXT"
+              },
+              "originalProcedureId": {
+                "value": {
+                  "$result": {
+                    "actionId": "prepare",
+                    "pointer": "/response/objectId"
+                  }
+                },
+                "provenance": "CONTEXT"
+              },
+              "procedureVersion": {
+                "value": "procedure-v2",
+                "provenance": "USER"
+              },
+              "segmentId": {
+                "value": {
+                  "$result": {
+                    "actionId": "split-life",
+                    "pointer": "/response/children/REST70/segmentId"
+                  }
+                },
+                "provenance": "CONTEXT"
+              },
+              "itemId": {
+                "value": {
+                  "$alias": "P"
+                },
+                "provenance": "CONTEXT"
+              },
+              "lotId": {
+                "value": {
+                  "$alias": "L"
+                },
+                "provenance": "CONTEXT"
+              },
+              "quantity": {
+                "value": "70",
+                "unit": "BOX",
+                "provenance": "USER"
+              },
+              "reason": {
+                "value": "보완 후 재제출",
+                "provenance": "USER"
+              },
+              "evidence": {
+                "value": "need",
+                "provenance": "USER"
+              }
+            },
+            "expectedRevision": 1,
+            "commandIdempotencyKey": "T15-procedure-lifecycle-resubmit-prepare",
+            "evidenceRefs": [
+              "need"
+            ]
+          },
+          "evidenceRefs": [
+            "resubmit-prepare:actual-adapter-artifact"
+          ]
+        },
+        {
+          "id": "resubmit",
+          "kind": "invoke",
+          "actorRef": "regulator",
+          "route": "api",
+          "capabilityId": "recordSubmission",
+          "request": {
+            "intentKind": "RECORD",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "recordSubmission",
+            "subjectRefs": [
+              {
+                "type": "TradeItem",
+                "id": {
+                  "$alias": "P"
+                }
+              }
+            ],
+            "slots": {
+              "procedureId": {
+                "value": {
+                  "$result": {
+                    "actionId": "resubmit-prepare",
+                    "pointer": "/response/objectId"
+                  }
+                },
+                "provenance": "CONTEXT"
+              },
+              "externalReceiptId": {
+                "value": "EXT-AGENCY-2",
+                "provenance": "USER"
+              },
+              "externalReceiptEvidence": {
+                "value": "agency-receipt",
+                "provenance": "USER"
+              }
+            },
+            "expectedRevision": 1,
+            "commandIdempotencyKey": "T15-procedure-lifecycle-resubmit",
+            "evidenceRefs": [
+              "need"
+            ]
+          },
+          "evidenceRefs": [
+            "resubmit:actual-adapter-artifact"
+          ]
+        },
+        {
+          "id": "label",
+          "kind": "invoke",
+          "actorRef": "regulator",
+          "route": "api",
+          "capabilityId": "verifyLabel",
+          "request": {
+            "intentKind": "COMMAND",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "verifyLabel",
+            "subjectRefs": [
+              {
+                "type": "TradeItem",
+                "id": {
+                  "$alias": "P"
+                }
+              }
+            ],
+            "slots": {
+              "procedureId": {
+                "value": {
+                  "$result": {
+                    "actionId": "prepare",
+                    "pointer": "/response/objectId"
+                  }
+                },
+                "provenance": "CONTEXT"
+              },
+              "segmentIds": {
+                "value": [
+                  {
+                    "$result": {
+                      "actionId": "split-life",
+                      "pointer": "/response/children/PART30/segmentId"
+                    }
+                  },
+                  {
+                    "$result": {
+                      "actionId": "split-life",
+                      "pointer": "/response/children/REST70/segmentId"
+                    }
+                  }
+                ],
+                "provenance": "USER"
+              },
+              "quantity": {
+                "value": "100",
+                "unit": "BOX",
+                "provenance": "USER"
+              },
+              "labelVersion": {
+                "value": "label-v1",
+                "provenance": "USER"
+              },
+              "evidence": {
+                "value": "label",
+                "provenance": "USER"
+              }
+            },
+            "expectedRevision": 1,
+            "commandIdempotencyKey": "T15-procedure-lifecycle-label",
+            "evidenceRefs": [
+              "need"
+            ]
+          },
+          "evidenceRefs": [
+            "label:actual-adapter-artifact"
+          ]
+        },
+        {
+          "id": "history",
+          "kind": "query",
+          "actorRef": "regulator",
+          "route": "api",
+          "capabilityId": "getObject",
+          "request": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "caseId": "T15",
+              "subcaseId": "procedure-lifecycle",
+              "itemId": {
+                "$alias": "P"
+              }
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z",
+            "objectId": {
+              "$result": {
+                "actionId": "prepare",
+                "pointer": "/response/objectId"
+              }
+            }
+          },
+          "evidenceRefs": [
+            "history:actual-adapter-artifact"
+          ]
+        },
+        {
+          "id": "history-db",
+          "kind": "observe",
+          "observation": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "caseId": "T15",
+              "subcaseId": "procedure-lifecycle",
+              "itemId": {
+                "$alias": "P"
+              }
+            },
+            "snapshotRef": {
+              "$result": {
+                "actionId": "history",
+                "pointer": "/response/snapshotRevision"
+              }
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z",
+            "sources": [
+              "procedures",
+              "submissions",
+              "regulatoryDecisions",
+              "labels"
+            ]
+          },
+          "evidenceRefs": [
+            "history-db:actual-adapter-artifact"
+          ]
+        }
+      ],
+      "assertions": [
+        {
+          "id": "local-PREPARED",
+          "op": "equals",
+          "source": {
+            "actionId": "local",
+            "pointer": "/response/data/status"
+          },
+          "expected": "PREPARED",
+          "requirementRefs": [
+            "D15"
+          ],
+          "evidenceRefs": [
+            "local:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "T15",
+            "subcaseId": "procedure-lifecycle",
+            "itemId": {
+              "$alias": "P"
+            }
+          },
+          "oracleExplanation": "고정 oracle local-document-state의 실제 값과 범위를 확인한다",
+          "oracleRef": {
+            "oracleId": "T15.procedure-lifecycle",
+            "observationNames": [
+              "local-document-state"
+            ]
+          }
+        },
+        {
+          "id": "local-db-PREPARED",
+          "op": "relationSet",
+          "source": {
+            "actionId": "local-db",
+            "pointer": "/data/rawRows/procedures",
+            "field": [
+              "status",
+              "procedureVersion"
+            ]
+          },
+          "expected": [
+            [
+              "PREPARED",
+              "procedure-v1"
+            ]
+          ],
+          "requirementRefs": [
+            "D15"
+          ],
+          "evidenceRefs": [
+            "local-db:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "T15",
+            "subcaseId": "procedure-lifecycle",
+            "itemId": {
+              "$alias": "P"
+            }
+          },
+          "oracleExplanation": "고정 oracle local-document-state의 실제 값과 범위를 확인한다",
+          "oracleRef": {
+            "oracleId": "T15.procedure-lifecycle",
+            "observationNames": [
+              "local-document-state"
+            ]
+          }
+        },
+        {
+          "id": "local-external-zero",
+          "op": "sameAs",
+          "source": {
+            "actionId": "local-db",
+            "pointer": "/data/rawRows/externalSubmissions"
+          },
+          "expected": true,
+          "requirementRefs": [
+            "D15"
+          ],
+          "evidenceRefs": [
+            "local-db:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "T15",
+            "subcaseId": "procedure-lifecycle",
+            "itemId": {
+              "$alias": "P"
+            }
+          },
+          "oracleExplanation": "실제 전후 원행이 같아 금지 효과가 없다",
+          "oracleRef": {
+            "oracleId": "T15.procedure-lifecycle",
+            "observationNames": [
+              "local-document-external-submission"
+            ]
+          },
+          "baseline": {
+            "actionId": "before-local-db",
+            "pointer": "/data/rawRows/externalSubmissions"
+          }
+        },
+        {
+          "id": "local-outbox-zero",
+          "op": "sameAs",
+          "source": {
+            "actionId": "local-db",
+            "pointer": "/data/rawRows/outbox"
+          },
+          "expected": true,
+          "requirementRefs": [
+            "D15"
+          ],
+          "evidenceRefs": [
+            "local-db:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "T15",
+            "subcaseId": "procedure-lifecycle",
+            "itemId": {
+              "$alias": "P"
+            }
+          },
+          "oracleExplanation": "실제 전후 원행이 같아 금지 효과가 없다",
+          "oracleRef": {
+            "oracleId": "T15.procedure-lifecycle",
+            "observationNames": [
+              "local-document-external-submission"
+            ]
+          },
+          "baseline": {
+            "actionId": "before-local-db",
+            "pointer": "/data/rawRows/outbox"
+          }
+        },
+        {
+          "id": "no-local-submit",
+          "op": "count",
+          "source": {
+            "actionId": "local-db",
+            "pointer": "/data/rawRows/externalSubmissions"
+          },
+          "expected": 0,
+          "requirementRefs": [
+            "D15"
+          ],
+          "evidenceRefs": [
+            "local-db:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "T15",
+            "subcaseId": "procedure-lifecycle",
+            "itemId": {
+              "$alias": "P"
+            }
+          },
+          "oracleExplanation": "고정 oracle local-document-external-submission의 실제 값과 범위를 확인한다",
+          "oracleRef": {
+            "oracleId": "T15.procedure-lifecycle",
+            "observationNames": [
+              "local-document-external-submission"
+            ]
+          }
+        },
+        {
+          "id": "no-local-submit-outbox",
+          "op": "count",
+          "source": {
+            "actionId": "local-db",
+            "pointer": "/data/rawRows/outbox",
+            "where": {
+              "effectClass": "AGENCY_SUBMISSION"
+            }
+          },
+          "expected": 0,
+          "requirementRefs": [
+            "D15"
+          ],
+          "evidenceRefs": [
+            "local-db:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "T15",
+            "subcaseId": "procedure-lifecycle",
+            "itemId": {
+              "$alias": "P"
+            }
+          },
+          "oracleExplanation": "고정 oracle local-document-external-submission의 실제 값과 범위를 확인한다",
+          "oracleRef": {
+            "oracleId": "T15.procedure-lifecycle",
+            "observationNames": [
+              "local-document-external-submission"
+            ]
+          }
+        },
+        {
+          "id": "submit-unconfirmed",
+          "op": "equals",
+          "source": {
+            "actionId": "unknown",
+            "pointer": "/response/data/status"
+          },
+          "expected": "SUBMISSION_UNCONFIRMED",
+          "requirementRefs": [
+            "D15"
+          ],
+          "evidenceRefs": [
+            "unknown:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "T15",
+            "subcaseId": "procedure-lifecycle",
+            "itemId": {
+              "$alias": "P"
+            }
+          },
+          "oracleExplanation": "고정 oracle unknown-submit-state의 실제 값과 범위를 확인한다",
+          "oracleRef": {
+            "oracleId": "T15.procedure-lifecycle",
+            "observationNames": [
+              "unknown-submit-state"
+            ]
+          }
+        },
+        {
+          "id": "submit-unconfirmed-raw",
+          "op": "exactSet",
+          "source": {
+            "actionId": "unknown-db",
+            "pointer": "/data/rawRows/procedures",
+            "field": "status"
+          },
+          "expected": [
+            "SUBMISSION_UNCONFIRMED"
+          ],
+          "requirementRefs": [
+            "D15"
+          ],
+          "evidenceRefs": [
+            "unknown-db:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "T15",
+            "subcaseId": "procedure-lifecycle",
+            "itemId": {
+              "$alias": "P"
+            }
+          },
+          "oracleExplanation": "고정 oracle unknown-submit-state의 실제 값과 범위를 확인한다",
+          "oracleRef": {
+            "oracleId": "T15.procedure-lifecycle",
+            "observationNames": [
+              "unknown-submit-state"
+            ]
+          }
+        },
+        {
+          "id": "submitted-requires-receipt",
+          "op": "relationSet",
+          "source": {
+            "actionId": "submitted-db",
+            "pointer": "/data/rawRows/submissions",
+            "field": [
+              "status",
+              "externalReceiptId",
+              "receiptEvidenceHash"
+            ]
+          },
+          "expected": [
+            [
+              "SUBMITTED",
+              "EXT-AGENCY-1",
+              "97d6b9b0dfc9c741a816e61ffe1381309ae0179ddb59f468d9c9034f6814c712"
+            ]
+          ],
+          "requirementRefs": [
+            "D15"
+          ],
+          "evidenceRefs": [
+            "submitted-db:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "T15",
+            "subcaseId": "procedure-lifecycle",
+            "itemId": {
+              "$alias": "P"
+            }
+          },
+          "oracleExplanation": "고정 oracle regulatory-history의 실제 값과 범위를 확인한다",
+          "oracleRef": {
+            "oracleId": "T15.procedure-lifecycle",
+            "observationNames": [
+              "regulatory-history"
+            ]
+          }
+        },
+        {
+          "id": "immutable-v1-v2",
+          "op": "relationSet",
+          "source": {
+            "actionId": "history-db",
+            "pointer": "/data/rawRows/procedures",
+            "field": [
+              "id",
+              "originalProcedureId",
+              "procedureVersion",
+              "quantity",
+              "unit"
+            ]
+          },
+          "expected": [
+            [
+              {
+                "$result": {
+                  "actionId": "prepare",
+                  "pointer": "/response/objectId"
+                }
+              },
+              {
+                "$result": {
+                  "actionId": "prepare",
+                  "pointer": "/response/objectId"
+                }
+              },
+              "procedure-v1",
+              "100",
+              "BOX"
+            ],
+            [
+              {
+                "$result": {
+                  "actionId": "resubmit-prepare",
+                  "pointer": "/response/objectId"
+                }
+              },
+              {
+                "$result": {
+                  "actionId": "prepare",
+                  "pointer": "/response/objectId"
+                }
+              },
+              "procedure-v2",
+              "70",
+              "BOX"
+            ]
+          ],
+          "requirementRefs": [
+            "D15"
+          ],
+          "evidenceRefs": [
+            "history-db:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "T15",
+            "subcaseId": "procedure-lifecycle",
+            "itemId": {
+              "$alias": "P"
+            }
+          },
+          "oracleExplanation": "고정 oracle regulatory-history의 실제 값과 범위를 확인한다",
+          "oracleRef": {
+            "oracleId": "T15.procedure-lifecycle",
+            "observationNames": [
+              "regulatory-history"
+            ]
+          }
+        },
+        {
+          "id": "decision-history",
+          "op": "relationSet",
+          "source": {
+            "actionId": "history-db",
+            "pointer": "/data/rawRows/regulatoryDecisions",
+            "field": [
+              "procedureId",
+              "decision",
+              "quantity",
+              "unit",
+              "decisionVersion"
+            ]
+          },
+          "expected": [
+            [
+              {
+                "$result": {
+                  "actionId": "prepare",
+                  "pointer": "/response/objectId"
+                }
+              },
+              "ALLOW",
+              "30",
+              "BOX",
+              "partial-v1"
+            ],
+            [
+              {
+                "$result": {
+                  "actionId": "prepare",
+                  "pointer": "/response/objectId"
+                }
+              },
+              "SUPPLEMENT_REQUIRED",
+              "70",
+              "BOX",
+              "supplement-v1"
+            ],
+            [
+              {
+                "$result": {
+                  "actionId": "prepare",
+                  "pointer": "/response/objectId"
+                }
+              },
+              "REJECTED",
+              "70",
+              "BOX",
+              "reject-v1"
+            ]
+          ],
+          "requirementRefs": [
+            "D15"
+          ],
+          "evidenceRefs": [
+            "history-db:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "T15",
+            "subcaseId": "procedure-lifecycle",
+            "itemId": {
+              "$alias": "P"
+            }
+          },
+          "oracleExplanation": "고정 oracle regulatory-history의 실제 값과 범위를 확인한다",
+          "oracleRef": {
+            "oracleId": "T15.procedure-lifecycle",
+            "observationNames": [
+              "regulatory-history"
+            ]
+          }
+        },
+        {
+          "id": "labels-not-agency",
+          "op": "relationSet",
+          "source": {
+            "actionId": "history-db",
+            "pointer": "/data/rawRows/labels",
+            "field": [
+              "segmentIds",
+              "quantity",
+              "unit",
+              "labelVersion"
+            ]
+          },
+          "expected": [
+            [
+              [
+                {
+                  "$result": {
+                    "actionId": "split-life",
+                    "pointer": "/response/children/PART30/segmentId"
+                  }
+                },
+                {
+                  "$result": {
+                    "actionId": "split-life",
+                    "pointer": "/response/children/REST70/segmentId"
+                  }
+                }
+              ],
+              "100",
+              "BOX",
+              "label-v1"
+            ]
+          ],
+          "requirementRefs": [
+            "D15"
+          ],
+          "evidenceRefs": [
+            "history-db:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "T15",
+            "subcaseId": "procedure-lifecycle",
+            "itemId": {
+              "$alias": "P"
+            }
+          },
+          "oracleExplanation": "고정 oracle regulatory-history의 실제 값과 범위를 확인한다",
+          "oracleRef": {
+            "oracleId": "T15.procedure-lifecycle",
+            "observationNames": [
+              "regulatory-history"
+            ]
+          }
+        }
+      ],
+      "oracleExplanation": "가상 입력 fixture에서 모든 명령을 실제 서버에 전달하고 원행·단위·증거·인간 책임을 독립 대조한다. 미구현은 NOT_RUN이며 표본 검사는 제품 PASS가 아니다."
+    },
+    {
+      "id": "missing-officialSource",
+      "title": "실제 규제 officialSource 누락은 운영 허용을 만들지 않는다",
+      "fixtureRef": "verification/cases/T15/fixtures/missing-officialSource.json",
+      "requiredAdapters": [
+        "api",
+        "independent-db-observer",
+        "regulatory-policy-review"
+      ],
+      "actions": [
+        {
+          "id": "setup",
+          "kind": "installFixture",
+          "fixtureRef": "verification/cases/T15/fixtures/missing-officialSource.json",
+          "evidenceRefs": [
+            "setup:actual-adapter-artifact"
+          ]
+        },
+        {
+          "id": "policy-draft",
+          "kind": "invoke",
+          "actorRef": "config",
+          "route": "api",
+          "capabilityId": "createPolicyDraft",
+          "request": {
+            "intentKind": "COMMAND",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "createPolicyDraft",
+            "subjectRefs": [
+              {
+                "type": "TradeItem",
+                "id": {
+                  "$alias": "P"
+                }
+              }
+            ],
+            "slots": {
+              "kind": {
+                "value": "REGULATORY",
+                "provenance": "USER"
+              },
+              "policyVersion": {
+                "value": "unverified-v1",
+                "provenance": "USER"
+              },
+              "officialSource": {
+                "value": null,
+                "provenance": "USER"
+              },
+              "applicableDate": {
+                "value": "2026-10-07",
+                "provenance": "USER"
+              },
+              "reviewerId": {
+                "value": {
+                  "$alias": "config"
+                },
+                "provenance": "CONTEXT"
+              },
+              "synthetic": {
+                "value": true,
+                "provenance": "USER"
+              }
+            },
+            "expectedRevision": 1,
+            "commandIdempotencyKey": "T15-missing-officialSource-policy-draft",
+            "evidenceRefs": [
+              "need"
+            ]
+          },
+          "evidenceRefs": [
+            "policy-draft:actual-adapter-artifact"
+          ]
+        },
+        {
+          "id": "before-activate",
+          "kind": "query",
+          "actorRef": "config",
+          "route": "api",
+          "capabilityId": "getPolicy",
+          "request": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "caseId": "T15",
+              "subcaseId": "missing-officialSource",
+              "itemId": {
+                "$alias": "P"
+              }
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z",
+            "policyId": {
+              "$result": {
+                "actionId": "policy-draft",
+                "pointer": "/response/policyId"
+              }
+            }
+          },
+          "evidenceRefs": [
+            "before-activate:actual-adapter-artifact"
+          ]
+        },
+        {
+          "id": "before-activate-db",
+          "kind": "observe",
+          "observation": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "caseId": "T15",
+              "subcaseId": "missing-officialSource",
+              "itemId": {
+                "$alias": "P"
+              }
+            },
+            "snapshotRef": {
+              "$result": {
+                "actionId": "before-activate",
+                "pointer": "/response/snapshotRevision"
+              }
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z",
+            "sources": [
+              "policies"
+            ]
+          },
+          "evidenceRefs": [
+            "before-activate-db:actual-adapter-artifact"
+          ]
+        },
+        {
+          "id": "activate",
+          "kind": "invoke",
+          "actorRef": "config",
+          "route": "api",
+          "capabilityId": "activatePolicy",
+          "request": {
+            "intentKind": "COMMAND",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "activatePolicy",
+            "subjectRefs": [
+              {
+                "type": "TradeItem",
+                "id": {
+                  "$alias": "P"
+                }
+              }
+            ],
+            "slots": {
+              "policyId": {
+                "value": {
+                  "$result": {
+                    "actionId": "policy-draft",
+                    "pointer": "/response/policyId"
+                  }
+                },
+                "provenance": "CONTEXT"
+              }
+            },
+            "expectedRevision": {
+              "$result": {
+                "actionId": "policy-draft",
+                "pointer": "/response/revision"
+              }
+            },
+            "commandIdempotencyKey": "T15-missing-officialSource-activate",
+            "evidenceRefs": [
+              "need"
+            ]
+          },
+          "evidenceRefs": [
+            "activate:actual-adapter-artifact"
+          ]
+        },
+        {
+          "id": "eligible",
+          "kind": "query",
+          "actorRef": "regulator",
+          "route": "api",
+          "capabilityId": "evaluateEligibility",
+          "request": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "caseId": "T15",
+              "subcaseId": "missing-officialSource",
+              "itemId": {
+                "$alias": "P"
+              }
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z",
+            "action": "SELL"
+          },
+          "evidenceRefs": [
+            "eligible:actual-adapter-artifact"
+          ]
+        },
+        {
+          "id": "db",
+          "kind": "observe",
+          "observation": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "caseId": "T15",
+              "subcaseId": "missing-officialSource",
+              "itemId": {
+                "$alias": "P"
+              }
+            },
+            "snapshotRef": {
+              "$result": {
+                "actionId": "eligible",
+                "pointer": "/response/snapshotRevision"
+              }
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z",
+            "sources": [
+              "policies",
+              "eligibilityComponents",
+              "audit",
+              "segments"
+            ]
+          },
+          "evidenceRefs": [
+            "db:actual-adapter-artifact"
+          ]
+        }
+      ],
+      "assertions": [
+        {
+          "id": "unverified-eligible0",
+          "op": "decimalEquals",
+          "source": {
+            "actionId": "eligible",
+            "pointer": "/response/data/confirmedEligibleQuantity"
+          },
+          "expected": "0",
+          "requirementRefs": [
+            "D15"
+          ],
+          "evidenceRefs": [
+            "eligible:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "T15",
+            "subcaseId": "missing-officialSource",
+            "itemId": {
+              "$alias": "P"
+            }
+          },
+          "oracleExplanation": "고정 oracle confirmed-eligible의 실제 값과 범위를 확인한다",
+          "oracleRef": {
+            "oracleId": "T15.unresolved-real-policy",
+            "observationNames": [
+              "confirmed-eligible"
+            ]
+          },
+          "unit": "BOX",
+          "unitSource": {
+            "actionId": "eligible",
+            "pointer": "/response/data/unit"
+          }
+        },
+        {
+          "id": "legal-UNVERIFIED",
+          "op": "equals",
+          "source": {
+            "actionId": "eligible",
+            "pointer": "/response/data/legalAssessment"
+          },
+          "expected": "UNVERIFIED",
+          "requirementRefs": [
+            "D15"
+          ],
+          "evidenceRefs": [
+            "eligible:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "T15",
+            "subcaseId": "missing-officialSource",
+            "itemId": {
+              "$alias": "P"
+            }
+          },
+          "oracleExplanation": "고정 oracle legal-eligibility의 실제 값과 범위를 확인한다",
+          "oracleRef": {
+            "oracleId": "T15.unresolved-real-policy",
+            "observationNames": [
+              "legal-eligibility"
+            ]
+          }
+        },
+        {
+          "id": "activation-effect0",
+          "op": "sameAs",
+          "source": {
+            "actionId": "db",
+            "pointer": "/data/rawRows/policies"
+          },
+          "expected": true,
+          "requirementRefs": [
+            "D15"
+          ],
+          "evidenceRefs": [
+            "db:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "T15",
+            "subcaseId": "missing-officialSource",
+            "itemId": {
+              "$alias": "P"
+            }
+          },
+          "oracleExplanation": "실제 전후 원행이 같아 금지 효과가 없다",
+          "oracleRef": {
+            "oracleId": "T15.unresolved-real-policy",
+            "observationNames": [
+              "regulatory-gate"
+            ]
+          },
+          "baseline": {
+            "actionId": "before-activate-db",
+            "pointer": "/data/rawRows/policies"
+          }
+        },
+        {
+          "id": "official-active0",
+          "op": "count",
+          "source": {
+            "actionId": "db",
+            "pointer": "/data/rawRows/policies",
+            "where": {
+              "kind": "REGULATORY",
+              "status": "ACTIVE",
+              "synthetic": false
+            }
+          },
+          "expected": 0,
+          "requirementRefs": [
+            "D15"
+          ],
+          "evidenceRefs": [
+            "db:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "T15",
+            "subcaseId": "missing-officialSource",
+            "itemId": {
+              "$alias": "P"
+            }
+          },
+          "oracleExplanation": "고정 oracle regulatory-gate의 실제 값과 범위를 확인한다",
+          "oracleRef": {
+            "oracleId": "T15.unresolved-real-policy",
+            "observationNames": [
+              "regulatory-gate"
+            ]
+          }
+        },
+        {
+          "id": "activation-blocked",
+          "op": "equals",
+          "source": {
+            "actionId": "activate",
+            "pointer": "/response/outcome"
+          },
+          "expected": "REJECTED",
+          "requirementRefs": [
+            "D15"
+          ],
+          "evidenceRefs": [
+            "activate:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "T15",
+            "subcaseId": "missing-officialSource",
+            "itemId": {
+              "$alias": "P"
+            }
+          },
+          "oracleExplanation": "고정 oracle regulatory-gate의 실제 값과 범위를 확인한다",
+          "oracleRef": {
+            "oracleId": "T15.unresolved-real-policy",
+            "observationNames": [
+              "regulatory-gate"
+            ]
+          }
+        },
+        {
+          "id": "activation-blocked-error",
+          "op": "equals",
+          "source": {
+            "actionId": "activate",
+            "pointer": "/response/error/code"
+          },
+          "expected": "POLICY_UNRESOLVED",
+          "requirementRefs": [
+            "D15"
+          ],
+          "evidenceRefs": [
+            "activate:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "T15",
+            "subcaseId": "missing-officialSource",
+            "itemId": {
+              "$alias": "P"
+            }
+          },
+          "oracleExplanation": "고정 oracle regulatory-gate의 실제 값과 범위를 확인한다",
+          "oracleRef": {
+            "oracleId": "T15.unresolved-real-policy",
+            "observationNames": [
+              "regulatory-gate"
+            ]
+          }
+        },
+        {
+          "id": "fixture-not-official",
+          "op": "exactSet",
+          "source": {
+            "actionId": "db",
+            "pointer": "/data/rawRows/policies",
+            "field": "synthetic",
+            "where": {
+              "policyId": {
+                "$result": {
+                  "actionId": "policy-draft",
+                  "pointer": "/response/policyId"
+                }
+              }
+            }
+          },
+          "expected": [
+            true
+          ],
+          "requirementRefs": [
+            "D15"
+          ],
+          "evidenceRefs": [
+            "db:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "T15",
+            "subcaseId": "missing-officialSource",
+            "itemId": {
+              "$alias": "P"
+            }
+          },
+          "oracleExplanation": "고정 oracle regulatory-gate의 실제 값과 범위를 확인한다",
+          "oracleRef": {
+            "oracleId": "T15.unresolved-real-policy",
+            "observationNames": [
+              "regulatory-gate"
+            ]
+          }
+        },
+        {
+          "id": "agency-unknown",
+          "op": "relationSet",
+          "source": {
+            "actionId": "db",
+            "pointer": "/data/rawRows/eligibilityComponents",
+            "field": [
+              "condition",
+              "result"
+            ],
+            "where": {
+              "condition": "AGENCY"
+            }
+          },
+          "expected": [
+            [
+              "AGENCY",
+              "UNKNOWN"
+            ]
+          ],
+          "requirementRefs": [
+            "D15"
+          ],
+          "evidenceRefs": [
+            "db:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "T15",
+            "subcaseId": "missing-officialSource",
+            "itemId": {
+              "$alias": "P"
+            }
+          },
+          "oracleExplanation": "고정 oracle legal-eligibility의 실제 값과 범위를 확인한다",
+          "oracleRef": {
+            "oracleId": "T15.unresolved-real-policy",
+            "observationNames": [
+              "legal-eligibility"
+            ]
+          }
+        }
+      ],
+      "oracleExplanation": "가상 입력 fixture에서 모든 명령을 실제 서버에 전달하고 원행·단위·증거·인간 책임을 독립 대조한다. 미구현은 NOT_RUN이며 표본 검사는 제품 PASS가 아니다."
+    },
+    {
+      "id": "missing-applicableDate",
+      "title": "실제 규제 applicableDate 누락은 운영 허용을 만들지 않는다",
+      "fixtureRef": "verification/cases/T15/fixtures/missing-applicableDate.json",
+      "requiredAdapters": [
+        "api",
+        "independent-db-observer",
+        "regulatory-policy-review"
+      ],
+      "actions": [
+        {
+          "id": "setup",
+          "kind": "installFixture",
+          "fixtureRef": "verification/cases/T15/fixtures/missing-applicableDate.json",
+          "evidenceRefs": [
+            "setup:actual-adapter-artifact"
+          ]
+        },
+        {
+          "id": "policy-draft",
+          "kind": "invoke",
+          "actorRef": "config",
+          "route": "api",
+          "capabilityId": "createPolicyDraft",
+          "request": {
+            "intentKind": "COMMAND",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "createPolicyDraft",
+            "subjectRefs": [
+              {
+                "type": "TradeItem",
+                "id": {
+                  "$alias": "P"
+                }
+              }
+            ],
+            "slots": {
+              "kind": {
+                "value": "REGULATORY",
+                "provenance": "USER"
+              },
+              "policyVersion": {
+                "value": "unverified-v1",
+                "provenance": "USER"
+              },
+              "officialSource": {
+                "value": "SYNTHETIC-NOT-OFFICIAL",
+                "provenance": "USER"
+              },
+              "applicableDate": {
+                "value": null,
+                "provenance": "USER"
+              },
+              "reviewerId": {
+                "value": {
+                  "$alias": "config"
+                },
+                "provenance": "CONTEXT"
+              },
+              "synthetic": {
+                "value": true,
+                "provenance": "USER"
+              }
+            },
+            "expectedRevision": 1,
+            "commandIdempotencyKey": "T15-missing-applicableDate-policy-draft",
+            "evidenceRefs": [
+              "need"
+            ]
+          },
+          "evidenceRefs": [
+            "policy-draft:actual-adapter-artifact"
+          ]
+        },
+        {
+          "id": "before-activate",
+          "kind": "query",
+          "actorRef": "config",
+          "route": "api",
+          "capabilityId": "getPolicy",
+          "request": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "caseId": "T15",
+              "subcaseId": "missing-applicableDate",
+              "itemId": {
+                "$alias": "P"
+              }
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z",
+            "policyId": {
+              "$result": {
+                "actionId": "policy-draft",
+                "pointer": "/response/policyId"
+              }
+            }
+          },
+          "evidenceRefs": [
+            "before-activate:actual-adapter-artifact"
+          ]
+        },
+        {
+          "id": "before-activate-db",
+          "kind": "observe",
+          "observation": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "caseId": "T15",
+              "subcaseId": "missing-applicableDate",
+              "itemId": {
+                "$alias": "P"
+              }
+            },
+            "snapshotRef": {
+              "$result": {
+                "actionId": "before-activate",
+                "pointer": "/response/snapshotRevision"
+              }
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z",
+            "sources": [
+              "policies"
+            ]
+          },
+          "evidenceRefs": [
+            "before-activate-db:actual-adapter-artifact"
+          ]
+        },
+        {
+          "id": "activate",
+          "kind": "invoke",
+          "actorRef": "config",
+          "route": "api",
+          "capabilityId": "activatePolicy",
+          "request": {
+            "intentKind": "COMMAND",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "activatePolicy",
+            "subjectRefs": [
+              {
+                "type": "TradeItem",
+                "id": {
+                  "$alias": "P"
+                }
+              }
+            ],
+            "slots": {
+              "policyId": {
+                "value": {
+                  "$result": {
+                    "actionId": "policy-draft",
+                    "pointer": "/response/policyId"
+                  }
+                },
+                "provenance": "CONTEXT"
+              }
+            },
+            "expectedRevision": {
+              "$result": {
+                "actionId": "policy-draft",
+                "pointer": "/response/revision"
+              }
+            },
+            "commandIdempotencyKey": "T15-missing-applicableDate-activate",
+            "evidenceRefs": [
+              "need"
+            ]
+          },
+          "evidenceRefs": [
+            "activate:actual-adapter-artifact"
+          ]
+        },
+        {
+          "id": "eligible",
+          "kind": "query",
+          "actorRef": "regulator",
+          "route": "api",
+          "capabilityId": "evaluateEligibility",
+          "request": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "caseId": "T15",
+              "subcaseId": "missing-applicableDate",
+              "itemId": {
+                "$alias": "P"
+              }
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z",
+            "action": "SELL"
+          },
+          "evidenceRefs": [
+            "eligible:actual-adapter-artifact"
+          ]
+        },
+        {
+          "id": "db",
+          "kind": "observe",
+          "observation": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "caseId": "T15",
+              "subcaseId": "missing-applicableDate",
+              "itemId": {
+                "$alias": "P"
+              }
+            },
+            "snapshotRef": {
+              "$result": {
+                "actionId": "eligible",
+                "pointer": "/response/snapshotRevision"
+              }
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z",
+            "sources": [
+              "policies",
+              "eligibilityComponents",
+              "audit",
+              "segments"
+            ]
+          },
+          "evidenceRefs": [
+            "db:actual-adapter-artifact"
+          ]
+        }
+      ],
+      "assertions": [
+        {
+          "id": "unverified-eligible0",
+          "op": "decimalEquals",
+          "source": {
+            "actionId": "eligible",
+            "pointer": "/response/data/confirmedEligibleQuantity"
+          },
+          "expected": "0",
+          "requirementRefs": [
+            "D15"
+          ],
+          "evidenceRefs": [
+            "eligible:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "T15",
+            "subcaseId": "missing-applicableDate",
+            "itemId": {
+              "$alias": "P"
+            }
+          },
+          "oracleExplanation": "고정 oracle confirmed-eligible의 실제 값과 범위를 확인한다",
+          "oracleRef": {
+            "oracleId": "T15.unresolved-real-policy",
+            "observationNames": [
+              "confirmed-eligible"
+            ]
+          },
+          "unit": "BOX",
+          "unitSource": {
+            "actionId": "eligible",
+            "pointer": "/response/data/unit"
+          }
+        },
+        {
+          "id": "legal-UNVERIFIED",
+          "op": "equals",
+          "source": {
+            "actionId": "eligible",
+            "pointer": "/response/data/legalAssessment"
+          },
+          "expected": "UNVERIFIED",
+          "requirementRefs": [
+            "D15"
+          ],
+          "evidenceRefs": [
+            "eligible:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "T15",
+            "subcaseId": "missing-applicableDate",
+            "itemId": {
+              "$alias": "P"
+            }
+          },
+          "oracleExplanation": "고정 oracle legal-eligibility의 실제 값과 범위를 확인한다",
+          "oracleRef": {
+            "oracleId": "T15.unresolved-real-policy",
+            "observationNames": [
+              "legal-eligibility"
+            ]
+          }
+        },
+        {
+          "id": "activation-effect0",
+          "op": "sameAs",
+          "source": {
+            "actionId": "db",
+            "pointer": "/data/rawRows/policies"
+          },
+          "expected": true,
+          "requirementRefs": [
+            "D15"
+          ],
+          "evidenceRefs": [
+            "db:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "T15",
+            "subcaseId": "missing-applicableDate",
+            "itemId": {
+              "$alias": "P"
+            }
+          },
+          "oracleExplanation": "실제 전후 원행이 같아 금지 효과가 없다",
+          "oracleRef": {
+            "oracleId": "T15.unresolved-real-policy",
+            "observationNames": [
+              "regulatory-gate"
+            ]
+          },
+          "baseline": {
+            "actionId": "before-activate-db",
+            "pointer": "/data/rawRows/policies"
+          }
+        },
+        {
+          "id": "official-active0",
+          "op": "count",
+          "source": {
+            "actionId": "db",
+            "pointer": "/data/rawRows/policies",
+            "where": {
+              "kind": "REGULATORY",
+              "status": "ACTIVE",
+              "synthetic": false
+            }
+          },
+          "expected": 0,
+          "requirementRefs": [
+            "D15"
+          ],
+          "evidenceRefs": [
+            "db:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "T15",
+            "subcaseId": "missing-applicableDate",
+            "itemId": {
+              "$alias": "P"
+            }
+          },
+          "oracleExplanation": "고정 oracle regulatory-gate의 실제 값과 범위를 확인한다",
+          "oracleRef": {
+            "oracleId": "T15.unresolved-real-policy",
+            "observationNames": [
+              "regulatory-gate"
+            ]
+          }
+        },
+        {
+          "id": "activation-blocked",
+          "op": "equals",
+          "source": {
+            "actionId": "activate",
+            "pointer": "/response/outcome"
+          },
+          "expected": "REJECTED",
+          "requirementRefs": [
+            "D15"
+          ],
+          "evidenceRefs": [
+            "activate:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "T15",
+            "subcaseId": "missing-applicableDate",
+            "itemId": {
+              "$alias": "P"
+            }
+          },
+          "oracleExplanation": "고정 oracle regulatory-gate의 실제 값과 범위를 확인한다",
+          "oracleRef": {
+            "oracleId": "T15.unresolved-real-policy",
+            "observationNames": [
+              "regulatory-gate"
+            ]
+          }
+        },
+        {
+          "id": "activation-blocked-error",
+          "op": "equals",
+          "source": {
+            "actionId": "activate",
+            "pointer": "/response/error/code"
+          },
+          "expected": "POLICY_UNRESOLVED",
+          "requirementRefs": [
+            "D15"
+          ],
+          "evidenceRefs": [
+            "activate:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "T15",
+            "subcaseId": "missing-applicableDate",
+            "itemId": {
+              "$alias": "P"
+            }
+          },
+          "oracleExplanation": "고정 oracle regulatory-gate의 실제 값과 범위를 확인한다",
+          "oracleRef": {
+            "oracleId": "T15.unresolved-real-policy",
+            "observationNames": [
+              "regulatory-gate"
+            ]
+          }
+        },
+        {
+          "id": "fixture-not-official",
+          "op": "exactSet",
+          "source": {
+            "actionId": "db",
+            "pointer": "/data/rawRows/policies",
+            "field": "synthetic",
+            "where": {
+              "policyId": {
+                "$result": {
+                  "actionId": "policy-draft",
+                  "pointer": "/response/policyId"
+                }
+              }
+            }
+          },
+          "expected": [
+            true
+          ],
+          "requirementRefs": [
+            "D15"
+          ],
+          "evidenceRefs": [
+            "db:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "T15",
+            "subcaseId": "missing-applicableDate",
+            "itemId": {
+              "$alias": "P"
+            }
+          },
+          "oracleExplanation": "고정 oracle regulatory-gate의 실제 값과 범위를 확인한다",
+          "oracleRef": {
+            "oracleId": "T15.unresolved-real-policy",
+            "observationNames": [
+              "regulatory-gate"
+            ]
+          }
+        },
+        {
+          "id": "agency-unknown",
+          "op": "relationSet",
+          "source": {
+            "actionId": "db",
+            "pointer": "/data/rawRows/eligibilityComponents",
+            "field": [
+              "condition",
+              "result"
+            ],
+            "where": {
+              "condition": "AGENCY"
+            }
+          },
+          "expected": [
+            [
+              "AGENCY",
+              "UNKNOWN"
+            ]
+          ],
+          "requirementRefs": [
+            "D15"
+          ],
+          "evidenceRefs": [
+            "db:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "T15",
+            "subcaseId": "missing-applicableDate",
+            "itemId": {
+              "$alias": "P"
+            }
+          },
+          "oracleExplanation": "고정 oracle legal-eligibility의 실제 값과 범위를 확인한다",
+          "oracleRef": {
+            "oracleId": "T15.unresolved-real-policy",
+            "observationNames": [
+              "legal-eligibility"
+            ]
+          }
+        }
+      ],
+      "oracleExplanation": "가상 입력 fixture에서 모든 명령을 실제 서버에 전달하고 원행·단위·증거·인간 책임을 독립 대조한다. 미구현은 NOT_RUN이며 표본 검사는 제품 PASS가 아니다."
+    },
+    {
+      "id": "missing-reviewer",
+      "title": "실제 규제 reviewer 누락은 운영 허용을 만들지 않는다",
+      "fixtureRef": "verification/cases/T15/fixtures/missing-reviewer.json",
+      "requiredAdapters": [
+        "api",
+        "independent-db-observer",
+        "regulatory-policy-review"
+      ],
+      "actions": [
+        {
+          "id": "setup",
+          "kind": "installFixture",
+          "fixtureRef": "verification/cases/T15/fixtures/missing-reviewer.json",
+          "evidenceRefs": [
+            "setup:actual-adapter-artifact"
+          ]
+        },
+        {
+          "id": "policy-draft",
+          "kind": "invoke",
+          "actorRef": "config",
+          "route": "api",
+          "capabilityId": "createPolicyDraft",
+          "request": {
+            "intentKind": "COMMAND",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "createPolicyDraft",
+            "subjectRefs": [
+              {
+                "type": "TradeItem",
+                "id": {
+                  "$alias": "P"
+                }
+              }
+            ],
+            "slots": {
+              "kind": {
+                "value": "REGULATORY",
+                "provenance": "USER"
+              },
+              "policyVersion": {
+                "value": "unverified-v1",
+                "provenance": "USER"
+              },
+              "officialSource": {
+                "value": "SYNTHETIC-NOT-OFFICIAL",
+                "provenance": "USER"
+              },
+              "applicableDate": {
+                "value": "2026-10-07",
+                "provenance": "USER"
+              },
+              "reviewerId": {
+                "value": null,
+                "provenance": "USER"
+              },
+              "synthetic": {
+                "value": true,
+                "provenance": "USER"
+              }
+            },
+            "expectedRevision": 1,
+            "commandIdempotencyKey": "T15-missing-reviewer-policy-draft",
+            "evidenceRefs": [
+              "need"
+            ]
+          },
+          "evidenceRefs": [
+            "policy-draft:actual-adapter-artifact"
+          ]
+        },
+        {
+          "id": "before-activate",
+          "kind": "query",
+          "actorRef": "config",
+          "route": "api",
+          "capabilityId": "getPolicy",
+          "request": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "caseId": "T15",
+              "subcaseId": "missing-reviewer",
+              "itemId": {
+                "$alias": "P"
+              }
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z",
+            "policyId": {
+              "$result": {
+                "actionId": "policy-draft",
+                "pointer": "/response/policyId"
+              }
+            }
+          },
+          "evidenceRefs": [
+            "before-activate:actual-adapter-artifact"
+          ]
+        },
+        {
+          "id": "before-activate-db",
+          "kind": "observe",
+          "observation": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "caseId": "T15",
+              "subcaseId": "missing-reviewer",
+              "itemId": {
+                "$alias": "P"
+              }
+            },
+            "snapshotRef": {
+              "$result": {
+                "actionId": "before-activate",
+                "pointer": "/response/snapshotRevision"
+              }
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z",
+            "sources": [
+              "policies"
+            ]
+          },
+          "evidenceRefs": [
+            "before-activate-db:actual-adapter-artifact"
+          ]
+        },
+        {
+          "id": "activate",
+          "kind": "invoke",
+          "actorRef": "config",
+          "route": "api",
+          "capabilityId": "activatePolicy",
+          "request": {
+            "intentKind": "COMMAND",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "activatePolicy",
+            "subjectRefs": [
+              {
+                "type": "TradeItem",
+                "id": {
+                  "$alias": "P"
+                }
+              }
+            ],
+            "slots": {
+              "policyId": {
+                "value": {
+                  "$result": {
+                    "actionId": "policy-draft",
+                    "pointer": "/response/policyId"
+                  }
+                },
+                "provenance": "CONTEXT"
+              }
+            },
+            "expectedRevision": {
+              "$result": {
+                "actionId": "policy-draft",
+                "pointer": "/response/revision"
+              }
+            },
+            "commandIdempotencyKey": "T15-missing-reviewer-activate",
+            "evidenceRefs": [
+              "need"
+            ]
+          },
+          "evidenceRefs": [
+            "activate:actual-adapter-artifact"
+          ]
+        },
+        {
+          "id": "eligible",
+          "kind": "query",
+          "actorRef": "regulator",
+          "route": "api",
+          "capabilityId": "evaluateEligibility",
+          "request": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "caseId": "T15",
+              "subcaseId": "missing-reviewer",
+              "itemId": {
+                "$alias": "P"
+              }
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z",
+            "action": "SELL"
+          },
+          "evidenceRefs": [
+            "eligible:actual-adapter-artifact"
+          ]
+        },
+        {
+          "id": "db",
+          "kind": "observe",
+          "observation": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "caseId": "T15",
+              "subcaseId": "missing-reviewer",
+              "itemId": {
+                "$alias": "P"
+              }
+            },
+            "snapshotRef": {
+              "$result": {
+                "actionId": "eligible",
+                "pointer": "/response/snapshotRevision"
+              }
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z",
+            "sources": [
+              "policies",
+              "eligibilityComponents",
+              "audit",
+              "segments"
+            ]
+          },
+          "evidenceRefs": [
+            "db:actual-adapter-artifact"
+          ]
+        }
+      ],
+      "assertions": [
+        {
+          "id": "unverified-eligible0",
+          "op": "decimalEquals",
+          "source": {
+            "actionId": "eligible",
+            "pointer": "/response/data/confirmedEligibleQuantity"
+          },
+          "expected": "0",
+          "requirementRefs": [
+            "D15"
+          ],
+          "evidenceRefs": [
+            "eligible:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "T15",
+            "subcaseId": "missing-reviewer",
+            "itemId": {
+              "$alias": "P"
+            }
+          },
+          "oracleExplanation": "고정 oracle confirmed-eligible의 실제 값과 범위를 확인한다",
+          "oracleRef": {
+            "oracleId": "T15.unresolved-real-policy",
+            "observationNames": [
+              "confirmed-eligible"
+            ]
+          },
+          "unit": "BOX",
+          "unitSource": {
+            "actionId": "eligible",
+            "pointer": "/response/data/unit"
+          }
+        },
+        {
+          "id": "legal-UNVERIFIED",
+          "op": "equals",
+          "source": {
+            "actionId": "eligible",
+            "pointer": "/response/data/legalAssessment"
+          },
+          "expected": "UNVERIFIED",
+          "requirementRefs": [
+            "D15"
+          ],
+          "evidenceRefs": [
+            "eligible:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "T15",
+            "subcaseId": "missing-reviewer",
+            "itemId": {
+              "$alias": "P"
+            }
+          },
+          "oracleExplanation": "고정 oracle legal-eligibility의 실제 값과 범위를 확인한다",
+          "oracleRef": {
+            "oracleId": "T15.unresolved-real-policy",
+            "observationNames": [
+              "legal-eligibility"
+            ]
+          }
+        },
+        {
+          "id": "activation-effect0",
+          "op": "sameAs",
+          "source": {
+            "actionId": "db",
+            "pointer": "/data/rawRows/policies"
+          },
+          "expected": true,
+          "requirementRefs": [
+            "D15"
+          ],
+          "evidenceRefs": [
+            "db:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "T15",
+            "subcaseId": "missing-reviewer",
+            "itemId": {
+              "$alias": "P"
+            }
+          },
+          "oracleExplanation": "실제 전후 원행이 같아 금지 효과가 없다",
+          "oracleRef": {
+            "oracleId": "T15.unresolved-real-policy",
+            "observationNames": [
+              "regulatory-gate"
+            ]
+          },
+          "baseline": {
+            "actionId": "before-activate-db",
+            "pointer": "/data/rawRows/policies"
+          }
+        },
+        {
+          "id": "official-active0",
+          "op": "count",
+          "source": {
+            "actionId": "db",
+            "pointer": "/data/rawRows/policies",
+            "where": {
+              "kind": "REGULATORY",
+              "status": "ACTIVE",
+              "synthetic": false
+            }
+          },
+          "expected": 0,
+          "requirementRefs": [
+            "D15"
+          ],
+          "evidenceRefs": [
+            "db:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "T15",
+            "subcaseId": "missing-reviewer",
+            "itemId": {
+              "$alias": "P"
+            }
+          },
+          "oracleExplanation": "고정 oracle regulatory-gate의 실제 값과 범위를 확인한다",
+          "oracleRef": {
+            "oracleId": "T15.unresolved-real-policy",
+            "observationNames": [
+              "regulatory-gate"
+            ]
+          }
+        },
+        {
+          "id": "activation-blocked",
+          "op": "equals",
+          "source": {
+            "actionId": "activate",
+            "pointer": "/response/outcome"
+          },
+          "expected": "REJECTED",
+          "requirementRefs": [
+            "D15"
+          ],
+          "evidenceRefs": [
+            "activate:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "T15",
+            "subcaseId": "missing-reviewer",
+            "itemId": {
+              "$alias": "P"
+            }
+          },
+          "oracleExplanation": "고정 oracle regulatory-gate의 실제 값과 범위를 확인한다",
+          "oracleRef": {
+            "oracleId": "T15.unresolved-real-policy",
+            "observationNames": [
+              "regulatory-gate"
+            ]
+          }
+        },
+        {
+          "id": "activation-blocked-error",
+          "op": "equals",
+          "source": {
+            "actionId": "activate",
+            "pointer": "/response/error/code"
+          },
+          "expected": "POLICY_UNRESOLVED",
+          "requirementRefs": [
+            "D15"
+          ],
+          "evidenceRefs": [
+            "activate:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "T15",
+            "subcaseId": "missing-reviewer",
+            "itemId": {
+              "$alias": "P"
+            }
+          },
+          "oracleExplanation": "고정 oracle regulatory-gate의 실제 값과 범위를 확인한다",
+          "oracleRef": {
+            "oracleId": "T15.unresolved-real-policy",
+            "observationNames": [
+              "regulatory-gate"
+            ]
+          }
+        },
+        {
+          "id": "fixture-not-official",
+          "op": "exactSet",
+          "source": {
+            "actionId": "db",
+            "pointer": "/data/rawRows/policies",
+            "field": "synthetic",
+            "where": {
+              "policyId": {
+                "$result": {
+                  "actionId": "policy-draft",
+                  "pointer": "/response/policyId"
+                }
+              }
+            }
+          },
+          "expected": [
+            true
+          ],
+          "requirementRefs": [
+            "D15"
+          ],
+          "evidenceRefs": [
+            "db:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "T15",
+            "subcaseId": "missing-reviewer",
+            "itemId": {
+              "$alias": "P"
+            }
+          },
+          "oracleExplanation": "고정 oracle regulatory-gate의 실제 값과 범위를 확인한다",
+          "oracleRef": {
+            "oracleId": "T15.unresolved-real-policy",
+            "observationNames": [
+              "regulatory-gate"
+            ]
+          }
+        },
+        {
+          "id": "agency-unknown",
+          "op": "relationSet",
+          "source": {
+            "actionId": "db",
+            "pointer": "/data/rawRows/eligibilityComponents",
+            "field": [
+              "condition",
+              "result"
+            ],
+            "where": {
+              "condition": "AGENCY"
+            }
+          },
+          "expected": [
+            [
+              "AGENCY",
+              "UNKNOWN"
+            ]
+          ],
+          "requirementRefs": [
+            "D15"
+          ],
+          "evidenceRefs": [
+            "db:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "T15",
+            "subcaseId": "missing-reviewer",
+            "itemId": {
+              "$alias": "P"
+            }
+          },
+          "oracleExplanation": "고정 oracle legal-eligibility의 실제 값과 범위를 확인한다",
+          "oracleRef": {
+            "oracleId": "T15.unresolved-real-policy",
+            "observationNames": [
+              "legal-eligibility"
+            ]
+          }
+        }
+      ],
+      "oracleExplanation": "가상 입력 fixture에서 모든 명령을 실제 서버에 전달하고 원행·단위·증거·인간 책임을 독립 대조한다. 미구현은 NOT_RUN이며 표본 검사는 제품 PASS가 아니다."
+    }
+  ]
+}

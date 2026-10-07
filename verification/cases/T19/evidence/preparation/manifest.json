@@ -1,0 +1,776 @@
+{
+  "recordType": "SUPPLY_PREPARATION_EVIDENCE",
+  "caseId": "T19",
+  "status": "PREPARED",
+  "runtimeStatus": "NOT_RUN",
+  "runtimeComplete": false,
+  "productCoverageClaimed": false,
+  "b2Commit": "feaca0af9673620eff9a5ac0f08a657ce14e9ccd",
+  "verifiedCommonCommit": "77c2df3440b6d8b362bfb52fed677e441c372b4c",
+  "workingTreeDirtyDuringExecution": true,
+  "caseSha256": "9efb7299ce220e85d857e2becaeda7e8bc4ea392dacbcdd4778a18c560f9db95",
+  "featureSha256": "c696daced8160137543024c3e0b494429de7c2c72fddfd10065d7c2211a5ce19",
+  "normativeCatalogSha256": "61968b22cde1f35922df323d964599228d8dfbbe71b0ee32192b59de0a9f5ed9",
+  "baseFixtureSha256": "166d7320c289dbe025af5a9bed0973d8738f81b5289bc9ce0df6f5ff33e45cc2",
+  "subcases": 9,
+  "actions": 95,
+  "assertions": 122,
+  "oracleCount": 3,
+  "observationCount": 19,
+  "fixtures": [
+    {
+      "subcaseId": "invoice-match-difference",
+      "fixtureRef": "verification/cases/T19/fixtures/invoice-match-difference.json",
+      "fixtureSha256": "06bead9ac47df6274661e0e4ba395b8a9290702069fb3e047458867b1e636a6f"
+    },
+    {
+      "subcaseId": "invoice-quantity-difference",
+      "fixtureRef": "verification/cases/T19/fixtures/invoice-quantity-difference.json",
+      "fixtureSha256": "f15fc2d6de72ab85b8c2238a720064a183fc97ddb68668cadf7b15bbef3d9fe4"
+    },
+    {
+      "subcaseId": "fx-commercial",
+      "fixtureRef": "verification/cases/T19/fixtures/fx-commercial.json",
+      "fixtureSha256": "b55f69c32639e3169509f1bcf418414a1caa6d111e8141fcd0b67f5f814f3949"
+    },
+    {
+      "subcaseId": "fx-domestic_tax",
+      "fixtureRef": "verification/cases/T19/fixtures/fx-domestic_tax.json",
+      "fixtureSha256": "45968fc628b32e22ea45eb28e612510c164ecec0a2ce770341ddf92cb7b59929"
+    },
+    {
+      "subcaseId": "fx-correction",
+      "fixtureRef": "verification/cases/T19/fixtures/fx-correction.json",
+      "fixtureSha256": "93751d2bcb1b0accc2571331dc2c322364c83955be4fc83045968acd62875dd4"
+    },
+    {
+      "subcaseId": "fx-credit_note",
+      "fixtureRef": "verification/cases/T19/fixtures/fx-credit_note.json",
+      "fixtureSha256": "e71ea85821d85a17e0301f527fbb502f1beed6dc9fbebd033e63cdf5d8a6d2e0"
+    },
+    {
+      "subcaseId": "settlement-valid",
+      "fixtureRef": "verification/cases/T19/fixtures/settlement-valid.json",
+      "fixtureSha256": "a3a8c27b79c489661543f31e6f71a3d0d5b91977258b29b1ebaacb49a769a098"
+    },
+    {
+      "subcaseId": "settlement-unauthorized",
+      "fixtureRef": "verification/cases/T19/fixtures/settlement-unauthorized.json",
+      "fixtureSha256": "c8f7060597063249f58a9a178b9b4da75278522cbb1536078ab9fcb7f5423a1d"
+    },
+    {
+      "subcaseId": "settlement-stale",
+      "fixtureRef": "verification/cases/T19/fixtures/settlement-stale.json",
+      "fixtureSha256": "b4c68798297b310d7170f71c814c55f17e9efbbf810d4d5807cd711f4a80e155"
+    }
+  ],
+  "checks": [
+    {
+      "command": "./verify validate verification/cases/T13/case.json verification/cases/T14/case.json verification/cases/T15/case.json verification/cases/T19/case.json",
+      "exitCode": 0,
+      "result": "PREPARATION_SCHEMA_VALID all 4 cases"
+    },
+    {
+      "command": "./verify harness",
+      "exitCode": 0,
+      "tests": 148,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "supplyAssertionMutantTests": 18,
+      "result": "ASSERTION_SELFTEST_PASS; no product runtime claimed"
+    },
+    {
+      "command": "./verify contract-red verification/cases/T13/case.json verification/cases/T14/case.json verification/cases/T15/case.json verification/cases/T19/case.json",
+      "exitCode": 1,
+      "expected": 35,
+      "discovered": 35,
+      "started": 35,
+      "notImplementedAssertionFailures": 35,
+      "skipped": 0,
+      "result": "EXPECTED_CONTRACT_RED"
+    },
+    {
+      "command": "./verify scenarios",
+      "exitCode": 2,
+      "discoveredSubcases": 35,
+      "runtimeComplete": false,
+      "result": "NOT_RUN missing real adapters"
+    }
+  ],
+  "aggregateEvidenceRef": "verification/cases/T13/evidence/preparation",
+  "unexecuted": [
+    "real API adapter",
+    "independent product DB observer",
+    "host/runtime adapter",
+    "regulatory-policy-review adapter",
+    "regulatory real-world acceptance",
+    "live or paid model",
+    "external submission or payment"
+  ],
+  "namedObservationLinks": [
+    {
+      "oracleId": "T19.fx-document-payment-reference",
+      "name": "automatic-tax-issue-or-submit",
+      "normativeExpected": 0,
+      "assertions": [
+        {
+          "subcaseId": "fx-commercial",
+          "assertionId": "taxOperations-zero"
+        },
+        {
+          "subcaseId": "fx-commercial",
+          "assertionId": "taxOperations-count0"
+        },
+        {
+          "subcaseId": "fx-commercial",
+          "assertionId": "tax-outbox0"
+        },
+        {
+          "subcaseId": "fx-domestic_tax",
+          "assertionId": "taxOperations-zero"
+        },
+        {
+          "subcaseId": "fx-domestic_tax",
+          "assertionId": "taxOperations-count0"
+        },
+        {
+          "subcaseId": "fx-domestic_tax",
+          "assertionId": "tax-outbox0"
+        },
+        {
+          "subcaseId": "fx-correction",
+          "assertionId": "taxOperations-zero"
+        },
+        {
+          "subcaseId": "fx-correction",
+          "assertionId": "taxOperations-count0"
+        },
+        {
+          "subcaseId": "fx-correction",
+          "assertionId": "tax-outbox0"
+        },
+        {
+          "subcaseId": "fx-credit_note",
+          "assertionId": "taxOperations-zero"
+        },
+        {
+          "subcaseId": "fx-credit_note",
+          "assertionId": "taxOperations-count0"
+        },
+        {
+          "subcaseId": "fx-credit_note",
+          "assertionId": "tax-outbox0"
+        }
+      ]
+    },
+    {
+      "oracleId": "T19.fx-document-payment-reference",
+      "name": "commercial-as-domestic-tax-document",
+      "normativeExpected": 0,
+      "assertions": [
+        {
+          "subcaseId": "fx-commercial",
+          "assertionId": "commercial-no-domestic-tax"
+        }
+      ]
+    },
+    {
+      "oracleId": "T19.fx-document-payment-reference",
+      "name": "converted-amount",
+      "normativeExpected": {
+        "value": "150000",
+        "unit": "KRW"
+      },
+      "assertions": [
+        {
+          "subcaseId": "fx-commercial",
+          "assertionId": "converted150000KRW"
+        },
+        {
+          "subcaseId": "fx-domestic_tax",
+          "assertionId": "converted150000KRW"
+        },
+        {
+          "subcaseId": "fx-correction",
+          "assertionId": "converted150000KRW"
+        },
+        {
+          "subcaseId": "fx-credit_note",
+          "assertionId": "converted150000KRW"
+        }
+      ]
+    },
+    {
+      "oracleId": "T19.fx-document-payment-reference",
+      "name": "fx-snapshot",
+      "normativeExpected": {
+        "pairRateDateSourcePolicyPreserved": true,
+        "roundingOnlyPinnedPolicy": true
+      },
+      "assertions": [
+        {
+          "subcaseId": "fx-commercial",
+          "assertionId": "fx-exact-snapshot"
+        },
+        {
+          "subcaseId": "fx-commercial",
+          "assertionId": "fx-original-immutable"
+        },
+        {
+          "subcaseId": "fx-domestic_tax",
+          "assertionId": "fx-exact-snapshot"
+        },
+        {
+          "subcaseId": "fx-domestic_tax",
+          "assertionId": "fx-original-immutable"
+        },
+        {
+          "subcaseId": "fx-correction",
+          "assertionId": "fx-exact-snapshot"
+        },
+        {
+          "subcaseId": "fx-correction",
+          "assertionId": "fx-original-immutable"
+        },
+        {
+          "subcaseId": "fx-credit_note",
+          "assertionId": "fx-exact-snapshot"
+        },
+        {
+          "subcaseId": "fx-credit_note",
+          "assertionId": "fx-original-immutable"
+        }
+      ]
+    },
+    {
+      "oracleId": "T19.fx-document-payment-reference",
+      "name": "original-amount",
+      "normativeExpected": {
+        "value": "100",
+        "unit": "EUR"
+      },
+      "assertions": [
+        {
+          "subcaseId": "fx-commercial",
+          "assertionId": "original100EUR"
+        },
+        {
+          "subcaseId": "fx-commercial",
+          "assertionId": "invoice-kind-exact"
+        },
+        {
+          "subcaseId": "fx-domestic_tax",
+          "assertionId": "original100EUR"
+        },
+        {
+          "subcaseId": "fx-domestic_tax",
+          "assertionId": "invoice-kind-exact"
+        },
+        {
+          "subcaseId": "fx-correction",
+          "assertionId": "original100EUR"
+        },
+        {
+          "subcaseId": "fx-correction",
+          "assertionId": "invoice-kind-exact"
+        },
+        {
+          "subcaseId": "fx-credit_note",
+          "assertionId": "original100EUR"
+        },
+        {
+          "subcaseId": "fx-credit_note",
+          "assertionId": "invoice-kind-exact"
+        }
+      ]
+    },
+    {
+      "oracleId": "T19.fx-document-payment-reference",
+      "name": "payment-reference-bank-transfer",
+      "normativeExpected": 0,
+      "assertions": [
+        {
+          "subcaseId": "fx-commercial",
+          "assertionId": "bankTransfers-zero"
+        },
+        {
+          "subcaseId": "fx-commercial",
+          "assertionId": "bankTransfers-count0"
+        },
+        {
+          "subcaseId": "fx-commercial",
+          "assertionId": "payment-is-reference"
+        },
+        {
+          "subcaseId": "fx-domestic_tax",
+          "assertionId": "bankTransfers-zero"
+        },
+        {
+          "subcaseId": "fx-domestic_tax",
+          "assertionId": "bankTransfers-count0"
+        },
+        {
+          "subcaseId": "fx-domestic_tax",
+          "assertionId": "payment-is-reference"
+        },
+        {
+          "subcaseId": "fx-correction",
+          "assertionId": "bankTransfers-zero"
+        },
+        {
+          "subcaseId": "fx-correction",
+          "assertionId": "bankTransfers-count0"
+        },
+        {
+          "subcaseId": "fx-correction",
+          "assertionId": "payment-is-reference"
+        },
+        {
+          "subcaseId": "fx-credit_note",
+          "assertionId": "bankTransfers-zero"
+        },
+        {
+          "subcaseId": "fx-credit_note",
+          "assertionId": "bankTransfers-count0"
+        },
+        {
+          "subcaseId": "fx-credit_note",
+          "assertionId": "payment-is-reference"
+        }
+      ]
+    },
+    {
+      "oracleId": "T19.fx-document-payment-reference",
+      "name": "qc-pass-payment-authorization",
+      "normativeExpected": 0,
+      "assertions": [
+        {
+          "subcaseId": "fx-commercial",
+          "assertionId": "paymentAuthorizations-zero"
+        },
+        {
+          "subcaseId": "fx-commercial",
+          "assertionId": "paymentAuthorizations-count0"
+        },
+        {
+          "subcaseId": "fx-domestic_tax",
+          "assertionId": "paymentAuthorizations-zero"
+        },
+        {
+          "subcaseId": "fx-domestic_tax",
+          "assertionId": "paymentAuthorizations-count0"
+        },
+        {
+          "subcaseId": "fx-correction",
+          "assertionId": "paymentAuthorizations-zero"
+        },
+        {
+          "subcaseId": "fx-correction",
+          "assertionId": "paymentAuthorizations-count0"
+        },
+        {
+          "subcaseId": "fx-credit_note",
+          "assertionId": "paymentAuthorizations-zero"
+        },
+        {
+          "subcaseId": "fx-credit_note",
+          "assertionId": "paymentAuthorizations-count0"
+        }
+      ]
+    },
+    {
+      "oracleId": "T19.invoice-quantity-price-match",
+      "name": "logistics-assessment",
+      "normativeExpected": "SATISFIED",
+      "assertions": [
+        {
+          "subcaseId": "invoice-match-difference",
+          "assertionId": "logistics-satisfied"
+        },
+        {
+          "subcaseId": "invoice-match-difference",
+          "assertionId": "logistics-db"
+        },
+        {
+          "subcaseId": "invoice-quantity-difference",
+          "assertionId": "logistics-still-satisfied"
+        }
+      ]
+    },
+    {
+      "oracleId": "T19.invoice-quantity-price-match",
+      "name": "matching-links",
+      "normativeExpected": {
+        "purchase": [
+          "POLine",
+          "ReceiptContribution",
+          "InvoiceLine"
+        ],
+        "sale": [
+          "SaleLine",
+          "Delivery",
+          "InvoiceLine"
+        ],
+        "adjustmentDoesNotEraseOriginalDifference": true
+      },
+      "assertions": [
+        {
+          "subcaseId": "invoice-match-difference",
+          "assertionId": "purchase-three-way"
+        },
+        {
+          "subcaseId": "invoice-match-difference",
+          "assertionId": "sale-delivery-invoice"
+        },
+        {
+          "subcaseId": "invoice-match-difference",
+          "assertionId": "adjustment-original-kept"
+        },
+        {
+          "subcaseId": "invoice-quantity-difference",
+          "assertionId": "quantity-match-scope"
+        },
+        {
+          "subcaseId": "invoice-quantity-difference",
+          "assertionId": "quantity-difference5BOX"
+        }
+      ]
+    },
+    {
+      "oracleId": "T19.invoice-quantity-price-match",
+      "name": "original-invoice-difference",
+      "normativeExpected": {
+        "value": "5",
+        "unit": "EUR"
+      },
+      "assertions": [
+        {
+          "subcaseId": "invoice-match-difference",
+          "assertionId": "original5"
+        },
+        {
+          "subcaseId": "invoice-match-difference",
+          "assertionId": "original-difference5"
+        },
+        {
+          "subcaseId": "invoice-quantity-difference",
+          "assertionId": "amount-difference5EUR"
+        },
+        {
+          "subcaseId": "invoice-quantity-difference",
+          "assertionId": "original-money5"
+        }
+      ]
+    },
+    {
+      "oracleId": "T19.invoice-quantity-price-match",
+      "name": "settlement-assessment",
+      "normativeExpected": "UNSATISFIED",
+      "assertions": [
+        {
+          "subcaseId": "invoice-match-difference",
+          "assertionId": "settlement-unsatisfied"
+        },
+        {
+          "subcaseId": "invoice-quantity-difference",
+          "assertionId": "settlement-still-open"
+        }
+      ]
+    },
+    {
+      "oracleId": "T19.invoice-quantity-price-match",
+      "name": "settlement-duty",
+      "normativeExpected": {
+        "owner": "assigned-human",
+        "nextAction": "nonempty",
+        "nextCheckAt": "fixed-or-controlled-clock",
+        "currentAssignmentCount": 1
+      },
+      "assertions": [
+        {
+          "subcaseId": "invoice-match-difference",
+          "assertionId": "settlement-owner-one"
+        },
+        {
+          "subcaseId": "invoice-match-difference",
+          "assertionId": "settlement-owner-owner"
+        },
+        {
+          "subcaseId": "invoice-quantity-difference",
+          "assertionId": "quantity-mismatch-owner-one"
+        },
+        {
+          "subcaseId": "invoice-quantity-difference",
+          "assertionId": "quantity-mismatch-owner-owner"
+        }
+      ]
+    },
+    {
+      "oracleId": "T19.settlement-manager-decision",
+      "name": "authorized-confirmation-count",
+      "normativeExpected": 1,
+      "assertions": [
+        {
+          "subcaseId": "settlement-valid",
+          "assertionId": "one-manager-confirmation"
+        },
+        {
+          "subcaseId": "settlement-valid",
+          "assertionId": "manager-applied"
+        }
+      ]
+    },
+    {
+      "oracleId": "T19.settlement-manager-decision",
+      "name": "confirmed-difference-bank-transfer",
+      "normativeExpected": 0,
+      "assertions": [
+        {
+          "subcaseId": "settlement-valid",
+          "assertionId": "no-bank-delta"
+        },
+        {
+          "subcaseId": "settlement-valid",
+          "assertionId": "no-bank0"
+        },
+        {
+          "subcaseId": "settlement-unauthorized",
+          "assertionId": "no-bank-delta"
+        },
+        {
+          "subcaseId": "settlement-unauthorized",
+          "assertionId": "no-bank0"
+        },
+        {
+          "subcaseId": "settlement-stale",
+          "assertionId": "no-bank-delta"
+        },
+        {
+          "subcaseId": "settlement-stale",
+          "assertionId": "no-bank0"
+        }
+      ]
+    },
+    {
+      "oracleId": "T19.settlement-manager-decision",
+      "name": "confirmed-settlement-difference",
+      "normativeExpected": {
+        "value": "5",
+        "unit": "EUR"
+      },
+      "assertions": [
+        {
+          "subcaseId": "settlement-valid",
+          "assertionId": "confirmed5EUR"
+        },
+        {
+          "subcaseId": "settlement-valid",
+          "assertionId": "confirmed-api5"
+        }
+      ]
+    },
+    {
+      "oracleId": "T19.settlement-manager-decision",
+      "name": "management-decision-boundary",
+      "normativeExpected": {
+        "scopedMANAGERDecisionEvidenceCurrentRevisionRequired": true,
+        "ordinaryWriteGrantNotFinalConfirmation": true,
+        "confirmationNotAutomaticDutyResolutionWithoutResolutionEvidence": true
+      },
+      "assertions": [
+        {
+          "subcaseId": "settlement-valid",
+          "assertionId": "current-manager-boundary"
+        },
+        {
+          "subcaseId": "settlement-valid",
+          "assertionId": "confirmation-not-resolution-one"
+        },
+        {
+          "subcaseId": "settlement-valid",
+          "assertionId": "confirmation-not-resolution-owner"
+        },
+        {
+          "subcaseId": "settlement-unauthorized",
+          "assertionId": "manager-denial"
+        },
+        {
+          "subcaseId": "settlement-unauthorized",
+          "assertionId": "manager-denial-error"
+        },
+        {
+          "subcaseId": "settlement-unauthorized",
+          "assertionId": "denied-manager0"
+        },
+        {
+          "subcaseId": "settlement-unauthorized",
+          "assertionId": "denied-manager-responsibility-one"
+        },
+        {
+          "subcaseId": "settlement-unauthorized",
+          "assertionId": "denied-manager-responsibility-owner"
+        },
+        {
+          "subcaseId": "settlement-stale",
+          "assertionId": "manager-denial"
+        },
+        {
+          "subcaseId": "settlement-stale",
+          "assertionId": "manager-denial-error"
+        },
+        {
+          "subcaseId": "settlement-stale",
+          "assertionId": "denied-manager0"
+        },
+        {
+          "subcaseId": "settlement-stale",
+          "assertionId": "denied-manager-responsibility-one"
+        },
+        {
+          "subcaseId": "settlement-stale",
+          "assertionId": "denied-manager-responsibility-owner"
+        }
+      ]
+    },
+    {
+      "oracleId": "T19.settlement-manager-decision",
+      "name": "observations-proposal-preserved",
+      "normativeExpected": {
+        "invoiceOriginalDifferenceAndProposalPersisted": true,
+        "ordinaryScopedRECORDAllowed": true
+      },
+      "assertions": [
+        {
+          "subcaseId": "settlement-valid",
+          "assertionId": "ordinary-proposal-APPLIED"
+        },
+        {
+          "subcaseId": "settlement-valid",
+          "assertionId": "original-preserved-ordinary"
+        },
+        {
+          "subcaseId": "settlement-valid",
+          "assertionId": "proposal-preserved-ordinary"
+        },
+        {
+          "subcaseId": "settlement-valid",
+          "assertionId": "ordinary-record-proposal"
+        },
+        {
+          "subcaseId": "settlement-unauthorized",
+          "assertionId": "ordinary-proposal-APPLIED"
+        },
+        {
+          "subcaseId": "settlement-unauthorized",
+          "assertionId": "original-preserved-ordinary"
+        },
+        {
+          "subcaseId": "settlement-unauthorized",
+          "assertionId": "proposal-preserved-ordinary"
+        },
+        {
+          "subcaseId": "settlement-unauthorized",
+          "assertionId": "ordinary-record-proposal"
+        },
+        {
+          "subcaseId": "settlement-stale",
+          "assertionId": "ordinary-proposal-APPLIED"
+        },
+        {
+          "subcaseId": "settlement-stale",
+          "assertionId": "original-preserved-ordinary"
+        },
+        {
+          "subcaseId": "settlement-stale",
+          "assertionId": "proposal-preserved-ordinary"
+        },
+        {
+          "subcaseId": "settlement-stale",
+          "assertionId": "ordinary-record-proposal"
+        }
+      ]
+    },
+    {
+      "oracleId": "T19.settlement-manager-decision",
+      "name": "ordinary-write-confirmed-settlement-effects",
+      "normativeExpected": 0,
+      "assertions": [
+        {
+          "subcaseId": "settlement-valid",
+          "assertionId": "ordinary-not-manager"
+        },
+        {
+          "subcaseId": "settlement-valid",
+          "assertionId": "ordinary-not-manager-error"
+        },
+        {
+          "subcaseId": "settlement-valid",
+          "assertionId": "ordinary-confirmation0"
+        },
+        {
+          "subcaseId": "settlement-valid",
+          "assertionId": "ordinary-denial-audit"
+        },
+        {
+          "subcaseId": "settlement-unauthorized",
+          "assertionId": "ordinary-not-manager"
+        },
+        {
+          "subcaseId": "settlement-unauthorized",
+          "assertionId": "ordinary-not-manager-error"
+        },
+        {
+          "subcaseId": "settlement-unauthorized",
+          "assertionId": "ordinary-confirmation0"
+        },
+        {
+          "subcaseId": "settlement-unauthorized",
+          "assertionId": "ordinary-denial-audit"
+        },
+        {
+          "subcaseId": "settlement-stale",
+          "assertionId": "ordinary-not-manager"
+        },
+        {
+          "subcaseId": "settlement-stale",
+          "assertionId": "ordinary-not-manager-error"
+        },
+        {
+          "subcaseId": "settlement-stale",
+          "assertionId": "ordinary-confirmation0"
+        },
+        {
+          "subcaseId": "settlement-stale",
+          "assertionId": "ordinary-denial-audit"
+        }
+      ]
+    },
+    {
+      "oracleId": "T19.settlement-manager-decision",
+      "name": "preserved-original-difference",
+      "normativeExpected": {
+        "value": "5",
+        "unit": "EUR"
+      },
+      "assertions": [
+        {
+          "subcaseId": "settlement-valid",
+          "assertionId": "preserved-original-api5"
+        },
+        {
+          "subcaseId": "settlement-valid",
+          "assertionId": "original5-preserved"
+        },
+        {
+          "subcaseId": "settlement-unauthorized",
+          "assertionId": "original5-preserved"
+        },
+        {
+          "subcaseId": "settlement-stale",
+          "assertionId": "original5-preserved"
+        }
+      ]
+    }
+  ]
+}

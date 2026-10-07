@@ -1,0 +1,138 @@
+{
+  "schemaVersion" : "1.0.0",
+  "caseId" : "T19",
+  "subcaseId" : "invoice-quantity-difference",
+  "status" : "FAIL",
+  "runtimeComplete" : false,
+  "startedAt" : "2026-10-07T14:33:37.374191Z",
+  "finishedAt" : "2026-10-07T14:33:37.381981Z",
+  "command" : "./verify contract-red verification/cases/T13/case.json verification/cases/T14/case.json verification/cases/T15/case.json verification/cases/T19/case.json",
+  "caseHash" : "9efb7299ce220e85d857e2becaeda7e8bc4ea392dacbcdd4778a18c560f9db95",
+  "fixtureRef" : "verification/cases/T19/fixtures/invoice-quantity-difference.json",
+  "fixtureHash" : "f15fc2d6de72ab85b8c2238a720064a183fc97ddb68668cadf7b15bbef3d9fe4",
+  "versions" : {
+    "definition" : "definition-v1",
+    "evaluator" : "evaluator-v1",
+    "policy" : "SYNTHETIC-policy-v1"
+  },
+  "requiredAdapters" : [ "api", "independent-db-observer" ],
+  "actions" : {
+    "assessment" : {
+      "actionId" : "assessment",
+      "driverStatus" : "NOT_IMPLEMENTED",
+      "data" : null,
+      "response" : null,
+      "reason" : "NOT_IMPLEMENTED: no real product adapters installed",
+      "provenance" : {
+        "adapter" : "unimplemented",
+        "adapterVersion" : "1.0.0",
+        "buildVersion" : "NONE",
+        "authenticatedActor" : null,
+        "source" : "NONE",
+        "independent" : false,
+        "scopeComplete" : false,
+        "sourceQuery" : null,
+        "snapshot" : null
+      },
+      "artifactRefs" : [ ]
+    },
+    "match" : {
+      "actionId" : "match",
+      "driverStatus" : "NOT_IMPLEMENTED",
+      "data" : null,
+      "response" : null,
+      "reason" : "NOT_IMPLEMENTED: no real product adapters installed",
+      "provenance" : {
+        "adapter" : "unimplemented",
+        "adapterVersion" : "1.0.0",
+        "buildVersion" : "NONE",
+        "authenticatedActor" : null,
+        "source" : "NONE",
+        "independent" : false,
+        "scopeComplete" : false,
+        "sourceQuery" : null,
+        "snapshot" : null
+      },
+      "artifactRefs" : [ ]
+    },
+    "setup" : {
+      "actionId" : "setup",
+      "driverStatus" : "NOT_IMPLEMENTED",
+      "data" : null,
+      "response" : null,
+      "reason" : "NOT_IMPLEMENTED: no real product adapters installed",
+      "provenance" : {
+        "adapter" : "unimplemented",
+        "adapterVersion" : "1.0.0",
+        "buildVersion" : "NONE",
+        "authenticatedActor" : null,
+        "source" : "NONE",
+        "independent" : false,
+        "scopeComplete" : false,
+        "sourceQuery" : null,
+        "snapshot" : null
+      },
+      "artifactRefs" : [ ]
+    },
+    "invoice" : {
+      "actionId" : "invoice",
+      "driverStatus" : "NOT_IMPLEMENTED",
+      "data" : null,
+      "response" : null,
+      "reason" : "NOT_IMPLEMENTED: no real product adapters installed",
+      "provenance" : {
+        "adapter" : "unimplemented",
+        "adapterVersion" : "1.0.0",
+        "buildVersion" : "NONE",
+        "authenticatedActor" : null,
+        "source" : "NONE",
+        "independent" : false,
+        "scopeComplete" : false,
+        "sourceQuery" : null,
+        "snapshot" : null
+      },
+      "artifactRefs" : [ ]
+    },
+    "db" : {
+      "actionId" : "db",
+      "driverStatus" : "NOT_IMPLEMENTED",
+      "data" : null,
+      "response" : null,
+      "reason" : "NOT_IMPLEMENTED: no real product adapters installed",
+      "provenance" : {
+        "adapter" : "unimplemented",
+        "adapterVersion" : "1.0.0",
+        "buildVersion" : "NONE",
+        "authenticatedActor" : null,
+        "source" : "NONE",
+        "independent" : false,
+        "scopeComplete" : false,
+        "sourceQuery" : null,
+        "snapshot" : null
+      },
+      "artifactRefs" : [ ]
+    }
+  },
+  "assertions" : [ {
+    "assertionId" : "quantity-match-scope",
+    "expected" : [ [ {
+      "$alias" : "PO-A"
+    }, "ACTUAL-R100", {
+      "$result" : {
+        "actionId" : "invoice",
+        "pointer" : "/response/invoiceId"
+      }
+    }, "100", "100", "105", "BOX", "1", "EUR" ] ],
+    "source" : {
+      "actionId" : "db",
+      "pointer" : "/data/rawRows/purchaseMatches",
+      "field" : [ "purchaseLineId", "receiptOccurrenceKey", "invoiceId", "orderedQuantity", "receivedQuantity", "invoiceQuantity", "unit", "unitPrice", "currency" ]
+    },
+    "requirementRefs" : [ "D19" ],
+    "evidenceRefs" : [ "db:actual-adapter-artifact" ],
+    "status" : "FAIL",
+    "reason" : "source db is NOT_IMPLEMENTED: NOT_IMPLEMENTED: no real product adapters installed"
+  } ],
+  "missingAssertions" : 7,
+  "productCoverageClaimed" : false
+}
