@@ -33,7 +33,7 @@ public class AssessmentFactProvider {
         var allocations=credits.stream().filter(x->Objects.equals(occurrence.get("ID"),x.get("occurrenceId"))).toList();
         if((!Objects.equals(work.get("ID"),occurrence.get("workId"))&&allocations.isEmpty())||!Objects.equals(work.get("itemId"),occurrence.get("itemId")))continue;
         var domainProviders=admissions.stream().filter(p->p.eventKinds().contains(occurrence.get("kind"))).toList();
-        var admission=domainProviders.size()==1?domainProviders.getFirst().admit(c,work.get("ID").toString(),goalId,occurrence):new CanonicalFactAdmission.Admission(!"PHYSICAL_RECEIPT".equals(occurrence.get("kind"))&&domainProviders.isEmpty(),(java.math.BigDecimal)occurrence.get("quantity"),null,List.of());
+        var admission=domainProviders.size()==1?domainProviders.getFirst().admit(c,work.get("ID").toString(),goalId,occurrence):new CanonicalFactAdmission.Admission(!Set.of("PHYSICAL_RECEIPT","PHYSICAL_DELIVERY","RETURN_RECEIPT").contains(occurrence.get("kind"))&&domainProviders.isEmpty(),(java.math.BigDecimal)occurrence.get("quantity"),null,List.of());
         Object factLot=admission.lotId()!=null?admission.lotId():"LOT".equals(occurrence.get("subjectKind"))?occurrence.get("subjectId"):segments.stream().filter(x->Objects.equals(x.get("ID"),occurrence.get("physicalScopeId"))).map(x->x.get("lotId")).findFirst().orElse(null);
         if(lotScope!=null&&!Objects.equals(lotScope,factLot))continue;
         if(slots.get("eventKind")!=null&&!Objects.equals(slots.get("eventKind"),occurrence.get("kind")))continue;
