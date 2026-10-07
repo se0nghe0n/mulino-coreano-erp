@@ -103,7 +103,8 @@ public class AssessmentFactProvider {
   }
   private Fact normalize(Fact f,String expected,Object item,List<Map<String,Object>> conversions,Instant at){
     if(expected==null||f.unit()==null||Objects.equals(expected,f.unit())||f.value()==null)return f;
-    var matches=conversions.stream().filter(x->Objects.equals(item,x.get("itemId"))&&Objects.equals(f.unit(),x.get("fromUnit"))&&Objects.equals(expected,x.get("toUnit"))&&!at.isBefore(instant(x.get("validFrom")))&&(x.get("validUntil")==null||at.isBefore(instant(x.get("validUntil"))))&&x.get("evidenceRef")!=null).toList();
+    Instant conversionAt=f.canonicalId()!=null?f.effectiveFrom():at;
+    var matches=conversions.stream().filter(x->Objects.equals(item,x.get("itemId"))&&Objects.equals(f.unit(),x.get("fromUnit"))&&Objects.equals(expected,x.get("toUnit"))&&!conversionAt.isBefore(instant(x.get("validFrom")))&&(x.get("validUntil")==null||conversionAt.isBefore(instant(x.get("validUntil"))))&&x.get("evidenceRef")!=null).toList();
     if(matches.size()!=1)return new Fact(f.sourceId(),f.sourceVersion(),f.sourceHash(),f.canonicalId(),f.physicalScopeId(),f.value(),f.unit(),State.UNKNOWN,false,f.effectiveFrom(),f.effectiveUntil(),f.recordedAt(),f.evidenceRefs());
     var conversion=matches.getFirst();var factor=new java.math.BigDecimal(conversion.get("factor").toString());var value=new java.math.BigDecimal(f.value().toString()).multiply(factor);
     if(factor.signum()<=0||value.scale()>12||value.precision()-value.scale()>26)return new Fact(f.sourceId(),f.sourceVersion(),f.sourceHash(),f.canonicalId(),f.physicalScopeId(),f.value(),f.unit(),State.UNKNOWN,false,f.effectiveFrom(),f.effectiveUntil(),f.recordedAt(),f.evidenceRefs());
