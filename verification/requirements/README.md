@@ -47,6 +47,23 @@ assertion의 source pointer는 실제 API/DB/MCP 관찰로 매핑하되 catalog�
 `20`을 문자열 `"20"`으로 표현하는 등 전송상의 정규화는 허용하지만
 단위·양·비교 방향·책임·금지 효과를 약화할 수 없다.
 
+`constraint`의 `eligibilityRereadAfterLock=true`나
+`notAutomaticallyCompliantGoalFulfilment=true`는 의미 계약이다.
+production response에 같은 이름의 boolean 필드를 만들라는 뜻이 아니다.
+테스트를 통과시키기 위한 server boolean이나 observer가 만든 의미 판정
+flag만 비교해서 계약을 입증할 수 없다.
+
+예를 들어 `V3.hold-before-dispatch`의 `scope-lock` 관찰은 같은
+`oracleRef`에 연결한 여러 구체 assertion으로 입증한다. 출고 요청이
+초기 적격 조회 뒤 barrier에 멈췄다는 ACK, 별도 QC transaction의 보류
+commit과 이후 출고 재개 순서, 출고의 구조화 거부 outcome, 독립 DB
+원장의 신규 출고량0을 각각 비교한다. 이 조합으로 잠금 뒤 현재 제한을
+적용했는지 검증하며, `eligibilityRereadAfterLock` flag 자체를 답안으로
+삼지 않는다. barrier/transaction 기록·API 응답·DB 원장 artifact를
+함께 연결하고 각 assertion이 `scope-lock`의 어느 clause를 입증하는지
+남긴다. 연결의 구조 검사만으로 이 조합의 의미가 충분하다고 판정하지
+않으며 QA가 실제 실행 경로와 반대 commit 순서의 사례도 대조한다.
+
 각 `requiredLayers`의 실제 실행과 `artifactKinds`를 immutable artifact에
 연결한다. command/version/commit/fixture hash/시간/expected/observed/
 exit code와 `PASS|FAIL|NOT_RUN`을 기록한다. stub·정적 구조검사·논리
