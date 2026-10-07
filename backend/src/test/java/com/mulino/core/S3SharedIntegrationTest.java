@@ -31,7 +31,7 @@ class S3SharedIntegrationTest extends S1ReadIntegrationTest {
   }
   java.sql.Timestamp Timestamp(Instant time){return java.sql.Timestamp.from(time);}
   Map<String,Object> command(boolean fail,String key){return row("intentKind","COMMAND","definitionVersion","s3-shared-v1","capabilityId","s3SharedImpact","commandIdempotencyKey",key,"subjectRefs",List.of(Map.of("type","Work","id",work)),"slots",Map.of("workId",work,"sourceId","regulatory-version-1","physicalScopeId",segment,"fail",fail),"provenance",Map.of("sourceNamespace","USER"),"expectedRevision",jdbc.queryForObject("SELECT revision FROM mulino_work_read_Works WHERE organizationId=? AND ID=?",Integer.class,org,work));}
-  Map<String,Object> execute(Map<String,Object> input){return runtime.requestContext().run(c->commands.execute(input));}
+  Map<String,Object> execute(Map<String,Object> input){return runtime.requestContext().run(c->{return commands.execute(input);});}
   @Test void gatewayDutyAndAssessmentPendingCommitOnceAndCurrentGrantReplayIsDenied(){
     var input=command(false,"once");var first=execute(input);assertEquals("APPLIED",first.get("outcome"));assertEquals(first,execute(input));
     assertEquals(1,jdbc.queryForObject("SELECT count(*) FROM mulino_responsibility_Roots WHERE organizationId=?",Integer.class,org));
