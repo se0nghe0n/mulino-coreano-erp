@@ -38,3 +38,14 @@ entity RecoverySchedules {
  ownerId: UUID not null; supervisorId: UUID not null;
  nextAction: String(500) not null; revision: Integer not null;
 }
+entity IntakeRecoveries {
+ key organizationId: UUID; key ID: UUID; eventId: UUID not null;
+ sourceProfileId: UUID not null; intakeOwnerId: UUID not null; supervisorId: UUID not null;
+ nextAction: String(500) not null; nextCheckAt: Timestamp not null;
+ state: String(40) not null; revision: Integer not null;
+ policyId: UUID; policyHash: String(64); decisionReason: String(500);
+ linkedWorkId: UUID; linkedAssignmentId: UUID; createdWorkId: UUID;
+ createIntentJson: LargeString; canonicalIntentHash: String(64);
+ leaseOwner: String(160); fencingToken: Integer64 not null; leaseExpiresAt: Timestamp;
+ attempts: Integer not null; lastCode: String(80);
+}

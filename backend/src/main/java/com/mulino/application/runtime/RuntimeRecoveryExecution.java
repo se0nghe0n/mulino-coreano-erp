@@ -15,7 +15,7 @@ public class RuntimeRecoveryExecution {
   String id=(String)work.get("ID");var lease=runtime.claim(c,id,capability,key,"durable-recovery",Duration.ofSeconds(5));
   if(lease.isEmpty())return Map.of("outcome","BUSY");
   var slots=new LinkedHashMap<String,Object>();slots.put("workId",Map.of("type","WORK","id",id));if(capability.equals("resumeWork"))slots.put("evidence",Map.of());
-  var intent=new LinkedHashMap<String,Object>();intent.put("intentKind","COMMAND");intent.put("capabilityId",capability);intent.put("definitionVersion",work.get("definitionVersionId"));intent.put("commandIdempotencyKey",key);intent.put("expectedRevision",work.get("revision"));intent.put("slots",slots);
+  var intent=new LinkedHashMap<String,Object>();intent.put("intentKind","COMMAND");intent.put("capabilityVersion","1.0.0");intent.put("subjectRefs",List.of(Map.of("type","WORK","id",id)));var provenance=new LinkedHashMap<String,String>();slots.keySet().forEach(k->provenance.put(k,"CONTEXT"));intent.put("provenance",provenance);intent.put("capabilityId",capability);intent.put("definitionVersion",work.get("definitionVersionId"));intent.put("commandIdempotencyKey",key);intent.put("expectedRevision",work.get("revision"));intent.put("slots",slots);
   var result=commands.executeClaimed(intent,lease.get());
   try{runtime.finish(c,lease.get(),"APPLIED".equals(result.get("outcome"))?"SUCCEEDED":"HELD","RECOVERY_COMMAND_RESULT");}catch(DomainError expired){return Map.of("outcome","STALE_EXECUTION");}
   return result;

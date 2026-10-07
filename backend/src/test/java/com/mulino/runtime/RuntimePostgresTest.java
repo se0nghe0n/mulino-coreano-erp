@@ -30,6 +30,7 @@ class RuntimePostgresTest {
  @BeforeEach void setup() throws Exception {
   var source=new DriverManagerDataSource(PG.getJdbcUrl(),PG.getUsername(),PG.getPassword());jdbc=new JdbcTemplate(source);tx=new TransactionTemplate(new DataSourceTransactionManager(source));
   jdbc.execute("DROP SCHEMA public CASCADE");jdbc.execute("CREATE SCHEMA public");
+  jdbc.execute("CREATE TABLE mulino_evidence_InboxRecords(ID varchar(36) PRIMARY KEY)");jdbc.execute("CREATE TABLE mulino_evidence_Events(ID varchar(36) PRIMARY KEY)");
   jdbc.execute(Files.readString(Path.of("../database/migrations/V13__runtime.sql")));
   jdbc.execute("CREATE TABLE fixture_effect(ID text PRIMARY KEY, quantity integer NOT NULL)");
   now=new AtomicReference<>(T);repo=new RuntimeRepository(jdbc,new ExecutionClock(){@Override public Instant instant(){return now.get();}});

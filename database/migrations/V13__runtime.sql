@@ -61,3 +61,20 @@ CREATE INDEX runtime_schedule_due ON mulino_runtime_RecoverySchedules(nextCheckA
 CREATE INDEX runtime_schedule_boundary ON mulino_runtime_RecoverySchedules(nextValidityBoundary);
 CREATE INDEX runtime_schedule_pending ON mulino_runtime_RecoverySchedules(organizationId,workId)
  WHERE pendingAssessment=true;
+CREATE TABLE mulino_runtime_IntakeRecoveries (
+ organizationId varchar(36) NOT NULL, ID varchar(36) NOT NULL,
+ eventId varchar(36) NOT NULL, sourceProfileId varchar(36) NOT NULL,
+ intakeOwnerId varchar(36) NOT NULL, supervisorId varchar(36) NOT NULL,
+ nextAction varchar(500) NOT NULL, nextCheckAt timestamptz NOT NULL,
+ state varchar(40) NOT NULL DEFAULT 'PENDING', revision integer NOT NULL DEFAULT 0,
+ policyId varchar(36), policyHash varchar(64), decisionReason varchar(500),
+ linkedWorkId varchar(36), linkedAssignmentId varchar(36), createdWorkId varchar(36),
+ createIntentJson text, canonicalIntentHash varchar(64),
+ leaseOwner varchar(160), fencingToken bigint NOT NULL DEFAULT 0, leaseExpiresAt timestamptz,
+ attempts integer NOT NULL DEFAULT 0, lastCode varchar(80),
+ PRIMARY KEY(organizationId,ID),
+ FOREIGN KEY(ID) REFERENCES mulino_evidence_InboxRecords(ID),
+ FOREIGN KEY(eventId) REFERENCES mulino_evidence_Events(ID)
+);
+CREATE INDEX runtime_intake_due ON mulino_runtime_IntakeRecoveries(nextCheckAt)
+ WHERE state IN ('PENDING','HELD_POLICY','HELD_LINK');

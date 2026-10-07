@@ -19,6 +19,7 @@ public final class RuntimeVerificationHost {
   try(var context=app.run(args)){
    var worker=context.getBean(DurableDeliveryWorker.class);
    var sweeper=context.getBean(RuntimeRecoverySweeper.class);
+   var intake=context.getBean(RuntimeIntakeProcessor.class);
    var cds=context.getBean(com.sap.cds.services.runtime.CdsRuntime.class);
    var adapter=new ExternalDeliveryAdapter(){
     private final HttpClient http=HttpClient.newBuilder().connectTimeout(Duration.ofSeconds(1)).build();
@@ -34,7 +35,7 @@ public final class RuntimeVerificationHost {
      catch(Exception failure){return Result.UNKNOWN;}
     }
    };
-   while(!Thread.currentThread().isInterrupted()){cds.requestContext().run(c->{sweeper.sweep();});worker.tick("verification-native-worker",Map.of("fixtureExternalEffect",adapter));Thread.sleep(1000);}
+   while(!Thread.currentThread().isInterrupted()){cds.requestContext().run(c->{sweeper.sweep();intake.recoverDue();});worker.tick("verification-native-worker",Map.of("fixtureExternalEffect",adapter));Thread.sleep(1000);}
   }
  }
 }

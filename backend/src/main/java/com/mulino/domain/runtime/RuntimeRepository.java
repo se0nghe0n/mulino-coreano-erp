@@ -38,11 +38,19 @@ public class RuntimeRepository implements CommandLeasePort,TransactionalOutboxPo
     return Optional.of(Map.of("organizationId",c.organizationId(),"attemptId",id,"leaseToken",token,"leaseOwner",worker,"workId",work,"capabilityId",capability,"commandId",command));
   }
   public DomainContext resolveContext(Map<String,Object> claim,Instant now){
-    transaction();var rows=db.queryForList("SELECT * FROM mulino_runtime_ExecutionAttempts WHERE organizationId=? AND ID=?",claim.get("organizationId"),claim.get("attemptId"));
+    transaction();if("INTAKE".equals(claim.get("scopeKind"))){
+      var rows=db.queryForList("SELECT r.*,a.stableRequestOwner FROM mulino_runtime_IntakeRecoveries r JOIN mulino_identity_Actors a ON a.organizationId=r.organizationId AND a.ID=r.intakeOwnerId WHERE r.organizationId=? AND r.ID=?",claim.get("organizationId"),claim.get("intakeId"));if(rows.size()!=1)throw conflict();var r=rows.getFirst();var c=new DomainContext((String)r.get("organizationid"),(String)r.get("intakeownerid"),(String)r.get("stablerequestowner"),now,now);fenceAndVerify(c,claim);return c;
+    }
+    var rows=db.queryForList("SELECT * FROM mulino_runtime_ExecutionAttempts WHERE organizationId=? AND ID=?",claim.get("organizationId"),claim.get("attemptId"));
     if(rows.size()!=1)throw conflict();var a=rows.getFirst();var c=new DomainContext((String)a.get("organizationid"),(String)a.get("actorid"),(String)a.get("stablerequestowner"),now,now);fenceAndVerify(c,claim);return c;
   }
   @Override public void fenceAndVerify(DomainContext c,Map<String,Object> claim){
     transaction();if(claim==null||claim.isEmpty())return;
+    if("INTAKE".equals(claim.get("scopeKind"))){
+      var rows=db.queryForList("SELECT r.*,i.sourceProfileId AS originalSource,p.intakeOwnerId AS originalOwner FROM mulino_runtime_IntakeRecoveries r JOIN mulino_evidence_InboxRecords i ON i.organizationId=r.organizationId AND i.ID=r.ID JOIN mulino_evidence_SourceProfiles p ON p.organizationId=i.organizationId AND p.ID=i.sourceProfileId WHERE r.organizationId=? AND r.ID=? FOR UPDATE OF r",c.organizationId(),claim.get("intakeId"));if(rows.size()!=1)throw conflict();var r=rows.getFirst();
+      if(!"createDraft".equals(claim.get("capabilityId"))||!c.actorId().equals(r.get("intakeownerid"))||!c.actorId().equals(r.get("originalowner"))||!Objects.equals(r.get("leaseowner"),claim.get("leaseOwner"))||!(claim.get("leaseToken") instanceof Number token)||((Number)r.get("fencingtoken")).longValue()!=token.longValue()||!Objects.equals(r.get("canonicalintenthash"),claim.get("canonicalIntentHash"))||r.get("leaseexpiresat")==null||!instant(r.get("leaseexpiresat")).isAfter(clock.instant())||Set.of("LINKED","NO_RESPONSE").contains(r.get("state")))throw conflict();
+      var intent=json.readValue((String)r.get("createintentjson"),Map.class);if(!Objects.equals(intent.get("commandIdempotencyKey"),claim.get("commandId")))throw conflict();return;
+    }
     var rows=db.queryForList("SELECT a.* FROM mulino_runtime_ExecutionScopes s JOIN mulino_runtime_ExecutionAttempts a ON a.organizationId=s.organizationId AND a.ID=s.attemptId WHERE s.organizationId=? AND s.workId=? AND s.capabilityId=? AND s.commandId=? FOR UPDATE OF s,a",c.organizationId(),claim.get("workId"),claim.get("capabilityId"),claim.get("commandId"));
     if(rows.size()!=1)throw conflict();var a=rows.getFirst();
     if(!Objects.equals(a.get("id"),claim.get("attemptId"))||!Objects.equals(a.get("leaseowner"),claim.get("leaseOwner"))||!(claim.get("leaseToken") instanceof Number token)||((Number)a.get("fencingtoken")).longValue()!=token.longValue()||!"ACTIVE".equals(a.get("status"))||!instant(a.get("leaseexpiresat")).isAfter(clock.instant())||!c.actorId().equals(a.get("actorid"))||!c.stableRequestOwner().equals(a.get("stablerequestowner")))throw conflict();
@@ -54,7 +62,7 @@ public class RuntimeRepository implements CommandLeasePort,TransactionalOutboxPo
     fenceAndVerify(c,claim);db.update("UPDATE mulino_runtime_ExecutionAttempts SET status=?,technicalCode=?,finishedAt=? WHERE organizationId=? AND ID=?",status,code,at(clock.instant()),c.organizationId(),claim.get("attemptId"));
   }
   @Override public String enqueue(DomainContext c,String command,String externalId,String operation,Map<String,Object> payload){
-    transaction();try{UUID.fromString(externalId);}catch(RuntimeException invalid){throw DomainError.invalid("Stable external operation must be UUID");}safePayload(payload);String serialized=json.writeValueAsString(canonical(payload));
+    transaction();try{UUID.fromString(externalId);}catch(RuntimeException invalid){throw DomainError.invalid("Stable external operation must be UUID");}requireQueueSafe(payload);String serialized=json.writeValueAsString(canonical(payload));
     var existing=db.queryForList("SELECT * FROM mulino_runtime_Outbox WHERE organizationId=? AND externalOperationId=? FOR UPDATE",c.organizationId(),externalId);
     if(!existing.isEmpty()){var e=existing.getFirst();if(!command.equals(e.get("commandid"))||!operation.equals(e.get("operation"))||!serialized.equals(e.get("payloadjson"))||!c.actorId().equals(e.get("actorid"))||!c.stableRequestOwner().equals(e.get("stablerequestowner")))throw conflict();return (String)e.get("id");}
     String id=UUID.randomUUID().toString();Instant now=clock.instant();
@@ -62,9 +70,9 @@ public class RuntimeRepository implements CommandLeasePort,TransactionalOutboxPo
   }
   private static Object canonical(Object value){if(value instanceof Map<?,?> m){var result=new TreeMap<String,Object>();m.forEach((k,v)->result.put(k.toString(),canonical(v)));return result;}if(value instanceof Collection<?> l)return l.stream().map(RuntimeRepository::canonical).toList();return value;}
   private static void validateTtl(Duration ttl){if(ttl.isNegative()||ttl.isZero()||ttl.compareTo(Duration.ofMinutes(5))>0)throw DomainError.invalid("Lease duration outside bounded policy");}
-  private static void safePayload(Object value){
-    if(value instanceof Map<?,?> m){for(var e:m.entrySet()){String key=e.getKey().toString().toLowerCase(Locale.ROOT);if(key.matches(".*(token|secret|password|authorization|privateprofile|credential).*"))throw DomainError.invalid("Secret-bearing payload is not queueable");safePayload(e.getValue());}}
-    else if(value instanceof Collection<?> list)list.forEach(RuntimeRepository::safePayload);
+  public static void requireQueueSafe(Object value){
+    if(value instanceof Map<?,?> m){for(var e:m.entrySet()){String key=e.getKey().toString().toLowerCase(Locale.ROOT);if(key.matches(".*(token|secret|password|authorization|privateprofile|credential).*"))throw DomainError.invalid("Secret-bearing payload is not queueable");requireQueueSafe(e.getValue());}}
+    else if(value instanceof Collection<?> list)list.forEach(RuntimeRepository::requireQueueSafe);
     else if(value instanceof String s && (s.toLowerCase(Locale.ROOT).contains("bearer ")||s.contains("-----BEGIN PRIVATE KEY")))throw DomainError.invalid("Secret-bearing payload is not queueable");
   }
 }
