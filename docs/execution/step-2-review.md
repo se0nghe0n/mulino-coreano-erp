@@ -133,3 +133,26 @@ coverage assembly를 확인한다. 두 reviewer의 전체 지적 closure를
 18건의 지적은 CLOSED다. Step2 전체 gate는 마지막 준비 enum 수정과
 실제 producer→consumer 회귀 검증, 두 reviewer의 scoped 확인까지
 ACTIVE로 유지한다. 제품 S0–S6와 실제 runtime은 여전히 NOT_RUN이다.
+
+
+## Step2 최종 판정: COMPLETE
+
+마지막 준비 enum은 `d7ef715`에서 producer의 PREPARED로 통일했다.
+consumer의 엄격한 검사를 완화하지 않았고 실제 Java producer의
+보고서·source hash를 Python consumer에 전달하는 회귀 검사를 추가했다.
+이 검사는 수정 전 실패했고 수정 후 성공했다.
+
+[최종 영향 검사](evidence/step2-final/d7ef715/summary.json)는 focused16
+PASS, preparation PREPARED, model207 input hash drift0, SIT/UAT 각60
+NOT_IMPLEMENTED RED·skip0, coverage VALID를 확인했다. 이전 전체
+407 PASS·789개 RED 증거와 함께 인수하며 전체408개를 새로 실행했다고
+주장하지 않는다.
+
+실제 GPT-6.1 Sol xhigh와 GPT-6 Astra low는 모두 `d7ef715`에서
+Step2 테스트 계약 납품 최종 PASS를 반환했다. 원 지적과 공유·후속
+반례, 준비 enum 연결을 모두 닫았다. 새 조치 가능한 지적은 없다.
+따라서 사용자 Step2는 COMPLETE다. 제품·실모델 runtime은 NOT_RUN,
+실제 모델 호출0회, usage/cost=null, gateComplete=false다.
+
+다음 사용자 Step3는 GPT-6.1 Sol medium으로 S0의 검증된 기술 기준선부터
+구현한다. 이 Step2 완료를 S0–S6 실제 인수 완료로 사용하지 않는다.

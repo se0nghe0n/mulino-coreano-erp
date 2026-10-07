@@ -1,0 +1,179 @@
+{
+  "checkedCommit": "d7ef715edd8d47b588f5c2f53f861145e0bf76b4",
+  "scope": "Preparation enum producer/consumer integration; unaffected full aggregate at e5fd831 retained",
+  "focused": {
+    "tests": 16,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "coverage": {
+    "status": "NOT_RUN",
+    "preparationStatus": "PREPARED",
+    "runtimeStatus": "NOT_RUN",
+    "gateComplete": false,
+    "productRuntimeClaimed": false,
+    "coverageProblems": [],
+    "preparationProblems": []
+  },
+  "model": {
+    "status": "PREPARED",
+    "preparationStatus": "PREPARED",
+    "runtimeStatus": "NOT_RUN",
+    "caseCount": 60,
+    "turnCount": 73,
+    "actualModelCalls": 0,
+    "usage": null,
+    "cost": null
+  },
+  "inputArtifactCount": 207,
+  "inputHashDrift": [],
+  "commands": [
+    {
+      "name": "focused",
+      "command": [
+        "./mvnw",
+        "-B",
+        "-ntp",
+        "-f",
+        "verification/harness/pom.xml",
+        "-Dtest=ModelBindingPreparationCoverageTest,ModelBindingContractTest",
+        "test"
+      ],
+      "exitCode": 0,
+      "expectedExitCode": 0,
+      "elapsedSeconds": 4.142,
+      "checkedCommit": "d7ef715edd8d47b588f5c2f53f861145e0bf76b4"
+    },
+    {
+      "name": "model-prepare",
+      "command": [
+        "verification/model-binding/run",
+        "prepare"
+      ],
+      "exitCode": 0,
+      "expectedExitCode": 0,
+      "elapsedSeconds": 1.983,
+      "checkedCommit": "d7ef715edd8d47b588f5c2f53f861145e0bf76b4"
+    },
+    {
+      "name": "model-sit-gherkin",
+      "command": [
+        "verification/model-binding/run",
+        "gherkin-red",
+        "SIT"
+      ],
+      "exitCode": 1,
+      "expectedExitCode": 1,
+      "elapsedSeconds": 2.454,
+      "checkedCommit": "d7ef715edd8d47b588f5c2f53f861145e0bf76b4"
+    },
+    {
+      "name": "model-uat-gherkin",
+      "command": [
+        "verification/model-binding/run",
+        "gherkin-red",
+        "UAT"
+      ],
+      "exitCode": 1,
+      "expectedExitCode": 1,
+      "elapsedSeconds": 2.417,
+      "checkedCommit": "d7ef715edd8d47b588f5c2f53f861145e0bf76b4"
+    },
+    {
+      "name": "assembly",
+      "command": [
+        "python3",
+        "verification/coverage/assemble.py",
+        "--check-preparation"
+      ],
+      "exitCode": 2,
+      "expectedExitCode": 2,
+      "elapsedSeconds": 17.548,
+      "checkedCommit": "d7ef715edd8d47b588f5c2f53f861145e0bf76b4"
+    },
+    {
+      "name": "validation",
+      "command": [
+        "python3",
+        "verification/coverage/validate.py"
+      ],
+      "exitCode": 0,
+      "expectedExitCode": 0,
+      "elapsedSeconds": 14.436,
+      "checkedCommit": "d7ef715edd8d47b588f5c2f53f861145e0bf76b4"
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "TEST-org.mulino.verification.modelbinding.ModelBindingContractTest.xml.gz",
+      "sha256": "610ec4aef02d72d61982ce226a17718e51aeab51e555c648eaa0939a994791a4",
+      "sizeBytes": 2765
+    },
+    {
+      "path": "TEST-org.mulino.verification.modelbinding.ModelBindingPreparationCoverageTest.xml.gz",
+      "sha256": "d21bbe1cd0882b928ccffeecc06596a1d4aae9b25c7115a7d2cc9b985db0e54a",
+      "sizeBytes": 2274
+    },
+    {
+      "path": "assembly.log.gz",
+      "sha256": "a47d3ff327a7c3f205619fc0b6cc190d3105b2fa36ce830ea485e0cee5de6c92",
+      "sizeBytes": 227
+    },
+    {
+      "path": "commands.json.gz",
+      "sha256": "14a333daf300a1824222894060c2f37de2b205c643619c9e0badf9ac538ae19b",
+      "sizeBytes": 428
+    },
+    {
+      "path": "focused.log.gz",
+      "sha256": "b4e644fc082be2bf6a2ebb698866b9861fc6ad3cc3b33c2014db51bee208df7c",
+      "sizeBytes": 923
+    },
+    {
+      "path": "model-binding-gherkin-red-uat.json.gz",
+      "sha256": "49fc2b693e2ea3aa948e0e8ac98755d9cc29ae08cca6de57d00e853f41301b22",
+      "sizeBytes": 11706
+    },
+    {
+      "path": "model-binding-gherkin-red.json.gz",
+      "sha256": "a1b90dca5c3f84e336a3b2286d8a2e1d0bd67da5fe493887cd7d06a88a1f28ae",
+      "sizeBytes": 11702
+    },
+    {
+      "path": "model-binding-preparation.json.gz",
+      "sha256": "6ba85b869265167b4432e51f61f59a58c03ab2377108cdd12b98047112bbcfd6",
+      "sizeBytes": 11358
+    },
+    {
+      "path": "model-prepare.log.gz",
+      "sha256": "c834d5efd214835d23578022b488ea3921e5979a4f6b9e149a686bb87dfef94e",
+      "sizeBytes": 12027
+    },
+    {
+      "path": "model-sit-gherkin.log.gz",
+      "sha256": "aad9ae527a9e77df57e46402c42459837f391234e393b43bd188e74c70726d0c",
+      "sizeBytes": 1228
+    },
+    {
+      "path": "model-uat-gherkin.log.gz",
+      "sha256": "dd95debffdaee8ba9598636098d731ecb39cc56be20c0901b6413d47ebf5efe9",
+      "sizeBytes": 1226
+    },
+    {
+      "path": "prepare.json.gz",
+      "sha256": "a3040d5d7c3df4d77f142d3fdf58df10d3fe7d1c106585f7c9ab359daee93a5a",
+      "sizeBytes": 492
+    },
+    {
+      "path": "runtime-manifest.json.gz",
+      "sha256": "cc06b4196c92f146d7087125fc729b06c1d8fde337103c4a3bf2c4dd1d1ccd61",
+      "sizeBytes": 480207
+    },
+    {
+      "path": "validation.log.gz",
+      "sha256": "c12792eeadee7504ded377a419d57f6df403be35586e72f2fbf82b6339759374",
+      "sizeBytes": 104
+    }
+  ]
+}

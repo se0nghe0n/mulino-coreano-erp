@@ -1,6 +1,6 @@
 # 전체 구현 Task의 실행 기록
 
-기록일: 2026-10-07. 상태는 실행 증거로 갱신한다. 계획 문서 검토
+기록일: 2026-10-08. 상태는 실행 증거로 갱신한다. 계획 문서 검토
 완료와 새 시스템 구현 완료는 서로 다른 판정이다.
 
 ## Task와 기준선
@@ -26,8 +26,8 @@
 | Step | 작업 | 실행 모델 / effort | 상태 |
 |---|---|---|---|
 | 1 | 새 skills와 실행 지침 | GPT-6.1 Sol / high | COMPLETE |
-| 2 | 전체 계획의 tests | GPT-6.1 Sol / high | ACTIVE |
-| 3 | 새 시스템 구현 | GPT-6.1 Sol / medium | PENDING |
+| 2 | 전체 계획의 tests | GPT-6.1 Sol / high | COMPLETE |
+| 3 | 새 시스템 구현 | GPT-6.1 Sol / medium | ACTIVE |
 | 4 | 실제 E2E | GPT-6.1 Sol / low | PENDING |
 | 5 | 패턴 분석·refactor | GPT-6 Astra / high | PENDING |
 | 6 | 검증된 운영 매뉴얼 | GPT-6 Astra / low | PENDING |
@@ -180,7 +180,7 @@ runner와 전체 coverage assembler에 연결되지 않았다. Step2에서는
 
 | 시스템 Step | 인수 범위 | 상태 |
 |---|---|---|
-| S0 | 추적·stack spike·schema/auth/MCP 기준선 | NOT_RUN |
+| S0 | 추적·stack spike·schema/auth/MCP 기준선 | ACTIVE |
 | S1 | core·정의·증거·신원·두 진입점 읽기 | NOT_RUN |
 | S2 | 목표·책임·거래·승인·idem·감사·복구 | NOT_RUN |
 | S3 | 구매·운송·수입·수령·QC | NOT_RUN |
@@ -230,8 +230,7 @@ coordinator가 3개 skill의 `quick_validate.py`를 uv+PyYAML 환경에서
 fresh 검사 결과는 [정적 검사 증거](evidence/step1-static-checks.txt)에
 기록했다. 두 실제 reviewer의 최종 범위 내 판정도 PASS다.
 
-다음은 전체 Step2 검토 지적을 수정·통합하고 결합 검사를 완료하는
-일이다. [공통 계약 검토 기록](step-2-common-review.md)은 이전 부분
+아래 과거 기록 이후 Step2의 지적 수정·통합과 결합 검사를 완료했다. [공통 계약 검토 기록](step-2-common-review.md)은 이전 부분
 검토이며, [전체 검토 기록](step-2-review.md)이 현재 gate를 추적한다.
 startup·도메인·DB·MCP/client·모델·BTP 인수는 NOT_RUN이다.
 
@@ -246,3 +245,36 @@ R2와 독립적인 읽기 조사를 실제 GPT-6.1 Sol high 두 worker가 수행
 2026-10-07의 후속 GitHub 조회에서 fork의 `has_issues=false`를 확인했다.
 이후 사용자가 로컬 추적을 선택해 R2 대기를 해소했다. 조사 문서의
 `PENDING_R2`는 당시 snapshot이며 현재 상태는 이 기록을 따른다.
+
+
+## 현재 gate: Step2 완료, Step3/S0 시작
+
+Step2 최종 코드 baseline은 `d7ef715`다. 전체 harness407 PASS와
+41 case·789 subcase·20461 assertion PREPARED, 실제 Gherkin789 RED를
+확인했다. 마지막 enum 연결 변경은 focused16 PASS와 실제 생성→집계,
+모델 SIT/UAT 각60 RED로 검사했다. 전체 준비는 PREPARED이고 coverage
+문제0·VALID다. [최종 검토 기록](step-2-review.md)과 그 evidence를 따른다.
+실제 Sol xhigh·Astra low의 최종 판정은 모두 PASS다.
+
+Step3의 같은 시작 baseline은 로컬 tag `step2-complete`로 고정한다.
+실제 GPT-6.1 Sol medium으로 아래 S0 Subtask를 병렬 수행한다. 모든
+산출물 통합·실제 checks 통과와 platform decision 전에는 S1 도메인
+구현으로 넘어가지 않는다. 사용자 Step3 전체의 필수 두 reviewer
+검토는 구현 통합이 끝난 뒤 수행한다.
+
+| Subtask | branch / 절대 worktree | 소유 범위 |
+|---|---|---|
+| CAP/DB 실행 기반 | `step3/s0-platform` / `/Volumes/VideoStore/Developer/mulino-ontology-step3-s0-platform` | backend·database·platform decision/versions/spike·local deploy |
+| 인증 경계 | `step3/s0-security` / `/Volumes/VideoStore/Developer/mulino-ontology-step3-s0-security` | contracts/security·verification/platform/security |
+| 최신 MCP wire | `step3/s0-protocol` / `/Volumes/VideoStore/Developer/mulino-ontology-step3-s0-protocol` | contracts/mcp·verification/platform/protocol |
+| 보존·자료 inventory | `step3/s0-inventory` / `/Volumes/VideoStore/Developer/mulino-ontology-step3-s0-inventory` | docs/execution/s0-inventory·verification/platform/inventory |
+
+platform worker가 S0 backend의 단일 writer다. security/protocol은
+계약·독립 probe를 소유하고 platform과 공유한다. 공통 실행 기반을
+먼저 통합한 뒤 필요한 backend 작업을 새 baseline에서 분할한다.
+coordinator만 Task branch에 통합하며 긴 Maven/verify 실행은 동시2개로
+제한한다. 사용자 원본 ERP checkout과 과거 소스는 재사용하지 않는다.
+
+R2는 로컬 추적으로 확정됐다. R3/R5/R7/R8의 미정 운영 입력은 해당
+scope를 활성화하지 않고 독립적인 구현을 계속한다. 실모델·유료 배포는
+아직 수행하지 않는다. 전체 Task와 S0–S6 인수는 미완료다.
