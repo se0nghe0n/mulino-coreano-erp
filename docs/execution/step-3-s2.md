@@ -104,3 +104,10 @@ ACTIVE다. 아직 합쳐진 전체 source의 clean build와 인수 실행 전이
 version/hash와 CONTEXT provenance를 보존한다. 근거 없는 기본값은
 사용하지 않는다. 실제 사건의 Work 기여 범위도 독립 저장·중복 방지와
 부모 목표 평가에 연결하고 있다.
+
+## 통합 실패와 부분 검토
+
+최초 전체 backend 실행과 후속 runtime 실행의 실패를 보존했다.
+현재 source 수정·영역별 검증·공개 HTTP 결합 상태와 실제 두 모델의
+6개 지적은 [부분 검토 기록](s2-review/partial-review.md)에서 추적한다.
+위 1차 점검의 숫자는 당시 중간 결과이며 현재 통합 PASS를 뜻하지 않는다.
