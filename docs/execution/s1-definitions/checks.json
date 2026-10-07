@@ -37,5 +37,16 @@
     "S2 state/distinct-event evaluators NOT_RUN",
     "S5 approved definition publication workflow NOT_RUN"
   ],
-  "artifactSanitization": "Removed runtime properties and container stdout; preserved test names/counts/results"
+  "artifactSanitization": "Removed runtime properties and container stdout; preserved test names/counts/results",
+  "finalUnitCheck": {
+    "command": "cd backend; python3 ../docs/execution/s1-definitions/run-unit-short.py",
+    "runner": "javac plus direct @Test method invocation with real JUnit assertions; no lifecycle hooks in this class",
+    "tests": 8,
+    "exitCode": 0,
+    "status": "PASS",
+    "artifact": "docs/execution/s1-definitions/evidence/final-unit.txt",
+    "artifactSha256": "7dda5ba80715a6495b5a06815fdccb225b2525fe2d68c758cc186819ca4098b8",
+    "initialAttempt": "Wrong working directory caused fixture path failure; corrected to backend and passed",
+    "pending": "Final aggregate Maven invocation by coordinator"
+  }
 }

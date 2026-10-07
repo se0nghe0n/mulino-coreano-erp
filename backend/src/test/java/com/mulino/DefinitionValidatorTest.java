@@ -48,6 +48,15 @@ class DefinitionValidatorTest {
    assertEquals("UNSUPPORTED",validator.validatePredicate(fixture(),Map.of("operator","sql","value","SELECT 1")).outcome());
    assertEquals("INVALID",validator.validatePredicate(fixture(),Map.of("operator","exists","property","QuantitySegment.role")).outcome());
    assertEquals("UNSUPPORTED",validator.validatePredicate(fixture(),Map.of("operator","exists","property","QuantitySegment.quantity","script","eval()")).outcome());
+   assertEquals("UNSUPPORTED",validator.validatePredicate(fixture(),Map.of("operator","exists","property","QuantitySegment.quantity","children",List.of(Map.of("operator","sql")))).outcome());
+ }
+ @Test void recursivePredicateAndOperandSizesAreBounded() {
+   assertTrue(validator.validatePredicate(fixture(),Map.of("operator","range","property","QuantitySegment.quantity","minimum",Map.of("value","20","unit","BOX"),"maximum",Map.of("value","10","unit","BOX"))).problems().stream().anyMatch(p->p.code().equals("REVERSED_BOUNDS")));
+   Map<String,Object> node=Map.of("operator","exists","property","QuantitySegment.quantity");
+   for(int i=0;i<34;i++) node=Map.of("operator","not","children",List.of(node));
+   assertTrue(validator.validatePredicate(fixture(),node).problems().stream().anyMatch(p->p.code().equals("DEPTH_LIMIT")));
+   var children=Collections.nCopies(101,Map.of("operator","exists","property","QuantitySegment.quantity"));
+   assertEquals("INVALID",validator.validatePredicate(fixture(),Map.of("operator","all","children",children)).outcome());
  }
  @Test void unknownAndConflictSurviveLogicalOperations() {
    var unknown=new PredicateTruth(PredicateTruth.State.UNVERIFIED,true);

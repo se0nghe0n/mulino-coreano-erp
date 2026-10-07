@@ -31,3 +31,8 @@ capability/evaluator/schema 조합은 HELD_UNSUPPORTED이며 최신으로 바꾸
 검증 범위는 DefinitionValidatorTest와 실제 PostgreSQL의
 DefinitionsPersistenceTest다. T02 전체 외부 ID·단위 환산, T07 문서/사건
 대조, T21 승인·migration과 전체 V1은 해당 후속 Step에서 인수한다.
+
+Predicate 크기는 depth32/node1000/operand100으로 제한한다. 타입별
+value envelope는 지정 필드만 받고 역전된 수량/시간 bounds를 거부한다.
+최종 보강은 short runner로 실제 JUnit assertion 8개를 실행했다.
+초기 Maven 결과와 최종 short 결과를 checks.json에서 구별한다.
