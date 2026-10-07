@@ -1,6 +1,7 @@
 package com.mulino.adapters.blob;
 
 import com.mulino.application.core.DomainError;
+import com.mulino.application.core.ExecutionClock;
 import java.io.*;
 import java.nio.file.*;
 import java.nio.file.attribute.PosixFilePermissions;
@@ -16,7 +17,9 @@ import org.springframework.stereotype.Component;
 public class LocalBlobStore {
   public record Staged(UUID id, String sha256, long size) {}
   private final Path root;
-  public LocalBlobStore(@Value("${mulino.evidence.blob-root:${java.io.tmpdir}/mulino-evidence-blobs}") String root) {
+  private final ExecutionClock clock;
+  public LocalBlobStore(@Value("${mulino.evidence.blob-root:${java.io.tmpdir}/mulino-evidence-blobs}") String root,ExecutionClock clock) {
+    this.clock=clock;
     this.root = Path.of(root).toAbsolutePath().normalize();
     try {
       var privateDirectory=PosixFilePermissions.asFileAttribute(PosixFilePermissions.fromString("rwx------"));
@@ -67,7 +70,7 @@ public class LocalBlobStore {
   }
   /** Reference predicate must inspect all committed DB references. Grace excludes active uploads. */
   public int cleanupOrphans(Instant olderThan,Predicate<UUID> referenced) {
-    if(olderThan.isAfter(Instant.now().minus(Duration.ofHours(1))))throw DomainError.invalid("Orphan cleanup requires at least one-hour grace");
+    if(olderThan.isAfter(clock.instant().minus(Duration.ofHours(1))))throw DomainError.invalid("Orphan cleanup requires at least one-hour grace");
     int removed=0;
     for(String dir:List.of("staging","objects")) {
       try(var files=Files.list(root.resolve(dir))) {

@@ -22,10 +22,11 @@ public class EvidenceReconciliation {
   private final EvidenceRecords records;
   private final IdentityAuthorization auth;
   private final LocalBlobStore blobs;
+  private final ExecutionClock clock;
   private final ObjectProvider<EvidenceCorrectionImpact> impacts;
   private final ObjectProvider<ExternalOperationScopePort> externalOperations;
-  public EvidenceReconciliation(EvidenceRepository r,EvidenceRecords records,IdentityAuthorization auth,LocalBlobStore blobs,ObjectProvider<EvidenceCorrectionImpact> impacts,ObjectProvider<ExternalOperationScopePort> externalOperations) {
-    this.r=r;this.records=records;this.auth=auth;this.blobs=blobs;this.impacts=impacts;this.externalOperations=externalOperations;
+  public EvidenceReconciliation(EvidenceRepository r,EvidenceRecords records,IdentityAuthorization auth,LocalBlobStore blobs,ObjectProvider<EvidenceCorrectionImpact> impacts,ObjectProvider<ExternalOperationScopePort> externalOperations,ExecutionClock clock) {
+    this.r=r;this.records=records;this.auth=auth;this.blobs=blobs;this.impacts=impacts;this.externalOperations=externalOperations;this.clock=clock;
   }
   public Map<String,Object> claim(DomainContext c,String id){return r.require("Claims",c.organizationId(),uuid(id));}
   public Map<String,Object> review(DomainContext c,String id){return r.require("Reconciliations",c.organizationId(),uuid(id));}
@@ -97,13 +98,13 @@ public class EvidenceReconciliation {
     if(input.physicalScopeId()!=null && r.rows("CanonicalOccurrences",c.organizationId()).stream().anyMatch(x->input.physicalScopeId().equals(x.get("physicalScopeId"))&&event.get("kind").equals(x.get("kind"))&&!input.effectiveFrom().equals(instant(x.get("effectiveFrom")))))decision="CONFLICT";
     if(input.physicalScopeId()!=null && r.rows("CanonicalOccurrences",c.organizationId()).stream().anyMatch(x->input.physicalScopeId().equals(x.get("physicalScopeId"))&&event.get("kind").equals(x.get("kind"))
         &&(!Objects.equals(claim.get("effectiveUntil"),x.get("effectiveUntil"))||!Objects.equals(claim.get("timePrecision"),x.get("timePrecision")))))decision="CONFLICT";
-    if(input.effectiveFrom().isAfter(Instant.now()))decision="UNVERIFIED";
+    if(input.effectiveFrom().isAfter(clock.instant()))decision="UNVERIFIED";
     if(input.existingCanonicalId()!=null) {
       var canonical=r.require("CanonicalOccurrences",c.organizationId(),uuid(input.existingCanonicalId()));auth.authorizeScopes(c,capability,scopes(canonical));
       if(!Objects.equals(input.physicalScopeId(),canonical.get("physicalScopeId"))||!Objects.equals(claim.get("subjectId"),canonical.get("subjectId"))||!Objects.equals(event.get("kind"),canonical.get("kind"))
           ||!sameQuantity(quantity,canonical.get("quantity"))||!Objects.equals(input.unit(),canonical.get("unit"))||!input.effectiveFrom().equals(instant(canonical.get("effectiveFrom"))))decision="CONFLICT";
     }
-    var row=new LinkedHashMap<String,Object>();row.put("ID",UUID.randomUUID().toString());row.put("organizationId",c.organizationId());row.put("revision",1);row.put("createdAt",Instant.now());row.put("recordedAt",Instant.now());row.put("recordedBy",c.actorId());
+    var row=new LinkedHashMap<String,Object>();row.put("ID",UUID.randomUUID().toString());row.put("organizationId",c.organizationId());row.put("revision",1);var now=clock.instant();row.put("createdAt",now);row.put("recordedAt",now);row.put("recordedBy",c.actorId());
     for(String field:List.of("subjectKind","subjectId","itemId","placeId","workId","sourceProfileId"))if(claim.get(field)!=null)row.put(field,claim.get(field));
     row.put("claimId",claim.get("ID"));row.put("basisDocumentId",doc.get("ID"));if(input.physicalScopeId()!=null)row.put("physicalScopeId",uuid(input.physicalScopeId()));
     if(input.existingCanonicalId()!=null)row.put("existingCanonicalId",uuid(input.existingCanonicalId()));

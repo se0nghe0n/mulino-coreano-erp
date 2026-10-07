@@ -19,7 +19,8 @@ public class EvidenceRecords {
   private final EvidenceRepository r;
   private final IdentityAuthorization auth;
   private final LocalBlobStore blobs;
-  public EvidenceRecords(EvidenceRepository r,IdentityAuthorization auth,LocalBlobStore blobs) { this.r=r; this.auth=auth; this.blobs=blobs; }
+  private final ExecutionClock clock;
+  public EvidenceRecords(EvidenceRepository r,IdentityAuthorization auth,LocalBlobStore blobs,ExecutionClock clock) { this.r=r; this.auth=auth; this.blobs=blobs; this.clock=clock; }
   public record DocumentInput(Subject subject,String sourceNamespace,String sourceReference,String mediaType,
       String expectedHash,String provenance,String supersedesId) {}
   public record EventInput(Subject subject,String kind,String sourceNamespace,String externalEventId,String sourceVersion,
@@ -137,9 +138,9 @@ public class EvidenceRecords {
       return LocalBlobStore.hash(new com.fasterxml.jackson.databind.ObjectMapper().writeValueAsBytes(fields));
     }catch(java.io.IOException e){throw new IllegalStateException(e);}
   }
-  private DomainContext now() { var c=auth.context(Instant.now(),Instant.now()); auth.fence(c,List.of()); return c; }
+  private DomainContext now() { var now=clock.instant(); var c=auth.context(now,now); auth.fence(c,List.of()); return c; }
   private Map<String,Object> base(DomainContext c) {
-    var row=new LinkedHashMap<String,Object>();row.put("ID",UUID.randomUUID().toString());row.put("organizationId",c.organizationId());row.put("revision",1);row.put("createdAt",Instant.now());row.put("recordedAt",Instant.now());row.put("recordedBy",c.actorId());return row;
+    var row=new LinkedHashMap<String,Object>();row.put("ID",UUID.randomUUID().toString());row.put("organizationId",c.organizationId());row.put("revision",1);var now=clock.instant();row.put("createdAt",now);row.put("recordedAt",now);row.put("recordedBy",c.actorId());return row;
   }
   Map<String,Object> source(DomainContext c,String namespace) {
     text(namespace,160);
@@ -149,7 +150,7 @@ public class EvidenceRecords {
     for(String role:List.of("intakeOwnerId","supervisorId")) {
       var actor=r.db().run(Select.from("mulino.identity.Actors").where(x->x.get("organizationId").eq(c.organizationId()).and(x.get("ID").eq(profile.get(role))))).first().orElseThrow(DomainError::forbidden);
       if(!"HUMAN".equals(actor.get("kind")))throw new DomainError("REJECTED","POLICY_UNRESOLVED","Intake responsibility requires humans");
-      Instant now=Instant.now();
+      Instant now=clock.instant();
       boolean active=r.db().run(Select.from("mulino.identity.Memberships").where(x->x.get("organizationId").eq(c.organizationId()).and(x.get("actorId").eq(profile.get(role))))).listOf(Map.class).stream()
         .anyMatch(m->m.get("revokedAt")==null&&m.get("validFrom")!=null&&!instant(m.get("validFrom")).isAfter(now)&&(m.get("validUntil")==null||now.isBefore(instant(m.get("validUntil")))));
       if(!active)throw new DomainError("REJECTED","POLICY_UNRESOLVED","Intake responsibility requires active humans");

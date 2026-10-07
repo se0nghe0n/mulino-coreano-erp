@@ -14,7 +14,8 @@ public class EvidenceQueries implements QueryHandler {
   private final EvidenceRepository r;
   private final ReadAuthorizer auth;
   private final LocalBlobStore blobs;
-  public EvidenceQueries(EvidenceRepository r,ReadAuthorizer auth,LocalBlobStore blobs) { this.r=r; this.auth=auth; this.blobs=blobs; }
+  private final ExecutionClock clock;
+  public EvidenceQueries(EvidenceRepository r,ReadAuthorizer auth,LocalBlobStore blobs,ExecutionClock clock) { this.r=r; this.auth=auth; this.blobs=blobs; this.clock=clock; }
   public Set<String> operations() { return Set.of("getEvidence","getInbox","getReconciliation"); }
   @Transactional(readOnly=true)
   public QueryResult query(DomainContext c,QueryRequest q) {
@@ -97,7 +98,7 @@ public class EvidenceQueries implements QueryHandler {
   }
   @Transactional(readOnly=true)
   public Download download(String id) {
-    DomainContext c=auth.context(Instant.now(),Instant.now());
+    var now=clock.instant();DomainContext c=auth.context(now,now);
     Map<String,Object> document=r.require("DocumentVersions",c.organizationId(),uuid(id));
     auth.authorizeScopes(c,"getEvidence",scopes(document));
     if(!"AVAILABLE".equals(document.get("availability"))||document.get("blobId")==null)
