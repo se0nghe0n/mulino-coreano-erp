@@ -80,9 +80,9 @@ Step 2의 최초 공통 baseline은 `cef526e9f77679d8429fb517184f018d64824443`�
 
 | Subtask | branch / 절대 worktree | 소유 범위 | 상태 |
 |---|---|---|---|
-| 공통 harness | `step2/test-harness` / `/Volumes/VideoStore/Developer/mulino-ontology-step2-harness` | `contracts`, harness·base fixture·wrapper | 작성·검증 중 |
-| 실모델 corpus | `step2/model-corpus` / `/Volumes/VideoStore/Developer/mulino-ontology-step2-model-corpus` | `verification/model-corpus` | 작성·검증 중, 실제 모델 호출 없음 |
-| 독립 oracle 목록 | `step2/oracle-catalog` / `/Volumes/VideoStore/Developer/mulino-ontology-step2-oracles` | `verification/requirements` | 작성·검증 중 |
+| 공통 harness | `step2/test-harness` / `/Volumes/VideoStore/Developer/mulino-ontology-step2-harness` | `contracts`, harness·base fixture·wrapper | `32c446f` 통합, review P2 수정 중 |
+| 실모델 corpus | `step2/model-corpus` / `/Volumes/VideoStore/Developer/mulino-ontology-step2-model-corpus` | `verification/model-corpus` | `b8ee1ae` 통합, 경로별 oracle 수정 중 |
+| 독립 oracle 목록 | `step2/oracle-catalog` / `/Volumes/VideoStore/Developer/mulino-ontology-step2-oracles` | `verification/requirements` | `7f972dd` 통합, scoped closure PASS |
 
 공통 계약과 독립 oracle 목록을 먼저 검증·통합한 commit을 B2로 기록한다.
 그 뒤 사례별 writer에게 같은 B2를 배정한다. 공통 interface가 준비되기
@@ -109,8 +109,9 @@ oracle 목록에 반영해 실행 검증한다. 이 사전 검토는 전체 Step
 사용자 Step 1의 skills 파일은 S5 인수의 준비물이다. 문서와 manifest
 존재는 서버 구현·client loading·실제 호출·운영 인수를 대신하지 않는다.
 Java21/CAP/Maven/PostgreSQL은 후보이며 exact 조합은 S0에서 검증한다.
-startup 명령과 `./verify` wrapper는 아직 실행 가능한 것으로 확인하지
-않았다. 운영 매뉴얼은 사용자 Step 6의 검증 후 산출물이다.
+`./verify harness`의 실행을 확인했고 실제 제품 profile은 adapter 부재로
+`NOT_RUN`이다. startup과 운영 인수는 아직 확인하지 않았다. 운영
+매뉴얼은 사용자 Step 6의 검증 후 산출물이다.
 
 ## 필수 인수와 미결정값
 
@@ -147,9 +148,10 @@ coordinator가 3개 skill의 `quick_validate.py`를 uv+PyYAML 환경에서
 fresh 검사 결과는 [정적 검사 증거](evidence/step1-static-checks.txt)에
 기록했다. 두 실제 reviewer의 최종 범위 내 판정도 PASS다.
 
-다음은 공통 테스트 harness와 계약을 검증·통합하고 같은 기준선에서
-사례별 테스트를 작성하는 일이다. startup·도메인·DB·MCP/client·모델·
-BTP 인수는 NOT_RUN이다.
+다음은 공통 runner review의 P2를 해소한 뒤 B2를 기록하고 같은
+기준선에서 사례별 테스트를 작성하는 일이다. [공통 계약 검토 기록](step-2-common-review.md)에
+부분 검토·실행 검사·미해결 항목을 남긴다. startup·도메인·DB·
+MCP/client·모델·BTP 인수는 NOT_RUN이다.
 
 Step 1 기록 통합과 최종 일치 검사는 `393cb5c`에서 완료했다. 이후
 R2와 독립적인 읽기 조사를 실제 GPT-6.1 Sol high 두 worker가 수행했다.
