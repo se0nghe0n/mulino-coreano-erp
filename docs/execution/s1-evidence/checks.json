@@ -1,0 +1,30 @@
+{
+  "status": "PASS",
+  "scope": "S1 focused evidence persistence/file acceptance ONLY",
+  "implementationCommit": "1492b0b",
+  "baseline": "164414418b6c3ce2959979939388d59cf2068e2c",
+  "tests": "15",
+  "failures": "0",
+  "errors": "0",
+  "skipped": "0",
+  "model": "GPT-6.1 Sol",
+  "effort": "medium",
+  "command": "JAVA_HOME=/Library/Java/JavaVirtualMachines/zulu-21.jdk/Contents/Home PATH=<Node24.19.0 dirname>:$PATH JWT_PUBLIC_KEY=<ephemeral public.pem> ../mvnw -B -ntp -Dtest=EvidencePersistenceTest test",
+  "versions": {
+    "java": "21.0.5",
+    "CAP": "5.1.1",
+    "springBoot": "4.1.1",
+    "PostgreSQL": "18.6",
+    "Node": "24.19.0"
+  },
+  "ephemeralCdsImport": "backend/srv/evidence-test-import.cds imports only S1 db modules; removed after run. Coordinator supplies final service model imports.",
+  "outstanding": {
+    "signedHttpMcpIntegration": "NOT_RUN by this worker; coordinator integration",
+    "T06FullAssessment": "NOT_IMPLEMENTED S2",
+    "T07WholeCase": "NOT_RUN",
+    "T41Runtime": "NOT_IMPLEMENTED",
+    "physicalInventoryEffects": "NOT_IMPLEMENTED S3/S4",
+    "retentionRestore": "NOT_IMPLEMENTED S6",
+    "productPaidModelBTP": "NOT_RUN; no calls"
+  }
+}
