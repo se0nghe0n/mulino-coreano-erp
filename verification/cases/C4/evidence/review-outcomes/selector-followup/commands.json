@@ -1,0 +1,33 @@
+{
+  "classification": "ASSERTION_SELFTEST_NOT_PRODUCT_ACCEPTANCE",
+  "baseline": "3d459a1",
+  "reason": "Integration SELFTEST selector chose new obligation sameAs rather than historical assessment sameAs",
+  "command": [
+    "./mvnw",
+    "-B",
+    "-ntp",
+    "-f",
+    "verification/harness/pom.xml",
+    "-Dtest=SalesAssertionMutationTest,OutcomeEffectAssertionSelfTest",
+    "test"
+  ],
+  "environment": {
+    "JAVA_HOME": "/Library/Java/JavaVirtualMachines/zulu-21.jdk/Contents/Home",
+    "PATHPrefix": "/Library/Java/JavaVirtualMachines/zulu-21.jdk/Contents/Home/bin"
+  },
+  "exitCode": 0,
+  "observed": {
+    "tests": 20,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "status": "PASS"
+  },
+  "artifactHashes": {
+    "verification/cases/C4/evidence/review-outcomes/selector-followup/outcome-selector-followup.log.gz": "34571e9c83a9eef7e883837f7215cb7184a7731aa7ea84bed52b7e8248609bab",
+    "verification/cases/C4/evidence/review-outcomes/selector-followup/TEST-org.mulino.verification.cases.sales.SalesAssertionMutationTest.xml.gz": "dd09dbdb43cddd961f63613bfe7eb424ab03e63cfa6d4b3c3521d4a569a9f10e",
+    "verification/cases/C4/evidence/review-outcomes/selector-followup/TEST-org.mulino.verification.cases.sales.OutcomeEffectAssertionSelfTest.xml.gz": "c29396eb71b07c3651eee67e7184554bdb57edb32cb67f3d67815509b2c12e46"
+  },
+  "sourceHash": "6e12678e8aa2c3f9213b80825fcee2da701cffca6baa70ab23bed345c4d55fae",
+  "productStatus": "NOT_RUN"
+}

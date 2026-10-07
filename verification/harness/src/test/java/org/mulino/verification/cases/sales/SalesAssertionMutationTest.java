@@ -104,10 +104,17 @@ public final class SalesAssertionMutationTest {
         ((ObjectNode)n.path("provenance")).put("scopeComplete",false);wrong(a,rs);
     }
     @Test void currentReassessmentCannotRewriteHistoricalEvaluatorVersion() throws Exception {
-        JsonNode a=null;
+        List<JsonNode> matches=new ArrayList<>();
         for(JsonNode sub:Json.read(root.resolve("verification/cases/C4/case.json")).path("subcases")) if(sub.path("id").asText().equals("resolved-no-resurrection-resolved"))
-            for(JsonNode b:sub.path("assertions")) if(b.path("oracleRef").path("observationNames").get(0).asText().equals("valid-resolution") && b.path("op").asText().equals("sameAs")) a=b;
-        assertNotNull(a);
+            for(JsonNode b:sub.path("assertions")) if(b.path("id").asText().equals("valid-resolution-6")) matches.add(b);
+        assertEquals(1,matches.size(),"Historical assessment assertion must have one exact ID match");
+        JsonNode a=matches.get(0);
+        assertEquals("sameAs",a.path("op").asText());
+        assertEquals("after-reprocess-db",a.path("source").path("actionId").asText());
+        assertEquals("/data/rawRows/assessments",a.path("source").path("pointer").asText());
+        assertEquals("historical-db",a.path("baseline").path("actionId").asText());
+        assertEquals("/data/rawRows/assessments",a.path("baseline").path("pointer").asText());
+        assertEquals(Json.parse("[\"id\",\"result\",\"inputSnapshotId\",\"evaluatorVersion\"]"),a.path("source").path("field"));
         ObjectNode after=capture("{\"rawRows\":{\"assessments\":[{\"id\":\"old-assessment\",\"current\":false,\"result\":\"SATISFIED\",\"inputSnapshotId\":\"original-100\",\"evaluatorVersion\":\"evaluator-v1\"}]}}");
         ObjectNode before=capture("{\"rawRows\":{\"assessments\":[{\"id\":\"old-assessment\",\"current\":true,\"result\":\"SATISFIED\",\"inputSnapshotId\":\"original-100\",\"evaluatorVersion\":\"evaluator-v1\"}]}}");
         var rs=one(a,after);rs.put(a.path("baseline").path("actionId").asText(),before);check(a,rs);
