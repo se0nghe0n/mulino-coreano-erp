@@ -24,6 +24,16 @@ public class ApplicationCommands {
   public Map<String,Object> validate(Map<String,Object> input){
     return transaction.execute(status->{Map<String,Object> intent=typed(input,false);DomainContext c=auth.context(clock.instant(),clock.instant());CommandHandler h=handler(intent);definitions.verify(c,intent,h);CommandPreparation prep=h.prepare(c,intent);auth.authorizeScopes(c,(String)intent.get("capabilityId"),prep.scopes());return Map.of("outcome","VALIDATED","canonicalIntentHash",CommandRequests.hash(intent),"proposalRevision",prep.proposalRevision()>0?prep.proposalRevision():1,"capabilityVersion",h.semanticVersion(),"effectClass",prep.effectClass(),"scope",prep.scopes());});
   }
+  /** Safe operational replay of the stored canonical command; never creates a new revision or key. */
+  public Map<String,Object> retryOriginal(String commandRecordId,Map<String,Object> serverClaim){
+    CommandRequests.uuid(commandRecordId);
+    Map<String,Object> original=transaction.execute(status->{
+      DomainContext c=auth.context(clock.instant(),clock.instant());var row=repository.owned(c,commandRecordId).orElseThrow(DomainError::forbidden);
+      if("UNKNOWN_EXTERNAL".equals(row.get("state")))throw new DomainError("REJECTED","EXTERNAL_RECONCILIATION_REQUIRED","External result requires reconciliation");
+      auth.authorize(c,(String)row.get("capabilityId"),null);return repository.original(row);
+    });
+    return execute(original,serverClaim);
+  }
   public Map<String,Object> execute(Map<String,Object> input){return execute(input,Map.of());}
   /** Internal runtime entrypoint; executionClaim is server-issued and never accepted by public adapters. */
   public Map<String,Object> execute(Map<String,Object> input,Map<String,Object> serverExecutionClaim){
@@ -34,7 +44,7 @@ public class ApplicationCommands {
     for(int attempt=0;attempt<3;attempt++)try{return transaction.execute(status->apply(intent,hash,serverExecutionClaim));}
     catch(DomainError failure){return reject(intent,hash,failure);}
     catch(AccessDeniedException failure){return reject(intent,hash,DomainError.forbidden());}
-    catch(org.springframework.dao.DataAccessException failure){if(transientFailure(failure)&&attempt<2)continue;throw failure;}
+    catch(RuntimeException failure){if(transientFailure(failure)&&attempt<2)continue;throw failure;}
     throw new IllegalStateException("Unreachable retry state");
   }
   private Map<String,Object> typed(Map<String,Object> input,boolean executing){Map<String,Object> intent=new LinkedHashMap<>(CommandRequests.parse(input,executing));CommandHandler h=handlers.get(intent.get("capabilityId"));if(h!=null)intent.putIfAbsent("capabilityVersion",h.semanticVersion());else intent.putIfAbsent("capabilityVersion","UNKNOWN");return Map.copyOf(intent);}
@@ -44,7 +54,7 @@ public class ApplicationCommands {
     CommandHandler h=handler(intent);definitions.verify(c,intent,h);CommandPreparation initial=h.prepare(c,intent);
     List<String> fences=new ArrayList<>(initial.fenceKeys());fences.add("command:"+c.stableRequestOwner()+":"+cap+":"+key);repository.fence(c,fences);
     CommandGuard current=guard.getIfAvailable();if(current==null)throw new DomainError("REJECTED","POLICY_UNRESOLVED","Current command guard unavailable");current.fence(c,initial);
-    CommandPreparation prep=h.prepare(c,intent);if(!initial.scopes().equals(prep.scopes())||!new TreeSet<>(initial.fenceKeys()).equals(new TreeSet<>(prep.fenceKeys())))throw new DomainError("CONFLICT","STALE_REVISION","Command scope changed");
+    CommandPreparation prep=h.prepare(c,intent);if(!initial.authorityActors().equals(prep.authorityActors())||!initial.effectClass().equals(prep.effectClass())||!Objects.equals(initial.approvalAction(),prep.approvalAction())||!initial.scopes().equals(prep.scopes())||!new TreeSet<>(initial.fenceKeys()).equals(new TreeSet<>(prep.fenceKeys())))throw new DomainError("CONFLICT","STALE_REVISION","Command scope changed");
     auth.authorizeScopes(c,cap,prep.scopes());
     if(!claim.isEmpty()){CommandLeasePort lease=leases.getIfAvailable();if(lease==null)throw DomainError.forbidden();lease.fenceAndVerify(c,claim);}
     Optional<Map<String,Object>> old=repository.find(c,cap,key);
@@ -52,7 +62,8 @@ public class ApplicationCommands {
     if(prep.currentRevision()!=null&&(!intent.containsKey("expectedRevision")||((Number)intent.get("expectedRevision")).intValue()!=prep.currentRevision()))throw new DomainError("CONFLICT","STALE_REVISION","Expected revision changed");
     if(intent.containsKey("proposalRevision")&&((Number)intent.get("proposalRevision")).intValue()!=(prep.proposalRevision()>0?prep.proposalRevision():1))throw new DomainError("CONFLICT","STALE_REVISION","Proposal revision changed");
     current.verify(c,cap,hash,prep,intent);
-    String id=repository.begin(c,intent,hash,clock.instant());Map<String,Object> result=new LinkedHashMap<>(h.execute(c,intent));
+    String id=repository.begin(c,intent,hash,clock.instant(),true);Map<String,Object> result;String previous=CommandExecution.enter(id);
+    try{result=new LinkedHashMap<>(h.execute(c,intent));}finally{CommandExecution.exit(previous);}
     if(!Set.of("APPLIED","ACCEPTED_PENDING_EXTERNAL","PENDING_EXTERNAL","WAITING_APPROVAL","NEEDS_INPUT","REJECTED","CONFLICT").contains(result.get("outcome")))throw new IllegalStateException("Invalid handler command outcome");
     if(Set.of("REJECTED","CONFLICT","NEEDS_INPUT","WAITING_APPROVAL").contains(result.get("outcome")))throw new DomainError((String)result.get("outcome"),"COMMAND_NOT_APPLIED","Command did not apply");
     auth.authorizeScopes(c,cap,prep.scopes());current.verify(c,cap,hash,prep,intent);if(!claim.isEmpty())leases.getObject().fenceAndVerify(c,claim);
@@ -65,7 +76,7 @@ public class ApplicationCommands {
     Map<String,Object> result=failure.response();
     return denial.execute(status->{DomainContext c;try{c=auth.context(clock.instant(),clock.instant());}catch(AccessDeniedException unauthenticated){return result;}
       String cap=(String)intent.get("capabilityId"),key=(String)intent.get("commandIdempotencyKey");repository.fence(c,List.of("command:"+c.stableRequestOwner()+":"+cap+":"+key));var old=repository.find(c,cap,key);
-      if(old.isPresent())return result;String id=repository.begin(c,intent,hash,clock.instant());repository.finish(c,id,intent,hash,result,clock.instant());return result;});
+      if(old.isPresent())return result;String id=repository.begin(c,intent,hash,clock.instant(),false);repository.finish(c,id,intent,hash,result,clock.instant());return result;});
   }
-  private boolean transientFailure(org.springframework.dao.DataAccessException failure){Throwable cause=failure;while(cause!=null){if(cause instanceof java.sql.SQLException sql&&Set.of("55P03","40P01","40001").contains(sql.getSQLState()))return true;cause=cause.getCause();}return false;}
+  private boolean transientFailure(RuntimeException failure){Throwable cause=failure;while(cause!=null){if(cause instanceof java.sql.SQLException sql&&Set.of("55P03","40P01","40001").contains(sql.getSQLState()))return true;cause=cause.getCause();}return false;}
 }

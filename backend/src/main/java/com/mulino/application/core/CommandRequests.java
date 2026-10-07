@@ -17,6 +17,11 @@ public final class CommandRequests {
     ((Map<?,?>)input.get("provenance")).forEach((k,v)->{if(!(k instanceof String)||!Set.of("USER","CONTEXT","APPROVED_DEFAULT").contains(v))throw DomainError.invalid("Invalid provenance");});
     for(String field:List.of("expectedRevision","proposalRevision"))if(input.containsKey(field)&&(!(input.get(field) instanceof Number n)||n.longValue()<0||n.doubleValue()!=n.longValue()||n.longValue()>Integer.MAX_VALUE))throw DomainError.invalid("Integer revision required");
     if(input.containsKey("canonicalIntentHash")&&(!(input.get("canonicalIntentHash") instanceof String hash)||!hash.matches("[a-f0-9]{64}")))throw DomainError.invalid("Invalid canonical hash");
+    for(String field:List.of("conditions","evidenceRefs","sourceRefs","contextRefs"))if(input.containsKey(field)&&!(input.get(field) instanceof List<?>))throw DomainError.invalid("Array required for "+field);
+    if(input.containsKey("evidenceRefs"))for(Object value:(List<?>)input.get("evidenceRefs")){if(!(value instanceof String))throw DomainError.invalid("Typed evidence ID required");uuid((String)value);}
+    for(String field:List.of("sourceRefs","contextRefs"))if(input.containsKey(field))for(Object value:(List<?>)input.get(field))if(!(value instanceof String))throw DomainError.invalid("String reference required");
+    if(input.containsKey("approvalId")){text(input,"approvalId",36);uuid((String)input.get("approvalId"));}
+    if(input.containsKey("conversationRequestId"))text(input,"conversationRequestId",160);
     if(input.containsKey("capabilityVersion"))text(input,"capabilityVersion",80);
     if(executing)text(input,"commandIdempotencyKey",160);
     return Map.copyOf(input);

@@ -18,8 +18,12 @@ public class CommandRepository {
   public Optional<Map<String,Object>> find(DomainContext c,String cap,String key){
     return db.run(Select.from("mulino.commands.CommandRecords").where(b->b.get("organizationId").eq(c.organizationId()).and(b.get("stableRequestOwner").eq(c.stableRequestOwner())).and(b.get("capabilityId").eq(cap)).and(b.get("commandIdempotencyKey").eq(key)))).first().map(r->(Map<String,Object>)r);
   }
-  public String begin(DomainContext c,Map<String,Object> intent,String hash,java.time.Instant now){
-    String id=UUID.randomUUID().toString();Map<String,Object> row=new HashMap<>();row.put("ID",id);row.put("organizationId",c.organizationId());row.put("stableRequestOwner",c.stableRequestOwner());row.put("capabilityId",intent.get("capabilityId"));row.put("commandIdempotencyKey",intent.get("commandIdempotencyKey"));row.put("canonicalHash",hash);row.put("definitionVersion",intent.get("definitionVersion"));row.put("capabilityVersion",intent.get("capabilityVersion"));row.put("state","IN_PROGRESS");row.put("createdAt",now);
+  public Optional<Map<String,Object>> owned(DomainContext c,String id){
+    return db.run(Select.from("mulino.commands.CommandRecords").where(b->b.get("organizationId").eq(c.organizationId()).and(b.get("ID").eq(id)).and(b.get("stableRequestOwner").eq(c.stableRequestOwner())).and(b.get("actorId").eq(c.actorId())))).first().map(r->(Map<String,Object>)r);
+  }
+  public Map<String,Object> original(Map<String,Object> row){try{return json.readValue((String)row.get("canonicalIntentJson"),Map.class);}catch(Exception failure){throw new DomainError("REJECTED","COMMAND_UNAVAILABLE","Canonical request unavailable");}}
+  public String begin(DomainContext c,Map<String,Object> intent,String hash,java.time.Instant now,boolean validated){
+    String id=UUID.randomUUID().toString();Map<String,Object> row=new HashMap<>();row.put("ID",id);row.put("organizationId",c.organizationId());row.put("actorId",c.actorId());if(validated)row.put("canonicalIntentJson",encode(intent));row.put("stableRequestOwner",c.stableRequestOwner());row.put("capabilityId",intent.get("capabilityId"));row.put("commandIdempotencyKey",intent.get("commandIdempotencyKey"));row.put("canonicalHash",hash);row.put("definitionVersion",intent.get("definitionVersion"));row.put("capabilityVersion",intent.get("capabilityVersion"));row.put("state","IN_PROGRESS");row.put("createdAt",now);
     db.run(Insert.into("mulino.commands.CommandRecords").entry(row));return id;
   }
   public void finish(DomainContext c,String id,Map<String,Object> intent,String hash,Map<String,Object> result,java.time.Instant now){
