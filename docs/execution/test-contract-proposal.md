@@ -103,8 +103,10 @@ ID, 인간 owner·기한을 고정한다. 가상 정책은 실제 법규가 아�
 
 발생시각·기록시각·UTC instant·원 offset/시간대·정밀도·기한 끝점을
 고정한다. `MISSING/UNKNOWN/NOT_APPLICABLE/CONFLICT`를0이나 단일 null로
-합치지 않는다. fixture/setup과 본 실행을 구별해 setup 효과를 업무
-assertion에 포함하지 않는다.
+합치지 않는다. fixture/setup 상태는 baseline으로 기록하고 검증 대상
+행동의 새 효과와 구별한다. 현재량·누적량 oracle는 정의된 scope 안의
+baseline 사실도 포함한다. setup 자체를 해당 capability의 실행
+coverage로 세지 않으며 검증하려는 행동을 setup으로 대신하지 않는다.
 
 각 사례는 입력·인증 주체·route·실제 capability, 정상/예외 기대값,
 독립 손계산, assertion ID, 관찰 원천, 효과 scope, 허용/금지 변화와
@@ -166,8 +168,9 @@ runtime coverage는 EXECUTED observation과 실제 artifact를 추가로
 요구한다. ID 목록, feature 존재, stub FAIL와 정적 PASS는 실행 coverage가
 아니다. `./verify`는 내부 command·version·exit code를 노출하고
 `failIfNoTests`, 등록된 필수 case/subcase의 discovery·실행 수 대조로
-빈 suite나 누락을 실패 처리한다. T26+C5+V8+E2의41개 top-level case
-ID는 최소 index이며 실제 필수 subcase 수는 registry에서 검사한다.
+빈 suite나 누락을 실패 처리한다. T 26개+C 5개+V 8개+E 2개인 총41개
+top-level case ID는 최소 index이며 실제 필수 subcase 수는 registry에서
+검사한다.
 skip·pending·비용 미승인을 PASS에 포함하지 않는다.
 
 ## 5. 공통 계약 뒤의 여덟 독립 Subtask
