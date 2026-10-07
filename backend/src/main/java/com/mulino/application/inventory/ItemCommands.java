@@ -14,6 +14,13 @@ public final class ItemCommands implements CommandHandler {
  private final InventoryRepository repository;
  public ItemCommands(InventoryRepository repository){this.repository=repository;}
  public Set<String> capabilities(){return Set.of("registerItem","linkExternalId");}
+ @Override public List<SubjectBinding> subjectBindings(DomainContext c,Map<String,Object> intent,CommandPreparation preparation) {
+  String capability=InventoryCommands.text(intent,"capabilityId",100);
+  if(capability.equals("registerItem"))return List.of();
+  if(!capability.equals("linkExternalId"))throw DomainError.unsupported();
+  String item=InventoryCommands.uuid(InventoryCommands.slots(intent),"itemId");repository.current(c,"TradeItems",item);
+  return List.of(SubjectBinding.optional("TradeItem",Set.of(item)));
+ }
  public CommandPreparation prepare(DomainContext c,Map<String,Object> intent) {
   var p=InventoryCommands.slots(intent);String capability=InventoryCommands.text(intent,"capabilityId",100);
   if(!"COMMAND".equals(intent.get("intentKind")))throw DomainError.invalid("Metadata COMMAND required");

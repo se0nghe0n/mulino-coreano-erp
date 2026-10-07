@@ -87,3 +87,18 @@ InventoryPostgresTest의 기존 시점·관계 assertion도 유지한다.
 전체 V2 예약/정정·V3 출고/QC 경합·C1 판매 적격성과 S3/S4 인수는
 이 primitive tests만으로 PASS라고 표시하지 않는다. paid model/BTP는
 실행하지 않는다.
+
+## 명사 subject의 실제 대상 결합
+
+subjectRefs는 권한 scope 목록을 복사하지 않는다. 물량 명령은 validated
+segmentId/segmentIds를 QuantitySegment로, 그 조직의 실제 segment가
+참조하는 itemId만 TradeItem으로 결합한다. 이 경로는 T03/T04의
+QuantitySegment와 E1/E2/T13의 TradeItem 진입점을 같은 실물에 연결한다.
+Place·Organization과 관계없는 다른 품목은 subject로 허용하지 않는다.
+
+registerItem은 아직 존재하지 않는 ID를 생성하므로 기존 subject는 없다.
+linkExternalId는 validated itemId의 실제 TradeItem 하나만 결합한다.
+필수 대상은 typed slots에 이미 있어 명사 선언 0개는 허용한다. 명사를
+선언하면 공통 resolver가 발행된 noun/action, 정확한 ID와 cardinality를
+잠금 전후에 확인한다. InventorySubjectBindingTest는 실제 원천과 품목,
+merge의 여러 source, 생성/연결의 차이와 권한 scope ID 배제를 확인한다.

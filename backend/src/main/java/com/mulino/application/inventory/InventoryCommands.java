@@ -13,6 +13,14 @@ public final class InventoryCommands implements CommandHandler {
   private final InventoryRepository repository; private final StockPrimitives stock; private final ReadAuthorizer authorizer; private final InventoryRestrictionGuard restrictions;
   public InventoryCommands(InventoryRepository repository,StockPrimitives stock,ReadAuthorizer authorizer,InventoryRestrictionGuard restrictions){this.repository=repository;this.stock=stock;this.authorizer=authorizer;this.restrictions=restrictions;}
   public Set<String> capabilities(){return Set.of("splitQuantity","mergeQuantity","moveQuantity","recordStocktake","adjustQuantity","disposeQuantity");}
+  @Override public List<SubjectBinding> subjectBindings(DomainContext c,Map<String,Object> intent,CommandPreparation preparation) {
+    String capability=text(intent,"capabilityId",100);if(!capabilities().contains(capability))throw DomainError.unsupported();
+    var slots=slots(intent);
+    var targets=capability.equals("mergeQuantity")?Set.copyOf(strings(slots,"segmentIds")):Set.of(uuid(slots,"segmentId"));
+    var items=new HashSet<String>();
+    for(String id:targets)items.add((String)repository.current(c,"QuantitySegments",id).get("itemId"));
+    return List.of(SubjectBinding.optional("QuantitySegment",targets),SubjectBinding.optional("TradeItem",items));
+  }
   public Set<String> intentKinds(){return Set.of("COMMAND","RECORD");}
   public CommandPreparation prepare(DomainContext c,Map<String,Object> intent) {
     String capability=text(intent,"capabilityId",100);var slots=slots(intent);Instant at=time(c,slots);
