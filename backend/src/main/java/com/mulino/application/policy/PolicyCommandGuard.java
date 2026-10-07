@@ -14,6 +14,11 @@ public class PolicyCommandGuard implements CommandGuard {
  private final IdentityAuthorization auth;private final IdentityRepository identity;private final PolicyRepository policy;private final ApprovalRepository approvals;
  public PolicyCommandGuard(IdentityAuthorization auth,IdentityRepository identity,PolicyRepository policy,ApprovalRepository approvals){this.auth=auth;this.identity=identity;this.policy=policy;this.approvals=approvals;}
  public void fence(DomainContext c,CommandPreparation p){policy.fence(c.organizationId());auth.fence(c,p.authorityActors());}
+ public void authorizeReplay(DomainContext c,String capability,Map<String,List<String>> savedScopes){
+   // This is only a serialization fence; replay does not select or reconsume policy decisions.
+   policy.fence(c.organizationId());auth.fence(c,List.of());
+   if(!everyScope(c,capability,savedScopes))throw DomainError.forbidden();
+ }
  public void verify(DomainContext c,String capability,String hash,CommandPreparation p,Map<String,Object> intent){
    if(!everyScope(c,capability,p.scopes()))throw DomainError.forbidden();
    var selection=rule(c,capability);var rule=selection.rule();
