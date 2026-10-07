@@ -1,11 +1,11 @@
 {
-  "status": "PARTIAL_PASS",
+  "status": "PASS_SCOPED",
   "userStep": 3,
   "systemStage": "S2_ACTIVE",
   "baseline": "40a240c3886d3316ba1fd686e9b44bfa1ba6ec2d",
   "runtime": "Java21/CAP5.1.1/PostgreSQL18.6/CQN",
-  "checkedCommit": "03f55eb",
-  "dependencyBaseline": "de5d587",
+  "checkedCommit": "1c86cf3",
+  "dependencyBaseline": "28b224eb68ab06cc2040e4d0284c860eba3faf73",
   "checks": [
     {
       "command": "JAVA_HOME=/Library/Java/JavaVirtualMachines/zulu-21.jdk/Contents/Home PATH=/Users/n30gu1/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin:/Library/Java/JavaVirtualMachines/zulu-21.jdk/Contents/Home/bin:$PATH ./mvnw -f backend/pom.xml -Dtest=GoalInputTest,S2WorkLifecyclePostgresTest,S2WorkActualIntegrationTest test",
@@ -18,26 +18,61 @@
       "observed": "actual WorkLifecycle/AssessmentService/ResponsibilityService PostgreSQL integration1 PASS; no business-port mocks",
       "exitCode": 0,
       "artifact": "s2-work-actual-final.log.gz"
+    },
+    {
+      "source": "4a7bc33",
+      "command": "JAVA_HOME=/Library/Java/JavaVirtualMachines/zulu-21.jdk/Contents/Home PATH=/Users/n30gu1/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin:/Library/Java/JavaVirtualMachines/zulu-21.jdk/Contents/Home/bin:$PATH ./mvnw -f backend/pom.xml -Dtest=GoalInputTest,S2WorkLifecyclePostgresTest,S2WorkActualIntegrationTest test",
+      "observed": "pure4 PASS; Spring suites blocked by missing real IntakeDutyPort implementation dependency",
+      "exitCode": 1,
+      "artifact": "s2-work-gateway-final.log.gz"
+    },
+    {
+      "source": "28b224e dependency merge + 4a7bc33 own",
+      "command": "JAVA_HOME=/Library/Java/JavaVirtualMachines/zulu-21.jdk/Contents/Home PATH=/Users/n30gu1/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin:/Library/Java/JavaVirtualMachines/zulu-21.jdk/Contents/Home/bin:$PATH ./mvnw -f backend/pom.xml -Dtest=GoalInputTest,S2WorkLifecyclePostgresTest,S2WorkActualIntegrationTest test",
+      "observed": "DI PASS; complete native goal fixtures lacked newly required interval flags, gateway fixture lacked actor AuthorityFences",
+      "exitCode": 1,
+      "artifact": "s2-work-gateway-rerun.log.gz"
+    },
+    {
+      "source": "c595c1b",
+      "command": "JAVA_HOME=/Library/Java/JavaVirtualMachines/zulu-21.jdk/Contents/Home PATH=/Users/n30gu1/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin:/Library/Java/JavaVirtualMachines/zulu-21.jdk/Contents/Home/bin:$PATH ./mvnw -f backend/pom.xml -Dtest=GoalInputTest,S2WorkLifecyclePostgresTest,S2WorkActualIntegrationTest test",
+      "observed": "pure4 PASS; partial PostgreSQL5 PASS; actual gateway2 PASS; actual3 rejected fixture condition arrived versus published Arrival",
+      "exitCode": 1,
+      "artifact": "s2-work-gateway-fixture-final.log.gz"
+    },
+    {
+      "source": "1c86cf3",
+      "command": "JAVA_HOME=/Library/Java/JavaVirtualMachines/zulu-21.jdk/Contents/Home PATH=/Users/n30gu1/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin:/Library/Java/JavaVirtualMachines/zulu-21.jdk/Contents/Home/bin:$PATH ./mvnw -f backend/pom.xml -Dtest=S2WorkActualIntegrationTest test",
+      "observed": "actual coupled PostgreSQL5 PASS; failures0 errors0 skipped0; WorkLifecycle, AssessmentService, ResponsibilityService, authorization, policy and command gateway have no business-port mocks",
+      "exitCode": 0,
+      "artifact": "s2-work-actual-gateway-pass.log.gz"
     }
   ],
   "limitations": [
-    "Signed REST/OData/MCP lifecycle not executed in this worker",
-    "Full normative T09-T12/C2/C5 cases NOT_RUN; S3 receipts and canonical physical scope binding not substituted by synthetic fixture",
-    "New contribution-range test pending execution",
+    "Partial PostgreSQL5 uses primary interface guards and is not a full lifecycle acceptance claim",
+    "Signed REST/OData/MCP lifecycle not executed in this worker; root owns combined native probes",
+    "Full normative T09-T12/C2/C5 cases NOT_RUN in this worker; S3 receipt handler semantics are not substituted by internally seeded genuine canonical evidence fixtures",
     "Paid model, regulatory, BTP NOT_RUN"
   ],
   "files": {
     "backend/src/test/java/com/mulino/core/S2WorkActualIntegrationTest.java": {
-      "sha256": "71701184e64df8c8bd26534a0efff4cb212ca5d6d6caa84851abf62d16ac1364",
-      "source": "03f55eb"
+      "sha256": "a16046366e475b40bf727c149634158b455cf42fafcd14e2197c7b105629b26f",
+      "source": "1c86cf3"
     },
     "backend/src/test/java/com/mulino/core/S2WorkLifecyclePostgresTest.java": {
-      "sha256": "999a9490f54247841f81a41064da0145df9d5f83aa2bbc0bb83448b506e49c0c",
-      "source": "03f55eb"
+      "sha256": "b51b13f32777bd502e49c59a190a81531fb37a97c2073b9f3d884af2cc8dbd06",
+      "source": "c595c1b"
     },
     "backend/src/test/java/com/mulino/work/GoalInputTest.java": {
       "sha256": "4991fd233bbf0137a38eb71b81fa4881839d4fe49e04494c6d3740be04db658b",
-      "source": "03f55eb"
+      "source": "unchanged GoalInputTest"
     }
-  }
+  },
+  "acceptance": [
+    "Goal100 with actual90 cannot fulfill, verified10 addition permits fulfilled close; immutable prior UNSAT assessment preserved; noun and verb reads see the same persisted world",
+    "Actual canonical credit ranges cannot overlap globally or exceed actual quantity; closed child with parent credited90 never fulfills target100",
+    "Public ApplicationCommands createWork persists explicit interval booleans; revision preserves old endpoints and deadline history; public newDueAt/previousGoalVersion creates immutable version3",
+    "Actual command gateway draft/cancel/replay yields APPLIED, two committed records and audits, and no unsolicited external delivery",
+    "Closed correction followup is source-idempotent, preserves original CLOSED history and requires explicit independent Goal revision"
+  ]
 }
