@@ -1,0 +1,162 @@
++ java -version
+openjdk version "21.0.5" 2024-10-15 LTS
+OpenJDK Runtime Environment Zulu21.38+21-CA (build 21.0.5+11-LTS)
+OpenJDK 64-Bit Server VM Zulu21.38+21-CA (build 21.0.5+11-LTS, mixed mode, sharing)
+exitCode=0
++ /Volumes/VideoStore/Developer/mulino-ontology-step2-platform/mvnw -version
+Apache Maven 3.9.16 (2bdd9fddda4b155ebf8000e807eb73fd829a51d5)
+Maven home: /Users/n30gu1/.m2/wrapper/dists/apache-maven-3.9.16/56ba1f9f
+Java version: 21.0.5, vendor: Azul Systems, Inc., runtime: /Library/Java/JavaVirtualMachines/zulu-21.jdk/Contents/Home
+Default locale: en_KR, platform encoding: UTF-8
+OS name: "mac os x", version: "27.0.1", arch: "aarch64", family: "mac"
+exitCode=0
++ /Volumes/VideoStore/Developer/mulino-ontology-step2-platform/mvnw -B -ntp -f /Volumes/VideoStore/Developer/mulino-ontology-step2-platform/verification/harness/pom.xml test
+[INFO] Scanning for projects...
+[INFO]
+[INFO] -------------------< org.mulino:acceptance-harness >--------------------
+[INFO] Building acceptance-harness 1.0.0
+[INFO]   from pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO]
+[INFO] --- resources:3.4.0:resources (default-resources) @ acceptance-harness ---
+[INFO] skip non existing resourceDirectory /Volumes/VideoStore/Developer/mulino-ontology-step2-platform/verification/harness/src/main/resources
+[INFO]
+[INFO] --- compiler:3.14.1:compile (default-compile) @ acceptance-harness ---
+[INFO] Nothing to compile - all classes are up to date.
+[INFO]
+[INFO] --- resources:3.4.0:testResources (default-testResources) @ acceptance-harness ---
+[INFO] Copying 36 resources from src/test/resources to target/test-classes
+[INFO]
+[INFO] --- compiler:3.14.1:testCompile (default-testCompile) @ acceptance-harness ---
+[INFO] Nothing to compile - all classes are up to date.
+[INFO]
+[INFO] --- surefire:3.5.6:test (default-test) @ acceptance-harness ---
+[INFO] Using auto detected provider org.apache.maven.surefire.junitplatform.JUnitPlatformProvider
+[INFO]
+[INFO] -------------------------------------------------------
+[INFO]  T E S T S
+[INFO] -------------------------------------------------------
+[INFO] Running org.mulino.verification.PreparationValidatorTest
+SLF4J(W): No SLF4J providers were found.
+SLF4J(W): Defaulting to no-operation (NOP) logger implementation
+SLF4J(W): See https://www.slf4j.org/codes.html#noProviders for further details.
+[INFO] Tests run: 39, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.212 s -- in org.mulino.verification.PreparationValidatorTest
+[INFO] Running org.mulino.verification.ReviewContractTest
+[INFO] Tests run: 8, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.117 s -- in org.mulino.verification.ReviewContractTest
+[INFO] Running org.mulino.verification.ReferenceResolverTest
+[INFO] Tests run: 10, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.009 s -- in org.mulino.verification.ReferenceResolverTest
+[INFO] Running org.mulino.verification.HostObservationValidatorTest
+[INFO] Tests run: 10, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.132 s -- in org.mulino.verification.HostObservationValidatorTest
+[INFO] Running org.mulino.verification.AssertionEngineTest
+[INFO] Tests run: 13, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.013 s -- in org.mulino.verification.AssertionEngineTest
+[INFO] Running org.mulino.verification.cases.platform.PlatformAssertionTest
+[ERROR] Tests run: 18, Failures: 1, Errors: 4, Skipped: 0, Time elapsed: 0.080 s <<< FAILURE! -- in org.mulino.verification.cases.platform.PlatformAssertionTest
+[ERROR] org.mulino.verification.cases.platform.PlatformAssertionTest.retiredParentCannotBeDoubleCountedAndWrongQuantityOrUnitFails -- Time elapsed: 0.008 s <<< FAILURE!
+org.opentest4j.AssertionFailedError: Unexpected exception thrown: java.lang.IllegalArgumentException: Unresolved server fixture alias "P"
+        at org.junit.jupiter.api.Assertions.assertDoesNotThrow(Assertions.java:3306)
+        at org.mulino.verification.cases.platform.PlatformAssertionTest.retiredParentCannotBeDoubleCountedAndWrongQuantityOrUnitFails(PlatformAssertionTest.java:45)
+Caused by: java.lang.IllegalArgumentException: Unresolved server fixture alias "P"
+        at org.mulino.verification.ReferenceResolver.require(ReferenceResolver.java:94)
+        at org.mulino.verification.ReferenceResolver.resolve(ReferenceResolver.java:19)
+        at org.mulino.verification.ReferenceResolver.lambda$resolve$0(ReferenceResolver.java:34)
+        at java.base/java.util.Iterator.forEachRemaining(Iterator.java:133)
+        at org.mulino.verification.ReferenceResolver.resolve(ReferenceResolver.java:34)
+        at org.mulino.verification.ReferenceResolver.identity(ReferenceResolver.java:15)
+        at org.mulino.verification.AssertionEngine.check(AssertionEngine.java:14)
+        at org.mulino.verification.cases.platform.PlatformAssertionTest.check(PlatformAssertionTest.java:36)
+        at org.mulino.verification.cases.platform.PlatformAssertionTest.lambda$retiredParentCannotBeDoubleCountedAndWrongQuantityOrUnitFails$0(PlatformAssertionTest.java:45)
+        at org.junit.jupiter.api.AssertDoesNotThrow.assertDoesNotThrow(AssertDoesNotThrow.java:52)
+        at org.junit.jupiter.api.AssertDoesNotThrow.assertDoesNotThrow(AssertDoesNotThrow.java:39)
+        ... 2 more
+
+[ERROR] org.mulino.verification.cases.platform.PlatformAssertionTest.duplicatePhysicalScopeFailsEvenWithCorrectTotal -- Time elapsed: 0.002 s <<< ERROR!
+java.lang.IllegalArgumentException: Unresolved server fixture alias "P"
+        at org.mulino.verification.ReferenceResolver.require(ReferenceResolver.java:94)
+        at org.mulino.verification.ReferenceResolver.resolve(ReferenceResolver.java:19)
+        at org.mulino.verification.ReferenceResolver.lambda$resolve$0(ReferenceResolver.java:34)
+        at java.base/java.util.Iterator.forEachRemaining(Iterator.java:133)
+        at org.mulino.verification.ReferenceResolver.resolve(ReferenceResolver.java:34)
+        at org.mulino.verification.ReferenceResolver.identity(ReferenceResolver.java:15)
+        at org.mulino.verification.AssertionEngine.check(AssertionEngine.java:14)
+        at org.mulino.verification.cases.platform.PlatformAssertionTest.check(PlatformAssertionTest.java:36)
+        at org.mulino.verification.cases.platform.PlatformAssertionTest.duplicatePhysicalScopeFailsEvenWithCorrectTotal(PlatformAssertionTest.java:53)
+
+[ERROR] org.mulino.verification.cases.platform.PlatformAssertionTest.changedIdempotencyResultFailsPreservation -- Time elapsed: 0.002 s <<< ERROR!
+java.lang.IllegalArgumentException: Unresolved server fixture alias "P"
+        at org.mulino.verification.ReferenceResolver.require(ReferenceResolver.java:94)
+        at org.mulino.verification.ReferenceResolver.resolve(ReferenceResolver.java:19)
+        at org.mulino.verification.ReferenceResolver.lambda$resolve$0(ReferenceResolver.java:34)
+        at java.base/java.util.Iterator.forEachRemaining(Iterator.java:133)
+        at org.mulino.verification.ReferenceResolver.resolve(ReferenceResolver.java:34)
+        at org.mulino.verification.ReferenceResolver.identity(ReferenceResolver.java:15)
+        at org.mulino.verification.AssertionEngine.check(AssertionEngine.java:14)
+        at org.mulino.verification.cases.platform.PlatformAssertionTest.check(PlatformAssertionTest.java:36)
+        at org.mulino.verification.cases.platform.PlatformAssertionTest.changedIdempotencyResultFailsPreservation(PlatformAssertionTest.java:67)
+
+[ERROR] org.mulino.verification.cases.platform.PlatformAssertionTest.missingDutyOwnerAndChangedQuantityOrDeadlineFail -- Time elapsed: 0.002 s <<< ERROR!
+java.lang.IllegalArgumentException: Unresolved server fixture alias "P"
+        at org.mulino.verification.ReferenceResolver.require(ReferenceResolver.java:94)
+        at org.mulino.verification.ReferenceResolver.resolve(ReferenceResolver.java:19)
+        at org.mulino.verification.ReferenceResolver.lambda$resolve$0(ReferenceResolver.java:34)
+        at java.base/java.util.Iterator.forEachRemaining(Iterator.java:133)
+        at org.mulino.verification.ReferenceResolver.resolve(ReferenceResolver.java:34)
+        at org.mulino.verification.ReferenceResolver.identity(ReferenceResolver.java:15)
+        at org.mulino.verification.AssertionEngine.check(AssertionEngine.java:14)
+        at org.mulino.verification.cases.platform.PlatformAssertionTest.check(PlatformAssertionTest.java:36)
+        at org.mulino.verification.cases.platform.PlatformAssertionTest.missingDutyOwnerAndChangedQuantityOrDeadlineFail(PlatformAssertionTest.java:58)
+
+[ERROR] org.mulino.verification.cases.platform.PlatformAssertionTest.preservedDefinitionMeaningCannotBecomeV2 -- Time elapsed: 0.002 s <<< ERROR!
+java.lang.IllegalArgumentException: Unresolved server fixture alias "P"
+        at org.mulino.verification.ReferenceResolver.require(ReferenceResolver.java:94)
+        at org.mulino.verification.ReferenceResolver.resolve(ReferenceResolver.java:19)
+        at org.mulino.verification.ReferenceResolver.lambda$resolve$0(ReferenceResolver.java:34)
+        at java.base/java.util.Iterator.forEachRemaining(Iterator.java:133)
+        at org.mulino.verification.ReferenceResolver.resolve(ReferenceResolver.java:34)
+        at org.mulino.verification.ReferenceResolver.identity(ReferenceResolver.java:15)
+        at org.mulino.verification.AssertionEngine.check(AssertionEngine.java:14)
+        at org.mulino.verification.cases.platform.PlatformAssertionTest.check(PlatformAssertionTest.java:36)
+        at org.mulino.verification.cases.platform.PlatformAssertionTest.preservedDefinitionMeaningCannotBecomeV2(PlatformAssertionTest.java:62)
+
+[INFO] Running org.mulino.verification.ContractValidatorTest
+[INFO] Tests run: 8, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.035 s -- in org.mulino.verification.ContractValidatorTest
+[INFO] Running org.mulino.verification.RunnerPortTest
+[INFO] Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.009 s -- in org.mulino.verification.RunnerPortTest
+[INFO] Running org.mulino.verification.HarnessTest
+
+@harness-selftest
+시나리오: 고정 표본은 제품 실행 증거가 아니다                       # classpath:features/harness-smoke.feature:4
+  ✔ 먼저 고정 관찰 표본과 독립 기대값을 읽는다                     # org.mulino.verification.ScenarioGlue.canned()
+  ✔ 만일 표본 수량과 책임을 assertion으로 검사한다               # org.mulino.verification.ScenarioGlue.checkCanned()
+  ✔ 그러면 제품 실행 coverage 없이 11개 assertion 자체가 통과한다 # org.mulino.verification.ScenarioGlue.count(int)
+[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.089 s -- in org.mulino.verification.HarnessTest
+[INFO]
+[INFO] Results:
+[INFO]
+[ERROR] Failures:
+[ERROR]   PlatformAssertionTest.retiredParentCannotBeDoubleCountedAndWrongQuantityOrUnitFails:45 Unexpected exception thrown: java.lang.IllegalArgumentException: Unresolved server fixture alias "P"
+[ERROR] Errors:
+[ERROR]   PlatformAssertionTest.changedIdempotencyResultFailsPreservation:67->check:36 » IllegalArgument Unresolved server fixture alias "P"
+[ERROR]   PlatformAssertionTest.duplicatePhysicalScopeFailsEvenWithCorrectTotal:53->check:36 » IllegalArgument Unresolved server fixture alias "P"
+[ERROR]   PlatformAssertionTest.missingDutyOwnerAndChangedQuantityOrDeadlineFail:58->check:36 » IllegalArgument Unresolved server fixture alias "P"
+[ERROR]   PlatformAssertionTest.preservedDefinitionMeaningCannotBecomeV2:62->check:36 » IllegalArgument Unresolved server fixture alias "P"
+[INFO]
+[ERROR] Tests run: 109, Failures: 1, Errors: 4, Skipped: 0
+[INFO]
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD FAILURE
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  1.576 s
+[INFO] Finished at: 2026-10-07T23:13:39+09:00
+[INFO] ------------------------------------------------------------------------
+[ERROR] Failed to execute goal org.apache.maven.plugins:maven-surefire-plugin:3.5.6:test (default-test) on project acceptance-harness: There are test failures.
+[ERROR]
+[ERROR] See /Volumes/VideoStore/Developer/mulino-ontology-step2-platform/verification/harness/target/surefire-reports for the individual test results.
+[ERROR] See dump files (if any exist) [date].dump, [date]-jvmRun[N].dump and [date].dumpstream.
+[ERROR] -> [Help 1]
+[ERROR]
+[ERROR] To see the full stack trace of the errors, re-run Maven with the -e switch.
+[ERROR] Re-run Maven using the -X switch to enable full debug logging.
+[ERROR]
+[ERROR] For more information about the errors and possible solutions, please read the following articles:
+[ERROR] [Help 1] http://cwiki.apache.org/confluence/display/MAVEN/MojoFailureException
+exitCode=1

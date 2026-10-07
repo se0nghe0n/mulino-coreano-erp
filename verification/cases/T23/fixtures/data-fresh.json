@@ -1,0 +1,387 @@
+{
+  "schemaVersion": "1.0.0",
+  "fixtureId": "T23-data-fresh",
+  "synthetic": true,
+  "baseRefs": [],
+  "clock": {
+    "asOf": "2026-10-07T09:00:00Z",
+    "knownAt": "2026-10-07T09:00:01Z",
+    "timezone": "Asia/Seoul",
+    "precision": "SECOND",
+    "deadlineInclusive": true
+  },
+  "versions": {
+    "definition": "definition-v1",
+    "evaluator": "evaluator-v1",
+    "policy": "SYNTHETIC-platform-v1",
+    "candidateCompiler": "7.1.1",
+    "schema": "ontology-v1"
+  },
+  "actors": {
+    "reader": {
+      "issuer": "synthetic-platform-issuer",
+      "subject": "reader",
+      "audience": "isolated-ontology",
+      "organizationAlias": "ORG",
+      "roleCapabilities": [
+        "getInventory",
+        "getWork",
+        "getAssessment",
+        "getObligations",
+        "getDefinition",
+        "getEvidence",
+        "traceLot",
+        "searchOperationalIssues",
+        "getAccessContext",
+        "getGrant",
+        "reserveQuantity"
+      ],
+      "grant": {
+        "delegatorAlias": "supervisor",
+        "actions": [
+          "getInventory",
+          "getWork",
+          "getAssessment",
+          "getObligations",
+          "getDefinition",
+          "getEvidence",
+          "traceLot",
+          "searchOperationalIssues",
+          "getAccessContext",
+          "getGrant",
+          "reserveQuantity"
+        ],
+        "scope": {
+          "organizationAlias": "ORG",
+          "environmentId": "T23-data-fresh",
+          "itemAliases": [
+            "P"
+          ],
+          "placeAliases": [
+            "W",
+            "TRANSIT"
+          ]
+        },
+        "validFrom": "2026-10-01T00:00:00Z",
+        "validUntil": "2026-10-31T23:59:59Z",
+        "revision": 1
+      }
+    },
+    "warehouse": {
+      "issuer": "synthetic-platform-issuer",
+      "subject": "warehouse",
+      "audience": "isolated-ontology",
+      "organizationAlias": "ORG",
+      "roleCapabilities": [
+        "reserveQuantity",
+        "splitQuantity",
+        "dispatchQuantity",
+        "confirmReceipt"
+      ],
+      "grant": {
+        "delegatorAlias": "supervisor",
+        "actions": [
+          "reserveQuantity",
+          "splitQuantity",
+          "dispatchQuantity",
+          "confirmReceipt"
+        ],
+        "scope": {
+          "organizationAlias": "ORG",
+          "environmentId": "T23-data-fresh",
+          "itemAliases": [
+            "P"
+          ],
+          "placeAliases": [
+            "W",
+            "TRANSIT"
+          ]
+        },
+        "validFrom": "2026-10-01T00:00:00Z",
+        "validUntil": "2026-10-31T23:59:59Z",
+        "revision": 1
+      }
+    },
+    "procurement": {
+      "issuer": "synthetic-platform-issuer",
+      "subject": "procurement",
+      "audience": "isolated-ontology",
+      "organizationAlias": "ORG",
+      "roleCapabilities": [
+        "proposePurchase",
+        "dispatchPurchaseOrder",
+        "recordExternalReconciliation",
+        "getWork",
+        "getObligations"
+      ],
+      "grant": {
+        "delegatorAlias": "supervisor",
+        "actions": [
+          "proposePurchase",
+          "dispatchPurchaseOrder",
+          "recordExternalReconciliation",
+          "getWork",
+          "getObligations"
+        ],
+        "scope": {
+          "organizationAlias": "ORG",
+          "environmentId": "T23-data-fresh",
+          "itemAliases": [
+            "P"
+          ],
+          "placeAliases": [
+            "W",
+            "TRANSIT"
+          ]
+        },
+        "validFrom": "2026-10-01T00:00:00Z",
+        "validUntil": "2026-10-31T23:59:59Z",
+        "revision": 1
+      }
+    },
+    "manager": {
+      "issuer": "synthetic-platform-issuer",
+      "subject": "manager",
+      "audience": "isolated-ontology",
+      "organizationAlias": "ORG",
+      "roleCapabilities": [
+        "approvePurchase"
+      ],
+      "grant": {
+        "delegatorAlias": "supervisor",
+        "actions": [
+          "approvePurchase"
+        ],
+        "scope": {
+          "organizationAlias": "ORG",
+          "environmentId": "T23-data-fresh",
+          "itemAliases": [
+            "P"
+          ],
+          "placeAliases": [
+            "W",
+            "TRANSIT"
+          ]
+        },
+        "validFrom": "2026-10-01T00:00:00Z",
+        "validUntil": "2026-10-31T23:59:59Z",
+        "revision": 1
+      }
+    },
+    "outsider": {
+      "issuer": "synthetic-platform-issuer",
+      "subject": "outsider",
+      "audience": "isolated-ontology",
+      "organizationAlias": "OTHER_ORG",
+      "roleCapabilities": [
+        "getInventory"
+      ],
+      "grant": {
+        "delegatorAlias": "supervisor",
+        "actions": [
+          "getInventory"
+        ],
+        "scope": {
+          "organizationAlias": "OTHER_ORG",
+          "environmentId": "T23-data-fresh",
+          "itemAliases": [
+            "P"
+          ],
+          "placeAliases": [
+            "W",
+            "TRANSIT"
+          ]
+        },
+        "validFrom": "2026-10-01T00:00:00Z",
+        "validUntil": "2026-10-31T23:59:59Z",
+        "revision": 1
+      }
+    },
+    "operations": {
+      "issuer": "synthetic-platform-issuer",
+      "subject": "operations",
+      "audience": "isolated-ontology",
+      "organizationAlias": "ORG",
+      "roleCapabilities": [
+        "retrySafeCommand",
+        "searchOperationalIssues"
+      ],
+      "grant": {
+        "delegatorAlias": "supervisor",
+        "actions": [
+          "retrySafeCommand",
+          "searchOperationalIssues"
+        ],
+        "scope": {
+          "organizationAlias": "ORG",
+          "environmentId": "T23-data-fresh",
+          "itemAliases": [
+            "P"
+          ],
+          "placeAliases": [
+            "W",
+            "TRANSIT"
+          ]
+        },
+        "validFrom": "2026-10-01T00:00:00Z",
+        "validUntil": "2026-10-31T23:59:59Z",
+        "revision": 1
+      }
+    }
+  },
+  "aliases": {
+    "reader": {
+      "type": "Human"
+    },
+    "warehouse": {
+      "type": "Human"
+    },
+    "procurement": {
+      "type": "Human"
+    },
+    "manager": {
+      "type": "Human"
+    },
+    "outsider": {
+      "type": "Human"
+    },
+    "operations": {
+      "type": "Human"
+    },
+    "supervisor": {
+      "type": "Human"
+    },
+    "qc": {
+      "type": "Human"
+    },
+    "dataOwner": {
+      "type": "Human"
+    },
+    "intake": {
+      "type": "Human"
+    },
+    "ORG": {
+      "type": "Organization"
+    },
+    "OTHER_ORG": {
+      "type": "Organization"
+    },
+    "P": {
+      "type": "TradeItem",
+      "unit": "BOX"
+    },
+    "LOT": {
+      "type": "ManufacturingLot",
+      "manufacturer": "synthetic-import-supplier"
+    },
+    "W": {
+      "type": "Place"
+    },
+    "TRANSIT": {
+      "type": "Place"
+    },
+    "HOLD-DOC": {
+      "type": "DocumentVersion",
+      "sourceArtifact": {
+        "path": "verification/platform-tests/inputs/receipt-evidence.json",
+        "sha256": "e265496117f06724e63c0b0fa56e250885396fb7aaf32301e6ec71040c4a2d68",
+        "sizeBytes": 322,
+        "scope": {
+          "caseFamily": "platform"
+        },
+        "completeness": "COMPLETE"
+      },
+      "legalHold": true,
+      "evidenceAlias": "receipt-evidence"
+    },
+    "DELETED-DOC": {
+      "type": "DocumentVersion",
+      "sourceArtifact": {
+        "path": "verification/platform-tests/inputs/receipt-evidence.json",
+        "sha256": "e265496117f06724e63c0b0fa56e250885396fb7aaf32301e6ec71040c4a2d68",
+        "sizeBytes": 322,
+        "scope": {
+          "caseFamily": "platform"
+        },
+        "completeness": "COMPLETE"
+      },
+      "relationToInventory": "NONE",
+      "currentStatus": "DELETED"
+    }
+  },
+  "baseline": {
+    "variant": "fresh",
+    "environmentId": "T23-data-fresh",
+    "environmentProfile": "LOCAL",
+    "schemaFamily": "NEW_ONTOLOGY_ONLY",
+    "schemaVersion": "EMPTY",
+    "setupIsExecutionCoverage": false,
+    "intakeConfiguration": {
+      "ownerAlias": "intake",
+      "supervisorAlias": "supervisor",
+      "nextAction": "원천 사건과 책임 대조",
+      "nextCheckAt": "2026-10-08T09:00:00Z"
+    },
+    "segments": [],
+    "genealogy": [],
+    "work": null,
+    "idempotency": [],
+    "retention": {
+      "syntheticPolicy": "retention-v1",
+      "restoreBaseline": {
+        "createActualPreDeletionSnapshot": true,
+        "snapshotScope": "v1-data-before-deletion",
+        "preDeletionBlobAliases": [
+          "DELETED-DOC",
+          "HOLD-DOC"
+        ],
+        "currentDeletionJournalIsSeparate": true
+      },
+      "legalHoldAliases": [
+        "HOLD-DOC"
+      ],
+      "deletionJournal": [
+        {
+          "documentAlias": "DELETED-DOC",
+          "status": "DELETED",
+          "effectiveAt": "2026-10-07T08:00:00Z"
+        }
+      ]
+    },
+    "allocation": null,
+    "salesOrder": null,
+    "eligibilityBases": [],
+    "syntheticEligibilityInputs": {
+      "B40": "in transit, not available at W"
+    },
+    "archivePolicy": "Only inventory/hash and isolated roundtrip; no old implementation content inspection",
+    "runtimeRequirements": {
+      "bindingSource": "ACTUAL_VERIFIED_NON_SECRET_MANIFEST",
+      "requiredBindings": [],
+      "missingBindingResult": "NOT_RUN"
+    },
+    "operatingActivation": "blocked pending actual R3/R5/R7 and exact R1 manifest"
+  },
+  "evidence": [
+    {
+      "alias": "receipt-evidence",
+      "sha256": "e265496117f06724e63c0b0fa56e250885396fb7aaf32301e6ec71040c4a2d68",
+      "sourceNamespace": "synthetic-platform-warehouse",
+      "externalEventId": "R60",
+      "sourceVersion": "1",
+      "occurredAt": "2026-10-06T09:00:00Z",
+      "recordedAt": "2026-10-06T09:00:01Z"
+    }
+  ],
+  "responsibilities": [
+    {
+      "scope": {
+        "environmentId": "T23-data-fresh"
+      },
+      "ownerAlias": "dataOwner",
+      "supervisorAlias": "supervisor",
+      "nextAction": "복구 자료와 미해결 책임 대조",
+      "nextCheckAt": "2026-10-08T09:00:00Z"
+    }
+  ]
+}

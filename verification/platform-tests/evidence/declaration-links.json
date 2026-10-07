@@ -1,0 +1,4958 @@
+{
+  "kind": "DECLARATION_LINK_CHECK_ONLY",
+  "catalogPath": "verification/requirements/mandatory-oracles.json",
+  "oracleCount": 7,
+  "namedObservationCount": 16,
+  "missingNamedObservations": [],
+  "productResult": "NOT_RUN",
+  "connections": [
+    {
+      "oracleId": "T23.archive-and-data-branch",
+      "observationName": "archive-restored",
+      "declarations": [
+        {
+          "caseId": "T23",
+          "subcaseId": "archive-inventory-roundtrip",
+          "assertionId": "전수-inventory-fields",
+          "source": {
+            "actionId": "inventory",
+            "pointer": "/data/hostObservation/extractor/rawRows/facts/files"
+          }
+        },
+        {
+          "caseId": "T23",
+          "subcaseId": "archive-inventory-roundtrip",
+          "assertionId": "현재-track경로-전수",
+          "source": {
+            "actionId": "inventory",
+            "pointer": "/data/hostObservation/extractor/rawRows/facts/preservedPaths"
+          }
+        },
+        {
+          "caseId": "T23",
+          "subcaseId": "archive-inventory-roundtrip",
+          "assertionId": "원-tree-hash-복원",
+          "source": {
+            "actionId": "restore-archive",
+            "pointer": "/data/hostObservation/extractor/rawRows/facts/restoredTreeHash"
+          }
+        },
+        {
+          "caseId": "T23",
+          "subcaseId": "archive-inventory-roundtrip",
+          "assertionId": "원-파일-hash-대조",
+          "source": {
+            "actionId": "restore-archive",
+            "pointer": "/data/hostObservation/extractor/rawRows/facts/fileHashes"
+          }
+        },
+        {
+          "caseId": "T23",
+          "subcaseId": "archive-inventory-roundtrip",
+          "assertionId": "역사-명령-active-참조0",
+          "source": {
+            "actionId": "inventory",
+            "pointer": "/data/hostObservation/extractor/rawRows/facts/activeAssertionHistoricalCommandRefs"
+          }
+        },
+        {
+          "caseId": "T23",
+          "subcaseId": "archive-inventory-roundtrip",
+          "assertionId": "archive-내용-재사용0",
+          "source": {
+            "actionId": "restore-archive",
+            "pointer": "/data/hostObservation/extractor/rawRows/facts/implementationContentReads"
+          }
+        },
+        {
+          "caseId": "T23",
+          "subcaseId": "archive-inventory-roundtrip",
+          "assertionId": "보존-commit",
+          "source": {
+            "actionId": "restore-archive",
+            "pointer": "/data/hostObservation/extractor/rawRows/facts/restoredCommit"
+          }
+        }
+      ]
+    },
+    {
+      "oracleId": "T23.archive-and-data-branch",
+      "observationName": "data-branch",
+      "declarations": [
+        {
+          "caseId": "T23",
+          "subcaseId": "data-fresh",
+          "assertionId": "네-source-분류-검증",
+          "source": {
+            "actionId": "data-inventory",
+            "pointer": "/data/hostObservation/extractor/rawRows/facts/sourceClasses"
+          }
+        },
+        {
+          "caseId": "T23",
+          "subcaseId": "data-fresh",
+          "assertionId": "운영-자료-가상-분리",
+          "source": {
+            "actionId": "data-inventory",
+            "pointer": "/data/hostObservation/extractor/rawRows/facts/inventoryEvidenceScope"
+          }
+        },
+        {
+          "caseId": "T23",
+          "subcaseId": "data-fresh",
+          "assertionId": "authoritative-원천0",
+          "source": {
+            "actionId": "data-inventory",
+            "pointer": "/data/hostObservation/extractor/rawRows/facts/authoritativeSources"
+          }
+        },
+        {
+          "caseId": "T23",
+          "subcaseId": "data-fresh",
+          "assertionId": "fresh-분기",
+          "source": {
+            "actionId": "data-inventory",
+            "pointer": "/data/hostObservation/extractor/rawRows/facts/selectedBranch"
+          }
+        },
+        {
+          "caseId": "T23",
+          "subcaseId": "data-fresh",
+          "assertionId": "임의-legacy-migration0",
+          "source": {
+            "actionId": "data-inventory",
+            "pointer": "/data/hostObservation/extractor/rawRows/facts/legacyMigrationJobs"
+          }
+        },
+        {
+          "caseId": "T23",
+          "subcaseId": "data-live",
+          "assertionId": "네-source-분류-검증",
+          "source": {
+            "actionId": "data-inventory",
+            "pointer": "/data/hostObservation/extractor/rawRows/facts/sourceClasses"
+          }
+        },
+        {
+          "caseId": "T23",
+          "subcaseId": "data-live",
+          "assertionId": "운영-자료-가상-분리",
+          "source": {
+            "actionId": "data-inventory",
+            "pointer": "/data/hostObservation/extractor/rawRows/facts/inventoryEvidenceScope"
+          }
+        },
+        {
+          "caseId": "T23",
+          "subcaseId": "data-live",
+          "assertionId": "live-분기",
+          "source": {
+            "actionId": "data-inventory",
+            "pointer": "/data/hostObservation/extractor/rawRows/facts/selectedBranch"
+          }
+        },
+        {
+          "caseId": "T23",
+          "subcaseId": "data-live",
+          "assertionId": "읽기전용-archive",
+          "source": {
+            "actionId": "data-inventory",
+            "pointer": "/data/hostObservation/extractor/rawRows/facts/originalAccessMode"
+          }
+        },
+        {
+          "caseId": "T23",
+          "subcaseId": "data-live",
+          "assertionId": "미대응-제조원본-읽기유지",
+          "source": {
+            "actionId": "data-inventory",
+            "pointer": "/data/hostObservation/extractor/rawRows/facts/sourceRecords",
+            "field": [
+              "id",
+              "classification",
+              "quantity",
+              "unit",
+              "owner"
+            ]
+          }
+        },
+        {
+          "caseId": "T23",
+          "subcaseId": "data-live",
+          "assertionId": "원본70-대조",
+          "source": {
+            "actionId": "data-inventory",
+            "pointer": "/data/hostObservation/extractor/rawRows/facts/sourceQuantity"
+          }
+        },
+        {
+          "caseId": "T23",
+          "subcaseId": "data-live",
+          "assertionId": "누락물량0",
+          "source": {
+            "actionId": "data-inventory",
+            "pointer": "/data/hostObservation/extractor/rawRows/facts/unaccountedQuantity"
+          }
+        },
+        {
+          "caseId": "T23",
+          "subcaseId": "data-live",
+          "assertionId": "의무-미손실",
+          "source": {
+            "actionId": "data-inventory",
+            "pointer": "/data/hostObservation/extractor/rawRows/facts/dutyReconciliation",
+            "field": [
+              "sourceId",
+              "owner",
+              "nextAction",
+              "nextCheckAt"
+            ]
+          }
+        },
+        {
+          "caseId": "T23",
+          "subcaseId": "data-live",
+          "assertionId": "권한자-전환검토",
+          "source": {
+            "actionId": "confirm-mapping",
+            "pointer": "/data/hostObservation/extractor/rawRows/facts/cutoverDecision",
+            "field": [
+              "actor",
+              "decision",
+              "mappingVersion"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "oracleId": "T23.archive-and-data-branch",
+      "observationName": "manufacture-as-import-relabel",
+      "declarations": [
+        {
+          "caseId": "T23",
+          "subcaseId": "data-fresh",
+          "assertionId": "원-제조-import-relabel0",
+          "source": {
+            "actionId": "data-inventory",
+            "pointer": "/data/hostObservation/extractor/rawRows/facts/manufactureAsImportRows"
+          }
+        },
+        {
+          "caseId": "T23",
+          "subcaseId": "data-live",
+          "assertionId": "원-제조-import-relabel0",
+          "source": {
+            "actionId": "data-inventory",
+            "pointer": "/data/hostObservation/extractor/rawRows/facts/manufactureAsImportRows"
+          }
+        }
+      ]
+    },
+    {
+      "oracleId": "T23.schema-ownership-upgrade-drift",
+      "observationName": "schema-owner",
+      "declarations": [
+        {
+          "caseId": "T23",
+          "subcaseId": "schema-fresh",
+          "assertionId": "유일-DDL-writer",
+          "source": {
+            "actionId": "compare",
+            "pointer": "/data/hostObservation/extractor/rawRows/facts/ddlWriters"
+          }
+        },
+        {
+          "caseId": "T23",
+          "subcaseId": "schema-fresh",
+          "assertionId": "CAP-auto-deployer0",
+          "source": {
+            "actionId": "compare",
+            "pointer": "/data/hostObservation/extractor/rawRows/facts/autoDeployExecutions"
+          }
+        },
+        {
+          "caseId": "T23",
+          "subcaseId": "schema-fresh",
+          "assertionId": "Boot-SQL-init-never",
+          "source": {
+            "actionId": "compare",
+            "pointer": "/data/hostObservation/extractor/rawRows/facts/sqlInitMode"
+          }
+        },
+        {
+          "caseId": "T23",
+          "subcaseId": "schema-fresh",
+          "assertionId": "단일-CQN-model",
+          "source": {
+            "actionId": "compare",
+            "pointer": "/data/hostObservation/extractor/rawRows/facts/persistenceModels"
+          }
+        },
+        {
+          "caseId": "T23",
+          "subcaseId": "schema-upgrade",
+          "assertionId": "유일-DDL-writer",
+          "source": {
+            "actionId": "compare",
+            "pointer": "/data/hostObservation/extractor/rawRows/facts/ddlWriters"
+          }
+        },
+        {
+          "caseId": "T23",
+          "subcaseId": "schema-upgrade",
+          "assertionId": "CAP-auto-deployer0",
+          "source": {
+            "actionId": "compare",
+            "pointer": "/data/hostObservation/extractor/rawRows/facts/autoDeployExecutions"
+          }
+        },
+        {
+          "caseId": "T23",
+          "subcaseId": "schema-upgrade",
+          "assertionId": "Boot-SQL-init-never",
+          "source": {
+            "actionId": "compare",
+            "pointer": "/data/hostObservation/extractor/rawRows/facts/sqlInitMode"
+          }
+        },
+        {
+          "caseId": "T23",
+          "subcaseId": "schema-upgrade",
+          "assertionId": "단일-CQN-model",
+          "source": {
+            "actionId": "compare",
+            "pointer": "/data/hostObservation/extractor/rawRows/facts/persistenceModels"
+          }
+        },
+        {
+          "caseId": "T23",
+          "subcaseId": "schema-upgrade",
+          "assertionId": "현재-W-60",
+          "source": {
+            "actionId": "after",
+            "pointer": "/data/data/inventory/heldQuantity"
+          }
+        },
+        {
+          "caseId": "T23",
+          "subcaseId": "schema-upgrade",
+          "assertionId": "식별된-실물-100",
+          "source": {
+            "actionId": "after",
+            "pointer": "/data/rawRows/segments",
+            "where": {
+              "active": true
+            },
+            "field": "quantity"
+          }
+        },
+        {
+          "caseId": "T23",
+          "subcaseId": "schema-upgrade",
+          "assertionId": "실물-identity-중복0",
+          "source": {
+            "actionId": "after",
+            "pointer": "/data/rawRows/segments",
+            "where": {
+              "active": true
+            },
+            "field": "physicalScopeId"
+          }
+        },
+        {
+          "caseId": "T23",
+          "subcaseId": "schema-upgrade",
+          "assertionId": "원-LOT-관계",
+          "source": {
+            "actionId": "after",
+            "pointer": "/data/rawRows/segments",
+            "where": {
+              "active": true
+            },
+            "field": [
+              "id",
+              "lotId",
+              "placeId",
+              "quantity",
+              "unit"
+            ]
+          }
+        },
+        {
+          "caseId": "T23",
+          "subcaseId": "schema-upgrade",
+          "assertionId": "진행-업무-WAITING",
+          "source": {
+            "actionId": "after",
+            "pointer": "/data/rawRows/works/0/status"
+          }
+        },
+        {
+          "caseId": "T23",
+          "subcaseId": "schema-upgrade",
+          "assertionId": "v1-정의",
+          "source": {
+            "actionId": "after",
+            "pointer": "/data/rawRows/works/0/definitionVersion"
+          }
+        },
+        {
+          "caseId": "T23",
+          "subcaseId": "schema-upgrade",
+          "assertionId": "v1-evaluator",
+          "source": {
+            "actionId": "after",
+            "pointer": "/data/rawRows/assessments/0/evaluatorVersion"
+          }
+        },
+        {
+          "caseId": "T23",
+          "subcaseId": "schema-upgrade",
+          "assertionId": "v1-도착-미충족",
+          "source": {
+            "actionId": "after",
+            "pointer": "/data/rawRows/assessments/0/result"
+          }
+        },
+        {
+          "caseId": "T23",
+          "subcaseId": "schema-upgrade",
+          "assertionId": "v1-인정-도착60",
+          "source": {
+            "actionId": "after",
+            "pointer": "/data/rawRows/assessments/0/quantity"
+          }
+        },
+        {
+          "caseId": "T23",
+          "subcaseId": "schema-upgrade",
+          "assertionId": "남은40-인간-owner",
+          "source": {
+            "actionId": "after",
+            "pointer": "/data/rawRows/obligations",
+            "field": [
+              "id",
+              "ownerId",
+              "status",
+              "quantity",
+              "unit",
+              "nextAction",
+              "nextCheckAt"
+            ]
+          }
+        },
+        {
+          "caseId": "T23",
+          "subcaseId": "schema-upgrade",
+          "assertionId": "원문-증거-hash",
+          "source": {
+            "actionId": "after",
+            "pointer": "/data/rawRows/evidence/0/sha256"
+          }
+        },
+        {
+          "caseId": "T23",
+          "subcaseId": "schema-upgrade",
+          "assertionId": "원-수령-멱등결과",
+          "source": {
+            "actionId": "after",
+            "pointer": "/data/rawRows/idempotency/0/resultId"
+          }
+        },
+        {
+          "caseId": "T23",
+          "subcaseId": "schema-unexpected-drift",
+          "assertionId": "유일-DDL-writer",
+          "source": {
+            "actionId": "compare",
+            "pointer": "/data/hostObservation/extractor/rawRows/facts/ddlWriters"
+          }
+        },
+        {
+          "caseId": "T23",
+          "subcaseId": "schema-unexpected-drift",
+          "assertionId": "CAP-auto-deployer0",
+          "source": {
+            "actionId": "compare",
+            "pointer": "/data/hostObservation/extractor/rawRows/facts/autoDeployExecutions"
+          }
+        },
+        {
+          "caseId": "T23",
+          "subcaseId": "schema-unexpected-drift",
+          "assertionId": "Boot-SQL-init-never",
+          "source": {
+            "actionId": "compare",
+            "pointer": "/data/hostObservation/extractor/rawRows/facts/sqlInitMode"
+          }
+        },
+        {
+          "caseId": "T23",
+          "subcaseId": "schema-unexpected-drift",
+          "assertionId": "단일-CQN-model",
+          "source": {
+            "actionId": "compare",
+            "pointer": "/data/hostObservation/extractor/rawRows/facts/persistenceModels"
+          }
+        },
+        {
+          "caseId": "T23",
+          "subcaseId": "schema-unexpected-drift",
+          "assertionId": "현재-W-60",
+          "source": {
+            "actionId": "after",
+            "pointer": "/data/data/inventory/heldQuantity"
+          }
+        },
+        {
+          "caseId": "T23",
+          "subcaseId": "schema-unexpected-drift",
+          "assertionId": "식별된-실물-100",
+          "source": {
+            "actionId": "after",
+            "pointer": "/data/rawRows/segments",
+            "where": {
+              "active": true
+            },
+            "field": "quantity"
+          }
+        },
+        {
+          "caseId": "T23",
+          "subcaseId": "schema-unexpected-drift",
+          "assertionId": "실물-identity-중복0",
+          "source": {
+            "actionId": "after",
+            "pointer": "/data/rawRows/segments",
+            "where": {
+              "active": true
+            },
+            "field": "physicalScopeId"
+          }
+        },
+        {
+          "caseId": "T23",
+          "subcaseId": "schema-unexpected-drift",
+          "assertionId": "원-LOT-관계",
+          "source": {
+            "actionId": "after",
+            "pointer": "/data/rawRows/segments",
+            "where": {
+              "active": true
+            },
+            "field": [
+              "id",
+              "lotId",
+              "placeId",
+              "quantity",
+              "unit"
+            ]
+          }
+        },
+        {
+          "caseId": "T23",
+          "subcaseId": "schema-unexpected-drift",
+          "assertionId": "진행-업무-WAITING",
+          "source": {
+            "actionId": "after",
+            "pointer": "/data/rawRows/works/0/status"
+          }
+        },
+        {
+          "caseId": "T23",
+          "subcaseId": "schema-unexpected-drift",
+          "assertionId": "v1-정의",
+          "source": {
+            "actionId": "after",
+            "pointer": "/data/rawRows/works/0/definitionVersion"
+          }
+        },
+        {
+          "caseId": "T23",
+          "subcaseId": "schema-unexpected-drift",
+          "assertionId": "v1-evaluator",
+          "source": {
+            "actionId": "after",
+            "pointer": "/data/rawRows/assessments/0/evaluatorVersion"
+          }
+        },
+        {
+          "caseId": "T23",
+          "subcaseId": "schema-unexpected-drift",
+          "assertionId": "v1-도착-미충족",
+          "source": {
+            "actionId": "after",
+            "pointer": "/data/rawRows/assessments/0/result"
+          }
+        },
+        {
+          "caseId": "T23",
+          "subcaseId": "schema-unexpected-drift",
+          "assertionId": "v1-인정-도착60",
+          "source": {
+            "actionId": "after",
+            "pointer": "/data/rawRows/assessments/0/quantity"
+          }
+        },
+        {
+          "caseId": "T23",
+          "subcaseId": "schema-unexpected-drift",
+          "assertionId": "남은40-인간-owner",
+          "source": {
+            "actionId": "after",
+            "pointer": "/data/rawRows/obligations",
+            "field": [
+              "id",
+              "ownerId",
+              "status",
+              "quantity",
+              "unit",
+              "nextAction",
+              "nextCheckAt"
+            ]
+          }
+        },
+        {
+          "caseId": "T23",
+          "subcaseId": "schema-unexpected-drift",
+          "assertionId": "원문-증거-hash",
+          "source": {
+            "actionId": "after",
+            "pointer": "/data/rawRows/evidence/0/sha256"
+          }
+        },
+        {
+          "caseId": "T23",
+          "subcaseId": "schema-unexpected-drift",
+          "assertionId": "원-수령-멱등결과",
+          "source": {
+            "actionId": "after",
+            "pointer": "/data/rawRows/idempotency/0/resultId"
+          }
+        }
+      ]
+    },
+    {
+      "oracleId": "T23.schema-ownership-upgrade-drift",
+      "observationName": "schema-drift",
+      "declarations": [
+        {
+          "caseId": "T23",
+          "subcaseId": "schema-fresh",
+          "assertionId": "고정-compiler-version",
+          "source": {
+            "actionId": "compare",
+            "pointer": "/data/hostObservation/extractor/rawRows/facts/compilerVersion"
+          }
+        },
+        {
+          "caseId": "T23",
+          "subcaseId": "schema-fresh",
+          "assertionId": "custom-제약-allowlist-version",
+          "source": {
+            "actionId": "compare",
+            "pointer": "/data/hostObservation/extractor/rawRows/facts/allowlistVersion"
+          }
+        },
+        {
+          "caseId": "T23",
+          "subcaseId": "schema-fresh",
+          "assertionId": "허용-schema-delta",
+          "source": {
+            "actionId": "compare",
+            "pointer": "/data/hostObservation/extractor/rawRows/facts/allowedDeltaKinds"
+          }
+        },
+        {
+          "caseId": "T23",
+          "subcaseId": "schema-fresh",
+          "assertionId": "schema-drift-결과",
+          "source": {
+            "actionId": "compare",
+            "pointer": "/data/hostObservation/extractor/rawRows/facts/status"
+          }
+        },
+        {
+          "caseId": "T23",
+          "subcaseId": "schema-fresh",
+          "assertionId": "비허용-delta",
+          "source": {
+            "actionId": "compare",
+            "pointer": "/data/hostObservation/extractor/rawRows/facts/unapprovedDeltaKinds"
+          }
+        },
+        {
+          "caseId": "T23",
+          "subcaseId": "schema-fresh",
+          "assertionId": "FK-quantity-outbox-CQN-원검사",
+          "source": {
+            "actionId": "compare",
+            "pointer": "/data/hostObservation/extractor/rawRows/facts/probes",
+            "field": [
+              "id",
+              "observedOutcome"
+            ]
+          }
+        },
+        {
+          "caseId": "T23",
+          "subcaseId": "schema-upgrade",
+          "assertionId": "고정-compiler-version",
+          "source": {
+            "actionId": "compare",
+            "pointer": "/data/hostObservation/extractor/rawRows/facts/compilerVersion"
+          }
+        },
+        {
+          "caseId": "T23",
+          "subcaseId": "schema-upgrade",
+          "assertionId": "custom-제약-allowlist-version",
+          "source": {
+            "actionId": "compare",
+            "pointer": "/data/hostObservation/extractor/rawRows/facts/allowlistVersion"
+          }
+        },
+        {
+          "caseId": "T23",
+          "subcaseId": "schema-upgrade",
+          "assertionId": "허용-schema-delta",
+          "source": {
+            "actionId": "compare",
+            "pointer": "/data/hostObservation/extractor/rawRows/facts/allowedDeltaKinds"
+          }
+        },
+        {
+          "caseId": "T23",
+          "subcaseId": "schema-upgrade",
+          "assertionId": "schema-drift-결과",
+          "source": {
+            "actionId": "compare",
+            "pointer": "/data/hostObservation/extractor/rawRows/facts/status"
+          }
+        },
+        {
+          "caseId": "T23",
+          "subcaseId": "schema-upgrade",
+          "assertionId": "비허용-delta",
+          "source": {
+            "actionId": "compare",
+            "pointer": "/data/hostObservation/extractor/rawRows/facts/unapprovedDeltaKinds"
+          }
+        },
+        {
+          "caseId": "T23",
+          "subcaseId": "schema-upgrade",
+          "assertionId": "FK-quantity-outbox-CQN-원검사",
+          "source": {
+            "actionId": "compare",
+            "pointer": "/data/hostObservation/extractor/rawRows/facts/probes",
+            "field": [
+              "id",
+              "observedOutcome"
+            ]
+          }
+        },
+        {
+          "caseId": "T23",
+          "subcaseId": "schema-upgrade",
+          "assertionId": "보존-segments",
+          "source": {
+            "actionId": "after",
+            "pointer": "/data/rawRows/segments"
+          }
+        },
+        {
+          "caseId": "T23",
+          "subcaseId": "schema-upgrade",
+          "assertionId": "보존-genealogy",
+          "source": {
+            "actionId": "after",
+            "pointer": "/data/rawRows/genealogy"
+          }
+        },
+        {
+          "caseId": "T23",
+          "subcaseId": "schema-upgrade",
+          "assertionId": "보존-works",
+          "source": {
+            "actionId": "after",
+            "pointer": "/data/rawRows/works"
+          }
+        },
+        {
+          "caseId": "T23",
+          "subcaseId": "schema-upgrade",
+          "assertionId": "보존-goalVersions",
+          "source": {
+            "actionId": "after",
+            "pointer": "/data/rawRows/goalVersions"
+          }
+        },
+        {
+          "caseId": "T23",
+          "subcaseId": "schema-upgrade",
+          "assertionId": "보존-assessments",
+          "source": {
+            "actionId": "after",
+            "pointer": "/data/rawRows/assessments"
+          }
+        },
+        {
+          "caseId": "T23",
+          "subcaseId": "schema-upgrade",
+          "assertionId": "보존-obligations",
+          "source": {
+            "actionId": "after",
+            "pointer": "/data/rawRows/obligations"
+          }
+        },
+        {
+          "caseId": "T23",
+          "subcaseId": "schema-upgrade",
+          "assertionId": "보존-definitions",
+          "source": {
+            "actionId": "after",
+            "pointer": "/data/rawRows/definitions"
+          }
+        },
+        {
+          "caseId": "T23",
+          "subcaseId": "schema-upgrade",
+          "assertionId": "보존-evidence",
+          "source": {
+            "actionId": "after",
+            "pointer": "/data/rawRows/evidence"
+          }
+        },
+        {
+          "caseId": "T23",
+          "subcaseId": "schema-upgrade",
+          "assertionId": "보존-idempotency",
+          "source": {
+            "actionId": "after",
+            "pointer": "/data/rawRows/idempotency"
+          }
+        },
+        {
+          "caseId": "T23",
+          "subcaseId": "schema-upgrade",
+          "assertionId": "보존-allocations",
+          "source": {
+            "actionId": "after",
+            "pointer": "/data/rawRows/allocations"
+          }
+        },
+        {
+          "caseId": "T23",
+          "subcaseId": "schema-upgrade",
+          "assertionId": "현재-W-60",
+          "source": {
+            "actionId": "after",
+            "pointer": "/data/data/inventory/heldQuantity"
+          }
+        },
+        {
+          "caseId": "T23",
+          "subcaseId": "schema-upgrade",
+          "assertionId": "식별된-실물-100",
+          "source": {
+            "actionId": "after",
+            "pointer": "/data/rawRows/segments",
+            "where": {
+              "active": true
+            },
+            "field": "quantity"
+          }
+        },
+        {
+          "caseId": "T23",
+          "subcaseId": "schema-upgrade",
+          "assertionId": "실물-identity-중복0",
+          "source": {
+            "actionId": "after",
+            "pointer": "/data/rawRows/segments",
+            "where": {
+              "active": true
+            },
+            "field": "physicalScopeId"
+          }
+        },
+        {
+          "caseId": "T23",
+          "subcaseId": "schema-upgrade",
+          "assertionId": "원-LOT-관계",
+          "source": {
+            "actionId": "after",
+            "pointer": "/data/rawRows/segments",
+            "where": {
+              "active": true
+            },
+            "field": [
+              "id",
+              "lotId",
+              "placeId",
+              "quantity",
+              "unit"
+            ]
+          }
+        },
+        {
+          "caseId": "T23",
+          "subcaseId": "schema-upgrade",
+          "assertionId": "진행-업무-WAITING",
+          "source": {
+            "actionId": "after",
+            "pointer": "/data/rawRows/works/0/status"
+          }
+        },
+        {
+          "caseId": "T23",
+          "subcaseId": "schema-upgrade",
+          "assertionId": "v1-정의",
+          "source": {
+            "actionId": "after",
+            "pointer": "/data/rawRows/works/0/definitionVersion"
+          }
+        },
+        {
+          "caseId": "T23",
+          "subcaseId": "schema-upgrade",
+          "assertionId": "v1-evaluator",
+          "source": {
+            "actionId": "after",
+            "pointer": "/data/rawRows/assessments/0/evaluatorVersion"
+          }
+        },
+        {
+          "caseId": "T23",
+          "subcaseId": "schema-upgrade",
+          "assertionId": "v1-도착-미충족",
+          "source": {
+            "actionId": "after",
+            "pointer": "/data/rawRows/assessments/0/result"
+          }
+        },
+        {
+          "caseId": "T23",
+          "subcaseId": "schema-upgrade",
+          "assertionId": "v1-인정-도착60",
+          "source": {
+            "actionId": "after",
+            "pointer": "/data/rawRows/assessments/0/quantity"
+          }
+        },
+        {
+          "caseId": "T23",
+          "subcaseId": "schema-upgrade",
+          "assertionId": "남은40-인간-owner",
+          "source": {
+            "actionId": "after",
+            "pointer": "/data/rawRows/obligations",
+            "field": [
+              "id",
+              "ownerId",
+              "status",
+              "quantity",
+              "unit",
+              "nextAction",
+              "nextCheckAt"
+            ]
+          }
+        },
+        {
+          "caseId": "T23",
+          "subcaseId": "schema-upgrade",
+          "assertionId": "원문-증거-hash",
+          "source": {
+            "actionId": "after",
+            "pointer": "/data/rawRows/evidence/0/sha256"
+          }
+        },
+        {
+          "caseId": "T23",
+          "subcaseId": "schema-upgrade",
+          "assertionId": "원-수령-멱등결과",
+          "source": {
+            "actionId": "after",
+            "pointer": "/data/rawRows/idempotency/0/resultId"
+          }
+        },
+        {
+          "caseId": "T23",
+          "subcaseId": "schema-unexpected-drift",
+          "assertionId": "고정-compiler-version",
+          "source": {
+            "actionId": "compare",
+            "pointer": "/data/hostObservation/extractor/rawRows/facts/compilerVersion"
+          }
+        },
+        {
+          "caseId": "T23",
+          "subcaseId": "schema-unexpected-drift",
+          "assertionId": "custom-제약-allowlist-version",
+          "source": {
+            "actionId": "compare",
+            "pointer": "/data/hostObservation/extractor/rawRows/facts/allowlistVersion"
+          }
+        },
+        {
+          "caseId": "T23",
+          "subcaseId": "schema-unexpected-drift",
+          "assertionId": "허용-schema-delta",
+          "source": {
+            "actionId": "compare",
+            "pointer": "/data/hostObservation/extractor/rawRows/facts/allowedDeltaKinds"
+          }
+        },
+        {
+          "caseId": "T23",
+          "subcaseId": "schema-unexpected-drift",
+          "assertionId": "schema-drift-결과",
+          "source": {
+            "actionId": "compare",
+            "pointer": "/data/hostObservation/extractor/rawRows/facts/status"
+          }
+        },
+        {
+          "caseId": "T23",
+          "subcaseId": "schema-unexpected-drift",
+          "assertionId": "비허용-delta",
+          "source": {
+            "actionId": "compare",
+            "pointer": "/data/hostObservation/extractor/rawRows/facts/unapprovedDeltaKinds"
+          }
+        },
+        {
+          "caseId": "T23",
+          "subcaseId": "schema-unexpected-drift",
+          "assertionId": "FK-quantity-outbox-CQN-원검사",
+          "source": {
+            "actionId": "compare",
+            "pointer": "/data/hostObservation/extractor/rawRows/facts/probes",
+            "field": [
+              "id",
+              "observedOutcome"
+            ]
+          }
+        },
+        {
+          "caseId": "T23",
+          "subcaseId": "schema-unexpected-drift",
+          "assertionId": "보존-segments",
+          "source": {
+            "actionId": "after",
+            "pointer": "/data/rawRows/segments"
+          }
+        },
+        {
+          "caseId": "T23",
+          "subcaseId": "schema-unexpected-drift",
+          "assertionId": "보존-genealogy",
+          "source": {
+            "actionId": "after",
+            "pointer": "/data/rawRows/genealogy"
+          }
+        },
+        {
+          "caseId": "T23",
+          "subcaseId": "schema-unexpected-drift",
+          "assertionId": "보존-works",
+          "source": {
+            "actionId": "after",
+            "pointer": "/data/rawRows/works"
+          }
+        },
+        {
+          "caseId": "T23",
+          "subcaseId": "schema-unexpected-drift",
+          "assertionId": "보존-goalVersions",
+          "source": {
+            "actionId": "after",
+            "pointer": "/data/rawRows/goalVersions"
+          }
+        },
+        {
+          "caseId": "T23",
+          "subcaseId": "schema-unexpected-drift",
+          "assertionId": "보존-assessments",
+          "source": {
+            "actionId": "after",
+            "pointer": "/data/rawRows/assessments"
+          }
+        },
+        {
+          "caseId": "T23",
+          "subcaseId": "schema-unexpected-drift",
+          "assertionId": "보존-obligations",
+          "source": {
+            "actionId": "after",
+            "pointer": "/data/rawRows/obligations"
+          }
+        },
+        {
+          "caseId": "T23",
+          "subcaseId": "schema-unexpected-drift",
+          "assertionId": "보존-definitions",
+          "source": {
+            "actionId": "after",
+            "pointer": "/data/rawRows/definitions"
+          }
+        },
+        {
+          "caseId": "T23",
+          "subcaseId": "schema-unexpected-drift",
+          "assertionId": "보존-evidence",
+          "source": {
+            "actionId": "after",
+            "pointer": "/data/rawRows/evidence"
+          }
+        },
+        {
+          "caseId": "T23",
+          "subcaseId": "schema-unexpected-drift",
+          "assertionId": "보존-idempotency",
+          "source": {
+            "actionId": "after",
+            "pointer": "/data/rawRows/idempotency"
+          }
+        },
+        {
+          "caseId": "T23",
+          "subcaseId": "schema-unexpected-drift",
+          "assertionId": "보존-allocations",
+          "source": {
+            "actionId": "after",
+            "pointer": "/data/rawRows/allocations"
+          }
+        },
+        {
+          "caseId": "T23",
+          "subcaseId": "schema-unexpected-drift",
+          "assertionId": "현재-W-60",
+          "source": {
+            "actionId": "after",
+            "pointer": "/data/data/inventory/heldQuantity"
+          }
+        },
+        {
+          "caseId": "T23",
+          "subcaseId": "schema-unexpected-drift",
+          "assertionId": "식별된-실물-100",
+          "source": {
+            "actionId": "after",
+            "pointer": "/data/rawRows/segments",
+            "where": {
+              "active": true
+            },
+            "field": "quantity"
+          }
+        },
+        {
+          "caseId": "T23",
+          "subcaseId": "schema-unexpected-drift",
+          "assertionId": "실물-identity-중복0",
+          "source": {
+            "actionId": "after",
+            "pointer": "/data/rawRows/segments",
+            "where": {
+              "active": true
+            },
+            "field": "physicalScopeId"
+          }
+        },
+        {
+          "caseId": "T23",
+          "subcaseId": "schema-unexpected-drift",
+          "assertionId": "원-LOT-관계",
+          "source": {
+            "actionId": "after",
+            "pointer": "/data/rawRows/segments",
+            "where": {
+              "active": true
+            },
+            "field": [
+              "id",
+              "lotId",
+              "placeId",
+              "quantity",
+              "unit"
+            ]
+          }
+        },
+        {
+          "caseId": "T23",
+          "subcaseId": "schema-unexpected-drift",
+          "assertionId": "진행-업무-WAITING",
+          "source": {
+            "actionId": "after",
+            "pointer": "/data/rawRows/works/0/status"
+          }
+        },
+        {
+          "caseId": "T23",
+          "subcaseId": "schema-unexpected-drift",
+          "assertionId": "v1-정의",
+          "source": {
+            "actionId": "after",
+            "pointer": "/data/rawRows/works/0/definitionVersion"
+          }
+        },
+        {
+          "caseId": "T23",
+          "subcaseId": "schema-unexpected-drift",
+          "assertionId": "v1-evaluator",
+          "source": {
+            "actionId": "after",
+            "pointer": "/data/rawRows/assessments/0/evaluatorVersion"
+          }
+        },
+        {
+          "caseId": "T23",
+          "subcaseId": "schema-unexpected-drift",
+          "assertionId": "v1-도착-미충족",
+          "source": {
+            "actionId": "after",
+            "pointer": "/data/rawRows/assessments/0/result"
+          }
+        },
+        {
+          "caseId": "T23",
+          "subcaseId": "schema-unexpected-drift",
+          "assertionId": "v1-인정-도착60",
+          "source": {
+            "actionId": "after",
+            "pointer": "/data/rawRows/assessments/0/quantity"
+          }
+        },
+        {
+          "caseId": "T23",
+          "subcaseId": "schema-unexpected-drift",
+          "assertionId": "남은40-인간-owner",
+          "source": {
+            "actionId": "after",
+            "pointer": "/data/rawRows/obligations",
+            "field": [
+              "id",
+              "ownerId",
+              "status",
+              "quantity",
+              "unit",
+              "nextAction",
+              "nextCheckAt"
+            ]
+          }
+        },
+        {
+          "caseId": "T23",
+          "subcaseId": "schema-unexpected-drift",
+          "assertionId": "원문-증거-hash",
+          "source": {
+            "actionId": "after",
+            "pointer": "/data/rawRows/evidence/0/sha256"
+          }
+        },
+        {
+          "caseId": "T23",
+          "subcaseId": "schema-unexpected-drift",
+          "assertionId": "원-수령-멱등결과",
+          "source": {
+            "actionId": "after",
+            "pointer": "/data/rawRows/idempotency/0/resultId"
+          }
+        }
+      ]
+    },
+    {
+      "oracleId": "T23.cutover-and-safe-recovery",
+      "observationName": "cutover-order",
+      "declarations": [
+        {
+          "caseId": "T23",
+          "subcaseId": "cutover-open-order",
+          "assertionId": "stage-WRITE_FREEZE",
+          "source": {
+            "actionId": "write_freeze",
+            "pointer": "/data/hostObservation/extractor/rawRows/facts/stage"
+          }
+        },
+        {
+          "caseId": "T23",
+          "subcaseId": "cutover-open-order",
+          "assertionId": "stage-FINAL_SNAPSHOT",
+          "source": {
+            "actionId": "final_snapshot",
+            "pointer": "/data/hostObservation/extractor/rawRows/facts/stage"
+          }
+        },
+        {
+          "caseId": "T23",
+          "subcaseId": "cutover-open-order",
+          "assertionId": "stage-RECONCILE",
+          "source": {
+            "actionId": "reconcile",
+            "pointer": "/data/hostObservation/extractor/rawRows/facts/stage"
+          }
+        },
+        {
+          "caseId": "T23",
+          "subcaseId": "cutover-open-order",
+          "assertionId": "stage-APPLY_VERSION",
+          "source": {
+            "actionId": "apply_version",
+            "pointer": "/data/hostObservation/extractor/rawRows/facts/stage"
+          }
+        },
+        {
+          "caseId": "T23",
+          "subcaseId": "cutover-open-order",
+          "assertionId": "stage-SMOKE_AUTH_RESUME",
+          "source": {
+            "actionId": "smoke_auth_resume",
+            "pointer": "/data/hostObservation/extractor/rawRows/facts/stage"
+          }
+        },
+        {
+          "caseId": "T23",
+          "subcaseId": "cutover-open-order",
+          "assertionId": "stage-OPEN_WRITES",
+          "source": {
+            "actionId": "open_writes",
+            "pointer": "/data/hostObservation/extractor/rawRows/facts/stage"
+          }
+        },
+        {
+          "caseId": "T23",
+          "subcaseId": "cutover-open-order",
+          "assertionId": "보존-segments",
+          "source": {
+            "actionId": "after",
+            "pointer": "/data/rawRows/segments"
+          }
+        },
+        {
+          "caseId": "T23",
+          "subcaseId": "cutover-open-order",
+          "assertionId": "보존-genealogy",
+          "source": {
+            "actionId": "after",
+            "pointer": "/data/rawRows/genealogy"
+          }
+        },
+        {
+          "caseId": "T23",
+          "subcaseId": "cutover-open-order",
+          "assertionId": "보존-works",
+          "source": {
+            "actionId": "after",
+            "pointer": "/data/rawRows/works"
+          }
+        },
+        {
+          "caseId": "T23",
+          "subcaseId": "cutover-open-order",
+          "assertionId": "보존-goalVersions",
+          "source": {
+            "actionId": "after",
+            "pointer": "/data/rawRows/goalVersions"
+          }
+        },
+        {
+          "caseId": "T23",
+          "subcaseId": "cutover-open-order",
+          "assertionId": "보존-assessments",
+          "source": {
+            "actionId": "after",
+            "pointer": "/data/rawRows/assessments"
+          }
+        },
+        {
+          "caseId": "T23",
+          "subcaseId": "cutover-open-order",
+          "assertionId": "보존-obligations",
+          "source": {
+            "actionId": "after",
+            "pointer": "/data/rawRows/obligations"
+          }
+        },
+        {
+          "caseId": "T23",
+          "subcaseId": "cutover-open-order",
+          "assertionId": "보존-definitions",
+          "source": {
+            "actionId": "after",
+            "pointer": "/data/rawRows/definitions"
+          }
+        },
+        {
+          "caseId": "T23",
+          "subcaseId": "cutover-open-order",
+          "assertionId": "보존-evidence",
+          "source": {
+            "actionId": "after",
+            "pointer": "/data/rawRows/evidence"
+          }
+        },
+        {
+          "caseId": "T23",
+          "subcaseId": "cutover-open-order",
+          "assertionId": "보존-idempotency",
+          "source": {
+            "actionId": "after",
+            "pointer": "/data/rawRows/idempotency"
+          }
+        },
+        {
+          "caseId": "T23",
+          "subcaseId": "cutover-open-order",
+          "assertionId": "보존-allocations",
+          "source": {
+            "actionId": "after",
+            "pointer": "/data/rawRows/allocations"
+          }
+        },
+        {
+          "caseId": "T23",
+          "subcaseId": "cutover-open-order",
+          "assertionId": "현재-W-60",
+          "source": {
+            "actionId": "after",
+            "pointer": "/data/data/inventory/heldQuantity"
+          }
+        },
+        {
+          "caseId": "T23",
+          "subcaseId": "cutover-open-order",
+          "assertionId": "식별된-실물-100",
+          "source": {
+            "actionId": "after",
+            "pointer": "/data/rawRows/segments",
+            "where": {
+              "active": true
+            },
+            "field": "quantity"
+          }
+        },
+        {
+          "caseId": "T23",
+          "subcaseId": "cutover-open-order",
+          "assertionId": "실물-identity-중복0",
+          "source": {
+            "actionId": "after",
+            "pointer": "/data/rawRows/segments",
+            "where": {
+              "active": true
+            },
+            "field": "physicalScopeId"
+          }
+        },
+        {
+          "caseId": "T23",
+          "subcaseId": "cutover-open-order",
+          "assertionId": "원-LOT-관계",
+          "source": {
+            "actionId": "after",
+            "pointer": "/data/rawRows/segments",
+            "where": {
+              "active": true
+            },
+            "field": [
+              "id",
+              "lotId",
+              "placeId",
+              "quantity",
+              "unit"
+            ]
+          }
+        },
+        {
+          "caseId": "T23",
+          "subcaseId": "cutover-open-order",
+          "assertionId": "진행-업무-WAITING",
+          "source": {
+            "actionId": "after",
+            "pointer": "/data/rawRows/works/0/status"
+          }
+        },
+        {
+          "caseId": "T23",
+          "subcaseId": "cutover-open-order",
+          "assertionId": "v1-정의",
+          "source": {
+            "actionId": "after",
+            "pointer": "/data/rawRows/works/0/definitionVersion"
+          }
+        },
+        {
+          "caseId": "T23",
+          "subcaseId": "cutover-open-order",
+          "assertionId": "v1-evaluator",
+          "source": {
+            "actionId": "after",
+            "pointer": "/data/rawRows/assessments/0/evaluatorVersion"
+          }
+        },
+        {
+          "caseId": "T23",
+          "subcaseId": "cutover-open-order",
+          "assertionId": "v1-도착-미충족",
+          "source": {
+            "actionId": "after",
+            "pointer": "/data/rawRows/assessments/0/result"
+          }
+        },
+        {
+          "caseId": "T23",
+          "subcaseId": "cutover-open-order",
+          "assertionId": "v1-인정-도착60",
+          "source": {
+            "actionId": "after",
+            "pointer": "/data/rawRows/assessments/0/quantity"
+          }
+        },
+        {
+          "caseId": "T23",
+          "subcaseId": "cutover-open-order",
+          "assertionId": "남은40-인간-owner",
+          "source": {
+            "actionId": "after",
+            "pointer": "/data/rawRows/obligations",
+            "field": [
+              "id",
+              "ownerId",
+              "status",
+              "quantity",
+              "unit",
+              "nextAction",
+              "nextCheckAt"
+            ]
+          }
+        },
+        {
+          "caseId": "T23",
+          "subcaseId": "cutover-open-order",
+          "assertionId": "원문-증거-hash",
+          "source": {
+            "actionId": "after",
+            "pointer": "/data/rawRows/evidence/0/sha256"
+          }
+        },
+        {
+          "caseId": "T23",
+          "subcaseId": "cutover-open-order",
+          "assertionId": "원-수령-멱등결과",
+          "source": {
+            "actionId": "after",
+            "pointer": "/data/rawRows/idempotency/0/resultId"
+          }
+        },
+        {
+          "caseId": "T23",
+          "subcaseId": "cutover-open-order",
+          "assertionId": "쓰기개방-선행-stage",
+          "source": {
+            "actionId": "open_writes",
+            "pointer": "/data/hostObservation/extractor/rawRows/facts/completedStageOrder"
+          }
+        },
+        {
+          "caseId": "T23",
+          "subcaseId": "cutover-open-order",
+          "assertionId": "개방-전-수량차이0",
+          "source": {
+            "actionId": "reconcile",
+            "pointer": "/data/hostObservation/extractor/rawRows/facts/quantityDifference"
+          }
+        },
+        {
+          "caseId": "T23",
+          "subcaseId": "cutover-open-order",
+          "assertionId": "개방-전-의무차이0",
+          "source": {
+            "actionId": "reconcile",
+            "pointer": "/data/hostObservation/extractor/rawRows/facts/missingDutyRoots"
+          }
+        },
+        {
+          "caseId": "T23",
+          "subcaseId": "cutover-open-order",
+          "assertionId": "snapshot-호환-artifact-종류",
+          "source": {
+            "actionId": "final_snapshot",
+            "pointer": "/data/hostObservation/extractor/rawRows/facts/bundleKinds"
+          }
+        },
+        {
+          "caseId": "T23",
+          "subcaseId": "cutover-open-order",
+          "assertionId": "인가-재개-smoke",
+          "source": {
+            "actionId": "smoke_auth_resume",
+            "pointer": "/data/hostObservation/extractor/rawRows/facts/authCases",
+            "field": [
+              "case",
+              "outcome"
+            ]
+          }
+        },
+        {
+          "caseId": "T23",
+          "subcaseId": "failure-before-open",
+          "assertionId": "stage-WRITE_FREEZE",
+          "source": {
+            "actionId": "write_freeze",
+            "pointer": "/data/hostObservation/extractor/rawRows/facts/stage"
+          }
+        },
+        {
+          "caseId": "T23",
+          "subcaseId": "failure-before-open",
+          "assertionId": "stage-FINAL_SNAPSHOT",
+          "source": {
+            "actionId": "final_snapshot",
+            "pointer": "/data/hostObservation/extractor/rawRows/facts/stage"
+          }
+        },
+        {
+          "caseId": "T23",
+          "subcaseId": "failure-before-open",
+          "assertionId": "stage-RECONCILE",
+          "source": {
+            "actionId": "reconcile",
+            "pointer": "/data/hostObservation/extractor/rawRows/facts/stage"
+          }
+        },
+        {
+          "caseId": "T23",
+          "subcaseId": "failure-before-open",
+          "assertionId": "stage-APPLY_VERSION",
+          "source": {
+            "actionId": "apply_version",
+            "pointer": "/data/hostObservation/extractor/rawRows/facts/stage"
+          }
+        },
+        {
+          "caseId": "T23",
+          "subcaseId": "failure-before-open",
+          "assertionId": "현재-W-60",
+          "source": {
+            "actionId": "after",
+            "pointer": "/data/data/inventory/heldQuantity"
+          }
+        },
+        {
+          "caseId": "T23",
+          "subcaseId": "failure-before-open",
+          "assertionId": "식별된-실물-100",
+          "source": {
+            "actionId": "after",
+            "pointer": "/data/rawRows/segments",
+            "where": {
+              "active": true
+            },
+            "field": "quantity"
+          }
+        },
+        {
+          "caseId": "T23",
+          "subcaseId": "failure-before-open",
+          "assertionId": "실물-identity-중복0",
+          "source": {
+            "actionId": "after",
+            "pointer": "/data/rawRows/segments",
+            "where": {
+              "active": true
+            },
+            "field": "physicalScopeId"
+          }
+        },
+        {
+          "caseId": "T23",
+          "subcaseId": "failure-before-open",
+          "assertionId": "원-LOT-관계",
+          "source": {
+            "actionId": "after",
+            "pointer": "/data/rawRows/segments",
+            "where": {
+              "active": true
+            },
+            "field": [
+              "id",
+              "lotId",
+              "placeId",
+              "quantity",
+              "unit"
+            ]
+          }
+        },
+        {
+          "caseId": "T23",
+          "subcaseId": "failure-before-open",
+          "assertionId": "진행-업무-WAITING",
+          "source": {
+            "actionId": "after",
+            "pointer": "/data/rawRows/works/0/status"
+          }
+        },
+        {
+          "caseId": "T23",
+          "subcaseId": "failure-before-open",
+          "assertionId": "v1-정의",
+          "source": {
+            "actionId": "after",
+            "pointer": "/data/rawRows/works/0/definitionVersion"
+          }
+        },
+        {
+          "caseId": "T23",
+          "subcaseId": "failure-before-open",
+          "assertionId": "v1-evaluator",
+          "source": {
+            "actionId": "after",
+            "pointer": "/data/rawRows/assessments/0/evaluatorVersion"
+          }
+        },
+        {
+          "caseId": "T23",
+          "subcaseId": "failure-before-open",
+          "assertionId": "v1-도착-미충족",
+          "source": {
+            "actionId": "after",
+            "pointer": "/data/rawRows/assessments/0/result"
+          }
+        },
+        {
+          "caseId": "T23",
+          "subcaseId": "failure-before-open",
+          "assertionId": "v1-인정-도착60",
+          "source": {
+            "actionId": "after",
+            "pointer": "/data/rawRows/assessments/0/quantity"
+          }
+        },
+        {
+          "caseId": "T23",
+          "subcaseId": "failure-before-open",
+          "assertionId": "남은40-인간-owner",
+          "source": {
+            "actionId": "after",
+            "pointer": "/data/rawRows/obligations",
+            "field": [
+              "id",
+              "ownerId",
+              "status",
+              "quantity",
+              "unit",
+              "nextAction",
+              "nextCheckAt"
+            ]
+          }
+        },
+        {
+          "caseId": "T23",
+          "subcaseId": "failure-before-open",
+          "assertionId": "원문-증거-hash",
+          "source": {
+            "actionId": "after",
+            "pointer": "/data/rawRows/evidence/0/sha256"
+          }
+        },
+        {
+          "caseId": "T23",
+          "subcaseId": "failure-before-open",
+          "assertionId": "원-수령-멱등결과",
+          "source": {
+            "actionId": "after",
+            "pointer": "/data/rawRows/idempotency/0/resultId"
+          }
+        },
+        {
+          "caseId": "T23",
+          "subcaseId": "failure-after-open-forward",
+          "assertionId": "stage-WRITE_FREEZE",
+          "source": {
+            "actionId": "write_freeze",
+            "pointer": "/data/hostObservation/extractor/rawRows/facts/stage"
+          }
+        },
+        {
+          "caseId": "T23",
+          "subcaseId": "failure-after-open-forward",
+          "assertionId": "stage-FINAL_SNAPSHOT",
+          "source": {
+            "actionId": "final_snapshot",
+            "pointer": "/data/hostObservation/extractor/rawRows/facts/stage"
+          }
+        },
+        {
+          "caseId": "T23",
+          "subcaseId": "failure-after-open-forward",
+          "assertionId": "stage-RECONCILE",
+          "source": {
+            "actionId": "reconcile",
+            "pointer": "/data/hostObservation/extractor/rawRows/facts/stage"
+          }
+        },
+        {
+          "caseId": "T23",
+          "subcaseId": "failure-after-open-forward",
+          "assertionId": "stage-APPLY_VERSION",
+          "source": {
+            "actionId": "apply_version",
+            "pointer": "/data/hostObservation/extractor/rawRows/facts/stage"
+          }
+        },
+        {
+          "caseId": "T23",
+          "subcaseId": "failure-after-open-forward",
+          "assertionId": "stage-SMOKE_AUTH_RESUME",
+          "source": {
+            "actionId": "smoke_auth_resume",
+            "pointer": "/data/hostObservation/extractor/rawRows/facts/stage"
+          }
+        },
+        {
+          "caseId": "T23",
+          "subcaseId": "failure-after-open-forward",
+          "assertionId": "stage-OPEN_WRITES",
+          "source": {
+            "actionId": "open_writes",
+            "pointer": "/data/hostObservation/extractor/rawRows/facts/stage"
+          }
+        },
+        {
+          "caseId": "T23",
+          "subcaseId": "failure-after-open-forward",
+          "assertionId": "복구후-물량불변",
+          "source": {
+            "actionId": "after",
+            "pointer": "/data/data/inventory/heldQuantity"
+          }
+        },
+        {
+          "caseId": "T23",
+          "subcaseId": "failure-after-open-approved-snapshot",
+          "assertionId": "stage-WRITE_FREEZE",
+          "source": {
+            "actionId": "write_freeze",
+            "pointer": "/data/hostObservation/extractor/rawRows/facts/stage"
+          }
+        },
+        {
+          "caseId": "T23",
+          "subcaseId": "failure-after-open-approved-snapshot",
+          "assertionId": "stage-FINAL_SNAPSHOT",
+          "source": {
+            "actionId": "final_snapshot",
+            "pointer": "/data/hostObservation/extractor/rawRows/facts/stage"
+          }
+        },
+        {
+          "caseId": "T23",
+          "subcaseId": "failure-after-open-approved-snapshot",
+          "assertionId": "stage-RECONCILE",
+          "source": {
+            "actionId": "reconcile",
+            "pointer": "/data/hostObservation/extractor/rawRows/facts/stage"
+          }
+        },
+        {
+          "caseId": "T23",
+          "subcaseId": "failure-after-open-approved-snapshot",
+          "assertionId": "stage-APPLY_VERSION",
+          "source": {
+            "actionId": "apply_version",
+            "pointer": "/data/hostObservation/extractor/rawRows/facts/stage"
+          }
+        },
+        {
+          "caseId": "T23",
+          "subcaseId": "failure-after-open-approved-snapshot",
+          "assertionId": "stage-SMOKE_AUTH_RESUME",
+          "source": {
+            "actionId": "smoke_auth_resume",
+            "pointer": "/data/hostObservation/extractor/rawRows/facts/stage"
+          }
+        },
+        {
+          "caseId": "T23",
+          "subcaseId": "failure-after-open-approved-snapshot",
+          "assertionId": "stage-OPEN_WRITES",
+          "source": {
+            "actionId": "open_writes",
+            "pointer": "/data/hostObservation/extractor/rawRows/facts/stage"
+          }
+        },
+        {
+          "caseId": "T23",
+          "subcaseId": "failure-after-open-approved-snapshot",
+          "assertionId": "복구후-물량불변",
+          "source": {
+            "actionId": "after",
+            "pointer": "/data/data/inventory/heldQuantity"
+          }
+        }
+      ]
+    },
+    {
+      "oracleId": "T23.cutover-and-safe-recovery",
+      "observationName": "recovery-boundaries",
+      "declarations": [
+        {
+          "caseId": "T23",
+          "subcaseId": "cutover-open-order",
+          "assertionId": "현재-W-60",
+          "source": {
+            "actionId": "after",
+            "pointer": "/data/data/inventory/heldQuantity"
+          }
+        },
+        {
+          "caseId": "T23",
+          "subcaseId": "cutover-open-order",
+          "assertionId": "식별된-실물-100",
+          "source": {
+            "actionId": "after",
+            "pointer": "/data/rawRows/segments",
+            "where": {
+              "active": true
+            },
+            "field": "quantity"
+          }
+        },
+        {
+          "caseId": "T23",
+          "subcaseId": "cutover-open-order",
+          "assertionId": "실물-identity-중복0",
+          "source": {
+            "actionId": "after",
+            "pointer": "/data/rawRows/segments",
+            "where": {
+              "active": true
+            },
+            "field": "physicalScopeId"
+          }
+        },
+        {
+          "caseId": "T23",
+          "subcaseId": "cutover-open-order",
+          "assertionId": "원-LOT-관계",
+          "source": {
+            "actionId": "after",
+            "pointer": "/data/rawRows/segments",
+            "where": {
+              "active": true
+            },
+            "field": [
+              "id",
+              "lotId",
+              "placeId",
+              "quantity",
+              "unit"
+            ]
+          }
+        },
+        {
+          "caseId": "T23",
+          "subcaseId": "cutover-open-order",
+          "assertionId": "진행-업무-WAITING",
+          "source": {
+            "actionId": "after",
+            "pointer": "/data/rawRows/works/0/status"
+          }
+        },
+        {
+          "caseId": "T23",
+          "subcaseId": "cutover-open-order",
+          "assertionId": "v1-정의",
+          "source": {
+            "actionId": "after",
+            "pointer": "/data/rawRows/works/0/definitionVersion"
+          }
+        },
+        {
+          "caseId": "T23",
+          "subcaseId": "cutover-open-order",
+          "assertionId": "v1-evaluator",
+          "source": {
+            "actionId": "after",
+            "pointer": "/data/rawRows/assessments/0/evaluatorVersion"
+          }
+        },
+        {
+          "caseId": "T23",
+          "subcaseId": "cutover-open-order",
+          "assertionId": "v1-도착-미충족",
+          "source": {
+            "actionId": "after",
+            "pointer": "/data/rawRows/assessments/0/result"
+          }
+        },
+        {
+          "caseId": "T23",
+          "subcaseId": "cutover-open-order",
+          "assertionId": "v1-인정-도착60",
+          "source": {
+            "actionId": "after",
+            "pointer": "/data/rawRows/assessments/0/quantity"
+          }
+        },
+        {
+          "caseId": "T23",
+          "subcaseId": "cutover-open-order",
+          "assertionId": "남은40-인간-owner",
+          "source": {
+            "actionId": "after",
+            "pointer": "/data/rawRows/obligations",
+            "field": [
+              "id",
+              "ownerId",
+              "status",
+              "quantity",
+              "unit",
+              "nextAction",
+              "nextCheckAt"
+            ]
+          }
+        },
+        {
+          "caseId": "T23",
+          "subcaseId": "cutover-open-order",
+          "assertionId": "원문-증거-hash",
+          "source": {
+            "actionId": "after",
+            "pointer": "/data/rawRows/evidence/0/sha256"
+          }
+        },
+        {
+          "caseId": "T23",
+          "subcaseId": "cutover-open-order",
+          "assertionId": "원-수령-멱등결과",
+          "source": {
+            "actionId": "after",
+            "pointer": "/data/rawRows/idempotency/0/resultId"
+          }
+        },
+        {
+          "caseId": "T23",
+          "subcaseId": "failure-before-open",
+          "assertionId": "보존-segments",
+          "source": {
+            "actionId": "after",
+            "pointer": "/data/rawRows/segments"
+          }
+        },
+        {
+          "caseId": "T23",
+          "subcaseId": "failure-before-open",
+          "assertionId": "보존-genealogy",
+          "source": {
+            "actionId": "after",
+            "pointer": "/data/rawRows/genealogy"
+          }
+        },
+        {
+          "caseId": "T23",
+          "subcaseId": "failure-before-open",
+          "assertionId": "보존-works",
+          "source": {
+            "actionId": "after",
+            "pointer": "/data/rawRows/works"
+          }
+        },
+        {
+          "caseId": "T23",
+          "subcaseId": "failure-before-open",
+          "assertionId": "보존-goalVersions",
+          "source": {
+            "actionId": "after",
+            "pointer": "/data/rawRows/goalVersions"
+          }
+        },
+        {
+          "caseId": "T23",
+          "subcaseId": "failure-before-open",
+          "assertionId": "보존-assessments",
+          "source": {
+            "actionId": "after",
+            "pointer": "/data/rawRows/assessments"
+          }
+        },
+        {
+          "caseId": "T23",
+          "subcaseId": "failure-before-open",
+          "assertionId": "보존-obligations",
+          "source": {
+            "actionId": "after",
+            "pointer": "/data/rawRows/obligations"
+          }
+        },
+        {
+          "caseId": "T23",
+          "subcaseId": "failure-before-open",
+          "assertionId": "보존-definitions",
+          "source": {
+            "actionId": "after",
+            "pointer": "/data/rawRows/definitions"
+          }
+        },
+        {
+          "caseId": "T23",
+          "subcaseId": "failure-before-open",
+          "assertionId": "보존-evidence",
+          "source": {
+            "actionId": "after",
+            "pointer": "/data/rawRows/evidence"
+          }
+        },
+        {
+          "caseId": "T23",
+          "subcaseId": "failure-before-open",
+          "assertionId": "보존-idempotency",
+          "source": {
+            "actionId": "after",
+            "pointer": "/data/rawRows/idempotency"
+          }
+        },
+        {
+          "caseId": "T23",
+          "subcaseId": "failure-before-open",
+          "assertionId": "보존-allocations",
+          "source": {
+            "actionId": "after",
+            "pointer": "/data/rawRows/allocations"
+          }
+        },
+        {
+          "caseId": "T23",
+          "subcaseId": "failure-before-open",
+          "assertionId": "현재-W-60",
+          "source": {
+            "actionId": "after",
+            "pointer": "/data/data/inventory/heldQuantity"
+          }
+        },
+        {
+          "caseId": "T23",
+          "subcaseId": "failure-before-open",
+          "assertionId": "식별된-실물-100",
+          "source": {
+            "actionId": "after",
+            "pointer": "/data/rawRows/segments",
+            "where": {
+              "active": true
+            },
+            "field": "quantity"
+          }
+        },
+        {
+          "caseId": "T23",
+          "subcaseId": "failure-before-open",
+          "assertionId": "실물-identity-중복0",
+          "source": {
+            "actionId": "after",
+            "pointer": "/data/rawRows/segments",
+            "where": {
+              "active": true
+            },
+            "field": "physicalScopeId"
+          }
+        },
+        {
+          "caseId": "T23",
+          "subcaseId": "failure-before-open",
+          "assertionId": "원-LOT-관계",
+          "source": {
+            "actionId": "after",
+            "pointer": "/data/rawRows/segments",
+            "where": {
+              "active": true
+            },
+            "field": [
+              "id",
+              "lotId",
+              "placeId",
+              "quantity",
+              "unit"
+            ]
+          }
+        },
+        {
+          "caseId": "T23",
+          "subcaseId": "failure-before-open",
+          "assertionId": "진행-업무-WAITING",
+          "source": {
+            "actionId": "after",
+            "pointer": "/data/rawRows/works/0/status"
+          }
+        },
+        {
+          "caseId": "T23",
+          "subcaseId": "failure-before-open",
+          "assertionId": "v1-정의",
+          "source": {
+            "actionId": "after",
+            "pointer": "/data/rawRows/works/0/definitionVersion"
+          }
+        },
+        {
+          "caseId": "T23",
+          "subcaseId": "failure-before-open",
+          "assertionId": "v1-evaluator",
+          "source": {
+            "actionId": "after",
+            "pointer": "/data/rawRows/assessments/0/evaluatorVersion"
+          }
+        },
+        {
+          "caseId": "T23",
+          "subcaseId": "failure-before-open",
+          "assertionId": "v1-도착-미충족",
+          "source": {
+            "actionId": "after",
+            "pointer": "/data/rawRows/assessments/0/result"
+          }
+        },
+        {
+          "caseId": "T23",
+          "subcaseId": "failure-before-open",
+          "assertionId": "v1-인정-도착60",
+          "source": {
+            "actionId": "after",
+            "pointer": "/data/rawRows/assessments/0/quantity"
+          }
+        },
+        {
+          "caseId": "T23",
+          "subcaseId": "failure-before-open",
+          "assertionId": "남은40-인간-owner",
+          "source": {
+            "actionId": "after",
+            "pointer": "/data/rawRows/obligations",
+            "field": [
+              "id",
+              "ownerId",
+              "status",
+              "quantity",
+              "unit",
+              "nextAction",
+              "nextCheckAt"
+            ]
+          }
+        },
+        {
+          "caseId": "T23",
+          "subcaseId": "failure-before-open",
+          "assertionId": "원문-증거-hash",
+          "source": {
+            "actionId": "after",
+            "pointer": "/data/rawRows/evidence/0/sha256"
+          }
+        },
+        {
+          "caseId": "T23",
+          "subcaseId": "failure-before-open",
+          "assertionId": "원-수령-멱등결과",
+          "source": {
+            "actionId": "after",
+            "pointer": "/data/rawRows/idempotency/0/resultId"
+          }
+        },
+        {
+          "caseId": "T23",
+          "subcaseId": "failure-before-open",
+          "assertionId": "개방전-복구-mode",
+          "source": {
+            "actionId": "rollback",
+            "pointer": "/data/hostObservation/extractor/rawRows/facts/mode"
+          }
+        },
+        {
+          "caseId": "T23",
+          "subcaseId": "failure-before-open",
+          "assertionId": "개방전-write상태",
+          "source": {
+            "actionId": "rollback",
+            "pointer": "/data/hostObservation/extractor/rawRows/facts/writeIntake"
+          }
+        },
+        {
+          "caseId": "T23",
+          "subcaseId": "failure-after-open-forward",
+          "assertionId": "접수중지",
+          "source": {
+            "actionId": "stop-reconcile",
+            "pointer": "/data/hostObservation/extractor/rawRows/facts/writeIntake"
+          }
+        },
+        {
+          "caseId": "T23",
+          "subcaseId": "failure-after-open-forward",
+          "assertionId": "outbox-freeze",
+          "source": {
+            "actionId": "stop-reconcile",
+            "pointer": "/data/hostObservation/extractor/rawRows/facts/outboxDispatch"
+          }
+        },
+        {
+          "caseId": "T23",
+          "subcaseId": "failure-after-open-forward",
+          "assertionId": "외부결과-대조",
+          "source": {
+            "actionId": "repair",
+            "pointer": "/data/hostObservation/extractor/rawRows/facts/externalEffects",
+            "field": [
+              "externalOperationId",
+              "status",
+              "issueCount"
+            ]
+          }
+        },
+        {
+          "caseId": "T23",
+          "subcaseId": "failure-after-open-forward",
+          "assertionId": "명시-replay-compensation",
+          "source": {
+            "actionId": "repair",
+            "pointer": "/data/hostObservation/extractor/rawRows/facts/commandDecisions",
+            "field": [
+              "commandId",
+              "localAction",
+              "externalAction",
+              "physicalAction"
+            ]
+          }
+        },
+        {
+          "caseId": "T23",
+          "subcaseId": "failure-after-open-forward",
+          "assertionId": "복구후-물량불변",
+          "source": {
+            "actionId": "after",
+            "pointer": "/data/data/inventory/heldQuantity"
+          }
+        },
+        {
+          "caseId": "T23",
+          "subcaseId": "failure-after-open-forward",
+          "assertionId": "외부-재발행0",
+          "source": {
+            "actionId": "after",
+            "pointer": "/data/rawRows/externalEffects"
+          }
+        },
+        {
+          "caseId": "T23",
+          "subcaseId": "failure-after-open-forward",
+          "assertionId": "새-구매-기록보존",
+          "source": {
+            "actionId": "after",
+            "pointer": "/data/rawRows/purchaseOrders"
+          }
+        },
+        {
+          "caseId": "T23",
+          "subcaseId": "failure-after-open-forward",
+          "assertionId": "대조-책임-유지",
+          "source": {
+            "actionId": "after",
+            "pointer": "/data/rawRows/recoveryObligations"
+          }
+        },
+        {
+          "caseId": "T23",
+          "subcaseId": "failure-after-open-approved-snapshot",
+          "assertionId": "접수중지",
+          "source": {
+            "actionId": "stop-reconcile",
+            "pointer": "/data/hostObservation/extractor/rawRows/facts/writeIntake"
+          }
+        },
+        {
+          "caseId": "T23",
+          "subcaseId": "failure-after-open-approved-snapshot",
+          "assertionId": "outbox-freeze",
+          "source": {
+            "actionId": "stop-reconcile",
+            "pointer": "/data/hostObservation/extractor/rawRows/facts/outboxDispatch"
+          }
+        },
+        {
+          "caseId": "T23",
+          "subcaseId": "failure-after-open-approved-snapshot",
+          "assertionId": "외부결과-대조",
+          "source": {
+            "actionId": "repair",
+            "pointer": "/data/hostObservation/extractor/rawRows/facts/externalEffects",
+            "field": [
+              "externalOperationId",
+              "status",
+              "issueCount"
+            ]
+          }
+        },
+        {
+          "caseId": "T23",
+          "subcaseId": "failure-after-open-approved-snapshot",
+          "assertionId": "명시-replay-compensation",
+          "source": {
+            "actionId": "repair",
+            "pointer": "/data/hostObservation/extractor/rawRows/facts/commandDecisions",
+            "field": [
+              "commandId",
+              "localAction",
+              "externalAction",
+              "physicalAction"
+            ]
+          }
+        },
+        {
+          "caseId": "T23",
+          "subcaseId": "failure-after-open-approved-snapshot",
+          "assertionId": "복구후-물량불변",
+          "source": {
+            "actionId": "after",
+            "pointer": "/data/data/inventory/heldQuantity"
+          }
+        },
+        {
+          "caseId": "T23",
+          "subcaseId": "failure-after-open-approved-snapshot",
+          "assertionId": "외부-재발행0",
+          "source": {
+            "actionId": "after",
+            "pointer": "/data/rawRows/externalEffects"
+          }
+        },
+        {
+          "caseId": "T23",
+          "subcaseId": "failure-after-open-approved-snapshot",
+          "assertionId": "새-구매-기록보존",
+          "source": {
+            "actionId": "after",
+            "pointer": "/data/rawRows/purchaseOrders"
+          }
+        },
+        {
+          "caseId": "T23",
+          "subcaseId": "failure-after-open-approved-snapshot",
+          "assertionId": "대조-책임-유지",
+          "source": {
+            "actionId": "after",
+            "pointer": "/data/rawRows/recoveryObligations"
+          }
+        }
+      ]
+    },
+    {
+      "oracleId": "T23.cutover-and-safe-recovery",
+      "observationName": "SQLRollbackPretendedPhysicalContractCancel",
+      "declarations": [
+        {
+          "caseId": "T23",
+          "subcaseId": "cutover-open-order",
+          "assertionId": "현재-W-60",
+          "source": {
+            "actionId": "after",
+            "pointer": "/data/data/inventory/heldQuantity"
+          }
+        },
+        {
+          "caseId": "T23",
+          "subcaseId": "cutover-open-order",
+          "assertionId": "식별된-실물-100",
+          "source": {
+            "actionId": "after",
+            "pointer": "/data/rawRows/segments",
+            "where": {
+              "active": true
+            },
+            "field": "quantity"
+          }
+        },
+        {
+          "caseId": "T23",
+          "subcaseId": "cutover-open-order",
+          "assertionId": "실물-identity-중복0",
+          "source": {
+            "actionId": "after",
+            "pointer": "/data/rawRows/segments",
+            "where": {
+              "active": true
+            },
+            "field": "physicalScopeId"
+          }
+        },
+        {
+          "caseId": "T23",
+          "subcaseId": "cutover-open-order",
+          "assertionId": "원-LOT-관계",
+          "source": {
+            "actionId": "after",
+            "pointer": "/data/rawRows/segments",
+            "where": {
+              "active": true
+            },
+            "field": [
+              "id",
+              "lotId",
+              "placeId",
+              "quantity",
+              "unit"
+            ]
+          }
+        },
+        {
+          "caseId": "T23",
+          "subcaseId": "cutover-open-order",
+          "assertionId": "진행-업무-WAITING",
+          "source": {
+            "actionId": "after",
+            "pointer": "/data/rawRows/works/0/status"
+          }
+        },
+        {
+          "caseId": "T23",
+          "subcaseId": "cutover-open-order",
+          "assertionId": "v1-정의",
+          "source": {
+            "actionId": "after",
+            "pointer": "/data/rawRows/works/0/definitionVersion"
+          }
+        },
+        {
+          "caseId": "T23",
+          "subcaseId": "cutover-open-order",
+          "assertionId": "v1-evaluator",
+          "source": {
+            "actionId": "after",
+            "pointer": "/data/rawRows/assessments/0/evaluatorVersion"
+          }
+        },
+        {
+          "caseId": "T23",
+          "subcaseId": "cutover-open-order",
+          "assertionId": "v1-도착-미충족",
+          "source": {
+            "actionId": "after",
+            "pointer": "/data/rawRows/assessments/0/result"
+          }
+        },
+        {
+          "caseId": "T23",
+          "subcaseId": "cutover-open-order",
+          "assertionId": "v1-인정-도착60",
+          "source": {
+            "actionId": "after",
+            "pointer": "/data/rawRows/assessments/0/quantity"
+          }
+        },
+        {
+          "caseId": "T23",
+          "subcaseId": "cutover-open-order",
+          "assertionId": "남은40-인간-owner",
+          "source": {
+            "actionId": "after",
+            "pointer": "/data/rawRows/obligations",
+            "field": [
+              "id",
+              "ownerId",
+              "status",
+              "quantity",
+              "unit",
+              "nextAction",
+              "nextCheckAt"
+            ]
+          }
+        },
+        {
+          "caseId": "T23",
+          "subcaseId": "cutover-open-order",
+          "assertionId": "원문-증거-hash",
+          "source": {
+            "actionId": "after",
+            "pointer": "/data/rawRows/evidence/0/sha256"
+          }
+        },
+        {
+          "caseId": "T23",
+          "subcaseId": "cutover-open-order",
+          "assertionId": "원-수령-멱등결과",
+          "source": {
+            "actionId": "after",
+            "pointer": "/data/rawRows/idempotency/0/resultId"
+          }
+        },
+        {
+          "caseId": "T23",
+          "subcaseId": "failure-before-open",
+          "assertionId": "현재-W-60",
+          "source": {
+            "actionId": "after",
+            "pointer": "/data/data/inventory/heldQuantity"
+          }
+        },
+        {
+          "caseId": "T23",
+          "subcaseId": "failure-before-open",
+          "assertionId": "식별된-실물-100",
+          "source": {
+            "actionId": "after",
+            "pointer": "/data/rawRows/segments",
+            "where": {
+              "active": true
+            },
+            "field": "quantity"
+          }
+        },
+        {
+          "caseId": "T23",
+          "subcaseId": "failure-before-open",
+          "assertionId": "실물-identity-중복0",
+          "source": {
+            "actionId": "after",
+            "pointer": "/data/rawRows/segments",
+            "where": {
+              "active": true
+            },
+            "field": "physicalScopeId"
+          }
+        },
+        {
+          "caseId": "T23",
+          "subcaseId": "failure-before-open",
+          "assertionId": "원-LOT-관계",
+          "source": {
+            "actionId": "after",
+            "pointer": "/data/rawRows/segments",
+            "where": {
+              "active": true
+            },
+            "field": [
+              "id",
+              "lotId",
+              "placeId",
+              "quantity",
+              "unit"
+            ]
+          }
+        },
+        {
+          "caseId": "T23",
+          "subcaseId": "failure-before-open",
+          "assertionId": "진행-업무-WAITING",
+          "source": {
+            "actionId": "after",
+            "pointer": "/data/rawRows/works/0/status"
+          }
+        },
+        {
+          "caseId": "T23",
+          "subcaseId": "failure-before-open",
+          "assertionId": "v1-정의",
+          "source": {
+            "actionId": "after",
+            "pointer": "/data/rawRows/works/0/definitionVersion"
+          }
+        },
+        {
+          "caseId": "T23",
+          "subcaseId": "failure-before-open",
+          "assertionId": "v1-evaluator",
+          "source": {
+            "actionId": "after",
+            "pointer": "/data/rawRows/assessments/0/evaluatorVersion"
+          }
+        },
+        {
+          "caseId": "T23",
+          "subcaseId": "failure-before-open",
+          "assertionId": "v1-도착-미충족",
+          "source": {
+            "actionId": "after",
+            "pointer": "/data/rawRows/assessments/0/result"
+          }
+        },
+        {
+          "caseId": "T23",
+          "subcaseId": "failure-before-open",
+          "assertionId": "v1-인정-도착60",
+          "source": {
+            "actionId": "after",
+            "pointer": "/data/rawRows/assessments/0/quantity"
+          }
+        },
+        {
+          "caseId": "T23",
+          "subcaseId": "failure-before-open",
+          "assertionId": "남은40-인간-owner",
+          "source": {
+            "actionId": "after",
+            "pointer": "/data/rawRows/obligations",
+            "field": [
+              "id",
+              "ownerId",
+              "status",
+              "quantity",
+              "unit",
+              "nextAction",
+              "nextCheckAt"
+            ]
+          }
+        },
+        {
+          "caseId": "T23",
+          "subcaseId": "failure-before-open",
+          "assertionId": "원문-증거-hash",
+          "source": {
+            "actionId": "after",
+            "pointer": "/data/rawRows/evidence/0/sha256"
+          }
+        },
+        {
+          "caseId": "T23",
+          "subcaseId": "failure-before-open",
+          "assertionId": "원-수령-멱등결과",
+          "source": {
+            "actionId": "after",
+            "pointer": "/data/rawRows/idempotency/0/resultId"
+          }
+        },
+        {
+          "caseId": "T23",
+          "subcaseId": "failure-before-open",
+          "assertionId": "실물계약-SQL취소0",
+          "source": {
+            "actionId": "rollback",
+            "pointer": "/data/hostObservation/extractor/rawRows/facts/physicalOrContractCancellationClaims"
+          }
+        },
+        {
+          "caseId": "T23",
+          "subcaseId": "failure-after-open-forward",
+          "assertionId": "실물계약-취소주장0",
+          "source": {
+            "actionId": "repair",
+            "pointer": "/data/hostObservation/extractor/rawRows/facts/physicalOrContractCancellationClaims"
+          }
+        },
+        {
+          "caseId": "T23",
+          "subcaseId": "failure-after-open-forward",
+          "assertionId": "복구후-물량불변",
+          "source": {
+            "actionId": "after",
+            "pointer": "/data/data/inventory/heldQuantity"
+          }
+        },
+        {
+          "caseId": "T23",
+          "subcaseId": "failure-after-open-approved-snapshot",
+          "assertionId": "실물계약-취소주장0",
+          "source": {
+            "actionId": "repair",
+            "pointer": "/data/hostObservation/extractor/rawRows/facts/physicalOrContractCancellationClaims"
+          }
+        },
+        {
+          "caseId": "T23",
+          "subcaseId": "failure-after-open-approved-snapshot",
+          "assertionId": "복구후-물량불변",
+          "source": {
+            "actionId": "after",
+            "pointer": "/data/data/inventory/heldQuantity"
+          }
+        }
+      ]
+    },
+    {
+      "oracleId": "V8.fresh-install",
+      "observationName": "fresh-integration",
+      "declarations": [
+        {
+          "caseId": "V8",
+          "subcaseId": "fresh-install-manifest-cqn",
+          "assertionId": "Flyway-only-DDL",
+          "source": {
+            "actionId": "install",
+            "pointer": "/data/hostObservation/extractor/rawRows/facts/ddlWriters"
+          }
+        },
+        {
+          "caseId": "V8",
+          "subcaseId": "fresh-install-manifest-cqn",
+          "assertionId": "처음-빈-DB",
+          "source": {
+            "actionId": "install",
+            "pointer": "/data/hostObservation/extractor/rawRows/facts/initialUserTables"
+          }
+        },
+        {
+          "caseId": "V8",
+          "subcaseId": "fresh-install-manifest-cqn",
+          "assertionId": "정확-manifest-component-set",
+          "source": {
+            "actionId": "install",
+            "pointer": "/data/hostObservation/extractor/rawRows/facts/versionManifest/components",
+            "field": "component"
+          }
+        },
+        {
+          "caseId": "V8",
+          "subcaseId": "fresh-install-manifest-cqn",
+          "assertionId": "버전-manifest-근거",
+          "source": {
+            "actionId": "install",
+            "pointer": "/data/hostObservation/extractor/rawRows/facts/versionManifest/components"
+          }
+        },
+        {
+          "caseId": "V8",
+          "subcaseId": "fresh-install-manifest-cqn",
+          "assertionId": "stack-확정-runtime-증거",
+          "source": {
+            "actionId": "install",
+            "pointer": "/data/hostObservation/extractor/rawRows/facts/versionManifest/status"
+          }
+        },
+        {
+          "caseId": "V8",
+          "subcaseId": "fresh-install-manifest-cqn",
+          "assertionId": "lock-manifest-실제-runtime-동일",
+          "source": {
+            "actionId": "install",
+            "pointer": "/data/hostObservation/extractor/rawRows/facts/runtimeVersions",
+            "field": [
+              "component",
+              "version"
+            ]
+          }
+        },
+        {
+          "caseId": "V8",
+          "subcaseId": "fresh-install-manifest-cqn",
+          "assertionId": "manifest-exact-후보버전",
+          "source": {
+            "actionId": "install",
+            "pointer": "/data/hostObservation/extractor/rawRows/facts/candidateVersionChecks",
+            "field": [
+              "component",
+              "version"
+            ]
+          }
+        },
+        {
+          "caseId": "V8",
+          "subcaseId": "fresh-install-manifest-cqn",
+          "assertionId": "CQN-수령-원장",
+          "source": {
+            "actionId": "after",
+            "pointer": "/data/rawRows/movements",
+            "field": [
+              "activityId",
+              "kind",
+              "quantity",
+              "unit"
+            ]
+          }
+        },
+        {
+          "caseId": "V8",
+          "subcaseId": "fresh-install-manifest-cqn",
+          "assertionId": "신규-수령60",
+          "source": {
+            "actionId": "read-cqn",
+            "pointer": "/response/data/heldQuantity"
+          }
+        },
+        {
+          "caseId": "V8",
+          "subcaseId": "fresh-install-manifest-cqn",
+          "assertionId": "MCP-CQN-동일-response",
+          "source": {
+            "actionId": "read-mcp",
+            "pointer": "/response/data"
+          }
+        },
+        {
+          "caseId": "V8",
+          "subcaseId": "fresh-install-manifest-cqn",
+          "assertionId": "원자적-감사-연결",
+          "source": {
+            "actionId": "after",
+            "pointer": "/data/rawRows/audit",
+            "field": [
+              "commandId",
+              "capabilityId",
+              "outcome"
+            ]
+          }
+        },
+        {
+          "caseId": "V8",
+          "subcaseId": "fresh-install-manifest-cqn",
+          "assertionId": "원자적-outbox-연결",
+          "source": {
+            "actionId": "after",
+            "pointer": "/data/rawRows/outbox",
+            "field": [
+              "commandId",
+              "type",
+              "status"
+            ]
+          }
+        },
+        {
+          "caseId": "V8",
+          "subcaseId": "fresh-install-manifest-cqn",
+          "assertionId": "멱등-COMMITTED",
+          "source": {
+            "actionId": "after",
+            "pointer": "/data/rawRows/idempotency/0/status"
+          }
+        },
+        {
+          "caseId": "V8",
+          "subcaseId": "fresh-constraints-auth",
+          "assertionId": "조직-FK-23503",
+          "source": {
+            "actionId": "constraints",
+            "pointer": "/data/hostObservation/extractor/rawRows/facts/constraintAttempts",
+            "field": [
+              "case",
+              "sqlState"
+            ]
+          }
+        },
+        {
+          "caseId": "V8",
+          "subcaseId": "fresh-constraints-auth",
+          "assertionId": "custom-MCP-현재인가",
+          "source": {
+            "actionId": "unauthorized-endpoint",
+            "pointer": "/response/error/code"
+          }
+        },
+        {
+          "caseId": "V8",
+          "subcaseId": "fresh-constraints-auth",
+          "assertionId": "무권한효과0-segments",
+          "source": {
+            "actionId": "after",
+            "pointer": "/data/rawRows/segments"
+          }
+        },
+        {
+          "caseId": "V8",
+          "subcaseId": "fresh-constraints-auth",
+          "assertionId": "무권한효과0-movements",
+          "source": {
+            "actionId": "after",
+            "pointer": "/data/rawRows/movements"
+          }
+        },
+        {
+          "caseId": "V8",
+          "subcaseId": "fresh-constraints-auth",
+          "assertionId": "무권한효과0-allocations",
+          "source": {
+            "actionId": "after",
+            "pointer": "/data/rawRows/allocations"
+          }
+        },
+        {
+          "caseId": "V8",
+          "subcaseId": "fresh-constraints-auth",
+          "assertionId": "무권한효과0-works",
+          "source": {
+            "actionId": "after",
+            "pointer": "/data/rawRows/works"
+          }
+        },
+        {
+          "caseId": "V8",
+          "subcaseId": "fresh-constraints-auth",
+          "assertionId": "무권한효과0-approvals",
+          "source": {
+            "actionId": "after",
+            "pointer": "/data/rawRows/approvals"
+          }
+        },
+        {
+          "caseId": "V8",
+          "subcaseId": "fresh-constraints-auth",
+          "assertionId": "무권한효과0-outbox",
+          "source": {
+            "actionId": "after",
+            "pointer": "/data/rawRows/outbox"
+          }
+        },
+        {
+          "caseId": "V8",
+          "subcaseId": "fresh-constraints-auth",
+          "assertionId": "허용-denial-audit",
+          "source": {
+            "actionId": "after",
+            "pointer": "/data/rawRows/denialAudit/0/outcome"
+          }
+        },
+        {
+          "caseId": "V8",
+          "subcaseId": "transaction-rollback-all-effects",
+          "assertionId": "rollback-금지효과0-segments",
+          "source": {
+            "actionId": "after",
+            "pointer": "/data/rawRows/segments"
+          }
+        },
+        {
+          "caseId": "V8",
+          "subcaseId": "transaction-rollback-all-effects",
+          "assertionId": "rollback-금지효과0-genealogy",
+          "source": {
+            "actionId": "after",
+            "pointer": "/data/rawRows/genealogy"
+          }
+        },
+        {
+          "caseId": "V8",
+          "subcaseId": "transaction-rollback-all-effects",
+          "assertionId": "rollback-금지효과0-movements",
+          "source": {
+            "actionId": "after",
+            "pointer": "/data/rawRows/movements"
+          }
+        },
+        {
+          "caseId": "V8",
+          "subcaseId": "transaction-rollback-all-effects",
+          "assertionId": "rollback-금지효과0-allocations",
+          "source": {
+            "actionId": "after",
+            "pointer": "/data/rawRows/allocations"
+          }
+        },
+        {
+          "caseId": "V8",
+          "subcaseId": "transaction-rollback-all-effects",
+          "assertionId": "rollback-금지효과0-obligations",
+          "source": {
+            "actionId": "after",
+            "pointer": "/data/rawRows/obligations"
+          }
+        },
+        {
+          "caseId": "V8",
+          "subcaseId": "transaction-rollback-all-effects",
+          "assertionId": "rollback-금지효과0-audit",
+          "source": {
+            "actionId": "after",
+            "pointer": "/data/rawRows/audit"
+          }
+        },
+        {
+          "caseId": "V8",
+          "subcaseId": "transaction-rollback-all-effects",
+          "assertionId": "rollback-금지효과0-outbox",
+          "source": {
+            "actionId": "after",
+            "pointer": "/data/rawRows/outbox"
+          }
+        },
+        {
+          "caseId": "V8",
+          "subcaseId": "transaction-rollback-all-effects",
+          "assertionId": "rollback-금지효과0-idempotency",
+          "source": {
+            "actionId": "after",
+            "pointer": "/data/rawRows/idempotency"
+          }
+        },
+        {
+          "caseId": "V8",
+          "subcaseId": "transaction-rollback-all-effects",
+          "assertionId": "rollback-실패응답-audit",
+          "source": {
+            "actionId": "split-audit",
+            "pointer": "/response/outcome"
+          }
+        },
+        {
+          "caseId": "V8",
+          "subcaseId": "transaction-rollback-all-effects",
+          "assertionId": "rollback-실패응답-outbox",
+          "source": {
+            "actionId": "split-outbox",
+            "pointer": "/response/outcome"
+          }
+        },
+        {
+          "caseId": "V8",
+          "subcaseId": "transaction-rollback-all-effects",
+          "assertionId": "rollback-실패응답-idempotency",
+          "source": {
+            "actionId": "split-idempotency",
+            "pointer": "/response/outcome"
+          }
+        },
+        {
+          "caseId": "V8",
+          "subcaseId": "transaction-rollback-all-effects",
+          "assertionId": "rollback-수량변화0",
+          "source": {
+            "actionId": "after",
+            "pointer": "/data/data/inventory/heldQuantity"
+          }
+        },
+        {
+          "caseId": "V8",
+          "subcaseId": "real-lock-two-transactions",
+          "assertionId": "예약40-commit",
+          "source": {
+            "actionId": "terminal40",
+            "pointer": "/response/outcome"
+          }
+        },
+        {
+          "caseId": "V8",
+          "subcaseId": "real-lock-two-transactions",
+          "assertionId": "예약30-현재revision-거부",
+          "source": {
+            "actionId": "terminal30",
+            "pointer": "/response/error/code"
+          }
+        },
+        {
+          "caseId": "V8",
+          "subcaseId": "real-lock-two-transactions",
+          "assertionId": "실물-잠금전후-불변",
+          "source": {
+            "actionId": "after",
+            "pointer": "/data/data/inventory/heldQuantity"
+          }
+        },
+        {
+          "caseId": "V8",
+          "subcaseId": "real-lock-two-transactions",
+          "assertionId": "실제-독립-transaction",
+          "source": {
+            "actionId": "after",
+            "pointer": "/data/rawRows/lockEvidence",
+            "field": "transactionId"
+          }
+        },
+        {
+          "caseId": "V8",
+          "subcaseId": "real-lock-two-transactions",
+          "assertionId": "잠금-fence-원범위",
+          "source": {
+            "actionId": "after",
+            "pointer": "/data/rawRows/lockEvidence",
+            "field": [
+              "scopeId",
+              "transactionId",
+              "lockMode"
+            ]
+          }
+        },
+        {
+          "caseId": "V8",
+          "subcaseId": "real-lock-two-transactions",
+          "assertionId": "첫-reserve-40-효과",
+          "source": {
+            "actionId": "after",
+            "pointer": "/data/rawRows/newAllocations",
+            "field": [
+              "quantity",
+              "unit",
+              "status"
+            ]
+          }
+        },
+        {
+          "caseId": "V8",
+          "subcaseId": "real-lock-two-transactions",
+          "assertionId": "기존20+새40-실행배분60",
+          "source": {
+            "actionId": "after",
+            "pointer": "/data/data/inventory/reservedQuantity"
+          }
+        }
+      ]
+    },
+    {
+      "oracleId": "V8.ontology-upgrade-preservation",
+      "observationName": "upgrade-preserves",
+      "declarations": [
+        {
+          "caseId": "V8",
+          "subcaseId": "ontology-v1-v2-preserves",
+          "assertionId": "보존-segments",
+          "source": {
+            "actionId": "after",
+            "pointer": "/data/rawRows/segments"
+          }
+        },
+        {
+          "caseId": "V8",
+          "subcaseId": "ontology-v1-v2-preserves",
+          "assertionId": "보존-genealogy",
+          "source": {
+            "actionId": "after",
+            "pointer": "/data/rawRows/genealogy"
+          }
+        },
+        {
+          "caseId": "V8",
+          "subcaseId": "ontology-v1-v2-preserves",
+          "assertionId": "보존-works",
+          "source": {
+            "actionId": "after",
+            "pointer": "/data/rawRows/works"
+          }
+        },
+        {
+          "caseId": "V8",
+          "subcaseId": "ontology-v1-v2-preserves",
+          "assertionId": "보존-goalVersions",
+          "source": {
+            "actionId": "after",
+            "pointer": "/data/rawRows/goalVersions"
+          }
+        },
+        {
+          "caseId": "V8",
+          "subcaseId": "ontology-v1-v2-preserves",
+          "assertionId": "보존-assessments",
+          "source": {
+            "actionId": "after",
+            "pointer": "/data/rawRows/assessments"
+          }
+        },
+        {
+          "caseId": "V8",
+          "subcaseId": "ontology-v1-v2-preserves",
+          "assertionId": "보존-obligations",
+          "source": {
+            "actionId": "after",
+            "pointer": "/data/rawRows/obligations"
+          }
+        },
+        {
+          "caseId": "V8",
+          "subcaseId": "ontology-v1-v2-preserves",
+          "assertionId": "보존-definitions",
+          "source": {
+            "actionId": "after",
+            "pointer": "/data/rawRows/definitions"
+          }
+        },
+        {
+          "caseId": "V8",
+          "subcaseId": "ontology-v1-v2-preserves",
+          "assertionId": "보존-evidence",
+          "source": {
+            "actionId": "after",
+            "pointer": "/data/rawRows/evidence"
+          }
+        },
+        {
+          "caseId": "V8",
+          "subcaseId": "ontology-v1-v2-preserves",
+          "assertionId": "보존-idempotency",
+          "source": {
+            "actionId": "after",
+            "pointer": "/data/rawRows/idempotency"
+          }
+        },
+        {
+          "caseId": "V8",
+          "subcaseId": "ontology-v1-v2-preserves",
+          "assertionId": "보존-allocations",
+          "source": {
+            "actionId": "after",
+            "pointer": "/data/rawRows/allocations"
+          }
+        },
+        {
+          "caseId": "V8",
+          "subcaseId": "ontology-v1-v2-preserves",
+          "assertionId": "현재-W-60",
+          "source": {
+            "actionId": "after",
+            "pointer": "/data/data/inventory/heldQuantity"
+          }
+        },
+        {
+          "caseId": "V8",
+          "subcaseId": "ontology-v1-v2-preserves",
+          "assertionId": "식별된-실물-100",
+          "source": {
+            "actionId": "after",
+            "pointer": "/data/rawRows/segments",
+            "where": {
+              "active": true
+            },
+            "field": "quantity"
+          }
+        },
+        {
+          "caseId": "V8",
+          "subcaseId": "ontology-v1-v2-preserves",
+          "assertionId": "실물-identity-중복0",
+          "source": {
+            "actionId": "after",
+            "pointer": "/data/rawRows/segments",
+            "where": {
+              "active": true
+            },
+            "field": "physicalScopeId"
+          }
+        },
+        {
+          "caseId": "V8",
+          "subcaseId": "ontology-v1-v2-preserves",
+          "assertionId": "원-LOT-관계",
+          "source": {
+            "actionId": "after",
+            "pointer": "/data/rawRows/segments",
+            "where": {
+              "active": true
+            },
+            "field": [
+              "id",
+              "lotId",
+              "placeId",
+              "quantity",
+              "unit"
+            ]
+          }
+        },
+        {
+          "caseId": "V8",
+          "subcaseId": "ontology-v1-v2-preserves",
+          "assertionId": "진행-업무-WAITING",
+          "source": {
+            "actionId": "after",
+            "pointer": "/data/rawRows/works/0/status"
+          }
+        },
+        {
+          "caseId": "V8",
+          "subcaseId": "ontology-v1-v2-preserves",
+          "assertionId": "v1-정의",
+          "source": {
+            "actionId": "after",
+            "pointer": "/data/rawRows/works/0/definitionVersion"
+          }
+        },
+        {
+          "caseId": "V8",
+          "subcaseId": "ontology-v1-v2-preserves",
+          "assertionId": "v1-evaluator",
+          "source": {
+            "actionId": "after",
+            "pointer": "/data/rawRows/assessments/0/evaluatorVersion"
+          }
+        },
+        {
+          "caseId": "V8",
+          "subcaseId": "ontology-v1-v2-preserves",
+          "assertionId": "v1-도착-미충족",
+          "source": {
+            "actionId": "after",
+            "pointer": "/data/rawRows/assessments/0/result"
+          }
+        },
+        {
+          "caseId": "V8",
+          "subcaseId": "ontology-v1-v2-preserves",
+          "assertionId": "v1-인정-도착60",
+          "source": {
+            "actionId": "after",
+            "pointer": "/data/rawRows/assessments/0/quantity"
+          }
+        },
+        {
+          "caseId": "V8",
+          "subcaseId": "ontology-v1-v2-preserves",
+          "assertionId": "남은40-인간-owner",
+          "source": {
+            "actionId": "after",
+            "pointer": "/data/rawRows/obligations",
+            "field": [
+              "id",
+              "ownerId",
+              "status",
+              "quantity",
+              "unit",
+              "nextAction",
+              "nextCheckAt"
+            ]
+          }
+        },
+        {
+          "caseId": "V8",
+          "subcaseId": "ontology-v1-v2-preserves",
+          "assertionId": "원문-증거-hash",
+          "source": {
+            "actionId": "after",
+            "pointer": "/data/rawRows/evidence/0/sha256"
+          }
+        },
+        {
+          "caseId": "V8",
+          "subcaseId": "ontology-v1-v2-preserves",
+          "assertionId": "원-수령-멱등결과",
+          "source": {
+            "actionId": "after",
+            "pointer": "/data/rawRows/idempotency/0/resultId"
+          }
+        },
+        {
+          "caseId": "V8",
+          "subcaseId": "ontology-v1-v2-preserves",
+          "assertionId": "API-v1-판정-동일",
+          "source": {
+            "actionId": "assessment-after",
+            "pointer": "/response/data"
+          }
+        },
+        {
+          "caseId": "V8",
+          "subcaseId": "ontology-v1-v2-preserves",
+          "assertionId": "MCP-v1-판정-동일",
+          "source": {
+            "actionId": "mcp-after",
+            "pointer": "/response/data"
+          }
+        },
+        {
+          "caseId": "V8",
+          "subcaseId": "ontology-v1-v2-preserves",
+          "assertionId": "upgrade-재인수-probes",
+          "source": {
+            "actionId": "upgrade",
+            "pointer": "/data/hostObservation/extractor/rawRows/facts/revalidated",
+            "field": [
+              "gate",
+              "result"
+            ]
+          }
+        },
+        {
+          "caseId": "V8",
+          "subcaseId": "upgrade-revalidate-transactions",
+          "assertionId": "upgrade-실제-constraint-SQLSTATE",
+          "source": {
+            "actionId": "constraints",
+            "pointer": "/data/hostObservation/extractor/rawRows/facts/constraintAttempts",
+            "field": [
+              "case",
+              "sqlState"
+            ]
+          }
+        },
+        {
+          "caseId": "V8",
+          "subcaseId": "upgrade-revalidate-transactions",
+          "assertionId": "upgrade-실제-MCP-인가",
+          "source": {
+            "actionId": "unauthorized",
+            "pointer": "/response/error/code"
+          }
+        },
+        {
+          "caseId": "V8",
+          "subcaseId": "upgrade-revalidate-transactions",
+          "assertionId": "rollback-rollback-금지효과0-segments",
+          "source": {
+            "actionId": "rollback-after",
+            "pointer": "/data/rawRows/segments"
+          }
+        },
+        {
+          "caseId": "V8",
+          "subcaseId": "upgrade-revalidate-transactions",
+          "assertionId": "rollback-rollback-금지효과0-genealogy",
+          "source": {
+            "actionId": "rollback-after",
+            "pointer": "/data/rawRows/genealogy"
+          }
+        },
+        {
+          "caseId": "V8",
+          "subcaseId": "upgrade-revalidate-transactions",
+          "assertionId": "rollback-rollback-금지효과0-movements",
+          "source": {
+            "actionId": "rollback-after",
+            "pointer": "/data/rawRows/movements"
+          }
+        },
+        {
+          "caseId": "V8",
+          "subcaseId": "upgrade-revalidate-transactions",
+          "assertionId": "rollback-rollback-금지효과0-allocations",
+          "source": {
+            "actionId": "rollback-after",
+            "pointer": "/data/rawRows/allocations"
+          }
+        },
+        {
+          "caseId": "V8",
+          "subcaseId": "upgrade-revalidate-transactions",
+          "assertionId": "rollback-rollback-금지효과0-obligations",
+          "source": {
+            "actionId": "rollback-after",
+            "pointer": "/data/rawRows/obligations"
+          }
+        },
+        {
+          "caseId": "V8",
+          "subcaseId": "upgrade-revalidate-transactions",
+          "assertionId": "rollback-rollback-금지효과0-audit",
+          "source": {
+            "actionId": "rollback-after",
+            "pointer": "/data/rawRows/audit"
+          }
+        },
+        {
+          "caseId": "V8",
+          "subcaseId": "upgrade-revalidate-transactions",
+          "assertionId": "rollback-rollback-금지효과0-outbox",
+          "source": {
+            "actionId": "rollback-after",
+            "pointer": "/data/rawRows/outbox"
+          }
+        },
+        {
+          "caseId": "V8",
+          "subcaseId": "upgrade-revalidate-transactions",
+          "assertionId": "rollback-rollback-금지효과0-idempotency",
+          "source": {
+            "actionId": "rollback-after",
+            "pointer": "/data/rawRows/idempotency"
+          }
+        },
+        {
+          "caseId": "V8",
+          "subcaseId": "upgrade-revalidate-transactions",
+          "assertionId": "rollback-rollback-실패응답-audit",
+          "source": {
+            "actionId": "rollback-split-audit",
+            "pointer": "/response/outcome"
+          }
+        },
+        {
+          "caseId": "V8",
+          "subcaseId": "upgrade-revalidate-transactions",
+          "assertionId": "rollback-rollback-실패응답-outbox",
+          "source": {
+            "actionId": "rollback-split-outbox",
+            "pointer": "/response/outcome"
+          }
+        },
+        {
+          "caseId": "V8",
+          "subcaseId": "upgrade-revalidate-transactions",
+          "assertionId": "rollback-rollback-실패응답-idempotency",
+          "source": {
+            "actionId": "rollback-split-idempotency",
+            "pointer": "/response/outcome"
+          }
+        },
+        {
+          "caseId": "V8",
+          "subcaseId": "upgrade-revalidate-transactions",
+          "assertionId": "rollback-rollback-수량변화0",
+          "source": {
+            "actionId": "rollback-after",
+            "pointer": "/data/data/inventory/heldQuantity"
+          }
+        },
+        {
+          "caseId": "V8",
+          "subcaseId": "upgrade-revalidate-transactions",
+          "assertionId": "lock-예약40-commit",
+          "source": {
+            "actionId": "lock-terminal40",
+            "pointer": "/response/outcome"
+          }
+        },
+        {
+          "caseId": "V8",
+          "subcaseId": "upgrade-revalidate-transactions",
+          "assertionId": "lock-예약30-현재revision-거부",
+          "source": {
+            "actionId": "lock-terminal30",
+            "pointer": "/response/error/code"
+          }
+        },
+        {
+          "caseId": "V8",
+          "subcaseId": "upgrade-revalidate-transactions",
+          "assertionId": "lock-실물-잠금전후-불변",
+          "source": {
+            "actionId": "lock-after",
+            "pointer": "/data/data/inventory/heldQuantity"
+          }
+        },
+        {
+          "caseId": "V8",
+          "subcaseId": "upgrade-revalidate-transactions",
+          "assertionId": "lock-실제-독립-transaction",
+          "source": {
+            "actionId": "lock-after",
+            "pointer": "/data/rawRows/lockEvidence",
+            "field": "transactionId"
+          }
+        },
+        {
+          "caseId": "V8",
+          "subcaseId": "upgrade-revalidate-transactions",
+          "assertionId": "lock-잠금-fence-원범위",
+          "source": {
+            "actionId": "lock-after",
+            "pointer": "/data/rawRows/lockEvidence",
+            "field": [
+              "scopeId",
+              "transactionId",
+              "lockMode"
+            ]
+          }
+        },
+        {
+          "caseId": "V8",
+          "subcaseId": "upgrade-revalidate-transactions",
+          "assertionId": "lock-첫-reserve-40-효과",
+          "source": {
+            "actionId": "lock-after",
+            "pointer": "/data/rawRows/newAllocations",
+            "field": [
+              "quantity",
+              "unit",
+              "status"
+            ]
+          }
+        },
+        {
+          "caseId": "V8",
+          "subcaseId": "upgrade-revalidate-transactions",
+          "assertionId": "lock-기존20+새40-실행배분60",
+          "source": {
+            "actionId": "lock-after",
+            "pointer": "/data/data/inventory/reservedQuantity"
+          }
+        },
+        {
+          "caseId": "V8",
+          "subcaseId": "upgrade-revalidate-transactions",
+          "assertionId": "upgrade-outbox-command-일치",
+          "source": {
+            "actionId": "upgrade-final",
+            "pointer": "/data/rawRows/newOutbox",
+            "field": [
+              "commandId",
+              "organizationId",
+              "type",
+              "status"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "oracleId": "V8.ontology-upgrade-preservation",
+      "observationName": "legacy-migration-substitutes-ontology-upgrade",
+      "declarations": [
+        {
+          "caseId": "V8",
+          "subcaseId": "ontology-v1-v2-preserves",
+          "assertionId": "현재-W-60",
+          "source": {
+            "actionId": "after",
+            "pointer": "/data/data/inventory/heldQuantity"
+          }
+        },
+        {
+          "caseId": "V8",
+          "subcaseId": "ontology-v1-v2-preserves",
+          "assertionId": "식별된-실물-100",
+          "source": {
+            "actionId": "after",
+            "pointer": "/data/rawRows/segments",
+            "where": {
+              "active": true
+            },
+            "field": "quantity"
+          }
+        },
+        {
+          "caseId": "V8",
+          "subcaseId": "ontology-v1-v2-preserves",
+          "assertionId": "실물-identity-중복0",
+          "source": {
+            "actionId": "after",
+            "pointer": "/data/rawRows/segments",
+            "where": {
+              "active": true
+            },
+            "field": "physicalScopeId"
+          }
+        },
+        {
+          "caseId": "V8",
+          "subcaseId": "ontology-v1-v2-preserves",
+          "assertionId": "원-LOT-관계",
+          "source": {
+            "actionId": "after",
+            "pointer": "/data/rawRows/segments",
+            "where": {
+              "active": true
+            },
+            "field": [
+              "id",
+              "lotId",
+              "placeId",
+              "quantity",
+              "unit"
+            ]
+          }
+        },
+        {
+          "caseId": "V8",
+          "subcaseId": "ontology-v1-v2-preserves",
+          "assertionId": "진행-업무-WAITING",
+          "source": {
+            "actionId": "after",
+            "pointer": "/data/rawRows/works/0/status"
+          }
+        },
+        {
+          "caseId": "V8",
+          "subcaseId": "ontology-v1-v2-preserves",
+          "assertionId": "v1-정의",
+          "source": {
+            "actionId": "after",
+            "pointer": "/data/rawRows/works/0/definitionVersion"
+          }
+        },
+        {
+          "caseId": "V8",
+          "subcaseId": "ontology-v1-v2-preserves",
+          "assertionId": "v1-evaluator",
+          "source": {
+            "actionId": "after",
+            "pointer": "/data/rawRows/assessments/0/evaluatorVersion"
+          }
+        },
+        {
+          "caseId": "V8",
+          "subcaseId": "ontology-v1-v2-preserves",
+          "assertionId": "v1-도착-미충족",
+          "source": {
+            "actionId": "after",
+            "pointer": "/data/rawRows/assessments/0/result"
+          }
+        },
+        {
+          "caseId": "V8",
+          "subcaseId": "ontology-v1-v2-preserves",
+          "assertionId": "v1-인정-도착60",
+          "source": {
+            "actionId": "after",
+            "pointer": "/data/rawRows/assessments/0/quantity"
+          }
+        },
+        {
+          "caseId": "V8",
+          "subcaseId": "ontology-v1-v2-preserves",
+          "assertionId": "남은40-인간-owner",
+          "source": {
+            "actionId": "after",
+            "pointer": "/data/rawRows/obligations",
+            "field": [
+              "id",
+              "ownerId",
+              "status",
+              "quantity",
+              "unit",
+              "nextAction",
+              "nextCheckAt"
+            ]
+          }
+        },
+        {
+          "caseId": "V8",
+          "subcaseId": "ontology-v1-v2-preserves",
+          "assertionId": "원문-증거-hash",
+          "source": {
+            "actionId": "after",
+            "pointer": "/data/rawRows/evidence/0/sha256"
+          }
+        },
+        {
+          "caseId": "V8",
+          "subcaseId": "ontology-v1-v2-preserves",
+          "assertionId": "원-수령-멱등결과",
+          "source": {
+            "actionId": "after",
+            "pointer": "/data/rawRows/idempotency/0/resultId"
+          }
+        },
+        {
+          "caseId": "V8",
+          "subcaseId": "ontology-v1-v2-preserves",
+          "assertionId": "새-schema-family",
+          "source": {
+            "actionId": "upgrade",
+            "pointer": "/data/hostObservation/extractor/rawRows/facts/schemaFamily"
+          }
+        },
+        {
+          "caseId": "V8",
+          "subcaseId": "ontology-v1-v2-preserves",
+          "assertionId": "옛-migration-source0",
+          "source": {
+            "actionId": "upgrade",
+            "pointer": "/data/hostObservation/extractor/rawRows/facts/legacySchemaSources"
+          }
+        }
+      ]
+    },
+    {
+      "oracleId": "V8.db-blob-definition-restore",
+      "observationName": "restore-artifacts",
+      "declarations": [
+        {
+          "caseId": "V8",
+          "subcaseId": "restore-none",
+          "assertionId": "bundle-전수-종류",
+          "source": {
+            "actionId": "backup",
+            "pointer": "/data/hostObservation/extractor/rawRows/facts/bundleKinds"
+          }
+        },
+        {
+          "caseId": "V8",
+          "subcaseId": "restore-none",
+          "assertionId": "삭제전-백업-원본-positive",
+          "source": {
+            "actionId": "backup",
+            "pointer": "/data/hostObservation/extractor/rawRows/facts/preDeletionBlobs",
+            "field": [
+              "sourceAlias",
+              "sha256",
+              "state"
+            ]
+          }
+        },
+        {
+          "caseId": "V8",
+          "subcaseId": "restore-none",
+          "assertionId": "백업-원문-hash",
+          "source": {
+            "actionId": "backup",
+            "pointer": "/data/hostObservation/extractor/rawRows/facts/evidenceHashes"
+          }
+        },
+        {
+          "caseId": "V8",
+          "subcaseId": "restore-none",
+          "assertionId": "보존-segments",
+          "source": {
+            "actionId": "after",
+            "pointer": "/data/rawRows/segments"
+          }
+        },
+        {
+          "caseId": "V8",
+          "subcaseId": "restore-none",
+          "assertionId": "보존-genealogy",
+          "source": {
+            "actionId": "after",
+            "pointer": "/data/rawRows/genealogy"
+          }
+        },
+        {
+          "caseId": "V8",
+          "subcaseId": "restore-none",
+          "assertionId": "보존-works",
+          "source": {
+            "actionId": "after",
+            "pointer": "/data/rawRows/works"
+          }
+        },
+        {
+          "caseId": "V8",
+          "subcaseId": "restore-none",
+          "assertionId": "보존-goalVersions",
+          "source": {
+            "actionId": "after",
+            "pointer": "/data/rawRows/goalVersions"
+          }
+        },
+        {
+          "caseId": "V8",
+          "subcaseId": "restore-none",
+          "assertionId": "보존-assessments",
+          "source": {
+            "actionId": "after",
+            "pointer": "/data/rawRows/assessments"
+          }
+        },
+        {
+          "caseId": "V8",
+          "subcaseId": "restore-none",
+          "assertionId": "보존-obligations",
+          "source": {
+            "actionId": "after",
+            "pointer": "/data/rawRows/obligations"
+          }
+        },
+        {
+          "caseId": "V8",
+          "subcaseId": "restore-none",
+          "assertionId": "보존-definitions",
+          "source": {
+            "actionId": "after",
+            "pointer": "/data/rawRows/definitions"
+          }
+        },
+        {
+          "caseId": "V8",
+          "subcaseId": "restore-none",
+          "assertionId": "보존-evidence",
+          "source": {
+            "actionId": "after",
+            "pointer": "/data/rawRows/evidence"
+          }
+        },
+        {
+          "caseId": "V8",
+          "subcaseId": "restore-none",
+          "assertionId": "보존-idempotency",
+          "source": {
+            "actionId": "after",
+            "pointer": "/data/rawRows/idempotency"
+          }
+        },
+        {
+          "caseId": "V8",
+          "subcaseId": "restore-none",
+          "assertionId": "보존-allocations",
+          "source": {
+            "actionId": "after",
+            "pointer": "/data/rawRows/allocations"
+          }
+        },
+        {
+          "caseId": "V8",
+          "subcaseId": "restore-none",
+          "assertionId": "현재-W-60",
+          "source": {
+            "actionId": "after",
+            "pointer": "/data/data/inventory/heldQuantity"
+          }
+        },
+        {
+          "caseId": "V8",
+          "subcaseId": "restore-none",
+          "assertionId": "식별된-실물-100",
+          "source": {
+            "actionId": "after",
+            "pointer": "/data/rawRows/segments",
+            "where": {
+              "active": true
+            },
+            "field": "quantity"
+          }
+        },
+        {
+          "caseId": "V8",
+          "subcaseId": "restore-none",
+          "assertionId": "실물-identity-중복0",
+          "source": {
+            "actionId": "after",
+            "pointer": "/data/rawRows/segments",
+            "where": {
+              "active": true
+            },
+            "field": "physicalScopeId"
+          }
+        },
+        {
+          "caseId": "V8",
+          "subcaseId": "restore-none",
+          "assertionId": "원-LOT-관계",
+          "source": {
+            "actionId": "after",
+            "pointer": "/data/rawRows/segments",
+            "where": {
+              "active": true
+            },
+            "field": [
+              "id",
+              "lotId",
+              "placeId",
+              "quantity",
+              "unit"
+            ]
+          }
+        },
+        {
+          "caseId": "V8",
+          "subcaseId": "restore-none",
+          "assertionId": "진행-업무-WAITING",
+          "source": {
+            "actionId": "after",
+            "pointer": "/data/rawRows/works/0/status"
+          }
+        },
+        {
+          "caseId": "V8",
+          "subcaseId": "restore-none",
+          "assertionId": "v1-정의",
+          "source": {
+            "actionId": "after",
+            "pointer": "/data/rawRows/works/0/definitionVersion"
+          }
+        },
+        {
+          "caseId": "V8",
+          "subcaseId": "restore-none",
+          "assertionId": "v1-evaluator",
+          "source": {
+            "actionId": "after",
+            "pointer": "/data/rawRows/assessments/0/evaluatorVersion"
+          }
+        },
+        {
+          "caseId": "V8",
+          "subcaseId": "restore-none",
+          "assertionId": "v1-도착-미충족",
+          "source": {
+            "actionId": "after",
+            "pointer": "/data/rawRows/assessments/0/result"
+          }
+        },
+        {
+          "caseId": "V8",
+          "subcaseId": "restore-none",
+          "assertionId": "v1-인정-도착60",
+          "source": {
+            "actionId": "after",
+            "pointer": "/data/rawRows/assessments/0/quantity"
+          }
+        },
+        {
+          "caseId": "V8",
+          "subcaseId": "restore-none",
+          "assertionId": "남은40-인간-owner",
+          "source": {
+            "actionId": "after",
+            "pointer": "/data/rawRows/obligations",
+            "field": [
+              "id",
+              "ownerId",
+              "status",
+              "quantity",
+              "unit",
+              "nextAction",
+              "nextCheckAt"
+            ]
+          }
+        },
+        {
+          "caseId": "V8",
+          "subcaseId": "restore-none",
+          "assertionId": "원문-증거-hash",
+          "source": {
+            "actionId": "after",
+            "pointer": "/data/rawRows/evidence/0/sha256"
+          }
+        },
+        {
+          "caseId": "V8",
+          "subcaseId": "restore-none",
+          "assertionId": "원-수령-멱등결과",
+          "source": {
+            "actionId": "after",
+            "pointer": "/data/rawRows/idempotency/0/resultId"
+          }
+        },
+        {
+          "caseId": "V8",
+          "subcaseId": "restore-none",
+          "assertionId": "복원-API-evidence-hash",
+          "source": {
+            "actionId": "evidence-after",
+            "pointer": "/response/data/sha256"
+          }
+        },
+        {
+          "caseId": "V8",
+          "subcaseId": "restore-none",
+          "assertionId": "완전복원-결과",
+          "source": {
+            "actionId": "restore",
+            "pointer": "/data/hostObservation/extractor/rawRows/facts/status"
+          }
+        },
+        {
+          "caseId": "V8",
+          "subcaseId": "restore-none",
+          "assertionId": "artifact-hash-대조",
+          "source": {
+            "actionId": "restore",
+            "pointer": "/data/hostObservation/extractor/rawRows/facts/restoredArtifactHashes"
+          }
+        },
+        {
+          "caseId": "V8",
+          "subcaseId": "restore-none",
+          "assertionId": "복원-현재인가",
+          "source": {
+            "actionId": "restore",
+            "pointer": "/data/hostObservation/extractor/rawRows/facts/authCases",
+            "field": [
+              "case",
+              "outcome"
+            ]
+          }
+        },
+        {
+          "caseId": "V8",
+          "subcaseId": "restore-none",
+          "assertionId": "삭제-이력재적용",
+          "source": {
+            "actionId": "restore",
+            "pointer": "/data/hostObservation/extractor/rawRows/facts/deletionJournalApplied",
+            "field": [
+              "sourceAlias",
+              "status",
+              "effectiveAt"
+            ]
+          }
+        },
+        {
+          "caseId": "V8",
+          "subcaseId": "restore-none",
+          "assertionId": "deleted-원문-복활0",
+          "source": {
+            "actionId": "restore",
+            "pointer": "/data/hostObservation/extractor/rawRows/facts/readableDeletedBlobs"
+          }
+        },
+        {
+          "caseId": "V8",
+          "subcaseId": "restore-none",
+          "assertionId": "legal-hold-보존",
+          "source": {
+            "actionId": "restore",
+            "pointer": "/data/hostObservation/extractor/rawRows/facts/legalHoldBlobs"
+          }
+        },
+        {
+          "caseId": "V8",
+          "subcaseId": "restore-none",
+          "assertionId": "복원-API-v1-의미",
+          "source": {
+            "actionId": "assessment-after",
+            "pointer": "/response/data"
+          }
+        },
+        {
+          "caseId": "V8",
+          "subcaseId": "restore-blob",
+          "assertionId": "bundle-전수-종류",
+          "source": {
+            "actionId": "backup",
+            "pointer": "/data/hostObservation/extractor/rawRows/facts/bundleKinds"
+          }
+        },
+        {
+          "caseId": "V8",
+          "subcaseId": "restore-blob",
+          "assertionId": "삭제전-백업-원본-positive",
+          "source": {
+            "actionId": "backup",
+            "pointer": "/data/hostObservation/extractor/rawRows/facts/preDeletionBlobs",
+            "field": [
+              "sourceAlias",
+              "sha256",
+              "state"
+            ]
+          }
+        },
+        {
+          "caseId": "V8",
+          "subcaseId": "restore-blob",
+          "assertionId": "백업-원문-hash",
+          "source": {
+            "actionId": "backup",
+            "pointer": "/data/hostObservation/extractor/rawRows/facts/evidenceHashes"
+          }
+        },
+        {
+          "caseId": "V8",
+          "subcaseId": "restore-evaluator",
+          "assertionId": "bundle-전수-종류",
+          "source": {
+            "actionId": "backup",
+            "pointer": "/data/hostObservation/extractor/rawRows/facts/bundleKinds"
+          }
+        },
+        {
+          "caseId": "V8",
+          "subcaseId": "restore-evaluator",
+          "assertionId": "삭제전-백업-원본-positive",
+          "source": {
+            "actionId": "backup",
+            "pointer": "/data/hostObservation/extractor/rawRows/facts/preDeletionBlobs",
+            "field": [
+              "sourceAlias",
+              "sha256",
+              "state"
+            ]
+          }
+        },
+        {
+          "caseId": "V8",
+          "subcaseId": "restore-evaluator",
+          "assertionId": "백업-원문-hash",
+          "source": {
+            "actionId": "backup",
+            "pointer": "/data/hostObservation/extractor/rawRows/facts/evidenceHashes"
+          }
+        }
+      ]
+    },
+    {
+      "oracleId": "V8.db-blob-definition-restore",
+      "observationName": "missing-blob-restore-complete",
+      "declarations": [
+        {
+          "caseId": "V8",
+          "subcaseId": "restore-none",
+          "assertionId": "현재-W-60",
+          "source": {
+            "actionId": "after",
+            "pointer": "/data/data/inventory/heldQuantity"
+          }
+        },
+        {
+          "caseId": "V8",
+          "subcaseId": "restore-none",
+          "assertionId": "식별된-실물-100",
+          "source": {
+            "actionId": "after",
+            "pointer": "/data/rawRows/segments",
+            "where": {
+              "active": true
+            },
+            "field": "quantity"
+          }
+        },
+        {
+          "caseId": "V8",
+          "subcaseId": "restore-none",
+          "assertionId": "실물-identity-중복0",
+          "source": {
+            "actionId": "after",
+            "pointer": "/data/rawRows/segments",
+            "where": {
+              "active": true
+            },
+            "field": "physicalScopeId"
+          }
+        },
+        {
+          "caseId": "V8",
+          "subcaseId": "restore-none",
+          "assertionId": "원-LOT-관계",
+          "source": {
+            "actionId": "after",
+            "pointer": "/data/rawRows/segments",
+            "where": {
+              "active": true
+            },
+            "field": [
+              "id",
+              "lotId",
+              "placeId",
+              "quantity",
+              "unit"
+            ]
+          }
+        },
+        {
+          "caseId": "V8",
+          "subcaseId": "restore-none",
+          "assertionId": "진행-업무-WAITING",
+          "source": {
+            "actionId": "after",
+            "pointer": "/data/rawRows/works/0/status"
+          }
+        },
+        {
+          "caseId": "V8",
+          "subcaseId": "restore-none",
+          "assertionId": "v1-정의",
+          "source": {
+            "actionId": "after",
+            "pointer": "/data/rawRows/works/0/definitionVersion"
+          }
+        },
+        {
+          "caseId": "V8",
+          "subcaseId": "restore-none",
+          "assertionId": "v1-evaluator",
+          "source": {
+            "actionId": "after",
+            "pointer": "/data/rawRows/assessments/0/evaluatorVersion"
+          }
+        },
+        {
+          "caseId": "V8",
+          "subcaseId": "restore-none",
+          "assertionId": "v1-도착-미충족",
+          "source": {
+            "actionId": "after",
+            "pointer": "/data/rawRows/assessments/0/result"
+          }
+        },
+        {
+          "caseId": "V8",
+          "subcaseId": "restore-none",
+          "assertionId": "v1-인정-도착60",
+          "source": {
+            "actionId": "after",
+            "pointer": "/data/rawRows/assessments/0/quantity"
+          }
+        },
+        {
+          "caseId": "V8",
+          "subcaseId": "restore-none",
+          "assertionId": "남은40-인간-owner",
+          "source": {
+            "actionId": "after",
+            "pointer": "/data/rawRows/obligations",
+            "field": [
+              "id",
+              "ownerId",
+              "status",
+              "quantity",
+              "unit",
+              "nextAction",
+              "nextCheckAt"
+            ]
+          }
+        },
+        {
+          "caseId": "V8",
+          "subcaseId": "restore-none",
+          "assertionId": "원문-증거-hash",
+          "source": {
+            "actionId": "after",
+            "pointer": "/data/rawRows/evidence/0/sha256"
+          }
+        },
+        {
+          "caseId": "V8",
+          "subcaseId": "restore-none",
+          "assertionId": "원-수령-멱등결과",
+          "source": {
+            "actionId": "after",
+            "pointer": "/data/rawRows/idempotency/0/resultId"
+          }
+        },
+        {
+          "caseId": "V8",
+          "subcaseId": "restore-blob",
+          "assertionId": "partial-API-write차단",
+          "source": {
+            "actionId": "partial-access",
+            "pointer": "/response/data/writeActivation"
+          }
+        },
+        {
+          "caseId": "V8",
+          "subcaseId": "restore-blob",
+          "assertionId": "partial-DB-incomplete",
+          "source": {
+            "actionId": "partial-db",
+            "pointer": "/data/rawRows/restoreSessions/0/status"
+          }
+        },
+        {
+          "caseId": "V8",
+          "subcaseId": "restore-blob",
+          "assertionId": "partial-DB-completion0",
+          "source": {
+            "actionId": "partial-db",
+            "pointer": "/data/rawRows/restoreCompletionRecords"
+          }
+        },
+        {
+          "caseId": "V8",
+          "subcaseId": "restore-blob",
+          "assertionId": "partial-DB-recovery-owner",
+          "source": {
+            "actionId": "partial-db",
+            "pointer": "/data/rawRows/recoveryObligations"
+          }
+        },
+        {
+          "caseId": "V8",
+          "subcaseId": "restore-blob",
+          "assertionId": "불완전복원-결과",
+          "source": {
+            "actionId": "restore",
+            "pointer": "/data/hostObservation/extractor/rawRows/facts/status"
+          }
+        },
+        {
+          "caseId": "V8",
+          "subcaseId": "restore-blob",
+          "assertionId": "누락-kind",
+          "source": {
+            "actionId": "restore",
+            "pointer": "/data/hostObservation/extractor/rawRows/facts/missingArtifactKinds"
+          }
+        },
+        {
+          "caseId": "V8",
+          "subcaseId": "restore-blob",
+          "assertionId": "허위-완료-record0",
+          "source": {
+            "actionId": "restore",
+            "pointer": "/data/hostObservation/extractor/rawRows/facts/completionRecords"
+          }
+        },
+        {
+          "caseId": "V8",
+          "subcaseId": "restore-blob",
+          "assertionId": "운영쓰기-차단",
+          "source": {
+            "actionId": "restore",
+            "pointer": "/data/hostObservation/extractor/rawRows/facts/writeActivation"
+          }
+        },
+        {
+          "caseId": "V8",
+          "subcaseId": "restore-blob",
+          "assertionId": "복구-인간책임",
+          "source": {
+            "actionId": "restore",
+            "pointer": "/data/hostObservation/extractor/rawRows/facts/recoveryDuty",
+            "field": [
+              "owner",
+              "nextAction",
+              "nextCheckAt"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "oracleId": "V8.db-blob-definition-restore",
+      "observationName": "missing-evaluator-restore-complete",
+      "declarations": [
+        {
+          "caseId": "V8",
+          "subcaseId": "restore-none",
+          "assertionId": "현재-W-60",
+          "source": {
+            "actionId": "after",
+            "pointer": "/data/data/inventory/heldQuantity"
+          }
+        },
+        {
+          "caseId": "V8",
+          "subcaseId": "restore-none",
+          "assertionId": "식별된-실물-100",
+          "source": {
+            "actionId": "after",
+            "pointer": "/data/rawRows/segments",
+            "where": {
+              "active": true
+            },
+            "field": "quantity"
+          }
+        },
+        {
+          "caseId": "V8",
+          "subcaseId": "restore-none",
+          "assertionId": "실물-identity-중복0",
+          "source": {
+            "actionId": "after",
+            "pointer": "/data/rawRows/segments",
+            "where": {
+              "active": true
+            },
+            "field": "physicalScopeId"
+          }
+        },
+        {
+          "caseId": "V8",
+          "subcaseId": "restore-none",
+          "assertionId": "원-LOT-관계",
+          "source": {
+            "actionId": "after",
+            "pointer": "/data/rawRows/segments",
+            "where": {
+              "active": true
+            },
+            "field": [
+              "id",
+              "lotId",
+              "placeId",
+              "quantity",
+              "unit"
+            ]
+          }
+        },
+        {
+          "caseId": "V8",
+          "subcaseId": "restore-none",
+          "assertionId": "진행-업무-WAITING",
+          "source": {
+            "actionId": "after",
+            "pointer": "/data/rawRows/works/0/status"
+          }
+        },
+        {
+          "caseId": "V8",
+          "subcaseId": "restore-none",
+          "assertionId": "v1-정의",
+          "source": {
+            "actionId": "after",
+            "pointer": "/data/rawRows/works/0/definitionVersion"
+          }
+        },
+        {
+          "caseId": "V8",
+          "subcaseId": "restore-none",
+          "assertionId": "v1-evaluator",
+          "source": {
+            "actionId": "after",
+            "pointer": "/data/rawRows/assessments/0/evaluatorVersion"
+          }
+        },
+        {
+          "caseId": "V8",
+          "subcaseId": "restore-none",
+          "assertionId": "v1-도착-미충족",
+          "source": {
+            "actionId": "after",
+            "pointer": "/data/rawRows/assessments/0/result"
+          }
+        },
+        {
+          "caseId": "V8",
+          "subcaseId": "restore-none",
+          "assertionId": "v1-인정-도착60",
+          "source": {
+            "actionId": "after",
+            "pointer": "/data/rawRows/assessments/0/quantity"
+          }
+        },
+        {
+          "caseId": "V8",
+          "subcaseId": "restore-none",
+          "assertionId": "남은40-인간-owner",
+          "source": {
+            "actionId": "after",
+            "pointer": "/data/rawRows/obligations",
+            "field": [
+              "id",
+              "ownerId",
+              "status",
+              "quantity",
+              "unit",
+              "nextAction",
+              "nextCheckAt"
+            ]
+          }
+        },
+        {
+          "caseId": "V8",
+          "subcaseId": "restore-none",
+          "assertionId": "원문-증거-hash",
+          "source": {
+            "actionId": "after",
+            "pointer": "/data/rawRows/evidence/0/sha256"
+          }
+        },
+        {
+          "caseId": "V8",
+          "subcaseId": "restore-none",
+          "assertionId": "원-수령-멱등결과",
+          "source": {
+            "actionId": "after",
+            "pointer": "/data/rawRows/idempotency/0/resultId"
+          }
+        },
+        {
+          "caseId": "V8",
+          "subcaseId": "restore-evaluator",
+          "assertionId": "partial-API-write차단",
+          "source": {
+            "actionId": "partial-access",
+            "pointer": "/response/data/writeActivation"
+          }
+        },
+        {
+          "caseId": "V8",
+          "subcaseId": "restore-evaluator",
+          "assertionId": "partial-DB-incomplete",
+          "source": {
+            "actionId": "partial-db",
+            "pointer": "/data/rawRows/restoreSessions/0/status"
+          }
+        },
+        {
+          "caseId": "V8",
+          "subcaseId": "restore-evaluator",
+          "assertionId": "partial-DB-completion0",
+          "source": {
+            "actionId": "partial-db",
+            "pointer": "/data/rawRows/restoreCompletionRecords"
+          }
+        },
+        {
+          "caseId": "V8",
+          "subcaseId": "restore-evaluator",
+          "assertionId": "partial-DB-recovery-owner",
+          "source": {
+            "actionId": "partial-db",
+            "pointer": "/data/rawRows/recoveryObligations"
+          }
+        },
+        {
+          "caseId": "V8",
+          "subcaseId": "restore-evaluator",
+          "assertionId": "불완전복원-결과",
+          "source": {
+            "actionId": "restore",
+            "pointer": "/data/hostObservation/extractor/rawRows/facts/status"
+          }
+        },
+        {
+          "caseId": "V8",
+          "subcaseId": "restore-evaluator",
+          "assertionId": "누락-kind",
+          "source": {
+            "actionId": "restore",
+            "pointer": "/data/hostObservation/extractor/rawRows/facts/missingArtifactKinds"
+          }
+        },
+        {
+          "caseId": "V8",
+          "subcaseId": "restore-evaluator",
+          "assertionId": "허위-완료-record0",
+          "source": {
+            "actionId": "restore",
+            "pointer": "/data/hostObservation/extractor/rawRows/facts/completionRecords"
+          }
+        },
+        {
+          "caseId": "V8",
+          "subcaseId": "restore-evaluator",
+          "assertionId": "운영쓰기-차단",
+          "source": {
+            "actionId": "restore",
+            "pointer": "/data/hostObservation/extractor/rawRows/facts/writeActivation"
+          }
+        },
+        {
+          "caseId": "V8",
+          "subcaseId": "restore-evaluator",
+          "assertionId": "복구-인간책임",
+          "source": {
+            "actionId": "restore",
+            "pointer": "/data/hostObservation/extractor/rawRows/facts/recoveryDuty",
+            "field": [
+              "owner",
+              "nextAction",
+              "nextCheckAt"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "oracleId": "V8.btp-client-separate-gates",
+      "observationName": "btp-acceptance",
+      "declarations": [
+        {
+          "caseId": "V8",
+          "subcaseId": "btp-auth-binding-tls-wire",
+          "assertionId": "실제-BTP-profile",
+          "source": {
+            "actionId": "btp",
+            "pointer": "/data/hostObservation/extractor/rawRows/facts/profile"
+          }
+        },
+        {
+          "caseId": "V8",
+          "subcaseId": "btp-auth-binding-tls-wire",
+          "assertionId": "R7-region-entitlement-cost",
+          "source": {
+            "actionId": "btp",
+            "pointer": "/data/hostObservation/extractor/rawRows/facts/decisionR7"
+          }
+        },
+        {
+          "caseId": "V8",
+          "subcaseId": "btp-auth-binding-tls-wire",
+          "assertionId": "실제-runtime-binding",
+          "source": {
+            "actionId": "btp",
+            "pointer": "/data/hostObservation/extractor/rawRows/facts/runtimeBindings"
+          }
+        },
+        {
+          "caseId": "V8",
+          "subcaseId": "btp-auth-binding-tls-wire",
+          "assertionId": "현재-token-인가",
+          "source": {
+            "actionId": "btp",
+            "pointer": "/data/hostObservation/extractor/rawRows/facts/authCases",
+            "field": [
+              "case",
+              "outcome"
+            ]
+          }
+        },
+        {
+          "caseId": "V8",
+          "subcaseId": "btp-auth-binding-tls-wire",
+          "assertionId": "TLS-검증결과",
+          "source": {
+            "actionId": "btp",
+            "pointer": "/data/hostObservation/extractor/rawRows/facts/tlsVerification"
+          }
+        },
+        {
+          "caseId": "V8",
+          "subcaseId": "btp-auth-binding-tls-wire",
+          "assertionId": "실제-최신-MCP-wire",
+          "source": {
+            "actionId": "btp",
+            "pointer": "/data/hostObservation/extractor/rawRows/facts/wireMessages",
+            "field": [
+              "method",
+              "protocolVersion",
+              "profile"
+            ]
+          }
+        },
+        {
+          "caseId": "V8",
+          "subcaseId": "btp-auth-binding-tls-wire",
+          "assertionId": "BTP-wire-header-version",
+          "source": {
+            "actionId": "btp",
+            "pointer": "/data/hostObservation/extractor/rawRows/facts/wireRequestHeaders/MCP-Protocol-Version"
+          }
+        },
+        {
+          "caseId": "V8",
+          "subcaseId": "btp-auth-binding-tls-wire",
+          "assertionId": "BTP-wire-body-version",
+          "source": {
+            "actionId": "btp",
+            "pointer": "/data/hostObservation/extractor/rawRows/facts/wireRequestBody/params/_meta/io.modelcontextprotocol~1protocolVersion"
+          }
+        },
+        {
+          "caseId": "V8",
+          "subcaseId": "btp-auth-binding-tls-wire",
+          "assertionId": "BTP-raw-transcript-link",
+          "source": {
+            "actionId": "btp",
+            "pointer": "/data/hostObservation/extractor/rawRows/facts/wireTranscripts"
+          }
+        },
+        {
+          "caseId": "V8",
+          "subcaseId": "btp-auth-binding-tls-wire",
+          "assertionId": "BTP-wire-효과refs",
+          "source": {
+            "actionId": "btp",
+            "pointer": "/data/hostObservation/extractor/rawRows/facts/toolResults"
+          }
+        },
+        {
+          "caseId": "V8",
+          "subcaseId": "supported-client-separate",
+          "assertionId": "실제-client-profile",
+          "source": {
+            "actionId": "client",
+            "pointer": "/data/hostObservation/extractor/rawRows/facts/profile"
+          }
+        },
+        {
+          "caseId": "V8",
+          "subcaseId": "supported-client-separate",
+          "assertionId": "실제-client-version-source",
+          "source": {
+            "actionId": "client",
+            "pointer": "/data/hostObservation/extractor/rawRows/facts/clientInstall"
+          }
+        },
+        {
+          "caseId": "V8",
+          "subcaseId": "supported-client-separate",
+          "assertionId": "실제-client-wire",
+          "source": {
+            "actionId": "client",
+            "pointer": "/data/hostObservation/extractor/rawRows/facts/wireMessages",
+            "field": [
+              "method",
+              "protocolVersion",
+              "profile"
+            ]
+          }
+        },
+        {
+          "caseId": "V8",
+          "subcaseId": "supported-client-separate",
+          "assertionId": "client-wire-header-version",
+          "source": {
+            "actionId": "client",
+            "pointer": "/data/hostObservation/extractor/rawRows/facts/wireRequestHeaders/MCP-Protocol-Version"
+          }
+        },
+        {
+          "caseId": "V8",
+          "subcaseId": "supported-client-separate",
+          "assertionId": "client-wire-body-version",
+          "source": {
+            "actionId": "client",
+            "pointer": "/data/hostObservation/extractor/rawRows/facts/wireRequestBody/params/_meta/io.modelcontextprotocol~1protocolVersion"
+          }
+        },
+        {
+          "caseId": "V8",
+          "subcaseId": "supported-client-separate",
+          "assertionId": "client-raw-transcript-link",
+          "source": {
+            "actionId": "client",
+            "pointer": "/data/hostObservation/extractor/rawRows/facts/wireTranscripts"
+          }
+        },
+        {
+          "caseId": "V8",
+          "subcaseId": "supported-client-separate",
+          "assertionId": "client-skill-loading-artifact",
+          "source": {
+            "actionId": "client",
+            "pointer": "/data/hostObservation/extractor/rawRows/facts/loadingObservations"
+          }
+        },
+        {
+          "caseId": "V8",
+          "subcaseId": "unavailable-environment-gates",
+          "assertionId": "로컬-관찰-보유60",
+          "source": {
+            "actionId": "local-witness",
+            "pointer": "/response/data/heldQuantity"
+          }
+        }
+      ]
+    },
+    {
+      "oracleId": "V8.btp-client-separate-gates",
+      "observationName": "result-scope",
+      "declarations": [
+        {
+          "caseId": "V8",
+          "subcaseId": "supported-client-separate",
+          "assertionId": "profile-결과-각각",
+          "source": {
+            "actionId": "client",
+            "pointer": "/data/hostObservation/extractor/rawRows/facts/acceptanceGates",
+            "field": [
+              "profile",
+              "result"
+            ]
+          }
+        },
+        {
+          "caseId": "V8",
+          "subcaseId": "supported-client-separate",
+          "assertionId": "client-성공의-BTP-참조0",
+          "source": {
+            "actionId": "client",
+            "pointer": "/data/hostObservation/extractor/rawRows/facts/gatePromotionRefs"
+          }
+        },
+        {
+          "caseId": "V8",
+          "subcaseId": "unavailable-environment-gates",
+          "assertionId": "로컬-관찰-보유60",
+          "source": {
+            "actionId": "local-witness",
+            "pointer": "/response/data/heldQuantity"
+          }
+        },
+        {
+          "caseId": "V8",
+          "subcaseId": "unavailable-environment-gates",
+          "assertionId": "환경별-NOT_RUN",
+          "source": {
+            "actionId": "gate-inventory",
+            "pointer": "/data/hostObservation/extractor/rawRows/facts/acceptanceGates",
+            "field": [
+              "profile",
+              "result"
+            ]
+          }
+        },
+        {
+          "caseId": "V8",
+          "subcaseId": "unavailable-environment-gates",
+          "assertionId": "필수-gate-생략0",
+          "source": {
+            "actionId": "gate-inventory",
+            "pointer": "/data/hostObservation/extractor/rawRows/facts/waivers"
+          }
+        },
+        {
+          "caseId": "V8",
+          "subcaseId": "unavailable-environment-gates",
+          "assertionId": "candidate-최종확정0",
+          "source": {
+            "actionId": "gate-inventory",
+            "pointer": "/data/hostObservation/extractor/rawRows/facts/unverifiedFinalStackClaims"
+          }
+        },
+        {
+          "caseId": "V8",
+          "subcaseId": "unavailable-environment-gates",
+          "assertionId": "대안-oracle-동일",
+          "source": {
+            "actionId": "gate-inventory",
+            "pointer": "/data/hostObservation/extractor/rawRows/facts/candidateOracleBindings",
+            "field": [
+              "candidate",
+              "oracleId"
+            ]
+          }
+        },
+        {
+          "caseId": "V8",
+          "subcaseId": "unavailable-environment-gates",
+          "assertionId": "미정-계정-비용-실행0",
+          "source": {
+            "actionId": "gate-inventory",
+            "pointer": "/data/hostObservation/extractor/rawRows/facts/unauthorizedPaidRuns"
+          }
+        }
+      ]
+    }
+  ]
+}

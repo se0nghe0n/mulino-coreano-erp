@@ -1,0 +1,132 @@
+{
+  "schemaVersion" : "1.0.0",
+  "caseId" : "T23",
+  "subcaseId" : "data-live",
+  "status" : "FAIL",
+  "runtimeComplete" : false,
+  "startedAt" : "2026-10-07T14:37:39.504642Z",
+  "finishedAt" : "2026-10-07T14:37:39.518415Z",
+  "command" : "./verify contract-red verification/cases/T23/case.json verification/cases/V8/case.json",
+  "caseHash" : "f17994367065998540c2e3e0fd4bc161a7b8ccccc2b665f017f0043d29bdcd72",
+  "fixtureRef" : "verification/cases/T23/fixtures/data-live.json",
+  "fixtureHash" : "974feebe9b9c239f649359cfba9629f9c150d629956dc970ce3ed9128d856f11",
+  "versions" : {
+    "definition" : "definition-v1",
+    "evaluator" : "evaluator-v1",
+    "policy" : "SYNTHETIC-platform-v1",
+    "candidateCompiler" : "7.1.1",
+    "schema" : "ontology-v1"
+  },
+  "requiredAdapters" : [ "fixture", "host", "api", "db" ],
+  "actions" : {
+    "setup" : {
+      "actionId" : "setup",
+      "driverStatus" : "NOT_IMPLEMENTED",
+      "data" : null,
+      "response" : null,
+      "reason" : "NOT_IMPLEMENTED: no real product adapters installed",
+      "provenance" : {
+        "adapter" : "unimplemented",
+        "adapterVersion" : "1.0.0",
+        "buildVersion" : "NONE",
+        "authenticatedActor" : null,
+        "source" : "NONE",
+        "independent" : false,
+        "scopeComplete" : false,
+        "sourceQuery" : null,
+        "snapshot" : null
+      },
+      "artifactRefs" : [ ]
+    },
+    "data-inventory-inspect" : {
+      "actionId" : "data-inventory-inspect",
+      "driverStatus" : "NOT_IMPLEMENTED",
+      "data" : null,
+      "response" : null,
+      "reason" : "NOT_IMPLEMENTED: no real product adapters installed",
+      "provenance" : {
+        "adapter" : "unimplemented",
+        "adapterVersion" : "1.0.0",
+        "buildVersion" : "NONE",
+        "authenticatedActor" : null,
+        "source" : "NONE",
+        "independent" : false,
+        "scopeComplete" : false,
+        "sourceQuery" : null,
+        "snapshot" : null
+      },
+      "artifactRefs" : [ ]
+    },
+    "data-inventory" : {
+      "actionId" : "data-inventory",
+      "driverStatus" : "NOT_IMPLEMENTED",
+      "data" : null,
+      "response" : null,
+      "reason" : "NOT_IMPLEMENTED: no real product adapters installed",
+      "provenance" : {
+        "adapter" : "unimplemented",
+        "adapterVersion" : "1.0.0",
+        "buildVersion" : "NONE",
+        "authenticatedActor" : null,
+        "source" : "NONE",
+        "independent" : false,
+        "scopeComplete" : false,
+        "sourceQuery" : null,
+        "snapshot" : null
+      },
+      "artifactRefs" : [ ]
+    },
+    "confirm-mapping" : {
+      "actionId" : "confirm-mapping",
+      "driverStatus" : "NOT_IMPLEMENTED",
+      "data" : null,
+      "response" : null,
+      "reason" : "NOT_IMPLEMENTED: no real product adapters installed",
+      "provenance" : {
+        "adapter" : "unimplemented",
+        "adapterVersion" : "1.0.0",
+        "buildVersion" : "NONE",
+        "authenticatedActor" : null,
+        "source" : "NONE",
+        "independent" : false,
+        "scopeComplete" : false,
+        "sourceQuery" : null,
+        "snapshot" : null
+      },
+      "artifactRefs" : [ ]
+    },
+    "confirm-mapping-inspect" : {
+      "actionId" : "confirm-mapping-inspect",
+      "driverStatus" : "NOT_IMPLEMENTED",
+      "data" : null,
+      "response" : null,
+      "reason" : "NOT_IMPLEMENTED: no real product adapters installed",
+      "provenance" : {
+        "adapter" : "unimplemented",
+        "adapterVersion" : "1.0.0",
+        "buildVersion" : "NONE",
+        "authenticatedActor" : null,
+        "source" : "NONE",
+        "independent" : false,
+        "scopeComplete" : false,
+        "sourceQuery" : null,
+        "snapshot" : null
+      },
+      "artifactRefs" : [ ]
+    }
+  },
+  "assertions" : [ {
+    "assertionId" : "네-source-분류-검증",
+    "expected" : [ "DB", "BLOB", "EXTERNAL_EFFECT", "OPEN_DUTY" ],
+    "source" : {
+      "actionId" : "data-inventory",
+      "pointer" : "/data/hostObservation/extractor/rawRows/facts/sourceClasses"
+    },
+    "requirementRefs" : [ "D23" ],
+    "evidenceRefs" : [ "data-inventory:actual-artifact" ],
+    "status" : "FAIL",
+    "reason" : "source data-inventory is NOT_IMPLEMENTED: NOT_IMPLEMENTED: no real product adapters installed"
+  } ],
+  "missingAssertions" : 9,
+  "productCoverageClaimed" : false
+}

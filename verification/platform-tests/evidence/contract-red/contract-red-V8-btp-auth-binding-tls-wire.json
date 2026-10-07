@@ -1,0 +1,94 @@
+{
+  "schemaVersion" : "1.0.0",
+  "caseId" : "V8",
+  "subcaseId" : "btp-auth-binding-tls-wire",
+  "status" : "FAIL",
+  "runtimeComplete" : false,
+  "startedAt" : "2026-10-07T14:37:39.720055Z",
+  "finishedAt" : "2026-10-07T14:37:39.726408Z",
+  "command" : "./verify contract-red verification/cases/T23/case.json verification/cases/V8/case.json",
+  "caseHash" : "175ff53caeef95a937fe648911f09bd2839e45ac1bb8a03337ab4b06e0ed1b68",
+  "fixtureRef" : "verification/cases/V8/fixtures/btp-auth-binding-tls-wire.json",
+  "fixtureHash" : "acf71fabc383061a0b0bfd6e2b87b93bc974403bbd7b19547b4113aaf1825ab6",
+  "versions" : {
+    "definition" : "definition-v1",
+    "evaluator" : "evaluator-v1",
+    "policy" : "SYNTHETIC-platform-v1",
+    "candidateCompiler" : "7.1.1",
+    "schema" : "ontology-v1"
+  },
+  "requiredAdapters" : [ "fixture", "host", "api", "db", "btp" ],
+  "actions" : {
+    "btp-inspect" : {
+      "actionId" : "btp-inspect",
+      "driverStatus" : "NOT_IMPLEMENTED",
+      "data" : null,
+      "response" : null,
+      "reason" : "NOT_IMPLEMENTED: no real product adapters installed",
+      "provenance" : {
+        "adapter" : "unimplemented",
+        "adapterVersion" : "1.0.0",
+        "buildVersion" : "NONE",
+        "authenticatedActor" : null,
+        "source" : "NONE",
+        "independent" : false,
+        "scopeComplete" : false,
+        "sourceQuery" : null,
+        "snapshot" : null
+      },
+      "artifactRefs" : [ ]
+    },
+    "setup" : {
+      "actionId" : "setup",
+      "driverStatus" : "NOT_IMPLEMENTED",
+      "data" : null,
+      "response" : null,
+      "reason" : "NOT_IMPLEMENTED: no real product adapters installed",
+      "provenance" : {
+        "adapter" : "unimplemented",
+        "adapterVersion" : "1.0.0",
+        "buildVersion" : "NONE",
+        "authenticatedActor" : null,
+        "source" : "NONE",
+        "independent" : false,
+        "scopeComplete" : false,
+        "sourceQuery" : null,
+        "snapshot" : null
+      },
+      "artifactRefs" : [ ]
+    },
+    "btp" : {
+      "actionId" : "btp",
+      "driverStatus" : "NOT_IMPLEMENTED",
+      "data" : null,
+      "response" : null,
+      "reason" : "NOT_IMPLEMENTED: no real product adapters installed",
+      "provenance" : {
+        "adapter" : "unimplemented",
+        "adapterVersion" : "1.0.0",
+        "buildVersion" : "NONE",
+        "authenticatedActor" : null,
+        "source" : "NONE",
+        "independent" : false,
+        "scopeComplete" : false,
+        "sourceQuery" : null,
+        "snapshot" : null
+      },
+      "artifactRefs" : [ ]
+    }
+  },
+  "assertions" : [ {
+    "assertionId" : "실제-BTP-profile",
+    "expected" : "BTP",
+    "source" : {
+      "actionId" : "btp",
+      "pointer" : "/data/hostObservation/extractor/rawRows/facts/profile"
+    },
+    "requirementRefs" : [ "D23", "D24", "D26" ],
+    "evidenceRefs" : [ "btp:actual-artifact" ],
+    "status" : "FAIL",
+    "reason" : "source btp is NOT_IMPLEMENTED: NOT_IMPLEMENTED: no real product adapters installed"
+  } ],
+  "missingAssertions" : 9,
+  "productCoverageClaimed" : false
+}
