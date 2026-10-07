@@ -76,3 +76,18 @@ ALTER TABLE mulino_trade_purchase_OrderLines ADD FOREIGN KEY(organizationId,work
 ALTER TABLE mulino_trade_purchase_OrderLines ADD FOREIGN KEY(organizationId,itemId) REFERENCES mulino_inventory_TradeItems(organizationId,ID);
 ALTER TABLE mulino_trade_purchase_OrderLines ADD FOREIGN KEY(organizationId,destinationId) REFERENCES mulino_inventory_Places(organizationId,ID);
 ALTER TABLE mulino_trade_purchase_Cancellations ADD FOREIGN KEY(organizationId,orderId) REFERENCES mulino_trade_purchase_Orders(organizationId,ID);
+
+ALTER TABLE mulino_trade_purchase_Orders ADD conditionAssessmentJson text NOT NULL DEFAULT '{}';
+
+ALTER TABLE mulino_trade_purchase_SupplierReplies ADD canonicalOccurrenceId varchar(36) NOT NULL;
+ALTER TABLE mulino_trade_purchase_SupplierReplies ADD FOREIGN KEY(organizationId,canonicalOccurrenceId) REFERENCES mulino_evidence_CanonicalOccurrences(organizationId,ID);
+CREATE UNIQUE INDEX ON mulino_trade_purchase_SupplierReplies(organizationId,canonicalOccurrenceId);
+CREATE FUNCTION mulino_purchase_line_immutable() RETURNS trigger LANGUAGE plpgsql AS $$
+BEGIN
+ IF (NEW.organizationId,NEW.ID,NEW.orderId,NEW.proposalId,NEW.proposalRevision,NEW.workId,NEW.itemId,NEW.destinationId,NEW.quantity,NEW.unit)
+ IS DISTINCT FROM (OLD.organizationId,OLD.ID,OLD.orderId,OLD.proposalId,OLD.proposalRevision,OLD.workId,OLD.itemId,OLD.destinationId,OLD.quantity,OLD.unit)
+ THEN RAISE EXCEPTION 'Immutable purchase order line snapshot'; END IF;
+ RETURN NEW;
+END $$;
+CREATE TRIGGER purchase_line_snapshot_immutable BEFORE UPDATE ON mulino_trade_purchase_OrderLines
+ FOR EACH ROW EXECUTE FUNCTION mulino_purchase_line_immutable();

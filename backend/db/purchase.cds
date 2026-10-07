@@ -23,6 +23,7 @@ entity Approvals {
  revision:Integer not null default 1; createdAt:Timestamp not null; recordedAt:Timestamp not null; effectiveAt:Timestamp not null;
 }
 entity Orders {
+ conditionAssessmentJson:LargeString not null;
  key organizationId:UUID; key ID:UUID; proposalId:UUID not null; proposalRevision:Integer not null;
  proposalHash:String(64) not null; approvalId:UUID not null; channel:String(80) not null;
  externalOperationId:String(160) not null; outboxId:UUID not null; createdAt:Timestamp not null;
@@ -36,6 +37,7 @@ entity OrderLines {
  createdAt:Timestamp not null; recordedAt:Timestamp not null; effectiveAt:Timestamp not null;
 }
 entity SupplierReplies {
+ canonicalOccurrenceId:UUID not null;
  key organizationId:UUID; key ID:UUID; orderId:UUID not null; reply:String(24) not null;
  proposedQuantity:Decimal(38,12) not null; unit:String(20) not null;
  evidenceId:UUID not null; recordedAt:Timestamp not null;
