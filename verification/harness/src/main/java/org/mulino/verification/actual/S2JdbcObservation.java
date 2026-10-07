@@ -11,6 +11,10 @@ import org.mulino.verification.Json;
 final class S2JdbcObservation {
     private record Source(String table,String columns,String workColumn,String timeColumn) {Source(String table,String columns,String workColumn){this(table,columns,workColumn,"effectiveAt");}}
     private static final Map<String,Source> SOURCES=Map.ofEntries(
+        Map.entry("dutyRoots",new Source("mulino_responsibility_Roots","ID,revision,sourceId,sourceKind,sourceVersion,kind,scopeJson,quantity,unit,recordedAt",null,null)),
+        Map.entry("dutyScopes",new Source("mulino_responsibility_Scopes","ID,revision,rootId,parentScopeId,startQuantity,quantity,leaf,scopeJson,unit,recordedAt",null,null)),
+        Map.entry("completionCoverages",new Source("mulino_evidence_CompletionCoverages","ID,revision,occurrenceId,claimId,eventId,verificationId,documentVersionId,rootId,startQuantity,quantity,unit,originalHash,sourcePayloadHash,policyVersion,recordedAt",null,null)),
+        Map.entry("resolutionCredits",new Source("mulino_responsibility_ResolutionCredits","ID,revision,bindingId,rootId,scopeId,assignmentId,startQuantity,quantity,recordedAt",null,null)),
         Map.entry("canonicalOccurrences",new Source("mulino_evidence_CanonicalOccurrences","ID,revision,workId,itemId,kind,physicalScopeId,quantity,unit,valueState,effectiveFrom,recordedAt,reassessmentState","workId","effectiveFrom")),
         Map.entry("documents",new Source("mulino_evidence_DocumentVersions","ID,revision,workId,itemId,sha256,blobId,byteLength,availability,sourceNamespace,sourceProfileId,recordedAt","workId",null)),
         Map.entry("assessmentInputs",new Source("mulino_evaluation_InputSnapshots","ID,assessmentId,workId,goalId,recordedAt,asOf,knownAt,contentHash,contentJson","workId","asOf")),
@@ -37,6 +41,11 @@ final class S2JdbcObservation {
                 String name=requested.asText();Source source=SOURCES.get(name);List<Object> parameters=new ArrayList<>();parameters.add(scope.path("organizationId").asText());
                 String select=Arrays.stream(source.columns().split(",")).map(column->"r."+column+" AS \""+(column.equals("ID")?"id":column)+"\"").collect(java.util.stream.Collectors.joining(","));
                 String sql="SELECT "+select+" FROM "+source.table()+" r WHERE r.organizationId=?";
+                if(Set.of("dutyRoots","dutyScopes","completionCoverages","resolutionCredits").contains(name)) {
+                    String rootColumn=name.equals("dutyRoots")?"ID":"rootId";
+                    sql+=" AND EXISTS(SELECT 1 FROM mulino_work_read_ObligationReferences a JOIN mulino_work_read_Works w ON w.organizationId=a.organizationId AND w.ID=a.workId WHERE a.organizationId=r.organizationId AND a.rootId=r."+rootColumn;
+                    for(String field:List.of("workId","itemId","lotId"))if(scope.hasNonNull(field)){sql+=" AND "+(field.equals("workId")?"a.workId":"w."+field)+"=?";parameters.add(scope.path(field).asText());}sql+=") AND r.recordedAt<=?";parameters.add(OffsetDateTime.parse(Json.required(request,"knownAt")));
+                }
                 if(source.workColumn()!=null) {
                     if(scope.hasNonNull("workId")){sql+=" AND r."+source.workColumn()+"=?";parameters.add(scope.path("workId").asText());}
                     if(scope.hasNonNull("itemId")||scope.hasNonNull("lotId")) {

@@ -37,7 +37,9 @@
         "resolveObligation",
         "getAssessment",
         "getObligations",
-        "getEvidence"
+        "getEvidence",
+        "matchSourceIdentity",
+        "linkCanonicalOccurrence"
       ],
       "grant": {
         "delegatorAlias": "supervisor",
@@ -57,7 +59,9 @@
           "resolveObligation",
           "getAssessment",
           "getObligations",
-          "getEvidence"
+          "getEvidence",
+          "matchSourceIdentity",
+          "linkCanonicalOccurrence"
         ],
         "scope": {
           "organizationAlias": "ORG"
@@ -168,7 +172,9 @@
           {
             "name": "Receipt",
             "core": true
-          }
+          },
+          "Work",
+          "TradeItem"
         ],
         "attributes": [
           {
@@ -295,6 +301,20 @@
             "intentKind": "QUERY",
             "capabilityId": "getEvidence",
             "stage": "READ",
+            "slots": {}
+          },
+          {
+            "name": "matchSourceIdentity",
+            "intentKind": "COMMAND",
+            "capabilityId": "matchSourceIdentity",
+            "stage": "DRAFT",
+            "slots": {}
+          },
+          {
+            "name": "linkCanonicalOccurrence",
+            "intentKind": "COMMAND",
+            "capabilityId": "linkCanonicalOccurrence",
+            "stage": "DRAFT",
             "slots": {}
           }
         ],
@@ -440,6 +460,22 @@
           },
           {
             "capabilityId": "getEvidence",
+            "semanticVersion": "1.0.0",
+            "evaluatorVersion": "core-v1",
+            "inputSchemaVersion": "1.0.0",
+            "outputSchemaVersion": "1.0.0",
+            "supportedWorkMigration": []
+          },
+          {
+            "capabilityId": "matchSourceIdentity",
+            "semanticVersion": "1.0.0",
+            "evaluatorVersion": "core-v1",
+            "inputSchemaVersion": "1.0.0",
+            "outputSchemaVersion": "1.0.0",
+            "supportedWorkMigration": []
+          },
+          {
+            "capabilityId": "linkCanonicalOccurrence",
             "semanticVersion": "1.0.0",
             "evaluatorVersion": "core-v1",
             "inputSchemaVersion": "1.0.0",

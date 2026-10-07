@@ -104,3 +104,20 @@ verified RESPONSE_COMPLETED source를 전달한 뒤에만 종료를 시도한다
 같은 projection snapshot과 assessment history를 읽는다. 이 확장의
 통합 native 실행 결과는 root가 exact combined JAR로 실행한 receipt에서
 확인하며 전체 T11이나 S2 gate를 대신하지 않는다.
+
+### 원본 응답과 완료 범위
+
+`response-review.json`은 실제 API로 생성한 90 BOX duty의 root와 leaf
+범위를 읽은 뒤 원본 JSON을 준비한다. `dutyRootId`, `startQuantity`,
+`quantity`, `unit`은 같은 PostgreSQL 관찰의 실제 값이다. installer는
+그 값과 현재 OPEN assignment를 다시 대조하고 원본 bytes, event payload,
+claim만 저장한다. canonical verification, CompletionCoverages,
+CompletionBindings, ResolutionCredits는 fixture로 저장하지 않는다.
+
+`matchSourceIdentity`와 `linkCanonicalOccurrence` 실제 HTTP command가
+원본 hash와 source identity를 검증하고 trusted coverage를 발행한다.
+업무는 linked evidence invalidation 뒤 실제 `assessGoal`로 재판정한다.
+마지막 독립 SQL 관찰은 coverage의 root와 originalHash 및 resolution
+credit을 확인한다. 각 source phase의 namespace는 고유하다.
+
+이 확장의 native 실행은 combined backend JAR에서 아직 수행하지 않았다.

@@ -6,18 +6,32 @@
     "knownAt": "2026-10-07T09:00:00Z"
   },
   "sourceProfile": {
-    "namespace": "native-fixture",
+    "namespace": "native-fixture-response-review",
     "policyVersion": "fixture-v1",
-    "nextAction": "원본 근거 대조",
+    "nextAction": "\uc6d0\ubcf8 \uadfc\uac70 \ub300\uc870",
     "nextCheckAt": "2026-10-08T09:00:00Z"
   },
   "occurrence": {
     "kind": "RESPONSE_COMPLETED",
-    "quantity": null,
-    "unit": null,
+    "quantity": "90",
+    "unit": "BOX",
     "externalEventId": "s2-native-response-review",
-    "contentText": "S2 synthetic response-review response completed",
     "assertion": "RESPONSE_COMPLETED",
-    "reassessmentState": "COMPLETE"
+    "reassessmentState": "COMPLETE",
+    "originalMetadata": {
+      "dutyRootId": {
+        "bind": "actualDutyRoot.id"
+      },
+      "startQuantity": {
+        "bind": "actualDutyScope.startQuantity"
+      },
+      "quantity": {
+        "bind": "actualDutyScope.quantity"
+      },
+      "unit": {
+        "bind": "actualDutyRoot.unit"
+      }
+    },
+    "publication": "ACTUAL_HTTP_REVIEW_AND_LINK"
   }
 }
