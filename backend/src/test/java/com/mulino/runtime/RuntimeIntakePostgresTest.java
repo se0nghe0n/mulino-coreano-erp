@@ -1,0 +1,66 @@
+package com.mulino.runtime;
+
+import static org.junit.jupiter.api.Assertions.*;
+import com.mulino.application.runtime.*;
+import com.mulino.application.core.*;
+import com.mulino.domain.definitions.*;
+import com.sap.cds.services.runtime.CdsRuntime;
+import java.nio.file.*;
+import java.sql.Timestamp;
+import java.time.*;
+import java.util.*;
+import org.junit.jupiter.api.*;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.test.context.*;
+import org.testcontainers.postgresql.PostgreSQLContainer;
+import tools.jackson.databind.ObjectMapper;
+
+/** Real CAP/PG current authorization + canonical responsibility, without port doubles. */
+@SpringBootTest
+@ActiveProfiles({"local","verification"})
+class RuntimeIntakePostgresTest {
+ static final PostgreSQLContainer PG=new PostgreSQLContainer("postgres@sha256:4ef4dbc939d61acea57712655ddb4b4ab27419c913f94cca0cd57cb3ea3c2280");
+ static final Instant T=Instant.parse("2026-10-07T09:00:00Z");static final Path KEY;
+ static{try{PG.start();var generator=java.security.KeyPairGenerator.getInstance("RSA");generator.initialize(2048);KEY=Files.createTempFile("runtime-intake-public-",".pem");Files.writeString(KEY,"-----BEGIN PUBLIC KEY-----\n"+Base64.getMimeEncoder(64,new byte[]{10}).encodeToString(generator.generateKeyPair().getPublic().getEncoded())+"\n-----END PUBLIC KEY-----\n");}catch(Exception e){throw new ExceptionInInitializerError(e);}}
+ @DynamicPropertySource static void props(DynamicPropertyRegistry r){r.add("spring.datasource.url",PG::getJdbcUrl);r.add("spring.datasource.username",PG::getUsername);r.add("spring.datasource.password",PG::getPassword);r.add("JWT_PUBLIC_KEY",KEY::toString);r.add("JWT_ISSUER",()->"https://runtime-fixture.invalid");r.add("JWT_AUDIENCE",()->"mulino-test");r.add("mulino.verification.instant",()->T.toString());}
+ @Autowired JdbcTemplate db;@Autowired RuntimeIntakeProcessor processor;@Autowired CdsRuntime cds;@Autowired VerificationClock clock;
+ String org,actor,item,definition,work,profile,grant,event,inbox;ObjectMapper json=new ObjectMapper();
+ static String id(){return UUID.randomUUID().toString();}
+ static Map<String,Object> map(Object... pairs){var result=new LinkedHashMap<String,Object>();for(int n=0;n<pairs.length;n+=2)result.put(pairs[n].toString(),pairs[n+1]);return result;}
+ void insert(String table,Map<String,Object> values){db.update("INSERT INTO "+table+"("+String.join(",",values.keySet())+") VALUES("+String.join(",",Collections.nCopies(values.size(),"?"))+")",values.values().toArray());}
+ Map<String,Object> scoped(String id){return map("organizationId",org,"ID",id,"revision",0,"createdAt",Timestamp.from(T.minusSeconds(10)),"recordedAt",Timestamp.from(T.minusSeconds(10)));}
+ Map<String,Object> workRow(String id){var r=scoped(id);r.put("effectiveAt",Timestamp.from(T));return r;}
+ @BeforeEach void seed(){
+  org=id();actor=id();item=id();definition=id();work=id();profile=id();grant=id();event=id();inbox=id();
+  insert("mulino_identity_Organizations",map("ID",org,"externalAlias",org));insert("mulino_identity_Actors",map("organizationId",org,"ID",actor,"kind","HUMAN","stableRequestOwner","human-continuity-"+actor));
+  insert("mulino_identity_Memberships",map("organizationId",org,"ID",id(),"actorId",actor,"validFrom",Timestamp.from(T.minusSeconds(100)),"validUntil",Timestamp.from(T.plusSeconds(3600))));
+  insert("mulino_identity_Grants",map("organizationId",org,"ID",grant,"actorId",actor,"delegatorId",actor,"validFrom",Timestamp.from(T.minusSeconds(100)),"validUntil",Timestamp.from(T.plusSeconds(3600))));
+  insert("mulino_identity_GrantScopes",map("organizationId",org,"grantId",grant,"scopeKind","ORGANIZATION","scopeId",org));
+  for(String cap:List.of("createObligation","createFollowup"))insert("mulino_identity_CapabilityAssignments",map("organizationId",org,"ID",id(),"actorId",actor,"capabilityId",cap,"scopeKind","ORGANIZATION","scopeId",org,"validFrom",Timestamp.from(T.minusSeconds(100)),"validUntil",Timestamp.from(T.plusSeconds(3600))));
+  insert("mulino_identity_GrantActions",map("organizationId",org,"grantId",grant,"capabilityId","createFollowup"));
+  String product=id(),spec=id(),pack=id();var productRow=scoped(product);productRow.put("name","runtime fixture");insert("mulino_inventory_Products",productRow);
+  for(String table:List.of("SpecificationVersions","PackagingVersions")){var row=scoped(table.startsWith("Spec")?spec:pack);row.putAll(map("productId",product,"version","1","contentHash","a".repeat(64)));insert("mulino_inventory_"+table,row);}
+  var itemRow=scoped(item);itemRow.putAll(map("productId",product,"name","fixture","baseUnit","BOX","decimalPlaces",0,"specificationVersionId",spec,"packagingVersionId",pack));insert("mulino_inventory_TradeItems",itemRow);
+  var predicate=Map.<String,Object>of("operator","quantitySum","property","Receipt.quantity","minimum",Map.of("value","1","unit","BOX"),"unit","BOX","evidenceSelector","VERIFIED_DISTINCT");
+  var d=new Definition(org,definition,"1.0.0",null,"PUBLISHED","","core-v1","1.0.0",List.of(new Definition.NounType("Receipt",true)),List.of(new Definition.Attribute("Receipt","quantity",Definition.ValueType.DECIMAL,null,"BOX",0,1,1,"READ",true)),List.of(),List.of(),List.of(new Definition.Goal("Arrival","CUMULATIVE_EVENT","ARRIVED","core-v1",predicate)),List.of());String content=json.writeValueAsString(d);
+  insert("mulino_definitions_DefinitionVersions",map("organizationId",org,"ID",definition,"createdAt",Timestamp.from(T.minusSeconds(100)),"version","1.0.0","state","PUBLISHED","contentHash",DefinitionRepository.sha256(content),"content",content,"evaluatorVersion","core-v1","schemaVersion","1.0.0"));
+  var source=workRow(work);source.putAll(map("itemId",item,"definitionVersionId",definition,"kind","PURCHASE","status","CLOSED","closeReason","CANCELLED","lifecycleMode","COMMAND","ownerId",actor,"supervisorId",actor));insert("mulino_work_read_Works",source);
+  String goalId=id();var goal=workRow(goalId);goal.putAll(map("workId",work,"definitionVersionId",definition,"quantityMode","CUMULATIVE_EVENT","targetQuantity",new java.math.BigDecimal("100"),"unit","BOX","endpoint","ARRIVED","scopeJson","{}","slotsJson",json.writeValueAsString(goalSlots()),"provenanceJson","{}","goalVersion",1));insert("mulino_work_read_GoalReferences",goal);db.update("UPDATE mulino_work_read_Works SET currentGoalVersionId=? WHERE organizationId=? AND ID=?",goalId,org,work);
+  insert("mulino_evidence_SourceProfiles",map("organizationId",org,"ID",profile,"revision",1,"recordedAt",Timestamp.from(T.minusSeconds(10)),"recordedBy",actor,"namespace",profile,"policyVersion","fixture-v1","intakeOwnerId",actor,"supervisorId",actor,"nextAction","Review temperature evidence","nextCheckAt",Timestamp.from(T)));
+  policy("EVIDENCE",json.writeValueAsString(Map.of("intakeRules",Map.of("TEMPERATURE_ANOMALY",Map.of("requiresResponse",true),"NORMAL",Map.of("requiresResponse",false)))));
+  policy("COMMAND",json.writeValueAsString(Map.of("rules",Map.of("createObligation",Map.of("effectClass","RESPONSIBILITY")))));
+  observation("TEMPERATURE_ANOMALY");
+ }
+ Map<String,Object> goalSlots(){return map("quantityMode","CUMULATIVE_EVENT","targetQuantity","100","unit","BOX","endpoint","ARRIVED","dueAt","2026-10-31T00:00:00Z","scope",Map.of("itemId",item),"timezone","Asia/Seoul","evidencePolicyVersion","fixture-v1","periodStart","2026-10-01T00:00:00Z","periodEnd","2026-10-31T00:00:00Z","eventKind","RECEIPT","contributionScope",Map.of("itemId",item),"deduplication","CANONICAL_OCCURRENCE","conditions",List.of(Map.of("id","arrived")),"evaluatorVersion","core-v1");}
+ void policy(String kind,String content){String id=id();insert("mulino_governance_PolicyVersions",map("organizationId",org,"ID",id,"kind",kind,"version","fixture-v1","content",content,"contentHash",DefinitionRepository.sha256(content),"createdAt",Timestamp.from(T.minusSeconds(100)),"effectiveFrom",Timestamp.from(T.minusSeconds(100))));insert("mulino_governance_ActivePolicies",map("organizationId",org,"kind",kind,"policyId",id,"revision",1));}
+ void observation(String kind){insert("mulino_evidence_Events",map("organizationId",org,"ID",event,"revision",1,"recordedAt",Timestamp.from(T.minusSeconds(1)),"recordedBy",actor,"subjectKind","WORK","subjectId",work,"itemId",item,"workId",work,"effectiveFrom",Timestamp.from(T.minusSeconds(1)),"timeZone","UTC","timePrecision","SECOND","valueState","KNOWN","kind",kind,"sourceNamespace",profile,"sourceProfileId",profile,"externalEventId",event,"sourceVersion","1","payloadHash",DefinitionRepository.sha256("{}"),"payload","{}"));insert("mulino_evidence_InboxRecords",map("organizationId",org,"ID",inbox,"revision",1,"recordedAt",Timestamp.from(T.minusSeconds(1)),"recordedBy",actor,"subjectKind","WORK","subjectId",work,"itemId",item,"workId",work,"eventId",event,"sourceNamespace",profile,"sourceProfileId",profile,"externalEventId",event,"sourceVersion","1","payloadHash",DefinitionRepository.sha256("{}"),"state","RECEIVED","intakeOwnerId",actor,"supervisorId",actor,"nextAction","Review temperature evidence","nextCheckAt",Timestamp.from(T)));}
+ int tick(){return cds.requestContext().run(c->{return processor.recoverDue();});}
+ @Test void failureRetainsIntakeThenSameSourceLinksOneActualFollowupAndDuty(){
+  tick();assertEquals("HELD_LINK",db.queryForObject("SELECT state FROM mulino_runtime_IntakeRecoveries WHERE ID=?",String.class,inbox));assertEquals(actor,db.queryForObject("SELECT intakeOwnerId FROM mulino_runtime_IntakeRecoveries WHERE ID=?",String.class,inbox));assertEquals(actor,db.queryForObject("SELECT supervisorId FROM mulino_runtime_IntakeRecoveries WHERE ID=?",String.class,inbox));assertEquals(1,db.queryForObject("SELECT count(*) FROM mulino_work_read_Works WHERE organizationId=?",Integer.class,org));assertEquals(0,db.queryForObject("SELECT count(*) FROM mulino_responsibility_Roots WHERE organizationId=?",Integer.class,org));
+  insert("mulino_identity_GrantActions",map("organizationId",org,"grantId",grant,"capabilityId","createObligation"));clock.advance(clock.instant().plusSeconds(2));assertEquals(1,tick());assertEquals("LINKED",db.queryForObject("SELECT state FROM mulino_runtime_IntakeRecoveries WHERE ID=?",String.class,inbox));String linked=db.queryForObject("SELECT linkedWorkId FROM mulino_runtime_IntakeRecoveries WHERE ID=?",String.class,inbox);assertNotEquals(work,linked);assertEquals("ACTIVE",db.queryForObject("SELECT status FROM mulino_work_read_Works WHERE ID=?",String.class,linked));assertEquals("CLOSED",db.queryForObject("SELECT status FROM mulino_work_read_Works WHERE ID=?",String.class,work));assertEquals(1,db.queryForObject("SELECT count(*) FROM mulino_work_read_ObligationReferences WHERE organizationId=? AND status='OPEN' AND valid AND rootId IS NOT NULL",Integer.class,org));clock.advance(clock.instant().plusSeconds(2));tick();assertEquals(2,db.queryForObject("SELECT count(*) FROM mulino_work_read_Works WHERE organizationId=?",Integer.class,org));assertEquals(1,db.queryForObject("SELECT count(*) FROM mulino_responsibility_Roots WHERE organizationId=?",Integer.class,org));
+ }
+ @Test void normalObservationClosesWithPolicyRationaleAndCreatesNoWorkOrDuty(){event=id();inbox=id();observation("NORMAL");tick();assertEquals("NO_RESPONSE",db.queryForObject("SELECT state FROM mulino_runtime_IntakeRecoveries WHERE ID=?",String.class,inbox));assertNotNull(db.queryForObject("SELECT policyHash FROM mulino_runtime_IntakeRecoveries WHERE ID=?",String.class,inbox));assertNotNull(db.queryForObject("SELECT decisionReason FROM mulino_runtime_IntakeRecoveries WHERE ID=?",String.class,inbox));assertEquals(1,db.queryForObject("SELECT count(*) FROM mulino_work_read_Works WHERE organizationId=?",Integer.class,org));assertEquals(0,db.queryForObject("SELECT count(*) FROM mulino_responsibility_Roots WHERE organizationId=?",Integer.class,org));}
+ @AfterAll static void cleanup()throws Exception{PG.stop();Files.deleteIfExists(KEY);}
+}
