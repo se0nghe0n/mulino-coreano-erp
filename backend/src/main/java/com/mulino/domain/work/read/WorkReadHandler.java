@@ -23,7 +23,7 @@ public class WorkReadHandler implements QueryHandler {
       auth.authorizeScopes(c,q.operation(),workScopes(work));
       Map<String,Object> data=new LinkedHashMap<>(work);
       data.put("workId",q.id());
-      data.put("goals",linked(c,"GoalReferences",Set.of(q.id())));
+      var goals=linked(c,"GoalReferences",Set.of(q.id()));data.put("goals",goals);goals.stream().filter(g->Objects.equals(g.get("ID"),work.get("currentGoalVersionId"))).findFirst().ifPresent(g->{var current=new LinkedHashMap<String,Object>(g);current.put("version",g.get("goalVersion"));data.put("currentGoal",current);});
       data.put("assessments",linked(c,"AssessmentReferences",Set.of(q.id())));
       data.put("obligations",obligations(c,Set.of(q.id())));
       data.put("workLinks",workLinks(c,Set.of(q.id())));data.put("contributions",contributions(c,Set.of(q.id())));
