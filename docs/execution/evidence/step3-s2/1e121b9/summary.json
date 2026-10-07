@@ -1,0 +1,56 @@
+{
+  "sourceCommit": "1e121b998156c0a7e7817228d2bd6583e7ba62db",
+  "sourceUnchanged": true,
+  "backend": {
+    "command": "./mvnw --batch-mode -f backend/pom.xml -Dmulino.evidence.blob-root=<private temporary directory> clean package",
+    "tests": 215,
+    "passed": 214,
+    "failures": 1,
+    "errors": 0,
+    "skipped": 0,
+    "exitCode": 1,
+    "failedTest": "ResponsibilityPostgresTest.concurrentPartialCompletionCreditNeverDischargesHundred",
+    "jarBuilt": false
+  },
+  "harness": {
+    "command": "./verify harness",
+    "tests": 422,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "exitCode": 0,
+    "countSource": "Fresh Maven final aggregate in harness.log",
+    "staleReportsExcludedFromFreshCount": [
+      "TEST-org.mulino.verification.modelbinding.ModelBindingFeatureRed.xml",
+      "TEST-org.mulino.verification.CaseFeatureTest.xml"
+    ],
+    "explanation": "A report-directory naive sum included two prior intentional RED XML files. Both are preserved as preexisting artifacts; the actual fresh run is 422/0/0/0."
+  },
+  "prepare": {
+    "command": "./verify prepare",
+    "preparedCases": 41,
+    "preparedSubcases": 789,
+    "preparedAssertions": 20473,
+    "preparationProblems": [],
+    "exitCode": 0
+  },
+  "scope": "Partial S2 integration; full normative runtime and user Step3 incomplete",
+  "artifacts": [
+    {
+      "label": "backend",
+      "artifacts": 65
+    },
+    {
+      "label": "harness",
+      "artifacts": 42
+    },
+    {
+      "label": "runtime-pass4",
+      "artifacts": 7
+    },
+    {
+      "label": "parity-pass2",
+      "artifacts": 4
+    }
+  ]
+}
