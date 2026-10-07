@@ -1,0 +1,27 @@
+spring:
+  application:
+    name: mulino-ontology
+  datasource:
+    url: ${DB_URL}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+  sql:
+    init:
+      mode: never
+      authConfig:
+        enabled: false
+  flyway:
+    enabled: true
+cds:
+  security:
+    authentication:
+      mode: never
+      authConfig:
+        enabled: false
+    mock:
+      enabled: false
+      defaultUsers: false
+    identity:
+      enabled: false
+    xsuaa:
+      enabled: false
