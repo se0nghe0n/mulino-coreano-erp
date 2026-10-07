@@ -95,6 +95,8 @@ public class EvidenceReconciliation {
       if(r.rows("CanonicalOccurrences",c.organizationId()).stream().anyMatch(x->!input.physicalScopeId().equals(x.get("physicalScopeId"))&&overlapping.contains(x.get("physicalScopeId"))&&event.get("kind").equals(x.get("kind"))))decision="CONFLICT";
     }
     if(input.physicalScopeId()!=null && r.rows("CanonicalOccurrences",c.organizationId()).stream().anyMatch(x->input.physicalScopeId().equals(x.get("physicalScopeId"))&&event.get("kind").equals(x.get("kind"))&&!input.effectiveFrom().equals(instant(x.get("effectiveFrom")))))decision="CONFLICT";
+    if(input.physicalScopeId()!=null && r.rows("CanonicalOccurrences",c.organizationId()).stream().anyMatch(x->input.physicalScopeId().equals(x.get("physicalScopeId"))&&event.get("kind").equals(x.get("kind"))
+        &&(!Objects.equals(claim.get("effectiveUntil"),x.get("effectiveUntil"))||!Objects.equals(claim.get("timePrecision"),x.get("timePrecision")))))decision="CONFLICT";
     if(input.effectiveFrom().isAfter(Instant.now()))decision="UNVERIFIED";
     if(input.existingCanonicalId()!=null) {
       var canonical=r.require("CanonicalOccurrences",c.organizationId(),uuid(input.existingCanonicalId()));auth.authorizeScopes(c,capability,scopes(canonical));

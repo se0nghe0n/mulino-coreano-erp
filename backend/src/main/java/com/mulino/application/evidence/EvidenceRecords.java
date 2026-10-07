@@ -114,7 +114,7 @@ public class EvidenceRecords {
     if(input.existingCanonicalId()!=null) {
       canonical=r.require("CanonicalOccurrences",c.organizationId(),uuid(input.existingCanonicalId()));
       sameSubject(claim,canonical);
-      if(!physical.equals(canonical.get("physicalScopeId"))||!Objects.equals(claim.get("quantity"),canonical.get("quantity"))||!Objects.equals(claim.get("unit"),canonical.get("unit"))||!Objects.equals(event.get("kind"),canonical.get("kind"))||!instant(claim.get("effectiveFrom")).equals(instant(canonical.get("effectiveFrom"))))throw DomainError.invalid("Canonical occurrence mismatch");
+      if(!physical.equals(canonical.get("physicalScopeId"))||!Objects.equals(claim.get("quantity"),canonical.get("quantity"))||!Objects.equals(claim.get("unit"),canonical.get("unit"))||!Objects.equals(event.get("kind"),canonical.get("kind"))||!instant(claim.get("effectiveFrom")).equals(instant(canonical.get("effectiveFrom")))||!Objects.equals(claim.get("effectiveUntil"),canonical.get("effectiveUntil"))||!Objects.equals(claim.get("timePrecision"),canonical.get("timePrecision")))throw DomainError.invalid("Canonical occurrence mismatch");
     } else {
       var existing=r.rows("CanonicalOccurrences",c.organizationId()).stream().filter(x->physical.equals(x.get("physicalScopeId"))&&Objects.equals(event.get("kind"),x.get("kind"))&&instant(claim.get("effectiveFrom")).equals(instant(x.get("effectiveFrom")))).toList();
       if(!existing.isEmpty()&&input.supersedesId()==null)throw new DomainError("CONFLICT","EVIDENCE_CONFLICT","Canonical occurrence already exists; explicit reconciliation needed");
