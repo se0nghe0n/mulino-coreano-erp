@@ -70,3 +70,39 @@ case별 구체 assertion이 규범 의미를 충족하는지는 이후 review �
 실제 모델 호출은0회이고 usage/비용은 null이며 R8은 대기다. DB/API/MCP,
 client/model/BTP·규제·운영 인수는 모두 NOT_RUN이다. B2 동결이나 이
 부분 검토는 사용자 Step 2 완료 또는 시스템 S0–S6 PASS가 아니다.
+
+## 구체 사례 작성에서 확인한 B2 보완
+
+B2를 시작점으로 사례를 작성하면서 다음 공통 표현과 판정 오류를
+확인했다. B2 tag를 옮기지 않고 별도 dependency commit으로 통합했다.
+
+- T20의 실제 승인 소비 경합을 위해 raw wire async `startWire` port를
+  추가했다. 원 요청을 보존하고 제출 ACK와 각 terminal await를 구별한다.
+- transactionId와 goalVersionId를 실제 string ID allowlist에 추가했다.
+  Boolean·수량 self-copy를 허용하는 suffix 규칙은 도입하지 않았다.
+- source 미구현보다 먼저 alias를 해석해 형식 오류를 내던 순서를 고쳤다.
+  실제 source/reference/fixture 가용성을 먼저 검사하되 EXECUTED 결과의
+  잘못된 alias·pointer·type은 계속 계약 오류다. 부분 실행에서 이미
+  관찰한 독립 위반은 FAIL로 보존한다.
+- 수량 observation에 연결된 보조 relation/count까지 같은 수량 expected를
+  강제하던 matcher를 바꿨다. 직접적인 고정 수량·단위 주 assertion은
+  최소 하나 있어야 하며 보조 identity·관계 assertion을 함께 둔다.
+  presence/count만으로 수량 coverage를 통과시키지 않는다.
+
+공통 author source `4eb5837`은 Task `b7ca0a0`으로, catalog link source
+`f9a933a`는 Task `ac616a1`로 통합했다. coordinator가 두 변경의 결합
+`b7ca0a0bbf552fc18ad9d7469243456b8bf0d288`에서 harness130개를 실행해
+failure0·error0·skip0·exit0을 확인했다.
+[결합 증거](evidence/step2-common-extension/summary.json)를 보존한다.
+Work51의 원 case 파일을 변경하지 않은 임시 입력 복사로 실제 Gherkin
+selector를 실행해 expected/discovered/started/NOT_IMPLEMENTED failure가
+모두51, skip0·exit1인 것도 author가 확인했다. 이 결과는 제품 PASS가 아니다.
+
+coordinator는 같은 두 dependency를 모든10 case·model-binding·coverage
+worktree에 적용했다. 각 author는 자기 산출물 commit만 반환하며 공통
+commit은 중복 통합하지 않는다. 전체 Step2의 두 모델 최종 review는 남았다.
+
+병렬 검증 중 새 process 생성에 `Too many open files (os error 24)`가
+발생했다. 열린 실행 session을 회수한 뒤 생성이 회복됐고, 관찰한
+maxfiles soft limit는256이었다. 지속 OS 설정 변경 없이 긴 Maven/verify
+실행을 동시2개로 조정했다. 해당 환경 실패는 contract RED에 포함하지 않는다.

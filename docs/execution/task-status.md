@@ -128,6 +128,13 @@ coordinator가 확인한다. 상세 인수 조건은 [작성 인계](step-2-case
 실제 입력 artifact·hash·실행 여부를 연결하며 부재를 성공이나0으로
 채우지 않는다. 이 기록 시점에는 아직 생성하거나 제품 인수하지 않았다.
 
+B2 이후 실제 사례가 드러낸 공통 보완은 `ac616a1`과 `b7ca0a0`으로
+통합했다. raw wire async, 실제 두 ID 참조, 미실행 reference 판정 순서와
+수량 observation의 보조 관계 연결을 교정했다. 결합 harness130개가
+통과했고 모든 작성 worktree에도 같은 dependency를 반영했다.
+파일 한도 환경 오류가 발생해 긴 검증은 동시2개로 조정했다. 전체
+Step2 완료와 제품 gate는 아직 판정하지 않았다.
+
 ## 시스템 S0–S6의 별도 gate
 
 | 시스템 Step | 인수 범위 | 상태 |
