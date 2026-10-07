@@ -34,7 +34,7 @@ public class TradeImpact {
     return recorded(context,workId,sourceId,kind,physicalScopeId,nextAction,nextCheckAt,CommandExecution.commandId(),residualScope,quantity,unit);
   }
 
-  private Map<String,Object> recorded(DomainContext context,String workId,String sourceId,
+  public Map<String,Object> recorded(DomainContext context,String workId,String sourceId,
       String kind,String physicalScopeId,String nextAction,Instant nextCheckAt,String sourceCommandId,
       Map<String,Object> residualScope,BigDecimal quantity,String unit){
     if(quantity!=null&&(quantity.signum()<=0||quantity.scale()>12||quantity.precision()>38||quantity.precision()-quantity.scale()>26||unit==null||unit.isBlank()))throw DomainError.invalid("Typed residual quantity required");

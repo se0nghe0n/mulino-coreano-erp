@@ -13,6 +13,7 @@ import org.springframework.transaction.annotation.*;
 public class ApplicationQueries {
   private static final Set<String> WORLD=Set.of("getObject","getWork","getInventory","getObligations","getAssessment","traceLot","getTrace");
   private final Map<String,QueryHandler> handlers=new HashMap<>();
+  private final Set<String> worldOperations=new HashSet<>(WORLD);
   private final Set<String> objectTypes=new HashSet<>(Set.of("Product","TradeItem","ManufacturingLot","QuantitySegment","LogisticsUnit","Place","Manufacturer"));
   private final ReadAuthorizer auth;
   private final ExecutionClock clock;
@@ -22,6 +23,7 @@ public class ApplicationQueries {
   @org.springframework.beans.factory.annotation.Autowired
   public ApplicationQueries(List<QueryHandler> handlers,ReadAuthorizer auth,WorkReadHandler work,ExecutionClock clock,List<ObjectReadProvider> objects){
     this.auth=auth;this.work=work;this.clock=clock;
+    for(var provider:objects){if(provider instanceof QueryHandler query)worldOperations.addAll(query.operations());}
     for(var provider:objects)for(String type:provider.objectTypes())if(!objectTypes.add(type))throw new IllegalStateException("Duplicate noun read provider "+type);
     for(QueryHandler handler:handlers)for(String operation:handler.operations())if(this.handlers.put(operation,handler)!=null)throw new IllegalStateException("Duplicate query capability "+operation);
   }
@@ -61,7 +63,7 @@ public class ApplicationQueries {
     TreeSet<String> unknowns=new TreeSet<>(result.unknowns());
     TreeSet<String> conflicts=new TreeSet<>(result.conflicts());
     Object shared=data;
-    if(WORLD.contains(request.operation())&&data instanceof Map<?,?>&&scope.get("itemId")!=null){
+    if(worldOperations.contains(request.operation())&&data instanceof Map<?,?>&&scope.get("itemId")!=null){
       Map<String,Object> world=work.world(context,scope);
       if(handlers.containsKey("getInventory")){
         var inventoryScope=new LinkedHashMap<String,Object>();for(String key:List.of("organizationId","itemId","lotId","placeId"))if(scope.containsKey(key))inventoryScope.put(key,scope.get(key));
