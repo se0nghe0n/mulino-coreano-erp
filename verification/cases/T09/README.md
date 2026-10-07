@@ -32,3 +32,22 @@ UNVERIFIED는 별도 fixture다. LOT는 초안과 수령의 필수 단계를 구
 
 fixture의 DocumentVersion.content는 UTF-8 원문이다. sha256는 해당
 원문의 실제 bytes에서 계산했으며 토큰이나 credential을 담지 않는다.
+
+## 작성 인수 증거
+
+[checks/work-contracts.json](checks/work-contracts.json)은6개 case의
+17 oracle·69 observation을509개 assertion에 연결한다. 검증 baseline은
+6add3a5이며51개 fixture와 Gherkin·원문·schema hash를 보존한다.
+
+- schema6개는 exit0이다. 실제 AssertionEngine을 사용하는 자체13개를
+  포함한 harness143개가 실패·오류·skip0으로 통과했다.
+- 실제 Gherkin file selector는 기대·발견·시작·실패·미구현 실패가
+  각각51이고 scenario skip0이며 exit1이다. 첫 실패 뒤의 Gherkin
+  step skip은 제품 assertion 전수 PASS로 해석하지 않는다.
+- 제품 scenarios profile은 exit2/NOT_RUN이다. 원행·host·API·유료 모델과
+  실제 제품의 행동을 실행했다고 주장하지 않는다. 이 증거는 Step2
+  작성 인수이며 combined registry/prepare와 review는 통합 단계에 남는다.
+
+초기 빈 where 형식 오류와 공통 alias 가용성 순서 오류는 최종 검증에서
+수정된 상태로 재실행했으며 RED로 세지 않았다. 완전한 명령·관찰·exit와
+원행 미실행 결과는 checks/의 로그 및 보고서에 기록했다.
