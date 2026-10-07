@@ -6,5 +6,6 @@ public interface EvidenceCorrectionImpact {
   record Correction(String previousId,String currentId,Set<String> affectedWorkIds,Set<String> affectedGoalIds) {
     public Correction { affectedWorkIds=Set.copyOf(affectedWorkIds);affectedGoalIds=Set.copyOf(affectedGoalIds); }
   }
+  default void evidenceLinked(DomainContext context,String claimId,String canonicalId){throw com.mulino.application.core.DomainError.unsupported();}
   void apply(DomainContext context,Correction correction);
 }

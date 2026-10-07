@@ -8,6 +8,8 @@ import java.math.BigDecimal;
 import java.time.*;
 import java.util.*;
 import org.springframework.stereotype.Service;
+import org.springframework.beans.factory.ObjectProvider;
+import com.sap.cds.ql.Select;
 import org.springframework.transaction.annotation.Transactional;
 import static com.mulino.domain.evidence.EvidenceTypes.*;
 
@@ -20,8 +22,9 @@ public class EvidenceReconciliation {
   private final EvidenceRecords records;
   private final IdentityAuthorization auth;
   private final LocalBlobStore blobs;
-  public EvidenceReconciliation(EvidenceRepository r,EvidenceRecords records,IdentityAuthorization auth,LocalBlobStore blobs) {
-    this.r=r;this.records=records;this.auth=auth;this.blobs=blobs;
+  private final ObjectProvider<EvidenceCorrectionImpact> impacts;
+  public EvidenceReconciliation(EvidenceRepository r,EvidenceRecords records,IdentityAuthorization auth,LocalBlobStore blobs,ObjectProvider<EvidenceCorrectionImpact> impacts) {
+    this.r=r;this.records=records;this.auth=auth;this.blobs=blobs;this.impacts=impacts;
   }
   public Map<String,Object> claim(DomainContext c,String id){return r.require("Claims",c.organizationId(),uuid(id));}
   public Map<String,Object> review(DomainContext c,String id){return r.require("Reconciliations",c.organizationId(),uuid(id));}
@@ -106,6 +109,14 @@ public class EvidenceReconciliation {
       if(candidates.size()==1)existing=candidates.getFirst().get("ID").toString();
       if(candidates.size()>1)throw new DomainError("HELD","EVIDENCE_CONFLICT","Canonical scope has competing revisions");
     }
-    return records.verifyCanonical(new EvidenceRecords.CanonicalInput(claim.get("ID").toString(),physical,review.get("basisDocumentId").toString(),review.get("policyVersion").toString(),true,true,true,true,true,existing,null,review.get("reason").toString()));
+    var result=records.verifyCanonical(new EvidenceRecords.CanonicalInput(claim.get("ID").toString(),physical,review.get("basisDocumentId").toString(),review.get("policyVersion").toString(),true,true,true,true,true,existing,null,review.get("reason").toString()));
+    var impact=impacts.getIfAvailable();
+    if(impact!=null)impact.evidenceLinked(c,claim.get("ID").toString(),result.get("id").toString());
+    else {
+      boolean hasWorks=r.db().run(Select.from("mulino.work.read.Works").where(x->x.get("organizationId").eq(c.organizationId()))).listOf(Map.class).stream()
+        .anyMatch(w->claim.get("workId")!=null&&claim.get("workId").equals(w.get("ID"))||claim.get("itemId")!=null&&claim.get("itemId").equals(w.get("itemId")));
+      if(hasWorks)throw new DomainError("HELD","POLICY_UNRESOLVED","Affected Work invalidation service unavailable");
+    }
+    return result;
   }
 }
