@@ -48,7 +48,7 @@ fork의 issue 기능은 비활성 상태로 확인됐다. 추적 위치 결정�
 - 사용자 Step 순서의 모델/effort로 수행하고 매 Step의 Sol xhigh·
   Astra low review 지적을 해결한다. 실제 동작으로 운영 매뉴얼을 쓴다.
 
-## 완료 조건
+## 완료 조건 (Definition of Done)
 
 - [ ] 채택된 D01–D26와 C1–C5의 구현을 통합했다.
 - [ ] T01–T26·C1–C5·V1–V8·E1/E2의 필수 실행을 통과했다.
