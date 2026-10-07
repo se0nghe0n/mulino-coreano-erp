@@ -77,7 +77,7 @@ class EvidenceReconciliationTest {
     jdbc.update("INSERT INTO mulino_inventory_Manufacturers(organizationId,ID,name) VALUES(?,?, 'Fixture maker')",ORG,manufacturer);
     jdbc.update("INSERT INTO mulino_inventory_ManufacturingLots(organizationId,ID,itemId,manufacturerId,originalLot) VALUES(?,?,?,?,?)",ORG,lot,ITEM,manufacturer,id);
     jdbc.update("INSERT INTO mulino_inventory_Places(organizationId,ID,name,kind) VALUES(?,?, 'Fixture W','WAREHOUSE')",ORG,place);
-    jdbc.update("INSERT INTO mulino_inventory_QuantitySegments(organizationId,ID,itemId,lotId,placeId,controlScope,quantity,unit,identificationStatus,mixtureStatus,validFrom) VALUES(?,?,?,?,?,'fixture',60,'BOX','CONFIRMED','IDENTIFIED',?)",ORG,id,ITEM,lot,place,OCCURRED);
+    jdbc.update("INSERT INTO mulino_inventory_QuantitySegments(organizationId,ID,itemId,lotId,placeId,controlScope,quantity,unit,identificationStatus,mixtureStatus,validFrom) VALUES(?,?,?,?,?,'fixture',60,'BOX','CONFIRMED','IDENTIFIED',?)",ORG,id,ITEM,lot,place,java.sql.Timestamp.from(OCCURRED));
     return id;
   }
   EvidenceReconciliation.Review review(String claim,String doc,String segment,String quantity){return new EvidenceReconciliation.Review(claim,doc,segment,null,"synthetic-v1","warehouse:R60:1",quantity,"BOX",OCCURRED,"Human reviewed original, source, event identity and exact physical scope");}

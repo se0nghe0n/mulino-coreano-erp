@@ -118,7 +118,7 @@ class EvidencePersistenceTest {
     assertEquals(1,jdbc.queryForObject("SELECT count(*) FROM mulino_evidence_CanonicalOccurrences",Integer.class));
     assertEquals("60.000000000000",jdbc.queryForObject("SELECT quantity::text FROM mulino_evidence_CanonicalOccurrences",String.class));
     assertEquals(2,jdbc.queryForObject("SELECT count(*) FROM mulino_evidence_Verifications",Integer.class));
-    assertEquals("NOT_IMPLEMENTED",first.get("inventoryEffects"));
+    assertEquals("NONE",first.get("inventoryEffects"));
     assertEquals(true,((Map<?,?>)read("CANONICAL",canonical,Instant.now().plusSeconds(1)).data()).get("verified"));
   }
   @Test void sourceConflictCannotBecomeCanonicalVerified(){

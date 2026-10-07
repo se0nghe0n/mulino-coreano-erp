@@ -1,0 +1,69 @@
+{
+  "task": "new mulino-coreano-ontology",
+  "userStep": 3,
+  "systemStage": "S2",
+  "baseline": "40a240c3886d3316ba1fd686e9b44bfa1ba6ec2d",
+  "testedSourceCommit": "b0633b6e85c806b10a587187cd9f81c2f7d5ff13",
+  "fixtureCorrection": "JDBC fixture Instant serialized as Timestamp; S1 inventoryEffects metadata NONE; SQL no-movement assertions unchanged",
+  "command": "JAVA_HOME=/Library/Java/JavaVirtualMachines/zulu-21.jdk/Contents/Home PATH=<Node24.19.0 bin>:<Java21 bin>:$PATH JWT_PUBLIC_KEY=<ephemeral public.pem> ../mvnw -B -ntp -Dtest=EvidencePersistenceTest,EvidenceReconciliationTest test",
+  "timestamp": "2026-10-08T03:17:43+09:00",
+  "exitCode": 0,
+  "versions": {
+    "java": "21",
+    "node": "24.19.0",
+    "cap": "5.1.1",
+    "springBoot": "4.1.1",
+    "postgres": "18.6",
+    "postgresImage": "postgres@sha256:4ef4dbc939d61acea57712655ddb4b4ab27419c913f94cca0cd57cb3ea3c2280"
+  },
+  "expected": {
+    "tests": 21,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "observed": {
+    "tests": 21,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "build": "SUCCESS",
+    "seconds": 13.297
+  },
+  "status": "PASS",
+  "artifacts": [
+    "maven.log.gz",
+    "maven-initial-failure.log.gz",
+    "TEST-com.mulino.application.evidence.EvidencePersistenceTest.xml.gz",
+    "TEST-com.mulino.application.evidence.EvidenceReconciliationTest.xml.gz"
+  ],
+  "notRun": [
+    "signed combined HTTP/OData/MCP evidence command",
+    "combined correction assessment/duty/followup implementation",
+    "runtime ExternalOperationScopePort native acceptance",
+    "full C4 delivery98/current duty2",
+    "paid models",
+    "BTP"
+  ],
+  "supportingChecks": {
+    "npmCi": {
+      "node": "24.19.0",
+      "exitCode": 0
+    },
+    "freshCdsCompile": {
+      "dialect": "postgres",
+      "exitCode": 0
+    },
+    "gitDiffCheck": {
+      "exitCode": 0
+    }
+  },
+  "requirementScope": [
+    "T06",
+    "T07",
+    "T22",
+    "T24",
+    "C4 staged partial only"
+  ],
+  "paidModelCalls": 0
+}
