@@ -1,0 +1,59 @@
+{
+  "schemaVersion": "1.0.0",
+  "scope": "S0 actual custom MCP minimum wire only",
+  "status": "PASS",
+  "baseline": "4280a750dca0aef35abaf10b6797881181dd88d7",
+  "protocolVersion": "2026-07-28",
+  "serverInfo": {
+    "name": "mulino-platform-s0",
+    "version": "0.1.0"
+  },
+  "serverSdk": null,
+  "client": {
+    "name": "mulino-s0-wire-probe",
+    "version": "1.0.0",
+    "sdk": null
+  },
+  "command": "MCP_TOKEN=<transient fixture writer credential> python3 verification/platform/protocol/wire_probe.py --url http://localhost:8080/mcp --scope-id 00000000-0000-0000-0000-000000000001 --revision 1 --output verification/platform/protocol/evidence/wire-run-2.json",
+  "exitCode": 0,
+  "requests": 29,
+  "assertions": 118,
+  "initialObserved": {
+    "held": "60",
+    "reserved": "1",
+    "revision": 1
+  },
+  "finalObserved": {
+    "held": "60",
+    "reserved": "2",
+    "revision": 2
+  },
+  "fullT20Status": "NOT_RUN",
+  "s5ClientLoadingStatus": "NOT_RUN",
+  "modelCalls": 0,
+  "limitations": [
+    "No official SDK runtime interoperability or real host skill loading",
+    "No OAuth/IAS/BTP/TLS production acceptance",
+    "No MRTR/full public tool surface",
+    "S0 readScope decimal JSON representation numeric; S1 public decimal string contract required",
+    "Tool text uses Java map representation; serialized JSON compatibility SHOULD remains for S5"
+  ],
+  "artifacts": [
+    {
+      "path": "verification/platform/protocol/wire_probe.py",
+      "sha256": "1f9ff1267de0540b2ea97587db847427d8a04aad517a6f704623b586613f250b"
+    },
+    {
+      "path": "verification/platform/protocol/evidence/wire-run-1.json",
+      "sha256": "4d06b504eab7b40c7746afd09b5757ba8c5fcf2dd0d8122f16e7a1f3abce5906"
+    },
+    {
+      "path": "verification/platform/protocol/evidence/wire-run-2.json",
+      "sha256": "e6e379b88d81cea55160e0f160c64f214431237f0ab7cdf6b507f01111ea7287"
+    },
+    {
+      "path": "verification/platform/protocol/evidence/discovery-before-fix.json",
+      "sha256": "fa9314ee9381dd04d8911c81dd88973ffe4040e89f011809f38514d59afecfb1"
+    }
+  ]
+}

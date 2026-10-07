@@ -102,7 +102,10 @@ python3 verification/platform/protocol/wire_probe.py \
   --revision 0 --output verification/platform/protocol/evidence/wire.json
 ```
 
-실제 수행 전 status는 NOT_RUN이다. S0 wire 성공은 DB effects/rollback,
+실제 local platform에 두 번 수행했다. 최종29개 HTTP 요청과118개
+assertion이 PASS이며 원 wire와 SHA256는 wire-run-2.json에 있다.
+첫 discovery의 namespaced meta 추출 오류는 실제 FAIL로 보존한 뒤
+platform 수정 후 같은 공식 요청으로 검증했다. 전체 T20/S5는 NOT_RUN이다. S0 wire 성공은 DB effects/rollback,
 CQN read/action parity, V2/V3 fence 인수를 대신하지 않는다. 해당 증거는
 platform의 실제 integration test와 결합해야 한다.
 

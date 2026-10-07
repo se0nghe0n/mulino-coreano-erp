@@ -2,6 +2,7 @@
 """Independent S0 HTTP observer. No SDK, model calls, DB mutations outside tools."""
 import argparse, base64, datetime, hashlib, json, os, pathlib, platform, sys
 import urllib.error, urllib.request, uuid
+from decimal import Decimal
 
 VERSION = '2026-07-28'
 META = {'io.modelcontextprotocol/protocolVersion': VERSION,
@@ -95,6 +96,12 @@ def main():
     probe.check('list:minimum-tools', {'platform.readScope', 'platform.reserve'}.issubset({t.get('name') for t in tools}))
     for tool in tools:
         probe.check('schema:' + tool.get('name', '?'), isinstance(tool.get('inputSchema'), dict))
+        expected = {'scopeId': 'string'}
+        if tool.get('name') == 'platform.reserve':
+            expected.update(quantity='string', expectedRevision='integer', idempotencyKey='string')
+        schema = tool.get('inputSchema', {})
+        probe.check('schema-required:' + tool.get('name', '?'), set(schema.get('required', [])) == set(expected))
+        probe.check('schema-types:' + tool.get('name', '?'), all(schema.get('properties', {}).get(k, {}).get('type') == v for k,v in expected.items()))
     read_args = {'name': 'platform.readScope', 'arguments': {'scopeId': args.scope_id}}
     before = probe.result(probe.request('read-before', 'tools/call', read_args))
     key = 's0-wire-' + str(uuid.uuid4())
@@ -104,11 +111,22 @@ def main():
     replay = probe.result(probe.request('reserve-retry-fresh-rpc-id', 'tools/call', command))
     probe.check('reserve:success', first.get('isError') is False and isinstance(first.get('structuredContent'), dict))
     probe.check('retry:same-domain-result', first.get('structuredContent') == replay.get('structuredContent'))
+    probe.check('reserve:accepted-outcome', first.get('structuredContent', {}).get('outcome') == 'ACCEPTED')
+    probe.check('retry:no-error', replay.get('isError') is False)
     after = probe.result(probe.request('read-after', 'tools/call', read_args))
     probe.check('read:structured', isinstance(before.get('structuredContent'), dict) and isinstance(after.get('structuredContent'), dict))
+    b, a = before.get('structuredContent', {}), after.get('structuredContent', {})
+    probe.check('reserve:single-revision', b.get('revision') == args.revision and a.get('revision') == args.revision + 1)
+    probe.check('reserve:held-unchanged', b.get('quantity') == a.get('quantity'))
+    try:
+        delta_ok = Decimal(str(a.get('reserved'))) - Decimal(str(b.get('reserved'))) == Decimal(args.quantity)
+    except Exception:
+        delta_ok = False
+    probe.check('reserve:single-quantity-effect', delta_ok)
     changed = json.loads(json.dumps(command)); changed['arguments']['quantity'] = '2' if args.quantity != '2' else '3'
     conflict = probe.result(probe.request('same-key-different-intent', 'tools/call', changed))
     probe.check('conflict:tool-error', conflict.get('isError') is True and bool(conflict.get('structuredContent')))
+    probe.check('conflict:domain-outcome', conflict.get('structuredContent', {}).get('outcome') == 'IDEMPOTENCY_CONFLICT')
     probe.error(probe.request('missing-auth', authenticated=False), 401)
     probe.error(probe.request('foreign-origin', headers={'Origin': 'https://attacker.invalid'}), 403)
     probe.error(probe.request('get-not-supported', http_method='GET'), 405)
@@ -128,7 +146,8 @@ def main():
                             ('mismatched-name', {'Mcp-Name': 'platform.reserve'})]:
         probe.error(probe.request(label, 'tools/call', read_args, headers=override), 400, -32020)
     encoded = '=?base64?' + base64.b64encode(b'platform.readScope').decode() + '?='
-    probe.result(probe.request('encoded-name', 'tools/call', read_args, headers={'Mcp-Name': encoded}))
+    late_read = probe.result(probe.request('encoded-name', 'tools/call', read_args, headers={'Mcp-Name': encoded}))
+    probe.check('rejections:no-later-domain-effect', late_read.get('structuredContent') == after.get('structuredContent'))
     probe.result(probe.request('obsolete-session-ignored', headers={'Mcp-Session-Id': 'obsolete', 'Last-Event-ID': 'obsolete'}))
     probe.result(probe.request('client-info-optional', params={'_meta': {k:v for k,v in META.items() if not k.endswith('/clientInfo')}}))
     probe.error(probe.request('missing-body-meta', with_meta=False), 400)

@@ -1,0 +1,2219 @@
+{
+  "schemaVersion": "1.0.0",
+  "scope": "S0 minimum custom MCP wire; not full T20/S5",
+  "protocolVersion": "2026-07-28",
+  "client": {
+    "name": "mulino-s0-wire-probe",
+    "version": "1.0.0",
+    "runtime": "3.14.7",
+    "sdk": null
+  },
+  "timestamp": "2026-10-07T16:44:20.220670+00:00",
+  "status": "PASS",
+  "assertions": [
+    {
+      "assertion": "discover:no-session",
+      "status": "PASS"
+    },
+    {
+      "assertion": "discover:json-response",
+      "status": "PASS"
+    },
+    {
+      "assertion": "discover:rpc-id",
+      "status": "PASS"
+    },
+    {
+      "assertion": "discover:complete",
+      "status": "PASS"
+    },
+    {
+      "assertion": "discover:supportedVersions",
+      "status": "PASS"
+    },
+    {
+      "assertion": "discover:tools-capability",
+      "status": "PASS"
+    },
+    {
+      "assertion": "discover:server-info",
+      "status": "PASS"
+    },
+    {
+      "assertion": "list:no-session",
+      "status": "PASS"
+    },
+    {
+      "assertion": "list:json-response",
+      "status": "PASS"
+    },
+    {
+      "assertion": "list:rpc-id",
+      "status": "PASS"
+    },
+    {
+      "assertion": "list:complete",
+      "status": "PASS"
+    },
+    {
+      "assertion": "list:minimum-tools",
+      "status": "PASS"
+    },
+    {
+      "assertion": "schema:platform.readScope",
+      "status": "PASS"
+    },
+    {
+      "assertion": "schema-required:platform.readScope",
+      "status": "PASS"
+    },
+    {
+      "assertion": "schema-types:platform.readScope",
+      "status": "PASS"
+    },
+    {
+      "assertion": "schema:platform.reserve",
+      "status": "PASS"
+    },
+    {
+      "assertion": "schema-required:platform.reserve",
+      "status": "PASS"
+    },
+    {
+      "assertion": "schema-types:platform.reserve",
+      "status": "PASS"
+    },
+    {
+      "assertion": "read-before:no-session",
+      "status": "PASS"
+    },
+    {
+      "assertion": "read-before:json-response",
+      "status": "PASS"
+    },
+    {
+      "assertion": "read-before:rpc-id",
+      "status": "PASS"
+    },
+    {
+      "assertion": "read-before:complete",
+      "status": "PASS"
+    },
+    {
+      "assertion": "reserve:no-session",
+      "status": "PASS"
+    },
+    {
+      "assertion": "reserve:json-response",
+      "status": "PASS"
+    },
+    {
+      "assertion": "reserve:rpc-id",
+      "status": "PASS"
+    },
+    {
+      "assertion": "reserve:complete",
+      "status": "PASS"
+    },
+    {
+      "assertion": "reserve-retry-fresh-rpc-id:no-session",
+      "status": "PASS"
+    },
+    {
+      "assertion": "reserve-retry-fresh-rpc-id:json-response",
+      "status": "PASS"
+    },
+    {
+      "assertion": "reserve-retry-fresh-rpc-id:rpc-id",
+      "status": "PASS"
+    },
+    {
+      "assertion": "reserve-retry-fresh-rpc-id:complete",
+      "status": "PASS"
+    },
+    {
+      "assertion": "reserve:success",
+      "status": "PASS"
+    },
+    {
+      "assertion": "retry:same-domain-result",
+      "status": "PASS"
+    },
+    {
+      "assertion": "reserve:accepted-outcome",
+      "status": "PASS"
+    },
+    {
+      "assertion": "retry:no-error",
+      "status": "PASS"
+    },
+    {
+      "assertion": "read-after:no-session",
+      "status": "PASS"
+    },
+    {
+      "assertion": "read-after:json-response",
+      "status": "PASS"
+    },
+    {
+      "assertion": "read-after:rpc-id",
+      "status": "PASS"
+    },
+    {
+      "assertion": "read-after:complete",
+      "status": "PASS"
+    },
+    {
+      "assertion": "read:structured",
+      "status": "PASS"
+    },
+    {
+      "assertion": "reserve:single-revision",
+      "status": "PASS"
+    },
+    {
+      "assertion": "reserve:held-unchanged",
+      "status": "PASS"
+    },
+    {
+      "assertion": "reserve:single-quantity-effect",
+      "status": "PASS"
+    },
+    {
+      "assertion": "same-key-different-intent:no-session",
+      "status": "PASS"
+    },
+    {
+      "assertion": "same-key-different-intent:json-response",
+      "status": "PASS"
+    },
+    {
+      "assertion": "same-key-different-intent:rpc-id",
+      "status": "PASS"
+    },
+    {
+      "assertion": "same-key-different-intent:complete",
+      "status": "PASS"
+    },
+    {
+      "assertion": "conflict:tool-error",
+      "status": "PASS"
+    },
+    {
+      "assertion": "conflict:domain-outcome",
+      "status": "PASS"
+    },
+    {
+      "assertion": "missing-auth:no-session",
+      "status": "PASS"
+    },
+    {
+      "assertion": "missing-auth:http",
+      "status": "PASS"
+    },
+    {
+      "assertion": "foreign-origin:no-session",
+      "status": "PASS"
+    },
+    {
+      "assertion": "foreign-origin:http",
+      "status": "PASS"
+    },
+    {
+      "assertion": "get-not-supported:no-session",
+      "status": "PASS"
+    },
+    {
+      "assertion": "get-not-supported:http",
+      "status": "PASS"
+    },
+    {
+      "assertion": "delete-not-supported:no-session",
+      "status": "PASS"
+    },
+    {
+      "assertion": "delete-not-supported:http",
+      "status": "PASS"
+    },
+    {
+      "assertion": "unsupported-rpc:no-session",
+      "status": "PASS"
+    },
+    {
+      "assertion": "unsupported-rpc:http",
+      "status": "PASS"
+    },
+    {
+      "assertion": "unsupported-rpc:error-code",
+      "status": "PASS"
+    },
+    {
+      "assertion": "unsupported-rpc:rpc-id",
+      "status": "PASS"
+    },
+    {
+      "assertion": "legacy-initialize-rejected:no-session",
+      "status": "PASS"
+    },
+    {
+      "assertion": "legacy-initialize-rejected:http",
+      "status": "PASS"
+    },
+    {
+      "assertion": "legacy-initialize-rejected:error-code",
+      "status": "PASS"
+    },
+    {
+      "assertion": "legacy-initialize-rejected:rpc-id",
+      "status": "PASS"
+    },
+    {
+      "assertion": "unsupported-version:no-session",
+      "status": "PASS"
+    },
+    {
+      "assertion": "unsupported-version:http",
+      "status": "PASS"
+    },
+    {
+      "assertion": "unsupported-version:error-code",
+      "status": "PASS"
+    },
+    {
+      "assertion": "unsupported-version:rpc-id",
+      "status": "PASS"
+    },
+    {
+      "assertion": "unsupported:versions",
+      "status": "PASS"
+    },
+    {
+      "assertion": "missing-version-header:no-session",
+      "status": "PASS"
+    },
+    {
+      "assertion": "missing-version-header:http",
+      "status": "PASS"
+    },
+    {
+      "assertion": "missing-version-header:error-code",
+      "status": "PASS"
+    },
+    {
+      "assertion": "missing-version-header:rpc-id",
+      "status": "PASS"
+    },
+    {
+      "assertion": "missing-method-header:no-session",
+      "status": "PASS"
+    },
+    {
+      "assertion": "missing-method-header:http",
+      "status": "PASS"
+    },
+    {
+      "assertion": "missing-method-header:error-code",
+      "status": "PASS"
+    },
+    {
+      "assertion": "missing-method-header:rpc-id",
+      "status": "PASS"
+    },
+    {
+      "assertion": "mismatched-method:no-session",
+      "status": "PASS"
+    },
+    {
+      "assertion": "mismatched-method:http",
+      "status": "PASS"
+    },
+    {
+      "assertion": "mismatched-method:error-code",
+      "status": "PASS"
+    },
+    {
+      "assertion": "mismatched-method:rpc-id",
+      "status": "PASS"
+    },
+    {
+      "assertion": "mismatched-version:no-session",
+      "status": "PASS"
+    },
+    {
+      "assertion": "mismatched-version:http",
+      "status": "PASS"
+    },
+    {
+      "assertion": "mismatched-version:error-code",
+      "status": "PASS"
+    },
+    {
+      "assertion": "mismatched-version:rpc-id",
+      "status": "PASS"
+    },
+    {
+      "assertion": "missing-name-header:no-session",
+      "status": "PASS"
+    },
+    {
+      "assertion": "missing-name-header:http",
+      "status": "PASS"
+    },
+    {
+      "assertion": "missing-name-header:error-code",
+      "status": "PASS"
+    },
+    {
+      "assertion": "missing-name-header:rpc-id",
+      "status": "PASS"
+    },
+    {
+      "assertion": "mismatched-name:no-session",
+      "status": "PASS"
+    },
+    {
+      "assertion": "mismatched-name:http",
+      "status": "PASS"
+    },
+    {
+      "assertion": "mismatched-name:error-code",
+      "status": "PASS"
+    },
+    {
+      "assertion": "mismatched-name:rpc-id",
+      "status": "PASS"
+    },
+    {
+      "assertion": "encoded-name:no-session",
+      "status": "PASS"
+    },
+    {
+      "assertion": "encoded-name:json-response",
+      "status": "PASS"
+    },
+    {
+      "assertion": "encoded-name:rpc-id",
+      "status": "PASS"
+    },
+    {
+      "assertion": "encoded-name:complete",
+      "status": "PASS"
+    },
+    {
+      "assertion": "rejections:no-later-domain-effect",
+      "status": "PASS"
+    },
+    {
+      "assertion": "obsolete-session-ignored:no-session",
+      "status": "PASS"
+    },
+    {
+      "assertion": "obsolete-session-ignored:json-response",
+      "status": "PASS"
+    },
+    {
+      "assertion": "obsolete-session-ignored:rpc-id",
+      "status": "PASS"
+    },
+    {
+      "assertion": "obsolete-session-ignored:complete",
+      "status": "PASS"
+    },
+    {
+      "assertion": "client-info-optional:no-session",
+      "status": "PASS"
+    },
+    {
+      "assertion": "client-info-optional:json-response",
+      "status": "PASS"
+    },
+    {
+      "assertion": "client-info-optional:rpc-id",
+      "status": "PASS"
+    },
+    {
+      "assertion": "client-info-optional:complete",
+      "status": "PASS"
+    },
+    {
+      "assertion": "missing-body-meta:no-session",
+      "status": "PASS"
+    },
+    {
+      "assertion": "missing-body-meta:http",
+      "status": "PASS"
+    },
+    {
+      "assertion": "missing-client-capabilities:no-session",
+      "status": "PASS"
+    },
+    {
+      "assertion": "missing-client-capabilities:http",
+      "status": "PASS"
+    },
+    {
+      "assertion": "wrong-content-type:no-session",
+      "status": "PASS"
+    },
+    {
+      "assertion": "wrong-content-type:http",
+      "status": "PASS"
+    },
+    {
+      "assertion": "missing-accept:no-session",
+      "status": "PASS"
+    },
+    {
+      "assertion": "missing-accept:http",
+      "status": "PASS"
+    },
+    {
+      "assertion": "malformed-json:no-session",
+      "status": "PASS"
+    },
+    {
+      "assertion": "malformed-json:http",
+      "status": "PASS"
+    },
+    {
+      "assertion": "batch-rejected:no-session",
+      "status": "PASS"
+    },
+    {
+      "assertion": "batch-rejected:http",
+      "status": "PASS"
+    }
+  ],
+  "transcript": [
+    {
+      "case": "discover",
+      "request": {
+        "httpMethod": "POST",
+        "url": "http://localhost:8080/mcp",
+        "headers": {
+          "Content-Type": "application/json",
+          "Accept": "application/json, text/event-stream",
+          "MCP-Protocol-Version": "2026-07-28",
+          "Mcp-Method": "server/discover",
+          "Authorization": "[REDACTED_SECRET]"
+        },
+        "body": {
+          "jsonrpc": "2.0",
+          "id": "41a2929a-3ac9-4138-8fa6-919ac0969811",
+          "method": "server/discover",
+          "params": {
+            "_meta": {
+              "io.modelcontextprotocol/protocolVersion": "2026-07-28",
+              "io.modelcontextprotocol/clientInfo": {
+                "name": "mulino-s0-wire-probe",
+                "version": "1.0.0"
+              },
+              "io.modelcontextprotocol/clientCapabilities": {}
+            }
+          }
+        },
+        "rawBody": "{\"jsonrpc\":\"2.0\",\"id\":\"41a2929a-3ac9-4138-8fa6-919ac0969811\",\"method\":\"server/discover\",\"params\":{\"_meta\":{\"io.modelcontextprotocol/protocolVersion\":\"2026-07-28\",\"io.modelcontextprotocol/clientInfo\":{\"name\":\"mulino-s0-wire-probe\",\"version\":\"1.0.0\"},\"io.modelcontextprotocol/clientCapabilities\":{}}}}"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "X-Content-Type-Options": "nosniff",
+          "X-XSS-Protection": "0",
+          "Cache-Control": "no-cache, no-store, max-age=0, must-revalidate",
+          "Pragma": "no-cache",
+          "Expires": "0",
+          "X-Frame-Options": "DENY",
+          "Content-Type": "application/json",
+          "Transfer-Encoding": "chunked",
+          "Date": "Wed, 07 Oct 2026 16:44:20 GMT",
+          "Connection": "close"
+        },
+        "rawBody": "{\"jsonrpc\":\"2.0\",\"id\":\"41a2929a-3ac9-4138-8fa6-919ac0969811\",\"result\":{\"capabilities\":{\"tools\":{}},\"supportedVersions\":[\"2026-07-28\"],\"_meta\":{\"io.modelcontextprotocol/serverInfo\":{\"name\":\"mulino-platform-s0\",\"version\":\"0.1.0\"}},\"resultType\":\"complete\"}}",
+        "body": {
+          "jsonrpc": "2.0",
+          "id": "41a2929a-3ac9-4138-8fa6-919ac0969811",
+          "result": {
+            "capabilities": {
+              "tools": {}
+            },
+            "supportedVersions": [
+              "2026-07-28"
+            ],
+            "_meta": {
+              "io.modelcontextprotocol/serverInfo": {
+                "name": "mulino-platform-s0",
+                "version": "0.1.0"
+              }
+            },
+            "resultType": "complete"
+          }
+        }
+      }
+    },
+    {
+      "case": "list",
+      "request": {
+        "httpMethod": "POST",
+        "url": "http://localhost:8080/mcp",
+        "headers": {
+          "Content-Type": "application/json",
+          "Accept": "application/json, text/event-stream",
+          "MCP-Protocol-Version": "2026-07-28",
+          "Mcp-Method": "tools/list",
+          "Authorization": "[REDACTED_SECRET]"
+        },
+        "body": {
+          "jsonrpc": "2.0",
+          "id": "45f3af4b-e531-40d3-a34f-4be31a4fc1d5",
+          "method": "tools/list",
+          "params": {
+            "_meta": {
+              "io.modelcontextprotocol/protocolVersion": "2026-07-28",
+              "io.modelcontextprotocol/clientInfo": {
+                "name": "mulino-s0-wire-probe",
+                "version": "1.0.0"
+              },
+              "io.modelcontextprotocol/clientCapabilities": {}
+            }
+          }
+        },
+        "rawBody": "{\"jsonrpc\":\"2.0\",\"id\":\"45f3af4b-e531-40d3-a34f-4be31a4fc1d5\",\"method\":\"tools/list\",\"params\":{\"_meta\":{\"io.modelcontextprotocol/protocolVersion\":\"2026-07-28\",\"io.modelcontextprotocol/clientInfo\":{\"name\":\"mulino-s0-wire-probe\",\"version\":\"1.0.0\"},\"io.modelcontextprotocol/clientCapabilities\":{}}}}"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "X-Content-Type-Options": "nosniff",
+          "X-XSS-Protection": "0",
+          "Cache-Control": "no-cache, no-store, max-age=0, must-revalidate",
+          "Pragma": "no-cache",
+          "Expires": "0",
+          "X-Frame-Options": "DENY",
+          "Content-Type": "application/json",
+          "Transfer-Encoding": "chunked",
+          "Date": "Wed, 07 Oct 2026 16:44:20 GMT",
+          "Connection": "close"
+        },
+        "rawBody": "{\"jsonrpc\":\"2.0\",\"id\":\"45f3af4b-e531-40d3-a34f-4be31a4fc1d5\",\"result\":{\"tools\":[{\"description\":\"S0 isolated platform proof\",\"inputSchema\":{\"required\":[\"scopeId\"],\"additionalProperties\":false,\"properties\":{\"scopeId\":{\"format\":\"uuid\",\"type\":\"string\"}},\"type\":\"object\"},\"name\":\"platform.readScope\"},{\"description\":\"S0 isolated platform proof\",\"inputSchema\":{\"required\":[\"scopeId\",\"quantity\",\"expectedRevision\",\"idempotencyKey\"],\"additionalProperties\":false,\"properties\":{\"scopeId\":{\"format\":\"uuid\",\"type\":\"string\"},\"quantity\":{\"type\":\"string\"},\"expectedRevision\":{\"type\":\"integer\"},\"idempotencyKey\":{\"type\":\"string\"}},\"type\":\"object\"},\"name\":\"platform.reserve\"}],\"resultType\":\"complete\"}}",
+        "body": {
+          "jsonrpc": "2.0",
+          "id": "45f3af4b-e531-40d3-a34f-4be31a4fc1d5",
+          "result": {
+            "tools": [
+              {
+                "description": "S0 isolated platform proof",
+                "inputSchema": {
+                  "required": [
+                    "scopeId"
+                  ],
+                  "additionalProperties": false,
+                  "properties": {
+                    "scopeId": {
+                      "format": "uuid",
+                      "type": "string"
+                    }
+                  },
+                  "type": "object"
+                },
+                "name": "platform.readScope"
+              },
+              {
+                "description": "S0 isolated platform proof",
+                "inputSchema": {
+                  "required": [
+                    "scopeId",
+                    "quantity",
+                    "expectedRevision",
+                    "idempotencyKey"
+                  ],
+                  "additionalProperties": false,
+                  "properties": {
+                    "scopeId": {
+                      "format": "uuid",
+                      "type": "string"
+                    },
+                    "quantity": {
+                      "type": "string"
+                    },
+                    "expectedRevision": {
+                      "type": "integer"
+                    },
+                    "idempotencyKey": {
+                      "type": "string"
+                    }
+                  },
+                  "type": "object"
+                },
+                "name": "platform.reserve"
+              }
+            ],
+            "resultType": "complete"
+          }
+        }
+      }
+    },
+    {
+      "case": "read-before",
+      "request": {
+        "httpMethod": "POST",
+        "url": "http://localhost:8080/mcp",
+        "headers": {
+          "Content-Type": "application/json",
+          "Accept": "application/json, text/event-stream",
+          "MCP-Protocol-Version": "2026-07-28",
+          "Mcp-Method": "tools/call",
+          "Mcp-Name": "platform.readScope",
+          "Authorization": "[REDACTED_SECRET]"
+        },
+        "body": {
+          "jsonrpc": "2.0",
+          "id": "5b6cf32f-a224-43d2-a46e-7a2e99ab8fa1",
+          "method": "tools/call",
+          "params": {
+            "name": "platform.readScope",
+            "arguments": {
+              "scopeId": "00000000-0000-0000-0000-000000000001"
+            },
+            "_meta": {
+              "io.modelcontextprotocol/protocolVersion": "2026-07-28",
+              "io.modelcontextprotocol/clientInfo": {
+                "name": "mulino-s0-wire-probe",
+                "version": "1.0.0"
+              },
+              "io.modelcontextprotocol/clientCapabilities": {}
+            }
+          }
+        },
+        "rawBody": "{\"jsonrpc\":\"2.0\",\"id\":\"5b6cf32f-a224-43d2-a46e-7a2e99ab8fa1\",\"method\":\"tools/call\",\"params\":{\"name\":\"platform.readScope\",\"arguments\":{\"scopeId\":\"00000000-0000-0000-0000-000000000001\"},\"_meta\":{\"io.modelcontextprotocol/protocolVersion\":\"2026-07-28\",\"io.modelcontextprotocol/clientInfo\":{\"name\":\"mulino-s0-wire-probe\",\"version\":\"1.0.0\"},\"io.modelcontextprotocol/clientCapabilities\":{}}}}"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "X-Content-Type-Options": "nosniff",
+          "X-XSS-Protection": "0",
+          "Cache-Control": "no-cache, no-store, max-age=0, must-revalidate",
+          "Pragma": "no-cache",
+          "Expires": "0",
+          "X-Frame-Options": "DENY",
+          "Content-Type": "application/json",
+          "Transfer-Encoding": "chunked",
+          "Date": "Wed, 07 Oct 2026 16:44:20 GMT",
+          "Connection": "close"
+        },
+        "rawBody": "{\"jsonrpc\":\"2.0\",\"id\":\"5b6cf32f-a224-43d2-a46e-7a2e99ab8fa1\",\"result\":{\"isError\":false,\"content\":[{\"type\":\"text\",\"text\":\"{organizationId=org-a, ID=00000000-0000-0000-0000-000000000001, quantity=60.000000000000, blocked=false, reserved=1.000000000000, revision=1}\"}],\"structuredContent\":{\"organizationId\":\"org-a\",\"ID\":\"00000000-0000-0000-0000-000000000001\",\"quantity\":60.000000000000,\"blocked\":false,\"reserved\":1.000000000000,\"revision\":1},\"resultType\":\"complete\"}}",
+        "body": {
+          "jsonrpc": "2.0",
+          "id": "5b6cf32f-a224-43d2-a46e-7a2e99ab8fa1",
+          "result": {
+            "isError": false,
+            "content": [
+              {
+                "type": "text",
+                "text": "{organizationId=org-a, ID=00000000-0000-0000-0000-000000000001, quantity=60.000000000000, blocked=false, reserved=1.000000000000, revision=1}"
+              }
+            ],
+            "structuredContent": {
+              "organizationId": "org-a",
+              "ID": "00000000-0000-0000-0000-000000000001",
+              "quantity": 60.0,
+              "blocked": false,
+              "reserved": 1.0,
+              "revision": 1
+            },
+            "resultType": "complete"
+          }
+        }
+      }
+    },
+    {
+      "case": "reserve",
+      "request": {
+        "httpMethod": "POST",
+        "url": "http://localhost:8080/mcp",
+        "headers": {
+          "Content-Type": "application/json",
+          "Accept": "application/json, text/event-stream",
+          "MCP-Protocol-Version": "2026-07-28",
+          "Mcp-Method": "tools/call",
+          "Mcp-Name": "platform.reserve",
+          "Authorization": "[REDACTED_SECRET]"
+        },
+        "body": {
+          "jsonrpc": "2.0",
+          "id": "5581c7b9-3208-4b78-b93e-722e0860582f",
+          "method": "tools/call",
+          "params": {
+            "name": "platform.reserve",
+            "arguments": {
+              "scopeId": "00000000-0000-0000-0000-000000000001",
+              "quantity": "1",
+              "expectedRevision": 1,
+              "idempotencyKey": "s0-wire-ae9396b7-f7e9-488c-bbaa-f15caca252a0"
+            },
+            "_meta": {
+              "io.modelcontextprotocol/protocolVersion": "2026-07-28",
+              "io.modelcontextprotocol/clientInfo": {
+                "name": "mulino-s0-wire-probe",
+                "version": "1.0.0"
+              },
+              "io.modelcontextprotocol/clientCapabilities": {}
+            }
+          }
+        },
+        "rawBody": "{\"jsonrpc\":\"2.0\",\"id\":\"5581c7b9-3208-4b78-b93e-722e0860582f\",\"method\":\"tools/call\",\"params\":{\"name\":\"platform.reserve\",\"arguments\":{\"scopeId\":\"00000000-0000-0000-0000-000000000001\",\"quantity\":\"1\",\"expectedRevision\":1,\"idempotencyKey\":\"s0-wire-ae9396b7-f7e9-488c-bbaa-f15caca252a0\"},\"_meta\":{\"io.modelcontextprotocol/protocolVersion\":\"2026-07-28\",\"io.modelcontextprotocol/clientInfo\":{\"name\":\"mulino-s0-wire-probe\",\"version\":\"1.0.0\"},\"io.modelcontextprotocol/clientCapabilities\":{}}}}"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "X-Content-Type-Options": "nosniff",
+          "X-XSS-Protection": "0",
+          "Cache-Control": "no-cache, no-store, max-age=0, must-revalidate",
+          "Pragma": "no-cache",
+          "Expires": "0",
+          "X-Frame-Options": "DENY",
+          "Content-Type": "application/json",
+          "Transfer-Encoding": "chunked",
+          "Date": "Wed, 07 Oct 2026 16:44:20 GMT",
+          "Connection": "close"
+        },
+        "rawBody": "{\"jsonrpc\":\"2.0\",\"id\":\"5581c7b9-3208-4b78-b93e-722e0860582f\",\"result\":{\"isError\":false,\"content\":[{\"type\":\"text\",\"text\":\"{reserved=2.000000000000, operationId=077c4c96-d554-4303-94d5-03f1ec3b6e33, revision=2, outcome=ACCEPTED}\"}],\"structuredContent\":{\"reserved\":\"2.000000000000\",\"operationId\":\"077c4c96-d554-4303-94d5-03f1ec3b6e33\",\"revision\":2,\"outcome\":\"ACCEPTED\"},\"resultType\":\"complete\"}}",
+        "body": {
+          "jsonrpc": "2.0",
+          "id": "5581c7b9-3208-4b78-b93e-722e0860582f",
+          "result": {
+            "isError": false,
+            "content": [
+              {
+                "type": "text",
+                "text": "{reserved=2.000000000000, operationId=077c4c96-d554-4303-94d5-03f1ec3b6e33, revision=2, outcome=ACCEPTED}"
+              }
+            ],
+            "structuredContent": {
+              "reserved": "2.000000000000",
+              "operationId": "077c4c96-d554-4303-94d5-03f1ec3b6e33",
+              "revision": 2,
+              "outcome": "ACCEPTED"
+            },
+            "resultType": "complete"
+          }
+        }
+      }
+    },
+    {
+      "case": "reserve-retry-fresh-rpc-id",
+      "request": {
+        "httpMethod": "POST",
+        "url": "http://localhost:8080/mcp",
+        "headers": {
+          "Content-Type": "application/json",
+          "Accept": "application/json, text/event-stream",
+          "MCP-Protocol-Version": "2026-07-28",
+          "Mcp-Method": "tools/call",
+          "Mcp-Name": "platform.reserve",
+          "Authorization": "[REDACTED_SECRET]"
+        },
+        "body": {
+          "jsonrpc": "2.0",
+          "id": "29a22315-74d5-4be7-b8b6-82d8a5f386cb",
+          "method": "tools/call",
+          "params": {
+            "name": "platform.reserve",
+            "arguments": {
+              "scopeId": "00000000-0000-0000-0000-000000000001",
+              "quantity": "1",
+              "expectedRevision": 1,
+              "idempotencyKey": "s0-wire-ae9396b7-f7e9-488c-bbaa-f15caca252a0"
+            },
+            "_meta": {
+              "io.modelcontextprotocol/protocolVersion": "2026-07-28",
+              "io.modelcontextprotocol/clientInfo": {
+                "name": "mulino-s0-wire-probe",
+                "version": "1.0.0"
+              },
+              "io.modelcontextprotocol/clientCapabilities": {}
+            }
+          }
+        },
+        "rawBody": "{\"jsonrpc\":\"2.0\",\"id\":\"29a22315-74d5-4be7-b8b6-82d8a5f386cb\",\"method\":\"tools/call\",\"params\":{\"name\":\"platform.reserve\",\"arguments\":{\"scopeId\":\"00000000-0000-0000-0000-000000000001\",\"quantity\":\"1\",\"expectedRevision\":1,\"idempotencyKey\":\"s0-wire-ae9396b7-f7e9-488c-bbaa-f15caca252a0\"},\"_meta\":{\"io.modelcontextprotocol/protocolVersion\":\"2026-07-28\",\"io.modelcontextprotocol/clientInfo\":{\"name\":\"mulino-s0-wire-probe\",\"version\":\"1.0.0\"},\"io.modelcontextprotocol/clientCapabilities\":{}}}}"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "X-Content-Type-Options": "nosniff",
+          "X-XSS-Protection": "0",
+          "Cache-Control": "no-cache, no-store, max-age=0, must-revalidate",
+          "Pragma": "no-cache",
+          "Expires": "0",
+          "X-Frame-Options": "DENY",
+          "Content-Type": "application/json",
+          "Transfer-Encoding": "chunked",
+          "Date": "Wed, 07 Oct 2026 16:44:20 GMT",
+          "Connection": "close"
+        },
+        "rawBody": "{\"jsonrpc\":\"2.0\",\"id\":\"29a22315-74d5-4be7-b8b6-82d8a5f386cb\",\"result\":{\"isError\":false,\"content\":[{\"type\":\"text\",\"text\":\"{reserved=2.000000000000, operationId=077c4c96-d554-4303-94d5-03f1ec3b6e33, revision=2, outcome=ACCEPTED}\"}],\"structuredContent\":{\"reserved\":\"2.000000000000\",\"operationId\":\"077c4c96-d554-4303-94d5-03f1ec3b6e33\",\"revision\":2,\"outcome\":\"ACCEPTED\"},\"resultType\":\"complete\"}}",
+        "body": {
+          "jsonrpc": "2.0",
+          "id": "29a22315-74d5-4be7-b8b6-82d8a5f386cb",
+          "result": {
+            "isError": false,
+            "content": [
+              {
+                "type": "text",
+                "text": "{reserved=2.000000000000, operationId=077c4c96-d554-4303-94d5-03f1ec3b6e33, revision=2, outcome=ACCEPTED}"
+              }
+            ],
+            "structuredContent": {
+              "reserved": "2.000000000000",
+              "operationId": "077c4c96-d554-4303-94d5-03f1ec3b6e33",
+              "revision": 2,
+              "outcome": "ACCEPTED"
+            },
+            "resultType": "complete"
+          }
+        }
+      }
+    },
+    {
+      "case": "read-after",
+      "request": {
+        "httpMethod": "POST",
+        "url": "http://localhost:8080/mcp",
+        "headers": {
+          "Content-Type": "application/json",
+          "Accept": "application/json, text/event-stream",
+          "MCP-Protocol-Version": "2026-07-28",
+          "Mcp-Method": "tools/call",
+          "Mcp-Name": "platform.readScope",
+          "Authorization": "[REDACTED_SECRET]"
+        },
+        "body": {
+          "jsonrpc": "2.0",
+          "id": "16fbaa23-16a6-4e22-a6c0-f1b47ee6786a",
+          "method": "tools/call",
+          "params": {
+            "name": "platform.readScope",
+            "arguments": {
+              "scopeId": "00000000-0000-0000-0000-000000000001"
+            },
+            "_meta": {
+              "io.modelcontextprotocol/protocolVersion": "2026-07-28",
+              "io.modelcontextprotocol/clientInfo": {
+                "name": "mulino-s0-wire-probe",
+                "version": "1.0.0"
+              },
+              "io.modelcontextprotocol/clientCapabilities": {}
+            }
+          }
+        },
+        "rawBody": "{\"jsonrpc\":\"2.0\",\"id\":\"16fbaa23-16a6-4e22-a6c0-f1b47ee6786a\",\"method\":\"tools/call\",\"params\":{\"name\":\"platform.readScope\",\"arguments\":{\"scopeId\":\"00000000-0000-0000-0000-000000000001\"},\"_meta\":{\"io.modelcontextprotocol/protocolVersion\":\"2026-07-28\",\"io.modelcontextprotocol/clientInfo\":{\"name\":\"mulino-s0-wire-probe\",\"version\":\"1.0.0\"},\"io.modelcontextprotocol/clientCapabilities\":{}}}}"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "X-Content-Type-Options": "nosniff",
+          "X-XSS-Protection": "0",
+          "Cache-Control": "no-cache, no-store, max-age=0, must-revalidate",
+          "Pragma": "no-cache",
+          "Expires": "0",
+          "X-Frame-Options": "DENY",
+          "Content-Type": "application/json",
+          "Transfer-Encoding": "chunked",
+          "Date": "Wed, 07 Oct 2026 16:44:20 GMT",
+          "Connection": "close"
+        },
+        "rawBody": "{\"jsonrpc\":\"2.0\",\"id\":\"16fbaa23-16a6-4e22-a6c0-f1b47ee6786a\",\"result\":{\"isError\":false,\"content\":[{\"type\":\"text\",\"text\":\"{organizationId=org-a, ID=00000000-0000-0000-0000-000000000001, quantity=60.000000000000, blocked=false, reserved=2.000000000000, revision=2}\"}],\"structuredContent\":{\"organizationId\":\"org-a\",\"ID\":\"00000000-0000-0000-0000-000000000001\",\"quantity\":60.000000000000,\"blocked\":false,\"reserved\":2.000000000000,\"revision\":2},\"resultType\":\"complete\"}}",
+        "body": {
+          "jsonrpc": "2.0",
+          "id": "16fbaa23-16a6-4e22-a6c0-f1b47ee6786a",
+          "result": {
+            "isError": false,
+            "content": [
+              {
+                "type": "text",
+                "text": "{organizationId=org-a, ID=00000000-0000-0000-0000-000000000001, quantity=60.000000000000, blocked=false, reserved=2.000000000000, revision=2}"
+              }
+            ],
+            "structuredContent": {
+              "organizationId": "org-a",
+              "ID": "00000000-0000-0000-0000-000000000001",
+              "quantity": 60.0,
+              "blocked": false,
+              "reserved": 2.0,
+              "revision": 2
+            },
+            "resultType": "complete"
+          }
+        }
+      }
+    },
+    {
+      "case": "same-key-different-intent",
+      "request": {
+        "httpMethod": "POST",
+        "url": "http://localhost:8080/mcp",
+        "headers": {
+          "Content-Type": "application/json",
+          "Accept": "application/json, text/event-stream",
+          "MCP-Protocol-Version": "2026-07-28",
+          "Mcp-Method": "tools/call",
+          "Mcp-Name": "platform.reserve",
+          "Authorization": "[REDACTED_SECRET]"
+        },
+        "body": {
+          "jsonrpc": "2.0",
+          "id": "37d8e5bb-5616-46d5-a416-50c541e8c06b",
+          "method": "tools/call",
+          "params": {
+            "name": "platform.reserve",
+            "arguments": {
+              "scopeId": "00000000-0000-0000-0000-000000000001",
+              "quantity": "2",
+              "expectedRevision": 1,
+              "idempotencyKey": "s0-wire-ae9396b7-f7e9-488c-bbaa-f15caca252a0"
+            },
+            "_meta": {
+              "io.modelcontextprotocol/protocolVersion": "2026-07-28",
+              "io.modelcontextprotocol/clientInfo": {
+                "name": "mulino-s0-wire-probe",
+                "version": "1.0.0"
+              },
+              "io.modelcontextprotocol/clientCapabilities": {}
+            }
+          }
+        },
+        "rawBody": "{\"jsonrpc\":\"2.0\",\"id\":\"37d8e5bb-5616-46d5-a416-50c541e8c06b\",\"method\":\"tools/call\",\"params\":{\"name\":\"platform.reserve\",\"arguments\":{\"scopeId\":\"00000000-0000-0000-0000-000000000001\",\"quantity\":\"2\",\"expectedRevision\":1,\"idempotencyKey\":\"s0-wire-ae9396b7-f7e9-488c-bbaa-f15caca252a0\"},\"_meta\":{\"io.modelcontextprotocol/protocolVersion\":\"2026-07-28\",\"io.modelcontextprotocol/clientInfo\":{\"name\":\"mulino-s0-wire-probe\",\"version\":\"1.0.0\"},\"io.modelcontextprotocol/clientCapabilities\":{}}}}"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "X-Content-Type-Options": "nosniff",
+          "X-XSS-Protection": "0",
+          "Cache-Control": "no-cache, no-store, max-age=0, must-revalidate",
+          "Pragma": "no-cache",
+          "Expires": "0",
+          "X-Frame-Options": "DENY",
+          "Content-Type": "application/json",
+          "Transfer-Encoding": "chunked",
+          "Date": "Wed, 07 Oct 2026 16:44:20 GMT",
+          "Connection": "close"
+        },
+        "rawBody": "{\"jsonrpc\":\"2.0\",\"id\":\"37d8e5bb-5616-46d5-a416-50c541e8c06b\",\"result\":{\"isError\":true,\"content\":[{\"type\":\"text\",\"text\":\"IDEMPOTENCY_CONFLICT\"}],\"structuredContent\":{\"outcome\":\"IDEMPOTENCY_CONFLICT\"},\"resultType\":\"complete\"}}",
+        "body": {
+          "jsonrpc": "2.0",
+          "id": "37d8e5bb-5616-46d5-a416-50c541e8c06b",
+          "result": {
+            "isError": true,
+            "content": [
+              {
+                "type": "text",
+                "text": "IDEMPOTENCY_CONFLICT"
+              }
+            ],
+            "structuredContent": {
+              "outcome": "IDEMPOTENCY_CONFLICT"
+            },
+            "resultType": "complete"
+          }
+        }
+      }
+    },
+    {
+      "case": "missing-auth",
+      "request": {
+        "httpMethod": "POST",
+        "url": "http://localhost:8080/mcp",
+        "headers": {
+          "Content-Type": "application/json",
+          "Accept": "application/json, text/event-stream",
+          "MCP-Protocol-Version": "2026-07-28",
+          "Mcp-Method": "server/discover"
+        },
+        "body": {
+          "jsonrpc": "2.0",
+          "id": "c7952321-0b56-496a-b4e7-891da37a3c1a",
+          "method": "server/discover",
+          "params": {
+            "_meta": {
+              "io.modelcontextprotocol/protocolVersion": "2026-07-28",
+              "io.modelcontextprotocol/clientInfo": {
+                "name": "mulino-s0-wire-probe",
+                "version": "1.0.0"
+              },
+              "io.modelcontextprotocol/clientCapabilities": {}
+            }
+          }
+        },
+        "rawBody": "{\"jsonrpc\":\"2.0\",\"id\":\"c7952321-0b56-496a-b4e7-891da37a3c1a\",\"method\":\"server/discover\",\"params\":{\"_meta\":{\"io.modelcontextprotocol/protocolVersion\":\"2026-07-28\",\"io.modelcontextprotocol/clientInfo\":{\"name\":\"mulino-s0-wire-probe\",\"version\":\"1.0.0\"},\"io.modelcontextprotocol/clientCapabilities\":{}}}}"
+      },
+      "response": {
+        "status": 401,
+        "headers": {
+          "WWW-Authenticate": "Bearer resource_metadata=\"http://localhost:8080/.well-known/oauth-protected-resource\"",
+          "X-Content-Type-Options": "nosniff",
+          "X-XSS-Protection": "0",
+          "Cache-Control": "no-cache, no-store, max-age=0, must-revalidate",
+          "Pragma": "no-cache",
+          "Expires": "0",
+          "X-Frame-Options": "DENY",
+          "Content-Length": "0",
+          "Date": "Wed, 07 Oct 2026 16:44:20 GMT",
+          "Connection": "close"
+        },
+        "rawBody": "",
+        "body": null
+      }
+    },
+    {
+      "case": "foreign-origin",
+      "request": {
+        "httpMethod": "POST",
+        "url": "http://localhost:8080/mcp",
+        "headers": {
+          "Content-Type": "application/json",
+          "Accept": "application/json, text/event-stream",
+          "MCP-Protocol-Version": "2026-07-28",
+          "Mcp-Method": "server/discover",
+          "Origin": "https://attacker.invalid",
+          "Authorization": "[REDACTED_SECRET]"
+        },
+        "body": {
+          "jsonrpc": "2.0",
+          "id": "3b4d37d5-24be-44a5-8787-05d5a41a89d3",
+          "method": "server/discover",
+          "params": {
+            "_meta": {
+              "io.modelcontextprotocol/protocolVersion": "2026-07-28",
+              "io.modelcontextprotocol/clientInfo": {
+                "name": "mulino-s0-wire-probe",
+                "version": "1.0.0"
+              },
+              "io.modelcontextprotocol/clientCapabilities": {}
+            }
+          }
+        },
+        "rawBody": "{\"jsonrpc\":\"2.0\",\"id\":\"3b4d37d5-24be-44a5-8787-05d5a41a89d3\",\"method\":\"server/discover\",\"params\":{\"_meta\":{\"io.modelcontextprotocol/protocolVersion\":\"2026-07-28\",\"io.modelcontextprotocol/clientInfo\":{\"name\":\"mulino-s0-wire-probe\",\"version\":\"1.0.0\"},\"io.modelcontextprotocol/clientCapabilities\":{}}}}"
+      },
+      "response": {
+        "status": 403,
+        "headers": {
+          "X-Content-Type-Options": "nosniff",
+          "X-XSS-Protection": "0",
+          "Cache-Control": "no-cache, no-store, max-age=0, must-revalidate",
+          "Pragma": "no-cache",
+          "Expires": "0",
+          "X-Frame-Options": "DENY",
+          "Content-Type": "application/json",
+          "Transfer-Encoding": "chunked",
+          "Date": "Wed, 07 Oct 2026 16:44:20 GMT",
+          "Connection": "close"
+        },
+        "rawBody": "{\"jsonrpc\":\"2.0\",\"id\":\"3b4d37d5-24be-44a5-8787-05d5a41a89d3\",\"error\":{\"code\":-32020,\"data\":{},\"message\":\"Origin denied\"}}",
+        "body": {
+          "jsonrpc": "2.0",
+          "id": "3b4d37d5-24be-44a5-8787-05d5a41a89d3",
+          "error": {
+            "code": -32020,
+            "data": {},
+            "message": "Origin denied"
+          }
+        }
+      }
+    },
+    {
+      "case": "get-not-supported",
+      "request": {
+        "httpMethod": "GET",
+        "url": "http://localhost:8080/mcp",
+        "headers": {
+          "Content-Type": "application/json",
+          "Accept": "application/json, text/event-stream",
+          "MCP-Protocol-Version": "2026-07-28",
+          "Mcp-Method": "server/discover",
+          "Authorization": "[REDACTED_SECRET]"
+        },
+        "body": {
+          "jsonrpc": "2.0",
+          "id": "c96bfc4e-3428-42c1-8a9a-a67884ab366c",
+          "method": "server/discover",
+          "params": {
+            "_meta": {
+              "io.modelcontextprotocol/protocolVersion": "2026-07-28",
+              "io.modelcontextprotocol/clientInfo": {
+                "name": "mulino-s0-wire-probe",
+                "version": "1.0.0"
+              },
+              "io.modelcontextprotocol/clientCapabilities": {}
+            }
+          }
+        },
+        "rawBody": ""
+      },
+      "response": {
+        "status": 405,
+        "headers": {
+          "Allow": "POST",
+          "X-Content-Type-Options": "nosniff",
+          "X-XSS-Protection": "0",
+          "Cache-Control": "no-cache, no-store, max-age=0, must-revalidate",
+          "Pragma": "no-cache",
+          "Expires": "0",
+          "X-Frame-Options": "DENY",
+          "Content-Type": "application/json",
+          "Transfer-Encoding": "chunked",
+          "Date": "Wed, 07 Oct 2026 16:44:20 GMT",
+          "Connection": "close"
+        },
+        "rawBody": "{\"timestamp\":\"2026-10-07T16:44:20.181Z\",\"status\":405,\"error\":\"Method Not Allowed\",\"path\":\"/mcp\"}",
+        "body": {
+          "timestamp": "2026-10-07T16:44:20.181Z",
+          "status": 405,
+          "error": "Method Not Allowed",
+          "path": "/mcp"
+        }
+      }
+    },
+    {
+      "case": "delete-not-supported",
+      "request": {
+        "httpMethod": "DELETE",
+        "url": "http://localhost:8080/mcp",
+        "headers": {
+          "Content-Type": "application/json",
+          "Accept": "application/json, text/event-stream",
+          "MCP-Protocol-Version": "2026-07-28",
+          "Mcp-Method": "server/discover",
+          "Authorization": "[REDACTED_SECRET]"
+        },
+        "body": {
+          "jsonrpc": "2.0",
+          "id": "75718e76-1961-40d1-a5ee-287d1fcab978",
+          "method": "server/discover",
+          "params": {
+            "_meta": {
+              "io.modelcontextprotocol/protocolVersion": "2026-07-28",
+              "io.modelcontextprotocol/clientInfo": {
+                "name": "mulino-s0-wire-probe",
+                "version": "1.0.0"
+              },
+              "io.modelcontextprotocol/clientCapabilities": {}
+            }
+          }
+        },
+        "rawBody": ""
+      },
+      "response": {
+        "status": 405,
+        "headers": {
+          "Allow": "POST",
+          "X-Content-Type-Options": "nosniff",
+          "X-XSS-Protection": "0",
+          "Cache-Control": "no-cache, no-store, max-age=0, must-revalidate",
+          "Pragma": "no-cache",
+          "Expires": "0",
+          "X-Frame-Options": "DENY",
+          "Content-Type": "application/json",
+          "Transfer-Encoding": "chunked",
+          "Date": "Wed, 07 Oct 2026 16:44:20 GMT",
+          "Connection": "close"
+        },
+        "rawBody": "{\"timestamp\":\"2026-10-07T16:44:20.183Z\",\"status\":405,\"error\":\"Method Not Allowed\",\"path\":\"/mcp\"}",
+        "body": {
+          "timestamp": "2026-10-07T16:44:20.183Z",
+          "status": 405,
+          "error": "Method Not Allowed",
+          "path": "/mcp"
+        }
+      }
+    },
+    {
+      "case": "unsupported-rpc",
+      "request": {
+        "httpMethod": "POST",
+        "url": "http://localhost:8080/mcp",
+        "headers": {
+          "Content-Type": "application/json",
+          "Accept": "application/json, text/event-stream",
+          "MCP-Protocol-Version": "2026-07-28",
+          "Mcp-Method": "mulino/unknown",
+          "Authorization": "[REDACTED_SECRET]"
+        },
+        "body": {
+          "jsonrpc": "2.0",
+          "id": "9056a515-d6e8-48f5-92be-c676267ede20",
+          "method": "mulino/unknown",
+          "params": {
+            "_meta": {
+              "io.modelcontextprotocol/protocolVersion": "2026-07-28",
+              "io.modelcontextprotocol/clientInfo": {
+                "name": "mulino-s0-wire-probe",
+                "version": "1.0.0"
+              },
+              "io.modelcontextprotocol/clientCapabilities": {}
+            }
+          }
+        },
+        "rawBody": "{\"jsonrpc\":\"2.0\",\"id\":\"9056a515-d6e8-48f5-92be-c676267ede20\",\"method\":\"mulino/unknown\",\"params\":{\"_meta\":{\"io.modelcontextprotocol/protocolVersion\":\"2026-07-28\",\"io.modelcontextprotocol/clientInfo\":{\"name\":\"mulino-s0-wire-probe\",\"version\":\"1.0.0\"},\"io.modelcontextprotocol/clientCapabilities\":{}}}}"
+      },
+      "response": {
+        "status": 404,
+        "headers": {
+          "X-Content-Type-Options": "nosniff",
+          "X-XSS-Protection": "0",
+          "Cache-Control": "no-cache, no-store, max-age=0, must-revalidate",
+          "Pragma": "no-cache",
+          "Expires": "0",
+          "X-Frame-Options": "DENY",
+          "Content-Type": "application/json",
+          "Transfer-Encoding": "chunked",
+          "Date": "Wed, 07 Oct 2026 16:44:20 GMT",
+          "Connection": "close"
+        },
+        "rawBody": "{\"jsonrpc\":\"2.0\",\"id\":\"9056a515-d6e8-48f5-92be-c676267ede20\",\"error\":{\"code\":-32601,\"data\":{},\"message\":\"Method not found\"}}",
+        "body": {
+          "jsonrpc": "2.0",
+          "id": "9056a515-d6e8-48f5-92be-c676267ede20",
+          "error": {
+            "code": -32601,
+            "data": {},
+            "message": "Method not found"
+          }
+        }
+      }
+    },
+    {
+      "case": "legacy-initialize-rejected",
+      "request": {
+        "httpMethod": "POST",
+        "url": "http://localhost:8080/mcp",
+        "headers": {
+          "Content-Type": "application/json",
+          "Accept": "application/json, text/event-stream",
+          "MCP-Protocol-Version": "2026-07-28",
+          "Mcp-Method": "initialize",
+          "Authorization": "[REDACTED_SECRET]"
+        },
+        "body": {
+          "jsonrpc": "2.0",
+          "id": "eabc7800-f66c-44ad-a2cb-cb1ba455762b",
+          "method": "initialize",
+          "params": {
+            "_meta": {
+              "io.modelcontextprotocol/protocolVersion": "2026-07-28",
+              "io.modelcontextprotocol/clientInfo": {
+                "name": "mulino-s0-wire-probe",
+                "version": "1.0.0"
+              },
+              "io.modelcontextprotocol/clientCapabilities": {}
+            }
+          }
+        },
+        "rawBody": "{\"jsonrpc\":\"2.0\",\"id\":\"eabc7800-f66c-44ad-a2cb-cb1ba455762b\",\"method\":\"initialize\",\"params\":{\"_meta\":{\"io.modelcontextprotocol/protocolVersion\":\"2026-07-28\",\"io.modelcontextprotocol/clientInfo\":{\"name\":\"mulino-s0-wire-probe\",\"version\":\"1.0.0\"},\"io.modelcontextprotocol/clientCapabilities\":{}}}}"
+      },
+      "response": {
+        "status": 404,
+        "headers": {
+          "X-Content-Type-Options": "nosniff",
+          "X-XSS-Protection": "0",
+          "Cache-Control": "no-cache, no-store, max-age=0, must-revalidate",
+          "Pragma": "no-cache",
+          "Expires": "0",
+          "X-Frame-Options": "DENY",
+          "Content-Type": "application/json",
+          "Transfer-Encoding": "chunked",
+          "Date": "Wed, 07 Oct 2026 16:44:20 GMT",
+          "Connection": "close"
+        },
+        "rawBody": "{\"jsonrpc\":\"2.0\",\"id\":\"eabc7800-f66c-44ad-a2cb-cb1ba455762b\",\"error\":{\"code\":-32601,\"data\":{},\"message\":\"Method not found\"}}",
+        "body": {
+          "jsonrpc": "2.0",
+          "id": "eabc7800-f66c-44ad-a2cb-cb1ba455762b",
+          "error": {
+            "code": -32601,
+            "data": {},
+            "message": "Method not found"
+          }
+        }
+      }
+    },
+    {
+      "case": "unsupported-version",
+      "request": {
+        "httpMethod": "POST",
+        "url": "http://localhost:8080/mcp",
+        "headers": {
+          "Content-Type": "application/json",
+          "Accept": "application/json, text/event-stream",
+          "MCP-Protocol-Version": "1900-01-01",
+          "Mcp-Method": "server/discover",
+          "Authorization": "[REDACTED_SECRET]"
+        },
+        "body": {
+          "jsonrpc": "2.0",
+          "id": "e7d3121c-1e4b-4edb-b250-6630a09fb55c",
+          "method": "server/discover",
+          "params": {
+            "_meta": {
+              "io.modelcontextprotocol/protocolVersion": "1900-01-01",
+              "io.modelcontextprotocol/clientInfo": {
+                "name": "mulino-s0-wire-probe",
+                "version": "1.0.0"
+              },
+              "io.modelcontextprotocol/clientCapabilities": {}
+            }
+          }
+        },
+        "rawBody": "{\"jsonrpc\":\"2.0\",\"id\":\"e7d3121c-1e4b-4edb-b250-6630a09fb55c\",\"method\":\"server/discover\",\"params\":{\"_meta\":{\"io.modelcontextprotocol/protocolVersion\":\"1900-01-01\",\"io.modelcontextprotocol/clientInfo\":{\"name\":\"mulino-s0-wire-probe\",\"version\":\"1.0.0\"},\"io.modelcontextprotocol/clientCapabilities\":{}}}}"
+      },
+      "response": {
+        "status": 400,
+        "headers": {
+          "X-Content-Type-Options": "nosniff",
+          "X-XSS-Protection": "0",
+          "Cache-Control": "no-cache, no-store, max-age=0, must-revalidate",
+          "Pragma": "no-cache",
+          "Expires": "0",
+          "X-Frame-Options": "DENY",
+          "Content-Type": "application/json",
+          "Transfer-Encoding": "chunked",
+          "Date": "Wed, 07 Oct 2026 16:44:20 GMT",
+          "Connection": "close"
+        },
+        "rawBody": "{\"jsonrpc\":\"2.0\",\"id\":\"e7d3121c-1e4b-4edb-b250-6630a09fb55c\",\"error\":{\"code\":-32022,\"data\":{\"requested\":\"1900-01-01\",\"supported\":[\"2026-07-28\"]},\"message\":\"UnsupportedProtocolVersion\"}}",
+        "body": {
+          "jsonrpc": "2.0",
+          "id": "e7d3121c-1e4b-4edb-b250-6630a09fb55c",
+          "error": {
+            "code": -32022,
+            "data": {
+              "requested": "1900-01-01",
+              "supported": [
+                "2026-07-28"
+              ]
+            },
+            "message": "UnsupportedProtocolVersion"
+          }
+        }
+      }
+    },
+    {
+      "case": "missing-version-header",
+      "request": {
+        "httpMethod": "POST",
+        "url": "http://localhost:8080/mcp",
+        "headers": {
+          "Content-Type": "application/json",
+          "Accept": "application/json, text/event-stream",
+          "Mcp-Method": "server/discover",
+          "Authorization": "[REDACTED_SECRET]"
+        },
+        "body": {
+          "jsonrpc": "2.0",
+          "id": "f833fa93-36da-4647-891c-77b2321c781c",
+          "method": "server/discover",
+          "params": {
+            "_meta": {
+              "io.modelcontextprotocol/protocolVersion": "2026-07-28",
+              "io.modelcontextprotocol/clientInfo": {
+                "name": "mulino-s0-wire-probe",
+                "version": "1.0.0"
+              },
+              "io.modelcontextprotocol/clientCapabilities": {}
+            }
+          }
+        },
+        "rawBody": "{\"jsonrpc\":\"2.0\",\"id\":\"f833fa93-36da-4647-891c-77b2321c781c\",\"method\":\"server/discover\",\"params\":{\"_meta\":{\"io.modelcontextprotocol/protocolVersion\":\"2026-07-28\",\"io.modelcontextprotocol/clientInfo\":{\"name\":\"mulino-s0-wire-probe\",\"version\":\"1.0.0\"},\"io.modelcontextprotocol/clientCapabilities\":{}}}}"
+      },
+      "response": {
+        "status": 400,
+        "headers": {
+          "X-Content-Type-Options": "nosniff",
+          "X-XSS-Protection": "0",
+          "Cache-Control": "no-cache, no-store, max-age=0, must-revalidate",
+          "Pragma": "no-cache",
+          "Expires": "0",
+          "X-Frame-Options": "DENY",
+          "Content-Type": "application/json",
+          "Transfer-Encoding": "chunked",
+          "Date": "Wed, 07 Oct 2026 16:44:20 GMT",
+          "Connection": "close"
+        },
+        "rawBody": "{\"jsonrpc\":\"2.0\",\"id\":\"f833fa93-36da-4647-891c-77b2321c781c\",\"error\":{\"code\":-32020,\"data\":{},\"message\":\"HeaderMismatch\"}}",
+        "body": {
+          "jsonrpc": "2.0",
+          "id": "f833fa93-36da-4647-891c-77b2321c781c",
+          "error": {
+            "code": -32020,
+            "data": {},
+            "message": "HeaderMismatch"
+          }
+        }
+      }
+    },
+    {
+      "case": "missing-method-header",
+      "request": {
+        "httpMethod": "POST",
+        "url": "http://localhost:8080/mcp",
+        "headers": {
+          "Content-Type": "application/json",
+          "Accept": "application/json, text/event-stream",
+          "MCP-Protocol-Version": "2026-07-28",
+          "Authorization": "[REDACTED_SECRET]"
+        },
+        "body": {
+          "jsonrpc": "2.0",
+          "id": "beff07e2-53f3-44b1-b79b-fa8ed3f55e5d",
+          "method": "server/discover",
+          "params": {
+            "_meta": {
+              "io.modelcontextprotocol/protocolVersion": "2026-07-28",
+              "io.modelcontextprotocol/clientInfo": {
+                "name": "mulino-s0-wire-probe",
+                "version": "1.0.0"
+              },
+              "io.modelcontextprotocol/clientCapabilities": {}
+            }
+          }
+        },
+        "rawBody": "{\"jsonrpc\":\"2.0\",\"id\":\"beff07e2-53f3-44b1-b79b-fa8ed3f55e5d\",\"method\":\"server/discover\",\"params\":{\"_meta\":{\"io.modelcontextprotocol/protocolVersion\":\"2026-07-28\",\"io.modelcontextprotocol/clientInfo\":{\"name\":\"mulino-s0-wire-probe\",\"version\":\"1.0.0\"},\"io.modelcontextprotocol/clientCapabilities\":{}}}}"
+      },
+      "response": {
+        "status": 400,
+        "headers": {
+          "X-Content-Type-Options": "nosniff",
+          "X-XSS-Protection": "0",
+          "Cache-Control": "no-cache, no-store, max-age=0, must-revalidate",
+          "Pragma": "no-cache",
+          "Expires": "0",
+          "X-Frame-Options": "DENY",
+          "Content-Type": "application/json",
+          "Transfer-Encoding": "chunked",
+          "Date": "Wed, 07 Oct 2026 16:44:20 GMT",
+          "Connection": "close"
+        },
+        "rawBody": "{\"jsonrpc\":\"2.0\",\"id\":\"beff07e2-53f3-44b1-b79b-fa8ed3f55e5d\",\"error\":{\"code\":-32020,\"data\":{},\"message\":\"HeaderMismatch\"}}",
+        "body": {
+          "jsonrpc": "2.0",
+          "id": "beff07e2-53f3-44b1-b79b-fa8ed3f55e5d",
+          "error": {
+            "code": -32020,
+            "data": {},
+            "message": "HeaderMismatch"
+          }
+        }
+      }
+    },
+    {
+      "case": "mismatched-method",
+      "request": {
+        "httpMethod": "POST",
+        "url": "http://localhost:8080/mcp",
+        "headers": {
+          "Content-Type": "application/json",
+          "Accept": "application/json, text/event-stream",
+          "MCP-Protocol-Version": "2026-07-28",
+          "Mcp-Method": "tools/list",
+          "Authorization": "[REDACTED_SECRET]"
+        },
+        "body": {
+          "jsonrpc": "2.0",
+          "id": "917aa66e-34a4-4624-9f90-245283ed82e2",
+          "method": "server/discover",
+          "params": {
+            "_meta": {
+              "io.modelcontextprotocol/protocolVersion": "2026-07-28",
+              "io.modelcontextprotocol/clientInfo": {
+                "name": "mulino-s0-wire-probe",
+                "version": "1.0.0"
+              },
+              "io.modelcontextprotocol/clientCapabilities": {}
+            }
+          }
+        },
+        "rawBody": "{\"jsonrpc\":\"2.0\",\"id\":\"917aa66e-34a4-4624-9f90-245283ed82e2\",\"method\":\"server/discover\",\"params\":{\"_meta\":{\"io.modelcontextprotocol/protocolVersion\":\"2026-07-28\",\"io.modelcontextprotocol/clientInfo\":{\"name\":\"mulino-s0-wire-probe\",\"version\":\"1.0.0\"},\"io.modelcontextprotocol/clientCapabilities\":{}}}}"
+      },
+      "response": {
+        "status": 400,
+        "headers": {
+          "X-Content-Type-Options": "nosniff",
+          "X-XSS-Protection": "0",
+          "Cache-Control": "no-cache, no-store, max-age=0, must-revalidate",
+          "Pragma": "no-cache",
+          "Expires": "0",
+          "X-Frame-Options": "DENY",
+          "Content-Type": "application/json",
+          "Transfer-Encoding": "chunked",
+          "Date": "Wed, 07 Oct 2026 16:44:20 GMT",
+          "Connection": "close"
+        },
+        "rawBody": "{\"jsonrpc\":\"2.0\",\"id\":\"917aa66e-34a4-4624-9f90-245283ed82e2\",\"error\":{\"code\":-32020,\"data\":{},\"message\":\"HeaderMismatch\"}}",
+        "body": {
+          "jsonrpc": "2.0",
+          "id": "917aa66e-34a4-4624-9f90-245283ed82e2",
+          "error": {
+            "code": -32020,
+            "data": {},
+            "message": "HeaderMismatch"
+          }
+        }
+      }
+    },
+    {
+      "case": "mismatched-version",
+      "request": {
+        "httpMethod": "POST",
+        "url": "http://localhost:8080/mcp",
+        "headers": {
+          "Content-Type": "application/json",
+          "Accept": "application/json, text/event-stream",
+          "MCP-Protocol-Version": "2025-11-25",
+          "Mcp-Method": "server/discover",
+          "Authorization": "[REDACTED_SECRET]"
+        },
+        "body": {
+          "jsonrpc": "2.0",
+          "id": "45f0708a-6e81-413c-8f51-0a797735343c",
+          "method": "server/discover",
+          "params": {
+            "_meta": {
+              "io.modelcontextprotocol/protocolVersion": "2026-07-28",
+              "io.modelcontextprotocol/clientInfo": {
+                "name": "mulino-s0-wire-probe",
+                "version": "1.0.0"
+              },
+              "io.modelcontextprotocol/clientCapabilities": {}
+            }
+          }
+        },
+        "rawBody": "{\"jsonrpc\":\"2.0\",\"id\":\"45f0708a-6e81-413c-8f51-0a797735343c\",\"method\":\"server/discover\",\"params\":{\"_meta\":{\"io.modelcontextprotocol/protocolVersion\":\"2026-07-28\",\"io.modelcontextprotocol/clientInfo\":{\"name\":\"mulino-s0-wire-probe\",\"version\":\"1.0.0\"},\"io.modelcontextprotocol/clientCapabilities\":{}}}}"
+      },
+      "response": {
+        "status": 400,
+        "headers": {
+          "X-Content-Type-Options": "nosniff",
+          "X-XSS-Protection": "0",
+          "Cache-Control": "no-cache, no-store, max-age=0, must-revalidate",
+          "Pragma": "no-cache",
+          "Expires": "0",
+          "X-Frame-Options": "DENY",
+          "Content-Type": "application/json",
+          "Transfer-Encoding": "chunked",
+          "Date": "Wed, 07 Oct 2026 16:44:20 GMT",
+          "Connection": "close"
+        },
+        "rawBody": "{\"jsonrpc\":\"2.0\",\"id\":\"45f0708a-6e81-413c-8f51-0a797735343c\",\"error\":{\"code\":-32020,\"data\":{},\"message\":\"HeaderMismatch\"}}",
+        "body": {
+          "jsonrpc": "2.0",
+          "id": "45f0708a-6e81-413c-8f51-0a797735343c",
+          "error": {
+            "code": -32020,
+            "data": {},
+            "message": "HeaderMismatch"
+          }
+        }
+      }
+    },
+    {
+      "case": "missing-name-header",
+      "request": {
+        "httpMethod": "POST",
+        "url": "http://localhost:8080/mcp",
+        "headers": {
+          "Content-Type": "application/json",
+          "Accept": "application/json, text/event-stream",
+          "MCP-Protocol-Version": "2026-07-28",
+          "Mcp-Method": "tools/call",
+          "Authorization": "[REDACTED_SECRET]"
+        },
+        "body": {
+          "jsonrpc": "2.0",
+          "id": "ef7c7dec-aa1c-4955-a626-bbc28aa0918e",
+          "method": "tools/call",
+          "params": {
+            "name": "platform.readScope",
+            "arguments": {
+              "scopeId": "00000000-0000-0000-0000-000000000001"
+            },
+            "_meta": {
+              "io.modelcontextprotocol/protocolVersion": "2026-07-28",
+              "io.modelcontextprotocol/clientInfo": {
+                "name": "mulino-s0-wire-probe",
+                "version": "1.0.0"
+              },
+              "io.modelcontextprotocol/clientCapabilities": {}
+            }
+          }
+        },
+        "rawBody": "{\"jsonrpc\":\"2.0\",\"id\":\"ef7c7dec-aa1c-4955-a626-bbc28aa0918e\",\"method\":\"tools/call\",\"params\":{\"name\":\"platform.readScope\",\"arguments\":{\"scopeId\":\"00000000-0000-0000-0000-000000000001\"},\"_meta\":{\"io.modelcontextprotocol/protocolVersion\":\"2026-07-28\",\"io.modelcontextprotocol/clientInfo\":{\"name\":\"mulino-s0-wire-probe\",\"version\":\"1.0.0\"},\"io.modelcontextprotocol/clientCapabilities\":{}}}}"
+      },
+      "response": {
+        "status": 400,
+        "headers": {
+          "X-Content-Type-Options": "nosniff",
+          "X-XSS-Protection": "0",
+          "Cache-Control": "no-cache, no-store, max-age=0, must-revalidate",
+          "Pragma": "no-cache",
+          "Expires": "0",
+          "X-Frame-Options": "DENY",
+          "Content-Type": "application/json",
+          "Transfer-Encoding": "chunked",
+          "Date": "Wed, 07 Oct 2026 16:44:20 GMT",
+          "Connection": "close"
+        },
+        "rawBody": "{\"jsonrpc\":\"2.0\",\"id\":\"ef7c7dec-aa1c-4955-a626-bbc28aa0918e\",\"error\":{\"code\":-32020,\"data\":{},\"message\":\"HeaderMismatch\"}}",
+        "body": {
+          "jsonrpc": "2.0",
+          "id": "ef7c7dec-aa1c-4955-a626-bbc28aa0918e",
+          "error": {
+            "code": -32020,
+            "data": {},
+            "message": "HeaderMismatch"
+          }
+        }
+      }
+    },
+    {
+      "case": "mismatched-name",
+      "request": {
+        "httpMethod": "POST",
+        "url": "http://localhost:8080/mcp",
+        "headers": {
+          "Content-Type": "application/json",
+          "Accept": "application/json, text/event-stream",
+          "MCP-Protocol-Version": "2026-07-28",
+          "Mcp-Method": "tools/call",
+          "Mcp-Name": "platform.reserve",
+          "Authorization": "[REDACTED_SECRET]"
+        },
+        "body": {
+          "jsonrpc": "2.0",
+          "id": "aa1e595b-0ed9-4514-bccc-b94b83876de0",
+          "method": "tools/call",
+          "params": {
+            "name": "platform.readScope",
+            "arguments": {
+              "scopeId": "00000000-0000-0000-0000-000000000001"
+            },
+            "_meta": {
+              "io.modelcontextprotocol/protocolVersion": "2026-07-28",
+              "io.modelcontextprotocol/clientInfo": {
+                "name": "mulino-s0-wire-probe",
+                "version": "1.0.0"
+              },
+              "io.modelcontextprotocol/clientCapabilities": {}
+            }
+          }
+        },
+        "rawBody": "{\"jsonrpc\":\"2.0\",\"id\":\"aa1e595b-0ed9-4514-bccc-b94b83876de0\",\"method\":\"tools/call\",\"params\":{\"name\":\"platform.readScope\",\"arguments\":{\"scopeId\":\"00000000-0000-0000-0000-000000000001\"},\"_meta\":{\"io.modelcontextprotocol/protocolVersion\":\"2026-07-28\",\"io.modelcontextprotocol/clientInfo\":{\"name\":\"mulino-s0-wire-probe\",\"version\":\"1.0.0\"},\"io.modelcontextprotocol/clientCapabilities\":{}}}}"
+      },
+      "response": {
+        "status": 400,
+        "headers": {
+          "X-Content-Type-Options": "nosniff",
+          "X-XSS-Protection": "0",
+          "Cache-Control": "no-cache, no-store, max-age=0, must-revalidate",
+          "Pragma": "no-cache",
+          "Expires": "0",
+          "X-Frame-Options": "DENY",
+          "Content-Type": "application/json",
+          "Transfer-Encoding": "chunked",
+          "Date": "Wed, 07 Oct 2026 16:44:20 GMT",
+          "Connection": "close"
+        },
+        "rawBody": "{\"jsonrpc\":\"2.0\",\"id\":\"aa1e595b-0ed9-4514-bccc-b94b83876de0\",\"error\":{\"code\":-32020,\"data\":{},\"message\":\"HeaderMismatch\"}}",
+        "body": {
+          "jsonrpc": "2.0",
+          "id": "aa1e595b-0ed9-4514-bccc-b94b83876de0",
+          "error": {
+            "code": -32020,
+            "data": {},
+            "message": "HeaderMismatch"
+          }
+        }
+      }
+    },
+    {
+      "case": "encoded-name",
+      "request": {
+        "httpMethod": "POST",
+        "url": "http://localhost:8080/mcp",
+        "headers": {
+          "Content-Type": "application/json",
+          "Accept": "application/json, text/event-stream",
+          "MCP-Protocol-Version": "2026-07-28",
+          "Mcp-Method": "tools/call",
+          "Mcp-Name": "=?base64?cGxhdGZvcm0ucmVhZFNjb3Bl?=",
+          "Authorization": "[REDACTED_SECRET]"
+        },
+        "body": {
+          "jsonrpc": "2.0",
+          "id": "a4361468-a437-4142-a307-dbb0062b845c",
+          "method": "tools/call",
+          "params": {
+            "name": "platform.readScope",
+            "arguments": {
+              "scopeId": "00000000-0000-0000-0000-000000000001"
+            },
+            "_meta": {
+              "io.modelcontextprotocol/protocolVersion": "2026-07-28",
+              "io.modelcontextprotocol/clientInfo": {
+                "name": "mulino-s0-wire-probe",
+                "version": "1.0.0"
+              },
+              "io.modelcontextprotocol/clientCapabilities": {}
+            }
+          }
+        },
+        "rawBody": "{\"jsonrpc\":\"2.0\",\"id\":\"a4361468-a437-4142-a307-dbb0062b845c\",\"method\":\"tools/call\",\"params\":{\"name\":\"platform.readScope\",\"arguments\":{\"scopeId\":\"00000000-0000-0000-0000-000000000001\"},\"_meta\":{\"io.modelcontextprotocol/protocolVersion\":\"2026-07-28\",\"io.modelcontextprotocol/clientInfo\":{\"name\":\"mulino-s0-wire-probe\",\"version\":\"1.0.0\"},\"io.modelcontextprotocol/clientCapabilities\":{}}}}"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "X-Content-Type-Options": "nosniff",
+          "X-XSS-Protection": "0",
+          "Cache-Control": "no-cache, no-store, max-age=0, must-revalidate",
+          "Pragma": "no-cache",
+          "Expires": "0",
+          "X-Frame-Options": "DENY",
+          "Content-Type": "application/json",
+          "Transfer-Encoding": "chunked",
+          "Date": "Wed, 07 Oct 2026 16:44:20 GMT",
+          "Connection": "close"
+        },
+        "rawBody": "{\"jsonrpc\":\"2.0\",\"id\":\"a4361468-a437-4142-a307-dbb0062b845c\",\"result\":{\"isError\":false,\"content\":[{\"type\":\"text\",\"text\":\"{organizationId=org-a, ID=00000000-0000-0000-0000-000000000001, quantity=60.000000000000, blocked=false, reserved=2.000000000000, revision=2}\"}],\"structuredContent\":{\"organizationId\":\"org-a\",\"ID\":\"00000000-0000-0000-0000-000000000001\",\"quantity\":60.000000000000,\"blocked\":false,\"reserved\":2.000000000000,\"revision\":2},\"resultType\":\"complete\"}}",
+        "body": {
+          "jsonrpc": "2.0",
+          "id": "a4361468-a437-4142-a307-dbb0062b845c",
+          "result": {
+            "isError": false,
+            "content": [
+              {
+                "type": "text",
+                "text": "{organizationId=org-a, ID=00000000-0000-0000-0000-000000000001, quantity=60.000000000000, blocked=false, reserved=2.000000000000, revision=2}"
+              }
+            ],
+            "structuredContent": {
+              "organizationId": "org-a",
+              "ID": "00000000-0000-0000-0000-000000000001",
+              "quantity": 60.0,
+              "blocked": false,
+              "reserved": 2.0,
+              "revision": 2
+            },
+            "resultType": "complete"
+          }
+        }
+      }
+    },
+    {
+      "case": "obsolete-session-ignored",
+      "request": {
+        "httpMethod": "POST",
+        "url": "http://localhost:8080/mcp",
+        "headers": {
+          "Content-Type": "application/json",
+          "Accept": "application/json, text/event-stream",
+          "MCP-Protocol-Version": "2026-07-28",
+          "Mcp-Method": "server/discover",
+          "Mcp-Session-Id": "obsolete",
+          "Last-Event-ID": "obsolete",
+          "Authorization": "[REDACTED_SECRET]"
+        },
+        "body": {
+          "jsonrpc": "2.0",
+          "id": "d7d3af2a-cba0-43db-9fa0-d7819ee6866d",
+          "method": "server/discover",
+          "params": {
+            "_meta": {
+              "io.modelcontextprotocol/protocolVersion": "2026-07-28",
+              "io.modelcontextprotocol/clientInfo": {
+                "name": "mulino-s0-wire-probe",
+                "version": "1.0.0"
+              },
+              "io.modelcontextprotocol/clientCapabilities": {}
+            }
+          }
+        },
+        "rawBody": "{\"jsonrpc\":\"2.0\",\"id\":\"d7d3af2a-cba0-43db-9fa0-d7819ee6866d\",\"method\":\"server/discover\",\"params\":{\"_meta\":{\"io.modelcontextprotocol/protocolVersion\":\"2026-07-28\",\"io.modelcontextprotocol/clientInfo\":{\"name\":\"mulino-s0-wire-probe\",\"version\":\"1.0.0\"},\"io.modelcontextprotocol/clientCapabilities\":{}}}}"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "X-Content-Type-Options": "nosniff",
+          "X-XSS-Protection": "0",
+          "Cache-Control": "no-cache, no-store, max-age=0, must-revalidate",
+          "Pragma": "no-cache",
+          "Expires": "0",
+          "X-Frame-Options": "DENY",
+          "Content-Type": "application/json",
+          "Transfer-Encoding": "chunked",
+          "Date": "Wed, 07 Oct 2026 16:44:20 GMT",
+          "Connection": "close"
+        },
+        "rawBody": "{\"jsonrpc\":\"2.0\",\"id\":\"d7d3af2a-cba0-43db-9fa0-d7819ee6866d\",\"result\":{\"capabilities\":{\"tools\":{}},\"supportedVersions\":[\"2026-07-28\"],\"_meta\":{\"io.modelcontextprotocol/serverInfo\":{\"name\":\"mulino-platform-s0\",\"version\":\"0.1.0\"}},\"resultType\":\"complete\"}}",
+        "body": {
+          "jsonrpc": "2.0",
+          "id": "d7d3af2a-cba0-43db-9fa0-d7819ee6866d",
+          "result": {
+            "capabilities": {
+              "tools": {}
+            },
+            "supportedVersions": [
+              "2026-07-28"
+            ],
+            "_meta": {
+              "io.modelcontextprotocol/serverInfo": {
+                "name": "mulino-platform-s0",
+                "version": "0.1.0"
+              }
+            },
+            "resultType": "complete"
+          }
+        }
+      }
+    },
+    {
+      "case": "client-info-optional",
+      "request": {
+        "httpMethod": "POST",
+        "url": "http://localhost:8080/mcp",
+        "headers": {
+          "Content-Type": "application/json",
+          "Accept": "application/json, text/event-stream",
+          "MCP-Protocol-Version": "2026-07-28",
+          "Mcp-Method": "server/discover",
+          "Authorization": "[REDACTED_SECRET]"
+        },
+        "body": {
+          "jsonrpc": "2.0",
+          "id": "3476f64f-f157-48e4-afc9-1ae4560462b0",
+          "method": "server/discover",
+          "params": {
+            "_meta": {
+              "io.modelcontextprotocol/protocolVersion": "2026-07-28",
+              "io.modelcontextprotocol/clientCapabilities": {}
+            }
+          }
+        },
+        "rawBody": "{\"jsonrpc\":\"2.0\",\"id\":\"3476f64f-f157-48e4-afc9-1ae4560462b0\",\"method\":\"server/discover\",\"params\":{\"_meta\":{\"io.modelcontextprotocol/protocolVersion\":\"2026-07-28\",\"io.modelcontextprotocol/clientCapabilities\":{}}}}"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "X-Content-Type-Options": "nosniff",
+          "X-XSS-Protection": "0",
+          "Cache-Control": "no-cache, no-store, max-age=0, must-revalidate",
+          "Pragma": "no-cache",
+          "Expires": "0",
+          "X-Frame-Options": "DENY",
+          "Content-Type": "application/json",
+          "Transfer-Encoding": "chunked",
+          "Date": "Wed, 07 Oct 2026 16:44:20 GMT",
+          "Connection": "close"
+        },
+        "rawBody": "{\"jsonrpc\":\"2.0\",\"id\":\"3476f64f-f157-48e4-afc9-1ae4560462b0\",\"result\":{\"capabilities\":{\"tools\":{}},\"supportedVersions\":[\"2026-07-28\"],\"_meta\":{\"io.modelcontextprotocol/serverInfo\":{\"name\":\"mulino-platform-s0\",\"version\":\"0.1.0\"}},\"resultType\":\"complete\"}}",
+        "body": {
+          "jsonrpc": "2.0",
+          "id": "3476f64f-f157-48e4-afc9-1ae4560462b0",
+          "result": {
+            "capabilities": {
+              "tools": {}
+            },
+            "supportedVersions": [
+              "2026-07-28"
+            ],
+            "_meta": {
+              "io.modelcontextprotocol/serverInfo": {
+                "name": "mulino-platform-s0",
+                "version": "0.1.0"
+              }
+            },
+            "resultType": "complete"
+          }
+        }
+      }
+    },
+    {
+      "case": "missing-body-meta",
+      "request": {
+        "httpMethod": "POST",
+        "url": "http://localhost:8080/mcp",
+        "headers": {
+          "Content-Type": "application/json",
+          "Accept": "application/json, text/event-stream",
+          "MCP-Protocol-Version": "2026-07-28",
+          "Mcp-Method": "server/discover",
+          "Authorization": "[REDACTED_SECRET]"
+        },
+        "body": {
+          "jsonrpc": "2.0",
+          "id": "1548af10-eda8-4adc-8e14-8841d5975619",
+          "method": "server/discover",
+          "params": {}
+        },
+        "rawBody": "{\"jsonrpc\":\"2.0\",\"id\":\"1548af10-eda8-4adc-8e14-8841d5975619\",\"method\":\"server/discover\",\"params\":{}}"
+      },
+      "response": {
+        "status": 400,
+        "headers": {
+          "X-Content-Type-Options": "nosniff",
+          "X-XSS-Protection": "0",
+          "Cache-Control": "no-cache, no-store, max-age=0, must-revalidate",
+          "Pragma": "no-cache",
+          "Expires": "0",
+          "X-Frame-Options": "DENY",
+          "Content-Type": "application/json",
+          "Transfer-Encoding": "chunked",
+          "Date": "Wed, 07 Oct 2026 16:44:20 GMT",
+          "Connection": "close"
+        },
+        "rawBody": "{\"jsonrpc\":\"2.0\",\"id\":\"1548af10-eda8-4adc-8e14-8841d5975619\",\"error\":{\"code\":-32600,\"data\":{},\"message\":\"Required metadata missing\"}}",
+        "body": {
+          "jsonrpc": "2.0",
+          "id": "1548af10-eda8-4adc-8e14-8841d5975619",
+          "error": {
+            "code": -32600,
+            "data": {},
+            "message": "Required metadata missing"
+          }
+        }
+      }
+    },
+    {
+      "case": "missing-client-capabilities",
+      "request": {
+        "httpMethod": "POST",
+        "url": "http://localhost:8080/mcp",
+        "headers": {
+          "Content-Type": "application/json",
+          "Accept": "application/json, text/event-stream",
+          "MCP-Protocol-Version": "2026-07-28",
+          "Mcp-Method": "server/discover",
+          "Authorization": "[REDACTED_SECRET]"
+        },
+        "body": {
+          "jsonrpc": "2.0",
+          "id": "3e39460b-b615-4769-84e6-ef2ec05a5b00",
+          "method": "server/discover",
+          "params": {
+            "_meta": {
+              "io.modelcontextprotocol/protocolVersion": "2026-07-28",
+              "io.modelcontextprotocol/clientInfo": {
+                "name": "mulino-s0-wire-probe",
+                "version": "1.0.0"
+              }
+            }
+          }
+        },
+        "rawBody": "{\"jsonrpc\":\"2.0\",\"id\":\"3e39460b-b615-4769-84e6-ef2ec05a5b00\",\"method\":\"server/discover\",\"params\":{\"_meta\":{\"io.modelcontextprotocol/protocolVersion\":\"2026-07-28\",\"io.modelcontextprotocol/clientInfo\":{\"name\":\"mulino-s0-wire-probe\",\"version\":\"1.0.0\"}}}}"
+      },
+      "response": {
+        "status": 400,
+        "headers": {
+          "X-Content-Type-Options": "nosniff",
+          "X-XSS-Protection": "0",
+          "Cache-Control": "no-cache, no-store, max-age=0, must-revalidate",
+          "Pragma": "no-cache",
+          "Expires": "0",
+          "X-Frame-Options": "DENY",
+          "Content-Type": "application/json",
+          "Transfer-Encoding": "chunked",
+          "Date": "Wed, 07 Oct 2026 16:44:20 GMT",
+          "Connection": "close"
+        },
+        "rawBody": "{\"jsonrpc\":\"2.0\",\"id\":\"3e39460b-b615-4769-84e6-ef2ec05a5b00\",\"error\":{\"code\":-32020,\"data\":{},\"message\":\"HeaderMismatch\"}}",
+        "body": {
+          "jsonrpc": "2.0",
+          "id": "3e39460b-b615-4769-84e6-ef2ec05a5b00",
+          "error": {
+            "code": -32020,
+            "data": {},
+            "message": "HeaderMismatch"
+          }
+        }
+      }
+    },
+    {
+      "case": "wrong-content-type",
+      "request": {
+        "httpMethod": "POST",
+        "url": "http://localhost:8080/mcp",
+        "headers": {
+          "Content-Type": "text/plain",
+          "Accept": "application/json, text/event-stream",
+          "MCP-Protocol-Version": "2026-07-28",
+          "Mcp-Method": "server/discover",
+          "Authorization": "[REDACTED_SECRET]"
+        },
+        "body": {
+          "jsonrpc": "2.0",
+          "id": "de83d5eb-4401-4864-bae8-4dcc41e79dd8",
+          "method": "server/discover",
+          "params": {
+            "_meta": {
+              "io.modelcontextprotocol/protocolVersion": "2026-07-28",
+              "io.modelcontextprotocol/clientInfo": {
+                "name": "mulino-s0-wire-probe",
+                "version": "1.0.0"
+              },
+              "io.modelcontextprotocol/clientCapabilities": {}
+            }
+          }
+        },
+        "rawBody": "{\"jsonrpc\":\"2.0\",\"id\":\"de83d5eb-4401-4864-bae8-4dcc41e79dd8\",\"method\":\"server/discover\",\"params\":{\"_meta\":{\"io.modelcontextprotocol/protocolVersion\":\"2026-07-28\",\"io.modelcontextprotocol/clientInfo\":{\"name\":\"mulino-s0-wire-probe\",\"version\":\"1.0.0\"},\"io.modelcontextprotocol/clientCapabilities\":{}}}}"
+      },
+      "response": {
+        "status": 415,
+        "headers": {
+          "Accept": "application/json",
+          "X-Content-Type-Options": "nosniff",
+          "X-XSS-Protection": "0",
+          "Cache-Control": "no-cache, no-store, max-age=0, must-revalidate",
+          "Pragma": "no-cache",
+          "Expires": "0",
+          "X-Frame-Options": "DENY",
+          "Content-Type": "application/json",
+          "Transfer-Encoding": "chunked",
+          "Date": "Wed, 07 Oct 2026 16:44:20 GMT",
+          "Connection": "close"
+        },
+        "rawBody": "{\"timestamp\":\"2026-10-07T16:44:20.214Z\",\"status\":415,\"error\":\"Unsupported Media Type\",\"path\":\"/mcp\"}",
+        "body": {
+          "timestamp": "2026-10-07T16:44:20.214Z",
+          "status": 415,
+          "error": "Unsupported Media Type",
+          "path": "/mcp"
+        }
+      }
+    },
+    {
+      "case": "missing-accept",
+      "request": {
+        "httpMethod": "POST",
+        "url": "http://localhost:8080/mcp",
+        "headers": {
+          "Content-Type": "application/json",
+          "MCP-Protocol-Version": "2026-07-28",
+          "Mcp-Method": "server/discover",
+          "Authorization": "[REDACTED_SECRET]"
+        },
+        "body": {
+          "jsonrpc": "2.0",
+          "id": "7b941175-279f-49d4-814e-e48ddfef65b8",
+          "method": "server/discover",
+          "params": {
+            "_meta": {
+              "io.modelcontextprotocol/protocolVersion": "2026-07-28",
+              "io.modelcontextprotocol/clientInfo": {
+                "name": "mulino-s0-wire-probe",
+                "version": "1.0.0"
+              },
+              "io.modelcontextprotocol/clientCapabilities": {}
+            }
+          }
+        },
+        "rawBody": "{\"jsonrpc\":\"2.0\",\"id\":\"7b941175-279f-49d4-814e-e48ddfef65b8\",\"method\":\"server/discover\",\"params\":{\"_meta\":{\"io.modelcontextprotocol/protocolVersion\":\"2026-07-28\",\"io.modelcontextprotocol/clientInfo\":{\"name\":\"mulino-s0-wire-probe\",\"version\":\"1.0.0\"},\"io.modelcontextprotocol/clientCapabilities\":{}}}}"
+      },
+      "response": {
+        "status": 406,
+        "headers": {
+          "X-Content-Type-Options": "nosniff",
+          "X-XSS-Protection": "0",
+          "Cache-Control": "no-cache, no-store, max-age=0, must-revalidate",
+          "Pragma": "no-cache",
+          "Expires": "0",
+          "X-Frame-Options": "DENY",
+          "Content-Type": "application/json",
+          "Transfer-Encoding": "chunked",
+          "Date": "Wed, 07 Oct 2026 16:44:20 GMT",
+          "Connection": "close"
+        },
+        "rawBody": "{\"jsonrpc\":\"2.0\",\"id\":\"7b941175-279f-49d4-814e-e48ddfef65b8\",\"error\":{\"code\":-32600,\"data\":{},\"message\":\"Required Accept missing\"}}",
+        "body": {
+          "jsonrpc": "2.0",
+          "id": "7b941175-279f-49d4-814e-e48ddfef65b8",
+          "error": {
+            "code": -32600,
+            "data": {},
+            "message": "Required Accept missing"
+          }
+        }
+      }
+    },
+    {
+      "case": "malformed-json",
+      "request": {
+        "httpMethod": "POST",
+        "url": "http://localhost:8080/mcp",
+        "headers": {
+          "Content-Type": "application/json",
+          "Accept": "application/json, text/event-stream",
+          "MCP-Protocol-Version": "2026-07-28",
+          "Mcp-Method": "server/discover",
+          "Authorization": "[REDACTED_SECRET]"
+        },
+        "body": null,
+        "rawBody": "{"
+      },
+      "response": {
+        "status": 400,
+        "headers": {
+          "X-Content-Type-Options": "nosniff",
+          "X-XSS-Protection": "0",
+          "Cache-Control": "no-cache, no-store, max-age=0, must-revalidate",
+          "Pragma": "no-cache",
+          "Expires": "0",
+          "X-Frame-Options": "DENY",
+          "Content-Type": "application/json",
+          "Transfer-Encoding": "chunked",
+          "Date": "Wed, 07 Oct 2026 16:44:20 GMT",
+          "Connection": "close"
+        },
+        "rawBody": "{\"timestamp\":\"2026-10-07T16:44:20.218Z\",\"status\":400,\"error\":\"Bad Request\",\"path\":\"/mcp\"}",
+        "body": {
+          "timestamp": "2026-10-07T16:44:20.218Z",
+          "status": 400,
+          "error": "Bad Request",
+          "path": "/mcp"
+        }
+      }
+    },
+    {
+      "case": "batch-rejected",
+      "request": {
+        "httpMethod": "POST",
+        "url": "http://localhost:8080/mcp",
+        "headers": {
+          "Content-Type": "application/json",
+          "Accept": "application/json, text/event-stream",
+          "MCP-Protocol-Version": "2026-07-28",
+          "Mcp-Method": "server/discover",
+          "Authorization": "[REDACTED_SECRET]"
+        },
+        "body": null,
+        "rawBody": "[]"
+      },
+      "response": {
+        "status": 400,
+        "headers": {
+          "X-Content-Type-Options": "nosniff",
+          "X-XSS-Protection": "0",
+          "Cache-Control": "no-cache, no-store, max-age=0, must-revalidate",
+          "Pragma": "no-cache",
+          "Expires": "0",
+          "X-Frame-Options": "DENY",
+          "Content-Type": "application/json",
+          "Transfer-Encoding": "chunked",
+          "Date": "Wed, 07 Oct 2026 16:44:20 GMT",
+          "Connection": "close"
+        },
+        "rawBody": "{\"timestamp\":\"2026-10-07T16:44:20.220Z\",\"status\":400,\"error\":\"Bad Request\",\"path\":\"/mcp\"}",
+        "body": {
+          "timestamp": "2026-10-07T16:44:20.220Z",
+          "status": 400,
+          "error": "Bad Request",
+          "path": "/mcp"
+        }
+      }
+    }
+  ]
+}
