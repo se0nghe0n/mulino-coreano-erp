@@ -126,7 +126,8 @@ coordinator가 확인한다. 상세 인수 조건은 [작성 인계](step-2-case
 공통 runtime manifest의 출력 경로는
 `verification/harness/target/evidence/runtime-manifest.json`이다.
 실제 입력 artifact·hash·실행 여부를 연결하며 부재를 성공이나0으로
-채우지 않는다. 이 기록 시점에는 아직 생성하거나 제품 인수하지 않았다.
+채우지 않는다. assembly 도구는 통합했지만 실제 제품 인수는 아직
+NOT_RUN이다. 전체 검토와 fresh assembly 결과는 아래 기록을 따른다.
 
 B2 이후 실제 사례가 드러낸 공통 보완은 `ac616a1`과 `b7ca0a0`으로
 통합했다. raw wire async, 실제 두 ID 참조, 미실행 reference 판정 순서와
@@ -134,6 +135,42 @@ B2 이후 실제 사례가 드러낸 공통 보완은 `ac616a1`과 `b7ca0a0`으�
 통과했고 모든 작성 worktree에도 같은 dependency를 반영했다.
 파일 한도 환경 오류가 발생해 긴 검증은 동시2개로 조정했다. 전체
 Step2 완료와 제품 gate는 아직 판정하지 않았다.
+
+## Step 2 전체 통합과 검토 수정
+
+10개 영역의 case와 model-binding, coverage assembler를 Task branch에
+통합했다. `9b5e5d7`에 전체41 case와785개 필수 subcase의 registry를
+고정했다. 독립 catalog는122 oracle·499 observation이며 D01–D26을
+연결한다. 별도 모델 corpus는60 case·73 turn·221 공통 assertion과
+154 공통 semantic path, negative 경로의 추가4 path를 포함한다.
+
+`9b5e5d7`에서 결합 harness320건이 failure/error/skip 없이 통과했다.
+첫 전체 preparation은 고정 수량의 primary assertion3개가 없어
+FAIL이었다. `f426712`에서 T03 원천40과 C1 신규 예약·출고0의 실제
+수량·단위 검사를 보강한 뒤 preparation은41 case·785 subcase·
+19996 assertion, 문제0으로 PREPARED다. 실패와 수정 후 증거를 모두
+[evidence/step2-integrated](evidence/step2-integrated/summary.json)에 남겼다.
+이 preparation은 의미 검토나 실제 제품 실행의 PASS를 뜻하지 않는다.
+
+실제 GPT-6.1 Sol xhigh와 GPT-6 Astra low가 같은 `9b5e5d7`에서
+전체 Step2를 분담 검토했다. Astra의9개 새 지적과 Sol의 추가 지적을
+[전체 검토 기록](step-2-review.md)에 남기고 수정 중이다. 각 수정
+writer는 같은 `f426712`의 독립 worktree에서 GPT-6.1 Sol high로
+작업한다. coordinator가 통합하고 두 reviewer의 closure와 결합
+checks까지 통과한 뒤에만 Step2를 닫는다.
+
+| 수정 Subtask | branch / 절대 worktree | 소유 범위 |
+|---|---|---|
+| 공통 계약·timeout | `step2/review-common` / `/Volumes/VideoStore/Developer/mulino-ontology-step2-review-common` | host schema·validator·CaseRunner·공통 tests |
+| host 참조·복구 | `step2/review-case-contracts` / `/Volumes/VideoStore/Developer/mulino-ontology-step2-review-case-contracts` | T26·V5·T14와 고유 tests |
+| 승인·물량·QC | `step2/review-business` / `/Volumes/VideoStore/Developer/mulino-ontology-step2-review-business` | V3·T20·E2와 작성 도구·고유 tests |
+| 모델 집계 | `step2/review-coverage` / `/Volumes/VideoStore/Developer/mulino-ontology-step2-review-coverage` | coverage assembler·고유 tests |
+| 수락 주체 | `step2/review-handover` / `/Volumes/VideoStore/Developer/mulino-ontology-step2-review-handover` | T10와 고유 tests |
+
+root `./verify model`과 `./verify coverage`는 아직 별도 model-binding
+runner와 전체 coverage assembler에 연결되지 않았다. Step2에서는
+각 README의 별도 명령으로 준비·RED를 검증하며, 실제 adapter와
+통합 entrypoint는 Step3에 구현한다. 제품 runtime은 NOT_RUN이다.
 
 ## 시스템 S0–S6의 별도 gate
 
@@ -189,10 +226,10 @@ coordinator가 3개 skill의 `quick_validate.py`를 uv+PyYAML 환경에서
 fresh 검사 결과는 [정적 검사 증거](evidence/step1-static-checks.txt)에
 기록했다. 두 실제 reviewer의 최종 범위 내 판정도 PASS다.
 
-다음은 B2의 공통 계약으로 전체 사례별 테스트와 모델 평가 바인딩을
-작성하고 registry·coverage를 통합하는 일이다. [공통 계약 검토 기록](step-2-common-review.md)에
-부분 검토·실행 검사·미해결 항목을 남긴다. startup·도메인·DB·
-MCP/client·모델·BTP 인수는 NOT_RUN이다.
+다음은 전체 Step2 검토 지적을 수정·통합하고 결합 검사를 완료하는
+일이다. [공통 계약 검토 기록](step-2-common-review.md)은 이전 부분
+검토이며, [전체 검토 기록](step-2-review.md)이 현재 gate를 추적한다.
+startup·도메인·DB·MCP/client·모델·BTP 인수는 NOT_RUN이다.
 
 Step 1 기록 통합과 최종 일치 검사는 `393cb5c`에서 완료했다. 이후
 R2와 독립적인 읽기 조사를 실제 GPT-6.1 Sol high 두 worker가 수행했다.

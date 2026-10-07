@@ -1,0 +1,61 @@
+{
+  "checkedCommit": "9b5e5d7675033666944b1caacc69234b6c4864a5",
+  "recordedAt": "2026-10-07T14:43:57.437117+00:00",
+  "results": [
+    {
+      "command": [
+        "./verify",
+        "harness"
+      ],
+      "exitCode": 0,
+      "log": "docs/execution/evidence/step2-integrated/harness.txt",
+      "counts": {
+        "tests": 320,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      }
+    },
+    {
+      "command": [
+        "./verify",
+        "prepare"
+      ],
+      "exitCode": 1,
+      "log": "docs/execution/evidence/step2-integrated/prepare.txt",
+      "report": {
+        "status": "FAIL",
+        "preparedCases": 41,
+        "preparedSubcases": 785,
+        "preparedAssertions": 19994,
+        "preparationProblems": [
+          "Missing substantive fixed quantity assertion (value/unit/operator) T03.indistinguishable-mixture/source-affected",
+          "Missing substantive fixed quantity assertion (value/unit/operator) C1.revoked-disposition/new-reservation",
+          "Missing substantive fixed quantity assertion (value/unit/operator) C1.revoked-disposition/new-dispatch"
+        ],
+        "runtimeStatus": "NOT_RUN",
+        "gateComplete": false
+      }
+    },
+    {
+      "command": [
+        "./verify",
+        "prepare"
+      ],
+      "checkedCommit": "f426712fcd1bcfc1ed71a1beb9aa80ec3051e182",
+      "exitCode": 0,
+      "log": "docs/execution/evidence/step2-integrated/prepare-after-quantity.txt",
+      "reportRef": "docs/execution/evidence/step2-integrated/prepare-after-quantity.json",
+      "report": {
+        "status": "PREPARED",
+        "preparedCases": 41,
+        "preparedSubcases": 785,
+        "preparedAssertions": 19996,
+        "preparationProblems": [],
+        "runtimeStatus": "NOT_RUN",
+        "gateComplete": false
+      }
+    }
+  ],
+  "productRuntime": "NOT_RUN"
+}
