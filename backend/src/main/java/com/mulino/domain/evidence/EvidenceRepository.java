@@ -51,6 +51,12 @@ public class EvidenceRepository {
       }}while(changed);
       result.addAll(direction);
     }
+    Set<String> component=new HashSet<>();component.add(segmentId);boolean changed;
+    do {changed=false;for(var edge:edges) {
+      String from=Objects.toString(edge.get("sourceId"),null),to=Objects.toString(edge.get("targetId"),null);
+      if(from!=null&&to!=null&&(component.contains(from)||component.contains(to))){changed|=component.add(from);changed|=component.add(to);}
+    }}while(changed);
+    if(edges.stream().anyMatch(edge->Boolean.TRUE.equals(edge.get("uncertain"))&&(component.contains(edge.get("sourceId"))||component.contains(edge.get("targetId")))))return component;
     return result;
   }
   public boolean referenced(UUID blob) {
