@@ -17,4 +17,24 @@ class TypedPredicateEvaluatorTest {
  @Test void conflictDoesNotDisappearUnderAny(){var conflict=new EvaluationFacts.Fact("c","1","hash","c","p",null,"BOX",EvaluationFacts.State.CONFLICT,false,t,null,t,List.of());var node=Map.<String,Object>of("operator","any","children",List.of(sum(),Map.of("operator","exists","property","Other.present")));var f=new EvaluationFacts(Map.of("Receipt.quantity",List.of(conflict),"Other.present",List.of(fact("b","b","1",t,null,true))),Map.of());var r=evaluator.evaluate(node,f,t,t);assertEquals(PredicateTruth.State.SATISFIED,r.truth().state());assertTrue(r.truth().conflict());}
  @Test void throughputGapIsUnknownEvenWithSatisfiedEndpoints(){var predicate=Map.<String,Object>of("operator","compare","property","Receipt.quantity","minimum",Map.of("value","100","unit","BOX"),"unit","BOX");var f=facts(fact("a","a","100",t,t.plusSeconds(10),true),fact("b","b","100",t.plusSeconds(20),t.plusSeconds(30),true));assertEquals(PredicateTruth.State.UNVERIFIED,evaluator.evaluateInterval(predicate,f,t,t.plusSeconds(30),t,true).truth().state());assertEquals(PredicateTruth.State.SATISFIED,evaluator.evaluateInterval(predicate,f,t,t.plusSeconds(30),t,false).truth().state());}
  @Test void exactTimeEndpointsRespectInclusivity(){var f=new EvaluationFacts(Map.of("Receipt.at",List.of(new EvaluationFacts.Fact("a","1","h","a","a",t,null,EvaluationFacts.State.KNOWN,true,t,null,t,List.of()))),Map.of());var n=Map.<String,Object>of("operator","timeIn","property","Receipt.at","minimum",t.toString(),"maximum",t.plusSeconds(10).toString(),"timezone","Asia/Seoul","inclusiveStart",false,"inclusiveEnd",true);assertEquals(PredicateTruth.State.UNSATISFIED,evaluator.evaluate(n,f,t,t).truth().state());}
+ @Test void currentStateRetiredParentAndActiveChildrenAreNotDoubleCounted(){
+   var n=Map.<String,Object>of("operator","stateQuantity","property","Receipt.quantity","minimum",Map.of("value","100","unit","BOX"),"unit","BOX");
+   var input=facts(fact("parent","parent","100",t.minusSeconds(100),t,true),fact("child60","child60","60",t,null,true),fact("child25","child25","25",t,null,true));
+   var result=evaluator.evaluate(n,input,t,t);assertEquals(PredicateTruth.State.UNSATISFIED,result.truth().state());assertEquals(2,result.conditions().getFirst().inputs().size());
+ }
+ @Test void equalInRangeAndNotPreserveTypedFacts(){
+   var f=facts(fact("a","a","100",t,null,true));
+   for(String op:List.of("equals","in")){
+     var n=new HashMap<String,Object>();n.put("operator",op);n.put("property","Receipt.quantity");n.put(op.equals("equals")?"value":"values",op.equals("equals")?Map.of("value","100","unit","BOX"):List.of(Map.of("value","100","unit","BOX")));
+     assertEquals(PredicateTruth.State.SATISFIED,evaluator.evaluate(n,f,t,t).truth().state());
+     assertEquals(PredicateTruth.State.UNSATISFIED,evaluator.evaluate(Map.of("operator","not","children",List.of(n)),f,t,t).truth().state());
+   }
+   assertEquals(PredicateTruth.State.SATISFIED,evaluator.evaluate(Map.of("operator","range","property","Receipt.quantity","minimum",Map.of("value","90","unit","BOX"),"maximum",Map.of("value","110","unit","BOX"),"unit","BOX"),f,t,t).truth().state());
+ }
+ @Test void cardinalityUsesDistinctCurrentTargetsAndKnowledgeBoundary(){
+   var f=new EvaluationFacts(Map.of(),Map.of("locatedAt",List.of(fact("a","a","1",t,null,true),fact("b","b","1",t,null,true))));
+   assertEquals(PredicateTruth.State.SATISFIED,evaluator.evaluate(Map.of("operator","cardinality","relation","locatedAt","minimum",1,"maximum",1),f,t,t).truth().state());
+   assertEquals(PredicateTruth.State.UNVERIFIED,evaluator.evaluate(sum(),facts(fact("a","a","100",t,null,true)),t,t.minusSeconds(1)).truth().state());
+ }
+
 }

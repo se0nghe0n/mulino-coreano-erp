@@ -28,10 +28,10 @@ public final class TypedPredicateEvaluator {
     } else {
       if(!Set.of("equals","in","compare","range","exists","cardinality","timeIn","quantitySum","stateQuantity").contains(op))throw new IllegalArgumentException("Unsupported operator");
       inputs=(op.equals("cardinality")?facts.relations().getOrDefault(Objects.toString(n.get("relation")),List.of()):facts.properties().getOrDefault(Objects.toString(n.get("property")),List.of())).stream().filter(f->!f.recordedAt().isAfter(known)).toList();
+      if(op.equals("stateQuantity"))inputs=inputs.stream().filter(f->covers(f,at)).toList();
       boolean conflict=inputs.stream().anyMatch(f->f.state()==State.CONFLICT);
       List<Fact> values=inputs.stream().filter(f->f.state()==State.KNOWN&&f.verified()).toList();
       boolean uncertain=inputs.isEmpty()||values.size()!=inputs.size();
-      if(op.equals("stateQuantity"))values=values.stream().filter(f->covers(f,at)).toList();
       if(op.equals("exists")) result=new PredicateTruth(!values.isEmpty()?SATISFIED:UNVERIFIED,conflict);
       else if(op.equals("quantitySum")||op.equals("stateQuantity")) {
         var scopes=new HashMap<String,Fact>();boolean duplicateConflict=false;

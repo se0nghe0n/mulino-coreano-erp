@@ -58,7 +58,7 @@ public class AssessmentFactProvider {
         facts.add(new Fact(occurrence.get("ID").toString(),Objects.toString(occurrence.get("revision")),DefinitionRepository.sha256(occurrence.toString()),occurrence.get("ID").toString(),Objects.toString(occurrence.get("physicalScopeId"),null),value,Objects.toString(occurrence.get("unit"),null),state,verified,effective,instantOrNull(occurrence.get("effectiveUntil")),instant(occurrence.get("recordedAt")),refs));
       }
       // Existing segment facts represent actual state only; action eligibility and contribution adapters are S3/S4.
-      if((attribute.name().equals("stateQuantity")||attribute.name().equals("quantity")&&"STATE_AT".equals(slots.get("quantityMode")))&&(!slots.containsKey("action")||"PHYSICAL".equals(slots.get("action")))&&!Boolean.TRUE.equals(slots.get("includeReserved")))for(var segment:r.rows(c,"mulino.inventory.QuantitySegments")) {
+      if((attribute.name().equals("stateQuantity")||attribute.name().equals("quantity")&&"STATE_AT".equals(slots.get("quantityMode")))&&(!slots.containsKey("action")||Set.of("PHYSICAL","PHYSICAL_HELD").contains(slots.get("action")))&&(!slots.containsKey("includeReserved")||Boolean.TRUE.equals(slots.get("includeReserved"))))for(var segment:r.rows(c,"mulino.inventory.QuantitySegments")) {
         if(!Objects.equals(work.get("itemId"),segment.get("itemId"))||slots.get("placeId")!=null&&!Objects.equals(slots.get("placeId"),segment.get("placeId")))continue;
         boolean known="CONFIRMED".equals(segment.get("identificationStatus"))||"IDENTIFIED".equals(segment.get("identificationStatus"));
         Instant retired=instantOrNull(segment.get("retiredAt"));
