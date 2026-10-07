@@ -93,6 +93,15 @@ class EvidenceReconciliationTest {
     assertEquals(1,jdbc.queryForObject("SELECT count(*) FROM mulino_evidence_CanonicalOccurrences",Integer.class));
     assertEquals(0,jdbc.queryForObject("SELECT count(*) FROM mulino_inventory_QuantityMovements",Integer.class));
   }
+  @Test void oneSourceObservationCannotBeCountedAgainstTwoPhysicalScopes(){
+    String physical=segment(),otherPhysical=segment(),event=event(),doc=document(),claim=claim(event,doc,"60");
+    var first=request(()->reconciliation.match(auth.context(null,null),review(claim,doc,physical,"60"),"matchSourceIdentity"));
+    request(()->reconciliation.link(auth.context(null,null),first.get("id").toString()));
+    var conflicting=request(()->reconciliation.match(auth.context(null,null),review(claim,doc,otherPhysical,"60"),"matchSourceIdentity"));
+    assertEquals("CONFLICT",conflicting.get("outcome"));
+    assertThrows(DomainError.class,()->request(()->reconciliation.link(auth.context(null,null),conflicting.get("id").toString())));
+    assertEquals(1,jdbc.queryForObject("SELECT count(*) FROM mulino_evidence_CanonicalOccurrences",Integer.class));
+  }
   @Test void unknownIdentityAndQuantityMismatchRetainIntakeResponsibility(){
     String event=event(),doc=document(),claim=claim(event,doc,"60"),physical=segment();
     var result=request(()->reconciliation.match(auth.context(null,null),review(claim,doc,physical,"58"),"matchSourceIdentity"));

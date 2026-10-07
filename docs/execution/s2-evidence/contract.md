@@ -30,3 +30,11 @@ Goal의 현재 판정·책임을 처리한다. 이 port가 없으면 효과0 보
 
 C4의 인도100→실제98 정정·유효 의무2와 반품20은 S4 거래 경로에서 별도로
 검증해야 한다. S2 일반 기록을 실제 인도 원장 효과로 표시하지 않는다.
+
+외부 결과의 대조는 EXTERNAL_RESULT 사건에 한정한다. runtime이 소유한
+ExternalOperationScopePort가 실제 조직별 operation UUID와 Work를 확인한다.
+인간 대조 담당이 제출한 원본 JSON과 Event payload의 operation·확정 결과가
+같아야 한다. 이 사실의 canonical은 재고 segment가 아니라 operation UUID를
+범위로 쓰며 물량은 만들지 않는다. 후속 recordExternalReconciliation은
+ExternalResultEvidenceGuard로 같은 원본·검증·정확한 결과를 다시 확인한다.
+미확인 외부 결과를 확정 성공으로 꾸미거나 새 외부 발행을 만들지 않는다.
