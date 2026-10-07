@@ -76,7 +76,7 @@ public class PlatformCommands {
     var q = new BigDecimal(quantity);
     if (q.signum() <= 0 || q.scale() > 12 || q.precision() > 38 || key == null || key.isBlank())
       throw new IllegalArgumentException("Invalid command");
-    r.fence(scopeId);
+    fence(scopeId);
     var s = r.scope(scopeId);
     authorize(who, s, true);
     var policy =
@@ -165,7 +165,7 @@ public class PlatformCommands {
 
   @Transactional
   public void restrict(String id) {
-    r.fence(id);
+    fence(id);
     var s = r.scope(id);
     authorize(identities.get(), s, true);
     r.insert(
@@ -174,7 +174,7 @@ public class PlatformCommands {
 
   @Transactional
   public void revoke(String id, String actor) {
-    r.fence(id);
+    fence(id);
     var s = r.scope(id);
     authorize(identities.get(), s, true);
     r.db()
@@ -182,6 +182,14 @@ public class PlatformCommands {
             Update.entity("mulino.platform.Grants")
                 .data("allowed", false)
                 .where(x -> x.get("scopeId").eq(id).and(x.get("actor").eq(actor))));
+  }
+
+  private void fence(String id) {
+    try {
+      r.fence(id);
+    } catch (ScopeRepository.LockConflict lock) {
+      throw new Conflict("LOCK_CONFLICT");
+    }
   }
 
   private static String hash(String s) {

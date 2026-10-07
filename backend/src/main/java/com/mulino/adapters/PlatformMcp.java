@@ -25,14 +25,30 @@ public class PlatformMcp {
         || !accept.contains("application/json")
         || !accept.contains("text/event-stream"))
       return error(id, 406, -32600, "Required Accept missing", Map.of());
+    if (!"2.0".equals(body.get("jsonrpc"))
+        || !body.containsKey("id")
+        || !(body.get("method") instanceof String)
+        || (id != null
+            && !(id instanceof String)
+            && !(id instanceof Integer)
+            && !(id instanceof Long))
+        || !(body.get("params") instanceof Map<?, ?>))
+      return error(id, 400, -32600, "Invalid request", Map.of());
     String method = (String) body.get("method");
-    Map<String, Object> p = (Map<String, Object>) body.getOrDefault("params", Map.of());
-    Map<String, Object> meta = (Map<String, Object>) p.getOrDefault("_meta", Map.of());
+    Map<String, Object> p = (Map<String, Object>) body.get("params");
+    if (!(p.get("_meta") instanceof Map<?, ?>))
+      return error(id, 400, -32600, "Required metadata missing", Map.of());
+    Map<String, Object> meta = (Map<String, Object>) p.get("_meta");
     String origin = request.getHeader("Origin");
     if (origin != null && !origin.equals("http://localhost:8080"))
       return error(id, 403, -32020, "Origin denied", Map.of());
-    if (!VERSION.equals(request.getHeader("MCP-Protocol-Version"))
-        || !VERSION.equals(meta.get("io.modelcontextprotocol/protocolVersion")))
+    if (!Objects.equals(method, request.getHeader("Mcp-Method"))
+        || request.getHeader("MCP-Protocol-Version") == null
+        || !Objects.equals(
+            request.getHeader("MCP-Protocol-Version"),
+            meta.get("io.modelcontextprotocol/protocolVersion")))
+      return error(id, 400, -32020, "HeaderMismatch", Map.of());
+    if (!VERSION.equals(meta.get("io.modelcontextprotocol/protocolVersion")))
       return error(
           id,
           400,
@@ -43,8 +59,7 @@ public class PlatformMcp {
               List.of(VERSION),
               "requested",
               String.valueOf(meta.get("io.modelcontextprotocol/protocolVersion"))));
-    if (!Objects.equals(method, request.getHeader("Mcp-Method"))
-        || !meta.containsKey("io.modelcontextprotocol/clientCapabilities"))
+    if (!(meta.get("io.modelcontextprotocol/clientCapabilities") instanceof Map<?, ?>))
       return error(id, 400, -32020, "HeaderMismatch", Map.of());
     String name = request.getHeader("Mcp-Name");
     if (name != null && name.startsWith("=?base64?") && name.endsWith("?=")) {
@@ -99,7 +114,7 @@ public class PlatformMcp {
                   "structuredContent",
                   value,
                   "content",
-                  List.of(Map.of("type", "text", "text", value.toString())));
+                  List.of(Map.of("type", "text", "text", json(value))));
         } catch (Exception e) {
           String outcome =
               e instanceof org.springframework.security.access.AccessDeniedException
@@ -120,7 +135,19 @@ public class PlatformMcp {
     }
     var complete = new LinkedHashMap<String, Object>(result);
     complete.put("resultType", "complete");
-    return ResponseEntity.ok(Map.of("jsonrpc", "2.0", "id", id, "result", complete));
+    var response = new LinkedHashMap<String, Object>();
+    response.put("jsonrpc", "2.0");
+    response.put("id", id);
+    response.put("result", complete);
+    return ResponseEntity.ok(response);
+  }
+
+  private static String json(Object value) {
+    try {
+      return new com.fasterxml.jackson.databind.ObjectMapper().writeValueAsString(value);
+    } catch (Exception failure) {
+      throw new IllegalStateException(failure);
+    }
   }
 
   private static Map<String, Object> tool(String name, boolean write) {

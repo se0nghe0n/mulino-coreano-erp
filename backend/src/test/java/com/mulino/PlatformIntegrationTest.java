@@ -23,7 +23,9 @@ import org.testcontainers.postgresql.PostgreSQLContainer;
 @SpringBootTest
 @ActiveProfiles("local")
 class PlatformIntegrationTest {
-  static final PostgreSQLContainer PG = new PostgreSQLContainer("postgres:18.6");
+  static final PostgreSQLContainer PG =
+      new PostgreSQLContainer(
+          "postgres@sha256:4ef4dbc939d61acea57712655ddb4b4ab27419c913f94cca0cd57cb3ea3c2280");
 
   static {
     PG.start();
@@ -211,11 +213,26 @@ class PlatformIntegrationTest {
                 return request(() -> commands.reserve(ID, "20", 0, "fenced"));
               });
       assertTrue(started.await(5, TimeUnit.SECONDS));
-      try {
-        future.get(200, TimeUnit.MILLISECONDS);
-        fail("command crossed held fence");
-      } catch (TimeoutException blocked) {
+      int holder;
+      try (var pid = c.createStatement().executeQuery("SELECT pg_backend_pid()")) {
+        pid.next();
+        holder = pid.getInt(1);
       }
+      long deadline = System.nanoTime() + TimeUnit.SECONDS.toNanos(10);
+      boolean observed = false;
+      while (System.nanoTime() < deadline) {
+        observed =
+            jdbc.queryForObject(
+                    "SELECT count(*) FROM pg_stat_activity WHERE ? = ANY(pg_blocking_pids(pid)) AND"
+                        + " wait_event_type='Lock' AND query LIKE '%mulino_platform_scopes%FOR"
+                        + " UPDATE%'",
+                    Integer.class, holder)
+                > 0;
+        if (observed) break;
+        if (future.isDone()) fail("command completed before PostgreSQL lock wait was observed");
+        Thread.sleep(20);
+      }
+      assertTrue(observed, "PostgreSQL waiter must be blocked by the held transaction");
       c.createStatement().execute(sql);
       c.commit();
       var error = assertThrows(ExecutionException.class, () -> future.get(10, TimeUnit.SECONDS));
@@ -298,14 +315,56 @@ class PlatformIntegrationTest {
   }
 
   @Test
+  void scopeLockTimeoutReturnsStructuredConflictWithoutEffects() throws Exception {
+    var pool = Executors.newSingleThreadExecutor();
+    try (var c = DriverManager.getConnection(PG.getJdbcUrl(), PG.getUsername(), PG.getPassword())) {
+      c.setAutoCommit(false);
+      try (var st =
+          c.prepareStatement("SELECT id FROM mulino_platform_scopes WHERE id=? FOR UPDATE")) {
+        st.setString(1, ID);
+        st.executeQuery();
+      }
+      var command = pool.submit(() -> request(() -> commands.reserve(ID, "20", 0, "timeout")));
+      var error = assertThrows(ExecutionException.class, () -> command.get(10, TimeUnit.SECONDS));
+      assertInstanceOf(PlatformCommands.Conflict.class, error.getCause());
+      assertEquals("LOCK_CONFLICT", error.getCause().getMessage());
+      assertEquals(0, count("audit"));
+      assertEquals(0, count("outbox"));
+      assertEquals(0, count("idempotency"));
+      c.rollback();
+    } finally {
+      pool.shutdownNow();
+    }
+  }
+
+  @Test
   void compilerColumnsMatchFlywaySchema() throws Exception {
     try (var c = DriverManager.getConnection(PG.getJdbcUrl(), PG.getUsername(), PG.getPassword())) {
       c.createStatement().execute("CREATE SCHEMA expected_compiler");
       c.createStatement().execute("SET search_path TO expected_compiler");
-      c.createStatement()
-          .execute(
-              java.nio.file.Files.readString(
-                  java.nio.file.Path.of("../verification/platform/spike/expected-v2.sql")));
+      var generated = java.nio.file.Path.of("target/expected-v2-fresh.sql");
+      String node = System.getenv().getOrDefault("NODE24_BIN", "node");
+      var compiler =
+          new ProcessBuilder(
+                  node,
+                  "node_modules/@sap/cds-dk/bin/cds.js",
+                  "compile",
+                  "db",
+                  "--to",
+                  "sql",
+                  "--dialect",
+                  "postgres")
+              .redirectOutput(generated.toFile())
+              .redirectError(ProcessBuilder.Redirect.INHERIT)
+              .start();
+      assertTrue(compiler.waitFor(30, TimeUnit.SECONDS));
+      assertEquals(0, compiler.exitValue());
+      assertEquals(
+          -1,
+          java.nio.file.Files.mismatch(
+              generated, java.nio.file.Path.of("../verification/platform/spike/expected-v2.sql")),
+          "Current pinned compiler output must match versioned expected DDL");
+      c.createStatement().execute(java.nio.file.Files.readString(generated));
       var q =
           "SELECT"
               + " table_name,column_name,data_type,COALESCE(character_maximum_length,0),COALESCE(numeric_precision,0),COALESCE(numeric_scale,0)"

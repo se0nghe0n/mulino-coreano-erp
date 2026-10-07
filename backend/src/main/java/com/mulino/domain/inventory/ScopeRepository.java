@@ -21,7 +21,21 @@ public class ScopeRepository {
   }
 
   public void fence(String id) {
-    jdbc.queryForList("SELECT id FROM mulino_platform_scopes WHERE id = ? FOR UPDATE", id);
+    try {
+      jdbc.queryForList("SELECT set_config('lock_timeout', ?, true)", "2000ms");
+      jdbc.queryForList("SELECT id FROM mulino_platform_scopes WHERE id = ? FOR UPDATE", id);
+    } catch (org.springframework.dao.DataAccessException failure) {
+      if (failure.getMostSpecificCause() instanceof java.sql.SQLException sql
+          && Set.of("55P03", "40P01", "40001").contains(sql.getSQLState()))
+        throw new LockConflict(failure);
+      throw failure;
+    }
+  }
+
+  public static class LockConflict extends RuntimeException {
+    public LockConflict(Throwable cause) {
+      super("Scope lock conflict", cause);
+    }
   }
 
   public Map<String, Object> scope(String id) {
