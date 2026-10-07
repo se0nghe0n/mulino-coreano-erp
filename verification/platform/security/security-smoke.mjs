@@ -19,7 +19,7 @@ if (mode === 'prepare') {
       wrongIssuer:{iss:'https://untrusted.invalid'},wrongAudience:{aud:'another-api'},
       expired:{exp:now-300,nbf:now-600},notYetValid:{nbf:now+300},
       otherOrganization:{organizationId:'org-b',stableRequestOwner:'owner-b'},
-      revoked:{sub:'revoked-a'},missingOrganization:{organizationId:null},
+      revoked:{sub:'revoked-a'},noGrant:{sub:'unassigned-a'},missingOrganization:{organizationId:null},
       missingOwner:{stableRequestOwner:null}})) tokens[name] = jwt({...base,...patch});
   const outsider = generateKeyPairSync('rsa', {modulusLength:2048});
   const body = `${encode({alg:'RS256',typ:'JWT'})}.${encode(base)}`;

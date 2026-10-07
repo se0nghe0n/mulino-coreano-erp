@@ -3,12 +3,16 @@ const [tokenPath,outputPath,baseUrl='http://localhost:8080'] = process.argv.slic
 if (!tokenPath || !outputPath) throw Error('tokenPath and outputPath required');
 const scopeId='00000000-0000-0000-0000-000000000001';
 const get={method:'GET',path:`/api/platform/scopes/${scopeId}`};
+const list={method:'GET',path:'/odata/v4/platform/Scopes'};
 const rest={method:'POST',path:'/api/platform/actions/reserve'};
 const odata={method:'POST',path:'/odata/v4/platform/reserve'};
 const mcp={method:'POST',path:'/mcp'};
 const cases=[];
 for(const token of [null,'wrongSignature','wrongIssuer','wrongAudience','expired','notYetValid','missingOrganization','missingOwner'])
  cases.push({id:`rest-auth-${token??'anonymous'}`,route:get,token,status:[401]});
+cases.push({id:'rest-no-grant-read',route:get,token:'noGrant',status:[403]});
+cases.push({id:'odata-no-grant-list',route:list,token:'noGrant',status:[200],bodyEquals:{'/value':[]}});
+cases.push({id:'odata-other-org-list',route:list,token:'otherOrganization',status:[200],bodyEquals:{'/value':[]}});
 cases.push({id:'rest-valid-read',route:get,token:'writer',status:[200]});
 cases.push({id:'rest-other-org',route:get,token:'otherOrganization',status:[403]});
 const payload=(key)=>({scopeId,quantity:'1',expectedRevision:0,idempotencyKey:key});
