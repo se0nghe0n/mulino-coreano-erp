@@ -10,7 +10,7 @@ public final class InventoryQuantity {
     if (!(value instanceof String text) || !text.matches("[0-9]+(?:\\.[0-9]+)?")) throw DomainError.invalid("Quantity must be a decimal string");
     BigDecimal q = new BigDecimal(text);
     BigDecimal normalized = q.stripTrailingZeros();
-    if (q.signum() <= 0 || decimalPlaces < 0 || decimalPlaces > 12 || normalized.scale() > decimalPlaces || Math.max(0, normalized.precision()-normalized.scale()) > 26) throw DomainError.invalid("Quantity exceeds unit precision or numeric range");
+    if (q.signum() <= 0 || decimalPlaces < 0 || decimalPlaces > 12 || q.scale() > decimalPlaces || q.scale() > 12 || Math.max(0, normalized.precision()-normalized.scale()) > 26) throw DomainError.invalid("Quantity exceeds unit precision or numeric range");
     return q;
   }
   public static BigDecimal convert(String value, BigDecimal factor, int decimalPlaces) {

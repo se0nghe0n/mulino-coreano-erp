@@ -186,3 +186,33 @@ entity ObjectRelations {
   validFrom : Timestamp;
   validUntil : Timestamp;
 }
+entity Stocktakes {
+ key organizationId : UUID; key ID : UUID; revision : Integer;
+ createdAt : Timestamp; recordedAt : Timestamp; segmentId : UUID;
+ observedQuantity : Decimal(38,12); unit : String(40); occurredAt : Timestamp;
+ evidenceRef : String(240); commandId : UUID;
+}
+entity IdentifierConflicts {
+ key organizationId : UUID; key ID : UUID; revision : Integer;
+ createdAt : Timestamp; recordedAt : Timestamp; itemId : UUID;
+ existingIdentifierId : UUID; issuer : String(240); namespace : String(160);
+ value : String(240); validFrom : Timestamp; validUntil : Timestamp; state : String(40);
+}
+entity Restrictions {
+ key organizationId : UUID; key ID : UUID; revision : Integer;
+ createdAt : Timestamp; recordedAt : Timestamp; controlScope : String(160);
+ action : String(80); state : String(40); validFrom : Timestamp; validUntil : Timestamp;
+ decisionId : UUID; evidenceRef : String(240);
+}
+entity DispositionBases {
+ key organizationId : UUID; key ID : UUID; revision : Integer;
+ createdAt : Timestamp; recordedAt : Timestamp; controlScope : String(160);
+ action : String(80); state : String(40); validFrom : Timestamp; validUntil : Timestamp;
+ decisionId : UUID; evidenceRef : String(240);
+}
+entity SegmentAllocations {
+ key organizationId : UUID; key ID : UUID; revision : Integer;
+ createdAt : Timestamp; recordedAt : Timestamp; rootId : UUID; segmentId : UUID;
+ orderLineId : UUID; quantity : Decimal(38,12); unit : String(40); state : String(40);
+ predecessorId : UUID; commandId : UUID;
+}
