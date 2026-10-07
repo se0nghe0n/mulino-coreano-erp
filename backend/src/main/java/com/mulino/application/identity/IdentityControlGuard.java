@@ -18,7 +18,7 @@ public class IdentityControlGuard {
     auth.fence(context,List.of(recipient));
     auth.authorize(context,"createGrant",null);
     var actor=repository.actor(context.organizationId(),context.actorId()).orElseThrow(IdentityAuthorization::denied);
-    if(!"HUMAN".equals(actor.get("kind"))||recipient.equals(context.actorId())||capabilities.isEmpty()||scopes.isEmpty()||!until.isAfter(from)) throw IdentityAuthorization.denied();
+    if(!"HUMAN".equals(actor.get("kind"))||recipient.equals(context.actorId())||capabilities.isEmpty()||scopes.isEmpty()||!until.isAfter(from)||!until.isAfter(auth.now())) throw IdentityAuthorization.denied();
     repository.actor(context.organizationId(),recipient).orElseThrow(IdentityAuthorization::denied);
     if(!repository.rows("Memberships",context.organizationId()).stream().anyMatch(r -> recipient.equals(r.get("actorId")) && IdentityAuthorization.active(r,auth.now()))) throw IdentityAuthorization.denied();
     Map<String,Collection<String>> requested=new HashMap<>();
