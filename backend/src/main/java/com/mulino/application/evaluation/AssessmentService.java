@@ -42,7 +42,7 @@ public class AssessmentService implements CommandHandler,WorkAssessmentGuard {
   }
   public void requireResume(DomainContext c,Map<String,Object> w,Map<String,Object> wait,Map<String,Object> evidence){
     var goal=work.currentGoal(c,w.get("ID").toString());Definition d=definition(goal,c);var predicate=map(wait.get("resumePredicate"));if(!"VALID".equals(validator.validatePredicate(d,predicate).outcome()))throw DomainError.invalid("Unsupported resume predicate");
-    var result=evaluator.evaluate(predicate,provider.load(c,w,decode(goal.get("slotsJson")),d),c.asOf(),c.knownAt());
+    var result=evaluator.evaluate(predicate,provider.load(c,w,decode(goal.get("slotsJson")),d,goal.get("ID").toString()),c.asOf(),c.knownAt());
     if(result.truth().state()!=PredicateTruth.State.SATISFIED||result.truth().conflict())throw new DomainError("HELD","WAIT_UNVERIFIED","Verified resume condition required");
   }
   public void goalChanged(DomainContext c,String workId,String previousGoalId,String newGoalId){/* WorkLifecycle records pending flag with the new goal in its own atomic transition. */}
@@ -54,7 +54,7 @@ public class AssessmentService implements CommandHandler,WorkAssessmentGuard {
     try{d=definition(goal,c);}catch(DomainError|NoSuchElementException e){return held(goal,slots,"PINNED_CONTRACT_UNAVAILABLE");}
     var policy=policies.current(c.organizationId(),"EVIDENCE",c.asOf()).stream().filter(p->p.get("createdAt")!=null&&!instant(p.get("createdAt")).isAfter(c.knownAt())&&Objects.equals(slots.get("evidencePolicyVersion"),p.get("version"))).toList();
     if(policy.size()!=1)return held(goal,slots,"EVIDENCE_POLICY_UNRESOLVED");
-    var facts=provider.load(c,w,slots,d);Map<String,Object> predicate=goalPredicate(d,slots);
+    var facts=provider.load(c,w,slots,d,goal.get("ID").toString());Map<String,Object> predicate=goalPredicate(d,slots);
     TypedPredicateEvaluator.Result result;
     String mode=slots.get("quantityMode").toString();
     if(mode.equals("EXISTS_IN")||mode.equals("THROUGHOUT"))result=evaluator.evaluateInterval(predicate,facts,instant(slots.get("periodStart")),instant(slots.get("periodEnd")),c.knownAt(),mode.equals("THROUGHOUT"));

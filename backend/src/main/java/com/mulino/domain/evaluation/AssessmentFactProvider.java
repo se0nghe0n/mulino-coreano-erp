@@ -6,14 +6,18 @@ import com.mulino.adapters.blob.LocalBlobStore;
 import java.time.*;
 import java.util.*;
 import org.springframework.stereotype.Component;
+import org.springframework.beans.factory.ObjectProvider;
+import com.mulino.application.work.WorkContributionRead;
 import static com.mulino.domain.evaluation.EvaluationFacts.*;
 
 /** CQN-backed observation provider. Raw claims and unsupported downstream adapters cannot fulfil a goal. */
 @Component
 public class AssessmentFactProvider {
-  private final AssessmentRepository r; private final LocalBlobStore blobs;
-  public AssessmentFactProvider(AssessmentRepository r,LocalBlobStore blobs){this.r=r;this.blobs=blobs;}
-  public EvaluationFacts load(DomainContext c,Map<String,Object> work,Map<String,Object> slots,Definition definition) {
+  private final AssessmentRepository r; private final LocalBlobStore blobs;private final ObjectProvider<WorkContributionRead> contributionPort;
+  public AssessmentFactProvider(AssessmentRepository r,LocalBlobStore blobs,ObjectProvider<WorkContributionRead> contributionPort){this.r=r;this.blobs=blobs;this.contributionPort=contributionPort;}
+  public EvaluationFacts load(DomainContext c,Map<String,Object> work,Map<String,Object> slots,Definition definition){return load(c,work,slots,definition,null);}
+  public EvaluationFacts load(DomainContext c,Map<String,Object> work,Map<String,Object> slots,Definition definition,String goalId) {
+    var port=contributionPort.getIfAvailable();var credits=goalId==null||port==null?List.<Map<String,Object>>of():port.contributions(c,work.get("ID").toString(),goalId);
     boolean stateGoal="STATE_AT".equals(slots.get("quantityMode"))||definition.goals().stream().filter(g->Objects.equals(slots.get("endpoint"),g.endpoint())&&Objects.equals(slots.get("quantityMode"),g.quantityMode())).anyMatch(g->usesCurrentState(g.predicate()));
     var properties=new TreeMap<String,List<Fact>>();var relations=new TreeMap<String,List<Fact>>();
     var occurrences=r.rows(c,"mulino.evidence.CanonicalOccurrences");var verifications=r.rows(c,"mulino.evidence.Verifications");
@@ -22,7 +26,8 @@ public class AssessmentFactProvider {
     for(var attribute:definition.attributes()) {
       String property=attribute.nounType()+"."+attribute.name();var facts=new ArrayList<Fact>();
       if(!stateGoal&&(attribute.name().equals("quantity")||attribute.name().equals("occurredAt")))for(var occurrence:occurrences) {
-        if(!Objects.equals(work.get("ID"),occurrence.get("workId"))||!Objects.equals(work.get("itemId"),occurrence.get("itemId")))continue;
+        var allocations=credits.stream().filter(x->Objects.equals(occurrence.get("ID"),x.get("occurrenceId"))).toList();
+        if((!Objects.equals(work.get("ID"),occurrence.get("workId"))&&allocations.isEmpty())||!Objects.equals(work.get("itemId"),occurrence.get("itemId")))continue;
         if(slots.get("eventKind")!=null&&!Objects.equals(slots.get("eventKind"),occurrence.get("kind")))continue;
         if(slots.get("placeId")!=null&&!Objects.equals(slots.get("placeId"),occurrence.get("placeId")))continue;
         if(occurrences.stream().anyMatch(x->occurrence.get("ID").equals(x.get("supersedesId"))))continue;
@@ -58,7 +63,12 @@ public class AssessmentFactProvider {
         Object value=attribute.name().equals("occurredAt")?effective:occurrence.get("quantity");
         Instant until=instantOrNull(occurrence.get("effectiveUntil"));
         if(Set.of("EXISTS_IN","THROUGHOUT").contains(slots.get("quantityMode"))&&until==null)until=effective.plusNanos(1);
-        facts.add(new Fact(occurrence.get("ID").toString(),Objects.toString(occurrence.get("revision")),DefinitionRepository.sha256(occurrence.toString()),occurrence.get("ID").toString(),Objects.toString(occurrence.get("physicalScopeId"),null),value,Objects.toString(occurrence.get("unit"),null),state,verified,effective,until,instant(occurrence.get("recordedAt")),refs));
+        if(allocations.isEmpty())facts.add(new Fact(occurrence.get("ID").toString(),Objects.toString(occurrence.get("revision")),DefinitionRepository.sha256(occurrence.toString()),occurrence.get("ID").toString(),Objects.toString(occurrence.get("physicalScopeId"),null),value,Objects.toString(occurrence.get("unit"),null),state,verified,effective,until,instant(occurrence.get("recordedAt")),refs));
+        else for(var credit:allocations){
+          var creditRefs=new ArrayList<>(refs);creditRefs.add(credit.get("ID").toString());
+          boolean validCredit=occurrence.get("physicalScopeId")!=null&&Objects.equals(credit.get("unit"),occurrence.get("unit"));
+          facts.add(new Fact(occurrence.get("ID").toString(),Objects.toString(occurrence.get("revision")),DefinitionRepository.sha256(occurrence.toString()),occurrence.get("ID").toString(),occurrence.get("physicalScopeId")+"|"+credit.get("ID"),attribute.name().equals("quantity")?credit.get("quantity"):value,Objects.toString(credit.get("unit")),validCredit?state:State.CONFLICT,verified&&validCredit,effective,until,instant(occurrence.get("recordedAt")),creditRefs));
+        }
       }
       // Existing segment facts represent actual state only; action eligibility and contribution adapters are S3/S4.
       if((attribute.name().equals("stateQuantity")||attribute.name().equals("quantity")&&stateGoal)&&(!slots.containsKey("action")||Set.of("PHYSICAL","PHYSICAL_HELD").contains(slots.get("action")))&&(!slots.containsKey("includeReserved")||Boolean.TRUE.equals(slots.get("includeReserved"))))for(var segment:r.rows(c,"mulino.inventory.QuantitySegments")) {
@@ -83,6 +93,7 @@ public class AssessmentFactProvider {
     for(String entity:List.of("CanonicalOccurrences","Verifications","Claims","Events","InboxRecords","DocumentVersions")) {
       var selected=r.rows(c,"mulino.evidence."+entity).stream().filter(x->referenced.contains(Objects.toString(x.get("ID")))||entity.equals("InboxRecords")&&referenced.contains(Objects.toString(x.get("eventId")))).map(x->new TreeMap<String,Object>(x)).map(x->(Map<String,Object>)x).toList();sources.put("evidence."+entity,selected);
     }
+    sources.put("work.Contributions",credits);
     sources.put("inventory.UnitConversions",r.rows(c,"mulino.inventory.UnitConversions").stream().filter(x->referenced.contains(Objects.toString(x.get("ID")))).toList());
     return new EvaluationFacts(properties,relations,sources);
   }

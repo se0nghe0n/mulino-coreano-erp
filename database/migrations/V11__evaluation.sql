@@ -1,6 +1,6 @@
 ALTER TABLE mulino_work_read_AssessmentReferences
   ADD COLUMN definitionVersionId VARCHAR(36),
-  ADD COLUMN policyVersionId VARCHAR(160),
+  ADD COLUMN policyVersionId VARCHAR(36),
   ADD COLUMN knownAt TIMESTAMPTZ,
   ADD COLUMN asOf TIMESTAMPTZ,
   ADD COLUMN previousAssessmentId VARCHAR(36),
@@ -9,6 +9,7 @@ ALTER TABLE mulino_work_read_AssessmentReferences
   ADD COLUMN held BOOLEAN NOT NULL DEFAULT FALSE,
   ADD COLUMN conflict BOOLEAN NOT NULL DEFAULT FALSE,
   ADD FOREIGN KEY(organizationId,definitionVersionId) REFERENCES mulino_definitions_DefinitionVersions(organizationId,ID),
+  ADD FOREIGN KEY(organizationId,policyVersionId) REFERENCES mulino_governance_PolicyVersions(organizationId,ID),
   ADD FOREIGN KEY(organizationId,previousAssessmentId) REFERENCES mulino_work_read_AssessmentReferences(organizationId,ID);
 CREATE TABLE mulino_evaluation_InputSnapshots (
   organizationId VARCHAR(36) NOT NULL,
