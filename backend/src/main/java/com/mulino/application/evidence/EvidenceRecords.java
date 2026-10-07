@@ -100,7 +100,10 @@ public class EvidenceRecords {
   public Map<String,Object> verifyCanonical(CanonicalInput input) { return verifyCanonical(input,false); }
   @Transactional
   Map<String,Object> verifyReviewedCanonical(CanonicalInput input) { return verifyCanonical(input,true); }
-  private Map<String,Object> verifyCanonical(CanonicalInput input,boolean reviewed) {
+  @Transactional
+  Map<String,Object> verifyReviewedReceiptCanonical(CanonicalInput input,Map<String,Object> trustedScope){return verifyCanonical(input,true,trustedScope);}
+  private Map<String,Object> verifyCanonical(CanonicalInput input,boolean reviewed) {return verifyCanonical(input,reviewed,Map.of());}
+  private Map<String,Object> verifyCanonical(CanonicalInput input,boolean reviewed,Map<String,Object> trustedScope) {
     var c=now(); var claim=r.require("Claims",c.organizationId(),uuid(input.claimId())); var event=r.require("Events",c.organizationId(),claim.get("eventId").toString());
     auth.authorizeScopes(c,"linkCanonicalOccurrence",scopes(event));
     if(r.rows("Events",c.organizationId()).stream().anyMatch(x->event.get("ID").equals(x.get("supersedesId"))||event.get("ID").equals(x.get("invalidatesId")))||r.rows("Claims",c.organizationId()).stream().anyMatch(x->claim.get("ID").equals(x.get("supersedesId"))))throw new DomainError("CONFLICT","EVIDENCE_CONFLICT","Superseded or invalidated evidence cannot become current canonical evidence");
@@ -118,12 +121,14 @@ public class EvidenceRecords {
     if(input.existingCanonicalId()!=null) {
       canonical=r.require("CanonicalOccurrences",c.organizationId(),uuid(input.existingCanonicalId()));
       sameSubject(claim,canonical);
+      for(var field:trustedScope.entrySet())if(!Objects.equals(field.getValue(),canonical.get(field.getKey())))throw DomainError.invalid("Canonical receipt scope differs from confirmed provisional identity");
       if(!physical.equals(canonical.get("physicalScopeId"))||!Objects.equals(claim.get("quantity"),canonical.get("quantity"))||!Objects.equals(claim.get("unit"),canonical.get("unit"))||!Objects.equals(event.get("kind"),canonical.get("kind"))||!instant(claim.get("effectiveFrom")).equals(instant(canonical.get("effectiveFrom")))||!Objects.equals(claim.get("effectiveUntil"),canonical.get("effectiveUntil"))||!Objects.equals(claim.get("timePrecision"),canonical.get("timePrecision")))throw DomainError.invalid("Canonical occurrence mismatch");
     } else {
       var existing=r.rows("CanonicalOccurrences",c.organizationId()).stream().filter(x->physical.equals(x.get("physicalScopeId"))&&Objects.equals(event.get("kind"),x.get("kind"))&&instant(claim.get("effectiveFrom")).equals(instant(x.get("effectiveFrom")))).toList();
       if(!existing.isEmpty()&&input.supersedesId()==null)throw new DomainError("CONFLICT","EVIDENCE_CONFLICT","Canonical occurrence already exists; explicit reconciliation needed");
       canonical=base(c); copySubject(claim,canonical);copyTime(claim,canonical);canonical.put("sourceProfileId",event.get("sourceProfileId"));canonical.put("kind",event.get("kind"));canonical.put("physicalScopeId",physical);canonical.put("valueState","KNOWN");canonical.put("reassessmentState",reviewed?"COMPLETE":"NOT_IMPLEMENTED");
       if(claim.get("quantity")!=null){canonical.put("quantity",claim.get("quantity"));canonical.put("unit",claim.get("unit"));}
+      for(var field:trustedScope.entrySet()){if(canonical.get(field.getKey())!=null&&!Objects.equals(canonical.get(field.getKey()),field.getValue()))throw DomainError.invalid("Claim differs from confirmed receipt scope");canonical.put(field.getKey(),field.getValue());}
       supersedes(c,"CanonicalOccurrences",canonical,input.supersedesId()); r.insert("CanonicalOccurrences",canonical);
     }
     var verification=base(c);verification.put("claimId",claim.get("ID"));verification.put("canonicalOccurrenceId",canonical.get("ID"));verification.put("basisDocumentId",basis.get("ID"));verification.put("policyVersion",input.policyVersion());

@@ -9,11 +9,13 @@ import org.springframework.stereotype.Service;
 /** Due time triggers current commands; it never invents approval or arrival. */
 @Service
 public class RuntimeRecoverySweeper {
- private final RuntimeService runtime;private final WorkAccess works;private final ExecutionClock clock;private final IdentityRepository identities;private final RuntimeRecoveryExecution execution;
- public RuntimeRecoverySweeper(RuntimeService runtime,WorkAccess works,ExecutionClock clock,IdentityRepository identities,RuntimeRecoveryExecution execution){this.runtime=runtime;this.works=works;this.clock=clock;this.identities=identities;this.execution=execution;}
+ private final RuntimeService runtime;private final WorkAccess works;private final ExecutionClock clock;private final IdentityRepository identities;private final RuntimeRecoveryExecution execution;private final List<ValidityBoundarySweep> validity;
+ public RuntimeRecoverySweeper(RuntimeService runtime,WorkAccess works,ExecutionClock clock,IdentityRepository identities,RuntimeRecoveryExecution execution){this(runtime,works,clock,identities,execution,List.of());}
+ @org.springframework.beans.factory.annotation.Autowired
+ public RuntimeRecoverySweeper(RuntimeService runtime,WorkAccess works,ExecutionClock clock,IdentityRepository identities,RuntimeRecoveryExecution execution,List<ValidityBoundarySweep> validity){this.runtime=runtime;this.works=works;this.clock=clock;this.identities=identities;this.execution=execution;this.validity=List.copyOf(validity);}
  public int sweep(){
   runtime.recoverExpiredExecutions();runtime.captureControlInvalidations();
-  var due=runtime.dueSchedules(100);int changed=0;
+  var due=runtime.dueSchedules(100);int changed=0;for(var boundary:validity)changed+=boundary.sweep();
   for(var schedule:due){
    String org=(String)schedule.get("organizationid"),owner=(String)schedule.get("ownerid"),workId=(String)schedule.get("workid");
    var actor=identities.actor(org,owner).orElse(null);

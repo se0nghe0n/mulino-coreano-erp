@@ -64,7 +64,7 @@ public class EvidenceReconciliation {
       var providers=receiptScopes.stream().toList();if(providers.size()!=1)throw new DomainError("HELD","POLICY_UNRESOLVED","Receipt identity provider unavailable");
       var range=providers.getFirst().require(c,uuid(input.physicalScopeId()));
       var allowed=new LinkedHashMap<String,Collection<String>>(scopes(claim));allowed.put("TARGET",List.of(range.receiptRangeId()));allowed.put("ITEM",List.of(range.itemId()));allowed.put("PLACE",List.of(range.placeId()));if(range.workId()!=null)allowed.put("WORK",List.of(range.workId()));auth.authorizeScopes(c,capability,allowed);
-      identity=range.receiptRangeId().equals(input.physicalScopeId())&&Objects.equals(range.itemId(),claim.get("itemId"))&&Objects.equals(range.placeId(),claim.get("placeId"))&&Objects.equals(range.workId(),claim.get("workId"))&&sameQuantity(quantity,range.quantity())&&Objects.equals(input.unit(),range.unit())&&range.occurredAt().equals(input.effectiveFrom())&&switch(claim.get("subjectKind").toString()){case "ITEM"->range.itemId().equals(claim.get("subjectId"));case "LOT"->Objects.equals(range.lotId(),claim.get("subjectId"));default->false;};
+      identity=range.receiptRangeId().equals(input.physicalScopeId())&&Objects.equals(range.itemId(),claim.get("itemId"))&&(claim.get("placeId")==null||Objects.equals(range.placeId(),claim.get("placeId")))&&(claim.get("workId")==null||Objects.equals(range.workId(),claim.get("workId")))&&sameQuantity(quantity,range.quantity())&&Objects.equals(input.unit(),range.unit())&&range.occurredAt().equals(input.effectiveFrom())&&switch(claim.get("subjectKind").toString()){case "ITEM"->range.itemId().equals(claim.get("subjectId"));case "LOT"->Objects.equals(range.lotId(),claim.get("subjectId"));default->false;};
       try {
         var mapper=new com.fasterxml.jackson.databind.ObjectMapper();var originalPayload=mapper.readTree(blobs.read(UUID.fromString(doc.get("blobId").toString()),doc.get("sha256").toString()));var eventPayload=mapper.readTree(event.get("payload").toString());
         for(var payload:List.of(originalPayload,eventPayload))identity &= receiptPayloadMatches(payload,range);
@@ -151,7 +151,9 @@ public class EvidenceReconciliation {
       if(candidates.size()==1)existing=candidates.getFirst().get("ID").toString();
       if(candidates.size()>1)throw new DomainError("HELD","EVIDENCE_CONFLICT","Canonical scope has competing revisions");
     }
-    var result=records.verifyReviewedCanonical(new EvidenceRecords.CanonicalInput(claim.get("ID").toString(),physical,review.get("basisDocumentId").toString(),review.get("policyVersion").toString(),true,true,true,true,true,existing,null,review.get("reason").toString()));
+    var canonicalInput=new EvidenceRecords.CanonicalInput(claim.get("ID").toString(),physical,review.get("basisDocumentId").toString(),review.get("policyVersion").toString(),true,true,true,true,true,existing,null,review.get("reason").toString());
+    Map<String,Object> result;
+    if("PHYSICAL_RECEIPT".equals(event.get("kind"))){var providers=receiptScopes.stream().toList();if(providers.size()!=1)throw new DomainError("HELD","POLICY_UNRESOLVED","Receipt identity provider unavailable");var range=providers.getFirst().require(c,physical);var trusted=new LinkedHashMap<String,Object>();trusted.put("itemId",range.itemId());trusted.put("placeId",range.placeId());if(range.workId()!=null)trusted.put("workId",range.workId());result=records.verifyReviewedReceiptCanonical(canonicalInput,trusted);}else result=records.verifyReviewedCanonical(canonicalInput);
     completion.publish(c,result.get("id").toString(),claim.get("ID").toString(),review.get("basisDocumentId").toString());
     var impact=impacts.getIfAvailable();
     if(impact!=null)impact.evidenceLinked(c,claim.get("ID").toString(),result.get("id").toString());
