@@ -142,6 +142,8 @@ entity LogisticsMemberships {
   validUntil : Timestamp;
 }
 entity GenealogyEdges {
+  sourceStartQuantity : Decimal(38,12);
+  targetStartQuantity : Decimal(38,12);
   key organizationId : UUID;
   key ID : UUID;
   revision : Integer;

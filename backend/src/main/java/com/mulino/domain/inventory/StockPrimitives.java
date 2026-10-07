@@ -65,7 +65,7 @@ public final class StockPrimitives {
     if(!Set.of("DISPOSE","ADJUST_DECREASE").contains(kind))throw DomainError.invalid("Unsupported decrease");
     lockSources(c,List.of(parent));var s=leaf(c,parent,at);BigDecimal decrease=quantity(c,s,value,unit),remaining=amount(s).subtract(decrease);
     if(remaining.signum()<0)throw DomainError.invalid("Decrease exceeds physical leaf");
-    if(!repository.currentRows(c,"SegmentAllocations").stream().filter(a->parent.equals(a.get("segmentId"))).noneMatch(a->Set.of("EXECUTABLE","SUSPENDED").contains(a.get("state"))))throw conflict("Resolve allocation responsibility before decreasing stock");
+    if(kind.equals("DISPOSE")&&!repository.currentRows(c,"SegmentAllocations").stream().filter(a->parent.equals(a.get("segmentId"))).noneMatch(a->Set.of("EXECUTABLE","SUSPENDED").contains(a.get("state"))))throw conflict("Resolve allocation responsibility before disposing stock");
     List<String> children=replace(c,List.of(s),remaining.signum()==0?List.of():List.of(remaining),(String)s.get("placeId"),at,evidence,command,kind);
     movement(c,s,null,decrease,kind,at,evidence,command);return children;
   }
@@ -85,8 +85,25 @@ public final class StockPrimitives {
     BigDecimal corrected=amount(s).add(delta);quantity(c,s,corrected.toPlainString(),unit);
     var extra=child(c,s,corrected,(String)s.get("placeId"),at,evidence);repository.insert("QuantitySegments",extra);
     repository.update(c,"QuantitySegments",parent,Map.of("retiredAt",at,"retirementRecordedAt",c.knownAt(),"revision",((Number)s.get("revision")).intValue()+1));
-    edge(c,s,extra,amount(s),"ADJUST_RETAINED","UNCERTAIN_MIXTURE".equals(s.get("mixtureStatus")),at,evidence,command);
+    edge(c,s,extra,amount(s),BigDecimal.ZERO,BigDecimal.ZERO,"ADJUST_RETAINED","UNCERTAIN_MIXTURE".equals(s.get("mixtureStatus")),at,evidence,command);
     movement(c,null,extra,delta,"ADJUST_INCREASE",at,evidence,command);transferAllocations(c,s,List.of(extra),at,command);closeMembership(c,s,List.of(extra),at);return (String)extra.get("ID");
+  }
+  /** Relocates an identified interval and retains exact prefix/suffix identities. */
+  public String transferRange(DomainContext c,String segmentId,BigDecimal start,BigDecimal q,String destination,Instant at,String evidence,String command,String kind){
+    return replaceRange(c,segmentId,start,q,destination,at,evidence,command,kind,false);
+  }
+  public void disposeRange(DomainContext c,String segmentId,BigDecimal start,BigDecimal q,Instant at,String evidence,String command){
+    replaceRange(c,segmentId,start,q,null,at,evidence,command,"DISPOSE",true);
+  }
+  private String replaceRange(DomainContext c,String segmentId,BigDecimal start,BigDecimal q,String destination,Instant at,String evidence,String command,String kind,boolean discard){
+    lockSources(c,List.of(segmentId));var source=leaf(c,segmentId,at);quantity(c,source,q.toPlainString(),(String)source.get("unit"));
+    if(start.signum()<0||start.add(q).compareTo(amount(source))>0||"UNCERTAIN_MIXTURE".equals(source.get("mixtureStatus")))throw DomainError.invalid("Identified exact physical interval required");
+    if(destination!=null)repository.current(c,"Places",destination);
+    var children=new ArrayList<Map<String,Object>>();String selected=null;
+    BigDecimal end=start.add(q);var intervals=new ArrayList<QualityRanges.Range>();if(start.signum()>0)intervals.add(new QualityRanges.Range(BigDecimal.ZERO,start));if(!discard)intervals.add(new QualityRanges.Range(start,end));if(end.compareTo(amount(source))<0)intervals.add(new QualityRanges.Range(end,amount(source)));
+    for(var range:intervals){boolean chosen=!discard&&range.start().compareTo(start)==0&&range.end().compareTo(end)==0;var child=child(c,source,range.end().subtract(range.start()),chosen?destination:(String)source.get("placeId"),at,evidence);repository.insert("QuantitySegments",child);children.add(child);edge(c,source,child,amount(child),range.start(),BigDecimal.ZERO,kind,false,at,evidence,command);if(chosen)selected=(String)child.get("ID");}
+    repository.update(c,"QuantitySegments",segmentId,Map.of("retiredAt",at,"retirementRecordedAt",c.knownAt(),"revision",((Number)source.get("revision")).intValue()+1));
+    transferAllocations(c,source,children,at,command);closeMembership(c,source,children,at);if(discard)movement(c,source,null,q,kind,at,evidence,command);return selected;
   }
   private void lockSources(DomainContext c,List<String> ids) {
     var keys=new TreeSet<String>();
@@ -106,30 +123,31 @@ public final class StockPrimitives {
     for(BigDecimal q:amounts) {var child=child(c,first,q,place,at,evidence);if(uncertain)child.put("mixtureStatus","UNCERTAIN_MIXTURE");children.add(child);repository.insert("QuantitySegments",child);}
     for(var source:sources) {
       repository.update(c,"QuantitySegments",(String)source.get("ID"),Map.of("retiredAt",at,"retirementRecordedAt",c.knownAt(),"revision",((Number)source.get("revision")).intValue()+1));
-      if(sources.size()==1) for(var target:children)edge(c,source,target,amount(target),kind,uncertain,at,evidence,command);
-      else edge(c,source,children.getFirst(),amount(source),kind,uncertain,at,evidence,command);
+      if(sources.size()==1) {BigDecimal offset=BigDecimal.ZERO;for(var target:children){edge(c,source,target,amount(target),offset,BigDecimal.ZERO,kind,uncertain,at,evidence,command);offset=offset.add(amount(target));}}
+      else {BigDecimal offset=BigDecimal.ZERO;for(var prior:sources){if(prior==source)break;offset=offset.add(amount(prior));}edge(c,source,children.getFirst(),amount(source),BigDecimal.ZERO,offset,kind,uncertain,at,evidence,command);}
       transferAllocations(c,source,children,at,command);
       closeMembership(c,source,children,at);
     }
     return children.stream().map(s->(String)s.get("ID")).toList();
   }
   private void transferAllocations(DomainContext c,Map<String,Object> source,List<Map<String,Object>> children,Instant at,String command) {
-    Map<String,BigDecimal> available=new LinkedHashMap<>();children.forEach(child->available.put((String)child.get("ID"),amount(child)));
-    // Existing allocations of other merge parents already moved into the same child.
-    repository.currentRows(c,"SegmentAllocations").stream().filter(a->available.containsKey(a.get("segmentId"))&&Set.of("EXECUTABLE","SUSPENDED").contains(a.get("state"))).forEach(a->available.compute((String)a.get("segmentId"),(k,v)->v.subtract((BigDecimal)a.get("quantity"))));
     var old=repository.currentRows(c,"SegmentAllocations").stream().filter(a->source.get("ID").equals(a.get("segmentId"))&&Set.of("EXECUTABLE","SUSPENDED").contains(a.get("state"))).sorted(Comparator.comparing(a->(String)a.get("ID"))).toList();
+    BigDecimal legacyCursor=BigDecimal.ZERO;
     for(var a:old) {
-      BigDecimal remaining=(BigDecimal)a.get("quantity");
-      for(var child:children) {
-        String sid=(String)child.get("ID");BigDecimal q=remaining.min(available.get(sid));if(q.signum()<=0)continue;
-        var next=row(c,id(),at);for(String key:List.of("rootId","orderLineId","unit","state","workId","authorizationActorId","action","nextValidityBoundary"))if(a.containsKey(key))next.put(key,a.get(key));
-        next.put("segmentId",sid);next.put("quantity",q);next.put("predecessorId",a.get("ID"));next.put("commandId",command);
-        repository.insert("SegmentAllocations",next);remaining=remaining.subtract(q);available.put(sid,available.get(sid).subtract(q));
+      BigDecimal start=a.get("startQuantity") instanceof BigDecimal x?x:legacyCursor,q=(BigDecimal)a.get("quantity");legacyCursor=start.add(q);
+      BigDecimal retained=BigDecimal.ZERO;
+      for(var child:children) for(var range:PhysicalRanges.project(repository.currentRows(c,"GenealogyEdges"),(String)source.get("ID"),(String)child.get("ID"),start,q)) {
+        var next=row(c,id(),at);for(String key:List.of("rootId","orderLineId","unit","state","workId","authorizationActorId","action","customerId","nextValidityBoundary","suspendedAt","suspensionReason"))if(a.get(key)!=null)next.put(key,a.get(key));
+        BigDecimal count=range.end().subtract(range.start());next.put("segmentId",child.get("ID"));next.put("startQuantity",range.start());next.put("quantity",count);next.put("predecessorId",a.get("ID"));next.put("commandId",command);repository.insert("SegmentAllocations",next);retained=retained.add(count);
       }
-      if(remaining.signum()!=0)throw conflict("Existing allocation exceeds replacement stock");
+      if(retained.compareTo(q)<0){
+        // The missing physical part remains a suspended obligation; it cannot execute on a retired parent.
+        var shortage=new LinkedHashMap<String,Object>(a);shortage.putAll(row(c,id(),at));shortage.put("quantity",q.subtract(retained));shortage.put("startQuantity",start.add(retained));shortage.put("state","SUSPENDED");shortage.put("suspendedAt",c.knownAt());shortage.put("suspensionReason","PHYSICAL_SHORTAGE");shortage.put("predecessorId",a.get("ID"));shortage.put("commandId",command);repository.insert("SegmentAllocations",shortage);
+      }
       repository.update(c,"SegmentAllocations",(String)a.get("ID"),Map.of("state","REPLACED","revision",((Number)a.get("revision")).intValue()+1));
     }
   }
+
   private void closeMembership(DomainContext c,Map<String,Object> source,List<Map<String,Object>> children,Instant at) {
     for(var membership:repository.currentRows(c,"LogisticsMemberships"))if(source.get("ID").equals(membership.get("segmentId"))&&!instant(membership.get("validFrom")).isAfter(at)&&(membership.get("validUntil")==null||at.isBefore(instant(membership.get("validUntil"))))) {
       if(!at.isAfter(instant(membership.get("validFrom"))))throw DomainError.invalid("Membership transition must follow its start");
@@ -144,8 +162,8 @@ public final class StockPrimitives {
     var r=row(c,id(),at);for(String key:List.of("itemId","lotId","identificationStatus","unit","custodianId","ownerId","controlScope","mixtureStatus"))r.put(key,source.get(key));
     r.put("quantity",q);r.put("placeId",place);r.put("validFrom",at);r.put("evidenceRef",evidence);return r;
   }
-  private void edge(DomainContext c,Map<String,Object> source,Map<String,Object> target,BigDecimal q,String kind,boolean uncertain,Instant at,String evidence,String command) {
-    var r=row(c,id(),at);r.put("sourceId",source.get("ID"));r.put("targetId",target.get("ID"));r.put("quantity",q);r.put("unit",source.get("unit"));r.put("kind",kind);r.put("uncertain",uncertain);r.put("occurredAt",at);r.put("evidenceRef",evidence);repository.insert("GenealogyEdges",r);
+  private void edge(DomainContext c,Map<String,Object> source,Map<String,Object> target,BigDecimal q,BigDecimal sourceStart,BigDecimal targetStart,String kind,boolean uncertain,Instant at,String evidence,String command) {
+    var r=row(c,id(),at);r.put("sourceId",source.get("ID"));r.put("targetId",target.get("ID"));r.put("quantity",q);r.put("unit",source.get("unit"));r.put("kind",kind);r.put("sourceStartQuantity",sourceStart);r.put("targetStartQuantity",targetStart);r.put("uncertain",uncertain);r.put("occurredAt",at);r.put("evidenceRef",evidence);repository.insert("GenealogyEdges",r);
     movement(c,source,target,q,kind,at,evidence,command);
   }
   private void movement(DomainContext c,Map<String,Object> source,Map<String,Object> target,BigDecimal q,String kind,Instant at,String evidence,String command) {
