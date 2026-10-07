@@ -70,7 +70,7 @@ unit 6 tests·failure0·error0으로 별도 통과한 뒤 최종 PG 포함
 
 최초 unit 실패는 fixture JwtAuthenticationToken의 authenticated 상태가
 빠진 원인이며, 최초 PG test compile 실패는 CAP requestContext run의
-Consumer/Function overload 모호성이다. 수정 전 로그도 보존한다.
+Consumer/Function overload 모호성이다. 수정 전 로그도 보존한다. 저장 로그의 줄 끝 공백만 정규화했다.
 
 ## 미실행과 후속 경계
 
