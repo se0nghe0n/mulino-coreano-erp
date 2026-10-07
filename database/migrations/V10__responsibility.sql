@@ -61,3 +61,10 @@ CREATE CONSTRAINT TRIGGER responsibility_root_integrity AFTER INSERT OR UPDATE O
 CREATE CONSTRAINT TRIGGER responsibility_scope_integrity AFTER INSERT OR UPDATE ON mulino_responsibility_Scopes DEFERRABLE INITIALLY DEFERRED FOR EACH ROW EXECUTE FUNCTION mulino_responsibility_validate();
 CREATE CONSTRAINT TRIGGER responsibility_assignment_integrity AFTER INSERT OR UPDATE ON mulino_work_read_ObligationReferences DEFERRABLE INITIALLY DEFERRED FOR EACH ROW EXECUTE FUNCTION mulino_responsibility_validate();
 CREATE TRIGGER responsibility_assignment_human BEFORE UPDATE ON mulino_work_read_ObligationReferences FOR EACH ROW EXECUTE FUNCTION mulino_work_read_human_responsibility();
+-- Responsibility history cannot disappear through a direct row deletion.
+CREATE FUNCTION mulino_responsibility_no_delete() RETURNS trigger LANGUAGE plpgsql AS $$
+BEGIN RAISE EXCEPTION 'Responsibility history cannot be deleted'; END $$;
+CREATE TRIGGER responsibility_root_no_delete BEFORE DELETE ON mulino_responsibility_Roots FOR EACH ROW EXECUTE FUNCTION mulino_responsibility_no_delete();
+CREATE TRIGGER responsibility_scope_no_delete BEFORE DELETE ON mulino_responsibility_Scopes FOR EACH ROW EXECUTE FUNCTION mulino_responsibility_no_delete();
+CREATE TRIGGER responsibility_assignment_no_delete BEFORE DELETE ON mulino_work_read_ObligationReferences FOR EACH ROW WHEN (OLD.rootId IS NOT NULL) EXECUTE FUNCTION mulino_responsibility_no_delete();
+CREATE TRIGGER responsibility_handover_no_delete BEFORE DELETE ON mulino_responsibility_Handovers FOR EACH ROW EXECUTE FUNCTION mulino_responsibility_no_delete();
