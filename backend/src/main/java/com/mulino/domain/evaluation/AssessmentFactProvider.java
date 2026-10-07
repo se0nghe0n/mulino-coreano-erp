@@ -44,17 +44,17 @@ public class AssessmentFactProvider {
           verified=claim.isPresent()&&document.isPresent()&&"AVAILABLE".equals(document.get().get("availability"))&&document.get().get("blobId")!=null&&blobs.available(UUID.fromString(document.get().get("blobId").toString()),document.get().get("sha256").toString());
           if(document.isPresent()) {
             refs.add(document.get().get("ID").toString());
-            verified=verified&&!documents.stream().anyMatch(x->Objects.equals(document.get().get("ID"),x.get("supersedesId")));
+            var supersedingDocuments=documents.stream().filter(x->Objects.equals(document.get().get("ID"),x.get("supersedesId"))).toList();supersedingDocuments.forEach(x->refs.add(x.get("ID").toString()));verified=verified&&supersedingDocuments.isEmpty();
           }
           if(claim.isPresent()) {
             refs.add(claim.get().get("ID").toString());
-            verified=verified&&!claims.stream().anyMatch(x->Objects.equals(claim.get().get("ID"),x.get("supersedesId")));
+            var supersedingClaims=claims.stream().filter(x->Objects.equals(claim.get().get("ID"),x.get("supersedesId"))).toList();supersedingClaims.forEach(x->refs.add(x.get("ID").toString()));verified=verified&&supersedingClaims.isEmpty();
             var event=events.stream().filter(x->Objects.equals(claim.get().get("eventId"),x.get("ID"))).findFirst();
             verified=verified&&event.isPresent();
             if(event.isPresent()) {
-              var e=event.get();verified=verified&&!events.stream().anyMatch(x->Objects.equals(e.get("ID"),x.get("invalidatesId"))||Objects.equals(e.get("ID"),x.get("supersedesId")));
+              var e=event.get();var supersedingEvents=events.stream().filter(x->Objects.equals(e.get("ID"),x.get("invalidatesId"))||Objects.equals(e.get("ID"),x.get("supersedesId"))).toList();supersedingEvents.forEach(x->refs.add(x.get("ID").toString()));verified=verified&&supersedingEvents.isEmpty();
               var variants=inbox.stream().filter(x->Objects.equals(e.get("sourceNamespace"),x.get("sourceNamespace"))&&Objects.equals(e.get("externalEventId"),x.get("externalEventId"))&&Objects.equals(e.get("sourceVersion"),x.get("sourceVersion"))).toList();
-              sourceConflict=variants.size()>1||variants.stream().anyMatch(x->"CONFLICT".equals(x.get("state")));verified=verified&&variants.size()==1&&!sourceConflict;
+              variants.forEach(x->refs.add(x.get("ID").toString()));sourceConflict=variants.size()>1||variants.stream().anyMatch(x->"CONFLICT".equals(x.get("state")));verified=verified&&variants.size()==1&&!sourceConflict;
               refs.add(e.get("ID").toString());
             }
           }
