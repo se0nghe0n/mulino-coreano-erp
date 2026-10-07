@@ -76,12 +76,11 @@ scope fence에서 실제 allocation 범위와 현재 판정을 다시 검사해�
 
 ## 검증 상태
 
-초기 Java21 compile과 QualityRangesTest 네 검사는 PASS다.
-첫 PostgreSQL 실행에서 fresh PostgreSQL18.6 V20 적용은 PASS지만
-SourceProfiles fixture revision0이 revision>0 제약에 걸렸다. revision1로
-수정했다. 이후 compile와 Spring context 문제를 dependency 수정으로
-해소했고 source helper의 null operation 처리도 수정했다. 현재 gateway
-종단 검사는 재실행 대기다. 최종 결과는 evidence.md에 남긴다.
+Java21 main/test compile와 fresh PostgreSQL18.6 V1–V21 적용은 PASS다.
+QualityRangesTest4와 QualityPostgresTest9 총13개가 source469aa4d7에서
+PASS다. partial30, C1 상업40, 독립 보류 해제, owner/custodian 권한 분리,
+무이벤트 만료20의 guard+sweep+책임, 상업 결정 role 거부와 선택적 정지
+세 가지 반례를 검증했다. 이전 실패와 재실행 로그는 evidence.md에 있다.
 
 실기관·실공급자·유료 모델·BTP 호출은 이 local fixture 범위에서
 실행하지 않았다.

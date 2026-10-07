@@ -39,4 +39,21 @@ QualityRangesTest의 decimal 교집합·독립 hold·범위 union·full closed
   lifecycle Work 생성으로 fixture를 고쳤다.
 
 로그는 `/tmp/mulino-s3-quality-tests-{fourth,fifth,sixth}.log`에 보존한다.
-현재 PG9 재실행 대기 상태이며 gateway acceptance PASS로 표시하지 않는다.
+- seventh: WorkLifecycle이 지원하는 definition-v1 대신 fixture 전용
+  version을 써서 public creation이 HELD됐다. 지원 version으로 고쳤다.
+- eighth: 전체 goal definition 검증이 role-only decision capability와
+  아직 설치하지 않은 S4 reserveQuantity를 거부했다. 실제 handler만
+  definition에 설치하고 creation 전 validator VALID 검사를 추가했다.
+
+- ninth: pure4와 actual commercial role-denial1은 PASS다. 나머지8은
+  scoped basis ACTIVE가 기존 CONFIRMED/REVOKED state 제약에 걸렸다.
+  V20에 legacy와 scoped state를 분리하고 scoped 시간 구간의 closed
+  endpoint도 명시했다. Work·source reconciliation·기관 gateway는 통과했다.
+
+tenth source `469aa4d7`에서 fresh V1–V21 migration, main/test compile,
+pure4와 actual PG/gateway9 모두 PASS다. 총13, failure0, error0다.
+`/tmp/mulino-s3-quality-tests-tenth.log`에 원문 결과가 있다.
+
+추가 actual decimal 교집합 검사는 별도 실행 대기다. 그 외 13개 결과를
+소급 변경하지 않는다. 전체 Step 통합과 native adapter 검증은 coordinator가
+별도 source에서 실행한다.
