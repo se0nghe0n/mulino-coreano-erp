@@ -37,7 +37,7 @@ public final class FixtureInstaller {
                         switch(type) {
                             case "Human","Agent" -> {seedTemporal(c,fixture,"INSERT INTO mulino_identity_Actors(organizationId,ID,kind,stableRequestOwner) VALUES(?,?,?,?)",org,id,type.equals("Human")?"HUMAN":"AGENT",UUID.randomUUID().toString());seed(c,"INSERT INTO mulino_identity_AuthorityFences(organizationId,actorId) VALUES(?,?)",org,id);}
                             case "Manufacturer" -> seedTemporal(c,fixture,"INSERT INTO mulino_inventory_Manufacturers(organizationId,ID,name) VALUES(?,?,?)",org,id,name);
-                            case "Place" -> seedTemporal(c,fixture,"INSERT INTO mulino_inventory_Places(organizationId,ID,name,kind) VALUES(?,?,?,?)",org,id,name,"WAREHOUSE");
+                            case "Place" -> seedTemporal(c,fixture,"INSERT INTO mulino_inventory_Places(organizationId,ID,name,kind) VALUES(?,?,?,?)",org,id,name,a.path("kind").asText("WAREHOUSE"));
                             case "Product" -> seedTemporal(c,fixture,"INSERT INTO mulino_inventory_Products(organizationId,ID,name) VALUES(?,?,?)",org,id,name);
                             case "SpecificationVersion","PackagingVersion" -> {
                                 JsonNode content=a.path("content");if(!content.isObject()||content.isEmpty())throw new IllegalArgumentException("Versioned fixture content required");

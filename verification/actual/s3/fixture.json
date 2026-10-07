@@ -55,7 +55,8 @@
         "decideQuality",
         "confirmCustomerConditions",
         "confirmCommercialDisposition",
-        "decideRecallRestriction"
+        "decideRecallRestriction",
+        "reconcileEvidence"
       ],
       "grant": {
         "delegatorAlias": "supervisor",
@@ -93,7 +94,8 @@
           "decideQuality",
           "confirmCustomerConditions",
           "confirmCommercialDisposition",
-          "decideRecallRestriction"
+          "decideRecallRestriction",
+          "reconcileEvidence"
         ],
         "scope": {
           "organizationAlias": "ORG"
@@ -142,7 +144,8 @@
         "decideQuality",
         "confirmCustomerConditions",
         "confirmCommercialDisposition",
-        "decideRecallRestriction"
+        "decideRecallRestriction",
+        "reconcileEvidence"
       ],
       "grant": {
         "delegatorAlias": "supervisor",
@@ -180,7 +183,8 @@
           "decideQuality",
           "confirmCustomerConditions",
           "confirmCommercialDisposition",
-          "decideRecallRestriction"
+          "decideRecallRestriction",
+          "reconcileEvidence"
         ],
         "scope": {
           "organizationAlias": "ORG"
@@ -219,7 +223,8 @@
       "expiresAt": "2027-10-07T00:00:00Z"
     },
     "W": {
-      "type": "Place"
+      "type": "Place",
+      "kind": "INTERNAL_STORAGE"
     },
     "PRD": {
       "type": "Product",
@@ -300,6 +305,10 @@
           },
           {
             "name": "DispositionBasis",
+            "core": true
+          },
+          {
+            "name": "PurchaseOrderLine",
             "core": true
           }
         ],
@@ -865,16 +874,16 @@
             "effectClass": "RECEIPT"
           },
           "prepareRegulatoryProcedure": {
-            "effectClass": "REGULATORY"
+            "effectClass": "REGULATORY_RECORD"
           },
           "recordSubmission": {
-            "effectClass": "REGULATORY"
+            "effectClass": "REGULATORY_RECORD"
           },
           "recordRegulatoryDecision": {
-            "effectClass": "REGULATORY"
+            "effectClass": "REGULATORY_RECORD"
           },
           "verifyLabel": {
-            "effectClass": "REGULATORY"
+            "effectClass": "REGULATORY_RECORD"
           },
           "placeHold": {
             "effectClass": "QUALITY_CONTROL",
@@ -922,7 +931,8 @@
       "name": "Synthetic supplier"
     },
     "DEST": {
-      "type": "Place"
+      "type": "Place",
+      "kind": "INTERNAL_STORAGE"
     },
     "AUTH": {
       "type": "ManagementAuthority",
@@ -948,6 +958,22 @@
       },
       "effectiveFrom": "2026-10-01T00:00:00Z",
       "activate": true
+    },
+    "TRANSIT": {
+      "type": "Place",
+      "kind": "TRANSIT"
+    },
+    "REGPOL": {
+      "type": "RegulatoryPolicy",
+      "actorAlias": "reader",
+      "version": "fixture-v1",
+      "authority": "FICTIONAL-AUTHORITY",
+      "sourceNamespace": "native-s3-regulator",
+      "action": "SELL",
+      "validFrom": "2026-10-01T00:00:00Z",
+      "validUntil": "2026-10-31T23:59:59Z",
+      "status": "ACTIVE",
+      "requiresLabel": true
     }
   },
   "baseline": {},
