@@ -10,7 +10,7 @@ public final class ActualFixtureBindings {
     static JsonNode bind(Path root,JsonNode bundle,ActualConfiguration config) throws Exception {
         String ref=System.getProperty("verification.actual.identityBinding");
         if(ref==null)return bundle;
-        Path path=root.resolve(ref).normalize();if(!path.startsWith(root))throw new IllegalArgumentException("Binding manifest escapes root");
+        Path base=root.toAbsolutePath().normalize();Path path=base.resolve(ref).normalize();if(!path.startsWith(base))throw new IllegalArgumentException("Binding manifest escapes root");
         JsonNode manifest=Json.read(path);
         if(!manifest.path("synthetic").asBoolean()||!manifest.path("isolatedLoopbackOnly").asBoolean())throw new IllegalArgumentException("Isolated synthetic binding required");
         if(!config.issuer().equals(Json.required(manifest,"deployedIssuer"))||!config.audience().equals(Json.required(manifest,"deployedAudience")))throw new IllegalArgumentException("Binding differs from real deployed identity configuration");
