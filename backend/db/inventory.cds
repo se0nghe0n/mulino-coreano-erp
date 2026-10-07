@@ -203,18 +203,30 @@ entity Restrictions {
  createdAt : Timestamp; recordedAt : Timestamp; controlScope : String(160);
  action : String(80); state : String(40); validFrom : Timestamp; validUntil : Timestamp;
  decisionId : UUID; evidenceRef : String(240);
+ segmentId : UUID; startQuantity : Decimal(38,12); quantity : Decimal(38,12); unit : String(40);
+ category : String(40); customerId : UUID; workId : UUID; nextCheckAt : Timestamp;
+ commandId : UUID; releasedAt : Timestamp; releaseDecisionId : UUID; policyHash : String(64);
+
 }
 entity DispositionBases {
  key organizationId : UUID; key ID : UUID; revision : Integer;
  createdAt : Timestamp; recordedAt : Timestamp; controlScope : String(160);
  action : String(80); state : String(40); validFrom : Timestamp; validUntil : Timestamp;
  decisionId : UUID; evidenceRef : String(240);
+ segmentId : UUID; startQuantity : Decimal(38,12); quantity : Decimal(38,12); unit : String(40);
+ category : String(40); customerId : UUID; workId : UUID; nextCheckAt : Timestamp;
+ commandId : UUID; releasedAt : Timestamp; releaseDecisionId : UUID; policyHash : String(64);
+
 }
 entity SegmentAllocations {
  key organizationId : UUID; key ID : UUID; revision : Integer;
  createdAt : Timestamp; recordedAt : Timestamp; rootId : UUID; segmentId : UUID;
  orderLineId : UUID; quantity : Decimal(38,12); unit : String(40); state : String(40);
  predecessorId : UUID; commandId : UUID;
+ startQuantity : Decimal(38,12); action : String(80); customerId : UUID;
+ workId : UUID; authorizationActorId : UUID; nextValidityBoundary : Timestamp;
+ suspendedAt : Timestamp; suspensionReason : String(240);
+
 }
 entity StockAdjustments {
  key organizationId : UUID; key ID : UUID; revision : Integer;
