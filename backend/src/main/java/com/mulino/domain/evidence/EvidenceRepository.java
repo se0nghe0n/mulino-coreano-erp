@@ -33,7 +33,7 @@ public class EvidenceRepository {
       case "LOT" -> "mulino.inventory.ManufacturingLots";
       case "SEGMENT" -> "mulino.inventory.QuantitySegments";
       case "PLACE" -> "mulino.inventory.Places";
-      case "WORK" -> "mulino.work.Works";
+      case "WORK" -> "mulino.work.read.Works";
       default -> throw DomainError.invalid("Unsupported evidence subject type");
     };
     return db.run(Select.from(entity).where(x->x.get("organizationId").eq(org).and(x.get("ID").eq(id)))).first()
