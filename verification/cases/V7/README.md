@@ -18,7 +18,10 @@ ACK의 transaction/participant/point/state/scope를 exact 대조한다.
 검사한다. 전체 restart 분기는 prior20을 실제 command로 먼저 만든다.
 기확정 효과를 seed하지 않는다. 원 시도 terminal, application/
 scheduler/두 worker의 실제 새 process instance, autonomous scheduler
-task terminal 뒤 현재 grant/claim을 재검사하는 safe retry를 관찰한다.
+task의 제출 ID·handle로 실제 claim을 관찰하고 terminal을 기다린다.
+safe retry의 fencingToken은 이 claim 관찰에서 읽는다. tick ACK를
+claim fence나 업무 terminal로 해석하지 않는다. 현재 grant 철회에 따른
+거부와 기확정 사실의 보존은 기존 독립 원행 oracle로 검사한다.
 
 모든 fixture는 가상값이다. Step2의 parser·assertion·RED 준비와 실제
 제품 DB/API/MCP/경합/host/모델 인수를 구별한다. 제품 인수는 NOT_RUN이다.
@@ -29,3 +32,7 @@ task terminal 뒤 현재 grant/claim을 재검사하는 safe retry를 관찰한�
 구체 subcase/action/assertion 및 JSON pointer에 연결한다.
 고정 수량 oracle의 primary와 보조 관계/assertion을 함께 보존한다.
 이 연결은 작성 증거이며 실제 제품 효과를 관측한 결과가 아니다.
+
+V7 claim fence와 timeout 이후 metadata dispatch 경계의 후속 검사·
+4개 시나리오 RED는 `evidence/host-closure/checks.json`에 있다.
+고정 host 표본과 실제 JVM selftest를 제품 실행 성공으로 세지 않는다.

@@ -94,7 +94,7 @@ driverProvenance는 각각 선언한 host metadata와 StepResult provenance의
 | stop | processId, environmentId / 명시한 parameters.processId | 실제 전후 process instance/status와 정지 terminal snapshot |
 | restart | processId, environmentId / 명시한 parameters.processId | 실제 새 instance의 RUNNING과 전후 terminal snapshot |
 | tickScheduler | schedulerId, tickId, submissionStatus / due scope와 고정 clock | SUBMITTED의 실제 taskId/handle 또는 관찰된 NO_TASK; 완료 업무와 구별한다 |
-| claim | schedulerId, claimId, leaseId, fencingToken / claim scope | 실제 lease/fence rows; stale worker 효과는 DB assertion으로 검사한다 |
+| claim | schedulerId, claimId, leaseId, fencingToken / claim scope | 실제 lease/fence rows; 요청 taskId/invocationHandle은 관찰 identity와 exact 대조한다. stale worker 효과는 DB assertion으로 검사한다 |
 | sweepDue | schedulerId, sweepId, submissionStatus / due scope와 clock | SUBMITTED의 실제 taskId/handle 또는 관찰된 NO_TASK; 예약 전이·의무·출고0은 독립 DB로 검사한다 |
 | awaitRuntimeTask | schedulerId / 실제 taskId 또는 invocationHandle | 아래 autonomous task terminal과 snapshot을 모두 검사한다 |
 | archiveInventory | repositoryId, baselineCommit, inventoryId | 실제 파일별 hash·분류·보존 위치 inventory artifact |

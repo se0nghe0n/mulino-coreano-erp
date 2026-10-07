@@ -226,6 +226,12 @@ local port executor의 종료이며 remote 효과 취소를 주장하지 않는�
 지원해야 한다. 미확정 외부 효과와 cleanup 불완료는 isolated 환경을
 보존해 대조하며 runtime PASS로 바꾸지 않는다.
 
+Adapter metadata 조회가 cancellation을 무시해 늦게 반환해도 dispatch
+직전에 중단 상태를 다시 확인하여 새 port 호출을 차단한다. port에 걸친
+lock은 잡지 않는다. 중단 검사와 호출 사이의 경쟁이나 이미 전송된 원격
+효과를 interrupt만으로 취소했다고 주장하지 않는다. 실제 adapter는
+자체 deadline과 원격 효과 대조를 제공해야 한다.
+
 `route=wire`의 request는 raw HTTP header/body, content type, protocol,
 JSON-RPC ID, MRTR state/inputResponses/effect key를 그대로 전달할 수 있다.
 harness가 공격 입력을 정상화하거나 header/body mismatch를 수선하지

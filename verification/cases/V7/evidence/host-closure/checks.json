@@ -1,0 +1,51 @@
+{
+  "recordType": "STEP2_COMMON_HOST_BOUNDARY_CHECKS",
+  "baseline": "3a9de9fad15eea01f56f6f4b13fe7aba88be4589",
+  "recordedAt": "2026-10-07T15:32:28.972744+00:00",
+  "checks": [
+    {
+      "command": "./mvnw -B -ntp -f verification/harness/pom.xml -Dtest=CommonReviewRegressionTest,HostObservationValidatorTest test",
+      "exitCode": 0,
+      "status": "PASS",
+      "tests": 17,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "evidenceRef": "targeted-tests.txt"
+    },
+    {
+      "command": "./verify validate verification/cases/V7/case.json",
+      "exitCode": 0,
+      "status": "PREPARATION_SCHEMA_VALID",
+      "evidenceRef": "validate-wrapper.json"
+    },
+    {
+      "command": "./verify contract-red verification/cases/V7/case.json",
+      "exitCode": 1,
+      "status": "EXPECTED_NOT_IMPLEMENTED_RED",
+      "expectedScenarios": 4,
+      "discoveredScenarios": 4,
+      "notImplementedAssertionFailures": 4,
+      "skippedScenarios": 0,
+      "evidenceRef": "feature-red-summary.json"
+    }
+  ],
+  "runtimeStatus": "NOT_RUN",
+  "productRuntimeClaimed": false,
+  "paidModelOrBtpOrProductProcessExecuted": false,
+  "limitations": [
+    "CAPTURED_SELFTEST host samples establish validator/reference mechanics only.",
+    "Actual JVM delayed metadata callbacks are local hostile test ports, not product adapters.",
+    "Interrupt/fence cannot establish already dispatched remote effects were cancelled.",
+    "No lock spans a port; a check-to-call race remains and real adapters require bounded deadlines and reconciliation."
+  ],
+  "files": {
+    "contracts/acceptance-host-observation.schema.json": "d263dc5636812d35bb70296ebee8dbb1549c8473940e46d4ad1d4411ccce14b3",
+    "verification/cases/V7/case.json": "a09c68b842b8bf81abad220e154fb97bd6484a528d005e1487e22049c9a2ccc3",
+    "verification/cases/V7/scenario.feature": "504e320e480dac32ede5c66291add1d68a3b05271273d566e344b199660d3073",
+    "verification/cases/V7/observation-bindings.json": "ac45f10705cc2c1aa7abf938cc2cd44f7fd2b3e06d49261609c3f4ce27e2957f",
+    "verification/harness/src/main/java/org/mulino/verification/CaseRunner.java": "5a6a1264bdf5d8bb6f9d4ef68b49a92cfc20f322effea841e4aa97c4e1083484",
+    "verification/harness/src/main/java/org/mulino/verification/HostObservationValidator.java": "fb99d5cf58d3003e75dbd276af6e0ef61edfb98a439aa2f97f3d7c1221adbb1b",
+    "verification/harness/src/test/java/org/mulino/verification/CommonReviewRegressionTest.java": "3fb58b92a1ba7e0c9b481b0b20c7139348728c0f6744abdd4331f0c3c77cb2be"
+  }
+}

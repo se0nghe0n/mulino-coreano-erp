@@ -127,6 +127,7 @@
     만일 "시스템" 역할이 "restart-worker-a" 행동을 수행한다
     만일 "시스템" 역할이 "restart-worker-b" 행동을 수행한다
     만일 "시스템" 역할이 "scheduler-tick" 행동을 수행한다
+    만일 "시스템" 역할이 "runtime-claim" 행동을 수행한다
     만일 "시스템" 역할이 "runtime-terminal" 행동을 수행한다
     만일 "delegator" 역할이 "safe-retry" 행동을 수행한다
     만일 "delegator" 역할이 "after-snapshot" 행동을 수행한다

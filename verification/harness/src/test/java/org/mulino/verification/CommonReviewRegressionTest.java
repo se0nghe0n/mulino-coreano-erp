@@ -107,4 +107,45 @@ final class CommonReviewRegressionTest {
             assertNull(runner.results().get("right"));release.countDown();assertTrue(rightStopped.await(1,TimeUnit.SECONDS));assertNull(runner.results().get("right"));assertThrows(AssertionError.class,runner::verifyComplete);
         } finally {release.countDown();caller.shutdownNow();assertTrue(caller.awaitTermination(2,TimeUnit.SECONDS));}
     }
+    @Test void v7FenceComesFromSchemaValidClaimOfTheSubmittedTaskNotTickAck() throws Exception {
+        ContractValidator validator=new ContractValidator(root);JsonNode file=validator.caseFile(root.resolve("verification/cases/V7/case.json"));
+        JsonNode sub=null;for(JsonNode candidate:file.path("subcases")) if(candidate.path("id").asText().equals("restart-after-revoke")) sub=candidate;
+        assertNotNull(sub);Map<String,JsonNode> actions=new HashMap<>();for(JsonNode action:sub.path("actions")) actions.put(action.path("id").asText(),action);
+        ObjectNode aliases=Json.object();aliases.put("ORG-A","synthetic-organization").put("P","synthetic-item").put("WORK","synthetic-work");
+        var tick=submitted("tickScheduler");JsonNode tickControl=new ReferenceResolver(Map.of(),aliases).resolve(actions.get("scheduler-tick").path("control"));
+        tick.control().set("parameters",tickControl.path("parameters"));tick.host().set("requestedInputs",tickControl.path("parameters"));tick.host().set("scope",tickControl.path("parameters").path("scope"));
+        ((ObjectNode)tick.host().path("operationEvidence")).put("schedulerId","authority-scheduler").put("tickId","post-revoke-tick");tick=rows(tick);HostObservationValidator.validate(validator,tick.control(),tick.result());
+        var claim=hostSamples.capture("claim");JsonNode claimControl=new ReferenceResolver(Map.of("scheduler-tick",tick.result().toJson()),aliases).resolve(actions.get("runtime-claim").path("control"));
+        claim.control().set("parameters",claimControl.path("parameters"));claim.host().set("requestedInputs",claimControl.path("parameters"));claim.host().set("scope",claimControl.path("parameters").path("scope"));
+        ObjectNode identity=(ObjectNode)claim.host().path("operationEvidence");identity.put("schedulerId","authority-scheduler");for(String key:List.of("taskId","invocationHandle")) identity.set(key,claimControl.path("parameters").path(key));
+        claim=rows(claim);HostObservationValidator.validate(validator,claim.control(),claim.result());
+        ReferenceResolver resolver=new ReferenceResolver(Map.of("scheduler-tick",tick.result().toJson(),"runtime-claim",claim.result().toJson()),aliases);
+        assertEquals(identity.path("fencingToken"),resolver.resolve(actions.get("safe-retry").path("request").path("slots").path("claimFencingToken")));
+        JsonNode terminal=resolver.resolve(actions.get("runtime-terminal").path("control"));for(String key:List.of("taskId","invocationHandle")) assertEquals(claimControl.path("parameters").path(key),terminal.path("parameters").path(key));
+        identity.remove("taskId");var missing=rows(claim);assertThrows(IllegalArgumentException.class,()->HostObservationValidator.validate(validator,missing.control(),missing.result()));
+        identity.put("taskId","different-task");var wrong=rows(claim);assertThrows(IllegalArgumentException.class,()->HostObservationValidator.validate(validator,wrong.control(),wrong.result()));
+        ((ObjectNode)tick.host().path("operationEvidence")).put("fencingToken","invented-tick-fence");var forbidden=rows(tick);assertThrows(IllegalArgumentException.class,()->HostObservationValidator.validate(validator,forbidden.control(),forbidden.result()));
+    }
+    @Test void delayedAdapterMetadataCannotStartNewPortsOrPublishAfterParallelHalt() throws Exception {
+        CountDownLatch entered=new CountDownLatch(2),release=new CountDownLatch(1);AtomicInteger metadataCalls=new AtomicInteger(),portCalls=new AtomicInteger();List<Thread> blocked=new CopyOnWriteArrayList<>();
+        TestPort port=new TestPort(){
+            public Set<String> availableAdapters() {
+                if(metadataCalls.incrementAndGet()>1) {
+                    blocked.add(Thread.currentThread());entered.countDown();
+                    while(release.getCount()>0) try {release.await();}catch(InterruptedException ignored) {/* Actual JVM hostile metadata callback; no product behavior. */}
+                }
+                return Set.of("CAPTURED_SELFTEST_ONLY");
+            }
+            public StepResult query(String id,String route,JsonNode actor,String cap,JsonNode request) {portCalls.incrementAndGet();return StepResult.missing(id,"CAPTURED_SELFTEST no product call");}
+        };
+        CaseRunner runner=new CaseRunner(new ContractValidator(root),port,new AgentRunner.Scripted(),parallelCase(),SUBCASE);ExecutorService caller=Executors.newSingleThreadExecutor();
+        try {
+            Future<IOException> completion=caller.submit(()->assertThrows(IOException.class,()->runner.execute("parallel")));assertTrue(entered.await(1,TimeUnit.SECONDS));completion.get(3,TimeUnit.SECONDS);
+            JsonNode failure=runner.evidence("PASS","CAPTURED_SELFTEST").path("parallelFailures").get(0);assertFalse(failure.path("cleanupComplete").asBoolean());assertEquals(0,portCalls.get());
+            release.countDown();for(Thread thread:blocked) {thread.join(1000);assertFalse(thread.isAlive(),"Metadata branch must stop after returning to cancelled dispatcher");}
+            assertEquals(0,portCalls.get(),"No new actual port calls after metadata returns following halt");assertTrue(runner.results().isEmpty(),"No child or parallel result may publish after halt");assertThrows(IOException.class,()->runner.execute("after-timeout"));
+            ObjectNode evidence=Json.object();evidence.put("evidenceClass","ACTUAL_JVM_SELFTEST").put("productRuntimeClaimed",false).put("metadataCalls",metadataCalls.get()).put("newPortCallsAfterHalt",portCalls.get()).put("publishedResults",runner.results().size()).put("allMetadataThreadsTerminated",true);evidence.set("parallelFailure",failure);Json.write(root.resolve("verification/harness/target/evidence/delayed-metadata-fence-selftest.json"),evidence);
+        } finally {release.countDown();for(Thread thread:blocked) thread.join(1000);caller.shutdownNow();assertTrue(caller.awaitTermination(2,TimeUnit.SECONDS));}
+    }
+
 }

@@ -1,0 +1,255 @@
++ java -version
+openjdk version "21.0.5" 2024-10-15 LTS
+OpenJDK Runtime Environment Zulu21.38+21-CA (build 21.0.5+11-LTS)
+OpenJDK 64-Bit Server VM Zulu21.38+21-CA (build 21.0.5+11-LTS, mixed mode, sharing)
+exitCode=0
++ /Volumes/VideoStore/Developer/mulino-ontology-step2-review-common/mvnw -version
+Apache Maven 3.9.16 (2bdd9fddda4b155ebf8000e807eb73fd829a51d5)
+Maven home: /Users/n30gu1/.m2/wrapper/dists/apache-maven-3.9.16/56ba1f9f
+Java version: 21.0.5, vendor: Azul Systems, Inc., runtime: /Library/Java/JavaVirtualMachines/zulu-21.jdk/Contents/Home
+Default locale: en_KR, platform encoding: UTF-8
+OS name: "mac os x", version: "27.0.1", arch: "aarch64", family: "mac"
+exitCode=0
++ /Volumes/VideoStore/Developer/mulino-ontology-step2-review-common/mvnw -B -ntp -f /Volumes/VideoStore/Developer/mulino-ontology-step2-review-common/verification/harness/pom.xml -Dtest=CaseFeatureTest -Dverification.mode=contract-red '-Dverification.command=./verify contract-red verification/cases/V7/case.json' -Dverification.caseFiles=verification/cases/V7/case.json test
+[INFO] Scanning for projects...
+[INFO] 
+[INFO] -------------------< org.mulino:acceptance-harness >--------------------
+[INFO] Building acceptance-harness 1.0.0
+[INFO]   from pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] --- resources:3.4.0:resources (default-resources) @ acceptance-harness ---
+[INFO] skip non existing resourceDirectory /Volumes/VideoStore/Developer/mulino-ontology-step2-review-common/verification/harness/src/main/resources
+[INFO] 
+[INFO] --- compiler:3.14.1:compile (default-compile) @ acceptance-harness ---
+[INFO] Nothing to compile - all classes are up to date.
+[INFO] 
+[INFO] --- resources:3.4.0:testResources (default-testResources) @ acceptance-harness ---
+[INFO] Copying 36 resources from src/test/resources to target/test-classes
+[INFO] 
+[INFO] --- compiler:3.14.1:testCompile (default-testCompile) @ acceptance-harness ---
+[INFO] Nothing to compile - all classes are up to date.
+[INFO] 
+[INFO] --- surefire:3.5.6:test (default-test) @ acceptance-harness ---
+[INFO] Using auto detected provider org.apache.maven.surefire.junitplatform.JUnitPlatformProvider
+[INFO] 
+[INFO] -------------------------------------------------------
+[INFO]  T E S T S
+[INFO] -------------------------------------------------------
+[INFO] Running org.mulino.verification.CaseFeatureTest
+SLF4J(W): No SLF4J providers were found.
+SLF4J(W): Defaulting to no-operation (NOP) logger implementation
+SLF4J(W): See https://www.slf4j.org/codes.html#noProviders for further details.
+
+@V7 @D08 @D26 @sit
+시나리오: 현재 grant 철회와 출고 commit의 실제 순서를 대조한다: enqueue-then-revoke                                         # file:///Volumes/VideoStore/Developer/mulino-ontology-step2-review-common/verification/cases/V7/scenario.feature:6
+  ✔ 먼저 사례 파일 "verification/cases/V7/case.json"의 "enqueue-then-revoke"를 준비한다                            # org.mulino.verification.ScenarioGlue.prepare(java.lang.String,java.lang.String)
+  ✔ 만일 "시스템" 역할이 "setup" 행동을 수행한다                                                                      # org.mulino.verification.ScenarioGlue.action(java.lang.String,java.lang.String)
+  ✔ 만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다                                                      # org.mulino.verification.ScenarioGlue.action(java.lang.String,java.lang.String)
+  ✔ 만일 "시스템" 역할이 "before" 행동을 수행한다                                                                     # org.mulino.verification.ScenarioGlue.action(java.lang.String,java.lang.String)
+  ✔ 만일 "시스템" 역할이 "dispatch-start" 행동을 수행한다                                                             # org.mulino.verification.ScenarioGlue.action(java.lang.String,java.lang.String)
+  ✔ 만일 "시스템" 역할이 "dispatch-ready" 행동을 수행한다                                                             # org.mulino.verification.ScenarioGlue.action(java.lang.String,java.lang.String)
+  ✔ 만일 "delegator" 역할이 "revoke" 행동을 수행한다                                                               # org.mulino.verification.ScenarioGlue.action(java.lang.String,java.lang.String)
+  ✔ 만일 "시스템" 역할이 "dispatch-resume" 행동을 수행한다                                                            # org.mulino.verification.ScenarioGlue.action(java.lang.String,java.lang.String)
+  ✔ 만일 "시스템" 역할이 "dispatch-result" 행동을 수행한다                                                            # org.mulino.verification.ScenarioGlue.action(java.lang.String,java.lang.String)
+  ✔ 만일 "delegator" 역할이 "after-snapshot" 행동을 수행한다                                                       # org.mulino.verification.ScenarioGlue.action(java.lang.String,java.lang.String)
+  ✔ 만일 "시스템" 역할이 "after" 행동을 수행한다                                                                      # org.mulino.verification.ScenarioGlue.action(java.lang.String,java.lang.String)
+  ✘ 그러면 "dispatch-ready-point" assertion으로 "worker-auth dispatch-ready-point"를 확인한다                    # org.mulino.verification.ScenarioGlue.assertion(java.lang.String,java.lang.String)
+        java.lang.AssertionError: source dispatch-ready is NOT_IMPLEMENTED: NOT_IMPLEMENTED: no real product adapters installed
+        	at org.mulino.verification.AssertionEngine.fail(AssertionEngine.java:138)
+        	at org.mulino.verification.AssertionEngine.require(AssertionEngine.java:137)
+        	at org.mulino.verification.AssertionEngine.requireExecuted(AssertionEngine.java:77)
+        	at org.mulino.verification.AssertionEngine.requireSourcesAvailable(AssertionEngine.java:68)
+        	at org.mulino.verification.CaseRunner.assertId(CaseRunner.java:242)
+        	at org.mulino.verification.ScenarioGlue.assertion(ScenarioGlue.java:26)
+        	at ✽."dispatch-ready-point" assertion으로 "worker-auth dispatch-ready-point"를 확인한다(file:///Volumes/VideoStore/Developer/mulino-ontology-step2-review-common/verification/cases/V7/scenario.feature:18)
+  ↷ 그러면 "dispatch-ready-state" assertion으로 "worker-auth dispatch-ready-state"를 확인한다                    # org.mulino.verification.ScenarioGlue.assertion(java.lang.String,java.lang.String)
+  ↷ 그러면 "revoke-committed" assertion으로 "worker-auth revoke-committed"를 확인한다                            # org.mulino.verification.ScenarioGlue.assertion(java.lang.String,java.lang.String)
+  ↷ 그러면 "dispatch-resume-point" assertion으로 "worker-auth dispatch-resume-point"를 확인한다                  # org.mulino.verification.ScenarioGlue.assertion(java.lang.String,java.lang.String)
+  ↷ 그러면 "dispatch-resume-state" assertion으로 "worker-auth dispatch-resume-state"를 확인한다                  # org.mulino.verification.ScenarioGlue.assertion(java.lang.String,java.lang.String)
+  ↷ 그러면 "dispatch-result-completed" assertion으로 "worker-auth dispatch-result-completed"를 확인한다          # org.mulino.verification.ScenarioGlue.assertion(java.lang.String,java.lang.String)
+  ↷ 그러면 "dispatch-result-same-handle" assertion으로 "worker-auth dispatch-result-same-handle"를 확인한다      # org.mulino.verification.ScenarioGlue.assertion(java.lang.String,java.lang.String)
+  ↷ 그러면 "dispatch-result-code" assertion으로 "worker-auth dispatch-result-code"를 확인한다                    # org.mulino.verification.ScenarioGlue.assertion(java.lang.String,java.lang.String)
+  ↷ 그러면 "dispatch-result-outcome" assertion으로 "worker-auth dispatch-result-outcome"를 확인한다              # org.mulino.verification.ScenarioGlue.assertion(java.lang.String,java.lang.String)
+  ↷ 그러면 "new-dispatch-rows0" assertion으로 "worker-auth new-dispatch-rows0"를 확인한다                        # org.mulino.verification.ScenarioGlue.assertion(java.lang.String,java.lang.String)
+  ↷ 그러면 "new20-command-not-committed" assertion으로 "worker-auth new20-command-not-committed"를 확인한다      # org.mulino.verification.ScenarioGlue.assertion(java.lang.String,java.lang.String)
+  ↷ 그러면 "new-effect-quantity0" assertion으로 "new-effects-quantity new-effect-quantity0"를 확인한다           # org.mulino.verification.ScenarioGlue.assertion(java.lang.String,java.lang.String)
+  ↷ 그러면 "blocked-duty-assignment1" assertion으로 "blocked-duty blocked-duty-assignment1"를 확인한다           # org.mulino.verification.ScenarioGlue.assertion(java.lang.String,java.lang.String)
+  ↷ 그러면 "blocked-duty-owner" assertion으로 "blocked-duty blocked-duty-owner"를 확인한다                       # org.mulino.verification.ScenarioGlue.assertion(java.lang.String,java.lang.String)
+  ↷ 그러면 "blocked-duty-assignment-scope" assertion으로 "blocked-duty blocked-duty-assignment-scope"를 확인한다 # org.mulino.verification.ScenarioGlue.assertion(java.lang.String,java.lang.String)
+  ↷ 그러면 "revoked-current-grant" assertion으로 "worker-auth revoked-current-grant"를 확인한다                  # org.mulino.verification.ScenarioGlue.assertion(java.lang.String,java.lang.String)
+  ↷ 그러면 "common-scope-fence" assertion으로 "worker-auth common-scope-fence"를 확인한다                        # org.mulino.verification.ScenarioGlue.assertion(java.lang.String,java.lang.String)
+
+@V7 @D08 @D26 @sit
+시나리오: 현재 grant 철회와 출고 commit의 실제 순서를 대조한다: authorization-revoke-first                                                                               # file:///Volumes/VideoStore/Developer/mulino-ontology-step2-review-common/verification/cases/V7/scenario.feature:37
+  ✔ 먼저 사례 파일 "verification/cases/V7/case.json"의 "authorization-revoke-first"를 준비한다                                                                  # org.mulino.verification.ScenarioGlue.prepare(java.lang.String,java.lang.String)
+  ✔ 만일 "시스템" 역할이 "setup" 행동을 수행한다                                                                                                                   # org.mulino.verification.ScenarioGlue.action(java.lang.String,java.lang.String)
+  ✔ 만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다                                                                                                   # org.mulino.verification.ScenarioGlue.action(java.lang.String,java.lang.String)
+  ✔ 만일 "시스템" 역할이 "before" 행동을 수행한다                                                                                                                  # org.mulino.verification.ScenarioGlue.action(java.lang.String,java.lang.String)
+  ✔ 만일 "시스템" 역할이 "dispatch-start" 행동을 수행한다                                                                                                          # org.mulino.verification.ScenarioGlue.action(java.lang.String,java.lang.String)
+  ✔ 만일 "시스템" 역할이 "dispatch-ready" 행동을 수행한다                                                                                                          # org.mulino.verification.ScenarioGlue.action(java.lang.String,java.lang.String)
+  ✔ 만일 "delegator" 역할이 "revoke" 행동을 수행한다                                                                                                            # org.mulino.verification.ScenarioGlue.action(java.lang.String,java.lang.String)
+  ✔ 만일 "시스템" 역할이 "dispatch-resume" 행동을 수행한다                                                                                                         # org.mulino.verification.ScenarioGlue.action(java.lang.String,java.lang.String)
+  ✔ 만일 "시스템" 역할이 "dispatch-result" 행동을 수행한다                                                                                                         # org.mulino.verification.ScenarioGlue.action(java.lang.String,java.lang.String)
+  ✔ 만일 "delegator" 역할이 "after-snapshot" 행동을 수행한다                                                                                                    # org.mulino.verification.ScenarioGlue.action(java.lang.String,java.lang.String)
+  ✔ 만일 "시스템" 역할이 "after" 행동을 수행한다                                                                                                                   # org.mulino.verification.ScenarioGlue.action(java.lang.String,java.lang.String)
+  ✘ 그러면 "dispatch-ready-point" assertion으로 "blocked-or-post-revoke-duty dispatch-ready-point"를 확인한다                                                 # org.mulino.verification.ScenarioGlue.assertion(java.lang.String,java.lang.String)
+        java.lang.AssertionError: source dispatch-ready is NOT_IMPLEMENTED: NOT_IMPLEMENTED: no real product adapters installed
+        	at org.mulino.verification.AssertionEngine.fail(AssertionEngine.java:138)
+        	at org.mulino.verification.AssertionEngine.require(AssertionEngine.java:137)
+        	at org.mulino.verification.AssertionEngine.requireExecuted(AssertionEngine.java:77)
+        	at org.mulino.verification.AssertionEngine.requireSourcesAvailable(AssertionEngine.java:68)
+        	at org.mulino.verification.CaseRunner.assertId(CaseRunner.java:242)
+        	at org.mulino.verification.ScenarioGlue.assertion(ScenarioGlue.java:26)
+        	at ✽."dispatch-ready-point" assertion으로 "blocked-or-post-revoke-duty dispatch-ready-point"를 확인한다(file:///Volumes/VideoStore/Developer/mulino-ontology-step2-review-common/verification/cases/V7/scenario.feature:49)
+  ↷ 그러면 "dispatch-ready-state" assertion으로 "blocked-or-post-revoke-duty dispatch-ready-state"를 확인한다                                                 # org.mulino.verification.ScenarioGlue.assertion(java.lang.String,java.lang.String)
+  ↷ 그러면 "revoke-committed" assertion으로 "linearization-evidence revoke-committed"를 확인한다                                                              # org.mulino.verification.ScenarioGlue.assertion(java.lang.String,java.lang.String)
+  ↷ 그러면 "dispatch-resume-point" assertion으로 "blocked-or-post-revoke-duty dispatch-resume-point"를 확인한다                                               # org.mulino.verification.ScenarioGlue.assertion(java.lang.String,java.lang.String)
+  ↷ 그러면 "dispatch-resume-state" assertion으로 "blocked-or-post-revoke-duty dispatch-resume-state"를 확인한다                                               # org.mulino.verification.ScenarioGlue.assertion(java.lang.String,java.lang.String)
+  ↷ 그러면 "dispatch-result-completed" assertion으로 "blocked-or-post-revoke-duty dispatch-result-completed"를 확인한다                                       # org.mulino.verification.ScenarioGlue.assertion(java.lang.String,java.lang.String)
+  ↷ 그러면 "dispatch-result-same-handle" assertion으로 "blocked-or-post-revoke-duty dispatch-result-same-handle"를 확인한다                                   # org.mulino.verification.ScenarioGlue.assertion(java.lang.String,java.lang.String)
+  ↷ 그러면 "dispatch-result-code" assertion으로 "linearization-evidence dispatch-result-code"를 확인한다                                                      # org.mulino.verification.ScenarioGlue.assertion(java.lang.String,java.lang.String)
+  ↷ 그러면 "dispatch-result-outcome" assertion으로 "linearization-evidence dispatch-result-outcome"를 확인한다                                                # org.mulino.verification.ScenarioGlue.assertion(java.lang.String,java.lang.String)
+  ↷ 그러면 "new-dispatch-rows0" assertion으로 "linearization-evidence new-dispatch-rows0"를 확인한다                                                          # org.mulino.verification.ScenarioGlue.assertion(java.lang.String,java.lang.String)
+  ↷ 그러면 "new20-command-not-committed" assertion으로 "linearization-evidence new20-command-not-committed"를 확인한다                                        # org.mulino.verification.ScenarioGlue.assertion(java.lang.String,java.lang.String)
+  ↷ 그러면 "revoke-is-only-new-fence-commit" assertion으로 "linearization-evidence revoke-is-only-new-fence-commit"를 확인한다                                # org.mulino.verification.ScenarioGlue.assertion(java.lang.String,java.lang.String)
+  ↷ 그러면 "new-effect-quantity0" assertion으로 "effect-if-revoke-commits-first new-effect-quantity0"를 확인한다                                              # org.mulino.verification.ScenarioGlue.assertion(java.lang.String,java.lang.String)
+  ↷ 그러면 "blocked-or-post-revoke-duty-assignment1" assertion으로 "blocked-or-post-revoke-duty blocked-or-post-revoke-duty-assignment1"를 확인한다           # org.mulino.verification.ScenarioGlue.assertion(java.lang.String,java.lang.String)
+  ↷ 그러면 "blocked-or-post-revoke-duty-owner" assertion으로 "blocked-or-post-revoke-duty blocked-or-post-revoke-duty-owner"를 확인한다                       # org.mulino.verification.ScenarioGlue.assertion(java.lang.String,java.lang.String)
+  ↷ 그러면 "blocked-or-post-revoke-duty-assignment-scope" assertion으로 "blocked-or-post-revoke-duty blocked-or-post-revoke-duty-assignment-scope"를 확인한다 # org.mulino.verification.ScenarioGlue.assertion(java.lang.String,java.lang.String)
+  ↷ 그러면 "revoked-current-grant" assertion으로 "linearization-evidence revoked-current-grant"를 확인한다                                                    # org.mulino.verification.ScenarioGlue.assertion(java.lang.String,java.lang.String)
+  ↷ 그러면 "common-scope-fence" assertion으로 "linearization-evidence common-scope-fence"를 확인한다                                                          # org.mulino.verification.ScenarioGlue.assertion(java.lang.String,java.lang.String)
+
+@V7 @D08 @D26 @sit
+시나리오: 현재 grant 철회와 출고 commit의 실제 순서를 대조한다: authorization-effect-first                                                                               # file:///Volumes/VideoStore/Developer/mulino-ontology-step2-review-common/verification/cases/V7/scenario.feature:69
+  ✔ 먼저 사례 파일 "verification/cases/V7/case.json"의 "authorization-effect-first"를 준비한다                                                                  # org.mulino.verification.ScenarioGlue.prepare(java.lang.String,java.lang.String)
+  ✔ 만일 "시스템" 역할이 "setup" 행동을 수행한다                                                                                                                   # org.mulino.verification.ScenarioGlue.action(java.lang.String,java.lang.String)
+  ✔ 만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다                                                                                                   # org.mulino.verification.ScenarioGlue.action(java.lang.String,java.lang.String)
+  ✔ 만일 "시스템" 역할이 "before" 행동을 수행한다                                                                                                                  # org.mulino.verification.ScenarioGlue.action(java.lang.String,java.lang.String)
+  ✔ 만일 "시스템" 역할이 "dispatch-start" 행동을 수행한다                                                                                                          # org.mulino.verification.ScenarioGlue.action(java.lang.String,java.lang.String)
+  ✔ 만일 "시스템" 역할이 "dispatch-ready" 행동을 수행한다                                                                                                          # org.mulino.verification.ScenarioGlue.action(java.lang.String,java.lang.String)
+  ✔ 만일 "시스템" 역할이 "revoke-start" 행동을 수행한다                                                                                                            # org.mulino.verification.ScenarioGlue.action(java.lang.String,java.lang.String)
+  ✔ 만일 "시스템" 역할이 "revoke-blocked" 행동을 수행한다                                                                                                          # org.mulino.verification.ScenarioGlue.action(java.lang.String,java.lang.String)
+  ✔ 만일 "시스템" 역할이 "dispatch-resume" 행동을 수행한다                                                                                                         # org.mulino.verification.ScenarioGlue.action(java.lang.String,java.lang.String)
+  ✔ 만일 "시스템" 역할이 "dispatch-result" 행동을 수행한다                                                                                                         # org.mulino.verification.ScenarioGlue.action(java.lang.String,java.lang.String)
+  ✔ 만일 "시스템" 역할이 "revoke-resume" 행동을 수행한다                                                                                                           # org.mulino.verification.ScenarioGlue.action(java.lang.String,java.lang.String)
+  ✔ 만일 "시스템" 역할이 "revoke-result" 행동을 수행한다                                                                                                           # org.mulino.verification.ScenarioGlue.action(java.lang.String,java.lang.String)
+  ✔ 만일 "warehouse" 역할이 "post-revoke" 행동을 수행한다                                                                                                       # org.mulino.verification.ScenarioGlue.action(java.lang.String,java.lang.String)
+  ✔ 만일 "delegator" 역할이 "after-snapshot" 행동을 수행한다                                                                                                    # org.mulino.verification.ScenarioGlue.action(java.lang.String,java.lang.String)
+  ✔ 만일 "시스템" 역할이 "after" 행동을 수행한다                                                                                                                   # org.mulino.verification.ScenarioGlue.action(java.lang.String,java.lang.String)
+  ✘ 그러면 "dispatch-ready-point" assertion으로 "blocked-or-post-revoke-duty dispatch-ready-point"를 확인한다                                                 # org.mulino.verification.ScenarioGlue.assertion(java.lang.String,java.lang.String)
+        java.lang.AssertionError: source dispatch-ready is NOT_IMPLEMENTED: NOT_IMPLEMENTED: no real product adapters installed
+        	at org.mulino.verification.AssertionEngine.fail(AssertionEngine.java:138)
+        	at org.mulino.verification.AssertionEngine.require(AssertionEngine.java:137)
+        	at org.mulino.verification.AssertionEngine.requireExecuted(AssertionEngine.java:77)
+        	at org.mulino.verification.AssertionEngine.requireSourcesAvailable(AssertionEngine.java:68)
+        	at org.mulino.verification.CaseRunner.assertId(CaseRunner.java:242)
+        	at org.mulino.verification.ScenarioGlue.assertion(ScenarioGlue.java:26)
+        	at ✽."dispatch-ready-point" assertion으로 "blocked-or-post-revoke-duty dispatch-ready-point"를 확인한다(file:///Volumes/VideoStore/Developer/mulino-ontology-step2-review-common/verification/cases/V7/scenario.feature:85)
+  ↷ 그러면 "dispatch-ready-state" assertion으로 "blocked-or-post-revoke-duty dispatch-ready-state"를 확인한다                                                 # org.mulino.verification.ScenarioGlue.assertion(java.lang.String,java.lang.String)
+  ↷ 그러면 "revoke-blocked-point" assertion으로 "blocked-or-post-revoke-duty revoke-blocked-point"를 확인한다                                                 # org.mulino.verification.ScenarioGlue.assertion(java.lang.String,java.lang.String)
+  ↷ 그러면 "revoke-blocked-state" assertion으로 "blocked-or-post-revoke-duty revoke-blocked-state"를 확인한다                                                 # org.mulino.verification.ScenarioGlue.assertion(java.lang.String,java.lang.String)
+  ↷ 그러면 "dispatch-resume-point" assertion으로 "blocked-or-post-revoke-duty dispatch-resume-point"를 확인한다                                               # org.mulino.verification.ScenarioGlue.assertion(java.lang.String,java.lang.String)
+  ↷ 그러면 "dispatch-resume-state" assertion으로 "blocked-or-post-revoke-duty dispatch-resume-state"를 확인한다                                               # org.mulino.verification.ScenarioGlue.assertion(java.lang.String,java.lang.String)
+  ↷ 그러면 "revoke-resume-point" assertion으로 "blocked-or-post-revoke-duty revoke-resume-point"를 확인한다                                                   # org.mulino.verification.ScenarioGlue.assertion(java.lang.String,java.lang.String)
+  ↷ 그러면 "revoke-resume-state" assertion으로 "blocked-or-post-revoke-duty revoke-resume-state"를 확인한다                                                   # org.mulino.verification.ScenarioGlue.assertion(java.lang.String,java.lang.String)
+  ↷ 그러면 "dispatch-result-completed" assertion으로 "blocked-or-post-revoke-duty dispatch-result-completed"를 확인한다                                       # org.mulino.verification.ScenarioGlue.assertion(java.lang.String,java.lang.String)
+  ↷ 그러면 "dispatch-result-same-handle" assertion으로 "blocked-or-post-revoke-duty dispatch-result-same-handle"를 확인한다                                   # org.mulino.verification.ScenarioGlue.assertion(java.lang.String,java.lang.String)
+  ↷ 그러면 "revoke-result-completed" assertion으로 "blocked-or-post-revoke-duty revoke-result-completed"를 확인한다                                           # org.mulino.verification.ScenarioGlue.assertion(java.lang.String,java.lang.String)
+  ↷ 그러면 "revoke-result-same-handle" assertion으로 "blocked-or-post-revoke-duty revoke-result-same-handle"를 확인한다                                       # org.mulino.verification.ScenarioGlue.assertion(java.lang.String,java.lang.String)
+  ↷ 그러면 "effect20-applied" assertion으로 "linearization-evidence effect20-applied"를 확인한다                                                              # org.mulino.verification.ScenarioGlue.assertion(java.lang.String,java.lang.String)
+  ↷ 그러면 "revoke-after-applied" assertion으로 "linearization-evidence revoke-after-applied"를 확인한다                                                      # org.mulino.verification.ScenarioGlue.assertion(java.lang.String,java.lang.String)
+  ↷ 그러면 "post-revoke-code" assertion으로 "effect-after-serialized-revoke post-revoke-code"를 확인한다                                                      # org.mulino.verification.ScenarioGlue.assertion(java.lang.String,java.lang.String)
+  ↷ 그러면 "post-revoke-outcome" assertion으로 "effect-after-serialized-revoke post-revoke-outcome"를 확인한다                                                # org.mulino.verification.ScenarioGlue.assertion(java.lang.String,java.lang.String)
+  ↷ 그러면 "preserved20-quantity" assertion으로 "preserved-if-effect-commits-first preserved20-quantity"를 확인한다                                           # org.mulino.verification.ScenarioGlue.assertion(java.lang.String,java.lang.String)
+  ↷ 그러면 "effect-after-serialized-revoke-rows0" assertion으로 "effect-after-serialized-revoke effect-after-serialized-revoke-rows0"를 확인한다              # org.mulino.verification.ScenarioGlue.assertion(java.lang.String,java.lang.String)
+  ↷ 그러면 "dispatch-terminal-before-revoke" assertion으로 "linearization-evidence dispatch-terminal-before-revoke"를 확인한다                                # org.mulino.verification.ScenarioGlue.assertion(java.lang.String,java.lang.String)
+  ↷ 그러면 "linearization-order" assertion으로 "linearization-evidence linearization-order"를 확인한다                                                        # org.mulino.verification.ScenarioGlue.assertion(java.lang.String,java.lang.String)
+  ↷ 그러면 "blocked-or-post-revoke-duty-assignment1" assertion으로 "blocked-or-post-revoke-duty blocked-or-post-revoke-duty-assignment1"를 확인한다           # org.mulino.verification.ScenarioGlue.assertion(java.lang.String,java.lang.String)
+  ↷ 그러면 "blocked-or-post-revoke-duty-owner" assertion으로 "blocked-or-post-revoke-duty blocked-or-post-revoke-duty-owner"를 확인한다                       # org.mulino.verification.ScenarioGlue.assertion(java.lang.String,java.lang.String)
+  ↷ 그러면 "blocked-or-post-revoke-duty-assignment-scope" assertion으로 "blocked-or-post-revoke-duty blocked-or-post-revoke-duty-assignment-scope"를 확인한다 # org.mulino.verification.ScenarioGlue.assertion(java.lang.String,java.lang.String)
+  ↷ 그러면 "revoked-current-grant" assertion으로 "linearization-evidence revoked-current-grant"를 확인한다                                                    # org.mulino.verification.ScenarioGlue.assertion(java.lang.String,java.lang.String)
+  ↷ 그러면 "common-scope-fence" assertion으로 "linearization-evidence common-scope-fence"를 확인한다                                                          # org.mulino.verification.ScenarioGlue.assertion(java.lang.String,java.lang.String)
+
+@V7 @D08 @D26 @sit
+시나리오: 현재 grant 철회와 출고 commit의 실제 순서를 대조한다: restart-after-revoke                                                                                  # file:///Volumes/VideoStore/Developer/mulino-ontology-step2-review-common/verification/cases/V7/scenario.feature:112
+  ✔ 먼저 사례 파일 "verification/cases/V7/case.json"의 "restart-after-revoke"를 준비한다                                                                     # org.mulino.verification.ScenarioGlue.prepare(java.lang.String,java.lang.String)
+  ✔ 만일 "시스템" 역할이 "setup" 행동을 수행한다                                                                                                                # org.mulino.verification.ScenarioGlue.action(java.lang.String,java.lang.String)
+  ✔ 만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다                                                                                                # org.mulino.verification.ScenarioGlue.action(java.lang.String,java.lang.String)
+  ✔ 만일 "시스템" 역할이 "before" 행동을 수행한다                                                                                                               # org.mulino.verification.ScenarioGlue.action(java.lang.String,java.lang.String)
+  ✔ 만일 "warehouse" 역할이 "prior-dispatch" 행동을 수행한다                                                                                                 # org.mulino.verification.ScenarioGlue.action(java.lang.String,java.lang.String)
+  ✔ 만일 "delegator" 역할이 "prior-committed-snapshot" 행동을 수행한다                                                                                       # org.mulino.verification.ScenarioGlue.action(java.lang.String,java.lang.String)
+  ✔ 만일 "시스템" 역할이 "prior-committed" 행동을 수행한다                                                                                                      # org.mulino.verification.ScenarioGlue.action(java.lang.String,java.lang.String)
+  ✔ 만일 "시스템" 역할이 "dispatch-start" 행동을 수행한다                                                                                                       # org.mulino.verification.ScenarioGlue.action(java.lang.String,java.lang.String)
+  ✔ 만일 "시스템" 역할이 "dispatch-ready" 행동을 수행한다                                                                                                       # org.mulino.verification.ScenarioGlue.action(java.lang.String,java.lang.String)
+  ✔ 만일 "delegator" 역할이 "revoke" 행동을 수행한다                                                                                                         # org.mulino.verification.ScenarioGlue.action(java.lang.String,java.lang.String)
+  ✔ 만일 "시스템" 역할이 "cancel-old-handle" 행동을 수행한다                                                                                                    # org.mulino.verification.ScenarioGlue.action(java.lang.String,java.lang.String)
+  ✔ 만일 "시스템" 역할이 "dispatch-result" 행동을 수행한다                                                                                                      # org.mulino.verification.ScenarioGlue.action(java.lang.String,java.lang.String)
+  ✔ 만일 "시스템" 역할이 "restart-application" 행동을 수행한다                                                                                                  # org.mulino.verification.ScenarioGlue.action(java.lang.String,java.lang.String)
+  ✔ 만일 "시스템" 역할이 "restart-scheduler" 행동을 수행한다                                                                                                    # org.mulino.verification.ScenarioGlue.action(java.lang.String,java.lang.String)
+  ✔ 만일 "시스템" 역할이 "restart-worker-a" 행동을 수행한다                                                                                                     # org.mulino.verification.ScenarioGlue.action(java.lang.String,java.lang.String)
+  ✔ 만일 "시스템" 역할이 "restart-worker-b" 행동을 수행한다                                                                                                     # org.mulino.verification.ScenarioGlue.action(java.lang.String,java.lang.String)
+  ✔ 만일 "시스템" 역할이 "scheduler-tick" 행동을 수행한다                                                                                                       # org.mulino.verification.ScenarioGlue.action(java.lang.String,java.lang.String)
+  ✔ 만일 "시스템" 역할이 "runtime-claim" 행동을 수행한다                                                                                                        # org.mulino.verification.ScenarioGlue.action(java.lang.String,java.lang.String)
+  ✔ 만일 "시스템" 역할이 "runtime-terminal" 행동을 수행한다                                                                                                     # org.mulino.verification.ScenarioGlue.action(java.lang.String,java.lang.String)
+  ✔ 만일 "delegator" 역할이 "safe-retry" 행동을 수행한다                                                                                                     # org.mulino.verification.ScenarioGlue.action(java.lang.String,java.lang.String)
+  ✔ 만일 "delegator" 역할이 "after-snapshot" 행동을 수행한다                                                                                                 # org.mulino.verification.ScenarioGlue.action(java.lang.String,java.lang.String)
+  ✔ 만일 "시스템" 역할이 "after" 행동을 수행한다                                                                                                                # org.mulino.verification.ScenarioGlue.action(java.lang.String,java.lang.String)
+  ✘ 그러면 "prior20-applied" assertion으로 "safe-retry prior20-applied"를 확인한다                                                                         # org.mulino.verification.ScenarioGlue.assertion(java.lang.String,java.lang.String)
+        java.lang.AssertionError: source prior-dispatch is NOT_IMPLEMENTED: NOT_IMPLEMENTED: no real product adapters installed
+        	at org.mulino.verification.AssertionEngine.fail(AssertionEngine.java:138)
+        	at org.mulino.verification.AssertionEngine.require(AssertionEngine.java:137)
+        	at org.mulino.verification.AssertionEngine.requireExecuted(AssertionEngine.java:77)
+        	at org.mulino.verification.AssertionEngine.requireSourcesAvailable(AssertionEngine.java:68)
+        	at org.mulino.verification.CaseRunner.assertId(CaseRunner.java:242)
+        	at org.mulino.verification.ScenarioGlue.assertion(ScenarioGlue.java:26)
+        	at ✽."prior20-applied" assertion으로 "safe-retry prior20-applied"를 확인한다(file:///Volumes/VideoStore/Developer/mulino-ontology-step2-review-common/verification/cases/V7/scenario.feature:135)
+  ↷ 그러면 "dispatch-ready-point" assertion으로 "safe-retry dispatch-ready-point"를 확인한다                                                               # org.mulino.verification.ScenarioGlue.assertion(java.lang.String,java.lang.String)
+  ↷ 그러면 "dispatch-ready-state" assertion으로 "safe-retry dispatch-ready-state"를 확인한다                                                               # org.mulino.verification.ScenarioGlue.assertion(java.lang.String,java.lang.String)
+  ↷ 그러면 "revoke-committed" assertion으로 "safe-retry revoke-committed"를 확인한다                                                                       # org.mulino.verification.ScenarioGlue.assertion(java.lang.String,java.lang.String)
+  ↷ 그러면 "dispatch-result-completed" assertion으로 "safe-retry dispatch-result-completed"를 확인한다                                                     # org.mulino.verification.ScenarioGlue.assertion(java.lang.String,java.lang.String)
+  ↷ 그러면 "dispatch-result-same-handle" assertion으로 "safe-retry dispatch-result-same-handle"를 확인한다                                                 # org.mulino.verification.ScenarioGlue.assertion(java.lang.String,java.lang.String)
+  ↷ 그러면 "old-worker-cancelled" assertion으로 "safe-retry old-worker-cancelled"를 확인한다                                                               # org.mulino.verification.ScenarioGlue.assertion(java.lang.String,java.lang.String)
+  ↷ 그러면 "safe-retry-code" assertion으로 "safe-retry safe-retry-code"를 확인한다                                                                         # org.mulino.verification.ScenarioGlue.assertion(java.lang.String,java.lang.String)
+  ↷ 그러면 "safe-retry-outcome" assertion으로 "safe-retry safe-retry-outcome"를 확인한다                                                                   # org.mulino.verification.ScenarioGlue.assertion(java.lang.String,java.lang.String)
+  ↷ 그러면 "new-dispatch-rows0" assertion으로 "safe-retry new-dispatch-rows0"를 확인한다                                                                   # org.mulino.verification.ScenarioGlue.assertion(java.lang.String,java.lang.String)
+  ↷ 그러면 "new20-command-not-committed" assertion으로 "safe-retry new20-command-not-committed"를 확인한다                                                 # org.mulino.verification.ScenarioGlue.assertion(java.lang.String,java.lang.String)
+  ↷ 그러면 "new-effect-quantity0" assertion으로 "unauthorized-recovered-effects new-effect-quantity0"를 확인한다                                           # org.mulino.verification.ScenarioGlue.assertion(java.lang.String,java.lang.String)
+  ↷ 그러면 "prior20-raw-preserved" assertion으로 "safe-retry prior20-raw-preserved"를 확인한다                                                             # org.mulino.verification.ScenarioGlue.assertion(java.lang.String,java.lang.String)
+  ↷ 그러면 "prior20-still-total" assertion으로 "prior-committed-preserved prior20-still-total"를 확인한다                                                  # org.mulino.verification.ScenarioGlue.assertion(java.lang.String,java.lang.String)
+  ↷ 그러면 "blocked-duty-after-restart-assignment1" assertion으로 "blocked-duty-after-restart blocked-duty-after-restart-assignment1"를 확인한다           # org.mulino.verification.ScenarioGlue.assertion(java.lang.String,java.lang.String)
+  ↷ 그러면 "blocked-duty-after-restart-owner" assertion으로 "blocked-duty-after-restart blocked-duty-after-restart-owner"를 확인한다                       # org.mulino.verification.ScenarioGlue.assertion(java.lang.String,java.lang.String)
+  ↷ 그러면 "blocked-duty-after-restart-assignment-scope" assertion으로 "blocked-duty-after-restart blocked-duty-after-restart-assignment-scope"를 확인한다 # org.mulino.verification.ScenarioGlue.assertion(java.lang.String,java.lang.String)
+  ↷ 그러면 "revoked-current-grant" assertion으로 "safe-retry revoked-current-grant"를 확인한다                                                             # org.mulino.verification.ScenarioGlue.assertion(java.lang.String,java.lang.String)
+  ↷ 그러면 "common-scope-fence" assertion으로 "safe-retry common-scope-fence"를 확인한다                                                                   # org.mulino.verification.ScenarioGlue.assertion(java.lang.String,java.lang.String)
+[ERROR] Tests run: 1, Failures: 1, Errors: 0, Skipped: 0, Time elapsed: 0.479 s <<< FAILURE! -- in org.mulino.verification.CaseFeatureTest
+[ERROR] org.mulino.verification.CaseFeatureTest.executeEveryDeclaredKoreanScenario -- Time elapsed: 0.471 s <<< FAILURE!
+java.lang.AssertionError: NOT_IMPLEMENTED: 4 independently discovered Korean scenarios failed required product assertions
+	at org.mulino.verification.CaseFeatureTest.executeEveryDeclaredKoreanScenario(CaseFeatureTest.java:38)
+
+[INFO] 
+[INFO] Results:
+[INFO] 
+[ERROR] Failures: 
+[ERROR]   CaseFeatureTest.executeEveryDeclaredKoreanScenario:38 NOT_IMPLEMENTED: 4 independently discovered Korean scenarios failed required product assertions
+[INFO] 
+[ERROR] Tests run: 1, Failures: 1, Errors: 0, Skipped: 0
+[INFO] 
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD FAILURE
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  1.239 s
+[INFO] Finished at: 2026-10-08T00:31:15+09:00
+[INFO] ------------------------------------------------------------------------
+[ERROR] Failed to execute goal org.apache.maven.plugins:maven-surefire-plugin:3.5.6:test (default-test) on project acceptance-harness: There are test failures.
+[ERROR] 
+[ERROR] See /Volumes/VideoStore/Developer/mulino-ontology-step2-review-common/verification/harness/target/surefire-reports for the individual test results.
+[ERROR] See dump files (if any exist) [date].dump, [date]-jvmRun[N].dump and [date].dumpstream.
+[ERROR] -> [Help 1]
+[ERROR] 
+[ERROR] To see the full stack trace of the errors, re-run Maven with the -e switch.
+[ERROR] Re-run Maven using the -X switch to enable full debug logging.
+[ERROR] 
+[ERROR] For more information about the errors and possible solutions, please read the following articles:
+[ERROR] [Help 1] http://cwiki.apache.org/confluence/display/MAVEN/MojoFailureException
+exitCode=1

@@ -56,6 +56,8 @@ public final class HostObservationValidator {
         for(String key:List.of("operation","command","environment")) ContractValidator.require(extractedRows.path(key).equals(host.path(key)),"Independent artifact differs from declared host "+key);
         ContractValidator.require(extractedRows.path("driverProvenance").equals(result.provenance()),"Independent artifact differs from declared driver provenance");
         identity.fields().forEachRemaining(e->{if(requested.has(e.getKey())) ContractValidator.require(e.getValue().equals(requested.get(e.getKey())),"Host operation identity differs from requested "+e.getKey());});
+        if(operation.equals("claim")) for(String key:List.of("taskId","invocationHandle")) if(requested.has(key))
+            ContractValidator.require(requested.path(key).isTextual() && !requested.path(key).asText().isBlank() && requested.path(key).equals(identity.path(key)),"Claim identity missing or different from requested "+key);
         // Fail closed when an explicitly requested profile would be replaced by a local probe.
         if(requested.has("profile")) ContractValidator.require(requested.path("profile").equals(host.path("environment").path("profile")),"Host profile differs from requested profile");
         if(LOCAL_ONLY.contains(operation)) ContractValidator.require(host.path("environment").path("profile").asText().equals("LOCAL"),"Local host operation cannot establish another profile's acceptance");

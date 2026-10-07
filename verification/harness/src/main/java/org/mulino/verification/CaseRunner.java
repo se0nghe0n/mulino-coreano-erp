@@ -51,24 +51,27 @@ public final class CaseRunner {
         ensureActive();
         String id=Json.required(a,"id"),kind=Json.required(a,"kind"); StepResult result;
         try {
-            result=driver.availableAdapters().isEmpty() && !kind.equals("parallel") ? StepResult.missing(id,"NOT_IMPLEMENTED: no real product adapters installed") : switch(kind) {
-                case "installFixture" -> driver.installFixture(id,fixtureBundle());
-                case "invoke" -> a.has("protocolOperation") ? driver.wire(id,actor(a),Json.required(a,"protocolOperation"),resolve(a.path("request"))) : driver.invoke(id,Json.required(a,"route"),actor(a),Json.required(a,"capabilityId"),resolve(a.path("request")));
-                case "query" -> a.has("protocolOperation") ? driver.wire(id,actor(a),Json.required(a,"protocolOperation"),resolve(a.path("request"))) : driver.query(id,Json.required(a,"route"),actor(a),Json.required(a,"capabilityId"),resolve(a.path("request")));
-                case "observe" -> driver.observe(id,resolve(a.path("observation")));
-                case "control" -> driver.control(id,resolve(a.path("control")));
-                case "agent" -> agentRunner.run(id,Json.required(a,"route"),actor(a),resolve(a),driver);
+            boolean adaptersAvailable=!driver.availableAdapters().isEmpty();
+            // Metadata may block and ignore cancellation; fence again before dispatch.
+            ensureActive();
+            result=!adaptersAvailable && !kind.equals("parallel") ? StepResult.missing(id,"NOT_IMPLEMENTED: no real product adapters installed") : switch(kind) {
+                case "installFixture" -> dispatch(() -> driver.installFixture(id,fixtureBundle()));
+                case "invoke" -> dispatch(() -> a.has("protocolOperation") ? driver.wire(id,actor(a),Json.required(a,"protocolOperation"),resolve(a.path("request"))) : driver.invoke(id,Json.required(a,"route"),actor(a),Json.required(a,"capabilityId"),resolve(a.path("request"))));
+                case "query" -> dispatch(() -> a.has("protocolOperation") ? driver.wire(id,actor(a),Json.required(a,"protocolOperation"),resolve(a.path("request"))) : driver.query(id,Json.required(a,"route"),actor(a),Json.required(a,"capabilityId"),resolve(a.path("request"))));
+                case "observe" -> dispatch(() -> driver.observe(id,resolve(a.path("observation"))));
+                case "control" -> dispatch(() -> driver.control(id,resolve(a.path("control"))));
+                case "agent" -> dispatch(() -> agentRunner.run(id,Json.required(a,"route"),actor(a),resolve(a),driver));
                 case "start" -> {
                     JsonNode call=a.path("call");
-                    yield call.has("protocolOperation")
+                    yield dispatch(() -> call.has("protocolOperation")
                         ? driver.startWire(id,actor(call),Json.required(call,"protocolOperation"),resolve(call.path("request")))
-                        : driver.start(id,Json.required(call,"route"),actor(call),Json.required(call,"capabilityId"),resolve(call.path("request")));
+                        : driver.start(id,Json.required(call,"route"),actor(call),Json.required(call,"capabilityId"),resolve(call.path("request"))));
                 }
                 case "await" -> {
                     String sourceId=Json.required(a,"awaitActionId"); JsonNode previous=results.get(sourceId);
                     if(previous==null) throw new IllegalArgumentException("Await without submission "+sourceId);
                     if(!"EXECUTED".equals(previous.path("driverStatus").asText())) yield StepResult.missing(id,"NOT_IMPLEMENTED: asynchronous submission "+sourceId+" did not execute");
-                    yield driver.await(id,previous.path("data").path("invocationHandle"),a.path("timeoutSeconds").asInt(30));
+                    yield dispatch(() -> driver.await(id,previous.path("data").path("invocationHandle"),a.path("timeoutSeconds").asInt(30)));
                 }
                 case "parallel" -> parallel(a);
                 default -> throw new IllegalArgumentException("Unknown action kind "+kind);
@@ -123,6 +126,11 @@ public final class CaseRunner {
             }
             return result;
         } catch(RuntimeException e) { throw new IllegalArgumentException("Action "+id+": "+e.getMessage(),e); }
+    }
+    @FunctionalInterface private interface PortDispatch { StepResult call() throws IOException; }
+    private StepResult dispatch(PortDispatch call) throws IOException {
+        // Do not lock across an uncooperative port. Already dispatched remote effects need reconciliation.
+        ensureActive();return call.call();
     }
     private void ensureActive() throws IOException {
         if(halted || Thread.currentThread().isInterrupted()) throw new IOException("Execution stopped after parallel cancellation; no further adapter calls or late result publication");
