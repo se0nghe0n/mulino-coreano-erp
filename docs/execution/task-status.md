@@ -73,6 +73,27 @@ skills 파일은 변경하지 않는다. 다음 commit을 coordinator가 통합�
 반환했다. 모든 skills는 아직 실제
 애플리케이션·MCP/client 호출로 인수한 것이 아니다.
 
+## Step 2 소유권과 현재 통합 gate
+
+Step 2의 최초 공통 baseline은 `cef526e9f77679d8429fb517184f018d64824443`다.
+아래 writer는 각각 독립 worktree에서 실제 GPT-6.1 Sol high로 수행한다.
+
+| Subtask | branch / 절대 worktree | 소유 범위 | 상태 |
+|---|---|---|---|
+| 공통 harness | `step2/test-harness` / `/Volumes/VideoStore/Developer/mulino-ontology-step2-harness` | `contracts`, harness·base fixture·wrapper | 작성·검증 중 |
+| 실모델 corpus | `step2/model-corpus` / `/Volumes/VideoStore/Developer/mulino-ontology-step2-model-corpus` | `verification/model-corpus` | 작성·검증 중, 실제 모델 호출 없음 |
+| 독립 oracle 목록 | `step2/oracle-catalog` / `/Volumes/VideoStore/Developer/mulino-ontology-step2-oracles` | `verification/requirements` | 작성·검증 중 |
+
+공통 계약과 독립 oracle 목록을 먼저 검증·통합한 commit을 B2로 기록한다.
+그 뒤 사례별 writer에게 같은 B2를 배정한다. 공통 interface가 준비되기
+전에 작성자별 호출 형식을 각각 만들지 않는다.
+
+Sol xhigh와 Astra low의 설계 사전 검토는 관찰/control 미지원의 효과0
+오인, 비동기 경합의 순차 실행 오인, snapshot 불일치, UAT 정답 주입,
+필수 subcase 누락과 wire 정규화 위험을 지적했다. 해당 경계를 harness와
+oracle 목록에 반영해 실행 검증한다. 이 사전 검토는 전체 Step 2 코드의
+최종 review가 아니다. 최종 통합 뒤 같은 두 모델/effort로 다시 검토한다.
+
 ## 시스템 S0–S6의 별도 gate
 
 | 시스템 Step | 인수 범위 | 상태 |
