@@ -5,24 +5,53 @@
   "baseline": "40a240c3886d3316ba1fd686e9b44bfa1ba6ec2d",
   "command": "JAVA_HOME=<Zulu21> PATH=<Node24>:<Zulu21>:$PATH ./mvnw -q -f backend/pom.xml -Dtest=ResponsibilityServiceTest,ResponsibilityPostgresTest,ResponsibilityEvidenceGateTest test",
   "observed": {
-    "tests": 12,
+    "tests": 21,
     "failures": 0,
     "errors": 0,
     "skipped": 0
   },
   "result": "PASS",
-  "scope": "5 service unit, 4 core actual evidence unit, 3 independent real PostgreSQL responsibility invariants and concurrent transfer",
-  "remaining": "New partial transfer and assignment quantity SQL tests NOT_RUN; gateway HTTP/MCP two-accept full flow, aggregate Spring wiring, whole C2/C5 and later kind resolution NOT_RUN.",
+  "scope": "7 service unit, 6 typed coverage and actual evidence unit, 8 fresh PostgreSQL constraint and concurrency tests",
+  "remaining": "Evidence owner typed source/hash/current-review provider and cross-schema coverage FK must integrate; combined HTTP/MCP coverage proof, whole C2/C5 remain NOT_RUN.",
   "artifacts": [
     "postgres-test.txt",
     "service-test.txt",
     "evidence-test.txt"
   ],
-  "earlierFailures": "Native fixture missing alias/specification and V9 ACTIVE status corrected; original logs kept /tmp/s2-responsibility-test*.log",
+  "earlierFailures": "Earlier fixture setup failures corrected before PASS; original logs /tmp/s2-responsibility-test*.log. P1 suite initial run passed.",
   "latestSourceCompile": {
     "command": "Zulu21 javac -cp <prior Surefire classpath> -d /tmp/s2-responsibility-latest-javac application/responsibility/*.java domain/responsibility/*.java WorkAccess.java RuntimeDutyPort.java",
     "exitCode": 0,
     "result": "PASS",
     "scope": "Exact current owned production source and current dependency interfaces; Spring aggregate wiring remains integration check"
+  },
+  "testSuites": [
+    {
+      "class": "ResponsibilityServiceTest",
+      "tests": 7,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "class": "ResponsibilityPostgresTest",
+      "tests": 8,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "class": "ResponsibilityEvidenceGateTest",
+      "tests": 6,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    }
+  ],
+  "codeCommit": "fc55404",
+  "p1Counterexample": {
+    "partialCompletion50": "Only covered first50 can RESOLVE; second50 remains OPEN after rejected transaction",
+    "fullCompletion100": "Two disjoint50 credit rows, sum100, source evidence credit immutable",
+    "concurrentPartial": "One covered first50 commit, second50 rejected, persistedcreditcount1 quantity50"
   }
 }
