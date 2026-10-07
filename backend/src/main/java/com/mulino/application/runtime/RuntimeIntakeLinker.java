@@ -29,14 +29,14 @@ public class RuntimeIntakeLinker {
   return new Rule(policy,(Map<String,Object>)r,event,profile);
  }
  @Transactional public void noResponse(DomainContext c,Map<String,Object> index){
-  policies.fence(c.organizationId());if(index.get("createdworkid")!=null)throw new DomainError("HELD","POLICY_UNRESOLVED","Existing response draft requires explicit authorized disposition");var proof=rule(c,index);if(!Boolean.FALSE.equals(proof.rule.get("requiresResponse")))throw conflict();
+  var current=locked(c,index);if(Set.of("LINKED","NO_RESPONSE").contains(current.get("state")))return;policies.fence(c.organizationId());if(current.get("createdworkid")!=null||current.get("createintentjson")!=null)throw new DomainError("HELD","POLICY_UNRESOLVED","Existing or uncertain response draft requires explicit authorized disposition");var proof=rule(c,index);if(!Boolean.FALSE.equals(proof.rule.get("requiresResponse")))throw conflict();
   repository.db().update("UPDATE mulino_runtime_IntakeRecoveries SET state='NO_RESPONSE',policyId=?,policyHash=?,decisionReason=?,lastCode='POLICY_NO_RESPONSE',revision=revision+1 WHERE organizationId=? AND ID=? AND state NOT IN ('LINKED','NO_RESPONSE')",proof.policy.get("ID"),proof.policy.get("contentHash"),"Current "+proof.policy.get("version")+" intake rule for "+proof.event.get("kind")+" requires no obligation",c.organizationId(),index.get("id"));
  }
  @Transactional public void link(DomainContext c,Map<String,Object> index,String workId){
+  var current=locked(c,index);if("LINKED".equals(current.get("state")))return;if("NO_RESPONSE".equals(current.get("state")))throw conflict();
   var prep=CommandPreparation.ordinary(Map.of("WORK",List.of(workId),"SOURCE",List.of(index.get("sourceprofileid").toString())),List.of("work:"+workId),"RESPONSIBILITY",workId,null);
   guard.fence(c,prep);var proof=rule(c,index);if(!Boolean.TRUE.equals(proof.rule.get("requiresResponse")))throw conflict();
   auth.authorizeScopes(c,"createObligation",prep.scopes());guard.verify(c,"createObligation",CommandRequests.hash(Map.of("intakeId",index.get("id"),"workId",workId)),prep,Map.of());
-  var rows=repository.db().queryForList("SELECT * FROM mulino_runtime_IntakeRecoveries WHERE organizationId=? AND ID=? FOR UPDATE",c.organizationId(),index.get("id"));if(rows.size()!=1)throw DomainError.forbidden();if("LINKED".equals(rows.getFirst().get("state")))return;
   var source=works.require(c,workId,true);if("CLOSED".equals(source.get("status")))auth.authorizeScope(c,"createFollowup","WORK",workId);
   duties.ensureEvidenceCorrectionDuty(c,workId,index.get("eventid").toString(),"EVENT",proof.profile.get("nextaction").toString(),instant(proof.profile.get("nextcheckat")));
   var linked=repository.db().queryForList("SELECT a.ID,a.workId,w.ownerId,w.supervisorId FROM mulino_work_read_ObligationReferences a JOIN mulino_responsibility_Roots r ON r.organizationId=a.organizationId AND r.ID=a.rootId JOIN mulino_work_read_Works w ON w.organizationId=a.organizationId AND w.ID=a.workId WHERE a.organizationId=? AND r.sourceId=? AND r.sourceKind='EVENT' AND a.status='OPEN' AND a.valid AND w.status IN ('ACTIVE','WAITING')",c.organizationId(),index.get("eventid"));
@@ -46,4 +46,5 @@ public class RuntimeIntakeLinker {
   }
   repository.db().update("UPDATE mulino_runtime_IntakeRecoveries SET state='LINKED',linkedWorkId=?,linkedAssignmentId=?,policyId=?,policyHash=?,decisionReason='Policy-required response has actual human work and OPEN assignment',lastCode='LINKED',revision=revision+1 WHERE organizationId=? AND ID=?",actual.get("workid"),actual.get("id"),proof.policy.get("ID"),proof.policy.get("contentHash"),c.organizationId(),index.get("id"));
  }
+ private Map<String,Object> locked(DomainContext c,Map<String,Object> index){var rows=repository.db().queryForList("SELECT * FROM mulino_runtime_IntakeRecoveries WHERE organizationId=? AND ID=? FOR UPDATE",c.organizationId(),index.get("id"));if(rows.size()!=1)throw DomainError.forbidden();return rows.getFirst();}
 }
