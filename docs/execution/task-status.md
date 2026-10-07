@@ -165,7 +165,11 @@ checks까지 통과한 뒤에만 Step2를 닫는다.
 | host 참조·복구 | `step2/review-case-contracts` / `/Volumes/VideoStore/Developer/mulino-ontology-step2-review-case-contracts` | T26·V5·T14와 고유 tests |
 | 승인·물량·QC | `step2/review-business` / `/Volumes/VideoStore/Developer/mulino-ontology-step2-review-business` | V3·T20·E2와 작성 도구·고유 tests |
 | 모델 집계 | `step2/review-coverage` / `/Volumes/VideoStore/Developer/mulino-ontology-step2-review-coverage` | coverage assembler·고유 tests |
-| 수락 주체 | `step2/review-handover` / `/Volumes/VideoStore/Developer/mulino-ontology-step2-review-handover` | T10와 고유 tests |
+| 수락 주체 | `step2/review-handover` / `/Volumes/VideoStore/Developer/mulino-ontology-step2-review-handover` | T10·T11와 고유 tests |
+| 인가 positive 전제 | `step2/review-authority` / `/Volumes/VideoStore/Developer/mulino-ontology-step2-review-authority` | C3와 고유 tests |
+| 실제 DB 경합 | `step2/review-locks` / `/Volumes/VideoStore/Developer/mulino-ontology-step2-review-locks` | V8와 고유 tests |
+| 적용 사실 증명 | `step2/review-outcomes` / `/Volumes/VideoStore/Developer/mulino-ontology-step2-review-outcomes` | C4·T17와 고유 tests |
+| 실제 모델 응답 연결 | `step2/review-model-binding` / `/Volumes/VideoStore/Developer/mulino-ontology-step2-review-model-binding` | model-binding와 고유 tests |
 
 root `./verify model`과 `./verify coverage`는 아직 별도 model-binding
 runner와 전체 coverage assembler에 연결되지 않았다. Step2에서는

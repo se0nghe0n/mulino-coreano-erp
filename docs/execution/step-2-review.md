@@ -34,7 +34,14 @@
 | A8 | Astra P2 | T26 만료 복구를 사용자 command 전 독립 sweep으로 검증한다 | 수정 중 |
 | A9 | Astra P2 | repair dry-run·무권한 APPLY 직후 projection 불변을 각각 검증한다 | 수정 중 |
 | S1 | Sol P2 | tick/sweep 제출 identity와 awaitRuntimeTask 계약을 일치시킨다 | 수정 중 |
-| S2 | Sol P2 | T10 인계는 대상 담당자의 실제 수락을 요구하고 대리 수락을 거부한다 | 수정 중 |
+| S2 | Sol P2 | T10·T11 인계는 대상 담당자의 실제 수락을 요구하고 대리 수락을 거부한다 | 수정 중 |
+| S3 | Sol P1 | C3 발주 positive 전에 유효한 MANAGER 승인을 확보한다 | 수정 중 |
+| S4 | Sol P1 | C3 정의 전환 positive에 발행된 정의·영향·mapping·전환 승인을 연결한다 | 수정 중 |
+| S5 | Sol P2 | T20 MRTR 주체 검사는 동일 권한 두 주체의 자기/타인 state로 분리한다 | 수정 중 |
+| S6 | Sol P2 | V8은 첫 lock 보유 중 두 번째 transaction의 실제 DB WAIT를 관찰한다 | 수정 중 |
+| S7 | Sol P2 | C4 재정정 적용·새 evidence revision을 먼저 입증한다 | 수정 중 |
+| S8 | Sol P2 | 모델 사전 중단의 허위 완료 응답을 독립 상태와 대조한다 | 수정 중 |
+| S9 | Sol P2 | 모델 API oracle를 실제 인증 request/response와 같은 key/payload replay에 연결한다 | 수정 중 |
 
 A1은 정상 schema를 따르는 출력도 downstream 참조에서 실패하는
 문제다. A3은 공통 assertion만 있는180회는 통과하면서 실제 선택
@@ -42,6 +49,11 @@ A1은 정상 schema를 따르는 출력도 downstream 참조에서 실패하는
 A4는 잘못된 metric object와 숫자가 아닌 비용 문자열을 통과시키는
 집계 반례가 있었다. A6·A7·A8·A9·S2는 의도한 업무 효과가 없거나
 잘못된 주체가 처리해도 통과할 수 있는 의미 검증 누락이다.
+
+Astra의9건과 Sol의12건 중 V3·E2·usage/cost3건이 겹쳐 독립 지적은
+18건이다. 각 reviewer의 최초 전체 판정은 FAIL이며 수정 후 closure가
+남았다. 같은 원인의 회귀 범위로 T17 해제·배분 상태와 C3 인계 수락도
+확인한다. 확인된 제한을 Step3 구현에 넘겨 해결한 것으로 세지 않는다.
 
 root entrypoint와 별도 모델·coverage 도구의 미연결은 알려진 통합
 제한이다. 새 skills가 Step2에서 별도 명령과 실제 adapter 부재를
