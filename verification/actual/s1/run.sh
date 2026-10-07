@@ -70,7 +70,7 @@ phase=ephemeral-identity
 openssl genpkey -algorithm RSA -pkeyopt rsa_keygen_bits:2048 -out "$fixture/private.pem" 2> "$fixture/keygen.log"
 openssl pkey -in "$fixture/private.pem" -pubout -out "$fixture/public.pem" 2> "$fixture/pubkey.log"
 export JWT_PRIVATE_KEY="$fixture/private.pem" JWT_PUBLIC_KEY="$fixture/public.pem"
-export JWT_ISSUER=synthetic-fixture-issuer JWT_AUDIENCE=isolated-ontology
+export JWT_ISSUER=https://mulino-native.invalid JWT_AUDIENCE=isolated-ontology
 export DB_USERNAME=postgres DB_PASSWORD
 DB_PASSWORD=$(python3 -c 'import secrets; print(secrets.token_urlsafe(24))')
 phase=disposable-postgres

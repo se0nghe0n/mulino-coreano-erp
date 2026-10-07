@@ -23,7 +23,7 @@ Step2의 `UnimplementedDriver`는 제품 실행 없이 RED 원인을 보존한�
 receipt에 쓰지 않는다. backend는 동일한 public key를 사용한다.
 
 `verification/actual/s1/fixture.json`의 issuer/audience는 각각
-`synthetic-fixture-issuer`, `isolated-ontology`다. fixture 설치는
+`https://mulino-native.invalid`, `isolated-ontology`다. fixture 설치는
 backend의 Flyway schema가 이미 적용된 disposable DB에만 수행한다.
 DB 삭제·migration·backend 시작은 이 adapter의 기능이 아니다.
 
@@ -105,3 +105,20 @@ JUnit Platform launcher로 adapter contract 6개를 실행해 모두 통과했�
 Python compile이 통과했고, 임시 Git fixture의 source drift가 native
 PASS를 FAIL로 바꾸는 receipt check도 통과했다. Maven slot은 사용하지
 않았다. 이 결과는 실제 PostgreSQL/HTTP 실행 성공을 뜻하지 않는다.
+
+
+## native issuer URL 수정
+
+설치된 Spring Security 7.1.1의 `JwtClaimAccessor.getIssuer()`는
+`java.net.URL`을 반환하고 `getClaimAsURL("iss")`를 호출한다.
+실제 `Jwt.withTokenValue(...).claim("iss",...).build().getIssuer()`
+probe에서 `synthetic-fixture-issuer`는 URL 변환
+`IllegalArgumentException`을 냈고 `https://mulino-native.invalid`는
+그 URL을 반환했다. native fixture와 runner를 후자로 맞췄다.
+`.invalid` 주소로 DNS나 HTTP 요청을 수행하지 않는다. 기존 Step2
+normative fixture issuer 추상 계약은 바꾸지 않는다.
+
+수정 후 focused Maven adapter suite는 7 tests, failures 0, errors 0,
+skipped 0, BUILD SUCCESS(2.727초)를 확인했다.
+[JUnit XML](issuer-contract-tests.xml)과 [probe 관찰](issuer-probe.txt)을
+남긴다. 실제 backend TCP 인수는 여전히 root 통합 실행 대상이다.

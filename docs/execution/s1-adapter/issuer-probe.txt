@@ -1,0 +1,7 @@
+Installed library: spring-security-oauth2-jose 7.1.1
+Method: Jwt.withTokenValue("probe").header("alg","RS256").claim("iss", value).build().getIssuer()
+Observed:
+synthetic-fixture-issuer => IllegalArgumentException: Unable to convert claim 'iss' of type 'class java.lang.String' to URL.
+https://mulino-native.invalid => https://mulino-native.invalid
+javap confirmed: JwtClaimAccessor.getIssuer() returns java.net.URL and calls getClaimAsURL("iss").
+No DNS or HTTP request performed by this probe.

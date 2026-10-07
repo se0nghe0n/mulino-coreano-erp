@@ -9,6 +9,13 @@ import static org.junit.jupiter.api.Assertions.*;
 
 /** Adapter plumbing tests; no product runtime/acceptance coverage is claimed. */
 public final class ActualAdapterContractTest {
+    @Test void nativeFixtureIssuerHasUrlShapeRequiredByInstalledSpring() throws Exception {
+        var root=Path.of(System.getProperty("repo.root","."));
+        var fixture=Json.read(root.resolve("verification/actual/s1/fixture.json"));
+        String issuer=Json.required(fixture.path("actors").path("reader"),"issuer");
+        var url=java.net.URI.create(issuer).toURL();
+        assertEquals("https",url.getProtocol());assertEquals("mulino-native.invalid",url.getHost());
+    }
     @Test void observedViolationRemainsFailEvenWhenOtherActionsUnavailable() {
         assertEquals("FAIL",ActualAttemptStatus.classify(true,true,false));
         assertEquals("FAIL",ActualAttemptStatus.classify(true,true,true));
