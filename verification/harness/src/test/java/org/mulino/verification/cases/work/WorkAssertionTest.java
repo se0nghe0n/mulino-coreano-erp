@@ -15,7 +15,7 @@ public class WorkAssertionTest {
     private final AssertionEngine engine = new AssertionEngine();
     private final JsonNode aliases = Json.parse("""
         {"ORG":"org-id","P":"item-id","W":"warehouse-id","ROOT":"root-id",
-         "SOURCE":"source-id","TARGET":"target-id","A":"human-a","B":"human-b"}
+         "SOURCE":"source-id","TARGET":"target-id","A":"human-a","B":"human-b","intake":"human-intake"}
         """);
     private JsonNode assertion(String caseId, String subcase, String id) throws Exception {
         Path path = Path.of(System.getProperty("repo.root"), "verification/cases", caseId, "case.json");
@@ -128,6 +128,25 @@ public class WorkAssertionTest {
         var a=assertion("T12","conflicting-claims","versions-pinned");engine.check(a,rows,aliases);
         ((ObjectNode)rows.get("after-db").at("/data/rawRows/assessments/0")).put("evaluatorVersion","evaluator-v2");
         assertThrows(AssertionError.class, () -> engine.check(a,rows,aliases));
+    }
+    @Test void failedLinkCannotHideOtherOwnerAssignment() throws Exception {
+        var rows = new HashMap<String, JsonNode>();
+        rows.put("anomaly", identity("occurrenceId", "anomaly-id"));
+        rows.put("after-db", captured("""
+          {"rawRows":{"assignments":[{"sourceOccurrenceId":"anomaly-id","status":"OPEN",
+          "ownerId":"human-intake","nextAction":"온도 이상 원자료 확인","nextCheckAt":"2026-10-08T09:00:00Z"}]}}
+          """));
+        var count = assertion("C5","failed-link","intake-current-assignment1");
+        var owner = assertion("C5","failed-link","intake-assignment-owner-next-check");
+        engine.check(count,rows,aliases);engine.check(owner,rows,aliases);
+        var assignments = (com.fasterxml.jackson.databind.node.ArrayNode) rows.get("after-db").at("/data/rawRows/assignments");
+        assignments.add(assignments.get(0).deepCopy());
+        ((ObjectNode)assignments.get(1)).put("ownerId","human-b");
+        assertThrows(AssertionError.class, () -> engine.check(count,rows,aliases));
+        assignments.remove(1);
+        ((ObjectNode)assignments.get(0)).put("ownerId","human-b");
+        engine.check(count,rows,aliases);
+        assertThrows(AssertionError.class, () -> engine.check(owner,rows,aliases));
     }
     @Test void unavailableAndIncompleteScopeNeverBecomeZeroEffectPass() throws Exception {
         var rows=assignmentSample();var a=assertion("T10","link-failure","no-target-assignment");engine.check(a,rows,aliases);

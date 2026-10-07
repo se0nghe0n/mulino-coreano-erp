@@ -18,6 +18,7 @@
     그러면 "intake-owner-human" assertion으로 "종료된 부모 뒤 이상 접수의 책임 failed-link. intake-owner의 독립 고정 기대값을 대조한다."를 확인한다
     그러면 "intake-one" assertion으로 "종료된 부모 뒤 이상 접수의 책임 failed-link. intake-owner의 독립 고정 기대값을 대조한다."를 확인한다
     그러면 "intake-current-assignment1" assertion으로 "종료된 부모 뒤 이상 접수의 책임 failed-link. intake-owner의 독립 고정 기대값을 대조한다."를 확인한다
+    그러면 "intake-assignment-owner-next-check" assertion으로 "접수 업무의 OPEN assignment 전체가 인간 접수 담당자와 실제 다음 행동·점검 시점 하나에 연결되는지 검증한다."를 확인한다
     그러면 "alert-not-closure" assertion으로 "종료된 부모 뒤 이상 접수의 책임 failed-link. alert-delivery-closes-intake의 독립 고정 기대값을 대조한다."를 확인한다
     그러면 "parent-not-rewritten" assertion으로 "같은 대상의 독립 전후 원행을 비교한다. 조회/거부 감사의 추가는 별도 허용한다."를 확인한다
     그러면 "parent-assessment-not-rewritten" assertion으로 "같은 대상의 독립 전후 원행을 비교한다. 조회/거부 감사의 추가는 별도 허용한다."를 확인한다

@@ -510,9 +510,6 @@
                   "pointer": "/response/occurrenceId"
                 }
               },
-              "ownerId": {
-                "$alias": "intake"
-              },
               "status": "OPEN"
             }
           },
@@ -535,6 +532,61 @@
             }
           },
           "oracleExplanation": "종료된 부모 뒤 이상 접수의 책임 failed-link. intake-owner의 독립 고정 기대값을 대조한다.",
+          "oracleRef": {
+            "oracleId": "C5.failed-link-responsibility",
+            "observationNames": [
+              "intake-owner"
+            ]
+          }
+        },
+        {
+          "id": "intake-assignment-owner-next-check",
+          "op": "relationSet",
+          "source": {
+            "actionId": "after-db",
+            "pointer": "/data/rawRows/assignments",
+            "where": {
+              "sourceOccurrenceId": {
+                "$result": {
+                  "actionId": "anomaly",
+                  "pointer": "/response/occurrenceId"
+                }
+              },
+              "status": "OPEN"
+            },
+            "field": [
+              "ownerId",
+              "nextAction",
+              "nextCheckAt"
+            ]
+          },
+          "expected": [
+            [
+              {
+                "$alias": "intake"
+              },
+              "온도 이상 원자료 확인",
+              "2026-10-08T09:00:00Z"
+            ]
+          ],
+          "requirementRefs": [
+            "D10",
+            "D14",
+            "D26"
+          ],
+          "evidenceRefs": [
+            "after-db:actual-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "C5",
+            "itemId": {
+              "$alias": "P"
+            }
+          },
+          "oracleExplanation": "접수 업무의 OPEN assignment 전체가 인간 접수 담당자와 실제 다음 행동·점검 시점 하나에 연결되는지 검증한다.",
           "oracleRef": {
             "oracleId": "C5.failed-link-responsibility",
             "observationNames": [
