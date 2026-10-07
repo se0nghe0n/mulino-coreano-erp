@@ -6,4 +6,4 @@ entity Restrictions { key ID : UUID; scopeId : UUID; active : Boolean; }
 entity Audit { key ID : UUID; scopeId : UUID; actor : String(80); operation : String(40); }
 entity Outbox { key ID : UUID; scopeId : UUID; operationId : UUID; state : String(40); }
 entity Idempotency { key ID : UUID; organizationId : String(80); owner : String(80); capability : String(80); commandKey : String(160); intentHash : String(64); response : LargeString; }
-entity Preserved { key ID : UUID; workState : String(40); definitionVersion : String(40); evidenceHash : String(64); }
+entity Preserved { key ID : UUID; workState : String(40); definitionVersion : String(40); evidenceHash : String(64); upgradeMarker : String(40); }
