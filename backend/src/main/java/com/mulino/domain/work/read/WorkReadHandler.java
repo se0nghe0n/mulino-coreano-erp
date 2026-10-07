@@ -45,7 +45,7 @@ public class WorkReadHandler implements QueryHandler {
     var obligations=obligations(c,ids);
     TreeSet<String> owners=new TreeSet<>(),next=new TreeSet<>(),evidence=new TreeSet<>();
     works.forEach(w->owners.add(String.valueOf(w.get("ownerId"))));
-    obligations.forEach(o->{owners.add(String.valueOf(o.get("ownerId")));next.add(String.valueOf(o.get("nextAction")));});
+    obligations.stream().filter(o->"OPEN".equals(o.get("status"))&&!Boolean.FALSE.equals(o.get("valid"))).forEach(o->{owners.add(String.valueOf(o.get("ownerId")));next.add(String.valueOf(o.get("nextAction")));});
     for(var ref:linked(c,"EvidenceReferences",ids)){
       if(!repository.documentKnown(c,String.valueOf(ref.get("documentVersionId"))))continue;
       try{var parent=works.stream().filter(w->Objects.equals(w.get("ID"),ref.get("workId"))).findFirst().orElseThrow();auth.authorizeScopes(c,"getEvidence",Map.of("TARGET",List.of(String.valueOf(ref.get("documentVersionId"))),"WORK",List.of(String.valueOf(ref.get("workId"))),"ITEM",List.of(String.valueOf(parent.get("itemId")))));evidence.add(String.valueOf(ref.get("documentVersionId")));}catch(DomainError denied){if(!denied.code().equals("FORBIDDEN"))throw denied;}
