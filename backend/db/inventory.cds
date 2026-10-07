@@ -227,7 +227,7 @@ entity SegmentAllocations {
  predecessorId : UUID; commandId : UUID;
  startQuantity : Decimal(38,12); action : String(80); customerId : UUID;
  workId : UUID; authorizationActorId : UUID; nextValidityBoundary : Timestamp;
- suspendedAt : Timestamp; suspensionReason : String(240);
+ suspendedAt : Timestamp; suspensionReason : String(240); pickedAt : Timestamp;
 
 }
 entity StockAdjustments {
@@ -235,4 +235,20 @@ entity StockAdjustments {
  createdAt : Timestamp; recordedAt : Timestamp; stocktakeId : UUID; segmentId : UUID;
  direction : String(40); quantity : Decimal(38,12); unit : String(40);
  occurredAt : Timestamp; reason : String(240); evidenceRef : String(240); commandId : UUID;
+}
+entity Dispatches {
+ key organizationId : UUID; key ID : UUID; revision : Integer; createdAt : Timestamp; recordedAt : Timestamp;
+ cargoScopeId : UUID; allocationId : UUID; salesLineId : UUID; customerId : UUID; workId : UUID;
+ itemId : UUID; lotId : UUID; rangeRootId : UUID; startQuantity : Decimal(38,12); quantity : Decimal(38,12); unit : String(40);
+ transitSegmentId : UUID; destinationId : UUID; occurredAt : Timestamp; commandId : UUID; evidenceRef : String(240);
+}
+entity CargoScopes {
+ key organizationId : UUID; key ID : UUID; revision : Integer; createdAt : Timestamp; recordedAt : Timestamp;
+ dispatchId : UUID; rangeRootId : UUID; startQuantity : Decimal(38,12); quantity : Decimal(38,12); unit : String(40);
+ segmentId : UUID; customerId : UUID; workId : UUID; commandId : UUID;
+}
+entity DeliveryTransfers {
+ key organizationId : UUID; key ID : UUID; revision : Integer; createdAt : Timestamp; recordedAt : Timestamp;
+ dispatchId : UUID; canonicalId : UUID; startQuantity : Decimal(38,12); quantity : Decimal(38,12); unit : String(40);
+ segmentId : UUID; occurredAt : Timestamp; commandId : UUID;
 }

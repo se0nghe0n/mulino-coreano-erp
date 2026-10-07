@@ -30,8 +30,8 @@ public class QualityEligibility implements InventoryReadFacts,QueryHandler {
   var bases=r.rows(c,"DispositionBases");
   for(String category:List.of("QC","CUSTOMER","COMMERCIAL")){
    var ranges=new ArrayList<QualityRanges.Range>();
-   for(var b:bases)if(id.equals(b.get("segmentId"))&&category.equals(b.get("category"))&&action.equals(b.get("action"))&&(b.get("customerId")==null||Objects.equals(customerId,b.get("customerId")))){
-    next=permissionBoundary(next,b,at);if(active(b,at,c.knownAt())&&evidence.valid(c,(String)b.get("evidenceRef"),id)){ranges.add(range(b));refs.add((String)b.get("evidenceRef"));}
+   for(var b:bases)if(b.get("segmentId")!=null&&category.equals(b.get("category"))&&action.equals(b.get("action"))&&(b.get("customerId")==null||Objects.equals(customerId,b.get("customerId")))){
+    next=permissionBoundary(next,b,at);if(active(b,at,c.knownAt())&&evidence.valid(c,(String)b.get("evidenceRef"),(String)b.get("segmentId"))){ranges.addAll(PhysicalRanges.project(r.rows(c,"GenealogyEdges"),(String)b.get("segmentId"),id,range(b).start(),(BigDecimal)b.get("quantity")));refs.add((String)b.get("evidenceRef"));}
    }
    String state=ranges.isEmpty()?"UNKNOWN":"ALLOWED";if(ranges.isEmpty())unknowns.add(category+"_AUTHORITY_UNCONFIRMED");conditions.add(Map.of("condition",category,"state",state,"allowedRanges",dto(ranges)));
    allowed=QualityRanges.intersect(allowed,ranges);
@@ -42,8 +42,7 @@ public class QualityEligibility implements InventoryReadFacts,QueryHandler {
   for(var hold:r.rows(c,"Restrictions"))if(Objects.equals(segment.get("controlScope"),hold.get("controlScope"))&&Set.of(action,"ALL").contains(hold.get("action"))){
    next=permissionBoundary(next,hold,at);if(active(hold,at,c.knownAt())){
     if(hold.get("segmentId")==null){blocks.add(new QualityRanges.Range(BigDecimal.ZERO,quantity));blocked=true;}
-    else if(id.equals(hold.get("segmentId"))){blocks.add(range(hold));blocked=true;refs.add((String)hold.get("evidenceRef"));}
-    else if(overlap(c,id,(String)hold.get("segmentId"))){blocks.add(new QualityRanges.Range(BigDecimal.ZERO,quantity));blocked=true;unknowns.add("ANCESTOR_SCOPE_REQUIRES_PHYSICAL_RECONCILIATION");}
+    else {var projected=PhysicalRanges.project(r.rows(c,"GenealogyEdges"),(String)hold.get("segmentId"),id,range(hold).start(),(BigDecimal)hold.get("quantity"));if(!projected.isEmpty()){blocks.addAll(projected);blocked=true;refs.add((String)hold.get("evidenceRef"));}else if(overlap(c,id,(String)hold.get("segmentId"))){blocks.add(new QualityRanges.Range(BigDecimal.ZERO,quantity));blocked=true;unknowns.add("ANCESTOR_SCOPE_REQUIRES_PHYSICAL_RECONCILIATION");}}
    }
   }
   allowed=QualityRanges.subtract(allowed,blocks);conditions.add(Map.of("condition","RESTRICTIONS","state",blocked?"DENIED":"ALLOWED","blockedRanges",dto(blocks)));

@@ -101,7 +101,7 @@ public final class StockPrimitives {
     if(destination!=null)repository.current(c,"Places",destination);
     var children=new ArrayList<Map<String,Object>>();String selected=null;
     BigDecimal end=start.add(q);var intervals=new ArrayList<QualityRanges.Range>();if(start.signum()>0)intervals.add(new QualityRanges.Range(BigDecimal.ZERO,start));if(!discard)intervals.add(new QualityRanges.Range(start,end));if(end.compareTo(amount(source))<0)intervals.add(new QualityRanges.Range(end,amount(source)));
-    for(var range:intervals){boolean chosen=!discard&&range.start().compareTo(start)==0&&range.end().compareTo(end)==0;var child=child(c,source,range.end().subtract(range.start()),chosen?destination:(String)source.get("placeId"),at,evidence);repository.insert("QuantitySegments",child);children.add(child);edge(c,source,child,amount(child),range.start(),BigDecimal.ZERO,kind,false,at,evidence,command);if(chosen)selected=(String)child.get("ID");}
+    for(var range:intervals){boolean chosen=!discard&&range.start().compareTo(start)==0&&range.end().compareTo(end)==0;var child=child(c,source,range.end().subtract(range.start()),chosen?destination:(String)source.get("placeId"),at,evidence);repository.insert("QuantitySegments",child);children.add(child);edge(c,source,child,amount(child),range.start(),BigDecimal.ZERO,chosen?kind:"RETAINED",false,at,evidence,command);if(chosen)selected=(String)child.get("ID");}
     repository.update(c,"QuantitySegments",segmentId,Map.of("retiredAt",at,"retirementRecordedAt",c.knownAt(),"revision",((Number)source.get("revision")).intValue()+1));
     transferAllocations(c,source,children,at,command);closeMembership(c,source,children,at);if(discard)movement(c,source,null,q,kind,at,evidence,command);return selected;
   }
@@ -132,17 +132,19 @@ public final class StockPrimitives {
   }
   private void transferAllocations(DomainContext c,Map<String,Object> source,List<Map<String,Object>> children,Instant at,String command) {
     var old=repository.currentRows(c,"SegmentAllocations").stream().filter(a->source.get("ID").equals(a.get("segmentId"))&&Set.of("EXECUTABLE","SUSPENDED").contains(a.get("state"))).sorted(Comparator.comparing(a->(String)a.get("ID"))).toList();
-    BigDecimal legacyCursor=BigDecimal.ZERO;
+
     for(var a:old) {
-      BigDecimal start=a.get("startQuantity") instanceof BigDecimal x?x:legacyCursor,q=(BigDecimal)a.get("quantity");legacyCursor=start.add(q);
-      BigDecimal retained=BigDecimal.ZERO;
+      BigDecimal start=a.get("startQuantity") instanceof BigDecimal x?x:null,q=(BigDecimal)a.get("quantity");
+      if(start==null){var unresolved=new LinkedHashMap<String,Object>(a);unresolved.putAll(row(c,id(),at));unresolved.put("state","SUSPENDED");unresolved.put("suspendedAt",c.knownAt());unresolved.put("suspensionReason","PHYSICAL_RANGE_UNCONFIRMED");unresolved.put("predecessorId",a.get("ID"));unresolved.put("commandId",command);repository.insert("SegmentAllocations",unresolved);repository.update(c,"SegmentAllocations",(String)a.get("ID"),Map.of("state","REPLACED","revision",((Number)a.get("revision")).intValue()+1));continue;}
+      BigDecimal retained=BigDecimal.ZERO;var sourceRetained=new ArrayList<QualityRanges.Range>();
+      for(var edge:repository.currentRows(c,"GenealogyEdges"))if(source.get("ID").equals(edge.get("sourceId"))&&children.stream().anyMatch(child->child.get("ID").equals(edge.get("targetId")))&&edge.get("sourceStartQuantity") instanceof BigDecimal offset)sourceRetained.addAll(QualityRanges.intersect(List.of(new QualityRanges.Range(start,start.add(q))),List.of(new QualityRanges.Range(offset,offset.add((BigDecimal)edge.get("quantity"))))));
       for(var child:children) for(var range:PhysicalRanges.project(repository.currentRows(c,"GenealogyEdges"),(String)source.get("ID"),(String)child.get("ID"),start,q)) {
         var next=row(c,id(),at);for(String key:List.of("rootId","orderLineId","unit","state","workId","authorizationActorId","action","customerId","nextValidityBoundary","suspendedAt","suspensionReason"))if(a.get(key)!=null)next.put(key,a.get(key));
         BigDecimal count=range.end().subtract(range.start());next.put("segmentId",child.get("ID"));next.put("startQuantity",range.start());next.put("quantity",count);next.put("predecessorId",a.get("ID"));next.put("commandId",command);repository.insert("SegmentAllocations",next);retained=retained.add(count);
       }
-      if(retained.compareTo(q)<0){
+      for(var missing:QualityRanges.subtract(List.of(new QualityRanges.Range(start,start.add(q))),sourceRetained)){
         // The missing physical part remains a suspended obligation; it cannot execute on a retired parent.
-        var shortage=new LinkedHashMap<String,Object>(a);shortage.putAll(row(c,id(),at));shortage.put("quantity",q.subtract(retained));shortage.put("startQuantity",start.add(retained));shortage.put("state","SUSPENDED");shortage.put("suspendedAt",c.knownAt());shortage.put("suspensionReason","PHYSICAL_SHORTAGE");shortage.put("predecessorId",a.get("ID"));shortage.put("commandId",command);repository.insert("SegmentAllocations",shortage);
+        var shortage=new LinkedHashMap<String,Object>(a);shortage.putAll(row(c,id(),at));shortage.put("quantity",missing.end().subtract(missing.start()));shortage.put("startQuantity",missing.start());shortage.put("state","SUSPENDED");shortage.put("suspendedAt",c.knownAt());shortage.put("suspensionReason","PHYSICAL_SHORTAGE");shortage.put("predecessorId",a.get("ID"));shortage.put("commandId",command);repository.insert("SegmentAllocations",shortage);
       }
       repository.update(c,"SegmentAllocations",(String)a.get("ID"),Map.of("state","REPLACED","revision",((Number)a.get("revision")).intValue()+1));
     }
