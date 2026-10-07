@@ -46,7 +46,7 @@ public class ApplicationQueries {
     Set<String> allowedScope=evidenceOperation?Set.of("organizationId","kind","subjectKind","subjectId"):Set.of("organizationId","itemId","lotId","workId","placeId","customerId","objectType");
     if(!allowedScope.containsAll(request.scope().keySet()))throw DomainError.invalid("Unsupported scope key");
     request.scope().forEach((key,value)->{
-      Set<String> enumValues=switch(key){case "objectType"->objectTypes;case "kind"->Set.of("DOCUMENT","EVENT","CLAIM","CANONICAL");case "subjectKind"->Set.of("ITEM","LOT","SEGMENT","WORK","PLACE");default->null;};
+      Set<String> enumValues=switch(key){case "objectType"->objectTypes;case "kind"->Set.of("DOCUMENT","EVENT","CLAIM","CANONICAL");case "subjectKind"->Set.of("ITEM","LOT","SEGMENT","WORK","PLACE","PURCHASE_ORDER");default->null;};
       if(enumValues!=null){if(!(value instanceof String)||!enumValues.contains(value))throw DomainError.invalid("Invalid typed selector");return;}
       if(!(value instanceof String))throw DomainError.invalid("Typed scope ID required");try{UUID.fromString((String)value);}catch(IllegalArgumentException invalid){throw DomainError.invalid("UUID scope ID required");}
     });

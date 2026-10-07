@@ -11,7 +11,10 @@ import org.springframework.stereotype.Repository;
 public class EvidenceRepository {
   private final PersistenceService db;
   private final JdbcTemplate jdbc;
-  public EvidenceRepository(PersistenceService db,JdbcTemplate jdbc) { this.db=db; this.jdbc=jdbc; }
+  private final Map<String,EvidenceSubjectPort> subjects=new HashMap<>();
+  public EvidenceRepository(PersistenceService db,JdbcTemplate jdbc) {this(db,jdbc,List.of());}
+  @org.springframework.beans.factory.annotation.Autowired
+  public EvidenceRepository(PersistenceService db,JdbcTemplate jdbc,List<EvidenceSubjectPort> subjects) { this.db=db; this.jdbc=jdbc;for(var provider:subjects)for(String kind:provider.subjectKinds())if(Set.of("ITEM","LOT","SEGMENT","PLACE","WORK").contains(kind)||this.subjects.put(kind,provider)!=null)throw new IllegalStateException("Duplicate evidence subject provider "+kind); }
   public PersistenceService db() { return db; }
   public Optional<Map<String,Object>> find(String entity,String org,String id) {
     return db.run(Select.from("mulino.evidence."+entity).where(x->x.get("organizationId").eq(org).and(x.get("ID").eq(id)))).first()
@@ -28,6 +31,7 @@ public class EvidenceRepository {
     jdbc.queryForList("SELECT pg_advisory_xact_lock(hashtextextended(?,0))",org+"|"+namespace+"|"+event+"|"+version);
   }
   public Map<String,Object> subject(String org,String kind,String id) {
+    var provider=subjects.get(kind);if(provider!=null)return provider.require(org,kind,id);
     String entity=switch(kind) {
       case "ITEM" -> "mulino.inventory.TradeItems";
       case "LOT" -> "mulino.inventory.ManufacturingLots";

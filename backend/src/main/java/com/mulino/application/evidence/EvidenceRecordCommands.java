@@ -51,7 +51,7 @@ public class EvidenceRecordCommands implements CommandHandler {
     return value;
   }
   public List<SubjectBinding> subjectBindings(DomainContext c,Map<String,Object> intent,CommandPreparation prep){var target=subject(input(intent));return List.of(SubjectBinding.optional(noun(target.kind().name()),Set.of(target.id())));}
-  static String noun(String kind){return switch(kind){case "ITEM"->"TradeItem";case "LOT"->"ManufacturingLot";case "SEGMENT"->"QuantitySegment";case "WORK"->"Work";case "PLACE"->"Place";default->throw DomainError.invalid("Evidence subject noun unsupported");};}
+  static String noun(String kind){return switch(kind){case "ITEM"->"TradeItem";case "LOT"->"ManufacturingLot";case "SEGMENT"->"QuantitySegment";case "WORK"->"Work";case "PLACE"->"Place";case "PURCHASE_ORDER"->"PurchaseOrder";default->throw DomainError.invalid("Evidence subject noun unsupported");};}
   public Map<String,Object> execute(DomainContext c,Map<String,Object> intent){
     String capability=intent.get("capabilityId").toString();var s=input(intent);String type=type(capability,s);
     EvidenceCorrectionImpact impact=null;if("correctEvidence".equals(capability)){impact=impacts.getIfAvailable();if(impact==null)throw new DomainError("HELD","POLICY_UNRESOLVED","Correction impact service unavailable");}
