@@ -1,0 +1,322 @@
+{
+  "schemaVersion": "1.0.0",
+  "fixtureId": "S2-ACTUAL-NATIVE-WORK",
+  "synthetic": true,
+  "baseRefs": [],
+  "clock": {
+    "asOf": "2026-10-07T09:00:00Z",
+    "knownAt": "2026-10-07T09:00:01Z",
+    "timezone": "Asia/Seoul",
+    "precision": "SECOND",
+    "deadlineInclusive": true
+  },
+  "versions": {
+    "definition": "definition-v1",
+    "evaluator": "core-v1",
+    "policy": "fixture-v1"
+  },
+  "actors": {
+    "reader": {
+      "issuer": "https://mulino-native.invalid",
+      "subject": "s2-native-actor",
+      "audience": "isolated-ontology",
+      "organizationAlias": "ORG",
+      "roleCapabilities": [
+        "createDraft",
+        "cancelDraft",
+        "activateWork",
+        "waitWork",
+        "resumeWork",
+        "getWork",
+        "getInventory",
+        "getObject"
+      ],
+      "grant": {
+        "delegatorAlias": "supervisor",
+        "actions": [
+          "createDraft",
+          "cancelDraft",
+          "activateWork",
+          "waitWork",
+          "resumeWork",
+          "getWork",
+          "getInventory",
+          "getObject"
+        ],
+        "scope": {
+          "organizationAlias": "ORG"
+        },
+        "validFrom": "2026-10-01T00:00:00Z",
+        "validUntil": "2026-10-31T23:59:59Z",
+        "revision": 1
+      }
+    }
+  },
+  "aliases": {
+    "ORG": {
+      "type": "Organization"
+    },
+    "reader": {
+      "type": "Human"
+    },
+    "supervisor": {
+      "type": "Human"
+    },
+    "P": {
+      "type": "TradeItem",
+      "name": "S1 \ube44\uc2a4\ud0b7",
+      "unit": "BOX",
+      "productAlias": "PRD",
+      "specificationVersionAlias": "SPEC",
+      "packagingVersionAlias": "PACK"
+    },
+    "M": {
+      "type": "Manufacturer"
+    },
+    "L": {
+      "type": "ManufacturerLot",
+      "itemAlias": "P",
+      "manufacturerAlias": "M"
+    },
+    "W": {
+      "type": "Place"
+    },
+    "A60": {
+      "type": "QuantitySegment",
+      "itemAlias": "P",
+      "lotAlias": "L",
+      "locationAlias": "W",
+      "quantity": "60",
+      "unit": "BOX",
+      "physicalScope": "S1-A60"
+    },
+    "B40": {
+      "type": "QuantitySegment",
+      "itemAlias": "P",
+      "lotAlias": "L",
+      "locationAlias": "W",
+      "quantity": "40",
+      "unit": "BOX",
+      "physicalScope": "S1-B40"
+    },
+    "PRD": {
+      "type": "Product",
+      "name": "S1 synthetic biscuit product"
+    },
+    "SPEC": {
+      "type": "SpecificationVersion",
+      "productAlias": "PRD",
+      "version": "1",
+      "content": {
+        "description": "Synthetic S1 biscuit specification"
+      }
+    },
+    "PACK": {
+      "type": "PackagingVersion",
+      "productAlias": "PRD",
+      "version": "1",
+      "content": {
+        "unit": "BOX",
+        "description": "Synthetic S1 box packaging"
+      }
+    },
+    "DEF": {
+      "type": "DefinitionVersion",
+      "content": {
+        "organizationId": "00000000-0000-0000-0000-000000000001",
+        "id": "00000000-0000-0000-0000-000000000010",
+        "version": "definition-v1",
+        "parentVersionId": null,
+        "state": "PUBLISHED",
+        "contentHash": "",
+        "evaluatorVersion": "core-v1",
+        "schemaVersion": "1.0.0",
+        "nouns": [
+          {
+            "name": "QuantitySegment",
+            "core": true
+          },
+          {
+            "name": "Place",
+            "core": true
+          }
+        ],
+        "attributes": [
+          {
+            "nounType": "QuantitySegment",
+            "name": "quantity",
+            "type": "DECIMAL",
+            "referenceType": null,
+            "unit": "BOX",
+            "decimalPlaces": 0,
+            "minimumCount": 1,
+            "maximumCount": 1,
+            "requiredStage": "CONFIRM_RECEIPT",
+            "core": true
+          },
+          {
+            "nounType": "QuantitySegment",
+            "name": "destination",
+            "type": "REFERENCE",
+            "referenceType": "Place",
+            "unit": null,
+            "decimalPlaces": 0,
+            "minimumCount": 1,
+            "maximumCount": 1,
+            "requiredStage": "DRAFT",
+            "core": true
+          }
+        ],
+        "verbs": [
+          {
+            "name": "createDraft",
+            "intentKind": "COMMAND",
+            "capabilityId": "createDraft",
+            "stage": "DRAFT",
+            "slots": {}
+          },
+          {
+            "name": "cancelDraft",
+            "intentKind": "COMMAND",
+            "capabilityId": "cancelDraft",
+            "stage": "DRAFT",
+            "slots": {}
+          },
+          {
+            "name": "activateWork",
+            "intentKind": "COMMAND",
+            "capabilityId": "activateWork",
+            "stage": "DRAFT",
+            "slots": {}
+          },
+          {
+            "name": "waitWork",
+            "intentKind": "COMMAND",
+            "capabilityId": "waitWork",
+            "stage": "DRAFT",
+            "slots": {}
+          },
+          {
+            "name": "resumeWork",
+            "intentKind": "COMMAND",
+            "capabilityId": "resumeWork",
+            "stage": "DRAFT",
+            "slots": {}
+          },
+          {
+            "name": "getWork",
+            "intentKind": "QUERY",
+            "capabilityId": "getWork",
+            "stage": "READ",
+            "slots": {}
+          },
+          {
+            "name": "getInventory",
+            "intentKind": "QUERY",
+            "capabilityId": "getInventory",
+            "stage": "READ",
+            "slots": {}
+          },
+          {
+            "name": "getObject",
+            "intentKind": "QUERY",
+            "capabilityId": "getObject",
+            "stage": "READ",
+            "slots": {}
+          }
+        ],
+        "relations": [
+          {
+            "name": "locatedAt",
+            "sourceType": "QuantitySegment",
+            "targetType": "Place",
+            "minimumCount": 0,
+            "maximumCount": 1,
+            "cycleAllowed": false
+          }
+        ],
+        "goals": [
+          {
+            "name": "arrived",
+            "quantityMode": "CUMULATIVE_EVENT",
+            "endpoint": "ARRIVED",
+            "evaluatorVersion": "core-v1",
+            "predicate": {
+              "operator": "exists",
+              "property": "QuantitySegment.quantity"
+            }
+          }
+        ],
+        "capabilities": [
+          {
+            "capabilityId": "createDraft",
+            "semanticVersion": "1.0.0",
+            "evaluatorVersion": "core-v1",
+            "inputSchemaVersion": "1.0.0",
+            "outputSchemaVersion": "1.0.0",
+            "supportedWorkMigration": []
+          },
+          {
+            "capabilityId": "cancelDraft",
+            "semanticVersion": "1.0.0",
+            "evaluatorVersion": "core-v1",
+            "inputSchemaVersion": "1.0.0",
+            "outputSchemaVersion": "1.0.0",
+            "supportedWorkMigration": []
+          },
+          {
+            "capabilityId": "activateWork",
+            "semanticVersion": "1.0.0",
+            "evaluatorVersion": "core-v1",
+            "inputSchemaVersion": "1.0.0",
+            "outputSchemaVersion": "1.0.0",
+            "supportedWorkMigration": []
+          },
+          {
+            "capabilityId": "waitWork",
+            "semanticVersion": "1.0.0",
+            "evaluatorVersion": "core-v1",
+            "inputSchemaVersion": "1.0.0",
+            "outputSchemaVersion": "1.0.0",
+            "supportedWorkMigration": []
+          },
+          {
+            "capabilityId": "resumeWork",
+            "semanticVersion": "1.0.0",
+            "evaluatorVersion": "core-v1",
+            "inputSchemaVersion": "1.0.0",
+            "outputSchemaVersion": "1.0.0",
+            "supportedWorkMigration": []
+          },
+          {
+            "capabilityId": "getWork",
+            "semanticVersion": "1.0.0",
+            "evaluatorVersion": "core-v1",
+            "inputSchemaVersion": "1.0.0",
+            "outputSchemaVersion": "1.0.0",
+            "supportedWorkMigration": []
+          },
+          {
+            "capabilityId": "getInventory",
+            "semanticVersion": "1.0.0",
+            "evaluatorVersion": "core-v1",
+            "inputSchemaVersion": "1.0.0",
+            "outputSchemaVersion": "1.0.0",
+            "supportedWorkMigration": []
+          },
+          {
+            "capabilityId": "getObject",
+            "semanticVersion": "1.0.0",
+            "evaluatorVersion": "core-v1",
+            "inputSchemaVersion": "1.0.0",
+            "outputSchemaVersion": "1.0.0",
+            "supportedWorkMigration": []
+          }
+        ]
+      }
+    }
+  },
+  "baseline": {},
+  "evidence": [],
+  "responsibilities": []
+}

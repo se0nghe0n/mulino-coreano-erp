@@ -13,7 +13,7 @@ public final class JdbcObservation {
     public ObjectNode capture(JsonNode request) throws Exception {
         if(request.hasNonNull("snapshotRef"))throw new UnsupportedOperationException("Independent API projection snapshot reconstruction pending; requested token is not a PostgreSQL snapshot");
         if(request.path("sources").isEmpty())throw new IllegalArgumentException("Raw sources required");
-        for(JsonNode source:request.path("sources"))if(!source.asText().equals("segments"))throw new UnsupportedOperationException("Raw source "+source.asText()+" not installed/mapped");
+        if(request.path("sources").size()!=1||!request.path("sources").get(0).asText().equals("segments"))return S2JdbcObservation.capture(configuration,request);
         var scope=request.path("scope");
         for(String field:java.util.List.of("organizationId","itemId","lotId"))java.util.UUID.fromString(Json.required(scope,field));
         if(scope.size()!=3)throw new UnsupportedOperationException("Raw segments require complete organization/item/lot scope");

@@ -1,0 +1,54 @@
+package org.mulino.verification.actual;
+
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import java.sql.*;
+import java.time.*;
+import java.util.*;
+import org.mulino.verification.Json;
+
+/** Explicit canonical tables only, independently read in one PostgreSQL RR transaction. */
+final class S2JdbcObservation {
+    private record Source(String table,String columns,String workColumn) {}
+    private static final Map<String,Source> SOURCES=Map.ofEntries(
+        Map.entry("works",new Source("mulino_work_read_Works","ID,revision,itemId,lotId,definitionVersionId,kind,status,ownerId,supervisorId,waitJson,currentGoalVersionId,closeReason,pendingInvalidation,lifecycleMode","ID")),
+        Map.entry("goals",new Source("mulino_work_read_GoalReferences","ID,revision,workId,definitionVersionId,quantityMode,targetQuantity,unit,endpoint,scopeJson,slotsJson,provenanceJson,evidencePolicyVersion,timezone,dueAt,previousGoalId,goalVersion","workId")),
+        Map.entry("assessments",new Source("mulino_work_read_AssessmentReferences","ID,revision,workId,goalId,outcome,evaluatorVersion,assessedAt,conditionsJson","workId")),
+        Map.entry("obligations",new Source("mulino_work_read_ObligationReferences","ID,revision,workId,kind,status,ownerId,supervisorId,nextAction,nextCheckAt,quantity,unit,scopeJson,rootId,scopeId,valid,evidenceId,basis,predecessorId","workId")),
+        Map.entry("assignments",new Source("mulino_work_read_ObligationReferences","ID,revision,workId,kind,status,ownerId,supervisorId,nextAction,nextCheckAt,quantity,unit,scopeJson,rootId,scopeId,valid,evidenceId,basis,predecessorId","workId")),
+        Map.entry("definitions",new Source("mulino_definitions_DefinitionVersions","ID,revision,version,state,contentHash,content,evaluatorVersion,schemaVersion",null)),
+        Map.entry("policies",new Source("mulino_governance_PolicyVersions","ID,revision,version,kind,content,contentHash,effectiveFrom,effectiveUntil",null)),
+        Map.entry("grants",new Source("mulino_identity_Grants","ID,revision,actorId,delegatorId,validFrom,validUntil,revokedAt",null)),
+        Map.entry("capabilityAssignments",new Source("mulino_identity_CapabilityAssignments","ID,revision,actorId,capabilityId,scopeKind,scopeId,validFrom,validUntil,revokedAt",null)));
+    static ObjectNode capture(ActualConfiguration config,JsonNode request) throws Exception {
+        if(request.hasNonNull("snapshotRef"))throw new UnsupportedOperationException("Independent shared-world projection hash reconstruction pending");
+        if(request.path("sources").isEmpty())throw new IllegalArgumentException("Raw sources required");
+        for(JsonNode source:request.path("sources"))if(!SOURCES.containsKey(source.asText()))throw new UnsupportedOperationException("Raw source "+source.asText()+" not mapped");
+        JsonNode scope=request.path("scope");UUID.fromString(Json.required(scope,"organizationId"));
+        for(var fields=scope.fieldNames();fields.hasNext();) {String field=fields.next();if(!Set.of("organizationId","itemId","lotId","workId","caseId").contains(field))throw new UnsupportedOperationException("Unsupported raw scope "+field);if(!field.equals("caseId"))UUID.fromString(Json.required(scope,field));}
+        var raw=Json.object();var queries=Json.array();String mvcc;
+        try(var c=DriverManager.getConnection(config.jdbcUrl(),config.username(),config.password())) {
+            c.setAutoCommit(false);c.setReadOnly(true);c.setTransactionIsolation(Connection.TRANSACTION_REPEATABLE_READ);
+            try(var s=c.createStatement();var rows=s.executeQuery("SELECT pg_current_snapshot()::text")){rows.next();mvcc=rows.getString(1);}
+            for(JsonNode requested:request.path("sources")) {
+                String name=requested.asText();Source source=SOURCES.get(name);List<Object> parameters=new ArrayList<>();parameters.add(scope.path("organizationId").asText());
+                String select=Arrays.stream(source.columns().split(",")).map(column->"r."+column+" AS \""+(column.equals("ID")?"id":column)+"\"").collect(java.util.stream.Collectors.joining(","));
+                String sql="SELECT "+select+" FROM "+source.table()+" r WHERE r.organizationId=?";
+                if(source.workColumn()!=null) {
+                    if(scope.hasNonNull("workId")){sql+=" AND r."+source.workColumn()+"=?";parameters.add(scope.path("workId").asText());}
+                    if(scope.hasNonNull("itemId")||scope.hasNonNull("lotId")) {
+                        sql+=" AND EXISTS(SELECT 1 FROM mulino_work_read_Works w WHERE w.organizationId=r.organizationId AND w.ID=r."+source.workColumn();
+                        for(String field:List.of("itemId","lotId"))if(scope.hasNonNull(field)){sql+=" AND w."+field+"=?";parameters.add(scope.path(field).asText());}sql+=")";
+                    }
+                    sql+=" AND r.effectiveAt<=? AND r.recordedAt<=?";parameters.add(OffsetDateTime.parse(Json.required(request,"asOf")));parameters.add(OffsetDateTime.parse(Json.required(request,"knownAt")));
+                }
+                sql+=" ORDER BY r.ID";var rows=Json.array();
+                try(var s=c.prepareStatement(sql)) {for(int i=0;i<parameters.size();i++)s.setObject(i+1,parameters.get(i));try(var result=s.executeQuery()){while(result.next()){var row=Json.object();var metadata=result.getMetaData();for(int col=1;col<=metadata.getColumnCount();col++){String label=metadata.getColumnLabel(col);Object value=result.getObject(col);if(value==null)row.putNull(label);else if(value instanceof java.math.BigDecimal decimal)row.put(label,decimal.stripTrailingZeros().toPlainString());else if(value instanceof Number number)row.set(label,Json.MAPPER.valueToTree(number));else if(value instanceof Boolean bool)row.put(label,bool);else row.put(label,value.toString());}rows.add(row);}}}
+                raw.set(name,rows);var query=Json.object();query.put("source",name).put("statementId","s2-"+name+"-v1").put("sql",sql).put("mappingVersion","1.0.0");query.set("parameters",Json.MAPPER.valueToTree(parameters.stream().map(Object::toString).toList()));queries.add(query);
+            }c.commit();
+        }
+        var result=Json.object();result.put("snapshotRevision",mvcc).put("asOf",Json.required(request,"asOf")).put("knownAt",Json.required(request,"knownAt")).put("scopeComplete",true);result.set("scope",scope);var sourceQuery=Json.object();sourceQuery.put("statementId","s2-canonical-row-set-v1").put("mappingVersion","1.0.0");sourceQuery.set("queries",queries);result.set("sourceQuery",sourceQuery);result.set("rawRows",raw);result.set("data",Json.object());
+        var snapshot=Json.object();snapshot.put("id",mvcc).put("isolation","REPEATABLE_READ").put("capturedAt",Instant.now().toString());result.set("snapshot",snapshot);return result;
+    }
+    private S2JdbcObservation() {}
+}
