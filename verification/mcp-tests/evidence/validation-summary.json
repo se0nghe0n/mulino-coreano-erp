@@ -1,0 +1,104 @@
+{
+  "recordType": "STEP2_CHANNEL_CONTRACT_VALIDATION",
+  "schemaVersion": "1.0.0",
+  "baselineCommit": "feaca0af9673620eff9a5ac0f08a657ce14e9ccd",
+  "dependencyCommit": "77c2df3440b6d8b362bfb52fed677e441c372b4c",
+  "testedUncommittedCaseContentPinnedByHashes": true,
+  "timestamp": "2026-10-07T14:39:56.203854+00:00",
+  "contractValidationStatus": "PASS",
+  "selftestStatus": "PASS",
+  "productCoverageClaimed": false,
+  "runtimeStatus": "NOT_RUN",
+  "gateComplete": false,
+  "caseCount": 3,
+  "subcaseCount": 90,
+  "assertionCount": 2683,
+  "oracleCount": 10,
+  "namedObservationCount": 24,
+  "cases": {
+    "T01": {
+      "subcases": 12,
+      "assertions": 125,
+      "caseSha256": "ccc19836624d5e536d55b7e9fa643a665bacf59f8ce1b3cb8cf1fa10b7b1c80e",
+      "fixtureSha256": "2d38c9e6a3dc24feca887fa7bb67a02b54933965c7e69489137638f8f0be298a",
+      "featureSha256": "dcfe10334c6ee577e76154e1cff0defa91bdeffaecd72307739f8f67f0a08f0f"
+    },
+    "T20": {
+      "subcases": 56,
+      "assertions": 914,
+      "caseSha256": "0f1d8b69652de58491da6d0aa8fd5a225114730af1c09b7e7c505e803b9e83a6",
+      "fixtureSha256": "90b5862441280a7f2f2ff1ff1731a71501c09f5cfab2f7f5fcec379a48b42030",
+      "featureSha256": "1af2a138e8fa117a99b3039c05d951604a26231222bfe251f87f9b88ba59b274"
+    },
+    "T25": {
+      "subcases": 22,
+      "assertions": 1644,
+      "caseSha256": "520977851c9fbf79f43392508b59b62c22b0f06f54c5f0e5fa561f5be9467d0e",
+      "fixtureSha256": "997da2087fbd7a5969898aa4b4a68a3ecd4be22f7cae560c03596ed17f56da45",
+      "featureSha256": "553f422d589eb5965fb009657e2548c9c88eeba75f28754b4e2b3c0189fbb4b8"
+    }
+  },
+  "checks": [
+    {
+      "command": "./verify validate verification/cases/T01/case.json verification/cases/T20/case.json verification/cases/T25/case.json",
+      "exitCode": 0,
+      "status": "PREPARATION_SCHEMA_VALID",
+      "wrapperRef": "validate-wrapper.json",
+      "logRef": "validate.log.gz",
+      "logEncoding": "gzip",
+      "originalLogSha256": "8568d346dabd627eb9bfc07bb11f4553f5d90cda1b2b765391503f1016eb8375"
+    },
+    {
+      "command": "./verify harness",
+      "exitCode": 0,
+      "status": "PASS",
+      "totalTests": 150,
+      "channelsTests": 20,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "wrapperRef": "harness-wrapper.json",
+      "logRef": "harness-check.log.gz",
+      "artifactRef": "channels-selftest.xml",
+      "logEncoding": "gzip",
+      "originalLogSha256": "1cd6c34c3222b4a483f3b333a4c2be87a165ac201ca9b2d7ef45a2cdaa3bf28a"
+    },
+    {
+      "command": "./verify contract-red verification/cases/T01/case.json verification/cases/T20/case.json verification/cases/T25/case.json",
+      "exitCode": 1,
+      "status": "EXPECTED_NOT_IMPLEMENTED_RED",
+      "expectedScenarios": 90,
+      "discoveredScenarios": 90,
+      "startedScenarios": 90,
+      "notImplementedAssertionFailures": 90,
+      "skippedScenarios": 0,
+      "wrapperRef": "red-wrapper.json",
+      "summaryRef": "feature-red-summary.json",
+      "logRef": "contract-red.log.gz",
+      "logEncoding": "gzip",
+      "originalLogSha256": "92400c43d17fd6f179e3858c1d89af9c6ea41c5860234c47d33334690ba5604a",
+      "selectorResultRef": "actual-selector-results.json",
+      "junitArtifactRef": "actual-gherkin-red.xml.gz"
+    },
+    {
+      "command": "./verify mcp verification/cases/T20/case.json",
+      "exitCode": 2,
+      "status": "NOT_RUN",
+      "selectedSubcases": 56,
+      "gateComplete": false,
+      "wrapperRef": "not-run-wrapper.json",
+      "artifactRef": "mcp-not-run.json",
+      "logRef": "not-run.log.gz",
+      "logEncoding": "gzip",
+      "originalLogSha256": "2ed4b2787585a117f45468c8742b11fa134195e45b40d3f7c87c137afd14f8cb"
+    }
+  ],
+  "versions": {
+    "java": "Zulu OpenJDK 21.0.5+11-LTS",
+    "maven": "3.9.16"
+  },
+  "actualModelCalls": 0,
+  "usage": null,
+  "cost": null,
+  "missingReason": "No actual product, client, model, deployment or legal-review adapter/evidence installed. Step 2 authors contract availability and independent assertion selftests only."
+}

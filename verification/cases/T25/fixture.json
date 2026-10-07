@@ -1,0 +1,695 @@
+{
+  "schemaVersion": "1.0.0",
+  "fixtureId": "T25-CHANNEL-BASELINE",
+  "synthetic": true,
+  "baseRefs": [],
+  "clock": {
+    "asOf": "2026-10-07T09:00:00Z",
+    "knownAt": "2026-10-07T09:00:01Z",
+    "timezone": "Asia/Seoul",
+    "precision": "SECOND",
+    "deadlineInclusive": true
+  },
+  "versions": {
+    "definition": "definition-v1",
+    "evaluator": "evaluator-v1",
+    "policy": "SYNTHETIC-policy-v1"
+  },
+  "actors": {
+    "reader": {
+      "issuer": "synthetic-fixture-issuer",
+      "subject": "synthetic-reader",
+      "audience": "isolated-ontology",
+      "organizationAlias": "ORG",
+      "roleCapabilities": [
+        "getObject",
+        "getWork",
+        "getInventory",
+        "getObligations",
+        "traceLot",
+        "getAssessment",
+        "getEvidence",
+        "getDefinition",
+        "searchObjects",
+        "searchWorks",
+        "getCommandResult"
+      ],
+      "grant": {
+        "delegatorAlias": "supervisor",
+        "actions": [
+          "getObject",
+          "getWork",
+          "getInventory",
+          "getObligations",
+          "traceLot",
+          "getAssessment",
+          "getEvidence",
+          "getDefinition",
+          "searchObjects",
+          "searchWorks",
+          "getCommandResult"
+        ],
+        "scope": {
+          "organizationAlias": "ORG",
+          "itemAliases": [
+            "P"
+          ],
+          "workAliases": [
+            "O1",
+            "S1"
+          ],
+          "segmentAliases": [
+            "A60",
+            "B40"
+          ]
+        },
+        "validFrom": "2026-10-01T00:00:00Z",
+        "validUntil": "2026-10-31T23:59:59Z",
+        "revision": 1
+      }
+    },
+    "writer": {
+      "issuer": "synthetic-fixture-issuer",
+      "subject": "synthetic-writer",
+      "audience": "isolated-ontology",
+      "organizationAlias": "ORG",
+      "roleCapabilities": [
+        "getObject",
+        "getWork",
+        "getInventory",
+        "getObligations",
+        "traceLot",
+        "getAssessment",
+        "getEvidence",
+        "getDefinition",
+        "searchObjects",
+        "searchWorks",
+        "getCommandResult",
+        "structureIntent",
+        "createDraft",
+        "activateWork",
+        "proposePurchase",
+        "revisePurchase",
+        "approvePurchase",
+        "dispatchPurchaseOrder",
+        "confirmReceipt",
+        "recordActivity",
+        "placeHold",
+        "reserveQuantity"
+      ],
+      "grant": {
+        "delegatorAlias": "supervisor",
+        "actions": [
+          "getObject",
+          "getWork",
+          "getInventory",
+          "getObligations",
+          "traceLot",
+          "getAssessment",
+          "getEvidence",
+          "getDefinition",
+          "searchObjects",
+          "searchWorks",
+          "getCommandResult",
+          "structureIntent",
+          "createDraft",
+          "activateWork",
+          "proposePurchase",
+          "revisePurchase",
+          "approvePurchase",
+          "dispatchPurchaseOrder",
+          "confirmReceipt",
+          "recordActivity",
+          "placeHold",
+          "reserveQuantity"
+        ],
+        "scope": {
+          "organizationAlias": "ORG",
+          "itemAliases": [
+            "P"
+          ],
+          "workAliases": [
+            "O1",
+            "S1"
+          ],
+          "segmentAliases": [
+            "A60",
+            "B40"
+          ]
+        },
+        "validFrom": "2026-10-01T00:00:00Z",
+        "validUntil": "2026-10-31T23:59:59Z",
+        "revision": 1
+      }
+    },
+    "manager": {
+      "issuer": "synthetic-fixture-issuer",
+      "subject": "synthetic-manager",
+      "audience": "isolated-ontology",
+      "organizationAlias": "ORG",
+      "roleCapabilities": [
+        "getObject",
+        "getWork",
+        "getInventory",
+        "getObligations",
+        "traceLot",
+        "getAssessment",
+        "getEvidence",
+        "getDefinition",
+        "searchObjects",
+        "searchWorks",
+        "getCommandResult",
+        "approvePurchase"
+      ],
+      "grant": {
+        "delegatorAlias": "supervisor",
+        "actions": [
+          "getObject",
+          "getWork",
+          "getInventory",
+          "getObligations",
+          "traceLot",
+          "getAssessment",
+          "getEvidence",
+          "getDefinition",
+          "searchObjects",
+          "searchWorks",
+          "getCommandResult",
+          "approvePurchase"
+        ],
+        "scope": {
+          "organizationAlias": "ORG",
+          "itemAliases": [
+            "P"
+          ],
+          "workAliases": [
+            "O1",
+            "S1"
+          ],
+          "segmentAliases": [
+            "A60",
+            "B40"
+          ]
+        },
+        "validFrom": "2026-10-01T00:00:00Z",
+        "validUntil": "2026-10-31T23:59:59Z",
+        "revision": 1
+      }
+    },
+    "readAgent": {
+      "issuer": "synthetic-fixture-issuer",
+      "subject": "synthetic-readAgent",
+      "audience": "isolated-ontology",
+      "organizationAlias": "ORG",
+      "roleCapabilities": [
+        "getObject",
+        "getWork",
+        "getInventory",
+        "getObligations",
+        "traceLot",
+        "getAssessment",
+        "getEvidence",
+        "getDefinition",
+        "searchObjects",
+        "searchWorks",
+        "getCommandResult",
+        "structureIntent",
+        "createDraft",
+        "activateWork",
+        "proposePurchase",
+        "revisePurchase",
+        "approvePurchase",
+        "dispatchPurchaseOrder",
+        "confirmReceipt",
+        "recordActivity",
+        "placeHold",
+        "reserveQuantity"
+      ],
+      "grant": {
+        "delegatorAlias": "supervisor",
+        "actions": [
+          "getObject",
+          "getWork",
+          "getInventory",
+          "getObligations",
+          "traceLot",
+          "getAssessment",
+          "getEvidence",
+          "getDefinition",
+          "searchObjects",
+          "searchWorks",
+          "getCommandResult"
+        ],
+        "scope": {
+          "organizationAlias": "ORG",
+          "itemAliases": [
+            "P"
+          ],
+          "workAliases": [
+            "O1",
+            "S1"
+          ],
+          "segmentAliases": [
+            "A60",
+            "B40"
+          ]
+        },
+        "validFrom": "2026-10-01T00:00:00Z",
+        "validUntil": "2026-10-31T23:59:59Z",
+        "revision": 1
+      }
+    },
+    "otherPrincipal": {
+      "issuer": "synthetic-fixture-issuer",
+      "subject": "synthetic-otherPrincipal",
+      "audience": "isolated-ontology",
+      "organizationAlias": "ORG",
+      "roleCapabilities": [
+        "getObject",
+        "getWork",
+        "getInventory",
+        "getObligations",
+        "traceLot",
+        "getAssessment",
+        "getEvidence",
+        "getDefinition",
+        "searchObjects",
+        "searchWorks",
+        "getCommandResult"
+      ],
+      "grant": {
+        "delegatorAlias": "supervisor",
+        "actions": [
+          "getObject",
+          "getWork",
+          "getInventory",
+          "getObligations",
+          "traceLot",
+          "getAssessment",
+          "getEvidence",
+          "getDefinition",
+          "searchObjects",
+          "searchWorks",
+          "getCommandResult"
+        ],
+        "scope": {
+          "organizationAlias": "ORG",
+          "itemAliases": [
+            "P"
+          ],
+          "workAliases": [
+            "O1",
+            "S1"
+          ],
+          "segmentAliases": [
+            "A60",
+            "B40"
+          ]
+        },
+        "validFrom": "2026-10-01T00:00:00Z",
+        "validUntil": "2026-10-31T23:59:59Z",
+        "revision": 1
+      }
+    },
+    "anonymous": {
+      "issuer": "synthetic-fixture-issuer",
+      "subject": "synthetic-anonymous",
+      "audience": "isolated-ontology",
+      "organizationAlias": "ORG",
+      "roleCapabilities": [],
+      "grant": {
+        "delegatorAlias": "supervisor",
+        "actions": [],
+        "scope": {
+          "organizationAlias": "ORG",
+          "itemAliases": [
+            "P"
+          ],
+          "workAliases": [
+            "O1",
+            "S1"
+          ],
+          "segmentAliases": [
+            "A60",
+            "B40"
+          ]
+        },
+        "validFrom": "2026-10-01T00:00:00Z",
+        "validUntil": "2026-10-31T23:59:59Z",
+        "revision": 1
+      }
+    }
+  },
+  "aliases": {
+    "ORG": {
+      "type": "Organization"
+    },
+    "P": {
+      "type": "TradeItem",
+      "unit": "BOX"
+    },
+    "P2": {
+      "type": "TradeItem",
+      "name": "동명이인 비스킷",
+      "unit": "BOX"
+    },
+    "L": {
+      "type": "ManufacturerLot",
+      "itemAlias": "P",
+      "manufacturerAlias": "M"
+    },
+    "M": {
+      "type": "Manufacturer"
+    },
+    "W": {
+      "type": "Place"
+    },
+    "W2": {
+      "type": "Place"
+    },
+    "C": {
+      "type": "Customer"
+    },
+    "C2": {
+      "type": "Customer"
+    },
+    "SUP": {
+      "type": "Supplier"
+    },
+    "SL1": {
+      "type": "SalesOrderLine",
+      "salesWorkAlias": "S1"
+    },
+    "O1": {
+      "type": "Work"
+    },
+    "S1": {
+      "type": "Work"
+    },
+    "A60": {
+      "type": "QuantitySegment",
+      "itemAlias": "P",
+      "lotAlias": "L",
+      "locationAlias": "W",
+      "quantity": "60",
+      "unit": "BOX",
+      "physicalScope": "T25-A60"
+    },
+    "B40": {
+      "type": "QuantitySegment",
+      "itemAlias": "P",
+      "lotAlias": "L",
+      "locationAlias": "W",
+      "quantity": "40",
+      "unit": "BOX",
+      "physicalScope": "T25-B40"
+    },
+    "receipt60": {
+      "type": "DocumentVersion"
+    },
+    "receipt40": {
+      "type": "DocumentVersion"
+    },
+    "qc60": {
+      "type": "DocumentVersion"
+    },
+    "hold40": {
+      "type": "DocumentVersion"
+    },
+    "regulatory60": {
+      "type": "DocumentVersion"
+    },
+    "disposition60": {
+      "type": "DocumentVersion"
+    },
+    "customerConditions60": {
+      "type": "DocumentVersion"
+    },
+    "delivery": {
+      "type": "DocumentVersion"
+    },
+    "temperature": {
+      "type": "DocumentVersion"
+    },
+    "reader": {
+      "type": "Human"
+    },
+    "writer": {
+      "type": "Human"
+    },
+    "manager": {
+      "type": "Human"
+    },
+    "readAgent": {
+      "type": "Agent"
+    },
+    "otherPrincipal": {
+      "type": "Agent"
+    },
+    "anonymous": {
+      "type": "Agent"
+    },
+    "supervisor": {
+      "type": "Human"
+    }
+  },
+  "baseline": {
+    "setupIsExecutionCoverage": false,
+    "segments": [
+      {
+        "alias": "A60",
+        "quantity": "60",
+        "unit": "BOX",
+        "locationAlias": "W",
+        "lotAlias": "L"
+      },
+      {
+        "alias": "B40",
+        "quantity": "40",
+        "unit": "BOX",
+        "locationAlias": "W",
+        "lotAlias": "L"
+      }
+    ],
+    "works": [
+      {
+        "alias": "O1",
+        "kind": "PURCHASE",
+        "status": "WAITING",
+        "goal": {
+          "quantity": "100",
+          "unit": "BOX",
+          "endpoint": "ARRIVED",
+          "quantityMode": "CUMULATIVE_EVENT",
+          "destinationAlias": "W",
+          "dueAt": "2026-10-09T09:00:00Z"
+        },
+        "waitReason": "B40 품질 후속 근거 대기",
+        "resumePredicate": {
+          "evidenceAlias": "hold40",
+          "decision": "RESOLVED"
+        },
+        "verifierAlias": "reader",
+        "nextCheckAt": "2026-10-07T10:00:00Z",
+        "overdueAction": "supervisor에게 품질 근거 확인 요청"
+      },
+      {
+        "alias": "S1",
+        "kind": "SALES",
+        "status": "ACTIVE",
+        "customerAlias": "C",
+        "goal": {
+          "quantity": "30",
+          "unit": "BOX",
+          "endpoint": "DELIVERED",
+          "quantityMode": "CUMULATIVE_EVENT",
+          "dueAt": "2026-10-09T09:00:00Z"
+        }
+      }
+    ],
+    "restrictions": [
+      {
+        "segmentAlias": "B40",
+        "quantity": "40",
+        "unit": "BOX",
+        "kind": "QC",
+        "status": "ACTIVE",
+        "evidenceAlias": "hold40"
+      }
+    ],
+    "eligibilityBases": [
+      {
+        "segmentAlias": "A60",
+        "action": "SELL",
+        "quantity": "60",
+        "unit": "BOX",
+        "qcEvidenceAlias": "qc60",
+        "regulatoryEvidenceAlias": "regulatory60",
+        "dispositionEvidenceAlias": "disposition60",
+        "customerEvidenceAlias": "customerConditions60"
+      }
+    ],
+    "relations": [
+      {
+        "sourceAlias": "L",
+        "targetAlias": "A60",
+        "type": "LOT_QUANTITY"
+      },
+      {
+        "sourceAlias": "L",
+        "targetAlias": "B40",
+        "type": "LOT_QUANTITY"
+      },
+      {
+        "sourceAlias": "A60",
+        "targetAlias": "S1",
+        "type": "SUBJECT_OF"
+      },
+      {
+        "sourceAlias": "S1",
+        "targetAlias": "C",
+        "type": "CUSTOMER"
+      }
+    ],
+    "policy": {
+      "synthetic": true,
+      "actions": [
+        "READ",
+        "RECORD",
+        "COMMAND"
+      ],
+      "purchaseDecisionRole": "MANAGER",
+      "allowanceEvidenceRequired": [
+        "qc",
+        "regulatory",
+        "disposition",
+        "customer"
+      ],
+      "actualLegalComplianceClaimed": false,
+      "deletionEnabled": false
+    },
+    "identitySources": {
+      "ambiguousItemNames": [
+        "P",
+        "P2"
+      ],
+      "approvedDefaultUnit": "BOX",
+      "defaultSource": "SYNTHETIC-policy-v1"
+    },
+    "traceabilitySeed": {
+      "workAlias": "S1",
+      "customerAlias": "C",
+      "segmentAlias": "A60",
+      "relationType": "SUBJECT_OF",
+      "effectClass": "READ_CANDIDATE_ONLY",
+      "quantity": "30",
+      "unit": "BOX"
+    }
+  },
+  "evidence": [
+    {
+      "alias": "receipt60",
+      "sha256": "1111111111111111111111111111111111111111111111111111111111111111",
+      "sourceNamespace": "synthetic-warehouse",
+      "externalEventId": "T25-receipt60",
+      "sourceVersion": "1",
+      "occurredAt": "2026-10-07T09:00:00Z",
+      "recordedAt": "2026-10-07T09:00:01Z"
+    },
+    {
+      "alias": "receipt40",
+      "sha256": "2222222222222222222222222222222222222222222222222222222222222222",
+      "sourceNamespace": "synthetic-warehouse",
+      "externalEventId": "T25-receipt40",
+      "sourceVersion": "1",
+      "occurredAt": "2026-10-07T09:00:00Z",
+      "recordedAt": "2026-10-07T09:00:01Z"
+    },
+    {
+      "alias": "qc60",
+      "sha256": "3333333333333333333333333333333333333333333333333333333333333333",
+      "sourceNamespace": "synthetic-warehouse",
+      "externalEventId": "T25-qc60",
+      "sourceVersion": "1",
+      "occurredAt": "2026-10-07T09:00:00Z",
+      "recordedAt": "2026-10-07T09:00:01Z"
+    },
+    {
+      "alias": "hold40",
+      "sha256": "4444444444444444444444444444444444444444444444444444444444444444",
+      "sourceNamespace": "synthetic-warehouse",
+      "externalEventId": "T25-hold40",
+      "sourceVersion": "1",
+      "occurredAt": "2026-10-07T09:00:00Z",
+      "recordedAt": "2026-10-07T09:00:01Z"
+    },
+    {
+      "alias": "regulatory60",
+      "sha256": "5555555555555555555555555555555555555555555555555555555555555555",
+      "sourceNamespace": "synthetic-warehouse",
+      "externalEventId": "T25-regulatory60",
+      "sourceVersion": "1",
+      "occurredAt": "2026-10-07T09:00:00Z",
+      "recordedAt": "2026-10-07T09:00:01Z"
+    },
+    {
+      "alias": "disposition60",
+      "sha256": "6666666666666666666666666666666666666666666666666666666666666666",
+      "sourceNamespace": "synthetic-warehouse",
+      "externalEventId": "T25-disposition60",
+      "sourceVersion": "1",
+      "occurredAt": "2026-10-07T09:00:00Z",
+      "recordedAt": "2026-10-07T09:00:01Z"
+    },
+    {
+      "alias": "customerConditions60",
+      "sha256": "7777777777777777777777777777777777777777777777777777777777777777",
+      "sourceNamespace": "synthetic-warehouse",
+      "externalEventId": "T25-customerConditions60",
+      "sourceVersion": "1",
+      "occurredAt": "2026-10-07T09:00:00Z",
+      "recordedAt": "2026-10-07T09:00:01Z"
+    },
+    {
+      "alias": "delivery",
+      "sha256": "8888888888888888888888888888888888888888888888888888888888888888",
+      "sourceNamespace": "synthetic-warehouse",
+      "externalEventId": "T25-delivery",
+      "sourceVersion": "1",
+      "occurredAt": "2026-10-07T09:00:00Z",
+      "recordedAt": "2026-10-07T09:00:01Z"
+    },
+    {
+      "alias": "temperature",
+      "sha256": "9999999999999999999999999999999999999999999999999999999999999999",
+      "sourceNamespace": "synthetic-warehouse",
+      "externalEventId": "T25-temperature",
+      "sourceVersion": "1",
+      "occurredAt": "2026-10-07T09:00:00Z",
+      "recordedAt": "2026-10-07T09:00:01Z"
+    }
+  ],
+  "responsibilities": [
+    {
+      "scope": {
+        "workAlias": "O1",
+        "segments": [
+          "B40"
+        ]
+      },
+      "ownerAlias": "reader",
+      "supervisorAlias": "supervisor",
+      "nextAction": "검사 근거 확인",
+      "nextCheckAt": "2026-10-07T10:00:00Z"
+    },
+    {
+      "scope": {
+        "workAlias": "S1"
+      },
+      "ownerAlias": "writer",
+      "supervisorAlias": "supervisor",
+      "nextAction": "인도 증거 확인",
+      "nextCheckAt": "2026-10-07T10:00:00Z"
+    }
+  ]
+}
