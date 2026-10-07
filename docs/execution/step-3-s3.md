@@ -52,3 +52,17 @@ fresh worktree의 backend에서 npm ci를 먼저 수행한다. 실제 외부 기
 공급자 전송, 유료 모델과 BTP는 이 S3 개발 fixture 실행에 포함하지 않는다.
 모든 소유 산출물 통합·관련 검토 지적 수정·결합 검사가 통과하기 전
 S3를 닫거나 S4를 시작하지 않는다.
+
+## 초기 통합
+
+공통 inventory metric/noun provider와 canonical evidence/잔여 책임
+ports, 구매·운송·규제·수령 초기 구현을 `320eda6`까지 통합했다.
+QC 구현과 각 영역의 최종 tests는 진행 중이다. 이는 S3 완료가 아니다.
+[초기 계약 검토](s3-review/early-review.md)의 표시 거절/시간 경계
+지적을 수정하고 실제 실행 근거를 추가한다.
+
+실제 native의 주 구매→신규 수령 흐름은 final 재고를 seed하지 않는다.
+별도의 기존 운송 물량 이동 사례는 원본/원장이 일치하는 TRANSIT60을
+명시적인 시작 fixture로 사용한다. 실제 confirmReceipt 후 총60 유지,
+운송0/보관60과 단일 이동·재시도 무효과를 독립 관찰한다. 이 사례는
+운송 재고의 최초 취득 성공을 주장하지 않는다.

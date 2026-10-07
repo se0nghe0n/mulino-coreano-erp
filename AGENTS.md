@@ -137,3 +137,16 @@ checklist를 유지한다. 새 기능 이슈는
 skills의 실제 경로·discovery links·명령은 새 manifest의 현재 값을
 따르고 과거 파일명을 임의로 복원하지 않는다. 비밀·token·인증 원문을
 commit하거나 실행 증거·log에 저장하지 않는다.
+
+## Grok Bot 결과 알림
+
+2026-10-08 사용자의 새 지침에 따라 coordinator는 전체 Task 완료,
+실패/진행 불가, 사용자 입력/승인 필요 시 Grok Bot에 결과당 한 번
+알린다. Subtask 완료와 사소한 진행은 별도 알림을 보내지 않는다.
+명시적으로 전달을 요청받은 내용은 message 이벤트를 사용한다.
+
+`~/.gbm/bin/grok-notify -e <event> -t "<짧은 제목>" "<1–3문장 결과>"`
+형식이며 이벤트는 `turn.completed`, `failed`, `needs-input`,
+`message`다. PR/관련 링크가 있으면 `-l <url>`을 붙인다. URL/key는
+macOS Keychain에서 도구가 읽으며 출력·로그·질문에 포함하지 않는다.
+실패 exit는 보고하고 작업을 계속하되 반복 재시도하지 않는다.
