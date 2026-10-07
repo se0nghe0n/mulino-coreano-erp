@@ -52,7 +52,9 @@ PostgreSQL의 microsecond 저장 정밀도에 맞춰 until+1µs를 다음 만료
 
 release는 지정한 hold만 해제하고 그 hold의 QUALITY_REVIEW 의무만
 증거로 해소한다. 겹친 다른 hold와 SUSPENDED allocation은 유지한다.
-revoke는 미래 실행배분을 정지하고 근거와 책임을 유지한다.
+hold/revoke는 각 allocation의 현재 행동·고객·실물 범위를 재평가한다.
+교집합이 부족한 allocation만 정지하고 근거와 책임을 유지한다.
+다른 행동, 제한 밖 범위, 겹친 다른 허용이 충분하면 실행 상태를 유지한다.
 
 InventoryReadFacts는 eligibleQuantity, reservedQuantity,
 unreservedEligibleQuantity, eligibilityStatus를 소유한다. reserved에는
@@ -77,7 +79,9 @@ scope fence에서 실제 allocation 범위와 현재 판정을 다시 검사해�
 초기 Java21 compile과 QualityRangesTest 네 검사는 PASS다.
 첫 PostgreSQL 실행에서 fresh PostgreSQL18.6 V20 적용은 PASS지만
 SourceProfiles fixture revision0이 revision>0 제약에 걸렸다. revision1로
-수정했고 종단 검사는 재실행 대기다. 최종 결과는 evidence.md에 남긴다.
+수정했다. 이후 compile와 Spring context 문제를 dependency 수정으로
+해소했고 source helper의 null operation 처리도 수정했다. 현재 gateway
+종단 검사는 재실행 대기다. 최종 결과는 evidence.md에 남긴다.
 
 실기관·실공급자·유료 모델·BTP 호출은 이 local fixture 범위에서
 실행하지 않았다.
@@ -96,3 +100,8 @@ clock과 같은 scope·policy·identity fence에서 실제 배분 좌표를 다�
 hold/revoke의 QUALITY_REVIEW root와 leaf 및 assignment에는 실제 제한
 수량·단위를 전달하고 residual scope에 startQuantity와 행동·category를
 담는다. 수량 없는 일반 의무의 기본1로 보류20을 표시하지 않는다.
+
+동일 sourceDecisionId·sourceVersion·category·operation·segment는
+출처가 달라도 같은 occurrence identity를 쓴다. 서로 다른 결정은 같은
+시간에 기록돼도 별개다. 공유 대조는 원문의 canonical JSON 의미 hash가
+다르면 같은 identity로 합치지 않는다.
