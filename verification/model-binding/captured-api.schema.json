@@ -1,0 +1,134 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "evidenceClass",
+    "actionId",
+    "scope",
+    "requestSentAt",
+    "responseReceivedAt",
+    "toolCall",
+    "authenticatedActor",
+    "request",
+    "response"
+  ],
+  "properties": {
+    "evidenceClass": {
+      "enum": [
+        "ACTUAL_HOST",
+        "ACTUAL_API_CAPTURE",
+        "CAPTURED_CONTRACT_SELFTEST"
+      ]
+    },
+    "actionId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "scope": {
+      "type": "object"
+    },
+    "requestSentAt": {
+      "type": "string",
+      "minLength": 1,
+      "format": "date-time"
+    },
+    "responseReceivedAt": {
+      "type": "string",
+      "minLength": 1,
+      "format": "date-time"
+    },
+    "toolCall": {
+      "type": "object"
+    },
+    "authenticatedActor": {
+      "type": "object",
+      "required": [
+        "issuer",
+        "subject",
+        "audience",
+        "organizationRef",
+        "authorizationGrantRef"
+      ],
+      "properties": {
+        "issuer": {
+          "type": "string",
+          "minLength": 1
+        },
+        "subject": {
+          "type": "string",
+          "minLength": 1
+        },
+        "audience": {
+          "type": "string",
+          "minLength": 1
+        },
+        "organizationRef": {
+          "type": "string",
+          "minLength": 1
+        },
+        "authorizationGrantRef": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "request": {
+      "type": "object",
+      "required": [
+        "jsonrpc",
+        "id",
+        "method",
+        "params"
+      ],
+      "properties": {
+        "jsonrpc": {
+          "const": "2.0"
+        },
+        "id": {
+          "type": [
+            "string",
+            "integer"
+          ]
+        },
+        "method": {
+          "const": "tools/call"
+        },
+        "params": {
+          "type": "object",
+          "required": [
+            "name",
+            "arguments"
+          ],
+          "properties": {
+            "name": {
+              "type": "string",
+              "minLength": 1
+            },
+            "arguments": {
+              "type": "object"
+            }
+          }
+        }
+      }
+    },
+    "response": {
+      "type": "object",
+      "required": [
+        "jsonrpc",
+        "id"
+      ],
+      "properties": {
+        "jsonrpc": {
+          "const": "2.0"
+        },
+        "id": {
+          "type": [
+            "string",
+            "integer"
+          ]
+        }
+      }
+    }
+  }
+}

@@ -96,20 +96,31 @@ public final class ModelBindingRunner {
         JsonNode exec=results.get(prefix+"/agent"),before=results.get(prefix+"/before"),after=results.get(prefix+"/after"),oracle=source.path("oracle"),path=Json.object();String selected="DIRECT";
         ArrayNode ars=(ArrayNode)report.path("assertionResults");
         try {
+            JsonNode transcript=Json.object();CapturedApiObservation api;
             List<JsonNode> effects=BindingEvaluator.newEffects(before.path("data").path("data").path("effects"),after.path("data").path("data").path("effects"));
             if(profile.equals("UAT")) {
                 JsonNode control=Json.parse("{\"type\":\"process\",\"operation\":\"clientProbe\",\"parameters\":{}}");((ObjectNode)control).set("parameters",scope(prefix));
                 StepResult host=new StepResult(prefix+"/agent",StepResult.DriverStatus.EXECUTED,exec.path("data"),exec.path("response"),exec.path("reason").asText(),exec.path("provenance"),strings(exec.path("artifactRefs")));
                 HostObservationValidator.validate(contract.validator,control,host);
-                JsonNode transcript=completionWitness(agentTranscript(exec),prefix);checkStructuredIntent(source.path("expectedIntent"),transcript.path("structuredIntent"));validateUatCalls(transcript,source,turn);
+                transcript=completionWitness(agentTranscript(exec),prefix);checkStructuredIntent(source.path("expectedIntent"),transcript.path("structuredIntent"));validateUatCalls(transcript,source,turn);
                 if(oracle.has("uatCompletion")){selected=evaluator.selectPath(oracle,transcript,effects,aliasMap,fixture);path=oracle.path("uatCompletion").path("pathOracles").path(selected);if(selected.equals("SERVER_REJECTION")&&path.isMissingNode())path=oracle.path("sitDirectCommand");}
             } else if(oracle.has("sitDirectCommand")){selected="SERVER_REJECTION";path=oracle.path("sitDirectCommand");}
-            report.put("selectedPath",selected);
+            api=capturedApis(exec,transcript,prefix);
+            api.requireExecutionCall(source.path("expectedIntent"),turn.path("capabilityMapping").path("public").asText(),selected);
+            if(binding.path("caseId").asText().equals("M50")&&prefix.equals("turn-1")){JsonNode replayPayload=fixture.path("baseline").path("domainFacts").path("receipt").path("canonicalPayload");api.requireReplay(replayPayload,aliasMap,"confirmReceipt");api.requireReplayReferences(before,after,BindingEvaluator.aliases(replayPayload,aliasMap),"confirmReceipt");}
+            report.put("selectedPathId",selected).put("selectedPath",selected);report.set("capturedApiCallIds",Json.MAPPER.valueToTree(api.ids()));report.set("apiAssertionSources",api.sources());
             for(JsonNode effect:effects){BindingContract.require(effect.path("organizationRef").equals(aliasMap.path("org"))&&effect.path("installationId").equals(results.get("install").path("data").path("installationId"))&&effect.path("turnId").asText().equals(prefix),"Effect delta scope mismatch");}
             if(selected.equals("EVIDENCED_PREFLIGHT_STOP")){verifyGroundedRead(completionWitness(agentTranscript(exec),prefix),after,turn,source);BindingContract.require(rowSet(before.path("data").path("rawRows")).equals(rowSet(after.path("data").path("rawRows"))),"Preflight changed observed business rows");}
-            if(!selected.equals("EVIDENCED_PREFLIGHT_STOP")) BindingContract.require(exec.path("response").path("outcome").asText().equals(oracle.path("outcome").asText()),"Actual server outcome differs");
-            int ai=0;for(JsonNode a:oracle.path("assertions"))checkAssertion(a,turn.path("commonAssertions").get(ai++).path("assertionId").asText(),exec,after,effects,ars,source);
-            String branch=profile.equals("SIT")?"SIT_DIRECT_COMMAND":selected;JsonNode refs=turn.path("oracleAssertions").path(branch);if(refs.isMissingNode())refs=turn.path("oracleAssertions").path("SIT_DIRECT_COMMAND");ai=0;for(JsonNode a:path.path("assertions"))checkAssertion(a,refs.get(ai++).path("assertionId").asText(),exec,after,effects,ars,source);
+            if(!selected.equals("EVIDENCED_PREFLIGHT_STOP")) {
+                String cap=turn.path("capabilityMapping").path("public").asText(),original=source.path("expectedIntent").path("slots").path("originalCapability").path("value").asText();
+                boolean finalOnly=source.path("expectedIntent").path("status").asText().equals("NEEDS_INPUT")||profile.equals("UAT")&&source.path("expectedIntent").path("intentKind").asText().equals("QUERY");
+                JsonNode outcomeSource=finalOnly?exec.path("response"):api.commandResponse(cap,original);
+                if(!(profile.equals("UAT")&&finalOnly))BindingContract.require(outcomeSource.path("outcome").asText().equals(oracle.path("outcome").asText()),"Actual captured server outcome differs");
+                if(profile.equals("SIT"))BindingContract.require(exec.path("response").equals(outcomeSource),"Scripted API result differs from actual captured response");
+            }
+            if(profile.equals("UAT")){JsonNode semantics=finalResponseObservation(exec,transcript,prefix);report.put("finalResponseObservationRef",Json.required(exec.path("data"),"finalResponseObservationRef"));FinalResponseObservation.check(semantics,transcript.path("finalResponse"),selected,oracle.has("uatCompletion"),oracle,exec,after,effects,aliasMap,evaluator,api);}
+            int ai=0;for(JsonNode a:oracle.path("assertions"))checkAssertion(a,turn.path("commonAssertions").get(ai++).path("assertionId").asText(),exec,after,effects,ars,source,api);
+            String branch=profile.equals("SIT")?"SIT_DIRECT_COMMAND":selected;JsonNode refs=turn.path("oracleAssertions").path(branch);if(refs.isMissingNode())refs=turn.path("oracleAssertions").path("SIT_DIRECT_COMMAND");ai=0;for(JsonNode a:path.path("assertions"))checkAssertion(a,refs.get(ai++).path("assertionId").asText(),exec,after,effects,ars,source,api);
             evaluator.effectWhitelist(oracle,path,effects,aliasMap);evaluator.preserveObligations(before.path("data").path("data").path("obligations"),after.path("data").path("data").path("obligations"),effects);evaluator.obligations(oracle,path,after.path("data").path("data").path("obligations"),aliasMap);verifyHumanOwners(after.path("data").path("data").path("obligations"));
             // input-required is structural, not fixed response text. User answers never approve.
             JsonNode clarification=oracle.path("clarification");BindingContract.require(exec.path("response").path("clarification").path("required").asBoolean(false)==clarification.path("required").asBoolean(),"Clarification requirement differs");
@@ -119,8 +130,48 @@ public final class ModelBindingRunner {
     }
     private void verifyHumanOwners(JsonNode obligations){Set<JsonNode> humans=new HashSet<>();fixture.path("baseline").path("principalFacts").fields().forEachRemaining(e->{if(e.getValue().path("human").asBoolean(false)){JsonNode id=aliasMap.get(e.getKey());BindingContract.require(id!=null,"Installed human owner alias missing");humans.add(id);}});for(JsonNode duty:obligations)if(duty.path("status").asText().equals("OPEN"))BindingContract.require(humans.contains(duty.path("ownerRef")),"OPEN obligation has no existing human owner");}
     private JsonNode agentTranscript(JsonNode execution) throws IOException {
-        String ref=Json.required(execution.path("data"),"agentTranscriptRef");BindingContract.require(strings(execution.path("artifactRefs")).contains(ref),"Unlinked actual agent transcript");
-        Path file=contract.validator.path(ref);BindingContract.require(file.toRealPath().startsWith(contract.validator.root().toRealPath()),"Agent transcript escapes repository");boolean linked=false;for(JsonNode artifact:execution.path("data").path("hostObservation").path("extractor").path("inputArtifacts"))if(artifact.path("path").asText().equals(ref)){BindingContract.require(artifact.path("sha256").asText().equals(Json.sha256(file))&&artifact.path("sizeBytes").asLong()==Files.size(file),"Agent transcript hash/bytes differ");linked=true;}BindingContract.require(linked,"Agent transcript not independently extracted");JsonNode transcript=Json.read(file);for(JsonNode call:transcript.path("toolCalls")){String wire=Json.required(call,"wireArtifactRef");BindingContract.require(strings(execution.path("artifactRefs")).contains(wire),"Tool wire artifact unlinked");JsonNode actual=Json.read(contract.validator.path(wire));BindingContract.require(actual.path("evidenceClass").asText().equals("ACTUAL_HOST"),"Captured wire cannot establish actual UAT");BindingContract.require(actual.path("toolCall").equals(call),"Declared tool call differs from captured wire");}BindingContract.require(transcript.path("evidenceClass").asText().equals("ACTUAL_HOST"),"Captured transcript cannot establish UAT");return transcript;
+        String ref=Json.required(execution.path("data"),"agentTranscriptRef");
+        JsonNode transcript=linkedArtifact(execution,ref,true);
+        BindingContract.require(transcript.path("evidenceClass").asText().equals("ACTUAL_HOST"),"Captured transcript cannot establish UAT");
+        BindingContract.require(transcript.has("finalResponse")&&transcript.path("finalResponse").equals(execution.path("response")),"Client final response differs from independently captured transcript");
+        return transcript;
+    }
+    /** Only artifacts consumed by the actual independent host extractor establish UAT. */
+    private JsonNode linkedArtifact(JsonNode execution,String ref,boolean host) throws IOException {
+        BindingContract.require(strings(execution.path("artifactRefs")).contains(ref),"Actual response/wire artifact unlinked");
+        Path file=contract.validator.path(ref);BindingContract.require(file.toRealPath().startsWith(contract.validator.root().toRealPath()),"Artifact escapes repository");
+        if(!host)BindingContract.require(execution.path("provenance").path("independentCapture").asBoolean(false)&&execution.path("provenance").path("captureSource").asText().equals("ACTUAL_AUTHENTICATED_TRANSPORT"),"API capture is a client projection rather than independent transport observation");
+        JsonNode artifacts=host?execution.path("data").path("hostObservation").path("extractor").path("inputArtifacts"):execution.path("provenance").path("capturedArtifacts");
+        boolean linked=false;for(JsonNode artifact:artifacts)if(artifact.path("path").asText().equals(ref)){BindingContract.require(artifact.path("sha256").asText().equals(Json.sha256(file))&&artifact.path("sizeBytes").asLong(-1)==Files.size(file),"Captured artifact hash/bytes differ");linked=true;}
+        BindingContract.require(linked,"Artifact lacks independent capture hash/bytes");return Json.read(file);
+    }
+    private CapturedApiObservation.Call capturedCall(JsonNode execution,JsonNode call,String prefix,boolean host) throws IOException {
+        JsonNode wire=linkedArtifact(execution,Json.required(call,"wireArtifactRef"),host);
+        contract.validator.schema("verification/model-binding/captured-api.schema.json",wire);
+        BindingContract.require(wire.path("evidenceClass").asText().equals(host?"ACTUAL_HOST":"ACTUAL_API_CAPTURE"),"Selftest/projection cannot establish actual captured API");
+        CapturedApiObservation.checkCaptureContext(wire,scope(prefix),execution.path("actionId"),host?execution.path("data").path("hostObservation").path("command"):null);
+        return CapturedApiObservation.decode(call,wire);
+    }
+    private CapturedApiObservation capturedApis(JsonNode execution,JsonNode transcript,String prefix) throws IOException {
+        JsonNode calls=profile.equals("UAT")?transcript.path("toolCalls"):execution.path("data").path("capturedApiCalls");
+        BindingContract.require(calls.isArray(),"Actual API calls unobserved");List<CapturedApiObservation.Call> captured=new ArrayList<>();
+        if(profile.equals("SIT")){var transport=Json.object();transport.put("terminal",true);transport.set("toolCalls",calls);JsonNode turn=null;for(JsonNode t:binding.path("turns"))if(t.path("id").asText().equals(prefix))turn=t;validateUatCalls(transport,contract.sourceTurn(turn),turn);}
+        for(JsonNode call:calls)captured.add(capturedCall(execution,call,prefix,profile.equals("UAT")));
+        if(profile.equals("UAT")){JsonNode context=results.get(prefix+"/context"),read=context.path("data").path("authenticatedRead");if(read.isObject())captured.add(capturedCall(context,read,prefix,false));}
+        JsonNode sources=profile.equals("UAT")?transcript.path("apiAssertionSources"):execution.path("data").path("apiAssertionSources");
+        return new CapturedApiObservation(captured,sources);
+    }
+    private JsonNode finalResponseObservation(JsonNode execution,JsonNode transcript,String prefix) throws IOException {
+        JsonNode observation=linkedArtifact(execution,Json.required(execution.path("data"),"finalResponseObservationRef"),true);
+        contract.validator.schema("verification/model-binding/final-response-observation.schema.json",observation);
+        BindingContract.require(observation.path("evidenceClass").asText().equals("ACTUAL_HOST")&&observation.path("scope").equals(scope(prefix)),"Final-response semantics has wrong actual scope");
+        BindingContract.require(observation.path("sourceTranscriptRef").asText().equals(Json.required(execution.path("data"),"agentTranscriptRef"))&&observation.path("sourceResponse").equals(transcript.path("finalResponse")),"Semantic extractor did not observe entire actual final response");
+        JsonNode extractor=execution.path("data").path("hostObservation").path("extractor");
+        BindingContract.require(observation.path("extractor").path("command").equals(extractor.path("command")),"Final-response semantics lacks actual independent extractor command");
+        JsonNode rows=extractor.path("rawRows");
+        if(rows.isMissingNode())for(JsonNode ref:extractor.path("transcriptRefs")){JsonNode candidate=linkedArtifact(execution,ref.asText(),true);if(candidate.has("operationEvidence")){rows=candidate;break;}}
+        BindingContract.require(rows.path("finalResponseObservation").equals(observation),"Final-response semantics differs from independently extracted host output");
+        return observation;
     }
     private void validateUatCalls(JsonNode transcript,JsonNode source,JsonNode turn){
         BindingContract.require(transcript.path("terminal").asBoolean(false)&&transcript.path("toolCalls").isArray(),"Actual client invocation not fully observed");Set<String> permittedCommands=new HashSet<>();permittedCommands.add(turn.path("capabilityMapping").path("public").asText());String original=source.path("expectedIntent").path("slots").path("originalCapability").path("value").asText();if(!original.isBlank())permittedCommands.add(original);
@@ -132,7 +183,7 @@ public final class ModelBindingRunner {
     }
     private JsonNode completionWitness(JsonNode transcript,String prefix) throws IOException {
         ObjectNode witness=transcript.deepCopy();JsonNode context=results.get(prefix+"/context"),read=context.path("data").path("authenticatedRead");ArrayNode reads=Json.array();
-        if(read.isObject()){String ref=Json.required(read,"wireArtifactRef");BindingContract.require(strings(context.path("artifactRefs")).contains(ref),"Context read wire is unlinked");Path file=contract.validator.path(ref);BindingContract.require(file.toRealPath().startsWith(contract.validator.root().toRealPath()),"Context wire escapes repository");JsonNode actual=Json.read(file);BindingContract.require(actual.path("toolCall").equals(read)&&actual.path("evidenceClass").asText().equals("ACTUAL_HOST"),"Context witness differs from actual authenticated wire");BindingContract.require(read.path("constraintFacts").equals(context.path("response").path("constraintFacts")),"Context blocking facts differ from actual server response");reads.add(read);}
+        if(read.isObject()){String ref=Json.required(read,"wireArtifactRef");BindingContract.require(strings(context.path("artifactRefs")).contains(ref),"Context read wire is unlinked");Path file=contract.validator.path(ref);BindingContract.require(file.toRealPath().startsWith(contract.validator.root().toRealPath()),"Context wire escapes repository");CapturedApiObservation.Call actual=capturedCall(context,read,prefix,false);BindingContract.require(actual.response().equals(context.path("response")),"Context response differs from actual authenticated captured wire");BindingContract.require(read.path("constraintFacts").equals(actual.response().path("constraintFacts")),"Context blocking facts differ from actual captured server response");reads.add(read);}
         witness.set("contextReads",reads);return witness;
     }
     private static Set<JsonNode> rowSet(JsonNode rows){BindingContract.require(rows.isArray(),"Business row scope unobserved");Set<JsonNode> set=new HashSet<>();rows.forEach(r->BindingContract.require(set.add(r),"Duplicate physical observation row"));return set;}
@@ -150,7 +201,7 @@ public final class ModelBindingRunner {
         String cap=expected.path("capabilityId").asText();BindingContract.require(actual.path("capabilityId").asText().equals(cap)||cap.equals("linkRelation")&&actual.path("capabilityId").asText().equals("recordRelation"),"Actual intent capability differs");
         expected.path("slots").fields().forEachRemaining(e->{JsonNode observed=actual.path("slots").path(e.getKey()),value=BindingEvaluator.aliases(e.getValue().path("value"),aliasMap);BindingContract.require(observed.path("value").equals(value),"Actual slot value differs "+e.getKey());for(String k:List.of("provenance","sourceRef","sourceText"))if(e.getValue().has(k))BindingContract.require(observed.path(k).equals(e.getValue().path(k)),"Actual slot source differs "+e.getKey());});
     }
-    private void checkAssertion(JsonNode a,String assertionId,JsonNode exec,JsonNode after,List<JsonNode> effects,ArrayNode results,JsonNode source){ObjectNode r=Json.object();r.put("assertionId",assertionId).put("semanticPath",a.path("path").asText());results.add(r);try{evaluator.assertSemantic(a,exec,after,effects,aliasMap,expectedUnit(a,source));r.put("status","PASS");}catch(AssertionError|IllegalArgumentException e){r.put("status","FAIL").put("reason",e.getMessage());throw e;}}
+    private void checkAssertion(JsonNode a,String assertionId,JsonNode exec,JsonNode after,List<JsonNode> effects,ArrayNode results,JsonNode source,CapturedApiObservation api){ObjectNode r=Json.object();r.put("assertionId",assertionId).put("semanticPath",a.path("path").asText());results.add(r);try{evaluator.assertSemantic(a,exec,after,effects,aliasMap,expectedUnit(a,source),api);if(contract.mapping(a.path("path").asText()).path("evidenceClass").asText().equals("AUTHENTICATED_API")){var call=api.source(a.path("path").asText());String capability=source.path("expectedIntent").path("capabilityId").asText();if(capability.equals("linkRelation"))capability="recordRelation";String original=source.path("expectedIntent").path("slots").path("originalCapability").path("value").asText();BindingContract.require(call.capabilityId().equals(capability)||!original.isBlank()&&call.capabilityId().equals(original)||source.path("expectedIntent").path("intentKind").asText().equals("QUERY")&&call.capabilityId().equals("getObject"),"API assertion uses a different capability response");r.put("capturedCallId",call.id()).put("wireArtifactRef",call.wireArtifactRef()).put("businessResponsePointer",call.responsePointer());}r.put("status","PASS");}catch(AssertionError|IllegalArgumentException e){r.put("status","FAIL").put("reason",e.getMessage());throw e;}}
     private String expectedUnit(JsonNode assertion,JsonNode source){
         JsonNode expected=assertion.path("expected");boolean numeric=expected.isTextual()&&expected.asText().matches("-?(0|[1-9][0-9]*)(\\.[0-9]+)?");if(expected.isArray()&&!expected.isEmpty()){numeric=true;for(JsonNode n:expected)numeric&=n.isTextual()&&n.asText().matches("-?(0|[1-9][0-9]*)(\\.[0-9]+)?");}if(!numeric)return null;
         String path=assertion.path("path").asText();if(path.equals("state.invoice.convertedAmount"))return "KRW";if(path.equals("state.invoice.originalAmount")||path.equals("state.paymentReference.amount"))return source.path("expectedIntent").path("slots").path("currency").path("value").asText();

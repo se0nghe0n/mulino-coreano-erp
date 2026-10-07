@@ -137,3 +137,70 @@ actual model calls는0, attempts는 빈 배열, usage/cost는 null과 누락
 이유이며 status는 NOT_RUN이다. planned repeats3/180 attempts는 실행
 증거가 아니다. 95% clear-structure/부당 실행0은 R8 수용치 제안이며
 사업 SLA나 실제 모델 품질 주장으로 바꾸지 않는다.
+
+## 마지막 답변과 실제 API 결과의 분리
+
+client의 마지막 답변은 API 응답 원장이 아니다. `AUTHENTICATED_API`
+assertion은 `apiAssertionSources[{semanticPath,capturedCallId}]`로 지정한
+실제 call의 raw MCP request/response에서만 읽는다. UAT의 call 목록과
+source 지정은 hash/bytes가 확인된 `agentTranscriptRef`에서 읽고, SIT는
+실제 transport가 반환한 `data.capturedApiCalls`와
+`data.apiAssertionSources`를 쓴다. 각 call에는 `callId`, capability,
+인증 profile/principal/grant, `wireArtifactRef`,
+`businessResponsePointer`가 있다. pointer는 raw wire의 `/response/` 아래
+실제 business response object를 가리킨다. adapter가 답안으로 만든
+projection이나 client final answer를 이 object로 복사할 수 없다.
+
+`captured-api.schema.json`의 wire에는 raw JSON-RPC request/response,
+서버에서 관찰한 authenticatedActor, actionId, installation/turn scope,
+requestSentAt/responseReceivedAt가 있다. request/response RPC ID,
+capability, 인증 주체와 grant, 현재 action/scope를 대조한다. UAT tool wire는
+실제 host invocation 시간 안에 있어야 하며 host extractor가 읽은
+artifact의 path/hash/bytes와 연결된다. SIT 및 사전 context read는
+`provenance.independentCapture=true`,
+`captureSource=ACTUAL_AUTHENTICATED_TRANSPORT`,
+`capturedArtifacts[{path,sha256,sizeBytes}]`를 요구한다.
+CAPTURED_CONTRACT_SELFTEST는 계약 반례에만 사용하고 제품 PASS로 세지 않는다.
+
+QUERY는 이미 인증된 context read가 실제 API assertion의 원천이 될 수
+있으며 같은 읽기를 다시 호출하도록 강제하지 않는다. executed command는
+실제 matching command RPC가 필수다. M50 turn1은
+동일 commandIdempotencyKey, stableRequestOwner와 전체 canonical payload의
+실제 replay request, 실제 APPLIED/reusedCommittedResult 응답을 요구한다.
+RPC ID는 업무 idempotency key와 구별한다. 실제 응답의
+committedReceiptOccurrenceRef와 committedPhysicalScopeRef는 각각 독립
+receiptOccurrence 원 행의 rowId와 physicalScopeId다. 동일 실물 scope와
+원장 occurrence ID를 섞지 않는다. 원장에는 기존 key/owner column도
+관찰되어야 한다. 실제 응답의 committedEffectRefs는 기존 key/owner에
+속한 receipt/movement/outbox 업무 effect ID 집합과 정확히 같아야 하고,
+전후 원장에 기존 occurrence/effect가 보존되어야 한다. 기존 수량60과
+새 effect0만으로 replay가 실행됐다고 판정하지 않는다.
+
+UAT의 모든 마지막 답변은 actual transcript의 `finalResponse`로 보존하며
+StepResult.response와 같아야 한다. 별도
+`data.finalResponseObservationRef`는 전체 마지막 답변의 의미를 독립
+extractor가 관찰한 artifact다. schema는
+`final-response-observation.schema.json`이다. sourceTranscriptRef,
+sourceResponse 전체 값, extractor의 name/version/실제 command와 scope를
+확인하고 shared host extractor의 실제 output에 있는
+finalResponseObservation과 동일해야 한다. artifact와 원 transcript의
+hash/bytes도 같은 host 계약으로 확인한다. 모델이 작성한 completion
+self label을 semantic observation으로 인정하지 않는다.
+
+독립 extractor는 claimed effects, business completion, residual human
+responsibility 세 영역의 의미를 빠짐없이 관찰한다. 정확한 답변 문구를
+요구하지 않는다. semantic assertions와 언급한 잔여 의무/owner/수량은
+실제 API·독립 DB·effect delta와 대조한다. 모든 negative 경로에서
+거짓 FULFILLED/CLOSED와 남은 인간 책임의 RELEASED를 금지한다. 합법적인
+EVIDENCED_PREFLIGHT_STOP은 실제 차단 근거와 불변 snapshot을 유지하며
+NOT_EXECUTED 의미를, SERVER_REJECTION은 실제 거부 RPC와 REJECTED 의미를
+요구한다. preflight에도 APPLIED라는 최종 structured outcome을 허용하지
+않는다. 정확한 server error는 SIT/서버 거부 경로에만 요구한다.
+
+이는 의미 extractor나 제품 구현을 제공하는 변경이 아니다. 실제
+read-only extractor가 전체 final response를 관찰해 위 증거를 생성하기
+전에는 UAT PASS가 불가능하다. 제품 fake, 답안 seed, 실제 모델 호출은 없다.
+perTurn에는 canonical selectedPathId와 같은 값의 selectedPath,
+capturedApiCallIds, apiAssertionSources의 실제 wire/pointer,
+finalResponseObservationRef를 기록한다. 이 API call IDs는 유료 provider
+modelCalls의 callId와 다른 namespace이며 모델 usage/cost를 나타내지 않는다.

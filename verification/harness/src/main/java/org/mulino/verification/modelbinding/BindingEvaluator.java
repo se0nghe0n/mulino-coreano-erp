@@ -70,10 +70,11 @@ public final class BindingEvaluator {
         BindingContract.require(grounded,"Preflight lacks authenticated constraint facts");
         BindingContract.require(effects.stream().noneMatch(BindingEvaluator::business),"Preflight created business effect");return "EVIDENCED_PREFLIGHT_STOP";
     }
-    public JsonNode value(String semantic,JsonNode execution,JsonNode observation,List<JsonNode> effects){
+    public JsonNode value(String semantic,JsonNode execution,JsonNode observation,List<JsonNode> effects){return value(semantic,execution,observation,effects,null);}
+    public JsonNode value(String semantic,JsonNode execution,JsonNode observation,List<JsonNode> effects,CapturedApiObservation api){
         JsonNode m=contract.mapping(semantic);
         switch(m.path("evidenceClass").asText()) {
-            case "AUTHENTICATED_API": {JsonNode value=execution.at(m.path("pointer").asText());BindingContract.require(!value.isMissingNode()&&!value.isNull(),"Missing actual response "+semantic);return value;}
+            case "AUTHENTICATED_API": {BindingContract.require(api!=null,"Client final answer is not an authenticated API observation");JsonNode value=api.response(semantic).at(m.path("pointer").asText().substring("/response".length()));BindingContract.require(!value.isMissingNode()&&!value.isNull(),"Missing actual response "+semantic);return value;}
             case "INDEPENDENT_DB_ROWS": {
                 BindingContract.require(observation.path("data").path("rawRows").isArray(),"Independent raw rows scope unobserved");List<JsonNode> matches=new ArrayList<>();for(JsonNode row:observation.path("data").path("rawRows")) {
                     if(row.path("dataset").equals(m.path("dataset"))&&row.path("attribute").equals(m.path("attribute"))) {
@@ -107,15 +108,16 @@ public final class BindingEvaluator {
         String operation=OPERATIONS.get(name);BindingContract.require(operation!=null,"Unbound effect metric "+name);return Json.MAPPER.valueToTree(effects.stream().filter(e->e.path("operation").asText().equals(operation)).count());
     }
     public void assertSemantic(JsonNode assertion,JsonNode execution,JsonNode observation,List<JsonNode> effects,JsonNode aliases){assertSemantic(assertion,execution,observation,effects,aliases,null);}
-    public void assertSemantic(JsonNode assertion,JsonNode execution,JsonNode observation,List<JsonNode> effects,JsonNode aliases,String expectedUnit){
-        if(expectedUnit!=null)checkExpectedUnit(assertion.path("path").asText(),execution,observation,effects,expectedUnit);
-        JsonNode observed=value(assertion.path("path").asText(),execution,observation,effects),expected=aliases(assertion.path("expected"),aliases);
+    public void assertSemantic(JsonNode assertion,JsonNode execution,JsonNode observation,List<JsonNode> effects,JsonNode aliases,String expectedUnit){assertSemantic(assertion,execution,observation,effects,aliases,expectedUnit,null);}
+    public void assertSemantic(JsonNode assertion,JsonNode execution,JsonNode observation,List<JsonNode> effects,JsonNode aliases,String expectedUnit,CapturedApiObservation api){
+        if(expectedUnit!=null)checkExpectedUnit(assertion.path("path").asText(),execution,observation,effects,expectedUnit,api);
+        JsonNode observed=value(assertion.path("path").asText(),execution,observation,effects,api),expected=aliases(assertion.path("expected"),aliases);
         ObjectNode a=Json.object();a.put("op",expected.isTextual()&&expected.asText().matches("-?(0|[1-9][0-9]*)(\\.[0-9]+)?")?"decimalEquals":"equals");a.set("expected",expected);a.set("source",Json.parse("{\"actionId\":\"observed\",\"pointer\":\"/data/value\"}"));
         ObjectNode sample=Json.object();sample.put("driverStatus","EXECUTED");sample.set("provenance",Json.parse("{\"scopeComplete\":true}"));sample.set("data",Json.object().set("value",observed));new AssertionEngine().check(a,Map.of("observed",sample));
     }
-    private void checkExpectedUnit(String semantic,JsonNode execution,JsonNode observation,List<JsonNode> effects,String expected){
+    private void checkExpectedUnit(String semantic,JsonNode execution,JsonNode observation,List<JsonNode> effects,String expected,CapturedApiObservation api){
         JsonNode m=contract.mapping(semantic);String type=m.path("evidenceClass").asText();
-        if(type.equals("AUTHENTICATED_API")){String pointer=m.path("pointer").asText();int slash=pointer.lastIndexOf('/');BindingContract.require(execution.at(pointer.substring(0,slash)+"/unit").asText().equals(expected),"API quantity unit mismatch");}
+        if(type.equals("AUTHENTICATED_API")){String pointer=m.path("pointer").asText();int slash=pointer.lastIndexOf('/');BindingContract.require(api!=null,"API quantity has no captured source");BindingContract.require(api.response(semantic).at(pointer.substring("/response".length(),slash)+"/unit").asText().equals(expected),"API quantity unit mismatch");}
         else if(type.equals("INDEPENDENT_DB_ROWS")){boolean found=false;for(JsonNode row:observation.path("data").path("rawRows"))if(row.path("dataset").equals(m.path("dataset"))&&row.path("attribute").equals(m.path("attribute"))){found=true;BindingContract.require(row.path("unit").asText().equals(expected),"Independent quantity/currency unit mismatch");}if(!found)BindingContract.require(observation.path("data").path("data").path("units").path(m.path("dataset").asText()).asText().equals(expected),"Empty quantity scope lacks independently observed unit");}
         else {String name=m.path("metric").asText(),kind=name.equals("newInventoryQuantity")?"INVENTORY":name.equals("newPhysicalQuantity")?"PHYSICAL":"CONFIRMED_PHYSICAL";BindingContract.require(observation.path("data").path("data").path("units").path(kind).asText().equals(expected),"Effect quantity dimension/unit absent");for(JsonNode e:effects)for(JsonNode q:e.path("measurements"))if(q.path("kind").asText().equals(kind))BindingContract.require(q.path("unit").asText().equals(expected),"Effect quantity unit mismatch");}
     }

@@ -1,0 +1,144 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "evidenceClass",
+    "scope",
+    "sourceTranscriptRef",
+    "sourceResponse",
+    "extractor",
+    "coverage",
+    "complete",
+    "claims"
+  ],
+  "properties": {
+    "evidenceClass": {
+      "enum": [
+        "ACTUAL_HOST",
+        "CAPTURED_CONTRACT_SELFTEST"
+      ]
+    },
+    "scope": {
+      "type": "object"
+    },
+    "sourceTranscriptRef": {
+      "type": "string",
+      "minLength": 1
+    },
+    "sourceResponse": {},
+    "extractor": {
+      "type": "object",
+      "required": [
+        "independent",
+        "source",
+        "name",
+        "version",
+        "command"
+      ],
+      "properties": {
+        "independent": {
+          "const": true
+        },
+        "source": {
+          "const": "INDEPENDENT_FINAL_RESPONSE_SEMANTICS"
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "version": {
+          "type": "string",
+          "minLength": 1
+        },
+        "command": {
+          "type": "object"
+        }
+      }
+    },
+    "coverage": {
+      "type": "array",
+      "minItems": 3,
+      "maxItems": 3,
+      "uniqueItems": true,
+      "items": {
+        "enum": [
+          "CLAIMED_EFFECTS",
+          "COMPLETION",
+          "RESIDUAL_RESPONSIBILITY"
+        ]
+      }
+    },
+    "complete": {
+      "const": true
+    },
+    "claims": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "execution",
+        "completion",
+        "responsibility",
+        "assertions",
+        "residualObligations"
+      ],
+      "properties": {
+        "execution": {
+          "enum": [
+            "NOT_EXECUTED",
+            "REJECTED",
+            "EXECUTED",
+            "READ",
+            "NEEDS_INPUT",
+            "PENDING"
+          ]
+        },
+        "completion": {
+          "enum": [
+            "NOT_CLAIMED",
+            "OPEN",
+            "BLOCKED",
+            "FULFILLED",
+            "CLOSED"
+          ]
+        },
+        "responsibility": {
+          "enum": [
+            "NOT_CLAIMED",
+            "PRESERVED",
+            "RELEASED",
+            "TRANSFERRED"
+          ]
+        },
+        "assertions": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "semanticPath",
+              "value"
+            ],
+            "properties": {
+              "semanticPath": {
+                "type": "string",
+                "minLength": 1
+              },
+              "value": {},
+              "unit": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          }
+        },
+        "residualObligations": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        }
+      }
+    }
+  }
+}

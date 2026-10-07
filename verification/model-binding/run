@@ -7,7 +7,7 @@ profile=sys.argv[2] if len(sys.argv)>2 else 'SIT'
 if profile not in ('SIT','UAT'): sys.exit('SIT|UAT profile required')
 base=[str(root/'mvnw'),'-B','-ntp','-f',str(root/'verification/harness/pom.xml')]
 if mode in ('selftest','gherkin-red'):
- tests='ModelBindingContractTest,ModelBindingEvaluatorTest' if mode=='selftest' else 'ModelBindingFeatureRed'
+ tests='ModelBindingContractTest,ModelBindingEvaluatorTest,ModelBindingResponseEvidenceTest' if mode=='selftest' else 'ModelBindingFeatureRed'
  raise SystemExit(subprocess.call(base+['-Dtest='+tests,'-Dverification.command=verification/model-binding/run '+mode+' '+profile,'-Dmodel.binding.profile='+profile,'test'],cwd=root))
 if mode not in ('prepare','red'): sys.exit('prepare|red|selftest|gherkin-red required')
 code=subprocess.call(base+['-Dmaven.test.skip=true','package','dependency:build-classpath','-Dmdep.outputFile=target/model-binding-classpath.txt'],cwd=root)

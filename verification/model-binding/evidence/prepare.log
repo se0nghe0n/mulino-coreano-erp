@@ -6,7 +6,7 @@
 [INFO] --------------------------------[ jar ]---------------------------------
 [INFO] 
 [INFO] --- resources:3.4.0:resources (default-resources) @ acceptance-harness ---
-[INFO] skip non existing resourceDirectory /Volumes/VideoStore/Developer/mulino-ontology-step2-model-binding/verification/harness/src/main/resources
+[INFO] skip non existing resourceDirectory /Volumes/VideoStore/Developer/mulino-ontology-step2-review-model-binding/verification/harness/src/main/resources
 [INFO] 
 [INFO] --- compiler:3.14.1:compile (default-compile) @ acceptance-harness ---
 [INFO] Nothing to compile - all classes are up to date.
@@ -21,15 +21,15 @@
 [INFO] Tests are skipped.
 [INFO] 
 [INFO] --- jar:3.5.0:jar (default-jar) @ acceptance-harness ---
-[INFO] Building jar: /Volumes/VideoStore/Developer/mulino-ontology-step2-model-binding/verification/harness/target/acceptance-harness-1.0.0.jar
+[INFO] Building jar: /Volumes/VideoStore/Developer/mulino-ontology-step2-review-model-binding/verification/harness/target/acceptance-harness-1.0.0.jar
 [INFO] 
 [INFO] --- dependency:3.9.0:build-classpath (default-cli) @ acceptance-harness ---
-[INFO] Skipped writing classpath file '/Volumes/VideoStore/Developer/mulino-ontology-step2-model-binding/verification/harness/target/model-binding-classpath.txt'.  No changes found.
+[INFO] Skipped writing classpath file '/Volumes/VideoStore/Developer/mulino-ontology-step2-review-model-binding/verification/harness/target/model-binding-classpath.txt'.  No changes found.
 [INFO] ------------------------------------------------------------------------
 [INFO] BUILD SUCCESS
 [INFO] ------------------------------------------------------------------------
-[INFO] Total time:  0.791 s
-[INFO] Finished at: 2026-10-07T23:31:16+09:00
+[INFO] Total time:  0.761 s
+[INFO] Finished at: 2026-10-08T00:27:53+09:00
 [INFO] ------------------------------------------------------------------------
 SLF4J(W): No SLF4J providers were found.
 SLF4J(W): Defaulting to no-operation (NOP) logger implementation
@@ -49,8 +49,8 @@ SLF4J(W): See https://www.slf4j.org/codes.html#noProviders for further details.
   "plannedAttempts" : 180,
   "corpusSha256" : "570ce4610e585c698aeed4043be449e9bb8951448fb57111bddb5c49ac1e65bb",
   "bindingRegistrySha256" : "7c5a29f43d21fc4d151c657587f5138909936cc96ed85dc9e8be1917154348b1",
-  "timestamp" : "2026-10-07T14:31:17.045425Z",
-  "codeCommit" : "77c2df3440b6d8b362bfb52fed677e441c372b4c",
+  "timestamp" : "2026-10-07T15:27:53.802143Z",
+  "codeCommit" : "9ebbc5aa5ee6a00215fbeac85f08467d1a276a18",
   "workingTreeDirty" : true,
   "javaVersion" : "21.0.5+11-LTS",
   "inputArtifacts" : [ {
@@ -67,8 +67,8 @@ SLF4J(W): See https://www.slf4j.org/codes.html#noProviders for further details.
     "sizeBytes" : 5920
   }, {
     "path" : "contracts/acceptance-host-observation.schema.json",
-    "sha256" : "bd9a3d7b1c8d8b992be016429564e80d11ccb55b2d7bd6619f5c2117cc994897",
-    "sizeBytes" : 29687
+    "sha256" : "f47c1c64d2dd4b40b9bd2d092d816a0674962681218281550d100ac5d81ccf50",
+    "sizeBytes" : 33927
   }, {
     "path" : "contracts/acceptance-observation.schema.json",
     "sha256" : "54c44e2b40972a6cd009d45b4b98ba01461e9ce06ffe30823538573ca81fa768",
@@ -87,24 +87,32 @@ SLF4J(W): See https://www.slf4j.org/codes.html#noProviders for further details.
     "sizeBytes" : 9770
   }, {
     "path" : "verification/harness/src/main/java/org/mulino/verification/HostObservationValidator.java",
-    "sha256" : "545282a6ba54e14c1d22e65785ff5170238099d8ab91dbaa6b3c18642d4c5d35",
-    "sizeBytes" : 22974
+    "sha256" : "2b9f30a0625a140f513525d60f6604a56797bfa070483514d1c57ba3faa89af0",
+    "sizeBytes" : 23800
   }, {
     "path" : "verification/harness/src/main/java/org/mulino/verification/modelbinding/BindingContract.java",
-    "sha256" : "3ec4ee07577a25041c4ad57a7cc5b91db4cc54e15b1db767cb0df22e069881b5",
-    "sizeBytes" : 15050
+    "sha256" : "f2df9a6e5f61b7498b67cfeb679ee344da74a89ba0f63c0319f696670d4a3f46",
+    "sizeBytes" : 15172
   }, {
     "path" : "verification/harness/src/main/java/org/mulino/verification/modelbinding/BindingEvaluator.java",
-    "sha256" : "6fd202c60b587b9a921654b3c63e9ec71d5c0bd447120646fe85e9a5e2f4cd7a",
-    "sizeBytes" : 17030
+    "sha256" : "e7d45bc070ed13b7f51f575509e190b078a06f52a2cb38a2cf9a1731a637dc12",
+    "sizeBytes" : 17767
+  }, {
+    "path" : "verification/harness/src/main/java/org/mulino/verification/modelbinding/CapturedApiObservation.java",
+    "sha256" : "c2bc75ef6f3dbd7a178c41e323e19a9730937b0555d186a9c7c7879a4c64562a",
+    "sizeBytes" : 11671
+  }, {
+    "path" : "verification/harness/src/main/java/org/mulino/verification/modelbinding/FinalResponseObservation.java",
+    "sha256" : "392dc5b8a4be66030cff3a0796e7bc49dc8eda8c547e1018a398ea357f54cd14",
+    "sizeBytes" : 5491
   }, {
     "path" : "verification/harness/src/main/java/org/mulino/verification/modelbinding/ModelBindingMain.java",
     "sha256" : "2d2f9001d7d2b3ddd5583aa280b60296a18f513e0ecc370a8b33935c39b877a6",
     "sizeBytes" : 2094
   }, {
     "path" : "verification/harness/src/main/java/org/mulino/verification/modelbinding/ModelBindingRunner.java",
-    "sha256" : "ce5baa07c2aaf9adfc48ffe5ed059fc47e2da89c729ff8d693b69f8cd68bc31d",
-    "sizeBytes" : 27853
+    "sha256" : "18b2fb6f2960254ab499f3f0f43e0d6eebdac091efd13d359815a3600c1b017d",
+    "sizeBytes" : 34532
   }, {
     "path" : "verification/harness/src/main/java/org/mulino/verification/modelbinding/ModelBindingRuntimeProvider.java",
     "sha256" : "1d9c9ab61670b9742f6fd2c5a246ddfa481b1bf8b6541fbdc5e1bfa2d8487520",
@@ -117,6 +125,10 @@ SLF4J(W): See https://www.slf4j.org/codes.html#noProviders for further details.
     "path" : "verification/model-binding/binding.schema.json",
     "sha256" : "a6f7e4074278d5cb0467925d6e1919556cce3825f41c620eb86658e8777703e0",
     "sizeBytes" : 4401
+  }, {
+    "path" : "verification/model-binding/captured-api.schema.json",
+    "sha256" : "631a9dc53d6c726579d4e237c6bb435a4069af8734266e89511cd6b014dd8545",
+    "sizeBytes" : 2573
   }, {
     "path" : "verification/model-binding/cases/M01/binding.json",
     "sha256" : "ea2984a62dcaf0cdc55ad619b32a00dddf29d63e6d61682b857401be18b7accc",
@@ -837,6 +849,10 @@ SLF4J(W): See https://www.slf4j.org/codes.html#noProviders for further details.
     "path" : "verification/model-binding/cases/M60/scenario.feature",
     "sha256" : "3e84b3f1cbc5c8e71e71361d90edcc56f324039a6a5d25c14df4c50dc5fbed55",
     "sizeBytes" : 1205
+  }, {
+    "path" : "verification/model-binding/final-response-observation.schema.json",
+    "sha256" : "3c44f95c00eb685beab5d1a5606a095ea04468771bae8863b0280688d570e550",
+    "sizeBytes" : 2964
   }, {
     "path" : "verification/model-binding/observer-rows.schema.json",
     "sha256" : "f666b80e754e6b1bc52d127f92982282e1c91e65ac3b8b5f4fda2b6754d95942",
