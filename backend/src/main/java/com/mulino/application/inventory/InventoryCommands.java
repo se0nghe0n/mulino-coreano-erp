@@ -10,8 +10,8 @@ import org.springframework.stereotype.Component;
 /** All command adapters dispatch here through the common envelope transaction. */
 @Component
 public final class InventoryCommands implements CommandHandler {
-  private final InventoryRepository repository; private final StockPrimitives stock;
-  public InventoryCommands(InventoryRepository repository,StockPrimitives stock){this.repository=repository;this.stock=stock;}
+  private final InventoryRepository repository; private final StockPrimitives stock; private final ReadAuthorizer authorizer;
+  public InventoryCommands(InventoryRepository repository,StockPrimitives stock,ReadAuthorizer authorizer){this.repository=repository;this.stock=stock;this.authorizer=authorizer;}
   public Set<String> capabilities(){return Set.of("splitQuantity","mergeQuantity","moveQuantity","recordStocktake","adjustQuantity","disposeQuantity");}
   public Set<String> intentKinds(){return Set.of("COMMAND","RECORD");}
   public CommandPreparation prepare(DomainContext c,Map<String,Object> intent) {
@@ -31,6 +31,8 @@ public final class InventoryCommands implements CommandHandler {
     List<String> ids=capability.equals("mergeQuantity")?strings(slots,"segmentIds"):List.of(uuid(slots,"segmentId"));
     if(ids.size()>100||new HashSet<>(ids).size()!=ids.size())throw DomainError.invalid("Distinct bounded segments required");
     var sources=ids.stream().sorted().map(id->stock.leaf(c,id,at)).toList();var first=sources.getFirst();
+    // Multi-source scope IDs are NOT an authorization union: every consumed parent must be permitted.
+    for(var source:sources)authorizer.authorizeScopes(c,capability,Map.of("TARGET",List.of((String)source.get("ID")),"ITEM",List.of((String)source.get("itemId")),"PLACE",List.of((String)source.get("placeId"))));
     var fences=new TreeSet<String>();sources.forEach(s->fences.addAll(stock.fences(s)));
     if(capability.equals("splitQuantity")) {
       var amounts=strings(slots,"quantities");if(amounts.size()<2||amounts.size()>100)throw DomainError.invalid("Split requires 2..100 children");
@@ -48,7 +50,8 @@ public final class InventoryCommands implements CommandHandler {
     if(capability.equals("moveQuantity")) {
       String destination=uuid(slots,"destinationId");var place=repository.current(c,"Places",destination);
       var origin=repository.current(c,"Places",(String)first.get("placeId"));
-      if(!"INTERNAL_STORAGE".equals(place.get("kind"))||!"INTERNAL_STORAGE".equals(origin.get("kind"))||destination.equals(first.get("placeId"))||first.get("custodianId")==null)throw DomainError.invalid("Configured internal storage and confirmed custody required");
+      if(!"INTERNAL_STORAGE".equals(place.get("kind"))||!"INTERNAL_STORAGE".equals(origin.get("kind"))||destination.equals(first.get("placeId"))||!repository.internalCustodian(c,(String)first.get("custodianId")))throw DomainError.invalid("Configured internal storage and confirmed custody required");
+      authorizer.authorizeScopes(c,capability,Map.of("TARGET",List.of((String)first.get("ID")),"ITEM",List.of((String)first.get("itemId")),"PLACE",List.of(destination)));
       fences.add("inventory/place/"+destination);
     }
     if(capability.equals("recordStocktake"))validateObserved(c,first,slots.get("observedQuantity"),text(slots,"unit",40));
@@ -58,6 +61,7 @@ public final class InventoryCommands implements CommandHandler {
       if(capability.equals("adjustQuantity")) {
         String direction=text(slots,"direction",40);if(!Set.of("INCREASE","DECREASE").contains(direction))throw DomainError.invalid("Adjustment direction required");
         var count=repository.current(c,"Stocktakes",uuid(slots,"stocktakeId"));
+        if(repository.currentRows(c,"StockAdjustments").stream().anyMatch(a->count.get("ID").equals(a.get("stocktakeId"))))throw new DomainError("REJECTED","REVISION_CONFLICT","Stocktake difference already applied");
         BigDecimal difference=((BigDecimal)count.get("observedQuantity")).subtract(StockPrimitives.amount(first));
         if(!first.get("ID").equals(count.get("segmentId"))||!first.get("unit").equals(count.get("unit"))||difference.abs().compareTo(q)!=0||difference.signum()!=(direction.equals("INCREASE")?1:-1))throw DomainError.invalid("Adjustment must reconcile this stocktake difference");
         fences.add("inventory/stocktake/"+count.get("ID"));
@@ -75,7 +79,7 @@ public final class InventoryCommands implements CommandHandler {
       case "mergeQuantity"->List.of(stock.merge(c,strings(s,"segmentIds"),at,evidence,command));
       case "moveQuantity"->List.of(stock.moveInternal(c,uuid(s,"segmentId"),uuid(s,"destinationId"),at,evidence,command));
       case "recordStocktake"->List.of(stock.stocktake(c,uuid(s,"segmentId"),s.get("observedQuantity"),text(s,"unit",40),at,evidence,command));
-      case "adjustQuantity"->s.get("direction").equals("INCREASE")?List.of(stock.increase(c,uuid(s,"segmentId"),s.get("quantity"),text(s,"unit",40),at,evidence,command)):stock.decrease(c,uuid(s,"segmentId"),s.get("quantity"),text(s,"unit",40),at,evidence,command,"ADJUST_DECREASE");
+      case "adjustQuantity"->stock.adjust(c,uuid(s,"segmentId"),uuid(s,"stocktakeId"),s.get("quantity"),text(s,"unit",40),text(s,"direction",40),at,evidence,command,text(s,"reason",240));
       case "disposeQuantity"->stock.decrease(c,uuid(s,"segmentId"),s.get("quantity"),text(s,"unit",40),at,evidence,command,"DISPOSE");
       default->throw DomainError.unsupported();
     };

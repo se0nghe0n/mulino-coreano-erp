@@ -44,7 +44,7 @@ public final class StockPrimitives {
     lockSources(c,List.of(parent));var s=leaf(c,parent,at);
     var from=repository.current(c,"Places",(String)s.get("placeId"));var to=repository.current(c,"Places",destination);
     if(!"INTERNAL_STORAGE".equals(from.get("kind"))||!"INTERNAL_STORAGE".equals(to.get("kind")) || Objects.equals(from.get("ID"),to.get("ID")))throw DomainError.invalid("Configured distinct internal storage places required");
-    if(s.get("custodianId")==null)throw DomainError.invalid("Confirmed internal custody required");
+    if(!repository.internalCustodian(c,(String)s.get("custodianId")))throw DomainError.invalid("Confirmed internal custody required");
     return replace(c,List.of(s),List.of(amount(s)),destination,at,evidence,command,"INTERNAL_MOVE").getFirst();
   }
   public String stocktake(DomainContext c,String parent,Object value,String unit,Instant at,String evidence,String command) {
@@ -61,11 +61,23 @@ public final class StockPrimitives {
     List<String> children=replace(c,List.of(s),remaining.signum()==0?List.of():List.of(remaining),(String)s.get("placeId"),at,evidence,command,kind);
     movement(c,s,null,decrease,kind,at,evidence,command);return children;
   }
+  public List<String> adjust(DomainContext c,String parent,String stocktakeId,Object value,String unit,String direction,Instant at,String evidence,String command,String reason) {
+    var keys=new TreeSet<>(fences(repository.current(c,"QuantitySegments",parent)));keys.add("inventory/stocktake/"+stocktakeId);repository.fence(c,keys);
+    var s=leaf(c,parent,at);var count=repository.current(c,"Stocktakes",stocktakeId);var delta=quantity(c,s,value,unit);
+    if(repository.currentRows(c,"StockAdjustments").stream().anyMatch(a->stocktakeId.equals(a.get("stocktakeId"))))throw conflict("Stocktake difference already applied");
+    BigDecimal difference=((BigDecimal)count.get("observedQuantity")).subtract(amount(s));
+    if(!parent.equals(count.get("segmentId"))||!unit.equals(count.get("unit"))||difference.abs().compareTo(delta)!=0||difference.signum()!=(direction.equals("INCREASE")?1:-1))throw DomainError.invalid("Adjustment must reconcile this stocktake difference");
+    var r=row(c,id(),at);r.put("stocktakeId",stocktakeId);r.put("segmentId",parent);r.put("direction",direction);r.put("quantity",delta);r.put("unit",unit);r.put("occurredAt",at);r.put("reason",reason);r.put("evidenceRef",evidence);r.put("commandId",command);repository.insert("StockAdjustments",r);
+    return direction.equals("INCREASE")?List.of(increase(c,parent,value,unit,at,evidence,command)):decrease(c,parent,value,unit,at,evidence,command,"ADJUST_DECREASE");
+  }
   /** Explicit approved upward correction keeps old scope and identifies the excess as a new leaf. */
-  public String increase(DomainContext c,String parent,Object value,String unit,Instant at,String evidence,String command) {
+  private String increase(DomainContext c,String parent,Object value,String unit,Instant at,String evidence,String command) {
     lockSources(c,List.of(parent));var s=leaf(c,parent,at);var delta=quantity(c,s,value,unit);
-    var extra=child(c,s,delta,(String)s.get("placeId"),at,evidence);
-    repository.insert("QuantitySegments",extra);movement(c,null,extra,delta,"ADJUST_INCREASE",at,evidence,command);return (String)extra.get("ID");
+    BigDecimal corrected=amount(s).add(delta);quantity(c,s,corrected.toPlainString(),unit);
+    var extra=child(c,s,corrected,(String)s.get("placeId"),at,evidence);repository.insert("QuantitySegments",extra);
+    repository.update(c,"QuantitySegments",parent,Map.of("retiredAt",at,"retirementRecordedAt",c.knownAt(),"revision",((Number)s.get("revision")).intValue()+1));
+    edge(c,s,extra,amount(s),"ADJUST_RETAINED","UNCERTAIN_MIXTURE".equals(s.get("mixtureStatus")),at,evidence,command);
+    movement(c,null,extra,delta,"ADJUST_INCREASE",at,evidence,command);transferAllocations(c,s,List.of(extra),at,command);closeMembership(c,s,List.of(extra),at);return (String)extra.get("ID");
   }
   private void lockSources(DomainContext c,List<String> ids) {
     var keys=new TreeSet<String>();

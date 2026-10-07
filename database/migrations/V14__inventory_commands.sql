@@ -88,3 +88,17 @@ BEGIN
 END $$;
 CREATE TRIGGER inventory_physical_immutable BEFORE UPDATE ON mulino_inventory_QuantitySegments FOR EACH ROW EXECUTE FUNCTION inventory_physical_immutable();
 CREATE TRIGGER inventory_stocktake_immutable BEFORE UPDATE OR DELETE ON mulino_inventory_Stocktakes FOR EACH ROW EXECUTE FUNCTION inventory_version_immutable();
+CREATE TABLE mulino_inventory_StockAdjustments (
+ organizationId VARCHAR(36) NOT NULL, ID VARCHAR(36) NOT NULL,
+ revision INTEGER NOT NULL DEFAULT 0, createdAt TIMESTAMPTZ NOT NULL, recordedAt TIMESTAMPTZ NOT NULL,
+ stocktakeId VARCHAR(36) NOT NULL, segmentId VARCHAR(36) NOT NULL,
+ direction VARCHAR(40) NOT NULL CHECK(direction IN ('INCREASE','DECREASE')),
+ quantity NUMERIC(38,12) NOT NULL CHECK(quantity>0), unit VARCHAR(40) NOT NULL,
+ occurredAt TIMESTAMPTZ NOT NULL, reason VARCHAR(240) NOT NULL, evidenceRef VARCHAR(240) NOT NULL,
+ commandId VARCHAR(36) NOT NULL, PRIMARY KEY(organizationId,ID), UNIQUE(organizationId,stocktakeId),
+ FOREIGN KEY(organizationId,stocktakeId) REFERENCES mulino_inventory_Stocktakes(organizationId,ID),
+ FOREIGN KEY(organizationId,segmentId) REFERENCES mulino_inventory_QuantitySegments(organizationId,ID)
+);
+CREATE TRIGGER inventory_adjustment_immutable BEFORE UPDATE OR DELETE ON mulino_inventory_StockAdjustments FOR EACH ROW EXECUTE FUNCTION inventory_version_immutable();
+ALTER TABLE mulino_inventory_Restrictions ADD FOREIGN KEY(organizationId) REFERENCES mulino_identity_Organizations(ID);
+ALTER TABLE mulino_inventory_DispositionBases ADD FOREIGN KEY(organizationId) REFERENCES mulino_identity_Organizations(ID);

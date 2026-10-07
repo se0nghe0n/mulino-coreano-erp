@@ -9,7 +9,7 @@ import org.springframework.stereotype.Repository;
 /** Org predicates are applied in CQN, including every lineage and object lookup. */
 @Repository
 public class InventoryRepository {
-  public static final Set<String> ENTITIES = Set.of("Products", "TradeItems", "SpecificationVersions", "PackagingVersions", "UnitConversions", "ExternalIdentifiers", "Manufacturers", "ManufacturingLots", "Places", "QuantitySegments", "LogisticsUnits", "LogisticsMemberships", "GenealogyEdges", "QuantityMovements", "ObjectRelations", "Stocktakes", "IdentifierConflicts", "SegmentAllocations", "Restrictions", "DispositionBases");
+  public static final Set<String> ENTITIES = Set.of("Products", "TradeItems", "SpecificationVersions", "PackagingVersions", "UnitConversions", "ExternalIdentifiers", "Manufacturers", "ManufacturingLots", "Places", "QuantitySegments", "LogisticsUnits", "LogisticsMemberships", "GenealogyEdges", "QuantityMovements", "ObjectRelations", "Stocktakes", "StockAdjustments", "IdentifierConflicts", "SegmentAllocations", "Restrictions", "DispositionBases");
   private final PersistenceService db;
   private final org.springframework.jdbc.core.JdbcTemplate jdbc;
   public InventoryRepository(PersistenceService db,org.springframework.jdbc.core.JdbcTemplate jdbc) { this.db = db; this.jdbc=jdbc; }
@@ -29,6 +29,9 @@ public class InventoryRepository {
   public void register(String entity, Map<String,Object> row) {
     if (!Set.of("Products","TradeItems","SpecificationVersions","PackagingVersions","ExternalIdentifiers").contains(entity)) throw DomainError.unsupported();
     db.run(Insert.into("mulino.inventory."+entity).entry(row));
+  }
+  public boolean internalCustodian(DomainContext c,String actorId) {
+    return actorId!=null&&db.run(Select.from("mulino.identity.Actors").where(r->r.get("organizationId").eq(c.organizationId()).and(r.get("ID").eq(actorId)).and(r.get("kind").in("HUMAN","AGENT")))).first().isPresent();
   }
   public void recordIdentifierConflict(Map<String,Object> conflict) {
     db.run(Insert.into("mulino.inventory.IdentifierConflicts").entry(conflict));

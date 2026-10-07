@@ -161,4 +161,19 @@ class StockCommandPostgresTest {
    assertEquals(0,jdbc.queryForObject("SELECT COUNT(*) FROM mulino_inventory_QuantityMovements WHERE sourceId=?",Integer.class,source));
   } finally {release.countDown();pool.shutdownNow();}
  }
+
+ @Test void multiSourceGrantMustAuthorizeEveryConsumedParent(){
+  doAnswer(call->{Map<String,Collection<String>> scopes=call.getArgument(2);if(scopes.get("TARGET").contains(right))throw new org.springframework.security.access.AccessDeniedException("Unavailable scope");return null;}).when(authorizer).authorizeScopes(any(),eq("mergeQuantity"),anyMap());
+  var merge=intent("mergeQuantity",Map.of("segmentIds",List.of(left,right),"expectedRevisions",Map.of(left,0,right,0),"occurredAt",at.toString(),"evidenceRef","w"));
+  assertThrows(org.springframework.security.access.AccessDeniedException.class,()->tx(()->commands.execute(context(),merge)));
+  assertEquals(2,jdbc.queryForObject("SELECT COUNT(*) FROM mulino_inventory_QuantitySegments WHERE id IN (?,?) AND retiredAt IS NULL",Integer.class,left,right));
+ }
+
+ @Test void stocktakeAdjustmentCannotBeAppliedTwiceUnderNewCommandKey(){
+  String count=tx(()->stock.stocktake(context(),source,"110","EA",at,"count",id(340)));
+  var corrected=tx(()->stock.adjust(context(),source,count,"10","EA","INCREASE",at,"approved",id(341),"count reconciliation"));
+  assertEquals("110.000000000000",jdbc.queryForObject("SELECT quantity::text FROM mulino_inventory_QuantitySegments WHERE id=?",String.class,corrected.getFirst()));
+  assertThrows(DomainError.class,()->tx(()->stock.adjust(context(),source,count,"10","EA","INCREASE",at,"approved",id(342),"repeat")));
+  assertEquals(1,jdbc.queryForObject("SELECT COUNT(*) FROM mulino_inventory_StockAdjustments WHERE stocktakeId=?",Integer.class,count));
+ }
 }

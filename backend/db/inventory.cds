@@ -216,3 +216,9 @@ entity SegmentAllocations {
  orderLineId : UUID; quantity : Decimal(38,12); unit : String(40); state : String(40);
  predecessorId : UUID; commandId : UUID;
 }
+entity StockAdjustments {
+ key organizationId : UUID; key ID : UUID; revision : Integer;
+ createdAt : Timestamp; recordedAt : Timestamp; stocktakeId : UUID; segmentId : UUID;
+ direction : String(40); quantity : Decimal(38,12); unit : String(40);
+ occurredAt : Timestamp; reason : String(240); evidenceRef : String(240); commandId : UUID;
+}
