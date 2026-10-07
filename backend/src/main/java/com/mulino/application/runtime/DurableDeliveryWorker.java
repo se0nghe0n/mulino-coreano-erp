@@ -25,11 +25,8 @@ public class DurableDeliveryWorker {
     Optional<Map<String,Object>> claimed;
     try{claimed=service.claimDelivery(c,worker,operation,adapter.support(operation),3,Duration.ofSeconds(5));}catch(org.springframework.security.access.AccessDeniedException|DomainError denied){return;}
     if(claimed.isEmpty())return;var delivery=claimed.get();
-    ExternalDeliveryAdapter.Result result;
-    try{var payload=json.readValue((String)delivery.get("payloadjson"),Map.class);result=adapter.deliver((String)delivery.get("operation"),(String)delivery.get("externaloperationid"),payload);}
-    catch(RuntimeException failure){result=ExternalDeliveryAdapter.Result.UNKNOWN;}
-    try{service.deliveryResult(c,(String)delivery.get("id"),((Number)delivery.get("fencingtoken")).longValue(),worker,result,null);}
-    catch(DomainError expired){/* intent is durable; expiry recovery will require reconciliation */}
+    try{service.deliverUnderFence(c,(String)delivery.get("id"),((Number)delivery.get("fencingtoken")).longValue(),worker,adapter);}
+    catch(org.springframework.security.access.AccessDeniedException|DomainError held){/* Durable intent remains for recovery; no external effect on denial. */}
     delivered[0]++;
    });
   }

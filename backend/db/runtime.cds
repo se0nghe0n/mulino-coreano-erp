@@ -33,6 +33,8 @@ entity RecoverySchedules {
  key organizationId: UUID; key ID: UUID; workId: UUID not null;
  kind: String(80) not null; nextCheckAt: Timestamp not null;
  nextValidityBoundary: Timestamp; pendingAssessment: Boolean not null;
+ recoveryStatus: String(40) not null; lastOutcome: String(80);
+ lastCheckedAt: Timestamp; attemptCount: Integer not null;
  ownerId: UUID not null; supervisorId: UUID not null;
  nextAction: String(500) not null; revision: Integer not null;
 }

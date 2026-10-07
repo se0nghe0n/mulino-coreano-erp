@@ -82,7 +82,7 @@ class RuntimePostgresTest {
  }
  @Test void unknownExternalCannotBeClaimedAgainEvenWithIdempotencySupport(){
   var auth=mock(IdentityAuthorization.class);var duties=mock(RuntimeDutyPort.class);
-  var service=new RuntimeService(repo,new ExecutionClock(){@Override public Instant instant(){return now.get();}},auth,duties,mock(com.mulino.application.evidence.ExternalResultEvidenceGuard.class));
+  var service=new RuntimeService(repo,new ExecutionClock(){@Override public Instant instant(){return now.get();}},auth,duties,mock(com.mulino.application.evidence.ExternalResultEvidenceGuard.class),mock(org.springframework.beans.factory.ObjectProvider.class));
   String id=tx.execute(s->repo.enqueue(context(),"command-record-id","00000000-0000-0000-0000-000000000205","fixtureExternalEffect",Map.of("workId",WORK,"quantity","60")));
   var delivery=tx.execute(s->service.claimDelivery(context(),"worker-a","fixtureExternalEffect",new ExternalDeliveryAdapter.Support(true,true),3,Duration.ofSeconds(5)).orElseThrow());
   tx.execute(s->{service.deliveryResult(context(),id,((Number)delivery.get("fencingtoken")).longValue(),"worker-a",ExternalDeliveryAdapter.Result.UNKNOWN,null);return null;});
@@ -94,7 +94,7 @@ class RuntimePostgresTest {
  }
  @Test void crashAfterDeliveryIntentBecomesUnknownAndRetainsDuty(){
   var auth=mock(IdentityAuthorization.class);var duties=mock(RuntimeDutyPort.class);
-  var service=new RuntimeService(repo,new ExecutionClock(){@Override public Instant instant(){return now.get();}},auth,duties,mock(com.mulino.application.evidence.ExternalResultEvidenceGuard.class));
+  var service=new RuntimeService(repo,new ExecutionClock(){@Override public Instant instant(){return now.get();}},auth,duties,mock(com.mulino.application.evidence.ExternalResultEvidenceGuard.class),mock(org.springframework.beans.factory.ObjectProvider.class));
   String id=tx.execute(s->repo.enqueue(context(),"command-record-id","00000000-0000-0000-0000-000000000206","fixtureExternalEffect",Map.of("workId",WORK)));
   assertTrue(tx.execute(s->service.claimDelivery(context(),"dead-worker","fixtureExternalEffect",new ExternalDeliveryAdapter.Support(false,false),3,Duration.ofSeconds(5))).isPresent());
   now.set(T.plusSeconds(6));assertEquals(1,tx.execute(s->service.recoverExpiredDeliveries()).intValue());assertEquals(0,tx.execute(s->service.recoverExpiredDeliveries()).intValue());

@@ -35,7 +35,11 @@ public class RuntimeRepository implements CommandLeasePort,TransactionalOutboxPo
     long token=((Number)scope.get("fencingtoken")).longValue()+1;String id=UUID.randomUUID().toString();
     db.update("INSERT INTO mulino_runtime_ExecutionAttempts(organizationId,ID,workId,capabilityId,commandId,actorId,stableRequestOwner,leaseOwner,fencingToken,startedAt,heartbeatAt,leaseExpiresAt,status) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,'ACTIVE')",c.organizationId(),id,work,capability,command,c.actorId(),c.stableRequestOwner(),worker,token,at(now),at(now),at(now.plus(ttl)));
     db.update("UPDATE mulino_runtime_ExecutionScopes SET fencingToken=?,attemptId=? WHERE organizationId=? AND workId=? AND capabilityId=? AND commandId=?",token,id,c.organizationId(),work,capability,command);
-    return Optional.of(Map.of("attemptId",id,"leaseToken",token,"leaseOwner",worker,"workId",work,"capabilityId",capability,"commandId",command));
+    return Optional.of(Map.of("organizationId",c.organizationId(),"attemptId",id,"leaseToken",token,"leaseOwner",worker,"workId",work,"capabilityId",capability,"commandId",command));
+  }
+  public DomainContext resolveContext(Map<String,Object> claim,Instant now){
+    transaction();var rows=db.queryForList("SELECT * FROM mulino_runtime_ExecutionAttempts WHERE organizationId=? AND ID=?",claim.get("organizationId"),claim.get("attemptId"));
+    if(rows.size()!=1)throw conflict();var a=rows.getFirst();var c=new DomainContext((String)a.get("organizationid"),(String)a.get("actorid"),(String)a.get("stablerequestowner"),now,now);fenceAndVerify(c,claim);return c;
   }
   @Override public void fenceAndVerify(DomainContext c,Map<String,Object> claim){
     transaction();if(claim==null||claim.isEmpty())return;

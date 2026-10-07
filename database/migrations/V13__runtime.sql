@@ -51,6 +51,8 @@ CREATE TABLE mulino_runtime_RecoverySchedules (
  workId varchar(36) NOT NULL, kind varchar(80) NOT NULL,
  nextCheckAt timestamptz NOT NULL, nextValidityBoundary timestamptz,
  pendingAssessment boolean NOT NULL DEFAULT false,
+ recoveryStatus varchar(40) NOT NULL DEFAULT 'READY',
+ lastOutcome varchar(80), lastCheckedAt timestamptz, attemptCount integer NOT NULL DEFAULT 0,
  ownerId varchar(36) NOT NULL, supervisorId varchar(36) NOT NULL,
  nextAction varchar(500) NOT NULL, revision integer NOT NULL DEFAULT 0,
  PRIMARY KEY(organizationId,ID), UNIQUE(organizationId,workId,kind)
