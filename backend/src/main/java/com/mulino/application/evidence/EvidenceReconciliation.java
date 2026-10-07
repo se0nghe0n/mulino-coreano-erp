@@ -63,6 +63,7 @@ public class EvidenceReconciliation {
     var tradeProviders=tradeScopes.stream().filter(p->p.eventKinds().contains(event.get("kind"))).toList();
     if(tradeProviders.size()>1)throw new DomainError("HELD","POLICY_UNRESOLVED","Ambiguous trade evidence identity");
     boolean trade=!tradeProviders.isEmpty();
+    if(trade)sameQuantity=quantity==null?claim.get("quantity")==null:claim.get("quantity") instanceof BigDecimal tradeQuantity&&quantity.compareTo(tradeQuantity)==0&&Objects.equals(input.unit(),claim.get("unit"));
     boolean identity=false;
     if(trade&&input.physicalScopeId()!=null&&original){
       try{var scope=tradeProviders.getFirst().require(c,uuid(input.physicalScopeId()),claim,event,doc,blobs.read(UUID.fromString(doc.get("blobId").toString()),doc.get("sha256").toString()));auth.authorizeScopes(c,capability,scope.scopes());validateTrustedFields(scope.canonicalFields());identity=true;}catch(DomainError unavailable){if(!"EVIDENCE_UNVERIFIED".equals(unavailable.code()))throw unavailable;}
