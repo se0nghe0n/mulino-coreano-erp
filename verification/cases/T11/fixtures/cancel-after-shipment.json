@@ -512,6 +512,9 @@
     },
     "warehouse": {
       "type": "Human"
+    },
+    "TRANSFERPROPOSAL": {
+      "type": "DocumentVersion"
     }
   },
   "baseline": {
@@ -576,6 +579,11 @@
         "alias": "DOC",
         "content": "T11cancel-after-shipment",
         "sha256": "3462234616e31cf46fceffbba72585bef18403a5377b0fccb5f3e70183399ae4"
+      },
+      {
+        "alias": "TRANSFERPROPOSAL",
+        "content": "{\"acceptanceState\":\"NOT_ACCEPTED\",\"kind\":\"OBLIGATION_TRANSFER_PROPOSAL\",\"obligationAlias\":\"ROOT\",\"physicalScope\":[\"b01\",\"b02\",\"b03\",\"b04\",\"b05\",\"b06\",\"b07\",\"b08\",\"b09\",\"b10\"],\"proposerAlias\":\"A\",\"quantity\":{\"unit\":\"BOX\",\"value\":\"10\"},\"recipientAlias\":\"B\",\"sourceWorkAlias\":\"SOURCE\",\"targetWorkAlias\":\"TARGET\"}",
+        "sha256": "1c0cba1e4e714347b69ae30e25a27a93b5aeb65a225a6a237805d7a4e83e3bc6"
       }
     ],
     "segments": [
@@ -690,6 +698,15 @@
       "sha256": "3462234616e31cf46fceffbba72585bef18403a5377b0fccb5f3e70183399ae4",
       "sourceNamespace": "synthetic-warehouse",
       "externalEventId": "T11-cancel-after-shipment",
+      "sourceVersion": "1",
+      "occurredAt": "2026-10-07T00:00:00Z",
+      "recordedAt": "2026-10-07T04:00:00Z"
+    },
+    {
+      "alias": "TRANSFERPROPOSAL",
+      "sha256": "1c0cba1e4e714347b69ae30e25a27a93b5aeb65a225a6a237805d7a4e83e3bc6",
+      "sourceNamespace": "synthetic-source-owner-A",
+      "externalEventId": "T11-cancel-after-shipment-transfer-proposal",
       "sourceVersion": "1",
       "occurredAt": "2026-10-07T00:00:00Z",
       "recordedAt": "2026-10-07T04:00:00Z"

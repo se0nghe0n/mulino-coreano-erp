@@ -240,7 +240,7 @@
     만일 "A" 역할이 "shipped-db-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "shipped-db" 행동을 수행한다
     만일 "A" 역할이 "close-with-duty" 행동을 수행한다
-    만일 "A" 역할이 "transfer" 행동을 수행한다
+    만일 "B" 역할이 "transfer" 행동을 수행한다
     만일 "A" 역할이 "close" 행동을 수행한다
     만일 "A" 역할이 "after-db-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "after-db" 행동을 수행한다
@@ -255,6 +255,9 @@
     그러면 "residual-owner-owner" assertion으로 "업무 상태의 독립 판정 cancel-after-shipment. cancel-preservation의 독립 고정 기대값을 대조한다."를 확인한다
     그러면 "residual-owner-next-action" assertion으로 "업무 상태의 독립 판정 cancel-after-shipment. cancel-preservation의 독립 고정 기대값을 대조한다."를 확인한다
     그러면 "residual-owner-next-check" assertion으로 "업무 상태의 독립 판정 cancel-after-shipment. cancel-preservation의 독립 고정 기대값을 대조한다."를 확인한다
+    그러면 "recipient-authenticated-acceptance" assertion으로 "실제 scoped grant를 가진 B의 공개 명령과 저장된 audit가 인수 수락을 확인한다. proposal Document나 acceptedById 문자열로 수락을 대체하지 않는다."를 확인한다
+    그러면 "acceptance-and-assignment-one-transaction" assertion으로 "B의 수락 감사와 새 유효 assignment 생성은 같은 실제 transaction에서 확정한다."를 확인한다
+    그러면 "transfer-applied-before-close" assertion으로 "B가 잔여 의무를 실제 수락한 뒤 원 업무 취소를 허용한다. A의 수락 주장은 선행 조건을 대신하지 않는다."를 확인한다
 
   시나리오: blocking 업무 의존 순환은 두 번째 링크를 거부한다
     먼저 사례 파일 "verification/cases/T11/case.json"의 "dependency-cycle"를 준비한다

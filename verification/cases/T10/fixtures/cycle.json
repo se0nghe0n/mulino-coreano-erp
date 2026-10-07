@@ -512,6 +512,9 @@
     },
     "warehouse": {
       "type": "Human"
+    },
+    "BACKDOC": {
+      "type": "DocumentVersion"
     }
   },
   "baseline": {
@@ -574,8 +577,13 @@
     "documents": [
       {
         "alias": "DOC",
-        "content": "T10cycle",
-        "sha256": "85ef003df52160dbcf141e219f1f4f4c18741adb49c4906a61a18d4f76965456"
+        "content": "{\"acceptanceState\":\"NOT_ACCEPTED\",\"effectiveAt\":\"2026-10-07T01:00:00Z\",\"kind\":\"OBLIGATION_TRANSFER_PROPOSAL\",\"obligationAlias\":\"ROOT\",\"physicalScope\":[\"b01\",\"b02\",\"b03\",\"b04\",\"b05\",\"b06\",\"b07\",\"b08\",\"b09\",\"b10\"],\"proposerAlias\":\"A\",\"quantity\":{\"unit\":\"BOX\",\"value\":\"10\"},\"recipientAlias\":\"B\",\"sourceWorkAlias\":\"SOURCE\",\"targetWorkAlias\":\"TARGET\"}",
+        "sha256": "cf3800c97dec25393c4d879b26d34750452631d098251ab7b90f551836657ced"
+      },
+      {
+        "alias": "BACKDOC",
+        "content": "{\"acceptanceState\":\"NOT_ACCEPTED\",\"effectiveAt\":\"2026-10-07T02:00:00Z\",\"kind\":\"OBLIGATION_TRANSFER_PROPOSAL\",\"obligationAlias\":\"ROOT\",\"physicalScope\":[\"b01\",\"b02\",\"b03\",\"b04\",\"b05\",\"b06\",\"b07\",\"b08\",\"b09\",\"b10\"],\"proposerAlias\":\"B\",\"quantity\":{\"unit\":\"BOX\",\"value\":\"10\"},\"recipientAlias\":\"A\",\"sourceWorkAlias\":\"TARGET\",\"targetWorkAlias\":\"SOURCE\"}",
+        "sha256": "12779e65dffe894900f40e1420e45c0b6e209dfaa75be43e80e3817fbcd41057"
       }
     ],
     "segments": [],
@@ -662,9 +670,18 @@
   "evidence": [
     {
       "alias": "DOC",
-      "sha256": "85ef003df52160dbcf141e219f1f4f4c18741adb49c4906a61a18d4f76965456",
-      "sourceNamespace": "synthetic-warehouse",
-      "externalEventId": "T10-cycle",
+      "sha256": "cf3800c97dec25393c4d879b26d34750452631d098251ab7b90f551836657ced",
+      "sourceNamespace": "synthetic-source-owner-A",
+      "externalEventId": "T10-cycle-DOC-proposal",
+      "sourceVersion": "1",
+      "occurredAt": "2026-10-07T00:00:00Z",
+      "recordedAt": "2026-10-07T04:00:00Z"
+    },
+    {
+      "alias": "BACKDOC",
+      "sha256": "12779e65dffe894900f40e1420e45c0b6e209dfaa75be43e80e3817fbcd41057",
+      "sourceNamespace": "synthetic-source-owner-B",
+      "externalEventId": "T10-cycle-BACKDOC-proposal",
       "sourceVersion": "1",
       "occurredAt": "2026-10-07T00:00:00Z",
       "recordedAt": "2026-10-07T04:00:00Z"

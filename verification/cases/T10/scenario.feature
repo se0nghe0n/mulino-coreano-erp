@@ -132,7 +132,7 @@
     만일 "A" 역할이 "before-db-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before-db" 행동을 수행한다
     만일 "시스템" 역할이 "link-fault" 행동을 수행한다
-    만일 "A" 역할이 "transfer" 행동을 수행한다
+    만일 "B" 역할이 "transfer" 행동을 수행한다
     만일 "A" 역할이 "responsibility" 행동을 수행한다
     만일 "시스템" 역할이 "after-db" 행동을 수행한다
     그러면 "transfer-rollback" assertion으로 "의무 이전의 책임 원자성 link-failure. orphan-target-assignment의 독립 고정 기대값을 대조한다."를 확인한다
@@ -149,7 +149,7 @@
     만일 "시스템" 역할이 "setup" 행동을 수행한다
     만일 "A" 역할이 "before-db-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before-db" 행동을 수행한다
-    만일 "A" 역할이 "transfer" 행동을 수행한다
+    만일 "B" 역할이 "transfer" 행동을 수행한다
     만일 "A" 역할이 "responsibility" 행동을 수행한다
     만일 "시스템" 역할이 "after-db" 행동을 수행한다
     그러면 "transfer-rollback" assertion으로 "의무 이전의 책임 원자성 closed-target. orphan-target-assignment의 독립 고정 기대값을 대조한다."를 확인한다
@@ -166,7 +166,7 @@
     만일 "시스템" 역할이 "setup" 행동을 수행한다
     만일 "A" 역할이 "before-db-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before-db" 행동을 수행한다
-    만일 "A" 역할이 "transfer" 행동을 수행한다
+    만일 "B" 역할이 "transfer" 행동을 수행한다
     만일 "A" 역할이 "responsibility" 행동을 수행한다
     만일 "시스템" 역할이 "after-db" 행동을 수행한다
     그러면 "transfer-rollback" assertion으로 "의무 이전의 책임 원자성 missing-owner. orphan-target-assignment의 독립 고정 기대값을 대조한다."를 확인한다
@@ -183,7 +183,7 @@
     만일 "시스템" 역할이 "setup" 행동을 수행한다
     만일 "A" 역할이 "before-db-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before-db" 행동을 수행한다
-    만일 "A" 역할이 "transfer" 행동을 수행한다
+    만일 "B" 역할이 "transfer" 행동을 수행한다
     만일 "A" 역할이 "responsibility" 행동을 수행한다
     만일 "시스템" 역할이 "after-db" 행동을 수행한다
     그러면 "transfer-rollback" assertion으로 "의무 이전의 책임 원자성 missing-next-action. orphan-target-assignment의 독립 고정 기대값을 대조한다."를 확인한다
@@ -200,7 +200,7 @@
     만일 "시스템" 역할이 "setup" 행동을 수행한다
     만일 "A" 역할이 "before-db-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before-db" 행동을 수행한다
-    만일 "A" 역할이 "transfer" 행동을 수행한다
+    만일 "B" 역할이 "transfer" 행동을 수행한다
     만일 "A" 역할이 "responsibility" 행동을 수행한다
     만일 "시스템" 역할이 "after-db" 행동을 수행한다
     그러면 "transfer-rollback" assertion으로 "의무 이전의 책임 원자성 missing-next-check. orphan-target-assignment의 독립 고정 기대값을 대조한다."를 확인한다
@@ -217,9 +217,26 @@
     만일 "시스템" 역할이 "setup" 행동을 수행한다
     만일 "A" 역할이 "before-db-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before-db" 행동을 수행한다
-    만일 "A" 역할이 "transfer" 행동을 수행한다
+    만일 "A" 역할이 "impersonated-acceptance" 행동을 수행한다
+    만일 "A" 역할이 "after-impersonation-snapshot" 행동을 수행한다
+    만일 "시스템" 역할이 "after-impersonation-db" 행동을 수행한다
+    만일 "B" 역할이 "transfer" 행동을 수행한다
     만일 "A" 역할이 "responsibility" 행동을 수행한다
     만일 "시스템" 역할이 "after-db" 행동을 수행한다
+    그러면 "impersonation-rejected" assertion으로 "출발 담당 A의 acceptedById=B 주장은 인수자 수락이 아니다. 같은 입력의 실제 B 호출 전 원10/A 책임과 대상·outbox를 보존하고 A의 거부 감사를 남긴다."를 확인한다
+    그러면 "impersonation-works-unchanged" assertion으로 "출발 담당 A의 acceptedById=B 주장은 인수자 수락이 아니다. 같은 입력의 실제 B 호출 전 원10/A 책임과 대상·outbox를 보존하고 A의 거부 감사를 남긴다."를 확인한다
+    그러면 "impersonation-assignments-unchanged" assertion으로 "출발 담당 A의 acceptedById=B 주장은 인수자 수락이 아니다. 같은 입력의 실제 B 호출 전 원10/A 책임과 대상·outbox를 보존하고 A의 거부 감사를 남긴다."를 확인한다
+    그러면 "impersonation-obligations-unchanged" assertion으로 "출발 담당 A의 acceptedById=B 주장은 인수자 수락이 아니다. 같은 입력의 실제 B 호출 전 원10/A 책임과 대상·outbox를 보존하고 A의 거부 감사를 남긴다."를 확인한다
+    그러면 "impersonation-workLinks-unchanged" assertion으로 "출발 담당 A의 acceptedById=B 주장은 인수자 수락이 아니다. 같은 입력의 실제 B 호출 전 원10/A 책임과 대상·outbox를 보존하고 A의 거부 감사를 남긴다."를 확인한다
+    그러면 "impersonation-outbox-unchanged" assertion으로 "출발 담당 A의 acceptedById=B 주장은 인수자 수락이 아니다. 같은 입력의 실제 B 호출 전 원10/A 책임과 대상·outbox를 보존하고 A의 거부 감사를 남긴다."를 확인한다
+    그러면 "impersonation-source-open" assertion으로 "출발 담당 A의 acceptedById=B 주장은 인수자 수락이 아니다. 같은 입력의 실제 B 호출 전 원10/A 책임과 대상·outbox를 보존하고 A의 거부 감사를 남긴다."를 확인한다
+    그러면 "impersonation-source-owner" assertion으로 "출발 담당 A의 acceptedById=B 주장은 인수자 수락이 아니다. 같은 입력의 실제 B 호출 전 원10/A 책임과 대상·outbox를 보존하고 A의 거부 감사를 남긴다."를 확인한다
+    그러면 "impersonation-target-assignment0" assertion으로 "출발 담당 A의 acceptedById=B 주장은 인수자 수락이 아니다. 같은 입력의 실제 B 호출 전 원10/A 책임과 대상·outbox를 보존하고 A의 거부 감사를 남긴다."를 확인한다
+    그러면 "impersonation-root-open" assertion으로 "출발 담당 A의 acceptedById=B 주장은 인수자 수락이 아니다. 같은 입력의 실제 B 호출 전 원10/A 책임과 대상·outbox를 보존하고 A의 거부 감사를 남긴다."를 확인한다
+    그러면 "impersonation-root10" assertion으로 "출발 담당 A의 acceptedById=B 주장은 인수자 수락이 아니다. 같은 입력의 실제 B 호출 전 원10/A 책임과 대상·outbox를 보존하고 A의 거부 감사를 남긴다."를 확인한다
+    그러면 "impersonation-denial-audit" assertion으로 "출발 담당 A의 acceptedById=B 주장은 인수자 수락이 아니다. 같은 입력의 실제 B 호출 전 원10/A 책임과 대상·outbox를 보존하고 A의 거부 감사를 남긴다."를 확인한다
+    그러면 "recipient-authenticated-acceptance" assertion으로 "실제 scoped grant를 가진 B의 공개 명령과 저장된 audit가 인수 수락을 확인한다. proposal Document나 acceptedById 문자열로 수락을 대체하지 않는다."를 확인한다
+    그러면 "acceptance-and-assignment-one-transaction" assertion으로 "B의 수락 감사와 새 유효 assignment 생성은 같은 실제 transaction에서 확정한다."를 확인한다
     그러면 "transfer-applied" assertion으로 "의무 이전의 책임 원자성 successful-transfer. transfer-guard의 독립 고정 기대값을 대조한다."를 확인한다
     그러면 "source-transferred" assertion으로 "의무 이전의 책임 원자성 successful-transfer. transfer-guard의 독립 고정 기대값을 대조한다."를 확인한다
     그러면 "target-owner-one" assertion으로 "의무 이전의 책임 원자성 successful-transfer. transfer-guard의 독립 고정 기대값을 대조한다."를 확인한다
@@ -236,8 +253,8 @@
     만일 "시스템" 역할이 "setup" 행동을 수행한다
     만일 "A" 역할이 "before-db-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before-db" 행동을 수행한다
-    만일 "A" 역할이 "transfer" 행동을 수행한다
-    만일 "B" 역할이 "back-transfer" 행동을 수행한다
+    만일 "B" 역할이 "transfer" 행동을 수행한다
+    만일 "A" 역할이 "back-transfer" 행동을 수행한다
     만일 "A" 역할이 "responsibility" 행동을 수행한다
     만일 "시스템" 역할이 "after-db" 행동을 수행한다
     그러면 "transfer-applied" assertion으로 "의무 이전의 책임 원자성 cycle. transfer-guard의 독립 고정 기대값을 대조한다."를 확인한다
@@ -258,9 +275,26 @@
     만일 "시스템" 역할이 "setup" 행동을 수행한다
     만일 "A" 역할이 "before-db-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before-db" 행동을 수행한다
-    만일 "A" 역할이 "partial-transfer" 행동을 수행한다
+    만일 "A" 역할이 "impersonated-acceptance" 행동을 수행한다
+    만일 "A" 역할이 "after-impersonation-snapshot" 행동을 수행한다
+    만일 "시스템" 역할이 "after-impersonation-db" 행동을 수행한다
+    만일 "B" 역할이 "partial-transfer" 행동을 수행한다
     만일 "A" 역할이 "after-db-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "after-db" 행동을 수행한다
+    그러면 "impersonation-rejected" assertion으로 "출발 담당 A의 acceptedById=B 주장은 인수자 수락이 아니다. 같은 입력의 실제 B 호출 전 원10/A 책임과 대상·outbox를 보존하고 A의 거부 감사를 남긴다."를 확인한다
+    그러면 "impersonation-works-unchanged" assertion으로 "출발 담당 A의 acceptedById=B 주장은 인수자 수락이 아니다. 같은 입력의 실제 B 호출 전 원10/A 책임과 대상·outbox를 보존하고 A의 거부 감사를 남긴다."를 확인한다
+    그러면 "impersonation-assignments-unchanged" assertion으로 "출발 담당 A의 acceptedById=B 주장은 인수자 수락이 아니다. 같은 입력의 실제 B 호출 전 원10/A 책임과 대상·outbox를 보존하고 A의 거부 감사를 남긴다."를 확인한다
+    그러면 "impersonation-obligations-unchanged" assertion으로 "출발 담당 A의 acceptedById=B 주장은 인수자 수락이 아니다. 같은 입력의 실제 B 호출 전 원10/A 책임과 대상·outbox를 보존하고 A의 거부 감사를 남긴다."를 확인한다
+    그러면 "impersonation-workLinks-unchanged" assertion으로 "출발 담당 A의 acceptedById=B 주장은 인수자 수락이 아니다. 같은 입력의 실제 B 호출 전 원10/A 책임과 대상·outbox를 보존하고 A의 거부 감사를 남긴다."를 확인한다
+    그러면 "impersonation-outbox-unchanged" assertion으로 "출발 담당 A의 acceptedById=B 주장은 인수자 수락이 아니다. 같은 입력의 실제 B 호출 전 원10/A 책임과 대상·outbox를 보존하고 A의 거부 감사를 남긴다."를 확인한다
+    그러면 "impersonation-source-open" assertion으로 "출발 담당 A의 acceptedById=B 주장은 인수자 수락이 아니다. 같은 입력의 실제 B 호출 전 원10/A 책임과 대상·outbox를 보존하고 A의 거부 감사를 남긴다."를 확인한다
+    그러면 "impersonation-source-owner" assertion으로 "출발 담당 A의 acceptedById=B 주장은 인수자 수락이 아니다. 같은 입력의 실제 B 호출 전 원10/A 책임과 대상·outbox를 보존하고 A의 거부 감사를 남긴다."를 확인한다
+    그러면 "impersonation-target-assignment0" assertion으로 "출발 담당 A의 acceptedById=B 주장은 인수자 수락이 아니다. 같은 입력의 실제 B 호출 전 원10/A 책임과 대상·outbox를 보존하고 A의 거부 감사를 남긴다."를 확인한다
+    그러면 "impersonation-root-open" assertion으로 "출발 담당 A의 acceptedById=B 주장은 인수자 수락이 아니다. 같은 입력의 실제 B 호출 전 원10/A 책임과 대상·outbox를 보존하고 A의 거부 감사를 남긴다."를 확인한다
+    그러면 "impersonation-root10" assertion으로 "출발 담당 A의 acceptedById=B 주장은 인수자 수락이 아니다. 같은 입력의 실제 B 호출 전 원10/A 책임과 대상·outbox를 보존하고 A의 거부 감사를 남긴다."를 확인한다
+    그러면 "impersonation-denial-audit" assertion으로 "출발 담당 A의 acceptedById=B 주장은 인수자 수락이 아니다. 같은 입력의 실제 B 호출 전 원10/A 책임과 대상·outbox를 보존하고 A의 거부 감사를 남긴다."를 확인한다
+    그러면 "recipient-authenticated-acceptance" assertion으로 "실제 scoped grant를 가진 B의 공개 명령과 저장된 audit가 인수 수락을 확인한다. proposal Document나 acceptedById 문자열로 수락을 대체하지 않는다."를 확인한다
+    그러면 "acceptance-and-assignment-one-transaction" assertion으로 "B의 수락 감사와 새 유효 assignment 생성은 같은 실제 transaction에서 확정한다."를 확인한다
     그러면 "partial-applied" assertion으로 "부분 이전4와 잔여6의 root10을 중복 없이 보존한다 False. current-assignments의 독립 고정 기대값을 대조한다."를 확인한다
     그러면 "transferred-quantity" assertion으로 "부분 이전4와 잔여6의 root10을 중복 없이 보존한다 False. transferred-scope의 독립 고정 기대값을 대조한다."를 확인한다
     그러면 "remaining-quantity" assertion으로 "부분 이전4와 잔여6의 root10을 중복 없이 보존한다 False. remaining-scope의 독립 고정 기대값을 대조한다."를 확인한다
@@ -284,7 +318,7 @@
     만일 "A" 역할이 "before-db-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before-db" 행동을 수행한다
     만일 "시스템" 역할이 "partial-fault" 행동을 수행한다
-    만일 "A" 역할이 "partial-transfer" 행동을 수행한다
+    만일 "B" 역할이 "partial-transfer" 행동을 수행한다
     만일 "A" 역할이 "after-db-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "after-db" 행동을 수행한다
     그러면 "partial-rejected" assertion으로 "부분 이전4와 잔여6의 root10을 중복 없이 보존한다 True. current-assignments의 독립 고정 기대값을 대조한다."를 확인한다

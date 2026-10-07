@@ -1,0 +1,79 @@
+{
+  "recordType": "RECIPIENT_ACCEPTANCE_CONTRACT_REVIEW_FIX",
+  "baselineCommit": "f426712fcd1bcfc1ed71a1beb9aa80ec3051e182",
+  "workingTreeDirtyDuringChecks": true,
+  "ownedSubcasesAdded": 0,
+  "caseCounts": {
+    "T10": {
+      "subcases": 19,
+      "assertions": 197
+    },
+    "T11": {
+      "subcases": 12,
+      "assertions": 110
+    }
+  },
+  "focusedChecks": {
+    "command": [
+      "./mvnw",
+      "-B",
+      "-ntp",
+      "-f",
+      "verification/harness/pom.xml",
+      "-Dtest=RecipientAcceptanceAssertionTest,WorkAssertionTest",
+      "test"
+    ],
+    "exitCode": 0,
+    "tests": 19,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "schemaAndFeaturePreparation": "PASS",
+    "observedEvidenceType": "CANNED_CONTRACT_SELFTEST"
+  },
+  "contractRed": {
+    "command": [
+      "./verify",
+      "contract-red",
+      "verification/cases/T10/case.json",
+      "verification/cases/T11/case.json"
+    ],
+    "exitCode": 1,
+    "expectedScenarios": 31,
+    "discoveredScenarios": 31,
+    "notImplementedAssertionFailures": 31,
+    "skippedScenarios": 0,
+    "meaningfulRedConfirmed": true
+  },
+  "originalAssertionsPreserved": "PASS by JSON equality against baseline per subcase/assertion ID",
+  "utf8DocumentHashCheck": "PASS",
+  "diffWhitespaceCheck": "PASS",
+  "productRuntimeStatus": "NOT_RUN",
+  "actualDatabaseApiMcpModelClaimed": false,
+  "fixtureOrSourceHashes": {
+    "verification/cases/T10/README.md": "955ca6021102a3988a09f73d083b8e902b5d1d5569b619f225ad1234097caf7e",
+    "verification/cases/T10/case.json": "77a533958fada13b11f2c45070dc143aa358748b8bda0916b7bbba9338e12c7c",
+    "verification/cases/T10/fixtures/closed-target.json": "3a83e49c6aceedf4db7e9f15520fd9d8d9ba36f9096d91eb008e7a7ed30a2f97",
+    "verification/cases/T10/fixtures/cycle.json": "21268cf526ec770dc92f7b16cda22cfdf2412bad16d9d89e1a6a7d55cee8e90d",
+    "verification/cases/T10/fixtures/link-failure.json": "952599d961b3abe8377eec61062e70de75d7650afae53670aff05393b8c9b3f0",
+    "verification/cases/T10/fixtures/missing-next-action.json": "aeb0e5583fea89d596148494c47c7f9c609ac87a849078d6a99d3c0714e68ad4",
+    "verification/cases/T10/fixtures/missing-next-check.json": "18a9e46ba4e84ab254c3078f5ab2bb6ee85960264f8ec1dabefad39652e63783",
+    "verification/cases/T10/fixtures/missing-owner.json": "6c052fd568afda50b7d3b90eff2bb79e4b993c8455ba313382cb23defa838a57",
+    "verification/cases/T10/fixtures/partial-commit.json": "5d95d4ca09ef0c114f4fe35cc89be67edd024fcb2e507231057aac6141382e1f",
+    "verification/cases/T10/fixtures/partial-failure.json": "e67143358d25a7118502b2fce8613e86fddfec6790a515e97c6f3063dafb545b",
+    "verification/cases/T10/fixtures/successful-transfer.json": "47da510137d4c7f7d00d67ae1d53ae3f12396a7c358a65781f9494b6eeb631ea",
+    "verification/cases/T10/scenario.feature": "2c9d861c30adb20c43f6c6f11fbcc12890d1c37045af048861803611666cc4ff",
+    "verification/cases/T11/case.json": "3eded483b57309c54cf0274b8dc52908a7f67bfbd5283927bab7478d3b254edf",
+    "verification/cases/T11/fixtures/cancel-after-shipment.json": "315cd806be95bd8fea3c581bcaba9e90336c33bc5012026995cd984da206a6b6",
+    "verification/cases/T11/scenario.feature": "b1f17654d27dc5902e0ad8c1beae6eb8bee40cc215ca42d29c8c0d4fa47ac314",
+    "verification/harness/src/test/java/org/mulino/verification/cases/work/RecipientAcceptanceAssertionTest.java": "0b980491effde75203ec3accb954cbb325a3eaa9d0c9851384bdc4403958ce89"
+  },
+  "evidenceArtifacts": [
+    "focused-maven.txt",
+    "RecipientAcceptanceAssertionTest.txt",
+    "WorkAssertionTest.txt",
+    "feature-red-summary.json",
+    "red-wrapper-commands.json",
+    "tool-versions.txt"
+  ]
+}

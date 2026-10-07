@@ -32,3 +32,15 @@ oracleExplanation과 oracleRef에 보존한다. 서버 의미 Boolean을 답안�
 
 fixture의 DocumentVersion.content는 UTF-8 원문이다. sha256는 해당
 원문의 실제 bytes에서 계산했으며 토큰이나 credential을 담지 않는다.
+
+전체·부분 이전은 A가 같은 slots로 B를 사칭하는 요청을 먼저 제출한다.
+독립 전후 원행에서 원 assignment OPEN/A·root10·대상 assignment0·
+workLinks·outbox 보존과 A의 REJECTED audit를 확인한 뒤 B가 직접
+수락한다. fixture의 DOC는 범위·수량이 명시된 A의 NOT_ACCEPTED proposal이며
+수락 사실을 seed하지 않는다. 실제 B 인증·현재 grant를 적용한 공개
+transferObligation 호출과 B의 APPLIED audit가 수락이며, 해당 audit와
+대상 assignment의 transaction identity를 비교한다.
+
+실패 사례도 실제 인수자 B가 호출한다. cycle의 역방향은 실제 인수자 A가
+호출하고 별도 BACKDOC proposal을 쓴다. 따라서 잘못된 수락 주체에 대한
+일반 거부가 link fault·target 조건·cycle·부분 rollback을 대신하지 않는다.
