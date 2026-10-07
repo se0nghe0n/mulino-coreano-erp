@@ -36,21 +36,26 @@ public class ApplicationCommands {
   }
   public Map<String,Object> execute(Map<String,Object> input){return execute(input,Map.of());}
   /** Internal runtime entrypoint; executionClaim is server-issued and never accepted by public adapters. */
-  public Map<String,Object> execute(Map<String,Object> input,Map<String,Object> serverExecutionClaim){
+  public Map<String,Object> execute(Map<String,Object> input,Map<String,Object> serverExecutionClaim){return executeInternal(input,serverExecutionClaim,false);}
+  /** Internal worker entrypoint; identity is resolved from the fenced persistent claim, never payload. */
+  public Map<String,Object> executeClaimed(Map<String,Object> input,Map<String,Object> serverExecutionClaim){
+    if(serverExecutionClaim.isEmpty())throw DomainError.forbidden();return executeInternal(input,serverExecutionClaim,true);
+  }
+  private Map<String,Object> executeInternal(Map<String,Object> input,Map<String,Object> serverExecutionClaim,boolean claimed){
     Map<String,Object> intent;
     try{intent=typed(input,true);}catch(DomainError failure){return failure.response();}
     String hash=CommandRequests.hash(intent);
     if(intent.containsKey("canonicalIntentHash")&&!hash.equals(intent.get("canonicalIntentHash")))return new DomainError("CONFLICT","IDEMPOTENCY_CONFLICT","Canonical intent changed").response();
-    for(int attempt=0;attempt<3;attempt++)try{return transaction.execute(status->apply(intent,hash,serverExecutionClaim));}
-    catch(DomainError failure){return reject(intent,hash,failure);}
-    catch(AccessDeniedException failure){return reject(intent,hash,DomainError.forbidden());}
+    for(int attempt=0;attempt<3;attempt++)try{return transaction.execute(status->apply(intent,hash,serverExecutionClaim,claimed));}
+    catch(DomainError failure){return reject(intent,hash,failure,serverExecutionClaim,claimed);}
+    catch(AccessDeniedException failure){return reject(intent,hash,DomainError.forbidden(),serverExecutionClaim,claimed);}
     catch(RuntimeException failure){if(transientFailure(failure)&&attempt<2)continue;throw failure;}
     throw new IllegalStateException("Unreachable retry state");
   }
   private Map<String,Object> typed(Map<String,Object> input,boolean executing){Map<String,Object> intent=new LinkedHashMap<>(CommandRequests.parse(input,executing));CommandHandler h=handlers.get(intent.get("capabilityId"));if(h!=null)intent.putIfAbsent("capabilityVersion",h.semanticVersion());else intent.putIfAbsent("capabilityVersion","UNKNOWN");return Map.copyOf(intent);}
   private CommandHandler handler(Map<String,Object> intent){CommandHandler h=handlers.get(intent.get("capabilityId"));if(h==null||!h.semanticVersion().equals(intent.get("capabilityVersion"))||!h.intentKinds().contains(intent.get("intentKind")))throw DomainError.unsupported();return h;}
-  private Map<String,Object> apply(Map<String,Object> intent,String hash,Map<String,Object> claim){
-    DomainContext c=auth.context(clock.instant(),clock.instant());String cap=(String)intent.get("capabilityId"),key=(String)intent.get("commandIdempotencyKey");
+  private Map<String,Object> apply(Map<String,Object> intent,String hash,Map<String,Object> claim,boolean claimed){
+    DomainContext c=claimed?leases.getObject().resolveContext(claim,clock.instant()):auth.context(clock.instant(),clock.instant());String cap=(String)intent.get("capabilityId"),key=(String)intent.get("commandIdempotencyKey");
     CommandHandler h=handler(intent);definitions.verify(c,intent,h);CommandPreparation initial=h.prepare(c,intent);
     List<String> fences=new ArrayList<>(initial.fenceKeys());fences.add("command:"+c.stableRequestOwner()+":"+cap+":"+key);repository.fence(c,fences);
     CommandGuard current=guard.getIfAvailable();if(current==null)throw new DomainError("REJECTED","POLICY_UNRESOLVED","Current command guard unavailable");current.fence(c,initial);
@@ -72,9 +77,9 @@ public class ApplicationCommands {
     result.putIfAbsent("effects",Map.of());repository.finish(c,id,intent,hash,result,clock.instant());return result;
   }
   /** Expected denial audit is committed separately only after the effect transaction rolled back. */
-  private Map<String,Object> reject(Map<String,Object> intent,String hash,DomainError failure){
+  private Map<String,Object> reject(Map<String,Object> intent,String hash,DomainError failure,Map<String,Object> claim,boolean claimed){
     Map<String,Object> result=failure.response();
-    return denial.execute(status->{DomainContext c;try{c=auth.context(clock.instant(),clock.instant());}catch(AccessDeniedException unauthenticated){return result;}
+    return denial.execute(status->{DomainContext c;try{c=claimed?leases.getObject().resolveContext(claim,clock.instant()):auth.context(clock.instant(),clock.instant());}catch(AccessDeniedException|DomainError unauthenticated){return result;}
       String cap=(String)intent.get("capabilityId"),key=(String)intent.get("commandIdempotencyKey");repository.fence(c,List.of("command:"+c.stableRequestOwner()+":"+cap+":"+key));var old=repository.find(c,cap,key);
       if(old.isPresent())return result;String id=repository.begin(c,intent,hash,clock.instant(),false);repository.finish(c,id,intent,hash,result,clock.instant());return result;});
   }
