@@ -9,8 +9,9 @@ public interface TradeEvidenceScopePort {
   /** Reject EVIDENCE_UNVERIFIED when original/event/claim differ from the exact server scope. */
   Scope require(DomainContext context,String physicalScopeId,Map<String,Object> claim,
       Map<String,Object> event,Map<String,Object> document,byte[] original);
-  record Scope(Map<String,Object> canonicalFields,Map<String,List<String>> scopes,String occurrenceIdentity) {
-    public Scope(Map<String,Object> canonicalFields,Map<String,List<String>> scopes){this(canonicalFields,scopes,null);}
+  record Scope(Map<String,Object> canonicalFields,Map<String,List<String>> scopes,String occurrenceIdentity,String semanticHash) {
+    public Scope(Map<String,Object> canonicalFields,Map<String,List<String>> scopes){this(canonicalFields,scopes,null,null);}
+    public Scope(Map<String,Object> canonicalFields,Map<String,List<String>> scopes,String occurrenceIdentity){this(canonicalFields,scopes,occurrenceIdentity,null);}
     public Scope {canonicalFields=Map.copyOf(canonicalFields);scopes=Map.copyOf(scopes);}
   }
 }

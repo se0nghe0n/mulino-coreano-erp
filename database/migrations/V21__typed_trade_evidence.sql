@@ -1,5 +1,8 @@
 -- Typed decisions have immutable occurrence identity distinct from physical coordinates.
-ALTER TABLE mulino_evidence_CanonicalOccurrences ADD occurrenceIdentity varchar(36);
+ALTER TABLE mulino_evidence_CanonicalOccurrences ADD occurrenceIdentity varchar(36), ADD occurrenceSemanticHash varchar(64);
+ALTER TABLE mulino_evidence_CanonicalOccurrences ADD CHECK(
+ (occurrenceIdentity IS NULL AND occurrenceSemanticHash IS NULL) OR
+ (occurrenceIdentity IS NOT NULL AND occurrenceSemanticHash ~ '^[a-f0-9]{64}$'));
 DROP INDEX evidence_canonical_original;
 CREATE UNIQUE INDEX evidence_canonical_original
  ON mulino_evidence_CanonicalOccurrences(organizationId,physicalScopeId,kind,effectiveFrom)
