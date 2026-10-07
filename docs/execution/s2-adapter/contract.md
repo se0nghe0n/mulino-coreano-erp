@@ -69,3 +69,12 @@ runner는 자신이 만든 container·backend PID·임시 key/blob directory만
 hash와 cleanup 결과를 남긴다. JWT·credential·환경 전체 dump는 남기지
 않는다. 서버와 clock·공통 pipeline이 통합되지 않았으면 성공을 추정하지
 않고 NOT_RUN 또는 실제 실패를 기록한다.
+
+## 현재 확인한 결과
+
+`checks.json`의 좁은 검사에서는 Java release 21 compile과 12개 test가
+통과했다. 최초 binding test 오류는 `repo.root`의 `..`를 기준 경로에서
+정규화하지 않은 문제였고 `5b07637`에서 수정했다. 최초·최종 로그와
+실제 Surefire XML을 압축하여 함께 남긴다. 이 결과는 isolated HTTP
+transport와 binding·fixture schema 검사다. 통합 backend의 native S2
+업무 probe는 아직 실행하지 않았으며 해당 결과는 NOT_RUN이다.

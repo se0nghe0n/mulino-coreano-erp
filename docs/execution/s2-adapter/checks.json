@@ -1,0 +1,49 @@
+{
+  "recordType": "S2_ADAPTER_PLUMBING_CHECKS",
+  "codeCommit": "5b07637a3ccd0a790b7c0525755ceb6e12ff9fdd",
+  "status": "PASS",
+  "productRuntimeAcceptance": "NOT_RUN",
+  "fullCaseGateComplete": false,
+  "testCounts": {
+    "executed": 12,
+    "passed": 12,
+    "failed": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "command": "./mvnw -B -ntp -f verification/harness/pom.xml -Dtest=ActualS2TransportTest,ActualS2BindingTest,ActualAdapterContractTest test",
+  "exitCode": 0,
+  "checks": [
+    "Java release 21 compilation",
+    "actual isolated HTTP command/record paths and concurrent terminal receipts",
+    "explicit identity mapping retains fixture clock/grant/hash",
+    "native fixture schema and exact capability semanticVersion",
+    "default and RED driver separation",
+    "unknown source/snapshot rejection",
+    "signed JWT transport isolation",
+    "sh -n verification/actual/s2/run.sh",
+    "Python AST parse and authored JSON parse",
+    "git diff --check"
+  ],
+  "initialFailure": {
+    "cause": "Unnormalized Maven repo.root containing /../.. failed explicit binding path containment",
+    "fixedBy": "5b07637",
+    "originalResult": "11 pass, 1 error"
+  },
+  "notRun": [
+    "Integrated product NativeS2WorkMain against S2 backend/JAR",
+    "Normative T/C/V/E cases with all assertions",
+    "Independent API projection hash reconstruction",
+    "Host process restart/barrier/worker controls",
+    "Full baseline work/obligation/evidence fixture mapping",
+    "Paid product model acceptance",
+    "BTP/production/regulatory acceptance"
+  ],
+  "artifacts": {
+    "docs/execution/s2-adapter/TEST-org.mulino.verification.actual.ActualAdapterContractTest.xml.gz": "1294b6c445f64ce5971d464493ac74f76dce15d84b78132ae5ba562082b9ae75",
+    "docs/execution/s2-adapter/TEST-org.mulino.verification.actual.ActualS2BindingTest.xml.gz": "5d552b3e90261271054cc234b3f10b59468ba49bd09056a2a5919726e2f05af1",
+    "docs/execution/s2-adapter/TEST-org.mulino.verification.actual.ActualS2TransportTest.xml.gz": "d476e07cb9082bb99824827fd995ee721080f854de0d208d6bcc74986743411c",
+    "docs/execution/s2-adapter/final-narrow.log.gz": "7de60e032d1052a6318c43b3e1438693612e88a24fa157912264a2ebd3eb77cc",
+    "docs/execution/s2-adapter/initial-binding-path-error.log.gz": "7baecb4fcb0a5fd37629e86b926c512d415c4c4b7580c68a183cedb8028d57f0"
+  }
+}
