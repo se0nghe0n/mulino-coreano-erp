@@ -181,8 +181,8 @@ runner와 전체 coverage assembler에 연결되지 않았다. Step2에서는
 | 시스템 Step | 인수 범위 | 상태 |
 |---|---|---|
 | S0 | 추적·stack spike·schema/auth/MCP 기준선 | COMPLETE |
-| S1 | core·정의·증거·신원·두 진입점 읽기 | ACTIVE |
-| S2 | 목표·책임·거래·승인·idem·감사·복구 | NOT_RUN |
+| S1 | core·정의·증거·신원·두 진입점 읽기 | COMPLETE |
+| S2 | 목표·책임·거래·승인·idem·감사·복구 | ACTIVE |
 | S3 | 구매·운송·수입·수령·QC | NOT_RUN |
 | S4 | 판매·반품·회수·정산·E1 | NOT_RUN |
 | S5 | MCP·skills/client/model·정의 전환 | NOT_RUN |
@@ -290,3 +290,19 @@ CAP/CQN 기반으로, R3는 실제 자료 없이 새 DB로 시작하는 것으�
 고정하며 같은 기준선의 독립 worktree에서 실제 Sol6.1 medium으로
 신원·정의·물량·증거·공통 읽기 및 실제 인수 adapter를 구현한다.
 사용자 Step3 전체와 운영/model/BTP 인수는 여전히 미완료다.
+
+
+## 현재 gate: S1 완료, S2 시작
+
+[S1 통합 기록](step-3-s1.md)의 여섯 산출물을 통합했다. Task35c810e에서
+전체 backend64·harness417 tests가 실패/skip 없이 통과했다. 준비 검사는
+41 case·789 subcase·20473 assertion PREPARED다. 별도 native 실행의
+필수 version fixture 누락을 수정한 Taska59ee02에서 새 PG·실제 서명
+HTTP·독립 JDBC21 assertions가 통과했다. backend/DB 입력은64 PASS 때와
+차이0이며 같은 JAR hash를 실행했다. 실패와 통과 증거를 모두 보존했다.
+
+S1은 COMPLETE이며 다음 공통 baseline을 로컬 tag `step3-s1-complete`로
+고정한다. S2에서 업무·목표·책임·현재 인가·승인·멱등성·감사·outbox·
+복구를 구현한다. 기존 read reference는 같은 거래의 권위 상태와
+결합하며 독립 shadow state로 유지하지 않는다. 사용자 Step3와
+전체 T/C/V/E·운영/model/BTP 인수는 계속 미완료다.

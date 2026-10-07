@@ -1,0 +1,128 @@
+{
+  "codeCommit": "a59ee02d46d4e475ddb646540d1169a63bb2c1e5",
+  "recordedAt": "2026-10-07T17:42:51.779106+00:00",
+  "s1Gate": "COMPLETE",
+  "userStep3": "ACTIVE",
+  "fullTcvEProductGate": "NOT_RUN",
+  "command": "./verify actual-s1 /tmp/mulino-s1-native-a836",
+  "status": "PASS",
+  "boundedNativeAssertions": 21,
+  "sourceInputHashDrift": 0,
+  "executedJarSha256": "2ecb10885d529009ef4b631a9524147fb41c1d40c6ebb38e0ee421f1750f2b19",
+  "backend64PassCodeCommit": "35c810e1843b28da53dc4f21f6461d9e17af3098",
+  "backendAndDatabaseInputDriftSince64Pass": 0,
+  "backendAndHarnessEvidence": "../35c810e/summary.json",
+  "focusedFinalAdapterTests": 9,
+  "focusedFinalAdapterEvidence": "../../../s1-adapter/fixture-dependency-tests.xml",
+  "cleanup": {
+    "backendStopped": true,
+    "createdContainerRemoved": true,
+    "ephemeralKeyDirectoryRemoved": true,
+    "ephemeralBlobDirectoryRemoved": true
+  },
+  "limitation": "Bounded S1 reads and S1 schema/auth/evidence tests passed. Full T/C/V/E, Work lifecycle, eligibility, receipt, runtime, actual client/model and BTP remain later gates.",
+  "artifacts": [
+    {
+      "artifact": "actual-s1-native.json.gz",
+      "rawSha256": "3bb1e4e140db7eaf0b2720b0b7a95808ab06aa2140d2de7d6a2f9bfa187f6190",
+      "gzipSha256": "6dc978d12b5b8649218b65a58455e3c6dc7714056fa1ce7ad86b50f656ae0e7e",
+      "rawBytes": 19124
+    },
+    {
+      "artifact": "backend-loopback-url.txt.gz",
+      "rawSha256": "3610395a2d04490996074578541c72438560e5f14e37cf945bc5e6cddaa92c9e",
+      "gzipSha256": "43dbf183446599240183b64d191e4f8a46b20bac869dc5ef6a084623d9b318c6",
+      "rawBytes": 23
+    },
+    {
+      "artifact": "backend-runtime.log.gz",
+      "rawSha256": "1a15aea0c9568b22338eb495f245c53fdfa373882ad1833856b100a0afec4bad",
+      "gzipSha256": "06e7fec3269bc7ee5c08937c5184a00397142a8a914bb3a51c55a99cafa27949",
+      "rawBytes": 28721
+    },
+    {
+      "artifact": "container-cleanup.txt.gz",
+      "rawSha256": "0854c15094bebfca5d4d2ea8392c24621b5415194b2bedf59d9d732c7d3111da",
+      "gzipSha256": "2441b658485729fc590e3e7bc3c1e3e29f5147ad9ee753e56d4406498699eeb4",
+      "rawBytes": 54
+    },
+    {
+      "artifact": "container-id.txt.gz",
+      "rawSha256": "bbebab51a0d85d6472f404dd4fb00c555271a0426e3d75769d34b26f16898aac",
+      "gzipSha256": "279bd20b66219b4d9aeac67a8de84a4a3fa58c3bcc80ab34252d2386e3633ec3",
+      "rawBytes": 65
+    },
+    {
+      "artifact": "native-stderr.txt.gz",
+      "rawSha256": "2c58b87a0350a39bb1c3b5f4891defeeb9a785e84aa11a466dc9ddb21253bf58",
+      "gzipSha256": "bfe23d49bd33bb8ff20fbe65e319d8fd7deac45174069f26d60a7cd5bf53f92f",
+      "rawBytes": 186
+    },
+    {
+      "artifact": "native-stdout.json.gz",
+      "rawSha256": "3bb1e4e140db7eaf0b2720b0b7a95808ab06aa2140d2de7d6a2f9bfa187f6190",
+      "gzipSha256": "6dc978d12b5b8649218b65a58455e3c6dc7714056fa1ce7ad86b50f656ae0e7e",
+      "rawBytes": 19124
+    },
+    {
+      "artifact": "postgres-image-id.txt.gz",
+      "rawSha256": "3256f05ad6b56c80bbca86ff15d0de4b57083c599441797e7b2213bc62afcb38",
+      "gzipSha256": "1cc7d32ab39095a458d2d354ce0ec695f116f5036347c52f7ac184621d08f163",
+      "rawBytes": 72
+    },
+    {
+      "artifact": "postgres-image-reference.txt.gz",
+      "rawSha256": "058d018a01df613916c61fb3e6fd3b008146970c2756187a369f29f5f72cab8e",
+      "gzipSha256": "64bb739ec1ba46f6c12f7d0184e9ea715fc2e4a463ae04191fefe1d0b5b4e493",
+      "rawBytes": 81
+    },
+    {
+      "artifact": "postgres-runtime.log.gz",
+      "rawSha256": "12c02ab2030bc65f5a55109c7fa306225e807870c6ffff8379b11cc5b8c1ae2f",
+      "gzipSha256": "e9fdce69b66d98a482aa07cce383006c6b49f930d2408a0496dc2d6d603b7335",
+      "rawBytes": 3309
+    },
+    {
+      "artifact": "postgres-version.txt.gz",
+      "rawSha256": "1bb919c53b0a9f6fa678be489d5ff035a2adb445dfec76a65e61ba2a88b535e0",
+      "gzipSha256": "50ae56b2fc2a2b3d8975e33e651f34f733a078962a07d2d540d8300f565b00f6",
+      "rawBytes": 121
+    },
+    {
+      "artifact": "run-receipt.json.gz",
+      "rawSha256": "ad95dac6b85d9519967d70a00ada4b360bbdf8dd9e033cb1a85e3d272bbd570a",
+      "gzipSha256": "a23026dd730781135b3d2c7e76478355d72a18c8c599847485f59d79e4d542c4",
+      "rawBytes": 777840
+    },
+    {
+      "artifact": "verification/harness/target/evidence/actual/feadde7c-7246-43d2-aa7f-dfe25397475c/0f98eee5-1f77-4870-9052-c9eac83bcadd.json.gz",
+      "rawSha256": "da4e5b8e75b724f69bf30c9a2433d4758b481b36bf6ef210cfdc220a4a68f6a0",
+      "gzipSha256": "eda5e9a09694e9b8d10efd19720b643e7e628d8536d371c5f020b9387ecc1d1f",
+      "rawBytes": 5137
+    },
+    {
+      "artifact": "verification/harness/target/evidence/actual/feadde7c-7246-43d2-aa7f-dfe25397475c/5776e78b-670b-4c79-af81-e6df94c5389a.json.gz",
+      "rawSha256": "63aa2bc9a830c96796f20ddd54acab824ef1b498f7ff764c8c33beb06a4626bc",
+      "gzipSha256": "722249439f177a7c68faee402542ff40dd2405baa144f162c92e6e3efbf8388c",
+      "rawBytes": 3304
+    },
+    {
+      "artifact": "verification/harness/target/evidence/actual/feadde7c-7246-43d2-aa7f-dfe25397475c/8a44a7ca-0185-4821-b540-e548ea4a860b.json.gz",
+      "rawSha256": "fc727a14700f026bdcec414a48dbfbd26971c17d59d972141e42fc0eaf250c1d",
+      "gzipSha256": "3bd4f3409c239943ce92f5b62f91519e272bffaa1f46ab5a5eced6f44e57d13a",
+      "rawBytes": 984
+    },
+    {
+      "artifact": "verification/harness/target/evidence/actual/feadde7c-7246-43d2-aa7f-dfe25397475c/f1c93ab7-fc95-4c1f-ac15-7536897170d0.json.gz",
+      "rawSha256": "36aa319377413659e65d9261ed47f65aed5db650eeabb8d73f7f56d34082122a",
+      "gzipSha256": "d2a104748b5bb42c9b03833e16ea87f745c594157987893ad889cfb4f4c2f62a",
+      "rawBytes": 3376
+    },
+    {
+      "artifact": "wrapper.log.gz",
+      "rawSha256": "bcf014899540da696fad54550cc30918c493e3242017e2fb18217872b860fe9d",
+      "gzipSha256": "97732abd6e0b94c50e6e0a8daa8f078e0719a27aa1ee80a2a91e55ef3a6bdd9a",
+      "rawBytes": 3381
+    }
+  ]
+}

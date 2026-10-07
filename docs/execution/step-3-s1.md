@@ -1,7 +1,7 @@
 # S1 core·정의·신원·증거·읽기 통합 기록
 
 S0의 실제 DB·인가·MCP 기준선을 새 업무 모델로 확장한다. 사용자
-Step3는 ACTIVE이며 이 문서의 S1도 아직 ACTIVE다. 각 worker의 검사
+Step3는 ACTIVE이며 S1은 아래 최종 통합 증거로 COMPLETE다. 각 worker의 검사
 성공만으로 S1을 닫지 않는다.
 
 ## 기준선과 소유권
@@ -84,3 +84,30 @@ PostgreSQL/CQN 경로를 포함해 통과했다. adapter 기반4 tests도 통과
 R3에 따라 실제 운영 자료 없이 격리 DB와 개발 fixture를 사용한다.
 R5 실제 identity, R7 BTP, R8 추가 실모델 비용은 아직 미확정이며
 로컬 개발 fixture나 native 구현 worker를 운영 인수로 표시하지 않는다.
+
+
+## 최종 통합 gate
+
+Task35c810e에서 빈 DB 전체 migration·실제 CQN·서명된 REST/OData/MCP·
+FK/권한/시간/문서/관계 검사64개가 failure/error/skip0으로 통과했다.
+같은 commit의 전체 harness417개도 통과했고41/789/20473 준비 검사가
+PREPARED였다. 이전 expected RED XML2개가 target에 남아 있어 현재
+실행 시작 이후의 XML만 집계했으며 build log와417개가 일치한다.
+
+첫 별도 native 실행은 fixture의 필수 규격/포장 version 누락으로
+transaction을 rollback했다. 해당 실패와 임시 자원 정리를
+[evidence35c810e](evidence/step3-s1/35c810e/summary.json)에 보존했다.
+worker871c33f를 Taska59ee02로 통합해 실제 Product→Spec/Pack→TradeItem
+연결과 content hash를 설치·검사했다. 최종 adapter focused9 tests와
+새 disposable PG·서명 HTTP·독립 JDBC21 assertions가 통과했다.
+
+[evidencea59ee02](evidence/step3-s1/a59ee02/summary.json)에 실행 JAR
+hash, 깨끗한 source와 입력 drift0, HTTP/DB 관찰, cleanup을 연결했다.
+64개 검사 이후 backend/database 입력은 그대로이며 같은 JAR를
+실행했다. 이것으로 S1을 COMPLETE로 닫는다. 전체 사례의 모든
+후속 명령을 실행한 것은 아니며 전체 T/C/V/E gate는 NOT_RUN이다.
+
+S2는 같은 DB transaction에서 Work lifecycle과 read 참조를 통합하고
+목표 판정·의무·인계·현재 권한·승인·멱등성·감사·복구를 구현한다.
+S1의 imported 참조나 unknown 물량을 구현 완료로 승격하지 않는다.
+사용자 Step3의 두 필수 adversarial review는 전체 구현 통합 후 남는다.
