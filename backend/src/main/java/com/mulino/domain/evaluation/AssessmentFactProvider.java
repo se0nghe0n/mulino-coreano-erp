@@ -82,6 +82,7 @@ public class AssessmentFactProvider {
         boolean known="CONFIRMED".equals(segment.get("identificationStatus"))||"IDENTIFIED".equals(segment.get("identificationStatus"));
         Instant retired=instantOrNull(segment.get("retiredAt"));
         if(segment.get("retirementRecordedAt")!=null&&instant(segment.get("retirementRecordedAt")).isAfter(c.knownAt()))retired=null;
+        if(Set.of("EXISTS_IN","THROUGHOUT").contains(slots.get("quantityMode"))&&(retired==null||retired.isAfter(c.asOf())))retired=c.asOf().plusNanos(1);
         facts.add(new Fact(segment.get("ID").toString(),Objects.toString(segment.get("revision")),DefinitionRepository.sha256(segment.toString()),null,segment.get("ID").toString(),segment.get("quantity"),Objects.toString(segment.get("unit")),known?State.KNOWN:State.UNKNOWN,known,instant(segment.get("validFrom")),retired,instant(segment.get("recordedAt")),List.of(Objects.toString(segment.get("evidenceRef"),""))));
       }
       var conversions=r.rows(c,"mulino.inventory.UnitConversions");
