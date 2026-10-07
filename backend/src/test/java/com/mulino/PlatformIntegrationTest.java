@@ -349,7 +349,7 @@ class PlatformIntegrationTest {
                   node,
                   "node_modules/@sap/cds-dk/bin/cds.js",
                   "compile",
-                  "db",
+                  "db/schema.cds",
                   "--to",
                   "sql",
                   "--dialect",
