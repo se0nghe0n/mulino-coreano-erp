@@ -8,7 +8,7 @@ import java.util.*;
 import org.springframework.stereotype.Service;
 import tools.jackson.databind.ObjectMapper;
 
-/** One bounded native-host tick. IO is outside transaction; failures remain durable. */
+/** Bounded native-host tick; committed intent precedes fenced IO and durable recovery. */
 @Service
 public class DurableDeliveryWorker {
  private final RuntimeService service;private final RuntimeRepository repository;private final ExecutionClock clock;private final CdsRuntime cds;
