@@ -1,0 +1,172 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "caseId",
+    "corpusSha256",
+    "corpusCasePointer",
+    "fixtureRef",
+    "featureRef",
+    "profiles",
+    "plannedRepeats",
+    "turns"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "const": "1.0.0"
+    },
+    "caseId": {
+      "type": "string",
+      "pattern": "^M(0[1-9]|[1-5][0-9]|60)$"
+    },
+    "corpusSha256": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "corpusCasePointer": {
+      "type": "string",
+      "pattern": "^/cases/[0-9]+$"
+    },
+    "fixtureRef": {
+      "type": "string",
+      "pattern": "^verification/model-binding/cases/M[0-9]{2}/fixture.json$"
+    },
+    "featureRef": {
+      "type": "string",
+      "pattern": "^verification/model-binding/cases/M[0-9]{2}/scenario.feature$"
+    },
+    "profiles": {
+      "const": [
+        "SIT",
+        "UAT"
+      ]
+    },
+    "plannedRepeats": {
+      "const": 3
+    },
+    "turns": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "corpusTurnPointer",
+          "capabilityMapping",
+          "commandActorRef",
+          "readActorRef",
+          "steps",
+          "commonAssertions",
+          "oracleAssertions",
+          "oracleRef"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^turn-[12]$"
+          },
+          "corpusTurnPointer": {
+            "type": "string",
+            "pattern": "^/cases/[0-9]+/turns/[01]$"
+          },
+          "capabilityMapping": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "semantic",
+              "public"
+            ],
+            "properties": {
+              "semantic": {
+                "type": "string",
+                "minLength": 1
+              },
+              "public": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          },
+          "commandActorRef": {
+            "const": "command-actor"
+          },
+          "readActorRef": {
+            "const": "read-probe-actor"
+          },
+          "steps": {
+            "const": [
+              "context",
+              "before",
+              "agent",
+              "after",
+              "assert"
+            ]
+          },
+          "commonAssertions": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "assertionId",
+                "corpusAssertionPointer",
+                "semanticPath"
+              ],
+              "properties": {
+                "assertionId": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "corpusAssertionPointer": {
+                  "type": "string",
+                  "pattern": "^/cases/[0-9]+/turns/[01]/oracle/"
+                },
+                "semanticPath": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              }
+            }
+          },
+          "oracleAssertions": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "assertionId",
+                  "corpusAssertionPointer",
+                  "semanticPath"
+                ],
+                "properties": {
+                  "assertionId": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "corpusAssertionPointer": {
+                    "type": "string",
+                    "pattern": "^/cases/[0-9]+/turns/[01]/oracle/"
+                  },
+                  "semanticPath": {
+                    "type": "string",
+                    "minLength": 1
+                  }
+                }
+              }
+            }
+          },
+          "oracleRef": {
+            "type": "string",
+            "pattern": "^/cases/[0-9]+/turns/[01]/oracle$"
+          }
+        }
+      }
+    }
+  }
+}

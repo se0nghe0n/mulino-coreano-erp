@@ -1,0 +1,101 @@
+{
+  "schemaVersion": "1.0.0",
+  "caseId": "M54",
+  "corpusSha256": "570ce4610e585c698aeed4043be449e9bb8951448fb57111bddb5c49ac1e65bb",
+  "corpusCasePointer": "/cases/53",
+  "fixtureRef": "verification/model-binding/cases/M54/fixture.json",
+  "featureRef": "verification/model-binding/cases/M54/scenario.feature",
+  "profiles": [
+    "SIT",
+    "UAT"
+  ],
+  "plannedRepeats": 3,
+  "turns": [
+    {
+      "id": "turn-1",
+      "corpusTurnPointer": "/cases/53/turns/0",
+      "capabilityMapping": {
+        "semantic": "recordActivity",
+        "public": "recordActivity"
+      },
+      "commandActorRef": "command-actor",
+      "readActorRef": "read-probe-actor",
+      "steps": [
+        "context",
+        "before",
+        "agent",
+        "after",
+        "assert"
+      ],
+      "commonAssertions": [
+        {
+          "assertionId": "M54/turn-1/common-1",
+          "corpusAssertionPointer": "/cases/53/turns/0/oracle/assertions/0",
+          "semanticPath": "state.intake.status"
+        },
+        {
+          "assertionId": "M54/turn-1/common-2",
+          "corpusAssertionPointer": "/cases/53/turns/0/oracle/assertions/1",
+          "semanticPath": "state.intake.ownerRef"
+        },
+        {
+          "assertionId": "M54/turn-1/common-3",
+          "corpusAssertionPointer": "/cases/53/turns/0/oracle/assertions/2",
+          "semanticPath": "state.intake.nextCheckAt"
+        },
+        {
+          "assertionId": "M54/turn-1/common-4",
+          "corpusAssertionPointer": "/cases/53/turns/0/oracle/assertions/3",
+          "semanticPath": "state.intake.closedByNotification"
+        }
+      ],
+      "oracleAssertions": {
+        "SIT_DIRECT_COMMAND": []
+      },
+      "oracleRef": "/cases/53/turns/0/oracle"
+    },
+    {
+      "id": "turn-2",
+      "corpusTurnPointer": "/cases/53/turns/1",
+      "capabilityMapping": {
+        "semantic": "retrySafeCommand",
+        "public": "retrySafeCommand"
+      },
+      "commandActorRef": "command-actor",
+      "readActorRef": "read-probe-actor",
+      "steps": [
+        "context",
+        "before",
+        "agent",
+        "after",
+        "assert"
+      ],
+      "commonAssertions": [
+        {
+          "assertionId": "M54/turn-2/common-1",
+          "corpusAssertionPointer": "/cases/53/turns/1/oracle/assertions/0",
+          "semanticPath": "state.currentObligationCount"
+        },
+        {
+          "assertionId": "M54/turn-2/common-2",
+          "corpusAssertionPointer": "/cases/53/turns/1/oracle/assertions/1",
+          "semanticPath": "state.followupWorkCount"
+        },
+        {
+          "assertionId": "M54/turn-2/common-3",
+          "corpusAssertionPointer": "/cases/53/turns/1/oracle/assertions/2",
+          "semanticPath": "state.currentOwnerRef"
+        },
+        {
+          "assertionId": "M54/turn-2/common-4",
+          "corpusAssertionPointer": "/cases/53/turns/1/oracle/assertions/3",
+          "semanticPath": "state.parent.O1.state"
+        }
+      ],
+      "oracleAssertions": {
+        "SIT_DIRECT_COMMAND": []
+      },
+      "oracleRef": "/cases/53/turns/1/oracle"
+    }
+  ]
+}

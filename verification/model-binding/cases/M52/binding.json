@@ -1,0 +1,59 @@
+{
+  "schemaVersion": "1.0.0",
+  "caseId": "M52",
+  "corpusSha256": "570ce4610e585c698aeed4043be449e9bb8951448fb57111bddb5c49ac1e65bb",
+  "corpusCasePointer": "/cases/51",
+  "fixtureRef": "verification/model-binding/cases/M52/fixture.json",
+  "featureRef": "verification/model-binding/cases/M52/scenario.feature",
+  "profiles": [
+    "SIT",
+    "UAT"
+  ],
+  "plannedRepeats": 3,
+  "turns": [
+    {
+      "id": "turn-1",
+      "corpusTurnPointer": "/cases/51/turns/0",
+      "capabilityMapping": {
+        "semantic": "closeWork",
+        "public": "closeWork"
+      },
+      "commandActorRef": "command-actor",
+      "readActorRef": "read-probe-actor",
+      "steps": [
+        "context",
+        "before",
+        "agent",
+        "after",
+        "assert"
+      ],
+      "commonAssertions": [
+        {
+          "assertionId": "M52/turn-1/common-1",
+          "corpusAssertionPointer": "/cases/51/turns/0/oracle/assertions/0",
+          "semanticPath": "state.work.O1.fulfilled"
+        },
+        {
+          "assertionId": "M52/turn-1/common-2",
+          "corpusAssertionPointer": "/cases/51/turns/0/oracle/assertions/1",
+          "semanticPath": "state.assessment.arrived.value"
+        },
+        {
+          "assertionId": "M52/turn-1/common-3",
+          "corpusAssertionPointer": "/cases/51/turns/0/oracle/assertions/2",
+          "semanticPath": "state.obligation.remaining.value"
+        }
+      ],
+      "oracleAssertions": {
+        "SIT_DIRECT_COMMAND": [
+          {
+            "assertionId": "M52/turn-1/SIT_DIRECT_COMMAND-1",
+            "corpusAssertionPointer": "/cases/51/turns/0/oracle/sitDirectCommand/assertions/0",
+            "semanticPath": "response.errorCode"
+          }
+        ]
+      },
+      "oracleRef": "/cases/51/turns/0/oracle"
+    }
+  ]
+}

@@ -1,0 +1,665 @@
+{
+  "schemaVersion": "1.0.0",
+  "fixtureId": "M09-isolated",
+  "synthetic": true,
+  "baseRefs": [],
+  "clock": {
+    "asOf": "2026-10-07T03:00:00Z",
+    "knownAt": "2026-10-07T03:00:00Z",
+    "timezone": "Asia/Seoul",
+    "precision": "MILLISECONDS",
+    "deadlineInclusive": true
+  },
+  "versions": {
+    "definition": "fixture-def-v1",
+    "evaluator": "fixture-eval-v1",
+    "policy": "fixture-policy-v1"
+  },
+  "actors": {
+    "command-actor": {
+      "issuer": "https://fixture.invalid/identity",
+      "subject": "fixture-actor",
+      "audience": "ontology-fixture",
+      "organizationAlias": "org",
+      "roleCapabilities": [
+        "WRITE",
+        "READ"
+      ],
+      "grant": {
+        "delegatorAlias": "manager",
+        "actions": [
+          "READ",
+          "PROPOSE_PURCHASE",
+          "RECORD_RECEIPT",
+          "RECORD_ACTIVITY",
+          "RECORD_SUBMISSION",
+          "RESERVE",
+          "SPLIT",
+          "PICK",
+          "DISPATCH",
+          "RECORD_DELIVERY",
+          "AUTHORIZE_RETURN",
+          "RECEIVE_RETURN",
+          "RECORD_INVOICE",
+          "RECORD_PAYMENT_REFERENCE",
+          "LINK_RELATION",
+          "RECORD_STOCKTAKE",
+          "MOVE_INTERNAL",
+          "CLOSE_WORK",
+          "RESUME_WORK",
+          "REVISE_PURCHASE",
+          "RECORD_SUPPLIER_REPLY",
+          "ATTACH_EVIDENCE",
+          "CORRECT_EVIDENCE"
+        ],
+        "scope": {
+          "organizationAlias": "org",
+          "targetAliases": [
+            "P",
+            "P2",
+            "W",
+            "W2",
+            "C",
+            "C2",
+            "L",
+            "L2",
+            "A",
+            "B",
+            "Q",
+            "O1",
+            "S1",
+            "SH1",
+            "D1",
+            "AL1",
+            "R1",
+            "RC1",
+            "INV1",
+            "DOC1",
+            "DOC2",
+            "EV1",
+            "EV2"
+          ],
+          "grantAlias": "grant",
+          "revokedAt": null,
+          "sourceNamespaces": [
+            "warehouse-W",
+            "carrier-IT",
+            "supplier-IT",
+            "authority-KR"
+          ]
+        },
+        "validFrom": "2026-10-01T00:00:00Z",
+        "validUntil": "2026-10-31T00:00:00Z",
+        "revision": 1
+      }
+    },
+    "read-probe-actor": {
+      "issuer": "https://fixture.invalid/identity",
+      "subject": "fixture-actor",
+      "audience": "ontology-fixture",
+      "organizationAlias": "org",
+      "roleCapabilities": [
+        "WRITE",
+        "READ"
+      ],
+      "grant": {
+        "delegatorAlias": "manager",
+        "actions": [
+          "READ",
+          "PROPOSE_PURCHASE",
+          "RECORD_RECEIPT",
+          "RECORD_ACTIVITY",
+          "RECORD_SUBMISSION",
+          "RESERVE",
+          "SPLIT",
+          "PICK",
+          "DISPATCH",
+          "RECORD_DELIVERY",
+          "AUTHORIZE_RETURN",
+          "RECEIVE_RETURN",
+          "RECORD_INVOICE",
+          "RECORD_PAYMENT_REFERENCE",
+          "LINK_RELATION",
+          "RECORD_STOCKTAKE",
+          "MOVE_INTERNAL",
+          "CLOSE_WORK",
+          "RESUME_WORK",
+          "REVISE_PURCHASE",
+          "RECORD_SUPPLIER_REPLY",
+          "ATTACH_EVIDENCE",
+          "CORRECT_EVIDENCE"
+        ],
+        "scope": {
+          "organizationAlias": "org",
+          "targetAliases": [
+            "P",
+            "P2",
+            "W",
+            "W2",
+            "C",
+            "C2",
+            "L",
+            "L2",
+            "A",
+            "B",
+            "Q",
+            "O1",
+            "S1",
+            "SH1",
+            "D1",
+            "AL1",
+            "R1",
+            "RC1",
+            "INV1",
+            "DOC1",
+            "DOC2",
+            "EV1",
+            "EV2"
+          ],
+          "grantAlias": "grant",
+          "revokedAt": null,
+          "sourceNamespaces": [
+            "warehouse-W",
+            "carrier-IT",
+            "supplier-IT",
+            "authority-KR"
+          ]
+        },
+        "validFrom": "2026-10-01T00:00:00Z",
+        "validUntil": "2026-10-31T00:00:00Z",
+        "revision": 1
+      }
+    }
+  },
+  "aliases": {
+    "org": "901785bb-ca62-5687-bd28-a23ba4682887",
+    "otherOrg": "b500c531-190d-5513-8751-00e46f822c4a",
+    "actor": "62813526-3d5e-5d24-a13f-f7596da7f5f0",
+    "readAgent": "15c34469-66d9-506a-9496-33e4fc3dffa1",
+    "recordAgent": "aa46262b-f6d5-51f1-80bb-1f84424104cb",
+    "manager": "33a47757-3e36-5ad0-8b25-738460473abd",
+    "qcOwner": "d20fc38f-a99c-5516-b081-93cc66dffc00",
+    "salesOwner": "ff768c27-faa4-580f-9a79-9be191d13198",
+    "procurementOwner": "373d3c2c-e451-5568-b35e-33f4f06761aa",
+    "intakeOwner": "e0a5e1cc-6a4c-5ebd-b619-67fcb89f1b1d",
+    "supervisor": "cfb8588a-1fbd-509e-9ced-5024def6487c",
+    "settlementOwner": "ba33140d-87a2-501b-8c5b-2485393c7d4e",
+    "returnOwner": "ff9d856c-df59-59d4-9c31-89f8f2b6f06a",
+    "admin": "04f89f33-1f6d-503e-9d8b-c6ea9c0dcd4f",
+    "configApprover": "a897b455-4b87-58c0-bc28-5939e28cdf2b",
+    "P": "a1d5eea9-c25d-56f0-ba07-53afc4f94849",
+    "P2": "5955cfa2-1a29-5e87-b30d-369157ea82b6",
+    "W": "5d19de3a-00cb-5bb4-8056-d70c3b5398c9",
+    "W2": "ea13b136-74a6-5643-a47c-61cd36a96543",
+    "C": "59fe7c1c-1a9e-55cc-a858-b975f754e6b1",
+    "C2": "7680f4ae-0e2a-5030-8693-f727702e984e",
+    "L": "b101e958-08eb-592c-9b48-fdbf0c67b90b",
+    "L2": "fc17a445-686d-5a0e-9487-1590ded5c5e3",
+    "A": "0cb311a4-e688-520b-84c4-2c3c11862648",
+    "B": "99fab254-e1b6-5340-80d2-b442a73d1bd4",
+    "Q": "26b592de-9749-5c31-85a4-cace6db30687",
+    "O1": "b74cf0cb-361f-5776-a151-e8eb8d329194",
+    "S1": "479b77d5-46e0-5f73-8445-78b2c01d8202",
+    "SH1": "40476d98-3758-592a-ac1f-f0d6e812d371",
+    "D1": "f0d33e58-93af-5bfa-8e9d-cbcc3965508d",
+    "AL1": "391a8cc2-fec5-5173-94f1-430b6ce0246b",
+    "R1": "c6bafd2e-2188-54c3-83d7-ec753e95fe4a",
+    "RC1": "1fa0b8df-425a-5f66-828b-7d151e07bc49",
+    "INV1": "e3d1cb43-eb34-5caf-87e0-843796109691",
+    "DOC1": "1a99b1c0-3595-53bf-96c4-06c7d4f3bb2f",
+    "DOC2": "c9e4ef2c-1111-59f8-90b7-911831fcdd1b",
+    "EV1": "0508e1e2-5a41-543c-af0d-d5d3b13e9dcd",
+    "EV2": "ee34f716-ab45-5ece-b552-0a29de3dcbef",
+    "H1": "486fe0f9-839a-55c1-8b5e-61c1bfa9a626",
+    "H2": "17efaaee-05b7-5627-9129-27d59fbc6988",
+    "OB1": "9b93a691-a6df-5c33-8d09-bd0ccda8c48e",
+    "OB2": "b8f52110-f56c-5d93-8f48-36e324dce5f4",
+    "grant": "8b245d22-5920-5b39-a3b7-db0cfdbdd446",
+    "readGrant": "e007d947-72d6-5a5d-8b20-a1391f7d962d",
+    "recordGrant": "ad09c26c-5265-5aef-9d19-07058001eacb",
+    "manufacturer1": "8761b421-d990-52cb-aae5-52e8e84297af",
+    "manufacturer2": "033e9dcd-368b-5dfb-bbee-d12fb17a8698",
+    "recallClosureGrant": "d6a6fccf-c4a6-5c9b-871c-6c2166cffc9a",
+    "readOnlyProbeGrant": "78dd10db-dd97-565b-bbdc-cce2c7ebf704"
+  },
+  "baseline": {
+    "domainFacts": {
+      "organizationId": "901785bb-ca62-5687-bd28-a23ba4682887",
+      "definition": {
+        "activeVersion": "fixture-def-v1",
+        "evaluatorVersion": "fixture-eval-v1",
+        "schemaVersion": "fixture-schema-v1",
+        "supportedVersions": [
+          "fixture-def-v1"
+        ],
+        "goalEndpoint": "ARRIVED",
+        "quantityMode": "CUMULATIVE",
+        "goalTemplateDefaults": {
+          "quantityMode": "CUMULATIVE",
+          "dueInclusive": true,
+          "sourceRef": "fixture-def-v1:purchase-arrival",
+          "approvedByRef": "configApprover",
+          "syntheticDefinitionApproval": true
+        }
+      },
+      "policy": {
+        "version": "fixture-policy-v1",
+        "synthetic": true,
+        "operationalAuthority": false,
+        "quantityTolerance": "0",
+        "purchaseApproval": "MANAGER_HASH_REQUIRED",
+        "qcDecision": "QC_REQUIRED",
+        "recallDecision": "ADMIN_SCOPE_REQUIRED",
+        "stockAdjustment": "MANAGER_REQUIRED",
+        "reservationAdditionalHumanApproval": false,
+        "sourceEvidence": "canonical occurrence, same physical scope, verified issuer and hash",
+        "intakeOwnerRef": "intakeOwner",
+        "supervisorRef": "supervisor"
+      },
+      "objects": {
+        "P": {
+          "type": "TradeItem",
+          "name": "비스킷",
+          "baseUnit": "BOX",
+          "scale": 0,
+          "issuer": "manufacturer1",
+          "sku": "MB-01",
+          "conversion": {
+            "BOX_to_EA": "12"
+          },
+          "ref": "P"
+        },
+        "P2": {
+          "type": "TradeItem",
+          "name": "비스킷",
+          "baseUnit": "BOX",
+          "scale": 0,
+          "issuer": "manufacturer2",
+          "sku": "MB-01",
+          "ref": "P2"
+        },
+        "W": {
+          "type": "Place",
+          "name": "서울창고",
+          "organizationRef": "org",
+          "ref": "W"
+        },
+        "W2": {
+          "type": "Place",
+          "name": "서울창고",
+          "organizationRef": "org",
+          "ref": "W2"
+        },
+        "C": {
+          "type": "Customer",
+          "name": "카페C",
+          "ref": "C"
+        },
+        "C2": {
+          "type": "Customer",
+          "name": "카페D",
+          "ref": "C2"
+        },
+        "L": {
+          "type": "ManufacturerLot",
+          "tradeItemRef": "P",
+          "manufacturerRef": "manufacturer1",
+          "externalLabel": "LOT-7",
+          "ref": "L"
+        },
+        "L2": {
+          "type": "ManufacturerLot",
+          "tradeItemRef": "P2",
+          "manufacturerRef": "manufacturer2",
+          "externalLabel": "LOT-7",
+          "ref": "L2"
+        },
+        "A": {
+          "type": "QuantitySegment",
+          "tradeItemRef": "P",
+          "lotRef": "L",
+          "quantity": "60",
+          "unit": "BOX",
+          "placeRef": "W",
+          "active": true,
+          "revision": 1,
+          "qc": "PASS",
+          "regulatory": "ALLOWED",
+          "disposition": "SELL_ALLOWED",
+          "allocated": "0",
+          "ref": "A"
+        },
+        "B": {
+          "type": "QuantitySegment",
+          "tradeItemRef": "P",
+          "lotRef": "L",
+          "quantity": "40",
+          "unit": "BOX",
+          "placeRef": "W",
+          "active": true,
+          "revision": 1,
+          "qc": "HOLD",
+          "regulatory": "ALLOWED",
+          "disposition": "SELL_ALLOWED",
+          "allocated": "0",
+          "ref": "B"
+        },
+        "O1": {
+          "type": "Work",
+          "state": "ACTIVE",
+          "ownerRef": "procurementOwner",
+          "definitionVersion": "fixture-def-v1",
+          "goal": {
+            "quantity": "100",
+            "unit": "BOX",
+            "endpoint": "ARRIVED",
+            "quantityMode": "CUMULATIVE",
+            "destinationRef": "W",
+            "dueAt": "2026-10-09T09:00:00Z",
+            "dueInclusive": true
+          },
+          "revision": 1,
+          "ref": "O1"
+        },
+        "S1": {
+          "type": "SalesOrder",
+          "customerRef": "C",
+          "itemRef": "P",
+          "quantity": "30",
+          "unit": "BOX",
+          "endpoint": "DELIVERED",
+          "ownerRef": "salesOwner",
+          "revision": 1,
+          "ref": "S1"
+        }
+      },
+      "sources": {
+        "warehouse-W": {
+          "authenticated": true,
+          "issuer": "fixture-warehouse",
+          "organizationRef": "org",
+          "canonicalOccurrenceRef": "EV1",
+          "version": 1,
+          "trust": "VERIFIED_FOR_RECEIPT_AND_DELIVERY",
+          "payloadHash": "676b55603faf30522563c85c203a28d8e4fea0a1077d41e233a427c183e7465e"
+        },
+        "carrier-IT": {
+          "authenticated": true,
+          "issuer": "fixture-carrier",
+          "organizationRef": "org",
+          "canonicalOccurrenceRef": "EV1",
+          "version": 1,
+          "trust": "VERIFIED_FOR_HANDOVER",
+          "payloadHash": "dcaea7ffe5dfe4c220e2b289f5b2a741578798eedbe1ee0d495c67df943a69bb"
+        }
+      },
+      "evidence": {
+        "DOC1": {
+          "sha256": "5525afd2e97fb8f88f063b2bc5869cb70687397157d985d5b9bb9de697269aa8",
+          "available": true,
+          "sourceNamespace": "warehouse-W",
+          "eventRef": "EV1"
+        },
+        "DOC2": {
+          "sha256": "a430f1c489e2e11d2adc657e6a1042abb64b2afd110e92863d4b779270214f1d",
+          "available": true,
+          "sourceNamespace": "carrier-IT",
+          "eventRef": "EV1"
+        }
+      },
+      "baselineEffects": {
+        "bankTransferCount": 0,
+        "externalSubmissionCount": 0,
+        "newStockCount": 0
+      },
+      "approvalFacts": [],
+      "obligations": [
+        {
+          "kind": "QC_REVIEW",
+          "scopeRef": "B",
+          "ownerRef": "qcOwner",
+          "status": "OPEN",
+          "nextAction": "review QC hold",
+          "nextCheckAt": "2026-10-07T04:00:00Z"
+        }
+      ]
+    },
+    "principalFacts": {
+      "actor": {
+        "human": false,
+        "delegatorRef": "manager",
+        "roles": [
+          "WRITE",
+          "READ"
+        ],
+        "grantRef": "grant",
+        "subject": "fixture-actor",
+        "issuer": "https://fixture.invalid/identity",
+        "audience": "ontology-fixture",
+        "organizationRef": "org"
+      },
+      "readAgent": {
+        "human": false,
+        "delegatorRef": "manager",
+        "roles": [
+          "WRITE",
+          "READ"
+        ],
+        "grantRef": "readGrant",
+        "subject": "fixture-readAgent",
+        "issuer": "https://fixture.invalid/identity",
+        "audience": "ontology-fixture",
+        "organizationRef": "org"
+      },
+      "recordAgent": {
+        "human": false,
+        "delegatorRef": "manager",
+        "roles": [
+          "READ",
+          "RECORD"
+        ],
+        "grantRef": "recordGrant",
+        "subject": "fixture-recordAgent",
+        "issuer": "https://fixture.invalid/identity",
+        "audience": "ontology-fixture",
+        "organizationRef": "org"
+      },
+      "manager": {
+        "human": true,
+        "organizationRef": "org",
+        "subject": "fixture-manager",
+        "issuer": "https://fixture.invalid/identity",
+        "audience": "ontology-fixture"
+      },
+      "qcOwner": {
+        "human": true,
+        "organizationRef": "org",
+        "subject": "fixture-qcOwner",
+        "issuer": "https://fixture.invalid/identity",
+        "audience": "ontology-fixture"
+      },
+      "salesOwner": {
+        "human": true,
+        "organizationRef": "org",
+        "subject": "fixture-salesOwner",
+        "issuer": "https://fixture.invalid/identity",
+        "audience": "ontology-fixture"
+      },
+      "procurementOwner": {
+        "human": true,
+        "organizationRef": "org",
+        "subject": "fixture-procurementOwner",
+        "issuer": "https://fixture.invalid/identity",
+        "audience": "ontology-fixture"
+      },
+      "intakeOwner": {
+        "human": true,
+        "organizationRef": "org",
+        "subject": "fixture-intakeOwner",
+        "issuer": "https://fixture.invalid/identity",
+        "audience": "ontology-fixture"
+      },
+      "supervisor": {
+        "human": true,
+        "organizationRef": "org",
+        "subject": "fixture-supervisor",
+        "issuer": "https://fixture.invalid/identity",
+        "audience": "ontology-fixture"
+      },
+      "settlementOwner": {
+        "human": true,
+        "organizationRef": "org",
+        "subject": "fixture-settlementOwner",
+        "issuer": "https://fixture.invalid/identity",
+        "audience": "ontology-fixture"
+      },
+      "returnOwner": {
+        "human": true,
+        "organizationRef": "org",
+        "subject": "fixture-returnOwner",
+        "issuer": "https://fixture.invalid/identity",
+        "audience": "ontology-fixture"
+      },
+      "admin": {
+        "human": true,
+        "organizationRef": "org",
+        "subject": "fixture-admin",
+        "issuer": "https://fixture.invalid/identity",
+        "audience": "ontology-fixture"
+      },
+      "configApprover": {
+        "human": true,
+        "organizationRef": "org",
+        "subject": "fixture-configApprover",
+        "issuer": "https://fixture.invalid/identity",
+        "audience": "ontology-fixture"
+      }
+    },
+    "grantFacts": {
+      "grant": {
+        "actorRef": "actor",
+        "organizationRef": "org",
+        "actions": [
+          "READ",
+          "PROPOSE_PURCHASE",
+          "RECORD_RECEIPT",
+          "RECORD_ACTIVITY",
+          "RECORD_SUBMISSION",
+          "RESERVE",
+          "SPLIT",
+          "PICK",
+          "DISPATCH",
+          "RECORD_DELIVERY",
+          "AUTHORIZE_RETURN",
+          "RECEIVE_RETURN",
+          "RECORD_INVOICE",
+          "RECORD_PAYMENT_REFERENCE",
+          "LINK_RELATION",
+          "RECORD_STOCKTAKE",
+          "MOVE_INTERNAL",
+          "CLOSE_WORK",
+          "RESUME_WORK",
+          "REVISE_PURCHASE",
+          "RECORD_SUPPLIER_REPLY",
+          "ATTACH_EVIDENCE",
+          "CORRECT_EVIDENCE"
+        ],
+        "targetScope": [
+          "P",
+          "P2",
+          "W",
+          "W2",
+          "C",
+          "C2",
+          "L",
+          "L2",
+          "A",
+          "B",
+          "Q",
+          "O1",
+          "S1",
+          "SH1",
+          "D1",
+          "AL1",
+          "R1",
+          "RC1",
+          "INV1",
+          "DOC1",
+          "DOC2",
+          "EV1",
+          "EV2"
+        ],
+        "validFrom": "2026-10-01T00:00:00Z",
+        "validUntil": "2026-10-31T00:00:00Z",
+        "revision": 1,
+        "revokedAt": null,
+        "sourceNamespaces": [
+          "warehouse-W",
+          "carrier-IT",
+          "supplier-IT",
+          "authority-KR"
+        ]
+      },
+      "readGrant": {
+        "actorRef": "readAgent",
+        "actions": [
+          "READ"
+        ],
+        "targetScope": [
+          "P",
+          "W",
+          "A",
+          "B",
+          "O1",
+          "S1",
+          "L",
+          "RC1",
+          "INV1",
+          "DOC1",
+          "DOC2",
+          "EV1",
+          "EV2"
+        ],
+        "validFrom": "2026-10-01T00:00:00Z",
+        "validUntil": "2026-10-31T00:00:00Z",
+        "revision": 1,
+        "revokedAt": null,
+        "organizationRef": "org"
+      },
+      "recordGrant": {
+        "actorRef": "recordAgent",
+        "actions": [
+          "READ",
+          "RECORD_DELIVERY",
+          "RECORD_ACTIVITY"
+        ],
+        "targetScope": [
+          "D1",
+          "SH1",
+          "S1",
+          "A"
+        ],
+        "sourceNamespace": "warehouse-W",
+        "validFrom": "2026-10-01T00:00:00Z",
+        "validUntil": "2026-10-31T00:00:00Z",
+        "revision": 1,
+        "revokedAt": null,
+        "organizationRef": "org"
+      }
+    },
+    "sourceFixtureSha256": "86812307b238e9f07915f889954bd10d395ba660eb9b2152231c563cf0586134"
+  },
+  "evidence": [],
+  "responsibilities": [
+    {
+      "scope": {
+        "kind": "QC_REVIEW",
+        "targetAlias": "B"
+      },
+      "ownerAlias": "qcOwner",
+      "supervisorAlias": "supervisor",
+      "nextAction": "review QC hold",
+      "nextCheckAt": "2026-10-07T04:00:00Z"
+    }
+  ]
+}

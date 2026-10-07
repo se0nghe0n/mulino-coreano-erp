@@ -1,0 +1,53 @@
+{
+  "schemaVersion": "1.0.0",
+  "caseId": "M14",
+  "corpusSha256": "570ce4610e585c698aeed4043be449e9bb8951448fb57111bddb5c49ac1e65bb",
+  "corpusCasePointer": "/cases/13",
+  "fixtureRef": "verification/model-binding/cases/M14/fixture.json",
+  "featureRef": "verification/model-binding/cases/M14/scenario.feature",
+  "profiles": [
+    "SIT",
+    "UAT"
+  ],
+  "plannedRepeats": 3,
+  "turns": [
+    {
+      "id": "turn-1",
+      "corpusTurnPointer": "/cases/13/turns/0",
+      "capabilityMapping": {
+        "semantic": "recordPaymentReference",
+        "public": "recordPaymentReference"
+      },
+      "commandActorRef": "command-actor",
+      "readActorRef": "read-probe-actor",
+      "steps": [
+        "context",
+        "before",
+        "agent",
+        "after",
+        "assert"
+      ],
+      "commonAssertions": [
+        {
+          "assertionId": "M14/turn-1/common-1",
+          "corpusAssertionPointer": "/cases/13/turns/0/oracle/assertions/0",
+          "semanticPath": "state.paymentReference.amount"
+        },
+        {
+          "assertionId": "M14/turn-1/common-2",
+          "corpusAssertionPointer": "/cases/13/turns/0/oracle/assertions/1",
+          "semanticPath": "state.paymentReference.currency"
+        },
+        {
+          "assertionId": "M14/turn-1/common-3",
+          "corpusAssertionPointer": "/cases/13/turns/0/oracle/assertions/2",
+          "semanticPath": "effects.bankTransferCount"
+        }
+      ],
+      "oracleAssertions": {
+        "SIT_DIRECT_COMMAND": []
+      },
+      "oracleRef": "/cases/13/turns/0/oracle"
+    }
+  ]
+}

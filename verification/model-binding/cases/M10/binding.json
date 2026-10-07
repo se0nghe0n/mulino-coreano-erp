@@ -1,0 +1,53 @@
+{
+  "schemaVersion": "1.0.0",
+  "caseId": "M10",
+  "corpusSha256": "570ce4610e585c698aeed4043be449e9bb8951448fb57111bddb5c49ac1e65bb",
+  "corpusCasePointer": "/cases/9",
+  "fixtureRef": "verification/model-binding/cases/M10/fixture.json",
+  "featureRef": "verification/model-binding/cases/M10/scenario.feature",
+  "profiles": [
+    "SIT",
+    "UAT"
+  ],
+  "plannedRepeats": 3,
+  "turns": [
+    {
+      "id": "turn-1",
+      "corpusTurnPointer": "/cases/9/turns/0",
+      "capabilityMapping": {
+        "semantic": "pickQuantity",
+        "public": "pickQuantity"
+      },
+      "commandActorRef": "command-actor",
+      "readActorRef": "read-probe-actor",
+      "steps": [
+        "context",
+        "before",
+        "agent",
+        "after",
+        "assert"
+      ],
+      "commonAssertions": [
+        {
+          "assertionId": "M10/turn-1/common-1",
+          "corpusAssertionPointer": "/cases/9/turns/0/oracle/assertions/0",
+          "semanticPath": "state.pick.quantity"
+        },
+        {
+          "assertionId": "M10/turn-1/common-2",
+          "corpusAssertionPointer": "/cases/9/turns/0/oracle/assertions/1",
+          "semanticPath": "effects.dispatchCount"
+        },
+        {
+          "assertionId": "M10/turn-1/common-3",
+          "corpusAssertionPointer": "/cases/9/turns/0/oracle/assertions/2",
+          "semanticPath": "state.inventory.onHand.value"
+        }
+      ],
+      "oracleAssertions": {
+        "SIT_DIRECT_COMMAND": []
+      },
+      "oracleRef": "/cases/9/turns/0/oracle"
+    }
+  ]
+}

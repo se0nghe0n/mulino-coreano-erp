@@ -1,0 +1,54 @@
+{
+  "schemaVersion": "1.0.0",
+  "caseId": "M59",
+  "corpusSha256": "570ce4610e585c698aeed4043be449e9bb8951448fb57111bddb5c49ac1e65bb",
+  "corpusCasePointer": "/cases/58",
+  "fixtureRef": "verification/model-binding/cases/M59/fixture.json",
+  "featureRef": "verification/model-binding/cases/M59/scenario.feature",
+  "profiles": [
+    "SIT",
+    "UAT"
+  ],
+  "plannedRepeats": 3,
+  "turns": [
+    {
+      "id": "turn-1",
+      "corpusTurnPointer": "/cases/58/turns/0",
+      "capabilityMapping": {
+        "semantic": "reserveQuantity",
+        "public": "reserveQuantity"
+      },
+      "commandActorRef": "command-actor",
+      "readActorRef": "read-probe-actor",
+      "steps": [
+        "context",
+        "before",
+        "agent",
+        "after",
+        "assert"
+      ],
+      "commonAssertions": [
+        {
+          "assertionId": "M59/turn-1/common-1",
+          "corpusAssertionPointer": "/cases/58/turns/0/oracle/assertions/0",
+          "semanticPath": "effects.allocationCount"
+        },
+        {
+          "assertionId": "M59/turn-1/common-2",
+          "corpusAssertionPointer": "/cases/58/turns/0/oracle/assertions/1",
+          "semanticPath": "effects.newPhysicalQuantity"
+        }
+      ],
+      "oracleAssertions": {
+        "SIT_DIRECT_COMMAND": [
+          {
+            "assertionId": "M59/turn-1/SIT_DIRECT_COMMAND-1",
+            "corpusAssertionPointer": "/cases/58/turns/0/oracle/sitDirectCommand/assertions/0",
+            "semanticPath": "response.errorCode"
+          }
+        ]
+      },
+      "oracleRef": "/cases/58/turns/0/oracle"
+    }
+  ]
+}

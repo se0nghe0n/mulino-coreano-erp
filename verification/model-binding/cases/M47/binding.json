@@ -1,0 +1,138 @@
+{
+  "schemaVersion": "1.0.0",
+  "caseId": "M47",
+  "corpusSha256": "570ce4610e585c698aeed4043be449e9bb8951448fb57111bddb5c49ac1e65bb",
+  "corpusCasePointer": "/cases/46",
+  "fixtureRef": "verification/model-binding/cases/M47/fixture.json",
+  "featureRef": "verification/model-binding/cases/M47/scenario.feature",
+  "profiles": [
+    "SIT",
+    "UAT"
+  ],
+  "plannedRepeats": 3,
+  "turns": [
+    {
+      "id": "turn-1",
+      "corpusTurnPointer": "/cases/46/turns/0",
+      "capabilityMapping": {
+        "semantic": "retrySafeCommand",
+        "public": "retrySafeCommand"
+      },
+      "commandActorRef": "command-actor",
+      "readActorRef": "read-probe-actor",
+      "steps": [
+        "context",
+        "before",
+        "agent",
+        "after",
+        "assert"
+      ],
+      "commonAssertions": [
+        {
+          "assertionId": "M47/turn-1/common-1",
+          "corpusAssertionPointer": "/cases/46/turns/0/oracle/assertions/0",
+          "semanticPath": "effects.dispatchCount"
+        },
+        {
+          "assertionId": "M47/turn-1/common-2",
+          "corpusAssertionPointer": "/cases/46/turns/0/oracle/assertions/1",
+          "semanticPath": "effects.allocationConsumptionCount"
+        },
+        {
+          "assertionId": "M47/turn-1/common-3",
+          "corpusAssertionPointer": "/cases/46/turns/0/oracle/assertions/2",
+          "semanticPath": "state.currentWriteAuthorization"
+        },
+        {
+          "assertionId": "M47/turn-1/common-4",
+          "corpusAssertionPointer": "/cases/46/turns/0/oracle/assertions/3",
+          "semanticPath": "state.currentOwnerRef"
+        },
+        {
+          "assertionId": "M47/turn-1/common-5",
+          "corpusAssertionPointer": "/cases/46/turns/0/oracle/assertions/4",
+          "semanticPath": "state.obligation.OB1.status"
+        },
+        {
+          "assertionId": "M47/turn-1/common-6",
+          "corpusAssertionPointer": "/cases/46/turns/0/oracle/assertions/5",
+          "semanticPath": "state.obligation.OB1.ownerRef"
+        }
+      ],
+      "oracleAssertions": {
+        "SIT_DIRECT_COMMAND": [
+          {
+            "assertionId": "M47/turn-1/SIT_DIRECT_COMMAND-1",
+            "corpusAssertionPointer": "/cases/46/turns/0/oracle/sitDirectCommand/assertions/0",
+            "semanticPath": "state.allocation.status"
+          },
+          {
+            "assertionId": "M47/turn-1/SIT_DIRECT_COMMAND-2",
+            "corpusAssertionPointer": "/cases/46/turns/0/oracle/sitDirectCommand/assertions/1",
+            "semanticPath": "state.work.blockedOwnerRef"
+          },
+          {
+            "assertionId": "M47/turn-1/SIT_DIRECT_COMMAND-3",
+            "corpusAssertionPointer": "/cases/46/turns/0/oracle/sitDirectCommand/assertions/2",
+            "semanticPath": "state.currentObligationCount"
+          },
+          {
+            "assertionId": "M47/turn-1/SIT_DIRECT_COMMAND-4",
+            "corpusAssertionPointer": "/cases/46/turns/0/oracle/sitDirectCommand/assertions/3",
+            "semanticPath": "effects.allocationSuspensionCount"
+          },
+          {
+            "assertionId": "M47/turn-1/SIT_DIRECT_COMMAND-5",
+            "corpusAssertionPointer": "/cases/46/turns/0/oracle/sitDirectCommand/assertions/4",
+            "semanticPath": "effects.reauthorizationObligationCount"
+          }
+        ],
+        "EVIDENCED_PREFLIGHT_STOP": [
+          {
+            "assertionId": "M47/turn-1/EVIDENCED_PREFLIGHT_STOP-1",
+            "corpusAssertionPointer": "/cases/46/turns/0/oracle/uatCompletion/pathOracles/EVIDENCED_PREFLIGHT_STOP/assertions/0",
+            "semanticPath": "state.allocation.status"
+          },
+          {
+            "assertionId": "M47/turn-1/EVIDENCED_PREFLIGHT_STOP-2",
+            "corpusAssertionPointer": "/cases/46/turns/0/oracle/uatCompletion/pathOracles/EVIDENCED_PREFLIGHT_STOP/assertions/1",
+            "semanticPath": "state.currentObligationCount"
+          },
+          {
+            "assertionId": "M47/turn-1/EVIDENCED_PREFLIGHT_STOP-3",
+            "corpusAssertionPointer": "/cases/46/turns/0/oracle/uatCompletion/pathOracles/EVIDENCED_PREFLIGHT_STOP/assertions/2",
+            "semanticPath": "effects.businessEffectCount"
+          }
+        ],
+        "SERVER_REJECTION": [
+          {
+            "assertionId": "M47/turn-1/SERVER_REJECTION-1",
+            "corpusAssertionPointer": "/cases/46/turns/0/oracle/uatCompletion/pathOracles/SERVER_REJECTION/assertions/0",
+            "semanticPath": "state.allocation.status"
+          },
+          {
+            "assertionId": "M47/turn-1/SERVER_REJECTION-2",
+            "corpusAssertionPointer": "/cases/46/turns/0/oracle/uatCompletion/pathOracles/SERVER_REJECTION/assertions/1",
+            "semanticPath": "state.work.blockedOwnerRef"
+          },
+          {
+            "assertionId": "M47/turn-1/SERVER_REJECTION-3",
+            "corpusAssertionPointer": "/cases/46/turns/0/oracle/uatCompletion/pathOracles/SERVER_REJECTION/assertions/2",
+            "semanticPath": "state.currentObligationCount"
+          },
+          {
+            "assertionId": "M47/turn-1/SERVER_REJECTION-4",
+            "corpusAssertionPointer": "/cases/46/turns/0/oracle/uatCompletion/pathOracles/SERVER_REJECTION/assertions/3",
+            "semanticPath": "effects.allocationSuspensionCount"
+          },
+          {
+            "assertionId": "M47/turn-1/SERVER_REJECTION-5",
+            "corpusAssertionPointer": "/cases/46/turns/0/oracle/uatCompletion/pathOracles/SERVER_REJECTION/assertions/4",
+            "semanticPath": "effects.reauthorizationObligationCount"
+          }
+        ]
+      },
+      "oracleRef": "/cases/46/turns/0/oracle"
+    }
+  ]
+}

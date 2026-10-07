@@ -1,0 +1,63 @@
+{
+  "schemaVersion": "1.0.0",
+  "caseId": "M43",
+  "corpusSha256": "570ce4610e585c698aeed4043be449e9bb8951448fb57111bddb5c49ac1e65bb",
+  "corpusCasePointer": "/cases/42",
+  "fixtureRef": "verification/model-binding/cases/M43/fixture.json",
+  "featureRef": "verification/model-binding/cases/M43/scenario.feature",
+  "profiles": [
+    "SIT",
+    "UAT"
+  ],
+  "plannedRepeats": 3,
+  "turns": [
+    {
+      "id": "turn-1",
+      "corpusTurnPointer": "/cases/42/turns/0",
+      "capabilityMapping": {
+        "semantic": "getAssessment",
+        "public": "getAssessment"
+      },
+      "commandActorRef": "command-actor",
+      "readActorRef": "read-probe-actor",
+      "steps": [
+        "context",
+        "before",
+        "agent",
+        "after",
+        "assert"
+      ],
+      "commonAssertions": [
+        {
+          "assertionId": "M43/turn-1/common-1",
+          "corpusAssertionPointer": "/cases/42/turns/0/oracle/assertions/0",
+          "semanticPath": "response.goalDefinitionVersion"
+        },
+        {
+          "assertionId": "M43/turn-1/common-2",
+          "corpusAssertionPointer": "/cases/42/turns/0/oracle/assertions/1",
+          "semanticPath": "response.goalEndpoint"
+        },
+        {
+          "assertionId": "M43/turn-1/common-3",
+          "corpusAssertionPointer": "/cases/42/turns/0/oracle/assertions/2",
+          "semanticPath": "response.arrivalAssessment"
+        },
+        {
+          "assertionId": "M43/turn-1/common-4",
+          "corpusAssertionPointer": "/cases/42/turns/0/oracle/assertions/3",
+          "semanticPath": "response.currentSell"
+        },
+        {
+          "assertionId": "M43/turn-1/common-5",
+          "corpusAssertionPointer": "/cases/42/turns/0/oracle/assertions/4",
+          "semanticPath": "effects.goalMigrationCount"
+        }
+      ],
+      "oracleAssertions": {
+        "SIT_DIRECT_COMMAND": []
+      },
+      "oracleRef": "/cases/42/turns/0/oracle"
+    }
+  ]
+}

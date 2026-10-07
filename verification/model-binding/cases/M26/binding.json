@@ -1,0 +1,76 @@
+{
+  "schemaVersion": "1.0.0",
+  "caseId": "M26",
+  "corpusSha256": "570ce4610e585c698aeed4043be449e9bb8951448fb57111bddb5c49ac1e65bb",
+  "corpusCasePointer": "/cases/25",
+  "fixtureRef": "verification/model-binding/cases/M26/fixture.json",
+  "featureRef": "verification/model-binding/cases/M26/scenario.feature",
+  "profiles": [
+    "SIT",
+    "UAT"
+  ],
+  "plannedRepeats": 3,
+  "turns": [
+    {
+      "id": "turn-1",
+      "corpusTurnPointer": "/cases/25/turns/0",
+      "capabilityMapping": {
+        "semantic": "proposePurchase",
+        "public": "proposePurchase"
+      },
+      "commandActorRef": "command-actor",
+      "readActorRef": "read-probe-actor",
+      "steps": [
+        "context",
+        "before",
+        "agent",
+        "after",
+        "assert"
+      ],
+      "commonAssertions": [
+        {
+          "assertionId": "M26/turn-1/common-1",
+          "corpusAssertionPointer": "/cases/25/turns/0/oracle/assertions/0",
+          "semanticPath": "effects.businessEffectCount"
+        }
+      ],
+      "oracleAssertions": {
+        "SIT_DIRECT_COMMAND": []
+      },
+      "oracleRef": "/cases/25/turns/0/oracle"
+    },
+    {
+      "id": "turn-2",
+      "corpusTurnPointer": "/cases/25/turns/1",
+      "capabilityMapping": {
+        "semantic": "proposePurchase",
+        "public": "proposePurchase"
+      },
+      "commandActorRef": "command-actor",
+      "readActorRef": "read-probe-actor",
+      "steps": [
+        "context",
+        "before",
+        "agent",
+        "after",
+        "assert"
+      ],
+      "commonAssertions": [
+        {
+          "assertionId": "M26/turn-2/common-1",
+          "corpusAssertionPointer": "/cases/25/turns/1/oracle/assertions/0",
+          "semanticPath": "state.purchaseProposal.endpoint"
+        },
+        {
+          "assertionId": "M26/turn-2/common-2",
+          "corpusAssertionPointer": "/cases/25/turns/1/oracle/assertions/1",
+          "semanticPath": "state.purchaseProposal.qcNotArrivalPrecondition"
+        }
+      ],
+      "oracleAssertions": {
+        "SIT_DIRECT_COMMAND": []
+      },
+      "oracleRef": "/cases/25/turns/1/oracle"
+    }
+  ]
+}

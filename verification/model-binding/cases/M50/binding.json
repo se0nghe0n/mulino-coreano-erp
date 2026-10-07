@@ -1,0 +1,117 @@
+{
+  "schemaVersion": "1.0.0",
+  "caseId": "M50",
+  "corpusSha256": "570ce4610e585c698aeed4043be449e9bb8951448fb57111bddb5c49ac1e65bb",
+  "corpusCasePointer": "/cases/49",
+  "fixtureRef": "verification/model-binding/cases/M50/fixture.json",
+  "featureRef": "verification/model-binding/cases/M50/scenario.feature",
+  "profiles": [
+    "SIT",
+    "UAT"
+  ],
+  "plannedRepeats": 3,
+  "turns": [
+    {
+      "id": "turn-1",
+      "corpusTurnPointer": "/cases/49/turns/0",
+      "capabilityMapping": {
+        "semantic": "confirmReceipt",
+        "public": "confirmReceipt"
+      },
+      "commandActorRef": "command-actor",
+      "readActorRef": "read-probe-actor",
+      "steps": [
+        "context",
+        "before",
+        "agent",
+        "after",
+        "assert"
+      ],
+      "commonAssertions": [
+        {
+          "assertionId": "M50/turn-1/common-1",
+          "corpusAssertionPointer": "/cases/49/turns/0/oracle/assertions/0",
+          "semanticPath": "state.receipt.cumulative.value"
+        },
+        {
+          "assertionId": "M50/turn-1/common-2",
+          "corpusAssertionPointer": "/cases/49/turns/0/oracle/assertions/1",
+          "semanticPath": "state.receipt.totalEffectCount"
+        },
+        {
+          "assertionId": "M50/turn-1/common-3",
+          "corpusAssertionPointer": "/cases/49/turns/0/oracle/assertions/2",
+          "semanticPath": "effects.newReceiptCount"
+        },
+        {
+          "assertionId": "M50/turn-1/common-4",
+          "corpusAssertionPointer": "/cases/49/turns/0/oracle/assertions/3",
+          "semanticPath": "effects.newMovementCount"
+        },
+        {
+          "assertionId": "M50/turn-1/common-5",
+          "corpusAssertionPointer": "/cases/49/turns/0/oracle/assertions/4",
+          "semanticPath": "effects.newOutboxCount"
+        },
+        {
+          "assertionId": "M50/turn-1/common-6",
+          "corpusAssertionPointer": "/cases/49/turns/0/oracle/assertions/5",
+          "semanticPath": "response.reusedCommittedResult"
+        }
+      ],
+      "oracleAssertions": {
+        "SIT_DIRECT_COMMAND": []
+      },
+      "oracleRef": "/cases/49/turns/0/oracle"
+    },
+    {
+      "id": "turn-2",
+      "corpusTurnPointer": "/cases/49/turns/1",
+      "capabilityMapping": {
+        "semantic": "confirmReceipt",
+        "public": "confirmReceipt"
+      },
+      "commandActorRef": "command-actor",
+      "readActorRef": "read-probe-actor",
+      "steps": [
+        "context",
+        "before",
+        "agent",
+        "after",
+        "assert"
+      ],
+      "commonAssertions": [
+        {
+          "assertionId": "M50/turn-2/common-1",
+          "corpusAssertionPointer": "/cases/49/turns/1/oracle/assertions/0",
+          "semanticPath": "state.receipt.cumulative.value"
+        },
+        {
+          "assertionId": "M50/turn-2/common-2",
+          "corpusAssertionPointer": "/cases/49/turns/1/oracle/assertions/1",
+          "semanticPath": "effects.newReceiptCount"
+        },
+        {
+          "assertionId": "M50/turn-2/common-3",
+          "corpusAssertionPointer": "/cases/49/turns/1/oracle/assertions/2",
+          "semanticPath": "effects.newMovementCount"
+        },
+        {
+          "assertionId": "M50/turn-2/common-4",
+          "corpusAssertionPointer": "/cases/49/turns/1/oracle/assertions/3",
+          "semanticPath": "effects.newOutboxCount"
+        }
+      ],
+      "oracleAssertions": {
+        "SIT_DIRECT_COMMAND": [
+          {
+            "assertionId": "M50/turn-2/SIT_DIRECT_COMMAND-1",
+            "corpusAssertionPointer": "/cases/49/turns/1/oracle/sitDirectCommand/assertions/0",
+            "semanticPath": "response.errorCode"
+          }
+        ]
+      },
+      "oracleRef": "/cases/49/turns/1/oracle"
+    }
+  ]
+}

@@ -1,0 +1,51 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "array",
+  "items": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": [
+      "dataset",
+      "attribute",
+      "table",
+      "column",
+      "rowId",
+      "value"
+    ],
+    "properties": {
+      "dataset": {
+        "type": "string",
+        "minLength": 1
+      },
+      "attribute": {
+        "type": "string",
+        "minLength": 1
+      },
+      "table": {
+        "type": "string",
+        "minLength": 1
+      },
+      "column": {
+        "type": "string",
+        "minLength": 1
+      },
+      "rowId": {
+        "type": "string",
+        "minLength": 1
+      },
+      "entityId": {
+        "type": "string",
+        "minLength": 1
+      },
+      "value": {},
+      "unit": {
+        "type": "string",
+        "minLength": 1
+      },
+      "physicalScopeId": {
+        "type": "string",
+        "minLength": 1
+      }
+    }
+  }
+}

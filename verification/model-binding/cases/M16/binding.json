@@ -1,0 +1,73 @@
+{
+  "schemaVersion": "1.0.0",
+  "caseId": "M16",
+  "corpusSha256": "570ce4610e585c698aeed4043be449e9bb8951448fb57111bddb5c49ac1e65bb",
+  "corpusCasePointer": "/cases/15",
+  "fixtureRef": "verification/model-binding/cases/M16/fixture.json",
+  "featureRef": "verification/model-binding/cases/M16/scenario.feature",
+  "profiles": [
+    "SIT",
+    "UAT"
+  ],
+  "plannedRepeats": 3,
+  "turns": [
+    {
+      "id": "turn-1",
+      "corpusTurnPointer": "/cases/15/turns/0",
+      "capabilityMapping": {
+        "semantic": "getWork",
+        "public": "getWork"
+      },
+      "commandActorRef": "command-actor",
+      "readActorRef": "read-probe-actor",
+      "steps": [
+        "context",
+        "before",
+        "agent",
+        "after",
+        "assert"
+      ],
+      "commonAssertions": [
+        {
+          "assertionId": "M16/turn-1/common-1",
+          "corpusAssertionPointer": "/cases/15/turns/0/oracle/assertions/0",
+          "semanticPath": "response.arrived.value"
+        },
+        {
+          "assertionId": "M16/turn-1/common-2",
+          "corpusAssertionPointer": "/cases/15/turns/0/oracle/assertions/1",
+          "semanticPath": "response.onHand.value"
+        },
+        {
+          "assertionId": "M16/turn-1/common-3",
+          "corpusAssertionPointer": "/cases/15/turns/0/oracle/assertions/2",
+          "semanticPath": "response.delivered.value"
+        },
+        {
+          "assertionId": "M16/turn-1/common-4",
+          "corpusAssertionPointer": "/cases/15/turns/0/oracle/assertions/3",
+          "semanticPath": "response.returned.value"
+        },
+        {
+          "assertionId": "M16/turn-1/common-5",
+          "corpusAssertionPointer": "/cases/15/turns/0/oracle/assertions/4",
+          "semanticPath": "response.eligible.value"
+        },
+        {
+          "assertionId": "M16/turn-1/common-6",
+          "corpusAssertionPointer": "/cases/15/turns/0/oracle/assertions/5",
+          "semanticPath": "response.openObligationKinds"
+        },
+        {
+          "assertionId": "M16/turn-1/common-7",
+          "corpusAssertionPointer": "/cases/15/turns/0/oracle/assertions/6",
+          "semanticPath": "effects.bankTransferCount"
+        }
+      ],
+      "oracleAssertions": {
+        "SIT_DIRECT_COMMAND": []
+      },
+      "oracleRef": "/cases/15/turns/0/oracle"
+    }
+  ]
+}

@@ -1,0 +1,68 @@
+{
+  "schemaVersion": "1.0.0",
+  "caseId": "M51",
+  "corpusSha256": "570ce4610e585c698aeed4043be449e9bb8951448fb57111bddb5c49ac1e65bb",
+  "corpusCasePointer": "/cases/50",
+  "fixtureRef": "verification/model-binding/cases/M51/fixture.json",
+  "featureRef": "verification/model-binding/cases/M51/scenario.feature",
+  "profiles": [
+    "SIT",
+    "UAT"
+  ],
+  "plannedRepeats": 3,
+  "turns": [
+    {
+      "id": "turn-1",
+      "corpusTurnPointer": "/cases/50/turns/0",
+      "capabilityMapping": {
+        "semantic": "recordDelivery",
+        "public": "recordDelivery"
+      },
+      "commandActorRef": "command-actor",
+      "readActorRef": "read-probe-actor",
+      "steps": [
+        "context",
+        "before",
+        "agent",
+        "after",
+        "assert"
+      ],
+      "commonAssertions": [
+        {
+          "assertionId": "M51/turn-1/common-1",
+          "corpusAssertionPointer": "/cases/50/turns/0/oracle/assertions/0",
+          "semanticPath": "state.delivery.actual.value"
+        },
+        {
+          "assertionId": "M51/turn-1/common-2",
+          "corpusAssertionPointer": "/cases/50/turns/0/oracle/assertions/1",
+          "semanticPath": "state.transport.remaining.value"
+        },
+        {
+          "assertionId": "M51/turn-1/common-3",
+          "corpusAssertionPointer": "/cases/50/turns/0/oracle/assertions/2",
+          "semanticPath": "effects.newWarehouseDispatchCount"
+        },
+        {
+          "assertionId": "M51/turn-1/common-4",
+          "corpusAssertionPointer": "/cases/50/turns/0/oracle/assertions/3",
+          "semanticPath": "effects.newAllocationCount"
+        },
+        {
+          "assertionId": "M51/turn-1/common-5",
+          "corpusAssertionPointer": "/cases/50/turns/0/oracle/assertions/4",
+          "semanticPath": "state.assessment.normalFulfillment"
+        },
+        {
+          "assertionId": "M51/turn-1/common-6",
+          "corpusAssertionPointer": "/cases/50/turns/0/oracle/assertions/5",
+          "semanticPath": "state.delivery.compliance"
+        }
+      ],
+      "oracleAssertions": {
+        "SIT_DIRECT_COMMAND": []
+      },
+      "oracleRef": "/cases/50/turns/0/oracle"
+    }
+  ]
+}

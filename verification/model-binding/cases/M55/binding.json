@@ -1,0 +1,111 @@
+{
+  "schemaVersion": "1.0.0",
+  "caseId": "M55",
+  "corpusSha256": "570ce4610e585c698aeed4043be449e9bb8951448fb57111bddb5c49ac1e65bb",
+  "corpusCasePointer": "/cases/54",
+  "fixtureRef": "verification/model-binding/cases/M55/fixture.json",
+  "featureRef": "verification/model-binding/cases/M55/scenario.feature",
+  "profiles": [
+    "SIT",
+    "UAT"
+  ],
+  "plannedRepeats": 3,
+  "turns": [
+    {
+      "id": "turn-1",
+      "corpusTurnPointer": "/cases/54/turns/0",
+      "capabilityMapping": {
+        "semantic": "receiveReturn",
+        "public": "receiveReturn"
+      },
+      "commandActorRef": "command-actor",
+      "readActorRef": "read-probe-actor",
+      "steps": [
+        "context",
+        "before",
+        "agent",
+        "after",
+        "assert"
+      ],
+      "commonAssertions": [
+        {
+          "assertionId": "M55/turn-1/common-1",
+          "corpusAssertionPointer": "/cases/54/turns/0/oracle/assertions/0",
+          "semanticPath": "state.delivery.historical.value"
+        },
+        {
+          "assertionId": "M55/turn-1/common-2",
+          "corpusAssertionPointer": "/cases/54/turns/0/oracle/assertions/1",
+          "semanticPath": "state.return.received.value"
+        },
+        {
+          "assertionId": "M55/turn-1/common-3",
+          "corpusAssertionPointer": "/cases/54/turns/0/oracle/assertions/2",
+          "semanticPath": "state.return.qc"
+        },
+        {
+          "assertionId": "M55/turn-1/common-4",
+          "corpusAssertionPointer": "/cases/54/turns/0/oracle/assertions/3",
+          "semanticPath": "state.inventory.returnedOnHand.value"
+        },
+        {
+          "assertionId": "M55/turn-1/common-5",
+          "corpusAssertionPointer": "/cases/54/turns/0/oracle/assertions/4",
+          "semanticPath": "effects.deliveryCorrectionCount"
+        }
+      ],
+      "oracleAssertions": {
+        "SIT_DIRECT_COMMAND": []
+      },
+      "oracleRef": "/cases/54/turns/0/oracle"
+    },
+    {
+      "id": "turn-2",
+      "corpusTurnPointer": "/cases/54/turns/1",
+      "capabilityMapping": {
+        "semantic": "receiveReturn",
+        "public": "receiveReturn"
+      },
+      "commandActorRef": "command-actor",
+      "readActorRef": "read-probe-actor",
+      "steps": [
+        "context",
+        "before",
+        "agent",
+        "after",
+        "assert"
+      ],
+      "commonAssertions": [
+        {
+          "assertionId": "M55/turn-2/common-1",
+          "corpusAssertionPointer": "/cases/54/turns/1/oracle/assertions/0",
+          "semanticPath": "state.delivery.historical.value"
+        },
+        {
+          "assertionId": "M55/turn-2/common-2",
+          "corpusAssertionPointer": "/cases/54/turns/1/oracle/assertions/1",
+          "semanticPath": "state.return.received.value"
+        },
+        {
+          "assertionId": "M55/turn-2/common-3",
+          "corpusAssertionPointer": "/cases/54/turns/1/oracle/assertions/2",
+          "semanticPath": "effects.newReturnCount"
+        },
+        {
+          "assertionId": "M55/turn-2/common-4",
+          "corpusAssertionPointer": "/cases/54/turns/1/oracle/assertions/3",
+          "semanticPath": "effects.newPhysicalQuantity"
+        },
+        {
+          "assertionId": "M55/turn-2/common-5",
+          "corpusAssertionPointer": "/cases/54/turns/1/oracle/assertions/4",
+          "semanticPath": "state.currentReturnObligationCount"
+        }
+      ],
+      "oracleAssertions": {
+        "SIT_DIRECT_COMMAND": []
+      },
+      "oracleRef": "/cases/54/turns/1/oracle"
+    }
+  ]
+}

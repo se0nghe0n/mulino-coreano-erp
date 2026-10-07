@@ -1,0 +1,48 @@
+{
+  "schemaVersion": "1.0.0",
+  "caseId": "M35",
+  "corpusSha256": "570ce4610e585c698aeed4043be449e9bb8951448fb57111bddb5c49ac1e65bb",
+  "corpusCasePointer": "/cases/34",
+  "fixtureRef": "verification/model-binding/cases/M35/fixture.json",
+  "featureRef": "verification/model-binding/cases/M35/scenario.feature",
+  "profiles": [
+    "SIT",
+    "UAT"
+  ],
+  "plannedRepeats": 3,
+  "turns": [
+    {
+      "id": "turn-1",
+      "corpusTurnPointer": "/cases/34/turns/0",
+      "capabilityMapping": {
+        "semantic": "getDefinition",
+        "public": "getDefinition"
+      },
+      "commandActorRef": "command-actor",
+      "readActorRef": "read-probe-actor",
+      "steps": [
+        "context",
+        "before",
+        "agent",
+        "after",
+        "assert"
+      ],
+      "commonAssertions": [
+        {
+          "assertionId": "M35/turn-1/common-1",
+          "corpusAssertionPointer": "/cases/34/turns/0/oracle/assertions/0",
+          "semanticPath": "response.defaultReturnQc"
+        },
+        {
+          "assertionId": "M35/turn-1/common-2",
+          "corpusAssertionPointer": "/cases/34/turns/0/oracle/assertions/1",
+          "semanticPath": "effects.returnCount"
+        }
+      ],
+      "oracleAssertions": {
+        "SIT_DIRECT_COMMAND": []
+      },
+      "oracleRef": "/cases/34/turns/0/oracle"
+    }
+  ]
+}

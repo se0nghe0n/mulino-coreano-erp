@@ -1,0 +1,58 @@
+{
+  "schemaVersion": "1.0.0",
+  "caseId": "M36",
+  "corpusSha256": "570ce4610e585c698aeed4043be449e9bb8951448fb57111bddb5c49ac1e65bb",
+  "corpusCasePointer": "/cases/35",
+  "fixtureRef": "verification/model-binding/cases/M36/fixture.json",
+  "featureRef": "verification/model-binding/cases/M36/scenario.feature",
+  "profiles": [
+    "SIT",
+    "UAT"
+  ],
+  "plannedRepeats": 3,
+  "turns": [
+    {
+      "id": "turn-1",
+      "corpusTurnPointer": "/cases/35/turns/0",
+      "capabilityMapping": {
+        "semantic": "getWork",
+        "public": "getWork"
+      },
+      "commandActorRef": "command-actor",
+      "readActorRef": "read-probe-actor",
+      "steps": [
+        "context",
+        "before",
+        "agent",
+        "after",
+        "assert"
+      ],
+      "commonAssertions": [
+        {
+          "assertionId": "M36/turn-1/common-1",
+          "corpusAssertionPointer": "/cases/35/turns/0/oracle/assertions/0",
+          "semanticPath": "response.dispatched.value"
+        },
+        {
+          "assertionId": "M36/turn-1/common-2",
+          "corpusAssertionPointer": "/cases/35/turns/0/oracle/assertions/1",
+          "semanticPath": "response.delivered.value"
+        },
+        {
+          "assertionId": "M36/turn-1/common-3",
+          "corpusAssertionPointer": "/cases/35/turns/0/oracle/assertions/2",
+          "semanticPath": "response.deliveryRemaining.value"
+        },
+        {
+          "assertionId": "M36/turn-1/common-4",
+          "corpusAssertionPointer": "/cases/35/turns/0/oracle/assertions/3",
+          "semanticPath": "effects.newDispatchCount"
+        }
+      ],
+      "oracleAssertions": {
+        "SIT_DIRECT_COMMAND": []
+      },
+      "oracleRef": "/cases/35/turns/0/oracle"
+    }
+  ]
+}

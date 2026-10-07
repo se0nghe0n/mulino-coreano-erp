@@ -1,0 +1,86 @@
+{
+  "schemaVersion": "1.0.0",
+  "caseId": "M30",
+  "corpusSha256": "570ce4610e585c698aeed4043be449e9bb8951448fb57111bddb5c49ac1e65bb",
+  "corpusCasePointer": "/cases/29",
+  "fixtureRef": "verification/model-binding/cases/M30/fixture.json",
+  "featureRef": "verification/model-binding/cases/M30/scenario.feature",
+  "profiles": [
+    "SIT",
+    "UAT"
+  ],
+  "plannedRepeats": 3,
+  "turns": [
+    {
+      "id": "turn-1",
+      "corpusTurnPointer": "/cases/29/turns/0",
+      "capabilityMapping": {
+        "semantic": "linkCanonicalOccurrence",
+        "public": "linkCanonicalOccurrence"
+      },
+      "commandActorRef": "command-actor",
+      "readActorRef": "read-probe-actor",
+      "steps": [
+        "context",
+        "before",
+        "agent",
+        "after",
+        "assert"
+      ],
+      "commonAssertions": [
+        {
+          "assertionId": "M30/turn-1/common-1",
+          "corpusAssertionPointer": "/cases/29/turns/0/oracle/assertions/0",
+          "semanticPath": "effects.confirmedPhysicalQuantity"
+        },
+        {
+          "assertionId": "M30/turn-1/common-2",
+          "corpusAssertionPointer": "/cases/29/turns/0/oracle/assertions/1",
+          "semanticPath": "state.claims.preservedCount"
+        }
+      ],
+      "oracleAssertions": {
+        "SIT_DIRECT_COMMAND": []
+      },
+      "oracleRef": "/cases/29/turns/0/oracle"
+    },
+    {
+      "id": "turn-2",
+      "corpusTurnPointer": "/cases/29/turns/1",
+      "capabilityMapping": {
+        "semantic": "linkCanonicalOccurrence",
+        "public": "linkCanonicalOccurrence"
+      },
+      "commandActorRef": "command-actor",
+      "readActorRef": "read-probe-actor",
+      "steps": [
+        "context",
+        "before",
+        "agent",
+        "after",
+        "assert"
+      ],
+      "commonAssertions": [
+        {
+          "assertionId": "M30/turn-2/common-1",
+          "corpusAssertionPointer": "/cases/29/turns/1/oracle/assertions/0",
+          "semanticPath": "effects.confirmedPhysicalQuantity"
+        },
+        {
+          "assertionId": "M30/turn-2/common-2",
+          "corpusAssertionPointer": "/cases/29/turns/1/oracle/assertions/1",
+          "semanticPath": "state.claims.preservedCount"
+        },
+        {
+          "assertionId": "M30/turn-2/common-3",
+          "corpusAssertionPointer": "/cases/29/turns/1/oracle/assertions/2",
+          "semanticPath": "state.reconciliation.status"
+        }
+      ],
+      "oracleAssertions": {
+        "SIT_DIRECT_COMMAND": []
+      },
+      "oracleRef": "/cases/29/turns/1/oracle"
+    }
+  ]
+}
