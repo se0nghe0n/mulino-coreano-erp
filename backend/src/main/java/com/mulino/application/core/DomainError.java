@@ -16,5 +16,5 @@ public class DomainError extends RuntimeException {
   }
   public static DomainError invalid(String message) { return new DomainError("REJECTED","TYPE_INVALID",message); }
   public static DomainError forbidden() { return new DomainError("REJECTED","FORBIDDEN","Unavailable scope"); }
-  public static DomainError unsupported() { return new DomainError("REJECTED","VERSION_UNSUPPORTED","Unsupported capability or definition"); }
+  public static DomainError unsupported() { return new DomainError("HELD","VERSION_UNSUPPORTED","Unsupported capability or definition"); }
 }
