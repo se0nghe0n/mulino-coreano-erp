@@ -168,7 +168,8 @@ for v in variants:
  elif v=='unsupported-version':w['request']['headers']['MCP-Protocol-Version']='1900-01-01';w['request']['body']['params']['_meta']['io.modelcontextprotocol/protocolVersion']='1900-01-01';expected='error';http=400
  elif v=='missing-meta':del w['request']['body']['params']['_meta'];expected='error';http=400
  elif v in ['missing-client-info','missing-capabilities']:
-  del w['request']['body']['params']['_meta']['io.modelcontextprotocol/'+('clientInfo' if v=='missing-client-info' else 'clientCapabilities')];expected='error';http=400
+  del w['request']['body']['params']['_meta']['io.modelcontextprotocol/'+('clientInfo' if v=='missing-client-info' else 'clientCapabilities')]
+  if v=='missing-capabilities':expected='error';http=400
  elif v=='unauthenticated':w['actorRef']='anonymous';w['request']['credentialProfileRef']='anonymous';expected='error';http=401
  elif v=='bad-origin':w['request']['headers']['Origin']='https://untrusted.example.invalid';expected='error';http=403
  elif v=='initialize-not-required':w['request']['connectionState']={'initialized':False,'sessionId':None}
@@ -177,8 +178,14 @@ for v in variants:
  elif v=='old-protocol':w['request']['headers']['MCP-Protocol-Version']='2025-11-25';w['request']['body']['params']['_meta']['io.modelcontextprotocol/protocolVersion']='2025-11-25';expected='error';http=400
  a=[setup(),action('noun','getInventory'),obs('db-before'),w,action('after','getInventory'),obs('db-after','after')]
  x=[eq('wire-transport',o,'wire-protocol','wire','/response/transport','stdio') if v=='stdio' else eq('wire-http',o,'wire-protocol','wire','/response/httpStatus',http),eq('jsonrpc-version',o,'wire-protocol','wire','/response/body/jsonrpc','2.0'),eq('jsonrpc-id',o,'wire-protocol','wire','/response/body/id','wire')]+no_effect(o,'wire-protocol')
- if expected=='result':x += [eq('protocol-result-version',o,'wire-protocol','wire','/response/body/result/protocolVersion','2026-07-28'),eq('stateless-handshake',o,'wire-protocol','wire','/data/transcript/clientMethods',['server/discover']),eq('server-requests',o,'wire-protocol','wire','/data/transcript/serverRequestMethods',[]),assertion('tool-schema-registry',o,'domain-parity','exactSet','wire','/response/body/result/tools',PUBLIC_CAPABILITIES,field='name')]
- else:x += [eq('wire-error-class',o,'wire-protocol','wire','/response/body/error/data/category','PROTOCOL' if http==400 else 'AUTHENTICATION' if http==401 else 'ORIGIN'),assertion('no-tool-result',o,'domain-parity','absent','wire','/response/body/result',None)]
+ if expected=='result':x += [eq('protocol-result-version',o,'wire-protocol','wire','/response/body/result/supportedVersions',['2026-07-28']),eq('stateless-handshake',o,'wire-protocol','wire','/data/transcript/clientMethods',['server/discover']),eq('server-requests',o,'wire-protocol','wire','/data/transcript/serverRequestMethods',[]),assertion('tool-schema-registry',o,'domain-parity','exactSet','tools-list','/response/body/result/tools',PUBLIC_CAPABILITIES,field='name')]
+
+ if expected=='result':
+  tw=wire('tools-list','tools/list',meta=w['request']['body']['params']['_meta'],actor=w['actorRef'],transport=w['request']['transport'])
+  if v=='stdio':tw['request']['headers']={};tw['request'].pop('httpMethod',None)
+  a.insert(a.index(w)+1,tw)
+  x += [eq('discover-result-type',o,'wire-protocol','wire','/response/body/result/resultType','complete'),eq('discover-tools-capability',o,'wire-protocol','wire','/response/body/result/capabilities/tools',{})]
+ if expected!='result':x += [eq('wire-error-class',o,'wire-protocol','wire','/response/body/error/data/category','PROTOCOL' if http==400 else 'AUTHENTICATION' if http==401 else 'ORIGIN'),assertion('no-tool-result',o,'domain-parity','absent','wire','/response/body/result',None)]
  T20.append(sub('T20','wire-'+v,'raw stateless MCP '+v,o,a,x,['fixture','api','db','wire']))
 o='T20.mcp-stateless-wire'
 w=wire('wire','tools/call',{'name':'createDraft','arguments':typed()},actor='readAgent',transport='stdio');w['request']['headers']={};w['request'].pop('httpMethod',None)

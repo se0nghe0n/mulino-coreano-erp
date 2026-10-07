@@ -6830,6 +6830,48 @@
           ]
         },
         {
+          "id": "tools-list",
+          "kind": "invoke",
+          "actorRef": "reader",
+          "route": "wire",
+          "protocolOperation": "tools/list",
+          "request": {
+            "transport": "streamable-http",
+            "httpMethod": "POST",
+            "headers": {
+              "MCP-Protocol-Version": "2026-07-28",
+              "Mcp-Method": "tools/list",
+              "Content-Type": "application/json",
+              "Origin": "https://isolated-client.example.invalid"
+            },
+            "body": {
+              "jsonrpc": "2.0",
+              "id": "tools-list",
+              "method": "tools/list",
+              "params": {
+                "_meta": {
+                  "io.modelcontextprotocol/protocolVersion": "2026-07-28",
+                  "io.modelcontextprotocol/clientInfo": {
+                    "name": "ontology-channel-contract",
+                    "version": "1.0.0"
+                  },
+                  "io.modelcontextprotocol/clientCapabilities": {
+                    "elicitation": {
+                      "form": {}
+                    }
+                  }
+                }
+              }
+            },
+            "credentialProfileRef": "reader"
+          },
+          "evidenceRefs": [
+            "tools-list:redacted-raw-wire",
+            "tools-list:authenticated-context",
+            "tools-list:server-response"
+          ]
+        },
+        {
           "id": "after",
           "kind": "query",
           "actorRef": "reader",
@@ -7308,9 +7350,11 @@
           "op": "equals",
           "source": {
             "actionId": "wire",
-            "pointer": "/response/body/result/protocolVersion"
+            "pointer": "/response/body/result/supportedVersions"
           },
-          "expected": "2026-07-28",
+          "expected": [
+            "2026-07-28"
+          ],
           "requirementRefs": [
             "D20"
           ],
@@ -7329,7 +7373,7 @@
               "$alias": "L"
             }
           },
-          "oracleExplanation": "protocol-result-version: /response/body/result/protocolVersion의 실제 equals 기대값은 \"2026-07-28\"다. 미관찰·UNKNOWN은 정상값이 아니다.",
+          "oracleExplanation": "공식 DiscoverResult의 supportedVersions는 [2026-07-28]이며 legacy protocolVersion 필드로 대체하지 않는다.",
           "oracleRef": {
             "oracleId": "T20.mcp-stateless-wire",
             "observationNames": [
@@ -7411,7 +7455,7 @@
           "id": "tool-schema-registry",
           "op": "exactSet",
           "source": {
-            "actionId": "wire",
+            "actionId": "tools-list",
             "pointer": "/response/body/result/tools",
             "field": "name"
           },
@@ -7534,8 +7578,8 @@
             "D20"
           ],
           "evidenceRefs": [
-            "wire:actual-observation",
-            "wire:source-artifact"
+            "tools-list:actual-observation",
+            "tools-list:source-artifact"
           ],
           "scope": {
             "organizationId": {
@@ -7548,7 +7592,7 @@
               "$alias": "L"
             }
           },
-          "oracleExplanation": "tool-schema-registry: /response/body/result/tools의 실제 name는 고정한 113개 identity/관계와 exact 일치하며 중복·누락을 거부한다.",
+          "oracleExplanation": "독립 tools/list 응답의 공개 capability name을 고정 목록과 exact 대조한다. discover에서 tools를 꾸미지 않는다.",
           "oracleRef": {
             "oracleId": "T20.mcp-stateless-wire",
             "observationNames": [
@@ -7730,6 +7774,74 @@
             }
           },
           "oracleExplanation": "wire-raw-meta: /data/transcript/request/body/params/_meta의 실제 equals 기대값은 {\"io.modelcontextprotocol/protocolVersion\": \"2026-07-28\", \"io.modelcontextprotocol/clientInfo\": {\"name\": \"ontology-channel-contract\", \"version\": \"1.0.0\"}, \"io.modelcontextprotocol/clientCapabilities\": {\"elicitation\": {\"form\": {}}}}다. 미관찰·UNKNOWN은 정상값이 아니다.",
+          "oracleRef": {
+            "oracleId": "T20.mcp-stateless-wire",
+            "observationNames": [
+              "wire-protocol"
+            ]
+          }
+        },
+        {
+          "id": "discover-result-type",
+          "op": "equals",
+          "source": {
+            "actionId": "wire",
+            "pointer": "/response/body/result/resultType"
+          },
+          "expected": "complete",
+          "requirementRefs": [
+            "D20"
+          ],
+          "evidenceRefs": [
+            "wire:actual-observation",
+            "wire:source-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "lotId": {
+              "$alias": "L"
+            }
+          },
+          "oracleExplanation": "discover-result-type: 공식 discovery result를 exact 대조한다.",
+          "oracleRef": {
+            "oracleId": "T20.mcp-stateless-wire",
+            "observationNames": [
+              "wire-protocol"
+            ]
+          }
+        },
+        {
+          "id": "discover-tools-capability",
+          "op": "equals",
+          "source": {
+            "actionId": "wire",
+            "pointer": "/response/body/result/capabilities/tools"
+          },
+          "expected": {},
+          "requirementRefs": [
+            "D20"
+          ],
+          "evidenceRefs": [
+            "wire:actual-observation",
+            "wire:source-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "lotId": {
+              "$alias": "L"
+            }
+          },
+          "oracleExplanation": "discover-tools-capability: 공식 discovery result를 exact 대조한다.",
           "oracleRef": {
             "oracleId": "T20.mcp-stateless-wire",
             "observationNames": [
@@ -12184,6 +12296,44 @@
           ]
         },
         {
+          "id": "tools-list",
+          "kind": "invoke",
+          "actorRef": "reader",
+          "route": "wire",
+          "protocolOperation": "tools/list",
+          "request": {
+            "transport": "streamable-http",
+            "httpMethod": "POST",
+            "headers": {
+              "MCP-Protocol-Version": "2026-07-28",
+              "Mcp-Method": "tools/list",
+              "Content-Type": "application/json",
+              "Origin": "https://isolated-client.example.invalid"
+            },
+            "body": {
+              "jsonrpc": "2.0",
+              "id": "tools-list",
+              "method": "tools/list",
+              "params": {
+                "_meta": {
+                  "io.modelcontextprotocol/protocolVersion": "2026-07-28",
+                  "io.modelcontextprotocol/clientCapabilities": {
+                    "elicitation": {
+                      "form": {}
+                    }
+                  }
+                }
+              }
+            },
+            "credentialProfileRef": "reader"
+          },
+          "evidenceRefs": [
+            "tools-list:redacted-raw-wire",
+            "tools-list:authenticated-context",
+            "tools-list:server-response"
+          ]
+        },
+        {
           "id": "after",
           "kind": "query",
           "actorRef": "reader",
@@ -12264,7 +12414,7 @@
             "actionId": "wire",
             "pointer": "/response/httpStatus"
           },
-          "expected": 400,
+          "expected": 200,
           "requirementRefs": [
             "D20"
           ],
@@ -12283,7 +12433,7 @@
               "$alias": "L"
             }
           },
-          "oracleExplanation": "wire-http: /response/httpStatus의 실제 equals 기대값은 400다. 미관찰·UNKNOWN은 정상값이 아니다.",
+          "oracleExplanation": "wire-http: /response/httpStatus의 실제 equals 기대값은 200다. 미관찰·UNKNOWN은 정상값이 아니다.",
           "oracleRef": {
             "oracleId": "T20.mcp-stateless-wire",
             "observationNames": [
@@ -12658,74 +12808,6 @@
           }
         },
         {
-          "id": "wire-error-class",
-          "op": "equals",
-          "source": {
-            "actionId": "wire",
-            "pointer": "/response/body/error/data/category"
-          },
-          "expected": "PROTOCOL",
-          "requirementRefs": [
-            "D20"
-          ],
-          "evidenceRefs": [
-            "wire:actual-observation",
-            "wire:source-artifact"
-          ],
-          "scope": {
-            "organizationId": {
-              "$alias": "ORG"
-            },
-            "itemId": {
-              "$alias": "P"
-            },
-            "lotId": {
-              "$alias": "L"
-            }
-          },
-          "oracleExplanation": "wire-error-class: /response/body/error/data/category의 실제 equals 기대값은 \"PROTOCOL\"다. 미관찰·UNKNOWN은 정상값이 아니다.",
-          "oracleRef": {
-            "oracleId": "T20.mcp-stateless-wire",
-            "observationNames": [
-              "wire-protocol"
-            ]
-          }
-        },
-        {
-          "id": "no-tool-result",
-          "op": "absent",
-          "source": {
-            "actionId": "wire",
-            "pointer": "/response/body/result"
-          },
-          "expected": null,
-          "requirementRefs": [
-            "D20"
-          ],
-          "evidenceRefs": [
-            "wire:actual-observation",
-            "wire:source-artifact"
-          ],
-          "scope": {
-            "organizationId": {
-              "$alias": "ORG"
-            },
-            "itemId": {
-              "$alias": "P"
-            },
-            "lotId": {
-              "$alias": "L"
-            }
-          },
-          "oracleExplanation": "no-tool-result: 실제 관찰한 부모 object에서 /response/body/result가 없음을 확인한다. null·미관찰을 없음으로 바꾸지 않는다.",
-          "oracleRef": {
-            "oracleId": "T20.mcp-stateless-wire",
-            "observationNames": [
-              "domain-parity"
-            ]
-          }
-        },
-        {
           "id": "wire-raw-method",
           "op": "equals",
           "source": {
@@ -12895,6 +12977,329 @@
             }
           },
           "oracleExplanation": "wire-raw-meta: /data/transcript/request/body/params/_meta의 실제 equals 기대값은 {\"io.modelcontextprotocol/protocolVersion\": \"2026-07-28\", \"io.modelcontextprotocol/clientCapabilities\": {\"elicitation\": {\"form\": {}}}}다. 미관찰·UNKNOWN은 정상값이 아니다.",
+          "oracleRef": {
+            "oracleId": "T20.mcp-stateless-wire",
+            "observationNames": [
+              "wire-protocol"
+            ]
+          }
+        },
+        {
+          "id": "protocol-result-version",
+          "op": "equals",
+          "source": {
+            "actionId": "wire",
+            "pointer": "/response/body/result/supportedVersions"
+          },
+          "expected": [
+            "2026-07-28"
+          ],
+          "requirementRefs": [
+            "D20"
+          ],
+          "evidenceRefs": [
+            "wire:actual-observation",
+            "wire:source-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "lotId": {
+              "$alias": "L"
+            }
+          },
+          "oracleExplanation": "공식 DiscoverResult의 supportedVersions는 [2026-07-28]이며 legacy protocolVersion 필드로 대체하지 않는다.",
+          "oracleRef": {
+            "oracleId": "T20.mcp-stateless-wire",
+            "observationNames": [
+              "wire-protocol"
+            ]
+          }
+        },
+        {
+          "id": "stateless-handshake",
+          "op": "equals",
+          "source": {
+            "actionId": "wire",
+            "pointer": "/data/transcript/clientMethods"
+          },
+          "expected": [
+            "server/discover"
+          ],
+          "requirementRefs": [
+            "D20"
+          ],
+          "evidenceRefs": [
+            "wire:actual-observation",
+            "wire:source-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "lotId": {
+              "$alias": "L"
+            }
+          },
+          "oracleExplanation": "stateless-handshake: /data/transcript/clientMethods의 실제 equals 기대값은 [\"server/discover\"]다. 미관찰·UNKNOWN은 정상값이 아니다.",
+          "oracleRef": {
+            "oracleId": "T20.mcp-stateless-wire",
+            "observationNames": [
+              "wire-protocol"
+            ]
+          }
+        },
+        {
+          "id": "server-requests",
+          "op": "equals",
+          "source": {
+            "actionId": "wire",
+            "pointer": "/data/transcript/serverRequestMethods"
+          },
+          "expected": [],
+          "requirementRefs": [
+            "D20"
+          ],
+          "evidenceRefs": [
+            "wire:actual-observation",
+            "wire:source-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "lotId": {
+              "$alias": "L"
+            }
+          },
+          "oracleExplanation": "server-requests: /data/transcript/serverRequestMethods의 실제 equals 기대값은 []다. 미관찰·UNKNOWN은 정상값이 아니다.",
+          "oracleRef": {
+            "oracleId": "T20.mcp-stateless-wire",
+            "observationNames": [
+              "wire-protocol"
+            ]
+          }
+        },
+        {
+          "id": "tool-schema-registry",
+          "op": "exactSet",
+          "source": {
+            "actionId": "tools-list",
+            "pointer": "/response/body/result/tools",
+            "field": "name"
+          },
+          "expected": [
+            "getObject",
+            "searchObjects",
+            "getWork",
+            "searchWorks",
+            "getInventory",
+            "getObligations",
+            "traceLot",
+            "getEvidence",
+            "getAssessment",
+            "getDefinition",
+            "splitQuantity",
+            "mergeQuantity",
+            "moveQuantity",
+            "adjustQuantity",
+            "reserveQuantity",
+            "replaceAllocation",
+            "pickQuantity",
+            "dispatchQuantity",
+            "confirmReceipt",
+            "disposeQuantity",
+            "createDraft",
+            "cancelDraft",
+            "activateWork",
+            "waitWork",
+            "resumeWork",
+            "reviseGoal",
+            "closeWork",
+            "createFollowup",
+            "resolveObligation",
+            "waiveObligation",
+            "transferObligation",
+            "registerItem",
+            "linkExternalId",
+            "attachEvidence",
+            "correctEvidence",
+            "proposePurchase",
+            "revisePurchase",
+            "approvePurchase",
+            "dispatchPurchaseOrder",
+            "recordSupplierReply",
+            "cancelPurchase",
+            "createShipment",
+            "recordLegEvent",
+            "recordHandover",
+            "prepareRegulatoryProcedure",
+            "recordSubmission",
+            "recordRegulatoryDecision",
+            "verifyLabel",
+            "receiveProvisional",
+            "placeHold",
+            "releaseHold",
+            "recordDispositionBasis",
+            "revokeDispositionBasis",
+            "recordStocktake",
+            "createSalesOrder",
+            "reviseSalesOrder",
+            "releaseAllocation",
+            "recordDelivery",
+            "recordObservedMovement",
+            "authorizeReturn",
+            "receiveReturn",
+            "decideReturnDisposition",
+            "openInvestigation",
+            "proposeRecall",
+            "approveRecall",
+            "recordRecallNotice",
+            "recordRecovery",
+            "closeRecall",
+            "recordInvoice",
+            "recordCharge",
+            "matchInvoice",
+            "recordSettlementAdjustment",
+            "recordPaymentReference",
+            "createGrant",
+            "revokeGrant",
+            "getGrant",
+            "getAccessContext",
+            "assignCapability",
+            "revokeCapability",
+            "proposeHandover",
+            "acceptHandover",
+            "rejectHandover",
+            "emergencyReassign",
+            "createPolicyDraft",
+            "approvePolicy",
+            "activatePolicy",
+            "retirePolicy",
+            "getPolicy",
+            "matchSourceIdentity",
+            "linkCanonicalOccurrence",
+            "resolveEvidenceConflict",
+            "getInbox",
+            "getReconciliation",
+            "recordExternalReconciliation",
+            "searchOperationalIssues",
+            "createDefinitionDraft",
+            "validateDefinition",
+            "submitDefinitionReview",
+            "approveDefinition",
+            "publishDefinition",
+            "activateDefinition",
+            "retireDefinition",
+            "migrateWorkDefinition",
+            "evaluateEligibility",
+            "createWork",
+            "recordActivity",
+            "retrySafeCommand",
+            "recordRelation",
+            "convertUnit",
+            "createWorkLink",
+            "getCommandResult",
+            "structureIntent",
+            "emergencyRepair"
+          ],
+          "requirementRefs": [
+            "D20"
+          ],
+          "evidenceRefs": [
+            "tools-list:actual-observation",
+            "tools-list:source-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "lotId": {
+              "$alias": "L"
+            }
+          },
+          "oracleExplanation": "독립 tools/list 응답의 공개 capability name을 고정 목록과 exact 대조한다. discover에서 tools를 꾸미지 않는다.",
+          "oracleRef": {
+            "oracleId": "T20.mcp-stateless-wire",
+            "observationNames": [
+              "domain-parity"
+            ]
+          }
+        },
+        {
+          "id": "discover-result-type",
+          "op": "equals",
+          "source": {
+            "actionId": "wire",
+            "pointer": "/response/body/result/resultType"
+          },
+          "expected": "complete",
+          "requirementRefs": [
+            "D20"
+          ],
+          "evidenceRefs": [
+            "wire:actual-observation",
+            "wire:source-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "lotId": {
+              "$alias": "L"
+            }
+          },
+          "oracleExplanation": "discover-result-type: 공식 discovery result를 exact 대조한다.",
+          "oracleRef": {
+            "oracleId": "T20.mcp-stateless-wire",
+            "observationNames": [
+              "wire-protocol"
+            ]
+          }
+        },
+        {
+          "id": "discover-tools-capability",
+          "op": "equals",
+          "source": {
+            "actionId": "wire",
+            "pointer": "/response/body/result/capabilities/tools"
+          },
+          "expected": {},
+          "requirementRefs": [
+            "D20"
+          ],
+          "evidenceRefs": [
+            "wire:actual-observation",
+            "wire:source-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "lotId": {
+              "$alias": "L"
+            }
+          },
+          "oracleExplanation": "discover-tools-capability: 공식 discovery result를 exact 대조한다.",
           "oracleRef": {
             "oracleId": "T20.mcp-stateless-wire",
             "observationNames": [
@@ -15606,6 +16011,52 @@
           ]
         },
         {
+          "id": "tools-list",
+          "kind": "invoke",
+          "actorRef": "reader",
+          "route": "wire",
+          "protocolOperation": "tools/list",
+          "request": {
+            "transport": "streamable-http",
+            "httpMethod": "POST",
+            "headers": {
+              "MCP-Protocol-Version": "2026-07-28",
+              "Mcp-Method": "tools/list",
+              "Content-Type": "application/json",
+              "Origin": "https://isolated-client.example.invalid"
+            },
+            "body": {
+              "jsonrpc": "2.0",
+              "id": "tools-list",
+              "method": "tools/list",
+              "params": {
+                "_meta": {
+                  "io.modelcontextprotocol/protocolVersion": "2026-07-28",
+                  "io.modelcontextprotocol/clientInfo": {
+                    "name": "ontology-channel-contract",
+                    "version": "1.0.0"
+                  },
+                  "io.modelcontextprotocol/clientCapabilities": {
+                    "elicitation": {
+                      "form": {}
+                    }
+                  }
+                }
+              }
+            },
+            "credentialProfileRef": "reader",
+            "connectionState": {
+              "initialized": false,
+              "sessionId": null
+            }
+          },
+          "evidenceRefs": [
+            "tools-list:redacted-raw-wire",
+            "tools-list:authenticated-context",
+            "tools-list:server-response"
+          ]
+        },
+        {
           "id": "after",
           "kind": "query",
           "actorRef": "reader",
@@ -16084,9 +16535,11 @@
           "op": "equals",
           "source": {
             "actionId": "wire",
-            "pointer": "/response/body/result/protocolVersion"
+            "pointer": "/response/body/result/supportedVersions"
           },
-          "expected": "2026-07-28",
+          "expected": [
+            "2026-07-28"
+          ],
           "requirementRefs": [
             "D20"
           ],
@@ -16105,7 +16558,7 @@
               "$alias": "L"
             }
           },
-          "oracleExplanation": "protocol-result-version: /response/body/result/protocolVersion의 실제 equals 기대값은 \"2026-07-28\"다. 미관찰·UNKNOWN은 정상값이 아니다.",
+          "oracleExplanation": "공식 DiscoverResult의 supportedVersions는 [2026-07-28]이며 legacy protocolVersion 필드로 대체하지 않는다.",
           "oracleRef": {
             "oracleId": "T20.mcp-stateless-wire",
             "observationNames": [
@@ -16187,7 +16640,7 @@
           "id": "tool-schema-registry",
           "op": "exactSet",
           "source": {
-            "actionId": "wire",
+            "actionId": "tools-list",
             "pointer": "/response/body/result/tools",
             "field": "name"
           },
@@ -16310,8 +16763,8 @@
             "D20"
           ],
           "evidenceRefs": [
-            "wire:actual-observation",
-            "wire:source-artifact"
+            "tools-list:actual-observation",
+            "tools-list:source-artifact"
           ],
           "scope": {
             "organizationId": {
@@ -16324,7 +16777,7 @@
               "$alias": "L"
             }
           },
-          "oracleExplanation": "tool-schema-registry: /response/body/result/tools의 실제 name는 고정한 113개 identity/관계와 exact 일치하며 중복·누락을 거부한다.",
+          "oracleExplanation": "독립 tools/list 응답의 공개 capability name을 고정 목록과 exact 대조한다. discover에서 tools를 꾸미지 않는다.",
           "oracleRef": {
             "oracleId": "T20.mcp-stateless-wire",
             "observationNames": [
@@ -16506,6 +16959,74 @@
             }
           },
           "oracleExplanation": "wire-raw-meta: /data/transcript/request/body/params/_meta의 실제 equals 기대값은 {\"io.modelcontextprotocol/protocolVersion\": \"2026-07-28\", \"io.modelcontextprotocol/clientInfo\": {\"name\": \"ontology-channel-contract\", \"version\": \"1.0.0\"}, \"io.modelcontextprotocol/clientCapabilities\": {\"elicitation\": {\"form\": {}}}}다. 미관찰·UNKNOWN은 정상값이 아니다.",
+          "oracleRef": {
+            "oracleId": "T20.mcp-stateless-wire",
+            "observationNames": [
+              "wire-protocol"
+            ]
+          }
+        },
+        {
+          "id": "discover-result-type",
+          "op": "equals",
+          "source": {
+            "actionId": "wire",
+            "pointer": "/response/body/result/resultType"
+          },
+          "expected": "complete",
+          "requirementRefs": [
+            "D20"
+          ],
+          "evidenceRefs": [
+            "wire:actual-observation",
+            "wire:source-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "lotId": {
+              "$alias": "L"
+            }
+          },
+          "oracleExplanation": "discover-result-type: 공식 discovery result를 exact 대조한다.",
+          "oracleRef": {
+            "oracleId": "T20.mcp-stateless-wire",
+            "observationNames": [
+              "wire-protocol"
+            ]
+          }
+        },
+        {
+          "id": "discover-tools-capability",
+          "op": "equals",
+          "source": {
+            "actionId": "wire",
+            "pointer": "/response/body/result/capabilities/tools"
+          },
+          "expected": {},
+          "requirementRefs": [
+            "D20"
+          ],
+          "evidenceRefs": [
+            "wire:actual-observation",
+            "wire:source-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "lotId": {
+              "$alias": "L"
+            }
+          },
+          "oracleExplanation": "discover-tools-capability: 공식 discovery result를 exact 대조한다.",
           "oracleRef": {
             "oracleId": "T20.mcp-stateless-wire",
             "observationNames": [
@@ -16650,6 +17171,49 @@
           ]
         },
         {
+          "id": "tools-list",
+          "kind": "invoke",
+          "actorRef": "reader",
+          "route": "wire",
+          "protocolOperation": "tools/list",
+          "request": {
+            "transport": "streamable-http",
+            "httpMethod": "POST",
+            "headers": {
+              "MCP-Protocol-Version": "2026-07-28",
+              "Mcp-Method": "tools/list",
+              "Content-Type": "application/json",
+              "Origin": "https://isolated-client.example.invalid"
+            },
+            "body": {
+              "jsonrpc": "2.0",
+              "id": "tools-list",
+              "method": "tools/list",
+              "params": {
+                "_meta": {
+                  "io.modelcontextprotocol/protocolVersion": "2026-07-28",
+                  "io.modelcontextprotocol/clientInfo": {
+                    "name": "ontology-channel-contract",
+                    "version": "1.0.0"
+                  },
+                  "io.modelcontextprotocol/clientCapabilities": {
+                    "elicitation": {
+                      "form": {}
+                    }
+                  }
+                }
+              }
+            },
+            "credentialProfileRef": "reader",
+            "clientAcceptsServerRequests": false
+          },
+          "evidenceRefs": [
+            "tools-list:redacted-raw-wire",
+            "tools-list:authenticated-context",
+            "tools-list:server-response"
+          ]
+        },
+        {
           "id": "after",
           "kind": "query",
           "actorRef": "reader",
@@ -17128,9 +17692,11 @@
           "op": "equals",
           "source": {
             "actionId": "wire",
-            "pointer": "/response/body/result/protocolVersion"
+            "pointer": "/response/body/result/supportedVersions"
           },
-          "expected": "2026-07-28",
+          "expected": [
+            "2026-07-28"
+          ],
           "requirementRefs": [
             "D20"
           ],
@@ -17149,7 +17715,7 @@
               "$alias": "L"
             }
           },
-          "oracleExplanation": "protocol-result-version: /response/body/result/protocolVersion의 실제 equals 기대값은 \"2026-07-28\"다. 미관찰·UNKNOWN은 정상값이 아니다.",
+          "oracleExplanation": "공식 DiscoverResult의 supportedVersions는 [2026-07-28]이며 legacy protocolVersion 필드로 대체하지 않는다.",
           "oracleRef": {
             "oracleId": "T20.mcp-stateless-wire",
             "observationNames": [
@@ -17231,7 +17797,7 @@
           "id": "tool-schema-registry",
           "op": "exactSet",
           "source": {
-            "actionId": "wire",
+            "actionId": "tools-list",
             "pointer": "/response/body/result/tools",
             "field": "name"
           },
@@ -17354,8 +17920,8 @@
             "D20"
           ],
           "evidenceRefs": [
-            "wire:actual-observation",
-            "wire:source-artifact"
+            "tools-list:actual-observation",
+            "tools-list:source-artifact"
           ],
           "scope": {
             "organizationId": {
@@ -17368,7 +17934,7 @@
               "$alias": "L"
             }
           },
-          "oracleExplanation": "tool-schema-registry: /response/body/result/tools의 실제 name는 고정한 113개 identity/관계와 exact 일치하며 중복·누락을 거부한다.",
+          "oracleExplanation": "독립 tools/list 응답의 공개 capability name을 고정 목록과 exact 대조한다. discover에서 tools를 꾸미지 않는다.",
           "oracleRef": {
             "oracleId": "T20.mcp-stateless-wire",
             "observationNames": [
@@ -17556,6 +18122,74 @@
               "wire-protocol"
             ]
           }
+        },
+        {
+          "id": "discover-result-type",
+          "op": "equals",
+          "source": {
+            "actionId": "wire",
+            "pointer": "/response/body/result/resultType"
+          },
+          "expected": "complete",
+          "requirementRefs": [
+            "D20"
+          ],
+          "evidenceRefs": [
+            "wire:actual-observation",
+            "wire:source-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "lotId": {
+              "$alias": "L"
+            }
+          },
+          "oracleExplanation": "discover-result-type: 공식 discovery result를 exact 대조한다.",
+          "oracleRef": {
+            "oracleId": "T20.mcp-stateless-wire",
+            "observationNames": [
+              "wire-protocol"
+            ]
+          }
+        },
+        {
+          "id": "discover-tools-capability",
+          "op": "equals",
+          "source": {
+            "actionId": "wire",
+            "pointer": "/response/body/result/capabilities/tools"
+          },
+          "expected": {},
+          "requirementRefs": [
+            "D20"
+          ],
+          "evidenceRefs": [
+            "wire:actual-observation",
+            "wire:source-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "lotId": {
+              "$alias": "L"
+            }
+          },
+          "oracleExplanation": "discover-tools-capability: 공식 discovery result를 exact 대조한다.",
+          "oracleRef": {
+            "oracleId": "T20.mcp-stateless-wire",
+            "observationNames": [
+              "wire-protocol"
+            ]
+          }
         }
       ],
       "oracleExplanation": "raw stateless MCP server-request-not-required — T20.mcp-stateless-wire의 named observation을 응답과 독립 원행/host artifact로 검증한다. setup은 실행 coverage가 아니다."
@@ -17684,6 +18318,42 @@
             "wire:redacted-raw-wire",
             "wire:authenticated-context",
             "wire:server-response"
+          ]
+        },
+        {
+          "id": "tools-list",
+          "kind": "invoke",
+          "actorRef": "readAgent",
+          "route": "wire",
+          "protocolOperation": "tools/list",
+          "request": {
+            "transport": "stdio",
+            "headers": {},
+            "body": {
+              "jsonrpc": "2.0",
+              "id": "tools-list",
+              "method": "tools/list",
+              "params": {
+                "_meta": {
+                  "io.modelcontextprotocol/protocolVersion": "2026-07-28",
+                  "io.modelcontextprotocol/clientInfo": {
+                    "name": "ontology-channel-contract",
+                    "version": "1.0.0"
+                  },
+                  "io.modelcontextprotocol/clientCapabilities": {
+                    "elicitation": {
+                      "form": {}
+                    }
+                  }
+                }
+              }
+            },
+            "credentialProfileRef": "readAgent"
+          },
+          "evidenceRefs": [
+            "tools-list:redacted-raw-wire",
+            "tools-list:authenticated-context",
+            "tools-list:server-response"
           ]
         },
         {
@@ -18165,9 +18835,11 @@
           "op": "equals",
           "source": {
             "actionId": "wire",
-            "pointer": "/response/body/result/protocolVersion"
+            "pointer": "/response/body/result/supportedVersions"
           },
-          "expected": "2026-07-28",
+          "expected": [
+            "2026-07-28"
+          ],
           "requirementRefs": [
             "D20"
           ],
@@ -18186,7 +18858,7 @@
               "$alias": "L"
             }
           },
-          "oracleExplanation": "protocol-result-version: /response/body/result/protocolVersion의 실제 equals 기대값은 \"2026-07-28\"다. 미관찰·UNKNOWN은 정상값이 아니다.",
+          "oracleExplanation": "공식 DiscoverResult의 supportedVersions는 [2026-07-28]이며 legacy protocolVersion 필드로 대체하지 않는다.",
           "oracleRef": {
             "oracleId": "T20.mcp-stateless-wire",
             "observationNames": [
@@ -18268,7 +18940,7 @@
           "id": "tool-schema-registry",
           "op": "exactSet",
           "source": {
-            "actionId": "wire",
+            "actionId": "tools-list",
             "pointer": "/response/body/result/tools",
             "field": "name"
           },
@@ -18391,8 +19063,8 @@
             "D20"
           ],
           "evidenceRefs": [
-            "wire:actual-observation",
-            "wire:source-artifact"
+            "tools-list:actual-observation",
+            "tools-list:source-artifact"
           ],
           "scope": {
             "organizationId": {
@@ -18405,7 +19077,7 @@
               "$alias": "L"
             }
           },
-          "oracleExplanation": "tool-schema-registry: /response/body/result/tools의 실제 name는 고정한 113개 identity/관계와 exact 일치하며 중복·누락을 거부한다.",
+          "oracleExplanation": "독립 tools/list 응답의 공개 capability name을 고정 목록과 exact 대조한다. discover에서 tools를 꾸미지 않는다.",
           "oracleRef": {
             "oracleId": "T20.mcp-stateless-wire",
             "observationNames": [
@@ -18519,6 +19191,74 @@
             }
           },
           "oracleExplanation": "wire-raw-meta: /data/transcript/request/body/params/_meta의 실제 equals 기대값은 {\"io.modelcontextprotocol/protocolVersion\": \"2026-07-28\", \"io.modelcontextprotocol/clientInfo\": {\"name\": \"ontology-channel-contract\", \"version\": \"1.0.0\"}, \"io.modelcontextprotocol/clientCapabilities\": {\"elicitation\": {\"form\": {}}}}다. 미관찰·UNKNOWN은 정상값이 아니다.",
+          "oracleRef": {
+            "oracleId": "T20.mcp-stateless-wire",
+            "observationNames": [
+              "wire-protocol"
+            ]
+          }
+        },
+        {
+          "id": "discover-result-type",
+          "op": "equals",
+          "source": {
+            "actionId": "wire",
+            "pointer": "/response/body/result/resultType"
+          },
+          "expected": "complete",
+          "requirementRefs": [
+            "D20"
+          ],
+          "evidenceRefs": [
+            "wire:actual-observation",
+            "wire:source-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "lotId": {
+              "$alias": "L"
+            }
+          },
+          "oracleExplanation": "discover-result-type: 공식 discovery result를 exact 대조한다.",
+          "oracleRef": {
+            "oracleId": "T20.mcp-stateless-wire",
+            "observationNames": [
+              "wire-protocol"
+            ]
+          }
+        },
+        {
+          "id": "discover-tools-capability",
+          "op": "equals",
+          "source": {
+            "actionId": "wire",
+            "pointer": "/response/body/result/capabilities/tools"
+          },
+          "expected": {},
+          "requirementRefs": [
+            "D20"
+          ],
+          "evidenceRefs": [
+            "wire:actual-observation",
+            "wire:source-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "lotId": {
+              "$alias": "L"
+            }
+          },
+          "oracleExplanation": "discover-tools-capability: 공식 discovery result를 exact 대조한다.",
           "oracleRef": {
             "oracleId": "T20.mcp-stateless-wire",
             "observationNames": [

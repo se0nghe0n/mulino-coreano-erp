@@ -92,6 +92,37 @@ final class ChannelsContractTest {
         var rs=Map.<String,JsonNode>of("wire",r);check(a,rs);
         ((ObjectNode)r.path("data").path("transcript").path("request").path("headers")).put("Mcp-Method","server/discover");assertThrows(AssertionError.class,()->check(a,rs));
     }
+    @Test void discoverUsesSupportedVersionsAndToolsListOwnsRegistry() throws Exception {
+        JsonNode version=declared("T20","wire-discover","protocol-result-version");
+        JsonNode type=declared("T20","wire-discover","discover-result-type");
+        JsonNode capability=declared("T20","wire-discover","discover-tools-capability");
+        ObjectNode discovery=sample("{\"response\":{\"body\":{\"result\":{\"resultType\":\"complete\",\"supportedVersions\":[\"2026-07-28\"],\"capabilities\":{\"tools\":{}}}}}}");
+        var rs=Map.<String,JsonNode>of("wire",discovery);
+        check(version,rs);check(type,rs);check(capability,rs);
+        ObjectNode result=(ObjectNode)discovery.path("response").path("body").path("result");
+        result.remove("supportedVersions");result.put("protocolVersion","2026-07-28");
+        assertThrows(AssertionError.class,()->check(version,rs));
+        JsonNode registry=declared("T20","wire-discover","tool-schema-registry");
+        assertEquals("tools-list",registry.path("source").path("actionId").asText());
+        assertThrows(AssertionError.class,()->check(registry,rs));
+    }
+    @Test void missingClientInfoKeepsMandatoryVersionAndCapabilities() throws Exception {
+        JsonNode c=Json.read(root.resolve("verification/cases/T20/case.json"));
+        JsonNode selected=null;
+        for(JsonNode s:c.path("subcases"))if(s.path("id").asText().equals("wire-missing-client-info"))selected=s;
+        assertNotNull(selected);
+        for(JsonNode a:selected.path("actions"))if(a.path("id").asText().equals("wire")) {
+            JsonNode meta=a.path("request").path("body").path("params").path("_meta");
+            assertFalse(meta.has("io.modelcontextprotocol/clientInfo"));
+            assertEquals("2026-07-28",meta.path("io.modelcontextprotocol/protocolVersion").asText());
+            assertTrue(meta.has("io.modelcontextprotocol/clientCapabilities"));
+        }
+        JsonNode http=declared("T20","wire-missing-client-info","wire-http");
+        var rs=Map.<String,JsonNode>of("wire",sample("{\"response\":{\"httpStatus\":200}}"));
+        check(http,rs);
+        ((ObjectNode)rs.get("wire").get("response")).put("httpStatus",400);
+        assertThrows(AssertionError.class,()->check(http,rs));
+    }
     @Test void mrtrNewRpcIdIsCheckedOnActualRequestAndResponse() throws Exception {
         JsonNode a=declared("T20","mrtr-continuation","continued-raw-jsonrpc-id");
         ObjectNode r=sample("{\"data\":{\"transcript\":{\"request\":{\"body\":{\"id\":\"T20-new-rpc\"}}}}}");

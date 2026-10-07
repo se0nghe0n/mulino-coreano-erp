@@ -1,0 +1,36 @@
+{
+  "schemaVersion": "1.0.0",
+  "scope": "T20 protocol compatibility repair and parser assertion selftests only",
+  "status": "PASS",
+  "baseline": "4280a750dca0aef35abaf10b6797881181dd88d7",
+  "command": "./mvnw -B -ntp -f verification/harness/pom.xml -Dtest=ChannelsContractTest test",
+  "exitCode": 0,
+  "tests": 22,
+  "runtimeMcpStatus": "NOT_RUN",
+  "changedSubcases": [
+    "wire-discover",
+    "wire-missing-client-info",
+    "wire-initialize-not-required",
+    "wire-server-request-not-required",
+    "wire-stdio"
+  ],
+  "unchangedSubcasesCount": 51,
+  "artifacts": [
+    {
+      "path": "verification/cases/T20/case.json",
+      "sha256": "b8170645059d14296bb72f5ba6a442cc89fc6b25c8cabc969c354afb820b8232"
+    },
+    {
+      "path": "verification/cases/T20/scenario.feature",
+      "sha256": "8855b27a7030b3fe9797bb08005d6428e9e74c25c5005d7dc14ac7eb3e22e189"
+    },
+    {
+      "path": "verification/platform/protocol/evidence/channels-contract.log",
+      "sha256": "1f69d1d4f3e9c2057460f2d1f0ff7e4311a2dcfbc22896070ea422df0232863d"
+    },
+    {
+      "path": "verification/platform/protocol/evidence/channels-contract.xml",
+      "sha256": "acb8f3a34b73454f626d6ec89ba6dc46c42ee982e5cffdc7647068d97c16dca2"
+    }
+  ]
+}

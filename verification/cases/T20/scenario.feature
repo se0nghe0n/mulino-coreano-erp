@@ -186,6 +186,7 @@
     만일 "reader" 역할이 "noun" 행동을 수행한다
     만일 "시스템" 역할이 "db-before" 행동을 수행한다
     만일 "reader" 역할이 "wire" 행동을 수행한다
+    만일 "reader" 역할이 "tools-list" 행동을 수행한다
     만일 "reader" 역할이 "after" 행동을 수행한다
     만일 "시스템" 역할이 "db-after" 행동을 수행한다
     그러면 "wire-http" assertion으로 "wire-http: /response/httpStatus의 실제 equals 기대값은 200다. 미관찰·UNKNOWN은 정상값이 아니다."를 확인한다
@@ -197,15 +198,17 @@
     그러면 "unchanged-approvals" assertion으로 "승인·실물·배분·업무·외부효과의 전후 원행을 exact 대조한다. 허용 감사는 이 불변 대상에서 분리한다."를 확인한다
     그러면 "unchanged-works" assertion으로 "승인·실물·배분·업무·외부효과의 전후 원행을 exact 대조한다. 허용 감사는 이 불변 대상에서 분리한다."를 확인한다
     그러면 "unchanged-outbox" assertion으로 "승인·실물·배분·업무·외부효과의 전후 원행을 exact 대조한다. 허용 감사는 이 불변 대상에서 분리한다."를 확인한다
-    그러면 "protocol-result-version" assertion으로 "protocol-result-version: /response/body/result/protocolVersion의 실제 equals 기대값은 '2026-07-28'다. 미관찰·UNKNOWN은 정상값이 아니다."를 확인한다
+    그러면 "protocol-result-version" assertion으로 "공식 DiscoverResult의 supportedVersions는 [2026-07-28]이며 legacy protocolVersion 필드로 대체하지 않는다."를 확인한다
     그러면 "stateless-handshake" assertion으로 "stateless-handshake: /data/transcript/clientMethods의 실제 equals 기대값은 ['server/discover']다. 미관찰·UNKNOWN은 정상값이 아니다."를 확인한다
     그러면 "server-requests" assertion으로 "server-requests: /data/transcript/serverRequestMethods의 실제 equals 기대값은 []다. 미관찰·UNKNOWN은 정상값이 아니다."를 확인한다
-    그러면 "tool-schema-registry" assertion으로 "tool-schema-registry: /response/body/result/tools의 실제 name는 고정한 113개 identity/관계와 exact 일치하며 중복·누락을 거부한다."를 확인한다
+    그러면 "tool-schema-registry" assertion으로 "독립 tools/list 응답의 공개 capability name을 고정 목록과 exact 대조한다. discover에서 tools를 꾸미지 않는다."를 확인한다
     그러면 "wire-raw-method" assertion으로 "wire-raw-method: /data/transcript/request/body/method의 실제 equals 기대값은 'server/discover'다. 미관찰·UNKNOWN은 정상값이 아니다."를 확인한다
     그러면 "wire-raw-jsonrpc-id" assertion으로 "wire-raw-jsonrpc-id: /data/transcript/request/body/id의 실제 equals 기대값은 'wire'다. 미관찰·UNKNOWN은 정상값이 아니다."를 확인한다
     그러면 "wire-raw-MCP-Protocol-Version" assertion으로 "wire-raw-MCP-Protocol-Version: /data/transcript/request/headers/MCP-Protocol-Version의 실제 equals 기대값은 '2026-07-28'다. 미관찰·UNKNOWN은 정상값이 아니다."를 확인한다
     그러면 "wire-raw-Mcp-Method" assertion으로 "wire-raw-Mcp-Method: /data/transcript/request/headers/Mcp-Method의 실제 equals 기대값은 'server/discover'다. 미관찰·UNKNOWN은 정상값이 아니다."를 확인한다
     그러면 "wire-raw-meta" assertion으로 "wire-raw-meta: /data/transcript/request/body/params/_meta의 실제 equals 기대값은 {'io.modelcontextprotocol/protocolVersion': '2026-07-28', 'io.modelcontextprotocol/clientInfo': {'name': 'ontology-channel-contract', 'version': '1.0.0'}, 'io.modelcontextprotocol/clientCapabilities': {'elicitation': {'form': {}}}}다. 미관찰·UNKNOWN은 정상값이 아니다."를 확인한다
+    그러면 "discover-result-type" assertion으로 "discover-result-type: 공식 discovery result를 exact 대조한다."를 확인한다
+    그러면 "discover-tools-capability" assertion으로 "discover-tools-capability: 공식 discovery result를 exact 대조한다."를 확인한다
   시나리오: raw stateless MCP method-mismatch
     먼저 사례 파일 "verification/cases/T20/case.json"의 "wire-method-mismatch"를 준비한다
     만일 "시스템" 역할이 "setup" 행동을 수행한다
@@ -333,9 +336,10 @@
     만일 "reader" 역할이 "noun" 행동을 수행한다
     만일 "시스템" 역할이 "db-before" 행동을 수행한다
     만일 "reader" 역할이 "wire" 행동을 수행한다
+    만일 "reader" 역할이 "tools-list" 행동을 수행한다
     만일 "reader" 역할이 "after" 행동을 수행한다
     만일 "시스템" 역할이 "db-after" 행동을 수행한다
-    그러면 "wire-http" assertion으로 "wire-http: /response/httpStatus의 실제 equals 기대값은 400다. 미관찰·UNKNOWN은 정상값이 아니다."를 확인한다
+    그러면 "wire-http" assertion으로 "wire-http: /response/httpStatus의 실제 equals 기대값은 200다. 미관찰·UNKNOWN은 정상값이 아니다."를 확인한다
     그러면 "jsonrpc-version" assertion으로 "jsonrpc-version: /response/body/jsonrpc의 실제 equals 기대값은 '2.0'다. 미관찰·UNKNOWN은 정상값이 아니다."를 확인한다
     그러면 "jsonrpc-id" assertion으로 "jsonrpc-id: /response/body/id의 실제 equals 기대값은 'wire'다. 미관찰·UNKNOWN은 정상값이 아니다."를 확인한다
     그러면 "unchanged-segments" assertion으로 "승인·실물·배분·업무·외부효과의 전후 원행을 exact 대조한다. 허용 감사는 이 불변 대상에서 분리한다."를 확인한다
@@ -344,13 +348,17 @@
     그러면 "unchanged-approvals" assertion으로 "승인·실물·배분·업무·외부효과의 전후 원행을 exact 대조한다. 허용 감사는 이 불변 대상에서 분리한다."를 확인한다
     그러면 "unchanged-works" assertion으로 "승인·실물·배분·업무·외부효과의 전후 원행을 exact 대조한다. 허용 감사는 이 불변 대상에서 분리한다."를 확인한다
     그러면 "unchanged-outbox" assertion으로 "승인·실물·배분·업무·외부효과의 전후 원행을 exact 대조한다. 허용 감사는 이 불변 대상에서 분리한다."를 확인한다
-    그러면 "wire-error-class" assertion으로 "wire-error-class: /response/body/error/data/category의 실제 equals 기대값은 'PROTOCOL'다. 미관찰·UNKNOWN은 정상값이 아니다."를 확인한다
-    그러면 "no-tool-result" assertion으로 "no-tool-result: 실제 관찰한 부모 object에서 /response/body/result가 없음을 확인한다. null·미관찰을 없음으로 바꾸지 않는다."를 확인한다
     그러면 "wire-raw-method" assertion으로 "wire-raw-method: /data/transcript/request/body/method의 실제 equals 기대값은 'server/discover'다. 미관찰·UNKNOWN은 정상값이 아니다."를 확인한다
     그러면 "wire-raw-jsonrpc-id" assertion으로 "wire-raw-jsonrpc-id: /data/transcript/request/body/id의 실제 equals 기대값은 'wire'다. 미관찰·UNKNOWN은 정상값이 아니다."를 확인한다
     그러면 "wire-raw-MCP-Protocol-Version" assertion으로 "wire-raw-MCP-Protocol-Version: /data/transcript/request/headers/MCP-Protocol-Version의 실제 equals 기대값은 '2026-07-28'다. 미관찰·UNKNOWN은 정상값이 아니다."를 확인한다
     그러면 "wire-raw-Mcp-Method" assertion으로 "wire-raw-Mcp-Method: /data/transcript/request/headers/Mcp-Method의 실제 equals 기대값은 'server/discover'다. 미관찰·UNKNOWN은 정상값이 아니다."를 확인한다
     그러면 "wire-raw-meta" assertion으로 "wire-raw-meta: /data/transcript/request/body/params/_meta의 실제 equals 기대값은 {'io.modelcontextprotocol/protocolVersion': '2026-07-28', 'io.modelcontextprotocol/clientCapabilities': {'elicitation': {'form': {}}}}다. 미관찰·UNKNOWN은 정상값이 아니다."를 확인한다
+    그러면 "protocol-result-version" assertion으로 "공식 DiscoverResult의 supportedVersions는 [2026-07-28]이며 legacy protocolVersion 필드로 대체하지 않는다."를 확인한다
+    그러면 "stateless-handshake" assertion으로 "stateless-handshake: /data/transcript/clientMethods의 실제 equals 기대값은 ['server/discover']다. 미관찰·UNKNOWN은 정상값이 아니다."를 확인한다
+    그러면 "server-requests" assertion으로 "server-requests: /data/transcript/serverRequestMethods의 실제 equals 기대값은 []다. 미관찰·UNKNOWN은 정상값이 아니다."를 확인한다
+    그러면 "tool-schema-registry" assertion으로 "독립 tools/list 응답의 공개 capability name을 고정 목록과 exact 대조한다. discover에서 tools를 꾸미지 않는다."를 확인한다
+    그러면 "discover-result-type" assertion으로 "discover-result-type: 공식 discovery result를 exact 대조한다."를 확인한다
+    그러면 "discover-tools-capability" assertion으로 "discover-tools-capability: 공식 discovery result를 exact 대조한다."를 확인한다
   시나리오: raw stateless MCP missing-capabilities
     먼저 사례 파일 "verification/cases/T20/case.json"의 "wire-missing-capabilities"를 준비한다
     만일 "시스템" 역할이 "setup" 행동을 수행한다
@@ -429,6 +437,7 @@
     만일 "reader" 역할이 "noun" 행동을 수행한다
     만일 "시스템" 역할이 "db-before" 행동을 수행한다
     만일 "reader" 역할이 "wire" 행동을 수행한다
+    만일 "reader" 역할이 "tools-list" 행동을 수행한다
     만일 "reader" 역할이 "after" 행동을 수행한다
     만일 "시스템" 역할이 "db-after" 행동을 수행한다
     그러면 "wire-http" assertion으로 "wire-http: /response/httpStatus의 실제 equals 기대값은 200다. 미관찰·UNKNOWN은 정상값이 아니다."를 확인한다
@@ -440,21 +449,24 @@
     그러면 "unchanged-approvals" assertion으로 "승인·실물·배분·업무·외부효과의 전후 원행을 exact 대조한다. 허용 감사는 이 불변 대상에서 분리한다."를 확인한다
     그러면 "unchanged-works" assertion으로 "승인·실물·배분·업무·외부효과의 전후 원행을 exact 대조한다. 허용 감사는 이 불변 대상에서 분리한다."를 확인한다
     그러면 "unchanged-outbox" assertion으로 "승인·실물·배분·업무·외부효과의 전후 원행을 exact 대조한다. 허용 감사는 이 불변 대상에서 분리한다."를 확인한다
-    그러면 "protocol-result-version" assertion으로 "protocol-result-version: /response/body/result/protocolVersion의 실제 equals 기대값은 '2026-07-28'다. 미관찰·UNKNOWN은 정상값이 아니다."를 확인한다
+    그러면 "protocol-result-version" assertion으로 "공식 DiscoverResult의 supportedVersions는 [2026-07-28]이며 legacy protocolVersion 필드로 대체하지 않는다."를 확인한다
     그러면 "stateless-handshake" assertion으로 "stateless-handshake: /data/transcript/clientMethods의 실제 equals 기대값은 ['server/discover']다. 미관찰·UNKNOWN은 정상값이 아니다."를 확인한다
     그러면 "server-requests" assertion으로 "server-requests: /data/transcript/serverRequestMethods의 실제 equals 기대값은 []다. 미관찰·UNKNOWN은 정상값이 아니다."를 확인한다
-    그러면 "tool-schema-registry" assertion으로 "tool-schema-registry: /response/body/result/tools의 실제 name는 고정한 113개 identity/관계와 exact 일치하며 중복·누락을 거부한다."를 확인한다
+    그러면 "tool-schema-registry" assertion으로 "독립 tools/list 응답의 공개 capability name을 고정 목록과 exact 대조한다. discover에서 tools를 꾸미지 않는다."를 확인한다
     그러면 "wire-raw-method" assertion으로 "wire-raw-method: /data/transcript/request/body/method의 실제 equals 기대값은 'server/discover'다. 미관찰·UNKNOWN은 정상값이 아니다."를 확인한다
     그러면 "wire-raw-jsonrpc-id" assertion으로 "wire-raw-jsonrpc-id: /data/transcript/request/body/id의 실제 equals 기대값은 'wire'다. 미관찰·UNKNOWN은 정상값이 아니다."를 확인한다
     그러면 "wire-raw-MCP-Protocol-Version" assertion으로 "wire-raw-MCP-Protocol-Version: /data/transcript/request/headers/MCP-Protocol-Version의 실제 equals 기대값은 '2026-07-28'다. 미관찰·UNKNOWN은 정상값이 아니다."를 확인한다
     그러면 "wire-raw-Mcp-Method" assertion으로 "wire-raw-Mcp-Method: /data/transcript/request/headers/Mcp-Method의 실제 equals 기대값은 'server/discover'다. 미관찰·UNKNOWN은 정상값이 아니다."를 확인한다
     그러면 "wire-raw-meta" assertion으로 "wire-raw-meta: /data/transcript/request/body/params/_meta의 실제 equals 기대값은 {'io.modelcontextprotocol/protocolVersion': '2026-07-28', 'io.modelcontextprotocol/clientInfo': {'name': 'ontology-channel-contract', 'version': '1.0.0'}, 'io.modelcontextprotocol/clientCapabilities': {'elicitation': {'form': {}}}}다. 미관찰·UNKNOWN은 정상값이 아니다."를 확인한다
+    그러면 "discover-result-type" assertion으로 "discover-result-type: 공식 discovery result를 exact 대조한다."를 확인한다
+    그러면 "discover-tools-capability" assertion으로 "discover-tools-capability: 공식 discovery result를 exact 대조한다."를 확인한다
   시나리오: raw stateless MCP server-request-not-required
     먼저 사례 파일 "verification/cases/T20/case.json"의 "wire-server-request-not-required"를 준비한다
     만일 "시스템" 역할이 "setup" 행동을 수행한다
     만일 "reader" 역할이 "noun" 행동을 수행한다
     만일 "시스템" 역할이 "db-before" 행동을 수행한다
     만일 "reader" 역할이 "wire" 행동을 수행한다
+    만일 "reader" 역할이 "tools-list" 행동을 수행한다
     만일 "reader" 역할이 "after" 행동을 수행한다
     만일 "시스템" 역할이 "db-after" 행동을 수행한다
     그러면 "wire-http" assertion으로 "wire-http: /response/httpStatus의 실제 equals 기대값은 200다. 미관찰·UNKNOWN은 정상값이 아니다."를 확인한다
@@ -466,21 +478,24 @@
     그러면 "unchanged-approvals" assertion으로 "승인·실물·배분·업무·외부효과의 전후 원행을 exact 대조한다. 허용 감사는 이 불변 대상에서 분리한다."를 확인한다
     그러면 "unchanged-works" assertion으로 "승인·실물·배분·업무·외부효과의 전후 원행을 exact 대조한다. 허용 감사는 이 불변 대상에서 분리한다."를 확인한다
     그러면 "unchanged-outbox" assertion으로 "승인·실물·배분·업무·외부효과의 전후 원행을 exact 대조한다. 허용 감사는 이 불변 대상에서 분리한다."를 확인한다
-    그러면 "protocol-result-version" assertion으로 "protocol-result-version: /response/body/result/protocolVersion의 실제 equals 기대값은 '2026-07-28'다. 미관찰·UNKNOWN은 정상값이 아니다."를 확인한다
+    그러면 "protocol-result-version" assertion으로 "공식 DiscoverResult의 supportedVersions는 [2026-07-28]이며 legacy protocolVersion 필드로 대체하지 않는다."를 확인한다
     그러면 "stateless-handshake" assertion으로 "stateless-handshake: /data/transcript/clientMethods의 실제 equals 기대값은 ['server/discover']다. 미관찰·UNKNOWN은 정상값이 아니다."를 확인한다
     그러면 "server-requests" assertion으로 "server-requests: /data/transcript/serverRequestMethods의 실제 equals 기대값은 []다. 미관찰·UNKNOWN은 정상값이 아니다."를 확인한다
-    그러면 "tool-schema-registry" assertion으로 "tool-schema-registry: /response/body/result/tools의 실제 name는 고정한 113개 identity/관계와 exact 일치하며 중복·누락을 거부한다."를 확인한다
+    그러면 "tool-schema-registry" assertion으로 "독립 tools/list 응답의 공개 capability name을 고정 목록과 exact 대조한다. discover에서 tools를 꾸미지 않는다."를 확인한다
     그러면 "wire-raw-method" assertion으로 "wire-raw-method: /data/transcript/request/body/method의 실제 equals 기대값은 'server/discover'다. 미관찰·UNKNOWN은 정상값이 아니다."를 확인한다
     그러면 "wire-raw-jsonrpc-id" assertion으로 "wire-raw-jsonrpc-id: /data/transcript/request/body/id의 실제 equals 기대값은 'wire'다. 미관찰·UNKNOWN은 정상값이 아니다."를 확인한다
     그러면 "wire-raw-MCP-Protocol-Version" assertion으로 "wire-raw-MCP-Protocol-Version: /data/transcript/request/headers/MCP-Protocol-Version의 실제 equals 기대값은 '2026-07-28'다. 미관찰·UNKNOWN은 정상값이 아니다."를 확인한다
     그러면 "wire-raw-Mcp-Method" assertion으로 "wire-raw-Mcp-Method: /data/transcript/request/headers/Mcp-Method의 실제 equals 기대값은 'server/discover'다. 미관찰·UNKNOWN은 정상값이 아니다."를 확인한다
     그러면 "wire-raw-meta" assertion으로 "wire-raw-meta: /data/transcript/request/body/params/_meta의 실제 equals 기대값은 {'io.modelcontextprotocol/protocolVersion': '2026-07-28', 'io.modelcontextprotocol/clientInfo': {'name': 'ontology-channel-contract', 'version': '1.0.0'}, 'io.modelcontextprotocol/clientCapabilities': {'elicitation': {'form': {}}}}다. 미관찰·UNKNOWN은 정상값이 아니다."를 확인한다
+    그러면 "discover-result-type" assertion으로 "discover-result-type: 공식 discovery result를 exact 대조한다."를 확인한다
+    그러면 "discover-tools-capability" assertion으로 "discover-tools-capability: 공식 discovery result를 exact 대조한다."를 확인한다
   시나리오: raw stateless MCP stdio
     먼저 사례 파일 "verification/cases/T20/case.json"의 "wire-stdio"를 준비한다
     만일 "시스템" 역할이 "setup" 행동을 수행한다
     만일 "reader" 역할이 "noun" 행동을 수행한다
     만일 "시스템" 역할이 "db-before" 행동을 수행한다
     만일 "readAgent" 역할이 "wire" 행동을 수행한다
+    만일 "readAgent" 역할이 "tools-list" 행동을 수행한다
     만일 "reader" 역할이 "after" 행동을 수행한다
     만일 "시스템" 역할이 "db-after" 행동을 수행한다
     그러면 "wire-transport" assertion으로 "wire-transport: /response/transport의 실제 equals 기대값은 'stdio'다. 미관찰·UNKNOWN은 정상값이 아니다."를 확인한다
@@ -492,13 +507,15 @@
     그러면 "unchanged-approvals" assertion으로 "승인·실물·배분·업무·외부효과의 전후 원행을 exact 대조한다. 허용 감사는 이 불변 대상에서 분리한다."를 확인한다
     그러면 "unchanged-works" assertion으로 "승인·실물·배분·업무·외부효과의 전후 원행을 exact 대조한다. 허용 감사는 이 불변 대상에서 분리한다."를 확인한다
     그러면 "unchanged-outbox" assertion으로 "승인·실물·배분·업무·외부효과의 전후 원행을 exact 대조한다. 허용 감사는 이 불변 대상에서 분리한다."를 확인한다
-    그러면 "protocol-result-version" assertion으로 "protocol-result-version: /response/body/result/protocolVersion의 실제 equals 기대값은 '2026-07-28'다. 미관찰·UNKNOWN은 정상값이 아니다."를 확인한다
+    그러면 "protocol-result-version" assertion으로 "공식 DiscoverResult의 supportedVersions는 [2026-07-28]이며 legacy protocolVersion 필드로 대체하지 않는다."를 확인한다
     그러면 "stateless-handshake" assertion으로 "stateless-handshake: /data/transcript/clientMethods의 실제 equals 기대값은 ['server/discover']다. 미관찰·UNKNOWN은 정상값이 아니다."를 확인한다
     그러면 "server-requests" assertion으로 "server-requests: /data/transcript/serverRequestMethods의 실제 equals 기대값은 []다. 미관찰·UNKNOWN은 정상값이 아니다."를 확인한다
-    그러면 "tool-schema-registry" assertion으로 "tool-schema-registry: /response/body/result/tools의 실제 name는 고정한 113개 identity/관계와 exact 일치하며 중복·누락을 거부한다."를 확인한다
+    그러면 "tool-schema-registry" assertion으로 "독립 tools/list 응답의 공개 capability name을 고정 목록과 exact 대조한다. discover에서 tools를 꾸미지 않는다."를 확인한다
     그러면 "wire-raw-method" assertion으로 "wire-raw-method: /data/transcript/request/body/method의 실제 equals 기대값은 'server/discover'다. 미관찰·UNKNOWN은 정상값이 아니다."를 확인한다
     그러면 "wire-raw-jsonrpc-id" assertion으로 "wire-raw-jsonrpc-id: /data/transcript/request/body/id의 실제 equals 기대값은 'wire'다. 미관찰·UNKNOWN은 정상값이 아니다."를 확인한다
     그러면 "wire-raw-meta" assertion으로 "wire-raw-meta: /data/transcript/request/body/params/_meta의 실제 equals 기대값은 {'io.modelcontextprotocol/protocolVersion': '2026-07-28', 'io.modelcontextprotocol/clientInfo': {'name': 'ontology-channel-contract', 'version': '1.0.0'}, 'io.modelcontextprotocol/clientCapabilities': {'elicitation': {'form': {}}}}다. 미관찰·UNKNOWN은 정상값이 아니다."를 확인한다
+    그러면 "discover-result-type" assertion으로 "discover-result-type: 공식 discovery result를 exact 대조한다."를 확인한다
+    그러면 "discover-tools-capability" assertion으로 "discover-tools-capability: 공식 discovery result를 exact 대조한다."를 확인한다
   시나리오: raw stateless MCP old-protocol
     먼저 사례 파일 "verification/cases/T20/case.json"의 "wire-old-protocol"를 준비한다
     만일 "시스템" 역할이 "setup" 행동을 수행한다
