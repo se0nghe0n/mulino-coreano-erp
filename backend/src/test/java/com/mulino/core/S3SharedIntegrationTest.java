@@ -18,6 +18,7 @@ class S3SharedIntegrationTest extends S1ReadIntegrationTest {
   @Autowired ApplicationCommands commands;
   @Autowired TradeImpact impact;
   @BeforeEach void commandContract()throws Exception {
+    jdbc.update("UPDATE mulino_work_read_Works SET status='ACTIVE',waitJson=NULL WHERE organizationId=? AND ID=?",org,work);
     String grant=jdbc.queryForObject("SELECT ID FROM mulino_identity_Grants WHERE organizationId=?",String.class,org);
     insert("mulino_identity_CapabilityAssignments",row("organizationId",org,"ID",id(),"actorId",actor,"capabilityId","s3SharedImpact","scopeKind","ORGANIZATION","scopeId",org,"validFrom",Timestamp(Instant.now().minusSeconds(3600)),"validUntil",Timestamp(Instant.now().plusSeconds(3600))));
     insert("mulino_identity_GrantActions",row("organizationId",org,"grantId",grant,"capabilityId","s3SharedImpact"));

@@ -58,7 +58,7 @@ public class ApplicationQueries {
     if(scope.containsKey("organizationId")&&!Objects.equals(scope.get("organizationId"),context.organizationId()))throw DomainError.forbidden();
     scope.put("organizationId",context.organizationId());
     Object data=result.data();
-    if(request.operation().equals("getObject")&&data instanceof Map<?,?> object&&object.get("itemId")!=null)scope.putIfAbsent("itemId",object.get("itemId"));
+    if(data instanceof Map<?,?> object&&object.get("itemId")!=null)scope.putIfAbsent("itemId",object.get("itemId"));
     TreeSet<String> evidence=new TreeSet<>(result.evidenceRefs());
     TreeSet<String> unknowns=new TreeSet<>(result.unknowns());
     TreeSet<String> conflicts=new TreeSet<>(result.conflicts());
