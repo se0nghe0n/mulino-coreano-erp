@@ -1,0 +1,502 @@
+{
+  "codeCommit": "35c810e1843b28da53dc4f21f6461d9e17af3098",
+  "recordedAt": "2026-10-07T17:38:32.553691+00:00",
+  "s1Gate": "ACTIVE",
+  "productFullCaseGate": "NOT_RUN",
+  "backend": {
+    "status": "PASS",
+    "tests": 64,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "command": [
+      "./mvnw",
+      "-B",
+      "-ntp",
+      "-f",
+      "backend/pom.xml",
+      "-Dmulino.evidence.blob-root=/tmp/mulino-s1-root-build.6hnj1v8x/blobs",
+      "clean",
+      "test",
+      "package"
+    ],
+    "jarSha256": "2ecb10885d529009ef4b631a9524147fb41c1d40c6ebb38e0ee421f1750f2b19"
+  },
+  "harness": {
+    "status": "PASS",
+    "tests": 417,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "command": "./verify harness",
+    "preexistingReportsExcluded": [
+      "verification/harness/target/surefire-reports/TEST-org.mulino.verification.CaseFeatureTest.xml",
+      "verification/harness/target/surefire-reports/TEST-org.mulino.verification.modelbinding.ModelBindingFeatureRed.xml"
+    ],
+    "exclusionReason": "Files predate this run; two previous expected RED suite reports remain on disk. Current build log and fresh suite XML agree on 417 PASS."
+  },
+  "preparation": {
+    "status": "PREPARED",
+    "cases": 41,
+    "subcases": 789,
+    "assertions": 20473,
+    "problems": 0,
+    "command": "./verify prepare"
+  },
+  "nativeAttempt": {
+    "status": "ENVIRONMENT_OR_CONTRACT_FAILURE",
+    "command": "./verify actual-s1 /tmp/mulino-s1-root-35c810e/native",
+    "exitCode": 3,
+    "cause": "FixtureInstaller omitted mandatory TradeItem specificationVersionId and packagingVersionId. Disposable SQL transaction rolled back. Backend startup succeeded, domain actions not attempted.",
+    "cleanup": {
+      "backendStopped": true,
+      "createdContainerRemoved": true,
+      "ephemeralKeyDirectoryRemoved": true,
+      "ephemeralBlobDirectoryRemoved": true
+    }
+  },
+  "sourceInputHashDrift": 0,
+  "artifactFiles": [
+    {
+      "input": "/tmp/mulino-s1-root-35c810e/actual-s1.log",
+      "artifact": "run/actual-s1.log.gz",
+      "rawSha256": "f23ba50be6a41c46cae3425b9be070de8d67df443698b533b1832a6e8a6b0ae6",
+      "gzipSha256": "88e502c51a69e26f7ed1b0a0a25651371010d965a8241d39dc03c0ba81931060",
+      "rawBytes": 2796
+    },
+    {
+      "input": "/tmp/mulino-s1-root-35c810e/backend.log",
+      "artifact": "run/backend.log.gz",
+      "rawSha256": "4d8ee0e138a21c5bb9ada4feb242ac6a74c9e27a98931fb319af453c8abee7cc",
+      "gzipSha256": "c3089ff3f22963002fb2f183d6bcb9c76a04fefba24f3bee6edf212709cc879b",
+      "rawBytes": 476284
+    },
+    {
+      "input": "/tmp/mulino-s1-root-35c810e/harness.log",
+      "artifact": "run/harness.log.gz",
+      "rawSha256": "996d97098ee19f6be5debd916307ce591204e6b7acd51dbdd911ad3e72ab4ecb",
+      "gzipSha256": "2782bd56aad878c406714218d6ed53901d818772c950adf00e98a80eb2910cba",
+      "rawBytes": 11632
+    },
+    {
+      "input": "/tmp/mulino-s1-root-35c810e/key-prepare.txt",
+      "artifact": "run/key-prepare.txt.gz",
+      "rawSha256": "8885b04655485c00eed13660bde79437181a369a8ab0c7889fc8cc13b34be59b",
+      "gzipSha256": "79ce05e6028abb42755b35803b8791561fc8285db15d8ea98a845b524081c867",
+      "rawBytes": 135
+    },
+    {
+      "input": "/tmp/mulino-s1-root-35c810e/native/actual-s1-native.json",
+      "artifact": "run/native/actual-s1-native.json.gz",
+      "rawSha256": "5ca2e28e130f8dce030e93925687ed9084f04e0ef8bbcb94ee30e1370c455755",
+      "gzipSha256": "e237d0faf5450b089e0507c66d9987ebb661b68cf7dae93d00a487eb89699454",
+      "rawBytes": 982
+    },
+    {
+      "input": "/tmp/mulino-s1-root-35c810e/native/backend-loopback-url.txt",
+      "artifact": "run/native/backend-loopback-url.txt.gz",
+      "rawSha256": "6c2ced97a4eb52b1a9b13b4ffa8f24fd5c9467dd4b102c0a99d7a282c81b5baf",
+      "gzipSha256": "7ead35b9d2038ab4196414b6cc1b8be2b9471f22a3eae611b9c201e45263e46d",
+      "rawBytes": 23
+    },
+    {
+      "input": "/tmp/mulino-s1-root-35c810e/native/backend-runtime.log",
+      "artifact": "run/native/backend-runtime.log.gz",
+      "rawSha256": "c0321c6049315793b94d5e95489577a818721fbe0b322496c6f0f2e86044ba10",
+      "gzipSha256": "fb796fcde4d0aa9c9367490492f21b115612f246df633411dfa01210257b950c",
+      "rawBytes": 10470
+    },
+    {
+      "input": "/tmp/mulino-s1-root-35c810e/native/container-cleanup.txt",
+      "artifact": "run/native/container-cleanup.txt.gz",
+      "rawSha256": "0ca68be5248bd0df892b8a7c6c851fd9156cd29069bfcdd6f297dcb89058a522",
+      "gzipSha256": "0a09b2d4f25f66cdb15d8e219634abab2e4475b4bf8ab03cfa9f35d4c648201b",
+      "rawBytes": 54
+    },
+    {
+      "input": "/tmp/mulino-s1-root-35c810e/native/container-id.txt",
+      "artifact": "run/native/container-id.txt.gz",
+      "rawSha256": "76a36ee99c9863b38de0431ac34eb6759344553803b7a9d19b2eb3bcf78af2de",
+      "gzipSha256": "493dcea002e90ef186efc53718afb03610004c6124ae3c59028fb0b846f39dd9",
+      "rawBytes": 65
+    },
+    {
+      "input": "/tmp/mulino-s1-root-35c810e/native/native-stderr.txt",
+      "artifact": "run/native/native-stderr.txt.gz",
+      "rawSha256": "2c58b87a0350a39bb1c3b5f4891defeeb9a785e84aa11a466dc9ddb21253bf58",
+      "gzipSha256": "bfe23d49bd33bb8ff20fbe65e319d8fd7deac45174069f26d60a7cd5bf53f92f",
+      "rawBytes": 186
+    },
+    {
+      "input": "/tmp/mulino-s1-root-35c810e/native/native-stdout.json",
+      "artifact": "run/native/native-stdout.json.gz",
+      "rawSha256": "5ca2e28e130f8dce030e93925687ed9084f04e0ef8bbcb94ee30e1370c455755",
+      "gzipSha256": "e237d0faf5450b089e0507c66d9987ebb661b68cf7dae93d00a487eb89699454",
+      "rawBytes": 982
+    },
+    {
+      "input": "/tmp/mulino-s1-root-35c810e/native/postgres-image-id.txt",
+      "artifact": "run/native/postgres-image-id.txt.gz",
+      "rawSha256": "3256f05ad6b56c80bbca86ff15d0de4b57083c599441797e7b2213bc62afcb38",
+      "gzipSha256": "1cc7d32ab39095a458d2d354ce0ec695f116f5036347c52f7ac184621d08f163",
+      "rawBytes": 72
+    },
+    {
+      "input": "/tmp/mulino-s1-root-35c810e/native/postgres-image-reference.txt",
+      "artifact": "run/native/postgres-image-reference.txt.gz",
+      "rawSha256": "058d018a01df613916c61fb3e6fd3b008146970c2756187a369f29f5f72cab8e",
+      "gzipSha256": "64bb739ec1ba46f6c12f7d0184e9ea715fc2e4a463ae04191fefe1d0b5b4e493",
+      "rawBytes": 81
+    },
+    {
+      "input": "/tmp/mulino-s1-root-35c810e/native/postgres-runtime.log",
+      "artifact": "run/native/postgres-runtime.log.gz",
+      "rawSha256": "b79b741f4558ee3a262fe73839ff55d7f6203b82c5e8518c4062f5ef68a582f0",
+      "gzipSha256": "5f90fbdf7b586b53c161f4bbd87e978d392d9de7bc436f9d4bea40ccd2cdeebd",
+      "rawBytes": 3929
+    },
+    {
+      "input": "/tmp/mulino-s1-root-35c810e/native/postgres-version.txt",
+      "artifact": "run/native/postgres-version.txt.gz",
+      "rawSha256": "1bb919c53b0a9f6fa678be489d5ff035a2adb445dfec76a65e61ba2a88b535e0",
+      "gzipSha256": "50ae56b2fc2a2b3d8975e33e651f34f733a078962a07d2d540d8300f565b00f6",
+      "rawBytes": 121
+    },
+    {
+      "input": "/tmp/mulino-s1-root-35c810e/native/run-receipt.json",
+      "artifact": "run/native/run-receipt.json.gz",
+      "rawSha256": "cec68d068cd8c23296408ba836eff5433411e2dabd260a6805c744d155ae84ba",
+      "gzipSha256": "284890d355d55d2c1d455c162bf0525ea7a7950fb9d46fd45209c94284e1ba63",
+      "rawBytes": 753892
+    },
+    {
+      "input": "/tmp/mulino-s1-root-35c810e/npm-ci.log",
+      "artifact": "run/npm-ci.log.gz",
+      "rawSha256": "95bc0f5afdb462337496b953bfcd32a5bc0e01e3b2313b662b436388953f1f94",
+      "gzipSha256": "0dee7fc7920238a95f1cd6028bc8d634a090891fe02d1e648ba5ca4702f063e3",
+      "rawBytes": 25
+    },
+    {
+      "input": "/tmp/mulino-s1-root-35c810e/prepare.log",
+      "artifact": "run/prepare.log.gz",
+      "rawSha256": "4d0f01f31ec7705716ebb19e6fcdc9ac0fdbba3451274cf344cae247a222ddb1",
+      "gzipSha256": "024b5c039bb2a051243ddd11c026606d7cd4a4b692a8a23c91b66e9a37505374",
+      "rawBytes": 8267
+    },
+    {
+      "input": "/tmp/mulino-s1-root-35c810e/source-before.json",
+      "artifact": "run/source-before.json.gz",
+      "rawSha256": "d37a9fe18890a4abf95002bee21253754702514a392c5bb02c51192da028b2a4",
+      "gzipSha256": "1261dc174d9ae5a7e6a12ef0b8456e8107a9037b60f2def85f6ea046ee2b62e9",
+      "rawBytes": 375705
+    },
+    {
+      "input": "backend/target/surefire-reports/TEST-com.mulino.DefinitionValidatorTest.xml",
+      "artifact": "backend/TEST-com.mulino.DefinitionValidatorTest.xml.gz",
+      "rawSha256": "2eec69abbbddeec1e60aa2b7485b88e8940f9baaadfc8a8bf6921924886e8f75",
+      "gzipSha256": "fa7428ee0cbcff6faeed5261c78c130e8c105b9cbf4244280c6758a0f2ea9ef5",
+      "rawBytes": 44923
+    },
+    {
+      "input": "backend/target/surefire-reports/TEST-com.mulino.DefinitionsPersistenceTest.xml",
+      "artifact": "backend/TEST-com.mulino.DefinitionsPersistenceTest.xml.gz",
+      "rawSha256": "7721c6eeb9da7038935b80d2ea16a697557d0fbf9520c074b8ffd51e758bfe99",
+      "gzipSha256": "94eade03e9f906e4026b8493b4e53a9d828ed792124a45bf78aef764698c697e",
+      "rawBytes": 45110
+    },
+    {
+      "input": "backend/target/surefire-reports/TEST-com.mulino.PlatformIntegrationTest.xml",
+      "artifact": "backend/TEST-com.mulino.PlatformIntegrationTest.xml.gz",
+      "rawSha256": "5f3abd13d4fa1c61ea10a423ead4134864417269c96dc363fd7dcfd1da4681d5",
+      "gzipSha256": "631952bf4dbed188d9299907e7703bcddd3125e987ae44a6b5809460a4594839",
+      "rawBytes": 79385
+    },
+    {
+      "input": "backend/target/surefire-reports/TEST-com.mulino.application.evidence.EvidencePersistenceTest.xml",
+      "artifact": "backend/TEST-com.mulino.application.evidence.EvidencePersistenceTest.xml.gz",
+      "rawSha256": "4460546af2e2c3c2c0e26556d842558810c4ee34bf0cd39bd12ccf4bf0697c13",
+      "gzipSha256": "20a746a00e634642ad3aa4f0a24ad04cba1d1f87a212111d06331e1e9bac480d",
+      "rawBytes": 256920
+    },
+    {
+      "input": "backend/target/surefire-reports/TEST-com.mulino.application.identity.IdentityAuthorizationTest.xml",
+      "artifact": "backend/TEST-com.mulino.application.identity.IdentityAuthorizationTest.xml.gz",
+      "rawSha256": "e39995a81b4e9b2e767be5e58a3f2b3fbc0537a1b0f995c363559c1fc59f7d82",
+      "gzipSha256": "f5cc5e69631b9d1145004980384b2b6a60e1635d5ed0c774911cc80bf632b8fa",
+      "rawBytes": 44890
+    },
+    {
+      "input": "backend/target/surefire-reports/TEST-com.mulino.application.identity.IdentityPersistenceTest.xml",
+      "artifact": "backend/TEST-com.mulino.application.identity.IdentityPersistenceTest.xml.gz",
+      "rawSha256": "f7d46517c3a4987c13ef7cc6eea19cf837e56af631f9fd8d76bbd4a3dcec88b7",
+      "gzipSha256": "45c043773d2088ce00b4490a65d076534d7bf666c678d56a063577afa2ddbc6c",
+      "rawBytes": 61572
+    },
+    {
+      "input": "backend/target/surefire-reports/TEST-com.mulino.core.ReadContractsTest.xml",
+      "artifact": "backend/TEST-com.mulino.core.ReadContractsTest.xml.gz",
+      "rawSha256": "f5a4483e397558b0292f215fe6ca7d27680c46543b1385dae69d6e6be8377e28",
+      "gzipSha256": "6ef8cd268424fed24ff1570835ead45ec5b1165f5da02f0cbd4674578a33efe3",
+      "rawBytes": 44414
+    },
+    {
+      "input": "backend/target/surefire-reports/TEST-com.mulino.core.S1ReadIntegrationTest.xml",
+      "artifact": "backend/TEST-com.mulino.core.S1ReadIntegrationTest.xml.gz",
+      "rawSha256": "39b12eea3502cb5718d747a966619b3869a62419548b2a6f242922d90fae282d",
+      "gzipSha256": "68160476d45eb608a5dd19dbbeab153bcbd5e731da240424e9b7a0f620a6c93d",
+      "rawBytes": 236300
+    },
+    {
+      "input": "backend/target/surefire-reports/TEST-com.mulino.inventory.InventoryPostgresTest.xml",
+      "artifact": "backend/TEST-com.mulino.inventory.InventoryPostgresTest.xml.gz",
+      "rawSha256": "d0c165e01daa7738e28e92a03f18dd1dc2162461650d0161e78f140647d1357e",
+      "gzipSha256": "262661b7a5ebff02088d9980d7523f22e737bdd5c5a2574755eeaa449d51f8f0",
+      "rawBytes": 58870
+    },
+    {
+      "input": "backend/target/surefire-reports/TEST-com.mulino.inventory.InventoryQuantityTest.xml",
+      "artifact": "backend/TEST-com.mulino.inventory.InventoryQuantityTest.xml.gz",
+      "rawSha256": "1b75373fe717688cc6d0641db3c869fe2cddca606e54d801f66f0202a7d2f4fa",
+      "gzipSha256": "45daec522c1b4adc9af50d5e0168047294e0a3ab2120f0bec5a19e0e119db94c",
+      "rawBytes": 44230
+    },
+    {
+      "input": "verification/harness/target/surefire-reports/TEST-org.mulino.verification.AssertionAvailabilityTest.xml",
+      "artifact": "harness/TEST-org.mulino.verification.AssertionAvailabilityTest.xml.gz",
+      "rawSha256": "9a1da7a1f08d4a2630aec0107f2cc4074ba2a80dddd08be9684fc35fffa5e968",
+      "gzipSha256": "0cbaa5817ee764abe2e51c811c08a8ef78156c9790570f682c159300e5dda3f6",
+      "rawBytes": 14463
+    },
+    {
+      "input": "verification/harness/target/surefire-reports/TEST-org.mulino.verification.AssertionEngineTest.xml",
+      "artifact": "harness/TEST-org.mulino.verification.AssertionEngineTest.xml.gz",
+      "rawSha256": "e0a9bf12f4f65c364e7f68358e83f7be7aac64bbd3a0e1c0a8cbde95645b21fa",
+      "gzipSha256": "99a3a54cf2460180d6f8717619f9768ac8c68a16e880fbb64f3f75b6006d2bb2",
+      "rawBytes": 15486
+    },
+    {
+      "input": "verification/harness/target/surefire-reports/TEST-org.mulino.verification.CatalogLinkValidatorTest.xml",
+      "artifact": "harness/TEST-org.mulino.verification.CatalogLinkValidatorTest.xml.gz",
+      "rawSha256": "571cc0d20f17cbadc87471993cc4587428533dac20f22e6b69c8b5fb94b1dff7",
+      "gzipSha256": "294ab052488cf609813f9a5bd3339de53a4ffd228635b99368d9b1b339e6c57a",
+      "rawBytes": 17957
+    },
+    {
+      "input": "verification/harness/target/surefire-reports/TEST-org.mulino.verification.CommonReviewRegressionTest.xml",
+      "artifact": "harness/TEST-org.mulino.verification.CommonReviewRegressionTest.xml.gz",
+      "rawSha256": "a24d73166afc02a2b89f9144ec421a1260355a357bd3ca517251dfb6a502a53a",
+      "gzipSha256": "15035d607da081c933482674cb3f743276b37086e95372eb4cc376fadff3f46a",
+      "rawBytes": 14999
+    },
+    {
+      "input": "verification/harness/target/surefire-reports/TEST-org.mulino.verification.ContractValidatorTest.xml",
+      "artifact": "harness/TEST-org.mulino.verification.ContractValidatorTest.xml.gz",
+      "rawSha256": "24e78c568b52c6542542b02b38d0a813d5ad72393aac99e26920bd5f250ed3de",
+      "gzipSha256": "d644a4b14e92060983261776ea80fa2ca5550cdbe76602fb0aef4e8551ab16a0",
+      "rawBytes": 15036
+    },
+    {
+      "input": "verification/harness/target/surefire-reports/TEST-org.mulino.verification.HarnessTest.xml",
+      "artifact": "harness/TEST-org.mulino.verification.HarnessTest.xml.gz",
+      "rawSha256": "0185f953a4095c87a6a7cd0437293ff0e5a4ae8753dccb8931ab3eacf2fddec8",
+      "gzipSha256": "471e8cfc7921ade2fd98e44dccc759fcf986012aaf0075fc7ec24fa0d91b3f4f",
+      "rawBytes": 14905
+    },
+    {
+      "input": "verification/harness/target/surefire-reports/TEST-org.mulino.verification.HostObservationValidatorTest.xml",
+      "artifact": "harness/TEST-org.mulino.verification.HostObservationValidatorTest.xml.gz",
+      "rawSha256": "9011d6baea2abee8026afec40fa968e200aca02aa590907dd1d9ec8c5b1ae467",
+      "gzipSha256": "983baa90f1dcb1bff547da0e8f6f1b54120cb59e03d94d62ab99267f3596669e",
+      "rawBytes": 15497
+    },
+    {
+      "input": "verification/harness/target/surefire-reports/TEST-org.mulino.verification.PreparationValidatorTest.xml",
+      "artifact": "harness/TEST-org.mulino.verification.PreparationValidatorTest.xml.gz",
+      "rawSha256": "b705abe524b4136417822e4bb80303e99733d0abdda079d320333a494c8024b5",
+      "gzipSha256": "5852529c596b7d1f773d9875217922ff78936a0c23179f50920e74a820d56702",
+      "rawBytes": 19067
+    },
+    {
+      "input": "verification/harness/target/surefire-reports/TEST-org.mulino.verification.ReferenceResolverTest.xml",
+      "artifact": "harness/TEST-org.mulino.verification.ReferenceResolverTest.xml.gz",
+      "rawSha256": "45ea30960ab81700177d020574a54b3404bc2a5c9043034dee0e5195722d99e0",
+      "gzipSha256": "be8770b1d1c42e6532a12275ba2cfec270f0c8903e412f91a918b19f69463190",
+      "rawBytes": 15644
+    },
+    {
+      "input": "verification/harness/target/surefire-reports/TEST-org.mulino.verification.ReviewContractTest.xml",
+      "artifact": "harness/TEST-org.mulino.verification.ReviewContractTest.xml.gz",
+      "rawSha256": "1efb011920d306bd3fd6673378a77d28231cb4dbbb445e6ec7d7dcbd870a6a60",
+      "gzipSha256": "a2f9b4a09ad3f6d1db52590e9fc8d5e490911c63a422c6bf9660f54cd6114495",
+      "rawBytes": 15051
+    },
+    {
+      "input": "verification/harness/target/surefire-reports/TEST-org.mulino.verification.RunnerPortTest.xml",
+      "artifact": "harness/TEST-org.mulino.verification.RunnerPortTest.xml.gz",
+      "rawSha256": "b11baa9c47d260adcf6a49fea9f30e1576863b1fb6799073c9e42d296c41cb9f",
+      "gzipSha256": "b11d164fa83b347427c7efb6e6606b27ebd8d177b200431b55e940fa16b911c5",
+      "rawBytes": 14122
+    },
+    {
+      "input": "verification/harness/target/surefire-reports/TEST-org.mulino.verification.WireAsyncContractTest.xml",
+      "artifact": "harness/TEST-org.mulino.verification.WireAsyncContractTest.xml.gz",
+      "rawSha256": "96aa1c7c58587684b026e67e6ba3018c03aa25be5c02e57f1713604b6b927578",
+      "gzipSha256": "0eeabebc09d21fb47dd37c8ef76e12ef3f33811897abe0f2590bba5d525c5d95",
+      "rawBytes": 14460
+    },
+    {
+      "input": "verification/harness/target/surefire-reports/TEST-org.mulino.verification.actual.ActualAdapterContractTest.xml",
+      "artifact": "harness/TEST-org.mulino.verification.actual.ActualAdapterContractTest.xml.gz",
+      "rawSha256": "846ea4985545180101d00d441aed94cf94aacdf881b4968e17fd43b09e555b4c",
+      "gzipSha256": "df5a2f9262011901cba8100759d9b46e860345e5d5809720c8ff8553b304f1eb",
+      "rawBytes": 14933
+    },
+    {
+      "input": "verification/harness/target/surefire-reports/TEST-org.mulino.verification.cases.authority.AuthorityAssertionsTest.xml",
+      "artifact": "harness/TEST-org.mulino.verification.cases.authority.AuthorityAssertionsTest.xml.gz",
+      "rawSha256": "ca17fc542ed083a7c3feae3eb03b8e3029c314c2012c6956f2f214ab7542bde9",
+      "gzipSha256": "fdc26e9a46a1f7237b83b381426607a220d0805bcbfdd7a61ffb3d29baa99709",
+      "rawBytes": 15406
+    },
+    {
+      "input": "verification/harness/target/surefire-reports/TEST-org.mulino.verification.cases.authority.AuthorityPrerequisiteAssertionsTest.xml",
+      "artifact": "harness/TEST-org.mulino.verification.cases.authority.AuthorityPrerequisiteAssertionsTest.xml.gz",
+      "rawSha256": "671ef4f77317caf59d1a2a3fa84af5ad8b40e8ee14500fdb7113820dbbd8810a",
+      "gzipSha256": "e2eeb8bd5fc5235d22bcef4f5ce512aed8d1351d76640e711227dba0eb844ba3",
+      "rawBytes": 15565
+    },
+    {
+      "input": "verification/harness/target/surefire-reports/TEST-org.mulino.verification.cases.casecontractfix.CaseContractRoutesSelfTest.xml",
+      "artifact": "harness/TEST-org.mulino.verification.cases.casecontractfix.CaseContractRoutesSelfTest.xml.gz",
+      "rawSha256": "7f99e15040602320a6a84cb0abf028faee7c8894737cda980f41862c0ae6379c",
+      "gzipSha256": "3f3989c06ed23c20b612ea4f08206fd28196c60593fed9d92c7e868ca219e52f",
+      "rawBytes": 15396
+    },
+    {
+      "input": "verification/harness/target/surefire-reports/TEST-org.mulino.verification.cases.channels.ChannelsContractTest.xml",
+      "artifact": "harness/TEST-org.mulino.verification.cases.channels.ChannelsContractTest.xml.gz",
+      "rawSha256": "cc20e68d67aa81124f7bb5358addbc83399662797ee9fa3d79c26db32606aa9a",
+      "gzipSha256": "9a4b3daa60b8602c872e2cd165cb7a23d8ee2d316c849432fb9fc188289b67ed",
+      "rawBytes": 17333
+    },
+    {
+      "input": "verification/harness/target/surefire-reports/TEST-org.mulino.verification.cases.definitions.DefinitionsAssertionTest.xml",
+      "artifact": "harness/TEST-org.mulino.verification.cases.definitions.DefinitionsAssertionTest.xml.gz",
+      "rawSha256": "a3ffd35657adbeb4593e0f473e8b0847e0e37fa5a762ccd3f9681baa36005cf0",
+      "gzipSha256": "d18c1f26e7bbf309b169733eccd789353e8ab2c440c97721fa9423a54d66d298",
+      "rawBytes": 16298
+    },
+    {
+      "input": "verification/harness/target/surefire-reports/TEST-org.mulino.verification.cases.evidence.EvidenceAssertionContractTest.xml",
+      "artifact": "harness/TEST-org.mulino.verification.cases.evidence.EvidenceAssertionContractTest.xml.gz",
+      "rawSha256": "cc681b0e2ec9dbce4c1697efb7dd289768189a09a5078cd3022478b41c6c1857",
+      "gzipSha256": "8927bb9f07948206cb1e6eab3a36961bcd23d38f4ee8529b1bfea3c570ec30c4",
+      "rawBytes": 16949
+    },
+    {
+      "input": "verification/harness/target/surefire-reports/TEST-org.mulino.verification.cases.inventory.InventoryAssertionContractTest.xml",
+      "artifact": "harness/TEST-org.mulino.verification.cases.inventory.InventoryAssertionContractTest.xml.gz",
+      "rawSha256": "b25f743a5b739813c469adfd4193508b35eb6ccfbcdd85a4846df802c74cb016",
+      "gzipSha256": "fb0a06529f04e00ec92af88d8bd7ce6c03108126574c99a47d525e81bfcc1974",
+      "rawBytes": 16439
+    },
+    {
+      "input": "verification/harness/target/surefire-reports/TEST-org.mulino.verification.cases.platform.PlatformAssertionTest.xml",
+      "artifact": "harness/TEST-org.mulino.verification.cases.platform.PlatformAssertionTest.xml.gz",
+      "rawSha256": "175e6088d67d0fb81ead640322034db2a7f792633f9abac6a57fcd2745bff53b",
+      "gzipSha256": "39548fcea0b6e8637d0c0d2e10c15e4b2e1f78e6ca11dacc94ff39cf87154309",
+      "rawBytes": 16721
+    },
+    {
+      "input": "verification/harness/target/surefire-reports/TEST-org.mulino.verification.cases.platform.V8LockChoreographySelftestTest.xml",
+      "artifact": "harness/TEST-org.mulino.verification.cases.platform.V8LockChoreographySelftestTest.xml.gz",
+      "rawSha256": "af78caa2b0b17d2b73a05d2149ddeecef3e98e51bba6f3dd80bab2300ec79e73",
+      "gzipSha256": "2e32bf71f890c2405bedb4e836e4ea8134215df232fd233192ec2256434fe82c",
+      "rawBytes": 14976
+    },
+    {
+      "input": "verification/harness/target/surefire-reports/TEST-org.mulino.verification.cases.reviewbusiness.BusinessReviewAssertionTest.xml",
+      "artifact": "harness/TEST-org.mulino.verification.cases.reviewbusiness.BusinessReviewAssertionTest.xml.gz",
+      "rawSha256": "8aa31bc950ac0f2b15cdebe506c234f55c3bc19910d1f0d343b4bdb3dbfb3a5c",
+      "gzipSha256": "6ea6133cd227ad2563b4d1a9b61be2a6ef8787d7ffed336e0c01d3a1640d9326",
+      "rawBytes": 16059
+    },
+    {
+      "input": "verification/harness/target/surefire-reports/TEST-org.mulino.verification.cases.runtime.RuntimeAssertionTest.xml",
+      "artifact": "harness/TEST-org.mulino.verification.cases.runtime.RuntimeAssertionTest.xml.gz",
+      "rawSha256": "bc56c1cae4aa7b76de95bcbb67dba8f056e77958fc134148715736720c72bf23",
+      "gzipSha256": "bb92725e9da1e2c4f8b9799c5ed1d8271dfc5781850efd49abf3e1ee25120c73",
+      "rawBytes": 16789
+    },
+    {
+      "input": "verification/harness/target/surefire-reports/TEST-org.mulino.verification.cases.sales.OutcomeEffectAssertionSelfTest.xml",
+      "artifact": "harness/TEST-org.mulino.verification.cases.sales.OutcomeEffectAssertionSelfTest.xml.gz",
+      "rawSha256": "4ea7233b84febc8a19994b61165e2bbb637471b2f0568a7a374fe653a6b2ec83",
+      "gzipSha256": "10d3191b521ca6ad4108fbee532c33120126df0e2bf436ee5916bf1e6cbc320c",
+      "rawBytes": 15073
+    },
+    {
+      "input": "verification/harness/target/surefire-reports/TEST-org.mulino.verification.cases.sales.SalesAssertionMutationTest.xml",
+      "artifact": "harness/TEST-org.mulino.verification.cases.sales.SalesAssertionMutationTest.xml.gz",
+      "rawSha256": "f23024ef3b294e29716bf4189bedc9cb28b692d04c2cd46054121b7795ad9eca",
+      "gzipSha256": "dede4174a22ef03a4f37f7fdd949ef16365c955116c92500ce7f40d27587b594",
+      "rawBytes": 16052
+    },
+    {
+      "input": "verification/harness/target/surefire-reports/TEST-org.mulino.verification.cases.supply.SupplyAssertionTest.xml",
+      "artifact": "harness/TEST-org.mulino.verification.cases.supply.SupplyAssertionTest.xml.gz",
+      "rawSha256": "1fdb3c2073b2863e49865773f722572d8fc358c09fcfea8f9ec913077e6b36c4",
+      "gzipSha256": "a24975460e7ad7edd1ddd3e7d1d006901fff7483165163ab3227f404fc4e26c3",
+      "rawBytes": 16493
+    },
+    {
+      "input": "verification/harness/target/surefire-reports/TEST-org.mulino.verification.cases.work.RecipientAcceptanceAssertionTest.xml",
+      "artifact": "harness/TEST-org.mulino.verification.cases.work.RecipientAcceptanceAssertionTest.xml.gz",
+      "rawSha256": "47a627b26f25e69e654975c6b4c631ec0a3c1d0777620b58cfca0fc77b26e8d3",
+      "gzipSha256": "3d0016b627377ea8e02e71025a61f1b937ba341c8762db472fcd9a7e5e5940b1",
+      "rawBytes": 14889
+    },
+    {
+      "input": "verification/harness/target/surefire-reports/TEST-org.mulino.verification.cases.work.WorkAssertionTest.xml",
+      "artifact": "harness/TEST-org.mulino.verification.cases.work.WorkAssertionTest.xml.gz",
+      "rawSha256": "303a984d9d67bcd95c869e1629450d4b77e9b9f8848ac5fbda05ebc6723a15f8",
+      "gzipSha256": "a47de822382ae8a0f67b7fd4c3e3ec1f649449bfea61d165ab4b439ca3b5b923",
+      "rawBytes": 15773
+    },
+    {
+      "input": "verification/harness/target/surefire-reports/TEST-org.mulino.verification.coverage.CoverageSchemaTest.xml",
+      "artifact": "harness/TEST-org.mulino.verification.coverage.CoverageSchemaTest.xml.gz",
+      "rawSha256": "230da722607fa6f63fb2983f05dcccd64543d4b8d6cfc648770675ce6fa67e21",
+      "gzipSha256": "b905ed1e07de93ca5d42b9a4635d91020d0922202751177d908b6ba79478f1eb",
+      "rawBytes": 14319
+    },
+    {
+      "input": "verification/harness/target/surefire-reports/TEST-org.mulino.verification.modelbinding.ModelBindingContractTest.xml",
+      "artifact": "harness/TEST-org.mulino.verification.modelbinding.ModelBindingContractTest.xml.gz",
+      "rawSha256": "c71879552946c2c6af35f6e00b3f326ea7416b563114e9a0c9e30bbfff2a4ca4",
+      "gzipSha256": "06fcac60f033c2105b572e1e73ea21499c09cd31163f36c8a0e4c22461fddafa",
+      "rawBytes": 16018
+    },
+    {
+      "input": "verification/harness/target/surefire-reports/TEST-org.mulino.verification.modelbinding.ModelBindingEvaluatorTest.xml",
+      "artifact": "harness/TEST-org.mulino.verification.modelbinding.ModelBindingEvaluatorTest.xml.gz",
+      "rawSha256": "9059f8b7678b29e468649b0a3426b73a31888f324a9b0b8ce284b17b6c2d4995",
+      "gzipSha256": "ec58e7f18d6b3cbe2c5097de92fc3d516be80fec531fc71714ae26f4c8dad487",
+      "rawBytes": 16187
+    },
+    {
+      "input": "verification/harness/target/surefire-reports/TEST-org.mulino.verification.modelbinding.ModelBindingPreparationCoverageTest.xml",
+      "artifact": "harness/TEST-org.mulino.verification.modelbinding.ModelBindingPreparationCoverageTest.xml.gz",
+      "rawSha256": "3b7544a80d48ff6678eec71b6c85e897ba0e0c3c28abd3ad3aa8750e2b63aee2",
+      "gzipSha256": "fa57b61f26c042968457863602ecf6a64974c9845337f1b598ddd2ddd770d632",
+      "rawBytes": 14040
+    },
+    {
+      "input": "verification/harness/target/surefire-reports/TEST-org.mulino.verification.modelbinding.ModelBindingResponseEvidenceTest.xml",
+      "artifact": "harness/TEST-org.mulino.verification.modelbinding.ModelBindingResponseEvidenceTest.xml.gz",
+      "rawSha256": "dc1456b2b877c8e7d31f3d5f2e9e5b7183595c1acde9f65fa1f36e5deef7ea6f",
+      "gzipSha256": "bd296a9022bf9c484c134dc6553f3a165058367fcdebf4c38af698898da5285e",
+      "rawBytes": 18571
+    }
+  ]
+}
