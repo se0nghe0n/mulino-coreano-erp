@@ -7,6 +7,18 @@ import java.util.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 public final class ReferenceResolverTest {
+    @Test void purchaseOrderIdentityIsAStringIdOnBusinessAndRawProtocolSurfaces() {
+        for(String pointer:List.of("/response/purchaseOrderId","/response/body/result/structuredContent/purchaseOrderId")) {
+            ObjectNode response=Json.object();JsonNode value=Json.MAPPER.valueToTree("purchase-order-issued-1");
+            if(pointer.equals("/response/purchaseOrderId")) response.set("purchaseOrderId",value);
+            else {ObjectNode content=Json.object();content.set("purchaseOrderId",value);ObjectNode result=Json.object();result.set("structuredContent",content);response.set("body",Json.object().set("result",result));}
+            ObjectNode source=Json.object();source.put("driverStatus","EXECUTED");source.set("provenance",Json.parse("{\"scopeComplete\":true}"));source.set("response",response);ReferenceResolver resolver=new ReferenceResolver(Map.of("created",source),Json.object());
+            JsonNode ref=Json.parse("{\"$result\":{\"actionId\":\"created\",\"pointer\":\""+pointer+"\"}}");assertEquals(value,resolver.identity(ref));
+            for(JsonNode invalid:List.<JsonNode>of(Json.MAPPER.valueToTree(1),Json.MAPPER.valueToTree(true),Json.object(),Json.MAPPER.valueToTree(""))) {
+                ObjectNode parent=(ObjectNode)source.at(pointer.substring(0,pointer.lastIndexOf('/')));parent.set("purchaseOrderId",invalid);assertThrows(IllegalArgumentException.class,()->resolver.identity(ref));
+            }
+        }
+    }
     private final JsonNode aliases=Json.parse("{\"LOT\":\"server-lot-1\",\"qc\":\"server-human-1\"}");
     private Map<String,JsonNode> results() {
         return new HashMap<>(Map.of("created",Json.parse("{\"driverStatus\":\"EXECUTED\",\"provenance\":{\"scopeComplete\":true},\"response\":{\"workId\":\"generated-W1\",\"proposalHash\":\"sha1\",\"quantity\":\"100\",\"state\":\"STATE-A\",\"jsonState\":{\"boundWorkId\":\"generated-W1\",\"inputResponses\":[1,2]}},\"data\":{\"rows\":[{\"lotId\":\"server-lot-1\",\"workId\":\"generated-W1\",\"ownerId\":\"server-human-1\"},{\"lotId\":\"other-lot\",\"workId\":\"other-work\",\"ownerId\":\"other-human\"}]}}")));

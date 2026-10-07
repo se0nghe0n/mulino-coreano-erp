@@ -7,6 +7,7 @@ import java.nio.file.Path;
 import java.time.Instant;
 import java.util.*;
 import java.util.concurrent.*;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public final class CaseRunner {
     private final ContractValidator validator;
@@ -18,6 +19,13 @@ public final class CaseRunner {
     private final Set<String> asserted=new HashSet<>();
     private final Map<String,JsonNode> startedHandles=new ConcurrentHashMap<>();
     private final Set<String> terminalStarts=ConcurrentHashMap.newKeySet();
+    private record RuntimeIdentity(String schedulerId,String taskId,String invocationHandle) {}
+    private record RuntimeSubmission(String actionId,JsonNode scope,JsonNode environment,JsonNode evidenceClass,Instant submittedAt) {}
+    private final Map<RuntimeIdentity,RuntimeSubmission> runtimeSubmissions=new ConcurrentHashMap<>();
+    private final Set<RuntimeIdentity> runtimeTerminals=ConcurrentHashMap.newKeySet();
+    private final List<ObjectNode> parallelFailures=new CopyOnWriteArrayList<>();
+    private final Object executionGate=new Object();
+    private volatile boolean halted;
     private final Map<String,JsonNode> actionIndex=new LinkedHashMap<>();
     private final Map<String,JsonNode> assertionIndex=new LinkedHashMap<>();
     private final List<ObjectNode> assertionResults=new ArrayList<>();
@@ -40,6 +48,7 @@ public final class CaseRunner {
         executeAction(a);
     }
     private StepResult executeAction(JsonNode a) throws IOException {
+        ensureActive();
         String id=Json.required(a,"id"),kind=Json.required(a,"kind"); StepResult result;
         try {
             result=driver.availableAdapters().isEmpty() && !kind.equals("parallel") ? StepResult.missing(id,"NOT_IMPLEMENTED: no real product adapters installed") : switch(kind) {
@@ -65,6 +74,7 @@ public final class CaseRunner {
                 default -> throw new IllegalArgumentException("Unknown action kind "+kind);
             };
             if(!id.equals(result.actionId())) throw new IllegalArgumentException("Adapter actionId mismatch");
+            ensureActive();
             validator.result(result,kind);
             if(result.driverStatus()==StepResult.DriverStatus.EXECUTED && kind.equals("control")) {
                 if(!result.data().path("controlType").asText().equals(a.path("control").path("type").asText()) || !result.data().path("operation").asText().equals(a.path("control").path("operation").asText()))
@@ -76,13 +86,11 @@ public final class CaseRunner {
                     if(!requested.path("parameters").hasNonNull(field) || !result.data().hasNonNull(field) || !result.data().path(field).equals(requested.path("parameters").path(field)))
                         throw new IllegalArgumentException("Barrier ACK differs from requested "+field);
             }
-            if(result.driverStatus()==StepResult.DriverStatus.EXECUTED && kind.equals("start")) startedHandles.put(id,result.data().path("invocationHandle"));
             if(result.driverStatus()==StepResult.DriverStatus.EXECUTED && kind.equals("await")) {
                 String source=Json.required(a,"awaitActionId");
                 if(!result.data().path("completed").asBoolean(false) || !Set.of("SUCCEEDED","FAILED","CANCELLED").contains(result.data().path("terminalStatus").asText()))
                     throw new IllegalArgumentException("await requires actual terminal invocation ACK/status, not only submission ACK");
                 if(!result.data().path("invocationHandle").equals(startedHandles.get(source))) throw new IllegalArgumentException("await terminal ACK handle differs from submitted invocation");
-                terminalStarts.add(source);
             }
             if(result.driverStatus()==StepResult.DriverStatus.EXECUTED && kind.equals("observe")) {
                 JsonNode requested=resolve(a.path("observation"));
@@ -100,35 +108,110 @@ public final class CaseRunner {
                 if(!result.data().path("snapshot").equals(result.provenance().path("snapshot")) || !result.data().path("sourceQuery").equals(result.provenance().path("sourceQuery")))
                     throw new IllegalArgumentException("Observer data snapshot/sourceQuery differ from actual provenance");
             }
-            results.put(id,result.toJson());
-            if(kind.equals("installFixture") && result.driverStatus()==StepResult.DriverStatus.EXECUTED) {
-                if(!result.data().hasNonNull("aliasMap") || !result.data().hasNonNull("fixtureHash")) throw new IllegalArgumentException("Fixture install requires actual alias map/hash");
-                aliases=result.data().path("aliasMap");
+            synchronized(executionGate) {
+                ensureActive();
+                if(result.driverStatus()==StepResult.DriverStatus.EXECUTED) {
+                    if(kind.equals("start")) startedHandles.put(id,result.data().path("invocationHandle"));
+                    if(kind.equals("await")) terminalStarts.add(Json.required(a,"awaitActionId"));
+                    if(kind.equals("control") && a.path("control").path("type").asText().equals("process")) runtimeControl(id,result);
+                    if(kind.equals("installFixture")) {
+                        if(!result.data().hasNonNull("aliasMap") || !result.data().hasNonNull("fixtureHash")) throw new IllegalArgumentException("Fixture install requires actual alias map/hash");
+                        aliases=result.data().path("aliasMap");
+                    }
+                }
+                results.put(id,result.toJson());
             }
             return result;
         } catch(RuntimeException e) { throw new IllegalArgumentException("Action "+id+": "+e.getMessage(),e); }
     }
+    private void ensureActive() throws IOException {
+        if(halted || Thread.currentThread().isInterrupted()) throw new IOException("Execution stopped after parallel cancellation; no further adapter calls or late result publication");
+    }
+    private void runtimeControl(String actionId,StepResult result) {
+        JsonNode host=result.data().path("hostObservation"),identity=host.path("operationEvidence");String operation=host.path("operation").asText();
+        if(Set.of("tickScheduler","sweepDue").contains(operation) && identity.path("submissionStatus").asText().equals("SUBMITTED")) {
+            RuntimeIdentity key=new RuntimeIdentity(Json.required(identity,"schedulerId"),Json.required(identity,"taskId"),Json.required(identity,"invocationHandle"));
+            RuntimeSubmission submission=new RuntimeSubmission(actionId,host.path("scope").deepCopy(),host.path("environment").deepCopy(),host.path("evidenceClass").deepCopy(),Instant.parse(Json.required(identity,"submittedAt")));
+            if(runtimeSubmissions.putIfAbsent(key,submission)!=null) throw new IllegalArgumentException("Scheduler task identity was submitted more than once");
+        }
+        if(operation.equals("awaitRuntimeTask")) {
+            JsonNode task=host.path("runtimeTask");RuntimeIdentity key=new RuntimeIdentity(Json.required(identity,"schedulerId"),Json.required(task,"taskId"),Json.required(task,"invocationHandle"));
+            RuntimeSubmission submission=runtimeSubmissions.get(key);
+            if(submission==null) throw new IllegalArgumentException("Runtime terminal has no matching scheduler/taskId/invocationHandle submission");
+            if(!submission.scope().equals(host.path("scope")) || !submission.environment().equals(host.path("environment")) || !submission.evidenceClass().equals(host.path("evidenceClass"))) throw new IllegalArgumentException("Runtime terminal scope/environment/evidence class differs from submitted task");
+            if(Instant.parse(Json.required(task,"completedAt")).isBefore(submission.submittedAt())) throw new IllegalArgumentException("Runtime task completed before actual submission");
+            if(!runtimeTerminals.add(key)) throw new IllegalArgumentException("Runtime task has more than one terminal observation");
+        }
+    }
     private StepResult parallel(JsonNode action) throws IOException {
-        // Each branch submits real async calls. Joining submission ACKs never claims transaction completion.
-        try(ExecutorService pool=Executors.newVirtualThreadPerTaskExecutor()) {
-            List<Future<List<StepResult>>> futures=new ArrayList<>();
+        // One deadline covers all branches; ExecutorService.close() would wait forever on a blocked port.
+        ExecutorService pool=Executors.newVirtualThreadPerTaskExecutor();
+        AtomicInteger activeBranches=new AtomicInteger();
+        List<Future<List<StepResult>>> futures=new ArrayList<>();List<StepResult> children=new ArrayList<>();
+        long deadline=System.nanoTime()+TimeUnit.SECONDS.toNanos(action.path("timeoutSeconds").asInt(30));
+        Throwable failure=null;boolean interrupted=false;
+        try {
             for(JsonNode branch:action.path("branches")) futures.add(pool.submit(() -> {
-                List<StepResult> branchResults=new ArrayList<>();
-                for(JsonNode child:branch.path("actions")) {
-                    if(!Set.of("start","control","query").contains(child.path("kind").asText())) throw new IllegalArgumentException("parallel branch requires asynchronous start/control/query; await is explicit later");
-                    branchResults.add(executeAction(child));
+                synchronized(executionGate) {ensureActive();activeBranches.incrementAndGet();}
+                try {
+                    List<StepResult> branchResults=new ArrayList<>();
+                    for(JsonNode child:branch.path("actions")) {
+                        ensureActive();
+                        if(!Set.of("start","control","query").contains(child.path("kind").asText())) throw new IllegalArgumentException("parallel branch requires asynchronous start/control/query; await is explicit later");
+                        branchResults.add(executeAction(child));
+                    }
+                    return branchResults;
+                } finally {
+                    synchronized(executionGate) {activeBranches.decrementAndGet();executionGate.notifyAll();}
                 }
-                return branchResults;
             }));
-            List<StepResult> children=new ArrayList<>();
-            for(Future<List<StepResult>> future:futures) children.addAll(future.get(action.path("timeoutSeconds").asInt(30),TimeUnit.SECONDS));
-            if(children.stream().anyMatch(c->c.driverStatus()!=StepResult.DriverStatus.EXECUTED)) return StepResult.missing(Json.required(action,"id"),"NOT_IMPLEMENTED: a required parallel child did not execute");
-            List<String> artifacts=children.stream().flatMap(r->r.artifactRefs().stream()).distinct().toList();
-            ObjectNode p=Json.object();p.put("adapter","harness-parallel-submission").put("adapterVersion","1.0.0").put("buildVersion","1.0.0").putNull("authenticatedActor").put("source","REAL_ADAPTER_ACKS").put("independent",false).put("scopeComplete",true).putNull("sourceQuery").putNull("snapshot");
-            ObjectNode data=Json.object();data.set("childActionIds",Json.MAPPER.valueToTree(children.stream().map(StepResult::actionId).toList()));data.put("submissionAcknowledged",true).put("transactionCompletionClaimed",false);
-            return new StepResult(Json.required(action,"id"),StepResult.DriverStatus.EXECUTED,data,null,null,p,artifacts);
-        } catch(InterruptedException e) { Thread.currentThread().interrupt(); throw new IOException("Parallel interrupted",e); }
-        catch(ExecutionException|TimeoutException e) { throw new IOException("Parallel submission failed",e); }
+            for(Future<List<StepResult>> future:futures) {
+                long remaining=deadline-System.nanoTime();
+                if(remaining<=0) throw new TimeoutException("Total parallel submission deadline exceeded");
+                children.addAll(future.get(remaining,TimeUnit.NANOSECONDS));
+            }
+        } catch(InterruptedException e) {failure=e;interrupted=true;}
+        catch(ExecutionException|TimeoutException|RuntimeException e) {failure=e;}
+        if(failure!=null) {
+            synchronized(executionGate) {halted=true;}
+            futures.forEach(f->f.cancel(true));pool.shutdownNow();
+        } else pool.shutdown();
+        // Local port implementations must honour interruption. A port that does not is unresolved, never PASS.
+        boolean cleanupComplete=false;long cleanupDeadline=System.nanoTime()+TimeUnit.SECONDS.toNanos(1);
+        while(!cleanupComplete && System.nanoTime()<cleanupDeadline) {
+            try {
+                boolean executorTerminated=pool.awaitTermination(Math.max(1,cleanupDeadline-System.nanoTime()),TimeUnit.NANOSECONDS);
+                synchronized(executionGate) {
+                    cleanupComplete=executorTerminated && activeBranches.get()==0;
+                    if(!cleanupComplete && executorTerminated) {
+                        long remaining=cleanupDeadline-System.nanoTime();
+                        if(remaining>0) TimeUnit.NANOSECONDS.timedWait(executionGate,remaining);
+                    }
+                }
+            }
+            catch(InterruptedException e) {
+                interrupted=true;if(failure==null) failure=e;
+                synchronized(executionGate) {halted=true;}
+                futures.forEach(f->f.cancel(true));pool.shutdownNow();
+            }
+        }
+        if(failure!=null || !cleanupComplete) {
+            synchronized(executionGate) {halted=true;}
+            if(!cleanupComplete) {futures.forEach(f->f.cancel(true));pool.shutdownNow();}
+            ObjectNode evidence=Json.object();evidence.put("actionId",Json.required(action,"id")).put("status","FAIL").put("failureKind",failure instanceof TimeoutException?"TOTAL_DEADLINE_EXCEEDED":failure instanceof InterruptedException?"INTERRUPTED":"PARALLEL_EXECUTION_FAILED");
+            evidence.put("reason",failure==null?"Executor did not terminate within bounded cleanup":failure.toString()).put("cancellationRequested",true).put("cleanupComplete",cleanupComplete).put("lateResultPublicationFenced",true).put("runtimeComplete",false).put("timeoutSeconds",action.path("timeoutSeconds").asInt(30)).put("cleanupBoundSeconds",1);
+            evidence.put("localBranchesRemaining",activeBranches.get()).put("cleanupScope","LOCAL_PORT_EXECUTOR").put("remoteEffectsCancellationClaimed",false);
+            var ids=Json.array();for(JsonNode branch:action.path("branches")) for(JsonNode child:branch.path("actions")) ids.add(child.path("id"));evidence.set("childActionIds",ids);
+            String artifact="verification/harness/target/evidence/parallel-failure-"+UUID.randomUUID()+".json";evidence.put("artifactRef",artifact);parallelFailures.add(evidence);Json.write(validator.path(artifact),evidence);
+            if(interrupted) Thread.currentThread().interrupt();
+            throw new IOException("Parallel submission failed; cleanupComplete="+cleanupComplete+"; evidence="+artifact,failure);
+        }
+        if(interrupted) Thread.currentThread().interrupt();
+        if(children.stream().anyMatch(c->c.driverStatus()!=StepResult.DriverStatus.EXECUTED)) return StepResult.missing(Json.required(action,"id"),"NOT_IMPLEMENTED: a required parallel child did not execute");
+        List<String> artifacts=children.stream().flatMap(r->r.artifactRefs().stream()).distinct().toList();
+        ObjectNode p=Json.object();p.put("adapter","harness-parallel-submission").put("adapterVersion","1.0.0").put("buildVersion","1.0.0").putNull("authenticatedActor").put("source","REAL_ADAPTER_ACKS").put("independent",false).put("scopeComplete",true).putNull("sourceQuery").putNull("snapshot");
+        ObjectNode data=Json.object();data.set("childActionIds",Json.MAPPER.valueToTree(children.stream().map(StepResult::actionId).toList()));data.put("submissionAcknowledged",true).put("transactionCompletionClaimed",false);
+        return new StepResult(Json.required(action,"id"),StepResult.DriverStatus.EXECUTED,data,null,null,p,artifacts);
     }
     private JsonNode actor(JsonNode action) {
         String actor=Json.required(action,"actorRef"); JsonNode a=fixture.path("actors").get(actor);
@@ -165,7 +248,7 @@ public final class CaseRunner {
                 ObjectNode e=Json.object();e.put("assertionId",id).put("status","NOT_RUN").put("reason","Assertion source unavailable; no zero effects inferred");e.set("expected",assertion.path("expected"));e.set("source",assertion.path("source"));e.putNull("observed");assertionResults.add(e);
             } else try { assertId(id); } catch(AssertionError e) { failed=true; }
         }
-        boolean incomplete=!terminalStarts.containsAll(startedHandles.keySet());
+        boolean incomplete=!terminalStarts.containsAll(startedHandles.keySet()) || !runtimeTerminals.containsAll(runtimeSubmissions.keySet());
         return failed ? "FAIL" : missing || incomplete ? "NOT_RUN" : "PASS";
     }
     private boolean sourcesExecuted(JsonNode assertion) {
@@ -194,14 +277,18 @@ public final class CaseRunner {
         if(!results.keySet().containsAll(actionIndex.keySet())) throw new AssertionError("Feature omitted required actions");
         if(!asserted.containsAll(assertionIndex.keySet())) throw new AssertionError("Feature omitted substantive assertions");
         if(!terminalStarts.containsAll(startedHandles.keySet())) throw new AssertionError("Started invocation lacks terminal await ACK");
+        if(!runtimeTerminals.containsAll(runtimeSubmissions.keySet())) throw new AssertionError("Submitted scheduler task lacks matching runtime terminal observation");
+        if(halted || !parallelFailures.isEmpty()) throw new AssertionError("Parallel cancellation/cleanup failure prevents completion");
         if(results.values().stream().anyMatch(r->!"EXECUTED".equals(r.path("driverStatus").asText()))) throw new AssertionError("Required adapter action NOT_IMPLEMENTED/UNAVAILABLE");
     }
     public ObjectNode evidence(String status,String command) throws IOException {
+        if(halted || !parallelFailures.isEmpty()) status="FAIL";
         ObjectNode e=Json.object();e.put("schemaVersion","1.0.0").put("caseId",caseFile.path("caseId").asText()).put("subcaseId",subcase.path("id").asText()).put("status",status).put("runtimeComplete",status.equals("PASS"));
         e.put("startedAt",startedAt.toString()).put("finishedAt",Instant.now().toString()).put("command",command);
         e.put("caseHash",caseHash);e.put("fixtureRef",Json.required(subcase,"fixtureRef")).put("fixtureHash",Json.sha256(validator.path(Json.required(subcase,"fixtureRef"))));
         e.set("versions",fixture.path("versions"));e.set("requiredAdapters",subcase.path("requiredAdapters"));
         e.set("actions",Json.MAPPER.valueToTree(results));e.set("assertions",Json.MAPPER.valueToTree(assertionResults));
+        e.set("parallelFailures",Json.MAPPER.valueToTree(parallelFailures));e.put("uncompletedRuntimeTasks",runtimeSubmissions.size()-runtimeTerminals.size());
         e.put("missingAssertions",assertionIndex.size()-asserted.size());e.put("productCoverageClaimed",false); return e;
     }
 }

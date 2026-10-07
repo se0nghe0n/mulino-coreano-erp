@@ -93,9 +93,9 @@ driverProvenance는 각각 선언한 host metadata와 StepResult provenance의
 | start | processId, environmentId / 명시한 parameters.processId | 실제 미기동→RUNNING instance와 terminal snapshot |
 | stop | processId, environmentId / 명시한 parameters.processId | 실제 전후 process instance/status와 정지 terminal snapshot |
 | restart | processId, environmentId / 명시한 parameters.processId | 실제 새 instance의 RUNNING과 전후 terminal snapshot |
-| tickScheduler | schedulerId, tickId / due scope와 고정 clock | 실제 tick ACK와 scheduler rows; 완료 업무와 구별한다 |
+| tickScheduler | schedulerId, tickId, submissionStatus / due scope와 고정 clock | SUBMITTED의 실제 taskId/handle 또는 관찰된 NO_TASK; 완료 업무와 구별한다 |
 | claim | schedulerId, claimId, leaseId, fencingToken / claim scope | 실제 lease/fence rows; stale worker 효과는 DB assertion으로 검사한다 |
-| sweepDue | schedulerId, sweepId / due scope와 clock | 실제 sweep rows; 예약 전이·의무·출고0은 독립 DB로 검사한다 |
+| sweepDue | schedulerId, sweepId, submissionStatus / due scope와 clock | SUBMITTED의 실제 taskId/handle 또는 관찰된 NO_TASK; 예약 전이·의무·출고0은 독립 DB로 검사한다 |
 | awaitRuntimeTask | schedulerId / 실제 taskId 또는 invocationHandle | 아래 autonomous task terminal과 snapshot을 모두 검사한다 |
 | archiveInventory | repositoryId, baselineCommit, inventoryId | 실제 파일별 hash·분류·보존 위치 inventory artifact |
 | archiveRestore | archiveId, restoreEnvironmentId, restoredCommit | 실제 archive를 읽은 isolated 복원 artifact·대조 report |
@@ -196,6 +196,21 @@ selftest의 `sentinel.txt`에는 가상 marker 두 개가 있다. 발견0·틀�
 검출 계약이며 모든 종류의 secret 부재를 자동 증명하지 않는다.
 
 ## autonomous scheduler terminal
+
+tickScheduler/sweepDue의 `operationEvidence.submissionStatus`는 실제 독립
+rows에 기록된 `SUBMITTED` 또는 `NO_TASK`다. SUBMITTED에는 실제 `taskId`,
+`invocationHandle`, `submittedAt`을 모두 둔다. submittedAt은 해당 host
+command의 시작·종료 사이여야 한다. NO_TASK에는 세 field를 넣지 않는다.
+미관찰 task를 NO_TASK로 치환하지 않고 원행·scope·실제 command evidence를
+같이 검사한다. 제출 ACK에는 runtimeTask terminal을 넣지 않는다.
+
+한 scoped control의 typed submission identity를 후속 `$result`로 읽는다.
+단순 task 배열의 첫 row를 추측하지 않는다. 실제 task를 제출했다면
+CaseRunner는 동일 scheduler/taskId/invocationHandle의 terminal을 요구한다.
+scope·environment·evidenceClass도 submission과 같으며 완료 시각은 제출
+시각 이후다. terminal이 없으면 제품 case는 NOT_RUN, 다른 identity나
+환경의 terminal이면 계약 실패다. NO_TASK만 관찰한 control은 terminal을
+생성하지 않는다. 업무 생성0과 scheduler technical task 부재는 별개다.
 
 `awaitRuntimeTask` request는 이전 actual scheduler 관찰 결과의 `taskId`
 또는 `invocationHandle`을 strict `$result`로 받는다. 두 값을 request에

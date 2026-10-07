@@ -1,0 +1,69 @@
+{
+  "schemaVersion": "1.0.0",
+  "baselineCommit": "f426712fcd1bcfc1ed71a1beb9aa80ec3051e182",
+  "scope": "COMMON_HOST_AND_PARALLEL_REGRESSION_ONLY",
+  "commands": [
+    {
+      "argv": [
+        "./mvnw",
+        "-B",
+        "-ntp",
+        "-f",
+        "verification/harness/pom.xml",
+        "-Dtest=CommonReviewRegressionTest,HostObservationValidatorTest,ReferenceResolverTest",
+        "test"
+      ],
+      "exitCode": 0,
+      "tests": 27,
+      "artifact": "targeted.txt"
+    },
+    {
+      "argv": [
+        "./verify",
+        "harness"
+      ],
+      "exitCode": 0,
+      "tests": 329,
+      "artifact": "harness.txt"
+    }
+  ],
+  "junit": {
+    "CommonReviewRegressionTest": {
+      "tests": "5",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0"
+    },
+    "HostObservationValidatorTest": {
+      "tests": "10",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0"
+    },
+    "ReferenceResolverTest": {
+      "tests": "12",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0"
+    }
+  },
+  "runtimeStatus": "NOT_RUN",
+  "productRuntimeClaimed": false,
+  "actualHostOrPaidCalls": false,
+  "evidenceLogNormalization": "Trailing whitespace removed only; command/result/exit preserved.",
+  "parallelCleanupBoundary": "Local executor plus actual branch finally exit; remote effect cancellation is not claimed.",
+  "unpairedSubmissionAudit": {
+    "requiresAddedTerminal": [
+      "T26.operational-nine-categories:claim-tick"
+    ],
+    "requiresActualNoTaskOrAdditionalTerminal": [
+      "T22.external-unknown:retry-tick",
+      "T22.external-success:retry-tick",
+      "T22.external-failure-no-retry:retry-tick",
+      "T22.external-no-lookup:retry-tick",
+      "T22.external-local-cancel:retry-tick"
+    ]
+  },
+  "caseFilesChanged": false,
+  "preValidationEnvironmentFailure": "Initial redirect target directory missing; Maven was not started, excluded from RED."
+}

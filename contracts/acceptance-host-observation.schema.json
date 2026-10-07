@@ -522,14 +522,95 @@
               "tickId": {
                 "type": "string",
                 "minLength": 1
+              },
+              "submissionStatus": {
+                "enum": [
+                  "SUBMITTED",
+                  "NO_TASK"
+                ]
+              },
+              "taskId": {
+                "type": "string",
+                "minLength": 1
+              },
+              "invocationHandle": {
+                "type": "string",
+                "minLength": 1
+              },
+              "submittedAt": {
+                "type": "string",
+                "format": "date-time"
               }
             },
             "required": [
               "schedulerId",
-              "tickId"
+              "tickId",
+              "submissionStatus"
             ],
-            "additionalProperties": false
+            "additionalProperties": false,
+            "allOf": [
+              {
+                "if": {
+                  "properties": {
+                    "submissionStatus": {
+                      "const": "SUBMITTED"
+                    }
+                  }
+                },
+                "then": {
+                  "required": [
+                    "taskId",
+                    "invocationHandle",
+                    "submittedAt"
+                  ]
+                }
+              },
+              {
+                "if": {
+                  "properties": {
+                    "submissionStatus": {
+                      "const": "NO_TASK"
+                    }
+                  }
+                },
+                "then": {
+                  "not": {
+                    "anyOf": [
+                      {
+                        "required": [
+                          "taskId"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "invocationHandle"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "submittedAt"
+                        ]
+                      }
+                    ]
+                  }
+                }
+              }
+            ]
           }
+        },
+        "not": {
+          "anyOf": [
+            {
+              "required": [
+                "runtimeTask"
+              ]
+            },
+            {
+              "required": [
+                "processObservation"
+              ]
+            }
+          ]
         }
       }
     },
@@ -594,14 +675,95 @@
               "sweepId": {
                 "type": "string",
                 "minLength": 1
+              },
+              "submissionStatus": {
+                "enum": [
+                  "SUBMITTED",
+                  "NO_TASK"
+                ]
+              },
+              "taskId": {
+                "type": "string",
+                "minLength": 1
+              },
+              "invocationHandle": {
+                "type": "string",
+                "minLength": 1
+              },
+              "submittedAt": {
+                "type": "string",
+                "format": "date-time"
               }
             },
             "required": [
               "schedulerId",
-              "sweepId"
+              "sweepId",
+              "submissionStatus"
             ],
-            "additionalProperties": false
+            "additionalProperties": false,
+            "allOf": [
+              {
+                "if": {
+                  "properties": {
+                    "submissionStatus": {
+                      "const": "SUBMITTED"
+                    }
+                  }
+                },
+                "then": {
+                  "required": [
+                    "taskId",
+                    "invocationHandle",
+                    "submittedAt"
+                  ]
+                }
+              },
+              {
+                "if": {
+                  "properties": {
+                    "submissionStatus": {
+                      "const": "NO_TASK"
+                    }
+                  }
+                },
+                "then": {
+                  "not": {
+                    "anyOf": [
+                      {
+                        "required": [
+                          "taskId"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "invocationHandle"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "submittedAt"
+                        ]
+                      }
+                    ]
+                  }
+                }
+              }
+            ]
           }
+        },
+        "not": {
+          "anyOf": [
+            {
+              "required": [
+                "runtimeTask"
+              ]
+            },
+            {
+              "required": [
+                "processObservation"
+              ]
+            }
+          ]
         }
       }
     },

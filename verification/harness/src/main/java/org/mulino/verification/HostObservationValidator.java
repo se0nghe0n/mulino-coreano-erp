@@ -66,8 +66,17 @@ public final class HostObservationValidator {
         if(operation.equals("cutoverStage")) ContractValidator.require(Set.of("WRITE_FREEZE","FINAL_SNAPSHOT","RECONCILE","APPLY_VERSION","SMOKE_AUTH_RESUME","OPEN_WRITES","ROLLBACK_BEFORE_OPEN","STOP_AND_RECONCILE_AFTER_OPEN","FORWARD_REPAIR").contains(identity.path("stage").asText()),"Unknown bounded cutover stage");
         if(READ_OPERATIONS.contains(operation)) inspect(validator,requested,host,extracted);
         if(operation.equals("scanArtifacts")) scan(validator,requested,host);
+        if(Set.of("tickScheduler","sweepDue").contains(operation)) schedulerSubmission(requested,host);
         if(operation.equals("awaitRuntimeTask")) runtimeTask(validator,requested,host,result);
         if(Set.of("start","stop","restart").contains(operation)) lifecycle(validator,requested,host,result);
+    }
+    private static void schedulerSubmission(JsonNode requested,JsonNode host) {
+        JsonNode identity=host.path("operationEvidence");
+        ContractValidator.require(Json.required(requested,"schedulerId").equals(identity.path("schedulerId").asText()),"Scheduler submission belongs to a different requested scheduler");
+        if(identity.path("submissionStatus").asText().equals("SUBMITTED")) {
+            Instant submitted=instant(identity,"submittedAt");
+            ContractValidator.require(!submitted.isBefore(instant(host.path("command"),"startedAt")) && !submitted.isAfter(instant(host.path("command"),"completedAt")),"Scheduler submission timestamp is outside actual command observation");
+        }
     }
     private static void lifecycle(ContractValidator validator,JsonNode requested,JsonNode host,StepResult result) throws IOException {
         JsonNode observed=host.path("processObservation"),before=observed.path("before"),after=observed.path("after");

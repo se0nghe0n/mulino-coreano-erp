@@ -40,7 +40,7 @@ public final class ReferenceResolver {
         "ownerId","actorId","principalId","subjectId","organizationId","tenantId","commandId",
         "requestId","proposalId","approvalId","restrictionId","allocationId","movementId","evidenceId",
         "occurrenceId","definitionId","evaluatorId","policyId","grantId","taskId","runId","workLinkId",
-        "parentWorkId","childWorkId","supplierId","customerId","shipmentId","invoiceId","externalId",
+        "parentWorkId","childWorkId","supplierId","customerId","purchaseOrderId","shipmentId","invoiceId","externalId",
         "runtimeTaskId","invocationHandle","transactionId","goalVersionId");
     private static final Set<String> IDS_FIELDS=Set.of("ids","workIds","obligationIds");
     private static final Set<String> HASH_FIELDS=Set.of("hash","proposalHash","evidenceHash","definitionHash","policyHash","artifactHash","requestHash","inputHash","sha256");

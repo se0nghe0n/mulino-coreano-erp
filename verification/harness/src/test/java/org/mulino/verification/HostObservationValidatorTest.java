@@ -12,7 +12,7 @@ public final class HostObservationValidatorTest {
     private final Path root=Path.of(System.getProperty("repo.root")).toAbsolutePath().normalize();
     private final String dir="verification/harness/src/test/resources/host-observation/";
     private static final Set<String> GENERATES=Set.of("archiveInventory","archiveRestore","dataInventory","schemaInstall","schemaUpgrade","compileSchema","compilerSchemaProbe","backup","restore","cutoverStage","deploymentProbe","clientProbe","retentionSweep","verifyCoverage");
-    private record Capture(ObjectNode control,ObjectNode host,StepResult result) {}
+    record Capture(ObjectNode control,ObjectNode host,StepResult result) {}
     private ObjectNode artifact(String name) throws Exception {
         ObjectNode a=Json.object();String path=dir+name;a.put("path",path).put("sha256",Json.sha256(root.resolve(path))).put("sizeBytes",Files.size(root.resolve(path))).put("completeness","COMPLETE");
         a.set("scope",Json.parse("{\"workspace\":\"host-selftest\"}"));return a;
@@ -21,8 +21,9 @@ public final class HostObservationValidatorTest {
         ObjectNode c=Json.object();c.set("argv",Json.MAPPER.valueToTree(List.of("CAPTURED_CONTRACT_SELFTEST_ONLY",operation)));
         c.put("exitCode",0).put("startedAt","2026-10-07T00:00:00Z").put("completedAt","2026-10-07T00:00:03Z").put("transcriptRef",dir+"transcript.txt").put("redacted",true);return c;
     }
-    private Capture capture(String operation) throws Exception {
+    Capture capture(String operation) throws Exception {
         JsonNode rows=Json.read(root.resolve(dir+operation+"-rows.json"));ObjectNode params=Json.object();params.set("scope",Json.parse("{\"workspace\":\"host-selftest\"}"));
+        if(rows.path("operationEvidence").has("schedulerId")) params.set("schedulerId",rows.path("operationEvidence").path("schedulerId"));
         ObjectNode host=Json.object();host.put("schemaVersion","1.0.0").put("evidenceClass","CAPTURED_SELFTEST").put("operation",operation).put("scopeComplete",true);
         host.set("scope",params.path("scope").deepCopy());host.set("command",command(operation));host.set("toolVersions",Json.parse("[{\"name\":\"CAPTURED_SELFTEST_ONLY\",\"version\":\"1.0.0\"}]"));
         String profile=operation.equals("deploymentProbe")?"BTP":operation.equals("clientProbe")?"CLIENT":"LOCAL";

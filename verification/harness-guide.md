@@ -214,6 +214,18 @@ PASS로 세지 않는다. `parallel.branches`는 실제 async start/control/quer
 각 invocation의 `await`와 post-commit 독립 관찰을 별도로 둔다. 모든
 child도 실행 상태·scope·artifact 검증 대상이다.
 
+parallel의 timeoutSeconds는 모든 branch를 합친 하나의 deadline이다.
+timeout/실패에는 모든 Future를 cancel/interrupt하고 local executor와
+실제 branch finally 종료를 최대1초 더 기다린다. Future의 cancelled나
+Executor 종료 표지만으로 살아 있는 port 호출의 cleanup을 선언하지
+않는다. 실패 뒤 새 adapter 호출과 늦은 result publication을 차단한다.
+`target/evidence/parallel-failure-*.json`과 case evidence에는 cancellation,
+남은 local branch, cleanupComplete와 FAIL을 기록한다. cleanupComplete는
+local port executor의 종료이며 remote 효과 취소를 주장하지 않는다.
+실제 adapter는 interruption·bounded transport timeout·외부 task 취소/대조를
+지원해야 한다. 미확정 외부 효과와 cleanup 불완료는 isolated 환경을
+보존해 대조하며 runtime PASS로 바꾸지 않는다.
+
 `route=wire`의 request는 raw HTTP header/body, content type, protocol,
 JSON-RPC ID, MRTR state/inputResponses/effect key를 그대로 전달할 수 있다.
 harness가 공격 입력을 정상화하거나 header/body mismatch를 수선하지
