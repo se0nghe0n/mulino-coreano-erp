@@ -45,7 +45,8 @@ public final class ItemCommands implements CommandHandler {
   String item=InventoryCommands.uuid(p,"itemId");Instant[] interval=interval(p);
   var overlaps=repository.currentRows(c,"ExternalIdentifiers").stream().filter(r->Objects.equals(r.get("issuer"),p.get("issuer"))&&Objects.equals(r.get("namespace"),p.get("namespace"))&&Objects.equals(r.get("value"),p.get("value"))).filter(r->(interval[1]==null||StockPrimitives.instant(r.get("validFrom")).isBefore(interval[1]))&&(r.get("validUntil")==null||interval[0].isBefore(StockPrimitives.instant(r.get("validUntil"))))).toList();
   for(var existing:overlaps) {
-   if(item.equals(existing.get("itemId")))return Map.of("outcome","ACCEPTED","revision",0,"effects",Map.of("externalIdentifierId",existing.get("ID"),"alreadyLinked",true));
+   boolean covers=!StockPrimitives.instant(existing.get("validFrom")).isAfter(interval[0])&&(existing.get("validUntil")==null||(interval[1]!=null&&!StockPrimitives.instant(existing.get("validUntil")).isBefore(interval[1])));
+   if(item.equals(existing.get("itemId"))&&covers)return Map.of("outcome","ACCEPTED","revision",0,"effects",Map.of("externalIdentifierId",existing.get("ID"),"alreadyLinked",true));
    String id=StockPrimitives.id();var conflict=StockPrimitives.row(c,id,c.knownAt());for(String key:List.of("issuer","namespace","value"))conflict.put(key,p.get(key));conflict.put("itemId",item);conflict.put("existingIdentifierId",existing.get("ID"));conflict.put("validFrom",interval[0]);conflict.put("validUntil",interval[1]);conflict.put("state","RECONCILIATION_REQUIRED");
    // Persist the conflict through a bounded metadata-only method.
    repository.recordIdentifierConflict(conflict);
