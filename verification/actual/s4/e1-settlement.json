@@ -1,0 +1,274 @@
+{
+  "schemaVersion": "1.0.0",
+  "status": "NOT_RUN",
+  "actions": [
+    {
+      "id": "e1-invoice-input",
+      "type": "original",
+      "fixture": {
+        "synthetic": true,
+        "clock": {
+          "asOf": "2026-10-07T09:00:02Z",
+          "knownAt": "2026-10-07T09:00:02Z"
+        },
+        "sourceProfile": {
+          "namespace": "native-s4-e1-invoice-input",
+          "policyVersion": "fixture-v1",
+          "nextAction": "원본 범위와 실제 효과 대조",
+          "nextCheckAt": "2026-10-08T09:00:00Z"
+        },
+        "occurrence": {
+          "kind": "INVOICE",
+          "content": {
+            "sourceNamespace": "synthetic-invoice-e1",
+            "sourceKey": "invoice40-receipt40",
+            "sourceVersion": "1",
+            "lineId": "$LINE",
+            "referenceId": "$receipt40.canonical",
+            "scopeKind": "PURCHASE",
+            "invoiceKind": "COMMERCIAL",
+            "itemId": "$P",
+            "quantity": "40",
+            "unit": "BOX",
+            "unitPrice": "200.125",
+            "originalAmount": "8005",
+            "currency": "EUR",
+            "occurredAt": "2026-10-07T09:00:02Z"
+          },
+          "externalEventId": "e1-invoice-input",
+          "quantity": "40",
+          "unit": "BOX",
+          "assertion": "authored synthetic external original"
+        }
+      },
+      "binding": {
+        "organizationId": "$ORG",
+        "workId": "$WORK",
+        "itemId": "$P",
+        "actorId": "$reader",
+        "supervisorId": "$supervisor",
+        "physicalScopeId": "$LINE",
+        "subjectId": "$LINE",
+        "subjectKind": "PURCHASE_ORDER_LINE",
+        "placeId": "$W"
+      }
+    },
+    {
+      "id": "e1-purchase-line-revision",
+      "type": "observe",
+      "bind": {
+        "PURCHASE_LINE_REV": "/rawRows/mulino_trade_purchase_orderlines/0/revision"
+      }
+    },
+    {
+      "id": "e1-record-invoice40",
+      "type": "command",
+      "capability": "recordInvoice",
+      "request": {
+        "intentKind": "RECORD",
+        "definitionVersion": "definition-v1",
+        "capabilityId": "recordInvoice",
+        "expectedRevision": "$PURCHASE_LINE_REV",
+        "commandIdempotencyKey": "e1-record-invoice40",
+        "slots": {
+          "invoiceKind": "COMMERCIAL",
+          "originalAmount": {
+            "value": "8005",
+            "currency": "EUR",
+            "provenance": "USER"
+          },
+          "line": {
+            "value": {
+              "purchaseLineId": "$LINE",
+              "receiptOccurrenceId": "$receipt40.canonical",
+              "quantity": {
+                "value": "40",
+                "unit": "BOX"
+              },
+              "unitPrice": {
+                "value": "200.125",
+                "currency": "EUR"
+              }
+            },
+            "provenance": "USER"
+          },
+          "evidence": "$e1-invoice-input.document"
+        },
+        "provenance": {},
+        "subjectRefs": [
+          {
+            "type": "Work",
+            "id": "$WORK"
+          }
+        ]
+      },
+      "outcome": "APPLIED",
+      "bind": {
+        "INVOICE": "/invoiceId"
+      }
+    },
+    {
+      "id": "e1-invoice-original",
+      "type": "original",
+      "fixture": {
+        "synthetic": true,
+        "clock": {
+          "asOf": "2026-10-07T09:00:02Z",
+          "knownAt": "2026-10-07T09:00:02Z"
+        },
+        "sourceProfile": {
+          "namespace": "native-s4-e1-invoice-original",
+          "policyVersion": "fixture-v1",
+          "nextAction": "원본 범위와 실제 효과 대조",
+          "nextCheckAt": "2026-10-08T09:00:00Z"
+        },
+        "occurrence": {
+          "kind": "INVOICE",
+          "content": {
+            "sourceNamespace": "synthetic-invoice-e1",
+            "sourceKey": "invoice40-receipt40",
+            "sourceVersion": "1",
+            "lineId": "$LINE",
+            "referenceId": "$receipt40.canonical",
+            "scopeKind": "PURCHASE",
+            "invoiceKind": "COMMERCIAL",
+            "itemId": "$P",
+            "quantity": "40",
+            "unit": "BOX",
+            "unitPrice": "200.125",
+            "originalAmount": "8005",
+            "currency": "EUR",
+            "occurredAt": "2026-10-07T09:00:02Z"
+          },
+          "externalEventId": "e1-invoice-original",
+          "quantity": "40",
+          "unit": "BOX",
+          "assertion": "authored synthetic external original"
+        }
+      },
+      "binding": {
+        "organizationId": "$ORG",
+        "workId": "$WORK",
+        "itemId": "$P",
+        "actorId": "$reader",
+        "supervisorId": "$supervisor",
+        "physicalScopeId": "$INVOICE",
+        "subjectId": "$INVOICE",
+        "subjectKind": "INVOICE",
+        "placeId": "$W"
+      }
+    },
+    {
+      "id": "e1-invoice-original-match",
+      "type": "command",
+      "capability": "matchSourceIdentity",
+      "request": {
+        "intentKind": "COMMAND",
+        "definitionVersion": "definition-v1",
+        "capabilityId": "matchSourceIdentity",
+        "expectedRevision": 1,
+        "commandIdempotencyKey": "e1-invoice-original-match",
+        "slots": {
+          "claimId": "$e1-invoice-original.claim",
+          "basisDocumentId": "$e1-invoice-original.document",
+          "physicalScopeId": "$INVOICE",
+          "policyVersion": "fixture-v1",
+          "sourceIdentity": "native-s4-e1-invoice-original:e1-invoice-original:1",
+          "quantity": "40",
+          "unit": "BOX",
+          "effectiveFrom": "2026-10-07T09:00:02Z",
+          "reason": "동일 원본과 대상 범위 대조"
+        },
+        "provenance": {},
+        "subjectRefs": [
+          {
+            "type": "Work",
+            "id": "$WORK"
+          }
+        ]
+      },
+      "outcome": "APPLIED",
+      "bind": {
+        "e1-invoice-original.reconciliation": "/id"
+      }
+    },
+    {
+      "id": "e1-invoice-original-link",
+      "type": "command",
+      "capability": "linkCanonicalOccurrence",
+      "request": {
+        "intentKind": "COMMAND",
+        "definitionVersion": "definition-v1",
+        "capabilityId": "linkCanonicalOccurrence",
+        "expectedRevision": 1,
+        "commandIdempotencyKey": "e1-invoice-original-link",
+        "slots": {
+          "reconciliationId": "$e1-invoice-original.reconciliation"
+        },
+        "provenance": {},
+        "subjectRefs": [
+          {
+            "type": "Work",
+            "id": "$WORK"
+          }
+        ]
+      },
+      "outcome": "APPLIED",
+      "bind": {
+        "e1-invoice-original.canonical": "/id"
+      }
+    },
+    {
+      "id": "e1-match-invoice-gap5",
+      "type": "command",
+      "capability": "matchInvoice",
+      "request": {
+        "intentKind": "COMMAND",
+        "definitionVersion": "definition-v1",
+        "capabilityId": "matchInvoice",
+        "expectedRevision": 1,
+        "commandIdempotencyKey": "e1-match-invoice-gap5",
+        "slots": {
+          "invoiceId": "$INVOICE",
+          "canonicalOccurrenceId": "$e1-invoice-original.canonical",
+          "evidence": "$e1-invoice-original.document"
+        },
+        "provenance": {},
+        "subjectRefs": [
+          {
+            "type": "Work",
+            "id": "$WORK"
+          }
+        ]
+      },
+      "outcome": "APPLIED",
+      "assertions": [
+        {
+          "pointer": "/quantityDifference",
+          "operator": "equals",
+          "expected": "0"
+        },
+        {
+          "pointer": "/originalDifference",
+          "operator": "equals",
+          "expected": "5"
+        },
+        {
+          "pointer": "/businessStatus",
+          "operator": "equals",
+          "expected": "DIFFERENCE"
+        },
+        {
+          "pointer": "/settlementResult",
+          "operator": "equals",
+          "expected": "UNSATISFIED"
+        },
+        {
+          "pointer": "/bankEffect",
+          "operator": "equals",
+          "expected": "0"
+        }
+      ]
+    }
+  ]
+}

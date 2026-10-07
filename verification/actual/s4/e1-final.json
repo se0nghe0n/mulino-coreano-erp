@@ -1,0 +1,157 @@
+{
+  "schemaVersion": "1.0.0",
+  "status": "NOT_RUN",
+  "actions": [
+    {
+      "id": "e1-final-independent",
+      "type": "observe",
+      "assertions": [
+        {
+          "pointer": "/rawRows/mulino_inventory_quantitysegments",
+          "operator": "sum",
+          "column": "quantity",
+          "where": {
+            "retiredat": null,
+            "placeid": "$W"
+          },
+          "expected": "80"
+        },
+        {
+          "pointer": "/rawRows/mulino_trade_receipt_receipts",
+          "operator": "sum",
+          "column": "contributedquantity",
+          "expected": "100"
+        },
+        {
+          "pointer": "/rawRows/mulino_trade_sales_deliveries",
+          "operator": "sum",
+          "column": "quantity",
+          "expected": "30"
+        },
+        {
+          "pointer": "/rawRows/mulino_trade_returns_receipts",
+          "operator": "sum",
+          "column": "quantity",
+          "expected": "10"
+        },
+        {
+          "pointer": "/rawRows/mulino_trade_settlement_matches",
+          "operator": "sum",
+          "column": "originaldifference",
+          "expected": "5"
+        },
+        {
+          "pointer": "/rawRows/mulino_trade_settlement_paymentreferences",
+          "operator": "size",
+          "expected": 0
+        },
+        {
+          "pointer": "/rawRows/mulino_work_read_obligationreferences",
+          "operator": "humanDuties",
+          "kinds": [
+            "QUALITY_REVIEW",
+            "RETURN_QC_REVIEW",
+            "RETURN_COMMERCIAL_REVIEW",
+            "RETURN_SETTLEMENT_REVIEW",
+            "SETTLEMENT_DIFFERENCE"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "e1-current-warehouse",
+      "type": "query",
+      "capability": "getInventory",
+      "request": {
+        "scope": {
+          "organizationId": "$ORG",
+          "itemId": "$P",
+          "placeId": "$W"
+        },
+        "asOf": "2026-10-07T09:00:02Z",
+        "knownAt": "2026-10-07T09:00:02Z"
+      },
+      "assertions": [
+        {
+          "pointer": "/data/heldQuantity",
+          "operator": "equals",
+          "expected": "80"
+        },
+        {
+          "pointer": "/data/eligibleQuantity",
+          "operator": "equals",
+          "expected": "0"
+        }
+      ]
+    },
+    {
+      "id": "e1-noun",
+      "type": "query",
+      "capability": "getObject",
+      "request": {
+        "id": "$P",
+        "scope": {
+          "organizationId": "$ORG",
+          "itemId": "$P"
+        },
+        "asOf": "2026-10-07T09:00:02Z",
+        "knownAt": "2026-10-07T09:00:02Z"
+      },
+      "bind": {
+        "E1_SNAPSHOT": "/snapshotRevision",
+        "E1_WORK_IDS": "/data/workIds",
+        "E1_DUTIES": "/data/obligations",
+        "E1_CONTRIBUTIONS": "/data/contributions",
+        "E1_OWNERS": "/data/ownerIds",
+        "E1_EVIDENCE": "/data/evidenceRefs"
+      }
+    },
+    {
+      "id": "e1-verb",
+      "type": "query",
+      "capability": "getWork",
+      "request": {
+        "id": "$WORK",
+        "scope": {
+          "organizationId": "$ORG",
+          "itemId": "$P"
+        },
+        "asOf": "2026-10-07T09:00:02Z",
+        "knownAt": "2026-10-07T09:00:02Z",
+        "snapshotRef": "$E1_SNAPSHOT"
+      },
+      "assertions": [
+        {
+          "pointer": "/snapshotRevision",
+          "operator": "equals",
+          "expected": "$E1_SNAPSHOT"
+        },
+        {
+          "pointer": "/data/workIds",
+          "operator": "equals",
+          "expected": "$E1_WORK_IDS"
+        },
+        {
+          "pointer": "/data/obligations",
+          "operator": "equals",
+          "expected": "$E1_DUTIES"
+        },
+        {
+          "pointer": "/data/contributions",
+          "operator": "equals",
+          "expected": "$E1_CONTRIBUTIONS"
+        },
+        {
+          "pointer": "/data/ownerIds",
+          "operator": "equals",
+          "expected": "$E1_OWNERS"
+        },
+        {
+          "pointer": "/data/evidenceRefs",
+          "operator": "equals",
+          "expected": "$E1_EVIDENCE"
+        }
+      ]
+    }
+  ]
+}

@@ -9,7 +9,7 @@ import org.mulino.verification.Json;
 
 /** Full organization fixture snapshot. Table names are harness-owned, never request SQL. */
 final class S4JdbcObservation {
-    private static final Set<String> PREFIXES=Set.of("mulino_sales_","mulino_returns_","mulino_recall_","mulino_settlement_","mulino_trade_","mulino_purchase_","mulino_shipment_","mulino_regulatory_","mulino_receipt_","mulino_quality_","mulino_inventory_","mulino_commands_","mulino_governance_","mulino_work_read_","mulino_responsibility_","mulino_evidence_","mulino_evaluation_","mulino_runtime_");
+    private static final Set<String> PREFIXES=Set.of("mulino_identity_","mulino_sales_","mulino_returns_","mulino_recall_","mulino_settlement_","mulino_trade_","mulino_purchase_","mulino_shipment_","mulino_regulatory_","mulino_receipt_","mulino_quality_","mulino_inventory_","mulino_commands_","mulino_governance_","mulino_work_read_","mulino_responsibility_","mulino_evidence_","mulino_evaluation_","mulino_runtime_");
     static ObjectNode capture(ActualConfiguration config,JsonNode request)throws Exception {
         JsonNode scope=request.path("scope");
         String organization=Json.required(scope,"organizationId");UUID.fromString(organization);

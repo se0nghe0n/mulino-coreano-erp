@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """Source/artifact custody receipt; no credentials or environment dump."""
-import hashlib, json, pathlib, subprocess, sys, datetime
+import hashlib, json, pathlib, subprocess, sys, datetime, os
 
 def sha(path):
     return hashlib.sha256(path.read_bytes()).hexdigest()
@@ -23,6 +23,7 @@ def main():
             'sourceCleanBefore':not bool(status),'sourceStatusBefore':status,'sourceInputHashesBefore':inputs(root),
             'executedJarSha256':optional_sha(root/'backend/target/ontology-0.1.0-SNAPSHOT.jar'),
             'fixtureTemplateSha256':sha(root/'verification/actual/s4/fixture.json'),
+            'flowRef':os.environ.get('ACTUAL_FLOW_REF','verification/actual/s4/flow.json'),
             'harnessMainClassSha256':optional_sha(root/'verification/harness/target/classes/org/mulino/verification/actual/NativeS4TradeMain.class')}
         (out/'run-receipt.json').write_text(json.dumps(receipt,indent=2)+'\n')
         custody=json.loads((root/'verification/harness/target/s4-build-custody.json').read_text())

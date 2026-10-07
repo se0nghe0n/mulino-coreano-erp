@@ -97,10 +97,10 @@
       "type": "query",
       "capability": "getObject",
       "request": {
-        "type": "QuantitySegment",
         "id": "$receipt60.segment",
         "scope": {
-          "organizationId": "$ORG"
+          "organizationId": "$ORG",
+          "objectType": "QuantitySegment"
         },
         "asOf": "2026-10-07T09:00:02Z",
         "knownAt": "2026-10-07T09:00:02Z"
@@ -369,7 +369,7 @@
         "intentKind": "RECORD",
         "definitionVersion": "definition-v1",
         "capabilityId": "recordDelivery",
-        "expectedRevision": 0,
+        "expectedRevision": 1,
         "commandIdempotencyKey": "e1-delivery-confirm",
         "slots": {
           "observationId": "$DELIVERY_OBSERVATION",
@@ -389,6 +389,23 @@
       }
     },
     {
+      "id": "e1-delivery-revision",
+      "type": "query",
+      "capability": "getObject",
+      "request": {
+        "id": "$DELIVERY",
+        "scope": {
+          "organizationId": "$ORG",
+          "objectType": "Delivery"
+        },
+        "asOf": "2026-10-07T09:00:02Z",
+        "knownAt": "2026-10-07T09:00:02Z"
+      },
+      "bind": {
+        "DELIVERY_REV": "/data/revision"
+      }
+    },
+    {
       "id": "e1-return-authorize10",
       "type": "command",
       "capability": "authorizeReturn",
@@ -396,7 +413,7 @@
         "intentKind": "COMMAND",
         "definitionVersion": "definition-v1",
         "capabilityId": "authorizeReturn",
-        "expectedRevision": 0,
+        "expectedRevision": "$DELIVERY_REV",
         "commandIdempotencyKey": "e1-return-authorize10",
         "slots": {
           "deliveryId": "$DELIVERY",
@@ -411,7 +428,7 @@
         "subjectRefs": [
           {
             "type": "Work",
-            "id": "$WORK"
+            "id": "$SALES_WORK"
           }
         ]
       },

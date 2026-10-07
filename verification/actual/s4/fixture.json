@@ -67,7 +67,9 @@
         "releaseAllocation",
         "dispatchQuantity",
         "authorizeReturn",
-        "receiveReturn"
+        "receiveReturn",
+        "recordInvoice",
+        "matchInvoice"
       ],
       "grant": {
         "delegatorAlias": "supervisor",
@@ -117,7 +119,9 @@
           "releaseAllocation",
           "dispatchQuantity",
           "authorizeReturn",
-          "receiveReturn"
+          "receiveReturn",
+          "recordInvoice",
+          "matchInvoice"
         ],
         "scope": {
           "organizationAlias": "ORG"
@@ -178,7 +182,9 @@
         "releaseAllocation",
         "dispatchQuantity",
         "authorizeReturn",
-        "receiveReturn"
+        "receiveReturn",
+        "recordInvoice",
+        "matchInvoice"
       ],
       "grant": {
         "delegatorAlias": "supervisor",
@@ -228,7 +234,9 @@
           "releaseAllocation",
           "dispatchQuantity",
           "authorizeReturn",
-          "receiveReturn"
+          "receiveReturn",
+          "recordInvoice",
+          "matchInvoice"
         ],
         "scope": {
           "organizationAlias": "ORG"
@@ -440,6 +448,18 @@
         "attributes": [
           {
             "nounType": "Receipt",
+            "name": "quantity",
+            "type": "DECIMAL",
+            "referenceType": null,
+            "unit": "BOX",
+            "decimalPlaces": 0,
+            "minimumCount": 1,
+            "maximumCount": 1,
+            "requiredStage": "READ",
+            "core": true
+          },
+          {
+            "nounType": "Delivery",
             "name": "quantity",
             "type": "DECIMAL",
             "referenceType": null,
@@ -738,6 +758,20 @@
             "capabilityId": "receiveReturn",
             "stage": "DRAFT",
             "slots": {}
+          },
+          {
+            "name": "recordInvoice",
+            "intentKind": "RECORD",
+            "capabilityId": "recordInvoice",
+            "stage": "DRAFT",
+            "slots": {}
+          },
+          {
+            "name": "matchInvoice",
+            "intentKind": "COMMAND",
+            "capabilityId": "matchInvoice",
+            "stage": "DRAFT",
+            "slots": {}
           }
         ],
         "relations": [],
@@ -750,6 +784,22 @@
             "predicate": {
               "operator": "quantitySum",
               "property": "Receipt.quantity",
+              "minimum": {
+                "value": "1",
+                "unit": "BOX"
+              },
+              "unit": "BOX",
+              "evidenceSelector": "VERIFIED_DISTINCT"
+            }
+          },
+          {
+            "name": "delivered",
+            "quantityMode": "CUMULATIVE_EVENT",
+            "endpoint": "DELIVERED",
+            "evaluatorVersion": "core-v1",
+            "predicate": {
+              "operator": "quantitySum",
+              "property": "Delivery.quantity",
               "minimum": {
                 "value": "1",
                 "unit": "BOX"
@@ -1155,6 +1205,12 @@
           },
           "receiveReturn": {
             "effectClass": "RETURN"
+          },
+          "recordInvoice": {
+            "effectClass": "SETTLEMENT"
+          },
+          "matchInvoice": {
+            "effectClass": "SETTLEMENT"
           }
         }
       },
