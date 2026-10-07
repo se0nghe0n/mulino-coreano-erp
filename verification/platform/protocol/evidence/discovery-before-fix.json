@@ -1,0 +1,66 @@
+{
+  "scope": "S0 independent actual HTTP observation before correction",
+  "status": "FAIL",
+  "transcript": [
+    {
+      "case": "independent-discovery-before-fix",
+      "request": {
+        "httpMethod": "POST",
+        "url": "http://localhost:8080/mcp",
+        "headers": {
+          "Content-Type": "application/json",
+          "Accept": "application/json, text/event-stream",
+          "MCP-Protocol-Version": "2026-07-28",
+          "Mcp-Method": "server/discover",
+          "Authorization": "[REDACTED_SECRET]"
+        },
+        "body": {
+          "jsonrpc": "2.0",
+          "id": "67c52c32-64d2-44c2-85f1-1a81b7124ff5",
+          "method": "server/discover",
+          "params": {
+            "_meta": {
+              "io.modelcontextprotocol/protocolVersion": "2026-07-28",
+              "io.modelcontextprotocol/clientInfo": {
+                "name": "mulino-s0-wire-probe",
+                "version": "1.0.0"
+              },
+              "io.modelcontextprotocol/clientCapabilities": {}
+            }
+          }
+        },
+        "rawBody": "{\"jsonrpc\":\"2.0\",\"id\":\"67c52c32-64d2-44c2-85f1-1a81b7124ff5\",\"method\":\"server/discover\",\"params\":{\"_meta\":{\"io.modelcontextprotocol/protocolVersion\":\"2026-07-28\",\"io.modelcontextprotocol/clientInfo\":{\"name\":\"mulino-s0-wire-probe\",\"version\":\"1.0.0\"},\"io.modelcontextprotocol/clientCapabilities\":{}}}}"
+      },
+      "response": {
+        "status": 400,
+        "headers": {
+          "X-Content-Type-Options": "nosniff",
+          "X-XSS-Protection": "0",
+          "Cache-Control": "no-cache, no-store, max-age=0, must-revalidate",
+          "Pragma": "no-cache",
+          "Expires": "0",
+          "X-Frame-Options": "DENY",
+          "Content-Type": "application/json",
+          "Transfer-Encoding": "chunked",
+          "Date": "Wed, 07 Oct 2026 16:39:42 GMT",
+          "Connection": "close"
+        },
+        "rawBody": "{\"jsonrpc\":\"2.0\",\"id\":\"67c52c32-64d2-44c2-85f1-1a81b7124ff5\",\"error\":{\"message\":\"UnsupportedProtocolVersion\",\"data\":{\"supported\":[\"2026-07-28\"],\"requested\":\"null\"},\"code\":-32022}}",
+        "body": {
+          "jsonrpc": "2.0",
+          "id": "67c52c32-64d2-44c2-85f1-1a81b7124ff5",
+          "error": {
+            "message": "UnsupportedProtocolVersion",
+            "data": {
+              "supported": [
+                "2026-07-28"
+              ],
+              "requested": "null"
+            },
+            "code": -32022
+          }
+        }
+      }
+    }
+  ]
+}
