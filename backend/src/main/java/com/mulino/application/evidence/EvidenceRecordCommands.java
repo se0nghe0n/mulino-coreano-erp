@@ -44,12 +44,14 @@ public class EvidenceRecordCommands implements CommandHandler {
       if(!subject.id().equals(parent.get("subjectId"))||!profile.get("ID").equals(parent.get("sourceProfileId")))throw DomainError.invalid("Claim correction source or subject mismatch");
       state(s);quantity(string(s,"quantity"),string(s,"unit"),state(s));required(s,"assertion");uuid(required(s,"documentId"));
     }
-    return new CommandPreparation(dimensions,List.of("evidence-subject:"+subject.id(),"source:"+profile.get("ID")),Set.of(profile.get("intakeOwnerId").toString(),profile.get("supervisorId").toString()),"RECORD",null,null,0,previous==null?subject.id():previous,revision);
+    return new CommandPreparation(dimensions,List.of("evidence-subject:"+subject.id(),"source:"+profile.get("ID")),new HashSet<>(List.of(profile.get("intakeOwnerId").toString(),profile.get("supervisorId").toString())),"RECORD",null,null,0,previous==null?subject.id():previous,revision);
   }
   private static String content(Map<String,Object> slots) {
     if(!(slots.get("contentBase64") instanceof String value)||value.length()>24*1024*1024)throw DomainError.invalid("Original content size exceeds upload limit");
     return value;
   }
+  public List<SubjectBinding> subjectBindings(DomainContext c,Map<String,Object> intent,CommandPreparation prep){var target=subject(input(intent));return List.of(SubjectBinding.optional(noun(target.kind().name()),Set.of(target.id())));}
+  static String noun(String kind){return switch(kind){case "ITEM"->"TradeItem";case "LOT"->"ManufacturingLot";case "SEGMENT"->"QuantitySegment";case "WORK"->"Work";case "PLACE"->"Place";default->throw DomainError.invalid("Evidence subject noun unsupported");};}
   public Map<String,Object> execute(DomainContext c,Map<String,Object> intent){
     String capability=intent.get("capabilityId").toString();var s=input(intent);String type=type(capability,s);
     EvidenceCorrectionImpact impact=null;if("correctEvidence".equals(capability)){impact=impacts.getIfAvailable();if(impact==null)throw new DomainError("HELD","POLICY_UNRESOLVED","Correction impact service unavailable");}
