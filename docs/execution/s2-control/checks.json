@@ -38,7 +38,7 @@
     "reason": "Included in 13-test combined-source focused native run before final replay-denial audit assertion change"
   },
   "replayRegression": {
-    "status": "PASS_BEFORE_FINAL_DENIAL_AUDIT_ASSERTIONS",
+    "status": "PASS",
     "timestamp": "2026-10-08T03:46:22+09:00",
     "command": "JAVA_HOME=Java21 JWT_PUBLIC_KEY=<ephemeral public.pem> ./mvnw -B -ntp -f backend/pom.xml -Dtest=IdentityAuthorizationTest,AuthorityEvidenceTest,ControlPersistenceTest test",
     "tests": 13,
@@ -65,6 +65,8 @@
       "Final denial-audit assertions expect APPLIED+REJECTED audits linked to same COMMITTED record; updated after passing run for shared3144652 and remain NOT_RUN until root regression",
       "No signed HTTP/MCP transport or full WORK business semantics claim from fixture handler",
       "Operating identity/R5, full C3/V4/V7, regulatory/model/BTP acceptance NOT_RUN"
-    ]
+    ],
+    "resultAppliesTo": "Before final denial-audit assertion change",
+    "finalDenialAuditAssertions": "NOT_RUN"
   }
 }
