@@ -88,25 +88,7 @@ public final class Main {
         Json.write(validator.root().resolve("verification/harness/target/evidence/"+mode+".json"),report);System.out.println(report.toPrettyString());return problems.isEmpty()?0:1;
     }
     private static void catalogLinks(ContractValidator validator,JsonNode catalog,Map<String,JsonNode> cases,List<String> problems) throws IOException {
-        Map<String,JsonNode> oracles=new HashMap<>();for(JsonNode o:catalog.path("oracles")) oracles.put(o.path("oracleId").asText(),o);
-        Set<String> covered=new HashSet<>();
-        for(JsonNode c:cases.values()) for(JsonNode sub:c.path("subcases")) for(JsonNode a:sub.path("assertions")) {
-            JsonNode ref=a.path("oracleRef");String id=ref.path("oracleId").asText();JsonNode o=oracles.get(id);
-            if(o==null) {problems.add("Unknown independent oracle "+id);continue;}
-            if(!o.path("caseId").asText().equals(c.path("caseId").asText())) problems.add("Oracle points at different case "+id);
-            for(JsonNode name:ref.path("observationNames")) {
-                JsonNode observation=null;for(JsonNode item:o.path("expectedObservations")) if(item.path("name").asText().equals(name.asText())) observation=item;
-                if(observation==null) {problems.add("Unknown oracle observation "+id+"/"+name.asText());continue;}
-                covered.add(id+"/"+name.asText());
-                if(observation.path("type").asText().equals("quantity")) {
-                    JsonNode expected=observation.path("expected");
-                    if(expected.has("value") && !expected.path("value").equals(a.path("expected"))) problems.add("Fixed quantity differs from normative oracle "+id+"/"+name.asText());
-                    if(expected.has("unit") && !expected.path("unit").equals(a.path("unit"))) problems.add("Unit differs from normative oracle "+id+"/"+name.asText());
-                }
-            }
-        }
-        for(JsonNode o:catalog.path("oracles")) for(JsonNode n:o.path("expectedObservations")) if(!covered.contains(o.path("oracleId").asText()+"/"+n.path("name").asText())) problems.add("Unlinked normative observation "+o.path("oracleId").asText()+"/"+n.path("name").asText());
-        for(JsonNode source:catalog.path("sourceFiles")) if(!Json.sha256(validator.path(source.path("path").asText())).equals(source.path("sha256").asText())) problems.add("Normative source hash drift "+source.path("path"));
+        CatalogLinkValidator.validate(validator,catalog,cases,problems);
     }
     private static ObjectNode base(Path root,String profile,String status,int exit) throws IOException,InterruptedException {
         ObjectNode r=Json.object();r.put("schemaVersion","1.0.0").put("recordType","ACCEPTANCE_HARNESS_REPORT").put("profile",profile).put("status",status).put("exitCode",exit).put("timestamp",Instant.now().toString()).put("command",System.getProperty("verification.command","Java acceptance harness"));
