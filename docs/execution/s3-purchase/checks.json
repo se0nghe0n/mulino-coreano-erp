@@ -1,0 +1,39 @@
+{
+  "task": "새 ontology 전체 구현",
+  "userStep": 3,
+  "status": "ACTIVE",
+  "subtask": "S3 purchase",
+  "baseline": "c6c910b81c8a61fbdf309da9144022482408d5dc",
+  "testedCommit": "48d8707",
+  "model": "gpt-6.1-sol",
+  "effort": "medium",
+  "serviceTier": "tool exposes no tier selection or confirmation",
+  "commands": [
+    "PATH=<fixed Node24> npm ci (backend)",
+    "JAVA_HOME=/Library/Java/JavaVirtualMachines/zulu-21.jdk/Contents/Home PATH=<fixed Node24> ./mvnw -f backend/pom.xml -Dtest=PurchaseCommandPostgresTest test"
+  ],
+  "finalAttempt": 7,
+  "exitCode": 0,
+  "tests": 7,
+  "failures": 0,
+  "errors": 0,
+  "skipped": 0,
+  "statusRuntime": "PASS",
+  "durationSeconds": 14.517,
+  "timestamp": "2026-10-08T05:09:17+09:00",
+  "hashes": {
+    "backend/src/main/java/com/mulino/application/trade/purchase/PurchaseCommands.java": "11360cfcc6eaf8a853565e156547f7b42aeef34824176d197f2c95fb2c2cad13",
+    "backend/src/main/java/com/mulino/application/trade/purchase/PurchaseEvidence.java": "3c7a7b0e560397b9c874bddfd898467dd3d0d130f212a94963a9c04ab32fa237",
+    "backend/src/test/java/com/mulino/core/PurchaseCommandPostgresTest.java": "0805d91417b067d441186a1a9b42670b92318441e5818a2135bd248f43151b8c",
+    "database/migrations/V16__purchase_lifecycle.sql": "0bb494b93e2ae96750dd9c760f7eb0302a9498fc8bd8ddb61bddfe1c35bb7bfb"
+  },
+  "notRun": [
+    "supplier public evidence chain pending shared V21",
+    "multiple PO receipt allocation actual gateway",
+    "conditional predicate auto fulfillment",
+    "external supplier network",
+    "real model",
+    "BTP"
+  ],
+  "remaining": "root integration and required review remain open"
+}
