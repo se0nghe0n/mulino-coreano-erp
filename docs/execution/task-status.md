@@ -131,3 +131,15 @@ fresh 검사 결과는 [정적 검사 증거](evidence/step1-static-checks.txt)�
 다음은 이 기록을 Task branch에 통합해 최종 일치를 확인하고 R2 추적
 위치 답변에 따라 Step 2에 착수하는 일이다. 아직 Step 2는 시작하지
 않았다. startup·도메인·DB·MCP/client·모델·BTP 인수는 NOT_RUN이다.
+
+Step 1 기록 통합과 최종 일치 검사는 `393cb5c`에서 완료했다. 이후
+R2와 독립적인 읽기 조사를 실제 GPT-6.1 Sol high 두 worker가 수행했다.
+[플랫폼 조사](platform-research.md)는 후보 버전과 dependency resolution
+증거를, [테스트 계약 제안](test-contract-proposal.md)은 공통 harness와
+독립 관찰·RED/NOT_RUN·병렬 소유권의 제안을 남긴다. `434220b`,
+`d6d60b3`, `d42f159`에서 통합했다. 제안 계약은 아직 동결하지 않았다.
+이 조사에서 앱·test 코드와 DB를 만들거나 실행하지 않았다.
+
+2026-10-07의 후속 GitHub 조회에서도 fork의 `has_issues=false`를
+확인했다. R2 질문에는 아직 답변이 없으며 원격 설정·이슈 게시를
+수행하지 않았다. Step 2 코드 작성은 계속 `PENDING_R2`다.
