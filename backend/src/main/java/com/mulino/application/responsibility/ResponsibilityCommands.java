@@ -10,6 +10,19 @@ public class ResponsibilityCommands implements CommandHandler {
  public ResponsibilityCommands(ResponsibilityService s,ResponsibilityRepository r,WorkAccess w){service=s;repository=r;works=w;}
  public Set<String> capabilities(){return Set.of("createObligation","openObligation","resolveObligation","waiveObligation","transferObligation","proposeHandover","acceptHandover","rejectHandover","expireHandover","emergencyReassign");}
  @SuppressWarnings("unchecked") private Map<String,Object> slots(Map<String,Object> i){if(!(i.get("slots") instanceof Map))throw DomainError.invalid("Typed slots required");return (Map<String,Object>)i.get("slots");}
+ public List<SubjectBinding> subjectBindings(DomainContext c,Map<String,Object> intent,CommandPreparation preparation){
+  var p=slots(intent);String capability=intent.get("capabilityId").toString();var workIds=new TreeSet<String>();var assignmentIds=new TreeSet<String>();var handoverIds=new TreeSet<String>();
+  if(Set.of("acceptHandover","rejectHandover","expireHandover").contains(capability)){
+   var handover=repository.require("Handovers",c.organizationId(),p.get("handoverId").toString());handoverIds.add(handover.get("ID").toString());workIds.add(handover.get("workId").toString());if(handover.get("targetWorkId")!=null)workIds.add(handover.get("targetWorkId").toString());if(handover.get("assignmentId")!=null)assignmentIds.add(handover.get("assignmentId").toString());
+  }else if(Set.of("resolveObligation","waiveObligation").contains(capability)){
+   var assignment=repository.require("Assignments",c.organizationId(),p.get("assignmentId").toString());assignmentIds.add(assignment.get("ID").toString());workIds.add(assignment.get("workId").toString());
+  }else{
+   String sourceWork=p.get("workId").toString();workIds.add(sourceWork);
+   if("transferObligation".equals(capability)){var assignment=repository.require("Assignments",c.organizationId(),p.get("assignmentId").toString());if(!sourceWork.equals(assignment.get("workId")))throw DomainError.forbidden();assignmentIds.add(assignment.get("ID").toString());workIds.add(p.get("targetWorkId").toString());}
+  }
+  var itemIds=new TreeSet<String>();for(String workId:workIds)itemIds.add(works.require(c,workId,false).get("itemId").toString());
+  var bindings=new ArrayList<SubjectBinding>();bindings.add(SubjectBinding.optional("Work",workIds));bindings.add(SubjectBinding.optional("TradeItem",itemIds));if(!assignmentIds.isEmpty())bindings.add(SubjectBinding.optional("Obligation",assignmentIds));if(!handoverIds.isEmpty())bindings.add(SubjectBinding.optional("Handover",handoverIds));return List.copyOf(bindings);
+ }
  public CommandPreparation prepare(DomainContext c,Map<String,Object>i){var p=slots(i);String cap=i.get("capabilityId").toString();String workId;Map<String,Object> subject;
  if(Set.of("acceptHandover","rejectHandover","expireHandover").contains(cap)){subject=repository.require("Handovers",c.organizationId(),p.get("handoverId").toString());workId=subject.get("workId").toString();}
  else if(Set.of("resolveObligation","waiveObligation").contains(cap)){subject=repository.require("Assignments",c.organizationId(),p.get("assignmentId").toString());workId=subject.get("workId").toString();}
