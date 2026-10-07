@@ -45,4 +45,16 @@ public class ContractValidatorTest {
         ((com.fasterxml.jackson.databind.node.ObjectNode)request.path("state").path("$transform")).put("operation","eval");Json.write(p,c);
         assertThrows(IllegalArgumentException.class,()->new ContractValidator(root).caseFile(p));
     }
+    @Test void businessBooleansAndQuantityReferencesAreStaticallyRejectedDespiteIdSuffix() throws Exception {
+        JsonNode c=Json.read(root.resolve("verification/harness/src/test/resources/examples/HARNESS-EXAMPLE/case.json"));
+        var assertion=(com.fasterxml.jackson.databind.node.ObjectNode)c.path("subcases").get(0).path("assertions").get(0);assertion.put("op","equals");
+        Path p=root.resolve("verification/harness/target/identity-allowlist-selftest.json");
+        for(String field:java.util.List.of("approvalValid","isValid","amountPaid","quantity")) {
+            assertion.set("expected",Json.parse("{\"$result\":{\"actionId\":\"after\",\"pointer\":\"/response/"+field+"\"}}"));Json.write(p,c);
+            assertTrue(assertThrows(IllegalArgumentException.class,()->new ContractValidator(root).caseFile(p)).getMessage().contains("identity"));
+        }
+        for(String field:java.util.List.of("workId","proposalHash","revision")) {
+            assertion.set("expected",Json.parse("{\"$result\":{\"actionId\":\"after\",\"pointer\":\"/response/"+field+"\"}}"));Json.write(p,c);new ContractValidator(root).caseFile(p);
+        }
+    }
 }

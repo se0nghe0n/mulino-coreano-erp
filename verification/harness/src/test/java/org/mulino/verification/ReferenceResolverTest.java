@@ -53,4 +53,31 @@ public final class ReferenceResolverTest {
         var r=results();r.put("created",StepResult.missing("created","NOT_IMPLEMENTED").toJson());
         assertThrows(AssertionError.class,()->new ReferenceResolver(r,aliases).resolve(Json.parse("{\"$transform\":{\"source\":{\"$result\":{\"actionId\":\"created\",\"pointer\":\"/response/state\"}},\"operation\":\"opaqueByteXor\",\"index\":0,\"xor\":1}}")));
     }
+    @Test void misleadingIdSuffixBusinessFieldsCannotSelfCopyFalseOrQuantity() {
+        var r=results();ObjectNode response=(ObjectNode)r.get("created").path("response");
+        for(String field:List.of("approvalValid","isValid","amountPaid","quantity")) {
+            response.set(field,field.equals("amountPaid") || field.equals("quantity")?Json.MAPPER.valueToTree(100):Json.MAPPER.valueToTree(false));
+            var a=Json.parse("{\"op\":\"equals\",\"source\":{\"actionId\":\"created\",\"pointer\":\"/response/"+field+"\"},\"expected\":{\"$result\":{\"actionId\":\"created\",\"pointer\":\"/response/"+field+"\"}}}");
+            assertFalse(ReferenceResolver.identityPointer("/response/"+field));
+            assertThrows(IllegalArgumentException.class,()->new AssertionEngine().check(a,r,aliases));
+        }
+    }
+    @Test void allowedIdentityFieldsStillRequireActualValueType() {
+        var r=results();var resolver=new ReferenceResolver(r,aliases);ObjectNode response=(ObjectNode)r.get("created").path("response");
+        for(String field:List.of("workId","proposalHash")) for(JsonNode invalid:List.<JsonNode>of(Json.MAPPER.valueToTree(100),Json.MAPPER.valueToTree(false),Json.object())) {
+            response.set(field,invalid);
+            assertThrows(IllegalArgumentException.class,()->resolver.identity(Json.parse("{\"$result\":{\"actionId\":\"created\",\"pointer\":\"/response/"+field+"\"}}")));
+        }
+        response.put("revision",false);assertThrows(IllegalArgumentException.class,()->resolver.identity(Json.parse("{\"$result\":{\"actionId\":\"created\",\"pointer\":\"/response/revision\"}}")));
+        response.put("revision",-1);assertThrows(IllegalArgumentException.class,()->resolver.identity(Json.parse("{\"$result\":{\"actionId\":\"created\",\"pointer\":\"/response/revision\"}}")));
+    }
+    @Test void explicitIdsHashAndTextOrIntegerRevisionRemainSupported() {
+        var r=results();var resolver=new ReferenceResolver(r,aliases);ObjectNode response=(ObjectNode)r.get("created").path("response");
+        response.put("proposalHash","a".repeat(64)).put("revision",7);
+        for(String field:List.of("workId","proposalHash","revision")) {
+            var binding=Json.parse("{\"$result\":{\"actionId\":\"created\",\"pointer\":\"/response/"+field+"\"}}");assertEquals(response.path(field),resolver.identity(binding));
+        }
+        response.put("revision","revision-8");assertEquals("revision-8",resolver.identity(Json.parse("{\"$result\":{\"actionId\":\"created\",\"pointer\":\"/response/revision\"}}")).asText());
+        assertFalse(ReferenceResolver.identityPointer("/response/WORKID"));assertFalse(ReferenceResolver.identityPointer("/response/Valid"));
+    }
 }

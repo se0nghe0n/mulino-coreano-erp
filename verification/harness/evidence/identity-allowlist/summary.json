@@ -1,0 +1,51 @@
+{
+  "baselineCommit": "54132539a872ee88da3f824fdc3078d77e5da5dc",
+  "sourceState": "DIRTY_WORKTREE_WITH_EXPLICIT_IDENTITY_ALLOWLIST",
+  "harness": {
+    "status": "PASS",
+    "exitCode": 0,
+    "tests": 41,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "koreanSmokeScenarios": 1
+  },
+  "contractRed": {
+    "exitCode": 1,
+    "discoveredScenarios": 1,
+    "notImplementedAssertionFailures": 1,
+    "environmentOrSyntaxFailure": false
+  },
+  "sourceFilesSha256": {
+    "verification/harness/src/main/java/org/mulino/verification/ReferenceResolver.java": "c028f6dfe249ead7a3d8e6435ae8a90c908515e4d61abf5fa2f57fc9c4a36753",
+    "verification/harness/src/main/java/org/mulino/verification/ContractValidator.java": "b53035dcde01e58d9c0b9d56fd5365e6f47d9d5b7bd44f2fee15cd56a9bc55c6",
+    "verification/harness/src/test/java/org/mulino/verification/ReferenceResolverTest.java": "d56648c3c74d94dd24596498246ab4f2e1cf6415e0e4fc246bdca53f89763779",
+    "verification/harness/src/test/java/org/mulino/verification/ContractValidatorTest.java": "a6f587355e37391f27525e166af65d777109695d94839c448ab548521b3ca286",
+    "verification/harness-guide.md": "85b8d69355faabaee067e6a2fd69b0c3b1b8b1719d46389ef4ac372693268868"
+  },
+  "logNormalization": [
+    {
+      "file": "verification/harness/evidence/identity-allowlist/identity-allowlist-contract-red.log",
+      "rawSha256": "1c35a133d94b13a0ecd5b184eac251d861c8eddf5ce9282e5938d736a7b5e38d",
+      "sha256": "1c5f9f78af41615df1290ecf73014d96b0e5ef4ce8a3583e57d4a686ef99b27b",
+      "normalization": "Tabs expanded/trailing whitespace removed only"
+    },
+    {
+      "file": "verification/harness/evidence/identity-allowlist/identity-allowlist-harness.log",
+      "rawSha256": "60b8b88300dd83a556965888df98cdb84c80b57526bbc757c1220ac1451563c9",
+      "sha256": "492a1a13263eae3c50e4b949192524aacfeb95551b0406e3449b78c06de4bf5a",
+      "normalization": "Tabs expanded/trailing whitespace removed only"
+    }
+  ],
+  "fixedCases": [
+    "approvalValid/isValid false self-copy rejected static/runtime",
+    "amountPaid/quantity numeric self-copy rejected static/runtime",
+    "allowed ID/hash receiving number/Boolean/object rejected runtime",
+    "Boolean/negative revision rejected runtime",
+    "normal ID/hash/string revision/nonnegative integer revision supported"
+  ],
+  "probeLimit": "Initial added test had Jackson generic inference ClassCastException; corrected List<JsonNode> type. This was a selftest setup error, not a meaningful product RED. Final suite41 is green.",
+  "runtimeProductStatus": "NOT_RUN",
+  "productGateComplete": false,
+  "remainingIntegration": "Host dependency and typed wiring owned by coordinator followup."
+}

@@ -296,9 +296,9 @@ fixture alias는 설치 결과의 실제 ID이고 새 object의 ID/revision/hash
 
 이 참조는 identity 연결용이다. 관찰 수량·상태·효과를 자기 expected로
 복사하면 independent oracle가 무력화된다. expected/where/scope의
-`$result` pointer 끝 필드는 ID/IDs/revision/hash/version/token 또는
-owner/subject/principal 계열만 허용한다. 수량·효과·시간·단위의 기대값은
-독립 고정값으로 둔다. field 이름 검사는 의미 완전성의 증명이 아니며
+`$result` pointer 끝 필드는 아래 case-sensitive allowlist만 허용한다.
+접미사나 case-insensitive 추측으로 새로운 필드를 허용하지 않는다. 수량·효과·시간·단위의 기대값은
+독립 고정값으로 둔다. field/type 검사는 의미 완전성의 증명이 아니며
 잘못 이름 붙인 업무 결과로 oracle를 우회해서는 안 된다. 미실행 source는
 NOT_RUN이며 missing/null reference를0이나 임의 ID로 대체하지 않는다.
 unknown action과 identity가 아닌 result 참조는 준비 단계에서 거부한다.
@@ -374,3 +374,20 @@ host/runtime 검사는 `control(type=process)`의 명시 operation으로 선언�
 실제 process/command/exit/version, 독립 artifact scan과 자율 runtime task
 완료 증거를 구분한다. server/discover·skillLoading·modelEvaluation 등의
 pseudo label을 public business capability로 추가하지 않는다.
+
+
+## assertion identity field allowlist
+
+| 실제 pointer 끝 필드 | 허용 실제 값 |
+|---|---|
+| id, objectId, itemId, lotId, segmentId, workId, activityId, obligationId, ownerId, actorId, principalId, subjectId, organizationId, tenantId, commandId, requestId, proposalId, approvalId, restrictionId, allocationId, movementId, evidenceId, occurrenceId, definitionId, evaluatorId, policyId, grantId, taskId, runId, workLinkId, parentWorkId, childWorkId, supplierId, customerId, shipmentId, invoiceId, externalId, runtimeTaskId, invocationHandle | 비어 있지 않은 string, 최대512 characters |
+| ids, workIds, obligationIds | 비어 있지 않은 string ID array, 각 ID 최대512 characters |
+| hash, proposalHash, evidenceHash, definitionHash, policyHash, artifactHash, requestHash, inputHash, sha256 | SHA-256 64자리 hexadecimal string |
+| revision, proposalRevision, snapshotRevision, definitionRevision, policyRevision, grantRevision, workRevision, approvalRevision | 비어 있지 않은 string(최대512 characters) 또는 nonnegative integer(Long 범위) |
+
+approvalValid/isValid/amountPaid/quantity와 Boolean 업무 결과는 허용하지
+않는다. ID/hash field가 number/Boolean/object를 반환해도 실제 값 타입
+검사에서 거부한다. `$alias`의 assertion identity도 실제 string ID여야
+한다. 버전·단위·업무 상태와 수량 기대값은 계속 독립 고정값으로 둔다.
+허용 목록 확장은 계획상 identity임을 확인한 뒤 explicit 계약 변경으로
+처리한다. 이름만 바꾼 업무값을 identity로 표시해서 oracle를 우회하지 않는다.

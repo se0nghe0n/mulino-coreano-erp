@@ -101,3 +101,19 @@ wire header/body mismatch 보존을 selftest로 확인했다. fixed capture는
 host 계약은 별도 worker의 schema/validator/guide를 연결한 뒤 typed wiring과
 결합 검사를 수행한다. 준비/registry 보완도 coordinator에서 통합한다.
 이 commit의37 selftests로 제품 runtime이나 B2/Step2 완료를 주장하지 않는다.
+
+## identity allowlist 리뷰 보완
+
+suffix `.*id`가 approvalValid/isValid/amountPaid를 identity로 오인했다.
+이를 case-sensitive 명시 field allowlist로 바꾸고 실제 값도 string ID,
+64자리 SHA-256 hash, text/nonnegative integer revision으로 검사한다.
+지원 목록을 guide에 적었다. 숫자·Boolean·object를 ID/hash로 반환하거나
+Boolean revision을 반환해도 거부한다. 일반 ID/hash/revision 참조는 유지한다.
+
+`./verify harness`는41 tests PASS, 실패/오류/skip0이고 한국어 Gherkin1을
+실행했다. `./verify contract-red`는 실제 unique scenario1에서
+NOT_IMPLEMENTED assertion FAIL1, 오류/skip0, exit1을 유지했다.
+[identity 보완 증거](evidence/identity-allowlist/summary.json)에 명령 log,
+JUnit/Cucumber와 source hash를 남겼다. 추가 test의 초기 Jackson generic
+inference 오류는 List<JsonNode>로 교정했고 제품 RED로 세지 않았다.
+제품 runtime은 NOT_RUN이며 host 통합/wiring은 아직 별도 후속이다.
