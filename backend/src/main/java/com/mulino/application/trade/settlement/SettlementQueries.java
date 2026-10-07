@@ -1,0 +1,22 @@
+package com.mulino.application.trade.settlement;
+import com.mulino.application.core.*;
+import com.mulino.domain.trade.settlement.SettlementRepository;
+import java.util.*;
+import java.math.BigDecimal;
+import java.time.Instant;
+import org.springframework.stereotype.Component;
+import static com.mulino.domain.trade.settlement.SettlementAmounts.*;
+/** Noun and verb share immutable invoice, match, evidence and duty snapshot. */
+@Component
+public class SettlementQueries implements QueryHandler,ObjectReadProvider {
+ private final SettlementRepository r;private final ReadAuthorizer auth;private final SettlementTradeFacts facts;
+ public SettlementQueries(SettlementRepository r,ReadAuthorizer auth,SettlementTradeFacts facts){this.r=r;this.auth=auth;this.facts=facts;}
+ public Set<String> operations(){return Set.of("getSettlement");}
+ public Set<String> objectTypes(){return Set.of("Invoice");}
+ private boolean visible(DomainContext c,Map<String,Object> x){return !Instant.parse(x.get("recordedAt").toString()).isAfter(c.knownAt());}
+ private List<Map<String,Object>> related(DomainContext c,String table,String invoice){return r.rows(c,table).stream().filter(x->invoice.equals(x.get("invoiceId"))&&visible(c,x)).toList();}
+ public QueryResult query(DomainContext c,QueryRequest q){if(q.id()==null)throw DomainError.invalid("Invoice ID required");var invoice=r.require(c,"Invoices",q.id());if(!visible(c,invoice))throw DomainError.forbidden();auth.authorizeScopes(c,q.operation().equals("getSettlement")?"getSettlement":"getObject",SettlementCommands.scopes(facts.line(c,invoice.get("scopeKind").toString(),invoice.get("lineId").toString())));var data=new LinkedHashMap<>(invoice);var matches=related(c,"Matches",q.id());var adjustments=related(c,"Adjustments",q.id());var charges=related(c,"Charges",q.id());var payments=related(c,"PaymentReferences",q.id());data.put("type","Invoice");data.put("matches",matches);data.put("charges",charges);data.put("adjustments",adjustments);data.put("paymentReferences",payments);data.put("bankEffect","0");data.put("taxIssuanceEffect","0");data.put("paymentAuthorized",false);var settlement=new LinkedHashMap<String,Object>();settlement.put("result","UNVERIFIED");settlement.put("currency",invoice.get("currency"));
+  if(!matches.isEmpty()){var m=matches.getFirst();settlement.put("quantityDifference",m.get("quantityDifference"));settlement.put("quantityDifferenceUnit",m.get("unit"));settlement.put("priceDifference",m.get("priceDifference"));settlement.put("currencyDifference",m.get("currencyDifference"));if(m.get("originalDifference")!=null){BigDecimal original=decimal(m.get("originalDifference")),approved=adjustments.stream().filter(x->"CONFIRMED".equals(x.get("status"))).map(x->decimal(x.get("amount"))).reduce(BigDecimal.ZERO,BigDecimal::add),remaining=original.subtract(approved);settlement.put("originalDifference",original);settlement.put("settlementDifference",remaining);settlement.put("result",remaining.signum()==0&&decimal(m.get("quantityDifference")).signum()==0&&!Boolean.TRUE.equals(m.get("currencyDifference"))?"SATISFIED":"UNSATISFIED");}else settlement.put("result","UNVERIFIED");if(m.get("dutyRootId")!=null)data.put("dutyRootId",m.get("dutyRootId"));}
+  data.put("settlement",settlement);var work=r.external(c,"mulino.work.read.Works",invoice.get("workId").toString());var goals=r.externalRows(c,"mulino.work.read.GoalReferences").stream().filter(x->invoice.get("workId").equals(x.get("workId"))&&visible(c,x)).toList();data.put("logistics",Map.of("workId",work.get("ID"),"status",work.get("status"),"goals",goals));var duties=r.externalRows(c,"mulino.work.read.ObligationReferences").stream().filter(x->visible(c,x)&&(invoice.get("workId").equals(x.get("workId"))||data.get("dutyRootId")!=null&&data.get("dutyRootId").equals(x.get("rootId")))).toList();data.put("obligations",duties);var refs=new ArrayList<String>(List.of(invoice.get("evidenceId").toString()));matches.forEach(x->refs.add(x.get("invoiceOccurrenceId").toString()));return new QueryResult(data,Map.of("organizationId",c.organizationId(),"itemId",invoice.get("itemId"),"workId",invoice.get("workId")),matches.isEmpty()?List.of("INVOICE_UNMATCHED"):List.of(),List.of(),refs,null);
+ }
+}
