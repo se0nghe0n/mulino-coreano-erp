@@ -13,6 +13,7 @@ public final class FixtureInstaller {
     private final ActualConfiguration configuration;
     public FixtureInstaller(ActualConfiguration configuration){this.configuration=configuration;}
     public ObjectNode install(JsonNode bundle) throws Exception {
+        if(bundle.path("fixturePhase").asText().equals("EVIDENCE"))return EvidenceFixtureInstaller.install(configuration,bundle);
         JsonNode fixture=bundle.path("fixture");
         if(!fixture.path("synthetic").asBoolean(false))throw new IllegalArgumentException("Only synthetic fixtures allowed");
         if(!bundle.path("bases").isEmpty()||!fixture.path("baseRefs").isEmpty())throw new UnsupportedOperationException("Fixture inheritance not installed in S1");
@@ -50,8 +51,9 @@ public final class FixtureInstaller {
                                 seed(c,"INSERT INTO mulino_definitions_DefinitionVersions(organizationId,ID,version,state,contentHash,content,evaluatorVersion,schemaVersion,createdAt) VALUES(?,?,?,?,?,?,?,?,?)",org,id,Json.required(content,"version"),"PUBLISHED",contentHash(content),content.toString(),Json.required(content,"evaluatorVersion"),Json.required(content,"schemaVersion"),time(fixture.path("clock").path("asOf").asText()));
                             }
                             case "PolicyVersion" -> {
-                                JsonNode content=a.path("content");if(!content.isObject()||content.isEmpty())throw new IllegalArgumentException("Complete authored policy content required");
-                                seed(c,"INSERT INTO mulino_governance_PolicyVersions(organizationId,ID,version,kind,content,contentHash,effectiveFrom,effectiveUntil) VALUES(?,?,?,?,?,?,?,?)",org,id,Json.required(a,"version"),Json.required(a,"kind"),content.toString(),contentHash(content),time(Json.required(a,"effectiveFrom")),a.hasNonNull("effectiveUntil")?time(a.path("effectiveUntil").asText()):null);
+                                JsonNode content=a.path("content");if(!content.isObject())throw new IllegalArgumentException("Authored policy object required");
+                                seed(c,"INSERT INTO mulino_governance_PolicyVersions(organizationId,ID,version,kind,content,contentHash,effectiveFrom,effectiveUntil,createdAt) VALUES(?,?,?,?,?,?,?,?,?)",org,id,Json.required(a,"version"),Json.required(a,"kind"),content.toString(),contentHash(content),time(Json.required(a,"effectiveFrom")),a.hasNonNull("effectiveUntil")?time(a.path("effectiveUntil").asText()):null,time(fixture.path("clock").path("asOf").asText()));
+                                if(a.path("activate").asBoolean())seed(c,"INSERT INTO mulino_governance_ActivePolicies(organizationId,kind,policyId,revision) VALUES(?,?,?,?)",org,Json.required(a,"kind"),id,0);
                             }
                             case "TradeItem" -> seedTemporal(c,fixture,"INSERT INTO mulino_inventory_TradeItems(organizationId,ID,productId,name,baseUnit,decimalPlaces,specificationVersionId,packagingVersionId) VALUES(?,?,?,?,?,?,?,?)",org,id,ref(aliases,a,"productAlias"),name,Json.required(a,"unit"),0,ref(aliases,a,"specificationVersionAlias"),ref(aliases,a,"packagingVersionAlias"));
                             case "ManufacturerLot" -> seedTemporal(c,fixture,"INSERT INTO mulino_inventory_ManufacturingLots(organizationId,ID,manufacturerId,itemId,originalLot) VALUES(?,?,?,?,?)",org,id,ref(aliases,a,"manufacturerAlias"),ref(aliases,a,"itemAlias"),entry.getKey());

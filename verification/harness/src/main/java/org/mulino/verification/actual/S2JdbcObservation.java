@@ -9,11 +9,14 @@ import org.mulino.verification.Json;
 
 /** Explicit canonical tables only, independently read in one PostgreSQL RR transaction. */
 final class S2JdbcObservation {
-    private record Source(String table,String columns,String workColumn) {}
+    private record Source(String table,String columns,String workColumn,String timeColumn) {Source(String table,String columns,String workColumn){this(table,columns,workColumn,"effectiveAt");}}
     private static final Map<String,Source> SOURCES=Map.ofEntries(
+        Map.entry("canonicalOccurrences",new Source("mulino_evidence_CanonicalOccurrences","ID,revision,workId,itemId,kind,physicalScopeId,quantity,unit,valueState,effectiveFrom,recordedAt,reassessmentState","workId","effectiveFrom")),
+        Map.entry("documents",new Source("mulino_evidence_DocumentVersions","ID,revision,workId,itemId,sha256,blobId,byteLength,availability,sourceNamespace,sourceProfileId,recordedAt","workId",null)),
+        Map.entry("assessmentInputs",new Source("mulino_evaluation_InputSnapshots","ID,assessmentId,workId,goalId,recordedAt,asOf,knownAt,contentHash,contentJson","workId","asOf")),
         Map.entry("works",new Source("mulino_work_read_Works","ID,revision,itemId,lotId,definitionVersionId,kind,status,ownerId,supervisorId,waitJson,currentGoalVersionId,closeReason,pendingInvalidation,lifecycleMode","ID")),
         Map.entry("goals",new Source("mulino_work_read_GoalReferences","ID,revision,workId,definitionVersionId,quantityMode,targetQuantity,unit,endpoint,scopeJson,slotsJson,provenanceJson,evidencePolicyVersion,timezone,dueAt,previousGoalId,goalVersion","workId")),
-        Map.entry("assessments",new Source("mulino_work_read_AssessmentReferences","ID,revision,workId,goalId,outcome,evaluatorVersion,assessedAt,conditionsJson","workId")),
+        Map.entry("assessments",new Source("mulino_work_read_AssessmentReferences","ID,revision,workId,goalId,outcome,evaluatorVersion,assessedAt,conditionsJson,definitionVersionId,policyVersionId,knownAt,asOf,previousAssessmentId,inputSnapshotHash,deadlineViolated,held,conflict","workId")),
         Map.entry("obligations",new Source("mulino_work_read_ObligationReferences","ID,revision,workId,kind,status,ownerId,supervisorId,nextAction,nextCheckAt,quantity,unit,scopeJson,rootId,scopeId,valid,evidenceId,basis,predecessorId","workId")),
         Map.entry("assignments",new Source("mulino_work_read_ObligationReferences","ID,revision,workId,kind,status,ownerId,supervisorId,nextAction,nextCheckAt,quantity,unit,scopeJson,rootId,scopeId,valid,evidenceId,basis,predecessorId","workId")),
         Map.entry("definitions",new Source("mulino_definitions_DefinitionVersions","ID,revision,version,state,contentHash,content,evaluatorVersion,schemaVersion",null)),
@@ -40,7 +43,7 @@ final class S2JdbcObservation {
                         sql+=" AND EXISTS(SELECT 1 FROM mulino_work_read_Works w WHERE w.organizationId=r.organizationId AND w.ID=r."+source.workColumn();
                         for(String field:List.of("itemId","lotId"))if(scope.hasNonNull(field)){sql+=" AND w."+field+"=?";parameters.add(scope.path(field).asText());}sql+=")";
                     }
-                    sql+=" AND r.effectiveAt<=? AND r.recordedAt<=?";parameters.add(OffsetDateTime.parse(Json.required(request,"asOf")));parameters.add(OffsetDateTime.parse(Json.required(request,"knownAt")));
+                    if(source.timeColumn()!=null){sql+=" AND r."+source.timeColumn()+"<=?";parameters.add(OffsetDateTime.parse(Json.required(request,"asOf")));}sql+=" AND r.recordedAt<=?";parameters.add(OffsetDateTime.parse(Json.required(request,"knownAt")));
                 }
                 sql+=" ORDER BY r.ID";var rows=Json.array();
                 try(var s=c.prepareStatement(sql)) {for(int i=0;i<parameters.size();i++)s.setObject(i+1,parameters.get(i));try(var result=s.executeQuery()){while(result.next()){var row=Json.object();var metadata=result.getMetaData();for(int col=1;col<=metadata.getColumnCount();col++){String label=metadata.getColumnLabel(col);Object value=result.getObject(col);if(value==null)row.putNull(label);else if(value instanceof java.math.BigDecimal decimal)row.put(label,decimal.stripTrailingZeros().toPlainString());else if(value instanceof Number number)row.set(label,Json.MAPPER.valueToTree(number));else if(value instanceof Boolean bool)row.put(label,bool);else row.put(label,value.toString());}rows.add(row);}}}

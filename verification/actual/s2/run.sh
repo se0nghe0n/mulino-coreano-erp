@@ -107,7 +107,7 @@ printf '%s\n' "$ACTUAL_BASE_URL" > "$evidence/backend-loopback-url.txt"
 phase=actual-http-jdbc
 classpath="$repo/verification/harness/target/classes:$(cat verification/harness/target/classpath.txt)"
 set +e
-java "-Drepo.root=$repo" '-Dverification.command=./verify actual-s2' "-Dverification.actual.output=$evidence" -Dverification.actual.identityBinding=verification/actual/s2/identity-binding.json -cp "$classpath" org.mulino.verification.actual.NativeS2WorkMain > "$evidence/native-stdout.json" 2> "$evidence/native-stderr.txt"
+java "-Drepo.root=$repo" '-Dverification.command=./verify actual-s2' "-Dverification.actual.output=$evidence" -Dverification.actual.identityBinding=verification/actual/s2/identity-binding.json "-Dverification.actual.blobRoot=$fixture/blobs" -cp "$classpath" org.mulino.verification.actual.NativeS2WorkMain > "$evidence/native-stdout.json" 2> "$evidence/native-stderr.txt"
 code=$?
 set -e
 phase=completed-native-attempt

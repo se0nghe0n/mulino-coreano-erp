@@ -78,3 +78,29 @@ hash와 cleanup 결과를 남긴다. JWT·credential·환경 전체 dump는 남�
 실제 Surefire XML을 압축하여 함께 남긴다. 이 결과는 isolated HTTP
 transport와 binding·fixture schema 검사다. 통합 backend의 native S2
 업무 probe는 아직 실행하지 않았으며 해당 결과는 NOT_RUN이다.
+
+## 90→100 목표와 책임 종료 probe 확장
+
+`e830a00`의 실제 `S2WorkActualIntegrationTest` source 계약을 확인하여
+동일한 문서·사건·Inbox·Claim·CanonicalOccurrence·Verification 연결을
+native HTTP probe로 옮긴다. `EvidenceFixtureInstaller`는 authored synthetic
+fixture의 source 사실만 새 canonical Work/item에 설치한다. 평가·업무 상태·
+책임을 DB에서 갱신하지 않는다. 문서 bytes는 서버의 실제 object store에
+새 UUID로 기록하고 읽기 전용 권한과 SHA-256 readback을 확인한다. DB
+transaction 실패 시 자신이 만든 blob만 제거한다. fixture 설치 결과는
+업무 실행 성공으로 세지 않는다.
+
+명시적인 `EVIDENCE`, `GOAL_CONTEXT` 정책과 현재 supervisor membership을
+설치한다. public `createWork`는 fixture 정책에서 timezone을 읽고 정의에서
+evaluator/condition을 읽는다. native probe는 그 값을 wire에 몰래 채우지
+않는다. 서버 clock은 각 판정 사이에 전진한다.90 도착 source로 판정하고
+FULFILLED 종료를 거부하는지, 뒤의10 source로100이 충족돼도 OPEN 의무가
+종료를 막는지 확인한다. 실제 public `resolveObligation`에 범위가 같은
+verified RESPONSE_COMPLETED source를 전달한 뒤에만 종료를 시도한다.
+
+독립 JDBC는 canonical90/10 행의 합100, 과거 UNSATISFIED 판정의 보존,
+실제 input snapshot, 현재 Work 및 RESOLVED 의무 이력을 읽는다. 실제
+`getEvidence`는 원문 blob의 AVAILABLE/hash를 확인하고 명사·동사 조회는
+같은 projection snapshot과 assessment history를 읽는다. 이 확장의
+통합 native 실행 결과는 root가 exact combined JAR로 실행한 receipt에서
+확인하며 전체 T11이나 S2 gate를 대신하지 않는다.

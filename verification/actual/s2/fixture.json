@@ -29,7 +29,15 @@
         "resumeWork",
         "getWork",
         "getInventory",
-        "getObject"
+        "getObject",
+        "createWork",
+        "assessGoal",
+        "closeWork",
+        "createObligation",
+        "resolveObligation",
+        "getAssessment",
+        "getObligations",
+        "getEvidence"
       ],
       "grant": {
         "delegatorAlias": "supervisor",
@@ -41,8 +49,33 @@
           "resumeWork",
           "getWork",
           "getInventory",
-          "getObject"
+          "getObject",
+          "createWork",
+          "assessGoal",
+          "closeWork",
+          "createObligation",
+          "resolveObligation",
+          "getAssessment",
+          "getObligations",
+          "getEvidence"
         ],
+        "scope": {
+          "organizationAlias": "ORG"
+        },
+        "validFrom": "2026-10-01T00:00:00Z",
+        "validUntil": "2026-10-31T23:59:59Z",
+        "revision": 1
+      }
+    },
+    "supervisor": {
+      "issuer": "https://mulino-native.invalid",
+      "subject": "s2-native-supervisor",
+      "audience": "isolated-ontology",
+      "organizationAlias": "ORG",
+      "roleCapabilities": [],
+      "grant": {
+        "delegatorAlias": "supervisor",
+        "actions": [],
         "scope": {
           "organizationAlias": "ORG"
         },
@@ -133,17 +166,13 @@
         "schemaVersion": "1.0.0",
         "nouns": [
           {
-            "name": "QuantitySegment",
-            "core": true
-          },
-          {
-            "name": "Place",
+            "name": "Receipt",
             "core": true
           }
         ],
         "attributes": [
           {
-            "nounType": "QuantitySegment",
+            "nounType": "Receipt",
             "name": "quantity",
             "type": "DECIMAL",
             "referenceType": null,
@@ -151,19 +180,7 @@
             "decimalPlaces": 0,
             "minimumCount": 1,
             "maximumCount": 1,
-            "requiredStage": "CONFIRM_RECEIPT",
-            "core": true
-          },
-          {
-            "nounType": "QuantitySegment",
-            "name": "destination",
-            "type": "REFERENCE",
-            "referenceType": "Place",
-            "unit": null,
-            "decimalPlaces": 0,
-            "minimumCount": 1,
-            "maximumCount": 1,
-            "requiredStage": "DRAFT",
+            "requiredStage": "READ",
             "core": true
           }
         ],
@@ -223,18 +240,65 @@
             "capabilityId": "getObject",
             "stage": "READ",
             "slots": {}
-          }
-        ],
-        "relations": [
+          },
           {
-            "name": "locatedAt",
-            "sourceType": "QuantitySegment",
-            "targetType": "Place",
-            "minimumCount": 0,
-            "maximumCount": 1,
-            "cycleAllowed": false
+            "name": "createWork",
+            "intentKind": "COMMAND",
+            "capabilityId": "createWork",
+            "stage": "DRAFT",
+            "slots": {}
+          },
+          {
+            "name": "assessGoal",
+            "intentKind": "COMMAND",
+            "capabilityId": "assessGoal",
+            "stage": "DRAFT",
+            "slots": {}
+          },
+          {
+            "name": "closeWork",
+            "intentKind": "COMMAND",
+            "capabilityId": "closeWork",
+            "stage": "DRAFT",
+            "slots": {}
+          },
+          {
+            "name": "createObligation",
+            "intentKind": "COMMAND",
+            "capabilityId": "createObligation",
+            "stage": "DRAFT",
+            "slots": {}
+          },
+          {
+            "name": "resolveObligation",
+            "intentKind": "COMMAND",
+            "capabilityId": "resolveObligation",
+            "stage": "DRAFT",
+            "slots": {}
+          },
+          {
+            "name": "getAssessment",
+            "intentKind": "QUERY",
+            "capabilityId": "getAssessment",
+            "stage": "READ",
+            "slots": {}
+          },
+          {
+            "name": "getObligations",
+            "intentKind": "QUERY",
+            "capabilityId": "getObligations",
+            "stage": "READ",
+            "slots": {}
+          },
+          {
+            "name": "getEvidence",
+            "intentKind": "QUERY",
+            "capabilityId": "getEvidence",
+            "stage": "READ",
+            "slots": {}
           }
         ],
+        "relations": [],
         "goals": [
           {
             "name": "arrived",
@@ -242,8 +306,14 @@
             "endpoint": "ARRIVED",
             "evaluatorVersion": "core-v1",
             "predicate": {
-              "operator": "exists",
-              "property": "QuantitySegment.quantity"
+              "operator": "quantitySum",
+              "property": "Receipt.quantity",
+              "minimum": {
+                "value": "1",
+                "unit": "BOX"
+              },
+              "unit": "BOX",
+              "evidenceSelector": "VERIFIED_DISTINCT"
             }
           }
         ],
@@ -311,9 +381,91 @@
             "inputSchemaVersion": "1.0.0",
             "outputSchemaVersion": "1.0.0",
             "supportedWorkMigration": []
+          },
+          {
+            "capabilityId": "createWork",
+            "semanticVersion": "1.0.0",
+            "evaluatorVersion": "core-v1",
+            "inputSchemaVersion": "1.0.0",
+            "outputSchemaVersion": "1.0.0",
+            "supportedWorkMigration": []
+          },
+          {
+            "capabilityId": "assessGoal",
+            "semanticVersion": "1.0.0",
+            "evaluatorVersion": "core-v1",
+            "inputSchemaVersion": "1.0.0",
+            "outputSchemaVersion": "1.0.0",
+            "supportedWorkMigration": []
+          },
+          {
+            "capabilityId": "closeWork",
+            "semanticVersion": "1.0.0",
+            "evaluatorVersion": "core-v1",
+            "inputSchemaVersion": "1.0.0",
+            "outputSchemaVersion": "1.0.0",
+            "supportedWorkMigration": []
+          },
+          {
+            "capabilityId": "createObligation",
+            "semanticVersion": "1.0.0",
+            "evaluatorVersion": "core-v1",
+            "inputSchemaVersion": "1.0.0",
+            "outputSchemaVersion": "1.0.0",
+            "supportedWorkMigration": []
+          },
+          {
+            "capabilityId": "resolveObligation",
+            "semanticVersion": "1.0.0",
+            "evaluatorVersion": "core-v1",
+            "inputSchemaVersion": "1.0.0",
+            "outputSchemaVersion": "1.0.0",
+            "supportedWorkMigration": []
+          },
+          {
+            "capabilityId": "getAssessment",
+            "semanticVersion": "1.0.0",
+            "evaluatorVersion": "core-v1",
+            "inputSchemaVersion": "1.0.0",
+            "outputSchemaVersion": "1.0.0",
+            "supportedWorkMigration": []
+          },
+          {
+            "capabilityId": "getObligations",
+            "semanticVersion": "1.0.0",
+            "evaluatorVersion": "core-v1",
+            "inputSchemaVersion": "1.0.0",
+            "outputSchemaVersion": "1.0.0",
+            "supportedWorkMigration": []
+          },
+          {
+            "capabilityId": "getEvidence",
+            "semanticVersion": "1.0.0",
+            "evaluatorVersion": "core-v1",
+            "inputSchemaVersion": "1.0.0",
+            "outputSchemaVersion": "1.0.0",
+            "supportedWorkMigration": []
           }
         ]
       }
+    },
+    "EPOL": {
+      "type": "PolicyVersion",
+      "kind": "EVIDENCE",
+      "version": "fixture-v1",
+      "content": {},
+      "effectiveFrom": "2026-10-01T00:00:00Z",
+      "activate": true
+    },
+    "CTX": {
+      "type": "PolicyVersion",
+      "kind": "GOAL_CONTEXT",
+      "version": "fixture-timezone-v1",
+      "content": {
+        "timezone": "Asia/Seoul"
+      },
+      "effectiveFrom": "2026-10-01T00:00:00Z",
+      "activate": true
     }
   },
   "baseline": {},
