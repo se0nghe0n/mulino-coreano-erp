@@ -32,7 +32,7 @@ public class WorkReadRepository {
     var works=db.run(Select.from("mulino.work.read.Works").where(r->r.get("organizationId").eq(c.organizationId()))).listOf(Map.class);
     for(var raw:works){Map<String,Object> w=(Map)raw;
       if(!"COMMAND".equals(w.get("lifecycleMode"))){if(instant(w.get("effectiveAt")).isAfter(c.asOf())||instant(w.get("recordedAt")).isAfter(c.knownAt()))continue;result.add(w);continue;}
-      var transitions=db.run(Select.from("mulino.work.WorkTransitions").where(r->r.get("organizationId").eq(c.organizationId()).and(r.get("workId").eq(w.get("ID"))).and(r.get("recordedAt").le(c.knownAt()))).orderBy("revision desc")).listOf(Map.class);
+      var transitions=db.run(Select.from("mulino.work.WorkTransitions").where(r->r.get("organizationId").eq(c.organizationId()).and(r.get("workId").eq(w.get("ID"))).and(r.get("recordedAt").le(c.knownAt()))).orderBy(r->r.get("revision").desc())).listOf(Map.class);
       for(var transition:transitions)try{Map<String,Object> snapshot=new com.fasterxml.jackson.databind.ObjectMapper().readValue(String.valueOf(transition.get("snapshotJson")),Map.class);if(!instant(snapshot.get("effectiveAt")).isAfter(c.asOf())){result.add(snapshot);break;}}catch(java.io.IOException failure){throw new IllegalStateException("Invalid work transition snapshot",failure);}
     }
     result.sort(Comparator.comparing(w->String.valueOf(w.get("ID"))));return result;

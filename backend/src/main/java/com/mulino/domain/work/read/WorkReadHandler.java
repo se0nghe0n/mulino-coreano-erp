@@ -10,7 +10,8 @@ public class WorkReadHandler implements QueryHandler {
   private final WorkReadRepository repository;
   private final ReadAuthorizer auth;
   private final ObjectMapper json=new ObjectMapper();
-  public WorkReadHandler(WorkReadRepository repository,ReadAuthorizer auth) {this.repository=repository;this.auth=auth;}
+  private final org.springframework.beans.factory.ObjectProvider<com.mulino.application.work.WorkAssessmentRead> assessmentRead;
+  public WorkReadHandler(WorkReadRepository repository,ReadAuthorizer auth,org.springframework.beans.factory.ObjectProvider<com.mulino.application.work.WorkAssessmentRead> assessmentRead) {this.repository=repository;this.auth=auth;this.assessmentRead=assessmentRead;}
   public Set<String> operations(){return Set.of("getWork","searchWorks","getObligations","getAssessment");}
   public QueryResult query(DomainContext c,QueryRequest q){
     if(!Set.of("itemId","lotId","workId","status","sort","action","customerId").containsAll(q.filters().keySet()))throw DomainError.invalid("Unsupported work filter");
@@ -25,6 +26,7 @@ public class WorkReadHandler implements QueryHandler {
       data.put("goals",linked(c,"GoalReferences",Set.of(q.id())));
       data.put("assessments",linked(c,"AssessmentReferences",Set.of(q.id())));
       data.put("obligations",obligations(c,Set.of(q.id())));
+      if(assessmentRead.getIfAvailable()!=null)data.put("assessmentInputSnapshots",assessmentRead.getIfAvailable().snapshots(c,q.id()));
       if(work.get("waitJson")!=null)data.put("wait",decode(work.get("waitJson")));
       data.remove("waitJson");
       return QueryResult.of(data,scope(c,q.scope(),work));
@@ -50,6 +52,7 @@ public class WorkReadHandler implements QueryHandler {
     Map<String,Object> data=new LinkedHashMap<>();
     data.put("workIds",List.copyOf(ids));data.put("ownerIds",List.copyOf(owners));data.put("nextActions",List.copyOf(next));data.put("evidenceRefs",List.copyOf(evidence));data.put("obligations",obligations);
     data.put("workReferences",works);data.put("goalReferences",linked(c,"GoalReferences",ids));data.put("assessmentReferences",linked(c,"AssessmentReferences",ids));
+    if(assessmentRead.getIfAvailable()!=null)data.put("assessmentInputSnapshots",ids.stream().flatMap(id->assessmentRead.getIfAvailable().snapshots(c,id).stream()).toList());
     return data;
   }
   private List<Map<String,Object>> authorizedWorks(DomainContext c,Map<String,Object> scope,Map<String,Object> filters,String capability){

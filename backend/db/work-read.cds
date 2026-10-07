@@ -1,3 +1,4 @@
+using {mulino.work} from './work';
 namespace mulino.work.read;
 aspect scopedRead {
   key organizationId : UUID;
@@ -52,6 +53,7 @@ entity AssessmentReferences : scopedRead {
   inputSnapshotHash : String(64);
   deadlineViolated : Boolean not null default false;
   held : Boolean not null default false;
+  conflict : Boolean not null default false;
 }
 entity ObligationReferences : scopedRead {
   workId : UUID not null;
