@@ -26,8 +26,9 @@ public class EvidenceReconciliation {
   private final VerifiedResponsibilityCompletionEvidence completion;
   private final ObjectProvider<EvidenceCorrectionImpact> impacts;
   private final ObjectProvider<ExternalOperationScopePort> externalOperations;
-  public EvidenceReconciliation(EvidenceRepository r,EvidenceRecords records,IdentityAuthorization auth,LocalBlobStore blobs,ObjectProvider<EvidenceCorrectionImpact> impacts,ObjectProvider<ExternalOperationScopePort> externalOperations,ExecutionClock clock,VerifiedResponsibilityCompletionEvidence completion) {
-    this.r=r;this.records=records;this.auth=auth;this.blobs=blobs;this.impacts=impacts;this.externalOperations=externalOperations;this.clock=clock;this.completion=completion;
+  private final ObjectProvider<com.mulino.application.trade.ReceiptEvidenceScopePort> receiptScopes;
+  public EvidenceReconciliation(EvidenceRepository r,EvidenceRecords records,IdentityAuthorization auth,LocalBlobStore blobs,ObjectProvider<EvidenceCorrectionImpact> impacts,ObjectProvider<ExternalOperationScopePort> externalOperations,ExecutionClock clock,VerifiedResponsibilityCompletionEvidence completion,ObjectProvider<com.mulino.application.trade.ReceiptEvidenceScopePort> receiptScopes) {
+    this.r=r;this.records=records;this.auth=auth;this.blobs=blobs;this.impacts=impacts;this.externalOperations=externalOperations;this.clock=clock;this.completion=completion;this.receiptScopes=receiptScopes;
   }
   public Map<String,Object> claim(DomainContext c,String id){return r.require("Claims",c.organizationId(),uuid(id));}
   public Map<String,Object> review(DomainContext c,String id){return r.require("Reconciliations",c.organizationId(),uuid(id));}
@@ -55,10 +56,20 @@ public class EvidenceReconciliation {
     BigDecimal quantity=quantity(input.quantity(),input.unit(),ValueState.KNOWN);
     boolean external="EXTERNAL_RESULT".equals(event.get("kind"));
     boolean response="RESPONSE_COMPLETED".equals(event.get("kind"));
+    boolean receipt="PHYSICAL_RECEIPT".equals(event.get("kind"));
     boolean sameQuantity=external?quantity==null&&claim.get("quantity")==null:quantity!=null&&claim.get("quantity") instanceof BigDecimal q&&quantity.compareTo(q)==0&&Objects.equals(input.unit(),claim.get("unit"));
     boolean original=!r.rows("DocumentVersions",c.organizationId()).stream().anyMatch(x->doc.get("ID").equals(x.get("supersedesId")))&&"AVAILABLE".equals(doc.get("availability"))&&doc.get("blobId")!=null&&blobs.available(UUID.fromString(doc.get("blobId").toString()),doc.get("sha256").toString());
     boolean identity=false;
-    if(response&&input.physicalScopeId()!=null&&original) {
+    if(receipt&&input.physicalScopeId()!=null&&original) {
+      var providers=receiptScopes.stream().toList();if(providers.size()!=1)throw new DomainError("HELD","POLICY_UNRESOLVED","Receipt identity provider unavailable");
+      var range=providers.getFirst().require(c,uuid(input.physicalScopeId()));
+      var allowed=new LinkedHashMap<String,Collection<String>>(scopes(claim));allowed.put("TARGET",List.of(range.receiptRangeId()));allowed.put("ITEM",List.of(range.itemId()));allowed.put("PLACE",List.of(range.placeId()));if(range.workId()!=null)allowed.put("WORK",List.of(range.workId()));auth.authorizeScopes(c,capability,allowed);
+      identity=range.receiptRangeId().equals(input.physicalScopeId())&&Objects.equals(range.itemId(),claim.get("itemId"))&&Objects.equals(range.placeId(),claim.get("placeId"))&&Objects.equals(range.workId(),claim.get("workId"))&&sameQuantity(quantity,range.quantity())&&Objects.equals(input.unit(),range.unit())&&range.occurredAt().equals(input.effectiveFrom())&&switch(claim.get("subjectKind").toString()){case "ITEM"->range.itemId().equals(claim.get("subjectId"));case "LOT"->Objects.equals(range.lotId(),claim.get("subjectId"));default->false;};
+      try {
+        var mapper=new com.fasterxml.jackson.databind.ObjectMapper();var originalPayload=mapper.readTree(blobs.read(UUID.fromString(doc.get("blobId").toString()),doc.get("sha256").toString()));var eventPayload=mapper.readTree(event.get("payload").toString());
+        for(var payload:List.of(originalPayload,eventPayload))identity &= receiptPayloadMatches(payload,range);
+      }catch(java.io.IOException malformed){identity=false;}
+    }else if(response&&input.physicalScopeId()!=null&&original) {
       try{completion.sourceRange(c,claim,event,doc,uuid(input.physicalScopeId()));identity=true;}catch(DomainError unavailable){if(!"EVIDENCE_UNVERIFIED".equals(unavailable.code()))throw unavailable;}
     }else if(external&&input.physicalScopeId()!=null) {
       var operations=externalOperations.getIfAvailable();
@@ -96,7 +107,7 @@ public class EvidenceReconciliation {
       var relatedClaims=r.rows("Claims",c.organizationId()).stream().filter(x->Objects.equals(claim.get("eventId"),x.get("eventId"))).map(x->x.get("ID").toString()).collect(java.util.stream.Collectors.toSet());
       var canonicalIds=r.rows("Verifications",c.organizationId()).stream().filter(x->relatedClaims.contains(x.get("claimId"))&&"VERIFIED".equals(x.get("verdict"))).map(x->x.get("canonicalOccurrenceId").toString()).collect(java.util.stream.Collectors.toSet());
       if(r.rows("CanonicalOccurrences",c.organizationId()).stream().anyMatch(x->canonicalIds.contains(x.get("ID"))&&!input.physicalScopeId().equals(x.get("physicalScopeId"))))decision="CONFLICT";
-      Set<String> overlapping=external||response?Set.of(input.physicalScopeId()):r.overlappingScopes(c.organizationId(),input.physicalScopeId());
+      Set<String> overlapping=external||response||receipt?Set.of(input.physicalScopeId()):r.overlappingScopes(c.organizationId(),input.physicalScopeId());
       if(r.rows("CanonicalOccurrences",c.organizationId()).stream().anyMatch(x->!input.physicalScopeId().equals(x.get("physicalScopeId"))&&overlapping.contains(x.get("physicalScopeId"))&&event.get("kind").equals(x.get("kind"))))decision="CONFLICT";
     }
     if(input.physicalScopeId()!=null && r.rows("CanonicalOccurrences",c.organizationId()).stream().anyMatch(x->input.physicalScopeId().equals(x.get("physicalScopeId"))&&event.get("kind").equals(x.get("kind"))&&!input.effectiveFrom().equals(instant(x.get("effectiveFrom")))))decision="CONFLICT";
@@ -117,6 +128,9 @@ public class EvidenceReconciliation {
     for(String field:List.of("intakeOwnerId","supervisorId","nextAction","nextCheckAt"))row.put(field,profile.get(field));
     r.insert("Reconciliations",row);
     return Map.of("id",row.get("ID"),"revision",1,"outcome",decision,"inventoryEffects","NONE");
+  }
+  private static boolean receiptPayloadMatches(com.fasterxml.jackson.databind.JsonNode payload,com.mulino.application.trade.ReceiptEvidenceScopePort.Scope range){
+    try{return payload.path("rangeRootId").isTextual()&&range.receiptRangeId().equals(payload.path("rangeRootId").asText())&&payload.path("startQuantity").isTextual()&&range.startQuantity().compareTo(new BigDecimal(payload.path("startQuantity").asText()))==0&&range.itemId().equals(payload.path("itemId").asText())&&Objects.equals(range.lotId(),payload.hasNonNull("lotId")?payload.get("lotId").asText():null)&&range.placeId().equals(payload.path("placeId").asText())&&Objects.equals(range.workId(),payload.hasNonNull("workId")?payload.get("workId").asText():null)&&payload.path("quantity").isTextual()&&range.quantity().compareTo(new BigDecimal(payload.path("quantity").asText()))==0&&range.unit().equals(payload.path("unit").asText())&&range.occurredAt().equals(Instant.parse(payload.path("occurredAt").asText()));}catch(RuntimeException invalid){return false;}
   }
   private static boolean sameQuantity(BigDecimal requested,Object stored) {
     return requested==null?stored==null:stored instanceof BigDecimal quantity&&requested.compareTo(quantity)==0;

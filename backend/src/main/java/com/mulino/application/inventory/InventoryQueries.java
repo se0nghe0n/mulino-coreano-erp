@@ -24,7 +24,9 @@ public class InventoryQueries implements QueryHandler {
   }
   public Set<String> operations() { return Set.of("getObject","searchObjects","getInventory","getTrace","traceLot"); }
   public QueryResult query(DomainContext c, QueryRequest q) {
-    if(Set.of("getObject","searchObjects").contains(q.operation())){Object type=q.scope().getOrDefault("objectType",q.filters().get("type"));var provider=objects.get(type);if(provider!=null)return provider.query(c,q);}
+    if(q.scope().containsKey("organizationId")&&!c.organizationId().equals(q.scope().get("organizationId")))throw DomainError.forbidden();
+    if(q.scope().containsKey("objectType")&&q.filters().containsKey("type")&&!Objects.equals(q.scope().get("objectType"),q.filters().get("type")))throw DomainError.invalid("Conflicting object types");
+    if(Set.of("getObject","searchObjects").contains(q.operation())){if(!Set.of("type","sort").containsAll(q.filters().keySet()))throw DomainError.invalid("Unsupported object filter");if(q.filters().containsKey("sort")&&!"ID".equals(q.filters().get("sort")))throw DomainError.invalid("Unsupported object sort");Object type=q.scope().getOrDefault("objectType",q.filters().get("type"));var provider=objects.get(type);if(provider!=null)return provider.query(c,q);}
     if (!Set.of("type","sort").containsAll(q.filters().keySet())) throw DomainError.invalid("Unsupported inventory filter");
     if (q.filters().containsKey("sort")&&!"ID".equals(q.filters().get("sort"))) throw DomainError.invalid("Unsupported inventory sort");
     if(q.scope().containsKey("organizationId")&&!c.organizationId().equals(q.scope().get("organizationId"))) throw DomainError.forbidden();
