@@ -56,11 +56,30 @@ predicate를 검증해야 한다. S0의 별도 spike schema는 변경하지 않�
 | V4 정의·정책 schema | `36e3834` | `6bc3d53` |
 | 정의 조회·검증·부분 검사 | `5baf104` | `92c228c` |
 | V5 물량 schema·읽기 | `03be319` | `e025b9b` |
+| predicate 입력 제한 | `956c879` | `aab4cfb` |
+| 현재 신원/인가 구현·검사 기록 | `702927b`·`f912a59`·`1e6b38f` | `f918741`·`38db821`·`dea4532` |
+| V6 증거의 첫 구현 | `837fd76` | `4dcc337` |
+| S1 전체 CDS import | `e854387` | `5929efa` |
+| 공통 조회 adapter·V7 업무 참조 | `c596319` | `0f79428` |
+| 실제 HTTP/JDBC adapter 기반 | `1fce413`·`25110c5` | `4891de7`·`cde68a8` |
+| typed 관계·과거 물량 조회 | `db10778`·`184c0f6` | `dce8bda`·`dc5b483` |
+| 계보 부모/자식 시간 중복 차단 | `e379996` | `beff33d` |
 
 definitions의 focused8 tests는 통과했다. 이 중 PostgreSQL 검사는 최소
 조직 dependency로 V4를 검증했으며 V3–V7 전체 결합 증거는 아니다.
 통합 build·전체 schema compatibility·실제 두 진입점 검사는 아직 대기다.
 후속 commit과 실행 결과를 이 기록에 추가한다.
+
+identity의 focused8 tests와 inventory의 focused9 tests는 실제
+PostgreSQL/CQN 경로를 포함해 통과했다. adapter 기반4 tests도 통과했다.
+마지막 inventory 시간 중복 방어의 추가 regression은 통합 실행 대기다.
+이 숫자들을 합쳐 전체 제품 인수 결과로 보고하지 않는다.
+
+모듈 결합 검토에서 공통 scope whitelist와 evidence typed selector의
+불일치를 발견했다. 공통 검증과 각 handler의 org/type 검증을 맞추고
+실제 HTTP 증거 조회로 확인해야 한다. 전체 schema 비교는 SQL의
+추가 NOT NULL 강화도 column별 예외 목록으로 남기며 느슨한 type/null
+비교로 숨기지 않는다. 실제 command·work lifecycle은 계속 후속 S2다.
 
 R3에 따라 실제 운영 자료 없이 격리 DB와 개발 fixture를 사용한다.
 R5 실제 identity, R7 BTP, R8 추가 실모델 비용은 아직 미확정이며
