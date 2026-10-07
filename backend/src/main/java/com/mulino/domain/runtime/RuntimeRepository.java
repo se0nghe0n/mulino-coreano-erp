@@ -23,7 +23,8 @@ public class RuntimeRepository implements CommandLeasePort,TransactionalOutboxPo
   public static DomainError conflict(){return new DomainError("CONFLICT","STALE_EXECUTION","Execution claim is no longer current");}
   public Optional<Map<String,Object>> claim(DomainContext c,String work,String capability,String command,String worker,Duration ttl){
     transaction();validateTtl(ttl);Instant now=clock.instant();
-    db.update("INSERT INTO mulino_runtime_ExecutionScopes(organizationId,workId,capabilityId,commandId) VALUES(?,?,?,?) ON CONFLICT DO NOTHING",c.organizationId(),work,capability,command);
+    if(db.queryForObject("SELECT count(*) FROM mulino_runtime_ExecutionScopes WHERE organizationId=? AND workId=? AND capabilityId=? AND commandId=?",Integer.class,c.organizationId(),work,capability,command)==0)
+      db.update("INSERT INTO mulino_runtime_ExecutionScopes(organizationId,workId,capabilityId,commandId) VALUES(?,?,?,?) ON CONFLICT DO NOTHING",c.organizationId(),work,capability,command);
     var rows=db.queryForList("SELECT * FROM mulino_runtime_ExecutionScopes WHERE organizationId=? AND workId=? AND capabilityId=? AND commandId=? FOR UPDATE SKIP LOCKED",c.organizationId(),work,capability,command);
     if(rows.isEmpty())return Optional.empty();var scope=rows.getFirst();
     if(scope.get("attemptid")!=null){var a=db.queryForMap("SELECT * FROM mulino_runtime_ExecutionAttempts WHERE organizationId=? AND ID=?",c.organizationId(),scope.get("attemptid"));
@@ -49,12 +50,13 @@ public class RuntimeRepository implements CommandLeasePort,TransactionalOutboxPo
     fenceAndVerify(c,claim);db.update("UPDATE mulino_runtime_ExecutionAttempts SET status=?,technicalCode=?,finishedAt=? WHERE organizationId=? AND ID=?",status,code,at(clock.instant()),c.organizationId(),claim.get("attemptId"));
   }
   @Override public String enqueue(DomainContext c,String command,String externalId,String operation,Map<String,Object> payload){
-    transaction();safePayload(payload);String serialized=json.writeValueAsString(payload);
+    transaction();try{UUID.fromString(externalId);}catch(RuntimeException invalid){throw DomainError.invalid("Stable external operation must be UUID");}safePayload(payload);String serialized=json.writeValueAsString(canonical(payload));
     var existing=db.queryForList("SELECT * FROM mulino_runtime_Outbox WHERE organizationId=? AND externalOperationId=? FOR UPDATE",c.organizationId(),externalId);
     if(!existing.isEmpty()){var e=existing.getFirst();if(!command.equals(e.get("commandid"))||!operation.equals(e.get("operation"))||!serialized.equals(e.get("payloadjson"))||!c.actorId().equals(e.get("actorid"))||!c.stableRequestOwner().equals(e.get("stablerequestowner")))throw conflict();return (String)e.get("id");}
     String id=UUID.randomUUID().toString();Instant now=clock.instant();
     db.update("INSERT INTO mulino_runtime_Outbox(organizationId,ID,commandId,externalOperationId,operation,payloadJson,actorId,stableRequestOwner,status,createdAt,nextCheckAt,nextAction) VALUES(?,?,?,?,?,?,?,?,'PENDING',?,?,?)",c.organizationId(),id,command,externalId,operation,serialized,c.actorId(),c.stableRequestOwner(),at(now),at(now),"Verify current authority before external delivery");return id;
   }
+  private static Object canonical(Object value){if(value instanceof Map<?,?> m){var result=new TreeMap<String,Object>();m.forEach((k,v)->result.put(k.toString(),canonical(v)));return result;}if(value instanceof Collection<?> l)return l.stream().map(RuntimeRepository::canonical).toList();return value;}
   private static void validateTtl(Duration ttl){if(ttl.isNegative()||ttl.isZero()||ttl.compareTo(Duration.ofMinutes(5))>0)throw DomainError.invalid("Lease duration outside bounded policy");}
   private static void safePayload(Object value){
     if(value instanceof Map<?,?> m){for(var e:m.entrySet()){String key=e.getKey().toString().toLowerCase(Locale.ROOT);if(key.matches(".*(token|secret|password|authorization|privateprofile|credential).*"))throw DomainError.invalid("Secret-bearing payload is not queueable");safePayload(e.getValue());}}

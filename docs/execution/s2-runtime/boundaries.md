@@ -19,6 +19,15 @@ runtime table에 복제하지 않는다. RecoverySchedules는 due discovery inde
 시간 경과는 current grant/policy와 재개 predicate 확인의 이유이며 승인이나
 도착의 근거가 아니다.
 
-현재 미완료: 실제 reconciliation evidence 검사·canonical duty 연결,
-worker native process runner, 자동 due sweeper와 안전 명령 retry. 테스트
-실행 전 이 문서나 schema 존재를 V5/V6/V7 PASS로 보지 않는다.
+canonical duty는 RuntimeDutyPort로 실제 책임 module에 연결한다.
+확정 외부 결과는 immutable original과 verified canonical operation의
+증거 guard를 통과해야 한다. fixture native JVM runner와 독립 HTTP/SQLite
+외부 효과 service를 제공한다. 실제 process kill/restart 종단 실행은 아직
+NOT_RUN이다. RecoverySchedules는 due 업무를 pending assessment로 표시하며
+시간만으로 재개하지 않는다. 안전 명령 retry는 공통 command의 원 요청
+재실행 API와 결합해야 한다.
+
+실제 PostgreSQL 계약 tests 6건이 통과했다. 마지막 두 tests의 authority와
+responsibility hook은 mock이며 전체 인가·책임 통합 성공으로 세지 않는다.
+현재 source와 통합된 module의 결합 checks가 남는다. V5/V6/V7 전체는
+NOT_RUN이다.

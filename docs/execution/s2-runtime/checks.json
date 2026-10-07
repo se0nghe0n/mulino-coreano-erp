@@ -1,0 +1,52 @@
+{
+  "baseline": "40a240c3886d3316ba1fd686e9b44bfa1ba6ec2d",
+  "stage": "UserStep3/S2 partial runtime",
+  "command": "JAVA_HOME=/Library/Java/JavaVirtualMachines/zulu-21.jdk/Contents/Home PATH=<Node24-first>:/opt/homebrew/bin:<system> ./mvnw -B -ntp -f backend/pom.xml -Dtest=RuntimePostgresTest test",
+  "result": "PASS",
+  "tests": 6,
+  "failures": 0,
+  "errors": 0,
+  "skipped": 0,
+  "exitCode": 0,
+  "database": "postgres@sha256:4ef4dbc939d61acea57712655ddb4b4ab27419c913f94cca0cd57cb3ea3c2280",
+  "java": "Zulu21",
+  "compiledClassSha256": {
+    "backend/target/classes/com/mulino/application/runtime/DurableDeliveryWorker.class": "4d06ab8131e14ccddefa4672e09119ce34d7eba43c2576c507cfac2d721d53e4",
+    "backend/target/classes/com/mulino/application/runtime/ExternalDeliveryAdapter$Result.class": "6348ea1dd20c2f229e068536fff2096ce8651569d0fcc517570169c209b1d2c1",
+    "backend/target/classes/com/mulino/application/runtime/ExternalDeliveryAdapter$Support.class": "779d24feca7fb575e5655a89b1145dd5630211d4b9a58cc9bdaa5845ea7cedf4",
+    "backend/target/classes/com/mulino/application/runtime/ExternalDeliveryAdapter.class": "8731e3a462a5463e79d061d8f3a387ab110d7697aa84fd4ea6661cac1862a0a9",
+    "backend/target/classes/com/mulino/application/runtime/ExternalDutyEvidence.class": "2dd26d348a33672712fefcb77f433199da73889ae13e1520fd4674e0c8084071",
+    "backend/target/classes/com/mulino/application/runtime/RuntimeDutyPort.class": "00ca43b4fae9efef73ba536dd67b88af1982ffc552c61bfe4fe5839879d26c99",
+    "backend/target/classes/com/mulino/application/runtime/RuntimeExternalScope.class": "728085dcbbf3da38d48b332186a30438f2e7807054869700c4b7b61f8e556b2a",
+    "backend/target/classes/com/mulino/application/runtime/RuntimeRecoverySweeper.class": "2354c256e956dcaa0629d8433e7eab7ec9559efb9addb97b81ad5158ab89a6a3",
+    "backend/target/classes/com/mulino/application/runtime/RuntimeService.class": "4b0d89575f844c42fa8f4a4dceffcd18b020ce0216243b7e0ee5869cc5f3d738",
+    "backend/target/classes/com/mulino/application/runtime/RuntimeVerificationHost$1.class": "d614a782472b4b9e4a5586794ccc879137e035a825ad6a41e07f83c8d7e26dab",
+    "backend/target/classes/com/mulino/application/runtime/RuntimeVerificationHost.class": "61abff715d3659a706b7613411ce930a9ff06b390c206845801d28c04015b178",
+    "backend/target/classes/com/mulino/application/runtime/RuntimeWorkObserver.class": "25a21a21ac1dbb3681f6f7876144166919bec7ad5955f259e3b4c610da5b0147",
+    "backend/target/classes/com/mulino/application/runtime/VerificationClock.class": "862b26cbaec2ebbffcedca6895cfd62c9640de45cee9d8c845dd4142c8d3a11f",
+    "backend/target/classes/com/mulino/application/runtime/VerificationRuntimeControl.class": "0343279a6c915ba53d3aee8fbe01a2b1a44465e21a59098740e86c7a3b3aa119",
+    "backend/target/classes/com/mulino/domain/runtime/RuntimeRepository.class": "f0d3de593b08ec7a757c7f317f7fdc25caf63a5afe2c0c74ff948c5fe6787ff4",
+    "backend/target/test-classes/com/mulino/runtime/RuntimePostgresTest$1.class": "9d2e662c3085aab807f80bc041d8da80ed44e93f88b06cff9d9aad57875ec3f2",
+    "backend/target/test-classes/com/mulino/runtime/RuntimePostgresTest$2.class": "eead3dd27448a5c3b7d0824ef741f9e689eaef8ec67e40f7d52d937120378fd2",
+    "backend/target/test-classes/com/mulino/runtime/RuntimePostgresTest$3.class": "0699853d3534eac1a16c65a8ffa3b75cbf4cfcb648ce5dc3fa7cce52d12128e7",
+    "backend/target/test-classes/com/mulino/runtime/RuntimePostgresTest$4.class": "a4171e84932d1a969e121d20513fb9a14b66bbf9f735f4fda086707e03ef548f",
+    "backend/target/test-classes/com/mulino/runtime/RuntimePostgresTest.class": "d9206c91ce2df05c5b4520dab8e4dfe0b999dba8e32cc16ed182911e4fe66954"
+  },
+  "observations": [
+    "Expired claim reclaim rejects stale writer and rolls back effect + outbox",
+    "Latch-controlled two-worker claim creates one ACTIVE attempt",
+    "Expiry after scope fence rejects command precommit and rolls back effect",
+    "Parent rollback removes outbox; new repository replays durable same operation",
+    "UNKNOWN_EXTERNAL remains undeliverable despite adapter idempotency",
+    "Interrupted IN_FLIGHT lease becomes UNKNOWN once and retains duty hook"
+  ],
+  "limits": [
+    "Last two tests use mocked authority and responsibility ports; not currentauth integration PASS",
+    "Separate native worker + independent fixture effect + restart not run yet",
+    "Policy/actor invalidation sweep and safe retry full native acceptance pending",
+    "Source evolved after compiled snapshots; integrated retest required"
+  ],
+  "initialEnvironmentFailure": "First Maven attempt lacked npx in PATH; npm ci and /opt/homebrew/bin npx corrected it",
+  "productModelCalls": 0,
+  "fullV5V6V7": "NOT_RUN"
+}
