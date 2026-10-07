@@ -9,7 +9,7 @@ public final class GoalInput {
  private GoalInput(){}
  public static final Set<String> MODES=Set.of("CUMULATIVE_EVENT","STATE_AT","EXISTS_IN","THROUGHOUT");
  public static void validate(Map<String,Object> goal,boolean complete){
-  if(!Set.of("quantityMode","targetQuantity","unit","endpoint","scope","timezone","dueAt","evidencePolicyVersion","periodStart","periodEnd","eventKind","contributionScope","deduplication","evaluationAt","placeId","action","includeReserved","observationPolicy","conditions","evaluatorVersion","provenance").containsAll(goal.keySet()))throw DomainError.invalid("Unsupported goal slot");
+  if(!Set.of("quantityMode","targetQuantity","unit","endpoint","scope","timezone","dueAt","evidencePolicyVersion","periodStart","periodEnd","eventKind","contributionScope","deduplication","evaluationAt","placeId","action","includeReserved","observationPolicy","conditions","evaluatorVersion","provenance","defaultContext").containsAll(goal.keySet()))throw DomainError.invalid("Unsupported goal slot");
   if(goal.containsKey("quantityMode")&&!MODES.contains(goal.get("quantityMode")))throw DomainError.invalid("Unsupported quantity mode");
   if(goal.containsKey("targetQuantity")){var d=new DecimalValue(text(goal,"targetQuantity"),text(goal,"unit"));if(new java.math.BigDecimal(d.value()).signum()<0)throw DomainError.invalid("Negative goal target");}
   for(String key:List.of("dueAt","periodStart","periodEnd","evaluationAt"))if(goal.containsKey(key))try{Instant.parse(text(goal,key));}catch(DateTimeException e){throw DomainError.invalid("Invalid goal instant");}
