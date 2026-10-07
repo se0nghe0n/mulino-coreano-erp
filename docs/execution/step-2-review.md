@@ -61,6 +61,35 @@ root entrypoint와 별도 모델·coverage 도구의 미연결은 알려진 통�
 root 명령을 연결해야 한다. default UAT gate는 미승인 유료 호출을
 실행하지 않으며 실제 모델 품질을 주장하지 않는다.
 
+## 1차 수정 통합과 부분 closure
+
+아래 산출물을 Task branch에 통합했다. 각 worker의 checks는 수정한
+영역의 증거이며 전체 Step2 완료를 뜻하지 않는다.
+
+| 범위 | worker commit | Task commit | 확인한 checks |
+|---|---|---|---|
+| T10·T11 수락 | `f205e53` | `ca57ea0` | focused19 PASS, schema/feature PASS, RED31/31·skip0 |
+| 공통 host·timeout | `3a9de9f` | `d35967d` | targeted27, 당시 결합 harness329 PASS |
+| V8 DB WAIT | `6621904` | `fe4e13f` | focused25 PASS, RED12/12·skip0 |
+| C4·T17 실제 효과 | `3d459a1` | `d11177b` | 직접 JUnit7 PASS, mutant42 검출, schema PASS |
+| host 참조·만료·repair | `8fcb810` | `6140f53` | focused26 PASS, schema3 PASS, RED28/28·skip0 |
+| 모델 coverage | `66551fe` | `7c49687` | Python43, schema3 PASS, 실제 assembly NOT_RUN |
+
+`bbff6dd`에서 T26 자동 만료와 지연 commit guard를 독립적으로 검사할
+4개 필수 subcase를 registry에 추가했다. `7c49687`의 fresh preparation은
+41 case·789 subcase·20255 assertion이며 문제0으로 PREPARED다.
+[실행 증거](evidence/step2-integrated/prepare-after-runtime-fixes.json)를
+보존했다. 실제 runtime은 NOT_RUN이고 gateComplete=false다.
+
+Astra low는 같은 `7c49687`에서 A1/A3/A4/A5/A9/S1/S2/S6/S7과 T17
+회귀 범위의 부분 closure를 확인했다. 다만 A8의 sweep 시점에는
+OPEN 의무 수만 검사하고 current assignment·owner·supervisor·
+nextAction·nextCheck는 사용자 dispatch 이후 관찰에 남아 있었다.
+담당 없는 의무를 sweep가 만든 뒤 dispatch가 책임을 보완하는
+반례가 가능해 A8은 아직 열린 상태다. 담당 worker가 dispatch 전
+책임과 반복 sweep의 동일성 검사를 추가한다. Sol의 부분 closure와
+남은 승인·모델 binding 수정, 전체 결합 검사는 별도로 필요하다.
+
 ## 남은 gate
 
 실제 Sol high 수정 산출물을 Task branch에 통합하고 필수 subcase
