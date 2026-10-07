@@ -11,6 +11,15 @@ ALTER TABLE mulino_inventory_DispositionBases
  ADD commandId VARCHAR(36), ADD releasedAt TIMESTAMPTZ, ADD releaseDecisionId VARCHAR(36), ADD policyHash VARCHAR(64),
  ADD FOREIGN KEY(organizationId,segmentId) REFERENCES mulino_inventory_QuantitySegments(organizationId,ID),
  ADD CHECK(segmentId IS NULL OR (startQuantity IS NOT NULL AND quantity IS NOT NULL AND startQuantity>=0 AND quantity>0 AND unit IS NOT NULL AND commandId IS NOT NULL AND category IS NOT NULL AND workId IS NOT NULL AND policyHash IS NOT NULL AND validUntil IS NOT NULL AND validUntil>=validFrom));
+-- Legacy control-scope bases retain CONFIRMED; exact scoped decisions use ACTIVE.
+ALTER TABLE mulino_inventory_DispositionBases
+ DROP CONSTRAINT mulino_inventory_dispositionbases_state_check,
+ DROP CONSTRAINT mulino_inventory_dispositionbases_check,
+ ADD CONSTRAINT quality_basis_state CHECK((segmentId IS NULL AND state IN ('CONFIRMED','REVOKED')) OR (segmentId IS NOT NULL AND state IN ('ACTIVE','REVOKED'))),
+ ADD CONSTRAINT quality_basis_closed_interval CHECK((segmentId IS NULL AND validUntil>validFrom) OR (segmentId IS NOT NULL AND validUntil>=validFrom));
+ALTER TABLE mulino_inventory_Restrictions
+ DROP CONSTRAINT mulino_inventory_restrictions_check,
+ ADD CONSTRAINT quality_hold_closed_interval CHECK(validUntil IS NULL OR (segmentId IS NULL AND validUntil>validFrom) OR (segmentId IS NOT NULL AND validUntil>=validFrom));
 ALTER TABLE mulino_inventory_SegmentAllocations
  ADD startQuantity NUMERIC(38,12), ADD action VARCHAR(80), ADD customerId VARCHAR(36),
  ADD workId VARCHAR(36), ADD authorizationActorId VARCHAR(36), ADD nextValidityBoundary TIMESTAMPTZ,
