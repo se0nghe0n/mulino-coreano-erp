@@ -80,3 +80,12 @@ Native HTTP 인수는 계속 진행 중이다. 첫 실행의 PostgreSQL 임시
 수정했다. 세 번째 실행은 실제 createDraft 요청까지 도달했으나
 VERSION_UNSUPPORTED로 보류돼 fixture의 발행 정의/역량 버전을
 대조하고 있다. 실제 업무 흐름이 통과하기 전 S2는 ACTIVE다.
+
+## 통합 실행 closure
+
+`91fce58`의 실제 HTTP/JDBC 48개, harness424개와 변경 없는 backend
+235개가 통과했다. 원본 범위/의무 credit 결합과 Evidence gateway의
+실제 응답 검증·해소·종료까지 확인해 위 부분 review의 모든 지적을
+닫았다. [최종 manifest](../evidence/step3-s2/91fce58/summary.json)에
+source/JAR·실행·정리 근거를 보존했다. S2 core는 COMPLETE이며 전체
+사용자 Step3 review와 T/C/V/E 제품 전체 인수는 아직 아니다.

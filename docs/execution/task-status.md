@@ -182,7 +182,7 @@ runner와 전체 coverage assembler에 연결되지 않았다. Step2에서는
 |---|---|---|
 | S0 | 추적·stack spike·schema/auth/MCP 기준선 | COMPLETE |
 | S1 | core·정의·증거·신원·두 진입점 읽기 | COMPLETE |
-| S2 | 목표·책임·거래·승인·idem·감사·복구 | ACTIVE |
+| S2 | 목표·책임·거래·승인·idem·감사·복구 | COMPLETE (구현 core) |
 | S3 | 구매·운송·수입·수령·QC | NOT_RUN |
 | S4 | 판매·반품·회수·정산·E1 | NOT_RUN |
 | S5 | MCP·skills/client/model·정의 전환 | NOT_RUN |
@@ -306,3 +306,10 @@ S1은 COMPLETE이며 다음 공통 baseline을 로컬 tag `step3-s1-complete`로
 복구를 구현한다. 기존 read reference는 같은 거래의 권위 상태와
 결합하며 독립 shadow state로 유지하지 않는다. 사용자 Step3와
 전체 T/C/V/E·운영/model/BTP 인수는 계속 미완료다.
+
+## S2 core 완료
+
+`91fce58`에서 실제 HTTP/JDBC48·최종 harness424가 통과했다.
+backend는 `e249df7`의 235 PASS 이후 변경이 없고 최종 JAR hash가
+일치한다. [S2 실행 기록](step-3-s2.md)과 원본 증거 manifest를 따른다.
+전체 사용자 Step3는 ACTIVE이며 S3 구매·운송·수입·수령·QC를 시작한다.

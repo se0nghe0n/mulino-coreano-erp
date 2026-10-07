@@ -1,6 +1,6 @@
 # S2 목표·책임·거래·복구 통합 기록
 
-사용자 Step3와 시스템 S2는 ACTIVE다. S1은 실제 backend64·harness417
+사용자 Step3는 ACTIVE이며 시스템 S2의 구현된 core 통합 gate는 COMPLETE다. S1은 실제 backend64·harness417
 검사 및 새 DB의 HTTP/JDBC21 assertions로 완료했다. 첫 native fixture
 실패도 보존했으며 최종 수정은 backend 입력을 변경하지 않았다.
 
@@ -111,3 +111,31 @@ version/hash와 CONTEXT provenance를 보존한다. 근거 없는 기본값은
 현재 source 수정·영역별 검증·공개 HTTP 결합 상태와 실제 두 모델의
 6개 지적은 [부분 검토 기록](s2-review/partial-review.md)에서 추적한다.
 위 1차 점검의 숫자는 당시 중간 결과이며 현재 통합 PASS를 뜻하지 않는다.
+
+## 최종 통합 인수
+
+통합 source `91fce586598b97596850ddadd809344de134e5f5`에서 clean
+build와 새 PostgreSQL·별도 backend 프로세스의 HTTP/JDBC 실행이
+통과했다. 구현된 core 범위의 S2는 COMPLETE다. 전체 사용자 Step3와
+T/C/V/E의 전체 제품 gate를 완료했다는 뜻은 아니다.
+
+- Backend는 `e249df7`의 235개 PASS 이후 코드 변경이 없다.
+  최종 실행 JAR hash도 보존한 backend build와 일치한다.
+- 최종 harness는 424 PASS·실패/오류/skip0이다. preparation은
+  41 cases·789 subcases·20473 assertions·문제0의 PREPARED다.
+- Native HTTP/JDBC는 48 assertions PASS다. draft 재요청의 단일 효과,
+  변경 payload 충돌, 실제 90→100 누적 판정, 미해소 의무의 종료 거부,
+  원본 범위에 결합한 응답 검증·credit 소비·의무 해소와 FULFILLED 종료,
+  과거 90 판정 보존과 명사/동사 조회의 같은 상태를 확인했다.
+- HTTP 요청 구간 중첩은 관찰했으나 통제된 barrier 경합으로 주장하지
+  않는다. 실제 PostgreSQL 경합은 별도 235개 suite의 검사를 따른다.
+- source 변경 없음, 실행 JAR 복사 검증, backend 종료·생성 container와
+  임시 key/blob 정리 성공을 receipt에 남겼다.
+
+[최종 증거 manifest](evidence/step3-s2/91fce58/summary.json)는
+원본 HTTP/SQL artifact 37개와 각 sourceQuery·bound parameter·
+REPEATABLE READ snapshot, 실패 후 재실행 기록을 연결한다.
+두 모델의 부분 review 지적은 수정과 통합 실행으로 닫았다.
+사용자 Step3 전체 adversarial review는 S3–S6 구현 후 별도로 수행한다.
+수령/출고 도메인·전체 MCP/client/실모델·BTP와 전체 규범 사례는
+해당 후속 gate에서 인수하며 현재 NOT_RUN이다.
