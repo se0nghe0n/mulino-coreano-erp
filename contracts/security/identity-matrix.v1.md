@@ -38,8 +38,10 @@ NOT_RUN이다. fixture 조직이나 역할을 운영 기본값으로 사용하�
 2026-10-08 공식 자료를 확인했다. CAP 문서는 identity dependency와
 IAS/XSUAA binding이 함께 있어야 자동 보안을 켠다고 설명한다.
 `model-relaxed`의 공개 가능성과 custom chain precedence를 확인했다.
-완전한 override는 자동 authentication 설정을 끄고 명시 chain이 모든
-경로를 보호하며 CAP UserInfo에 동일 검증 주체를 연결해야 한다.
+완전한 override는 `cds.security.authentication.authConfig.enabled=false`로
+CAP chain을 끈다. `cds.security.mock.enabled=false`와
+`cds.security.mock.defaultUsers=false`로 mock 신원을 끈다. 명시 chain은
+모든 경로를 보호하며 CAP UserInfo에 동일 검증 주체를 연결해야 한다.
 Spring 문서는 signature/exp/nbf/issuer 검증과 별도 audience 검증을
 설명한다. 이 계약의 current grant/policy fence는 애플리케이션 책임이다.
 
