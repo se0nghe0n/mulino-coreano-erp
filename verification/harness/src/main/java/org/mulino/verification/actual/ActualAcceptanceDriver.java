@@ -60,7 +60,7 @@ public final class ActualAcceptanceDriver implements AcceptanceDriver, Independe
             var data=observer.capture(request);
             String ref="verification/harness/target/evidence/actual/"+run+"/"+UUID.randomUUID()+".json";
             ((ObjectNode)data.path("snapshot")).put("artifactRef",ref);
-            var sources=Json.object();for(JsonNode requested:request.path("sources")){String name=requested.asText();var evidence=Json.object();evidence.put("complete",true).put("rowPointer","/rawRows/"+name.replace("~","~0").replace("/","~1")).put("artifactRef",ref);evidence.set("sourceQuery",data.path("sourceQuery"));sources.set(name,evidence);}data.set("sourceEvidence",sources);
+            var sources=Json.object();for(JsonNode requested:request.path("sources")){String name=requested.asText();var evidence=Json.object();evidence.put("complete",true).put("rowPointer","/rawRows/"+name.replace("~","~0").replace("/","~1")).put("artifactRef",ref);evidence.set("sourceQuery",data.path("sourceEvidence").path(name).hasNonNull("sourceQuery")?data.path("sourceEvidence").path(name).path("sourceQuery"):data.path("sourceQuery"));sources.set(name,evidence);}data.set("sourceEvidence",sources);
             Json.write(root.resolve(ref),data);
             return new StepResult(id,StepResult.DriverStatus.EXECUTED,data,null,null,provenance(null,"POSTGRESQL_JDBC",true,data.path("sourceQuery"),data.path("snapshot")),List.of(ref));
         } catch(UnsupportedOperationException unsupported){return StepResult.missing(id,"NOT_IMPLEMENTED: "+unsupported.getMessage());}
