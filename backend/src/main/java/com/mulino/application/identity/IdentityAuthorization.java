@@ -42,37 +42,54 @@ public class IdentityAuthorization implements ReadAuthorizer {
   }
   /** Scope dimensions intersect; IDs within one dimension are alternatives. */
   public boolean permittedScopes(DomainContext context,String capability,Map<String,? extends Collection<String>> targets) {
-    return permittedScopes(context,capability,targets,new HashSet<>());
+    return permittedScopes(context,capability,targets,new HashSet<>(),new ArrayList<>());
   }
-  private boolean permittedScopes(DomainContext context,String capability,Map<String,? extends Collection<String>> targets,Set<String> visited) {
+  public List<Map<String,Object>> authorityEvidence(DomainContext context,String capability,Map<String,? extends Collection<String>> targets) {
+    var proof=new ArrayList<Map<String,Object>>();
+    if(!permittedScopes(context,capability,targets,new HashSet<>(),proof))throw denied();
+    return List.copyOf(proof);
+  }
+  private boolean permittedScopes(DomainContext context,String capability,Map<String,? extends Collection<String>> targets,Set<String> visited,List<Map<String,Object>> proof) {
     Instant now=clock.instant();
     String org=context.organizationId(),actor=context.actorId();
     if(!visited.add(actor)||visited.size()>32)return false;
-    if(!repository.rows("Memberships",org).stream().anyMatch(r -> actor.equals(r.get("actorId")) && active(r,now))) return false;
+    var membership=repository.rows("Memberships",org).stream().filter(r -> actor.equals(r.get("actorId")) && active(r,now)).findFirst().orElse(null);
+    if(membership==null)return false;
     var assigned=repository.rows("CapabilityAssignments",org).stream().filter(r -> actor.equals(r.get("actorId")) && capability.equals(r.get("capabilityId")) && active(r,now)).toList();
     var actions=repository.rows("GrantActions",org); var allScopes=repository.rows("GrantScopes",org);
     for(var grant:repository.rows("Grants",org)) {
       if(!actor.equals(grant.get("actorId")) || !active(grant,now)) continue;
       String id=(String)grant.get("ID");
+      var parentProof=new ArrayList<Map<String,Object>>();
       Object delegator=grant.get("delegatorId");
       if(delegator instanceof String d&&!d.equals(actor)) {
         var owner=repository.actor(org,d).orElse(null);if(owner==null)continue;
         var parent=new DomainContext(org,d,(String)owner.get("stableRequestOwner"),context.asOf(),context.knownAt());
-        if(!permittedScopes(parent,capability,targets,new HashSet<>(visited)))continue;
+        if(!permittedScopes(parent,capability,targets,new HashSet<>(visited),parentProof))continue;
       }
       if(actions.stream().noneMatch(r -> id.equals(r.get("grantId")) && capability.equals(r.get("capabilityId")))) continue;
       var scopes=allScopes.stream().filter(r -> id.equals(r.get("grantId"))).toList();
       if(scopes.isEmpty()) continue;
       for(var assignment:assigned) {
         if(targets==null) {
-          if(scopes.stream().anyMatch(scope -> overlaps(assignment,scope,org))) return true;
+          if(scopes.stream().anyMatch(scope -> overlaps(assignment,scope,org))){appendProof(proof,parentProof,actor,grant,assignment,membership);return true;}
         } else if(matchesTargets(assignment,targets,org)) {
           var dimensions=scopes.stream().filter(r -> !organizationScope(r,org)).map(r -> (String)r.get("scopeKind")).distinct().toList();
-          if(dimensions.stream().allMatch(d -> scopes.stream().filter(r -> d.equals(r.get("scopeKind"))).anyMatch(r -> matchesTargets(r,targets,org)))) return true;
+          if(dimensions.stream().allMatch(d -> scopes.stream().filter(r -> d.equals(r.get("scopeKind"))).anyMatch(r -> matchesTargets(r,targets,org)))){appendProof(proof,parentProof,actor,grant,assignment,membership);return true;}
         }
       }
     }
     return false;
+  }
+  private static void appendProof(List<Map<String,Object>> proof,List<Map<String,Object>> parent,String actor,Map<String,Object> grant,Map<String,Object> assignment,Map<String,Object> membership) {
+    var row=new LinkedHashMap<String,Object>();row.put("actorId",actor);
+    reference(row,"grant",grant);reference(row,"assignment",assignment);reference(row,"membership",membership);
+    if(grant.get("delegatorId")!=null)row.put("delegatorId",grant.get("delegatorId"));
+    proof.add(Map.copyOf(row));proof.addAll(parent);
+  }
+  private static void reference(Map<String,Object> output,String kind,Map<String,Object> source) {
+    if(source.get("ID")!=null)output.put(kind+"Id",source.get("ID"));
+    if(source.get("revision")!=null)output.put(kind+"Revision",source.get("revision"));
   }
   private static boolean matchesTargets(Map<String,Object> scope,Map<String,? extends Collection<String>> targets,String org) {
     if(organizationScope(scope,org)) return true;

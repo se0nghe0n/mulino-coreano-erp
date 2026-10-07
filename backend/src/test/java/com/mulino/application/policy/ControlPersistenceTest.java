@@ -64,13 +64,16 @@ class ControlPersistenceTest {
    assertEquals(1,policy.current(org,"COMMAND",now).size());assertTrue(policy.current(org,"COMMAND",now.plusSeconds(61)).isEmpty());
  });}
 
- @Test void selfRevocationCommitsThroughActualGateway(){
+ @Test void selfRevocationCommitsThroughActualGateway() throws Exception {
    var result=execute("revokeGrant",Map.of("id",grant),1);assertEquals("APPLIED",result.get("outcome"));
    assertEquals(2,jdbc.queryForObject("SELECT revision FROM mulino_identity_Grants WHERE organizationId=? AND ID=?",Integer.class,org,grant));
    tx(()->assertFalse(auth.permittedScopes(ctx,"reserveQuantity",preparation().scopes())));
    assertEquals(1,jdbc.queryForObject("SELECT count(*) FROM mulino_commands_CommandAudits WHERE organizationId=?",Integer.class,org));
+   var facts=new com.fasterxml.jackson.databind.ObjectMapper().readValue(jdbc.queryForObject("SELECT auditFactsJson FROM mulino_commands_CommandAudits WHERE organizationId=?",String.class,org),Map.class);
+   assertEquals(pid,facts.get("policyVersionId"));var chain=(List<Map<String,Object>>)facts.get("authorityChain");assertEquals(grant,chain.getFirst().get("grantId"));assertEquals(1,((Number)chain.getFirst().get("grantRevision")).intValue());
+
  }
- @Test void tighteningPolicyActivationCommitsThroughActualGateway(){
+ @Test void tighteningPolicyActivationCommitsThroughActualGateway() throws Exception {
    String content="{\"rules\":{}}";
    var create=execute("createPolicyDraft",IdentityCommands.fields("kind","COMMAND","version","tight-v2","content",content,"source","synthetic-local-only","regressionEvidence","fixture-regression","effectiveFrom",now.minusSeconds(1).toString(),"effectiveUntil",now.plusSeconds(30).toString(),"fixtureOnly",true,"legallyRestrictive",true),null);
    assertEquals("APPLIED",create.get("outcome"));String draft=(String)create.get("id");
@@ -78,6 +81,9 @@ class ControlPersistenceTest {
    assertEquals("APPLIED",execute("activatePolicy",Map.of("id",draft),2).get("outcome"));
    assertEquals(draft,jdbc.queryForObject("SELECT policyId FROM mulino_governance_ActivePolicies WHERE organizationId=? AND kind='COMMAND'",String.class,org));
    tx(()->assertThrows(DomainError.class,()->guard.verify(ctx,"reserveQuantity","hash",preparation(),Map.of())));
+   var facts=new com.fasterxml.jackson.databind.ObjectMapper().readValue(jdbc.queryForObject("SELECT auditFactsJson FROM mulino_commands_CommandAudits WHERE organizationId=? AND capabilityId='activatePolicy'",String.class,org),Map.class);
+   assertEquals(pid,facts.get("policyVersionId"));assertNotEquals(draft,facts.get("policyVersionId"));
+
  }
  Map<String,Object> execute(String capability,Map<String,Object> slots,Integer revision){
    var intent=new LinkedHashMap<String,Object>(Map.of("intentKind","COMMAND","definitionVersion","1.0.0","capabilityId",capability,"subjectRefs",List.of(),"slots",slots,"provenance",Map.of(),"commandIdempotencyKey",id()));if(revision!=null)intent.put("expectedRevision",revision);

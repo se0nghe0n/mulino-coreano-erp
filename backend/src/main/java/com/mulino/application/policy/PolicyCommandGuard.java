@@ -10,6 +10,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class PolicyCommandGuard implements CommandGuard {
  private final Object proofResource=new Object();
+ private final Object auditResource=new Object();
  private final IdentityAuthorization auth;private final IdentityRepository identity;private final PolicyRepository policy;private final ApprovalRepository approvals;
  public PolicyCommandGuard(IdentityAuthorization auth,IdentityRepository identity,PolicyRepository policy,ApprovalRepository approvals){this.auth=auth;this.identity=identity;this.policy=policy;this.approvals=approvals;}
  public void fence(DomainContext c,CommandPreparation p){policy.fence(c.organizationId());auth.fence(c,p.authorityActors());}
@@ -19,7 +20,7 @@ public class PolicyCommandGuard implements CommandGuard {
    if(!p.effectClass().equals(rule.get("effectClass")))throw held("Effect class is unresolved");
    String action=(String)rule.get("approvalAction");
    if(!Objects.equals(action,p.approvalAction()))throw held("Approval policy mismatch");
-   if(action==null){remember(c,capability,hash,p,List.of());return;}
+   if(action==null){remember(c,capability,hash,p,List.of());rememberFacts(c,capability,hash,p,selection,null,null);return;}
    var a=approval(c,intent);String approver=(String)a.get("approverId");auth.fence(c,List.of(approver));
    String decision=(String)rule.get("decisionCapability");if(decision==null)throw held("Decision capability is unresolved");
    var actor=identity.actor(c.organizationId(),approver).orElseThrow(DomainError::forbidden);if(!"HUMAN".equals(actor.get("kind")))throw DomainError.forbidden();
@@ -28,6 +29,7 @@ public class PolicyCommandGuard implements CommandGuard {
    Instant now=auth.now();
    if(!"APPROVED".equals(a.get("decision"))||!action.equals(a.get("action"))||!hash.equals(a.get("canonicalHash"))||!scopeHash(p.scopes()).equals(a.get("scopeHash"))||!Objects.equals(p.proposalId(),a.get("proposalId"))||p.proposalRevision()!=number(a.get("proposalRevision"))||!Objects.equals(p.targetId(),a.get("targetId"))||!Objects.equals(p.currentRevision(),a.get("targetRevision"))||!selection.policyHash().equals(a.get("policyHash"))||now.isBefore(instant(a.get("decidedAt")))||!now.isBefore(instant(a.get("expiresAt")))||(Boolean.TRUE.equals(a.get("singleUse"))&&approvals.consumed(c,(String)a.get("ID"))))throw DomainError.forbidden();
    remember(c,capability,hash,p,List.of(approver));
+   rememberFacts(c,capability,hash,p,selection,a,ac);
    var proofs=(Map<String,Instant>)org.springframework.transaction.support.TransactionSynchronizationManager.getResource(proofResource);
    proofs.merge(proofKey(c,capability,hash),instant(a.get("expiresAt")),(x,y)->x.isBefore(y)?x:y);
  }
@@ -57,19 +59,52 @@ public class PolicyCommandGuard implements CommandGuard {
  public void consume(DomainContext c,CommandPreparation p,Map<String,Object> i,String commandId){if(p.approvalAction()!=null){var a=approval(c,i);if(Boolean.TRUE.equals(a.get("singleUse")))approvals.consume(c,(String)a.get("ID"),commandId,auth.now());}}
  public Selection rule(DomainContext c,String capability){
    var current=policy.current(c.organizationId(),"COMMAND",auth.now());if(current.size()!=1)throw held("Current policy is unresolved");var selected=current.getFirst();
-   try{var document=new ObjectMapper().readValue((String)selected.get("content"),Map.class);var rules=(Map<?,?>)document.get("rules");Object found=rules==null?null:rules.get(capability);if(!(found instanceof Map<?,?> rule))throw held("Action policy is unresolved");return new Selection((Map<String,Object>)rule,(String)selected.get("contentHash"));}catch(DomainError e){throw e;}catch(Exception e){throw held("Current policy is invalid");}
+   try{var document=new ObjectMapper().readValue((String)selected.get("content"),Map.class);var rules=(Map<?,?>)document.get("rules");Object found=rules==null?null:rules.get(capability);if(!(found instanceof Map<?,?> rule))throw held("Action policy is unresolved");return new Selection((Map<String,Object>)rule,(String)selected.get("contentHash"),(String)selected.get("ID"),(String)selected.get("version"));}catch(DomainError e){throw e;}catch(Exception e){throw held("Current policy is invalid");}
  }
- public record Selection(Map<String,Object> rule,String policyHash){}
- private boolean everyScope(DomainContext c,String capability,Map<String,List<String>> scopes){
-   if(scopes.isEmpty())return auth.permittedScopes(c,capability,null);
+ public record Selection(Map<String,Object> rule,String policyHash,String policyVersionId,String policyVersion){}
+ public Map<String,Object> auditFacts(DomainContext c,String capability,CommandPreparation p,Map<String,Object> intent){
+   var facts=(Map<String,Map<String,Object>>)org.springframework.transaction.support.TransactionSynchronizationManager.getResource(auditResource);
+   var selected=facts==null?null:facts.get(proofKey(c,capability,CommandRequests.hash(intent)));
+   if(selected==null)throw DomainError.forbidden();
+   return selected;
+ }
+ private void rememberFacts(DomainContext c,String capability,String hash,CommandPreparation p,Selection selection,Map<String,Object> approval,DomainContext approver){
+   var stored=(Map<String,Map<String,Object>>)org.springframework.transaction.support.TransactionSynchronizationManager.getResource(auditResource);
+   if(stored==null){stored=new HashMap<>();org.springframework.transaction.support.TransactionSynchronizationManager.bindResource(auditResource,stored);
+     org.springframework.transaction.support.TransactionSynchronizationManager.registerSynchronization(new org.springframework.transaction.support.TransactionSynchronization(){public void afterCompletion(int status){org.springframework.transaction.support.TransactionSynchronizationManager.unbindResourceIfPossible(auditResource);}});
+   }
+   String key=proofKey(c,capability,hash);if(stored.containsKey(key))return;
+   var facts=new LinkedHashMap<String,Object>();facts.put("policyVersionId",selection.policyVersionId());facts.put("policyVersion",selection.policyVersion());facts.put("policyHash",selection.policyHash());
+   facts.put("authorityChain",authorityChain(c,capability,p.scopes()));
+   if(approval!=null){
+     for(String field:List.of("ID","canonicalHash","scopeHash","proposalId","proposalRevision","decisionCapability","approverId","policyHash")){
+       String label=switch(field){case "ID"->"approvalId";case "canonicalHash"->"approvalCanonicalHash";case "scopeHash"->"approvalScopeHash";case "proposalId"->"approvalProposalId";case "proposalRevision"->"approvalProposalRevision";case "policyHash"->"approvalPolicyHash";default->field;};
+       if(approval.get(field)!=null)facts.put(label,approval.get(field));
+     }
+     facts.put("decisionAuthorityChain",authorityChain(approver,(String)approval.get("decisionCapability"),p.scopes()));
+   }
+   stored.put(key,Map.copyOf(facts));
+ }
+ private List<Map<String,Object>> authorityChain(DomainContext c,String capability,Map<String,List<String>> scopes){
+   var evidence=new LinkedHashSet<Map<String,Object>>();
+   if(scopes.isEmpty())evidence.addAll(auth.authorityEvidence(c,capability,null));
+   else for(var candidate:scopeCombinations(scopes))evidence.addAll(auth.authorityEvidence(c,capability,candidate));
+   return List.copyOf(evidence);
+ }
+ private List<Map<String,List<String>>> scopeCombinations(Map<String,List<String>> scopes){
    List<Map<String,List<String>>> combinations=new ArrayList<>();combinations.add(Map.of());
    for(var dimension:new TreeMap<>(scopes).entrySet()){
-     if(dimension.getValue().isEmpty()||(long)combinations.size()*dimension.getValue().size()>256)return false;
+     if(dimension.getValue().isEmpty()||(long)combinations.size()*dimension.getValue().size()>256)throw DomainError.forbidden();
      var expanded=new ArrayList<Map<String,List<String>>>();
      for(var candidate:combinations)for(String id:dimension.getValue()){var copy=new HashMap<>(candidate);copy.put(dimension.getKey(),List.of(id));expanded.add(copy);}combinations=expanded;
    }
-   return combinations.stream().allMatch(candidate->auth.permittedScopes(c,capability,candidate));
+   return combinations;
  }
+ private boolean everyScope(DomainContext c,String capability,Map<String,List<String>> scopes){
+   if(scopes.isEmpty())return auth.permittedScopes(c,capability,null);
+   return scopeCombinations(scopes).stream().allMatch(candidate->auth.permittedScopes(c,capability,candidate));
+ }
+
 
  private Map<String,Object> approval(DomainContext c,Map<String,Object> i){Object id=i.get("approvalId");if(id==null)id=IdentityCommands.payload(i).get("approvalId");if(!(id instanceof String s))throw DomainError.forbidden();return approvals.find(c,s).orElseThrow(DomainError::forbidden);}
  public static String scopeHash(Map<String,? extends Collection<String>> scopes){return CommandRequests.hash(Map.of("scope",scopes));}

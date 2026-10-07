@@ -74,3 +74,14 @@ transaction의 fence를 유지하며 원 membership/grant/assignment/정책/
 정책 강화 때문에 원 명령을 rollback하지 않는다. 일반 업무 command는
 post-effect 현재 인가를 다시 확인한다. payload의 effect class로 이 경로를
 선택하지 않는다.
+
+감사 연결 후속 변경은 실행 전 실제 COMMAND policy ID/version/hash와
+검증한 approval ID/hash·scope hash·proposal revision·decision capability·
+approver를 transaction-local proof에 보존한다. membership/assignment/
+grant ID·revision과 delegator chain은 같은 현재 scope 인가 평가에서
+선택한 행을 사용한다. 정책 활성화와 자기 철회 후에도 이 원 근거를
+감사에 남긴다. replay는 새 결정이나 효과를 만들지 않는다.
+
+`AuthorityEvidenceTest`와 기존 gateway test의 감사 assertion은 이 후속
+변경에서 추가했다. Maven slot을 사용하지 않았으며 새 assertion의
+실행 상태는 `NOT_RUN`이다. root의 전체 native 회귀에서 확인한다.

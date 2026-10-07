@@ -1,13 +1,40 @@
 {
-  "status":"PASS",
-  "scope":"S2 control partial contracts only",
-  "command":"JAVA_HOME=Java21 JWT_PUBLIC_KEY=<ephemeral public.pem> ./mvnw -B -ntp -f backend/pom.xml -Dtest=IdentityAuthorizationTest,ControlPersistenceTest test",
-  "java":"21.0.5",
-  "node":"26.10.0",
-  "postgresImage":"postgres@sha256:4ef4dbc939d61acea57712655ddb4b4ab27419c913f94cca0cd57cb3ea3c2280",
-  "tests":11,"failures":0,"errors":0,"skipped":0,"exitCode":0,
-  "classes":{"IdentityAuthorizationTest":6,"ControlPersistenceTest":5},
-  "observed":["immutable policy and cross-org active pointer rejected","current grant/effect-class intersection","expiry uses server clock rather than query asOf","parallel revocation waits for effect fence and later command denied","actual gateway self-revoke committed with audit","actual gateway tighter COMMAND policy activation committed and subsequent action held"],
-  "limitations":["Shared srv imports for unintegrated work/responsibility/evaluation/runtime temporarily omitted during focused build and restored afterward","Full combined adapters/domain gate not run here","Full C3/V4/V7, actual operating identity/R5, regulatory acceptance, model calls and BTP NOT_RUN"],
-  "note":"Initial bootstrap/compiler/JDBC fixture failures fixed before passing targeted run. Followup approval-proof expiry bound added after run; requires combined regression."
+  "status": "PASS",
+  "scope": "S2 control partial contracts only",
+  "command": "JAVA_HOME=Java21 JWT_PUBLIC_KEY=<ephemeral public.pem> ./mvnw -B -ntp -f backend/pom.xml -Dtest=IdentityAuthorizationTest,ControlPersistenceTest test",
+  "java": "21.0.5",
+  "node": "26.10.0",
+  "postgresImage": "postgres@sha256:4ef4dbc939d61acea57712655ddb4b4ab27419c913f94cca0cd57cb3ea3c2280",
+  "tests": 11,
+  "failures": 0,
+  "errors": 0,
+  "skipped": 0,
+  "exitCode": 0,
+  "classes": {
+    "IdentityAuthorizationTest": 6,
+    "ControlPersistenceTest": 5
+  },
+  "observed": [
+    "immutable policy and cross-org active pointer rejected",
+    "current grant/effect-class intersection",
+    "expiry uses server clock rather than query asOf",
+    "parallel revocation waits for effect fence and later command denied",
+    "actual gateway self-revoke committed with audit",
+    "actual gateway tighter COMMAND policy activation committed and subsequent action held"
+  ],
+  "limitations": [
+    "Shared srv imports for unintegrated work/responsibility/evaluation/runtime temporarily omitted during focused build and restored afterward",
+    "Full combined adapters/domain gate not run here",
+    "Full C3/V4/V7, actual operating identity/R5, regulatory acceptance, model calls and BTP NOT_RUN"
+  ],
+  "note": "Initial bootstrap/compiler/JDBC fixture failures fixed before passing targeted run. Followup approval-proof expiry bound added after run; requires combined regression.",
+  "followupAudit": {
+    "status": "NOT_RUN",
+    "assertions": [
+      "same authorization evaluator returns selected grant/assignment/membership revision and parent delegator chain",
+      "self-revoke audit retains original grant revision and policy ID",
+      "tightened policy activation audit retains prior selected policy ID"
+    ],
+    "reason": "Root owns active Maven slots; combined native regression pending"
+  }
 }
