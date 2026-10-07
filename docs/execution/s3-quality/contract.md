@@ -92,3 +92,7 @@ segment 대조가 전량만 허용해 부분30 검증을 만들 수 없는 결�
 호출할 port다. 저장된 조회시점을 실행 권한으로 사용하지 않고 server
 clock과 같은 scope·policy·identity fence에서 실제 배분 좌표를 다시
 검증한다. 늦은 sweep 전에 만료20의 실행을 이 guard가 거부한다.
+
+hold/revoke의 QUALITY_REVIEW root와 leaf 및 assignment에는 실제 제한
+수량·단위를 전달하고 residual scope에 startQuantity와 행동·category를
+담는다. 수량 없는 일반 의무의 기본1로 보류20을 표시하지 않는다.
