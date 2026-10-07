@@ -140,3 +140,21 @@ ALTER TABLE mulino_trade_shipment_LegEvents ADD FOREIGN KEY(organizationId,place
 ALTER TABLE mulino_trade_shipment_CustodyHandovers ADD FOREIGN KEY(organizationId,placeId) REFERENCES mulino_inventory_Places(organizationId,ID);
 ALTER TABLE mulino_trade_shipment_CustodyHandovers ADD FOREIGN KEY(organizationId,fromCustodianId) REFERENCES mulino_identity_Actors(organizationId,ID);
 ALTER TABLE mulino_trade_shipment_CustodyHandovers ADD FOREIGN KEY(organizationId,toCustodianId) REFERENCES mulino_identity_Actors(organizationId,ID);
+CREATE TABLE mulino_trade_shipment_DepartureAllocations (
+ organizationId varchar(36) NOT NULL,ID varchar(36) NOT NULL,
+ revision integer NOT NULL,createdAt timestamptz NOT NULL,
+ recordedAt timestamptz NOT NULL,recordedBy varchar(36) NOT NULL,
+ shipmentId varchar(36) NOT NULL,cargoId varchar(36) NOT NULL,
+ observationId varchar(36) NOT NULL,physicalScopeId varchar(36) NOT NULL,
+ poLineId varchar(36) NOT NULL,quantity numeric(38,12) NOT NULL CHECK(quantity>0),
+ unit varchar(40) NOT NULL,PRIMARY KEY(organizationId,ID),
+ UNIQUE(organizationId,observationId,poLineId),
+ UNIQUE(organizationId,cargoId,physicalScopeId,poLineId),
+ FOREIGN KEY(organizationId,recordedBy) REFERENCES mulino_identity_Actors(organizationId,ID),
+ FOREIGN KEY(organizationId,shipmentId) REFERENCES mulino_trade_shipment_Shipments(organizationId,ID),
+ FOREIGN KEY(organizationId,cargoId) REFERENCES mulino_trade_shipment_ShipmentCargo(organizationId,ID),
+ FOREIGN KEY(organizationId,observationId) REFERENCES mulino_trade_shipment_LegEvents(organizationId,ID),
+ FOREIGN KEY(organizationId,poLineId) REFERENCES mulino_trade_purchase_OrderLines(organizationId,ID)
+);
+CREATE TRIGGER shipment_departureallocations_immutable BEFORE UPDATE OR DELETE ON
+ mulino_trade_shipment_DepartureAllocations FOR EACH ROW EXECUTE FUNCTION mulino_evidence_reject_mutation();

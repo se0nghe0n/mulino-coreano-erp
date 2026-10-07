@@ -92,3 +92,18 @@ entity CustodyHandovers {
  occurredAt : Timestamp;
  detailStatus : String(40);
 }
+entity DepartureAllocations {
+ key organizationId : UUID;
+ key ID : UUID;
+ revision : Integer;
+ createdAt : Timestamp;
+ recordedAt : Timestamp;
+ recordedBy : UUID;
+ shipmentId : UUID;
+ cargoId : UUID;
+ observationId : UUID;
+ physicalScopeId : UUID;
+ poLineId : UUID;
+ quantity : Decimal(38,12);
+ unit : String(40);
+}

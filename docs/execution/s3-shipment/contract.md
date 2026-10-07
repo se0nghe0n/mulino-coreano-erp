@@ -40,3 +40,12 @@ verifiedObservations(context,cargoId)는 receipt가 actual physicalScopeId를
 읽도록 제공하며 getShipment 권한을 다시 검사한다.
 
 실제 supplier/carrier 전송, paid model과 BTP 실행은 NOT_RUN이다.
+
+후속 대조는 원문과 event payload의 `shipmentEventId` UUID를 요구한다.
+같은 실제 사건의 복수 보고는 같은 UUID이며 다음 관측은 새 UUID다.
+V21의 semantic fingerprint는 같은 UUID의 다른 cargo/수량/시점을 상충으로
+보존한다. source key와 물리 좌표만으로 같은 사건을 추정하지 않는다.
+
+`DepartureAllocations`는 실제 최초 출하의 PO 귀속을 immutable하게 남긴다.
+부분 출하를 여러 번 기록해도 각 PO line의 cargo 계획을 넘지 않고,
+뒤 구간의 같은 물리 범위는 최초 귀속을 변경하거나 다시 기여하지 않는다.
