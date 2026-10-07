@@ -1,0 +1,1166 @@
+{
+  "tickScheduler": {
+    "actionId": "SELFTEST-tickScheduler",
+    "driverStatus": "EXECUTED",
+    "data": {
+      "hostObservation": {
+        "schemaVersion": "1.0.0",
+        "evidenceClass": "CAPTURED_SELFTEST",
+        "operation": "tickScheduler",
+        "requestedInputs": {},
+        "scope": {
+          "workspace": "host-selftest"
+        },
+        "scopeComplete": true,
+        "command": {
+          "argv": [
+            "CAPTURED_CONTRACT_SELFTEST_ONLY",
+            "tickScheduler"
+          ],
+          "exitCode": 0,
+          "startedAt": "2026-10-07T00:00:00Z",
+          "completedAt": "2026-10-07T00:00:03Z",
+          "transcriptRef": "verification/harness/src/test/resources/host-observation/transcript.txt",
+          "redacted": true
+        },
+        "toolVersions": [
+          {
+            "name": "CAPTURED_SELFTEST_ONLY",
+            "version": "1.0.0"
+          }
+        ],
+        "environment": {
+          "profile": "LOCAL",
+          "hostId": "synthetic-host",
+          "workspaceId": "host-selftest",
+          "isolated": true
+        },
+        "inputArtifacts": [],
+        "generatedOutputs": [],
+        "observedArtifacts": [],
+        "extractor": {
+          "name": "SELFTEST-fixed-shape",
+          "version": "1.0.0",
+          "source": "FILESYSTEM_READ_ONLY",
+          "independent": true,
+          "readOnly": true,
+          "command": {
+            "argv": [
+              "CAPTURED_CONTRACT_SELFTEST_ONLY",
+              "tickScheduler"
+            ],
+            "exitCode": 0,
+            "startedAt": "2026-10-07T00:00:00Z",
+            "completedAt": "2026-10-07T00:00:03Z",
+            "transcriptRef": "verification/harness/src/test/resources/host-observation/transcript.txt",
+            "redacted": true
+          },
+          "inputArtifacts": [
+            {
+              "path": "verification/cases/T26/selftest/host-shaped-results.json",
+              "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+              "sizeBytes": 1,
+              "scope": {
+                "workspace": "host-selftest"
+              },
+              "completeness": "COMPLETE"
+            }
+          ],
+          "rawRows": {
+            "evidenceClass": "CAPTURED_SELFTEST",
+            "operationEvidence": {
+              "schedulerId": "synthetic-schedulerId",
+              "tickId": "synthetic-tickId",
+              "submissionStatus": "SUBMITTED",
+              "taskId": "SELFTEST-task",
+              "invocationHandle": "SELFTEST-handle",
+              "submittedAt": "2026-10-07T00:00:02Z"
+            },
+            "scope": {
+              "workspace": "host-selftest"
+            },
+            "operation": "tickScheduler",
+            "driverProvenance": {
+              "adapter": "captured-contract-selftest",
+              "adapterVersion": "1.0.0",
+              "buildVersion": "SELFTEST",
+              "authenticatedActor": null,
+              "source": "CANNED_CONTRACT_SELFTEST",
+              "independent": false,
+              "scopeComplete": true,
+              "sourceQuery": null,
+              "snapshot": null
+            },
+            "command": {
+              "argv": [
+                "CAPTURED_CONTRACT_SELFTEST_ONLY",
+                "tickScheduler"
+              ],
+              "exitCode": 0,
+              "startedAt": "2026-10-07T00:00:00Z",
+              "completedAt": "2026-10-07T00:00:03Z",
+              "transcriptRef": "verification/harness/src/test/resources/host-observation/transcript.txt",
+              "redacted": true
+            },
+            "environment": {
+              "profile": "LOCAL",
+              "hostId": "synthetic-host",
+              "workspaceId": "host-selftest",
+              "isolated": true
+            },
+            "claims": [
+              {
+                "id": "SELFTEST-claim",
+                "barrierId": "SELFTEST-barrier",
+                "workerId": "SELFTEST-worker",
+                "transactionId": "SELFTEST-transaction",
+                "claimedAt": "2026-10-07T09:00:00Z",
+                "expiresAt": "2026-10-07T09:00:05Z"
+              }
+            ],
+            "backupParts": [
+              {
+                "kind": "DB"
+              },
+              {
+                "kind": "BLOB"
+              },
+              {
+                "kind": "DEFINITION"
+              },
+              {
+                "kind": "CAPABILITY"
+              },
+              {
+                "kind": "EVALUATOR"
+              },
+              {
+                "kind": "SKILLS"
+              },
+              {
+                "kind": "CONFIG"
+              },
+              {
+                "kind": "DEPLOYMENT"
+              }
+            ],
+            "configEntries": [
+              {
+                "key": "SELFTEST-config"
+              }
+            ],
+            "restoreResult": {
+              "status": "COMPLETE"
+            },
+            "missingParts": [],
+            "evidenceBlobs": [
+              {
+                "evidenceId": "SELFTEST-doc",
+                "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+              }
+            ],
+            "secretRecovery": {
+              "channel": "SECRET_MANAGER"
+            }
+          },
+          "rawRowsArtifactRef": "verification/cases/T26/selftest/host-shaped-results.json"
+        },
+        "operationEvidence": {
+          "schedulerId": "synthetic-schedulerId",
+          "tickId": "synthetic-tickId",
+          "submissionStatus": "SUBMITTED",
+          "taskId": "SELFTEST-task",
+          "invocationHandle": "SELFTEST-handle",
+          "submittedAt": "2026-10-07T00:00:02Z"
+        }
+      }
+    },
+    "response": null,
+    "reason": "Fixed schema-shaped SELFTEST only; does not execute a product or host process",
+    "provenance": {
+      "adapter": "captured-contract-selftest",
+      "adapterVersion": "1.0.0",
+      "buildVersion": "SELFTEST",
+      "authenticatedActor": null,
+      "source": "CANNED_CONTRACT_SELFTEST",
+      "independent": false,
+      "scopeComplete": true,
+      "sourceQuery": null,
+      "snapshot": null
+    },
+    "artifactRefs": [
+      "verification/cases/T26/selftest/host-shaped-results.json"
+    ]
+  },
+  "sweepDue": {
+    "actionId": "SELFTEST-sweepDue",
+    "driverStatus": "EXECUTED",
+    "data": {
+      "hostObservation": {
+        "schemaVersion": "1.0.0",
+        "evidenceClass": "CAPTURED_SELFTEST",
+        "operation": "sweepDue",
+        "requestedInputs": {},
+        "scope": {
+          "workspace": "host-selftest"
+        },
+        "scopeComplete": true,
+        "command": {
+          "argv": [
+            "CAPTURED_CONTRACT_SELFTEST_ONLY",
+            "sweepDue"
+          ],
+          "exitCode": 0,
+          "startedAt": "2026-10-07T00:00:00Z",
+          "completedAt": "2026-10-07T00:00:03Z",
+          "transcriptRef": "verification/harness/src/test/resources/host-observation/transcript.txt",
+          "redacted": true
+        },
+        "toolVersions": [
+          {
+            "name": "CAPTURED_SELFTEST_ONLY",
+            "version": "1.0.0"
+          }
+        ],
+        "environment": {
+          "profile": "LOCAL",
+          "hostId": "synthetic-host",
+          "workspaceId": "host-selftest",
+          "isolated": true
+        },
+        "inputArtifacts": [],
+        "generatedOutputs": [],
+        "observedArtifacts": [],
+        "extractor": {
+          "name": "SELFTEST-fixed-shape",
+          "version": "1.0.0",
+          "source": "FILESYSTEM_READ_ONLY",
+          "independent": true,
+          "readOnly": true,
+          "command": {
+            "argv": [
+              "CAPTURED_CONTRACT_SELFTEST_ONLY",
+              "sweepDue"
+            ],
+            "exitCode": 0,
+            "startedAt": "2026-10-07T00:00:00Z",
+            "completedAt": "2026-10-07T00:00:03Z",
+            "transcriptRef": "verification/harness/src/test/resources/host-observation/transcript.txt",
+            "redacted": true
+          },
+          "inputArtifacts": [
+            {
+              "path": "verification/cases/T26/selftest/host-shaped-results.json",
+              "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+              "sizeBytes": 1,
+              "scope": {
+                "workspace": "host-selftest"
+              },
+              "completeness": "COMPLETE"
+            }
+          ],
+          "rawRows": {
+            "evidenceClass": "CAPTURED_SELFTEST",
+            "operationEvidence": {
+              "schedulerId": "synthetic-schedulerId",
+              "sweepId": "synthetic-sweepId",
+              "submissionStatus": "SUBMITTED",
+              "taskId": "SELFTEST-task",
+              "invocationHandle": "SELFTEST-handle",
+              "submittedAt": "2026-10-07T00:00:02Z"
+            },
+            "scope": {
+              "workspace": "host-selftest"
+            },
+            "operation": "sweepDue",
+            "driverProvenance": {
+              "adapter": "captured-contract-selftest",
+              "adapterVersion": "1.0.0",
+              "buildVersion": "SELFTEST",
+              "authenticatedActor": null,
+              "source": "CANNED_CONTRACT_SELFTEST",
+              "independent": false,
+              "scopeComplete": true,
+              "sourceQuery": null,
+              "snapshot": null
+            },
+            "command": {
+              "argv": [
+                "CAPTURED_CONTRACT_SELFTEST_ONLY",
+                "sweepDue"
+              ],
+              "exitCode": 0,
+              "startedAt": "2026-10-07T00:00:00Z",
+              "completedAt": "2026-10-07T00:00:03Z",
+              "transcriptRef": "verification/harness/src/test/resources/host-observation/transcript.txt",
+              "redacted": true
+            },
+            "environment": {
+              "profile": "LOCAL",
+              "hostId": "synthetic-host",
+              "workspaceId": "host-selftest",
+              "isolated": true
+            },
+            "claims": [
+              {
+                "id": "SELFTEST-claim",
+                "barrierId": "SELFTEST-barrier",
+                "workerId": "SELFTEST-worker",
+                "transactionId": "SELFTEST-transaction",
+                "claimedAt": "2026-10-07T09:00:00Z",
+                "expiresAt": "2026-10-07T09:00:05Z"
+              }
+            ],
+            "backupParts": [
+              {
+                "kind": "DB"
+              },
+              {
+                "kind": "BLOB"
+              },
+              {
+                "kind": "DEFINITION"
+              },
+              {
+                "kind": "CAPABILITY"
+              },
+              {
+                "kind": "EVALUATOR"
+              },
+              {
+                "kind": "SKILLS"
+              },
+              {
+                "kind": "CONFIG"
+              },
+              {
+                "kind": "DEPLOYMENT"
+              }
+            ],
+            "configEntries": [
+              {
+                "key": "SELFTEST-config"
+              }
+            ],
+            "restoreResult": {
+              "status": "COMPLETE"
+            },
+            "missingParts": [],
+            "evidenceBlobs": [
+              {
+                "evidenceId": "SELFTEST-doc",
+                "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+              }
+            ],
+            "secretRecovery": {
+              "channel": "SECRET_MANAGER"
+            }
+          },
+          "rawRowsArtifactRef": "verification/cases/T26/selftest/host-shaped-results.json"
+        },
+        "operationEvidence": {
+          "schedulerId": "synthetic-schedulerId",
+          "sweepId": "synthetic-sweepId",
+          "submissionStatus": "SUBMITTED",
+          "taskId": "SELFTEST-task",
+          "invocationHandle": "SELFTEST-handle",
+          "submittedAt": "2026-10-07T00:00:02Z"
+        }
+      }
+    },
+    "response": null,
+    "reason": "Fixed schema-shaped SELFTEST only; does not execute a product or host process",
+    "provenance": {
+      "adapter": "captured-contract-selftest",
+      "adapterVersion": "1.0.0",
+      "buildVersion": "SELFTEST",
+      "authenticatedActor": null,
+      "source": "CANNED_CONTRACT_SELFTEST",
+      "independent": false,
+      "scopeComplete": true,
+      "sourceQuery": null,
+      "snapshot": null
+    },
+    "artifactRefs": [
+      "verification/cases/T26/selftest/host-shaped-results.json"
+    ]
+  },
+  "claim": {
+    "actionId": "SELFTEST-claim",
+    "driverStatus": "EXECUTED",
+    "data": {
+      "hostObservation": {
+        "schemaVersion": "1.0.0",
+        "evidenceClass": "CAPTURED_SELFTEST",
+        "operation": "claim",
+        "requestedInputs": {},
+        "scope": {
+          "workspace": "host-selftest"
+        },
+        "scopeComplete": true,
+        "command": {
+          "argv": [
+            "CAPTURED_CONTRACT_SELFTEST_ONLY",
+            "claim"
+          ],
+          "exitCode": 0,
+          "startedAt": "2026-10-07T00:00:00Z",
+          "completedAt": "2026-10-07T00:00:03Z",
+          "transcriptRef": "verification/harness/src/test/resources/host-observation/transcript.txt",
+          "redacted": true
+        },
+        "toolVersions": [
+          {
+            "name": "CAPTURED_SELFTEST_ONLY",
+            "version": "1.0.0"
+          }
+        ],
+        "environment": {
+          "profile": "LOCAL",
+          "hostId": "synthetic-host",
+          "workspaceId": "host-selftest",
+          "isolated": true
+        },
+        "inputArtifacts": [],
+        "generatedOutputs": [],
+        "observedArtifacts": [],
+        "extractor": {
+          "name": "SELFTEST-fixed-shape",
+          "version": "1.0.0",
+          "source": "FILESYSTEM_READ_ONLY",
+          "independent": true,
+          "readOnly": true,
+          "command": {
+            "argv": [
+              "CAPTURED_CONTRACT_SELFTEST_ONLY",
+              "claim"
+            ],
+            "exitCode": 0,
+            "startedAt": "2026-10-07T00:00:00Z",
+            "completedAt": "2026-10-07T00:00:03Z",
+            "transcriptRef": "verification/harness/src/test/resources/host-observation/transcript.txt",
+            "redacted": true
+          },
+          "inputArtifacts": [
+            {
+              "path": "verification/cases/T26/selftest/host-shaped-results.json",
+              "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+              "sizeBytes": 1,
+              "scope": {
+                "workspace": "host-selftest"
+              },
+              "completeness": "COMPLETE"
+            }
+          ],
+          "rawRows": {
+            "evidenceClass": "CAPTURED_SELFTEST",
+            "operationEvidence": {
+              "schedulerId": "synthetic-schedulerId",
+              "claimId": "synthetic-claimId",
+              "leaseId": "synthetic-leaseId",
+              "fencingToken": "synthetic-fencingToken"
+            },
+            "scope": {
+              "workspace": "host-selftest"
+            },
+            "operation": "claim",
+            "driverProvenance": {
+              "adapter": "captured-contract-selftest",
+              "adapterVersion": "1.0.0",
+              "buildVersion": "SELFTEST",
+              "authenticatedActor": null,
+              "source": "CANNED_CONTRACT_SELFTEST",
+              "independent": false,
+              "scopeComplete": true,
+              "sourceQuery": null,
+              "snapshot": null
+            },
+            "command": {
+              "argv": [
+                "CAPTURED_CONTRACT_SELFTEST_ONLY",
+                "claim"
+              ],
+              "exitCode": 0,
+              "startedAt": "2026-10-07T00:00:00Z",
+              "completedAt": "2026-10-07T00:00:03Z",
+              "transcriptRef": "verification/harness/src/test/resources/host-observation/transcript.txt",
+              "redacted": true
+            },
+            "environment": {
+              "profile": "LOCAL",
+              "hostId": "synthetic-host",
+              "workspaceId": "host-selftest",
+              "isolated": true
+            },
+            "claims": [
+              {
+                "id": "SELFTEST-claim",
+                "barrierId": "SELFTEST-barrier",
+                "workerId": "SELFTEST-worker",
+                "transactionId": "SELFTEST-transaction",
+                "claimedAt": "2026-10-07T09:00:00Z",
+                "expiresAt": "2026-10-07T09:00:05Z"
+              }
+            ],
+            "backupParts": [
+              {
+                "kind": "DB"
+              },
+              {
+                "kind": "BLOB"
+              },
+              {
+                "kind": "DEFINITION"
+              },
+              {
+                "kind": "CAPABILITY"
+              },
+              {
+                "kind": "EVALUATOR"
+              },
+              {
+                "kind": "SKILLS"
+              },
+              {
+                "kind": "CONFIG"
+              },
+              {
+                "kind": "DEPLOYMENT"
+              }
+            ],
+            "configEntries": [
+              {
+                "key": "SELFTEST-config"
+              }
+            ],
+            "restoreResult": {
+              "status": "COMPLETE"
+            },
+            "missingParts": [],
+            "evidenceBlobs": [
+              {
+                "evidenceId": "SELFTEST-doc",
+                "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+              }
+            ],
+            "secretRecovery": {
+              "channel": "SECRET_MANAGER"
+            }
+          },
+          "rawRowsArtifactRef": "verification/cases/T26/selftest/host-shaped-results.json"
+        },
+        "operationEvidence": {
+          "schedulerId": "synthetic-schedulerId",
+          "claimId": "synthetic-claimId",
+          "leaseId": "synthetic-leaseId",
+          "fencingToken": "synthetic-fencingToken"
+        }
+      }
+    },
+    "response": null,
+    "reason": "Fixed schema-shaped SELFTEST only; does not execute a product or host process",
+    "provenance": {
+      "adapter": "captured-contract-selftest",
+      "adapterVersion": "1.0.0",
+      "buildVersion": "SELFTEST",
+      "authenticatedActor": null,
+      "source": "CANNED_CONTRACT_SELFTEST",
+      "independent": false,
+      "scopeComplete": true,
+      "sourceQuery": null,
+      "snapshot": null
+    },
+    "artifactRefs": [
+      "verification/cases/T26/selftest/host-shaped-results.json"
+    ]
+  },
+  "backup": {
+    "actionId": "SELFTEST-backup",
+    "driverStatus": "EXECUTED",
+    "data": {
+      "hostObservation": {
+        "schemaVersion": "1.0.0",
+        "evidenceClass": "CAPTURED_SELFTEST",
+        "operation": "backup",
+        "requestedInputs": {},
+        "scope": {
+          "workspace": "host-selftest"
+        },
+        "scopeComplete": true,
+        "command": {
+          "argv": [
+            "CAPTURED_CONTRACT_SELFTEST_ONLY",
+            "backup"
+          ],
+          "exitCode": 0,
+          "startedAt": "2026-10-07T00:00:00Z",
+          "completedAt": "2026-10-07T00:00:03Z",
+          "transcriptRef": "verification/harness/src/test/resources/host-observation/transcript.txt",
+          "redacted": true
+        },
+        "toolVersions": [
+          {
+            "name": "CAPTURED_SELFTEST_ONLY",
+            "version": "1.0.0"
+          }
+        ],
+        "environment": {
+          "profile": "LOCAL",
+          "hostId": "synthetic-host",
+          "workspaceId": "host-selftest",
+          "isolated": true
+        },
+        "inputArtifacts": [],
+        "generatedOutputs": [
+          {
+            "path": "verification/cases/T26/selftest/host-shaped-results.json",
+            "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "sizeBytes": 1,
+            "scope": {
+              "workspace": "host-selftest"
+            },
+            "completeness": "COMPLETE"
+          }
+        ],
+        "observedArtifacts": [],
+        "extractor": {
+          "name": "SELFTEST-fixed-shape",
+          "version": "1.0.0",
+          "source": "FILESYSTEM_READ_ONLY",
+          "independent": true,
+          "readOnly": true,
+          "command": {
+            "argv": [
+              "CAPTURED_CONTRACT_SELFTEST_ONLY",
+              "backup"
+            ],
+            "exitCode": 0,
+            "startedAt": "2026-10-07T00:00:00Z",
+            "completedAt": "2026-10-07T00:00:03Z",
+            "transcriptRef": "verification/harness/src/test/resources/host-observation/transcript.txt",
+            "redacted": true
+          },
+          "inputArtifacts": [
+            {
+              "path": "verification/cases/T26/selftest/host-shaped-results.json",
+              "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+              "sizeBytes": 1,
+              "scope": {
+                "workspace": "host-selftest"
+              },
+              "completeness": "COMPLETE"
+            }
+          ],
+          "rawRows": {
+            "evidenceClass": "CAPTURED_SELFTEST",
+            "operationEvidence": {
+              "environmentId": "synthetic-environmentId",
+              "backupId": "synthetic-backupId",
+              "snapshotId": "synthetic-snapshotId"
+            },
+            "scope": {
+              "workspace": "host-selftest"
+            },
+            "operation": "backup",
+            "driverProvenance": {
+              "adapter": "captured-contract-selftest",
+              "adapterVersion": "1.0.0",
+              "buildVersion": "SELFTEST",
+              "authenticatedActor": null,
+              "source": "CANNED_CONTRACT_SELFTEST",
+              "independent": false,
+              "scopeComplete": true,
+              "sourceQuery": null,
+              "snapshot": null
+            },
+            "command": {
+              "argv": [
+                "CAPTURED_CONTRACT_SELFTEST_ONLY",
+                "backup"
+              ],
+              "exitCode": 0,
+              "startedAt": "2026-10-07T00:00:00Z",
+              "completedAt": "2026-10-07T00:00:03Z",
+              "transcriptRef": "verification/harness/src/test/resources/host-observation/transcript.txt",
+              "redacted": true
+            },
+            "environment": {
+              "profile": "LOCAL",
+              "hostId": "synthetic-host",
+              "workspaceId": "host-selftest",
+              "isolated": true
+            },
+            "claims": [
+              {
+                "id": "SELFTEST-claim",
+                "barrierId": "SELFTEST-barrier",
+                "workerId": "SELFTEST-worker",
+                "transactionId": "SELFTEST-transaction",
+                "claimedAt": "2026-10-07T09:00:00Z",
+                "expiresAt": "2026-10-07T09:00:05Z"
+              }
+            ],
+            "backupParts": [
+              {
+                "kind": "DB"
+              },
+              {
+                "kind": "BLOB"
+              },
+              {
+                "kind": "DEFINITION"
+              },
+              {
+                "kind": "CAPABILITY"
+              },
+              {
+                "kind": "EVALUATOR"
+              },
+              {
+                "kind": "SKILLS"
+              },
+              {
+                "kind": "CONFIG"
+              },
+              {
+                "kind": "DEPLOYMENT"
+              }
+            ],
+            "configEntries": [
+              {
+                "key": "SELFTEST-config"
+              }
+            ],
+            "restoreResult": {
+              "status": "COMPLETE"
+            },
+            "missingParts": [],
+            "evidenceBlobs": [
+              {
+                "evidenceId": "SELFTEST-doc",
+                "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+              }
+            ],
+            "secretRecovery": {
+              "channel": "SECRET_MANAGER"
+            }
+          },
+          "rawRowsArtifactRef": "verification/cases/T26/selftest/host-shaped-results.json"
+        },
+        "operationEvidence": {
+          "environmentId": "synthetic-environmentId",
+          "backupId": "synthetic-backupId",
+          "snapshotId": "synthetic-snapshotId"
+        }
+      }
+    },
+    "response": null,
+    "reason": "Fixed schema-shaped SELFTEST only; does not execute a product or host process",
+    "provenance": {
+      "adapter": "captured-contract-selftest",
+      "adapterVersion": "1.0.0",
+      "buildVersion": "SELFTEST",
+      "authenticatedActor": null,
+      "source": "CANNED_CONTRACT_SELFTEST",
+      "independent": false,
+      "scopeComplete": true,
+      "sourceQuery": null,
+      "snapshot": null
+    },
+    "artifactRefs": [
+      "verification/cases/T26/selftest/host-shaped-results.json"
+    ]
+  },
+  "restore": {
+    "actionId": "SELFTEST-restore",
+    "driverStatus": "EXECUTED",
+    "data": {
+      "hostObservation": {
+        "schemaVersion": "1.0.0",
+        "evidenceClass": "CAPTURED_SELFTEST",
+        "operation": "restore",
+        "requestedInputs": {},
+        "scope": {
+          "workspace": "host-selftest"
+        },
+        "scopeComplete": true,
+        "command": {
+          "argv": [
+            "CAPTURED_CONTRACT_SELFTEST_ONLY",
+            "restore"
+          ],
+          "exitCode": 0,
+          "startedAt": "2026-10-07T00:00:00Z",
+          "completedAt": "2026-10-07T00:00:03Z",
+          "transcriptRef": "verification/harness/src/test/resources/host-observation/transcript.txt",
+          "redacted": true
+        },
+        "toolVersions": [
+          {
+            "name": "CAPTURED_SELFTEST_ONLY",
+            "version": "1.0.0"
+          }
+        ],
+        "environment": {
+          "profile": "LOCAL",
+          "hostId": "synthetic-host",
+          "workspaceId": "host-selftest",
+          "isolated": true
+        },
+        "inputArtifacts": [],
+        "generatedOutputs": [
+          {
+            "path": "verification/cases/T26/selftest/host-shaped-results.json",
+            "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "sizeBytes": 1,
+            "scope": {
+              "workspace": "host-selftest"
+            },
+            "completeness": "COMPLETE"
+          }
+        ],
+        "observedArtifacts": [],
+        "extractor": {
+          "name": "SELFTEST-fixed-shape",
+          "version": "1.0.0",
+          "source": "FILESYSTEM_READ_ONLY",
+          "independent": true,
+          "readOnly": true,
+          "command": {
+            "argv": [
+              "CAPTURED_CONTRACT_SELFTEST_ONLY",
+              "restore"
+            ],
+            "exitCode": 0,
+            "startedAt": "2026-10-07T00:00:00Z",
+            "completedAt": "2026-10-07T00:00:03Z",
+            "transcriptRef": "verification/harness/src/test/resources/host-observation/transcript.txt",
+            "redacted": true
+          },
+          "inputArtifacts": [
+            {
+              "path": "verification/cases/T26/selftest/host-shaped-results.json",
+              "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+              "sizeBytes": 1,
+              "scope": {
+                "workspace": "host-selftest"
+              },
+              "completeness": "COMPLETE"
+            }
+          ],
+          "rawRows": {
+            "evidenceClass": "CAPTURED_SELFTEST",
+            "operationEvidence": {
+              "backupId": "synthetic-backupId",
+              "restoreEnvironmentId": "synthetic-restoreEnvironmentId",
+              "snapshotId": "synthetic-snapshotId"
+            },
+            "scope": {
+              "workspace": "host-selftest"
+            },
+            "operation": "restore",
+            "driverProvenance": {
+              "adapter": "captured-contract-selftest",
+              "adapterVersion": "1.0.0",
+              "buildVersion": "SELFTEST",
+              "authenticatedActor": null,
+              "source": "CANNED_CONTRACT_SELFTEST",
+              "independent": false,
+              "scopeComplete": true,
+              "sourceQuery": null,
+              "snapshot": null
+            },
+            "command": {
+              "argv": [
+                "CAPTURED_CONTRACT_SELFTEST_ONLY",
+                "restore"
+              ],
+              "exitCode": 0,
+              "startedAt": "2026-10-07T00:00:00Z",
+              "completedAt": "2026-10-07T00:00:03Z",
+              "transcriptRef": "verification/harness/src/test/resources/host-observation/transcript.txt",
+              "redacted": true
+            },
+            "environment": {
+              "profile": "LOCAL",
+              "hostId": "synthetic-host",
+              "workspaceId": "host-selftest",
+              "isolated": true
+            },
+            "claims": [
+              {
+                "id": "SELFTEST-claim",
+                "barrierId": "SELFTEST-barrier",
+                "workerId": "SELFTEST-worker",
+                "transactionId": "SELFTEST-transaction",
+                "claimedAt": "2026-10-07T09:00:00Z",
+                "expiresAt": "2026-10-07T09:00:05Z"
+              }
+            ],
+            "backupParts": [
+              {
+                "kind": "DB"
+              },
+              {
+                "kind": "BLOB"
+              },
+              {
+                "kind": "DEFINITION"
+              },
+              {
+                "kind": "CAPABILITY"
+              },
+              {
+                "kind": "EVALUATOR"
+              },
+              {
+                "kind": "SKILLS"
+              },
+              {
+                "kind": "CONFIG"
+              },
+              {
+                "kind": "DEPLOYMENT"
+              }
+            ],
+            "configEntries": [
+              {
+                "key": "SELFTEST-config"
+              }
+            ],
+            "restoreResult": {
+              "status": "COMPLETE"
+            },
+            "missingParts": [],
+            "evidenceBlobs": [
+              {
+                "evidenceId": "SELFTEST-doc",
+                "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+              }
+            ],
+            "secretRecovery": {
+              "channel": "SECRET_MANAGER"
+            }
+          },
+          "rawRowsArtifactRef": "verification/cases/T26/selftest/host-shaped-results.json"
+        },
+        "operationEvidence": {
+          "backupId": "synthetic-backupId",
+          "restoreEnvironmentId": "synthetic-restoreEnvironmentId",
+          "snapshotId": "synthetic-snapshotId"
+        }
+      }
+    },
+    "response": null,
+    "reason": "Fixed schema-shaped SELFTEST only; does not execute a product or host process",
+    "provenance": {
+      "adapter": "captured-contract-selftest",
+      "adapterVersion": "1.0.0",
+      "buildVersion": "SELFTEST",
+      "authenticatedActor": null,
+      "source": "CANNED_CONTRACT_SELFTEST",
+      "independent": false,
+      "scopeComplete": true,
+      "sourceQuery": null,
+      "snapshot": null
+    },
+    "artifactRefs": [
+      "verification/cases/T26/selftest/host-shaped-results.json"
+    ]
+  },
+  "awaitRuntimeTask": {
+    "actionId": "SELFTEST-awaitRuntimeTask",
+    "driverStatus": "EXECUTED",
+    "data": {
+      "hostObservation": {
+        "schemaVersion": "1.0.0",
+        "evidenceClass": "CAPTURED_SELFTEST",
+        "operation": "awaitRuntimeTask",
+        "requestedInputs": {},
+        "scope": {
+          "workspace": "host-selftest"
+        },
+        "scopeComplete": true,
+        "command": {
+          "argv": [
+            "CAPTURED_CONTRACT_SELFTEST_ONLY",
+            "awaitRuntimeTask"
+          ],
+          "exitCode": 0,
+          "startedAt": "2026-10-07T00:00:00Z",
+          "completedAt": "2026-10-07T00:00:03Z",
+          "transcriptRef": "verification/harness/src/test/resources/host-observation/transcript.txt",
+          "redacted": true
+        },
+        "toolVersions": [
+          {
+            "name": "CAPTURED_SELFTEST_ONLY",
+            "version": "1.0.0"
+          }
+        ],
+        "environment": {
+          "profile": "LOCAL",
+          "hostId": "synthetic-host",
+          "workspaceId": "host-selftest",
+          "isolated": true
+        },
+        "inputArtifacts": [],
+        "generatedOutputs": [],
+        "observedArtifacts": [],
+        "extractor": {
+          "name": "SELFTEST-fixed-shape",
+          "version": "1.0.0",
+          "source": "FILESYSTEM_READ_ONLY",
+          "independent": true,
+          "readOnly": true,
+          "command": {
+            "argv": [
+              "CAPTURED_CONTRACT_SELFTEST_ONLY",
+              "awaitRuntimeTask"
+            ],
+            "exitCode": 0,
+            "startedAt": "2026-10-07T00:00:00Z",
+            "completedAt": "2026-10-07T00:00:03Z",
+            "transcriptRef": "verification/harness/src/test/resources/host-observation/transcript.txt",
+            "redacted": true
+          },
+          "inputArtifacts": [
+            {
+              "path": "verification/cases/T26/selftest/host-shaped-results.json",
+              "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+              "sizeBytes": 1,
+              "scope": {
+                "workspace": "host-selftest"
+              },
+              "completeness": "COMPLETE"
+            }
+          ],
+          "rawRows": {
+            "evidenceClass": "CAPTURED_SELFTEST",
+            "operationEvidence": {
+              "schedulerId": "synthetic-schedulerId"
+            },
+            "scope": {
+              "workspace": "host-selftest"
+            },
+            "operation": "awaitRuntimeTask",
+            "driverProvenance": {
+              "adapter": "captured-contract-selftest",
+              "adapterVersion": "1.0.0",
+              "buildVersion": "SELFTEST",
+              "authenticatedActor": null,
+              "source": "CANNED_CONTRACT_SELFTEST",
+              "independent": false,
+              "scopeComplete": true,
+              "sourceQuery": null,
+              "snapshot": null
+            },
+            "command": {
+              "argv": [
+                "CAPTURED_CONTRACT_SELFTEST_ONLY",
+                "awaitRuntimeTask"
+              ],
+              "exitCode": 0,
+              "startedAt": "2026-10-07T00:00:00Z",
+              "completedAt": "2026-10-07T00:00:03Z",
+              "transcriptRef": "verification/harness/src/test/resources/host-observation/transcript.txt",
+              "redacted": true
+            },
+            "environment": {
+              "profile": "LOCAL",
+              "hostId": "synthetic-host",
+              "workspaceId": "host-selftest",
+              "isolated": true
+            },
+            "claims": [
+              {
+                "id": "SELFTEST-claim",
+                "barrierId": "SELFTEST-barrier",
+                "workerId": "SELFTEST-worker",
+                "transactionId": "SELFTEST-transaction",
+                "claimedAt": "2026-10-07T09:00:00Z",
+                "expiresAt": "2026-10-07T09:00:05Z"
+              }
+            ],
+            "backupParts": [
+              {
+                "kind": "DB"
+              },
+              {
+                "kind": "BLOB"
+              },
+              {
+                "kind": "DEFINITION"
+              },
+              {
+                "kind": "CAPABILITY"
+              },
+              {
+                "kind": "EVALUATOR"
+              },
+              {
+                "kind": "SKILLS"
+              },
+              {
+                "kind": "CONFIG"
+              },
+              {
+                "kind": "DEPLOYMENT"
+              }
+            ],
+            "configEntries": [
+              {
+                "key": "SELFTEST-config"
+              }
+            ],
+            "restoreResult": {
+              "status": "COMPLETE"
+            },
+            "missingParts": [],
+            "evidenceBlobs": [
+              {
+                "evidenceId": "SELFTEST-doc",
+                "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+              }
+            ],
+            "secretRecovery": {
+              "channel": "SECRET_MANAGER"
+            }
+          },
+          "rawRowsArtifactRef": "verification/cases/T26/selftest/host-shaped-results.json"
+        },
+        "operationEvidence": {
+          "schedulerId": "synthetic-schedulerId"
+        },
+        "runtimeTask": {
+          "taskId": "SELFTEST-task",
+          "invocationHandle": "SELFTEST-handle",
+          "origin": "autonomousScheduler",
+          "terminalStatus": "SUCCEEDED",
+          "completedAt": "2026-10-07T09:00:20Z",
+          "snapshot": {
+            "id": "SELFTEST-snapshot",
+            "capturedAt": "2026-10-07T09:00:20Z",
+            "artifactRef": "verification/cases/T26/selftest/host-shaped-results.json"
+          }
+        }
+      }
+    },
+    "response": null,
+    "reason": "Fixed schema-shaped SELFTEST only; does not execute a product or host process",
+    "provenance": {
+      "adapter": "captured-contract-selftest",
+      "adapterVersion": "1.0.0",
+      "buildVersion": "SELFTEST",
+      "authenticatedActor": null,
+      "source": "CANNED_CONTRACT_SELFTEST",
+      "independent": false,
+      "scopeComplete": true,
+      "sourceQuery": null,
+      "snapshot": null
+    },
+    "artifactRefs": [
+      "verification/cases/T26/selftest/host-shaped-results.json"
+    ]
+  }
+}

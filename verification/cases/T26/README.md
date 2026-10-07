@@ -18,7 +18,7 @@ host 복원 adapter는 `NOT_RUN`이다. 고정 JUnit 표본은 실제
 | safe-retry-canonical-current-grant | move commit fault로 효과0을 만든다. OPERATIONS retry의 원 actor·canonical hash/key·현재 grant·claim fence와 실제 이동20 한 번을 확인한다. |
 | safe-retry-revoked-blocked | 같은 rollback 뒤 grant를 철회하고 재시작한다. retry의 FORBIDDEN·허용 denial audit와 금지된 물량 효과0·남은 인간 책임을 구별한다. |
 | unknown-external-reconcile-before-retry | 상대 문서 commit 뒤 응답을 버린다. status 조회도 unavailable로 둔다. 대조 전 retry 거부, 담당 대조 성공 뒤 외부 전달1 유지와 로컬 연결을 확인한다. |
-| lot-expiry-no-event | LOT 만료20의 boundary를 기록한다. sweeper 중지·clock 전진·실제 출고 거부 뒤 sweep 정지·의무 생성을 확인한다. |
+| lot-expiry-no-event | LOT 만료20의 boundary를 기록한다. Work 활성화·예약 후 clock을 전진한다. 출고나 query 전에 sweep terminal snapshot의 독립 DB에서 사건·판정·후속 의무를 확인하고 반복 sweep 뒤 같은 원 행을 비교한다. |
 | disposition-expiry-no-event | 처분 허용의 만료를 같은 순서로 확인한다. |
 | grant-expiry-no-event | warehouse grant 만료를 같은 순서로 확인한다. |
 | policy-expiry-no-event | 현재 정책 만료를 같은 순서로 확인한다. |
@@ -43,7 +43,7 @@ SUSPENDED·대조 의무를 기록할 수 있으므로 모든 DB 행의 불변�
 검사한다. split 후 active8+12=20이고 retired 부모20을 더하지 않는다.
 
 각 `observe`는 명시된 organization·case/subcase·추가 대상 범위와 실제
-API snapshot token을 사용한다. `sources`의 모든 원 행은 read-only
+API snapshot token 또는 자율 task terminal snapshot token을 사용한다. `sources`의 모든 원 행은 read-only
 query/parameters/mapping version·source artifact·완전성·snapshot으로
 연결한다. adapter가 API projection을 복사하거나 빈 결과를 만들어서는
 안 된다. `movements`, `dutyTransitions`, `externalDeliveries` 등은 새 S0
@@ -59,15 +59,40 @@ ref로 `inspectArtifacts`에 전달한다. 실제 secret은 bundle에 넣지 않
 
 ## 추적과 실행 상태
 
-16 subcase와297 assertion이 세 T26 oracle의 여섯 named observation을
+20 subcase와490 assertion이 세 T26 oracle의 여섯 named observation을
 연결한다. 상세 연결은 `oracle-bindings.json`이다. 이는 선언 추적이며
 실행 coverage를 증명하지 않는다. 실행 명령·exit·검증 수·fixture hash는
 `evidence/`에 별도 기록한다. 환경/형식 오류 exit3은 의도된 RED가 아니다.
 
-최종 준비 검증은 `./verify validate` exit0과 `./verify harness`
+수정 전 baseline에 기록된 준비 검증은 `./verify validate` exit0과 `./verify harness`
 149 PASS(이 폴더 관련 selftest19: mutant17·구조2, 실패/오류/skip0)다.
-두 case의 실제 Gherkin selector RED는 발견/시작20·NOT_IMPLEMENTED
+당시 두 case의 실제 Gherkin selector RED는 발견/시작20·NOT_IMPLEMENTED
 실패20·scenario skip0, exit1이다. 각 scenario의 첫 필수 assertion이
 실패한 뒤 남은 assertion은 실행되지 않았다. 제품 recovery는 exit2
 `NOT_RUN`이며 297개 assertion의 관찰 source가 미실행이다.
 `evidence/authoring-summary.json`에 실제 입력 hash와 명령을 기록했다.
+
+## Step2 review 수정
+
+네 `*-expiry-delayed-guard`는 자동 sweep 없이 중지 상태에서 출고를
+거부하는 별도 fixture다. 기존 `*-expiry-no-event`는 sweep 직후 독립
+DB를 먼저 관찰한다. 활성화한 Work의 현재 assessment는
+`causeKind=VALIDITY_EXPIRED`, `asOf`로 만료 재평가를 식별하며 원래
+확정 증거가 없으므로 `UNVERIFIED`를 유지한다. 내부 만료 사건은
+`events.kind=VALIDITY_EXPIRED`, 만료 후속 의무와 assignment는
+`sourceKind=VALIDITY_EXPIRED`로 최초 활성화 책임과 구별한다. 이는
+read-only logical source mapping 계약이며 제품 실행 증거가 아니다.
+
+`dryrun-db`와 `denied-db`는 인가된 APPLY 전에 projection 전체 원 행을
+`before-db`와 비교한다. 대상 ID·sourceRevision0·비어 있지 않은
+projection ID를 확인해 빈 배열 비교나 조기 repair로 통과하지 못한다.
+Host task ID/handle은 typed `operationEvidence`에서 읽으며 claims,
+backup, restore 원 행은 `extractor/rawRows`에서 읽는다.
+
+이번 review 수정의 검증은 `evidence/review-case-contracts/checks.json`에
+기록했다. `CaseContractRoutesSelftest`7개와 기존 runtime selftest19개가
+실패·오류·skip0으로 PASS했고 세 case schema가 유효하다. 명시적
+Gherkin RED는 T26/V5/T14 합계28개를 모두 발견·시작했고
+NOT_IMPLEMENTED assertion 실패28·scenario skip0·exit1을 관찰했다.
+고정 payload의 schema·참조·assertion 검사이며 실제 제품 인수는
+NOT_RUN이다. 과거 evidence는 수정 전 snapshot으로 보존했다.

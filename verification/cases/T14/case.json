@@ -3568,7 +3568,7 @@
               "taskId": {
                 "$result": {
                   "actionId": "notification-tick",
-                  "pointer": "/data/hostObservation/rawRows/tasks/0/taskId"
+                  "pointer": "/data/hostObservation/operationEvidence/taskId"
                 }
               },
               "scope": {
@@ -3577,7 +3577,14 @@
                 },
                 "caseId": "T14",
                 "subcaseId": "orphan-temperature"
-              }
+              },
+              "invocationHandle": {
+                "$result": {
+                  "actionId": "notification-tick",
+                  "pointer": "/data/hostObservation/operationEvidence/invocationHandle"
+                }
+              },
+              "timeoutSeconds": 30
             }
           },
           "evidenceRefs": [

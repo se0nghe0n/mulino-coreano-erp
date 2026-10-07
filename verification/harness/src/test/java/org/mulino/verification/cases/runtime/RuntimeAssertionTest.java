@@ -42,7 +42,7 @@ public final class RuntimeAssertionTest {
     private void rejects(JsonNode a, Map<String, JsonNode> sample) {
         assertThrows(AssertionError.class, () -> engine.check(a, sample, aliases));
     }
-    @Test void allTwentyContractsValidateAndEveryAssignedObservationIsLinked() throws Exception {
+    @Test void allRuntimeContractsValidateAndEveryAssignedObservationIsLinked() throws Exception {
         var validator = new ContractValidator(root);
         Set<String> actual = new HashSet<>(), required = new HashSet<>();
         int subcases = 0;
@@ -58,7 +58,7 @@ public final class RuntimeAssertionTest {
                 for (JsonNode observation : oracle.path("expectedObservations"))
                     required.add(oracle.path("oracleId").asText() + ":" + observation.path("name").asText());
         }
-        assertEquals(20, subcases); assertEquals(14, required.size()); assertEquals(required, actual);
+        assertEquals(24, subcases); assertEquals(14, required.size()); assertEquals(required, actual);
     }
     @Test void everyFixtureArtifactMatchesActualBytesAndDigest() throws Exception {
         for (String id : List.of("T26", "V5")) {
@@ -168,9 +168,10 @@ public final class RuntimeAssertionTest {
     @Test void missingEvaluatorMustKeepRestoreIncomplete() throws Exception {
         JsonNode a = assertion("T26", "restore-missing-v1-evaluator", "restore-completeness");
         ObjectNode capture = capture("{}", "{}", "{}");
-        ((ObjectNode) capture.path("data")).set("hostObservation", Json.parse("{\"rawRows\":{\"restoreResult\":{\"status\":\"INCOMPLETE\"}}}"));
+        ((ObjectNode) capture.path("data")).set("hostObservation", Json.read(root.resolve("verification/cases/T26/selftest/host-shaped-results.json")).path("restore").path("data").path("hostObservation").deepCopy());
+        ((ObjectNode) capture.at("/data/hostObservation/extractor/rawRows/restoreResult")).put("status", "INCOMPLETE");
         var rows = new HashMap<String, JsonNode>(Map.of("restore", capture)); accepts(a, rows);
-        ((ObjectNode) capture.at("/data/hostObservation/rawRows/restoreResult")).put("status", "COMPLETE"); rejects(a, rows);
+        ((ObjectNode) capture.at("/data/hostObservation/extractor/rawRows/restoreResult")).put("status", "COMPLETE"); rejects(a, rows);
     }
     @Test void v1EvaluatorAndDefinitionCannotBeSilentlyReplaced() throws Exception {
         JsonNode a = assertion("T26", "restore-complete", "v1-evaluator");
@@ -181,9 +182,10 @@ public final class RuntimeAssertionTest {
         JsonNode a = assertion("T26", "restore-complete", "blob-hash");
         String fixedHash = Json.sha256(root.resolve("verification/cases/T26/fixtures/artifacts/DOC-TEMP.json"));
         ObjectNode capture = capture("{}", "{}", "{}");
-        ((ObjectNode) capture.path("data")).set("hostObservation", Json.parse("{\"rawRows\":{\"evidenceBlobs\":[{\"evidenceId\":\"actual-temp-doc\",\"sha256\":\"" + fixedHash + "\"}]}}"));
+        ((ObjectNode) capture.path("data")).set("hostObservation", Json.read(root.resolve("verification/cases/T26/selftest/host-shaped-results.json")).path("restore").path("data").path("hostObservation").deepCopy());
+        ((ObjectNode) capture.at("/data/hostObservation/extractor/rawRows/evidenceBlobs/0")).put("evidenceId", "actual-temp-doc").put("sha256", fixedHash);
         var rows = new HashMap<String, JsonNode>(Map.of("restore", capture)); accepts(a, rows);
-        ((ObjectNode) capture.at("/data/hostObservation/rawRows/evidenceBlobs/0")).put("sha256", "0".repeat(64)); rejects(a, rows);
+        ((ObjectNode) capture.at("/data/hostObservation/extractor/rawRows/evidenceBlobs/0")).put("sha256", "0".repeat(64)); rejects(a, rows);
     }
     @Test void emergencyRepairDiffMustMatchTheActualBeforeAfterValues() throws Exception {
         JsonNode a = assertion("T26", "emergency-repair-dryrun-apply", "dryrun-diff");

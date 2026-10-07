@@ -1,0 +1,150 @@
+{
+  "evidenceClass": "SELFTEST_AND_CONTRACT_RED_ONLY",
+  "productStatus": "NOT_RUN",
+  "actualModelCalls": 0,
+  "stepBaseline": "f426712",
+  "commonDependencyOriginalCommit": "3a9de9fad15eea01f56f6f4b13fe7aba88be4589",
+  "commonDependencyAppliedCommit": "62d2d54",
+  "capturedAt": "2026-10-07T15:13:34.666555+00:00",
+  "caseCounts": {
+    "T26": {
+      "subcases": 20,
+      "assertions": 490
+    },
+    "V5": {
+      "subcases": 4,
+      "assertions": 91
+    },
+    "T14": {
+      "subcases": 4,
+      "assertions": 41
+    }
+  },
+  "schemaValidHostRefsResolved": 85,
+  "schemaValidExtractorSelectorsExercised": 21,
+  "oldForbiddenPointerCountInCurrentCases": 0,
+  "checks": [
+    {
+      "command": "./mvnw -B -ntp -f verification/harness/pom.xml -Dtest=CaseContractRoutesSelftest,RuntimeAssertionTest test",
+      "exitCode": 0,
+      "tests": 26,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "status": "PASS"
+    },
+    {
+      "command": "./verify validate verification/cases/T26/case.json verification/cases/V5/case.json verification/cases/T14/case.json",
+      "exitCode": 0,
+      "status": "PASS"
+    },
+    {
+      "command": "./verify contract-red verification/cases/T26/case.json verification/cases/V5/case.json verification/cases/T14/case.json",
+      "exitCode": 1,
+      "expectedScenarios": 28,
+      "discoveredScenarios": 28,
+      "startedScenarios": 28,
+      "notImplementedAssertionFailures": 28,
+      "skippedScenarios": 0,
+      "status": "EXPECTED_RED"
+    },
+    {
+      "command": "git diff --check",
+      "exitCode": 0,
+      "status": "PASS"
+    }
+  ],
+  "inputArtifacts": [
+    {
+      "path": "verification/cases/T26/case.json",
+      "sha256": "9ba30accdb9a2417ecee6b8485546e8f5b7c906c9406d94f2ecc67b6fbbe6088",
+      "sizeBytes": 940912
+    },
+    {
+      "path": "verification/cases/V5/case.json",
+      "sha256": "4fd67dade8877d25ab14d9c1caa50540adcdd034c6c5231b8a682d31f13ac6e0",
+      "sizeBytes": 190616
+    },
+    {
+      "path": "verification/cases/T14/case.json",
+      "sha256": "d44358dcb71d480a4bde0798e057c6f99dda1a1de7e9ececdc1ae0bd97919763",
+      "sizeBytes": 108237
+    },
+    {
+      "path": "verification/cases/T26/scenario.feature",
+      "sha256": "1ca1346b02dbff5dade40b8cc7989201992b240392977581f00b9109635e3f80",
+      "sizeBytes": 108363
+    },
+    {
+      "path": "verification/cases/T26/oracle-bindings.json",
+      "sha256": "4850ccaf8b75345c8d978ad4544173a0cb830e89be628bc6a82ba458a2bea393",
+      "sizeBytes": 101747
+    },
+    {
+      "path": "verification/cases/V5/oracle-bindings.json",
+      "sha256": "607ab76a4f6f87fcdb48a974411c45b599b81480c460eed4cb990bb74b29eab5",
+      "sizeBytes": 19306
+    },
+    {
+      "path": "verification/cases/T26/selftest/host-shaped-results.json",
+      "sha256": "7b0b97915c5d2c63454db6d83b06a0fabd0851ebccc6eb29294b09b2ffbe2a3f",
+      "sizeBytes": 37384
+    },
+    {
+      "path": "verification/harness/src/test/java/org/mulino/verification/cases/casecontractfix/CaseContractRoutesSelftest.java",
+      "sha256": "34305ee58ec14dca525a2f40c4363ba32883c8c31cc40f67b3c9104d50d9c009",
+      "sizeBytes": 14632
+    },
+    {
+      "path": "verification/harness/src/test/java/org/mulino/verification/cases/runtime/RuntimeAssertionTest.java",
+      "sha256": "108f8821a9d9b021c65377a8e29b56b90e885788d4610f729af5946c29013230",
+      "sizeBytes": 14245
+    },
+    {
+      "path": "verification/cases/T26/fixtures/policy-expiry-delayed-guard.json",
+      "sha256": "90701d82f681a44fcd60fca68b21070e68d323ce8456758df8958688fd1fde01",
+      "sizeBytes": 23726
+    },
+    {
+      "path": "verification/cases/T26/fixtures/disposition-expiry-delayed-guard.json",
+      "sha256": "d05def2cdd9a200c5b25b11a3aed41ab7d77529782b9e0c4895e857091386514",
+      "sizeBytes": 23741
+    },
+    {
+      "path": "verification/cases/T26/fixtures/grant-expiry-delayed-guard.json",
+      "sha256": "8bb544a2f658b05f89a869d4d3c42bdff99a228703e063d180a0e5f7ae758cf7",
+      "sizeBytes": 23723
+    },
+    {
+      "path": "verification/cases/T26/fixtures/disposition-expiry-no-event.json",
+      "sha256": "60da5bb267e24fca62ced415b964250844d8ad01afd22a154a889a3871e998df",
+      "sizeBytes": 23726
+    },
+    {
+      "path": "verification/cases/T26/fixtures/lot-expiry-delayed-guard.json",
+      "sha256": "3d89407df73250345b61b3f108790b7bd200e13a9af87c0068a3caaca8acc694",
+      "sizeBytes": 23717
+    },
+    {
+      "path": "verification/cases/T26/fixtures/grant-expiry-no-event.json",
+      "sha256": "e277665da3bd587fac55be52774987833fa9173ba9b4a14f66453b07d9046bb4",
+      "sizeBytes": 23708
+    },
+    {
+      "path": "verification/cases/T26/fixtures/lot-expiry-no-event.json",
+      "sha256": "bcf2cb58cbdd23c815a2bc2655ebc677cb0d62989b5f6142e4debbdbdce14585",
+      "sizeBytes": 23702
+    },
+    {
+      "path": "verification/cases/T26/fixtures/policy-expiry-no-event.json",
+      "sha256": "e0e67ecda16264560884546604f17882a6074fa28f5a9b22e2e28ce99dd153bf",
+      "sizeBytes": 23711
+    }
+  ],
+  "limitations": [
+    "Fixed CAPTURED_SELFTEST payloads exercise schema, reference resolution and assertion engine; their descriptors are synthetic metadata, not actual independent host process observations.",
+    "No actual API, DB, MCP, worker, external deployment or model run occurred.",
+    "Global registry/coverage integration and aggregate gate are owned by coordinator.",
+    "Historical evidence remains unchanged and contains prior contract snapshots."
+  ]
+}
