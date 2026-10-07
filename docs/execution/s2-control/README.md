@@ -83,5 +83,20 @@ grant ID·revision과 delegator chain은 같은 현재 scope 인가 평가에서
 감사에 남긴다. replay는 새 결정이나 효과를 만들지 않는다.
 
 `AuthorityEvidenceTest`와 기존 gateway test의 감사 assertion은 이 후속
-변경에서 추가했다. Maven slot을 사용하지 않았으며 새 assertion의
-실행 상태는 `NOT_RUN`이다. root의 전체 native 회귀에서 확인한다.
+변경에서 추가했다. 이후 세 class의 13 tests가 모두 통과했다. 실제 두 WORK scope replay
+반례와 감사 assertion을 포함한다. 아래 최종 denial audit assertion
+변경은 별도 root 회귀가 필요하다.
+
+Sol review P2의 재요청 결과 누설을 차단했다. 최초 실행이 W1/W2를
+포함한 결과를 저장한 뒤 W2 grant만 철회하고 W1은 유지했다. 검색의
+ID OR 권한은 여전히 true지만 같은 key의 전체 결과 replay는 거부되고
+새 효과는 0이었다. replay guard는 모든 저장 효과 scope를 현재
+identity chain fence 안에서 확인하며 업무 prerequisite나 승인 소비를
+반복하지 않는다. 실제 gateway·PolicyCommandGuard·IdentityAuthorization·
+PostgreSQL/CQN을 썼고 업무 효과 handler만 테스트 fixture다.
+
+13 tests PASS 후 공유 `3144652`가 재요청 거부 감사를 별도로 저장하도록
+변경됐다. test는 원 COMMITTED 기록/효과 1개를 유지하고 동일 command에
+APPLIED와 REJECTED 감사 2개, 안전한 denial facts와 빈 effect refs를
+요구하도록 맞췄다. 이 마지막 assertion 변경은 `NOT_RUN`이며 root의
+combined native 회귀에서 확인한다.
