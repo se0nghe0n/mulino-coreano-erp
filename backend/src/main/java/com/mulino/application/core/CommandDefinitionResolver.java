@@ -27,13 +27,13 @@ public class CommandDefinitionResolver {
     Set<String> nouns=new HashSet<>();definition.nouns().forEach(n->nouns.add(n.name()));
     Map<String,SubjectBinding> byNoun=new HashMap<>();
     for(SubjectBinding binding:bindings){
-      if(!nouns.contains(binding.nounType())||byNoun.put(binding.nounType(),binding)!=null)throw DomainError.invalid("Subject contract is not published");
+      if((binding.minimumCount()>0&&!nouns.contains(binding.nounType()))||byNoun.put(binding.nounType(),binding)!=null)throw DomainError.invalid("Subject contract is not published");
     }
     List<?> declared=(List<?>)intent.get("subjectRefs");
     if(!declared.isEmpty()&&definition.verbs().stream().noneMatch(v->v.capabilityId().equals(intent.get("capabilityId"))&&v.intentKind().equals(intent.get("intentKind"))))throw DomainError.invalid("Subject action is not published");
     Map<String,Set<String>> actual=new HashMap<>();
     for(Object value:declared){Map<?,?> ref=(Map<?,?>)value;String noun=(String)ref.get("type"),id=(String)ref.get("id");SubjectBinding binding=byNoun.get(noun);
-      if(binding==null||!binding.targetIds().contains(id)||!actual.computeIfAbsent(noun,k->new HashSet<>()).add(id))throw DomainError.invalid("Declared subject differs from command target");
+      if(!nouns.contains(noun)||binding==null||!binding.targetIds().contains(id)||!actual.computeIfAbsent(noun,k->new HashSet<>()).add(id))throw DomainError.invalid("Declared subject differs from command target");
     }
     for(SubjectBinding binding:bindings){int count=actual.getOrDefault(binding.nounType(),Set.of()).size();if(count<binding.minimumCount()||count>binding.maximumCount())throw DomainError.invalid("Subject cardinality differs from published action contract");}
     return bindings;
