@@ -27,3 +27,10 @@ provisional 대조도 observationId·confirmedReceiptId로 정확히 해소한�
 모든 write는 기존 command transaction과 fence에 참여한다. 범용 공개
 command나 client supplied 잔여 scalar는 없다. PostgreSQL constraint
 검증과 gateway 인수 결과는 실제 실행 뒤 별도로 기록한다.
+
+실행 검증은 `checks.json`과 gzip Maven/JUnit 원문에 남겼다.
+2026-10-08 actual PostgreSQL 18.6에서 5 Unit + 3 gateway 사례가
+PASS다. 실제 인계 수락·정확한 40 credit·late commit rollback과
+credit UPDATE 거부를 확인했다. 기존 settlement 상태의 보존을
+검증했으나 그 settlement 승인 command 자체는 이 fixture 범위가 아니다.
+전체 S3 gate와 native E2E는 coordinator의 통합 인수로 남는다.

@@ -1,0 +1,47 @@
+{
+  "result": "PASS",
+  "userStep": 3,
+  "systemGate": "S3",
+  "testedCommit": "b1cb119aede52e530e5b10680d1a8e493fd30852",
+  "baseline": "c6c910b81c8a61fbdf309da9144022482408d5dc",
+  "timestamp": "2026-10-08T05:29:32+09:00",
+  "command": "JAVA_HOME=/Library/Java/JavaVirtualMachines/zulu-21.jdk/Contents/Home PATH=<Node24>:$PATH JWT_PUBLIC_KEY=<private-temp>/public.pem JWT_ISSUER=https://mulino.local.invalid JWT_AUDIENCE=mulino-platform ./mvnw -f backend/pom.xml -Dtest=TradeResidualRemedyTest,ReceiptResidualGatewayPostgresTest#transferredReceiptLeafConservesRecipientHistoryAndExactCredits+lateCommitFailureRollsBackReceiptCreditAndDutyRangeSplit+previouslySettledLeafIsNeverReactivatedByReceipt test",
+  "exitCode": 0,
+  "versions": {
+    "java": "21.0.5 Azul",
+    "maven": "3.9.16",
+    "postgresql": "18.6",
+    "postgresImage": "postgres@sha256:4ef4dbc939d61acea57712655ddb4b4ab27419c913f94cca0cd57cb3ea3c2280"
+  },
+  "counts": {
+    "unit": 5,
+    "actualPostgres": 3,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "totalSeconds": 14.255,
+  "fixtureHashes": {
+    "backend/src/test/java/com/mulino/application/evidence/ReceiptResidualGatewayPostgresTest.java": "6ba7da28300e09844f13f02bb3834a4e6a1a7d699f0635658666d2984dbe774e",
+    "backend/src/test/java/com/mulino/trade/TradeResidualRemedyTest.java": "d30d64c115a3c3543f06d5730587755abb5eb86266d6d1c8658da9b58550d6af",
+    "database/migrations/V22__receipt_residual_remedy.sql": "b57a7f646dab3794bcfb9c9b7575339ec39da3f1d613a9b75c3f7ed9d7ea9b4f"
+  },
+  "observations": [
+    "60+20+20 keeps one immutable initial shortfall root and open quantities40/20/0",
+    "accepted partial transfer retains recipient10 until receipt prefix covers its range; exact total40 is credited once",
+    "late commit guard failure rolls back physical receipt, PO contribution, split scopes, assignments and receipt duty credits together",
+    "immutable receipt credit UPDATE rejected in actual PostgreSQL",
+    "previous settlement state preserved without reactivation; settlement authorization itself not exercised by this fixture"
+  ],
+  "limits": [
+    "Unit mock test is not runtime evidence",
+    "S3 aggregate/schema parity/native E2E remains coordinator acceptance",
+    "Actual concurrent receipt/transfer race not separately exercised by this focused suite; same transaction fences and DB range exclusion are retained",
+    "No actual model, paid provider, regulatory or BTP validation"
+  ],
+  "artifacts": [
+    "maven-attempt1.log.gz",
+    "unit-junit.xml.gz",
+    "postgres-junit.xml.gz"
+  ]
+}
