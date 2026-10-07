@@ -49,7 +49,13 @@ class IdentityPersistenceTest {
       DomainContext c=auth.context(Instant.now(),Instant.now());assertEquals(ACTOR,c.actorId());assertEquals(ORG,c.organizationId());assertEquals(OWNER,c.stableRequestOwner());
       auth.authorize(c,"getObject",TARGET);assertTrue(auth.permitted(c,"getObject",null,null));assertFalse(auth.permitted(c,"getObject",OTHER,null));
       assertThrows(AccessDeniedException.class,()->auth.authorize(c,"dispatchQuantity",TARGET));
-      jdbc.update("UPDATE mulino_identity_Grants SET revokedAt=CURRENT_TIMESTAMP,revision=revision+1 WHERE organizationId=? AND ID=?",ORG,GRANT);
+      // Authority uses the server ExecutionClock. A separate database clock may
+      // put CURRENT_TIMESTAMP slightly in the future; pin the actual effective
+      // revocation to that same server clock, without waiting or loosening denial.
+      Instant revokedAt=auth.now();
+      assertEquals(1,jdbc.update("UPDATE mulino_identity_Grants SET revokedAt=?,revision=revision+1 WHERE organizationId=? AND ID=?",java.sql.Timestamp.from(revokedAt),ORG,GRANT));
+      var persisted=repository.rows("Grants",ORG).stream().filter(g->GRANT.equals(g.get("ID"))).findFirst().orElseThrow();
+      assertFalse(IdentityAuthorization.instant(persisted.get("revokedAt")).isAfter(auth.now()),"Persisted revocation is already effective at the authorization clock");
       assertThrows(AccessDeniedException.class,()->auth.authorize(c,"getObject",TARGET));
     });
   }
