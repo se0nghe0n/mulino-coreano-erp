@@ -5,6 +5,8 @@ public interface CommandGuard {
   void fence(DomainContext context,CommandPreparation preparation);
   void verify(DomainContext context,String capability,String canonicalHash,
       CommandPreparation preparation,Map<String,Object> intent);
+  /** Completed-result reads must fence current identity and authorize every saved effect scope. */
+  default void authorizeReplay(DomainContext context,String capability,Map<String,List<String>> savedScopes){throw DomainError.forbidden();}
   /** Controls use an expiry-checked pre-effect proof for their own intentional authority mutation. */
   default void verifyCommit(DomainContext context,String capability,String canonicalHash,
       CommandPreparation preparation,Map<String,Object> intent,boolean mutatesAuthorization){

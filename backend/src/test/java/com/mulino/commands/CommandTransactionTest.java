@@ -30,19 +30,23 @@ class CommandTransactionTest {
  String org,actor;DomainContext context;
  @TestConfiguration static class Fixture {
   @Bean @Primary CommandLeasePort fixtureLease(){return mock(CommandLeasePort.class);}
-  @Bean @Primary Guard guard(){return new Guard();}
+  @Bean @Primary Guard guard(ReadAuthorizer auth){return new Guard(auth);}
   @Bean CommandHandler fixtureHandler(JdbcTemplate jdbc){return new CommandHandler(){
    public Set<String> capabilities(){return Set.of("fixtureIncrement","fixtureClose");}
    public CommandPreparation prepare(DomainContext c,Map<String,Object> i){if("fixtureClose".equals(i.get("capabilityId"))&&jdbc.queryForObject("SELECT revision FROM command_fixture WHERE organizationId=?",Integer.class,c.organizationId())>0)throw DomainError.invalid("Parent consumed");if(!((Map<?,?>)i.get("slots")).keySet().equals(Set.of("amount")))throw DomainError.invalid("Typed amount required");return CommandPreparation.ordinary(Map.of("ORGANIZATION",List.of(c.organizationId()),"WORK",List.of(c.actorId())),List.of("fixture-state"),"INTERNAL_MOVE",null,jdbc.queryForObject("SELECT revision FROM command_fixture WHERE organizationId=?",Integer.class,c.organizationId()));}
    public Map<String,Object> execute(DomainContext c,Map<String,Object> i){jdbc.update("UPDATE command_fixture SET revision=revision+1,quantity=quantity+? WHERE organizationId=?",Integer.parseInt((String)((Map<?,?>)i.get("slots")).get("amount")),c.organizationId());return Map.of("outcome","APPLIED","revision",jdbc.queryForObject("SELECT revision FROM command_fixture WHERE organizationId=?",Integer.class,c.organizationId()),"effects",Map.of("movement","fixture"));}
   };}
  }
+ interface ReplayCheck{void check(DomainContext c,String capability,Map<String,List<String>> scopes);}
  static class Guard implements CommandGuard {
+  final ReadAuthorizer auth;ReplayCheck replay;
+  Guard(ReadAuthorizer auth){this.auth=auth;}
+  public void authorizeReplay(DomainContext c,String capability,Map<String,List<String>> scopes){if(replay!=null){replay.check(c,capability,scopes);return;}for(var dimension:scopes.entrySet())for(String id:dimension.getValue()){var single=new HashMap<>(scopes);single.put(dimension.getKey(),List.of(id));auth.authorizeScopes(c,capability,single);}}
   AtomicBoolean allowed=new AtomicBoolean(true);AtomicBoolean approval=new AtomicBoolean(true);AtomicBoolean after=new AtomicBoolean(false);int verifies;
   public void fence(DomainContext c,CommandPreparation p){}
   public void verify(DomainContext c,String cap,String hash,CommandPreparation p,Map<String,Object> i){verifies++;if(!allowed.get()||after.get()&&verifies%2==0)throw DomainError.forbidden();if(!approval.get())throw new DomainError("WAITING_APPROVAL","APPROVAL_REQUIRED","Approval required");}
  }
- @BeforeEach void setup(){org=UUID.randomUUID().toString();actor=UUID.randomUUID().toString();jdbc.execute("CREATE TABLE IF NOT EXISTS command_fixture(organizationId VARCHAR(36) PRIMARY KEY,revision INTEGER NOT NULL,quantity INTEGER NOT NULL)");jdbc.update("INSERT INTO mulino_identity_Organizations(ID,externalAlias) VALUES (?,?)",org,org);jdbc.update("INSERT INTO mulino_identity_Actors(organizationId,ID,kind,stableRequestOwner) VALUES (?,?,'HUMAN',?)",org,actor,actor);jdbc.update("INSERT INTO command_fixture VALUES (?,0,0)",org);context=new DomainContext(org,actor,actor,Instant.now(),Instant.now());when(auth.context(any(),any())).thenReturn(context);reset(lease);when(lease.resolveContext(anyMap(),any())).thenReturn(context);guard.allowed.set(true);guard.approval.set(true);guard.after.set(false);guard.verifies=0;
+ @BeforeEach void setup(){org=UUID.randomUUID().toString();actor=UUID.randomUUID().toString();jdbc.execute("CREATE TABLE IF NOT EXISTS command_fixture(organizationId VARCHAR(36) PRIMARY KEY,revision INTEGER NOT NULL,quantity INTEGER NOT NULL)");jdbc.update("INSERT INTO mulino_identity_Organizations(ID,externalAlias) VALUES (?,?)",org,org);jdbc.update("INSERT INTO mulino_identity_Actors(organizationId,ID,kind,stableRequestOwner) VALUES (?,?,'HUMAN',?)",org,actor,actor);jdbc.update("INSERT INTO command_fixture VALUES (?,0,0)",org);context=new DomainContext(org,actor,actor,Instant.now(),Instant.now());when(auth.context(any(),any())).thenReturn(context);reset(lease);when(lease.resolveContext(anyMap(),any())).thenReturn(context);guard.allowed.set(true);guard.approval.set(true);guard.after.set(false);guard.verifies=0;guard.replay=null;
     try{
       String definition=UUID.randomUUID().toString();
       var d=new com.mulino.domain.definitions.Definition(org,definition,"fixture-published",null,"PUBLISHED",null,"core-v1","1.0.0",List.of(),List.of(),List.of(),List.of(),List.of(),List.of(new com.mulino.domain.definitions.Definition.Capability("fixtureIncrement","1.0.0","core-v1","1.0.0","1.0.0",List.of()),new com.mulino.domain.definitions.Definition.Capability("fixtureClose","1.0.0","core-v1","1.0.0","1.0.0",List.of())));

@@ -60,7 +60,7 @@ public class ApplicationCommands {
     repository.fence(c,List.of("command:"+c.stableRequestOwner()+":"+cap+":"+key));
     Optional<Map<String,Object>> old=repository.find(c,cap,key);
     if(old.isPresent()){
-      if(old.get().get("authorizationScopeJson")!=null)auth.authorizeScopes(c,cap,repository.scopes(old.get()));else auth.authorize(c,cap,null);
+      if(old.get().get("authorizationScopeJson")!=null){CommandGuard replay=guard.getIfAvailable();if(replay==null)throw DomainError.forbidden();replay.authorizeReplay(c,cap,repository.scopes(old.get()));}else auth.authorize(c,cap,null);
       if(!claim.isEmpty()){verifyClaim(intent,claim,repository.scopes(old.get()));leases.getObject().fenceAndVerify(c,claim);}
       if(!hash.equals(old.get().get("canonicalHash")))throw new DomainError("CONFLICT","IDEMPOTENCY_CONFLICT","Idempotency key has different content");
       if(old.get().get("resultJson")==null)throw new DomainError("CONFLICT","COMMAND_IN_PROGRESS","Command unavailable");
