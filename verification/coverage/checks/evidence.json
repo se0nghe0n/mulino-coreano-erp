@@ -1,0 +1,66 @@
+{
+  "recordType": "COVERAGE_CONTRACT_SELFTEST",
+  "evidenceClass": "SELFTEST",
+  "baselineCommit": "77c2df3440b6d8b362bfb52fed677e441c372b4c",
+  "originalAssignedBaseline": "feaca0af9673620eff9a5ac0f08a657ce14e9ccd",
+  "timestamp": "2026-10-07T14:30:27.690098+00:00",
+  "workingTreeDirty": true,
+  "pythonVersion": "3.14.7",
+  "javaRuntimeVersion": "21.0.5+11-LTS",
+  "versionsMissing": {
+    "mavenVersion": "Focused Maven invocation did not print its own version; command path recorded, no guessed value"
+  },
+  "sourceSha256": {
+    "verification/coverage/README.md": "ae7d035bd87df6bb74b115f0f4513122de06225d5a0a682b77c0ca524d41c36e",
+    "verification/coverage/assemble.py": "7058207ee6305daff8bdb88874f0ac1bd37fdfb2dbbcf08f8d741aaca56cb0d5",
+    "verification/coverage/execution-receipt.schema.json": "9de94fb337fe7814948dad80e1f59e39bde74bcd5f7988ba8a77d69179d71080",
+    "verification/coverage/runtime-evidence-index.json": "62860891482d769aa2123aa1eeecefc536ccb3b98b7742db0fe04c6b85f30c28",
+    "verification/coverage/runtime-evidence-index.schema.json": "72284a2f468f670ce19a24ad1ce7fe3a576e01430b53d4d51afe501d51b58c97",
+    "verification/coverage/runtime-manifest.schema.json": "45b30210d9eb8d965bead404300bc5ff7b3ee143784a5cb9ac946ba984581edf",
+    "verification/coverage/test_coverage.py": "358f66d2a9eae19d0ea80ef0f350163f3dafe059e935ce50b40bcfe1cdb0e8e0",
+    "verification/coverage/validate.py": "ba26032adafd0bb854c7ef26022b34dcca5aabc06f10e1c22e968e04c378b728",
+    "verification/harness/src/test/java/org/mulino/verification/coverage/CoverageSchemaTest.java": "78cba738cc85e52b8e0e50de567ca094827ad2c665ae260c7b064681d17b227a"
+  },
+  "checks": [
+    {
+      "command": "python3 -m unittest discover -s verification/coverage -p 'test_*.py' -v",
+      "exitCode": 0,
+      "status": "SELFTEST_PASS",
+      "tests": 31,
+      "failures": 0,
+      "skipped": 0,
+      "artifact": "python-selftest.txt"
+    },
+    {
+      "command": "./mvnw -B -ntp -f verification/harness/pom.xml -Dtest=org.mulino.verification.coverage.CoverageSchemaTest test",
+      "exitCode": 0,
+      "status": "SELFTEST_PASS",
+      "tests": 3,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "artifact": "schema-junit.txt"
+    },
+    {
+      "command": "python3 verification/coverage/assemble.py",
+      "exitCode": 2,
+      "status": "NOT_RUN",
+      "artifact": "assembly.txt"
+    },
+    {
+      "command": "python3 verification/coverage/validate.py",
+      "exitCode": 0,
+      "status": "MANIFEST_VALID_RUNTIME_NOT_RUN",
+      "artifact": "saved-validation.txt"
+    }
+  ],
+  "productGateComplete": false,
+  "userStep2CompleteClaimed": false,
+  "actualModelCallsPerformedByThisTool": 0,
+  "actualProductRuntime": "NOT_RUN",
+  "actualModelUsage": null,
+  "actualModelCost": null,
+  "missingReason": "Isolated B2 lacks product case/binding integration and actual mandatory runtime reports; no model/deployment calls",
+  "normalization": "Saved command logs only expand tabs and strip trailing whitespace",
+  "remainingIntegration": "Coordinator creates final registry, merges all case/binding outputs, runs fresh prepare and binding preparation, assembles actual reports later"
+}

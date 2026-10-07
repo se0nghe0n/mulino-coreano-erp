@@ -1,0 +1,692 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://mulino.test/verification/coverage/runtime-manifest.schema.json",
+  "type": "object",
+  "required": [
+    "schemaVersion",
+    "recordType",
+    "profile",
+    "status",
+    "exitCode",
+    "timestamp",
+    "command",
+    "codeCommit",
+    "assemblyVersion",
+    "assemblerPythonVersion",
+    "gateComplete",
+    "runtimeComplete",
+    "productRuntimeClaimed",
+    "artifactCoverageStatus",
+    "preparationStatus",
+    "runtimeStatus",
+    "expectedCaseIds",
+    "oracleCount",
+    "observationCount",
+    "cases",
+    "namedObservations",
+    "profiles",
+    "model",
+    "inputArtifacts",
+    "coverageProblems",
+    "preparationProblems",
+    "semanticOracleEquivalence",
+    "assemblyEvidenceClass",
+    "selftestIsProductEvidence",
+    "runtimeArtifacts",
+    "runtimeArtifactDescriptors",
+    "workingTreeDirty"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "const": "1.0.0"
+    },
+    "recordType": {
+      "const": "ACCEPTANCE_HARNESS_REPORT"
+    },
+    "profile": {
+      "const": "coverage"
+    },
+    "status": {
+      "enum": [
+        "PASS",
+        "FAIL",
+        "NOT_RUN"
+      ]
+    },
+    "exitCode": {
+      "enum": [
+        0,
+        1,
+        2
+      ]
+    },
+    "timestamp": {
+      "type": "string",
+      "minLength": 1
+    },
+    "command": {
+      "type": "string",
+      "minLength": 1
+    },
+    "codeCommit": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{40}$"
+    },
+    "assemblyVersion": {
+      "const": "1.0.0"
+    },
+    "assemblerPythonVersion": {
+      "type": "string",
+      "minLength": 1
+    },
+    "gateComplete": {
+      "type": "boolean"
+    },
+    "runtimeComplete": {
+      "type": "boolean"
+    },
+    "productRuntimeClaimed": {
+      "type": "boolean"
+    },
+    "artifactCoverageStatus": {
+      "enum": [
+        "PASS",
+        "FAIL",
+        "NOT_RUN"
+      ]
+    },
+    "preparationStatus": {
+      "enum": [
+        "PREPARED",
+        "FAIL",
+        "NOT_RUN"
+      ]
+    },
+    "runtimeStatus": {
+      "enum": [
+        "PASS",
+        "FAIL",
+        "NOT_RUN"
+      ]
+    },
+    "expectedCaseIds": {
+      "type": "array",
+      "uniqueItems": true,
+      "minItems": 41,
+      "maxItems": 41,
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "oracleCount": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "observationCount": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "cases": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/case"
+      }
+    },
+    "namedObservations": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/observation"
+      }
+    },
+    "profiles": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/profile"
+      }
+    },
+    "model": {
+      "$ref": "#/$defs/model"
+    },
+    "inputArtifacts": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/artifact"
+      }
+    },
+    "coverageProblems": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/problem"
+      }
+    },
+    "preparationProblems": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/problem"
+      }
+    },
+    "semanticOracleEquivalence": {
+      "const": "REQUIRES_CASE_AND_RUNTIME_REVIEW"
+    },
+    "assemblyEvidenceClass": {
+      "const": "FILESYSTEM_READ_ONLY"
+    },
+    "selftestIsProductEvidence": {
+      "const": false
+    },
+    "runtimeArtifacts": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "path",
+          "sha256",
+          "sizeBytes",
+          "caseId",
+          "subcaseId",
+          "profile",
+          "assertionId",
+          "status",
+          "fixtureHash",
+          "codeCommit",
+          "command",
+          "versions",
+          "expected",
+          "observed",
+          "exitCode"
+        ]
+      }
+    },
+    "runtimeArtifactDescriptors": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "path",
+          "sha256",
+          "sizeBytes",
+          "scope",
+          "completeness"
+        ],
+        "properties": {
+          "path": {
+            "type": "string",
+            "minLength": 1
+          },
+          "sha256": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{64}$"
+          },
+          "sizeBytes": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "scope": {
+            "type": "object",
+            "minProperties": 1
+          },
+          "completeness": {
+            "const": "COMPLETE"
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "workingTreeDirty": {
+      "type": "boolean"
+    }
+  },
+  "additionalProperties": false,
+  "$defs": {
+    "artifact": {
+      "type": "object",
+      "required": [
+        "path",
+        "sha256",
+        "sizeBytes"
+      ],
+      "properties": {
+        "path": {
+          "type": "string",
+          "minLength": 1
+        },
+        "sha256": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "sizeBytes": {
+          "type": "integer",
+          "minimum": 0
+        }
+      },
+      "additionalProperties": false
+    },
+    "assertion": {
+      "type": "object",
+      "required": [
+        "assertionId",
+        "oracleId",
+        "observationNames",
+        "status",
+        "expected",
+        "observed",
+        "evidenceRefs"
+      ],
+      "properties": {
+        "assertionId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "oracleId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "observationNames": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "status": {
+          "enum": [
+            "PASS",
+            "FAIL",
+            "NOT_RUN"
+          ]
+        },
+        "expected": {},
+        "observed": {},
+        "evidenceRefs": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "case": {
+      "type": "object",
+      "required": [
+        "caseId",
+        "subcaseId",
+        "profile",
+        "status",
+        "caseHash",
+        "fixtureArtifacts",
+        "assertions"
+      ],
+      "properties": {
+        "caseId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "subcaseId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "profile": {
+          "type": "string",
+          "minLength": 1
+        },
+        "status": {
+          "enum": [
+            "PASS",
+            "FAIL",
+            "NOT_RUN"
+          ]
+        },
+        "caseHash": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "fixtureArtifacts": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/artifact"
+          }
+        },
+        "assertions": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/assertion"
+          }
+        },
+        "missingReason": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "additionalProperties": false
+    },
+    "observation": {
+      "type": "object",
+      "required": [
+        "oracleId",
+        "observationName",
+        "caseId",
+        "requiredProfiles",
+        "assertionLinks",
+        "status",
+        "expected"
+      ],
+      "properties": {
+        "oracleId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "observationName": {
+          "type": "string",
+          "minLength": 1
+        },
+        "caseId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "requiredProfiles": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "assertionLinks": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "caseId",
+              "subcaseId",
+              "assertionId",
+              "evidenceRefs",
+              "profile",
+              "status"
+            ],
+            "properties": {
+              "caseId": {
+                "type": "string",
+                "minLength": 1
+              },
+              "subcaseId": {
+                "type": "string",
+                "minLength": 1
+              },
+              "assertionId": {
+                "type": "string",
+                "minLength": 1
+              },
+              "evidenceRefs": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "profile": {
+                "type": "string",
+                "minLength": 1
+              },
+              "status": {
+                "enum": [
+                  "PASS",
+                  "FAIL",
+                  "NOT_RUN"
+                ]
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "status": {
+          "enum": [
+            "PASS",
+            "FAIL",
+            "NOT_RUN"
+          ]
+        },
+        "expected": {}
+      },
+      "additionalProperties": false
+    },
+    "profile": {
+      "type": "object",
+      "required": [
+        "profile",
+        "status",
+        "prerequisiteProfiles",
+        "missingReason"
+      ],
+      "properties": {
+        "profile": {
+          "type": "string",
+          "minLength": 1
+        },
+        "status": {
+          "enum": [
+            "PASS",
+            "FAIL",
+            "NOT_RUN"
+          ]
+        },
+        "prerequisiteProfiles": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "missingReason": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "reportArtifact": {
+          "$ref": "#/$defs/artifact"
+        },
+        "receiptArtifact": {
+          "$ref": "#/$defs/artifact"
+        },
+        "executionIdentity": {
+          "type": "object"
+        },
+        "command": {
+          "type": "object"
+        },
+        "versions": {
+          "type": "object"
+        },
+        "inputArtifacts": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/artifact"
+          }
+        },
+        "artifactRefs": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "model": {
+      "type": "object",
+      "required": [
+        "caseCount",
+        "turnCount",
+        "plannedRepeats",
+        "preparationStatus",
+        "status",
+        "actualModelCalls",
+        "usage",
+        "cost",
+        "missingReason"
+      ],
+      "properties": {
+        "caseCount": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "turnCount": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "plannedRepeats": {
+          "const": 3
+        },
+        "preparationStatus": {
+          "enum": [
+            "PREPARED",
+            "FAIL",
+            "NOT_RUN"
+          ]
+        },
+        "status": {
+          "enum": [
+            "PASS",
+            "FAIL",
+            "NOT_RUN"
+          ]
+        },
+        "actualModelCalls": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 0
+        },
+        "usage": {
+          "type": [
+            "object",
+            "null"
+          ]
+        },
+        "cost": {
+          "type": [
+            "object",
+            "null"
+          ]
+        },
+        "missingReason": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "additionalProperties": false
+    },
+    "problem": {
+      "type": "object",
+      "required": [
+        "status",
+        "reason"
+      ],
+      "properties": {
+        "status": {
+          "enum": [
+            "FAIL",
+            "NOT_RUN"
+          ]
+        },
+        "reason": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "status": {
+            "enum": [
+              "FAIL",
+              "NOT_RUN"
+            ]
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "gateComplete": {
+            "const": false
+          },
+          "runtimeComplete": {
+            "const": false
+          },
+          "productRuntimeClaimed": {
+            "const": false
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "status": {
+            "const": "PASS"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "exitCode": {
+            "const": 0
+          },
+          "gateComplete": {
+            "const": true
+          },
+          "runtimeComplete": {
+            "const": true
+          },
+          "productRuntimeClaimed": {
+            "const": true
+          },
+          "preparationStatus": {
+            "const": "PREPARED"
+          },
+          "runtimeStatus": {
+            "const": "PASS"
+          },
+          "oracleCount": {
+            "const": 122
+          },
+          "observationCount": {
+            "const": 499
+          },
+          "model": {
+            "properties": {
+              "status": {
+                "const": "PASS"
+              },
+              "actualModelCalls": {
+                "type": "integer",
+                "minimum": 219
+              },
+              "usage": {
+                "type": "object"
+              },
+              "cost": {
+                "type": "object"
+              }
+            }
+          }
+        }
+      }
+    }
+  ]
+}
