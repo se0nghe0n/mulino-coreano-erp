@@ -39,6 +39,20 @@ public class EvidenceRepository {
     return db.run(Select.from(entity).where(x->x.get("organizationId").eq(org).and(x.get("ID").eq(id)))).first()
       .map(row->new LinkedHashMap<String,Object>(row)).orElseThrow(DomainError::forbidden);
   }
+  /** Ancestor and descendant scopes overlap; sibling split scopes remain disjoint. */
+  public Set<String> overlappingScopes(String org,String segmentId) {
+    var edges=db.run(Select.from("mulino.inventory.GenealogyEdges").where(x->x.get("organizationId").eq(org))).listOf(Map.class);
+    Set<String> result=new HashSet<>();result.add(segmentId);
+    for(boolean forward:List.of(true,false)) {
+      Set<String> direction=new HashSet<>();direction.add(segmentId);boolean changed;
+      do {changed=false;for(var edge:edges) {
+        String from=Objects.toString(edge.get(forward?"sourceId":"targetId"),null),to=Objects.toString(edge.get(forward?"targetId":"sourceId"),null);
+        if(from!=null&&to!=null&&direction.contains(from))changed|=direction.add(to);
+      }}while(changed);
+      result.addAll(direction);
+    }
+    return result;
+  }
   public boolean referenced(UUID blob) {
     return db.run(Select.from("mulino.evidence.DocumentVersions").where(x->x.get("blobId").eq(blob.toString()))).rowCount()>0;
   }

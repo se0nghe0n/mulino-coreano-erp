@@ -52,7 +52,9 @@ public class EvidenceReconciliation {
     boolean identity=false;
     if(input.physicalScopeId()!=null) {
       var physical=r.subject(c.organizationId(),"SEGMENT",uuid(input.physicalScopeId()));
-      auth.authorizeScopes(c,capability,Map.of("TARGET",List.of(input.physicalScopeId()),"ITEM",List.of(physical.get("itemId").toString())));
+      var physicalScopes=new LinkedHashMap<String,Collection<String>>(scopes(claim));physicalScopes.put("TARGET",List.of(input.physicalScopeId()));physicalScopes.put("ITEM",List.of(physical.get("itemId").toString()));
+      if(physical.get("placeId")!=null)physicalScopes.put("PLACE",List.of(physical.get("placeId").toString()));
+      auth.authorizeScopes(c,capability,physicalScopes);
       identity="CONFIRMED".equals(physical.get("identificationStatus"))&&"IDENTIFIED".equals(physical.get("mixtureStatus"))&&quantity!=null&&quantity.compareTo((BigDecimal)physical.get("quantity"))==0&&Objects.equals(input.unit(),physical.get("unit"))&&switch(claim.get("subjectKind").toString()) {
         case "SEGMENT" -> input.physicalScopeId().equals(claim.get("subjectId"));
         case "ITEM" -> claim.get("subjectId").equals(physical.get("itemId"));
@@ -64,6 +66,10 @@ public class EvidenceReconciliation {
     if(current&&variants==1&&identity&&original&&sameQuantity&&"KNOWN".equals(claim.get("valueState"))&&"KNOWN".equals(event.get("valueState"))
        &&Objects.equals(input.sourceIdentity(),event.get("sourceNamespace")+":"+event.get("externalEventId")+":"+event.get("sourceVersion"))
        &&input.effectiveFrom().equals(instant(claim.get("effectiveFrom"))))decision="MATCHED";
+    if(input.physicalScopeId()!=null) {
+      Set<String> overlapping=r.overlappingScopes(c.organizationId(),input.physicalScopeId());
+      if(r.rows("CanonicalOccurrences",c.organizationId()).stream().anyMatch(x->!input.physicalScopeId().equals(x.get("physicalScopeId"))&&overlapping.contains(x.get("physicalScopeId"))&&event.get("kind").equals(x.get("kind"))))decision="CONFLICT";
+    }
     if(input.physicalScopeId()!=null && r.rows("CanonicalOccurrences",c.organizationId()).stream().anyMatch(x->input.physicalScopeId().equals(x.get("physicalScopeId"))&&event.get("kind").equals(x.get("kind"))&&!input.effectiveFrom().equals(instant(x.get("effectiveFrom")))))decision="CONFLICT";
     if(input.effectiveFrom().isAfter(Instant.now()))decision="UNVERIFIED";
     if(input.existingCanonicalId()!=null) {
