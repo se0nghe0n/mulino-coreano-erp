@@ -46,6 +46,31 @@
       "passed": 3,
       "errors": 5,
       "cause": "seeded canonical fixture omitted mandatory reassessmentState; fixed in 5b9b3a9"
+    },
+    {
+      "attempt": 6,
+      "status": "FAIL",
+      "stage": "gateway and PostgreSQL",
+      "tests": 9,
+      "passed": 7,
+      "failures": 1,
+      "errors": 1,
+      "testedCommit": "a0a23a44e4db831385e16f7576890dd809c3623b",
+      "cause": "Public reconciliation fixture incorrectly used RECORD instead of installed COMMAND; PREPARED remedy null decision raised NPE; fixed c7cafed",
+      "sourceHashes": {
+        "backend/src/main/java/com/mulino/application/trade/regulatory/RegulatoryCommands.java": "e9247c7bee9d76aa265259305c110e2e4e6c008d06336c3b69d75746f305983b",
+        "backend/src/main/java/com/mulino/application/trade/regulatory/RegulatoryInputs.java": "de8a8e266bf32b71a96d7376879e566315939cb4c352f4b7886f53156cacd59d",
+        "backend/src/main/java/com/mulino/application/trade/regulatory/RegulatoryQueries.java": "6921a7279a8ac44f29d3d4291fbe442f845c9a399c2362842bae618ac3d3e4ec",
+        "backend/src/main/java/com/mulino/application/trade/regulatory/RegulatoryEvidence.java": "bbd61e1aba00e808c2494212a7c7aafede4a11f847842fe6310ee7d78efe73f0",
+        "backend/src/main/java/com/mulino/application/trade/regulatory/RegulatoryEvidenceScope.java": "6e030898384705ea6e0a9dd23b7896ac4225d45bdd5961926d4ac9fe005ecc57",
+        "backend/src/main/java/com/mulino/application/trade/regulatory/RegulatoryEligibility.java": "d0dc0ae25f6ba8bb8f2979569fce25562e906bfe6af0f6aa45b63decd850f9b0",
+        "backend/src/main/java/com/mulino/application/trade/regulatory/RegulatoryResponsibilities.java": "ff6df421dd0c5d8fb3672db0f2221df2d49fb6f2049c9550b55567cf5df7d0bc",
+        "backend/src/main/java/com/mulino/domain/trade/regulatory/RegulatoryRepository.java": "63b2dfc273c4df2e5f99190105152cc9272e7829b241a1e26820a714745f9429",
+        "backend/src/test/java/com/mulino/core/S3RegulatoryActualTest.java": "93b8473ef2081d787827daafb03f5f60d80889a833057379834fb8377605ebcf",
+        "database/migrations/V18__regulatory_procedures.sql": "e45c867ee7eaff49831871f4b4f7fe7745f9c35cf96eab1401b09812f584ea47",
+        "backend/db/regulatory.cds": "e4f2096de928ecd6df65ae6042ecd6304fa348624f35f1764dad0448c47751c9",
+        "backend/srv/regulatory-model.cds": "650fc926e190ebf0ee210d8060de16b2d889a3bda8c94b3883e13854e6c2d30c"
+      }
     }
   ],
   "limits": [
@@ -59,6 +84,7 @@
     "maven-1.log.gz": "c3e6117877bf3d43ceb3f1a302422e16b47ccaeee76ac5697266d21c5f6378bf",
     "maven-5.log.gz": "01e61df817fee1fb63dfc76c7e3ad0025019e680f8b2d29e7ea9f252eb8ca3a6",
     "maven-2.log.gz": "deeb4f4190c87ee2e4dcc8f7eda70a44bea31c2b5ad1abc0afb74ab0d18fd243",
-    "maven-4.log.gz": "550e914f839cc88adbd33beaf8129c1df0f00c1ca63f921cd25ff579af97f4fc"
+    "maven-4.log.gz": "550e914f839cc88adbd33beaf8129c1df0f00c1ca63f921cd25ff579af97f4fc",
+    "maven-6.log.gz": "95ef93bd5940d26d6ce24407bba93247e5347d960ed01472217eb28cbcb9dd49"
   }
 }
