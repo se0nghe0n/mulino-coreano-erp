@@ -18,8 +18,9 @@ public class WorkReadRepository {
   }
   @SuppressWarnings({"unchecked","rawtypes"})
   public List<Map<String,Object>> rows(String entity,DomainContext context) {
-    if(!Set.of("Works","GoalReferences","AssessmentReferences","ObligationReferences","SubjectLinks","EvidenceReferences").contains(entity)) throw DomainError.invalid("Unsupported read entity");
+    if(!Set.of("Works","GoalReferences","AssessmentReferences","ObligationReferences","SubjectLinks","EvidenceReferences","WorkLinks","WorkContributions").contains(entity)) throw DomainError.invalid("Unsupported read entity");
     if(entity.equals("Works"))return workHistory(context);
+    if(entity.equals("WorkLinks")||entity.equals("WorkContributions"))return (List)db.run(Select.from("mulino.work."+entity).where(r->r.get("organizationId").eq(context.organizationId()).and(r.get(entity.equals("WorkLinks")?"createdAt":"recordedAt").le(context.knownAt()))).orderBy("ID")).listOf(Map.class);
     return (List)db.run(Select.from("mulino.work.read."+entity)
         .where(r->r.get("organizationId").eq(context.organizationId())
             .and(r.get("effectiveAt").le(context.asOf()))

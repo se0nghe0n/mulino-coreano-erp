@@ -2,7 +2,8 @@ namespace mulino.work;
 entity WorkLinks {
  key organizationId : UUID;
  key ID : UUID;
- sourceWorkId : UUID not null;
+ sourceWorkId : UUID;
+ activityId : UUID;
  targetWorkId : UUID not null;
  kind : String(40) not null;
  createdAt : Timestamp not null;

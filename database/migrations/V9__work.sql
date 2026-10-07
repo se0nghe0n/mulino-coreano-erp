@@ -24,12 +24,13 @@ ALTER TABLE mulino_work_read_GoalReferences ADD COLUMN slotsJson TEXT,
  ADD CHECK(goalVersion>0);
 CREATE TABLE mulino_work_WorkLinks (
  organizationId VARCHAR(36) NOT NULL, ID VARCHAR(36) NOT NULL,
- sourceWorkId VARCHAR(36) NOT NULL, targetWorkId VARCHAR(36) NOT NULL,
+ sourceWorkId VARCHAR(36), activityId VARCHAR(36), targetWorkId VARCHAR(36) NOT NULL,
  kind VARCHAR(40) NOT NULL, createdAt TIMESTAMPTZ NOT NULL,
  PRIMARY KEY(organizationId,ID),
+ FOREIGN KEY(organizationId,activityId) REFERENCES mulino_evidence_Events(organizationId,ID),
  FOREIGN KEY(organizationId,sourceWorkId) REFERENCES mulino_work_read_Works(organizationId,ID),
  FOREIGN KEY(organizationId,targetWorkId) REFERENCES mulino_work_read_Works(organizationId,ID),
- CHECK(sourceWorkId<>targetWorkId), CHECK(kind IN ('CONTRIBUTES_TO','DEPENDS_ON','SHARES_ACTIVITY','FOLLOWUP')),
+ CHECK(sourceWorkId<>targetWorkId OR kind='SHARES_ACTIVITY'), CHECK(sourceWorkId IS NOT NULL OR (kind='SHARES_ACTIVITY' AND activityId IS NOT NULL)), CHECK(kind IN ('CONTRIBUTES_TO','DEPENDS_ON','SHARES_ACTIVITY','FOLLOWUP')),
  UNIQUE(organizationId,sourceWorkId,targetWorkId,kind));
 CREATE TABLE mulino_work_WorkTransitions (
  organizationId VARCHAR(36) NOT NULL, ID VARCHAR(36) NOT NULL,
@@ -74,3 +75,5 @@ BEGIN
  RETURN NEW;
 END $$;
 CREATE TRIGGER work_contribution_range BEFORE INSERT ON mulino_work_WorkContributions FOR EACH ROW EXECUTE FUNCTION mulino_work_contribution_range();
+
+CREATE UNIQUE INDEX work_shared_activity_once ON mulino_work_WorkLinks(organizationId,activityId,targetWorkId,kind) WHERE activityId IS NOT NULL;
