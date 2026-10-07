@@ -13,7 +13,7 @@ public final class ScenarioGlue {
     @Given("사례 파일 {string}의 {string}를 준비한다")
     public void prepare(String caseRef,String subcase) throws IOException {
         ContractValidator validator=new ContractValidator(root);
-        runner=new CaseRunner(validator,new UnimplementedDriver(),new AgentRunner.Scripted(),validator.path(caseRef),subcase);
+        runner=new CaseRunner(validator,DriverFactory.create(root,System.getProperty("verification.mode","").equals("contract-red")),new AgentRunner.Scripted(),validator.path(caseRef),subcase);
     }
     @When("{string} 역할이 {string} 행동을 수행한다")
     public void action(String actor,String id) throws IOException {

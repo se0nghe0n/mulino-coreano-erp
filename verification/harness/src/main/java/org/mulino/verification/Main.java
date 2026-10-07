@@ -34,7 +34,8 @@ public final class Main {
         }
         if(mode.equals("prepare") || mode.equals("coverage")) return prepare(validator,paths,mode);
         if(!mode.equals("profile") && !mode.equals("red")) throw new IllegalArgumentException("Unknown mode "+mode);
-        AcceptanceDriver driver=new UnimplementedDriver(); // Step2: no production/client/model adapter is installed.
+        AcceptanceDriver driver=DriverFactory.create(root,mode.equals("red"));
+        boolean actual=driver instanceof org.mulino.verification.actual.ActualAcceptanceDriver;
         ArrayNode cases=Json.array();boolean anyFail=false,anyNotRun=false;
         int discovered=0,selected=0;
         for(Path path:paths) {
@@ -50,9 +51,12 @@ public final class Main {
         String status=anyFail ? "FAIL" : anyNotRun || selected==0 ? "NOT_RUN" : "PASS";
         int exit=status.equals("FAIL")?1:status.equals("NOT_RUN")?2:0;
         ObjectNode report=base(root,profile,status,exit);report.put("discoveredSubcases",discovered).put("selectedSubcases",selected).put("gateComplete",status.equals("PASS"));
-        report.set("cases",cases);report.put("reason",selected==0?"NOT_IMPLEMENTED: product adapter/cases missing; failIfNoTests prevents PASS":"Required actions and observers must execute; unavailable adapters do not establish zero effects");
+        int actualExecutedActions=0;
+        for(JsonNode evidence:cases) for(JsonNode action:evidence.path("actions")) if(actual && action.path("driverStatus").asText().equals("EXECUTED")) actualExecutedActions++;
+        report.put("driver",actual?"actual":"unimplemented");report.put("actualExecutedActions",actualExecutedActions);report.put("productRuntimeClaimed",actualExecutedActions>0);report.set("cases",cases);report.put("reason",selected==0?"NOT_IMPLEMENTED: product adapter/cases missing; failIfNoTests prevents PASS":"Required actions and observers must execute; unavailable adapters do not establish zero effects");
         report.set("prerequisiteProfiles",Json.MAPPER.valueToTree(prerequisites(profile)));report.put("prerequisiteRuntimeComplete",false);
-        if(!mode.equals("red")) {report.put("gateComplete",false);report.put("status",anyFail?"FAIL":"NOT_RUN");report.put("exitCode",anyFail?1:2);exit=anyFail?1:2;}
+        if(!mode.equals("red") && !actual) {report.put("gateComplete",false);report.put("status",anyFail?"FAIL":"NOT_RUN");report.put("exitCode",anyFail?1:2);exit=anyFail?1:2;}
+        if(actual) report.put("gateComplete",false); // Prerequisite integration gates remain independently unverified.
         Json.write(root.resolve("verification/harness/target/evidence/"+profile+".json"),report);
         System.out.println(report.toPrettyString());return exit;
     }

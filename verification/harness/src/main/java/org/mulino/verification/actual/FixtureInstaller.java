@@ -1,0 +1,72 @@
+package org.mulino.verification.actual;
+
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import java.sql.*;
+import java.time.*;
+import java.util.*;
+import org.mulino.verification.Json;
+
+/** Disposable test-only typed seed, atomic, with no HTTP fixture surface. */
+public final class FixtureInstaller {
+    private static final Set<String> TYPES=Set.of("Organization","Human","Agent","TradeItem","Manufacturer","ManufacturerLot","Place","QuantitySegment");
+    private final ActualConfiguration configuration;
+    public FixtureInstaller(ActualConfiguration configuration){this.configuration=configuration;}
+    public ObjectNode install(JsonNode bundle) throws Exception {
+        JsonNode fixture=bundle.path("fixture");
+        if(!fixture.path("synthetic").asBoolean(false))throw new IllegalArgumentException("Only synthetic fixtures allowed");
+        if(!bundle.path("bases").isEmpty()||!fixture.path("baseRefs").isEmpty())throw new UnsupportedOperationException("Fixture inheritance not installed in S1");
+        for(JsonNode alias:fixture.path("aliases")) if(!TYPES.contains(alias.path("type").asText()))throw new UnsupportedOperationException("S1 fixture alias type "+alias.path("type").asText());
+        if(!fixture.path("baseline").isEmpty()||!fixture.path("evidence").isEmpty()||!fixture.path("responsibilities").isEmpty())
+            throw new UnsupportedOperationException("S1 installer cannot silently omit baseline/evidence/responsibility facts");
+        ObjectNode aliases=Json.object();fixture.path("aliases").fieldNames().forEachRemaining(a->aliases.put(a,UUID.randomUUID().toString()));
+        String orgAlias=null;
+        for(var it=fixture.path("aliases").fields();it.hasNext();) {var e=it.next();if(e.getValue().path("type").asText().equals("Organization")){if(orgAlias!=null)throw new UnsupportedOperationException("Multi-organization fixtures pending");orgAlias=e.getKey();}}
+        if(orgAlias==null)throw new IllegalArgumentException("Organization alias required");
+        String org=aliases.path(orgAlias).asText();
+        try(Connection c=DriverManager.getConnection(configuration.jdbcUrl(),configuration.username(),configuration.password())) {
+            c.setAutoCommit(false);
+            try {
+                seed(c,"INSERT INTO mulino_identity_Organizations(ID,externalAlias) VALUES(?,?)",org,orgAlias);
+                for(String type:List.of("Human","Agent","Manufacturer","Place","TradeItem","ManufacturerLot","QuantitySegment"))
+                    for(var it=fixture.path("aliases").fields();it.hasNext();) {var entry=it.next();JsonNode a=entry.getValue();if(!type.equals(a.path("type").asText()))continue;
+                        String id=aliases.path(entry.getKey()).asText();String name=a.path("name").asText(entry.getKey());
+                        switch(type) {
+                            case "Human","Agent" -> {seed(c,"INSERT INTO mulino_identity_Actors(organizationId,ID,kind,stableRequestOwner) VALUES(?,?,?,?)",org,id,type.equals("Human")?"HUMAN":"AGENT",UUID.randomUUID().toString());seed(c,"INSERT INTO mulino_identity_AuthorityFences(organizationId,actorId) VALUES(?,?)",org,id);}
+                            case "Manufacturer" -> seedTemporal(c,fixture,"INSERT INTO mulino_inventory_Manufacturers(organizationId,ID,name) VALUES(?,?,?)",org,id,name);
+                            case "Place" -> seedTemporal(c,fixture,"INSERT INTO mulino_inventory_Places(organizationId,ID,name,kind) VALUES(?,?,?,?)",org,id,name,"WAREHOUSE");
+                            case "TradeItem" -> {String product=UUID.randomUUID().toString();seedTemporal(c,fixture,"INSERT INTO mulino_inventory_Products(organizationId,ID,name) VALUES(?,?,?)",org,product,name);seedTemporal(c,fixture,"INSERT INTO mulino_inventory_TradeItems(organizationId,ID,productId,name,baseUnit,decimalPlaces) VALUES(?,?,?,?,?,?)",org,id,product,name,Json.required(a,"unit"),0);}
+                            case "ManufacturerLot" -> seedTemporal(c,fixture,"INSERT INTO mulino_inventory_ManufacturingLots(organizationId,ID,manufacturerId,itemId,originalLot) VALUES(?,?,?,?,?)",org,id,ref(aliases,a,"manufacturerAlias"),ref(aliases,a,"itemAlias"),entry.getKey());
+                            case "QuantitySegment" -> seed(c,"INSERT INTO mulino_inventory_QuantitySegments(organizationId,ID,itemId,lotId,identificationStatus,quantity,unit,placeId,controlScope,validFrom,mixtureStatus,createdAt,recordedAt) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?)",org,id,ref(aliases,a,"itemAlias"),ref(aliases,a,"lotAlias"),"CONFIRMED",new java.math.BigDecimal(Json.required(a,"quantity")),Json.required(a,"unit"),ref(aliases,a,"locationAlias"),Json.required(a,"physicalScope"),time(fixture.path("clock").path("asOf").asText()),"IDENTIFIED",time(fixture.path("clock").path("asOf").asText()),time(fixture.path("clock").path("knownAt").asText()));
+                            default -> throw new IllegalStateException(type);
+                        }
+                    }
+                for(var it=fixture.path("actors").fields();it.hasNext();) {var entry=it.next();JsonNode a=entry.getValue();String actor=aliases.path(entry.getKey()).asText();
+                    if(actor.isBlank())throw new IllegalArgumentException("Actor alias absent");
+                    if(!orgAlias.equals(Json.required(a,"organizationAlias")))throw new UnsupportedOperationException("Actor organization differs");
+                    if(!configuration.issuer().equals(Json.required(a,"issuer"))||!configuration.audience().equals(Json.required(a,"audience")))throw new IllegalArgumentException("Fixture identity issuer/audience differs from backend");
+                    var grant=a.path("grant");String delegator=ref(aliases,grant,"delegatorAlias"),grantId=UUID.randomUUID().toString();
+                    var from=time(Json.required(grant,"validFrom"));var until=time(Json.required(grant,"validUntil"));
+                    seed(c,"INSERT INTO mulino_identity_ExternalIdentities(organizationId,ID,actorId,issuer,subject,organizationAlias) VALUES(?,?,?,?,?,?)",org,UUID.randomUUID().toString(),actor,configuration.issuer(),Json.required(a,"subject"),orgAlias);
+                    seed(c,"INSERT INTO mulino_identity_Memberships(organizationId,ID,actorId,validFrom,validUntil) VALUES(?,?,?,?,?)",org,UUID.randomUUID().toString(),actor,from,until);
+                    seed(c,"INSERT INTO mulino_identity_Grants(organizationId,ID,actorId,delegatorId,validFrom,validUntil) VALUES(?,?,?,?,?,?)",org,grantId,actor,delegator,from,until);
+                    // Only an explicit organization scope is supported; never broaden item/work-restricted grants.
+                    if(grant.path("scope").size()!=1||!orgAlias.equals(grant.path("scope").path("organizationAlias").asText()))throw new UnsupportedOperationException("Dimension-restricted grant fixture mapping pending");
+                    seed(c,"INSERT INTO mulino_identity_GrantScopes(organizationId,grantId,scopeKind,scopeId) VALUES(?,?,?,?)",org,grantId,"ORGANIZATION",org);
+                    for(JsonNode action:grant.path("actions"))seed(c,"INSERT INTO mulino_identity_GrantActions(organizationId,grantId,capabilityId) VALUES(?,?,?)",org,grantId,action.asText());
+                    for(JsonNode action:a.path("roleCapabilities"))seed(c,"INSERT INTO mulino_identity_CapabilityAssignments(organizationId,ID,actorId,capabilityId,scopeKind,scopeId,validFrom,validUntil) VALUES(?,?,?,?,?,?,?,?)",org,UUID.randomUUID().toString(),actor,action.asText(),"ORGANIZATION",org,from,until);
+                }
+                c.commit();
+            } catch(Exception failure){c.rollback();throw failure;}
+        }
+        var result=Json.object();result.set("aliasMap",aliases);result.put("fixtureHash",Json.required(bundle,"fixtureHash"));result.set("clock",fixture.path("clock"));result.put("committed",true).put("businessExecutionClaimed",false);return result;
+    }
+    private static String ref(JsonNode aliases,JsonNode object,String field) {String alias=Json.required(object,field);String id=aliases.path(alias).asText();if(id.isBlank())throw new IllegalArgumentException("Unknown fixture alias "+alias);return id;}
+    private static OffsetDateTime time(String value){return OffsetDateTime.parse(value);}
+    private static void seedTemporal(Connection c,JsonNode fixture,String sql,Object... parameters) throws SQLException {
+        String temporal=sql.replace(") VALUES(",",createdAt,recordedAt) VALUES(");
+        temporal=temporal.substring(0,temporal.length()-1)+",?,?)";
+        Object[] all=Arrays.copyOf(parameters,parameters.length+2);all[parameters.length]=time(fixture.path("clock").path("asOf").asText());all[parameters.length+1]=time(fixture.path("clock").path("knownAt").asText());seed(c,temporal,all);
+    }
+    private static void seed(Connection c,String sql,Object... parameters) throws SQLException {try(var statement=c.prepareStatement(sql)){for(int i=0;i<parameters.length;i++)statement.setObject(i+1,parameters[i]);if(statement.executeUpdate()!=1)throw new SQLException("Fixture insert did not create exactly one row");}}
+}

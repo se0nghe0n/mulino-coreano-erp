@@ -1,0 +1,101 @@
+{
+  "schemaVersion": "1.0.0",
+  "fixtureId": "S1-ACTUAL-PHYSICAL-READ-ONLY",
+  "synthetic": true,
+  "baseRefs": [],
+  "clock": {
+    "asOf": "2026-10-07T09:00:00Z",
+    "knownAt": "2026-10-07T09:00:01Z",
+    "timezone": "Asia/Seoul",
+    "precision": "SECOND",
+    "deadlineInclusive": true
+  },
+  "versions": {
+    "definition": "S1-NOT-EVALUATED",
+    "evaluator": "S1-NOT-EVALUATED",
+    "policy": "SYNTHETIC-read-only"
+  },
+  "actors": {
+    "reader": {
+      "issuer": "synthetic-fixture-issuer",
+      "subject": "s1-actual-reader",
+      "audience": "isolated-ontology",
+      "organizationAlias": "ORG",
+      "roleCapabilities": [
+        "getObject",
+        "getInventory",
+        "getWork",
+        "getObligations",
+        "getAssessment",
+        "traceLot",
+        "searchObjects"
+      ],
+      "grant": {
+        "delegatorAlias": "supervisor",
+        "actions": [
+          "getObject",
+          "getInventory",
+          "getWork",
+          "getObligations",
+          "getAssessment",
+          "traceLot",
+          "searchObjects"
+        ],
+        "scope": {
+          "organizationAlias": "ORG"
+        },
+        "validFrom": "2026-10-01T00:00:00Z",
+        "validUntil": "2026-10-31T23:59:59Z",
+        "revision": 1
+      }
+    }
+  },
+  "aliases": {
+    "ORG": {
+      "type": "Organization"
+    },
+    "reader": {
+      "type": "Human"
+    },
+    "supervisor": {
+      "type": "Human"
+    },
+    "P": {
+      "type": "TradeItem",
+      "name": "S1 비스킷",
+      "unit": "BOX"
+    },
+    "M": {
+      "type": "Manufacturer"
+    },
+    "L": {
+      "type": "ManufacturerLot",
+      "itemAlias": "P",
+      "manufacturerAlias": "M"
+    },
+    "W": {
+      "type": "Place"
+    },
+    "A60": {
+      "type": "QuantitySegment",
+      "itemAlias": "P",
+      "lotAlias": "L",
+      "locationAlias": "W",
+      "quantity": "60",
+      "unit": "BOX",
+      "physicalScope": "S1-A60"
+    },
+    "B40": {
+      "type": "QuantitySegment",
+      "itemAlias": "P",
+      "lotAlias": "L",
+      "locationAlias": "W",
+      "quantity": "40",
+      "unit": "BOX",
+      "physicalScope": "S1-B40"
+    }
+  },
+  "baseline": {},
+  "evidence": [],
+  "responsibilities": []
+}

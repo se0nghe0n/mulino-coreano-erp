@@ -28,12 +28,14 @@ public final class CaseFeatureTest {
         var summary=listener.getSummary();
         var r=Json.object();r.put("expectedScenarios",expected).put("discoveredScenarios",summary.getTestsFoundCount()).put("startedScenarios",summary.getTestsStartedCount()).put("skippedScenarios",summary.getTestsSkippedCount()).put("failedScenarios",summary.getTestsFailedCount());
         long unavailable=summary.getFailures().stream().filter(f->f.getException() instanceof AssertionError && f.getException().getMessage()!=null && f.getException().getMessage().contains("NOT_IMPLEMENTED")).count();
-        r.put("notImplementedAssertionFailures",unavailable).put("status","FAIL").put("productCoverageClaimed",false);
+        boolean actual=System.getProperty("verification.driver","").equals("actual") && !System.getProperty("verification.mode","").equals("contract-red");
+        r.put("notImplementedAssertionFailures",unavailable).put("status",actual && summary.getTestsFailedCount()==0?"PASS":"FAIL").put("productCoverageClaimed",false);
         r.set("failureReasons",Json.MAPPER.valueToTree(summary.getFailures().stream().map(f->f.getException().toString()).toList()));
         Json.write(root.resolve("verification/harness/target/evidence/feature-red-summary.json"),r);
         assertEquals(expected,summary.getTestsFoundCount(),"Scenario discovery count");
         assertEquals(expected,summary.getTestsStartedCount(),"Scenario execution count");
         assertEquals(0,summary.getTestsSkippedCount(),"No skipped scenario allowed");
+        if(actual) {assertEquals(0,summary.getTestsFailedCount(),"Actual Gherkin scenarios must satisfy every substantive assertion");return;}
         assertEquals(expected,unavailable,"Each RED must be NOT_IMPLEMENTED assertion, not format/environment failure");
         throw new AssertionError("NOT_IMPLEMENTED: "+unavailable+" independently discovered Korean scenarios failed required product assertions");
     }
