@@ -89,7 +89,7 @@ b=[original('e1-invoice-input','INVOICE',inv,'$LINE','40',subject='PURCHASE_ORDE
 b += link('e1-invoice-original','$INVOICE','40')
 b += [command('e1-match-invoice-gap5','matchInvoice',{'invoiceId':'$INVOICE','canonicalOccurrenceId':'$e1-invoice-original.canonical','evidence':'$e1-invoice-original.document'},revision=1,assertions=[{'pointer':'/quantityDifference','operator':'equals','expected':'0'},{'pointer':'/originalDifference','operator':'equals','expected':'5'},{'pointer':'/businessStatus','operator':'equals','expected':'DIFFERENCE'},{'pointer':'/settlementResult','operator':'equals','expected':'UNSATISFIED'},{'pointer':'/bankEffect','operator':'equals','expected':'0'}])]
 write('e1-settlement.json',{'schemaVersion':'1.0.0','status':'NOT_RUN','actions':b})
-c=[{'id':'e1-final-independent','type':'observe','assertions':[
+c=[{'id':'e1-current-sales-revision','type':'observe','bindRows':{'SALES_WORK_REV':{'pointer':'/rawRows/mulino_work_read_works','where':{'id':'$SALES_WORK'},'column':'revision'}}},command('e1-assess-sales30','assessGoal',{'workId':'$SALES_WORK'},revision='$SALES_WORK_REV',refs=[{'type':'Work','id':'$SALES_WORK'}],assertions=[{'pointer':'/assessment/outcome','operator':'equals','expected':'SATISFIED'}]),{'id':'e1-final-independent','type':'observe','assertions':[
  {'pointer':'/rawRows/mulino_inventory_quantitysegments','operator':'sum','column':'quantity','where':{'retiredat':None,'placeid':'$W'},'expected':'80'},
  {'pointer':'/rawRows/mulino_trade_receipt_receipts','operator':'sum','column':'contributedquantity','expected':'100'},
  {'pointer':'/rawRows/mulino_trade_sales_deliveries','operator':'sum','column':'quantity','expected':'30'},

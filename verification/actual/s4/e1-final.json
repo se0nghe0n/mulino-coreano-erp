@@ -3,6 +3,49 @@
   "status": "NOT_RUN",
   "actions": [
     {
+      "id": "e1-current-sales-revision",
+      "type": "observe",
+      "bindRows": {
+        "SALES_WORK_REV": {
+          "pointer": "/rawRows/mulino_work_read_works",
+          "where": {
+            "id": "$SALES_WORK"
+          },
+          "column": "revision"
+        }
+      }
+    },
+    {
+      "id": "e1-assess-sales30",
+      "type": "command",
+      "capability": "assessGoal",
+      "request": {
+        "intentKind": "COMMAND",
+        "definitionVersion": "definition-v1",
+        "capabilityId": "assessGoal",
+        "expectedRevision": "$SALES_WORK_REV",
+        "commandIdempotencyKey": "e1-assess-sales30",
+        "slots": {
+          "workId": "$SALES_WORK"
+        },
+        "provenance": {},
+        "subjectRefs": [
+          {
+            "type": "Work",
+            "id": "$SALES_WORK"
+          }
+        ]
+      },
+      "outcome": "APPLIED",
+      "assertions": [
+        {
+          "pointer": "/assessment/outcome",
+          "operator": "equals",
+          "expected": "SATISFIED"
+        }
+      ]
+    },
+    {
       "id": "e1-final-independent",
       "type": "observe",
       "assertions": [

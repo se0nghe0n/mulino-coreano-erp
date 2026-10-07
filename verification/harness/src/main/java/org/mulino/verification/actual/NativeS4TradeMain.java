@@ -13,7 +13,7 @@ public final class NativeS4TradeMain {
     private final Path root;
     private final ObjectNode actions=Json.object(),bindings=Json.object(),report=Json.object();
     private ActualAcceptanceDriver driver;
-    private JsonNode actor;
+    private JsonNode actor,currentFixture;
     private String work;
     private int checks;
     private NativeS4TradeMain(Path root){this.root=root;}
@@ -22,7 +22,7 @@ public final class NativeS4TradeMain {
         int exit=3;report.put("recordType","S4_ACTUAL_NATIVE_TRADE_RECEIPT").put("status","NOT_RUN").put("gateComplete",false).put("fullCaseCoverageClaimed",false).put("startedAt",Instant.now().toString());report.set("actions",actions);
         try {
             driver=new ActualAcceptanceDriver(root,ActualConfiguration.environment(System.getenv()));
-            String ref="verification/actual/s4/fixture.json";JsonNode fixture=Json.read(root.resolve(ref));
+            String ref="verification/actual/s4/fixture.json";JsonNode fixture=Json.read(root.resolve(ref));currentFixture=fixture;
             var bundle=Json.object();bundle.set("fixture",fixture);bundle.set("bases",Json.array());bundle.put("fixtureHash",Json.sha256(root.resolve(ref)));
             var installed=driver.installFixture("setup",bundle);capture(installed);available(installed);bindings.setAll((ObjectNode)installed.data().path("aliasMap"));actor=fixture.path("actors").path("reader");
             clock("2026-10-07T09:00:02Z");
@@ -44,7 +44,7 @@ public final class NativeS4TradeMain {
             case "include" -> {for(JsonNode nested:Json.read(root.resolve(Json.required(a,"scriptRef"))).path("actions"))execute(nested);}
             case "require-contract" -> throw new Unavailable(a.path("reason").asText());
             case "setup" -> {
-                String ref=Json.required(a,"fixtureRef");var fixture=Json.read(root.resolve(ref));var bundle=Json.object();bundle.set("fixture",fixture);bundle.set("bases",Json.array());bundle.put("fixtureHash",Json.sha256(root.resolve(ref)));var result=driver.installFixture(id,bundle);capture(result);available(result);bindings.setAll((ObjectNode)result.data().path("aliasMap"));if(a.has("organizationAlias"))bindings.set("ORG",result.data().path("aliasMap").path(Json.required(a,"organizationAlias")));actor=fixture.path("actors").path("reader");
+                String ref=Json.required(a,"fixtureRef");var fixture=Json.read(root.resolve(ref));currentFixture=fixture;var bundle=Json.object();bundle.set("fixture",fixture);bundle.set("bases",Json.array());bundle.put("fixtureHash",Json.sha256(root.resolve(ref)));var result=driver.installFixture(id,bundle);capture(result);available(result);bindings.setAll((ObjectNode)result.data().path("aliasMap"));if(a.has("organizationAlias"))bindings.set("ORG",result.data().path("aliasMap").path(Json.required(a,"organizationAlias")));actor=fixture.path("actors").path("reader");
             }
             case "clock" -> clock(a.path("instant").asText());
             case "uuid" -> bindings.put(Json.required(a,"alias"),UUID.randomUUID().toString());
@@ -78,11 +78,12 @@ public final class NativeS4TradeMain {
                 var request=Json.object();request.put("profile","S4").put("asOf",a.path("asOf").asText("2026-10-07T09:00:02Z")).put("knownAt",a.path("knownAt").asText("2026-10-07T09:00:02Z"));var scope=Json.object();scope.set("organizationId",bindings.path("ORG"));request.set("scope",scope);request.set("sources",Json.parse("[\"s4\"]"));
                 var result=driver.observe(id,request);capture(result);available(result);new ContractValidator(root).result(result,"observe");assertions(id,result.data(),a.path("assertions"));
                 for(var it=a.path("bind").fields();it.hasNext();){var e=it.next();JsonNode value=result.data().at(e.getValue().asText());require(!value.isMissingNode(),id+" missing SQL binding "+e.getValue());bindings.set(e.getKey(),value);}
+                for(var it=a.path("bindRows").fields();it.hasNext();){var e=it.next();var selector=resolve(e.getValue());var rows=result.data().at(Json.required(selector,"pointer"));JsonNode selected=null;for(JsonNode row:rows)if(matches(row,selector.path("where"))){require(selected==null,id+" ambiguous SQL row binding "+e.getKey());selected=row;}require(selected!=null,id+" missing SQL row binding "+e.getKey());JsonNode value=selected.path(Json.required(selector,"column"));require(!value.isMissingNode(),id+" missing SQL column "+e.getKey());bindings.set(e.getKey(),value);}
             }
             default -> throw new IllegalArgumentException("Unsupported authored S4 action "+type);
         }
     }
-    private JsonNode resolveActor(String name)throws Exception{return Json.read(root.resolve("verification/actual/s4/fixture.json")).path("actors").path(name);}
+    private JsonNode resolveActor(String name)throws Exception{return currentFixture.path("actors").path(name);}
     private void assertions(String id,JsonNode data,JsonNode assertions) {
         for(JsonNode assertion:assertions) {
             JsonNode value=data.at(Json.required(assertion,"pointer"));require(!value.isMissingNode(),id+" missing observation "+assertion.path("pointer"));
