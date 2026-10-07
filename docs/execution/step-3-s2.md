@@ -72,3 +72,35 @@ S2 종료에는 실제 command gateway를 통한 lifecycle·책임·판정·현�
 표시하되 S2 core 기능을 단순 fail-closed stub으로 남기지 않는다.
 원본 ERP와 운영 자료는 건드리지 않고 native 개발/검토 외의 유료
 모델·BTP 실행은 승인된 범위가 없어 계속 미실행이다.
+
+
+## 1차 통합 점검
+
+Task branch에는 9개 소유 영역의 공통 command gateway, 실제 canonical
+Work/Goal/Assessment/Obligation 확장, 현재 정책·위임 검사, 물량 primitive,
+증거 대조·정정 port와 native HTTP/JDBC adapter를 통합했다. S2는 여전히
+ACTIVE다. 아직 합쳐진 전체 source의 clean build와 인수 실행 전이다.
+
+개별 writer가 관찰한 중간 결과는 다음과 같다. 이후 source 변경이 있는
+검사는 최종 통합 검사로 다시 확인해야 하며 숫자를 합산해 인수로 세지
+않는다.
+
+- commands: 실제 published Definition·PostgreSQL 거래 검사 9개 통과.
+  이후 canonical 원 요청 보존과 commit 검증 연결은 별도 재검사가 필요하다.
+- responsibility: 서비스·실제 PostgreSQL·증거 gate 12개 통과.
+  이후 부분 scope 및 정정 책임 연결은 통합 검사 대상이다.
+- evaluation: 최초 17개 중 16개 통과, 불변 trigger의 예외 분류 1개 실패.
+  실제 변경 거부는 확인했으며 분류 검사를 수정해 후속 재실행한다.
+- control: 실제 PostgreSQL/CQN 및 현재 권한 검사 11개 통과.
+  공통 gateway의 유효한 자기 위임 철회와 정책 강화 commit을 포함한다.
+- runtime: 실제 PostgreSQL lease·rollback·outbox 복구 검사 6개 통과.
+  일부 권한·책임 hook은 test double이므로 전체 worker 인수는 아니다.
+- actual adapter: Java compile과 12개 중 11개 통과. binding 기준 경로의
+  정규화 오류 1개를 수정했고 재실행 전이다. native 제품 실행은 아직이다.
+
+통합에서 발견한 결과 형식 불일치와 두 개의 global CommandGuard 등록은
+각 writer가 수정했다. 목표의 evaluator·condition 기본값은 고정된 발행
+정의에서, timezone은 명시적인 GOAL_CONTEXT 정책에서 가져오고 각각의
+version/hash와 CONTEXT provenance를 보존한다. 근거 없는 기본값은
+사용하지 않는다. 실제 사건의 Work 기여 범위도 독립 저장·중복 방지와
+부모 목표 평가에 연결하고 있다.
