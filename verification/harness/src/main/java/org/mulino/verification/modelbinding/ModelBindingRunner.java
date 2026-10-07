@@ -140,8 +140,9 @@ public final class ModelBindingRunner {
     private JsonNode linkedArtifact(JsonNode execution,String ref,boolean host) throws IOException {
         BindingContract.require(strings(execution.path("artifactRefs")).contains(ref),"Actual response/wire artifact unlinked");
         Path file=contract.validator.path(ref);BindingContract.require(file.toRealPath().startsWith(contract.validator.root().toRealPath()),"Artifact escapes repository");
-        if(!host)BindingContract.require(execution.path("provenance").path("independentCapture").asBoolean(false)&&execution.path("provenance").path("captureSource").asText().equals("ACTUAL_AUTHENTICATED_TRANSPORT"),"API capture is a client projection rather than independent transport observation");
-        JsonNode artifacts=host?execution.path("data").path("hostObservation").path("extractor").path("inputArtifacts"):execution.path("provenance").path("capturedArtifacts");
+        if(!host)BindingContract.require(execution.path("provenance").path("independent").asBoolean(false)&&execution.path("provenance").path("source").asText().equals("ACTUAL_AUTHENTICATED_TRANSPORT"),"API capture is a client projection rather than independent transport observation");
+        JsonNode artifacts=host?execution.path("data").path("hostObservation").path("extractor").path("inputArtifacts"):execution.path("data").path("capturedArtifacts");
+        if(!host)contract.validator.schema("verification/model-binding/capture-artifacts.schema.json",artifacts);
         boolean linked=false;for(JsonNode artifact:artifacts)if(artifact.path("path").asText().equals(ref)){BindingContract.require(artifact.path("sha256").asText().equals(Json.sha256(file))&&artifact.path("sizeBytes").asLong(-1)==Files.size(file),"Captured artifact hash/bytes differ");linked=true;}
         BindingContract.require(linked,"Artifact lacks independent capture hash/bytes");return Json.read(file);
     }

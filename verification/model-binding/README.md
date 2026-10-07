@@ -157,9 +157,9 @@ requestSentAt/responseReceivedAt가 있다. request/response RPC ID,
 capability, 인증 주체와 grant, 현재 action/scope를 대조한다. UAT tool wire는
 실제 host invocation 시간 안에 있어야 하며 host extractor가 읽은
 artifact의 path/hash/bytes와 연결된다. SIT 및 사전 context read는
-`provenance.independentCapture=true`,
-`captureSource=ACTUAL_AUTHENTICATED_TRANSPORT`,
-`capturedArtifacts[{path,sha256,sizeBytes}]`를 요구한다.
+기존 driver schema의 `provenance.independent=true`,
+`provenance.source=ACTUAL_AUTHENTICATED_TRANSPORT`와
+`data.capturedArtifacts[{path,sha256,sizeBytes}]`를 요구한다.
 CAPTURED_CONTRACT_SELFTEST는 계약 반례에만 사용하고 제품 PASS로 세지 않는다.
 
 QUERY는 이미 인증된 context read가 실제 API assertion의 원천이 될 수
@@ -204,3 +204,12 @@ perTurn에는 canonical selectedPathId와 같은 값의 selectedPath,
 capturedApiCallIds, apiAssertionSources의 실제 wire/pointer,
 finalResponseObservationRef를 기록한다. 이 API call IDs는 유료 provider
 modelCalls의 callId와 다른 namespace이며 모델 usage/cost를 나타내지 않는다.
+
+
+capture hash 목록은 별도 `capture-artifacts.schema.json`의 typed array로
+검증한다. 공통 driver provenance의 additionalProperties=false는 유지한다.
+사전 중단이나 business effect0에서 책임을 TRANSFERRED라고 주장할 수 없다.
+실행된 이전을 주장하려면 실제 OBLIGATION_ASSIGNMENT effect의
+obligationRef/newOwnerRef, 독립 현재 duty의 id/ownerRef, 답변에서 관찰된
+인수자와 잔여 의무가 함께 같아야 한다. 기존 인간 책임이 남았는데 이전을
+완료했다고 답하는 것도 거짓 완료다.

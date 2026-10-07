@@ -43,6 +43,16 @@ public final class FinalResponseObservation {
         if(Set.of("FULFILLED","CLOSED").contains(completion))BindingContract.require(completionProof,"Business completion claim has no independently verified completion state");
         var claimed=Json.object();claimed.set("obligations",claims.path("residualObligations"));
         evaluator.obligations(claimed,Json.object(),after.path("data").path("data").path("obligations"),aliases);
+        if(responsibility.equals("TRANSFERRED")) {
+            BindingContract.require(!selectedPath.equals("EVIDENCED_PREFLIGHT_STOP")&&effects.stream().anyMatch(BindingEvaluator::business),"Final response claims a transfer without an executed business handover");
+            boolean handedOver=false;
+            for(JsonNode effect:effects)if(effect.path("classes").isArray())for(JsonNode type:effect.path("classes"))if(type.asText().equals("OBLIGATION_ASSIGNMENT")) {
+                String obligation=Json.required(effect,"obligationRef"),recipient=Json.required(effect,"newOwnerRef");
+                for(JsonNode duty:after.path("data").path("data").path("obligations"))if(duty.path("id").asText().equals(obligation)&&duty.path("ownerRef").asText().equals(recipient))
+                    for(JsonNode claim:claims.path("residualObligations")){JsonNode resolved=BindingEvaluator.aliases(claim,aliases);if(resolved.path("id").asText().equals(obligation)&&resolved.path("ownerRef").asText().equals(recipient))handedOver=true;}
+            }
+            BindingContract.require(handedOver,"Final transfer lacks an actual assignment effect, recipient and preserved responsibility");
+        }
         if(responsibility.equals("RELEASED"))for(JsonNode duty:after.path("data").path("data").path("obligations"))BindingContract.require(!duty.path("status").asText().equals("OPEN"),"Final response releases still-open responsibility");
     }
 }
