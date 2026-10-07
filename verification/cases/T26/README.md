@@ -59,7 +59,7 @@ ref로 `inspectArtifacts`에 전달한다. 실제 secret은 bundle에 넣지 않
 
 ## 추적과 실행 상태
 
-20 subcase와490 assertion이 세 T26 oracle의 여섯 named observation을
+20 subcase와558 assertion이 세 T26 oracle의 여섯 named observation을
 연결한다. 상세 연결은 `oracle-bindings.json`이다. 이는 선언 추적이며
 실행 coverage를 증명하지 않는다. 실행 명령·exit·검증 수·fixture hash는
 `evidence/`에 별도 기록한다. 환경/형식 오류 exit3은 의도된 RED가 아니다.
@@ -96,3 +96,18 @@ Gherkin RED는 T26/V5/T14 합계28개를 모두 발견·시작했고
 NOT_IMPLEMENTED assertion 실패28·scenario skip0·exit1을 관찰했다.
 고정 payload의 schema·참조·assertion 검사이며 실제 제품 인수는
 NOT_RUN이다. 과거 evidence는 수정 전 snapshot으로 보존했다.
+
+자동 만료의 `sweep-db`와 `repeat-db`는 출고 이전 snapshot에서 OPEN
+의무·현재 OPEN assignment 각1과 owner·supervisor·nextAction·nextCheckAt을
+검사한다. assignment의 obligationId·rootId·workId를 같은 snapshot의
+만료 의무 ID·rootId·responsibleWorkId와 대조하고 반복 sweep 뒤 같은
+assignment 원 행을 유지해야 한다. 이후 출고가 책임 필드를 복구해도
+자동 sweep의 누락은 통과하지 못한다.
+
+A8 후속 검증은 `evidence/review-autonomous-responsibility/checks.json`에
+기록했다. 새 책임 mutant selftest1개가 네 만료 profile과 출고 전 두
+snapshot의 반례180개를 거부했고 실패·오류·skip0으로 PASS했다.
+Cucumber CLI의 `--name`으로 자동 만료 Gherkin4개만 실행해
+NOT_IMPLEMENTED 실패4·undefined0·scenario skip0·exit1을 관찰했다.
+뒤 assertion step의 skip은 첫 미지원 제품 assertion 이후의 중단이며
+제품·DB·worker·모델 실행 인수는 NOT_RUN이다.

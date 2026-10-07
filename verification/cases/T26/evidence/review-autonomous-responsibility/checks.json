@@ -1,0 +1,68 @@
+{
+  "evidenceClass": "SELFTEST_AND_CONTRACT_RED_ONLY",
+  "productStatus": "NOT_RUN",
+  "actualModelCalls": 0,
+  "baselineCommit": "8fcb8109b56eb8274030bfdaedbac55da3a0c999",
+  "capturedAt": "2026-10-07T15:23:55.463125+00:00",
+  "T26": {
+    "subcases": 20,
+    "assertions": 558,
+    "addedAssertions": 68,
+    "newSubcaseIds": []
+  },
+  "checks": [
+    {
+      "command": "./mvnw -B -ntp -f verification/harness/pom.xml -Dtest=CaseContractRoutesSelftest#autonomousSweepRequiresLinkedHumanResponsibilityEvenWhenLaterDispatchRepairsIt test",
+      "exitCode": 0,
+      "tests": 1,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "status": "PASS",
+      "mutationVariantsRejected": 180,
+      "scope": "four expiry profiles; sweep-db and repeat-db before dispatch; final db remains correct"
+    },
+    {
+      "commandRef": "focused-red-command.json",
+      "exitCode": 1,
+      "scenarios": 4,
+      "notImplementedAssertionFailures": 4,
+      "undefinedSteps": 0,
+      "scenarioSkip": 0,
+      "status": "EXPECTED_RED",
+      "stepSkips": "Later assertions after first unavailable product assertion are skipped; no scenario is omitted."
+    },
+    {
+      "command": "git diff --check",
+      "exitCode": 0,
+      "status": "PASS"
+    }
+  ],
+  "inputArtifacts": [
+    {
+      "path": "verification/cases/T26/case.json",
+      "sha256": "e05e0bbf0f47c75e06fc85cdc84734a38dd9e089b69c4aacaedd787766dbaded",
+      "sizeBytes": 1043237
+    },
+    {
+      "path": "verification/cases/T26/scenario.feature",
+      "sha256": "f8280912f115ce915fafdbf6f6dae05c0c1a4b94a0cc916861a265529691ad3e",
+      "sizeBytes": 126139
+    },
+    {
+      "path": "verification/cases/T26/oracle-bindings.json",
+      "sha256": "bfadf5912b082233af4ed058a0a0dd468d1e92435ab8808d826c360463a92000",
+      "sizeBytes": 117080
+    },
+    {
+      "path": "verification/harness/src/test/java/org/mulino/verification/cases/casecontractfix/CaseContractRoutesSelftest.java",
+      "sha256": "a70b9432ff7a2fd015645b0aac1f8a06d3e14b0a664586ab65978ee6651109f4",
+      "sizeBytes": 20203
+    }
+  ],
+  "limitations": [
+    "Fixed SELFTEST samples test the actual assertion engine and contract declarations only.",
+    "No real API, DB, worker, MCP or model acceptance was executed.",
+    "Scoped Cucumber CLI runs only four autonomous expiry scenarios, preserving all four complete source scenarios."
+  ]
+}

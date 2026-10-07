@@ -370,6 +370,23 @@
     그러면 "before-no-expiry-events" assertion으로 "만료 이전 baseline에는 해당 만료 사건·재평가·후속 의무가 없다. sweep가 만들 효과를 먼저 seed해 통과하지 않는다."를 확인한다
     그러면 "before-no-expiry-assessments" assertion으로 "만료 이전 baseline에는 해당 만료 사건·재평가·후속 의무가 없다. sweep가 만들 효과를 먼저 seed해 통과하지 않는다."를 확인한다
     그러면 "before-no-expiry-obligations" assertion으로 "만료 이전 baseline에는 해당 만료 사건·재평가·후속 의무가 없다. sweep가 만들 효과를 먼저 seed해 통과하지 않는다."를 확인한다
+    그러면 "sweep-db-followup-responsibility-present" assertion으로 "사용자 요청 전에 자동 만료 의무의 실제 ID·root·책임 업무·인간 owner·supervisor·다음 행동·확인 시점이 모두 존재해야 한다. 빈 원 행이나 owner 없는 OPEN은 통과하지 못한다."를 확인한다
+    그러면 "sweep-db-followup-responsibility-values" assertion으로 "자동 만료 의무는 fixture의 인간 책임자·감독자·다음 행동·확인 시점을 갖는다. 뒤 출고의 책임 복구로 대신하지 않는다."를 확인한다
+    그러면 "sweep-db-current-expiry-assignment-one" assertion으로 "자동 생성된 만료 후속 의무의 현재 OPEN assignment는 하나다. 초기 활성화 의무와 구별하고 빈 행·중복 assignment를 거부한다."를 확인한다
+    그러면 "sweep-db-expiry-assignment-responsibility-present" assertion으로 "자동 sweep의 같은 snapshot에 실제 assignment ID·의무·root·업무와 인간 책임 필드가 모두 있어야 한다."를 확인한다
+    그러면 "sweep-db-expiry-assignment-responsibility-values" assertion으로 "자동 sweep가 current OPEN assignment의 owner·supervisor·다음 행동·확인 시점을 함께 upsert한다."를 확인한다
+    그러면 "sweep-db-expiry-assignment-obligationId-linked" assertion으로 "자동 sweep가 만든 assignment는 같은 snapshot의 만료 의무·stable root·책임 업무에 연결된다. 이름이나 count만 같은 별도 책임으로 대신하지 않는다."를 확인한다
+    그러면 "sweep-db-expiry-assignment-rootId-linked" assertion으로 "자동 sweep가 만든 assignment는 같은 snapshot의 만료 의무·stable root·책임 업무에 연결된다. 이름이나 count만 같은 별도 책임으로 대신하지 않는다."를 확인한다
+    그러면 "sweep-db-expiry-assignment-workId-linked" assertion으로 "자동 sweep가 만든 assignment는 같은 snapshot의 만료 의무·stable root·책임 업무에 연결된다. 이름이나 count만 같은 별도 책임으로 대신하지 않는다."를 확인한다
+    그러면 "repeat-db-followup-responsibility-present" assertion으로 "사용자 요청 전에 자동 만료 의무의 실제 ID·root·책임 업무·인간 owner·supervisor·다음 행동·확인 시점이 모두 존재해야 한다. 빈 원 행이나 owner 없는 OPEN은 통과하지 못한다."를 확인한다
+    그러면 "repeat-db-followup-responsibility-values" assertion으로 "자동 만료 의무는 fixture의 인간 책임자·감독자·다음 행동·확인 시점을 갖는다. 뒤 출고의 책임 복구로 대신하지 않는다."를 확인한다
+    그러면 "repeat-db-current-expiry-assignment-one" assertion으로 "자동 생성된 만료 후속 의무의 현재 OPEN assignment는 하나다. 초기 활성화 의무와 구별하고 빈 행·중복 assignment를 거부한다."를 확인한다
+    그러면 "repeat-db-expiry-assignment-responsibility-present" assertion으로 "자동 sweep의 같은 snapshot에 실제 assignment ID·의무·root·업무와 인간 책임 필드가 모두 있어야 한다."를 확인한다
+    그러면 "repeat-db-expiry-assignment-responsibility-values" assertion으로 "자동 sweep가 current OPEN assignment의 owner·supervisor·다음 행동·확인 시점을 함께 upsert한다."를 확인한다
+    그러면 "repeat-db-expiry-assignment-obligationId-linked" assertion으로 "자동 sweep가 만든 assignment는 같은 snapshot의 만료 의무·stable root·책임 업무에 연결된다. 이름이나 count만 같은 별도 책임으로 대신하지 않는다."를 확인한다
+    그러면 "repeat-db-expiry-assignment-rootId-linked" assertion으로 "자동 sweep가 만든 assignment는 같은 snapshot의 만료 의무·stable root·책임 업무에 연결된다. 이름이나 count만 같은 별도 책임으로 대신하지 않는다."를 확인한다
+    그러면 "repeat-db-expiry-assignment-workId-linked" assertion으로 "자동 sweep가 만든 assignment는 같은 snapshot의 만료 의무·stable root·책임 업무에 연결된다. 이름이나 count만 같은 별도 책임으로 대신하지 않는다."를 확인한다
+    그러면 "repeat-expiry-assignment-identity-kept" assertion으로 "반복 sweep는 동일한 현재 OPEN assignment 원 행·ID·owner·supervisor·다음 행동·확인 시점을 유지한다."를 확인한다
 
   시나리오: sweeper 중지 중 lot 만료 뒤 출고를 거부한다
     먼저 사례 파일 "verification/cases/T26/case.json"의 "lot-expiry-delayed-guard"를 준비한다
@@ -487,6 +504,23 @@
     그러면 "before-no-expiry-events" assertion으로 "만료 이전 baseline에는 해당 만료 사건·재평가·후속 의무가 없다. sweep가 만들 효과를 먼저 seed해 통과하지 않는다."를 확인한다
     그러면 "before-no-expiry-assessments" assertion으로 "만료 이전 baseline에는 해당 만료 사건·재평가·후속 의무가 없다. sweep가 만들 효과를 먼저 seed해 통과하지 않는다."를 확인한다
     그러면 "before-no-expiry-obligations" assertion으로 "만료 이전 baseline에는 해당 만료 사건·재평가·후속 의무가 없다. sweep가 만들 효과를 먼저 seed해 통과하지 않는다."를 확인한다
+    그러면 "sweep-db-followup-responsibility-present" assertion으로 "사용자 요청 전에 자동 만료 의무의 실제 ID·root·책임 업무·인간 owner·supervisor·다음 행동·확인 시점이 모두 존재해야 한다. 빈 원 행이나 owner 없는 OPEN은 통과하지 못한다."를 확인한다
+    그러면 "sweep-db-followup-responsibility-values" assertion으로 "자동 만료 의무는 fixture의 인간 책임자·감독자·다음 행동·확인 시점을 갖는다. 뒤 출고의 책임 복구로 대신하지 않는다."를 확인한다
+    그러면 "sweep-db-current-expiry-assignment-one" assertion으로 "자동 생성된 만료 후속 의무의 현재 OPEN assignment는 하나다. 초기 활성화 의무와 구별하고 빈 행·중복 assignment를 거부한다."를 확인한다
+    그러면 "sweep-db-expiry-assignment-responsibility-present" assertion으로 "자동 sweep의 같은 snapshot에 실제 assignment ID·의무·root·업무와 인간 책임 필드가 모두 있어야 한다."를 확인한다
+    그러면 "sweep-db-expiry-assignment-responsibility-values" assertion으로 "자동 sweep가 current OPEN assignment의 owner·supervisor·다음 행동·확인 시점을 함께 upsert한다."를 확인한다
+    그러면 "sweep-db-expiry-assignment-obligationId-linked" assertion으로 "자동 sweep가 만든 assignment는 같은 snapshot의 만료 의무·stable root·책임 업무에 연결된다. 이름이나 count만 같은 별도 책임으로 대신하지 않는다."를 확인한다
+    그러면 "sweep-db-expiry-assignment-rootId-linked" assertion으로 "자동 sweep가 만든 assignment는 같은 snapshot의 만료 의무·stable root·책임 업무에 연결된다. 이름이나 count만 같은 별도 책임으로 대신하지 않는다."를 확인한다
+    그러면 "sweep-db-expiry-assignment-workId-linked" assertion으로 "자동 sweep가 만든 assignment는 같은 snapshot의 만료 의무·stable root·책임 업무에 연결된다. 이름이나 count만 같은 별도 책임으로 대신하지 않는다."를 확인한다
+    그러면 "repeat-db-followup-responsibility-present" assertion으로 "사용자 요청 전에 자동 만료 의무의 실제 ID·root·책임 업무·인간 owner·supervisor·다음 행동·확인 시점이 모두 존재해야 한다. 빈 원 행이나 owner 없는 OPEN은 통과하지 못한다."를 확인한다
+    그러면 "repeat-db-followup-responsibility-values" assertion으로 "자동 만료 의무는 fixture의 인간 책임자·감독자·다음 행동·확인 시점을 갖는다. 뒤 출고의 책임 복구로 대신하지 않는다."를 확인한다
+    그러면 "repeat-db-current-expiry-assignment-one" assertion으로 "자동 생성된 만료 후속 의무의 현재 OPEN assignment는 하나다. 초기 활성화 의무와 구별하고 빈 행·중복 assignment를 거부한다."를 확인한다
+    그러면 "repeat-db-expiry-assignment-responsibility-present" assertion으로 "자동 sweep의 같은 snapshot에 실제 assignment ID·의무·root·업무와 인간 책임 필드가 모두 있어야 한다."를 확인한다
+    그러면 "repeat-db-expiry-assignment-responsibility-values" assertion으로 "자동 sweep가 current OPEN assignment의 owner·supervisor·다음 행동·확인 시점을 함께 upsert한다."를 확인한다
+    그러면 "repeat-db-expiry-assignment-obligationId-linked" assertion으로 "자동 sweep가 만든 assignment는 같은 snapshot의 만료 의무·stable root·책임 업무에 연결된다. 이름이나 count만 같은 별도 책임으로 대신하지 않는다."를 확인한다
+    그러면 "repeat-db-expiry-assignment-rootId-linked" assertion으로 "자동 sweep가 만든 assignment는 같은 snapshot의 만료 의무·stable root·책임 업무에 연결된다. 이름이나 count만 같은 별도 책임으로 대신하지 않는다."를 확인한다
+    그러면 "repeat-db-expiry-assignment-workId-linked" assertion으로 "자동 sweep가 만든 assignment는 같은 snapshot의 만료 의무·stable root·책임 업무에 연결된다. 이름이나 count만 같은 별도 책임으로 대신하지 않는다."를 확인한다
+    그러면 "repeat-expiry-assignment-identity-kept" assertion으로 "반복 sweep는 동일한 현재 OPEN assignment 원 행·ID·owner·supervisor·다음 행동·확인 시점을 유지한다."를 확인한다
 
   시나리오: sweeper 중지 중 disposition 만료 뒤 출고를 거부한다
     먼저 사례 파일 "verification/cases/T26/case.json"의 "disposition-expiry-delayed-guard"를 준비한다
@@ -604,6 +638,23 @@
     그러면 "before-no-expiry-events" assertion으로 "만료 이전 baseline에는 해당 만료 사건·재평가·후속 의무가 없다. sweep가 만들 효과를 먼저 seed해 통과하지 않는다."를 확인한다
     그러면 "before-no-expiry-assessments" assertion으로 "만료 이전 baseline에는 해당 만료 사건·재평가·후속 의무가 없다. sweep가 만들 효과를 먼저 seed해 통과하지 않는다."를 확인한다
     그러면 "before-no-expiry-obligations" assertion으로 "만료 이전 baseline에는 해당 만료 사건·재평가·후속 의무가 없다. sweep가 만들 효과를 먼저 seed해 통과하지 않는다."를 확인한다
+    그러면 "sweep-db-followup-responsibility-present" assertion으로 "사용자 요청 전에 자동 만료 의무의 실제 ID·root·책임 업무·인간 owner·supervisor·다음 행동·확인 시점이 모두 존재해야 한다. 빈 원 행이나 owner 없는 OPEN은 통과하지 못한다."를 확인한다
+    그러면 "sweep-db-followup-responsibility-values" assertion으로 "자동 만료 의무는 fixture의 인간 책임자·감독자·다음 행동·확인 시점을 갖는다. 뒤 출고의 책임 복구로 대신하지 않는다."를 확인한다
+    그러면 "sweep-db-current-expiry-assignment-one" assertion으로 "자동 생성된 만료 후속 의무의 현재 OPEN assignment는 하나다. 초기 활성화 의무와 구별하고 빈 행·중복 assignment를 거부한다."를 확인한다
+    그러면 "sweep-db-expiry-assignment-responsibility-present" assertion으로 "자동 sweep의 같은 snapshot에 실제 assignment ID·의무·root·업무와 인간 책임 필드가 모두 있어야 한다."를 확인한다
+    그러면 "sweep-db-expiry-assignment-responsibility-values" assertion으로 "자동 sweep가 current OPEN assignment의 owner·supervisor·다음 행동·확인 시점을 함께 upsert한다."를 확인한다
+    그러면 "sweep-db-expiry-assignment-obligationId-linked" assertion으로 "자동 sweep가 만든 assignment는 같은 snapshot의 만료 의무·stable root·책임 업무에 연결된다. 이름이나 count만 같은 별도 책임으로 대신하지 않는다."를 확인한다
+    그러면 "sweep-db-expiry-assignment-rootId-linked" assertion으로 "자동 sweep가 만든 assignment는 같은 snapshot의 만료 의무·stable root·책임 업무에 연결된다. 이름이나 count만 같은 별도 책임으로 대신하지 않는다."를 확인한다
+    그러면 "sweep-db-expiry-assignment-workId-linked" assertion으로 "자동 sweep가 만든 assignment는 같은 snapshot의 만료 의무·stable root·책임 업무에 연결된다. 이름이나 count만 같은 별도 책임으로 대신하지 않는다."를 확인한다
+    그러면 "repeat-db-followup-responsibility-present" assertion으로 "사용자 요청 전에 자동 만료 의무의 실제 ID·root·책임 업무·인간 owner·supervisor·다음 행동·확인 시점이 모두 존재해야 한다. 빈 원 행이나 owner 없는 OPEN은 통과하지 못한다."를 확인한다
+    그러면 "repeat-db-followup-responsibility-values" assertion으로 "자동 만료 의무는 fixture의 인간 책임자·감독자·다음 행동·확인 시점을 갖는다. 뒤 출고의 책임 복구로 대신하지 않는다."를 확인한다
+    그러면 "repeat-db-current-expiry-assignment-one" assertion으로 "자동 생성된 만료 후속 의무의 현재 OPEN assignment는 하나다. 초기 활성화 의무와 구별하고 빈 행·중복 assignment를 거부한다."를 확인한다
+    그러면 "repeat-db-expiry-assignment-responsibility-present" assertion으로 "자동 sweep의 같은 snapshot에 실제 assignment ID·의무·root·업무와 인간 책임 필드가 모두 있어야 한다."를 확인한다
+    그러면 "repeat-db-expiry-assignment-responsibility-values" assertion으로 "자동 sweep가 current OPEN assignment의 owner·supervisor·다음 행동·확인 시점을 함께 upsert한다."를 확인한다
+    그러면 "repeat-db-expiry-assignment-obligationId-linked" assertion으로 "자동 sweep가 만든 assignment는 같은 snapshot의 만료 의무·stable root·책임 업무에 연결된다. 이름이나 count만 같은 별도 책임으로 대신하지 않는다."를 확인한다
+    그러면 "repeat-db-expiry-assignment-rootId-linked" assertion으로 "자동 sweep가 만든 assignment는 같은 snapshot의 만료 의무·stable root·책임 업무에 연결된다. 이름이나 count만 같은 별도 책임으로 대신하지 않는다."를 확인한다
+    그러면 "repeat-db-expiry-assignment-workId-linked" assertion으로 "자동 sweep가 만든 assignment는 같은 snapshot의 만료 의무·stable root·책임 업무에 연결된다. 이름이나 count만 같은 별도 책임으로 대신하지 않는다."를 확인한다
+    그러면 "repeat-expiry-assignment-identity-kept" assertion으로 "반복 sweep는 동일한 현재 OPEN assignment 원 행·ID·owner·supervisor·다음 행동·확인 시점을 유지한다."를 확인한다
 
   시나리오: sweeper 중지 중 grant 만료 뒤 출고를 거부한다
     먼저 사례 파일 "verification/cases/T26/case.json"의 "grant-expiry-delayed-guard"를 준비한다
@@ -721,6 +772,23 @@
     그러면 "before-no-expiry-events" assertion으로 "만료 이전 baseline에는 해당 만료 사건·재평가·후속 의무가 없다. sweep가 만들 효과를 먼저 seed해 통과하지 않는다."를 확인한다
     그러면 "before-no-expiry-assessments" assertion으로 "만료 이전 baseline에는 해당 만료 사건·재평가·후속 의무가 없다. sweep가 만들 효과를 먼저 seed해 통과하지 않는다."를 확인한다
     그러면 "before-no-expiry-obligations" assertion으로 "만료 이전 baseline에는 해당 만료 사건·재평가·후속 의무가 없다. sweep가 만들 효과를 먼저 seed해 통과하지 않는다."를 확인한다
+    그러면 "sweep-db-followup-responsibility-present" assertion으로 "사용자 요청 전에 자동 만료 의무의 실제 ID·root·책임 업무·인간 owner·supervisor·다음 행동·확인 시점이 모두 존재해야 한다. 빈 원 행이나 owner 없는 OPEN은 통과하지 못한다."를 확인한다
+    그러면 "sweep-db-followup-responsibility-values" assertion으로 "자동 만료 의무는 fixture의 인간 책임자·감독자·다음 행동·확인 시점을 갖는다. 뒤 출고의 책임 복구로 대신하지 않는다."를 확인한다
+    그러면 "sweep-db-current-expiry-assignment-one" assertion으로 "자동 생성된 만료 후속 의무의 현재 OPEN assignment는 하나다. 초기 활성화 의무와 구별하고 빈 행·중복 assignment를 거부한다."를 확인한다
+    그러면 "sweep-db-expiry-assignment-responsibility-present" assertion으로 "자동 sweep의 같은 snapshot에 실제 assignment ID·의무·root·업무와 인간 책임 필드가 모두 있어야 한다."를 확인한다
+    그러면 "sweep-db-expiry-assignment-responsibility-values" assertion으로 "자동 sweep가 current OPEN assignment의 owner·supervisor·다음 행동·확인 시점을 함께 upsert한다."를 확인한다
+    그러면 "sweep-db-expiry-assignment-obligationId-linked" assertion으로 "자동 sweep가 만든 assignment는 같은 snapshot의 만료 의무·stable root·책임 업무에 연결된다. 이름이나 count만 같은 별도 책임으로 대신하지 않는다."를 확인한다
+    그러면 "sweep-db-expiry-assignment-rootId-linked" assertion으로 "자동 sweep가 만든 assignment는 같은 snapshot의 만료 의무·stable root·책임 업무에 연결된다. 이름이나 count만 같은 별도 책임으로 대신하지 않는다."를 확인한다
+    그러면 "sweep-db-expiry-assignment-workId-linked" assertion으로 "자동 sweep가 만든 assignment는 같은 snapshot의 만료 의무·stable root·책임 업무에 연결된다. 이름이나 count만 같은 별도 책임으로 대신하지 않는다."를 확인한다
+    그러면 "repeat-db-followup-responsibility-present" assertion으로 "사용자 요청 전에 자동 만료 의무의 실제 ID·root·책임 업무·인간 owner·supervisor·다음 행동·확인 시점이 모두 존재해야 한다. 빈 원 행이나 owner 없는 OPEN은 통과하지 못한다."를 확인한다
+    그러면 "repeat-db-followup-responsibility-values" assertion으로 "자동 만료 의무는 fixture의 인간 책임자·감독자·다음 행동·확인 시점을 갖는다. 뒤 출고의 책임 복구로 대신하지 않는다."를 확인한다
+    그러면 "repeat-db-current-expiry-assignment-one" assertion으로 "자동 생성된 만료 후속 의무의 현재 OPEN assignment는 하나다. 초기 활성화 의무와 구별하고 빈 행·중복 assignment를 거부한다."를 확인한다
+    그러면 "repeat-db-expiry-assignment-responsibility-present" assertion으로 "자동 sweep의 같은 snapshot에 실제 assignment ID·의무·root·업무와 인간 책임 필드가 모두 있어야 한다."를 확인한다
+    그러면 "repeat-db-expiry-assignment-responsibility-values" assertion으로 "자동 sweep가 current OPEN assignment의 owner·supervisor·다음 행동·확인 시점을 함께 upsert한다."를 확인한다
+    그러면 "repeat-db-expiry-assignment-obligationId-linked" assertion으로 "자동 sweep가 만든 assignment는 같은 snapshot의 만료 의무·stable root·책임 업무에 연결된다. 이름이나 count만 같은 별도 책임으로 대신하지 않는다."를 확인한다
+    그러면 "repeat-db-expiry-assignment-rootId-linked" assertion으로 "자동 sweep가 만든 assignment는 같은 snapshot의 만료 의무·stable root·책임 업무에 연결된다. 이름이나 count만 같은 별도 책임으로 대신하지 않는다."를 확인한다
+    그러면 "repeat-db-expiry-assignment-workId-linked" assertion으로 "자동 sweep가 만든 assignment는 같은 snapshot의 만료 의무·stable root·책임 업무에 연결된다. 이름이나 count만 같은 별도 책임으로 대신하지 않는다."를 확인한다
+    그러면 "repeat-expiry-assignment-identity-kept" assertion으로 "반복 sweep는 동일한 현재 OPEN assignment 원 행·ID·owner·supervisor·다음 행동·확인 시점을 유지한다."를 확인한다
 
   시나리오: sweeper 중지 중 policy 만료 뒤 출고를 거부한다
     먼저 사례 파일 "verification/cases/T26/case.json"의 "policy-expiry-delayed-guard"를 준비한다

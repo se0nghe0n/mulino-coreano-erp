@@ -12,7 +12,7 @@ import static org.junit.jupiter.api.Assertions.*;
 /** Fixed EXECUTED payloads validate schema/routes/oracles only; no runtime acceptance. */
 public final class CaseContractRoutesSelftest {
     private final Path root=Path.of(System.getProperty("repo.root"));
-    private final JsonNode aliases=Json.parse("{\"ORG\":\"SELFTEST-org\",\"Q20\":\"SELFTEST-Q20\",\"DOC-TEMP\":\"SELFTEST-doc\"}");
+    private final JsonNode aliases=Json.parse("{\"ORG\":\"SELFTEST-org\",\"Q20\":\"SELFTEST-Q20\",\"DOC-TEMP\":\"SELFTEST-doc\",\"owner\":\"SELFTEST-owner\",\"supervisor\":\"SELFTEST-supervisor\"}");
     private final AssertionEngine engine=new AssertionEngine();
     private JsonNode caseFile(String id) throws Exception {return Json.read(root.resolve("verification/cases/"+id+"/case.json"));}
     private JsonNode subcase(String id) throws Exception {
@@ -131,6 +131,65 @@ public final class CaseContractRoutesSelftest {
         engine.check(assertion(sub,"sweep-db-goal-still-unverified"),r,aliases);
         ((ObjectNode)r.get("sweep-db").at("/data/rawRows/assessments/0")).put("result","SATISFIED");
         assertThrows(AssertionError.class,()->engine.check(assertion(sub,"sweep-db-goal-still-unverified"),r,aliases));
+    }
+    private ObjectNode completeExpiryResponsibilityRows() {
+        return (ObjectNode)Json.parse("""
+            {"obligations":[
+              {"id":"SELFTEST-initial-duty","rootId":"SELFTEST-initial-root","sourceKind":"ACTIVATION","status":"OPEN"},
+              {"id":"SELFTEST-expiry-duty","rootId":"SELFTEST-expiry-root","sourceKind":"VALIDITY_EXPIRED","status":"OPEN",
+               "responsibleWorkId":"SELFTEST-followup-work","ownerId":"SELFTEST-owner","supervisorId":"SELFTEST-supervisor",
+               "nextAction":"조사·재인가·안전 재시도","nextCheckAt":"2026-10-07T09:01:00Z"}],
+             "assignments":[
+              {"id":"SELFTEST-initial-assignment","sourceKind":"ACTIVATION","status":"OPEN","current":true},
+              {"id":"SELFTEST-expiry-assignment","obligationId":"SELFTEST-expiry-duty","rootId":"SELFTEST-expiry-root",
+               "workId":"SELFTEST-followup-work","sourceKind":"VALIDITY_EXPIRED","status":"OPEN","current":true,
+               "ownerId":"SELFTEST-owner","supervisorId":"SELFTEST-supervisor","nextAction":"조사·재인가·안전 재시도",
+               "nextCheckAt":"2026-10-07T09:01:00Z"}]}
+            """);
+    }
+    private Map<String,JsonNode> responsibilityResults() {
+        return new HashMap<>(Map.of("sweep-db",dbResult(completeExpiryResponsibilityRows()),
+            "repeat-db",dbResult(completeExpiryResponsibilityRows()),"db",dbResult(completeExpiryResponsibilityRows())));
+    }
+    private List<String> responsibilityAssertions(String action) {
+        return List.of(action+"-followup-responsibility-present",action+"-followup-responsibility-values",
+            action+"-current-expiry-assignment-one",action+"-expiry-assignment-responsibility-present",
+            action+"-expiry-assignment-responsibility-values",action+"-expiry-assignment-obligationId-linked",
+            action+"-expiry-assignment-rootId-linked",action+"-expiry-assignment-workId-linked");
+    }
+    @Test void autonomousSweepRequiresLinkedHumanResponsibilityEvenWhenLaterDispatchRepairsIt() throws Exception {
+        for(String id:expiryIds()) {
+            JsonNode sub=subcase(id);Map<String,JsonNode> good=responsibilityResults();
+            for(String action:List.of("sweep-db","repeat-db")) {
+                for(JsonNode declared:sub.path("actions"))if(declared.path("id").asText().equals(action)) {
+                    Set<String> sources=new HashSet<>();declared.path("observation").path("sources").forEach(n->sources.add(n.asText()));
+                    assertTrue(sources.containsAll(List.of("obligations","assignments")));
+                }
+                for(String assertionId:responsibilityAssertions(action))engine.check(assertion(sub,assertionId),good,aliases);
+                for(String table:List.of("obligations","assignments"))for(String field:List.of("ownerId","supervisorId","nextAction","nextCheckAt")) {
+                    Map<String,JsonNode> mutated=responsibilityResults();ObjectNode early=(ObjectNode)mutated.get(action).at("/data/rawRows/"+table+"/1");early.remove(field);
+                    String kind=table.equals("obligations")?"followup":"expiry-assignment";
+                    assertThrows(AssertionError.class,()->engine.check(assertion(sub,action+"-"+kind+"-responsibility-present"),mutated,aliases),id+"/"+action+" missing "+table+"."+field);
+                    // Final post-dispatch responsibility is still complete: it cannot rescue early failure.
+                    engine.check(assertion(sub,"db-owner"),mutated,aliases);engine.check(assertion(sub,"db-next-check"),mutated,aliases);
+                    early.put(field,"SELFTEST-wrong");
+                    assertThrows(AssertionError.class,()->engine.check(assertion(sub,action+"-"+kind+"-responsibility-values"),mutated,aliases));
+                }
+                Map<String,JsonNode> empty=responsibilityResults();((ArrayNode)empty.get(action).at("/data/rawRows/assignments")).remove(1);
+                assertThrows(AssertionError.class,()->engine.check(assertion(sub,action+"-current-expiry-assignment-one"),empty,aliases));
+                assertThrows(AssertionError.class,()->engine.check(assertion(sub,action+"-expiry-assignment-responsibility-present"),empty,aliases));
+                Map<String,JsonNode> duplicate=responsibilityResults();ArrayNode assignments=(ArrayNode)duplicate.get(action).at("/data/rawRows/assignments");assignments.add(assignments.get(1).deepCopy());
+                assertThrows(AssertionError.class,()->engine.check(assertion(sub,action+"-current-expiry-assignment-one"),duplicate,aliases));
+                engine.check(assertion(sub,"db-current-assignment-one"),duplicate,aliases);
+                for(String field:List.of("obligationId","rootId","workId")) {
+                    Map<String,JsonNode> wrongLink=responsibilityResults();((ObjectNode)wrongLink.get(action).at("/data/rawRows/assignments/1")).put(field,"SELFTEST-unrelated");
+                    assertThrows(AssertionError.class,()->engine.check(assertion(sub,action+"-expiry-assignment-"+field+"-linked"),wrongLink,aliases));
+                }
+            }
+            engine.check(assertion(sub,"repeat-expiry-assignment-identity-kept"),good,aliases);
+            ((ObjectNode)good.get("repeat-db").at("/data/rawRows/assignments/1")).put("id","SELFTEST-replaced-assignment");
+            assertThrows(AssertionError.class,()->engine.check(assertion(sub,"repeat-expiry-assignment-identity-kept"),good,aliases));
+        }
     }
     @Test void dryrunAndDeniedApplyRejectEarlyProjectionRepairEmptyRowsAndIdentityChanges() throws Exception {
         JsonNode sub=subcase("emergency-repair-dryrun-apply");List<String> order=new ArrayList<>();for(JsonNode a:sub.path("actions"))order.add(a.path("id").asText());

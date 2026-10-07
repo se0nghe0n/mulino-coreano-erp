@@ -11455,6 +11455,799 @@
               "boundary-index"
             ]
           }
+        },
+        {
+          "id": "sweep-db-followup-responsibility-present",
+          "op": "fieldsPresent",
+          "source": {
+            "actionId": "sweep-db",
+            "pointer": "/data/rawRows/obligations",
+            "where": {
+              "sourceKind": "VALIDITY_EXPIRED",
+              "status": "OPEN"
+            }
+          },
+          "expected": [
+            "id",
+            "rootId",
+            "responsibleWorkId",
+            "ownerId",
+            "supervisorId",
+            "nextAction",
+            "nextCheckAt"
+          ],
+          "requirementRefs": [
+            "D26"
+          ],
+          "evidenceRefs": [
+            "sweep-db:actual-artifact",
+            "sweep-db:source-rows"
+          ],
+          "scope": {
+            "normativeScope": "boundary-index",
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "T26",
+            "subcaseId": "lot-expiry-no-event"
+          },
+          "oracleExplanation": "사용자 요청 전에 자동 만료 의무의 실제 ID·root·책임 업무·인간 owner·supervisor·다음 행동·확인 시점이 모두 존재해야 한다. 빈 원 행이나 owner 없는 OPEN은 통과하지 못한다.",
+          "oracleRef": {
+            "oracleId": "T26.boundary-index-and-emergency-repair",
+            "observationNames": [
+              "boundary-index"
+            ]
+          }
+        },
+        {
+          "id": "sweep-db-followup-responsibility-values",
+          "op": "relationSet",
+          "source": {
+            "actionId": "sweep-db",
+            "pointer": "/data/rawRows/obligations",
+            "where": {
+              "sourceKind": "VALIDITY_EXPIRED",
+              "status": "OPEN"
+            },
+            "field": [
+              "ownerId",
+              "supervisorId",
+              "nextAction",
+              "nextCheckAt"
+            ]
+          },
+          "expected": [
+            [
+              {
+                "$alias": "owner"
+              },
+              {
+                "$alias": "supervisor"
+              },
+              "조사·재인가·안전 재시도",
+              "2026-10-07T09:01:00Z"
+            ]
+          ],
+          "requirementRefs": [
+            "D26"
+          ],
+          "evidenceRefs": [
+            "sweep-db:actual-artifact",
+            "sweep-db:source-rows"
+          ],
+          "scope": {
+            "normativeScope": "boundary-index",
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "T26",
+            "subcaseId": "lot-expiry-no-event"
+          },
+          "oracleExplanation": "자동 만료 의무는 fixture의 인간 책임자·감독자·다음 행동·확인 시점을 갖는다. 뒤 출고의 책임 복구로 대신하지 않는다.",
+          "oracleRef": {
+            "oracleId": "T26.boundary-index-and-emergency-repair",
+            "observationNames": [
+              "boundary-index"
+            ]
+          }
+        },
+        {
+          "id": "sweep-db-current-expiry-assignment-one",
+          "op": "count",
+          "source": {
+            "actionId": "sweep-db",
+            "pointer": "/data/rawRows/assignments",
+            "where": {
+              "sourceKind": "VALIDITY_EXPIRED",
+              "current": true,
+              "status": "OPEN"
+            }
+          },
+          "expected": 1,
+          "requirementRefs": [
+            "D26"
+          ],
+          "evidenceRefs": [
+            "sweep-db:actual-artifact",
+            "sweep-db:source-rows"
+          ],
+          "scope": {
+            "normativeScope": "boundary-index",
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "T26",
+            "subcaseId": "lot-expiry-no-event"
+          },
+          "oracleExplanation": "자동 생성된 만료 후속 의무의 현재 OPEN assignment는 하나다. 초기 활성화 의무와 구별하고 빈 행·중복 assignment를 거부한다.",
+          "oracleRef": {
+            "oracleId": "T26.boundary-index-and-emergency-repair",
+            "observationNames": [
+              "boundary-index"
+            ]
+          }
+        },
+        {
+          "id": "sweep-db-expiry-assignment-responsibility-present",
+          "op": "fieldsPresent",
+          "source": {
+            "actionId": "sweep-db",
+            "pointer": "/data/rawRows/assignments",
+            "where": {
+              "sourceKind": "VALIDITY_EXPIRED",
+              "current": true,
+              "status": "OPEN"
+            }
+          },
+          "expected": [
+            "id",
+            "obligationId",
+            "rootId",
+            "workId",
+            "ownerId",
+            "supervisorId",
+            "nextAction",
+            "nextCheckAt"
+          ],
+          "requirementRefs": [
+            "D26"
+          ],
+          "evidenceRefs": [
+            "sweep-db:actual-artifact",
+            "sweep-db:source-rows"
+          ],
+          "scope": {
+            "normativeScope": "boundary-index",
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "T26",
+            "subcaseId": "lot-expiry-no-event"
+          },
+          "oracleExplanation": "자동 sweep의 같은 snapshot에 실제 assignment ID·의무·root·업무와 인간 책임 필드가 모두 있어야 한다.",
+          "oracleRef": {
+            "oracleId": "T26.boundary-index-and-emergency-repair",
+            "observationNames": [
+              "boundary-index"
+            ]
+          }
+        },
+        {
+          "id": "sweep-db-expiry-assignment-responsibility-values",
+          "op": "relationSet",
+          "source": {
+            "actionId": "sweep-db",
+            "pointer": "/data/rawRows/assignments",
+            "where": {
+              "sourceKind": "VALIDITY_EXPIRED",
+              "current": true,
+              "status": "OPEN"
+            },
+            "field": [
+              "ownerId",
+              "supervisorId",
+              "nextAction",
+              "nextCheckAt"
+            ]
+          },
+          "expected": [
+            [
+              {
+                "$alias": "owner"
+              },
+              {
+                "$alias": "supervisor"
+              },
+              "조사·재인가·안전 재시도",
+              "2026-10-07T09:01:00Z"
+            ]
+          ],
+          "requirementRefs": [
+            "D26"
+          ],
+          "evidenceRefs": [
+            "sweep-db:actual-artifact",
+            "sweep-db:source-rows"
+          ],
+          "scope": {
+            "normativeScope": "boundary-index",
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "T26",
+            "subcaseId": "lot-expiry-no-event"
+          },
+          "oracleExplanation": "자동 sweep가 current OPEN assignment의 owner·supervisor·다음 행동·확인 시점을 함께 upsert한다.",
+          "oracleRef": {
+            "oracleId": "T26.boundary-index-and-emergency-repair",
+            "observationNames": [
+              "boundary-index"
+            ]
+          }
+        },
+        {
+          "id": "sweep-db-expiry-assignment-obligationId-linked",
+          "op": "sameAs",
+          "source": {
+            "actionId": "sweep-db",
+            "pointer": "/data/rawRows/assignments",
+            "where": {
+              "sourceKind": "VALIDITY_EXPIRED",
+              "current": true,
+              "status": "OPEN"
+            },
+            "field": "obligationId"
+          },
+          "expected": true,
+          "requirementRefs": [
+            "D26"
+          ],
+          "evidenceRefs": [
+            "sweep-db:actual-artifact",
+            "sweep-db:source-rows",
+            "sweep-db:actual-artifact",
+            "sweep-db:source-rows"
+          ],
+          "scope": {
+            "normativeScope": "boundary-index",
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "T26",
+            "subcaseId": "lot-expiry-no-event"
+          },
+          "oracleExplanation": "자동 sweep가 만든 assignment는 같은 snapshot의 만료 의무·stable root·책임 업무에 연결된다. 이름이나 count만 같은 별도 책임으로 대신하지 않는다.",
+          "oracleRef": {
+            "oracleId": "T26.boundary-index-and-emergency-repair",
+            "observationNames": [
+              "boundary-index"
+            ]
+          },
+          "baseline": {
+            "actionId": "sweep-db",
+            "pointer": "/data/rawRows/obligations",
+            "where": {
+              "sourceKind": "VALIDITY_EXPIRED",
+              "status": "OPEN"
+            },
+            "field": "id"
+          }
+        },
+        {
+          "id": "sweep-db-expiry-assignment-rootId-linked",
+          "op": "sameAs",
+          "source": {
+            "actionId": "sweep-db",
+            "pointer": "/data/rawRows/assignments",
+            "where": {
+              "sourceKind": "VALIDITY_EXPIRED",
+              "current": true,
+              "status": "OPEN"
+            },
+            "field": "rootId"
+          },
+          "expected": true,
+          "requirementRefs": [
+            "D26"
+          ],
+          "evidenceRefs": [
+            "sweep-db:actual-artifact",
+            "sweep-db:source-rows",
+            "sweep-db:actual-artifact",
+            "sweep-db:source-rows"
+          ],
+          "scope": {
+            "normativeScope": "boundary-index",
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "T26",
+            "subcaseId": "lot-expiry-no-event"
+          },
+          "oracleExplanation": "자동 sweep가 만든 assignment는 같은 snapshot의 만료 의무·stable root·책임 업무에 연결된다. 이름이나 count만 같은 별도 책임으로 대신하지 않는다.",
+          "oracleRef": {
+            "oracleId": "T26.boundary-index-and-emergency-repair",
+            "observationNames": [
+              "boundary-index"
+            ]
+          },
+          "baseline": {
+            "actionId": "sweep-db",
+            "pointer": "/data/rawRows/obligations",
+            "where": {
+              "sourceKind": "VALIDITY_EXPIRED",
+              "status": "OPEN"
+            },
+            "field": "rootId"
+          }
+        },
+        {
+          "id": "sweep-db-expiry-assignment-workId-linked",
+          "op": "sameAs",
+          "source": {
+            "actionId": "sweep-db",
+            "pointer": "/data/rawRows/assignments",
+            "where": {
+              "sourceKind": "VALIDITY_EXPIRED",
+              "current": true,
+              "status": "OPEN"
+            },
+            "field": "workId"
+          },
+          "expected": true,
+          "requirementRefs": [
+            "D26"
+          ],
+          "evidenceRefs": [
+            "sweep-db:actual-artifact",
+            "sweep-db:source-rows",
+            "sweep-db:actual-artifact",
+            "sweep-db:source-rows"
+          ],
+          "scope": {
+            "normativeScope": "boundary-index",
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "T26",
+            "subcaseId": "lot-expiry-no-event"
+          },
+          "oracleExplanation": "자동 sweep가 만든 assignment는 같은 snapshot의 만료 의무·stable root·책임 업무에 연결된다. 이름이나 count만 같은 별도 책임으로 대신하지 않는다.",
+          "oracleRef": {
+            "oracleId": "T26.boundary-index-and-emergency-repair",
+            "observationNames": [
+              "boundary-index"
+            ]
+          },
+          "baseline": {
+            "actionId": "sweep-db",
+            "pointer": "/data/rawRows/obligations",
+            "where": {
+              "sourceKind": "VALIDITY_EXPIRED",
+              "status": "OPEN"
+            },
+            "field": "responsibleWorkId"
+          }
+        },
+        {
+          "id": "repeat-db-followup-responsibility-present",
+          "op": "fieldsPresent",
+          "source": {
+            "actionId": "repeat-db",
+            "pointer": "/data/rawRows/obligations",
+            "where": {
+              "sourceKind": "VALIDITY_EXPIRED",
+              "status": "OPEN"
+            }
+          },
+          "expected": [
+            "id",
+            "rootId",
+            "responsibleWorkId",
+            "ownerId",
+            "supervisorId",
+            "nextAction",
+            "nextCheckAt"
+          ],
+          "requirementRefs": [
+            "D26"
+          ],
+          "evidenceRefs": [
+            "repeat-db:actual-artifact",
+            "repeat-db:source-rows"
+          ],
+          "scope": {
+            "normativeScope": "boundary-index",
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "T26",
+            "subcaseId": "lot-expiry-no-event"
+          },
+          "oracleExplanation": "사용자 요청 전에 자동 만료 의무의 실제 ID·root·책임 업무·인간 owner·supervisor·다음 행동·확인 시점이 모두 존재해야 한다. 빈 원 행이나 owner 없는 OPEN은 통과하지 못한다.",
+          "oracleRef": {
+            "oracleId": "T26.boundary-index-and-emergency-repair",
+            "observationNames": [
+              "boundary-index"
+            ]
+          }
+        },
+        {
+          "id": "repeat-db-followup-responsibility-values",
+          "op": "relationSet",
+          "source": {
+            "actionId": "repeat-db",
+            "pointer": "/data/rawRows/obligations",
+            "where": {
+              "sourceKind": "VALIDITY_EXPIRED",
+              "status": "OPEN"
+            },
+            "field": [
+              "ownerId",
+              "supervisorId",
+              "nextAction",
+              "nextCheckAt"
+            ]
+          },
+          "expected": [
+            [
+              {
+                "$alias": "owner"
+              },
+              {
+                "$alias": "supervisor"
+              },
+              "조사·재인가·안전 재시도",
+              "2026-10-07T09:01:00Z"
+            ]
+          ],
+          "requirementRefs": [
+            "D26"
+          ],
+          "evidenceRefs": [
+            "repeat-db:actual-artifact",
+            "repeat-db:source-rows"
+          ],
+          "scope": {
+            "normativeScope": "boundary-index",
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "T26",
+            "subcaseId": "lot-expiry-no-event"
+          },
+          "oracleExplanation": "자동 만료 의무는 fixture의 인간 책임자·감독자·다음 행동·확인 시점을 갖는다. 뒤 출고의 책임 복구로 대신하지 않는다.",
+          "oracleRef": {
+            "oracleId": "T26.boundary-index-and-emergency-repair",
+            "observationNames": [
+              "boundary-index"
+            ]
+          }
+        },
+        {
+          "id": "repeat-db-current-expiry-assignment-one",
+          "op": "count",
+          "source": {
+            "actionId": "repeat-db",
+            "pointer": "/data/rawRows/assignments",
+            "where": {
+              "sourceKind": "VALIDITY_EXPIRED",
+              "current": true,
+              "status": "OPEN"
+            }
+          },
+          "expected": 1,
+          "requirementRefs": [
+            "D26"
+          ],
+          "evidenceRefs": [
+            "repeat-db:actual-artifact",
+            "repeat-db:source-rows"
+          ],
+          "scope": {
+            "normativeScope": "boundary-index",
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "T26",
+            "subcaseId": "lot-expiry-no-event"
+          },
+          "oracleExplanation": "자동 생성된 만료 후속 의무의 현재 OPEN assignment는 하나다. 초기 활성화 의무와 구별하고 빈 행·중복 assignment를 거부한다.",
+          "oracleRef": {
+            "oracleId": "T26.boundary-index-and-emergency-repair",
+            "observationNames": [
+              "boundary-index"
+            ]
+          }
+        },
+        {
+          "id": "repeat-db-expiry-assignment-responsibility-present",
+          "op": "fieldsPresent",
+          "source": {
+            "actionId": "repeat-db",
+            "pointer": "/data/rawRows/assignments",
+            "where": {
+              "sourceKind": "VALIDITY_EXPIRED",
+              "current": true,
+              "status": "OPEN"
+            }
+          },
+          "expected": [
+            "id",
+            "obligationId",
+            "rootId",
+            "workId",
+            "ownerId",
+            "supervisorId",
+            "nextAction",
+            "nextCheckAt"
+          ],
+          "requirementRefs": [
+            "D26"
+          ],
+          "evidenceRefs": [
+            "repeat-db:actual-artifact",
+            "repeat-db:source-rows"
+          ],
+          "scope": {
+            "normativeScope": "boundary-index",
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "T26",
+            "subcaseId": "lot-expiry-no-event"
+          },
+          "oracleExplanation": "자동 sweep의 같은 snapshot에 실제 assignment ID·의무·root·업무와 인간 책임 필드가 모두 있어야 한다.",
+          "oracleRef": {
+            "oracleId": "T26.boundary-index-and-emergency-repair",
+            "observationNames": [
+              "boundary-index"
+            ]
+          }
+        },
+        {
+          "id": "repeat-db-expiry-assignment-responsibility-values",
+          "op": "relationSet",
+          "source": {
+            "actionId": "repeat-db",
+            "pointer": "/data/rawRows/assignments",
+            "where": {
+              "sourceKind": "VALIDITY_EXPIRED",
+              "current": true,
+              "status": "OPEN"
+            },
+            "field": [
+              "ownerId",
+              "supervisorId",
+              "nextAction",
+              "nextCheckAt"
+            ]
+          },
+          "expected": [
+            [
+              {
+                "$alias": "owner"
+              },
+              {
+                "$alias": "supervisor"
+              },
+              "조사·재인가·안전 재시도",
+              "2026-10-07T09:01:00Z"
+            ]
+          ],
+          "requirementRefs": [
+            "D26"
+          ],
+          "evidenceRefs": [
+            "repeat-db:actual-artifact",
+            "repeat-db:source-rows"
+          ],
+          "scope": {
+            "normativeScope": "boundary-index",
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "T26",
+            "subcaseId": "lot-expiry-no-event"
+          },
+          "oracleExplanation": "자동 sweep가 current OPEN assignment의 owner·supervisor·다음 행동·확인 시점을 함께 upsert한다.",
+          "oracleRef": {
+            "oracleId": "T26.boundary-index-and-emergency-repair",
+            "observationNames": [
+              "boundary-index"
+            ]
+          }
+        },
+        {
+          "id": "repeat-db-expiry-assignment-obligationId-linked",
+          "op": "sameAs",
+          "source": {
+            "actionId": "repeat-db",
+            "pointer": "/data/rawRows/assignments",
+            "where": {
+              "sourceKind": "VALIDITY_EXPIRED",
+              "current": true,
+              "status": "OPEN"
+            },
+            "field": "obligationId"
+          },
+          "expected": true,
+          "requirementRefs": [
+            "D26"
+          ],
+          "evidenceRefs": [
+            "repeat-db:actual-artifact",
+            "repeat-db:source-rows",
+            "repeat-db:actual-artifact",
+            "repeat-db:source-rows"
+          ],
+          "scope": {
+            "normativeScope": "boundary-index",
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "T26",
+            "subcaseId": "lot-expiry-no-event"
+          },
+          "oracleExplanation": "자동 sweep가 만든 assignment는 같은 snapshot의 만료 의무·stable root·책임 업무에 연결된다. 이름이나 count만 같은 별도 책임으로 대신하지 않는다.",
+          "oracleRef": {
+            "oracleId": "T26.boundary-index-and-emergency-repair",
+            "observationNames": [
+              "boundary-index"
+            ]
+          },
+          "baseline": {
+            "actionId": "repeat-db",
+            "pointer": "/data/rawRows/obligations",
+            "where": {
+              "sourceKind": "VALIDITY_EXPIRED",
+              "status": "OPEN"
+            },
+            "field": "id"
+          }
+        },
+        {
+          "id": "repeat-db-expiry-assignment-rootId-linked",
+          "op": "sameAs",
+          "source": {
+            "actionId": "repeat-db",
+            "pointer": "/data/rawRows/assignments",
+            "where": {
+              "sourceKind": "VALIDITY_EXPIRED",
+              "current": true,
+              "status": "OPEN"
+            },
+            "field": "rootId"
+          },
+          "expected": true,
+          "requirementRefs": [
+            "D26"
+          ],
+          "evidenceRefs": [
+            "repeat-db:actual-artifact",
+            "repeat-db:source-rows",
+            "repeat-db:actual-artifact",
+            "repeat-db:source-rows"
+          ],
+          "scope": {
+            "normativeScope": "boundary-index",
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "T26",
+            "subcaseId": "lot-expiry-no-event"
+          },
+          "oracleExplanation": "자동 sweep가 만든 assignment는 같은 snapshot의 만료 의무·stable root·책임 업무에 연결된다. 이름이나 count만 같은 별도 책임으로 대신하지 않는다.",
+          "oracleRef": {
+            "oracleId": "T26.boundary-index-and-emergency-repair",
+            "observationNames": [
+              "boundary-index"
+            ]
+          },
+          "baseline": {
+            "actionId": "repeat-db",
+            "pointer": "/data/rawRows/obligations",
+            "where": {
+              "sourceKind": "VALIDITY_EXPIRED",
+              "status": "OPEN"
+            },
+            "field": "rootId"
+          }
+        },
+        {
+          "id": "repeat-db-expiry-assignment-workId-linked",
+          "op": "sameAs",
+          "source": {
+            "actionId": "repeat-db",
+            "pointer": "/data/rawRows/assignments",
+            "where": {
+              "sourceKind": "VALIDITY_EXPIRED",
+              "current": true,
+              "status": "OPEN"
+            },
+            "field": "workId"
+          },
+          "expected": true,
+          "requirementRefs": [
+            "D26"
+          ],
+          "evidenceRefs": [
+            "repeat-db:actual-artifact",
+            "repeat-db:source-rows",
+            "repeat-db:actual-artifact",
+            "repeat-db:source-rows"
+          ],
+          "scope": {
+            "normativeScope": "boundary-index",
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "T26",
+            "subcaseId": "lot-expiry-no-event"
+          },
+          "oracleExplanation": "자동 sweep가 만든 assignment는 같은 snapshot의 만료 의무·stable root·책임 업무에 연결된다. 이름이나 count만 같은 별도 책임으로 대신하지 않는다.",
+          "oracleRef": {
+            "oracleId": "T26.boundary-index-and-emergency-repair",
+            "observationNames": [
+              "boundary-index"
+            ]
+          },
+          "baseline": {
+            "actionId": "repeat-db",
+            "pointer": "/data/rawRows/obligations",
+            "where": {
+              "sourceKind": "VALIDITY_EXPIRED",
+              "status": "OPEN"
+            },
+            "field": "responsibleWorkId"
+          }
+        },
+        {
+          "id": "repeat-expiry-assignment-identity-kept",
+          "op": "sameAs",
+          "source": {
+            "actionId": "repeat-db",
+            "pointer": "/data/rawRows/assignments",
+            "where": {
+              "sourceKind": "VALIDITY_EXPIRED",
+              "current": true,
+              "status": "OPEN"
+            }
+          },
+          "expected": true,
+          "requirementRefs": [
+            "D26"
+          ],
+          "evidenceRefs": [
+            "repeat-db:actual-artifact",
+            "repeat-db:source-rows",
+            "sweep-db:actual-artifact",
+            "sweep-db:source-rows"
+          ],
+          "scope": {
+            "normativeScope": "boundary-index",
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "T26",
+            "subcaseId": "lot-expiry-no-event"
+          },
+          "oracleExplanation": "반복 sweep는 동일한 현재 OPEN assignment 원 행·ID·owner·supervisor·다음 행동·확인 시점을 유지한다.",
+          "oracleRef": {
+            "oracleId": "T26.boundary-index-and-emergency-repair",
+            "observationNames": [
+              "boundary-index"
+            ]
+          },
+          "baseline": {
+            "actionId": "sweep-db",
+            "pointer": "/data/rawRows/assignments",
+            "where": {
+              "sourceKind": "VALIDITY_EXPIRED",
+              "current": true,
+              "status": "OPEN"
+            }
+          }
         }
       ],
       "oracleExplanation": "사용자 command/query 전에 sweep terminal snapshot의 독립 DB에서 만료 사건1·현재 goal refresh1·OPEN 후속1을 확인한다. 반복 sweep 뒤 같은 원 행을 유지하며 출고0을 확인한다. 지연 commit guard는 별도 delayed-guard fixture로 검증한다."
@@ -15360,6 +16153,799 @@
             "observationNames": [
               "boundary-index"
             ]
+          }
+        },
+        {
+          "id": "sweep-db-followup-responsibility-present",
+          "op": "fieldsPresent",
+          "source": {
+            "actionId": "sweep-db",
+            "pointer": "/data/rawRows/obligations",
+            "where": {
+              "sourceKind": "VALIDITY_EXPIRED",
+              "status": "OPEN"
+            }
+          },
+          "expected": [
+            "id",
+            "rootId",
+            "responsibleWorkId",
+            "ownerId",
+            "supervisorId",
+            "nextAction",
+            "nextCheckAt"
+          ],
+          "requirementRefs": [
+            "D26"
+          ],
+          "evidenceRefs": [
+            "sweep-db:actual-artifact",
+            "sweep-db:source-rows"
+          ],
+          "scope": {
+            "normativeScope": "boundary-index",
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "T26",
+            "subcaseId": "disposition-expiry-no-event"
+          },
+          "oracleExplanation": "사용자 요청 전에 자동 만료 의무의 실제 ID·root·책임 업무·인간 owner·supervisor·다음 행동·확인 시점이 모두 존재해야 한다. 빈 원 행이나 owner 없는 OPEN은 통과하지 못한다.",
+          "oracleRef": {
+            "oracleId": "T26.boundary-index-and-emergency-repair",
+            "observationNames": [
+              "boundary-index"
+            ]
+          }
+        },
+        {
+          "id": "sweep-db-followup-responsibility-values",
+          "op": "relationSet",
+          "source": {
+            "actionId": "sweep-db",
+            "pointer": "/data/rawRows/obligations",
+            "where": {
+              "sourceKind": "VALIDITY_EXPIRED",
+              "status": "OPEN"
+            },
+            "field": [
+              "ownerId",
+              "supervisorId",
+              "nextAction",
+              "nextCheckAt"
+            ]
+          },
+          "expected": [
+            [
+              {
+                "$alias": "owner"
+              },
+              {
+                "$alias": "supervisor"
+              },
+              "조사·재인가·안전 재시도",
+              "2026-10-07T09:01:00Z"
+            ]
+          ],
+          "requirementRefs": [
+            "D26"
+          ],
+          "evidenceRefs": [
+            "sweep-db:actual-artifact",
+            "sweep-db:source-rows"
+          ],
+          "scope": {
+            "normativeScope": "boundary-index",
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "T26",
+            "subcaseId": "disposition-expiry-no-event"
+          },
+          "oracleExplanation": "자동 만료 의무는 fixture의 인간 책임자·감독자·다음 행동·확인 시점을 갖는다. 뒤 출고의 책임 복구로 대신하지 않는다.",
+          "oracleRef": {
+            "oracleId": "T26.boundary-index-and-emergency-repair",
+            "observationNames": [
+              "boundary-index"
+            ]
+          }
+        },
+        {
+          "id": "sweep-db-current-expiry-assignment-one",
+          "op": "count",
+          "source": {
+            "actionId": "sweep-db",
+            "pointer": "/data/rawRows/assignments",
+            "where": {
+              "sourceKind": "VALIDITY_EXPIRED",
+              "current": true,
+              "status": "OPEN"
+            }
+          },
+          "expected": 1,
+          "requirementRefs": [
+            "D26"
+          ],
+          "evidenceRefs": [
+            "sweep-db:actual-artifact",
+            "sweep-db:source-rows"
+          ],
+          "scope": {
+            "normativeScope": "boundary-index",
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "T26",
+            "subcaseId": "disposition-expiry-no-event"
+          },
+          "oracleExplanation": "자동 생성된 만료 후속 의무의 현재 OPEN assignment는 하나다. 초기 활성화 의무와 구별하고 빈 행·중복 assignment를 거부한다.",
+          "oracleRef": {
+            "oracleId": "T26.boundary-index-and-emergency-repair",
+            "observationNames": [
+              "boundary-index"
+            ]
+          }
+        },
+        {
+          "id": "sweep-db-expiry-assignment-responsibility-present",
+          "op": "fieldsPresent",
+          "source": {
+            "actionId": "sweep-db",
+            "pointer": "/data/rawRows/assignments",
+            "where": {
+              "sourceKind": "VALIDITY_EXPIRED",
+              "current": true,
+              "status": "OPEN"
+            }
+          },
+          "expected": [
+            "id",
+            "obligationId",
+            "rootId",
+            "workId",
+            "ownerId",
+            "supervisorId",
+            "nextAction",
+            "nextCheckAt"
+          ],
+          "requirementRefs": [
+            "D26"
+          ],
+          "evidenceRefs": [
+            "sweep-db:actual-artifact",
+            "sweep-db:source-rows"
+          ],
+          "scope": {
+            "normativeScope": "boundary-index",
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "T26",
+            "subcaseId": "disposition-expiry-no-event"
+          },
+          "oracleExplanation": "자동 sweep의 같은 snapshot에 실제 assignment ID·의무·root·업무와 인간 책임 필드가 모두 있어야 한다.",
+          "oracleRef": {
+            "oracleId": "T26.boundary-index-and-emergency-repair",
+            "observationNames": [
+              "boundary-index"
+            ]
+          }
+        },
+        {
+          "id": "sweep-db-expiry-assignment-responsibility-values",
+          "op": "relationSet",
+          "source": {
+            "actionId": "sweep-db",
+            "pointer": "/data/rawRows/assignments",
+            "where": {
+              "sourceKind": "VALIDITY_EXPIRED",
+              "current": true,
+              "status": "OPEN"
+            },
+            "field": [
+              "ownerId",
+              "supervisorId",
+              "nextAction",
+              "nextCheckAt"
+            ]
+          },
+          "expected": [
+            [
+              {
+                "$alias": "owner"
+              },
+              {
+                "$alias": "supervisor"
+              },
+              "조사·재인가·안전 재시도",
+              "2026-10-07T09:01:00Z"
+            ]
+          ],
+          "requirementRefs": [
+            "D26"
+          ],
+          "evidenceRefs": [
+            "sweep-db:actual-artifact",
+            "sweep-db:source-rows"
+          ],
+          "scope": {
+            "normativeScope": "boundary-index",
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "T26",
+            "subcaseId": "disposition-expiry-no-event"
+          },
+          "oracleExplanation": "자동 sweep가 current OPEN assignment의 owner·supervisor·다음 행동·확인 시점을 함께 upsert한다.",
+          "oracleRef": {
+            "oracleId": "T26.boundary-index-and-emergency-repair",
+            "observationNames": [
+              "boundary-index"
+            ]
+          }
+        },
+        {
+          "id": "sweep-db-expiry-assignment-obligationId-linked",
+          "op": "sameAs",
+          "source": {
+            "actionId": "sweep-db",
+            "pointer": "/data/rawRows/assignments",
+            "where": {
+              "sourceKind": "VALIDITY_EXPIRED",
+              "current": true,
+              "status": "OPEN"
+            },
+            "field": "obligationId"
+          },
+          "expected": true,
+          "requirementRefs": [
+            "D26"
+          ],
+          "evidenceRefs": [
+            "sweep-db:actual-artifact",
+            "sweep-db:source-rows",
+            "sweep-db:actual-artifact",
+            "sweep-db:source-rows"
+          ],
+          "scope": {
+            "normativeScope": "boundary-index",
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "T26",
+            "subcaseId": "disposition-expiry-no-event"
+          },
+          "oracleExplanation": "자동 sweep가 만든 assignment는 같은 snapshot의 만료 의무·stable root·책임 업무에 연결된다. 이름이나 count만 같은 별도 책임으로 대신하지 않는다.",
+          "oracleRef": {
+            "oracleId": "T26.boundary-index-and-emergency-repair",
+            "observationNames": [
+              "boundary-index"
+            ]
+          },
+          "baseline": {
+            "actionId": "sweep-db",
+            "pointer": "/data/rawRows/obligations",
+            "where": {
+              "sourceKind": "VALIDITY_EXPIRED",
+              "status": "OPEN"
+            },
+            "field": "id"
+          }
+        },
+        {
+          "id": "sweep-db-expiry-assignment-rootId-linked",
+          "op": "sameAs",
+          "source": {
+            "actionId": "sweep-db",
+            "pointer": "/data/rawRows/assignments",
+            "where": {
+              "sourceKind": "VALIDITY_EXPIRED",
+              "current": true,
+              "status": "OPEN"
+            },
+            "field": "rootId"
+          },
+          "expected": true,
+          "requirementRefs": [
+            "D26"
+          ],
+          "evidenceRefs": [
+            "sweep-db:actual-artifact",
+            "sweep-db:source-rows",
+            "sweep-db:actual-artifact",
+            "sweep-db:source-rows"
+          ],
+          "scope": {
+            "normativeScope": "boundary-index",
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "T26",
+            "subcaseId": "disposition-expiry-no-event"
+          },
+          "oracleExplanation": "자동 sweep가 만든 assignment는 같은 snapshot의 만료 의무·stable root·책임 업무에 연결된다. 이름이나 count만 같은 별도 책임으로 대신하지 않는다.",
+          "oracleRef": {
+            "oracleId": "T26.boundary-index-and-emergency-repair",
+            "observationNames": [
+              "boundary-index"
+            ]
+          },
+          "baseline": {
+            "actionId": "sweep-db",
+            "pointer": "/data/rawRows/obligations",
+            "where": {
+              "sourceKind": "VALIDITY_EXPIRED",
+              "status": "OPEN"
+            },
+            "field": "rootId"
+          }
+        },
+        {
+          "id": "sweep-db-expiry-assignment-workId-linked",
+          "op": "sameAs",
+          "source": {
+            "actionId": "sweep-db",
+            "pointer": "/data/rawRows/assignments",
+            "where": {
+              "sourceKind": "VALIDITY_EXPIRED",
+              "current": true,
+              "status": "OPEN"
+            },
+            "field": "workId"
+          },
+          "expected": true,
+          "requirementRefs": [
+            "D26"
+          ],
+          "evidenceRefs": [
+            "sweep-db:actual-artifact",
+            "sweep-db:source-rows",
+            "sweep-db:actual-artifact",
+            "sweep-db:source-rows"
+          ],
+          "scope": {
+            "normativeScope": "boundary-index",
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "T26",
+            "subcaseId": "disposition-expiry-no-event"
+          },
+          "oracleExplanation": "자동 sweep가 만든 assignment는 같은 snapshot의 만료 의무·stable root·책임 업무에 연결된다. 이름이나 count만 같은 별도 책임으로 대신하지 않는다.",
+          "oracleRef": {
+            "oracleId": "T26.boundary-index-and-emergency-repair",
+            "observationNames": [
+              "boundary-index"
+            ]
+          },
+          "baseline": {
+            "actionId": "sweep-db",
+            "pointer": "/data/rawRows/obligations",
+            "where": {
+              "sourceKind": "VALIDITY_EXPIRED",
+              "status": "OPEN"
+            },
+            "field": "responsibleWorkId"
+          }
+        },
+        {
+          "id": "repeat-db-followup-responsibility-present",
+          "op": "fieldsPresent",
+          "source": {
+            "actionId": "repeat-db",
+            "pointer": "/data/rawRows/obligations",
+            "where": {
+              "sourceKind": "VALIDITY_EXPIRED",
+              "status": "OPEN"
+            }
+          },
+          "expected": [
+            "id",
+            "rootId",
+            "responsibleWorkId",
+            "ownerId",
+            "supervisorId",
+            "nextAction",
+            "nextCheckAt"
+          ],
+          "requirementRefs": [
+            "D26"
+          ],
+          "evidenceRefs": [
+            "repeat-db:actual-artifact",
+            "repeat-db:source-rows"
+          ],
+          "scope": {
+            "normativeScope": "boundary-index",
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "T26",
+            "subcaseId": "disposition-expiry-no-event"
+          },
+          "oracleExplanation": "사용자 요청 전에 자동 만료 의무의 실제 ID·root·책임 업무·인간 owner·supervisor·다음 행동·확인 시점이 모두 존재해야 한다. 빈 원 행이나 owner 없는 OPEN은 통과하지 못한다.",
+          "oracleRef": {
+            "oracleId": "T26.boundary-index-and-emergency-repair",
+            "observationNames": [
+              "boundary-index"
+            ]
+          }
+        },
+        {
+          "id": "repeat-db-followup-responsibility-values",
+          "op": "relationSet",
+          "source": {
+            "actionId": "repeat-db",
+            "pointer": "/data/rawRows/obligations",
+            "where": {
+              "sourceKind": "VALIDITY_EXPIRED",
+              "status": "OPEN"
+            },
+            "field": [
+              "ownerId",
+              "supervisorId",
+              "nextAction",
+              "nextCheckAt"
+            ]
+          },
+          "expected": [
+            [
+              {
+                "$alias": "owner"
+              },
+              {
+                "$alias": "supervisor"
+              },
+              "조사·재인가·안전 재시도",
+              "2026-10-07T09:01:00Z"
+            ]
+          ],
+          "requirementRefs": [
+            "D26"
+          ],
+          "evidenceRefs": [
+            "repeat-db:actual-artifact",
+            "repeat-db:source-rows"
+          ],
+          "scope": {
+            "normativeScope": "boundary-index",
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "T26",
+            "subcaseId": "disposition-expiry-no-event"
+          },
+          "oracleExplanation": "자동 만료 의무는 fixture의 인간 책임자·감독자·다음 행동·확인 시점을 갖는다. 뒤 출고의 책임 복구로 대신하지 않는다.",
+          "oracleRef": {
+            "oracleId": "T26.boundary-index-and-emergency-repair",
+            "observationNames": [
+              "boundary-index"
+            ]
+          }
+        },
+        {
+          "id": "repeat-db-current-expiry-assignment-one",
+          "op": "count",
+          "source": {
+            "actionId": "repeat-db",
+            "pointer": "/data/rawRows/assignments",
+            "where": {
+              "sourceKind": "VALIDITY_EXPIRED",
+              "current": true,
+              "status": "OPEN"
+            }
+          },
+          "expected": 1,
+          "requirementRefs": [
+            "D26"
+          ],
+          "evidenceRefs": [
+            "repeat-db:actual-artifact",
+            "repeat-db:source-rows"
+          ],
+          "scope": {
+            "normativeScope": "boundary-index",
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "T26",
+            "subcaseId": "disposition-expiry-no-event"
+          },
+          "oracleExplanation": "자동 생성된 만료 후속 의무의 현재 OPEN assignment는 하나다. 초기 활성화 의무와 구별하고 빈 행·중복 assignment를 거부한다.",
+          "oracleRef": {
+            "oracleId": "T26.boundary-index-and-emergency-repair",
+            "observationNames": [
+              "boundary-index"
+            ]
+          }
+        },
+        {
+          "id": "repeat-db-expiry-assignment-responsibility-present",
+          "op": "fieldsPresent",
+          "source": {
+            "actionId": "repeat-db",
+            "pointer": "/data/rawRows/assignments",
+            "where": {
+              "sourceKind": "VALIDITY_EXPIRED",
+              "current": true,
+              "status": "OPEN"
+            }
+          },
+          "expected": [
+            "id",
+            "obligationId",
+            "rootId",
+            "workId",
+            "ownerId",
+            "supervisorId",
+            "nextAction",
+            "nextCheckAt"
+          ],
+          "requirementRefs": [
+            "D26"
+          ],
+          "evidenceRefs": [
+            "repeat-db:actual-artifact",
+            "repeat-db:source-rows"
+          ],
+          "scope": {
+            "normativeScope": "boundary-index",
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "T26",
+            "subcaseId": "disposition-expiry-no-event"
+          },
+          "oracleExplanation": "자동 sweep의 같은 snapshot에 실제 assignment ID·의무·root·업무와 인간 책임 필드가 모두 있어야 한다.",
+          "oracleRef": {
+            "oracleId": "T26.boundary-index-and-emergency-repair",
+            "observationNames": [
+              "boundary-index"
+            ]
+          }
+        },
+        {
+          "id": "repeat-db-expiry-assignment-responsibility-values",
+          "op": "relationSet",
+          "source": {
+            "actionId": "repeat-db",
+            "pointer": "/data/rawRows/assignments",
+            "where": {
+              "sourceKind": "VALIDITY_EXPIRED",
+              "current": true,
+              "status": "OPEN"
+            },
+            "field": [
+              "ownerId",
+              "supervisorId",
+              "nextAction",
+              "nextCheckAt"
+            ]
+          },
+          "expected": [
+            [
+              {
+                "$alias": "owner"
+              },
+              {
+                "$alias": "supervisor"
+              },
+              "조사·재인가·안전 재시도",
+              "2026-10-07T09:01:00Z"
+            ]
+          ],
+          "requirementRefs": [
+            "D26"
+          ],
+          "evidenceRefs": [
+            "repeat-db:actual-artifact",
+            "repeat-db:source-rows"
+          ],
+          "scope": {
+            "normativeScope": "boundary-index",
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "T26",
+            "subcaseId": "disposition-expiry-no-event"
+          },
+          "oracleExplanation": "자동 sweep가 current OPEN assignment의 owner·supervisor·다음 행동·확인 시점을 함께 upsert한다.",
+          "oracleRef": {
+            "oracleId": "T26.boundary-index-and-emergency-repair",
+            "observationNames": [
+              "boundary-index"
+            ]
+          }
+        },
+        {
+          "id": "repeat-db-expiry-assignment-obligationId-linked",
+          "op": "sameAs",
+          "source": {
+            "actionId": "repeat-db",
+            "pointer": "/data/rawRows/assignments",
+            "where": {
+              "sourceKind": "VALIDITY_EXPIRED",
+              "current": true,
+              "status": "OPEN"
+            },
+            "field": "obligationId"
+          },
+          "expected": true,
+          "requirementRefs": [
+            "D26"
+          ],
+          "evidenceRefs": [
+            "repeat-db:actual-artifact",
+            "repeat-db:source-rows",
+            "repeat-db:actual-artifact",
+            "repeat-db:source-rows"
+          ],
+          "scope": {
+            "normativeScope": "boundary-index",
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "T26",
+            "subcaseId": "disposition-expiry-no-event"
+          },
+          "oracleExplanation": "자동 sweep가 만든 assignment는 같은 snapshot의 만료 의무·stable root·책임 업무에 연결된다. 이름이나 count만 같은 별도 책임으로 대신하지 않는다.",
+          "oracleRef": {
+            "oracleId": "T26.boundary-index-and-emergency-repair",
+            "observationNames": [
+              "boundary-index"
+            ]
+          },
+          "baseline": {
+            "actionId": "repeat-db",
+            "pointer": "/data/rawRows/obligations",
+            "where": {
+              "sourceKind": "VALIDITY_EXPIRED",
+              "status": "OPEN"
+            },
+            "field": "id"
+          }
+        },
+        {
+          "id": "repeat-db-expiry-assignment-rootId-linked",
+          "op": "sameAs",
+          "source": {
+            "actionId": "repeat-db",
+            "pointer": "/data/rawRows/assignments",
+            "where": {
+              "sourceKind": "VALIDITY_EXPIRED",
+              "current": true,
+              "status": "OPEN"
+            },
+            "field": "rootId"
+          },
+          "expected": true,
+          "requirementRefs": [
+            "D26"
+          ],
+          "evidenceRefs": [
+            "repeat-db:actual-artifact",
+            "repeat-db:source-rows",
+            "repeat-db:actual-artifact",
+            "repeat-db:source-rows"
+          ],
+          "scope": {
+            "normativeScope": "boundary-index",
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "T26",
+            "subcaseId": "disposition-expiry-no-event"
+          },
+          "oracleExplanation": "자동 sweep가 만든 assignment는 같은 snapshot의 만료 의무·stable root·책임 업무에 연결된다. 이름이나 count만 같은 별도 책임으로 대신하지 않는다.",
+          "oracleRef": {
+            "oracleId": "T26.boundary-index-and-emergency-repair",
+            "observationNames": [
+              "boundary-index"
+            ]
+          },
+          "baseline": {
+            "actionId": "repeat-db",
+            "pointer": "/data/rawRows/obligations",
+            "where": {
+              "sourceKind": "VALIDITY_EXPIRED",
+              "status": "OPEN"
+            },
+            "field": "rootId"
+          }
+        },
+        {
+          "id": "repeat-db-expiry-assignment-workId-linked",
+          "op": "sameAs",
+          "source": {
+            "actionId": "repeat-db",
+            "pointer": "/data/rawRows/assignments",
+            "where": {
+              "sourceKind": "VALIDITY_EXPIRED",
+              "current": true,
+              "status": "OPEN"
+            },
+            "field": "workId"
+          },
+          "expected": true,
+          "requirementRefs": [
+            "D26"
+          ],
+          "evidenceRefs": [
+            "repeat-db:actual-artifact",
+            "repeat-db:source-rows",
+            "repeat-db:actual-artifact",
+            "repeat-db:source-rows"
+          ],
+          "scope": {
+            "normativeScope": "boundary-index",
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "T26",
+            "subcaseId": "disposition-expiry-no-event"
+          },
+          "oracleExplanation": "자동 sweep가 만든 assignment는 같은 snapshot의 만료 의무·stable root·책임 업무에 연결된다. 이름이나 count만 같은 별도 책임으로 대신하지 않는다.",
+          "oracleRef": {
+            "oracleId": "T26.boundary-index-and-emergency-repair",
+            "observationNames": [
+              "boundary-index"
+            ]
+          },
+          "baseline": {
+            "actionId": "repeat-db",
+            "pointer": "/data/rawRows/obligations",
+            "where": {
+              "sourceKind": "VALIDITY_EXPIRED",
+              "status": "OPEN"
+            },
+            "field": "responsibleWorkId"
+          }
+        },
+        {
+          "id": "repeat-expiry-assignment-identity-kept",
+          "op": "sameAs",
+          "source": {
+            "actionId": "repeat-db",
+            "pointer": "/data/rawRows/assignments",
+            "where": {
+              "sourceKind": "VALIDITY_EXPIRED",
+              "current": true,
+              "status": "OPEN"
+            }
+          },
+          "expected": true,
+          "requirementRefs": [
+            "D26"
+          ],
+          "evidenceRefs": [
+            "repeat-db:actual-artifact",
+            "repeat-db:source-rows",
+            "sweep-db:actual-artifact",
+            "sweep-db:source-rows"
+          ],
+          "scope": {
+            "normativeScope": "boundary-index",
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "T26",
+            "subcaseId": "disposition-expiry-no-event"
+          },
+          "oracleExplanation": "반복 sweep는 동일한 현재 OPEN assignment 원 행·ID·owner·supervisor·다음 행동·확인 시점을 유지한다.",
+          "oracleRef": {
+            "oracleId": "T26.boundary-index-and-emergency-repair",
+            "observationNames": [
+              "boundary-index"
+            ]
+          },
+          "baseline": {
+            "actionId": "sweep-db",
+            "pointer": "/data/rawRows/assignments",
+            "where": {
+              "sourceKind": "VALIDITY_EXPIRED",
+              "current": true,
+              "status": "OPEN"
+            }
           }
         }
       ],
@@ -19267,6 +20853,799 @@
               "boundary-index"
             ]
           }
+        },
+        {
+          "id": "sweep-db-followup-responsibility-present",
+          "op": "fieldsPresent",
+          "source": {
+            "actionId": "sweep-db",
+            "pointer": "/data/rawRows/obligations",
+            "where": {
+              "sourceKind": "VALIDITY_EXPIRED",
+              "status": "OPEN"
+            }
+          },
+          "expected": [
+            "id",
+            "rootId",
+            "responsibleWorkId",
+            "ownerId",
+            "supervisorId",
+            "nextAction",
+            "nextCheckAt"
+          ],
+          "requirementRefs": [
+            "D26"
+          ],
+          "evidenceRefs": [
+            "sweep-db:actual-artifact",
+            "sweep-db:source-rows"
+          ],
+          "scope": {
+            "normativeScope": "boundary-index",
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "T26",
+            "subcaseId": "grant-expiry-no-event"
+          },
+          "oracleExplanation": "사용자 요청 전에 자동 만료 의무의 실제 ID·root·책임 업무·인간 owner·supervisor·다음 행동·확인 시점이 모두 존재해야 한다. 빈 원 행이나 owner 없는 OPEN은 통과하지 못한다.",
+          "oracleRef": {
+            "oracleId": "T26.boundary-index-and-emergency-repair",
+            "observationNames": [
+              "boundary-index"
+            ]
+          }
+        },
+        {
+          "id": "sweep-db-followup-responsibility-values",
+          "op": "relationSet",
+          "source": {
+            "actionId": "sweep-db",
+            "pointer": "/data/rawRows/obligations",
+            "where": {
+              "sourceKind": "VALIDITY_EXPIRED",
+              "status": "OPEN"
+            },
+            "field": [
+              "ownerId",
+              "supervisorId",
+              "nextAction",
+              "nextCheckAt"
+            ]
+          },
+          "expected": [
+            [
+              {
+                "$alias": "owner"
+              },
+              {
+                "$alias": "supervisor"
+              },
+              "조사·재인가·안전 재시도",
+              "2026-10-07T09:01:00Z"
+            ]
+          ],
+          "requirementRefs": [
+            "D26"
+          ],
+          "evidenceRefs": [
+            "sweep-db:actual-artifact",
+            "sweep-db:source-rows"
+          ],
+          "scope": {
+            "normativeScope": "boundary-index",
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "T26",
+            "subcaseId": "grant-expiry-no-event"
+          },
+          "oracleExplanation": "자동 만료 의무는 fixture의 인간 책임자·감독자·다음 행동·확인 시점을 갖는다. 뒤 출고의 책임 복구로 대신하지 않는다.",
+          "oracleRef": {
+            "oracleId": "T26.boundary-index-and-emergency-repair",
+            "observationNames": [
+              "boundary-index"
+            ]
+          }
+        },
+        {
+          "id": "sweep-db-current-expiry-assignment-one",
+          "op": "count",
+          "source": {
+            "actionId": "sweep-db",
+            "pointer": "/data/rawRows/assignments",
+            "where": {
+              "sourceKind": "VALIDITY_EXPIRED",
+              "current": true,
+              "status": "OPEN"
+            }
+          },
+          "expected": 1,
+          "requirementRefs": [
+            "D26"
+          ],
+          "evidenceRefs": [
+            "sweep-db:actual-artifact",
+            "sweep-db:source-rows"
+          ],
+          "scope": {
+            "normativeScope": "boundary-index",
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "T26",
+            "subcaseId": "grant-expiry-no-event"
+          },
+          "oracleExplanation": "자동 생성된 만료 후속 의무의 현재 OPEN assignment는 하나다. 초기 활성화 의무와 구별하고 빈 행·중복 assignment를 거부한다.",
+          "oracleRef": {
+            "oracleId": "T26.boundary-index-and-emergency-repair",
+            "observationNames": [
+              "boundary-index"
+            ]
+          }
+        },
+        {
+          "id": "sweep-db-expiry-assignment-responsibility-present",
+          "op": "fieldsPresent",
+          "source": {
+            "actionId": "sweep-db",
+            "pointer": "/data/rawRows/assignments",
+            "where": {
+              "sourceKind": "VALIDITY_EXPIRED",
+              "current": true,
+              "status": "OPEN"
+            }
+          },
+          "expected": [
+            "id",
+            "obligationId",
+            "rootId",
+            "workId",
+            "ownerId",
+            "supervisorId",
+            "nextAction",
+            "nextCheckAt"
+          ],
+          "requirementRefs": [
+            "D26"
+          ],
+          "evidenceRefs": [
+            "sweep-db:actual-artifact",
+            "sweep-db:source-rows"
+          ],
+          "scope": {
+            "normativeScope": "boundary-index",
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "T26",
+            "subcaseId": "grant-expiry-no-event"
+          },
+          "oracleExplanation": "자동 sweep의 같은 snapshot에 실제 assignment ID·의무·root·업무와 인간 책임 필드가 모두 있어야 한다.",
+          "oracleRef": {
+            "oracleId": "T26.boundary-index-and-emergency-repair",
+            "observationNames": [
+              "boundary-index"
+            ]
+          }
+        },
+        {
+          "id": "sweep-db-expiry-assignment-responsibility-values",
+          "op": "relationSet",
+          "source": {
+            "actionId": "sweep-db",
+            "pointer": "/data/rawRows/assignments",
+            "where": {
+              "sourceKind": "VALIDITY_EXPIRED",
+              "current": true,
+              "status": "OPEN"
+            },
+            "field": [
+              "ownerId",
+              "supervisorId",
+              "nextAction",
+              "nextCheckAt"
+            ]
+          },
+          "expected": [
+            [
+              {
+                "$alias": "owner"
+              },
+              {
+                "$alias": "supervisor"
+              },
+              "조사·재인가·안전 재시도",
+              "2026-10-07T09:01:00Z"
+            ]
+          ],
+          "requirementRefs": [
+            "D26"
+          ],
+          "evidenceRefs": [
+            "sweep-db:actual-artifact",
+            "sweep-db:source-rows"
+          ],
+          "scope": {
+            "normativeScope": "boundary-index",
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "T26",
+            "subcaseId": "grant-expiry-no-event"
+          },
+          "oracleExplanation": "자동 sweep가 current OPEN assignment의 owner·supervisor·다음 행동·확인 시점을 함께 upsert한다.",
+          "oracleRef": {
+            "oracleId": "T26.boundary-index-and-emergency-repair",
+            "observationNames": [
+              "boundary-index"
+            ]
+          }
+        },
+        {
+          "id": "sweep-db-expiry-assignment-obligationId-linked",
+          "op": "sameAs",
+          "source": {
+            "actionId": "sweep-db",
+            "pointer": "/data/rawRows/assignments",
+            "where": {
+              "sourceKind": "VALIDITY_EXPIRED",
+              "current": true,
+              "status": "OPEN"
+            },
+            "field": "obligationId"
+          },
+          "expected": true,
+          "requirementRefs": [
+            "D26"
+          ],
+          "evidenceRefs": [
+            "sweep-db:actual-artifact",
+            "sweep-db:source-rows",
+            "sweep-db:actual-artifact",
+            "sweep-db:source-rows"
+          ],
+          "scope": {
+            "normativeScope": "boundary-index",
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "T26",
+            "subcaseId": "grant-expiry-no-event"
+          },
+          "oracleExplanation": "자동 sweep가 만든 assignment는 같은 snapshot의 만료 의무·stable root·책임 업무에 연결된다. 이름이나 count만 같은 별도 책임으로 대신하지 않는다.",
+          "oracleRef": {
+            "oracleId": "T26.boundary-index-and-emergency-repair",
+            "observationNames": [
+              "boundary-index"
+            ]
+          },
+          "baseline": {
+            "actionId": "sweep-db",
+            "pointer": "/data/rawRows/obligations",
+            "where": {
+              "sourceKind": "VALIDITY_EXPIRED",
+              "status": "OPEN"
+            },
+            "field": "id"
+          }
+        },
+        {
+          "id": "sweep-db-expiry-assignment-rootId-linked",
+          "op": "sameAs",
+          "source": {
+            "actionId": "sweep-db",
+            "pointer": "/data/rawRows/assignments",
+            "where": {
+              "sourceKind": "VALIDITY_EXPIRED",
+              "current": true,
+              "status": "OPEN"
+            },
+            "field": "rootId"
+          },
+          "expected": true,
+          "requirementRefs": [
+            "D26"
+          ],
+          "evidenceRefs": [
+            "sweep-db:actual-artifact",
+            "sweep-db:source-rows",
+            "sweep-db:actual-artifact",
+            "sweep-db:source-rows"
+          ],
+          "scope": {
+            "normativeScope": "boundary-index",
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "T26",
+            "subcaseId": "grant-expiry-no-event"
+          },
+          "oracleExplanation": "자동 sweep가 만든 assignment는 같은 snapshot의 만료 의무·stable root·책임 업무에 연결된다. 이름이나 count만 같은 별도 책임으로 대신하지 않는다.",
+          "oracleRef": {
+            "oracleId": "T26.boundary-index-and-emergency-repair",
+            "observationNames": [
+              "boundary-index"
+            ]
+          },
+          "baseline": {
+            "actionId": "sweep-db",
+            "pointer": "/data/rawRows/obligations",
+            "where": {
+              "sourceKind": "VALIDITY_EXPIRED",
+              "status": "OPEN"
+            },
+            "field": "rootId"
+          }
+        },
+        {
+          "id": "sweep-db-expiry-assignment-workId-linked",
+          "op": "sameAs",
+          "source": {
+            "actionId": "sweep-db",
+            "pointer": "/data/rawRows/assignments",
+            "where": {
+              "sourceKind": "VALIDITY_EXPIRED",
+              "current": true,
+              "status": "OPEN"
+            },
+            "field": "workId"
+          },
+          "expected": true,
+          "requirementRefs": [
+            "D26"
+          ],
+          "evidenceRefs": [
+            "sweep-db:actual-artifact",
+            "sweep-db:source-rows",
+            "sweep-db:actual-artifact",
+            "sweep-db:source-rows"
+          ],
+          "scope": {
+            "normativeScope": "boundary-index",
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "T26",
+            "subcaseId": "grant-expiry-no-event"
+          },
+          "oracleExplanation": "자동 sweep가 만든 assignment는 같은 snapshot의 만료 의무·stable root·책임 업무에 연결된다. 이름이나 count만 같은 별도 책임으로 대신하지 않는다.",
+          "oracleRef": {
+            "oracleId": "T26.boundary-index-and-emergency-repair",
+            "observationNames": [
+              "boundary-index"
+            ]
+          },
+          "baseline": {
+            "actionId": "sweep-db",
+            "pointer": "/data/rawRows/obligations",
+            "where": {
+              "sourceKind": "VALIDITY_EXPIRED",
+              "status": "OPEN"
+            },
+            "field": "responsibleWorkId"
+          }
+        },
+        {
+          "id": "repeat-db-followup-responsibility-present",
+          "op": "fieldsPresent",
+          "source": {
+            "actionId": "repeat-db",
+            "pointer": "/data/rawRows/obligations",
+            "where": {
+              "sourceKind": "VALIDITY_EXPIRED",
+              "status": "OPEN"
+            }
+          },
+          "expected": [
+            "id",
+            "rootId",
+            "responsibleWorkId",
+            "ownerId",
+            "supervisorId",
+            "nextAction",
+            "nextCheckAt"
+          ],
+          "requirementRefs": [
+            "D26"
+          ],
+          "evidenceRefs": [
+            "repeat-db:actual-artifact",
+            "repeat-db:source-rows"
+          ],
+          "scope": {
+            "normativeScope": "boundary-index",
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "T26",
+            "subcaseId": "grant-expiry-no-event"
+          },
+          "oracleExplanation": "사용자 요청 전에 자동 만료 의무의 실제 ID·root·책임 업무·인간 owner·supervisor·다음 행동·확인 시점이 모두 존재해야 한다. 빈 원 행이나 owner 없는 OPEN은 통과하지 못한다.",
+          "oracleRef": {
+            "oracleId": "T26.boundary-index-and-emergency-repair",
+            "observationNames": [
+              "boundary-index"
+            ]
+          }
+        },
+        {
+          "id": "repeat-db-followup-responsibility-values",
+          "op": "relationSet",
+          "source": {
+            "actionId": "repeat-db",
+            "pointer": "/data/rawRows/obligations",
+            "where": {
+              "sourceKind": "VALIDITY_EXPIRED",
+              "status": "OPEN"
+            },
+            "field": [
+              "ownerId",
+              "supervisorId",
+              "nextAction",
+              "nextCheckAt"
+            ]
+          },
+          "expected": [
+            [
+              {
+                "$alias": "owner"
+              },
+              {
+                "$alias": "supervisor"
+              },
+              "조사·재인가·안전 재시도",
+              "2026-10-07T09:01:00Z"
+            ]
+          ],
+          "requirementRefs": [
+            "D26"
+          ],
+          "evidenceRefs": [
+            "repeat-db:actual-artifact",
+            "repeat-db:source-rows"
+          ],
+          "scope": {
+            "normativeScope": "boundary-index",
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "T26",
+            "subcaseId": "grant-expiry-no-event"
+          },
+          "oracleExplanation": "자동 만료 의무는 fixture의 인간 책임자·감독자·다음 행동·확인 시점을 갖는다. 뒤 출고의 책임 복구로 대신하지 않는다.",
+          "oracleRef": {
+            "oracleId": "T26.boundary-index-and-emergency-repair",
+            "observationNames": [
+              "boundary-index"
+            ]
+          }
+        },
+        {
+          "id": "repeat-db-current-expiry-assignment-one",
+          "op": "count",
+          "source": {
+            "actionId": "repeat-db",
+            "pointer": "/data/rawRows/assignments",
+            "where": {
+              "sourceKind": "VALIDITY_EXPIRED",
+              "current": true,
+              "status": "OPEN"
+            }
+          },
+          "expected": 1,
+          "requirementRefs": [
+            "D26"
+          ],
+          "evidenceRefs": [
+            "repeat-db:actual-artifact",
+            "repeat-db:source-rows"
+          ],
+          "scope": {
+            "normativeScope": "boundary-index",
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "T26",
+            "subcaseId": "grant-expiry-no-event"
+          },
+          "oracleExplanation": "자동 생성된 만료 후속 의무의 현재 OPEN assignment는 하나다. 초기 활성화 의무와 구별하고 빈 행·중복 assignment를 거부한다.",
+          "oracleRef": {
+            "oracleId": "T26.boundary-index-and-emergency-repair",
+            "observationNames": [
+              "boundary-index"
+            ]
+          }
+        },
+        {
+          "id": "repeat-db-expiry-assignment-responsibility-present",
+          "op": "fieldsPresent",
+          "source": {
+            "actionId": "repeat-db",
+            "pointer": "/data/rawRows/assignments",
+            "where": {
+              "sourceKind": "VALIDITY_EXPIRED",
+              "current": true,
+              "status": "OPEN"
+            }
+          },
+          "expected": [
+            "id",
+            "obligationId",
+            "rootId",
+            "workId",
+            "ownerId",
+            "supervisorId",
+            "nextAction",
+            "nextCheckAt"
+          ],
+          "requirementRefs": [
+            "D26"
+          ],
+          "evidenceRefs": [
+            "repeat-db:actual-artifact",
+            "repeat-db:source-rows"
+          ],
+          "scope": {
+            "normativeScope": "boundary-index",
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "T26",
+            "subcaseId": "grant-expiry-no-event"
+          },
+          "oracleExplanation": "자동 sweep의 같은 snapshot에 실제 assignment ID·의무·root·업무와 인간 책임 필드가 모두 있어야 한다.",
+          "oracleRef": {
+            "oracleId": "T26.boundary-index-and-emergency-repair",
+            "observationNames": [
+              "boundary-index"
+            ]
+          }
+        },
+        {
+          "id": "repeat-db-expiry-assignment-responsibility-values",
+          "op": "relationSet",
+          "source": {
+            "actionId": "repeat-db",
+            "pointer": "/data/rawRows/assignments",
+            "where": {
+              "sourceKind": "VALIDITY_EXPIRED",
+              "current": true,
+              "status": "OPEN"
+            },
+            "field": [
+              "ownerId",
+              "supervisorId",
+              "nextAction",
+              "nextCheckAt"
+            ]
+          },
+          "expected": [
+            [
+              {
+                "$alias": "owner"
+              },
+              {
+                "$alias": "supervisor"
+              },
+              "조사·재인가·안전 재시도",
+              "2026-10-07T09:01:00Z"
+            ]
+          ],
+          "requirementRefs": [
+            "D26"
+          ],
+          "evidenceRefs": [
+            "repeat-db:actual-artifact",
+            "repeat-db:source-rows"
+          ],
+          "scope": {
+            "normativeScope": "boundary-index",
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "T26",
+            "subcaseId": "grant-expiry-no-event"
+          },
+          "oracleExplanation": "자동 sweep가 current OPEN assignment의 owner·supervisor·다음 행동·확인 시점을 함께 upsert한다.",
+          "oracleRef": {
+            "oracleId": "T26.boundary-index-and-emergency-repair",
+            "observationNames": [
+              "boundary-index"
+            ]
+          }
+        },
+        {
+          "id": "repeat-db-expiry-assignment-obligationId-linked",
+          "op": "sameAs",
+          "source": {
+            "actionId": "repeat-db",
+            "pointer": "/data/rawRows/assignments",
+            "where": {
+              "sourceKind": "VALIDITY_EXPIRED",
+              "current": true,
+              "status": "OPEN"
+            },
+            "field": "obligationId"
+          },
+          "expected": true,
+          "requirementRefs": [
+            "D26"
+          ],
+          "evidenceRefs": [
+            "repeat-db:actual-artifact",
+            "repeat-db:source-rows",
+            "repeat-db:actual-artifact",
+            "repeat-db:source-rows"
+          ],
+          "scope": {
+            "normativeScope": "boundary-index",
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "T26",
+            "subcaseId": "grant-expiry-no-event"
+          },
+          "oracleExplanation": "자동 sweep가 만든 assignment는 같은 snapshot의 만료 의무·stable root·책임 업무에 연결된다. 이름이나 count만 같은 별도 책임으로 대신하지 않는다.",
+          "oracleRef": {
+            "oracleId": "T26.boundary-index-and-emergency-repair",
+            "observationNames": [
+              "boundary-index"
+            ]
+          },
+          "baseline": {
+            "actionId": "repeat-db",
+            "pointer": "/data/rawRows/obligations",
+            "where": {
+              "sourceKind": "VALIDITY_EXPIRED",
+              "status": "OPEN"
+            },
+            "field": "id"
+          }
+        },
+        {
+          "id": "repeat-db-expiry-assignment-rootId-linked",
+          "op": "sameAs",
+          "source": {
+            "actionId": "repeat-db",
+            "pointer": "/data/rawRows/assignments",
+            "where": {
+              "sourceKind": "VALIDITY_EXPIRED",
+              "current": true,
+              "status": "OPEN"
+            },
+            "field": "rootId"
+          },
+          "expected": true,
+          "requirementRefs": [
+            "D26"
+          ],
+          "evidenceRefs": [
+            "repeat-db:actual-artifact",
+            "repeat-db:source-rows",
+            "repeat-db:actual-artifact",
+            "repeat-db:source-rows"
+          ],
+          "scope": {
+            "normativeScope": "boundary-index",
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "T26",
+            "subcaseId": "grant-expiry-no-event"
+          },
+          "oracleExplanation": "자동 sweep가 만든 assignment는 같은 snapshot의 만료 의무·stable root·책임 업무에 연결된다. 이름이나 count만 같은 별도 책임으로 대신하지 않는다.",
+          "oracleRef": {
+            "oracleId": "T26.boundary-index-and-emergency-repair",
+            "observationNames": [
+              "boundary-index"
+            ]
+          },
+          "baseline": {
+            "actionId": "repeat-db",
+            "pointer": "/data/rawRows/obligations",
+            "where": {
+              "sourceKind": "VALIDITY_EXPIRED",
+              "status": "OPEN"
+            },
+            "field": "rootId"
+          }
+        },
+        {
+          "id": "repeat-db-expiry-assignment-workId-linked",
+          "op": "sameAs",
+          "source": {
+            "actionId": "repeat-db",
+            "pointer": "/data/rawRows/assignments",
+            "where": {
+              "sourceKind": "VALIDITY_EXPIRED",
+              "current": true,
+              "status": "OPEN"
+            },
+            "field": "workId"
+          },
+          "expected": true,
+          "requirementRefs": [
+            "D26"
+          ],
+          "evidenceRefs": [
+            "repeat-db:actual-artifact",
+            "repeat-db:source-rows",
+            "repeat-db:actual-artifact",
+            "repeat-db:source-rows"
+          ],
+          "scope": {
+            "normativeScope": "boundary-index",
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "T26",
+            "subcaseId": "grant-expiry-no-event"
+          },
+          "oracleExplanation": "자동 sweep가 만든 assignment는 같은 snapshot의 만료 의무·stable root·책임 업무에 연결된다. 이름이나 count만 같은 별도 책임으로 대신하지 않는다.",
+          "oracleRef": {
+            "oracleId": "T26.boundary-index-and-emergency-repair",
+            "observationNames": [
+              "boundary-index"
+            ]
+          },
+          "baseline": {
+            "actionId": "repeat-db",
+            "pointer": "/data/rawRows/obligations",
+            "where": {
+              "sourceKind": "VALIDITY_EXPIRED",
+              "status": "OPEN"
+            },
+            "field": "responsibleWorkId"
+          }
+        },
+        {
+          "id": "repeat-expiry-assignment-identity-kept",
+          "op": "sameAs",
+          "source": {
+            "actionId": "repeat-db",
+            "pointer": "/data/rawRows/assignments",
+            "where": {
+              "sourceKind": "VALIDITY_EXPIRED",
+              "current": true,
+              "status": "OPEN"
+            }
+          },
+          "expected": true,
+          "requirementRefs": [
+            "D26"
+          ],
+          "evidenceRefs": [
+            "repeat-db:actual-artifact",
+            "repeat-db:source-rows",
+            "sweep-db:actual-artifact",
+            "sweep-db:source-rows"
+          ],
+          "scope": {
+            "normativeScope": "boundary-index",
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "T26",
+            "subcaseId": "grant-expiry-no-event"
+          },
+          "oracleExplanation": "반복 sweep는 동일한 현재 OPEN assignment 원 행·ID·owner·supervisor·다음 행동·확인 시점을 유지한다.",
+          "oracleRef": {
+            "oracleId": "T26.boundary-index-and-emergency-repair",
+            "observationNames": [
+              "boundary-index"
+            ]
+          },
+          "baseline": {
+            "actionId": "sweep-db",
+            "pointer": "/data/rawRows/assignments",
+            "where": {
+              "sourceKind": "VALIDITY_EXPIRED",
+              "current": true,
+              "status": "OPEN"
+            }
+          }
         }
       ],
       "oracleExplanation": "사용자 command/query 전에 sweep terminal snapshot의 독립 DB에서 만료 사건1·현재 goal refresh1·OPEN 후속1을 확인한다. 반복 sweep 뒤 같은 원 행을 유지하며 출고0을 확인한다. 지연 commit guard는 별도 delayed-guard fixture로 검증한다."
@@ -23172,6 +25551,799 @@
             "observationNames": [
               "boundary-index"
             ]
+          }
+        },
+        {
+          "id": "sweep-db-followup-responsibility-present",
+          "op": "fieldsPresent",
+          "source": {
+            "actionId": "sweep-db",
+            "pointer": "/data/rawRows/obligations",
+            "where": {
+              "sourceKind": "VALIDITY_EXPIRED",
+              "status": "OPEN"
+            }
+          },
+          "expected": [
+            "id",
+            "rootId",
+            "responsibleWorkId",
+            "ownerId",
+            "supervisorId",
+            "nextAction",
+            "nextCheckAt"
+          ],
+          "requirementRefs": [
+            "D26"
+          ],
+          "evidenceRefs": [
+            "sweep-db:actual-artifact",
+            "sweep-db:source-rows"
+          ],
+          "scope": {
+            "normativeScope": "boundary-index",
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "T26",
+            "subcaseId": "policy-expiry-no-event"
+          },
+          "oracleExplanation": "사용자 요청 전에 자동 만료 의무의 실제 ID·root·책임 업무·인간 owner·supervisor·다음 행동·확인 시점이 모두 존재해야 한다. 빈 원 행이나 owner 없는 OPEN은 통과하지 못한다.",
+          "oracleRef": {
+            "oracleId": "T26.boundary-index-and-emergency-repair",
+            "observationNames": [
+              "boundary-index"
+            ]
+          }
+        },
+        {
+          "id": "sweep-db-followup-responsibility-values",
+          "op": "relationSet",
+          "source": {
+            "actionId": "sweep-db",
+            "pointer": "/data/rawRows/obligations",
+            "where": {
+              "sourceKind": "VALIDITY_EXPIRED",
+              "status": "OPEN"
+            },
+            "field": [
+              "ownerId",
+              "supervisorId",
+              "nextAction",
+              "nextCheckAt"
+            ]
+          },
+          "expected": [
+            [
+              {
+                "$alias": "owner"
+              },
+              {
+                "$alias": "supervisor"
+              },
+              "조사·재인가·안전 재시도",
+              "2026-10-07T09:01:00Z"
+            ]
+          ],
+          "requirementRefs": [
+            "D26"
+          ],
+          "evidenceRefs": [
+            "sweep-db:actual-artifact",
+            "sweep-db:source-rows"
+          ],
+          "scope": {
+            "normativeScope": "boundary-index",
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "T26",
+            "subcaseId": "policy-expiry-no-event"
+          },
+          "oracleExplanation": "자동 만료 의무는 fixture의 인간 책임자·감독자·다음 행동·확인 시점을 갖는다. 뒤 출고의 책임 복구로 대신하지 않는다.",
+          "oracleRef": {
+            "oracleId": "T26.boundary-index-and-emergency-repair",
+            "observationNames": [
+              "boundary-index"
+            ]
+          }
+        },
+        {
+          "id": "sweep-db-current-expiry-assignment-one",
+          "op": "count",
+          "source": {
+            "actionId": "sweep-db",
+            "pointer": "/data/rawRows/assignments",
+            "where": {
+              "sourceKind": "VALIDITY_EXPIRED",
+              "current": true,
+              "status": "OPEN"
+            }
+          },
+          "expected": 1,
+          "requirementRefs": [
+            "D26"
+          ],
+          "evidenceRefs": [
+            "sweep-db:actual-artifact",
+            "sweep-db:source-rows"
+          ],
+          "scope": {
+            "normativeScope": "boundary-index",
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "T26",
+            "subcaseId": "policy-expiry-no-event"
+          },
+          "oracleExplanation": "자동 생성된 만료 후속 의무의 현재 OPEN assignment는 하나다. 초기 활성화 의무와 구별하고 빈 행·중복 assignment를 거부한다.",
+          "oracleRef": {
+            "oracleId": "T26.boundary-index-and-emergency-repair",
+            "observationNames": [
+              "boundary-index"
+            ]
+          }
+        },
+        {
+          "id": "sweep-db-expiry-assignment-responsibility-present",
+          "op": "fieldsPresent",
+          "source": {
+            "actionId": "sweep-db",
+            "pointer": "/data/rawRows/assignments",
+            "where": {
+              "sourceKind": "VALIDITY_EXPIRED",
+              "current": true,
+              "status": "OPEN"
+            }
+          },
+          "expected": [
+            "id",
+            "obligationId",
+            "rootId",
+            "workId",
+            "ownerId",
+            "supervisorId",
+            "nextAction",
+            "nextCheckAt"
+          ],
+          "requirementRefs": [
+            "D26"
+          ],
+          "evidenceRefs": [
+            "sweep-db:actual-artifact",
+            "sweep-db:source-rows"
+          ],
+          "scope": {
+            "normativeScope": "boundary-index",
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "T26",
+            "subcaseId": "policy-expiry-no-event"
+          },
+          "oracleExplanation": "자동 sweep의 같은 snapshot에 실제 assignment ID·의무·root·업무와 인간 책임 필드가 모두 있어야 한다.",
+          "oracleRef": {
+            "oracleId": "T26.boundary-index-and-emergency-repair",
+            "observationNames": [
+              "boundary-index"
+            ]
+          }
+        },
+        {
+          "id": "sweep-db-expiry-assignment-responsibility-values",
+          "op": "relationSet",
+          "source": {
+            "actionId": "sweep-db",
+            "pointer": "/data/rawRows/assignments",
+            "where": {
+              "sourceKind": "VALIDITY_EXPIRED",
+              "current": true,
+              "status": "OPEN"
+            },
+            "field": [
+              "ownerId",
+              "supervisorId",
+              "nextAction",
+              "nextCheckAt"
+            ]
+          },
+          "expected": [
+            [
+              {
+                "$alias": "owner"
+              },
+              {
+                "$alias": "supervisor"
+              },
+              "조사·재인가·안전 재시도",
+              "2026-10-07T09:01:00Z"
+            ]
+          ],
+          "requirementRefs": [
+            "D26"
+          ],
+          "evidenceRefs": [
+            "sweep-db:actual-artifact",
+            "sweep-db:source-rows"
+          ],
+          "scope": {
+            "normativeScope": "boundary-index",
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "T26",
+            "subcaseId": "policy-expiry-no-event"
+          },
+          "oracleExplanation": "자동 sweep가 current OPEN assignment의 owner·supervisor·다음 행동·확인 시점을 함께 upsert한다.",
+          "oracleRef": {
+            "oracleId": "T26.boundary-index-and-emergency-repair",
+            "observationNames": [
+              "boundary-index"
+            ]
+          }
+        },
+        {
+          "id": "sweep-db-expiry-assignment-obligationId-linked",
+          "op": "sameAs",
+          "source": {
+            "actionId": "sweep-db",
+            "pointer": "/data/rawRows/assignments",
+            "where": {
+              "sourceKind": "VALIDITY_EXPIRED",
+              "current": true,
+              "status": "OPEN"
+            },
+            "field": "obligationId"
+          },
+          "expected": true,
+          "requirementRefs": [
+            "D26"
+          ],
+          "evidenceRefs": [
+            "sweep-db:actual-artifact",
+            "sweep-db:source-rows",
+            "sweep-db:actual-artifact",
+            "sweep-db:source-rows"
+          ],
+          "scope": {
+            "normativeScope": "boundary-index",
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "T26",
+            "subcaseId": "policy-expiry-no-event"
+          },
+          "oracleExplanation": "자동 sweep가 만든 assignment는 같은 snapshot의 만료 의무·stable root·책임 업무에 연결된다. 이름이나 count만 같은 별도 책임으로 대신하지 않는다.",
+          "oracleRef": {
+            "oracleId": "T26.boundary-index-and-emergency-repair",
+            "observationNames": [
+              "boundary-index"
+            ]
+          },
+          "baseline": {
+            "actionId": "sweep-db",
+            "pointer": "/data/rawRows/obligations",
+            "where": {
+              "sourceKind": "VALIDITY_EXPIRED",
+              "status": "OPEN"
+            },
+            "field": "id"
+          }
+        },
+        {
+          "id": "sweep-db-expiry-assignment-rootId-linked",
+          "op": "sameAs",
+          "source": {
+            "actionId": "sweep-db",
+            "pointer": "/data/rawRows/assignments",
+            "where": {
+              "sourceKind": "VALIDITY_EXPIRED",
+              "current": true,
+              "status": "OPEN"
+            },
+            "field": "rootId"
+          },
+          "expected": true,
+          "requirementRefs": [
+            "D26"
+          ],
+          "evidenceRefs": [
+            "sweep-db:actual-artifact",
+            "sweep-db:source-rows",
+            "sweep-db:actual-artifact",
+            "sweep-db:source-rows"
+          ],
+          "scope": {
+            "normativeScope": "boundary-index",
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "T26",
+            "subcaseId": "policy-expiry-no-event"
+          },
+          "oracleExplanation": "자동 sweep가 만든 assignment는 같은 snapshot의 만료 의무·stable root·책임 업무에 연결된다. 이름이나 count만 같은 별도 책임으로 대신하지 않는다.",
+          "oracleRef": {
+            "oracleId": "T26.boundary-index-and-emergency-repair",
+            "observationNames": [
+              "boundary-index"
+            ]
+          },
+          "baseline": {
+            "actionId": "sweep-db",
+            "pointer": "/data/rawRows/obligations",
+            "where": {
+              "sourceKind": "VALIDITY_EXPIRED",
+              "status": "OPEN"
+            },
+            "field": "rootId"
+          }
+        },
+        {
+          "id": "sweep-db-expiry-assignment-workId-linked",
+          "op": "sameAs",
+          "source": {
+            "actionId": "sweep-db",
+            "pointer": "/data/rawRows/assignments",
+            "where": {
+              "sourceKind": "VALIDITY_EXPIRED",
+              "current": true,
+              "status": "OPEN"
+            },
+            "field": "workId"
+          },
+          "expected": true,
+          "requirementRefs": [
+            "D26"
+          ],
+          "evidenceRefs": [
+            "sweep-db:actual-artifact",
+            "sweep-db:source-rows",
+            "sweep-db:actual-artifact",
+            "sweep-db:source-rows"
+          ],
+          "scope": {
+            "normativeScope": "boundary-index",
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "T26",
+            "subcaseId": "policy-expiry-no-event"
+          },
+          "oracleExplanation": "자동 sweep가 만든 assignment는 같은 snapshot의 만료 의무·stable root·책임 업무에 연결된다. 이름이나 count만 같은 별도 책임으로 대신하지 않는다.",
+          "oracleRef": {
+            "oracleId": "T26.boundary-index-and-emergency-repair",
+            "observationNames": [
+              "boundary-index"
+            ]
+          },
+          "baseline": {
+            "actionId": "sweep-db",
+            "pointer": "/data/rawRows/obligations",
+            "where": {
+              "sourceKind": "VALIDITY_EXPIRED",
+              "status": "OPEN"
+            },
+            "field": "responsibleWorkId"
+          }
+        },
+        {
+          "id": "repeat-db-followup-responsibility-present",
+          "op": "fieldsPresent",
+          "source": {
+            "actionId": "repeat-db",
+            "pointer": "/data/rawRows/obligations",
+            "where": {
+              "sourceKind": "VALIDITY_EXPIRED",
+              "status": "OPEN"
+            }
+          },
+          "expected": [
+            "id",
+            "rootId",
+            "responsibleWorkId",
+            "ownerId",
+            "supervisorId",
+            "nextAction",
+            "nextCheckAt"
+          ],
+          "requirementRefs": [
+            "D26"
+          ],
+          "evidenceRefs": [
+            "repeat-db:actual-artifact",
+            "repeat-db:source-rows"
+          ],
+          "scope": {
+            "normativeScope": "boundary-index",
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "T26",
+            "subcaseId": "policy-expiry-no-event"
+          },
+          "oracleExplanation": "사용자 요청 전에 자동 만료 의무의 실제 ID·root·책임 업무·인간 owner·supervisor·다음 행동·확인 시점이 모두 존재해야 한다. 빈 원 행이나 owner 없는 OPEN은 통과하지 못한다.",
+          "oracleRef": {
+            "oracleId": "T26.boundary-index-and-emergency-repair",
+            "observationNames": [
+              "boundary-index"
+            ]
+          }
+        },
+        {
+          "id": "repeat-db-followup-responsibility-values",
+          "op": "relationSet",
+          "source": {
+            "actionId": "repeat-db",
+            "pointer": "/data/rawRows/obligations",
+            "where": {
+              "sourceKind": "VALIDITY_EXPIRED",
+              "status": "OPEN"
+            },
+            "field": [
+              "ownerId",
+              "supervisorId",
+              "nextAction",
+              "nextCheckAt"
+            ]
+          },
+          "expected": [
+            [
+              {
+                "$alias": "owner"
+              },
+              {
+                "$alias": "supervisor"
+              },
+              "조사·재인가·안전 재시도",
+              "2026-10-07T09:01:00Z"
+            ]
+          ],
+          "requirementRefs": [
+            "D26"
+          ],
+          "evidenceRefs": [
+            "repeat-db:actual-artifact",
+            "repeat-db:source-rows"
+          ],
+          "scope": {
+            "normativeScope": "boundary-index",
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "T26",
+            "subcaseId": "policy-expiry-no-event"
+          },
+          "oracleExplanation": "자동 만료 의무는 fixture의 인간 책임자·감독자·다음 행동·확인 시점을 갖는다. 뒤 출고의 책임 복구로 대신하지 않는다.",
+          "oracleRef": {
+            "oracleId": "T26.boundary-index-and-emergency-repair",
+            "observationNames": [
+              "boundary-index"
+            ]
+          }
+        },
+        {
+          "id": "repeat-db-current-expiry-assignment-one",
+          "op": "count",
+          "source": {
+            "actionId": "repeat-db",
+            "pointer": "/data/rawRows/assignments",
+            "where": {
+              "sourceKind": "VALIDITY_EXPIRED",
+              "current": true,
+              "status": "OPEN"
+            }
+          },
+          "expected": 1,
+          "requirementRefs": [
+            "D26"
+          ],
+          "evidenceRefs": [
+            "repeat-db:actual-artifact",
+            "repeat-db:source-rows"
+          ],
+          "scope": {
+            "normativeScope": "boundary-index",
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "T26",
+            "subcaseId": "policy-expiry-no-event"
+          },
+          "oracleExplanation": "자동 생성된 만료 후속 의무의 현재 OPEN assignment는 하나다. 초기 활성화 의무와 구별하고 빈 행·중복 assignment를 거부한다.",
+          "oracleRef": {
+            "oracleId": "T26.boundary-index-and-emergency-repair",
+            "observationNames": [
+              "boundary-index"
+            ]
+          }
+        },
+        {
+          "id": "repeat-db-expiry-assignment-responsibility-present",
+          "op": "fieldsPresent",
+          "source": {
+            "actionId": "repeat-db",
+            "pointer": "/data/rawRows/assignments",
+            "where": {
+              "sourceKind": "VALIDITY_EXPIRED",
+              "current": true,
+              "status": "OPEN"
+            }
+          },
+          "expected": [
+            "id",
+            "obligationId",
+            "rootId",
+            "workId",
+            "ownerId",
+            "supervisorId",
+            "nextAction",
+            "nextCheckAt"
+          ],
+          "requirementRefs": [
+            "D26"
+          ],
+          "evidenceRefs": [
+            "repeat-db:actual-artifact",
+            "repeat-db:source-rows"
+          ],
+          "scope": {
+            "normativeScope": "boundary-index",
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "T26",
+            "subcaseId": "policy-expiry-no-event"
+          },
+          "oracleExplanation": "자동 sweep의 같은 snapshot에 실제 assignment ID·의무·root·업무와 인간 책임 필드가 모두 있어야 한다.",
+          "oracleRef": {
+            "oracleId": "T26.boundary-index-and-emergency-repair",
+            "observationNames": [
+              "boundary-index"
+            ]
+          }
+        },
+        {
+          "id": "repeat-db-expiry-assignment-responsibility-values",
+          "op": "relationSet",
+          "source": {
+            "actionId": "repeat-db",
+            "pointer": "/data/rawRows/assignments",
+            "where": {
+              "sourceKind": "VALIDITY_EXPIRED",
+              "current": true,
+              "status": "OPEN"
+            },
+            "field": [
+              "ownerId",
+              "supervisorId",
+              "nextAction",
+              "nextCheckAt"
+            ]
+          },
+          "expected": [
+            [
+              {
+                "$alias": "owner"
+              },
+              {
+                "$alias": "supervisor"
+              },
+              "조사·재인가·안전 재시도",
+              "2026-10-07T09:01:00Z"
+            ]
+          ],
+          "requirementRefs": [
+            "D26"
+          ],
+          "evidenceRefs": [
+            "repeat-db:actual-artifact",
+            "repeat-db:source-rows"
+          ],
+          "scope": {
+            "normativeScope": "boundary-index",
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "T26",
+            "subcaseId": "policy-expiry-no-event"
+          },
+          "oracleExplanation": "자동 sweep가 current OPEN assignment의 owner·supervisor·다음 행동·확인 시점을 함께 upsert한다.",
+          "oracleRef": {
+            "oracleId": "T26.boundary-index-and-emergency-repair",
+            "observationNames": [
+              "boundary-index"
+            ]
+          }
+        },
+        {
+          "id": "repeat-db-expiry-assignment-obligationId-linked",
+          "op": "sameAs",
+          "source": {
+            "actionId": "repeat-db",
+            "pointer": "/data/rawRows/assignments",
+            "where": {
+              "sourceKind": "VALIDITY_EXPIRED",
+              "current": true,
+              "status": "OPEN"
+            },
+            "field": "obligationId"
+          },
+          "expected": true,
+          "requirementRefs": [
+            "D26"
+          ],
+          "evidenceRefs": [
+            "repeat-db:actual-artifact",
+            "repeat-db:source-rows",
+            "repeat-db:actual-artifact",
+            "repeat-db:source-rows"
+          ],
+          "scope": {
+            "normativeScope": "boundary-index",
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "T26",
+            "subcaseId": "policy-expiry-no-event"
+          },
+          "oracleExplanation": "자동 sweep가 만든 assignment는 같은 snapshot의 만료 의무·stable root·책임 업무에 연결된다. 이름이나 count만 같은 별도 책임으로 대신하지 않는다.",
+          "oracleRef": {
+            "oracleId": "T26.boundary-index-and-emergency-repair",
+            "observationNames": [
+              "boundary-index"
+            ]
+          },
+          "baseline": {
+            "actionId": "repeat-db",
+            "pointer": "/data/rawRows/obligations",
+            "where": {
+              "sourceKind": "VALIDITY_EXPIRED",
+              "status": "OPEN"
+            },
+            "field": "id"
+          }
+        },
+        {
+          "id": "repeat-db-expiry-assignment-rootId-linked",
+          "op": "sameAs",
+          "source": {
+            "actionId": "repeat-db",
+            "pointer": "/data/rawRows/assignments",
+            "where": {
+              "sourceKind": "VALIDITY_EXPIRED",
+              "current": true,
+              "status": "OPEN"
+            },
+            "field": "rootId"
+          },
+          "expected": true,
+          "requirementRefs": [
+            "D26"
+          ],
+          "evidenceRefs": [
+            "repeat-db:actual-artifact",
+            "repeat-db:source-rows",
+            "repeat-db:actual-artifact",
+            "repeat-db:source-rows"
+          ],
+          "scope": {
+            "normativeScope": "boundary-index",
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "T26",
+            "subcaseId": "policy-expiry-no-event"
+          },
+          "oracleExplanation": "자동 sweep가 만든 assignment는 같은 snapshot의 만료 의무·stable root·책임 업무에 연결된다. 이름이나 count만 같은 별도 책임으로 대신하지 않는다.",
+          "oracleRef": {
+            "oracleId": "T26.boundary-index-and-emergency-repair",
+            "observationNames": [
+              "boundary-index"
+            ]
+          },
+          "baseline": {
+            "actionId": "repeat-db",
+            "pointer": "/data/rawRows/obligations",
+            "where": {
+              "sourceKind": "VALIDITY_EXPIRED",
+              "status": "OPEN"
+            },
+            "field": "rootId"
+          }
+        },
+        {
+          "id": "repeat-db-expiry-assignment-workId-linked",
+          "op": "sameAs",
+          "source": {
+            "actionId": "repeat-db",
+            "pointer": "/data/rawRows/assignments",
+            "where": {
+              "sourceKind": "VALIDITY_EXPIRED",
+              "current": true,
+              "status": "OPEN"
+            },
+            "field": "workId"
+          },
+          "expected": true,
+          "requirementRefs": [
+            "D26"
+          ],
+          "evidenceRefs": [
+            "repeat-db:actual-artifact",
+            "repeat-db:source-rows",
+            "repeat-db:actual-artifact",
+            "repeat-db:source-rows"
+          ],
+          "scope": {
+            "normativeScope": "boundary-index",
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "T26",
+            "subcaseId": "policy-expiry-no-event"
+          },
+          "oracleExplanation": "자동 sweep가 만든 assignment는 같은 snapshot의 만료 의무·stable root·책임 업무에 연결된다. 이름이나 count만 같은 별도 책임으로 대신하지 않는다.",
+          "oracleRef": {
+            "oracleId": "T26.boundary-index-and-emergency-repair",
+            "observationNames": [
+              "boundary-index"
+            ]
+          },
+          "baseline": {
+            "actionId": "repeat-db",
+            "pointer": "/data/rawRows/obligations",
+            "where": {
+              "sourceKind": "VALIDITY_EXPIRED",
+              "status": "OPEN"
+            },
+            "field": "responsibleWorkId"
+          }
+        },
+        {
+          "id": "repeat-expiry-assignment-identity-kept",
+          "op": "sameAs",
+          "source": {
+            "actionId": "repeat-db",
+            "pointer": "/data/rawRows/assignments",
+            "where": {
+              "sourceKind": "VALIDITY_EXPIRED",
+              "current": true,
+              "status": "OPEN"
+            }
+          },
+          "expected": true,
+          "requirementRefs": [
+            "D26"
+          ],
+          "evidenceRefs": [
+            "repeat-db:actual-artifact",
+            "repeat-db:source-rows",
+            "sweep-db:actual-artifact",
+            "sweep-db:source-rows"
+          ],
+          "scope": {
+            "normativeScope": "boundary-index",
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "T26",
+            "subcaseId": "policy-expiry-no-event"
+          },
+          "oracleExplanation": "반복 sweep는 동일한 현재 OPEN assignment 원 행·ID·owner·supervisor·다음 행동·확인 시점을 유지한다.",
+          "oracleRef": {
+            "oracleId": "T26.boundary-index-and-emergency-repair",
+            "observationNames": [
+              "boundary-index"
+            ]
+          },
+          "baseline": {
+            "actionId": "sweep-db",
+            "pointer": "/data/rawRows/assignments",
+            "where": {
+              "sourceKind": "VALIDITY_EXPIRED",
+              "current": true,
+              "status": "OPEN"
+            }
           }
         }
       ],
