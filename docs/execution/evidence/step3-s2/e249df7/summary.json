@@ -1,0 +1,588 @@
+{
+  "sourceCommit": "e249df7964ac9f650346c75a0585d375390abcea",
+  "sourceUnchanged": true,
+  "backend": {
+    "tests": 235,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "exitCode": 0,
+    "package": "PASS"
+  },
+  "native": {
+    "status": "FAIL",
+    "failure": "AssertionError: Draft must be accepted",
+    "codeCommit": "e249df7964ac9f650346c75a0585d375390abcea",
+    "executedJarSha256": "6e8329f3d1351a4e1ecd256aa5f6bf20172f4a414ff7c31b3ef565e97d0d7cf1",
+    "sourceDrift": false,
+    "cleanup": {
+      "backendStopped": true,
+      "createdContainerRemoved": true,
+      "ephemeralKeyDirectoryRemoved": true,
+      "ephemeralBlobDirectoryRemoved": true
+    },
+    "businessResult": "Both actual createDraft requests returned HELD / VERSION_UNSUPPORTED, zero claimed effects. Fixture definition validation is being corrected.",
+    "referencedRawArtifacts": 6
+  },
+  "gateComplete": false,
+  "artifacts": [
+    {
+      "path": "backend/exit.json.gz",
+      "sourceSha256": "72347652e85f9381930874d795f1c09b722344bb13e60b02c618ef0dcbab75d6",
+      "sourceBytes": 226,
+      "gzipSha256": "765ac3d4b257fd7fa4e25880b8f7f4b0ce55f08523331211603e2236c6776f34"
+    },
+    {
+      "path": "backend/maven.log.gz",
+      "sourceSha256": "1f61a74c460121bd6d5e7448e76d44ddf2f738b688fa09229b1dec9e69712aea",
+      "sourceBytes": 2517462,
+      "gzipSha256": "f91c3467a80b3d8e0de9e8d50f8a712bb3ae5cbfaeb1e3da26d885e1b0c5f415"
+    },
+    {
+      "path": "backend/reports/TEST-com.mulino.AssessmentPostgresTest.xml.gz",
+      "sourceSha256": "6cd908a2ec7c2941d5c4fcb311e02e9577b0b2b699768b715a3ebfabdb7019dd",
+      "sourceBytes": 109231,
+      "gzipSha256": "17ebe13b15249c5904cdd28fcee8de1979954f92450b8f6a72ae781ae8317fba"
+    },
+    {
+      "path": "backend/reports/TEST-com.mulino.DefinitionValidatorTest.xml.gz",
+      "sourceSha256": "fafa869378cd0c40d35045213756aabbf2785f10d40c2ef3ea626027a9cfa5d6",
+      "sourceBytes": 45102,
+      "gzipSha256": "8f64411a358a32b85c9a439e13c6b0cbe1fee76531f4dbf9094f1757c1a590f3"
+    },
+    {
+      "path": "backend/reports/TEST-com.mulino.DefinitionsPersistenceTest.xml.gz",
+      "sourceSha256": "a88cae9fc2809f9e39db2d47c4a0211038baacc4521f5a709985f9d9f2b31eea",
+      "sourceBytes": 45156,
+      "gzipSha256": "990f3a4b78bf88e64540c3b294069aff329ae92a79464f6004f3ec3c66995280"
+    },
+    {
+      "path": "backend/reports/TEST-com.mulino.PlatformIntegrationTest.xml.gz",
+      "sourceSha256": "6c183d698f4abf92bf91b8d167c36ae4d855350ad1cbb20f359798d580d6b6ba",
+      "sourceBytes": 82344,
+      "gzipSha256": "94ab362969e194ace37a2f7b7915936efa7d35d116df4844167f63ad67f0fdb4"
+    },
+    {
+      "path": "backend/reports/TEST-com.mulino.TypedPredicateEvaluatorTest.xml.gz",
+      "sourceSha256": "9331a9a8c3a33267eed15b9ef41dcfde7b491fea1766a748819aab199972ec94",
+      "sourceBytes": 45250,
+      "gzipSha256": "1a7b2a1f63172afb64587934506b23475065fffb342c8797710df7393c494658"
+    },
+    {
+      "path": "backend/reports/TEST-com.mulino.application.evidence.CompletionCoverageGatewayTest.xml.gz",
+      "sourceSha256": "6cf806b993df286889eded9a8cd742c58d13b6f27d0e240debeaec74269d0de1",
+      "sourceBytes": 588672,
+      "gzipSha256": "1c965a6809aff81e167079459b9e98329feade8a34aeaa02f2a674a334f0b831"
+    },
+    {
+      "path": "backend/reports/TEST-com.mulino.application.evidence.EvidenceGatewayTest.xml.gz",
+      "sourceSha256": "eaddfb6b13e5c3d55820d183c3b3daa90448695bad31b7dd1c954471e4ba519a",
+      "sourceBytes": 363958,
+      "gzipSha256": "82157ed1a326fbd4056afbd9e04e5d3993e72e64a29790b3aa3a1066bb2af873"
+    },
+    {
+      "path": "backend/reports/TEST-com.mulino.application.evidence.EvidencePersistenceTest.xml.gz",
+      "sourceSha256": "0958be2a3a2eb42fb4dd5da065db1e18834830701b9a9b3e405445f33905652b",
+      "sourceBytes": 289931,
+      "gzipSha256": "2b1221276aa74e49771acb0e96f482f1cd5656c4a4ddb978d7cceb43f8972583"
+    },
+    {
+      "path": "backend/reports/TEST-com.mulino.application.evidence.EvidenceReconciliationTest.xml.gz",
+      "sourceSha256": "cb1fb8533874fe3e27218a4d466f3404b928d2a0cf5674b9e50641d5168a072b",
+      "sourceBytes": 269814,
+      "gzipSha256": "f906c803be01445ea30155aee1f54a846a77d934cf8ea873f534260183a39cc0"
+    },
+    {
+      "path": "backend/reports/TEST-com.mulino.application.identity.AuthorityEvidenceTest.xml.gz",
+      "sourceSha256": "583eaca85ba2a1dc596409486014e8bad970d44b4d3ccd75d18588bbd9595988",
+      "sourceBytes": 44142,
+      "gzipSha256": "86470d68e99402ea7dd7aaed74dbec3f6f44506784d1baa3fa8e0e13ae3475e8"
+    },
+    {
+      "path": "backend/reports/TEST-com.mulino.application.identity.IdentityAuthorizationTest.xml.gz",
+      "sourceSha256": "f588780b359e5fee6c09953590594c78dbca8b67403ff152d46252053a3130d1",
+      "sourceBytes": 44937,
+      "gzipSha256": "a3dd9a31b1cd0687b5f4364af0ae5f57326b1be6ecadaeaf1517915d45bfc016"
+    },
+    {
+      "path": "backend/reports/TEST-com.mulino.application.identity.IdentityPersistenceTest.xml.gz",
+      "sourceSha256": "b59774cd653ba6cd4e0de27485131152dd8c893430c30d7dc68f0a3c8536d63a",
+      "sourceBytes": 62884,
+      "gzipSha256": "47a06c96060408f5f5920459e89ed5b606dd9ae9d841935e15893c2f61b5d36d"
+    },
+    {
+      "path": "backend/reports/TEST-com.mulino.application.policy.ControlPersistenceTest.xml.gz",
+      "sourceSha256": "eb34d1ac0e9646ca128dfcd21dd5abd16f392f7581615097d9f845662be83e4c",
+      "sourceBytes": 171373,
+      "gzipSha256": "a1d48d23812eb7c929dd54a62120fee17a09024512a04dd8d52d1a8a6eac1c12"
+    },
+    {
+      "path": "backend/reports/TEST-com.mulino.commands.CommandEnvelopeTest.xml.gz",
+      "sourceSha256": "c547c3491bb9a3271f1509ad80f0aff92f65d4fe39c55ffcec7c7796da7005bd",
+      "sourceBytes": 44387,
+      "gzipSha256": "53acb775034b01bb357ccbba1077402c5c490d8e73d0b64c05f59873b0fad3ee"
+    },
+    {
+      "path": "backend/reports/TEST-com.mulino.commands.CommandSubjectTest.xml.gz",
+      "sourceSha256": "249a06bfed40371eae23c8388daea6ac424fe25ac7464b74c473c832f34d3055",
+      "sourceBytes": 44767,
+      "gzipSha256": "68cb05840e32343dbbe32b42dbbc865e2b74c133e5f86c0e9146320cef8f044b"
+    },
+    {
+      "path": "backend/reports/TEST-com.mulino.commands.CommandTransactionTest.xml.gz",
+      "sourceSha256": "73a8d8ddb95a61994b095f0da83c50b59a05dc7c59db364461d687fa92d4b48d",
+      "sourceBytes": 91654,
+      "gzipSha256": "8c25f33513e034aa8cdeb9c7fc37eda879d068b419101b381cf5b7c370331259"
+    },
+    {
+      "path": "backend/reports/TEST-com.mulino.core.ReadContractsTest.xml.gz",
+      "sourceSha256": "a2ff7f67fe4f72527b310a388f29903a777fb9ee77e3530fa2928e8a5b1ce1bb",
+      "sourceBytes": 44460,
+      "gzipSha256": "197297f6ead207343d6a46855087c1216740fb9c296f96185b326204db966f07"
+    },
+    {
+      "path": "backend/reports/TEST-com.mulino.core.S1ReadIntegrationTest.xml.gz",
+      "sourceSha256": "cf17ae5c2f92e731a83f5300e3ad44d650c614e98f366403a35441e305a4b808",
+      "sourceBytes": 353195,
+      "gzipSha256": "cfc1de15c10179262b57eaf50d1c567e85cae9a54afd1980ac04a53b70b81f1f"
+    },
+    {
+      "path": "backend/reports/TEST-com.mulino.core.S2WorkActualIntegrationTest.xml.gz",
+      "sourceSha256": "1121b59bddfa0a1fd945c3d2c7feba5da7e39c8a1593a9667079ec1729b58568",
+      "sourceBytes": 419246,
+      "gzipSha256": "a2e05d13eccf9c4d79236d544e898e9a93a561a8816d02731608235ce9fe741d"
+    },
+    {
+      "path": "backend/reports/TEST-com.mulino.core.S2WorkLifecyclePostgresTest.xml.gz",
+      "sourceSha256": "a0aa1b135b5d4f419d4cb8c0de512423b587d534244467eb77616d4015b917b3",
+      "sourceBytes": 84613,
+      "gzipSha256": "a11a598be1c93d6a3565bccf2742e94da4b9148654a5e5ab6cee88c1b6dc8241"
+    },
+    {
+      "path": "backend/reports/TEST-com.mulino.inventory.InventoryPostgresTest.xml.gz",
+      "sourceSha256": "a9b9e29baa44c898217269369a13754ec006f2739ff0a0aaf98468f33c8d500e",
+      "sourceBytes": 60298,
+      "gzipSha256": "45ec73f6ab2f92441feffffd207104e260f20d552eacbbcffc05dd2c05b6c183"
+    },
+    {
+      "path": "backend/reports/TEST-com.mulino.inventory.InventoryQuantityTest.xml.gz",
+      "sourceSha256": "b3567d4fcf5746d6da1589ea2f0e612d2029be27bd9d1c18db570d25b90819a2",
+      "sourceBytes": 44273,
+      "gzipSha256": "49c22ec75656342303be1304586880e5d5ac89bf77130e7a6e5100d8774eb1b7"
+    },
+    {
+      "path": "backend/reports/TEST-com.mulino.inventory.InventorySubjectBindingTest.xml.gz",
+      "sourceSha256": "067b6c2ed6d5647ea9758f7447c98076ed5251006a3a4336c8e40aadbc71ed72",
+      "sourceBytes": 44591,
+      "gzipSha256": "46b16653ae139c46f8aaa627ec14b87b2ba912775a5e28fd9b54c87178b1fb20"
+    },
+    {
+      "path": "backend/reports/TEST-com.mulino.inventory.StockCommandPostgresTest.xml.gz",
+      "sourceSha256": "70696fa2eb46252d5a2b6dced9f93702113985dc1d82c592fc6d9d928e0721a0",
+      "sourceBytes": 112059,
+      "gzipSha256": "9381afa0e1ff48799ee88a1613073d89acc0ad304b999e0930c801ad4f94e1b3"
+    },
+    {
+      "path": "backend/reports/TEST-com.mulino.responsibility.ResponsibilityEvidenceGateTest.xml.gz",
+      "sourceSha256": "365a77e50a60880d8924b2990dbeea672d4636b58b158845b299fdd4ab5cb334",
+      "sourceBytes": 44566,
+      "gzipSha256": "d9a702942d74ba1f50477bc86b4f6e36a83e9d292e2e7e21bcdfa4e7282cd610"
+    },
+    {
+      "path": "backend/reports/TEST-com.mulino.responsibility.ResponsibilityPostgresTest.xml.gz",
+      "sourceSha256": "f4ce48ae4a386701ea51a34fff5da71b188fbb3e9df30d865438d988cdd065f7",
+      "sourceBytes": 52533,
+      "gzipSha256": "31da3497bb9c475f433828cd438b4feec3321a1de85bf3860020a400d6dec0b7"
+    },
+    {
+      "path": "backend/reports/TEST-com.mulino.responsibility.ResponsibilityServiceTest.xml.gz",
+      "sourceSha256": "7c17f5d5388397a7211872e47bc1bc2364df384ef4419ae141f360c180b09f4e",
+      "sourceBytes": 44685,
+      "gzipSha256": "9d2623de24199b019c0367ead9db04d0a6520aada48f2a465b09d1eb4caeb551"
+    },
+    {
+      "path": "backend/reports/TEST-com.mulino.responsibility.ResponsibilitySubjectBindingTest.xml.gz",
+      "sourceSha256": "ee5d861bc693e59da1d8930dc2c83d60dbf55080b6cdfe12c2632fafd956c0f4",
+      "sourceBytes": 44159,
+      "gzipSha256": "120e6909efeba19f411f17539ca4bffa9c77abca002b81cf8f94f41d9b3a0384"
+    },
+    {
+      "path": "backend/reports/TEST-com.mulino.runtime.RuntimeIntakePostgresTest.xml.gz",
+      "sourceSha256": "1da028016208b3eeef62d8d2549da599475f210e3b56a341eedbf4264887a1c9",
+      "sourceBytes": 127381,
+      "gzipSha256": "8ece239cee0d8ac622de5ccf08681adb940817f9b653a3177fde68daba731adb"
+    },
+    {
+      "path": "backend/reports/TEST-com.mulino.runtime.RuntimePostgresTest.xml.gz",
+      "sourceSha256": "16ff284a4d2fba73fabefe9123854f8c81dee15a13e2d1679c61acac9b6ac5c5",
+      "sourceBytes": 45854,
+      "gzipSha256": "722bd746163c84afbcac074dc0f4de49d1f9e9caddb4632d0722ea8e89afbc16"
+    },
+    {
+      "path": "backend/reports/TEST-com.mulino.work.GoalInputTest.xml.gz",
+      "sourceSha256": "b09ef1389fcd414ddb246541e21b75a6c311e4280b024d7a96f98c718ed7c4fb",
+      "sourceBytes": 44429,
+      "gzipSha256": "0704540049ab92e679b3e442bde778712f0ae23b1be7e35fe7115e64b705fa81"
+    },
+    {
+      "path": "backend/reports/com.mulino.AssessmentPostgresTest.txt.gz",
+      "sourceSha256": "2a36900a4fc7e0522ce4a7b3ff87f2a7da4ae1cf73094844fa0132002206be13",
+      "sourceBytes": 316,
+      "gzipSha256": "696d5d6f770c111fbcc8191c7436bc8a814da67a46532c214421434a2a86d8d7"
+    },
+    {
+      "path": "backend/reports/com.mulino.DefinitionValidatorTest.txt.gz",
+      "sourceSha256": "9c933dadc8db4646fad1d3fcfbf4e71f029111ede44bfeb1da93606b8302685e",
+      "sourceBytes": 318,
+      "gzipSha256": "81a1f141519b3ab76173f268921fe0ee645b8370c0a85eb6120c1613a76b7205"
+    },
+    {
+      "path": "backend/reports/com.mulino.DefinitionsPersistenceTest.txt.gz",
+      "sourceSha256": "d1f06730765888cb11c7e6ecd115ee357d50b04bc6a73bacd9e20cda731b3c3a",
+      "sourceBytes": 324,
+      "gzipSha256": "a21b0e9fffbb372cc08e6c3aef976efe06ab5677589ca499c3d6c75bf68328c4"
+    },
+    {
+      "path": "backend/reports/com.mulino.PlatformIntegrationTest.txt.gz",
+      "sourceSha256": "9e917a6d5e6ba18e33cb1e82e545c9652c6eb0dbf64f8f5d7f2e09794ca83c44",
+      "sourceBytes": 319,
+      "gzipSha256": "47ee623ea7e1dd31f52782a3dc4c81d787ae6cd5dc3bbc5b81fbfe5795d63f14"
+    },
+    {
+      "path": "backend/reports/com.mulino.TypedPredicateEvaluatorTest.txt.gz",
+      "sourceSha256": "950ddaa6b2b7747b6bdd88c95f2bb07b28c257c2abd7f0ee13fc8e89469138de",
+      "sourceBytes": 327,
+      "gzipSha256": "fbede64fc935ed24b248e85b29132075774d0b38657dd94584f0df0b0ba04594"
+    },
+    {
+      "path": "backend/reports/com.mulino.application.evidence.CompletionCoverageGatewayTest.txt.gz",
+      "sourceSha256": "85af43e21f1f247eea0a348d1a2f20a92c221b00e5b3c595a7f90d25bbe7a4d1",
+      "sourceBytes": 373,
+      "gzipSha256": "c90bc379c45288830790cb7c271623703973bb30a2e82e1916dc548e917fb42d"
+    },
+    {
+      "path": "backend/reports/com.mulino.application.evidence.EvidenceGatewayTest.txt.gz",
+      "sourceSha256": "093b70cd434a96903049b2f9a1fee21336b96022a99d98d5cc4956b60b80c101",
+      "sourceBytes": 353,
+      "gzipSha256": "8ecd5ff6fac5ead739bd639ce6e2eba779da3d9d76d29885f177554f1a500ca3"
+    },
+    {
+      "path": "backend/reports/com.mulino.application.evidence.EvidencePersistenceTest.txt.gz",
+      "sourceSha256": "7050c1baccfb24578b51b955f0ae806e1511421c787905e2c31ee636908e46ab",
+      "sourceBytes": 361,
+      "gzipSha256": "53b093bbd18ebc72a312dbc9dc9bc6d6f516ba5071d6490750dc31985e2da5ba"
+    },
+    {
+      "path": "backend/reports/com.mulino.application.evidence.EvidenceReconciliationTest.txt.gz",
+      "sourceSha256": "d2fe0eaab9ea0d0c50cf58043e80db6f4a136682f8ce06377d47edc2d8ddc045",
+      "sourceBytes": 366,
+      "gzipSha256": "576df8d3c12ebe13f240014c7904fac0bb3ee8cab822fcc9fb37b9b170c00ce0"
+    },
+    {
+      "path": "backend/reports/com.mulino.application.identity.AuthorityEvidenceTest.txt.gz",
+      "sourceSha256": "a3a465d663d663759b0c1ae502eb89806f2c4936c088d06b4cb180b27498eb54",
+      "sourceBytes": 356,
+      "gzipSha256": "c50018e0cc97b48246117c51bf203d855f929ec8153488d5b532967e887666e9"
+    },
+    {
+      "path": "backend/reports/com.mulino.application.identity.IdentityAuthorizationTest.txt.gz",
+      "sourceSha256": "793767f9a80f9683c86f25fca16b991ee31feee975abf857ebae20847abf4897",
+      "sourceBytes": 364,
+      "gzipSha256": "4e13fb57a906cd7637cc6a2ea4e672ff974d68acfae5917c2d8258adebbb4b9f"
+    },
+    {
+      "path": "backend/reports/com.mulino.application.identity.IdentityPersistenceTest.txt.gz",
+      "sourceSha256": "45e1a1ec28a7c73e1ffd2fa2150fca4a2ecfd9fca814fafd3c6bb970ca05d1e7",
+      "sourceBytes": 360,
+      "gzipSha256": "2a5c3bd143244cc1471b16a39f75521fa786775d38d519be173fa7baaf185c1b"
+    },
+    {
+      "path": "backend/reports/com.mulino.application.policy.ControlPersistenceTest.txt.gz",
+      "sourceSha256": "5177da6179517f25e75594e1ec61066d08803305ac57333803e0496cbadecc9e",
+      "sourceBytes": 354,
+      "gzipSha256": "3cee3323ae302d9c4e5b3e3123b45f73086d1f688c5b0a7f751c53f7991da8e3"
+    },
+    {
+      "path": "backend/reports/com.mulino.commands.CommandEnvelopeTest.txt.gz",
+      "sourceSha256": "f473c5d35d3af5b02ce8b0909c305c392621caeec6572f4ec948abab8a1e8acb",
+      "sourceBytes": 328,
+      "gzipSha256": "3729173f2c813b2f201cd814a219b3516313da8cc90aca76cc8e8a659a6cbba4"
+    },
+    {
+      "path": "backend/reports/com.mulino.commands.CommandSubjectTest.txt.gz",
+      "sourceSha256": "954d51b4437b84b18193f8134f365d3ad21a21ec08cd7439e81fca35c88f0383",
+      "sourceBytes": 326,
+      "gzipSha256": "49790eb73a8f86368f93feb414ad5b9ae81fe2d8f1ef48cf4e7f965e96cf5259"
+    },
+    {
+      "path": "backend/reports/com.mulino.commands.CommandTransactionTest.txt.gz",
+      "sourceSha256": "b37f4c064242117ab425cb27d2a6d29f4e64246b272295eb7ffbac50c6525e91",
+      "sourceBytes": 335,
+      "gzipSha256": "0b6c08c53d19427c8c6d83bc5000f858ff6bd84ed4d7bb8f015fecdb0a6c371d"
+    },
+    {
+      "path": "backend/reports/com.mulino.core.ReadContractsTest.txt.gz",
+      "sourceSha256": "3b37b92ea9ee254d6ec7d791d1e40564f62714832e2cc6f3627d8060504de5c4",
+      "sourceBytes": 316,
+      "gzipSha256": "b8e925017f934ac4fc14eb548013cc10656280925b3c08c28c8b4d31c4bcc9ed"
+    },
+    {
+      "path": "backend/reports/com.mulino.core.S1ReadIntegrationTest.txt.gz",
+      "sourceSha256": "1249001e2d5444f802d47bc2600b870f1c76a9b2addab6dc8af4f2e96ec330f9",
+      "sourceBytes": 324,
+      "gzipSha256": "9baaa4f00e33b88b42ac0e5cad6b6de55efbf0b764262aba6ba6c420901410b0"
+    },
+    {
+      "path": "backend/reports/com.mulino.core.S2WorkActualIntegrationTest.txt.gz",
+      "sourceSha256": "15275fd1536788ebadad1386de7b31d0f0b42d67baa55a98cbef72a41210fcdf",
+      "sourceBytes": 336,
+      "gzipSha256": "aa9356d24ddd70e1f304351234055c3e43882f779e5cf09204e9a2e4b1d3f236"
+    },
+    {
+      "path": "backend/reports/com.mulino.core.S2WorkLifecyclePostgresTest.txt.gz",
+      "sourceSha256": "953d8eafc05782eea5d57f196c0142183c8c245daad9282183bf945be5ec94df",
+      "sourceBytes": 336,
+      "gzipSha256": "a6fdb0e4d957e5b53273b808c4dbe8e3f2f878ac18e3e45034d2798d0ece34d5"
+    },
+    {
+      "path": "backend/reports/com.mulino.inventory.InventoryPostgresTest.txt.gz",
+      "sourceSha256": "bbcc22383fae8139df48c1ce20d0a99a626758c45e29e21add1be14431141e1f",
+      "sourceBytes": 334,
+      "gzipSha256": "a2a3dd61b8b25d6dd5a40a9fe964c2f256f2bb97a0763a72b7f70ceb4b3bf1dd"
+    },
+    {
+      "path": "backend/reports/com.mulino.inventory.InventoryQuantityTest.txt.gz",
+      "sourceSha256": "39776c10877fefa2e945ae21ec98640d3137047ddaa1dce5c03777894a306ab3",
+      "sourceBytes": 334,
+      "gzipSha256": "300671257f7c259b5df0a93060a2e1d8fd3c224bf5941dbb0c0d47200f32a6f2"
+    },
+    {
+      "path": "backend/reports/com.mulino.inventory.InventorySubjectBindingTest.txt.gz",
+      "sourceSha256": "983a98bd6562deabf0af8c9c7ae0b8ba3ab97ba51c58322a2a0099291f9e9951",
+      "sourceBytes": 346,
+      "gzipSha256": "38a2046fd40efde276483f1cd7cde6e968ec9977091a124158a82aeb7bd3bbbe"
+    },
+    {
+      "path": "backend/reports/com.mulino.inventory.StockCommandPostgresTest.txt.gz",
+      "sourceSha256": "c3979ddcb723f267bf7e5a0e697f625bef1f5ae2e4e8c0b85ba86d587664f9fb",
+      "sourceBytes": 341,
+      "gzipSha256": "764f4212fd3b2b628b74237b963f0d186cb65d6cd0940ee99eae9e628ae3dc47"
+    },
+    {
+      "path": "backend/reports/com.mulino.responsibility.ResponsibilityEvidenceGateTest.txt.gz",
+      "sourceSha256": "538690678dd101294d1a373543e6cf86d4f0f843e7eaf3cce90d1b20a62eb266",
+      "sourceBytes": 362,
+      "gzipSha256": "400174f42284e45b2911dfa51c6bafe5325a20c65602aa1c494673f577a335e3"
+    },
+    {
+      "path": "backend/reports/com.mulino.responsibility.ResponsibilityPostgresTest.txt.gz",
+      "sourceSha256": "118f97ad2f59cc474aa0cf9190d96c5a4cb54b82013cbec48a9a199c43d94dc1",
+      "sourceBytes": 355,
+      "gzipSha256": "2f9ace981e2dacf6587a38be6549a0189c43fff4af662431574cae43358c38dd"
+    },
+    {
+      "path": "backend/reports/com.mulino.responsibility.ResponsibilityServiceTest.txt.gz",
+      "sourceSha256": "15b5465b829c59d092e60a74b4b5b8c3940fd979b5cf52bbcfce28d59643aaf4",
+      "sourceBytes": 352,
+      "gzipSha256": "d3708b93e2ad27be5ea33bec76e484601ce6c64f92e8caa4e9cc0e0fdf7d61f6"
+    },
+    {
+      "path": "backend/reports/com.mulino.responsibility.ResponsibilitySubjectBindingTest.txt.gz",
+      "sourceSha256": "9276b6623b9588a9f3248a8a4b46ff4d993eb098e5bddcff3ddeb473c9b4f9f9",
+      "sourceBytes": 366,
+      "gzipSha256": "4976c4b7272219f5eedc78413ad060f762161e0e2712ce5a4005b1652990d919"
+    },
+    {
+      "path": "backend/reports/com.mulino.runtime.RuntimeIntakePostgresTest.txt.gz",
+      "sourceSha256": "d7bbcb4237226dd886927e2185a7c2b0ca018ede6d415de0e5426e2e560d8275",
+      "sourceBytes": 338,
+      "gzipSha256": "4a680c975da28cc9c032804a9d3c5efe4dd65703058cd69bb18aaec08868a36e"
+    },
+    {
+      "path": "backend/reports/com.mulino.runtime.RuntimePostgresTest.txt.gz",
+      "sourceSha256": "a10b9eb9b4c58dc580a422137a1ce45ea2276d91ae9cb8e2bc0a560096951e13",
+      "sourceBytes": 326,
+      "gzipSha256": "dff679cd8dab914a98c738647d81e120f21163e8009c1684f405c6a1529a4244"
+    },
+    {
+      "path": "backend/reports/com.mulino.work.GoalInputTest.txt.gz",
+      "sourceSha256": "30529ab02406b57bd657947d99ac8eabc14bac15cc5f4386f4c743daa93ab88b",
+      "sourceBytes": 308,
+      "gzipSha256": "ab9956aa59cdfec4e4c7f24fa8193b0b561a7747c83a025f1659ecf5e54d3270"
+    },
+    {
+      "path": "backend/source.json.gz",
+      "sourceSha256": "f465012d41745bc3b7445f4ea156dec00a86ad31ba571aab43adfc192ce2af07",
+      "sourceBytes": 117,
+      "gzipSha256": "8a94cb73fc445f02bd8b80dad71d268cdf5dc8fd0cb88ccd7d9e2e618a378c12"
+    },
+    {
+      "path": "native/build.log.gz",
+      "sourceSha256": "0534aecb343f80e2be5f5b8394399d9db810c8ef4c97357d02b85610f05e329e",
+      "sourceBytes": 5679,
+      "gzipSha256": "dfb6963168aabc6a28e159934759f390ca153f7138c4e15c5b8d54cdd2d6f169"
+    },
+    {
+      "path": "native/exit.json.gz",
+      "sourceSha256": "dcead65dd5ca1b61b3956613d9449f7518f2a44ae34ae4793868a0cd92d2d14e",
+      "sourceBytes": 71,
+      "gzipSha256": "897fa0d3511c9ac91167f03ba4197b0554807b4ea23822360def1174ef961250"
+    },
+    {
+      "path": "native/native/actual-s2-native.json.gz",
+      "sourceSha256": "40af5e8e181db9ba96cecdce3afce534cb41296ba4d088d13261ac3321a16392",
+      "sourceBytes": 7656,
+      "gzipSha256": "cd262a70fd4ff0d130488ebc67cc3795882dd09d02f63a94745f0aacb4a31285"
+    },
+    {
+      "path": "native/native/backend-loopback-url.txt.gz",
+      "sourceSha256": "d172c31424aadebf19db53c32337e794ae8471c5f3f48ab4a5b3959eb266a103",
+      "sourceBytes": 23,
+      "gzipSha256": "be5578888209e39a4948e3eaa2bf0af1dc9137e52a2b23e92b25e5c1409bb5d5"
+    },
+    {
+      "path": "native/native/backend-runtime.log.gz",
+      "sourceSha256": "b2479cbe8658d8ff5dd6f34f2cdce00a786aa29767ed759be1c5a10ef1b37665",
+      "sourceBytes": 17042,
+      "gzipSha256": "a3c076ef920912460724755b2b46ae095c1f121755193393c6d36bc8b5ce127a"
+    },
+    {
+      "path": "native/native/container-cleanup.txt.gz",
+      "sourceSha256": "01fe4e75ab2d502b5c77df3ef7308ab1eb43edfc01bbc0793e7512b34800aa99",
+      "sourceBytes": 54,
+      "gzipSha256": "2661e2f71258fcf37465ed9d8324bd85c3cacf22f6bf0e413d653c1e490d002a"
+    },
+    {
+      "path": "native/native/container-id.txt.gz",
+      "sourceSha256": "67ceacba1e3aecf89eacc6951b7f42af59699a2dde51d3a739d59685ebd6d4e6",
+      "sourceBytes": 65,
+      "gzipSha256": "842ed340e58575d2ae109eff95fcab45d7ba05660f36f845da4c19a8d5c14aaa"
+    },
+    {
+      "path": "native/native/native-stderr.txt.gz",
+      "sourceSha256": "2c58b87a0350a39bb1c3b5f4891defeeb9a785e84aa11a466dc9ddb21253bf58",
+      "sourceBytes": 186,
+      "gzipSha256": "bfe23d49bd33bb8ff20fbe65e319d8fd7deac45174069f26d60a7cd5bf53f92f"
+    },
+    {
+      "path": "native/native/native-stdout.json.gz",
+      "sourceSha256": "40af5e8e181db9ba96cecdce3afce534cb41296ba4d088d13261ac3321a16392",
+      "sourceBytes": 7656,
+      "gzipSha256": "cd262a70fd4ff0d130488ebc67cc3795882dd09d02f63a94745f0aacb4a31285"
+    },
+    {
+      "path": "native/native/postgres-image-id.txt.gz",
+      "sourceSha256": "3256f05ad6b56c80bbca86ff15d0de4b57083c599441797e7b2213bc62afcb38",
+      "sourceBytes": 72,
+      "gzipSha256": "1cc7d32ab39095a458d2d354ce0ec695f116f5036347c52f7ac184621d08f163"
+    },
+    {
+      "path": "native/native/postgres-image-reference.txt.gz",
+      "sourceSha256": "058d018a01df613916c61fb3e6fd3b008146970c2756187a369f29f5f72cab8e",
+      "sourceBytes": 81,
+      "gzipSha256": "64bb739ec1ba46f6c12f7d0184e9ea715fc2e4a463ae04191fefe1d0b5b4e493"
+    },
+    {
+      "path": "native/native/postgres-runtime.log.gz",
+      "sourceSha256": "51809f8b09c6c5daf0fcc412b74591836c2573332129312be8675fe55b5f1627",
+      "sourceBytes": 3230,
+      "gzipSha256": "d1fa2cf85e279f4be000fd26d03913a83b00f2de44edd7bce16b66fcb789d1c9"
+    },
+    {
+      "path": "native/native/postgres-version.txt.gz",
+      "sourceSha256": "1bb919c53b0a9f6fa678be489d5ff035a2adb445dfec76a65e61ba2a88b535e0",
+      "sourceBytes": 121,
+      "gzipSha256": "50ae56b2fc2a2b3d8975e33e651f34f733a078962a07d2d540d8300f565b00f6"
+    },
+    {
+      "path": "native/native/run-receipt.json.gz",
+      "sourceSha256": "1600f9639ecdb5283ec2885e805ffaa04152896fa794e52348bf524a00c558a7",
+      "sourceBytes": 1376854,
+      "gzipSha256": "061fd849f5f07e5ac61f8cd764e2be2429017401f24f1904400ca92e005942dc"
+    },
+    {
+      "path": "native/native/verification/harness/target/evidence/actual/cdaed2af-6ca4-4364-8d34-fcb8c6cb209c/3c5b134d-b72a-4220-80f9-b935cae0d06c.json.gz",
+      "sourceSha256": "2c2816e6b498c6fa16bb44b6a702452cc8b527e1da272e3028445a34d3a63a70",
+      "sourceBytes": 412,
+      "gzipSha256": "0c37c6a328be023c4c12413c5257ec627d1b1c9b524ca5d1be77d594665a7f49"
+    },
+    {
+      "path": "native/native/verification/harness/target/evidence/actual/cdaed2af-6ca4-4364-8d34-fcb8c6cb209c/75ecaab9-442e-44c7-9795-b489eb7464de.json.gz",
+      "sourceSha256": "2187321d3eb662acffa9f3754f3f624fec113520f38f272389ae5baff6166430",
+      "sourceBytes": 115,
+      "gzipSha256": "5f0074b7f50f7cb637999ce837fbdc38b3144f81da84502aa61091bbe17e9761"
+    },
+    {
+      "path": "native/native/verification/harness/target/evidence/actual/cdaed2af-6ca4-4364-8d34-fcb8c6cb209c/8a1d79d9-ea06-4cc0-9972-aafa991c89fe.json.gz",
+      "sourceSha256": "3d7c6e1ac05a7f26b6494ce63ef92464bf321fcf3b523c52a8888e582f8f069b",
+      "sourceBytes": 1235,
+      "gzipSha256": "2f3ef5816405729287418e5d354a9abae833af31d71823a2d13dd933ad85e088"
+    },
+    {
+      "path": "native/native/verification/harness/target/evidence/actual/cdaed2af-6ca4-4364-8d34-fcb8c6cb209c/af0bdfe7-93b1-4477-b3e2-3498973bb01e.json.gz",
+      "sourceSha256": "fd3719fac3eb42907ba559d83413c4e5c64298b397da9a544eb632380f5bf7a6",
+      "sourceBytes": 3164,
+      "gzipSha256": "8e903dada78014784659d8e4b80baf2f8e4d4a1bf851f4de827ca34a9b44583e"
+    },
+    {
+      "path": "native/native/verification/harness/target/evidence/actual/cdaed2af-6ca4-4364-8d34-fcb8c6cb209c/af30c851-12c8-4a62-8c29-13da582bab3a.json.gz",
+      "sourceSha256": "28fca21f7d64e80d749e3eed608014ed630a216c17cf025e6cc69ea3e1dc339d",
+      "sourceBytes": 3164,
+      "gzipSha256": "e8ebcf6bbc72b770d04139f42ffb0fba7d29e3bbbe86760011f7436fb25108c6"
+    },
+    {
+      "path": "native/native/verification/harness/target/evidence/actual/cdaed2af-6ca4-4364-8d34-fcb8c6cb209c/bab4534c-4665-446a-8ad8-051708d0854a.json.gz",
+      "sourceSha256": "078b60e0a72eead33631fedfaf2b0cf37786357c4490602869bd6a9c6fa8e62d",
+      "sourceBytes": 115,
+      "gzipSha256": "efef7d1a6a7e1d6b6b09bcf9c1d2e0ebebb7f752d14612f3aac8aadaac406e1b"
+    },
+    {
+      "path": "native/native.log.gz",
+      "sourceSha256": "bd70a29e0023e909d4281287cf7235cda718ee9b0693ddc9475ca2e4a23882cc",
+      "sourceBytes": 2806,
+      "gzipSha256": "788d7ba55b17f3691fcac563439c9b9b05382ac498b691d8e8ee0907f6980124"
+    },
+    {
+      "path": "native-artifact-refs/3c5b134d-b72a-4220-80f9-b935cae0d06c.json.gz",
+      "sourceSha256": "2c2816e6b498c6fa16bb44b6a702452cc8b527e1da272e3028445a34d3a63a70",
+      "sourceBytes": 412,
+      "gzipSha256": "0c37c6a328be023c4c12413c5257ec627d1b1c9b524ca5d1be77d594665a7f49",
+      "originalRef": "verification/harness/target/evidence/actual/cdaed2af-6ca4-4364-8d34-fcb8c6cb209c/3c5b134d-b72a-4220-80f9-b935cae0d06c.json"
+    },
+    {
+      "path": "native-artifact-refs/75ecaab9-442e-44c7-9795-b489eb7464de.json.gz",
+      "sourceSha256": "2187321d3eb662acffa9f3754f3f624fec113520f38f272389ae5baff6166430",
+      "sourceBytes": 115,
+      "gzipSha256": "5f0074b7f50f7cb637999ce837fbdc38b3144f81da84502aa61091bbe17e9761",
+      "originalRef": "verification/harness/target/evidence/actual/cdaed2af-6ca4-4364-8d34-fcb8c6cb209c/75ecaab9-442e-44c7-9795-b489eb7464de.json"
+    },
+    {
+      "path": "native-artifact-refs/8a1d79d9-ea06-4cc0-9972-aafa991c89fe.json.gz",
+      "sourceSha256": "3d7c6e1ac05a7f26b6494ce63ef92464bf321fcf3b523c52a8888e582f8f069b",
+      "sourceBytes": 1235,
+      "gzipSha256": "2f3ef5816405729287418e5d354a9abae833af31d71823a2d13dd933ad85e088",
+      "originalRef": "verification/harness/target/evidence/actual/cdaed2af-6ca4-4364-8d34-fcb8c6cb209c/8a1d79d9-ea06-4cc0-9972-aafa991c89fe.json"
+    },
+    {
+      "path": "native-artifact-refs/af0bdfe7-93b1-4477-b3e2-3498973bb01e.json.gz",
+      "sourceSha256": "fd3719fac3eb42907ba559d83413c4e5c64298b397da9a544eb632380f5bf7a6",
+      "sourceBytes": 3164,
+      "gzipSha256": "8e903dada78014784659d8e4b80baf2f8e4d4a1bf851f4de827ca34a9b44583e",
+      "originalRef": "verification/harness/target/evidence/actual/cdaed2af-6ca4-4364-8d34-fcb8c6cb209c/af0bdfe7-93b1-4477-b3e2-3498973bb01e.json"
+    },
+    {
+      "path": "native-artifact-refs/af30c851-12c8-4a62-8c29-13da582bab3a.json.gz",
+      "sourceSha256": "28fca21f7d64e80d749e3eed608014ed630a216c17cf025e6cc69ea3e1dc339d",
+      "sourceBytes": 3164,
+      "gzipSha256": "e8ebcf6bbc72b770d04139f42ffb0fba7d29e3bbbe86760011f7436fb25108c6",
+      "originalRef": "verification/harness/target/evidence/actual/cdaed2af-6ca4-4364-8d34-fcb8c6cb209c/af30c851-12c8-4a62-8c29-13da582bab3a.json"
+    },
+    {
+      "path": "native-artifact-refs/bab4534c-4665-446a-8ad8-051708d0854a.json.gz",
+      "sourceSha256": "078b60e0a72eead33631fedfaf2b0cf37786357c4490602869bd6a9c6fa8e62d",
+      "sourceBytes": 115,
+      "gzipSha256": "efef7d1a6a7e1d6b6b09bcf9c1d2e0ebebb7f752d14612f3aac8aadaac406e1b",
+      "originalRef": "verification/harness/target/evidence/actual/cdaed2af-6ca4-4364-8d34-fcb8c6cb209c/bab4534c-4665-446a-8ad8-051708d0854a.json"
+    }
+  ]
+}
