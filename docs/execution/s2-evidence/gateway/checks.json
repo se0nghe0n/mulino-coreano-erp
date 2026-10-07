@@ -1,0 +1,71 @@
+{
+  "task": "new mulino-coreano-ontology",
+  "userStep": 3,
+  "systemStage": "S2",
+  "productionCommit": "c4fdd75",
+  "timestamp": "2026-10-08T04:01:12+09:00",
+  "command": "JAVA_HOME=<Java21> PATH=<Node24>:<Java21>:$PATH JWT_PUBLIC_KEY=<ephemeral public.pem> ../mvnw -B -ntp -Dtest=CompletionCoverageGatewayTest,EvidenceReconciliationTest test",
+  "exitCode": 0,
+  "observed": {
+    "tests": 25,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "build": "SUCCESS",
+    "seconds": 24.852
+  },
+  "versions": {
+    "java": "21",
+    "node": "24.19.0",
+    "postgres": "18.6",
+    "postgresImage": "postgres@sha256:4ef4dbc939d61acea57712655ddb4b4ab27419c913f94cca0cd57cb3ea3c2280"
+  },
+  "policyFixture": "Only PolicyCommandGuard mocked; actual gateway/identity/source scope/PostgreSQL/files/reconciliation/responsibility credits",
+  "verified": [
+    "record attach correction APPLIED with separate evidenceStatus",
+    "same command idempotency replay",
+    "conflicting source hash retains intake owner/supervisor/next action/check",
+    "immutable original history and correction link",
+    "subject TradeItem/Work exact target gateway acceptance",
+    "partial50 resolves matching50 only",
+    "full100 credits disjoint50+50 and duplicate credit rejected",
+    "zero inventory movements",
+    "command COMMITTED and audit persisted"
+  ],
+  "notRun": [
+    "signed HTTP/OData/MCP combined production policy coupling",
+    "paid models",
+    "BTP"
+  ],
+  "artifacts": [
+    "maven.log.gz",
+    "maven-initial-failure.log.gz",
+    "maven-fixture-failure.log.gz",
+    "maven-work-selector-failure.log.gz",
+    "TEST-com.mulino.application.evidence.CompletionCoverageGatewayTest.xml.gz",
+    "TEST-com.mulino.application.evidence.EvidenceReconciliationTest.xml.gz"
+  ],
+  "sourceAndFixtureHashes": {
+    "backend/db/evidence.cds": "c3f104d7e74fc1f0a69c99974bee3dc1e2f6936d559b101696c52dc5cd62991a",
+    "backend/src/main/java/com/mulino/adapters/blob/EvidenceDownload.java": "b57e227d721609cf986800927a6f28e74ae31712a79adf35c9e97eed5c7c366f",
+    "backend/src/main/java/com/mulino/adapters/blob/LocalBlobStore.java": "ec13279192055ffe29822ae0fb09c4e5f50d28b66b5dc5432590cdc168b387eb",
+    "backend/src/main/java/com/mulino/application/evidence/EvidenceCommandInputs.java": "f14d8c23614e6e41b43d5fe5a86f1805490036b0cb66bd4f233bf5279e9eb6ea",
+    "backend/src/main/java/com/mulino/application/evidence/EvidenceCommandOutcomes.java": "c364259bd1d0fc62879ff333a5f2792906fc57717f052566788983f71188d13a",
+    "backend/src/main/java/com/mulino/application/evidence/EvidenceCorrectionImpact.java": "d9b4ab36a36878e8c8fd8eefaf944868d957ec3d9a7407236f47eeadee09fa8d",
+    "backend/src/main/java/com/mulino/application/evidence/EvidenceQueries.java": "2bbe52ff48e3dbd5c7ab62aa0e0bb289f26772edc209e4b9bc5fa00c299c92b9",
+    "backend/src/main/java/com/mulino/application/evidence/EvidenceReconciliation.java": "f544e7b673741801216310a41d4b82912f8fa1d01076c310417ffc37379b4263",
+    "backend/src/main/java/com/mulino/application/evidence/EvidenceReconciliationCommands.java": "9f110451130a4bb925373927b711e4fd58d72af4f07ea55ce20bc99328a8b42a",
+    "backend/src/main/java/com/mulino/application/evidence/EvidenceRecordCommands.java": "5fa5405217b93c74d668188fddfff6eea994c15f40e2eb95eba9c7b095a18be1",
+    "backend/src/main/java/com/mulino/application/evidence/EvidenceRecords.java": "631b1091d9321dcfc087db3c976f3a6eb8889814ac0071cd8d435aee6526dba5",
+    "backend/src/main/java/com/mulino/application/evidence/ExternalResultEvidenceGuard.java": "0adcf6d7d88282595f614c285214e3ae111f8cce297bcb6a367d36695b01c975",
+    "backend/src/main/java/com/mulino/application/evidence/VerifiedExternalResultEvidence.java": "ba677ff4e404d36ca736b2ca44b88d1ff238d2b914fa6a8567077ec892c9269c",
+    "backend/src/main/java/com/mulino/application/evidence/VerifiedResponsibilityCompletionEvidence.java": "5f63da90c4f450c5f9aeeefd964e3882c4894808c943775e7c25020acc92265f",
+    "backend/src/main/java/com/mulino/domain/evidence/EvidenceRepository.java": "9e0b181cca1132bbeb363019e5f223f61720fedd5167581d73fd228fd8a3c9c5",
+    "backend/src/main/java/com/mulino/domain/evidence/EvidenceTypes.java": "ed4e625e4577e09b04eeaae2d00f343334d2e580aa132293f4a0e8549f766331",
+    "backend/src/main/java/com/mulino/domain/evidence/ExternalOperationScopePort.java": "23a01cef57ab979af01bd3b2e7c7c1c49656a8905c265a09982d79bb817c9e7b",
+    "backend/src/test/java/com/mulino/application/evidence/CompletionCoverageGatewayTest.java": "686a5d470858df6d01693356aa1aee181c3f7fa7e8d6715b7241eca2b4ac02fc",
+    "backend/src/test/java/com/mulino/application/evidence/EvidenceGatewayTest.java": "34262f015b83c8bd8f82889c95e1f268f68fed906e33c0390f8cab2693442051",
+    "backend/src/test/java/com/mulino/application/evidence/EvidenceReconciliationTest.java": "00e574077ba954200c332f55a1d80e2e6a0b605ca751354f28931e489866a4a4",
+    "database/migrations/V15__evidence_commands.sql": "764d40de502ec1fff71ad9c5f70d834a578d37724877490887d8ea38c194e245"
+  }
+}

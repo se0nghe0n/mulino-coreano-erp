@@ -38,3 +38,23 @@ ExternalOperationScopePort가 실제 조직별 operation UUID와 Work를 확인�
 범위로 쓰며 물량은 만들지 않는다. 후속 recordExternalReconciliation은
 ExternalResultEvidenceGuard로 같은 원본·검증·정확한 결과를 다시 확인한다.
 미확인 외부 결과를 확정 성공으로 꾸미거나 새 외부 발행을 만들지 않는다.
+
+
+일반 gateway는 증거 접수와 대조의 성공을 APPLIED로 commit한다. 원래
+RECORDED·EVIDENCE_CONFLICT·VERIFIED_RECORD_ONLY 상태는 evidenceStatus에
+별도로 둔다. 상충 접수도 담당자·감독자·다음 조치를 보존하며 실물 효과는
+0이다. gateway 성공 허용 목록에 증거 상태를 추가하지 않는다.
+
+RESPONSE_COMPLETED는 실제 의무 root가 만들어진 뒤 작성한 원본 JSON과
+Event payload에서 dutyRootId·startQuantity·quantity·unit을 대조한다.
+검증된 원본 hash·source policy·현재 verification을 다시 확인하고 불변
+CompletionCoverages에 저장한다. 공개 요청의 범위 힌트로 완료 구간을
+만들지 않는다. 실제 root·Work assignment·physicalScopeId·단위를 확인한다.
+CompletionBindings는 이 검증 행의 정확한 범위와 verification을 참조한다.
+50의 검증 구간은 같은 50 leaf만 완료하고, 100의 구간은 겹치지 않는 두
+50 leaf에 총100까지 credit을 준다. 같은 구간의 중복 credit은 거부한다.
+
+추가 gateway 검증은 PostgreSQL 18.6과 실제 파일 저장소에서 25건을
+통과했다. 접수·첨부·정정의 command commit·audit·불변 원본과 partial/full
+완료 credit을 확인했다. PolicyCommandGuard만 로컬 승인 fixture로 바꿨다.
+HTTP 서명·실제 policy coupling의 통합 결과는 root의 결합 실행에서 확인한다.
