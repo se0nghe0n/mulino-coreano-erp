@@ -56,8 +56,9 @@ raw('after60',[sums('mulino_inventory_quantitysegments','quantity','60',{'retire
 # Same key retry is a new authenticated HTTP call; observation must remain one effect.
 cmd('retry60','confirmReceipt',{'receiptId':'$receipt60.observation','canonicalOccurrenceId':'$receipt60.canonical','lotId':'$L'},revision=0,subject='$receipt60.observation',noun='Receipt',key='receipt60-confirm-stable')
 A[-1]['type']='parallel'
+raw('concurrent-retry-one-effect',[count('mulino_commands_commandrecords',1,{'commandidempotencykey':'receipt60-confirm-stable','actorid':'$reader','state':'COMMITTED'}),count('mulino_commands_commandaudits',1,{'capabilityid':'confirmReceipt','outcome':'APPLIED'}),count('mulino_inventory_quantitymovements',1,{'kind':'RECEIPT'}),count('mulino_trade_receipt_receipts',1)])
 receipt('sourceB60','0','60',existing='$receipt60.canonical')
-raw('duplicate60',[sums('mulino_inventory_quantitysegments','quantity','60',{'retiredat':None}),sums('mulino_trade_receipt_receipts','contributedquantity','60')])
+raw('duplicate60',[count('mulino_evidence_canonicaloccurrences',1,{'kind':'PHYSICAL_RECEIPT'}),count('mulino_inventory_quantitymovements',1,{'kind':'RECEIPT'}),sums('mulino_inventory_quantitysegments','quantity','60',{'retiredat':None}),sums('mulino_trade_receipt_receipts','contributedquantity','60')])
 cmd('other-actor-no-replay','confirmReceipt',{'receiptId':'$receipt60.observation','canonicalOccurrenceId':'$receipt60.canonical','lotId':'$L'},revision=0,subject='$receipt60.observation',noun='Receipt',key='receipt60-confirm-stable',outcome='REJECTED',assertions=[{'pointer':'/effects','operator':'equals','expected':{}},{'pointer':'/error/code','operator':'equals','expected':'FORBIDDEN'}]);A[-1]['actor']='outsider'
 receipt('receipt40','0','40')
 raw('after100',[sums('mulino_inventory_quantitysegments','quantity','100',{'retiredat':None}),sums('mulino_trade_receipt_receipts','contributedquantity','100')])

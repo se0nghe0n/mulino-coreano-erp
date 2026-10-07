@@ -1121,6 +1121,44 @@
       "outcome": "APPLIED"
     },
     {
+      "id": "concurrent-retry-one-effect",
+      "type": "observe",
+      "assertions": [
+        {
+          "pointer": "/rawRows/mulino_commands_commandrecords",
+          "operator": "matchingRows",
+          "expected": 1,
+          "where": {
+            "commandidempotencykey": "receipt60-confirm-stable",
+            "actorid": "$reader",
+            "state": "COMMITTED"
+          }
+        },
+        {
+          "pointer": "/rawRows/mulino_commands_commandaudits",
+          "operator": "matchingRows",
+          "expected": 1,
+          "where": {
+            "capabilityid": "confirmReceipt",
+            "outcome": "APPLIED"
+          }
+        },
+        {
+          "pointer": "/rawRows/mulino_inventory_quantitymovements",
+          "operator": "matchingRows",
+          "expected": 1,
+          "where": {
+            "kind": "RECEIPT"
+          }
+        },
+        {
+          "pointer": "/rawRows/mulino_trade_receipt_receipts",
+          "operator": "size",
+          "expected": 1
+        }
+      ]
+    },
+    {
       "id": "sourceB60",
       "type": "original",
       "fixture": {
@@ -1313,6 +1351,22 @@
       "id": "duplicate60",
       "type": "observe",
       "assertions": [
+        {
+          "pointer": "/rawRows/mulino_evidence_canonicaloccurrences",
+          "operator": "matchingRows",
+          "expected": 1,
+          "where": {
+            "kind": "PHYSICAL_RECEIPT"
+          }
+        },
+        {
+          "pointer": "/rawRows/mulino_inventory_quantitymovements",
+          "operator": "matchingRows",
+          "expected": 1,
+          "where": {
+            "kind": "RECEIPT"
+          }
+        },
         {
           "pointer": "/rawRows/mulino_inventory_quantitysegments",
           "operator": "sum",
