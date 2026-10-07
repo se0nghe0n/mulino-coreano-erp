@@ -58,6 +58,40 @@ public class ResponsibilityService implements WorkResponsibility, com.mulino.app
   return result;
  }
  private Map<String,Object> ensureDuty(DomainContext c,String originalId,String sourceId,String sourceKind,String kind,String action,Instant next){r.fence(c.organizationId(),originalId);var w=work.require(c,originalId,true);if("CLOSED".equals(w.get("status")))w=work.ensureFollowup(c,originalId,sourceId,kind,action,next);var source=r.requireSource(c.organizationId(),sourceKind,sourceId);String version=source.get("canonicalHash")!=null?source.get("canonicalHash").toString():String.valueOf(source.getOrDefault("revision",0));var scope=new TreeMap<String,Object>();scope.put("originalWorkId",originalId);if(source.get("physicalScopeId")!=null)scope.put("physicalScopeId",source.get("physicalScopeId"));String scopeJson;try{scopeJson=new com.fasterxml.jackson.databind.ObjectMapper().writeValueAsString(scope);}catch(Exception e){throw new IllegalStateException(e);}return openDuty(c,Map.of("workId",w.get("ID"),"sourceId",sourceId,"sourceKind",sourceKind,"sourceVersion",version,"kind",kind,"scopeJson",scopeJson,"nextAction",action,"nextCheckAt",next));}
+ /** Conserves immutable root quantity and transferred ownership while discharging only receipt-covered open leaves. */
+ public void applyReceiptProgress(DomainContext c,com.mulino.application.trade.TradeResidualRemedy.ReceiptProgress progress){
+  r.fence(c.organizationId(),progress.rootId());
+  var root=r.require("Roots",c.organizationId(),progress.rootId());
+  if(!"RECEIPT_SHORTFALL".equals(root.get("kind"))||progress.covered().compareTo((BigDecimal)root.get("quantity"))>0)throw DomainError.invalid("Receipt residual root mismatch");
+  for(var a:r.rows("Assignments",c.organizationId())){
+   if(!progress.rootId().equals(a.get("rootId"))||!open(a))continue;
+   var scope=r.require("Scopes",c.organizationId(),text(a,"scopeId"));
+   BigDecimal start=(BigDecimal)scope.get("startQuantity"),full=(BigDecimal)scope.get("quantity");
+   BigDecimal covered=progress.covered().subtract(start).max(BigDecimal.ZERO).min(full);
+   if(covered.signum()==0)continue;
+   Map<String,Object> resolving=a;
+   if(covered.compareTo(full)<0){
+    r.update("Assignments",c.organizationId(),text(a,"ID"),Map.of("status","TRANSFERRED","valid",false,"basis","RECEIPT_RANGE_SPLIT","revision",((Number)a.get("revision")).intValue()+1));
+    r.update("Scopes",c.organizationId(),text(scope,"ID"),Map.of("leaf",false));
+    var done=child(c,scope,start,covered);var remaining=child(c,scope,start.add(covered),full.subtract(covered));
+    resolving=receiptChildAssignment(c,a,done);r.insert("Assignments",resolving);r.insert("Assignments",receiptChildAssignment(c,a,remaining));scope=done;
+   }
+   var credit=row(c,UUID.randomUUID().toString());credit.putAll(Map.of("rootId",root.get("ID"),"scopeId",scope.get("ID"),"assignmentId",resolving.get("ID"),"receiptId",progress.receiptId(),"startQuantity",scope.get("startQuantity"),"quantity",scope.get("quantity")));
+   r.insert("ReceiptResidualCredits",credit);
+   r.update("Assignments",c.organizationId(),text(resolving,"ID"),Map.of("status","RESOLVED","evidenceId",progress.occurrenceId(),"basis","VERIFIED_RECEIPT_CONTRIBUTION","revision",((Number)resolving.get("revision")).intValue()+1));
+  }
+ }
+ public void applyReceiptObservation(DomainContext c,com.mulino.application.trade.TradeResidualRemedy.ObservationCompletion completion){
+  r.fence(c.organizationId(),completion.rootId());var root=r.require("Roots",c.organizationId(),completion.rootId());
+  if(!"RECEIPT_RECONCILIATION".equals(root.get("kind"))||root.get("quantity")!=null)throw DomainError.invalid("Observation reconciliation root required");
+  for(var a:r.rows("Assignments",c.organizationId()))if(completion.rootId().equals(a.get("rootId"))&&open(a)){
+   var credit=row(c,UUID.randomUUID().toString());credit.putAll(Map.of("rootId",completion.rootId(),"assignmentId",a.get("ID"),"observationId",completion.observationId(),"receiptId",completion.receiptId()));r.insert("ObservationReceiptCredits",credit);
+   r.update("Assignments",c.organizationId(),text(a,"ID"),Map.of("status","RESOLVED","evidenceId",completion.occurrenceId(),"basis","VERIFIED_RECEIPT_OBSERVATION","revision",((Number)a.get("revision")).intValue()+1));
+  }
+ }
+ private Map<String,Object> receiptChildAssignment(DomainContext c,Map<String,Object>previous,Map<String,Object>scope){
+  var result=new LinkedHashMap<>(previous);result.putAll(row(c,UUID.randomUUID().toString()));result.put("effectiveAt",c.asOf());result.put("scopeId",scope.get("ID"));result.put("quantity",scope.get("quantity"));result.put("predecessorId",previous.get("ID"));result.put("status","OPEN");result.put("valid",true);result.remove("evidenceId");result.remove("basis");return result;
+ }
  private static String canonicalScope(String scope){try{var json=new com.fasterxml.jackson.databind.ObjectMapper();var tree=json.readTree(scope);if(!tree.isObject())throw DomainError.invalid("Duty scope object required");return json.writeValueAsString(sort(tree));}catch(DomainError e){throw e;}catch(Exception e){throw DomainError.invalid("Duty scope invalid");}}
  private static Object sort(com.fasterxml.jackson.databind.JsonNode node){if(node.isObject()){var result=new TreeMap<String,Object>();node.fields().forEachRemaining(x->result.put(x.getKey(),sort(x.getValue())));return result;}if(node.isArray()){var result=new ArrayList<Object>();node.forEach(x->result.add(sort(x)));return result;}return node;}
  private static String hash(String s){try{return HexFormat.of().formatHex(MessageDigest.getInstance("SHA-256").digest(s.getBytes(StandardCharsets.UTF_8)));}catch(Exception e){throw new IllegalStateException(e);}}
