@@ -24,6 +24,12 @@ public class ApplicationQueries {
   @Transactional(readOnly=true,isolation=Isolation.REPEATABLE_READ)
   @SuppressWarnings("unchecked")
   public Map<String,Object> query(QueryRequest request){
+    try { return queryInternal(request); }
+    catch(org.springframework.security.access.AccessDeniedException denied) { throw DomainError.forbidden(); }
+    catch(IllegalArgumentException invalid) { throw DomainError.invalid("Invalid typed query"); }
+  }
+  @SuppressWarnings("unchecked")
+  private Map<String,Object> queryInternal(QueryRequest request){
     QueryHandler handler=handlers.get(request.operation());
     if(handler==null)throw DomainError.unsupported();
     Instant now=Instant.now();
@@ -31,8 +37,14 @@ public class ApplicationQueries {
     Instant knownAt=request.knownAt()==null?now:request.knownAt();
     DomainContext context=auth.context(asOf,knownAt);
     if(request.scope().containsKey("organizationId")&&!context.organizationId().equals(request.scope().get("organizationId")))throw DomainError.forbidden();
-    if(!Set.of("organizationId","itemId","lotId","workId","placeId","customerId","objectType").containsAll(request.scope().keySet()))throw DomainError.invalid("Unsupported scope key");
-    request.scope().forEach((key,value)->{if(key.equals("objectType")){if(!(value instanceof String)||!Set.of("Product","TradeItem","ManufacturingLot","QuantitySegment","LogisticsUnit","Place","Manufacturer").contains(value))throw DomainError.invalid("Invalid object type");return;}if(!(value instanceof String))throw DomainError.invalid("Typed scope ID required");try{UUID.fromString((String)value);}catch(IllegalArgumentException invalid){throw DomainError.invalid("UUID scope ID required");}});
+    boolean evidenceOperation=Set.of("getEvidence","getInbox").contains(request.operation());
+    Set<String> allowedScope=evidenceOperation?Set.of("organizationId","kind","subjectKind","subjectId"):Set.of("organizationId","itemId","lotId","workId","placeId","customerId","objectType");
+    if(!allowedScope.containsAll(request.scope().keySet()))throw DomainError.invalid("Unsupported scope key");
+    request.scope().forEach((key,value)->{
+      Set<String> enumValues=switch(key){case "objectType"->Set.of("Product","TradeItem","ManufacturingLot","QuantitySegment","LogisticsUnit","Place","Manufacturer");case "kind"->Set.of("DOCUMENT","EVENT","CLAIM","CANONICAL");case "subjectKind"->Set.of("ITEM","LOT","SEGMENT","WORK","PLACE");default->null;};
+      if(enumValues!=null){if(!(value instanceof String)||!enumValues.contains(value))throw DomainError.invalid("Invalid typed selector");return;}
+      if(!(value instanceof String))throw DomainError.invalid("Typed scope ID required");try{UUID.fromString((String)value);}catch(IllegalArgumentException invalid){throw DomainError.invalid("UUID scope ID required");}
+    });
     auth.authorize(context,request.operation(),null);
     QueryResult result=handler.query(context,request);
     Map<String,Object> scope=new LinkedHashMap<>(result.scope());

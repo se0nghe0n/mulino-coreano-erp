@@ -15,7 +15,7 @@ public class WorkReadHandler implements QueryHandler {
   public QueryResult query(DomainContext c,QueryRequest q){
     if(!Set.of("itemId","lotId","workId","status","sort","action","customerId").containsAll(q.filters().keySet()))throw DomainError.invalid("Unsupported work filter");
     if(q.filters().containsKey("sort")&&!"ID".equals(q.filters().get("sort")))throw DomainError.invalid("Only stable ID sort supported");
-    var works=authorizedWorks(c,q.scope(),q.filters());
+    var works=authorizedWorks(c,q.scope(),q.filters(),q.operation());
     if(!q.operation().equals("searchWorks")) {
       if(q.id()==null)throw DomainError.invalid("Work ID required");
       var work=works.stream().filter(w->q.id().equals(w.get("ID"))).findFirst().orElseThrow(DomainError::forbidden);
@@ -37,13 +37,14 @@ public class WorkReadHandler implements QueryHandler {
     return new QueryResult(rows,scope(c,q.scope(),null),List.of(),List.of(),List.of(),cursor);
   }
   public Map<String,Object> world(DomainContext c,Map<String,Object> scope){
-    var works=authorizedWorks(c,scope,Map.of());
+    var works=authorizedWorks(c,scope,Map.of(),"getWork");
     Set<String> ids=new TreeSet<>(); works.forEach(w->ids.add(String.valueOf(w.get("ID"))));
     var obligations=obligations(c,ids);
     TreeSet<String> owners=new TreeSet<>(),next=new TreeSet<>(),evidence=new TreeSet<>();
     works.forEach(w->owners.add(String.valueOf(w.get("ownerId"))));
     obligations.forEach(o->{owners.add(String.valueOf(o.get("ownerId")));next.add(String.valueOf(o.get("nextAction")));});
     for(var ref:linked(c,"EvidenceReferences",ids)){
+      if(!repository.documentKnown(c,String.valueOf(ref.get("documentVersionId"))))continue;
       try{var parent=works.stream().filter(w->Objects.equals(w.get("ID"),ref.get("workId"))).findFirst().orElseThrow();auth.authorizeScopes(c,"getEvidence",Map.of("TARGET",List.of(String.valueOf(ref.get("documentVersionId"))),"WORK",List.of(String.valueOf(ref.get("workId"))),"ITEM",List.of(String.valueOf(parent.get("itemId")))));evidence.add(String.valueOf(ref.get("documentVersionId")));}catch(DomainError denied){if(!denied.code().equals("FORBIDDEN"))throw denied;}
     }
     Map<String,Object> data=new LinkedHashMap<>();
@@ -51,9 +52,9 @@ public class WorkReadHandler implements QueryHandler {
     data.put("workReferences",works);data.put("goalReferences",linked(c,"GoalReferences",ids));data.put("assessmentReferences",linked(c,"AssessmentReferences",ids));
     return data;
   }
-  private List<Map<String,Object>> authorizedWorks(DomainContext c,Map<String,Object> scope,Map<String,Object> filters){
+  private List<Map<String,Object>> authorizedWorks(DomainContext c,Map<String,Object> scope,Map<String,Object> filters,String capability){
     return repository.rows("Works",c).stream().filter(w->matches(w,scope)&&matches(w,filters)).filter(w->{
-      try{auth.authorizeScopes(c,"getWork",workScopes(w));return true;}catch(DomainError denied){if(!denied.code().equals("FORBIDDEN"))throw denied;return false;}
+      try{auth.authorizeScopes(c,capability,workScopes(w));return true;}catch(DomainError denied){if(!denied.code().equals("FORBIDDEN"))throw denied;return false;}
     }).toList();
   }
   private Map<String,List<String>> workScopes(Map<String,Object> w){return Map.of("TARGET",List.of(String.valueOf(w.get("ID"))),"WORK",List.of(String.valueOf(w.get("ID"))),"ITEM",List.of(String.valueOf(w.get("itemId"))));}

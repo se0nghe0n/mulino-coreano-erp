@@ -27,3 +27,40 @@
 효과는 NOT_RUN으로 남긴다. 실제 PG·CQN·HTTP 및 compatibility 검증은
 dependency 통합 후 기록한다. 아직 실행하지 않은 검사를 PASS로
 표시하지 않는다.
+
+## S2 인계 조건
+
+S1의 imported read reference는 S2의 권위 있는 Work·Goal·Assessment·
+Obligation 상태와 통합돼야 한다. 두 모델을 독립적으로 변경하는 shadow
+world를 유지하지 않는다. lifecycle command와 read projection 갱신은
+하나의 committed transaction에서 대조하고 같은 두 진입점 계약을
+계속 검증한다. S1의 read-only fixture 상태를 lifecycle 성공 증거로
+승격하지 않는다.
+
+## Native 조회 검증
+
+`ReadContractsTest,S1ReadIntegrationTest`의11 tests가 실제 PostgreSQL18.6과
+CAP5.1.1 CQN 경로에서 PASS했다. HTTP tests는 임시 RSA key로 서명한
+JWT를 사용하고 검증된 외부 신원과 서버의 조직/actor/current grant를
+연결했다. 비밀과 token은 실행 증거에 저장하지 않는다.
+
+- REST의 getObject/getWork와 OData query, 제품 MCP tools/call은 같은
+  snapshot·물량100BOX·document ID·human owner·nextAction을 반환했다.
+- 제품 MCP tools/list 발견과 tools/call의 구조화된 FORBIDDEN을 대조했다.
+- getEvidence의 typed selector는 실제 document metadata를 읽고 타 조직과
+  잘못된 selector를 거부했다. 문서 내용 가용성은 UNKNOWN으로 보존했다.
+- 같은 조직의 FK와 HUMAN responsibility guard, 다른 조직의 WORK
+  evidence reference 및 stale projection의 SNAPSHOT_CHANGED를 검증했다.
+- 같은 transaction의 SET LOCAL TIME ZONE을 UTC·Asia/Seoul·NewYork로
+  바꾸고 CQN의 Instant insert/read와 offset 입력을 대조했다. effective
+  boundary 직전의 Work와 knownAt 직전의 document가 노출되지 않았다.
+- 전체568 columns의 이름·type·width·decimal precision·PK를 대조했다.
+  `schema-compatibility.json`의 명시110 Timestamp widening과259 mandatory
+  NOT NULL strengthening 외의 차이는 없다. literal DDL identity를
+  주장하지 않으며 nullability weakening은 허용하지 않는다.
+
+초기 fixture seed 누락, 테스트 authentication constructor와 schema
+allowlist 생성 오류는 final 실행 전에 수정했다. 재실행 command와
+로그는 evidence에 연결한다. 전체 backend test와 root의 fresh deployment
+재검증은 별도의 통합 gate다. S1 native 일부 PASS가 전체 T01/T20이나
+S2–S6·운영 identity·BTP·실모델 gate PASS를 뜻하지 않는다.

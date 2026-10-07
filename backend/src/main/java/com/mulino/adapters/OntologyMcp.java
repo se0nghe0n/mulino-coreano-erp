@@ -18,10 +18,10 @@ public class OntologyMcp {
   @SuppressWarnings("unchecked")
   public ResponseEntity<Map<String,Object>> rpc(@RequestBody Map<String,Object> body,HttpServletRequest request){
     Object id=body.get("id");
-    if(!"2.0".equals(body.get("jsonrpc"))||id==null||!(body.get("method")instanceof String method)||!(body.get("params")instanceof Map<?,?> params))return rpcError(id,400,-32600,"Invalid request");
+    if(!"2.0".equals(body.get("jsonrpc"))||!(id instanceof String||id instanceof Integer||id instanceof Long)||!(body.get("method")instanceof String method)||!(body.get("params")instanceof Map<?,?> params))return rpcError(id,400,-32600,"Invalid request");
     String accept=request.getHeader("Accept");
     if(accept==null||!accept.contains("application/json")||!accept.contains("text/event-stream"))return rpcError(id,406,-32600,"Required Accept missing");
-    String origin=request.getHeader("Origin");if(origin!=null&&!origin.equals("http://localhost:8080"))return rpcError(id,403,-32020,"Origin denied");
+    String origin=request.getHeader("Origin");if(origin!=null&&!Set.of("http://localhost:"+request.getLocalPort(),"http://127.0.0.1:"+request.getLocalPort()).contains(origin))return rpcError(id,403,-32020,"Origin denied");
     if(!method.equals(request.getHeader("Mcp-Method"))||!VERSION.equals(request.getHeader("MCP-Protocol-Version"))||!(params.get("_meta")instanceof Map<?,?> meta)||!VERSION.equals(meta.get("io.modelcontextprotocol/protocolVersion"))||!(meta.get("io.modelcontextprotocol/clientCapabilities")instanceof Map<?,?>))return rpcError(id,400,-32020,"HeaderMismatch");
     Map<String,Object> result;
     switch(method){
@@ -37,7 +37,14 @@ public class OntologyMcp {
     Map<String,Object> complete=new LinkedHashMap<>(result);complete.put("resultType","complete");
     return ResponseEntity.ok(Map.of("jsonrpc","2.0","id",id,"result",complete));
   }
-  private Map<String,Object> tool(String operation){return Map.of("name",operation,"description","Authorized ontology read", "inputSchema",Map.of("type","object","properties",Map.of("id",Map.of("type","string","format","uuid"),"scope",Map.of("type","object"),"filters",Map.of("type","object"),"asOf",Map.of("type","string","format","date-time"),"knownAt",Map.of("type","string","format","date-time"),"snapshotRef",Map.of("type","string"),"limit",Map.of("type","integer","minimum",1,"maximum",200),"cursor",Map.of("type","string"),"definitionVersion",Map.of("type","string")),"additionalProperties",false));}
+  private Map<String,Object> tool(String operation){
+    Map<String,Object> properties=new LinkedHashMap<>();
+    for(String field:List.of("id","workId","itemId","lotId","customerId"))properties.put(field,Map.of("type","string","format","uuid"));
+    for(String field:List.of("asOf","knownAt"))properties.put(field,Map.of("type","string","format","date-time"));
+    for(String field:List.of("cursor","snapshotRef","definitionVersion","action","type","sort","name","status"))properties.put(field,Map.of("type","string"));
+    properties.put("scope",Map.of("type","object"));properties.put("filters",Map.of("type","object"));properties.put("limit",Map.of("type","integer","minimum",1,"maximum",200));
+    return Map.of("name",operation,"description","Authorized ontology read", "inputSchema",Map.of("type","object","properties",properties,"additionalProperties",false));
+  }
   private Map<String,Object> toolResult(Object value,boolean error){try{return Map.of("isError",error,"structuredContent",value,"content",List.of(Map.of("type","text","text",json.writeValueAsString(value))));}catch(Exception failure){throw new IllegalStateException(failure);}}
   private ResponseEntity<Map<String,Object>> rpcError(Object id,int status,int code,String message){Map<String,Object> body=new LinkedHashMap<>();body.put("jsonrpc","2.0");body.put("id",id);body.put("error",Map.of("code",code,"message",message));return ResponseEntity.status(status).body(body);}
 }

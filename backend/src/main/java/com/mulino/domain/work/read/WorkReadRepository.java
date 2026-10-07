@@ -11,6 +11,11 @@ import org.springframework.stereotype.Repository;
 public class WorkReadRepository {
   private final PersistenceService db;
   public WorkReadRepository(PersistenceService db) { this.db=db; }
+  public boolean documentKnown(DomainContext context,String id) {
+    return db.run(Select.from("mulino.evidence.DocumentVersions")
+        .where(r->r.get("organizationId").eq(context.organizationId()).and(r.get("ID").eq(id))
+            .and(r.get("recordedAt").le(context.knownAt())))).rowCount() > 0;
+  }
   @SuppressWarnings({"unchecked","rawtypes"})
   public List<Map<String,Object>> rows(String entity,DomainContext context) {
     if(!Set.of("Works","GoalReferences","AssessmentReferences","ObligationReferences","SubjectLinks","EvidenceReferences").contains(entity)) throw DomainError.invalid("Unsupported read entity");

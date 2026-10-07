@@ -160,3 +160,21 @@ BEGIN
 END $$;
 CREATE TRIGGER work_read_human_owner BEFORE INSERT ON mulino_work_read_Works FOR EACH ROW EXECUTE FUNCTION mulino_work_read_human_responsibility();
 CREATE TRIGGER obligation_read_human_owner BEFORE INSERT ON mulino_work_read_ObligationReferences FOR EACH ROW EXECUTE FUNCTION mulino_work_read_human_responsibility();
+
+-- Work references cannot be installed before the read Work catalog exists.
+ALTER TABLE mulino_evidence_DocumentVersions ADD FOREIGN KEY(organizationId,workId) REFERENCES mulino_work_read_Works(organizationId,ID);
+ALTER TABLE mulino_evidence_Events ADD FOREIGN KEY(organizationId,workId) REFERENCES mulino_work_read_Works(organizationId,ID);
+ALTER TABLE mulino_evidence_Claims ADD FOREIGN KEY(organizationId,workId) REFERENCES mulino_work_read_Works(organizationId,ID);
+ALTER TABLE mulino_evidence_InboxRecords ADD FOREIGN KEY(organizationId,workId) REFERENCES mulino_work_read_Works(organizationId,ID);
+ALTER TABLE mulino_evidence_CanonicalOccurrences ADD FOREIGN KEY(organizationId,workId) REFERENCES mulino_work_read_Works(organizationId,ID);
+CREATE FUNCTION mulino_work_read_evidence_subject() RETURNS trigger LANGUAGE plpgsql AS $$
+BEGIN
+  IF NEW.subjectKind='WORK' AND NOT EXISTS(SELECT 1 FROM mulino_work_read_Works WHERE organizationId=NEW.organizationId AND ID=NEW.subjectId)
+  THEN RAISE EXCEPTION 'Work subject must belong to evidence organization'; END IF;
+  RETURN NEW;
+END $$;
+CREATE TRIGGER evidence_work_subject BEFORE INSERT ON mulino_evidence_DocumentVersions FOR EACH ROW EXECUTE FUNCTION mulino_work_read_evidence_subject();
+CREATE TRIGGER evidence_work_subject BEFORE INSERT ON mulino_evidence_Events FOR EACH ROW EXECUTE FUNCTION mulino_work_read_evidence_subject();
+CREATE TRIGGER evidence_work_subject BEFORE INSERT ON mulino_evidence_Claims FOR EACH ROW EXECUTE FUNCTION mulino_work_read_evidence_subject();
+CREATE TRIGGER evidence_work_subject BEFORE INSERT ON mulino_evidence_InboxRecords FOR EACH ROW EXECUTE FUNCTION mulino_work_read_evidence_subject();
+CREATE TRIGGER evidence_work_subject BEFORE INSERT ON mulino_evidence_CanonicalOccurrences FOR EACH ROW EXECUTE FUNCTION mulino_work_read_evidence_subject();
