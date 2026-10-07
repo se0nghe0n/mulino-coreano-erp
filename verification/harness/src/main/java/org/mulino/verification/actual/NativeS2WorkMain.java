@@ -36,7 +36,7 @@ public final class NativeS2WorkMain {
             boolean overlap=!Instant.parse(ar.path("capturedAt").asText()).isBefore(Instant.parse(br.path("submittedAt").asText()))&&!Instant.parse(br.path("capturedAt").asText()).isBefore(Instant.parse(ar.path("submittedAt").asText()));
             report.put("requestIntervalsOverlap",overlap).put("concurrencyBarrierControlled",false);
             require(a.data().path("httpStatus").asInt()==200&&b.data().path("httpStatus").asInt()==200,"Concurrent draft requests must return successful HTTP responses");
-            require(a.response().path("outcome").asText().equals("ACCEPTED"),"Draft must be accepted");
+            require(a.response().path("outcome").asText().equals("APPLIED"),"Draft must be applied through the actual command gateway");
             String work=Json.required(a.response().path("effects"),"workId");require(work.equals(b.response().path("effects").path("workId").asText()),"Same stable command key created different works");
             var changed=intent.deepCopy();((ObjectNode)changed.path("slots").path("goal")).put("targetQuantity","101");
             var conflict=driver.invoke("different-payload","api",actor,"createDraft",changed);capture(actions,conflict);available(conflict);require(conflict.data().path("httpStatus").asInt()==409,"Same key with changed payload must conflict");
