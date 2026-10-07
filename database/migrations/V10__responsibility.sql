@@ -97,10 +97,13 @@ CREATE TABLE mulino_responsibility_ResolutionCredits (
  CHECK(startQuantity>=0 AND quantity>0),
  EXCLUDE USING gist (organizationId WITH =,bindingId WITH =,numrange(startQuantity,startQuantity+quantity,'[)') WITH &&)
 );
+-- NO KEY UPDATE serializes credit validation while remaining compatible with the
+-- binding foreign-key KEY SHARE locks held by concurrent credit insertions.
+-- The following SUM is a separate volatile trigger query at READ COMMITTED.
 CREATE FUNCTION mulino_responsibility_credit_validate() RETURNS trigger LANGUAGE plpgsql AS $$
 DECLARE binding mulino_responsibility_CompletionBindings%ROWTYPE; scope mulino_responsibility_Scopes%ROWTYPE; root mulino_responsibility_Roots%ROWTYPE; used numeric;
 BEGIN
- IF TG_TABLE_NAME='mulino_responsibility_completionbindings' THEN binding:=NEW; ELSE SELECT * INTO binding FROM mulino_responsibility_CompletionBindings WHERE organizationId=NEW.organizationId AND ID=NEW.bindingId FOR UPDATE; END IF;
+ IF TG_TABLE_NAME='mulino_responsibility_completionbindings' THEN binding:=NEW; ELSE SELECT * INTO binding FROM mulino_responsibility_CompletionBindings WHERE organizationId=NEW.organizationId AND ID=NEW.bindingId FOR NO KEY UPDATE; END IF;
  SELECT * INTO root FROM mulino_responsibility_Roots WHERE organizationId=binding.organizationId AND ID=binding.rootId;
  IF binding.startQuantity+binding.quantity>COALESCE(root.quantity,1) OR binding.unit IS DISTINCT FROM root.unit THEN RAISE EXCEPTION 'Completion evidence outside duty root'; END IF;
  IF NOT EXISTS(SELECT 1 FROM mulino_evidence_Verifications v JOIN mulino_evidence_CanonicalOccurrences o ON o.organizationId=v.organizationId AND o.ID=v.canonicalOccurrenceId WHERE v.organizationId=binding.organizationId AND v.ID=binding.verificationId AND o.ID=binding.occurrenceId AND v.verdict='VERIFIED' AND v.sourceMatched AND v.identityMatched AND v.quantityMatched AND v.timeMatched AND v.duplicateChecked AND v.basisDocumentId IS NOT NULL AND o.kind='RESPONSE_COMPLETED' AND o.valueState='KNOWN' AND o.reassessmentState='COMPLETE' AND COALESCE(o.quantity,1)=binding.quantity AND o.unit IS NOT DISTINCT FROM binding.unit) THEN RAISE EXCEPTION 'Completion requires verified canonical quantity and action'; END IF;

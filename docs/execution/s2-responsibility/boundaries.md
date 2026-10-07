@@ -49,3 +49,14 @@ startQuantity/quantity가 그 범위 안에 있는지 검사한다. CompletionBi
 UNIQUE assignment, range EXCLUDE, binding row lock과 deferred 수량 검사가
 중복·겹침·경합을 막는다. verified partial 50은 대응하는 50 leaf만 해소한다.
 verified full 100은 서로 겹치지 않는 두 50 leaf를 각각 해소할 수 있다.
+
+전체 backend 검사에서 직접 credit 경합의 유효한 50도 실패했다. SQLSTATE를
+기록한 재현 10회에서 40P01 deadlock을 확인했다. 두 INSERT가 binding FK의
+KEY SHARE를 보유한 채 deferred trigger가 FOR UPDATE로 upgrade하려 했기
+때문이다. binding key는 immutable이므로 FOR NO KEY UPDATE로 잠근다.
+이 lock은 FK 확인과 호환되면서 credit 검사를 직렬화한다. 이후 별도
+volatile trigger SUM query가 READ COMMITTED의 확정 credit을 읽는다.
+수정 뒤 fresh PostgreSQL 27 tests가 통과했다. partial 10회에서 실제 credit50과
+OPEN50을 확인했고, full 10회에서 서로 다른 두 50의 정상 commit과 합계100을
+확인했다. 오류 SQLSTATE는 숨기지 않고 P0001 범위·수량 거부를 명시한다.
+전체 CAP·V15·HTTP 결합 재실행은 coordinator gate에 남는다.

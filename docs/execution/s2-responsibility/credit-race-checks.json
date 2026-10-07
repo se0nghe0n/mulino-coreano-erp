@@ -1,0 +1,34 @@
+{
+  "integrationBaseline": "1e121b9",
+  "reason": "CompletionBindings foreign-key KEY SHARE locks deadlocked with deferred FOR UPDATE lock upgrade in both credit transactions",
+  "before": {
+    "command": "Zulu21 javac -cp <prior Surefire classpath> -d backend/target/test-classes ResponsibilityPostgresTest.java; ./mvnw -q -f backend/pom.xml -Dtest=ResponsibilityPostgresTest#concurrentPartialCompletionCreditNeverDischargesHundred surefire:test",
+    "result": "FAIL",
+    "repetitions": 10,
+    "failures": 10,
+    "observedSqlState": "40P01",
+    "artifact": "credit-race-before.log"
+  },
+  "fix": "FOR NO KEY UPDATE serializes non-key credit validation while permitting foreign-key KEY SHARE holders; separate volatile trigger SUM observes committed credits at READ COMMITTED",
+  "after": {
+    "command": "Zulu21 javac -cp <prior Surefire classpath> -d backend/target/test-classes ResponsibilityPostgresTest.java; ./mvnw -q -f backend/pom.xml -Dtest=ResponsibilityPostgresTest surefire:test",
+    "result": "PASS",
+    "tests": 27,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "partialRaceRepetitions": 10,
+    "fullRaceRepetitions": 10,
+    "partialObserved": "valid 50 commit; invalid 50 P0001; stored credits=1,sum=50; unresolved assignments=1,sum=50",
+    "fullObserved": "both disjoint 50 commit; stored credits=2,sum=100; unresolved assignments=0",
+    "artifacts": [
+      "credit-race-after.log",
+      "postgres-test.txt"
+    ]
+  },
+  "sourceHashes": {
+    "database/migrations/V10__responsibility.sql": "c26e0c6876669b4dbb8160ba57d8f72d0c5f7302844f5123be26d9f8cf44e514",
+    "backend/src/test/java/com/mulino/responsibility/ResponsibilityPostgresTest.java": "3ac14b2802eb16547ccf8a40fc111e38ea9f0a52ffffea1a9b5a723a0a93fbb3"
+  },
+  "limits": "Targeted native PostgreSQL suite uses fresh V1-V7/V9/V10 install and explicit latest Java21 test compilation. Full Maven source lifecycle, V15/provider and signed native HTTP aggregate rerun remain coordinator checks."
+}
