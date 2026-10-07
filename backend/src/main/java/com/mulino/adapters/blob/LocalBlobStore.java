@@ -18,7 +18,15 @@ public class LocalBlobStore {
   private final Path root;
   public LocalBlobStore(@Value("${mulino.evidence.blob-root:${java.io.tmpdir}/mulino-evidence-blobs}") String root) {
     this.root = Path.of(root).toAbsolutePath().normalize();
-    try { Files.createDirectories(this.root.resolve("staging")); Files.createDirectories(this.root.resolve("objects")); }
+    try {
+      var privateDirectory=PosixFilePermissions.asFileAttribute(PosixFilePermissions.fromString("rwx------"));
+      Files.createDirectories(this.root,privateDirectory);
+      Files.createDirectories(this.root.resolve("staging"),privateDirectory);
+      Files.createDirectories(this.root.resolve("objects"),privateDirectory);
+      for(Path directory:List.of(this.root,this.root.resolve("staging"),this.root.resolve("objects"))) {
+        if(Files.isSymbolicLink(directory)||!Files.getPosixFilePermissions(directory).equals(PosixFilePermissions.fromString("rwx------")))throw new IOException("Blob directories must be private");
+      }
+    }
     catch (IOException e) { throw new IllegalStateException("Blob store unavailable",e); }
   }
   public Staged stage(byte[] content, String expectedHash) {
@@ -27,7 +35,9 @@ public class LocalBlobStore {
     if (expectedHash == null || !hash.equals(expectedHash))
       throw new DomainError("REJECTED","EVIDENCE_HASH_MISMATCH","Original content hash differs");
     UUID id = UUID.randomUUID();
-    try { Files.write(path("staging",id),content,StandardOpenOption.CREATE_NEW); }
+    try(var channel=Files.newByteChannel(path("staging",id),Set.of(StandardOpenOption.CREATE_NEW,StandardOpenOption.WRITE),PosixFilePermissions.asFileAttribute(PosixFilePermissions.fromString("rw-------")))) {
+      var buffer=java.nio.ByteBuffer.wrap(content);while(buffer.hasRemaining())channel.write(buffer);
+    }
     catch(IOException e) { throw new IllegalStateException("Upload unavailable",e); }
     return new Staged(id,hash,content.length);
   }
@@ -57,6 +67,7 @@ public class LocalBlobStore {
   }
   /** Reference predicate must inspect all committed DB references. Grace excludes active uploads. */
   public int cleanupOrphans(Instant olderThan,Predicate<UUID> referenced) {
+    if(olderThan.isAfter(Instant.now().minus(Duration.ofHours(1))))throw DomainError.invalid("Orphan cleanup requires at least one-hour grace");
     int removed=0;
     for(String dir:List.of("staging","objects")) {
       try(var files=Files.list(root.resolve(dir))) {

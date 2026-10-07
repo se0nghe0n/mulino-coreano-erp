@@ -36,7 +36,7 @@ public final class EvidenceTypes {
     if(value==null)return null;
     try {
       BigDecimal q=new BigDecimal(value);
-      if(q.signum()<0||q.scale()>12||q.precision()>38||unit==null||unit.isBlank()) throw DomainError.invalid("Invalid quantity and unit");
+      if(q.signum()<0||q.scale()>12||q.precision()-q.scale()>26||q.precision()>38||unit==null||unit.isBlank()) throw DomainError.invalid("Invalid quantity and unit");
       return q;
     }catch(NumberFormatException e) { throw DomainError.invalid("Invalid decimal quantity"); }
   }
@@ -48,7 +48,7 @@ public final class EvidenceTypes {
   }
   public static Map<String,Collection<String>> scopes(Map<String,Object> row) {
     Map<String,Collection<String>> result=new LinkedHashMap<>();
-    result.put("TARGET",List.of(row.get("ID").toString()));
+    result.put("TARGET",row.get("subjectId")==null?List.of(row.get("ID").toString()):List.of(row.get("ID").toString(),row.get("subjectId").toString()));
     for(String dimension:List.of("ITEM","PLACE","WORK")) {
       Object id=row.get(dimension.toLowerCase()+"Id");
       if(id!=null) result.put(dimension,List.of(id.toString()));

@@ -6,6 +6,7 @@ entity SourceProfiles {
   key ID : UUID;
   organizationId : UUID;
   revision : Integer;
+  createdAt : Timestamp;
   recordedAt : Timestamp;
   recordedBy : UUID;
   namespace : String(160);
@@ -20,6 +21,7 @@ entity DocumentVersions {
   key ID : UUID;
   organizationId : UUID;
   revision : Integer;
+  createdAt : Timestamp;
   recordedAt : Timestamp;
   recordedBy : UUID;
   subjectKind : String(20);
@@ -43,6 +45,7 @@ entity Events {
   key ID : UUID;
   organizationId : UUID;
   revision : Integer;
+  createdAt : Timestamp;
   recordedAt : Timestamp;
   recordedBy : UUID;
   subjectKind : String(20);
@@ -67,9 +70,11 @@ entity Events {
 }
 
 entity Claims {
+  sourceProfileId : UUID;
   key ID : UUID;
   organizationId : UUID;
   revision : Integer;
+  createdAt : Timestamp;
   recordedAt : Timestamp;
   recordedBy : UUID;
   subjectKind : String(20);
@@ -94,6 +99,7 @@ entity InboxRecords {
   key ID : UUID;
   organizationId : UUID;
   revision : Integer;
+  createdAt : Timestamp;
   recordedAt : Timestamp;
   recordedBy : UUID;
   subjectKind : String(20);
@@ -116,9 +122,11 @@ entity InboxRecords {
 }
 
 entity CanonicalOccurrences {
+  sourceProfileId : UUID;
   key ID : UUID;
   organizationId : UUID;
   revision : Integer;
+  createdAt : Timestamp;
   recordedAt : Timestamp;
   recordedBy : UUID;
   subjectKind : String(20);
@@ -143,6 +151,7 @@ entity Verifications {
   key ID : UUID;
   organizationId : UUID;
   revision : Integer;
+  createdAt : Timestamp;
   recordedAt : Timestamp;
   recordedBy : UUID;
   claimId : UUID;
@@ -162,6 +171,7 @@ entity EvidenceLinks {
   key ID : UUID;
   organizationId : UUID;
   revision : Integer;
+  createdAt : Timestamp;
   recordedAt : Timestamp;
   recordedBy : UUID;
   documentVersionId : UUID;

@@ -4,6 +4,7 @@ CREATE TABLE mulino_evidence_SourceProfiles (
   ID VARCHAR(36) NOT NULL,
   organizationId VARCHAR(36) NOT NULL,
   revision INTEGER NOT NULL,
+  createdAt TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
   recordedAt TIMESTAMP WITH TIME ZONE NOT NULL,
   recordedBy VARCHAR(36) NOT NULL,
   namespace VARCHAR(160),
@@ -25,6 +26,7 @@ CREATE TABLE mulino_evidence_DocumentVersions (
   ID VARCHAR(36) NOT NULL,
   organizationId VARCHAR(36) NOT NULL,
   revision INTEGER NOT NULL,
+  createdAt TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
   recordedAt TIMESTAMP WITH TIME ZONE NOT NULL,
   recordedBy VARCHAR(36) NOT NULL,
   subjectKind VARCHAR(20),
@@ -61,6 +63,7 @@ CREATE TABLE mulino_evidence_Events (
   ID VARCHAR(36) NOT NULL,
   organizationId VARCHAR(36) NOT NULL,
   revision INTEGER NOT NULL,
+  createdAt TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
   recordedAt TIMESTAMP WITH TIME ZONE NOT NULL,
   recordedBy VARCHAR(36) NOT NULL,
   subjectKind VARCHAR(20),
@@ -102,9 +105,11 @@ ALTER TABLE mulino_evidence_Events ADD CHECK(subjectKind IN ('ITEM','LOT','SEGME
 CREATE INDEX ON mulino_evidence_Events(organizationId,recordedAt,ID);
 
 CREATE TABLE mulino_evidence_Claims (
+  sourceProfileId VARCHAR(36) NOT NULL,
   ID VARCHAR(36) NOT NULL,
   organizationId VARCHAR(36) NOT NULL,
   revision INTEGER NOT NULL,
+  createdAt TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
   recordedAt TIMESTAMP WITH TIME ZONE NOT NULL,
   recordedBy VARCHAR(36) NOT NULL,
   subjectKind VARCHAR(20),
@@ -148,6 +153,7 @@ CREATE TABLE mulino_evidence_InboxRecords (
   ID VARCHAR(36) NOT NULL,
   organizationId VARCHAR(36) NOT NULL,
   revision INTEGER NOT NULL,
+  createdAt TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
   recordedAt TIMESTAMP WITH TIME ZONE NOT NULL,
   recordedBy VARCHAR(36) NOT NULL,
   subjectKind VARCHAR(20),
@@ -185,9 +191,11 @@ ALTER TABLE mulino_evidence_InboxRecords ADD CHECK(subjectKind IN ('ITEM','LOT',
 CREATE INDEX ON mulino_evidence_InboxRecords(organizationId,recordedAt,ID);
 
 CREATE TABLE mulino_evidence_CanonicalOccurrences (
+  sourceProfileId VARCHAR(36) NOT NULL,
   ID VARCHAR(36) NOT NULL,
   organizationId VARCHAR(36) NOT NULL,
   revision INTEGER NOT NULL,
+  createdAt TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
   recordedAt TIMESTAMP WITH TIME ZONE NOT NULL,
   recordedBy VARCHAR(36) NOT NULL,
   subjectKind VARCHAR(20),
@@ -227,6 +235,7 @@ CREATE TABLE mulino_evidence_Verifications (
   ID VARCHAR(36) NOT NULL,
   organizationId VARCHAR(36) NOT NULL,
   revision INTEGER NOT NULL,
+  createdAt TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
   recordedAt TIMESTAMP WITH TIME ZONE NOT NULL,
   recordedBy VARCHAR(36) NOT NULL,
   claimId VARCHAR(36),
@@ -259,6 +268,7 @@ CREATE TABLE mulino_evidence_EvidenceLinks (
   ID VARCHAR(36) NOT NULL,
   organizationId VARCHAR(36) NOT NULL,
   revision INTEGER NOT NULL,
+  createdAt TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
   recordedAt TIMESTAMP WITH TIME ZONE NOT NULL,
   recordedBy VARCHAR(36) NOT NULL,
   documentVersionId VARCHAR(36),
@@ -340,3 +350,47 @@ ALTER TABLE mulino_evidence_Verifications
   ALTER COLUMN claimId SET NOT NULL, ALTER COLUMN policyVersion SET NOT NULL,
   ALTER COLUMN verdict SET NOT NULL, ALTER COLUMN reason SET NOT NULL;
 ALTER TABLE mulino_evidence_Claims ADD CHECK(valueState='KNOWN' OR quantity IS NULL);
+
+ALTER TABLE mulino_evidence_SourceProfiles ADD UNIQUE(organizationId,ID,namespace);
+ALTER TABLE mulino_evidence_DocumentVersions ADD FOREIGN KEY(organizationId,sourceProfileId,sourceNamespace) REFERENCES mulino_evidence_SourceProfiles(organizationId,ID,namespace);
+ALTER TABLE mulino_evidence_Events ADD FOREIGN KEY(organizationId,sourceProfileId,sourceNamespace) REFERENCES mulino_evidence_SourceProfiles(organizationId,ID,namespace);
+ALTER TABLE mulino_evidence_InboxRecords ADD FOREIGN KEY(organizationId,sourceProfileId,sourceNamespace) REFERENCES mulino_evidence_SourceProfiles(organizationId,ID,namespace);
+
+-- Monotone append-only supersession prevents cycles and accidental scope replacement.
+CREATE FUNCTION mulino_evidence_validate_supersession() RETURNS trigger LANGUAGE plpgsql AS $$
+DECLARE prior_org varchar(36); prior_subject varchar(36); prior_kind varchar(20); prior_recorded timestamptz; prior_revision integer;
+BEGIN
+  IF NEW.supersedesId IS NOT NULL THEN
+    EXECUTE format('SELECT organizationId, subjectId, subjectKind, recordedAt, revision FROM %I WHERE ID=$1', TG_TABLE_NAME)
+      INTO prior_org, prior_subject, prior_kind, prior_recorded, prior_revision USING NEW.supersedesId;
+    IF prior_org IS DISTINCT FROM NEW.organizationId OR prior_subject IS DISTINCT FROM NEW.subjectId
+      OR prior_kind IS DISTINCT FROM NEW.subjectKind OR prior_recorded >= NEW.recordedAt
+      OR NEW.revision <> prior_revision+1 THEN
+      RAISE EXCEPTION 'Invalid immutable supersession' USING ERRCODE='23514';
+    END IF;
+  END IF;
+  RETURN NEW;
+END $$;
+CREATE TRIGGER evidence_supersession BEFORE INSERT ON mulino_evidence_DocumentVersions FOR EACH ROW EXECUTE FUNCTION mulino_evidence_validate_supersession();
+CREATE TRIGGER evidence_supersession BEFORE INSERT ON mulino_evidence_Events FOR EACH ROW EXECUTE FUNCTION mulino_evidence_validate_supersession();
+CREATE TRIGGER evidence_supersession BEFORE INSERT ON mulino_evidence_Claims FOR EACH ROW EXECUTE FUNCTION mulino_evidence_validate_supersession();
+CREATE TRIGGER evidence_supersession BEFORE INSERT ON mulino_evidence_CanonicalOccurrences FOR EACH ROW EXECUTE FUNCTION mulino_evidence_validate_supersession();
+
+ALTER TABLE mulino_evidence_Claims ADD FOREIGN KEY(organizationId,sourceProfileId) REFERENCES mulino_evidence_SourceProfiles(organizationId,ID);
+ALTER TABLE mulino_evidence_CanonicalOccurrences ADD FOREIGN KEY(organizationId,sourceProfileId) REFERENCES mulino_evidence_SourceProfiles(organizationId,ID);
+
+CREATE UNIQUE INDEX evidence_canonical_original ON mulino_evidence_CanonicalOccurrences(organizationId,physicalScopeId,kind,effectiveFrom) WHERE supersedesId IS NULL;
+CREATE UNIQUE INDEX evidence_document_correction ON mulino_evidence_DocumentVersions(organizationId,supersedesId) WHERE supersedesId IS NOT NULL;
+CREATE UNIQUE INDEX evidence_event_correction ON mulino_evidence_Events(organizationId,supersedesId) WHERE supersedesId IS NOT NULL;
+CREATE UNIQUE INDEX evidence_claim_correction ON mulino_evidence_Claims(organizationId,supersedesId) WHERE supersedesId IS NOT NULL;
+CREATE UNIQUE INDEX evidence_canonical_correction ON mulino_evidence_CanonicalOccurrences(organizationId,supersedesId) WHERE supersedesId IS NOT NULL;
+
+ALTER TABLE mulino_evidence_DocumentVersions ADD FOREIGN KEY(organizationId,itemId) REFERENCES mulino_inventory_TradeItems(organizationId,ID), ADD FOREIGN KEY(organizationId,placeId) REFERENCES mulino_inventory_Places(organizationId,ID);
+
+ALTER TABLE mulino_evidence_Events ADD FOREIGN KEY(organizationId,itemId) REFERENCES mulino_inventory_TradeItems(organizationId,ID), ADD FOREIGN KEY(organizationId,placeId) REFERENCES mulino_inventory_Places(organizationId,ID);
+
+ALTER TABLE mulino_evidence_Claims ADD FOREIGN KEY(organizationId,itemId) REFERENCES mulino_inventory_TradeItems(organizationId,ID), ADD FOREIGN KEY(organizationId,placeId) REFERENCES mulino_inventory_Places(organizationId,ID);
+
+ALTER TABLE mulino_evidence_InboxRecords ADD FOREIGN KEY(organizationId,itemId) REFERENCES mulino_inventory_TradeItems(organizationId,ID), ADD FOREIGN KEY(organizationId,placeId) REFERENCES mulino_inventory_Places(organizationId,ID);
+
+ALTER TABLE mulino_evidence_CanonicalOccurrences ADD FOREIGN KEY(organizationId,itemId) REFERENCES mulino_inventory_TradeItems(organizationId,ID), ADD FOREIGN KEY(organizationId,placeId) REFERENCES mulino_inventory_Places(organizationId,ID);

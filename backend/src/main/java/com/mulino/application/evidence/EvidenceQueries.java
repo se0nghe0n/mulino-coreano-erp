@@ -18,8 +18,12 @@ public class EvidenceQueries implements QueryHandler {
   public Set<String> operations() { return Set.of("getEvidence","getInbox"); }
   @Transactional(readOnly=true)
   public QueryResult query(DomainContext c,QueryRequest q) {
-    if(!Set.of("kind","subjectKind","subjectId").containsAll(q.scope().keySet()) ||
+    if(!Set.of("organizationId","kind","subjectKind","subjectId").containsAll(q.scope().keySet()) ||
        !Set.of("includeSuperseded","verifiedOnly").containsAll(q.filters().keySet()))throw DomainError.invalid("Unsupported evidence selector");
+    if(q.scope().containsKey("subjectId")!=q.scope().containsKey("subjectKind"))throw DomainError.invalid("Typed subject requires kind and identifier");
+    if(q.scope().get("subjectKind")!=null)try { SubjectKind.valueOf(q.scope().get("subjectKind").toString());uuid(q.scope().get("subjectId").toString()); }catch(IllegalArgumentException e){throw DomainError.invalid("Invalid typed subject");}
+    for(Object filter:q.filters().values())if(!(filter instanceof Boolean))throw DomainError.invalid("Evidence flags must be boolean");
+    if(q.scope().get("organizationId")!=null&&!c.organizationId().equals(q.scope().get("organizationId")))throw DomainError.forbidden();
     String kind=Objects.toString(q.scope().getOrDefault("kind","DOCUMENT"));
     String entity="getInbox".equals(q.operation())?"InboxRecords":switch(kind) {
       case "DOCUMENT" -> "DocumentVersions"; case "EVENT" -> "Events";
@@ -32,6 +36,7 @@ public class EvidenceQueries implements QueryHandler {
     String after=ReadCursor.decode(q.cursor(),c,q);
     List<Map<String,Object>> selected=new ArrayList<>();
     List<String> unknowns=new ArrayList<>(),conflicts=new ArrayList<>(),refs=new ArrayList<>();
+    boolean hasMore=false;
     for(Map<String,Object> row:rows) {
       String id=row.get("ID").toString();
       if(q.id()!=null&&!id.equals(uuid(q.id())))continue;
@@ -39,9 +44,12 @@ public class EvidenceQueries implements QueryHandler {
       if(!visible(row,c)||!matches(row,q.scope()))continue;
       if(!auth.permittedScopes(c,q.operation(),scopes(row)))continue;
       boolean superseded=rows.stream().anyMatch(next->id.equals(next.get("supersedesId"))&&visible(next,c));
-      if(superseded&&!Boolean.TRUE.equals(q.filters().get("includeSuperseded"))&&q.id()==null)continue;
+      boolean invalidated=rows.stream().anyMatch(next->id.equals(next.get("invalidatesId"))&&visible(next,c));
+      if((superseded||invalidated)&&!Boolean.TRUE.equals(q.filters().get("includeSuperseded"))&&q.id()==null)continue;
+      if(verified&&!verifiedAt(c,id))continue;
+      if(selected.size()==q.limit()){hasMore=true;break;}
       var output=new LinkedHashMap<>(row);
-      output.put("superseded",superseded);
+      output.put("superseded",superseded);output.put("invalidated",invalidated);
       if("DocumentVersions".equals(entity)) {
         boolean available="AVAILABLE".equals(row.get("availability"))&&row.get("blobId")!=null&&blobs.available(UUID.fromString(row.get("blobId").toString()),row.get("sha256").toString());
         output.put("availability",available?"AVAILABLE":"UNKNOWN");
@@ -57,19 +65,30 @@ public class EvidenceQueries implements QueryHandler {
         output.put("workReassessment","NOT_IMPLEMENTED");
         if(!isVerified)unknowns.add(id+":CANONICAL_UNVERIFIED");
       }
+      for(var link:r.rows("EvidenceLinks",c.organizationId())) {
+        if(!visible(link,c)||!(id.equals(link.get("eventId"))||id.equals(link.get("claimId"))||id.equals(link.get("canonicalOccurrenceId"))))continue;
+        var doc=r.require("DocumentVersions",c.organizationId(),link.get("documentVersionId").toString());
+        if(visible(doc,c)&&auth.permittedScopes(c,"getEvidence",scopes(doc)))refs.add(doc.get("ID").toString());
+      }
       Object state=row.get("valueState");
       if(state!=null&&Set.of("UNKNOWN","MISSING","NOT_APPLICABLE").contains(state.toString()))unknowns.add(id+":"+state);
       if("CONFLICT".equals(state)||"CONFLICT".equals(row.get("state")))conflicts.add(id+":EVIDENCE_CONFLICT");
       selected.add(output);
-      if(selected.size()>q.limit())break;
     }
     if(q.id()!=null&&selected.isEmpty())throw DomainError.forbidden();
     String next=null;
-    if(selected.size()>q.limit()) { selected.removeLast(); next=ReadCursor.encode(selected.getLast().get("ID").toString(),c,q); }
-    return new QueryResult(q.id()==null?selected:selected.getFirst(),q.scope(),unknowns,conflicts,refs,next);
+    if(hasMore)next=ReadCursor.encode(selected.getLast().get("ID").toString(),c,q);
+    return new QueryResult(q.id()==null?selected:selected.getFirst(),q.scope(),unknowns,conflicts,refs.stream().distinct().toList(),next);
   }
   public boolean verifiedAt(DomainContext c,String canonicalId) {
-    return r.rows("Verifications",c.organizationId()).stream().anyMatch(v->canonicalId.equals(v.get("canonicalOccurrenceId"))&&"VERIFIED".equals(v.get("verdict"))&&visible(v,c));
+    return r.rows("Verifications",c.organizationId()).stream().anyMatch(v->{
+      if(!canonicalId.equals(v.get("canonicalOccurrenceId"))||!"VERIFIED".equals(v.get("verdict"))||!visible(v,c))return false;
+      var claim=r.require("Claims",c.organizationId(),v.get("claimId").toString());
+      var event=r.require("Events",c.organizationId(),claim.get("eventId").toString());
+      if(r.rows("Events",c.organizationId()).stream().anyMatch(x->visible(x,c)&&(event.get("ID").equals(x.get("invalidatesId"))||event.get("ID").equals(x.get("supersedesId")))))return false;
+      long variants=r.rows("InboxRecords",c.organizationId()).stream().filter(x->visible(x,c)&&Objects.equals(event.get("sourceNamespace"),x.get("sourceNamespace"))&&Objects.equals(event.get("externalEventId"),x.get("externalEventId"))&&Objects.equals(event.get("sourceVersion"),x.get("sourceVersion"))).count();
+      return variants==1;
+    });
   }
   @Transactional(readOnly=true)
   public Download download(String id) {

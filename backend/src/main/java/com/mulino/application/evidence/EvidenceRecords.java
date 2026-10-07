@@ -2,6 +2,7 @@ package com.mulino.application.evidence;
 
 import com.mulino.application.core.*;
 import com.mulino.domain.evidence.*;
+import com.mulino.application.identity.IdentityAuthorization;
 import com.mulino.adapters.blob.LocalBlobStore;
 import com.sap.cds.ql.Select;
 import java.math.BigDecimal;
@@ -16,9 +17,9 @@ import static com.mulino.domain.evidence.EvidenceTypes.*;
 @Service
 public class EvidenceRecords {
   private final EvidenceRepository r;
-  private final ReadAuthorizer auth;
+  private final IdentityAuthorization auth;
   private final LocalBlobStore blobs;
-  public EvidenceRecords(EvidenceRepository r,ReadAuthorizer auth,LocalBlobStore blobs) { this.r=r; this.auth=auth; this.blobs=blobs; }
+  public EvidenceRecords(EvidenceRepository r,IdentityAuthorization auth,LocalBlobStore blobs) { this.r=r; this.auth=auth; this.blobs=blobs; }
   public record DocumentInput(Subject subject,String sourceNamespace,String sourceReference,String mediaType,
       String expectedHash,String provenance,String supersedesId) {}
   public record EventInput(Subject subject,String kind,String sourceNamespace,String externalEventId,String sourceVersion,
@@ -69,7 +70,7 @@ public class EvidenceRecords {
       return result(original,"CONFLICT".equals(inbox.get("state"))?"EVIDENCE_CONFLICT":"REPLAYED");
     }
     supersedes(c,"Events",row,input.supersedesId());
-    if(input.invalidatesId()!=null) { r.require("Events",c.organizationId(),uuid(input.invalidatesId())); row.put("invalidatesId",input.invalidatesId()); }
+    if(input.invalidatesId()!=null) { var invalidated=r.require("Events",c.organizationId(),uuid(input.invalidatesId()));sameSubject(row,invalidated);auth.authorizeScopes(c,"correctEvidence",scopes(invalidated));row.put("invalidatesId",input.invalidatesId()); }
     if(!prior.isEmpty())row.put("valueState","CONFLICT");
     r.insert("Events",row);
     var inbox=base(c); copySubject(row,inbox); sourceFields(inbox,profile); inbox.put("eventId",row.get("ID"));
@@ -85,10 +86,12 @@ public class EvidenceRecords {
     auth.authorizeScopes(c,"recordActivity",scopes(event));
     var doc=r.require("DocumentVersions",c.organizationId(),uuid(input.documentId())); auth.authorizeScopes(c,"attachEvidence",scopes(doc));
     sameSubject(event,doc);
-    var row=base(c); copySubject(event,row); copyTime(event,row); row.put("eventId",event.get("ID")); row.put("documentVersionId",doc.get("ID"));
+    var row=base(c); copySubject(event,row); copyTime(event,row);row.put("sourceProfileId",event.get("sourceProfileId")); row.put("eventId",event.get("ID")); row.put("documentVersionId",doc.get("ID"));
     row.put("assertion",text(input.assertion(),100000)); row.put("valueState",input.valueState().name());
     var quantity=quantity(input.quantity(),input.unit(),input.valueState());
-    if(quantity!=null){row.put("quantity",quantity);row.put("unit",text(input.unit(),24));}
+    if(quantity!=null){
+      if(row.get("itemId")!=null){var item=r.subject(c.organizationId(),"ITEM",row.get("itemId").toString());if(!input.unit().equals(item.get("baseUnit"))||quantity.stripTrailingZeros().scale()>((Number)item.get("decimalPlaces")).intValue())throw DomainError.invalid("Claim quantity violates item base unit precision");}
+      row.put("quantity",quantity);row.put("unit",text(input.unit(),24));}
     supersedes(c,"Claims",row,input.supersedesId()); r.insert("Claims",row);
     link(c,doc.get("ID").toString(),null,row.get("ID").toString(),null,"CLAIM_SOURCE"); return result(row,"RECORDED");
   }
@@ -96,6 +99,7 @@ public class EvidenceRecords {
   public Map<String,Object> verifyCanonical(CanonicalInput input) {
     var c=now(); var claim=r.require("Claims",c.organizationId(),uuid(input.claimId())); var event=r.require("Events",c.organizationId(),claim.get("eventId").toString());
     auth.authorizeScopes(c,"linkCanonicalOccurrence",scopes(event));
+    if(r.rows("Events",c.organizationId()).stream().anyMatch(x->event.get("ID").equals(x.get("supersedesId"))||event.get("ID").equals(x.get("invalidatesId")))||r.rows("Claims",c.organizationId()).stream().anyMatch(x->claim.get("ID").equals(x.get("supersedesId"))))throw new DomainError("CONFLICT","EVIDENCE_CONFLICT","Superseded or invalidated evidence cannot become current canonical evidence");
     var basis=r.require("DocumentVersions",c.organizationId(),uuid(input.basisDocumentId())); auth.authorizeScopes(c,"getEvidence",scopes(basis));
     sameSubject(claim,basis);
     if(!input.sourceMatched()||!input.identityMatched()||!input.quantityMatched()||!input.timeMatched()||!input.duplicateChecked()||!"KNOWN".equals(claim.get("valueState"))||!"KNOWN".equals(event.get("valueState")))
@@ -114,7 +118,7 @@ public class EvidenceRecords {
     } else {
       var existing=r.rows("CanonicalOccurrences",c.organizationId()).stream().filter(x->physical.equals(x.get("physicalScopeId"))&&Objects.equals(event.get("kind"),x.get("kind"))&&instant(claim.get("effectiveFrom")).equals(instant(x.get("effectiveFrom")))).toList();
       if(!existing.isEmpty()&&input.supersedesId()==null)throw new DomainError("CONFLICT","EVIDENCE_CONFLICT","Canonical occurrence already exists; explicit reconciliation needed");
-      canonical=base(c); copySubject(claim,canonical);copyTime(claim,canonical);canonical.put("kind",event.get("kind"));canonical.put("physicalScopeId",physical);canonical.put("valueState","KNOWN");canonical.put("reassessmentState","NOT_IMPLEMENTED");
+      canonical=base(c); copySubject(claim,canonical);copyTime(claim,canonical);canonical.put("sourceProfileId",event.get("sourceProfileId"));canonical.put("kind",event.get("kind"));canonical.put("physicalScopeId",physical);canonical.put("valueState","KNOWN");canonical.put("reassessmentState","NOT_IMPLEMENTED");
       if(claim.get("quantity")!=null){canonical.put("quantity",claim.get("quantity"));canonical.put("unit",claim.get("unit"));}
       supersedes(c,"CanonicalOccurrences",canonical,input.supersedesId()); r.insert("CanonicalOccurrences",canonical);
     }
@@ -133,13 +137,18 @@ public class EvidenceRecords {
       return LocalBlobStore.hash(new com.fasterxml.jackson.databind.ObjectMapper().writeValueAsBytes(fields));
     }catch(java.io.IOException e){throw new IllegalStateException(e);}
   }
-  private DomainContext now() { return auth.context(Instant.now(),Instant.now()); }
+  private DomainContext now() { var c=auth.context(Instant.now(),Instant.now()); auth.fence(c,List.of()); return c; }
   private Map<String,Object> base(DomainContext c) {
-    var row=new LinkedHashMap<String,Object>();row.put("ID",UUID.randomUUID().toString());row.put("organizationId",c.organizationId());row.put("revision",1);row.put("recordedAt",Instant.now());row.put("recordedBy",c.actorId());return row;
+    var row=new LinkedHashMap<String,Object>();row.put("ID",UUID.randomUUID().toString());row.put("organizationId",c.organizationId());row.put("revision",1);row.put("createdAt",Instant.now());row.put("recordedAt",Instant.now());row.put("recordedBy",c.actorId());return row;
   }
   private Map<String,Object> source(DomainContext c,String namespace) {
     text(namespace,160);
-    return r.rows("SourceProfiles",c.organizationId()).stream().filter(x->namespace.equals(x.get("namespace"))).findFirst().orElseThrow(()->new DomainError("REJECTED","POLICY_UNRESOLVED","Source profile or intake responsibility unresolved"));
+    var profile=r.rows("SourceProfiles",c.organizationId()).stream().filter(x->namespace.equals(x.get("namespace"))).findFirst().orElseThrow(()->new DomainError("REJECTED","POLICY_UNRESOLVED","Source profile or intake responsibility unresolved"));
+    for(String role:List.of("intakeOwnerId","supervisorId")) {
+      var actor=r.db().run(Select.from("mulino.identity.Actors").where(x->x.get("organizationId").eq(c.organizationId()).and(x.get("ID").eq(profile.get(role))))).first().orElseThrow(DomainError::forbidden);
+      if(!"HUMAN".equals(actor.get("kind")))throw new DomainError("REJECTED","POLICY_UNRESOLVED","Intake responsibility requires humans");
+    }
+    return profile;
   }
   private void sourceFields(Map<String,Object> row,Map<String,Object> profile) { row.put("sourceNamespace",profile.get("namespace"));row.put("sourceProfileId",profile.get("ID")); }
   private void subject(DomainContext c,Map<String,Object> row,Subject input) {
