@@ -1,0 +1,101 @@
+{
+  "task": "UserStep3/S2 common commands",
+  "testedBaseline": "dcbd556",
+  "dependencyBaseline": "4792b95",
+  "command": "./mvnw -q -f backend/pom.xml -Dtest=CommandEnvelopeTest,CommandTransactionTest test",
+  "exitCode": 0,
+  "versions": {
+    "java": "Zulu21",
+    "CAP": "5.1.1",
+    "SpringBoot": "4.1.1",
+    "PostgreSQL": "18.6",
+    "Node": "24.19.0"
+  },
+  "status": "PASS",
+  "tests": [
+    {
+      "suite": "com.mulino.commands.CommandEnvelopeTest",
+      "tests": 3,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "testcases": [
+        "requestKindsAndFinalKeyRemainSeparate",
+        "canonicalizationIgnoresTransportCollectionOrderAndCollectionRequest",
+        "actorRoleClockAndRuntimeClaimCannotBePayloadAuthority"
+      ],
+      "reportSha256": "66538562eafd0e19a5b529ff568e6afb9e45f8b8a600b57505ca04936c258663"
+    },
+    {
+      "suite": "com.mulino.commands.CommandTransactionTest",
+      "tests": 9,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "testcases": [
+        "staleAndApprovalRequiredPersistStableRejectedWithoutEffects",
+        "operationalRetryUsesStoredSameActorOwnerKeyAndNoNewEffect",
+        "currentGrantIsRequiredOnReplayAndCommit",
+        "replayOfConsumingActionUsesSavedScopeInsteadOfConsumedPrerequisites",
+        "claimForDifferentCapabilityOrKeyOrWorkCannotExecuteAnotherAction",
+        "replayAndDifferentPayloadHaveOneRealEffect",
+        "postEffectDenialRollsBackEffectAndPersistsOnlySafeDenial",
+        "auditFailureRollsBackEffectAndIdempotency",
+        "unsupportedPublishedCapabilityAndDefinitionHaveZeroEffects"
+      ],
+      "reportSha256": "5451ec51fb3eaed90f7b2b22cfcf8905b3ad276d4102588a6b6ca80cfd519da5"
+    }
+  ],
+  "compiledCoreClassSha256": {
+    "com/mulino/application/core/ApplicationCommands.class": "673d7a6a851a932fdeaa668ef729b96e851a793d1be6a32017e8e35f52390836",
+    "com/mulino/application/core/ApplicationQueries.class": "9a91b420996f7f42f4c6def48a35daab705f70106edc0adc3968f096c8e2bb36",
+    "com/mulino/application/core/CommandDefinitionResolver.class": "3f3052fcce0beacd76c89208a8b2ff82c614a4729df1906db46e5594872d3b7b",
+    "com/mulino/application/core/CommandExecution.class": "9585060ef8826c4a091506d4aabe3b98cae75cafd8744f3ba5cd343eb398cc72",
+    "com/mulino/application/core/CommandGuard.class": "8ef6147b07cfa58ff6f9bd0a08a40edc9beef6ca890433f273ad25c3c5d5933a",
+    "com/mulino/application/core/CommandHandler.class": "ad2d888c37775760d33b12a110aca343ea7148ee5a0861fc073d67c64bf8f862",
+    "com/mulino/application/core/CommandLeasePort.class": "c2cdd44a2f25eada0f0f52f0292e41a6b4c98e773a9e860c4201cee3e40d755b",
+    "com/mulino/application/core/CommandPreparation.class": "5ef27c3c1d7d1e3a2ea234570a073df3eeed763973a327a82284d0918854f785",
+    "com/mulino/application/core/CommandRepository.class": "d95087cadb873fbd4640ff0dc842a42ef7fcc1fcd6e88ff2e7eb55fe6c61540f",
+    "com/mulino/application/core/CommandRequests.class": "15e9e1d21aa1f3efcec8b92f54c1a2b06e809e56aabb241f98415fbf5e0a0b87",
+    "com/mulino/application/core/CommandSchemas.class": "53184e5d6ab8ede3729779b2dd7a147596885133bc532ff19a2837f334d61947",
+    "com/mulino/application/core/DecimalValue.class": "6dcf7426a16e3dac03847fb874a89dc3b4167b2750d57e169460314e86b2ed79",
+    "com/mulino/application/core/DomainContext.class": "a15af8f6ac5d7a73a91430224968d2e43b99f34404c76459eb12036d21a58a55",
+    "com/mulino/application/core/DomainError.class": "24cea88fc79b68b5aa2a033252047c6299bd9cd404a273b08325f0b0d082f9cd",
+    "com/mulino/application/core/ExecutionClock.class": "904f16faace3c52f4033137f5ebcad9d72d99b070c7d49454a3574e5f3049916",
+    "com/mulino/application/core/QueryHandler.class": "4a2aa0714ec3a0641e58bf0c99cf8ff3661a5545f893acf245026e4b68fc6cc9",
+    "com/mulino/application/core/QueryRequest.class": "87b44154e45ef369fbbfdc3a03b94f6e783c52bfd1e9a53529341c5cb0166e41",
+    "com/mulino/application/core/QueryRequests.class": "aa31c9b0d70072fe9310a31bd8627e35cc44c2fe91aeeb5c23a56e25627ea6b7",
+    "com/mulino/application/core/QueryResult.class": "975b82d007808437247c17a121d533ac4e7bf0a9d5c5fe57f3c0faeba374e75a",
+    "com/mulino/application/core/ReadAuthorizer.class": "6e19b7c394a07b2b3bd07014f637573aa83ec089b64d409caa6a78a467f9f23d",
+    "com/mulino/application/core/ReadCursor.class": "afa5112dc3b9ee6a43471752328bc540aeb3a9198dde189cc24351b3544e475d",
+    "com/mulino/application/core/TransactionalOutboxPort.class": "2b8cbed6f0f596192f226b5df4cc37a58dd8626a1536c89f0109508bc342b06f",
+    "com/mulino/application/core/TransportValues.class": "a5f6e50a24ceef8f39b79c0b56351cf984d59a6db96a3cc6a7b21ad7529fe88f"
+  },
+  "observed": [
+    "actual PostgreSQL Spring/CQN transaction",
+    "actual immutable published definition hash/metadata and registered semantic compatibility",
+    "consumed-state replay uses saved scope and applies once",
+    "current scope authorization on replay; identity evaluator is a test double",
+    "same-key different payload conflict",
+    "stored canonical actor/owner/key retry applies once",
+    "post-effect denial rollback with safe separate denial audit",
+    "actual database audit insert failure rolls back effect/idempotency",
+    "cross-capability/key/WORK claim denial plus valid countercall; lease verifier is a test double"
+  ],
+  "notRun": [
+    "INTAKE canonical claim branch added after focused run",
+    "final schema with subsequent recovery modules",
+    "actual integrated policy/identity/lease/outbox/native command channels",
+    "whole T41/full domain E2E",
+    "paid model/BTP/operational acceptance"
+  ],
+  "schemaCandidate": {
+    "baseline": "c88d527",
+    "columns": 933,
+    "timestampWidening": 178,
+    "notNullStrengthening": 406,
+    "structuralDifferences": 0,
+    "primaryKeyDifferences": false,
+    "finalGate": "NOT_RUN"
+  }
+}
