@@ -64,6 +64,8 @@ public class EvidenceReconciliation {
     if(current&&variants==1&&identity&&original&&sameQuantity&&"KNOWN".equals(claim.get("valueState"))&&"KNOWN".equals(event.get("valueState"))
        &&Objects.equals(input.sourceIdentity(),event.get("sourceNamespace")+":"+event.get("externalEventId")+":"+event.get("sourceVersion"))
        &&input.effectiveFrom().equals(instant(claim.get("effectiveFrom"))))decision="MATCHED";
+    if(input.physicalScopeId()!=null && r.rows("CanonicalOccurrences",c.organizationId()).stream().anyMatch(x->input.physicalScopeId().equals(x.get("physicalScopeId"))&&event.get("kind").equals(x.get("kind"))&&!input.effectiveFrom().equals(instant(x.get("effectiveFrom")))))decision="CONFLICT";
+    if(input.effectiveFrom().isAfter(Instant.now()))decision="UNVERIFIED";
     if(input.existingCanonicalId()!=null) {
       var canonical=r.require("CanonicalOccurrences",c.organizationId(),uuid(input.existingCanonicalId()));auth.authorizeScopes(c,capability,scopes(canonical));
       if(!Objects.equals(input.physicalScopeId(),canonical.get("physicalScopeId"))||!Objects.equals(claim.get("subjectId"),canonical.get("subjectId"))||!Objects.equals(event.get("kind"),canonical.get("kind"))

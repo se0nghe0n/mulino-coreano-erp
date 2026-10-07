@@ -30,10 +30,14 @@ public class EvidenceRecordCommands implements CommandHandler {
     if("attachEvidence".equals(capability))document(s);else event(s);
     return new CommandPreparation(dimensions,List.of("evidence-subject:"+subject.id(),"source:"+profile.get("ID")),Set.of(profile.get("intakeOwnerId").toString(),profile.get("supervisorId").toString()),"RECORD",null,null,0,previous==null?subject.id():previous,revision);
   }
+  private static String content(Map<String,Object> slots) {
+    if(!(slots.get("contentBase64") instanceof String value)||value.length()>24*1024*1024)throw DomainError.invalid("Original content size exceeds upload limit");
+    return value;
+  }
   public Map<String,Object> execute(DomainContext c,Map<String,Object> intent){
     String capability=intent.get("capabilityId").toString();var s=slots(intent,"attachEvidence".equals(capability)?DOCUMENT:EVENT);
     if("attachEvidence".equals(capability)){
-      byte[] content;try{content=Base64.getDecoder().decode(required(s,"contentBase64"));}catch(IllegalArgumentException e){throw DomainError.invalid("Original content must be base64 bytes");}
+      byte[] content;try{content=Base64.getDecoder().decode(content(s));}catch(IllegalArgumentException e){throw DomainError.invalid("Original content must be base64 bytes");}
       return records.attachDocument(document(s),content);
     }
     EvidenceCorrectionImpact impact=null;if("correctEvidence".equals(capability)){impact=impacts.getIfAvailable();if(impact==null)throw new DomainError("HELD","POLICY_UNRESOLVED","Correction impact service unavailable");}
