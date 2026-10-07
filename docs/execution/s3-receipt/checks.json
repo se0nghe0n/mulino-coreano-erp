@@ -1,0 +1,80 @@
+{
+  "task": "Step3/S3 physical receipt",
+  "baseline": "c6c910b81c8a61fbdf309da9144022482408d5dc",
+  "dependencyHead": "0b576315cd604476cae3512d3c6a69ab4b681fe7",
+  "sourceHashes": {
+    "backend/src/test/java/com/mulino/application/evidence/ReceiptGatewayPostgresTest.java": "61de2ea32b01524c23682fef9593c3b6f1ed368a5a7a57658f42b3aabf238d7f",
+    "backend/src/main/java/com/mulino/application/trade/receipt/ReceiptCommands.java": "9c0d0f2bbd4f13d85d1271b2f6b67d36bba4c825e6e8873497f0560eee3eca93",
+    "backend/src/main/java/com/mulino/domain/inventory/ReceiptStockPrimitives.java": "0a2bc6b2b430b57833474eb9e36cd73c37642f51281fbba939056f54000d53a6",
+    "database/migrations/V19__physical_receipt.sql": "784822c31aca1054457afc789d183dbaa382c3aa32989342cdb1575ab9c596e6"
+  },
+  "command": "JAVA_HOME=/Library/Java/JavaVirtualMachines/zulu-21.jdk/Contents/Home PATH=<Node24>:<Java21>:/opt/homebrew/bin:<PATH> JWT_PUBLIC_KEY=<temporary RSA public key path> ./mvnw -f backend/pom.xml -Dtest=ReceiptGatewayPostgresTest test",
+  "postgresImage": "postgres@sha256:4ef4dbc939d61acea57712655ddb4b4ab27419c913f94cca0cd57cb3ea3c2280",
+  "observed": {
+    "tests": 7,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "elapsedSeconds": 15.078,
+    "result": "PASS"
+  },
+  "assertions": [
+    "Actual new60+40 creates activephysical100 and exactly2 receipt movements",
+    "Different source claim same60 links canonical original; duplicate confirmation+replay physicaleffect0",
+    "Unidentified provisional no segments, cannot canonicalize; human residual responsibility persists",
+    "Existing identified transit60 is moved with physical total60; repeated source consumption rejected",
+    "Transit uncertainmixture/controlscope/legalownership preserved; newstock owner/custodian remain unknown",
+    "Gateway commit-failure rollback stock/receipt/duties",
+    "Idempotency changedpayload conflict and revokedcurrentgrant rejects neweffect",
+    "Actual purchasecredit60+40 remains100 with extra5 separatelyphysical+excess duty"
+  ],
+  "limitations": [
+    "PolicyCommandGuard is local permission fixture; actual identity grants, source documents, reconciliation, gateway, CAP persistence and PostgreSQL run",
+    "Current seven cases do not settle provisional/shortfall via new typed remedy helper yet",
+    "Actual goal fact admission and real assessGoal assertions require incoming integration hook",
+    "Concurrent retry/restart/native HTTP/integration suites still pending",
+    "External supplier/agency/BTP and paid model calls NOT_RUN"
+  ],
+  "attempts": [
+    {
+      "attempt": 1,
+      "status": "NOT_RUN",
+      "reason": "purchase dependency compile error"
+    },
+    {
+      "attempt": 2,
+      "status": "NOT_RUN",
+      "reason": "quality dependency testcompile error"
+    },
+    {
+      "attempt": 3,
+      "status": "NOT_RUN",
+      "reason": "JWT_PUBLIC_KEY incorrectly supplied PEM rather than path"
+    },
+    {
+      "attempt": 4,
+      "status": "NOT_RUN",
+      "reason": "unordered fixture setup actor missing"
+    },
+    {
+      "attempt": 5,
+      "status": "FAIL",
+      "reason": "provisional used correction-specific duty hook and rejected receipt"
+    },
+    {
+      "attempt": 6,
+      "status": "NOT_RUN",
+      "reason": "fixture Work default IMPORTED prevented commanded invalidation"
+    },
+    {
+      "attempt": 7,
+      "status": "FAIL",
+      "reason": "3 assertion queries used nonexistent assignment table; 4cases passed"
+    },
+    {
+      "attempt": 8,
+      "status": "PASS",
+      "reason": "7actual cases0fail0error0skip"
+    }
+  ]
+}
