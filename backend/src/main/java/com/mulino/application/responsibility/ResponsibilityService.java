@@ -14,7 +14,7 @@ import org.springframework.stereotype.Service;
 
 /** Invoked only inside the common command or runtime transaction, never commits independently. */
 @Service
-public class ResponsibilityService implements WorkResponsibility, com.mulino.application.runtime.RuntimeDutyPort {
+public class ResponsibilityService implements WorkResponsibility, com.mulino.application.runtime.IntakeDutyPort, com.mulino.application.runtime.RuntimeDutyPort {
  private final ResponsibilityRepository r; private final WorkAccess work;
  private final ExecutionClock clock; private final IdentityRepository identities; private final IdentityAuthorization auth; private final ResponsibilityEvidence evidence;
  public ResponsibilityService(ResponsibilityRepository r,@org.springframework.context.annotation.Lazy WorkAccess work,IdentityRepository identities,IdentityAuthorization auth,ResponsibilityEvidence evidence,ExecutionClock clock){this.r=r;this.work=work;this.identities=identities;this.auth=auth;this.evidence=evidence;this.clock=clock;}

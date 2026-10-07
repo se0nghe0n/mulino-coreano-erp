@@ -38,3 +38,14 @@ raw source revision과 kind를 root key에 사용하고 canonical occurrence나
 실물 효과·목표 충족 근거를 만들지 않는다. 이 hook만 raw source 종류를
 허용한다. 일반 createObligation은 계속 OCCURRENCE·DECISION만 허용한다.
 같은 root가 이미 해소·이전됐으면 접수 재처리가 원 책임을 되돌리지 않는다.
+
+같은 50 완료 증거로 두 50 leaf를 해소하면 실제 50이 책임 100을 지운다.
+이 반례를 막기 위해 evidence owner의 ResponsibilityCompletionEvidence가
+검증된 immutable source·hash·현재 review에 묶인 root/range를 반환한다.
+resolver는 실제 canonical 수량과 typed coverage를 맞추고 authoritative leaf의
+startQuantity/quantity가 그 범위 안에 있는지 검사한다. CompletionBindings는
+한 canonical occurrence를 한 stable root와 범위에 고정한다. ResolutionCredits는
+정확한 assignment/leaf 범위를 같은 transaction에 소비한다. evidence ID lock,
+UNIQUE assignment, range EXCLUDE, binding row lock과 deferred 수량 검사가
+중복·겹침·경합을 막는다. verified partial 50은 대응하는 50 leaf만 해소한다.
+verified full 100은 서로 겹치지 않는 두 50 leaf를 각각 해소할 수 있다.
