@@ -116,3 +116,30 @@ CREATE TRIGGER returns_dispositions_immutable BEFORE UPDATE OR DELETE ON mulino_
 CREATE UNIQUE INDEX returns_one_event ON mulino_trade_returns_Receipts(organizationId,eventId);
 CREATE UNIQUE INDEX returns_one_canonical ON mulino_trade_returns_Receipts(organizationId,canonicalOccurrenceId);
 ALTER TABLE mulino_trade_returns_Receipts ADD CONSTRAINT returns_physical_overlap EXCLUDE USING gist (organizationId WITH =, rangeRootId WITH =, numrange(startQuantity,startQuantity+quantity,'[)') WITH &&);
+ALTER TABLE mulino_trade_returns_Authorizations
+ ALTER workId SET NOT NULL, ALTER deliveryId SET NOT NULL,
+ ALTER customerId SET NOT NULL, ALTER itemId SET NOT NULL, ALTER lotId SET NOT NULL,
+ ALTER rangeRootId SET NOT NULL, ALTER startQuantity SET NOT NULL, ALTER quantity SET NOT NULL,
+ ALTER unit SET NOT NULL, ALTER destinationId SET NOT NULL, ALTER actorId SET NOT NULL,
+ ALTER validUntil SET NOT NULL, ALTER policyHash SET NOT NULL, ALTER commandId SET NOT NULL;
+ALTER TABLE mulino_trade_returns_Observations
+ ALTER authorizationId SET NOT NULL, ALTER eventId SET NOT NULL,
+ ALTER workId SET NOT NULL, ALTER deliveryId SET NOT NULL, ALTER customerId SET NOT NULL,
+ ALTER itemId SET NOT NULL, ALTER lotId SET NOT NULL, ALTER rangeRootId SET NOT NULL,
+ ALTER startQuantity SET NOT NULL, ALTER quantity SET NOT NULL, ALTER unit SET NOT NULL,
+ ALTER placeId SET NOT NULL, ALTER occurredAt SET NOT NULL, ALTER nextCheckAt SET NOT NULL,
+ ALTER state SET NOT NULL, ADD CHECK(state IN ('PROVISIONAL','CONFIRMED'));
+ALTER TABLE mulino_trade_returns_Receipts
+ ALTER observationId SET NOT NULL, ALTER authorizationId SET NOT NULL, ALTER eventId SET NOT NULL,
+ ALTER canonicalOccurrenceId SET NOT NULL, ALTER workId SET NOT NULL, ALTER deliveryId SET NOT NULL,
+ ALTER customerId SET NOT NULL, ALTER itemId SET NOT NULL, ALTER lotId SET NOT NULL,
+ ALTER rangeRootId SET NOT NULL, ALTER startQuantity SET NOT NULL, ALTER quantity SET NOT NULL,
+ ALTER unit SET NOT NULL, ALTER placeId SET NOT NULL, ALTER segmentId SET NOT NULL,
+ ALTER restrictionId SET NOT NULL, ALTER occurredAt SET NOT NULL, ALTER commandId SET NOT NULL,
+ ADD FOREIGN KEY(organizationId,restrictionId) REFERENCES mulino_inventory_Restrictions(organizationId,ID);
+ALTER TABLE mulino_trade_returns_Dispositions
+ ALTER returnId SET NOT NULL, ALTER workId SET NOT NULL, ALTER decision SET NOT NULL,
+ ALTER actorId SET NOT NULL, ALTER evidenceId SET NOT NULL, ALTER policyHash SET NOT NULL,
+ ALTER commandId SET NOT NULL, ADD CHECK(decision IN ('REVIEW','RESALE','EXCHANGE','REFUND','DISPOSE')),
+ ADD FOREIGN KEY(organizationId,returnId) REFERENCES mulino_trade_returns_Receipts(organizationId,ID),
+ ADD FOREIGN KEY(organizationId,evidenceId) REFERENCES mulino_evidence_CanonicalOccurrences(organizationId,ID);
