@@ -1,0 +1,15 @@
+{
+  "schemaVersion": "1.0.0",
+  "step": "USER_STEP_3_S1",
+  "baseline": "164414418b6c3ce2959979939388d59cf2068e2c",
+  "command": "cd backend; ../mvnw -B -ntp -Dtest=IdentityAuthorizationTest,IdentityPersistenceTest test",
+  "environment": {"node": "24.19.0", "java": "21", "cap": "5.1.1", "springBoot": "4.1.1", "postgres": "18.6", "identityFixture": "IN_PROCESS_AUTHENTICATED_JWT_NOT_SIGNATURE_ACCEPTANCE"},
+  "result": "PASS",
+  "tests": 8,
+  "failures": 0,
+  "errors": 0,
+  "skipped": 0,
+  "artifact": "docs/execution/s1-identity/final-checks.log",
+  "assertions": ["external issuer/subject/organization alias resolves UUID actor", "stable owner is server row rather than token claim", "scope dimensions intersect", "historical query does not revive revoked grant", "direct and search authorization reject disjoint scope", "role strings cannot mint identity or business permissions", "actual PG composite org actor FK denies foreign org membership", "actual CQN grant revoke denies read and read-only grant denies assigned write capability"],
+  "notRun": ["signed HTTP identity acceptance", "full C3 matrix", "T08 complete", "V4 complete", "V7 grant revoke race and boundary duties", "R5 operational identity mapping", "control-plane atomic write commands"]
+}
