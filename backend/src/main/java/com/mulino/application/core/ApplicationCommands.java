@@ -22,7 +22,7 @@ public class ApplicationCommands {
   public Set<String> operations(){return Set.copyOf(handlers.keySet());}
   public List<Map<String,Object>> manifest(){return handlers.entrySet().stream().map(e->Map.<String,Object>of("capabilityId",e.getKey(),"semanticVersion",e.getValue().semanticVersion(),"definitionVersions",e.getValue().definitionVersions(),"intentKinds",e.getValue().intentKinds())).toList();}
   public Map<String,Object> validate(Map<String,Object> input){
-    return transaction.execute(status->{Map<String,Object> intent=typed(input,false);DomainContext c=auth.context(clock.instant(),clock.instant());CommandHandler h=handler(intent);definitions.verify(c,intent,h);CommandPreparation prep=h.prepare(c,intent);auth.authorizeScopes(c,(String)intent.get("capabilityId"),prep.scopes());return Map.of("outcome","VALIDATED","canonicalIntentHash",CommandRequests.hash(intent),"proposalRevision",prep.proposalRevision()>0?prep.proposalRevision():1,"capabilityVersion",h.semanticVersion(),"effectClass",prep.effectClass(),"scope",prep.scopes());});
+    return transaction.execute(status->{Map<String,Object> intent=typed(input,false);DomainContext c=auth.context(clock.instant(),clock.instant());CommandHandler h=handler(intent);definitions.verify(c,intent,h);CommandPreparation prep=h.prepare(c,intent);definitions.verifySubjects(c,intent,h,prep);auth.authorizeScopes(c,(String)intent.get("capabilityId"),prep.scopes());return Map.of("outcome","VALIDATED","canonicalIntentHash",CommandRequests.hash(intent),"proposalRevision",prep.proposalRevision()>0?prep.proposalRevision():1,"capabilityVersion",h.semanticVersion(),"effectClass",prep.effectClass(),"scope",prep.scopes());});
   }
   /** Safe operational replay of the stored canonical command; never creates a new revision or key. */
   public Map<String,Object> retryOriginal(String commandRecordId,Map<String,Object> serverClaim){
@@ -66,16 +66,17 @@ public class ApplicationCommands {
       if(old.get().get("resultJson")==null)throw new DomainError("CONFLICT","COMMAND_IN_PROGRESS","Command unavailable");
       return repository.result(old.get());
     }
-    CommandHandler h=handler(intent);definitions.verify(c,intent,h);CommandPreparation initial=h.prepare(c,intent);
+    CommandHandler h=handler(intent);definitions.verify(c,intent,h);CommandPreparation initial=h.prepare(c,intent);List<SubjectBinding> initialSubjects=definitions.verifySubjects(c,intent,h,initial);
     repository.fence(c,initial.fenceKeys());
     CommandGuard current=guard.getIfAvailable();if(current==null)throw new DomainError("REJECTED","POLICY_UNRESOLVED","Current command guard unavailable");current.fence(c,initial);
     CommandPreparation prep=h.prepare(c,intent);if(!initial.authorityActors().equals(prep.authorityActors())||!initial.effectClass().equals(prep.effectClass())||!Objects.equals(initial.approvalAction(),prep.approvalAction())||!initial.scopes().equals(prep.scopes())||!new TreeSet<>(initial.fenceKeys()).equals(new TreeSet<>(prep.fenceKeys())))throw new DomainError("CONFLICT","STALE_REVISION","Command scope changed");
+    List<SubjectBinding> subjects=definitions.verifySubjects(c,intent,h,prep);if(!initialSubjects.equals(subjects))throw new DomainError("CONFLICT","STALE_REVISION","Command subject changed");
     auth.authorizeScopes(c,cap,prep.scopes());
     if(!claim.isEmpty()){verifyClaim(intent,claim,prep.scopes());CommandLeasePort lease=leases.getIfAvailable();if(lease==null)throw DomainError.forbidden();lease.fenceAndVerify(c,claim);}
     if(prep.currentRevision()!=null&&(!intent.containsKey("expectedRevision")||((Number)intent.get("expectedRevision")).intValue()!=prep.currentRevision()))throw new DomainError("CONFLICT","STALE_REVISION","Expected revision changed");
     if(intent.containsKey("proposalRevision")&&((Number)intent.get("proposalRevision")).intValue()!=(prep.proposalRevision()>0?prep.proposalRevision():1))throw new DomainError("CONFLICT","STALE_REVISION","Proposal revision changed");
     current.verify(c,cap,hash,prep,intent);
-    Map<String,Object> facts=new LinkedHashMap<>(current.auditFacts(c,cap,prep,intent));facts.put("scope",prep.scopes());facts.put("effectClass",prep.effectClass());facts.put("definitionVersion",intent.get("definitionVersion"));facts.put("capabilityVersion",intent.get("capabilityVersion"));if(prep.currentRevision()!=null)facts.put("beforeRevision",prep.currentRevision());if(prep.targetId()!=null)facts.put("targetId",prep.targetId());
+    Map<String,Object> facts=new LinkedHashMap<>(current.auditFacts(c,cap,prep,intent));facts.put("subjectBindings",subjects.stream().map(SubjectBinding::facts).toList());facts.put("scope",prep.scopes());facts.put("effectClass",prep.effectClass());facts.put("definitionVersion",intent.get("definitionVersion"));facts.put("capabilityVersion",intent.get("capabilityVersion"));if(prep.currentRevision()!=null)facts.put("beforeRevision",prep.currentRevision());if(prep.targetId()!=null)facts.put("targetId",prep.targetId());
     String id=repository.begin(c,intent,hash,clock.instant(),prep);Map<String,Object> result;String previous=CommandExecution.enter(id);
     try{result=new LinkedHashMap<>(h.execute(c,intent));}finally{CommandExecution.exit(previous);}
     if(!Set.of("APPLIED","ACCEPTED_PENDING_EXTERNAL","PENDING_EXTERNAL","WAITING_APPROVAL","NEEDS_INPUT","REJECTED","CONFLICT","HELD").contains(result.get("outcome")))throw new IllegalStateException("Invalid handler command outcome");
