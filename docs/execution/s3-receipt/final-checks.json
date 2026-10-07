@@ -1,0 +1,62 @@
+{
+  "task": "Step3/S3 receipt final focused verification",
+  "testedSourceCommit": "bff7157d03d88c3f940c2a5039c510728f1e9ede",
+  "dependencyRoot": "d355f09d",
+  "sourceHashes": {
+    "backend/src/test/java/com/mulino/application/evidence/ReceiptGatewayPostgresTest.java": "59997021eb23a0ac4486e93a751ece65f4bd6a43979f840e6cfee073f9d8683c",
+    "backend/src/main/java/com/mulino/application/trade/receipt/ReceiptCommands.java": "a291c833ac770143b7022ceecfda2f09dac61fbb71aadd0a01a20c803ef84a9e",
+    "backend/src/main/java/com/mulino/application/trade/receipt/ReceiptCanonicalFactAdmission.java": "2dd81c4eba1def971836a01a16c98b98ad06e7d5ce3d594c7408b8bff02da973",
+    "backend/src/main/java/com/mulino/domain/inventory/ReceiptStockPrimitives.java": "0a2bc6b2b430b57833474eb9e36cd73c37642f51281fbba939056f54000d53a6",
+    "database/migrations/V19__physical_receipt.sql": "784822c31aca1054457afc789d183dbaa382c3aa32989342cdb1575ab9c596e6",
+    "database/migrations/V22__receipt_residual_remedy.sql": "b57a7f646dab3794bcfb9c9b7575339ec39da3f1d613a9b75c3f7ed9d7ea9b4f"
+  },
+  "command": "JAVA_HOME=/Library/Java/JavaVirtualMachines/zulu-21.jdk/Contents/Home PATH=<Node24>:<Java21>:/opt/homebrew/bin:<PATH> JWT_PUBLIC_KEY=<temporary RSA public key path> ./mvnw -f backend/pom.xml -Dtest=ReceiptGatewayPostgresTest test",
+  "observed": {
+    "tests": 10,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "suiteElapsedSeconds": 12.034,
+    "mavenElapsedSeconds": 16.911,
+    "result": "PASS"
+  },
+  "testCases": [
+    "realPurchaseCredit60plus40AndExtra5DoesNotOverFulfil100",
+    "returnedTransitAncestryCannotContributeAgainToOriginalPurchaseOrder",
+    "transitPreservesUncertainMixtureAndInheritedControlRestriction",
+    "auditFailureRollsBackReceiptStockContributionAndDuty",
+    "actual60plus40CrossSourceDuplicateAndReplayProduceOnePhysicalEffectPerRange",
+    "canonicalObservationCannotCompleteArrivalUntilPhysicalReceiptsCommit",
+    "transitMovesExistingPhysicalQuantityAndRejectsSecondConsumption",
+    "changedIdempotencyPayloadAndRevokedGrantDoNotCreateMoreStock",
+    "receipt60then20then20ConservesOneShortfallRootAndSettlesExactObservedRanges",
+    "unidentifiedProvisionalHasNoPhysicalStockAndCannotCanonicalize"
+  ],
+  "attempts": [
+    {
+      "attempt": 9,
+      "result": "FAIL",
+      "tests": 10,
+      "failures": 0,
+      "errors": 1,
+      "reason": "Residual evidence assertion used nonexistent receipt namespace after behavioral40\u219220\u21920 assertions passed;9othercasesPASS",
+      "log": "attempts/tests-9.log.gz"
+    },
+    {
+      "attempt": 10,
+      "result": "PASS",
+      "tests": 10,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "log": "attempts/tests-10.log.gz",
+      "xml": "attempts/tests-10-report.xml.gz"
+    }
+  ],
+  "limitations": [
+    "PolicyCommandGuard is local permission fixture; actual identity grants, original blobs, source policy, reconciliation, common gateway, CAP and PostgreSQL run.",
+    "Existing commercial order and pre-existing return genealogy are fixtures; receipt and goal transitions themselves execute gateway.",
+    "Native HTTP combined integration/restart acceptance remains coordinator-owned.",
+    "External supplier/agency/BTP and paid model calls NOT_RUN."
+  ]
+}
