@@ -52,7 +52,7 @@ public final class NativeS3TradeMain {
             }
             case "observe" -> {
                 var request=Json.object();request.put("profile","S3").put("asOf",a.path("asOf").asText("2026-10-07T09:00:02Z")).put("knownAt",a.path("knownAt").asText("2026-10-07T09:00:02Z"));var scope=Json.object();scope.set("organizationId",bindings.path("ORG"));request.set("scope",scope);request.set("sources",Json.parse("[\"s3\"]"));
-                var result=driver.observe(id,request);capture(result);available(result);assertions(id,result.data(),a.path("assertions"));
+                var result=driver.observe(id,request);capture(result);available(result);new ContractValidator(root).result(result,"observe");assertions(id,result.data(),a.path("assertions"));
                 for(var it=a.path("bind").fields();it.hasNext();){var e=it.next();JsonNode value=result.data().at(e.getValue().asText());require(!value.isMissingNode(),id+" missing SQL binding "+e.getValue());bindings.set(e.getKey(),value);}
             }
             default -> throw new IllegalArgumentException("Unsupported authored S3 action "+type);

@@ -1,0 +1,153 @@
+{
+  "scope": "Bounded S3 actual acceptance; full normative cases not claimed",
+  "actions": [
+    {
+      "id": "create-work",
+      "type": "command",
+      "capability": "createWork",
+      "request": {
+        "intentKind": "COMMAND",
+        "definitionVersion": "definition-v1",
+        "capabilityId": "createWork",
+        "expectedRevision": 0,
+        "commandIdempotencyKey": "create-work",
+        "slots": {
+          "workType": "PURCHASE",
+          "quantityMode": "CUMULATIVE_EVENT",
+          "endpoint": "ARRIVED",
+          "dueAt": "2026-10-31T00:00:00Z",
+          "evidencePolicyVersion": "fixture-v1",
+          "ownerId": "$reader",
+          "supervisorId": "$supervisor",
+          "quantity": {
+            "value": "100",
+            "unit": "BOX"
+          },
+          "period": {
+            "start": "2026-10-01T00:00:00Z",
+            "end": "2026-10-31T00:00:00Z",
+            "startInclusive": true,
+            "endInclusive": true
+          },
+          "eventKinds": [
+            "RECEIPT"
+          ],
+          "distinctContributionScope": {
+            "itemId": "$P"
+          }
+        },
+        "provenance": {},
+        "subjectRefs": [
+          {
+            "type": "TradeItem",
+            "id": "$P"
+          }
+        ]
+      },
+      "bind": {
+        "WORK": "/effects/workId",
+        "WORK_REV": "/revision"
+      }
+    },
+    {
+      "id": "proposal100",
+      "type": "command",
+      "capability": "proposePurchase",
+      "request": {
+        "intentKind": "COMMAND",
+        "definitionVersion": "definition-v1",
+        "capabilityId": "proposePurchase",
+        "expectedRevision": "$WORK_REV",
+        "commandIdempotencyKey": "proposal100",
+        "slots": {
+          "workId": "$WORK",
+          "quantity": {
+            "value": "100",
+            "unit": "BOX"
+          },
+          "price": {
+            "value": "200",
+            "currency": "EUR"
+          },
+          "supplierId": "$SUP",
+          "destinationId": "$W",
+          "dueAt": "2026-10-31T00:00:00Z",
+          "endpoint": "ARRIVED",
+          "quantityMode": "CUMULATIVE_EVENT"
+        },
+        "provenance": {},
+        "subjectRefs": [
+          {
+            "type": "Work",
+            "id": "$WORK"
+          }
+        ]
+      },
+      "bind": {
+        "PROPOSAL": "/effects/proposalId",
+        "PROPOSAL_HASH": "/effects/proposalHash",
+        "PROPOSAL_REV": "/effects/proposalRevision"
+      }
+    },
+    {
+      "id": "approve100",
+      "type": "command",
+      "capability": "approvePurchase",
+      "request": {
+        "intentKind": "COMMAND",
+        "definitionVersion": "definition-v1",
+        "capabilityId": "approvePurchase",
+        "expectedRevision": "$PROPOSAL_REV",
+        "commandIdempotencyKey": "approve100",
+        "slots": {
+          "proposalId": "$PROPOSAL",
+          "proposalHash": "$PROPOSAL_HASH",
+          "decision": "APPROVE",
+          "validUntil": "2026-10-31T00:00:00Z",
+          "conditions": {}
+        },
+        "provenance": {},
+        "subjectRefs": [
+          {
+            "type": "PurchaseProposal",
+            "id": "$PROPOSAL"
+          }
+        ]
+      },
+      "bind": {
+        "APPROVAL": "/effects/approvalId"
+      },
+      "actor": "supervisor"
+    },
+    {
+      "id": "dispatch100",
+      "type": "command",
+      "capability": "dispatchPurchaseOrder",
+      "request": {
+        "intentKind": "COMMAND",
+        "definitionVersion": "definition-v1",
+        "capabilityId": "dispatchPurchaseOrder",
+        "expectedRevision": "$PROPOSAL_REV",
+        "commandIdempotencyKey": "dispatch100",
+        "slots": {
+          "proposalId": "$PROPOSAL",
+          "proposalHash": "$PROPOSAL_HASH",
+          "approvalId": "$APPROVAL",
+          "channel": "SYNTHETIC",
+          "externalOperationId": "s3-native-purchase100"
+        },
+        "provenance": {},
+        "subjectRefs": [
+          {
+            "type": "PurchaseProposal",
+            "id": "$PROPOSAL"
+          }
+        ]
+      },
+      "bind": {
+        "ORDER": "/effects/orderId",
+        "LINE": "/effects/poLineId"
+      }
+    }
+  ]
+}
