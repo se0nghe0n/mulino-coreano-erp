@@ -1,0 +1,29 @@
+{
+  "schemaBaselineDependency": "80abae76",
+  "ownSourceCommit": "3d9d8e12",
+  "scope": "S3 common glue only; domain aggregate acceptance remains Task coordinator responsibility",
+  "passedChecks": {
+    "gatewayApplyCurrentAuthorityReplayRollbackExpiry": 3,
+    "nounVerbCustomerSnapshot": 1,
+    "canonicalStrictSourceScopeSnapshot": 2,
+    "typedOccurrenceIdentitySemantics": 2,
+    "cdsFlywayV22Parity": 1
+  },
+  "schema": {
+    "columns": 1432,
+    "timestampWidening": 276,
+    "notNullStrengthening": 584,
+    "structuralDifferences": [],
+    "primaryKeyDifferences": false
+  },
+  "commands": {
+    "gateway": "./mvnw -f backend/pom.xml -Dtest=S3SharedIntegrationTest#gatewayDutyAndAssessmentPendingCommitOnceAndCurrentGrantReplayIsDenied+domainFailureRollsBackDutyPendingAndTransitionsTogether+distinctExpiryBoundariesHaveSeparateStableDuties test",
+    "parityAndSource": "Selected S1 parity, S3Shared4, S3Canonical2 and S3Typed2; 6 passed,3 missing-authority fixture errors subsequently fixed and rerun"
+  },
+  "logSha256": {
+    "parityAndSource": "5a3783348db60fb71491ceeaa525aaa9c9a0272d791771e57eb8175f7b85ef54",
+    "gateway": "85d59bac5d64b5a16cc1e46013b6de2f4b96bd572b627847c0702b6f96ddf1f6"
+  },
+  "paidModelExecution": false,
+  "btpExecution": false
+}
