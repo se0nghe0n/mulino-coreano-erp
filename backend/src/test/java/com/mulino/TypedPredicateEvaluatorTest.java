@@ -37,4 +37,14 @@ class TypedPredicateEvaluatorTest {
    assertEquals(PredicateTruth.State.UNVERIFIED,evaluator.evaluate(sum(),facts(fact("a","a","100",t,null,true)),t,t.minusSeconds(1)).truth().state());
  }
 
+ @Test void intervalEndpointsUseExplicitGoalInclusivity(){
+   var n=Map.<String,Object>of("operator","exists","property","Receipt.quantity");
+   var endOnly=facts(fact("end","end","1",t.plusSeconds(10),t.plusSeconds(10).plusNanos(1),true));
+   assertEquals(PredicateTruth.State.UNVERIFIED,evaluator.evaluateInterval(n,endOnly,t,t.plusSeconds(10),t,false,true,false).truth().state());
+   assertEquals(PredicateTruth.State.SATISFIED,evaluator.evaluateInterval(n,endOnly,t,t.plusSeconds(10),t,false,true,true).truth().state());
+   var startOnly=facts(fact("start","start","1",t,t.plusNanos(1),true));
+   assertEquals(PredicateTruth.State.UNVERIFIED,evaluator.evaluateInterval(n,startOnly,t,t.plusSeconds(10),t,false,false,false).truth().state());
+   assertEquals(PredicateTruth.State.SATISFIED,evaluator.evaluateInterval(n,startOnly,t,t.plusSeconds(10),t,false,true,false).truth().state());
+ }
+
 }

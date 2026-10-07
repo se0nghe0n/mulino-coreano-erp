@@ -72,4 +72,17 @@ class AssessmentPostgresTest {
  @Test void unknownAndUnsupportedPinnedEvaluatorRemainHeld()throws Exception{
   assertEquals("UNVERIFIED",((Map<?,?>)assess(t).get("assessment")).get("outcome"));var slots=slots();slots.put("evaluatorVersion","future-v9");String newGoal=id();var g=scoped(newGoal);g.putAll(row("effectiveAt",Timestamp.from(t),"workId",work,"definitionVersionId",definition,"quantityMode","CUMULATIVE_EVENT","targetQuantity",new BigDecimal("100"),"unit","BOX","endpoint","ARRIVED","scopeJson","{}","slotsJson",json.writeValueAsString(slots),"previousGoalId",goal,"goalVersion",2));insert("mulino_work_read_GoalReferences",g);jdbc.update("UPDATE mulino_work_read_Works SET currentGoalVersionId=? WHERE organizationId=? AND ID=?",newGoal,org,work);assertEquals("HELD",assess(t).get("outcome"));assertEquals(true,jdbc.queryForObject("SELECT pendingInvalidation FROM mulino_work_read_Works WHERE ID=?",Boolean.class,work));
  }
+ void revisePeriod(boolean startInclusive,boolean endInclusive)throws Exception{
+  var slots=slots();slots.put("periodStart",t.minusSeconds(10).toString());slots.put("periodEnd",t.toString());slots.put("periodStartInclusive",startInclusive);slots.put("periodEndInclusive",endInclusive);
+  String next=id();var g=scoped(next);g.putAll(row("effectiveAt",Timestamp.from(t),"workId",work,"definitionVersionId",definition,"quantityMode","CUMULATIVE_EVENT","targetQuantity",new BigDecimal("100"),"unit","BOX","endpoint","ARRIVED","scopeJson","{}","slotsJson",json.writeValueAsString(slots),"previousGoalId",goal,"goalVersion",2));insert("mulino_work_read_GoalReferences",g);jdbc.update("UPDATE mulino_work_read_Works SET currentGoalVersionId=? WHERE organizationId=? AND ID=?",next,org,work);goal=next;
+ }
+ @Test void immutableGoalPeriodEndpointsControlActualCanonicalContribution()throws Exception{
+  occurrence(id(),"60",t.minusSeconds(10),"start60");occurrence(id(),"40",t,"end40");
+  revisePeriod(true,false);var startOnly=(Map<?,?>)assess(t).get("assessment");assertEquals("UNSATISFIED",startOnly.get("outcome"));
+  assertEquals(new BigDecimal("60.000000000000"),jdbc.queryForObject("SELECT SUM(quantity) FROM mulino_evidence_CanonicalOccurrences WHERE organizationId=? AND effectiveFrom>=? AND effectiveFrom<?",BigDecimal.class,org,Timestamp.from(t.minusSeconds(10)),Timestamp.from(t)));
+  revisePeriod(false,true);var endOnly=(Map<?,?>)assess(t).get("assessment");assertEquals("UNSATISFIED",endOnly.get("outcome"));
+  revisePeriod(true,true);var both=(Map<?,?>)assess(t).get("assessment");assertEquals("SATISFIED",both.get("outcome"));assertEquals(endOnly.get("ID"),both.get("previousAssessmentId"));
+  assertEquals("UNSATISFIED",jdbc.queryForObject("SELECT outcome FROM mulino_work_read_AssessmentReferences WHERE ID=?",String.class,startOnly.get("ID")));
+ }
+
 }

@@ -60,7 +60,7 @@ public class AssessmentService implements CommandHandler,WorkAssessmentGuard {
     var facts=provider.load(c,w,slots,d,goal.get("ID").toString());Map<String,Object> predicate=goalPredicate(d,slots);
     TypedPredicateEvaluator.Result result;
     String mode=slots.get("quantityMode").toString();
-    if(mode.equals("EXISTS_IN")||mode.equals("THROUGHOUT"))result=evaluator.evaluateInterval(predicate,facts,instant(slots.get("periodStart")),instant(slots.get("periodEnd")),c.knownAt(),mode.equals("THROUGHOUT"));
+    if(mode.equals("EXISTS_IN")||mode.equals("THROUGHOUT"))result=evaluator.evaluateInterval(predicate,facts,instant(slots.get("periodStart")),instant(slots.get("periodEnd")),c.knownAt(),mode.equals("THROUGHOUT"),!Boolean.FALSE.equals(slots.get("periodStartInclusive")),!Boolean.FALSE.equals(slots.get("periodEndInclusive")));
     else result=evaluator.evaluate(predicate,facts,mode.equals("STATE_AT")?instant(slots.get("evaluationAt")):c.asOf(),c.knownAt());
     var snapshot=new LinkedHashMap<String,Object>();snapshot.put("goalId",goal.get("ID"));snapshot.put("goal",goal);snapshot.put("definitionId",d.id());snapshot.put("definitionHash",d.contentHash());snapshot.put("goalSlots",slots);snapshot.put("policy",policy.getFirst());snapshot.put("facts",facts);snapshot.put("conditions",result.conditions());String payload=encode(snapshot);
     return new Calculation(result,DefinitionRepository.sha256(payload),payload,policy.getFirst().get("ID").toString(),false);

@@ -37,8 +37,8 @@ public class AssessmentFactProvider {
         if(placeScope!=null&&!Objects.equals(placeScope,occurrence.get("placeId")))continue;
         if(occurrences.stream().anyMatch(x->occurrence.get("ID").equals(x.get("supersedesId"))))continue;
         Instant effective=instant(occurrence.get("effectiveFrom"));
-        if(slots.get("periodStart")!=null&&effective.isBefore(instant(slots.get("periodStart"))))continue;
-        if(slots.get("periodEnd")!=null&&effective.isAfter(instant(slots.get("periodEnd"))))continue;
+        if(slots.get("periodStart")!=null){Instant start=instant(slots.get("periodStart"));if(effective.isBefore(start)||effective.equals(start)&&Boolean.FALSE.equals(slots.get("periodStartInclusive")))continue;}
+        if(slots.get("periodEnd")!=null){Instant end=instant(slots.get("periodEnd"));if(effective.isAfter(end)||effective.equals(end)&&Boolean.FALSE.equals(slots.get("periodEndInclusive")))continue;}
         if(effective.isAfter(c.asOf()))continue;
         var verification=verifications.stream().filter(v->Objects.equals(occurrence.get("ID"),v.get("canonicalOccurrenceId"))&&Objects.equals(slots.get("evidencePolicyVersion"),v.get("policyVersion"))&&"VERIFIED".equals(v.get("verdict"))&&List.of("sourceMatched","identityMatched","quantityMatched","timeMatched","duplicateChecked").stream().allMatch(k->Boolean.TRUE.equals(v.get(k)))).findFirst();
         boolean verified=verification.isPresent();boolean sourceConflict=false;var refs=new ArrayList<String>();

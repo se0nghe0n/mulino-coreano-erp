@@ -66,9 +66,16 @@ public final class TypedPredicateEvaluator {
     out.add(new Condition(id,result,List.copyOf(inputs),inputs.stream().flatMap(f->f.evidenceRefs().stream()).distinct().sorted().toList(),VERSION));return result;
   }
   public Result evaluateInterval(Map<String,Object> node,EvaluationFacts facts,Instant start,Instant end,Instant known,boolean throughout) {
+    return evaluateInterval(node,facts,start,end,known,throughout,true,false);
+  }
+  public Result evaluateInterval(Map<String,Object> node,EvaluationFacts facts,Instant start,Instant end,Instant known,boolean throughout,boolean startInclusive,boolean endInclusive) {
     if(!start.isBefore(end))throw new IllegalArgumentException("Invalid interval");
+    if(!startInclusive)start=start.plusNanos(1);
+    if(endInclusive)end=end.plusNanos(1);
+    if(!start.isBefore(end))throw new IllegalArgumentException("Empty interval");
+    final Instant intervalStart=start,intervalEnd=end;
     var boundaries=new TreeSet<Instant>();boundaries.add(start);boundaries.add(end);
-    facts.properties().values().stream().flatMap(Collection::stream).filter(f->!f.recordedAt().isAfter(known)).forEach(f->{if(f.effectiveFrom()!=null&&f.effectiveFrom().isAfter(start)&&f.effectiveFrom().isBefore(end))boundaries.add(f.effectiveFrom());if(f.effectiveUntil()!=null&&f.effectiveUntil().isAfter(start)&&f.effectiveUntil().isBefore(end))boundaries.add(f.effectiveUntil());});
+    facts.properties().values().stream().flatMap(Collection::stream).filter(f->!f.recordedAt().isAfter(known)).forEach(f->{if(f.effectiveFrom()!=null&&f.effectiveFrom().isAfter(intervalStart)&&f.effectiveFrom().isBefore(intervalEnd))boundaries.add(f.effectiveFrom());if(f.effectiveUntil()!=null&&f.effectiveUntil().isAfter(intervalStart)&&f.effectiveUntil().isBefore(intervalEnd))boundaries.add(f.effectiveUntil());});
     var answers=new ArrayList<PredicateTruth>();var conditions=new ArrayList<Condition>();
     for(Instant at:boundaries.headSet(end)) {
       var p=new HashMap<String,List<Fact>>();facts.properties().forEach((key,values)->p.put(key,values.stream().filter(f->covers(f,at)).toList()));
