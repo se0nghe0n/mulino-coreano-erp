@@ -68,6 +68,6 @@ public class EvidenceRecordCommands implements CommandHandler {
       else if(original.isPresent()&&r.db().run(com.sap.cds.ql.Select.from("mulino.work.read.Works").where(x->x.get("organizationId").eq(c.organizationId()))).rowCount()>0)throw new DomainError("HELD","POLICY_UNRESOLVED","Evidence conflict impact service unavailable");
     }
     if(impact!=null){var workIds=new LinkedHashSet<String>();var subject=subject(s);if(subject.kind()==SubjectKind.WORK)workIds.add(subject.id());var old=r.require(switch(type){case "DOCUMENT"->"DocumentVersions";case "CLAIM"->"Claims";default->"Events";},c.organizationId(),required(s,"supersedesId"));if(old.get("workId")!=null)workIds.add(old.get("workId").toString());impact.apply(c,new EvidenceCorrectionImpact.Correction(required(s,"supersedesId"),output.get("id").toString(),workIds,Set.of()));output.put("workReassessment","PENDING");}
-    return output;
+    return EvidenceCommandOutcomes.applied(output);
   }
 }

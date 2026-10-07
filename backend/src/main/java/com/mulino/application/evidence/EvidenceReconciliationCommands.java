@@ -21,8 +21,8 @@ public class EvidenceReconciliationCommands implements CommandHandler {
   }
   public Map<String,Object> execute(DomainContext c,Map<String,Object> intent){
     String capability=intent.get("capabilityId").toString();var s=slots(intent,"linkCanonicalOccurrence".equals(capability)?Set.of("reconciliationId"):REVIEW);
-    if("linkCanonicalOccurrence".equals(capability))return service.link(c,required(s,"reconciliationId"));
+    if("linkCanonicalOccurrence".equals(capability))return EvidenceCommandOutcomes.applied(service.link(c,required(s,"reconciliationId")));
     // Conflict resolution records the authorized investigation result. It never selects a source by priority.
-    return service.match(c,review(s),capability);
+    return EvidenceCommandOutcomes.applied(service.match(c,review(s),capability));
   }
 }
