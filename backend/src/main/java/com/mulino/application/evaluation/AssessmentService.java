@@ -21,6 +21,12 @@ public class AssessmentService implements CommandHandler,WorkAssessmentGuard {
   public AssessmentService(WorkAccess work,AssessmentRepository repository,DefinitionRepository definitions,DefinitionValidator validator,AssessmentFactProvider provider,PolicyRepository policies,ExecutionClock clock){this.clock=clock;this.work=work;this.repository=repository;this.definitions=definitions;this.validator=validator;this.provider=provider;this.policies=policies;}
   public Set<String> capabilities(){return Set.of("assessGoal");}
   public CommandPreparation prepare(DomainContext c,Map<String,Object> intent){String id=id(parameters(intent).get("workId"));var w=work.require(c,id,false);return CommandPreparation.ordinary(Map.of("WORK",List.of(id),"ITEM",List.of(w.get("itemId").toString())),List.of("work:"+id),"ASSESSMENT",id,((Number)w.get("revision")).intValue());}
+  public List<SubjectBinding> subjectBindings(DomainContext c,Map<String,Object> intent,CommandPreparation preparation){
+    var slots=parameters(intent);if(!Set.of("workId").equals(slots.keySet()))throw DomainError.invalid("Only workId selects a current pinned goal");
+    String workId=id(slots.get("workId"));if(!Objects.equals(workId,preparation.targetId()))throw DomainError.invalid("Assessment target changed");
+    var target=work.require(c,workId,false);var goal=work.currentGoal(c,workId);
+    return List.of(SubjectBinding.optional("Work",Set.of(target.get("ID").toString())),SubjectBinding.optional("Goal",Set.of(goal.get("ID").toString())));
+  }
   @Transactional
   public Map<String,Object> execute(DomainContext c,Map<String,Object> intent){var p=parameters(intent);if(!Set.of("workId").equals(p.keySet()))throw DomainError.invalid("Only workId selects a current pinned goal");return assess(c,id(p.get("workId")));}
   @Transactional

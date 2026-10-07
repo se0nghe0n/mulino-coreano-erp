@@ -85,4 +85,14 @@ class AssessmentPostgresTest {
   assertEquals("UNSATISFIED",jdbc.queryForObject("SELECT outcome FROM mulino_work_read_AssessmentReferences WHERE ID=?",String.class,startOnly.get("ID")));
  }
 
+ @Test void declaredSubjectsBindOnlyActualWorkAndCurrentImmutableGoal()throws Exception{
+  var intent=Map.<String,Object>of("slots",Map.of("workId",work));
+  runtime.requestContext().run(request->{var c=new DomainContext(org,actor,actor,t,t.plusSeconds(1000));var preparation=service.prepare(c,intent);var bindings=service.subjectBindings(c,intent,preparation);
+    assertEquals(List.of("Work","Goal"),bindings.stream().map(SubjectBinding::nounType).toList());assertEquals(Set.of(work),bindings.get(0).targetIds());assertEquals(Set.of(goal),bindings.get(1).targetIds());assertTrue(bindings.stream().allMatch(b->b.minimumCount()==0&&b.maximumCount()==1));
+    assertThrows(DomainError.class,()->service.subjectBindings(c,intent,CommandPreparation.ordinary(preparation.scopes(),preparation.fenceKeys(),"ASSESSMENT",id(),0)));
+    return null;});
+  String previous=goal;revisePeriod(true,false);
+  runtime.requestContext().run(request->{var c=new DomainContext(org,actor,actor,t,t.plusSeconds(1000));var bindings=service.subjectBindings(c,intent,service.prepare(c,intent));assertEquals(Set.of(goal),bindings.get(1).targetIds());assertFalse(bindings.get(1).targetIds().contains(previous));return null;});
+ }
+
 }
