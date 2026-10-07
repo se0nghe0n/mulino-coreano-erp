@@ -75,3 +75,7 @@ writer는 직접 원장을 쓰지 않고 inventory가 제공하는 dispatch/관�
 반환한다. 전체 통합·관련 지적 수정·결합 checks 전 S4를 닫지 않는다.
 사용자 Step3 전체의 Sol xhigh/Astra low review는 S6 구현까지 통합한
 뒤 수행한다.
+
+초기 통합에서 확인한 물량 좌표·이동 합계·판매 revision·증거 결합·회수
+보류 문제와 검증 조건은 [통합 검토 기록](s4-integration-notes.md)에 남긴다.
+Source 수정과 runtime 검증 상태를 구별한다.
