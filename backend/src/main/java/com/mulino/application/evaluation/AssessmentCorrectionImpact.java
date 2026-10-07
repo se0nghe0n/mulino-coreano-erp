@@ -32,6 +32,12 @@ public class AssessmentCorrectionImpact implements EvidenceCorrectionImpact {
   }
  }
  public void evidenceLinked(DomainContext c,String claimId,String canonicalId){for(String id:affected(c,claimId,canonicalId,Set.of()))service.invalidate(c,id);}
+ private record Raw(String kind,Map<String,Object> row){}
+ private Raw rawEvidence(DomainContext c,String id){
+  for(var type:Map.of("EVENT","Events","CLAIM","Claims","DOCUMENT","DocumentVersions").entrySet())for(var row:repository.rows(c,"mulino.evidence."+type.getValue()))if(id.equals(row.get("ID")))return new Raw(type.getKey(),row);
+  throw new DomainError("HELD","SOURCE_UNVERIFIED","Typed correction source missing");
+ }
+ private Map<String,Object> profile(DomainContext c,Object id){return repository.rows(c,"mulino.evidence.SourceProfiles").stream().filter(p->Objects.equals(p.get("ID"),id)&&p.get("nextAction")!=null&&p.get("nextCheckAt")!=null).findFirst().orElseThrow(()->new DomainError("HELD","FOLLOWUP_UNAVAILABLE","Source follow-up policy missing"));}
  private Set<String> affected(DomainContext c,String previous,String current,Set<String> direct){
   var ids=new TreeSet<>(direct);
   for(var snapshot:repository.rows(c,"mulino.evaluation.InputSnapshots"))try{if(contains(json.readValue(snapshot.get("contentJson").toString(),Object.class),previous))ids.add(snapshot.get("workId").toString());}catch(java.io.IOException e){throw DomainError.invalid("Invalid historical input snapshot");}
