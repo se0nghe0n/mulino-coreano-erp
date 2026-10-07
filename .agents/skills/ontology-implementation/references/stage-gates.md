@@ -13,8 +13,8 @@
 | 2 | 테스트 구현: GPT-6.1 Sol high |
 | 3 | 애플리케이션 구현: GPT-6.1 Sol medium |
 | 4 | E2E 검증·교정: GPT-6.1 Sol low |
-| 5 | 재사용 패턴/추상화 검토: GPT-6 Astra high |
-| 6 | 수동 검증: GPT-6 Astra low |
+| 5 | 재사용 패턴/추상화 검토와 구현 refactoring: GPT-6 Astra high |
+| 6 | 검증된 실제 동작으로 운영 매뉴얼 작성: GPT-6 Astra low |
 | 7 | 지정 순서를 반복해 남은 실패/공백 해소 |
 
 각 사용자 단계의 통합 산출물은 다음 단계 전에 실제 GPT-6.1 Sol xhigh와
