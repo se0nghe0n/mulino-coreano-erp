@@ -1,0 +1,2070 @@
+{
+  "schemaVersion": "1.0.0",
+  "fixtureId": "C3-fixture-proposePurchase",
+  "synthetic": true,
+  "baseRefs": [],
+  "clock": {
+    "asOf": "2026-10-07T09:00:00Z",
+    "knownAt": "2026-10-07T09:00:00Z",
+    "timezone": "Asia/Seoul",
+    "precision": "SECOND",
+    "deadlineInclusive": true
+  },
+  "versions": {
+    "definition": "definition-v1",
+    "evaluator": "arrival-v1",
+    "policy": "synthetic-authority-v1"
+  },
+  "actors": {
+    "reader": {
+      "issuer": "https://fixture.invalid/issuer",
+      "subject": "fixture-reader",
+      "audience": "mulino-acceptance",
+      "organizationAlias": "ORG-A",
+      "roleCapabilities": [
+        "getObject",
+        "searchObjects",
+        "getWork",
+        "searchWorks",
+        "getInventory",
+        "getObligations",
+        "traceLot",
+        "getEvidence",
+        "getAssessment",
+        "getDefinition",
+        "splitQuantity",
+        "mergeQuantity",
+        "moveQuantity",
+        "adjustQuantity",
+        "reserveQuantity",
+        "replaceAllocation",
+        "pickQuantity",
+        "dispatchQuantity",
+        "confirmReceipt",
+        "disposeQuantity",
+        "createDraft",
+        "cancelDraft",
+        "activateWork",
+        "waitWork",
+        "resumeWork",
+        "reviseGoal",
+        "closeWork",
+        "createFollowup",
+        "resolveObligation",
+        "waiveObligation",
+        "transferObligation",
+        "registerItem",
+        "linkExternalId",
+        "attachEvidence",
+        "correctEvidence",
+        "proposePurchase",
+        "revisePurchase",
+        "approvePurchase",
+        "dispatchPurchaseOrder",
+        "recordSupplierReply",
+        "cancelPurchase",
+        "createShipment",
+        "recordLegEvent",
+        "recordHandover",
+        "prepareRegulatoryProcedure",
+        "recordSubmission",
+        "recordRegulatoryDecision",
+        "verifyLabel",
+        "receiveProvisional",
+        "placeHold",
+        "releaseHold",
+        "recordDispositionBasis",
+        "revokeDispositionBasis",
+        "recordStocktake",
+        "createSalesOrder",
+        "reviseSalesOrder",
+        "releaseAllocation",
+        "recordDelivery",
+        "recordObservedMovement",
+        "authorizeReturn",
+        "receiveReturn",
+        "decideReturnDisposition",
+        "openInvestigation",
+        "proposeRecall",
+        "approveRecall",
+        "recordRecallNotice",
+        "recordRecovery",
+        "closeRecall",
+        "recordInvoice",
+        "recordCharge",
+        "matchInvoice",
+        "recordSettlementAdjustment",
+        "recordPaymentReference",
+        "createGrant",
+        "revokeGrant",
+        "getGrant",
+        "getAccessContext",
+        "assignCapability",
+        "revokeCapability",
+        "proposeHandover",
+        "acceptHandover",
+        "rejectHandover",
+        "emergencyReassign",
+        "createPolicyDraft",
+        "approvePolicy",
+        "activatePolicy",
+        "retirePolicy",
+        "getPolicy",
+        "matchSourceIdentity",
+        "linkCanonicalOccurrence",
+        "resolveEvidenceConflict",
+        "getInbox",
+        "getReconciliation",
+        "recordExternalReconciliation",
+        "searchOperationalIssues",
+        "createDefinitionDraft",
+        "validateDefinition",
+        "submitDefinitionReview",
+        "approveDefinition",
+        "publishDefinition",
+        "activateDefinition",
+        "retireDefinition",
+        "migrateWorkDefinition",
+        "evaluateEligibility",
+        "createWork",
+        "recordActivity",
+        "retrySafeCommand",
+        "recordRelation",
+        "convertUnit",
+        "createWorkLink",
+        "getCommandResult",
+        "structureIntent",
+        "emergencyRepair"
+      ],
+      "grant": {
+        "delegatorAlias": "delegator",
+        "actions": [
+          "getObject",
+          "searchObjects",
+          "getWork",
+          "searchWorks",
+          "getInventory",
+          "getObligations",
+          "traceLot",
+          "getEvidence",
+          "getAssessment",
+          "getDefinition",
+          "getGrant",
+          "getAccessContext",
+          "getPolicy",
+          "getInbox",
+          "getReconciliation",
+          "searchOperationalIssues",
+          "evaluateEligibility",
+          "convertUnit",
+          "getCommandResult",
+          "structureIntent"
+        ],
+        "scope": {
+          "organizationAlias": "ORG-A",
+          "itemAliases": [
+            "P"
+          ],
+          "workAliases": [
+            "WORK"
+          ],
+          "placeAliases": [
+            "W",
+            "W2",
+            "CUSTOMER-PLACE"
+          ]
+        },
+        "validFrom": "2026-10-07T00:00:00Z",
+        "validUntil": "2026-10-08T00:00:00Z",
+        "revision": 1
+      }
+    },
+    "delegator": {
+      "issuer": "https://fixture.invalid/issuer",
+      "subject": "fixture-delegator",
+      "audience": "mulino-acceptance",
+      "organizationAlias": "ORG-A",
+      "roleCapabilities": [
+        "getObject",
+        "searchObjects",
+        "getWork",
+        "searchWorks",
+        "getInventory",
+        "getObligations",
+        "traceLot",
+        "getEvidence",
+        "getAssessment",
+        "getDefinition",
+        "splitQuantity",
+        "mergeQuantity",
+        "moveQuantity",
+        "adjustQuantity",
+        "reserveQuantity",
+        "replaceAllocation",
+        "pickQuantity",
+        "dispatchQuantity",
+        "confirmReceipt",
+        "disposeQuantity",
+        "createDraft",
+        "cancelDraft",
+        "activateWork",
+        "waitWork",
+        "resumeWork",
+        "reviseGoal",
+        "closeWork",
+        "createFollowup",
+        "resolveObligation",
+        "waiveObligation",
+        "transferObligation",
+        "registerItem",
+        "linkExternalId",
+        "attachEvidence",
+        "correctEvidence",
+        "proposePurchase",
+        "revisePurchase",
+        "approvePurchase",
+        "dispatchPurchaseOrder",
+        "recordSupplierReply",
+        "cancelPurchase",
+        "createShipment",
+        "recordLegEvent",
+        "recordHandover",
+        "prepareRegulatoryProcedure",
+        "recordSubmission",
+        "recordRegulatoryDecision",
+        "verifyLabel",
+        "receiveProvisional",
+        "placeHold",
+        "releaseHold",
+        "recordDispositionBasis",
+        "revokeDispositionBasis",
+        "recordStocktake",
+        "createSalesOrder",
+        "reviseSalesOrder",
+        "releaseAllocation",
+        "recordDelivery",
+        "recordObservedMovement",
+        "authorizeReturn",
+        "receiveReturn",
+        "decideReturnDisposition",
+        "openInvestigation",
+        "proposeRecall",
+        "approveRecall",
+        "recordRecallNotice",
+        "recordRecovery",
+        "closeRecall",
+        "recordInvoice",
+        "recordCharge",
+        "matchInvoice",
+        "recordSettlementAdjustment",
+        "recordPaymentReference",
+        "createGrant",
+        "revokeGrant",
+        "getGrant",
+        "getAccessContext",
+        "assignCapability",
+        "revokeCapability",
+        "proposeHandover",
+        "acceptHandover",
+        "rejectHandover",
+        "emergencyReassign",
+        "createPolicyDraft",
+        "approvePolicy",
+        "activatePolicy",
+        "retirePolicy",
+        "getPolicy",
+        "matchSourceIdentity",
+        "linkCanonicalOccurrence",
+        "resolveEvidenceConflict",
+        "getInbox",
+        "getReconciliation",
+        "recordExternalReconciliation",
+        "searchOperationalIssues",
+        "createDefinitionDraft",
+        "validateDefinition",
+        "submitDefinitionReview",
+        "approveDefinition",
+        "publishDefinition",
+        "activateDefinition",
+        "retireDefinition",
+        "migrateWorkDefinition",
+        "evaluateEligibility",
+        "createWork",
+        "recordActivity",
+        "retrySafeCommand",
+        "recordRelation",
+        "convertUnit",
+        "createWorkLink",
+        "getCommandResult",
+        "structureIntent",
+        "emergencyRepair"
+      ],
+      "grant": {
+        "delegatorAlias": "delegator",
+        "actions": [
+          "getObject",
+          "searchObjects",
+          "getWork",
+          "searchWorks",
+          "getInventory",
+          "getObligations",
+          "traceLot",
+          "getEvidence",
+          "getAssessment",
+          "getDefinition",
+          "splitQuantity",
+          "mergeQuantity",
+          "moveQuantity",
+          "adjustQuantity",
+          "reserveQuantity",
+          "replaceAllocation",
+          "pickQuantity",
+          "dispatchQuantity",
+          "confirmReceipt",
+          "disposeQuantity",
+          "createDraft",
+          "cancelDraft",
+          "activateWork",
+          "waitWork",
+          "resumeWork",
+          "reviseGoal",
+          "closeWork",
+          "createFollowup",
+          "resolveObligation",
+          "waiveObligation",
+          "transferObligation",
+          "registerItem",
+          "linkExternalId",
+          "attachEvidence",
+          "correctEvidence",
+          "proposePurchase",
+          "revisePurchase",
+          "approvePurchase",
+          "dispatchPurchaseOrder",
+          "recordSupplierReply",
+          "cancelPurchase",
+          "createShipment",
+          "recordLegEvent",
+          "recordHandover",
+          "prepareRegulatoryProcedure",
+          "recordSubmission",
+          "recordRegulatoryDecision",
+          "verifyLabel",
+          "receiveProvisional",
+          "placeHold",
+          "releaseHold",
+          "recordDispositionBasis",
+          "revokeDispositionBasis",
+          "recordStocktake",
+          "createSalesOrder",
+          "reviseSalesOrder",
+          "releaseAllocation",
+          "recordDelivery",
+          "recordObservedMovement",
+          "authorizeReturn",
+          "receiveReturn",
+          "decideReturnDisposition",
+          "openInvestigation",
+          "proposeRecall",
+          "approveRecall",
+          "recordRecallNotice",
+          "recordRecovery",
+          "closeRecall",
+          "recordInvoice",
+          "recordCharge",
+          "matchInvoice",
+          "recordSettlementAdjustment",
+          "recordPaymentReference",
+          "createGrant",
+          "revokeGrant",
+          "getGrant",
+          "getAccessContext",
+          "assignCapability",
+          "revokeCapability",
+          "proposeHandover",
+          "acceptHandover",
+          "rejectHandover",
+          "emergencyReassign",
+          "createPolicyDraft",
+          "approvePolicy",
+          "activatePolicy",
+          "retirePolicy",
+          "getPolicy",
+          "matchSourceIdentity",
+          "linkCanonicalOccurrence",
+          "resolveEvidenceConflict",
+          "getInbox",
+          "getReconciliation",
+          "recordExternalReconciliation",
+          "searchOperationalIssues",
+          "createDefinitionDraft",
+          "validateDefinition",
+          "submitDefinitionReview",
+          "approveDefinition",
+          "publishDefinition",
+          "activateDefinition",
+          "retireDefinition",
+          "migrateWorkDefinition",
+          "evaluateEligibility",
+          "createWork",
+          "recordActivity",
+          "retrySafeCommand",
+          "recordRelation",
+          "convertUnit",
+          "createWorkLink",
+          "getCommandResult",
+          "structureIntent",
+          "emergencyRepair"
+        ],
+        "scope": {
+          "organizationAlias": "ORG-A",
+          "itemAliases": [
+            "P"
+          ],
+          "workAliases": [
+            "WORK"
+          ],
+          "placeAliases": [
+            "W",
+            "W2",
+            "CUSTOMER-PLACE"
+          ]
+        },
+        "validFrom": "2026-10-07T00:00:00Z",
+        "validUntil": "2026-10-08T00:00:00Z",
+        "revision": 1
+      }
+    },
+    "warehouse": {
+      "issuer": "https://fixture.invalid/issuer",
+      "subject": "fixture-warehouse",
+      "audience": "mulino-acceptance",
+      "organizationAlias": "ORG-A",
+      "roleCapabilities": [
+        "getInventory",
+        "getObject",
+        "getWork",
+        "getObligations",
+        "getAccessContext",
+        "getGrant",
+        "confirmReceipt",
+        "reserveQuantity",
+        "dispatchQuantity",
+        "moveQuantity",
+        "recordStocktake",
+        "recordObservedMovement",
+        "retrySafeCommand",
+        "getCommandResult"
+      ],
+      "grant": {
+        "delegatorAlias": "delegator",
+        "actions": [
+          "getInventory",
+          "getObject",
+          "getWork",
+          "getObligations",
+          "getAccessContext",
+          "getGrant",
+          "confirmReceipt",
+          "reserveQuantity",
+          "dispatchQuantity",
+          "moveQuantity",
+          "recordStocktake",
+          "recordObservedMovement",
+          "retrySafeCommand",
+          "getCommandResult"
+        ],
+        "scope": {
+          "organizationAlias": "ORG-A",
+          "itemAliases": [
+            "P"
+          ],
+          "workAliases": [
+            "WORK"
+          ],
+          "placeAliases": [
+            "W",
+            "W2",
+            "CUSTOMER-PLACE"
+          ]
+        },
+        "validFrom": "2026-10-07T00:00:00Z",
+        "validUntil": "2026-10-08T00:00:00Z",
+        "revision": 1
+      }
+    },
+    "recordOnly": {
+      "issuer": "https://fixture.invalid/issuer",
+      "subject": "fixture-recordOnly",
+      "audience": "mulino-acceptance",
+      "organizationAlias": "ORG-A",
+      "roleCapabilities": [
+        "getObject",
+        "searchObjects",
+        "getWork",
+        "searchWorks",
+        "getInventory",
+        "getObligations",
+        "traceLot",
+        "getEvidence",
+        "getAssessment",
+        "getDefinition",
+        "splitQuantity",
+        "mergeQuantity",
+        "moveQuantity",
+        "adjustQuantity",
+        "reserveQuantity",
+        "replaceAllocation",
+        "pickQuantity",
+        "dispatchQuantity",
+        "confirmReceipt",
+        "disposeQuantity",
+        "createDraft",
+        "cancelDraft",
+        "activateWork",
+        "waitWork",
+        "resumeWork",
+        "reviseGoal",
+        "closeWork",
+        "createFollowup",
+        "resolveObligation",
+        "waiveObligation",
+        "transferObligation",
+        "registerItem",
+        "linkExternalId",
+        "attachEvidence",
+        "correctEvidence",
+        "proposePurchase",
+        "revisePurchase",
+        "approvePurchase",
+        "dispatchPurchaseOrder",
+        "recordSupplierReply",
+        "cancelPurchase",
+        "createShipment",
+        "recordLegEvent",
+        "recordHandover",
+        "prepareRegulatoryProcedure",
+        "recordSubmission",
+        "recordRegulatoryDecision",
+        "verifyLabel",
+        "receiveProvisional",
+        "placeHold",
+        "releaseHold",
+        "recordDispositionBasis",
+        "revokeDispositionBasis",
+        "recordStocktake",
+        "createSalesOrder",
+        "reviseSalesOrder",
+        "releaseAllocation",
+        "recordDelivery",
+        "recordObservedMovement",
+        "authorizeReturn",
+        "receiveReturn",
+        "decideReturnDisposition",
+        "openInvestigation",
+        "proposeRecall",
+        "approveRecall",
+        "recordRecallNotice",
+        "recordRecovery",
+        "closeRecall",
+        "recordInvoice",
+        "recordCharge",
+        "matchInvoice",
+        "recordSettlementAdjustment",
+        "recordPaymentReference",
+        "createGrant",
+        "revokeGrant",
+        "getGrant",
+        "getAccessContext",
+        "assignCapability",
+        "revokeCapability",
+        "proposeHandover",
+        "acceptHandover",
+        "rejectHandover",
+        "emergencyReassign",
+        "createPolicyDraft",
+        "approvePolicy",
+        "activatePolicy",
+        "retirePolicy",
+        "getPolicy",
+        "matchSourceIdentity",
+        "linkCanonicalOccurrence",
+        "resolveEvidenceConflict",
+        "getInbox",
+        "getReconciliation",
+        "recordExternalReconciliation",
+        "searchOperationalIssues",
+        "createDefinitionDraft",
+        "validateDefinition",
+        "submitDefinitionReview",
+        "approveDefinition",
+        "publishDefinition",
+        "activateDefinition",
+        "retireDefinition",
+        "migrateWorkDefinition",
+        "evaluateEligibility",
+        "createWork",
+        "recordActivity",
+        "retrySafeCommand",
+        "recordRelation",
+        "convertUnit",
+        "createWorkLink",
+        "getCommandResult",
+        "structureIntent",
+        "emergencyRepair"
+      ],
+      "grant": {
+        "delegatorAlias": "delegator",
+        "actions": [
+          "attachEvidence",
+          "correctEvidence",
+          "recordSupplierReply",
+          "recordLegEvent",
+          "recordHandover",
+          "recordSubmission",
+          "recordRegulatoryDecision",
+          "recordDispositionBasis",
+          "recordStocktake",
+          "recordDelivery",
+          "recordObservedMovement",
+          "recordRecallNotice",
+          "recordRecovery",
+          "recordInvoice",
+          "recordCharge",
+          "recordSettlementAdjustment",
+          "recordPaymentReference",
+          "recordExternalReconciliation",
+          "recordActivity",
+          "getObject",
+          "searchObjects",
+          "getWork",
+          "searchWorks",
+          "getInventory",
+          "getObligations",
+          "traceLot",
+          "getEvidence",
+          "getAssessment",
+          "getDefinition",
+          "getGrant",
+          "getAccessContext",
+          "getPolicy",
+          "getInbox",
+          "getReconciliation",
+          "searchOperationalIssues",
+          "evaluateEligibility",
+          "convertUnit",
+          "getCommandResult",
+          "structureIntent"
+        ],
+        "scope": {
+          "organizationAlias": "ORG-A",
+          "itemAliases": [
+            "P"
+          ],
+          "workAliases": [
+            "WORK"
+          ],
+          "placeAliases": [
+            "W",
+            "W2",
+            "CUSTOMER-PLACE"
+          ]
+        },
+        "validFrom": "2026-10-07T00:00:00Z",
+        "validUntil": "2026-10-08T00:00:00Z",
+        "revision": 1
+      }
+    },
+    "manager": {
+      "issuer": "https://fixture.invalid/issuer",
+      "subject": "fixture-manager",
+      "audience": "mulino-acceptance",
+      "organizationAlias": "ORG-A",
+      "roleCapabilities": [
+        "approvePurchase",
+        "getObject",
+        "getWork",
+        "getInventory"
+      ],
+      "grant": {
+        "delegatorAlias": "delegator",
+        "actions": [
+          "approvePurchase",
+          "getObject",
+          "getWork",
+          "getInventory"
+        ],
+        "scope": {
+          "organizationAlias": "ORG-A",
+          "itemAliases": [
+            "P"
+          ],
+          "workAliases": [
+            "WORK"
+          ],
+          "placeAliases": [
+            "W",
+            "W2",
+            "CUSTOMER-PLACE"
+          ]
+        },
+        "validFrom": "2026-10-07T00:00:00Z",
+        "validUntil": "2026-10-08T00:00:00Z",
+        "revision": 1
+      }
+    },
+    "qc": {
+      "issuer": "https://fixture.invalid/issuer",
+      "subject": "fixture-qc",
+      "audience": "mulino-acceptance",
+      "organizationAlias": "ORG-A",
+      "roleCapabilities": [
+        "placeHold",
+        "releaseHold",
+        "getInventory"
+      ],
+      "grant": {
+        "delegatorAlias": "delegator",
+        "actions": [
+          "placeHold",
+          "releaseHold",
+          "getInventory"
+        ],
+        "scope": {
+          "organizationAlias": "ORG-A",
+          "itemAliases": [
+            "P"
+          ],
+          "workAliases": [
+            "WORK"
+          ],
+          "placeAliases": [
+            "W",
+            "W2",
+            "CUSTOMER-PLACE"
+          ]
+        },
+        "validFrom": "2026-10-07T00:00:00Z",
+        "validUntil": "2026-10-08T00:00:00Z",
+        "revision": 1
+      }
+    },
+    "admin": {
+      "issuer": "https://fixture.invalid/issuer",
+      "subject": "fixture-admin",
+      "audience": "mulino-acceptance",
+      "organizationAlias": "ORG-A",
+      "roleCapabilities": [
+        "approveRecall",
+        "closeRecall",
+        "emergencyReassign",
+        "getInventory"
+      ],
+      "grant": {
+        "delegatorAlias": "delegator",
+        "actions": [
+          "approveRecall",
+          "closeRecall",
+          "emergencyReassign",
+          "getInventory"
+        ],
+        "scope": {
+          "organizationAlias": "ORG-A",
+          "itemAliases": [
+            "P"
+          ],
+          "workAliases": [
+            "WORK"
+          ],
+          "placeAliases": [
+            "W",
+            "W2",
+            "CUSTOMER-PLACE"
+          ]
+        },
+        "validFrom": "2026-10-07T00:00:00Z",
+        "validUntil": "2026-10-08T00:00:00Z",
+        "revision": 1
+      }
+    },
+    "fde": {
+      "issuer": "https://fixture.invalid/issuer",
+      "subject": "fixture-fde",
+      "audience": "mulino-acceptance",
+      "organizationAlias": "ORG-A",
+      "roleCapabilities": [
+        "createDefinitionDraft",
+        "getDefinition",
+        "getInventory"
+      ],
+      "grant": {
+        "delegatorAlias": "delegator",
+        "actions": [
+          "createDefinitionDraft",
+          "getDefinition",
+          "getInventory"
+        ],
+        "scope": {
+          "organizationAlias": "ORG-A",
+          "itemAliases": [
+            "P"
+          ],
+          "workAliases": [
+            "WORK"
+          ],
+          "placeAliases": [
+            "W",
+            "W2",
+            "CUSTOMER-PLACE"
+          ]
+        },
+        "validFrom": "2026-10-07T00:00:00Z",
+        "validUntil": "2026-10-08T00:00:00Z",
+        "revision": 1
+      }
+    },
+    "identityAdmin": {
+      "issuer": "https://fixture.invalid/issuer",
+      "subject": "fixture-identityAdmin",
+      "audience": "mulino-acceptance",
+      "organizationAlias": "ORG-A",
+      "roleCapabilities": [
+        "assignCapability",
+        "revokeCapability",
+        "createGrant",
+        "revokeGrant",
+        "getAccessContext",
+        "getInventory"
+      ],
+      "grant": {
+        "delegatorAlias": "delegator",
+        "actions": [
+          "assignCapability",
+          "revokeCapability",
+          "createGrant",
+          "revokeGrant",
+          "getAccessContext",
+          "getInventory"
+        ],
+        "scope": {
+          "organizationAlias": "ORG-A",
+          "itemAliases": [
+            "P"
+          ],
+          "workAliases": [
+            "WORK"
+          ],
+          "placeAliases": [
+            "W",
+            "W2",
+            "CUSTOMER-PLACE"
+          ]
+        },
+        "validFrom": "2026-10-07T00:00:00Z",
+        "validUntil": "2026-10-08T00:00:00Z",
+        "revision": 1
+      }
+    },
+    "supervisor": {
+      "issuer": "https://fixture.invalid/issuer",
+      "subject": "fixture-supervisor",
+      "audience": "mulino-acceptance",
+      "organizationAlias": "ORG-A",
+      "roleCapabilities": [
+        "getObject",
+        "searchObjects",
+        "getWork",
+        "searchWorks",
+        "getInventory",
+        "getObligations",
+        "traceLot",
+        "getEvidence",
+        "getAssessment",
+        "getDefinition",
+        "getGrant",
+        "getAccessContext",
+        "getPolicy",
+        "getInbox",
+        "getReconciliation",
+        "searchOperationalIssues",
+        "evaluateEligibility",
+        "convertUnit",
+        "getCommandResult",
+        "structureIntent"
+      ],
+      "grant": {
+        "delegatorAlias": "delegator",
+        "actions": [
+          "getObject",
+          "searchObjects",
+          "getWork",
+          "searchWorks",
+          "getInventory",
+          "getObligations",
+          "traceLot",
+          "getEvidence",
+          "getAssessment",
+          "getDefinition",
+          "getGrant",
+          "getAccessContext",
+          "getPolicy",
+          "getInbox",
+          "getReconciliation",
+          "searchOperationalIssues",
+          "evaluateEligibility",
+          "convertUnit",
+          "getCommandResult",
+          "structureIntent"
+        ],
+        "scope": {
+          "organizationAlias": "ORG-A",
+          "itemAliases": [
+            "P"
+          ],
+          "workAliases": [
+            "WORK"
+          ],
+          "placeAliases": [
+            "W",
+            "W2",
+            "CUSTOMER-PLACE"
+          ]
+        },
+        "validFrom": "2026-10-07T00:00:00Z",
+        "validUntil": "2026-10-08T00:00:00Z",
+        "revision": 1
+      }
+    },
+    "other": {
+      "issuer": "https://fixture.invalid/issuer",
+      "subject": "fixture-other",
+      "audience": "mulino-acceptance",
+      "organizationAlias": "ORG-A",
+      "roleCapabilities": [
+        "getObject",
+        "searchObjects",
+        "getWork",
+        "searchWorks",
+        "getInventory",
+        "getObligations",
+        "traceLot",
+        "getEvidence",
+        "getAssessment",
+        "getDefinition",
+        "getGrant",
+        "getAccessContext",
+        "getPolicy",
+        "getInbox",
+        "getReconciliation",
+        "searchOperationalIssues",
+        "evaluateEligibility",
+        "convertUnit",
+        "getCommandResult",
+        "structureIntent"
+      ],
+      "grant": {
+        "delegatorAlias": "delegator",
+        "actions": [
+          "getObject",
+          "searchObjects",
+          "getWork",
+          "searchWorks",
+          "getInventory",
+          "getObligations",
+          "traceLot",
+          "getEvidence",
+          "getAssessment",
+          "getDefinition",
+          "getGrant",
+          "getAccessContext",
+          "getPolicy",
+          "getInbox",
+          "getReconciliation",
+          "searchOperationalIssues",
+          "evaluateEligibility",
+          "convertUnit",
+          "getCommandResult",
+          "structureIntent"
+        ],
+        "scope": {
+          "organizationAlias": "ORG-A",
+          "itemAliases": [
+            "P"
+          ],
+          "workAliases": [],
+          "placeAliases": [
+            "W"
+          ]
+        },
+        "validFrom": "2026-10-07T00:00:00Z",
+        "validUntil": "2026-10-08T00:00:00Z",
+        "revision": 1
+      }
+    },
+    "orgB": {
+      "issuer": "https://fixture.invalid/issuer",
+      "subject": "fixture-orgB",
+      "audience": "mulino-acceptance",
+      "organizationAlias": "ORG-B",
+      "roleCapabilities": [
+        "getObject",
+        "searchObjects",
+        "getWork",
+        "searchWorks",
+        "getInventory",
+        "getObligations",
+        "traceLot",
+        "getEvidence",
+        "getAssessment",
+        "getDefinition",
+        "splitQuantity",
+        "mergeQuantity",
+        "moveQuantity",
+        "adjustQuantity",
+        "reserveQuantity",
+        "replaceAllocation",
+        "pickQuantity",
+        "dispatchQuantity",
+        "confirmReceipt",
+        "disposeQuantity",
+        "createDraft",
+        "cancelDraft",
+        "activateWork",
+        "waitWork",
+        "resumeWork",
+        "reviseGoal",
+        "closeWork",
+        "createFollowup",
+        "resolveObligation",
+        "waiveObligation",
+        "transferObligation",
+        "registerItem",
+        "linkExternalId",
+        "attachEvidence",
+        "correctEvidence",
+        "proposePurchase",
+        "revisePurchase",
+        "approvePurchase",
+        "dispatchPurchaseOrder",
+        "recordSupplierReply",
+        "cancelPurchase",
+        "createShipment",
+        "recordLegEvent",
+        "recordHandover",
+        "prepareRegulatoryProcedure",
+        "recordSubmission",
+        "recordRegulatoryDecision",
+        "verifyLabel",
+        "receiveProvisional",
+        "placeHold",
+        "releaseHold",
+        "recordDispositionBasis",
+        "revokeDispositionBasis",
+        "recordStocktake",
+        "createSalesOrder",
+        "reviseSalesOrder",
+        "releaseAllocation",
+        "recordDelivery",
+        "recordObservedMovement",
+        "authorizeReturn",
+        "receiveReturn",
+        "decideReturnDisposition",
+        "openInvestigation",
+        "proposeRecall",
+        "approveRecall",
+        "recordRecallNotice",
+        "recordRecovery",
+        "closeRecall",
+        "recordInvoice",
+        "recordCharge",
+        "matchInvoice",
+        "recordSettlementAdjustment",
+        "recordPaymentReference",
+        "createGrant",
+        "revokeGrant",
+        "getGrant",
+        "getAccessContext",
+        "assignCapability",
+        "revokeCapability",
+        "proposeHandover",
+        "acceptHandover",
+        "rejectHandover",
+        "emergencyReassign",
+        "createPolicyDraft",
+        "approvePolicy",
+        "activatePolicy",
+        "retirePolicy",
+        "getPolicy",
+        "matchSourceIdentity",
+        "linkCanonicalOccurrence",
+        "resolveEvidenceConflict",
+        "getInbox",
+        "getReconciliation",
+        "recordExternalReconciliation",
+        "searchOperationalIssues",
+        "createDefinitionDraft",
+        "validateDefinition",
+        "submitDefinitionReview",
+        "approveDefinition",
+        "publishDefinition",
+        "activateDefinition",
+        "retireDefinition",
+        "migrateWorkDefinition",
+        "evaluateEligibility",
+        "createWork",
+        "recordActivity",
+        "retrySafeCommand",
+        "recordRelation",
+        "convertUnit",
+        "createWorkLink",
+        "getCommandResult",
+        "structureIntent",
+        "emergencyRepair"
+      ],
+      "grant": {
+        "delegatorAlias": "delegator",
+        "actions": [
+          "getObject",
+          "searchObjects",
+          "getWork",
+          "searchWorks",
+          "getInventory",
+          "getObligations",
+          "traceLot",
+          "getEvidence",
+          "getAssessment",
+          "getDefinition",
+          "splitQuantity",
+          "mergeQuantity",
+          "moveQuantity",
+          "adjustQuantity",
+          "reserveQuantity",
+          "replaceAllocation",
+          "pickQuantity",
+          "dispatchQuantity",
+          "confirmReceipt",
+          "disposeQuantity",
+          "createDraft",
+          "cancelDraft",
+          "activateWork",
+          "waitWork",
+          "resumeWork",
+          "reviseGoal",
+          "closeWork",
+          "createFollowup",
+          "resolveObligation",
+          "waiveObligation",
+          "transferObligation",
+          "registerItem",
+          "linkExternalId",
+          "attachEvidence",
+          "correctEvidence",
+          "proposePurchase",
+          "revisePurchase",
+          "approvePurchase",
+          "dispatchPurchaseOrder",
+          "recordSupplierReply",
+          "cancelPurchase",
+          "createShipment",
+          "recordLegEvent",
+          "recordHandover",
+          "prepareRegulatoryProcedure",
+          "recordSubmission",
+          "recordRegulatoryDecision",
+          "verifyLabel",
+          "receiveProvisional",
+          "placeHold",
+          "releaseHold",
+          "recordDispositionBasis",
+          "revokeDispositionBasis",
+          "recordStocktake",
+          "createSalesOrder",
+          "reviseSalesOrder",
+          "releaseAllocation",
+          "recordDelivery",
+          "recordObservedMovement",
+          "authorizeReturn",
+          "receiveReturn",
+          "decideReturnDisposition",
+          "openInvestigation",
+          "proposeRecall",
+          "approveRecall",
+          "recordRecallNotice",
+          "recordRecovery",
+          "closeRecall",
+          "recordInvoice",
+          "recordCharge",
+          "matchInvoice",
+          "recordSettlementAdjustment",
+          "recordPaymentReference",
+          "createGrant",
+          "revokeGrant",
+          "getGrant",
+          "getAccessContext",
+          "assignCapability",
+          "revokeCapability",
+          "proposeHandover",
+          "acceptHandover",
+          "rejectHandover",
+          "emergencyReassign",
+          "createPolicyDraft",
+          "approvePolicy",
+          "activatePolicy",
+          "retirePolicy",
+          "getPolicy",
+          "matchSourceIdentity",
+          "linkCanonicalOccurrence",
+          "resolveEvidenceConflict",
+          "getInbox",
+          "getReconciliation",
+          "recordExternalReconciliation",
+          "searchOperationalIssues",
+          "createDefinitionDraft",
+          "validateDefinition",
+          "submitDefinitionReview",
+          "approveDefinition",
+          "publishDefinition",
+          "activateDefinition",
+          "retireDefinition",
+          "migrateWorkDefinition",
+          "evaluateEligibility",
+          "createWork",
+          "recordActivity",
+          "retrySafeCommand",
+          "recordRelation",
+          "convertUnit",
+          "createWorkLink",
+          "getCommandResult",
+          "structureIntent",
+          "emergencyRepair"
+        ],
+        "scope": {
+          "organizationAlias": "ORG-B",
+          "itemAliases": [
+            "P-B"
+          ],
+          "workAliases": [
+            "WORK-B"
+          ],
+          "placeAliases": [
+            "W-B"
+          ]
+        },
+        "validFrom": "2026-10-07T00:00:00Z",
+        "validUntil": "2026-10-08T00:00:00Z",
+        "revision": 1
+      }
+    },
+    "limitedDelegator": {
+      "issuer": "https://fixture.invalid/issuer",
+      "subject": "fixture-limitedDelegator",
+      "audience": "mulino-acceptance",
+      "organizationAlias": "ORG-A",
+      "roleCapabilities": [
+        "createGrant",
+        "getObject",
+        "getInventory"
+      ],
+      "grant": {
+        "delegatorAlias": "delegator",
+        "actions": [
+          "createGrant",
+          "getObject",
+          "getInventory"
+        ],
+        "scope": {
+          "organizationAlias": "ORG-A",
+          "itemAliases": [
+            "P"
+          ],
+          "workAliases": [
+            "WORK"
+          ],
+          "placeAliases": [
+            "W"
+          ]
+        },
+        "validFrom": "2026-10-07T00:00:00Z",
+        "validUntil": "2026-10-08T00:00:00Z",
+        "revision": 1
+      }
+    },
+    "invalidIssuer": {
+      "issuer": "https://untrusted.invalid/issuer",
+      "subject": "fixture-invalidIssuer",
+      "audience": "mulino-acceptance",
+      "organizationAlias": "ORG-A",
+      "roleCapabilities": [
+        "getInventory",
+        "getObject",
+        "getWork",
+        "getObligations",
+        "getAccessContext",
+        "getGrant",
+        "confirmReceipt",
+        "reserveQuantity",
+        "dispatchQuantity",
+        "moveQuantity",
+        "recordStocktake",
+        "recordObservedMovement",
+        "retrySafeCommand",
+        "getCommandResult"
+      ],
+      "grant": {
+        "delegatorAlias": "delegator",
+        "actions": [
+          "getInventory",
+          "getObject",
+          "getWork",
+          "getObligations",
+          "getAccessContext",
+          "getGrant",
+          "confirmReceipt",
+          "reserveQuantity",
+          "dispatchQuantity",
+          "moveQuantity",
+          "recordStocktake",
+          "recordObservedMovement",
+          "retrySafeCommand",
+          "getCommandResult"
+        ],
+        "scope": {
+          "organizationAlias": "ORG-A",
+          "itemAliases": [
+            "P"
+          ],
+          "workAliases": [
+            "WORK"
+          ],
+          "placeAliases": [
+            "W",
+            "W2",
+            "CUSTOMER-PLACE"
+          ]
+        },
+        "validFrom": "2026-10-07T00:00:00Z",
+        "validUntil": "2026-10-08T00:00:00Z",
+        "revision": 1
+      }
+    },
+    "invalidSubject": {
+      "issuer": "https://fixture.invalid/issuer",
+      "subject": "unregistered-subject",
+      "audience": "mulino-acceptance",
+      "organizationAlias": "ORG-A",
+      "roleCapabilities": [
+        "getInventory",
+        "getObject",
+        "getWork",
+        "getObligations",
+        "getAccessContext",
+        "getGrant",
+        "confirmReceipt",
+        "reserveQuantity",
+        "dispatchQuantity",
+        "moveQuantity",
+        "recordStocktake",
+        "recordObservedMovement",
+        "retrySafeCommand",
+        "getCommandResult"
+      ],
+      "grant": {
+        "delegatorAlias": "delegator",
+        "actions": [
+          "getInventory",
+          "getObject",
+          "getWork",
+          "getObligations",
+          "getAccessContext",
+          "getGrant",
+          "confirmReceipt",
+          "reserveQuantity",
+          "dispatchQuantity",
+          "moveQuantity",
+          "recordStocktake",
+          "recordObservedMovement",
+          "retrySafeCommand",
+          "getCommandResult"
+        ],
+        "scope": {
+          "organizationAlias": "ORG-A",
+          "itemAliases": [
+            "P"
+          ],
+          "workAliases": [
+            "WORK"
+          ],
+          "placeAliases": [
+            "W",
+            "W2",
+            "CUSTOMER-PLACE"
+          ]
+        },
+        "validFrom": "2026-10-07T00:00:00Z",
+        "validUntil": "2026-10-08T00:00:00Z",
+        "revision": 1
+      }
+    },
+    "invalidAudience": {
+      "issuer": "https://fixture.invalid/issuer",
+      "subject": "fixture-invalidAudience",
+      "audience": "wrong-audience",
+      "organizationAlias": "ORG-A",
+      "roleCapabilities": [
+        "getInventory",
+        "getObject",
+        "getWork",
+        "getObligations",
+        "getAccessContext",
+        "getGrant",
+        "confirmReceipt",
+        "reserveQuantity",
+        "dispatchQuantity",
+        "moveQuantity",
+        "recordStocktake",
+        "recordObservedMovement",
+        "retrySafeCommand",
+        "getCommandResult"
+      ],
+      "grant": {
+        "delegatorAlias": "delegator",
+        "actions": [
+          "getInventory",
+          "getObject",
+          "getWork",
+          "getObligations",
+          "getAccessContext",
+          "getGrant",
+          "confirmReceipt",
+          "reserveQuantity",
+          "dispatchQuantity",
+          "moveQuantity",
+          "recordStocktake",
+          "recordObservedMovement",
+          "retrySafeCommand",
+          "getCommandResult"
+        ],
+        "scope": {
+          "organizationAlias": "ORG-A",
+          "itemAliases": [
+            "P"
+          ],
+          "workAliases": [
+            "WORK"
+          ],
+          "placeAliases": [
+            "W",
+            "W2",
+            "CUSTOMER-PLACE"
+          ]
+        },
+        "validFrom": "2026-10-07T00:00:00Z",
+        "validUntil": "2026-10-08T00:00:00Z",
+        "revision": 1
+      }
+    }
+  },
+  "aliases": {
+    "ORG-A": {
+      "type": "Organization",
+      "organizationAlias": "ORG-A"
+    },
+    "ORG-B": {
+      "type": "Organization",
+      "organizationAlias": "ORG-B"
+    },
+    "P": {
+      "type": "TradeItem",
+      "organizationAlias": "ORG-A"
+    },
+    "P-B": {
+      "type": "TradeItem",
+      "organizationAlias": "ORG-B"
+    },
+    "L": {
+      "type": "ManufacturingLot",
+      "organizationAlias": "ORG-A"
+    },
+    "W": {
+      "type": "Place",
+      "organizationAlias": "ORG-A"
+    },
+    "W2": {
+      "type": "Place",
+      "organizationAlias": "ORG-A"
+    },
+    "CUSTOMER-PLACE": {
+      "type": "Place",
+      "organizationAlias": "ORG-A"
+    },
+    "W-B": {
+      "type": "Place",
+      "organizationAlias": "ORG-B"
+    },
+    "A60": {
+      "type": "QuantitySegment",
+      "organizationAlias": "ORG-A"
+    },
+    "A20": {
+      "type": "QuantitySegment",
+      "organizationAlias": "ORG-A"
+    },
+    "Q60": {
+      "type": "QuantitySegment",
+      "organizationAlias": "ORG-A"
+    },
+    "B20": {
+      "type": "QuantitySegment",
+      "organizationAlias": "ORG-A"
+    },
+    "WORK": {
+      "type": "Work",
+      "organizationAlias": "ORG-A"
+    },
+    "WORK-B": {
+      "type": "Work",
+      "organizationAlias": "ORG-B"
+    },
+    "WORK2": {
+      "type": "Work",
+      "organizationAlias": "ORG-A"
+    },
+    "PO": {
+      "type": "PurchaseOrder",
+      "organizationAlias": "ORG-A"
+    },
+    "PO2": {
+      "type": "PurchaseOrder",
+      "organizationAlias": "ORG-A"
+    },
+    "PO-LINE": {
+      "type": "PurchaseOrderLine",
+      "organizationAlias": "ORG-A"
+    },
+    "PO2-LINE": {
+      "type": "PurchaseOrderLine",
+      "organizationAlias": "ORG-A"
+    },
+    "SALE": {
+      "type": "SalesOrder",
+      "organizationAlias": "ORG-A"
+    },
+    "SALE-LINE": {
+      "type": "SalesOrderLine",
+      "organizationAlias": "ORG-A"
+    },
+    "CUSTOMER": {
+      "type": "Customer",
+      "organizationAlias": "ORG-A"
+    },
+    "SUPPLIER": {
+      "type": "Supplier",
+      "organizationAlias": "ORG-A"
+    },
+    "SHIPMENT": {
+      "type": "Shipment",
+      "organizationAlias": "ORG-A"
+    },
+    "CARGO": {
+      "type": "CargoScope",
+      "organizationAlias": "ORG-A"
+    },
+    "RETURN": {
+      "type": "ReturnAuthorization",
+      "organizationAlias": "ORG-A"
+    },
+    "DELIVERY": {
+      "type": "Delivery",
+      "organizationAlias": "ORG-A"
+    },
+    "RECALL": {
+      "type": "Recall",
+      "organizationAlias": "ORG-A"
+    },
+    "INVOICE": {
+      "type": "Invoice",
+      "organizationAlias": "ORG-A"
+    },
+    "DOC": {
+      "type": "DocumentVersion",
+      "organizationAlias": "ORG-A"
+    },
+    "OCCURRENCE": {
+      "type": "Occurrence",
+      "organizationAlias": "ORG-A"
+    },
+    "DISPATCH": {
+      "type": "Dispatch",
+      "organizationAlias": "ORG-A"
+    },
+    "ALLOCATION": {
+      "type": "Allocation",
+      "organizationAlias": "ORG-A"
+    },
+    "ALLOCATION2": {
+      "type": "Allocation",
+      "organizationAlias": "ORG-A"
+    },
+    "GRANT": {
+      "type": "Grant",
+      "organizationAlias": "ORG-A"
+    },
+    "HOLD": {
+      "type": "Restriction",
+      "organizationAlias": "ORG-A"
+    },
+    "BASIS": {
+      "type": "DispositionBasis",
+      "organizationAlias": "ORG-A"
+    },
+    "DUTY": {
+      "type": "Obligation",
+      "organizationAlias": "ORG-A"
+    },
+    "HANDOVER": {
+      "type": "Handover",
+      "organizationAlias": "ORG-A"
+    },
+    "DEFINITION-DRAFT": {
+      "type": "DefinitionPackage",
+      "organizationAlias": "ORG-A"
+    },
+    "DEFINITION": {
+      "type": "DefinitionVersion",
+      "organizationAlias": "ORG-A"
+    },
+    "POLICY": {
+      "type": "PolicyVersion",
+      "organizationAlias": "ORG-A"
+    },
+    "PROPOSAL": {
+      "type": "PurchaseProposal",
+      "organizationAlias": "ORG-A"
+    },
+    "REGULATORY": {
+      "type": "RegulatoryProcedure",
+      "organizationAlias": "ORG-A"
+    },
+    "INBOX": {
+      "type": "InboxRecord",
+      "organizationAlias": "ORG-A"
+    },
+    "RECONCILIATION": {
+      "type": "ReconciliationCase",
+      "organizationAlias": "ORG-A"
+    },
+    "EXTERNAL-OP": {
+      "type": "ExternalOperation",
+      "organizationAlias": "ORG-A"
+    },
+    "CASE-COMMAND": {
+      "type": "CommandRecord",
+      "organizationAlias": "ORG-A"
+    },
+    "LEASE": {
+      "type": "Lease",
+      "organizationAlias": "ORG-A"
+    },
+    "reader": {
+      "type": "Agent",
+      "organizationAlias": "ORG-A"
+    },
+    "delegator": {
+      "type": "Human",
+      "organizationAlias": "ORG-A"
+    },
+    "warehouse": {
+      "type": "Human",
+      "organizationAlias": "ORG-A"
+    },
+    "recordOnly": {
+      "type": "Human",
+      "organizationAlias": "ORG-A"
+    },
+    "manager": {
+      "type": "Human",
+      "organizationAlias": "ORG-A"
+    },
+    "qc": {
+      "type": "Human",
+      "organizationAlias": "ORG-A"
+    },
+    "admin": {
+      "type": "Human",
+      "organizationAlias": "ORG-A"
+    },
+    "fde": {
+      "type": "Human",
+      "organizationAlias": "ORG-A"
+    },
+    "identityAdmin": {
+      "type": "Human",
+      "organizationAlias": "ORG-A"
+    },
+    "supervisor": {
+      "type": "Human",
+      "organizationAlias": "ORG-A"
+    },
+    "other": {
+      "type": "Human",
+      "organizationAlias": "ORG-A"
+    },
+    "orgB": {
+      "type": "Human",
+      "organizationAlias": "ORG-B"
+    },
+    "limitedDelegator": {
+      "type": "Human",
+      "organizationAlias": "ORG-A"
+    },
+    "invalidIssuer": {
+      "type": "Human",
+      "organizationAlias": "ORG-A"
+    },
+    "invalidSubject": {
+      "type": "Human",
+      "organizationAlias": "ORG-A"
+    },
+    "invalidAudience": {
+      "type": "Human",
+      "organizationAlias": "ORG-A"
+    }
+  },
+  "baseline": {
+    "installationMode": "isolated-disposable",
+    "organizations": [
+      "ORG-A",
+      "ORG-B"
+    ],
+    "places": [
+      {
+        "alias": "W",
+        "kind": "INTERNAL_WAREHOUSE"
+      },
+      {
+        "alias": "W2",
+        "kind": "INTERNAL_WAREHOUSE"
+      },
+      {
+        "alias": "CUSTOMER-PLACE",
+        "kind": "EXTERNAL_CUSTOMER"
+      },
+      {
+        "alias": "W-B",
+        "kind": "INTERNAL_WAREHOUSE",
+        "organizationAlias": "ORG-B"
+      }
+    ],
+    "items": [
+      {
+        "alias": "P",
+        "baseUnit": "BOX",
+        "fractionDigits": 0
+      },
+      {
+        "alias": "P-B",
+        "baseUnit": "BOX",
+        "fractionDigits": 0
+      }
+    ],
+    "lots": [
+      {
+        "alias": "L",
+        "itemAlias": "P",
+        "expiry": "2027-01-01T00:00:00Z"
+      }
+    ],
+    "segments": [
+      {
+        "alias": "A60",
+        "itemAlias": "P",
+        "lotAlias": "L",
+        "quantity": "60",
+        "unit": "BOX",
+        "placeAlias": "W",
+        "custodianAlias": "warehouse",
+        "ownerAlias": "delegator",
+        "active": true,
+        "physicalScope": "A60-unique"
+      },
+      {
+        "alias": "A20",
+        "itemAlias": "P",
+        "lotAlias": "L",
+        "quantity": "20",
+        "unit": "BOX",
+        "placeAlias": "W",
+        "custodianAlias": "warehouse",
+        "ownerAlias": "delegator",
+        "active": true,
+        "physicalScope": "A20-unique"
+      }
+    ],
+    "work": {
+      "alias": "WORK",
+      "state": "ACTIVE",
+      "ownerAlias": "warehouse",
+      "supervisorAlias": "supervisor",
+      "definitionVersion": "definition-v1",
+      "goal": {
+        "quantity": "100",
+        "unit": "BOX",
+        "quantityMode": "CUMULATIVE_EVENT",
+        "endpoint": "ARRIVED",
+        "destinationAlias": "W",
+        "dueAt": "2026-10-09T18:00:00+09:00"
+      }
+    },
+    "priorEntities": {
+      "PO": {
+        "revision": 1,
+        "quantity": "100",
+        "unit": "BOX",
+        "state": "ACCEPTED",
+        "destinationAlias": "W"
+      },
+      "PO2": {
+        "revision": 1,
+        "quantity": "100",
+        "unit": "BOX",
+        "state": "ACCEPTED",
+        "destinationAlias": "W"
+      },
+      "SALE": {
+        "revision": 1,
+        "quantity": "20",
+        "unit": "BOX",
+        "state": "ACTIVE",
+        "destinationAlias": "CUSTOMER-PLACE"
+      },
+      "ALLOCATION": {
+        "revision": 1,
+        "segmentAlias": "A20",
+        "quantity": "20",
+        "unit": "BOX",
+        "state": "EXECUTABLE",
+        "orderLineAlias": "SALE-LINE"
+      },
+      "PROPOSAL": {
+        "revision": 1,
+        "state": "IN_REVIEW",
+        "quantity": "100",
+        "unit": "BOX",
+        "itemAlias": "P",
+        "destinationAlias": "W",
+        "price": "2.50",
+        "currency": "EUR",
+        "canonicalHash": "3bd0ecac96e706c25912e884a2ad656dea1b2e672ad8f13058e1f116ec082471"
+      },
+      "GRANT": {
+        "revision": 1,
+        "actorAlias": "reader",
+        "delegatorAlias": "delegator",
+        "actions": [
+          "getObject",
+          "searchObjects",
+          "getWork",
+          "searchWorks",
+          "getInventory",
+          "getObligations",
+          "traceLot",
+          "getEvidence",
+          "getAssessment",
+          "getDefinition",
+          "getGrant",
+          "getAccessContext",
+          "getPolicy",
+          "getInbox",
+          "getReconciliation",
+          "searchOperationalIssues",
+          "evaluateEligibility",
+          "convertUnit",
+          "getCommandResult",
+          "structureIntent"
+        ],
+        "scope": {
+          "workAlias": "WORK",
+          "itemAlias": "P"
+        },
+        "validFrom": "2026-10-07T00:00:00Z",
+        "validUntil": "2026-10-08T00:00:00Z",
+        "revokedAt": null
+      },
+      "DUTY": {
+        "kind": "DELIVER",
+        "scope": {
+          "segmentAlias": "A20"
+        },
+        "ownerAlias": "warehouse",
+        "status": "OPEN",
+        "nextAction": "출고 권한과 현재 조건을 재확인한다",
+        "nextCheckAt": "2026-10-07T10:00:00Z"
+      },
+      "DEFINITION-DRAFT": {
+        "state": "IN_REVIEW",
+        "revision": 1,
+        "hash": "60051c49a6af25996d7ebe5d95be7d3f28782de19191df0742cf5b6d78b1051e"
+      },
+      "CAPABILITY-getObject": {
+        "actorAlias": "reader",
+        "capabilityId": "getObject",
+        "status": "ACTIVE",
+        "revision": 1
+      },
+      "POLICY": {
+        "state": "IN_REVIEW",
+        "revision": 1,
+        "hash": "421bf77e57b1afab10a6c229c232cd1ab613295ad0d2c8416bb7fc84c74ed7e3"
+      },
+      "BASIS": {
+        "revision": 1,
+        "status": "ACTIVE",
+        "scopeSegmentAlias": "A20",
+        "action": "SELL",
+        "decisionOwnerAlias": "manager"
+      },
+      "HANDOVER": {
+        "revision": 1,
+        "status": "PROPOSED",
+        "workAlias": "WORK",
+        "fromOwnerAlias": "warehouse",
+        "toOwnerAlias": "delegator"
+      },
+      "RETURN": {
+        "revision": 1,
+        "status": "AUTHORIZED",
+        "deliveryAlias": "DELIVERY",
+        "quantity": "20",
+        "unit": "BOX"
+      },
+      "DELIVERY": {
+        "revision": 1,
+        "quantity": "20",
+        "unit": "BOX",
+        "state": "VERIFIED",
+        "dispatchAlias": "DISPATCH"
+      },
+      "RECALL": {
+        "revision": 1,
+        "state": "PROPOSED",
+        "quantity": "20",
+        "unit": "BOX",
+        "scopeVersion": "1"
+      },
+      "REGULATORY": {
+        "revision": 1,
+        "state": "PREPARED",
+        "quantity": "20",
+        "unit": "BOX",
+        "policyVersion": "synthetic-authority-v1"
+      },
+      "INBOX": {
+        "revision": 1,
+        "state": "QUARANTINED",
+        "ownerAlias": "warehouse",
+        "nextCheckAt": "2026-10-07T10:00:00Z"
+      },
+      "RECONCILIATION": {
+        "revision": 1,
+        "state": "OPEN",
+        "ownerAlias": "warehouse",
+        "nextCheckAt": "2026-10-07T10:00:00Z"
+      },
+      "INVOICE": {
+        "revision": 1,
+        "kind": "COMMERCIAL",
+        "quantity": "20",
+        "unit": "BOX",
+        "amount": "50.00",
+        "currency": "EUR"
+      },
+      "CASE-COMMAND": {
+        "revision": 1,
+        "state": "REJECTED",
+        "capabilityId": "moveQuantity",
+        "canonicalPayloadRef": "original-canonical-command",
+        "idempotencyKey": "retry-original"
+      },
+      "SHIPMENT": {
+        "revision": 1,
+        "state": "PLANNED",
+        "cargoScopeAlias": "CARGO",
+        "quantity": "20",
+        "unit": "BOX"
+      }
+    },
+    "policies": {
+      "synthetic": true,
+      "source": "개발 fixture의 가상 승인된 업무 정책이며 실제 법규가 아니다",
+      "effectiveAt": "2026-10-07T00:00:00Z",
+      "decisionOwnerAlias": "delegator",
+      "regulatory": "ALLOWED",
+      "qc": "ALLOWED",
+      "customer": "ALLOWED",
+      "disposition": "ALLOWED",
+      "receiptEvidencePolicy": "identified-physical-event-with-immutable-versioned-source-evidence",
+      "audit": "query-and-denial-allowed; business-effects-atomic",
+      "retention": {
+        "effectRecordsUntil": "2027-10-07T00:00:00Z",
+        "idempotencyTombstonesUntil": "2027-10-07T00:00:00Z"
+      }
+    },
+    "documents": [
+      {
+        "alias": "DOC",
+        "path": "verification/cases/C3/source-evidence.txt",
+        "mediaType": "text/plain",
+        "immutable": true,
+        "sha256": "4b398be9cfce00b636b953a9438da62d83df1a18c49cd62a6cddcfbc797cfe1a"
+      }
+    ],
+    "sourceProfiles": [
+      {
+        "namespace": "fixture-warehouse",
+        "recordActorAlias": "recordOnly",
+        "allowedItemAliases": [
+          "P"
+        ],
+        "reconciliationOwnerAlias": "warehouse"
+      }
+    ],
+    "entityRevisions": {
+      "initial": 1
+    },
+    "fenceScope": {
+      "workAlias": "WORK",
+      "grantAlias": "GRANT",
+      "initialFenceRevision": 1
+    },
+    "policyReauthorization": {
+      "ownerAlias": "warehouse",
+      "nextAction": "현재 권한을 재확인하고 필요한 재인가를 요청한다",
+      "nextCheckAt": "2026-10-07T10:00:00Z"
+    },
+    "fixtureClassification": "SYNTHETIC_INPUT_AND_PRIOR_FACTS",
+    "operationUnderTest": "proposePurchase"
+  },
+  "evidence": [
+    {
+      "alias": "DOC",
+      "sha256": "4b398be9cfce00b636b953a9438da62d83df1a18c49cd62a6cddcfbc797cfe1a",
+      "sourceNamespace": "fixture-warehouse",
+      "externalEventId": "receipt60-input",
+      "sourceVersion": "1",
+      "occurredAt": "2026-10-07T09:00:00Z",
+      "recordedAt": "2026-10-07T09:00:00Z"
+    }
+  ],
+  "responsibilities": [
+    {
+      "scope": {
+        "workAlias": "WORK",
+        "itemAlias": "P"
+      },
+      "ownerAlias": "warehouse",
+      "supervisorAlias": "supervisor",
+      "nextAction": "권한과 실물 범위를 확인하고 미해결 물량을 대조한다",
+      "nextCheckAt": "2026-10-07T10:00:00Z"
+    }
+  ]
+}

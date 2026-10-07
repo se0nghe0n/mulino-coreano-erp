@@ -1,0 +1,632 @@
+{
+  "recordType": "STEP2_AUTHORITY_PREPARATION_CHECKS",
+  "baseline": "feaca0af9673620eff9a5ac0f08a657ce14e9ccd",
+  "checkedCommonCommit": "77c2df3440b6d8b362bfb52fed677e441c372b4c",
+  "workingTreeDirtyDuringCheck": true,
+  "caseCounts": [
+    {
+      "caseId": "T08",
+      "subcases": 23,
+      "assertions": 421,
+      "oracles": 3,
+      "observations": 11,
+      "caseHash": "48bdaefddde4cd6796501d011a311c2e64e933adf16fd1acc580ae963b92216c",
+      "fixtures": [
+        {
+          "path": "verification/cases/T08/fixture.json",
+          "sha256": "98ab6d41c96cfb58092519f6d7b49e2ef890161ea019306879abdc5271bf544b"
+        },
+        {
+          "path": "verification/cases/T08/unresolved-policy-fixture.json",
+          "sha256": "7b00130f42cf49ccc9fbc08bd58c645d803f39340f325f908085b46089746f71"
+        }
+      ],
+      "checkedFeatureHash": "70b106a1c132a1b3821937bc2ea44df2b05641cbc00328eed01be833cbcaa192",
+      "featureHash": "9c3c3bffd50f22469de57cf7a2ed87713d5f76cddef0f940ed9c928ecb3fa51b",
+      "postCheckFormatting": "Removed only one blank line at EOF after git diff --cached --check; Gherkin statements and scenario/action/assertion identities unchanged."
+    },
+    {
+      "caseId": "C3",
+      "subcases": 309,
+      "assertions": 11202,
+      "oracles": 2,
+      "observations": 10,
+      "caseHash": "8ea2b0447fda64c7ff8ab36b4b749a6ed92d679d7c86bea9f56afd39e0fe0318",
+      "fixtures": [
+        {
+          "path": "verification/cases/C3/fixture-acceptHandover.json",
+          "sha256": "208215ffaa38d98fecb9406d3a1e2c322801139c88706a86173d027d32ab89ba"
+        },
+        {
+          "path": "verification/cases/C3/fixture-activateDefinition.json",
+          "sha256": "97367e491010b7a31e52966aa4aeda3d0d29e5039bd2bf496140216897b9934d"
+        },
+        {
+          "path": "verification/cases/C3/fixture-activatePolicy.json",
+          "sha256": "193628e0f43815775bf9cb265e171fd2fabb70b637a6b4780ed7a66e611087e5"
+        },
+        {
+          "path": "verification/cases/C3/fixture-activateWork.json",
+          "sha256": "603bad81972e5bbead78fd23f6ca1ee1bb6e7df65f2e68020bdba7a5b7e49cf0"
+        },
+        {
+          "path": "verification/cases/C3/fixture-adjustQuantity.json",
+          "sha256": "530554f211a249666dfc2bfe03359635047fe0ab63d0aff628e018569974332e"
+        },
+        {
+          "path": "verification/cases/C3/fixture-approveDefinition.json",
+          "sha256": "7421f40b2905f13af6082466591db807e42b0f7e99197637368e3663550ba396"
+        },
+        {
+          "path": "verification/cases/C3/fixture-approvePolicy.json",
+          "sha256": "54f13fefc0963ea26f04646af50bc549a5d66c66d2da2a20d61e1da22dbc9fe8"
+        },
+        {
+          "path": "verification/cases/C3/fixture-approvePurchase.json",
+          "sha256": "2cd44e5472738d93e3713e7bcb0eb9bfaa0d9f0616dc168713df0ef5a8d03881"
+        },
+        {
+          "path": "verification/cases/C3/fixture-approveRecall.json",
+          "sha256": "7ca69c7fc7b65748411577212798ee6732b7c53cdb866d9976e079b86b21dd8b"
+        },
+        {
+          "path": "verification/cases/C3/fixture-assignCapability.json",
+          "sha256": "278d0e5261bf860ca0aa115bddc21b1d4d15820905b7d8b38a73cfc6278cf1f1"
+        },
+        {
+          "path": "verification/cases/C3/fixture-attachEvidence.json",
+          "sha256": "cff12a609d06168c44a92244375406c7270c61ddfa4e0c934b9fdc695bb5fbb2"
+        },
+        {
+          "path": "verification/cases/C3/fixture-authorizeReturn.json",
+          "sha256": "21bd417e72c83053ad4c5ec78249a08ec8669b054abddca90804e131d6a19ea0"
+        },
+        {
+          "path": "verification/cases/C3/fixture-cancelDraft.json",
+          "sha256": "146150783fa9e7feffda72c2bd52a978076ef8aa683254d9764c3e25597d2614"
+        },
+        {
+          "path": "verification/cases/C3/fixture-cancelPurchase.json",
+          "sha256": "2cbb8fda9af464b229b16bc59703af4ef7080ef5b4ce37b4e39eaa9798148535"
+        },
+        {
+          "path": "verification/cases/C3/fixture-closeRecall.json",
+          "sha256": "5b369dfa1173afb996c25e05a0c7b42c0131eb9e035018155b0aa3dbbadf7b72"
+        },
+        {
+          "path": "verification/cases/C3/fixture-closeWork.json",
+          "sha256": "bdf57a7ee1c14b768f5a681683cbaa9cf681357535026d77a8f1a57faad15eab"
+        },
+        {
+          "path": "verification/cases/C3/fixture-confirmReceipt.json",
+          "sha256": "c19e463af99d0a737f09d7dc696650d4af3b91d9ec6acef0ed31c5de884160e6"
+        },
+        {
+          "path": "verification/cases/C3/fixture-correctEvidence.json",
+          "sha256": "59b7302a3e755d78e14a5ddf51e597ad58ad2390dc80cfc704615cb337c5983d"
+        },
+        {
+          "path": "verification/cases/C3/fixture-createDefinitionDraft.json",
+          "sha256": "2f94e247d8bf09f06516a4ba0f55933a6125b1540f1c984520362adadc2f8797"
+        },
+        {
+          "path": "verification/cases/C3/fixture-createDraft.json",
+          "sha256": "ef574065ec00bc8640f63deb1ef55e3f8bc77413a513596a462550761a626653"
+        },
+        {
+          "path": "verification/cases/C3/fixture-createFollowup.json",
+          "sha256": "7b633177acfb173bf93b6f1c45e6ce2bf94a4ee827f11232da7bfe5536fae082"
+        },
+        {
+          "path": "verification/cases/C3/fixture-createGrant.json",
+          "sha256": "0f7a93afdced9b4b0cb23c2a5072122428cf4379a7147b40592090cd3abdf5d2"
+        },
+        {
+          "path": "verification/cases/C3/fixture-createPolicyDraft.json",
+          "sha256": "41512f7b042fc165698e5b40c2756f04d62724ce2d4e58464a4ab0f4f4aa1b03"
+        },
+        {
+          "path": "verification/cases/C3/fixture-createSalesOrder.json",
+          "sha256": "bd3648ae9acf691f9249c38ffb3334c62042ad0034fd5628f8e8d9d69666b124"
+        },
+        {
+          "path": "verification/cases/C3/fixture-createShipment.json",
+          "sha256": "80cca0fe7a154e53af552e5fbfa9e71e38f3528f9226e1db706b6d91348493fb"
+        },
+        {
+          "path": "verification/cases/C3/fixture-createWork.json",
+          "sha256": "056c19ee944f60ad17d350872a3862902de26f0e4744a445a291e5f5e3631ded"
+        },
+        {
+          "path": "verification/cases/C3/fixture-createWorkLink.json",
+          "sha256": "d50c992e97ed8a7bc8b94ce0c48afdb521c0f4d5b7b5d09d7b8299e684f9f3f9"
+        },
+        {
+          "path": "verification/cases/C3/fixture-decideReturnDisposition.json",
+          "sha256": "8950498f4172ed8e395a5053e943f142f9c6fa67a597d8b1f8e14bd50447467a"
+        },
+        {
+          "path": "verification/cases/C3/fixture-dispatchPurchaseOrder.json",
+          "sha256": "3ba6805b0cb6194c6cf3185ff642f2d619137d2055eabd78d2e24ba1bf036230"
+        },
+        {
+          "path": "verification/cases/C3/fixture-dispatchQuantity.json",
+          "sha256": "17f3015c3d464300feb8824ee0429b56eb1e05faacd79d3262606ed02a3bb408"
+        },
+        {
+          "path": "verification/cases/C3/fixture-disposeQuantity.json",
+          "sha256": "5ef90f61943e32a05ad44406c5a0b54ae30703997abba944db98aa4914711ea2"
+        },
+        {
+          "path": "verification/cases/C3/fixture-emergencyReassign.json",
+          "sha256": "f2e59349db7f2b649f2c04ba3802d0d9221d80bac457cdad76ed8291bdae1e13"
+        },
+        {
+          "path": "verification/cases/C3/fixture-emergencyRepair.json",
+          "sha256": "634d3008234384f5747d902dd9ccb96f24792efae30e0dd25930e1292a25d435"
+        },
+        {
+          "path": "verification/cases/C3/fixture-linkCanonicalOccurrence.json",
+          "sha256": "e3e8efafd9d273bc9d34894411f07eed649989c581941cd9f032c1874198cc0a"
+        },
+        {
+          "path": "verification/cases/C3/fixture-linkExternalId.json",
+          "sha256": "dfbc23aebb0dacb443497e63f4062228d4c56b90a051f3eead9bd01ee7861199"
+        },
+        {
+          "path": "verification/cases/C3/fixture-matchInvoice.json",
+          "sha256": "02338b9975a5533298b16c5d3794a14f6617f1c220ad26ec556f80aa5fb7ba08"
+        },
+        {
+          "path": "verification/cases/C3/fixture-matchSourceIdentity.json",
+          "sha256": "a5c57155c5292c784c35522205a0e5f1009cc1292bf27fe838616704635bb777"
+        },
+        {
+          "path": "verification/cases/C3/fixture-mergeQuantity.json",
+          "sha256": "2a758aa8ba49e402f146df7fd1c2293230a305c8cef57aa3b3da61273e973c8e"
+        },
+        {
+          "path": "verification/cases/C3/fixture-migrateWorkDefinition.json",
+          "sha256": "b88d0fed9c182e4aa35595a563aaae0ed23b4841ad43c61e16990fefc89dd8bc"
+        },
+        {
+          "path": "verification/cases/C3/fixture-moveQuantity.json",
+          "sha256": "53b875f3e59406644fd17ba9ab3ac59b9c8bdbcea9a01600c0eb9aa8a202ed91"
+        },
+        {
+          "path": "verification/cases/C3/fixture-openInvestigation.json",
+          "sha256": "ab7ba42c48f42313b514bac3ee428ba0e7a27063c675e0ed72e465a29ccd4c16"
+        },
+        {
+          "path": "verification/cases/C3/fixture-pickQuantity.json",
+          "sha256": "96a9df358e11b0cd183cae181a24462a6b20bc4dd6fb1e918de9952e50f7d6b4"
+        },
+        {
+          "path": "verification/cases/C3/fixture-placeHold.json",
+          "sha256": "72797b712a2e0e4b0e02b1879eb7e160e68c4abd74da920825735e78a6569bd3"
+        },
+        {
+          "path": "verification/cases/C3/fixture-prepareRegulatoryProcedure.json",
+          "sha256": "5e7b56e68f21cb8a15cbb5efd6625d522f3d8bfe60392b1bffc58eb424298b39"
+        },
+        {
+          "path": "verification/cases/C3/fixture-proposeHandover.json",
+          "sha256": "2b7e5e9dc7c77043377598d2e1746c81ba4f610728804e70a2d72e1ba03a92a8"
+        },
+        {
+          "path": "verification/cases/C3/fixture-proposePurchase.json",
+          "sha256": "0056590b394c9c74b1fe3cf872b977e9d84761e9aebef7eb984e93318fea4cd1"
+        },
+        {
+          "path": "verification/cases/C3/fixture-proposeRecall.json",
+          "sha256": "fe960b782eb440856f0a4c1affcd0279f33397a01ae0d8a9df5ff82cd7b606bf"
+        },
+        {
+          "path": "verification/cases/C3/fixture-publishDefinition.json",
+          "sha256": "5ec89ff0099436bcfeafb54403b9ae22c84bcb3c946972cc01a7a5e90f3ebd5b"
+        },
+        {
+          "path": "verification/cases/C3/fixture-receiveProvisional.json",
+          "sha256": "8f9ddc0a3cbfbbe6f92b9f213b9bb4c43464b4325a46ba18750707e86ccc2f05"
+        },
+        {
+          "path": "verification/cases/C3/fixture-receiveReturn.json",
+          "sha256": "67ca241621941df3ef831dc9bba034ac5c06564b26e5abc306c3ce6b4e09b879"
+        },
+        {
+          "path": "verification/cases/C3/fixture-recordActivity.json",
+          "sha256": "a4a764fc6068fbf43e02bed536b6a25cbdaac1c32be853652a20d4b173a03909"
+        },
+        {
+          "path": "verification/cases/C3/fixture-recordCharge.json",
+          "sha256": "1cb66be02d7f1abb265ef07eee76330ce8056578f0784eb74337c85ea93b6839"
+        },
+        {
+          "path": "verification/cases/C3/fixture-recordDelivery.json",
+          "sha256": "302ef7c5bc65988365097ed7efc8fc4f9177ea2da6cd12793768fbac666cc690"
+        },
+        {
+          "path": "verification/cases/C3/fixture-recordDispositionBasis.json",
+          "sha256": "c63eb23e4d6e0a775b674c4c8ec558078067baaf75b07f3e3bc2ff6aef2627f6"
+        },
+        {
+          "path": "verification/cases/C3/fixture-recordExternalReconciliation.json",
+          "sha256": "321b0b7e5e952de25962b65f2ec4e6b47d4d1542f7b8e0f1917ff2df04403fc5"
+        },
+        {
+          "path": "verification/cases/C3/fixture-recordHandover.json",
+          "sha256": "833c7684049754f704d54ba7f8e8698659d54aab1f509e21695ae3c54e0f36a6"
+        },
+        {
+          "path": "verification/cases/C3/fixture-recordInvoice.json",
+          "sha256": "be1b15a2f28869118c2a1533968b653ea67063316b55c58ce77a4f66c00f8dfb"
+        },
+        {
+          "path": "verification/cases/C3/fixture-recordLegEvent.json",
+          "sha256": "3691c50a4f03b5739daa4e576dd74ddbde1d877da93ebd1ce8c9eefc8ab4a051"
+        },
+        {
+          "path": "verification/cases/C3/fixture-recordObservedMovement.json",
+          "sha256": "ceb3333a8a79844b91a5c8a3014128e953cbe8caffefe514b518b0ea622b7e0f"
+        },
+        {
+          "path": "verification/cases/C3/fixture-recordPaymentReference.json",
+          "sha256": "c2ea2e94359fd7a1f0350421144ee22bc12fc29a986abac596452919e277daa1"
+        },
+        {
+          "path": "verification/cases/C3/fixture-recordRecallNotice.json",
+          "sha256": "e0937abaa4cfb7697f565b2b13b1f0dac37c2ae4b4c1b0b01e72a1990fed87e7"
+        },
+        {
+          "path": "verification/cases/C3/fixture-recordRecovery.json",
+          "sha256": "69875572ed5919711d416cfdc8889d3f0f3ef06396613a8746610ded7d0c9d93"
+        },
+        {
+          "path": "verification/cases/C3/fixture-recordRegulatoryDecision.json",
+          "sha256": "fb77127493d9ca179e86101c32cd99573bc1ff3da9fdb23172c9eb85e48c9899"
+        },
+        {
+          "path": "verification/cases/C3/fixture-recordRelation.json",
+          "sha256": "86cce144c35f7548cf08b7631b4a172480766b600580bbf235acc72479f5a44b"
+        },
+        {
+          "path": "verification/cases/C3/fixture-recordSettlementAdjustment.json",
+          "sha256": "d1af9bd94690f4c867f617a80240cbe8f9bb6c2bd1d34fc2e4c8c6e69d39a8d8"
+        },
+        {
+          "path": "verification/cases/C3/fixture-recordStocktake.json",
+          "sha256": "894610e09e514e6da79c66a7e9f82576dbce236ded7ddac60fbdde826ca17635"
+        },
+        {
+          "path": "verification/cases/C3/fixture-recordSubmission.json",
+          "sha256": "04e67a66f3f56e011bd97f87fdce956e393fd683523edd5b8a334d1ec192101f"
+        },
+        {
+          "path": "verification/cases/C3/fixture-recordSupplierReply.json",
+          "sha256": "6fd7179c361dbaaa7ed3b283445d7c0acf1bb8bf103be04452dbbe8991287167"
+        },
+        {
+          "path": "verification/cases/C3/fixture-registerItem.json",
+          "sha256": "dca6d795c913660f60eb710b076252c61e9e7b1c957f9dac1672925573f3e472"
+        },
+        {
+          "path": "verification/cases/C3/fixture-rejectHandover.json",
+          "sha256": "0570a15230a06d470d136992d28039ed1f4a2c2ce3204d54ee6b69d8996bb96c"
+        },
+        {
+          "path": "verification/cases/C3/fixture-releaseAllocation.json",
+          "sha256": "1bca5c7dba776c2bb1411eb3c8e04fa25a13f32faf44d93bf9a83c94875f6ae2"
+        },
+        {
+          "path": "verification/cases/C3/fixture-releaseHold.json",
+          "sha256": "f1d7026b1269196bc650ba1d51c7b73312144921f94884ef78f21397e161f464"
+        },
+        {
+          "path": "verification/cases/C3/fixture-replaceAllocation.json",
+          "sha256": "d181f9d1bf70e69af8e13f90613134bc8788f74a543594276daf5e052f2721bd"
+        },
+        {
+          "path": "verification/cases/C3/fixture-reserveQuantity.json",
+          "sha256": "830bd5176279edf840e6c62afc547b9eb7384128f0df0f6a7b31f0a154fc186c"
+        },
+        {
+          "path": "verification/cases/C3/fixture-resolveEvidenceConflict.json",
+          "sha256": "712a15e59f65b466f529f792cc8f21bb781bfba0c76b2cc77aaea065e918d1ea"
+        },
+        {
+          "path": "verification/cases/C3/fixture-resolveObligation.json",
+          "sha256": "3aee986c7d6c58c03f8883c04ac5da5b82f5ca1f9b59fce5e41c791d87713415"
+        },
+        {
+          "path": "verification/cases/C3/fixture-resumeWork.json",
+          "sha256": "c3dbfb6d7eaca1d9884692a57da97b806a1fc800867fd50217595ed270e4066c"
+        },
+        {
+          "path": "verification/cases/C3/fixture-retireDefinition.json",
+          "sha256": "8420eb16a01ee9b3de400f0e6b6da692c6ac5aad755676bd40b029e10abfcac4"
+        },
+        {
+          "path": "verification/cases/C3/fixture-retirePolicy.json",
+          "sha256": "07588be7cd2df2176bb1fb7e627167596f3c3ce9e8c3f9b8998edea9bdc9ac3e"
+        },
+        {
+          "path": "verification/cases/C3/fixture-retrySafeCommand.json",
+          "sha256": "ec61f2dc08b034f3098672c0542e0c1f155aeed89bd20f7801a21435f71c9269"
+        },
+        {
+          "path": "verification/cases/C3/fixture-reviseGoal.json",
+          "sha256": "1f15e739a0cf1fdacd0230240e12fcf28fe933e104dd43ff0306e79d25ae21e6"
+        },
+        {
+          "path": "verification/cases/C3/fixture-revisePurchase.json",
+          "sha256": "70cf045ee07cedee356ce36a8ba650f5177c5f46cd9f7941e15cc074f0bd72ed"
+        },
+        {
+          "path": "verification/cases/C3/fixture-reviseSalesOrder.json",
+          "sha256": "1a2d2f24e1b0031f21198260095c3eeface0e3c388546b0907cc52a8b76eae06"
+        },
+        {
+          "path": "verification/cases/C3/fixture-revokeCapability.json",
+          "sha256": "b3f0024269f923be81e2200f9cff3dbeb820e5a1ed9a74dc7904a7117192d29e"
+        },
+        {
+          "path": "verification/cases/C3/fixture-revokeDispositionBasis.json",
+          "sha256": "77b9a6703894f3d5da549598fc5f92481a0ecb983754faa6e8ff34b2f0d2b404"
+        },
+        {
+          "path": "verification/cases/C3/fixture-revokeGrant.json",
+          "sha256": "5799c720a90afcbff4477c1ef1365b398a8d2b801a214f4bfc1a65ca332545f0"
+        },
+        {
+          "path": "verification/cases/C3/fixture-splitQuantity.json",
+          "sha256": "e146dc07af176f0a13130d9ffcf5f53a79c346fa7b0524442daa06a27b986464"
+        },
+        {
+          "path": "verification/cases/C3/fixture-submitDefinitionReview.json",
+          "sha256": "52ac1dde183ee321ce752da4ba2f11c640ad4648f3d5cb4967fc3c7098cde2bc"
+        },
+        {
+          "path": "verification/cases/C3/fixture-transferObligation.json",
+          "sha256": "b4eca6b503bf7f16c571241c024fe0930a941e9615b9a882e7b70d3646e424b6"
+        },
+        {
+          "path": "verification/cases/C3/fixture-validateDefinition.json",
+          "sha256": "8553466f9ce6e9d67f1d6d0ea806387d5e33e409fa77833511993a2a7749caf3"
+        },
+        {
+          "path": "verification/cases/C3/fixture-verifyLabel.json",
+          "sha256": "0597c036248515020808463f6512ebc9289e90387fcf7f15add4bcee0bda616f"
+        },
+        {
+          "path": "verification/cases/C3/fixture-waitWork.json",
+          "sha256": "424127afb0e63226f2ecc95f0cf5c85bacfd0e479dfdb3c0107a49da4e4de920"
+        },
+        {
+          "path": "verification/cases/C3/fixture-waiveObligation.json",
+          "sha256": "2dee995446df7644586a4cb1d306424dff791c2a39fff1fd091b552d673ccc91"
+        },
+        {
+          "path": "verification/cases/C3/fixture.json",
+          "sha256": "91289ec8388db321f9f596859aabfcea613146cd5dc2a252cd90d4c6764a83b3"
+        }
+      ],
+      "checkedFeatureHash": "ed71cbb02491da30b877933d503309635992943b7759e02cd83ea407ce3195a4",
+      "featureHash": "589a49fe6786ec8d8d70a79eed9c7002699393d765bd155fa7b531da0bdf2c7e",
+      "postCheckFormatting": "Removed only one blank line at EOF after git diff --cached --check; Gherkin statements and scenario/action/assertion identities unchanged."
+    },
+    {
+      "caseId": "V4",
+      "subcases": 92,
+      "assertions": 2134,
+      "oracles": 2,
+      "observations": 11,
+      "caseHash": "b9fa2dac543964f04ac9ac7108d23053435c76397282f0821346298b87e3ee8b",
+      "fixtures": [
+        {
+          "path": "verification/cases/C3/fixture-approvePurchase.json",
+          "sha256": "2cd44e5472738d93e3713e7bcb0eb9bfaa0d9f0616dc168713df0ef5a8d03881"
+        },
+        {
+          "path": "verification/cases/C3/fixture-createDefinitionDraft.json",
+          "sha256": "2f94e247d8bf09f06516a4ba0f55933a6125b1540f1c984520362adadc2f8797"
+        },
+        {
+          "path": "verification/cases/C3/fixture-createDraft.json",
+          "sha256": "ef574065ec00bc8640f63deb1ef55e3f8bc77413a513596a462550761a626653"
+        },
+        {
+          "path": "verification/cases/C3/fixture-createGrant.json",
+          "sha256": "0f7a93afdced9b4b0cb23c2a5072122428cf4379a7147b40592090cd3abdf5d2"
+        },
+        {
+          "path": "verification/cases/C3/fixture-createPolicyDraft.json",
+          "sha256": "41512f7b042fc165698e5b40c2756f04d62724ce2d4e58464a4ab0f4f4aa1b03"
+        },
+        {
+          "path": "verification/cases/C3/fixture-createSalesOrder.json",
+          "sha256": "bd3648ae9acf691f9249c38ffb3334c62042ad0034fd5628f8e8d9d69666b124"
+        },
+        {
+          "path": "verification/cases/C3/fixture-moveQuantity.json",
+          "sha256": "53b875f3e59406644fd17ba9ab3ac59b9c8bdbcea9a01600c0eb9aa8a202ed91"
+        },
+        {
+          "path": "verification/cases/C3/fixture-recordStocktake.json",
+          "sha256": "894610e09e514e6da79c66a7e9f82576dbce236ded7ddac60fbdde826ca17635"
+        },
+        {
+          "path": "verification/cases/C3/fixture-reserveQuantity.json",
+          "sha256": "830bd5176279edf840e6c62afc547b9eb7384128f0df0f6a7b31f0a154fc186c"
+        },
+        {
+          "path": "verification/cases/C3/fixture-retrySafeCommand.json",
+          "sha256": "ec61f2dc08b034f3098672c0542e0c1f155aeed89bd20f7801a21435f71c9269"
+        },
+        {
+          "path": "verification/cases/V4/fixture.json",
+          "sha256": "bceee33bb065cdfbd13c534445c06b5e7b6fc9d9e6e5bf8e28ee2e2cba963a86"
+        }
+      ],
+      "checkedFeatureHash": "60eea3356fd7e891c8df759ac55edeb159171cb2b205ebdca4c486a0c5c2b913",
+      "featureHash": "c1e4592da255f06c1e71b4a11d44e218d6bdd9120ae338dbc76d2ee561c8f194",
+      "postCheckFormatting": "Removed only one blank line at EOF after git diff --cached --check; Gherkin statements and scenario/action/assertion identities unchanged."
+    },
+    {
+      "caseId": "V6",
+      "subcases": 9,
+      "assertions": 101,
+      "oracles": 3,
+      "observations": 10,
+      "caseHash": "cea979f47138d0359531b6e8c0d89c974949460bc32cafcceb0a7414a83f3147",
+      "fixtures": [
+        {
+          "path": "verification/cases/V6/receipt-fixture.json",
+          "sha256": "09e0dba158c8fdb04b505cd4c3190ddec3f29883d734f572e28cfaef5b2fa0f8"
+        },
+        {
+          "path": "verification/cases/V6/two-po-fixture.json",
+          "sha256": "b35bd6bcbe763fe12c697a0fe7851f9e420d4753bba773446ab13f89dd5e0d8b"
+        }
+      ],
+      "checkedFeatureHash": "7ff0208fbc0f884bd292845423067306658f84d9f87698f9ffa4228b097fea0a",
+      "featureHash": "19f984a09074b1a290d9f947db7706717199fc67b72bbb6c1921de3eed7b4960",
+      "postCheckFormatting": "Removed only one blank line at EOF after git diff --cached --check; Gherkin statements and scenario/action/assertion identities unchanged."
+    },
+    {
+      "caseId": "V7",
+      "subcases": 4,
+      "assertions": 79,
+      "oracles": 3,
+      "observations": 12,
+      "caseHash": "cc1f2db945972a6ef86a2fd23b61b9f4b4b65c43de40ae210301d3cc825f449e",
+      "fixtures": [
+        {
+          "path": "verification/cases/V7/fixture.json",
+          "sha256": "dec30859378ecb6a8b27b976b0662e0379a0e0db6e7bf53522406a308d4f3558"
+        },
+        {
+          "path": "verification/cases/V7/restart-fixture.json",
+          "sha256": "0d951ca47fb4971dbf5e9e5ef28f82645833baeb6bfd3dafb6b28f2a611298e3"
+        }
+      ],
+      "checkedFeatureHash": "6299cb4d1627ec12a74ceb6a757485299754870320c9e4414c8c06509d393b87",
+      "featureHash": "96abe4886c2a3dde490d13eb3c0e632b3105eaa9dfd5b2123c4655a7c81ab09b",
+      "postCheckFormatting": "Removed only one blank line at EOF after git diff --cached --check; Gherkin statements and scenario/action/assertion identities unchanged."
+    }
+  ],
+  "totalSubcases": 437,
+  "totalAssertions": 13937,
+  "totalOracles": 13,
+  "totalObservations": 54,
+  "checks": [
+    {
+      "command": "./verify validate verification/cases/T08/case.json verification/cases/C3/case.json verification/cases/V4/case.json verification/cases/V6/case.json verification/cases/V7/case.json",
+      "exitCode": 0,
+      "result": "5 PREPARATION_SCHEMA_VALID"
+    },
+    {
+      "command": "./verify harness",
+      "exitCode": 0,
+      "tests": 139,
+      "ownedAssertionTests": 9,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "command": "./verify contract-red verification/cases/T08/case.json verification/cases/C3/case.json verification/cases/V4/case.json verification/cases/V6/case.json verification/cases/V7/case.json",
+      "exitCode": 1,
+      "expectedScenarios": 437,
+      "discoveredScenarios": 437,
+      "startedScenarios": 437,
+      "failedScenarios": 437,
+      "notImplementedAssertionFailures": 437,
+      "skippedScenarios": 0,
+      "result": "INTENTIONAL_NOT_IMPLEMENTED_RED"
+    },
+    {
+      "command": "./verify scenarios verification/cases/T08/case.json verification/cases/C3/case.json verification/cases/V4/case.json verification/cases/V6/case.json verification/cases/V7/case.json",
+      "exitCode": 2,
+      "discoveredSubcases": 437,
+      "selectedSubcases": 437,
+      "notRunSubcases": 437,
+      "result": "NOT_RUN"
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "verification/cases/T08/evidence/authority-suite/validate.log.gz",
+      "sha256": "776dcfc8db5cb2322e3eddac7ac8205cb7b779b0c96cacbdbfc9028841d96bbc",
+      "sourcePath": "/tmp/authority-final-validate.log",
+      "sourceSha256": "7e42d6eb85b943aac02126ec8e271c0979be5736321fdc3531e318616a4ef3fd",
+      "sourceBytes": 7912
+    },
+    {
+      "path": "verification/cases/T08/evidence/authority-suite/harness.log.gz",
+      "sha256": "017af70a94623462bb05c6420d5ef10ab7fb346c93c8f2887f9ab6826e488176",
+      "sourcePath": "/tmp/authority-final-harness.log",
+      "sourceSha256": "86adb960bb82c343d49ffebc719133c137ef4fd275b82928721ef25d0626da1e",
+      "sourceBytes": 6168
+    },
+    {
+      "path": "verification/cases/T08/evidence/authority-suite/contract-red.log.gz",
+      "sha256": "d7e4a6be8430e15a593b6e8616b5eabeb04c47d0bef20558b761d583028e9c42",
+      "sourcePath": "/tmp/authority-final-red.log",
+      "sourceSha256": "ad1afa9775c0608e566b9f3ab2332aaa01c23f471851e45741fda6634e450333",
+      "sourceBytes": 4836303
+    },
+    {
+      "path": "verification/cases/T08/evidence/authority-suite/scenarios-not-run.log.gz",
+      "sha256": "2ac8b735aec70f3154c29da3c8585cdd37c5d20bd2d5a374149e2d6fd338a256",
+      "sourcePath": "/tmp/authority-final-not-run.log",
+      "sourceSha256": "0f93ee470759faafb127d37f477c7b0079d7d48e00a8f3a0b1258fdd3eeabec4",
+      "sourceBytes": 8330299
+    },
+    {
+      "path": "verification/cases/T08/evidence/authority-suite/feature-red-cucumber.json.gz",
+      "sha256": "f2687408c20b14227cf95b9404f1bbc3c4ebdc5dd0f15c1c655cb3409c3f074b",
+      "sourcePath": "/Volumes/VideoStore/Developer/mulino-ontology-step2-authority/verification/harness/target/feature-red-cucumber.json",
+      "sourceSha256": "058be0f626f0f41991f5b91a16e2954c127db0db304a20b169c155982c2a72ba",
+      "sourceBytes": 8305298
+    },
+    {
+      "path": "verification/cases/T08/evidence/authority-suite/feature-red-summary.json",
+      "sha256": "88461867d7ca9decfd62f07489c75e8dfefd825297f40698de434059988048de",
+      "sourcePath": "/Volumes/VideoStore/Developer/mulino-ontology-step2-authority/verification/harness/target/evidence/feature-red-summary.json",
+      "sourceSha256": "88461867d7ca9decfd62f07489c75e8dfefd825297f40698de434059988048de",
+      "sourceBytes": 51065
+    },
+    {
+      "path": "verification/cases/T08/evidence/authority-suite/scenarios-not-run.json.gz",
+      "sha256": "f4cdc0e2f88636e431aa80f1d63bceaccc9589fee303144c349406d812f5cda8",
+      "sourcePath": "/Volumes/VideoStore/Developer/mulino-ontology-step2-authority/verification/harness/target/evidence/scenarios.json",
+      "sourceSha256": "2174b4220e1203093d7605709e3d258c63248f77e28cb06a1e26601c61d67af4",
+      "sourceBytes": 8322679
+    },
+    {
+      "path": "verification/cases/T08/evidence/authority-suite/scenarios-wrapper-commands.json",
+      "sha256": "d542b7792d378a9f57faf8a19186f52786a2b7c5c640dece6d99da5759418703",
+      "sourcePath": "/Volumes/VideoStore/Developer/mulino-ontology-step2-authority/verification/harness/target/wrapper-commands.json",
+      "sourceSha256": "d542b7792d378a9f57faf8a19186f52786a2b7c5c640dece6d99da5759418703",
+      "sourceBytes": 6130
+    },
+    {
+      "path": "verification/cases/T08/evidence/authority-suite/authority-assertions-junit.xml",
+      "sha256": "710b6ea81674a395bdd6e1cf99c77ad0508356e9bca32cc5947458a1effdff8f",
+      "sourcePath": "/Volumes/VideoStore/Developer/mulino-ontology-step2-authority/verification/harness/target/surefire-reports/TEST-org.mulino.verification.cases.authority.AuthorityAssertionsTest.xml",
+      "sourceSha256": "710b6ea81674a395bdd6e1cf99c77ad0508356e9bca32cc5947458a1effdff8f",
+      "sourceBytes": 15316
+    },
+    {
+      "path": "verification/cases/T08/evidence/authority-suite/contract-red-case-evidence.json.gz",
+      "sha256": "2941c8d8236a5135aaa25bbb79c5702328e1d1e5803bc3ee9af46efaf7eb42cb",
+      "source": "437 actual CaseFeatureTest evidence files",
+      "sourceBytes": 2503916
+    }
+  ],
+  "productRuntimeClaimed": false,
+  "modelExecutionPerformed": false,
+  "gateComplete": false,
+  "runtimeStatus": "NOT_RUN",
+  "remaining": "Actual fixture/API/independent DB/MCP/worker/barrier/host/model adapters remain NOT_IMPLEMENTED. Semantic equivalence requires Step2 review and integrated coverage; product acceptance is NOT_RUN."
+}

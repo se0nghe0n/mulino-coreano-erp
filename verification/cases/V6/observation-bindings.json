@@ -1,0 +1,203 @@
+{
+  "recordType": "PREPARED_NORMATIVE_OBSERVATION_BINDINGS",
+  "caseId": "V6",
+  "caseHash": "cea979f47138d0359531b6e8c0d89c974949460bc32cafcceb0a7414a83f3147",
+  "catalogSha256": "61968b22cde1f35922df323d964599228d8dfbbe71b0ee32192b59de0a9f5ed9",
+  "productRuntimeClaimed": false,
+  "runtimeStatus": "NOT_RUN",
+  "observations": [
+    {
+      "oracleId": "V6.receipt60-lost-response-retry",
+      "observationName": "physical-receipt-total",
+      "runtimeStatus": "NOT_RUN",
+      "primaryFixedQuantityAssertions": [
+        {"subcaseId":"lost-response-token-rpc-concurrent","assertionId":"receipt-physical-total","pointer":"/subcases/0/assertions/9","actionId":"after","op":"sumEquals"},
+        {"subcaseId":"rollback-in-progress","assertionId":"receipt-physical-total","pointer":"/subcases/1/assertions/12","actionId":"after","op":"sumEquals"}
+      ],
+      "bindings": [
+        {"subcaseId":"lost-response-token-rpc-concurrent","assertionId":"receipt-physical-total","pointer":"/subcases/0/assertions/9","actionId":"after","op":"sumEquals"},
+        {"subcaseId":"rollback-in-progress","assertionId":"receipt-physical-total","pointer":"/subcases/1/assertions/12","actionId":"after","op":"sumEquals"}
+      ]
+    },
+    {
+      "oracleId": "V6.receipt60-lost-response-retry",
+      "observationName": "committed-effect-count",
+      "runtimeStatus": "NOT_RUN",
+      "primaryFixedQuantityAssertions": [
+      ],
+      "bindings": [
+        {"subcaseId":"lost-response-token-rpc-concurrent","assertionId":"one-movements-K-60","pointer":"/subcases/0/assertions/10","actionId":"after","op":"count"},
+        {"subcaseId":"lost-response-token-rpc-concurrent","assertionId":"one-commands-K-60","pointer":"/subcases/0/assertions/11","actionId":"after","op":"count"},
+        {"subcaseId":"lost-response-token-rpc-concurrent","assertionId":"receipt-movement","pointer":"/subcases/0/assertions/12","actionId":"after","op":"relationSet"},
+        {"subcaseId":"lost-response-token-rpc-concurrent","assertionId":"receipt-owner-one","pointer":"/subcases/0/assertions/15","actionId":"after","op":"count"},
+        {"subcaseId":"lost-response-token-rpc-concurrent","assertionId":"one-receipt-followup","pointer":"/subcases/0/assertions/16","actionId":"after","op":"count"},
+        {"subcaseId":"rollback-in-progress","assertionId":"one-movements-K-60","pointer":"/subcases/1/assertions/13","actionId":"after","op":"count"},
+        {"subcaseId":"rollback-in-progress","assertionId":"one-commands-K-60","pointer":"/subcases/1/assertions/14","actionId":"after","op":"count"},
+        {"subcaseId":"rollback-in-progress","assertionId":"receipt-movement","pointer":"/subcases/1/assertions/15","actionId":"after","op":"relationSet"},
+        {"subcaseId":"rollback-in-progress","assertionId":"receipt-owner-one","pointer":"/subcases/1/assertions/18","actionId":"after","op":"count"},
+        {"subcaseId":"rollback-in-progress","assertionId":"one-receipt-followup","pointer":"/subcases/1/assertions/19","actionId":"after","op":"count"}
+      ]
+    },
+    {
+      "oracleId": "V6.receipt60-lost-response-retry",
+      "observationName": "retry-result",
+      "runtimeStatus": "NOT_RUN",
+      "primaryFixedQuantityAssertions": [
+      ],
+      "bindings": [
+        {"subcaseId":"lost-response-token-rpc-concurrent","assertionId":"response-lost-transport","pointer":"/subcases/0/assertions/0","actionId":"first","op":"equals"},
+        {"subcaseId":"lost-response-token-rpc-concurrent","assertionId":"retry-a-ready-point","pointer":"/subcases/0/assertions/1","actionId":"retry-a-ready","op":"equals"},
+        {"subcaseId":"lost-response-token-rpc-concurrent","assertionId":"retry-a-ready-state","pointer":"/subcases/0/assertions/2","actionId":"retry-a-ready","op":"equals"},
+        {"subcaseId":"lost-response-token-rpc-concurrent","assertionId":"retry-b-ready-point","pointer":"/subcases/0/assertions/3","actionId":"retry-b-ready","op":"equals"},
+        {"subcaseId":"lost-response-token-rpc-concurrent","assertionId":"retry-b-ready-state","pointer":"/subcases/0/assertions/4","actionId":"retry-b-ready","op":"equals"},
+        {"subcaseId":"lost-response-token-rpc-concurrent","assertionId":"resume-a-point","pointer":"/subcases/0/assertions/5","actionId":"resume-a","op":"equals"},
+        {"subcaseId":"lost-response-token-rpc-concurrent","assertionId":"resume-a-state","pointer":"/subcases/0/assertions/6","actionId":"resume-a","op":"equals"},
+        {"subcaseId":"lost-response-token-rpc-concurrent","assertionId":"resume-b-point","pointer":"/subcases/0/assertions/7","actionId":"resume-b","op":"equals"},
+        {"subcaseId":"lost-response-token-rpc-concurrent","assertionId":"resume-b-state","pointer":"/subcases/0/assertions/8","actionId":"resume-b","op":"equals"},
+        {"subcaseId":"lost-response-token-rpc-concurrent","assertionId":"receipt-result-transaction","pointer":"/subcases/0/assertions/13","actionId":"after","op":"relationSet"},
+        {"subcaseId":"lost-response-token-rpc-concurrent","assertionId":"receipt-audit-transaction","pointer":"/subcases/0/assertions/14","actionId":"after","op":"relationSet"},
+        {"subcaseId":"lost-response-token-rpc-concurrent","assertionId":"result-a-completed","pointer":"/subcases/0/assertions/17","actionId":"result-a","op":"equals"},
+        {"subcaseId":"lost-response-token-rpc-concurrent","assertionId":"result-a-same-handle","pointer":"/subcases/0/assertions/18","actionId":"result-a","op":"equals"},
+        {"subcaseId":"lost-response-token-rpc-concurrent","assertionId":"result-a-receipt","pointer":"/subcases/0/assertions/19","actionId":"result-a","op":"equals"},
+        {"subcaseId":"lost-response-token-rpc-concurrent","assertionId":"result-a-command","pointer":"/subcases/0/assertions/20","actionId":"result-a","op":"equals"},
+        {"subcaseId":"lost-response-token-rpc-concurrent","assertionId":"result-a-applied","pointer":"/subcases/0/assertions/21","actionId":"result-a","op":"equals"},
+        {"subcaseId":"lost-response-token-rpc-concurrent","assertionId":"result-b-completed","pointer":"/subcases/0/assertions/22","actionId":"result-b","op":"equals"},
+        {"subcaseId":"lost-response-token-rpc-concurrent","assertionId":"result-b-same-handle","pointer":"/subcases/0/assertions/23","actionId":"result-b","op":"equals"},
+        {"subcaseId":"lost-response-token-rpc-concurrent","assertionId":"result-b-receipt","pointer":"/subcases/0/assertions/24","actionId":"result-b","op":"equals"},
+        {"subcaseId":"lost-response-token-rpc-concurrent","assertionId":"result-b-command","pointer":"/subcases/0/assertions/25","actionId":"result-b","op":"equals"},
+        {"subcaseId":"lost-response-token-rpc-concurrent","assertionId":"result-b-applied","pointer":"/subcases/0/assertions/26","actionId":"result-b","op":"equals"},
+        {"subcaseId":"lost-response-token-rpc-concurrent","assertionId":"stable-owner-preserved","pointer":"/subcases/0/assertions/27","actionId":"replay","op":"equals"},
+        {"subcaseId":"lost-response-token-rpc-concurrent","assertionId":"definition-preserved","pointer":"/subcases/0/assertions/28","actionId":"replay","op":"equals"},
+        {"subcaseId":"rollback-in-progress","assertionId":"rollback-movements","pointer":"/subcases/1/assertions/0","actionId":"after-first","op":"sameAs"},
+        {"subcaseId":"rollback-in-progress","assertionId":"rollback-segments","pointer":"/subcases/1/assertions/1","actionId":"after-first","op":"sameAs"},
+        {"subcaseId":"rollback-in-progress","assertionId":"rollback-outbox","pointer":"/subcases/1/assertions/2","actionId":"after-first","op":"sameAs"},
+        {"subcaseId":"rollback-in-progress","assertionId":"rollback-not-committed","pointer":"/subcases/1/assertions/3","actionId":"after-first","op":"count"},
+        {"subcaseId":"rollback-in-progress","assertionId":"retry-a-ready-point","pointer":"/subcases/1/assertions/4","actionId":"retry-a-ready","op":"equals"},
+        {"subcaseId":"rollback-in-progress","assertionId":"retry-a-ready-state","pointer":"/subcases/1/assertions/5","actionId":"retry-a-ready","op":"equals"},
+        {"subcaseId":"rollback-in-progress","assertionId":"retry-b-ready-point","pointer":"/subcases/1/assertions/6","actionId":"retry-b-ready","op":"equals"},
+        {"subcaseId":"rollback-in-progress","assertionId":"retry-b-ready-state","pointer":"/subcases/1/assertions/7","actionId":"retry-b-ready","op":"equals"},
+        {"subcaseId":"rollback-in-progress","assertionId":"resume-a-point","pointer":"/subcases/1/assertions/8","actionId":"resume-a","op":"equals"},
+        {"subcaseId":"rollback-in-progress","assertionId":"resume-a-state","pointer":"/subcases/1/assertions/9","actionId":"resume-a","op":"equals"},
+        {"subcaseId":"rollback-in-progress","assertionId":"resume-b-point","pointer":"/subcases/1/assertions/10","actionId":"resume-b","op":"equals"},
+        {"subcaseId":"rollback-in-progress","assertionId":"resume-b-state","pointer":"/subcases/1/assertions/11","actionId":"resume-b","op":"equals"},
+        {"subcaseId":"rollback-in-progress","assertionId":"receipt-result-transaction","pointer":"/subcases/1/assertions/16","actionId":"after","op":"relationSet"},
+        {"subcaseId":"rollback-in-progress","assertionId":"receipt-audit-transaction","pointer":"/subcases/1/assertions/17","actionId":"after","op":"relationSet"},
+        {"subcaseId":"rollback-in-progress","assertionId":"result-a-completed","pointer":"/subcases/1/assertions/20","actionId":"result-a","op":"equals"},
+        {"subcaseId":"rollback-in-progress","assertionId":"result-a-same-handle","pointer":"/subcases/1/assertions/21","actionId":"result-a","op":"equals"},
+        {"subcaseId":"rollback-in-progress","assertionId":"result-a-receipt","pointer":"/subcases/1/assertions/22","actionId":"result-a","op":"equals"},
+        {"subcaseId":"rollback-in-progress","assertionId":"result-a-command","pointer":"/subcases/1/assertions/23","actionId":"result-a","op":"equals"},
+        {"subcaseId":"rollback-in-progress","assertionId":"result-a-applied","pointer":"/subcases/1/assertions/24","actionId":"result-a","op":"equals"},
+        {"subcaseId":"rollback-in-progress","assertionId":"result-b-completed","pointer":"/subcases/1/assertions/25","actionId":"result-b","op":"equals"},
+        {"subcaseId":"rollback-in-progress","assertionId":"result-b-same-handle","pointer":"/subcases/1/assertions/26","actionId":"result-b","op":"equals"},
+        {"subcaseId":"rollback-in-progress","assertionId":"result-b-receipt","pointer":"/subcases/1/assertions/27","actionId":"result-b","op":"equals"},
+        {"subcaseId":"rollback-in-progress","assertionId":"result-b-command","pointer":"/subcases/1/assertions/28","actionId":"result-b","op":"equals"},
+        {"subcaseId":"rollback-in-progress","assertionId":"result-b-applied","pointer":"/subcases/1/assertions/29","actionId":"result-b","op":"equals"},
+        {"subcaseId":"rollback-in-progress","assertionId":"stable-owner-preserved","pointer":"/subcases/1/assertions/30","actionId":"replay","op":"equals"},
+        {"subcaseId":"rollback-in-progress","assertionId":"definition-preserved","pointer":"/subcases/1/assertions/31","actionId":"replay","op":"equals"}
+      ]
+    },
+    {
+      "oracleId": "V6.key-conflicts-owner-and-distinct-order",
+      "observationName": "different-payload",
+      "runtimeStatus": "NOT_RUN",
+      "primaryFixedQuantityAssertions": [
+      ],
+      "bindings": [
+        {"subcaseId":"same-key40-conflict","assertionId":"conflict-code","pointer":"/subcases/2/assertions/0","actionId":"conflict","op":"equals"},
+        {"subcaseId":"same-key40-conflict","assertionId":"conflict-outcome","pointer":"/subcases/2/assertions/1","actionId":"conflict","op":"equals"},
+        {"subcaseId":"rejected-new-key","assertionId":"same-rejected-key-code","pointer":"/subcases/6/assertions/2","actionId":"same-rejected-key","op":"equals"},
+        {"subcaseId":"rejected-new-key","assertionId":"same-rejected-key-outcome","pointer":"/subcases/6/assertions/3","actionId":"same-rejected-key","op":"equals"}
+      ]
+    },
+    {
+      "oracleId": "V6.key-conflicts-owner-and-distinct-order",
+      "observationName": "conflict-new-effects",
+      "runtimeStatus": "NOT_RUN",
+      "primaryFixedQuantityAssertions": [
+      ],
+      "bindings": [
+        {"subcaseId":"same-key40-conflict","assertionId":"conflict-keeps-raw-effects","pointer":"/subcases/2/assertions/2","actionId":"after","op":"sameAs"},
+        {"subcaseId":"other-owner-no-result","assertionId":"other-owner-did-not-write","pointer":"/subcases/3/assertions/4","actionId":"after","op":"sameAs"},
+        {"subcaseId":"replay-after-read-revocation","assertionId":"prior-receipt-unchanged","pointer":"/subcases/4/assertions/3","actionId":"after","op":"sameAs"},
+        {"subcaseId":"rejected-new-key","assertionId":"new-key-same-canonical-physical","pointer":"/subcases/6/assertions/6","actionId":"after","op":"sameAs"}
+      ]
+    },
+    {
+      "oracleId": "V6.key-conflicts-owner-and-distinct-order",
+      "observationName": "other-owner-result-leak",
+      "runtimeStatus": "NOT_RUN",
+      "primaryFixedQuantityAssertions": [
+      ],
+      "bindings": [
+        {"subcaseId":"other-owner-no-result","assertionId":"leak-code","pointer":"/subcases/3/assertions/0","actionId":"leak","op":"equals"},
+        {"subcaseId":"other-owner-no-result","assertionId":"leak-outcome","pointer":"/subcases/3/assertions/1","actionId":"leak","op":"equals"},
+        {"subcaseId":"other-owner-no-result","assertionId":"result-not-visible","pointer":"/subcases/3/assertions/2","actionId":"leak","op":"absent"},
+        {"subcaseId":"other-owner-no-result","assertionId":"leak-no-identity-error-details","pointer":"/subcases/3/assertions/3","actionId":"leak","op":"equals"},
+        {"subcaseId":"replay-after-read-revocation","assertionId":"no-replayed-result","pointer":"/subcases/4/assertions/2","actionId":"leak","op":"absent"}
+      ]
+    },
+    {
+      "oracleId": "V6.key-conflicts-owner-and-distinct-order",
+      "observationName": "namespaces",
+      "runtimeStatus": "NOT_RUN",
+      "primaryFixedQuantityAssertions": [
+      ],
+      "bindings": [
+        {"subcaseId":"same-key40-conflict","assertionId":"unique-namespace-owner","pointer":"/subcases/2/assertions/3","actionId":"replay","op":"equals"},
+        {"subcaseId":"same-key40-conflict","assertionId":"unique-command-namespace-columns","pointer":"/subcases/2/assertions/4","actionId":"after","op":"relationSet"},
+        {"subcaseId":"replay-after-read-revocation","assertionId":"leak-code","pointer":"/subcases/4/assertions/0","actionId":"leak","op":"equals"},
+        {"subcaseId":"replay-after-read-revocation","assertionId":"leak-outcome","pointer":"/subcases/4/assertions/1","actionId":"leak","op":"equals"},
+        {"subcaseId":"distinct-po-distinct-keys","assertionId":"po-a-replay-preserves-effect","pointer":"/subcases/5/assertions/0","actionId":"po-a","op":"equals"},
+        {"subcaseId":"distinct-po-distinct-keys","assertionId":"po-b-applied","pointer":"/subcases/5/assertions/1","actionId":"po-b","op":"equals"},
+        {"subcaseId":"distinct-po-distinct-keys","assertionId":"distinct-order-keys","pointer":"/subcases/5/assertions/2","actionId":"after","op":"relationSet"},
+        {"subcaseId":"distinct-po-distinct-keys","assertionId":"distinct-orders-physical","pointer":"/subcases/5/assertions/3","actionId":"after","op":"sumEquals"},
+        {"subcaseId":"rejected-new-key","assertionId":"bad-code","pointer":"/subcases/6/assertions/0","actionId":"bad","op":"equals"},
+        {"subcaseId":"rejected-new-key","assertionId":"bad-outcome","pointer":"/subcases/6/assertions/1","actionId":"bad","op":"equals"},
+        {"subcaseId":"rejected-new-key","assertionId":"new-key-valid-dedup","pointer":"/subcases/6/assertions/4","actionId":"new-request","op":"equals"},
+        {"subcaseId":"rejected-new-key","assertionId":"rejected-original-kept","pointer":"/subcases/6/assertions/5","actionId":"after","op":"relationSet"},
+        {"subcaseId":"retained-tombstone","assertionId":"tombstone-kept-until","pointer":"/subcases/7/assertions/0","actionId":"after","op":"relationSet"},
+        {"subcaseId":"retained-tombstone","assertionId":"tombstone-references-prior-effect","pointer":"/subcases/7/assertions/1","actionId":"after","op":"exactSet"}
+      ]
+    },
+    {
+      "oracleId": "V6.input-destination-supplement",
+      "observationName": "draft-supplement-physical-effects",
+      "runtimeStatus": "NOT_RUN",
+      "primaryFixedQuantityAssertions": [
+      ],
+      "bindings": [
+        {"subcaseId":"destination-input-supplement","assertionId":"unchanged-segments","pointer":"/subcases/8/assertions/6","actionId":"after","op":"sameAs"},
+        {"subcaseId":"destination-input-supplement","assertionId":"unchanged-movements","pointer":"/subcases/8/assertions/7","actionId":"after","op":"sameAs"},
+        {"subcaseId":"destination-input-supplement","assertionId":"unchanged-allocations","pointer":"/subcases/8/assertions/8","actionId":"after","op":"sameAs"},
+        {"subcaseId":"destination-input-supplement","assertionId":"unchanged-approvals","pointer":"/subcases/8/assertions/9","actionId":"after","op":"sameAs"},
+        {"subcaseId":"destination-input-supplement","assertionId":"unchanged-outbox","pointer":"/subcases/8/assertions/10","actionId":"after","op":"sameAs"}
+      ]
+    },
+    {
+      "oracleId": "V6.input-destination-supplement",
+      "observationName": "draft-supplement-idempotency-conflict",
+      "runtimeStatus": "NOT_RUN",
+      "primaryFixedQuantityAssertions": [
+      ],
+      "bindings": [
+        {"subcaseId":"destination-input-supplement","assertionId":"structured-ready","pointer":"/subcases/8/assertions/1","actionId":"input-complete","op":"equals"},
+        {"subcaseId":"destination-input-supplement","assertionId":"draft-supplement-idempotency-conflict-rows0","pointer":"/subcases/8/assertions/11","actionId":"after","op":"count"}
+      ]
+    },
+    {
+      "oracleId": "V6.input-destination-supplement",
+      "observationName": "completed-intent",
+      "runtimeStatus": "NOT_RUN",
+      "primaryFixedQuantityAssertions": [
+      ],
+      "bindings": [
+        {"subcaseId":"destination-input-supplement","assertionId":"needs-input","pointer":"/subcases/8/assertions/0","actionId":"input-missing","op":"equals"},
+        {"subcaseId":"destination-input-supplement","assertionId":"same-conversation","pointer":"/subcases/8/assertions/2","actionId":"input-complete","op":"equals"},
+        {"subcaseId":"destination-input-supplement","assertionId":"canonical-proposal-revision","pointer":"/subcases/8/assertions/3","actionId":"input-complete","op":"equals"},
+        {"subcaseId":"destination-input-supplement","assertionId":"validated-destination","pointer":"/subcases/8/assertions/4","actionId":"input-complete","op":"equals"},
+        {"subcaseId":"destination-input-supplement","assertionId":"no-effect-key-during-input","pointer":"/subcases/8/assertions/5","actionId":"input-complete","op":"absent"},
+        {"subcaseId":"destination-input-supplement","assertionId":"canonical-hash-row","pointer":"/subcases/8/assertions/12","actionId":"after","op":"relationSet"}
+      ]
+    }
+  ]
+}
