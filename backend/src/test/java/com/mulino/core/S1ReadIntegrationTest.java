@@ -85,8 +85,18 @@ class S1ReadIntegrationTest {
     var noun=read("getObject",item,null);var verb=read("getWork",work,(String)noun.get("snapshotRevision"));
     for(String key:List.of("snapshotRevision","asOf","knownAt","scope","evidenceRefs"))assertEquals(noun.get(key),verb.get(key));
     var n=(Map<?,?>)noun.get("data");var v=(Map<?,?>)verb.get("data");
-    for(String key:List.of("itemId","workIds","heldQuantity","unit","ownerIds","nextActions","evidenceRefs"))assertEquals(n.get(key),v.get(key));
-    assertEquals("100",n.get("heldQuantity"));assertNull(n.get("eligibleQuantity"));assertNull(n.get("cumulativeArrival"));assertEquals(List.of(actor),n.get("ownerIds"));assertEquals(List.of(document),n.get("evidenceRefs"));
+    for(String key:List.of("itemId","workIds","heldQuantity","eligibleQuantity","eligibilityStatus","cumulativeArrival","unit","ownerIds","nextActions","evidenceRefs"))assertEquals(n.get(key),v.get(key));
+    assertEquals("100",n.get("heldQuantity"));
+    // S3 exposes the proven executable subset: unknown permissions prove no
+    // executable quantity, while the status and missing-fact reasons stay UNKNOWN.
+    assertEquals("0",n.get("eligibleQuantity"));assertEquals("UNKNOWN",n.get("eligibilityStatus"));
+    assertTrue(((List<?>)noun.get("unknowns")).contains("CURRENT_ELIGIBILITY_POLICY_UNRESOLVED"));
+    assertTrue(((List<?>)noun.get("unknowns")).contains("QC_AUTHORITY_UNCONFIRMED"));
+    // No authoritative confirmed Receipts exist in this snapshot: this sum is
+    // confirmed zero, unlike a provisional/withdrawn receipt source unknown.
+    assertEquals("0",n.get("cumulativeArrival"));
+    assertEquals(0,jdbc.queryForObject("SELECT count(*) FROM mulino_trade_receipt_Receipts WHERE organizationId=?",Integer.class,org));
+    assertEquals(List.of(actor),n.get("ownerIds"));assertEquals(List.of(document),n.get("evidenceRefs"));
     assertEquals(1,jdbc.queryForObject("SELECT count(*) FROM mulino_work_read_ObligationReferences WHERE organizationId=? AND status='OPEN'",Integer.class,org));
     assertEquals(new java.math.BigDecimal("100.000000000000"),jdbc.queryForObject("SELECT sum(quantity) FROM mulino_inventory_QuantitySegments WHERE organizationId=?",java.math.BigDecimal.class,org));
   }
