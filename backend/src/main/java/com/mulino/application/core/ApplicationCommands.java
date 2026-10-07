@@ -56,18 +56,26 @@ public class ApplicationCommands {
   private CommandHandler handler(Map<String,Object> intent){CommandHandler h=handlers.get(intent.get("capabilityId"));if(h==null||!h.semanticVersion().equals(intent.get("capabilityVersion"))||!h.intentKinds().contains(intent.get("intentKind")))throw DomainError.unsupported();return h;}
   private Map<String,Object> apply(Map<String,Object> intent,String hash,Map<String,Object> claim,boolean claimed){
     DomainContext c=claimed?leases.getObject().resolveContext(claim,clock.instant()):auth.context(clock.instant(),clock.instant());String cap=(String)intent.get("capabilityId"),key=(String)intent.get("commandIdempotencyKey");
+    // The key fence and saved scope precede prerequisites which a successful action may consume.
+    repository.fence(c,List.of("command:"+c.stableRequestOwner()+":"+cap+":"+key));
+    Optional<Map<String,Object>> old=repository.find(c,cap,key);
+    if(old.isPresent()){
+      if(old.get().get("authorizationScopeJson")!=null)auth.authorizeScopes(c,cap,repository.scopes(old.get()));else auth.authorize(c,cap,null);
+      if(!claim.isEmpty())leases.getObject().fenceAndVerify(c,claim);
+      if(!hash.equals(old.get().get("canonicalHash")))throw new DomainError("CONFLICT","IDEMPOTENCY_CONFLICT","Idempotency key has different content");
+      if(old.get().get("resultJson")==null)throw new DomainError("CONFLICT","COMMAND_IN_PROGRESS","Command unavailable");
+      return repository.result(old.get());
+    }
     CommandHandler h=handler(intent);definitions.verify(c,intent,h);CommandPreparation initial=h.prepare(c,intent);
-    List<String> fences=new ArrayList<>(initial.fenceKeys());fences.add("command:"+c.stableRequestOwner()+":"+cap+":"+key);repository.fence(c,fences);
+    repository.fence(c,initial.fenceKeys());
     CommandGuard current=guard.getIfAvailable();if(current==null)throw new DomainError("REJECTED","POLICY_UNRESOLVED","Current command guard unavailable");current.fence(c,initial);
     CommandPreparation prep=h.prepare(c,intent);if(!initial.authorityActors().equals(prep.authorityActors())||!initial.effectClass().equals(prep.effectClass())||!Objects.equals(initial.approvalAction(),prep.approvalAction())||!initial.scopes().equals(prep.scopes())||!new TreeSet<>(initial.fenceKeys()).equals(new TreeSet<>(prep.fenceKeys())))throw new DomainError("CONFLICT","STALE_REVISION","Command scope changed");
     auth.authorizeScopes(c,cap,prep.scopes());
     if(!claim.isEmpty()){CommandLeasePort lease=leases.getIfAvailable();if(lease==null)throw DomainError.forbidden();lease.fenceAndVerify(c,claim);}
-    Optional<Map<String,Object>> old=repository.find(c,cap,key);
-    if(old.isPresent()){if(!hash.equals(old.get().get("canonicalHash")))throw new DomainError("CONFLICT","IDEMPOTENCY_CONFLICT","Idempotency key has different content");if(old.get().get("resultJson")==null)throw new DomainError("CONFLICT","COMMAND_IN_PROGRESS","Command unavailable");return repository.result(old.get());}
     if(prep.currentRevision()!=null&&(!intent.containsKey("expectedRevision")||((Number)intent.get("expectedRevision")).intValue()!=prep.currentRevision()))throw new DomainError("CONFLICT","STALE_REVISION","Expected revision changed");
     if(intent.containsKey("proposalRevision")&&((Number)intent.get("proposalRevision")).intValue()!=(prep.proposalRevision()>0?prep.proposalRevision():1))throw new DomainError("CONFLICT","STALE_REVISION","Proposal revision changed");
     current.verify(c,cap,hash,prep,intent);
-    String id=repository.begin(c,intent,hash,clock.instant(),true);Map<String,Object> result;String previous=CommandExecution.enter(id);
+    String id=repository.begin(c,intent,hash,clock.instant(),prep);Map<String,Object> result;String previous=CommandExecution.enter(id);
     try{result=new LinkedHashMap<>(h.execute(c,intent));}finally{CommandExecution.exit(previous);}
     if(!Set.of("APPLIED","ACCEPTED_PENDING_EXTERNAL","PENDING_EXTERNAL","WAITING_APPROVAL","NEEDS_INPUT","REJECTED","CONFLICT","HELD").contains(result.get("outcome")))throw new IllegalStateException("Invalid handler command outcome");
     if(Set.of("REJECTED","CONFLICT","NEEDS_INPUT","WAITING_APPROVAL","HELD").contains(result.get("outcome")))throw new DomainError((String)result.get("outcome"),"COMMAND_NOT_APPLIED","Command did not apply");
@@ -81,7 +89,7 @@ public class ApplicationCommands {
     Map<String,Object> result=failure.response();
     return denial.execute(status->{DomainContext c;try{c=claimed?leases.getObject().resolveContext(claim,clock.instant()):auth.context(clock.instant(),clock.instant());}catch(AccessDeniedException|DomainError unauthenticated){return result;}
       String cap=(String)intent.get("capabilityId"),key=(String)intent.get("commandIdempotencyKey");repository.fence(c,List.of("command:"+c.stableRequestOwner()+":"+cap+":"+key));var old=repository.find(c,cap,key);
-      if(old.isPresent())return result;String id=repository.begin(c,intent,hash,clock.instant(),false);repository.finish(c,id,intent,hash,result,clock.instant());return result;});
+      if(old.isPresent())return result;String id=repository.begin(c,intent,hash,clock.instant(),null);repository.finish(c,id,intent,hash,result,clock.instant());return result;});
   }
   private boolean transientFailure(RuntimeException failure){Throwable cause=failure;while(cause!=null){if(cause instanceof java.sql.SQLException sql&&Set.of("55P03","40P01","40001").contains(sql.getSQLState()))return true;cause=cause.getCause();}return false;}
 }

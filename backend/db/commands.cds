@@ -1,7 +1,7 @@
 namespace mulino.commands;
 entity CommandRecords {
  key ID : UUID;
- organizationId : UUID; actorId : UUID; canonicalIntentJson : LargeString; stableRequestOwner : String(160);
+ organizationId : UUID; actorId : UUID; canonicalIntentJson : LargeString; authorizationScopeJson : LargeString; effectClass : String(80); stableRequestOwner : String(160);
  capabilityId : String(120); commandIdempotencyKey : String(160);
  canonicalHash : String(64); definitionVersion : String(80); capabilityVersion : String(80);
  state : String(30); resultJson : LargeString; createdAt : Timestamp; completedAt : Timestamp;

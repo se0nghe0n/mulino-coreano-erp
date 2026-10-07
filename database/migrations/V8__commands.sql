@@ -1,6 +1,6 @@
 CREATE TABLE mulino_commands_CommandRecords (
  ID VARCHAR(36) PRIMARY KEY, organizationId VARCHAR(36) NOT NULL,
- actorId VARCHAR(36) NOT NULL, canonicalIntentJson TEXT,
+ actorId VARCHAR(36) NOT NULL, canonicalIntentJson TEXT, authorizationScopeJson TEXT, effectClass VARCHAR(80),
  stableRequestOwner VARCHAR(160) NOT NULL, capabilityId VARCHAR(120) NOT NULL,
  commandIdempotencyKey VARCHAR(160) NOT NULL, canonicalHash VARCHAR(64) NOT NULL,
  definitionVersion VARCHAR(80) NOT NULL, capabilityVersion VARCHAR(80) NOT NULL,
