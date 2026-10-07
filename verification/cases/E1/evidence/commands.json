@@ -1,0 +1,89 @@
+[
+  {
+    "argv": [
+      "./verify",
+      "harness"
+    ],
+    "exitCode": 0,
+    "expectedExitCode": 0,
+    "logRef": "verification/cases/E1/evidence/harness-final.txt.gz"
+  },
+  {
+    "argv": [
+      "./verify",
+      "validate",
+      "verification/cases/T17/case.json",
+      "verification/cases/T18/case.json",
+      "verification/cases/C4/case.json",
+      "verification/cases/E1/case.json",
+      "verification/cases/E2/case.json"
+    ],
+    "exitCode": 0,
+    "expectedExitCode": 0,
+    "logRef": "verification/cases/E1/evidence/validate-final.txt.gz"
+  },
+  {
+    "argv": [
+      "./verify",
+      "contract-red",
+      "verification/cases/T17/case.json"
+    ],
+    "exitCode": 1,
+    "expectedExitCode": 1,
+    "logRef": "verification/cases/E1/evidence/red-T17.txt.gz"
+  },
+  {
+    "argv": [
+      "./verify",
+      "contract-red",
+      "verification/cases/T18/case.json"
+    ],
+    "exitCode": 1,
+    "expectedExitCode": 1,
+    "logRef": "verification/cases/E1/evidence/red-T18.txt.gz"
+  },
+  {
+    "argv": [
+      "./verify",
+      "contract-red",
+      "verification/cases/C4/case.json"
+    ],
+    "exitCode": 1,
+    "expectedExitCode": 1,
+    "logRef": "verification/cases/E1/evidence/red-C4.txt.gz"
+  },
+  {
+    "argv": [
+      "./verify",
+      "contract-red",
+      "verification/cases/E1/case.json"
+    ],
+    "exitCode": 1,
+    "expectedExitCode": 1,
+    "logRef": "verification/cases/E1/evidence/red-E1.txt.gz"
+  },
+  {
+    "argv": [
+      "./verify",
+      "contract-red",
+      "verification/cases/E2/case.json"
+    ],
+    "exitCode": 1,
+    "expectedExitCode": 1,
+    "logRef": "verification/cases/E1/evidence/red-E2.txt.gz"
+  },
+  {
+    "argv": [
+      "./verify",
+      "scenarios",
+      "verification/cases/T17/case.json",
+      "verification/cases/T18/case.json",
+      "verification/cases/C4/case.json",
+      "verification/cases/E1/case.json",
+      "verification/cases/E2/case.json"
+    ],
+    "exitCode": 2,
+    "expectedExitCode": 2,
+    "logRef": "verification/cases/E1/evidence/scenarios-not-run.txt.gz"
+  }
+]

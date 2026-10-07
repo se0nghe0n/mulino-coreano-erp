@@ -1,0 +1,6200 @@
+{
+  "schemaVersion": "1.0.0",
+  "caseId": "E2",
+  "title": "겹친 제한과 중복 없는 회수 처분·예외 책임",
+  "requirementRefs": [
+    "D03",
+    "D16",
+    "D18"
+  ],
+  "profiles": [
+    "scenarios"
+  ],
+  "subcases": [
+    {
+      "id": "overlapping-holds",
+      "title": "동일 LOT60의 QC20만 해제해도 회수 조사60 제한과 조사 책임은 남는다",
+      "fixtureRef": "verification/cases/E2/fixtures/overlapping-holds.json",
+      "requiredAdapters": [
+        "fixture",
+        "api",
+        "db"
+      ],
+      "actions": [
+        {
+          "id": "setup",
+          "kind": "installFixture",
+          "evidenceRefs": [
+            "setup:fixture-installation"
+          ]
+        },
+        {
+          "id": "order",
+          "kind": "invoke",
+          "actorRef": "sales",
+          "route": "api",
+          "capabilityId": "createSalesOrder",
+          "request": {
+            "intentKind": "COMMAND",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "createSalesOrder",
+            "subjectRefs": [
+              {
+                "type": "TradeItem",
+                "id": {
+                  "$alias": "P"
+                }
+              }
+            ],
+            "slots": {
+              "customerId": {
+                "$alias": "C"
+              },
+              "quantity": {
+                "value": "60",
+                "unit": "BOX"
+              },
+              "destinationId": {
+                "$alias": "CUSTOMER"
+              },
+              "deliveryEndpoint": "CUSTOMER_ACCEPTED"
+            },
+            "expectedRevision": 1,
+            "commandIdempotencyKey": "E2-overlapping-holds-order",
+            "evidenceRefs": [
+              {
+                "$alias": "delivery-proof"
+              }
+            ],
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseId": "E2",
+              "scenarioId": "overlapping-holds"
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z"
+          },
+          "evidenceRefs": [
+            "order:api-response",
+            "order:actual-command-artifact"
+          ]
+        },
+        {
+          "id": "reserve",
+          "kind": "invoke",
+          "actorRef": "sales",
+          "route": "api",
+          "capabilityId": "reserveQuantity",
+          "request": {
+            "intentKind": "COMMAND",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "reserveQuantity",
+            "subjectRefs": [
+              {
+                "type": "TradeItem",
+                "id": {
+                  "$alias": "P"
+                }
+              }
+            ],
+            "slots": {
+              "orderLineId": {
+                "$result": {
+                  "actionId": "order",
+                  "pointer": "/response/line/id"
+                }
+              },
+              "segmentId": {
+                "$alias": "A"
+              },
+              "quantity": {
+                "value": "60",
+                "unit": "BOX"
+              }
+            },
+            "expectedRevision": 1,
+            "commandIdempotencyKey": "E2-overlapping-holds-reserve",
+            "evidenceRefs": [
+              {
+                "$alias": "delivery-proof"
+              }
+            ],
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseId": "E2",
+              "scenarioId": "overlapping-holds"
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z"
+          },
+          "evidenceRefs": [
+            "reserve:api-response",
+            "reserve:actual-command-artifact"
+          ]
+        },
+        {
+          "id": "split",
+          "kind": "invoke",
+          "actorRef": "procurement",
+          "route": "api",
+          "capabilityId": "splitQuantity",
+          "request": {
+            "intentKind": "COMMAND",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "splitQuantity",
+            "subjectRefs": [
+              {
+                "type": "TradeItem",
+                "id": {
+                  "$alias": "P"
+                }
+              }
+            ],
+            "slots": {
+              "segmentId": {
+                "$alias": "A"
+              },
+              "quantity": {
+                "value": "20",
+                "unit": "BOX"
+              },
+              "reason": "IDENTIFIABLE_QC_SCOPE"
+            },
+            "expectedRevision": {
+              "$result": {
+                "actionId": "reserve",
+                "pointer": "/response/revision"
+              }
+            },
+            "commandIdempotencyKey": "E2-overlapping-holds-split",
+            "evidenceRefs": [
+              {
+                "$alias": "delivery-proof"
+              }
+            ],
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseId": "E2",
+              "scenarioId": "overlapping-holds"
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z"
+          },
+          "evidenceRefs": [
+            "split:api-response",
+            "split:actual-command-artifact"
+          ]
+        },
+        {
+          "id": "qc-hold20",
+          "kind": "invoke",
+          "actorRef": "qc",
+          "route": "api",
+          "capabilityId": "placeHold",
+          "request": {
+            "intentKind": "COMMAND",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "placeHold",
+            "subjectRefs": [
+              {
+                "type": "TradeItem",
+                "id": {
+                  "$alias": "P"
+                }
+              }
+            ],
+            "slots": {
+              "segmentId": {
+                "$result": {
+                  "actionId": "split",
+                  "pointer": "/response/children/0/id"
+                }
+              },
+              "quantity": {
+                "value": "20",
+                "unit": "BOX"
+              },
+              "action": "SELL",
+              "reason": "QC_REVIEW"
+            },
+            "expectedRevision": 1,
+            "commandIdempotencyKey": "E2-overlapping-holds-qc-hold20",
+            "evidenceRefs": [
+              {
+                "$alias": "delivery-proof"
+              }
+            ],
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseId": "E2",
+              "scenarioId": "overlapping-holds"
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z"
+          },
+          "evidenceRefs": [
+            "qc-hold20:api-response",
+            "qc-hold20:actual-command-artifact"
+          ]
+        },
+        {
+          "id": "investigate",
+          "kind": "invoke",
+          "actorRef": "admin",
+          "route": "api",
+          "capabilityId": "openInvestigation",
+          "request": {
+            "intentKind": "COMMAND",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "openInvestigation",
+            "subjectRefs": [
+              {
+                "type": "TradeItem",
+                "id": {
+                  "$alias": "P"
+                }
+              }
+            ],
+            "slots": {
+              "lotId": {
+                "$alias": "L"
+              },
+              "quantity": {
+                "value": "60",
+                "unit": "BOX"
+              },
+              "classification": "CANDIDATE",
+              "evidenceId": {
+                "$alias": "recall-proof"
+              }
+            },
+            "expectedRevision": 1,
+            "commandIdempotencyKey": "E2-overlapping-holds-investigate",
+            "evidenceRefs": [
+              {
+                "$alias": "delivery-proof"
+              }
+            ],
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseId": "E2",
+              "scenarioId": "overlapping-holds"
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z"
+          },
+          "evidenceRefs": [
+            "investigate:api-response",
+            "investigate:actual-command-artifact"
+          ]
+        },
+        {
+          "id": "recall-hold60",
+          "kind": "invoke",
+          "actorRef": "admin",
+          "route": "api",
+          "capabilityId": "placeHold",
+          "request": {
+            "intentKind": "COMMAND",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "placeHold",
+            "subjectRefs": [
+              {
+                "type": "TradeItem",
+                "id": {
+                  "$alias": "P"
+                }
+              }
+            ],
+            "slots": {
+              "lotId": {
+                "$alias": "L"
+              },
+              "segmentIds": [
+                {
+                  "$result": {
+                    "actionId": "split",
+                    "pointer": "/response/children/0/id"
+                  }
+                },
+                {
+                  "$result": {
+                    "actionId": "split",
+                    "pointer": "/response/children/1/id"
+                  }
+                }
+              ],
+              "quantity": {
+                "value": "60",
+                "unit": "BOX"
+              },
+              "action": "SELL",
+              "reason": "RECALL_INVESTIGATION",
+              "investigationId": {
+                "$result": {
+                  "actionId": "investigate",
+                  "pointer": "/response/id"
+                }
+              }
+            },
+            "expectedRevision": 1,
+            "commandIdempotencyKey": "E2-overlapping-holds-recall-hold60",
+            "evidenceRefs": [
+              {
+                "$alias": "delivery-proof"
+              }
+            ],
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseId": "E2",
+              "scenarioId": "overlapping-holds"
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z"
+          },
+          "evidenceRefs": [
+            "recall-hold60:api-response",
+            "recall-hold60:actual-command-artifact"
+          ]
+        },
+        {
+          "id": "qc-release20",
+          "kind": "invoke",
+          "actorRef": "qc",
+          "route": "api",
+          "capabilityId": "releaseHold",
+          "request": {
+            "intentKind": "COMMAND",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "releaseHold",
+            "subjectRefs": [
+              {
+                "type": "TradeItem",
+                "id": {
+                  "$alias": "P"
+                }
+              }
+            ],
+            "slots": {
+              "restrictionId": {
+                "$result": {
+                  "actionId": "qc-hold20",
+                  "pointer": "/response/restrictionId"
+                }
+              },
+              "evidenceId": {
+                "$alias": "qc-proof"
+              }
+            },
+            "expectedRevision": {
+              "$result": {
+                "actionId": "recall-hold60",
+                "pointer": "/response/revision"
+              }
+            },
+            "commandIdempotencyKey": "E2-overlapping-holds-qc-release20",
+            "evidenceRefs": [
+              {
+                "$alias": "delivery-proof"
+              }
+            ],
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseId": "E2",
+              "scenarioId": "overlapping-holds"
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z"
+          },
+          "evidenceRefs": [
+            "qc-release20:api-response",
+            "qc-release20:actual-command-artifact"
+          ]
+        },
+        {
+          "id": "before-dispatch",
+          "kind": "query",
+          "actorRef": "observer",
+          "route": "api",
+          "capabilityId": "getObject",
+          "request": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseId": "E2",
+              "scenarioId": "overlapping-holds"
+            },
+            "subjectRefs": [
+              {
+                "type": "TradeItem",
+                "id": {
+                  "$alias": "P"
+                }
+              }
+            ],
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z",
+            "include": [
+              "inventory",
+              "trade",
+              "evidence",
+              "assessments",
+              "obligations",
+              "audit",
+              "outbox"
+            ]
+          },
+          "evidenceRefs": [
+            "before-dispatch:api-response"
+          ]
+        },
+        {
+          "id": "before-dispatch-db",
+          "kind": "observe",
+          "observation": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseId": "E2",
+              "scenarioId": "overlapping-holds"
+            },
+            "snapshotRef": {
+              "$result": {
+                "actionId": "before-dispatch",
+                "pointer": "/response/snapshotRevision"
+              }
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z",
+            "sources": [
+              "segments",
+              "movements",
+              "allocations",
+              "restrictions",
+              "investigations",
+              "obligations",
+              "audit",
+              "outbox"
+            ]
+          },
+          "evidenceRefs": [
+            "before-dispatch-db:raw-rows",
+            "before-dispatch-db:source-query",
+            "before-dispatch-db:snapshot"
+          ]
+        },
+        {
+          "id": "dispatch60",
+          "kind": "invoke",
+          "actorRef": "sales",
+          "route": "api",
+          "capabilityId": "dispatchQuantity",
+          "request": {
+            "intentKind": "COMMAND",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "dispatchQuantity",
+            "subjectRefs": [
+              {
+                "type": "TradeItem",
+                "id": {
+                  "$alias": "P"
+                }
+              }
+            ],
+            "slots": {
+              "orderLineId": {
+                "$result": {
+                  "actionId": "order",
+                  "pointer": "/response/line/id"
+                }
+              },
+              "allocationIds": [
+                {
+                  "$result": {
+                    "actionId": "split",
+                    "pointer": "/response/allocations/0/id"
+                  }
+                },
+                {
+                  "$result": {
+                    "actionId": "split",
+                    "pointer": "/response/allocations/1/id"
+                  }
+                }
+              ],
+              "segmentIds": [
+                {
+                  "$result": {
+                    "actionId": "split",
+                    "pointer": "/response/children/0/id"
+                  }
+                },
+                {
+                  "$result": {
+                    "actionId": "split",
+                    "pointer": "/response/children/1/id"
+                  }
+                }
+              ],
+              "quantity": {
+                "value": "60",
+                "unit": "BOX"
+              },
+              "originId": {
+                "$alias": "W"
+              },
+              "destinationId": {
+                "$alias": "CUSTOMER"
+              }
+            },
+            "expectedRevision": {
+              "$result": {
+                "actionId": "qc-release20",
+                "pointer": "/response/revision"
+              }
+            },
+            "commandIdempotencyKey": "E2-overlapping-holds-dispatch60",
+            "evidenceRefs": [
+              {
+                "$alias": "delivery-proof"
+              }
+            ],
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseId": "E2",
+              "scenarioId": "overlapping-holds"
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z"
+          },
+          "evidenceRefs": [
+            "dispatch60:api-response",
+            "dispatch60:actual-command-artifact"
+          ]
+        },
+        {
+          "id": "after-dispatch",
+          "kind": "query",
+          "actorRef": "observer",
+          "route": "api",
+          "capabilityId": "getObject",
+          "request": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseId": "E2",
+              "scenarioId": "overlapping-holds"
+            },
+            "subjectRefs": [
+              {
+                "type": "TradeItem",
+                "id": {
+                  "$alias": "P"
+                }
+              }
+            ],
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z",
+            "include": [
+              "inventory",
+              "trade",
+              "evidence",
+              "assessments",
+              "obligations",
+              "audit",
+              "outbox"
+            ]
+          },
+          "evidenceRefs": [
+            "after-dispatch:api-response"
+          ]
+        },
+        {
+          "id": "after-dispatch-db",
+          "kind": "observe",
+          "observation": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseId": "E2",
+              "scenarioId": "overlapping-holds"
+            },
+            "snapshotRef": {
+              "$result": {
+                "actionId": "after-dispatch",
+                "pointer": "/response/snapshotRevision"
+              }
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z",
+            "sources": [
+              "segments",
+              "movements",
+              "allocations",
+              "restrictions",
+              "investigations",
+              "obligations",
+              "audit",
+              "outbox"
+            ]
+          },
+          "evidenceRefs": [
+            "after-dispatch-db:raw-rows",
+            "after-dispatch-db:source-query",
+            "after-dispatch-db:snapshot"
+          ]
+        }
+      ],
+      "assertions": [
+        {
+          "id": "physical-held-1",
+          "op": "decimalEquals",
+          "source": {
+            "actionId": "after-dispatch",
+            "pointer": "/response/data/heldQuantity"
+          },
+          "expected": "60",
+          "requirementRefs": [
+            "D03",
+            "D16",
+            "D18"
+          ],
+          "evidenceRefs": [
+            "after-dispatch:actual-response-or-host-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "E2",
+            "scenarioId": "overlapping-holds"
+          },
+          "oracleExplanation": "physical-held는 동일 LOT60의 QC20만 해제해도 회수 조사60 제한과 조사 책임은 남는다의 독립 고정값과 실제 원 행을 대조한다.",
+          "oracleRef": {
+            "oracleId": "E2.overlapping-holds",
+            "observationNames": [
+              "physical-held"
+            ]
+          },
+          "unit": "BOX",
+          "unitSource": {
+            "actionId": "after-dispatch",
+            "pointer": "/response/data/unit"
+          }
+        },
+        {
+          "id": "physical-held-2",
+          "op": "sumEquals",
+          "source": {
+            "actionId": "after-dispatch-db",
+            "pointer": "/data/rawRows/segments",
+            "where": {
+              "locationId": {
+                "$alias": "W"
+              },
+              "active": true
+            },
+            "field": "quantity"
+          },
+          "expected": "60",
+          "requirementRefs": [
+            "D03",
+            "D16",
+            "D18"
+          ],
+          "evidenceRefs": [
+            "after-dispatch-db:raw-rows"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "E2",
+            "scenarioId": "overlapping-holds"
+          },
+          "oracleExplanation": "physical-held는 동일 LOT60의 QC20만 해제해도 회수 조사60 제한과 조사 책임은 남는다의 독립 고정값과 실제 원 행을 대조한다.",
+          "oracleRef": {
+            "oracleId": "E2.overlapping-holds",
+            "observationNames": [
+              "physical-held"
+            ]
+          },
+          "unit": "BOX",
+          "unitSource": {
+            "actionId": "after-dispatch-db",
+            "pointer": "/data/rawRows/segments",
+            "field": "unit",
+            "where": {
+              "locationId": {
+                "$alias": "W"
+              },
+              "active": true
+            }
+          }
+        },
+        {
+          "id": "dispatched-after-QC-only-release-3",
+          "op": "decimalDelta",
+          "source": {
+            "actionId": "after-dispatch",
+            "pointer": "/response/data/warehouseDispatchQuantity"
+          },
+          "expected": "0",
+          "requirementRefs": [
+            "D03",
+            "D16",
+            "D18"
+          ],
+          "evidenceRefs": [
+            "after-dispatch:actual-response-or-host-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "E2",
+            "scenarioId": "overlapping-holds"
+          },
+          "oracleExplanation": "dispatched-after-QC-only-release는 동일 LOT60의 QC20만 해제해도 회수 조사60 제한과 조사 책임은 남는다의 독립 고정값과 실제 원 행을 대조한다.",
+          "oracleRef": {
+            "oracleId": "E2.overlapping-holds",
+            "observationNames": [
+              "dispatched-after-QC-only-release"
+            ]
+          },
+          "baseline": {
+            "actionId": "before-dispatch",
+            "pointer": "/response/data/warehouseDispatchQuantity"
+          },
+          "unit": "BOX",
+          "unitSource": {
+            "actionId": "after-dispatch",
+            "pointer": "/response/data/unit"
+          },
+          "baselineUnitSource": {
+            "actionId": "before-dispatch",
+            "pointer": "/response/data/unit"
+          }
+        },
+        {
+          "id": "dispatched-after-QC-only-release-4",
+          "op": "sameAs",
+          "source": {
+            "actionId": "after-dispatch-db",
+            "pointer": "/data/rawRows/movements",
+            "field": [
+              "id",
+              "quantity",
+              "kind"
+            ]
+          },
+          "expected": null,
+          "requirementRefs": [
+            "D03",
+            "D16",
+            "D18"
+          ],
+          "evidenceRefs": [
+            "after-dispatch-db:raw-rows"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "E2",
+            "scenarioId": "overlapping-holds"
+          },
+          "oracleExplanation": "dispatched-after-QC-only-release는 동일 LOT60의 QC20만 해제해도 회수 조사60 제한과 조사 책임은 남는다의 독립 고정값과 실제 원 행을 대조한다.",
+          "oracleRef": {
+            "oracleId": "E2.overlapping-holds",
+            "observationNames": [
+              "dispatched-after-QC-only-release"
+            ]
+          },
+          "baseline": {
+            "actionId": "before-dispatch-db",
+            "pointer": "/data/rawRows/movements",
+            "field": [
+              "id",
+              "quantity",
+              "kind"
+            ]
+          }
+        },
+        {
+          "id": "dispatched-after-QC-only-release-5",
+          "op": "sameAs",
+          "source": {
+            "actionId": "after-dispatch-db",
+            "pointer": "/data/rawRows/allocations",
+            "field": [
+              "id",
+              "quantity",
+              "status"
+            ]
+          },
+          "expected": null,
+          "requirementRefs": [
+            "D03",
+            "D16",
+            "D18"
+          ],
+          "evidenceRefs": [
+            "after-dispatch-db:raw-rows"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "E2",
+            "scenarioId": "overlapping-holds"
+          },
+          "oracleExplanation": "dispatched-after-QC-only-release는 동일 LOT60의 QC20만 해제해도 회수 조사60 제한과 조사 책임은 남는다의 독립 고정값과 실제 원 행을 대조한다.",
+          "oracleRef": {
+            "oracleId": "E2.overlapping-holds",
+            "observationNames": [
+              "dispatched-after-QC-only-release"
+            ]
+          },
+          "baseline": {
+            "actionId": "before-dispatch-db",
+            "pointer": "/data/rawRows/allocations",
+            "field": [
+              "id",
+              "quantity",
+              "status"
+            ]
+          }
+        },
+        {
+          "id": "dispatched-after-QC-only-release-6",
+          "op": "sameAs",
+          "source": {
+            "actionId": "after-dispatch",
+            "pointer": "/response/data/effectLedger/movements"
+          },
+          "expected": null,
+          "requirementRefs": [
+            "D03",
+            "D16",
+            "D18"
+          ],
+          "evidenceRefs": [
+            "after-dispatch:actual-response-or-host-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "E2",
+            "scenarioId": "overlapping-holds"
+          },
+          "oracleExplanation": "dispatched-after-QC-only-release는 동일 LOT60의 QC20만 해제해도 회수 조사60 제한과 조사 책임은 남는다의 독립 고정값과 실제 원 행을 대조한다.",
+          "oracleRef": {
+            "oracleId": "E2.overlapping-holds",
+            "observationNames": [
+              "dispatched-after-QC-only-release"
+            ]
+          },
+          "baseline": {
+            "actionId": "before-dispatch",
+            "pointer": "/response/data/effectLedger/movements"
+          }
+        },
+        {
+          "id": "dispatched-after-QC-only-release-7",
+          "op": "sameAs",
+          "source": {
+            "actionId": "after-dispatch",
+            "pointer": "/response/data/effectLedger/allocations"
+          },
+          "expected": null,
+          "requirementRefs": [
+            "D03",
+            "D16",
+            "D18"
+          ],
+          "evidenceRefs": [
+            "after-dispatch:actual-response-or-host-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "E2",
+            "scenarioId": "overlapping-holds"
+          },
+          "oracleExplanation": "dispatched-after-QC-only-release는 동일 LOT60의 QC20만 해제해도 회수 조사60 제한과 조사 책임은 남는다의 독립 고정값과 실제 원 행을 대조한다.",
+          "oracleRef": {
+            "oracleId": "E2.overlapping-holds",
+            "observationNames": [
+              "dispatched-after-QC-only-release"
+            ]
+          },
+          "baseline": {
+            "actionId": "before-dispatch",
+            "pointer": "/response/data/effectLedger/allocations"
+          }
+        },
+        {
+          "id": "recall-hold-8",
+          "op": "equals",
+          "source": {
+            "actionId": "after-dispatch",
+            "pointer": "/response/data/recallRestrictionStatus"
+          },
+          "expected": "ACTIVE",
+          "requirementRefs": [
+            "D03",
+            "D16",
+            "D18"
+          ],
+          "evidenceRefs": [
+            "after-dispatch:actual-response-or-host-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "E2",
+            "scenarioId": "overlapping-holds"
+          },
+          "oracleExplanation": "recall-hold는 동일 LOT60의 QC20만 해제해도 회수 조사60 제한과 조사 책임은 남는다의 독립 고정값과 실제 원 행을 대조한다.",
+          "oracleRef": {
+            "oracleId": "E2.overlapping-holds",
+            "observationNames": [
+              "recall-hold"
+            ]
+          }
+        },
+        {
+          "id": "recall-hold-9",
+          "op": "exactSet",
+          "source": {
+            "actionId": "after-dispatch-db",
+            "pointer": "/data/rawRows/restrictions",
+            "where": {
+              "id": {
+                "$result": {
+                  "actionId": "recall-hold60",
+                  "pointer": "/response/restrictionId"
+                }
+              }
+            },
+            "field": "status"
+          },
+          "expected": [
+            "ACTIVE"
+          ],
+          "requirementRefs": [
+            "D03",
+            "D16",
+            "D18"
+          ],
+          "evidenceRefs": [
+            "after-dispatch-db:raw-rows"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "E2",
+            "scenarioId": "overlapping-holds"
+          },
+          "oracleExplanation": "recall-hold는 동일 LOT60의 QC20만 해제해도 회수 조사60 제한과 조사 책임은 남는다의 독립 고정값과 실제 원 행을 대조한다.",
+          "oracleRef": {
+            "oracleId": "E2.overlapping-holds",
+            "observationNames": [
+              "recall-hold"
+            ]
+          }
+        },
+        {
+          "id": "candidate-as-confirmed-contamination-10",
+          "op": "exactSet",
+          "source": {
+            "actionId": "after-dispatch-db",
+            "pointer": "/data/rawRows/investigations",
+            "field": "classification"
+          },
+          "expected": [
+            "CANDIDATE"
+          ],
+          "requirementRefs": [
+            "D03",
+            "D16",
+            "D18"
+          ],
+          "evidenceRefs": [
+            "after-dispatch-db:raw-rows"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "E2",
+            "scenarioId": "overlapping-holds"
+          },
+          "oracleExplanation": "candidate-as-confirmed-contamination는 동일 LOT60의 QC20만 해제해도 회수 조사60 제한과 조사 책임은 남는다의 독립 고정값과 실제 원 행을 대조한다.",
+          "oracleRef": {
+            "oracleId": "E2.overlapping-holds",
+            "observationNames": [
+              "candidate-as-confirmed-contamination"
+            ]
+          }
+        },
+        {
+          "id": "candidate-as-confirmed-contamination-11",
+          "op": "count",
+          "source": {
+            "actionId": "after-dispatch-db",
+            "pointer": "/data/rawRows/investigations",
+            "where": {
+              "classification": "CONFIRMED_CONTAMINATION"
+            }
+          },
+          "expected": 0,
+          "requirementRefs": [
+            "D03",
+            "D16",
+            "D18"
+          ],
+          "evidenceRefs": [
+            "after-dispatch-db:raw-rows"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "E2",
+            "scenarioId": "overlapping-holds"
+          },
+          "oracleExplanation": "candidate-as-confirmed-contamination는 동일 LOT60의 QC20만 해제해도 회수 조사60 제한과 조사 책임은 남는다의 독립 고정값과 실제 원 행을 대조한다.",
+          "oracleRef": {
+            "oracleId": "E2.overlapping-holds",
+            "observationNames": [
+              "candidate-as-confirmed-contamination"
+            ]
+          }
+        },
+        {
+          "id": "candidate-as-confirmed-contamination-12",
+          "op": "equals",
+          "source": {
+            "actionId": "after-dispatch",
+            "pointer": "/response/data/contaminationStatus"
+          },
+          "expected": "UNKNOWN",
+          "requirementRefs": [
+            "D03",
+            "D16",
+            "D18"
+          ],
+          "evidenceRefs": [
+            "after-dispatch:actual-response-or-host-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "E2",
+            "scenarioId": "overlapping-holds"
+          },
+          "oracleExplanation": "candidate-as-confirmed-contamination는 동일 LOT60의 QC20만 해제해도 회수 조사60 제한과 조사 책임은 남는다의 독립 고정값과 실제 원 행을 대조한다.",
+          "oracleRef": {
+            "oracleId": "E2.overlapping-holds",
+            "observationNames": [
+              "candidate-as-confirmed-contamination"
+            ]
+          }
+        },
+        {
+          "id": "investigation-duty-13",
+          "op": "count",
+          "source": {
+            "actionId": "after-dispatch-db",
+            "pointer": "/data/rawRows/obligations",
+            "where": {
+              "kind": "RECALL_RESPONSE",
+              "current": true
+            }
+          },
+          "expected": 1,
+          "requirementRefs": [
+            "D03",
+            "D16",
+            "D18"
+          ],
+          "evidenceRefs": [
+            "after-dispatch-db:raw-rows"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "E2",
+            "scenarioId": "overlapping-holds"
+          },
+          "oracleExplanation": "investigation-duty는 동일 LOT60의 QC20만 해제해도 회수 조사60 제한과 조사 책임은 남는다의 독립 고정값과 실제 원 행을 대조한다.",
+          "oracleRef": {
+            "oracleId": "E2.overlapping-holds",
+            "observationNames": [
+              "investigation-duty"
+            ]
+          }
+        },
+        {
+          "id": "investigation-duty-14",
+          "op": "exactSet",
+          "source": {
+            "actionId": "after-dispatch-db",
+            "pointer": "/data/rawRows/obligations",
+            "where": {
+              "kind": "RECALL_RESPONSE",
+              "current": true
+            },
+            "field": "ownerId"
+          },
+          "expected": [
+            {
+              "$alias": "admin"
+            }
+          ],
+          "requirementRefs": [
+            "D03",
+            "D16",
+            "D18"
+          ],
+          "evidenceRefs": [
+            "after-dispatch-db:raw-rows"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "E2",
+            "scenarioId": "overlapping-holds"
+          },
+          "oracleExplanation": "investigation-duty는 동일 LOT60의 QC20만 해제해도 회수 조사60 제한과 조사 책임은 남는다의 독립 고정값과 실제 원 행을 대조한다.",
+          "oracleRef": {
+            "oracleId": "E2.overlapping-holds",
+            "observationNames": [
+              "investigation-duty"
+            ]
+          }
+        },
+        {
+          "id": "investigation-duty-15",
+          "op": "exactSet",
+          "source": {
+            "actionId": "after-dispatch-db",
+            "pointer": "/data/rawRows/obligations",
+            "where": {
+              "kind": "RECALL_RESPONSE",
+              "current": true
+            },
+            "field": "status"
+          },
+          "expected": [
+            "OPEN"
+          ],
+          "requirementRefs": [
+            "D03",
+            "D16",
+            "D18"
+          ],
+          "evidenceRefs": [
+            "after-dispatch-db:raw-rows"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "E2",
+            "scenarioId": "overlapping-holds"
+          },
+          "oracleExplanation": "investigation-duty는 동일 LOT60의 QC20만 해제해도 회수 조사60 제한과 조사 책임은 남는다의 독립 고정값과 실제 원 행을 대조한다.",
+          "oracleRef": {
+            "oracleId": "E2.overlapping-holds",
+            "observationNames": [
+              "investigation-duty"
+            ]
+          }
+        },
+        {
+          "id": "investigation-duty-16",
+          "op": "exactSet",
+          "source": {
+            "actionId": "after-dispatch-db",
+            "pointer": "/data/rawRows/obligations",
+            "where": {
+              "kind": "RECALL_RESPONSE",
+              "current": true
+            },
+            "field": "nextAction"
+          },
+          "expected": [
+            "미확인 실물과 회수 근거를 확인한다"
+          ],
+          "requirementRefs": [
+            "D03",
+            "D16",
+            "D18"
+          ],
+          "evidenceRefs": [
+            "after-dispatch-db:raw-rows"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "E2",
+            "scenarioId": "overlapping-holds"
+          },
+          "oracleExplanation": "investigation-duty는 동일 LOT60의 QC20만 해제해도 회수 조사60 제한과 조사 책임은 남는다의 독립 고정값과 실제 원 행을 대조한다.",
+          "oracleRef": {
+            "oracleId": "E2.overlapping-holds",
+            "observationNames": [
+              "investigation-duty"
+            ]
+          }
+        },
+        {
+          "id": "investigation-duty-17",
+          "op": "exactSet",
+          "source": {
+            "actionId": "after-dispatch-db",
+            "pointer": "/data/rawRows/obligations",
+            "where": {
+              "kind": "RECALL_RESPONSE",
+              "current": true
+            },
+            "field": "nextCheckAt"
+          },
+          "expected": [
+            "2026-10-07T10:00:00Z"
+          ],
+          "requirementRefs": [
+            "D03",
+            "D16",
+            "D18"
+          ],
+          "evidenceRefs": [
+            "after-dispatch-db:raw-rows"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "E2",
+            "scenarioId": "overlapping-holds"
+          },
+          "oracleExplanation": "investigation-duty는 동일 LOT60의 QC20만 해제해도 회수 조사60 제한과 조사 책임은 남는다의 독립 고정값과 실제 원 행을 대조한다.",
+          "oracleRef": {
+            "oracleId": "E2.overlapping-holds",
+            "observationNames": [
+              "investigation-duty"
+            ]
+          }
+        },
+        {
+          "id": "investigation-duty-18",
+          "op": "fieldsPresent",
+          "source": {
+            "actionId": "after-dispatch-db",
+            "pointer": "/data/rawRows/obligations",
+            "where": {
+              "kind": "RECALL_RESPONSE",
+              "current": true
+            }
+          },
+          "expected": [
+            "id",
+            "rootId",
+            "ownerId",
+            "responsibleWorkId",
+            "nextAction",
+            "nextCheckAt",
+            "sourceOccurrenceId"
+          ],
+          "requirementRefs": [
+            "D03",
+            "D16",
+            "D18"
+          ],
+          "evidenceRefs": [
+            "after-dispatch-db:raw-rows"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "E2",
+            "scenarioId": "overlapping-holds"
+          },
+          "oracleExplanation": "investigation-duty는 동일 LOT60의 QC20만 해제해도 회수 조사60 제한과 조사 책임은 남는다의 독립 고정값과 실제 원 행을 대조한다.",
+          "oracleRef": {
+            "oracleId": "E2.overlapping-holds",
+            "observationNames": [
+              "investigation-duty"
+            ]
+          }
+        },
+        {
+          "id": "investigation-duty-19",
+          "op": "sameAs",
+          "source": {
+            "actionId": "after-dispatch",
+            "pointer": "/response/data/obligations",
+            "where": {
+              "kind": "RECALL_RESPONSE",
+              "current": true
+            },
+            "field": [
+              "id",
+              "rootId",
+              "ownerId",
+              "status",
+              "nextAction",
+              "nextCheckAt"
+            ]
+          },
+          "expected": null,
+          "requirementRefs": [
+            "D03",
+            "D16",
+            "D18"
+          ],
+          "evidenceRefs": [
+            "after-dispatch:actual-response-or-host-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "E2",
+            "scenarioId": "overlapping-holds"
+          },
+          "oracleExplanation": "investigation-duty는 동일 LOT60의 QC20만 해제해도 회수 조사60 제한과 조사 책임은 남는다의 독립 고정값과 실제 원 행을 대조한다.",
+          "oracleRef": {
+            "oracleId": "E2.overlapping-holds",
+            "observationNames": [
+              "investigation-duty"
+            ]
+          },
+          "baseline": {
+            "actionId": "after-dispatch-db",
+            "pointer": "/data/rawRows/obligations",
+            "where": {
+              "kind": "RECALL_RESPONSE",
+              "current": true
+            },
+            "field": [
+              "id",
+              "rootId",
+              "ownerId",
+              "status",
+              "nextAction",
+              "nextCheckAt"
+            ]
+          }
+        }
+      ],
+      "oracleExplanation": "가상 fixture는 선행 실물·정책·증거 입력만 설치한다. 검증하는 주문·승인·예약·출고·인도·반품·회수·정정 효과는 각각 공개 명령으로 실행한다. 동일 LOT60의 QC20만 해제해도 회수 조사60 제한과 조사 책임은 남는다의 수량과 책임은 고정 기대값과 원 행·응답을 함께 검증한다."
+    },
+    {
+      "id": "same-25-not-50",
+      "title": "승인50 중 회수25와 동일 실물 폐기25는 최종25이며 미확인25의 종료를 막는다",
+      "fixtureRef": "verification/cases/E2/fixtures/same-25-not-50.json",
+      "requiredAdapters": [
+        "fixture",
+        "api",
+        "db"
+      ],
+      "actions": [
+        {
+          "id": "setup",
+          "kind": "installFixture",
+          "evidenceRefs": [
+            "setup:fixture-installation"
+          ]
+        },
+        {
+          "id": "order",
+          "kind": "invoke",
+          "actorRef": "sales",
+          "route": "api",
+          "capabilityId": "createSalesOrder",
+          "request": {
+            "intentKind": "COMMAND",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "createSalesOrder",
+            "subjectRefs": [
+              {
+                "type": "TradeItem",
+                "id": {
+                  "$alias": "P"
+                }
+              }
+            ],
+            "slots": {
+              "customerId": {
+                "$alias": "C"
+              },
+              "quantity": {
+                "value": "50",
+                "unit": "BOX"
+              },
+              "destinationId": {
+                "$alias": "CUSTOMER"
+              },
+              "deliveryEndpoint": "CUSTOMER_ACCEPTED",
+              "packagingVersion": "sealed-box-v1",
+              "dueAt": "2026-10-07T10:00:00Z"
+            },
+            "expectedRevision": 1,
+            "commandIdempotencyKey": "E2-same-25-not-50-order",
+            "evidenceRefs": [
+              {
+                "$alias": "delivery-proof"
+              }
+            ],
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseId": "E2",
+              "scenarioId": "same-25-not-50"
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z"
+          },
+          "evidenceRefs": [
+            "order:api-response",
+            "order:actual-command-artifact"
+          ]
+        },
+        {
+          "id": "reserve",
+          "kind": "invoke",
+          "actorRef": "sales",
+          "route": "api",
+          "capabilityId": "reserveQuantity",
+          "request": {
+            "intentKind": "COMMAND",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "reserveQuantity",
+            "subjectRefs": [
+              {
+                "type": "TradeItem",
+                "id": {
+                  "$alias": "P"
+                }
+              }
+            ],
+            "slots": {
+              "orderLineId": {
+                "$result": {
+                  "actionId": "order",
+                  "pointer": "/response/line/id"
+                }
+              },
+              "segmentId": {
+                "$alias": "A"
+              },
+              "quantity": {
+                "value": "50",
+                "unit": "BOX"
+              },
+              "action": "SELL"
+            },
+            "expectedRevision": 1,
+            "commandIdempotencyKey": "E2-same-25-not-50-reserve",
+            "evidenceRefs": [
+              {
+                "$alias": "delivery-proof"
+              }
+            ],
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseId": "E2",
+              "scenarioId": "same-25-not-50"
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z"
+          },
+          "evidenceRefs": [
+            "reserve:api-response",
+            "reserve:actual-command-artifact"
+          ]
+        },
+        {
+          "id": "pick",
+          "kind": "invoke",
+          "actorRef": "sales",
+          "route": "api",
+          "capabilityId": "pickQuantity",
+          "request": {
+            "intentKind": "COMMAND",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "pickQuantity",
+            "subjectRefs": [
+              {
+                "type": "TradeItem",
+                "id": {
+                  "$alias": "P"
+                }
+              }
+            ],
+            "slots": {
+              "allocationId": {
+                "$result": {
+                  "actionId": "reserve",
+                  "pointer": "/response/allocationId"
+                }
+              },
+              "quantity": {
+                "value": "50",
+                "unit": "BOX"
+              }
+            },
+            "expectedRevision": {
+              "$result": {
+                "actionId": "reserve",
+                "pointer": "/response/revision"
+              }
+            },
+            "commandIdempotencyKey": "E2-same-25-not-50-pick",
+            "evidenceRefs": [
+              {
+                "$alias": "delivery-proof"
+              }
+            ],
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseId": "E2",
+              "scenarioId": "same-25-not-50"
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z"
+          },
+          "evidenceRefs": [
+            "pick:api-response",
+            "pick:actual-command-artifact"
+          ]
+        },
+        {
+          "id": "dispatch",
+          "kind": "invoke",
+          "actorRef": "sales",
+          "route": "api",
+          "capabilityId": "dispatchQuantity",
+          "request": {
+            "intentKind": "COMMAND",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "dispatchQuantity",
+            "subjectRefs": [
+              {
+                "type": "TradeItem",
+                "id": {
+                  "$alias": "P"
+                }
+              }
+            ],
+            "slots": {
+              "allocationId": {
+                "$result": {
+                  "actionId": "reserve",
+                  "pointer": "/response/allocationId"
+                }
+              },
+              "originId": {
+                "$alias": "W"
+              },
+              "destinationId": {
+                "$alias": "CUSTOMER"
+              },
+              "cargoPlaceId": {
+                "$alias": "TRANSIT"
+              },
+              "quantity": {
+                "value": "50",
+                "unit": "BOX"
+              }
+            },
+            "expectedRevision": {
+              "$result": {
+                "actionId": "pick",
+                "pointer": "/response/revision"
+              }
+            },
+            "commandIdempotencyKey": "E2-same-25-not-50-dispatch",
+            "evidenceRefs": [
+              {
+                "$alias": "delivery-proof"
+              }
+            ],
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseId": "E2",
+              "scenarioId": "same-25-not-50"
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z"
+          },
+          "evidenceRefs": [
+            "dispatch:api-response",
+            "dispatch:actual-command-artifact"
+          ]
+        },
+        {
+          "id": "delivery",
+          "kind": "invoke",
+          "actorRef": "receiver",
+          "route": "api",
+          "capabilityId": "recordDelivery",
+          "request": {
+            "intentKind": "RECORD",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "recordDelivery",
+            "subjectRefs": [
+              {
+                "type": "TradeItem",
+                "id": {
+                  "$alias": "P"
+                }
+              }
+            ],
+            "slots": {
+              "dispatchId": {
+                "$result": {
+                  "actionId": "dispatch",
+                  "pointer": "/response/id"
+                }
+              },
+              "cargoScopeId": {
+                "$result": {
+                  "actionId": "dispatch",
+                  "pointer": "/response/cargoScope/id"
+                }
+              },
+              "allocationId": {
+                "$result": {
+                  "actionId": "reserve",
+                  "pointer": "/response/allocationId"
+                }
+              },
+              "quantity": {
+                "value": "50",
+                "unit": "BOX"
+              },
+              "occurredAt": "2026-10-07T09:00:00Z",
+              "sourceEvidenceId": {
+                "$alias": "delivery-proof"
+              },
+              "sourceNamespace": "SYNTHETIC-CUSTOMER",
+              "externalEventId": "same-25-not-50-actual-delivery",
+              "sourceVersion": "1"
+            },
+            "expectedRevision": {
+              "$result": {
+                "actionId": "dispatch",
+                "pointer": "/response/revision"
+              }
+            },
+            "commandIdempotencyKey": "E2-same-25-not-50-delivery",
+            "evidenceRefs": [
+              {
+                "$alias": "delivery-proof"
+              }
+            ],
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseId": "E2",
+              "scenarioId": "same-25-not-50"
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z"
+          },
+          "evidenceRefs": [
+            "delivery:api-response",
+            "delivery:actual-command-artifact"
+          ]
+        },
+        {
+          "id": "investigate",
+          "kind": "invoke",
+          "actorRef": "admin",
+          "route": "api",
+          "capabilityId": "openInvestigation",
+          "request": {
+            "intentKind": "COMMAND",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "openInvestigation",
+            "subjectRefs": [
+              {
+                "type": "TradeItem",
+                "id": {
+                  "$alias": "P"
+                }
+              }
+            ],
+            "slots": {
+              "lotId": {
+                "$alias": "L"
+              },
+              "quantity": {
+                "value": "50",
+                "unit": "BOX"
+              },
+              "classification": "CANDIDATE",
+              "evidenceId": {
+                "$alias": "recall-proof"
+              }
+            },
+            "expectedRevision": 1,
+            "commandIdempotencyKey": "E2-same-25-not-50-investigate",
+            "evidenceRefs": [
+              {
+                "$alias": "delivery-proof"
+              }
+            ],
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseId": "E2",
+              "scenarioId": "same-25-not-50"
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z"
+          },
+          "evidenceRefs": [
+            "investigate:api-response",
+            "investigate:actual-command-artifact"
+          ]
+        },
+        {
+          "id": "recall-proposal",
+          "kind": "invoke",
+          "actorRef": "admin",
+          "route": "api",
+          "capabilityId": "proposeRecall",
+          "request": {
+            "intentKind": "COMMAND",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "proposeRecall",
+            "subjectRefs": [
+              {
+                "type": "TradeItem",
+                "id": {
+                  "$alias": "P"
+                }
+              }
+            ],
+            "slots": {
+              "investigationId": {
+                "$result": {
+                  "actionId": "investigate",
+                  "pointer": "/response/id"
+                }
+              },
+              "lotId": {
+                "$alias": "L"
+              },
+              "quantity": {
+                "value": "50",
+                "unit": "BOX"
+              },
+              "reason": "SYNTHETIC_RECALL"
+            },
+            "expectedRevision": {
+              "$result": {
+                "actionId": "investigate",
+                "pointer": "/response/revision"
+              }
+            },
+            "commandIdempotencyKey": "E2-same-25-not-50-recall-proposal",
+            "evidenceRefs": [
+              {
+                "$alias": "delivery-proof"
+              }
+            ],
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseId": "E2",
+              "scenarioId": "same-25-not-50"
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z"
+          },
+          "evidenceRefs": [
+            "recall-proposal:api-response",
+            "recall-proposal:actual-command-artifact"
+          ]
+        },
+        {
+          "id": "recall-approve",
+          "kind": "invoke",
+          "actorRef": "admin",
+          "route": "api",
+          "capabilityId": "approveRecall",
+          "request": {
+            "intentKind": "COMMAND",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "approveRecall",
+            "subjectRefs": [
+              {
+                "type": "TradeItem",
+                "id": {
+                  "$alias": "P"
+                }
+              }
+            ],
+            "slots": {
+              "proposalId": {
+                "$result": {
+                  "actionId": "recall-proposal",
+                  "pointer": "/response/proposalId"
+                }
+              },
+              "scopeHash": {
+                "$result": {
+                  "actionId": "recall-proposal",
+                  "pointer": "/response/proposalHash"
+                }
+              },
+              "scopeVersion": {
+                "$result": {
+                  "actionId": "recall-proposal",
+                  "pointer": "/response/revision"
+                }
+              },
+              "decision": "APPROVED",
+              "validUntil": "2026-10-31T23:59:59Z"
+            },
+            "expectedRevision": {
+              "$result": {
+                "actionId": "recall-proposal",
+                "pointer": "/response/revision"
+              }
+            },
+            "commandIdempotencyKey": "E2-same-25-not-50-recall-approve",
+            "evidenceRefs": [
+              {
+                "$alias": "delivery-proof"
+              }
+            ],
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseId": "E2",
+              "scenarioId": "same-25-not-50"
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z"
+          },
+          "evidenceRefs": [
+            "recall-approve:api-response",
+            "recall-approve:actual-command-artifact"
+          ]
+        },
+        {
+          "id": "recover25",
+          "kind": "invoke",
+          "actorRef": "receiver",
+          "route": "api",
+          "capabilityId": "recordRecovery",
+          "request": {
+            "intentKind": "RECORD",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "recordRecovery",
+            "subjectRefs": [
+              {
+                "type": "TradeItem",
+                "id": {
+                  "$alias": "P"
+                }
+              }
+            ],
+            "slots": {
+              "recallId": {
+                "$result": {
+                  "actionId": "recall-approve",
+                  "pointer": "/response/id"
+                }
+              },
+              "scopeVersion": {
+                "$result": {
+                  "actionId": "recall-approve",
+                  "pointer": "/response/revision"
+                }
+              },
+              "quantity": {
+                "value": "25",
+                "unit": "BOX"
+              },
+              "deliveryId": {
+                "$result": {
+                  "actionId": "delivery",
+                  "pointer": "/response/id"
+                }
+              },
+              "physicalScopeId": {
+                "$result": {
+                  "actionId": "delivery",
+                  "pointer": "/response/physicalScope/id"
+                }
+              },
+              "destinationId": {
+                "$alias": "W"
+              },
+              "evidenceId": {
+                "$alias": "recovery-proof"
+              }
+            },
+            "expectedRevision": {
+              "$result": {
+                "actionId": "recall-approve",
+                "pointer": "/response/revision"
+              }
+            },
+            "commandIdempotencyKey": "E2-same-25-not-50-recover25",
+            "evidenceRefs": [
+              {
+                "$alias": "delivery-proof"
+              }
+            ],
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseId": "E2",
+              "scenarioId": "same-25-not-50"
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z"
+          },
+          "evidenceRefs": [
+            "recover25:api-response",
+            "recover25:actual-command-artifact"
+          ]
+        },
+        {
+          "id": "recall-dispose-clearance",
+          "kind": "invoke",
+          "actorRef": "admin",
+          "route": "api",
+          "capabilityId": "recordDispositionBasis",
+          "request": {
+            "intentKind": "RECORD",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "recordDispositionBasis",
+            "subjectRefs": [
+              {
+                "type": "TradeItem",
+                "id": {
+                  "$alias": "P"
+                }
+              }
+            ],
+            "slots": {
+              "segmentId": {
+                "$result": {
+                  "actionId": "recover25",
+                  "pointer": "/response/segmentId"
+                }
+              },
+              "recallId": {
+                "$result": {
+                  "actionId": "recall-approve",
+                  "pointer": "/response/id"
+                }
+              },
+              "quantity": {
+                "value": "25",
+                "unit": "BOX"
+              },
+              "action": "DISPOSE",
+              "decisionKind": "RECALL_DISPOSITION_CLEARANCE",
+              "reason": "VERIFIED_RECOVERED_SCOPE",
+              "evidenceId": {
+                "$alias": "dispose-proof"
+              },
+              "validUntil": "2026-10-07T10:00:00Z"
+            },
+            "expectedRevision": {
+              "$result": {
+                "actionId": "recover25",
+                "pointer": "/response/revision"
+              }
+            },
+            "commandIdempotencyKey": "E2-same-25-not-50-recall-dispose-clearance",
+            "evidenceRefs": [
+              {
+                "$alias": "delivery-proof"
+              }
+            ],
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseId": "E2",
+              "scenarioId": "same-25-not-50"
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z"
+          },
+          "evidenceRefs": [
+            "recall-dispose-clearance:api-response",
+            "recall-dispose-clearance:actual-command-artifact"
+          ]
+        },
+        {
+          "id": "dispose-decision",
+          "kind": "invoke",
+          "actorRef": "manager",
+          "route": "api",
+          "capabilityId": "recordDispositionBasis",
+          "request": {
+            "intentKind": "RECORD",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "recordDispositionBasis",
+            "subjectRefs": [
+              {
+                "type": "TradeItem",
+                "id": {
+                  "$alias": "P"
+                }
+              }
+            ],
+            "slots": {
+              "segmentId": {
+                "$result": {
+                  "actionId": "recover25",
+                  "pointer": "/response/segmentId"
+                }
+              },
+              "quantity": {
+                "value": "25",
+                "unit": "BOX"
+              },
+              "action": "DISPOSE",
+              "reason": "RECALL_DISPOSAL",
+              "evidenceId": {
+                "$alias": "dispose-proof"
+              },
+              "validUntil": "2026-10-07T10:00:00Z"
+            },
+            "expectedRevision": {
+              "$result": {
+                "actionId": "recover25",
+                "pointer": "/response/revision"
+              }
+            },
+            "commandIdempotencyKey": "E2-same-25-not-50-dispose-decision",
+            "evidenceRefs": [
+              {
+                "$alias": "delivery-proof"
+              }
+            ],
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseId": "E2",
+              "scenarioId": "same-25-not-50"
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z"
+          },
+          "evidenceRefs": [
+            "dispose-decision:api-response",
+            "dispose-decision:actual-command-artifact"
+          ]
+        },
+        {
+          "id": "dispose25",
+          "kind": "invoke",
+          "actorRef": "manager",
+          "route": "api",
+          "capabilityId": "disposeQuantity",
+          "request": {
+            "intentKind": "COMMAND",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "disposeQuantity",
+            "subjectRefs": [
+              {
+                "type": "TradeItem",
+                "id": {
+                  "$alias": "P"
+                }
+              }
+            ],
+            "slots": {
+              "segmentId": {
+                "$result": {
+                  "actionId": "recover25",
+                  "pointer": "/response/segmentId"
+                }
+              },
+              "recoveryId": {
+                "$result": {
+                  "actionId": "recover25",
+                  "pointer": "/response/id"
+                }
+              },
+              "quantity": {
+                "value": "25",
+                "unit": "BOX"
+              },
+              "dispositionBasisId": {
+                "$result": {
+                  "actionId": "dispose-decision",
+                  "pointer": "/response/id"
+                }
+              },
+              "recallApprovalId": {
+                "$result": {
+                  "actionId": "recall-approve",
+                  "pointer": "/response/approvalId"
+                }
+              },
+              "recallDispositionDecisionId": {
+                "$result": {
+                  "actionId": "recall-dispose-clearance",
+                  "pointer": "/response/id"
+                }
+              },
+              "evidenceId": {
+                "$alias": "dispose-proof"
+              }
+            },
+            "expectedRevision": {
+              "$result": {
+                "actionId": "dispose-decision",
+                "pointer": "/response/revision"
+              }
+            },
+            "commandIdempotencyKey": "E2-same-25-not-50-dispose25",
+            "evidenceRefs": [
+              {
+                "$alias": "delivery-proof"
+              }
+            ],
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseId": "E2",
+              "scenarioId": "same-25-not-50"
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z"
+          },
+          "evidenceRefs": [
+            "dispose25:api-response",
+            "dispose25:actual-command-artifact"
+          ]
+        },
+        {
+          "id": "before-close",
+          "kind": "query",
+          "actorRef": "observer",
+          "route": "api",
+          "capabilityId": "getObject",
+          "request": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseId": "E2",
+              "scenarioId": "same-25-not-50"
+            },
+            "subjectRefs": [
+              {
+                "type": "TradeItem",
+                "id": {
+                  "$alias": "P"
+                }
+              }
+            ],
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z",
+            "include": [
+              "inventory",
+              "trade",
+              "evidence",
+              "assessments",
+              "obligations",
+              "audit",
+              "outbox"
+            ]
+          },
+          "evidenceRefs": [
+            "before-close:api-response"
+          ]
+        },
+        {
+          "id": "before-close-db",
+          "kind": "observe",
+          "observation": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseId": "E2",
+              "scenarioId": "same-25-not-50"
+            },
+            "snapshotRef": {
+              "$result": {
+                "actionId": "before-close",
+                "pointer": "/response/snapshotRevision"
+              }
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z",
+            "sources": [
+              "segments",
+              "movements",
+              "recoveries",
+              "dispositions",
+              "recallScopes",
+              "recallMembers",
+              "recoveredMembers",
+              "disposedMembers",
+              "obligations",
+              "decisions",
+              "audit",
+              "outbox"
+            ]
+          },
+          "evidenceRefs": [
+            "before-close-db:raw-rows",
+            "before-close-db:source-query",
+            "before-close-db:snapshot"
+          ]
+        },
+        {
+          "id": "false-close",
+          "kind": "invoke",
+          "actorRef": "admin",
+          "route": "api",
+          "capabilityId": "closeRecall",
+          "request": {
+            "intentKind": "COMMAND",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "closeRecall",
+            "subjectRefs": [
+              {
+                "type": "TradeItem",
+                "id": {
+                  "$alias": "P"
+                }
+              }
+            ],
+            "slots": {
+              "recallId": {
+                "$result": {
+                  "actionId": "recall-approve",
+                  "pointer": "/response/id"
+                }
+              },
+              "claimedProcessedQuantity": {
+                "value": "50",
+                "unit": "BOX"
+              },
+              "reason": "RECOVERED_AND_DISPOSED_SUM"
+            },
+            "expectedRevision": {
+              "$result": {
+                "actionId": "dispose25",
+                "pointer": "/response/revision"
+              }
+            },
+            "commandIdempotencyKey": "E2-same-25-not-50-false-close",
+            "evidenceRefs": [
+              {
+                "$alias": "delivery-proof"
+              }
+            ],
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseId": "E2",
+              "scenarioId": "same-25-not-50"
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z"
+          },
+          "evidenceRefs": [
+            "false-close:api-response",
+            "false-close:actual-command-artifact"
+          ]
+        },
+        {
+          "id": "after-close",
+          "kind": "query",
+          "actorRef": "observer",
+          "route": "api",
+          "capabilityId": "getObject",
+          "request": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseId": "E2",
+              "scenarioId": "same-25-not-50"
+            },
+            "subjectRefs": [
+              {
+                "type": "TradeItem",
+                "id": {
+                  "$alias": "P"
+                }
+              }
+            ],
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z",
+            "include": [
+              "inventory",
+              "trade",
+              "evidence",
+              "assessments",
+              "obligations",
+              "audit",
+              "outbox"
+            ]
+          },
+          "evidenceRefs": [
+            "after-close:api-response"
+          ]
+        },
+        {
+          "id": "after-close-db",
+          "kind": "observe",
+          "observation": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseId": "E2",
+              "scenarioId": "same-25-not-50"
+            },
+            "snapshotRef": {
+              "$result": {
+                "actionId": "after-close",
+                "pointer": "/response/snapshotRevision"
+              }
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z",
+            "sources": [
+              "segments",
+              "movements",
+              "recoveries",
+              "dispositions",
+              "recallScopes",
+              "recallMembers",
+              "recoveredMembers",
+              "disposedMembers",
+              "obligations",
+              "decisions",
+              "audit",
+              "outbox"
+            ]
+          },
+          "evidenceRefs": [
+            "after-close-db:raw-rows",
+            "after-close-db:source-query",
+            "after-close-db:snapshot"
+          ]
+        }
+      ],
+      "assertions": [
+        {
+          "id": "unique-recovered-1",
+          "op": "decimalEquals",
+          "source": {
+            "actionId": "after-close",
+            "pointer": "/response/data/recoveredQuantity"
+          },
+          "expected": "25",
+          "requirementRefs": [
+            "D03",
+            "D16",
+            "D18"
+          ],
+          "evidenceRefs": [
+            "after-close:actual-response-or-host-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "E2",
+            "scenarioId": "same-25-not-50"
+          },
+          "oracleExplanation": "unique-recovered는 승인50 중 회수25와 동일 실물 폐기25는 최종25이며 미확인25의 종료를 막는다의 독립 고정값과 실제 원 행을 대조한다.",
+          "oracleRef": {
+            "oracleId": "E2.same-25-not-50",
+            "observationNames": [
+              "unique-recovered"
+            ]
+          },
+          "unit": "BOX",
+          "unitSource": {
+            "actionId": "after-close",
+            "pointer": "/response/data/unit"
+          }
+        },
+        {
+          "id": "unique-recovered-2",
+          "op": "sumEquals",
+          "source": {
+            "actionId": "after-close-db",
+            "pointer": "/data/rawRows/recoveries",
+            "where": {
+              "canonical": true
+            },
+            "field": "quantity"
+          },
+          "expected": "25",
+          "requirementRefs": [
+            "D03",
+            "D16",
+            "D18"
+          ],
+          "evidenceRefs": [
+            "after-close-db:raw-rows"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "E2",
+            "scenarioId": "same-25-not-50"
+          },
+          "oracleExplanation": "unique-recovered는 승인50 중 회수25와 동일 실물 폐기25는 최종25이며 미확인25의 종료를 막는다의 독립 고정값과 실제 원 행을 대조한다.",
+          "oracleRef": {
+            "oracleId": "E2.same-25-not-50",
+            "observationNames": [
+              "unique-recovered"
+            ]
+          },
+          "unit": "BOX",
+          "unitSource": {
+            "actionId": "after-close-db",
+            "pointer": "/data/rawRows/recoveries",
+            "field": "unit",
+            "where": {
+              "canonical": true
+            }
+          }
+        },
+        {
+          "id": "unique-finally-processed-3",
+          "op": "decimalEquals",
+          "source": {
+            "actionId": "after-close",
+            "pointer": "/response/data/processedQuantity"
+          },
+          "expected": "25",
+          "requirementRefs": [
+            "D03",
+            "D16",
+            "D18"
+          ],
+          "evidenceRefs": [
+            "after-close:actual-response-or-host-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "E2",
+            "scenarioId": "same-25-not-50"
+          },
+          "oracleExplanation": "unique-finally-processed는 승인50 중 회수25와 동일 실물 폐기25는 최종25이며 미확인25의 종료를 막는다의 독립 고정값과 실제 원 행을 대조한다.",
+          "oracleRef": {
+            "oracleId": "E2.same-25-not-50",
+            "observationNames": [
+              "unique-finally-processed"
+            ]
+          },
+          "unit": "BOX",
+          "unitSource": {
+            "actionId": "after-close",
+            "pointer": "/response/data/unit"
+          }
+        },
+        {
+          "id": "unique-finally-processed-4",
+          "op": "sumEquals",
+          "source": {
+            "actionId": "after-close-db",
+            "pointer": "/data/rawRows/dispositions",
+            "where": {
+              "terminal": true
+            },
+            "field": "quantity"
+          },
+          "expected": "25",
+          "requirementRefs": [
+            "D03",
+            "D16",
+            "D18"
+          ],
+          "evidenceRefs": [
+            "after-close-db:raw-rows"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "E2",
+            "scenarioId": "same-25-not-50"
+          },
+          "oracleExplanation": "unique-finally-processed는 승인50 중 회수25와 동일 실물 폐기25는 최종25이며 미확인25의 종료를 막는다의 독립 고정값과 실제 원 행을 대조한다.",
+          "oracleRef": {
+            "oracleId": "E2.same-25-not-50",
+            "observationNames": [
+              "unique-finally-processed"
+            ]
+          },
+          "unit": "BOX",
+          "unitSource": {
+            "actionId": "after-close-db",
+            "pointer": "/data/rawRows/dispositions",
+            "field": "unit",
+            "where": {
+              "terminal": true
+            }
+          }
+        },
+        {
+          "id": "unknown-5",
+          "op": "decimalEquals",
+          "source": {
+            "actionId": "after-close",
+            "pointer": "/response/data/unknownQuantity"
+          },
+          "expected": "25",
+          "requirementRefs": [
+            "D03",
+            "D16",
+            "D18"
+          ],
+          "evidenceRefs": [
+            "after-close:actual-response-or-host-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "E2",
+            "scenarioId": "same-25-not-50"
+          },
+          "oracleExplanation": "unknown는 승인50 중 회수25와 동일 실물 폐기25는 최종25이며 미확인25의 종료를 막는다의 독립 고정값과 실제 원 행을 대조한다.",
+          "oracleRef": {
+            "oracleId": "E2.same-25-not-50",
+            "observationNames": [
+              "unknown"
+            ]
+          },
+          "unit": "BOX",
+          "unitSource": {
+            "actionId": "after-close",
+            "pointer": "/response/data/unit"
+          }
+        },
+        {
+          "id": "unknown-6",
+          "op": "sumEquals",
+          "source": {
+            "actionId": "after-close-db",
+            "pointer": "/data/rawRows/recallScopes",
+            "where": {
+              "finalDisposition": "UNKNOWN"
+            },
+            "field": "quantity"
+          },
+          "expected": "25",
+          "requirementRefs": [
+            "D03",
+            "D16",
+            "D18"
+          ],
+          "evidenceRefs": [
+            "after-close-db:raw-rows"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "E2",
+            "scenarioId": "same-25-not-50"
+          },
+          "oracleExplanation": "unknown는 승인50 중 회수25와 동일 실물 폐기25는 최종25이며 미확인25의 종료를 막는다의 독립 고정값과 실제 원 행을 대조한다.",
+          "oracleRef": {
+            "oracleId": "E2.same-25-not-50",
+            "observationNames": [
+              "unknown"
+            ]
+          },
+          "unit": "BOX",
+          "unitSource": {
+            "actionId": "after-close-db",
+            "pointer": "/data/rawRows/recallScopes",
+            "field": "unit",
+            "where": {
+              "finalDisposition": "UNKNOWN"
+            }
+          }
+        },
+        {
+          "id": "25-plus-25-equals50-7",
+          "op": "sameAs",
+          "source": {
+            "actionId": "after-close-db",
+            "pointer": "/data/rawRows/recallScopes",
+            "field": [
+              "id",
+              "quantity",
+              "finalDisposition"
+            ]
+          },
+          "expected": null,
+          "requirementRefs": [
+            "D03",
+            "D16",
+            "D18"
+          ],
+          "evidenceRefs": [
+            "after-close-db:raw-rows"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "E2",
+            "scenarioId": "same-25-not-50"
+          },
+          "oracleExplanation": "25-plus-25-equals50는 승인50 중 회수25와 동일 실물 폐기25는 최종25이며 미확인25의 종료를 막는다의 독립 고정값과 실제 원 행을 대조한다.",
+          "oracleRef": {
+            "oracleId": "E2.same-25-not-50",
+            "observationNames": [
+              "25-plus-25-equals50"
+            ]
+          },
+          "baseline": {
+            "actionId": "before-close-db",
+            "pointer": "/data/rawRows/recallScopes",
+            "field": [
+              "id",
+              "quantity",
+              "finalDisposition"
+            ]
+          }
+        },
+        {
+          "id": "25-plus-25-equals50-8",
+          "op": "sameAs",
+          "source": {
+            "actionId": "after-close",
+            "pointer": "/response/data/effectLedger/recallScopes"
+          },
+          "expected": null,
+          "requirementRefs": [
+            "D03",
+            "D16",
+            "D18"
+          ],
+          "evidenceRefs": [
+            "after-close:actual-response-or-host-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "E2",
+            "scenarioId": "same-25-not-50"
+          },
+          "oracleExplanation": "25-plus-25-equals50는 승인50 중 회수25와 동일 실물 폐기25는 최종25이며 미확인25의 종료를 막는다의 독립 고정값과 실제 원 행을 대조한다.",
+          "oracleRef": {
+            "oracleId": "E2.same-25-not-50",
+            "observationNames": [
+              "25-plus-25-equals50"
+            ]
+          },
+          "baseline": {
+            "actionId": "before-close",
+            "pointer": "/response/data/effectLedger/recallScopes"
+          }
+        },
+        {
+          "id": "unapproved-unknown-close-9",
+          "op": "sameAs",
+          "source": {
+            "actionId": "after-close-db",
+            "pointer": "/data/rawRows/decisions",
+            "field": [
+              "id",
+              "scopeHash",
+              "decision"
+            ]
+          },
+          "expected": null,
+          "requirementRefs": [
+            "D03",
+            "D16",
+            "D18"
+          ],
+          "evidenceRefs": [
+            "after-close-db:raw-rows"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "E2",
+            "scenarioId": "same-25-not-50"
+          },
+          "oracleExplanation": "unapproved-unknown-close는 승인50 중 회수25와 동일 실물 폐기25는 최종25이며 미확인25의 종료를 막는다의 독립 고정값과 실제 원 행을 대조한다.",
+          "oracleRef": {
+            "oracleId": "E2.same-25-not-50",
+            "observationNames": [
+              "unapproved-unknown-close"
+            ]
+          },
+          "baseline": {
+            "actionId": "before-close-db",
+            "pointer": "/data/rawRows/decisions",
+            "field": [
+              "id",
+              "scopeHash",
+              "decision"
+            ]
+          }
+        },
+        {
+          "id": "unapproved-unknown-close-10",
+          "op": "sameAs",
+          "source": {
+            "actionId": "after-close-db",
+            "pointer": "/data/rawRows/obligations",
+            "field": [
+              "id",
+              "rootId",
+              "status",
+              "ownerId"
+            ]
+          },
+          "expected": null,
+          "requirementRefs": [
+            "D03",
+            "D16",
+            "D18"
+          ],
+          "evidenceRefs": [
+            "after-close-db:raw-rows"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "E2",
+            "scenarioId": "same-25-not-50"
+          },
+          "oracleExplanation": "unapproved-unknown-close는 승인50 중 회수25와 동일 실물 폐기25는 최종25이며 미확인25의 종료를 막는다의 독립 고정값과 실제 원 행을 대조한다.",
+          "oracleRef": {
+            "oracleId": "E2.same-25-not-50",
+            "observationNames": [
+              "unapproved-unknown-close"
+            ]
+          },
+          "baseline": {
+            "actionId": "before-close-db",
+            "pointer": "/data/rawRows/obligations",
+            "field": [
+              "id",
+              "rootId",
+              "status",
+              "ownerId"
+            ]
+          }
+        },
+        {
+          "id": "unapproved-unknown-close-11",
+          "op": "sameAs",
+          "source": {
+            "actionId": "after-close",
+            "pointer": "/response/data/effectLedger/decisions"
+          },
+          "expected": null,
+          "requirementRefs": [
+            "D03",
+            "D16",
+            "D18"
+          ],
+          "evidenceRefs": [
+            "after-close:actual-response-or-host-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "E2",
+            "scenarioId": "same-25-not-50"
+          },
+          "oracleExplanation": "unapproved-unknown-close는 승인50 중 회수25와 동일 실물 폐기25는 최종25이며 미확인25의 종료를 막는다의 독립 고정값과 실제 원 행을 대조한다.",
+          "oracleRef": {
+            "oracleId": "E2.same-25-not-50",
+            "observationNames": [
+              "unapproved-unknown-close"
+            ]
+          },
+          "baseline": {
+            "actionId": "before-close",
+            "pointer": "/response/data/effectLedger/decisions"
+          }
+        },
+        {
+          "id": "unapproved-unknown-close-12",
+          "op": "sameAs",
+          "source": {
+            "actionId": "after-close",
+            "pointer": "/response/data/effectLedger/obligations"
+          },
+          "expected": null,
+          "requirementRefs": [
+            "D03",
+            "D16",
+            "D18"
+          ],
+          "evidenceRefs": [
+            "after-close:actual-response-or-host-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "E2",
+            "scenarioId": "same-25-not-50"
+          },
+          "oracleExplanation": "unapproved-unknown-close는 승인50 중 회수25와 동일 실물 폐기25는 최종25이며 미확인25의 종료를 막는다의 독립 고정값과 실제 원 행을 대조한다.",
+          "oracleRef": {
+            "oracleId": "E2.same-25-not-50",
+            "observationNames": [
+              "unapproved-unknown-close"
+            ]
+          },
+          "baseline": {
+            "actionId": "before-close",
+            "pointer": "/response/data/effectLedger/obligations"
+          }
+        },
+        {
+          "id": "unapproved-unknown-close-13",
+          "op": "equals",
+          "source": {
+            "actionId": "false-close",
+            "pointer": "/response/outcome"
+          },
+          "expected": "REJECTED",
+          "requirementRefs": [
+            "D03",
+            "D16",
+            "D18"
+          ],
+          "evidenceRefs": [
+            "false-close:actual-response-or-host-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "E2",
+            "scenarioId": "same-25-not-50"
+          },
+          "oracleExplanation": "unapproved-unknown-close는 승인50 중 회수25와 동일 실물 폐기25는 최종25이며 미확인25의 종료를 막는다의 독립 고정값과 실제 원 행을 대조한다.",
+          "oracleRef": {
+            "oracleId": "E2.same-25-not-50",
+            "observationNames": [
+              "unapproved-unknown-close"
+            ]
+          }
+        },
+        {
+          "id": "status-axes-14",
+          "op": "relationSet",
+          "source": {
+            "actionId": "after-close-db",
+            "pointer": "/data/rawRows/recallScopes",
+            "field": [
+              "physicalScopeId",
+              "finalDisposition",
+              "lastConfirmedPlaceId",
+              "currentControlStatus"
+            ]
+          },
+          "expected": [
+            [
+              {
+                "$result": {
+                  "actionId": "recover25",
+                  "pointer": "/response/physicalScope/id"
+                }
+              },
+              "DISPOSED",
+              {
+                "$alias": "W"
+              },
+              "NO_ACTIVE_PHYSICAL_STOCK"
+            ],
+            [
+              {
+                "$result": {
+                  "actionId": "recover25",
+                  "pointer": "/response/unrecoveredScope/id"
+                }
+              },
+              "UNKNOWN",
+              {
+                "$alias": "CUSTOMER"
+              },
+              "UNVERIFIED"
+            ]
+          ],
+          "requirementRefs": [
+            "D03",
+            "D16",
+            "D18"
+          ],
+          "evidenceRefs": [
+            "after-close-db:raw-rows"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "E2",
+            "scenarioId": "same-25-not-50"
+          },
+          "oracleExplanation": "status-axes는 승인50 중 회수25와 동일 실물 폐기25는 최종25이며 미확인25의 종료를 막는다의 독립 고정값과 실제 원 행을 대조한다.",
+          "oracleRef": {
+            "oracleId": "E2.same-25-not-50",
+            "observationNames": [
+              "status-axes"
+            ]
+          }
+        },
+        {
+          "id": "status-axes-15",
+          "op": "unique",
+          "source": {
+            "actionId": "after-close-db",
+            "pointer": "/data/rawRows/recallScopes",
+            "field": "physicalScopeId"
+          },
+          "expected": true,
+          "requirementRefs": [
+            "D03",
+            "D16",
+            "D18"
+          ],
+          "evidenceRefs": [
+            "after-close-db:raw-rows"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "E2",
+            "scenarioId": "same-25-not-50"
+          },
+          "oracleExplanation": "status-axes는 승인50 중 회수25와 동일 실물 폐기25는 최종25이며 미확인25의 종료를 막는다의 독립 고정값과 실제 원 행을 대조한다.",
+          "oracleRef": {
+            "oracleId": "E2.same-25-not-50",
+            "observationNames": [
+              "status-axes"
+            ]
+          }
+        },
+        {
+          "id": "status-axes-16",
+          "op": "sumEquals",
+          "source": {
+            "actionId": "after-close-db",
+            "pointer": "/data/rawRows/recallScopes",
+            "field": "quantity"
+          },
+          "expected": "50",
+          "requirementRefs": [
+            "D03",
+            "D16",
+            "D18"
+          ],
+          "evidenceRefs": [
+            "after-close-db:raw-rows"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "E2",
+            "scenarioId": "same-25-not-50"
+          },
+          "oracleExplanation": "status-axes는 승인50 중 회수25와 동일 실물 폐기25는 최종25이며 미확인25의 종료를 막는다의 독립 고정값과 실제 원 행을 대조한다.",
+          "oracleRef": {
+            "oracleId": "E2.same-25-not-50",
+            "observationNames": [
+              "status-axes"
+            ]
+          },
+          "unit": "BOX",
+          "unitSource": {
+            "actionId": "after-close-db",
+            "pointer": "/data/data/unit"
+          }
+        },
+        {
+          "id": "status-axes-17",
+          "op": "exactSet",
+          "source": {
+            "actionId": "after-close-db",
+            "pointer": "/data/rawRows/recoveredMembers",
+            "field": "boxSerial"
+          },
+          "expected": [
+            "same-25-not-50-A-BOX-001",
+            "same-25-not-50-A-BOX-002",
+            "same-25-not-50-A-BOX-003",
+            "same-25-not-50-A-BOX-004",
+            "same-25-not-50-A-BOX-005",
+            "same-25-not-50-A-BOX-006",
+            "same-25-not-50-A-BOX-007",
+            "same-25-not-50-A-BOX-008",
+            "same-25-not-50-A-BOX-009",
+            "same-25-not-50-A-BOX-010",
+            "same-25-not-50-A-BOX-011",
+            "same-25-not-50-A-BOX-012",
+            "same-25-not-50-A-BOX-013",
+            "same-25-not-50-A-BOX-014",
+            "same-25-not-50-A-BOX-015",
+            "same-25-not-50-A-BOX-016",
+            "same-25-not-50-A-BOX-017",
+            "same-25-not-50-A-BOX-018",
+            "same-25-not-50-A-BOX-019",
+            "same-25-not-50-A-BOX-020",
+            "same-25-not-50-A-BOX-021",
+            "same-25-not-50-A-BOX-022",
+            "same-25-not-50-A-BOX-023",
+            "same-25-not-50-A-BOX-024",
+            "same-25-not-50-A-BOX-025"
+          ],
+          "requirementRefs": [
+            "D03",
+            "D16",
+            "D18"
+          ],
+          "evidenceRefs": [
+            "after-close-db:raw-rows"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "E2",
+            "scenarioId": "same-25-not-50"
+          },
+          "oracleExplanation": "status-axes는 승인50 중 회수25와 동일 실물 폐기25는 최종25이며 미확인25의 종료를 막는다의 독립 고정값과 실제 원 행을 대조한다.",
+          "oracleRef": {
+            "oracleId": "E2.same-25-not-50",
+            "observationNames": [
+              "status-axes"
+            ]
+          }
+        },
+        {
+          "id": "status-axes-18",
+          "op": "exactSet",
+          "source": {
+            "actionId": "after-close-db",
+            "pointer": "/data/rawRows/disposedMembers",
+            "field": "boxSerial"
+          },
+          "expected": [
+            "same-25-not-50-A-BOX-001",
+            "same-25-not-50-A-BOX-002",
+            "same-25-not-50-A-BOX-003",
+            "same-25-not-50-A-BOX-004",
+            "same-25-not-50-A-BOX-005",
+            "same-25-not-50-A-BOX-006",
+            "same-25-not-50-A-BOX-007",
+            "same-25-not-50-A-BOX-008",
+            "same-25-not-50-A-BOX-009",
+            "same-25-not-50-A-BOX-010",
+            "same-25-not-50-A-BOX-011",
+            "same-25-not-50-A-BOX-012",
+            "same-25-not-50-A-BOX-013",
+            "same-25-not-50-A-BOX-014",
+            "same-25-not-50-A-BOX-015",
+            "same-25-not-50-A-BOX-016",
+            "same-25-not-50-A-BOX-017",
+            "same-25-not-50-A-BOX-018",
+            "same-25-not-50-A-BOX-019",
+            "same-25-not-50-A-BOX-020",
+            "same-25-not-50-A-BOX-021",
+            "same-25-not-50-A-BOX-022",
+            "same-25-not-50-A-BOX-023",
+            "same-25-not-50-A-BOX-024",
+            "same-25-not-50-A-BOX-025"
+          ],
+          "requirementRefs": [
+            "D03",
+            "D16",
+            "D18"
+          ],
+          "evidenceRefs": [
+            "after-close-db:raw-rows"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "E2",
+            "scenarioId": "same-25-not-50"
+          },
+          "oracleExplanation": "status-axes는 승인50 중 회수25와 동일 실물 폐기25는 최종25이며 미확인25의 종료를 막는다의 독립 고정값과 실제 원 행을 대조한다.",
+          "oracleRef": {
+            "oracleId": "E2.same-25-not-50",
+            "observationNames": [
+              "status-axes"
+            ]
+          }
+        },
+        {
+          "id": "status-axes-19",
+          "op": "exactSet",
+          "source": {
+            "actionId": "after-close-db",
+            "pointer": "/data/rawRows/recallMembers",
+            "field": "boxSerial"
+          },
+          "expected": [
+            "same-25-not-50-A-BOX-001",
+            "same-25-not-50-A-BOX-002",
+            "same-25-not-50-A-BOX-003",
+            "same-25-not-50-A-BOX-004",
+            "same-25-not-50-A-BOX-005",
+            "same-25-not-50-A-BOX-006",
+            "same-25-not-50-A-BOX-007",
+            "same-25-not-50-A-BOX-008",
+            "same-25-not-50-A-BOX-009",
+            "same-25-not-50-A-BOX-010",
+            "same-25-not-50-A-BOX-011",
+            "same-25-not-50-A-BOX-012",
+            "same-25-not-50-A-BOX-013",
+            "same-25-not-50-A-BOX-014",
+            "same-25-not-50-A-BOX-015",
+            "same-25-not-50-A-BOX-016",
+            "same-25-not-50-A-BOX-017",
+            "same-25-not-50-A-BOX-018",
+            "same-25-not-50-A-BOX-019",
+            "same-25-not-50-A-BOX-020",
+            "same-25-not-50-A-BOX-021",
+            "same-25-not-50-A-BOX-022",
+            "same-25-not-50-A-BOX-023",
+            "same-25-not-50-A-BOX-024",
+            "same-25-not-50-A-BOX-025",
+            "same-25-not-50-A-BOX-026",
+            "same-25-not-50-A-BOX-027",
+            "same-25-not-50-A-BOX-028",
+            "same-25-not-50-A-BOX-029",
+            "same-25-not-50-A-BOX-030",
+            "same-25-not-50-A-BOX-031",
+            "same-25-not-50-A-BOX-032",
+            "same-25-not-50-A-BOX-033",
+            "same-25-not-50-A-BOX-034",
+            "same-25-not-50-A-BOX-035",
+            "same-25-not-50-A-BOX-036",
+            "same-25-not-50-A-BOX-037",
+            "same-25-not-50-A-BOX-038",
+            "same-25-not-50-A-BOX-039",
+            "same-25-not-50-A-BOX-040",
+            "same-25-not-50-A-BOX-041",
+            "same-25-not-50-A-BOX-042",
+            "same-25-not-50-A-BOX-043",
+            "same-25-not-50-A-BOX-044",
+            "same-25-not-50-A-BOX-045",
+            "same-25-not-50-A-BOX-046",
+            "same-25-not-50-A-BOX-047",
+            "same-25-not-50-A-BOX-048",
+            "same-25-not-50-A-BOX-049",
+            "same-25-not-50-A-BOX-050"
+          ],
+          "requirementRefs": [
+            "D03",
+            "D16",
+            "D18"
+          ],
+          "evidenceRefs": [
+            "after-close-db:raw-rows"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "E2",
+            "scenarioId": "same-25-not-50"
+          },
+          "oracleExplanation": "status-axes는 승인50 중 회수25와 동일 실물 폐기25는 최종25이며 미확인25의 종료를 막는다의 독립 고정값과 실제 원 행을 대조한다.",
+          "oracleRef": {
+            "oracleId": "E2.same-25-not-50",
+            "observationNames": [
+              "status-axes"
+            ]
+          }
+        },
+        {
+          "id": "status-axes-20",
+          "op": "exactSet",
+          "source": {
+            "actionId": "after-close-db",
+            "pointer": "/data/rawRows/recallMembers",
+            "where": {
+              "finalDisposition": "UNKNOWN"
+            },
+            "field": "boxSerial"
+          },
+          "expected": [
+            "same-25-not-50-A-BOX-026",
+            "same-25-not-50-A-BOX-027",
+            "same-25-not-50-A-BOX-028",
+            "same-25-not-50-A-BOX-029",
+            "same-25-not-50-A-BOX-030",
+            "same-25-not-50-A-BOX-031",
+            "same-25-not-50-A-BOX-032",
+            "same-25-not-50-A-BOX-033",
+            "same-25-not-50-A-BOX-034",
+            "same-25-not-50-A-BOX-035",
+            "same-25-not-50-A-BOX-036",
+            "same-25-not-50-A-BOX-037",
+            "same-25-not-50-A-BOX-038",
+            "same-25-not-50-A-BOX-039",
+            "same-25-not-50-A-BOX-040",
+            "same-25-not-50-A-BOX-041",
+            "same-25-not-50-A-BOX-042",
+            "same-25-not-50-A-BOX-043",
+            "same-25-not-50-A-BOX-044",
+            "same-25-not-50-A-BOX-045",
+            "same-25-not-50-A-BOX-046",
+            "same-25-not-50-A-BOX-047",
+            "same-25-not-50-A-BOX-048",
+            "same-25-not-50-A-BOX-049",
+            "same-25-not-50-A-BOX-050"
+          ],
+          "requirementRefs": [
+            "D03",
+            "D16",
+            "D18"
+          ],
+          "evidenceRefs": [
+            "after-close-db:raw-rows"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "E2",
+            "scenarioId": "same-25-not-50"
+          },
+          "oracleExplanation": "status-axes는 승인50 중 회수25와 동일 실물 폐기25는 최종25이며 미확인25의 종료를 막는다의 독립 고정값과 실제 원 행을 대조한다.",
+          "oracleRef": {
+            "oracleId": "E2.same-25-not-50",
+            "observationNames": [
+              "status-axes"
+            ]
+          }
+        },
+        {
+          "id": "status-axes-21",
+          "op": "unique",
+          "source": {
+            "actionId": "after-close-db",
+            "pointer": "/data/rawRows/recallMembers",
+            "field": "boxSerial"
+          },
+          "expected": true,
+          "requirementRefs": [
+            "D03",
+            "D16",
+            "D18"
+          ],
+          "evidenceRefs": [
+            "after-close-db:raw-rows"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "E2",
+            "scenarioId": "same-25-not-50"
+          },
+          "oracleExplanation": "status-axes는 승인50 중 회수25와 동일 실물 폐기25는 최종25이며 미확인25의 종료를 막는다의 독립 고정값과 실제 원 행을 대조한다.",
+          "oracleRef": {
+            "oracleId": "E2.same-25-not-50",
+            "observationNames": [
+              "status-axes"
+            ]
+          }
+        },
+        {
+          "id": "status-axes-22",
+          "op": "sameAs",
+          "source": {
+            "actionId": "after-close-db",
+            "pointer": "/data/rawRows/recoveredMembers",
+            "field": "boxSerial"
+          },
+          "expected": null,
+          "requirementRefs": [
+            "D03",
+            "D16",
+            "D18"
+          ],
+          "evidenceRefs": [
+            "after-close-db:raw-rows"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "E2",
+            "scenarioId": "same-25-not-50"
+          },
+          "oracleExplanation": "status-axes는 승인50 중 회수25와 동일 실물 폐기25는 최종25이며 미확인25의 종료를 막는다의 독립 고정값과 실제 원 행을 대조한다.",
+          "oracleRef": {
+            "oracleId": "E2.same-25-not-50",
+            "observationNames": [
+              "status-axes"
+            ]
+          },
+          "baseline": {
+            "actionId": "after-close-db",
+            "pointer": "/data/rawRows/disposedMembers",
+            "field": "boxSerial"
+          }
+        }
+      ],
+      "oracleExplanation": "가상 fixture는 선행 실물·정책·증거 입력만 설치한다. 검증하는 주문·승인·예약·출고·인도·반품·회수·정정 효과는 각각 공개 명령으로 실행한다. 승인50 중 회수25와 동일 실물 폐기25는 최종25이며 미확인25의 종료를 막는다의 수량과 책임은 고정 기대값과 원 행·응답을 함께 검증한다."
+    },
+    {
+      "id": "exception-responsibility",
+      "title": "일반 역할의 예외 종료0 뒤 ADMIN 근거 있는 미확인25 예외 종료에도 잔여 책임은 보인다",
+      "fixtureRef": "verification/cases/E2/fixtures/exception-responsibility.json",
+      "requiredAdapters": [
+        "fixture",
+        "api",
+        "db"
+      ],
+      "actions": [
+        {
+          "id": "setup",
+          "kind": "installFixture",
+          "evidenceRefs": [
+            "setup:fixture-installation"
+          ]
+        },
+        {
+          "id": "order",
+          "kind": "invoke",
+          "actorRef": "sales",
+          "route": "api",
+          "capabilityId": "createSalesOrder",
+          "request": {
+            "intentKind": "COMMAND",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "createSalesOrder",
+            "subjectRefs": [
+              {
+                "type": "TradeItem",
+                "id": {
+                  "$alias": "P"
+                }
+              }
+            ],
+            "slots": {
+              "customerId": {
+                "$alias": "C"
+              },
+              "quantity": {
+                "value": "50",
+                "unit": "BOX"
+              },
+              "destinationId": {
+                "$alias": "CUSTOMER"
+              },
+              "deliveryEndpoint": "CUSTOMER_ACCEPTED",
+              "packagingVersion": "sealed-box-v1",
+              "dueAt": "2026-10-07T10:00:00Z"
+            },
+            "expectedRevision": 1,
+            "commandIdempotencyKey": "E2-exception-responsibility-order",
+            "evidenceRefs": [
+              {
+                "$alias": "delivery-proof"
+              }
+            ],
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseId": "E2",
+              "scenarioId": "exception-responsibility"
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z"
+          },
+          "evidenceRefs": [
+            "order:api-response",
+            "order:actual-command-artifact"
+          ]
+        },
+        {
+          "id": "reserve",
+          "kind": "invoke",
+          "actorRef": "sales",
+          "route": "api",
+          "capabilityId": "reserveQuantity",
+          "request": {
+            "intentKind": "COMMAND",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "reserveQuantity",
+            "subjectRefs": [
+              {
+                "type": "TradeItem",
+                "id": {
+                  "$alias": "P"
+                }
+              }
+            ],
+            "slots": {
+              "orderLineId": {
+                "$result": {
+                  "actionId": "order",
+                  "pointer": "/response/line/id"
+                }
+              },
+              "segmentId": {
+                "$alias": "A"
+              },
+              "quantity": {
+                "value": "50",
+                "unit": "BOX"
+              },
+              "action": "SELL"
+            },
+            "expectedRevision": 1,
+            "commandIdempotencyKey": "E2-exception-responsibility-reserve",
+            "evidenceRefs": [
+              {
+                "$alias": "delivery-proof"
+              }
+            ],
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseId": "E2",
+              "scenarioId": "exception-responsibility"
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z"
+          },
+          "evidenceRefs": [
+            "reserve:api-response",
+            "reserve:actual-command-artifact"
+          ]
+        },
+        {
+          "id": "pick",
+          "kind": "invoke",
+          "actorRef": "sales",
+          "route": "api",
+          "capabilityId": "pickQuantity",
+          "request": {
+            "intentKind": "COMMAND",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "pickQuantity",
+            "subjectRefs": [
+              {
+                "type": "TradeItem",
+                "id": {
+                  "$alias": "P"
+                }
+              }
+            ],
+            "slots": {
+              "allocationId": {
+                "$result": {
+                  "actionId": "reserve",
+                  "pointer": "/response/allocationId"
+                }
+              },
+              "quantity": {
+                "value": "50",
+                "unit": "BOX"
+              }
+            },
+            "expectedRevision": {
+              "$result": {
+                "actionId": "reserve",
+                "pointer": "/response/revision"
+              }
+            },
+            "commandIdempotencyKey": "E2-exception-responsibility-pick",
+            "evidenceRefs": [
+              {
+                "$alias": "delivery-proof"
+              }
+            ],
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseId": "E2",
+              "scenarioId": "exception-responsibility"
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z"
+          },
+          "evidenceRefs": [
+            "pick:api-response",
+            "pick:actual-command-artifact"
+          ]
+        },
+        {
+          "id": "dispatch",
+          "kind": "invoke",
+          "actorRef": "sales",
+          "route": "api",
+          "capabilityId": "dispatchQuantity",
+          "request": {
+            "intentKind": "COMMAND",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "dispatchQuantity",
+            "subjectRefs": [
+              {
+                "type": "TradeItem",
+                "id": {
+                  "$alias": "P"
+                }
+              }
+            ],
+            "slots": {
+              "allocationId": {
+                "$result": {
+                  "actionId": "reserve",
+                  "pointer": "/response/allocationId"
+                }
+              },
+              "originId": {
+                "$alias": "W"
+              },
+              "destinationId": {
+                "$alias": "CUSTOMER"
+              },
+              "cargoPlaceId": {
+                "$alias": "TRANSIT"
+              },
+              "quantity": {
+                "value": "50",
+                "unit": "BOX"
+              }
+            },
+            "expectedRevision": {
+              "$result": {
+                "actionId": "pick",
+                "pointer": "/response/revision"
+              }
+            },
+            "commandIdempotencyKey": "E2-exception-responsibility-dispatch",
+            "evidenceRefs": [
+              {
+                "$alias": "delivery-proof"
+              }
+            ],
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseId": "E2",
+              "scenarioId": "exception-responsibility"
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z"
+          },
+          "evidenceRefs": [
+            "dispatch:api-response",
+            "dispatch:actual-command-artifact"
+          ]
+        },
+        {
+          "id": "delivery",
+          "kind": "invoke",
+          "actorRef": "receiver",
+          "route": "api",
+          "capabilityId": "recordDelivery",
+          "request": {
+            "intentKind": "RECORD",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "recordDelivery",
+            "subjectRefs": [
+              {
+                "type": "TradeItem",
+                "id": {
+                  "$alias": "P"
+                }
+              }
+            ],
+            "slots": {
+              "dispatchId": {
+                "$result": {
+                  "actionId": "dispatch",
+                  "pointer": "/response/id"
+                }
+              },
+              "cargoScopeId": {
+                "$result": {
+                  "actionId": "dispatch",
+                  "pointer": "/response/cargoScope/id"
+                }
+              },
+              "allocationId": {
+                "$result": {
+                  "actionId": "reserve",
+                  "pointer": "/response/allocationId"
+                }
+              },
+              "quantity": {
+                "value": "50",
+                "unit": "BOX"
+              },
+              "occurredAt": "2026-10-07T09:00:00Z",
+              "sourceEvidenceId": {
+                "$alias": "delivery-proof"
+              },
+              "sourceNamespace": "SYNTHETIC-CUSTOMER",
+              "externalEventId": "exception-responsibility-actual-delivery",
+              "sourceVersion": "1"
+            },
+            "expectedRevision": {
+              "$result": {
+                "actionId": "dispatch",
+                "pointer": "/response/revision"
+              }
+            },
+            "commandIdempotencyKey": "E2-exception-responsibility-delivery",
+            "evidenceRefs": [
+              {
+                "$alias": "delivery-proof"
+              }
+            ],
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseId": "E2",
+              "scenarioId": "exception-responsibility"
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z"
+          },
+          "evidenceRefs": [
+            "delivery:api-response",
+            "delivery:actual-command-artifact"
+          ]
+        },
+        {
+          "id": "investigate",
+          "kind": "invoke",
+          "actorRef": "admin",
+          "route": "api",
+          "capabilityId": "openInvestigation",
+          "request": {
+            "intentKind": "COMMAND",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "openInvestigation",
+            "subjectRefs": [
+              {
+                "type": "TradeItem",
+                "id": {
+                  "$alias": "P"
+                }
+              }
+            ],
+            "slots": {
+              "lotId": {
+                "$alias": "L"
+              },
+              "quantity": {
+                "value": "50",
+                "unit": "BOX"
+              },
+              "classification": "CANDIDATE",
+              "evidenceId": {
+                "$alias": "recall-proof"
+              }
+            },
+            "expectedRevision": 1,
+            "commandIdempotencyKey": "E2-exception-responsibility-investigate",
+            "evidenceRefs": [
+              {
+                "$alias": "delivery-proof"
+              }
+            ],
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseId": "E2",
+              "scenarioId": "exception-responsibility"
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z"
+          },
+          "evidenceRefs": [
+            "investigate:api-response",
+            "investigate:actual-command-artifact"
+          ]
+        },
+        {
+          "id": "recall-proposal",
+          "kind": "invoke",
+          "actorRef": "admin",
+          "route": "api",
+          "capabilityId": "proposeRecall",
+          "request": {
+            "intentKind": "COMMAND",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "proposeRecall",
+            "subjectRefs": [
+              {
+                "type": "TradeItem",
+                "id": {
+                  "$alias": "P"
+                }
+              }
+            ],
+            "slots": {
+              "investigationId": {
+                "$result": {
+                  "actionId": "investigate",
+                  "pointer": "/response/id"
+                }
+              },
+              "lotId": {
+                "$alias": "L"
+              },
+              "quantity": {
+                "value": "50",
+                "unit": "BOX"
+              },
+              "reason": "SYNTHETIC_RECALL"
+            },
+            "expectedRevision": {
+              "$result": {
+                "actionId": "investigate",
+                "pointer": "/response/revision"
+              }
+            },
+            "commandIdempotencyKey": "E2-exception-responsibility-recall-proposal",
+            "evidenceRefs": [
+              {
+                "$alias": "delivery-proof"
+              }
+            ],
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseId": "E2",
+              "scenarioId": "exception-responsibility"
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z"
+          },
+          "evidenceRefs": [
+            "recall-proposal:api-response",
+            "recall-proposal:actual-command-artifact"
+          ]
+        },
+        {
+          "id": "recall-approve",
+          "kind": "invoke",
+          "actorRef": "admin",
+          "route": "api",
+          "capabilityId": "approveRecall",
+          "request": {
+            "intentKind": "COMMAND",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "approveRecall",
+            "subjectRefs": [
+              {
+                "type": "TradeItem",
+                "id": {
+                  "$alias": "P"
+                }
+              }
+            ],
+            "slots": {
+              "proposalId": {
+                "$result": {
+                  "actionId": "recall-proposal",
+                  "pointer": "/response/proposalId"
+                }
+              },
+              "scopeHash": {
+                "$result": {
+                  "actionId": "recall-proposal",
+                  "pointer": "/response/proposalHash"
+                }
+              },
+              "scopeVersion": {
+                "$result": {
+                  "actionId": "recall-proposal",
+                  "pointer": "/response/revision"
+                }
+              },
+              "decision": "APPROVED",
+              "validUntil": "2026-10-31T23:59:59Z"
+            },
+            "expectedRevision": {
+              "$result": {
+                "actionId": "recall-proposal",
+                "pointer": "/response/revision"
+              }
+            },
+            "commandIdempotencyKey": "E2-exception-responsibility-recall-approve",
+            "evidenceRefs": [
+              {
+                "$alias": "delivery-proof"
+              }
+            ],
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseId": "E2",
+              "scenarioId": "exception-responsibility"
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z"
+          },
+          "evidenceRefs": [
+            "recall-approve:api-response",
+            "recall-approve:actual-command-artifact"
+          ]
+        },
+        {
+          "id": "recover25",
+          "kind": "invoke",
+          "actorRef": "receiver",
+          "route": "api",
+          "capabilityId": "recordRecovery",
+          "request": {
+            "intentKind": "RECORD",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "recordRecovery",
+            "subjectRefs": [
+              {
+                "type": "TradeItem",
+                "id": {
+                  "$alias": "P"
+                }
+              }
+            ],
+            "slots": {
+              "recallId": {
+                "$result": {
+                  "actionId": "recall-approve",
+                  "pointer": "/response/id"
+                }
+              },
+              "scopeVersion": {
+                "$result": {
+                  "actionId": "recall-approve",
+                  "pointer": "/response/revision"
+                }
+              },
+              "quantity": {
+                "value": "25",
+                "unit": "BOX"
+              },
+              "deliveryId": {
+                "$result": {
+                  "actionId": "delivery",
+                  "pointer": "/response/id"
+                }
+              },
+              "physicalScopeId": {
+                "$result": {
+                  "actionId": "delivery",
+                  "pointer": "/response/physicalScope/id"
+                }
+              },
+              "destinationId": {
+                "$alias": "W"
+              },
+              "evidenceId": {
+                "$alias": "recovery-proof"
+              }
+            },
+            "expectedRevision": {
+              "$result": {
+                "actionId": "recall-approve",
+                "pointer": "/response/revision"
+              }
+            },
+            "commandIdempotencyKey": "E2-exception-responsibility-recover25",
+            "evidenceRefs": [
+              {
+                "$alias": "delivery-proof"
+              }
+            ],
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseId": "E2",
+              "scenarioId": "exception-responsibility"
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z"
+          },
+          "evidenceRefs": [
+            "recover25:api-response",
+            "recover25:actual-command-artifact"
+          ]
+        },
+        {
+          "id": "recall-dispose-clearance",
+          "kind": "invoke",
+          "actorRef": "admin",
+          "route": "api",
+          "capabilityId": "recordDispositionBasis",
+          "request": {
+            "intentKind": "RECORD",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "recordDispositionBasis",
+            "subjectRefs": [
+              {
+                "type": "TradeItem",
+                "id": {
+                  "$alias": "P"
+                }
+              }
+            ],
+            "slots": {
+              "segmentId": {
+                "$result": {
+                  "actionId": "recover25",
+                  "pointer": "/response/segmentId"
+                }
+              },
+              "recallId": {
+                "$result": {
+                  "actionId": "recall-approve",
+                  "pointer": "/response/id"
+                }
+              },
+              "quantity": {
+                "value": "25",
+                "unit": "BOX"
+              },
+              "action": "DISPOSE",
+              "decisionKind": "RECALL_DISPOSITION_CLEARANCE",
+              "reason": "VERIFIED_RECOVERED_SCOPE",
+              "evidenceId": {
+                "$alias": "dispose-proof"
+              },
+              "validUntil": "2026-10-07T10:00:00Z"
+            },
+            "expectedRevision": {
+              "$result": {
+                "actionId": "recover25",
+                "pointer": "/response/revision"
+              }
+            },
+            "commandIdempotencyKey": "E2-exception-responsibility-recall-dispose-clearance",
+            "evidenceRefs": [
+              {
+                "$alias": "delivery-proof"
+              }
+            ],
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseId": "E2",
+              "scenarioId": "exception-responsibility"
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z"
+          },
+          "evidenceRefs": [
+            "recall-dispose-clearance:api-response",
+            "recall-dispose-clearance:actual-command-artifact"
+          ]
+        },
+        {
+          "id": "dispose-decision",
+          "kind": "invoke",
+          "actorRef": "manager",
+          "route": "api",
+          "capabilityId": "recordDispositionBasis",
+          "request": {
+            "intentKind": "RECORD",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "recordDispositionBasis",
+            "subjectRefs": [
+              {
+                "type": "TradeItem",
+                "id": {
+                  "$alias": "P"
+                }
+              }
+            ],
+            "slots": {
+              "segmentId": {
+                "$result": {
+                  "actionId": "recover25",
+                  "pointer": "/response/segmentId"
+                }
+              },
+              "quantity": {
+                "value": "25",
+                "unit": "BOX"
+              },
+              "action": "DISPOSE",
+              "reason": "RECALL_DISPOSAL",
+              "evidenceId": {
+                "$alias": "dispose-proof"
+              },
+              "validUntil": "2026-10-07T10:00:00Z"
+            },
+            "expectedRevision": {
+              "$result": {
+                "actionId": "recover25",
+                "pointer": "/response/revision"
+              }
+            },
+            "commandIdempotencyKey": "E2-exception-responsibility-dispose-decision",
+            "evidenceRefs": [
+              {
+                "$alias": "delivery-proof"
+              }
+            ],
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseId": "E2",
+              "scenarioId": "exception-responsibility"
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z"
+          },
+          "evidenceRefs": [
+            "dispose-decision:api-response",
+            "dispose-decision:actual-command-artifact"
+          ]
+        },
+        {
+          "id": "dispose25",
+          "kind": "invoke",
+          "actorRef": "manager",
+          "route": "api",
+          "capabilityId": "disposeQuantity",
+          "request": {
+            "intentKind": "COMMAND",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "disposeQuantity",
+            "subjectRefs": [
+              {
+                "type": "TradeItem",
+                "id": {
+                  "$alias": "P"
+                }
+              }
+            ],
+            "slots": {
+              "segmentId": {
+                "$result": {
+                  "actionId": "recover25",
+                  "pointer": "/response/segmentId"
+                }
+              },
+              "recoveryId": {
+                "$result": {
+                  "actionId": "recover25",
+                  "pointer": "/response/id"
+                }
+              },
+              "quantity": {
+                "value": "25",
+                "unit": "BOX"
+              },
+              "dispositionBasisId": {
+                "$result": {
+                  "actionId": "dispose-decision",
+                  "pointer": "/response/id"
+                }
+              },
+              "recallApprovalId": {
+                "$result": {
+                  "actionId": "recall-approve",
+                  "pointer": "/response/approvalId"
+                }
+              },
+              "recallDispositionDecisionId": {
+                "$result": {
+                  "actionId": "recall-dispose-clearance",
+                  "pointer": "/response/id"
+                }
+              },
+              "evidenceId": {
+                "$alias": "dispose-proof"
+              }
+            },
+            "expectedRevision": {
+              "$result": {
+                "actionId": "dispose-decision",
+                "pointer": "/response/revision"
+              }
+            },
+            "commandIdempotencyKey": "E2-exception-responsibility-dispose25",
+            "evidenceRefs": [
+              {
+                "$alias": "delivery-proof"
+              }
+            ],
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseId": "E2",
+              "scenarioId": "exception-responsibility"
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z"
+          },
+          "evidenceRefs": [
+            "dispose25:api-response",
+            "dispose25:actual-command-artifact"
+          ]
+        },
+        {
+          "id": "before-exception",
+          "kind": "query",
+          "actorRef": "observer",
+          "route": "api",
+          "capabilityId": "getObject",
+          "request": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseId": "E2",
+              "scenarioId": "exception-responsibility"
+            },
+            "subjectRefs": [
+              {
+                "type": "TradeItem",
+                "id": {
+                  "$alias": "P"
+                }
+              }
+            ],
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z",
+            "include": [
+              "inventory",
+              "trade",
+              "evidence",
+              "assessments",
+              "obligations",
+              "audit",
+              "outbox"
+            ]
+          },
+          "evidenceRefs": [
+            "before-exception:api-response"
+          ]
+        },
+        {
+          "id": "before-exception-db",
+          "kind": "observe",
+          "observation": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseId": "E2",
+              "scenarioId": "exception-responsibility"
+            },
+            "snapshotRef": {
+              "$result": {
+                "actionId": "before-exception",
+                "pointer": "/response/snapshotRevision"
+              }
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z",
+            "sources": [
+              "recallScopes",
+              "recallMembers",
+              "recoveredMembers",
+              "disposedMembers",
+              "obligations",
+              "decisions",
+              "audit",
+              "outbox"
+            ]
+          },
+          "evidenceRefs": [
+            "before-exception-db:raw-rows",
+            "before-exception-db:source-query",
+            "before-exception-db:snapshot"
+          ]
+        },
+        {
+          "id": "operator-exception",
+          "kind": "invoke",
+          "actorRef": "operator",
+          "route": "api",
+          "capabilityId": "closeRecall",
+          "request": {
+            "intentKind": "COMMAND",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "closeRecall",
+            "subjectRefs": [
+              {
+                "type": "TradeItem",
+                "id": {
+                  "$alias": "P"
+                }
+              }
+            ],
+            "slots": {
+              "recallId": {
+                "$result": {
+                  "actionId": "recall-approve",
+                  "pointer": "/response/id"
+                }
+              },
+              "exceptionQuantity": {
+                "value": "25",
+                "unit": "BOX"
+              },
+              "reason": "UNLOCATED",
+              "evidenceId": {
+                "$alias": "exception-proof"
+              }
+            },
+            "expectedRevision": {
+              "$result": {
+                "actionId": "dispose25",
+                "pointer": "/response/revision"
+              }
+            },
+            "commandIdempotencyKey": "E2-exception-responsibility-operator-exception",
+            "evidenceRefs": [
+              {
+                "$alias": "delivery-proof"
+              }
+            ],
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseId": "E2",
+              "scenarioId": "exception-responsibility"
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z"
+          },
+          "evidenceRefs": [
+            "operator-exception:api-response",
+            "operator-exception:actual-command-artifact"
+          ]
+        },
+        {
+          "id": "after-operator",
+          "kind": "query",
+          "actorRef": "observer",
+          "route": "api",
+          "capabilityId": "getObject",
+          "request": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseId": "E2",
+              "scenarioId": "exception-responsibility"
+            },
+            "subjectRefs": [
+              {
+                "type": "TradeItem",
+                "id": {
+                  "$alias": "P"
+                }
+              }
+            ],
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z",
+            "include": [
+              "inventory",
+              "trade",
+              "evidence",
+              "assessments",
+              "obligations",
+              "audit",
+              "outbox"
+            ]
+          },
+          "evidenceRefs": [
+            "after-operator:api-response"
+          ]
+        },
+        {
+          "id": "after-operator-db",
+          "kind": "observe",
+          "observation": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseId": "E2",
+              "scenarioId": "exception-responsibility"
+            },
+            "snapshotRef": {
+              "$result": {
+                "actionId": "after-operator",
+                "pointer": "/response/snapshotRevision"
+              }
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z",
+            "sources": [
+              "recallScopes",
+              "recallMembers",
+              "recoveredMembers",
+              "disposedMembers",
+              "obligations",
+              "decisions",
+              "audit",
+              "outbox"
+            ]
+          },
+          "evidenceRefs": [
+            "after-operator-db:raw-rows",
+            "after-operator-db:source-query",
+            "after-operator-db:snapshot"
+          ]
+        },
+        {
+          "id": "admin-exception",
+          "kind": "invoke",
+          "actorRef": "admin",
+          "route": "api",
+          "capabilityId": "closeRecall",
+          "request": {
+            "intentKind": "COMMAND",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "closeRecall",
+            "subjectRefs": [
+              {
+                "type": "TradeItem",
+                "id": {
+                  "$alias": "P"
+                }
+              }
+            ],
+            "slots": {
+              "recallId": {
+                "$result": {
+                  "actionId": "recall-approve",
+                  "pointer": "/response/id"
+                }
+              },
+              "scopeVersion": {
+                "$result": {
+                  "actionId": "recall-approve",
+                  "pointer": "/response/revision"
+                }
+              },
+              "scopeHash": {
+                "$result": {
+                  "actionId": "recall-proposal",
+                  "pointer": "/response/proposalHash"
+                }
+              },
+              "exceptionScopeId": {
+                "$result": {
+                  "actionId": "recover25",
+                  "pointer": "/response/unrecoveredScope/id"
+                }
+              },
+              "exceptionQuantity": {
+                "value": "25",
+                "unit": "BOX"
+              },
+              "reason": "UNLOCATED_CUSTOMER_SCOPE_WITH_ACTIVE_FOLLOWUP",
+              "evidenceId": {
+                "$alias": "exception-proof"
+              },
+              "residualOwnerId": {
+                "$alias": "admin"
+              },
+              "nextAction": "미확인 실물과 회수 근거를 확인한다",
+              "nextCheckAt": "2026-10-07T10:00:00Z"
+            },
+            "expectedRevision": {
+              "$result": {
+                "actionId": "dispose25",
+                "pointer": "/response/revision"
+              }
+            },
+            "commandIdempotencyKey": "E2-exception-responsibility-admin-exception",
+            "evidenceRefs": [
+              {
+                "$alias": "delivery-proof"
+              }
+            ],
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseId": "E2",
+              "scenarioId": "exception-responsibility"
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z"
+          },
+          "evidenceRefs": [
+            "admin-exception:api-response",
+            "admin-exception:actual-command-artifact"
+          ]
+        },
+        {
+          "id": "closed",
+          "kind": "query",
+          "actorRef": "observer",
+          "route": "api",
+          "capabilityId": "getObject",
+          "request": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseId": "E2",
+              "scenarioId": "exception-responsibility"
+            },
+            "subjectRefs": [
+              {
+                "type": "TradeItem",
+                "id": {
+                  "$alias": "P"
+                }
+              }
+            ],
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z",
+            "include": [
+              "inventory",
+              "trade",
+              "evidence",
+              "assessments",
+              "obligations",
+              "audit",
+              "outbox"
+            ]
+          },
+          "evidenceRefs": [
+            "closed:api-response"
+          ]
+        },
+        {
+          "id": "closed-db",
+          "kind": "observe",
+          "observation": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseId": "E2",
+              "scenarioId": "exception-responsibility"
+            },
+            "snapshotRef": {
+              "$result": {
+                "actionId": "closed",
+                "pointer": "/response/snapshotRevision"
+              }
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z",
+            "sources": [
+              "recallScopes",
+              "recallMembers",
+              "recoveredMembers",
+              "disposedMembers",
+              "obligations",
+              "decisions",
+              "audit",
+              "outbox"
+            ]
+          },
+          "evidenceRefs": [
+            "closed-db:raw-rows",
+            "closed-db:source-query",
+            "closed-db:snapshot"
+          ]
+        }
+      ],
+      "assertions": [
+        {
+          "id": "unauthorized-exception-close-1",
+          "op": "sameAs",
+          "source": {
+            "actionId": "after-operator-db",
+            "pointer": "/data/rawRows/decisions",
+            "field": [
+              "id",
+              "decision"
+            ]
+          },
+          "expected": null,
+          "requirementRefs": [
+            "D03",
+            "D16",
+            "D18"
+          ],
+          "evidenceRefs": [
+            "after-operator-db:raw-rows"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "E2",
+            "scenarioId": "exception-responsibility"
+          },
+          "oracleExplanation": "unauthorized-exception-close는 일반 역할의 예외 종료0 뒤 ADMIN 근거 있는 미확인25 예외 종료에도 잔여 책임은 보인다의 독립 고정값과 실제 원 행을 대조한다.",
+          "oracleRef": {
+            "oracleId": "E2.exception-responsibility",
+            "observationNames": [
+              "unauthorized-exception-close"
+            ]
+          },
+          "baseline": {
+            "actionId": "before-exception-db",
+            "pointer": "/data/rawRows/decisions",
+            "field": [
+              "id",
+              "decision"
+            ]
+          }
+        },
+        {
+          "id": "unauthorized-exception-close-2",
+          "op": "sameAs",
+          "source": {
+            "actionId": "after-operator-db",
+            "pointer": "/data/rawRows/recallScopes",
+            "field": [
+              "id",
+              "status",
+              "finalDisposition"
+            ]
+          },
+          "expected": null,
+          "requirementRefs": [
+            "D03",
+            "D16",
+            "D18"
+          ],
+          "evidenceRefs": [
+            "after-operator-db:raw-rows"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "E2",
+            "scenarioId": "exception-responsibility"
+          },
+          "oracleExplanation": "unauthorized-exception-close는 일반 역할의 예외 종료0 뒤 ADMIN 근거 있는 미확인25 예외 종료에도 잔여 책임은 보인다의 독립 고정값과 실제 원 행을 대조한다.",
+          "oracleRef": {
+            "oracleId": "E2.exception-responsibility",
+            "observationNames": [
+              "unauthorized-exception-close"
+            ]
+          },
+          "baseline": {
+            "actionId": "before-exception-db",
+            "pointer": "/data/rawRows/recallScopes",
+            "field": [
+              "id",
+              "status",
+              "finalDisposition"
+            ]
+          }
+        },
+        {
+          "id": "unauthorized-exception-close-3",
+          "op": "sameAs",
+          "source": {
+            "actionId": "after-operator-db",
+            "pointer": "/data/rawRows/obligations",
+            "field": [
+              "id",
+              "rootId",
+              "ownerId",
+              "status"
+            ]
+          },
+          "expected": null,
+          "requirementRefs": [
+            "D03",
+            "D16",
+            "D18"
+          ],
+          "evidenceRefs": [
+            "after-operator-db:raw-rows"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "E2",
+            "scenarioId": "exception-responsibility"
+          },
+          "oracleExplanation": "unauthorized-exception-close는 일반 역할의 예외 종료0 뒤 ADMIN 근거 있는 미확인25 예외 종료에도 잔여 책임은 보인다의 독립 고정값과 실제 원 행을 대조한다.",
+          "oracleRef": {
+            "oracleId": "E2.exception-responsibility",
+            "observationNames": [
+              "unauthorized-exception-close"
+            ]
+          },
+          "baseline": {
+            "actionId": "before-exception-db",
+            "pointer": "/data/rawRows/obligations",
+            "field": [
+              "id",
+              "rootId",
+              "ownerId",
+              "status"
+            ]
+          }
+        },
+        {
+          "id": "unauthorized-exception-close-4",
+          "op": "sameAs",
+          "source": {
+            "actionId": "after-operator",
+            "pointer": "/response/data/effectLedger/decisions"
+          },
+          "expected": null,
+          "requirementRefs": [
+            "D03",
+            "D16",
+            "D18"
+          ],
+          "evidenceRefs": [
+            "after-operator:actual-response-or-host-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "E2",
+            "scenarioId": "exception-responsibility"
+          },
+          "oracleExplanation": "unauthorized-exception-close는 일반 역할의 예외 종료0 뒤 ADMIN 근거 있는 미확인25 예외 종료에도 잔여 책임은 보인다의 독립 고정값과 실제 원 행을 대조한다.",
+          "oracleRef": {
+            "oracleId": "E2.exception-responsibility",
+            "observationNames": [
+              "unauthorized-exception-close"
+            ]
+          },
+          "baseline": {
+            "actionId": "before-exception",
+            "pointer": "/response/data/effectLedger/decisions"
+          }
+        },
+        {
+          "id": "unauthorized-exception-close-5",
+          "op": "sameAs",
+          "source": {
+            "actionId": "after-operator",
+            "pointer": "/response/data/effectLedger/recallScopes"
+          },
+          "expected": null,
+          "requirementRefs": [
+            "D03",
+            "D16",
+            "D18"
+          ],
+          "evidenceRefs": [
+            "after-operator:actual-response-or-host-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "E2",
+            "scenarioId": "exception-responsibility"
+          },
+          "oracleExplanation": "unauthorized-exception-close는 일반 역할의 예외 종료0 뒤 ADMIN 근거 있는 미확인25 예외 종료에도 잔여 책임은 보인다의 독립 고정값과 실제 원 행을 대조한다.",
+          "oracleRef": {
+            "oracleId": "E2.exception-responsibility",
+            "observationNames": [
+              "unauthorized-exception-close"
+            ]
+          },
+          "baseline": {
+            "actionId": "before-exception",
+            "pointer": "/response/data/effectLedger/recallScopes"
+          }
+        },
+        {
+          "id": "unauthorized-exception-close-6",
+          "op": "sameAs",
+          "source": {
+            "actionId": "after-operator",
+            "pointer": "/response/data/effectLedger/obligations"
+          },
+          "expected": null,
+          "requirementRefs": [
+            "D03",
+            "D16",
+            "D18"
+          ],
+          "evidenceRefs": [
+            "after-operator:actual-response-or-host-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "E2",
+            "scenarioId": "exception-responsibility"
+          },
+          "oracleExplanation": "unauthorized-exception-close는 일반 역할의 예외 종료0 뒤 ADMIN 근거 있는 미확인25 예외 종료에도 잔여 책임은 보인다의 독립 고정값과 실제 원 행을 대조한다.",
+          "oracleRef": {
+            "oracleId": "E2.exception-responsibility",
+            "observationNames": [
+              "unauthorized-exception-close"
+            ]
+          },
+          "baseline": {
+            "actionId": "before-exception",
+            "pointer": "/response/data/effectLedger/obligations"
+          }
+        },
+        {
+          "id": "unauthorized-exception-close-7",
+          "op": "equals",
+          "source": {
+            "actionId": "operator-exception",
+            "pointer": "/response/code"
+          },
+          "expected": "FORBIDDEN",
+          "requirementRefs": [
+            "D03",
+            "D16",
+            "D18"
+          ],
+          "evidenceRefs": [
+            "operator-exception:actual-response-or-host-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "E2",
+            "scenarioId": "exception-responsibility"
+          },
+          "oracleExplanation": "unauthorized-exception-close는 일반 역할의 예외 종료0 뒤 ADMIN 근거 있는 미확인25 예외 종료에도 잔여 책임은 보인다의 독립 고정값과 실제 원 행을 대조한다.",
+          "oracleRef": {
+            "oracleId": "E2.exception-responsibility",
+            "observationNames": [
+              "unauthorized-exception-close"
+            ]
+          }
+        },
+        {
+          "id": "exception-unresolved-scope-8",
+          "op": "decimalEquals",
+          "source": {
+            "actionId": "closed",
+            "pointer": "/response/data/approvedUnresolvedExceptionQuantity"
+          },
+          "expected": "25",
+          "requirementRefs": [
+            "D03",
+            "D16",
+            "D18"
+          ],
+          "evidenceRefs": [
+            "closed:actual-response-or-host-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "E2",
+            "scenarioId": "exception-responsibility"
+          },
+          "oracleExplanation": "exception-unresolved-scope는 일반 역할의 예외 종료0 뒤 ADMIN 근거 있는 미확인25 예외 종료에도 잔여 책임은 보인다의 독립 고정값과 실제 원 행을 대조한다.",
+          "oracleRef": {
+            "oracleId": "E2.exception-responsibility",
+            "observationNames": [
+              "exception-unresolved-scope"
+            ]
+          },
+          "unit": "BOX",
+          "unitSource": {
+            "actionId": "closed",
+            "pointer": "/response/data/unit"
+          }
+        },
+        {
+          "id": "exception-unresolved-scope-9",
+          "op": "sumEquals",
+          "source": {
+            "actionId": "closed-db",
+            "pointer": "/data/rawRows/recallScopes",
+            "where": {
+              "finalDisposition": "APPROVED_UNRESOLVED_EXCEPTION"
+            },
+            "field": "quantity"
+          },
+          "expected": "25",
+          "requirementRefs": [
+            "D03",
+            "D16",
+            "D18"
+          ],
+          "evidenceRefs": [
+            "closed-db:raw-rows"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "E2",
+            "scenarioId": "exception-responsibility"
+          },
+          "oracleExplanation": "exception-unresolved-scope는 일반 역할의 예외 종료0 뒤 ADMIN 근거 있는 미확인25 예외 종료에도 잔여 책임은 보인다의 독립 고정값과 실제 원 행을 대조한다.",
+          "oracleRef": {
+            "oracleId": "E2.exception-responsibility",
+            "observationNames": [
+              "exception-unresolved-scope"
+            ]
+          },
+          "unit": "BOX",
+          "unitSource": {
+            "actionId": "closed-db",
+            "pointer": "/data/rawRows/recallScopes",
+            "field": "unit",
+            "where": {
+              "finalDisposition": "APPROVED_UNRESOLVED_EXCEPTION"
+            }
+          }
+        },
+        {
+          "id": "exception-residual-duty-10",
+          "op": "count",
+          "source": {
+            "actionId": "closed-db",
+            "pointer": "/data/rawRows/obligations",
+            "where": {
+              "kind": "RECALL_RESPONSE",
+              "current": true
+            }
+          },
+          "expected": 1,
+          "requirementRefs": [
+            "D03",
+            "D16",
+            "D18"
+          ],
+          "evidenceRefs": [
+            "closed-db:raw-rows"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "E2",
+            "scenarioId": "exception-responsibility"
+          },
+          "oracleExplanation": "exception-residual-duty는 일반 역할의 예외 종료0 뒤 ADMIN 근거 있는 미확인25 예외 종료에도 잔여 책임은 보인다의 독립 고정값과 실제 원 행을 대조한다.",
+          "oracleRef": {
+            "oracleId": "E2.exception-responsibility",
+            "observationNames": [
+              "exception-residual-duty"
+            ]
+          }
+        },
+        {
+          "id": "exception-residual-duty-11",
+          "op": "exactSet",
+          "source": {
+            "actionId": "closed-db",
+            "pointer": "/data/rawRows/obligations",
+            "where": {
+              "kind": "RECALL_RESPONSE",
+              "current": true
+            },
+            "field": "ownerId"
+          },
+          "expected": [
+            {
+              "$alias": "admin"
+            }
+          ],
+          "requirementRefs": [
+            "D03",
+            "D16",
+            "D18"
+          ],
+          "evidenceRefs": [
+            "closed-db:raw-rows"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "E2",
+            "scenarioId": "exception-responsibility"
+          },
+          "oracleExplanation": "exception-residual-duty는 일반 역할의 예외 종료0 뒤 ADMIN 근거 있는 미확인25 예외 종료에도 잔여 책임은 보인다의 독립 고정값과 실제 원 행을 대조한다.",
+          "oracleRef": {
+            "oracleId": "E2.exception-responsibility",
+            "observationNames": [
+              "exception-residual-duty"
+            ]
+          }
+        },
+        {
+          "id": "exception-residual-duty-12",
+          "op": "exactSet",
+          "source": {
+            "actionId": "closed-db",
+            "pointer": "/data/rawRows/obligations",
+            "where": {
+              "kind": "RECALL_RESPONSE",
+              "current": true
+            },
+            "field": "status"
+          },
+          "expected": [
+            "OPEN"
+          ],
+          "requirementRefs": [
+            "D03",
+            "D16",
+            "D18"
+          ],
+          "evidenceRefs": [
+            "closed-db:raw-rows"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "E2",
+            "scenarioId": "exception-responsibility"
+          },
+          "oracleExplanation": "exception-residual-duty는 일반 역할의 예외 종료0 뒤 ADMIN 근거 있는 미확인25 예외 종료에도 잔여 책임은 보인다의 독립 고정값과 실제 원 행을 대조한다.",
+          "oracleRef": {
+            "oracleId": "E2.exception-responsibility",
+            "observationNames": [
+              "exception-residual-duty"
+            ]
+          }
+        },
+        {
+          "id": "exception-residual-duty-13",
+          "op": "exactSet",
+          "source": {
+            "actionId": "closed-db",
+            "pointer": "/data/rawRows/obligations",
+            "where": {
+              "kind": "RECALL_RESPONSE",
+              "current": true
+            },
+            "field": "nextAction"
+          },
+          "expected": [
+            "미확인 실물과 회수 근거를 확인한다"
+          ],
+          "requirementRefs": [
+            "D03",
+            "D16",
+            "D18"
+          ],
+          "evidenceRefs": [
+            "closed-db:raw-rows"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "E2",
+            "scenarioId": "exception-responsibility"
+          },
+          "oracleExplanation": "exception-residual-duty는 일반 역할의 예외 종료0 뒤 ADMIN 근거 있는 미확인25 예외 종료에도 잔여 책임은 보인다의 독립 고정값과 실제 원 행을 대조한다.",
+          "oracleRef": {
+            "oracleId": "E2.exception-responsibility",
+            "observationNames": [
+              "exception-residual-duty"
+            ]
+          }
+        },
+        {
+          "id": "exception-residual-duty-14",
+          "op": "exactSet",
+          "source": {
+            "actionId": "closed-db",
+            "pointer": "/data/rawRows/obligations",
+            "where": {
+              "kind": "RECALL_RESPONSE",
+              "current": true
+            },
+            "field": "nextCheckAt"
+          },
+          "expected": [
+            "2026-10-07T10:00:00Z"
+          ],
+          "requirementRefs": [
+            "D03",
+            "D16",
+            "D18"
+          ],
+          "evidenceRefs": [
+            "closed-db:raw-rows"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "E2",
+            "scenarioId": "exception-responsibility"
+          },
+          "oracleExplanation": "exception-residual-duty는 일반 역할의 예외 종료0 뒤 ADMIN 근거 있는 미확인25 예외 종료에도 잔여 책임은 보인다의 독립 고정값과 실제 원 행을 대조한다.",
+          "oracleRef": {
+            "oracleId": "E2.exception-responsibility",
+            "observationNames": [
+              "exception-residual-duty"
+            ]
+          }
+        },
+        {
+          "id": "exception-residual-duty-15",
+          "op": "fieldsPresent",
+          "source": {
+            "actionId": "closed-db",
+            "pointer": "/data/rawRows/obligations",
+            "where": {
+              "kind": "RECALL_RESPONSE",
+              "current": true
+            }
+          },
+          "expected": [
+            "id",
+            "rootId",
+            "ownerId",
+            "responsibleWorkId",
+            "nextAction",
+            "nextCheckAt",
+            "sourceOccurrenceId"
+          ],
+          "requirementRefs": [
+            "D03",
+            "D16",
+            "D18"
+          ],
+          "evidenceRefs": [
+            "closed-db:raw-rows"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "E2",
+            "scenarioId": "exception-responsibility"
+          },
+          "oracleExplanation": "exception-residual-duty는 일반 역할의 예외 종료0 뒤 ADMIN 근거 있는 미확인25 예외 종료에도 잔여 책임은 보인다의 독립 고정값과 실제 원 행을 대조한다.",
+          "oracleRef": {
+            "oracleId": "E2.exception-responsibility",
+            "observationNames": [
+              "exception-residual-duty"
+            ]
+          }
+        },
+        {
+          "id": "exception-residual-duty-16",
+          "op": "sameAs",
+          "source": {
+            "actionId": "closed",
+            "pointer": "/response/data/obligations",
+            "where": {
+              "kind": "RECALL_RESPONSE",
+              "current": true
+            },
+            "field": [
+              "id",
+              "rootId",
+              "ownerId",
+              "status",
+              "nextAction",
+              "nextCheckAt"
+            ]
+          },
+          "expected": null,
+          "requirementRefs": [
+            "D03",
+            "D16",
+            "D18"
+          ],
+          "evidenceRefs": [
+            "closed:actual-response-or-host-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "E2",
+            "scenarioId": "exception-responsibility"
+          },
+          "oracleExplanation": "exception-residual-duty는 일반 역할의 예외 종료0 뒤 ADMIN 근거 있는 미확인25 예외 종료에도 잔여 책임은 보인다의 독립 고정값과 실제 원 행을 대조한다.",
+          "oracleRef": {
+            "oracleId": "E2.exception-responsibility",
+            "observationNames": [
+              "exception-residual-duty"
+            ]
+          },
+          "baseline": {
+            "actionId": "closed-db",
+            "pointer": "/data/rawRows/obligations",
+            "where": {
+              "kind": "RECALL_RESPONSE",
+              "current": true
+            },
+            "field": [
+              "id",
+              "rootId",
+              "ownerId",
+              "status",
+              "nextAction",
+              "nextCheckAt"
+            ]
+          }
+        },
+        {
+          "id": "exception-evidence-17",
+          "op": "exactSet",
+          "source": {
+            "actionId": "closed-db",
+            "pointer": "/data/rawRows/decisions",
+            "where": {
+              "kind": "RECALL_EXCEPTION"
+            },
+            "field": "deciderId"
+          },
+          "expected": [
+            {
+              "$alias": "admin"
+            }
+          ],
+          "requirementRefs": [
+            "D03",
+            "D16",
+            "D18"
+          ],
+          "evidenceRefs": [
+            "closed-db:raw-rows"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "E2",
+            "scenarioId": "exception-responsibility"
+          },
+          "oracleExplanation": "exception-evidence는 일반 역할의 예외 종료0 뒤 ADMIN 근거 있는 미확인25 예외 종료에도 잔여 책임은 보인다의 독립 고정값과 실제 원 행을 대조한다.",
+          "oracleRef": {
+            "oracleId": "E2.exception-responsibility",
+            "observationNames": [
+              "exception-evidence"
+            ]
+          }
+        },
+        {
+          "id": "exception-evidence-18",
+          "op": "exactSet",
+          "source": {
+            "actionId": "closed-db",
+            "pointer": "/data/rawRows/decisions",
+            "where": {
+              "kind": "RECALL_EXCEPTION"
+            },
+            "field": "scopeHash"
+          },
+          "expected": [
+            {
+              "$result": {
+                "actionId": "recall-proposal",
+                "pointer": "/response/proposalHash"
+              }
+            }
+          ],
+          "requirementRefs": [
+            "D03",
+            "D16",
+            "D18"
+          ],
+          "evidenceRefs": [
+            "closed-db:raw-rows"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "E2",
+            "scenarioId": "exception-responsibility"
+          },
+          "oracleExplanation": "exception-evidence는 일반 역할의 예외 종료0 뒤 ADMIN 근거 있는 미확인25 예외 종료에도 잔여 책임은 보인다의 독립 고정값과 실제 원 행을 대조한다.",
+          "oracleRef": {
+            "oracleId": "E2.exception-responsibility",
+            "observationNames": [
+              "exception-evidence"
+            ]
+          }
+        },
+        {
+          "id": "exception-evidence-19",
+          "op": "exactSet",
+          "source": {
+            "actionId": "closed-db",
+            "pointer": "/data/rawRows/decisions",
+            "where": {
+              "kind": "RECALL_EXCEPTION"
+            },
+            "field": "evidenceId"
+          },
+          "expected": [
+            {
+              "$alias": "exception-proof"
+            }
+          ],
+          "requirementRefs": [
+            "D03",
+            "D16",
+            "D18"
+          ],
+          "evidenceRefs": [
+            "closed-db:raw-rows"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "E2",
+            "scenarioId": "exception-responsibility"
+          },
+          "oracleExplanation": "exception-evidence는 일반 역할의 예외 종료0 뒤 ADMIN 근거 있는 미확인25 예외 종료에도 잔여 책임은 보인다의 독립 고정값과 실제 원 행을 대조한다.",
+          "oracleRef": {
+            "oracleId": "E2.exception-responsibility",
+            "observationNames": [
+              "exception-evidence"
+            ]
+          }
+        },
+        {
+          "id": "exception-evidence-20",
+          "op": "exactSet",
+          "source": {
+            "actionId": "closed-db",
+            "pointer": "/data/rawRows/decisions",
+            "where": {
+              "kind": "RECALL_EXCEPTION"
+            },
+            "field": "reason"
+          },
+          "expected": [
+            "UNLOCATED_CUSTOMER_SCOPE_WITH_ACTIVE_FOLLOWUP"
+          ],
+          "requirementRefs": [
+            "D03",
+            "D16",
+            "D18"
+          ],
+          "evidenceRefs": [
+            "closed-db:raw-rows"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "E2",
+            "scenarioId": "exception-responsibility"
+          },
+          "oracleExplanation": "exception-evidence는 일반 역할의 예외 종료0 뒤 ADMIN 근거 있는 미확인25 예외 종료에도 잔여 책임은 보인다의 독립 고정값과 실제 원 행을 대조한다.",
+          "oracleRef": {
+            "oracleId": "E2.exception-responsibility",
+            "observationNames": [
+              "exception-evidence"
+            ]
+          }
+        },
+        {
+          "id": "exception-evidence-21",
+          "op": "equals",
+          "source": {
+            "actionId": "closed",
+            "pointer": "/response/data/recallStatus"
+          },
+          "expected": "CLOSED_WITH_UNRESOLVED_EXCEPTION",
+          "requirementRefs": [
+            "D03",
+            "D16",
+            "D18"
+          ],
+          "evidenceRefs": [
+            "closed:actual-response-or-host-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "E2",
+            "scenarioId": "exception-responsibility"
+          },
+          "oracleExplanation": "exception-evidence는 일반 역할의 예외 종료0 뒤 ADMIN 근거 있는 미확인25 예외 종료에도 잔여 책임은 보인다의 독립 고정값과 실제 원 행을 대조한다.",
+          "oracleRef": {
+            "oracleId": "E2.exception-responsibility",
+            "observationNames": [
+              "exception-evidence"
+            ]
+          }
+        },
+        {
+          "id": "exception-evidence-22",
+          "op": "decimalEquals",
+          "source": {
+            "actionId": "closed",
+            "pointer": "/response/data/processedQuantity"
+          },
+          "expected": "25",
+          "requirementRefs": [
+            "D03",
+            "D16",
+            "D18"
+          ],
+          "evidenceRefs": [
+            "closed:actual-response-or-host-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "E2",
+            "scenarioId": "exception-responsibility"
+          },
+          "oracleExplanation": "exception-evidence는 일반 역할의 예외 종료0 뒤 ADMIN 근거 있는 미확인25 예외 종료에도 잔여 책임은 보인다의 독립 고정값과 실제 원 행을 대조한다.",
+          "oracleRef": {
+            "oracleId": "E2.exception-responsibility",
+            "observationNames": [
+              "exception-evidence"
+            ]
+          },
+          "unit": "BOX",
+          "unitSource": {
+            "actionId": "closed",
+            "pointer": "/response/data/unit"
+          }
+        },
+        {
+          "id": "exception-evidence-23",
+          "op": "sumEquals",
+          "source": {
+            "actionId": "closed-db",
+            "pointer": "/data/rawRows/recallScopes",
+            "where": {
+              "finalDisposition": "DISPOSED"
+            },
+            "field": "quantity"
+          },
+          "expected": "25",
+          "requirementRefs": [
+            "D03",
+            "D16",
+            "D18"
+          ],
+          "evidenceRefs": [
+            "closed-db:raw-rows"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "E2",
+            "scenarioId": "exception-responsibility"
+          },
+          "oracleExplanation": "exception-evidence는 일반 역할의 예외 종료0 뒤 ADMIN 근거 있는 미확인25 예외 종료에도 잔여 책임은 보인다의 독립 고정값과 실제 원 행을 대조한다.",
+          "oracleRef": {
+            "oracleId": "E2.exception-responsibility",
+            "observationNames": [
+              "exception-evidence"
+            ]
+          },
+          "unit": "BOX",
+          "unitSource": {
+            "actionId": "closed-db",
+            "pointer": "/data/rawRows/recallScopes",
+            "field": "unit",
+            "where": {
+              "finalDisposition": "DISPOSED"
+            }
+          }
+        },
+        {
+          "id": "exception-evidence-24",
+          "op": "exactSet",
+          "source": {
+            "actionId": "closed-db",
+            "pointer": "/data/rawRows/recoveredMembers",
+            "field": "boxSerial"
+          },
+          "expected": [
+            "exception-responsibility-A-BOX-001",
+            "exception-responsibility-A-BOX-002",
+            "exception-responsibility-A-BOX-003",
+            "exception-responsibility-A-BOX-004",
+            "exception-responsibility-A-BOX-005",
+            "exception-responsibility-A-BOX-006",
+            "exception-responsibility-A-BOX-007",
+            "exception-responsibility-A-BOX-008",
+            "exception-responsibility-A-BOX-009",
+            "exception-responsibility-A-BOX-010",
+            "exception-responsibility-A-BOX-011",
+            "exception-responsibility-A-BOX-012",
+            "exception-responsibility-A-BOX-013",
+            "exception-responsibility-A-BOX-014",
+            "exception-responsibility-A-BOX-015",
+            "exception-responsibility-A-BOX-016",
+            "exception-responsibility-A-BOX-017",
+            "exception-responsibility-A-BOX-018",
+            "exception-responsibility-A-BOX-019",
+            "exception-responsibility-A-BOX-020",
+            "exception-responsibility-A-BOX-021",
+            "exception-responsibility-A-BOX-022",
+            "exception-responsibility-A-BOX-023",
+            "exception-responsibility-A-BOX-024",
+            "exception-responsibility-A-BOX-025"
+          ],
+          "requirementRefs": [
+            "D03",
+            "D16",
+            "D18"
+          ],
+          "evidenceRefs": [
+            "closed-db:raw-rows"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "E2",
+            "scenarioId": "exception-responsibility"
+          },
+          "oracleExplanation": "exception-evidence는 일반 역할의 예외 종료0 뒤 ADMIN 근거 있는 미확인25 예외 종료에도 잔여 책임은 보인다의 독립 고정값과 실제 원 행을 대조한다.",
+          "oracleRef": {
+            "oracleId": "E2.exception-responsibility",
+            "observationNames": [
+              "exception-evidence"
+            ]
+          }
+        },
+        {
+          "id": "exception-evidence-25",
+          "op": "exactSet",
+          "source": {
+            "actionId": "closed-db",
+            "pointer": "/data/rawRows/disposedMembers",
+            "field": "boxSerial"
+          },
+          "expected": [
+            "exception-responsibility-A-BOX-001",
+            "exception-responsibility-A-BOX-002",
+            "exception-responsibility-A-BOX-003",
+            "exception-responsibility-A-BOX-004",
+            "exception-responsibility-A-BOX-005",
+            "exception-responsibility-A-BOX-006",
+            "exception-responsibility-A-BOX-007",
+            "exception-responsibility-A-BOX-008",
+            "exception-responsibility-A-BOX-009",
+            "exception-responsibility-A-BOX-010",
+            "exception-responsibility-A-BOX-011",
+            "exception-responsibility-A-BOX-012",
+            "exception-responsibility-A-BOX-013",
+            "exception-responsibility-A-BOX-014",
+            "exception-responsibility-A-BOX-015",
+            "exception-responsibility-A-BOX-016",
+            "exception-responsibility-A-BOX-017",
+            "exception-responsibility-A-BOX-018",
+            "exception-responsibility-A-BOX-019",
+            "exception-responsibility-A-BOX-020",
+            "exception-responsibility-A-BOX-021",
+            "exception-responsibility-A-BOX-022",
+            "exception-responsibility-A-BOX-023",
+            "exception-responsibility-A-BOX-024",
+            "exception-responsibility-A-BOX-025"
+          ],
+          "requirementRefs": [
+            "D03",
+            "D16",
+            "D18"
+          ],
+          "evidenceRefs": [
+            "closed-db:raw-rows"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "E2",
+            "scenarioId": "exception-responsibility"
+          },
+          "oracleExplanation": "exception-evidence는 일반 역할의 예외 종료0 뒤 ADMIN 근거 있는 미확인25 예외 종료에도 잔여 책임은 보인다의 독립 고정값과 실제 원 행을 대조한다.",
+          "oracleRef": {
+            "oracleId": "E2.exception-responsibility",
+            "observationNames": [
+              "exception-evidence"
+            ]
+          }
+        },
+        {
+          "id": "exception-evidence-26",
+          "op": "exactSet",
+          "source": {
+            "actionId": "closed-db",
+            "pointer": "/data/rawRows/recallMembers",
+            "field": "boxSerial"
+          },
+          "expected": [
+            "exception-responsibility-A-BOX-001",
+            "exception-responsibility-A-BOX-002",
+            "exception-responsibility-A-BOX-003",
+            "exception-responsibility-A-BOX-004",
+            "exception-responsibility-A-BOX-005",
+            "exception-responsibility-A-BOX-006",
+            "exception-responsibility-A-BOX-007",
+            "exception-responsibility-A-BOX-008",
+            "exception-responsibility-A-BOX-009",
+            "exception-responsibility-A-BOX-010",
+            "exception-responsibility-A-BOX-011",
+            "exception-responsibility-A-BOX-012",
+            "exception-responsibility-A-BOX-013",
+            "exception-responsibility-A-BOX-014",
+            "exception-responsibility-A-BOX-015",
+            "exception-responsibility-A-BOX-016",
+            "exception-responsibility-A-BOX-017",
+            "exception-responsibility-A-BOX-018",
+            "exception-responsibility-A-BOX-019",
+            "exception-responsibility-A-BOX-020",
+            "exception-responsibility-A-BOX-021",
+            "exception-responsibility-A-BOX-022",
+            "exception-responsibility-A-BOX-023",
+            "exception-responsibility-A-BOX-024",
+            "exception-responsibility-A-BOX-025",
+            "exception-responsibility-A-BOX-026",
+            "exception-responsibility-A-BOX-027",
+            "exception-responsibility-A-BOX-028",
+            "exception-responsibility-A-BOX-029",
+            "exception-responsibility-A-BOX-030",
+            "exception-responsibility-A-BOX-031",
+            "exception-responsibility-A-BOX-032",
+            "exception-responsibility-A-BOX-033",
+            "exception-responsibility-A-BOX-034",
+            "exception-responsibility-A-BOX-035",
+            "exception-responsibility-A-BOX-036",
+            "exception-responsibility-A-BOX-037",
+            "exception-responsibility-A-BOX-038",
+            "exception-responsibility-A-BOX-039",
+            "exception-responsibility-A-BOX-040",
+            "exception-responsibility-A-BOX-041",
+            "exception-responsibility-A-BOX-042",
+            "exception-responsibility-A-BOX-043",
+            "exception-responsibility-A-BOX-044",
+            "exception-responsibility-A-BOX-045",
+            "exception-responsibility-A-BOX-046",
+            "exception-responsibility-A-BOX-047",
+            "exception-responsibility-A-BOX-048",
+            "exception-responsibility-A-BOX-049",
+            "exception-responsibility-A-BOX-050"
+          ],
+          "requirementRefs": [
+            "D03",
+            "D16",
+            "D18"
+          ],
+          "evidenceRefs": [
+            "closed-db:raw-rows"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "E2",
+            "scenarioId": "exception-responsibility"
+          },
+          "oracleExplanation": "exception-evidence는 일반 역할의 예외 종료0 뒤 ADMIN 근거 있는 미확인25 예외 종료에도 잔여 책임은 보인다의 독립 고정값과 실제 원 행을 대조한다.",
+          "oracleRef": {
+            "oracleId": "E2.exception-responsibility",
+            "observationNames": [
+              "exception-evidence"
+            ]
+          }
+        },
+        {
+          "id": "exception-evidence-27",
+          "op": "exactSet",
+          "source": {
+            "actionId": "closed-db",
+            "pointer": "/data/rawRows/recallMembers",
+            "where": {
+              "finalDisposition": "APPROVED_UNRESOLVED_EXCEPTION"
+            },
+            "field": "boxSerial"
+          },
+          "expected": [
+            "exception-responsibility-A-BOX-026",
+            "exception-responsibility-A-BOX-027",
+            "exception-responsibility-A-BOX-028",
+            "exception-responsibility-A-BOX-029",
+            "exception-responsibility-A-BOX-030",
+            "exception-responsibility-A-BOX-031",
+            "exception-responsibility-A-BOX-032",
+            "exception-responsibility-A-BOX-033",
+            "exception-responsibility-A-BOX-034",
+            "exception-responsibility-A-BOX-035",
+            "exception-responsibility-A-BOX-036",
+            "exception-responsibility-A-BOX-037",
+            "exception-responsibility-A-BOX-038",
+            "exception-responsibility-A-BOX-039",
+            "exception-responsibility-A-BOX-040",
+            "exception-responsibility-A-BOX-041",
+            "exception-responsibility-A-BOX-042",
+            "exception-responsibility-A-BOX-043",
+            "exception-responsibility-A-BOX-044",
+            "exception-responsibility-A-BOX-045",
+            "exception-responsibility-A-BOX-046",
+            "exception-responsibility-A-BOX-047",
+            "exception-responsibility-A-BOX-048",
+            "exception-responsibility-A-BOX-049",
+            "exception-responsibility-A-BOX-050"
+          ],
+          "requirementRefs": [
+            "D03",
+            "D16",
+            "D18"
+          ],
+          "evidenceRefs": [
+            "closed-db:raw-rows"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "E2",
+            "scenarioId": "exception-responsibility"
+          },
+          "oracleExplanation": "exception-evidence는 일반 역할의 예외 종료0 뒤 ADMIN 근거 있는 미확인25 예외 종료에도 잔여 책임은 보인다의 독립 고정값과 실제 원 행을 대조한다.",
+          "oracleRef": {
+            "oracleId": "E2.exception-responsibility",
+            "observationNames": [
+              "exception-evidence"
+            ]
+          }
+        },
+        {
+          "id": "exception-evidence-28",
+          "op": "unique",
+          "source": {
+            "actionId": "closed-db",
+            "pointer": "/data/rawRows/recallMembers",
+            "field": "boxSerial"
+          },
+          "expected": true,
+          "requirementRefs": [
+            "D03",
+            "D16",
+            "D18"
+          ],
+          "evidenceRefs": [
+            "closed-db:raw-rows"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "E2",
+            "scenarioId": "exception-responsibility"
+          },
+          "oracleExplanation": "exception-evidence는 일반 역할의 예외 종료0 뒤 ADMIN 근거 있는 미확인25 예외 종료에도 잔여 책임은 보인다의 독립 고정값과 실제 원 행을 대조한다.",
+          "oracleRef": {
+            "oracleId": "E2.exception-responsibility",
+            "observationNames": [
+              "exception-evidence"
+            ]
+          }
+        },
+        {
+          "id": "exception-evidence-29",
+          "op": "sameAs",
+          "source": {
+            "actionId": "closed-db",
+            "pointer": "/data/rawRows/recoveredMembers",
+            "field": "boxSerial"
+          },
+          "expected": null,
+          "requirementRefs": [
+            "D03",
+            "D16",
+            "D18"
+          ],
+          "evidenceRefs": [
+            "closed-db:raw-rows"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "E2",
+            "scenarioId": "exception-responsibility"
+          },
+          "oracleExplanation": "exception-evidence는 일반 역할의 예외 종료0 뒤 ADMIN 근거 있는 미확인25 예외 종료에도 잔여 책임은 보인다의 독립 고정값과 실제 원 행을 대조한다.",
+          "oracleRef": {
+            "oracleId": "E2.exception-responsibility",
+            "observationNames": [
+              "exception-evidence"
+            ]
+          },
+          "baseline": {
+            "actionId": "closed-db",
+            "pointer": "/data/rawRows/disposedMembers",
+            "field": "boxSerial"
+          }
+        }
+      ],
+      "oracleExplanation": "가상 fixture는 선행 실물·정책·증거 입력만 설치한다. 검증하는 주문·승인·예약·출고·인도·반품·회수·정정 효과는 각각 공개 명령으로 실행한다. 일반 역할의 예외 종료0 뒤 ADMIN 근거 있는 미확인25 예외 종료에도 잔여 책임은 보인다의 수량과 책임은 고정 기대값과 원 행·응답을 함께 검증한다."
+    }
+  ]
+}

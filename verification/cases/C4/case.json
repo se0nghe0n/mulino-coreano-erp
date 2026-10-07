@@ -1,0 +1,5297 @@
+{
+  "schemaVersion": "1.0.0",
+  "caseId": "C4",
+  "title": "새 반품과 과거 정정 및 유효 의무 해소",
+  "requirementRefs": [
+    "D06",
+    "D12",
+    "D18"
+  ],
+  "profiles": [
+    "scenarios"
+  ],
+  "subcases": [
+    {
+      "id": "return-not-correction",
+      "title": "과거 인도100과 새 반품20을 분리하며 중복 반품·과거80 덮어쓰기를 막는다",
+      "fixtureRef": "verification/cases/C4/fixtures/return-not-correction.json",
+      "requiredAdapters": [
+        "fixture",
+        "api",
+        "db"
+      ],
+      "actions": [
+        {
+          "id": "setup",
+          "kind": "installFixture",
+          "evidenceRefs": [
+            "setup:fixture-installation"
+          ]
+        },
+        {
+          "id": "order",
+          "kind": "invoke",
+          "actorRef": "sales",
+          "route": "api",
+          "capabilityId": "createSalesOrder",
+          "request": {
+            "intentKind": "COMMAND",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "createSalesOrder",
+            "subjectRefs": [
+              {
+                "type": "TradeItem",
+                "id": {
+                  "$alias": "P"
+                }
+              }
+            ],
+            "slots": {
+              "customerId": {
+                "$alias": "C"
+              },
+              "quantity": {
+                "value": "100",
+                "unit": "BOX"
+              },
+              "destinationId": {
+                "$alias": "CUSTOMER"
+              },
+              "deliveryEndpoint": "CUSTOMER_ACCEPTED",
+              "packagingVersion": "sealed-box-v1",
+              "dueAt": "2026-10-07T10:00:00Z"
+            },
+            "expectedRevision": 1,
+            "commandIdempotencyKey": "C4-return-not-correction-order",
+            "evidenceRefs": [
+              {
+                "$alias": "delivery-proof"
+              }
+            ],
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseId": "C4",
+              "scenarioId": "return-not-correction"
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z"
+          },
+          "evidenceRefs": [
+            "order:api-response",
+            "order:actual-command-artifact"
+          ]
+        },
+        {
+          "id": "reserve",
+          "kind": "invoke",
+          "actorRef": "sales",
+          "route": "api",
+          "capabilityId": "reserveQuantity",
+          "request": {
+            "intentKind": "COMMAND",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "reserveQuantity",
+            "subjectRefs": [
+              {
+                "type": "TradeItem",
+                "id": {
+                  "$alias": "P"
+                }
+              }
+            ],
+            "slots": {
+              "orderLineId": {
+                "$result": {
+                  "actionId": "order",
+                  "pointer": "/response/line/id"
+                }
+              },
+              "segmentId": {
+                "$alias": "A"
+              },
+              "quantity": {
+                "value": "100",
+                "unit": "BOX"
+              },
+              "action": "SELL"
+            },
+            "expectedRevision": 1,
+            "commandIdempotencyKey": "C4-return-not-correction-reserve",
+            "evidenceRefs": [
+              {
+                "$alias": "delivery-proof"
+              }
+            ],
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseId": "C4",
+              "scenarioId": "return-not-correction"
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z"
+          },
+          "evidenceRefs": [
+            "reserve:api-response",
+            "reserve:actual-command-artifact"
+          ]
+        },
+        {
+          "id": "pick",
+          "kind": "invoke",
+          "actorRef": "sales",
+          "route": "api",
+          "capabilityId": "pickQuantity",
+          "request": {
+            "intentKind": "COMMAND",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "pickQuantity",
+            "subjectRefs": [
+              {
+                "type": "TradeItem",
+                "id": {
+                  "$alias": "P"
+                }
+              }
+            ],
+            "slots": {
+              "allocationId": {
+                "$result": {
+                  "actionId": "reserve",
+                  "pointer": "/response/allocationId"
+                }
+              },
+              "quantity": {
+                "value": "100",
+                "unit": "BOX"
+              }
+            },
+            "expectedRevision": {
+              "$result": {
+                "actionId": "reserve",
+                "pointer": "/response/revision"
+              }
+            },
+            "commandIdempotencyKey": "C4-return-not-correction-pick",
+            "evidenceRefs": [
+              {
+                "$alias": "delivery-proof"
+              }
+            ],
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseId": "C4",
+              "scenarioId": "return-not-correction"
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z"
+          },
+          "evidenceRefs": [
+            "pick:api-response",
+            "pick:actual-command-artifact"
+          ]
+        },
+        {
+          "id": "dispatch",
+          "kind": "invoke",
+          "actorRef": "sales",
+          "route": "api",
+          "capabilityId": "dispatchQuantity",
+          "request": {
+            "intentKind": "COMMAND",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "dispatchQuantity",
+            "subjectRefs": [
+              {
+                "type": "TradeItem",
+                "id": {
+                  "$alias": "P"
+                }
+              }
+            ],
+            "slots": {
+              "allocationId": {
+                "$result": {
+                  "actionId": "reserve",
+                  "pointer": "/response/allocationId"
+                }
+              },
+              "originId": {
+                "$alias": "W"
+              },
+              "destinationId": {
+                "$alias": "CUSTOMER"
+              },
+              "cargoPlaceId": {
+                "$alias": "TRANSIT"
+              },
+              "quantity": {
+                "value": "100",
+                "unit": "BOX"
+              }
+            },
+            "expectedRevision": {
+              "$result": {
+                "actionId": "pick",
+                "pointer": "/response/revision"
+              }
+            },
+            "commandIdempotencyKey": "C4-return-not-correction-dispatch",
+            "evidenceRefs": [
+              {
+                "$alias": "delivery-proof"
+              }
+            ],
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseId": "C4",
+              "scenarioId": "return-not-correction"
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z"
+          },
+          "evidenceRefs": [
+            "dispatch:api-response",
+            "dispatch:actual-command-artifact"
+          ]
+        },
+        {
+          "id": "delivery",
+          "kind": "invoke",
+          "actorRef": "receiver",
+          "route": "api",
+          "capabilityId": "recordDelivery",
+          "request": {
+            "intentKind": "RECORD",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "recordDelivery",
+            "subjectRefs": [
+              {
+                "type": "TradeItem",
+                "id": {
+                  "$alias": "P"
+                }
+              }
+            ],
+            "slots": {
+              "dispatchId": {
+                "$result": {
+                  "actionId": "dispatch",
+                  "pointer": "/response/id"
+                }
+              },
+              "cargoScopeId": {
+                "$result": {
+                  "actionId": "dispatch",
+                  "pointer": "/response/cargoScope/id"
+                }
+              },
+              "allocationId": {
+                "$result": {
+                  "actionId": "reserve",
+                  "pointer": "/response/allocationId"
+                }
+              },
+              "quantity": {
+                "value": "100",
+                "unit": "BOX"
+              },
+              "occurredAt": "2026-10-07T09:00:00Z",
+              "sourceEvidenceId": {
+                "$alias": "delivery-proof"
+              },
+              "sourceNamespace": "SYNTHETIC-CUSTOMER",
+              "externalEventId": "return-not-correction-actual-delivery",
+              "sourceVersion": "1"
+            },
+            "expectedRevision": {
+              "$result": {
+                "actionId": "dispatch",
+                "pointer": "/response/revision"
+              }
+            },
+            "commandIdempotencyKey": "C4-return-not-correction-delivery",
+            "evidenceRefs": [
+              {
+                "$alias": "delivery-proof"
+              }
+            ],
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseId": "C4",
+              "scenarioId": "return-not-correction"
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z"
+          },
+          "evidenceRefs": [
+            "delivery:api-response",
+            "delivery:actual-command-artifact"
+          ]
+        },
+        {
+          "id": "return-history-assessment",
+          "kind": "query",
+          "actorRef": "observer",
+          "route": "api",
+          "capabilityId": "getAssessment",
+          "request": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseId": "C4",
+              "scenarioId": "return-not-correction"
+            },
+            "subjectRefs": [
+              {
+                "type": "Work",
+                "id": {
+                  "$result": {
+                    "actionId": "order",
+                    "pointer": "/response/workId"
+                  }
+                }
+              }
+            ],
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z",
+            "include": [
+              "inventory",
+              "trade",
+              "evidence",
+              "assessments",
+              "obligations",
+              "audit",
+              "outbox"
+            ]
+          },
+          "evidenceRefs": [
+            "return-history-assessment:api-response"
+          ]
+        },
+        {
+          "id": "before-return",
+          "kind": "query",
+          "actorRef": "observer",
+          "route": "api",
+          "capabilityId": "getObject",
+          "request": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseId": "C4",
+              "scenarioId": "return-not-correction"
+            },
+            "subjectRefs": [
+              {
+                "type": "TradeItem",
+                "id": {
+                  "$alias": "P"
+                }
+              }
+            ],
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z",
+            "include": [
+              "inventory",
+              "trade",
+              "evidence",
+              "assessments",
+              "obligations",
+              "audit",
+              "outbox"
+            ]
+          },
+          "evidenceRefs": [
+            "before-return:api-response"
+          ]
+        },
+        {
+          "id": "before-return-db",
+          "kind": "observe",
+          "observation": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseId": "C4",
+              "scenarioId": "return-not-correction"
+            },
+            "snapshotRef": {
+              "$result": {
+                "actionId": "before-return",
+                "pointer": "/response/snapshotRevision"
+              }
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z",
+            "sources": [
+              "segments",
+              "movements",
+              "allocations",
+              "deliveries",
+              "receiptContributions",
+              "assessments",
+              "obligations",
+              "audit",
+              "outbox"
+            ]
+          },
+          "evidenceRefs": [
+            "before-return-db:raw-rows",
+            "before-return-db:source-query",
+            "before-return-db:snapshot"
+          ]
+        },
+        {
+          "id": "return-authorize",
+          "kind": "invoke",
+          "actorRef": "receiver",
+          "route": "api",
+          "capabilityId": "authorizeReturn",
+          "request": {
+            "intentKind": "COMMAND",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "authorizeReturn",
+            "subjectRefs": [
+              {
+                "type": "TradeItem",
+                "id": {
+                  "$alias": "P"
+                }
+              }
+            ],
+            "slots": {
+              "deliveryId": {
+                "$result": {
+                  "actionId": "delivery",
+                  "pointer": "/response/id"
+                }
+              },
+              "quantity": {
+                "value": "20",
+                "unit": "BOX"
+              },
+              "reason": "DAMAGED_RETURN",
+              "physicalScopeId": {
+                "$result": {
+                  "actionId": "delivery",
+                  "pointer": "/response/physicalScope/id"
+                }
+              }
+            },
+            "expectedRevision": {
+              "$result": {
+                "actionId": "delivery",
+                "pointer": "/response/revision"
+              }
+            },
+            "commandIdempotencyKey": "C4-return-not-correction-return-authorize",
+            "evidenceRefs": [
+              {
+                "$alias": "delivery-proof"
+              }
+            ],
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseId": "C4",
+              "scenarioId": "return-not-correction"
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z"
+          },
+          "evidenceRefs": [
+            "return-authorize:api-response",
+            "return-authorize:actual-command-artifact"
+          ]
+        },
+        {
+          "id": "return",
+          "kind": "invoke",
+          "actorRef": "receiver",
+          "route": "api",
+          "capabilityId": "receiveReturn",
+          "request": {
+            "intentKind": "COMMAND",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "receiveReturn",
+            "subjectRefs": [
+              {
+                "type": "TradeItem",
+                "id": {
+                  "$alias": "P"
+                }
+              }
+            ],
+            "slots": {
+              "returnAuthorizationId": {
+                "$result": {
+                  "actionId": "return-authorize",
+                  "pointer": "/response/id"
+                }
+              },
+              "deliveryId": {
+                "$result": {
+                  "actionId": "delivery",
+                  "pointer": "/response/id"
+                }
+              },
+              "quantity": {
+                "value": "20",
+                "unit": "BOX"
+              },
+              "destinationId": {
+                "$alias": "W"
+              },
+              "physicalScopeId": {
+                "$result": {
+                  "actionId": "return-authorize",
+                  "pointer": "/response/physicalScope/id"
+                }
+              },
+              "sourceEvidenceId": {
+                "$alias": "return-proof"
+              },
+              "externalEventId": "return-not-correction-return-one",
+              "sourceNamespace": "SYNTHETIC-RETURN",
+              "sourceVersion": "1"
+            },
+            "expectedRevision": {
+              "$result": {
+                "actionId": "return-authorize",
+                "pointer": "/response/revision"
+              }
+            },
+            "commandIdempotencyKey": "C4-return-not-correction-return",
+            "evidenceRefs": [
+              {
+                "$alias": "delivery-proof"
+              }
+            ],
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseId": "C4",
+              "scenarioId": "return-not-correction"
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z"
+          },
+          "evidenceRefs": [
+            "return:api-response",
+            "return:actual-command-artifact"
+          ]
+        },
+        {
+          "id": "before-duplicate",
+          "kind": "query",
+          "actorRef": "observer",
+          "route": "api",
+          "capabilityId": "getObject",
+          "request": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseId": "C4",
+              "scenarioId": "return-not-correction"
+            },
+            "subjectRefs": [
+              {
+                "type": "TradeItem",
+                "id": {
+                  "$alias": "P"
+                }
+              }
+            ],
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z",
+            "include": [
+              "inventory",
+              "trade",
+              "evidence",
+              "assessments",
+              "obligations",
+              "audit",
+              "outbox"
+            ]
+          },
+          "evidenceRefs": [
+            "before-duplicate:api-response"
+          ]
+        },
+        {
+          "id": "before-duplicate-db",
+          "kind": "observe",
+          "observation": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseId": "C4",
+              "scenarioId": "return-not-correction"
+            },
+            "snapshotRef": {
+              "$result": {
+                "actionId": "before-duplicate",
+                "pointer": "/response/snapshotRevision"
+              }
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z",
+            "sources": [
+              "segments",
+              "movements",
+              "allocations",
+              "deliveries",
+              "receiptContributions",
+              "returns",
+              "obligations",
+              "audit",
+              "outbox"
+            ]
+          },
+          "evidenceRefs": [
+            "before-duplicate-db:raw-rows",
+            "before-duplicate-db:source-query",
+            "before-duplicate-db:snapshot"
+          ]
+        },
+        {
+          "id": "duplicate-return",
+          "kind": "invoke",
+          "actorRef": "receiver",
+          "route": "api",
+          "capabilityId": "receiveReturn",
+          "request": {
+            "intentKind": "COMMAND",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "receiveReturn",
+            "subjectRefs": [
+              {
+                "type": "TradeItem",
+                "id": {
+                  "$alias": "P"
+                }
+              }
+            ],
+            "slots": {
+              "returnAuthorizationId": {
+                "$result": {
+                  "actionId": "return-authorize",
+                  "pointer": "/response/id"
+                }
+              },
+              "deliveryId": {
+                "$result": {
+                  "actionId": "delivery",
+                  "pointer": "/response/id"
+                }
+              },
+              "quantity": {
+                "value": "20",
+                "unit": "BOX"
+              },
+              "destinationId": {
+                "$alias": "W"
+              },
+              "physicalScopeId": {
+                "$result": {
+                  "actionId": "return-authorize",
+                  "pointer": "/response/physicalScope/id"
+                }
+              },
+              "sourceEvidenceId": {
+                "$alias": "return-proof"
+              },
+              "externalEventId": "return-not-correction-return-same-physical-other-source",
+              "sourceNamespace": "SYNTHETIC-CARRIER-RETURN",
+              "sourceVersion": "1"
+            },
+            "expectedRevision": {
+              "$result": {
+                "actionId": "return",
+                "pointer": "/response/revision"
+              }
+            },
+            "commandIdempotencyKey": "C4-return-not-correction-duplicate-return",
+            "evidenceRefs": [
+              {
+                "$alias": "delivery-proof"
+              }
+            ],
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseId": "C4",
+              "scenarioId": "return-not-correction"
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z"
+          },
+          "evidenceRefs": [
+            "duplicate-return:api-response",
+            "duplicate-return:actual-command-artifact"
+          ]
+        },
+        {
+          "id": "returned",
+          "kind": "query",
+          "actorRef": "observer",
+          "route": "api",
+          "capabilityId": "getObject",
+          "request": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseId": "C4",
+              "scenarioId": "return-not-correction"
+            },
+            "subjectRefs": [
+              {
+                "type": "TradeItem",
+                "id": {
+                  "$alias": "P"
+                }
+              }
+            ],
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z",
+            "include": [
+              "inventory",
+              "trade",
+              "evidence",
+              "assessments",
+              "obligations",
+              "audit",
+              "outbox"
+            ]
+          },
+          "evidenceRefs": [
+            "returned:api-response"
+          ]
+        },
+        {
+          "id": "returned-db",
+          "kind": "observe",
+          "observation": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseId": "C4",
+              "scenarioId": "return-not-correction"
+            },
+            "snapshotRef": {
+              "$result": {
+                "actionId": "returned",
+                "pointer": "/response/snapshotRevision"
+              }
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z",
+            "sources": [
+              "segments",
+              "movements",
+              "deliveries",
+              "returns",
+              "allocations",
+              "assessments",
+              "receiptContributions",
+              "obligations",
+              "audit",
+              "outbox"
+            ]
+          },
+          "evidenceRefs": [
+            "returned-db:raw-rows",
+            "returned-db:source-query",
+            "returned-db:snapshot"
+          ]
+        }
+      ],
+      "assertions": [
+        {
+          "id": "historical-delivery-1",
+          "op": "decimalEquals",
+          "source": {
+            "actionId": "returned",
+            "pointer": "/response/data/deliveredQuantity"
+          },
+          "expected": "100",
+          "requirementRefs": [
+            "D06",
+            "D12",
+            "D18"
+          ],
+          "evidenceRefs": [
+            "returned:actual-response-or-host-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "C4",
+            "scenarioId": "return-not-correction"
+          },
+          "oracleExplanation": "historical-delivery는 과거 인도100과 새 반품20을 분리하며 중복 반품·과거80 덮어쓰기를 막는다의 독립 고정값과 실제 원 행을 대조한다.",
+          "oracleRef": {
+            "oracleId": "C4.return-not-correction",
+            "observationNames": [
+              "historical-delivery"
+            ]
+          },
+          "unit": "BOX",
+          "unitSource": {
+            "actionId": "returned",
+            "pointer": "/response/data/unit"
+          }
+        },
+        {
+          "id": "historical-delivery-2",
+          "op": "sumEquals",
+          "source": {
+            "actionId": "returned-db",
+            "pointer": "/data/rawRows/deliveries",
+            "where": {
+              "canonical": true
+            },
+            "field": "quantity"
+          },
+          "expected": "100",
+          "requirementRefs": [
+            "D06",
+            "D12",
+            "D18"
+          ],
+          "evidenceRefs": [
+            "returned-db:raw-rows"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "C4",
+            "scenarioId": "return-not-correction"
+          },
+          "oracleExplanation": "historical-delivery는 과거 인도100과 새 반품20을 분리하며 중복 반품·과거80 덮어쓰기를 막는다의 독립 고정값과 실제 원 행을 대조한다.",
+          "oracleRef": {
+            "oracleId": "C4.return-not-correction",
+            "observationNames": [
+              "historical-delivery"
+            ]
+          },
+          "unit": "BOX",
+          "unitSource": {
+            "actionId": "returned-db",
+            "pointer": "/data/rawRows/deliveries",
+            "field": "unit",
+            "where": {
+              "canonical": true
+            }
+          }
+        },
+        {
+          "id": "new-return-3",
+          "op": "decimalEquals",
+          "source": {
+            "actionId": "returned",
+            "pointer": "/response/data/returnedQuantity"
+          },
+          "expected": "20",
+          "requirementRefs": [
+            "D06",
+            "D12",
+            "D18"
+          ],
+          "evidenceRefs": [
+            "returned:actual-response-or-host-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "C4",
+            "scenarioId": "return-not-correction"
+          },
+          "oracleExplanation": "new-return는 과거 인도100과 새 반품20을 분리하며 중복 반품·과거80 덮어쓰기를 막는다의 독립 고정값과 실제 원 행을 대조한다.",
+          "oracleRef": {
+            "oracleId": "C4.return-not-correction",
+            "observationNames": [
+              "new-return"
+            ]
+          },
+          "unit": "BOX",
+          "unitSource": {
+            "actionId": "returned",
+            "pointer": "/response/data/unit"
+          }
+        },
+        {
+          "id": "new-return-4",
+          "op": "sumEquals",
+          "source": {
+            "actionId": "returned-db",
+            "pointer": "/data/rawRows/returns",
+            "where": {
+              "canonical": true
+            },
+            "field": "quantity"
+          },
+          "expected": "20",
+          "requirementRefs": [
+            "D06",
+            "D12",
+            "D18"
+          ],
+          "evidenceRefs": [
+            "returned-db:raw-rows"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "C4",
+            "scenarioId": "return-not-correction"
+          },
+          "oracleExplanation": "new-return는 과거 인도100과 새 반품20을 분리하며 중복 반품·과거80 덮어쓰기를 막는다의 독립 고정값과 실제 원 행을 대조한다.",
+          "oracleRef": {
+            "oracleId": "C4.return-not-correction",
+            "observationNames": [
+              "new-return"
+            ]
+          },
+          "unit": "BOX",
+          "unitSource": {
+            "actionId": "returned-db",
+            "pointer": "/data/rawRows/returns",
+            "field": "unit",
+            "where": {
+              "canonical": true
+            }
+          }
+        },
+        {
+          "id": "duplicate-return-material-effects-5",
+          "op": "sameAs",
+          "source": {
+            "actionId": "returned-db",
+            "pointer": "/data/rawRows/segments",
+            "field": [
+              "id",
+              "quantity",
+              "locationId"
+            ]
+          },
+          "expected": null,
+          "requirementRefs": [
+            "D06",
+            "D12",
+            "D18"
+          ],
+          "evidenceRefs": [
+            "returned-db:raw-rows"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "C4",
+            "scenarioId": "return-not-correction"
+          },
+          "oracleExplanation": "duplicate-return-material-effects는 과거 인도100과 새 반품20을 분리하며 중복 반품·과거80 덮어쓰기를 막는다의 독립 고정값과 실제 원 행을 대조한다.",
+          "oracleRef": {
+            "oracleId": "C4.return-not-correction",
+            "observationNames": [
+              "duplicate-return-material-effects"
+            ]
+          },
+          "baseline": {
+            "actionId": "before-duplicate-db",
+            "pointer": "/data/rawRows/segments",
+            "field": [
+              "id",
+              "quantity",
+              "locationId"
+            ]
+          }
+        },
+        {
+          "id": "duplicate-return-material-effects-6",
+          "op": "sameAs",
+          "source": {
+            "actionId": "returned-db",
+            "pointer": "/data/rawRows/movements",
+            "field": [
+              "id",
+              "quantity"
+            ]
+          },
+          "expected": null,
+          "requirementRefs": [
+            "D06",
+            "D12",
+            "D18"
+          ],
+          "evidenceRefs": [
+            "returned-db:raw-rows"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "C4",
+            "scenarioId": "return-not-correction"
+          },
+          "oracleExplanation": "duplicate-return-material-effects는 과거 인도100과 새 반품20을 분리하며 중복 반품·과거80 덮어쓰기를 막는다의 독립 고정값과 실제 원 행을 대조한다.",
+          "oracleRef": {
+            "oracleId": "C4.return-not-correction",
+            "observationNames": [
+              "duplicate-return-material-effects"
+            ]
+          },
+          "baseline": {
+            "actionId": "before-duplicate-db",
+            "pointer": "/data/rawRows/movements",
+            "field": [
+              "id",
+              "quantity"
+            ]
+          }
+        },
+        {
+          "id": "duplicate-return-material-effects-7",
+          "op": "sameAs",
+          "source": {
+            "actionId": "returned",
+            "pointer": "/response/data/effectLedger/segments"
+          },
+          "expected": null,
+          "requirementRefs": [
+            "D06",
+            "D12",
+            "D18"
+          ],
+          "evidenceRefs": [
+            "returned:actual-response-or-host-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "C4",
+            "scenarioId": "return-not-correction"
+          },
+          "oracleExplanation": "duplicate-return-material-effects는 과거 인도100과 새 반품20을 분리하며 중복 반품·과거80 덮어쓰기를 막는다의 독립 고정값과 실제 원 행을 대조한다.",
+          "oracleRef": {
+            "oracleId": "C4.return-not-correction",
+            "observationNames": [
+              "duplicate-return-material-effects"
+            ]
+          },
+          "baseline": {
+            "actionId": "before-duplicate",
+            "pointer": "/response/data/effectLedger/segments"
+          }
+        },
+        {
+          "id": "duplicate-return-material-effects-8",
+          "op": "sameAs",
+          "source": {
+            "actionId": "returned",
+            "pointer": "/response/data/effectLedger/movements"
+          },
+          "expected": null,
+          "requirementRefs": [
+            "D06",
+            "D12",
+            "D18"
+          ],
+          "evidenceRefs": [
+            "returned:actual-response-or-host-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "C4",
+            "scenarioId": "return-not-correction"
+          },
+          "oracleExplanation": "duplicate-return-material-effects는 과거 인도100과 새 반품20을 분리하며 중복 반품·과거80 덮어쓰기를 막는다의 독립 고정값과 실제 원 행을 대조한다.",
+          "oracleRef": {
+            "oracleId": "C4.return-not-correction",
+            "observationNames": [
+              "duplicate-return-material-effects"
+            ]
+          },
+          "baseline": {
+            "actionId": "before-duplicate",
+            "pointer": "/response/data/effectLedger/movements"
+          }
+        },
+        {
+          "id": "return-overwrites-delivery-to80-9",
+          "op": "sameAs",
+          "source": {
+            "actionId": "returned-db",
+            "pointer": "/data/rawRows/deliveries",
+            "field": [
+              "id",
+              "quantity",
+              "occurredAt"
+            ]
+          },
+          "expected": null,
+          "requirementRefs": [
+            "D06",
+            "D12",
+            "D18"
+          ],
+          "evidenceRefs": [
+            "returned-db:raw-rows"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "C4",
+            "scenarioId": "return-not-correction"
+          },
+          "oracleExplanation": "return-overwrites-delivery-to80는 과거 인도100과 새 반품20을 분리하며 중복 반품·과거80 덮어쓰기를 막는다의 독립 고정값과 실제 원 행을 대조한다.",
+          "oracleRef": {
+            "oracleId": "C4.return-not-correction",
+            "observationNames": [
+              "return-overwrites-delivery-to80"
+            ]
+          },
+          "baseline": {
+            "actionId": "before-return-db",
+            "pointer": "/data/rawRows/deliveries",
+            "field": [
+              "id",
+              "quantity",
+              "occurredAt"
+            ]
+          }
+        },
+        {
+          "id": "physical-reference-10",
+          "op": "relationSet",
+          "source": {
+            "actionId": "returned-db",
+            "pointer": "/data/rawRows/returns",
+            "field": [
+              "originalDeliveryId",
+              "physicalScopeId",
+              "disposition"
+            ]
+          },
+          "expected": [
+            [
+              {
+                "$result": {
+                  "actionId": "delivery",
+                  "pointer": "/response/id"
+                }
+              },
+              {
+                "$result": {
+                  "actionId": "return-authorize",
+                  "pointer": "/response/physicalScope/id"
+                }
+              },
+              "QC_HOLD"
+            ]
+          ],
+          "requirementRefs": [
+            "D06",
+            "D12",
+            "D18"
+          ],
+          "evidenceRefs": [
+            "returned-db:raw-rows"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "C4",
+            "scenarioId": "return-not-correction"
+          },
+          "oracleExplanation": "physical-reference는 과거 인도100과 새 반품20을 분리하며 중복 반품·과거80 덮어쓰기를 막는다의 독립 고정값과 실제 원 행을 대조한다.",
+          "oracleRef": {
+            "oracleId": "C4.return-not-correction",
+            "observationNames": [
+              "physical-reference"
+            ]
+          }
+        },
+        {
+          "id": "physical-reference-11",
+          "op": "equals",
+          "source": {
+            "actionId": "returned",
+            "pointer": "/response/data/returnDisposition"
+          },
+          "expected": "QC_HOLD",
+          "requirementRefs": [
+            "D06",
+            "D12",
+            "D18"
+          ],
+          "evidenceRefs": [
+            "returned:actual-response-or-host-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "C4",
+            "scenarioId": "return-not-correction"
+          },
+          "oracleExplanation": "physical-reference는 과거 인도100과 새 반품20을 분리하며 중복 반품·과거80 덮어쓰기를 막는다의 독립 고정값과 실제 원 행을 대조한다.",
+          "oracleRef": {
+            "oracleId": "C4.return-not-correction",
+            "observationNames": [
+              "physical-reference"
+            ]
+          }
+        },
+        {
+          "id": "return-overwrites-delivery-to80-12",
+          "op": "equals",
+          "source": {
+            "actionId": "return-history-assessment",
+            "pointer": "/response/data/result"
+          },
+          "expected": "SATISFIED",
+          "requirementRefs": [
+            "D06",
+            "D12",
+            "D18"
+          ],
+          "evidenceRefs": [
+            "return-history-assessment:actual-response-or-host-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "C4",
+            "scenarioId": "return-not-correction"
+          },
+          "oracleExplanation": "return-overwrites-delivery-to80는 과거 인도100과 새 반품20을 분리하며 중복 반품·과거80 덮어쓰기를 막는다의 독립 고정값과 실제 원 행을 대조한다.",
+          "oracleRef": {
+            "oracleId": "C4.return-not-correction",
+            "observationNames": [
+              "return-overwrites-delivery-to80"
+            ]
+          }
+        }
+      ],
+      "oracleExplanation": "가상 fixture는 선행 실물·정책·증거 입력만 설치한다. 검증하는 주문·승인·예약·출고·인도·반품·회수·정정 효과는 각각 공개 명령으로 실행한다. 과거 인도100과 새 반품20을 분리하며 중복 반품·과거80 덮어쓰기를 막는다의 수량과 책임은 고정 기대값과 원 행·응답을 함께 검증한다."
+    },
+    {
+      "id": "corrected-delivery-98",
+      "title": "인도100의 실제98 정정은 과거 판정과 현재 부족2의 인간 책임을 함께 남긴다",
+      "fixtureRef": "verification/cases/C4/fixtures/corrected-delivery-98.json",
+      "requiredAdapters": [
+        "fixture",
+        "api",
+        "db"
+      ],
+      "actions": [
+        {
+          "id": "setup",
+          "kind": "installFixture",
+          "evidenceRefs": [
+            "setup:fixture-installation"
+          ]
+        },
+        {
+          "id": "order",
+          "kind": "invoke",
+          "actorRef": "sales",
+          "route": "api",
+          "capabilityId": "createSalesOrder",
+          "request": {
+            "intentKind": "COMMAND",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "createSalesOrder",
+            "subjectRefs": [
+              {
+                "type": "TradeItem",
+                "id": {
+                  "$alias": "P"
+                }
+              }
+            ],
+            "slots": {
+              "customerId": {
+                "$alias": "C"
+              },
+              "quantity": {
+                "value": "100",
+                "unit": "BOX"
+              },
+              "destinationId": {
+                "$alias": "CUSTOMER"
+              },
+              "deliveryEndpoint": "CUSTOMER_ACCEPTED",
+              "packagingVersion": "sealed-box-v1",
+              "dueAt": "2026-10-07T10:00:00Z"
+            },
+            "expectedRevision": 1,
+            "commandIdempotencyKey": "C4-corrected-delivery-98-order",
+            "evidenceRefs": [
+              {
+                "$alias": "delivery-proof"
+              }
+            ],
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseId": "C4",
+              "scenarioId": "corrected-delivery-98"
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z"
+          },
+          "evidenceRefs": [
+            "order:api-response",
+            "order:actual-command-artifact"
+          ]
+        },
+        {
+          "id": "reserve",
+          "kind": "invoke",
+          "actorRef": "sales",
+          "route": "api",
+          "capabilityId": "reserveQuantity",
+          "request": {
+            "intentKind": "COMMAND",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "reserveQuantity",
+            "subjectRefs": [
+              {
+                "type": "TradeItem",
+                "id": {
+                  "$alias": "P"
+                }
+              }
+            ],
+            "slots": {
+              "orderLineId": {
+                "$result": {
+                  "actionId": "order",
+                  "pointer": "/response/line/id"
+                }
+              },
+              "segmentId": {
+                "$alias": "A"
+              },
+              "quantity": {
+                "value": "100",
+                "unit": "BOX"
+              },
+              "action": "SELL"
+            },
+            "expectedRevision": 1,
+            "commandIdempotencyKey": "C4-corrected-delivery-98-reserve",
+            "evidenceRefs": [
+              {
+                "$alias": "delivery-proof"
+              }
+            ],
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseId": "C4",
+              "scenarioId": "corrected-delivery-98"
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z"
+          },
+          "evidenceRefs": [
+            "reserve:api-response",
+            "reserve:actual-command-artifact"
+          ]
+        },
+        {
+          "id": "pick",
+          "kind": "invoke",
+          "actorRef": "sales",
+          "route": "api",
+          "capabilityId": "pickQuantity",
+          "request": {
+            "intentKind": "COMMAND",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "pickQuantity",
+            "subjectRefs": [
+              {
+                "type": "TradeItem",
+                "id": {
+                  "$alias": "P"
+                }
+              }
+            ],
+            "slots": {
+              "allocationId": {
+                "$result": {
+                  "actionId": "reserve",
+                  "pointer": "/response/allocationId"
+                }
+              },
+              "quantity": {
+                "value": "100",
+                "unit": "BOX"
+              }
+            },
+            "expectedRevision": {
+              "$result": {
+                "actionId": "reserve",
+                "pointer": "/response/revision"
+              }
+            },
+            "commandIdempotencyKey": "C4-corrected-delivery-98-pick",
+            "evidenceRefs": [
+              {
+                "$alias": "delivery-proof"
+              }
+            ],
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseId": "C4",
+              "scenarioId": "corrected-delivery-98"
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z"
+          },
+          "evidenceRefs": [
+            "pick:api-response",
+            "pick:actual-command-artifact"
+          ]
+        },
+        {
+          "id": "dispatch",
+          "kind": "invoke",
+          "actorRef": "sales",
+          "route": "api",
+          "capabilityId": "dispatchQuantity",
+          "request": {
+            "intentKind": "COMMAND",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "dispatchQuantity",
+            "subjectRefs": [
+              {
+                "type": "TradeItem",
+                "id": {
+                  "$alias": "P"
+                }
+              }
+            ],
+            "slots": {
+              "allocationId": {
+                "$result": {
+                  "actionId": "reserve",
+                  "pointer": "/response/allocationId"
+                }
+              },
+              "originId": {
+                "$alias": "W"
+              },
+              "destinationId": {
+                "$alias": "CUSTOMER"
+              },
+              "cargoPlaceId": {
+                "$alias": "TRANSIT"
+              },
+              "quantity": {
+                "value": "100",
+                "unit": "BOX"
+              }
+            },
+            "expectedRevision": {
+              "$result": {
+                "actionId": "pick",
+                "pointer": "/response/revision"
+              }
+            },
+            "commandIdempotencyKey": "C4-corrected-delivery-98-dispatch",
+            "evidenceRefs": [
+              {
+                "$alias": "delivery-proof"
+              }
+            ],
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseId": "C4",
+              "scenarioId": "corrected-delivery-98"
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z"
+          },
+          "evidenceRefs": [
+            "dispatch:api-response",
+            "dispatch:actual-command-artifact"
+          ]
+        },
+        {
+          "id": "delivery",
+          "kind": "invoke",
+          "actorRef": "receiver",
+          "route": "api",
+          "capabilityId": "recordDelivery",
+          "request": {
+            "intentKind": "RECORD",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "recordDelivery",
+            "subjectRefs": [
+              {
+                "type": "TradeItem",
+                "id": {
+                  "$alias": "P"
+                }
+              }
+            ],
+            "slots": {
+              "dispatchId": {
+                "$result": {
+                  "actionId": "dispatch",
+                  "pointer": "/response/id"
+                }
+              },
+              "cargoScopeId": {
+                "$result": {
+                  "actionId": "dispatch",
+                  "pointer": "/response/cargoScope/id"
+                }
+              },
+              "allocationId": {
+                "$result": {
+                  "actionId": "reserve",
+                  "pointer": "/response/allocationId"
+                }
+              },
+              "quantity": {
+                "value": "100",
+                "unit": "BOX"
+              },
+              "occurredAt": "2026-10-07T09:00:00Z",
+              "sourceEvidenceId": {
+                "$alias": "delivery-proof"
+              },
+              "sourceNamespace": "SYNTHETIC-CUSTOMER",
+              "externalEventId": "corrected-delivery-98-actual-delivery",
+              "sourceVersion": "1"
+            },
+            "expectedRevision": {
+              "$result": {
+                "actionId": "dispatch",
+                "pointer": "/response/revision"
+              }
+            },
+            "commandIdempotencyKey": "C4-corrected-delivery-98-delivery",
+            "evidenceRefs": [
+              {
+                "$alias": "delivery-proof"
+              }
+            ],
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseId": "C4",
+              "scenarioId": "corrected-delivery-98"
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z"
+          },
+          "evidenceRefs": [
+            "delivery:api-response",
+            "delivery:actual-command-artifact"
+          ]
+        },
+        {
+          "id": "old-assessment",
+          "kind": "query",
+          "actorRef": "observer",
+          "route": "api",
+          "capabilityId": "getAssessment",
+          "request": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseId": "C4",
+              "scenarioId": "corrected-delivery-98"
+            },
+            "subjectRefs": [
+              {
+                "type": "Work",
+                "id": {
+                  "$result": {
+                    "actionId": "order",
+                    "pointer": "/response/workId"
+                  }
+                }
+              }
+            ],
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z",
+            "include": [
+              "inventory",
+              "trade",
+              "evidence",
+              "assessments",
+              "obligations",
+              "audit",
+              "outbox"
+            ]
+          },
+          "evidenceRefs": [
+            "old-assessment:api-response"
+          ]
+        },
+        {
+          "id": "historical",
+          "kind": "query",
+          "actorRef": "observer",
+          "route": "api",
+          "capabilityId": "getObject",
+          "request": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseId": "C4",
+              "scenarioId": "corrected-delivery-98"
+            },
+            "subjectRefs": [
+              {
+                "type": "TradeItem",
+                "id": {
+                  "$alias": "P"
+                }
+              }
+            ],
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z",
+            "include": [
+              "inventory",
+              "trade",
+              "evidence",
+              "assessments",
+              "obligations",
+              "audit",
+              "outbox"
+            ]
+          },
+          "evidenceRefs": [
+            "historical:api-response"
+          ]
+        },
+        {
+          "id": "historical-db",
+          "kind": "observe",
+          "observation": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseId": "C4",
+              "scenarioId": "corrected-delivery-98"
+            },
+            "snapshotRef": {
+              "$result": {
+                "actionId": "historical",
+                "pointer": "/response/snapshotRevision"
+              }
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z",
+            "sources": [
+              "segments",
+              "movements",
+              "deliveries",
+              "returns",
+              "assessments",
+              "obligations",
+              "decisions",
+              "audit",
+              "outbox"
+            ]
+          },
+          "evidenceRefs": [
+            "historical-db:raw-rows",
+            "historical-db:source-query",
+            "historical-db:snapshot"
+          ]
+        },
+        {
+          "id": "correct98",
+          "kind": "invoke",
+          "actorRef": "receiver",
+          "route": "api",
+          "capabilityId": "correctEvidence",
+          "request": {
+            "intentKind": "RECORD",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "correctEvidence",
+            "subjectRefs": [
+              {
+                "type": "TradeItem",
+                "id": {
+                  "$alias": "P"
+                }
+              }
+            ],
+            "slots": {
+              "originalOccurrenceId": {
+                "$result": {
+                  "actionId": "delivery",
+                  "pointer": "/response/occurrenceId"
+                }
+              },
+              "originalEvidenceId": {
+                "$alias": "delivery-proof"
+              },
+              "correctedQuantity": {
+                "value": "98",
+                "unit": "BOX"
+              },
+              "sourceEvidenceId": {
+                "$alias": "correction-98"
+              },
+              "reason": "ACTUAL_DELIVERY_98",
+              "supersedesOccurrenceId": {
+                "$result": {
+                  "actionId": "delivery",
+                  "pointer": "/response/occurrenceId"
+                }
+              }
+            },
+            "expectedRevision": {
+              "$result": {
+                "actionId": "delivery",
+                "pointer": "/response/revision"
+              }
+            },
+            "commandIdempotencyKey": "C4-corrected-delivery-98-correct98",
+            "evidenceRefs": [
+              {
+                "$alias": "delivery-proof"
+              }
+            ],
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseId": "C4",
+              "scenarioId": "corrected-delivery-98"
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z"
+          },
+          "evidenceRefs": [
+            "correct98:api-response",
+            "correct98:actual-command-artifact"
+          ]
+        },
+        {
+          "id": "corrected",
+          "kind": "query",
+          "actorRef": "observer",
+          "route": "api",
+          "capabilityId": "getObject",
+          "request": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseId": "C4",
+              "scenarioId": "corrected-delivery-98"
+            },
+            "subjectRefs": [
+              {
+                "type": "TradeItem",
+                "id": {
+                  "$alias": "P"
+                }
+              }
+            ],
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z",
+            "include": [
+              "inventory",
+              "trade",
+              "evidence",
+              "assessments",
+              "obligations",
+              "audit",
+              "outbox"
+            ]
+          },
+          "evidenceRefs": [
+            "corrected:api-response"
+          ]
+        },
+        {
+          "id": "corrected-db",
+          "kind": "observe",
+          "observation": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseId": "C4",
+              "scenarioId": "corrected-delivery-98"
+            },
+            "snapshotRef": {
+              "$result": {
+                "actionId": "corrected",
+                "pointer": "/response/snapshotRevision"
+              }
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z",
+            "sources": [
+              "segments",
+              "movements",
+              "deliveries",
+              "returns",
+              "assessments",
+              "obligations",
+              "decisions",
+              "audit",
+              "outbox"
+            ]
+          },
+          "evidenceRefs": [
+            "corrected-db:raw-rows",
+            "corrected-db:source-query",
+            "corrected-db:snapshot"
+          ]
+        },
+        {
+          "id": "current-assessment",
+          "kind": "query",
+          "actorRef": "observer",
+          "route": "api",
+          "capabilityId": "getAssessment",
+          "request": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseId": "C4",
+              "scenarioId": "corrected-delivery-98"
+            },
+            "subjectRefs": [
+              {
+                "type": "Work",
+                "id": {
+                  "$result": {
+                    "actionId": "order",
+                    "pointer": "/response/workId"
+                  }
+                }
+              }
+            ],
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z",
+            "include": [
+              "inventory",
+              "trade",
+              "evidence",
+              "assessments",
+              "obligations",
+              "audit",
+              "outbox"
+            ],
+            "snapshotRef": {
+              "$result": {
+                "actionId": "corrected",
+                "pointer": "/response/snapshotRevision"
+              }
+            }
+          },
+          "evidenceRefs": [
+            "current-assessment:api-response"
+          ]
+        },
+        {
+          "id": "current-duties",
+          "kind": "query",
+          "actorRef": "observer",
+          "route": "api",
+          "capabilityId": "getObligations",
+          "request": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseId": "C4",
+              "scenarioId": "corrected-delivery-98"
+            },
+            "subjectRefs": [
+              {
+                "type": "TradeItem",
+                "id": {
+                  "$alias": "P"
+                }
+              }
+            ],
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z",
+            "include": [
+              "inventory",
+              "trade",
+              "evidence",
+              "assessments",
+              "obligations",
+              "audit",
+              "outbox"
+            ],
+            "snapshotRef": {
+              "$result": {
+                "actionId": "corrected",
+                "pointer": "/response/snapshotRevision"
+              }
+            }
+          },
+          "evidenceRefs": [
+            "current-duties:api-response"
+          ]
+        }
+      ],
+      "assertions": [
+        {
+          "id": "historical-assessment-1",
+          "op": "equals",
+          "source": {
+            "actionId": "old-assessment",
+            "pointer": "/response/data/result"
+          },
+          "expected": "SATISFIED",
+          "requirementRefs": [
+            "D06",
+            "D12",
+            "D18"
+          ],
+          "evidenceRefs": [
+            "old-assessment:actual-response-or-host-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "C4",
+            "scenarioId": "corrected-delivery-98"
+          },
+          "oracleExplanation": "historical-assessment는 인도100의 실제98 정정은 과거 판정과 현재 부족2의 인간 책임을 함께 남긴다의 독립 고정값과 실제 원 행을 대조한다.",
+          "oracleRef": {
+            "oracleId": "C4.corrected-delivery-98",
+            "observationNames": [
+              "historical-assessment"
+            ]
+          }
+        },
+        {
+          "id": "historical-assessment-2",
+          "op": "equals",
+          "source": {
+            "actionId": "current-assessment",
+            "pointer": "/response/data/result"
+          },
+          "expected": "UNSATISFIED",
+          "requirementRefs": [
+            "D06",
+            "D12",
+            "D18"
+          ],
+          "evidenceRefs": [
+            "current-assessment:actual-response-or-host-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "C4",
+            "scenarioId": "corrected-delivery-98"
+          },
+          "oracleExplanation": "historical-assessment는 인도100의 실제98 정정은 과거 판정과 현재 부족2의 인간 책임을 함께 남긴다의 독립 고정값과 실제 원 행을 대조한다.",
+          "oracleRef": {
+            "oracleId": "C4.corrected-delivery-98",
+            "observationNames": [
+              "historical-assessment"
+            ]
+          }
+        },
+        {
+          "id": "currently-supported-delivery-3",
+          "op": "decimalEquals",
+          "source": {
+            "actionId": "corrected",
+            "pointer": "/response/data/supportedDeliveredQuantity"
+          },
+          "expected": "98",
+          "requirementRefs": [
+            "D06",
+            "D12",
+            "D18"
+          ],
+          "evidenceRefs": [
+            "corrected:actual-response-or-host-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "C4",
+            "scenarioId": "corrected-delivery-98"
+          },
+          "oracleExplanation": "currently-supported-delivery는 인도100의 실제98 정정은 과거 판정과 현재 부족2의 인간 책임을 함께 남긴다의 독립 고정값과 실제 원 행을 대조한다.",
+          "oracleRef": {
+            "oracleId": "C4.corrected-delivery-98",
+            "observationNames": [
+              "currently-supported-delivery"
+            ]
+          },
+          "unit": "BOX",
+          "unitSource": {
+            "actionId": "corrected",
+            "pointer": "/response/data/unit"
+          }
+        },
+        {
+          "id": "currently-supported-delivery-4",
+          "op": "sumEquals",
+          "source": {
+            "actionId": "corrected-db",
+            "pointer": "/data/rawRows/deliveries",
+            "where": {
+              "current": true
+            },
+            "field": "quantity"
+          },
+          "expected": "98",
+          "requirementRefs": [
+            "D06",
+            "D12",
+            "D18"
+          ],
+          "evidenceRefs": [
+            "corrected-db:raw-rows"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "C4",
+            "scenarioId": "corrected-delivery-98"
+          },
+          "oracleExplanation": "currently-supported-delivery는 인도100의 실제98 정정은 과거 판정과 현재 부족2의 인간 책임을 함께 남긴다의 독립 고정값과 실제 원 행을 대조한다.",
+          "oracleRef": {
+            "oracleId": "C4.corrected-delivery-98",
+            "observationNames": [
+              "currently-supported-delivery"
+            ]
+          },
+          "unit": "BOX",
+          "unitSource": {
+            "actionId": "corrected-db",
+            "pointer": "/data/rawRows/deliveries",
+            "field": "unit",
+            "where": {
+              "current": true
+            }
+          }
+        },
+        {
+          "id": "current-unresolved-deficit-5",
+          "op": "decimalEquals",
+          "source": {
+            "actionId": "corrected",
+            "pointer": "/response/data/unresolvedDeficitQuantity"
+          },
+          "expected": "2",
+          "requirementRefs": [
+            "D06",
+            "D12",
+            "D18"
+          ],
+          "evidenceRefs": [
+            "corrected:actual-response-or-host-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "C4",
+            "scenarioId": "corrected-delivery-98"
+          },
+          "oracleExplanation": "current-unresolved-deficit는 인도100의 실제98 정정은 과거 판정과 현재 부족2의 인간 책임을 함께 남긴다의 독립 고정값과 실제 원 행을 대조한다.",
+          "oracleRef": {
+            "oracleId": "C4.corrected-delivery-98",
+            "observationNames": [
+              "current-unresolved-deficit"
+            ]
+          },
+          "unit": "BOX",
+          "unitSource": {
+            "actionId": "corrected",
+            "pointer": "/response/data/unit"
+          }
+        },
+        {
+          "id": "current-unresolved-deficit-6",
+          "op": "sumEquals",
+          "source": {
+            "actionId": "corrected-db",
+            "pointer": "/data/rawRows/obligations",
+            "where": {
+              "kind": "DELIVERY_DEFICIT",
+              "status": "OPEN",
+              "current": true
+            },
+            "field": "quantity"
+          },
+          "expected": "2",
+          "requirementRefs": [
+            "D06",
+            "D12",
+            "D18"
+          ],
+          "evidenceRefs": [
+            "corrected-db:raw-rows"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "C4",
+            "scenarioId": "corrected-delivery-98"
+          },
+          "oracleExplanation": "current-unresolved-deficit는 인도100의 실제98 정정은 과거 판정과 현재 부족2의 인간 책임을 함께 남긴다의 독립 고정값과 실제 원 행을 대조한다.",
+          "oracleRef": {
+            "oracleId": "C4.corrected-delivery-98",
+            "observationNames": [
+              "current-unresolved-deficit"
+            ]
+          },
+          "unit": "BOX",
+          "unitSource": {
+            "actionId": "corrected-db",
+            "pointer": "/data/rawRows/obligations",
+            "field": "unit",
+            "where": {
+              "kind": "DELIVERY_DEFICIT",
+              "status": "OPEN",
+              "current": true
+            }
+          }
+        },
+        {
+          "id": "historical-assessment-7",
+          "op": "exactSet",
+          "source": {
+            "actionId": "corrected-db",
+            "pointer": "/data/rawRows/assessments",
+            "where": {
+              "current": false
+            },
+            "field": "result"
+          },
+          "expected": [
+            "SATISFIED"
+          ],
+          "requirementRefs": [
+            "D06",
+            "D12",
+            "D18"
+          ],
+          "evidenceRefs": [
+            "corrected-db:raw-rows"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "C4",
+            "scenarioId": "corrected-delivery-98"
+          },
+          "oracleExplanation": "historical-assessment는 인도100의 실제98 정정은 과거 판정과 현재 부족2의 인간 책임을 함께 남긴다의 독립 고정값과 실제 원 행을 대조한다.",
+          "oracleRef": {
+            "oracleId": "C4.corrected-delivery-98",
+            "observationNames": [
+              "historical-assessment"
+            ]
+          }
+        },
+        {
+          "id": "historical-assessment-8",
+          "op": "exactSet",
+          "source": {
+            "actionId": "corrected-db",
+            "pointer": "/data/rawRows/deliveries",
+            "where": {
+              "current": false
+            },
+            "field": "quantity"
+          },
+          "expected": [
+            "100"
+          ],
+          "requirementRefs": [
+            "D06",
+            "D12",
+            "D18"
+          ],
+          "evidenceRefs": [
+            "corrected-db:raw-rows"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "C4",
+            "scenarioId": "corrected-delivery-98"
+          },
+          "oracleExplanation": "historical-assessment는 인도100의 실제98 정정은 과거 판정과 현재 부족2의 인간 책임을 함께 남긴다의 독립 고정값과 실제 원 행을 대조한다.",
+          "oracleRef": {
+            "oracleId": "C4.corrected-delivery-98",
+            "observationNames": [
+              "historical-assessment"
+            ]
+          }
+        },
+        {
+          "id": "historical-assessment-9",
+          "op": "sameAs",
+          "source": {
+            "actionId": "corrected-db",
+            "pointer": "/data/rawRows/assessments",
+            "where": {
+              "current": true
+            },
+            "field": "previousAssessmentId"
+          },
+          "expected": null,
+          "requirementRefs": [
+            "D06",
+            "D12",
+            "D18"
+          ],
+          "evidenceRefs": [
+            "corrected-db:raw-rows"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "C4",
+            "scenarioId": "corrected-delivery-98"
+          },
+          "oracleExplanation": "historical-assessment는 인도100의 실제98 정정은 과거 판정과 현재 부족2의 인간 책임을 함께 남긴다의 독립 고정값과 실제 원 행을 대조한다.",
+          "oracleRef": {
+            "oracleId": "C4.corrected-delivery-98",
+            "observationNames": [
+              "historical-assessment"
+            ]
+          },
+          "baseline": {
+            "actionId": "historical-db",
+            "pointer": "/data/rawRows/assessments",
+            "where": {
+              "current": true
+            },
+            "field": "id"
+          }
+        },
+        {
+          "id": "historical-assessment-10",
+          "op": "count",
+          "source": {
+            "actionId": "corrected-db",
+            "pointer": "/data/rawRows/returns"
+          },
+          "expected": 0,
+          "requirementRefs": [
+            "D06",
+            "D12",
+            "D18"
+          ],
+          "evidenceRefs": [
+            "corrected-db:raw-rows"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "C4",
+            "scenarioId": "corrected-delivery-98"
+          },
+          "oracleExplanation": "historical-assessment는 인도100의 실제98 정정은 과거 판정과 현재 부족2의 인간 책임을 함께 남긴다의 독립 고정값과 실제 원 행을 대조한다.",
+          "oracleRef": {
+            "oracleId": "C4.corrected-delivery-98",
+            "observationNames": [
+              "historical-assessment"
+            ]
+          }
+        },
+        {
+          "id": "deficit-owner-11",
+          "op": "count",
+          "source": {
+            "actionId": "corrected-db",
+            "pointer": "/data/rawRows/obligations",
+            "where": {
+              "kind": "DELIVERY_DEFICIT",
+              "current": true
+            }
+          },
+          "expected": 1,
+          "requirementRefs": [
+            "D06",
+            "D12",
+            "D18"
+          ],
+          "evidenceRefs": [
+            "corrected-db:raw-rows"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "C4",
+            "scenarioId": "corrected-delivery-98"
+          },
+          "oracleExplanation": "deficit-owner는 인도100의 실제98 정정은 과거 판정과 현재 부족2의 인간 책임을 함께 남긴다의 독립 고정값과 실제 원 행을 대조한다.",
+          "oracleRef": {
+            "oracleId": "C4.corrected-delivery-98",
+            "observationNames": [
+              "deficit-owner"
+            ]
+          }
+        },
+        {
+          "id": "deficit-owner-12",
+          "op": "exactSet",
+          "source": {
+            "actionId": "corrected-db",
+            "pointer": "/data/rawRows/obligations",
+            "where": {
+              "kind": "DELIVERY_DEFICIT",
+              "current": true
+            },
+            "field": "ownerId"
+          },
+          "expected": [
+            {
+              "$alias": "sales"
+            }
+          ],
+          "requirementRefs": [
+            "D06",
+            "D12",
+            "D18"
+          ],
+          "evidenceRefs": [
+            "corrected-db:raw-rows"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "C4",
+            "scenarioId": "corrected-delivery-98"
+          },
+          "oracleExplanation": "deficit-owner는 인도100의 실제98 정정은 과거 판정과 현재 부족2의 인간 책임을 함께 남긴다의 독립 고정값과 실제 원 행을 대조한다.",
+          "oracleRef": {
+            "oracleId": "C4.corrected-delivery-98",
+            "observationNames": [
+              "deficit-owner"
+            ]
+          }
+        },
+        {
+          "id": "deficit-owner-13",
+          "op": "exactSet",
+          "source": {
+            "actionId": "corrected-db",
+            "pointer": "/data/rawRows/obligations",
+            "where": {
+              "kind": "DELIVERY_DEFICIT",
+              "current": true
+            },
+            "field": "status"
+          },
+          "expected": [
+            "OPEN"
+          ],
+          "requirementRefs": [
+            "D06",
+            "D12",
+            "D18"
+          ],
+          "evidenceRefs": [
+            "corrected-db:raw-rows"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "C4",
+            "scenarioId": "corrected-delivery-98"
+          },
+          "oracleExplanation": "deficit-owner는 인도100의 실제98 정정은 과거 판정과 현재 부족2의 인간 책임을 함께 남긴다의 독립 고정값과 실제 원 행을 대조한다.",
+          "oracleRef": {
+            "oracleId": "C4.corrected-delivery-98",
+            "observationNames": [
+              "deficit-owner"
+            ]
+          }
+        },
+        {
+          "id": "deficit-owner-14",
+          "op": "exactSet",
+          "source": {
+            "actionId": "corrected-db",
+            "pointer": "/data/rawRows/obligations",
+            "where": {
+              "kind": "DELIVERY_DEFICIT",
+              "current": true
+            },
+            "field": "nextAction"
+          },
+          "expected": [
+            "인도 부족과 제한 대응을 확인한다"
+          ],
+          "requirementRefs": [
+            "D06",
+            "D12",
+            "D18"
+          ],
+          "evidenceRefs": [
+            "corrected-db:raw-rows"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "C4",
+            "scenarioId": "corrected-delivery-98"
+          },
+          "oracleExplanation": "deficit-owner는 인도100의 실제98 정정은 과거 판정과 현재 부족2의 인간 책임을 함께 남긴다의 독립 고정값과 실제 원 행을 대조한다.",
+          "oracleRef": {
+            "oracleId": "C4.corrected-delivery-98",
+            "observationNames": [
+              "deficit-owner"
+            ]
+          }
+        },
+        {
+          "id": "deficit-owner-15",
+          "op": "exactSet",
+          "source": {
+            "actionId": "corrected-db",
+            "pointer": "/data/rawRows/obligations",
+            "where": {
+              "kind": "DELIVERY_DEFICIT",
+              "current": true
+            },
+            "field": "nextCheckAt"
+          },
+          "expected": [
+            "2026-10-07T10:00:00Z"
+          ],
+          "requirementRefs": [
+            "D06",
+            "D12",
+            "D18"
+          ],
+          "evidenceRefs": [
+            "corrected-db:raw-rows"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "C4",
+            "scenarioId": "corrected-delivery-98"
+          },
+          "oracleExplanation": "deficit-owner는 인도100의 실제98 정정은 과거 판정과 현재 부족2의 인간 책임을 함께 남긴다의 독립 고정값과 실제 원 행을 대조한다.",
+          "oracleRef": {
+            "oracleId": "C4.corrected-delivery-98",
+            "observationNames": [
+              "deficit-owner"
+            ]
+          }
+        },
+        {
+          "id": "deficit-owner-16",
+          "op": "fieldsPresent",
+          "source": {
+            "actionId": "corrected-db",
+            "pointer": "/data/rawRows/obligations",
+            "where": {
+              "kind": "DELIVERY_DEFICIT",
+              "current": true
+            }
+          },
+          "expected": [
+            "id",
+            "rootId",
+            "ownerId",
+            "responsibleWorkId",
+            "nextAction",
+            "nextCheckAt",
+            "sourceOccurrenceId"
+          ],
+          "requirementRefs": [
+            "D06",
+            "D12",
+            "D18"
+          ],
+          "evidenceRefs": [
+            "corrected-db:raw-rows"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "C4",
+            "scenarioId": "corrected-delivery-98"
+          },
+          "oracleExplanation": "deficit-owner는 인도100의 실제98 정정은 과거 판정과 현재 부족2의 인간 책임을 함께 남긴다의 독립 고정값과 실제 원 행을 대조한다.",
+          "oracleRef": {
+            "oracleId": "C4.corrected-delivery-98",
+            "observationNames": [
+              "deficit-owner"
+            ]
+          }
+        },
+        {
+          "id": "deficit-owner-17",
+          "op": "sameAs",
+          "source": {
+            "actionId": "corrected",
+            "pointer": "/response/data/obligations",
+            "where": {
+              "kind": "DELIVERY_DEFICIT",
+              "current": true
+            },
+            "field": [
+              "id",
+              "rootId",
+              "ownerId",
+              "status",
+              "nextAction",
+              "nextCheckAt"
+            ]
+          },
+          "expected": null,
+          "requirementRefs": [
+            "D06",
+            "D12",
+            "D18"
+          ],
+          "evidenceRefs": [
+            "corrected:actual-response-or-host-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "C4",
+            "scenarioId": "corrected-delivery-98"
+          },
+          "oracleExplanation": "deficit-owner는 인도100의 실제98 정정은 과거 판정과 현재 부족2의 인간 책임을 함께 남긴다의 독립 고정값과 실제 원 행을 대조한다.",
+          "oracleRef": {
+            "oracleId": "C4.corrected-delivery-98",
+            "observationNames": [
+              "deficit-owner"
+            ]
+          },
+          "baseline": {
+            "actionId": "corrected-db",
+            "pointer": "/data/rawRows/obligations",
+            "where": {
+              "kind": "DELIVERY_DEFICIT",
+              "current": true
+            },
+            "field": [
+              "id",
+              "rootId",
+              "ownerId",
+              "status",
+              "nextAction",
+              "nextCheckAt"
+            ]
+          }
+        }
+      ],
+      "oracleExplanation": "가상 fixture는 선행 실물·정책·증거 입력만 설치한다. 검증하는 주문·승인·예약·출고·인도·반품·회수·정정 효과는 각각 공개 명령으로 실행한다. 인도100의 실제98 정정은 과거 판정과 현재 부족2의 인간 책임을 함께 남긴다의 수량과 책임은 고정 기대값과 원 행·응답을 함께 검증한다."
+    },
+    {
+      "id": "resolved-no-resurrection-resolved",
+      "title": "정정으로 생긴 부족2를 RESOLVED 근거로 해소한 뒤 재대조해도 같은 의무는 부활하지 않는다",
+      "fixtureRef": "verification/cases/C4/fixtures/resolved-no-resurrection-resolved.json",
+      "requiredAdapters": [
+        "fixture",
+        "api",
+        "db"
+      ],
+      "actions": [
+        {
+          "id": "setup",
+          "kind": "installFixture",
+          "evidenceRefs": [
+            "setup:fixture-installation"
+          ]
+        },
+        {
+          "id": "order",
+          "kind": "invoke",
+          "actorRef": "sales",
+          "route": "api",
+          "capabilityId": "createSalesOrder",
+          "request": {
+            "intentKind": "COMMAND",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "createSalesOrder",
+            "subjectRefs": [
+              {
+                "type": "TradeItem",
+                "id": {
+                  "$alias": "P"
+                }
+              }
+            ],
+            "slots": {
+              "customerId": {
+                "$alias": "C"
+              },
+              "quantity": {
+                "value": "100",
+                "unit": "BOX"
+              },
+              "destinationId": {
+                "$alias": "CUSTOMER"
+              },
+              "deliveryEndpoint": "CUSTOMER_ACCEPTED",
+              "packagingVersion": "sealed-box-v1",
+              "dueAt": "2026-10-07T10:00:00Z"
+            },
+            "expectedRevision": 1,
+            "commandIdempotencyKey": "C4-resolved-no-resurrection-resolved-order",
+            "evidenceRefs": [
+              {
+                "$alias": "delivery-proof"
+              }
+            ],
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseId": "C4",
+              "scenarioId": "resolved-no-resurrection-resolved"
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z"
+          },
+          "evidenceRefs": [
+            "order:api-response",
+            "order:actual-command-artifact"
+          ]
+        },
+        {
+          "id": "reserve",
+          "kind": "invoke",
+          "actorRef": "sales",
+          "route": "api",
+          "capabilityId": "reserveQuantity",
+          "request": {
+            "intentKind": "COMMAND",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "reserveQuantity",
+            "subjectRefs": [
+              {
+                "type": "TradeItem",
+                "id": {
+                  "$alias": "P"
+                }
+              }
+            ],
+            "slots": {
+              "orderLineId": {
+                "$result": {
+                  "actionId": "order",
+                  "pointer": "/response/line/id"
+                }
+              },
+              "segmentId": {
+                "$alias": "A"
+              },
+              "quantity": {
+                "value": "100",
+                "unit": "BOX"
+              },
+              "action": "SELL"
+            },
+            "expectedRevision": 1,
+            "commandIdempotencyKey": "C4-resolved-no-resurrection-resolved-reserve",
+            "evidenceRefs": [
+              {
+                "$alias": "delivery-proof"
+              }
+            ],
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseId": "C4",
+              "scenarioId": "resolved-no-resurrection-resolved"
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z"
+          },
+          "evidenceRefs": [
+            "reserve:api-response",
+            "reserve:actual-command-artifact"
+          ]
+        },
+        {
+          "id": "pick",
+          "kind": "invoke",
+          "actorRef": "sales",
+          "route": "api",
+          "capabilityId": "pickQuantity",
+          "request": {
+            "intentKind": "COMMAND",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "pickQuantity",
+            "subjectRefs": [
+              {
+                "type": "TradeItem",
+                "id": {
+                  "$alias": "P"
+                }
+              }
+            ],
+            "slots": {
+              "allocationId": {
+                "$result": {
+                  "actionId": "reserve",
+                  "pointer": "/response/allocationId"
+                }
+              },
+              "quantity": {
+                "value": "100",
+                "unit": "BOX"
+              }
+            },
+            "expectedRevision": {
+              "$result": {
+                "actionId": "reserve",
+                "pointer": "/response/revision"
+              }
+            },
+            "commandIdempotencyKey": "C4-resolved-no-resurrection-resolved-pick",
+            "evidenceRefs": [
+              {
+                "$alias": "delivery-proof"
+              }
+            ],
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseId": "C4",
+              "scenarioId": "resolved-no-resurrection-resolved"
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z"
+          },
+          "evidenceRefs": [
+            "pick:api-response",
+            "pick:actual-command-artifact"
+          ]
+        },
+        {
+          "id": "dispatch",
+          "kind": "invoke",
+          "actorRef": "sales",
+          "route": "api",
+          "capabilityId": "dispatchQuantity",
+          "request": {
+            "intentKind": "COMMAND",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "dispatchQuantity",
+            "subjectRefs": [
+              {
+                "type": "TradeItem",
+                "id": {
+                  "$alias": "P"
+                }
+              }
+            ],
+            "slots": {
+              "allocationId": {
+                "$result": {
+                  "actionId": "reserve",
+                  "pointer": "/response/allocationId"
+                }
+              },
+              "originId": {
+                "$alias": "W"
+              },
+              "destinationId": {
+                "$alias": "CUSTOMER"
+              },
+              "cargoPlaceId": {
+                "$alias": "TRANSIT"
+              },
+              "quantity": {
+                "value": "100",
+                "unit": "BOX"
+              }
+            },
+            "expectedRevision": {
+              "$result": {
+                "actionId": "pick",
+                "pointer": "/response/revision"
+              }
+            },
+            "commandIdempotencyKey": "C4-resolved-no-resurrection-resolved-dispatch",
+            "evidenceRefs": [
+              {
+                "$alias": "delivery-proof"
+              }
+            ],
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseId": "C4",
+              "scenarioId": "resolved-no-resurrection-resolved"
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z"
+          },
+          "evidenceRefs": [
+            "dispatch:api-response",
+            "dispatch:actual-command-artifact"
+          ]
+        },
+        {
+          "id": "delivery",
+          "kind": "invoke",
+          "actorRef": "receiver",
+          "route": "api",
+          "capabilityId": "recordDelivery",
+          "request": {
+            "intentKind": "RECORD",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "recordDelivery",
+            "subjectRefs": [
+              {
+                "type": "TradeItem",
+                "id": {
+                  "$alias": "P"
+                }
+              }
+            ],
+            "slots": {
+              "dispatchId": {
+                "$result": {
+                  "actionId": "dispatch",
+                  "pointer": "/response/id"
+                }
+              },
+              "cargoScopeId": {
+                "$result": {
+                  "actionId": "dispatch",
+                  "pointer": "/response/cargoScope/id"
+                }
+              },
+              "allocationId": {
+                "$result": {
+                  "actionId": "reserve",
+                  "pointer": "/response/allocationId"
+                }
+              },
+              "quantity": {
+                "value": "100",
+                "unit": "BOX"
+              },
+              "occurredAt": "2026-10-07T09:00:00Z",
+              "sourceEvidenceId": {
+                "$alias": "delivery-proof"
+              },
+              "sourceNamespace": "SYNTHETIC-CUSTOMER",
+              "externalEventId": "resolved-no-resurrection-resolved-actual-delivery",
+              "sourceVersion": "1"
+            },
+            "expectedRevision": {
+              "$result": {
+                "actionId": "dispatch",
+                "pointer": "/response/revision"
+              }
+            },
+            "commandIdempotencyKey": "C4-resolved-no-resurrection-resolved-delivery",
+            "evidenceRefs": [
+              {
+                "$alias": "delivery-proof"
+              }
+            ],
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseId": "C4",
+              "scenarioId": "resolved-no-resurrection-resolved"
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z"
+          },
+          "evidenceRefs": [
+            "delivery:api-response",
+            "delivery:actual-command-artifact"
+          ]
+        },
+        {
+          "id": "old-assessment",
+          "kind": "query",
+          "actorRef": "observer",
+          "route": "api",
+          "capabilityId": "getAssessment",
+          "request": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseId": "C4",
+              "scenarioId": "resolved-no-resurrection-resolved"
+            },
+            "subjectRefs": [
+              {
+                "type": "Work",
+                "id": {
+                  "$result": {
+                    "actionId": "order",
+                    "pointer": "/response/workId"
+                  }
+                }
+              }
+            ],
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z",
+            "include": [
+              "inventory",
+              "trade",
+              "evidence",
+              "assessments",
+              "obligations",
+              "audit",
+              "outbox"
+            ]
+          },
+          "evidenceRefs": [
+            "old-assessment:api-response"
+          ]
+        },
+        {
+          "id": "historical",
+          "kind": "query",
+          "actorRef": "observer",
+          "route": "api",
+          "capabilityId": "getObject",
+          "request": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseId": "C4",
+              "scenarioId": "resolved-no-resurrection-resolved"
+            },
+            "subjectRefs": [
+              {
+                "type": "TradeItem",
+                "id": {
+                  "$alias": "P"
+                }
+              }
+            ],
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z",
+            "include": [
+              "inventory",
+              "trade",
+              "evidence",
+              "assessments",
+              "obligations",
+              "audit",
+              "outbox"
+            ]
+          },
+          "evidenceRefs": [
+            "historical:api-response"
+          ]
+        },
+        {
+          "id": "historical-db",
+          "kind": "observe",
+          "observation": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseId": "C4",
+              "scenarioId": "resolved-no-resurrection-resolved"
+            },
+            "snapshotRef": {
+              "$result": {
+                "actionId": "historical",
+                "pointer": "/response/snapshotRevision"
+              }
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z",
+            "sources": [
+              "segments",
+              "movements",
+              "deliveries",
+              "returns",
+              "assessments",
+              "obligations",
+              "decisions",
+              "audit",
+              "outbox"
+            ]
+          },
+          "evidenceRefs": [
+            "historical-db:raw-rows",
+            "historical-db:source-query",
+            "historical-db:snapshot"
+          ]
+        },
+        {
+          "id": "correct98",
+          "kind": "invoke",
+          "actorRef": "receiver",
+          "route": "api",
+          "capabilityId": "correctEvidence",
+          "request": {
+            "intentKind": "RECORD",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "correctEvidence",
+            "subjectRefs": [
+              {
+                "type": "TradeItem",
+                "id": {
+                  "$alias": "P"
+                }
+              }
+            ],
+            "slots": {
+              "originalOccurrenceId": {
+                "$result": {
+                  "actionId": "delivery",
+                  "pointer": "/response/occurrenceId"
+                }
+              },
+              "originalEvidenceId": {
+                "$alias": "delivery-proof"
+              },
+              "correctedQuantity": {
+                "value": "98",
+                "unit": "BOX"
+              },
+              "sourceEvidenceId": {
+                "$alias": "correction-98"
+              },
+              "reason": "ACTUAL_DELIVERY_98",
+              "supersedesOccurrenceId": {
+                "$result": {
+                  "actionId": "delivery",
+                  "pointer": "/response/occurrenceId"
+                }
+              }
+            },
+            "expectedRevision": {
+              "$result": {
+                "actionId": "delivery",
+                "pointer": "/response/revision"
+              }
+            },
+            "commandIdempotencyKey": "C4-resolved-no-resurrection-resolved-correct98",
+            "evidenceRefs": [
+              {
+                "$alias": "delivery-proof"
+              }
+            ],
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseId": "C4",
+              "scenarioId": "resolved-no-resurrection-resolved"
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z"
+          },
+          "evidenceRefs": [
+            "correct98:api-response",
+            "correct98:actual-command-artifact"
+          ]
+        },
+        {
+          "id": "corrected",
+          "kind": "query",
+          "actorRef": "observer",
+          "route": "api",
+          "capabilityId": "getObject",
+          "request": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseId": "C4",
+              "scenarioId": "resolved-no-resurrection-resolved"
+            },
+            "subjectRefs": [
+              {
+                "type": "TradeItem",
+                "id": {
+                  "$alias": "P"
+                }
+              }
+            ],
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z",
+            "include": [
+              "inventory",
+              "trade",
+              "evidence",
+              "assessments",
+              "obligations",
+              "audit",
+              "outbox"
+            ]
+          },
+          "evidenceRefs": [
+            "corrected:api-response"
+          ]
+        },
+        {
+          "id": "corrected-db",
+          "kind": "observe",
+          "observation": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseId": "C4",
+              "scenarioId": "resolved-no-resurrection-resolved"
+            },
+            "snapshotRef": {
+              "$result": {
+                "actionId": "corrected",
+                "pointer": "/response/snapshotRevision"
+              }
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z",
+            "sources": [
+              "segments",
+              "movements",
+              "deliveries",
+              "returns",
+              "assessments",
+              "obligations",
+              "decisions",
+              "audit",
+              "outbox"
+            ]
+          },
+          "evidenceRefs": [
+            "corrected-db:raw-rows",
+            "corrected-db:source-query",
+            "corrected-db:snapshot"
+          ]
+        },
+        {
+          "id": "duty",
+          "kind": "query",
+          "actorRef": "observer",
+          "route": "api",
+          "capabilityId": "getObligations",
+          "request": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseId": "C4",
+              "scenarioId": "resolved-no-resurrection-resolved"
+            },
+            "subjectRefs": [
+              {
+                "type": "TradeItem",
+                "id": {
+                  "$alias": "P"
+                }
+              }
+            ],
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z",
+            "include": [
+              "inventory",
+              "trade",
+              "evidence",
+              "assessments",
+              "obligations",
+              "audit",
+              "outbox"
+            ]
+          },
+          "evidenceRefs": [
+            "duty:api-response"
+          ]
+        },
+        {
+          "id": "resolution",
+          "kind": "invoke",
+          "actorRef": "manager",
+          "route": "api",
+          "capabilityId": "resolveObligation",
+          "request": {
+            "intentKind": "COMMAND",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "resolveObligation",
+            "subjectRefs": [
+              {
+                "type": "TradeItem",
+                "id": {
+                  "$alias": "P"
+                }
+              }
+            ],
+            "slots": {
+              "obligationId": {
+                "$result": {
+                  "actionId": "duty",
+                  "pointer": "/response/data/obligations/0/id"
+                }
+              },
+              "quantity": {
+                "value": "2",
+                "unit": "BOX"
+              },
+              "reason": "CUSTOMER_ACCEPTED_FINAL_SCOPE",
+              "evidenceId": {
+                "$alias": "resolution-proof"
+              }
+            },
+            "expectedRevision": {
+              "$result": {
+                "actionId": "correct98",
+                "pointer": "/response/revision"
+              }
+            },
+            "commandIdempotencyKey": "C4-resolved-no-resurrection-resolved-resolution",
+            "evidenceRefs": [
+              {
+                "$alias": "delivery-proof"
+              }
+            ],
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseId": "C4",
+              "scenarioId": "resolved-no-resurrection-resolved"
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z"
+          },
+          "evidenceRefs": [
+            "resolution:api-response",
+            "resolution:actual-command-artifact"
+          ]
+        },
+        {
+          "id": "before-reprocess",
+          "kind": "query",
+          "actorRef": "observer",
+          "route": "api",
+          "capabilityId": "getObject",
+          "request": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseId": "C4",
+              "scenarioId": "resolved-no-resurrection-resolved"
+            },
+            "subjectRefs": [
+              {
+                "type": "TradeItem",
+                "id": {
+                  "$alias": "P"
+                }
+              }
+            ],
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z",
+            "include": [
+              "inventory",
+              "trade",
+              "evidence",
+              "assessments",
+              "obligations",
+              "audit",
+              "outbox"
+            ]
+          },
+          "evidenceRefs": [
+            "before-reprocess:api-response"
+          ]
+        },
+        {
+          "id": "before-reprocess-db",
+          "kind": "observe",
+          "observation": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseId": "C4",
+              "scenarioId": "resolved-no-resurrection-resolved"
+            },
+            "snapshotRef": {
+              "$result": {
+                "actionId": "before-reprocess",
+                "pointer": "/response/snapshotRevision"
+              }
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z",
+            "sources": [
+              "deliveries",
+              "returns",
+              "assessments",
+              "obligations",
+              "decisions",
+              "audit",
+              "outbox"
+            ]
+          },
+          "evidenceRefs": [
+            "before-reprocess-db:raw-rows",
+            "before-reprocess-db:source-query",
+            "before-reprocess-db:snapshot"
+          ]
+        },
+        {
+          "id": "reconfirm98",
+          "kind": "invoke",
+          "actorRef": "receiver",
+          "route": "api",
+          "capabilityId": "correctEvidence",
+          "request": {
+            "intentKind": "RECORD",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "correctEvidence",
+            "subjectRefs": [
+              {
+                "type": "TradeItem",
+                "id": {
+                  "$alias": "P"
+                }
+              }
+            ],
+            "slots": {
+              "originalOccurrenceId": {
+                "$result": {
+                  "actionId": "delivery",
+                  "pointer": "/response/occurrenceId"
+                }
+              },
+              "supersedesOccurrenceId": {
+                "$result": {
+                  "actionId": "correct98",
+                  "pointer": "/response/occurrenceId"
+                }
+              },
+              "correctedQuantity": {
+                "value": "98",
+                "unit": "BOX"
+              },
+              "sourceEvidenceId": {
+                "$alias": "correction-98"
+              },
+              "reason": "SAME_CONFIRMED_ACTUAL_SCOPE_NEW_SOURCE_REVISION",
+              "sourceVersion": "2"
+            },
+            "expectedRevision": {
+              "$result": {
+                "actionId": "resolution",
+                "pointer": "/response/revision"
+              }
+            },
+            "commandIdempotencyKey": "C4-resolved-no-resurrection-resolved-reconfirm98",
+            "evidenceRefs": [
+              {
+                "$alias": "delivery-proof"
+              }
+            ],
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseId": "C4",
+              "scenarioId": "resolved-no-resurrection-resolved"
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z"
+          },
+          "evidenceRefs": [
+            "reconfirm98:api-response",
+            "reconfirm98:actual-command-artifact"
+          ]
+        },
+        {
+          "id": "after-reprocess",
+          "kind": "query",
+          "actorRef": "observer",
+          "route": "api",
+          "capabilityId": "getObject",
+          "request": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseId": "C4",
+              "scenarioId": "resolved-no-resurrection-resolved"
+            },
+            "subjectRefs": [
+              {
+                "type": "TradeItem",
+                "id": {
+                  "$alias": "P"
+                }
+              }
+            ],
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z",
+            "include": [
+              "inventory",
+              "trade",
+              "evidence",
+              "assessments",
+              "obligations",
+              "audit",
+              "outbox"
+            ]
+          },
+          "evidenceRefs": [
+            "after-reprocess:api-response"
+          ]
+        },
+        {
+          "id": "after-reprocess-db",
+          "kind": "observe",
+          "observation": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseId": "C4",
+              "scenarioId": "resolved-no-resurrection-resolved"
+            },
+            "snapshotRef": {
+              "$result": {
+                "actionId": "after-reprocess",
+                "pointer": "/response/snapshotRevision"
+              }
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z",
+            "sources": [
+              "deliveries",
+              "returns",
+              "assessments",
+              "obligations",
+              "decisions",
+              "audit",
+              "outbox"
+            ]
+          },
+          "evidenceRefs": [
+            "after-reprocess-db:raw-rows",
+            "after-reprocess-db:source-query",
+            "after-reprocess-db:snapshot"
+          ]
+        }
+      ],
+      "assertions": [
+        {
+          "id": "new-unresolved-deficit-1",
+          "op": "decimalEquals",
+          "source": {
+            "actionId": "after-reprocess",
+            "pointer": "/response/data/unresolvedDeficitQuantity"
+          },
+          "expected": "0",
+          "requirementRefs": [
+            "D06",
+            "D12",
+            "D18"
+          ],
+          "evidenceRefs": [
+            "after-reprocess:actual-response-or-host-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "C4",
+            "scenarioId": "resolved-no-resurrection-resolved"
+          },
+          "oracleExplanation": "new-unresolved-deficit는 정정으로 생긴 부족2를 RESOLVED 근거로 해소한 뒤 재대조해도 같은 의무는 부활하지 않는다의 독립 고정값과 실제 원 행을 대조한다.",
+          "oracleRef": {
+            "oracleId": "C4.resolved-debt-no-resurrection",
+            "observationNames": [
+              "new-unresolved-deficit"
+            ]
+          },
+          "unit": "BOX",
+          "unitSource": {
+            "actionId": "after-reprocess",
+            "pointer": "/response/data/unit"
+          }
+        },
+        {
+          "id": "new-unresolved-deficit-2",
+          "op": "sumEquals",
+          "source": {
+            "actionId": "after-reprocess-db",
+            "pointer": "/data/rawRows/obligations",
+            "where": {
+              "kind": "DELIVERY_DEFICIT",
+              "status": "OPEN",
+              "current": true
+            },
+            "field": "quantity"
+          },
+          "expected": "0",
+          "requirementRefs": [
+            "D06",
+            "D12",
+            "D18"
+          ],
+          "evidenceRefs": [
+            "after-reprocess-db:raw-rows"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "C4",
+            "scenarioId": "resolved-no-resurrection-resolved"
+          },
+          "oracleExplanation": "new-unresolved-deficit는 정정으로 생긴 부족2를 RESOLVED 근거로 해소한 뒤 재대조해도 같은 의무는 부활하지 않는다의 독립 고정값과 실제 원 행을 대조한다.",
+          "oracleRef": {
+            "oracleId": "C4.resolved-debt-no-resurrection",
+            "observationNames": [
+              "new-unresolved-deficit"
+            ]
+          },
+          "unit": "BOX",
+          "unitSource": {
+            "actionId": "after-reprocess-db",
+            "pointer": "/data/data/unit"
+          }
+        },
+        {
+          "id": "resolved-debt-resurrection-3",
+          "op": "sameAs",
+          "source": {
+            "actionId": "after-reprocess-db",
+            "pointer": "/data/rawRows/obligations",
+            "field": [
+              "rootId",
+              "ownerId",
+              "status",
+              "resolutionDecisionId"
+            ]
+          },
+          "expected": null,
+          "requirementRefs": [
+            "D06",
+            "D12",
+            "D18"
+          ],
+          "evidenceRefs": [
+            "after-reprocess-db:raw-rows"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "C4",
+            "scenarioId": "resolved-no-resurrection-resolved"
+          },
+          "oracleExplanation": "resolved-debt-resurrection는 정정으로 생긴 부족2를 RESOLVED 근거로 해소한 뒤 재대조해도 같은 의무는 부활하지 않는다의 독립 고정값과 실제 원 행을 대조한다.",
+          "oracleRef": {
+            "oracleId": "C4.resolved-debt-no-resurrection",
+            "observationNames": [
+              "resolved-debt-resurrection"
+            ]
+          },
+          "baseline": {
+            "actionId": "before-reprocess-db",
+            "pointer": "/data/rawRows/obligations",
+            "field": [
+              "rootId",
+              "ownerId",
+              "status",
+              "resolutionDecisionId"
+            ]
+          }
+        },
+        {
+          "id": "valid-resolution-4",
+          "op": "exactSet",
+          "source": {
+            "actionId": "after-reprocess-db",
+            "pointer": "/data/rawRows/obligations",
+            "where": {
+              "kind": "DELIVERY_DEFICIT",
+              "current": true
+            },
+            "field": "status"
+          },
+          "expected": [
+            "RESOLVED"
+          ],
+          "requirementRefs": [
+            "D06",
+            "D12",
+            "D18"
+          ],
+          "evidenceRefs": [
+            "after-reprocess-db:raw-rows"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "C4",
+            "scenarioId": "resolved-no-resurrection-resolved"
+          },
+          "oracleExplanation": "valid-resolution는 정정으로 생긴 부족2를 RESOLVED 근거로 해소한 뒤 재대조해도 같은 의무는 부활하지 않는다의 독립 고정값과 실제 원 행을 대조한다.",
+          "oracleRef": {
+            "oracleId": "C4.resolved-debt-no-resurrection",
+            "observationNames": [
+              "valid-resolution"
+            ]
+          }
+        },
+        {
+          "id": "valid-resolution-5",
+          "op": "fieldsPresent",
+          "source": {
+            "actionId": "after-reprocess-db",
+            "pointer": "/data/rawRows/decisions"
+          },
+          "expected": [
+            "id",
+            "deciderId",
+            "evidenceId",
+            "scopeId",
+            "reason",
+            "authorizedAt"
+          ],
+          "requirementRefs": [
+            "D06",
+            "D12",
+            "D18"
+          ],
+          "evidenceRefs": [
+            "after-reprocess-db:raw-rows"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "C4",
+            "scenarioId": "resolved-no-resurrection-resolved"
+          },
+          "oracleExplanation": "valid-resolution는 정정으로 생긴 부족2를 RESOLVED 근거로 해소한 뒤 재대조해도 같은 의무는 부활하지 않는다의 독립 고정값과 실제 원 행을 대조한다.",
+          "oracleRef": {
+            "oracleId": "C4.resolved-debt-no-resurrection",
+            "observationNames": [
+              "valid-resolution"
+            ]
+          }
+        },
+        {
+          "id": "valid-resolution-6",
+          "op": "sameAs",
+          "source": {
+            "actionId": "after-reprocess-db",
+            "pointer": "/data/rawRows/assessments",
+            "where": {
+              "current": false,
+              "result": "SATISFIED"
+            },
+            "field": [
+              "id",
+              "result",
+              "inputSnapshotId",
+              "evaluatorVersion"
+            ]
+          },
+          "expected": null,
+          "requirementRefs": [
+            "D06",
+            "D12",
+            "D18"
+          ],
+          "evidenceRefs": [
+            "after-reprocess-db:raw-rows"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "C4",
+            "scenarioId": "resolved-no-resurrection-resolved"
+          },
+          "oracleExplanation": "valid-resolution는 정정으로 생긴 부족2를 RESOLVED 근거로 해소한 뒤 재대조해도 같은 의무는 부활하지 않는다의 독립 고정값과 실제 원 행을 대조한다.",
+          "oracleRef": {
+            "oracleId": "C4.resolved-debt-no-resurrection",
+            "observationNames": [
+              "valid-resolution"
+            ]
+          },
+          "baseline": {
+            "actionId": "historical-db",
+            "pointer": "/data/rawRows/assessments",
+            "where": {
+              "current": true
+            },
+            "field": [
+              "id",
+              "result",
+              "inputSnapshotId",
+              "evaluatorVersion"
+            ]
+          }
+        }
+      ],
+      "oracleExplanation": "가상 fixture는 선행 실물·정책·증거 입력만 설치한다. 검증하는 주문·승인·예약·출고·인도·반품·회수·정정 효과는 각각 공개 명령으로 실행한다. 정정으로 생긴 부족2를 RESOLVED 근거로 해소한 뒤 재대조해도 같은 의무는 부활하지 않는다의 수량과 책임은 고정 기대값과 원 행·응답을 함께 검증한다."
+    },
+    {
+      "id": "resolved-no-resurrection-waived",
+      "title": "정정으로 생긴 부족2를 WAIVED 근거로 해소한 뒤 재대조해도 같은 의무는 부활하지 않는다",
+      "fixtureRef": "verification/cases/C4/fixtures/resolved-no-resurrection-waived.json",
+      "requiredAdapters": [
+        "fixture",
+        "api",
+        "db"
+      ],
+      "actions": [
+        {
+          "id": "setup",
+          "kind": "installFixture",
+          "evidenceRefs": [
+            "setup:fixture-installation"
+          ]
+        },
+        {
+          "id": "order",
+          "kind": "invoke",
+          "actorRef": "sales",
+          "route": "api",
+          "capabilityId": "createSalesOrder",
+          "request": {
+            "intentKind": "COMMAND",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "createSalesOrder",
+            "subjectRefs": [
+              {
+                "type": "TradeItem",
+                "id": {
+                  "$alias": "P"
+                }
+              }
+            ],
+            "slots": {
+              "customerId": {
+                "$alias": "C"
+              },
+              "quantity": {
+                "value": "100",
+                "unit": "BOX"
+              },
+              "destinationId": {
+                "$alias": "CUSTOMER"
+              },
+              "deliveryEndpoint": "CUSTOMER_ACCEPTED",
+              "packagingVersion": "sealed-box-v1",
+              "dueAt": "2026-10-07T10:00:00Z"
+            },
+            "expectedRevision": 1,
+            "commandIdempotencyKey": "C4-resolved-no-resurrection-waived-order",
+            "evidenceRefs": [
+              {
+                "$alias": "delivery-proof"
+              }
+            ],
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseId": "C4",
+              "scenarioId": "resolved-no-resurrection-waived"
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z"
+          },
+          "evidenceRefs": [
+            "order:api-response",
+            "order:actual-command-artifact"
+          ]
+        },
+        {
+          "id": "reserve",
+          "kind": "invoke",
+          "actorRef": "sales",
+          "route": "api",
+          "capabilityId": "reserveQuantity",
+          "request": {
+            "intentKind": "COMMAND",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "reserveQuantity",
+            "subjectRefs": [
+              {
+                "type": "TradeItem",
+                "id": {
+                  "$alias": "P"
+                }
+              }
+            ],
+            "slots": {
+              "orderLineId": {
+                "$result": {
+                  "actionId": "order",
+                  "pointer": "/response/line/id"
+                }
+              },
+              "segmentId": {
+                "$alias": "A"
+              },
+              "quantity": {
+                "value": "100",
+                "unit": "BOX"
+              },
+              "action": "SELL"
+            },
+            "expectedRevision": 1,
+            "commandIdempotencyKey": "C4-resolved-no-resurrection-waived-reserve",
+            "evidenceRefs": [
+              {
+                "$alias": "delivery-proof"
+              }
+            ],
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseId": "C4",
+              "scenarioId": "resolved-no-resurrection-waived"
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z"
+          },
+          "evidenceRefs": [
+            "reserve:api-response",
+            "reserve:actual-command-artifact"
+          ]
+        },
+        {
+          "id": "pick",
+          "kind": "invoke",
+          "actorRef": "sales",
+          "route": "api",
+          "capabilityId": "pickQuantity",
+          "request": {
+            "intentKind": "COMMAND",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "pickQuantity",
+            "subjectRefs": [
+              {
+                "type": "TradeItem",
+                "id": {
+                  "$alias": "P"
+                }
+              }
+            ],
+            "slots": {
+              "allocationId": {
+                "$result": {
+                  "actionId": "reserve",
+                  "pointer": "/response/allocationId"
+                }
+              },
+              "quantity": {
+                "value": "100",
+                "unit": "BOX"
+              }
+            },
+            "expectedRevision": {
+              "$result": {
+                "actionId": "reserve",
+                "pointer": "/response/revision"
+              }
+            },
+            "commandIdempotencyKey": "C4-resolved-no-resurrection-waived-pick",
+            "evidenceRefs": [
+              {
+                "$alias": "delivery-proof"
+              }
+            ],
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseId": "C4",
+              "scenarioId": "resolved-no-resurrection-waived"
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z"
+          },
+          "evidenceRefs": [
+            "pick:api-response",
+            "pick:actual-command-artifact"
+          ]
+        },
+        {
+          "id": "dispatch",
+          "kind": "invoke",
+          "actorRef": "sales",
+          "route": "api",
+          "capabilityId": "dispatchQuantity",
+          "request": {
+            "intentKind": "COMMAND",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "dispatchQuantity",
+            "subjectRefs": [
+              {
+                "type": "TradeItem",
+                "id": {
+                  "$alias": "P"
+                }
+              }
+            ],
+            "slots": {
+              "allocationId": {
+                "$result": {
+                  "actionId": "reserve",
+                  "pointer": "/response/allocationId"
+                }
+              },
+              "originId": {
+                "$alias": "W"
+              },
+              "destinationId": {
+                "$alias": "CUSTOMER"
+              },
+              "cargoPlaceId": {
+                "$alias": "TRANSIT"
+              },
+              "quantity": {
+                "value": "100",
+                "unit": "BOX"
+              }
+            },
+            "expectedRevision": {
+              "$result": {
+                "actionId": "pick",
+                "pointer": "/response/revision"
+              }
+            },
+            "commandIdempotencyKey": "C4-resolved-no-resurrection-waived-dispatch",
+            "evidenceRefs": [
+              {
+                "$alias": "delivery-proof"
+              }
+            ],
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseId": "C4",
+              "scenarioId": "resolved-no-resurrection-waived"
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z"
+          },
+          "evidenceRefs": [
+            "dispatch:api-response",
+            "dispatch:actual-command-artifact"
+          ]
+        },
+        {
+          "id": "delivery",
+          "kind": "invoke",
+          "actorRef": "receiver",
+          "route": "api",
+          "capabilityId": "recordDelivery",
+          "request": {
+            "intentKind": "RECORD",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "recordDelivery",
+            "subjectRefs": [
+              {
+                "type": "TradeItem",
+                "id": {
+                  "$alias": "P"
+                }
+              }
+            ],
+            "slots": {
+              "dispatchId": {
+                "$result": {
+                  "actionId": "dispatch",
+                  "pointer": "/response/id"
+                }
+              },
+              "cargoScopeId": {
+                "$result": {
+                  "actionId": "dispatch",
+                  "pointer": "/response/cargoScope/id"
+                }
+              },
+              "allocationId": {
+                "$result": {
+                  "actionId": "reserve",
+                  "pointer": "/response/allocationId"
+                }
+              },
+              "quantity": {
+                "value": "100",
+                "unit": "BOX"
+              },
+              "occurredAt": "2026-10-07T09:00:00Z",
+              "sourceEvidenceId": {
+                "$alias": "delivery-proof"
+              },
+              "sourceNamespace": "SYNTHETIC-CUSTOMER",
+              "externalEventId": "resolved-no-resurrection-waived-actual-delivery",
+              "sourceVersion": "1"
+            },
+            "expectedRevision": {
+              "$result": {
+                "actionId": "dispatch",
+                "pointer": "/response/revision"
+              }
+            },
+            "commandIdempotencyKey": "C4-resolved-no-resurrection-waived-delivery",
+            "evidenceRefs": [
+              {
+                "$alias": "delivery-proof"
+              }
+            ],
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseId": "C4",
+              "scenarioId": "resolved-no-resurrection-waived"
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z"
+          },
+          "evidenceRefs": [
+            "delivery:api-response",
+            "delivery:actual-command-artifact"
+          ]
+        },
+        {
+          "id": "old-assessment",
+          "kind": "query",
+          "actorRef": "observer",
+          "route": "api",
+          "capabilityId": "getAssessment",
+          "request": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseId": "C4",
+              "scenarioId": "resolved-no-resurrection-waived"
+            },
+            "subjectRefs": [
+              {
+                "type": "Work",
+                "id": {
+                  "$result": {
+                    "actionId": "order",
+                    "pointer": "/response/workId"
+                  }
+                }
+              }
+            ],
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z",
+            "include": [
+              "inventory",
+              "trade",
+              "evidence",
+              "assessments",
+              "obligations",
+              "audit",
+              "outbox"
+            ]
+          },
+          "evidenceRefs": [
+            "old-assessment:api-response"
+          ]
+        },
+        {
+          "id": "historical",
+          "kind": "query",
+          "actorRef": "observer",
+          "route": "api",
+          "capabilityId": "getObject",
+          "request": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseId": "C4",
+              "scenarioId": "resolved-no-resurrection-waived"
+            },
+            "subjectRefs": [
+              {
+                "type": "TradeItem",
+                "id": {
+                  "$alias": "P"
+                }
+              }
+            ],
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z",
+            "include": [
+              "inventory",
+              "trade",
+              "evidence",
+              "assessments",
+              "obligations",
+              "audit",
+              "outbox"
+            ]
+          },
+          "evidenceRefs": [
+            "historical:api-response"
+          ]
+        },
+        {
+          "id": "historical-db",
+          "kind": "observe",
+          "observation": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseId": "C4",
+              "scenarioId": "resolved-no-resurrection-waived"
+            },
+            "snapshotRef": {
+              "$result": {
+                "actionId": "historical",
+                "pointer": "/response/snapshotRevision"
+              }
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z",
+            "sources": [
+              "segments",
+              "movements",
+              "deliveries",
+              "returns",
+              "assessments",
+              "obligations",
+              "decisions",
+              "audit",
+              "outbox"
+            ]
+          },
+          "evidenceRefs": [
+            "historical-db:raw-rows",
+            "historical-db:source-query",
+            "historical-db:snapshot"
+          ]
+        },
+        {
+          "id": "correct98",
+          "kind": "invoke",
+          "actorRef": "receiver",
+          "route": "api",
+          "capabilityId": "correctEvidence",
+          "request": {
+            "intentKind": "RECORD",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "correctEvidence",
+            "subjectRefs": [
+              {
+                "type": "TradeItem",
+                "id": {
+                  "$alias": "P"
+                }
+              }
+            ],
+            "slots": {
+              "originalOccurrenceId": {
+                "$result": {
+                  "actionId": "delivery",
+                  "pointer": "/response/occurrenceId"
+                }
+              },
+              "originalEvidenceId": {
+                "$alias": "delivery-proof"
+              },
+              "correctedQuantity": {
+                "value": "98",
+                "unit": "BOX"
+              },
+              "sourceEvidenceId": {
+                "$alias": "correction-98"
+              },
+              "reason": "ACTUAL_DELIVERY_98",
+              "supersedesOccurrenceId": {
+                "$result": {
+                  "actionId": "delivery",
+                  "pointer": "/response/occurrenceId"
+                }
+              }
+            },
+            "expectedRevision": {
+              "$result": {
+                "actionId": "delivery",
+                "pointer": "/response/revision"
+              }
+            },
+            "commandIdempotencyKey": "C4-resolved-no-resurrection-waived-correct98",
+            "evidenceRefs": [
+              {
+                "$alias": "delivery-proof"
+              }
+            ],
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseId": "C4",
+              "scenarioId": "resolved-no-resurrection-waived"
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z"
+          },
+          "evidenceRefs": [
+            "correct98:api-response",
+            "correct98:actual-command-artifact"
+          ]
+        },
+        {
+          "id": "corrected",
+          "kind": "query",
+          "actorRef": "observer",
+          "route": "api",
+          "capabilityId": "getObject",
+          "request": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseId": "C4",
+              "scenarioId": "resolved-no-resurrection-waived"
+            },
+            "subjectRefs": [
+              {
+                "type": "TradeItem",
+                "id": {
+                  "$alias": "P"
+                }
+              }
+            ],
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z",
+            "include": [
+              "inventory",
+              "trade",
+              "evidence",
+              "assessments",
+              "obligations",
+              "audit",
+              "outbox"
+            ]
+          },
+          "evidenceRefs": [
+            "corrected:api-response"
+          ]
+        },
+        {
+          "id": "corrected-db",
+          "kind": "observe",
+          "observation": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseId": "C4",
+              "scenarioId": "resolved-no-resurrection-waived"
+            },
+            "snapshotRef": {
+              "$result": {
+                "actionId": "corrected",
+                "pointer": "/response/snapshotRevision"
+              }
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z",
+            "sources": [
+              "segments",
+              "movements",
+              "deliveries",
+              "returns",
+              "assessments",
+              "obligations",
+              "decisions",
+              "audit",
+              "outbox"
+            ]
+          },
+          "evidenceRefs": [
+            "corrected-db:raw-rows",
+            "corrected-db:source-query",
+            "corrected-db:snapshot"
+          ]
+        },
+        {
+          "id": "duty",
+          "kind": "query",
+          "actorRef": "observer",
+          "route": "api",
+          "capabilityId": "getObligations",
+          "request": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseId": "C4",
+              "scenarioId": "resolved-no-resurrection-waived"
+            },
+            "subjectRefs": [
+              {
+                "type": "TradeItem",
+                "id": {
+                  "$alias": "P"
+                }
+              }
+            ],
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z",
+            "include": [
+              "inventory",
+              "trade",
+              "evidence",
+              "assessments",
+              "obligations",
+              "audit",
+              "outbox"
+            ]
+          },
+          "evidenceRefs": [
+            "duty:api-response"
+          ]
+        },
+        {
+          "id": "resolution",
+          "kind": "invoke",
+          "actorRef": "manager",
+          "route": "api",
+          "capabilityId": "waiveObligation",
+          "request": {
+            "intentKind": "COMMAND",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "waiveObligation",
+            "subjectRefs": [
+              {
+                "type": "TradeItem",
+                "id": {
+                  "$alias": "P"
+                }
+              }
+            ],
+            "slots": {
+              "obligationId": {
+                "$result": {
+                  "actionId": "duty",
+                  "pointer": "/response/data/obligations/0/id"
+                }
+              },
+              "quantity": {
+                "value": "2",
+                "unit": "BOX"
+              },
+              "reason": "AUTHORIZED_SHORTFALL_WAIVER",
+              "evidenceId": {
+                "$alias": "resolution-proof"
+              }
+            },
+            "expectedRevision": {
+              "$result": {
+                "actionId": "correct98",
+                "pointer": "/response/revision"
+              }
+            },
+            "commandIdempotencyKey": "C4-resolved-no-resurrection-waived-resolution",
+            "evidenceRefs": [
+              {
+                "$alias": "delivery-proof"
+              }
+            ],
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseId": "C4",
+              "scenarioId": "resolved-no-resurrection-waived"
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z"
+          },
+          "evidenceRefs": [
+            "resolution:api-response",
+            "resolution:actual-command-artifact"
+          ]
+        },
+        {
+          "id": "before-reprocess",
+          "kind": "query",
+          "actorRef": "observer",
+          "route": "api",
+          "capabilityId": "getObject",
+          "request": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseId": "C4",
+              "scenarioId": "resolved-no-resurrection-waived"
+            },
+            "subjectRefs": [
+              {
+                "type": "TradeItem",
+                "id": {
+                  "$alias": "P"
+                }
+              }
+            ],
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z",
+            "include": [
+              "inventory",
+              "trade",
+              "evidence",
+              "assessments",
+              "obligations",
+              "audit",
+              "outbox"
+            ]
+          },
+          "evidenceRefs": [
+            "before-reprocess:api-response"
+          ]
+        },
+        {
+          "id": "before-reprocess-db",
+          "kind": "observe",
+          "observation": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseId": "C4",
+              "scenarioId": "resolved-no-resurrection-waived"
+            },
+            "snapshotRef": {
+              "$result": {
+                "actionId": "before-reprocess",
+                "pointer": "/response/snapshotRevision"
+              }
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z",
+            "sources": [
+              "deliveries",
+              "returns",
+              "assessments",
+              "obligations",
+              "decisions",
+              "audit",
+              "outbox"
+            ]
+          },
+          "evidenceRefs": [
+            "before-reprocess-db:raw-rows",
+            "before-reprocess-db:source-query",
+            "before-reprocess-db:snapshot"
+          ]
+        },
+        {
+          "id": "reconfirm98",
+          "kind": "invoke",
+          "actorRef": "receiver",
+          "route": "api",
+          "capabilityId": "correctEvidence",
+          "request": {
+            "intentKind": "RECORD",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "correctEvidence",
+            "subjectRefs": [
+              {
+                "type": "TradeItem",
+                "id": {
+                  "$alias": "P"
+                }
+              }
+            ],
+            "slots": {
+              "originalOccurrenceId": {
+                "$result": {
+                  "actionId": "delivery",
+                  "pointer": "/response/occurrenceId"
+                }
+              },
+              "supersedesOccurrenceId": {
+                "$result": {
+                  "actionId": "correct98",
+                  "pointer": "/response/occurrenceId"
+                }
+              },
+              "correctedQuantity": {
+                "value": "98",
+                "unit": "BOX"
+              },
+              "sourceEvidenceId": {
+                "$alias": "correction-98"
+              },
+              "reason": "SAME_CONFIRMED_ACTUAL_SCOPE_NEW_SOURCE_REVISION",
+              "sourceVersion": "2"
+            },
+            "expectedRevision": {
+              "$result": {
+                "actionId": "resolution",
+                "pointer": "/response/revision"
+              }
+            },
+            "commandIdempotencyKey": "C4-resolved-no-resurrection-waived-reconfirm98",
+            "evidenceRefs": [
+              {
+                "$alias": "delivery-proof"
+              }
+            ],
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseId": "C4",
+              "scenarioId": "resolved-no-resurrection-waived"
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z"
+          },
+          "evidenceRefs": [
+            "reconfirm98:api-response",
+            "reconfirm98:actual-command-artifact"
+          ]
+        },
+        {
+          "id": "after-reprocess",
+          "kind": "query",
+          "actorRef": "observer",
+          "route": "api",
+          "capabilityId": "getObject",
+          "request": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseId": "C4",
+              "scenarioId": "resolved-no-resurrection-waived"
+            },
+            "subjectRefs": [
+              {
+                "type": "TradeItem",
+                "id": {
+                  "$alias": "P"
+                }
+              }
+            ],
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z",
+            "include": [
+              "inventory",
+              "trade",
+              "evidence",
+              "assessments",
+              "obligations",
+              "audit",
+              "outbox"
+            ]
+          },
+          "evidenceRefs": [
+            "after-reprocess:api-response"
+          ]
+        },
+        {
+          "id": "after-reprocess-db",
+          "kind": "observe",
+          "observation": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseId": "C4",
+              "scenarioId": "resolved-no-resurrection-waived"
+            },
+            "snapshotRef": {
+              "$result": {
+                "actionId": "after-reprocess",
+                "pointer": "/response/snapshotRevision"
+              }
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z",
+            "sources": [
+              "deliveries",
+              "returns",
+              "assessments",
+              "obligations",
+              "decisions",
+              "audit",
+              "outbox"
+            ]
+          },
+          "evidenceRefs": [
+            "after-reprocess-db:raw-rows",
+            "after-reprocess-db:source-query",
+            "after-reprocess-db:snapshot"
+          ]
+        }
+      ],
+      "assertions": [
+        {
+          "id": "new-unresolved-deficit-1",
+          "op": "decimalEquals",
+          "source": {
+            "actionId": "after-reprocess",
+            "pointer": "/response/data/unresolvedDeficitQuantity"
+          },
+          "expected": "0",
+          "requirementRefs": [
+            "D06",
+            "D12",
+            "D18"
+          ],
+          "evidenceRefs": [
+            "after-reprocess:actual-response-or-host-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "C4",
+            "scenarioId": "resolved-no-resurrection-waived"
+          },
+          "oracleExplanation": "new-unresolved-deficit는 정정으로 생긴 부족2를 WAIVED 근거로 해소한 뒤 재대조해도 같은 의무는 부활하지 않는다의 독립 고정값과 실제 원 행을 대조한다.",
+          "oracleRef": {
+            "oracleId": "C4.resolved-debt-no-resurrection",
+            "observationNames": [
+              "new-unresolved-deficit"
+            ]
+          },
+          "unit": "BOX",
+          "unitSource": {
+            "actionId": "after-reprocess",
+            "pointer": "/response/data/unit"
+          }
+        },
+        {
+          "id": "new-unresolved-deficit-2",
+          "op": "sumEquals",
+          "source": {
+            "actionId": "after-reprocess-db",
+            "pointer": "/data/rawRows/obligations",
+            "where": {
+              "kind": "DELIVERY_DEFICIT",
+              "status": "OPEN",
+              "current": true
+            },
+            "field": "quantity"
+          },
+          "expected": "0",
+          "requirementRefs": [
+            "D06",
+            "D12",
+            "D18"
+          ],
+          "evidenceRefs": [
+            "after-reprocess-db:raw-rows"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "C4",
+            "scenarioId": "resolved-no-resurrection-waived"
+          },
+          "oracleExplanation": "new-unresolved-deficit는 정정으로 생긴 부족2를 WAIVED 근거로 해소한 뒤 재대조해도 같은 의무는 부활하지 않는다의 독립 고정값과 실제 원 행을 대조한다.",
+          "oracleRef": {
+            "oracleId": "C4.resolved-debt-no-resurrection",
+            "observationNames": [
+              "new-unresolved-deficit"
+            ]
+          },
+          "unit": "BOX",
+          "unitSource": {
+            "actionId": "after-reprocess-db",
+            "pointer": "/data/data/unit"
+          }
+        },
+        {
+          "id": "resolved-debt-resurrection-3",
+          "op": "sameAs",
+          "source": {
+            "actionId": "after-reprocess-db",
+            "pointer": "/data/rawRows/obligations",
+            "field": [
+              "rootId",
+              "ownerId",
+              "status",
+              "resolutionDecisionId"
+            ]
+          },
+          "expected": null,
+          "requirementRefs": [
+            "D06",
+            "D12",
+            "D18"
+          ],
+          "evidenceRefs": [
+            "after-reprocess-db:raw-rows"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "C4",
+            "scenarioId": "resolved-no-resurrection-waived"
+          },
+          "oracleExplanation": "resolved-debt-resurrection는 정정으로 생긴 부족2를 WAIVED 근거로 해소한 뒤 재대조해도 같은 의무는 부활하지 않는다의 독립 고정값과 실제 원 행을 대조한다.",
+          "oracleRef": {
+            "oracleId": "C4.resolved-debt-no-resurrection",
+            "observationNames": [
+              "resolved-debt-resurrection"
+            ]
+          },
+          "baseline": {
+            "actionId": "before-reprocess-db",
+            "pointer": "/data/rawRows/obligations",
+            "field": [
+              "rootId",
+              "ownerId",
+              "status",
+              "resolutionDecisionId"
+            ]
+          }
+        },
+        {
+          "id": "valid-resolution-4",
+          "op": "exactSet",
+          "source": {
+            "actionId": "after-reprocess-db",
+            "pointer": "/data/rawRows/obligations",
+            "where": {
+              "kind": "DELIVERY_DEFICIT",
+              "current": true
+            },
+            "field": "status"
+          },
+          "expected": [
+            "WAIVED"
+          ],
+          "requirementRefs": [
+            "D06",
+            "D12",
+            "D18"
+          ],
+          "evidenceRefs": [
+            "after-reprocess-db:raw-rows"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "C4",
+            "scenarioId": "resolved-no-resurrection-waived"
+          },
+          "oracleExplanation": "valid-resolution는 정정으로 생긴 부족2를 WAIVED 근거로 해소한 뒤 재대조해도 같은 의무는 부활하지 않는다의 독립 고정값과 실제 원 행을 대조한다.",
+          "oracleRef": {
+            "oracleId": "C4.resolved-debt-no-resurrection",
+            "observationNames": [
+              "valid-resolution"
+            ]
+          }
+        },
+        {
+          "id": "valid-resolution-5",
+          "op": "fieldsPresent",
+          "source": {
+            "actionId": "after-reprocess-db",
+            "pointer": "/data/rawRows/decisions"
+          },
+          "expected": [
+            "id",
+            "deciderId",
+            "evidenceId",
+            "scopeId",
+            "reason",
+            "authorizedAt"
+          ],
+          "requirementRefs": [
+            "D06",
+            "D12",
+            "D18"
+          ],
+          "evidenceRefs": [
+            "after-reprocess-db:raw-rows"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "C4",
+            "scenarioId": "resolved-no-resurrection-waived"
+          },
+          "oracleExplanation": "valid-resolution는 정정으로 생긴 부족2를 WAIVED 근거로 해소한 뒤 재대조해도 같은 의무는 부활하지 않는다의 독립 고정값과 실제 원 행을 대조한다.",
+          "oracleRef": {
+            "oracleId": "C4.resolved-debt-no-resurrection",
+            "observationNames": [
+              "valid-resolution"
+            ]
+          }
+        },
+        {
+          "id": "valid-resolution-6",
+          "op": "sameAs",
+          "source": {
+            "actionId": "after-reprocess-db",
+            "pointer": "/data/rawRows/assessments",
+            "where": {
+              "current": false,
+              "result": "SATISFIED"
+            },
+            "field": [
+              "id",
+              "result",
+              "inputSnapshotId",
+              "evaluatorVersion"
+            ]
+          },
+          "expected": null,
+          "requirementRefs": [
+            "D06",
+            "D12",
+            "D18"
+          ],
+          "evidenceRefs": [
+            "after-reprocess-db:raw-rows"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "C4",
+            "scenarioId": "resolved-no-resurrection-waived"
+          },
+          "oracleExplanation": "valid-resolution는 정정으로 생긴 부족2를 WAIVED 근거로 해소한 뒤 재대조해도 같은 의무는 부활하지 않는다의 독립 고정값과 실제 원 행을 대조한다.",
+          "oracleRef": {
+            "oracleId": "C4.resolved-debt-no-resurrection",
+            "observationNames": [
+              "valid-resolution"
+            ]
+          },
+          "baseline": {
+            "actionId": "historical-db",
+            "pointer": "/data/rawRows/assessments",
+            "where": {
+              "current": true
+            },
+            "field": [
+              "id",
+              "result",
+              "inputSnapshotId",
+              "evaluatorVersion"
+            ]
+          }
+        }
+      ],
+      "oracleExplanation": "가상 fixture는 선행 실물·정책·증거 입력만 설치한다. 검증하는 주문·승인·예약·출고·인도·반품·회수·정정 효과는 각각 공개 명령으로 실행한다. 정정으로 생긴 부족2를 WAIVED 근거로 해소한 뒤 재대조해도 같은 의무는 부활하지 않는다의 수량과 책임은 고정 기대값과 원 행·응답을 함께 검증한다."
+    }
+  ]
+}

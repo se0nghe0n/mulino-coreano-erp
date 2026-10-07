@@ -1,0 +1,2611 @@
+{
+  "schemaVersion": "1.0.0",
+  "fixtureId": "E2-same-25-not-50",
+  "synthetic": true,
+  "baseRefs": [],
+  "clock": {
+    "asOf": "2026-10-07T09:00:00Z",
+    "knownAt": "2026-10-07T09:00:01Z",
+    "timezone": "Asia/Seoul",
+    "precision": "SECOND",
+    "deadlineInclusive": true
+  },
+  "versions": {
+    "definition": "definition-v1",
+    "evaluator": "evaluator-v1",
+    "policy": "SYNTHETIC-sales-v1"
+  },
+  "actors": {
+    "sales": {
+      "issuer": "synthetic-issuer",
+      "subject": "E2-sales",
+      "audience": "isolated-ontology",
+      "organizationAlias": "ORG",
+      "roleCapabilities": [
+        "createSalesOrder",
+        "reviseSalesOrder",
+        "reserveQuantity",
+        "replaceAllocation",
+        "releaseAllocation",
+        "pickQuantity",
+        "dispatchQuantity",
+        "getObject",
+        "getWork",
+        "getInventory",
+        "getObligations",
+        "getAssessment",
+        "traceLot",
+        "getEvidence",
+        "evaluateEligibility"
+      ],
+      "grant": {
+        "delegatorAlias": "supervisor",
+        "actions": [
+          "createSalesOrder",
+          "reviseSalesOrder",
+          "reserveQuantity",
+          "replaceAllocation",
+          "releaseAllocation",
+          "pickQuantity",
+          "dispatchQuantity",
+          "getObject",
+          "getWork",
+          "getInventory",
+          "getObligations",
+          "getAssessment",
+          "traceLot",
+          "getEvidence",
+          "evaluateEligibility"
+        ],
+        "scope": {
+          "organizationAlias": "ORG",
+          "itemAliases": [
+            "P",
+            "ALT"
+          ],
+          "lotAliases": [
+            "L"
+          ],
+          "placeAliases": [
+            "W",
+            "TRANSIT",
+            "CUSTOMER",
+            "SUPPLIER_PLACE"
+          ],
+          "customerAliases": [
+            "C"
+          ],
+          "supplierAliases": [
+            "SUPPLIER"
+          ],
+          "workKinds": [
+            "PURCHASE",
+            "SALES",
+            "QC",
+            "RETURN",
+            "RECALL",
+            "SETTLEMENT",
+            "RECONCILIATION"
+          ],
+          "sourceNamespaces": [
+            "SYNTHETIC-CARRIER",
+            "SYNTHETIC-CARRIER-RETURN",
+            "SYNTHETIC-CUSTOMER",
+            "SYNTHETIC-RETURN",
+            "SYNTHETIC-UNVERIFIED-SOURCE",
+            "SYNTHETIC-WAREHOUSE",
+            "SYNTHETIC-agency-proof",
+            "SYNTHETIC-carrier-60",
+            "SYNTHETIC-claim-proof",
+            "SYNTHETIC-correction-98",
+            "SYNTHETIC-delivery-20",
+            "SYNTHETIC-dispose-proof",
+            "SYNTHETIC-exception-proof",
+            "SYNTHETIC-invoice-proof",
+            "SYNTHETIC-qc-proof",
+            "SYNTHETIC-recall-proof",
+            "SYNTHETIC-recovery-proof",
+            "SYNTHETIC-replacement-proof",
+            "SYNTHETIC-resolution-proof",
+            "SYNTHETIC-return-proof",
+            "SYNTHETIC-submission-proof",
+            "SYNTHETIC-supplier-proof",
+            "SYNTHETIC-warehouse-40",
+            "SYNTHETIC-warehouse-60"
+          ]
+        },
+        "validFrom": "2026-10-01T00:00:00Z",
+        "validUntil": "2026-10-31T23:59:59Z",
+        "revision": 1
+      }
+    },
+    "receiver": {
+      "issuer": "synthetic-issuer",
+      "subject": "E2-receiver",
+      "audience": "isolated-ontology",
+      "organizationAlias": "ORG",
+      "roleCapabilities": [
+        "recordDelivery",
+        "recordObservedMovement",
+        "authorizeReturn",
+        "receiveReturn",
+        "decideReturnDisposition",
+        "recordRecovery",
+        "recordActivity",
+        "attachEvidence",
+        "correctEvidence",
+        "getObject",
+        "getWork",
+        "getInventory",
+        "getObligations",
+        "getAssessment",
+        "traceLot",
+        "getEvidence",
+        "evaluateEligibility"
+      ],
+      "grant": {
+        "delegatorAlias": "supervisor",
+        "actions": [
+          "recordDelivery",
+          "recordObservedMovement",
+          "authorizeReturn",
+          "receiveReturn",
+          "decideReturnDisposition",
+          "recordRecovery",
+          "recordActivity",
+          "attachEvidence",
+          "correctEvidence",
+          "getObject",
+          "getWork",
+          "getInventory",
+          "getObligations",
+          "getAssessment",
+          "traceLot",
+          "getEvidence",
+          "evaluateEligibility"
+        ],
+        "scope": {
+          "organizationAlias": "ORG",
+          "itemAliases": [
+            "P",
+            "ALT"
+          ],
+          "lotAliases": [
+            "L"
+          ],
+          "placeAliases": [
+            "W",
+            "TRANSIT",
+            "CUSTOMER",
+            "SUPPLIER_PLACE"
+          ],
+          "customerAliases": [
+            "C"
+          ],
+          "supplierAliases": [
+            "SUPPLIER"
+          ],
+          "workKinds": [
+            "PURCHASE",
+            "SALES",
+            "QC",
+            "RETURN",
+            "RECALL",
+            "SETTLEMENT",
+            "RECONCILIATION"
+          ],
+          "sourceNamespaces": [
+            "SYNTHETIC-CARRIER",
+            "SYNTHETIC-CARRIER-RETURN",
+            "SYNTHETIC-CUSTOMER",
+            "SYNTHETIC-RETURN",
+            "SYNTHETIC-UNVERIFIED-SOURCE",
+            "SYNTHETIC-WAREHOUSE",
+            "SYNTHETIC-agency-proof",
+            "SYNTHETIC-carrier-60",
+            "SYNTHETIC-claim-proof",
+            "SYNTHETIC-correction-98",
+            "SYNTHETIC-delivery-20",
+            "SYNTHETIC-dispose-proof",
+            "SYNTHETIC-exception-proof",
+            "SYNTHETIC-invoice-proof",
+            "SYNTHETIC-qc-proof",
+            "SYNTHETIC-recall-proof",
+            "SYNTHETIC-recovery-proof",
+            "SYNTHETIC-replacement-proof",
+            "SYNTHETIC-resolution-proof",
+            "SYNTHETIC-return-proof",
+            "SYNTHETIC-submission-proof",
+            "SYNTHETIC-supplier-proof",
+            "SYNTHETIC-warehouse-40",
+            "SYNTHETIC-warehouse-60"
+          ]
+        },
+        "validFrom": "2026-10-01T00:00:00Z",
+        "validUntil": "2026-10-31T23:59:59Z",
+        "revision": 1
+      }
+    },
+    "qc": {
+      "issuer": "synthetic-issuer",
+      "subject": "E2-qc",
+      "audience": "isolated-ontology",
+      "organizationAlias": "ORG",
+      "roleCapabilities": [
+        "placeHold",
+        "releaseHold",
+        "evaluateEligibility",
+        "getObject",
+        "getWork",
+        "getInventory",
+        "getObligations",
+        "getAssessment",
+        "traceLot",
+        "getEvidence"
+      ],
+      "grant": {
+        "delegatorAlias": "supervisor",
+        "actions": [
+          "placeHold",
+          "releaseHold",
+          "evaluateEligibility",
+          "getObject",
+          "getWork",
+          "getInventory",
+          "getObligations",
+          "getAssessment",
+          "traceLot",
+          "getEvidence"
+        ],
+        "scope": {
+          "organizationAlias": "ORG",
+          "itemAliases": [
+            "P",
+            "ALT"
+          ],
+          "lotAliases": [
+            "L"
+          ],
+          "placeAliases": [
+            "W",
+            "TRANSIT",
+            "CUSTOMER",
+            "SUPPLIER_PLACE"
+          ],
+          "customerAliases": [
+            "C"
+          ],
+          "supplierAliases": [
+            "SUPPLIER"
+          ],
+          "workKinds": [
+            "PURCHASE",
+            "SALES",
+            "QC",
+            "RETURN",
+            "RECALL",
+            "SETTLEMENT",
+            "RECONCILIATION"
+          ],
+          "sourceNamespaces": [
+            "SYNTHETIC-CARRIER",
+            "SYNTHETIC-CARRIER-RETURN",
+            "SYNTHETIC-CUSTOMER",
+            "SYNTHETIC-RETURN",
+            "SYNTHETIC-UNVERIFIED-SOURCE",
+            "SYNTHETIC-WAREHOUSE",
+            "SYNTHETIC-agency-proof",
+            "SYNTHETIC-carrier-60",
+            "SYNTHETIC-claim-proof",
+            "SYNTHETIC-correction-98",
+            "SYNTHETIC-delivery-20",
+            "SYNTHETIC-dispose-proof",
+            "SYNTHETIC-exception-proof",
+            "SYNTHETIC-invoice-proof",
+            "SYNTHETIC-qc-proof",
+            "SYNTHETIC-recall-proof",
+            "SYNTHETIC-recovery-proof",
+            "SYNTHETIC-replacement-proof",
+            "SYNTHETIC-resolution-proof",
+            "SYNTHETIC-return-proof",
+            "SYNTHETIC-submission-proof",
+            "SYNTHETIC-supplier-proof",
+            "SYNTHETIC-warehouse-40",
+            "SYNTHETIC-warehouse-60"
+          ]
+        },
+        "validFrom": "2026-10-01T00:00:00Z",
+        "validUntil": "2026-10-31T23:59:59Z",
+        "revision": 1
+      }
+    },
+    "procurement": {
+      "issuer": "synthetic-issuer",
+      "subject": "E2-procurement",
+      "audience": "isolated-ontology",
+      "organizationAlias": "ORG",
+      "roleCapabilities": [
+        "proposePurchase",
+        "dispatchPurchaseOrder",
+        "recordSupplierReply",
+        "createShipment",
+        "recordLegEvent",
+        "recordHandover",
+        "prepareRegulatoryProcedure",
+        "recordSubmission",
+        "recordRegulatoryDecision",
+        "confirmReceipt",
+        "receiveProvisional",
+        "splitQuantity",
+        "linkCanonicalOccurrence",
+        "getObject",
+        "getWork",
+        "getInventory",
+        "getObligations",
+        "getAssessment",
+        "traceLot",
+        "getEvidence",
+        "evaluateEligibility"
+      ],
+      "grant": {
+        "delegatorAlias": "supervisor",
+        "actions": [
+          "proposePurchase",
+          "dispatchPurchaseOrder",
+          "recordSupplierReply",
+          "createShipment",
+          "recordLegEvent",
+          "recordHandover",
+          "prepareRegulatoryProcedure",
+          "recordSubmission",
+          "recordRegulatoryDecision",
+          "confirmReceipt",
+          "receiveProvisional",
+          "splitQuantity",
+          "linkCanonicalOccurrence",
+          "getObject",
+          "getWork",
+          "getInventory",
+          "getObligations",
+          "getAssessment",
+          "traceLot",
+          "getEvidence",
+          "evaluateEligibility"
+        ],
+        "scope": {
+          "organizationAlias": "ORG",
+          "itemAliases": [
+            "P",
+            "ALT"
+          ],
+          "lotAliases": [
+            "L"
+          ],
+          "placeAliases": [
+            "W",
+            "TRANSIT",
+            "CUSTOMER",
+            "SUPPLIER_PLACE"
+          ],
+          "customerAliases": [
+            "C"
+          ],
+          "supplierAliases": [
+            "SUPPLIER"
+          ],
+          "workKinds": [
+            "PURCHASE",
+            "SALES",
+            "QC",
+            "RETURN",
+            "RECALL",
+            "SETTLEMENT",
+            "RECONCILIATION"
+          ],
+          "sourceNamespaces": [
+            "SYNTHETIC-CARRIER",
+            "SYNTHETIC-CARRIER-RETURN",
+            "SYNTHETIC-CUSTOMER",
+            "SYNTHETIC-RETURN",
+            "SYNTHETIC-UNVERIFIED-SOURCE",
+            "SYNTHETIC-WAREHOUSE",
+            "SYNTHETIC-agency-proof",
+            "SYNTHETIC-carrier-60",
+            "SYNTHETIC-claim-proof",
+            "SYNTHETIC-correction-98",
+            "SYNTHETIC-delivery-20",
+            "SYNTHETIC-dispose-proof",
+            "SYNTHETIC-exception-proof",
+            "SYNTHETIC-invoice-proof",
+            "SYNTHETIC-qc-proof",
+            "SYNTHETIC-recall-proof",
+            "SYNTHETIC-recovery-proof",
+            "SYNTHETIC-replacement-proof",
+            "SYNTHETIC-resolution-proof",
+            "SYNTHETIC-return-proof",
+            "SYNTHETIC-submission-proof",
+            "SYNTHETIC-supplier-proof",
+            "SYNTHETIC-warehouse-40",
+            "SYNTHETIC-warehouse-60"
+          ]
+        },
+        "validFrom": "2026-10-01T00:00:00Z",
+        "validUntil": "2026-10-31T23:59:59Z",
+        "revision": 1
+      }
+    },
+    "manager": {
+      "issuer": "synthetic-issuer",
+      "subject": "E2-manager",
+      "audience": "isolated-ontology",
+      "organizationAlias": "ORG",
+      "roleCapabilities": [
+        "approvePurchase",
+        "disposeQuantity",
+        "recordDispositionBasis",
+        "resolveObligation",
+        "waiveObligation",
+        "getObject",
+        "getWork",
+        "getInventory",
+        "getObligations",
+        "getAssessment",
+        "traceLot",
+        "getEvidence",
+        "evaluateEligibility"
+      ],
+      "grant": {
+        "delegatorAlias": "supervisor",
+        "actions": [
+          "approvePurchase",
+          "disposeQuantity",
+          "recordDispositionBasis",
+          "resolveObligation",
+          "waiveObligation",
+          "getObject",
+          "getWork",
+          "getInventory",
+          "getObligations",
+          "getAssessment",
+          "traceLot",
+          "getEvidence",
+          "evaluateEligibility"
+        ],
+        "scope": {
+          "organizationAlias": "ORG",
+          "itemAliases": [
+            "P",
+            "ALT"
+          ],
+          "lotAliases": [
+            "L"
+          ],
+          "placeAliases": [
+            "W",
+            "TRANSIT",
+            "CUSTOMER",
+            "SUPPLIER_PLACE"
+          ],
+          "customerAliases": [
+            "C"
+          ],
+          "supplierAliases": [
+            "SUPPLIER"
+          ],
+          "workKinds": [
+            "PURCHASE",
+            "SALES",
+            "QC",
+            "RETURN",
+            "RECALL",
+            "SETTLEMENT",
+            "RECONCILIATION"
+          ],
+          "sourceNamespaces": [
+            "SYNTHETIC-CARRIER",
+            "SYNTHETIC-CARRIER-RETURN",
+            "SYNTHETIC-CUSTOMER",
+            "SYNTHETIC-RETURN",
+            "SYNTHETIC-UNVERIFIED-SOURCE",
+            "SYNTHETIC-WAREHOUSE",
+            "SYNTHETIC-agency-proof",
+            "SYNTHETIC-carrier-60",
+            "SYNTHETIC-claim-proof",
+            "SYNTHETIC-correction-98",
+            "SYNTHETIC-delivery-20",
+            "SYNTHETIC-dispose-proof",
+            "SYNTHETIC-exception-proof",
+            "SYNTHETIC-invoice-proof",
+            "SYNTHETIC-qc-proof",
+            "SYNTHETIC-recall-proof",
+            "SYNTHETIC-recovery-proof",
+            "SYNTHETIC-replacement-proof",
+            "SYNTHETIC-resolution-proof",
+            "SYNTHETIC-return-proof",
+            "SYNTHETIC-submission-proof",
+            "SYNTHETIC-supplier-proof",
+            "SYNTHETIC-warehouse-40",
+            "SYNTHETIC-warehouse-60"
+          ]
+        },
+        "validFrom": "2026-10-01T00:00:00Z",
+        "validUntil": "2026-10-31T23:59:59Z",
+        "revision": 1
+      }
+    },
+    "admin": {
+      "issuer": "synthetic-issuer",
+      "subject": "E2-admin",
+      "audience": "isolated-ontology",
+      "organizationAlias": "ORG",
+      "roleCapabilities": [
+        "openInvestigation",
+        "proposeRecall",
+        "approveRecall",
+        "recordRecallNotice",
+        "closeRecall",
+        "placeHold",
+        "releaseHold",
+        "recordDispositionBasis",
+        "getObject",
+        "getWork",
+        "getInventory",
+        "getObligations",
+        "getAssessment",
+        "traceLot",
+        "getEvidence",
+        "evaluateEligibility"
+      ],
+      "grant": {
+        "delegatorAlias": "supervisor",
+        "actions": [
+          "openInvestigation",
+          "proposeRecall",
+          "approveRecall",
+          "recordRecallNotice",
+          "closeRecall",
+          "placeHold",
+          "releaseHold",
+          "recordDispositionBasis",
+          "getObject",
+          "getWork",
+          "getInventory",
+          "getObligations",
+          "getAssessment",
+          "traceLot",
+          "getEvidence",
+          "evaluateEligibility"
+        ],
+        "scope": {
+          "organizationAlias": "ORG",
+          "itemAliases": [
+            "P",
+            "ALT"
+          ],
+          "lotAliases": [
+            "L"
+          ],
+          "placeAliases": [
+            "W",
+            "TRANSIT",
+            "CUSTOMER",
+            "SUPPLIER_PLACE"
+          ],
+          "customerAliases": [
+            "C"
+          ],
+          "supplierAliases": [
+            "SUPPLIER"
+          ],
+          "workKinds": [
+            "PURCHASE",
+            "SALES",
+            "QC",
+            "RETURN",
+            "RECALL",
+            "SETTLEMENT",
+            "RECONCILIATION"
+          ],
+          "sourceNamespaces": [
+            "SYNTHETIC-CARRIER",
+            "SYNTHETIC-CARRIER-RETURN",
+            "SYNTHETIC-CUSTOMER",
+            "SYNTHETIC-RETURN",
+            "SYNTHETIC-UNVERIFIED-SOURCE",
+            "SYNTHETIC-WAREHOUSE",
+            "SYNTHETIC-agency-proof",
+            "SYNTHETIC-carrier-60",
+            "SYNTHETIC-claim-proof",
+            "SYNTHETIC-correction-98",
+            "SYNTHETIC-delivery-20",
+            "SYNTHETIC-dispose-proof",
+            "SYNTHETIC-exception-proof",
+            "SYNTHETIC-invoice-proof",
+            "SYNTHETIC-qc-proof",
+            "SYNTHETIC-recall-proof",
+            "SYNTHETIC-recovery-proof",
+            "SYNTHETIC-replacement-proof",
+            "SYNTHETIC-resolution-proof",
+            "SYNTHETIC-return-proof",
+            "SYNTHETIC-submission-proof",
+            "SYNTHETIC-supplier-proof",
+            "SYNTHETIC-warehouse-40",
+            "SYNTHETIC-warehouse-60"
+          ]
+        },
+        "validFrom": "2026-10-01T00:00:00Z",
+        "validUntil": "2026-10-31T23:59:59Z",
+        "revision": 1
+      }
+    },
+    "settlement": {
+      "issuer": "synthetic-issuer",
+      "subject": "E2-settlement",
+      "audience": "isolated-ontology",
+      "organizationAlias": "ORG",
+      "roleCapabilities": [
+        "recordInvoice",
+        "matchInvoice",
+        "recordPaymentReference",
+        "getObject",
+        "getWork",
+        "getInventory",
+        "getObligations",
+        "getAssessment",
+        "traceLot",
+        "getEvidence",
+        "evaluateEligibility"
+      ],
+      "grant": {
+        "delegatorAlias": "supervisor",
+        "actions": [
+          "recordInvoice",
+          "matchInvoice",
+          "recordPaymentReference",
+          "getObject",
+          "getWork",
+          "getInventory",
+          "getObligations",
+          "getAssessment",
+          "traceLot",
+          "getEvidence",
+          "evaluateEligibility"
+        ],
+        "scope": {
+          "organizationAlias": "ORG",
+          "itemAliases": [
+            "P",
+            "ALT"
+          ],
+          "lotAliases": [
+            "L"
+          ],
+          "placeAliases": [
+            "W",
+            "TRANSIT",
+            "CUSTOMER",
+            "SUPPLIER_PLACE"
+          ],
+          "customerAliases": [
+            "C"
+          ],
+          "supplierAliases": [
+            "SUPPLIER"
+          ],
+          "workKinds": [
+            "PURCHASE",
+            "SALES",
+            "QC",
+            "RETURN",
+            "RECALL",
+            "SETTLEMENT",
+            "RECONCILIATION"
+          ],
+          "sourceNamespaces": [
+            "SYNTHETIC-CARRIER",
+            "SYNTHETIC-CARRIER-RETURN",
+            "SYNTHETIC-CUSTOMER",
+            "SYNTHETIC-RETURN",
+            "SYNTHETIC-UNVERIFIED-SOURCE",
+            "SYNTHETIC-WAREHOUSE",
+            "SYNTHETIC-agency-proof",
+            "SYNTHETIC-carrier-60",
+            "SYNTHETIC-claim-proof",
+            "SYNTHETIC-correction-98",
+            "SYNTHETIC-delivery-20",
+            "SYNTHETIC-dispose-proof",
+            "SYNTHETIC-exception-proof",
+            "SYNTHETIC-invoice-proof",
+            "SYNTHETIC-qc-proof",
+            "SYNTHETIC-recall-proof",
+            "SYNTHETIC-recovery-proof",
+            "SYNTHETIC-replacement-proof",
+            "SYNTHETIC-resolution-proof",
+            "SYNTHETIC-return-proof",
+            "SYNTHETIC-submission-proof",
+            "SYNTHETIC-supplier-proof",
+            "SYNTHETIC-warehouse-40",
+            "SYNTHETIC-warehouse-60"
+          ]
+        },
+        "validFrom": "2026-10-01T00:00:00Z",
+        "validUntil": "2026-10-31T23:59:59Z",
+        "revision": 1
+      }
+    },
+    "intake": {
+      "issuer": "synthetic-issuer",
+      "subject": "E2-intake",
+      "audience": "isolated-ontology",
+      "organizationAlias": "ORG",
+      "roleCapabilities": [
+        "matchSourceIdentity",
+        "linkCanonicalOccurrence",
+        "resolveEvidenceConflict",
+        "getInbox",
+        "getReconciliation",
+        "getObject",
+        "getWork",
+        "getInventory",
+        "getObligations",
+        "getAssessment",
+        "traceLot",
+        "getEvidence",
+        "evaluateEligibility"
+      ],
+      "grant": {
+        "delegatorAlias": "supervisor",
+        "actions": [
+          "matchSourceIdentity",
+          "linkCanonicalOccurrence",
+          "resolveEvidenceConflict",
+          "getInbox",
+          "getReconciliation",
+          "getObject",
+          "getWork",
+          "getInventory",
+          "getObligations",
+          "getAssessment",
+          "traceLot",
+          "getEvidence",
+          "evaluateEligibility"
+        ],
+        "scope": {
+          "organizationAlias": "ORG",
+          "itemAliases": [
+            "P",
+            "ALT"
+          ],
+          "lotAliases": [
+            "L"
+          ],
+          "placeAliases": [
+            "W",
+            "TRANSIT",
+            "CUSTOMER",
+            "SUPPLIER_PLACE"
+          ],
+          "customerAliases": [
+            "C"
+          ],
+          "supplierAliases": [
+            "SUPPLIER"
+          ],
+          "workKinds": [
+            "PURCHASE",
+            "SALES",
+            "QC",
+            "RETURN",
+            "RECALL",
+            "SETTLEMENT",
+            "RECONCILIATION"
+          ],
+          "sourceNamespaces": [
+            "SYNTHETIC-CARRIER",
+            "SYNTHETIC-CARRIER-RETURN",
+            "SYNTHETIC-CUSTOMER",
+            "SYNTHETIC-RETURN",
+            "SYNTHETIC-UNVERIFIED-SOURCE",
+            "SYNTHETIC-WAREHOUSE",
+            "SYNTHETIC-agency-proof",
+            "SYNTHETIC-carrier-60",
+            "SYNTHETIC-claim-proof",
+            "SYNTHETIC-correction-98",
+            "SYNTHETIC-delivery-20",
+            "SYNTHETIC-dispose-proof",
+            "SYNTHETIC-exception-proof",
+            "SYNTHETIC-invoice-proof",
+            "SYNTHETIC-qc-proof",
+            "SYNTHETIC-recall-proof",
+            "SYNTHETIC-recovery-proof",
+            "SYNTHETIC-replacement-proof",
+            "SYNTHETIC-resolution-proof",
+            "SYNTHETIC-return-proof",
+            "SYNTHETIC-submission-proof",
+            "SYNTHETIC-supplier-proof",
+            "SYNTHETIC-warehouse-40",
+            "SYNTHETIC-warehouse-60"
+          ]
+        },
+        "validFrom": "2026-10-01T00:00:00Z",
+        "validUntil": "2026-10-31T23:59:59Z",
+        "revision": 1
+      }
+    },
+    "observer": {
+      "issuer": "synthetic-issuer",
+      "subject": "E2-observer",
+      "audience": "isolated-ontology",
+      "organizationAlias": "ORG",
+      "roleCapabilities": [
+        "getObject",
+        "getWork",
+        "getInventory",
+        "getObligations",
+        "getAssessment",
+        "traceLot",
+        "getEvidence",
+        "evaluateEligibility"
+      ],
+      "grant": {
+        "delegatorAlias": "supervisor",
+        "actions": [
+          "getObject",
+          "getWork",
+          "getInventory",
+          "getObligations",
+          "getAssessment",
+          "traceLot",
+          "getEvidence",
+          "evaluateEligibility"
+        ],
+        "scope": {
+          "organizationAlias": "ORG",
+          "itemAliases": [
+            "P",
+            "ALT"
+          ],
+          "lotAliases": [
+            "L"
+          ],
+          "placeAliases": [
+            "W",
+            "TRANSIT",
+            "CUSTOMER",
+            "SUPPLIER_PLACE"
+          ],
+          "customerAliases": [
+            "C"
+          ],
+          "supplierAliases": [
+            "SUPPLIER"
+          ],
+          "workKinds": [
+            "PURCHASE",
+            "SALES",
+            "QC",
+            "RETURN",
+            "RECALL",
+            "SETTLEMENT",
+            "RECONCILIATION"
+          ],
+          "sourceNamespaces": [
+            "SYNTHETIC-CARRIER",
+            "SYNTHETIC-CARRIER-RETURN",
+            "SYNTHETIC-CUSTOMER",
+            "SYNTHETIC-RETURN",
+            "SYNTHETIC-UNVERIFIED-SOURCE",
+            "SYNTHETIC-WAREHOUSE",
+            "SYNTHETIC-agency-proof",
+            "SYNTHETIC-carrier-60",
+            "SYNTHETIC-claim-proof",
+            "SYNTHETIC-correction-98",
+            "SYNTHETIC-delivery-20",
+            "SYNTHETIC-dispose-proof",
+            "SYNTHETIC-exception-proof",
+            "SYNTHETIC-invoice-proof",
+            "SYNTHETIC-qc-proof",
+            "SYNTHETIC-recall-proof",
+            "SYNTHETIC-recovery-proof",
+            "SYNTHETIC-replacement-proof",
+            "SYNTHETIC-resolution-proof",
+            "SYNTHETIC-return-proof",
+            "SYNTHETIC-submission-proof",
+            "SYNTHETIC-supplier-proof",
+            "SYNTHETIC-warehouse-40",
+            "SYNTHETIC-warehouse-60"
+          ]
+        },
+        "validFrom": "2026-10-01T00:00:00Z",
+        "validUntil": "2026-10-31T23:59:59Z",
+        "revision": 1
+      }
+    },
+    "operator": {
+      "issuer": "synthetic-issuer",
+      "subject": "E2-operator",
+      "audience": "isolated-ontology",
+      "organizationAlias": "ORG",
+      "roleCapabilities": [
+        "openInvestigation",
+        "proposeRecall",
+        "recordRecallNotice",
+        "closeRecall",
+        "disposeQuantity",
+        "approveRecall",
+        "getObject",
+        "getWork",
+        "getInventory",
+        "getObligations",
+        "getAssessment",
+        "traceLot",
+        "getEvidence",
+        "evaluateEligibility"
+      ],
+      "grant": {
+        "delegatorAlias": "supervisor",
+        "actions": [
+          "openInvestigation",
+          "proposeRecall",
+          "recordRecallNotice",
+          "closeRecall",
+          "disposeQuantity",
+          "approveRecall",
+          "getObject",
+          "getWork",
+          "getInventory",
+          "getObligations",
+          "getAssessment",
+          "traceLot",
+          "getEvidence",
+          "evaluateEligibility"
+        ],
+        "scope": {
+          "organizationAlias": "ORG",
+          "itemAliases": [
+            "P",
+            "ALT"
+          ],
+          "lotAliases": [
+            "L"
+          ],
+          "placeAliases": [
+            "W",
+            "TRANSIT",
+            "CUSTOMER",
+            "SUPPLIER_PLACE"
+          ],
+          "customerAliases": [
+            "C"
+          ],
+          "supplierAliases": [
+            "SUPPLIER"
+          ],
+          "workKinds": [
+            "PURCHASE",
+            "SALES",
+            "QC",
+            "RETURN",
+            "RECALL",
+            "SETTLEMENT",
+            "RECONCILIATION"
+          ],
+          "sourceNamespaces": [
+            "SYNTHETIC-CARRIER",
+            "SYNTHETIC-CARRIER-RETURN",
+            "SYNTHETIC-CUSTOMER",
+            "SYNTHETIC-RETURN",
+            "SYNTHETIC-UNVERIFIED-SOURCE",
+            "SYNTHETIC-WAREHOUSE",
+            "SYNTHETIC-agency-proof",
+            "SYNTHETIC-carrier-60",
+            "SYNTHETIC-claim-proof",
+            "SYNTHETIC-correction-98",
+            "SYNTHETIC-delivery-20",
+            "SYNTHETIC-dispose-proof",
+            "SYNTHETIC-exception-proof",
+            "SYNTHETIC-invoice-proof",
+            "SYNTHETIC-qc-proof",
+            "SYNTHETIC-recall-proof",
+            "SYNTHETIC-recovery-proof",
+            "SYNTHETIC-replacement-proof",
+            "SYNTHETIC-resolution-proof",
+            "SYNTHETIC-return-proof",
+            "SYNTHETIC-submission-proof",
+            "SYNTHETIC-supplier-proof",
+            "SYNTHETIC-warehouse-40",
+            "SYNTHETIC-warehouse-60"
+          ]
+        },
+        "validFrom": "2026-10-01T00:00:00Z",
+        "validUntil": "2026-10-31T23:59:59Z",
+        "revision": 1
+      }
+    }
+  },
+  "aliases": {
+    "ORG": {
+      "type": "Organization"
+    },
+    "P": {
+      "type": "TradeItem",
+      "unit": "BOX",
+      "decimalScale": 0,
+      "packagingVersion": "sealed-box-v1"
+    },
+    "ALT": {
+      "type": "TradeItem",
+      "unit": "BOX",
+      "decimalScale": 0,
+      "packagingVersion": "other-box-v1"
+    },
+    "L": {
+      "type": "ManufacturerLot"
+    },
+    "W": {
+      "type": "Place"
+    },
+    "TRANSIT": {
+      "type": "Place"
+    },
+    "C": {
+      "type": "Customer"
+    },
+    "CUSTOMER": {
+      "type": "Place"
+    },
+    "SUPPLIER": {
+      "type": "Supplier"
+    },
+    "SUPPLIER_PLACE": {
+      "type": "Place"
+    },
+    "supervisor": {
+      "type": "Human"
+    },
+    "sales": {
+      "type": "Human"
+    },
+    "receiver": {
+      "type": "Human"
+    },
+    "qc": {
+      "type": "Human"
+    },
+    "procurement": {
+      "type": "Human"
+    },
+    "manager": {
+      "type": "Human"
+    },
+    "admin": {
+      "type": "Human"
+    },
+    "settlement": {
+      "type": "Human"
+    },
+    "intake": {
+      "type": "Human"
+    },
+    "observer": {
+      "type": "Human"
+    },
+    "operator": {
+      "type": "Human"
+    },
+    "A": {
+      "type": "QuantitySegment",
+      "itemAlias": "P",
+      "lotAlias": "L",
+      "locationAlias": "W",
+      "quantity": "50",
+      "unit": "BOX",
+      "physicalScope": "same-25-not-50-A",
+      "active": true,
+      "boxSerials": [
+        "same-25-not-50-A-BOX-001",
+        "same-25-not-50-A-BOX-002",
+        "same-25-not-50-A-BOX-003",
+        "same-25-not-50-A-BOX-004",
+        "same-25-not-50-A-BOX-005",
+        "same-25-not-50-A-BOX-006",
+        "same-25-not-50-A-BOX-007",
+        "same-25-not-50-A-BOX-008",
+        "same-25-not-50-A-BOX-009",
+        "same-25-not-50-A-BOX-010",
+        "same-25-not-50-A-BOX-011",
+        "same-25-not-50-A-BOX-012",
+        "same-25-not-50-A-BOX-013",
+        "same-25-not-50-A-BOX-014",
+        "same-25-not-50-A-BOX-015",
+        "same-25-not-50-A-BOX-016",
+        "same-25-not-50-A-BOX-017",
+        "same-25-not-50-A-BOX-018",
+        "same-25-not-50-A-BOX-019",
+        "same-25-not-50-A-BOX-020",
+        "same-25-not-50-A-BOX-021",
+        "same-25-not-50-A-BOX-022",
+        "same-25-not-50-A-BOX-023",
+        "same-25-not-50-A-BOX-024",
+        "same-25-not-50-A-BOX-025",
+        "same-25-not-50-A-BOX-026",
+        "same-25-not-50-A-BOX-027",
+        "same-25-not-50-A-BOX-028",
+        "same-25-not-50-A-BOX-029",
+        "same-25-not-50-A-BOX-030",
+        "same-25-not-50-A-BOX-031",
+        "same-25-not-50-A-BOX-032",
+        "same-25-not-50-A-BOX-033",
+        "same-25-not-50-A-BOX-034",
+        "same-25-not-50-A-BOX-035",
+        "same-25-not-50-A-BOX-036",
+        "same-25-not-50-A-BOX-037",
+        "same-25-not-50-A-BOX-038",
+        "same-25-not-50-A-BOX-039",
+        "same-25-not-50-A-BOX-040",
+        "same-25-not-50-A-BOX-041",
+        "same-25-not-50-A-BOX-042",
+        "same-25-not-50-A-BOX-043",
+        "same-25-not-50-A-BOX-044",
+        "same-25-not-50-A-BOX-045",
+        "same-25-not-50-A-BOX-046",
+        "same-25-not-50-A-BOX-047",
+        "same-25-not-50-A-BOX-048",
+        "same-25-not-50-A-BOX-049",
+        "same-25-not-50-A-BOX-050"
+      ]
+    },
+    "delivery-proof": {
+      "type": "DocumentVersion",
+      "fixtureContent": {
+        "synthetic": true,
+        "sourceNamespace": "SYNTHETIC-CUSTOMER",
+        "externalEventId": "same-25-not-50-actual-delivery",
+        "sourceVersion": "1",
+        "occurredAt": "2026-10-07T09:00:00Z",
+        "itemAlias": "P",
+        "lotAlias": "L",
+        "witnessKind": "delivery-proof",
+        "reportedQuantity": {
+          "value": "50",
+          "unit": "BOX"
+        }
+      },
+      "contentEncoding": "CANONICAL_JSON_UTF8"
+    },
+    "delivery-20": {
+      "type": "DocumentVersion",
+      "fixtureContent": {
+        "synthetic": true,
+        "sourceNamespace": "SYNTHETIC-delivery-20",
+        "externalEventId": "E2-same-25-not-50-delivery-20",
+        "sourceVersion": "1",
+        "occurredAt": "2026-10-07T09:00:00Z",
+        "itemAlias": "P",
+        "lotAlias": "L",
+        "witnessKind": "delivery-20",
+        "reportedQuantity": {
+          "value": "20",
+          "unit": "BOX"
+        }
+      },
+      "contentEncoding": "CANONICAL_JSON_UTF8"
+    },
+    "return-proof": {
+      "type": "DocumentVersion",
+      "fixtureContent": {
+        "synthetic": true,
+        "sourceNamespace": "SYNTHETIC-return-proof",
+        "externalEventId": "E2-same-25-not-50-return-proof",
+        "sourceVersion": "1",
+        "occurredAt": "2026-10-07T09:00:00Z",
+        "itemAlias": "P",
+        "lotAlias": "L",
+        "witnessKind": "return-proof"
+      },
+      "contentEncoding": "CANONICAL_JSON_UTF8"
+    },
+    "claim-proof": {
+      "type": "DocumentVersion",
+      "fixtureContent": {
+        "synthetic": true,
+        "sourceNamespace": "SYNTHETIC-claim-proof",
+        "externalEventId": "E2-same-25-not-50-claim-proof",
+        "sourceVersion": "1",
+        "occurredAt": "2026-10-07T09:00:00Z",
+        "itemAlias": "P",
+        "lotAlias": "L",
+        "witnessKind": "claim-proof",
+        "identityStatus": "UNKNOWN",
+        "canonicalOccurrenceId": null,
+        "verificationStatus": "UNCONFIRMED",
+        "variant": "same-25-not-50"
+      },
+      "contentEncoding": "CANONICAL_JSON_UTF8"
+    },
+    "qc-proof": {
+      "type": "DocumentVersion",
+      "fixtureContent": {
+        "synthetic": true,
+        "sourceNamespace": "SYNTHETIC-qc-proof",
+        "externalEventId": "E2-same-25-not-50-qc-proof",
+        "sourceVersion": "1",
+        "occurredAt": "2026-10-07T09:00:00Z",
+        "itemAlias": "P",
+        "lotAlias": "L",
+        "witnessKind": "qc-proof"
+      },
+      "contentEncoding": "CANONICAL_JSON_UTF8"
+    },
+    "recall-proof": {
+      "type": "DocumentVersion",
+      "fixtureContent": {
+        "synthetic": true,
+        "sourceNamespace": "SYNTHETIC-recall-proof",
+        "externalEventId": "E2-same-25-not-50-recall-proof",
+        "sourceVersion": "1",
+        "occurredAt": "2026-10-07T09:00:00Z",
+        "itemAlias": "P",
+        "lotAlias": "L",
+        "witnessKind": "recall-proof"
+      },
+      "contentEncoding": "CANONICAL_JSON_UTF8"
+    },
+    "recovery-proof": {
+      "type": "DocumentVersion",
+      "fixtureContent": {
+        "synthetic": true,
+        "sourceNamespace": "SYNTHETIC-recovery-proof",
+        "externalEventId": "E2-same-25-not-50-recovery-proof",
+        "sourceVersion": "1",
+        "occurredAt": "2026-10-07T09:00:00Z",
+        "itemAlias": "P",
+        "lotAlias": "L",
+        "witnessKind": "recovery-proof",
+        "reportedQuantity": {
+          "value": "25",
+          "unit": "BOX"
+        },
+        "observedBoxSerials": [
+          "same-25-not-50-A-BOX-001",
+          "same-25-not-50-A-BOX-002",
+          "same-25-not-50-A-BOX-003",
+          "same-25-not-50-A-BOX-004",
+          "same-25-not-50-A-BOX-005",
+          "same-25-not-50-A-BOX-006",
+          "same-25-not-50-A-BOX-007",
+          "same-25-not-50-A-BOX-008",
+          "same-25-not-50-A-BOX-009",
+          "same-25-not-50-A-BOX-010",
+          "same-25-not-50-A-BOX-011",
+          "same-25-not-50-A-BOX-012",
+          "same-25-not-50-A-BOX-013",
+          "same-25-not-50-A-BOX-014",
+          "same-25-not-50-A-BOX-015",
+          "same-25-not-50-A-BOX-016",
+          "same-25-not-50-A-BOX-017",
+          "same-25-not-50-A-BOX-018",
+          "same-25-not-50-A-BOX-019",
+          "same-25-not-50-A-BOX-020",
+          "same-25-not-50-A-BOX-021",
+          "same-25-not-50-A-BOX-022",
+          "same-25-not-50-A-BOX-023",
+          "same-25-not-50-A-BOX-024",
+          "same-25-not-50-A-BOX-025"
+        ]
+      },
+      "contentEncoding": "CANONICAL_JSON_UTF8"
+    },
+    "dispose-proof": {
+      "type": "DocumentVersion",
+      "fixtureContent": {
+        "synthetic": true,
+        "sourceNamespace": "SYNTHETIC-dispose-proof",
+        "externalEventId": "E2-same-25-not-50-dispose-proof",
+        "sourceVersion": "1",
+        "occurredAt": "2026-10-07T09:00:00Z",
+        "itemAlias": "P",
+        "lotAlias": "L",
+        "witnessKind": "dispose-proof",
+        "reportedQuantity": {
+          "value": "25",
+          "unit": "BOX"
+        },
+        "observedBoxSerials": [
+          "same-25-not-50-A-BOX-001",
+          "same-25-not-50-A-BOX-002",
+          "same-25-not-50-A-BOX-003",
+          "same-25-not-50-A-BOX-004",
+          "same-25-not-50-A-BOX-005",
+          "same-25-not-50-A-BOX-006",
+          "same-25-not-50-A-BOX-007",
+          "same-25-not-50-A-BOX-008",
+          "same-25-not-50-A-BOX-009",
+          "same-25-not-50-A-BOX-010",
+          "same-25-not-50-A-BOX-011",
+          "same-25-not-50-A-BOX-012",
+          "same-25-not-50-A-BOX-013",
+          "same-25-not-50-A-BOX-014",
+          "same-25-not-50-A-BOX-015",
+          "same-25-not-50-A-BOX-016",
+          "same-25-not-50-A-BOX-017",
+          "same-25-not-50-A-BOX-018",
+          "same-25-not-50-A-BOX-019",
+          "same-25-not-50-A-BOX-020",
+          "same-25-not-50-A-BOX-021",
+          "same-25-not-50-A-BOX-022",
+          "same-25-not-50-A-BOX-023",
+          "same-25-not-50-A-BOX-024",
+          "same-25-not-50-A-BOX-025"
+        ]
+      },
+      "contentEncoding": "CANONICAL_JSON_UTF8"
+    },
+    "correction-98": {
+      "type": "DocumentVersion",
+      "fixtureContent": {
+        "synthetic": true,
+        "sourceNamespace": "SYNTHETIC-correction-98",
+        "externalEventId": "E2-same-25-not-50-correction-98",
+        "sourceVersion": "1",
+        "occurredAt": "2026-10-07T09:00:00Z",
+        "itemAlias": "P",
+        "lotAlias": "L",
+        "witnessKind": "correction-98",
+        "reportedQuantity": {
+          "value": "98",
+          "unit": "BOX"
+        }
+      },
+      "contentEncoding": "CANONICAL_JSON_UTF8"
+    },
+    "resolution-proof": {
+      "type": "DocumentVersion",
+      "fixtureContent": {
+        "synthetic": true,
+        "sourceNamespace": "SYNTHETIC-resolution-proof",
+        "externalEventId": "E2-same-25-not-50-resolution-proof",
+        "sourceVersion": "1",
+        "occurredAt": "2026-10-07T09:00:00Z",
+        "itemAlias": "P",
+        "lotAlias": "L",
+        "witnessKind": "resolution-proof"
+      },
+      "contentEncoding": "CANONICAL_JSON_UTF8"
+    },
+    "warehouse-60": {
+      "type": "DocumentVersion",
+      "fixtureContent": {
+        "synthetic": true,
+        "sourceNamespace": "SYNTHETIC-warehouse-60",
+        "externalEventId": "E2-same-25-not-50-warehouse-60",
+        "sourceVersion": "1",
+        "occurredAt": "2026-10-07T09:00:00Z",
+        "itemAlias": "P",
+        "lotAlias": "L",
+        "witnessKind": "warehouse-60",
+        "reportedQuantity": {
+          "value": "60",
+          "unit": "BOX"
+        },
+        "observedBoxSerials": [
+          "same-25-not-50-A-BOX-001",
+          "same-25-not-50-A-BOX-002",
+          "same-25-not-50-A-BOX-003",
+          "same-25-not-50-A-BOX-004",
+          "same-25-not-50-A-BOX-005",
+          "same-25-not-50-A-BOX-006",
+          "same-25-not-50-A-BOX-007",
+          "same-25-not-50-A-BOX-008",
+          "same-25-not-50-A-BOX-009",
+          "same-25-not-50-A-BOX-010",
+          "same-25-not-50-A-BOX-011",
+          "same-25-not-50-A-BOX-012",
+          "same-25-not-50-A-BOX-013",
+          "same-25-not-50-A-BOX-014",
+          "same-25-not-50-A-BOX-015",
+          "same-25-not-50-A-BOX-016",
+          "same-25-not-50-A-BOX-017",
+          "same-25-not-50-A-BOX-018",
+          "same-25-not-50-A-BOX-019",
+          "same-25-not-50-A-BOX-020",
+          "same-25-not-50-A-BOX-021",
+          "same-25-not-50-A-BOX-022",
+          "same-25-not-50-A-BOX-023",
+          "same-25-not-50-A-BOX-024",
+          "same-25-not-50-A-BOX-025",
+          "same-25-not-50-A-BOX-026",
+          "same-25-not-50-A-BOX-027",
+          "same-25-not-50-A-BOX-028",
+          "same-25-not-50-A-BOX-029",
+          "same-25-not-50-A-BOX-030",
+          "same-25-not-50-A-BOX-031",
+          "same-25-not-50-A-BOX-032",
+          "same-25-not-50-A-BOX-033",
+          "same-25-not-50-A-BOX-034",
+          "same-25-not-50-A-BOX-035",
+          "same-25-not-50-A-BOX-036",
+          "same-25-not-50-A-BOX-037",
+          "same-25-not-50-A-BOX-038",
+          "same-25-not-50-A-BOX-039",
+          "same-25-not-50-A-BOX-040",
+          "same-25-not-50-A-BOX-041",
+          "same-25-not-50-A-BOX-042",
+          "same-25-not-50-A-BOX-043",
+          "same-25-not-50-A-BOX-044",
+          "same-25-not-50-A-BOX-045",
+          "same-25-not-50-A-BOX-046",
+          "same-25-not-50-A-BOX-047",
+          "same-25-not-50-A-BOX-048",
+          "same-25-not-50-A-BOX-049",
+          "same-25-not-50-A-BOX-050"
+        ]
+      },
+      "contentEncoding": "CANONICAL_JSON_UTF8"
+    },
+    "carrier-60": {
+      "type": "DocumentVersion",
+      "fixtureContent": {
+        "synthetic": true,
+        "sourceNamespace": "SYNTHETIC-carrier-60",
+        "externalEventId": "E2-same-25-not-50-carrier-60",
+        "sourceVersion": "1",
+        "occurredAt": "2026-10-07T09:00:00Z",
+        "itemAlias": "P",
+        "lotAlias": "L",
+        "witnessKind": "carrier-60",
+        "reportedQuantity": {
+          "value": "60",
+          "unit": "BOX"
+        },
+        "observedBoxSerials": [
+          "same-25-not-50-A-BOX-001",
+          "same-25-not-50-A-BOX-002",
+          "same-25-not-50-A-BOX-003",
+          "same-25-not-50-A-BOX-004",
+          "same-25-not-50-A-BOX-005",
+          "same-25-not-50-A-BOX-006",
+          "same-25-not-50-A-BOX-007",
+          "same-25-not-50-A-BOX-008",
+          "same-25-not-50-A-BOX-009",
+          "same-25-not-50-A-BOX-010",
+          "same-25-not-50-A-BOX-011",
+          "same-25-not-50-A-BOX-012",
+          "same-25-not-50-A-BOX-013",
+          "same-25-not-50-A-BOX-014",
+          "same-25-not-50-A-BOX-015",
+          "same-25-not-50-A-BOX-016",
+          "same-25-not-50-A-BOX-017",
+          "same-25-not-50-A-BOX-018",
+          "same-25-not-50-A-BOX-019",
+          "same-25-not-50-A-BOX-020",
+          "same-25-not-50-A-BOX-021",
+          "same-25-not-50-A-BOX-022",
+          "same-25-not-50-A-BOX-023",
+          "same-25-not-50-A-BOX-024",
+          "same-25-not-50-A-BOX-025",
+          "same-25-not-50-A-BOX-026",
+          "same-25-not-50-A-BOX-027",
+          "same-25-not-50-A-BOX-028",
+          "same-25-not-50-A-BOX-029",
+          "same-25-not-50-A-BOX-030",
+          "same-25-not-50-A-BOX-031",
+          "same-25-not-50-A-BOX-032",
+          "same-25-not-50-A-BOX-033",
+          "same-25-not-50-A-BOX-034",
+          "same-25-not-50-A-BOX-035",
+          "same-25-not-50-A-BOX-036",
+          "same-25-not-50-A-BOX-037",
+          "same-25-not-50-A-BOX-038",
+          "same-25-not-50-A-BOX-039",
+          "same-25-not-50-A-BOX-040",
+          "same-25-not-50-A-BOX-041",
+          "same-25-not-50-A-BOX-042",
+          "same-25-not-50-A-BOX-043",
+          "same-25-not-50-A-BOX-044",
+          "same-25-not-50-A-BOX-045",
+          "same-25-not-50-A-BOX-046",
+          "same-25-not-50-A-BOX-047",
+          "same-25-not-50-A-BOX-048",
+          "same-25-not-50-A-BOX-049",
+          "same-25-not-50-A-BOX-050"
+        ]
+      },
+      "contentEncoding": "CANONICAL_JSON_UTF8"
+    },
+    "warehouse-40": {
+      "type": "DocumentVersion",
+      "fixtureContent": {
+        "synthetic": true,
+        "sourceNamespace": "SYNTHETIC-warehouse-40",
+        "externalEventId": "E2-same-25-not-50-warehouse-40",
+        "sourceVersion": "1",
+        "occurredAt": "2026-10-07T09:00:00Z",
+        "itemAlias": "P",
+        "lotAlias": "L",
+        "witnessKind": "warehouse-40",
+        "reportedQuantity": {
+          "value": "40",
+          "unit": "BOX"
+        },
+        "observedBoxSerials": []
+      },
+      "contentEncoding": "CANONICAL_JSON_UTF8"
+    },
+    "agency-proof": {
+      "type": "DocumentVersion",
+      "fixtureContent": {
+        "synthetic": true,
+        "sourceNamespace": "SYNTHETIC-agency-proof",
+        "externalEventId": "E2-same-25-not-50-agency-proof",
+        "sourceVersion": "1",
+        "occurredAt": "2026-10-07T09:00:00Z",
+        "itemAlias": "P",
+        "lotAlias": "L",
+        "witnessKind": "agency-proof"
+      },
+      "contentEncoding": "CANONICAL_JSON_UTF8"
+    },
+    "submission-proof": {
+      "type": "DocumentVersion",
+      "fixtureContent": {
+        "synthetic": true,
+        "sourceNamespace": "SYNTHETIC-submission-proof",
+        "externalEventId": "E2-same-25-not-50-submission-proof",
+        "sourceVersion": "1",
+        "occurredAt": "2026-10-07T09:00:00Z",
+        "itemAlias": "P",
+        "lotAlias": "L",
+        "witnessKind": "submission-proof"
+      },
+      "contentEncoding": "CANONICAL_JSON_UTF8"
+    },
+    "invoice-proof": {
+      "type": "DocumentVersion",
+      "fixtureContent": {
+        "synthetic": true,
+        "sourceNamespace": "SYNTHETIC-invoice-proof",
+        "externalEventId": "E2-same-25-not-50-invoice-proof",
+        "sourceVersion": "1",
+        "occurredAt": "2026-10-07T09:00:00Z",
+        "itemAlias": "P",
+        "lotAlias": "L",
+        "witnessKind": "invoice-proof",
+        "invoiceKind": "COMMERCIAL",
+        "amount": {
+          "value": "105",
+          "unit": "EUR"
+        },
+        "quantity": {
+          "value": "100",
+          "unit": "BOX"
+        },
+        "currency": "EUR"
+      },
+      "contentEncoding": "CANONICAL_JSON_UTF8"
+    },
+    "exception-proof": {
+      "type": "DocumentVersion",
+      "fixtureContent": {
+        "synthetic": true,
+        "sourceNamespace": "SYNTHETIC-exception-proof",
+        "externalEventId": "E2-same-25-not-50-exception-proof",
+        "sourceVersion": "1",
+        "occurredAt": "2026-10-07T09:00:00Z",
+        "itemAlias": "P",
+        "lotAlias": "L",
+        "witnessKind": "exception-proof"
+      },
+      "contentEncoding": "CANONICAL_JSON_UTF8"
+    },
+    "replacement-proof": {
+      "type": "DocumentVersion",
+      "fixtureContent": {
+        "synthetic": true,
+        "sourceNamespace": "SYNTHETIC-replacement-proof",
+        "externalEventId": "E2-same-25-not-50-replacement-proof",
+        "sourceVersion": "1",
+        "occurredAt": "2026-10-07T09:00:00Z",
+        "itemAlias": "P",
+        "lotAlias": "L",
+        "witnessKind": "replacement-proof"
+      },
+      "contentEncoding": "CANONICAL_JSON_UTF8"
+    },
+    "supplier-proof": {
+      "type": "DocumentVersion",
+      "fixtureContent": {
+        "synthetic": true,
+        "sourceNamespace": "SYNTHETIC-supplier-proof",
+        "externalEventId": "E2-same-25-not-50-supplier-proof",
+        "sourceVersion": "1",
+        "occurredAt": "2026-10-07T09:00:00Z",
+        "itemAlias": "P",
+        "lotAlias": "L",
+        "witnessKind": "supplier-proof"
+      },
+      "contentEncoding": "CANONICAL_JSON_UTF8"
+    }
+  },
+  "baseline": {
+    "policy": {
+      "synthetic": true,
+      "policyVersion": "SYNTHETIC-sales-v1",
+      "tolerance": {
+        "value": "0",
+        "unit": "BOX"
+      },
+      "reservationNeedsSeparateApproval": false,
+      "packagingSubstitution": "EXPLICIT_APPROVAL_ONLY",
+      "returnInitialState": "QC_HOLD",
+      "recoveryClosureRole": "admin",
+      "stockDecreaseDecisionRole": "manager",
+      "recallDispositionDecisionRole": "admin",
+      "recallExceptionRequiresResidualOwner": true,
+      "sourceEvidencePolicy": "MATCH_DISPATCH_PHYSICAL_SCOPE_AND_DISTINCT_CANONICAL_OCCURRENCE",
+      "assignmentCountPerRoot": 1,
+      "denialAudit": "PRESERVE",
+      "denialReconciliation": "KEEP_INTAKE_OWNER",
+      "unknownEvidence": "FAIL_CLOSED",
+      "FEFOException": "REASON_REQUIRED",
+      "humanRoleAssignments": {
+        "sales": "SALES",
+        "receiver": "RECEIVER",
+        "qc": "QC",
+        "procurement": "PROCUREMENT",
+        "manager": "MANAGER",
+        "admin": "ADMIN",
+        "settlement": "SETTLEMENT",
+        "intake": "INTAKE",
+        "observer": "OBSERVER",
+        "operator": "ORDINARY_OPERATOR"
+      }
+    },
+    "segments": [
+      {
+        "alias": "A",
+        "quantity": "50",
+        "unit": "BOX",
+        "active": true,
+        "physicalScope": "same-25-not-50-A",
+        "boxSerials": [
+          "same-25-not-50-A-BOX-001",
+          "same-25-not-50-A-BOX-002",
+          "same-25-not-50-A-BOX-003",
+          "same-25-not-50-A-BOX-004",
+          "same-25-not-50-A-BOX-005",
+          "same-25-not-50-A-BOX-006",
+          "same-25-not-50-A-BOX-007",
+          "same-25-not-50-A-BOX-008",
+          "same-25-not-50-A-BOX-009",
+          "same-25-not-50-A-BOX-010",
+          "same-25-not-50-A-BOX-011",
+          "same-25-not-50-A-BOX-012",
+          "same-25-not-50-A-BOX-013",
+          "same-25-not-50-A-BOX-014",
+          "same-25-not-50-A-BOX-015",
+          "same-25-not-50-A-BOX-016",
+          "same-25-not-50-A-BOX-017",
+          "same-25-not-50-A-BOX-018",
+          "same-25-not-50-A-BOX-019",
+          "same-25-not-50-A-BOX-020",
+          "same-25-not-50-A-BOX-021",
+          "same-25-not-50-A-BOX-022",
+          "same-25-not-50-A-BOX-023",
+          "same-25-not-50-A-BOX-024",
+          "same-25-not-50-A-BOX-025",
+          "same-25-not-50-A-BOX-026",
+          "same-25-not-50-A-BOX-027",
+          "same-25-not-50-A-BOX-028",
+          "same-25-not-50-A-BOX-029",
+          "same-25-not-50-A-BOX-030",
+          "same-25-not-50-A-BOX-031",
+          "same-25-not-50-A-BOX-032",
+          "same-25-not-50-A-BOX-033",
+          "same-25-not-50-A-BOX-034",
+          "same-25-not-50-A-BOX-035",
+          "same-25-not-50-A-BOX-036",
+          "same-25-not-50-A-BOX-037",
+          "same-25-not-50-A-BOX-038",
+          "same-25-not-50-A-BOX-039",
+          "same-25-not-50-A-BOX-040",
+          "same-25-not-50-A-BOX-041",
+          "same-25-not-50-A-BOX-042",
+          "same-25-not-50-A-BOX-043",
+          "same-25-not-50-A-BOX-044",
+          "same-25-not-50-A-BOX-045",
+          "same-25-not-50-A-BOX-046",
+          "same-25-not-50-A-BOX-047",
+          "same-25-not-50-A-BOX-048",
+          "same-25-not-50-A-BOX-049",
+          "same-25-not-50-A-BOX-050"
+        ]
+      }
+    ],
+    "conditions": [
+      {
+        "segmentAlias": "A",
+        "conditionId": "QC",
+        "status": "ALLOWED",
+        "synthetic": true,
+        "evidenceAlias": "qc-proof",
+        "validFrom": "2026-10-01T00:00:00Z",
+        "validUntil": "2026-10-31T23:59:59Z",
+        "quantity": "50",
+        "unit": "BOX"
+      },
+      {
+        "segmentAlias": "A",
+        "conditionId": "REGULATORY",
+        "status": "ALLOWED",
+        "synthetic": true,
+        "evidenceAlias": "agency-proof",
+        "validFrom": "2026-10-01T00:00:00Z",
+        "validUntil": "2026-10-31T23:59:59Z",
+        "quantity": "50",
+        "unit": "BOX"
+      },
+      {
+        "segmentAlias": "A",
+        "conditionId": "LABEL",
+        "status": "ALLOWED",
+        "synthetic": true,
+        "evidenceAlias": "agency-proof",
+        "validFrom": "2026-10-01T00:00:00Z",
+        "validUntil": "2026-10-31T23:59:59Z",
+        "quantity": "50",
+        "unit": "BOX"
+      },
+      {
+        "segmentAlias": "A",
+        "conditionId": "DISPOSITION",
+        "status": "ALLOWED",
+        "synthetic": true,
+        "evidenceAlias": "agency-proof",
+        "validFrom": "2026-10-01T00:00:00Z",
+        "validUntil": "2026-10-31T23:59:59Z",
+        "quantity": "50",
+        "unit": "BOX"
+      },
+      {
+        "segmentAlias": "A",
+        "conditionId": "CUSTOMER_CONTRACT",
+        "status": "ALLOWED",
+        "synthetic": true,
+        "evidenceAlias": "agency-proof",
+        "validFrom": "2026-10-01T00:00:00Z",
+        "validUntil": "2026-10-31T23:59:59Z",
+        "quantity": "50",
+        "unit": "BOX"
+      }
+    ],
+    "setupIsExecutionCoverage": false,
+    "sourceProvenance": [
+      {
+        "supplierAlias": "SUPPLIER",
+        "lotAlias": "L",
+        "segmentAlias": "A",
+        "evidenceAlias": "supplier-proof"
+      }
+    ],
+    "sourceProfiles": [
+      {
+        "synthetic": true,
+        "sourceNamespace": "SYNTHETIC-CARRIER",
+        "version": "source-profile-v1",
+        "acceptedActorAliases": [
+          "receiver",
+          "procurement",
+          "intake",
+          "qc",
+          "admin",
+          "manager",
+          "settlement"
+        ],
+        "eventKinds": [
+          "RECEIPT_REPORT",
+          "DELIVERY",
+          "RETURN",
+          "RECOVERY",
+          "OBSERVED_MOVEMENT",
+          "DECISION"
+        ],
+        "canonicalPromotion": "REQUIRES_PHYSICAL_ID_QUANTITY_PRIOR_EVENT_AND_EVIDENCE_MATCH",
+        "unknownOrConflict": "QUARANTINE_WITH_OWNER"
+      },
+      {
+        "synthetic": true,
+        "sourceNamespace": "SYNTHETIC-CARRIER-RETURN",
+        "version": "source-profile-v1",
+        "acceptedActorAliases": [
+          "receiver",
+          "procurement",
+          "intake",
+          "qc",
+          "admin",
+          "manager",
+          "settlement"
+        ],
+        "eventKinds": [
+          "RECEIPT_REPORT",
+          "DELIVERY",
+          "RETURN",
+          "RECOVERY",
+          "OBSERVED_MOVEMENT",
+          "DECISION"
+        ],
+        "canonicalPromotion": "REQUIRES_PHYSICAL_ID_QUANTITY_PRIOR_EVENT_AND_EVIDENCE_MATCH",
+        "unknownOrConflict": "QUARANTINE_WITH_OWNER"
+      },
+      {
+        "synthetic": true,
+        "sourceNamespace": "SYNTHETIC-CUSTOMER",
+        "version": "source-profile-v1",
+        "acceptedActorAliases": [
+          "receiver",
+          "procurement",
+          "intake",
+          "qc",
+          "admin",
+          "manager",
+          "settlement"
+        ],
+        "eventKinds": [
+          "RECEIPT_REPORT",
+          "DELIVERY",
+          "RETURN",
+          "RECOVERY",
+          "OBSERVED_MOVEMENT",
+          "DECISION"
+        ],
+        "canonicalPromotion": "REQUIRES_PHYSICAL_ID_QUANTITY_PRIOR_EVENT_AND_EVIDENCE_MATCH",
+        "unknownOrConflict": "QUARANTINE_WITH_OWNER"
+      },
+      {
+        "synthetic": true,
+        "sourceNamespace": "SYNTHETIC-RETURN",
+        "version": "source-profile-v1",
+        "acceptedActorAliases": [
+          "receiver",
+          "procurement",
+          "intake",
+          "qc",
+          "admin",
+          "manager",
+          "settlement"
+        ],
+        "eventKinds": [
+          "RECEIPT_REPORT",
+          "DELIVERY",
+          "RETURN",
+          "RECOVERY",
+          "OBSERVED_MOVEMENT",
+          "DECISION"
+        ],
+        "canonicalPromotion": "REQUIRES_PHYSICAL_ID_QUANTITY_PRIOR_EVENT_AND_EVIDENCE_MATCH",
+        "unknownOrConflict": "QUARANTINE_WITH_OWNER"
+      },
+      {
+        "synthetic": true,
+        "sourceNamespace": "SYNTHETIC-UNVERIFIED-SOURCE",
+        "version": "source-profile-v1",
+        "acceptedActorAliases": [
+          "receiver",
+          "procurement",
+          "intake",
+          "qc",
+          "admin",
+          "manager",
+          "settlement"
+        ],
+        "eventKinds": [
+          "RECEIPT_REPORT",
+          "DELIVERY",
+          "RETURN",
+          "RECOVERY",
+          "OBSERVED_MOVEMENT",
+          "DECISION"
+        ],
+        "canonicalPromotion": "REQUIRES_PHYSICAL_ID_QUANTITY_PRIOR_EVENT_AND_EVIDENCE_MATCH",
+        "unknownOrConflict": "QUARANTINE_WITH_OWNER"
+      },
+      {
+        "synthetic": true,
+        "sourceNamespace": "SYNTHETIC-WAREHOUSE",
+        "version": "source-profile-v1",
+        "acceptedActorAliases": [
+          "receiver",
+          "procurement",
+          "intake",
+          "qc",
+          "admin",
+          "manager",
+          "settlement"
+        ],
+        "eventKinds": [
+          "RECEIPT_REPORT",
+          "DELIVERY",
+          "RETURN",
+          "RECOVERY",
+          "OBSERVED_MOVEMENT",
+          "DECISION"
+        ],
+        "canonicalPromotion": "REQUIRES_PHYSICAL_ID_QUANTITY_PRIOR_EVENT_AND_EVIDENCE_MATCH",
+        "unknownOrConflict": "QUARANTINE_WITH_OWNER"
+      },
+      {
+        "synthetic": true,
+        "sourceNamespace": "SYNTHETIC-agency-proof",
+        "version": "source-profile-v1",
+        "acceptedActorAliases": [
+          "receiver",
+          "procurement",
+          "intake",
+          "qc",
+          "admin",
+          "manager",
+          "settlement"
+        ],
+        "eventKinds": [
+          "RECEIPT_REPORT",
+          "DELIVERY",
+          "RETURN",
+          "RECOVERY",
+          "OBSERVED_MOVEMENT",
+          "DECISION"
+        ],
+        "canonicalPromotion": "REQUIRES_PHYSICAL_ID_QUANTITY_PRIOR_EVENT_AND_EVIDENCE_MATCH",
+        "unknownOrConflict": "QUARANTINE_WITH_OWNER"
+      },
+      {
+        "synthetic": true,
+        "sourceNamespace": "SYNTHETIC-carrier-60",
+        "version": "source-profile-v1",
+        "acceptedActorAliases": [
+          "receiver",
+          "procurement",
+          "intake",
+          "qc",
+          "admin",
+          "manager",
+          "settlement"
+        ],
+        "eventKinds": [
+          "RECEIPT_REPORT",
+          "DELIVERY",
+          "RETURN",
+          "RECOVERY",
+          "OBSERVED_MOVEMENT",
+          "DECISION"
+        ],
+        "canonicalPromotion": "REQUIRES_PHYSICAL_ID_QUANTITY_PRIOR_EVENT_AND_EVIDENCE_MATCH",
+        "unknownOrConflict": "QUARANTINE_WITH_OWNER"
+      },
+      {
+        "synthetic": true,
+        "sourceNamespace": "SYNTHETIC-claim-proof",
+        "version": "source-profile-v1",
+        "acceptedActorAliases": [
+          "receiver",
+          "procurement",
+          "intake",
+          "qc",
+          "admin",
+          "manager",
+          "settlement"
+        ],
+        "eventKinds": [
+          "RECEIPT_REPORT",
+          "DELIVERY",
+          "RETURN",
+          "RECOVERY",
+          "OBSERVED_MOVEMENT",
+          "DECISION"
+        ],
+        "canonicalPromotion": "REQUIRES_PHYSICAL_ID_QUANTITY_PRIOR_EVENT_AND_EVIDENCE_MATCH",
+        "unknownOrConflict": "QUARANTINE_WITH_OWNER"
+      },
+      {
+        "synthetic": true,
+        "sourceNamespace": "SYNTHETIC-correction-98",
+        "version": "source-profile-v1",
+        "acceptedActorAliases": [
+          "receiver",
+          "procurement",
+          "intake",
+          "qc",
+          "admin",
+          "manager",
+          "settlement"
+        ],
+        "eventKinds": [
+          "RECEIPT_REPORT",
+          "DELIVERY",
+          "RETURN",
+          "RECOVERY",
+          "OBSERVED_MOVEMENT",
+          "DECISION"
+        ],
+        "canonicalPromotion": "REQUIRES_PHYSICAL_ID_QUANTITY_PRIOR_EVENT_AND_EVIDENCE_MATCH",
+        "unknownOrConflict": "QUARANTINE_WITH_OWNER"
+      },
+      {
+        "synthetic": true,
+        "sourceNamespace": "SYNTHETIC-delivery-20",
+        "version": "source-profile-v1",
+        "acceptedActorAliases": [
+          "receiver",
+          "procurement",
+          "intake",
+          "qc",
+          "admin",
+          "manager",
+          "settlement"
+        ],
+        "eventKinds": [
+          "RECEIPT_REPORT",
+          "DELIVERY",
+          "RETURN",
+          "RECOVERY",
+          "OBSERVED_MOVEMENT",
+          "DECISION"
+        ],
+        "canonicalPromotion": "REQUIRES_PHYSICAL_ID_QUANTITY_PRIOR_EVENT_AND_EVIDENCE_MATCH",
+        "unknownOrConflict": "QUARANTINE_WITH_OWNER"
+      },
+      {
+        "synthetic": true,
+        "sourceNamespace": "SYNTHETIC-dispose-proof",
+        "version": "source-profile-v1",
+        "acceptedActorAliases": [
+          "receiver",
+          "procurement",
+          "intake",
+          "qc",
+          "admin",
+          "manager",
+          "settlement"
+        ],
+        "eventKinds": [
+          "RECEIPT_REPORT",
+          "DELIVERY",
+          "RETURN",
+          "RECOVERY",
+          "OBSERVED_MOVEMENT",
+          "DECISION"
+        ],
+        "canonicalPromotion": "REQUIRES_PHYSICAL_ID_QUANTITY_PRIOR_EVENT_AND_EVIDENCE_MATCH",
+        "unknownOrConflict": "QUARANTINE_WITH_OWNER"
+      },
+      {
+        "synthetic": true,
+        "sourceNamespace": "SYNTHETIC-exception-proof",
+        "version": "source-profile-v1",
+        "acceptedActorAliases": [
+          "receiver",
+          "procurement",
+          "intake",
+          "qc",
+          "admin",
+          "manager",
+          "settlement"
+        ],
+        "eventKinds": [
+          "RECEIPT_REPORT",
+          "DELIVERY",
+          "RETURN",
+          "RECOVERY",
+          "OBSERVED_MOVEMENT",
+          "DECISION"
+        ],
+        "canonicalPromotion": "REQUIRES_PHYSICAL_ID_QUANTITY_PRIOR_EVENT_AND_EVIDENCE_MATCH",
+        "unknownOrConflict": "QUARANTINE_WITH_OWNER"
+      },
+      {
+        "synthetic": true,
+        "sourceNamespace": "SYNTHETIC-invoice-proof",
+        "version": "source-profile-v1",
+        "acceptedActorAliases": [
+          "receiver",
+          "procurement",
+          "intake",
+          "qc",
+          "admin",
+          "manager",
+          "settlement"
+        ],
+        "eventKinds": [
+          "RECEIPT_REPORT",
+          "DELIVERY",
+          "RETURN",
+          "RECOVERY",
+          "OBSERVED_MOVEMENT",
+          "DECISION"
+        ],
+        "canonicalPromotion": "REQUIRES_PHYSICAL_ID_QUANTITY_PRIOR_EVENT_AND_EVIDENCE_MATCH",
+        "unknownOrConflict": "QUARANTINE_WITH_OWNER"
+      },
+      {
+        "synthetic": true,
+        "sourceNamespace": "SYNTHETIC-qc-proof",
+        "version": "source-profile-v1",
+        "acceptedActorAliases": [
+          "receiver",
+          "procurement",
+          "intake",
+          "qc",
+          "admin",
+          "manager",
+          "settlement"
+        ],
+        "eventKinds": [
+          "RECEIPT_REPORT",
+          "DELIVERY",
+          "RETURN",
+          "RECOVERY",
+          "OBSERVED_MOVEMENT",
+          "DECISION"
+        ],
+        "canonicalPromotion": "REQUIRES_PHYSICAL_ID_QUANTITY_PRIOR_EVENT_AND_EVIDENCE_MATCH",
+        "unknownOrConflict": "QUARANTINE_WITH_OWNER"
+      },
+      {
+        "synthetic": true,
+        "sourceNamespace": "SYNTHETIC-recall-proof",
+        "version": "source-profile-v1",
+        "acceptedActorAliases": [
+          "receiver",
+          "procurement",
+          "intake",
+          "qc",
+          "admin",
+          "manager",
+          "settlement"
+        ],
+        "eventKinds": [
+          "RECEIPT_REPORT",
+          "DELIVERY",
+          "RETURN",
+          "RECOVERY",
+          "OBSERVED_MOVEMENT",
+          "DECISION"
+        ],
+        "canonicalPromotion": "REQUIRES_PHYSICAL_ID_QUANTITY_PRIOR_EVENT_AND_EVIDENCE_MATCH",
+        "unknownOrConflict": "QUARANTINE_WITH_OWNER"
+      },
+      {
+        "synthetic": true,
+        "sourceNamespace": "SYNTHETIC-recovery-proof",
+        "version": "source-profile-v1",
+        "acceptedActorAliases": [
+          "receiver",
+          "procurement",
+          "intake",
+          "qc",
+          "admin",
+          "manager",
+          "settlement"
+        ],
+        "eventKinds": [
+          "RECEIPT_REPORT",
+          "DELIVERY",
+          "RETURN",
+          "RECOVERY",
+          "OBSERVED_MOVEMENT",
+          "DECISION"
+        ],
+        "canonicalPromotion": "REQUIRES_PHYSICAL_ID_QUANTITY_PRIOR_EVENT_AND_EVIDENCE_MATCH",
+        "unknownOrConflict": "QUARANTINE_WITH_OWNER"
+      },
+      {
+        "synthetic": true,
+        "sourceNamespace": "SYNTHETIC-replacement-proof",
+        "version": "source-profile-v1",
+        "acceptedActorAliases": [
+          "receiver",
+          "procurement",
+          "intake",
+          "qc",
+          "admin",
+          "manager",
+          "settlement"
+        ],
+        "eventKinds": [
+          "RECEIPT_REPORT",
+          "DELIVERY",
+          "RETURN",
+          "RECOVERY",
+          "OBSERVED_MOVEMENT",
+          "DECISION"
+        ],
+        "canonicalPromotion": "REQUIRES_PHYSICAL_ID_QUANTITY_PRIOR_EVENT_AND_EVIDENCE_MATCH",
+        "unknownOrConflict": "QUARANTINE_WITH_OWNER"
+      },
+      {
+        "synthetic": true,
+        "sourceNamespace": "SYNTHETIC-resolution-proof",
+        "version": "source-profile-v1",
+        "acceptedActorAliases": [
+          "receiver",
+          "procurement",
+          "intake",
+          "qc",
+          "admin",
+          "manager",
+          "settlement"
+        ],
+        "eventKinds": [
+          "RECEIPT_REPORT",
+          "DELIVERY",
+          "RETURN",
+          "RECOVERY",
+          "OBSERVED_MOVEMENT",
+          "DECISION"
+        ],
+        "canonicalPromotion": "REQUIRES_PHYSICAL_ID_QUANTITY_PRIOR_EVENT_AND_EVIDENCE_MATCH",
+        "unknownOrConflict": "QUARANTINE_WITH_OWNER"
+      },
+      {
+        "synthetic": true,
+        "sourceNamespace": "SYNTHETIC-return-proof",
+        "version": "source-profile-v1",
+        "acceptedActorAliases": [
+          "receiver",
+          "procurement",
+          "intake",
+          "qc",
+          "admin",
+          "manager",
+          "settlement"
+        ],
+        "eventKinds": [
+          "RECEIPT_REPORT",
+          "DELIVERY",
+          "RETURN",
+          "RECOVERY",
+          "OBSERVED_MOVEMENT",
+          "DECISION"
+        ],
+        "canonicalPromotion": "REQUIRES_PHYSICAL_ID_QUANTITY_PRIOR_EVENT_AND_EVIDENCE_MATCH",
+        "unknownOrConflict": "QUARANTINE_WITH_OWNER"
+      },
+      {
+        "synthetic": true,
+        "sourceNamespace": "SYNTHETIC-submission-proof",
+        "version": "source-profile-v1",
+        "acceptedActorAliases": [
+          "receiver",
+          "procurement",
+          "intake",
+          "qc",
+          "admin",
+          "manager",
+          "settlement"
+        ],
+        "eventKinds": [
+          "RECEIPT_REPORT",
+          "DELIVERY",
+          "RETURN",
+          "RECOVERY",
+          "OBSERVED_MOVEMENT",
+          "DECISION"
+        ],
+        "canonicalPromotion": "REQUIRES_PHYSICAL_ID_QUANTITY_PRIOR_EVENT_AND_EVIDENCE_MATCH",
+        "unknownOrConflict": "QUARANTINE_WITH_OWNER"
+      },
+      {
+        "synthetic": true,
+        "sourceNamespace": "SYNTHETIC-supplier-proof",
+        "version": "source-profile-v1",
+        "acceptedActorAliases": [
+          "receiver",
+          "procurement",
+          "intake",
+          "qc",
+          "admin",
+          "manager",
+          "settlement"
+        ],
+        "eventKinds": [
+          "RECEIPT_REPORT",
+          "DELIVERY",
+          "RETURN",
+          "RECOVERY",
+          "OBSERVED_MOVEMENT",
+          "DECISION"
+        ],
+        "canonicalPromotion": "REQUIRES_PHYSICAL_ID_QUANTITY_PRIOR_EVENT_AND_EVIDENCE_MATCH",
+        "unknownOrConflict": "QUARANTINE_WITH_OWNER"
+      },
+      {
+        "synthetic": true,
+        "sourceNamespace": "SYNTHETIC-warehouse-40",
+        "version": "source-profile-v1",
+        "acceptedActorAliases": [
+          "receiver",
+          "procurement",
+          "intake",
+          "qc",
+          "admin",
+          "manager",
+          "settlement"
+        ],
+        "eventKinds": [
+          "RECEIPT_REPORT",
+          "DELIVERY",
+          "RETURN",
+          "RECOVERY",
+          "OBSERVED_MOVEMENT",
+          "DECISION"
+        ],
+        "canonicalPromotion": "REQUIRES_PHYSICAL_ID_QUANTITY_PRIOR_EVENT_AND_EVIDENCE_MATCH",
+        "unknownOrConflict": "QUARANTINE_WITH_OWNER"
+      },
+      {
+        "synthetic": true,
+        "sourceNamespace": "SYNTHETIC-warehouse-60",
+        "version": "source-profile-v1",
+        "acceptedActorAliases": [
+          "receiver",
+          "procurement",
+          "intake",
+          "qc",
+          "admin",
+          "manager",
+          "settlement"
+        ],
+        "eventKinds": [
+          "RECEIPT_REPORT",
+          "DELIVERY",
+          "RETURN",
+          "RECOVERY",
+          "OBSERVED_MOVEMENT",
+          "DECISION"
+        ],
+        "canonicalPromotion": "REQUIRES_PHYSICAL_ID_QUANTITY_PRIOR_EVENT_AND_EVIDENCE_MATCH",
+        "unknownOrConflict": "QUARANTINE_WITH_OWNER"
+      }
+    ]
+  },
+  "evidence": [
+    {
+      "alias": "delivery-proof",
+      "sha256": "6f16d5a42b29d11ff2dcb7fb5f7061afd515c5f86e2e2588d0ee58c0ca8c4afb",
+      "sourceNamespace": "SYNTHETIC-CUSTOMER",
+      "externalEventId": "same-25-not-50-actual-delivery",
+      "sourceVersion": "1",
+      "occurredAt": "2026-10-07T09:00:00Z",
+      "recordedAt": "2026-10-07T09:00:01Z"
+    },
+    {
+      "alias": "delivery-20",
+      "sha256": "fb329c6c13b737bcba29e339c2e3cd6a61bddabd75513baadb0e9c5490f8cdfe",
+      "sourceNamespace": "SYNTHETIC-delivery-20",
+      "externalEventId": "E2-same-25-not-50-delivery-20",
+      "sourceVersion": "1",
+      "occurredAt": "2026-10-07T09:00:00Z",
+      "recordedAt": "2026-10-07T09:00:01Z"
+    },
+    {
+      "alias": "return-proof",
+      "sha256": "daea14dd6942a52e0dd4325c69194bf1b9e1d13677304c7cba2dc5e97a39ac36",
+      "sourceNamespace": "SYNTHETIC-return-proof",
+      "externalEventId": "E2-same-25-not-50-return-proof",
+      "sourceVersion": "1",
+      "occurredAt": "2026-10-07T09:00:00Z",
+      "recordedAt": "2026-10-07T09:00:01Z"
+    },
+    {
+      "alias": "claim-proof",
+      "sha256": "a5133668b277d2cbd552f82161ce4b530b6ce8eaf2391fc8d017dea34efb7c40",
+      "sourceNamespace": "SYNTHETIC-claim-proof",
+      "externalEventId": "E2-same-25-not-50-claim-proof",
+      "sourceVersion": "1",
+      "occurredAt": "2026-10-07T09:00:00Z",
+      "recordedAt": "2026-10-07T09:00:01Z"
+    },
+    {
+      "alias": "qc-proof",
+      "sha256": "7e7559bba3bb060899ca9f051804a5f5a812f5e7553cae61f648b350e67f409b",
+      "sourceNamespace": "SYNTHETIC-qc-proof",
+      "externalEventId": "E2-same-25-not-50-qc-proof",
+      "sourceVersion": "1",
+      "occurredAt": "2026-10-07T09:00:00Z",
+      "recordedAt": "2026-10-07T09:00:01Z"
+    },
+    {
+      "alias": "recall-proof",
+      "sha256": "9d5717ca145e2595842535f0362bada5010f3f139b94a8037f2a0076d4998563",
+      "sourceNamespace": "SYNTHETIC-recall-proof",
+      "externalEventId": "E2-same-25-not-50-recall-proof",
+      "sourceVersion": "1",
+      "occurredAt": "2026-10-07T09:00:00Z",
+      "recordedAt": "2026-10-07T09:00:01Z"
+    },
+    {
+      "alias": "recovery-proof",
+      "sha256": "ded95b4e58c4c6243e5a01ff2c7635e29f75f757b4e59350d3be0ee25c3e5a60",
+      "sourceNamespace": "SYNTHETIC-recovery-proof",
+      "externalEventId": "E2-same-25-not-50-recovery-proof",
+      "sourceVersion": "1",
+      "occurredAt": "2026-10-07T09:00:00Z",
+      "recordedAt": "2026-10-07T09:00:01Z"
+    },
+    {
+      "alias": "dispose-proof",
+      "sha256": "bb2654deca2ef9f093726fcdb2e880b18e346a11bc9dc033524c8dcf4ee2af26",
+      "sourceNamespace": "SYNTHETIC-dispose-proof",
+      "externalEventId": "E2-same-25-not-50-dispose-proof",
+      "sourceVersion": "1",
+      "occurredAt": "2026-10-07T09:00:00Z",
+      "recordedAt": "2026-10-07T09:00:01Z"
+    },
+    {
+      "alias": "correction-98",
+      "sha256": "927c9ee66b3d27bcf903f5a41b234726938ceaa9d099a56bf27a18368417863e",
+      "sourceNamespace": "SYNTHETIC-correction-98",
+      "externalEventId": "E2-same-25-not-50-correction-98",
+      "sourceVersion": "1",
+      "occurredAt": "2026-10-07T09:00:00Z",
+      "recordedAt": "2026-10-07T09:00:01Z"
+    },
+    {
+      "alias": "resolution-proof",
+      "sha256": "0d35bfa5a9c472f57cf65d48e40b42235d98358db7478d89a51541aa8c03db49",
+      "sourceNamespace": "SYNTHETIC-resolution-proof",
+      "externalEventId": "E2-same-25-not-50-resolution-proof",
+      "sourceVersion": "1",
+      "occurredAt": "2026-10-07T09:00:00Z",
+      "recordedAt": "2026-10-07T09:00:01Z"
+    },
+    {
+      "alias": "warehouse-60",
+      "sha256": "3a3e0ff401626cd0b345b22441f9901023b93734bb689aa8f07cbb07a20c8a75",
+      "sourceNamespace": "SYNTHETIC-warehouse-60",
+      "externalEventId": "E2-same-25-not-50-warehouse-60",
+      "sourceVersion": "1",
+      "occurredAt": "2026-10-07T09:00:00Z",
+      "recordedAt": "2026-10-07T09:00:01Z"
+    },
+    {
+      "alias": "carrier-60",
+      "sha256": "8744f8fba8fd3cd45ef7f1ca85b1470581bd772489a29aec14e5b9c70eda1d14",
+      "sourceNamespace": "SYNTHETIC-carrier-60",
+      "externalEventId": "E2-same-25-not-50-carrier-60",
+      "sourceVersion": "1",
+      "occurredAt": "2026-10-07T09:00:00Z",
+      "recordedAt": "2026-10-07T09:00:01Z"
+    },
+    {
+      "alias": "warehouse-40",
+      "sha256": "e9a5ee6c9ac886b4ae982cf6ac51ff8ce9236c27b03a73b10459126446842c7c",
+      "sourceNamespace": "SYNTHETIC-warehouse-40",
+      "externalEventId": "E2-same-25-not-50-warehouse-40",
+      "sourceVersion": "1",
+      "occurredAt": "2026-10-07T09:00:00Z",
+      "recordedAt": "2026-10-07T09:00:01Z"
+    },
+    {
+      "alias": "agency-proof",
+      "sha256": "482f5bbcbe3050b767d45fcaa76e3f9c2184e23718372cd68d3e1d773f0590f5",
+      "sourceNamespace": "SYNTHETIC-agency-proof",
+      "externalEventId": "E2-same-25-not-50-agency-proof",
+      "sourceVersion": "1",
+      "occurredAt": "2026-10-07T09:00:00Z",
+      "recordedAt": "2026-10-07T09:00:01Z"
+    },
+    {
+      "alias": "submission-proof",
+      "sha256": "9da465326b315ededaf4193d67d58059c9339ca5717eb7b6383ab863984cd61d",
+      "sourceNamespace": "SYNTHETIC-submission-proof",
+      "externalEventId": "E2-same-25-not-50-submission-proof",
+      "sourceVersion": "1",
+      "occurredAt": "2026-10-07T09:00:00Z",
+      "recordedAt": "2026-10-07T09:00:01Z"
+    },
+    {
+      "alias": "invoice-proof",
+      "sha256": "2a549ad61f1ff1275135c5ff9466882995aefeb3b7a89f0bfdb955dcb2b6d286",
+      "sourceNamespace": "SYNTHETIC-invoice-proof",
+      "externalEventId": "E2-same-25-not-50-invoice-proof",
+      "sourceVersion": "1",
+      "occurredAt": "2026-10-07T09:00:00Z",
+      "recordedAt": "2026-10-07T09:00:01Z"
+    },
+    {
+      "alias": "exception-proof",
+      "sha256": "aefb919f402c804723ebf1d3d23b1d14af0c63a06400aa3067b0de19ac235a04",
+      "sourceNamespace": "SYNTHETIC-exception-proof",
+      "externalEventId": "E2-same-25-not-50-exception-proof",
+      "sourceVersion": "1",
+      "occurredAt": "2026-10-07T09:00:00Z",
+      "recordedAt": "2026-10-07T09:00:01Z"
+    },
+    {
+      "alias": "replacement-proof",
+      "sha256": "6b699f482ff80203a571de5bf91eda266034cca02c6281eed9c0c19784d306fd",
+      "sourceNamespace": "SYNTHETIC-replacement-proof",
+      "externalEventId": "E2-same-25-not-50-replacement-proof",
+      "sourceVersion": "1",
+      "occurredAt": "2026-10-07T09:00:00Z",
+      "recordedAt": "2026-10-07T09:00:01Z"
+    },
+    {
+      "alias": "supplier-proof",
+      "sha256": "3e1b2a6dc6c5b18302fbf84dc6c2bdb5d4a2f9534cf2632f06c0bdb3153e5afb",
+      "sourceNamespace": "SYNTHETIC-supplier-proof",
+      "externalEventId": "E2-same-25-not-50-supplier-proof",
+      "sourceVersion": "1",
+      "occurredAt": "2026-10-07T09:00:00Z",
+      "recordedAt": "2026-10-07T09:00:01Z"
+    }
+  ],
+  "responsibilities": [
+    {
+      "scope": {
+        "organizationAlias": "ORG",
+        "itemAlias": "P",
+        "workKind": "QC"
+      },
+      "ownerAlias": "qc",
+      "supervisorAlias": "supervisor",
+      "nextAction": "보류 근거를 검사한다",
+      "nextCheckAt": "2026-10-07T10:00:00Z"
+    },
+    {
+      "scope": {
+        "organizationAlias": "ORG",
+        "itemAlias": "P",
+        "workKind": "RETURN"
+      },
+      "ownerAlias": "receiver",
+      "supervisorAlias": "supervisor",
+      "nextAction": "반품 처분과 교환·환불을 대조한다",
+      "nextCheckAt": "2026-10-07T10:00:00Z"
+    },
+    {
+      "scope": {
+        "organizationAlias": "ORG",
+        "itemAlias": "P",
+        "workKind": "RECALL"
+      },
+      "ownerAlias": "admin",
+      "supervisorAlias": "supervisor",
+      "nextAction": "미확인 실물과 회수 근거를 확인한다",
+      "nextCheckAt": "2026-10-07T10:00:00Z"
+    },
+    {
+      "scope": {
+        "organizationAlias": "ORG",
+        "itemAlias": "P",
+        "workKind": "SETTLEMENT"
+      },
+      "ownerAlias": "settlement",
+      "supervisorAlias": "supervisor",
+      "nextAction": "송장 원차이를 대조한다",
+      "nextCheckAt": "2026-10-07T10:00:00Z"
+    },
+    {
+      "scope": {
+        "organizationAlias": "ORG",
+        "itemAlias": "P",
+        "workKind": "RECONCILIATION"
+      },
+      "ownerAlias": "intake",
+      "supervisorAlias": "supervisor",
+      "nextAction": "원천 주장과 실제 실물을 대조한다",
+      "nextCheckAt": "2026-10-07T10:00:00Z"
+    },
+    {
+      "scope": {
+        "organizationAlias": "ORG",
+        "itemAlias": "P",
+        "workKind": "SALES"
+      },
+      "ownerAlias": "sales",
+      "supervisorAlias": "supervisor",
+      "nextAction": "인도 부족과 제한 대응을 확인한다",
+      "nextCheckAt": "2026-10-07T10:00:00Z"
+    }
+  ]
+}
