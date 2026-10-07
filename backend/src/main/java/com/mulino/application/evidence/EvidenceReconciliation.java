@@ -121,7 +121,8 @@ public class EvidenceReconciliation {
     if(!trade&&input.physicalScopeId()!=null && r.rows("CanonicalOccurrences",c.organizationId()).stream().anyMatch(x->input.physicalScopeId().equals(x.get("physicalScopeId"))&&event.get("kind").equals(x.get("kind"))&&!input.effectiveFrom().equals(instant(x.get("effectiveFrom")))))decision="CONFLICT";
     if(!trade&&input.physicalScopeId()!=null && r.rows("CanonicalOccurrences",c.organizationId()).stream().anyMatch(x->input.physicalScopeId().equals(x.get("physicalScopeId"))&&event.get("kind").equals(x.get("kind"))
         &&(!Objects.equals(claim.get("effectiveUntil"),x.get("effectiveUntil"))||!Objects.equals(claim.get("timePrecision"),x.get("timePrecision")))))decision="CONFLICT";
-    String correctionPrior=deliveryCorrectionPrior(c,event,claim);
+    String correctionPrior=deliveryCorrectionPrior(c,event,claim,input.physicalScopeId());
+    if(correctionPrior!=null&&!Objects.equals(r.require("CanonicalOccurrences",c.organizationId(),correctionPrior).get("occurrenceIdentity"),trustedTrade.get("occurrenceIdentity")))throw DomainError.invalid("Delivery correction must preserve original occurrence identity");
     if(trade&&trustedTrade.get("occurrenceIdentity")!=null&&r.rows("CanonicalOccurrences",c.organizationId()).stream().anyMatch(x->trustedTrade.get("occurrenceIdentity").equals(x.get("occurrenceIdentity"))&&event.get("kind").equals(x.get("kind"))&&!correctionAncestor(c,correctionPrior,x.get("ID").toString())&&(!Objects.equals(trustedTrade.get("occurrenceSemanticHash"),x.get("occurrenceSemanticHash"))||!Objects.equals(input.physicalScopeId(),x.get("physicalScopeId"))||!sameQuantity(quantity,x.get("quantity"))||!Objects.equals(input.unit(),x.get("unit"))||!input.effectiveFrom().equals(instant(x.get("effectiveFrom"))))))decision="CONFLICT";
     if(input.effectiveFrom().isAfter(clock.instant()))decision="UNVERIFIED";
     if(input.existingCanonicalId()!=null) {
@@ -140,7 +141,7 @@ public class EvidenceReconciliation {
     return Map.of("id",row.get("ID"),"revision",1,"outcome",decision,"inventoryEffects","NONE");
   }
   /** Only explicit PHYSICAL_DELIVERY evidence revision can replace its canonical predecessor. */
-  private String deliveryCorrectionPrior(DomainContext c,Map<String,Object> event,Map<String,Object> claim){
+  private String deliveryCorrectionPrior(DomainContext c,Map<String,Object> event,Map<String,Object> claim,String physical){
     if(!"PHYSICAL_DELIVERY".equals(event.get("kind"))||event.get("supersedesId")==null)return null;
     var previous=r.require("Events",c.organizationId(),event.get("supersedesId").toString());
     if(!Objects.equals(previous.get("kind"),event.get("kind"))||!Objects.equals(previous.get("subjectKind"),event.get("subjectKind"))||!Objects.equals(previous.get("subjectId"),event.get("subjectId"))||!Objects.equals(previous.get("sourceProfileId"),event.get("sourceProfileId")))throw DomainError.invalid("Delivery correction source and exact subject must remain unchanged");
@@ -150,7 +151,7 @@ public class EvidenceReconciliation {
     String prior=ids.iterator().next();var canonical=r.require("CanonicalOccurrences",c.organizationId(),prior);
     auth.authorizeScopes(c,"correctEvidence",scopes(canonical));
     if(r.rows("CanonicalOccurrences",c.organizationId()).stream().anyMatch(x->prior.equals(x.get("supersedesId"))))throw new DomainError("CONFLICT","EVIDENCE_CONFLICT","Delivery correction predecessor is no longer current");
-    if(!Objects.equals(canonical.get("itemId"),claim.get("itemId"))||!Objects.equals(canonical.get("workId"),claim.get("workId"))||!Objects.equals(canonical.get("unit"),claim.get("unit"))||!instant(canonical.get("effectiveFrom")).equals(instant(claim.get("effectiveFrom"))))throw DomainError.invalid("Delivery correction cannot change item, Work, unit or occurrence time");
+    if(!Objects.equals(canonical.get("physicalScopeId"),physical)||!Objects.equals(canonical.get("placeId"),claim.get("placeId"))||!Objects.equals(canonical.get("itemId"),claim.get("itemId"))||!Objects.equals(canonical.get("workId"),claim.get("workId"))||!Objects.equals(canonical.get("unit"),claim.get("unit"))||!instant(canonical.get("effectiveFrom")).equals(instant(claim.get("effectiveFrom"))))throw DomainError.invalid("Delivery correction cannot change item, Work, unit or occurrence time");
     return prior;
   }
   private boolean correctionAncestor(DomainContext c,String prior,String candidate){
@@ -175,7 +176,7 @@ public class EvidenceReconciliation {
     String physical=review.get("physicalScopeId").toString();String existing=Objects.toString(review.get("existingCanonicalId"),null);
     var event=r.require("Events",c.organizationId(),claim.get("eventId").toString());
     r.sourceFence(c.organizationId(),"canonical",physical,event.get("kind").toString());
-    String correctionPrior=deliveryCorrectionPrior(c,event,claim);
+    String correctionPrior=deliveryCorrectionPrior(c,event,claim,physical);
     if(correctionPrior!=null&&existing!=null)throw DomainError.invalid("Correction creates a new canonical revision; it cannot relink the old fact");
     if(existing==null&&correctionPrior==null) {
       var providers=tradeScopes.stream().filter(p->p.eventKinds().contains(event.get("kind"))).toList();Map<String,Object> semantic=Map.of();if(providers.size()==1){var doc=r.require("DocumentVersions",c.organizationId(),review.get("basisDocumentId").toString());semantic=tradeFields(providers.getFirst().require(c,physical,claim,event,doc,blobs.read(UUID.fromString(doc.get("blobId").toString()),doc.get("sha256").toString())),event);}final var typedIdentity=semantic.get("occurrenceIdentity");
