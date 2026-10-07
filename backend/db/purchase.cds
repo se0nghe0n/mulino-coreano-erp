@@ -2,6 +2,7 @@ namespace mulino.trade.purchase;
 entity Suppliers { key organizationId:UUID; key ID:UUID; name:String(240) not null;  revision:Integer not null default 1; createdAt:Timestamp not null; recordedAt:Timestamp not null; effectiveAt:Timestamp not null;
 }
 entity Proposals {
+ currentApprovalId:UUID;
  key organizationId:UUID; key ID:UUID; workId:UUID not null;
  currentRevision:Integer not null; status:String(40) not null; createdAt:Timestamp not null;
  revision:Integer not null default 1; recordedAt:Timestamp not null; effectiveAt:Timestamp not null;

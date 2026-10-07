@@ -91,3 +91,6 @@ BEGIN
 END $$;
 CREATE TRIGGER purchase_line_snapshot_immutable BEFORE UPDATE ON mulino_trade_purchase_OrderLines
  FOR EACH ROW EXECUTE FUNCTION mulino_purchase_line_immutable();
+
+ALTER TABLE mulino_trade_purchase_Proposals ADD currentApprovalId varchar(36);
+ALTER TABLE mulino_trade_purchase_Proposals ADD FOREIGN KEY(organizationId,currentApprovalId) REFERENCES mulino_trade_purchase_Approvals(organizationId,ID);
