@@ -16,6 +16,10 @@ public class VerifiedExternalResultEvidence implements ExternalResultEvidenceGua
     if(!Set.of("CONFIRMED_SUCCESS","CONFIRMED_FAILURE").contains(decision))throw DomainError.invalid("Confirmed external decision required");
     var doc=r.require("DocumentVersions",c.organizationId(),documentId);auth.authorizeScopes(c,"getEvidence",scopes(doc));
     if(!"AVAILABLE".equals(doc.get("availability"))||doc.get("blobId")==null||!blobs.available(UUID.fromString(doc.get("blobId").toString()),doc.get("sha256").toString()))throw unavailable();
+    try {
+      var original=new ObjectMapper().readTree(blobs.read(UUID.fromString(doc.get("blobId").toString()),doc.get("sha256").toString()));
+      if(!externalOperationId.equals(original.path("externalOperationId").asText())||!decision.equals(original.path("outcome").asText()))throw unavailable();
+    }catch(java.io.IOException invalidOriginal){throw unavailable();}
     for(var verification:r.rows("Verifications",c.organizationId())){
       if(!documentId.equals(verification.get("basisDocumentId"))||!"VERIFIED".equals(verification.get("verdict")))continue;
       if(!List.of("sourceMatched","identityMatched","quantityMatched","timeMatched","duplicateChecked").stream().allMatch(flag->Boolean.TRUE.equals(verification.get(flag))))continue;
