@@ -1,0 +1,5649 @@
+{
+  "schemaVersion": "1.0.0",
+  "caseId": "T16",
+  "title": "수령·QC·실사·무이벤트 만료",
+  "requirementRefs": [
+    "D16"
+  ],
+  "profiles": [
+    "scenarios",
+    "recovery"
+  ],
+  "subcases": [
+    {
+      "id": "provisional-holds",
+      "title": "임시수령60의 적격0과 QC·회수 제한의 독립 해제를 확인한다",
+      "fixtureRef": "verification/cases/T16/fixtures/provisional-holds.json",
+      "requiredAdapters": [
+        "fixture",
+        "api",
+        "db"
+      ],
+      "actions": [
+        {
+          "id": "setup",
+          "kind": "installFixture",
+          "fixtureRef": "verification/cases/T16/fixtures/provisional-holds.json",
+          "evidenceRefs": [
+            "setup:actual-adapter-artifact"
+          ]
+        },
+        {
+          "id": "before-api",
+          "kind": "query",
+          "actorRef": "warehouse",
+          "route": "api",
+          "capabilityId": "getInventory",
+          "request": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseKey": "T16-provisional-holds"
+            },
+            "action": "SELL",
+            "customerId": {
+              "$alias": "CUSTOMER"
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z"
+          },
+          "evidenceRefs": [
+            "before-api:actual-adapter-artifact"
+          ]
+        },
+        {
+          "id": "before-db",
+          "kind": "observe",
+          "observation": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseKey": "T16-provisional-holds"
+            },
+            "snapshotRef": {
+              "$result": {
+                "actionId": "before-api",
+                "pointer": "/response/snapshotRevision"
+              }
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z",
+            "sources": [
+              "segments",
+              "movements",
+              "genealogy",
+              "allocations",
+              "obligations",
+              "assignments",
+              "restrictions",
+              "dispositionBases",
+              "audit",
+              "outbox",
+              "commandResults",
+              "events",
+              "evidenceLinks",
+              "logisticsMemberships",
+              "shipments",
+              "intakes",
+              "stocktakes",
+              "decisions",
+              "locks",
+              "retryAttempts",
+              "dbPrivileges",
+              "boundaries",
+              "transactions"
+            ]
+          },
+          "evidenceRefs": [
+            "before-db:actual-adapter-artifact"
+          ]
+        },
+        {
+          "id": "provisional",
+          "kind": "invoke",
+          "actorRef": "recorder",
+          "route": "api",
+          "capabilityId": "receiveProvisional",
+          "request": {
+            "intentKind": "COMMAND",
+            "definitionVersion": "ontology-v1",
+            "capabilityId": "receiveProvisional",
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "subjectRefs": [
+              {
+                "type": "QuantitySegment",
+                "id": {
+                  "$alias": "TRANSIT60"
+                }
+              }
+            ],
+            "slots": {
+              "quantity": {
+                "value": "60",
+                "unit": "BOX",
+                "provenance": "USER"
+              },
+              "observedPlaceId": {
+                "$alias": "W"
+              },
+              "identification": "UNVERIFIED",
+              "originalTransitSegmentId": {
+                "$alias": "TRANSIT60"
+              },
+              "canonicalOccurrenceKey": "T16-RECEIPT60"
+            },
+            "expectedRevision": 1,
+            "commandIdempotencyKey": "T16-provisional-holds-provisional",
+            "evidenceRefs": [
+              {
+                "$alias": "operation-proof"
+              }
+            ],
+            "valueProvenance": "USER"
+          },
+          "evidenceRefs": [
+            "provisional:actual-adapter-artifact"
+          ]
+        },
+        {
+          "id": "provisional-api",
+          "kind": "query",
+          "actorRef": "warehouse",
+          "route": "api",
+          "capabilityId": "getInventory",
+          "request": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseKey": "T16-provisional-holds"
+            },
+            "action": "SELL",
+            "customerId": {
+              "$alias": "CUSTOMER"
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z"
+          },
+          "evidenceRefs": [
+            "provisional-api:actual-adapter-artifact"
+          ]
+        },
+        {
+          "id": "provisional-db",
+          "kind": "observe",
+          "observation": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseKey": "T16-provisional-holds"
+            },
+            "snapshotRef": {
+              "$result": {
+                "actionId": "provisional-api",
+                "pointer": "/response/snapshotRevision"
+              }
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z",
+            "sources": [
+              "segments",
+              "movements",
+              "genealogy",
+              "allocations",
+              "obligations",
+              "assignments",
+              "restrictions",
+              "dispositionBases",
+              "audit",
+              "outbox",
+              "commandResults",
+              "events",
+              "evidenceLinks",
+              "logisticsMemberships",
+              "shipments",
+              "intakes",
+              "stocktakes",
+              "decisions",
+              "locks",
+              "retryAttempts",
+              "dbPrivileges",
+              "boundaries",
+              "transactions"
+            ]
+          },
+          "evidenceRefs": [
+            "provisional-db:actual-adapter-artifact"
+          ]
+        },
+        {
+          "id": "confirm",
+          "kind": "invoke",
+          "actorRef": "recorder",
+          "route": "api",
+          "capabilityId": "confirmReceipt",
+          "request": {
+            "intentKind": "COMMAND",
+            "definitionVersion": "ontology-v1",
+            "capabilityId": "confirmReceipt",
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "subjectRefs": [
+              {
+                "type": "QuantitySegment",
+                "id": {
+                  "$alias": "TRANSIT60"
+                }
+              }
+            ],
+            "slots": {
+              "intakeId": {
+                "$result": {
+                  "actionId": "provisional",
+                  "pointer": "/response/requestId"
+                }
+              },
+              "quantity": {
+                "value": "60",
+                "unit": "BOX",
+                "provenance": "USER"
+              },
+              "destinationId": {
+                "$alias": "W"
+              },
+              "lotId": {
+                "$alias": "L1"
+              },
+              "canonicalOccurrenceKey": "T16-RECEIPT60",
+              "existingTransitSegmentId": {
+                "$alias": "TRANSIT60"
+              },
+              "verifiedEvidenceIds": [
+                {
+                  "$alias": "source-proof"
+                }
+              ]
+            },
+            "expectedRevision": {
+              "$result": {
+                "actionId": "provisional",
+                "pointer": "/response/revision"
+              }
+            },
+            "commandIdempotencyKey": "T16-provisional-holds-confirm",
+            "evidenceRefs": [
+              {
+                "$alias": "operation-proof"
+              }
+            ],
+            "valueProvenance": "USER"
+          },
+          "evidenceRefs": [
+            "confirm:actual-adapter-artifact"
+          ]
+        },
+        {
+          "id": "confirmed-api",
+          "kind": "query",
+          "actorRef": "warehouse",
+          "route": "api",
+          "capabilityId": "getInventory",
+          "request": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseKey": "T16-provisional-holds"
+            },
+            "action": "SELL",
+            "customerId": {
+              "$alias": "CUSTOMER"
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z"
+          },
+          "evidenceRefs": [
+            "confirmed-api:actual-adapter-artifact"
+          ]
+        },
+        {
+          "id": "confirmed-db",
+          "kind": "observe",
+          "observation": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseKey": "T16-provisional-holds"
+            },
+            "snapshotRef": {
+              "$result": {
+                "actionId": "confirmed-api",
+                "pointer": "/response/snapshotRevision"
+              }
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z",
+            "sources": [
+              "segments",
+              "movements",
+              "genealogy",
+              "allocations",
+              "obligations",
+              "assignments",
+              "restrictions",
+              "dispositionBases",
+              "audit",
+              "outbox",
+              "commandResults",
+              "events",
+              "evidenceLinks",
+              "logisticsMemberships",
+              "shipments",
+              "intakes",
+              "stocktakes",
+              "decisions",
+              "locks",
+              "retryAttempts",
+              "dbPrivileges",
+              "boundaries",
+              "transactions"
+            ]
+          },
+          "evidenceRefs": [
+            "confirmed-db:actual-adapter-artifact"
+          ]
+        },
+        {
+          "id": "qc-hold",
+          "kind": "invoke",
+          "actorRef": "qc",
+          "route": "api",
+          "capabilityId": "placeHold",
+          "request": {
+            "intentKind": "COMMAND",
+            "definitionVersion": "ontology-v1",
+            "capabilityId": "placeHold",
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "subjectRefs": [
+              {
+                "type": "QuantitySegment",
+                "id": {
+                  "$result": {
+                    "actionId": "confirm",
+                    "pointer": "/response/segmentId"
+                  }
+                }
+              }
+            ],
+            "slots": {
+              "quantity": {
+                "value": "20",
+                "unit": "BOX",
+                "provenance": "USER"
+              },
+              "kind": "QC",
+              "action": "SELL",
+              "reason": "검사 대기"
+            },
+            "expectedRevision": {
+              "$result": {
+                "actionId": "confirm",
+                "pointer": "/response/revision"
+              }
+            },
+            "commandIdempotencyKey": "T16-provisional-holds-qc-hold",
+            "evidenceRefs": [
+              {
+                "$alias": "operation-proof"
+              }
+            ],
+            "valueProvenance": "USER"
+          },
+          "evidenceRefs": [
+            "qc-hold:actual-adapter-artifact"
+          ]
+        },
+        {
+          "id": "recall-hold",
+          "kind": "invoke",
+          "actorRef": "admin",
+          "route": "api",
+          "capabilityId": "placeHold",
+          "request": {
+            "intentKind": "COMMAND",
+            "definitionVersion": "ontology-v1",
+            "capabilityId": "placeHold",
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "subjectRefs": [
+              {
+                "type": "QuantitySegment",
+                "id": {
+                  "$result": {
+                    "actionId": "confirm",
+                    "pointer": "/response/segmentId"
+                  }
+                }
+              }
+            ],
+            "slots": {
+              "quantity": {
+                "value": "60",
+                "unit": "BOX",
+                "provenance": "USER"
+              },
+              "kind": "RECALL",
+              "action": "SELL",
+              "reason": "회수 조사"
+            },
+            "expectedRevision": {
+              "$result": {
+                "actionId": "qc-hold",
+                "pointer": "/response/revision"
+              }
+            },
+            "commandIdempotencyKey": "T16-provisional-holds-recall-hold",
+            "evidenceRefs": [
+              {
+                "$alias": "operation-proof"
+              }
+            ],
+            "valueProvenance": "USER"
+          },
+          "evidenceRefs": [
+            "recall-hold:actual-adapter-artifact"
+          ]
+        },
+        {
+          "id": "held-api",
+          "kind": "query",
+          "actorRef": "warehouse",
+          "route": "api",
+          "capabilityId": "getInventory",
+          "request": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseKey": "T16-provisional-holds"
+            },
+            "action": "SELL",
+            "customerId": {
+              "$alias": "CUSTOMER"
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z"
+          },
+          "evidenceRefs": [
+            "held-api:actual-adapter-artifact"
+          ]
+        },
+        {
+          "id": "held-db",
+          "kind": "observe",
+          "observation": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseKey": "T16-provisional-holds"
+            },
+            "snapshotRef": {
+              "$result": {
+                "actionId": "held-api",
+                "pointer": "/response/snapshotRevision"
+              }
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z",
+            "sources": [
+              "segments",
+              "movements",
+              "genealogy",
+              "allocations",
+              "obligations",
+              "assignments",
+              "restrictions",
+              "dispositionBases",
+              "audit",
+              "outbox",
+              "commandResults",
+              "events",
+              "evidenceLinks",
+              "logisticsMemberships",
+              "shipments",
+              "intakes",
+              "stocktakes",
+              "decisions",
+              "locks",
+              "retryAttempts",
+              "dbPrivileges",
+              "boundaries",
+              "transactions"
+            ]
+          },
+          "evidenceRefs": [
+            "held-db:actual-adapter-artifact"
+          ]
+        },
+        {
+          "id": "ordinary-hold-proposal",
+          "kind": "invoke",
+          "actorRef": "ordinary",
+          "route": "api",
+          "capabilityId": "recordActivity",
+          "request": {
+            "intentKind": "RECORD",
+            "definitionVersion": "ontology-v1",
+            "capabilityId": "recordActivity",
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "subjectRefs": [
+              {
+                "type": "QuantitySegment",
+                "id": {
+                  "$result": {
+                    "actionId": "confirm",
+                    "pointer": "/response/segmentId"
+                  }
+                }
+              }
+            ],
+            "slots": {
+              "kind": "QC_HOLD_PROPOSAL",
+              "quantity": {
+                "value": "20",
+                "unit": "BOX",
+                "provenance": "USER"
+              },
+              "evidenceId": {
+                "$alias": "qc-proof"
+              }
+            },
+            "expectedRevision": {
+              "$result": {
+                "actionId": "recall-hold",
+                "pointer": "/response/revision"
+              }
+            },
+            "commandIdempotencyKey": "T16-provisional-holds-ordinary-hold-proposal",
+            "evidenceRefs": [
+              {
+                "$alias": "operation-proof"
+              }
+            ],
+            "valueProvenance": "USER"
+          },
+          "evidenceRefs": [
+            "ordinary-hold-proposal:actual-adapter-artifact"
+          ]
+        },
+        {
+          "id": "ordinary-hold",
+          "kind": "invoke",
+          "actorRef": "ordinary",
+          "route": "api",
+          "capabilityId": "placeHold",
+          "request": {
+            "intentKind": "COMMAND",
+            "definitionVersion": "ontology-v1",
+            "capabilityId": "placeHold",
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "subjectRefs": [
+              {
+                "type": "QuantitySegment",
+                "id": {
+                  "$result": {
+                    "actionId": "confirm",
+                    "pointer": "/response/segmentId"
+                  }
+                }
+              }
+            ],
+            "slots": {
+              "kind": "QC",
+              "action": "SELL",
+              "quantity": {
+                "value": "20",
+                "unit": "BOX",
+                "provenance": "USER"
+              }
+            },
+            "expectedRevision": {
+              "$result": {
+                "actionId": "recall-hold",
+                "pointer": "/response/revision"
+              }
+            },
+            "commandIdempotencyKey": "T16-provisional-holds-ordinary-hold",
+            "evidenceRefs": [
+              {
+                "$alias": "operation-proof"
+              }
+            ],
+            "valueProvenance": "USER"
+          },
+          "evidenceRefs": [
+            "ordinary-hold:actual-adapter-artifact"
+          ]
+        },
+        {
+          "id": "ordinary-release",
+          "kind": "invoke",
+          "actorRef": "ordinary",
+          "route": "api",
+          "capabilityId": "releaseHold",
+          "request": {
+            "intentKind": "COMMAND",
+            "definitionVersion": "ontology-v1",
+            "capabilityId": "releaseHold",
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "subjectRefs": [
+              {
+                "type": "QuantitySegment",
+                "id": {
+                  "$result": {
+                    "actionId": "confirm",
+                    "pointer": "/response/segmentId"
+                  }
+                }
+              }
+            ],
+            "slots": {
+              "restrictionId": {
+                "$result": {
+                  "actionId": "qc-hold",
+                  "pointer": "/response/restrictionId"
+                }
+              },
+              "quantity": {
+                "value": "20",
+                "unit": "BOX",
+                "provenance": "USER"
+              }
+            },
+            "expectedRevision": {
+              "$result": {
+                "actionId": "recall-hold",
+                "pointer": "/response/revision"
+              }
+            },
+            "commandIdempotencyKey": "T16-provisional-holds-ordinary-release",
+            "evidenceRefs": [
+              {
+                "$alias": "operation-proof"
+              }
+            ],
+            "valueProvenance": "USER"
+          },
+          "evidenceRefs": [
+            "ordinary-release:actual-adapter-artifact"
+          ]
+        },
+        {
+          "id": "denied-api",
+          "kind": "query",
+          "actorRef": "warehouse",
+          "route": "api",
+          "capabilityId": "getInventory",
+          "request": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseKey": "T16-provisional-holds"
+            },
+            "action": "SELL",
+            "customerId": {
+              "$alias": "CUSTOMER"
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z"
+          },
+          "evidenceRefs": [
+            "denied-api:actual-adapter-artifact"
+          ]
+        },
+        {
+          "id": "denied-db",
+          "kind": "observe",
+          "observation": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseKey": "T16-provisional-holds"
+            },
+            "snapshotRef": {
+              "$result": {
+                "actionId": "denied-api",
+                "pointer": "/response/snapshotRevision"
+              }
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z",
+            "sources": [
+              "segments",
+              "movements",
+              "genealogy",
+              "allocations",
+              "obligations",
+              "assignments",
+              "restrictions",
+              "dispositionBases",
+              "audit",
+              "outbox",
+              "commandResults",
+              "events",
+              "evidenceLinks",
+              "logisticsMemberships",
+              "shipments",
+              "intakes",
+              "stocktakes",
+              "decisions",
+              "locks",
+              "retryAttempts",
+              "dbPrivileges",
+              "boundaries",
+              "transactions"
+            ]
+          },
+          "evidenceRefs": [
+            "denied-db:actual-adapter-artifact"
+          ]
+        },
+        {
+          "id": "qc-release",
+          "kind": "invoke",
+          "actorRef": "qc",
+          "route": "api",
+          "capabilityId": "releaseHold",
+          "request": {
+            "intentKind": "COMMAND",
+            "definitionVersion": "ontology-v1",
+            "capabilityId": "releaseHold",
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "subjectRefs": [
+              {
+                "type": "QuantitySegment",
+                "id": {
+                  "$result": {
+                    "actionId": "confirm",
+                    "pointer": "/response/segmentId"
+                  }
+                }
+              }
+            ],
+            "slots": {
+              "restrictionId": {
+                "$result": {
+                  "actionId": "qc-hold",
+                  "pointer": "/response/restrictionId"
+                }
+              },
+              "quantity": {
+                "value": "20",
+                "unit": "BOX",
+                "provenance": "USER"
+              },
+              "decisionEvidenceId": {
+                "$alias": "qc-proof"
+              }
+            },
+            "expectedRevision": {
+              "$result": {
+                "actionId": "recall-hold",
+                "pointer": "/response/revision"
+              }
+            },
+            "commandIdempotencyKey": "T16-provisional-holds-qc-release",
+            "evidenceRefs": [
+              {
+                "$alias": "operation-proof"
+              }
+            ],
+            "valueProvenance": "USER"
+          },
+          "evidenceRefs": [
+            "qc-release:actual-adapter-artifact"
+          ]
+        },
+        {
+          "id": "after-api",
+          "kind": "query",
+          "actorRef": "warehouse",
+          "route": "api",
+          "capabilityId": "getInventory",
+          "request": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseKey": "T16-provisional-holds"
+            },
+            "action": "SELL",
+            "customerId": {
+              "$alias": "CUSTOMER"
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z"
+          },
+          "evidenceRefs": [
+            "after-api:actual-adapter-artifact"
+          ]
+        },
+        {
+          "id": "after-db",
+          "kind": "observe",
+          "observation": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseKey": "T16-provisional-holds"
+            },
+            "snapshotRef": {
+              "$result": {
+                "actionId": "after-api",
+                "pointer": "/response/snapshotRevision"
+              }
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z",
+            "sources": [
+              "segments",
+              "movements",
+              "genealogy",
+              "allocations",
+              "obligations",
+              "assignments",
+              "restrictions",
+              "dispositionBases",
+              "audit",
+              "outbox",
+              "commandResults",
+              "events",
+              "evidenceLinks",
+              "logisticsMemberships",
+              "shipments",
+              "intakes",
+              "stocktakes",
+              "decisions",
+              "locks",
+              "retryAttempts",
+              "dbPrivileges",
+              "boundaries",
+              "transactions"
+            ]
+          },
+          "evidenceRefs": [
+            "after-db:actual-adapter-artifact"
+          ]
+        }
+      ],
+      "assertions": [
+        {
+          "id": "provisional-eligible-1",
+          "op": "decimalEquals",
+          "source": {
+            "actionId": "provisional-api",
+            "pointer": "/response/data/eligibleQuantity"
+          },
+          "expected": "0",
+          "requirementRefs": [
+            "D16"
+          ],
+          "evidenceRefs": [
+            "provisional-api:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseKey": "T16-provisional-holds"
+          },
+          "oracleExplanation": "실물량·단위와 독립 손계산을 대조한다.",
+          "oracleRef": {
+            "oracleId": "T16.provisional-and-independent-holds",
+            "observationNames": [
+              "provisional-eligible"
+            ]
+          },
+          "unit": "BOX",
+          "unitSource": {
+            "actionId": "provisional-api",
+            "pointer": "/response/data/unit"
+          }
+        },
+        {
+          "id": "provisional-eligible-2",
+          "op": "relationSet",
+          "source": {
+            "actionId": "provisional-db",
+            "pointer": "/data/rawRows/intakes",
+            "field": [
+              "id",
+              "identification",
+              "claimedQuantity",
+              "unit"
+            ]
+          },
+          "expected": [
+            [
+              {
+                "$result": {
+                  "actionId": "provisional",
+                  "pointer": "/response/requestId"
+                }
+              },
+              "UNVERIFIED",
+              "60",
+              "BOX"
+            ]
+          ],
+          "requirementRefs": [
+            "D16"
+          ],
+          "evidenceRefs": [
+            "provisional-db:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseKey": "T16-provisional-holds"
+          },
+          "oracleExplanation": "독립 원 행의 실물·수량·관계·범위를 정확히 대조한다.",
+          "oracleRef": {
+            "oracleId": "T16.provisional-and-independent-holds",
+            "observationNames": [
+              "provisional-eligible"
+            ]
+          }
+        },
+        {
+          "id": "receipt-transit-double-creation-3",
+          "op": "sumEquals",
+          "source": {
+            "actionId": "provisional-db",
+            "pointer": "/data/rawRows/segments",
+            "where": {
+              "active": true
+            },
+            "field": "quantity"
+          },
+          "expected": "60",
+          "requirementRefs": [
+            "D16"
+          ],
+          "evidenceRefs": [
+            "provisional-db:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseKey": "T16-provisional-holds"
+          },
+          "oracleExplanation": "독립 원 행을 해당 범위에서 합산하며 부모와 자식을 이중 합산하지 않는다.",
+          "oracleRef": {
+            "oracleId": "T16.provisional-and-independent-holds",
+            "observationNames": [
+              "receipt-transit-double-creation"
+            ]
+          },
+          "unit": "BOX",
+          "unitSource": {
+            "actionId": "provisional-db",
+            "pointer": "/data/rawRows/segments",
+            "where": {
+              "active": true
+            },
+            "field": "unit"
+          }
+        },
+        {
+          "id": "receipt-transit-double-creation-4",
+          "op": "decimalEquals",
+          "source": {
+            "actionId": "confirmed-api",
+            "pointer": "/response/data/heldQuantity"
+          },
+          "expected": "60",
+          "requirementRefs": [
+            "D16"
+          ],
+          "evidenceRefs": [
+            "confirmed-api:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseKey": "T16-provisional-holds"
+          },
+          "oracleExplanation": "실물량·단위와 독립 손계산을 대조한다.",
+          "oracleRef": {
+            "oracleId": "T16.provisional-and-independent-holds",
+            "observationNames": [
+              "receipt-transit-double-creation"
+            ]
+          },
+          "unit": "BOX",
+          "unitSource": {
+            "actionId": "confirmed-api",
+            "pointer": "/response/data/unit"
+          }
+        },
+        {
+          "id": "receipt-transit-double-creation-5",
+          "op": "sumEquals",
+          "source": {
+            "actionId": "confirmed-db",
+            "pointer": "/data/rawRows/segments",
+            "where": {
+              "active": true
+            },
+            "field": "quantity"
+          },
+          "expected": "60",
+          "requirementRefs": [
+            "D16"
+          ],
+          "evidenceRefs": [
+            "confirmed-db:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseKey": "T16-provisional-holds"
+          },
+          "oracleExplanation": "실물량·단위와 독립 손계산을 대조한다.",
+          "oracleRef": {
+            "oracleId": "T16.provisional-and-independent-holds",
+            "observationNames": [
+              "receipt-transit-double-creation"
+            ]
+          },
+          "unit": "BOX",
+          "unitSource": {
+            "actionId": "confirmed-db",
+            "pointer": "/data/rawRows/segments",
+            "where": {
+              "active": true
+            },
+            "field": "unit"
+          }
+        },
+        {
+          "id": "receipt-transit-double-creation-6",
+          "op": "count",
+          "source": {
+            "actionId": "confirmed-db",
+            "pointer": "/data/rawRows/events",
+            "where": {
+              "canonicalOccurrenceKey": "T16-RECEIPT60",
+              "kind": "RECEIPT_CONFIRMED"
+            }
+          },
+          "expected": 1,
+          "requirementRefs": [
+            "D16"
+          ],
+          "evidenceRefs": [
+            "confirmed-db:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseKey": "T16-provisional-holds"
+          },
+          "oracleExplanation": "독립 원 행의 실물·수량·관계·범위를 정확히 대조한다.",
+          "oracleRef": {
+            "oracleId": "T16.provisional-and-independent-holds",
+            "observationNames": [
+              "receipt-transit-double-creation"
+            ]
+          }
+        },
+        {
+          "id": "receipt-transit-double-creation-7",
+          "op": "count",
+          "source": {
+            "actionId": "confirmed-db",
+            "pointer": "/data/rawRows/segments",
+            "where": {
+              "active": true,
+              "locationId": {
+                "$alias": "PORT"
+              }
+            }
+          },
+          "expected": 0,
+          "requirementRefs": [
+            "D16"
+          ],
+          "evidenceRefs": [
+            "confirmed-db:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseKey": "T16-provisional-holds"
+          },
+          "oracleExplanation": "독립 원 행의 실물·수량·관계·범위를 정확히 대조한다.",
+          "oracleRef": {
+            "oracleId": "T16.provisional-and-independent-holds",
+            "observationNames": [
+              "receipt-transit-double-creation"
+            ]
+          }
+        },
+        {
+          "id": "hold-authority-8",
+          "op": "equals",
+          "source": {
+            "actionId": "ordinary-release",
+            "pointer": "/response/outcome"
+          },
+          "expected": "REJECTED",
+          "requirementRefs": [
+            "D16"
+          ],
+          "evidenceRefs": [
+            "ordinary-release:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseKey": "T16-provisional-holds"
+          },
+          "oracleExplanation": "공개 명령의 구조화 outcome을 확인한다.",
+          "oracleRef": {
+            "oracleId": "T16.provisional-and-independent-holds",
+            "observationNames": [
+              "hold-authority"
+            ]
+          }
+        },
+        {
+          "id": "hold-authority-9",
+          "op": "equals",
+          "source": {
+            "actionId": "ordinary-release",
+            "pointer": "/response/errorCode"
+          },
+          "expected": "FORBIDDEN",
+          "requirementRefs": [
+            "D16"
+          ],
+          "evidenceRefs": [
+            "ordinary-release:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseKey": "T16-provisional-holds"
+          },
+          "oracleExplanation": "검증 실패를 해당 오류 코드로 구별한다.",
+          "oracleRef": {
+            "oracleId": "T16.provisional-and-independent-holds",
+            "observationNames": [
+              "hold-authority"
+            ]
+          }
+        },
+        {
+          "id": "hold-authority-10",
+          "op": "sameAs",
+          "source": {
+            "actionId": "denied-db",
+            "pointer": "/data/rawRows/restrictions"
+          },
+          "expected": true,
+          "requirementRefs": [
+            "D16"
+          ],
+          "evidenceRefs": [
+            "denied-db:actual-adapter-artifact",
+            "held-db:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseKey": "T16-provisional-holds"
+          },
+          "oracleExplanation": "금지 효과의 동일 scope 전후 원 행을 비교한다. 조회/거부 감사는 별도 scope다.",
+          "oracleRef": {
+            "oracleId": "T16.provisional-and-independent-holds",
+            "observationNames": [
+              "hold-authority"
+            ]
+          },
+          "baseline": {
+            "actionId": "held-db",
+            "pointer": "/data/rawRows/restrictions"
+          }
+        },
+        {
+          "id": "hold-authority-11",
+          "op": "sameAs",
+          "source": {
+            "actionId": "denied-db",
+            "pointer": "/data/rawRows/segments"
+          },
+          "expected": true,
+          "requirementRefs": [
+            "D16"
+          ],
+          "evidenceRefs": [
+            "denied-db:actual-adapter-artifact",
+            "held-db:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseKey": "T16-provisional-holds"
+          },
+          "oracleExplanation": "금지 효과의 동일 scope 전후 원 행을 비교한다. 조회/거부 감사는 별도 scope다.",
+          "oracleRef": {
+            "oracleId": "T16.provisional-and-independent-holds",
+            "observationNames": [
+              "hold-authority"
+            ]
+          },
+          "baseline": {
+            "actionId": "held-db",
+            "pointer": "/data/rawRows/segments"
+          }
+        },
+        {
+          "id": "hold-authority-12",
+          "op": "count",
+          "source": {
+            "actionId": "denied-db",
+            "pointer": "/data/rawRows/audit",
+            "where": {
+              "commandKey": "T16-provisional-holds-ordinary-release",
+              "outcome": "REJECTED"
+            }
+          },
+          "expected": 1,
+          "requirementRefs": [
+            "D16"
+          ],
+          "evidenceRefs": [
+            "denied-db:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseKey": "T16-provisional-holds"
+          },
+          "oracleExplanation": "허용된 denial 감사1과 금지된 업무 효과0을 분리한다.",
+          "oracleRef": {
+            "oracleId": "T16.provisional-and-independent-holds",
+            "observationNames": [
+              "hold-authority"
+            ]
+          }
+        },
+        {
+          "id": "eligible-after-QC-only-release-13",
+          "op": "decimalEquals",
+          "source": {
+            "actionId": "after-api",
+            "pointer": "/response/data/eligibleQuantity"
+          },
+          "expected": "0",
+          "requirementRefs": [
+            "D16"
+          ],
+          "evidenceRefs": [
+            "after-api:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseKey": "T16-provisional-holds"
+          },
+          "oracleExplanation": "실물량·단위와 독립 손계산을 대조한다.",
+          "oracleRef": {
+            "oracleId": "T16.provisional-and-independent-holds",
+            "observationNames": [
+              "eligible-after-QC-only-release"
+            ]
+          },
+          "unit": "BOX",
+          "unitSource": {
+            "actionId": "after-api",
+            "pointer": "/response/data/unit"
+          }
+        },
+        {
+          "id": "remaining-recall-14",
+          "op": "equals",
+          "source": {
+            "actionId": "after-db",
+            "pointer": "/data/rawRows/restrictions",
+            "where": {
+              "id": {
+                "$result": {
+                  "actionId": "recall-hold",
+                  "pointer": "/response/restrictionId"
+                }
+              }
+            },
+            "field": "state"
+          },
+          "expected": [
+            "ACTIVE"
+          ],
+          "requirementRefs": [
+            "D16"
+          ],
+          "evidenceRefs": [
+            "after-db:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseKey": "T16-provisional-holds"
+          },
+          "oracleExplanation": "독립 원 행의 실물·수량·관계·범위를 정확히 대조한다.",
+          "oracleRef": {
+            "oracleId": "T16.provisional-and-independent-holds",
+            "observationNames": [
+              "remaining-recall"
+            ]
+          }
+        },
+        {
+          "id": "hold-authority-15",
+          "op": "relationSet",
+          "source": {
+            "actionId": "after-db",
+            "pointer": "/data/rawRows/restrictions",
+            "field": [
+              "id",
+              "state",
+              "decisionMakerId"
+            ]
+          },
+          "expected": [
+            [
+              {
+                "$result": {
+                  "actionId": "qc-hold",
+                  "pointer": "/response/restrictionId"
+                }
+              },
+              "RELEASED",
+              {
+                "$alias": "qc"
+              }
+            ],
+            [
+              {
+                "$result": {
+                  "actionId": "recall-hold",
+                  "pointer": "/response/restrictionId"
+                }
+              },
+              "ACTIVE",
+              {
+                "$alias": "admin"
+              }
+            ]
+          ],
+          "requirementRefs": [
+            "D16"
+          ],
+          "evidenceRefs": [
+            "after-db:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseKey": "T16-provisional-holds"
+          },
+          "oracleExplanation": "독립 원 행의 실물·수량·관계·범위를 정확히 대조한다.",
+          "oracleRef": {
+            "oracleId": "T16.provisional-and-independent-holds",
+            "observationNames": [
+              "hold-authority"
+            ]
+          }
+        },
+        {
+          "id": "active-physical-identities",
+          "op": "unique",
+          "source": {
+            "actionId": "after-db",
+            "pointer": "/data/rawRows/segments",
+            "where": {
+              "active": true
+            },
+            "field": "physicalScope"
+          },
+          "expected": true,
+          "requirementRefs": [
+            "D16"
+          ],
+          "evidenceRefs": [
+            "provisional-api:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseKey": "T16-provisional-holds"
+          },
+          "oracleExplanation": "현재 active 실물 identity를 한 번씩만 합산하며 중복 실물은 거부한다.",
+          "oracleRef": {
+            "oracleId": "T16.provisional-and-independent-holds",
+            "observationNames": [
+              "provisional-eligible"
+            ]
+          }
+        },
+        {
+          "id": "response-definition-version",
+          "op": "equals",
+          "source": {
+            "actionId": "after-api",
+            "pointer": "/response/definitionVersion"
+          },
+          "expected": "ontology-v1",
+          "requirementRefs": [
+            "D16"
+          ],
+          "evidenceRefs": [
+            "provisional-api:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseKey": "T16-provisional-holds"
+          },
+          "oracleExplanation": "수량/제한을 읽는 실제 정의 버전은 고정 v1이며 다른 의미로 대체하지 않는다.",
+          "oracleRef": {
+            "oracleId": "T16.provisional-and-independent-holds",
+            "observationNames": [
+              "provisional-eligible"
+            ]
+          }
+        },
+        {
+          "id": "ordinary-proposal-recorded",
+          "op": "equals",
+          "source": {
+            "actionId": "ordinary-hold-proposal",
+            "pointer": "/response/outcome"
+          },
+          "expected": "APPLIED",
+          "requirementRefs": [
+            "D16"
+          ],
+          "evidenceRefs": [
+            "provisional-api:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseKey": "T16-provisional-holds"
+          },
+          "oracleExplanation": "일반 scoped RECORD는 QC 제안과 근거를 보존할 수 있다.",
+          "oracleRef": {
+            "oracleId": "T16.provisional-and-independent-holds",
+            "observationNames": [
+              "hold-authority"
+            ]
+          }
+        },
+        {
+          "id": "ordinary-cannot-place-qc-hold",
+          "op": "equals",
+          "source": {
+            "actionId": "ordinary-hold",
+            "pointer": "/response/outcome"
+          },
+          "expected": "REJECTED",
+          "requirementRefs": [
+            "D16"
+          ],
+          "evidenceRefs": [
+            "provisional-api:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseKey": "T16-provisional-holds"
+          },
+          "oracleExplanation": "일반 Agent는 QC 제한의 실제 결정을 할 수 없다.",
+          "oracleRef": {
+            "oracleId": "T16.provisional-and-independent-holds",
+            "observationNames": [
+              "hold-authority"
+            ]
+          }
+        },
+        {
+          "id": "ordinary-qc-proposal-evidence",
+          "op": "relationSet",
+          "source": {
+            "actionId": "after-db",
+            "pointer": "/data/rawRows/events",
+            "where": {
+              "kind": "QC_HOLD_PROPOSAL"
+            },
+            "field": [
+              "id",
+              "kind",
+              "actorId"
+            ]
+          },
+          "expected": [
+            [
+              {
+                "$result": {
+                  "actionId": "ordinary-hold-proposal",
+                  "pointer": "/response/activityId"
+                }
+              },
+              "QC_HOLD_PROPOSAL",
+              {
+                "$alias": "ordinary"
+              }
+            ]
+          ],
+          "requirementRefs": [
+            "D16"
+          ],
+          "evidenceRefs": [
+            "provisional-api:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseKey": "T16-provisional-holds"
+          },
+          "oracleExplanation": "QC 제안은 문서/사건으로 남지만 QC 결정으로 승격하지 않는다.",
+          "oracleRef": {
+            "oracleId": "T16.provisional-and-independent-holds",
+            "observationNames": [
+              "hold-authority"
+            ]
+          }
+        },
+        {
+          "id": "actual-baseline-physical-rows",
+          "op": "relationSet",
+          "source": {
+            "actionId": "before-db",
+            "pointer": "/data/rawRows/segments",
+            "where": {
+              "active": true
+            },
+            "field": [
+              "id",
+              "quantity",
+              "unit"
+            ]
+          },
+          "expected": [
+            [
+              {
+                "$alias": "TRANSIT60"
+              },
+              "60",
+              "BOX"
+            ]
+          ],
+          "requirementRefs": [
+            "D16"
+          ],
+          "evidenceRefs": [
+            "provisional-api:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseKey": "T16-provisional-holds"
+          },
+          "oracleExplanation": "서버에 실제 설치된 시작 실물의 ID·decimal·unit을 원 행에서 확인한다. baseline 자체는 업무 실행 coverage가 아니다.",
+          "oracleRef": {
+            "oracleId": "T16.provisional-and-independent-holds",
+            "observationNames": [
+              "provisional-eligible"
+            ]
+          }
+        }
+      ],
+      "oracleExplanation": "운송 실물60은 확인 수령에서 이동하며 재생성되지 않는다. QC20만 해제해도 회수60은ACTIVE라 판매0이다."
+    },
+    {
+      "id": "stocktake-adjust-move",
+      "title": "실사98은 관측이며 MANAGER 조정2 뒤 내부20 이동에도 총98이다",
+      "fixtureRef": "verification/cases/T16/fixtures/stocktake-adjust-move.json",
+      "requiredAdapters": [
+        "fixture",
+        "api",
+        "db"
+      ],
+      "actions": [
+        {
+          "id": "setup",
+          "kind": "installFixture",
+          "fixtureRef": "verification/cases/T16/fixtures/stocktake-adjust-move.json",
+          "evidenceRefs": [
+            "setup:actual-adapter-artifact"
+          ]
+        },
+        {
+          "id": "before-api",
+          "kind": "query",
+          "actorRef": "warehouse",
+          "route": "api",
+          "capabilityId": "getInventory",
+          "request": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseKey": "T16-stocktake-adjust-move",
+              "rawRowsOrder": {
+                "movements": [
+                  "ledgerSequence"
+                ]
+              }
+            },
+            "action": "SELL",
+            "customerId": {
+              "$alias": "CUSTOMER"
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z"
+          },
+          "evidenceRefs": [
+            "before-api:actual-adapter-artifact"
+          ]
+        },
+        {
+          "id": "before-db",
+          "kind": "observe",
+          "observation": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseKey": "T16-stocktake-adjust-move",
+              "rawRowsOrder": {
+                "movements": [
+                  "ledgerSequence"
+                ]
+              }
+            },
+            "snapshotRef": {
+              "$result": {
+                "actionId": "before-api",
+                "pointer": "/response/snapshotRevision"
+              }
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z",
+            "sources": [
+              "segments",
+              "movements",
+              "genealogy",
+              "allocations",
+              "obligations",
+              "assignments",
+              "restrictions",
+              "dispositionBases",
+              "audit",
+              "outbox",
+              "commandResults",
+              "events",
+              "evidenceLinks",
+              "logisticsMemberships",
+              "shipments",
+              "intakes",
+              "stocktakes",
+              "decisions",
+              "locks",
+              "retryAttempts",
+              "dbPrivileges",
+              "boundaries",
+              "transactions"
+            ]
+          },
+          "evidenceRefs": [
+            "before-db:actual-adapter-artifact"
+          ]
+        },
+        {
+          "id": "stocktake",
+          "kind": "invoke",
+          "actorRef": "recorder",
+          "route": "api",
+          "capabilityId": "recordStocktake",
+          "request": {
+            "intentKind": "RECORD",
+            "definitionVersion": "ontology-v1",
+            "capabilityId": "recordStocktake",
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "subjectRefs": [
+              {
+                "type": "QuantitySegment",
+                "id": {
+                  "$alias": "Q100"
+                }
+              }
+            ],
+            "slots": {
+              "observedQuantity": {
+                "value": "98",
+                "unit": "BOX",
+                "provenance": "USER"
+              },
+              "locationId": {
+                "$alias": "W"
+              },
+              "evidenceId": {
+                "$alias": "stocktake-proof"
+              }
+            },
+            "expectedRevision": 1,
+            "commandIdempotencyKey": "T16-stocktake-adjust-move-stocktake",
+            "evidenceRefs": [
+              {
+                "$alias": "operation-proof"
+              }
+            ],
+            "valueProvenance": "USER"
+          },
+          "evidenceRefs": [
+            "stocktake:actual-adapter-artifact"
+          ]
+        },
+        {
+          "id": "counted-api",
+          "kind": "query",
+          "actorRef": "warehouse",
+          "route": "api",
+          "capabilityId": "getInventory",
+          "request": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseKey": "T16-stocktake-adjust-move",
+              "rawRowsOrder": {
+                "movements": [
+                  "ledgerSequence"
+                ]
+              }
+            },
+            "action": "SELL",
+            "customerId": {
+              "$alias": "CUSTOMER"
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z"
+          },
+          "evidenceRefs": [
+            "counted-api:actual-adapter-artifact"
+          ]
+        },
+        {
+          "id": "counted-db",
+          "kind": "observe",
+          "observation": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseKey": "T16-stocktake-adjust-move",
+              "rawRowsOrder": {
+                "movements": [
+                  "ledgerSequence"
+                ]
+              }
+            },
+            "snapshotRef": {
+              "$result": {
+                "actionId": "counted-api",
+                "pointer": "/response/snapshotRevision"
+              }
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z",
+            "sources": [
+              "segments",
+              "movements",
+              "genealogy",
+              "allocations",
+              "obligations",
+              "assignments",
+              "restrictions",
+              "dispositionBases",
+              "audit",
+              "outbox",
+              "commandResults",
+              "events",
+              "evidenceLinks",
+              "logisticsMemberships",
+              "shipments",
+              "intakes",
+              "stocktakes",
+              "decisions",
+              "locks",
+              "retryAttempts",
+              "dbPrivileges",
+              "boundaries",
+              "transactions"
+            ]
+          },
+          "evidenceRefs": [
+            "counted-db:actual-adapter-artifact"
+          ]
+        },
+        {
+          "id": "ordinary-adjust",
+          "kind": "invoke",
+          "actorRef": "ordinary",
+          "route": "api",
+          "capabilityId": "adjustQuantity",
+          "request": {
+            "intentKind": "COMMAND",
+            "definitionVersion": "ontology-v1",
+            "capabilityId": "adjustQuantity",
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "subjectRefs": [
+              {
+                "type": "QuantitySegment",
+                "id": {
+                  "$alias": "Q100"
+                }
+              }
+            ],
+            "slots": {
+              "decrease": {
+                "value": "2",
+                "unit": "BOX",
+                "provenance": "USER"
+              },
+              "stocktakeId": {
+                "$result": {
+                  "actionId": "stocktake",
+                  "pointer": "/response/activityId"
+                }
+              },
+              "reason": "실사 차이"
+            },
+            "expectedRevision": {
+              "$result": {
+                "actionId": "stocktake",
+                "pointer": "/response/revision"
+              }
+            },
+            "commandIdempotencyKey": "T16-stocktake-adjust-move-ordinary-adjust",
+            "evidenceRefs": [
+              {
+                "$alias": "operation-proof"
+              }
+            ],
+            "valueProvenance": "USER"
+          },
+          "evidenceRefs": [
+            "ordinary-adjust:actual-adapter-artifact"
+          ]
+        },
+        {
+          "id": "denied-api",
+          "kind": "query",
+          "actorRef": "warehouse",
+          "route": "api",
+          "capabilityId": "getInventory",
+          "request": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseKey": "T16-stocktake-adjust-move",
+              "rawRowsOrder": {
+                "movements": [
+                  "ledgerSequence"
+                ]
+              }
+            },
+            "action": "SELL",
+            "customerId": {
+              "$alias": "CUSTOMER"
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z"
+          },
+          "evidenceRefs": [
+            "denied-api:actual-adapter-artifact"
+          ]
+        },
+        {
+          "id": "denied-db",
+          "kind": "observe",
+          "observation": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseKey": "T16-stocktake-adjust-move",
+              "rawRowsOrder": {
+                "movements": [
+                  "ledgerSequence"
+                ]
+              }
+            },
+            "snapshotRef": {
+              "$result": {
+                "actionId": "denied-api",
+                "pointer": "/response/snapshotRevision"
+              }
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z",
+            "sources": [
+              "segments",
+              "movements",
+              "genealogy",
+              "allocations",
+              "obligations",
+              "assignments",
+              "restrictions",
+              "dispositionBases",
+              "audit",
+              "outbox",
+              "commandResults",
+              "events",
+              "evidenceLinks",
+              "logisticsMemberships",
+              "shipments",
+              "intakes",
+              "stocktakes",
+              "decisions",
+              "locks",
+              "retryAttempts",
+              "dbPrivileges",
+              "boundaries",
+              "transactions"
+            ]
+          },
+          "evidenceRefs": [
+            "denied-db:actual-adapter-artifact"
+          ]
+        },
+        {
+          "id": "adjust",
+          "kind": "invoke",
+          "actorRef": "manager",
+          "route": "api",
+          "capabilityId": "adjustQuantity",
+          "request": {
+            "intentKind": "COMMAND",
+            "definitionVersion": "ontology-v1",
+            "capabilityId": "adjustQuantity",
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "subjectRefs": [
+              {
+                "type": "QuantitySegment",
+                "id": {
+                  "$alias": "Q100"
+                }
+              }
+            ],
+            "slots": {
+              "decrease": {
+                "value": "2",
+                "unit": "BOX",
+                "provenance": "USER"
+              },
+              "stocktakeId": {
+                "$result": {
+                  "actionId": "stocktake",
+                  "pointer": "/response/activityId"
+                }
+              },
+              "reason": "실사 차이 대조 확인",
+              "decisionEvidenceId": {
+                "$alias": "management-proof"
+              }
+            },
+            "expectedRevision": {
+              "$result": {
+                "actionId": "stocktake",
+                "pointer": "/response/revision"
+              }
+            },
+            "commandIdempotencyKey": "T16-stocktake-adjust-move-adjust",
+            "evidenceRefs": [
+              {
+                "$alias": "operation-proof"
+              }
+            ],
+            "valueProvenance": "USER"
+          },
+          "evidenceRefs": [
+            "adjust:actual-adapter-artifact"
+          ]
+        },
+        {
+          "id": "adjusted-api",
+          "kind": "query",
+          "actorRef": "warehouse",
+          "route": "api",
+          "capabilityId": "getInventory",
+          "request": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseKey": "T16-stocktake-adjust-move",
+              "rawRowsOrder": {
+                "movements": [
+                  "ledgerSequence"
+                ]
+              }
+            },
+            "action": "SELL",
+            "customerId": {
+              "$alias": "CUSTOMER"
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z"
+          },
+          "evidenceRefs": [
+            "adjusted-api:actual-adapter-artifact"
+          ]
+        },
+        {
+          "id": "adjusted-db",
+          "kind": "observe",
+          "observation": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseKey": "T16-stocktake-adjust-move",
+              "rawRowsOrder": {
+                "movements": [
+                  "ledgerSequence"
+                ]
+              }
+            },
+            "snapshotRef": {
+              "$result": {
+                "actionId": "adjusted-api",
+                "pointer": "/response/snapshotRevision"
+              }
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z",
+            "sources": [
+              "segments",
+              "movements",
+              "genealogy",
+              "allocations",
+              "obligations",
+              "assignments",
+              "restrictions",
+              "dispositionBases",
+              "audit",
+              "outbox",
+              "commandResults",
+              "events",
+              "evidenceLinks",
+              "logisticsMemberships",
+              "shipments",
+              "intakes",
+              "stocktakes",
+              "decisions",
+              "locks",
+              "retryAttempts",
+              "dbPrivileges",
+              "boundaries",
+              "transactions"
+            ]
+          },
+          "evidenceRefs": [
+            "adjusted-db:actual-adapter-artifact"
+          ]
+        },
+        {
+          "id": "split",
+          "kind": "invoke",
+          "actorRef": "warehouse",
+          "route": "api",
+          "capabilityId": "splitQuantity",
+          "request": {
+            "intentKind": "COMMAND",
+            "definitionVersion": "ontology-v1",
+            "capabilityId": "splitQuantity",
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "subjectRefs": [
+              {
+                "type": "QuantitySegment",
+                "id": {
+                  "$alias": "Q100"
+                }
+              }
+            ],
+            "slots": {
+              "children": [
+                {
+                  "value": "20",
+                  "unit": "BOX",
+                  "provenance": "USER"
+                },
+                {
+                  "value": "78",
+                  "unit": "BOX",
+                  "provenance": "USER"
+                }
+              ],
+              "loss": {
+                "value": "0",
+                "unit": "BOX",
+                "provenance": "USER"
+              }
+            },
+            "expectedRevision": {
+              "$result": {
+                "actionId": "adjust",
+                "pointer": "/response/revision"
+              }
+            },
+            "commandIdempotencyKey": "T16-stocktake-adjust-move-split",
+            "evidenceRefs": [
+              {
+                "$alias": "operation-proof"
+              }
+            ],
+            "valueProvenance": "USER"
+          },
+          "evidenceRefs": [
+            "split:actual-adapter-artifact"
+          ]
+        },
+        {
+          "id": "move",
+          "kind": "invoke",
+          "actorRef": "warehouse",
+          "route": "api",
+          "capabilityId": "moveQuantity",
+          "request": {
+            "intentKind": "COMMAND",
+            "definitionVersion": "ontology-v1",
+            "capabilityId": "moveQuantity",
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "subjectRefs": [
+              {
+                "type": "QuantitySegment",
+                "id": {
+                  "$result": {
+                    "actionId": "split",
+                    "pointer": "/response/children/0/segmentId"
+                  }
+                }
+              }
+            ],
+            "slots": {
+              "quantity": {
+                "value": "20",
+                "unit": "BOX",
+                "provenance": "USER"
+              },
+              "destinationId": {
+                "$alias": "W2"
+              },
+              "custodianId": {
+                "$alias": "CUSTODIAN"
+              }
+            },
+            "expectedRevision": {
+              "$result": {
+                "actionId": "split",
+                "pointer": "/response/revision"
+              }
+            },
+            "commandIdempotencyKey": "T16-stocktake-adjust-move-move",
+            "evidenceRefs": [
+              {
+                "$alias": "operation-proof"
+              }
+            ],
+            "valueProvenance": "USER"
+          },
+          "evidenceRefs": [
+            "move:actual-adapter-artifact"
+          ]
+        },
+        {
+          "id": "after-api",
+          "kind": "query",
+          "actorRef": "warehouse",
+          "route": "api",
+          "capabilityId": "getInventory",
+          "request": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseKey": "T16-stocktake-adjust-move",
+              "rawRowsOrder": {
+                "movements": [
+                  "ledgerSequence"
+                ]
+              }
+            },
+            "action": "SELL",
+            "customerId": {
+              "$alias": "CUSTOMER"
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z"
+          },
+          "evidenceRefs": [
+            "after-api:actual-adapter-artifact"
+          ]
+        },
+        {
+          "id": "after-db",
+          "kind": "observe",
+          "observation": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseKey": "T16-stocktake-adjust-move",
+              "rawRowsOrder": {
+                "movements": [
+                  "ledgerSequence"
+                ]
+              }
+            },
+            "snapshotRef": {
+              "$result": {
+                "actionId": "after-api",
+                "pointer": "/response/snapshotRevision"
+              }
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z",
+            "sources": [
+              "segments",
+              "movements",
+              "genealogy",
+              "allocations",
+              "obligations",
+              "assignments",
+              "restrictions",
+              "dispositionBases",
+              "audit",
+              "outbox",
+              "commandResults",
+              "events",
+              "evidenceLinks",
+              "logisticsMemberships",
+              "shipments",
+              "intakes",
+              "stocktakes",
+              "decisions",
+              "locks",
+              "retryAttempts",
+              "dbPrivileges",
+              "boundaries",
+              "transactions"
+            ]
+          },
+          "evidenceRefs": [
+            "after-db:actual-adapter-artifact"
+          ]
+        }
+      ],
+      "assertions": [
+        {
+          "id": "held-before-adjustment-1",
+          "op": "decimalEquals",
+          "source": {
+            "actionId": "counted-api",
+            "pointer": "/response/data/heldQuantity"
+          },
+          "expected": "100",
+          "requirementRefs": [
+            "D16"
+          ],
+          "evidenceRefs": [
+            "counted-api:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseKey": "T16-stocktake-adjust-move",
+            "rawRowsOrder": {
+              "movements": [
+                "ledgerSequence"
+              ]
+            }
+          },
+          "oracleExplanation": "실물량·단위와 독립 손계산을 대조한다.",
+          "oracleRef": {
+            "oracleId": "T16.movement-stocktake-adjustment",
+            "observationNames": [
+              "held-before-adjustment"
+            ]
+          },
+          "unit": "BOX",
+          "unitSource": {
+            "actionId": "counted-api",
+            "pointer": "/response/data/unit"
+          }
+        },
+        {
+          "id": "held-before-adjustment-2",
+          "op": "sumEquals",
+          "source": {
+            "actionId": "counted-db",
+            "pointer": "/data/rawRows/segments",
+            "where": {
+              "active": true
+            },
+            "field": "quantity"
+          },
+          "expected": "100",
+          "requirementRefs": [
+            "D16"
+          ],
+          "evidenceRefs": [
+            "counted-db:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseKey": "T16-stocktake-adjust-move",
+            "rawRowsOrder": {
+              "movements": [
+                "ledgerSequence"
+              ]
+            }
+          },
+          "oracleExplanation": "실물량·단위와 독립 손계산을 대조한다.",
+          "oracleRef": {
+            "oracleId": "T16.movement-stocktake-adjustment",
+            "observationNames": [
+              "held-before-adjustment"
+            ]
+          },
+          "unit": "BOX",
+          "unitSource": {
+            "actionId": "counted-db",
+            "pointer": "/data/rawRows/segments",
+            "where": {
+              "active": true
+            },
+            "field": "unit"
+          }
+        },
+        {
+          "id": "adjustment-proof-3",
+          "op": "relationSet",
+          "source": {
+            "actionId": "counted-db",
+            "pointer": "/data/rawRows/stocktakes",
+            "field": [
+              "observedQuantity",
+              "recordedQuantity",
+              "difference",
+              "unit"
+            ]
+          },
+          "expected": [
+            [
+              "98",
+              "100",
+              "-2",
+              "BOX"
+            ]
+          ],
+          "requirementRefs": [
+            "D16"
+          ],
+          "evidenceRefs": [
+            "counted-db:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseKey": "T16-stocktake-adjust-move",
+            "rawRowsOrder": {
+              "movements": [
+                "ledgerSequence"
+              ]
+            }
+          },
+          "oracleExplanation": "독립 원 행의 실물·수량·관계·범위를 정확히 대조한다.",
+          "oracleRef": {
+            "oracleId": "T16.movement-stocktake-adjustment",
+            "observationNames": [
+              "adjustment-proof"
+            ]
+          }
+        },
+        {
+          "id": "adjustment-proof-4",
+          "op": "equals",
+          "source": {
+            "actionId": "ordinary-adjust",
+            "pointer": "/response/outcome"
+          },
+          "expected": "REJECTED",
+          "requirementRefs": [
+            "D16"
+          ],
+          "evidenceRefs": [
+            "ordinary-adjust:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseKey": "T16-stocktake-adjust-move",
+            "rawRowsOrder": {
+              "movements": [
+                "ledgerSequence"
+              ]
+            }
+          },
+          "oracleExplanation": "공개 명령의 구조화 outcome을 확인한다.",
+          "oracleRef": {
+            "oracleId": "T16.movement-stocktake-adjustment",
+            "observationNames": [
+              "adjustment-proof"
+            ]
+          }
+        },
+        {
+          "id": "adjustment-proof-5",
+          "op": "equals",
+          "source": {
+            "actionId": "ordinary-adjust",
+            "pointer": "/response/errorCode"
+          },
+          "expected": "FORBIDDEN",
+          "requirementRefs": [
+            "D16"
+          ],
+          "evidenceRefs": [
+            "ordinary-adjust:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseKey": "T16-stocktake-adjust-move",
+            "rawRowsOrder": {
+              "movements": [
+                "ledgerSequence"
+              ]
+            }
+          },
+          "oracleExplanation": "검증 실패를 해당 오류 코드로 구별한다.",
+          "oracleRef": {
+            "oracleId": "T16.movement-stocktake-adjustment",
+            "observationNames": [
+              "adjustment-proof"
+            ]
+          }
+        },
+        {
+          "id": "adjustment-proof-6",
+          "op": "sameAs",
+          "source": {
+            "actionId": "denied-db",
+            "pointer": "/data/rawRows/segments"
+          },
+          "expected": true,
+          "requirementRefs": [
+            "D16"
+          ],
+          "evidenceRefs": [
+            "denied-db:actual-adapter-artifact",
+            "counted-db:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseKey": "T16-stocktake-adjust-move",
+            "rawRowsOrder": {
+              "movements": [
+                "ledgerSequence"
+              ]
+            }
+          },
+          "oracleExplanation": "금지 효과의 동일 scope 전후 원 행을 비교한다. 조회/거부 감사는 별도 scope다.",
+          "oracleRef": {
+            "oracleId": "T16.movement-stocktake-adjustment",
+            "observationNames": [
+              "adjustment-proof"
+            ]
+          },
+          "baseline": {
+            "actionId": "counted-db",
+            "pointer": "/data/rawRows/segments"
+          }
+        },
+        {
+          "id": "adjustment-proof-7",
+          "op": "sameAs",
+          "source": {
+            "actionId": "denied-db",
+            "pointer": "/data/rawRows/movements"
+          },
+          "expected": true,
+          "requirementRefs": [
+            "D16"
+          ],
+          "evidenceRefs": [
+            "denied-db:actual-adapter-artifact",
+            "counted-db:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseKey": "T16-stocktake-adjust-move",
+            "rawRowsOrder": {
+              "movements": [
+                "ledgerSequence"
+              ]
+            }
+          },
+          "oracleExplanation": "금지 효과의 동일 scope 전후 원 행을 비교한다. 조회/거부 감사는 별도 scope다.",
+          "oracleRef": {
+            "oracleId": "T16.movement-stocktake-adjustment",
+            "observationNames": [
+              "adjustment-proof"
+            ]
+          },
+          "baseline": {
+            "actionId": "counted-db",
+            "pointer": "/data/rawRows/movements"
+          }
+        },
+        {
+          "id": "adjustment-proof-8",
+          "op": "count",
+          "source": {
+            "actionId": "denied-db",
+            "pointer": "/data/rawRows/audit",
+            "where": {
+              "commandKey": "T16-stocktake-adjust-move-ordinary-adjust",
+              "outcome": "REJECTED"
+            }
+          },
+          "expected": 1,
+          "requirementRefs": [
+            "D16"
+          ],
+          "evidenceRefs": [
+            "denied-db:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseKey": "T16-stocktake-adjust-move",
+            "rawRowsOrder": {
+              "movements": [
+                "ledgerSequence"
+              ]
+            }
+          },
+          "oracleExplanation": "허용된 denial 감사1과 금지된 업무 효과0을 분리한다.",
+          "oracleRef": {
+            "oracleId": "T16.movement-stocktake-adjustment",
+            "observationNames": [
+              "adjustment-proof"
+            ]
+          }
+        },
+        {
+          "id": "held-after-adjustment-9",
+          "op": "decimalEquals",
+          "source": {
+            "actionId": "adjusted-api",
+            "pointer": "/response/data/heldQuantity"
+          },
+          "expected": "98",
+          "requirementRefs": [
+            "D16"
+          ],
+          "evidenceRefs": [
+            "adjusted-api:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseKey": "T16-stocktake-adjust-move",
+            "rawRowsOrder": {
+              "movements": [
+                "ledgerSequence"
+              ]
+            }
+          },
+          "oracleExplanation": "실물량·단위와 독립 손계산을 대조한다.",
+          "oracleRef": {
+            "oracleId": "T16.movement-stocktake-adjustment",
+            "observationNames": [
+              "held-after-adjustment"
+            ]
+          },
+          "unit": "BOX",
+          "unitSource": {
+            "actionId": "adjusted-api",
+            "pointer": "/response/data/unit"
+          }
+        },
+        {
+          "id": "held-after-adjustment-10",
+          "op": "sumEquals",
+          "source": {
+            "actionId": "adjusted-db",
+            "pointer": "/data/rawRows/segments",
+            "where": {
+              "active": true
+            },
+            "field": "quantity"
+          },
+          "expected": "98",
+          "requirementRefs": [
+            "D16"
+          ],
+          "evidenceRefs": [
+            "adjusted-db:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseKey": "T16-stocktake-adjust-move",
+            "rawRowsOrder": {
+              "movements": [
+                "ledgerSequence"
+              ]
+            }
+          },
+          "oracleExplanation": "실물량·단위와 독립 손계산을 대조한다.",
+          "oracleRef": {
+            "oracleId": "T16.movement-stocktake-adjustment",
+            "observationNames": [
+              "held-after-adjustment"
+            ]
+          },
+          "unit": "BOX",
+          "unitSource": {
+            "actionId": "adjusted-db",
+            "pointer": "/data/rawRows/segments",
+            "where": {
+              "active": true
+            },
+            "field": "unit"
+          }
+        },
+        {
+          "id": "adjustment-proof-11",
+          "op": "relationSet",
+          "source": {
+            "actionId": "adjusted-db",
+            "pointer": "/data/rawRows/movements",
+            "field": [
+              "kind",
+              "quantity",
+              "unit",
+              "decisionMakerId",
+              "reason"
+            ]
+          },
+          "expected": [
+            [
+              "ADJUSTMENT_DECREASE",
+              "2",
+              "BOX",
+              {
+                "$alias": "manager"
+              },
+              "실사 차이 대조 확인"
+            ]
+          ],
+          "requirementRefs": [
+            "D16"
+          ],
+          "evidenceRefs": [
+            "adjusted-db:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseKey": "T16-stocktake-adjust-move",
+            "rawRowsOrder": {
+              "movements": [
+                "ledgerSequence"
+              ]
+            }
+          },
+          "oracleExplanation": "독립 원 행의 실물·수량·관계·범위를 정확히 대조한다.",
+          "oracleRef": {
+            "oracleId": "T16.movement-stocktake-adjustment",
+            "observationNames": [
+              "adjustment-proof"
+            ]
+          }
+        },
+        {
+          "id": "distinct-total-after-internal-move-12",
+          "op": "decimalEquals",
+          "source": {
+            "actionId": "after-api",
+            "pointer": "/response/data/heldQuantity"
+          },
+          "expected": "98",
+          "requirementRefs": [
+            "D16"
+          ],
+          "evidenceRefs": [
+            "after-api:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseKey": "T16-stocktake-adjust-move",
+            "rawRowsOrder": {
+              "movements": [
+                "ledgerSequence"
+              ]
+            }
+          },
+          "oracleExplanation": "실물량·단위와 독립 손계산을 대조한다.",
+          "oracleRef": {
+            "oracleId": "T16.movement-stocktake-adjustment",
+            "observationNames": [
+              "distinct-total-after-internal-move"
+            ]
+          },
+          "unit": "BOX",
+          "unitSource": {
+            "actionId": "after-api",
+            "pointer": "/response/data/unit"
+          }
+        },
+        {
+          "id": "distinct-total-after-internal-move-13",
+          "op": "sumEquals",
+          "source": {
+            "actionId": "after-db",
+            "pointer": "/data/rawRows/segments",
+            "where": {
+              "active": true
+            },
+            "field": "quantity"
+          },
+          "expected": "98",
+          "requirementRefs": [
+            "D16"
+          ],
+          "evidenceRefs": [
+            "after-db:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseKey": "T16-stocktake-adjust-move",
+            "rawRowsOrder": {
+              "movements": [
+                "ledgerSequence"
+              ]
+            }
+          },
+          "oracleExplanation": "실물량·단위와 독립 손계산을 대조한다.",
+          "oracleRef": {
+            "oracleId": "T16.movement-stocktake-adjustment",
+            "observationNames": [
+              "distinct-total-after-internal-move"
+            ]
+          },
+          "unit": "BOX",
+          "unitSource": {
+            "actionId": "after-db",
+            "pointer": "/data/rawRows/segments",
+            "where": {
+              "active": true
+            },
+            "field": "unit"
+          }
+        },
+        {
+          "id": "adjustment-proof-14",
+          "op": "relationSet",
+          "source": {
+            "actionId": "after-db",
+            "pointer": "/data/rawRows/segments",
+            "where": {
+              "active": true
+            },
+            "field": [
+              "id",
+              "quantity",
+              "locationId"
+            ]
+          },
+          "expected": [
+            [
+              {
+                "$result": {
+                  "actionId": "split",
+                  "pointer": "/response/children/0/segmentId"
+                }
+              },
+              "20",
+              {
+                "$alias": "W2"
+              }
+            ],
+            [
+              {
+                "$result": {
+                  "actionId": "split",
+                  "pointer": "/response/children/1/segmentId"
+                }
+              },
+              "78",
+              {
+                "$alias": "W"
+              }
+            ]
+          ],
+          "requirementRefs": [
+            "D16"
+          ],
+          "evidenceRefs": [
+            "after-db:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseKey": "T16-stocktake-adjust-move",
+            "rawRowsOrder": {
+              "movements": [
+                "ledgerSequence"
+              ]
+            }
+          },
+          "oracleExplanation": "독립 원 행의 실물·수량·관계·범위를 정확히 대조한다.",
+          "oracleRef": {
+            "oracleId": "T16.movement-stocktake-adjustment",
+            "observationNames": [
+              "adjustment-proof"
+            ]
+          }
+        },
+        {
+          "id": "adjustment-proof-16",
+          "op": "equals",
+          "source": {
+            "actionId": "after-db",
+            "pointer": "/data/rawRows/movements",
+            "where": {
+              "affectsPhysicalQuantity": false
+            },
+            "field": "kind"
+          },
+          "expected": [
+            "SPLIT",
+            "INTERNAL_MOVE"
+          ],
+          "requirementRefs": [
+            "D16"
+          ],
+          "evidenceRefs": [
+            "after-db:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseKey": "T16-stocktake-adjust-move",
+            "rawRowsOrder": {
+              "movements": [
+                "ledgerSequence"
+              ]
+            }
+          },
+          "oracleExplanation": "부분20 이동 전에 분할 movement가 원장 순서에 먼저 존재한다.",
+          "oracleRef": {
+            "oracleId": "T16.movement-stocktake-adjustment",
+            "observationNames": [
+              "adjustment-proof"
+            ]
+          }
+        },
+        {
+          "id": "active-physical-identities",
+          "op": "unique",
+          "source": {
+            "actionId": "after-db",
+            "pointer": "/data/rawRows/segments",
+            "where": {
+              "active": true
+            },
+            "field": "physicalScope"
+          },
+          "expected": true,
+          "requirementRefs": [
+            "D16"
+          ],
+          "evidenceRefs": [
+            "counted-api:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseKey": "T16-stocktake-adjust-move"
+          },
+          "oracleExplanation": "현재 active 실물 identity를 한 번씩만 합산하며 중복 실물은 거부한다.",
+          "oracleRef": {
+            "oracleId": "T16.movement-stocktake-adjustment",
+            "observationNames": [
+              "held-before-adjustment"
+            ]
+          }
+        },
+        {
+          "id": "response-definition-version",
+          "op": "equals",
+          "source": {
+            "actionId": "after-api",
+            "pointer": "/response/definitionVersion"
+          },
+          "expected": "ontology-v1",
+          "requirementRefs": [
+            "D16"
+          ],
+          "evidenceRefs": [
+            "counted-api:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseKey": "T16-stocktake-adjust-move"
+          },
+          "oracleExplanation": "수량/제한을 읽는 실제 정의 버전은 고정 v1이며 다른 의미로 대체하지 않는다.",
+          "oracleRef": {
+            "oracleId": "T16.movement-stocktake-adjustment",
+            "observationNames": [
+              "held-before-adjustment"
+            ]
+          }
+        },
+        {
+          "id": "actual-baseline-physical-rows",
+          "op": "relationSet",
+          "source": {
+            "actionId": "before-db",
+            "pointer": "/data/rawRows/segments",
+            "where": {
+              "active": true
+            },
+            "field": [
+              "id",
+              "quantity",
+              "unit"
+            ]
+          },
+          "expected": [
+            [
+              {
+                "$alias": "Q100"
+              },
+              "100",
+              "BOX"
+            ]
+          ],
+          "requirementRefs": [
+            "D16"
+          ],
+          "evidenceRefs": [
+            "counted-api:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseKey": "T16-stocktake-adjust-move",
+            "rawRowsOrder": {
+              "movements": [
+                "ledgerSequence"
+              ]
+            }
+          },
+          "oracleExplanation": "서버에 실제 설치된 시작 실물의 ID·decimal·unit을 원 행에서 확인한다. baseline 자체는 업무 실행 coverage가 아니다.",
+          "oracleRef": {
+            "oracleId": "T16.movement-stocktake-adjustment",
+            "observationNames": [
+              "held-before-adjustment"
+            ]
+          }
+        }
+      ],
+      "oracleExplanation": "실사98은 보유100을 즉시 덮어쓰지 않는다. 승인 감소2 뒤98=20+78이며 내부 위치 변화로 새 재고가 생기지 않는다."
+    },
+    {
+      "id": "expiry-sweeper",
+      "title": "이벤트 없는 만료는 예약20과 인간 책임을 재평가한다",
+      "fixtureRef": "verification/cases/T16/fixtures/expiry-sweeper.json",
+      "requiredAdapters": [
+        "fixture",
+        "api",
+        "db",
+        "control"
+      ],
+      "actions": [
+        {
+          "id": "setup",
+          "kind": "installFixture",
+          "fixtureRef": "verification/cases/T16/fixtures/expiry-sweeper.json",
+          "evidenceRefs": [
+            "setup:actual-adapter-artifact"
+          ]
+        },
+        {
+          "id": "before-api",
+          "kind": "query",
+          "actorRef": "warehouse",
+          "route": "api",
+          "capabilityId": "getInventory",
+          "request": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseKey": "T16-expiry-sweeper"
+            },
+            "action": "SELL",
+            "customerId": {
+              "$alias": "CUSTOMER"
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z"
+          },
+          "evidenceRefs": [
+            "before-api:actual-adapter-artifact"
+          ]
+        },
+        {
+          "id": "before-db",
+          "kind": "observe",
+          "observation": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseKey": "T16-expiry-sweeper"
+            },
+            "snapshotRef": {
+              "$result": {
+                "actionId": "before-api",
+                "pointer": "/response/snapshotRevision"
+              }
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z",
+            "sources": [
+              "segments",
+              "movements",
+              "genealogy",
+              "allocations",
+              "obligations",
+              "assignments",
+              "restrictions",
+              "dispositionBases",
+              "audit",
+              "outbox",
+              "commandResults",
+              "events",
+              "evidenceLinks",
+              "logisticsMemberships",
+              "shipments",
+              "intakes",
+              "stocktakes",
+              "decisions",
+              "locks",
+              "retryAttempts",
+              "dbPrivileges",
+              "boundaries",
+              "transactions"
+            ]
+          },
+          "evidenceRefs": [
+            "before-db:actual-adapter-artifact"
+          ]
+        },
+        {
+          "id": "reserve",
+          "kind": "invoke",
+          "actorRef": "sales",
+          "route": "api",
+          "capabilityId": "reserveQuantity",
+          "request": {
+            "intentKind": "COMMAND",
+            "definitionVersion": "ontology-v1",
+            "capabilityId": "reserveQuantity",
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "subjectRefs": [
+              {
+                "type": "QuantitySegment",
+                "id": {
+                  "$alias": "A20"
+                }
+              }
+            ],
+            "slots": {
+              "quantity": {
+                "value": "20",
+                "unit": "BOX",
+                "provenance": "USER"
+              },
+              "orderLineId": {
+                "$alias": "ORDER"
+              }
+            },
+            "expectedRevision": 1,
+            "commandIdempotencyKey": "T16-expiry-sweeper-reserve",
+            "evidenceRefs": [
+              {
+                "$alias": "operation-proof"
+              }
+            ],
+            "valueProvenance": "USER"
+          },
+          "evidenceRefs": [
+            "reserve:actual-adapter-artifact"
+          ]
+        },
+        {
+          "id": "reserved-api",
+          "kind": "query",
+          "actorRef": "warehouse",
+          "route": "api",
+          "capabilityId": "getInventory",
+          "request": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseKey": "T16-expiry-sweeper"
+            },
+            "action": "SELL",
+            "customerId": {
+              "$alias": "CUSTOMER"
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z"
+          },
+          "evidenceRefs": [
+            "reserved-api:actual-adapter-artifact"
+          ]
+        },
+        {
+          "id": "reserved-db",
+          "kind": "observe",
+          "observation": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseKey": "T16-expiry-sweeper"
+            },
+            "snapshotRef": {
+              "$result": {
+                "actionId": "reserved-api",
+                "pointer": "/response/snapshotRevision"
+              }
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z",
+            "sources": [
+              "segments",
+              "movements",
+              "genealogy",
+              "allocations",
+              "obligations",
+              "assignments",
+              "restrictions",
+              "dispositionBases",
+              "audit",
+              "outbox",
+              "commandResults",
+              "events",
+              "evidenceLinks",
+              "logisticsMemberships",
+              "shipments",
+              "intakes",
+              "stocktakes",
+              "decisions",
+              "locks",
+              "retryAttempts",
+              "dbPrivileges",
+              "boundaries",
+              "transactions"
+            ]
+          },
+          "evidenceRefs": [
+            "reserved-db:actual-adapter-artifact"
+          ]
+        },
+        {
+          "id": "advance",
+          "kind": "control",
+          "control": {
+            "type": "clock",
+            "operation": "advanceTo",
+            "parameters": {
+              "asOf": "2026-10-07T09:05:01Z",
+              "knownAt": "2026-10-07T09:05:01Z",
+              "timezone": "Asia/Seoul",
+              "scope": {
+                "organizationId": {
+                  "$alias": "ORG"
+                },
+                "itemId": {
+                  "$alias": "P"
+                },
+                "caseKey": "T16-expiry-sweeper"
+              }
+            }
+          },
+          "evidenceRefs": [
+            "advance:actual-adapter-artifact"
+          ]
+        },
+        {
+          "id": "sweep",
+          "kind": "control",
+          "control": {
+            "type": "process",
+            "operation": "sweepDue",
+            "parameters": {
+              "schedulerId": "inventory-due-scheduler",
+              "sweepId": "T16-expiry-sweeper-sweep",
+              "scope": {
+                "organizationId": {
+                  "$alias": "ORG"
+                },
+                "itemId": {
+                  "$alias": "P"
+                },
+                "caseKey": "T16-expiry-sweeper"
+              },
+              "asOf": "2026-10-07T09:05:01Z",
+              "knownAt": "2026-10-07T09:05:01Z"
+            }
+          },
+          "evidenceRefs": [
+            "sweep:actual-adapter-artifact"
+          ]
+        },
+        {
+          "id": "await-sweep",
+          "kind": "control",
+          "control": {
+            "type": "process",
+            "operation": "awaitRuntimeTask",
+            "parameters": {
+              "schedulerId": "inventory-due-scheduler",
+              "taskId": {
+                "$result": {
+                  "actionId": "sweep",
+                  "pointer": "/data/hostObservation/operationEvidence/taskId"
+                }
+              },
+              "invocationHandle": {
+                "$result": {
+                  "actionId": "sweep",
+                  "pointer": "/data/hostObservation/operationEvidence/invocationHandle"
+                }
+              },
+              "scope": {
+                "organizationId": {
+                  "$alias": "ORG"
+                },
+                "itemId": {
+                  "$alias": "P"
+                },
+                "caseKey": "T16-expiry-sweeper"
+              }
+            }
+          },
+          "evidenceRefs": [
+            "await-sweep:actual-adapter-artifact"
+          ]
+        },
+        {
+          "id": "dispatch",
+          "kind": "invoke",
+          "actorRef": "warehouse",
+          "route": "api",
+          "capabilityId": "dispatchQuantity",
+          "request": {
+            "intentKind": "COMMAND",
+            "definitionVersion": "ontology-v1",
+            "capabilityId": "dispatchQuantity",
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "subjectRefs": [
+              {
+                "type": "QuantitySegment",
+                "id": {
+                  "$alias": "A20"
+                }
+              }
+            ],
+            "slots": {
+              "quantity": {
+                "value": "20",
+                "unit": "BOX",
+                "provenance": "USER"
+              },
+              "allocationId": {
+                "$result": {
+                  "actionId": "reserve",
+                  "pointer": "/response/allocationId"
+                }
+              },
+              "destinationId": {
+                "$alias": "CUSTOMER"
+              }
+            },
+            "expectedRevision": {
+              "$result": {
+                "actionId": "reserve",
+                "pointer": "/response/revision"
+              }
+            },
+            "commandIdempotencyKey": "T16-expiry-sweeper-dispatch",
+            "evidenceRefs": [
+              {
+                "$alias": "operation-proof"
+              }
+            ],
+            "valueProvenance": "USER"
+          },
+          "evidenceRefs": [
+            "dispatch:actual-adapter-artifact"
+          ]
+        },
+        {
+          "id": "after-api",
+          "kind": "query",
+          "actorRef": "warehouse",
+          "route": "api",
+          "capabilityId": "getInventory",
+          "request": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseKey": "T16-expiry-sweeper"
+            },
+            "action": "SELL",
+            "customerId": {
+              "$alias": "CUSTOMER"
+            },
+            "asOf": "2026-10-07T09:05:01Z",
+            "knownAt": "2026-10-07T09:05:01Z"
+          },
+          "evidenceRefs": [
+            "after-api:actual-adapter-artifact"
+          ]
+        },
+        {
+          "id": "after-db",
+          "kind": "observe",
+          "observation": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseKey": "T16-expiry-sweeper"
+            },
+            "snapshotRef": {
+              "$result": {
+                "actionId": "after-api",
+                "pointer": "/response/snapshotRevision"
+              }
+            },
+            "asOf": "2026-10-07T09:05:01Z",
+            "knownAt": "2026-10-07T09:05:01Z",
+            "sources": [
+              "segments",
+              "movements",
+              "genealogy",
+              "allocations",
+              "obligations",
+              "assignments",
+              "restrictions",
+              "dispositionBases",
+              "audit",
+              "outbox",
+              "commandResults",
+              "events",
+              "evidenceLinks",
+              "logisticsMemberships",
+              "shipments",
+              "intakes",
+              "stocktakes",
+              "decisions",
+              "locks",
+              "retryAttempts",
+              "dbPrivileges",
+              "boundaries",
+              "transactions"
+            ]
+          },
+          "evidenceRefs": [
+            "after-db:actual-adapter-artifact"
+          ]
+        },
+        {
+          "id": "expiry-obligations",
+          "kind": "query",
+          "actorRef": "sales",
+          "route": "api",
+          "capabilityId": "getObligations",
+          "request": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "allocationId": {
+                "$result": {
+                  "actionId": "reserve",
+                  "pointer": "/response/allocationId"
+                }
+              },
+              "kind": "VALIDITY_EXPIRY"
+            },
+            "snapshotRef": {
+              "$result": {
+                "actionId": "after-api",
+                "pointer": "/response/snapshotRevision"
+              }
+            },
+            "asOf": "2026-10-07T09:05:01Z",
+            "knownAt": "2026-10-07T09:05:01Z"
+          },
+          "evidenceRefs": [
+            "expiry-obligations:actual-adapter-artifact"
+          ]
+        }
+      ],
+      "assertions": [
+        {
+          "id": "allocation-after-boundary-1",
+          "op": "equals",
+          "source": {
+            "actionId": "after-db",
+            "pointer": "/data/rawRows/allocations",
+            "where": {
+              "id": {
+                "$result": {
+                  "actionId": "reserve",
+                  "pointer": "/response/allocationId"
+                }
+              }
+            },
+            "field": "state"
+          },
+          "expected": [
+            "SUSPENDED"
+          ],
+          "requirementRefs": [
+            "D16"
+          ],
+          "evidenceRefs": [
+            "after-db:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseKey": "T16-expiry-sweeper"
+          },
+          "oracleExplanation": "독립 원 행의 실물·수량·관계·범위를 정확히 대조한다.",
+          "oracleRef": {
+            "oracleId": "T16.no-event-expiry",
+            "observationNames": [
+              "allocation-after-boundary"
+            ]
+          }
+        },
+        {
+          "id": "post-expiry-dispatched-2",
+          "op": "decimalEquals",
+          "source": {
+            "actionId": "after-api",
+            "pointer": "/response/data/dispatchedQuantity"
+          },
+          "expected": "0",
+          "requirementRefs": [
+            "D16"
+          ],
+          "evidenceRefs": [
+            "after-api:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseKey": "T16-expiry-sweeper"
+          },
+          "oracleExplanation": "실물량·단위와 독립 손계산을 대조한다.",
+          "oracleRef": {
+            "oracleId": "T16.no-event-expiry",
+            "observationNames": [
+              "post-expiry-dispatched"
+            ]
+          },
+          "unit": "BOX",
+          "unitSource": {
+            "actionId": "after-api",
+            "pointer": "/response/data/unit"
+          }
+        },
+        {
+          "id": "post-expiry-dispatched-3",
+          "op": "count",
+          "source": {
+            "actionId": "after-db",
+            "pointer": "/data/rawRows/movements",
+            "where": {
+              "kind": "DISPATCH"
+            }
+          },
+          "expected": 0,
+          "requirementRefs": [
+            "D16"
+          ],
+          "evidenceRefs": [
+            "after-db:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseKey": "T16-expiry-sweeper"
+          },
+          "oracleExplanation": "독립 원 행의 실물·수량·관계·범위를 정확히 대조한다.",
+          "oracleRef": {
+            "oracleId": "T16.no-event-expiry",
+            "observationNames": [
+              "post-expiry-dispatched"
+            ]
+          }
+        },
+        {
+          "id": "expiry-duty-4",
+          "op": "count",
+          "source": {
+            "actionId": "after-db",
+            "pointer": "/data/rawRows/assignments",
+            "where": {
+              "obligationId": {
+                "$result": {
+                  "actionId": "expiry-obligations",
+                  "pointer": "/response/data/obligations/0/id"
+                }
+              },
+              "current": true,
+              "status": "OPEN"
+            }
+          },
+          "expected": 1,
+          "requirementRefs": [
+            "D16"
+          ],
+          "evidenceRefs": [
+            "after-db:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseKey": "T16-expiry-sweeper"
+          },
+          "oracleExplanation": "해당 obligation root/scope의 현재 유효 assignment는 하나다. 의무 root는 실제 명령/대조/sweeper가 반환한 obligationId로 한정한다.",
+          "oracleRef": {
+            "oracleId": "T16.no-event-expiry",
+            "observationNames": [
+              "expiry-duty"
+            ]
+          }
+        },
+        {
+          "id": "expiry-duty-5",
+          "op": "fieldsPresent",
+          "source": {
+            "actionId": "after-db",
+            "pointer": "/data/rawRows/assignments",
+            "where": {
+              "obligationId": {
+                "$result": {
+                  "actionId": "expiry-obligations",
+                  "pointer": "/response/data/obligations/0/id"
+                }
+              },
+              "current": true,
+              "status": "OPEN"
+            }
+          },
+          "expected": [
+            "ownerId",
+            "supervisorId",
+            "nextAction",
+            "nextCheckAt",
+            "rootId",
+            "workId"
+          ],
+          "requirementRefs": [
+            "D16"
+          ],
+          "evidenceRefs": [
+            "after-db:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseKey": "T16-expiry-sweeper"
+          },
+          "oracleExplanation": "책임자의 실제 ID와 다음 행동·확인 시각에 공백이 없어야 한다. 의무 root는 실제 명령/대조/sweeper가 반환한 obligationId로 한정한다.",
+          "oracleRef": {
+            "oracleId": "T16.no-event-expiry",
+            "observationNames": [
+              "expiry-duty"
+            ]
+          }
+        },
+        {
+          "id": "expiry-duty-6",
+          "op": "relationSet",
+          "source": {
+            "actionId": "after-db",
+            "pointer": "/data/rawRows/assignments",
+            "where": {
+              "obligationId": {
+                "$result": {
+                  "actionId": "expiry-obligations",
+                  "pointer": "/response/data/obligations/0/id"
+                }
+              },
+              "current": true,
+              "status": "OPEN"
+            },
+            "field": [
+              "ownerId",
+              "supervisorId",
+              "nextAction",
+              "nextCheckAt"
+            ]
+          },
+          "expected": [
+            [
+              {
+                "$alias": "sales"
+              },
+              {
+                "$alias": "supervisor"
+              },
+              "근거 대조 후 대체 배분 검토",
+              "2026-10-07T10:00:00Z"
+            ]
+          ],
+          "requirementRefs": [
+            "D16"
+          ],
+          "evidenceRefs": [
+            "after-db:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseKey": "T16-expiry-sweeper"
+          },
+          "oracleExplanation": "fixture의 지정된 인간 owner/supervisor와 고정 후속 행동/시각이 유지된다. 의무 root는 실제 명령/대조/sweeper가 반환한 obligationId로 한정한다.",
+          "oracleRef": {
+            "oracleId": "T16.no-event-expiry",
+            "observationNames": [
+              "expiry-duty"
+            ]
+          }
+        },
+        {
+          "id": "boundary-recheck-7",
+          "op": "timeAtMostSeconds",
+          "source": {
+            "actionId": "await-sweep",
+            "pointer": "/data/hostObservation/runtimeTask/completedAt"
+          },
+          "expected": "30",
+          "requirementRefs": [
+            "D16"
+          ],
+          "evidenceRefs": [
+            "await-sweep:actual-adapter-artifact",
+            "advance:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseKey": "T16-expiry-sweeper"
+          },
+          "oracleExplanation": "무이벤트 경계 이후30초 이내 실제 autonomous sweep task의 terminal을 관찰한다.",
+          "oracleRef": {
+            "oracleId": "T16.no-event-expiry",
+            "observationNames": [
+              "boundary-recheck"
+            ]
+          },
+          "baseline": {
+            "actionId": "advance",
+            "pointer": "/data/acknowledgedAt"
+          }
+        },
+        {
+          "id": "boundary-recheck-8",
+          "op": "relationSet",
+          "source": {
+            "actionId": "reserved-db",
+            "pointer": "/data/rawRows/boundaries",
+            "field": [
+              "allocationId",
+              "validAt",
+              "kind"
+            ]
+          },
+          "expected": [
+            [
+              {
+                "$result": {
+                  "actionId": "reserve",
+                  "pointer": "/response/allocationId"
+                }
+              },
+              "2026-10-07T09:05:00Z",
+              "DISPOSITION_VALID_UNTIL"
+            ]
+          ],
+          "requirementRefs": [
+            "D16"
+          ],
+          "evidenceRefs": [
+            "after-db:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseKey": "T16-expiry-sweeper"
+          },
+          "oracleExplanation": "이벤트 없는 만료 전에 예약의 nextValidityBoundary T를 실제 index 원 행으로 등록한다.",
+          "oracleRef": {
+            "oracleId": "T16.no-event-expiry",
+            "observationNames": [
+              "boundary-recheck"
+            ]
+          }
+        },
+        {
+          "id": "boundary-recheck-9",
+          "op": "sameAs",
+          "source": {
+            "actionId": "after-db",
+            "pointer": "/data/rawRows/allocations",
+            "where": {
+              "id": {
+                "$result": {
+                  "actionId": "reserve",
+                  "pointer": "/response/allocationId"
+                }
+              }
+            },
+            "field": "suspendedTransactionId"
+          },
+          "expected": true,
+          "requirementRefs": [
+            "D16"
+          ],
+          "evidenceRefs": [
+            "after-db:actual-adapter-artifact",
+            "after-db:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseKey": "T16-expiry-sweeper"
+          },
+          "oracleExplanation": "sweep의 배분 정지와 의무 upsert는 같은 실제 transaction이다.",
+          "oracleRef": {
+            "oracleId": "T16.no-event-expiry",
+            "observationNames": [
+              "boundary-recheck"
+            ]
+          },
+          "baseline": {
+            "actionId": "after-db",
+            "pointer": "/data/rawRows/assignments",
+            "where": {
+              "obligationId": {
+                "$result": {
+                  "actionId": "expiry-obligations",
+                  "pointer": "/response/data/obligations/0/id"
+                }
+              },
+              "current": true
+            },
+            "field": "transactionId"
+          }
+        },
+        {
+          "id": "boundary-recheck-10",
+          "op": "count",
+          "source": {
+            "actionId": "after-db",
+            "pointer": "/data/rawRows/locks",
+            "where": {
+              "kind": "SCOPE_FENCE",
+              "scopeRootId": {
+                "$alias": "A20"
+              }
+            }
+          },
+          "expected": 1,
+          "requirementRefs": [
+            "D16"
+          ],
+          "evidenceRefs": [
+            "after-db:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseKey": "T16-expiry-sweeper"
+          },
+          "oracleExplanation": "독립 원 행의 실물·수량·관계·범위를 정확히 대조한다.",
+          "oracleRef": {
+            "oracleId": "T16.no-event-expiry",
+            "observationNames": [
+              "boundary-recheck"
+            ]
+          }
+        },
+        {
+          "id": "active-physical-identities",
+          "op": "unique",
+          "source": {
+            "actionId": "after-db",
+            "pointer": "/data/rawRows/segments",
+            "where": {
+              "active": true
+            },
+            "field": "physicalScope"
+          },
+          "expected": true,
+          "requirementRefs": [
+            "D16"
+          ],
+          "evidenceRefs": [
+            "after-db:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseKey": "T16-expiry-sweeper"
+          },
+          "oracleExplanation": "현재 active 실물 identity를 한 번씩만 합산하며 중복 실물은 거부한다.",
+          "oracleRef": {
+            "oracleId": "T16.no-event-expiry",
+            "observationNames": [
+              "allocation-after-boundary"
+            ]
+          }
+        },
+        {
+          "id": "response-definition-version",
+          "op": "equals",
+          "source": {
+            "actionId": "after-api",
+            "pointer": "/response/definitionVersion"
+          },
+          "expected": "ontology-v1",
+          "requirementRefs": [
+            "D16"
+          ],
+          "evidenceRefs": [
+            "after-db:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseKey": "T16-expiry-sweeper"
+          },
+          "oracleExplanation": "수량/제한을 읽는 실제 정의 버전은 고정 v1이며 다른 의미로 대체하지 않는다.",
+          "oracleRef": {
+            "oracleId": "T16.no-event-expiry",
+            "observationNames": [
+              "allocation-after-boundary"
+            ]
+          }
+        },
+        {
+          "id": "actual-baseline-physical-rows",
+          "op": "relationSet",
+          "source": {
+            "actionId": "before-db",
+            "pointer": "/data/rawRows/segments",
+            "where": {
+              "active": true
+            },
+            "field": [
+              "id",
+              "quantity",
+              "unit"
+            ]
+          },
+          "expected": [
+            [
+              {
+                "$alias": "A20"
+              },
+              "20",
+              "BOX"
+            ]
+          ],
+          "requirementRefs": [
+            "D16"
+          ],
+          "evidenceRefs": [
+            "after-db:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseKey": "T16-expiry-sweeper"
+          },
+          "oracleExplanation": "서버에 실제 설치된 시작 실물의 ID·decimal·unit을 원 행에서 확인한다. baseline 자체는 업무 실행 coverage가 아니다.",
+          "oracleRef": {
+            "oracleId": "T16.no-event-expiry",
+            "observationNames": [
+              "allocation-after-boundary"
+            ]
+          }
+        },
+        {
+          "id": "actual-expiry-obligation-scope",
+          "op": "count",
+          "source": {
+            "actionId": "expiry-obligations",
+            "pointer": "/response/data/obligations"
+          },
+          "expected": 1,
+          "requirementRefs": [
+            "D16"
+          ],
+          "evidenceRefs": [
+            "after-db:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseKey": "T16-expiry-sweeper"
+          },
+          "oracleExplanation": "현재 allocation20의 만료 의무를 동일 DB snapshot에서 정확히 하나 조회한다.",
+          "oracleRef": {
+            "oracleId": "T16.no-event-expiry",
+            "observationNames": [
+              "expiry-duty"
+            ]
+          }
+        }
+      ],
+      "oracleExplanation": "예약20은 T까지 허용된다. queue 비어도 T 이후 sweeper가 정지/의무를 upsert하며 sweep 지연 중 출고 guard도 실제 현재조건을 재검증한다."
+    },
+    {
+      "id": "expiry-delayed-sweep",
+      "title": "이벤트 없는 만료는 예약20과 인간 책임을 재평가한다",
+      "fixtureRef": "verification/cases/T16/fixtures/expiry-delayed-sweep.json",
+      "requiredAdapters": [
+        "fixture",
+        "api",
+        "db",
+        "control"
+      ],
+      "actions": [
+        {
+          "id": "setup",
+          "kind": "installFixture",
+          "fixtureRef": "verification/cases/T16/fixtures/expiry-delayed-sweep.json",
+          "evidenceRefs": [
+            "setup:actual-adapter-artifact"
+          ]
+        },
+        {
+          "id": "before-api",
+          "kind": "query",
+          "actorRef": "warehouse",
+          "route": "api",
+          "capabilityId": "getInventory",
+          "request": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseKey": "T16-expiry-delayed-sweep"
+            },
+            "action": "SELL",
+            "customerId": {
+              "$alias": "CUSTOMER"
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z"
+          },
+          "evidenceRefs": [
+            "before-api:actual-adapter-artifact"
+          ]
+        },
+        {
+          "id": "before-db",
+          "kind": "observe",
+          "observation": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseKey": "T16-expiry-delayed-sweep"
+            },
+            "snapshotRef": {
+              "$result": {
+                "actionId": "before-api",
+                "pointer": "/response/snapshotRevision"
+              }
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z",
+            "sources": [
+              "segments",
+              "movements",
+              "genealogy",
+              "allocations",
+              "obligations",
+              "assignments",
+              "restrictions",
+              "dispositionBases",
+              "audit",
+              "outbox",
+              "commandResults",
+              "events",
+              "evidenceLinks",
+              "logisticsMemberships",
+              "shipments",
+              "intakes",
+              "stocktakes",
+              "decisions",
+              "locks",
+              "retryAttempts",
+              "dbPrivileges",
+              "boundaries",
+              "transactions"
+            ]
+          },
+          "evidenceRefs": [
+            "before-db:actual-adapter-artifact"
+          ]
+        },
+        {
+          "id": "reserve",
+          "kind": "invoke",
+          "actorRef": "sales",
+          "route": "api",
+          "capabilityId": "reserveQuantity",
+          "request": {
+            "intentKind": "COMMAND",
+            "definitionVersion": "ontology-v1",
+            "capabilityId": "reserveQuantity",
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "subjectRefs": [
+              {
+                "type": "QuantitySegment",
+                "id": {
+                  "$alias": "A20"
+                }
+              }
+            ],
+            "slots": {
+              "quantity": {
+                "value": "20",
+                "unit": "BOX",
+                "provenance": "USER"
+              },
+              "orderLineId": {
+                "$alias": "ORDER"
+              }
+            },
+            "expectedRevision": 1,
+            "commandIdempotencyKey": "T16-expiry-delayed-sweep-reserve",
+            "evidenceRefs": [
+              {
+                "$alias": "operation-proof"
+              }
+            ],
+            "valueProvenance": "USER"
+          },
+          "evidenceRefs": [
+            "reserve:actual-adapter-artifact"
+          ]
+        },
+        {
+          "id": "reserved-api",
+          "kind": "query",
+          "actorRef": "warehouse",
+          "route": "api",
+          "capabilityId": "getInventory",
+          "request": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseKey": "T16-expiry-delayed-sweep"
+            },
+            "action": "SELL",
+            "customerId": {
+              "$alias": "CUSTOMER"
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z"
+          },
+          "evidenceRefs": [
+            "reserved-api:actual-adapter-artifact"
+          ]
+        },
+        {
+          "id": "reserved-db",
+          "kind": "observe",
+          "observation": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseKey": "T16-expiry-delayed-sweep"
+            },
+            "snapshotRef": {
+              "$result": {
+                "actionId": "reserved-api",
+                "pointer": "/response/snapshotRevision"
+              }
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z",
+            "sources": [
+              "segments",
+              "movements",
+              "genealogy",
+              "allocations",
+              "obligations",
+              "assignments",
+              "restrictions",
+              "dispositionBases",
+              "audit",
+              "outbox",
+              "commandResults",
+              "events",
+              "evidenceLinks",
+              "logisticsMemberships",
+              "shipments",
+              "intakes",
+              "stocktakes",
+              "decisions",
+              "locks",
+              "retryAttempts",
+              "dbPrivileges",
+              "boundaries",
+              "transactions"
+            ]
+          },
+          "evidenceRefs": [
+            "reserved-db:actual-adapter-artifact"
+          ]
+        },
+        {
+          "id": "sweep-delay",
+          "kind": "control",
+          "control": {
+            "type": "fault",
+            "operation": "pause",
+            "parameters": {
+              "point": "beforeDueSweeperScopeLock",
+              "scope": {
+                "organizationId": {
+                  "$alias": "ORG"
+                },
+                "itemId": {
+                  "$alias": "P"
+                },
+                "caseKey": "T16-expiry-delayed-sweep"
+              },
+              "schedulerId": "inventory-due-scheduler"
+            }
+          },
+          "evidenceRefs": [
+            "sweep-delay:actual-adapter-artifact"
+          ]
+        },
+        {
+          "id": "advance",
+          "kind": "control",
+          "control": {
+            "type": "clock",
+            "operation": "advanceTo",
+            "parameters": {
+              "asOf": "2026-10-07T09:05:01Z",
+              "knownAt": "2026-10-07T09:05:01Z",
+              "timezone": "Asia/Seoul",
+              "scope": {
+                "organizationId": {
+                  "$alias": "ORG"
+                },
+                "itemId": {
+                  "$alias": "P"
+                },
+                "caseKey": "T16-expiry-delayed-sweep"
+              }
+            }
+          },
+          "evidenceRefs": [
+            "advance:actual-adapter-artifact"
+          ]
+        },
+        {
+          "id": "dispatch",
+          "kind": "invoke",
+          "actorRef": "warehouse",
+          "route": "api",
+          "capabilityId": "dispatchQuantity",
+          "request": {
+            "intentKind": "COMMAND",
+            "definitionVersion": "ontology-v1",
+            "capabilityId": "dispatchQuantity",
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "subjectRefs": [
+              {
+                "type": "QuantitySegment",
+                "id": {
+                  "$alias": "A20"
+                }
+              }
+            ],
+            "slots": {
+              "quantity": {
+                "value": "20",
+                "unit": "BOX",
+                "provenance": "USER"
+              },
+              "allocationId": {
+                "$result": {
+                  "actionId": "reserve",
+                  "pointer": "/response/allocationId"
+                }
+              },
+              "destinationId": {
+                "$alias": "CUSTOMER"
+              }
+            },
+            "expectedRevision": {
+              "$result": {
+                "actionId": "reserve",
+                "pointer": "/response/revision"
+              }
+            },
+            "commandIdempotencyKey": "T16-expiry-delayed-sweep-dispatch",
+            "evidenceRefs": [
+              {
+                "$alias": "operation-proof"
+              }
+            ],
+            "valueProvenance": "USER"
+          },
+          "evidenceRefs": [
+            "dispatch:actual-adapter-artifact"
+          ]
+        },
+        {
+          "id": "blocked-api",
+          "kind": "query",
+          "actorRef": "warehouse",
+          "route": "api",
+          "capabilityId": "getInventory",
+          "request": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseKey": "T16-expiry-delayed-sweep"
+            },
+            "action": "SELL",
+            "customerId": {
+              "$alias": "CUSTOMER"
+            },
+            "asOf": "2026-10-07T09:05:01Z",
+            "knownAt": "2026-10-07T09:05:01Z"
+          },
+          "evidenceRefs": [
+            "blocked-api:actual-adapter-artifact"
+          ]
+        },
+        {
+          "id": "blocked-db",
+          "kind": "observe",
+          "observation": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseKey": "T16-expiry-delayed-sweep"
+            },
+            "snapshotRef": {
+              "$result": {
+                "actionId": "blocked-api",
+                "pointer": "/response/snapshotRevision"
+              }
+            },
+            "asOf": "2026-10-07T09:05:01Z",
+            "knownAt": "2026-10-07T09:05:01Z",
+            "sources": [
+              "segments",
+              "movements",
+              "genealogy",
+              "allocations",
+              "obligations",
+              "assignments",
+              "restrictions",
+              "dispositionBases",
+              "audit",
+              "outbox",
+              "commandResults",
+              "events",
+              "evidenceLinks",
+              "logisticsMemberships",
+              "shipments",
+              "intakes",
+              "stocktakes",
+              "decisions",
+              "locks",
+              "retryAttempts",
+              "dbPrivileges",
+              "boundaries",
+              "transactions"
+            ]
+          },
+          "evidenceRefs": [
+            "blocked-db:actual-adapter-artifact"
+          ]
+        },
+        {
+          "id": "sweep-resume",
+          "kind": "control",
+          "control": {
+            "type": "fault",
+            "operation": "resume",
+            "parameters": {
+              "point": "beforeDueSweeperScopeLock",
+              "scope": {
+                "organizationId": {
+                  "$alias": "ORG"
+                },
+                "itemId": {
+                  "$alias": "P"
+                },
+                "caseKey": "T16-expiry-delayed-sweep"
+              },
+              "schedulerId": "inventory-due-scheduler"
+            }
+          },
+          "evidenceRefs": [
+            "sweep-resume:actual-adapter-artifact"
+          ]
+        },
+        {
+          "id": "sweep",
+          "kind": "control",
+          "control": {
+            "type": "process",
+            "operation": "sweepDue",
+            "parameters": {
+              "schedulerId": "inventory-due-scheduler",
+              "sweepId": "T16-expiry-delayed-sweep-sweep",
+              "scope": {
+                "organizationId": {
+                  "$alias": "ORG"
+                },
+                "itemId": {
+                  "$alias": "P"
+                },
+                "caseKey": "T16-expiry-delayed-sweep"
+              },
+              "asOf": "2026-10-07T09:05:01Z",
+              "knownAt": "2026-10-07T09:05:01Z"
+            }
+          },
+          "evidenceRefs": [
+            "sweep:actual-adapter-artifact"
+          ]
+        },
+        {
+          "id": "await-sweep",
+          "kind": "control",
+          "control": {
+            "type": "process",
+            "operation": "awaitRuntimeTask",
+            "parameters": {
+              "schedulerId": "inventory-due-scheduler",
+              "taskId": {
+                "$result": {
+                  "actionId": "sweep",
+                  "pointer": "/data/hostObservation/operationEvidence/taskId"
+                }
+              },
+              "invocationHandle": {
+                "$result": {
+                  "actionId": "sweep",
+                  "pointer": "/data/hostObservation/operationEvidence/invocationHandle"
+                }
+              },
+              "scope": {
+                "organizationId": {
+                  "$alias": "ORG"
+                },
+                "itemId": {
+                  "$alias": "P"
+                },
+                "caseKey": "T16-expiry-delayed-sweep"
+              }
+            }
+          },
+          "evidenceRefs": [
+            "await-sweep:actual-adapter-artifact"
+          ]
+        },
+        {
+          "id": "after-api",
+          "kind": "query",
+          "actorRef": "warehouse",
+          "route": "api",
+          "capabilityId": "getInventory",
+          "request": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseKey": "T16-expiry-delayed-sweep"
+            },
+            "action": "SELL",
+            "customerId": {
+              "$alias": "CUSTOMER"
+            },
+            "asOf": "2026-10-07T09:05:01Z",
+            "knownAt": "2026-10-07T09:05:01Z"
+          },
+          "evidenceRefs": [
+            "after-api:actual-adapter-artifact"
+          ]
+        },
+        {
+          "id": "after-db",
+          "kind": "observe",
+          "observation": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseKey": "T16-expiry-delayed-sweep"
+            },
+            "snapshotRef": {
+              "$result": {
+                "actionId": "after-api",
+                "pointer": "/response/snapshotRevision"
+              }
+            },
+            "asOf": "2026-10-07T09:05:01Z",
+            "knownAt": "2026-10-07T09:05:01Z",
+            "sources": [
+              "segments",
+              "movements",
+              "genealogy",
+              "allocations",
+              "obligations",
+              "assignments",
+              "restrictions",
+              "dispositionBases",
+              "audit",
+              "outbox",
+              "commandResults",
+              "events",
+              "evidenceLinks",
+              "logisticsMemberships",
+              "shipments",
+              "intakes",
+              "stocktakes",
+              "decisions",
+              "locks",
+              "retryAttempts",
+              "dbPrivileges",
+              "boundaries",
+              "transactions"
+            ]
+          },
+          "evidenceRefs": [
+            "after-db:actual-adapter-artifact"
+          ]
+        },
+        {
+          "id": "expiry-obligations",
+          "kind": "query",
+          "actorRef": "sales",
+          "route": "api",
+          "capabilityId": "getObligations",
+          "request": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "allocationId": {
+                "$result": {
+                  "actionId": "reserve",
+                  "pointer": "/response/allocationId"
+                }
+              },
+              "kind": "VALIDITY_EXPIRY"
+            },
+            "snapshotRef": {
+              "$result": {
+                "actionId": "after-api",
+                "pointer": "/response/snapshotRevision"
+              }
+            },
+            "asOf": "2026-10-07T09:05:01Z",
+            "knownAt": "2026-10-07T09:05:01Z"
+          },
+          "evidenceRefs": [
+            "expiry-obligations:actual-adapter-artifact"
+          ]
+        }
+      ],
+      "assertions": [
+        {
+          "id": "boundary-recheck-1",
+          "op": "equals",
+          "source": {
+            "actionId": "dispatch",
+            "pointer": "/response/outcome"
+          },
+          "expected": "REJECTED",
+          "requirementRefs": [
+            "D16"
+          ],
+          "evidenceRefs": [
+            "dispatch:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseKey": "T16-expiry-delayed-sweep"
+          },
+          "oracleExplanation": "공개 명령의 구조화 outcome을 확인한다.",
+          "oracleRef": {
+            "oracleId": "T16.no-event-expiry",
+            "observationNames": [
+              "boundary-recheck"
+            ]
+          }
+        },
+        {
+          "id": "boundary-recheck-2",
+          "op": "equals",
+          "source": {
+            "actionId": "dispatch",
+            "pointer": "/response/errorCode"
+          },
+          "expected": "INSUFFICIENT_ELIGIBLE_QUANTITY",
+          "requirementRefs": [
+            "D16"
+          ],
+          "evidenceRefs": [
+            "dispatch:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseKey": "T16-expiry-delayed-sweep"
+          },
+          "oracleExplanation": "검증 실패를 해당 오류 코드로 구별한다.",
+          "oracleRef": {
+            "oracleId": "T16.no-event-expiry",
+            "observationNames": [
+              "boundary-recheck"
+            ]
+          }
+        },
+        {
+          "id": "post-expiry-dispatched-3",
+          "op": "count",
+          "source": {
+            "actionId": "blocked-db",
+            "pointer": "/data/rawRows/movements",
+            "where": {
+              "commandKey": "T16-expiry-delayed-sweep-dispatch"
+            }
+          },
+          "expected": 0,
+          "requirementRefs": [
+            "D16"
+          ],
+          "evidenceRefs": [
+            "blocked-db:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseKey": "T16-expiry-delayed-sweep"
+          },
+          "oracleExplanation": "명령 효과 scope에서 생성된 업무 원 행 수가0이다. 감사는 별도로 확인한다.",
+          "oracleRef": {
+            "oracleId": "T16.no-event-expiry",
+            "observationNames": [
+              "post-expiry-dispatched"
+            ]
+          }
+        },
+        {
+          "id": "post-expiry-dispatched-4",
+          "op": "count",
+          "source": {
+            "actionId": "blocked-db",
+            "pointer": "/data/rawRows/outbox",
+            "where": {
+              "commandKey": "T16-expiry-delayed-sweep-dispatch",
+              "effectClass": "BUSINESS"
+            }
+          },
+          "expected": 0,
+          "requirementRefs": [
+            "D16"
+          ],
+          "evidenceRefs": [
+            "blocked-db:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseKey": "T16-expiry-delayed-sweep"
+          },
+          "oracleExplanation": "명령 효과 scope에서 생성된 업무 원 행 수가0이다. 감사는 별도로 확인한다.",
+          "oracleRef": {
+            "oracleId": "T16.no-event-expiry",
+            "observationNames": [
+              "post-expiry-dispatched"
+            ]
+          }
+        },
+        {
+          "id": "allocation-after-boundary-5",
+          "op": "equals",
+          "source": {
+            "actionId": "after-db",
+            "pointer": "/data/rawRows/allocations",
+            "where": {
+              "id": {
+                "$result": {
+                  "actionId": "reserve",
+                  "pointer": "/response/allocationId"
+                }
+              }
+            },
+            "field": "state"
+          },
+          "expected": [
+            "SUSPENDED"
+          ],
+          "requirementRefs": [
+            "D16"
+          ],
+          "evidenceRefs": [
+            "after-db:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseKey": "T16-expiry-delayed-sweep"
+          },
+          "oracleExplanation": "독립 원 행의 실물·수량·관계·범위를 정확히 대조한다.",
+          "oracleRef": {
+            "oracleId": "T16.no-event-expiry",
+            "observationNames": [
+              "allocation-after-boundary"
+            ]
+          }
+        },
+        {
+          "id": "post-expiry-dispatched-6",
+          "op": "decimalEquals",
+          "source": {
+            "actionId": "after-api",
+            "pointer": "/response/data/dispatchedQuantity"
+          },
+          "expected": "0",
+          "requirementRefs": [
+            "D16"
+          ],
+          "evidenceRefs": [
+            "after-api:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseKey": "T16-expiry-delayed-sweep"
+          },
+          "oracleExplanation": "실물량·단위와 독립 손계산을 대조한다.",
+          "oracleRef": {
+            "oracleId": "T16.no-event-expiry",
+            "observationNames": [
+              "post-expiry-dispatched"
+            ]
+          },
+          "unit": "BOX",
+          "unitSource": {
+            "actionId": "after-api",
+            "pointer": "/response/data/unit"
+          }
+        },
+        {
+          "id": "post-expiry-dispatched-7",
+          "op": "count",
+          "source": {
+            "actionId": "after-db",
+            "pointer": "/data/rawRows/movements",
+            "where": {
+              "kind": "DISPATCH"
+            }
+          },
+          "expected": 0,
+          "requirementRefs": [
+            "D16"
+          ],
+          "evidenceRefs": [
+            "after-db:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseKey": "T16-expiry-delayed-sweep"
+          },
+          "oracleExplanation": "독립 원 행의 실물·수량·관계·범위를 정확히 대조한다.",
+          "oracleRef": {
+            "oracleId": "T16.no-event-expiry",
+            "observationNames": [
+              "post-expiry-dispatched"
+            ]
+          }
+        },
+        {
+          "id": "expiry-duty-8",
+          "op": "count",
+          "source": {
+            "actionId": "after-db",
+            "pointer": "/data/rawRows/assignments",
+            "where": {
+              "obligationId": {
+                "$result": {
+                  "actionId": "expiry-obligations",
+                  "pointer": "/response/data/obligations/0/id"
+                }
+              },
+              "current": true,
+              "status": "OPEN"
+            }
+          },
+          "expected": 1,
+          "requirementRefs": [
+            "D16"
+          ],
+          "evidenceRefs": [
+            "after-db:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseKey": "T16-expiry-delayed-sweep"
+          },
+          "oracleExplanation": "해당 obligation root/scope의 현재 유효 assignment는 하나다. 의무 root는 실제 명령/대조/sweeper가 반환한 obligationId로 한정한다.",
+          "oracleRef": {
+            "oracleId": "T16.no-event-expiry",
+            "observationNames": [
+              "expiry-duty"
+            ]
+          }
+        },
+        {
+          "id": "expiry-duty-9",
+          "op": "fieldsPresent",
+          "source": {
+            "actionId": "after-db",
+            "pointer": "/data/rawRows/assignments",
+            "where": {
+              "obligationId": {
+                "$result": {
+                  "actionId": "expiry-obligations",
+                  "pointer": "/response/data/obligations/0/id"
+                }
+              },
+              "current": true,
+              "status": "OPEN"
+            }
+          },
+          "expected": [
+            "ownerId",
+            "supervisorId",
+            "nextAction",
+            "nextCheckAt",
+            "rootId",
+            "workId"
+          ],
+          "requirementRefs": [
+            "D16"
+          ],
+          "evidenceRefs": [
+            "after-db:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseKey": "T16-expiry-delayed-sweep"
+          },
+          "oracleExplanation": "책임자의 실제 ID와 다음 행동·확인 시각에 공백이 없어야 한다. 의무 root는 실제 명령/대조/sweeper가 반환한 obligationId로 한정한다.",
+          "oracleRef": {
+            "oracleId": "T16.no-event-expiry",
+            "observationNames": [
+              "expiry-duty"
+            ]
+          }
+        },
+        {
+          "id": "expiry-duty-10",
+          "op": "relationSet",
+          "source": {
+            "actionId": "after-db",
+            "pointer": "/data/rawRows/assignments",
+            "where": {
+              "obligationId": {
+                "$result": {
+                  "actionId": "expiry-obligations",
+                  "pointer": "/response/data/obligations/0/id"
+                }
+              },
+              "current": true,
+              "status": "OPEN"
+            },
+            "field": [
+              "ownerId",
+              "supervisorId",
+              "nextAction",
+              "nextCheckAt"
+            ]
+          },
+          "expected": [
+            [
+              {
+                "$alias": "sales"
+              },
+              {
+                "$alias": "supervisor"
+              },
+              "근거 대조 후 대체 배분 검토",
+              "2026-10-07T10:00:00Z"
+            ]
+          ],
+          "requirementRefs": [
+            "D16"
+          ],
+          "evidenceRefs": [
+            "after-db:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseKey": "T16-expiry-delayed-sweep"
+          },
+          "oracleExplanation": "fixture의 지정된 인간 owner/supervisor와 고정 후속 행동/시각이 유지된다. 의무 root는 실제 명령/대조/sweeper가 반환한 obligationId로 한정한다.",
+          "oracleRef": {
+            "oracleId": "T16.no-event-expiry",
+            "observationNames": [
+              "expiry-duty"
+            ]
+          }
+        },
+        {
+          "id": "boundary-recheck-11",
+          "op": "timeAtMostSeconds",
+          "source": {
+            "actionId": "await-sweep",
+            "pointer": "/data/hostObservation/runtimeTask/completedAt"
+          },
+          "expected": "30",
+          "requirementRefs": [
+            "D16"
+          ],
+          "evidenceRefs": [
+            "await-sweep:actual-adapter-artifact",
+            "advance:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseKey": "T16-expiry-delayed-sweep"
+          },
+          "oracleExplanation": "무이벤트 경계 이후30초 이내 실제 autonomous sweep task의 terminal을 관찰한다.",
+          "oracleRef": {
+            "oracleId": "T16.no-event-expiry",
+            "observationNames": [
+              "boundary-recheck"
+            ]
+          },
+          "baseline": {
+            "actionId": "advance",
+            "pointer": "/data/acknowledgedAt"
+          }
+        },
+        {
+          "id": "boundary-recheck-12",
+          "op": "relationSet",
+          "source": {
+            "actionId": "reserved-db",
+            "pointer": "/data/rawRows/boundaries",
+            "field": [
+              "allocationId",
+              "validAt",
+              "kind"
+            ]
+          },
+          "expected": [
+            [
+              {
+                "$result": {
+                  "actionId": "reserve",
+                  "pointer": "/response/allocationId"
+                }
+              },
+              "2026-10-07T09:05:00Z",
+              "DISPOSITION_VALID_UNTIL"
+            ]
+          ],
+          "requirementRefs": [
+            "D16"
+          ],
+          "evidenceRefs": [
+            "after-db:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseKey": "T16-expiry-delayed-sweep"
+          },
+          "oracleExplanation": "이벤트 없는 만료 전에 예약의 nextValidityBoundary T를 실제 index 원 행으로 등록한다.",
+          "oracleRef": {
+            "oracleId": "T16.no-event-expiry",
+            "observationNames": [
+              "boundary-recheck"
+            ]
+          }
+        },
+        {
+          "id": "boundary-recheck-13",
+          "op": "sameAs",
+          "source": {
+            "actionId": "after-db",
+            "pointer": "/data/rawRows/allocations",
+            "where": {
+              "id": {
+                "$result": {
+                  "actionId": "reserve",
+                  "pointer": "/response/allocationId"
+                }
+              }
+            },
+            "field": "suspendedTransactionId"
+          },
+          "expected": true,
+          "requirementRefs": [
+            "D16"
+          ],
+          "evidenceRefs": [
+            "after-db:actual-adapter-artifact",
+            "after-db:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseKey": "T16-expiry-delayed-sweep"
+          },
+          "oracleExplanation": "sweep의 배분 정지와 의무 upsert는 같은 실제 transaction이다.",
+          "oracleRef": {
+            "oracleId": "T16.no-event-expiry",
+            "observationNames": [
+              "boundary-recheck"
+            ]
+          },
+          "baseline": {
+            "actionId": "after-db",
+            "pointer": "/data/rawRows/assignments",
+            "where": {
+              "obligationId": {
+                "$result": {
+                  "actionId": "expiry-obligations",
+                  "pointer": "/response/data/obligations/0/id"
+                }
+              },
+              "current": true
+            },
+            "field": "transactionId"
+          }
+        },
+        {
+          "id": "boundary-recheck-14",
+          "op": "count",
+          "source": {
+            "actionId": "after-db",
+            "pointer": "/data/rawRows/locks",
+            "where": {
+              "kind": "SCOPE_FENCE",
+              "scopeRootId": {
+                "$alias": "A20"
+              }
+            }
+          },
+          "expected": 1,
+          "requirementRefs": [
+            "D16"
+          ],
+          "evidenceRefs": [
+            "after-db:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseKey": "T16-expiry-delayed-sweep"
+          },
+          "oracleExplanation": "독립 원 행의 실물·수량·관계·범위를 정확히 대조한다.",
+          "oracleRef": {
+            "oracleId": "T16.no-event-expiry",
+            "observationNames": [
+              "boundary-recheck"
+            ]
+          }
+        },
+        {
+          "id": "active-physical-identities",
+          "op": "unique",
+          "source": {
+            "actionId": "after-db",
+            "pointer": "/data/rawRows/segments",
+            "where": {
+              "active": true
+            },
+            "field": "physicalScope"
+          },
+          "expected": true,
+          "requirementRefs": [
+            "D16"
+          ],
+          "evidenceRefs": [
+            "dispatch:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseKey": "T16-expiry-delayed-sweep"
+          },
+          "oracleExplanation": "현재 active 실물 identity를 한 번씩만 합산하며 중복 실물은 거부한다.",
+          "oracleRef": {
+            "oracleId": "T16.no-event-expiry",
+            "observationNames": [
+              "boundary-recheck"
+            ]
+          }
+        },
+        {
+          "id": "response-definition-version",
+          "op": "equals",
+          "source": {
+            "actionId": "after-api",
+            "pointer": "/response/definitionVersion"
+          },
+          "expected": "ontology-v1",
+          "requirementRefs": [
+            "D16"
+          ],
+          "evidenceRefs": [
+            "dispatch:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseKey": "T16-expiry-delayed-sweep"
+          },
+          "oracleExplanation": "수량/제한을 읽는 실제 정의 버전은 고정 v1이며 다른 의미로 대체하지 않는다.",
+          "oracleRef": {
+            "oracleId": "T16.no-event-expiry",
+            "observationNames": [
+              "boundary-recheck"
+            ]
+          }
+        },
+        {
+          "id": "actual-baseline-physical-rows",
+          "op": "relationSet",
+          "source": {
+            "actionId": "before-db",
+            "pointer": "/data/rawRows/segments",
+            "where": {
+              "active": true
+            },
+            "field": [
+              "id",
+              "quantity",
+              "unit"
+            ]
+          },
+          "expected": [
+            [
+              {
+                "$alias": "A20"
+              },
+              "20",
+              "BOX"
+            ]
+          ],
+          "requirementRefs": [
+            "D16"
+          ],
+          "evidenceRefs": [
+            "dispatch:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseKey": "T16-expiry-delayed-sweep"
+          },
+          "oracleExplanation": "서버에 실제 설치된 시작 실물의 ID·decimal·unit을 원 행에서 확인한다. baseline 자체는 업무 실행 coverage가 아니다.",
+          "oracleRef": {
+            "oracleId": "T16.no-event-expiry",
+            "observationNames": [
+              "boundary-recheck"
+            ]
+          }
+        },
+        {
+          "id": "actual-expiry-obligation-scope",
+          "op": "count",
+          "source": {
+            "actionId": "expiry-obligations",
+            "pointer": "/response/data/obligations"
+          },
+          "expected": 1,
+          "requirementRefs": [
+            "D16"
+          ],
+          "evidenceRefs": [
+            "dispatch:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseKey": "T16-expiry-delayed-sweep"
+          },
+          "oracleExplanation": "현재 allocation20의 만료 의무를 동일 DB snapshot에서 정확히 하나 조회한다.",
+          "oracleRef": {
+            "oracleId": "T16.no-event-expiry",
+            "observationNames": [
+              "expiry-duty"
+            ]
+          }
+        }
+      ],
+      "oracleExplanation": "예약20은 T까지 허용된다. queue 비어도 T 이후 sweeper가 정지/의무를 upsert하며 sweep 지연 중 출고 guard도 실제 현재조건을 재검증한다."
+    }
+  ]
+}

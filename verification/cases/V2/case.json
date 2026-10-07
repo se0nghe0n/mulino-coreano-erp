@@ -1,0 +1,4157 @@
+{
+  "schemaVersion": "1.0.0",
+  "caseId": "V2",
+  "title": "분할·배분 경합과 실제량 정정",
+  "requirementRefs": [
+    "D17"
+  ],
+  "profiles": [
+    "scenarios",
+    "recovery"
+  ],
+  "subcases": [
+    {
+      "id": "split-commits-first",
+      "title": "분할·신규 예약 경합에서 split 거래를 먼저 commit한다",
+      "fixtureRef": "verification/cases/V2/fixtures/split-commits-first.json",
+      "requiredAdapters": [
+        "fixture",
+        "api",
+        "db",
+        "control"
+      ],
+      "actions": [
+        {
+          "id": "setup",
+          "kind": "installFixture",
+          "fixtureRef": "verification/cases/V2/fixtures/split-commits-first.json",
+          "evidenceRefs": [
+            "setup:actual-adapter-artifact"
+          ]
+        },
+        {
+          "id": "before-api",
+          "kind": "query",
+          "actorRef": "warehouse",
+          "route": "api",
+          "capabilityId": "getInventory",
+          "request": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseKey": "V2-split-commits-first"
+            },
+            "action": "SELL",
+            "customerId": {
+              "$alias": "CUSTOMER"
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z"
+          },
+          "evidenceRefs": [
+            "before-api:actual-adapter-artifact"
+          ]
+        },
+        {
+          "id": "before-db",
+          "kind": "observe",
+          "observation": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseKey": "V2-split-commits-first",
+              "transactionCommandKeys": [
+                "V2-split-commits-first-contender-call",
+                "V2-split-commits-first-winner"
+              ]
+            },
+            "snapshotRef": {
+              "$result": {
+                "actionId": "before-api",
+                "pointer": "/response/snapshotRevision"
+              }
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z",
+            "sources": [
+              "segments",
+              "movements",
+              "genealogy",
+              "allocations",
+              "obligations",
+              "assignments",
+              "restrictions",
+              "dispositionBases",
+              "audit",
+              "outbox",
+              "commandResults",
+              "events",
+              "evidenceLinks",
+              "logisticsMemberships",
+              "shipments",
+              "intakes",
+              "stocktakes",
+              "decisions",
+              "locks",
+              "retryAttempts",
+              "dbPrivileges",
+              "boundaries",
+              "transactions"
+            ]
+          },
+          "evidenceRefs": [
+            "before-db:actual-adapter-artifact"
+          ]
+        },
+        {
+          "id": "contender",
+          "kind": "start",
+          "call": {
+            "id": "contender-call",
+            "kind": "invoke",
+            "actorRef": "warehouse",
+            "route": "api",
+            "capabilityId": "reserveQuantity",
+            "request": {
+              "intentKind": "COMMAND",
+              "definitionVersion": "ontology-v1",
+              "capabilityId": "reserveQuantity",
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "subjectRefs": [
+                {
+                  "type": "QuantitySegment",
+                  "id": {
+                    "$alias": "A60"
+                  }
+                }
+              ],
+              "slots": {
+                "quantity": {
+                  "value": "20",
+                  "unit": "BOX",
+                  "provenance": "USER"
+                },
+                "orderLineId": {
+                  "$alias": "ORDER"
+                },
+                "testBarrier": "afterInitialReadBeforeLocks"
+              },
+              "expectedRevision": 1,
+              "commandIdempotencyKey": "V2-split-commits-first-contender-call",
+              "evidenceRefs": [
+                {
+                  "$alias": "operation-proof"
+                }
+              ],
+              "valueProvenance": "USER"
+            },
+            "evidenceRefs": [
+              "contender-call:actual-adapter-artifact"
+            ]
+          },
+          "evidenceRefs": [
+            "contender:actual-adapter-artifact"
+          ]
+        },
+        {
+          "id": "reached",
+          "kind": "control",
+          "control": {
+            "type": "barrier",
+            "operation": "waitReached",
+            "parameters": {
+              "barrierId": "V2-split-commits-first-barrier",
+              "participantId": "contender",
+              "transactionId": {
+                "$result": {
+                  "actionId": "contender",
+                  "pointer": "/data/transactionId"
+                }
+              },
+              "point": "afterInitialReadBeforeLocks",
+              "state": "REACHED",
+              "scope": {
+                "organizationId": {
+                  "$alias": "ORG"
+                },
+                "itemId": {
+                  "$alias": "P"
+                },
+                "caseKey": "V2-split-commits-first"
+              }
+            }
+          },
+          "evidenceRefs": [
+            "reached:actual-adapter-artifact"
+          ]
+        },
+        {
+          "id": "winner",
+          "kind": "invoke",
+          "actorRef": "warehouse",
+          "route": "api",
+          "capabilityId": "splitQuantity",
+          "request": {
+            "intentKind": "COMMAND",
+            "definitionVersion": "ontology-v1",
+            "capabilityId": "splitQuantity",
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "subjectRefs": [
+              {
+                "type": "QuantitySegment",
+                "id": {
+                  "$alias": "A60"
+                }
+              }
+            ],
+            "slots": {
+              "children": [
+                {
+                  "value": "40",
+                  "unit": "BOX",
+                  "provenance": "USER"
+                },
+                {
+                  "value": "20",
+                  "unit": "BOX",
+                  "provenance": "USER"
+                }
+              ],
+              "loss": {
+                "value": "0",
+                "unit": "BOX",
+                "provenance": "USER"
+              },
+              "allocationTransfer": [
+                {
+                  "allocationId": {
+                    "$alias": "ALLOC"
+                  },
+                  "childIndex": 0
+                }
+              ]
+            },
+            "expectedRevision": 1,
+            "commandIdempotencyKey": "V2-split-commits-first-winner",
+            "evidenceRefs": [
+              {
+                "$alias": "operation-proof"
+              }
+            ],
+            "valueProvenance": "USER"
+          },
+          "evidenceRefs": [
+            "winner:actual-adapter-artifact"
+          ]
+        },
+        {
+          "id": "resume",
+          "kind": "control",
+          "control": {
+            "type": "barrier",
+            "operation": "resume",
+            "parameters": {
+              "barrierId": "V2-split-commits-first-barrier",
+              "participantId": "contender",
+              "transactionId": {
+                "$result": {
+                  "actionId": "contender",
+                  "pointer": "/data/transactionId"
+                }
+              },
+              "point": "afterInitialReadBeforeLocks",
+              "state": "RESUMED",
+              "scope": {
+                "organizationId": {
+                  "$alias": "ORG"
+                },
+                "itemId": {
+                  "$alias": "P"
+                },
+                "caseKey": "V2-split-commits-first"
+              }
+            }
+          },
+          "evidenceRefs": [
+            "resume:actual-adapter-artifact"
+          ]
+        },
+        {
+          "id": "terminal",
+          "kind": "await",
+          "awaitActionId": "contender",
+          "timeoutSeconds": 30,
+          "evidenceRefs": [
+            "terminal:actual-adapter-artifact"
+          ]
+        },
+        {
+          "id": "raced-api",
+          "kind": "query",
+          "actorRef": "warehouse",
+          "route": "api",
+          "capabilityId": "getInventory",
+          "request": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseKey": "V2-split-commits-first"
+            },
+            "action": "SELL",
+            "customerId": {
+              "$alias": "CUSTOMER"
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z"
+          },
+          "evidenceRefs": [
+            "raced-api:actual-adapter-artifact"
+          ]
+        },
+        {
+          "id": "raced-db",
+          "kind": "observe",
+          "observation": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseKey": "V2-split-commits-first",
+              "transactionCommandKeys": [
+                "V2-split-commits-first-contender-call",
+                "V2-split-commits-first-winner"
+              ]
+            },
+            "snapshotRef": {
+              "$result": {
+                "actionId": "raced-api",
+                "pointer": "/response/snapshotRevision"
+              }
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z",
+            "sources": [
+              "segments",
+              "movements",
+              "genealogy",
+              "allocations",
+              "obligations",
+              "assignments",
+              "restrictions",
+              "dispositionBases",
+              "audit",
+              "outbox",
+              "commandResults",
+              "events",
+              "evidenceLinks",
+              "logisticsMemberships",
+              "shipments",
+              "intakes",
+              "stocktakes",
+              "decisions",
+              "locks",
+              "retryAttempts",
+              "dbPrivileges",
+              "boundaries",
+              "transactions"
+            ]
+          },
+          "evidenceRefs": [
+            "raced-db:actual-adapter-artifact"
+          ]
+        },
+        {
+          "id": "split-api",
+          "kind": "query",
+          "actorRef": "warehouse",
+          "route": "api",
+          "capabilityId": "getInventory",
+          "request": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseKey": "V2-split-commits-first"
+            },
+            "action": "SELL",
+            "customerId": {
+              "$alias": "CUSTOMER"
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z"
+          },
+          "evidenceRefs": [
+            "split-api:actual-adapter-artifact"
+          ]
+        },
+        {
+          "id": "split-db",
+          "kind": "observe",
+          "observation": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseKey": "V2-split-commits-first",
+              "transactionCommandKeys": [
+                "V2-split-commits-first-contender-call",
+                "V2-split-commits-first-winner"
+              ]
+            },
+            "snapshotRef": {
+              "$result": {
+                "actionId": "split-api",
+                "pointer": "/response/snapshotRevision"
+              }
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z",
+            "sources": [
+              "segments",
+              "movements",
+              "genealogy",
+              "allocations",
+              "obligations",
+              "assignments",
+              "restrictions",
+              "dispositionBases",
+              "audit",
+              "outbox",
+              "commandResults",
+              "events",
+              "evidenceLinks",
+              "logisticsMemberships",
+              "shipments",
+              "intakes",
+              "stocktakes",
+              "decisions",
+              "locks",
+              "retryAttempts",
+              "dbPrivileges",
+              "boundaries",
+              "transactions"
+            ]
+          },
+          "evidenceRefs": [
+            "split-db:actual-adapter-artifact"
+          ]
+        },
+        {
+          "id": "retired-parent",
+          "kind": "invoke",
+          "actorRef": "warehouse",
+          "route": "api",
+          "capabilityId": "reserveQuantity",
+          "request": {
+            "intentKind": "COMMAND",
+            "definitionVersion": "ontology-v1",
+            "capabilityId": "reserveQuantity",
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "subjectRefs": [
+              {
+                "type": "QuantitySegment",
+                "id": {
+                  "$alias": "A60"
+                }
+              }
+            ],
+            "slots": {
+              "quantity": {
+                "value": "1",
+                "unit": "BOX",
+                "provenance": "USER"
+              },
+              "orderLineId": {
+                "$alias": "ORDER"
+              }
+            },
+            "expectedRevision": {
+              "$result": {
+                "actionId": "winner",
+                "pointer": "/response/revision"
+              }
+            },
+            "commandIdempotencyKey": "V2-split-commits-first-retired-parent",
+            "evidenceRefs": [
+              {
+                "$alias": "operation-proof"
+              }
+            ],
+            "valueProvenance": "USER"
+          },
+          "evidenceRefs": [
+            "retired-parent:actual-adapter-artifact"
+          ]
+        },
+        {
+          "id": "after-api",
+          "kind": "query",
+          "actorRef": "warehouse",
+          "route": "api",
+          "capabilityId": "getInventory",
+          "request": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseKey": "V2-split-commits-first"
+            },
+            "action": "SELL",
+            "customerId": {
+              "$alias": "CUSTOMER"
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z"
+          },
+          "evidenceRefs": [
+            "after-api:actual-adapter-artifact"
+          ]
+        },
+        {
+          "id": "after-db",
+          "kind": "observe",
+          "observation": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseKey": "V2-split-commits-first",
+              "transactionCommandKeys": [
+                "V2-split-commits-first-contender-call",
+                "V2-split-commits-first-winner"
+              ]
+            },
+            "snapshotRef": {
+              "$result": {
+                "actionId": "after-api",
+                "pointer": "/response/snapshotRevision"
+              }
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z",
+            "sources": [
+              "segments",
+              "movements",
+              "genealogy",
+              "allocations",
+              "obligations",
+              "assignments",
+              "restrictions",
+              "dispositionBases",
+              "audit",
+              "outbox",
+              "commandResults",
+              "events",
+              "evidenceLinks",
+              "logisticsMemberships",
+              "shipments",
+              "intakes",
+              "stocktakes",
+              "decisions",
+              "locks",
+              "retryAttempts",
+              "dbPrivileges",
+              "boundaries",
+              "transactions"
+            ]
+          },
+          "evidenceRefs": [
+            "after-db:actual-adapter-artifact"
+          ]
+        }
+      ],
+      "assertions": [
+        {
+          "id": "allocation-transfer-1",
+          "op": "equals",
+          "source": {
+            "actionId": "winner",
+            "pointer": "/response/outcome"
+          },
+          "expected": "APPLIED",
+          "requirementRefs": [
+            "D17"
+          ],
+          "evidenceRefs": [
+            "winner:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseKey": "V2-split-commits-first"
+          },
+          "oracleExplanation": "공개 명령의 구조화 outcome을 확인한다.",
+          "oracleRef": {
+            "oracleId": "V2.split-reserve-race",
+            "observationNames": [
+              "allocation-transfer"
+            ]
+          }
+        },
+        {
+          "id": "allocation-transfer-2",
+          "op": "equals",
+          "source": {
+            "actionId": "terminal",
+            "pointer": "/response/outcome"
+          },
+          "expected": "CONFLICT",
+          "requirementRefs": [
+            "D17"
+          ],
+          "evidenceRefs": [
+            "terminal:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseKey": "V2-split-commits-first"
+          },
+          "oracleExplanation": "공개 명령의 구조화 outcome을 확인한다.",
+          "oracleRef": {
+            "oracleId": "V2.split-reserve-race",
+            "observationNames": [
+              "allocation-transfer"
+            ]
+          }
+        },
+        {
+          "id": "allocation-transfer-3",
+          "op": "equals",
+          "source": {
+            "actionId": "terminal",
+            "pointer": "/response/errorCode"
+          },
+          "expected": "STALE_REVISION",
+          "requirementRefs": [
+            "D17"
+          ],
+          "evidenceRefs": [
+            "terminal:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseKey": "V2-split-commits-first"
+          },
+          "oracleExplanation": "검증 실패를 해당 오류 코드로 구별한다.",
+          "oracleRef": {
+            "oracleId": "V2.split-reserve-race",
+            "observationNames": [
+              "allocation-transfer"
+            ]
+          }
+        },
+        {
+          "id": "active-physical-4",
+          "op": "decimalEquals",
+          "source": {
+            "actionId": "after-api",
+            "pointer": "/response/data/heldQuantity"
+          },
+          "expected": "60",
+          "requirementRefs": [
+            "D17"
+          ],
+          "evidenceRefs": [
+            "after-api:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseKey": "V2-split-commits-first"
+          },
+          "oracleExplanation": "실물량·단위와 독립 손계산을 대조한다.",
+          "oracleRef": {
+            "oracleId": "V2.split-reserve-race",
+            "observationNames": [
+              "active-physical"
+            ]
+          },
+          "unit": "BOX",
+          "unitSource": {
+            "actionId": "after-api",
+            "pointer": "/response/data/unit"
+          }
+        },
+        {
+          "id": "active-physical-5",
+          "op": "sumEquals",
+          "source": {
+            "actionId": "after-db",
+            "pointer": "/data/rawRows/segments",
+            "where": {
+              "active": true
+            },
+            "field": "quantity"
+          },
+          "expected": "60",
+          "requirementRefs": [
+            "D17"
+          ],
+          "evidenceRefs": [
+            "after-db:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseKey": "V2-split-commits-first"
+          },
+          "oracleExplanation": "실물량·단위와 독립 손계산을 대조한다.",
+          "oracleRef": {
+            "oracleId": "V2.split-reserve-race",
+            "observationNames": [
+              "active-physical"
+            ]
+          },
+          "unit": "BOX",
+          "unitSource": {
+            "actionId": "after-db",
+            "pointer": "/data/rawRows/segments",
+            "where": {
+              "active": true
+            },
+            "field": "unit"
+          }
+        },
+        {
+          "id": "existing-obligation-6",
+          "op": "sumEquals",
+          "source": {
+            "actionId": "after-db",
+            "pointer": "/data/rawRows/obligations",
+            "where": {
+              "rootId": {
+                "$alias": "PROMISE"
+              }
+            },
+            "field": "quantity"
+          },
+          "expected": "40",
+          "requirementRefs": [
+            "D17"
+          ],
+          "evidenceRefs": [
+            "after-db:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseKey": "V2-split-commits-first"
+          },
+          "oracleExplanation": "독립 원 행을 해당 범위에서 합산하며 부모와 자식을 이중 합산하지 않는다.",
+          "oracleRef": {
+            "oracleId": "V2.split-reserve-race",
+            "observationNames": [
+              "existing-obligation"
+            ]
+          },
+          "unit": "BOX",
+          "unitSource": {
+            "actionId": "after-db",
+            "pointer": "/data/rawRows/obligations",
+            "where": {
+              "rootId": {
+                "$alias": "PROMISE"
+              }
+            },
+            "field": "unit"
+          }
+        },
+        {
+          "id": "new-executable-reservation-7",
+          "op": "decimalAtMost",
+          "source": {
+            "actionId": "after-api",
+            "pointer": "/response/data/newExecutableReservationQuantity"
+          },
+          "expected": "0",
+          "requirementRefs": [
+            "D17"
+          ],
+          "evidenceRefs": [
+            "after-api:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseKey": "V2-split-commits-first"
+          },
+          "oracleExplanation": "실물량·단위와 독립 손계산을 대조한다.",
+          "oracleRef": {
+            "oracleId": "V2.split-reserve-race",
+            "observationNames": [
+              "new-executable-reservation"
+            ]
+          },
+          "unit": "BOX",
+          "unitSource": {
+            "actionId": "after-api",
+            "pointer": "/response/data/unit"
+          }
+        },
+        {
+          "id": "new-executable-reservation-8",
+          "op": "count",
+          "source": {
+            "actionId": "after-db",
+            "pointer": "/data/rawRows/allocations",
+            "where": {
+              "commandKey": "V2-split-commits-first-contender-call",
+              "state": "EXECUTABLE"
+            }
+          },
+          "expected": 0,
+          "requirementRefs": [
+            "D17"
+          ],
+          "evidenceRefs": [
+            "after-db:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseKey": "V2-split-commits-first"
+          },
+          "oracleExplanation": "독립 DB의 완전한 명령/행동 scope에서 해당 효과 원 행이0개다. 누락과 빈 결과를 혼동하지 않는다.",
+          "oracleRef": {
+            "oracleId": "V2.split-reserve-race",
+            "observationNames": [
+              "new-executable-reservation"
+            ]
+          }
+        },
+        {
+          "id": "all-executable-reservations-9",
+          "op": "decimalAtMost",
+          "source": {
+            "actionId": "after-api",
+            "pointer": "/response/data/executableReservedQuantity"
+          },
+          "expected": "60",
+          "requirementRefs": [
+            "D17"
+          ],
+          "evidenceRefs": [
+            "after-api:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseKey": "V2-split-commits-first"
+          },
+          "oracleExplanation": "실물량·단위와 독립 손계산을 대조한다.",
+          "oracleRef": {
+            "oracleId": "V2.split-reserve-race",
+            "observationNames": [
+              "all-executable-reservations"
+            ]
+          },
+          "unit": "BOX",
+          "unitSource": {
+            "actionId": "after-api",
+            "pointer": "/response/data/unit"
+          }
+        },
+        {
+          "id": "all-executable-reservations-10",
+          "op": "sumEquals",
+          "source": {
+            "actionId": "after-db",
+            "pointer": "/data/rawRows/allocations",
+            "where": {
+              "state": "EXECUTABLE",
+              "active": true
+            },
+            "field": "quantity"
+          },
+          "expected": "40",
+          "requirementRefs": [
+            "D17"
+          ],
+          "evidenceRefs": [
+            "after-db:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseKey": "V2-split-commits-first"
+          },
+          "oracleExplanation": "독립 원 행을 해당 범위에서 합산하며 부모와 자식을 이중 합산하지 않는다.",
+          "oracleRef": {
+            "oracleId": "V2.split-reserve-race",
+            "observationNames": [
+              "all-executable-reservations"
+            ]
+          },
+          "unit": "BOX",
+          "unitSource": {
+            "actionId": "after-db",
+            "pointer": "/data/rawRows/allocations",
+            "where": {
+              "state": "EXECUTABLE",
+              "active": true
+            },
+            "field": "unit"
+          }
+        },
+        {
+          "id": "retired-parent-reconsumption-11",
+          "op": "equals",
+          "source": {
+            "actionId": "retired-parent",
+            "pointer": "/response/outcome"
+          },
+          "expected": "REJECTED",
+          "requirementRefs": [
+            "D17"
+          ],
+          "evidenceRefs": [
+            "retired-parent:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseKey": "V2-split-commits-first"
+          },
+          "oracleExplanation": "공개 명령의 구조화 outcome을 확인한다.",
+          "oracleRef": {
+            "oracleId": "V2.split-reserve-race",
+            "observationNames": [
+              "retired-parent-reconsumption"
+            ]
+          }
+        },
+        {
+          "id": "retired-parent-reconsumption-12",
+          "op": "sameAs",
+          "source": {
+            "actionId": "after-db",
+            "pointer": "/data/rawRows/segments"
+          },
+          "expected": true,
+          "requirementRefs": [
+            "D17"
+          ],
+          "evidenceRefs": [
+            "after-db:actual-adapter-artifact",
+            "split-db:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseKey": "V2-split-commits-first"
+          },
+          "oracleExplanation": "금지 효과의 동일 scope 전후 원 행을 비교한다. 조회/거부 감사는 별도 scope다.",
+          "oracleRef": {
+            "oracleId": "V2.split-reserve-race",
+            "observationNames": [
+              "retired-parent-reconsumption"
+            ]
+          },
+          "baseline": {
+            "actionId": "split-db",
+            "pointer": "/data/rawRows/segments"
+          }
+        },
+        {
+          "id": "retired-parent-reconsumption-13",
+          "op": "sameAs",
+          "source": {
+            "actionId": "after-db",
+            "pointer": "/data/rawRows/movements"
+          },
+          "expected": true,
+          "requirementRefs": [
+            "D17"
+          ],
+          "evidenceRefs": [
+            "after-db:actual-adapter-artifact",
+            "split-db:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseKey": "V2-split-commits-first"
+          },
+          "oracleExplanation": "금지 효과의 동일 scope 전후 원 행을 비교한다. 조회/거부 감사는 별도 scope다.",
+          "oracleRef": {
+            "oracleId": "V2.split-reserve-race",
+            "observationNames": [
+              "retired-parent-reconsumption"
+            ]
+          },
+          "baseline": {
+            "actionId": "split-db",
+            "pointer": "/data/rawRows/movements"
+          }
+        },
+        {
+          "id": "retired-parent-reconsumption-14",
+          "op": "sameAs",
+          "source": {
+            "actionId": "after-db",
+            "pointer": "/data/rawRows/allocations"
+          },
+          "expected": true,
+          "requirementRefs": [
+            "D17"
+          ],
+          "evidenceRefs": [
+            "after-db:actual-adapter-artifact",
+            "split-db:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseKey": "V2-split-commits-first"
+          },
+          "oracleExplanation": "금지 효과의 동일 scope 전후 원 행을 비교한다. 조회/거부 감사는 별도 scope다.",
+          "oracleRef": {
+            "oracleId": "V2.split-reserve-race",
+            "observationNames": [
+              "retired-parent-reconsumption"
+            ]
+          },
+          "baseline": {
+            "actionId": "split-db",
+            "pointer": "/data/rawRows/allocations"
+          }
+        },
+        {
+          "id": "retired-parent-reconsumption-15",
+          "op": "count",
+          "source": {
+            "actionId": "after-db",
+            "pointer": "/data/rawRows/audit",
+            "where": {
+              "commandKey": "V2-split-commits-first-retired-parent",
+              "outcome": "REJECTED"
+            }
+          },
+          "expected": 1,
+          "requirementRefs": [
+            "D17"
+          ],
+          "evidenceRefs": [
+            "after-db:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseKey": "V2-split-commits-first"
+          },
+          "oracleExplanation": "허용된 denial 감사1과 금지된 업무 효과0을 분리한다.",
+          "oracleRef": {
+            "oracleId": "V2.split-reserve-race",
+            "observationNames": [
+              "retired-parent-reconsumption"
+            ]
+          }
+        },
+        {
+          "id": "allocation-transfer-16",
+          "op": "count",
+          "source": {
+            "actionId": "after-db",
+            "pointer": "/data/rawRows/allocations",
+            "where": {
+              "rootId": {
+                "$alias": "ALLOC"
+              },
+              "active": true
+            }
+          },
+          "expected": 1,
+          "requirementRefs": [
+            "D17"
+          ],
+          "evidenceRefs": [
+            "after-db:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseKey": "V2-split-commits-first"
+          },
+          "oracleExplanation": "독립 원 행의 실물·수량·관계·범위를 정확히 대조한다.",
+          "oracleRef": {
+            "oracleId": "V2.split-reserve-race",
+            "observationNames": [
+              "allocation-transfer"
+            ]
+          }
+        },
+        {
+          "id": "allocation-transfer-17",
+          "op": "relationSet",
+          "source": {
+            "actionId": "after-db",
+            "pointer": "/data/rawRows/allocations",
+            "where": {
+              "rootId": {
+                "$alias": "ALLOC"
+              },
+              "active": true
+            },
+            "field": [
+              "rootId",
+              "segmentId",
+              "quantity",
+              "unit"
+            ]
+          },
+          "expected": [
+            [
+              {
+                "$alias": "ALLOC"
+              },
+              {
+                "$result": {
+                  "actionId": "winner",
+                  "pointer": "/response/children/0/segmentId"
+                }
+              },
+              "40",
+              "BOX"
+            ]
+          ],
+          "requirementRefs": [
+            "D17"
+          ],
+          "evidenceRefs": [
+            "after-db:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseKey": "V2-split-commits-first"
+          },
+          "oracleExplanation": "독립 원 행의 실물·수량·관계·범위를 정확히 대조한다.",
+          "oracleRef": {
+            "oracleId": "V2.split-reserve-race",
+            "observationNames": [
+              "allocation-transfer"
+            ]
+          }
+        },
+        {
+          "id": "allocation-transfer-18",
+          "op": "relationSet",
+          "source": {
+            "actionId": "after-db",
+            "pointer": "/data/rawRows/obligations",
+            "where": {
+              "rootId": {
+                "$alias": "PROMISE"
+              }
+            },
+            "field": [
+              "rootId",
+              "quantity",
+              "unit",
+              "ownerId"
+            ]
+          },
+          "expected": [
+            [
+              {
+                "$alias": "PROMISE"
+              },
+              "40",
+              "BOX",
+              {
+                "$alias": "sales"
+              }
+            ]
+          ],
+          "requirementRefs": [
+            "D17"
+          ],
+          "evidenceRefs": [
+            "after-db:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseKey": "V2-split-commits-first"
+          },
+          "oracleExplanation": "독립 원 행의 실물·수량·관계·범위를 정확히 대조한다.",
+          "oracleRef": {
+            "oracleId": "V2.split-reserve-race",
+            "observationNames": [
+              "allocation-transfer"
+            ]
+          }
+        },
+        {
+          "id": "allocation-transfer-19",
+          "op": "equals",
+          "source": {
+            "actionId": "reached",
+            "pointer": "/data/state"
+          },
+          "expected": "REACHED",
+          "requirementRefs": [
+            "D17"
+          ],
+          "evidenceRefs": [
+            "reached:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseKey": "V2-split-commits-first"
+          },
+          "oracleExplanation": "실제 첫 read 뒤 두 번째 거래를 commit하기 전 barrier reached ACK다.",
+          "oracleRef": {
+            "oracleId": "V2.split-reserve-race",
+            "observationNames": [
+              "allocation-transfer"
+            ]
+          }
+        },
+        {
+          "id": "allocation-transfer-22",
+          "op": "sameAs",
+          "source": {
+            "actionId": "reached",
+            "pointer": "/data/transactionId"
+          },
+          "expected": true,
+          "requirementRefs": [
+            "D17"
+          ],
+          "evidenceRefs": [
+            "reached:actual-adapter-artifact",
+            "terminal:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseKey": "V2-split-commits-first"
+          },
+          "oracleExplanation": "barrier와 terminal await는 같은 contender transaction을 관찰한다.",
+          "oracleRef": {
+            "oracleId": "V2.split-reserve-race",
+            "observationNames": [
+              "allocation-transfer"
+            ]
+          },
+          "baseline": {
+            "actionId": "terminal",
+            "pointer": "/data/transactionId"
+          }
+        },
+        {
+          "id": "allocation-transfer-23",
+          "op": "equals",
+          "source": {
+            "actionId": "terminal",
+            "pointer": "/data/completed"
+          },
+          "expected": true,
+          "requirementRefs": [
+            "D17"
+          ],
+          "evidenceRefs": [
+            "terminal:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseKey": "V2-split-commits-first"
+          },
+          "oracleExplanation": "제출 ACK가 아닌 terminal await를 확인한다.",
+          "oracleRef": {
+            "oracleId": "V2.split-reserve-race",
+            "observationNames": [
+              "allocation-transfer"
+            ]
+          }
+        },
+        {
+          "id": "genuine-two-transactions",
+          "op": "count",
+          "source": {
+            "actionId": "raced-db",
+            "pointer": "/data/rawRows/transactions"
+          },
+          "expected": 2,
+          "requirementRefs": [
+            "D17"
+          ],
+          "evidenceRefs": [
+            "winner:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseKey": "V2-split-commits-first"
+          },
+          "oracleExplanation": "독립 DB transaction 원 행이 contender와 winner 각 하나씩이다. command ID로 거래 증거를 대신하지 않는다.",
+          "oracleRef": {
+            "oracleId": "V2.split-reserve-race",
+            "observationNames": [
+              "allocation-transfer"
+            ]
+          }
+        },
+        {
+          "id": "genuine-distinct-transaction-identities",
+          "op": "unique",
+          "source": {
+            "actionId": "raced-db",
+            "pointer": "/data/rawRows/transactions",
+            "field": "id"
+          },
+          "expected": true,
+          "requirementRefs": [
+            "D17"
+          ],
+          "evidenceRefs": [
+            "winner:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseKey": "V2-split-commits-first"
+          },
+          "oracleExplanation": "서로 다른 실제 DB transaction ID가 중복되지 않는다.",
+          "oracleRef": {
+            "oracleId": "V2.split-reserve-race",
+            "observationNames": [
+              "allocation-transfer"
+            ]
+          }
+        },
+        {
+          "id": "genuine-two-capabilities",
+          "op": "exactSet",
+          "source": {
+            "actionId": "raced-db",
+            "pointer": "/data/rawRows/transactions",
+            "field": "capabilityId"
+          },
+          "expected": [
+            "splitQuantity",
+            "reserveQuantity"
+          ],
+          "requirementRefs": [
+            "D17"
+          ],
+          "evidenceRefs": [
+            "winner:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseKey": "V2-split-commits-first"
+          },
+          "oracleExplanation": "실제 거래는 분할과 예약 각각이며 mock lock이나 제출 ACK만으로 대신하지 않는다.",
+          "oracleRef": {
+            "oracleId": "V2.split-reserve-race",
+            "observationNames": [
+              "allocation-transfer"
+            ]
+          }
+        },
+        {
+          "id": "active-physical-identities",
+          "op": "unique",
+          "source": {
+            "actionId": "after-db",
+            "pointer": "/data/rawRows/segments",
+            "where": {
+              "active": true
+            },
+            "field": "physicalScope"
+          },
+          "expected": true,
+          "requirementRefs": [
+            "D17"
+          ],
+          "evidenceRefs": [
+            "winner:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseKey": "V2-split-commits-first"
+          },
+          "oracleExplanation": "현재 active 실물 identity를 한 번씩만 합산하며 중복 실물은 거부한다.",
+          "oracleRef": {
+            "oracleId": "V2.split-reserve-race",
+            "observationNames": [
+              "allocation-transfer"
+            ]
+          }
+        },
+        {
+          "id": "response-definition-version",
+          "op": "equals",
+          "source": {
+            "actionId": "after-api",
+            "pointer": "/response/definitionVersion"
+          },
+          "expected": "ontology-v1",
+          "requirementRefs": [
+            "D17"
+          ],
+          "evidenceRefs": [
+            "winner:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseKey": "V2-split-commits-first"
+          },
+          "oracleExplanation": "수량/제한을 읽는 실제 정의 버전은 고정 v1이며 다른 의미로 대체하지 않는다.",
+          "oracleRef": {
+            "oracleId": "V2.split-reserve-race",
+            "observationNames": [
+              "allocation-transfer"
+            ]
+          }
+        },
+        {
+          "id": "actual-baseline-physical-rows",
+          "op": "relationSet",
+          "source": {
+            "actionId": "before-db",
+            "pointer": "/data/rawRows/segments",
+            "where": {
+              "active": true
+            },
+            "field": [
+              "id",
+              "quantity",
+              "unit"
+            ]
+          },
+          "expected": [
+            [
+              {
+                "$alias": "A60"
+              },
+              "60",
+              "BOX"
+            ]
+          ],
+          "requirementRefs": [
+            "D17"
+          ],
+          "evidenceRefs": [
+            "winner:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseKey": "V2-split-commits-first"
+          },
+          "oracleExplanation": "서버에 실제 설치된 시작 실물의 ID·decimal·unit을 원 행에서 확인한다. baseline 자체는 업무 실행 coverage가 아니다.",
+          "oracleRef": {
+            "oracleId": "V2.split-reserve-race",
+            "observationNames": [
+              "allocation-transfer"
+            ]
+          }
+        }
+      ],
+      "oracleExplanation": "실물60/기존 약속40은 보존된다. 신규20 경합은20 이하이며 기존 배분은 한 번만 자식으로 이관한다. stale contender는 revision conflict이고 explicit fresh split은 별도 명령이다."
+    },
+    {
+      "id": "reserve-commits-first",
+      "title": "분할·신규 예약 경합에서 reserve 거래를 먼저 commit한다",
+      "fixtureRef": "verification/cases/V2/fixtures/reserve-commits-first.json",
+      "requiredAdapters": [
+        "fixture",
+        "api",
+        "db",
+        "control"
+      ],
+      "actions": [
+        {
+          "id": "setup",
+          "kind": "installFixture",
+          "fixtureRef": "verification/cases/V2/fixtures/reserve-commits-first.json",
+          "evidenceRefs": [
+            "setup:actual-adapter-artifact"
+          ]
+        },
+        {
+          "id": "before-api",
+          "kind": "query",
+          "actorRef": "warehouse",
+          "route": "api",
+          "capabilityId": "getInventory",
+          "request": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseKey": "V2-reserve-commits-first"
+            },
+            "action": "SELL",
+            "customerId": {
+              "$alias": "CUSTOMER"
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z"
+          },
+          "evidenceRefs": [
+            "before-api:actual-adapter-artifact"
+          ]
+        },
+        {
+          "id": "before-db",
+          "kind": "observe",
+          "observation": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseKey": "V2-reserve-commits-first",
+              "transactionCommandKeys": [
+                "V2-reserve-commits-first-contender-call",
+                "V2-reserve-commits-first-winner"
+              ]
+            },
+            "snapshotRef": {
+              "$result": {
+                "actionId": "before-api",
+                "pointer": "/response/snapshotRevision"
+              }
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z",
+            "sources": [
+              "segments",
+              "movements",
+              "genealogy",
+              "allocations",
+              "obligations",
+              "assignments",
+              "restrictions",
+              "dispositionBases",
+              "audit",
+              "outbox",
+              "commandResults",
+              "events",
+              "evidenceLinks",
+              "logisticsMemberships",
+              "shipments",
+              "intakes",
+              "stocktakes",
+              "decisions",
+              "locks",
+              "retryAttempts",
+              "dbPrivileges",
+              "boundaries",
+              "transactions"
+            ]
+          },
+          "evidenceRefs": [
+            "before-db:actual-adapter-artifact"
+          ]
+        },
+        {
+          "id": "contender",
+          "kind": "start",
+          "call": {
+            "id": "contender-call",
+            "kind": "invoke",
+            "actorRef": "warehouse",
+            "route": "api",
+            "capabilityId": "splitQuantity",
+            "request": {
+              "intentKind": "COMMAND",
+              "definitionVersion": "ontology-v1",
+              "capabilityId": "splitQuantity",
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "subjectRefs": [
+                {
+                  "type": "QuantitySegment",
+                  "id": {
+                    "$alias": "A60"
+                  }
+                }
+              ],
+              "slots": {
+                "children": [
+                  {
+                    "value": "40",
+                    "unit": "BOX",
+                    "provenance": "USER"
+                  },
+                  {
+                    "value": "20",
+                    "unit": "BOX",
+                    "provenance": "USER"
+                  }
+                ],
+                "loss": {
+                  "value": "0",
+                  "unit": "BOX",
+                  "provenance": "USER"
+                },
+                "allocationTransfer": [
+                  {
+                    "allocationId": {
+                      "$alias": "ALLOC"
+                    },
+                    "childIndex": 0
+                  }
+                ],
+                "testBarrier": "afterInitialReadBeforeLocks"
+              },
+              "expectedRevision": 1,
+              "commandIdempotencyKey": "V2-reserve-commits-first-contender-call",
+              "evidenceRefs": [
+                {
+                  "$alias": "operation-proof"
+                }
+              ],
+              "valueProvenance": "USER"
+            },
+            "evidenceRefs": [
+              "contender-call:actual-adapter-artifact"
+            ]
+          },
+          "evidenceRefs": [
+            "contender:actual-adapter-artifact"
+          ]
+        },
+        {
+          "id": "reached",
+          "kind": "control",
+          "control": {
+            "type": "barrier",
+            "operation": "waitReached",
+            "parameters": {
+              "barrierId": "V2-reserve-commits-first-barrier",
+              "participantId": "contender",
+              "transactionId": {
+                "$result": {
+                  "actionId": "contender",
+                  "pointer": "/data/transactionId"
+                }
+              },
+              "point": "afterInitialReadBeforeLocks",
+              "state": "REACHED",
+              "scope": {
+                "organizationId": {
+                  "$alias": "ORG"
+                },
+                "itemId": {
+                  "$alias": "P"
+                },
+                "caseKey": "V2-reserve-commits-first"
+              }
+            }
+          },
+          "evidenceRefs": [
+            "reached:actual-adapter-artifact"
+          ]
+        },
+        {
+          "id": "winner",
+          "kind": "invoke",
+          "actorRef": "sales",
+          "route": "api",
+          "capabilityId": "reserveQuantity",
+          "request": {
+            "intentKind": "COMMAND",
+            "definitionVersion": "ontology-v1",
+            "capabilityId": "reserveQuantity",
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "subjectRefs": [
+              {
+                "type": "QuantitySegment",
+                "id": {
+                  "$alias": "A60"
+                }
+              }
+            ],
+            "slots": {
+              "quantity": {
+                "value": "20",
+                "unit": "BOX",
+                "provenance": "USER"
+              },
+              "orderLineId": {
+                "$alias": "ORDER"
+              }
+            },
+            "expectedRevision": 1,
+            "commandIdempotencyKey": "V2-reserve-commits-first-winner",
+            "evidenceRefs": [
+              {
+                "$alias": "operation-proof"
+              }
+            ],
+            "valueProvenance": "USER"
+          },
+          "evidenceRefs": [
+            "winner:actual-adapter-artifact"
+          ]
+        },
+        {
+          "id": "resume",
+          "kind": "control",
+          "control": {
+            "type": "barrier",
+            "operation": "resume",
+            "parameters": {
+              "barrierId": "V2-reserve-commits-first-barrier",
+              "participantId": "contender",
+              "transactionId": {
+                "$result": {
+                  "actionId": "contender",
+                  "pointer": "/data/transactionId"
+                }
+              },
+              "point": "afterInitialReadBeforeLocks",
+              "state": "RESUMED",
+              "scope": {
+                "organizationId": {
+                  "$alias": "ORG"
+                },
+                "itemId": {
+                  "$alias": "P"
+                },
+                "caseKey": "V2-reserve-commits-first"
+              }
+            }
+          },
+          "evidenceRefs": [
+            "resume:actual-adapter-artifact"
+          ]
+        },
+        {
+          "id": "terminal",
+          "kind": "await",
+          "awaitActionId": "contender",
+          "timeoutSeconds": 30,
+          "evidenceRefs": [
+            "terminal:actual-adapter-artifact"
+          ]
+        },
+        {
+          "id": "raced-api",
+          "kind": "query",
+          "actorRef": "warehouse",
+          "route": "api",
+          "capabilityId": "getInventory",
+          "request": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseKey": "V2-reserve-commits-first"
+            },
+            "action": "SELL",
+            "customerId": {
+              "$alias": "CUSTOMER"
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z"
+          },
+          "evidenceRefs": [
+            "raced-api:actual-adapter-artifact"
+          ]
+        },
+        {
+          "id": "raced-db",
+          "kind": "observe",
+          "observation": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseKey": "V2-reserve-commits-first",
+              "transactionCommandKeys": [
+                "V2-reserve-commits-first-contender-call",
+                "V2-reserve-commits-first-winner"
+              ]
+            },
+            "snapshotRef": {
+              "$result": {
+                "actionId": "raced-api",
+                "pointer": "/response/snapshotRevision"
+              }
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z",
+            "sources": [
+              "segments",
+              "movements",
+              "genealogy",
+              "allocations",
+              "obligations",
+              "assignments",
+              "restrictions",
+              "dispositionBases",
+              "audit",
+              "outbox",
+              "commandResults",
+              "events",
+              "evidenceLinks",
+              "logisticsMemberships",
+              "shipments",
+              "intakes",
+              "stocktakes",
+              "decisions",
+              "locks",
+              "retryAttempts",
+              "dbPrivileges",
+              "boundaries",
+              "transactions"
+            ]
+          },
+          "evidenceRefs": [
+            "raced-db:actual-adapter-artifact"
+          ]
+        },
+        {
+          "id": "explicit-fresh-split",
+          "kind": "invoke",
+          "actorRef": "warehouse",
+          "route": "api",
+          "capabilityId": "splitQuantity",
+          "request": {
+            "intentKind": "COMMAND",
+            "definitionVersion": "ontology-v1",
+            "capabilityId": "splitQuantity",
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "subjectRefs": [
+              {
+                "type": "QuantitySegment",
+                "id": {
+                  "$alias": "A60"
+                }
+              }
+            ],
+            "slots": {
+              "children": [
+                {
+                  "value": "40",
+                  "unit": "BOX",
+                  "provenance": "USER"
+                },
+                {
+                  "value": "20",
+                  "unit": "BOX",
+                  "provenance": "USER"
+                }
+              ],
+              "loss": {
+                "value": "0",
+                "unit": "BOX",
+                "provenance": "USER"
+              },
+              "allocationTransfer": [
+                {
+                  "allocationId": {
+                    "$alias": "ALLOC"
+                  },
+                  "childIndex": 0
+                },
+                {
+                  "allocationId": {
+                    "$result": {
+                      "actionId": "winner",
+                      "pointer": "/response/allocationId"
+                    }
+                  },
+                  "childIndex": 1
+                }
+              ]
+            },
+            "expectedRevision": {
+              "$result": {
+                "actionId": "winner",
+                "pointer": "/response/revision"
+              }
+            },
+            "commandIdempotencyKey": "V2-reserve-commits-first-explicit-fresh-split",
+            "evidenceRefs": [
+              {
+                "$alias": "operation-proof"
+              }
+            ],
+            "valueProvenance": "USER"
+          },
+          "evidenceRefs": [
+            "explicit-fresh-split:actual-adapter-artifact"
+          ]
+        },
+        {
+          "id": "split-api",
+          "kind": "query",
+          "actorRef": "warehouse",
+          "route": "api",
+          "capabilityId": "getInventory",
+          "request": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseKey": "V2-reserve-commits-first"
+            },
+            "action": "SELL",
+            "customerId": {
+              "$alias": "CUSTOMER"
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z"
+          },
+          "evidenceRefs": [
+            "split-api:actual-adapter-artifact"
+          ]
+        },
+        {
+          "id": "split-db",
+          "kind": "observe",
+          "observation": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseKey": "V2-reserve-commits-first",
+              "transactionCommandKeys": [
+                "V2-reserve-commits-first-contender-call",
+                "V2-reserve-commits-first-winner"
+              ]
+            },
+            "snapshotRef": {
+              "$result": {
+                "actionId": "split-api",
+                "pointer": "/response/snapshotRevision"
+              }
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z",
+            "sources": [
+              "segments",
+              "movements",
+              "genealogy",
+              "allocations",
+              "obligations",
+              "assignments",
+              "restrictions",
+              "dispositionBases",
+              "audit",
+              "outbox",
+              "commandResults",
+              "events",
+              "evidenceLinks",
+              "logisticsMemberships",
+              "shipments",
+              "intakes",
+              "stocktakes",
+              "decisions",
+              "locks",
+              "retryAttempts",
+              "dbPrivileges",
+              "boundaries",
+              "transactions"
+            ]
+          },
+          "evidenceRefs": [
+            "split-db:actual-adapter-artifact"
+          ]
+        },
+        {
+          "id": "retired-parent",
+          "kind": "invoke",
+          "actorRef": "warehouse",
+          "route": "api",
+          "capabilityId": "reserveQuantity",
+          "request": {
+            "intentKind": "COMMAND",
+            "definitionVersion": "ontology-v1",
+            "capabilityId": "reserveQuantity",
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "subjectRefs": [
+              {
+                "type": "QuantitySegment",
+                "id": {
+                  "$alias": "A60"
+                }
+              }
+            ],
+            "slots": {
+              "quantity": {
+                "value": "1",
+                "unit": "BOX",
+                "provenance": "USER"
+              },
+              "orderLineId": {
+                "$alias": "ORDER"
+              }
+            },
+            "expectedRevision": {
+              "$result": {
+                "actionId": "explicit-fresh-split",
+                "pointer": "/response/revision"
+              }
+            },
+            "commandIdempotencyKey": "V2-reserve-commits-first-retired-parent",
+            "evidenceRefs": [
+              {
+                "$alias": "operation-proof"
+              }
+            ],
+            "valueProvenance": "USER"
+          },
+          "evidenceRefs": [
+            "retired-parent:actual-adapter-artifact"
+          ]
+        },
+        {
+          "id": "after-api",
+          "kind": "query",
+          "actorRef": "warehouse",
+          "route": "api",
+          "capabilityId": "getInventory",
+          "request": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseKey": "V2-reserve-commits-first"
+            },
+            "action": "SELL",
+            "customerId": {
+              "$alias": "CUSTOMER"
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z"
+          },
+          "evidenceRefs": [
+            "after-api:actual-adapter-artifact"
+          ]
+        },
+        {
+          "id": "after-db",
+          "kind": "observe",
+          "observation": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseKey": "V2-reserve-commits-first",
+              "transactionCommandKeys": [
+                "V2-reserve-commits-first-contender-call",
+                "V2-reserve-commits-first-winner"
+              ]
+            },
+            "snapshotRef": {
+              "$result": {
+                "actionId": "after-api",
+                "pointer": "/response/snapshotRevision"
+              }
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z",
+            "sources": [
+              "segments",
+              "movements",
+              "genealogy",
+              "allocations",
+              "obligations",
+              "assignments",
+              "restrictions",
+              "dispositionBases",
+              "audit",
+              "outbox",
+              "commandResults",
+              "events",
+              "evidenceLinks",
+              "logisticsMemberships",
+              "shipments",
+              "intakes",
+              "stocktakes",
+              "decisions",
+              "locks",
+              "retryAttempts",
+              "dbPrivileges",
+              "boundaries",
+              "transactions"
+            ]
+          },
+          "evidenceRefs": [
+            "after-db:actual-adapter-artifact"
+          ]
+        }
+      ],
+      "assertions": [
+        {
+          "id": "allocation-transfer-1",
+          "op": "equals",
+          "source": {
+            "actionId": "winner",
+            "pointer": "/response/outcome"
+          },
+          "expected": "APPLIED",
+          "requirementRefs": [
+            "D17"
+          ],
+          "evidenceRefs": [
+            "winner:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseKey": "V2-reserve-commits-first"
+          },
+          "oracleExplanation": "공개 명령의 구조화 outcome을 확인한다.",
+          "oracleRef": {
+            "oracleId": "V2.split-reserve-race",
+            "observationNames": [
+              "allocation-transfer"
+            ]
+          }
+        },
+        {
+          "id": "allocation-transfer-2",
+          "op": "equals",
+          "source": {
+            "actionId": "terminal",
+            "pointer": "/response/outcome"
+          },
+          "expected": "CONFLICT",
+          "requirementRefs": [
+            "D17"
+          ],
+          "evidenceRefs": [
+            "terminal:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseKey": "V2-reserve-commits-first"
+          },
+          "oracleExplanation": "공개 명령의 구조화 outcome을 확인한다.",
+          "oracleRef": {
+            "oracleId": "V2.split-reserve-race",
+            "observationNames": [
+              "allocation-transfer"
+            ]
+          }
+        },
+        {
+          "id": "allocation-transfer-3",
+          "op": "equals",
+          "source": {
+            "actionId": "terminal",
+            "pointer": "/response/errorCode"
+          },
+          "expected": "STALE_REVISION",
+          "requirementRefs": [
+            "D17"
+          ],
+          "evidenceRefs": [
+            "terminal:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseKey": "V2-reserve-commits-first"
+          },
+          "oracleExplanation": "검증 실패를 해당 오류 코드로 구별한다.",
+          "oracleRef": {
+            "oracleId": "V2.split-reserve-race",
+            "observationNames": [
+              "allocation-transfer"
+            ]
+          }
+        },
+        {
+          "id": "active-physical-4",
+          "op": "decimalEquals",
+          "source": {
+            "actionId": "after-api",
+            "pointer": "/response/data/heldQuantity"
+          },
+          "expected": "60",
+          "requirementRefs": [
+            "D17"
+          ],
+          "evidenceRefs": [
+            "after-api:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseKey": "V2-reserve-commits-first"
+          },
+          "oracleExplanation": "실물량·단위와 독립 손계산을 대조한다.",
+          "oracleRef": {
+            "oracleId": "V2.split-reserve-race",
+            "observationNames": [
+              "active-physical"
+            ]
+          },
+          "unit": "BOX",
+          "unitSource": {
+            "actionId": "after-api",
+            "pointer": "/response/data/unit"
+          }
+        },
+        {
+          "id": "active-physical-5",
+          "op": "sumEquals",
+          "source": {
+            "actionId": "after-db",
+            "pointer": "/data/rawRows/segments",
+            "where": {
+              "active": true
+            },
+            "field": "quantity"
+          },
+          "expected": "60",
+          "requirementRefs": [
+            "D17"
+          ],
+          "evidenceRefs": [
+            "after-db:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseKey": "V2-reserve-commits-first"
+          },
+          "oracleExplanation": "실물량·단위와 독립 손계산을 대조한다.",
+          "oracleRef": {
+            "oracleId": "V2.split-reserve-race",
+            "observationNames": [
+              "active-physical"
+            ]
+          },
+          "unit": "BOX",
+          "unitSource": {
+            "actionId": "after-db",
+            "pointer": "/data/rawRows/segments",
+            "where": {
+              "active": true
+            },
+            "field": "unit"
+          }
+        },
+        {
+          "id": "existing-obligation-6",
+          "op": "sumEquals",
+          "source": {
+            "actionId": "after-db",
+            "pointer": "/data/rawRows/obligations",
+            "where": {
+              "rootId": {
+                "$alias": "PROMISE"
+              }
+            },
+            "field": "quantity"
+          },
+          "expected": "40",
+          "requirementRefs": [
+            "D17"
+          ],
+          "evidenceRefs": [
+            "after-db:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseKey": "V2-reserve-commits-first"
+          },
+          "oracleExplanation": "독립 원 행을 해당 범위에서 합산하며 부모와 자식을 이중 합산하지 않는다.",
+          "oracleRef": {
+            "oracleId": "V2.split-reserve-race",
+            "observationNames": [
+              "existing-obligation"
+            ]
+          },
+          "unit": "BOX",
+          "unitSource": {
+            "actionId": "after-db",
+            "pointer": "/data/rawRows/obligations",
+            "where": {
+              "rootId": {
+                "$alias": "PROMISE"
+              }
+            },
+            "field": "unit"
+          }
+        },
+        {
+          "id": "new-executable-reservation-7",
+          "op": "decimalAtMost",
+          "source": {
+            "actionId": "after-api",
+            "pointer": "/response/data/newExecutableReservationQuantity"
+          },
+          "expected": "20",
+          "requirementRefs": [
+            "D17"
+          ],
+          "evidenceRefs": [
+            "after-api:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseKey": "V2-reserve-commits-first"
+          },
+          "oracleExplanation": "실물량·단위와 독립 손계산을 대조한다.",
+          "oracleRef": {
+            "oracleId": "V2.split-reserve-race",
+            "observationNames": [
+              "new-executable-reservation"
+            ]
+          },
+          "unit": "BOX",
+          "unitSource": {
+            "actionId": "after-api",
+            "pointer": "/response/data/unit"
+          }
+        },
+        {
+          "id": "new-executable-reservation-8",
+          "op": "sumEquals",
+          "source": {
+            "actionId": "after-db",
+            "pointer": "/data/rawRows/allocations",
+            "where": {
+              "rootId": {
+                "$result": {
+                  "actionId": "winner",
+                  "pointer": "/response/allocationId"
+                }
+              }
+            },
+            "field": "quantity"
+          },
+          "expected": "20",
+          "requirementRefs": [
+            "D17"
+          ],
+          "evidenceRefs": [
+            "after-db:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseKey": "V2-reserve-commits-first"
+          },
+          "oracleExplanation": "독립 원 행을 해당 범위에서 합산하며 부모와 자식을 이중 합산하지 않는다.",
+          "oracleRef": {
+            "oracleId": "V2.split-reserve-race",
+            "observationNames": [
+              "new-executable-reservation"
+            ]
+          },
+          "unit": "BOX",
+          "unitSource": {
+            "actionId": "after-db",
+            "pointer": "/data/rawRows/allocations",
+            "where": {
+              "rootId": {
+                "$result": {
+                  "actionId": "winner",
+                  "pointer": "/response/allocationId"
+                }
+              }
+            },
+            "field": "unit"
+          }
+        },
+        {
+          "id": "all-executable-reservations-9",
+          "op": "decimalAtMost",
+          "source": {
+            "actionId": "after-api",
+            "pointer": "/response/data/executableReservedQuantity"
+          },
+          "expected": "60",
+          "requirementRefs": [
+            "D17"
+          ],
+          "evidenceRefs": [
+            "after-api:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseKey": "V2-reserve-commits-first"
+          },
+          "oracleExplanation": "실물량·단위와 독립 손계산을 대조한다.",
+          "oracleRef": {
+            "oracleId": "V2.split-reserve-race",
+            "observationNames": [
+              "all-executable-reservations"
+            ]
+          },
+          "unit": "BOX",
+          "unitSource": {
+            "actionId": "after-api",
+            "pointer": "/response/data/unit"
+          }
+        },
+        {
+          "id": "all-executable-reservations-10",
+          "op": "sumEquals",
+          "source": {
+            "actionId": "after-db",
+            "pointer": "/data/rawRows/allocations",
+            "where": {
+              "state": "EXECUTABLE",
+              "active": true
+            },
+            "field": "quantity"
+          },
+          "expected": "60",
+          "requirementRefs": [
+            "D17"
+          ],
+          "evidenceRefs": [
+            "after-db:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseKey": "V2-reserve-commits-first"
+          },
+          "oracleExplanation": "독립 원 행을 해당 범위에서 합산하며 부모와 자식을 이중 합산하지 않는다.",
+          "oracleRef": {
+            "oracleId": "V2.split-reserve-race",
+            "observationNames": [
+              "all-executable-reservations"
+            ]
+          },
+          "unit": "BOX",
+          "unitSource": {
+            "actionId": "after-db",
+            "pointer": "/data/rawRows/allocations",
+            "where": {
+              "state": "EXECUTABLE",
+              "active": true
+            },
+            "field": "unit"
+          }
+        },
+        {
+          "id": "retired-parent-reconsumption-11",
+          "op": "equals",
+          "source": {
+            "actionId": "retired-parent",
+            "pointer": "/response/outcome"
+          },
+          "expected": "REJECTED",
+          "requirementRefs": [
+            "D17"
+          ],
+          "evidenceRefs": [
+            "retired-parent:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseKey": "V2-reserve-commits-first"
+          },
+          "oracleExplanation": "공개 명령의 구조화 outcome을 확인한다.",
+          "oracleRef": {
+            "oracleId": "V2.split-reserve-race",
+            "observationNames": [
+              "retired-parent-reconsumption"
+            ]
+          }
+        },
+        {
+          "id": "retired-parent-reconsumption-12",
+          "op": "sameAs",
+          "source": {
+            "actionId": "after-db",
+            "pointer": "/data/rawRows/segments"
+          },
+          "expected": true,
+          "requirementRefs": [
+            "D17"
+          ],
+          "evidenceRefs": [
+            "after-db:actual-adapter-artifact",
+            "split-db:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseKey": "V2-reserve-commits-first"
+          },
+          "oracleExplanation": "금지 효과의 동일 scope 전후 원 행을 비교한다. 조회/거부 감사는 별도 scope다.",
+          "oracleRef": {
+            "oracleId": "V2.split-reserve-race",
+            "observationNames": [
+              "retired-parent-reconsumption"
+            ]
+          },
+          "baseline": {
+            "actionId": "split-db",
+            "pointer": "/data/rawRows/segments"
+          }
+        },
+        {
+          "id": "retired-parent-reconsumption-13",
+          "op": "sameAs",
+          "source": {
+            "actionId": "after-db",
+            "pointer": "/data/rawRows/movements"
+          },
+          "expected": true,
+          "requirementRefs": [
+            "D17"
+          ],
+          "evidenceRefs": [
+            "after-db:actual-adapter-artifact",
+            "split-db:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseKey": "V2-reserve-commits-first"
+          },
+          "oracleExplanation": "금지 효과의 동일 scope 전후 원 행을 비교한다. 조회/거부 감사는 별도 scope다.",
+          "oracleRef": {
+            "oracleId": "V2.split-reserve-race",
+            "observationNames": [
+              "retired-parent-reconsumption"
+            ]
+          },
+          "baseline": {
+            "actionId": "split-db",
+            "pointer": "/data/rawRows/movements"
+          }
+        },
+        {
+          "id": "retired-parent-reconsumption-14",
+          "op": "sameAs",
+          "source": {
+            "actionId": "after-db",
+            "pointer": "/data/rawRows/allocations"
+          },
+          "expected": true,
+          "requirementRefs": [
+            "D17"
+          ],
+          "evidenceRefs": [
+            "after-db:actual-adapter-artifact",
+            "split-db:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseKey": "V2-reserve-commits-first"
+          },
+          "oracleExplanation": "금지 효과의 동일 scope 전후 원 행을 비교한다. 조회/거부 감사는 별도 scope다.",
+          "oracleRef": {
+            "oracleId": "V2.split-reserve-race",
+            "observationNames": [
+              "retired-parent-reconsumption"
+            ]
+          },
+          "baseline": {
+            "actionId": "split-db",
+            "pointer": "/data/rawRows/allocations"
+          }
+        },
+        {
+          "id": "retired-parent-reconsumption-15",
+          "op": "count",
+          "source": {
+            "actionId": "after-db",
+            "pointer": "/data/rawRows/audit",
+            "where": {
+              "commandKey": "V2-reserve-commits-first-retired-parent",
+              "outcome": "REJECTED"
+            }
+          },
+          "expected": 1,
+          "requirementRefs": [
+            "D17"
+          ],
+          "evidenceRefs": [
+            "after-db:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseKey": "V2-reserve-commits-first"
+          },
+          "oracleExplanation": "허용된 denial 감사1과 금지된 업무 효과0을 분리한다.",
+          "oracleRef": {
+            "oracleId": "V2.split-reserve-race",
+            "observationNames": [
+              "retired-parent-reconsumption"
+            ]
+          }
+        },
+        {
+          "id": "allocation-transfer-16",
+          "op": "count",
+          "source": {
+            "actionId": "after-db",
+            "pointer": "/data/rawRows/allocations",
+            "where": {
+              "rootId": {
+                "$alias": "ALLOC"
+              },
+              "active": true
+            }
+          },
+          "expected": 1,
+          "requirementRefs": [
+            "D17"
+          ],
+          "evidenceRefs": [
+            "after-db:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseKey": "V2-reserve-commits-first"
+          },
+          "oracleExplanation": "독립 원 행의 실물·수량·관계·범위를 정확히 대조한다.",
+          "oracleRef": {
+            "oracleId": "V2.split-reserve-race",
+            "observationNames": [
+              "allocation-transfer"
+            ]
+          }
+        },
+        {
+          "id": "allocation-transfer-17",
+          "op": "relationSet",
+          "source": {
+            "actionId": "after-db",
+            "pointer": "/data/rawRows/allocations",
+            "where": {
+              "rootId": {
+                "$alias": "ALLOC"
+              },
+              "active": true
+            },
+            "field": [
+              "rootId",
+              "segmentId",
+              "quantity",
+              "unit"
+            ]
+          },
+          "expected": [
+            [
+              {
+                "$alias": "ALLOC"
+              },
+              {
+                "$result": {
+                  "actionId": "explicit-fresh-split",
+                  "pointer": "/response/children/0/segmentId"
+                }
+              },
+              "40",
+              "BOX"
+            ]
+          ],
+          "requirementRefs": [
+            "D17"
+          ],
+          "evidenceRefs": [
+            "after-db:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseKey": "V2-reserve-commits-first"
+          },
+          "oracleExplanation": "독립 원 행의 실물·수량·관계·범위를 정확히 대조한다.",
+          "oracleRef": {
+            "oracleId": "V2.split-reserve-race",
+            "observationNames": [
+              "allocation-transfer"
+            ]
+          }
+        },
+        {
+          "id": "allocation-transfer-18",
+          "op": "relationSet",
+          "source": {
+            "actionId": "after-db",
+            "pointer": "/data/rawRows/obligations",
+            "where": {
+              "rootId": {
+                "$alias": "PROMISE"
+              }
+            },
+            "field": [
+              "rootId",
+              "quantity",
+              "unit",
+              "ownerId"
+            ]
+          },
+          "expected": [
+            [
+              {
+                "$alias": "PROMISE"
+              },
+              "40",
+              "BOX",
+              {
+                "$alias": "sales"
+              }
+            ]
+          ],
+          "requirementRefs": [
+            "D17"
+          ],
+          "evidenceRefs": [
+            "after-db:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseKey": "V2-reserve-commits-first"
+          },
+          "oracleExplanation": "독립 원 행의 실물·수량·관계·범위를 정확히 대조한다.",
+          "oracleRef": {
+            "oracleId": "V2.split-reserve-race",
+            "observationNames": [
+              "allocation-transfer"
+            ]
+          }
+        },
+        {
+          "id": "allocation-transfer-19",
+          "op": "equals",
+          "source": {
+            "actionId": "reached",
+            "pointer": "/data/state"
+          },
+          "expected": "REACHED",
+          "requirementRefs": [
+            "D17"
+          ],
+          "evidenceRefs": [
+            "reached:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseKey": "V2-reserve-commits-first"
+          },
+          "oracleExplanation": "실제 첫 read 뒤 두 번째 거래를 commit하기 전 barrier reached ACK다.",
+          "oracleRef": {
+            "oracleId": "V2.split-reserve-race",
+            "observationNames": [
+              "allocation-transfer"
+            ]
+          }
+        },
+        {
+          "id": "allocation-transfer-22",
+          "op": "sameAs",
+          "source": {
+            "actionId": "reached",
+            "pointer": "/data/transactionId"
+          },
+          "expected": true,
+          "requirementRefs": [
+            "D17"
+          ],
+          "evidenceRefs": [
+            "reached:actual-adapter-artifact",
+            "terminal:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseKey": "V2-reserve-commits-first"
+          },
+          "oracleExplanation": "barrier와 terminal await는 같은 contender transaction을 관찰한다.",
+          "oracleRef": {
+            "oracleId": "V2.split-reserve-race",
+            "observationNames": [
+              "allocation-transfer"
+            ]
+          },
+          "baseline": {
+            "actionId": "terminal",
+            "pointer": "/data/transactionId"
+          }
+        },
+        {
+          "id": "allocation-transfer-23",
+          "op": "equals",
+          "source": {
+            "actionId": "terminal",
+            "pointer": "/data/completed"
+          },
+          "expected": true,
+          "requirementRefs": [
+            "D17"
+          ],
+          "evidenceRefs": [
+            "terminal:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseKey": "V2-reserve-commits-first"
+          },
+          "oracleExplanation": "제출 ACK가 아닌 terminal await를 확인한다.",
+          "oracleRef": {
+            "oracleId": "V2.split-reserve-race",
+            "observationNames": [
+              "allocation-transfer"
+            ]
+          }
+        },
+        {
+          "id": "genuine-two-transactions",
+          "op": "count",
+          "source": {
+            "actionId": "raced-db",
+            "pointer": "/data/rawRows/transactions"
+          },
+          "expected": 2,
+          "requirementRefs": [
+            "D17"
+          ],
+          "evidenceRefs": [
+            "winner:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseKey": "V2-reserve-commits-first"
+          },
+          "oracleExplanation": "독립 DB transaction 원 행이 contender와 winner 각 하나씩이다. command ID로 거래 증거를 대신하지 않는다.",
+          "oracleRef": {
+            "oracleId": "V2.split-reserve-race",
+            "observationNames": [
+              "allocation-transfer"
+            ]
+          }
+        },
+        {
+          "id": "genuine-distinct-transaction-identities",
+          "op": "unique",
+          "source": {
+            "actionId": "raced-db",
+            "pointer": "/data/rawRows/transactions",
+            "field": "id"
+          },
+          "expected": true,
+          "requirementRefs": [
+            "D17"
+          ],
+          "evidenceRefs": [
+            "winner:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseKey": "V2-reserve-commits-first"
+          },
+          "oracleExplanation": "서로 다른 실제 DB transaction ID가 중복되지 않는다.",
+          "oracleRef": {
+            "oracleId": "V2.split-reserve-race",
+            "observationNames": [
+              "allocation-transfer"
+            ]
+          }
+        },
+        {
+          "id": "genuine-two-capabilities",
+          "op": "exactSet",
+          "source": {
+            "actionId": "raced-db",
+            "pointer": "/data/rawRows/transactions",
+            "field": "capabilityId"
+          },
+          "expected": [
+            "splitQuantity",
+            "reserveQuantity"
+          ],
+          "requirementRefs": [
+            "D17"
+          ],
+          "evidenceRefs": [
+            "winner:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseKey": "V2-reserve-commits-first"
+          },
+          "oracleExplanation": "실제 거래는 분할과 예약 각각이며 mock lock이나 제출 ACK만으로 대신하지 않는다.",
+          "oracleRef": {
+            "oracleId": "V2.split-reserve-race",
+            "observationNames": [
+              "allocation-transfer"
+            ]
+          }
+        },
+        {
+          "id": "active-physical-identities",
+          "op": "unique",
+          "source": {
+            "actionId": "after-db",
+            "pointer": "/data/rawRows/segments",
+            "where": {
+              "active": true
+            },
+            "field": "physicalScope"
+          },
+          "expected": true,
+          "requirementRefs": [
+            "D17"
+          ],
+          "evidenceRefs": [
+            "winner:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseKey": "V2-reserve-commits-first"
+          },
+          "oracleExplanation": "현재 active 실물 identity를 한 번씩만 합산하며 중복 실물은 거부한다.",
+          "oracleRef": {
+            "oracleId": "V2.split-reserve-race",
+            "observationNames": [
+              "allocation-transfer"
+            ]
+          }
+        },
+        {
+          "id": "response-definition-version",
+          "op": "equals",
+          "source": {
+            "actionId": "after-api",
+            "pointer": "/response/definitionVersion"
+          },
+          "expected": "ontology-v1",
+          "requirementRefs": [
+            "D17"
+          ],
+          "evidenceRefs": [
+            "winner:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseKey": "V2-reserve-commits-first"
+          },
+          "oracleExplanation": "수량/제한을 읽는 실제 정의 버전은 고정 v1이며 다른 의미로 대체하지 않는다.",
+          "oracleRef": {
+            "oracleId": "V2.split-reserve-race",
+            "observationNames": [
+              "allocation-transfer"
+            ]
+          }
+        },
+        {
+          "id": "actual-baseline-physical-rows",
+          "op": "relationSet",
+          "source": {
+            "actionId": "before-db",
+            "pointer": "/data/rawRows/segments",
+            "where": {
+              "active": true
+            },
+            "field": [
+              "id",
+              "quantity",
+              "unit"
+            ]
+          },
+          "expected": [
+            [
+              {
+                "$alias": "A60"
+              },
+              "60",
+              "BOX"
+            ]
+          ],
+          "requirementRefs": [
+            "D17"
+          ],
+          "evidenceRefs": [
+            "winner:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseKey": "V2-reserve-commits-first"
+          },
+          "oracleExplanation": "서버에 실제 설치된 시작 실물의 ID·decimal·unit을 원 행에서 확인한다. baseline 자체는 업무 실행 coverage가 아니다.",
+          "oracleRef": {
+            "oracleId": "V2.split-reserve-race",
+            "observationNames": [
+              "allocation-transfer"
+            ]
+          }
+        }
+      ],
+      "oracleExplanation": "실물60/기존 약속40은 보존된다. 신규20 경합은20 이하이며 기존 배분은 한 번만 자식으로 이관한다. stale contender는 revision conflict이고 explicit fresh split은 별도 명령이다."
+    },
+    {
+      "id": "actual50-correction",
+      "title": "실제50 정정은 약속60과 부족10 책임을 보존한다",
+      "fixtureRef": "verification/cases/V2/fixtures/actual50-correction.json",
+      "requiredAdapters": [
+        "fixture",
+        "api",
+        "db"
+      ],
+      "actions": [
+        {
+          "id": "setup",
+          "kind": "installFixture",
+          "fixtureRef": "verification/cases/V2/fixtures/actual50-correction.json",
+          "evidenceRefs": [
+            "setup:actual-adapter-artifact"
+          ]
+        },
+        {
+          "id": "before-api",
+          "kind": "query",
+          "actorRef": "warehouse",
+          "route": "api",
+          "capabilityId": "getInventory",
+          "request": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseKey": "V2-actual50-correction"
+            },
+            "action": "SELL",
+            "customerId": {
+              "$alias": "CUSTOMER"
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z"
+          },
+          "evidenceRefs": [
+            "before-api:actual-adapter-artifact"
+          ]
+        },
+        {
+          "id": "before-db",
+          "kind": "observe",
+          "observation": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseKey": "V2-actual50-correction"
+            },
+            "snapshotRef": {
+              "$result": {
+                "actionId": "before-api",
+                "pointer": "/response/snapshotRevision"
+              }
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z",
+            "sources": [
+              "segments",
+              "movements",
+              "genealogy",
+              "allocations",
+              "obligations",
+              "assignments",
+              "restrictions",
+              "dispositionBases",
+              "audit",
+              "outbox",
+              "commandResults",
+              "events",
+              "evidenceLinks",
+              "logisticsMemberships",
+              "shipments",
+              "intakes",
+              "stocktakes",
+              "decisions",
+              "locks",
+              "retryAttempts",
+              "dbPrivileges",
+              "boundaries",
+              "transactions"
+            ]
+          },
+          "evidenceRefs": [
+            "before-db:actual-adapter-artifact"
+          ]
+        },
+        {
+          "id": "correct",
+          "kind": "invoke",
+          "actorRef": "recorder",
+          "route": "api",
+          "capabilityId": "correctEvidence",
+          "request": {
+            "intentKind": "RECORD",
+            "definitionVersion": "ontology-v1",
+            "capabilityId": "correctEvidence",
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "subjectRefs": [
+              {
+                "type": "QuantitySegment",
+                "id": {
+                  "$alias": "A60"
+                }
+              }
+            ],
+            "slots": {
+              "occurrenceId": {
+                "$alias": "RECEIPT"
+              },
+              "correctedQuantity": {
+                "value": "50",
+                "unit": "BOX",
+                "provenance": "USER"
+              },
+              "supersedesVersion": "1",
+              "newSourceVersion": "2",
+              "reason": "실수령 원천 대조",
+              "evidenceId": {
+                "$alias": "stocktake-proof"
+              }
+            },
+            "expectedRevision": 1,
+            "commandIdempotencyKey": "V2-actual50-correction-correct",
+            "evidenceRefs": [
+              {
+                "$alias": "operation-proof"
+              }
+            ],
+            "valueProvenance": "USER"
+          },
+          "evidenceRefs": [
+            "correct:actual-adapter-artifact"
+          ]
+        },
+        {
+          "id": "after-api",
+          "kind": "query",
+          "actorRef": "warehouse",
+          "route": "api",
+          "capabilityId": "getInventory",
+          "request": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseKey": "V2-actual50-correction"
+            },
+            "action": "SELL",
+            "customerId": {
+              "$alias": "CUSTOMER"
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z"
+          },
+          "evidenceRefs": [
+            "after-api:actual-adapter-artifact"
+          ]
+        },
+        {
+          "id": "after-db",
+          "kind": "observe",
+          "observation": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseKey": "V2-actual50-correction"
+            },
+            "snapshotRef": {
+              "$result": {
+                "actionId": "after-api",
+                "pointer": "/response/snapshotRevision"
+              }
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z",
+            "sources": [
+              "segments",
+              "movements",
+              "genealogy",
+              "allocations",
+              "obligations",
+              "assignments",
+              "restrictions",
+              "dispositionBases",
+              "audit",
+              "outbox",
+              "commandResults",
+              "events",
+              "evidenceLinks",
+              "logisticsMemberships",
+              "shipments",
+              "intakes",
+              "stocktakes",
+              "decisions",
+              "locks",
+              "retryAttempts",
+              "dbPrivileges",
+              "boundaries",
+              "transactions"
+            ]
+          },
+          "evidenceRefs": [
+            "after-db:actual-adapter-artifact"
+          ]
+        }
+      ],
+      "assertions": [
+        {
+          "id": "active-physical-1",
+          "op": "decimalEquals",
+          "source": {
+            "actionId": "after-api",
+            "pointer": "/response/data/heldQuantity"
+          },
+          "expected": "50",
+          "requirementRefs": [
+            "D17"
+          ],
+          "evidenceRefs": [
+            "after-api:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseKey": "V2-actual50-correction"
+          },
+          "oracleExplanation": "실물량·단위와 독립 손계산을 대조한다.",
+          "oracleRef": {
+            "oracleId": "V2.actual50-correction",
+            "observationNames": [
+              "active-physical"
+            ]
+          },
+          "unit": "BOX",
+          "unitSource": {
+            "actionId": "after-api",
+            "pointer": "/response/data/unit"
+          }
+        },
+        {
+          "id": "active-physical-2",
+          "op": "sumEquals",
+          "source": {
+            "actionId": "after-db",
+            "pointer": "/data/rawRows/segments",
+            "where": {
+              "active": true
+            },
+            "field": "quantity"
+          },
+          "expected": "50",
+          "requirementRefs": [
+            "D17"
+          ],
+          "evidenceRefs": [
+            "after-db:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseKey": "V2-actual50-correction"
+          },
+          "oracleExplanation": "실물량·단위와 독립 손계산을 대조한다.",
+          "oracleRef": {
+            "oracleId": "V2.actual50-correction",
+            "observationNames": [
+              "active-physical"
+            ]
+          },
+          "unit": "BOX",
+          "unitSource": {
+            "actionId": "after-db",
+            "pointer": "/data/rawRows/segments",
+            "where": {
+              "active": true
+            },
+            "field": "unit"
+          }
+        },
+        {
+          "id": "executable-allocation-3",
+          "op": "decimalAtMost",
+          "source": {
+            "actionId": "after-api",
+            "pointer": "/response/data/executableReservedQuantity"
+          },
+          "expected": "50",
+          "requirementRefs": [
+            "D17"
+          ],
+          "evidenceRefs": [
+            "after-api:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseKey": "V2-actual50-correction"
+          },
+          "oracleExplanation": "실물량·단위와 독립 손계산을 대조한다.",
+          "oracleRef": {
+            "oracleId": "V2.actual50-correction",
+            "observationNames": [
+              "executable-allocation"
+            ]
+          },
+          "unit": "BOX",
+          "unitSource": {
+            "actionId": "after-api",
+            "pointer": "/response/data/unit"
+          }
+        },
+        {
+          "id": "executable-allocation-4",
+          "op": "decimalAtMost",
+          "source": {
+            "actionId": "after-db",
+            "pointer": "/data/data/executableAllocationQuantity"
+          },
+          "expected": "50",
+          "requirementRefs": [
+            "D17"
+          ],
+          "evidenceRefs": [
+            "after-db:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseKey": "V2-actual50-correction"
+          },
+          "oracleExplanation": "독립 read-only DB SUM query는 원 행 scope의 실행 배분 상한50을 검증한다. product API projection을 복사하지 않는다.",
+          "oracleRef": {
+            "oracleId": "V2.actual50-correction",
+            "observationNames": [
+              "executable-allocation"
+            ]
+          },
+          "unit": "BOX",
+          "unitSource": {
+            "actionId": "after-db",
+            "pointer": "/data/rawRows/segments",
+            "where": {
+              "active": true
+            },
+            "field": "unit"
+          }
+        },
+        {
+          "id": "promised-obligation-total-5",
+          "op": "sumEquals",
+          "source": {
+            "actionId": "after-db",
+            "pointer": "/data/rawRows/obligations",
+            "where": {
+              "kind": "SALES_PROMISE"
+            },
+            "field": "quantity"
+          },
+          "expected": "60",
+          "requirementRefs": [
+            "D17"
+          ],
+          "evidenceRefs": [
+            "after-db:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseKey": "V2-actual50-correction"
+          },
+          "oracleExplanation": "독립 원 행을 해당 범위에서 합산하며 부모와 자식을 이중 합산하지 않는다.",
+          "oracleRef": {
+            "oracleId": "V2.actual50-correction",
+            "observationNames": [
+              "promised-obligation-total"
+            ]
+          },
+          "unit": "BOX",
+          "unitSource": {
+            "actionId": "after-db",
+            "pointer": "/data/rawRows/obligations",
+            "where": {
+              "kind": "SALES_PROMISE"
+            },
+            "field": "unit"
+          }
+        },
+        {
+          "id": "minimum-shortage-duty-6",
+          "op": "decimalAtLeast",
+          "source": {
+            "actionId": "after-api",
+            "pointer": "/response/data/shortageQuantity"
+          },
+          "expected": "10",
+          "requirementRefs": [
+            "D17"
+          ],
+          "evidenceRefs": [
+            "after-api:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseKey": "V2-actual50-correction"
+          },
+          "oracleExplanation": "실물량·단위와 독립 손계산을 대조한다.",
+          "oracleRef": {
+            "oracleId": "V2.actual50-correction",
+            "observationNames": [
+              "minimum-shortage-duty"
+            ]
+          },
+          "unit": "BOX",
+          "unitSource": {
+            "actionId": "after-api",
+            "pointer": "/response/data/unit"
+          }
+        },
+        {
+          "id": "minimum-shortage-duty-7",
+          "op": "decimalAtLeast",
+          "source": {
+            "actionId": "after-db",
+            "pointer": "/data/data/shortageQuantity"
+          },
+          "expected": "10",
+          "requirementRefs": [
+            "D17"
+          ],
+          "evidenceRefs": [
+            "after-db:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseKey": "V2-actual50-correction"
+          },
+          "oracleExplanation": "독립 read-only DB SUM query는 원 행 scope의 부족 하한10을 검증한다. product API projection을 복사하지 않는다.",
+          "oracleRef": {
+            "oracleId": "V2.actual50-correction",
+            "observationNames": [
+              "minimum-shortage-duty"
+            ]
+          },
+          "unit": "BOX",
+          "unitSource": {
+            "actionId": "after-db",
+            "pointer": "/data/rawRows/segments",
+            "where": {
+              "active": true
+            },
+            "field": "unit"
+          }
+        },
+        {
+          "id": "shortage-duty-8",
+          "op": "count",
+          "source": {
+            "actionId": "after-db",
+            "pointer": "/data/rawRows/assignments",
+            "where": {
+              "obligationId": {
+                "$result": {
+                  "actionId": "correct",
+                  "pointer": "/response/obligationId"
+                }
+              },
+              "current": true,
+              "status": "OPEN"
+            }
+          },
+          "expected": 1,
+          "requirementRefs": [
+            "D17"
+          ],
+          "evidenceRefs": [
+            "after-db:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseKey": "V2-actual50-correction"
+          },
+          "oracleExplanation": "해당 obligation root/scope의 현재 유효 assignment는 하나다. 의무 root는 실제 명령/대조/sweeper가 반환한 obligationId로 한정한다.",
+          "oracleRef": {
+            "oracleId": "V2.actual50-correction",
+            "observationNames": [
+              "shortage-duty"
+            ]
+          }
+        },
+        {
+          "id": "shortage-duty-9",
+          "op": "fieldsPresent",
+          "source": {
+            "actionId": "after-db",
+            "pointer": "/data/rawRows/assignments",
+            "where": {
+              "obligationId": {
+                "$result": {
+                  "actionId": "correct",
+                  "pointer": "/response/obligationId"
+                }
+              },
+              "current": true,
+              "status": "OPEN"
+            }
+          },
+          "expected": [
+            "ownerId",
+            "supervisorId",
+            "nextAction",
+            "nextCheckAt",
+            "rootId",
+            "workId"
+          ],
+          "requirementRefs": [
+            "D17"
+          ],
+          "evidenceRefs": [
+            "after-db:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseKey": "V2-actual50-correction"
+          },
+          "oracleExplanation": "책임자의 실제 ID와 다음 행동·확인 시각에 공백이 없어야 한다. 의무 root는 실제 명령/대조/sweeper가 반환한 obligationId로 한정한다.",
+          "oracleRef": {
+            "oracleId": "V2.actual50-correction",
+            "observationNames": [
+              "shortage-duty"
+            ]
+          }
+        },
+        {
+          "id": "shortage-duty-10",
+          "op": "relationSet",
+          "source": {
+            "actionId": "after-db",
+            "pointer": "/data/rawRows/assignments",
+            "where": {
+              "obligationId": {
+                "$result": {
+                  "actionId": "correct",
+                  "pointer": "/response/obligationId"
+                }
+              },
+              "current": true,
+              "status": "OPEN"
+            },
+            "field": [
+              "ownerId",
+              "supervisorId",
+              "nextAction",
+              "nextCheckAt"
+            ]
+          },
+          "expected": [
+            [
+              {
+                "$alias": "sales"
+              },
+              {
+                "$alias": "supervisor"
+              },
+              "근거 대조 후 대체 배분 검토",
+              "2026-10-07T10:00:00Z"
+            ]
+          ],
+          "requirementRefs": [
+            "D17"
+          ],
+          "evidenceRefs": [
+            "after-db:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseKey": "V2-actual50-correction"
+          },
+          "oracleExplanation": "fixture의 지정된 인간 owner/supervisor와 고정 후속 행동/시각이 유지된다. 의무 root는 실제 명령/대조/sweeper가 반환한 obligationId로 한정한다.",
+          "oracleRef": {
+            "oracleId": "V2.actual50-correction",
+            "observationNames": [
+              "shortage-duty"
+            ]
+          }
+        },
+        {
+          "id": "past-reservation-deletion-to-hide-shortage-12",
+          "op": "relationSet",
+          "source": {
+            "actionId": "after-db",
+            "pointer": "/data/rawRows/allocations",
+            "where": {
+              "rootId": {
+                "$alias": "ALLOC"
+              },
+              "originalRecord": true
+            },
+            "field": [
+              "rootId",
+              "originalQuantity",
+              "unit"
+            ]
+          },
+          "expected": [
+            [
+              {
+                "$alias": "ALLOC"
+              },
+              "60",
+              "BOX"
+            ]
+          ],
+          "requirementRefs": [
+            "D17"
+          ],
+          "evidenceRefs": [
+            "after-db:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseKey": "V2-actual50-correction"
+          },
+          "oracleExplanation": "독립 원 행의 실물·수량·관계·범위를 정확히 대조한다.",
+          "oracleRef": {
+            "oracleId": "V2.actual50-correction",
+            "observationNames": [
+              "past-reservation-deletion-to-hide-shortage"
+            ]
+          }
+        },
+        {
+          "id": "past-reservation-deletion-to-hide-shortage-13",
+          "op": "relationSet",
+          "source": {
+            "actionId": "after-db",
+            "pointer": "/data/rawRows/events",
+            "where": {
+              "occurrenceId": {
+                "$alias": "RECEIPT"
+              }
+            },
+            "field": [
+              "sourceVersion",
+              "quantity",
+              "unit"
+            ]
+          },
+          "expected": [
+            [
+              "1",
+              "60",
+              "BOX"
+            ],
+            [
+              "2",
+              "50",
+              "BOX"
+            ]
+          ],
+          "requirementRefs": [
+            "D17"
+          ],
+          "evidenceRefs": [
+            "after-db:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseKey": "V2-actual50-correction"
+          },
+          "oracleExplanation": "독립 원 행의 실물·수량·관계·범위를 정확히 대조한다.",
+          "oracleRef": {
+            "oracleId": "V2.actual50-correction",
+            "observationNames": [
+              "past-reservation-deletion-to-hide-shortage"
+            ]
+          }
+        },
+        {
+          "id": "active-physical-identities",
+          "op": "unique",
+          "source": {
+            "actionId": "after-db",
+            "pointer": "/data/rawRows/segments",
+            "where": {
+              "active": true
+            },
+            "field": "physicalScope"
+          },
+          "expected": true,
+          "requirementRefs": [
+            "D17"
+          ],
+          "evidenceRefs": [
+            "after-api:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseKey": "V2-actual50-correction"
+          },
+          "oracleExplanation": "현재 active 실물 identity를 한 번씩만 합산하며 중복 실물은 거부한다.",
+          "oracleRef": {
+            "oracleId": "V2.actual50-correction",
+            "observationNames": [
+              "active-physical"
+            ]
+          }
+        },
+        {
+          "id": "response-definition-version",
+          "op": "equals",
+          "source": {
+            "actionId": "after-api",
+            "pointer": "/response/definitionVersion"
+          },
+          "expected": "ontology-v1",
+          "requirementRefs": [
+            "D17"
+          ],
+          "evidenceRefs": [
+            "after-api:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseKey": "V2-actual50-correction"
+          },
+          "oracleExplanation": "수량/제한을 읽는 실제 정의 버전은 고정 v1이며 다른 의미로 대체하지 않는다.",
+          "oracleRef": {
+            "oracleId": "V2.actual50-correction",
+            "observationNames": [
+              "active-physical"
+            ]
+          }
+        },
+        {
+          "id": "actual-baseline-physical-rows",
+          "op": "relationSet",
+          "source": {
+            "actionId": "before-db",
+            "pointer": "/data/rawRows/segments",
+            "where": {
+              "active": true
+            },
+            "field": [
+              "id",
+              "quantity",
+              "unit"
+            ]
+          },
+          "expected": [
+            [
+              {
+                "$alias": "A60"
+              },
+              "60",
+              "BOX"
+            ]
+          ],
+          "requirementRefs": [
+            "D17"
+          ],
+          "evidenceRefs": [
+            "after-api:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseKey": "V2-actual50-correction"
+          },
+          "oracleExplanation": "서버에 실제 설치된 시작 실물의 ID·decimal·unit을 원 행에서 확인한다. baseline 자체는 업무 실행 coverage가 아니다.",
+          "oracleRef": {
+            "oracleId": "V2.actual50-correction",
+            "observationNames": [
+              "active-physical"
+            ]
+          }
+        }
+      ],
+      "oracleExplanation": "실물60→50, executable≤50이어도 약속60은 삭제하지 않는다. 부족10은 정확한 인간 owner와 현재 assignment1을 가진다."
+    }
+  ]
+}

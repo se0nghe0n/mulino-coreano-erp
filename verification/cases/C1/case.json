@@ -1,0 +1,2193 @@
+{
+  "schemaVersion": "1.0.0",
+  "caseId": "C1",
+  "title": "위탁과 고객 보관의 판매 범위",
+  "requirementRefs": [
+    "D05"
+  ],
+  "profiles": [
+    "scenarios"
+  ],
+  "subcases": [
+    {
+      "id": "custody-not-sale",
+      "title": "위탁40과 고객 보관60의 보유·판매·처분을 구분한다",
+      "fixtureRef": "verification/cases/C1/fixtures/custody-not-sale.json",
+      "requiredAdapters": [
+        "fixture",
+        "api",
+        "db"
+      ],
+      "actions": [
+        {
+          "id": "setup",
+          "kind": "installFixture",
+          "fixtureRef": "verification/cases/C1/fixtures/custody-not-sale.json",
+          "evidenceRefs": [
+            "setup:actual-adapter-artifact"
+          ]
+        },
+        {
+          "id": "before-api",
+          "kind": "query",
+          "actorRef": "warehouse",
+          "route": "api",
+          "capabilityId": "getInventory",
+          "request": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseKey": "C1-custody-not-sale"
+            },
+            "action": "SELL",
+            "customerId": {
+              "$alias": "CUSTOMER"
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z"
+          },
+          "evidenceRefs": [
+            "before-api:actual-adapter-artifact"
+          ]
+        },
+        {
+          "id": "before-db",
+          "kind": "observe",
+          "observation": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseKey": "C1-custody-not-sale"
+            },
+            "snapshotRef": {
+              "$result": {
+                "actionId": "before-api",
+                "pointer": "/response/snapshotRevision"
+              }
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z",
+            "sources": [
+              "segments",
+              "movements",
+              "genealogy",
+              "allocations",
+              "obligations",
+              "assignments",
+              "restrictions",
+              "dispositionBases",
+              "audit",
+              "outbox",
+              "commandResults",
+              "events",
+              "evidenceLinks",
+              "logisticsMemberships",
+              "shipments",
+              "intakes",
+              "stocktakes",
+              "decisions",
+              "locks",
+              "retryAttempts",
+              "dbPrivileges",
+              "boundaries",
+              "transactions"
+            ]
+          },
+          "evidenceRefs": [
+            "before-db:actual-adapter-artifact"
+          ]
+        },
+        {
+          "id": "eligible",
+          "kind": "query",
+          "actorRef": "warehouse",
+          "route": "api",
+          "capabilityId": "evaluateEligibility",
+          "request": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseKey": "C1-custody-not-sale"
+            },
+            "action": "SELL",
+            "customerId": {
+              "$alias": "CUSTOMER"
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z"
+          },
+          "evidenceRefs": [
+            "eligible:actual-adapter-artifact"
+          ]
+        },
+        {
+          "id": "custody",
+          "kind": "invoke",
+          "actorRef": "recorder",
+          "route": "api",
+          "capabilityId": "recordHandover",
+          "request": {
+            "intentKind": "RECORD",
+            "definitionVersion": "ontology-v1",
+            "capabilityId": "recordHandover",
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "subjectRefs": [
+              {
+                "type": "QuantitySegment",
+                "id": {
+                  "$alias": "CUS60"
+                }
+              }
+            ],
+            "slots": {
+              "custodianId": {
+                "$alias": "warehouse"
+              },
+              "quantity": {
+                "value": "60",
+                "unit": "BOX",
+                "provenance": "USER"
+              },
+              "confirmedLocationId": {
+                "$alias": "W"
+              }
+            },
+            "expectedRevision": 1,
+            "commandIdempotencyKey": "C1-custody-not-sale-custody",
+            "evidenceRefs": [
+              {
+                "$alias": "operation-proof"
+              }
+            ],
+            "valueProvenance": "USER"
+          },
+          "evidenceRefs": [
+            "custody:actual-adapter-artifact"
+          ]
+        },
+        {
+          "id": "hold-customer",
+          "kind": "invoke",
+          "actorRef": "qc",
+          "route": "api",
+          "capabilityId": "placeHold",
+          "request": {
+            "intentKind": "COMMAND",
+            "definitionVersion": "ontology-v1",
+            "capabilityId": "placeHold",
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "subjectRefs": [
+              {
+                "type": "QuantitySegment",
+                "id": {
+                  "$alias": "CUS60"
+                }
+              }
+            ],
+            "slots": {
+              "quantity": {
+                "value": "60",
+                "unit": "BOX",
+                "provenance": "USER"
+              },
+              "kind": "QC",
+              "action": "SELL"
+            },
+            "expectedRevision": 1,
+            "commandIdempotencyKey": "C1-custody-not-sale-hold-customer",
+            "evidenceRefs": [
+              {
+                "$alias": "operation-proof"
+              }
+            ],
+            "valueProvenance": "USER"
+          },
+          "evidenceRefs": [
+            "hold-customer:actual-adapter-artifact"
+          ]
+        },
+        {
+          "id": "release-customer",
+          "kind": "invoke",
+          "actorRef": "qc",
+          "route": "api",
+          "capabilityId": "releaseHold",
+          "request": {
+            "intentKind": "COMMAND",
+            "definitionVersion": "ontology-v1",
+            "capabilityId": "releaseHold",
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "subjectRefs": [
+              {
+                "type": "QuantitySegment",
+                "id": {
+                  "$alias": "CUS60"
+                }
+              }
+            ],
+            "slots": {
+              "restrictionId": {
+                "$result": {
+                  "actionId": "hold-customer",
+                  "pointer": "/response/restrictionId"
+                }
+              },
+              "quantity": {
+                "value": "60",
+                "unit": "BOX",
+                "provenance": "USER"
+              },
+              "qcDecisionEvidenceId": {
+                "$alias": "qc-proof"
+              }
+            },
+            "expectedRevision": {
+              "$result": {
+                "actionId": "hold-customer",
+                "pointer": "/response/revision"
+              }
+            },
+            "commandIdempotencyKey": "C1-custody-not-sale-release-customer",
+            "evidenceRefs": [
+              {
+                "$alias": "operation-proof"
+              }
+            ],
+            "valueProvenance": "USER"
+          },
+          "evidenceRefs": [
+            "release-customer:actual-adapter-artifact"
+          ]
+        },
+        {
+          "id": "app-write-reserve-customer",
+          "kind": "invoke",
+          "actorRef": "ordinary",
+          "route": "api",
+          "capabilityId": "reserveQuantity",
+          "request": {
+            "intentKind": "COMMAND",
+            "definitionVersion": "ontology-v1",
+            "capabilityId": "reserveQuantity",
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "subjectRefs": [
+              {
+                "type": "QuantitySegment",
+                "id": {
+                  "$alias": "CUS60"
+                }
+              }
+            ],
+            "slots": {
+              "quantity": {
+                "value": "60",
+                "unit": "BOX",
+                "provenance": "USER"
+              },
+              "orderLineId": {
+                "$alias": "ORDER"
+              }
+            },
+            "expectedRevision": {
+              "$result": {
+                "actionId": "release-customer",
+                "pointer": "/response/revision"
+              }
+            },
+            "commandIdempotencyKey": "C1-custody-not-sale-app-write-reserve-customer",
+            "evidenceRefs": [
+              {
+                "$alias": "operation-proof"
+              }
+            ],
+            "valueProvenance": "USER"
+          },
+          "evidenceRefs": [
+            "app-write-reserve-customer:actual-adapter-artifact"
+          ]
+        },
+        {
+          "id": "after-api",
+          "kind": "query",
+          "actorRef": "warehouse",
+          "route": "api",
+          "capabilityId": "getInventory",
+          "request": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseKey": "C1-custody-not-sale"
+            },
+            "action": "SELL",
+            "customerId": {
+              "$alias": "CUSTOMER"
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z"
+          },
+          "evidenceRefs": [
+            "after-api:actual-adapter-artifact"
+          ]
+        },
+        {
+          "id": "after-db",
+          "kind": "observe",
+          "observation": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseKey": "C1-custody-not-sale"
+            },
+            "snapshotRef": {
+              "$result": {
+                "actionId": "after-api",
+                "pointer": "/response/snapshotRevision"
+              }
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z",
+            "sources": [
+              "segments",
+              "movements",
+              "genealogy",
+              "allocations",
+              "obligations",
+              "assignments",
+              "restrictions",
+              "dispositionBases",
+              "audit",
+              "outbox",
+              "commandResults",
+              "events",
+              "evidenceLinks",
+              "logisticsMemberships",
+              "shipments",
+              "intakes",
+              "stocktakes",
+              "decisions",
+              "locks",
+              "retryAttempts",
+              "dbPrivileges",
+              "boundaries",
+              "transactions"
+            ]
+          },
+          "evidenceRefs": [
+            "after-db:actual-adapter-artifact"
+          ]
+        }
+      ],
+      "assertions": [
+        {
+          "id": "held-1",
+          "op": "decimalEquals",
+          "source": {
+            "actionId": "after-api",
+            "pointer": "/response/data/heldQuantity"
+          },
+          "expected": "100",
+          "requirementRefs": [
+            "D05"
+          ],
+          "evidenceRefs": [
+            "after-api:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseKey": "C1-custody-not-sale"
+          },
+          "oracleExplanation": "실물량·단위와 독립 손계산을 대조한다.",
+          "oracleRef": {
+            "oracleId": "C1.initial-eligibility",
+            "observationNames": [
+              "held"
+            ]
+          },
+          "unit": "BOX",
+          "unitSource": {
+            "actionId": "after-api",
+            "pointer": "/response/data/unit"
+          }
+        },
+        {
+          "id": "held-2",
+          "op": "sumEquals",
+          "source": {
+            "actionId": "after-db",
+            "pointer": "/data/rawRows/segments",
+            "where": {
+              "active": true
+            },
+            "field": "quantity"
+          },
+          "expected": "100",
+          "requirementRefs": [
+            "D05"
+          ],
+          "evidenceRefs": [
+            "after-db:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseKey": "C1-custody-not-sale"
+          },
+          "oracleExplanation": "실물량·단위와 독립 손계산을 대조한다.",
+          "oracleRef": {
+            "oracleId": "C1.initial-eligibility",
+            "observationNames": [
+              "held"
+            ]
+          },
+          "unit": "BOX",
+          "unitSource": {
+            "actionId": "after-db",
+            "pointer": "/data/rawRows/segments",
+            "where": {
+              "active": true
+            },
+            "field": "unit"
+          }
+        },
+        {
+          "id": "sell-eligible-3",
+          "op": "decimalEquals",
+          "source": {
+            "actionId": "after-api",
+            "pointer": "/response/data/eligibleQuantity"
+          },
+          "expected": "40",
+          "requirementRefs": [
+            "D05"
+          ],
+          "evidenceRefs": [
+            "after-api:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseKey": "C1-custody-not-sale"
+          },
+          "oracleExplanation": "실물량·단위와 독립 손계산을 대조한다.",
+          "oracleRef": {
+            "oracleId": "C1.initial-eligibility",
+            "observationNames": [
+              "sell-eligible"
+            ]
+          },
+          "unit": "BOX",
+          "unitSource": {
+            "actionId": "after-api",
+            "pointer": "/response/data/unit"
+          }
+        },
+        {
+          "id": "sell-eligible-4",
+          "op": "sumEquals",
+          "source": {
+            "actionId": "after-db",
+            "pointer": "/data/rawRows/segments",
+            "where": {
+              "id": {
+                "$alias": "CON40"
+              },
+              "active": true
+            },
+            "field": "quantity"
+          },
+          "expected": "40",
+          "requirementRefs": [
+            "D05"
+          ],
+          "evidenceRefs": [
+            "after-db:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseKey": "C1-custody-not-sale"
+          },
+          "oracleExplanation": "독립 원 행을 해당 범위에서 합산하며 부모와 자식을 이중 합산하지 않는다.",
+          "oracleRef": {
+            "oracleId": "C1.initial-eligibility",
+            "observationNames": [
+              "sell-eligible"
+            ]
+          },
+          "unit": "BOX",
+          "unitSource": {
+            "actionId": "after-db",
+            "pointer": "/data/rawRows/segments",
+            "where": {
+              "id": {
+                "$alias": "CON40"
+              },
+              "active": true
+            },
+            "field": "unit"
+          }
+        },
+        {
+          "id": "unreserved-eligible-5",
+          "op": "decimalEquals",
+          "source": {
+            "actionId": "after-api",
+            "pointer": "/response/data/unreservedEligibleQuantity"
+          },
+          "expected": "40",
+          "requirementRefs": [
+            "D05"
+          ],
+          "evidenceRefs": [
+            "after-api:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseKey": "C1-custody-not-sale"
+          },
+          "oracleExplanation": "실물량·단위와 독립 손계산을 대조한다.",
+          "oracleRef": {
+            "oracleId": "C1.initial-eligibility",
+            "observationNames": [
+              "unreserved-eligible"
+            ]
+          },
+          "unit": "BOX",
+          "unitSource": {
+            "actionId": "after-api",
+            "pointer": "/response/data/unit"
+          }
+        },
+        {
+          "id": "unreserved-eligible-6",
+          "op": "count",
+          "source": {
+            "actionId": "after-db",
+            "pointer": "/data/rawRows/allocations",
+            "where": {
+              "active": true
+            }
+          },
+          "expected": 0,
+          "requirementRefs": [
+            "D05"
+          ],
+          "evidenceRefs": [
+            "after-db:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseKey": "C1-custody-not-sale"
+          },
+          "oracleExplanation": "독립 원 행의 실물·수량·관계·범위를 정확히 대조한다.",
+          "oracleRef": {
+            "oracleId": "C1.initial-eligibility",
+            "observationNames": [
+              "unreserved-eligible"
+            ]
+          }
+        },
+        {
+          "id": "customer60-added-by-qc-or-app-write-7",
+          "op": "relationSet",
+          "source": {
+            "actionId": "after-db",
+            "pointer": "/data/rawRows/segments",
+            "where": {
+              "id": {
+                "$alias": "CUS60"
+              }
+            },
+            "field": [
+              "id",
+              "ownerId",
+              "custodianId",
+              "riskBearerId",
+              "locationId"
+            ]
+          },
+          "expected": [
+            [
+              {
+                "$alias": "CUS60"
+              },
+              {
+                "$alias": "CUSTOMER"
+              },
+              {
+                "$alias": "warehouse"
+              },
+              {
+                "$alias": "CUSTOMER"
+              },
+              {
+                "$alias": "W"
+              }
+            ]
+          ],
+          "requirementRefs": [
+            "D05"
+          ],
+          "evidenceRefs": [
+            "after-db:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseKey": "C1-custody-not-sale"
+          },
+          "oracleExplanation": "독립 원 행의 실물·수량·관계·범위를 정확히 대조한다.",
+          "oracleRef": {
+            "oracleId": "C1.initial-eligibility",
+            "observationNames": [
+              "customer60-added-by-qc-or-app-write"
+            ]
+          }
+        },
+        {
+          "id": "customer60-added-by-qc-or-app-write-8",
+          "op": "equals",
+          "source": {
+            "actionId": "app-write-reserve-customer",
+            "pointer": "/response/outcome"
+          },
+          "expected": "REJECTED",
+          "requirementRefs": [
+            "D05"
+          ],
+          "evidenceRefs": [
+            "app-write-reserve-customer:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseKey": "C1-custody-not-sale"
+          },
+          "oracleExplanation": "공개 명령의 구조화 outcome을 확인한다.",
+          "oracleRef": {
+            "oracleId": "C1.initial-eligibility",
+            "observationNames": [
+              "customer60-added-by-qc-or-app-write"
+            ]
+          }
+        },
+        {
+          "id": "customer60-added-by-qc-or-app-write-9",
+          "op": "equals",
+          "source": {
+            "actionId": "app-write-reserve-customer",
+            "pointer": "/response/errorCode"
+          },
+          "expected": "INSUFFICIENT_ELIGIBLE_QUANTITY",
+          "requirementRefs": [
+            "D05"
+          ],
+          "evidenceRefs": [
+            "app-write-reserve-customer:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseKey": "C1-custody-not-sale"
+          },
+          "oracleExplanation": "검증 실패를 해당 오류 코드로 구별한다.",
+          "oracleRef": {
+            "oracleId": "C1.initial-eligibility",
+            "observationNames": [
+              "customer60-added-by-qc-or-app-write"
+            ]
+          }
+        },
+        {
+          "id": "customer60-added-by-qc-or-app-write-10",
+          "op": "count",
+          "source": {
+            "actionId": "after-db",
+            "pointer": "/data/rawRows/allocations",
+            "where": {
+              "commandKey": "C1-custody-not-sale-app-write-reserve-customer"
+            }
+          },
+          "expected": 0,
+          "requirementRefs": [
+            "D05"
+          ],
+          "evidenceRefs": [
+            "after-db:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseKey": "C1-custody-not-sale"
+          },
+          "oracleExplanation": "명령 효과 scope에서 생성된 업무 원 행 수가0이다. 감사는 별도로 확인한다.",
+          "oracleRef": {
+            "oracleId": "C1.initial-eligibility",
+            "observationNames": [
+              "customer60-added-by-qc-or-app-write"
+            ]
+          }
+        },
+        {
+          "id": "customer60-added-by-qc-or-app-write-11",
+          "op": "count",
+          "source": {
+            "actionId": "after-db",
+            "pointer": "/data/rawRows/movements",
+            "where": {
+              "commandKey": "C1-custody-not-sale-app-write-reserve-customer"
+            }
+          },
+          "expected": 0,
+          "requirementRefs": [
+            "D05"
+          ],
+          "evidenceRefs": [
+            "after-db:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseKey": "C1-custody-not-sale"
+          },
+          "oracleExplanation": "명령 효과 scope에서 생성된 업무 원 행 수가0이다. 감사는 별도로 확인한다.",
+          "oracleRef": {
+            "oracleId": "C1.initial-eligibility",
+            "observationNames": [
+              "customer60-added-by-qc-or-app-write"
+            ]
+          }
+        },
+        {
+          "id": "customer60-added-by-qc-or-app-write-12",
+          "op": "count",
+          "source": {
+            "actionId": "after-db",
+            "pointer": "/data/rawRows/outbox",
+            "where": {
+              "commandKey": "C1-custody-not-sale-app-write-reserve-customer",
+              "effectClass": "BUSINESS"
+            }
+          },
+          "expected": 0,
+          "requirementRefs": [
+            "D05"
+          ],
+          "evidenceRefs": [
+            "after-db:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseKey": "C1-custody-not-sale"
+          },
+          "oracleExplanation": "명령 효과 scope에서 생성된 업무 원 행 수가0이다. 감사는 별도로 확인한다.",
+          "oracleRef": {
+            "oracleId": "C1.initial-eligibility",
+            "observationNames": [
+              "customer60-added-by-qc-or-app-write"
+            ]
+          }
+        },
+        {
+          "id": "customer60-added-by-qc-or-app-write-13",
+          "op": "count",
+          "source": {
+            "actionId": "after-db",
+            "pointer": "/data/rawRows/audit",
+            "where": {
+              "commandKey": "C1-custody-not-sale-app-write-reserve-customer",
+              "outcome": "REJECTED"
+            }
+          },
+          "expected": 1,
+          "requirementRefs": [
+            "D05"
+          ],
+          "evidenceRefs": [
+            "after-db:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseKey": "C1-custody-not-sale"
+          },
+          "oracleExplanation": "허용된 denial 감사1과 금지된 업무 효과0을 분리한다.",
+          "oracleRef": {
+            "oracleId": "C1.initial-eligibility",
+            "observationNames": [
+              "customer60-added-by-qc-or-app-write"
+            ]
+          }
+        },
+        {
+          "id": "active-physical-identities",
+          "op": "unique",
+          "source": {
+            "actionId": "after-db",
+            "pointer": "/data/rawRows/segments",
+            "where": {
+              "active": true
+            },
+            "field": "physicalScope"
+          },
+          "expected": true,
+          "requirementRefs": [
+            "D05"
+          ],
+          "evidenceRefs": [
+            "after-api:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseKey": "C1-custody-not-sale"
+          },
+          "oracleExplanation": "현재 active 실물 identity를 한 번씩만 합산하며 중복 실물은 거부한다.",
+          "oracleRef": {
+            "oracleId": "C1.initial-eligibility",
+            "observationNames": [
+              "held"
+            ]
+          }
+        },
+        {
+          "id": "response-definition-version",
+          "op": "equals",
+          "source": {
+            "actionId": "after-api",
+            "pointer": "/response/definitionVersion"
+          },
+          "expected": "ontology-v1",
+          "requirementRefs": [
+            "D05"
+          ],
+          "evidenceRefs": [
+            "after-api:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseKey": "C1-custody-not-sale"
+          },
+          "oracleExplanation": "수량/제한을 읽는 실제 정의 버전은 고정 v1이며 다른 의미로 대체하지 않는다.",
+          "oracleRef": {
+            "oracleId": "C1.initial-eligibility",
+            "observationNames": [
+              "held"
+            ]
+          }
+        },
+        {
+          "id": "actual-baseline-physical-rows",
+          "op": "relationSet",
+          "source": {
+            "actionId": "before-db",
+            "pointer": "/data/rawRows/segments",
+            "where": {
+              "active": true
+            },
+            "field": [
+              "id",
+              "quantity",
+              "unit"
+            ]
+          },
+          "expected": [
+            [
+              {
+                "$alias": "CON40"
+              },
+              "40",
+              "BOX"
+            ],
+            [
+              {
+                "$alias": "CUS60"
+              },
+              "60",
+              "BOX"
+            ]
+          ],
+          "requirementRefs": [
+            "D05"
+          ],
+          "evidenceRefs": [
+            "after-api:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseKey": "C1-custody-not-sale"
+          },
+          "oracleExplanation": "서버에 실제 설치된 시작 실물의 ID·decimal·unit을 원 행에서 확인한다. baseline 자체는 업무 실행 coverage가 아니다.",
+          "oracleRef": {
+            "oracleId": "C1.initial-eligibility",
+            "observationNames": [
+              "held"
+            ]
+          }
+        }
+      ],
+      "oracleExplanation": "위탁40+고객 보관60=보유100, confirmed SELL40, 예약0/미예약40. 인계·QC해제·앱WRITE가 고객 소유60의 SELL 근거를 만들지 않는다."
+    },
+    {
+      "id": "revoked-basis",
+      "title": "위탁 허용 철회 뒤 예약20의 책임을 보존하고 새 효과를 막는다",
+      "fixtureRef": "verification/cases/C1/fixtures/revoked-basis.json",
+      "requiredAdapters": [
+        "fixture",
+        "api",
+        "db"
+      ],
+      "actions": [
+        {
+          "id": "setup",
+          "kind": "installFixture",
+          "fixtureRef": "verification/cases/C1/fixtures/revoked-basis.json",
+          "evidenceRefs": [
+            "setup:actual-adapter-artifact"
+          ]
+        },
+        {
+          "id": "before-api",
+          "kind": "query",
+          "actorRef": "warehouse",
+          "route": "api",
+          "capabilityId": "getInventory",
+          "request": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseKey": "C1-revoked-basis"
+            },
+            "action": "SELL",
+            "customerId": {
+              "$alias": "CUSTOMER"
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z"
+          },
+          "evidenceRefs": [
+            "before-api:actual-adapter-artifact"
+          ]
+        },
+        {
+          "id": "before-db",
+          "kind": "observe",
+          "observation": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseKey": "C1-revoked-basis"
+            },
+            "snapshotRef": {
+              "$result": {
+                "actionId": "before-api",
+                "pointer": "/response/snapshotRevision"
+              }
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z",
+            "sources": [
+              "segments",
+              "movements",
+              "genealogy",
+              "allocations",
+              "obligations",
+              "assignments",
+              "restrictions",
+              "dispositionBases",
+              "audit",
+              "outbox",
+              "commandResults",
+              "events",
+              "evidenceLinks",
+              "logisticsMemberships",
+              "shipments",
+              "intakes",
+              "stocktakes",
+              "decisions",
+              "locks",
+              "retryAttempts",
+              "dbPrivileges",
+              "boundaries",
+              "transactions"
+            ]
+          },
+          "evidenceRefs": [
+            "before-db:actual-adapter-artifact"
+          ]
+        },
+        {
+          "id": "revoke",
+          "kind": "invoke",
+          "actorRef": "manager",
+          "route": "api",
+          "capabilityId": "revokeDispositionBasis",
+          "request": {
+            "intentKind": "COMMAND",
+            "definitionVersion": "ontology-v1",
+            "capabilityId": "revokeDispositionBasis",
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "subjectRefs": [
+              {
+                "type": "QuantitySegment",
+                "id": {
+                  "$alias": "CON40"
+                }
+              }
+            ],
+            "slots": {
+              "basisId": {
+                "$alias": "BASIS"
+              },
+              "quantity": {
+                "value": "40",
+                "unit": "BOX",
+                "provenance": "USER"
+              },
+              "action": "SELL",
+              "reason": "공급자 상업 허용 철회",
+              "evidenceId": {
+                "$alias": "management-proof"
+              }
+            },
+            "expectedRevision": 1,
+            "commandIdempotencyKey": "C1-revoked-basis-revoke",
+            "evidenceRefs": [
+              {
+                "$alias": "operation-proof"
+              }
+            ],
+            "valueProvenance": "USER"
+          },
+          "evidenceRefs": [
+            "revoke:actual-adapter-artifact"
+          ]
+        },
+        {
+          "id": "revoked-api",
+          "kind": "query",
+          "actorRef": "warehouse",
+          "route": "api",
+          "capabilityId": "getInventory",
+          "request": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseKey": "C1-revoked-basis"
+            },
+            "action": "SELL",
+            "customerId": {
+              "$alias": "CUSTOMER"
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z"
+          },
+          "evidenceRefs": [
+            "revoked-api:actual-adapter-artifact"
+          ]
+        },
+        {
+          "id": "revoked-db",
+          "kind": "observe",
+          "observation": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseKey": "C1-revoked-basis"
+            },
+            "snapshotRef": {
+              "$result": {
+                "actionId": "revoked-api",
+                "pointer": "/response/snapshotRevision"
+              }
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z",
+            "sources": [
+              "segments",
+              "movements",
+              "genealogy",
+              "allocations",
+              "obligations",
+              "assignments",
+              "restrictions",
+              "dispositionBases",
+              "audit",
+              "outbox",
+              "commandResults",
+              "events",
+              "evidenceLinks",
+              "logisticsMemberships",
+              "shipments",
+              "intakes",
+              "stocktakes",
+              "decisions",
+              "locks",
+              "retryAttempts",
+              "dbPrivileges",
+              "boundaries",
+              "transactions"
+            ]
+          },
+          "evidenceRefs": [
+            "revoked-db:actual-adapter-artifact"
+          ]
+        },
+        {
+          "id": "new-reserve",
+          "kind": "invoke",
+          "actorRef": "sales",
+          "route": "api",
+          "capabilityId": "reserveQuantity",
+          "request": {
+            "intentKind": "COMMAND",
+            "definitionVersion": "ontology-v1",
+            "capabilityId": "reserveQuantity",
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "subjectRefs": [
+              {
+                "type": "QuantitySegment",
+                "id": {
+                  "$alias": "CON40"
+                }
+              }
+            ],
+            "slots": {
+              "quantity": {
+                "value": "20",
+                "unit": "BOX",
+                "provenance": "USER"
+              },
+              "orderLineId": {
+                "$alias": "ORDER"
+              }
+            },
+            "expectedRevision": {
+              "$result": {
+                "actionId": "revoke",
+                "pointer": "/response/revision"
+              }
+            },
+            "commandIdempotencyKey": "C1-revoked-basis-new-reserve",
+            "evidenceRefs": [
+              {
+                "$alias": "operation-proof"
+              }
+            ],
+            "valueProvenance": "USER"
+          },
+          "evidenceRefs": [
+            "new-reserve:actual-adapter-artifact"
+          ]
+        },
+        {
+          "id": "dispatch",
+          "kind": "invoke",
+          "actorRef": "warehouse",
+          "route": "api",
+          "capabilityId": "dispatchQuantity",
+          "request": {
+            "intentKind": "COMMAND",
+            "definitionVersion": "ontology-v1",
+            "capabilityId": "dispatchQuantity",
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "subjectRefs": [
+              {
+                "type": "QuantitySegment",
+                "id": {
+                  "$alias": "CON40"
+                }
+              }
+            ],
+            "slots": {
+              "allocationId": {
+                "$alias": "ALLOC"
+              },
+              "quantity": {
+                "value": "20",
+                "unit": "BOX",
+                "provenance": "USER"
+              },
+              "destinationId": {
+                "$alias": "CUSTOMER"
+              }
+            },
+            "expectedRevision": {
+              "$result": {
+                "actionId": "revoke",
+                "pointer": "/response/revision"
+              }
+            },
+            "commandIdempotencyKey": "C1-revoked-basis-dispatch",
+            "evidenceRefs": [
+              {
+                "$alias": "operation-proof"
+              }
+            ],
+            "valueProvenance": "USER"
+          },
+          "evidenceRefs": [
+            "dispatch:actual-adapter-artifact"
+          ]
+        },
+        {
+          "id": "after-api",
+          "kind": "query",
+          "actorRef": "warehouse",
+          "route": "api",
+          "capabilityId": "getInventory",
+          "request": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseKey": "C1-revoked-basis"
+            },
+            "action": "SELL",
+            "customerId": {
+              "$alias": "CUSTOMER"
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z"
+          },
+          "evidenceRefs": [
+            "after-api:actual-adapter-artifact"
+          ]
+        },
+        {
+          "id": "after-db",
+          "kind": "observe",
+          "observation": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseKey": "C1-revoked-basis"
+            },
+            "snapshotRef": {
+              "$result": {
+                "actionId": "after-api",
+                "pointer": "/response/snapshotRevision"
+              }
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z",
+            "sources": [
+              "segments",
+              "movements",
+              "genealogy",
+              "allocations",
+              "obligations",
+              "assignments",
+              "restrictions",
+              "dispositionBases",
+              "audit",
+              "outbox",
+              "commandResults",
+              "events",
+              "evidenceLinks",
+              "logisticsMemberships",
+              "shipments",
+              "intakes",
+              "stocktakes",
+              "decisions",
+              "locks",
+              "retryAttempts",
+              "dbPrivileges",
+              "boundaries",
+              "transactions"
+            ]
+          },
+          "evidenceRefs": [
+            "after-db:actual-adapter-artifact"
+          ]
+        }
+      ],
+      "assertions": [
+        {
+          "id": "new-reservation-1",
+          "op": "equals",
+          "source": {
+            "actionId": "new-reserve",
+            "pointer": "/response/outcome"
+          },
+          "expected": "REJECTED",
+          "requirementRefs": [
+            "D05"
+          ],
+          "evidenceRefs": [
+            "new-reserve:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseKey": "C1-revoked-basis"
+          },
+          "oracleExplanation": "공개 명령의 구조화 outcome을 확인한다.",
+          "oracleRef": {
+            "oracleId": "C1.revoked-disposition",
+            "observationNames": [
+              "new-reservation"
+            ]
+          }
+        },
+        {
+          "id": "new-reservation-2",
+          "op": "equals",
+          "source": {
+            "actionId": "new-reserve",
+            "pointer": "/response/errorCode"
+          },
+          "expected": "INSUFFICIENT_ELIGIBLE_QUANTITY",
+          "requirementRefs": [
+            "D05"
+          ],
+          "evidenceRefs": [
+            "new-reserve:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseKey": "C1-revoked-basis"
+          },
+          "oracleExplanation": "검증 실패를 해당 오류 코드로 구별한다.",
+          "oracleRef": {
+            "oracleId": "C1.revoked-disposition",
+            "observationNames": [
+              "new-reservation"
+            ]
+          }
+        },
+        {
+          "id": "new-reservation-3",
+          "op": "count",
+          "source": {
+            "actionId": "after-db",
+            "pointer": "/data/rawRows/allocations",
+            "where": {
+              "commandKey": "C1-revoked-basis-new-reserve"
+            }
+          },
+          "expected": 0,
+          "requirementRefs": [
+            "D05"
+          ],
+          "evidenceRefs": [
+            "after-db:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseKey": "C1-revoked-basis"
+          },
+          "oracleExplanation": "명령 효과 scope에서 생성된 업무 원 행 수가0이다. 감사는 별도로 확인한다.",
+          "oracleRef": {
+            "oracleId": "C1.revoked-disposition",
+            "observationNames": [
+              "new-reservation"
+            ]
+          }
+        },
+        {
+          "id": "new-dispatch-4",
+          "op": "equals",
+          "source": {
+            "actionId": "dispatch",
+            "pointer": "/response/outcome"
+          },
+          "expected": "REJECTED",
+          "requirementRefs": [
+            "D05"
+          ],
+          "evidenceRefs": [
+            "dispatch:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseKey": "C1-revoked-basis"
+          },
+          "oracleExplanation": "공개 명령의 구조화 outcome을 확인한다.",
+          "oracleRef": {
+            "oracleId": "C1.revoked-disposition",
+            "observationNames": [
+              "new-dispatch"
+            ]
+          }
+        },
+        {
+          "id": "new-dispatch-5",
+          "op": "equals",
+          "source": {
+            "actionId": "dispatch",
+            "pointer": "/response/errorCode"
+          },
+          "expected": "INSUFFICIENT_ELIGIBLE_QUANTITY",
+          "requirementRefs": [
+            "D05"
+          ],
+          "evidenceRefs": [
+            "dispatch:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseKey": "C1-revoked-basis"
+          },
+          "oracleExplanation": "검증 실패를 해당 오류 코드로 구별한다.",
+          "oracleRef": {
+            "oracleId": "C1.revoked-disposition",
+            "observationNames": [
+              "new-dispatch"
+            ]
+          }
+        },
+        {
+          "id": "new-dispatch-6",
+          "op": "count",
+          "source": {
+            "actionId": "after-db",
+            "pointer": "/data/rawRows/movements",
+            "where": {
+              "commandKey": "C1-revoked-basis-dispatch"
+            }
+          },
+          "expected": 0,
+          "requirementRefs": [
+            "D05"
+          ],
+          "evidenceRefs": [
+            "after-db:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseKey": "C1-revoked-basis"
+          },
+          "oracleExplanation": "명령 효과 scope에서 생성된 업무 원 행 수가0이다. 감사는 별도로 확인한다.",
+          "oracleRef": {
+            "oracleId": "C1.revoked-disposition",
+            "observationNames": [
+              "new-dispatch"
+            ]
+          }
+        },
+        {
+          "id": "new-dispatch-7",
+          "op": "count",
+          "source": {
+            "actionId": "after-db",
+            "pointer": "/data/rawRows/outbox",
+            "where": {
+              "commandKey": "C1-revoked-basis-dispatch",
+              "effectClass": "BUSINESS"
+            }
+          },
+          "expected": 0,
+          "requirementRefs": [
+            "D05"
+          ],
+          "evidenceRefs": [
+            "after-db:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseKey": "C1-revoked-basis"
+          },
+          "oracleExplanation": "명령 효과 scope에서 생성된 업무 원 행 수가0이다. 감사는 별도로 확인한다.",
+          "oracleRef": {
+            "oracleId": "C1.revoked-disposition",
+            "observationNames": [
+              "new-dispatch"
+            ]
+          }
+        },
+        {
+          "id": "new-reservation-8",
+          "op": "sameAs",
+          "source": {
+            "actionId": "after-db",
+            "pointer": "/data/rawRows/segments"
+          },
+          "expected": true,
+          "requirementRefs": [
+            "D05"
+          ],
+          "evidenceRefs": [
+            "after-db:actual-adapter-artifact",
+            "revoked-db:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseKey": "C1-revoked-basis"
+          },
+          "oracleExplanation": "금지 효과의 동일 scope 전후 원 행을 비교한다. 조회/거부 감사는 별도 scope다.",
+          "oracleRef": {
+            "oracleId": "C1.revoked-disposition",
+            "observationNames": [
+              "new-reservation"
+            ]
+          },
+          "baseline": {
+            "actionId": "revoked-db",
+            "pointer": "/data/rawRows/segments"
+          }
+        },
+        {
+          "id": "new-reservation-9",
+          "op": "sameAs",
+          "source": {
+            "actionId": "after-db",
+            "pointer": "/data/rawRows/movements"
+          },
+          "expected": true,
+          "requirementRefs": [
+            "D05"
+          ],
+          "evidenceRefs": [
+            "after-db:actual-adapter-artifact",
+            "revoked-db:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseKey": "C1-revoked-basis"
+          },
+          "oracleExplanation": "금지 효과의 동일 scope 전후 원 행을 비교한다. 조회/거부 감사는 별도 scope다.",
+          "oracleRef": {
+            "oracleId": "C1.revoked-disposition",
+            "observationNames": [
+              "new-reservation"
+            ]
+          },
+          "baseline": {
+            "actionId": "revoked-db",
+            "pointer": "/data/rawRows/movements"
+          }
+        },
+        {
+          "id": "new-reservation-10",
+          "op": "sameAs",
+          "source": {
+            "actionId": "after-db",
+            "pointer": "/data/rawRows/allocations"
+          },
+          "expected": true,
+          "requirementRefs": [
+            "D05"
+          ],
+          "evidenceRefs": [
+            "after-db:actual-adapter-artifact",
+            "revoked-db:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseKey": "C1-revoked-basis"
+          },
+          "oracleExplanation": "금지 효과의 동일 scope 전후 원 행을 비교한다. 조회/거부 감사는 별도 scope다.",
+          "oracleRef": {
+            "oracleId": "C1.revoked-disposition",
+            "observationNames": [
+              "new-reservation"
+            ]
+          },
+          "baseline": {
+            "actionId": "revoked-db",
+            "pointer": "/data/rawRows/allocations"
+          }
+        },
+        {
+          "id": "existing-allocation-11",
+          "op": "equals",
+          "source": {
+            "actionId": "after-db",
+            "pointer": "/data/rawRows/allocations",
+            "where": {
+              "id": {
+                "$alias": "ALLOC"
+              }
+            },
+            "field": "state"
+          },
+          "expected": [
+            "SUSPENDED"
+          ],
+          "requirementRefs": [
+            "D05"
+          ],
+          "evidenceRefs": [
+            "after-db:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseKey": "C1-revoked-basis"
+          },
+          "oracleExplanation": "독립 원 행의 실물·수량·관계·범위를 정확히 대조한다.",
+          "oracleRef": {
+            "oracleId": "C1.revoked-disposition",
+            "observationNames": [
+              "existing-allocation"
+            ]
+          }
+        },
+        {
+          "id": "existing-obligation-scope-12",
+          "op": "sumEquals",
+          "source": {
+            "actionId": "after-db",
+            "pointer": "/data/rawRows/obligations",
+            "where": {
+              "workId": {
+                "$alias": "S1"
+              },
+              "status": "OPEN",
+              "kind": "SALES_PROMISE"
+            },
+            "field": "quantity"
+          },
+          "expected": "20",
+          "requirementRefs": [
+            "D05"
+          ],
+          "evidenceRefs": [
+            "after-db:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseKey": "C1-revoked-basis"
+          },
+          "oracleExplanation": "독립 원 행을 해당 범위에서 합산하며 부모와 자식을 이중 합산하지 않는다.",
+          "oracleRef": {
+            "oracleId": "C1.revoked-disposition",
+            "observationNames": [
+              "existing-obligation-scope"
+            ]
+          },
+          "unit": "BOX",
+          "unitSource": {
+            "actionId": "after-db",
+            "pointer": "/data/rawRows/obligations",
+            "where": {
+              "workId": {
+                "$alias": "S1"
+              },
+              "status": "OPEN",
+              "kind": "SALES_PROMISE"
+            },
+            "field": "unit"
+          }
+        },
+        {
+          "id": "revocation-duty-13",
+          "op": "count",
+          "source": {
+            "actionId": "after-db",
+            "pointer": "/data/rawRows/assignments",
+            "where": {
+              "obligationId": {
+                "$result": {
+                  "actionId": "revoke",
+                  "pointer": "/response/obligationId"
+                }
+              },
+              "current": true,
+              "status": "OPEN"
+            }
+          },
+          "expected": 1,
+          "requirementRefs": [
+            "D05"
+          ],
+          "evidenceRefs": [
+            "after-db:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseKey": "C1-revoked-basis"
+          },
+          "oracleExplanation": "해당 obligation root/scope의 현재 유효 assignment는 하나다. 의무 root는 실제 명령/대조/sweeper가 반환한 obligationId로 한정한다.",
+          "oracleRef": {
+            "oracleId": "C1.revoked-disposition",
+            "observationNames": [
+              "revocation-duty"
+            ]
+          }
+        },
+        {
+          "id": "revocation-duty-14",
+          "op": "fieldsPresent",
+          "source": {
+            "actionId": "after-db",
+            "pointer": "/data/rawRows/assignments",
+            "where": {
+              "obligationId": {
+                "$result": {
+                  "actionId": "revoke",
+                  "pointer": "/response/obligationId"
+                }
+              },
+              "current": true,
+              "status": "OPEN"
+            }
+          },
+          "expected": [
+            "ownerId",
+            "supervisorId",
+            "nextAction",
+            "nextCheckAt",
+            "rootId",
+            "workId"
+          ],
+          "requirementRefs": [
+            "D05"
+          ],
+          "evidenceRefs": [
+            "after-db:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseKey": "C1-revoked-basis"
+          },
+          "oracleExplanation": "책임자의 실제 ID와 다음 행동·확인 시각에 공백이 없어야 한다. 의무 root는 실제 명령/대조/sweeper가 반환한 obligationId로 한정한다.",
+          "oracleRef": {
+            "oracleId": "C1.revoked-disposition",
+            "observationNames": [
+              "revocation-duty"
+            ]
+          }
+        },
+        {
+          "id": "revocation-duty-15",
+          "op": "relationSet",
+          "source": {
+            "actionId": "after-db",
+            "pointer": "/data/rawRows/assignments",
+            "where": {
+              "obligationId": {
+                "$result": {
+                  "actionId": "revoke",
+                  "pointer": "/response/obligationId"
+                }
+              },
+              "current": true,
+              "status": "OPEN"
+            },
+            "field": [
+              "ownerId",
+              "supervisorId",
+              "nextAction",
+              "nextCheckAt"
+            ]
+          },
+          "expected": [
+            [
+              {
+                "$alias": "sales"
+              },
+              {
+                "$alias": "supervisor"
+              },
+              "근거 대조 후 대체 배분 검토",
+              "2026-10-07T10:00:00Z"
+            ]
+          ],
+          "requirementRefs": [
+            "D05"
+          ],
+          "evidenceRefs": [
+            "after-db:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseKey": "C1-revoked-basis"
+          },
+          "oracleExplanation": "fixture의 지정된 인간 owner/supervisor와 고정 후속 행동/시각이 유지된다. 의무 root는 실제 명령/대조/sweeper가 반환한 obligationId로 한정한다.",
+          "oracleRef": {
+            "oracleId": "C1.revoked-disposition",
+            "observationNames": [
+              "revocation-duty"
+            ]
+          }
+        },
+        {
+          "id": "new-reservation-16",
+          "op": "count",
+          "source": {
+            "actionId": "after-db",
+            "pointer": "/data/rawRows/audit",
+            "where": {
+              "commandKey": "C1-revoked-basis-new-reserve",
+              "outcome": "REJECTED"
+            }
+          },
+          "expected": 1,
+          "requirementRefs": [
+            "D05"
+          ],
+          "evidenceRefs": [
+            "after-db:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseKey": "C1-revoked-basis"
+          },
+          "oracleExplanation": "허용된 denial 감사1과 금지된 업무 효과0을 분리한다.",
+          "oracleRef": {
+            "oracleId": "C1.revoked-disposition",
+            "observationNames": [
+              "new-reservation"
+            ]
+          }
+        },
+        {
+          "id": "new-dispatch-17",
+          "op": "count",
+          "source": {
+            "actionId": "after-db",
+            "pointer": "/data/rawRows/audit",
+            "where": {
+              "commandKey": "C1-revoked-basis-dispatch",
+              "outcome": "REJECTED"
+            }
+          },
+          "expected": 1,
+          "requirementRefs": [
+            "D05"
+          ],
+          "evidenceRefs": [
+            "after-db:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseKey": "C1-revoked-basis"
+          },
+          "oracleExplanation": "허용된 denial 감사1과 금지된 업무 효과0을 분리한다.",
+          "oracleRef": {
+            "oracleId": "C1.revoked-disposition",
+            "observationNames": [
+              "new-dispatch"
+            ]
+          }
+        },
+        {
+          "id": "active-physical-identities",
+          "op": "unique",
+          "source": {
+            "actionId": "after-db",
+            "pointer": "/data/rawRows/segments",
+            "where": {
+              "active": true
+            },
+            "field": "physicalScope"
+          },
+          "expected": true,
+          "requirementRefs": [
+            "D05"
+          ],
+          "evidenceRefs": [
+            "new-reserve:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseKey": "C1-revoked-basis"
+          },
+          "oracleExplanation": "현재 active 실물 identity를 한 번씩만 합산하며 중복 실물은 거부한다.",
+          "oracleRef": {
+            "oracleId": "C1.revoked-disposition",
+            "observationNames": [
+              "new-reservation"
+            ]
+          }
+        },
+        {
+          "id": "response-definition-version",
+          "op": "equals",
+          "source": {
+            "actionId": "after-api",
+            "pointer": "/response/definitionVersion"
+          },
+          "expected": "ontology-v1",
+          "requirementRefs": [
+            "D05"
+          ],
+          "evidenceRefs": [
+            "new-reserve:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseKey": "C1-revoked-basis"
+          },
+          "oracleExplanation": "수량/제한을 읽는 실제 정의 버전은 고정 v1이며 다른 의미로 대체하지 않는다.",
+          "oracleRef": {
+            "oracleId": "C1.revoked-disposition",
+            "observationNames": [
+              "new-reservation"
+            ]
+          }
+        },
+        {
+          "id": "actual-baseline-physical-rows",
+          "op": "relationSet",
+          "source": {
+            "actionId": "before-db",
+            "pointer": "/data/rawRows/segments",
+            "where": {
+              "active": true
+            },
+            "field": [
+              "id",
+              "quantity",
+              "unit"
+            ]
+          },
+          "expected": [
+            [
+              {
+                "$alias": "CON40"
+              },
+              "40",
+              "BOX"
+            ]
+          ],
+          "requirementRefs": [
+            "D05"
+          ],
+          "evidenceRefs": [
+            "new-reserve:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseKey": "C1-revoked-basis"
+          },
+          "oracleExplanation": "서버에 실제 설치된 시작 실물의 ID·decimal·unit을 원 행에서 확인한다. baseline 자체는 업무 실행 coverage가 아니다.",
+          "oracleRef": {
+            "oracleId": "C1.revoked-disposition",
+            "observationNames": [
+              "new-reservation"
+            ]
+          }
+        }
+      ],
+      "oracleExplanation": "실물40은 유지되며 기존 약속20을 삭제하지 않는다. 처분 허용 철회는 앞으로의 배분/출고0과 owner 있는 의무를 남긴다."
+    }
+  ]
+}

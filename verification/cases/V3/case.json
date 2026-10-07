@@ -1,0 +1,3272 @@
+{
+  "schemaVersion": "1.0.0",
+  "caseId": "V3",
+  "title": "QC 제한과 출고의 직렬화",
+  "requirementRefs": [
+    "D17"
+  ],
+  "profiles": [
+    "scenarios",
+    "recovery"
+  ],
+  "subcases": [
+    {
+      "id": "hold-first",
+      "title": "QC 보류와 출고 경합에서 hold commit이 먼저다",
+      "fixtureRef": "verification/cases/V3/fixtures/hold-first.json",
+      "requiredAdapters": [
+        "fixture",
+        "api",
+        "db",
+        "control"
+      ],
+      "actions": [
+        {
+          "id": "setup",
+          "kind": "installFixture",
+          "fixtureRef": "verification/cases/V3/fixtures/hold-first.json",
+          "evidenceRefs": [
+            "setup:actual-adapter-artifact"
+          ]
+        },
+        {
+          "id": "before-api",
+          "kind": "query",
+          "actorRef": "warehouse",
+          "route": "api",
+          "capabilityId": "getInventory",
+          "request": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseKey": "V3-hold-first"
+            },
+            "action": "SELL",
+            "customerId": {
+              "$alias": "CUSTOMER"
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z"
+          },
+          "evidenceRefs": [
+            "before-api:actual-adapter-artifact"
+          ]
+        },
+        {
+          "id": "before-db",
+          "kind": "observe",
+          "observation": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseKey": "V3-hold-first"
+            },
+            "snapshotRef": {
+              "$result": {
+                "actionId": "before-api",
+                "pointer": "/response/snapshotRevision"
+              }
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z",
+            "sources": [
+              "segments",
+              "movements",
+              "genealogy",
+              "allocations",
+              "obligations",
+              "assignments",
+              "restrictions",
+              "dispositionBases",
+              "audit",
+              "outbox",
+              "commandResults",
+              "events",
+              "evidenceLinks",
+              "logisticsMemberships",
+              "shipments",
+              "intakes",
+              "stocktakes",
+              "decisions",
+              "locks",
+              "retryAttempts",
+              "dbPrivileges",
+              "boundaries",
+              "transactions"
+            ]
+          },
+          "evidenceRefs": [
+            "before-db:actual-adapter-artifact"
+          ]
+        },
+        {
+          "id": "contender",
+          "kind": "start",
+          "call": {
+            "id": "contender-call",
+            "kind": "invoke",
+            "actorRef": "warehouse",
+            "route": "api",
+            "capabilityId": "dispatchQuantity",
+            "request": {
+              "intentKind": "COMMAND",
+              "definitionVersion": "ontology-v1",
+              "capabilityId": "dispatchQuantity",
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "subjectRefs": [
+                {
+                  "type": "QuantitySegment",
+                  "id": {
+                    "$alias": "A20"
+                  }
+                }
+              ],
+              "slots": {
+                "allocationId": {
+                  "$alias": "ALLOC"
+                },
+                "quantity": {
+                  "value": "20",
+                  "unit": "BOX",
+                  "provenance": "USER"
+                },
+                "destinationId": {
+                  "$alias": "CUSTOMER"
+                },
+                "testBarrier": "afterEligibilityReadBeforeScopeFence"
+              },
+              "expectedRevision": 1,
+              "commandIdempotencyKey": "V3-hold-first-contender-call",
+              "evidenceRefs": [
+                {
+                  "$alias": "operation-proof"
+                }
+              ],
+              "valueProvenance": "USER"
+            },
+            "evidenceRefs": [
+              "contender-call:actual-adapter-artifact"
+            ]
+          },
+          "evidenceRefs": [
+            "contender:actual-adapter-artifact"
+          ]
+        },
+        {
+          "id": "reached",
+          "kind": "control",
+          "control": {
+            "type": "barrier",
+            "operation": "waitReached",
+            "parameters": {
+              "barrierId": "V3-hold-first-barrier",
+              "participantId": "contender",
+              "transactionId": {
+                "$result": {
+                  "actionId": "contender",
+                  "pointer": "/data/transactionId"
+                }
+              },
+              "point": "afterEligibilityReadBeforeScopeFence",
+              "state": "REACHED",
+              "scope": {
+                "organizationId": {
+                  "$alias": "ORG"
+                },
+                "itemId": {
+                  "$alias": "P"
+                },
+                "caseKey": "V3-hold-first"
+              }
+            }
+          },
+          "evidenceRefs": [
+            "reached:actual-adapter-artifact"
+          ]
+        },
+        {
+          "id": "winner",
+          "kind": "invoke",
+          "actorRef": "qc",
+          "route": "api",
+          "capabilityId": "placeHold",
+          "request": {
+            "intentKind": "COMMAND",
+            "definitionVersion": "ontology-v1",
+            "capabilityId": "placeHold",
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "subjectRefs": [
+              {
+                "type": "QuantitySegment",
+                "id": {
+                  "$alias": "A20"
+                }
+              }
+            ],
+            "slots": {
+              "quantity": {
+                "value": "20",
+                "unit": "BOX",
+                "provenance": "USER"
+              },
+              "kind": "QC",
+              "action": "SELL"
+            },
+            "expectedRevision": 1,
+            "commandIdempotencyKey": "V3-hold-first-winner",
+            "evidenceRefs": [
+              {
+                "$alias": "operation-proof"
+              }
+            ],
+            "valueProvenance": "USER"
+          },
+          "evidenceRefs": [
+            "winner:actual-adapter-artifact"
+          ]
+        },
+        {
+          "id": "winner-committed-api",
+          "kind": "query",
+          "actorRef": "warehouse",
+          "route": "api",
+          "capabilityId": "getInventory",
+          "request": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseKey": "V3-hold-first"
+            },
+            "action": "SELL",
+            "customerId": {
+              "$alias": "CUSTOMER"
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z"
+          },
+          "evidenceRefs": [
+            "winner-committed-api:actual-adapter-artifact"
+          ]
+        },
+        {
+          "id": "winner-committed-db",
+          "kind": "observe",
+          "observation": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseKey": "V3-hold-first"
+            },
+            "snapshotRef": {
+              "$result": {
+                "actionId": "winner-committed-api",
+                "pointer": "/response/snapshotRevision"
+              }
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z",
+            "sources": [
+              "segments",
+              "movements",
+              "genealogy",
+              "allocations",
+              "obligations",
+              "assignments",
+              "restrictions",
+              "dispositionBases",
+              "audit",
+              "outbox",
+              "commandResults",
+              "events",
+              "evidenceLinks",
+              "logisticsMemberships",
+              "shipments",
+              "intakes",
+              "stocktakes",
+              "decisions",
+              "locks",
+              "retryAttempts",
+              "dbPrivileges",
+              "boundaries",
+              "transactions"
+            ]
+          },
+          "evidenceRefs": [
+            "winner-committed-db:actual-adapter-artifact"
+          ]
+        },
+        {
+          "id": "resume",
+          "kind": "control",
+          "control": {
+            "type": "barrier",
+            "operation": "resume",
+            "parameters": {
+              "barrierId": "V3-hold-first-barrier",
+              "participantId": "contender",
+              "transactionId": {
+                "$result": {
+                  "actionId": "contender",
+                  "pointer": "/data/transactionId"
+                }
+              },
+              "point": "afterEligibilityReadBeforeScopeFence",
+              "state": "RESUMED",
+              "scope": {
+                "organizationId": {
+                  "$alias": "ORG"
+                },
+                "itemId": {
+                  "$alias": "P"
+                },
+                "caseKey": "V3-hold-first"
+              }
+            }
+          },
+          "evidenceRefs": [
+            "resume:actual-adapter-artifact"
+          ]
+        },
+        {
+          "id": "terminal",
+          "kind": "await",
+          "awaitActionId": "contender",
+          "timeoutSeconds": 30,
+          "evidenceRefs": [
+            "terminal:actual-adapter-artifact"
+          ]
+        },
+        {
+          "id": "after-api",
+          "kind": "query",
+          "actorRef": "warehouse",
+          "route": "api",
+          "capabilityId": "getInventory",
+          "request": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseKey": "V3-hold-first"
+            },
+            "action": "SELL",
+            "customerId": {
+              "$alias": "CUSTOMER"
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z"
+          },
+          "evidenceRefs": [
+            "after-api:actual-adapter-artifact"
+          ]
+        },
+        {
+          "id": "after-db",
+          "kind": "observe",
+          "observation": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseKey": "V3-hold-first"
+            },
+            "snapshotRef": {
+              "$result": {
+                "actionId": "after-api",
+                "pointer": "/response/snapshotRevision"
+              }
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z",
+            "sources": [
+              "segments",
+              "movements",
+              "genealogy",
+              "allocations",
+              "obligations",
+              "assignments",
+              "restrictions",
+              "dispositionBases",
+              "audit",
+              "outbox",
+              "commandResults",
+              "events",
+              "evidenceLinks",
+              "logisticsMemberships",
+              "shipments",
+              "intakes",
+              "stocktakes",
+              "decisions",
+              "locks",
+              "retryAttempts",
+              "dbPrivileges",
+              "boundaries",
+              "transactions"
+            ]
+          },
+          "evidenceRefs": [
+            "after-db:actual-adapter-artifact"
+          ]
+        }
+      ],
+      "assertions": [
+        {
+          "id": "scope-lock-1",
+          "op": "equals",
+          "source": {
+            "actionId": "winner",
+            "pointer": "/response/outcome"
+          },
+          "expected": "APPLIED",
+          "requirementRefs": [
+            "D17"
+          ],
+          "evidenceRefs": [
+            "winner:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseKey": "V3-hold-first"
+          },
+          "oracleExplanation": "공개 명령의 구조화 outcome을 확인한다.",
+          "oracleRef": {
+            "oracleId": "V3.hold-before-dispatch",
+            "observationNames": [
+              "scope-lock"
+            ]
+          }
+        },
+        {
+          "id": "new-dispatched-2",
+          "op": "equals",
+          "source": {
+            "actionId": "terminal",
+            "pointer": "/response/outcome"
+          },
+          "expected": "REJECTED",
+          "requirementRefs": [
+            "D17"
+          ],
+          "evidenceRefs": [
+            "terminal:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseKey": "V3-hold-first"
+          },
+          "oracleExplanation": "공개 명령의 구조화 outcome을 확인한다.",
+          "oracleRef": {
+            "oracleId": "V3.hold-before-dispatch",
+            "observationNames": [
+              "new-dispatched"
+            ]
+          }
+        },
+        {
+          "id": "new-dispatched-3",
+          "op": "equals",
+          "source": {
+            "actionId": "terminal",
+            "pointer": "/response/errorCode"
+          },
+          "expected": "INSUFFICIENT_ELIGIBLE_QUANTITY",
+          "requirementRefs": [
+            "D17"
+          ],
+          "evidenceRefs": [
+            "terminal:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseKey": "V3-hold-first"
+          },
+          "oracleExplanation": "검증 실패를 해당 오류 코드로 구별한다.",
+          "oracleRef": {
+            "oracleId": "V3.hold-before-dispatch",
+            "observationNames": [
+              "new-dispatched"
+            ]
+          }
+        },
+        {
+          "id": "new-dispatched-4",
+          "op": "decimalEquals",
+          "source": {
+            "actionId": "after-api",
+            "pointer": "/response/data/dispatchedQuantity"
+          },
+          "expected": "0",
+          "requirementRefs": [
+            "D17"
+          ],
+          "evidenceRefs": [
+            "after-api:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseKey": "V3-hold-first"
+          },
+          "oracleExplanation": "실물량·단위와 독립 손계산을 대조한다.",
+          "oracleRef": {
+            "oracleId": "V3.hold-before-dispatch",
+            "observationNames": [
+              "new-dispatched"
+            ]
+          },
+          "unit": "BOX",
+          "unitSource": {
+            "actionId": "after-api",
+            "pointer": "/response/data/unit"
+          }
+        },
+        {
+          "id": "new-dispatched-5",
+          "op": "sameAs",
+          "source": {
+            "actionId": "after-db",
+            "pointer": "/data/rawRows/segments"
+          },
+          "expected": true,
+          "requirementRefs": [
+            "D17"
+          ],
+          "evidenceRefs": [
+            "after-db:actual-adapter-artifact",
+            "winner-committed-db:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseKey": "V3-hold-first"
+          },
+          "oracleExplanation": "금지 효과의 동일 scope 전후 원 행을 비교한다. 조회/거부 감사는 별도 scope다.",
+          "oracleRef": {
+            "oracleId": "V3.hold-before-dispatch",
+            "observationNames": [
+              "new-dispatched"
+            ]
+          },
+          "baseline": {
+            "actionId": "winner-committed-db",
+            "pointer": "/data/rawRows/segments"
+          }
+        },
+        {
+          "id": "new-dispatched-6",
+          "op": "sameAs",
+          "source": {
+            "actionId": "after-db",
+            "pointer": "/data/rawRows/movements"
+          },
+          "expected": true,
+          "requirementRefs": [
+            "D17"
+          ],
+          "evidenceRefs": [
+            "after-db:actual-adapter-artifact",
+            "winner-committed-db:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseKey": "V3-hold-first"
+          },
+          "oracleExplanation": "금지 효과의 동일 scope 전후 원 행을 비교한다. 조회/거부 감사는 별도 scope다.",
+          "oracleRef": {
+            "oracleId": "V3.hold-before-dispatch",
+            "observationNames": [
+              "new-dispatched"
+            ]
+          },
+          "baseline": {
+            "actionId": "winner-committed-db",
+            "pointer": "/data/rawRows/movements"
+          }
+        },
+        {
+          "id": "new-dispatched-7",
+          "op": "sameAs",
+          "source": {
+            "actionId": "after-db",
+            "pointer": "/data/rawRows/allocations"
+          },
+          "expected": true,
+          "requirementRefs": [
+            "D17"
+          ],
+          "evidenceRefs": [
+            "after-db:actual-adapter-artifact",
+            "winner-committed-db:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseKey": "V3-hold-first"
+          },
+          "oracleExplanation": "금지 효과의 동일 scope 전후 원 행을 비교한다. 조회/거부 감사는 별도 scope다.",
+          "oracleRef": {
+            "oracleId": "V3.hold-before-dispatch",
+            "observationNames": [
+              "new-dispatched"
+            ]
+          },
+          "baseline": {
+            "actionId": "winner-committed-db",
+            "pointer": "/data/rawRows/allocations"
+          }
+        },
+        {
+          "id": "new-dispatched-8",
+          "op": "sameAs",
+          "source": {
+            "actionId": "after-db",
+            "pointer": "/data/rawRows/outbox",
+            "where": {
+              "effectClass": "BUSINESS"
+            }
+          },
+          "expected": true,
+          "requirementRefs": [
+            "D17"
+          ],
+          "evidenceRefs": [
+            "after-db:actual-adapter-artifact",
+            "winner-committed-db:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseKey": "V3-hold-first"
+          },
+          "oracleExplanation": "금지 효과의 동일 scope 전후 원 행을 비교한다. 조회/거부 감사는 별도 scope다.",
+          "oracleRef": {
+            "oracleId": "V3.hold-before-dispatch",
+            "observationNames": [
+              "new-dispatched"
+            ]
+          },
+          "baseline": {
+            "actionId": "winner-committed-db",
+            "pointer": "/data/rawRows/outbox",
+            "where": {
+              "effectClass": "BUSINESS"
+            }
+          }
+        },
+        {
+          "id": "allocation-9",
+          "op": "equals",
+          "source": {
+            "actionId": "after-db",
+            "pointer": "/data/rawRows/allocations",
+            "where": {
+              "id": {
+                "$alias": "ALLOC"
+              }
+            },
+            "field": "state"
+          },
+          "expected": [
+            "SUSPENDED"
+          ],
+          "requirementRefs": [
+            "D17"
+          ],
+          "evidenceRefs": [
+            "after-db:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseKey": "V3-hold-first"
+          },
+          "oracleExplanation": "독립 원 행의 실물·수량·관계·범위를 정확히 대조한다.",
+          "oracleRef": {
+            "oracleId": "V3.hold-before-dispatch",
+            "observationNames": [
+              "allocation"
+            ]
+          }
+        },
+        {
+          "id": "blocked-dispatch-duty-10",
+          "op": "count",
+          "source": {
+            "actionId": "after-db",
+            "pointer": "/data/rawRows/assignments",
+            "where": {
+              "obligationId": {
+                "$result": {
+                  "actionId": "terminal",
+                  "pointer": "/response/obligationId"
+                }
+              },
+              "current": true,
+              "status": "OPEN"
+            }
+          },
+          "expected": 1,
+          "requirementRefs": [
+            "D17"
+          ],
+          "evidenceRefs": [
+            "after-db:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseKey": "V3-hold-first"
+          },
+          "oracleExplanation": "해당 obligation root/scope의 현재 유효 assignment는 하나다. 의무 root는 실제 명령/대조/sweeper가 반환한 obligationId로 한정한다.",
+          "oracleRef": {
+            "oracleId": "V3.hold-before-dispatch",
+            "observationNames": [
+              "blocked-dispatch-duty"
+            ]
+          }
+        },
+        {
+          "id": "blocked-dispatch-duty-11",
+          "op": "fieldsPresent",
+          "source": {
+            "actionId": "after-db",
+            "pointer": "/data/rawRows/assignments",
+            "where": {
+              "obligationId": {
+                "$result": {
+                  "actionId": "terminal",
+                  "pointer": "/response/obligationId"
+                }
+              },
+              "current": true,
+              "status": "OPEN"
+            }
+          },
+          "expected": [
+            "ownerId",
+            "supervisorId",
+            "nextAction",
+            "nextCheckAt",
+            "rootId",
+            "workId"
+          ],
+          "requirementRefs": [
+            "D17"
+          ],
+          "evidenceRefs": [
+            "after-db:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseKey": "V3-hold-first"
+          },
+          "oracleExplanation": "책임자의 실제 ID와 다음 행동·확인 시각에 공백이 없어야 한다. 의무 root는 실제 명령/대조/sweeper가 반환한 obligationId로 한정한다.",
+          "oracleRef": {
+            "oracleId": "V3.hold-before-dispatch",
+            "observationNames": [
+              "blocked-dispatch-duty"
+            ]
+          }
+        },
+        {
+          "id": "blocked-dispatch-duty-12",
+          "op": "relationSet",
+          "source": {
+            "actionId": "after-db",
+            "pointer": "/data/rawRows/assignments",
+            "where": {
+              "obligationId": {
+                "$result": {
+                  "actionId": "terminal",
+                  "pointer": "/response/obligationId"
+                }
+              },
+              "current": true,
+              "status": "OPEN"
+            },
+            "field": [
+              "ownerId",
+              "supervisorId",
+              "nextAction",
+              "nextCheckAt"
+            ]
+          },
+          "expected": [
+            [
+              {
+                "$alias": "sales"
+              },
+              {
+                "$alias": "supervisor"
+              },
+              "근거 대조 후 대체 배분 검토",
+              "2026-10-07T10:00:00Z"
+            ]
+          ],
+          "requirementRefs": [
+            "D17"
+          ],
+          "evidenceRefs": [
+            "after-db:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseKey": "V3-hold-first"
+          },
+          "oracleExplanation": "fixture의 지정된 인간 owner/supervisor와 고정 후속 행동/시각이 유지된다. 의무 root는 실제 명령/대조/sweeper가 반환한 obligationId로 한정한다.",
+          "oracleRef": {
+            "oracleId": "V3.hold-before-dispatch",
+            "observationNames": [
+              "blocked-dispatch-duty"
+            ]
+          }
+        },
+        {
+          "id": "scope-lock-13",
+          "op": "relationSet",
+          "source": {
+            "actionId": "after-db",
+            "pointer": "/data/rawRows/locks",
+            "where": {
+              "capabilityId": "dispatchQuantity",
+              "kind": "SCOPE_FENCE"
+            },
+            "field": [
+              "restrictionId",
+              "recheckedRestrictionState"
+            ]
+          },
+          "expected": [
+            [
+              {
+                "$result": {
+                  "actionId": "winner",
+                  "pointer": "/response/restrictionId"
+                }
+              },
+              "ACTIVE"
+            ]
+          ],
+          "requirementRefs": [
+            "D17"
+          ],
+          "evidenceRefs": [
+            "after-db:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseKey": "V3-hold-first"
+          },
+          "oracleExplanation": "독립 원 행의 실물·수량·관계·범위를 정확히 대조한다.",
+          "oracleRef": {
+            "oracleId": "V3.hold-before-dispatch",
+            "observationNames": [
+              "scope-lock"
+            ]
+          }
+        },
+        {
+          "id": "scope-lock-14",
+          "op": "sameAs",
+          "source": {
+            "actionId": "after-db",
+            "pointer": "/data/rawRows/locks",
+            "where": {
+              "capabilityId": "dispatchQuantity",
+              "kind": "SCOPE_FENCE"
+            },
+            "field": "scopeFenceId"
+          },
+          "expected": true,
+          "requirementRefs": [
+            "D17"
+          ],
+          "evidenceRefs": [
+            "after-db:actual-adapter-artifact",
+            "after-db:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseKey": "V3-hold-first"
+          },
+          "oracleExplanation": "제한 삽입과 출고는 같은 실제 scope fence에 참여하고 현재 제한을 재읽는다.",
+          "oracleRef": {
+            "oracleId": "V3.hold-before-dispatch",
+            "observationNames": [
+              "scope-lock"
+            ]
+          },
+          "baseline": {
+            "actionId": "after-db",
+            "pointer": "/data/rawRows/restrictions",
+            "where": {
+              "id": {
+                "$result": {
+                  "actionId": "winner",
+                  "pointer": "/response/restrictionId"
+                }
+              }
+            },
+            "field": "scopeFenceId"
+          }
+        },
+        {
+          "id": "scope-lock-15",
+          "op": "sameAs",
+          "source": {
+            "actionId": "reached",
+            "pointer": "/data/transactionId"
+          },
+          "expected": true,
+          "requirementRefs": [
+            "D17"
+          ],
+          "evidenceRefs": [
+            "reached:actual-adapter-artifact",
+            "terminal:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseKey": "V3-hold-first"
+          },
+          "oracleExplanation": "barrier reached와 terminal은 동일 contender transaction의 실제 증거다.",
+          "oracleRef": {
+            "oracleId": "V3.hold-before-dispatch",
+            "observationNames": [
+              "scope-lock"
+            ]
+          },
+          "baseline": {
+            "actionId": "terminal",
+            "pointer": "/data/transactionId"
+          }
+        },
+        {
+          "id": "scope-lock-16",
+          "op": "equals",
+          "source": {
+            "actionId": "terminal",
+            "pointer": "/data/completed"
+          },
+          "expected": true,
+          "requirementRefs": [
+            "D17"
+          ],
+          "evidenceRefs": [
+            "terminal:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseKey": "V3-hold-first"
+          },
+          "oracleExplanation": "비동기 요청은 실제 terminal await가 있어야 끝난다.",
+          "oracleRef": {
+            "oracleId": "V3.hold-before-dispatch",
+            "observationNames": [
+              "scope-lock"
+            ]
+          }
+        },
+        {
+          "id": "active-physical-identities",
+          "op": "unique",
+          "source": {
+            "actionId": "after-db",
+            "pointer": "/data/rawRows/segments",
+            "where": {
+              "active": true
+            },
+            "field": "physicalScope"
+          },
+          "expected": true,
+          "requirementRefs": [
+            "D17"
+          ],
+          "evidenceRefs": [
+            "winner:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseKey": "V3-hold-first"
+          },
+          "oracleExplanation": "현재 active 실물 identity를 한 번씩만 합산하며 중복 실물은 거부한다.",
+          "oracleRef": {
+            "oracleId": "V3.hold-before-dispatch",
+            "observationNames": [
+              "scope-lock"
+            ]
+          }
+        },
+        {
+          "id": "response-definition-version",
+          "op": "equals",
+          "source": {
+            "actionId": "after-api",
+            "pointer": "/response/definitionVersion"
+          },
+          "expected": "ontology-v1",
+          "requirementRefs": [
+            "D17"
+          ],
+          "evidenceRefs": [
+            "winner:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseKey": "V3-hold-first"
+          },
+          "oracleExplanation": "수량/제한을 읽는 실제 정의 버전은 고정 v1이며 다른 의미로 대체하지 않는다.",
+          "oracleRef": {
+            "oracleId": "V3.hold-before-dispatch",
+            "observationNames": [
+              "scope-lock"
+            ]
+          }
+        },
+        {
+          "id": "actual-baseline-physical-rows",
+          "op": "relationSet",
+          "source": {
+            "actionId": "before-db",
+            "pointer": "/data/rawRows/segments",
+            "where": {
+              "active": true,
+              "kind": "SCOPE_FENCE"
+            },
+            "field": [
+              "id",
+              "quantity",
+              "unit"
+            ]
+          },
+          "expected": [
+            [
+              {
+                "$alias": "A20"
+              },
+              "20",
+              "BOX"
+            ]
+          ],
+          "requirementRefs": [
+            "D17"
+          ],
+          "evidenceRefs": [
+            "winner:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseKey": "V3-hold-first"
+          },
+          "oracleExplanation": "서버에 실제 설치된 시작 실물의 ID·decimal·unit을 원 행에서 확인한다. baseline 자체는 업무 실행 coverage가 아니다.",
+          "oracleRef": {
+            "oracleId": "V3.hold-before-dispatch",
+            "observationNames": [
+              "scope-lock"
+            ]
+          }
+        },
+        {
+          "id": "scope-lock-14-source-nonempty",
+          "op": "count",
+          "source": {
+            "actionId": "after-db",
+            "pointer": "/data/rawRows/locks",
+            "where": {
+              "capabilityId": "dispatchQuantity",
+              "kind": "SCOPE_FENCE"
+            }
+          },
+          "expected": 1,
+          "requirementRefs": [
+            "D17"
+          ],
+          "evidenceRefs": [
+            "winner:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseKey": "V3-hold-first"
+          },
+          "oracleExplanation": "동일 transaction/revision/fence 비교의 구체 원 행은 실제 하나 있어야 한다.",
+          "oracleRef": {
+            "oracleId": "V3.hold-before-dispatch",
+            "observationNames": [
+              "scope-lock"
+            ]
+          }
+        },
+        {
+          "id": "scope-lock-14-baseline-nonempty",
+          "op": "count",
+          "source": {
+            "actionId": "after-db",
+            "pointer": "/data/rawRows/restrictions",
+            "where": {
+              "id": {
+                "$result": {
+                  "actionId": "winner",
+                  "pointer": "/response/restrictionId"
+                }
+              }
+            }
+          },
+          "expected": 1,
+          "requirementRefs": [
+            "D17"
+          ],
+          "evidenceRefs": [
+            "winner:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseKey": "V3-hold-first"
+          },
+          "oracleExplanation": "동일 transaction/revision/fence 비교의 구체 원 행은 실제 하나 있어야 한다.",
+          "oracleRef": {
+            "oracleId": "V3.hold-before-dispatch",
+            "observationNames": [
+              "scope-lock"
+            ]
+          }
+        }
+      ],
+      "oracleExplanation": "hold 먼저면 출고0/배분SUSPENDED/책임 유지다. dispatch 먼저면 실제20 이력과CONSUMED를 보존하고 이동한 실물의 보류·후속 책임을 남긴다."
+    },
+    {
+      "id": "dispatch-first",
+      "title": "QC 보류와 출고 경합에서 dispatch commit이 먼저다",
+      "fixtureRef": "verification/cases/V3/fixtures/dispatch-first.json",
+      "requiredAdapters": [
+        "fixture",
+        "api",
+        "db",
+        "control"
+      ],
+      "actions": [
+        {
+          "id": "setup",
+          "kind": "installFixture",
+          "fixtureRef": "verification/cases/V3/fixtures/dispatch-first.json",
+          "evidenceRefs": [
+            "setup:actual-adapter-artifact"
+          ]
+        },
+        {
+          "id": "before-api",
+          "kind": "query",
+          "actorRef": "warehouse",
+          "route": "api",
+          "capabilityId": "getInventory",
+          "request": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseKey": "V3-dispatch-first"
+            },
+            "action": "SELL",
+            "customerId": {
+              "$alias": "CUSTOMER"
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z"
+          },
+          "evidenceRefs": [
+            "before-api:actual-adapter-artifact"
+          ]
+        },
+        {
+          "id": "before-db",
+          "kind": "observe",
+          "observation": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseKey": "V3-dispatch-first"
+            },
+            "snapshotRef": {
+              "$result": {
+                "actionId": "before-api",
+                "pointer": "/response/snapshotRevision"
+              }
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z",
+            "sources": [
+              "segments",
+              "movements",
+              "genealogy",
+              "allocations",
+              "obligations",
+              "assignments",
+              "restrictions",
+              "dispositionBases",
+              "audit",
+              "outbox",
+              "commandResults",
+              "events",
+              "evidenceLinks",
+              "logisticsMemberships",
+              "shipments",
+              "intakes",
+              "stocktakes",
+              "decisions",
+              "locks",
+              "retryAttempts",
+              "dbPrivileges",
+              "boundaries",
+              "transactions"
+            ]
+          },
+          "evidenceRefs": [
+            "before-db:actual-adapter-artifact"
+          ]
+        },
+        {
+          "id": "contender",
+          "kind": "start",
+          "call": {
+            "id": "contender-call",
+            "kind": "invoke",
+            "actorRef": "qc",
+            "route": "api",
+            "capabilityId": "placeHold",
+            "request": {
+              "intentKind": "COMMAND",
+              "definitionVersion": "ontology-v1",
+              "capabilityId": "placeHold",
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "subjectRefs": [
+                {
+                  "type": "QuantitySegment",
+                  "id": {
+                    "$alias": "A20"
+                  }
+                }
+              ],
+              "slots": {
+                "quantity": {
+                  "value": "20",
+                  "unit": "BOX",
+                  "provenance": "USER"
+                },
+                "kind": "QC",
+                "action": "SELL",
+                "testBarrier": "beforeScopeFence"
+              },
+              "expectedRevision": 1,
+              "commandIdempotencyKey": "V3-dispatch-first-contender-call",
+              "evidenceRefs": [
+                {
+                  "$alias": "operation-proof"
+                }
+              ],
+              "valueProvenance": "USER"
+            },
+            "evidenceRefs": [
+              "contender-call:actual-adapter-artifact"
+            ]
+          },
+          "evidenceRefs": [
+            "contender:actual-adapter-artifact"
+          ]
+        },
+        {
+          "id": "reached",
+          "kind": "control",
+          "control": {
+            "type": "barrier",
+            "operation": "waitReached",
+            "parameters": {
+              "barrierId": "V3-dispatch-first-barrier",
+              "participantId": "contender",
+              "transactionId": {
+                "$result": {
+                  "actionId": "contender",
+                  "pointer": "/data/transactionId"
+                }
+              },
+              "point": "beforeScopeFence",
+              "state": "REACHED",
+              "scope": {
+                "organizationId": {
+                  "$alias": "ORG"
+                },
+                "itemId": {
+                  "$alias": "P"
+                },
+                "caseKey": "V3-dispatch-first"
+              }
+            }
+          },
+          "evidenceRefs": [
+            "reached:actual-adapter-artifact"
+          ]
+        },
+        {
+          "id": "winner",
+          "kind": "invoke",
+          "actorRef": "warehouse",
+          "route": "api",
+          "capabilityId": "dispatchQuantity",
+          "request": {
+            "intentKind": "COMMAND",
+            "definitionVersion": "ontology-v1",
+            "capabilityId": "dispatchQuantity",
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "subjectRefs": [
+              {
+                "type": "QuantitySegment",
+                "id": {
+                  "$alias": "A20"
+                }
+              }
+            ],
+            "slots": {
+              "quantity": {
+                "value": "20",
+                "unit": "BOX",
+                "provenance": "USER"
+              },
+              "allocationId": {
+                "$alias": "ALLOC"
+              },
+              "destinationId": {
+                "$alias": "CUSTOMER"
+              }
+            },
+            "expectedRevision": 1,
+            "commandIdempotencyKey": "V3-dispatch-first-winner",
+            "evidenceRefs": [
+              {
+                "$alias": "operation-proof"
+              }
+            ],
+            "valueProvenance": "USER"
+          },
+          "evidenceRefs": [
+            "winner:actual-adapter-artifact"
+          ]
+        },
+        {
+          "id": "winner-committed-api",
+          "kind": "query",
+          "actorRef": "warehouse",
+          "route": "api",
+          "capabilityId": "getInventory",
+          "request": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseKey": "V3-dispatch-first"
+            },
+            "action": "SELL",
+            "customerId": {
+              "$alias": "CUSTOMER"
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z"
+          },
+          "evidenceRefs": [
+            "winner-committed-api:actual-adapter-artifact"
+          ]
+        },
+        {
+          "id": "winner-committed-db",
+          "kind": "observe",
+          "observation": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseKey": "V3-dispatch-first"
+            },
+            "snapshotRef": {
+              "$result": {
+                "actionId": "winner-committed-api",
+                "pointer": "/response/snapshotRevision"
+              }
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z",
+            "sources": [
+              "segments",
+              "movements",
+              "genealogy",
+              "allocations",
+              "obligations",
+              "assignments",
+              "restrictions",
+              "dispositionBases",
+              "audit",
+              "outbox",
+              "commandResults",
+              "events",
+              "evidenceLinks",
+              "logisticsMemberships",
+              "shipments",
+              "intakes",
+              "stocktakes",
+              "decisions",
+              "locks",
+              "retryAttempts",
+              "dbPrivileges",
+              "boundaries",
+              "transactions"
+            ]
+          },
+          "evidenceRefs": [
+            "winner-committed-db:actual-adapter-artifact"
+          ]
+        },
+        {
+          "id": "resume",
+          "kind": "control",
+          "control": {
+            "type": "barrier",
+            "operation": "resume",
+            "parameters": {
+              "barrierId": "V3-dispatch-first-barrier",
+              "participantId": "contender",
+              "transactionId": {
+                "$result": {
+                  "actionId": "contender",
+                  "pointer": "/data/transactionId"
+                }
+              },
+              "point": "beforeScopeFence",
+              "state": "RESUMED",
+              "scope": {
+                "organizationId": {
+                  "$alias": "ORG"
+                },
+                "itemId": {
+                  "$alias": "P"
+                },
+                "caseKey": "V3-dispatch-first"
+              }
+            }
+          },
+          "evidenceRefs": [
+            "resume:actual-adapter-artifact"
+          ]
+        },
+        {
+          "id": "terminal",
+          "kind": "await",
+          "awaitActionId": "contender",
+          "timeoutSeconds": 30,
+          "evidenceRefs": [
+            "terminal:actual-adapter-artifact"
+          ]
+        },
+        {
+          "id": "after-api",
+          "kind": "query",
+          "actorRef": "warehouse",
+          "route": "api",
+          "capabilityId": "getInventory",
+          "request": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseKey": "V3-dispatch-first"
+            },
+            "action": "SELL",
+            "customerId": {
+              "$alias": "CUSTOMER"
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z"
+          },
+          "evidenceRefs": [
+            "after-api:actual-adapter-artifact"
+          ]
+        },
+        {
+          "id": "after-db",
+          "kind": "observe",
+          "observation": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseKey": "V3-dispatch-first"
+            },
+            "snapshotRef": {
+              "$result": {
+                "actionId": "after-api",
+                "pointer": "/response/snapshotRevision"
+              }
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z",
+            "sources": [
+              "segments",
+              "movements",
+              "genealogy",
+              "allocations",
+              "obligations",
+              "assignments",
+              "restrictions",
+              "dispositionBases",
+              "audit",
+              "outbox",
+              "commandResults",
+              "events",
+              "evidenceLinks",
+              "logisticsMemberships",
+              "shipments",
+              "intakes",
+              "stocktakes",
+              "decisions",
+              "locks",
+              "retryAttempts",
+              "dbPrivileges",
+              "boundaries",
+              "transactions"
+            ]
+          },
+          "evidenceRefs": [
+            "after-db:actual-adapter-artifact"
+          ]
+        }
+      ],
+      "assertions": [
+        {
+          "id": "committed-dispatch-preserved-1",
+          "op": "equals",
+          "source": {
+            "actionId": "winner",
+            "pointer": "/response/outcome"
+          },
+          "expected": "APPLIED",
+          "requirementRefs": [
+            "D17"
+          ],
+          "evidenceRefs": [
+            "winner:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseKey": "V3-dispatch-first"
+          },
+          "oracleExplanation": "공개 명령의 구조화 outcome을 확인한다.",
+          "oracleRef": {
+            "oracleId": "V3.dispatch-before-hold",
+            "observationNames": [
+              "committed-dispatch-preserved"
+            ]
+          }
+        },
+        {
+          "id": "committed-dispatch-preserved-2",
+          "op": "sumEquals",
+          "source": {
+            "actionId": "after-db",
+            "pointer": "/data/rawRows/movements",
+            "where": {
+              "kind": "DISPATCH"
+            },
+            "field": "quantity"
+          },
+          "expected": "20",
+          "requirementRefs": [
+            "D17"
+          ],
+          "evidenceRefs": [
+            "after-db:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseKey": "V3-dispatch-first"
+          },
+          "oracleExplanation": "독립 원 행을 해당 범위에서 합산하며 부모와 자식을 이중 합산하지 않는다.",
+          "oracleRef": {
+            "oracleId": "V3.dispatch-before-hold",
+            "observationNames": [
+              "committed-dispatch-preserved"
+            ]
+          },
+          "unit": "BOX",
+          "unitSource": {
+            "actionId": "after-db",
+            "pointer": "/data/rawRows/movements",
+            "where": {
+              "kind": "DISPATCH"
+            },
+            "field": "unit"
+          }
+        },
+        {
+          "id": "allocation-3",
+          "op": "equals",
+          "source": {
+            "actionId": "after-db",
+            "pointer": "/data/rawRows/allocations",
+            "where": {
+              "id": {
+                "$alias": "ALLOC"
+              }
+            },
+            "field": "state"
+          },
+          "expected": [
+            "CONSUMED"
+          ],
+          "requirementRefs": [
+            "D17"
+          ],
+          "evidenceRefs": [
+            "after-db:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseKey": "V3-dispatch-first"
+          },
+          "oracleExplanation": "독립 원 행의 실물·수량·관계·범위를 정확히 대조한다.",
+          "oracleRef": {
+            "oracleId": "V3.dispatch-before-hold",
+            "observationNames": [
+              "allocation"
+            ]
+          }
+        },
+        {
+          "id": "post-dispatch-hold-response-4",
+          "op": "count",
+          "source": {
+            "actionId": "after-db",
+            "pointer": "/data/rawRows/assignments",
+            "where": {
+              "obligationId": {
+                "$result": {
+                  "actionId": "terminal",
+                  "pointer": "/response/obligationId"
+                }
+              },
+              "current": true,
+              "status": "OPEN"
+            }
+          },
+          "expected": 1,
+          "requirementRefs": [
+            "D17"
+          ],
+          "evidenceRefs": [
+            "after-db:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseKey": "V3-dispatch-first"
+          },
+          "oracleExplanation": "해당 obligation root/scope의 현재 유효 assignment는 하나다. 의무 root는 실제 명령/대조/sweeper가 반환한 obligationId로 한정한다.",
+          "oracleRef": {
+            "oracleId": "V3.dispatch-before-hold",
+            "observationNames": [
+              "post-dispatch-hold-response"
+            ]
+          }
+        },
+        {
+          "id": "post-dispatch-hold-response-5",
+          "op": "fieldsPresent",
+          "source": {
+            "actionId": "after-db",
+            "pointer": "/data/rawRows/assignments",
+            "where": {
+              "obligationId": {
+                "$result": {
+                  "actionId": "terminal",
+                  "pointer": "/response/obligationId"
+                }
+              },
+              "current": true,
+              "status": "OPEN"
+            }
+          },
+          "expected": [
+            "ownerId",
+            "supervisorId",
+            "nextAction",
+            "nextCheckAt",
+            "rootId",
+            "workId"
+          ],
+          "requirementRefs": [
+            "D17"
+          ],
+          "evidenceRefs": [
+            "after-db:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseKey": "V3-dispatch-first"
+          },
+          "oracleExplanation": "책임자의 실제 ID와 다음 행동·확인 시각에 공백이 없어야 한다. 의무 root는 실제 명령/대조/sweeper가 반환한 obligationId로 한정한다.",
+          "oracleRef": {
+            "oracleId": "V3.dispatch-before-hold",
+            "observationNames": [
+              "post-dispatch-hold-response"
+            ]
+          }
+        },
+        {
+          "id": "post-dispatch-hold-response-6",
+          "op": "relationSet",
+          "source": {
+            "actionId": "after-db",
+            "pointer": "/data/rawRows/assignments",
+            "where": {
+              "obligationId": {
+                "$result": {
+                  "actionId": "terminal",
+                  "pointer": "/response/obligationId"
+                }
+              },
+              "current": true,
+              "status": "OPEN"
+            },
+            "field": [
+              "ownerId",
+              "supervisorId",
+              "nextAction",
+              "nextCheckAt"
+            ]
+          },
+          "expected": [
+            [
+              {
+                "$alias": "sales"
+              },
+              {
+                "$alias": "supervisor"
+              },
+              "근거 대조 후 대체 배분 검토",
+              "2026-10-07T10:00:00Z"
+            ]
+          ],
+          "requirementRefs": [
+            "D17"
+          ],
+          "evidenceRefs": [
+            "after-db:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseKey": "V3-dispatch-first"
+          },
+          "oracleExplanation": "fixture의 지정된 인간 owner/supervisor와 고정 후속 행동/시각이 유지된다. 의무 root는 실제 명령/대조/sweeper가 반환한 obligationId로 한정한다.",
+          "oracleRef": {
+            "oracleId": "V3.dispatch-before-hold",
+            "observationNames": [
+              "post-dispatch-hold-response"
+            ]
+          }
+        },
+        {
+          "id": "history-deletion-or-fake-rollback-7",
+          "op": "sameAs",
+          "source": {
+            "actionId": "after-db",
+            "pointer": "/data/rawRows/movements"
+          },
+          "expected": true,
+          "requirementRefs": [
+            "D17"
+          ],
+          "evidenceRefs": [
+            "after-db:actual-adapter-artifact",
+            "winner-committed-db:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseKey": "V3-dispatch-first"
+          },
+          "oracleExplanation": "금지 효과의 동일 scope 전후 원 행을 비교한다. 조회/거부 감사는 별도 scope다.",
+          "oracleRef": {
+            "oracleId": "V3.dispatch-before-hold",
+            "observationNames": [
+              "history-deletion-or-fake-rollback"
+            ]
+          },
+          "baseline": {
+            "actionId": "winner-committed-db",
+            "pointer": "/data/rawRows/movements"
+          }
+        },
+        {
+          "id": "post-dispatch-hold-response-8",
+          "op": "relationSet",
+          "source": {
+            "actionId": "after-db",
+            "pointer": "/data/rawRows/restrictions",
+            "field": [
+              "id",
+              "state",
+              "physicalLocationClass",
+              "quantity",
+              "unit"
+            ]
+          },
+          "expected": [
+            [
+              {
+                "$result": {
+                  "actionId": "terminal",
+                  "pointer": "/response/restrictionId"
+                }
+              },
+              "ACTIVE",
+              "TRANSIT",
+              "20",
+              "BOX"
+            ]
+          ],
+          "requirementRefs": [
+            "D17"
+          ],
+          "evidenceRefs": [
+            "after-db:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseKey": "V3-dispatch-first"
+          },
+          "oracleExplanation": "독립 원 행의 실물·수량·관계·범위를 정확히 대조한다.",
+          "oracleRef": {
+            "oracleId": "V3.dispatch-before-hold",
+            "observationNames": [
+              "post-dispatch-hold-response"
+            ]
+          }
+        },
+        {
+          "id": "history-deletion-or-fake-rollback-9",
+          "op": "relationSet",
+          "source": {
+            "actionId": "after-db",
+            "pointer": "/data/rawRows/segments",
+            "where": {
+              "active": true
+            },
+            "field": [
+              "id",
+              "locationClass",
+              "quantity",
+              "unit"
+            ]
+          },
+          "expected": [
+            [
+              {
+                "$alias": "A20"
+              },
+              "TRANSIT",
+              "20",
+              "BOX"
+            ]
+          ],
+          "requirementRefs": [
+            "D17"
+          ],
+          "evidenceRefs": [
+            "after-db:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseKey": "V3-dispatch-first"
+          },
+          "oracleExplanation": "독립 원 행의 실물·수량·관계·범위를 정확히 대조한다.",
+          "oracleRef": {
+            "oracleId": "V3.dispatch-before-hold",
+            "observationNames": [
+              "history-deletion-or-fake-rollback"
+            ]
+          }
+        },
+        {
+          "id": "post-dispatch-hold-response-10",
+          "op": "sameAs",
+          "source": {
+            "actionId": "reached",
+            "pointer": "/data/transactionId"
+          },
+          "expected": true,
+          "requirementRefs": [
+            "D17"
+          ],
+          "evidenceRefs": [
+            "reached:actual-adapter-artifact",
+            "terminal:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseKey": "V3-dispatch-first"
+          },
+          "oracleExplanation": "barrier reached와 terminal은 동일 contender transaction의 실제 증거다.",
+          "oracleRef": {
+            "oracleId": "V3.dispatch-before-hold",
+            "observationNames": [
+              "post-dispatch-hold-response"
+            ]
+          },
+          "baseline": {
+            "actionId": "terminal",
+            "pointer": "/data/transactionId"
+          }
+        },
+        {
+          "id": "post-dispatch-hold-response-11",
+          "op": "equals",
+          "source": {
+            "actionId": "terminal",
+            "pointer": "/data/completed"
+          },
+          "expected": true,
+          "requirementRefs": [
+            "D17"
+          ],
+          "evidenceRefs": [
+            "terminal:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseKey": "V3-dispatch-first"
+          },
+          "oracleExplanation": "비동기 요청은 실제 terminal await가 있어야 끝난다.",
+          "oracleRef": {
+            "oracleId": "V3.dispatch-before-hold",
+            "observationNames": [
+              "post-dispatch-hold-response"
+            ]
+          }
+        },
+        {
+          "id": "active-physical-identities",
+          "op": "unique",
+          "source": {
+            "actionId": "after-db",
+            "pointer": "/data/rawRows/segments",
+            "where": {
+              "active": true
+            },
+            "field": "physicalScope"
+          },
+          "expected": true,
+          "requirementRefs": [
+            "D17"
+          ],
+          "evidenceRefs": [
+            "winner:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseKey": "V3-dispatch-first"
+          },
+          "oracleExplanation": "현재 active 실물 identity를 한 번씩만 합산하며 중복 실물은 거부한다.",
+          "oracleRef": {
+            "oracleId": "V3.dispatch-before-hold",
+            "observationNames": [
+              "committed-dispatch-preserved"
+            ]
+          }
+        },
+        {
+          "id": "response-definition-version",
+          "op": "equals",
+          "source": {
+            "actionId": "after-api",
+            "pointer": "/response/definitionVersion"
+          },
+          "expected": "ontology-v1",
+          "requirementRefs": [
+            "D17"
+          ],
+          "evidenceRefs": [
+            "winner:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseKey": "V3-dispatch-first"
+          },
+          "oracleExplanation": "수량/제한을 읽는 실제 정의 버전은 고정 v1이며 다른 의미로 대체하지 않는다.",
+          "oracleRef": {
+            "oracleId": "V3.dispatch-before-hold",
+            "observationNames": [
+              "committed-dispatch-preserved"
+            ]
+          }
+        },
+        {
+          "id": "actual-baseline-physical-rows",
+          "op": "relationSet",
+          "source": {
+            "actionId": "before-db",
+            "pointer": "/data/rawRows/segments",
+            "where": {
+              "active": true
+            },
+            "field": [
+              "id",
+              "quantity",
+              "unit"
+            ]
+          },
+          "expected": [
+            [
+              {
+                "$alias": "A20"
+              },
+              "20",
+              "BOX"
+            ]
+          ],
+          "requirementRefs": [
+            "D17"
+          ],
+          "evidenceRefs": [
+            "winner:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseKey": "V3-dispatch-first"
+          },
+          "oracleExplanation": "서버에 실제 설치된 시작 실물의 ID·decimal·unit을 원 행에서 확인한다. baseline 자체는 업무 실행 coverage가 아니다.",
+          "oracleRef": {
+            "oracleId": "V3.dispatch-before-hold",
+            "observationNames": [
+              "committed-dispatch-preserved"
+            ]
+          }
+        }
+      ],
+      "oracleExplanation": "hold 먼저면 출고0/배분SUSPENDED/책임 유지다. dispatch 먼저면 실제20 이력과CONSUMED를 보존하고 이동한 실물의 보류·후속 책임을 남긴다."
+    },
+    {
+      "id": "late-v1-release",
+      "title": "늦은 v1 해제는 새 v2 보류를 덮어쓰지 않는다",
+      "fixtureRef": "verification/cases/V3/fixtures/late-v1-release.json",
+      "requiredAdapters": [
+        "fixture",
+        "api",
+        "db"
+      ],
+      "actions": [
+        {
+          "id": "setup",
+          "kind": "installFixture",
+          "fixtureRef": "verification/cases/V3/fixtures/late-v1-release.json",
+          "evidenceRefs": [
+            "setup:actual-adapter-artifact"
+          ]
+        },
+        {
+          "id": "before-api",
+          "kind": "query",
+          "actorRef": "warehouse",
+          "route": "api",
+          "capabilityId": "getInventory",
+          "request": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseKey": "V3-late-v1-release"
+            },
+            "action": "SELL",
+            "customerId": {
+              "$alias": "CUSTOMER"
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z"
+          },
+          "evidenceRefs": [
+            "before-api:actual-adapter-artifact"
+          ]
+        },
+        {
+          "id": "before-db",
+          "kind": "observe",
+          "observation": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseKey": "V3-late-v1-release"
+            },
+            "snapshotRef": {
+              "$result": {
+                "actionId": "before-api",
+                "pointer": "/response/snapshotRevision"
+              }
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z",
+            "sources": [
+              "segments",
+              "movements",
+              "genealogy",
+              "allocations",
+              "obligations",
+              "assignments",
+              "restrictions",
+              "dispositionBases",
+              "audit",
+              "outbox",
+              "commandResults",
+              "events",
+              "evidenceLinks",
+              "logisticsMemberships",
+              "shipments",
+              "intakes",
+              "stocktakes",
+              "decisions",
+              "locks",
+              "retryAttempts",
+              "dbPrivileges",
+              "boundaries",
+              "transactions"
+            ]
+          },
+          "evidenceRefs": [
+            "before-db:actual-adapter-artifact"
+          ]
+        },
+        {
+          "id": "new-hold",
+          "kind": "invoke",
+          "actorRef": "qc",
+          "route": "api",
+          "capabilityId": "placeHold",
+          "request": {
+            "intentKind": "COMMAND",
+            "definitionVersion": "ontology-v1",
+            "capabilityId": "placeHold",
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "subjectRefs": [
+              {
+                "type": "QuantitySegment",
+                "id": {
+                  "$alias": "A20"
+                }
+              }
+            ],
+            "slots": {
+              "quantity": {
+                "value": "20",
+                "unit": "BOX",
+                "provenance": "USER"
+              },
+              "kind": "QC",
+              "action": "SELL",
+              "sourceNamespace": "synthetic-qc",
+              "externalEventId": "QC-A20",
+              "sourceVersion": "2",
+              "supersedesRestrictionId": {
+                "$alias": "OLD_HOLD"
+              }
+            },
+            "expectedRevision": 1,
+            "commandIdempotencyKey": "V3-late-v1-release-new-hold",
+            "evidenceRefs": [
+              {
+                "$alias": "operation-proof"
+              }
+            ],
+            "valueProvenance": "USER"
+          },
+          "evidenceRefs": [
+            "new-hold:actual-adapter-artifact"
+          ]
+        },
+        {
+          "id": "new-held-api",
+          "kind": "query",
+          "actorRef": "warehouse",
+          "route": "api",
+          "capabilityId": "getInventory",
+          "request": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseKey": "V3-late-v1-release"
+            },
+            "action": "SELL",
+            "customerId": {
+              "$alias": "CUSTOMER"
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z"
+          },
+          "evidenceRefs": [
+            "new-held-api:actual-adapter-artifact"
+          ]
+        },
+        {
+          "id": "new-held-db",
+          "kind": "observe",
+          "observation": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseKey": "V3-late-v1-release"
+            },
+            "snapshotRef": {
+              "$result": {
+                "actionId": "new-held-api",
+                "pointer": "/response/snapshotRevision"
+              }
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z",
+            "sources": [
+              "segments",
+              "movements",
+              "genealogy",
+              "allocations",
+              "obligations",
+              "assignments",
+              "restrictions",
+              "dispositionBases",
+              "audit",
+              "outbox",
+              "commandResults",
+              "events",
+              "evidenceLinks",
+              "logisticsMemberships",
+              "shipments",
+              "intakes",
+              "stocktakes",
+              "decisions",
+              "locks",
+              "retryAttempts",
+              "dbPrivileges",
+              "boundaries",
+              "transactions"
+            ]
+          },
+          "evidenceRefs": [
+            "new-held-db:actual-adapter-artifact"
+          ]
+        },
+        {
+          "id": "old-release",
+          "kind": "invoke",
+          "actorRef": "recorder",
+          "route": "api",
+          "capabilityId": "recordActivity",
+          "request": {
+            "intentKind": "RECORD",
+            "definitionVersion": "ontology-v1",
+            "capabilityId": "recordActivity",
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "subjectRefs": [
+              {
+                "type": "QuantitySegment",
+                "id": {
+                  "$alias": "A20"
+                }
+              }
+            ],
+            "slots": {
+              "kind": "QC_RELEASE_CLAIM",
+              "restrictionId": {
+                "$alias": "OLD_HOLD"
+              },
+              "sourceNamespace": "synthetic-qc",
+              "externalEventId": "QC-A20-RELEASE",
+              "sourceVersion": "1",
+              "occurredAt": "2026-10-07T08:00:00Z",
+              "quantity": {
+                "value": "20",
+                "unit": "BOX",
+                "provenance": "USER"
+              }
+            },
+            "expectedRevision": {
+              "$result": {
+                "actionId": "new-hold",
+                "pointer": "/response/revision"
+              }
+            },
+            "commandIdempotencyKey": "V3-late-v1-release-old-release",
+            "evidenceRefs": [
+              {
+                "$alias": "operation-proof"
+              }
+            ],
+            "valueProvenance": "USER"
+          },
+          "evidenceRefs": [
+            "old-release:actual-adapter-artifact"
+          ]
+        },
+        {
+          "id": "apply-old-release",
+          "kind": "invoke",
+          "actorRef": "qc",
+          "route": "api",
+          "capabilityId": "releaseHold",
+          "request": {
+            "intentKind": "COMMAND",
+            "definitionVersion": "ontology-v1",
+            "capabilityId": "releaseHold",
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "subjectRefs": [
+              {
+                "type": "QuantitySegment",
+                "id": {
+                  "$alias": "A20"
+                }
+              }
+            ],
+            "slots": {
+              "restrictionId": {
+                "$alias": "OLD_HOLD"
+              },
+              "quantity": {
+                "value": "20",
+                "unit": "BOX",
+                "provenance": "USER"
+              },
+              "sourceActivityId": {
+                "$result": {
+                  "actionId": "old-release",
+                  "pointer": "/response/activityId"
+                }
+              },
+              "sourceVersion": "1"
+            },
+            "expectedRevision": {
+              "$result": {
+                "actionId": "new-hold",
+                "pointer": "/response/revision"
+              }
+            },
+            "commandIdempotencyKey": "V3-late-v1-release-apply-old-release",
+            "evidenceRefs": [
+              {
+                "$alias": "operation-proof"
+              }
+            ],
+            "valueProvenance": "USER"
+          },
+          "evidenceRefs": [
+            "apply-old-release:actual-adapter-artifact"
+          ]
+        },
+        {
+          "id": "dispatch",
+          "kind": "invoke",
+          "actorRef": "warehouse",
+          "route": "api",
+          "capabilityId": "dispatchQuantity",
+          "request": {
+            "intentKind": "COMMAND",
+            "definitionVersion": "ontology-v1",
+            "capabilityId": "dispatchQuantity",
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "subjectRefs": [
+              {
+                "type": "QuantitySegment",
+                "id": {
+                  "$alias": "A20"
+                }
+              }
+            ],
+            "slots": {
+              "quantity": {
+                "value": "20",
+                "unit": "BOX",
+                "provenance": "USER"
+              },
+              "allocationId": {
+                "$alias": "ALLOC"
+              },
+              "destinationId": {
+                "$alias": "CUSTOMER"
+              }
+            },
+            "expectedRevision": {
+              "$result": {
+                "actionId": "new-hold",
+                "pointer": "/response/revision"
+              }
+            },
+            "commandIdempotencyKey": "V3-late-v1-release-dispatch",
+            "evidenceRefs": [
+              {
+                "$alias": "operation-proof"
+              }
+            ],
+            "valueProvenance": "USER"
+          },
+          "evidenceRefs": [
+            "dispatch:actual-adapter-artifact"
+          ]
+        },
+        {
+          "id": "after-api",
+          "kind": "query",
+          "actorRef": "warehouse",
+          "route": "api",
+          "capabilityId": "getInventory",
+          "request": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseKey": "V3-late-v1-release"
+            },
+            "action": "SELL",
+            "customerId": {
+              "$alias": "CUSTOMER"
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z"
+          },
+          "evidenceRefs": [
+            "after-api:actual-adapter-artifact"
+          ]
+        },
+        {
+          "id": "after-db",
+          "kind": "observe",
+          "observation": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseKey": "V3-late-v1-release"
+            },
+            "snapshotRef": {
+              "$result": {
+                "actionId": "after-api",
+                "pointer": "/response/snapshotRevision"
+              }
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z",
+            "sources": [
+              "segments",
+              "movements",
+              "genealogy",
+              "allocations",
+              "obligations",
+              "assignments",
+              "restrictions",
+              "dispositionBases",
+              "audit",
+              "outbox",
+              "commandResults",
+              "events",
+              "evidenceLinks",
+              "logisticsMemberships",
+              "shipments",
+              "intakes",
+              "stocktakes",
+              "decisions",
+              "locks",
+              "retryAttempts",
+              "dbPrivileges",
+              "boundaries",
+              "transactions"
+            ]
+          },
+          "evidenceRefs": [
+            "after-db:actual-adapter-artifact"
+          ]
+        }
+      ],
+      "assertions": [
+        {
+          "id": "new-hold-1",
+          "op": "equals",
+          "source": {
+            "actionId": "after-db",
+            "pointer": "/data/rawRows/restrictions",
+            "where": {
+              "id": {
+                "$result": {
+                  "actionId": "new-hold",
+                  "pointer": "/response/restrictionId"
+                }
+              }
+            },
+            "field": "state"
+          },
+          "expected": [
+            "ACTIVE"
+          ],
+          "requirementRefs": [
+            "D17"
+          ],
+          "evidenceRefs": [
+            "after-db:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseKey": "V3-late-v1-release"
+          },
+          "oracleExplanation": "독립 원 행의 실물·수량·관계·범위를 정확히 대조한다.",
+          "oracleRef": {
+            "oracleId": "V3.late-old-qc-release",
+            "observationNames": [
+              "new-hold"
+            ]
+          }
+        },
+        {
+          "id": "newly-dispatched-2",
+          "op": "decimalEquals",
+          "source": {
+            "actionId": "after-api",
+            "pointer": "/response/data/dispatchedQuantity"
+          },
+          "expected": "0",
+          "requirementRefs": [
+            "D17"
+          ],
+          "evidenceRefs": [
+            "after-api:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseKey": "V3-late-v1-release"
+          },
+          "oracleExplanation": "실물량·단위와 독립 손계산을 대조한다.",
+          "oracleRef": {
+            "oracleId": "V3.late-old-qc-release",
+            "observationNames": [
+              "newly-dispatched"
+            ]
+          },
+          "unit": "BOX",
+          "unitSource": {
+            "actionId": "after-api",
+            "pointer": "/response/data/unit"
+          }
+        },
+        {
+          "id": "newly-dispatched-3",
+          "op": "count",
+          "source": {
+            "actionId": "after-db",
+            "pointer": "/data/rawRows/movements",
+            "where": {
+              "kind": "DISPATCH"
+            }
+          },
+          "expected": 0,
+          "requirementRefs": [
+            "D17"
+          ],
+          "evidenceRefs": [
+            "after-db:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseKey": "V3-late-v1-release"
+          },
+          "oracleExplanation": "독립 원 행의 실물·수량·관계·범위를 정확히 대조한다.",
+          "oracleRef": {
+            "oracleId": "V3.late-old-qc-release",
+            "observationNames": [
+              "newly-dispatched"
+            ]
+          }
+        },
+        {
+          "id": "late-release-overwrites-new-hold-4",
+          "op": "relationSet",
+          "source": {
+            "actionId": "after-db",
+            "pointer": "/data/rawRows/restrictions",
+            "where": {
+              "id": {
+                "$result": {
+                  "actionId": "new-hold",
+                  "pointer": "/response/restrictionId"
+                }
+              }
+            },
+            "field": [
+              "id",
+              "state",
+              "sourceVersion"
+            ]
+          },
+          "expected": [
+            [
+              {
+                "$result": {
+                  "actionId": "new-hold",
+                  "pointer": "/response/restrictionId"
+                }
+              },
+              "ACTIVE",
+              "2"
+            ]
+          ],
+          "requirementRefs": [
+            "D17"
+          ],
+          "evidenceRefs": [
+            "after-db:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseKey": "V3-late-v1-release"
+          },
+          "oracleExplanation": "독립 원 행의 실물·수량·관계·범위를 정확히 대조한다.",
+          "oracleRef": {
+            "oracleId": "V3.late-old-qc-release",
+            "observationNames": [
+              "late-release-overwrites-new-hold"
+            ]
+          }
+        },
+        {
+          "id": "newly-dispatched-5",
+          "op": "equals",
+          "source": {
+            "actionId": "dispatch",
+            "pointer": "/response/outcome"
+          },
+          "expected": "REJECTED",
+          "requirementRefs": [
+            "D17"
+          ],
+          "evidenceRefs": [
+            "dispatch:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseKey": "V3-late-v1-release"
+          },
+          "oracleExplanation": "공개 명령의 구조화 outcome을 확인한다.",
+          "oracleRef": {
+            "oracleId": "V3.late-old-qc-release",
+            "observationNames": [
+              "newly-dispatched"
+            ]
+          }
+        },
+        {
+          "id": "newly-dispatched-6",
+          "op": "equals",
+          "source": {
+            "actionId": "dispatch",
+            "pointer": "/response/errorCode"
+          },
+          "expected": "INSUFFICIENT_ELIGIBLE_QUANTITY",
+          "requirementRefs": [
+            "D17"
+          ],
+          "evidenceRefs": [
+            "dispatch:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseKey": "V3-late-v1-release"
+          },
+          "oracleExplanation": "검증 실패를 해당 오류 코드로 구별한다.",
+          "oracleRef": {
+            "oracleId": "V3.late-old-qc-release",
+            "observationNames": [
+              "newly-dispatched"
+            ]
+          }
+        },
+        {
+          "id": "source-order-reconciliation-7",
+          "op": "count",
+          "source": {
+            "actionId": "after-db",
+            "pointer": "/data/rawRows/assignments",
+            "where": {
+              "obligationId": {
+                "$result": {
+                  "actionId": "old-release",
+                  "pointer": "/response/obligationId"
+                }
+              },
+              "current": true,
+              "status": "OPEN"
+            }
+          },
+          "expected": 1,
+          "requirementRefs": [
+            "D17"
+          ],
+          "evidenceRefs": [
+            "after-db:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseKey": "V3-late-v1-release"
+          },
+          "oracleExplanation": "해당 obligation root/scope의 현재 유효 assignment는 하나다. 의무 root는 실제 명령/대조/sweeper가 반환한 obligationId로 한정한다.",
+          "oracleRef": {
+            "oracleId": "V3.late-old-qc-release",
+            "observationNames": [
+              "source-order-reconciliation"
+            ]
+          }
+        },
+        {
+          "id": "source-order-reconciliation-8",
+          "op": "fieldsPresent",
+          "source": {
+            "actionId": "after-db",
+            "pointer": "/data/rawRows/assignments",
+            "where": {
+              "obligationId": {
+                "$result": {
+                  "actionId": "old-release",
+                  "pointer": "/response/obligationId"
+                }
+              },
+              "current": true,
+              "status": "OPEN"
+            }
+          },
+          "expected": [
+            "ownerId",
+            "supervisorId",
+            "nextAction",
+            "nextCheckAt",
+            "rootId",
+            "workId"
+          ],
+          "requirementRefs": [
+            "D17"
+          ],
+          "evidenceRefs": [
+            "after-db:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseKey": "V3-late-v1-release"
+          },
+          "oracleExplanation": "책임자의 실제 ID와 다음 행동·확인 시각에 공백이 없어야 한다. 의무 root는 실제 명령/대조/sweeper가 반환한 obligationId로 한정한다.",
+          "oracleRef": {
+            "oracleId": "V3.late-old-qc-release",
+            "observationNames": [
+              "source-order-reconciliation"
+            ]
+          }
+        },
+        {
+          "id": "source-order-reconciliation-9",
+          "op": "relationSet",
+          "source": {
+            "actionId": "after-db",
+            "pointer": "/data/rawRows/assignments",
+            "where": {
+              "obligationId": {
+                "$result": {
+                  "actionId": "old-release",
+                  "pointer": "/response/obligationId"
+                }
+              },
+              "current": true,
+              "status": "OPEN"
+            },
+            "field": [
+              "ownerId",
+              "supervisorId",
+              "nextAction",
+              "nextCheckAt"
+            ]
+          },
+          "expected": [
+            [
+              {
+                "$alias": "sales"
+              },
+              {
+                "$alias": "supervisor"
+              },
+              "근거 대조 후 대체 배분 검토",
+              "2026-10-07T10:00:00Z"
+            ]
+          ],
+          "requirementRefs": [
+            "D17"
+          ],
+          "evidenceRefs": [
+            "after-db:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseKey": "V3-late-v1-release"
+          },
+          "oracleExplanation": "fixture의 지정된 인간 owner/supervisor와 고정 후속 행동/시각이 유지된다. 의무 root는 실제 명령/대조/sweeper가 반환한 obligationId로 한정한다.",
+          "oracleRef": {
+            "oracleId": "V3.late-old-qc-release",
+            "observationNames": [
+              "source-order-reconciliation"
+            ]
+          }
+        },
+        {
+          "id": "source-order-reconciliation-10",
+          "op": "relationSet",
+          "source": {
+            "actionId": "after-db",
+            "pointer": "/data/rawRows/intakes",
+            "field": [
+              "activityId",
+              "reason",
+              "state"
+            ]
+          },
+          "expected": [
+            [
+              {
+                "$result": {
+                  "actionId": "old-release",
+                  "pointer": "/response/activityId"
+                }
+              },
+              "SOURCE_ORDER_UNVERIFIED",
+              "OPEN"
+            ]
+          ],
+          "requirementRefs": [
+            "D17"
+          ],
+          "evidenceRefs": [
+            "after-db:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseKey": "V3-late-v1-release"
+          },
+          "oracleExplanation": "독립 원 행의 실물·수량·관계·범위를 정확히 대조한다.",
+          "oracleRef": {
+            "oracleId": "V3.late-old-qc-release",
+            "observationNames": [
+              "source-order-reconciliation"
+            ]
+          }
+        },
+        {
+          "id": "active-physical-identities",
+          "op": "unique",
+          "source": {
+            "actionId": "after-db",
+            "pointer": "/data/rawRows/segments",
+            "where": {
+              "active": true
+            },
+            "field": "physicalScope"
+          },
+          "expected": true,
+          "requirementRefs": [
+            "D17"
+          ],
+          "evidenceRefs": [
+            "after-db:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseKey": "V3-late-v1-release"
+          },
+          "oracleExplanation": "현재 active 실물 identity를 한 번씩만 합산하며 중복 실물은 거부한다.",
+          "oracleRef": {
+            "oracleId": "V3.late-old-qc-release",
+            "observationNames": [
+              "new-hold"
+            ]
+          }
+        },
+        {
+          "id": "response-definition-version",
+          "op": "equals",
+          "source": {
+            "actionId": "after-api",
+            "pointer": "/response/definitionVersion"
+          },
+          "expected": "ontology-v1",
+          "requirementRefs": [
+            "D17"
+          ],
+          "evidenceRefs": [
+            "after-db:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseKey": "V3-late-v1-release"
+          },
+          "oracleExplanation": "수량/제한을 읽는 실제 정의 버전은 고정 v1이며 다른 의미로 대체하지 않는다.",
+          "oracleRef": {
+            "oracleId": "V3.late-old-qc-release",
+            "observationNames": [
+              "new-hold"
+            ]
+          }
+        },
+        {
+          "id": "actual-baseline-physical-rows",
+          "op": "relationSet",
+          "source": {
+            "actionId": "before-db",
+            "pointer": "/data/rawRows/segments",
+            "where": {
+              "active": true
+            },
+            "field": [
+              "id",
+              "quantity",
+              "unit"
+            ]
+          },
+          "expected": [
+            [
+              {
+                "$alias": "A20"
+              },
+              "20",
+              "BOX"
+            ]
+          ],
+          "requirementRefs": [
+            "D17"
+          ],
+          "evidenceRefs": [
+            "after-db:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseKey": "V3-late-v1-release"
+          },
+          "oracleExplanation": "서버에 실제 설치된 시작 실물의 ID·decimal·unit을 원 행에서 확인한다. baseline 자체는 업무 실행 coverage가 아니다.",
+          "oracleRef": {
+            "oracleId": "V3.late-old-qc-release",
+            "observationNames": [
+              "new-hold"
+            ]
+          }
+        }
+      ],
+      "oracleExplanation": "v1 release는 OLD_HOLD만 참조한다. 현재 v2 hold와 출고0을 보존하며 원천 선후 미확인은 대조 assignment1로 남긴다."
+    }
+  ]
+}

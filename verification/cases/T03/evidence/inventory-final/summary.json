@@ -1,0 +1,279 @@
+{
+  "recordType": "INVENTORY_CONTRACT_PREPARATION_EVIDENCE",
+  "baselineCommit": "77c2df3440b6d8b362bfb52fed677e441c372b4c",
+  "workingTreeDirtyAtExecution": true,
+  "caseCounts": {
+    "T03": {
+      "subcases": 8,
+      "assertions": 118
+    },
+    "T04": {
+      "subcases": 9,
+      "assertions": 132
+    },
+    "T05": {
+      "subcases": 3,
+      "assertions": 52
+    },
+    "T16": {
+      "subcases": 4,
+      "assertions": 71
+    },
+    "C1": {
+      "subcases": 2,
+      "assertions": 36
+    },
+    "V2": {
+      "subcases": 3,
+      "assertions": 69
+    },
+    "V3": {
+      "subcases": 3,
+      "assertions": 48
+    }
+  },
+  "caseCount": 7,
+  "subcaseCount": 32,
+  "assertionCount": 526,
+  "mandatoryOracleCount": 20,
+  "mandatoryObservationCount": 91,
+  "fixtureSourceDocumentCount": 192,
+  "harness": {
+    "tests": 142,
+    "failures": 0,
+    "errors": 0,
+    "skips": 0,
+    "inventorySelftests": 12
+  },
+  "contractRed": {
+    "expected": 32,
+    "discovered": 32,
+    "started": 32,
+    "notImplementedAssertionFailures": 32,
+    "skipped": 0,
+    "exitCode": 1
+  },
+  "representativeRuntime": {
+    "caseId": "T03",
+    "subcases": 8,
+    "status": "NOT_RUN",
+    "exitCode": 2
+  },
+  "commands": [
+    {
+      "profile": "harness",
+      "entrypoint": [
+        "./verify",
+        "harness"
+      ],
+      "exitCode": 0,
+      "commandsArtifact": "verification/cases/T03/evidence/inventory-final/harness-commands.json",
+      "logArtifact": "verification/cases/T03/evidence/inventory-final/harness.log.gz"
+    },
+    {
+      "profile": "validate",
+      "entrypoint": [
+        "./verify",
+        "validate",
+        "verification/cases/T03/case.json",
+        "verification/cases/T04/case.json",
+        "verification/cases/T05/case.json",
+        "verification/cases/T16/case.json",
+        "verification/cases/C1/case.json",
+        "verification/cases/V2/case.json",
+        "verification/cases/V3/case.json"
+      ],
+      "exitCode": 0,
+      "commandsArtifact": "verification/cases/T03/evidence/inventory-final/validate-commands.json",
+      "logArtifact": "verification/cases/T03/evidence/inventory-final/validate.log.gz"
+    },
+    {
+      "profile": "contract-red",
+      "entrypoint": [
+        "./verify",
+        "contract-red",
+        "verification/cases/T03/case.json",
+        "verification/cases/T04/case.json",
+        "verification/cases/T05/case.json",
+        "verification/cases/T16/case.json",
+        "verification/cases/C1/case.json",
+        "verification/cases/V2/case.json",
+        "verification/cases/V3/case.json"
+      ],
+      "exitCode": 1,
+      "commandsArtifact": "verification/cases/T03/evidence/inventory-final/contract-red-commands.json",
+      "logArtifact": "verification/cases/T03/evidence/inventory-final/contract-red.log.gz"
+    },
+    {
+      "profile": "scenarios",
+      "entrypoint": [
+        "./verify",
+        "scenarios",
+        "verification/cases/T03/case.json"
+      ],
+      "exitCode": 2,
+      "commandsArtifact": "verification/cases/T03/evidence/inventory-final/scenarios-notrun-commands.json",
+      "logArtifact": "verification/cases/T03/evidence/inventory-final/scenarios-notrun.log.gz"
+    }
+  ],
+  "perSubcaseEvidence": [
+    {
+      "path": "verification/cases/T03/evidence/contract-red-T03-split-merge.json",
+      "sha256": "04df11fba96b4e757e7da7a854894d21bfac3a784f3cb6f4ac1388cc118d7e79"
+    },
+    {
+      "path": "verification/cases/T03/evidence/contract-red-T03-pallet-two-lots.json",
+      "sha256": "c124e506cb115d54bac3a6bdea020de881267a945b2cb87e6bad4c2bd3aedb72"
+    },
+    {
+      "path": "verification/cases/T03/evidence/contract-red-T03-reject-cycle.json",
+      "sha256": "dd7fc52dc0eede55ef5880e4d2056327450c6ff4b58e4a556c7bca10eab51750"
+    },
+    {
+      "path": "verification/cases/T03/evidence/contract-red-T03-reject-consumeRetiredParent.json",
+      "sha256": "4d57ca06d46ae9da3cd1c43c747c29d99c20755170fe0911e52e8aac1c46d483"
+    },
+    {
+      "path": "verification/cases/T03/evidence/contract-red-T03-reject-mergeDifferentPlace.json",
+      "sha256": "47f3344340fc7425f697b7867d72576cb15fe4bfc8e8f250b7530333df335230"
+    },
+    {
+      "path": "verification/cases/T03/evidence/contract-red-T03-reject-mergeDifferentControl.json",
+      "sha256": "2ebee5cb353a3f8cd3f7a9775fa305ae1614cc449d3e640ab56f181e0c0c1d1e"
+    },
+    {
+      "path": "verification/cases/T03/evidence/contract-red-T03-reject-mergeIncompatibleUnit.json",
+      "sha256": "6325df5e44c8446cae2c09c6aa1742740312934afe74d57b650990983953eded"
+    },
+    {
+      "path": "verification/cases/T03/evidence/contract-red-T03-indistinguishable-mixture.json",
+      "sha256": "9238360090582b5e31d49032f53ee092be8fb4ad952a24a7883e17af10b8d9de"
+    },
+    {
+      "path": "verification/cases/T04/evidence/contract-red-T04-indivisible-ea.json",
+      "sha256": "8649eb9003b680998720a77ff68f4d435b0119de1c2c56ac7d9db6033811e1e3"
+    },
+    {
+      "path": "verification/cases/T04/evidence/contract-red-T04-scale-overflow.json",
+      "sha256": "e0f8f5a851adfcb8691c9e9684ea91457a0eb356dc1925594b566f5662c05d9d"
+    },
+    {
+      "path": "verification/cases/T04/evidence/contract-red-T04-precision-overflow.json",
+      "sha256": "6e35ebbbff544e0e94764e13130ad0ad384af63f138b854ee2cd9994af382a75"
+    },
+    {
+      "path": "verification/cases/T04/evidence/contract-red-T04-hold-dispose.json",
+      "sha256": "96337618bc610238eb2f44048759d904501929c0f0ee7ed6cb62230d7c2dbfbb"
+    },
+    {
+      "path": "verification/cases/T04/evidence/contract-red-T04-rollback-afterMovementBeforeAllocation.json",
+      "sha256": "3b78c01019eba911d38326ac4f59e96e5dfce88318c01bed4191eb1a4cfed438"
+    },
+    {
+      "path": "verification/cases/T04/evidence/contract-red-T04-rollback-afterAllocationBeforeAudit.json",
+      "sha256": "76e18af86a1c6116f0b1fd6ae882acc9d787e2dced805166a8b81eaeef831cfc"
+    },
+    {
+      "path": "verification/cases/T04/evidence/contract-red-T04-rollback-afterAuditBeforeOutbox.json",
+      "sha256": "3ae745f23295e9364671dffa9b11683c3ce5fc32adf4d97b995786fdeacb09ba"
+    },
+    {
+      "path": "verification/cases/T04/evidence/contract-red-T04-rollback-afterOutboxBeforeCommittedResult.json",
+      "sha256": "0a13abb9b240ea21c02f2d3d130355ec42beca612e4b1e14baa8ad1e66d9ee24"
+    },
+    {
+      "path": "verification/cases/T04/evidence/contract-red-T04-primitive-guards.json",
+      "sha256": "69333619694bd43bdb546280357395c4e1af8bbeadba17d61e406ab05e16e2e0"
+    },
+    {
+      "path": "verification/cases/T05/evidence/contract-red-T05-custody-not-sale.json",
+      "sha256": "b7d828061c361305ee8259e93ccff6432caf68f1821a15b3d31fc9f3e27fb25d"
+    },
+    {
+      "path": "verification/cases/T05/evidence/contract-red-T05-planned-not-actual.json",
+      "sha256": "a19076f60f1a1b853e930d33445cbfe6eee57d8f1cb30653a9669fd7871b152b"
+    },
+    {
+      "path": "verification/cases/T05/evidence/contract-red-T05-manager-disposition.json",
+      "sha256": "1d6a878f9354b1f4f9cbe6c7b61e93b8c11993357aea7fb0d3deff7f4b117b25"
+    },
+    {
+      "path": "verification/cases/T16/evidence/contract-red-T16-provisional-holds.json",
+      "sha256": "9661ec637b6ed1e47682b6d8ddd7b49f321bae1549160f621a294b1813ca5346"
+    },
+    {
+      "path": "verification/cases/T16/evidence/contract-red-T16-stocktake-adjust-move.json",
+      "sha256": "0ce457404a70d1c928e6bf8fa0543a6c9205a1186f470742ba82b5be310acb4b"
+    },
+    {
+      "path": "verification/cases/T16/evidence/contract-red-T16-expiry-sweeper.json",
+      "sha256": "b4c040ba4debeafc34c8bbde47556e740deaae5d7ef1ffb997cfa918d448f9f1"
+    },
+    {
+      "path": "verification/cases/T16/evidence/contract-red-T16-expiry-delayed-sweep.json",
+      "sha256": "cf94799137491d7ba96a825f0caea127360172b9d52ec986ac7c180dc35b7a58"
+    },
+    {
+      "path": "verification/cases/C1/evidence/contract-red-C1-custody-not-sale.json",
+      "sha256": "67e1577db44dc6e2db8bb4fbddca0dc1d2acdf865d55cca7ed7f9e0d3b8d94fe"
+    },
+    {
+      "path": "verification/cases/C1/evidence/contract-red-C1-revoked-basis.json",
+      "sha256": "e2a5b31230f0bb316220d995f803ac6cf521dfa967b82b8056fa071fdc30744c"
+    },
+    {
+      "path": "verification/cases/V2/evidence/contract-red-V2-split-commits-first.json",
+      "sha256": "cb908b9675c3cd135be6e4d02b7b2c6867f24a54d0b3fe5983f68da973d73329"
+    },
+    {
+      "path": "verification/cases/V2/evidence/contract-red-V2-reserve-commits-first.json",
+      "sha256": "907ec42fa33cb2f2190d5375b4137dd21841077b5c215cbb802b7125d4541485"
+    },
+    {
+      "path": "verification/cases/V2/evidence/contract-red-V2-actual50-correction.json",
+      "sha256": "2e15e671d7ef78084357db4d0013570bb2999a8105783fe78d1a55a69d90ac40"
+    },
+    {
+      "path": "verification/cases/V3/evidence/contract-red-V3-hold-first.json",
+      "sha256": "51c8dc0a14b4ef1fedace672e50b2fca8487b264fc71cb4f713e4e50badd9dd0"
+    },
+    {
+      "path": "verification/cases/V3/evidence/contract-red-V3-dispatch-first.json",
+      "sha256": "7109e5cedb06ea5f298526067401461477487a680a247f45fadadd0a26bf62c4"
+    },
+    {
+      "path": "verification/cases/V3/evidence/contract-red-V3-late-v1-release.json",
+      "sha256": "248d9d836b49b555f1f235caff188e33ba643aaf3d3387a011531dbc30da475c"
+    }
+  ],
+  "staticChecks": {
+    "sourceDocumentHashes": "PASS",
+    "allGherkinActionAndAssertionOrder": "PASS",
+    "mandatoryNamesExactSet": "91/91"
+  },
+  "productDbApiHostModelStatus": "NOT_RUN",
+  "productCoverageClaimed": false,
+  "limitations": [
+    "RED validates discovery, execution and availability failure, not product behavior or all 526 assertion outcomes.",
+    "12 fixed sample/mutant checks execute the real AssertionEngine and do not implement an application driver.",
+    "Runtime API/DB/host scope and raw-row mappings remain contracts until product adapters execute."
+  ],
+  "rawLogIntegrity": {
+    "harness": {
+      "uncompressedSha256": "4971ed8c2f467a7de6335a22b1a468053f96c2f7c6184170373e4366618deae9",
+      "uncompressedBytes": 6667
+    },
+    "validate": {
+      "uncompressedSha256": "93476150a5df35f1edaea32624b2bb19ed2c8c0ea57f23b3348def4a13feadaa",
+      "uncompressedBytes": 8312
+    },
+    "contract-red": {
+      "uncompressedSha256": "3da7c2f11b173851b0e4fef3119d09ed081742c36dee0ef2b24c6f454c7f36c7",
+      "uncompressedBytes": 291417
+    },
+    "scenarios-notrun": {
+      "uncompressedSha256": "2196fe90f8a5841b01b9ad5513fcb1f891565f019c314ff7bb7a73fdf156e142",
+      "uncompressedBytes": 100802
+    }
+  }
+}

@@ -1,0 +1,725 @@
+{
+  "schemaVersion": "1.0.0",
+  "fixtureId": "T04-primitive-guards",
+  "synthetic": true,
+  "baseRefs": [],
+  "clock": {
+    "asOf": "2026-10-07T09:00:00Z",
+    "knownAt": "2026-10-07T09:00:01Z",
+    "timezone": "Asia/Seoul",
+    "precision": "SECOND",
+    "deadlineInclusive": true
+  },
+  "versions": {
+    "definition": "ontology-v1",
+    "evaluator": "inventory-evaluator-v1",
+    "policy": "SYNTHETIC-default-v1"
+  },
+  "actors": {
+    "warehouse": {
+      "issuer": "synthetic-issuer",
+      "subject": "warehouse",
+      "audience": "isolated-ontology",
+      "organizationAlias": "ORG",
+      "roleCapabilities": [
+        "getInventory",
+        "getObject",
+        "getObligations",
+        "traceLot",
+        "evaluateEligibility",
+        "splitQuantity",
+        "mergeQuantity",
+        "moveQuantity",
+        "reserveQuantity",
+        "dispatchQuantity"
+      ],
+      "grant": {
+        "delegatorAlias": "supervisor",
+        "actions": [
+          "getInventory",
+          "getObject",
+          "getObligations",
+          "traceLot",
+          "evaluateEligibility",
+          "splitQuantity",
+          "mergeQuantity",
+          "moveQuantity",
+          "reserveQuantity",
+          "dispatchQuantity"
+        ],
+        "scope": {
+          "organizationAlias": "ORG",
+          "itemAlias": "P",
+          "segmentAliases": [
+            "A60"
+          ],
+          "workAliases": [
+            "S1"
+          ],
+          "placeAliases": [
+            "W",
+            "W2",
+            "PORT"
+          ],
+          "customerAliases": [
+            "CUSTOMER"
+          ],
+          "physicalRootAliases": [
+            "A60"
+          ],
+          "derivedSegmentsWithinSamePhysicalRoot": true
+        },
+        "validFrom": "2026-10-01T00:00:00Z",
+        "validUntil": "2026-10-31T23:59:59Z",
+        "revision": 1
+      }
+    },
+    "sales": {
+      "issuer": "synthetic-issuer",
+      "subject": "sales",
+      "audience": "isolated-ontology",
+      "organizationAlias": "ORG",
+      "roleCapabilities": [
+        "getInventory",
+        "getObject",
+        "getObligations",
+        "evaluateEligibility",
+        "reserveQuantity",
+        "dispatchQuantity"
+      ],
+      "grant": {
+        "delegatorAlias": "supervisor",
+        "actions": [
+          "getInventory",
+          "getObject",
+          "getObligations",
+          "evaluateEligibility",
+          "reserveQuantity",
+          "dispatchQuantity"
+        ],
+        "scope": {
+          "organizationAlias": "ORG",
+          "itemAlias": "P",
+          "segmentAliases": [
+            "A60"
+          ],
+          "workAliases": [
+            "S1"
+          ],
+          "placeAliases": [
+            "W",
+            "W2",
+            "PORT"
+          ],
+          "customerAliases": [
+            "CUSTOMER"
+          ],
+          "physicalRootAliases": [
+            "A60"
+          ],
+          "derivedSegmentsWithinSamePhysicalRoot": true
+        },
+        "validFrom": "2026-10-01T00:00:00Z",
+        "validUntil": "2026-10-31T23:59:59Z",
+        "revision": 1
+      }
+    },
+    "qc": {
+      "issuer": "synthetic-issuer",
+      "subject": "qc",
+      "audience": "isolated-ontology",
+      "organizationAlias": "ORG",
+      "roleCapabilities": [
+        "getInventory",
+        "getObject",
+        "getObligations",
+        "traceLot",
+        "placeHold",
+        "releaseHold",
+        "recordActivity",
+        "QC_DECIDE_RESTRICTION"
+      ],
+      "grant": {
+        "delegatorAlias": "supervisor",
+        "actions": [
+          "getInventory",
+          "getObject",
+          "getObligations",
+          "traceLot",
+          "placeHold",
+          "releaseHold",
+          "recordActivity"
+        ],
+        "scope": {
+          "organizationAlias": "ORG",
+          "itemAlias": "P",
+          "segmentAliases": [
+            "A60"
+          ],
+          "workAliases": [
+            "S1"
+          ],
+          "placeAliases": [
+            "W",
+            "W2",
+            "PORT"
+          ],
+          "customerAliases": [
+            "CUSTOMER"
+          ],
+          "physicalRootAliases": [
+            "A60"
+          ],
+          "derivedSegmentsWithinSamePhysicalRoot": true
+        },
+        "validFrom": "2026-10-01T00:00:00Z",
+        "validUntil": "2026-10-31T23:59:59Z",
+        "revision": 1
+      }
+    },
+    "manager": {
+      "issuer": "synthetic-issuer",
+      "subject": "manager",
+      "audience": "isolated-ontology",
+      "organizationAlias": "ORG",
+      "roleCapabilities": [
+        "getInventory",
+        "getObject",
+        "getObligations",
+        "adjustQuantity",
+        "disposeQuantity",
+        "recordDispositionBasis",
+        "revokeDispositionBasis",
+        "MANAGER_CONFIRM_DISPOSITION",
+        "MANAGER_APPROVE_STOCK_DECREASE",
+        "MANAGER_CONFIRM_STOCK_ADJUSTMENT"
+      ],
+      "grant": {
+        "delegatorAlias": "supervisor",
+        "actions": [
+          "getInventory",
+          "getObject",
+          "getObligations",
+          "adjustQuantity",
+          "disposeQuantity",
+          "recordDispositionBasis",
+          "revokeDispositionBasis"
+        ],
+        "scope": {
+          "organizationAlias": "ORG",
+          "itemAlias": "P",
+          "segmentAliases": [
+            "A60"
+          ],
+          "workAliases": [
+            "S1"
+          ],
+          "placeAliases": [
+            "W",
+            "W2",
+            "PORT"
+          ],
+          "customerAliases": [
+            "CUSTOMER"
+          ],
+          "physicalRootAliases": [
+            "A60"
+          ],
+          "derivedSegmentsWithinSamePhysicalRoot": true
+        },
+        "validFrom": "2026-10-01T00:00:00Z",
+        "validUntil": "2026-10-31T23:59:59Z",
+        "revision": 1
+      }
+    },
+    "admin": {
+      "issuer": "synthetic-issuer",
+      "subject": "admin",
+      "audience": "isolated-ontology",
+      "organizationAlias": "ORG",
+      "roleCapabilities": [
+        "getInventory",
+        "getObject",
+        "getObligations",
+        "placeHold",
+        "releaseHold",
+        "ADMIN_DECIDE_RECALL_RESTRICTION"
+      ],
+      "grant": {
+        "delegatorAlias": "supervisor",
+        "actions": [
+          "getInventory",
+          "getObject",
+          "getObligations",
+          "placeHold",
+          "releaseHold"
+        ],
+        "scope": {
+          "organizationAlias": "ORG",
+          "itemAlias": "P",
+          "segmentAliases": [
+            "A60"
+          ],
+          "workAliases": [
+            "S1"
+          ],
+          "placeAliases": [
+            "W",
+            "W2",
+            "PORT"
+          ],
+          "customerAliases": [
+            "CUSTOMER"
+          ],
+          "physicalRootAliases": [
+            "A60"
+          ],
+          "derivedSegmentsWithinSamePhysicalRoot": true
+        },
+        "validFrom": "2026-10-01T00:00:00Z",
+        "validUntil": "2026-10-31T23:59:59Z",
+        "revision": 1
+      }
+    },
+    "recorder": {
+      "issuer": "synthetic-issuer",
+      "subject": "recorder",
+      "audience": "isolated-ontology",
+      "organizationAlias": "ORG",
+      "roleCapabilities": [
+        "getInventory",
+        "getObject",
+        "traceLot",
+        "recordStocktake",
+        "receiveProvisional",
+        "confirmReceipt",
+        "recordActivity",
+        "recordHandover",
+        "createShipment",
+        "correctEvidence",
+        "recordRelation"
+      ],
+      "grant": {
+        "delegatorAlias": "supervisor",
+        "actions": [
+          "getInventory",
+          "getObject",
+          "traceLot",
+          "recordStocktake",
+          "receiveProvisional",
+          "confirmReceipt",
+          "recordActivity",
+          "recordHandover",
+          "createShipment",
+          "correctEvidence",
+          "recordRelation"
+        ],
+        "scope": {
+          "organizationAlias": "ORG",
+          "itemAlias": "P",
+          "segmentAliases": [
+            "A60"
+          ],
+          "workAliases": [
+            "S1"
+          ],
+          "placeAliases": [
+            "W",
+            "W2",
+            "PORT"
+          ],
+          "customerAliases": [
+            "CUSTOMER"
+          ],
+          "physicalRootAliases": [
+            "A60"
+          ],
+          "derivedSegmentsWithinSamePhysicalRoot": true
+        },
+        "validFrom": "2026-10-01T00:00:00Z",
+        "validUntil": "2026-10-31T23:59:59Z",
+        "revision": 1
+      }
+    },
+    "ordinary": {
+      "issuer": "synthetic-issuer",
+      "subject": "ordinary",
+      "audience": "isolated-ontology",
+      "organizationAlias": "ORG",
+      "roleCapabilities": [
+        "getInventory",
+        "getObject",
+        "evaluateEligibility",
+        "recordActivity",
+        "recordDispositionBasis",
+        "adjustQuantity",
+        "disposeQuantity",
+        "placeHold",
+        "releaseHold",
+        "reserveQuantity",
+        "dispatchQuantity"
+      ],
+      "grant": {
+        "delegatorAlias": "supervisor",
+        "actions": [
+          "getInventory",
+          "getObject",
+          "evaluateEligibility",
+          "recordActivity",
+          "recordDispositionBasis",
+          "adjustQuantity",
+          "disposeQuantity",
+          "placeHold",
+          "releaseHold",
+          "reserveQuantity",
+          "dispatchQuantity"
+        ],
+        "scope": {
+          "organizationAlias": "ORG",
+          "itemAlias": "P",
+          "segmentAliases": [
+            "A60"
+          ],
+          "workAliases": [
+            "S1"
+          ],
+          "placeAliases": [
+            "W",
+            "W2",
+            "PORT"
+          ],
+          "customerAliases": [
+            "CUSTOMER"
+          ],
+          "physicalRootAliases": [
+            "A60"
+          ],
+          "derivedSegmentsWithinSamePhysicalRoot": true
+        },
+        "validFrom": "2026-10-01T00:00:00Z",
+        "validUntil": "2026-10-31T23:59:59Z",
+        "revision": 1
+      }
+    }
+  },
+  "aliases": {
+    "ORG": {
+      "type": "Organization"
+    },
+    "P": {
+      "type": "TradeItem",
+      "unit": "BOX",
+      "permittedScale": 12,
+      "quantityTolerance": "0"
+    },
+    "W": {
+      "type": "Place",
+      "kind": "INTERNAL_WAREHOUSE"
+    },
+    "W2": {
+      "type": "Place",
+      "kind": "INTERNAL_WAREHOUSE"
+    },
+    "PORT": {
+      "type": "Place",
+      "name": "IT-port",
+      "kind": "PORT"
+    },
+    "CUSTOMER": {
+      "type": "Organization",
+      "kind": "B2B_CUSTOMER"
+    },
+    "SUPPLIER": {
+      "type": "Organization",
+      "kind": "SUPPLIER"
+    },
+    "CUSTODIAN": {
+      "type": "Organization",
+      "kind": "WAREHOUSE"
+    },
+    "S1": {
+      "type": "Work",
+      "kind": "SALES",
+      "state": "ACTIVE",
+      "ownerAlias": "sales",
+      "revision": 1
+    },
+    "ORDER": {
+      "type": "SalesOrderLine",
+      "workAlias": "S1",
+      "quantity": "20",
+      "unit": "BOX",
+      "customerAlias": "CUSTOMER",
+      "destinationAlias": "CUSTOMER",
+      "monetaryReference": {
+        "originalValue": "0.100000000001",
+        "currency": "EUR",
+        "roundingPolicy": "retain-original-no-rounding"
+      }
+    },
+    "warehouse": {
+      "type": "Human"
+    },
+    "sales": {
+      "type": "Human"
+    },
+    "qc": {
+      "type": "Human"
+    },
+    "manager": {
+      "type": "Human"
+    },
+    "admin": {
+      "type": "Human"
+    },
+    "recorder": {
+      "type": "Human"
+    },
+    "supervisor": {
+      "type": "Human"
+    },
+    "ordinary": {
+      "type": "Human"
+    },
+    "L1": {
+      "type": "ManufacturingLot",
+      "itemAlias": "P",
+      "manufacturerAlias": "SUPPLIER",
+      "externalLot": "L1",
+      "expiryAt": "2026-12-31T23:59:59Z"
+    },
+    "A60": {
+      "type": "QuantitySegment",
+      "itemAlias": "P",
+      "lotAlias": "L1",
+      "quantity": "60",
+      "unit": "BOX",
+      "locationAlias": "W",
+      "custodianAlias": "CUSTODIAN",
+      "ownerAlias": "SUPPLIER",
+      "riskBearerAlias": "SUPPLIER",
+      "physicalScope": "A60-physical",
+      "active": true,
+      "revision": 1,
+      "identifiability": "DISTINGUISHABLE"
+    },
+    "ALLOC": {
+      "type": "Allocation",
+      "segmentAlias": "A60",
+      "workAlias": "S1",
+      "quantity": "20",
+      "unit": "BOX",
+      "state": "EXECUTABLE",
+      "revision": 1
+    },
+    "PROMISE": {
+      "type": "ObligationRoot"
+    },
+    "baseline-permission": {
+      "type": "DocumentVersion",
+      "sha256": "6c671304cb1a26b5907e461dfac16c66b84bb866148ced950b8a32f7cbb59c47",
+      "mediaType": "application/json",
+      "sourceFile": "verification/cases/T04/fixtures/evidence/primitive-guards/baseline-permission.json"
+    },
+    "operation-proof": {
+      "type": "DocumentVersion",
+      "sha256": "1c47ba5bfe415154e1d5c443aea64e4fb1a7fa284ecaf1a92a30d1b0c4f8d46a",
+      "mediaType": "application/json",
+      "sourceFile": "verification/cases/T04/fixtures/evidence/primitive-guards/operation-proof.json"
+    },
+    "stocktake-proof": {
+      "type": "DocumentVersion",
+      "sha256": "573c6bdf6b716e02651945c47c15163ca53d917207f0388db529128f7f9f6dbe",
+      "mediaType": "application/json",
+      "sourceFile": "verification/cases/T04/fixtures/evidence/primitive-guards/stocktake-proof.json"
+    },
+    "qc-proof": {
+      "type": "DocumentVersion",
+      "sha256": "940f71f5fccba7816c6d943a41034d9af527300f83a6272a38cb5a76db9da3e7",
+      "mediaType": "application/json",
+      "sourceFile": "verification/cases/T04/fixtures/evidence/primitive-guards/qc-proof.json"
+    },
+    "management-proof": {
+      "type": "DocumentVersion",
+      "sha256": "e5d3d3d3ba5151435b00f0802a1f40ebfcee67b4154e262550a0425b7c13e049",
+      "mediaType": "application/json",
+      "sourceFile": "verification/cases/T04/fixtures/evidence/primitive-guards/management-proof.json"
+    },
+    "source-proof": {
+      "type": "DocumentVersion",
+      "sha256": "ca1d5f43d72e69c36fb51bc42ba5ef6aa220a5c9209084e421f526735abbb2a5",
+      "mediaType": "application/json",
+      "sourceFile": "verification/cases/T04/fixtures/evidence/primitive-guards/source-proof.json"
+    }
+  },
+  "baseline": {
+    "segments": [
+      {
+        "alias": "A60",
+        "quantity": "60",
+        "unit": "BOX"
+      }
+    ],
+    "roles": {
+      "ordinary": "WRITE",
+      "manager": "MANAGER",
+      "qc": "QC",
+      "admin": "ADMIN",
+      "warehouse": "WAREHOUSE",
+      "sales": "SALES",
+      "recorder": "RECORD"
+    },
+    "policies": {
+      "defaultManagementConfirmation": "MANAGER",
+      "qcDecision": "QC",
+      "recallDecision": "ADMIN",
+      "newApprovalForReservation": false,
+      "newApprovalForDispatch": false,
+      "quantityTolerance": "0",
+      "scale": 12,
+      "numericPrecision": 38,
+      "numericScale": 12,
+      "scopeLockOrder": "ascending-immutable-ID",
+      "boundedRetryLimit": 3,
+      "schedulerTickSeconds": 1,
+      "claimTtlSeconds": 5,
+      "heartbeatSeconds": 1,
+      "observationLimitSeconds": 30,
+      "nextAction": "근거 대조 후 대체 배분 검토",
+      "nextCheckAt": "2026-10-07T10:00:00Z",
+      "saleSourcePlaceAliases": [
+        "W",
+        "W2"
+      ],
+      "requiredManagementCapability": {
+        "recordDispositionBasis": "MANAGER_CONFIRM_DISPOSITION",
+        "disposeQuantity": "MANAGER_APPROVE_STOCK_DECREASE",
+        "adjustQuantity": "MANAGER_CONFIRM_STOCK_ADJUSTMENT",
+        "QC.placeHold": "QC_DECIDE_RESTRICTION",
+        "QC.releaseHold": "QC_DECIDE_RESTRICTION",
+        "RECALL.placeHold": "ADMIN_DECIDE_RECALL_RESTRICTION"
+      }
+    },
+    "work": {
+      "alias": "S1",
+      "ownerAlias": "sales",
+      "supervisorAlias": "supervisor",
+      "state": "ACTIVE",
+      "quantity": "20",
+      "unit": "BOX"
+    },
+    "allocations": [
+      {
+        "alias": "ALLOC",
+        "segmentAlias": "A60",
+        "workAlias": "S1",
+        "quantity": "20",
+        "unit": "BOX",
+        "state": "EXECUTABLE",
+        "revision": 1,
+        "commandKey": "synthetic-baseline-T04-primitive-guards",
+        "rootAlias": "ALLOC"
+      }
+    ],
+    "setupIsExecutionCoverage": false,
+    "eligibilityFacts": [
+      {
+        "segmentAlias": "A60",
+        "action": "SELL",
+        "qc": "ALLOWED",
+        "regulatory": "ALLOWED",
+        "customer": "ALLOWED",
+        "disposition": "CONFIRMED",
+        "dispositionDecisionMakerAlias": "manager",
+        "basisProposalHash": "db5f5555089f69ffc33d424a95bcebdb118cd291a8b8bdac9f5b2fc43aa4ee42",
+        "basisRevision": 1,
+        "validFrom": "2026-10-01T00:00:00Z",
+        "validUntil": "2026-10-31T23:59:59Z",
+        "evidenceAlias": "baseline-permission"
+      }
+    ],
+    "salesPromise": {
+      "scopeAlias": "S1",
+      "quantity": "20",
+      "unit": "BOX",
+      "ownerAlias": "sales",
+      "stableRootAlias": "PROMISE"
+    },
+    "lockProbeScope": {
+      "allocationAlias": "ALLOC",
+      "segmentAlias": "A60",
+      "scopeFenceRootAlias": "A60",
+      "readOnlyObserverOrderBy": "scopeId ASC",
+      "expectedScopeCount": 3
+    },
+    "rolesAreDescriptiveNotImplicitAuthority": true
+  },
+  "evidence": [
+    {
+      "alias": "baseline-permission",
+      "sha256": "6c671304cb1a26b5907e461dfac16c66b84bb866148ced950b8a32f7cbb59c47",
+      "sourceNamespace": "synthetic-supplier",
+      "externalEventId": "T04-primitive-guards-baseline-permission",
+      "sourceVersion": "1",
+      "occurredAt": "2026-10-07T09:00:00Z",
+      "recordedAt": "2026-10-07T09:00:01Z"
+    },
+    {
+      "alias": "operation-proof",
+      "sha256": "1c47ba5bfe415154e1d5c443aea64e4fb1a7fa284ecaf1a92a30d1b0c4f8d46a",
+      "sourceNamespace": "synthetic-warehouse",
+      "externalEventId": "T04-primitive-guards-operation-proof",
+      "sourceVersion": "1",
+      "occurredAt": "2026-10-07T09:00:00Z",
+      "recordedAt": "2026-10-07T09:00:01Z"
+    },
+    {
+      "alias": "stocktake-proof",
+      "sha256": "573c6bdf6b716e02651945c47c15163ca53d917207f0388db529128f7f9f6dbe",
+      "sourceNamespace": "synthetic-warehouse",
+      "externalEventId": "T04-primitive-guards-stocktake-proof",
+      "sourceVersion": "1",
+      "occurredAt": "2026-10-07T09:00:00Z",
+      "recordedAt": "2026-10-07T09:00:01Z"
+    },
+    {
+      "alias": "qc-proof",
+      "sha256": "940f71f5fccba7816c6d943a41034d9af527300f83a6272a38cb5a76db9da3e7",
+      "sourceNamespace": "synthetic-warehouse",
+      "externalEventId": "T04-primitive-guards-qc-proof",
+      "sourceVersion": "1",
+      "occurredAt": "2026-10-07T09:00:00Z",
+      "recordedAt": "2026-10-07T09:00:01Z"
+    },
+    {
+      "alias": "management-proof",
+      "sha256": "e5d3d3d3ba5151435b00f0802a1f40ebfcee67b4154e262550a0425b7c13e049",
+      "sourceNamespace": "synthetic-warehouse",
+      "externalEventId": "T04-primitive-guards-management-proof",
+      "sourceVersion": "1",
+      "occurredAt": "2026-10-07T09:00:00Z",
+      "recordedAt": "2026-10-07T09:00:01Z"
+    },
+    {
+      "alias": "source-proof",
+      "sha256": "ca1d5f43d72e69c36fb51bc42ba5ef6aa220a5c9209084e421f526735abbb2a5",
+      "sourceNamespace": "synthetic-warehouse",
+      "externalEventId": "T04-primitive-guards-source-proof",
+      "sourceVersion": "1",
+      "occurredAt": "2026-10-07T09:00:00Z",
+      "recordedAt": "2026-10-07T09:00:01Z"
+    }
+  ],
+  "responsibilities": [
+    {
+      "scope": {
+        "itemAlias": "P",
+        "workAlias": "S1"
+      },
+      "ownerAlias": "sales",
+      "supervisorAlias": "supervisor",
+      "nextAction": "근거 대조 후 대체 배분 검토",
+      "nextCheckAt": "2026-10-07T10:00:00Z"
+    }
+  ]
+}
