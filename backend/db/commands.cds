@@ -9,7 +9,7 @@ entity CommandRecords {
 entity CommandAudits {
  key ID : UUID; organizationId : UUID; actorId : UUID;
  commandId : UUID; capabilityId : String(120); canonicalHash : String(64);
- outcome : String(40); effectRefs : LargeString; createdAt : Timestamp;
+ outcome : String(40); effectRefs : LargeString; auditFactsJson : LargeString; createdAt : Timestamp;
 }
 entity Approvals {
  key ID : UUID; organizationId : UUID; proposalId : UUID; proposalRevision : Integer;

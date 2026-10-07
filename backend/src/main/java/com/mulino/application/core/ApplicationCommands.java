@@ -75,6 +75,7 @@ public class ApplicationCommands {
     if(prep.currentRevision()!=null&&(!intent.containsKey("expectedRevision")||((Number)intent.get("expectedRevision")).intValue()!=prep.currentRevision()))throw new DomainError("CONFLICT","STALE_REVISION","Expected revision changed");
     if(intent.containsKey("proposalRevision")&&((Number)intent.get("proposalRevision")).intValue()!=(prep.proposalRevision()>0?prep.proposalRevision():1))throw new DomainError("CONFLICT","STALE_REVISION","Proposal revision changed");
     current.verify(c,cap,hash,prep,intent);
+    Map<String,Object> facts=new LinkedHashMap<>(current.auditFacts(c,cap,prep,intent));facts.put("scope",prep.scopes());facts.put("effectClass",prep.effectClass());facts.put("definitionVersion",intent.get("definitionVersion"));facts.put("capabilityVersion",intent.get("capabilityVersion"));if(prep.currentRevision()!=null)facts.put("beforeRevision",prep.currentRevision());if(prep.targetId()!=null)facts.put("targetId",prep.targetId());
     String id=repository.begin(c,intent,hash,clock.instant(),prep);Map<String,Object> result;String previous=CommandExecution.enter(id);
     try{result=new LinkedHashMap<>(h.execute(c,intent));}finally{CommandExecution.exit(previous);}
     if(!Set.of("APPLIED","ACCEPTED_PENDING_EXTERNAL","PENDING_EXTERNAL","WAITING_APPROVAL","NEEDS_INPUT","REJECTED","CONFLICT","HELD").contains(result.get("outcome")))throw new IllegalStateException("Invalid handler command outcome");
@@ -82,14 +83,14 @@ public class ApplicationCommands {
     if(!h.mutatesAuthorization(cap))auth.authorizeScopes(c,cap,prep.scopes());current.verifyCommit(c,cap,hash,prep,intent,h.mutatesAuthorization(cap));if(!claim.isEmpty())leases.getObject().fenceAndVerify(c,claim);
     current.consume(c,prep,intent,id);
     result.put("commandId",id);result.put("canonicalIntentHash",hash);result.put("proposalRevision",prep.proposalRevision()>0?prep.proposalRevision():1);
-    result.putIfAbsent("effects",Map.of());repository.finish(c,id,intent,hash,result,clock.instant());return result;
+    result.putIfAbsent("effects",Map.of());if(result.get("revision") instanceof Number)facts.put("afterRevision",result.get("revision"));repository.finish(c,id,intent,hash,result,clock.instant(),facts);return result;
   }
   /** Expected denial audit is committed separately only after the effect transaction rolled back. */
   private Map<String,Object> reject(Map<String,Object> intent,String hash,DomainError failure,Map<String,Object> claim,boolean claimed){
     Map<String,Object> result=failure.response();
     return denial.execute(status->{DomainContext c;try{c=claimed?leases.getObject().resolveContext(claim,clock.instant()):auth.context(clock.instant(),clock.instant());}catch(AccessDeniedException|DomainError unauthenticated){return result;}
       String cap=(String)intent.get("capabilityId"),key=(String)intent.get("commandIdempotencyKey");repository.fence(c,List.of("command:"+c.stableRequestOwner()+":"+cap+":"+key));var old=repository.find(c,cap,key);
-      if(old.isPresent())return result;String id=repository.begin(c,intent,hash,clock.instant(),null);repository.finish(c,id,intent,hash,result,clock.instant());return result;});
+      if(old.isPresent())return result;String id=repository.begin(c,intent,hash,clock.instant(),null);repository.finish(c,id,intent,hash,result,clock.instant(),Map.of("expectedDenial",true,"definitionVersion",intent.get("definitionVersion"),"capabilityVersion",intent.get("capabilityVersion")));return result;});
   }
   private boolean transientFailure(RuntimeException failure){Throwable cause=failure;while(cause!=null){if(cause instanceof java.sql.SQLException sql&&Set.of("55P03","40P01","40001").contains(sql.getSQLState()))return true;cause=cause.getCause();}return false;}
 }

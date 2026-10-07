@@ -14,7 +14,7 @@ CREATE TABLE mulino_commands_CommandAudits (
  ID VARCHAR(36) PRIMARY KEY, organizationId VARCHAR(36) NOT NULL, actorId VARCHAR(36) NOT NULL,
  commandId VARCHAR(36) NOT NULL, capabilityId VARCHAR(120) NOT NULL,
  canonicalHash VARCHAR(64) NOT NULL, outcome VARCHAR(40) NOT NULL,
- effectRefs TEXT NOT NULL, createdAt TIMESTAMPTZ NOT NULL,
+ effectRefs TEXT NOT NULL, auditFactsJson TEXT NOT NULL, createdAt TIMESTAMPTZ NOT NULL,
  FOREIGN KEY(organizationId,actorId) REFERENCES mulino_identity_Actors(organizationId,ID),
  FOREIGN KEY(commandId) REFERENCES mulino_commands_CommandRecords(ID)
 );

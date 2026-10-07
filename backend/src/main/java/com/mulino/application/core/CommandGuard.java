@@ -10,5 +10,7 @@ public interface CommandGuard {
       CommandPreparation preparation,Map<String,Object> intent,boolean mutatesAuthorization){
     verify(context,capability,canonicalHash,preparation,intent);
   }
+  /** Immutable trusted policy/approval/delegator references selected by the pre-effect proof. */
+  default Map<String,Object> auditFacts(DomainContext context,String capability,CommandPreparation preparation,Map<String,Object> intent){return Map.of();}
   default void consume(DomainContext context,CommandPreparation preparation,Map<String,Object> intent,String commandId){}
 }
