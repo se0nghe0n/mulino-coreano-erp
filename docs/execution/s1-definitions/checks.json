@@ -1,0 +1,41 @@
+{
+  "timestamp": "2026-10-08T02:10:04+09:00",
+  "baseline": "164414418b6c3ce2959979939388d59cf2068e2c",
+  "schemaCommit": "36e3834",
+  "command": "cd backend; ../mvnw -B -ntp -Dtest=DefinitionValidatorTest,DefinitionsPersistenceTest test",
+  "exitCode": 0,
+  "status": "PASS",
+  "tests": 8,
+  "failures": 0,
+  "errors": 0,
+  "artifacts": [
+    {
+      "path": "docs/execution/s1-definitions/evidence/TEST-com.mulino.DefinitionValidatorTest.xml",
+      "sha256": "155b901c5c21177c7e056a58400deda2793feb4a717bc3b53bc16e6770227937"
+    },
+    {
+      "path": "docs/execution/s1-definitions/evidence/TEST-com.mulino.DefinitionsPersistenceTest.xml",
+      "sha256": "45f1c5476ddef5c6e4bbca55084d53908684081ea838ab3f074a736193da8af7"
+    }
+  ],
+  "environment": {
+    "java": "21",
+    "postgresImage": "postgres@sha256:4ef4dbc939d61acea57712655ddb4b4ab27419c913f94cca0cd57cb3ea3c2280",
+    "cds": "10.1.1"
+  },
+  "actualScope": [
+    "bounded typed validation",
+    "source hash fixture",
+    "pinned unsupported compatibility",
+    "logical unknown/conflict",
+    "V4 actual PostgreSQL immutable published components",
+    "V4 cross organization FK"
+  ],
+  "limitations": [
+    "identity dependency minimal exact Organization table; full V3 NOT_RUN here",
+    "CQN authenticated getDefinition integration NOT_RUN here",
+    "S2 state/distinct-event evaluators NOT_RUN",
+    "S5 approved definition publication workflow NOT_RUN"
+  ],
+  "artifactSanitization": "Removed runtime properties and container stdout; preserved test names/counts/results"
+}

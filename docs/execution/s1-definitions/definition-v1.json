@@ -1,0 +1,87 @@
+{
+  "organizationId": "00000000-0000-0000-0000-000000000001",
+  "id": "00000000-0000-0000-0000-000000000010",
+  "version": "definition-v1",
+  "parentVersionId": null,
+  "state": "PUBLISHED",
+  "contentHash": "",
+  "evaluatorVersion": "core-v1",
+  "schemaVersion": "1.0.0",
+  "nouns": [
+    {
+      "name": "QuantitySegment",
+      "core": true
+    },
+    {
+      "name": "Place",
+      "core": true
+    }
+  ],
+  "attributes": [
+    {
+      "nounType": "QuantitySegment",
+      "name": "quantity",
+      "type": "DECIMAL",
+      "referenceType": null,
+      "unit": "BOX",
+      "decimalPlaces": 0,
+      "minimumCount": 1,
+      "maximumCount": 1,
+      "requiredStage": "CONFIRM_RECEIPT",
+      "core": true
+    },
+    {
+      "nounType": "QuantitySegment",
+      "name": "destination",
+      "type": "REFERENCE",
+      "referenceType": "Place",
+      "unit": null,
+      "decimalPlaces": 0,
+      "minimumCount": 1,
+      "maximumCount": 1,
+      "requiredStage": "DRAFT",
+      "core": true
+    }
+  ],
+  "verbs": [
+    {
+      "name": "getDefinition",
+      "intentKind": "QUERY",
+      "capabilityId": "getDefinition",
+      "stage": "READ",
+      "slots": {}
+    }
+  ],
+  "relations": [
+    {
+      "name": "locatedAt",
+      "sourceType": "QuantitySegment",
+      "targetType": "Place",
+      "minimumCount": 0,
+      "maximumCount": 1,
+      "cycleAllowed": false
+    }
+  ],
+  "goals": [
+    {
+      "name": "arrived",
+      "quantityMode": "CUMULATIVE_EVENT",
+      "endpoint": "ARRIVED",
+      "evaluatorVersion": "core-v1",
+      "predicate": {
+        "operator": "exists",
+        "property": "QuantitySegment.quantity"
+      }
+    }
+  ],
+  "capabilities": [
+    {
+      "capabilityId": "getDefinition",
+      "semanticVersion": "core-v1",
+      "evaluatorVersion": "core-v1",
+      "inputSchemaVersion": "1.0.0",
+      "outputSchemaVersion": "1.0.0",
+      "supportedWorkMigration": []
+    }
+  ]
+}
