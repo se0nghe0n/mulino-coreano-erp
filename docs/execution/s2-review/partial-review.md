@@ -42,3 +42,41 @@ stableRequestOwner가 UUID 저장 폭을 초과해 seed에서 실패했다.
 [pass3 manifest](../evidence/step3-s2/runtime-pass3/manifest.json)에 있다.
 S2와 사용자 Step3는 ACTIVE이며 S3로 진행하기 전 모든 필수 결합
 검사와 지적의 closure를 완료한다.
+
+## 후속 통합 검사와 source closure
+
+`1e121b9` 전체 실행은 215개 중 214 PASS·1 FAIL이었다. 실패는 두
+credit INSERT의 FK KEY SHARE가 deferred 검사의 FOR UPDATE로
+upgrade하면서 발생한 실제 `40P01` deadlock이었다. 별도 재현 10회가
+모두 실패했다. Binding 검사의 잠금을 FOR NO KEY UPDATE로 변경해
+FK와의 충돌을 피하면서 같은 binding의 검증 직렬화를 유지했다.
+잠금 뒤 별도 SUM 조회는 READ COMMITTED에서 먼저 commit한 credit을
+관찰한다. 범위·수량·UNIQUE·EXCLUDE 제약은 유지했다. 수정 후 실제
+PostgreSQL 27개 검사가 통과했고 Astra low의 좁은 재검토도 통과했다.
+
+Sol xhigh 재검토는 기존 4개 지적의 source closure를 확인했으며,
+createWorkLink에서 선언한 source와 activity의 실제 source가 다른
+경우의 추가 P1을 발견했다. 이전 코드가 W1·W3 인가 후 W2→W3를
+저장해 권한과 dependency cycle 검사를 우회할 수 있었다. activity의
+실제 source를 먼저 확정하고 명시 source 불일치를 거부하도록 수정했다.
+같은 source를 subject·인가·fence·cycle·저장에 사용한다. 실제 gateway
+7개 검사와 implicit source·cycle의 추가 focused 검사가 통과했으며
+`ec17f5f`에 대한 Sol xhigh의 해당 P1 source closure도 PASS다.
+
+Astra low는 `1e121b9`에서 기존 P1·P2의 source closure를 확인했다.
+root·범위·원본 hash의 결합, 현재 검증/정정 확인, completion credit의
+중복·용량 제한, Goal 기간의 양 경계 보존을 검토했다. 이후
+`e249df7`의 DB 잠금 변경도 좁게 재검토해 추가 확정 결함이 없었다.
+두 reviewer 모두 전체 사용자 Step3 완료로 판정하지 않았다.
+
+`e249df7964ac9f650346c75a0585d375390abcea`의 fresh 전체 backend
+clean package는 **235 PASS·실패/오류/skip0**이고 실행 중 source 변경이
+없었다. 기존 `1e121b9`의 harness는 fresh Maven 집계 기준 **422 PASS**,
+준비 검사는 41 cases·789 subcases·20473 assertions·문제0이었다.
+이후 actual clock adapter만 변경됐으며 관련 focused 14개가 통과했다.
+
+Native HTTP 인수는 계속 진행 중이다. 첫 실행의 PostgreSQL 임시
+초기화 서버 오인과 두 번째 실행의 clock ACK receipt 연결 누락은
+수정했다. 세 번째 실행은 실제 createDraft 요청까지 도달했으나
+VERSION_UNSUPPORTED로 보류돼 fixture의 발행 정의/역량 버전을
+대조하고 있다. 실제 업무 흐름이 통과하기 전 S2는 ACTIVE다.
