@@ -94,6 +94,14 @@
     그러면 "valid-resolution-4" assertion으로 "valid-resolution"를 확인한다
     그러면 "valid-resolution-5" assertion으로 "valid-resolution"를 확인한다
     그러면 "valid-resolution-6" assertion으로 "valid-resolution"를 확인한다
+    그러면 "reconfirm-applied-7" assertion으로 "valid-resolution"를 확인한다
+    그러면 "reconfirm-new-occurrence-8" assertion으로 "valid-resolution"를 확인한다
+    그러면 "reconfirm-new-revision-9" assertion으로 "valid-resolution"를 확인한다
+    그러면 "reconfirm-baseline-98-10" assertion으로 "valid-resolution"를 확인한다
+    그러면 "reconfirm-canonical-revision-11" assertion으로 "valid-resolution"를 확인한다
+    그러면 "reconfirm-effective-98-12" assertion으로 "valid-resolution"를 확인한다
+    그러면 "reconfirm-old-revision-13" assertion으로 "valid-resolution"를 확인한다
+    그러면 "reconfirm-same-responsibility-id-14" assertion으로 "valid-resolution"를 확인한다
 
   시나리오: 정정으로 생긴 부족2를 WAIVED 근거로 해소한 뒤 재대조해도 같은 의무는 부활하지 않는다
     먼저 사례 파일 "verification/cases/C4/case.json"의 "resolved-no-resurrection-waived"를 준비한다
@@ -122,3 +130,11 @@
     그러면 "valid-resolution-4" assertion으로 "valid-resolution"를 확인한다
     그러면 "valid-resolution-5" assertion으로 "valid-resolution"를 확인한다
     그러면 "valid-resolution-6" assertion으로 "valid-resolution"를 확인한다
+    그러면 "reconfirm-applied-7" assertion으로 "valid-resolution"를 확인한다
+    그러면 "reconfirm-new-occurrence-8" assertion으로 "valid-resolution"를 확인한다
+    그러면 "reconfirm-new-revision-9" assertion으로 "valid-resolution"를 확인한다
+    그러면 "reconfirm-baseline-98-10" assertion으로 "valid-resolution"를 확인한다
+    그러면 "reconfirm-canonical-revision-11" assertion으로 "valid-resolution"를 확인한다
+    그러면 "reconfirm-effective-98-12" assertion으로 "valid-resolution"를 확인한다
+    그러면 "reconfirm-old-revision-13" assertion으로 "valid-resolution"를 확인한다
+    그러면 "reconfirm-same-responsibility-id-14" assertion으로 "valid-resolution"를 확인한다

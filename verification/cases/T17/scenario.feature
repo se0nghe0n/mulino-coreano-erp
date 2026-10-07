@@ -304,6 +304,15 @@
     그러면 "replacement-atomic-12" assertion으로 "replacement-atomic"를 확인한다
     그러면 "old-revival-13" assertion으로 "old-revival"를 확인한다
     그러면 "old-revival-14" assertion으로 "old-revival"를 확인한다
+    그러면 "hold-before-replace-15" assertion으로 "replacement-atomic"를 확인한다
+    그러면 "replacement-command-effects-16" assertion으로 "replacement-atomic"를 확인한다
+    그러면 "release-hold-applied-17" assertion으로 "old-revival"를 확인한다
+    그러면 "release-hold-target-18" assertion으로 "old-revival"를 확인한다
+    그러면 "hold-active-before-release-19" assertion으로 "old-revival"를 확인한다
+    그러면 "hold-released-20" assertion으로 "old-revival"를 확인한다
+    그러면 "released-replacement-allocation-21" assertion으로 "old-revival"를 확인한다
+    그러면 "released-executable-total-22" assertion으로 "old-revival"를 확인한다
+    그러면 "released-executable-rows-23" assertion으로 "old-revival"를 확인한다
 
   시나리오: 조건별 근거·FEFO·인도 끝점과 UNKNOWN 실행 경계를 확인한다
     먼저 사례 파일 "verification/cases/T17/case.json"의 "eligibility-unknown"를 준비한다

@@ -39,3 +39,33 @@ snapshot artifact와 함께 반환해야 한다. 미확인/상충은 0으로 바
 selector는 4개를 발견·시작했고 모두 NOT_IMPLEMENTED assertion으로
 RED(exit1), scenario skip0이다. 실제 제품 profile은 NOT_RUN(exit2)이다.
 전체 명령·version·집계는 E1/evidence/sales-preparation-summary.json에 있다.
+
+## Step2 adversarial review 보완
+
+기존 최종 상태만으로 중간 명령의 실행을 인정하지 않도록 보완했다.
+검증은 고정 관찰 표본을 사용하는 AssertionEngine SELFTEST와 실제
+제품 API/DB 실행을 구별한다. 제품 인수는 계속 NOT_RUN이다.
+
+RESOLVED/WAIVED 각각 기존6개 assertion을 유지하고8개를 추가했다.
+재확인 명령의 APPLIED, 새 occurrence ID와 revision, 원 사건·직전
+revision의 supersedes 연결, 현재 canonical98BOX, source version2의
+별도 증거 ID, 적용 command·transaction ID를 대조한다. 기존98
+revision과 과거 판정은 보존하고 동일 의무 ID·root·owner·해소 상태를
+유지한다. 실제98을100으로 되돌리는 가짜 정정은 만들지 않는다.
+새 증거는 synthetic source revision 입력이며 재확인 성공을 seed하지
+않는다. 기존 catalog oracle와 named observation은 그대로다.
+
+추가 assertion ID는 각 resolved-no-resurrection subcase의
+reconfirm-applied-7, reconfirm-new-occurrence-8,
+reconfirm-new-revision-9, reconfirm-baseline-98-10,
+reconfirm-canonical-revision-11, reconfirm-effective-98-12,
+reconfirm-old-revision-13, reconfirm-same-responsibility-id-14다.
+모두 valid-resolution 관찰을 보강한다.
+
+보완 검증은 JDK21 javac와 JUnit Platform/Jupiter6.1.2 직접 launcher로
+실행했다. OutcomeEffectAssertionSelfTest의7개 method가 발견·시작·
+성공했고 skip/FAIL0이다. 전체 정상 표본과42개 거부/no-op·출처·
+수량·transaction·책임 mutant를 검증했다. Maven queue를 쓰지 않은
+독립 SELFTEST이며 통합 harness check는 coordinator가 수행한다.
+정확한 argv·버전·source hash·log는
+C4/evidence/review-outcomes/selftest-commands.json에 보존했다.

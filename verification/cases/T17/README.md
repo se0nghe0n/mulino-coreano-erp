@@ -70,3 +70,33 @@ snapshot artifact와 함께 반환해야 한다. 미확인/상충은 0으로 바
 selector는 14개를 발견·시작했고 모두 NOT_IMPLEMENTED assertion으로
 RED(exit1), scenario skip0이다. 실제 제품 profile은 NOT_RUN(exit2)이다.
 전체 명령·version·집계는 E1/evidence/sales-preparation-summary.json에 있다.
+
+## Step2 adversarial review 보완
+
+기존 최종 상태만으로 중간 명령의 실행을 인정하지 않도록 보완했다.
+검증은 고정 관찰 표본을 사용하는 AssertionEngine SELFTEST와 실제
+제품 API/DB 실행을 구별한다. 제품 인수는 계속 NOT_RUN이다.
+
+replacement-no-revival의 기존14개 assertion을 유지하고9개를
+추가했다. 대체 전 SUSPENDED20BOX와 대체 후 A의 REPLACED/B의
+EXECUTABLE20BOX를 실제 대체 command·transaction과 연결한다.
+QC 제한은 대체 직후 ACTIVE이며 releaseHold의 APPLIED와 동일
+restriction ID, 실제 A20의 RELEASED를 모두 요구한다.
+그 뒤 releaseAllocation도 B20의 RELEASED와 command·transaction,
+실행 가능 예약0/행0을 확인한다. 각 단계의 A 예약 부활은 계속
+금지한다. 기존 catalog oracle와 named observation은 그대로다.
+
+추가 assertion ID는 hold-before-replace-15,
+replacement-command-effects-16, release-hold-applied-17,
+release-hold-target-18, hold-active-before-release-19,
+hold-released-20, released-replacement-allocation-21,
+released-executable-total-22, released-executable-rows-23이다.
+앞2개는 replacement-atomic, 나머지는 old-revival 관찰을 보강한다.
+
+보완 검증은 JDK21 javac와 JUnit Platform/Jupiter6.1.2 직접 launcher로
+실행했다. OutcomeEffectAssertionSelfTest의7개 method가 발견·시작·
+성공했고 skip/FAIL0이다. 전체 정상 표본과42개 거부/no-op·출처·
+수량·transaction·책임 mutant를 검증했다. Maven queue를 쓰지 않은
+독립 SELFTEST이며 통합 harness check는 coordinator가 수행한다.
+정확한 argv·버전·source hash·log는
+C4/evidence/review-outcomes/selftest-commands.json에 보존했다.

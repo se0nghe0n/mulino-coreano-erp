@@ -12069,6 +12069,496 @@
               "old-revival"
             ]
           }
+        },
+        {
+          "id": "hold-before-replace-15",
+          "op": "exactSet",
+          "source": {
+            "actionId": "suspended-db",
+            "pointer": "/data/rawRows/allocations",
+            "where": {
+              "id": {
+                "$result": {
+                  "actionId": "reserve",
+                  "pointer": "/response/allocationId"
+                }
+              }
+            },
+            "field": [
+              "status",
+              "quantity",
+              "unit"
+            ]
+          },
+          "expected": [
+            [
+              "SUSPENDED",
+              "20",
+              "BOX"
+            ]
+          ],
+          "requirementRefs": [
+            "D17"
+          ],
+          "evidenceRefs": [
+            "suspended-db:raw-rows"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "T17",
+            "scenarioId": "replacement-no-revival"
+          },
+          "oracleExplanation": "대체·QC 해제·미사용 배분 해제의 실제 적용을 각각 관찰한 뒤 옛 예약이 부활하지 않는지 확인한다. APPLIED 없는 명령과 해제 원 행 no-op은 실패다.",
+          "oracleRef": {
+            "oracleId": "T17.allocation-replacement-no-revival",
+            "observationNames": [
+              "replacement-atomic"
+            ]
+          }
+        },
+        {
+          "id": "replacement-command-effects-16",
+          "op": "exactSet",
+          "source": {
+            "actionId": "replaced-db",
+            "pointer": "/data/rawRows/allocations",
+            "field": [
+              "id",
+              "segmentId",
+              "status",
+              "quantity",
+              "unit",
+              "lastCommandId",
+              "transactionId"
+            ]
+          },
+          "expected": [
+            [
+              {
+                "$result": {
+                  "actionId": "reserve",
+                  "pointer": "/response/allocationId"
+                }
+              },
+              {
+                "$alias": "A"
+              },
+              "REPLACED",
+              "20",
+              "BOX",
+              {
+                "$result": {
+                  "actionId": "replace",
+                  "pointer": "/response/commandId"
+                }
+              },
+              {
+                "$result": {
+                  "actionId": "replace",
+                  "pointer": "/response/transactionId"
+                }
+              }
+            ],
+            [
+              {
+                "$result": {
+                  "actionId": "replace",
+                  "pointer": "/response/allocationId"
+                }
+              },
+              {
+                "$alias": "B"
+              },
+              "EXECUTABLE",
+              "20",
+              "BOX",
+              {
+                "$result": {
+                  "actionId": "replace",
+                  "pointer": "/response/commandId"
+                }
+              },
+              {
+                "$result": {
+                  "actionId": "replace",
+                  "pointer": "/response/transactionId"
+                }
+              }
+            ]
+          ],
+          "requirementRefs": [
+            "D17"
+          ],
+          "evidenceRefs": [
+            "replaced-db:raw-rows"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "T17",
+            "scenarioId": "replacement-no-revival"
+          },
+          "oracleExplanation": "대체·QC 해제·미사용 배분 해제의 실제 적용을 각각 관찰한 뒤 옛 예약이 부활하지 않는지 확인한다. APPLIED 없는 명령과 해제 원 행 no-op은 실패다.",
+          "oracleRef": {
+            "oracleId": "T17.allocation-replacement-no-revival",
+            "observationNames": [
+              "replacement-atomic"
+            ]
+          }
+        },
+        {
+          "id": "release-hold-applied-17",
+          "op": "equals",
+          "source": {
+            "actionId": "release-hold",
+            "pointer": "/response/outcome"
+          },
+          "expected": "APPLIED",
+          "requirementRefs": [
+            "D17"
+          ],
+          "evidenceRefs": [
+            "release-hold:actual-response-or-host-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "T17",
+            "scenarioId": "replacement-no-revival"
+          },
+          "oracleExplanation": "대체·QC 해제·미사용 배분 해제의 실제 적용을 각각 관찰한 뒤 옛 예약이 부활하지 않는지 확인한다. APPLIED 없는 명령과 해제 원 행 no-op은 실패다.",
+          "oracleRef": {
+            "oracleId": "T17.allocation-replacement-no-revival",
+            "observationNames": [
+              "old-revival"
+            ]
+          }
+        },
+        {
+          "id": "release-hold-target-18",
+          "op": "equals",
+          "source": {
+            "actionId": "release-hold",
+            "pointer": "/response/restrictionId"
+          },
+          "expected": {
+            "$result": {
+              "actionId": "hold",
+              "pointer": "/response/restrictionId"
+            }
+          },
+          "requirementRefs": [
+            "D17"
+          ],
+          "evidenceRefs": [
+            "release-hold:actual-response-or-host-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "T17",
+            "scenarioId": "replacement-no-revival"
+          },
+          "oracleExplanation": "대체·QC 해제·미사용 배분 해제의 실제 적용을 각각 관찰한 뒤 옛 예약이 부활하지 않는지 확인한다. APPLIED 없는 명령과 해제 원 행 no-op은 실패다.",
+          "oracleRef": {
+            "oracleId": "T17.allocation-replacement-no-revival",
+            "observationNames": [
+              "old-revival"
+            ]
+          }
+        },
+        {
+          "id": "hold-active-before-release-19",
+          "op": "exactSet",
+          "source": {
+            "actionId": "replaced-db",
+            "pointer": "/data/rawRows/restrictions",
+            "where": {
+              "id": {
+                "$result": {
+                  "actionId": "hold",
+                  "pointer": "/response/restrictionId"
+                }
+              }
+            },
+            "field": [
+              "id",
+              "segmentId",
+              "reason",
+              "status",
+              "quantity",
+              "unit"
+            ]
+          },
+          "expected": [
+            [
+              {
+                "$result": {
+                  "actionId": "hold",
+                  "pointer": "/response/restrictionId"
+                }
+              },
+              {
+                "$alias": "A"
+              },
+              "QC_REVIEW",
+              "ACTIVE",
+              "20",
+              "BOX"
+            ]
+          ],
+          "requirementRefs": [
+            "D17"
+          ],
+          "evidenceRefs": [
+            "replaced-db:raw-rows"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "T17",
+            "scenarioId": "replacement-no-revival"
+          },
+          "oracleExplanation": "대체·QC 해제·미사용 배분 해제의 실제 적용을 각각 관찰한 뒤 옛 예약이 부활하지 않는지 확인한다. APPLIED 없는 명령과 해제 원 행 no-op은 실패다.",
+          "oracleRef": {
+            "oracleId": "T17.allocation-replacement-no-revival",
+            "observationNames": [
+              "old-revival"
+            ]
+          }
+        },
+        {
+          "id": "hold-released-20",
+          "op": "exactSet",
+          "source": {
+            "actionId": "released-db",
+            "pointer": "/data/rawRows/restrictions",
+            "where": {
+              "id": {
+                "$result": {
+                  "actionId": "hold",
+                  "pointer": "/response/restrictionId"
+                }
+              }
+            },
+            "field": [
+              "id",
+              "segmentId",
+              "reason",
+              "status",
+              "quantity",
+              "unit"
+            ]
+          },
+          "expected": [
+            [
+              {
+                "$result": {
+                  "actionId": "hold",
+                  "pointer": "/response/restrictionId"
+                }
+              },
+              {
+                "$alias": "A"
+              },
+              "QC_REVIEW",
+              "RELEASED",
+              "20",
+              "BOX"
+            ]
+          ],
+          "requirementRefs": [
+            "D17"
+          ],
+          "evidenceRefs": [
+            "released-db:raw-rows"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "T17",
+            "scenarioId": "replacement-no-revival"
+          },
+          "oracleExplanation": "대체·QC 해제·미사용 배분 해제의 실제 적용을 각각 관찰한 뒤 옛 예약이 부활하지 않는지 확인한다. APPLIED 없는 명령과 해제 원 행 no-op은 실패다.",
+          "oracleRef": {
+            "oracleId": "T17.allocation-replacement-no-revival",
+            "observationNames": [
+              "old-revival"
+            ]
+          }
+        },
+        {
+          "id": "released-replacement-allocation-21",
+          "op": "exactSet",
+          "source": {
+            "actionId": "allocation-released-db",
+            "pointer": "/data/rawRows/allocations",
+            "where": {
+              "id": {
+                "$result": {
+                  "actionId": "replace",
+                  "pointer": "/response/allocationId"
+                }
+              }
+            },
+            "field": [
+              "id",
+              "segmentId",
+              "status",
+              "quantity",
+              "unit",
+              "lastCommandId",
+              "transactionId"
+            ]
+          },
+          "expected": [
+            [
+              {
+                "$result": {
+                  "actionId": "replace",
+                  "pointer": "/response/allocationId"
+                }
+              },
+              {
+                "$alias": "B"
+              },
+              "RELEASED",
+              "20",
+              "BOX",
+              {
+                "$result": {
+                  "actionId": "allocation-release",
+                  "pointer": "/response/commandId"
+                }
+              },
+              {
+                "$result": {
+                  "actionId": "allocation-release",
+                  "pointer": "/response/transactionId"
+                }
+              }
+            ]
+          ],
+          "requirementRefs": [
+            "D17"
+          ],
+          "evidenceRefs": [
+            "allocation-released-db:raw-rows"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "T17",
+            "scenarioId": "replacement-no-revival"
+          },
+          "oracleExplanation": "대체·QC 해제·미사용 배분 해제의 실제 적용을 각각 관찰한 뒤 옛 예약이 부활하지 않는지 확인한다. APPLIED 없는 명령과 해제 원 행 no-op은 실패다.",
+          "oracleRef": {
+            "oracleId": "T17.allocation-replacement-no-revival",
+            "observationNames": [
+              "old-revival"
+            ]
+          }
+        },
+        {
+          "id": "released-executable-total-22",
+          "op": "decimalEquals",
+          "source": {
+            "actionId": "allocation-released",
+            "pointer": "/response/data/executableReservedQuantity"
+          },
+          "expected": "0",
+          "requirementRefs": [
+            "D17"
+          ],
+          "evidenceRefs": [
+            "allocation-released:actual-response-or-host-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "T17",
+            "scenarioId": "replacement-no-revival"
+          },
+          "oracleExplanation": "대체·QC 해제·미사용 배분 해제의 실제 적용을 각각 관찰한 뒤 옛 예약이 부활하지 않는지 확인한다. APPLIED 없는 명령과 해제 원 행 no-op은 실패다.",
+          "oracleRef": {
+            "oracleId": "T17.allocation-replacement-no-revival",
+            "observationNames": [
+              "old-revival"
+            ]
+          },
+          "unit": "BOX",
+          "unitSource": {
+            "actionId": "allocation-released",
+            "pointer": "/response/data/unit"
+          }
+        },
+        {
+          "id": "released-executable-rows-23",
+          "op": "count",
+          "source": {
+            "actionId": "allocation-released-db",
+            "pointer": "/data/rawRows/allocations",
+            "where": {
+              "status": "EXECUTABLE"
+            }
+          },
+          "expected": 0,
+          "requirementRefs": [
+            "D17"
+          ],
+          "evidenceRefs": [
+            "allocation-released-db:raw-rows"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "T17",
+            "scenarioId": "replacement-no-revival"
+          },
+          "oracleExplanation": "대체·QC 해제·미사용 배분 해제의 실제 적용을 각각 관찰한 뒤 옛 예약이 부활하지 않는지 확인한다. APPLIED 없는 명령과 해제 원 행 no-op은 실패다.",
+          "oracleRef": {
+            "oracleId": "T17.allocation-replacement-no-revival",
+            "observationNames": [
+              "old-revival"
+            ]
+          }
         }
       ],
       "oracleExplanation": "가상 fixture는 선행 실물·정책·증거 입력만 설치한다. 검증하는 주문·승인·예약·출고·인도·반품·회수·정정 효과는 각각 공개 명령으로 실행한다. A20 정지 예약을 B20으로 대체한 뒤 A 보류를 해제해도 실행 예약은20이다의 수량과 책임은 고정 기대값과 원 행·응답을 함께 검증한다."

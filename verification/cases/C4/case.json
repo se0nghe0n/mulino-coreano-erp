@@ -3335,7 +3335,10 @@
                   "actionId": "delivery",
                   "pointer": "/response/occurrenceId"
                 }
-              }
+              },
+              "sourceVersion": "1",
+              "sourceNamespace": "SYNTHETIC-correction-98",
+              "externalEventId": "C4-resolved-no-resurrection-resolved-correction-98"
             },
             "expectedRevision": {
               "$result": {
@@ -3668,10 +3671,12 @@
                 "unit": "BOX"
               },
               "sourceEvidenceId": {
-                "$alias": "correction-98"
+                "$alias": "correction-98-v2"
               },
               "reason": "SAME_CONFIRMED_ACTUAL_SCOPE_NEW_SOURCE_REVISION",
-              "sourceVersion": "2"
+              "sourceVersion": "2",
+              "sourceNamespace": "SYNTHETIC-correction-98",
+              "externalEventId": "C4-resolved-no-resurrection-resolved-correction-98"
             },
             "expectedRevision": {
               "$result": {
@@ -3682,7 +3687,7 @@
             "commandIdempotencyKey": "C4-resolved-no-resurrection-resolved-reconfirm98",
             "evidenceRefs": [
               {
-                "$alias": "delivery-proof"
+                "$alias": "correction-98-v2"
               }
             ],
             "scope": {
@@ -4054,6 +4059,427 @@
               "result",
               "inputSnapshotId",
               "evaluatorVersion"
+            ]
+          }
+        },
+        {
+          "id": "reconfirm-applied-7",
+          "op": "equals",
+          "source": {
+            "actionId": "reconfirm98",
+            "pointer": "/response/outcome"
+          },
+          "expected": "APPLIED",
+          "requirementRefs": [
+            "D06",
+            "D12",
+            "D18"
+          ],
+          "evidenceRefs": [
+            "reconfirm98:actual-response-or-host-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "C4",
+            "scenarioId": "resolved-no-resurrection-resolved"
+          },
+          "oracleExplanation": "실제98의 새 canonical 증거 revision이 적용된 뒤에도 기존 해소·면제 책임은 유지한다. 명령 거부나 원 행 no-op을 재평가 성공으로 세지 않는다.",
+          "oracleRef": {
+            "oracleId": "C4.resolved-debt-no-resurrection",
+            "observationNames": [
+              "valid-resolution"
+            ]
+          }
+        },
+        {
+          "id": "reconfirm-new-occurrence-8",
+          "op": "notEquals",
+          "source": {
+            "actionId": "reconfirm98",
+            "pointer": "/response/occurrenceId"
+          },
+          "expected": {
+            "$result": {
+              "actionId": "correct98",
+              "pointer": "/response/occurrenceId"
+            }
+          },
+          "requirementRefs": [
+            "D06",
+            "D12",
+            "D18"
+          ],
+          "evidenceRefs": [
+            "reconfirm98:actual-response-or-host-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "C4",
+            "scenarioId": "resolved-no-resurrection-resolved"
+          },
+          "oracleExplanation": "실제98의 새 canonical 증거 revision이 적용된 뒤에도 기존 해소·면제 책임은 유지한다. 명령 거부나 원 행 no-op을 재평가 성공으로 세지 않는다.",
+          "oracleRef": {
+            "oracleId": "C4.resolved-debt-no-resurrection",
+            "observationNames": [
+              "valid-resolution"
+            ]
+          }
+        },
+        {
+          "id": "reconfirm-new-revision-9",
+          "op": "notEquals",
+          "source": {
+            "actionId": "reconfirm98",
+            "pointer": "/response/revision"
+          },
+          "expected": {
+            "$result": {
+              "actionId": "resolution",
+              "pointer": "/response/revision"
+            }
+          },
+          "requirementRefs": [
+            "D06",
+            "D12",
+            "D18"
+          ],
+          "evidenceRefs": [
+            "reconfirm98:actual-response-or-host-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "C4",
+            "scenarioId": "resolved-no-resurrection-resolved"
+          },
+          "oracleExplanation": "실제98의 새 canonical 증거 revision이 적용된 뒤에도 기존 해소·면제 책임은 유지한다. 명령 거부나 원 행 no-op을 재평가 성공으로 세지 않는다.",
+          "oracleRef": {
+            "oracleId": "C4.resolved-debt-no-resurrection",
+            "observationNames": [
+              "valid-resolution"
+            ]
+          }
+        },
+        {
+          "id": "reconfirm-baseline-98-10",
+          "op": "exactSet",
+          "source": {
+            "actionId": "before-reprocess-db",
+            "pointer": "/data/rawRows/deliveries",
+            "where": {
+              "originalOccurrenceId": {
+                "$result": {
+                  "actionId": "delivery",
+                  "pointer": "/response/occurrenceId"
+                }
+              },
+              "current": true,
+              "canonical": true
+            },
+            "field": [
+              "id",
+              "quantity",
+              "unit",
+              "sourceVersion"
+            ]
+          },
+          "expected": [
+            [
+              {
+                "$result": {
+                  "actionId": "correct98",
+                  "pointer": "/response/occurrenceId"
+                }
+              },
+              "98",
+              "BOX",
+              "1"
+            ]
+          ],
+          "requirementRefs": [
+            "D06",
+            "D12",
+            "D18"
+          ],
+          "evidenceRefs": [
+            "before-reprocess-db:raw-rows"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "C4",
+            "scenarioId": "resolved-no-resurrection-resolved"
+          },
+          "oracleExplanation": "실제98의 새 canonical 증거 revision이 적용된 뒤에도 기존 해소·면제 책임은 유지한다. 명령 거부나 원 행 no-op을 재평가 성공으로 세지 않는다.",
+          "oracleRef": {
+            "oracleId": "C4.resolved-debt-no-resurrection",
+            "observationNames": [
+              "valid-resolution"
+            ]
+          }
+        },
+        {
+          "id": "reconfirm-canonical-revision-11",
+          "op": "exactSet",
+          "source": {
+            "actionId": "after-reprocess-db",
+            "pointer": "/data/rawRows/deliveries",
+            "where": {
+              "originalOccurrenceId": {
+                "$result": {
+                  "actionId": "delivery",
+                  "pointer": "/response/occurrenceId"
+                }
+              },
+              "current": true,
+              "canonical": true
+            },
+            "field": [
+              "id",
+              "originalOccurrenceId",
+              "supersedesOccurrenceId",
+              "quantity",
+              "unit",
+              "sourceEvidenceId",
+              "sourceNamespace",
+              "sourceVersion",
+              "lastCommandId",
+              "transactionId"
+            ]
+          },
+          "expected": [
+            [
+              {
+                "$result": {
+                  "actionId": "reconfirm98",
+                  "pointer": "/response/occurrenceId"
+                }
+              },
+              {
+                "$result": {
+                  "actionId": "delivery",
+                  "pointer": "/response/occurrenceId"
+                }
+              },
+              {
+                "$result": {
+                  "actionId": "correct98",
+                  "pointer": "/response/occurrenceId"
+                }
+              },
+              "98",
+              "BOX",
+              {
+                "$alias": "correction-98-v2"
+              },
+              "SYNTHETIC-correction-98",
+              "2",
+              {
+                "$result": {
+                  "actionId": "reconfirm98",
+                  "pointer": "/response/commandId"
+                }
+              },
+              {
+                "$result": {
+                  "actionId": "reconfirm98",
+                  "pointer": "/response/transactionId"
+                }
+              }
+            ]
+          ],
+          "requirementRefs": [
+            "D06",
+            "D12",
+            "D18"
+          ],
+          "evidenceRefs": [
+            "after-reprocess-db:raw-rows"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "C4",
+            "scenarioId": "resolved-no-resurrection-resolved"
+          },
+          "oracleExplanation": "실제98의 새 canonical 증거 revision이 적용된 뒤에도 기존 해소·면제 책임은 유지한다. 명령 거부나 원 행 no-op을 재평가 성공으로 세지 않는다.",
+          "oracleRef": {
+            "oracleId": "C4.resolved-debt-no-resurrection",
+            "observationNames": [
+              "valid-resolution"
+            ]
+          }
+        },
+        {
+          "id": "reconfirm-effective-98-12",
+          "op": "decimalEquals",
+          "source": {
+            "actionId": "after-reprocess",
+            "pointer": "/response/data/supportedDeliveredQuantity"
+          },
+          "expected": "98",
+          "requirementRefs": [
+            "D06",
+            "D12",
+            "D18"
+          ],
+          "evidenceRefs": [
+            "after-reprocess:actual-response-or-host-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "C4",
+            "scenarioId": "resolved-no-resurrection-resolved"
+          },
+          "oracleExplanation": "실제98의 새 canonical 증거 revision이 적용된 뒤에도 기존 해소·면제 책임은 유지한다. 명령 거부나 원 행 no-op을 재평가 성공으로 세지 않는다.",
+          "oracleRef": {
+            "oracleId": "C4.resolved-debt-no-resurrection",
+            "observationNames": [
+              "valid-resolution"
+            ]
+          },
+          "unit": "BOX",
+          "unitSource": {
+            "actionId": "after-reprocess",
+            "pointer": "/response/data/unit"
+          }
+        },
+        {
+          "id": "reconfirm-old-revision-13",
+          "op": "exactSet",
+          "source": {
+            "actionId": "after-reprocess-db",
+            "pointer": "/data/rawRows/deliveries",
+            "where": {
+              "id": {
+                "$result": {
+                  "actionId": "correct98",
+                  "pointer": "/response/occurrenceId"
+                }
+              }
+            },
+            "field": [
+              "id",
+              "quantity",
+              "unit",
+              "current"
+            ]
+          },
+          "expected": [
+            [
+              {
+                "$result": {
+                  "actionId": "correct98",
+                  "pointer": "/response/occurrenceId"
+                }
+              },
+              "98",
+              "BOX",
+              false
+            ]
+          ],
+          "requirementRefs": [
+            "D06",
+            "D12",
+            "D18"
+          ],
+          "evidenceRefs": [
+            "after-reprocess-db:raw-rows"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "C4",
+            "scenarioId": "resolved-no-resurrection-resolved"
+          },
+          "oracleExplanation": "실제98의 새 canonical 증거 revision이 적용된 뒤에도 기존 해소·면제 책임은 유지한다. 명령 거부나 원 행 no-op을 재평가 성공으로 세지 않는다.",
+          "oracleRef": {
+            "oracleId": "C4.resolved-debt-no-resurrection",
+            "observationNames": [
+              "valid-resolution"
+            ]
+          }
+        },
+        {
+          "id": "reconfirm-same-responsibility-id-14",
+          "op": "sameAs",
+          "source": {
+            "actionId": "after-reprocess-db",
+            "pointer": "/data/rawRows/obligations",
+            "field": [
+              "id",
+              "rootId",
+              "ownerId",
+              "status",
+              "resolutionDecisionId"
+            ]
+          },
+          "expected": null,
+          "requirementRefs": [
+            "D06",
+            "D12",
+            "D18"
+          ],
+          "evidenceRefs": [
+            "after-reprocess-db:raw-rows"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "C4",
+            "scenarioId": "resolved-no-resurrection-resolved"
+          },
+          "oracleExplanation": "실제98의 새 canonical 증거 revision이 적용된 뒤에도 기존 해소·면제 책임은 유지한다. 명령 거부나 원 행 no-op을 재평가 성공으로 세지 않는다.",
+          "oracleRef": {
+            "oracleId": "C4.resolved-debt-no-resurrection",
+            "observationNames": [
+              "valid-resolution"
+            ]
+          },
+          "baseline": {
+            "actionId": "before-reprocess-db",
+            "pointer": "/data/rawRows/obligations",
+            "field": [
+              "id",
+              "rootId",
+              "ownerId",
+              "status",
+              "resolutionDecisionId"
             ]
           }
         }
@@ -4568,7 +4994,10 @@
                   "actionId": "delivery",
                   "pointer": "/response/occurrenceId"
                 }
-              }
+              },
+              "sourceVersion": "1",
+              "sourceNamespace": "SYNTHETIC-correction-98",
+              "externalEventId": "C4-resolved-no-resurrection-waived-correction-98"
             },
             "expectedRevision": {
               "$result": {
@@ -4901,10 +5330,12 @@
                 "unit": "BOX"
               },
               "sourceEvidenceId": {
-                "$alias": "correction-98"
+                "$alias": "correction-98-v2"
               },
               "reason": "SAME_CONFIRMED_ACTUAL_SCOPE_NEW_SOURCE_REVISION",
-              "sourceVersion": "2"
+              "sourceVersion": "2",
+              "sourceNamespace": "SYNTHETIC-correction-98",
+              "externalEventId": "C4-resolved-no-resurrection-waived-correction-98"
             },
             "expectedRevision": {
               "$result": {
@@ -4915,7 +5346,7 @@
             "commandIdempotencyKey": "C4-resolved-no-resurrection-waived-reconfirm98",
             "evidenceRefs": [
               {
-                "$alias": "delivery-proof"
+                "$alias": "correction-98-v2"
               }
             ],
             "scope": {
@@ -5287,6 +5718,427 @@
               "result",
               "inputSnapshotId",
               "evaluatorVersion"
+            ]
+          }
+        },
+        {
+          "id": "reconfirm-applied-7",
+          "op": "equals",
+          "source": {
+            "actionId": "reconfirm98",
+            "pointer": "/response/outcome"
+          },
+          "expected": "APPLIED",
+          "requirementRefs": [
+            "D06",
+            "D12",
+            "D18"
+          ],
+          "evidenceRefs": [
+            "reconfirm98:actual-response-or-host-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "C4",
+            "scenarioId": "resolved-no-resurrection-waived"
+          },
+          "oracleExplanation": "실제98의 새 canonical 증거 revision이 적용된 뒤에도 기존 해소·면제 책임은 유지한다. 명령 거부나 원 행 no-op을 재평가 성공으로 세지 않는다.",
+          "oracleRef": {
+            "oracleId": "C4.resolved-debt-no-resurrection",
+            "observationNames": [
+              "valid-resolution"
+            ]
+          }
+        },
+        {
+          "id": "reconfirm-new-occurrence-8",
+          "op": "notEquals",
+          "source": {
+            "actionId": "reconfirm98",
+            "pointer": "/response/occurrenceId"
+          },
+          "expected": {
+            "$result": {
+              "actionId": "correct98",
+              "pointer": "/response/occurrenceId"
+            }
+          },
+          "requirementRefs": [
+            "D06",
+            "D12",
+            "D18"
+          ],
+          "evidenceRefs": [
+            "reconfirm98:actual-response-or-host-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "C4",
+            "scenarioId": "resolved-no-resurrection-waived"
+          },
+          "oracleExplanation": "실제98의 새 canonical 증거 revision이 적용된 뒤에도 기존 해소·면제 책임은 유지한다. 명령 거부나 원 행 no-op을 재평가 성공으로 세지 않는다.",
+          "oracleRef": {
+            "oracleId": "C4.resolved-debt-no-resurrection",
+            "observationNames": [
+              "valid-resolution"
+            ]
+          }
+        },
+        {
+          "id": "reconfirm-new-revision-9",
+          "op": "notEquals",
+          "source": {
+            "actionId": "reconfirm98",
+            "pointer": "/response/revision"
+          },
+          "expected": {
+            "$result": {
+              "actionId": "resolution",
+              "pointer": "/response/revision"
+            }
+          },
+          "requirementRefs": [
+            "D06",
+            "D12",
+            "D18"
+          ],
+          "evidenceRefs": [
+            "reconfirm98:actual-response-or-host-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "C4",
+            "scenarioId": "resolved-no-resurrection-waived"
+          },
+          "oracleExplanation": "실제98의 새 canonical 증거 revision이 적용된 뒤에도 기존 해소·면제 책임은 유지한다. 명령 거부나 원 행 no-op을 재평가 성공으로 세지 않는다.",
+          "oracleRef": {
+            "oracleId": "C4.resolved-debt-no-resurrection",
+            "observationNames": [
+              "valid-resolution"
+            ]
+          }
+        },
+        {
+          "id": "reconfirm-baseline-98-10",
+          "op": "exactSet",
+          "source": {
+            "actionId": "before-reprocess-db",
+            "pointer": "/data/rawRows/deliveries",
+            "where": {
+              "originalOccurrenceId": {
+                "$result": {
+                  "actionId": "delivery",
+                  "pointer": "/response/occurrenceId"
+                }
+              },
+              "current": true,
+              "canonical": true
+            },
+            "field": [
+              "id",
+              "quantity",
+              "unit",
+              "sourceVersion"
+            ]
+          },
+          "expected": [
+            [
+              {
+                "$result": {
+                  "actionId": "correct98",
+                  "pointer": "/response/occurrenceId"
+                }
+              },
+              "98",
+              "BOX",
+              "1"
+            ]
+          ],
+          "requirementRefs": [
+            "D06",
+            "D12",
+            "D18"
+          ],
+          "evidenceRefs": [
+            "before-reprocess-db:raw-rows"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "C4",
+            "scenarioId": "resolved-no-resurrection-waived"
+          },
+          "oracleExplanation": "실제98의 새 canonical 증거 revision이 적용된 뒤에도 기존 해소·면제 책임은 유지한다. 명령 거부나 원 행 no-op을 재평가 성공으로 세지 않는다.",
+          "oracleRef": {
+            "oracleId": "C4.resolved-debt-no-resurrection",
+            "observationNames": [
+              "valid-resolution"
+            ]
+          }
+        },
+        {
+          "id": "reconfirm-canonical-revision-11",
+          "op": "exactSet",
+          "source": {
+            "actionId": "after-reprocess-db",
+            "pointer": "/data/rawRows/deliveries",
+            "where": {
+              "originalOccurrenceId": {
+                "$result": {
+                  "actionId": "delivery",
+                  "pointer": "/response/occurrenceId"
+                }
+              },
+              "current": true,
+              "canonical": true
+            },
+            "field": [
+              "id",
+              "originalOccurrenceId",
+              "supersedesOccurrenceId",
+              "quantity",
+              "unit",
+              "sourceEvidenceId",
+              "sourceNamespace",
+              "sourceVersion",
+              "lastCommandId",
+              "transactionId"
+            ]
+          },
+          "expected": [
+            [
+              {
+                "$result": {
+                  "actionId": "reconfirm98",
+                  "pointer": "/response/occurrenceId"
+                }
+              },
+              {
+                "$result": {
+                  "actionId": "delivery",
+                  "pointer": "/response/occurrenceId"
+                }
+              },
+              {
+                "$result": {
+                  "actionId": "correct98",
+                  "pointer": "/response/occurrenceId"
+                }
+              },
+              "98",
+              "BOX",
+              {
+                "$alias": "correction-98-v2"
+              },
+              "SYNTHETIC-correction-98",
+              "2",
+              {
+                "$result": {
+                  "actionId": "reconfirm98",
+                  "pointer": "/response/commandId"
+                }
+              },
+              {
+                "$result": {
+                  "actionId": "reconfirm98",
+                  "pointer": "/response/transactionId"
+                }
+              }
+            ]
+          ],
+          "requirementRefs": [
+            "D06",
+            "D12",
+            "D18"
+          ],
+          "evidenceRefs": [
+            "after-reprocess-db:raw-rows"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "C4",
+            "scenarioId": "resolved-no-resurrection-waived"
+          },
+          "oracleExplanation": "실제98의 새 canonical 증거 revision이 적용된 뒤에도 기존 해소·면제 책임은 유지한다. 명령 거부나 원 행 no-op을 재평가 성공으로 세지 않는다.",
+          "oracleRef": {
+            "oracleId": "C4.resolved-debt-no-resurrection",
+            "observationNames": [
+              "valid-resolution"
+            ]
+          }
+        },
+        {
+          "id": "reconfirm-effective-98-12",
+          "op": "decimalEquals",
+          "source": {
+            "actionId": "after-reprocess",
+            "pointer": "/response/data/supportedDeliveredQuantity"
+          },
+          "expected": "98",
+          "requirementRefs": [
+            "D06",
+            "D12",
+            "D18"
+          ],
+          "evidenceRefs": [
+            "after-reprocess:actual-response-or-host-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "C4",
+            "scenarioId": "resolved-no-resurrection-waived"
+          },
+          "oracleExplanation": "실제98의 새 canonical 증거 revision이 적용된 뒤에도 기존 해소·면제 책임은 유지한다. 명령 거부나 원 행 no-op을 재평가 성공으로 세지 않는다.",
+          "oracleRef": {
+            "oracleId": "C4.resolved-debt-no-resurrection",
+            "observationNames": [
+              "valid-resolution"
+            ]
+          },
+          "unit": "BOX",
+          "unitSource": {
+            "actionId": "after-reprocess",
+            "pointer": "/response/data/unit"
+          }
+        },
+        {
+          "id": "reconfirm-old-revision-13",
+          "op": "exactSet",
+          "source": {
+            "actionId": "after-reprocess-db",
+            "pointer": "/data/rawRows/deliveries",
+            "where": {
+              "id": {
+                "$result": {
+                  "actionId": "correct98",
+                  "pointer": "/response/occurrenceId"
+                }
+              }
+            },
+            "field": [
+              "id",
+              "quantity",
+              "unit",
+              "current"
+            ]
+          },
+          "expected": [
+            [
+              {
+                "$result": {
+                  "actionId": "correct98",
+                  "pointer": "/response/occurrenceId"
+                }
+              },
+              "98",
+              "BOX",
+              false
+            ]
+          ],
+          "requirementRefs": [
+            "D06",
+            "D12",
+            "D18"
+          ],
+          "evidenceRefs": [
+            "after-reprocess-db:raw-rows"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "C4",
+            "scenarioId": "resolved-no-resurrection-waived"
+          },
+          "oracleExplanation": "실제98의 새 canonical 증거 revision이 적용된 뒤에도 기존 해소·면제 책임은 유지한다. 명령 거부나 원 행 no-op을 재평가 성공으로 세지 않는다.",
+          "oracleRef": {
+            "oracleId": "C4.resolved-debt-no-resurrection",
+            "observationNames": [
+              "valid-resolution"
+            ]
+          }
+        },
+        {
+          "id": "reconfirm-same-responsibility-id-14",
+          "op": "sameAs",
+          "source": {
+            "actionId": "after-reprocess-db",
+            "pointer": "/data/rawRows/obligations",
+            "field": [
+              "id",
+              "rootId",
+              "ownerId",
+              "status",
+              "resolutionDecisionId"
+            ]
+          },
+          "expected": null,
+          "requirementRefs": [
+            "D06",
+            "D12",
+            "D18"
+          ],
+          "evidenceRefs": [
+            "after-reprocess-db:raw-rows"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "C4",
+            "scenarioId": "resolved-no-resurrection-waived"
+          },
+          "oracleExplanation": "실제98의 새 canonical 증거 revision이 적용된 뒤에도 기존 해소·면제 책임은 유지한다. 명령 거부나 원 행 no-op을 재평가 성공으로 세지 않는다.",
+          "oracleRef": {
+            "oracleId": "C4.resolved-debt-no-resurrection",
+            "observationNames": [
+              "valid-resolution"
+            ]
+          },
+          "baseline": {
+            "actionId": "before-reprocess-db",
+            "pointer": "/data/rawRows/obligations",
+            "field": [
+              "id",
+              "rootId",
+              "ownerId",
+              "status",
+              "resolutionDecisionId"
             ]
           }
         }
