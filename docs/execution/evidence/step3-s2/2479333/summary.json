@@ -1,0 +1,466 @@
+{
+  "codeCommit": "2479333",
+  "status": "FAIL",
+  "combinedAcceptance": false,
+  "counts": {
+    "tests": 140,
+    "failures": 2,
+    "errors": 32,
+    "skipped": 0
+  },
+  "classes": [
+    {
+      "class": "com.mulino.AssessmentPostgresTest",
+      "tests": 2,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "problems": []
+    },
+    {
+      "class": "com.mulino.DefinitionValidatorTest",
+      "tests": 9,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "problems": []
+    },
+    {
+      "class": "com.mulino.DefinitionsPersistenceTest",
+      "tests": 1,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "problems": []
+    },
+    {
+      "class": "com.mulino.PlatformIntegrationTest",
+      "tests": 11,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "problems": []
+    },
+    {
+      "class": "com.mulino.TypedPredicateEvaluatorTest",
+      "tests": 9,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "problems": []
+    },
+    {
+      "class": "com.mulino.application.evidence.EvidencePersistenceTest",
+      "tests": 15,
+      "failures": 1,
+      "errors": 0,
+      "skipped": 0,
+      "problems": [
+        {
+          "test": "twoDocumentsOneCanonicalReceiptCountsOnlyOneAndHasNoInventoryEffects",
+          "type": "org.opentest4j.AssertionFailedError",
+          "message": "expected: <NOT_IMPLEMENTED> but was: <NONE>",
+          "causes": []
+        }
+      ]
+    },
+    {
+      "class": "com.mulino.application.evidence.EvidenceReconciliationTest",
+      "tests": 6,
+      "failures": 0,
+      "errors": 5,
+      "skipped": 0,
+      "problems": [
+        {
+          "test": "unknownIdentityAndQuantityMismatchRetainIntakeResponsibility",
+          "type": "org.springframework.jdbc.BadSqlGrammarException",
+          "message": "PreparedStatementCallback; bad SQL grammar [INSERT INTO mulino_inventory_QuantitySegments(organizationId,ID,itemId,lotId,placeId,controlScope,quantity,unit,identificationStatus,mixtureStatus,validFrom) VALUES(?,?,?,?,?,'fixture',60,'BOX','CONFIRMED','IDENTIFIE",
+          "causes": [
+            "Caused by: org.postgresql.util.PSQLException: Can't infer the SQL type to use for an instance of java.time.Instant. Use setObject() with an explicit Types value to specify the type to use."
+          ]
+        },
+        {
+          "test": "publicSlotsRejectBooleanProofAndCrossSourceGrant",
+          "type": "org.springframework.jdbc.BadSqlGrammarException",
+          "message": "PreparedStatementCallback; bad SQL grammar [INSERT INTO mulino_inventory_QuantitySegments(organizationId,ID,itemId,lotId,placeId,controlScope,quantity,unit,identificationStatus,mixtureStatus,validFrom) VALUES(?,?,?,?,?,'fixture',60,'BOX','CONFIRMED','IDENTIFIE",
+          "causes": [
+            "Caused by: org.postgresql.util.PSQLException: Can't infer the SQL type to use for an instance of java.time.Instant. Use setObject() with an explicit Types value to specify the type to use."
+          ]
+        },
+        {
+          "test": "oneSourceObservationCannotBeCountedAgainstTwoPhysicalScopes",
+          "type": "org.springframework.jdbc.BadSqlGrammarException",
+          "message": "PreparedStatementCallback; bad SQL grammar [INSERT INTO mulino_inventory_QuantitySegments(organizationId,ID,itemId,lotId,placeId,controlScope,quantity,unit,identificationStatus,mixtureStatus,validFrom) VALUES(?,?,?,?,?,'fixture',60,'BOX','CONFIRMED','IDENTIFIE",
+          "causes": [
+            "Caused by: org.postgresql.util.PSQLException: Can't infer the SQL type to use for an instance of java.time.Instant. Use setObject() with an explicit Types value to specify the type to use."
+          ]
+        },
+        {
+          "test": "competingSourceHashCannotBeResolvedBySelectingPriority",
+          "type": "org.springframework.jdbc.BadSqlGrammarException",
+          "message": "PreparedStatementCallback; bad SQL grammar [INSERT INTO mulino_inventory_QuantitySegments(organizationId,ID,itemId,lotId,placeId,controlScope,quantity,unit,identificationStatus,mixtureStatus,validFrom) VALUES(?,?,?,?,?,'fixture',60,'BOX','CONFIRMED','IDENTIFIE",
+          "causes": [
+            "Caused by: org.postgresql.util.PSQLException: Can't infer the SQL type to use for an instance of java.time.Instant. Use setObject() with an explicit Types value to specify the type to use."
+          ]
+        },
+        {
+          "test": "authorizedReviewLinksTwoDocumentsToOneCanonicalSixty",
+          "type": "org.springframework.jdbc.BadSqlGrammarException",
+          "message": "PreparedStatementCallback; bad SQL grammar [INSERT INTO mulino_inventory_QuantitySegments(organizationId,ID,itemId,lotId,placeId,controlScope,quantity,unit,identificationStatus,mixtureStatus,validFrom) VALUES(?,?,?,?,?,'fixture',60,'BOX','CONFIRMED','IDENTIFIE",
+          "causes": [
+            "Caused by: org.postgresql.util.PSQLException: Can't infer the SQL type to use for an instance of java.time.Instant. Use setObject() with an explicit Types value to specify the type to use."
+          ]
+        }
+      ]
+    },
+    {
+      "class": "com.mulino.application.identity.IdentityAuthorizationTest",
+      "tests": 6,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "problems": []
+    },
+    {
+      "class": "com.mulino.application.identity.IdentityPersistenceTest",
+      "tests": 2,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "problems": []
+    },
+    {
+      "class": "com.mulino.application.policy.ControlPersistenceTest",
+      "tests": 5,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "problems": []
+    },
+    {
+      "class": "com.mulino.commands.CommandEnvelopeTest",
+      "tests": 3,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "problems": []
+    },
+    {
+      "class": "com.mulino.commands.CommandTransactionTest",
+      "tests": 7,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "problems": []
+    },
+    {
+      "class": "com.mulino.core.ReadContractsTest",
+      "tests": 4,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "problems": []
+    },
+    {
+      "class": "com.mulino.core.S1ReadIntegrationTest",
+      "tests": 7,
+      "failures": 1,
+      "errors": 0,
+      "skipped": 0,
+      "problems": [
+        {
+          "test": "freshFlywayMatchesAllCdsColumnsAndPrimaryKeysWithExplicitWidening",
+          "type": "org.opentest4j.AssertionFailedError",
+          "message": "Only explicit Timestamp widening and mandatory NOT NULL strengthening allowed: mulino_work_read_assessmentreferences.policyversionid ==> expected: <[character varying, 36, 0, 0, YES]> but was: <[character varying, 160, 0, 0, YES]>",
+          "causes": []
+        }
+      ]
+    },
+    {
+      "class": "com.mulino.core.S2WorkLifecyclePostgresTest",
+      "tests": 5,
+      "failures": 0,
+      "errors": 5,
+      "skipped": 0,
+      "problems": [
+        {
+          "test": "draftMissingGoalHasNoActivationEffect",
+          "type": "java.lang.IllegalStateException",
+          "message": "Failed to load ApplicationContext for [WebMergedContextConfiguration@1d4c39c2 testClass = com.mulino.core.S2WorkLifecyclePostgresTest, locations = [], classes = [com.mulino.OntologyApplication], contextInitializerClasses = [], activeProfiles = [\"local\"], prope",
+          "causes": [
+            "Caused by: org.springframework.beans.factory.UnsatisfiedDependencyException: Error creating bean with name 'responsibilityCommands' defined in file [/Volumes/VideoStore/Developer/mulino-coreano-ontology/backend/target/classes/com/mulino/application/responsibility/ResponsibilityCommands.class]: Unsatisfied dependency expressed through constructor parameter 0: Bean named 'responsibilityService' is expected to be of type 'com.mulino.application.responsibility.ResponsibilityService' but was actually of type 'com.mulino.application.work.WorkResponsibility$MockitoMock$n4DJGXDZ'",
+            "Caused by: org.springframework.beans.factory.BeanNotOfRequiredTypeException: Bean named 'responsibilityService' is expected to be of type 'com.mulino.application.responsibility.ResponsibilityService' but was actually of type 'com.mulino.application.work.WorkResponsibility$MockitoMock$n4DJGXDZ'"
+          ]
+        },
+        {
+          "test": "dependencyCycleRollsBackButSharedActivityIsNotGoalQuantity",
+          "type": "java.lang.IllegalStateException",
+          "message": "ApplicationContext failure threshold (1) exceeded: skipping repeated attempt to load context for [WebMergedContextConfiguration@1d4c39c2 testClass = com.mulino.core.S2WorkLifecyclePostgresTest, locations = [], classes = [com.mulino.OntologyApplication], contex",
+          "causes": []
+        },
+        {
+          "test": "lifecycleWaitDoesNotResumeFromElapsedTimeAndRevisionHistoryIsImmutable",
+          "type": "java.lang.IllegalStateException",
+          "message": "ApplicationContext failure threshold (1) exceeded: skipping repeated attempt to load context for [WebMergedContextConfiguration@1d4c39c2 testClass = com.mulino.core.S2WorkLifecyclePostgresTest, locations = [], classes = [com.mulino.OntologyApplication], contex",
+          "causes": []
+        },
+        {
+          "test": "remainingDutyAndUnsatisfiedGoalIndependentlyPreventFulfilledClose",
+          "type": "java.lang.IllegalStateException",
+          "message": "ApplicationContext failure threshold (1) exceeded: skipping repeated attempt to load context for [WebMergedContextConfiguration@1d4c39c2 testClass = com.mulino.core.S2WorkLifecyclePostgresTest, locations = [], classes = [com.mulino.OntologyApplication], contex",
+          "causes": []
+        },
+        {
+          "test": "revisionPreservesPreviousGoalAndClosedWorkNeverReopens",
+          "type": "java.lang.IllegalStateException",
+          "message": "ApplicationContext failure threshold (1) exceeded: skipping repeated attempt to load context for [WebMergedContextConfiguration@1d4c39c2 testClass = com.mulino.core.S2WorkLifecyclePostgresTest, locations = [], classes = [com.mulino.OntologyApplication], contex",
+          "causes": []
+        }
+      ]
+    },
+    {
+      "class": "com.mulino.inventory.InventoryPostgresTest",
+      "tests": 9,
+      "failures": 0,
+      "errors": 9,
+      "skipped": 0,
+      "problems": [
+        {
+          "test": "uncertainMixturePreservesCandidateAndCrossOrgReadDenied",
+          "type": "org.springframework.jdbc.BadSqlGrammarException",
+          "message": "PreparedStatementCallback; bad SQL grammar [INSERT INTO mulino_inventory_QuantitySegments(organizationId,id,itemId,lotId,identificationStatus,quantity,unit,placeId,controlScope,validFrom,retiredAt,retirementRecordedAt,mixtureStatus,createdAt,recordedAt) VALUES",
+          "causes": [
+            "Caused by: org.postgresql.util.PSQLException: Unterminated string literal started at position 355 in SQL INSERT INTO mulino_inventory_QuantitySegments(organizationId,id,itemId,lotId,identificationStatus,quantity,unit,placeId,controlScope,validFrom,retiredAt,retirementRecordedAt,mixtureStatus,createdAt,recordedAt) VALUES (?,?,?,?,'CONFIRMED',?::numeric,'EA',?,'warehouse',?::timestamptz,?::timestamptz,?::timestamptz,'IDENTIFIED',?::timestamptz,?::timestamptz'). Expected  char"
+          ]
+        },
+        {
+          "test": "cqnActiveLeavesIndependentSqlSumAndLineage",
+          "type": "org.springframework.jdbc.BadSqlGrammarException",
+          "message": "PreparedStatementCallback; bad SQL grammar [INSERT INTO mulino_inventory_QuantitySegments(organizationId,id,itemId,lotId,identificationStatus,quantity,unit,placeId,controlScope,validFrom,retiredAt,retirementRecordedAt,mixtureStatus,createdAt,recordedAt) VALUES",
+          "causes": [
+            "Caused by: org.postgresql.util.PSQLException: Unterminated string literal started at position 355 in SQL INSERT INTO mulino_inventory_QuantitySegments(organizationId,id,itemId,lotId,identificationStatus,quantity,unit,placeId,controlScope,validFrom,retiredAt,retirementRecordedAt,mixtureStatus,createdAt,recordedAt) VALUES (?,?,?,?,'CONFIRMED',?::numeric,'EA',?,'warehouse',?::timestamptz,?::timestamptz,?::timestamptz,'IDENTIFIED',?::timestamptz,?::timestamptz'). Expected  char"
+          ]
+        },
+        {
+          "test": "orgCompositeFkAndBaseUnitPrecisionReject",
+          "type": "org.springframework.jdbc.BadSqlGrammarException",
+          "message": "PreparedStatementCallback; bad SQL grammar [INSERT INTO mulino_inventory_QuantitySegments(organizationId,id,itemId,lotId,identificationStatus,quantity,unit,placeId,controlScope,validFrom,retiredAt,retirementRecordedAt,mixtureStatus,createdAt,recordedAt) VALUES",
+          "causes": [
+            "Caused by: org.postgresql.util.PSQLException: Unterminated string literal started at position 355 in SQL INSERT INTO mulino_inventory_QuantitySegments(organizationId,id,itemId,lotId,identificationStatus,quantity,unit,placeId,controlScope,validFrom,retiredAt,retirementRecordedAt,mixtureStatus,createdAt,recordedAt) VALUES (?,?,?,?,'CONFIRMED',?::numeric,'EA',?,'warehouse',?::timestamptz,?::timestamptz,?::timestamptz,'IDENTIFIED',?::timestamptz,?::timestamptz'). Expected  char"
+          ]
+        },
+        {
+          "test": "lineageRejectsHistoricalParentChildOverlap",
+          "type": "org.springframework.jdbc.BadSqlGrammarException",
+          "message": "PreparedStatementCallback; bad SQL grammar [INSERT INTO mulino_inventory_QuantitySegments(organizationId,id,itemId,lotId,identificationStatus,quantity,unit,placeId,controlScope,validFrom,retiredAt,retirementRecordedAt,mixtureStatus,createdAt,recordedAt) VALUES",
+          "causes": [
+            "Caused by: org.postgresql.util.PSQLException: Unterminated string literal started at position 355 in SQL INSERT INTO mulino_inventory_QuantitySegments(organizationId,id,itemId,lotId,identificationStatus,quantity,unit,placeId,controlScope,validFrom,retiredAt,retirementRecordedAt,mixtureStatus,createdAt,recordedAt) VALUES (?,?,?,?,'CONFIRMED',?::numeric,'EA',?,'warehouse',?::timestamptz,?::timestamptz,?::timestamptz,'IDENTIFIED',?::timestamptz,?::timestamptz'). Expected  char"
+          ]
+        },
+        {
+          "test": "namespacedExternalIdTimeAndLotManufacturerContext",
+          "type": "org.springframework.jdbc.BadSqlGrammarException",
+          "message": "PreparedStatementCallback; bad SQL grammar [INSERT INTO mulino_inventory_QuantitySegments(organizationId,id,itemId,lotId,identificationStatus,quantity,unit,placeId,controlScope,validFrom,retiredAt,retirementRecordedAt,mixtureStatus,createdAt,recordedAt) VALUES",
+          "causes": [
+            "Caused by: org.postgresql.util.PSQLException: Unterminated string literal started at position 355 in SQL INSERT INTO mulino_inventory_QuantitySegments(organizationId,id,itemId,lotId,identificationStatus,quantity,unit,placeId,controlScope,validFrom,retiredAt,retirementRecordedAt,mixtureStatus,createdAt,recordedAt) VALUES (?,?,?,?,'CONFIRMED',?::numeric,'EA',?,'warehouse',?::timestamptz,?::timestamptz,?::timestamptz,'IDENTIFIED',?::timestamptz,?::timestamptz'). Expected  char"
+          ]
+        },
+        {
+          "test": "historicalSnapshotAndFilteredSearchKeepServerContext",
+          "type": "org.springframework.jdbc.BadSqlGrammarException",
+          "message": "PreparedStatementCallback; bad SQL grammar [INSERT INTO mulino_inventory_QuantitySegments(organizationId,id,itemId,lotId,identificationStatus,quantity,unit,placeId,controlScope,validFrom,retiredAt,retirementRecordedAt,mixtureStatus,createdAt,recordedAt) VALUES",
+          "causes": [
+            "Caused by: org.postgresql.util.PSQLException: Unterminated string literal started at position 355 in SQL INSERT INTO mulino_inventory_QuantitySegments(organizationId,id,itemId,lotId,identificationStatus,quantity,unit,placeId,controlScope,validFrom,retiredAt,retirementRecordedAt,mixtureStatus,createdAt,recordedAt) VALUES (?,?,?,?,'CONFIRMED',?::numeric,'EA',?,'warehouse',?::timestamptz,?::timestamptz,?::timestamptz,'IDENTIFIED',?::timestamptz,?::timestamptz'). Expected  char"
+          ]
+        },
+        {
+          "test": "logisticsMembershipCannotDoubleCountOrCrossOrg",
+          "type": "org.springframework.jdbc.BadSqlGrammarException",
+          "message": "PreparedStatementCallback; bad SQL grammar [INSERT INTO mulino_inventory_QuantitySegments(organizationId,id,itemId,lotId,identificationStatus,quantity,unit,placeId,controlScope,validFrom,retiredAt,retirementRecordedAt,mixtureStatus,createdAt,recordedAt) VALUES",
+          "causes": [
+            "Caused by: org.postgresql.util.PSQLException: Unterminated string literal started at position 355 in SQL INSERT INTO mulino_inventory_QuantitySegments(organizationId,id,itemId,lotId,identificationStatus,quantity,unit,placeId,controlScope,validFrom,retiredAt,retirementRecordedAt,mixtureStatus,createdAt,recordedAt) VALUES (?,?,?,?,'CONFIRMED',?::numeric,'EA',?,'warehouse',?::timestamptz,?::timestamptz,?::timestamptz,'IDENTIFIED',?::timestamptz,?::timestamptz'). Expected  char"
+          ]
+        },
+        {
+          "test": "publishedTypedRelationsEnforceEndpointsPeriodCardinalityAndCycles",
+          "type": "org.springframework.jdbc.BadSqlGrammarException",
+          "message": "PreparedStatementCallback; bad SQL grammar [INSERT INTO mulino_inventory_QuantitySegments(organizationId,id,itemId,lotId,identificationStatus,quantity,unit,placeId,controlScope,validFrom,retiredAt,retirementRecordedAt,mixtureStatus,createdAt,recordedAt) VALUES",
+          "causes": [
+            "Caused by: org.postgresql.util.PSQLException: Unterminated string literal started at position 355 in SQL INSERT INTO mulino_inventory_QuantitySegments(organizationId,id,itemId,lotId,identificationStatus,quantity,unit,placeId,controlScope,validFrom,retiredAt,retirementRecordedAt,mixtureStatus,createdAt,recordedAt) VALUES (?,?,?,?,'CONFIRMED',?::numeric,'EA',?,'warehouse',?::timestamptz,?::timestamptz,?::timestamptz,'IDENTIFIED',?::timestamptz,?::timestamptz'). Expected  char"
+          ]
+        },
+        {
+          "test": "physicalHistoryCannotBeRewritten",
+          "type": "org.springframework.jdbc.BadSqlGrammarException",
+          "message": "PreparedStatementCallback; bad SQL grammar [INSERT INTO mulino_inventory_QuantitySegments(organizationId,id,itemId,lotId,identificationStatus,quantity,unit,placeId,controlScope,validFrom,retiredAt,retirementRecordedAt,mixtureStatus,createdAt,recordedAt) VALUES",
+          "causes": [
+            "Caused by: org.postgresql.util.PSQLException: Unterminated string literal started at position 355 in SQL INSERT INTO mulino_inventory_QuantitySegments(organizationId,id,itemId,lotId,identificationStatus,quantity,unit,placeId,controlScope,validFrom,retiredAt,retirementRecordedAt,mixtureStatus,createdAt,recordedAt) VALUES (?,?,?,?,'CONFIRMED',?::numeric,'EA',?,'warehouse',?::timestamptz,?::timestamptz,?::timestamptz,'IDENTIFIED',?::timestamptz,?::timestamptz'). Expected  char"
+          ]
+        }
+      ]
+    },
+    {
+      "class": "com.mulino.inventory.InventoryQuantityTest",
+      "tests": 2,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "problems": []
+    },
+    {
+      "class": "com.mulino.inventory.StockCommandPostgresTest",
+      "tests": 13,
+      "failures": 0,
+      "errors": 13,
+      "skipped": 0,
+      "problems": [
+        {
+          "test": "multiSourceGrantMustAuthorizeEveryConsumedParent",
+          "type": "org.springframework.jdbc.BadSqlGrammarException",
+          "message": "PreparedStatementCallback; bad SQL grammar [INSERT INTO mulino_inventory_QuantitySegments(organizationId,id,itemId,lotId,identificationStatus,quantity,unit,placeId,controlScope,validFrom,retiredAt,retirementRecordedAt,mixtureStatus,createdAt,recordedAt) VALUES",
+          "causes": [
+            "Caused by: org.postgresql.util.PSQLException: Unterminated string literal started at position 355 in SQL INSERT INTO mulino_inventory_QuantitySegments(organizationId,id,itemId,lotId,identificationStatus,quantity,unit,placeId,controlScope,validFrom,retiredAt,retirementRecordedAt,mixtureStatus,createdAt,recordedAt) VALUES (?,?,?,?,'CONFIRMED',?::numeric,'EA',?,'warehouse',?::timestamptz,?::timestamptz,?::timestamptz,'IDENTIFIED',?::timestamptz,?::timestamptz'). Expected  char"
+          ]
+        },
+        {
+          "test": "fractionalDecimalAndCrossOrgFailWithoutPhysicalEffect",
+          "type": "org.springframework.jdbc.BadSqlGrammarException",
+          "message": "PreparedStatementCallback; bad SQL grammar [INSERT INTO mulino_inventory_QuantitySegments(organizationId,id,itemId,lotId,identificationStatus,quantity,unit,placeId,controlScope,validFrom,retiredAt,retirementRecordedAt,mixtureStatus,createdAt,recordedAt) VALUES",
+          "causes": [
+            "Caused by: org.postgresql.util.PSQLException: Unterminated string literal started at position 355 in SQL INSERT INTO mulino_inventory_QuantitySegments(organizationId,id,itemId,lotId,identificationStatus,quantity,unit,placeId,controlScope,validFrom,retiredAt,retirementRecordedAt,mixtureStatus,createdAt,recordedAt) VALUES (?,?,?,?,'CONFIRMED',?::numeric,'EA',?,'warehouse',?::timestamptz,?::timestamptz,?::timestamptz,'IDENTIFIED',?::timestamptz,?::timestamptz'). Expected  char"
+          ]
+        },
+        {
+          "test": "stocktakeAdjustmentCannotBeAppliedTwiceUnderNewCommandKey",
+          "type": "org.springframework.jdbc.BadSqlGrammarException",
+          "message": "PreparedStatementCallback; bad SQL grammar [INSERT INTO mulino_inventory_QuantitySegments(organizationId,id,itemId,lotId,identificationStatus,quantity,unit,placeId,controlScope,validFrom,retiredAt,retirementRecordedAt,mixtureStatus,createdAt,recordedAt) VALUES",
+          "causes": [
+            "Caused by: org.postgresql.util.PSQLException: Unterminated string literal started at position 355 in SQL INSERT INTO mulino_inventory_QuantitySegments(organizationId,id,itemId,lotId,identificationStatus,quantity,unit,placeId,controlScope,validFrom,retiredAt,retirementRecordedAt,mixtureStatus,createdAt,recordedAt) VALUES (?,?,?,?,'CONFIRMED',?::numeric,'EA',?,'warehouse',?::timestamptz,?::timestamptz,?::timestamptz,'IDENTIFIED',?::timestamptz,?::timestamptz'). Expected  char"
+          ]
+        },
+        {
+          "test": "internalMoveRejectsCustomerDestinationAndUnconfirmedCustody",
+          "type": "org.springframework.jdbc.BadSqlGrammarException",
+          "message": "PreparedStatementCallback; bad SQL grammar [INSERT INTO mulino_inventory_QuantitySegments(organizationId,id,itemId,lotId,identificationStatus,quantity,unit,placeId,controlScope,validFrom,retiredAt,retirementRecordedAt,mixtureStatus,createdAt,recordedAt) VALUES",
+          "causes": [
+            "Caused by: org.postgresql.util.PSQLException: Unterminated string literal started at position 355 in SQL INSERT INTO mulino_inventory_QuantitySegments(organizationId,id,itemId,lotId,identificationStatus,quantity,unit,placeId,controlScope,validFrom,retiredAt,retirementRecordedAt,mixtureStatus,createdAt,recordedAt) VALUES (?,?,?,?,'CONFIRMED',?::numeric,'EA',?,'warehouse',?::timestamptz,?::timestamptz,?::timestamptz,'IDENTIFIED',?::timestamptz,?::timestamptz'). Expected  char"
+          ]
+        },
+        {
+          "test": "concurrentConsumptionSerializesAndOnlyOneCommits",
+          "type": "org.springframework.jdbc.BadSqlGrammarException",
+          "message": "PreparedStatementCallback; bad SQL grammar [INSERT INTO mulino_inventory_QuantitySegments(organizationId,id,itemId,lotId,identificationStatus,quantity,unit,placeId,controlScope,validFrom,retiredAt,retirementRecordedAt,mixtureStatus,createdAt,recordedAt) VALUES",
+          "causes": [
+            "Caused by: org.postgresql.util.PSQLException: Unterminated string literal started at position 355 in SQL INSERT INTO mulino_inventory_QuantitySegments(organizationId,id,itemId,lotId,identificationStatus,quantity,unit,placeId,controlScope,validFrom,retiredAt,retirementRecordedAt,mixtureStatus,createdAt,recordedAt) VALUES (?,?,?,?,'CONFIRMED',?::numeric,'EA',?,'warehouse',?::timestamptz,?::timestamptz,?::timestamptz,'IDENTIFIED',?::timestamptz,?::timestamptz'). Expected  char"
+          ]
+        },
+        {
+          "test": "allocation40TransfersExactlyOnceAndLeaves60Unallocated",
+          "type": "org.springframework.jdbc.BadSqlGrammarException",
+          "message": "PreparedStatementCallback; bad SQL grammar [INSERT INTO mulino_inventory_QuantitySegments(organizationId,id,itemId,lotId,identificationStatus,quantity,unit,placeId,controlScope,validFrom,retiredAt,retirementRecordedAt,mixtureStatus,createdAt,recordedAt) VALUES",
+          "causes": [
+            "Caused by: org.postgresql.util.PSQLException: Unterminated string literal started at position 355 in SQL INSERT INTO mulino_inventory_QuantitySegments(organizationId,id,itemId,lotId,identificationStatus,quantity,unit,placeId,controlScope,validFrom,retiredAt,retirementRecordedAt,mixtureStatus,createdAt,recordedAt) VALUES (?,?,?,?,'CONFIRMED',?::numeric,'EA',?,'warehouse',?::timestamptz,?::timestamptz,?::timestamptz,'IDENTIFIED',?::timestamptz,?::timestamptz'). Expected  char"
+          ]
+        },
+        {
+          "test": "externalCodeConflictDoesNotMergeItems",
+          "type": "org.springframework.jdbc.BadSqlGrammarException",
+          "message": "PreparedStatementCallback; bad SQL grammar [INSERT INTO mulino_inventory_QuantitySegments(organizationId,id,itemId,lotId,identificationStatus,quantity,unit,placeId,controlScope,validFrom,retiredAt,retirementRecordedAt,mixtureStatus,createdAt,recordedAt) VALUES",
+          "causes": [
+            "Caused by: org.postgresql.util.PSQLException: Unterminated string literal started at position 355 in SQL INSERT INTO mulino_inventory_QuantitySegments(organizationId,id,itemId,lotId,identificationStatus,quantity,unit,placeId,controlScope,validFrom,retiredAt,retirementRecordedAt,mixtureStatus,createdAt,recordedAt) VALUES (?,?,?,?,'CONFIRMED',?::numeric,'EA',?,'warehouse',?::timestamptz,?::timestamptz,?::timestamptz,'IDENTIFIED',?::timestamptz,?::timestamptz'). Expected  char"
+          ]
+        },
+        {
+          "test": "split60and40RetiresParentAndRejectsSecondConsumption",
+          "type": "org.springframework.jdbc.BadSqlGrammarException",
+          "message": "PreparedStatementCallback; bad SQL grammar [INSERT INTO mulino_inventory_QuantitySegments(organizationId,id,itemId,lotId,identificationStatus,quantity,unit,placeId,controlScope,validFrom,retiredAt,retirementRecordedAt,mixtureStatus,createdAt,recordedAt) VALUES",
+          "causes": [
+            "Caused by: org.postgresql.util.PSQLException: Unterminated string literal started at position 355 in SQL INSERT INTO mulino_inventory_QuantitySegments(organizationId,id,itemId,lotId,identificationStatus,quantity,unit,placeId,controlScope,validFrom,retiredAt,retirementRecordedAt,mixtureStatus,createdAt,recordedAt) VALUES (?,?,?,?,'CONFIRMED',?::numeric,'EA',?,'warehouse',?::timestamptz,?::timestamptz,?::timestamptz,'IDENTIFIED',?::timestamptz,?::timestamptz'). Expected  char"
+          ]
+        },
+        {
+          "test": "stocktakeIsObservationDisposalAloneDecreases",
+          "type": "org.springframework.jdbc.BadSqlGrammarException",
+          "message": "PreparedStatementCallback; bad SQL grammar [INSERT INTO mulino_inventory_QuantitySegments(organizationId,id,itemId,lotId,identificationStatus,quantity,unit,placeId,controlScope,validFrom,retiredAt,retirementRecordedAt,mixtureStatus,createdAt,recordedAt) VALUES",
+          "causes": [
+            "Caused by: org.postgresql.util.PSQLException: Unterminated string literal started at position 355 in SQL INSERT INTO mulino_inventory_QuantitySegments(organizationId,id,itemId,lotId,identificationStatus,quantity,unit,placeId,controlScope,validFrom,retiredAt,retirementRecordedAt,mixtureStatus,createdAt,recordedAt) VALUES (?,?,?,?,'CONFIRMED',?::numeric,'EA',?,'warehouse',?::timestamptz,?::timestamptz,?::timestamptz,'IDENTIFIED',?::timestamptz,?::timestamptz'). Expected  char"
+          ]
+        },
+        {
+          "test": "uncertainMixtureNeverBecomesCleanSubset",
+          "type": "org.springframework.jdbc.BadSqlGrammarException",
+          "message": "PreparedStatementCallback; bad SQL grammar [INSERT INTO mulino_inventory_QuantitySegments(organizationId,id,itemId,lotId,identificationStatus,quantity,unit,placeId,controlScope,validFrom,retiredAt,retirementRecordedAt,mixtureStatus,createdAt,recordedAt) VALUES",
+          "causes": [
+            "Caused by: org.postgresql.util.PSQLException: Unterminated string literal started at position 355 in SQL INSERT INTO mulino_inventory_QuantitySegments(organizationId,id,itemId,lotId,identificationStatus,quantity,unit,placeId,controlScope,validFrom,retiredAt,retirementRecordedAt,mixtureStatus,createdAt,recordedAt) VALUES (?,?,?,?,'CONFIRMED',?::numeric,'EA',?,'warehouse',?::timestamptz,?::timestamptz,?::timestamptz,'IDENTIFIED',?::timestamptz,?::timestamptz'). Expected  char"
+          ]
+        },
+        {
+          "test": "restrictionInsertionSharesFenceAndCommittedRestrictionDeniesEffect",
+          "type": "org.springframework.jdbc.BadSqlGrammarException",
+          "message": "PreparedStatementCallback; bad SQL grammar [INSERT INTO mulino_inventory_QuantitySegments(organizationId,id,itemId,lotId,identificationStatus,quantity,unit,placeId,controlScope,validFrom,retiredAt,retirementRecordedAt,mixtureStatus,createdAt,recordedAt) VALUES",
+          "causes": [
+            "Caused by: org.postgresql.util.PSQLException: Unterminated string literal started at position 355 in SQL INSERT INTO mulino_inventory_QuantitySegments(organizationId,id,itemId,lotId,identificationStatus,quantity,unit,placeId,controlScope,validFrom,retiredAt,retirementRecordedAt,mixtureStatus,createdAt,recordedAt) VALUES (?,?,?,?,'CONFIRMED',?::numeric,'EA',?,'warehouse',?::timestamptz,?::timestamptz,?::timestamptz,'IDENTIFIED',?::timestamptz,?::timestamptz'). Expected  char"
+          ]
+        },
+        {
+          "test": "failedLaterWriteRollsBackEveryStockEffect",
+          "type": "org.springframework.jdbc.BadSqlGrammarException",
+          "message": "PreparedStatementCallback; bad SQL grammar [INSERT INTO mulino_inventory_QuantitySegments(organizationId,id,itemId,lotId,identificationStatus,quantity,unit,placeId,controlScope,validFrom,retiredAt,retirementRecordedAt,mixtureStatus,createdAt,recordedAt) VALUES",
+          "causes": [
+            "Caused by: org.postgresql.util.PSQLException: Unterminated string literal started at position 355 in SQL INSERT INTO mulino_inventory_QuantitySegments(organizationId,id,itemId,lotId,identificationStatus,quantity,unit,placeId,controlScope,validFrom,retiredAt,retirementRecordedAt,mixtureStatus,createdAt,recordedAt) VALUES (?,?,?,?,'CONFIRMED',?::numeric,'EA',?,'warehouse',?::timestamptz,?::timestamptz,?::timestamptz,'IDENTIFIED',?::timestamptz,?::timestamptz'). Expected  char"
+          ]
+        },
+        {
+          "test": "splitMergeKeepsConservationAndRejectsCrossPlaceOrControl",
+          "type": "org.springframework.jdbc.BadSqlGrammarException",
+          "message": "PreparedStatementCallback; bad SQL grammar [INSERT INTO mulino_inventory_QuantitySegments(organizationId,id,itemId,lotId,identificationStatus,quantity,unit,placeId,controlScope,validFrom,retiredAt,retirementRecordedAt,mixtureStatus,createdAt,recordedAt) VALUES",
+          "causes": [
+            "Caused by: org.postgresql.util.PSQLException: Unterminated string literal started at position 355 in SQL INSERT INTO mulino_inventory_QuantitySegments(organizationId,id,itemId,lotId,identificationStatus,quantity,unit,placeId,controlScope,validFrom,retiredAt,retirementRecordedAt,mixtureStatus,createdAt,recordedAt) VALUES (?,?,?,?,'CONFIRMED',?::numeric,'EA',?,'warehouse',?::timestamptz,?::timestamptz,?::timestamptz,'IDENTIFIED',?::timestamptz,?::timestamptz'). Expected  char"
+          ]
+        }
+      ]
+    },
+    {
+      "class": "com.mulino.responsibility.ResponsibilityEvidenceGateTest",
+      "tests": 4,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "problems": []
+    },
+    {
+      "class": "com.mulino.responsibility.ResponsibilityPostgresTest",
+      "tests": 5,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "problems": []
+    },
+    {
+      "class": "com.mulino.responsibility.ResponsibilityServiceTest",
+      "tests": 5,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "problems": []
+    },
+    {
+      "class": "com.mulino.runtime.RuntimePostgresTest",
+      "tests": 6,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "problems": []
+    },
+    {
+      "class": "com.mulino.work.GoalInputTest",
+      "tests": 4,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "problems": []
+    }
+  ],
+  "sourcesUnchanged": true,
+  "sourceStatusAfter": "?? docs/execution/evidence/step3-s2/\n"
+}
