@@ -57,3 +57,20 @@ S0는 ACTIVE다. platform의 실제 DB WAIT 관찰과 fresh compiler 출력
 대조를 보강하고, 실행한 JAR/source hash에 HTTP 결과를 연결한다.
 coordinator가 통합 branch에서 관련 checks를 실행하고 exact platform
 판정을 확정한 뒤 S0를 닫는다. S1–S6와 사용자 Step3 전체는 미완료다.
+
+
+## 최종 통합 판정
+
+추가 `8310120`은 실제 DB WAIT와 fresh compiler 비교·잠금 timeout을
+고정했다. `996e0cc`는 clean 환경의 npm 설치 누락을 교정하고 정확한
+기술 버전을 기록했다. `13d5c56`은 증거 링크를 바로잡았다.
+
+Task `72b0a72`에서 전체 runner exit0, PostgreSQL11 tests PASS,
+보안23 requests PASS, MCP29 requests·118 assertions PASS를 확인했다.
+[실행 JAR와 입력 hash를 연결한 통합 증거](evidence/step3-s0/72b0a72/summary.json)를
+보존했다. 첫 clean bootstrap 실패는 삭제하지 않았다. 모든 Subtask가
+통합됐고 관련 결합 checks가 통과해 S0는 COMPLETE다.
+
+[플랫폼 판정](../../verification/platform/decision.md)에 따라 CAP/CQN을
+로컬 기반으로 채택한다. S1은 신원·정의·물량·증거와 공통 읽기 경로를
+구현한다. 사용자 Step3 전체와 S1–S6, 운영 인수는 아직 미완료다.

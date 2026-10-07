@@ -104,3 +104,18 @@ S0 outbox는 동일 거래에서 PENDING record를 내구성 있게 남기는 �
 도메인 증거 blob/정의 artifact 복원, 모든 D/C/V/E와 모델 인수는
 후속 구현과 검증 대상이다. full41 case PASS나 V1–V8 전체 PASS로
 기록하지 않는다. CAP의 기술적 기각 조건은 현재 발견하지 않았다.
+
+
+## 통합 branch 재검증 완료
+
+`72b0a7267fb0a33579b2458e3e66490bf871b703`의 clean checkout에서
+coordinator가 수정한 전체 runner를 실행해 exit0을 확인했다. 고정 lock의
+npm ci, build, PostgreSQL11 tests, 실제 HTTP23건과 MCP118 assertions가
+같은 실행에서 통과했다. 독립 DB는 보안 정상 counter-call3개의 효과3과
+reset 후 protocol 한 명령·재시도의 효과1을 확인했다.
+
+[통합 증거](../../docs/execution/evidence/step3-s0/72b0a72/summary.json)는
+실행 JAR SHA256와 backend·migration·probe 입력 hash를 보존한다. worker
+cache에 의존했던 첫 실패도 별도 남겼다. R1은 CAP/CQN 로컬 채택으로
+확정됐고 S0 통합 gate는 PASS다. 전체 도메인·운영·BTP·실모델 인수는
+계속 NOT_RUN이며 S1부터 같은 저장·거래·인가 경계를 확장한다.

@@ -4,7 +4,7 @@
   "baseline": "4280a750dca0aef35abaf10b6797881181dd88d7",
   "implementationCommit": "83101200cb8cc317a5ae47b49109edc23eb54ef8",
   "recordedAt": "2026-10-07T16:51:05.926045+00:00",
-  "decision": "CAP_LOCAL_ACCEPTED_PENDING_INTEGRATED_RECHECK",
+  "decision": "CAP_LOCAL_ACCEPTED",
   "stack": {
     "java": "Zulu OpenJDK 21.0.5+11",
     "maven": "3.9.16",
@@ -106,8 +106,19 @@
     "modelClientSkillAcceptance": "NOT_RUN",
     "fullV1V8DomainOracles": "NOT_RUN",
     "cleanBootstrap": {
-      "status": "FAIL_FIXED_PENDING_INTEGRATED_RECHECK",
+      "status": "PASS_INTEGRATED",
       "failure": "First root run lacked npm ci; npx could not find cds. Runner now requires npm11.19.1 and bootstraps exact package-lock under Node24.19.0."
     }
+  },
+  "integratedVerification": {
+    "checkedCommit": "72b0a7267fb0a33579b2458e3e66490bf871b703",
+    "status": "PASS",
+    "artifact": "docs/execution/evidence/step3-s0/72b0a72/summary.json",
+    "executedJarSha256": "ea3d300d31d1625441c556238426e6aa623ed2d92c0ef05c1fe7533980b626b5",
+    "inputHashDrift": 0,
+    "integrationTests": 11,
+    "securityRequests": 23,
+    "protocolAssertions": 118,
+    "protocolRequests": 29
   }
 }

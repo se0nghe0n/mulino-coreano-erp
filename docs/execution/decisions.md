@@ -43,3 +43,21 @@ backup/restore 인수는 계속 필수다.
 
 확인된 기존 PostgreSQL volume은 그대로 보존한다. 이 결정은 기존
 volume·DB·Git archive 삭제나 실제 운영 환경 활성화의 허가가 아니다.
+
+
+## R1: CAP/CQN 로컬 기술 기준선 확정
+
+| 항목 | 확정 값 |
+|---|---|
+| status | CONFIRMED_LOCAL |
+| owner | platform·coordinator |
+| inputRefs | 구현 계획 §2·S0, platform decision과 통합 실행 증거 |
+| proposedValue | CAP 우선 검증, 강제된 거래/인가 분리 시 대안 검증 |
+| confirmedValue | Java21·CAP5.1.1·Boot4.1.1·CQN·PG18.6·Flyway12.4.0, exact manifest 고정 |
+| decidedAt | 2026-10-08, Asia/Seoul |
+| blockedStep | 로컬 도메인 구현 차단 없음. BTP와 실제 IdP는 별도 미인수 |
+| evidencePath | verification/platform/decision.md·versions.json, step3-s0/72b0a72/summary.json |
+
+한 schema·transaction·인가 경로, 실제 rollback/lock·fresh/upgrade·
+복원·인증 MCP를 검증했다. CAP 기각 조건은 발견하지 않았다. 운영
+buildpack·identity·BTP 지원은 로컬 결과로 확정하지 않는다.

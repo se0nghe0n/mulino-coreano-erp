@@ -180,8 +180,8 @@ runner와 전체 coverage assembler에 연결되지 않았다. Step2에서는
 
 | 시스템 Step | 인수 범위 | 상태 |
 |---|---|---|
-| S0 | 추적·stack spike·schema/auth/MCP 기준선 | ACTIVE |
-| S1 | core·정의·증거·신원·두 진입점 읽기 | NOT_RUN |
+| S0 | 추적·stack spike·schema/auth/MCP 기준선 | COMPLETE |
+| S1 | core·정의·증거·신원·두 진입점 읽기 | ACTIVE |
 | S2 | 목표·책임·거래·승인·idem·감사·복구 | NOT_RUN |
 | S3 | 구매·운송·수입·수령·QC | NOT_RUN |
 | S4 | 판매·반품·회수·정산·E1 | NOT_RUN |
@@ -278,3 +278,15 @@ coordinator만 Task branch에 통합하며 긴 Maven/verify 실행은 동시2개
 R2는 로컬 추적으로 확정됐다. R3/R5/R7/R8의 미정 운영 입력은 해당
 scope를 활성화하지 않고 독립적인 구현을 계속한다. 실모델·유료 배포는
 아직 수행하지 않는다. 전체 Task와 S0–S6 인수는 미완료다.
+
+
+## 현재 gate: S0 완료, S1 시작
+
+[Step3 S0 기록](step-3-s0.md)의 모든 산출물을 통합했다. Task72b0a72
+전체 실행에서 PostgreSQL11 tests, 보안23 requests, MCP118 assertions가
+통과했고 실행 JAR/source hash·독립 DB 효과를 대조했다. R1은 로컬
+CAP/CQN 기반으로, R3는 실제 자료 없이 새 DB로 시작하는 것으로
+확정했다. S0는 COMPLETE다. S1 baseline은 로컬 tag `step3-s0-complete`로
+고정하며 같은 기준선의 독립 worktree에서 실제 Sol6.1 medium으로
+신원·정의·물량·증거·공통 읽기 및 실제 인수 adapter를 구현한다.
+사용자 Step3 전체와 운영/model/BTP 인수는 여전히 미완료다.
