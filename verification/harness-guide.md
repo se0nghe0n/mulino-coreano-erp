@@ -380,7 +380,7 @@ pseudo label을 public business capability로 추가하지 않는다.
 
 | 실제 pointer 끝 필드 | 허용 실제 값 |
 |---|---|
-| id, objectId, itemId, lotId, segmentId, workId, activityId, obligationId, ownerId, actorId, principalId, subjectId, organizationId, tenantId, commandId, requestId, proposalId, approvalId, restrictionId, allocationId, movementId, evidenceId, occurrenceId, definitionId, evaluatorId, policyId, grantId, taskId, runId, workLinkId, parentWorkId, childWorkId, supplierId, customerId, shipmentId, invoiceId, externalId, runtimeTaskId, invocationHandle | 비어 있지 않은 string, 최대512 characters |
+| id, objectId, itemId, lotId, segmentId, workId, activityId, obligationId, ownerId, actorId, principalId, subjectId, organizationId, tenantId, commandId, requestId, proposalId, approvalId, restrictionId, allocationId, movementId, evidenceId, occurrenceId, definitionId, evaluatorId, policyId, grantId, taskId, runId, workLinkId, parentWorkId, childWorkId, supplierId, customerId, shipmentId, invoiceId, externalId, runtimeTaskId, invocationHandle, transactionId, goalVersionId | 비어 있지 않은 string, 최대512 characters |
 | ids, workIds, obligationIds | 비어 있지 않은 string ID array, 각 ID 최대512 characters |
 | hash, proposalHash, evidenceHash, definitionHash, policyHash, artifactHash, requestHash, inputHash, sha256 | SHA-256 64자리 hexadecimal string |
 | revision, proposalRevision, snapshotRevision, definitionRevision, policyRevision, grantRevision, workRevision, approvalRevision | 비어 있지 않은 string(최대512 characters) 또는 nonnegative integer(Long 범위) |
@@ -400,3 +400,50 @@ Host 통합은 EXECUTED process control의 ACK 검사 뒤
 유지하며 전체 case를 PASS로 만들지 않는다. clock/barrier 등 다른 control은
 각자의 기존 계약을 사용한다. 검증 대상은 실제 실행 증거이며 harness가
 process command argv를 실행하지 않는다.
+
+
+## raw wire 비동기 제출
+
+MRTR single-use 경합은 `start.call`의 route=wire/protocolOperation으로
+직접 선언한다. business capabilityId와 protocolOperation은 동시에
+쓰지 않는다. schema는 기존 invoke/query wire call을 그대로 사용한다.
+
+```json
+{
+  "id":"mrtr-left-start", "kind":"start", "evidenceRefs":["wire:async-submission"],
+  "call":{
+    "id":"mrtr-left-call", "kind":"invoke", "actorRef":"qc", "route":"wire",
+    "protocolOperation":"tools/call",
+    "request":{"headers":{"Content-Type":"text/plain"},"body":"INTENTIONALLY_HOSTILE_RAW_BODY"},
+    "evidenceRefs":["wire:rawRequest"]
+  }
+}
+```
+
+이 action은 typed `AcceptanceDriver.startWire(actionId, actor,
+protocolOperation, rawRequest)`로 실제 비동기 제출 ACK를 받는다.
+기본 구현은 NOT_IMPLEMENTED/null이다. sync wire()/clientProbe로 대체하거나
+동기 완료를 async 제출 ACK로 표시하지 않는다. raw method/header/body는
+protocol 분류와 불일치하더라도 수정하지 않는다. 실제 발급 state의
+기존 $result/$transform 입력도 이 request 안에 쓸 수 있다.
+
+기존 start→barrier reached/commit→resume→각 await→독립 DB 관찰을
+그대로 사용한다. 모든 parallel child start마다 exactly-one await가
+필요하며 actual invocationHandle 일치와 completed/terminalStatus를
+확인해야 한다. 제출 ACK만 있거나 하나의 await가 미구현이면 전체 완료가
+아니다. clientProbe의 불투명한 동작에 raw wire action을 숨기지 않는다.
+
+transactionId와 goalVersionId를 명시 string identity allowlist에 추가했다.
+둘은 비어 있지 않은 string(최대512 characters)만 허용한다. number,
+Boolean, object와 transactionValid/goalVersionValid 같은 유사 업무명은
+거부한다. suffix 허용 범위는 넓히지 않았으며 instanceId/fencingToken은
+이번 계약의 assertion identity 목록에 추가하지 않았다.
+
+
+Assertion은 identity 치환 전에 primary/baseline/unit source와 모든
+$result source의 driverStatus를 검사한다. $alias assertion은 CaseRunner에서
+실제 installFixture source 가용성도 먼저 확인한다. 미실행 source는
+contract RED에서 NOT_IMPLEMENTED/UNAVAILABLE AssertionError, 일반 profile에서
+NOT_RUN이며 alias·값을 만들어 채우지 않는다. EXECUTED source의 실제
+missing alias/pointer/type는 진짜 contract 오류로 남긴다. 별도 실행된
+fixed assertion의 확인된 FAIL은 다른 미실행 source가 덮지 않는다.

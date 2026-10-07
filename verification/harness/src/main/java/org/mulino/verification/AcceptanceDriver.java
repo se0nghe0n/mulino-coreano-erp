@@ -17,6 +17,11 @@ public interface AcceptanceDriver {
     StepResult control(String actionId, JsonNode control);
     /** ACK only after a real asynchronous invocation is submitted. data.invocationHandle is opaque. */
     StepResult start(String actionId, String route, JsonNode authenticatedActor, String capabilityId, JsonNode request);
+    /** Submit real raw protocol transport asynchronously; never delegate to synchronous wire().
+     * Classification does not normalize raw method/headers/body. ACK requires actual invocationHandle. */
+    default StepResult startWire(String actionId,JsonNode authenticatedActor,String protocolOperation,JsonNode rawRequest) {
+        return StepResult.missing(actionId,"NOT_IMPLEMENTED: actual async raw protocol transport adapter absent");
+    }
     /** Terminal ACK: completed=true, identical invocationHandle, terminalStatus SUCCEEDED/FAILED/CANCELLED.
      * Preserve the actual result/commit response and artifact; submission alone is not completion. */
     StepResult await(String actionId, JsonNode invocationHandle, int timeoutSeconds);

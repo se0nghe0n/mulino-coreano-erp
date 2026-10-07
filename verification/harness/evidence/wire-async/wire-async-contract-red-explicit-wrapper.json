@@ -1,0 +1,43 @@
+{
+  "entrypoint": [
+    "./verify",
+    "contract-red",
+    "verification/harness/src/test/resources/examples/HARNESS-EXAMPLE/case.json"
+  ],
+  "timestamp": "2026-10-07T14:16:29Z",
+  "commands": [
+    {
+      "command": [
+        "java",
+        "-version"
+      ],
+      "exitCode": 0,
+      "elapsedSeconds": 0.041
+    },
+    {
+      "command": [
+        "/Volumes/VideoStore/Developer/mulino-ontology-step2-wire-async/mvnw",
+        "-version"
+      ],
+      "exitCode": 0,
+      "elapsedSeconds": 0.223
+    },
+    {
+      "command": [
+        "/Volumes/VideoStore/Developer/mulino-ontology-step2-wire-async/mvnw",
+        "-B",
+        "-ntp",
+        "-f",
+        "/Volumes/VideoStore/Developer/mulino-ontology-step2-wire-async/verification/harness/pom.xml",
+        "-Dtest=CaseFeatureTest",
+        "-Dverification.mode=contract-red",
+        "-Dverification.command=./verify contract-red verification/harness/src/test/resources/examples/HARNESS-EXAMPLE/case.json",
+        "-Dverification.caseFiles=verification/harness/src/test/resources/examples/HARNESS-EXAMPLE/case.json",
+        "test"
+      ],
+      "exitCode": 1,
+      "elapsedSeconds": 1.727
+    }
+  ],
+  "exitCode": 1
+}

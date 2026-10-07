@@ -1,0 +1,41 @@
+{
+  "entrypoint": [
+    "./verify",
+    "contract-red"
+  ],
+  "timestamp": "2026-10-07T14:16:27Z",
+  "commands": [
+    {
+      "command": [
+        "java",
+        "-version"
+      ],
+      "exitCode": 0,
+      "elapsedSeconds": 0.033
+    },
+    {
+      "command": [
+        "/Volumes/VideoStore/Developer/mulino-ontology-step2-wire-async/mvnw",
+        "-version"
+      ],
+      "exitCode": 0,
+      "elapsedSeconds": 0.229
+    },
+    {
+      "command": [
+        "/Volumes/VideoStore/Developer/mulino-ontology-step2-wire-async/mvnw",
+        "-B",
+        "-ntp",
+        "-f",
+        "/Volumes/VideoStore/Developer/mulino-ontology-step2-wire-async/verification/harness/pom.xml",
+        "-Dtest=ContractRedTest",
+        "-Dverification.mode=contract-red",
+        "-Dverification.command=./verify contract-red",
+        "test"
+      ],
+      "exitCode": 1,
+      "elapsedSeconds": 1.804
+    }
+  ],
+  "exitCode": 1
+}

@@ -10,6 +10,7 @@ import java.util.*;
 public final class AssertionEngine {
     public void check(JsonNode assertion, Map<String,JsonNode> results) { check(assertion,results,Json.object()); }
     public void check(JsonNode declared, Map<String,JsonNode> results,JsonNode aliases) {
+        requireSourcesAvailable(declared,results);
         var assertion=declared.deepCopy();var resolver=new ReferenceResolver(results,aliases);
         for(String field:List.of("expected","scope")) if(assertion.has(field)) ((com.fasterxml.jackson.databind.node.ObjectNode)assertion).set(field,resolver.identity(assertion.path(field)));
         for(String field:List.of("source","baseline","unitSource","baselineUnitSource")) if(assertion.path(field).has("where")) ((com.fasterxml.jackson.databind.node.ObjectNode)assertion.path(field)).set("where",resolver.identity(assertion.path(field).path("where")));
@@ -62,6 +63,18 @@ public final class AssertionEngine {
             }
             default -> fail("Unsupported assertion operator "+op);
         }
+    }
+    void requireSourcesAvailable(JsonNode assertion,Map<String,JsonNode> results) {
+        for(String field:List.of("source","baseline","unitSource","baselineUnitSource")) if(assertion.has(field)) requireExecuted(Json.required(assertion.path(field),"actionId"),results);
+        requireReferenceSourcesAvailable(assertion,results);
+    }
+    private void requireReferenceSourcesAvailable(JsonNode node,Map<String,JsonNode> results) {
+        if(node.isObject() && node.has("$result")) requireExecuted(Json.required(node.path("$result"),"actionId"),results);
+        else if(node.isContainerNode()) node.forEach(child->requireReferenceSourcesAvailable(child,results));
+    }
+    void requireExecuted(String actionId,Map<String,JsonNode> results) {
+        JsonNode result=results.get(actionId);require(result!=null,"No result for source "+actionId);
+        require("EXECUTED".equals(result.path("driverStatus").asText()),"source "+actionId+" is "+result.path("driverStatus").asText()+": "+result.path("reason").asText());
     }
     public JsonNode select(JsonNode source,Map<String,JsonNode> results,boolean allowAbsent) {
         if(source==null) fail("source is missing");

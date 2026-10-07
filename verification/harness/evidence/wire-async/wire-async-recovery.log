@@ -1,0 +1,70 @@
++ java -version
+exitCode=0
++ /Volumes/VideoStore/Developer/mulino-ontology-step2-wire-async/mvnw -version
+Apache Maven 3.9.16 (2bdd9fddda4b155ebf8000e807eb73fd829a51d5)
+Maven home: /Users/n30gu1/.m2/wrapper/dists/apache-maven-3.9.16/56ba1f9f
+Java version: 21.0.5, vendor: Azul Systems, Inc., runtime: /Library/Java/JavaVirtualMachines/zulu-21.jdk/Contents/Home
+Default locale: en_KR, platform encoding: UTF-8
+OS name: "mac os x", version: "27.0.1", arch: "aarch64", family: "mac"
+exitCode=0
++ /Volumes/VideoStore/Developer/mulino-ontology-step2-wire-async/mvnw -B -ntp -f /Volumes/VideoStore/Developer/mulino-ontology-step2-wire-async/verification/harness/pom.xml -Dmaven.test.skip=true package dependency:build-classpath -Dmdep.outputFile=target/classpath.txt
+[INFO] Scanning for projects...
+[INFO]
+[INFO] -------------------< org.mulino:acceptance-harness >--------------------
+[INFO] Building acceptance-harness 1.0.0
+[INFO]   from pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO]
+[INFO] --- resources:3.4.0:resources (default-resources) @ acceptance-harness ---
+[INFO] skip non existing resourceDirectory /Volumes/VideoStore/Developer/mulino-ontology-step2-wire-async/verification/harness/src/main/resources
+[INFO]
+[INFO] --- compiler:3.14.1:compile (default-compile) @ acceptance-harness ---
+[INFO] Nothing to compile - all classes are up to date.
+[INFO]
+[INFO] --- resources:3.4.0:testResources (default-testResources) @ acceptance-harness ---
+[INFO] Not copying test resources
+[INFO]
+[INFO] --- compiler:3.14.1:testCompile (default-testCompile) @ acceptance-harness ---
+[INFO] Not compiling test sources
+[INFO]
+[INFO] --- surefire:3.5.6:test (default-test) @ acceptance-harness ---
+[INFO] Tests are skipped.
+[INFO]
+[INFO] --- jar:3.5.0:jar (default-jar) @ acceptance-harness ---
+[INFO]
+[INFO] --- dependency:3.9.0:build-classpath (default-cli) @ acceptance-harness ---
+[INFO] Skipped writing classpath file '/Volumes/VideoStore/Developer/mulino-ontology-step2-wire-async/verification/harness/target/classpath.txt'.  No changes found.
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  0.652 s
+[INFO] Finished at: 2026-10-07T23:16:32+09:00
+[INFO] ------------------------------------------------------------------------
+exitCode=0
++ java -Drepo.root=/Volumes/VideoStore/Developer/mulino-ontology-step2-wire-async '-Dverification.command=./verify recovery' -cp /Volumes/VideoStore/Developer/mulino-ontology-step2-wire-async/verification/harness/target/classes:/Users/n30gu1/.m2/repository/io/cucumber/gherkin/42.0.1/gherkin-42.0.1.jar:/Users/n30gu1/.m2/repository/io/cucumber/messages/34.2.1/messages-34.2.1.jar:/Users/n30gu1/.m2/repository/org/jspecify/jspecify/1.0.1/jspecify-1.0.1.jar:/Users/n30gu1/.m2/repository/com/fasterxml/jackson/core/jackson-databind/2.21.2/jackson-databind-2.21.2.jar:/Users/n30gu1/.m2/repository/com/fasterxml/jackson/core/jackson-annotations/2.21/jackson-annotations-2.21.jar:/Users/n30gu1/.m2/repository/com/fasterxml/jackson/core/jackson-core/2.21.2/jackson-core-2.21.2.jar:/Users/n30gu1/.m2/repository/com/fasterxml/jackson/datatype/jackson-datatype-jdk8/2.21.2/jackson-datatype-jdk8-2.21.2.jar:/Users/n30gu1/.m2/repository/com/networknt/json-schema-validator/1.5.9/json-schema-validator-1.5.9.jar:/Users/n30gu1/.m2/repository/com/ethlo/time/itu/1.14.0/itu-1.14.0.jar:/Users/n30gu1/.m2/repository/com/fasterxml/jackson/dataformat/jackson-dataformat-yaml/2.18.3/jackson-dataformat-yaml-2.18.3.jar:/Users/n30gu1/.m2/repository/org/yaml/snakeyaml/2.3/snakeyaml-2.3.jar:/Users/n30gu1/.m2/repository/org/slf4j/slf4j-api/2.0.17/slf4j-api-2.0.17.jar:/Users/n30gu1/.m2/repository/org/junit/jupiter/junit-jupiter/6.1.2/junit-jupiter-6.1.2.jar:/Users/n30gu1/.m2/repository/org/junit/jupiter/junit-jupiter-api/6.1.2/junit-jupiter-api-6.1.2.jar:/Users/n30gu1/.m2/repository/org/opentest4j/opentest4j/1.3.0/opentest4j-1.3.0.jar:/Users/n30gu1/.m2/repository/org/junit/platform/junit-platform-commons/6.1.2/junit-platform-commons-6.1.2.jar:/Users/n30gu1/.m2/repository/org/junit/jupiter/junit-jupiter-params/6.1.2/junit-jupiter-params-6.1.2.jar:/Users/n30gu1/.m2/repository/org/junit/jupiter/junit-jupiter-engine/6.1.2/junit-jupiter-engine-6.1.2.jar:/Users/n30gu1/.m2/repository/org/junit/platform/junit-platform-launcher/6.1.2/junit-platform-launcher-6.1.2.jar:/Users/n30gu1/.m2/repository/org/junit/platform/junit-platform-engine/6.1.2/junit-platform-engine-6.1.2.jar:/Users/n30gu1/.m2/repository/org/apiguardian/apiguardian-api/1.1.2/apiguardian-api-1.1.2.jar:/Users/n30gu1/.m2/repository/org/junit/platform/junit-platform-suite/6.1.2/junit-platform-suite-6.1.2.jar:/Users/n30gu1/.m2/repository/org/junit/platform/junit-platform-suite-api/6.1.2/junit-platform-suite-api-6.1.2.jar:/Users/n30gu1/.m2/repository/org/junit/platform/junit-platform-suite-engine/6.1.2/junit-platform-suite-engine-6.1.2.jar:/Users/n30gu1/.m2/repository/io/cucumber/cucumber-java/8.0.4/cucumber-java-8.0.4.jar:/Users/n30gu1/.m2/repository/io/cucumber/cucumber-core/8.0.4/cucumber-core-8.0.4.jar:/Users/n30gu1/.m2/repository/io/cucumber/cucumber-gherkin/8.0.4/cucumber-gherkin-8.0.4.jar:/Users/n30gu1/.m2/repository/io/cucumber/cucumber-gherkin-messages/8.0.4/cucumber-gherkin-messages-8.0.4.jar:/Users/n30gu1/.m2/repository/io/cucumber/messages-ndjson/0.5.2/messages-ndjson-0.5.2.jar:/Users/n30gu1/.m2/repository/io/cucumber/pretty-formatter/4.1.0/pretty-formatter-4.1.0.jar:/Users/n30gu1/.m2/repository/io/cucumber/query/16.1.1/query-16.1.1.jar:/Users/n30gu1/.m2/repository/io/cucumber/teamcity-formatter/0.3.1/teamcity-formatter-0.3.1.jar:/Users/n30gu1/.m2/repository/io/cucumber/testng-xml-formatter/0.9.0/testng-xml-formatter-0.9.0.jar:/Users/n30gu1/.m2/repository/io/cucumber/usage-formatter/0.2.1/usage-formatter-0.2.1.jar:/Users/n30gu1/.m2/repository/io/cucumber/tag-expressions/11.0.1/tag-expressions-11.0.1.jar:/Users/n30gu1/.m2/repository/io/cucumber/cucumber-expressions/20.1.0/cucumber-expressions-20.1.0.jar:/Users/n30gu1/.m2/repository/io/cucumber/cucumber-json-formatter/0.4.2/cucumber-json-formatter-0.4.2.jar:/Users/n30gu1/.m2/repository/io/cucumber/datatable/8.0.4/datatable-8.0.4.jar:/Users/n30gu1/.m2/repository/io/cucumber/cucumber-plugin/8.0.4/cucumber-plugin-8.0.4.jar:/Users/n30gu1/.m2/repository/io/cucumber/docstring/8.0.4/docstring-8.0.4.jar:/Users/n30gu1/.m2/repository/io/cucumber/html-formatter/24.2.0/html-formatter-24.2.0.jar:/Users/n30gu1/.m2/repository/io/cucumber/junit-xml-formatter/0.15.0/junit-xml-formatter-0.15.0.jar:/Users/n30gu1/.m2/repository/io/cucumber/ci-environment/15.0.0/ci-environment-15.0.0.jar:/Users/n30gu1/.m2/repository/io/cucumber/cucumber-junit-platform-engine/8.0.4/cucumber-junit-platform-engine-8.0.4.jar org.mulino.verification.Main profile recovery
+{
+  "schemaVersion" : "1.0.0",
+  "recordType" : "ACCEPTANCE_HARNESS_REPORT",
+  "profile" : "recovery",
+  "status" : "NOT_RUN",
+  "exitCode" : 2,
+  "timestamp" : "2026-10-07T14:16:32.881815Z",
+  "command" : "./verify recovery",
+  "codeCommit" : "feaca0af9673620eff9a5ac0f08a657ce14e9ccd",
+  "workingTreeDirty" : true,
+  "harnessMainClassSha256" : "d3f85dede394d1a4ded8455d072f233132e827552ca3e474ac903e03b3aa88e0",
+  "javaVersion" : "21.0.5+11-LTS",
+  "harnessVersion" : "1.0.0",
+  "productRuntimeClaimed" : false,
+  "discoveredSubcases" : 0,
+  "selectedSubcases" : 0,
+  "gateComplete" : false,
+  "cases" : [ ],
+  "reason" : "NOT_IMPLEMENTED: product adapter/cases missing; failIfNoTests prevents PASS",
+  "prerequisiteProfiles" : [ "schema", "contracts" ],
+  "prerequisiteRuntimeComplete" : false
+}
+exitCode=2
+openjdk version "21.0.5" 2024-10-15 LTS
+OpenJDK Runtime Environment Zulu21.38+21-CA (build 21.0.5+11-LTS)
+OpenJDK 64-Bit Server VM Zulu21.38+21-CA (build 21.0.5+11-LTS, mixed mode, sharing)

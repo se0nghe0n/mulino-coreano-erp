@@ -88,7 +88,6 @@ public final class ContractValidator {
     private void checkAction(JsonNode action) {
         String kind=Json.required(action,"kind");
         if(Set.of("invoke","query").contains(kind) && !action.has("protocolOperation")) require(capabilities.contains(Json.required(action,"capabilityId")),"Unknown public capability "+action.path("capabilityId"));
-        if(kind.equals("start")) require(!action.path("call").has("protocolOperation"),"Async protocol calls need separate actual transport adapter; not supported by start");
         if(kind.equals("start")) { String child=action.path("call").path("kind").asText(); require(Set.of("invoke","query").contains(child),"start call must be invoke/query"); checkAction(action.path("call")); }
         if(kind.equals("agent")) {
             JsonNode context=action.path("permittedContext");

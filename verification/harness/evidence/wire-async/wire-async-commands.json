@@ -1,0 +1,44 @@
+[
+  {
+    "command": [
+      "./verify",
+      "contract-red"
+    ],
+    "exitCode": 1,
+    "log": "verification/harness/target/wire-async-contract-red.log"
+  },
+  {
+    "command": [
+      "./verify",
+      "contract-red",
+      "verification/harness/src/test/resources/examples/HARNESS-EXAMPLE/case.json"
+    ],
+    "exitCode": 1,
+    "log": "verification/harness/target/wire-async-contract-red-explicit.log"
+  },
+  {
+    "command": [
+      "./verify",
+      "scenarios",
+      "verification/harness/src/test/resources/examples/HARNESS-EXAMPLE/case.json"
+    ],
+    "exitCode": 2,
+    "log": "verification/harness/target/wire-async-scenarios.log"
+  },
+  {
+    "command": [
+      "./verify",
+      "recovery"
+    ],
+    "exitCode": 2,
+    "log": "verification/harness/target/wire-async-recovery.log"
+  },
+  {
+    "command": [
+      "./verify",
+      "mcp"
+    ],
+    "exitCode": 2,
+    "log": "verification/harness/target/wire-async-mcp.log"
+  }
+]

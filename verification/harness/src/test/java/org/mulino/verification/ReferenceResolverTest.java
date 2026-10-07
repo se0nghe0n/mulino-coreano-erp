@@ -80,4 +80,18 @@ public final class ReferenceResolverTest {
         response.put("revision","revision-8");assertEquals("revision-8",resolver.identity(Json.parse("{\"$result\":{\"actionId\":\"created\",\"pointer\":\"/response/revision\"}}")).asText());
         assertFalse(ReferenceResolver.identityPointer("/response/WORKID"));assertFalse(ReferenceResolver.identityPointer("/response/Valid"));
     }
+    @Test void transactionAndGoalVersionIdsAreOnlyExplicitStringIdentities() {
+        var r=results();var resolver=new ReferenceResolver(r,aliases);ObjectNode response=(ObjectNode)r.get("created").path("response");
+        for(String field:List.of("transactionId","goalVersionId")) {
+            response.put(field,"generated-"+field);var binding=Json.parse("{\"$result\":{\"actionId\":\"created\",\"pointer\":\"/response/"+field+"\"}}");
+            assertEquals(response.path(field),resolver.identity(binding));
+            for(JsonNode invalid:List.<JsonNode>of(Json.MAPPER.valueToTree(100),Json.MAPPER.valueToTree(false),Json.object())) {
+                response.set(field,invalid);assertThrows(IllegalArgumentException.class,()->resolver.identity(binding));
+            }
+        }
+        for(String field:List.of("transactionValid","goalVersionValid","transactionPaid","instanceId","fencingToken")) {
+            assertFalse(ReferenceResolver.identityPointer("/response/"+field));
+            response.put(field,false);assertThrows(IllegalArgumentException.class,()->resolver.identity(Json.parse("{\"$result\":{\"actionId\":\"created\",\"pointer\":\"/response/"+field+"\"}}")));
+        }
+    }
 }

@@ -51,7 +51,9 @@ public final class CaseRunner {
                 case "agent" -> agentRunner.run(id,Json.required(a,"route"),actor(a),resolve(a),driver);
                 case "start" -> {
                     JsonNode call=a.path("call");
-                    yield driver.start(id,Json.required(call,"route"),actor(call),Json.required(call,"capabilityId"),resolve(call.path("request")));
+                    yield call.has("protocolOperation")
+                        ? driver.startWire(id,actor(call),Json.required(call,"protocolOperation"),resolve(call.path("request")))
+                        : driver.start(id,Json.required(call,"route"),actor(call),Json.required(call,"capabilityId"),resolve(call.path("request")));
                 }
                 case "await" -> {
                     String sourceId=Json.required(a,"awaitActionId"); JsonNode previous=results.get(sourceId);
@@ -145,7 +147,11 @@ public final class CaseRunner {
     public void assertId(String id) {
         JsonNode assertion=assertionIndex.get(id); if(assertion==null) throw new IllegalArgumentException("Undeclared assertion "+id);
         asserted.add(id);ObjectNode evidence=Json.object(); evidence.put("assertionId",id);evidence.set("expected",assertion.path("expected"));evidence.set("source",assertion.path("source"));evidence.set("requirementRefs",assertion.path("requirementRefs"));evidence.set("evidenceRefs",assertion.path("evidenceRefs"));
-        try { new AssertionEngine().check(assertion,results,aliases); evidence.put("status","PASS"); }
+        try {
+            AssertionEngine engine=new AssertionEngine();engine.requireSourcesAvailable(assertion,results);
+            if(containsAlias(assertion)) for(JsonNode action:actionIndex.values()) if(action.path("kind").asText().equals("installFixture")) engine.requireExecuted(Json.required(action,"id"),results);
+            engine.check(assertion,results,aliases); evidence.put("status","PASS");
+        }
         catch(AssertionError e) { evidence.put("status","FAIL").put("reason",e.getMessage());assertionResults.add(evidence);throw e; }
         assertionResults.add(evidence);
     }
@@ -167,7 +173,15 @@ public final class CaseRunner {
             JsonNode r=results.get(assertion.path(key).path("actionId").asText());
             if(r==null || !r.path("driverStatus").asText().equals("EXECUTED")) return false;
         }
+        if(containsAlias(assertion)) for(JsonNode action:actionIndex.values()) if(action.path("kind").asText().equals("installFixture")) {
+            JsonNode r=results.get(action.path("id").asText());if(r==null || !r.path("driverStatus").asText().equals("EXECUTED")) return false;
+        }
         return referenceSourcesExecuted(assertion);
+    }
+    private boolean containsAlias(JsonNode node) {
+        if(node.isObject() && node.has("$alias")) return true;
+        if(node.isContainerNode()) for(JsonNode child:node) if(containsAlias(child)) return true;
+        return false;
     }
     private boolean referenceSourcesExecuted(JsonNode node) {
         if(node.isObject() && node.has("$result")) {
