@@ -66,3 +66,17 @@ QC 구현과 각 영역의 최종 tests는 진행 중이다. 이는 S3 완료가
 명시적인 시작 fixture로 사용한다. 실제 confirmReceipt 후 총60 유지,
 운송0/보관60과 단일 이동·재시도 무효과를 독립 관찰한다. 이 사례는
 운송 재고의 최초 취득 성공을 주장하지 않는다.
+
+## 첫 결합 컴파일과 수정 중인 인수
+
+`e71bbfe`의 첫 결합에서 main 158개 source compile은 통과했다.
+테스트 compile은 QualityPostgresTest의 미정의 변수 두 참조로 실패했고
+`2a53f0b`에서 수정했다. [원본 로그와 source 기록](evidence/step3-s3/initial-compile/summary.json)을
+보존한다. 테스트를 실행한 결과로 표시하지 않는다.
+
+worker의 후속 결합 compile은 통과했지만 전체 context에서
+ReceiptRepository의 final 선언이 Spring proxy 생성을 막았다.
+`56d6be4`에서 수정했고 실제 DB 검사를 재개한다. 별도로 거래 원본의
+PURCHASE_ORDER subject DB 제약과 같은 물량에 대한 후속 기관 결정의
+canonical identity를 보완한다. 실제 수령 뒤 부족 책임을 현재 잔여량과
+맞추는 동작도 검증 중이다. 이 항목과 native 경로가 남아 S3는 ACTIVE다.
