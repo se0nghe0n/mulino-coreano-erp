@@ -40,7 +40,7 @@ public class IdentityCommands implements CommandHandler {
      if(op.equals("revokeGrant"))guard.revokingGrant(c,id,((Number)row.get("revision")).longValue());else management(c,(String)row.get("capabilityId"),(String)row.get("scopeKind"),(String)row.get("scopeId"));
      repo.update(entity,c.organizationId(),id,Map.of("revokedAt",now,"revision",((Number)row.get("revision")).intValue()+1));
    }
-   repo.invalidate(c.organizationId(),actor,now,op);return Map.of("id",id,"actorId",actor,"revision",op.startsWith("revoke")?((Number)find(op.equals("revokeGrant")?"Grants":"CapabilityAssignments",c,id).get("revision")).intValue():1);
+   repo.invalidate(c.organizationId(),actor,now,op);return Map.of("outcome","APPLIED","effects",Map.of("identityId",id),"id",id,"actorId",actor,"revision",op.startsWith("revoke")?((Number)find(op.equals("revokeGrant")?"Grants":"CapabilityAssignments",c,id).get("revision")).intValue():1);
  }
  private void management(DomainContext c,String capability,String kind,String scope){
    var actor=repo.actor(c.organizationId(),c.actorId()).orElseThrow(IdentityAuthorization::denied);if(!"HUMAN".equals(actor.get("kind")))throw IdentityAuthorization.denied();

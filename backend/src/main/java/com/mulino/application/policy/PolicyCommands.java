@@ -49,7 +49,7 @@ public class PolicyCommands implements CommandHandler {
        }
        repo.retire(c.organizationId(),id);repo.update("PolicyDrafts",c.organizationId(),id,Map.of("status","RETIRED","revision",revision));boundary(c,id,now,"RETIRE");
      }
-   }return Map.of("id",id,"revision",revision);
+   }return Map.of("outcome","APPLIED","effects",Map.of("policyId",id),"id",id,"revision",revision);
  }
  private void boundary(DomainContext c,String id,Instant at,String reason){repo.insert("PolicyBoundaries",Map.of("organizationId",c.organizationId(),"ID",UUID.randomUUID().toString(),"policyId",id,"nextCheckAt",at,"reason",reason));}
  private Map<String,Object> draft(DomainContext c,String id){return repo.row("PolicyDrafts",c.organizationId(),id).orElseThrow(DomainError::forbidden);}
