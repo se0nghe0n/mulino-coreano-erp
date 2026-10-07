@@ -637,6 +637,44 @@
           }
         },
         {
+          "id": "parent-not-rewritten-baseline-one",
+          "op": "count",
+          "source": {
+            "actionId": "before-db",
+            "pointer": "/data/rawRows/works",
+            "where": {
+              "id": {
+                "$alias": "PARENT"
+              }
+            }
+          },
+          "expected": 1,
+          "requirementRefs": [
+            "D10",
+            "D14",
+            "D26"
+          ],
+          "evidenceRefs": [
+            "before-db:actual-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "C5",
+            "itemId": {
+              "$alias": "P"
+            }
+          },
+          "oracleExplanation": "보존 대상인 기존 부모 업무 또는 원래 판정 원행이 실제 이전 snapshot에 정확히 하나 존재해야 한다.",
+          "oracleRef": {
+            "oracleId": "C5.failed-link-responsibility",
+            "observationNames": [
+              "closed-parent-rewrite"
+            ]
+          }
+        },
+        {
           "id": "parent-not-rewritten",
           "op": "sameAs",
           "source": {
@@ -682,6 +720,44 @@
                 "$alias": "PARENT"
               }
             }
+          }
+        },
+        {
+          "id": "parent-assessment-not-rewritten-baseline-one",
+          "op": "count",
+          "source": {
+            "actionId": "before-db",
+            "pointer": "/data/rawRows/assessments",
+            "where": {
+              "id": {
+                "$alias": "OLDASSESS"
+              }
+            }
+          },
+          "expected": 1,
+          "requirementRefs": [
+            "D10",
+            "D14",
+            "D26"
+          ],
+          "evidenceRefs": [
+            "before-db:actual-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "C5",
+            "itemId": {
+              "$alias": "P"
+            }
+          },
+          "oracleExplanation": "보존 대상인 기존 부모 업무 또는 원래 판정 원행이 실제 이전 snapshot에 정확히 하나 존재해야 한다.",
+          "oracleRef": {
+            "oracleId": "C5.failed-link-responsibility",
+            "observationNames": [
+              "closed-parent-rewrite"
+            ]
           }
         },
         {
@@ -1204,6 +1280,44 @@
           }
         },
         {
+          "id": "parent-not-rewritten-baseline-one",
+          "op": "count",
+          "source": {
+            "actionId": "before-db",
+            "pointer": "/data/rawRows/works",
+            "where": {
+              "id": {
+                "$alias": "PARENT"
+              }
+            }
+          },
+          "expected": 1,
+          "requirementRefs": [
+            "D10",
+            "D14",
+            "D26"
+          ],
+          "evidenceRefs": [
+            "before-db:actual-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "C5",
+            "itemId": {
+              "$alias": "P"
+            }
+          },
+          "oracleExplanation": "보존 대상인 기존 부모 업무 또는 원래 판정 원행이 실제 이전 snapshot에 정확히 하나 존재해야 한다.",
+          "oracleRef": {
+            "oracleId": "C5.failed-link-responsibility",
+            "observationNames": [
+              "closed-parent-rewrite"
+            ]
+          }
+        },
+        {
           "id": "parent-not-rewritten",
           "op": "sameAs",
           "source": {
@@ -1249,6 +1363,44 @@
                 "$alias": "PARENT"
               }
             }
+          }
+        },
+        {
+          "id": "parent-assessment-not-rewritten-baseline-one",
+          "op": "count",
+          "source": {
+            "actionId": "before-db",
+            "pointer": "/data/rawRows/assessments",
+            "where": {
+              "id": {
+                "$alias": "OLDASSESS"
+              }
+            }
+          },
+          "expected": 1,
+          "requirementRefs": [
+            "D10",
+            "D14",
+            "D26"
+          ],
+          "evidenceRefs": [
+            "before-db:actual-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "C5",
+            "itemId": {
+              "$alias": "P"
+            }
+          },
+          "oracleExplanation": "보존 대상인 기존 부모 업무 또는 원래 판정 원행이 실제 이전 snapshot에 정확히 하나 존재해야 한다.",
+          "oracleRef": {
+            "oracleId": "C5.failed-link-responsibility",
+            "observationNames": [
+              "closed-parent-rewrite"
+            ]
           }
         },
         {
@@ -1771,6 +1923,44 @@
           }
         },
         {
+          "id": "parent-not-rewritten-baseline-one",
+          "op": "count",
+          "source": {
+            "actionId": "before-db",
+            "pointer": "/data/rawRows/works",
+            "where": {
+              "id": {
+                "$alias": "PARENT"
+              }
+            }
+          },
+          "expected": 1,
+          "requirementRefs": [
+            "D10",
+            "D14",
+            "D26"
+          ],
+          "evidenceRefs": [
+            "before-db:actual-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "C5",
+            "itemId": {
+              "$alias": "P"
+            }
+          },
+          "oracleExplanation": "보존 대상인 기존 부모 업무 또는 원래 판정 원행이 실제 이전 snapshot에 정확히 하나 존재해야 한다.",
+          "oracleRef": {
+            "oracleId": "C5.failed-link-responsibility",
+            "observationNames": [
+              "closed-parent-rewrite"
+            ]
+          }
+        },
+        {
           "id": "parent-not-rewritten",
           "op": "sameAs",
           "source": {
@@ -1816,6 +2006,44 @@
                 "$alias": "PARENT"
               }
             }
+          }
+        },
+        {
+          "id": "parent-assessment-not-rewritten-baseline-one",
+          "op": "count",
+          "source": {
+            "actionId": "before-db",
+            "pointer": "/data/rawRows/assessments",
+            "where": {
+              "id": {
+                "$alias": "OLDASSESS"
+              }
+            }
+          },
+          "expected": 1,
+          "requirementRefs": [
+            "D10",
+            "D14",
+            "D26"
+          ],
+          "evidenceRefs": [
+            "before-db:actual-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "C5",
+            "itemId": {
+              "$alias": "P"
+            }
+          },
+          "oracleExplanation": "보존 대상인 기존 부모 업무 또는 원래 판정 원행이 실제 이전 snapshot에 정확히 하나 존재해야 한다.",
+          "oracleRef": {
+            "oracleId": "C5.failed-link-responsibility",
+            "observationNames": [
+              "closed-parent-rewrite"
+            ]
           }
         },
         {

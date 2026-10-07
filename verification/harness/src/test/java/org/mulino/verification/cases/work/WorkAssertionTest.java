@@ -15,7 +15,7 @@ public class WorkAssertionTest {
     private final AssertionEngine engine = new AssertionEngine();
     private final JsonNode aliases = Json.parse("""
         {"ORG":"org-id","P":"item-id","W":"warehouse-id","ROOT":"root-id",
-         "SOURCE":"source-id","TARGET":"target-id","A":"human-a","B":"human-b","intake":"human-intake"}
+         "SOURCE":"source-id","TARGET":"target-id","A":"human-a","B":"human-b","intake":"human-intake","OLDASSESS":"old-assessment-id","PARENT":"parent-id"}
         """);
     private JsonNode assertion(String caseId, String subcase, String id) throws Exception {
         Path path = Path.of(System.getProperty("repo.root"), "verification/cases", caseId, "case.json");
@@ -128,6 +128,13 @@ public class WorkAssertionTest {
         var a=assertion("T12","conflicting-claims","versions-pinned");engine.check(a,rows,aliases);
         ((ObjectNode)rows.get("after-db").at("/data/rawRows/assessments/0")).put("evaluatorVersion","evaluator-v2");
         assertThrows(AssertionError.class, () -> engine.check(a,rows,aliases));
+    }
+    @Test void twoAbsentParentSnapshotsCannotProvePreservedAssessment() throws Exception {
+        var rows = new HashMap<String, JsonNode>();
+        rows.put("before-db", captured("{\"rawRows\":{\"assessments\":[]}}"));
+        rows.put("after-db", captured("{\"rawRows\":{\"assessments\":[]}}"));
+        engine.check(assertion("C5","failed-link","parent-assessment-not-rewritten"),rows,aliases);
+        assertThrows(AssertionError.class, () -> engine.check(assertion("C5","failed-link","parent-assessment-not-rewritten-baseline-one"),rows,aliases));
     }
     @Test void failedLinkCannotHideOtherOwnerAssignment() throws Exception {
         var rows = new HashMap<String, JsonNode>();
