@@ -88,6 +88,15 @@ public final class ReviewContractTest {
             assertTrue(assertThrows(IllegalArgumentException.class,()->runner(file,Map.of("barrier",captured("barrier",mutant,null,false))).run(false)).getMessage().contains(field));
         }
     }
+    @Test void processWiringRejectsBareAckAndPreservesUnavailableStatus() throws Exception {
+        ObjectNode a=(ObjectNode)action("process","control");a.set("control",Json.parse("{\"type\":\"process\",\"operation\":\"restart\",\"parameters\":{\"processId\":\"synthetic-worker\"}}"));
+        Path file=caseFile(List.of(a),List.of(assertion("ack","process","/data/acknowledged",Json.MAPPER.valueToTree(true))));
+        ObjectNode ack=Json.object();ack.put("acknowledged",true).put("controlType","process").put("operation","restart").put("acknowledgedAt","2026-10-07T00:00:00Z");
+        assertTrue(assertThrows(IllegalArgumentException.class,()->runner(file,Map.of("process",captured("process",ack,null,false))).run(false)).getMessage().contains("hostObservation"));
+        ack.set("hostObservation",Json.object());assertThrows(IllegalArgumentException.class,()->runner(file,Map.of("process",captured("process",ack,null,false))).run(false));
+        CaseRunner missing=runner(file,Map.of());assertEquals("NOT_RUN",missing.run(false));assertEquals("NOT_IMPLEMENTED",missing.results().get("process").path("driverStatus").asText());assertTrue(missing.results().get("process").path("data").isNull());
+        assertThrows(AssertionError.class,missing::verifyComplete);
+    }
     @Test void confirmedFailureSurvivesAnotherUnavailableAssertionSource() throws Exception {
         Path file=caseFile(List.of(invocation("executed","invoke"),invocation("missing","invoke")),List.of(assertion("wrong","executed","/response/effects",Json.MAPPER.valueToTree(0)),assertion("unavailable","missing","/response/effects",Json.MAPPER.valueToTree(0))));
         CaseRunner r=runner(file,Map.of("executed",captured("executed",Json.object(),Json.parse("{\"effects\":1}"),false)));

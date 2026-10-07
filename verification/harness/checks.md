@@ -117,3 +117,24 @@ NOT_IMPLEMENTED assertion FAIL1, 오류/skip0, exit1을 유지했다.
 JUnit/Cucumber와 source hash를 남겼다. 추가 test의 초기 Jackson generic
 inference 오류는 List<JsonNode>로 교정했고 제품 RED로 세지 않았다.
 제품 runtime은 NOT_RUN이며 host 통합/wiring은 아직 별도 후속이다.
+
+## typed host wiring 통합
+
+coordinator가 host 계약을 dependency `4ed71e5`로 이 worktree에 통합했다.
+CaseRunner의 EXECUTED process control에서 resolvedControl을 새
+HostObservationValidator에 직접 넘긴다. reflection/fallback은 없다.
+고유 wiring test에서 단순 ACK와 빈 hostObservation을 거부하고,
+NOT_IMPLEMENTED/null process는 NOT_RUN을 유지한다. 기존 parallel
+restart child도 미구현 상태와 availability guard를 그대로 유지한다.
+
+`./verify harness`는 host selftests 포함52 tests PASS, 실패/오류/skip0,
+한국어 Gherkin1 실행이다. classpath와 file selector contract-red는 각각
+unique scenario1의 NOT_IMPLEMENTED assertion FAIL1, 오류/skip0, exit1을
+유지했다. example scenarios와 recovery는 NOT_RUN/exit2다.
+[typed wiring 증거](evidence/host-wiring/summary.json)에 source hash와
+JUnit/Cucumber/명령/실제 exit/log를 남겼다. host 고정 표본은 실제 process
+실행 증거가 아니며 model/BTP/운영 process를 실행하지 않았다.
+
+이 commit은 host schema/validator/test와 Main/PreparationValidator/pom을
+바꾸지 않는다. preparation tests가 없는 isolated worktree 결과이므로
+coordinator의 전체 통합 검사가 남았고 B2/Step2 완료를 주장하지 않는다.

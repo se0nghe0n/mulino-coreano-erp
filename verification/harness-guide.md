@@ -391,3 +391,12 @@ approvalValid/isValid/amountPaid/quantity와 Boolean 업무 결과는 허용하�
 한다. 버전·단위·업무 상태와 수량 기대값은 계속 독립 고정값으로 둔다.
 허용 목록 확장은 계획상 identity임을 확인한 뒤 explicit 계약 변경으로
 처리한다. 이름만 바꾼 업무값을 identity로 표시해서 oracle를 우회하지 않는다.
+
+
+Host 통합은 EXECUTED process control의 ACK 검사 뒤
+`HostObservationValidator.validate(validator, resolvedControl, result)`를
+직접 호출한다. 단순 ACK·빈 hostObservation은 runtime assertion 전에
+거부한다. NOT_IMPLEMENTED/UNAVAILABLE 결과는 사실 없는 null 상태를
+유지하며 전체 case를 PASS로 만들지 않는다. clock/barrier 등 다른 control은
+각자의 기존 계약을 사용한다. 검증 대상은 실제 실행 증거이며 harness가
+process command argv를 실행하지 않는다.

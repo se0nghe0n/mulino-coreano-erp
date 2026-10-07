@@ -1,0 +1,91 @@
+{
+  "baselineCommit": "4ed71e5",
+  "dependency": "Host contract integrated by coordinator from74c2525",
+  "sourceState": "DIRTY_WORKTREE_WITH_TYPED_HOST_WIRING",
+  "harness": {
+    "status": "PASS",
+    "exitCode": 0,
+    "tests": 52,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "koreanSmokeScenarios": 1
+  },
+  "contractRed": {
+    "exitCode": 1,
+    "discoveredScenarios": 1,
+    "notImplementedAssertionFailures": 1,
+    "environmentOrSyntaxFailure": false
+  },
+  "fileSelectorRed": {
+    "expectedScenarios": 1,
+    "discoveredScenarios": 1,
+    "startedScenarios": 1,
+    "skippedScenarios": 0,
+    "failedScenarios": 1,
+    "notImplementedAssertionFailures": 1,
+    "status": "FAIL",
+    "productCoverageClaimed": false,
+    "failureReasons": [
+      "java.lang.AssertionError: source after is NOT_IMPLEMENTED: NOT_IMPLEMENTED: no real product adapters installed"
+    ]
+  },
+  "runtimeProfiles": {
+    "scenarios": {
+      "status": "NOT_RUN",
+      "exitCode": 2
+    },
+    "recovery": {
+      "status": "NOT_RUN",
+      "exitCode": 2
+    }
+  },
+  "sourceFilesSha256": {
+    "verification/harness/src/main/java/org/mulino/verification/CaseRunner.java": "16e68ab7e911921968419c0e1c54e906cb87710b1d06213799ef31d06691b630",
+    "verification/harness/src/main/java/org/mulino/verification/HostObservationValidator.java": "545282a6ba54e14c1d22e65785ff5170238099d8ab91dbaa6b3c18642d4c5d35",
+    "verification/harness/src/test/java/org/mulino/verification/ReviewContractTest.java": "411ae307cfc81295ebe5bb53e44d9ffae97f1683cf72884389ff8307e2151d44",
+    "verification/harness/src/test/java/org/mulino/verification/RunnerPortTest.java": "4e86630db9b7e4a23108fde00ef6ef6252039594b476e7f935e0bf594d7ba508",
+    "contracts/acceptance-host-observation.schema.json": "bd9a3d7b1c8d8b992be016429564e80d11ccb55b2d7bd6619f5c2117cc994897",
+    "verification/harness-guide.md": "4159c2c5bf079d8cf1a7916ffdb409ed261d4e4ed47ebfba3226932a8551bc1f",
+    "verification/host-observation-guide.md": "b5e4ccb88aedd3379107c2063ef8ccc39272c00f3bc688f49cffefa0a2d0219e"
+  },
+  "logNormalization": [
+    {
+      "file": "verification/harness/evidence/host-wiring/host-wiring-contract-red-explicit.log",
+      "rawSha256": "e76a3cbee5058450aa78c1be2da9e0c0607dd7f43709c8f6eae20ebca8ae2911",
+      "sha256": "ca45bf516e019047a9b99acff9e124636c680adad06b4b8fb0e2bf6bec84c7c2",
+      "normalization": "Tabs expanded/trailing whitespace removed only"
+    },
+    {
+      "file": "verification/harness/evidence/host-wiring/host-wiring-contract-red.log",
+      "rawSha256": "66851edf680bb7e2e7e336361bedba3d07e5f35d8eb11a88f67628c0049fe4a9",
+      "sha256": "96a23fae6d7dd9b43598535a96e6498aee4e3baa16f67cc01f3968a28c984088",
+      "normalization": "Tabs expanded/trailing whitespace removed only"
+    },
+    {
+      "file": "verification/harness/evidence/host-wiring/host-wiring-harness.log",
+      "rawSha256": "1437781420da0a892e8c1cfb9b3c7c4152c0d8e085f0fe28fb2d0a71352f6a55",
+      "sha256": "2d23e83094fe3fde626bac726f126bdd2dd7234976d1563f97a50e8e7fe6f151",
+      "normalization": "Tabs expanded/trailing whitespace removed only"
+    },
+    {
+      "file": "verification/harness/evidence/host-wiring/host-wiring-recovery.log",
+      "rawSha256": "b951e6b0d72645d806914767371023a12ce1d4f8af11dc50f9723c46ea11f2b2",
+      "sha256": "39d020fa25cc10032d0177980805f9b922bb024578bf8805e15a102ac4b719ca",
+      "normalization": "Tabs expanded/trailing whitespace removed only"
+    },
+    {
+      "file": "verification/harness/evidence/host-wiring/host-wiring-scenarios.log",
+      "rawSha256": "83de5e2aca8e71c953cff81c178a1daac947d7e425695de06042a8310cba4a0a",
+      "sha256": "58ba78d8cfad73d18a3f117c4b2ece956a0cbce545bfbeea09f339a460621686",
+      "normalization": "Tabs expanded/trailing whitespace removed only"
+    }
+  ],
+  "productGateComplete": false,
+  "knownLimits": [
+    "Standalone host validator samples are CAPTURED_SELFTEST and never execute actual processes.",
+    "Actual process/DB/service/model/BTP adapters absent; runtime gates incomplete.",
+    "Preparation tests not in isolated worktree; coordinator aggregate verification remains required.",
+    "No host schema/validator/test files altered in this wiring commit."
+  ]
+}

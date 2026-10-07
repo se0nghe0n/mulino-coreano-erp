@@ -69,6 +69,7 @@ public final class CaseRunner {
                     throw new IllegalArgumentException("Control ACK does not match requested control type/operation");
                 if(!result.data().hasNonNull("acknowledgedAt")) throw new IllegalArgumentException("Control ACK time absent");
                 JsonNode requested=resolve(a.path("control"));
+                HostObservationValidator.validate(validator,requested,result);
                 if(requested.path("type").asText().equals("barrier")) for(String field:List.of("barrierId","participantId","transactionId","point","state"))
                     if(!requested.path("parameters").hasNonNull(field) || !result.data().hasNonNull(field) || !result.data().path(field).equals(requested.path("parameters").path(field)))
                         throw new IllegalArgumentException("Barrier ACK differs from requested "+field);
