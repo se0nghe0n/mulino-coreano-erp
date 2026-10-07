@@ -15,7 +15,7 @@ public class IdentityQueries implements QueryHandler {
     auth.authorize(c,request.operation(),null);
     if("getAccessContext".equals(request.operation())) {
       var actor=repository.actor(c.organizationId(),c.actorId()).orElseThrow(IdentityAuthorization::denied);
-      return QueryResult.of(Map.of("actorId",c.actorId(),"organizationId",c.organizationId(),"stableRequestOwner",c.stableRequestOwner(),"kind",actor.get("kind"),"assignments",repository.rows("CapabilityAssignments",c.organizationId()).stream().filter(r -> c.actorId().equals(r.get("actorId"))).toList(),"grants",repository.rows("Grants",c.organizationId()).stream().filter(r -> c.actorId().equals(r.get("actorId"))).map(this::grantView).toList()),Map.of("organizationId",c.organizationId(),"actorId",c.actorId()));
+      return QueryResult.of(Map.of("actorId",c.actorId(),"organizationId",c.organizationId(),"stableRequestOwner",c.stableRequestOwner(),"kind",actor.get("kind"),"assignments",repository.rows("CapabilityAssignments",c.organizationId()).stream().filter(r -> c.actorId().equals(r.get("actorId"))&&IdentityAuthorization.active(r,auth.now())).toList(),"grants",repository.rows("Grants",c.organizationId()).stream().filter(r -> c.actorId().equals(r.get("actorId"))&&IdentityAuthorization.active(r,auth.now())).map(this::grantView).toList()),Map.of("organizationId",c.organizationId(),"actorId",c.actorId()));
     }
     var grant=repository.rows("Grants",c.organizationId()).stream().filter(r -> Objects.equals(request.id(),r.get("ID"))&&(c.actorId().equals(r.get("actorId"))||c.actorId().equals(r.get("delegatorId")))).findFirst().orElseThrow(IdentityAuthorization::denied);
     String id=(String)grant.get("ID");

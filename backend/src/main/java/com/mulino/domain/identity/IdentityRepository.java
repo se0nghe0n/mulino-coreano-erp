@@ -1,6 +1,8 @@
 package com.mulino.domain.identity;
 
 import com.sap.cds.ql.Select;
+import com.sap.cds.ql.Insert;
+import com.sap.cds.ql.Update;
 import com.sap.cds.services.persistence.PersistenceService;
 import java.util.*;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -35,4 +37,12 @@ public class IdentityRepository {
       if(found.isEmpty()) throw new org.springframework.security.access.AccessDeniedException("Unavailable authority");
     }
   }
+  public void insert(String entity,Map<String,Object> row) { db.run(Insert.into("mulino.identity."+entity).entry(row)); }
+  public void update(String entity,String org,String id,Map<String,Object> values) {
+    db.run(Update.entity("mulino.identity."+entity).data(values).where(b -> b.get("organizationId").eq(org).and(b.get("ID").eq(id))));
+  }
+  public void invalidate(String org,String actor,java.time.Instant now,String reason) {
+    insert("AuthorityInvalidations",Map.of("organizationId",org,"ID",UUID.randomUUID().toString(),"actorId",actor,"nextCheckAt",now,"reason",reason,"revision",1));
+  }
+
 }

@@ -20,6 +20,7 @@ public class IdentityControlGuard {
     var actor=repository.actor(context.organizationId(),context.actorId()).orElseThrow(IdentityAuthorization::denied);
     if(!"HUMAN".equals(actor.get("kind"))||recipient.equals(context.actorId())||capabilities.isEmpty()||scopes.isEmpty()||!until.isAfter(from)) throw IdentityAuthorization.denied();
     repository.actor(context.organizationId(),recipient).orElseThrow(IdentityAuthorization::denied);
+    if(!repository.rows("Memberships",context.organizationId()).stream().anyMatch(r -> recipient.equals(r.get("actorId")) && IdentityAuthorization.active(r,auth.now()))) throw IdentityAuthorization.denied();
     Map<String,Collection<String>> requested=new HashMap<>();
     for(Scope scope:scopes) requested.computeIfAbsent(scope.kind(),k -> new HashSet<>()).add(scope.id());
     var combinations=scopeCombinations(requested);
@@ -29,7 +30,7 @@ public class IdentityControlGuard {
     }
     // Delegation validity cannot exceed any current authority's earliest terminal boundary.
     Instant bound=delegationBoundary(context,capabilities,scopes);
-    if(from.isBefore(Instant.now())||until.isAfter(bound)) throw IdentityAuthorization.denied();
+    if(until.isAfter(bound)) throw IdentityAuthorization.denied();
   }
   private List<Map<String,Collection<String>>> scopeCombinations(Map<String,Collection<String>> scopes) {
     List<Map<String,Collection<String>>> result=new ArrayList<>();result.add(Map.of());
@@ -62,7 +63,7 @@ public class IdentityControlGuard {
     return auth.permitted(c,capability,c.organizationId(),"ORGANIZATION");
   }
   private Instant delegationBoundary(DomainContext c,Set<String> capabilities,Set<Scope> scopes) {
-    Instant now=Instant.now(),bound=Instant.MAX;
+    Instant now=auth.now(),bound=Instant.MAX;
     for(var row:repository.rows("Memberships",c.organizationId())) if(c.actorId().equals(row.get("actorId"))&&IdentityAuthorization.active(row,now)) bound=earliest(bound,row);
     for(var row:repository.rows("CapabilityAssignments",c.organizationId())) if(c.actorId().equals(row.get("actorId"))&&capabilities.contains(row.get("capabilityId"))&&IdentityAuthorization.active(row,now)) bound=earliest(bound,row);
     for(var row:repository.rows("Grants",c.organizationId())) if(c.actorId().equals(row.get("actorId"))&&IdentityAuthorization.active(row,now)) bound=earliest(bound,row);

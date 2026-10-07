@@ -12,11 +12,12 @@ import org.springframework.stereotype.Component;
 @Component
 public class IdentityAuthorization implements ReadAuthorizer {
   private final IdentityRepository repository;
-  private final Clock clock;
+  private final ExecutionClock clock;
   @org.springframework.beans.factory.annotation.Autowired
-  public IdentityAuthorization(IdentityRepository repository) { this(repository,Clock.systemUTC()); }
-  IdentityAuthorization(IdentityRepository repository,Clock clock) { this.repository=repository; this.clock=clock; }
+  public IdentityAuthorization(IdentityRepository repository,ExecutionClock clock) { this.repository=repository; this.clock=clock; }
+  IdentityAuthorization(IdentityRepository repository,Clock clock) { this(repository,new ExecutionClock(clock)); }
 
+  public Instant now() { return clock.instant(); }
   @Override public DomainContext context(Instant asOf,Instant knownAt) {
     var authentication=SecurityContextHolder.getContext().getAuthentication();
     if(authentication==null || !authentication.isAuthenticated() || !(authentication.getPrincipal() instanceof Jwt jwt)
@@ -41,14 +42,24 @@ public class IdentityAuthorization implements ReadAuthorizer {
   }
   /** Scope dimensions intersect; IDs within one dimension are alternatives. */
   public boolean permittedScopes(DomainContext context,String capability,Map<String,? extends Collection<String>> targets) {
+    return permittedScopes(context,capability,targets,new HashSet<>());
+  }
+  private boolean permittedScopes(DomainContext context,String capability,Map<String,? extends Collection<String>> targets,Set<String> visited) {
     Instant now=clock.instant();
     String org=context.organizationId(),actor=context.actorId();
+    if(!visited.add(actor)||visited.size()>32)return false;
     if(!repository.rows("Memberships",org).stream().anyMatch(r -> actor.equals(r.get("actorId")) && active(r,now))) return false;
     var assigned=repository.rows("CapabilityAssignments",org).stream().filter(r -> actor.equals(r.get("actorId")) && capability.equals(r.get("capabilityId")) && active(r,now)).toList();
     var actions=repository.rows("GrantActions",org); var allScopes=repository.rows("GrantScopes",org);
     for(var grant:repository.rows("Grants",org)) {
       if(!actor.equals(grant.get("actorId")) || !active(grant,now)) continue;
       String id=(String)grant.get("ID");
+      Object delegator=grant.get("delegatorId");
+      if(delegator instanceof String d&&!d.equals(actor)) {
+        var owner=repository.actor(org,d).orElse(null);if(owner==null)continue;
+        var parent=new DomainContext(org,d,(String)owner.get("stableRequestOwner"),context.asOf(),context.knownAt());
+        if(!permittedScopes(parent,capability,targets,new HashSet<>(visited)))continue;
+      }
       if(actions.stream().noneMatch(r -> id.equals(r.get("grantId")) && capability.equals(r.get("capabilityId")))) continue;
       var scopes=allScopes.stream().filter(r -> id.equals(r.get("grantId"))).toList();
       if(scopes.isEmpty()) continue;
@@ -69,7 +80,10 @@ public class IdentityAuthorization implements ReadAuthorizer {
     return ids!=null&&ids.contains(scope.get("scopeId"));
   }
   public void fence(DomainContext context,Collection<String> otherActors) {
-    var actors=new HashSet<>(otherActors); actors.add(context.actorId()); repository.fence(context.organizationId(),actors);
+    var actors=new HashSet<>(otherActors); actors.add(context.actorId());
+    var grants=repository.rows("Grants",context.organizationId());
+    boolean expanded;do { expanded=false;for(var g:grants)if(actors.contains(g.get("actorId"))&&g.get("delegatorId") instanceof String d)expanded|=actors.add(d); }while(expanded);
+    repository.fence(context.organizationId(),actors);
   }
   static boolean overlaps(Map<String,Object> a,Map<String,Object> b,String org) {
     return organizationScope(a,org)||organizationScope(b,org)||Objects.equals(a.get("scopeKind"),b.get("scopeKind"))&&Objects.equals(a.get("scopeId"),b.get("scopeId"));
