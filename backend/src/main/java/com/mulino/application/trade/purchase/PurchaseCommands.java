@@ -18,7 +18,7 @@ import org.springframework.stereotype.Component;
 public class PurchaseCommands implements CommandHandler,PurchaseLinePort {
  private final PurchaseConditions conditions;private final PurchaseRepository r;private final WorkAccess works;private final IdentityRepository identities;
  private final IdentityAuthorization auth;private final PolicyCommandGuard policy;private final TransactionalOutboxPort outbox;
- private final com.mulino.application.trade.TradeEvidence evidence;private final RuntimeDutyPort duties;private final ExecutionClock clock;private final ObjectMapper json=new ObjectMapper();
+ private final com.mulino.application.trade.TradeEvidence evidence;private final RuntimeDutyPort duties;private final ExecutionClock clock;private final ObjectMapper json=new ObjectMapper().findAndRegisterModules().configure(com.fasterxml.jackson.databind.SerializationFeature.ORDER_MAP_ENTRIES_BY_KEYS,true);
  public PurchaseCommands(PurchaseRepository r,WorkAccess works,IdentityRepository identities,IdentityAuthorization auth,PolicyCommandGuard policy,TransactionalOutboxPort outbox,RuntimeDutyPort duties,ExecutionClock clock,com.mulino.application.trade.TradeEvidence evidence,PurchaseConditions conditions){this.r=r;this.works=works;this.identities=identities;this.auth=auth;this.policy=policy;this.outbox=outbox;this.duties=duties;this.clock=clock;this.evidence=evidence;this.conditions=conditions;}
  public Set<String> capabilities(){return Set.of("proposePurchase","revisePurchase","approvePurchase","dispatchPurchaseOrder","recordSupplierReply","cancelPurchase");}
  public Set<String> definitionVersions(){return Set.of("1.0.0","definition-v1");}
