@@ -123,4 +123,10 @@ class S2WorkActualIntegrationTest {
     run("closeWork",revision(source),Map.of("workId",source,"reason","CANCELLED"));assertEquals("UNSATISFIED",((Map<?,?>)assess(parent).get("assessment")).get("outcome"));assertThrows(DomainError.class,()->run("closeWork",revision(parent),Map.of("workId",parent,"reason","FULFILLED")));assertEquals("ACTIVE",jdbc.queryForObject("SELECT status FROM mulino_work_read_Works WHERE ID=?",String.class,parent));
   }
 
+  @Test void publicCreateWorkPinsExplicitExclusivePeriodEnd() throws Exception {
+    var slots=row("workType","PURCHASE_ARRIVAL","quantity",Map.of("value","100","unit","BOX","provenance","USER"),"dueAt","2026-10-31T00:00:00Z","endpoint","ARRIVED","quantityMode","CUMULATIVE_EVENT","period",Map.of("start","2026-10-01T00:00:00Z","end","2026-10-31T00:00:00Z","startInclusive",true,"endInclusive",false),"eventKinds",List.of("RECEIPT"),"distinctContributionScope","DIRECT","evidencePolicyVersion","fixture-v1","timezone","UTC","ownerId",actor,"supervisorId",actor);
+    var intent=row("capabilityId","createWork","definitionVersion","1.0.0","subjectRefs",List.of(Map.of("type","TradeItem","id",item)),"slots",slots,"provenance",Map.of("quantity","USER"),"expectedRevision",0);
+    var response=runtime.requestContext().run(ctx->{return new org.springframework.transaction.support.TransactionTemplate(transactions).execute(tx->lifecycle.execute(context(),intent));});String created=String.valueOf(response.get("workId"));String stored=jdbc.queryForObject("SELECT slotsJson FROM mulino_work_read_GoalReferences WHERE workId=?",String.class,created);var goal=json.readValue(stored,Map.class);assertEquals(false,goal.get("periodEndInclusive"));assertEquals(true,goal.get("periodStartInclusive"));assertEquals("ACTIVE",jdbc.queryForObject("SELECT status FROM mulino_work_read_Works WHERE ID=?",String.class,created));assertEquals(1,jdbc.queryForObject("SELECT count(*) FROM mulino_work_read_AssessmentReferences WHERE workId=?",Integer.class,created));
+  }
+
 }
