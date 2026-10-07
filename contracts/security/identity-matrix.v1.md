@@ -18,8 +18,8 @@ Spring Boot4.1.1 후보의 모든 공개 경로는 하나의 Spring Security cha
 | worker | 원 actor/grant와 현재 fence 재검증 | system user 자체 권한 승격 금지 |
 
 GET `/api/platform/scopes/{id}`, POST `/api/platform/actions/reserve`,
-GET `/odata/v4/PlatformService/Scopes`, POST
-`/odata/v4/PlatformService/reserve`, POST `/mcp`는 같은 chain으로 보호한다.
+GET `/odata/v4/platform/Scopes`, POST
+`/odata/v4/platform/reserve`, POST `/mcp`는 같은 chain으로 보호한다.
 OData metadata·nested·projection·batch도 별도 허용 경로를 만들지 않는다.
 범용 core INSERT/UPDATE/DELETE는 공개하지 않는다. 미구현 nested/batch,
 worker/blob 경로는 NOT_RUN이며 응답 거부만으로 rollback을 증명하지 않는다.

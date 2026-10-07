@@ -48,9 +48,13 @@ if (mode === 'prepare') {
     const statusOk = test.status.includes(actual.status);
     const unchanged = before===null || (before.status===200 && after.status===200 &&
       JSON.stringify(before.body)===JSON.stringify(after.body));
-    const bodyOk = !test.bodyContains || JSON.stringify(actual.body).includes(test.bodyContains);
+    const bodyOk = (!test.bodyContains || JSON.stringify(actual.body).includes(test.bodyContains)) &&
+      Object.entries(test.bodyEquals??{}).every(([pointer,value])=>{
+        const observed=pointer.split('/').slice(1).reduce((obj,key)=>obj?.[key],actual.body);
+        return JSON.stringify(observed)===JSON.stringify(value);
+      });
     observations.push({id:test.id,method:test.route.method,path:test.route.path,status:actual.status,
-      expectedStatus:test.status,responseHash:actual.bodyHash,expectedCode:test.bodyContains??null,
+      expectedStatus:test.status,responseHash:actual.bodyHash,expectedCode:test.bodyContains??null,expectedBody:test.bodyEquals??null,
       bodyCodeMatches:bodyOk,snapshotBefore:before?.body??null,snapshotAfter:after?.body??null,
       publicSnapshotUnchanged:unchanged,result:statusOk&&unchanged&&bodyOk?'PASS':'FAIL'});
   }
