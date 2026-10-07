@@ -20,7 +20,7 @@ public class InventoryQueries implements QueryHandler {
   public InventoryQueries(InventoryRepository repository, ReadAuthorizer authorizer,List<InventoryReadFacts> facts,List<ObjectReadProvider> providers) {
     this.repository=repository; this.authorizer=authorizer;this.facts=List.copyOf(facts);
     for(var provider:providers)for(String type:provider.objectTypes())if(TYPES.containsKey(type)||objects.put(type,provider)!=null)throw new IllegalStateException("Duplicate noun read provider "+type);
-    var owned=new HashSet<String>();for(var provider:facts)for(String metric:provider.metrics())if(!Set.of("eligibleQuantity","reservedQuantity","unreservedEligibleQuantity","cumulativeArrival","eligibilityStatus").contains(metric)||!owned.add(metric))throw new IllegalStateException("Invalid or duplicate inventory metric "+metric);
+    var owned=new HashSet<String>();for(var provider:facts)for(String metric:provider.metrics())if(!Set.of("eligibleQuantity","reservedQuantity","unreservedEligibleQuantity","cumulativeArrival","eligibilityStatus","allocationShortageQuantity","reservationResponsibilityQuantity").contains(metric)||!owned.add(metric))throw new IllegalStateException("Invalid or duplicate inventory metric "+metric);
   }
   public Set<String> operations() { return Set.of("getObject","searchObjects","getInventory","getTrace","traceLot"); }
   public QueryResult query(DomainContext c, QueryRequest q) {

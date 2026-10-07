@@ -15,7 +15,7 @@ import org.springframework.stereotype.Component;
 public class QualityEligibility implements InventoryReadFacts,QueryHandler {
  private final InventoryRepository r;private final StockPrimitives stock;private final QualityEvidence evidence;private final RegulatoryEligibility regulatory;private final PolicyRepository policies;private final IdentityAuthorization auth;
  public QualityEligibility(InventoryRepository r,StockPrimitives stock,QualityEvidence evidence,RegulatoryEligibility regulatory,PolicyRepository policies,IdentityAuthorization auth){this.r=r;this.stock=stock;this.evidence=evidence;this.regulatory=regulatory;this.policies=policies;this.auth=auth;}
- public Set<String>metrics(){return Set.of("eligibleQuantity","reservedQuantity","unreservedEligibleQuantity","eligibilityStatus");}
+ public Set<String>metrics(){return Set.of("eligibleQuantity","reservedQuantity","unreservedEligibleQuantity","eligibilityStatus","allocationShortageQuantity","reservationResponsibilityQuantity");}
  public Set<String>operations(){return Set.of("evaluateEligibility");}
  public record Result(String state,BigDecimal eligibleQuantity,List<QualityRanges.Range>ranges,List<Map<String,Object>>conditions,List<String>evidenceRefs,List<String>unknowns,Instant nextValidityBoundary){}
  public Result assess(DomainContext c,Map<String,Object>segment,String action,String customerId){
@@ -65,7 +65,10 @@ public class QualityEligibility implements InventoryReadFacts,QueryHandler {
    var allocations=r.rows(c,"SegmentAllocations").stream().filter(a->segment.get("ID").equals(a.get("segmentId"))&&Set.of("EXECUTABLE","SUSPENDED").contains(a.get("state"))).toList();var ranges=new ArrayList<QualityRanges.Range>();BigDecimal unidentified=BigDecimal.ZERO;for(var a:allocations){reserved=reserved.add((BigDecimal)a.get("quantity"));if(a.get("startQuantity")==null)unidentified=unidentified.add((BigDecimal)a.get("quantity"));else ranges.add(range(a));}
    unreserved=unreserved.add(QualityRanges.quantity(QualityRanges.subtract(result.ranges(),ranges)).subtract(unidentified).max(BigDecimal.ZERO));
   }
-  return new Facts(Map.of("eligibleQuantity",InventoryQuantity.text(eligible),"reservedQuantity",InventoryQuantity.text(reserved),"unreservedEligibleQuantity",InventoryQuantity.text(unreserved),"eligibilityStatus",eligible.signum()>0?(partial?"PARTIAL":"ALLOWED"):(unknowns.isEmpty()?"DENIED":"UNKNOWN")),List.copyOf(unknowns),List.of(),List.copyOf(refs));
+  BigDecimal shortage=BigDecimal.ZERO;
+  for(var a:r.rows(c,"SegmentAllocations"))if("SUSPENDED".equals(a.get("state"))&&Set.of("PHYSICAL_SHORTAGE","PHYSICAL_RANGE_UNCONFIRMED").contains(Objects.toString(a.get("suspensionReason"),""))){var source=r.object(c,"QuantitySegments",(String)a.get("segmentId"));if(itemId.equals(source.get("itemId"))&&(scope.get("placeId")==null||scope.get("placeId").equals(source.get("placeId")))&&(scope.get("lotId")==null||scope.get("lotId").equals(source.get("lotId")))&&(scope.get("customerId")==null||scope.get("customerId").equals(a.get("customerId")))&&auth.permittedScopes(c,operation,Map.of("TARGET",List.of((String)source.get("ID")),"ITEM",List.of(itemId),"PLACE",List.of((String)source.get("placeId")))))shortage=shortage.add((BigDecimal)a.get("quantity"));}
+  if(shortage.signum()>0)unknowns.add("UNRESOLVED_ALLOCATION_PHYSICAL_SCOPE");
+  return new Facts(Map.of("eligibleQuantity",InventoryQuantity.text(eligible),"reservedQuantity",InventoryQuantity.text(reserved),"allocationShortageQuantity",InventoryQuantity.text(shortage),"reservationResponsibilityQuantity",InventoryQuantity.text(reserved.add(shortage)),"unreservedEligibleQuantity",InventoryQuantity.text(unreserved),"eligibilityStatus",eligible.signum()>0?(partial?"PARTIAL":"ALLOWED"):(unknowns.isEmpty()?"DENIED":"UNKNOWN")),List.copyOf(unknowns),List.of(),List.copyOf(refs));
  }
  /** S4 consumers use this inside their gateway transaction; a delayed sweep grants no execution. */
  public Result requireExecutableAllocation(DomainContext c,String allocationId,String capability,String action,String customerId){
