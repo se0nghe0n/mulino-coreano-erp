@@ -16,9 +16,17 @@ public class PurchaseConditions {
  for(Object selector:selectors){String name=selector instanceof String s?s:selector instanceof Map<?,?> m&&m.keySet().equals(Set.of("id"))?Objects.toString(m.get("id")):null;if(name==null)throw unsupported();var template=d.goals().stream().filter(g->name.equals(g.name())).findFirst().orElseThrow(PurchaseConditions::unsupported);if(!TypedPredicateEvaluator.VERSION.equals(template.evaluatorVersion())||!"VALID".equals(validator.validatePredicate(d,template.predicate()).outcome()))throw unsupported();
  var slots=new LinkedHashMap<String,Object>();try{var goal=works.currentGoal(c,w.get("ID").toString());if(goal.get("slotsJson")!=null)slots.putAll(json.readValue(goal.get("slotsJson").toString(),Map.class));}catch(DomainError absent){/* A bounded state prerequisite may use published physical facts without a Work goal. */}
  slots.put("quantityMode",template.quantityMode());slots.put("endpoint",template.endpoint());slots.put("scope",Map.of("itemId",revision.get("itemId"),"placeId",revision.get("destinationId")));slots.put("action","PHYSICAL");slots.put("includeReserved",true);
- var loaded=facts.load(c,w,slots,d);var result=new TypedPredicateEvaluator().evaluate(template.predicate(),loaded,c.asOf(),c.knownAt());if(result.truth().state()!=PredicateTruth.State.SATISFIED||result.truth().conflict())throw new DomainError("HELD","APPROVAL_CONDITION_UNVERIFIED","Current authoritative approval condition is not satisfied");results.add(Map.of("conditionId",name,"predicate",template.predicate(),"conditions",result.conditions(),"factSnapshotHash",DefinitionRepository.sha256(json.writeValueAsString(loaded))));
+ var loaded=facts.load(c,w,slots,d);var result=new TypedPredicateEvaluator().evaluate(template.predicate(),loaded,c.asOf(),c.knownAt());if(result.truth().state()!=PredicateTruth.State.SATISFIED||result.truth().conflict())throw new DomainError("HELD","APPROVAL_CONDITION_UNVERIFIED","Current authoritative approval condition is not satisfied");results.add(Map.of("conditionId",name,"predicate",template.predicate(),"conditions",normalize(result.conditions()),"factSnapshotHash",DefinitionRepository.sha256(json.writeValueAsString(normalize(loaded)))));
  }
  return Map.of("definitionVersionId",definition,"definitionHash",d.contentHash(),"evaluatorVersion",TypedPredicateEvaluator.VERSION,"asOf",c.asOf().toString(),"knownAt",c.knownAt().toString(),"conditions",results);
  }catch(DomainError e){throw e;}catch(Exception e){throw unsupported();}}
+ private static Object normalize(Object value){
+  if(value==null)return null;
+  if(value instanceof java.time.temporal.TemporalAccessor)return value.toString();
+  if(value instanceof Map<?,?> values){var out=new TreeMap<String,Object>();values.forEach((k,v)->out.put(k.toString(),normalize(v)));return out;}
+  if(value instanceof Collection<?> values)return values.stream().map(PurchaseConditions::normalize).toList();
+  if(value.getClass().isRecord()){var out=new TreeMap<String,Object>();for(var field:value.getClass().getRecordComponents())try{out.put(field.getName(),normalize(field.getAccessor().invoke(value)));}catch(ReflectiveOperationException e){throw unsupported();}return out;}
+  return value;
+ }
  private static DomainError unsupported(){return new DomainError("HELD","APPROVAL_CONDITION_UNSUPPORTED","Conditional selector or pinned predicate is unsupported");}
 }
