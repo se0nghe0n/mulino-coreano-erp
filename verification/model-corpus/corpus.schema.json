@@ -55,7 +55,8 @@
         "obligationsScope",
         "denialScope",
         "slotScope",
-        "fixtureScope"
+        "fixtureScope",
+        "negativeExecutionPaths"
       ]
     },
     "cases": {
@@ -92,6 +93,10 @@
           ]
         },
         "sourceRef": {
+          "type": "string",
+          "minLength": 1
+        },
+        "sourceText": {
           "type": "string",
           "minLength": 1
         }
@@ -352,6 +357,78 @@
             "approvalByAnswer"
           ],
           "additionalProperties": false
+        },
+        "unlistedEffectPolicy": {
+          "const": "FORBIDDEN"
+        },
+        "sitDirectCommand": {
+          "type": "object",
+          "properties": {
+            "expectedOutcome": {
+              "type": "string",
+              "minLength": 1
+            },
+            "assertions": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/assertion"
+              }
+            },
+            "actualCommandRequired": {
+              "const": true
+            }
+          },
+          "required": [
+            "expectedOutcome",
+            "assertions",
+            "actualCommandRequired"
+          ],
+          "additionalProperties": false
+        },
+        "uatCompletion": {
+          "type": "object",
+          "properties": {
+            "allowedPaths": {
+              "type": "array",
+              "items": {
+                "enum": [
+                  "EVIDENCED_PREFLIGHT_STOP",
+                  "SERVER_REJECTION"
+                ]
+              },
+              "minItems": 2,
+              "maxItems": 2
+            },
+            "requiresIndependentArtifacts": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1
+              },
+              "minItems": 4
+            },
+            "modelExplanationSufficient": {
+              "const": false
+            },
+            "commonBusinessAssertionsRequired": {
+              "const": true
+            },
+            "ownerAndObligationPreservationRequired": {
+              "const": true
+            },
+            "preflightBusinessEffectsMaximum": {
+              "const": 0
+            }
+          },
+          "required": [
+            "allowedPaths",
+            "requiresIndependentArtifacts",
+            "modelExplanationSufficient",
+            "commonBusinessAssertionsRequired",
+            "ownerAndObligationPreservationRequired",
+            "preflightBusinessEffectsMaximum"
+          ],
+          "additionalProperties": false
         }
       },
       "required": [
@@ -360,7 +437,8 @@
         "allowedEffects",
         "forbiddenEffects",
         "obligations",
-        "clarification"
+        "clarification",
+        "unlistedEffectPolicy"
       ],
       "additionalProperties": false
     },

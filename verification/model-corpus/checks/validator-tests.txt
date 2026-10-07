@@ -1,8 +1,21 @@
 test_ambiguous_input_cannot_authorize_business_effect (test_validate.CorpusValidationTests.test_ambiguous_input_cannot_authorize_business_effect) ... ok
+test_approval_hash_cannot_be_changed_to120 (test_validate.CorpusValidationTests.test_approval_hash_cannot_be_changed_to120) ... ok
 test_case_partial_usage_cannot_claim_complete (test_validate.CorpusValidationTests.test_case_partial_usage_cannot_claim_complete) ... ok
 test_clarification_answer_not_business_approval (test_validate.CorpusValidationTests.test_clarification_answer_not_business_approval) ... ok
+test_context_source_cannot_be_generic_fixture (test_validate.CorpusValidationTests.test_context_source_cannot_be_generic_fixture) ... ok
+test_context_source_must_resolve_exact_value (test_validate.CorpusValidationTests.test_context_source_must_resolve_exact_value) ... ok
+test_correction_baseline_must_not_seed_expected_shortfall (test_validate.CorpusValidationTests.test_correction_baseline_must_not_seed_expected_shortfall) ... ok
+test_correction_counterexample_requires_goal100 (test_validate.CorpusValidationTests.test_correction_counterexample_requires_goal100) ... ok
+test_correction_requires_delivery_goal_contribution (test_validate.CorpusValidationTests.test_correction_requires_delivery_goal_contribution) ... ok
 test_distinct_sixty_not_two_document_sum (test_validate.CorpusValidationTests.test_distinct_sixty_not_two_document_sum) ... ok
 test_duplicate_case_id (test_validate.CorpusValidationTests.test_duplicate_case_id) ... ok
+test_effective_approval_policy_cannot_autoapprove (test_validate.CorpusValidationTests.test_effective_approval_policy_cannot_autoapprove) ... ok
+test_effective_c3_must_preserve_write_role (test_validate.CorpusValidationTests.test_effective_c3_must_preserve_write_role) ... ok
+test_effective_case_cannot_blanket_approve (test_validate.CorpusValidationTests.test_effective_case_cannot_blanket_approve) ... ok
+test_effective_case_owner_must_remain_human (test_validate.CorpusValidationTests.test_effective_case_owner_must_remain_human) ... ok
+test_effective_case_read_grant_cannot_expand (test_validate.CorpusValidationTests.test_effective_case_read_grant_cannot_expand) ... ok
+test_effective_case_role_cannot_wildcard (test_validate.CorpusValidationTests.test_effective_case_role_cannot_wildcard) ... ok
+test_effective_case_target_scope_cannot_wildcard (test_validate.CorpusValidationTests.test_effective_case_target_scope_cannot_wildcard) ... ok
 test_expected_intent_leak_in_model_input (test_validate.CorpusValidationTests.test_expected_intent_leak_in_model_input) ... ok
 test_fixed_corpus_integrity_only (test_validate.CorpusValidationTests.test_fixed_corpus_integrity_only) ... ok
 test_foreign_cases_cannot_be_removed (test_validate.CorpusValidationTests.test_foreign_cases_cannot_be_removed) ... ok
@@ -10,18 +23,30 @@ test_independent_oracle_cannot_drop_false_fulfillment (test_validate.CorpusValid
 test_missing_case (test_validate.CorpusValidationTests.test_missing_case) ... ok
 test_missing_responsible_owner (test_validate.CorpusValidationTests.test_missing_responsible_owner) ... ok
 test_missing_slot_provenance (test_validate.CorpusValidationTests.test_missing_slot_provenance) ... ok
+test_needs_input_whitelist_rejects_invoice_write (test_validate.CorpusValidationTests.test_needs_input_whitelist_rejects_invoice_write) ... ok
 test_nested_slot_leak_in_model_input (test_validate.CorpusValidationTests.test_nested_slot_leak_in_model_input) ... ok
 test_no_wildcard_grants (test_validate.CorpusValidationTests.test_no_wildcard_grants) ... ok
 test_obligation_owner_must_be_human (test_validate.CorpusValidationTests.test_obligation_owner_must_be_human) ... ok
 test_query_cannot_allow_write (test_validate.CorpusValidationTests.test_query_cannot_allow_write) ... ok
+test_query_whitelist_rejects_nonprotected_business_classes (test_validate.CorpusValidationTests.test_query_whitelist_rejects_nonprotected_business_classes) ... ok
 test_read_grant_cannot_expand (test_validate.CorpusValidationTests.test_read_grant_cannot_expand) ... ok
 test_recall_and_disposal_cannot_double_count (test_validate.CorpusValidationTests.test_recall_and_disposal_cannot_double_count) ... ok
+test_recall_counterexample_requires_authenticated_admin (test_validate.CorpusValidationTests.test_recall_counterexample_requires_authenticated_admin) ... ok
+test_recall_counterexample_requires_scoped_close_capability (test_validate.CorpusValidationTests.test_recall_counterexample_requires_scoped_close_capability) ... ok
 test_repeat_not_three (test_validate.CorpusValidationTests.test_repeat_not_three) ... ok
 test_runtime_pass_invention (test_validate.CorpusValidationTests.test_runtime_pass_invention) ... ok
+test_uat_can_preflight_without_direct_error (test_validate.CorpusValidationTests.test_uat_can_preflight_without_direct_error) ... ok
+test_uat_cannot_drop_common_safety_oracle (test_validate.CorpusValidationTests.test_uat_cannot_drop_common_safety_oracle) ... ok
+test_uat_cannot_force_server_error_into_common_oracle (test_validate.CorpusValidationTests.test_uat_cannot_force_server_error_into_common_oracle) ... ok
+test_uat_model_explanation_never_suffices (test_validate.CorpusValidationTests.test_uat_model_explanation_never_suffices) ... ok
+test_uat_preflight_cannot_create_any_business_effect (test_validate.CorpusValidationTests.test_uat_preflight_cannot_create_any_business_effect) ... ok
+test_uat_preflight_requires_independent_snapshot (test_validate.CorpusValidationTests.test_uat_preflight_requires_independent_snapshot) ... ok
 test_unknown_cost_cannot_be_zero (test_validate.CorpusValidationTests.test_unknown_cost_cannot_be_zero) ... ok
+test_unlisted_effects_cannot_be_implicitly_allowed (test_validate.CorpusValidationTests.test_unlisted_effects_cannot_be_implicitly_allowed) ... ok
+test_user_source_excerpt_must_be_in_actual_turn (test_validate.CorpusValidationTests.test_user_source_excerpt_must_be_in_actual_turn) ... ok
 test_wrong_category (test_validate.CorpusValidationTests.test_wrong_category) ... ok
 
 ----------------------------------------------------------------------
-Ran 22 tests in 0.230s
+Ran 47 tests in 0.858s
 
 OK
