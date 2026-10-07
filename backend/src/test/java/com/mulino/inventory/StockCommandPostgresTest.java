@@ -64,8 +64,8 @@ class StockCommandPostgresTest {
  }
  void edge(String edge,String source,String target,String quantity){jdbc.update("INSERT INTO mulino_inventory_GenealogyEdges(organizationId,id,sourceId,targetId,quantity,unit,kind,uncertain,occurredAt,createdAt,recordedAt) VALUES (?,?,?,?,?::numeric,'EA','SPLIT',false,'2026-02-01','2026-02-01','2026-02-01')",org,edge,source,target,quantity);}
  QueryRequest query(String operation,String id,Map<String,Object> scope){return new QueryRequest(operation,id,scope,Map.of(),50,null,"v1",at,at,null);}
- <T> T tx(java.util.function.Supplier<T> action){return new org.springframework.transaction.support.TransactionTemplate(transactionManager).execute(status->runtime.requestContext().run(ctx->{return action.get();}));}
- Map<String,Object> intent(String capability,Map<String,Object> slots){return Map.of("capabilityId",capability,"intentKind",capability.equals("recordStocktake")?"RECORD":"COMMAND","commandId",id(300),"slots",slots);}
+ <T> T tx(java.util.function.Supplier<T> action){return new org.springframework.transaction.support.TransactionTemplate(transactionManager).execute(status->runtime.requestContext().run(ctx->{try(var commandContext=mockStatic(CommandExecution.class)){commandContext.when(CommandExecution::commandId).thenReturn(id(300));return action.get();}}));}
+ Map<String,Object> intent(String capability,Map<String,Object> slots){return Map.of("capabilityId",capability,"intentKind",capability.equals("recordStocktake")?"RECORD":"COMMAND","slots",slots);}
  Map<String,Object> splitIntent(){return intent("splitQuantity",Map.of("segmentId",source,"quantities",List.of("60","40"),"unit","EA","occurredAt",at.toString(),"evidenceRef","split-witness"));}
  @Test void split60and40RetiresParentAndRejectsSecondConsumption(){
   var result=tx(()->commands.execute(context(),splitIntent()));var effects=(Map<?,?>)result.get("effects");

@@ -6,7 +6,7 @@ import java.util.*;
 import org.springframework.stereotype.Component;
 /** A restriction is independent of custody/ownership and does not disappear by splitting. */
 @Component
-public final class InventoryRestrictionGuard implements CommandGuard {
+public final class InventoryRestrictionGuard {
  private final InventoryRepository repository;
  public InventoryRestrictionGuard(InventoryRepository repository){this.repository=repository;}
  public void fence(DomainContext c,CommandPreparation p) { /* Gateway holds sorted inventory/control fences. */ }

@@ -10,8 +10,8 @@ import org.springframework.stereotype.Component;
 /** All command adapters dispatch here through the common envelope transaction. */
 @Component
 public final class InventoryCommands implements CommandHandler {
-  private final InventoryRepository repository; private final StockPrimitives stock; private final ReadAuthorizer authorizer;
-  public InventoryCommands(InventoryRepository repository,StockPrimitives stock,ReadAuthorizer authorizer){this.repository=repository;this.stock=stock;this.authorizer=authorizer;}
+  private final InventoryRepository repository; private final StockPrimitives stock; private final ReadAuthorizer authorizer; private final InventoryRestrictionGuard restrictions;
+  public InventoryCommands(InventoryRepository repository,StockPrimitives stock,ReadAuthorizer authorizer,InventoryRestrictionGuard restrictions){this.repository=repository;this.stock=stock;this.authorizer=authorizer;this.restrictions=restrictions;}
   public Set<String> capabilities(){return Set.of("splitQuantity","mergeQuantity","moveQuantity","recordStocktake","adjustQuantity","disposeQuantity");}
   public Set<String> intentKinds(){return Set.of("COMMAND","RECORD");}
   public CommandPreparation prepare(DomainContext c,Map<String,Object> intent) {
@@ -71,10 +71,11 @@ public final class InventoryCommands implements CommandHandler {
     String effect=switch(capability){case "splitQuantity"->"SPLIT";case "mergeQuantity"->"MERGE";case "moveQuantity"->"INTERNAL_MOVE";case "recordStocktake"->"RECORD_STOCKTAKE";case "adjustQuantity"->"ADJUSTMENT";default->"DISPOSE";};
     Map<String,List<String>> scope=new LinkedHashMap<>();scope.put("TARGET",ids);scope.put("ITEM",sources.stream().map(s->(String)s.get("itemId")).distinct().toList());
     var places=new ArrayList<>(sources.stream().map(s->(String)s.get("placeId")).distinct().toList());if(capability.equals("moveQuantity"))places.add(uuid(slots,"destinationId"));scope.put("PLACE",places);
-    return CommandPreparation.ordinary(scope,new ArrayList<>(fences),effect,(String)first.get("ID"),((Number)first.get("revision")).intValue());
+    var prepared=CommandPreparation.ordinary(scope,new ArrayList<>(fences),effect,(String)first.get("ID"),((Number)first.get("revision")).intValue());
+    restrictions.verify(c,capability,"",prepared,intent);return prepared;
   }
   public Map<String,Object> execute(DomainContext c,Map<String,Object> intent) {
-    prepare(c,intent);var s=slots(intent);String capability=text(intent,"capabilityId",100),command=uuid(intent,"commandId"),evidence=text(s,"evidenceRef",240);Instant at=time(c,s);
+    prepare(c,intent);var s=slots(intent);String capability=text(intent,"capabilityId",100),command=CommandExecution.commandId(),evidence=text(s,"evidenceRef",240);Instant at=time(c,s);
     List<String> ids=switch(capability) {
       case "splitQuantity"->stock.split(c,uuid(s,"segmentId"),strings(s,"quantities"),text(s,"unit",40),at,evidence,command);
       case "mergeQuantity"->List.of(stock.merge(c,strings(s,"segmentIds"),at,evidence,command));
