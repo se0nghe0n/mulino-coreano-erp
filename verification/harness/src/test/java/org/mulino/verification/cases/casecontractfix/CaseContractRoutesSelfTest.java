@@ -10,7 +10,7 @@ import java.util.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 /** Fixed EXECUTED payloads validate schema/routes/oracles only; no runtime acceptance. */
-public final class CaseContractRoutesSelftest {
+public final class CaseContractRoutesSelfTest {
     private final Path root=Path.of(System.getProperty("repo.root"));
     private final JsonNode aliases=Json.parse("{\"ORG\":\"SELFTEST-org\",\"Q20\":\"SELFTEST-Q20\",\"DOC-TEMP\":\"SELFTEST-doc\",\"owner\":\"SELFTEST-owner\",\"supervisor\":\"SELFTEST-supervisor\"}");
     private final AssertionEngine engine=new AssertionEngine();

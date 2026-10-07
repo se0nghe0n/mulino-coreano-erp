@@ -90,7 +90,8 @@ Host task ID/handle은 typed `operationEvidence`에서 읽으며 claims,
 backup, restore 원 행은 `extractor/rawRows`에서 읽는다.
 
 이번 review 수정의 검증은 `evidence/review-case-contracts/checks.json`에
-기록했다. `CaseContractRoutesSelftest`7개와 기존 runtime selftest19개가
+기록했다. 당시 이름인 `CaseContractRoutesSelftest`7개와 기존 runtime
+selftest19개가
 실패·오류·skip0으로 PASS했고 세 case schema가 유효하다. 명시적
 Gherkin RED는 T26/V5/T14 합계28개를 모두 발견·시작했고
 NOT_IMPLEMENTED assertion 실패28·scenario skip0·exit1을 관찰했다.
@@ -111,3 +112,10 @@ Cucumber CLI의 `--name`으로 자동 만료 Gherkin4개만 실행해
 NOT_IMPLEMENTED 실패4·undefined0·scenario skip0·exit1을 관찰했다.
 뒤 assertion step의 skip은 첫 미지원 제품 assertion 이후의 중단이며
 제품·DB·worker·모델 실행 인수는 NOT_RUN이다.
+
+기본 Maven Surefire discovery를 위해 현재 클래스·파일 이름은
+`CaseContractRoutesSelfTest`다. 이름 변경은 assertion 동작을 바꾸지
+않으며 의도한 RED test의 exclusion도 유지한다. 현재 focused 실행은
+`./mvnw -B -ntp -f verification/harness/pom.xml
+-Dtest=CaseContractRoutesSelfTest test`로 8개 SELFTEST를 실행한다.
+과거 evidence의 실행 command·파일 hash는 당시 값으로 보존한다.

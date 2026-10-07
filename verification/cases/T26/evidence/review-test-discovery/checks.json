@@ -1,0 +1,39 @@
+{
+  "evidenceClass": "SELFTEST_ONLY",
+  "productStatus": "NOT_RUN",
+  "baselineCommit": "d2cb3d778150e664d88b84ff5666a51f10dcb67a",
+  "capturedAt": "2026-10-07T15:39:56.183879+00:00",
+  "change": "Rename class/file to match default Maven Surefire *Test pattern; assertion code unchanged.",
+  "checks": [
+    {
+      "command": "./mvnw -B -ntp -f verification/harness/pom.xml -Dtest=CaseContractRoutesSelfTest test",
+      "exitCode": 0,
+      "tests": 8,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "status": "PASS"
+    },
+    {
+      "command": "Compare previous source with current after replacing class declaration name",
+      "exitCode": 0,
+      "status": "PASS",
+      "behaviorChanged": false
+    },
+    {
+      "command": "git diff --check",
+      "exitCode": 0,
+      "status": "PASS"
+    }
+  ],
+  "inputArtifact": {
+    "path": "verification/harness/src/test/java/org/mulino/verification/cases/casecontractfix/CaseContractRoutesSelfTest.java",
+    "sha256": "8dfe51fca70d2e743be01c94a68bb26b9afba6f4cc07357041123d93ba43115a",
+    "sizeBytes": 20203
+  },
+  "limits": [
+    "Targeted tests compiled and ran; combined default-discovery verification remains with coordinator.",
+    "Prior saved execution commands, source paths and hashes remain historical records.",
+    "No product API, DB, worker or model execution occurred."
+  ]
+}
