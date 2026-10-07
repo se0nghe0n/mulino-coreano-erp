@@ -248,6 +248,7 @@ entity CargoScopes {
  segmentId : UUID; customerId : UUID; workId : UUID; commandId : UUID;
 }
 entity DeliveryTransfers {
+ legitimateQuantity : Decimal(38,12);
  key organizationId : UUID; key ID : UUID; revision : Integer; createdAt : Timestamp; recordedAt : Timestamp;
  dispatchId : UUID; canonicalId : UUID; startQuantity : Decimal(38,12); quantity : Decimal(38,12); unit : String(40);
  segmentId : UUID; occurredAt : Timestamp; commandId : UUID;

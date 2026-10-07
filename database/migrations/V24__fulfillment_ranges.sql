@@ -15,6 +15,7 @@ CREATE TABLE mulino_inventory_CargoScopes (
  PRIMARY KEY(organizationId,ID), UNIQUE(organizationId,dispatchId), FOREIGN KEY(organizationId,dispatchId) REFERENCES mulino_inventory_Dispatches(organizationId,ID)
 );
 CREATE TABLE mulino_inventory_DeliveryTransfers (
+ legitimateQuantity numeric(38,12) NOT NULL CHECK(legitimateQuantity>=0 AND legitimateQuantity<=quantity),
  organizationId varchar(36) NOT NULL, ID varchar(36) NOT NULL, revision integer NOT NULL DEFAULT 0, createdAt timestamptz NOT NULL, recordedAt timestamptz NOT NULL,
  dispatchId varchar(36) NOT NULL, canonicalId varchar(36) NOT NULL, startQuantity numeric(38,12) NOT NULL CHECK(startQuantity>=0), quantity numeric(38,12) NOT NULL CHECK(quantity>0), unit varchar(40) NOT NULL,
  segmentId varchar(36) NOT NULL, occurredAt timestamptz NOT NULL, commandId varchar(36) NOT NULL,
