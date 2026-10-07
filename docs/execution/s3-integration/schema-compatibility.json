@@ -1,0 +1,3041 @@
+{
+  "schemaVersion": "3.0.0",
+  "rationale": {
+    "timestampWidening": "R1 absolute instant policy. Explicit CDS Timestamp columns are stored TIMESTAMPTZ; CQN roundtrip and time predicates prove UTC/offset/session timezones.",
+    "notNullStrengthening": "Flyway enforces mandatory domain facts above nullable CDS default. Database nullability never weakens compiler requirements; only enumerated mandatory columns may differ.",
+    "scope": "S3 V1–V22 authoritative CDS/Flyway compatibility inventory; final observed count and mandatory columns are verified by fresh PostgreSQL compilation."
+  },
+  "timestampWidening": [
+    "mulino_commands_approvalconsumptions.consumedat",
+    "mulino_commands_approvals.decidedat",
+    "mulino_commands_approvals.expiresat",
+    "mulino_commands_commandaudits.createdat",
+    "mulino_commands_commandrecords.completedat",
+    "mulino_commands_commandrecords.createdat",
+    "mulino_evaluation_inputsnapshots.asof",
+    "mulino_evaluation_inputsnapshots.knownat",
+    "mulino_evaluation_inputsnapshots.recordedat",
+    "mulino_evidence_canonicaloccurrences.createdat",
+    "mulino_evidence_canonicaloccurrences.effectivefrom",
+    "mulino_evidence_canonicaloccurrences.effectiveuntil",
+    "mulino_evidence_canonicaloccurrences.recordedat",
+    "mulino_evidence_claims.createdat",
+    "mulino_evidence_claims.effectivefrom",
+    "mulino_evidence_claims.effectiveuntil",
+    "mulino_evidence_claims.recordedat",
+    "mulino_evidence_completioncoverages.createdat",
+    "mulino_evidence_completioncoverages.recordedat",
+    "mulino_evidence_documentversions.createdat",
+    "mulino_evidence_documentversions.recordedat",
+    "mulino_evidence_events.createdat",
+    "mulino_evidence_events.effectivefrom",
+    "mulino_evidence_events.effectiveuntil",
+    "mulino_evidence_events.recordedat",
+    "mulino_evidence_evidencelinks.createdat",
+    "mulino_evidence_evidencelinks.recordedat",
+    "mulino_evidence_inboxrecords.createdat",
+    "mulino_evidence_inboxrecords.nextcheckat",
+    "mulino_evidence_inboxrecords.recordedat",
+    "mulino_evidence_reconciliations.createdat",
+    "mulino_evidence_reconciliations.effectivefrom",
+    "mulino_evidence_reconciliations.nextcheckat",
+    "mulino_evidence_reconciliations.recordedat",
+    "mulino_evidence_sourceprofiles.createdat",
+    "mulino_evidence_sourceprofiles.nextcheckat",
+    "mulino_evidence_sourceprofiles.recordedat",
+    "mulino_evidence_verifications.createdat",
+    "mulino_evidence_verifications.recordedat",
+    "mulino_governance_policyapprovals.approvedat",
+    "mulino_governance_policyboundaries.nextcheckat",
+    "mulino_governance_policydrafts.effectivefrom",
+    "mulino_governance_policydrafts.effectiveuntil",
+    "mulino_governance_policyversions.createdat",
+    "mulino_governance_policyversions.effectivefrom",
+    "mulino_governance_policyversions.effectiveuntil",
+    "mulino_identity_actors.createdat",
+    "mulino_identity_actors.recordedat",
+    "mulino_identity_authorityinvalidations.nextcheckat",
+    "mulino_identity_capabilityassignments.createdat",
+    "mulino_identity_capabilityassignments.recordedat",
+    "mulino_identity_capabilityassignments.revokedat",
+    "mulino_identity_capabilityassignments.validfrom",
+    "mulino_identity_capabilityassignments.validuntil",
+    "mulino_identity_externalidentities.createdat",
+    "mulino_identity_externalidentities.recordedat",
+    "mulino_identity_grants.createdat",
+    "mulino_identity_grants.recordedat",
+    "mulino_identity_grants.revokedat",
+    "mulino_identity_grants.validfrom",
+    "mulino_identity_grants.validuntil",
+    "mulino_identity_managementauthorities.revokedat",
+    "mulino_identity_managementauthorities.validfrom",
+    "mulino_identity_managementauthorities.validuntil",
+    "mulino_identity_memberships.createdat",
+    "mulino_identity_memberships.recordedat",
+    "mulino_identity_memberships.revokedat",
+    "mulino_identity_memberships.validfrom",
+    "mulino_identity_memberships.validuntil",
+    "mulino_identity_organizations.createdat",
+    "mulino_identity_organizations.recordedat",
+    "mulino_inventory_dispositionbases.createdat",
+    "mulino_inventory_dispositionbases.nextcheckat",
+    "mulino_inventory_dispositionbases.recordedat",
+    "mulino_inventory_dispositionbases.releasedat",
+    "mulino_inventory_dispositionbases.validfrom",
+    "mulino_inventory_dispositionbases.validuntil",
+    "mulino_inventory_externalidentifiers.createdat",
+    "mulino_inventory_externalidentifiers.recordedat",
+    "mulino_inventory_externalidentifiers.validfrom",
+    "mulino_inventory_externalidentifiers.validuntil",
+    "mulino_inventory_genealogyedges.createdat",
+    "mulino_inventory_genealogyedges.occurredat",
+    "mulino_inventory_genealogyedges.recordedat",
+    "mulino_inventory_identifierconflicts.createdat",
+    "mulino_inventory_identifierconflicts.recordedat",
+    "mulino_inventory_identifierconflicts.validfrom",
+    "mulino_inventory_identifierconflicts.validuntil",
+    "mulino_inventory_logisticsmemberships.createdat",
+    "mulino_inventory_logisticsmemberships.recordedat",
+    "mulino_inventory_logisticsmemberships.validfrom",
+    "mulino_inventory_logisticsmemberships.validuntil",
+    "mulino_inventory_logisticsunits.createdat",
+    "mulino_inventory_logisticsunits.recordedat",
+    "mulino_inventory_manufacturers.createdat",
+    "mulino_inventory_manufacturers.recordedat",
+    "mulino_inventory_manufacturinglots.createdat",
+    "mulino_inventory_manufacturinglots.expiresat",
+    "mulino_inventory_manufacturinglots.productionat",
+    "mulino_inventory_manufacturinglots.recordedat",
+    "mulino_inventory_objectrelations.createdat",
+    "mulino_inventory_objectrelations.recordedat",
+    "mulino_inventory_objectrelations.validfrom",
+    "mulino_inventory_objectrelations.validuntil",
+    "mulino_inventory_packagingversions.createdat",
+    "mulino_inventory_packagingversions.recordedat",
+    "mulino_inventory_places.createdat",
+    "mulino_inventory_places.recordedat",
+    "mulino_inventory_products.createdat",
+    "mulino_inventory_products.recordedat",
+    "mulino_inventory_quantitymovements.createdat",
+    "mulino_inventory_quantitymovements.occurredat",
+    "mulino_inventory_quantitymovements.recordedat",
+    "mulino_inventory_quantitysegments.createdat",
+    "mulino_inventory_quantitysegments.recordedat",
+    "mulino_inventory_quantitysegments.retiredat",
+    "mulino_inventory_quantitysegments.retirementrecordedat",
+    "mulino_inventory_quantitysegments.validfrom",
+    "mulino_inventory_restrictions.createdat",
+    "mulino_inventory_restrictions.nextcheckat",
+    "mulino_inventory_restrictions.recordedat",
+    "mulino_inventory_restrictions.releasedat",
+    "mulino_inventory_restrictions.validfrom",
+    "mulino_inventory_restrictions.validuntil",
+    "mulino_inventory_segmentallocations.createdat",
+    "mulino_inventory_segmentallocations.nextvalidityboundary",
+    "mulino_inventory_segmentallocations.recordedat",
+    "mulino_inventory_segmentallocations.suspendedat",
+    "mulino_inventory_specificationversions.createdat",
+    "mulino_inventory_specificationversions.recordedat",
+    "mulino_inventory_stockadjustments.createdat",
+    "mulino_inventory_stockadjustments.occurredat",
+    "mulino_inventory_stockadjustments.recordedat",
+    "mulino_inventory_stocktakes.createdat",
+    "mulino_inventory_stocktakes.occurredat",
+    "mulino_inventory_stocktakes.recordedat",
+    "mulino_inventory_tradeitems.createdat",
+    "mulino_inventory_tradeitems.recordedat",
+    "mulino_inventory_unitconversions.createdat",
+    "mulino_inventory_unitconversions.recordedat",
+    "mulino_inventory_unitconversions.validfrom",
+    "mulino_inventory_unitconversions.validuntil",
+    "mulino_quality_decisions.createdat",
+    "mulino_quality_decisions.recordedat",
+    "mulino_responsibility_completionbindings.createdat",
+    "mulino_responsibility_completionbindings.recordedat",
+    "mulino_responsibility_handovers.createdat",
+    "mulino_responsibility_handovers.expiresat",
+    "mulino_responsibility_handovers.nextcheckat",
+    "mulino_responsibility_handovers.recordedat",
+    "mulino_responsibility_observationreceiptcredits.createdat",
+    "mulino_responsibility_observationreceiptcredits.recordedat",
+    "mulino_responsibility_receiptresidualcredits.createdat",
+    "mulino_responsibility_receiptresidualcredits.recordedat",
+    "mulino_responsibility_receiptresidualroots.createdat",
+    "mulino_responsibility_receiptresidualroots.recordedat",
+    "mulino_responsibility_resolutioncredits.createdat",
+    "mulino_responsibility_resolutioncredits.recordedat",
+    "mulino_responsibility_roots.createdat",
+    "mulino_responsibility_roots.recordedat",
+    "mulino_responsibility_scopes.createdat",
+    "mulino_responsibility_scopes.recordedat",
+    "mulino_runtime_executionattempts.finishedat",
+    "mulino_runtime_executionattempts.heartbeatat",
+    "mulino_runtime_executionattempts.leaseexpiresat",
+    "mulino_runtime_executionattempts.startedat",
+    "mulino_runtime_externalreconciliations.recordedat",
+    "mulino_runtime_intakerecoveries.leaseexpiresat",
+    "mulino_runtime_intakerecoveries.nextcheckat",
+    "mulino_runtime_outbox.createdat",
+    "mulino_runtime_outbox.leaseexpiresat",
+    "mulino_runtime_outbox.nextcheckat",
+    "mulino_runtime_recoveryschedules.lastcheckedat",
+    "mulino_runtime_recoveryschedules.nextcheckat",
+    "mulino_runtime_recoveryschedules.nextvalidityboundary",
+    "mulino_trade_purchase_approvals.createdat",
+    "mulino_trade_purchase_approvals.decidedat",
+    "mulino_trade_purchase_approvals.effectiveat",
+    "mulino_trade_purchase_approvals.recordedat",
+    "mulino_trade_purchase_approvals.validuntil",
+    "mulino_trade_purchase_cancellations.createdat",
+    "mulino_trade_purchase_cancellations.effectiveat",
+    "mulino_trade_purchase_cancellations.recordedat",
+    "mulino_trade_purchase_executioneffects.createdat",
+    "mulino_trade_purchase_executioneffects.effectiveat",
+    "mulino_trade_purchase_executioneffects.recordedat",
+    "mulino_trade_purchase_orderlines.createdat",
+    "mulino_trade_purchase_orderlines.effectiveat",
+    "mulino_trade_purchase_orderlines.recordedat",
+    "mulino_trade_purchase_orders.createdat",
+    "mulino_trade_purchase_orders.effectiveat",
+    "mulino_trade_purchase_orders.recordedat",
+    "mulino_trade_purchase_proposalrevisions.createdat",
+    "mulino_trade_purchase_proposalrevisions.dueat",
+    "mulino_trade_purchase_proposalrevisions.effectiveat",
+    "mulino_trade_purchase_proposalrevisions.recordedat",
+    "mulino_trade_purchase_proposals.createdat",
+    "mulino_trade_purchase_proposals.effectiveat",
+    "mulino_trade_purchase_proposals.recordedat",
+    "mulino_trade_purchase_receiptcredits.createdat",
+    "mulino_trade_purchase_receiptcredits.effectiveat",
+    "mulino_trade_purchase_receiptcredits.recordedat",
+    "mulino_trade_purchase_supplierreplies.createdat",
+    "mulino_trade_purchase_supplierreplies.effectiveat",
+    "mulino_trade_purchase_supplierreplies.recordedat",
+    "mulino_trade_purchase_suppliers.createdat",
+    "mulino_trade_purchase_suppliers.effectiveat",
+    "mulino_trade_purchase_suppliers.recordedat",
+    "mulino_trade_receipt_observations.createdat",
+    "mulino_trade_receipt_observations.nextcheckat",
+    "mulino_trade_receipt_observations.occurredat",
+    "mulino_trade_receipt_observations.recordedat",
+    "mulino_trade_receipt_receipts.createdat",
+    "mulino_trade_receipt_receipts.occurredat",
+    "mulino_trade_receipt_receipts.recordedat",
+    "mulino_trade_regulatory_decisionversions.createdat",
+    "mulino_trade_regulatory_decisionversions.recordedat",
+    "mulino_trade_regulatory_decisionversions.validfrom",
+    "mulino_trade_regulatory_decisionversions.validuntil",
+    "mulino_trade_regulatory_labelverifications.createdat",
+    "mulino_trade_regulatory_labelverifications.recordedat",
+    "mulino_trade_regulatory_labelverifications.validfrom",
+    "mulino_trade_regulatory_labelverifications.validuntil",
+    "mulino_trade_regulatory_policies.createdat",
+    "mulino_trade_regulatory_policies.recordedat",
+    "mulino_trade_regulatory_policies.validfrom",
+    "mulino_trade_regulatory_policies.validuntil",
+    "mulino_trade_regulatory_procedures.createdat",
+    "mulino_trade_regulatory_procedures.recordedat",
+    "mulino_trade_regulatory_procedureversions.createdat",
+    "mulino_trade_regulatory_procedureversions.occurredat",
+    "mulino_trade_regulatory_procedureversions.recordedat",
+    "mulino_trade_shipment_cargoallocations.createdat",
+    "mulino_trade_shipment_cargoallocations.recordedat",
+    "mulino_trade_shipment_custodyhandovers.createdat",
+    "mulino_trade_shipment_custodyhandovers.occurredat",
+    "mulino_trade_shipment_custodyhandovers.recordedat",
+    "mulino_trade_shipment_departureallocations.createdat",
+    "mulino_trade_shipment_departureallocations.recordedat",
+    "mulino_trade_shipment_legevents.createdat",
+    "mulino_trade_shipment_legevents.occurredat",
+    "mulino_trade_shipment_legevents.recordedat",
+    "mulino_trade_shipment_shipmentcargo.createdat",
+    "mulino_trade_shipment_shipmentcargo.recordedat",
+    "mulino_trade_shipment_shipmentlegs.createdat",
+    "mulino_trade_shipment_shipmentlegs.plannedarrivalat",
+    "mulino_trade_shipment_shipmentlegs.planneddepartureat",
+    "mulino_trade_shipment_shipmentlegs.recordedat",
+    "mulino_trade_shipment_shipments.createdat",
+    "mulino_trade_shipment_shipments.recordedat",
+    "mulino_work_read_assessmentreferences.asof",
+    "mulino_work_read_assessmentreferences.assessedat",
+    "mulino_work_read_assessmentreferences.createdat",
+    "mulino_work_read_assessmentreferences.effectiveat",
+    "mulino_work_read_assessmentreferences.knownat",
+    "mulino_work_read_assessmentreferences.recordedat",
+    "mulino_work_read_evidencereferences.createdat",
+    "mulino_work_read_evidencereferences.effectiveat",
+    "mulino_work_read_evidencereferences.recordedat",
+    "mulino_work_read_goalreferences.createdat",
+    "mulino_work_read_goalreferences.dueat",
+    "mulino_work_read_goalreferences.effectiveat",
+    "mulino_work_read_goalreferences.recordedat",
+    "mulino_work_read_obligationreferences.createdat",
+    "mulino_work_read_obligationreferences.effectiveat",
+    "mulino_work_read_obligationreferences.nextcheckat",
+    "mulino_work_read_obligationreferences.recordedat",
+    "mulino_work_read_subjectlinks.createdat",
+    "mulino_work_read_subjectlinks.effectiveat",
+    "mulino_work_read_subjectlinks.recordedat",
+    "mulino_work_read_works.createdat",
+    "mulino_work_read_works.effectiveat",
+    "mulino_work_read_works.recordedat",
+    "mulino_work_workcontributions.recordedat",
+    "mulino_work_worklinks.createdat",
+    "mulino_work_worktransitions.recordedat"
+  ],
+  "notNullStrengthening": [
+    "mulino_commands_approvalconsumptions.approvalid",
+    "mulino_commands_approvalconsumptions.commandid",
+    "mulino_commands_approvalconsumptions.consumedat",
+    "mulino_commands_approvalconsumptions.organizationid",
+    "mulino_commands_approvals.action",
+    "mulino_commands_approvals.approverid",
+    "mulino_commands_approvals.canonicalhash",
+    "mulino_commands_approvals.decidedat",
+    "mulino_commands_approvals.decision",
+    "mulino_commands_approvals.decisioncapability",
+    "mulino_commands_approvals.expiresat",
+    "mulino_commands_approvals.organizationid",
+    "mulino_commands_approvals.policyhash",
+    "mulino_commands_approvals.proposalid",
+    "mulino_commands_approvals.proposalrevision",
+    "mulino_commands_approvals.scopehash",
+    "mulino_commands_approvals.singleuse",
+    "mulino_commands_commandaudits.actorid",
+    "mulino_commands_commandaudits.auditfactsjson",
+    "mulino_commands_commandaudits.canonicalhash",
+    "mulino_commands_commandaudits.capabilityid",
+    "mulino_commands_commandaudits.commandid",
+    "mulino_commands_commandaudits.createdat",
+    "mulino_commands_commandaudits.effectrefs",
+    "mulino_commands_commandaudits.organizationid",
+    "mulino_commands_commandaudits.outcome",
+    "mulino_commands_commandrecords.actorid",
+    "mulino_commands_commandrecords.canonicalhash",
+    "mulino_commands_commandrecords.capabilityid",
+    "mulino_commands_commandrecords.capabilityversion",
+    "mulino_commands_commandrecords.commandidempotencykey",
+    "mulino_commands_commandrecords.createdat",
+    "mulino_commands_commandrecords.definitionversion",
+    "mulino_commands_commandrecords.organizationid",
+    "mulino_commands_commandrecords.stablerequestowner",
+    "mulino_commands_commandrecords.state",
+    "mulino_definitions_attributedefinitions.createdat",
+    "mulino_definitions_attributedefinitions.definitionversionid",
+    "mulino_definitions_attributedefinitions.name",
+    "mulino_definitions_attributedefinitions.revision",
+    "mulino_definitions_capabilitycontracts.createdat",
+    "mulino_definitions_capabilitycontracts.definitionversionid",
+    "mulino_definitions_capabilitycontracts.evaluatorversion",
+    "mulino_definitions_capabilitycontracts.revision",
+    "mulino_definitions_definitionversions.content",
+    "mulino_definitions_definitionversions.contenthash",
+    "mulino_definitions_definitionversions.createdat",
+    "mulino_definitions_definitionversions.evaluatorversion",
+    "mulino_definitions_definitionversions.revision",
+    "mulino_definitions_definitionversions.schemaversion",
+    "mulino_definitions_definitionversions.state",
+    "mulino_definitions_definitionversions.version",
+    "mulino_definitions_goaltemplates.createdat",
+    "mulino_definitions_goaltemplates.definitionversionid",
+    "mulino_definitions_goaltemplates.evaluatorversion",
+    "mulino_definitions_goaltemplates.name",
+    "mulino_definitions_goaltemplates.revision",
+    "mulino_definitions_nountypes.createdat",
+    "mulino_definitions_nountypes.definitionversionid",
+    "mulino_definitions_nountypes.name",
+    "mulino_definitions_nountypes.revision",
+    "mulino_definitions_relationdefinitions.createdat",
+    "mulino_definitions_relationdefinitions.definitionversionid",
+    "mulino_definitions_relationdefinitions.name",
+    "mulino_definitions_relationdefinitions.revision",
+    "mulino_definitions_verbdefinitions.createdat",
+    "mulino_definitions_verbdefinitions.definitionversionid",
+    "mulino_definitions_verbdefinitions.name",
+    "mulino_definitions_verbdefinitions.revision",
+    "mulino_evidence_canonicaloccurrences.createdat",
+    "mulino_evidence_canonicaloccurrences.effectivefrom",
+    "mulino_evidence_canonicaloccurrences.organizationid",
+    "mulino_evidence_canonicaloccurrences.physicalscopeid",
+    "mulino_evidence_canonicaloccurrences.reassessmentstate",
+    "mulino_evidence_canonicaloccurrences.recordedat",
+    "mulino_evidence_canonicaloccurrences.recordedby",
+    "mulino_evidence_canonicaloccurrences.revision",
+    "mulino_evidence_canonicaloccurrences.sourceprofileid",
+    "mulino_evidence_canonicaloccurrences.valuestate",
+    "mulino_evidence_claims.createdat",
+    "mulino_evidence_claims.documentversionid",
+    "mulino_evidence_claims.effectivefrom",
+    "mulino_evidence_claims.eventid",
+    "mulino_evidence_claims.organizationid",
+    "mulino_evidence_claims.recordedat",
+    "mulino_evidence_claims.recordedby",
+    "mulino_evidence_claims.revision",
+    "mulino_evidence_claims.sourceprofileid",
+    "mulino_evidence_claims.valuestate",
+    "mulino_evidence_completioncoverages.claimid",
+    "mulino_evidence_completioncoverages.createdat",
+    "mulino_evidence_completioncoverages.documentversionid",
+    "mulino_evidence_completioncoverages.eventid",
+    "mulino_evidence_completioncoverages.occurrenceid",
+    "mulino_evidence_completioncoverages.organizationid",
+    "mulino_evidence_completioncoverages.originalhash",
+    "mulino_evidence_completioncoverages.policyversion",
+    "mulino_evidence_completioncoverages.quantity",
+    "mulino_evidence_completioncoverages.recordedat",
+    "mulino_evidence_completioncoverages.recordedby",
+    "mulino_evidence_completioncoverages.revision",
+    "mulino_evidence_completioncoverages.rootid",
+    "mulino_evidence_completioncoverages.sourcepayloadhash",
+    "mulino_evidence_completioncoverages.startquantity",
+    "mulino_evidence_completioncoverages.verificationid",
+    "mulino_evidence_documentversions.availability",
+    "mulino_evidence_documentversions.bytelength",
+    "mulino_evidence_documentversions.createdat",
+    "mulino_evidence_documentversions.mediatype",
+    "mulino_evidence_documentversions.organizationid",
+    "mulino_evidence_documentversions.provenance",
+    "mulino_evidence_documentversions.recordedat",
+    "mulino_evidence_documentversions.recordedby",
+    "mulino_evidence_documentversions.revision",
+    "mulino_evidence_documentversions.sha256",
+    "mulino_evidence_documentversions.sourceprofileid",
+    "mulino_evidence_events.createdat",
+    "mulino_evidence_events.effectivefrom",
+    "mulino_evidence_events.externaleventid",
+    "mulino_evidence_events.organizationid",
+    "mulino_evidence_events.payload",
+    "mulino_evidence_events.payloadhash",
+    "mulino_evidence_events.recordedat",
+    "mulino_evidence_events.recordedby",
+    "mulino_evidence_events.revision",
+    "mulino_evidence_events.sourcenamespace",
+    "mulino_evidence_events.sourceprofileid",
+    "mulino_evidence_events.sourceversion",
+    "mulino_evidence_events.timeprecision",
+    "mulino_evidence_events.timezone",
+    "mulino_evidence_events.valuestate",
+    "mulino_evidence_evidencelinks.createdat",
+    "mulino_evidence_evidencelinks.organizationid",
+    "mulino_evidence_evidencelinks.recordedat",
+    "mulino_evidence_evidencelinks.recordedby",
+    "mulino_evidence_evidencelinks.revision",
+    "mulino_evidence_inboxrecords.createdat",
+    "mulino_evidence_inboxrecords.eventid",
+    "mulino_evidence_inboxrecords.intakeownerid",
+    "mulino_evidence_inboxrecords.nextaction",
+    "mulino_evidence_inboxrecords.nextcheckat",
+    "mulino_evidence_inboxrecords.organizationid",
+    "mulino_evidence_inboxrecords.recordedat",
+    "mulino_evidence_inboxrecords.recordedby",
+    "mulino_evidence_inboxrecords.revision",
+    "mulino_evidence_inboxrecords.sourceprofileid",
+    "mulino_evidence_inboxrecords.state",
+    "mulino_evidence_inboxrecords.supervisorid",
+    "mulino_evidence_reconciliations.basisdocumentid",
+    "mulino_evidence_reconciliations.claimid",
+    "mulino_evidence_reconciliations.createdat",
+    "mulino_evidence_reconciliations.decision",
+    "mulino_evidence_reconciliations.effectivefrom",
+    "mulino_evidence_reconciliations.intakeownerid",
+    "mulino_evidence_reconciliations.nextaction",
+    "mulino_evidence_reconciliations.nextcheckat",
+    "mulino_evidence_reconciliations.organizationid",
+    "mulino_evidence_reconciliations.policyversion",
+    "mulino_evidence_reconciliations.reason",
+    "mulino_evidence_reconciliations.recordedat",
+    "mulino_evidence_reconciliations.recordedby",
+    "mulino_evidence_reconciliations.revision",
+    "mulino_evidence_reconciliations.sourceidentity",
+    "mulino_evidence_reconciliations.sourceprofileid",
+    "mulino_evidence_reconciliations.subjectid",
+    "mulino_evidence_reconciliations.subjectkind",
+    "mulino_evidence_reconciliations.supervisorid",
+    "mulino_evidence_sourceprofiles.createdat",
+    "mulino_evidence_sourceprofiles.organizationid",
+    "mulino_evidence_sourceprofiles.recordedat",
+    "mulino_evidence_sourceprofiles.recordedby",
+    "mulino_evidence_sourceprofiles.revision",
+    "mulino_evidence_verifications.claimid",
+    "mulino_evidence_verifications.createdat",
+    "mulino_evidence_verifications.organizationid",
+    "mulino_evidence_verifications.policyversion",
+    "mulino_evidence_verifications.reason",
+    "mulino_evidence_verifications.recordedat",
+    "mulino_evidence_verifications.recordedby",
+    "mulino_evidence_verifications.revision",
+    "mulino_evidence_verifications.verdict",
+    "mulino_governance_activepolicies.policyid",
+    "mulino_governance_activepolicies.revision",
+    "mulino_governance_policyapprovals.approvedat",
+    "mulino_governance_policyapprovals.approverid",
+    "mulino_governance_policyapprovals.contenthash",
+    "mulino_governance_policyapprovals.draftid",
+    "mulino_governance_policyboundaries.nextcheckat",
+    "mulino_governance_policyboundaries.policyid",
+    "mulino_governance_policyboundaries.reason",
+    "mulino_governance_policydrafts.content",
+    "mulino_governance_policydrafts.contenthash",
+    "mulino_governance_policydrafts.effectivefrom",
+    "mulino_governance_policydrafts.fixtureonly",
+    "mulino_governance_policydrafts.kind",
+    "mulino_governance_policydrafts.legallyrestrictive",
+    "mulino_governance_policydrafts.regressionevidence",
+    "mulino_governance_policydrafts.revision",
+    "mulino_governance_policydrafts.source",
+    "mulino_governance_policydrafts.status",
+    "mulino_governance_policydrafts.version",
+    "mulino_governance_policyfences.revision",
+    "mulino_governance_policyversions.content",
+    "mulino_governance_policyversions.contenthash",
+    "mulino_governance_policyversions.createdat",
+    "mulino_governance_policyversions.effectivefrom",
+    "mulino_governance_policyversions.kind",
+    "mulino_governance_policyversions.revision",
+    "mulino_governance_policyversions.version",
+    "mulino_identity_actors.createdat",
+    "mulino_identity_actors.kind",
+    "mulino_identity_actors.recordedat",
+    "mulino_identity_actors.revision",
+    "mulino_identity_actors.stablerequestowner",
+    "mulino_identity_authorityfences.revision",
+    "mulino_identity_authorityinvalidations.actorid",
+    "mulino_identity_authorityinvalidations.nextcheckat",
+    "mulino_identity_authorityinvalidations.reason",
+    "mulino_identity_authorityinvalidations.revision",
+    "mulino_identity_capabilityassignments.actorid",
+    "mulino_identity_capabilityassignments.capabilityid",
+    "mulino_identity_capabilityassignments.createdat",
+    "mulino_identity_capabilityassignments.recordedat",
+    "mulino_identity_capabilityassignments.revision",
+    "mulino_identity_capabilityassignments.scopeid",
+    "mulino_identity_capabilityassignments.scopekind",
+    "mulino_identity_capabilityassignments.validfrom",
+    "mulino_identity_capabilityassignments.validuntil",
+    "mulino_identity_externalidentities.actorid",
+    "mulino_identity_externalidentities.createdat",
+    "mulino_identity_externalidentities.issuer",
+    "mulino_identity_externalidentities.organizationalias",
+    "mulino_identity_externalidentities.recordedat",
+    "mulino_identity_externalidentities.revision",
+    "mulino_identity_externalidentities.subject",
+    "mulino_identity_grants.actorid",
+    "mulino_identity_grants.createdat",
+    "mulino_identity_grants.delegatorid",
+    "mulino_identity_grants.recordedat",
+    "mulino_identity_grants.revision",
+    "mulino_identity_grants.validfrom",
+    "mulino_identity_grants.validuntil",
+    "mulino_identity_managementauthorities.actorid",
+    "mulino_identity_managementauthorities.capabilityid",
+    "mulino_identity_managementauthorities.revision",
+    "mulino_identity_managementauthorities.scopeid",
+    "mulino_identity_managementauthorities.scopekind",
+    "mulino_identity_managementauthorities.validfrom",
+    "mulino_identity_managementauthorities.validuntil",
+    "mulino_identity_memberships.actorid",
+    "mulino_identity_memberships.createdat",
+    "mulino_identity_memberships.recordedat",
+    "mulino_identity_memberships.revision",
+    "mulino_identity_memberships.validfrom",
+    "mulino_identity_memberships.validuntil",
+    "mulino_identity_organizations.createdat",
+    "mulino_identity_organizations.externalalias",
+    "mulino_identity_organizations.recordedat",
+    "mulino_identity_organizations.revision",
+    "mulino_inventory_dispositionbases.action",
+    "mulino_inventory_dispositionbases.controlscope",
+    "mulino_inventory_dispositionbases.createdat",
+    "mulino_inventory_dispositionbases.decisionid",
+    "mulino_inventory_dispositionbases.evidenceref",
+    "mulino_inventory_dispositionbases.recordedat",
+    "mulino_inventory_dispositionbases.revision",
+    "mulino_inventory_dispositionbases.state",
+    "mulino_inventory_dispositionbases.validfrom",
+    "mulino_inventory_dispositionbases.validuntil",
+    "mulino_inventory_externalidentifiers.createdat",
+    "mulino_inventory_externalidentifiers.issuer",
+    "mulino_inventory_externalidentifiers.itemid",
+    "mulino_inventory_externalidentifiers.namespace",
+    "mulino_inventory_externalidentifiers.recordedat",
+    "mulino_inventory_externalidentifiers.revision",
+    "mulino_inventory_externalidentifiers.validfrom",
+    "mulino_inventory_externalidentifiers.value",
+    "mulino_inventory_genealogyedges.createdat",
+    "mulino_inventory_genealogyedges.kind",
+    "mulino_inventory_genealogyedges.occurredat",
+    "mulino_inventory_genealogyedges.quantity",
+    "mulino_inventory_genealogyedges.recordedat",
+    "mulino_inventory_genealogyedges.revision",
+    "mulino_inventory_genealogyedges.uncertain",
+    "mulino_inventory_genealogyedges.unit",
+    "mulino_inventory_identifierconflicts.createdat",
+    "mulino_inventory_identifierconflicts.existingidentifierid",
+    "mulino_inventory_identifierconflicts.issuer",
+    "mulino_inventory_identifierconflicts.itemid",
+    "mulino_inventory_identifierconflicts.namespace",
+    "mulino_inventory_identifierconflicts.recordedat",
+    "mulino_inventory_identifierconflicts.revision",
+    "mulino_inventory_identifierconflicts.state",
+    "mulino_inventory_identifierconflicts.validfrom",
+    "mulino_inventory_identifierconflicts.value",
+    "mulino_inventory_logisticsmemberships.createdat",
+    "mulino_inventory_logisticsmemberships.logisticsunitid",
+    "mulino_inventory_logisticsmemberships.recordedat",
+    "mulino_inventory_logisticsmemberships.revision",
+    "mulino_inventory_logisticsmemberships.segmentid",
+    "mulino_inventory_logisticsmemberships.validfrom",
+    "mulino_inventory_logisticsunits.createdat",
+    "mulino_inventory_logisticsunits.name",
+    "mulino_inventory_logisticsunits.recordedat",
+    "mulino_inventory_logisticsunits.revision",
+    "mulino_inventory_manufacturers.createdat",
+    "mulino_inventory_manufacturers.name",
+    "mulino_inventory_manufacturers.recordedat",
+    "mulino_inventory_manufacturers.revision",
+    "mulino_inventory_manufacturinglots.createdat",
+    "mulino_inventory_manufacturinglots.itemid",
+    "mulino_inventory_manufacturinglots.manufacturerid",
+    "mulino_inventory_manufacturinglots.originallot",
+    "mulino_inventory_manufacturinglots.recordedat",
+    "mulino_inventory_manufacturinglots.revision",
+    "mulino_inventory_objectrelations.createdat",
+    "mulino_inventory_objectrelations.definitionversionid",
+    "mulino_inventory_objectrelations.recordedat",
+    "mulino_inventory_objectrelations.relationdefinitionid",
+    "mulino_inventory_objectrelations.revision",
+    "mulino_inventory_objectrelations.sourceid",
+    "mulino_inventory_objectrelations.sourcetype",
+    "mulino_inventory_objectrelations.targetid",
+    "mulino_inventory_objectrelations.targettype",
+    "mulino_inventory_objectrelations.validfrom",
+    "mulino_inventory_packagingversions.contenthash",
+    "mulino_inventory_packagingversions.createdat",
+    "mulino_inventory_packagingversions.productid",
+    "mulino_inventory_packagingversions.recordedat",
+    "mulino_inventory_packagingversions.revision",
+    "mulino_inventory_packagingversions.version",
+    "mulino_inventory_places.createdat",
+    "mulino_inventory_places.kind",
+    "mulino_inventory_places.name",
+    "mulino_inventory_places.recordedat",
+    "mulino_inventory_places.revision",
+    "mulino_inventory_products.createdat",
+    "mulino_inventory_products.name",
+    "mulino_inventory_products.recordedat",
+    "mulino_inventory_products.revision",
+    "mulino_inventory_quantitymovements.createdat",
+    "mulino_inventory_quantitymovements.kind",
+    "mulino_inventory_quantitymovements.occurredat",
+    "mulino_inventory_quantitymovements.quantity",
+    "mulino_inventory_quantitymovements.recordedat",
+    "mulino_inventory_quantitymovements.revision",
+    "mulino_inventory_quantitymovements.unit",
+    "mulino_inventory_quantitysegments.controlscope",
+    "mulino_inventory_quantitysegments.createdat",
+    "mulino_inventory_quantitysegments.identificationstatus",
+    "mulino_inventory_quantitysegments.itemid",
+    "mulino_inventory_quantitysegments.mixturestatus",
+    "mulino_inventory_quantitysegments.placeid",
+    "mulino_inventory_quantitysegments.quantity",
+    "mulino_inventory_quantitysegments.recordedat",
+    "mulino_inventory_quantitysegments.revision",
+    "mulino_inventory_quantitysegments.unit",
+    "mulino_inventory_quantitysegments.validfrom",
+    "mulino_inventory_restrictions.action",
+    "mulino_inventory_restrictions.controlscope",
+    "mulino_inventory_restrictions.createdat",
+    "mulino_inventory_restrictions.decisionid",
+    "mulino_inventory_restrictions.evidenceref",
+    "mulino_inventory_restrictions.recordedat",
+    "mulino_inventory_restrictions.revision",
+    "mulino_inventory_restrictions.state",
+    "mulino_inventory_restrictions.validfrom",
+    "mulino_inventory_segmentallocations.commandid",
+    "mulino_inventory_segmentallocations.createdat",
+    "mulino_inventory_segmentallocations.orderlineid",
+    "mulino_inventory_segmentallocations.quantity",
+    "mulino_inventory_segmentallocations.recordedat",
+    "mulino_inventory_segmentallocations.revision",
+    "mulino_inventory_segmentallocations.rootid",
+    "mulino_inventory_segmentallocations.segmentid",
+    "mulino_inventory_segmentallocations.state",
+    "mulino_inventory_segmentallocations.unit",
+    "mulino_inventory_specificationversions.contenthash",
+    "mulino_inventory_specificationversions.createdat",
+    "mulino_inventory_specificationversions.productid",
+    "mulino_inventory_specificationversions.recordedat",
+    "mulino_inventory_specificationversions.revision",
+    "mulino_inventory_specificationversions.version",
+    "mulino_inventory_stockadjustments.commandid",
+    "mulino_inventory_stockadjustments.createdat",
+    "mulino_inventory_stockadjustments.direction",
+    "mulino_inventory_stockadjustments.evidenceref",
+    "mulino_inventory_stockadjustments.occurredat",
+    "mulino_inventory_stockadjustments.quantity",
+    "mulino_inventory_stockadjustments.reason",
+    "mulino_inventory_stockadjustments.recordedat",
+    "mulino_inventory_stockadjustments.revision",
+    "mulino_inventory_stockadjustments.segmentid",
+    "mulino_inventory_stockadjustments.stocktakeid",
+    "mulino_inventory_stockadjustments.unit",
+    "mulino_inventory_stocktakes.commandid",
+    "mulino_inventory_stocktakes.createdat",
+    "mulino_inventory_stocktakes.evidenceref",
+    "mulino_inventory_stocktakes.observedquantity",
+    "mulino_inventory_stocktakes.occurredat",
+    "mulino_inventory_stocktakes.recordedat",
+    "mulino_inventory_stocktakes.revision",
+    "mulino_inventory_stocktakes.segmentid",
+    "mulino_inventory_stocktakes.unit",
+    "mulino_inventory_tradeitems.baseunit",
+    "mulino_inventory_tradeitems.createdat",
+    "mulino_inventory_tradeitems.decimalplaces",
+    "mulino_inventory_tradeitems.name",
+    "mulino_inventory_tradeitems.packagingversionid",
+    "mulino_inventory_tradeitems.productid",
+    "mulino_inventory_tradeitems.recordedat",
+    "mulino_inventory_tradeitems.revision",
+    "mulino_inventory_tradeitems.specificationversionid",
+    "mulino_inventory_unitconversions.createdat",
+    "mulino_inventory_unitconversions.factor",
+    "mulino_inventory_unitconversions.fromunit",
+    "mulino_inventory_unitconversions.itemid",
+    "mulino_inventory_unitconversions.recordedat",
+    "mulino_inventory_unitconversions.revision",
+    "mulino_inventory_unitconversions.tounit",
+    "mulino_inventory_unitconversions.validfrom",
+    "mulino_platform_preserved.upgrademarker",
+    "mulino_quality_decisions.actorid",
+    "mulino_quality_decisions.commandid",
+    "mulino_quality_decisions.createdat",
+    "mulino_quality_decisions.evidenceid",
+    "mulino_quality_decisions.operation",
+    "mulino_quality_decisions.policyhash",
+    "mulino_quality_decisions.reason",
+    "mulino_quality_decisions.recordedat",
+    "mulino_quality_decisions.revision",
+    "mulino_quality_decisions.segmentid",
+    "mulino_trade_receipt_observations.createdat",
+    "mulino_trade_receipt_observations.eventid",
+    "mulino_trade_receipt_observations.identificationstatus",
+    "mulino_trade_receipt_observations.itemid",
+    "mulino_trade_receipt_observations.nextaction",
+    "mulino_trade_receipt_observations.nextcheckat",
+    "mulino_trade_receipt_observations.occurredat",
+    "mulino_trade_receipt_observations.ownerid",
+    "mulino_trade_receipt_observations.placeid",
+    "mulino_trade_receipt_observations.quantity",
+    "mulino_trade_receipt_observations.rangerootid",
+    "mulino_trade_receipt_observations.recordedat",
+    "mulino_trade_receipt_observations.revision",
+    "mulino_trade_receipt_observations.startquantity",
+    "mulino_trade_receipt_observations.state",
+    "mulino_trade_receipt_observations.supervisorid",
+    "mulino_trade_receipt_observations.unit",
+    "mulino_trade_receipt_observations.workid",
+    "mulino_trade_receipt_receipts.canonicaloccurrenceid",
+    "mulino_trade_receipt_receipts.contributedquantity",
+    "mulino_trade_receipt_receipts.createdat",
+    "mulino_trade_receipt_receipts.excessquantity",
+    "mulino_trade_receipt_receipts.itemid",
+    "mulino_trade_receipt_receipts.lotid",
+    "mulino_trade_receipt_receipts.observationid",
+    "mulino_trade_receipt_receipts.occurredat",
+    "mulino_trade_receipt_receipts.physicaleffect",
+    "mulino_trade_receipt_receipts.placeid",
+    "mulino_trade_receipt_receipts.quantity",
+    "mulino_trade_receipt_receipts.rangerootid",
+    "mulino_trade_receipt_receipts.recordedat",
+    "mulino_trade_receipt_receipts.revision",
+    "mulino_trade_receipt_receipts.segmentid",
+    "mulino_trade_receipt_receipts.startquantity",
+    "mulino_trade_receipt_receipts.unit",
+    "mulino_trade_receipt_receipts.workid",
+    "mulino_trade_regulatory_decisionversions.action",
+    "mulino_trade_regulatory_decisionversions.authority",
+    "mulino_trade_regulatory_decisionversions.createdat",
+    "mulino_trade_regulatory_decisionversions.decision",
+    "mulino_trade_regulatory_decisionversions.organizationid",
+    "mulino_trade_regulatory_decisionversions.quantity",
+    "mulino_trade_regulatory_decisionversions.recordedat",
+    "mulino_trade_regulatory_decisionversions.recordedby",
+    "mulino_trade_regulatory_decisionversions.revision",
+    "mulino_trade_regulatory_decisionversions.startquantity",
+    "mulino_trade_regulatory_decisionversions.validfrom",
+    "mulino_trade_regulatory_labelverifications.createdat",
+    "mulino_trade_regulatory_labelverifications.organizationid",
+    "mulino_trade_regulatory_labelverifications.recordedat",
+    "mulino_trade_regulatory_labelverifications.recordedby",
+    "mulino_trade_regulatory_labelverifications.revision",
+    "mulino_trade_regulatory_labelverifications.validfrom",
+    "mulino_trade_regulatory_policies.action",
+    "mulino_trade_regulatory_policies.authority",
+    "mulino_trade_regulatory_policies.createdat",
+    "mulino_trade_regulatory_policies.fictional",
+    "mulino_trade_regulatory_policies.organizationid",
+    "mulino_trade_regulatory_policies.recordedat",
+    "mulino_trade_regulatory_policies.recordedby",
+    "mulino_trade_regulatory_policies.requireslabel",
+    "mulino_trade_regulatory_policies.revision",
+    "mulino_trade_regulatory_policies.sourcenamespace",
+    "mulino_trade_regulatory_policies.status",
+    "mulino_trade_regulatory_policies.validfrom",
+    "mulino_trade_regulatory_policies.version",
+    "mulino_trade_regulatory_procedures.createdat",
+    "mulino_trade_regulatory_procedures.organizationid",
+    "mulino_trade_regulatory_procedures.recordedat",
+    "mulino_trade_regulatory_procedures.recordedby",
+    "mulino_trade_regulatory_procedures.revision",
+    "mulino_trade_regulatory_procedureversions.createdat",
+    "mulino_trade_regulatory_procedureversions.organizationid",
+    "mulino_trade_regulatory_procedureversions.recordedat",
+    "mulino_trade_regulatory_procedureversions.recordedby",
+    "mulino_trade_regulatory_procedureversions.revision",
+    "mulino_trade_shipment_cargoallocations.cargoid",
+    "mulino_trade_shipment_cargoallocations.createdat",
+    "mulino_trade_shipment_cargoallocations.polineid",
+    "mulino_trade_shipment_cargoallocations.quantity",
+    "mulino_trade_shipment_cargoallocations.recordedat",
+    "mulino_trade_shipment_cargoallocations.recordedby",
+    "mulino_trade_shipment_cargoallocations.revision",
+    "mulino_trade_shipment_cargoallocations.shipmentid",
+    "mulino_trade_shipment_cargoallocations.unit",
+    "mulino_trade_shipment_custodyhandovers.cargoid",
+    "mulino_trade_shipment_custodyhandovers.createdat",
+    "mulino_trade_shipment_custodyhandovers.detailstatus",
+    "mulino_trade_shipment_custodyhandovers.fromcustodianid",
+    "mulino_trade_shipment_custodyhandovers.legid",
+    "mulino_trade_shipment_custodyhandovers.occurredat",
+    "mulino_trade_shipment_custodyhandovers.occurrenceid",
+    "mulino_trade_shipment_custodyhandovers.physicalscopeid",
+    "mulino_trade_shipment_custodyhandovers.placeid",
+    "mulino_trade_shipment_custodyhandovers.quantity",
+    "mulino_trade_shipment_custodyhandovers.recordedat",
+    "mulino_trade_shipment_custodyhandovers.recordedby",
+    "mulino_trade_shipment_custodyhandovers.revision",
+    "mulino_trade_shipment_custodyhandovers.shipmentid",
+    "mulino_trade_shipment_custodyhandovers.tocustodianid",
+    "mulino_trade_shipment_custodyhandovers.unit",
+    "mulino_trade_shipment_departureallocations.cargoid",
+    "mulino_trade_shipment_departureallocations.createdat",
+    "mulino_trade_shipment_departureallocations.observationid",
+    "mulino_trade_shipment_departureallocations.physicalscopeid",
+    "mulino_trade_shipment_departureallocations.polineid",
+    "mulino_trade_shipment_departureallocations.quantity",
+    "mulino_trade_shipment_departureallocations.recordedat",
+    "mulino_trade_shipment_departureallocations.recordedby",
+    "mulino_trade_shipment_departureallocations.revision",
+    "mulino_trade_shipment_departureallocations.shipmentid",
+    "mulino_trade_shipment_departureallocations.unit",
+    "mulino_trade_shipment_legevents.cargoid",
+    "mulino_trade_shipment_legevents.createdat",
+    "mulino_trade_shipment_legevents.detailstatus",
+    "mulino_trade_shipment_legevents.kind",
+    "mulino_trade_shipment_legevents.legid",
+    "mulino_trade_shipment_legevents.occurredat",
+    "mulino_trade_shipment_legevents.occurrenceid",
+    "mulino_trade_shipment_legevents.physicalscopeid",
+    "mulino_trade_shipment_legevents.placeid",
+    "mulino_trade_shipment_legevents.quantity",
+    "mulino_trade_shipment_legevents.recordedat",
+    "mulino_trade_shipment_legevents.recordedby",
+    "mulino_trade_shipment_legevents.revision",
+    "mulino_trade_shipment_legevents.shipmentid",
+    "mulino_trade_shipment_legevents.unit",
+    "mulino_trade_shipment_shipmentcargo.createdat",
+    "mulino_trade_shipment_shipmentcargo.itemid",
+    "mulino_trade_shipment_shipmentcargo.plannedquantity",
+    "mulino_trade_shipment_shipmentcargo.recordedat",
+    "mulino_trade_shipment_shipmentcargo.recordedby",
+    "mulino_trade_shipment_shipmentcargo.revision",
+    "mulino_trade_shipment_shipmentcargo.shipmentid",
+    "mulino_trade_shipment_shipmentcargo.unit",
+    "mulino_trade_shipment_shipmentlegs.carrierref",
+    "mulino_trade_shipment_shipmentlegs.createdat",
+    "mulino_trade_shipment_shipmentlegs.destinationid",
+    "mulino_trade_shipment_shipmentlegs.originid",
+    "mulino_trade_shipment_shipmentlegs.recordedat",
+    "mulino_trade_shipment_shipmentlegs.recordedby",
+    "mulino_trade_shipment_shipmentlegs.revision",
+    "mulino_trade_shipment_shipmentlegs.sequence",
+    "mulino_trade_shipment_shipmentlegs.shipmentid",
+    "mulino_trade_shipment_shipments.carrierref",
+    "mulino_trade_shipment_shipments.createdat",
+    "mulino_trade_shipment_shipments.destinationid",
+    "mulino_trade_shipment_shipments.originid",
+    "mulino_trade_shipment_shipments.recordedat",
+    "mulino_trade_shipment_shipments.recordedby",
+    "mulino_trade_shipment_shipments.revision",
+    "mulino_trade_shipment_shipments.state"
+  ],
+  "baseline": "80abae76",
+  "observedColumnCount": 1432,
+  "observedArtifactSha256": "022fa3c2c9a429124434ede57da27a999e7b4e0c7e6f7c105249f4f224652571",
+  "scope": "Combined V1–V22: 1432 columns, 276 explicit timestamp widenings, 584 explicit NOT NULL strengthenings; structural and primary-key differences zero. Final gate requires rerun with this explicit inventory.",
+  "reviewedAdditions": {
+    "mulino_commands_approvalconsumptions.consumedat": {
+      "migration": "database/migrations/V8__commands.sql",
+      "cds": "backend/db/commands.cds",
+      "timestampWideningReason": "실제 발생·기록·승인·실행 시각을 절대 instant로 보존한다.",
+      "notNullStrengtheningReason": "단일 소비 승인과 실제 원 명령의 연결 및 소비 시점을 보존한다."
+    },
+    "mulino_commands_approvals.decidedat": {
+      "migration": "database/migrations/V8__commands.sql",
+      "cds": "backend/db/commands.cds",
+      "timestampWideningReason": "실제 발생·기록·승인·실행 시각을 절대 instant로 보존한다.",
+      "notNullStrengtheningReason": "승인 내용·scope hash·revision·결정 권한·기간·소비 정책을 모두 결합한다."
+    },
+    "mulino_commands_approvals.expiresat": {
+      "migration": "database/migrations/V8__commands.sql",
+      "cds": "backend/db/commands.cds",
+      "timestampWideningReason": "승인·handover·worker lease 만료를 절대 instant로 판정한다.",
+      "notNullStrengtheningReason": "승인 내용·scope hash·revision·결정 권한·기간·소비 정책을 모두 결합한다."
+    },
+    "mulino_commands_commandaudits.createdat": {
+      "migration": "database/migrations/V8__commands.sql",
+      "cds": "backend/db/commands.cds",
+      "timestampWideningReason": "실제 발생·기록·승인·실행 시각을 절대 instant로 보존한다.",
+      "notNullStrengtheningReason": "실행 주체·원 명령·효과 참조·범위/정책 결정 근거와 결과를 불변 감사로 보존한다."
+    },
+    "mulino_commands_commandrecords.completedat": {
+      "migration": "database/migrations/V8__commands.sql",
+      "cds": "backend/db/commands.cds",
+      "timestampWideningReason": "실제 발생·기록·승인·실행 시각을 절대 instant로 보존한다."
+    },
+    "mulino_commands_commandrecords.createdat": {
+      "migration": "database/migrations/V8__commands.sql",
+      "cds": "backend/db/commands.cds",
+      "timestampWideningReason": "실제 발생·기록·승인·실행 시각을 절대 instant로 보존한다.",
+      "notNullStrengtheningReason": "검증된 주체와 멱등 namespace, 의도 hash·지원 version·거래 상태를 빠짐없이 보존한다."
+    },
+    "mulino_evaluation_inputsnapshots.asof": {
+      "migration": "database/migrations/V11__evaluation.sql",
+      "cds": "backend/db/evaluation.cds",
+      "timestampWideningReason": "판정의 effective/knownAt snapshot을 절대 instant로 보존한다."
+    },
+    "mulino_evaluation_inputsnapshots.knownat": {
+      "migration": "database/migrations/V11__evaluation.sql",
+      "cds": "backend/db/evaluation.cds",
+      "timestampWideningReason": "판정의 effective/knownAt snapshot을 절대 instant로 보존한다."
+    },
+    "mulino_evaluation_inputsnapshots.recordedat": {
+      "migration": "database/migrations/V11__evaluation.sql",
+      "cds": "backend/db/evaluation.cds",
+      "timestampWideningReason": "실제 발생·기록·승인·실행 시각을 절대 instant로 보존한다."
+    },
+    "mulino_evidence_reconciliations.createdat": {
+      "migration": "database/migrations/V15__evidence_commands.sql",
+      "cds": "backend/db/evidence.cds",
+      "timestampWideningReason": "실제 발생·기록·승인·실행 시각을 절대 instant로 보존한다.",
+      "notNullStrengtheningReason": "원 주장·출처·근거 문서·대조 결정 및 담당자·다음 확인을 함께 보존한다."
+    },
+    "mulino_evidence_reconciliations.effectivefrom": {
+      "migration": "database/migrations/V15__evidence_commands.sql",
+      "cds": "backend/db/evidence.cds",
+      "timestampWideningReason": "권한·정책·물량 제한의 유효 경계를 timezone과 무관한 절대 instant로 비교한다.",
+      "notNullStrengtheningReason": "원 주장·출처·근거 문서·대조 결정 및 담당자·다음 확인을 함께 보존한다."
+    },
+    "mulino_evidence_reconciliations.nextcheckat": {
+      "migration": "database/migrations/V15__evidence_commands.sql",
+      "cds": "backend/db/evidence.cds",
+      "timestampWideningReason": "책임·대조·복구의 다음 확인 시점을 절대 instant로 보존한다.",
+      "notNullStrengtheningReason": "원 주장·출처·근거 문서·대조 결정 및 담당자·다음 확인을 함께 보존한다."
+    },
+    "mulino_evidence_reconciliations.recordedat": {
+      "migration": "database/migrations/V15__evidence_commands.sql",
+      "cds": "backend/db/evidence.cds",
+      "timestampWideningReason": "실제 발생·기록·승인·실행 시각을 절대 instant로 보존한다.",
+      "notNullStrengtheningReason": "원 주장·출처·근거 문서·대조 결정 및 담당자·다음 확인을 함께 보존한다."
+    },
+    "mulino_governance_policyapprovals.approvedat": {
+      "migration": "database/migrations/V12__control.sql",
+      "cds": "backend/db/policies.cds",
+      "timestampWideningReason": "실제 발생·기록·승인·실행 시각을 절대 instant로 보존한다.",
+      "notNullStrengtheningReason": "불변 내용 hash와 결정자를 승인 기록에 결합한다."
+    },
+    "mulino_governance_policyboundaries.nextcheckat": {
+      "migration": "database/migrations/V12__control.sql",
+      "cds": "backend/db/policies.cds",
+      "timestampWideningReason": "책임·대조·복구의 다음 확인 시점을 절대 instant로 보존한다.",
+      "notNullStrengtheningReason": "정책 경계와 다음 확인 이유를 scheduler가 재발견할 수 있게 저장한다."
+    },
+    "mulino_governance_policydrafts.effectivefrom": {
+      "migration": "database/migrations/V12__control.sql",
+      "cds": "backend/db/policies.cds",
+      "timestampWideningReason": "권한·정책·물량 제한의 유효 경계를 timezone과 무관한 절대 instant로 비교한다.",
+      "notNullStrengtheningReason": "내용·근거·회귀 증거·상태와 정책 적용 성격을 누락 없이 저장한다."
+    },
+    "mulino_governance_policydrafts.effectiveuntil": {
+      "migration": "database/migrations/V12__control.sql",
+      "cds": "backend/db/policies.cds",
+      "timestampWideningReason": "권한·정책·물량 제한의 유효 경계를 timezone과 무관한 절대 instant로 비교한다."
+    },
+    "mulino_governance_policyversions.createdat": {
+      "migration": "database/migrations/V12__control.sql",
+      "cds": "backend/db/policies.cds",
+      "timestampWideningReason": "실제 발생·기록·승인·실행 시각을 절대 instant로 보존한다."
+    },
+    "mulino_governance_policyversions.effectivefrom": {
+      "migration": "database/migrations/V12__control.sql",
+      "cds": "backend/db/policies.cds",
+      "timestampWideningReason": "권한·정책·물량 제한의 유효 경계를 timezone과 무관한 절대 instant로 비교한다."
+    },
+    "mulino_governance_policyversions.effectiveuntil": {
+      "migration": "database/migrations/V12__control.sql",
+      "cds": "backend/db/policies.cds",
+      "timestampWideningReason": "권한·정책·물량 제한의 유효 경계를 timezone과 무관한 절대 instant로 비교한다."
+    },
+    "mulino_identity_authorityinvalidations.nextcheckat": {
+      "migration": "database/migrations/V12__control.sql",
+      "cds": "backend/db/identity.cds",
+      "timestampWideningReason": "책임·대조·복구의 다음 확인 시점을 절대 instant로 보존한다.",
+      "notNullStrengtheningReason": "권한 변경 대상과 재확인 시점·이유·revision을 보존한다."
+    },
+    "mulino_identity_managementauthorities.revokedat": {
+      "migration": "database/migrations/V12__control.sql",
+      "cds": "backend/db/identity.cds",
+      "timestampWideningReason": "권한·정책·물량 제한의 유효 경계를 timezone과 무관한 절대 instant로 비교한다."
+    },
+    "mulino_identity_managementauthorities.validfrom": {
+      "migration": "database/migrations/V12__control.sql",
+      "cds": "backend/db/identity.cds",
+      "timestampWideningReason": "권한·정책·물량 제한의 유효 경계를 timezone과 무관한 절대 instant로 비교한다.",
+      "notNullStrengtheningReason": "현재 관리 권한의 actor·capability·scope·기간·revision을 보존한다."
+    },
+    "mulino_identity_managementauthorities.validuntil": {
+      "migration": "database/migrations/V12__control.sql",
+      "cds": "backend/db/identity.cds",
+      "timestampWideningReason": "권한·정책·물량 제한의 유효 경계를 timezone과 무관한 절대 instant로 비교한다.",
+      "notNullStrengtheningReason": "현재 관리 권한의 actor·capability·scope·기간·revision을 보존한다."
+    },
+    "mulino_inventory_dispositionbases.createdat": {
+      "migration": "database/migrations/V14__inventory_commands.sql",
+      "cds": "backend/db/inventory.cds",
+      "timestampWideningReason": "실제 발생·기록·승인·실행 시각을 절대 instant로 보존한다.",
+      "notNullStrengtheningReason": "행동별 처분 허용의 scope·근거·결정·기간·상태를 보존한다."
+    },
+    "mulino_inventory_dispositionbases.recordedat": {
+      "migration": "database/migrations/V14__inventory_commands.sql",
+      "cds": "backend/db/inventory.cds",
+      "timestampWideningReason": "실제 발생·기록·승인·실행 시각을 절대 instant로 보존한다.",
+      "notNullStrengtheningReason": "행동별 처분 허용의 scope·근거·결정·기간·상태를 보존한다."
+    },
+    "mulino_inventory_dispositionbases.validfrom": {
+      "migration": "database/migrations/V14__inventory_commands.sql",
+      "cds": "backend/db/inventory.cds",
+      "timestampWideningReason": "권한·정책·물량 제한의 유효 경계를 timezone과 무관한 절대 instant로 비교한다.",
+      "notNullStrengtheningReason": "행동별 처분 허용의 scope·근거·결정·기간·상태를 보존한다."
+    },
+    "mulino_inventory_dispositionbases.validuntil": {
+      "migration": "database/migrations/V14__inventory_commands.sql",
+      "cds": "backend/db/inventory.cds",
+      "timestampWideningReason": "권한·정책·물량 제한의 유효 경계를 timezone과 무관한 절대 instant로 비교한다.",
+      "notNullStrengtheningReason": "행동별 처분 허용의 scope·근거·결정·기간·상태를 보존한다."
+    },
+    "mulino_inventory_identifierconflicts.createdat": {
+      "migration": "database/migrations/V14__inventory_commands.sql",
+      "cds": "backend/db/inventory.cds",
+      "timestampWideningReason": "실제 발생·기록·승인·실행 시각을 절대 instant로 보존한다.",
+      "notNullStrengtheningReason": "기존 외부 식별자와 충돌한 품목·namespace·값·시점을 보존한다."
+    },
+    "mulino_inventory_identifierconflicts.recordedat": {
+      "migration": "database/migrations/V14__inventory_commands.sql",
+      "cds": "backend/db/inventory.cds",
+      "timestampWideningReason": "실제 발생·기록·승인·실행 시각을 절대 instant로 보존한다.",
+      "notNullStrengtheningReason": "기존 외부 식별자와 충돌한 품목·namespace·값·시점을 보존한다."
+    },
+    "mulino_inventory_identifierconflicts.validfrom": {
+      "migration": "database/migrations/V14__inventory_commands.sql",
+      "cds": "backend/db/inventory.cds",
+      "timestampWideningReason": "권한·정책·물량 제한의 유효 경계를 timezone과 무관한 절대 instant로 비교한다.",
+      "notNullStrengtheningReason": "기존 외부 식별자와 충돌한 품목·namespace·값·시점을 보존한다."
+    },
+    "mulino_inventory_identifierconflicts.validuntil": {
+      "migration": "database/migrations/V14__inventory_commands.sql",
+      "cds": "backend/db/inventory.cds",
+      "timestampWideningReason": "권한·정책·물량 제한의 유효 경계를 timezone과 무관한 절대 instant로 비교한다."
+    },
+    "mulino_inventory_restrictions.createdat": {
+      "migration": "database/migrations/V14__inventory_commands.sql",
+      "cds": "backend/db/inventory.cds",
+      "timestampWideningReason": "실제 발생·기록·승인·실행 시각을 절대 instant로 보존한다.",
+      "notNullStrengtheningReason": "행동별 제한의 scope·근거·결정·기간·상태를 보존한다."
+    },
+    "mulino_inventory_restrictions.recordedat": {
+      "migration": "database/migrations/V14__inventory_commands.sql",
+      "cds": "backend/db/inventory.cds",
+      "timestampWideningReason": "실제 발생·기록·승인·실행 시각을 절대 instant로 보존한다.",
+      "notNullStrengtheningReason": "행동별 제한의 scope·근거·결정·기간·상태를 보존한다."
+    },
+    "mulino_inventory_restrictions.validfrom": {
+      "migration": "database/migrations/V14__inventory_commands.sql",
+      "cds": "backend/db/inventory.cds",
+      "timestampWideningReason": "권한·정책·물량 제한의 유효 경계를 timezone과 무관한 절대 instant로 비교한다.",
+      "notNullStrengtheningReason": "행동별 제한의 scope·근거·결정·기간·상태를 보존한다."
+    },
+    "mulino_inventory_restrictions.validuntil": {
+      "migration": "database/migrations/V14__inventory_commands.sql",
+      "cds": "backend/db/inventory.cds",
+      "timestampWideningReason": "권한·정책·물량 제한의 유효 경계를 timezone과 무관한 절대 instant로 비교한다."
+    },
+    "mulino_inventory_segmentallocations.createdat": {
+      "migration": "database/migrations/V14__inventory_commands.sql",
+      "cds": "backend/db/inventory.cds",
+      "timestampWideningReason": "실제 발생·기록·승인·실행 시각을 절대 instant로 보존한다.",
+      "notNullStrengtheningReason": "배분의 수량·단위·원 segment·주문·원 명령·상태를 함께 보존한다."
+    },
+    "mulino_inventory_segmentallocations.recordedat": {
+      "migration": "database/migrations/V14__inventory_commands.sql",
+      "cds": "backend/db/inventory.cds",
+      "timestampWideningReason": "실제 발생·기록·승인·실행 시각을 절대 instant로 보존한다.",
+      "notNullStrengtheningReason": "배분의 수량·단위·원 segment·주문·원 명령·상태를 함께 보존한다."
+    },
+    "mulino_inventory_stockadjustments.createdat": {
+      "migration": "database/migrations/V14__inventory_commands.sql",
+      "cds": "backend/db/inventory.cds",
+      "timestampWideningReason": "실제 발생·기록·승인·실행 시각을 절대 instant로 보존한다.",
+      "notNullStrengtheningReason": "원 실사와 segment·증감 방향·수량·단위·근거·원 명령을 연결한다."
+    },
+    "mulino_inventory_stockadjustments.occurredat": {
+      "migration": "database/migrations/V14__inventory_commands.sql",
+      "cds": "backend/db/inventory.cds",
+      "timestampWideningReason": "실제 발생·기록·승인·실행 시각을 절대 instant로 보존한다.",
+      "notNullStrengtheningReason": "원 실사와 segment·증감 방향·수량·단위·근거·원 명령을 연결한다."
+    },
+    "mulino_inventory_stockadjustments.recordedat": {
+      "migration": "database/migrations/V14__inventory_commands.sql",
+      "cds": "backend/db/inventory.cds",
+      "timestampWideningReason": "실제 발생·기록·승인·실행 시각을 절대 instant로 보존한다.",
+      "notNullStrengtheningReason": "원 실사와 segment·증감 방향·수량·단위·근거·원 명령을 연결한다."
+    },
+    "mulino_inventory_stocktakes.createdat": {
+      "migration": "database/migrations/V14__inventory_commands.sql",
+      "cds": "backend/db/inventory.cds",
+      "timestampWideningReason": "실제 발생·기록·승인·실행 시각을 절대 instant로 보존한다.",
+      "notNullStrengtheningReason": "관측 수량·단위·원 segment·근거·실제/기록 시점·원 명령을 연결한다."
+    },
+    "mulino_inventory_stocktakes.occurredat": {
+      "migration": "database/migrations/V14__inventory_commands.sql",
+      "cds": "backend/db/inventory.cds",
+      "timestampWideningReason": "실제 발생·기록·승인·실행 시각을 절대 instant로 보존한다.",
+      "notNullStrengtheningReason": "관측 수량·단위·원 segment·근거·실제/기록 시점·원 명령을 연결한다."
+    },
+    "mulino_inventory_stocktakes.recordedat": {
+      "migration": "database/migrations/V14__inventory_commands.sql",
+      "cds": "backend/db/inventory.cds",
+      "timestampWideningReason": "실제 발생·기록·승인·실행 시각을 절대 instant로 보존한다.",
+      "notNullStrengtheningReason": "관측 수량·단위·원 segment·근거·실제/기록 시점·원 명령을 연결한다."
+    },
+    "mulino_responsibility_handovers.createdat": {
+      "migration": "database/migrations/V10__responsibility.sql",
+      "cds": "backend/db/responsibility.cds",
+      "timestampWideningReason": "실제 발생·기록·승인·실행 시각을 절대 instant로 보존한다."
+    },
+    "mulino_responsibility_handovers.expiresat": {
+      "migration": "database/migrations/V10__responsibility.sql",
+      "cds": "backend/db/responsibility.cds",
+      "timestampWideningReason": "승인·handover·worker lease 만료를 절대 instant로 판정한다."
+    },
+    "mulino_responsibility_handovers.nextcheckat": {
+      "migration": "database/migrations/V10__responsibility.sql",
+      "cds": "backend/db/responsibility.cds",
+      "timestampWideningReason": "책임·대조·복구의 다음 확인 시점을 절대 instant로 보존한다."
+    },
+    "mulino_responsibility_handovers.recordedat": {
+      "migration": "database/migrations/V10__responsibility.sql",
+      "cds": "backend/db/responsibility.cds",
+      "timestampWideningReason": "실제 발생·기록·승인·실행 시각을 절대 instant로 보존한다."
+    },
+    "mulino_responsibility_roots.createdat": {
+      "migration": "database/migrations/V10__responsibility.sql",
+      "cds": "backend/db/responsibility.cds",
+      "timestampWideningReason": "실제 발생·기록·승인·실행 시각을 절대 instant로 보존한다."
+    },
+    "mulino_responsibility_roots.recordedat": {
+      "migration": "database/migrations/V10__responsibility.sql",
+      "cds": "backend/db/responsibility.cds",
+      "timestampWideningReason": "실제 발생·기록·승인·실행 시각을 절대 instant로 보존한다."
+    },
+    "mulino_responsibility_scopes.createdat": {
+      "migration": "database/migrations/V10__responsibility.sql",
+      "cds": "backend/db/responsibility.cds",
+      "timestampWideningReason": "실제 발생·기록·승인·실행 시각을 절대 instant로 보존한다."
+    },
+    "mulino_responsibility_scopes.recordedat": {
+      "migration": "database/migrations/V10__responsibility.sql",
+      "cds": "backend/db/responsibility.cds",
+      "timestampWideningReason": "실제 발생·기록·승인·실행 시각을 절대 instant로 보존한다."
+    },
+    "mulino_runtime_executionattempts.finishedat": {
+      "migration": "database/migrations/V13__runtime.sql",
+      "cds": "backend/db/runtime.cds",
+      "timestampWideningReason": "실제 발생·기록·승인·실행 시각을 절대 instant로 보존한다."
+    },
+    "mulino_runtime_executionattempts.heartbeatat": {
+      "migration": "database/migrations/V13__runtime.sql",
+      "cds": "backend/db/runtime.cds",
+      "timestampWideningReason": "실제 발생·기록·승인·실행 시각을 절대 instant로 보존한다."
+    },
+    "mulino_runtime_executionattempts.leaseexpiresat": {
+      "migration": "database/migrations/V13__runtime.sql",
+      "cds": "backend/db/runtime.cds",
+      "timestampWideningReason": "승인·handover·worker lease 만료를 절대 instant로 판정한다."
+    },
+    "mulino_runtime_executionattempts.startedat": {
+      "migration": "database/migrations/V13__runtime.sql",
+      "cds": "backend/db/runtime.cds",
+      "timestampWideningReason": "실제 발생·기록·승인·실행 시각을 절대 instant로 보존한다."
+    },
+    "mulino_runtime_externalreconciliations.recordedat": {
+      "migration": "database/migrations/V13__runtime.sql",
+      "cds": "backend/db/runtime.cds",
+      "timestampWideningReason": "실제 발생·기록·승인·실행 시각을 절대 instant로 보존한다."
+    },
+    "mulino_runtime_outbox.createdat": {
+      "migration": "database/migrations/V13__runtime.sql",
+      "cds": "backend/db/runtime.cds",
+      "timestampWideningReason": "실제 발생·기록·승인·실행 시각을 절대 instant로 보존한다."
+    },
+    "mulino_runtime_outbox.leaseexpiresat": {
+      "migration": "database/migrations/V13__runtime.sql",
+      "cds": "backend/db/runtime.cds",
+      "timestampWideningReason": "승인·handover·worker lease 만료를 절대 instant로 판정한다."
+    },
+    "mulino_runtime_outbox.nextcheckat": {
+      "migration": "database/migrations/V13__runtime.sql",
+      "cds": "backend/db/runtime.cds",
+      "timestampWideningReason": "책임·대조·복구의 다음 확인 시점을 절대 instant로 보존한다."
+    },
+    "mulino_runtime_recoveryschedules.nextcheckat": {
+      "migration": "database/migrations/V13__runtime.sql",
+      "cds": "backend/db/runtime.cds",
+      "timestampWideningReason": "책임·대조·복구의 다음 확인 시점을 절대 instant로 보존한다."
+    },
+    "mulino_runtime_recoveryschedules.nextvalidityboundary": {
+      "migration": "database/migrations/V13__runtime.sql",
+      "cds": "backend/db/runtime.cds",
+      "timestampWideningReason": "권한·정책·물량 제한의 유효 경계를 timezone과 무관한 절대 instant로 비교한다."
+    },
+    "mulino_work_read_assessmentreferences.asof": {
+      "migration": "database/migrations/V11__evaluation.sql",
+      "cds": "backend/db/work-read.cds",
+      "timestampWideningReason": "판정의 effective/knownAt snapshot을 절대 instant로 보존한다."
+    },
+    "mulino_work_read_assessmentreferences.knownat": {
+      "migration": "database/migrations/V11__evaluation.sql",
+      "cds": "backend/db/work-read.cds",
+      "timestampWideningReason": "판정의 effective/knownAt snapshot을 절대 instant로 보존한다."
+    },
+    "mulino_work_read_goalreferences.dueat": {
+      "migration": "database/migrations/V9__work.sql",
+      "cds": "backend/db/work-read.cds",
+      "timestampWideningReason": "목표 기한의 절대 instant와 별도 시간대·끝점 의미를 보존한다."
+    },
+    "mulino_work_workcontributions.recordedat": {
+      "migration": "database/migrations/V9__work.sql",
+      "cds": "backend/db/work.cds",
+      "timestampWideningReason": "실제 발생·기록·승인·실행 시각을 절대 instant로 보존한다."
+    },
+    "mulino_work_worklinks.createdat": {
+      "migration": "database/migrations/V9__work.sql",
+      "cds": "backend/db/work.cds",
+      "timestampWideningReason": "실제 발생·기록·승인·실행 시각을 절대 instant로 보존한다."
+    },
+    "mulino_work_worktransitions.recordedat": {
+      "migration": "database/migrations/V9__work.sql",
+      "cds": "backend/db/work.cds",
+      "timestampWideningReason": "실제 발생·기록·승인·실행 시각을 절대 instant로 보존한다."
+    },
+    "mulino_commands_approvalconsumptions.approvalid": {
+      "migration": "database/migrations/V8__commands.sql",
+      "cds": "backend/db/commands.cds",
+      "notNullStrengtheningReason": "단일 소비 승인과 실제 원 명령의 연결 및 소비 시점을 보존한다."
+    },
+    "mulino_commands_approvalconsumptions.commandid": {
+      "migration": "database/migrations/V8__commands.sql",
+      "cds": "backend/db/commands.cds",
+      "notNullStrengtheningReason": "단일 소비 승인과 실제 원 명령의 연결 및 소비 시점을 보존한다."
+    },
+    "mulino_commands_approvalconsumptions.organizationid": {
+      "migration": "database/migrations/V8__commands.sql",
+      "cds": "backend/db/commands.cds",
+      "notNullStrengtheningReason": "단일 소비 승인과 실제 원 명령의 연결 및 소비 시점을 보존한다."
+    },
+    "mulino_commands_approvals.action": {
+      "migration": "database/migrations/V8__commands.sql",
+      "cds": "backend/db/commands.cds",
+      "notNullStrengtheningReason": "승인 내용·scope hash·revision·결정 권한·기간·소비 정책을 모두 결합한다."
+    },
+    "mulino_commands_approvals.approverid": {
+      "migration": "database/migrations/V8__commands.sql",
+      "cds": "backend/db/commands.cds",
+      "notNullStrengtheningReason": "승인 내용·scope hash·revision·결정 권한·기간·소비 정책을 모두 결합한다."
+    },
+    "mulino_commands_approvals.canonicalhash": {
+      "migration": "database/migrations/V8__commands.sql",
+      "cds": "backend/db/commands.cds",
+      "notNullStrengtheningReason": "승인 내용·scope hash·revision·결정 권한·기간·소비 정책을 모두 결합한다."
+    },
+    "mulino_commands_approvals.decision": {
+      "migration": "database/migrations/V8__commands.sql",
+      "cds": "backend/db/commands.cds",
+      "notNullStrengtheningReason": "승인 내용·scope hash·revision·결정 권한·기간·소비 정책을 모두 결합한다."
+    },
+    "mulino_commands_approvals.decisioncapability": {
+      "migration": "database/migrations/V8__commands.sql",
+      "cds": "backend/db/commands.cds",
+      "notNullStrengtheningReason": "승인 내용·scope hash·revision·결정 권한·기간·소비 정책을 모두 결합한다."
+    },
+    "mulino_commands_approvals.organizationid": {
+      "migration": "database/migrations/V8__commands.sql",
+      "cds": "backend/db/commands.cds",
+      "notNullStrengtheningReason": "승인 내용·scope hash·revision·결정 권한·기간·소비 정책을 모두 결합한다."
+    },
+    "mulino_commands_approvals.policyhash": {
+      "migration": "database/migrations/V8__commands.sql",
+      "cds": "backend/db/commands.cds",
+      "notNullStrengtheningReason": "승인 내용·scope hash·revision·결정 권한·기간·소비 정책을 모두 결합한다."
+    },
+    "mulino_commands_approvals.proposalid": {
+      "migration": "database/migrations/V8__commands.sql",
+      "cds": "backend/db/commands.cds",
+      "notNullStrengtheningReason": "승인 내용·scope hash·revision·결정 권한·기간·소비 정책을 모두 결합한다."
+    },
+    "mulino_commands_approvals.proposalrevision": {
+      "migration": "database/migrations/V8__commands.sql",
+      "cds": "backend/db/commands.cds",
+      "notNullStrengtheningReason": "승인 내용·scope hash·revision·결정 권한·기간·소비 정책을 모두 결합한다."
+    },
+    "mulino_commands_approvals.scopehash": {
+      "migration": "database/migrations/V8__commands.sql",
+      "cds": "backend/db/commands.cds",
+      "notNullStrengtheningReason": "승인 내용·scope hash·revision·결정 권한·기간·소비 정책을 모두 결합한다."
+    },
+    "mulino_commands_approvals.singleuse": {
+      "migration": "database/migrations/V8__commands.sql",
+      "cds": "backend/db/commands.cds",
+      "notNullStrengtheningReason": "승인 내용·scope hash·revision·결정 권한·기간·소비 정책을 모두 결합한다."
+    },
+    "mulino_commands_commandaudits.actorid": {
+      "migration": "database/migrations/V8__commands.sql",
+      "cds": "backend/db/commands.cds",
+      "notNullStrengtheningReason": "실행 주체·원 명령·효과 참조·범위/정책 결정 근거와 결과를 불변 감사로 보존한다."
+    },
+    "mulino_commands_commandaudits.auditfactsjson": {
+      "migration": "database/migrations/V8__commands.sql",
+      "cds": "backend/db/commands.cds",
+      "notNullStrengtheningReason": "실행 주체·원 명령·효과 참조·범위/정책 결정 근거와 결과를 불변 감사로 보존한다."
+    },
+    "mulino_commands_commandaudits.canonicalhash": {
+      "migration": "database/migrations/V8__commands.sql",
+      "cds": "backend/db/commands.cds",
+      "notNullStrengtheningReason": "실행 주체·원 명령·효과 참조·범위/정책 결정 근거와 결과를 불변 감사로 보존한다."
+    },
+    "mulino_commands_commandaudits.capabilityid": {
+      "migration": "database/migrations/V8__commands.sql",
+      "cds": "backend/db/commands.cds",
+      "notNullStrengtheningReason": "실행 주체·원 명령·효과 참조·범위/정책 결정 근거와 결과를 불변 감사로 보존한다."
+    },
+    "mulino_commands_commandaudits.commandid": {
+      "migration": "database/migrations/V8__commands.sql",
+      "cds": "backend/db/commands.cds",
+      "notNullStrengtheningReason": "실행 주체·원 명령·효과 참조·범위/정책 결정 근거와 결과를 불변 감사로 보존한다."
+    },
+    "mulino_commands_commandaudits.effectrefs": {
+      "migration": "database/migrations/V8__commands.sql",
+      "cds": "backend/db/commands.cds",
+      "notNullStrengtheningReason": "실행 주체·원 명령·효과 참조·범위/정책 결정 근거와 결과를 불변 감사로 보존한다."
+    },
+    "mulino_commands_commandaudits.organizationid": {
+      "migration": "database/migrations/V8__commands.sql",
+      "cds": "backend/db/commands.cds",
+      "notNullStrengtheningReason": "실행 주체·원 명령·효과 참조·범위/정책 결정 근거와 결과를 불변 감사로 보존한다."
+    },
+    "mulino_commands_commandaudits.outcome": {
+      "migration": "database/migrations/V8__commands.sql",
+      "cds": "backend/db/commands.cds",
+      "notNullStrengtheningReason": "실행 주체·원 명령·효과 참조·범위/정책 결정 근거와 결과를 불변 감사로 보존한다."
+    },
+    "mulino_commands_commandrecords.actorid": {
+      "migration": "database/migrations/V8__commands.sql",
+      "cds": "backend/db/commands.cds",
+      "notNullStrengtheningReason": "검증된 주체와 멱등 namespace, 의도 hash·지원 version·거래 상태를 빠짐없이 보존한다."
+    },
+    "mulino_commands_commandrecords.canonicalhash": {
+      "migration": "database/migrations/V8__commands.sql",
+      "cds": "backend/db/commands.cds",
+      "notNullStrengtheningReason": "검증된 주체와 멱등 namespace, 의도 hash·지원 version·거래 상태를 빠짐없이 보존한다."
+    },
+    "mulino_commands_commandrecords.capabilityid": {
+      "migration": "database/migrations/V8__commands.sql",
+      "cds": "backend/db/commands.cds",
+      "notNullStrengtheningReason": "검증된 주체와 멱등 namespace, 의도 hash·지원 version·거래 상태를 빠짐없이 보존한다."
+    },
+    "mulino_commands_commandrecords.capabilityversion": {
+      "migration": "database/migrations/V8__commands.sql",
+      "cds": "backend/db/commands.cds",
+      "notNullStrengtheningReason": "검증된 주체와 멱등 namespace, 의도 hash·지원 version·거래 상태를 빠짐없이 보존한다."
+    },
+    "mulino_commands_commandrecords.commandidempotencykey": {
+      "migration": "database/migrations/V8__commands.sql",
+      "cds": "backend/db/commands.cds",
+      "notNullStrengtheningReason": "검증된 주체와 멱등 namespace, 의도 hash·지원 version·거래 상태를 빠짐없이 보존한다."
+    },
+    "mulino_commands_commandrecords.definitionversion": {
+      "migration": "database/migrations/V8__commands.sql",
+      "cds": "backend/db/commands.cds",
+      "notNullStrengtheningReason": "검증된 주체와 멱등 namespace, 의도 hash·지원 version·거래 상태를 빠짐없이 보존한다."
+    },
+    "mulino_commands_commandrecords.organizationid": {
+      "migration": "database/migrations/V8__commands.sql",
+      "cds": "backend/db/commands.cds",
+      "notNullStrengtheningReason": "검증된 주체와 멱등 namespace, 의도 hash·지원 version·거래 상태를 빠짐없이 보존한다."
+    },
+    "mulino_commands_commandrecords.stablerequestowner": {
+      "migration": "database/migrations/V8__commands.sql",
+      "cds": "backend/db/commands.cds",
+      "notNullStrengtheningReason": "검증된 주체와 멱등 namespace, 의도 hash·지원 version·거래 상태를 빠짐없이 보존한다."
+    },
+    "mulino_commands_commandrecords.state": {
+      "migration": "database/migrations/V8__commands.sql",
+      "cds": "backend/db/commands.cds",
+      "notNullStrengtheningReason": "검증된 주체와 멱등 namespace, 의도 hash·지원 version·거래 상태를 빠짐없이 보존한다."
+    },
+    "mulino_evidence_reconciliations.basisdocumentid": {
+      "migration": "database/migrations/V15__evidence_commands.sql",
+      "cds": "backend/db/evidence.cds",
+      "notNullStrengtheningReason": "원 주장·출처·근거 문서·대조 결정 및 담당자·다음 확인을 함께 보존한다."
+    },
+    "mulino_evidence_reconciliations.claimid": {
+      "migration": "database/migrations/V15__evidence_commands.sql",
+      "cds": "backend/db/evidence.cds",
+      "notNullStrengtheningReason": "원 주장·출처·근거 문서·대조 결정 및 담당자·다음 확인을 함께 보존한다."
+    },
+    "mulino_evidence_reconciliations.decision": {
+      "migration": "database/migrations/V15__evidence_commands.sql",
+      "cds": "backend/db/evidence.cds",
+      "notNullStrengtheningReason": "원 주장·출처·근거 문서·대조 결정 및 담당자·다음 확인을 함께 보존한다."
+    },
+    "mulino_evidence_reconciliations.intakeownerid": {
+      "migration": "database/migrations/V15__evidence_commands.sql",
+      "cds": "backend/db/evidence.cds",
+      "notNullStrengtheningReason": "원 주장·출처·근거 문서·대조 결정 및 담당자·다음 확인을 함께 보존한다."
+    },
+    "mulino_evidence_reconciliations.nextaction": {
+      "migration": "database/migrations/V15__evidence_commands.sql",
+      "cds": "backend/db/evidence.cds",
+      "notNullStrengtheningReason": "원 주장·출처·근거 문서·대조 결정 및 담당자·다음 확인을 함께 보존한다."
+    },
+    "mulino_evidence_reconciliations.organizationid": {
+      "migration": "database/migrations/V15__evidence_commands.sql",
+      "cds": "backend/db/evidence.cds",
+      "notNullStrengtheningReason": "원 주장·출처·근거 문서·대조 결정 및 담당자·다음 확인을 함께 보존한다."
+    },
+    "mulino_evidence_reconciliations.policyversion": {
+      "migration": "database/migrations/V15__evidence_commands.sql",
+      "cds": "backend/db/evidence.cds",
+      "notNullStrengtheningReason": "원 주장·출처·근거 문서·대조 결정 및 담당자·다음 확인을 함께 보존한다."
+    },
+    "mulino_evidence_reconciliations.reason": {
+      "migration": "database/migrations/V15__evidence_commands.sql",
+      "cds": "backend/db/evidence.cds",
+      "notNullStrengtheningReason": "원 주장·출처·근거 문서·대조 결정 및 담당자·다음 확인을 함께 보존한다."
+    },
+    "mulino_evidence_reconciliations.recordedby": {
+      "migration": "database/migrations/V15__evidence_commands.sql",
+      "cds": "backend/db/evidence.cds",
+      "notNullStrengtheningReason": "원 주장·출처·근거 문서·대조 결정 및 담당자·다음 확인을 함께 보존한다."
+    },
+    "mulino_evidence_reconciliations.revision": {
+      "migration": "database/migrations/V15__evidence_commands.sql",
+      "cds": "backend/db/evidence.cds",
+      "notNullStrengtheningReason": "원 주장·출처·근거 문서·대조 결정 및 담당자·다음 확인을 함께 보존한다."
+    },
+    "mulino_evidence_reconciliations.sourceidentity": {
+      "migration": "database/migrations/V15__evidence_commands.sql",
+      "cds": "backend/db/evidence.cds",
+      "notNullStrengtheningReason": "원 주장·출처·근거 문서·대조 결정 및 담당자·다음 확인을 함께 보존한다."
+    },
+    "mulino_evidence_reconciliations.sourceprofileid": {
+      "migration": "database/migrations/V15__evidence_commands.sql",
+      "cds": "backend/db/evidence.cds",
+      "notNullStrengtheningReason": "원 주장·출처·근거 문서·대조 결정 및 담당자·다음 확인을 함께 보존한다."
+    },
+    "mulino_evidence_reconciliations.subjectid": {
+      "migration": "database/migrations/V15__evidence_commands.sql",
+      "cds": "backend/db/evidence.cds",
+      "notNullStrengtheningReason": "원 주장·출처·근거 문서·대조 결정 및 담당자·다음 확인을 함께 보존한다."
+    },
+    "mulino_evidence_reconciliations.subjectkind": {
+      "migration": "database/migrations/V15__evidence_commands.sql",
+      "cds": "backend/db/evidence.cds",
+      "notNullStrengtheningReason": "원 주장·출처·근거 문서·대조 결정 및 담당자·다음 확인을 함께 보존한다."
+    },
+    "mulino_evidence_reconciliations.supervisorid": {
+      "migration": "database/migrations/V15__evidence_commands.sql",
+      "cds": "backend/db/evidence.cds",
+      "notNullStrengtheningReason": "원 주장·출처·근거 문서·대조 결정 및 담당자·다음 확인을 함께 보존한다."
+    },
+    "mulino_governance_activepolicies.policyid": {
+      "migration": "database/migrations/V12__control.sql",
+      "cds": "backend/db/policies.cds",
+      "notNullStrengtheningReason": "활성 정책 포인터와 revision을 함께 저장한다."
+    },
+    "mulino_governance_activepolicies.revision": {
+      "migration": "database/migrations/V12__control.sql",
+      "cds": "backend/db/policies.cds",
+      "notNullStrengtheningReason": "활성 정책 포인터와 revision을 함께 저장한다."
+    },
+    "mulino_governance_policyapprovals.approverid": {
+      "migration": "database/migrations/V12__control.sql",
+      "cds": "backend/db/policies.cds",
+      "notNullStrengtheningReason": "불변 내용 hash와 결정자를 승인 기록에 결합한다."
+    },
+    "mulino_governance_policyapprovals.contenthash": {
+      "migration": "database/migrations/V12__control.sql",
+      "cds": "backend/db/policies.cds",
+      "notNullStrengtheningReason": "불변 내용 hash와 결정자를 승인 기록에 결합한다."
+    },
+    "mulino_governance_policyapprovals.draftid": {
+      "migration": "database/migrations/V12__control.sql",
+      "cds": "backend/db/policies.cds",
+      "notNullStrengtheningReason": "불변 내용 hash와 결정자를 승인 기록에 결합한다."
+    },
+    "mulino_governance_policyboundaries.policyid": {
+      "migration": "database/migrations/V12__control.sql",
+      "cds": "backend/db/policies.cds",
+      "notNullStrengtheningReason": "정책 경계와 다음 확인 이유를 scheduler가 재발견할 수 있게 저장한다."
+    },
+    "mulino_governance_policyboundaries.reason": {
+      "migration": "database/migrations/V12__control.sql",
+      "cds": "backend/db/policies.cds",
+      "notNullStrengtheningReason": "정책 경계와 다음 확인 이유를 scheduler가 재발견할 수 있게 저장한다."
+    },
+    "mulino_governance_policydrafts.content": {
+      "migration": "database/migrations/V12__control.sql",
+      "cds": "backend/db/policies.cds",
+      "notNullStrengtheningReason": "내용·근거·회귀 증거·상태와 정책 적용 성격을 누락 없이 저장한다."
+    },
+    "mulino_governance_policydrafts.contenthash": {
+      "migration": "database/migrations/V12__control.sql",
+      "cds": "backend/db/policies.cds",
+      "notNullStrengtheningReason": "내용·근거·회귀 증거·상태와 정책 적용 성격을 누락 없이 저장한다."
+    },
+    "mulino_governance_policydrafts.fixtureonly": {
+      "migration": "database/migrations/V12__control.sql",
+      "cds": "backend/db/policies.cds",
+      "notNullStrengtheningReason": "내용·근거·회귀 증거·상태와 정책 적용 성격을 누락 없이 저장한다."
+    },
+    "mulino_governance_policydrafts.kind": {
+      "migration": "database/migrations/V12__control.sql",
+      "cds": "backend/db/policies.cds",
+      "notNullStrengtheningReason": "내용·근거·회귀 증거·상태와 정책 적용 성격을 누락 없이 저장한다."
+    },
+    "mulino_governance_policydrafts.legallyrestrictive": {
+      "migration": "database/migrations/V12__control.sql",
+      "cds": "backend/db/policies.cds",
+      "notNullStrengtheningReason": "내용·근거·회귀 증거·상태와 정책 적용 성격을 누락 없이 저장한다."
+    },
+    "mulino_governance_policydrafts.regressionevidence": {
+      "migration": "database/migrations/V12__control.sql",
+      "cds": "backend/db/policies.cds",
+      "notNullStrengtheningReason": "내용·근거·회귀 증거·상태와 정책 적용 성격을 누락 없이 저장한다."
+    },
+    "mulino_governance_policydrafts.revision": {
+      "migration": "database/migrations/V12__control.sql",
+      "cds": "backend/db/policies.cds",
+      "notNullStrengtheningReason": "내용·근거·회귀 증거·상태와 정책 적용 성격을 누락 없이 저장한다."
+    },
+    "mulino_governance_policydrafts.source": {
+      "migration": "database/migrations/V12__control.sql",
+      "cds": "backend/db/policies.cds",
+      "notNullStrengtheningReason": "내용·근거·회귀 증거·상태와 정책 적용 성격을 누락 없이 저장한다."
+    },
+    "mulino_governance_policydrafts.status": {
+      "migration": "database/migrations/V12__control.sql",
+      "cds": "backend/db/policies.cds",
+      "notNullStrengtheningReason": "내용·근거·회귀 증거·상태와 정책 적용 성격을 누락 없이 저장한다."
+    },
+    "mulino_governance_policydrafts.version": {
+      "migration": "database/migrations/V12__control.sql",
+      "cds": "backend/db/policies.cds",
+      "notNullStrengtheningReason": "내용·근거·회귀 증거·상태와 정책 적용 성격을 누락 없이 저장한다."
+    },
+    "mulino_governance_policyfences.revision": {
+      "migration": "database/migrations/V12__control.sql",
+      "cds": "backend/db/policies.cds",
+      "notNullStrengtheningReason": "정책 변경과 실행을 직렬화할 revision을 보존한다."
+    },
+    "mulino_identity_authorityinvalidations.actorid": {
+      "migration": "database/migrations/V12__control.sql",
+      "cds": "backend/db/identity.cds",
+      "notNullStrengtheningReason": "권한 변경 대상과 재확인 시점·이유·revision을 보존한다."
+    },
+    "mulino_identity_authorityinvalidations.reason": {
+      "migration": "database/migrations/V12__control.sql",
+      "cds": "backend/db/identity.cds",
+      "notNullStrengtheningReason": "권한 변경 대상과 재확인 시점·이유·revision을 보존한다."
+    },
+    "mulino_identity_authorityinvalidations.revision": {
+      "migration": "database/migrations/V12__control.sql",
+      "cds": "backend/db/identity.cds",
+      "notNullStrengtheningReason": "권한 변경 대상과 재확인 시점·이유·revision을 보존한다."
+    },
+    "mulino_identity_managementauthorities.actorid": {
+      "migration": "database/migrations/V12__control.sql",
+      "cds": "backend/db/identity.cds",
+      "notNullStrengtheningReason": "현재 관리 권한의 actor·capability·scope·기간·revision을 보존한다."
+    },
+    "mulino_identity_managementauthorities.capabilityid": {
+      "migration": "database/migrations/V12__control.sql",
+      "cds": "backend/db/identity.cds",
+      "notNullStrengtheningReason": "현재 관리 권한의 actor·capability·scope·기간·revision을 보존한다."
+    },
+    "mulino_identity_managementauthorities.revision": {
+      "migration": "database/migrations/V12__control.sql",
+      "cds": "backend/db/identity.cds",
+      "notNullStrengtheningReason": "현재 관리 권한의 actor·capability·scope·기간·revision을 보존한다."
+    },
+    "mulino_identity_managementauthorities.scopeid": {
+      "migration": "database/migrations/V12__control.sql",
+      "cds": "backend/db/identity.cds",
+      "notNullStrengtheningReason": "현재 관리 권한의 actor·capability·scope·기간·revision을 보존한다."
+    },
+    "mulino_identity_managementauthorities.scopekind": {
+      "migration": "database/migrations/V12__control.sql",
+      "cds": "backend/db/identity.cds",
+      "notNullStrengtheningReason": "현재 관리 권한의 actor·capability·scope·기간·revision을 보존한다."
+    },
+    "mulino_inventory_dispositionbases.action": {
+      "migration": "database/migrations/V14__inventory_commands.sql",
+      "cds": "backend/db/inventory.cds",
+      "notNullStrengtheningReason": "행동별 처분 허용의 scope·근거·결정·기간·상태를 보존한다."
+    },
+    "mulino_inventory_dispositionbases.controlscope": {
+      "migration": "database/migrations/V14__inventory_commands.sql",
+      "cds": "backend/db/inventory.cds",
+      "notNullStrengtheningReason": "행동별 처분 허용의 scope·근거·결정·기간·상태를 보존한다."
+    },
+    "mulino_inventory_dispositionbases.decisionid": {
+      "migration": "database/migrations/V14__inventory_commands.sql",
+      "cds": "backend/db/inventory.cds",
+      "notNullStrengtheningReason": "행동별 처분 허용의 scope·근거·결정·기간·상태를 보존한다."
+    },
+    "mulino_inventory_dispositionbases.evidenceref": {
+      "migration": "database/migrations/V14__inventory_commands.sql",
+      "cds": "backend/db/inventory.cds",
+      "notNullStrengtheningReason": "행동별 처분 허용의 scope·근거·결정·기간·상태를 보존한다."
+    },
+    "mulino_inventory_dispositionbases.revision": {
+      "migration": "database/migrations/V14__inventory_commands.sql",
+      "cds": "backend/db/inventory.cds",
+      "notNullStrengtheningReason": "행동별 처분 허용의 scope·근거·결정·기간·상태를 보존한다."
+    },
+    "mulino_inventory_dispositionbases.state": {
+      "migration": "database/migrations/V14__inventory_commands.sql",
+      "cds": "backend/db/inventory.cds",
+      "notNullStrengtheningReason": "행동별 처분 허용의 scope·근거·결정·기간·상태를 보존한다."
+    },
+    "mulino_inventory_identifierconflicts.existingidentifierid": {
+      "migration": "database/migrations/V14__inventory_commands.sql",
+      "cds": "backend/db/inventory.cds",
+      "notNullStrengtheningReason": "기존 외부 식별자와 충돌한 품목·namespace·값·시점을 보존한다."
+    },
+    "mulino_inventory_identifierconflicts.issuer": {
+      "migration": "database/migrations/V14__inventory_commands.sql",
+      "cds": "backend/db/inventory.cds",
+      "notNullStrengtheningReason": "기존 외부 식별자와 충돌한 품목·namespace·값·시점을 보존한다."
+    },
+    "mulino_inventory_identifierconflicts.itemid": {
+      "migration": "database/migrations/V14__inventory_commands.sql",
+      "cds": "backend/db/inventory.cds",
+      "notNullStrengtheningReason": "기존 외부 식별자와 충돌한 품목·namespace·값·시점을 보존한다."
+    },
+    "mulino_inventory_identifierconflicts.namespace": {
+      "migration": "database/migrations/V14__inventory_commands.sql",
+      "cds": "backend/db/inventory.cds",
+      "notNullStrengtheningReason": "기존 외부 식별자와 충돌한 품목·namespace·값·시점을 보존한다."
+    },
+    "mulino_inventory_identifierconflicts.revision": {
+      "migration": "database/migrations/V14__inventory_commands.sql",
+      "cds": "backend/db/inventory.cds",
+      "notNullStrengtheningReason": "기존 외부 식별자와 충돌한 품목·namespace·값·시점을 보존한다."
+    },
+    "mulino_inventory_identifierconflicts.state": {
+      "migration": "database/migrations/V14__inventory_commands.sql",
+      "cds": "backend/db/inventory.cds",
+      "notNullStrengtheningReason": "기존 외부 식별자와 충돌한 품목·namespace·값·시점을 보존한다."
+    },
+    "mulino_inventory_identifierconflicts.value": {
+      "migration": "database/migrations/V14__inventory_commands.sql",
+      "cds": "backend/db/inventory.cds",
+      "notNullStrengtheningReason": "기존 외부 식별자와 충돌한 품목·namespace·값·시점을 보존한다."
+    },
+    "mulino_inventory_restrictions.action": {
+      "migration": "database/migrations/V14__inventory_commands.sql",
+      "cds": "backend/db/inventory.cds",
+      "notNullStrengtheningReason": "행동별 제한의 scope·근거·결정·기간·상태를 보존한다."
+    },
+    "mulino_inventory_restrictions.controlscope": {
+      "migration": "database/migrations/V14__inventory_commands.sql",
+      "cds": "backend/db/inventory.cds",
+      "notNullStrengtheningReason": "행동별 제한의 scope·근거·결정·기간·상태를 보존한다."
+    },
+    "mulino_inventory_restrictions.decisionid": {
+      "migration": "database/migrations/V14__inventory_commands.sql",
+      "cds": "backend/db/inventory.cds",
+      "notNullStrengtheningReason": "행동별 제한의 scope·근거·결정·기간·상태를 보존한다."
+    },
+    "mulino_inventory_restrictions.evidenceref": {
+      "migration": "database/migrations/V14__inventory_commands.sql",
+      "cds": "backend/db/inventory.cds",
+      "notNullStrengtheningReason": "행동별 제한의 scope·근거·결정·기간·상태를 보존한다."
+    },
+    "mulino_inventory_restrictions.revision": {
+      "migration": "database/migrations/V14__inventory_commands.sql",
+      "cds": "backend/db/inventory.cds",
+      "notNullStrengtheningReason": "행동별 제한의 scope·근거·결정·기간·상태를 보존한다."
+    },
+    "mulino_inventory_restrictions.state": {
+      "migration": "database/migrations/V14__inventory_commands.sql",
+      "cds": "backend/db/inventory.cds",
+      "notNullStrengtheningReason": "행동별 제한의 scope·근거·결정·기간·상태를 보존한다."
+    },
+    "mulino_inventory_segmentallocations.commandid": {
+      "migration": "database/migrations/V14__inventory_commands.sql",
+      "cds": "backend/db/inventory.cds",
+      "notNullStrengtheningReason": "배분의 수량·단위·원 segment·주문·원 명령·상태를 함께 보존한다."
+    },
+    "mulino_inventory_segmentallocations.orderlineid": {
+      "migration": "database/migrations/V14__inventory_commands.sql",
+      "cds": "backend/db/inventory.cds",
+      "notNullStrengtheningReason": "배분의 수량·단위·원 segment·주문·원 명령·상태를 함께 보존한다."
+    },
+    "mulino_inventory_segmentallocations.quantity": {
+      "migration": "database/migrations/V14__inventory_commands.sql",
+      "cds": "backend/db/inventory.cds",
+      "notNullStrengtheningReason": "배분의 수량·단위·원 segment·주문·원 명령·상태를 함께 보존한다."
+    },
+    "mulino_inventory_segmentallocations.revision": {
+      "migration": "database/migrations/V14__inventory_commands.sql",
+      "cds": "backend/db/inventory.cds",
+      "notNullStrengtheningReason": "배분의 수량·단위·원 segment·주문·원 명령·상태를 함께 보존한다."
+    },
+    "mulino_inventory_segmentallocations.rootid": {
+      "migration": "database/migrations/V14__inventory_commands.sql",
+      "cds": "backend/db/inventory.cds",
+      "notNullStrengtheningReason": "배분의 수량·단위·원 segment·주문·원 명령·상태를 함께 보존한다."
+    },
+    "mulino_inventory_segmentallocations.segmentid": {
+      "migration": "database/migrations/V14__inventory_commands.sql",
+      "cds": "backend/db/inventory.cds",
+      "notNullStrengtheningReason": "배분의 수량·단위·원 segment·주문·원 명령·상태를 함께 보존한다."
+    },
+    "mulino_inventory_segmentallocations.state": {
+      "migration": "database/migrations/V14__inventory_commands.sql",
+      "cds": "backend/db/inventory.cds",
+      "notNullStrengtheningReason": "배분의 수량·단위·원 segment·주문·원 명령·상태를 함께 보존한다."
+    },
+    "mulino_inventory_segmentallocations.unit": {
+      "migration": "database/migrations/V14__inventory_commands.sql",
+      "cds": "backend/db/inventory.cds",
+      "notNullStrengtheningReason": "배분의 수량·단위·원 segment·주문·원 명령·상태를 함께 보존한다."
+    },
+    "mulino_inventory_stockadjustments.commandid": {
+      "migration": "database/migrations/V14__inventory_commands.sql",
+      "cds": "backend/db/inventory.cds",
+      "notNullStrengtheningReason": "원 실사와 segment·증감 방향·수량·단위·근거·원 명령을 연결한다."
+    },
+    "mulino_inventory_stockadjustments.direction": {
+      "migration": "database/migrations/V14__inventory_commands.sql",
+      "cds": "backend/db/inventory.cds",
+      "notNullStrengtheningReason": "원 실사와 segment·증감 방향·수량·단위·근거·원 명령을 연결한다."
+    },
+    "mulino_inventory_stockadjustments.evidenceref": {
+      "migration": "database/migrations/V14__inventory_commands.sql",
+      "cds": "backend/db/inventory.cds",
+      "notNullStrengtheningReason": "원 실사와 segment·증감 방향·수량·단위·근거·원 명령을 연결한다."
+    },
+    "mulino_inventory_stockadjustments.quantity": {
+      "migration": "database/migrations/V14__inventory_commands.sql",
+      "cds": "backend/db/inventory.cds",
+      "notNullStrengtheningReason": "원 실사와 segment·증감 방향·수량·단위·근거·원 명령을 연결한다."
+    },
+    "mulino_inventory_stockadjustments.reason": {
+      "migration": "database/migrations/V14__inventory_commands.sql",
+      "cds": "backend/db/inventory.cds",
+      "notNullStrengtheningReason": "원 실사와 segment·증감 방향·수량·단위·근거·원 명령을 연결한다."
+    },
+    "mulino_inventory_stockadjustments.revision": {
+      "migration": "database/migrations/V14__inventory_commands.sql",
+      "cds": "backend/db/inventory.cds",
+      "notNullStrengtheningReason": "원 실사와 segment·증감 방향·수량·단위·근거·원 명령을 연결한다."
+    },
+    "mulino_inventory_stockadjustments.segmentid": {
+      "migration": "database/migrations/V14__inventory_commands.sql",
+      "cds": "backend/db/inventory.cds",
+      "notNullStrengtheningReason": "원 실사와 segment·증감 방향·수량·단위·근거·원 명령을 연결한다."
+    },
+    "mulino_inventory_stockadjustments.stocktakeid": {
+      "migration": "database/migrations/V14__inventory_commands.sql",
+      "cds": "backend/db/inventory.cds",
+      "notNullStrengtheningReason": "원 실사와 segment·증감 방향·수량·단위·근거·원 명령을 연결한다."
+    },
+    "mulino_inventory_stockadjustments.unit": {
+      "migration": "database/migrations/V14__inventory_commands.sql",
+      "cds": "backend/db/inventory.cds",
+      "notNullStrengtheningReason": "원 실사와 segment·증감 방향·수량·단위·근거·원 명령을 연결한다."
+    },
+    "mulino_inventory_stocktakes.commandid": {
+      "migration": "database/migrations/V14__inventory_commands.sql",
+      "cds": "backend/db/inventory.cds",
+      "notNullStrengtheningReason": "관측 수량·단위·원 segment·근거·실제/기록 시점·원 명령을 연결한다."
+    },
+    "mulino_inventory_stocktakes.evidenceref": {
+      "migration": "database/migrations/V14__inventory_commands.sql",
+      "cds": "backend/db/inventory.cds",
+      "notNullStrengtheningReason": "관측 수량·단위·원 segment·근거·실제/기록 시점·원 명령을 연결한다."
+    },
+    "mulino_inventory_stocktakes.observedquantity": {
+      "migration": "database/migrations/V14__inventory_commands.sql",
+      "cds": "backend/db/inventory.cds",
+      "notNullStrengtheningReason": "관측 수량·단위·원 segment·근거·실제/기록 시점·원 명령을 연결한다."
+    },
+    "mulino_inventory_stocktakes.revision": {
+      "migration": "database/migrations/V14__inventory_commands.sql",
+      "cds": "backend/db/inventory.cds",
+      "notNullStrengtheningReason": "관측 수량·단위·원 segment·근거·실제/기록 시점·원 명령을 연결한다."
+    },
+    "mulino_inventory_stocktakes.segmentid": {
+      "migration": "database/migrations/V14__inventory_commands.sql",
+      "cds": "backend/db/inventory.cds",
+      "notNullStrengtheningReason": "관측 수량·단위·원 segment·근거·실제/기록 시점·원 명령을 연결한다."
+    },
+    "mulino_inventory_stocktakes.unit": {
+      "migration": "database/migrations/V14__inventory_commands.sql",
+      "cds": "backend/db/inventory.cds",
+      "notNullStrengtheningReason": "관측 수량·단위·원 segment·근거·실제/기록 시점·원 명령을 연결한다."
+    },
+    "mulino_evidence_completioncoverages.claimid": {
+      "migration": "database/migrations/V15__evidence_commands.sql",
+      "cds": "backend/db/evidence.cds",
+      "notNullStrengtheningReason": "원 claim FK를 필수로 보존해 검증 대상 주장을 연결한다."
+    },
+    "mulino_evidence_completioncoverages.createdat": {
+      "migration": "database/migrations/V15__evidence_commands.sql",
+      "cds": "backend/db/evidence.cds",
+      "timestampWideningReason": "immutable 완료 증거 binding·credit·coverage의 생성 시점을 절대 instant로 보존한다.",
+      "notNullStrengtheningReason": "coverage의 최초 생성 시점을 필수로 보존한다."
+    },
+    "mulino_evidence_completioncoverages.documentversionid": {
+      "migration": "database/migrations/V15__evidence_commands.sql",
+      "cds": "backend/db/evidence.cds",
+      "notNullStrengtheningReason": "검증 근거의 immutable document version FK를 필수로 보존한다."
+    },
+    "mulino_evidence_completioncoverages.eventid": {
+      "migration": "database/migrations/V15__evidence_commands.sql",
+      "cds": "backend/db/evidence.cds",
+      "notNullStrengtheningReason": "원 event FK를 필수로 보존해 실제 출처 사건을 연결한다."
+    },
+    "mulino_evidence_completioncoverages.occurrenceid": {
+      "migration": "database/migrations/V15__evidence_commands.sql",
+      "cds": "backend/db/evidence.cds",
+      "notNullStrengtheningReason": "같은 조직의 canonical occurrence FK와 단일 coverage를 필수로 결합한다."
+    },
+    "mulino_evidence_completioncoverages.organizationid": {
+      "migration": "database/migrations/V15__evidence_commands.sql",
+      "cds": "backend/db/evidence.cds",
+      "notNullStrengtheningReason": "증거 coverage의 조직 경계를 필수로 보존한다."
+    },
+    "mulino_evidence_completioncoverages.originalhash": {
+      "migration": "database/migrations/V15__evidence_commands.sql",
+      "cds": "backend/db/evidence.cds",
+      "notNullStrengtheningReason": "원문 증거 hash를 필수로 보존해 내용 바꿔치기를 막는다."
+    },
+    "mulino_evidence_completioncoverages.policyversion": {
+      "migration": "database/migrations/V15__evidence_commands.sql",
+      "cds": "backend/db/evidence.cds",
+      "notNullStrengtheningReason": "실제 검증 정책 version을 필수로 보존해 coverage 판단 기준을 고정한다."
+    },
+    "mulino_evidence_completioncoverages.quantity": {
+      "migration": "database/migrations/V15__evidence_commands.sql",
+      "cds": "backend/db/evidence.cds",
+      "notNullStrengtheningReason": "검증된 완료 범위의 양수 수량을 필수로 보존한다."
+    },
+    "mulino_evidence_completioncoverages.recordedat": {
+      "migration": "database/migrations/V15__evidence_commands.sql",
+      "cds": "backend/db/evidence.cds",
+      "timestampWideningReason": "immutable 완료 증거 binding·credit·coverage의 기록 시점을 절대 instant로 보존한다.",
+      "notNullStrengtheningReason": "coverage의 실제 기록 시점을 필수로 보존한다."
+    },
+    "mulino_evidence_completioncoverages.recordedby": {
+      "migration": "database/migrations/V15__evidence_commands.sql",
+      "cds": "backend/db/evidence.cds",
+      "notNullStrengtheningReason": "같은 조직의 실제 기록 actor FK를 필수로 보존한다."
+    },
+    "mulino_evidence_completioncoverages.revision": {
+      "migration": "database/migrations/V15__evidence_commands.sql",
+      "cds": "backend/db/evidence.cds",
+      "notNullStrengtheningReason": "immutable coverage 기록의 양수 revision을 필수로 보존한다."
+    },
+    "mulino_evidence_completioncoverages.rootid": {
+      "migration": "database/migrations/V15__evidence_commands.sql",
+      "cds": "backend/db/evidence.cds",
+      "notNullStrengtheningReason": "실제 duty root FK를 필수로 결합해 다른 의무에 완료를 재사용하지 않는다."
+    },
+    "mulino_evidence_completioncoverages.sourcepayloadhash": {
+      "migration": "database/migrations/V15__evidence_commands.sql",
+      "cds": "backend/db/evidence.cds",
+      "notNullStrengtheningReason": "실제 출처 payload hash를 필수로 보존해 출처 내용을 결합한다."
+    },
+    "mulino_evidence_completioncoverages.startquantity": {
+      "migration": "database/migrations/V15__evidence_commands.sql",
+      "cds": "backend/db/evidence.cds",
+      "notNullStrengtheningReason": "검증된 완료 범위의 음수 불가 시작 위치를 필수로 보존한다."
+    },
+    "mulino_evidence_completioncoverages.verificationid": {
+      "migration": "database/migrations/V15__evidence_commands.sql",
+      "cds": "backend/db/evidence.cds",
+      "notNullStrengtheningReason": "실제 verification FK를 필수로 결합해 임의 완료 주장을 막는다."
+    },
+    "mulino_responsibility_completionbindings.createdat": {
+      "migration": "database/migrations/V10__responsibility.sql",
+      "cds": "backend/db/responsibility.cds",
+      "timestampWideningReason": "immutable 완료 증거 binding·credit·coverage의 생성 시점을 절대 instant로 보존한다."
+    },
+    "mulino_responsibility_completionbindings.recordedat": {
+      "migration": "database/migrations/V10__responsibility.sql",
+      "cds": "backend/db/responsibility.cds",
+      "timestampWideningReason": "immutable 완료 증거 binding·credit·coverage의 기록 시점을 절대 instant로 보존한다."
+    },
+    "mulino_responsibility_resolutioncredits.createdat": {
+      "migration": "database/migrations/V10__responsibility.sql",
+      "cds": "backend/db/responsibility.cds",
+      "timestampWideningReason": "immutable 완료 증거 binding·credit·coverage의 생성 시점을 절대 instant로 보존한다."
+    },
+    "mulino_responsibility_resolutioncredits.recordedat": {
+      "migration": "database/migrations/V10__responsibility.sql",
+      "cds": "backend/db/responsibility.cds",
+      "timestampWideningReason": "immutable 완료 증거 binding·credit·coverage의 기록 시점을 절대 instant로 보존한다."
+    },
+    "mulino_runtime_intakerecoveries.leaseexpiresat": {
+      "migration": "database/migrations/V13__runtime.sql",
+      "cds": "backend/db/runtime.cds",
+      "timestampWideningReason": "원 intake 소유자의 server lease 만료를 시간대와 무관한 절대 instant로 판단한다."
+    },
+    "mulino_runtime_intakerecoveries.nextcheckat": {
+      "migration": "database/migrations/V13__runtime.sql",
+      "cds": "backend/db/runtime.cds",
+      "timestampWideningReason": "담당자 있는 intake 재검사 due 시각을 절대 instant로 비교한다."
+    },
+    "mulino_runtime_recoveryschedules.lastcheckedat": {
+      "migration": "database/migrations/V13__runtime.sql",
+      "cds": "backend/db/runtime.cds",
+      "timestampWideningReason": "recovery schedule의 실제 마지막 검사 시점을 절대 instant로 기록한다."
+    },
+    "mulino_inventory_dispositionbases.releasedat": {
+      "migration": "database/migrations/V20__quality_eligibility.sql",
+      "cds": "backend/db/inventory.cds",
+      "timestampWideningReason": "S3 불변 원천·결정·실물 적용의 absolute instant를 TIMESTAMPTZ로 보존한다."
+    },
+    "mulino_trade_purchase_executioneffects.createdat": {
+      "migration": "database/migrations/V16__purchase_lifecycle.sql",
+      "cds": "backend/db/purchase.cds",
+      "timestampWideningReason": "S3 불변 원천·결정·실물 적용의 absolute instant를 TIMESTAMPTZ로 보존한다."
+    },
+    "mulino_trade_regulatory_policies.recordedat": {
+      "migration": "database/migrations/V18__regulatory_procedures.sql",
+      "cds": "backend/db/regulatory.cds",
+      "timestampWideningReason": "S3 불변 원천·결정·실물 적용의 absolute instant를 TIMESTAMPTZ로 보존한다.",
+      "notNullStrengtheningReason": "S3 확정 관계와 필수 수량·단위·원천·주체를 nullable CDS 기본값보다 강하게 DB에서 요구한다."
+    },
+    "mulino_trade_shipment_custodyhandovers.occurredat": {
+      "migration": "database/migrations/V17__shipment.sql",
+      "cds": "backend/db/shipment.cds",
+      "timestampWideningReason": "S3 불변 원천·결정·실물 적용의 absolute instant를 TIMESTAMPTZ로 보존한다.",
+      "notNullStrengtheningReason": "S3 확정 관계와 필수 수량·단위·원천·주체를 nullable CDS 기본값보다 강하게 DB에서 요구한다."
+    },
+    "mulino_trade_shipment_cargoallocations.createdat": {
+      "migration": "database/migrations/V17__shipment.sql",
+      "cds": "backend/db/shipment.cds",
+      "timestampWideningReason": "S3 불변 원천·결정·실물 적용의 absolute instant를 TIMESTAMPTZ로 보존한다.",
+      "notNullStrengtheningReason": "S3 확정 관계와 필수 수량·단위·원천·주체를 nullable CDS 기본값보다 강하게 DB에서 요구한다."
+    },
+    "mulino_trade_receipt_observations.recordedat": {
+      "migration": "database/migrations/V19__physical_receipt.sql",
+      "cds": "backend/db/receipt.cds",
+      "timestampWideningReason": "S3 불변 원천·결정·실물 적용의 absolute instant를 TIMESTAMPTZ로 보존한다.",
+      "notNullStrengtheningReason": "S3 확정 관계와 필수 수량·단위·원천·주체를 nullable CDS 기본값보다 강하게 DB에서 요구한다."
+    },
+    "mulino_trade_regulatory_policies.createdat": {
+      "migration": "database/migrations/V18__regulatory_procedures.sql",
+      "cds": "backend/db/regulatory.cds",
+      "timestampWideningReason": "S3 불변 원천·결정·실물 적용의 absolute instant를 TIMESTAMPTZ로 보존한다.",
+      "notNullStrengtheningReason": "S3 확정 관계와 필수 수량·단위·원천·주체를 nullable CDS 기본값보다 강하게 DB에서 요구한다."
+    },
+    "mulino_trade_shipment_shipments.recordedat": {
+      "migration": "database/migrations/V17__shipment.sql",
+      "cds": "backend/db/shipment.cds",
+      "timestampWideningReason": "S3 불변 원천·결정·실물 적용의 absolute instant를 TIMESTAMPTZ로 보존한다.",
+      "notNullStrengtheningReason": "S3 확정 관계와 필수 수량·단위·원천·주체를 nullable CDS 기본값보다 강하게 DB에서 요구한다."
+    },
+    "mulino_trade_purchase_proposalrevisions.recordedat": {
+      "migration": "database/migrations/V16__purchase_lifecycle.sql",
+      "cds": "backend/db/purchase.cds",
+      "timestampWideningReason": "S3 불변 원천·결정·실물 적용의 absolute instant를 TIMESTAMPTZ로 보존한다."
+    },
+    "mulino_trade_purchase_receiptcredits.createdat": {
+      "migration": "database/migrations/V16__purchase_lifecycle.sql",
+      "cds": "backend/db/purchase.cds",
+      "timestampWideningReason": "S3 불변 원천·결정·실물 적용의 absolute instant를 TIMESTAMPTZ로 보존한다."
+    },
+    "mulino_trade_regulatory_decisionversions.validuntil": {
+      "migration": "database/migrations/V18__regulatory_procedures.sql",
+      "cds": "backend/db/regulatory.cds",
+      "timestampWideningReason": "S3 불변 원천·결정·실물 적용의 absolute instant를 TIMESTAMPTZ로 보존한다."
+    },
+    "mulino_trade_purchase_orders.recordedat": {
+      "migration": "database/migrations/V16__purchase_lifecycle.sql",
+      "cds": "backend/db/purchase.cds",
+      "timestampWideningReason": "S3 불변 원천·결정·실물 적용의 absolute instant를 TIMESTAMPTZ로 보존한다."
+    },
+    "mulino_trade_shipment_departureallocations.recordedat": {
+      "migration": "database/migrations/V17__shipment.sql",
+      "cds": "backend/db/shipment.cds",
+      "timestampWideningReason": "S3 불변 원천·결정·실물 적용의 absolute instant를 TIMESTAMPTZ로 보존한다.",
+      "notNullStrengtheningReason": "S3 확정 관계와 필수 수량·단위·원천·주체를 nullable CDS 기본값보다 강하게 DB에서 요구한다."
+    },
+    "mulino_trade_purchase_receiptcredits.effectiveat": {
+      "migration": "database/migrations/V16__purchase_lifecycle.sql",
+      "cds": "backend/db/purchase.cds",
+      "timestampWideningReason": "S3 불변 원천·결정·실물 적용의 absolute instant를 TIMESTAMPTZ로 보존한다."
+    },
+    "mulino_trade_purchase_proposals.recordedat": {
+      "migration": "database/migrations/V16__purchase_lifecycle.sql",
+      "cds": "backend/db/purchase.cds",
+      "timestampWideningReason": "S3 불변 원천·결정·실물 적용의 absolute instant를 TIMESTAMPTZ로 보존한다."
+    },
+    "mulino_responsibility_observationreceiptcredits.createdat": {
+      "migration": "database/migrations/V22__receipt_residual_remedy.sql",
+      "cds": "backend/db/receipt-residual.cds",
+      "timestampWideningReason": "S3 불변 원천·결정·실물 적용의 absolute instant를 TIMESTAMPTZ로 보존한다."
+    },
+    "mulino_trade_purchase_orderlines.effectiveat": {
+      "migration": "database/migrations/V16__purchase_lifecycle.sql",
+      "cds": "backend/db/purchase.cds",
+      "timestampWideningReason": "S3 불변 원천·결정·실물 적용의 absolute instant를 TIMESTAMPTZ로 보존한다."
+    },
+    "mulino_trade_purchase_suppliers.createdat": {
+      "migration": "database/migrations/V16__purchase_lifecycle.sql",
+      "cds": "backend/db/purchase.cds",
+      "timestampWideningReason": "S3 불변 원천·결정·실물 적용의 absolute instant를 TIMESTAMPTZ로 보존한다."
+    },
+    "mulino_trade_regulatory_decisionversions.recordedat": {
+      "migration": "database/migrations/V18__regulatory_procedures.sql",
+      "cds": "backend/db/regulatory.cds",
+      "timestampWideningReason": "S3 불변 원천·결정·실물 적용의 absolute instant를 TIMESTAMPTZ로 보존한다.",
+      "notNullStrengtheningReason": "S3 확정 관계와 필수 수량·단위·원천·주체를 nullable CDS 기본값보다 강하게 DB에서 요구한다."
+    },
+    "mulino_quality_decisions.createdat": {
+      "migration": "database/migrations/V20__quality_eligibility.sql",
+      "cds": "backend/db/quality.cds",
+      "timestampWideningReason": "S3 불변 원천·결정·실물 적용의 absolute instant를 TIMESTAMPTZ로 보존한다.",
+      "notNullStrengtheningReason": "S3 확정 관계와 필수 수량·단위·원천·주체를 nullable CDS 기본값보다 강하게 DB에서 요구한다."
+    },
+    "mulino_inventory_segmentallocations.suspendedat": {
+      "migration": "database/migrations/V20__quality_eligibility.sql",
+      "cds": "backend/db/inventory.cds",
+      "timestampWideningReason": "S3 불변 원천·결정·실물 적용의 absolute instant를 TIMESTAMPTZ로 보존한다."
+    },
+    "mulino_trade_shipment_shipmentcargo.createdat": {
+      "migration": "database/migrations/V17__shipment.sql",
+      "cds": "backend/db/shipment.cds",
+      "timestampWideningReason": "S3 불변 원천·결정·실물 적용의 absolute instant를 TIMESTAMPTZ로 보존한다.",
+      "notNullStrengtheningReason": "S3 확정 관계와 필수 수량·단위·원천·주체를 nullable CDS 기본값보다 강하게 DB에서 요구한다."
+    },
+    "mulino_trade_regulatory_policies.validfrom": {
+      "migration": "database/migrations/V18__regulatory_procedures.sql",
+      "cds": "backend/db/regulatory.cds",
+      "timestampWideningReason": "S3 불변 원천·결정·실물 적용의 absolute instant를 TIMESTAMPTZ로 보존한다.",
+      "notNullStrengtheningReason": "S3 확정 관계와 필수 수량·단위·원천·주체를 nullable CDS 기본값보다 강하게 DB에서 요구한다."
+    },
+    "mulino_trade_purchase_supplierreplies.recordedat": {
+      "migration": "database/migrations/V16__purchase_lifecycle.sql",
+      "cds": "backend/db/purchase.cds",
+      "timestampWideningReason": "S3 불변 원천·결정·실물 적용의 absolute instant를 TIMESTAMPTZ로 보존한다."
+    },
+    "mulino_trade_purchase_cancellations.effectiveat": {
+      "migration": "database/migrations/V16__purchase_lifecycle.sql",
+      "cds": "backend/db/purchase.cds",
+      "timestampWideningReason": "S3 불변 원천·결정·실물 적용의 absolute instant를 TIMESTAMPTZ로 보존한다."
+    },
+    "mulino_trade_shipment_cargoallocations.recordedat": {
+      "migration": "database/migrations/V17__shipment.sql",
+      "cds": "backend/db/shipment.cds",
+      "timestampWideningReason": "S3 불변 원천·결정·실물 적용의 absolute instant를 TIMESTAMPTZ로 보존한다.",
+      "notNullStrengtheningReason": "S3 확정 관계와 필수 수량·단위·원천·주체를 nullable CDS 기본값보다 강하게 DB에서 요구한다."
+    },
+    "mulino_trade_purchase_orders.effectiveat": {
+      "migration": "database/migrations/V16__purchase_lifecycle.sql",
+      "cds": "backend/db/purchase.cds",
+      "timestampWideningReason": "S3 불변 원천·결정·실물 적용의 absolute instant를 TIMESTAMPTZ로 보존한다."
+    },
+    "mulino_trade_purchase_cancellations.recordedat": {
+      "migration": "database/migrations/V16__purchase_lifecycle.sql",
+      "cds": "backend/db/purchase.cds",
+      "timestampWideningReason": "S3 불변 원천·결정·실물 적용의 absolute instant를 TIMESTAMPTZ로 보존한다."
+    },
+    "mulino_trade_purchase_executioneffects.effectiveat": {
+      "migration": "database/migrations/V16__purchase_lifecycle.sql",
+      "cds": "backend/db/purchase.cds",
+      "timestampWideningReason": "S3 불변 원천·결정·실물 적용의 absolute instant를 TIMESTAMPTZ로 보존한다."
+    },
+    "mulino_trade_receipt_observations.occurredat": {
+      "migration": "database/migrations/V19__physical_receipt.sql",
+      "cds": "backend/db/receipt.cds",
+      "timestampWideningReason": "S3 불변 원천·결정·실물 적용의 absolute instant를 TIMESTAMPTZ로 보존한다.",
+      "notNullStrengtheningReason": "S3 확정 관계와 필수 수량·단위·원천·주체를 nullable CDS 기본값보다 강하게 DB에서 요구한다."
+    },
+    "mulino_inventory_restrictions.releasedat": {
+      "migration": "database/migrations/V20__quality_eligibility.sql",
+      "cds": "backend/db/inventory.cds",
+      "timestampWideningReason": "S3 불변 원천·결정·실물 적용의 absolute instant를 TIMESTAMPTZ로 보존한다."
+    },
+    "mulino_trade_purchase_approvals.decidedat": {
+      "migration": "database/migrations/V16__purchase_lifecycle.sql",
+      "cds": "backend/db/purchase.cds",
+      "timestampWideningReason": "S3 불변 원천·결정·실물 적용의 absolute instant를 TIMESTAMPTZ로 보존한다."
+    },
+    "mulino_trade_shipment_shipmentlegs.planneddepartureat": {
+      "migration": "database/migrations/V17__shipment.sql",
+      "cds": "backend/db/shipment.cds",
+      "timestampWideningReason": "S3 불변 원천·결정·실물 적용의 absolute instant를 TIMESTAMPTZ로 보존한다."
+    },
+    "mulino_trade_regulatory_labelverifications.recordedat": {
+      "migration": "database/migrations/V18__regulatory_procedures.sql",
+      "cds": "backend/db/regulatory.cds",
+      "timestampWideningReason": "S3 불변 원천·결정·실물 적용의 absolute instant를 TIMESTAMPTZ로 보존한다.",
+      "notNullStrengtheningReason": "S3 확정 관계와 필수 수량·단위·원천·주체를 nullable CDS 기본값보다 강하게 DB에서 요구한다."
+    },
+    "mulino_trade_purchase_suppliers.effectiveat": {
+      "migration": "database/migrations/V16__purchase_lifecycle.sql",
+      "cds": "backend/db/purchase.cds",
+      "timestampWideningReason": "S3 불변 원천·결정·실물 적용의 absolute instant를 TIMESTAMPTZ로 보존한다."
+    },
+    "mulino_trade_receipt_receipts.recordedat": {
+      "migration": "database/migrations/V19__physical_receipt.sql",
+      "cds": "backend/db/receipt.cds",
+      "timestampWideningReason": "S3 불변 원천·결정·실물 적용의 absolute instant를 TIMESTAMPTZ로 보존한다.",
+      "notNullStrengtheningReason": "S3 확정 관계와 필수 수량·단위·원천·주체를 nullable CDS 기본값보다 강하게 DB에서 요구한다."
+    },
+    "mulino_trade_regulatory_labelverifications.createdat": {
+      "migration": "database/migrations/V18__regulatory_procedures.sql",
+      "cds": "backend/db/regulatory.cds",
+      "timestampWideningReason": "S3 불변 원천·결정·실물 적용의 absolute instant를 TIMESTAMPTZ로 보존한다.",
+      "notNullStrengtheningReason": "S3 확정 관계와 필수 수량·단위·원천·주체를 nullable CDS 기본값보다 강하게 DB에서 요구한다."
+    },
+    "mulino_responsibility_receiptresidualcredits.createdat": {
+      "migration": "database/migrations/V22__receipt_residual_remedy.sql",
+      "cds": "backend/db/receipt-residual.cds",
+      "timestampWideningReason": "S3 불변 원천·결정·실물 적용의 absolute instant를 TIMESTAMPTZ로 보존한다."
+    },
+    "mulino_trade_purchase_supplierreplies.effectiveat": {
+      "migration": "database/migrations/V16__purchase_lifecycle.sql",
+      "cds": "backend/db/purchase.cds",
+      "timestampWideningReason": "S3 불변 원천·결정·실물 적용의 absolute instant를 TIMESTAMPTZ로 보존한다."
+    },
+    "mulino_trade_purchase_proposalrevisions.createdat": {
+      "migration": "database/migrations/V16__purchase_lifecycle.sql",
+      "cds": "backend/db/purchase.cds",
+      "timestampWideningReason": "S3 불변 원천·결정·실물 적용의 absolute instant를 TIMESTAMPTZ로 보존한다."
+    },
+    "mulino_trade_shipment_shipmentlegs.createdat": {
+      "migration": "database/migrations/V17__shipment.sql",
+      "cds": "backend/db/shipment.cds",
+      "timestampWideningReason": "S3 불변 원천·결정·실물 적용의 absolute instant를 TIMESTAMPTZ로 보존한다.",
+      "notNullStrengtheningReason": "S3 확정 관계와 필수 수량·단위·원천·주체를 nullable CDS 기본값보다 강하게 DB에서 요구한다."
+    },
+    "mulino_trade_purchase_receiptcredits.recordedat": {
+      "migration": "database/migrations/V16__purchase_lifecycle.sql",
+      "cds": "backend/db/purchase.cds",
+      "timestampWideningReason": "S3 불변 원천·결정·실물 적용의 absolute instant를 TIMESTAMPTZ로 보존한다."
+    },
+    "mulino_quality_decisions.recordedat": {
+      "migration": "database/migrations/V20__quality_eligibility.sql",
+      "cds": "backend/db/quality.cds",
+      "timestampWideningReason": "S3 불변 원천·결정·실물 적용의 absolute instant를 TIMESTAMPTZ로 보존한다.",
+      "notNullStrengtheningReason": "S3 확정 관계와 필수 수량·단위·원천·주체를 nullable CDS 기본값보다 강하게 DB에서 요구한다."
+    },
+    "mulino_trade_purchase_orderlines.recordedat": {
+      "migration": "database/migrations/V16__purchase_lifecycle.sql",
+      "cds": "backend/db/purchase.cds",
+      "timestampWideningReason": "S3 불변 원천·결정·실물 적용의 absolute instant를 TIMESTAMPTZ로 보존한다."
+    },
+    "mulino_trade_shipment_shipmentcargo.recordedat": {
+      "migration": "database/migrations/V17__shipment.sql",
+      "cds": "backend/db/shipment.cds",
+      "timestampWideningReason": "S3 불변 원천·결정·실물 적용의 absolute instant를 TIMESTAMPTZ로 보존한다.",
+      "notNullStrengtheningReason": "S3 확정 관계와 필수 수량·단위·원천·주체를 nullable CDS 기본값보다 강하게 DB에서 요구한다."
+    },
+    "mulino_inventory_segmentallocations.nextvalidityboundary": {
+      "migration": "database/migrations/V20__quality_eligibility.sql",
+      "cds": "backend/db/inventory.cds",
+      "timestampWideningReason": "S3 불변 원천·결정·실물 적용의 absolute instant를 TIMESTAMPTZ로 보존한다."
+    },
+    "mulino_trade_shipment_custodyhandovers.recordedat": {
+      "migration": "database/migrations/V17__shipment.sql",
+      "cds": "backend/db/shipment.cds",
+      "timestampWideningReason": "S3 불변 원천·결정·실물 적용의 absolute instant를 TIMESTAMPTZ로 보존한다.",
+      "notNullStrengtheningReason": "S3 확정 관계와 필수 수량·단위·원천·주체를 nullable CDS 기본값보다 강하게 DB에서 요구한다."
+    },
+    "mulino_trade_receipt_observations.createdat": {
+      "migration": "database/migrations/V19__physical_receipt.sql",
+      "cds": "backend/db/receipt.cds",
+      "timestampWideningReason": "S3 불변 원천·결정·실물 적용의 absolute instant를 TIMESTAMPTZ로 보존한다.",
+      "notNullStrengtheningReason": "S3 확정 관계와 필수 수량·단위·원천·주체를 nullable CDS 기본값보다 강하게 DB에서 요구한다."
+    },
+    "mulino_trade_regulatory_policies.validuntil": {
+      "migration": "database/migrations/V18__regulatory_procedures.sql",
+      "cds": "backend/db/regulatory.cds",
+      "timestampWideningReason": "S3 불변 원천·결정·실물 적용의 absolute instant를 TIMESTAMPTZ로 보존한다."
+    },
+    "mulino_trade_regulatory_procedureversions.occurredat": {
+      "migration": "database/migrations/V18__regulatory_procedures.sql",
+      "cds": "backend/db/regulatory.cds",
+      "timestampWideningReason": "S3 불변 원천·결정·실물 적용의 absolute instant를 TIMESTAMPTZ로 보존한다."
+    },
+    "mulino_trade_purchase_approvals.recordedat": {
+      "migration": "database/migrations/V16__purchase_lifecycle.sql",
+      "cds": "backend/db/purchase.cds",
+      "timestampWideningReason": "S3 불변 원천·결정·실물 적용의 absolute instant를 TIMESTAMPTZ로 보존한다."
+    },
+    "mulino_trade_purchase_suppliers.recordedat": {
+      "migration": "database/migrations/V16__purchase_lifecycle.sql",
+      "cds": "backend/db/purchase.cds",
+      "timestampWideningReason": "S3 불변 원천·결정·실물 적용의 absolute instant를 TIMESTAMPTZ로 보존한다."
+    },
+    "mulino_inventory_dispositionbases.nextcheckat": {
+      "migration": "database/migrations/V20__quality_eligibility.sql",
+      "cds": "backend/db/inventory.cds",
+      "timestampWideningReason": "S3 불변 원천·결정·실물 적용의 absolute instant를 TIMESTAMPTZ로 보존한다."
+    },
+    "mulino_trade_regulatory_procedures.recordedat": {
+      "migration": "database/migrations/V18__regulatory_procedures.sql",
+      "cds": "backend/db/regulatory.cds",
+      "timestampWideningReason": "S3 불변 원천·결정·실물 적용의 absolute instant를 TIMESTAMPTZ로 보존한다.",
+      "notNullStrengtheningReason": "S3 확정 관계와 필수 수량·단위·원천·주체를 nullable CDS 기본값보다 강하게 DB에서 요구한다."
+    },
+    "mulino_trade_purchase_approvals.effectiveat": {
+      "migration": "database/migrations/V16__purchase_lifecycle.sql",
+      "cds": "backend/db/purchase.cds",
+      "timestampWideningReason": "S3 불변 원천·결정·실물 적용의 absolute instant를 TIMESTAMPTZ로 보존한다."
+    },
+    "mulino_trade_receipt_observations.nextcheckat": {
+      "migration": "database/migrations/V19__physical_receipt.sql",
+      "cds": "backend/db/receipt.cds",
+      "timestampWideningReason": "S3 불변 원천·결정·실물 적용의 absolute instant를 TIMESTAMPTZ로 보존한다.",
+      "notNullStrengtheningReason": "S3 확정 관계와 필수 수량·단위·원천·주체를 nullable CDS 기본값보다 강하게 DB에서 요구한다."
+    },
+    "mulino_trade_receipt_receipts.occurredat": {
+      "migration": "database/migrations/V19__physical_receipt.sql",
+      "cds": "backend/db/receipt.cds",
+      "timestampWideningReason": "S3 불변 원천·결정·실물 적용의 absolute instant를 TIMESTAMPTZ로 보존한다.",
+      "notNullStrengtheningReason": "S3 확정 관계와 필수 수량·단위·원천·주체를 nullable CDS 기본값보다 강하게 DB에서 요구한다."
+    },
+    "mulino_responsibility_observationreceiptcredits.recordedat": {
+      "migration": "database/migrations/V22__receipt_residual_remedy.sql",
+      "cds": "backend/db/receipt-residual.cds",
+      "timestampWideningReason": "S3 불변 원천·결정·실물 적용의 absolute instant를 TIMESTAMPTZ로 보존한다."
+    },
+    "mulino_responsibility_receiptresidualroots.recordedat": {
+      "migration": "database/migrations/V22__receipt_residual_remedy.sql",
+      "cds": "backend/db/receipt-residual.cds",
+      "timestampWideningReason": "S3 불변 원천·결정·실물 적용의 absolute instant를 TIMESTAMPTZ로 보존한다."
+    },
+    "mulino_trade_receipt_receipts.createdat": {
+      "migration": "database/migrations/V19__physical_receipt.sql",
+      "cds": "backend/db/receipt.cds",
+      "timestampWideningReason": "S3 불변 원천·결정·실물 적용의 absolute instant를 TIMESTAMPTZ로 보존한다.",
+      "notNullStrengtheningReason": "S3 확정 관계와 필수 수량·단위·원천·주체를 nullable CDS 기본값보다 강하게 DB에서 요구한다."
+    },
+    "mulino_trade_regulatory_decisionversions.validfrom": {
+      "migration": "database/migrations/V18__regulatory_procedures.sql",
+      "cds": "backend/db/regulatory.cds",
+      "timestampWideningReason": "S3 불변 원천·결정·실물 적용의 absolute instant를 TIMESTAMPTZ로 보존한다.",
+      "notNullStrengtheningReason": "S3 확정 관계와 필수 수량·단위·원천·주체를 nullable CDS 기본값보다 강하게 DB에서 요구한다."
+    },
+    "mulino_responsibility_receiptresidualcredits.recordedat": {
+      "migration": "database/migrations/V22__receipt_residual_remedy.sql",
+      "cds": "backend/db/receipt-residual.cds",
+      "timestampWideningReason": "S3 불변 원천·결정·실물 적용의 absolute instant를 TIMESTAMPTZ로 보존한다."
+    },
+    "mulino_trade_purchase_proposals.createdat": {
+      "migration": "database/migrations/V16__purchase_lifecycle.sql",
+      "cds": "backend/db/purchase.cds",
+      "timestampWideningReason": "S3 불변 원천·결정·실물 적용의 absolute instant를 TIMESTAMPTZ로 보존한다."
+    },
+    "mulino_trade_purchase_supplierreplies.createdat": {
+      "migration": "database/migrations/V16__purchase_lifecycle.sql",
+      "cds": "backend/db/purchase.cds",
+      "timestampWideningReason": "S3 불변 원천·결정·실물 적용의 absolute instant를 TIMESTAMPTZ로 보존한다."
+    },
+    "mulino_trade_regulatory_procedures.createdat": {
+      "migration": "database/migrations/V18__regulatory_procedures.sql",
+      "cds": "backend/db/regulatory.cds",
+      "timestampWideningReason": "S3 불변 원천·결정·실물 적용의 absolute instant를 TIMESTAMPTZ로 보존한다.",
+      "notNullStrengtheningReason": "S3 확정 관계와 필수 수량·단위·원천·주체를 nullable CDS 기본값보다 강하게 DB에서 요구한다."
+    },
+    "mulino_trade_shipment_shipmentlegs.recordedat": {
+      "migration": "database/migrations/V17__shipment.sql",
+      "cds": "backend/db/shipment.cds",
+      "timestampWideningReason": "S3 불변 원천·결정·실물 적용의 absolute instant를 TIMESTAMPTZ로 보존한다.",
+      "notNullStrengtheningReason": "S3 확정 관계와 필수 수량·단위·원천·주체를 nullable CDS 기본값보다 강하게 DB에서 요구한다."
+    },
+    "mulino_trade_regulatory_procedureversions.recordedat": {
+      "migration": "database/migrations/V18__regulatory_procedures.sql",
+      "cds": "backend/db/regulatory.cds",
+      "timestampWideningReason": "S3 불변 원천·결정·실물 적용의 absolute instant를 TIMESTAMPTZ로 보존한다.",
+      "notNullStrengtheningReason": "S3 확정 관계와 필수 수량·단위·원천·주체를 nullable CDS 기본값보다 강하게 DB에서 요구한다."
+    },
+    "mulino_trade_purchase_cancellations.createdat": {
+      "migration": "database/migrations/V16__purchase_lifecycle.sql",
+      "cds": "backend/db/purchase.cds",
+      "timestampWideningReason": "S3 불변 원천·결정·실물 적용의 absolute instant를 TIMESTAMPTZ로 보존한다."
+    },
+    "mulino_trade_purchase_proposals.effectiveat": {
+      "migration": "database/migrations/V16__purchase_lifecycle.sql",
+      "cds": "backend/db/purchase.cds",
+      "timestampWideningReason": "S3 불변 원천·결정·실물 적용의 absolute instant를 TIMESTAMPTZ로 보존한다."
+    },
+    "mulino_inventory_restrictions.nextcheckat": {
+      "migration": "database/migrations/V20__quality_eligibility.sql",
+      "cds": "backend/db/inventory.cds",
+      "timestampWideningReason": "S3 불변 원천·결정·실물 적용의 absolute instant를 TIMESTAMPTZ로 보존한다."
+    },
+    "mulino_trade_shipment_departureallocations.createdat": {
+      "migration": "database/migrations/V17__shipment.sql",
+      "cds": "backend/db/shipment.cds",
+      "timestampWideningReason": "S3 불변 원천·결정·실물 적용의 absolute instant를 TIMESTAMPTZ로 보존한다.",
+      "notNullStrengtheningReason": "S3 확정 관계와 필수 수량·단위·원천·주체를 nullable CDS 기본값보다 강하게 DB에서 요구한다."
+    },
+    "mulino_trade_regulatory_labelverifications.validfrom": {
+      "migration": "database/migrations/V18__regulatory_procedures.sql",
+      "cds": "backend/db/regulatory.cds",
+      "timestampWideningReason": "S3 불변 원천·결정·실물 적용의 absolute instant를 TIMESTAMPTZ로 보존한다.",
+      "notNullStrengtheningReason": "S3 확정 관계와 필수 수량·단위·원천·주체를 nullable CDS 기본값보다 강하게 DB에서 요구한다."
+    },
+    "mulino_trade_regulatory_decisionversions.createdat": {
+      "migration": "database/migrations/V18__regulatory_procedures.sql",
+      "cds": "backend/db/regulatory.cds",
+      "timestampWideningReason": "S3 불변 원천·결정·실물 적용의 absolute instant를 TIMESTAMPTZ로 보존한다.",
+      "notNullStrengtheningReason": "S3 확정 관계와 필수 수량·단위·원천·주체를 nullable CDS 기본값보다 강하게 DB에서 요구한다."
+    },
+    "mulino_trade_purchase_approvals.validuntil": {
+      "migration": "database/migrations/V16__purchase_lifecycle.sql",
+      "cds": "backend/db/purchase.cds",
+      "timestampWideningReason": "S3 불변 원천·결정·실물 적용의 absolute instant를 TIMESTAMPTZ로 보존한다."
+    },
+    "mulino_trade_purchase_approvals.createdat": {
+      "migration": "database/migrations/V16__purchase_lifecycle.sql",
+      "cds": "backend/db/purchase.cds",
+      "timestampWideningReason": "S3 불변 원천·결정·실물 적용의 absolute instant를 TIMESTAMPTZ로 보존한다."
+    },
+    "mulino_trade_purchase_proposalrevisions.effectiveat": {
+      "migration": "database/migrations/V16__purchase_lifecycle.sql",
+      "cds": "backend/db/purchase.cds",
+      "timestampWideningReason": "S3 불변 원천·결정·실물 적용의 absolute instant를 TIMESTAMPTZ로 보존한다."
+    },
+    "mulino_trade_regulatory_labelverifications.validuntil": {
+      "migration": "database/migrations/V18__regulatory_procedures.sql",
+      "cds": "backend/db/regulatory.cds",
+      "timestampWideningReason": "S3 불변 원천·결정·실물 적용의 absolute instant를 TIMESTAMPTZ로 보존한다."
+    },
+    "mulino_trade_shipment_shipments.createdat": {
+      "migration": "database/migrations/V17__shipment.sql",
+      "cds": "backend/db/shipment.cds",
+      "timestampWideningReason": "S3 불변 원천·결정·실물 적용의 absolute instant를 TIMESTAMPTZ로 보존한다.",
+      "notNullStrengtheningReason": "S3 확정 관계와 필수 수량·단위·원천·주체를 nullable CDS 기본값보다 강하게 DB에서 요구한다."
+    },
+    "mulino_trade_shipment_legevents.createdat": {
+      "migration": "database/migrations/V17__shipment.sql",
+      "cds": "backend/db/shipment.cds",
+      "timestampWideningReason": "S3 불변 원천·결정·실물 적용의 absolute instant를 TIMESTAMPTZ로 보존한다.",
+      "notNullStrengtheningReason": "S3 확정 관계와 필수 수량·단위·원천·주체를 nullable CDS 기본값보다 강하게 DB에서 요구한다."
+    },
+    "mulino_trade_regulatory_procedureversions.createdat": {
+      "migration": "database/migrations/V18__regulatory_procedures.sql",
+      "cds": "backend/db/regulatory.cds",
+      "timestampWideningReason": "S3 불변 원천·결정·실물 적용의 absolute instant를 TIMESTAMPTZ로 보존한다.",
+      "notNullStrengtheningReason": "S3 확정 관계와 필수 수량·단위·원천·주체를 nullable CDS 기본값보다 강하게 DB에서 요구한다."
+    },
+    "mulino_trade_purchase_orderlines.createdat": {
+      "migration": "database/migrations/V16__purchase_lifecycle.sql",
+      "cds": "backend/db/purchase.cds",
+      "timestampWideningReason": "S3 불변 원천·결정·실물 적용의 absolute instant를 TIMESTAMPTZ로 보존한다."
+    },
+    "mulino_trade_purchase_proposalrevisions.dueat": {
+      "migration": "database/migrations/V16__purchase_lifecycle.sql",
+      "cds": "backend/db/purchase.cds",
+      "timestampWideningReason": "S3 불변 원천·결정·실물 적용의 absolute instant를 TIMESTAMPTZ로 보존한다."
+    },
+    "mulino_trade_purchase_orders.createdat": {
+      "migration": "database/migrations/V16__purchase_lifecycle.sql",
+      "cds": "backend/db/purchase.cds",
+      "timestampWideningReason": "S3 불변 원천·결정·실물 적용의 absolute instant를 TIMESTAMPTZ로 보존한다."
+    },
+    "mulino_trade_shipment_legevents.occurredat": {
+      "migration": "database/migrations/V17__shipment.sql",
+      "cds": "backend/db/shipment.cds",
+      "timestampWideningReason": "S3 불변 원천·결정·실물 적용의 absolute instant를 TIMESTAMPTZ로 보존한다.",
+      "notNullStrengtheningReason": "S3 확정 관계와 필수 수량·단위·원천·주체를 nullable CDS 기본값보다 강하게 DB에서 요구한다."
+    },
+    "mulino_trade_purchase_executioneffects.recordedat": {
+      "migration": "database/migrations/V16__purchase_lifecycle.sql",
+      "cds": "backend/db/purchase.cds",
+      "timestampWideningReason": "S3 불변 원천·결정·실물 적용의 absolute instant를 TIMESTAMPTZ로 보존한다."
+    },
+    "mulino_trade_shipment_shipmentlegs.plannedarrivalat": {
+      "migration": "database/migrations/V17__shipment.sql",
+      "cds": "backend/db/shipment.cds",
+      "timestampWideningReason": "S3 불변 원천·결정·실물 적용의 absolute instant를 TIMESTAMPTZ로 보존한다."
+    },
+    "mulino_responsibility_receiptresidualroots.createdat": {
+      "migration": "database/migrations/V22__receipt_residual_remedy.sql",
+      "cds": "backend/db/receipt-residual.cds",
+      "timestampWideningReason": "S3 불변 원천·결정·실물 적용의 absolute instant를 TIMESTAMPTZ로 보존한다."
+    },
+    "mulino_trade_shipment_legevents.recordedat": {
+      "migration": "database/migrations/V17__shipment.sql",
+      "cds": "backend/db/shipment.cds",
+      "timestampWideningReason": "S3 불변 원천·결정·실물 적용의 absolute instant를 TIMESTAMPTZ로 보존한다.",
+      "notNullStrengtheningReason": "S3 확정 관계와 필수 수량·단위·원천·주체를 nullable CDS 기본값보다 강하게 DB에서 요구한다."
+    },
+    "mulino_trade_shipment_custodyhandovers.createdat": {
+      "migration": "database/migrations/V17__shipment.sql",
+      "cds": "backend/db/shipment.cds",
+      "timestampWideningReason": "S3 불변 원천·결정·실물 적용의 absolute instant를 TIMESTAMPTZ로 보존한다.",
+      "notNullStrengtheningReason": "S3 확정 관계와 필수 수량·단위·원천·주체를 nullable CDS 기본값보다 강하게 DB에서 요구한다."
+    },
+    "mulino_trade_shipment_custodyhandovers.detailstatus": {
+      "migration": "database/migrations/V17__shipment.sql",
+      "cds": "backend/db/shipment.cds",
+      "notNullStrengtheningReason": "S3 확정 관계와 필수 수량·단위·원천·주체를 nullable CDS 기본값보다 강하게 DB에서 요구한다."
+    },
+    "mulino_quality_decisions.operation": {
+      "migration": "database/migrations/V20__quality_eligibility.sql",
+      "cds": "backend/db/quality.cds",
+      "notNullStrengtheningReason": "S3 확정 관계와 필수 수량·단위·원천·주체를 nullable CDS 기본값보다 강하게 DB에서 요구한다."
+    },
+    "mulino_trade_shipment_custodyhandovers.legid": {
+      "migration": "database/migrations/V17__shipment.sql",
+      "cds": "backend/db/shipment.cds",
+      "notNullStrengtheningReason": "S3 확정 관계와 필수 수량·단위·원천·주체를 nullable CDS 기본값보다 강하게 DB에서 요구한다."
+    },
+    "mulino_trade_shipment_shipmentcargo.unit": {
+      "migration": "database/migrations/V17__shipment.sql",
+      "cds": "backend/db/shipment.cds",
+      "notNullStrengtheningReason": "S3 확정 관계와 필수 수량·단위·원천·주체를 nullable CDS 기본값보다 강하게 DB에서 요구한다."
+    },
+    "mulino_trade_regulatory_decisionversions.authority": {
+      "migration": "database/migrations/V18__regulatory_procedures.sql",
+      "cds": "backend/db/regulatory.cds",
+      "notNullStrengtheningReason": "S3 확정 관계와 필수 수량·단위·원천·주체를 nullable CDS 기본값보다 강하게 DB에서 요구한다."
+    },
+    "mulino_trade_shipment_legevents.recordedby": {
+      "migration": "database/migrations/V17__shipment.sql",
+      "cds": "backend/db/shipment.cds",
+      "notNullStrengtheningReason": "S3 확정 관계와 필수 수량·단위·원천·주체를 nullable CDS 기본값보다 강하게 DB에서 요구한다."
+    },
+    "mulino_trade_shipment_departureallocations.cargoid": {
+      "migration": "database/migrations/V17__shipment.sql",
+      "cds": "backend/db/shipment.cds",
+      "notNullStrengtheningReason": "S3 확정 관계와 필수 수량·단위·원천·주체를 nullable CDS 기본값보다 강하게 DB에서 요구한다."
+    },
+    "mulino_trade_shipment_shipmentlegs.shipmentid": {
+      "migration": "database/migrations/V17__shipment.sql",
+      "cds": "backend/db/shipment.cds",
+      "notNullStrengtheningReason": "S3 확정 관계와 필수 수량·단위·원천·주체를 nullable CDS 기본값보다 강하게 DB에서 요구한다."
+    },
+    "mulino_trade_receipt_receipts.startquantity": {
+      "migration": "database/migrations/V19__physical_receipt.sql",
+      "cds": "backend/db/receipt.cds",
+      "notNullStrengtheningReason": "S3 확정 관계와 필수 수량·단위·원천·주체를 nullable CDS 기본값보다 강하게 DB에서 요구한다."
+    },
+    "mulino_trade_shipment_departureallocations.shipmentid": {
+      "migration": "database/migrations/V17__shipment.sql",
+      "cds": "backend/db/shipment.cds",
+      "notNullStrengtheningReason": "S3 확정 관계와 필수 수량·단위·원천·주체를 nullable CDS 기본값보다 강하게 DB에서 요구한다."
+    },
+    "mulino_trade_regulatory_labelverifications.recordedby": {
+      "migration": "database/migrations/V18__regulatory_procedures.sql",
+      "cds": "backend/db/regulatory.cds",
+      "notNullStrengtheningReason": "S3 확정 관계와 필수 수량·단위·원천·주체를 nullable CDS 기본값보다 강하게 DB에서 요구한다."
+    },
+    "mulino_trade_shipment_legevents.occurrenceid": {
+      "migration": "database/migrations/V17__shipment.sql",
+      "cds": "backend/db/shipment.cds",
+      "notNullStrengtheningReason": "S3 확정 관계와 필수 수량·단위·원천·주체를 nullable CDS 기본값보다 강하게 DB에서 요구한다."
+    },
+    "mulino_quality_decisions.segmentid": {
+      "migration": "database/migrations/V20__quality_eligibility.sql",
+      "cds": "backend/db/quality.cds",
+      "notNullStrengtheningReason": "S3 확정 관계와 필수 수량·단위·원천·주체를 nullable CDS 기본값보다 강하게 DB에서 요구한다."
+    },
+    "mulino_trade_shipment_shipmentcargo.shipmentid": {
+      "migration": "database/migrations/V17__shipment.sql",
+      "cds": "backend/db/shipment.cds",
+      "notNullStrengtheningReason": "S3 확정 관계와 필수 수량·단위·원천·주체를 nullable CDS 기본값보다 강하게 DB에서 요구한다."
+    },
+    "mulino_quality_decisions.commandid": {
+      "migration": "database/migrations/V20__quality_eligibility.sql",
+      "cds": "backend/db/quality.cds",
+      "notNullStrengtheningReason": "S3 확정 관계와 필수 수량·단위·원천·주체를 nullable CDS 기본값보다 강하게 DB에서 요구한다."
+    },
+    "mulino_trade_receipt_observations.itemid": {
+      "migration": "database/migrations/V19__physical_receipt.sql",
+      "cds": "backend/db/receipt.cds",
+      "notNullStrengtheningReason": "S3 확정 관계와 필수 수량·단위·원천·주체를 nullable CDS 기본값보다 강하게 DB에서 요구한다."
+    },
+    "mulino_quality_decisions.reason": {
+      "migration": "database/migrations/V20__quality_eligibility.sql",
+      "cds": "backend/db/quality.cds",
+      "notNullStrengtheningReason": "S3 확정 관계와 필수 수량·단위·원천·주체를 nullable CDS 기본값보다 강하게 DB에서 요구한다."
+    },
+    "mulino_trade_shipment_custodyhandovers.unit": {
+      "migration": "database/migrations/V17__shipment.sql",
+      "cds": "backend/db/shipment.cds",
+      "notNullStrengtheningReason": "S3 확정 관계와 필수 수량·단위·원천·주체를 nullable CDS 기본값보다 강하게 DB에서 요구한다."
+    },
+    "mulino_trade_shipment_departureallocations.quantity": {
+      "migration": "database/migrations/V17__shipment.sql",
+      "cds": "backend/db/shipment.cds",
+      "notNullStrengtheningReason": "S3 확정 관계와 필수 수량·단위·원천·주체를 nullable CDS 기본값보다 강하게 DB에서 요구한다."
+    },
+    "mulino_trade_shipment_legevents.physicalscopeid": {
+      "migration": "database/migrations/V17__shipment.sql",
+      "cds": "backend/db/shipment.cds",
+      "notNullStrengtheningReason": "S3 확정 관계와 필수 수량·단위·원천·주체를 nullable CDS 기본값보다 강하게 DB에서 요구한다."
+    },
+    "mulino_trade_shipment_cargoallocations.shipmentid": {
+      "migration": "database/migrations/V17__shipment.sql",
+      "cds": "backend/db/shipment.cds",
+      "notNullStrengtheningReason": "S3 확정 관계와 필수 수량·단위·원천·주체를 nullable CDS 기본값보다 강하게 DB에서 요구한다."
+    },
+    "mulino_trade_shipment_shipments.destinationid": {
+      "migration": "database/migrations/V17__shipment.sql",
+      "cds": "backend/db/shipment.cds",
+      "notNullStrengtheningReason": "S3 확정 관계와 필수 수량·단위·원천·주체를 nullable CDS 기본값보다 강하게 DB에서 요구한다."
+    },
+    "mulino_trade_regulatory_decisionversions.quantity": {
+      "migration": "database/migrations/V18__regulatory_procedures.sql",
+      "cds": "backend/db/regulatory.cds",
+      "notNullStrengtheningReason": "S3 확정 관계와 필수 수량·단위·원천·주체를 nullable CDS 기본값보다 강하게 DB에서 요구한다."
+    },
+    "mulino_trade_shipment_custodyhandovers.fromcustodianid": {
+      "migration": "database/migrations/V17__shipment.sql",
+      "cds": "backend/db/shipment.cds",
+      "notNullStrengtheningReason": "S3 확정 관계와 필수 수량·단위·원천·주체를 nullable CDS 기본값보다 강하게 DB에서 요구한다."
+    },
+    "mulino_trade_shipment_departureallocations.recordedby": {
+      "migration": "database/migrations/V17__shipment.sql",
+      "cds": "backend/db/shipment.cds",
+      "notNullStrengtheningReason": "S3 확정 관계와 필수 수량·단위·원천·주체를 nullable CDS 기본값보다 강하게 DB에서 요구한다."
+    },
+    "mulino_trade_shipment_cargoallocations.unit": {
+      "migration": "database/migrations/V17__shipment.sql",
+      "cds": "backend/db/shipment.cds",
+      "notNullStrengtheningReason": "S3 확정 관계와 필수 수량·단위·원천·주체를 nullable CDS 기본값보다 강하게 DB에서 요구한다."
+    },
+    "mulino_trade_receipt_receipts.lotid": {
+      "migration": "database/migrations/V19__physical_receipt.sql",
+      "cds": "backend/db/receipt.cds",
+      "notNullStrengtheningReason": "S3 확정 관계와 필수 수량·단위·원천·주체를 nullable CDS 기본값보다 강하게 DB에서 요구한다."
+    },
+    "mulino_trade_shipment_legevents.quantity": {
+      "migration": "database/migrations/V17__shipment.sql",
+      "cds": "backend/db/shipment.cds",
+      "notNullStrengtheningReason": "S3 확정 관계와 필수 수량·단위·원천·주체를 nullable CDS 기본값보다 강하게 DB에서 요구한다."
+    },
+    "mulino_trade_receipt_receipts.placeid": {
+      "migration": "database/migrations/V19__physical_receipt.sql",
+      "cds": "backend/db/receipt.cds",
+      "notNullStrengtheningReason": "S3 확정 관계와 필수 수량·단위·원천·주체를 nullable CDS 기본값보다 강하게 DB에서 요구한다."
+    },
+    "mulino_trade_shipment_shipmentcargo.plannedquantity": {
+      "migration": "database/migrations/V17__shipment.sql",
+      "cds": "backend/db/shipment.cds",
+      "notNullStrengtheningReason": "S3 확정 관계와 필수 수량·단위·원천·주체를 nullable CDS 기본값보다 강하게 DB에서 요구한다."
+    },
+    "mulino_trade_receipt_observations.unit": {
+      "migration": "database/migrations/V19__physical_receipt.sql",
+      "cds": "backend/db/receipt.cds",
+      "notNullStrengtheningReason": "S3 확정 관계와 필수 수량·단위·원천·주체를 nullable CDS 기본값보다 강하게 DB에서 요구한다."
+    },
+    "mulino_trade_receipt_receipts.quantity": {
+      "migration": "database/migrations/V19__physical_receipt.sql",
+      "cds": "backend/db/receipt.cds",
+      "notNullStrengtheningReason": "S3 확정 관계와 필수 수량·단위·원천·주체를 nullable CDS 기본값보다 강하게 DB에서 요구한다."
+    },
+    "mulino_trade_shipment_shipmentlegs.carrierref": {
+      "migration": "database/migrations/V17__shipment.sql",
+      "cds": "backend/db/shipment.cds",
+      "notNullStrengtheningReason": "S3 확정 관계와 필수 수량·단위·원천·주체를 nullable CDS 기본값보다 강하게 DB에서 요구한다."
+    },
+    "mulino_trade_shipment_shipmentcargo.recordedby": {
+      "migration": "database/migrations/V17__shipment.sql",
+      "cds": "backend/db/shipment.cds",
+      "notNullStrengtheningReason": "S3 확정 관계와 필수 수량·단위·원천·주체를 nullable CDS 기본값보다 강하게 DB에서 요구한다."
+    },
+    "mulino_trade_receipt_observations.revision": {
+      "migration": "database/migrations/V19__physical_receipt.sql",
+      "cds": "backend/db/receipt.cds",
+      "notNullStrengtheningReason": "S3 확정 관계와 필수 수량·단위·원천·주체를 nullable CDS 기본값보다 강하게 DB에서 요구한다."
+    },
+    "mulino_trade_regulatory_policies.status": {
+      "migration": "database/migrations/V18__regulatory_procedures.sql",
+      "cds": "backend/db/regulatory.cds",
+      "notNullStrengtheningReason": "S3 확정 관계와 필수 수량·단위·원천·주체를 nullable CDS 기본값보다 강하게 DB에서 요구한다."
+    },
+    "mulino_trade_receipt_observations.workid": {
+      "migration": "database/migrations/V19__physical_receipt.sql",
+      "cds": "backend/db/receipt.cds",
+      "notNullStrengtheningReason": "S3 확정 관계와 필수 수량·단위·원천·주체를 nullable CDS 기본값보다 강하게 DB에서 요구한다."
+    },
+    "mulino_trade_shipment_custodyhandovers.physicalscopeid": {
+      "migration": "database/migrations/V17__shipment.sql",
+      "cds": "backend/db/shipment.cds",
+      "notNullStrengtheningReason": "S3 확정 관계와 필수 수량·단위·원천·주체를 nullable CDS 기본값보다 강하게 DB에서 요구한다."
+    },
+    "mulino_trade_shipment_legevents.shipmentid": {
+      "migration": "database/migrations/V17__shipment.sql",
+      "cds": "backend/db/shipment.cds",
+      "notNullStrengtheningReason": "S3 확정 관계와 필수 수량·단위·원천·주체를 nullable CDS 기본값보다 강하게 DB에서 요구한다."
+    },
+    "mulino_trade_shipment_legevents.detailstatus": {
+      "migration": "database/migrations/V17__shipment.sql",
+      "cds": "backend/db/shipment.cds",
+      "notNullStrengtheningReason": "S3 확정 관계와 필수 수량·단위·원천·주체를 nullable CDS 기본값보다 강하게 DB에서 요구한다."
+    },
+    "mulino_trade_shipment_shipments.recordedby": {
+      "migration": "database/migrations/V17__shipment.sql",
+      "cds": "backend/db/shipment.cds",
+      "notNullStrengtheningReason": "S3 확정 관계와 필수 수량·단위·원천·주체를 nullable CDS 기본값보다 강하게 DB에서 요구한다."
+    },
+    "mulino_trade_shipment_departureallocations.observationid": {
+      "migration": "database/migrations/V17__shipment.sql",
+      "cds": "backend/db/shipment.cds",
+      "notNullStrengtheningReason": "S3 확정 관계와 필수 수량·단위·원천·주체를 nullable CDS 기본값보다 강하게 DB에서 요구한다."
+    },
+    "mulino_trade_receipt_receipts.rangerootid": {
+      "migration": "database/migrations/V19__physical_receipt.sql",
+      "cds": "backend/db/receipt.cds",
+      "notNullStrengtheningReason": "S3 확정 관계와 필수 수량·단위·원천·주체를 nullable CDS 기본값보다 강하게 DB에서 요구한다."
+    },
+    "mulino_trade_regulatory_policies.action": {
+      "migration": "database/migrations/V18__regulatory_procedures.sql",
+      "cds": "backend/db/regulatory.cds",
+      "notNullStrengtheningReason": "S3 확정 관계와 필수 수량·단위·원천·주체를 nullable CDS 기본값보다 강하게 DB에서 요구한다."
+    },
+    "mulino_trade_receipt_receipts.canonicaloccurrenceid": {
+      "migration": "database/migrations/V19__physical_receipt.sql",
+      "cds": "backend/db/receipt.cds",
+      "notNullStrengtheningReason": "S3 확정 관계와 필수 수량·단위·원천·주체를 nullable CDS 기본값보다 강하게 DB에서 요구한다."
+    },
+    "mulino_trade_regulatory_labelverifications.revision": {
+      "migration": "database/migrations/V18__regulatory_procedures.sql",
+      "cds": "backend/db/regulatory.cds",
+      "notNullStrengtheningReason": "S3 확정 관계와 필수 수량·단위·원천·주체를 nullable CDS 기본값보다 강하게 DB에서 요구한다."
+    },
+    "mulino_trade_regulatory_decisionversions.action": {
+      "migration": "database/migrations/V18__regulatory_procedures.sql",
+      "cds": "backend/db/regulatory.cds",
+      "notNullStrengtheningReason": "S3 확정 관계와 필수 수량·단위·원천·주체를 nullable CDS 기본값보다 강하게 DB에서 요구한다."
+    },
+    "mulino_trade_receipt_observations.state": {
+      "migration": "database/migrations/V19__physical_receipt.sql",
+      "cds": "backend/db/receipt.cds",
+      "notNullStrengtheningReason": "S3 확정 관계와 필수 수량·단위·원천·주체를 nullable CDS 기본값보다 강하게 DB에서 요구한다."
+    },
+    "mulino_trade_receipt_receipts.workid": {
+      "migration": "database/migrations/V19__physical_receipt.sql",
+      "cds": "backend/db/receipt.cds",
+      "notNullStrengtheningReason": "S3 확정 관계와 필수 수량·단위·원천·주체를 nullable CDS 기본값보다 강하게 DB에서 요구한다."
+    },
+    "mulino_trade_receipt_receipts.itemid": {
+      "migration": "database/migrations/V19__physical_receipt.sql",
+      "cds": "backend/db/receipt.cds",
+      "notNullStrengtheningReason": "S3 확정 관계와 필수 수량·단위·원천·주체를 nullable CDS 기본값보다 강하게 DB에서 요구한다."
+    },
+    "mulino_trade_regulatory_policies.fictional": {
+      "migration": "database/migrations/V18__regulatory_procedures.sql",
+      "cds": "backend/db/regulatory.cds",
+      "notNullStrengtheningReason": "S3 확정 관계와 필수 수량·단위·원천·주체를 nullable CDS 기본값보다 강하게 DB에서 요구한다."
+    },
+    "mulino_trade_shipment_custodyhandovers.revision": {
+      "migration": "database/migrations/V17__shipment.sql",
+      "cds": "backend/db/shipment.cds",
+      "notNullStrengtheningReason": "S3 확정 관계와 필수 수량·단위·원천·주체를 nullable CDS 기본값보다 강하게 DB에서 요구한다."
+    },
+    "mulino_trade_shipment_shipmentlegs.revision": {
+      "migration": "database/migrations/V17__shipment.sql",
+      "cds": "backend/db/shipment.cds",
+      "notNullStrengtheningReason": "S3 확정 관계와 필수 수량·단위·원천·주체를 nullable CDS 기본값보다 강하게 DB에서 요구한다."
+    },
+    "mulino_trade_shipment_cargoallocations.polineid": {
+      "migration": "database/migrations/V17__shipment.sql",
+      "cds": "backend/db/shipment.cds",
+      "notNullStrengtheningReason": "S3 확정 관계와 필수 수량·단위·원천·주체를 nullable CDS 기본값보다 강하게 DB에서 요구한다."
+    },
+    "mulino_trade_shipment_shipmentlegs.originid": {
+      "migration": "database/migrations/V17__shipment.sql",
+      "cds": "backend/db/shipment.cds",
+      "notNullStrengtheningReason": "S3 확정 관계와 필수 수량·단위·원천·주체를 nullable CDS 기본값보다 강하게 DB에서 요구한다."
+    },
+    "mulino_trade_shipment_legevents.legid": {
+      "migration": "database/migrations/V17__shipment.sql",
+      "cds": "backend/db/shipment.cds",
+      "notNullStrengtheningReason": "S3 확정 관계와 필수 수량·단위·원천·주체를 nullable CDS 기본값보다 강하게 DB에서 요구한다."
+    },
+    "mulino_quality_decisions.actorid": {
+      "migration": "database/migrations/V20__quality_eligibility.sql",
+      "cds": "backend/db/quality.cds",
+      "notNullStrengtheningReason": "S3 확정 관계와 필수 수량·단위·원천·주체를 nullable CDS 기본값보다 강하게 DB에서 요구한다."
+    },
+    "mulino_trade_shipment_departureallocations.polineid": {
+      "migration": "database/migrations/V17__shipment.sql",
+      "cds": "backend/db/shipment.cds",
+      "notNullStrengtheningReason": "S3 확정 관계와 필수 수량·단위·원천·주체를 nullable CDS 기본값보다 강하게 DB에서 요구한다."
+    },
+    "mulino_trade_shipment_custodyhandovers.placeid": {
+      "migration": "database/migrations/V17__shipment.sql",
+      "cds": "backend/db/shipment.cds",
+      "notNullStrengtheningReason": "S3 확정 관계와 필수 수량·단위·원천·주체를 nullable CDS 기본값보다 강하게 DB에서 요구한다."
+    },
+    "mulino_trade_regulatory_decisionversions.decision": {
+      "migration": "database/migrations/V18__regulatory_procedures.sql",
+      "cds": "backend/db/regulatory.cds",
+      "notNullStrengtheningReason": "S3 확정 관계와 필수 수량·단위·원천·주체를 nullable CDS 기본값보다 강하게 DB에서 요구한다."
+    },
+    "mulino_trade_regulatory_decisionversions.startquantity": {
+      "migration": "database/migrations/V18__regulatory_procedures.sql",
+      "cds": "backend/db/regulatory.cds",
+      "notNullStrengtheningReason": "S3 확정 관계와 필수 수량·단위·원천·주체를 nullable CDS 기본값보다 강하게 DB에서 요구한다."
+    },
+    "mulino_trade_receipt_observations.placeid": {
+      "migration": "database/migrations/V19__physical_receipt.sql",
+      "cds": "backend/db/receipt.cds",
+      "notNullStrengtheningReason": "S3 확정 관계와 필수 수량·단위·원천·주체를 nullable CDS 기본값보다 강하게 DB에서 요구한다."
+    },
+    "mulino_trade_regulatory_procedureversions.recordedby": {
+      "migration": "database/migrations/V18__regulatory_procedures.sql",
+      "cds": "backend/db/regulatory.cds",
+      "notNullStrengtheningReason": "S3 확정 관계와 필수 수량·단위·원천·주체를 nullable CDS 기본값보다 강하게 DB에서 요구한다."
+    },
+    "mulino_trade_shipment_legevents.cargoid": {
+      "migration": "database/migrations/V17__shipment.sql",
+      "cds": "backend/db/shipment.cds",
+      "notNullStrengtheningReason": "S3 확정 관계와 필수 수량·단위·원천·주체를 nullable CDS 기본값보다 강하게 DB에서 요구한다."
+    },
+    "mulino_trade_receipt_receipts.segmentid": {
+      "migration": "database/migrations/V19__physical_receipt.sql",
+      "cds": "backend/db/receipt.cds",
+      "notNullStrengtheningReason": "S3 확정 관계와 필수 수량·단위·원천·주체를 nullable CDS 기본값보다 강하게 DB에서 요구한다."
+    },
+    "mulino_trade_shipment_custodyhandovers.tocustodianid": {
+      "migration": "database/migrations/V17__shipment.sql",
+      "cds": "backend/db/shipment.cds",
+      "notNullStrengtheningReason": "S3 확정 관계와 필수 수량·단위·원천·주체를 nullable CDS 기본값보다 강하게 DB에서 요구한다."
+    },
+    "mulino_trade_regulatory_procedures.recordedby": {
+      "migration": "database/migrations/V18__regulatory_procedures.sql",
+      "cds": "backend/db/regulatory.cds",
+      "notNullStrengtheningReason": "S3 확정 관계와 필수 수량·단위·원천·주체를 nullable CDS 기본값보다 강하게 DB에서 요구한다."
+    },
+    "mulino_trade_shipment_shipmentlegs.recordedby": {
+      "migration": "database/migrations/V17__shipment.sql",
+      "cds": "backend/db/shipment.cds",
+      "notNullStrengtheningReason": "S3 확정 관계와 필수 수량·단위·원천·주체를 nullable CDS 기본값보다 강하게 DB에서 요구한다."
+    },
+    "mulino_trade_receipt_receipts.excessquantity": {
+      "migration": "database/migrations/V19__physical_receipt.sql",
+      "cds": "backend/db/receipt.cds",
+      "notNullStrengtheningReason": "S3 확정 관계와 필수 수량·단위·원천·주체를 nullable CDS 기본값보다 강하게 DB에서 요구한다."
+    },
+    "mulino_quality_decisions.policyhash": {
+      "migration": "database/migrations/V20__quality_eligibility.sql",
+      "cds": "backend/db/quality.cds",
+      "notNullStrengtheningReason": "S3 확정 관계와 필수 수량·단위·원천·주체를 nullable CDS 기본값보다 강하게 DB에서 요구한다."
+    },
+    "mulino_trade_shipment_shipmentcargo.itemid": {
+      "migration": "database/migrations/V17__shipment.sql",
+      "cds": "backend/db/shipment.cds",
+      "notNullStrengtheningReason": "S3 확정 관계와 필수 수량·단위·원천·주체를 nullable CDS 기본값보다 강하게 DB에서 요구한다."
+    },
+    "mulino_trade_shipment_shipments.state": {
+      "migration": "database/migrations/V17__shipment.sql",
+      "cds": "backend/db/shipment.cds",
+      "notNullStrengtheningReason": "S3 확정 관계와 필수 수량·단위·원천·주체를 nullable CDS 기본값보다 강하게 DB에서 요구한다."
+    },
+    "mulino_trade_receipt_observations.ownerid": {
+      "migration": "database/migrations/V19__physical_receipt.sql",
+      "cds": "backend/db/receipt.cds",
+      "notNullStrengtheningReason": "S3 확정 관계와 필수 수량·단위·원천·주체를 nullable CDS 기본값보다 강하게 DB에서 요구한다."
+    },
+    "mulino_trade_regulatory_policies.sourcenamespace": {
+      "migration": "database/migrations/V18__regulatory_procedures.sql",
+      "cds": "backend/db/regulatory.cds",
+      "notNullStrengtheningReason": "S3 확정 관계와 필수 수량·단위·원천·주체를 nullable CDS 기본값보다 강하게 DB에서 요구한다."
+    },
+    "mulino_trade_shipment_cargoallocations.recordedby": {
+      "migration": "database/migrations/V17__shipment.sql",
+      "cds": "backend/db/shipment.cds",
+      "notNullStrengtheningReason": "S3 확정 관계와 필수 수량·단위·원천·주체를 nullable CDS 기본값보다 강하게 DB에서 요구한다."
+    },
+    "mulino_trade_regulatory_procedureversions.organizationid": {
+      "migration": "database/migrations/V18__regulatory_procedures.sql",
+      "cds": "backend/db/regulatory.cds",
+      "notNullStrengtheningReason": "S3 확정 관계와 필수 수량·단위·원천·주체를 nullable CDS 기본값보다 강하게 DB에서 요구한다."
+    },
+    "mulino_trade_shipment_cargoallocations.quantity": {
+      "migration": "database/migrations/V17__shipment.sql",
+      "cds": "backend/db/shipment.cds",
+      "notNullStrengtheningReason": "S3 확정 관계와 필수 수량·단위·원천·주체를 nullable CDS 기본값보다 강하게 DB에서 요구한다."
+    },
+    "mulino_trade_regulatory_decisionversions.organizationid": {
+      "migration": "database/migrations/V18__regulatory_procedures.sql",
+      "cds": "backend/db/regulatory.cds",
+      "notNullStrengtheningReason": "S3 확정 관계와 필수 수량·단위·원천·주체를 nullable CDS 기본값보다 강하게 DB에서 요구한다."
+    },
+    "mulino_trade_shipment_custodyhandovers.recordedby": {
+      "migration": "database/migrations/V17__shipment.sql",
+      "cds": "backend/db/shipment.cds",
+      "notNullStrengtheningReason": "S3 확정 관계와 필수 수량·단위·원천·주체를 nullable CDS 기본값보다 강하게 DB에서 요구한다."
+    },
+    "mulino_trade_receipt_observations.quantity": {
+      "migration": "database/migrations/V19__physical_receipt.sql",
+      "cds": "backend/db/receipt.cds",
+      "notNullStrengtheningReason": "S3 확정 관계와 필수 수량·단위·원천·주체를 nullable CDS 기본값보다 강하게 DB에서 요구한다."
+    },
+    "mulino_trade_regulatory_procedureversions.revision": {
+      "migration": "database/migrations/V18__regulatory_procedures.sql",
+      "cds": "backend/db/regulatory.cds",
+      "notNullStrengtheningReason": "S3 확정 관계와 필수 수량·단위·원천·주체를 nullable CDS 기본값보다 강하게 DB에서 요구한다."
+    },
+    "mulino_trade_shipment_legevents.kind": {
+      "migration": "database/migrations/V17__shipment.sql",
+      "cds": "backend/db/shipment.cds",
+      "notNullStrengtheningReason": "S3 확정 관계와 필수 수량·단위·원천·주체를 nullable CDS 기본값보다 강하게 DB에서 요구한다."
+    },
+    "mulino_trade_regulatory_policies.requireslabel": {
+      "migration": "database/migrations/V18__regulatory_procedures.sql",
+      "cds": "backend/db/regulatory.cds",
+      "notNullStrengtheningReason": "S3 확정 관계와 필수 수량·단위·원천·주체를 nullable CDS 기본값보다 강하게 DB에서 요구한다."
+    },
+    "mulino_trade_regulatory_procedures.revision": {
+      "migration": "database/migrations/V18__regulatory_procedures.sql",
+      "cds": "backend/db/regulatory.cds",
+      "notNullStrengtheningReason": "S3 확정 관계와 필수 수량·단위·원천·주체를 nullable CDS 기본값보다 강하게 DB에서 요구한다."
+    },
+    "mulino_trade_regulatory_decisionversions.recordedby": {
+      "migration": "database/migrations/V18__regulatory_procedures.sql",
+      "cds": "backend/db/regulatory.cds",
+      "notNullStrengtheningReason": "S3 확정 관계와 필수 수량·단위·원천·주체를 nullable CDS 기본값보다 강하게 DB에서 요구한다."
+    },
+    "mulino_trade_shipment_cargoallocations.cargoid": {
+      "migration": "database/migrations/V17__shipment.sql",
+      "cds": "backend/db/shipment.cds",
+      "notNullStrengtheningReason": "S3 확정 관계와 필수 수량·단위·원천·주체를 nullable CDS 기본값보다 강하게 DB에서 요구한다."
+    },
+    "mulino_trade_shipment_legevents.placeid": {
+      "migration": "database/migrations/V17__shipment.sql",
+      "cds": "backend/db/shipment.cds",
+      "notNullStrengtheningReason": "S3 확정 관계와 필수 수량·단위·원천·주체를 nullable CDS 기본값보다 강하게 DB에서 요구한다."
+    },
+    "mulino_trade_receipt_observations.supervisorid": {
+      "migration": "database/migrations/V19__physical_receipt.sql",
+      "cds": "backend/db/receipt.cds",
+      "notNullStrengtheningReason": "S3 확정 관계와 필수 수량·단위·원천·주체를 nullable CDS 기본값보다 강하게 DB에서 요구한다."
+    },
+    "mulino_trade_regulatory_policies.authority": {
+      "migration": "database/migrations/V18__regulatory_procedures.sql",
+      "cds": "backend/db/regulatory.cds",
+      "notNullStrengtheningReason": "S3 확정 관계와 필수 수량·단위·원천·주체를 nullable CDS 기본값보다 강하게 DB에서 요구한다."
+    },
+    "mulino_trade_receipt_receipts.observationid": {
+      "migration": "database/migrations/V19__physical_receipt.sql",
+      "cds": "backend/db/receipt.cds",
+      "notNullStrengtheningReason": "S3 확정 관계와 필수 수량·단위·원천·주체를 nullable CDS 기본값보다 강하게 DB에서 요구한다."
+    },
+    "mulino_trade_shipment_shipments.originid": {
+      "migration": "database/migrations/V17__shipment.sql",
+      "cds": "backend/db/shipment.cds",
+      "notNullStrengtheningReason": "S3 확정 관계와 필수 수량·단위·원천·주체를 nullable CDS 기본값보다 강하게 DB에서 요구한다."
+    },
+    "mulino_trade_regulatory_procedures.organizationid": {
+      "migration": "database/migrations/V18__regulatory_procedures.sql",
+      "cds": "backend/db/regulatory.cds",
+      "notNullStrengtheningReason": "S3 확정 관계와 필수 수량·단위·원천·주체를 nullable CDS 기본값보다 강하게 DB에서 요구한다."
+    },
+    "mulino_quality_decisions.revision": {
+      "migration": "database/migrations/V20__quality_eligibility.sql",
+      "cds": "backend/db/quality.cds",
+      "notNullStrengtheningReason": "S3 확정 관계와 필수 수량·단위·원천·주체를 nullable CDS 기본값보다 강하게 DB에서 요구한다."
+    },
+    "mulino_trade_shipment_custodyhandovers.shipmentid": {
+      "migration": "database/migrations/V17__shipment.sql",
+      "cds": "backend/db/shipment.cds",
+      "notNullStrengtheningReason": "S3 확정 관계와 필수 수량·단위·원천·주체를 nullable CDS 기본값보다 강하게 DB에서 요구한다."
+    },
+    "mulino_trade_receipt_observations.rangerootid": {
+      "migration": "database/migrations/V19__physical_receipt.sql",
+      "cds": "backend/db/receipt.cds",
+      "notNullStrengtheningReason": "S3 확정 관계와 필수 수량·단위·원천·주체를 nullable CDS 기본값보다 강하게 DB에서 요구한다."
+    },
+    "mulino_trade_regulatory_policies.revision": {
+      "migration": "database/migrations/V18__regulatory_procedures.sql",
+      "cds": "backend/db/regulatory.cds",
+      "notNullStrengtheningReason": "S3 확정 관계와 필수 수량·단위·원천·주체를 nullable CDS 기본값보다 강하게 DB에서 요구한다."
+    },
+    "mulino_trade_shipment_departureallocations.unit": {
+      "migration": "database/migrations/V17__shipment.sql",
+      "cds": "backend/db/shipment.cds",
+      "notNullStrengtheningReason": "S3 확정 관계와 필수 수량·단위·원천·주체를 nullable CDS 기본값보다 강하게 DB에서 요구한다."
+    },
+    "mulino_trade_shipment_departureallocations.physicalscopeid": {
+      "migration": "database/migrations/V17__shipment.sql",
+      "cds": "backend/db/shipment.cds",
+      "notNullStrengtheningReason": "S3 확정 관계와 필수 수량·단위·원천·주체를 nullable CDS 기본값보다 강하게 DB에서 요구한다."
+    },
+    "mulino_trade_receipt_observations.startquantity": {
+      "migration": "database/migrations/V19__physical_receipt.sql",
+      "cds": "backend/db/receipt.cds",
+      "notNullStrengtheningReason": "S3 확정 관계와 필수 수량·단위·원천·주체를 nullable CDS 기본값보다 강하게 DB에서 요구한다."
+    },
+    "mulino_quality_decisions.evidenceid": {
+      "migration": "database/migrations/V20__quality_eligibility.sql",
+      "cds": "backend/db/quality.cds",
+      "notNullStrengtheningReason": "S3 확정 관계와 필수 수량·단위·원천·주체를 nullable CDS 기본값보다 강하게 DB에서 요구한다."
+    },
+    "mulino_trade_receipt_receipts.revision": {
+      "migration": "database/migrations/V19__physical_receipt.sql",
+      "cds": "backend/db/receipt.cds",
+      "notNullStrengtheningReason": "S3 확정 관계와 필수 수량·단위·원천·주체를 nullable CDS 기본값보다 강하게 DB에서 요구한다."
+    },
+    "mulino_trade_receipt_receipts.physicaleffect": {
+      "migration": "database/migrations/V19__physical_receipt.sql",
+      "cds": "backend/db/receipt.cds",
+      "notNullStrengtheningReason": "S3 확정 관계와 필수 수량·단위·원천·주체를 nullable CDS 기본값보다 강하게 DB에서 요구한다."
+    },
+    "mulino_trade_receipt_receipts.unit": {
+      "migration": "database/migrations/V19__physical_receipt.sql",
+      "cds": "backend/db/receipt.cds",
+      "notNullStrengtheningReason": "S3 확정 관계와 필수 수량·단위·원천·주체를 nullable CDS 기본값보다 강하게 DB에서 요구한다."
+    },
+    "mulino_trade_shipment_shipments.revision": {
+      "migration": "database/migrations/V17__shipment.sql",
+      "cds": "backend/db/shipment.cds",
+      "notNullStrengtheningReason": "S3 확정 관계와 필수 수량·단위·원천·주체를 nullable CDS 기본값보다 강하게 DB에서 요구한다."
+    },
+    "mulino_trade_shipment_custodyhandovers.quantity": {
+      "migration": "database/migrations/V17__shipment.sql",
+      "cds": "backend/db/shipment.cds",
+      "notNullStrengtheningReason": "S3 확정 관계와 필수 수량·단위·원천·주체를 nullable CDS 기본값보다 강하게 DB에서 요구한다."
+    },
+    "mulino_trade_shipment_legevents.revision": {
+      "migration": "database/migrations/V17__shipment.sql",
+      "cds": "backend/db/shipment.cds",
+      "notNullStrengtheningReason": "S3 확정 관계와 필수 수량·단위·원천·주체를 nullable CDS 기본값보다 강하게 DB에서 요구한다."
+    },
+    "mulino_trade_shipment_shipmentlegs.sequence": {
+      "migration": "database/migrations/V17__shipment.sql",
+      "cds": "backend/db/shipment.cds",
+      "notNullStrengtheningReason": "S3 확정 관계와 필수 수량·단위·원천·주체를 nullable CDS 기본값보다 강하게 DB에서 요구한다."
+    },
+    "mulino_trade_shipment_departureallocations.revision": {
+      "migration": "database/migrations/V17__shipment.sql",
+      "cds": "backend/db/shipment.cds",
+      "notNullStrengtheningReason": "S3 확정 관계와 필수 수량·단위·원천·주체를 nullable CDS 기본값보다 강하게 DB에서 요구한다."
+    },
+    "mulino_trade_regulatory_policies.version": {
+      "migration": "database/migrations/V18__regulatory_procedures.sql",
+      "cds": "backend/db/regulatory.cds",
+      "notNullStrengtheningReason": "S3 확정 관계와 필수 수량·단위·원천·주체를 nullable CDS 기본값보다 강하게 DB에서 요구한다."
+    },
+    "mulino_trade_receipt_observations.nextaction": {
+      "migration": "database/migrations/V19__physical_receipt.sql",
+      "cds": "backend/db/receipt.cds",
+      "notNullStrengtheningReason": "S3 확정 관계와 필수 수량·단위·원천·주체를 nullable CDS 기본값보다 강하게 DB에서 요구한다."
+    },
+    "mulino_trade_receipt_receipts.contributedquantity": {
+      "migration": "database/migrations/V19__physical_receipt.sql",
+      "cds": "backend/db/receipt.cds",
+      "notNullStrengtheningReason": "S3 확정 관계와 필수 수량·단위·원천·주체를 nullable CDS 기본값보다 강하게 DB에서 요구한다."
+    },
+    "mulino_trade_shipment_shipmentlegs.destinationid": {
+      "migration": "database/migrations/V17__shipment.sql",
+      "cds": "backend/db/shipment.cds",
+      "notNullStrengtheningReason": "S3 확정 관계와 필수 수량·단위·원천·주체를 nullable CDS 기본값보다 강하게 DB에서 요구한다."
+    },
+    "mulino_trade_receipt_observations.eventid": {
+      "migration": "database/migrations/V19__physical_receipt.sql",
+      "cds": "backend/db/receipt.cds",
+      "notNullStrengtheningReason": "S3 확정 관계와 필수 수량·단위·원천·주체를 nullable CDS 기본값보다 강하게 DB에서 요구한다."
+    },
+    "mulino_trade_shipment_legevents.unit": {
+      "migration": "database/migrations/V17__shipment.sql",
+      "cds": "backend/db/shipment.cds",
+      "notNullStrengtheningReason": "S3 확정 관계와 필수 수량·단위·원천·주체를 nullable CDS 기본값보다 강하게 DB에서 요구한다."
+    },
+    "mulino_trade_shipment_custodyhandovers.occurrenceid": {
+      "migration": "database/migrations/V17__shipment.sql",
+      "cds": "backend/db/shipment.cds",
+      "notNullStrengtheningReason": "S3 확정 관계와 필수 수량·단위·원천·주체를 nullable CDS 기본값보다 강하게 DB에서 요구한다."
+    },
+    "mulino_trade_shipment_shipments.carrierref": {
+      "migration": "database/migrations/V17__shipment.sql",
+      "cds": "backend/db/shipment.cds",
+      "notNullStrengtheningReason": "S3 확정 관계와 필수 수량·단위·원천·주체를 nullable CDS 기본값보다 강하게 DB에서 요구한다."
+    },
+    "mulino_trade_regulatory_decisionversions.revision": {
+      "migration": "database/migrations/V18__regulatory_procedures.sql",
+      "cds": "backend/db/regulatory.cds",
+      "notNullStrengtheningReason": "S3 확정 관계와 필수 수량·단위·원천·주체를 nullable CDS 기본값보다 강하게 DB에서 요구한다."
+    },
+    "mulino_trade_regulatory_labelverifications.organizationid": {
+      "migration": "database/migrations/V18__regulatory_procedures.sql",
+      "cds": "backend/db/regulatory.cds",
+      "notNullStrengtheningReason": "S3 확정 관계와 필수 수량·단위·원천·주체를 nullable CDS 기본값보다 강하게 DB에서 요구한다."
+    },
+    "mulino_trade_receipt_observations.identificationstatus": {
+      "migration": "database/migrations/V19__physical_receipt.sql",
+      "cds": "backend/db/receipt.cds",
+      "notNullStrengtheningReason": "S3 확정 관계와 필수 수량·단위·원천·주체를 nullable CDS 기본값보다 강하게 DB에서 요구한다."
+    },
+    "mulino_trade_regulatory_policies.organizationid": {
+      "migration": "database/migrations/V18__regulatory_procedures.sql",
+      "cds": "backend/db/regulatory.cds",
+      "notNullStrengtheningReason": "S3 확정 관계와 필수 수량·단위·원천·주체를 nullable CDS 기본값보다 강하게 DB에서 요구한다."
+    },
+    "mulino_trade_shipment_shipmentcargo.revision": {
+      "migration": "database/migrations/V17__shipment.sql",
+      "cds": "backend/db/shipment.cds",
+      "notNullStrengtheningReason": "S3 확정 관계와 필수 수량·단위·원천·주체를 nullable CDS 기본값보다 강하게 DB에서 요구한다."
+    },
+    "mulino_trade_shipment_custodyhandovers.cargoid": {
+      "migration": "database/migrations/V17__shipment.sql",
+      "cds": "backend/db/shipment.cds",
+      "notNullStrengtheningReason": "S3 확정 관계와 필수 수량·단위·원천·주체를 nullable CDS 기본값보다 강하게 DB에서 요구한다."
+    },
+    "mulino_trade_shipment_cargoallocations.revision": {
+      "migration": "database/migrations/V17__shipment.sql",
+      "cds": "backend/db/shipment.cds",
+      "notNullStrengtheningReason": "S3 확정 관계와 필수 수량·단위·원천·주체를 nullable CDS 기본값보다 강하게 DB에서 요구한다."
+    },
+    "mulino_trade_regulatory_policies.recordedby": {
+      "migration": "database/migrations/V18__regulatory_procedures.sql",
+      "cds": "backend/db/regulatory.cds",
+      "notNullStrengtheningReason": "S3 확정 관계와 필수 수량·단위·원천·주체를 nullable CDS 기본값보다 강하게 DB에서 요구한다."
+    }
+  }
+}

@@ -119,12 +119,12 @@ class S1ReadIntegrationTest {
     q.put("asOf",AS_OF.minusNanos(1).toString());assertEquals("FORBIDDEN",assertThrows(DomainError.class,()->runtime.requestContext().run(c->{return queries.query(QueryRequests.parse("getWork",q));})).code());
   }
   @Test @SuppressWarnings("unchecked") void freshFlywayMatchesAllCdsColumnsAndPrimaryKeysWithExplicitWidening() throws Exception {
-    Path output=Path.of("target/s2-compiler-expected.sql");String node=System.getenv().getOrDefault("NODE24_BIN","node");
+    Path output=Path.of("target/s3-compiler-expected.sql");String node=System.getenv().getOrDefault("NODE24_BIN","node");
     var compiler=new ProcessBuilder(node,"node_modules/@sap/cds-dk/bin/cds.js","compile","db","--to","sql","--dialect","postgres").redirectOutput(output.toFile()).redirectError(ProcessBuilder.Redirect.INHERIT).start();assertTrue(compiler.waitFor(30,java.util.concurrent.TimeUnit.SECONDS));assertEquals(0,compiler.exitValue());
     try(var connection=java.sql.DriverManager.getConnection(PG.getJdbcUrl(),PG.getUsername(),PG.getPassword())){
-      connection.createStatement().execute("CREATE SCHEMA s2_compiler_expected");connection.createStatement().execute("SET search_path TO s2_compiler_expected");connection.createStatement().execute(Files.readString(output));
-      var expected=columns(connection,"s2_compiler_expected");var actual=columns(connection,"public");assertEquals(expected.keySet(),actual.keySet(),"Exact CDS/Flyway entity and column identity");
-      var policy=json.readValue(Files.readString(Path.of("../docs/execution/s2-commands/schema-compatibility.json")),Map.class);
+      connection.createStatement().execute("CREATE SCHEMA s3_compiler_expected");connection.createStatement().execute("SET search_path TO s3_compiler_expected");connection.createStatement().execute(Files.readString(output));
+      var expected=columns(connection,"s3_compiler_expected");var actual=columns(connection,"public");assertEquals(expected.keySet(),actual.keySet(),"Exact CDS/Flyway entity and column identity");
+      var policy=json.readValue(Files.readString(Path.of("../docs/execution/s3-integration/schema-compatibility.json")),Map.class);
       var timestamps=new TreeSet<String>();var strengthening=new TreeSet<String>();var differences=new ArrayList<Map<String,Object>>();
       for(String key:expected.keySet()){
         var e=expected.get(key);var a=actual.get(key);String et=String.valueOf(e.get(0)),at=String.valueOf(a.get(0));
@@ -132,11 +132,11 @@ class S1ReadIntegrationTest {
         if(e.get(4).equals("YES")&&a.get(4).equals("NO")){strengthening.add(key);a.set(4,"YES");}
         if(!e.equals(a))differences.add(Map.of("column",key,"expected",e,"actual",a));
       }
-      Files.writeString(Path.of("target/s2-compatibility-observed.json"),json.writerWithDefaultPrettyPrinter().writeValueAsString(Map.of("timestampWidening",timestamps,"notNullStrengthening",strengthening,"columnCount",actual.size(),"structuralDifferences",differences,"primaryKeyDifferences",!primaryKeys(connection,"s2_compiler_expected").equals(primaryKeys(connection,"public")))));
+      Files.writeString(Path.of("target/s3-compatibility-observed.json"),json.writerWithDefaultPrettyPrinter().writeValueAsString(Map.of("timestampWidening",timestamps,"notNullStrengthening",strengthening,"columnCount",actual.size(),"structuralDifferences",differences,"primaryKeyDifferences",!primaryKeys(connection,"s3_compiler_expected").equals(primaryKeys(connection,"public")))));
       assertEquals(List.of(),differences,"Only enumerated Timestamp widening and mandatory NOT NULL strengthening are eligible for the explicit inventory; other shape changes must be corrected in source");
       assertEquals(((Number)policy.get("observedColumnCount")).intValue(),actual.size(),"Explicit combined inventory column count");
       assertEquals(new TreeSet<>((List<String>)policy.get("timestampWidening")),timestamps,"Explicit absolute-instant column list");assertEquals(new TreeSet<>((List<String>)policy.get("notNullStrengthening")),strengthening,"Explicit required-domain column list");
-      assertEquals(primaryKeys(connection,"s2_compiler_expected"),primaryKeys(connection,"public"),"Exact CDS/Flyway primary key identity and ordering");
+      assertEquals(primaryKeys(connection,"s3_compiler_expected"),primaryKeys(connection,"public"),"Exact CDS/Flyway primary key identity and ordering");
     }
   }
   Map<String,List<Object>> columns(Connection connection,String schema)throws Exception{
