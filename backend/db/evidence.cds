@@ -180,3 +180,34 @@ entity EvidenceLinks {
   canonicalOccurrenceId : UUID;
   role : String(40);
 }
+
+// Authorized human review is a distinct immutable decision, not an external claim.
+entity Reconciliations {
+  key ID : UUID;
+  organizationId : UUID;
+  revision : Integer;
+  createdAt : Timestamp;
+  recordedAt : Timestamp;
+  recordedBy : UUID;
+  subjectKind : String(20);
+  subjectId : UUID;
+  itemId : UUID;
+  placeId : UUID;
+  workId : UUID;
+  sourceProfileId : UUID;
+  claimId : UUID;
+  basisDocumentId : UUID;
+  physicalScopeId : UUID;
+  existingCanonicalId : UUID;
+  policyVersion : String(160);
+  decision : String(24);
+  reason : String(640);
+  sourceIdentity : String(320);
+  quantity : Decimal(38,12);
+  unit : String(24);
+  effectiveFrom : Timestamp;
+  intakeOwnerId : UUID;
+  supervisorId : UUID;
+  nextAction : String(320);
+  nextCheckAt : Timestamp;
+}

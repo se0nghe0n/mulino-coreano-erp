@@ -13,7 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.*;
 import static com.mulino.domain.evidence.EvidenceTypes.*;
 
-/** S1 internal recording ports; no public dispatcher or physical inventory effects. */
+/** Immutable recording ports joining the enclosing command transaction; no physical effects. */
 @Service
 public class EvidenceRecords {
   private final EvidenceRepository r;
@@ -127,7 +127,7 @@ public class EvidenceRecords {
     verification.put("verdict","VERIFIED");verification.put("reason",text(input.reason(),640));r.insert("Verifications",verification);
     link(c,basis.get("ID").toString(),null,null,canonical.get("ID").toString(),"VERIFICATION_BASIS");return result(canonical,"VERIFIED_RECORD_ONLY");
   }
-  private static String eventHash(EventInput input) {
+  static String eventHash(EventInput input) {
     try {
       var fields=new TreeMap<String,Object>();
       fields.put("subjectKind",input.subject().kind().name());fields.put("subjectId",input.subject().id());fields.put("kind",input.kind());
@@ -141,13 +141,15 @@ public class EvidenceRecords {
   private Map<String,Object> base(DomainContext c) {
     var row=new LinkedHashMap<String,Object>();row.put("ID",UUID.randomUUID().toString());row.put("organizationId",c.organizationId());row.put("revision",1);row.put("createdAt",Instant.now());row.put("recordedAt",Instant.now());row.put("recordedBy",c.actorId());return row;
   }
-  private Map<String,Object> source(DomainContext c,String namespace) {
+  Map<String,Object> source(DomainContext c,String namespace) {
     text(namespace,160);
     var profile=r.rows("SourceProfiles",c.organizationId()).stream().filter(x->namespace.equals(x.get("namespace"))).findFirst().orElseThrow(()->new DomainError("REJECTED","POLICY_UNRESOLVED","Source profile or intake responsibility unresolved"));
     for(String role:List.of("intakeOwnerId","supervisorId")) {
       var actor=r.db().run(Select.from("mulino.identity.Actors").where(x->x.get("organizationId").eq(c.organizationId()).and(x.get("ID").eq(profile.get(role))))).first().orElseThrow(DomainError::forbidden);
       if(!"HUMAN".equals(actor.get("kind")))throw new DomainError("REJECTED","POLICY_UNRESOLVED","Intake responsibility requires humans");
     }
+    text(Objects.toString(profile.get("nextAction"),null),320);
+    if(profile.get("nextCheckAt")==null)throw new DomainError("REJECTED","POLICY_UNRESOLVED","Intake next check unresolved");
     return profile;
   }
   private void sourceFields(Map<String,Object> row,Map<String,Object> profile) { row.put("sourceNamespace",profile.get("namespace"));row.put("sourceProfileId",profile.get("ID")); }
@@ -173,5 +175,5 @@ public class EvidenceRecords {
   private void link(DomainContext c,String document,String event,String claim,String canonical,String role) {
     var row=base(c);row.put("documentVersionId",document);if(event!=null)row.put("eventId",event);if(claim!=null)row.put("claimId",claim);if(canonical!=null)row.put("canonicalOccurrenceId",canonical);row.put("role",role);r.insert("EvidenceLinks",row);
   }
-  private static Map<String,Object> result(Map<String,Object> row,String status) { return Map.of("outcome",status,"id",row.get("ID"),"revision",row.get("revision"),"inventoryEffects","NOT_IMPLEMENTED","workReassessment","NOT_IMPLEMENTED"); }
+  private static Map<String,Object> result(Map<String,Object> row,String status) { return Map.of("outcome",status,"id",row.get("ID"),"revision",row.get("revision"),"inventoryEffects","NONE","workReassessment","NOT_REQUESTED"); }
 }

@@ -15,7 +15,7 @@ public class EvidenceQueries implements QueryHandler {
   private final ReadAuthorizer auth;
   private final LocalBlobStore blobs;
   public EvidenceQueries(EvidenceRepository r,ReadAuthorizer auth,LocalBlobStore blobs) { this.r=r; this.auth=auth; this.blobs=blobs; }
-  public Set<String> operations() { return Set.of("getEvidence","getInbox"); }
+  public Set<String> operations() { return Set.of("getEvidence","getInbox","getReconciliation"); }
   @Transactional(readOnly=true)
   public QueryResult query(DomainContext c,QueryRequest q) {
     if(!Set.of("organizationId","kind","subjectKind","subjectId").containsAll(q.scope().keySet()) ||
@@ -25,7 +25,7 @@ public class EvidenceQueries implements QueryHandler {
     for(Object filter:q.filters().values())if(!(filter instanceof Boolean))throw DomainError.invalid("Evidence flags must be boolean");
     if(q.scope().get("organizationId")!=null&&!c.organizationId().equals(q.scope().get("organizationId")))throw DomainError.forbidden();
     String kind=Objects.toString(q.scope().getOrDefault("kind","DOCUMENT"));
-    String entity="getInbox".equals(q.operation())?"InboxRecords":switch(kind) {
+    String entity="getInbox".equals(q.operation())?"InboxRecords":"getReconciliation".equals(q.operation())?"Reconciliations":switch(kind) {
       case "DOCUMENT" -> "DocumentVersions"; case "EVENT" -> "Events";
       case "CLAIM" -> "Claims"; case "CANONICAL" -> "CanonicalOccurrences";
       default -> throw DomainError.invalid("Invalid evidence selector kind");
@@ -61,8 +61,8 @@ public class EvidenceQueries implements QueryHandler {
         boolean isVerified=verifiedAt(c,id);
         if(verified&&!isVerified)continue;
         output.put("verified",isVerified);
-        output.put("inventoryEffects","NOT_IMPLEMENTED");
-        output.put("workReassessment","NOT_IMPLEMENTED");
+        output.put("inventoryEffects","NONE");
+        output.put("workReassessment",row.getOrDefault("reassessmentState","UNKNOWN"));
         if(!isVerified)unknowns.add(id+":CANONICAL_UNVERIFIED");
       }
       for(var link:r.rows("EvidenceLinks",c.organizationId())) {
@@ -72,7 +72,7 @@ public class EvidenceQueries implements QueryHandler {
       }
       Object state=row.get("valueState");
       if(state!=null&&Set.of("UNKNOWN","MISSING","NOT_APPLICABLE").contains(state.toString()))unknowns.add(id+":"+state);
-      if("CONFLICT".equals(state)||"CONFLICT".equals(row.get("state")))conflicts.add(id+":EVIDENCE_CONFLICT");
+      if("CONFLICT".equals(state)||"CONFLICT".equals(row.get("state"))||"CONFLICT".equals(row.get("decision")))conflicts.add(id+":EVIDENCE_CONFLICT");
       selected.add(output);
     }
     if(q.id()!=null&&selected.isEmpty())throw DomainError.forbidden();
@@ -86,6 +86,7 @@ public class EvidenceQueries implements QueryHandler {
       var claim=r.require("Claims",c.organizationId(),v.get("claimId").toString());
       var event=r.require("Events",c.organizationId(),claim.get("eventId").toString());
       if(r.rows("Events",c.organizationId()).stream().anyMatch(x->visible(x,c)&&(event.get("ID").equals(x.get("invalidatesId"))||event.get("ID").equals(x.get("supersedesId")))))return false;
+      if(r.rows("Claims",c.organizationId()).stream().anyMatch(x->visible(x,c)&&claim.get("ID").equals(x.get("supersedesId"))))return false;
       long variants=r.rows("InboxRecords",c.organizationId()).stream().filter(x->visible(x,c)&&Objects.equals(event.get("sourceNamespace"),x.get("sourceNamespace"))&&Objects.equals(event.get("externalEventId"),x.get("externalEventId"))&&Objects.equals(event.get("sourceVersion"),x.get("sourceVersion"))).count();
       return variants==1;
     });
