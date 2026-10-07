@@ -13,13 +13,13 @@ import static com.mulino.domain.evidence.EvidenceTypes.*;
 public class RegulatoryEvidence {
  private final EvidenceRepository r;private final EvidenceQueries q;private final LocalBlobStore blobs;private final IdentityAuthorization auth;
  public RegulatoryEvidence(EvidenceRepository r,EvidenceQueries q,LocalBlobStore blobs,IdentityAuthorization auth){this.r=r;this.q=q;this.blobs=blobs;this.auth=auth;}
- public Map<String,Object> document(DomainContext c,String id,String item){var d=r.require("DocumentVersions",c.organizationId(),id);auth.authorizeScopes(c,"getEvidence",scopes(d));if(!item.equals(d.get("itemId"))||!"AVAILABLE".equals(d.get("availability"))||d.get("blobId")==null||!blobs.available(UUID.fromString(d.get("blobId").toString()),d.get("sha256").toString()))throw held();return d;}
+ public Map<String,Object> document(DomainContext c,String id,String item){var d=r.require("DocumentVersions",c.organizationId(),id);auth.authorizeScopes(c,"getEvidence",scopes(d));if(instant(d.get("recordedAt")).isAfter(c.knownAt())||!item.equals(d.get("itemId"))||!"AVAILABLE".equals(d.get("availability"))||d.get("blobId")==null||!blobs.available(UUID.fromString(d.get("blobId").toString()),d.get("sha256").toString()))throw held();return d;}
  public Map<String,Object> require(DomainContext c,String occurrence,String kind,Map<String,Object> procedure,Map<String,Object> policy,Map<String,Object> expected){
   var fact=r.require("CanonicalOccurrences",c.organizationId(),occurrence);auth.authorizeScopes(c,"getEvidence",scopes(fact));
   if(!q.verifiedAt(c,occurrence)||!kind.equals(fact.get("kind"))||!procedure.get("itemId").equals(fact.get("itemId"))||!procedure.get("physicalScopeId").equals(fact.get("physicalScopeId")))throw held();
   for(var v:r.rows("Verifications",c.organizationId())){
    if(!occurrence.equals(v.get("canonicalOccurrenceId"))||!"VERIFIED".equals(v.get("verdict"))||!policy.get("version").equals(v.get("policyVersion"))||!List.of("sourceMatched","identityMatched","quantityMatched","timeMatched","duplicateChecked").stream().allMatch(k->Boolean.TRUE.equals(v.get(k))))continue;
-   var claim=r.require("Claims",c.organizationId(),v.get("claimId").toString());var event=r.require("Events",c.organizationId(),claim.get("eventId").toString());
+   if(instant(v.get("recordedAt")).isAfter(c.knownAt()))continue;var claim=r.require("Claims",c.organizationId(),v.get("claimId").toString());var event=r.require("Events",c.organizationId(),claim.get("eventId").toString());
    if(!policy.get("sourceNamespace").equals(event.get("sourceNamespace"))||!kind.equals(event.get("kind"))||!"KNOWN".equals(event.get("valueState"))||!"KNOWN".equals(claim.get("valueState")))continue;
    var doc=document(c,v.get("basisDocumentId").toString(),procedure.get("itemId").toString());
    try{
