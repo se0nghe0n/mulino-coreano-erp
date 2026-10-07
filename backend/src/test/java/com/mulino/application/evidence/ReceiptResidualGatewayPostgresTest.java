@@ -21,6 +21,7 @@ class ReceiptResidualGatewayPostgresTest extends ReceiptGatewayPostgresTest {
   String target=uuid();
   jdbc.update("INSERT INTO mulino_work_read_Works(organizationId,ID,createdAt,recordedAt,effectiveAt,itemId,definitionVersionId,kind,status,ownerId,supervisorId,lifecycleMode) SELECT organizationId,?,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP,itemId,definitionVersionId,kind,'ACTIVE',ownerId,supervisorId,lifecycleMode FROM mulino_work_read_Works WHERE ID=?",target,WORK);
   jdbc.update("INSERT INTO mulino_identity_CapabilityAssignments(organizationId,ID,actorId,capabilityId,scopeKind,scopeId,validFrom,validUntil) VALUES(?,?,?,'acceptHandover','ORGANIZATION',?,CURRENT_TIMESTAMP-INTERVAL '1 day',CURRENT_TIMESTAMP+INTERVAL '1 day')",ORG,uuid(),ACTOR,ORG);
+  jdbc.update("INSERT INTO mulino_identity_GrantActions VALUES(?,?,?)",ORG,GRANT,"acceptHandover");
   String assignment=jdbc.queryForObject("SELECT ID FROM mulino_work_read_ObligationReferences WHERE kind='RECEIPT_SHORTFALL' AND status='OPEN' AND valid",String.class);
   request(()->new TransactionTemplate(tx).execute(status->{var c=auth.context(Instant.now(),Instant.now());var h=duties.propose(c,Map.of("workId",WORK,"assignmentId",assignment,"recipientId",ACTOR,"targetWorkId",target,"quantity","10","expiresAt",Instant.now().plusSeconds(100),"nextAction","Check recipient remainder","nextCheckAt",Instant.now().plusSeconds(1000)),true);duties.decide(c,h.get("ID").toString(),"ACCEPTED");return null;}));
   arrive(20);assertEquals(0,new BigDecimal("20").compareTo(openShortfall()));
