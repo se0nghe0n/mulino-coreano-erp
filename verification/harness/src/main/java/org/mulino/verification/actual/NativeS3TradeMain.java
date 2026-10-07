@@ -47,11 +47,25 @@ public final class NativeS3TradeMain {
             case "uuid" -> bindings.put(Json.required(a,"alias"),UUID.randomUUID().toString());
             case "original" -> original(id,resolve(a.path("fixture")),resolve(a.path("binding")));
             case "command" -> {
-                JsonNode request=resolve(a.path("request"));var result=driver.invoke(id,"api",a.path("actor").asText().equals("supervisor")?resolveActor("supervisor"):actor,Json.required(a,"capability"),request);capture(result);available(result);
+                JsonNode request=resolve(a.path("request"));var result=driver.invoke(id,"api",a.hasNonNull("actor")?resolveActor(a.path("actor").asText()):actor,Json.required(a,"capability"),request);capture(result);available(result);
                 require(result.data().path("httpStatus").asInt()==a.path("httpStatus").asInt(200),id+" HTTP status "+result.data().path("httpStatus"));
                 require(result.response().path("outcome").asText().equals(a.path("outcome").asText("APPLIED")),id+" expected business outcome "+a.path("outcome").asText("APPLIED")+" observed "+result.response());
                 for(var it=a.path("bind").fields();it.hasNext();){var e=it.next();JsonNode value=result.response().at(e.getValue().asText());require(!value.isMissingNode(),id+" missing response binding "+e.getValue());bindings.set(e.getKey(),value);if(e.getKey().equals("WORK"))work=value.asText();}
                 assertions(id,result.response(),a.path("assertions"));
+            }
+            case "lost-response" -> {
+                var config=ActualConfiguration.environment(System.getenv());JsonNode request=resolve(a.path("request"));JsonNode proof;
+                try(var proxy=new S3ResponseLossProxy(config.baseUri())) {
+                    var lossy=new ActualAcceptanceDriver(root,new ActualConfiguration(proxy.uri(),config.jdbcUrl(),config.username(),config.password(),config.signingKey(),config.issuer(),config.audience(),config.buildVersion()));boolean responseLost=false;
+                    try{lossy.invoke(id,"api",actor,Json.required(a,"capability"),request);}catch(IllegalStateException expected){responseLost=true;}
+                    require(responseLost,id+" client must lose its actual HTTP response");proof=proxy.receipt();require(proof.path("upstreamHttpStatus").asInt()==200&&proof.path("response").path("outcome").asText().equals("APPLIED"),id+" upstream must commit APPLIED before response loss");
+                }
+                String ref="verification/harness/target/evidence/actual/response-loss-"+UUID.randomUUID()+".json";Json.write(root.resolve(ref),proof);var control=Json.object();control.put("driverStatus","EXECUTED").put("source","REAL_LOOPBACK_RESPONSE_LOSS_PROXY");control.set("response",proof);control.set("artifactRefs",Json.MAPPER.valueToTree(List.of(ref)));actions.set(id,control);
+                for(var it=a.path("bind").fields();it.hasNext();){var e=it.next();JsonNode value=proof.path("response").at(e.getValue().asText());require(!value.isMissingNode(),id+" missing upstream binding");bindings.set(e.getKey(),value);}
+            }
+            case "parallel" -> {
+                JsonNode request=resolve(a.path("request"));var first=driver.start(id+"-start1","api",actor,Json.required(a,"capability"),request);var second=driver.start(id+"-start2","api",actor,Json.required(a,"capability"),request);capture(first);capture(second);available(first);available(second);
+                var r1=driver.await(id+"-result1",first.data().path("invocationHandle"),30);var r2=driver.await(id+"-result2",second.data().path("invocationHandle"),30);capture(r1);capture(r2);available(r1);available(r2);require(r1.response().path("outcome").asText().equals("APPLIED")&&r2.response().path("outcome").asText().equals("APPLIED"),id+" retries must return APPLIED business outcome");require(r1.response().path("effects").equals(r2.response().path("effects")),id+" retry effects differ");var p1=Json.read(root.resolve(r1.artifactRefs().getFirst()));var p2=Json.read(root.resolve(r2.artifactRefs().getFirst()));require(!p1.path("credentialSha256").equals(p2.path("credentialSha256")),id+" retries must use refreshed distinct JWT credentials");
             }
             case "query" -> {
                 var result=driver.query(id,"api",actor,Json.required(a,"capability"),resolve(a.path("request")));capture(result);available(result);require(result.data().path("httpStatus").asInt()==a.path("httpStatus").asInt(200),id+" query HTTP failed");assertions(id,result.response(),a.path("assertions"));

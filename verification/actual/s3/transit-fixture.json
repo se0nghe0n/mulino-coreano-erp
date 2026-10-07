@@ -1,6 +1,6 @@
 {
   "schemaVersion": "1.0.0",
-  "fixtureId": "S3-ACTUAL-NATIVE-TRADE",
+  "fixtureId": "S3-PREEXISTING-TRANSIT-INPUT",
   "synthetic": true,
   "baseRefs": [],
   "clock": {
@@ -1036,11 +1036,23 @@
       "status": "ACTIVE",
       "requiresLabel": true
     },
+    "INPUT60": {
+      "type": "QuantitySegment",
+      "itemAlias": "P",
+      "lotAlias": "L",
+      "locationAlias": "TRANSIT",
+      "quantity": "60",
+      "unit": "BOX",
+      "physicalScope": "authored-preexisting-transit60",
+      "ownerAlias": "reader",
+      "custodianAlias": "reader"
+    },
     "outsider": {
       "type": "Human"
     }
   },
   "baseline": {},
   "evidence": [],
-  "responsibilities": []
+  "responsibilities": [],
+  "preexistingTransitBaseline": true
 }

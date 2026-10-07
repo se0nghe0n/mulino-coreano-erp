@@ -24,6 +24,7 @@ public final class JwtSigner {
         try {
             Instant now=Instant.now(); var claims=Json.object();
             claims.put("iss",configuration.issuer()).put("aud",configuration.audience()).put("sub",Json.required(actor,"subject"));
+            claims.put("jti",java.util.UUID.randomUUID().toString());
             claims.put("organizationId",Json.required(actor,"organizationAlias"));
             // This claim satisfies the S0 decoder shape; current server identity ignores it for ownership.
             claims.put("stableRequestOwner","UNTRUSTED-CLIENT-CLAIM").put("iat",now.getEpochSecond()).put("exp",now.plusSeconds(120).getEpochSecond());

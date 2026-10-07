@@ -42,12 +42,14 @@ public final class ActualAcceptanceDriver implements AcceptanceDriver, Independe
             var uri=configuration.baseUri().resolve("/api/ontology/"+category+"/"+operation);
             JsonNode wireRequest=request.deepCopy();
             if(category.equals("queries")&&wireRequest.path("scope").isObject())((ObjectNode)wireRequest.path("scope")).remove("caseId");
-            var call=HttpRequest.newBuilder(uri).timeout(Duration.ofSeconds(30)).header("Content-Type","application/json").header("Authorization","Bearer "+signer.sign(actor)).POST(HttpRequest.BodyPublishers.ofString(wireRequest.toString())).build();
+            String credential=signer.sign(actor);
+            var call=HttpRequest.newBuilder(uri).timeout(Duration.ofSeconds(30)).header("Content-Type","application/json").header("Authorization","Bearer "+credential).POST(HttpRequest.BodyPublishers.ofString(wireRequest.toString())).build();
             Instant submittedAt=Instant.now();
             var result=http.send(call,HttpResponse.BodyHandlers.ofString());
             if(result.statusCode()==404)return StepResult.missing(id,"NOT_IMPLEMENTED: actual HTTP endpoint "+uri.getPath());
             JsonNode response=Json.parse(result.body());
             var receipt=Json.object();receipt.put("method","POST").put("path",uri.getPath()).put("httpStatus",result.statusCode()).put("submittedAt",submittedAt.toString()).put("capturedAt",Instant.now().toString());
+            receipt.put("credentialSha256",java.util.HexFormat.of().formatHex(java.security.MessageDigest.getInstance("SHA-256").digest(credential.getBytes(java.nio.charset.StandardCharsets.UTF_8))));
             receipt.set("request",request);receipt.set("wireRequest",wireRequest);receipt.set("response",response);
             var identity=Json.object();identity.put("issuer",configuration.issuer()).put("subject",Json.required(actor,"subject")).put("organizationAlias",Json.required(actor,"organizationAlias"));
             var transport=Json.object();transport.put("httpStatus",result.statusCode());
