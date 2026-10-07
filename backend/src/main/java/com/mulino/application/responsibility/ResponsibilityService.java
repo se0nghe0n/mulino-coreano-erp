@@ -81,6 +81,11 @@ public class ResponsibilityService implements WorkResponsibility, com.mulino.app
    r.update("Assignments",c.organizationId(),text(resolving,"ID"),Map.of("status","RESOLVED","evidenceId",progress.occurrenceId(),"basis","VERIFIED_RECEIPT_CONTRIBUTION","revision",((Number)resolving.get("revision")).intValue()+1));
   }
  }
+ public void applyTradeObservation(DomainContext c,com.mulino.application.trade.TradeObservationRemedy.Completion completion){
+  r.fence(c.organizationId(),completion.rootId());var root=r.require("Roots",c.organizationId(),completion.rootId());
+  if(!Set.of("DELIVERY_RECONCILIATION","RETURN_RECONCILIATION").contains(completion.kind())||!completion.kind().equals(root.get("kind"))||root.get("quantity")!=null)throw DomainError.invalid("Exact nonquantity trade reconciliation root required");
+  for(var assignment:r.rows("Assignments",c.organizationId()))if(completion.rootId().equals(assignment.get("rootId"))&&open(assignment))r.update("Assignments",c.organizationId(),text(assignment,"ID"),Map.of("status","RESOLVED","evidenceId",completion.canonicalId(),"basis","VERIFIED_TRADE_OBSERVATION:"+completion.actualId(),"revision",((Number)assignment.get("revision")).intValue()+1));
+ }
  public void applyReceiptObservation(DomainContext c,com.mulino.application.trade.TradeResidualRemedy.ObservationCompletion completion){
   r.fence(c.organizationId(),completion.rootId());var root=r.require("Roots",c.organizationId(),completion.rootId());
   if(!"RECEIPT_RECONCILIATION".equals(root.get("kind"))||root.get("quantity")!=null)throw DomainError.invalid("Observation reconciliation root required");

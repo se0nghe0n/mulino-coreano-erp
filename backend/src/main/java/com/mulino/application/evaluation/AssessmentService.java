@@ -81,11 +81,10 @@ public class AssessmentService implements CommandHandler,WorkAssessmentGuard {
   private Map<String,Object> goalPredicate(Definition d,Map<String,Object> slots){
     var original=template(d,slots).predicate();
     if(slots.get("targetQuantity")==null)return original;
-    var quantity=d.attributes().stream().filter(a->a.name().equals("quantity")&&a.type()==Definition.ValueType.DECIMAL&&Objects.equals(a.unit(),slots.get("unit"))).toList();
-    if(quantity.size()!=1)throw new DomainError("HELD","VERSION_UNSUPPORTED","Unique typed quantity property required");
+    String quantityProperty=GoalQuantityProperty.resolve(d,original,Objects.toString(slots.get("unit"),null));
     String mode=slots.get("quantityMode").toString();
     if(!Set.of("CUMULATIVE_EVENT","STATE_AT").contains(mode))return original;
-    var target=Map.<String,Object>of("operator",mode.equals("CUMULATIVE_EVENT")?"quantitySum":"stateQuantity","property",quantity.getFirst().nounType()+".quantity","minimum",Map.of("value",slots.get("targetQuantity"),"unit",slots.get("unit")),"unit",slots.get("unit"),"evidenceSelector",mode.equals("CUMULATIVE_EVENT")?"VERIFIED_DISTINCT":"CURRENT_STATE");
+    var target=Map.<String,Object>of("operator",mode.equals("CUMULATIVE_EVENT")?"quantitySum":"stateQuantity","property",quantityProperty,"minimum",Map.of("value",slots.get("targetQuantity"),"unit",slots.get("unit")),"unit",slots.get("unit"),"evidenceSelector",mode.equals("CUMULATIVE_EVENT")?"VERIFIED_DISTINCT":"CURRENT_STATE");
     return Map.of("operator","all","children",List.of(original,target));
   }
   private Definition.Goal template(Definition d,Map<String,Object> slots){var candidates=d.goals().stream().filter(g->Objects.equals(g.endpoint(),slots.get("endpoint"))&&Objects.equals(g.quantityMode(),slots.get("quantityMode"))).toList();if(candidates.size()!=1)throw new DomainError("HELD","VERSION_UNSUPPORTED","Unique pinned goal template required");return candidates.getFirst();}

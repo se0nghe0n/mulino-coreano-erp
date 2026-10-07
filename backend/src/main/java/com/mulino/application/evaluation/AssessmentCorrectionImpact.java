@@ -11,8 +11,8 @@ import org.springframework.stereotype.Component;
 /** Exact persisted input matches and typed target scopes. All changes share the evidence transaction. */
 @Component
 public class AssessmentCorrectionImpact implements EvidenceCorrectionImpact {
- private final AssessmentService service;private final AssessmentRepository repository;private final ObjectProvider<ResponsibilityService> duties;private final ObjectMapper json=new ObjectMapper();
- public AssessmentCorrectionImpact(AssessmentService service,AssessmentRepository repository,ObjectProvider<ResponsibilityService> duties){this.service=service;this.repository=repository;this.duties=duties;}
+ private final AssessmentService service;private final AssessmentRepository repository;private final ObjectProvider<ResponsibilityService> duties;private final ObjectMapper json=new ObjectMapper();private final ObjectProvider<com.mulino.application.trade.DeliveryCorrectionPort> deliveryCorrections;
+ public AssessmentCorrectionImpact(AssessmentService service,AssessmentRepository repository,ObjectProvider<ResponsibilityService> duties,ObjectProvider<com.mulino.application.trade.DeliveryCorrectionPort> deliveryCorrections){this.service=service;this.repository=repository;this.duties=duties;this.deliveryCorrections=deliveryCorrections;}
  public void apply(DomainContext c,Correction correction){
   var ids=affected(c,correction.previousId(),correction.currentId(),correction.affectedWorkIds());
   var occurrences=relatedOccurrences(c,correction.previousId());
@@ -31,7 +31,16 @@ public class AssessmentCorrectionImpact implements EvidenceCorrectionImpact {
     }
   }
  }
- public void evidenceLinked(DomainContext c,String claimId,String canonicalId){for(String id:affected(c,claimId,canonicalId,Set.of()))service.invalidate(c,id);}
+ public void evidenceLinked(DomainContext c,String claimId,String canonicalId){
+  for(String id:affected(c,claimId,canonicalId,Set.of()))service.invalidate(c,id);
+  var canonical=repository.rows(c,"mulino.evidence.CanonicalOccurrences").stream().filter(x->canonicalId.equals(x.get("ID"))).findFirst().orElseThrow(DomainError::forbidden);
+  if("PHYSICAL_DELIVERY".equals(canonical.get("kind"))&&canonical.get("supersedesId")!=null){
+   var deliveries=repository.rows(c,"mulino.trade.sales.Deliveries").stream().filter(x->Objects.equals(x.get("observationId"),canonical.get("physicalScopeId"))).toList();
+   if(deliveries.size()!=1)throw new DomainError("HELD","EVIDENCE_UNVERIFIED","Delivery correction requires one applied original delivery");
+   var ports=deliveryCorrections.stream().toList();if(ports.size()!=1)throw new DomainError("HELD","FOLLOWUP_UNAVAILABLE","Exact delivery correction responsibility provider required");
+   ports.getFirst().correctionImpact(c,deliveries.getFirst().get("ID").toString(),canonicalId);
+  }
+ }
  private record Raw(String kind,Map<String,Object> row){}
  private Raw rawEvidence(DomainContext c,String id){
   for(var type:Map.of("EVENT","Events","CLAIM","Claims","DOCUMENT","DocumentVersions").entrySet())for(var row:repository.rows(c,"mulino.evidence."+type.getValue()))if(id.equals(row.get("ID")))return new Raw(type.getKey(),row);
