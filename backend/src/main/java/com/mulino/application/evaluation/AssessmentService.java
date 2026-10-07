@@ -50,7 +50,10 @@ public class AssessmentService implements CommandHandler,WorkAssessmentGuard {
   public void invalidate(DomainContext c,String workId){work.require(c,workId,true);work.markInvalidation(c,workId,true);}
   private record Calculation(TypedPredicateEvaluator.Result result,String hash,String snapshot,String policy,boolean held){}
   private Calculation calculate(DomainContext c,Map<String,Object> w,Map<String,Object> goal){
-    var slots=decode(goal.get("slotsJson"));Definition d;
+    var slots=decode(goal.get("slotsJson"));
+    if(!(slots.get("scope") instanceof Map<?,?> scope)||!Set.of("itemId","lotId","placeId","workId").containsAll(scope.keySet()))throw DomainError.invalid("Typed bounded goal scope required");
+    if(scope.get("itemId")!=null&&!Objects.equals(scope.get("itemId"),w.get("itemId"))||scope.get("workId")!=null&&!Objects.equals(scope.get("workId"),w.get("ID")))throw DomainError.forbidden();
+    Definition d;
     try{d=definition(goal,c);}catch(DomainError|NoSuchElementException e){return held(goal,slots,"PINNED_CONTRACT_UNAVAILABLE");}
     var policy=policies.current(c.organizationId(),"EVIDENCE",c.asOf()).stream().filter(p->p.get("createdAt")!=null&&!instant(p.get("createdAt")).isAfter(c.knownAt())&&Objects.equals(slots.get("evidencePolicyVersion"),p.get("version"))).toList();
     if(policy.size()!=1)return held(goal,slots,"EVIDENCE_POLICY_UNRESOLVED");

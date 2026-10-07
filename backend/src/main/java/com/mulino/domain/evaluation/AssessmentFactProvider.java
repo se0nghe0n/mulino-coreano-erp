@@ -18,6 +18,9 @@ public class AssessmentFactProvider {
   public EvaluationFacts load(DomainContext c,Map<String,Object> work,Map<String,Object> slots,Definition definition){return load(c,work,slots,definition,null);}
   public EvaluationFacts load(DomainContext c,Map<String,Object> work,Map<String,Object> slots,Definition definition,String goalId) {
     var port=contributionPort.getIfAvailable();var credits=goalId==null||port==null?List.<Map<String,Object>>of():port.contributions(c,work.get("ID").toString(),goalId);
+    Map<?,?> scope=slots.get("scope") instanceof Map<?,?> m?m:Map.of();
+    Object lotScope=scope.get("lotId")!=null?scope.get("lotId"):work.get("lotId");
+    var segments=r.rows(c,"mulino.inventory.QuantitySegments");
     boolean stateGoal="STATE_AT".equals(slots.get("quantityMode"))||definition.goals().stream().filter(g->Objects.equals(slots.get("endpoint"),g.endpoint())&&Objects.equals(slots.get("quantityMode"),g.quantityMode())).anyMatch(g->usesCurrentState(g.predicate()));
     var properties=new TreeMap<String,List<Fact>>();var relations=new TreeMap<String,List<Fact>>();
     var occurrences=r.rows(c,"mulino.evidence.CanonicalOccurrences");var verifications=r.rows(c,"mulino.evidence.Verifications");
@@ -28,6 +31,7 @@ public class AssessmentFactProvider {
       if(!stateGoal&&(attribute.name().equals("quantity")||attribute.name().equals("occurredAt")))for(var occurrence:occurrences) {
         var allocations=credits.stream().filter(x->Objects.equals(occurrence.get("ID"),x.get("occurrenceId"))).toList();
         if((!Objects.equals(work.get("ID"),occurrence.get("workId"))&&allocations.isEmpty())||!Objects.equals(work.get("itemId"),occurrence.get("itemId")))continue;
+        if(lotScope!=null&&!Objects.equals(lotScope,occurrence.get("subjectKind").equals("LOT")?occurrence.get("subjectId"):segments.stream().filter(x->Objects.equals(x.get("ID"),occurrence.get("physicalScopeId"))).map(x->x.get("lotId")).findFirst().orElse(null)))continue;
         if(slots.get("eventKind")!=null&&!Objects.equals(slots.get("eventKind"),occurrence.get("kind")))continue;
         if(slots.get("placeId")!=null&&!Objects.equals(slots.get("placeId"),occurrence.get("placeId")))continue;
         if(occurrences.stream().anyMatch(x->occurrence.get("ID").equals(x.get("supersedesId"))))continue;
@@ -71,7 +75,8 @@ public class AssessmentFactProvider {
         }
       }
       // Existing segment facts represent actual state only; action eligibility and contribution adapters are S3/S4.
-      if((attribute.name().equals("stateQuantity")||attribute.name().equals("quantity")&&stateGoal)&&(!slots.containsKey("action")||Set.of("PHYSICAL","PHYSICAL_HELD").contains(slots.get("action")))&&(!slots.containsKey("includeReserved")||Boolean.TRUE.equals(slots.get("includeReserved"))))for(var segment:r.rows(c,"mulino.inventory.QuantitySegments")) {
+      if((attribute.name().equals("stateQuantity")||attribute.name().equals("quantity")&&stateGoal)&&(!slots.containsKey("action")||Set.of("PHYSICAL","PHYSICAL_HELD").contains(slots.get("action")))&&(!slots.containsKey("includeReserved")||Boolean.TRUE.equals(slots.get("includeReserved"))))for(var segment:segments) {
+        if(lotScope!=null&&!Objects.equals(lotScope,segment.get("lotId")))continue;
         if(!Objects.equals(work.get("itemId"),segment.get("itemId"))||slots.get("placeId")!=null&&!Objects.equals(slots.get("placeId"),segment.get("placeId")))continue;
         boolean known="CONFIRMED".equals(segment.get("identificationStatus"))||"IDENTIFIED".equals(segment.get("identificationStatus"));
         Instant retired=instantOrNull(segment.get("retiredAt"));
