@@ -9,7 +9,7 @@ import org.mulino.verification.Json;
 
 /** Disposable test-only typed seed, atomic, with no HTTP fixture surface. */
 public final class FixtureInstaller {
-    private static final Set<String> TYPES=Set.of("Organization","Human","Agent","TradeItem","Manufacturer","ManufacturerLot","Place","QuantitySegment");
+    private static final Set<String> TYPES=Set.of("Organization","Human","Agent","Product","SpecificationVersion","PackagingVersion","TradeItem","Manufacturer","ManufacturerLot","Place","QuantitySegment");
     private final ActualConfiguration configuration;
     public FixtureInstaller(ActualConfiguration configuration){this.configuration=configuration;}
     public ObjectNode install(JsonNode bundle) throws Exception {
@@ -28,14 +28,21 @@ public final class FixtureInstaller {
             c.setAutoCommit(false);
             try {
                 seed(c,"INSERT INTO mulino_identity_Organizations(ID,externalAlias) VALUES(?,?)",org,orgAlias);
-                for(String type:List.of("Human","Agent","Manufacturer","Place","TradeItem","ManufacturerLot","QuantitySegment"))
+                for(String type:List.of("Human","Agent","Product","Manufacturer","Place","SpecificationVersion","PackagingVersion","TradeItem","ManufacturerLot","QuantitySegment"))
                     for(var it=fixture.path("aliases").fields();it.hasNext();) {var entry=it.next();JsonNode a=entry.getValue();if(!type.equals(a.path("type").asText()))continue;
                         String id=aliases.path(entry.getKey()).asText();String name=a.path("name").asText(entry.getKey());
                         switch(type) {
                             case "Human","Agent" -> {seed(c,"INSERT INTO mulino_identity_Actors(organizationId,ID,kind,stableRequestOwner) VALUES(?,?,?,?)",org,id,type.equals("Human")?"HUMAN":"AGENT",UUID.randomUUID().toString());seed(c,"INSERT INTO mulino_identity_AuthorityFences(organizationId,actorId) VALUES(?,?)",org,id);}
                             case "Manufacturer" -> seedTemporal(c,fixture,"INSERT INTO mulino_inventory_Manufacturers(organizationId,ID,name) VALUES(?,?,?)",org,id,name);
                             case "Place" -> seedTemporal(c,fixture,"INSERT INTO mulino_inventory_Places(organizationId,ID,name,kind) VALUES(?,?,?,?)",org,id,name,"WAREHOUSE");
-                            case "TradeItem" -> {String product=UUID.randomUUID().toString();seedTemporal(c,fixture,"INSERT INTO mulino_inventory_Products(organizationId,ID,name) VALUES(?,?,?)",org,product,name);seedTemporal(c,fixture,"INSERT INTO mulino_inventory_TradeItems(organizationId,ID,productId,name,baseUnit,decimalPlaces) VALUES(?,?,?,?,?,?)",org,id,product,name,Json.required(a,"unit"),0);}
+                            case "Product" -> seedTemporal(c,fixture,"INSERT INTO mulino_inventory_Products(organizationId,ID,name) VALUES(?,?,?)",org,id,name);
+                            case "SpecificationVersion","PackagingVersion" -> {
+                                JsonNode content=a.path("content");if(!content.isObject()||content.isEmpty())throw new IllegalArgumentException("Versioned fixture content required");
+                                String hash=contentHash(content);
+                                String sql=type.equals("SpecificationVersion")?"INSERT INTO mulino_inventory_SpecificationVersions(organizationId,ID,productId,version,contentHash,description) VALUES(?,?,?,?,?,?)":"INSERT INTO mulino_inventory_PackagingVersions(organizationId,ID,productId,version,contentHash,description) VALUES(?,?,?,?,?,?)";
+                                seedTemporal(c,fixture,sql,org,id,ref(aliases,a,"productAlias"),Json.required(a,"version"),hash,content.toString());
+                            }
+                            case "TradeItem" -> seedTemporal(c,fixture,"INSERT INTO mulino_inventory_TradeItems(organizationId,ID,productId,name,baseUnit,decimalPlaces,specificationVersionId,packagingVersionId) VALUES(?,?,?,?,?,?,?,?)",org,id,ref(aliases,a,"productAlias"),name,Json.required(a,"unit"),0,ref(aliases,a,"specificationVersionAlias"),ref(aliases,a,"packagingVersionAlias"));
                             case "ManufacturerLot" -> seedTemporal(c,fixture,"INSERT INTO mulino_inventory_ManufacturingLots(organizationId,ID,manufacturerId,itemId,originalLot) VALUES(?,?,?,?,?)",org,id,ref(aliases,a,"manufacturerAlias"),ref(aliases,a,"itemAlias"),entry.getKey());
                             case "QuantitySegment" -> seed(c,"INSERT INTO mulino_inventory_QuantitySegments(organizationId,ID,itemId,lotId,identificationStatus,quantity,unit,placeId,controlScope,validFrom,mixtureStatus,createdAt,recordedAt) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?)",org,id,ref(aliases,a,"itemAlias"),ref(aliases,a,"lotAlias"),"CONFIRMED",new java.math.BigDecimal(Json.required(a,"quantity")),Json.required(a,"unit"),ref(aliases,a,"locationAlias"),Json.required(a,"physicalScope"),time(fixture.path("clock").path("asOf").asText()),"IDENTIFIED",time(fixture.path("clock").path("asOf").asText()),time(fixture.path("clock").path("knownAt").asText()));
                             default -> throw new IllegalStateException(type);
@@ -60,6 +67,9 @@ public final class FixtureInstaller {
             } catch(Exception failure){c.rollback();throw failure;}
         }
         var result=Json.object();result.set("aliasMap",aliases);result.put("fixtureHash",Json.required(bundle,"fixtureHash"));result.set("clock",fixture.path("clock"));result.put("committed",true).put("businessExecutionClaimed",false);return result;
+    }
+    static String contentHash(JsonNode content) throws java.security.NoSuchAlgorithmException {
+        return java.util.HexFormat.of().formatHex(java.security.MessageDigest.getInstance("SHA-256").digest(content.toString().getBytes(java.nio.charset.StandardCharsets.UTF_8)));
     }
     private static String ref(JsonNode aliases,JsonNode object,String field) {String alias=Json.required(object,field);String id=aliases.path(alias).asText();if(id.isBlank())throw new IllegalArgumentException("Unknown fixture alias "+alias);return id;}
     private static OffsetDateTime time(String value){return OffsetDateTime.parse(value);}

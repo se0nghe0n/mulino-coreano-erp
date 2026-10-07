@@ -27,7 +27,7 @@ public final class ActualAcceptanceDriver implements AcceptanceDriver, Independe
     @Override public StepResult installFixture(String id,JsonNode bundle) {
         try {var data=fixtures.install(bundle);return executed(id,data,null,provenance(null,"JDBC_FIXTURE_INSTALL",false,null,null),data);}
         catch(UnsupportedOperationException unsupported){return StepResult.missing(id,"NOT_IMPLEMENTED: "+unsupported.getMessage());}
-        catch(Exception failure){throw new IllegalStateException("Actual fixture transaction failed",failure);}
+        catch(Exception failure){throw new IllegalStateException("Actual fixture transaction failed: "+SqlFailureSummary.safe(failure),failure);}
     }
     @Override public StepResult query(String id,String route,JsonNode actor,String operation,JsonNode request) {
         if(!route.equals("api")||!QUERIES.contains(operation))return StepResult.missing(id,"NOT_IMPLEMENTED: actual query route/capability "+route+"/"+operation);

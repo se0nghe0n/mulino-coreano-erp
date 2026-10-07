@@ -63,7 +63,10 @@
     "P": {
       "type": "TradeItem",
       "name": "S1 비스킷",
-      "unit": "BOX"
+      "unit": "BOX",
+      "productAlias": "PRD",
+      "specificationVersionAlias": "SPEC",
+      "packagingVersionAlias": "PACK"
     },
     "M": {
       "type": "Manufacturer"
@@ -93,6 +96,27 @@
       "quantity": "40",
       "unit": "BOX",
       "physicalScope": "S1-B40"
+    },
+    "PRD": {
+      "type": "Product",
+      "name": "S1 synthetic biscuit product"
+    },
+    "SPEC": {
+      "type": "SpecificationVersion",
+      "productAlias": "PRD",
+      "version": "1",
+      "content": {
+        "description": "Synthetic S1 biscuit specification"
+      }
+    },
+    "PACK": {
+      "type": "PackagingVersion",
+      "productAlias": "PRD",
+      "version": "1",
+      "content": {
+        "unit": "BOX",
+        "description": "Synthetic S1 box packaging"
+      }
     }
   },
   "baseline": {},

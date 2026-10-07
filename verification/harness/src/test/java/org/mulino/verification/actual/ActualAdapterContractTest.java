@@ -9,6 +9,19 @@ import static org.junit.jupiter.api.Assertions.*;
 
 /** Adapter plumbing tests; no product runtime/acceptance coverage is claimed. */
 public final class ActualAdapterContractTest {
+    @Test void nativeTradeItemHasExplicitVersionedDependencies() throws Exception {
+        var fixture=Json.read(Path.of(System.getProperty("repo.root",".")).resolve("verification/actual/s1/fixture.json"));var aliases=fixture.path("aliases");var item=aliases.path("P");
+        assertEquals("Product",aliases.path(item.path("productAlias").asText()).path("type").asText());
+        for(String field:List.of("specificationVersionAlias","packagingVersionAlias")) {
+            var version=aliases.path(item.path(field).asText());assertEquals(item.path("productAlias"),version.path("productAlias"));
+            assertFalse(version.path("content").isEmpty());assertEquals(64,FixtureInstaller.contentHash(version.path("content")).length());
+        }
+    }
+    @Test void sqlFailureSummaryPreservesStateWithoutStatementValues() {
+        var secret=new java.sql.SQLException("password SECRET and statement parameters SECRET","23502");
+        var wrapped=new IllegalStateException("wrapper SECRET",secret);String safe=SqlFailureSummary.safe(wrapped);
+        assertEquals("SQLException SQLSTATE=23502",safe);assertFalse(safe.contains("SECRET"));
+    }
     @Test void nativeFixtureIssuerHasUrlShapeRequiredByInstalledSpring() throws Exception {
         var root=Path.of(System.getProperty("repo.root","."));
         var fixture=Json.read(root.resolve("verification/actual/s1/fixture.json"));

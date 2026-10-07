@@ -128,3 +128,26 @@ backend의 `mulino.evidence.blob-root`도 자신이 생성한 0700 fixture
 안의 `blobs`로 지정한다. BlobStore가 새 0700 directory를 만들며
 trap의 fixture cleanup으로 blob와 key가 함께 정리된다. 기존 기본
 `/tmp/mulino-evidence-blobs`는 확인하거나 수정하지 않는다.
+
+## 실제 fixture dependency 실패 수정
+
+root native 실행은 V5의 TradeItem 필수 specificationVersionId를
+누락해 SQLSTATE 23502로 실패했다. V5의 후반 ALTER가 specification과
+packaging version을 필수로 만들고 같은 product의 version만 연결한다.
+기존 fixture의 자동 product 생성과 비어 있는 version 연결은 이 계약을
+만족하지 못했다.
+
+native fixture에 Product·SpecificationVersion·PackagingVersion alias와
+TradeItem의 explicit dependency를 추가했다. installer는 product 다음
+두 immutable version을 설치하고 authored synthetic content의 SHA256을
+저장한 뒤 TradeItem에 실제 UUID를 연결한다. native HTTP assertion은
+product/version 연결과 실제 응답의 contentHash를 확인한다. 원래
+normative case 기대값이나 oracle를 읽어 row를 만들지 않는다.
+
+fixture 실패 메시지에는 underlying SQL exception class, SQLSTATE와
+서버 table/constraint/column identifier만 남긴다. 서버 message·detail·
+SQL statement·parameter·credential 원문을 복사하지 않는다.
+focused Maven adapter suite 9 tests, failures 0, errors 0, skipped 0,
+BUILD SUCCESS(2.953초)를 확인했고 마지막 native assertion 변경도
+`javac --release 21`로 compile했다. [JUnit XML](fixture-dependency-tests.xml)을
+남긴다. 실제 native 재실행은 root 통합 backend에서 필요하다.

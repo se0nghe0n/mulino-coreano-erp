@@ -29,6 +29,13 @@ public final class NativeS1ReadMain {
             var nounRequest=request.deepCopy();nounRequest.put("id",aliases.path("P").asText());nounRequest.put("snapshotRef",Json.required(inventory.response(),"snapshotRevision"));
             var noun=driver.query("noun","api",actor,"getObject",nounRequest);steps.set("noun",noun.toJson());available(noun);validator.result(noun,"query");require(noun.data().path("httpStatus").asInt()==200,"Object HTTP must succeed");
             require(inventory.response().path("snapshotRevision").equals(noun.response().path("snapshotRevision")),"Same world snapshot changed across physical reads");
+            require(noun.response().path("data").path("productId").asText().equals(aliases.path("PRD").asText()),"Trade item product dependency differs");
+            for(var versionEntry:java.util.Map.of("specificationVersion","SPEC","packagingVersion","PACK").entrySet()) {
+                var actual=noun.response().path("data").path(versionEntry.getKey());var expected=fixture.path("aliases").path(versionEntry.getValue());
+                require(noun.response().path("data").path(versionEntry.getKey()+"Id").asText().equals(aliases.path(versionEntry.getValue()).asText()),"Trade item version dependency differs");
+                require(actual.path("productId").asText().equals(aliases.path("PRD").asText()),"Version belongs to another product");
+                require(actual.path("contentHash").asText().equals(FixtureInstaller.contentHash(expected.path("content"))),"Persisted version content hash differs");
+            }
             require(new BigDecimal(inventory.response().path("data").path("heldQuantity").asText()).compareTo(new BigDecimal("100"))==0,"Held quantity must be 100 BOX");
             require(new BigDecimal(noun.response().path("data").path("heldQuantity").asText()).compareTo(new BigDecimal("100"))==0,"Object view held quantity must be 100 BOX");
             require(inventory.response().path("data").path("eligibleQuantity").isNull(),"Missing SELL eligibility must remain unknown");
