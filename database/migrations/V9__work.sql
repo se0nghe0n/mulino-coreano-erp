@@ -70,7 +70,7 @@ BEGIN
  PERFORM pg_advisory_xact_lock(hashtextextended(NEW.organizationId||'|contribution|'||NEW.occurrenceId,0));
  SELECT quantity,unit INTO actual,actual_unit FROM mulino_evidence_CanonicalOccurrences WHERE organizationId=NEW.organizationId AND ID=NEW.occurrenceId FOR UPDATE;
  IF actual IS NULL OR NEW.unit<>actual_unit OR NEW.startQuantity+NEW.quantity>actual THEN RAISE EXCEPTION 'Contribution exceeds actual occurrence'; END IF;
- IF EXISTS(SELECT 1 FROM mulino_work_WorkContributions c WHERE c.organizationId=NEW.organizationId AND c.occurrenceId=NEW.occurrenceId AND c.conditionId=NEW.conditionId AND c.startQuantity<NEW.startQuantity+NEW.quantity AND NEW.startQuantity<c.startQuantity+c.quantity) THEN RAISE EXCEPTION 'Actual contribution range already credited'; END IF;
+ IF EXISTS(SELECT 1 FROM mulino_work_WorkContributions c WHERE c.organizationId=NEW.organizationId AND c.occurrenceId=NEW.occurrenceId AND c.startQuantity<NEW.startQuantity+NEW.quantity AND NEW.startQuantity<c.startQuantity+c.quantity) THEN RAISE EXCEPTION 'Actual contribution range already credited'; END IF;
  RETURN NEW;
 END $$;
 CREATE TRIGGER work_contribution_range BEFORE INSERT ON mulino_work_WorkContributions FOR EACH ROW EXECUTE FUNCTION mulino_work_contribution_range();
