@@ -141,6 +141,7 @@ entity CanonicalOccurrences {
   valueState : String(24);
   kind : String(80);
   physicalScopeId : UUID;
+  occurrenceIdentity : UUID;
   quantity : Decimal(38,12);
   unit : String(24);
   supersedesId : UUID;

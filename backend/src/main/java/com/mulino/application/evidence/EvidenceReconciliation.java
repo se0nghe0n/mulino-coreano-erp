@@ -64,9 +64,10 @@ public class EvidenceReconciliation {
     if(tradeProviders.size()>1)throw new DomainError("HELD","POLICY_UNRESOLVED","Ambiguous trade evidence identity");
     boolean trade=!tradeProviders.isEmpty();
     if(trade)sameQuantity=quantity==null?claim.get("quantity")==null:claim.get("quantity") instanceof BigDecimal tradeQuantity&&quantity.compareTo(tradeQuantity)==0&&Objects.equals(input.unit(),claim.get("unit"));
+    var trustedTrade=new LinkedHashMap<String,Object>();
     boolean identity=false;
     if(trade&&input.physicalScopeId()!=null&&original){
-      try{var scope=tradeProviders.getFirst().require(c,uuid(input.physicalScopeId()),claim,event,doc,blobs.read(UUID.fromString(doc.get("blobId").toString()),doc.get("sha256").toString()));auth.authorizeScopes(c,capability,scope.scopes());validateTrustedFields(scope.canonicalFields());identity=true;}catch(DomainError unavailable){if(!"EVIDENCE_UNVERIFIED".equals(unavailable.code()))throw unavailable;}
+      try{var scope=tradeProviders.getFirst().require(c,uuid(input.physicalScopeId()),claim,event,doc,blobs.read(UUID.fromString(doc.get("blobId").toString()),doc.get("sha256").toString()));auth.authorizeScopes(c,capability,scope.scopes());trustedTrade.putAll(tradeFields(scope,event));identity=true;}catch(DomainError unavailable){if(!"EVIDENCE_UNVERIFIED".equals(unavailable.code()))throw unavailable;}
     }else if(receipt&&input.physicalScopeId()!=null&&original) {
       var providers=receiptScopes.stream().toList();if(providers.size()!=1)throw new DomainError("HELD","POLICY_UNRESOLVED","Receipt identity provider unavailable");
       var range=providers.getFirst().require(c,uuid(input.physicalScopeId()));
@@ -117,9 +118,10 @@ public class EvidenceReconciliation {
       Set<String> overlapping=external||response||receipt||trade?Set.of(input.physicalScopeId()):r.overlappingScopes(c.organizationId(),input.physicalScopeId());
       if(r.rows("CanonicalOccurrences",c.organizationId()).stream().anyMatch(x->!input.physicalScopeId().equals(x.get("physicalScopeId"))&&overlapping.contains(x.get("physicalScopeId"))&&event.get("kind").equals(x.get("kind"))))decision="CONFLICT";
     }
-    if(input.physicalScopeId()!=null && r.rows("CanonicalOccurrences",c.organizationId()).stream().anyMatch(x->input.physicalScopeId().equals(x.get("physicalScopeId"))&&event.get("kind").equals(x.get("kind"))&&!input.effectiveFrom().equals(instant(x.get("effectiveFrom")))))decision="CONFLICT";
-    if(input.physicalScopeId()!=null && r.rows("CanonicalOccurrences",c.organizationId()).stream().anyMatch(x->input.physicalScopeId().equals(x.get("physicalScopeId"))&&event.get("kind").equals(x.get("kind"))
+    if(!trade&&input.physicalScopeId()!=null && r.rows("CanonicalOccurrences",c.organizationId()).stream().anyMatch(x->input.physicalScopeId().equals(x.get("physicalScopeId"))&&event.get("kind").equals(x.get("kind"))&&!input.effectiveFrom().equals(instant(x.get("effectiveFrom")))))decision="CONFLICT";
+    if(!trade&&input.physicalScopeId()!=null && r.rows("CanonicalOccurrences",c.organizationId()).stream().anyMatch(x->input.physicalScopeId().equals(x.get("physicalScopeId"))&&event.get("kind").equals(x.get("kind"))
         &&(!Objects.equals(claim.get("effectiveUntil"),x.get("effectiveUntil"))||!Objects.equals(claim.get("timePrecision"),x.get("timePrecision")))))decision="CONFLICT";
+    if(trade&&trustedTrade.get("occurrenceIdentity")!=null&&r.rows("CanonicalOccurrences",c.organizationId()).stream().anyMatch(x->trustedTrade.get("occurrenceIdentity").equals(x.get("occurrenceIdentity"))&&event.get("kind").equals(x.get("kind"))&&(!Objects.equals(input.physicalScopeId(),x.get("physicalScopeId"))||!sameQuantity(quantity,x.get("quantity"))||!Objects.equals(input.unit(),x.get("unit"))||!input.effectiveFrom().equals(instant(x.get("effectiveFrom"))))))decision="CONFLICT";
     if(input.effectiveFrom().isAfter(clock.instant()))decision="UNVERIFIED";
     if(input.existingCanonicalId()!=null) {
       var canonical=r.require("CanonicalOccurrences",c.organizationId(),uuid(input.existingCanonicalId()));auth.authorizeScopes(c,capability,scopes(canonical));
@@ -136,6 +138,7 @@ public class EvidenceReconciliation {
     r.insert("Reconciliations",row);
     return Map.of("id",row.get("ID"),"revision",1,"outcome",decision,"inventoryEffects","NONE");
   }
+  private static Map<String,Object> tradeFields(com.mulino.application.trade.TradeEvidenceScopePort.Scope scope,Map<String,Object> event){validateTrustedFields(scope.canonicalFields());var fields=new LinkedHashMap<String,Object>(scope.canonicalFields());fields.put("occurrenceIdentity",uuid(scope.occurrenceIdentity()==null?event.get("ID").toString():scope.occurrenceIdentity()));return fields;}
   private static void validateTrustedFields(Map<String,Object> fields){if(!Set.of("itemId","placeId","workId").containsAll(fields.keySet()))throw DomainError.invalid("Only trusted bounded domain scope may enrich canonical evidence");fields.values().forEach(value->uuid(value.toString()));}
   private static boolean receiptPayloadMatches(com.fasterxml.jackson.databind.JsonNode payload,com.mulino.application.trade.ReceiptEvidenceScopePort.Scope range){
     try{return payload.path("rangeRootId").isTextual()&&range.receiptRangeId().equals(payload.path("rangeRootId").asText())&&payload.path("startQuantity").isTextual()&&range.startQuantity().compareTo(new BigDecimal(payload.path("startQuantity").asText()))==0&&range.itemId().equals(payload.path("itemId").asText())&&Objects.equals(range.lotId(),payload.hasNonNull("lotId")?payload.get("lotId").asText():null)&&range.placeId().equals(payload.path("placeId").asText())&&Objects.equals(range.workId(),payload.hasNonNull("workId")?payload.get("workId").asText():null)&&payload.path("quantity").isTextual()&&range.quantity().compareTo(new BigDecimal(payload.path("quantity").asText()))==0&&range.unit().equals(payload.path("unit").asText())&&range.occurredAt().equals(Instant.parse(payload.path("occurredAt").asText()));}catch(RuntimeException invalid){return false;}
@@ -155,14 +158,15 @@ public class EvidenceReconciliation {
     var event=r.require("Events",c.organizationId(),claim.get("eventId").toString());
     r.sourceFence(c.organizationId(),"canonical",physical,event.get("kind").toString());
     if(existing==null) {
-      var candidates=r.rows("CanonicalOccurrences",c.organizationId()).stream().filter(x->physical.equals(x.get("physicalScopeId"))&&event.get("kind").equals(x.get("kind"))&&instant(claim.get("effectiveFrom")).equals(instant(x.get("effectiveFrom")))).toList();
+      var providers=tradeScopes.stream().filter(p->p.eventKinds().contains(event.get("kind"))).toList();Map<String,Object> semantic=Map.of();if(providers.size()==1){var doc=r.require("DocumentVersions",c.organizationId(),review.get("basisDocumentId").toString());semantic=tradeFields(providers.getFirst().require(c,physical,claim,event,doc,blobs.read(UUID.fromString(doc.get("blobId").toString()),doc.get("sha256").toString())),event);}final var typedIdentity=semantic.get("occurrenceIdentity");
+      var candidates=r.rows("CanonicalOccurrences",c.organizationId()).stream().filter(x->event.get("kind").equals(x.get("kind"))&&(typedIdentity!=null?typedIdentity.equals(x.get("occurrenceIdentity")):physical.equals(x.get("physicalScopeId"))&&instant(claim.get("effectiveFrom")).equals(instant(x.get("effectiveFrom"))))).toList();
       if(candidates.size()==1)existing=candidates.getFirst().get("ID").toString();
       if(candidates.size()>1)throw new DomainError("HELD","EVIDENCE_CONFLICT","Canonical scope has competing revisions");
     }
     var canonicalInput=new EvidenceRecords.CanonicalInput(claim.get("ID").toString(),physical,review.get("basisDocumentId").toString(),review.get("policyVersion").toString(),true,true,true,true,true,existing,null,review.get("reason").toString());
     Map<String,Object> result;
     var tradeProviders=tradeScopes.stream().filter(p->p.eventKinds().contains(event.get("kind"))).toList();
-    if(tradeProviders.size()==1){var doc=r.require("DocumentVersions",c.organizationId(),review.get("basisDocumentId").toString());var scope=tradeProviders.getFirst().require(c,physical,claim,event,doc,blobs.read(UUID.fromString(doc.get("blobId").toString()),doc.get("sha256").toString()));auth.authorizeScopes(c,"linkCanonicalOccurrence",scope.scopes());validateTrustedFields(scope.canonicalFields());result=records.verifyReviewedReceiptCanonical(canonicalInput,scope.canonicalFields());}
+    if(tradeProviders.size()==1){var doc=r.require("DocumentVersions",c.organizationId(),review.get("basisDocumentId").toString());var scope=tradeProviders.getFirst().require(c,physical,claim,event,doc,blobs.read(UUID.fromString(doc.get("blobId").toString()),doc.get("sha256").toString()));auth.authorizeScopes(c,"linkCanonicalOccurrence",scope.scopes());result=records.verifyReviewedReceiptCanonical(canonicalInput,tradeFields(scope,event));}
     else if("PHYSICAL_RECEIPT".equals(event.get("kind"))){var providers=receiptScopes.stream().toList();if(providers.size()!=1)throw new DomainError("HELD","POLICY_UNRESOLVED","Receipt identity provider unavailable");var range=providers.getFirst().require(c,physical);var trusted=new LinkedHashMap<String,Object>();trusted.put("itemId",range.itemId());trusted.put("placeId",range.placeId());if(range.workId()!=null)trusted.put("workId",range.workId());result=records.verifyReviewedReceiptCanonical(canonicalInput,trusted);}else result=records.verifyReviewedCanonical(canonicalInput);
     completion.publish(c,result.get("id").toString(),claim.get("ID").toString(),review.get("basisDocumentId").toString());
     var impact=impacts.getIfAvailable();
