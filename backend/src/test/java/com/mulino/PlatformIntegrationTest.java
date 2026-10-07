@@ -21,7 +21,7 @@ import org.springframework.test.context.DynamicPropertySource;
 import org.testcontainers.postgresql.PostgreSQLContainer;
 
 @SpringBootTest
-@ActiveProfiles("local")
+@ActiveProfiles({"local","platform-spike"})
 class PlatformIntegrationTest {
   static final PostgreSQLContainer PG =
       new PostgreSQLContainer(

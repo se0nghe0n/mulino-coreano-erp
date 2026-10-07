@@ -7,6 +7,7 @@ import com.sap.cds.services.handler.EventHandler;
 import com.sap.cds.services.handler.annotations.*;
 import org.springframework.stereotype.Component;
 
+@org.springframework.context.annotation.Profile("platform-spike")
 @Component
 @ServiceName("PlatformService")
 public class PlatformCap implements EventHandler {

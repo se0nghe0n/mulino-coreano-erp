@@ -12,6 +12,7 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+@org.springframework.context.annotation.Profile("platform-spike")
 @Service
 public class PlatformCommands {
   private final ScopeRepository r;

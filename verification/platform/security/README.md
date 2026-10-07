@@ -51,3 +51,8 @@ V6 수령 replay, V7 동시 철회/restart와 실제 운영 R5를 대신하지 �
 policy UNKNOWN과 동시 fence 증거는 플랫폼 담당의 DB/transaction 검증과
 결합해야 한다. 운영 profile은 실제 IdP binding 구현 전 모두 startup을
 거부하며 dummy binding marker도 허용하지 않는다.
+
+S0 검증 서버는 `--spring.profiles.active=local,platform-spike`로 실행한다.
+일반 제품 profile에서 S0 REST/MCP route는 등록되지 않고 CAP의
+`PlatformService`는 서버가 부여하는 spike role 없이는 접근할 수 없다.
+JWT payload의 role 이름으로 이 role을 얻을 수 없다.

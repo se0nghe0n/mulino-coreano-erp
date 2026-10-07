@@ -4,6 +4,7 @@ import com.mulino.application.PlatformCommands;
 import java.util.*;
 import org.springframework.web.bind.annotation.*;
 
+@org.springframework.context.annotation.Profile("platform-spike")
 @RestController
 public class PlatformRest {
   private final PlatformCommands service;

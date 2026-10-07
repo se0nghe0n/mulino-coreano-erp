@@ -7,6 +7,7 @@ import java.util.*;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+@org.springframework.context.annotation.Profile("platform-spike")
 @RestController
 public class PlatformMcp {
   private static final String VERSION = "2026-07-28";
