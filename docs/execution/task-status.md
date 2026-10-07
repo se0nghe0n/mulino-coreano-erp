@@ -25,7 +25,7 @@
 
 | Step | 작업 | 실행 모델 / effort | 상태 |
 |---|---|---|---|
-| 1 | 새 skills와 실행 지침 | GPT-6.1 Sol / high | ACTIVE |
+| 1 | 새 skills와 실행 지침 | GPT-6.1 Sol / high | COMPLETE |
 | 2 | 전체 계획의 tests | GPT-6.1 Sol / high | PENDING |
 | 3 | 새 시스템 구현 | GPT-6.1 Sol / medium | PENDING |
 | 4 | 실제 E2E | GPT-6.1 Sol / low | PENDING |
@@ -35,7 +35,10 @@
 
 매 Step의 필수 review는 GPT-6.1 Sol `xhigh`와 GPT-6 Astra `low`다.
 모든 산출물 통합·지적 수정·결합 checks까지 끝나야 Step를 닫는다.
-현재 Step 1의 두 review와 aggregate checks는 `NOT_RUN`이다.
+Step 1의 정적 checks와 두 실제 reviewer의 closure가 `fe0d8df`에서
+통과했다. 필수 지적이 모두 해결돼 Step 1은 `COMPLETE`다. 이 기록의
+통합·최종 일치 검사는 coordinator가 수행한다. Step 2는 R2 추적 결정
+대기로 `PENDING`이다. [Step 1 검토 기록](step-1-review.md)을 따른다.
 
 ## Step 1 소유권과 통합
 
@@ -45,15 +48,30 @@ Task integration branch는 `feat/ontology-implementation`이고 경로는
 
 | Subtask | branch | 절대 worktree | 소유 범위 |
 |---|---|---|---|
-| 개발 skills | coordinator가 통합 시 기록 | `/Volumes/VideoStore/Developer/mulino-ontology-step1-domain` | `ontology-implementation` |
-| Agent skills | coordinator가 통합 시 기록 | `/Volumes/VideoStore/Developer/mulino-ontology-step1-agent` | `ontology-agent-implementation` |
-| 테스트 skills | coordinator가 통합 시 기록 | `/Volumes/VideoStore/Developer/mulino-ontology-step1-testing` | `ontology-scenario-testing` |
+| 개발 skills | `step1/ontology-skill` | `/Volumes/VideoStore/Developer/mulino-ontology-step1-domain` | `ontology-implementation` |
+| Agent skills | `step1/agent-skill` | `/Volumes/VideoStore/Developer/mulino-ontology-step1-agent` | `ontology-agent-implementation` |
+| 테스트 skills | `step1/scenario-skill` | `/Volumes/VideoStore/Developer/mulino-ontology-step1-testing` | `ontology-scenario-testing` |
 | workspace 지침 | `step1/workspace-guide` | `/Volumes/VideoStore/Developer/mulino-ontology-step1-workspace` | root 지침·README·execution·templates |
 
 workspace 지침의 소유 파일은 root `AGENTS.md`, `CLAUDE.md`, `.gitignore`,
 `README.md`, `docs/execution/*`와 새 `.github` templates다. 다른 worker의
-skills 파일은 변경하지 않는다. worker commit은 coordinator가 통합 후
-기록한다. 이 문서 작성 시점의 상태는 worker 작성 중, 통합 전이다.
+skills 파일은 변경하지 않는다. 다음 commit을 coordinator가 통합했다.
+
+| 산출물 | worker commit | Task branch commit |
+|---|---|---|
+| Agent skill | `5def7b4` | `18514d5` |
+| 개발 skill | `489d` | `3f81593` |
+| 테스트 skill | `29cf` | `0461587` |
+| workspace 지침 | `c7a814f` | `d7c1cde` |
+| 이슈 완료 조건 절 | `2fe7263` | `bde2cee` |
+| refactor·운영 매뉴얼 단계 교정 | `1f50779` | `c8a29c7` |
+| E1 판매 주문·예약 선행 절차 교정 | `33ff9cc` | `fe0d8df` |
+
+기록 기준의 Task HEAD는 `fe0d8df`다. E1 template의 판매 주문·30 예약
+선행 절차 교정도 통합했다. Astra low는 이 HEAD에서 두 P2의 해결을
+확인하고 closure PASS를 반환했고 Sol xhigh도 같은 HEAD에서 PASS를
+반환했다. 모든 skills는 아직 실제
+애플리케이션·MCP/client 호출로 인수한 것이 아니다.
 
 ## 시스템 S0–S6의 별도 gate
 
@@ -81,7 +99,11 @@ D01–D26, T01–T26, C1–C5, V1–V8, E1/E2 모두 구현/실행 `NOT_RUN`이�
 
 R1–R9의 실제 결정 register는 아직 작성하지 않았다. 특히 R2 추적,
 R3 실자료, R4/R6 정책, R5 실제 신원, R7 BTP, R8 모델 비용과 수용치를
-미확정으로 유지한다. 알려지지 않은 정책을 임의 허용하지 않으며
+미확정으로 유지한다. R2는 fork issue 기능 활성화와 이슈 게시 또는
+로컬 추적 유지의 선택 질문이 pending이다. R8은 추가 UAT 비용 상한
+20/50 또는 견적 준비의 선택 질문이 pending이다. 답변은 아직 없으며
+경과 시간을 동의로 취급하지 않는다. 이 질문과 무관한 Step 1 통합·
+review·checks는 계속한다. 알려지지 않은 정책을 임의 허용하지 않으며
 필수 gate를 비대상으로 바꾸지 않는다.
 
 ## 실행 증거와 다음 행동
@@ -99,7 +121,13 @@ workspace worker의 `git diff --check`는 통과했다. Python 정적 검사로
 verification manifest는 제외되지 않음을 확인했다. 이 결과는 workspace
 Subtask의 정적 증거이며 전체 Step 1 aggregate PASS가 아니다.
 
-다음은 모든 skills와 지침 commit을 Task branch에 통합한 뒤 실제
-skill discovery/정적 checks와 두 모델 review를 수행하고 지적을 고치는
-일이다. coordinator가 정확한 command·exit code·review artifact·통합
-commit과 잔여 문제를 이 문서에 기록한다.
+coordinator가 3개 skill의 `quick_validate.py`를 uv+PyYAML 환경에서
+실행해 모두 PASS했다고 전달했다. aggregate Python 검사에서 새 문서
+14개·상대 링크42개·symlink4개·evidence JSON의 NOT_RUN 필드와 PR/이슈
+절 구조를 확인했고 baseline 대비 `git diff --check`도 PASS였다.
+fresh 검사 결과는 [정적 검사 증거](evidence/step1-static-checks.txt)에
+기록했다. 두 실제 reviewer의 최종 범위 내 판정도 PASS다.
+
+다음은 이 기록을 Task branch에 통합해 최종 일치를 확인하고 R2 추적
+위치 답변에 따라 Step 2에 착수하는 일이다. 아직 Step 2는 시작하지
+않았다. startup·도메인·DB·MCP/client·모델·BTP 인수는 NOT_RUN이다.
