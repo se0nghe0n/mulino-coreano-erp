@@ -53,7 +53,7 @@ public class EvidenceReconciliation {
     if(input.physicalScopeId()!=null) {
       var physical=r.subject(c.organizationId(),"SEGMENT",uuid(input.physicalScopeId()));
       auth.authorizeScopes(c,capability,Map.of("TARGET",List.of(input.physicalScopeId()),"ITEM",List.of(physical.get("itemId").toString())));
-      identity=switch(claim.get("subjectKind").toString()) {
+      identity="CONFIRMED".equals(physical.get("identificationStatus"))&&"IDENTIFIED".equals(physical.get("mixtureStatus"))&&quantity!=null&&quantity.compareTo((BigDecimal)physical.get("quantity"))==0&&Objects.equals(input.unit(),physical.get("unit"))&&switch(claim.get("subjectKind").toString()) {
         case "SEGMENT" -> input.physicalScopeId().equals(claim.get("subjectId"));
         case "ITEM" -> claim.get("subjectId").equals(physical.get("itemId"));
         case "LOT" -> claim.get("subjectId").equals(physical.get("lotId"));
