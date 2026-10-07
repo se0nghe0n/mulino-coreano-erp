@@ -7,7 +7,7 @@ CREATE TABLE mulino_responsibility_Roots (
  kind varchar(80) NOT NULL, scopeJson text NOT NULL, quantity numeric(38,12), unit varchar(20),
  PRIMARY KEY(organizationId,ID), UNIQUE(organizationId,dutyKey),
  FOREIGN KEY(organizationId) REFERENCES mulino_identity_Organizations(ID),
- CHECK(sourceKind IN ('OCCURRENCE','DECISION')), CHECK(jsonb_typeof(scopeJson::jsonb)='object'),
+ CHECK(sourceKind IN ('OCCURRENCE','DECISION','EVENT','CLAIM','DOCUMENT')), CHECK(jsonb_typeof(scopeJson::jsonb)='object'),
  CHECK(quantity IS NULL OR (quantity>0 AND unit IS NOT NULL))
 );
 CREATE TABLE mulino_responsibility_Scopes (

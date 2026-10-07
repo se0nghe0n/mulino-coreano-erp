@@ -17,10 +17,10 @@ public class ResponsibilityRepository {
   public Map<String,Object> require(String name,String org,String id){return rows(name,org).stream().filter(x->id.equals(x.get("ID"))).findFirst().orElseThrow(DomainError::forbidden);}
   public void insert(String name,Map<String,Object> row){db.run(Insert.into(entity(name)).entry(row));}
   public void update(String name,String org,String id,Map<String,Object> values){db.run(Update.entity(entity(name)).data(values).where(x->x.get("organizationId").eq(org).and(x.get("ID").eq(id))));}
-  public List<Map<String,Object>> evidenceRows(String name,String org){String entity=switch(name){case "Occurrences"->"mulino.evidence.CanonicalOccurrences";case "Verifications"->"mulino.evidence.Verifications";case "Approvals"->"mulino.commands.Approvals";case "Commands"->"mulino.commands.CommandRecords";default->throw DomainError.unsupported();};return db.run(Select.from(entity).where(x->x.get("organizationId").eq(org))).listOf(Map.class).stream().map(x->(Map<String,Object>)new LinkedHashMap<String,Object>(x)).toList();}
+  public List<Map<String,Object>> evidenceRows(String name,String org){String entity=switch(name){case "Occurrences"->"mulino.evidence.CanonicalOccurrences";case "Verifications"->"mulino.evidence.Verifications";case "Approvals"->"mulino.commands.Approvals";case "Commands"->"mulino.commands.CommandRecords";case "EVENT"->"mulino.evidence.Events";case "CLAIM"->"mulino.evidence.Claims";case "DOCUMENT"->"mulino.evidence.DocumentVersions";case "Profiles"->"mulino.evidence.SourceProfiles";default->throw DomainError.unsupported();};return db.run(Select.from(entity).where(x->x.get("organizationId").eq(org))).listOf(Map.class).stream().map(x->(Map<String,Object>)new LinkedHashMap<String,Object>(x)).toList();}
   public Map<String,Object> requireSource(String org,String kind,String id){
-    if(!Set.of("OCCURRENCE","DECISION").contains(kind))throw DomainError.unsupported();
-    var found=evidenceRows("OCCURRENCE".equals(kind)?"Occurrences":"Approvals",org).stream().filter(x->id.equals(x.get("ID"))).findFirst();
+    if(!Set.of("OCCURRENCE","DECISION","EVENT","CLAIM","DOCUMENT").contains(kind))throw DomainError.unsupported();
+    var found=evidenceRows("OCCURRENCE".equals(kind)?"Occurrences":"DECISION".equals(kind)?"Approvals":kind,org).stream().filter(x->id.equals(x.get("ID"))).findFirst();
     if(found.isEmpty()&&"DECISION".equals(kind))found=evidenceRows("Commands",org).stream().filter(x->id.equals(x.get("ID"))).findFirst();
     return found.orElseThrow(DomainError::forbidden);
   }

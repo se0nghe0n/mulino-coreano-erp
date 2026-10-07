@@ -29,3 +29,12 @@ occurrence와 COMPLETE 재평가, VERIFIED 원천·동일성·수량·시간·�
 검증은 focused Java 단위와 fresh PostgreSQL의 독립 raw SQL 관찰을 구별한다.
 현재 SQL concurrency 증거는 gateway·HTTP·MCP end-to-end 수락 인수가 아니다.
 C2의 실제 도착/출고와 C5 온도 이상 intake 전체는 후속 도메인 결합 인수다.
+
+정정 대상이 아직 canonical 사실로 확인되지 않은 EVENT·CLAIM·DOCUMENT라도
+접수 책임을 잃지 않는다. ensureEvidenceCorrectionDuty는 authoritative raw
+source와 SourceProfile을 조직 범위에서 확인하고 HUMAN intake owner·supervisor,
+저장된 nextAction·nextCheckAt을 보존한 UNVERIFIED_SOURCE_REVIEW를 만든다.
+raw source revision과 kind를 root key에 사용하고 canonical occurrence나
+실물 효과·목표 충족 근거를 만들지 않는다. 이 hook만 raw source 종류를
+허용한다. 일반 createObligation은 계속 OCCURRENCE·DECISION만 허용한다.
+같은 root가 이미 해소·이전됐으면 접수 재처리가 원 책임을 되돌리지 않는다.
