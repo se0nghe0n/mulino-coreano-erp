@@ -66,4 +66,13 @@ class DefinitionValidatorTest {
    assertEquals(new PredicateTruth(PredicateTruth.State.SATISFIED,true),PredicateTruth.any(List.of(yes,unknown)));
    assertEquals(unknown,unknown.not());
  }
+ @Test void quantitiesRequirePinnedTypedUnitBoundsAndVerifiedSelector() {
+   var valid=Map.<String,Object>of("operator","quantitySum","property","QuantitySegment.quantity","minimum",Map.of("value","100","unit","BOX"),"unit","BOX","evidenceSelector","VERIFIED_DISTINCT");
+   assertEquals("VALID",validator.validatePredicate(fixture(),valid).outcome());
+   var missing=new HashMap<>(valid);missing.remove("evidenceSelector");assertEquals("INVALID",validator.validatePredicate(fixture(),missing).outcome());
+   var state=new HashMap<>(valid);state.put("operator","stateQuantity");assertEquals("INVALID",validator.validatePredicate(fixture(),state).outcome());
+   state.put("evidenceSelector","CURRENT_STATE");assertEquals("VALID",validator.validatePredicate(fixture(),state).outcome());
+   missing=new HashMap<>(valid);missing.put("minimum",Map.of("value","1","unit","EA"));assertEquals("INVALID",validator.validatePredicate(fixture(),missing).outcome());
+ }
+
 }

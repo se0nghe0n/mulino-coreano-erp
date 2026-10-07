@@ -2,6 +2,7 @@ package com.mulino.domain.evaluation;
 
 import com.mulino.application.core.*;
 import com.mulino.domain.definitions.*;
+import com.mulino.adapters.blob.LocalBlobStore;
 import java.time.*;
 import java.util.*;
 import org.springframework.stereotype.Component;
@@ -10,8 +11,8 @@ import static com.mulino.domain.evaluation.EvaluationFacts.*;
 /** CQN-backed observation provider. Raw claims and unsupported downstream adapters cannot fulfil a goal. */
 @Component
 public class AssessmentFactProvider {
-  private final AssessmentRepository r;
-  public AssessmentFactProvider(AssessmentRepository r){this.r=r;}
+  private final AssessmentRepository r; private final LocalBlobStore blobs;
+  public AssessmentFactProvider(AssessmentRepository r,LocalBlobStore blobs){this.r=r;this.blobs=blobs;}
   public EvaluationFacts load(DomainContext c,Map<String,Object> work,Map<String,Object> slots,Definition definition) {
     var properties=new TreeMap<String,List<Fact>>();var relations=new TreeMap<String,List<Fact>>();
     var occurrences=r.rows(c,"mulino.evidence.CanonicalOccurrences");var verifications=r.rows(c,"mulino.evidence.Verifications");
@@ -19,7 +20,7 @@ public class AssessmentFactProvider {
     var documents=r.rows(c,"mulino.evidence.DocumentVersions");
     for(var attribute:definition.attributes()) {
       String property=attribute.nounType()+"."+attribute.name();var facts=new ArrayList<Fact>();
-      if(attribute.name().equals("quantity")||attribute.name().equals("occurredAt"))for(var occurrence:occurrences) {
+      if(!"STATE_AT".equals(slots.get("quantityMode"))&&(attribute.name().equals("quantity")||attribute.name().equals("occurredAt")))for(var occurrence:occurrences) {
         if(!Objects.equals(work.get("ID"),occurrence.get("workId"))||!Objects.equals(work.get("itemId"),occurrence.get("itemId")))continue;
         if(slots.get("eventKind")!=null&&!Objects.equals(slots.get("eventKind"),occurrence.get("kind")))continue;
         if(slots.get("placeId")!=null&&!Objects.equals(slots.get("placeId"),occurrence.get("placeId")))continue;
@@ -29,44 +30,67 @@ public class AssessmentFactProvider {
         if(slots.get("periodEnd")!=null&&effective.isAfter(instant(slots.get("periodEnd"))))continue;
         if(effective.isAfter(c.asOf()))continue;
         var verification=verifications.stream().filter(v->Objects.equals(occurrence.get("ID"),v.get("canonicalOccurrenceId"))&&Objects.equals(slots.get("evidencePolicyVersion"),v.get("policyVersion"))&&"VERIFIED".equals(v.get("verdict"))&&List.of("sourceMatched","identityMatched","quantityMatched","timeMatched","duplicateChecked").stream().allMatch(k->Boolean.TRUE.equals(v.get(k)))).findFirst();
-        boolean verified=verification.isPresent();var refs=new ArrayList<String>();
+        boolean verified=verification.isPresent();boolean sourceConflict=false;var refs=new ArrayList<String>();
         if(verified) {
           var v=verification.get();refs.add(v.get("ID").toString());
           var claim=claims.stream().filter(x->Objects.equals(v.get("claimId"),x.get("ID"))).findFirst();
           var document=documents.stream().filter(x->Objects.equals(v.get("basisDocumentId"),x.get("ID"))).findFirst();
-          verified=claim.isPresent()&&document.isPresent()&&"AVAILABLE".equals(document.get().get("availability"));
-          if(document.isPresent())refs.add(document.get().get("ID").toString());
+          verified=claim.isPresent()&&document.isPresent()&&"AVAILABLE".equals(document.get().get("availability"))&&document.get().get("blobId")!=null&&blobs.available(UUID.fromString(document.get().get("blobId").toString()),document.get().get("sha256").toString());
+          if(document.isPresent()) {
+            refs.add(document.get().get("ID").toString());
+            verified=verified&&!documents.stream().anyMatch(x->Objects.equals(document.get().get("ID"),x.get("supersedesId")));
+          }
           if(claim.isPresent()) {
+            refs.add(claim.get().get("ID").toString());
+            verified=verified&&!claims.stream().anyMatch(x->Objects.equals(claim.get().get("ID"),x.get("supersedesId")));
             var event=events.stream().filter(x->Objects.equals(claim.get().get("eventId"),x.get("ID"))).findFirst();
             verified=verified&&event.isPresent();
             if(event.isPresent()) {
               var e=event.get();verified=verified&&!events.stream().anyMatch(x->Objects.equals(e.get("ID"),x.get("invalidatesId"))||Objects.equals(e.get("ID"),x.get("supersedesId")));
-              verified=verified&&inbox.stream().filter(x->Objects.equals(e.get("sourceNamespace"),x.get("sourceNamespace"))&&Objects.equals(e.get("externalEventId"),x.get("externalEventId"))&&Objects.equals(e.get("sourceVersion"),x.get("sourceVersion"))).count()==1;
+              var variants=inbox.stream().filter(x->Objects.equals(e.get("sourceNamespace"),x.get("sourceNamespace"))&&Objects.equals(e.get("externalEventId"),x.get("externalEventId"))&&Objects.equals(e.get("sourceVersion"),x.get("sourceVersion"))).toList();
+              sourceConflict=variants.size()>1||variants.stream().anyMatch(x->"CONFLICT".equals(x.get("state")));verified=verified&&variants.size()==1&&!sourceConflict;
               refs.add(e.get("ID").toString());
             }
           }
         }
-        State state=state(occurrence.get("valueState"));
+        State state=sourceConflict?State.CONFLICT:state(occurrence.get("valueState"));
         Object value=attribute.name().equals("occurredAt")?effective:occurrence.get("quantity");
         facts.add(new Fact(occurrence.get("ID").toString(),Objects.toString(occurrence.get("revision")),DefinitionRepository.sha256(occurrence.toString()),occurrence.get("ID").toString(),Objects.toString(occurrence.get("physicalScopeId"),null),value,Objects.toString(occurrence.get("unit"),null),state,verified,effective,instantOrNull(occurrence.get("effectiveUntil")),instant(occurrence.get("recordedAt")),refs));
       }
       // Existing segment facts represent actual state only; action eligibility and contribution adapters are S3/S4.
-      if(attribute.name().equals("stateQuantity")&&!slots.containsKey("action")&&!Boolean.TRUE.equals(slots.get("includeReserved")))for(var segment:r.rows(c,"mulino.inventory.QuantitySegments")) {
+      if((attribute.name().equals("stateQuantity")||attribute.name().equals("quantity")&&"STATE_AT".equals(slots.get("quantityMode")))&&(!slots.containsKey("action")||"PHYSICAL".equals(slots.get("action")))&&!Boolean.TRUE.equals(slots.get("includeReserved")))for(var segment:r.rows(c,"mulino.inventory.QuantitySegments")) {
         if(!Objects.equals(work.get("itemId"),segment.get("itemId"))||slots.get("placeId")!=null&&!Objects.equals(slots.get("placeId"),segment.get("placeId")))continue;
         boolean known="CONFIRMED".equals(segment.get("identificationStatus"))||"IDENTIFIED".equals(segment.get("identificationStatus"));
         Instant retired=instantOrNull(segment.get("retiredAt"));
         if(segment.get("retirementRecordedAt")!=null&&instant(segment.get("retirementRecordedAt")).isAfter(c.knownAt()))retired=null;
         facts.add(new Fact(segment.get("ID").toString(),Objects.toString(segment.get("revision")),DefinitionRepository.sha256(segment.toString()),null,segment.get("ID").toString(),segment.get("quantity"),Objects.toString(segment.get("unit")),known?State.KNOWN:State.UNKNOWN,known,instant(segment.get("validFrom")),retired,instant(segment.get("recordedAt")),List.of(Objects.toString(segment.get("evidenceRef"),""))));
       }
-      properties.put(property,facts);
+      var conversions=r.rows(c,"mulino.inventory.UnitConversions");
+      properties.put(property,facts.stream().map(f->normalize(f,attribute.unit(),work.get("itemId"),conversions,c.asOf())).toList());
     }
     for(var relation:definition.relations()) {
+      var ids=r.rows(c,"mulino.definitions.RelationDefinitions").stream().filter(x->Objects.equals(definition.id(),x.get("definitionVersionId"))&&Objects.equals(relation.name(),x.get("name"))).map(x->x.get("ID")).toList();
       var facts=new ArrayList<Fact>();for(var row:r.rows(c,"mulino.inventory.ObjectRelations")) {
-        if(!Objects.equals(work.get("itemId"),row.get("sourceId"))||!Objects.equals(definition.id(),row.get("definitionVersionId"))||!Objects.equals(relation.name(),row.get("relationDefinitionId")))continue;
+        if(!Objects.equals(work.get("itemId"),row.get("sourceId"))||!Objects.equals(definition.id(),row.get("definitionVersionId"))||!ids.contains(row.get("relationDefinitionId")))continue;
         facts.add(new Fact(row.get("ID").toString(),Objects.toString(row.get("revision")),DefinitionRepository.sha256(row.toString()),null,null,row.get("targetId"),null,State.KNOWN,true,instant(row.get("validFrom")),instantOrNull(row.get("validUntil")),instant(row.get("recordedAt")),List.of()));
       }relations.put(relation.name(),facts);
     }
-    return new EvaluationFacts(properties,relations);
+    var referenced=new HashSet<String>();properties.values().stream().flatMap(Collection::stream).forEach(f->{referenced.add(f.sourceId());referenced.addAll(f.evidenceRefs());});
+    var sources=new TreeMap<String,List<Map<String,Object>>>();
+    for(String entity:List.of("CanonicalOccurrences","Verifications","Claims","Events","InboxRecords","DocumentVersions")) {
+      var selected=r.rows(c,"mulino.evidence."+entity).stream().filter(x->referenced.contains(Objects.toString(x.get("ID")))||entity.equals("InboxRecords")&&referenced.contains(Objects.toString(x.get("eventId")))).map(x->new TreeMap<String,Object>(x)).map(x->(Map<String,Object>)x).toList();sources.put("evidence."+entity,selected);
+    }
+    sources.put("inventory.UnitConversions",r.rows(c,"mulino.inventory.UnitConversions").stream().filter(x->referenced.contains(Objects.toString(x.get("ID")))).toList());
+    return new EvaluationFacts(properties,relations,sources);
+  }
+  private Fact normalize(Fact f,String expected,Object item,List<Map<String,Object>> conversions,Instant at){
+    if(expected==null||f.unit()==null||Objects.equals(expected,f.unit())||f.value()==null)return f;
+    var matches=conversions.stream().filter(x->Objects.equals(item,x.get("itemId"))&&Objects.equals(f.unit(),x.get("fromUnit"))&&Objects.equals(expected,x.get("toUnit"))&&!at.isBefore(instant(x.get("validFrom")))&&(x.get("validUntil")==null||at.isBefore(instant(x.get("validUntil"))))&&x.get("evidenceRef")!=null).toList();
+    if(matches.size()!=1)return new Fact(f.sourceId(),f.sourceVersion(),f.sourceHash(),f.canonicalId(),f.physicalScopeId(),f.value(),f.unit(),State.UNKNOWN,false,f.effectiveFrom(),f.effectiveUntil(),f.recordedAt(),f.evidenceRefs());
+    var conversion=matches.getFirst();var factor=new java.math.BigDecimal(conversion.get("factor").toString());var value=new java.math.BigDecimal(f.value().toString()).multiply(factor);
+    if(factor.signum()<=0||value.scale()>12||value.precision()-value.scale()>26)return new Fact(f.sourceId(),f.sourceVersion(),f.sourceHash(),f.canonicalId(),f.physicalScopeId(),f.value(),f.unit(),State.UNKNOWN,false,f.effectiveFrom(),f.effectiveUntil(),f.recordedAt(),f.evidenceRefs());
+    var refs=new ArrayList<>(f.evidenceRefs());refs.add(conversion.get("ID").toString());refs.add(conversion.get("evidenceRef").toString());
+    return new Fact(f.sourceId(),f.sourceVersion(),f.sourceHash(),f.canonicalId(),f.physicalScopeId(),value,expected,f.state(),f.verified(),f.effectiveFrom(),f.effectiveUntil(),f.recordedAt(),refs);
   }
   static Instant instant(Object v){return v instanceof Instant i?i:OffsetDateTime.parse(v.toString()).toInstant();}
   static Instant instantOrNull(Object v){return v==null?null:instant(v);}

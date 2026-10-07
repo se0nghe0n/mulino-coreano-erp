@@ -4,10 +4,20 @@ import java.math.BigDecimal;
 import java.time.*;
 import java.util.*;
 import org.springframework.stereotype.Component;
+import org.springframework.beans.factory.ObjectProvider;
+import org.springframework.beans.factory.annotation.Autowired;
+import com.mulino.application.core.CommandHandler;
 
 /** Bounded, structural validation. Validation never grants execution authority. */
 @Component
 public class DefinitionValidator {
+  private final ObjectProvider<CommandHandler> handlers;
+  public DefinitionValidator(){this.handlers=null;}
+  @Autowired public DefinitionValidator(ObjectProvider<CommandHandler> handlers){this.handlers=handlers;}
+  private boolean supportedCapability(Definition.Capability capability){
+    if(Set.of("getDefinition","getObject","searchObjects","getWork","searchWorks","getInventory","getEvidence","getAssessment","getObligations","getReconciliation").contains(capability.capabilityId()))return true;
+    return handlers!=null&&handlers.orderedStream().anyMatch(h->h.capabilities().contains(capability.capabilityId())&&h.semanticVersion().equals(capability.semanticVersion()));
+  }
   private static final Set<String> RESERVED=Set.of("eligible","eligibility","role","roles","remainingquantity","assessment","permissions");
   private static final Set<String> OPERATORS=Set.of("equals","in","compare","range","exists","cardinality","timeIn","all","any","not","quantitySum","stateQuantity");
   public record Problem(String path,String code) {}
@@ -36,7 +46,7 @@ public class DefinitionValidator {
     var capabilityNames=new HashSet<String>();
     for(var capability:d.capabilities()) {
       if(!capabilityNames.add(capability.capabilityId())) p.add(new Problem(capability.capabilityId(),"DUPLICATE_CAPABILITY"));
-      if(!Set.of("getDefinition","getObject","searchObjects","getInventory","getEvidence","getReconciliation","getWork","getAssessment","getObligations").contains(capability.capabilityId())) p.add(new Problem(capability.capabilityId(),"UNSUPPORTED_CAPABILITY"));
+      if(!supportedCapability(capability)) p.add(new Problem(capability.capabilityId(),"UNSUPPORTED_CAPABILITY"));
       if(!"core-v1".equals(capability.evaluatorVersion())||!"1.0.0".equals(capability.inputSchemaVersion())||!"1.0.0".equals(capability.outputSchemaVersion())) p.add(new Problem(capability.capabilityId(),"UNSUPPORTED_RUNTIME_CONTRACT"));
     }
     for(var v:d.verbs()) {
