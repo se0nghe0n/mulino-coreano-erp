@@ -6,8 +6,14 @@
 Step2의 고정 관찰 표본은 validator selftest이며 실제 process를 실행하지
 않는다. Step3 adapter가 없으면 `NOT_IMPLEMENTED`, 제품 case는 `NOT_RUN`이다.
 
-`HostObservationValidator.validate(ContractValidator, JsonNode, StepResult)`의
-두 번째 인자는 `$alias`/`$result` 치환을 마친 `action.control`이다. 일반 DB
+`HostObservationValidator.validate(ContractValidator, JsonNode, StepResult,
+boolean requireActualHost)`의 두 번째 인자는 `$alias`/`$result` 치환을 마친
+`action.control`이다. 제품 profile 실행(`CaseRunner` 기본 PRODUCT 정책,
+`Main`·Gherkin)은 `requireActualHost=true`로 호출한다. 이때
+`evidenceClass=ACTUAL_HOST`와 provenance `source=ACTUAL_HOST_PROCESS`만
+받는다. `CAPTURED_SELFTEST`/`CANNED_CONTRACT_SELFTEST`는 라벨이 서로
+맞아도 거부하며 실행은 exit3 형식 오류다. 세 인자 형태와
+`CaseRunner.harnessSelftest(...)`는 harness 단위 시험 전용이다. 일반 DB
 `observe`는 기존 observation 계약을 쓴다. `type=process`의 `EXECUTED` 결과는
 `data.hostObservation`에 아래 schema를 따른다.
 
@@ -233,6 +239,9 @@ snapshot은 terminal completion 이후, await command completion까지 관찰된
 `verification/harness/evidence/host-observation/`에 command/version/exit와
 JUnit 결과를 남긴다. selftest의 argv와 JSON은 `CAPTURED_SELFTEST`라고
 명시된 고정 관찰 입력이며 executable fake process adapter가 아니다.
+제품 실행 경로는 이 표본을 제품 증거로 받지 않는다. 같은 표본은 PRODUCT
+정책의 `CaseRunner`와 `requireActualHost=true` 검증에서 거부된다
+(`StepTwoReReviewRegressionTest`).
 
 실제 inspect/scan/schema/restore/scheduler/client/profile adapter는 없다.
 해당 `./verify` 제품 profile은 계속 `NOT_RUN`이며 비용 승인 없이 모델이나
