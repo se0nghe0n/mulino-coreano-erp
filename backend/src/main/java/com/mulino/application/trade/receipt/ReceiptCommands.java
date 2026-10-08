@@ -52,9 +52,13 @@ public final class ReceiptCommands implements CommandHandler {
   var row=new LinkedHashMap<>(observation(c,intent));String canonical=uuid(s,"canonicalOccurrenceId");row.put("lotId",uuid(s,"lotId"));
   var scope=new ReceiptEvidenceScopes(r,inventory,auth).require(c,row.get("rangeRootId").toString());if(!row.get("lotId").equals(scope.lotId())||!StockPrimitives.instant(row.get("occurredAt")).equals(scope.occurredAt()))throw DomainError.invalid("Confirmed receipt identity/time differs from reconciled range");
   verified.requireCanonical(c,canonical,"PHYSICAL_RECEIPT",row.get("itemId").toString(),row.get("rangeRootId").toString(),(BigDecimal)row.get("quantity"),row.get("unit").toString());
-  String custodian=s.get("receivingCustodianId")==null?null:uuid(s,"receivingCustodianId");if(custodian!=null){requireEvidencedCustodian(c,canonical,row,custodian);row.put("receivingCustodianId",custodian);}
+  // Every confirm, with or without the slot and including duplicate sources,
+  // re-reads custody statements from all verified chains (plan §4.1–§4.3):
+  // verified sources that disagree are reconciled, never first-confirm-wins.
+  var named=evidencedCustodians(c,canonical,row);if(named.size()>1)throw new DomainError("HELD","EVIDENCE_CONFLICT","Verified receipt sources name different receiving custodians");
+  String custodian=s.get("receivingCustodianId")==null?null:uuid(s,"receivingCustodianId");if(custodian!=null){if(!named.equals(Set.of(custodian)))throw new DomainError("HELD","EVIDENCE_UNVERIFIED","Receiving custodian is not named by verified receipt evidence");row.put("receivingCustodianId",custodian);}
   var prior=r.currentRows(c,"Receipts").stream().filter(x->row.get("rangeRootId").equals(x.get("rangeRootId"))&&overlap(row,x)).toList();
-  if(!prior.isEmpty()){var old=prior.getFirst();if(prior.size()!=1||!same(row,old))throw new DomainError("HELD","EVIDENCE_CONFLICT","Receipt range overlaps committed physical history");if(!canonical.equals(old.get("canonicalOccurrenceId")))throw new DomainError("HELD","EVIDENCE_CONFLICT","Duplicate source must link the original canonical occurrence");if(custodian!=null&&!custodian.equals(inventory.object(c,"QuantitySegments",old.get("segmentId").toString()).get("custodianId")))throw new DomainError("HELD","EVIDENCE_CONFLICT","Duplicate source names different receiving custody");if("PROVISIONAL".equals(row.get("state")))r.confirmed(c,row.get("ID").toString());remedy.reconcileReceiptObservation(c,row.get("ID").toString(),old.get("ID").toString());return applied(old.get("ID").toString(),old.get("segmentId").toString(),(BigDecimal)old.get("contributedQuantity"),(BigDecimal)old.get("excessQuantity"),true);}
+  if(!prior.isEmpty()){var old=prior.getFirst();if(prior.size()!=1||!same(row,old))throw new DomainError("HELD","EVIDENCE_CONFLICT","Receipt range overlaps committed physical history");if(!canonical.equals(old.get("canonicalOccurrenceId")))throw new DomainError("HELD","EVIDENCE_CONFLICT","Duplicate source must link the original canonical occurrence");Object recorded=inventory.object(c,"QuantitySegments",old.get("segmentId").toString()).get("custodianId");if(custodian!=null&&!custodian.equals(recorded)||recorded!=null&&!named.isEmpty()&&!named.equals(Set.of(recorded.toString())))throw new DomainError("HELD","EVIDENCE_CONFLICT","Duplicate source names different receiving custody");if("PROVISIONAL".equals(row.get("state")))r.confirmed(c,row.get("ID").toString());remedy.reconcileReceiptObservation(c,row.get("ID").toString(),old.get("ID").toString());return applied(old.get("ID").toString(),old.get("segmentId").toString(),(BigDecimal)old.get("contributedQuantity"),(BigDecimal)old.get("excessQuantity"),true);}
   preventRepeatedOrderContribution(c,row);String segment=stock.receive(c,row,canonical,CommandExecution.commandId());BigDecimal contributed=BigDecimal.ZERO,excess=(BigDecimal)row.get("quantity");
   if(row.get("purchaseLineId")!=null){var credit=purchase.creditReceipt(c,row.get("purchaseLineId").toString(),canonical,(BigDecimal)row.get("quantity"),row.get("unit").toString());contributed=new BigDecimal(credit.get("contributedQuantity").toString());excess=new BigDecimal(credit.get("excessQuantity").toString());}
   var receipt=StockPrimitives.row(c,StockPrimitives.id(),c.asOf());for(String k:List.of("rangeRootId","startQuantity","quantity","unit","itemId","lotId","placeId","purchaseLineId","workId","occurredAt"))if(row.get(k)!=null)receipt.put(k,row.get(k));receipt.putAll(Map.of("observationId",row.get("ID"),"canonicalOccurrenceId",canonical,"segmentId",segment,"contributedQuantity",contributed,"excessQuantity",excess,"physicalEffect",row.get("transitSegmentId")==null?"NEW_STOCK":"TRANSIT_MOVE"));r.insert("Receipts",receipt);r.confirmed(c,row.get("ID").toString());remedy.reconcileReceiptObservation(c,row.get("ID").toString(),receipt.get("ID").toString());if(row.get("purchaseLineId")!=null)remedy.reconcileReceiptShortfall(c,receipt.get("ID").toString(),StockPrimitives.instant(row.get("nextCheckAt")));assessments.invalidate(c,row.get("workId").toString());
@@ -69,7 +73,8 @@ public final class ReceiptCommands implements CommandHandler {
   var holder=new DomainContext(c.organizationId(),custodian,Objects.toString(actor.get("stableRequestOwner"),custodian),c.asOf(),c.knownAt());
   if(!auth.permittedScopes(holder,"confirmReceipt",scopes))throw new DomainError("REJECTED","SCOPE_INELIGIBLE","Receiving custodian lacks current receive authority for this place");
  }
- private void requireEvidencedCustodian(DomainContext c,String canonical,Map<String,Object> row,String custodian){
+ /** Custodians named by every verified chain; a chain whose event and original disagree is itself a conflict. */
+ private Set<String> evidencedCustodians(DomainContext c,String canonical,Map<String,Object> row){
   var chains=verified.verifiedCanonical(c,canonical,"PHYSICAL_RECEIPT",row.get("itemId").toString(),row.get("rangeRootId").toString(),(BigDecimal)row.get("quantity"),row.get("unit").toString());
   var named=new TreeSet<String>();var mapper=new com.fasterxml.jackson.databind.ObjectMapper();
   for(var chain:chains){var refs=(List<?>)chain.get("evidenceRefs");var event=evidence.require("Events",c.organizationId(),refs.get(3).toString());var doc=evidence.require("DocumentVersions",c.organizationId(),refs.get(4).toString());
@@ -78,9 +83,8 @@ public final class ReceiptCommands implements CommandHandler {
     if(fromPayload.isMissingNode()&&fromOriginal.isMissingNode())continue;
     if(!fromPayload.isTextual()||!fromOriginal.isTextual()||!fromPayload.asText().equals(fromOriginal.asText()))throw new DomainError("HELD","EVIDENCE_CONFLICT","Receipt original and event disagree on receiving custodian");
     named.add(fromPayload.asText());
-   }catch(java.io.IOException malformed){throw new DomainError("HELD","EVIDENCE_UNVERIFIED","Receiving custodian requires parseable verified receipt evidence");}}
-  if(named.size()>1)throw new DomainError("HELD","EVIDENCE_CONFLICT","Verified receipt sources name different receiving custodians");
-  if(!named.equals(Set.of(custodian)))throw new DomainError("HELD","EVIDENCE_UNVERIFIED","Receiving custodian is not named by verified receipt evidence");
+   }catch(java.io.IOException unstructured){continue;}} // a non-JSON source states no custody; a slot then stays EVIDENCE_UNVERIFIED
+  return named;
  }
  private void preventRepeatedOrderContribution(DomainContext c,Map<String,Object> receipt){
   if(receipt.get("transitSegmentId")==null||receipt.get("purchaseLineId")==null)return;
