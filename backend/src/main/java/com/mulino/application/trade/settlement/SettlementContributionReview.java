@@ -42,11 +42,21 @@ public class SettlementContributionReview implements SettlementContributionPort 
     // action) makes every decision bound to the pre-restoration revision, such as a decided but unexecuted waiver, fail its revision
     // binding, so the outcome does not depend on whether that waiver executes before or after this correction (plan §5.3 waive "현재
     // scope/revision ... 책임의 단절 거부").
-    if(!openRoots.isEmpty()){for(var root:openRoots)duties.reissueOpen(c,root,RESTORED,c.knownAt().plusSeconds(3600),"CONTRIBUTION_RESTORED:"+canonicalId);continue;}
-    // A residual a MANAGER waiver already validly covered is not revived by a restoration (plan §4.3 "해소/면제 결정이 이미 유효하면 자동
-    // 부활시키지 않는다"): the original match difference (no confirmed adjustment since) or a restored residual an earlier root waived.
-    if(waivedResidual(c,match,roots,decimal(assessed.get("settlementDifference"))))continue;
+    // The re-issue and a waiver of the same organization never interleave: every guarded command first takes the organization row
+    // FOR UPDATE (ApplicationCommands.apply -> PolicyCommandGuard.fence -> PolicyRepository.fence) and holds it to commit, so a waiver
+    // reads either the pre- or the post-restoration revision of a committed transaction (s4l review index 0, REFUTED by that fence).
+    // A same-quantity supersession of a CURRENT contribution changes nothing an open root was issued for, so it re-issues nothing and a
+    // decision bound to the current revision stays executable (s4l[2]). Roots issued for a CHANGED/UNVERIFIED contribution are re-issued.
+    if(!openRoots.isEmpty()){if(sameContribution(correcting,occurrences)&&openRoots.stream().allMatch(root->issuedCurrent(c,match,root)))continue;
+     for(var root:openRoots)duties.reissueOpen(c,root,RESTORED,c.knownAt().plusSeconds(3600),"CONTRIBUTION_RESTORED:"+canonicalId);continue;}
+    // A residual a MANAGER waiver already validly covered is not revived by a restoration (plan §4.3 134행 "해소/면제 결정이 이미 유효하면
+    // 자동 부활시키지 않는다"): only the CURRENT residual a waiver recorded when it executed counts, never the root's opening amount.
+    if(waivedResidual(c,roots,decimal(assessed.get("settlementDifference"))))continue;
    }
+   // A relinked correction whose chain contains the canonical an open UNVERIFIED root of this match was opened for (an invalidating
+   // correction, AssessmentCorrectionImpact.apply) adopts that root: it is re-issued for the relinked contribution instead of a second
+   // root opening beside it (s4l[3], plan §4.3 정정 재평가, §5.3 "현재 책임의 단절/중복을 거부").
+   if(!current){var adopted=unverifiedRoots(c,match,chain,canonicalId);if(!adopted.isEmpty()){for(var root:adopted)duties.reissueOpen(c,root,NEXT,c.knownAt().plusSeconds(3600),"CONTRIBUTION_RELINKED:"+canonicalId);continue;}}
    var invoice=r.require(c,"Invoices",invoiceId);String workId=invoice.get("workId").toString();
    var target=works.require(c,workId,true);if("CLOSED".equals(target.get("status")))target=works.ensureFollowup(c,workId,canonicalId,KIND,NEXT,c.knownAt().plusSeconds(3600));
    var residual=new TreeMap<String,Object>();residual.put("invoiceId",invoiceId);residual.put("matchId",match.get("ID"));residual.put("currency",invoice.get("currency"));residual.put("contributionCanonicalId",canonicalId);residual.put("contributionState",assessed.get("contributionState"));if(current&&assessed.get("settlementDifference")!=null)residual.put("settlementDifference",decimal(assessed.get("settlementDifference")).stripTrailingZeros().toPlainString());
@@ -58,17 +68,39 @@ public class SettlementContributionReview implements SettlementContributionPort 
   }
   return List.copyOf(opened);
  }
- /** True when a closed-by-waiver root of this match covered exactly the present CURRENT residual. */
- private boolean waivedResidual(DomainContext c,Map<String,Object> match,List<String> roots,java.math.BigDecimal remaining){
-  if(remaining==null)return false;var json=new ObjectMapper();var assignments=dutyRows.rows("Assignments",c.organizationId());
-  for(String root:roots){
-   if(assignments.stream().noneMatch(a->root.equals(a.get("rootId"))&&"WAIVED".equals(a.get("status"))))continue;
-   java.math.BigDecimal covered;
-   if(root.equals(Objects.toString(match.get("dutyRootId"),null)))covered=decimal(match.get("originalDifference"));
-   else{try{var residual=json.readTree(dutyRows.require("Roots",c.organizationId(),root).get("scopeJson").toString()).path("residual");if(!"CURRENT".equals(residual.path("contributionState").asText())||!residual.hasNonNull("settlementDifference"))continue;covered=new java.math.BigDecimal(residual.get("settlementDifference").asText());}catch(Exception e){throw DomainError.invalid("Settlement difference scope invalid");}}
-   if(covered!=null&&covered.compareTo(remaining)==0)return true;
+ /**
+  * True when a waiver of a root of this match covered exactly the present CURRENT residual. The covered residual is the one the waiver
+  * recorded when it executed (SettlementResponsibilities.waiverCoverage); a waiver with no recorded CURRENT residual, or one taken while
+  * the contribution was CHANGED/UNVERIFIED, never suppresses a root (fail closed, s4l[1]/[5]).
+  */
+ private boolean waivedResidual(DomainContext c,List<String> roots,java.math.BigDecimal remaining){
+  if(remaining==null)return false;
+  for(var a:dutyRows.rows("Assignments",c.organizationId())){
+   if(!roots.contains(Objects.toString(a.get("rootId"),""))||!"WAIVED".equals(a.get("status")))continue;
+   var covered=COVERED.matcher(Objects.toString(a.get("basis"),""));
+   if(covered.find()&&new java.math.BigDecimal(covered.group(1)).compareTo(remaining)==0)return true;
   }
   return false;
  }
+ private static final java.util.regex.Pattern COVERED=java.util.regex.Pattern.compile("\\[SETTLEMENT_COVERED CURRENT (-?[0-9]+(?:\\.[0-9]+)?)\\]$");
+ /** The correcting canonical restates the quantity and unit of the canonical it directly supersedes. Unknown predecessor: changed. */
+ private static boolean sameContribution(Map<String,Object> correcting,Map<String,Map<String,Object>> occurrences){
+  var prior=correcting.get("supersedesId")==null?null:occurrences.get(correcting.get("supersedesId").toString());
+  if(prior==null||correcting.get("quantity")==null||prior.get("quantity")==null)return false;
+  return decimal(correcting.get("quantity")).compareTo(decimal(prior.get("quantity")))==0&&Objects.equals(correcting.get("unit"),prior.get("unit"));
+ }
+ /** The match's own difference root, or a root opened for a CURRENT contribution, was issued for an unchanged contribution. */
+ private boolean issuedCurrent(DomainContext c,Map<String,Object> match,String root){
+  if(root.equals(Objects.toString(match.get("dutyRootId"),null)))return true;
+  return "CURRENT".equals(residual(c,root).path("contributionState").asText());
+ }
+ /** Open roots of this match opened for an UNVERIFIED contribution of a canonical in the relinked chain, other than this canonical. */
+ private List<String> unverifiedRoots(DomainContext c,Map<String,Object> match,Set<String> chain,String canonicalId){
+  var out=new ArrayList<String>();
+  for(String root:state.matchRoots(c,match)){if(!state.open(c,root))continue;var residual=residual(c,root);String opened=residual.path("contributionCanonicalId").asText(null);
+   if("UNVERIFIED".equals(residual.path("contributionState").asText())&&opened!=null&&!opened.equals(canonicalId)&&chain.contains(opened))out.add(root);}
+  return out;
+ }
+ private com.fasterxml.jackson.databind.JsonNode residual(DomainContext c,String root){try{return new ObjectMapper().readTree(dutyRows.require("Roots",c.organizationId(),root).get("scopeJson").toString()).path("residual");}catch(Exception e){throw DomainError.invalid("Settlement difference scope invalid");}}
  private static java.math.BigDecimal decimal(Object v){return v==null?null:v instanceof java.math.BigDecimal b?b:new java.math.BigDecimal(v.toString());}
 }

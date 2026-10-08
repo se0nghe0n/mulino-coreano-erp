@@ -30,4 +30,14 @@ class CompletionCoverageGatewayTest extends EvidenceGatewayTest {
   * does not rewrite, so the link applies and the Work row is unchanged (old code: raw trigger 'Imported S1 work remains immutable'). */
  @Test void verifiedLinkSkipsAnImmutableImportedWorkInsteadOfFailingOnItsTrigger()throws Exception{var duty=rootFixture("IMPORTED");var before=jdbc.queryForMap("SELECT revision,pendingInvalidation FROM mulino_work_read_Works WHERE ID=?",duty[0]);String canonical=completed(duty,"50");assertNotNull(canonical);
   assertEquals(before,jdbc.queryForMap("SELECT revision,pendingInvalidation FROM mulino_work_read_Works WHERE ID=?",duty[0]));resolve(duty[3],canonical);assertEquals("RESOLVED",jdbc.queryForObject("SELECT status FROM mulino_work_read_ObligationReferences WHERE ID=?",String.class,duty[3]));}
+ /** MUST s4l[4]/[6] (plan §4.3 129행): a completion recorded on an IMPORTED Work resolved its duty; correcting that evidence must keep an
+  * owned follow-up on the now-invalid basis. The immutable Work row is not rewritten, but a FOLLOWUP_REVIEW keyed to the corrected
+  * canonical opens with the Work owner and next check (old code: the IMPORTED Work was dropped and nothing owned the correction). */
+ @Test void correctingEvidenceThatResolvedAnImportedWorkDutyOpensAnOwnedFollowup()throws Exception{var duty=rootFixture("IMPORTED");String canonical=completed(duty,"50");resolve(duty[3],canonical);
+  var before=jdbc.queryForMap("SELECT revision,pendingInvalidation FROM mulino_work_read_Works WHERE ID=?",duty[0]);String event=jdbc.queryForObject("SELECT ID FROM mulino_evidence_Events WHERE externalEventId='complete'",String.class);
+  var corrected=slots("{\"corrected\":true}");corrected.put("subject",Map.of("kind","WORK","id",duty[0]));corrected.put("kind","RESPONSE_COMPLETED");corrected.put("externalEventId","complete");corrected.put("sourceVersion","2");corrected.put("supersedesId",event);
+  var result=execute(workEnvelope("correctEvidence","completion-correction",corrected,1,duty[0]));assertEquals("APPLIED",result.get("outcome"),result.toString());
+  assertEquals(before,jdbc.queryForMap("SELECT revision,pendingInvalidation FROM mulino_work_read_Works WHERE ID=?",duty[0]));assertEquals("RESOLVED",jdbc.queryForObject("SELECT status FROM mulino_work_read_ObligationReferences WHERE ID=?",String.class,duty[3]));
+  var owned=jdbc.queryForList("SELECT o.ownerId,o.nextAction,o.nextCheckAt FROM mulino_work_read_ObligationReferences o JOIN mulino_responsibility_Roots r ON r.organizationId=o.organizationId AND r.ID=o.rootId WHERE o.workId=? AND o.kind='FOLLOWUP_REVIEW' AND o.status='OPEN' AND r.sourceId=?",duty[0],canonical);
+  assertEquals(1,owned.size(),owned.toString());assertEquals(ACTOR,owned.getFirst().get("ownerId"));assertNotNull(owned.getFirst().get("nextAction"));assertNotNull(owned.getFirst().get("nextCheckAt"));}
 }

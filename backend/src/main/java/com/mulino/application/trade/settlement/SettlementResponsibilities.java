@@ -57,5 +57,21 @@ public class SettlementResponsibilities implements ResponsibilityKindEvidence {
   var assessed=settlement.assess(c,match,r.rows(c,"Adjustments"));
   if(!"SATISFIED".equals(assessed.get("result")))throw new DomainError("HELD","EVIDENCE_UNVERIFIED","Settlement is "+assessed.get("result")+": the restoring correction does not reconcile the match");
  }
+ /**
+  * The residual this SETTLEMENT_DIFFERENCE waiver covers, read with the shared predicate when the waiver executes (plan §4.3 134행
+  * "해소/면제 결정이 이미 유효하면 자동 부활시키지 않는다", §5.3 waiveObligation, §6 정산). Only a CURRENT contribution has a residual a
+  * later CURRENT restoration can compare with; a CHANGED/UNVERIFIED or correction-invoice waiver records its state and no amount.
+  */
+ public String waiverCoverage(DomainContext c,String rootId){
+  var root=duties.require("Roots",c.organizationId(),rootId);if(!kind().equals(root.get("kind")))return null;
+  String invoiceId,matchId;try{var residual=new ObjectMapper().readTree(root.get("scopeJson").toString()).path("residual");if(residual.hasNonNull("correctionInvoiceId"))return COVERED+" NONE]";invoiceId=residual.path("invoiceId").asText(null);matchId=residual.path("matchId").asText(null);}catch(Exception e){throw DomainError.invalid("Settlement difference scope invalid");}
+  var match=r.rows(c,"Matches").stream().filter(x->Objects.equals(matchId,Objects.toString(x.get("ID"),null))&&Objects.equals(invoiceId,Objects.toString(x.get("invoiceId"),null))).findFirst();
+  if(match.isEmpty())return COVERED+" NONE]";
+  var assessed=settlement.assess(c,match.get(),r.rows(c,"Adjustments"));String state=Objects.toString(assessed.get("contributionState"),"UNVERIFIED");
+  if("CURRENT".equals(state)&&assessed.get("settlementDifference") instanceof java.math.BigDecimal remaining)return COVERED+" CURRENT "+remaining.stripTrailingZeros().toPlainString()+"]";
+  return COVERED+" "+state+"]";
+ }
+ /** Marker prefix the waived assignment basis ends with; parsed only from the server-appended suffix. */
+ static final String COVERED="[SETTLEMENT_COVERED";
  private static DomainError unverified(){return new DomainError("HELD","EVIDENCE_UNVERIFIED","MANAGER-confirmed adjustment of this exact invoice match required");}
 }
