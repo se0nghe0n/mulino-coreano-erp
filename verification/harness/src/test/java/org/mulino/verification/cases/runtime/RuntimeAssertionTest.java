@@ -64,7 +64,16 @@ public final class RuntimeAssertionTest {
         boolean forgedActor = false, forgedHash = false; int autonomous = 0;
         for (JsonNode sub : Json.read(root.resolve("verification/cases/T26/case.json")).path("subcases")) {
             String id = sub.path("id").asText();
-            for (JsonNode a : sub.path("actions")) {
+            List<JsonNode> flat = new ArrayList<>();
+            for (JsonNode a : sub.path("actions")) { flat.add(a); for (JsonNode b : a.path("branches")) b.path("actions").forEach(flat::add); }
+            if (id.endsWith("-autonomous-loop")) {
+                // The passive watcher and the loop's process starts run in one parallel action, watcher branch first.
+                JsonNode group = null; for (JsonNode a : sub.path("actions")) if (a.path("kind").asText().equals("parallel")) group = a;
+                assertNotNull(group, id);
+                assertTrue(Set.of("tickScheduler", "sweepDue").contains(group.at("/branches/0/actions/0/control/operation").asText()), id);
+                for (JsonNode a : group.at("/branches/1/actions")) assertEquals("start", a.path("control").path("operation").asText(), id);
+            }
+            for (JsonNode a : flat) {
                 if (a.path("capabilityId").asText().equals("retrySafeCommand")) {
                     JsonNode r = a.path("request");
                     assertTrue(r.path("slots").has("commandId"), id);
@@ -84,10 +93,13 @@ public final class RuntimeAssertionTest {
         JsonNode within = assertion("T26", "due-wait-autonomous-loop", "autonomous-within-30s");
         ObjectNode tick = Json.object(); tick.put("driverStatus", "EXECUTED"); tick.set("provenance", Json.parse("{\"scopeComplete\":true}"));
         tick.set("data", Json.parse("{\"hostObservation\":{\"operationEvidence\":{\"submittedAt\":\"2026-10-08T00:00:20Z\"}}}"));
-        ObjectNode start = tick.deepCopy(); start.set("data", Json.parse("{\"hostObservation\":{\"processObservation\":{\"completedAt\":\"2026-10-08T00:00:00Z\"}}}"));
+        ObjectNode start = tick.deepCopy(); start.set("data", Json.parse("{\"hostObservation\":{\"command\":{\"startedAt\":\"2026-10-08T00:00:00Z\"}}}"));
         var results = new java.util.HashMap<String, JsonNode>(); results.put("tick", tick); results.put("start-again-scheduler", start);
         engine.check(within, results, aliases);
         ((ObjectNode) tick.at("/data/hostObservation/operationEvidence")).put("submittedAt", "2026-10-08T00:00:31Z");
+        assertThrows(AssertionError.class, () -> engine.check(within, results, aliases));
+        // A submission before the scheduler start command began cannot be the restarted loop's own tick.
+        ((ObjectNode) tick.at("/data/hostObservation/operationEvidence")).put("submittedAt", "2026-10-07T23:59:59Z");
         assertThrows(AssertionError.class, () -> engine.check(within, results, aliases));
     }
     @Test void everyFixtureArtifactMatchesActualBytesAndDigest() throws Exception {

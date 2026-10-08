@@ -31,7 +31,7 @@ public final class CaseContractRoutesSelfTest {
         else if(node.isContainerNode())for(JsonNode child:node)refs(child,refs);
     }
     private void actions(JsonNode node,Map<String,JsonNode> out) {
-        for(JsonNode a:node){out.put(a.path("id").asText(),a);if(a.has("actions"))actions(a.path("actions"),out);}
+        for(JsonNode a:node){out.put(a.path("id").asText(),a);if(a.has("actions"))actions(a.path("actions"),out);for(JsonNode b:a.path("branches"))actions(b.path("actions"),out);}
     }
     @Test void downstreamHostReferencesResolveFromSchemaValidExecutedPayloads() throws Exception {
         ContractValidator validator=new ContractValidator(root);int resolved=0,selected=0;

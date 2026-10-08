@@ -72,7 +72,7 @@ public final class SalesAssertionMutationTest {
     }
     @Test void deficit2IsNotZeroAndMissingHumanResponsibilityCannotPass() throws Exception {
         JsonNode quantity=assertion("C4","corrected-delivery-98","current-unresolved-deficit","sumEquals",true);
-        ObjectNode n=capture("{\"data\":{\"unit\":\"BOX\"},\"rawRows\":{\"obligations\":[{\"id\":\"deficit-two\",\"rootId\":\"root-two\",\"kind\":\"DELIVERY_DEFICIT\",\"status\":\"OPEN\",\"current\":true,\"quantity\":\"2\",\"unit\":\"BOX\",\"ownerId\":\"sales-human\",\"responsibleWorkId\":\"work-one\",\"nextAction\":\"인도 부족과 제한 대응을 확인한다\",\"nextCheckAt\":\"2026-10-07T10:00:00Z\",\"sourceOccurrenceId\":\"corrected-one\"}]}}");var rs=one(quantity,n);check(quantity,rs);
+        ObjectNode n=capture("{\"data\":{\"unit\":\"BOX\"},\"rawRows\":{\"obligations\":[{\"id\":\"deficit-two\",\"rootId\":\"root-two\",\"kind\":\"DELIVERY_CORRECTED_DEFICIT\",\"status\":\"OPEN\",\"current\":true,\"quantity\":\"2\",\"unit\":\"BOX\",\"ownerId\":\"sales-human\",\"responsibleWorkId\":\"work-one\",\"nextAction\":\"인도 부족과 제한 대응을 확인한다\",\"nextCheckAt\":\"2026-10-07T10:00:00Z\",\"sourceOccurrenceId\":\"corrected-one\"}]}}");var rs=one(quantity,n);check(quantity,rs);
         JsonNode owner=assertion("C4","corrected-delivery-98","deficit-owner","fieldsPresent",true);check(owner,rs);
         ((ObjectNode)n.path("data").path("rawRows").path("obligations").get(0)).remove("ownerId");wrong(owner,rs);
         ((ObjectNode)n.path("data").path("rawRows").path("obligations").get(0)).put("quantity","0");wrong(quantity,rs);
@@ -99,7 +99,7 @@ public final class SalesAssertionMutationTest {
     }
     @Test void ownerPresenceDoesNotReplaceCorrectOneCurrentHumanAssignment() throws Exception {
         JsonNode a=assertion("E2","exception-responsibility","exception-residual-duty","count",true);
-        ObjectNode n=capture("{\"rawRows\":{\"obligations\":[{\"kind\":\"RECALL_RESPONSE\",\"current\":true}]}}");var rs=one(a,n);check(a,rs);
+        ObjectNode n=capture("{\"rawRows\":{\"obligations\":[{\"kind\":\"RECALL_EXCEPTION_RESIDUAL\",\"current\":true}]}}");var rs=one(a,n);check(a,rs);
         ((ArrayNode)n.path("data").path("rawRows").path("obligations")).add(n.path("data").path("rawRows").path("obligations").get(0).deepCopy());wrong(a,rs);
         ((ObjectNode)n.path("provenance")).put("scopeComplete",false);wrong(a,rs);
     }

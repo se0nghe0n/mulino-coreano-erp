@@ -48,8 +48,8 @@ class RecipientAcceptanceAssertionTest {
             """);
         ObjectNode after = before.deepCopy();
         ObjectNode audit = Json.object();
-        audit.put("commandKey", "T10-" + id + "-impersonated-acceptance");
-        audit.put("actorId", "human-a"); audit.put("action", "transferObligation"); audit.put("outcome", "REJECTED");
+        audit.put("commandIdempotencyKey", "T10-" + id + "-impersonated-acceptance");
+        audit.put("actorId", "human-a"); audit.put("capabilityId", "transferObligation"); audit.put("outcome", "REJECTED");
         ((ArrayNode) after.at("/data/rawRows/audit")).add(audit);
         var response = captured("{}"); response.set("response", Json.parse("{\"outcome\":\"REJECTED\"}"));
         return new HashMap<>(Map.of("before-db", before, "after-impersonation-db", after, "impersonated-acceptance", response));
@@ -57,12 +57,12 @@ class RecipientAcceptanceAssertionTest {
     private Map<String, JsonNode> accepted(String id) throws Exception {
         String command = id.equals("partial-commit") ? "partial-transfer" : "transfer";
         var after = captured("""
-            {"rawRows":{"audit":[{"actorId":"human-b","action":"transferObligation",
+            {"rawRows":{"audit":[{"actorId":"human-b","capabilityId":"transferObligation",
              "outcome":"APPLIED","transactionId":"tx-accepted"}],
              "assignments":[{"workId":"target-id","ownerId":"human-b","status":"OPEN",
              "createdTransactionId":"tx-accepted"}]}}
             """);
-        ((ObjectNode) after.at("/data/rawRows/audit/0")).put("commandKey", "T10-" + id + "-" + command);
+        ((ObjectNode) after.at("/data/rawRows/audit/0")).put("commandIdempotencyKey", "T10-" + id + "-" + command);
         return new HashMap<>(Map.of("after-db", after));
     }
 
@@ -165,7 +165,7 @@ class RecipientAcceptanceAssertionTest {
             assertEquals("TRANSFERPROPOSAL", action.at("/request/slots/acceptanceEvidenceId/$alias").asText());
         }
         var rows = accepted("successful-transfer");
-        ((ObjectNode) rows.get("after-db").at("/data/rawRows/audit/0")).put("commandKey", "T11-cancel-after-shipment-transfer");
+        ((ObjectNode) rows.get("after-db").at("/data/rawRows/audit/0")).put("commandIdempotencyKey", "T11-cancel-after-shipment-transfer");
         JsonNode recipient = null, transaction = null;
         for (JsonNode a : sub.path("assertions")) {
             if (a.path("id").asText().equals("recipient-authenticated-acceptance")) recipient = a;
