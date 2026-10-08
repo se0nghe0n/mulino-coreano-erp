@@ -131,6 +131,53 @@ class CoverageSelftest(unittest.TestCase):
         profiles = self.a.profiles({'profiles': [{'profile': 'schema', 'reportRef': 'failure.json', 'receiptRef': 'absent.json', 'evidenceClass': 'ACTUAL'}]})
         self.assertEqual('FAIL', profiles['schema']['status'])
 
+    def reachability_problems(self, profiles):
+        # One linked assertion; the oracle requires UNIT(contracts) and API/DB(scenarios).
+        self.write('verification/cases/registry.json', {'expectedCases': 41, 'expectedSubcases': 1, 'cases': []})
+        self.write('verification/cases/T04/case.json', {'caseId': 'T04', 'profiles': profiles, 'subcases': [{
+            'id': 'one', 'fixtureRef': 'fixture.json', 'assertions': [{
+                'id': 'a1', 'oracleRef': {'oracleId': 'T04.decimal-boundary', 'observationNames': ['invalid-decimals']}}]}]})
+        self.write('fixture.json', {'baseRefs': []})
+        observations = {('T04.decimal-boundary', 'invalid-decimals'): {
+            'oracleId': 'T04.decimal-boundary', 'observationName': 'invalid-decimals', 'caseId': 'T04',
+            'requiredProfiles': ['contracts', 'scenarios'], 'assertionLinks': [], 'status': 'NOT_RUN', 'expected': 'REJECTED'}}
+        self.a.declarations(observations)
+        return [p for p in self.a.preparation_problems if 'Unreachable required profile' in p['reason'] or 'unknown verification profile' in p['reason']]
+
+    def test_required_profile_without_case_assertion_fails_preparation(self):
+        problems = self.reachability_problems(['scenarios'])
+        self.assertEqual(1, len(problems))
+        self.assertEqual('FAIL', problems[0]['status'])
+        self.assertIn('requires contracts', problems[0]['reason'])
+
+    def test_every_required_profile_linked_has_no_reachability_problem(self):
+        self.assertEqual([], self.reachability_problems(['contracts', 'scenarios']))
+
+    def test_unknown_case_profile_cannot_satisfy_a_required_profile(self):
+        problems = self.reachability_problems(['scenarios', 'contract'])
+        self.assertTrue(any(p['status'] == 'FAIL' and 'unknown verification profile' in p['reason'] for p in problems))
+        self.assertTrue(any('requires contracts' in p['reason'] for p in problems))
+
+    def test_real_repository_reports_every_unreachable_required_profile(self):
+        # Mutation over the real repository: dropping one declared case profile must surface.
+        a = m.Assembly(HERE.parents[1], COMMIT)
+        _, observations = a.catalog()
+        a.declarations(observations)
+        baseline = {p['reason'] for p in a.preparation_problems if 'Unreachable required profile' in p['reason']}
+        self.assertFalse(any('case T04 ' in r or 'case T09 ' in r or 'case T12 ' in r or 'case T23 ' in r or 'case V8 ' in r for r in baseline))
+        b = m.Assembly(HERE.parents[1], COMMIT)
+        original = b.read
+        def without_contracts(ref, preparation=False):
+            value = original(ref, preparation)
+            if ref == 'verification/cases/T09/case.json':
+                value = dict(value, profiles=[p for p in value['profiles'] if p != 'contracts'])
+            return value
+        b.read = without_contracts
+        _, observations = b.catalog()
+        b.declarations(observations)
+        mutated = {p['reason'] for p in b.preparation_problems if 'Unreachable required profile' in p['reason']}
+        self.assertEqual(13, len([r for r in mutated - baseline if 'case T09 ' in r and 'requires contracts' in r]))
+
     def test_red_and_selftest_are_not_actual_profile_pass(self):
         self.write('pass.json', {'status': 'PASS', 'gateComplete': True})
         for evidence_class in ('SELFTEST', 'CONTRACT_RED'):

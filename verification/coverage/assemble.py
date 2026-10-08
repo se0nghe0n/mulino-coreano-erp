@@ -204,6 +204,9 @@ class Assembly:
                 registered = entry.get('subcaseIds', [])
                 if len(ids) != len(set(ids)) or len(registered) != len(set(registered)) or set(ids) != set(registered):
                     self.issue('FAIL', f'Registry subcase identity mismatch: {case_id}', True)
+            unknown_profiles = sorted(set(effective_profiles(case.get('profiles', []))) - set(PROFILES))
+            if unknown_profiles:
+                self.issue('FAIL', f'Case declares unknown verification profile(s): {case_id} {unknown_profiles}', True)
             for sub in case.get('subcases', []):
                 bundle = self.fixture_bundle(sub.get('fixtureRef'))
                 for profile in effective_profiles(case.get('profiles', [])):
@@ -224,6 +227,15 @@ class Assembly:
         for observation in observations.values():
             if not observation['assertionLinks']:
                 self.issue('NOT_RUN', f'Unlinked observation: {observation["oracleId"]}/{observation["observationName"]}', True)
+                continue
+            # requiredLayers map to required profiles. A profile that no case assertion executes on can
+            # never yield a clause state, so the observation would stay NOT_RUN forever while the
+            # declaration looked complete. That is a preparation defect, not a runtime gap.
+            linked = {link['profile'] for link in observation['assertionLinks']}
+            for profile in observation['requiredProfiles']:
+                if profile not in linked:
+                    self.issue('FAIL', f'Unreachable required profile: {observation["oracleId"]}/{observation["observationName"]} '
+                                       f'requires {profile} but case {observation["caseId"]} links no assertion on that profile', True)
         if registry and (registry.get('expectedCases') != 41 or registry.get('expectedSubcases') != len({(d['caseId'], d['subcaseId']) for d in declarations})):
             self.issue('FAIL', 'Registry discovery counts differ from declaration inputs', True)
         return declarations

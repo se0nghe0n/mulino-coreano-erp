@@ -114,6 +114,14 @@ case의 기존 deployment 선언을 둘로 펼친다. regulatory도 별도 필�
 profile이다. 관찰의 requiredLayers는 각 필수 profile에 연결한다.
 그 경로에 실행 assertion이 없으면 해당 관찰을 PASS로 바꾸지 않는다.
 
+필수 profile에 연결된 assertion이 하나도 없는 관찰은 실행해도 영원히
+NOT_RUN이다. 준비 단계에서 이를 `Unreachable required profile` FAIL로
+보고하므로 preparationStatus는 PREPARED가 될 수 없다. 링크는 case가
+선언한 profile에서만 생기므로 case의 `profiles`가 oracle의
+requiredLayers를 모두 덮어야 한다. 알 수 없는 profile 선언도 FAIL이다.
+profile 선언은 필요조건일 뿐이다. 그 profile에서 실제 MCP·skill 경로를
+지나는 action인지는 case review가 확인한다.
+
 T25의 verifyCoverage는 지정된 입력 snapshot의 연결·누락·상태 분류를
 검사한다. snapshot 자체나 T25 결과가 전체 gate PASS일 필요는 없다.
 T25를 포함한 모든 결과를 나중에 assembler가 통합 판정한다. 현재 T25
