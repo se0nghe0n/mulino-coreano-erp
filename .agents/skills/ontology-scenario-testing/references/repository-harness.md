@@ -138,8 +138,8 @@ nested navigation의 생성·수정·삭제를 시도한다. capability allowlis
 막고 READ grant 주체의 우회 효과가 0임을 전후 DB 관찰로 증명한다.
 존재하지 않는 경로의 404만으로는 부족하다.
 
-현재 상태: `verification/cases/V4`는 고정 route inventory(92 subcase)이며 이 열거를 구현하지 않았다. `raw-crud-*` subcase는
-가상 경로(`/core/<Entity>/fixture-target`)의 404와 행 불변만 본다. `$metadata`·
+현재 상태: `verification/cases/V4`는 고정 route inventory(92 subcase)이며
+이 열거를 구현하지 않았다. `raw-crud-*` subcase는 가상 경로(`/core/<Entity>/fixture-target`)의 404와 행 불변만 본다. `$metadata`·
 `tools/list`·worker registry를 읽는 subcase는 없다(`V4/README.md`는 이 목록이
 "존재하는 endpoint 주장이 아니다"라고 한다). 따라서:
 
