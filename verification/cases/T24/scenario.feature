@@ -18,7 +18,7 @@
     그러면 "allocations-unchanged" assertion으로 "allocations unchanged의 실제 값과 범위를 대조한다"를 확인한다
     그러면 "outbox-unchanged" assertion으로 "outbox unchanged의 실제 값과 범위를 대조한다"를 확인한다
     그러면 "command_records-unchanged" assertion으로 "command_records unchanged의 실제 값과 범위를 대조한다"를 확인한다
-    그러면 "denial-audit" assertion으로 "denial audit의 실제 값과 범위를 대조한다"를 확인한다
+    그러면 "denial-audit" assertion으로 "search 경로의 조직 밖/READ 위임 우회 searchObjects 시도는 조회 감사(queryAudit)에 outcome=REJECTED 한 행으로 남는다(contracts/audit-observation-fields.json)."를 확인한다
 
   시나리오: blob 경로의 조직밖 또는 READ위임 우회를 거부한다
     먼저 사례 파일 "verification/cases/T24/case.json"의 "deny-blob"를 준비한다
@@ -37,7 +37,7 @@
     그러면 "allocations-unchanged" assertion으로 "allocations unchanged의 실제 값과 범위를 대조한다"를 확인한다
     그러면 "outbox-unchanged" assertion으로 "outbox unchanged의 실제 값과 범위를 대조한다"를 확인한다
     그러면 "command_records-unchanged" assertion으로 "command_records unchanged의 실제 값과 범위를 대조한다"를 확인한다
-    그러면 "denial-audit" assertion으로 "denial audit의 실제 값과 범위를 대조한다"를 확인한다
+    그러면 "denial-audit" assertion으로 "blob 경로의 조직 밖/READ 위임 우회 getEvidence 시도는 조회 감사(queryAudit)에 outcome=REJECTED 한 행으로 남는다(contracts/audit-observation-fields.json)."를 확인한다
     그러면 "no-download-ref" assertion으로 "no download ref의 실제 값과 범위를 대조한다"를 확인한다
 
   시나리오: batch 경로의 조직밖 또는 READ위임 우회를 거부한다
@@ -58,7 +58,7 @@
     그러면 "allocations-unchanged" assertion으로 "allocations unchanged의 실제 값과 범위를 대조한다"를 확인한다
     그러면 "outbox-unchanged" assertion으로 "outbox unchanged의 실제 값과 범위를 대조한다"를 확인한다
     그러면 "command_records-unchanged" assertion으로 "command_records unchanged의 실제 값과 범위를 대조한다"를 확인한다
-    그러면 "denial-audit" assertion으로 "denial audit의 실제 값과 범위를 대조한다"를 확인한다
+    그러면 "denial-audit" assertion으로 "batch 경로의 조직 밖/READ 위임 우회 dispatchQuantity 시도는 명령 감사(audit)에 outcome=REJECTED 한 행으로 남는다(contracts/audit-observation-fields.json)."를 확인한다
     그러면 "restrictions-unchanged" assertion으로 "restrictions unchanged의 실제 값과 범위를 대조한다"를 확인한다
     그러면 "permitted-first-applied" assertion으로 "permitted first applied의 실제 값과 범위를 대조한다"를 확인한다
     그러면 "first-hold-survives-batch" assertion으로 "first hold survives batch의 실제 값과 범위를 대조한다"를 확인한다
@@ -80,7 +80,7 @@
     그러면 "allocations-unchanged" assertion으로 "allocations unchanged의 실제 값과 범위를 대조한다"를 확인한다
     그러면 "outbox-unchanged" assertion으로 "outbox unchanged의 실제 값과 범위를 대조한다"를 확인한다
     그러면 "command_records-unchanged" assertion으로 "command_records unchanged의 실제 값과 범위를 대조한다"를 확인한다
-    그러면 "denial-audit" assertion으로 "denial audit의 실제 값과 범위를 대조한다"를 확인한다
+    그러면 "denial-audit" assertion으로 "worker 경로의 조직 밖/READ 위임 우회 dispatchQuantity 시도는 명령 감사(audit)에 outcome=REJECTED 한 행으로 남는다(contracts/audit-observation-fields.json)."를 확인한다
     그러면 "worker-delegated-actor" assertion으로 "worker delegated actor의 실제 값과 범위를 대조한다"를 확인한다
 
   시나리오: admin 경로의 조직밖 또는 READ위임 우회를 거부한다
@@ -100,7 +100,7 @@
     그러면 "allocations-unchanged" assertion으로 "allocations unchanged의 실제 값과 범위를 대조한다"를 확인한다
     그러면 "outbox-unchanged" assertion으로 "outbox unchanged의 실제 값과 범위를 대조한다"를 확인한다
     그러면 "command_records-unchanged" assertion으로 "command_records unchanged의 실제 값과 범위를 대조한다"를 확인한다
-    그러면 "denial-audit" assertion으로 "denial audit의 실제 값과 범위를 대조한다"를 확인한다
+    그러면 "denial-audit" assertion으로 "admin 경로의 조직 밖/READ 위임 우회 assignCapability 시도는 명령 감사(audit)에 outcome=REJECTED 한 행으로 남는다(contracts/audit-observation-fields.json)."를 확인한다
 
   시나리오: 서버 인가 후 단기참조로 자기 근거 bytes를 읽는다
     먼저 사례 파일 "verification/cases/T24/case.json"의 "authorized-blob"를 준비한다

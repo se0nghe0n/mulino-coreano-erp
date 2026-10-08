@@ -167,9 +167,17 @@ if pinned:
     problems.append(f'V2/reserve-commits-first: contender result pinned to one branch by {pinned}')
 need = {'contender-reported-equals-recorded', 'contender-conflict-is-stale-revision',
         'contender-conflict-iff-converge-split-applied', 'raced-allocations-exactly-once',
-        'final-allocations-exactly-once', 'final-children-40-20', 'final-no-allocation-on-retired-parent'}
-need |= {'contender-outcome-not-' + o for o in ('rejected', 'waiting-approval', 'needs-input',
-                                               'accepted-pending-external', 'pending-external', 'held')}
+        'final-allocations-exactly-once', 'final-children-40-20', 'final-no-allocation-on-retired-parent',
+        # Per-child placement: each allocation sits on the child whose quantity it fills (no 40 on the 20 child).
+        'final-alloc40-on-child40', 'final-winner20-on-child20',
+        # The retired-parent probe targets an order line with outstanding quantity and pins the reason.
+        'retired-parent-reconsumption-code'}
+# Every command outcome of the published vocabulary except the two allowed branches is excluded.
+VOCABULARY_OUTCOMES = [o['outcome'] for o in load('contracts/domain-vocabulary.json')['outcomes']]
+need |= {'contender-outcome-not-' + o.lower().replace('_', '-') for o in VOCABULARY_OUTCOMES if o not in ('APPLIED', 'CONFLICT')}
+probe = next(a for a in sub['actions'] if a['id'] == 'retired-parent')
+if probe['request']['slots'].get('orderLineId') != {'$alias': 'ORDER3'}:
+    problems.append('V2/reserve-commits-first: retired-parent probe must target ORDER3 (outstanding 10), not a fully covered line')
 missing = need - {x['id'] for x in sub['assertions']}
 if missing:
     problems.append(f'V2/reserve-commits-first: invariant oracle missing {sorted(missing)}')

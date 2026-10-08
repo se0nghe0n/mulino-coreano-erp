@@ -109,6 +109,10 @@
     그러면 "newly-dispatched-2" assertion으로 "실물량·단위와 독립 손계산을 대조한다."를 확인한다
     그러면 "newly-dispatched-3" assertion으로 "독립 원 행의 실물·수량·관계·범위를 정확히 대조한다."를 확인한다
     그러면 "late-release-overwrites-new-hold-4" assertion으로 "독립 원 행의 실물·수량·관계·범위를 정확히 대조한다."를 확인한다
+    그러면 "apply-old-release-not-applied" assertion으로 "대체된 OLD_HOLD의 늦은 v1 해제 명령은 APPLIED가 아니다"를 확인한다
+    그러면 "apply-old-release-not-external" assertion으로 "늦은 v1 해제는 ACCEPTED_PENDING_EXTERNAL도 아니다"를 확인한다
+    그러면 "old-hold-not-released" assertion으로 "OLD_HOLD 원행은 RELEASED가 되지 않는다"를 확인한다
+    그러면 "old-release-no-applied-audit" assertion으로 "늦은 해제 명령의 APPLIED 감사는 0건이다"를 확인한다
     그러면 "newly-dispatched-5" assertion으로 "공개 명령의 구조화 outcome을 확인한다."를 확인한다
     그러면 "newly-dispatched-6" assertion으로 "검증 실패를 해당 오류 코드로 구별한다."를 확인한다
     그러면 "source-order-reconciliation-7" assertion으로 "해당 obligation root/scope의 현재 유효 assignment는 하나다. 의무 root는 실제 명령/대조/sweeper가 반환한 obligationId로 한정한다."를 확인한다

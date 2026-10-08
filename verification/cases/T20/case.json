@@ -12348,6 +12348,40 @@
           }
         },
         {
+          "id": "wire-error-code",
+          "op": "equals",
+          "source": {
+            "actionId": "wire",
+            "pointer": "/response/body/error/code"
+          },
+          "expected": -32602,
+          "requirementRefs": [
+            "D20"
+          ],
+          "evidenceRefs": [
+            "wire:actual-observation",
+            "wire:source-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "lotId": {
+              "$alias": "L"
+            }
+          },
+          "oracleExplanation": "공식 2026-07-28 wire 오류 코드 -32602를 exact 대조한다. 프로젝트 임의 category로 대신하지 않는다.",
+          "oracleRef": {
+            "oracleId": "T20.mcp-stateless-wire",
+            "observationNames": [
+              "wire-protocol"
+            ]
+          }
+        },
+        {
           "id": "wire-raw-method",
           "op": "equals",
           "source": {
@@ -14179,6 +14213,40 @@
         }
       ],
       "assertions": [
+        {
+          "id": "wire-http",
+          "op": "equals",
+          "source": {
+            "actionId": "wire",
+            "pointer": "/response/httpStatus"
+          },
+          "expected": 400,
+          "requirementRefs": [
+            "D20"
+          ],
+          "evidenceRefs": [
+            "wire:actual-observation",
+            "wire:source-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "lotId": {
+              "$alias": "L"
+            }
+          },
+          "oracleExplanation": "wire-http: /response/httpStatus의 실제 equals 기대값은 400다. 미관찰·UNKNOWN은 정상값이 아니다.",
+          "oracleRef": {
+            "oracleId": "T20.mcp-stateless-wire",
+            "observationNames": [
+              "wire-protocol"
+            ]
+          }
+        },
         {
           "id": "jsonrpc-version",
           "op": "equals",
@@ -58396,6 +58464,71 @@
           ]
         },
         {
+          "id": "scripted-write",
+          "kind": "invoke",
+          "actorRef": "readAgent",
+          "route": "wire",
+          "protocolOperation": "tools/call",
+          "request": {
+            "transport": "streamable-http",
+            "httpMethod": "POST",
+            "headers": {
+              "MCP-Protocol-Version": "2026-07-28",
+              "Mcp-Method": "tools/call",
+              "Content-Type": "application/json",
+              "Origin": "https://isolated-client.example.invalid",
+              "Mcp-Name": "reserveQuantity"
+            },
+            "body": {
+              "jsonrpc": "2.0",
+              "id": "scripted-write",
+              "method": "tools/call",
+              "params": {
+                "name": "reserveQuantity",
+                "arguments": {
+                  "intentKind": "COMMAND",
+                  "definitionVersion": "definition-v1",
+                  "segmentId": {
+                    "$alias": "B40"
+                  },
+                  "salesOrderLineId": {
+                    "$alias": "SL1"
+                  },
+                  "quantity": {
+                    "value": "20",
+                    "unit": "BOX"
+                  },
+                  "expectedRevision": {
+                    "$result": {
+                      "actionId": "noun",
+                      "pointer": "/response/revision"
+                    }
+                  },
+                  "commandIdempotencyKey": "T20-allowed-tools-scripted-write"
+                },
+                "_meta": {
+                  "io.modelcontextprotocol/protocolVersion": "2026-07-28",
+                  "io.modelcontextprotocol/clientInfo": {
+                    "name": "ontology-channel-contract",
+                    "version": "1.0.0"
+                  },
+                  "io.modelcontextprotocol/clientCapabilities": {
+                    "elicitation": {
+                      "form": {}
+                    }
+                  }
+                }
+              }
+            },
+            "credentialProfileRef": "readAgent"
+          },
+          "evidenceRefs": [
+            "scripted-write:redacted-raw-wire",
+            "scripted-write:authenticated-context",
+            "scripted-write:server-response"
+          ]
+        },
+        {
           "id": "after",
           "kind": "query",
           "actorRef": "reader",
@@ -58953,29 +59086,19 @@
           }
         },
         {
-          "id": "write-attempt-observed",
-          "op": "fieldsPresent",
+          "id": "scripted-write-http",
+          "op": "equals",
           "source": {
-            "actionId": "probe",
-            "pointer": "/data/hostObservation/extractor/rawRows/toolCalls",
-            "where": {
-              "actorId": {
-                "$alias": "readAgent"
-              },
-              "intentKind": "COMMAND"
-            }
+            "actionId": "scripted-write",
+            "pointer": "/response/httpStatus"
           },
-          "expected": [
-            "capabilityId",
-            "serverOutcome",
-            "serverErrorCode"
-          ],
+          "expected": 200,
           "requirementRefs": [
             "D20"
           ],
           "evidenceRefs": [
-            "probe:actual-observation",
-            "probe:source-artifact"
+            "scripted-write:actual-observation",
+            "scripted-write:source-artifact"
           ],
           "scope": {
             "organizationId": {
@@ -58988,7 +59111,7 @@
               "$alias": "L"
             }
           },
-          "oracleExplanation": "쓰기 요청과 allowed-tools 허용 아래 host가 실제 COMMAND를 제출해야 서버 경계를 관찰한 것이다. 제출이 없으면 이 관찰은 성립하지 않는다.",
+          "oracleExplanation": "scripted tools/call reserveQuantity의 도메인 거부는 HTTP 200 tool result다(contracts/mcp/s0-protocol.md 오류 표).",
           "oracleRef": {
             "oracleId": "T20.skills-real-loading-and-meaning",
             "observationNames": [
@@ -58997,28 +59120,19 @@
           }
         },
         {
-          "id": "write-refused-by-server",
-          "op": "fieldsPresent",
+          "id": "scripted-write-outcome",
+          "op": "equals",
           "source": {
-            "actionId": "probe",
-            "pointer": "/data/hostObservation/extractor/rawRows/toolCalls",
-            "where": {
-              "intentKind": "COMMAND",
-              "serverOutcome": "REJECTED",
-              "serverErrorCode": "FORBIDDEN"
-            }
+            "actionId": "scripted-write",
+            "pointer": "/response/body/result/structuredContent/outcome"
           },
-          "expected": [
-            "capabilityId",
-            "serverOutcome",
-            "serverErrorCode"
-          ],
+          "expected": "REJECTED",
           "requirementRefs": [
             "D20"
           ],
           "evidenceRefs": [
-            "probe:actual-observation",
-            "probe:source-artifact"
+            "scripted-write:actual-observation",
+            "scripted-write:source-artifact"
           ],
           "scope": {
             "organizationId": {
@@ -59031,7 +59145,75 @@
               "$alias": "L"
             }
           },
-          "oracleExplanation": "write-refused-by-server: 비어 있지 않은 실제 원행마다 capabilityId, serverOutcome, serverErrorCode를 확인하며 별도 값/효과 assertion과 함께 검증한다.",
+          "oracleExplanation": "client allowed-tools가 reserveQuantity를 미리 허용해도 READ grant의 readAgent가 보낸 같은 COMMAND는 서버에서 REJECTED다. 모델의 시도 여부와 무관한 결정적 호출이다.",
+          "oracleRef": {
+            "oracleId": "T20.skills-real-loading-and-meaning",
+            "observationNames": [
+              "allowed-tools-as-server-authorization"
+            ]
+          }
+        },
+        {
+          "id": "scripted-write-forbidden",
+          "op": "equals",
+          "source": {
+            "actionId": "scripted-write",
+            "pointer": "/response/body/result/structuredContent/error/code"
+          },
+          "expected": "FORBIDDEN",
+          "requirementRefs": [
+            "D20"
+          ],
+          "evidenceRefs": [
+            "scripted-write:actual-observation",
+            "scripted-write:source-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "lotId": {
+              "$alias": "L"
+            }
+          },
+          "oracleExplanation": "거부 이유는 현재 grant 밖 행동의 FORBIDDEN이다. 형식 오류(-32602)나 다른 코드로 서버 인가 경계를 대신하지 않는다.",
+          "oracleRef": {
+            "oracleId": "T20.skills-real-loading-and-meaning",
+            "observationNames": [
+              "allowed-tools-as-server-authorization"
+            ]
+          }
+        },
+        {
+          "id": "scripted-write-is-error",
+          "op": "equals",
+          "source": {
+            "actionId": "scripted-write",
+            "pointer": "/response/body/result/isError"
+          },
+          "expected": true,
+          "requirementRefs": [
+            "D20"
+          ],
+          "evidenceRefs": [
+            "scripted-write:actual-observation",
+            "scripted-write:source-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "lotId": {
+              "$alias": "L"
+            }
+          },
+          "oracleExplanation": "도메인 거부·충돌의 MCP tool result는 isError=true이고 도메인 outcome과 오류를 structuredContent에 담는다(contracts/mcp/s0-protocol.md 오류 표).",
           "oracleRef": {
             "oracleId": "T20.skills-real-loading-and-meaning",
             "observationNames": [
@@ -59264,6 +59446,221 @@
             "oracleId": "T20.skills-real-loading-and-meaning",
             "observationNames": [
               "allowed-tools-as-server-authorization"
+            ]
+          }
+        },
+        {
+          "id": "scripted-write-raw-method",
+          "op": "equals",
+          "source": {
+            "actionId": "scripted-write",
+            "pointer": "/data/transcript/request/body/method"
+          },
+          "expected": "tools/call",
+          "requirementRefs": [
+            "D20"
+          ],
+          "evidenceRefs": [
+            "scripted-write:actual-observation",
+            "scripted-write:source-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "lotId": {
+              "$alias": "L"
+            }
+          },
+          "oracleExplanation": "scripted-write-raw-method: /data/transcript/request/body/method의 실제 equals 기대값은 \"tools/call\"다. 미관찰·UNKNOWN은 정상값이 아니다.",
+          "oracleRef": {
+            "oracleId": "T20.mcp-stateless-wire",
+            "observationNames": [
+              "wire-protocol"
+            ]
+          }
+        },
+        {
+          "id": "scripted-write-raw-jsonrpc-id",
+          "op": "equals",
+          "source": {
+            "actionId": "scripted-write",
+            "pointer": "/data/transcript/request/body/id"
+          },
+          "expected": "scripted-write",
+          "requirementRefs": [
+            "D20"
+          ],
+          "evidenceRefs": [
+            "scripted-write:actual-observation",
+            "scripted-write:source-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "lotId": {
+              "$alias": "L"
+            }
+          },
+          "oracleExplanation": "scripted-write-raw-jsonrpc-id: /data/transcript/request/body/id의 실제 equals 기대값은 \"scripted-write\"다. 미관찰·UNKNOWN은 정상값이 아니다.",
+          "oracleRef": {
+            "oracleId": "T20.mcp-stateless-wire",
+            "observationNames": [
+              "wire-protocol"
+            ]
+          }
+        },
+        {
+          "id": "scripted-write-raw-MCP-Protocol-Version",
+          "op": "equals",
+          "source": {
+            "actionId": "scripted-write",
+            "pointer": "/data/transcript/request/headers/MCP-Protocol-Version"
+          },
+          "expected": "2026-07-28",
+          "requirementRefs": [
+            "D20"
+          ],
+          "evidenceRefs": [
+            "scripted-write:actual-observation",
+            "scripted-write:source-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "lotId": {
+              "$alias": "L"
+            }
+          },
+          "oracleExplanation": "scripted-write-raw-MCP-Protocol-Version: /data/transcript/request/headers/MCP-Protocol-Version의 실제 equals 기대값은 \"2026-07-28\"다. 미관찰·UNKNOWN은 정상값이 아니다.",
+          "oracleRef": {
+            "oracleId": "T20.mcp-stateless-wire",
+            "observationNames": [
+              "wire-protocol"
+            ]
+          }
+        },
+        {
+          "id": "scripted-write-raw-Mcp-Method",
+          "op": "equals",
+          "source": {
+            "actionId": "scripted-write",
+            "pointer": "/data/transcript/request/headers/Mcp-Method"
+          },
+          "expected": "tools/call",
+          "requirementRefs": [
+            "D20"
+          ],
+          "evidenceRefs": [
+            "scripted-write:actual-observation",
+            "scripted-write:source-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "lotId": {
+              "$alias": "L"
+            }
+          },
+          "oracleExplanation": "scripted-write-raw-Mcp-Method: /data/transcript/request/headers/Mcp-Method의 실제 equals 기대값은 \"tools/call\"다. 미관찰·UNKNOWN은 정상값이 아니다.",
+          "oracleRef": {
+            "oracleId": "T20.mcp-stateless-wire",
+            "observationNames": [
+              "wire-protocol"
+            ]
+          }
+        },
+        {
+          "id": "scripted-write-raw-Mcp-Name",
+          "op": "equals",
+          "source": {
+            "actionId": "scripted-write",
+            "pointer": "/data/transcript/request/headers/Mcp-Name"
+          },
+          "expected": "reserveQuantity",
+          "requirementRefs": [
+            "D20"
+          ],
+          "evidenceRefs": [
+            "scripted-write:actual-observation",
+            "scripted-write:source-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "lotId": {
+              "$alias": "L"
+            }
+          },
+          "oracleExplanation": "scripted-write-raw-Mcp-Name: /data/transcript/request/headers/Mcp-Name의 실제 equals 기대값은 \"reserveQuantity\"다. 미관찰·UNKNOWN은 정상값이 아니다.",
+          "oracleRef": {
+            "oracleId": "T20.mcp-stateless-wire",
+            "observationNames": [
+              "wire-protocol"
+            ]
+          }
+        },
+        {
+          "id": "scripted-write-raw-meta",
+          "op": "equals",
+          "source": {
+            "actionId": "scripted-write",
+            "pointer": "/data/transcript/request/body/params/_meta"
+          },
+          "expected": {
+            "io.modelcontextprotocol/protocolVersion": "2026-07-28",
+            "io.modelcontextprotocol/clientInfo": {
+              "name": "ontology-channel-contract",
+              "version": "1.0.0"
+            },
+            "io.modelcontextprotocol/clientCapabilities": {
+              "elicitation": {
+                "form": {}
+              }
+            }
+          },
+          "requirementRefs": [
+            "D20"
+          ],
+          "evidenceRefs": [
+            "scripted-write:actual-observation",
+            "scripted-write:source-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "lotId": {
+              "$alias": "L"
+            }
+          },
+          "oracleExplanation": "scripted-write-raw-meta: /data/transcript/request/body/params/_meta의 실제 equals 기대값은 {\"io.modelcontextprotocol/protocolVersion\": \"2026-07-28\", \"io.modelcontextprotocol/clientInfo\": {\"name\": \"ontology-channel-contract\", \"version\": \"1.0.0\"}, \"io.modelcontextprotocol/clientCapabilities\": {\"elicitation\": {\"form\": {}}}}다. 미관찰·UNKNOWN은 정상값이 아니다.",
+          "oracleRef": {
+            "oracleId": "T20.mcp-stateless-wire",
+            "observationNames": [
+              "wire-protocol"
             ]
           }
         }

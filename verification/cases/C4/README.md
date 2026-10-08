@@ -74,9 +74,9 @@ C4/evidence/review-outcomes/selftest-commands.json에 보존했다.
 
 - return-not-correction은 반품 뒤 같은 snapshot의 getAssessment가
   SATISFIED이고, 주문 업무의 current 판정 원행이 SATISFIED뿐이며,
-  DELIVERY_DEFICIT 의무가 0건임을 확인한다. 반품 전 판정은 기준선이다.
+  DELIVERY_CORRECTED_DEFICIT 의무가 0건임을 확인한다. 반품 전 판정은 기준선이다.
 - 의무 원행의 `current`는 status와 독립인 행 유효성이다. 해소·면제된
   부족2는 `current=true`·RESOLVED/WAIVED로 남는다(E1과 같은 의미).
-- resolved/waived의 duty 조회는 kind DELIVERY_DEFICIT·status OPEN
+- resolved/waived의 duty 조회는 kind DELIVERY_CORRECTED_DEFICIT·status OPEN
   filter로 해소 대상을 좁힌다. 다른 의무를 해소하면 valid-resolution-4와
   new-unresolved-deficit-2가 실패한다.

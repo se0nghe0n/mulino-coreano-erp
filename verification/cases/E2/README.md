@@ -62,7 +62,8 @@ RED(exit1), scenario skip0이다. 실제 제품 profile은 NOT_RUN(exit2)이다.
 - qc-release-only-control은 조사·회수 보류만 뺀 대조군이다. 같은 형식의
   출고40이 APPLIED, 창고 출고40, 배분 CONSUMED가 된다.
 - same-25-not-50의 false-close는 admin-exception과 같은 scopeVersion·
-  scopeHash·근거를 보내고 RECALL_RESIDUAL_UNKNOWN과 거부 감사1을 고정한다.
+  scopeHash·근거를 보내고 HELD·RECALL_RESIDUAL_UNKNOWN(contracts/domain-vocabulary.json)과
+  보류 감사1을 고정한다.
 - 모든 oracle이 MCP layer를 요구하므로 `mcp` profile을 선언하고 최종
   조회를 같은 snapshot의 MCP route로 다시 읽는다.
 - 오류 코드는 `/response/error/code`로만 읽는다.

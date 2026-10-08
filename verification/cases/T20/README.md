@@ -58,9 +58,21 @@ case.json·fixture·Gherkin은 `verification/mcp-tests/author_cases.py`의
 - host 변형은 COMMAND와 RECORD 호출을 각각0으로 센다. 근거 연결·
   의무·관계 원행도 전후 비교하고 client 주체를 readAgent로 고정한다.
   `host-allowed-tools-write`는 fixture의 `skillVariants`로 frontmatter
-  allowed-tools에 reserveQuantity를 설치하고 쓰기를 요청한다. host가
-  실제 COMMAND를 제출해야 하며 서버는 REJECTED·FORBIDDEN으로 거부하고
-  적용·외부전달·승인대기 쓰기는0이다.
+  allowed-tools에 reserveQuantity를 설치하고 쓰기를 요청한다. 모델이
+  쓰기를 시도하는지는 요구하지 않는다. grant를 확인하고 거절하는 client도
+  올바르다. host가 제출한 COMMAND·RECORD는 적용·외부전달·승인대기가
+  0건이어야 한다. 서버 경계는 같은 readAgent 주체의 scripted
+  `tools/call reserveQuantity`(action `scripted-write`)로 결정적으로 본다.
+  이 호출은 HTTP 200 tool result, outcome REJECTED, code FORBIDDEN,
+  isError=true이고 전후 원행은 같다. client allowed-tools는 서버 인가가
+  아니다.
+
+wire 오류는 2026-07-28 공식 규격을 따른다. `_meta` 전체가 없으면
+필수 field 누락이므로 HTTP 400·-32602다(basic/index "Per-request protocol
+fields"). header와 비교할 body 값이 없어 -32020으로 보지 않는다.
+clientInfo 형식 오류도 HTTP 400·-32602다. MRTR requestState TTL은
+fixture `baseline.mrtr.requestStateTtlSeconds`=600이고 두 경계 시각
+09:09:59Z·09:10:01Z는 생성기가 이 값에서 계산한다.
 
 계획 §9.1 문장과 catalog clause의 clientInfo 표현은 이 worktree에서
 고치지 않았다. 공식 규격상 clientInfo는 optional이며 이 case는

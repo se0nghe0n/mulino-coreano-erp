@@ -2799,8 +2799,11 @@
     만일 "시스템" 역할이 "setup" 행동을 수행한다
     만일 "delegator" 역할이 "precondition-recall" 행동을 수행한다
     만일 "admin" 역할이 "precondition-approval" 행동을 수행한다
+    만일 "delegator" 역할이 "precondition-recall-after-approval" 행동을 수행한다
     만일 "admin" 역할이 "precondition-notice" 행동을 수행한다
+    만일 "delegator" 역할이 "precondition-recall-after-notice" 행동을 수행한다
     만일 "delegator" 역할이 "precondition-recovery" 행동을 수행한다
+    만일 "delegator" 역할이 "precondition-recall-after-recovery" 행동을 수행한다
     만일 "delegator" 역할이 "precondition-disposal" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
@@ -7371,8 +7374,11 @@
     만일 "시스템" 역할이 "setup" 행동을 수행한다
     만일 "delegator" 역할이 "precondition-recall" 행동을 수행한다
     만일 "admin" 역할이 "precondition-approval" 행동을 수행한다
+    만일 "delegator" 역할이 "precondition-recall-after-approval" 행동을 수행한다
     만일 "admin" 역할이 "precondition-notice" 행동을 수행한다
+    만일 "delegator" 역할이 "precondition-recall-after-notice" 행동을 수행한다
     만일 "delegator" 역할이 "precondition-recovery" 행동을 수행한다
+    만일 "delegator" 역할이 "precondition-recall-after-recovery" 행동을 수행한다
     만일 "delegator" 역할이 "precondition-disposal" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
@@ -11943,8 +11949,11 @@
     만일 "시스템" 역할이 "setup" 행동을 수행한다
     만일 "delegator" 역할이 "precondition-recall" 행동을 수행한다
     만일 "admin" 역할이 "precondition-approval" 행동을 수행한다
+    만일 "delegator" 역할이 "precondition-recall-after-approval" 행동을 수행한다
     만일 "admin" 역할이 "precondition-notice" 행동을 수행한다
+    만일 "delegator" 역할이 "precondition-recall-after-notice" 행동을 수행한다
     만일 "delegator" 역할이 "precondition-recovery" 행동을 수행한다
+    만일 "delegator" 역할이 "precondition-recall-after-recovery" 행동을 수행한다
     만일 "delegator" 역할이 "precondition-disposal" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다

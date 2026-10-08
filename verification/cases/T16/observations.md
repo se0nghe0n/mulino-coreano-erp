@@ -30,7 +30,7 @@ lockProbeScopeOnly는 fixture가 지정한 segment/allocation/fence 세 scope의
 - `receipt-transit-double-creation-6` → `T16.provisional-and-independent-holds / receipt-transit-double-creation`: 독립 원 행의 실물·수량·관계·범위를 정확히 대조한다.
 - `receipt-transit-double-creation-7` → `T16.provisional-and-independent-holds / receipt-transit-double-creation`: 독립 원 행의 실물·수량·관계·범위를 정확히 대조한다.
 - `hold-authority-8` → `T16.provisional-and-independent-holds / hold-authority`: 공개 명령의 구조화 outcome을 확인한다.
-- `hold-authority-9` → `T16.provisional-and-independent-holds / hold-authority`: 검증 실패를 해당 오류 코드로 구별한다.
+- `hold-authority-9` → `T16.provisional-and-independent-holds / hold-authority`: 응답의 구조화 오류 코드 /response/error/code가 FORBIDDEN다(계획 §3.4, contracts/command-response.schema.json).
 - `hold-authority-10` → `T16.provisional-and-independent-holds / hold-authority`: 금지 효과의 동일 scope 전후 원 행을 비교한다. 조회/거부 감사는 별도 scope다.
 - `hold-authority-11` → `T16.provisional-and-independent-holds / hold-authority`: 금지 효과의 동일 scope 전후 원 행을 비교한다. 조회/거부 감사는 별도 scope다.
 - `hold-authority-12` → `T16.provisional-and-independent-holds / hold-authority`: 허용된 denial 감사1과 금지된 업무 효과0을 분리한다.
@@ -52,7 +52,7 @@ lockProbeScopeOnly는 fixture가 지정한 segment/allocation/fence 세 scope의
 - `held-before-adjustment-2` → `T16.movement-stocktake-adjustment / held-before-adjustment`: 실물량·단위와 독립 손계산을 대조한다.
 - `adjustment-proof-3` → `T16.movement-stocktake-adjustment / adjustment-proof`: 독립 원 행의 실물·수량·관계·범위를 정확히 대조한다.
 - `adjustment-proof-4` → `T16.movement-stocktake-adjustment / adjustment-proof`: 공개 명령의 구조화 outcome을 확인한다.
-- `adjustment-proof-5` → `T16.movement-stocktake-adjustment / adjustment-proof`: 검증 실패를 해당 오류 코드로 구별한다.
+- `adjustment-proof-5` → `T16.movement-stocktake-adjustment / adjustment-proof`: 응답의 구조화 오류 코드 /response/error/code가 FORBIDDEN다(계획 §3.4, contracts/command-response.schema.json).
 - `adjustment-proof-6` → `T16.movement-stocktake-adjustment / adjustment-proof`: 금지 효과의 동일 scope 전후 원 행을 비교한다. 조회/거부 감사는 별도 scope다.
 - `adjustment-proof-7` → `T16.movement-stocktake-adjustment / adjustment-proof`: 금지 효과의 동일 scope 전후 원 행을 비교한다. 조회/거부 감사는 별도 scope다.
 - `adjustment-proof-8` → `T16.movement-stocktake-adjustment / adjustment-proof`: 허용된 denial 감사1과 금지된 업무 효과0을 분리한다.
@@ -74,9 +74,9 @@ lockProbeScopeOnly는 fixture가 지정한 segment/allocation/fence 세 scope의
 - `allocation-after-boundary-1` → `T16.no-event-expiry / allocation-after-boundary`: 독립 원 행의 실물·수량·관계·범위를 정확히 대조한다.
 - `post-expiry-dispatched-2` → `T16.no-event-expiry / post-expiry-dispatched`: 실물량·단위와 독립 손계산을 대조한다.
 - `post-expiry-dispatched-3` → `T16.no-event-expiry / post-expiry-dispatched`: 독립 원 행의 실물·수량·관계·범위를 정확히 대조한다.
-- `expiry-duty-4` → `T16.no-event-expiry / expiry-duty`: 해당 obligation root/scope의 현재 유효 assignment는 하나다. 의무 root는 실제 명령/대조 결과 또는 동일 snapshot 의무 조회의 obligationId로 한정한다.
-- `expiry-duty-5` → `T16.no-event-expiry / expiry-duty`: 책임자의 실제 ID와 다음 행동·확인 시각에 공백이 없어야 한다. 의무 root는 실제 명령/대조 결과 또는 동일 snapshot 의무 조회의 obligationId로 한정한다.
-- `expiry-duty-6` → `T16.no-event-expiry / expiry-duty`: fixture의 지정된 인간 owner/supervisor와 고정 후속 행동/시각이 유지된다. 의무 root는 실제 명령/대조 결과 또는 동일 snapshot 의무 조회의 obligationId로 한정한다.
+- `expiry-duty-4` → `T16.no-event-expiry / expiry-duty`: 해당 obligation root/scope의 현재 유효 assignment는 하나다. 의무 root는 실제 명령/대조/sweeper가 반환한 obligationId로 한정한다.
+- `expiry-duty-5` → `T16.no-event-expiry / expiry-duty`: 책임자의 실제 ID와 다음 행동·확인 시각에 공백이 없어야 한다. 의무 root는 실제 명령/대조/sweeper가 반환한 obligationId로 한정한다.
+- `expiry-duty-6` → `T16.no-event-expiry / expiry-duty`: fixture의 지정된 인간 owner/supervisor와 고정 후속 행동/시각이 유지된다. 의무 root는 실제 명령/대조/sweeper가 반환한 obligationId로 한정한다.
 - `boundary-recheck-7` → `T16.no-event-expiry / boundary-recheck`: 무이벤트 경계 이후30초 이내 실제 autonomous sweep task의 terminal을 관찰한다.
 - `boundary-recheck-8` → `T16.no-event-expiry / boundary-recheck`: 이벤트 없는 만료 전에 예약의 nextValidityBoundary T를 실제 index 원 행으로 등록한다.
 - `boundary-recheck-9` → `T16.no-event-expiry / boundary-recheck`: sweep의 배분 정지와 의무 upsert는 같은 실제 transaction이다.
@@ -91,15 +91,15 @@ lockProbeScopeOnly는 fixture가 지정한 segment/allocation/fence 세 scope의
 예약20은 T까지 허용된다. queue 비어도 T 이후 sweeper가 정지/의무를 upsert하며 sweep 지연 중 출고 guard도 실제 현재조건을 재검증한다.
 
 - `boundary-recheck-1` → `T16.no-event-expiry / boundary-recheck`: 공개 명령의 구조화 outcome을 확인한다.
-- `boundary-recheck-2` → `T16.no-event-expiry / boundary-recheck`: 검증 실패를 해당 오류 코드로 구별한다.
+- `boundary-recheck-2` → `T16.no-event-expiry / boundary-recheck`: 응답의 구조화 오류 코드 /response/error/code가 INSUFFICIENT_ELIGIBLE_QUANTITY다(계획 §3.4, contracts/command-response.schema.json).
 - `post-expiry-dispatched-3` → `T16.no-event-expiry / post-expiry-dispatched`: 명령 효과 scope에서 생성된 업무 원 행 수가0이다. 감사는 별도로 확인한다.
 - `post-expiry-dispatched-4` → `T16.no-event-expiry / post-expiry-dispatched`: 명령 효과 scope에서 생성된 업무 원 행 수가0이다. 감사는 별도로 확인한다.
 - `allocation-after-boundary-5` → `T16.no-event-expiry / allocation-after-boundary`: 독립 원 행의 실물·수량·관계·범위를 정확히 대조한다.
 - `post-expiry-dispatched-6` → `T16.no-event-expiry / post-expiry-dispatched`: 실물량·단위와 독립 손계산을 대조한다.
 - `post-expiry-dispatched-7` → `T16.no-event-expiry / post-expiry-dispatched`: 독립 원 행의 실물·수량·관계·범위를 정확히 대조한다.
-- `expiry-duty-8` → `T16.no-event-expiry / expiry-duty`: 해당 obligation root/scope의 현재 유효 assignment는 하나다. 의무 root는 실제 명령/대조 결과 또는 동일 snapshot 의무 조회의 obligationId로 한정한다.
-- `expiry-duty-9` → `T16.no-event-expiry / expiry-duty`: 책임자의 실제 ID와 다음 행동·확인 시각에 공백이 없어야 한다. 의무 root는 실제 명령/대조 결과 또는 동일 snapshot 의무 조회의 obligationId로 한정한다.
-- `expiry-duty-10` → `T16.no-event-expiry / expiry-duty`: fixture의 지정된 인간 owner/supervisor와 고정 후속 행동/시각이 유지된다. 의무 root는 실제 명령/대조 결과 또는 동일 snapshot 의무 조회의 obligationId로 한정한다.
+- `expiry-duty-8` → `T16.no-event-expiry / expiry-duty`: 해당 obligation root/scope의 현재 유효 assignment는 하나다. 의무 root는 실제 명령/대조/sweeper가 반환한 obligationId로 한정한다.
+- `expiry-duty-9` → `T16.no-event-expiry / expiry-duty`: 책임자의 실제 ID와 다음 행동·확인 시각에 공백이 없어야 한다. 의무 root는 실제 명령/대조/sweeper가 반환한 obligationId로 한정한다.
+- `expiry-duty-10` → `T16.no-event-expiry / expiry-duty`: fixture의 지정된 인간 owner/supervisor와 고정 후속 행동/시각이 유지된다. 의무 root는 실제 명령/대조/sweeper가 반환한 obligationId로 한정한다.
 - `boundary-recheck-11` → `T16.no-event-expiry / boundary-recheck`: 무이벤트 경계 이후30초 이내 실제 autonomous sweep task의 terminal을 관찰한다.
 - `boundary-recheck-12` → `T16.no-event-expiry / boundary-recheck`: 이벤트 없는 만료 전에 예약의 nextValidityBoundary T를 실제 index 원 행으로 등록한다.
 - `boundary-recheck-13` → `T16.no-event-expiry / boundary-recheck`: sweep의 배분 정지와 의무 upsert는 같은 실제 transaction이다.

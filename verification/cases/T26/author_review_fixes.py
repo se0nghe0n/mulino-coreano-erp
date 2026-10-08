@@ -11,6 +11,7 @@ from pathlib import Path
 ROOT=Path(__file__).resolve().parents[3]
 DIR=ROOT/'verification/cases/T26'
 CASE=DIR/'case.json'
+AUTONOMOUS=[('due-wait-db-rediscovery','due-wait-autonomous-loop','tick','db'),('lot-expiry-no-event','lot-expiry-autonomous-loop','sweep','sweep-db'),('orphan-intake-recovered','orphan-intake-autonomous-loop','tick','db')]
 NEW_SUBCASES=['safe-retry-forged-original-actor','safe-retry-forged-request-hash','due-wait-autonomous-loop','lot-expiry-autonomous-loop','orphan-intake-autonomous-loop']
 OWNED_ASSERTIONS=('retry-request-','stored-','forged-','autonomous-','queue-empty-after-restart')
 FORGED_HASH='f0'*32
@@ -71,15 +72,57 @@ def forged_hash(base):
         assertion_like(base,'before-movement-zero',id='forged-hash-no-committed-retry',source={'actionId':'db','pointer':'/data/rawRows/commands','where':{'commandIdempotencyKey':'T26-safe-retry-forged-request-hash-retry','status':'COMMITTED'}},expected=0,oracleExplanation='위조 hash retry는 COMMITTED command를 남기지 않는다.'),
         assertion_like(base,'retry-canonical-hash',id='stored-hash-unchanged',source={'actionId':'db','pointer':'/data/rawRows/commands','field':'requestHash','where':{'commandIdempotencyKey':'CANONICAL-MOVE-safe-retry-forged-request-hash'}},oracleExplanation='원 canonical key의 저장 command hash는 원 응답의 hash 그대로이며 호출자 hash로 바뀌지 않는다. 거부된 retry record는 별도 허용 기록이다.')]
     return s
-def autonomous(base,new_id,trigger_id,start_id,db_id):
-    """Same fault and DB oracles, but the harness only restarts processes and moves the clock."""
-    s=rescope(copy.deepcopy(base),base['id'],new_id);s['id']=new_id;s['fixtureRef']=base['fixtureRef']
+AUTONOMOUS_PROFILE={'controlledTicks':False,'pausedUntilTickControl':False}
+def autonomous_fixture(base_ref,new_id):
+    """Same seeded state as the base fixture, but the scheduler/sweeper loop runs on its own 1s tick.
+    controlledTicks=false and pausedUntilTickControl=false mean no harness tick gates the loop (README §runtimeProfile)."""
+    f=json.loads((ROOT/base_ref).read_text())
+    f['fixtureId']='T26-'+new_id
+    f['baseline']['runtimeProfile'].update(AUTONOMOUS_PROFILE)
+    return f
+def process_action(template,new_action_id,operation):
+    a=copy.deepcopy(template);a['id']=new_action_id;a['control']['operation']=operation;a['evidenceRefs']=[new_action_id+':actual-artifact'];return a
+def autonomous(base,new_id,trigger_id,db_id):
+    """Same fault and DB oracles, but the harness only restarts processes and moves the clock.
+    The fixture lets the loop run freely. Every process start that follows the clock advance runs in one
+    parallel action together with the passive watcher, so the watcher is already observing when the
+    restarted loop can first submit (HostObservationValidator: submittedAt inside the watcher command)."""
+    s=rescope(copy.deepcopy(base),base['id'],new_id);s['id']=new_id
+    s['fixtureRef']=f'verification/cases/T26/fixtures/{new_id}.json'
     s['title']=base['title']+' — harness tick/sweep 없이 scheduler loop가 스스로 찾는다'
     s['oracleExplanation']=('plan §10은 별도 이벤트나 사용자 요청 없이 scheduler/due sweeper가 DB에서 다시 찾아 test 관찰 제한30초 안에 처리하기를 요구한다. '
-        'harness는 process 재시작과 가상 clock 전진만 하고 '+trigger_id+'는 OBSERVE_NEXT_NATURAL_TICK으로 다음 자연 tick의 제출만 관찰한다. tick hook만 있고 loop가 없는 구현은 30초 안에 제출을 만들지 못한다.')
-    t=by_id(s['actions'],trigger_id)
+        'fixture runtimeProfile은 loop가 harness tick 없이 1초마다 스스로 돈다(controlledTicks=false, pausedUntilTickControl=false). '
+        'harness는 process 중지·가상 clock 전진만 하고, 재시작과 '+trigger_id+'의 OBSERVE_NEXT_NATURAL_TICK 수동 관찰을 한 parallel action으로 함께 시작해 loop의 첫 제출을 관찰 창 안에서 본다. tick hook만 있고 loop가 없는 구현은 30초 안에 제출을 만들지 못한다.')
+    acts=s['actions']
+    # Orphan intake restarts processes before the advance; split each restart into stop (before) and start (after).
+    restarts=[a for a in acts if a.get('kind')=='control' and a['control']['type']=='process' and a['control']['operation']=='restart']
+    if restarts:
+        advance=by_id(acts,'advance');acts.remove(advance)
+        first=acts.index(restarts[0])
+        stops=[process_action(r,r['id'].replace('restart-','stop-again-'),'stop') for r in restarts]
+        starts=[process_action(r,r['id'].replace('restart-','start-again-'),'start') for r in restarts]
+        for r in restarts:acts.remove(r)
+        acts[first:first]=stops+[advance]+starts
+    # Any loop that could act on the advanced clock is stopped first and started inside the group, so no
+    # running scheduler-like process can submit before the watcher exists (lot expiry stops only the sweeper).
+    advance=by_id(acts,'advance');advance_at=acts.index(advance)
+    t=by_id(acts,trigger_id);trigger_at=acts.index(t)
+    restarted={a['control']['parameters']['processId'] for a in acts[advance_at+1:trigger_at]}
+    for loop in ('scheduler',):
+        if loop not in restarted:
+            template=by_id(acts,'start-app-'+loop)
+            acts.insert(advance_at,process_action(template,'stop-again-'+loop,'stop'))
+            acts.insert(acts.index(t),process_action(template,'start-again-'+loop,'start'))
+    advance_at=acts.index(advance);trigger_at=acts.index(t)
+    starts=acts[advance_at+1:trigger_at]
+    assert starts and all(a['control']['operation']=='start' for a in starts),new_id
+    start_id=starts[0]['id'] if starts[0]['control']['parameters']['processId']=='due-sweeper' else next(a['id'] for a in starts if a['control']['parameters']['processId']=='scheduler')
     t['control']['parameters'].pop('clockInstant',None)
     t['control']['parameters'].update(trigger='OBSERVE_NEXT_NATURAL_TICK',observationWindowSeconds=30,triggeredBy='SCHEDULER_LOOP')
+    group={'id':'restart-while-observing','kind':'parallel','timeoutSeconds':90,
+        'branches':[{'id':'natural-tick-watch','actions':[t]},{'id':'process-restart','actions':starts}],
+        'evidenceRefs':['restart-while-observing:actual-acks']}
+    s['actions']=acts[:advance_at+1]+[group]+acts[trigger_at+1:]
     for a in s['actions']:
         if a.get('kind')=='control' and a['control']['operation'] in ('tickScheduler','sweepDue') and a['id']!=trigger_id:
             a['control']['parameters'].pop('clockInstant',None)
@@ -89,8 +132,8 @@ def autonomous(base,new_id,trigger_id,start_id,db_id):
         assertion_like(s,origin['id'],id='autonomous-trigger-loop',source={'actionId':trigger_id,'pointer':'/data/hostObservation/operationEvidence/triggeredBy'},expected='SCHEDULER_LOOP',
             oracleExplanation='제출 identity는 harness tick이 아니라 scheduler loop의 자연 tick에서 나왔다.'),
         assertion_like(s,origin['id'],id='autonomous-within-30s',op='timeAtMostSeconds',source={'actionId':trigger_id,'pointer':'/data/hostObservation/operationEvidence/submittedAt'},
-            baseline={'actionId':start_id,'pointer':'/data/hostObservation/processObservation/completedAt'},expected='30',
-            oracleExplanation='scheduler process가 RUNNING이 된 뒤 30초(개발/CI 관찰 제한, plan §10) 안에 자율 제출이 관찰된다.'),
+            baseline={'actionId':start_id,'pointer':'/data/hostObservation/command/startedAt'},expected='30',
+            oracleExplanation='scheduler process 시작 command가 시작된 뒤 30초(개발/CI 관찰 제한, plan §10) 안에 자율 제출이 관찰된다. 제출은 시작 command보다 앞설 수 없다.'),
         assertion_like(s,origin['id'],id='autonomous-attempt-source',op='exactSet',source={'actionId':db_id,'pointer':'/data/rawRows/attempts','field':'triggeredBy'},expected=['SCHEDULER_LOOP'],
             oracleExplanation='독립 DB attempt 원행도 scheduler loop가 시작한 시도만 있다. harness tick이나 API 호출로 시작한 시도는 없다.')]
     return s
@@ -122,7 +165,12 @@ def self_check(c):
             if a.get('capabilityId')=='retrySafeCommand' and s['id']!='safe-retry-forged-original-actor':assert 'originalActorId' not in a['request'],s['id']
             if a.get('capabilityId')=='retrySafeCommand' and s['id']!='safe-retry-forged-request-hash':assert 'canonicalRequestHash' not in a['request'],s['id']
         if 'autonomous' in s['id']:
-            ops=[a['control'] for a in s['actions'] if a.get('kind')=='control' and a['control']['operation'] in ('tickScheduler','sweepDue')]
+            flat=[c for a in s['actions'] for c in ([x for b in a['branches'] for x in b['actions']] if a['kind']=='parallel' else [a])]
+            ops=[a['control'] for a in flat if a.get('kind')=='control' and a['control']['operation'] in ('tickScheduler','sweepDue')]
+            group=next(a for a in s['actions'] if a['kind']=='parallel')
+            assert group['branches'][0]['actions'][0]['control']['operation'] in ('tickScheduler','sweepDue'),s['id']
+            assert all(a['control']['operation']=='start' for a in group['branches'][1]['actions']),s['id']
+            assert not any(a.get('kind')=='control' and a['control']['operation']=='restart' for a in flat),s['id']
             assert ops and all(o['parameters'].get('trigger')=='OBSERVE_NEXT_NATURAL_TICK' and 'clockInstant' not in o['parameters'] for o in ops),s['id']
 def main():
     c=json.loads(CASE.read_text())
@@ -137,9 +185,9 @@ def main():
     for s in c['subcases']:
         order.append(s)
         if s['id']=='safe-retry-revoked-blocked':order += [forged_actor(subs['safe-retry-revoked-blocked']),forged_hash(subs['safe-retry-canonical-current-grant'])]
-    order += [autonomous(subs['due-wait-db-rediscovery'],'due-wait-autonomous-loop','tick','start-again-scheduler','db'),
-              autonomous(subs['lot-expiry-no-event'],'lot-expiry-autonomous-loop','sweep','start-sweeper','sweep-db'),
-              autonomous(subs['orphan-intake-recovered'],'orphan-intake-autonomous-loop','tick','restart-scheduler','db')]
+    for base_id,new_id,trigger_id,db_id in AUTONOMOUS:
+        dump(DIR/f'fixtures/{new_id}.json',autonomous_fixture(subs[base_id]['fixtureRef'],new_id))
+        order.append(autonomous(subs[base_id],new_id,trigger_id,db_id))
     c['subcases']=order
     self_check(c)
     dump(CASE,c)

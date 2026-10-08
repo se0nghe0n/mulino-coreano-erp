@@ -127,9 +127,9 @@
     그러면 "unapproved-unknown-close-10" assertion으로 "unapproved-unknown-close"를 확인한다
     그러면 "unapproved-unknown-close-11" assertion으로 "unapproved-unknown-close"를 확인한다
     그러면 "unapproved-unknown-close-12" assertion으로 "unapproved-unknown-close"를 확인한다
-    그러면 "unapproved-unknown-close-13" assertion으로 "unapproved-unknown-close"를 확인한다
+    그러면 "unapproved-unknown-close-13" assertion으로 "처리50 합산 종료는 HELD로 보류되고 미확인25 책임이 남는다"를 확인한다
     그러면 "unapproved-unknown-close-reason" assertion으로 "정상 형식의 종료 요청도 미확인 잔여25 때문에 RECALL_RESIDUAL_UNKNOWN으로 거부된다"를 확인한다
-    그러면 "unapproved-unknown-close-audit" assertion으로 "거짓 종료 거부 감사가 정확히 1건 남는다"를 확인한다
+    그러면 "unapproved-unknown-close-audit" assertion으로 "거짓 종료의 HELD 감사가 정확히 1건 남는다"를 확인한다
     그러면 "status-axes-14" assertion으로 "status-axes"를 확인한다
     그러면 "status-axes-15" assertion으로 "status-axes"를 확인한다
     그러면 "status-axes-16" assertion으로 "status-axes"를 확인한다

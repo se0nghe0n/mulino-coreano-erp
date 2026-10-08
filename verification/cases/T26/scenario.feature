@@ -251,7 +251,7 @@
     그러면 "db-movements-unchanged" assertion으로 "허용된 audit·대조 책임과 분리해 금지된 업무 효과 전후 원 행을 비교한다."를 확인한다
     그러면 "db-allocations-unchanged" assertion으로 "허용된 audit·대조 책임과 분리해 금지된 업무 효과 전후 원 행을 비교한다."를 확인한다
     그러면 "db-quantity-delta-zero" assertion으로 "전후 보유량20−20=0BOX다. 현재와 baseline 단위를 모두 검사한다."를 확인한다
-    그러면 "retry-denial-audit" assertion으로 "독립 DB 원 행을 정확한 대상 scope로 세어 중복·누락을 거부한다."를 확인한다
+    그러면 "retry-denial-audit" assertion으로 "철회된 grant로 재시도한 retrySafeCommand는 명령 감사에 outcome=REJECTED, errorCode=FORBIDDEN 한 행만 남긴다(contracts/audit-observation-fields.json)."를 확인한다
     그러면 "retry-forbidden" assertion으로 "운영 scope는 원 actor의 현재 grant를 대신하지 않는다."를 확인한다
     그러면 "db-current-assignment-one" assertion으로 "독립 DB 원 행을 정확한 대상 scope로 세어 중복·누락을 거부한다."를 확인한다
     그러면 "db-owner" assertion으로 "해당 scope의 각 실제 원 행 값과 고정 기대값을 대조한다."를 확인한다
@@ -1107,11 +1107,7 @@
     만일 "시스템" 역할이 "stop-app-worker-a" 행동을 수행한다
     만일 "시스템" 역할이 "stop-app-worker-b" 행동을 수행한다
     만일 "시스템" 역할이 "advance" 행동을 수행한다
-    만일 "시스템" 역할이 "start-again-api" 행동을 수행한다
-    만일 "시스템" 역할이 "start-again-scheduler" 행동을 수행한다
-    만일 "시스템" 역할이 "start-again-worker-a" 행동을 수행한다
-    만일 "시스템" 역할이 "start-again-worker-b" 행동을 수행한다
-    만일 "시스템" 역할이 "tick" 행동을 수행한다
+    만일 "시스템" 역할이 "restart-while-observing" 행동을 수행한다
     만일 "시스템" 역할이 "terminal" 행동을 수행한다
     만일 "operations" 역할이 "api" 행동을 수행한다
     만일 "시스템" 역할이 "db" 행동을 수행한다
@@ -1134,7 +1130,7 @@
     그러면 "timeout-never-satisfied" assertion으로 "시간 경과·queue 성공이 증거 없는 목표를 충족시키지 않는다."를 확인한다
     그러면 "queue-empty-after-restart" assertion으로 "재시작 뒤 terminal 관찰 시점에도 queue message0이다. 재발견은 DB due index에서만 온다."를 확인한다
     그러면 "autonomous-trigger-loop" assertion으로 "제출 identity는 harness tick이 아니라 scheduler loop의 자연 tick에서 나왔다."를 확인한다
-    그러면 "autonomous-within-30s" assertion으로 "scheduler process가 RUNNING이 된 뒤 30초(개발/CI 관찰 제한, plan §10) 안에 자율 제출이 관찰된다."를 확인한다
+    그러면 "autonomous-within-30s" assertion으로 "scheduler process 시작 command가 시작된 뒤 30초(개발/CI 관찰 제한, plan §10) 안에 자율 제출이 관찰된다. 제출은 시작 command보다 앞설 수 없다."를 확인한다
     그러면 "autonomous-attempt-source" assertion으로 "독립 DB attempt 원행도 scheduler loop가 시작한 시도만 있다. harness tick이나 API 호출로 시작한 시도는 없다."를 확인한다
 
   시나리오: 새 사건 없이 lot 만료20을 정지하고 sweeper 지연에도 출고를 막는다 — harness tick/sweep 없이 scheduler loop가 스스로 찾는다
@@ -1150,9 +1146,9 @@
     만일 "operations" 역할이 "before" 행동을 수행한다
     만일 "시스템" 역할이 "before-db" 행동을 수행한다
     만일 "시스템" 역할이 "stop-sweeper" 행동을 수행한다
+    만일 "시스템" 역할이 "stop-again-scheduler" 행동을 수행한다
     만일 "시스템" 역할이 "advance" 행동을 수행한다
-    만일 "시스템" 역할이 "start-sweeper" 행동을 수행한다
-    만일 "시스템" 역할이 "sweep" 행동을 수행한다
+    만일 "시스템" 역할이 "restart-while-observing" 행동을 수행한다
     만일 "시스템" 역할이 "sweep-terminal" 행동을 수행한다
     만일 "시스템" 역할이 "sweep-db" 행동을 수행한다
     만일 "시스템" 역할이 "repeat-sweep" 행동을 수행한다
@@ -1229,7 +1225,7 @@
     그러면 "repeat-db-expiry-assignment-workId-linked" assertion으로 "자동 sweep가 만든 assignment는 같은 snapshot의 만료 의무·stable root·책임 업무에 연결된다. 이름이나 count만 같은 별도 책임으로 대신하지 않는다."를 확인한다
     그러면 "repeat-expiry-assignment-identity-kept" assertion으로 "반복 sweep는 동일한 현재 OPEN assignment 원 행·ID·owner·supervisor·다음 행동·확인 시점을 유지한다."를 확인한다
     그러면 "autonomous-trigger-loop" assertion으로 "제출 identity는 harness tick이 아니라 scheduler loop의 자연 tick에서 나왔다."를 확인한다
-    그러면 "autonomous-within-30s" assertion으로 "scheduler process가 RUNNING이 된 뒤 30초(개발/CI 관찰 제한, plan §10) 안에 자율 제출이 관찰된다."를 확인한다
+    그러면 "autonomous-within-30s" assertion으로 "scheduler process 시작 command가 시작된 뒤 30초(개발/CI 관찰 제한, plan §10) 안에 자율 제출이 관찰된다. 제출은 시작 command보다 앞설 수 없다."를 확인한다
     그러면 "autonomous-attempt-source" assertion으로 "독립 DB attempt 원행도 scheduler loop가 시작한 시도만 있다. harness tick이나 API 호출로 시작한 시도는 없다."를 확인한다
 
   시나리오: 종료된 부모 뒤 이상 접수의 연결 장애를 DB에서 복구한다 — harness tick/sweep 없이 scheduler loop가 스스로 찾는다
@@ -1244,12 +1240,12 @@
     만일 "operations" 역할이 "before" 행동을 수행한다
     만일 "시스템" 역할이 "before-db" 행동을 수행한다
     만일 "시스템" 역할이 "link-fault-clear" 행동을 수행한다
-    만일 "시스템" 역할이 "restart-api" 행동을 수행한다
-    만일 "시스템" 역할이 "restart-scheduler" 행동을 수행한다
-    만일 "시스템" 역할이 "restart-worker-a" 행동을 수행한다
-    만일 "시스템" 역할이 "restart-worker-b" 행동을 수행한다
+    만일 "시스템" 역할이 "stop-again-api" 행동을 수행한다
+    만일 "시스템" 역할이 "stop-again-scheduler" 행동을 수행한다
+    만일 "시스템" 역할이 "stop-again-worker-a" 행동을 수행한다
+    만일 "시스템" 역할이 "stop-again-worker-b" 행동을 수행한다
     만일 "시스템" 역할이 "advance" 행동을 수행한다
-    만일 "시스템" 역할이 "tick" 행동을 수행한다
+    만일 "시스템" 역할이 "restart-while-observing" 행동을 수행한다
     만일 "시스템" 역할이 "terminal" 행동을 수행한다
     만일 "operations" 역할이 "api" 행동을 수행한다
     만일 "시스템" 역할이 "db" 행동을 수행한다
@@ -1273,5 +1269,5 @@
     그러면 "intake-link-confirmed" assertion으로 "해당 scope의 각 실제 원 행 값과 고정 기대값을 대조한다."를 확인한다
     그러면 "canonical-intake-linked-duty" assertion으로 "재시도에서 같은 접수와 단 하나 의무를 연결한다."를 확인한다
     그러면 "autonomous-trigger-loop" assertion으로 "제출 identity는 harness tick이 아니라 scheduler loop의 자연 tick에서 나왔다."를 확인한다
-    그러면 "autonomous-within-30s" assertion으로 "scheduler process가 RUNNING이 된 뒤 30초(개발/CI 관찰 제한, plan §10) 안에 자율 제출이 관찰된다."를 확인한다
+    그러면 "autonomous-within-30s" assertion으로 "scheduler process 시작 command가 시작된 뒤 30초(개발/CI 관찰 제한, plan §10) 안에 자율 제출이 관찰된다. 제출은 시작 command보다 앞설 수 없다."를 확인한다
     그러면 "autonomous-attempt-source" assertion으로 "독립 DB attempt 원행도 scheduler loop가 시작한 시도만 있다. harness tick이나 API 호출로 시작한 시도는 없다."를 확인한다

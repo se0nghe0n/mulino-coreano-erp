@@ -116,4 +116,4 @@ C4/evidence/review-outcomes/selftest-commands.json에 보존했다.
   T17.late-restriction-actual-delivery의 actual-delivered,
   remaining-transit, new-warehouse-dispatch, new-executable-allocation,
   fact-not-permission, late-restriction-duty에 연결했다. 회수 의무는
-  만료 쪽에 없으므로 RECALL_RESPONSE assertion은 넣지 않았다.
+  만료 쪽에 없으므로 RECALL_INVESTIGATION assertion은 넣지 않았다.

@@ -30,7 +30,7 @@ lockProbeScopeOnly는 fixture가 지정한 segment/allocation/fence 세 scope의
 - `unreserved-eligible-6` → `C1.initial-eligibility / unreserved-eligible`: 독립 원 행의 실물·수량·관계·범위를 정확히 대조한다.
 - `customer60-added-by-qc-or-app-write-7` → `C1.initial-eligibility / customer60-added-by-qc-or-app-write`: 독립 원 행의 실물·수량·관계·범위를 정확히 대조한다.
 - `customer60-added-by-qc-or-app-write-8` → `C1.initial-eligibility / customer60-added-by-qc-or-app-write`: 공개 명령의 구조화 outcome을 확인한다.
-- `customer60-added-by-qc-or-app-write-9` → `C1.initial-eligibility / customer60-added-by-qc-or-app-write`: 검증 실패를 해당 오류 코드로 구별한다.
+- `customer60-added-by-qc-or-app-write-9` → `C1.initial-eligibility / customer60-added-by-qc-or-app-write`: 응답의 구조화 오류 코드 /response/error/code가 INSUFFICIENT_ELIGIBLE_QUANTITY다(계획 §3.4, contracts/command-response.schema.json).
 - `customer60-added-by-qc-or-app-write-10` → `C1.initial-eligibility / customer60-added-by-qc-or-app-write`: 명령 효과 scope에서 생성된 업무 원 행 수가0이다. 감사는 별도로 확인한다.
 - `customer60-added-by-qc-or-app-write-11` → `C1.initial-eligibility / customer60-added-by-qc-or-app-write`: 명령 효과 scope에서 생성된 업무 원 행 수가0이다. 감사는 별도로 확인한다.
 - `customer60-added-by-qc-or-app-write-12` → `C1.initial-eligibility / customer60-added-by-qc-or-app-write`: 명령 효과 scope에서 생성된 업무 원 행 수가0이다. 감사는 별도로 확인한다.
@@ -44,10 +44,10 @@ lockProbeScopeOnly는 fixture가 지정한 segment/allocation/fence 세 scope의
 실물40은 유지되며 기존 약속20을 삭제하지 않는다. 처분 허용 철회는 앞으로의 배분/출고0과 owner 있는 의무를 남긴다.
 
 - `new-reservation-1` → `C1.revoked-disposition / new-reservation`: 공개 명령의 구조화 outcome을 확인한다.
-- `new-reservation-2` → `C1.revoked-disposition / new-reservation`: 검증 실패를 해당 오류 코드로 구별한다.
+- `new-reservation-2` → `C1.revoked-disposition / new-reservation`: 응답의 구조화 오류 코드 /response/error/code가 INSUFFICIENT_ELIGIBLE_QUANTITY다(계획 §3.4, contracts/command-response.schema.json).
 - `new-reservation-3` → `C1.revoked-disposition / new-reservation`: 명령 효과 scope에서 생성된 업무 원 행 수가0이다. 감사는 별도로 확인한다.
 - `new-dispatch-4` → `C1.revoked-disposition / new-dispatch`: 공개 명령의 구조화 outcome을 확인한다.
-- `new-dispatch-5` → `C1.revoked-disposition / new-dispatch`: 검증 실패를 해당 오류 코드로 구별한다.
+- `new-dispatch-5` → `C1.revoked-disposition / new-dispatch`: 응답의 구조화 오류 코드 /response/error/code가 INSUFFICIENT_ELIGIBLE_QUANTITY다(계획 §3.4, contracts/command-response.schema.json).
 - `new-dispatch-6` → `C1.revoked-disposition / new-dispatch`: 명령 효과 scope에서 생성된 업무 원 행 수가0이다. 감사는 별도로 확인한다.
 - `new-dispatch-7` → `C1.revoked-disposition / new-dispatch`: 명령 효과 scope에서 생성된 업무 원 행 수가0이다. 감사는 별도로 확인한다.
 - `new-reservation-8` → `C1.revoked-disposition / new-reservation`: 금지 효과의 동일 scope 전후 원 행을 비교한다. 조회/거부 감사는 별도 scope다.
@@ -55,14 +55,16 @@ lockProbeScopeOnly는 fixture가 지정한 segment/allocation/fence 세 scope의
 - `new-reservation-10` → `C1.revoked-disposition / new-reservation`: 금지 효과의 동일 scope 전후 원 행을 비교한다. 조회/거부 감사는 별도 scope다.
 - `existing-allocation-11` → `C1.revoked-disposition / existing-allocation`: 독립 원 행의 실물·수량·관계·범위를 정확히 대조한다.
 - `existing-obligation-scope-12` → `C1.revoked-disposition / existing-obligation-scope`: 독립 원 행을 해당 범위에서 합산하며 부모와 자식을 이중 합산하지 않는다.
-- `revocation-duty-13` → `C1.revoked-disposition / revocation-duty`: 해당 obligation root/scope의 현재 유효 assignment는 하나다. 의무 root는 실제 명령/대조 결과 또는 동일 snapshot 의무 조회의 obligationId로 한정한다.
-- `revocation-duty-14` → `C1.revoked-disposition / revocation-duty`: 책임자의 실제 ID와 다음 행동·확인 시각에 공백이 없어야 한다. 의무 root는 실제 명령/대조 결과 또는 동일 snapshot 의무 조회의 obligationId로 한정한다.
-- `revocation-duty-15` → `C1.revoked-disposition / revocation-duty`: fixture의 지정된 인간 owner/supervisor와 고정 후속 행동/시각이 유지된다. 의무 root는 실제 명령/대조 결과 또는 동일 snapshot 의무 조회의 obligationId로 한정한다.
+- `revocation-duty-13` → `C1.revoked-disposition / revocation-duty`: 해당 obligation root/scope의 현재 유효 assignment는 하나다. 의무 root는 실제 명령/대조/sweeper가 반환한 obligationId로 한정한다.
+- `revocation-duty-14` → `C1.revoked-disposition / revocation-duty`: 책임자의 실제 ID와 다음 행동·확인 시각에 공백이 없어야 한다. 의무 root는 실제 명령/대조/sweeper가 반환한 obligationId로 한정한다.
+- `revocation-duty-15` → `C1.revoked-disposition / revocation-duty`: fixture의 지정된 인간 owner/supervisor와 고정 후속 행동/시각이 유지된다. 의무 root는 실제 명령/대조/sweeper가 반환한 obligationId로 한정한다.
 - `new-reservation-16` → `C1.revoked-disposition / new-reservation`: 허용된 denial 감사1과 금지된 업무 효과0을 분리한다.
 - `new-dispatch-17` → `C1.revoked-disposition / new-dispatch`: 허용된 denial 감사1과 금지된 업무 효과0을 분리한다.
 - `active-physical-identities` → `C1.revoked-disposition / new-reservation`: 현재 active 실물 identity를 한 번씩만 합산하며 중복 실물은 거부한다.
 - `response-definition-version` → `C1.revoked-disposition / new-reservation`: 수량/제한을 읽는 실제 정의 버전은 고정 v1이며 다른 의미로 대체하지 않는다.
 - `actual-baseline-physical-rows` → `C1.revoked-disposition / new-reservation`: 서버에 실제 설치된 시작 실물의 ID·decimal·unit을 원 행에서 확인한다. baseline 자체는 업무 실행 coverage가 아니다.
+- `new-reservation-quantity-primary` → `C1.revoked-disposition / new-reservation`: 실제 독립DB의 해당 명령 효과 원행 quantity 합계는0이며, 같은 실물CON40 원행에서 관찰한 단위는BOX다. 완료된 빈 효과 scope만0으로 합산하며 누락/null/미구현은 거부한다.
+- `new-dispatch-quantity-primary` → `C1.revoked-disposition / new-dispatch`: 실제 독립DB의 해당 명령 효과 원행 quantity 합계는0이며, 같은 실물CON40 원행에서 관찰한 단위는BOX다. 완료된 빈 효과 scope만0으로 합산하며 누락/null/미구현은 거부한다.
 
 
 ## 실행 증거

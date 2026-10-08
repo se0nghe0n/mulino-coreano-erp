@@ -34,7 +34,8 @@ class GeneratorsReproduceCommittedFiles(unittest.TestCase):
 
     def test_t26_post_processor_is_a_fixed_point(self):
         self.run_generator('verification/cases/T26/author_review_fixes.py', ['verification/cases/T26'],
-                           [f'verification/cases/T26/{f}' for f in ['case.json', 'scenario.feature', 'oracle-bindings.json', 'fixtures/safe-retry-forged-original-actor.json']])
+                           [f'verification/cases/T26/{f}' for f in ['case.json', 'scenario.feature', 'oracle-bindings.json', 'fixtures/safe-retry-forged-original-actor.json',
+                            'fixtures/due-wait-autonomous-loop.json', 'fixtures/lot-expiry-autonomous-loop.json', 'fixtures/orphan-intake-autonomous-loop.json']])
 
 if __name__ == '__main__':
     unittest.main()

@@ -30,7 +30,7 @@ lockProbeScopeOnly는 fixture가 지정한 segment/allocation/fence 세 scope의
 - `unreserved-eligible-6` → `T05.ownership-custody-disposition / unreserved-eligible`: 독립 원 행의 실물·수량·관계·범위를 정확히 대조한다.
 - `relations-independent-7` → `T05.ownership-custody-disposition / relations-independent`: 독립 원 행의 실물·수량·관계·범위를 정확히 대조한다.
 - `relations-independent-8` → `T05.ownership-custody-disposition / relations-independent`: 공개 명령의 구조화 outcome을 확인한다.
-- `relations-independent-9` → `T05.ownership-custody-disposition / relations-independent`: 검증 실패를 해당 오류 코드로 구별한다.
+- `relations-independent-9` → `T05.ownership-custody-disposition / relations-independent`: 응답의 구조화 오류 코드 /response/error/code가 INSUFFICIENT_ELIGIBLE_QUANTITY다(계획 §3.4, contracts/command-response.schema.json).
 - `relations-independent-10` → `T05.ownership-custody-disposition / relations-independent`: 명령 효과 scope에서 생성된 업무 원 행 수가0이다. 감사는 별도로 확인한다.
 - `relations-independent-11` → `T05.ownership-custody-disposition / relations-independent`: 명령 효과 scope에서 생성된 업무 원 행 수가0이다. 감사는 별도로 확인한다.
 - `relations-independent-12` → `T05.ownership-custody-disposition / relations-independent`: 명령 효과 scope에서 생성된 업무 원 행 수가0이다. 감사는 별도로 확인한다.
@@ -60,7 +60,7 @@ lockProbeScopeOnly는 fixture가 지정한 segment/allocation/fence 세 scope의
 문서/제안은 보존하되 일반WRITE 확인효과0, MANAGER 확인1 뒤SELL40. reserve/dispatch10에 새 승인 추가0이며 독립 QC는 계속 적용한다.
 
 - `ordinary-write-confirmed-basis-effects-1` → `T05.disposition-manager-decision / ordinary-write-confirmed-basis-effects`: 공개 명령의 구조화 outcome을 확인한다.
-- `ordinary-write-confirmed-basis-effects-2` → `T05.disposition-manager-decision / ordinary-write-confirmed-basis-effects`: 검증 실패를 해당 오류 코드로 구별한다.
+- `ordinary-write-confirmed-basis-effects-2` → `T05.disposition-manager-decision / ordinary-write-confirmed-basis-effects`: 응답의 구조화 오류 코드 /response/error/code가 FORBIDDEN다(계획 §3.4, contracts/command-response.schema.json).
 - `ordinary-write-confirmed-basis-effects-3` → `T05.disposition-manager-decision / ordinary-write-confirmed-basis-effects`: 명령 효과 scope에서 생성된 업무 원 행 수가0이다. 감사는 별도로 확인한다.
 - `ordinary-write-confirmed-basis-effects-4` → `T05.disposition-manager-decision / ordinary-write-confirmed-basis-effects`: 허용된 denial 감사1과 금지된 업무 효과0을 분리한다.
 - `eligible-before-manager-confirmation-5` → `T05.disposition-manager-decision / eligible-before-manager-confirmation`: 실물량·단위와 독립 손계산을 대조한다.

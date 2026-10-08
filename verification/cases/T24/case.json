@@ -269,7 +269,8 @@
               "documents",
               "tombstones",
               "deletion_log",
-              "domain_records"
+              "domain_records",
+              "queryAudit"
             ]
           }
         }
@@ -547,10 +548,10 @@
           "op": "count",
           "source": {
             "actionId": "db-after",
-            "pointer": "/data/rawRows/audit",
+            "pointer": "/data/rawRows/queryAudit",
             "where": {
-              "kind": "DENIAL",
-              "action": "searchObjects"
+              "capabilityId": "searchObjects",
+              "outcome": "REJECTED"
             }
           },
           "expected": 1,
@@ -573,7 +574,7 @@
             "caseId": "T24",
             "subcaseId": "deny-search"
           },
-          "oracleExplanation": "denial audit의 실제 값과 범위를 대조한다",
+          "oracleExplanation": "search 경로의 조직 밖/READ 위임 우회 searchObjects 시도는 조회 감사(queryAudit)에 outcome=REJECTED 한 행으로 남는다(contracts/audit-observation-fields.json).",
           "oracleRef": {
             "oracleId": "T24.all-auth-surfaces",
             "observationNames": [
@@ -838,7 +839,8 @@
               "documents",
               "tombstones",
               "deletion_log",
-              "domain_records"
+              "domain_records",
+              "queryAudit"
             ]
           }
         }
@@ -1149,10 +1151,10 @@
           "op": "count",
           "source": {
             "actionId": "db-after",
-            "pointer": "/data/rawRows/audit",
+            "pointer": "/data/rawRows/queryAudit",
             "where": {
-              "kind": "DENIAL",
-              "action": "getEvidence"
+              "capabilityId": "getEvidence",
+              "outcome": "REJECTED"
             }
           },
           "expected": 1,
@@ -1175,7 +1177,7 @@
             "caseId": "T24",
             "subcaseId": "deny-blob"
           },
-          "oracleExplanation": "denial audit의 실제 값과 범위를 대조한다",
+          "oracleExplanation": "blob 경로의 조직 밖/READ 위임 우회 getEvidence 시도는 조회 감사(queryAudit)에 outcome=REJECTED 한 행으로 남는다(contracts/audit-observation-fields.json).",
           "oracleRef": {
             "oracleId": "T24.all-auth-surfaces",
             "observationNames": [
@@ -1830,8 +1832,8 @@
             "actionId": "db-after",
             "pointer": "/data/rawRows/audit",
             "where": {
-              "kind": "DENIAL",
-              "action": "dispatchQuantity"
+              "capabilityId": "dispatchQuantity",
+              "outcome": "REJECTED"
             }
           },
           "expected": 1,
@@ -1854,7 +1856,7 @@
             "caseId": "T24",
             "subcaseId": "deny-batch"
           },
-          "oracleExplanation": "denial audit의 실제 값과 범위를 대조한다",
+          "oracleExplanation": "batch 경로의 조직 밖/READ 위임 우회 dispatchQuantity 시도는 명령 감사(audit)에 outcome=REJECTED 한 행으로 남는다(contracts/audit-observation-fields.json).",
           "oracleRef": {
             "oracleId": "T24.all-auth-surfaces",
             "observationNames": [
@@ -2541,8 +2543,8 @@
             "actionId": "db-after",
             "pointer": "/data/rawRows/audit",
             "where": {
-              "kind": "DENIAL",
-              "action": "dispatchQuantity"
+              "capabilityId": "dispatchQuantity",
+              "outcome": "REJECTED"
             }
           },
           "expected": 1,
@@ -2565,7 +2567,7 @@
             "caseId": "T24",
             "subcaseId": "deny-worker"
           },
-          "oracleExplanation": "denial audit의 실제 값과 범위를 대조한다",
+          "oracleExplanation": "worker 경로의 조직 밖/READ 위임 우회 dispatchQuantity 시도는 명령 감사(audit)에 outcome=REJECTED 한 행으로 남는다(contracts/audit-observation-fields.json).",
           "oracleRef": {
             "oracleId": "T24.all-auth-surfaces",
             "observationNames": [
@@ -2581,7 +2583,8 @@
             "pointer": "/data/rawRows/audit",
             "field": "actorId",
             "where": {
-              "kind": "DENIAL"
+              "commandIdempotencyKey": "T24-deny-worker-attack",
+              "outcome": "REJECTED"
             }
           },
           "expected": [
@@ -3184,8 +3187,8 @@
             "actionId": "db-after",
             "pointer": "/data/rawRows/audit",
             "where": {
-              "kind": "DENIAL",
-              "action": "assignCapability"
+              "capabilityId": "assignCapability",
+              "outcome": "REJECTED"
             }
           },
           "expected": 1,
@@ -3208,7 +3211,7 @@
             "caseId": "T24",
             "subcaseId": "deny-admin"
           },
-          "oracleExplanation": "denial audit의 실제 값과 범위를 대조한다",
+          "oracleExplanation": "admin 경로의 조직 밖/READ 위임 우회 assignCapability 시도는 명령 감사(audit)에 outcome=REJECTED 한 행으로 남는다(contracts/audit-observation-fields.json).",
           "oracleRef": {
             "oracleId": "T24.all-auth-surfaces",
             "observationNames": [
@@ -4140,14 +4143,15 @@
               "delegatorId",
               "workId",
               "targetId",
-              "action",
+              "capabilityId",
               "definitionVersion",
               "policyVersion",
-              "result",
+              "outcome",
               "commandIdempotencyKey"
             ],
             "where": {
-              "kind": "MUTATION"
+              "commandIdempotencyKey": "T24-audit-effect",
+              "outcome": "APPLIED"
             }
           },
           "expected": [
@@ -4204,7 +4208,8 @@
             "pointer": "/data/rawRows/audit",
             "field": "before",
             "where": {
-              "kind": "MUTATION"
+              "commandIdempotencyKey": "T24-audit-effect",
+              "outcome": "APPLIED"
             }
           },
           "expected": [
@@ -4249,7 +4254,8 @@
             "pointer": "/data/rawRows/audit",
             "field": "after",
             "where": {
-              "kind": "MUTATION"
+              "commandIdempotencyKey": "T24-audit-effect",
+              "outcome": "APPLIED"
             }
           },
           "expected": [
@@ -4294,7 +4300,8 @@
             "pointer": "/data/rawRows/audit",
             "field": "movementId",
             "where": {
-              "kind": "MUTATION"
+              "commandIdempotencyKey": "T24-audit-effect",
+              "outcome": "APPLIED"
             }
           },
           "expected": [
@@ -4338,7 +4345,8 @@
             "pointer": "/data/rawRows/audit",
             "field": "requestId",
             "where": {
-              "kind": "MUTATION"
+              "commandIdempotencyKey": "T24-audit-effect",
+              "outcome": "APPLIED"
             }
           },
           "expected": [
@@ -4382,7 +4390,8 @@
             "pointer": "/data/rawRows/audit",
             "field": "approvalRefs",
             "where": {
-              "kind": "MUTATION"
+              "commandIdempotencyKey": "T24-audit-effect",
+              "outcome": "APPLIED"
             }
           },
           "expected": [
@@ -4421,7 +4430,8 @@
             "pointer": "/data/rawRows/audit",
             "field": "evidenceIds",
             "where": {
-              "kind": "MUTATION"
+              "commandIdempotencyKey": "T24-audit-effect",
+              "outcome": "APPLIED"
             }
           },
           "expected": [
@@ -4732,7 +4742,7 @@
               "sweepId"
             ],
             "where": {
-              "action": "retentionSweep"
+              "capabilityId": "retentionSweep"
             }
           },
           "expected": [
@@ -5330,7 +5340,7 @@
               "sweepId"
             ],
             "where": {
-              "action": "retentionSweep"
+              "capabilityId": "retentionSweep"
             }
           },
           "expected": [
@@ -5928,7 +5938,7 @@
               "sweepId"
             ],
             "where": {
-              "action": "retentionSweep"
+              "capabilityId": "retentionSweep"
             }
           },
           "expected": [
@@ -6526,7 +6536,7 @@
               "sweepId"
             ],
             "where": {
-              "action": "retentionSweep"
+              "capabilityId": "retentionSweep"
             }
           },
           "expected": [
@@ -7127,7 +7137,7 @@
               "sweepId"
             ],
             "where": {
-              "action": "retentionSweep"
+              "capabilityId": "retentionSweep"
             }
           },
           "expected": [
@@ -7947,7 +7957,8 @@
               "documents",
               "tombstones",
               "deletion_log",
-              "domain_records"
+              "domain_records",
+              "queryAudit"
             ]
           }
         }
@@ -8415,9 +8426,8 @@
           "op": "count",
           "source": {
             "actionId": "db-after",
-            "pointer": "/data/rawRows/audit",
+            "pointer": "/data/rawRows/queryAudit",
             "where": {
-              "kind": "QUERY",
               "actorId": {
                 "$alias": "readAgent"
               }
@@ -8454,16 +8464,13 @@
           "op": "relationSet",
           "source": {
             "actionId": "db-after",
-            "pointer": "/data/rawRows/audit",
+            "pointer": "/data/rawRows/queryAudit",
             "field": [
               "actorId",
               "targetId",
-              "action",
-              "result"
-            ],
-            "where": {
-              "kind": "QUERY"
-            }
+              "capabilityId",
+              "outcome"
+            ]
           },
           "expected": [
             [

@@ -23,7 +23,7 @@ lockProbeScopeOnly는 fixture가 지정한 segment/allocation/fence 세 scope의
 numeric(38,12)의 정밀도/scale와 EA 불가분 정책을 거부 outcome·원 입력·영속 효과0으로 검증한다.
 
 - `invalid-decimals-1` → `T04.decimal-boundary / invalid-decimals`: 공개 명령의 구조화 outcome을 확인한다.
-- `invalid-decimals-2` → `T04.decimal-boundary / invalid-decimals`: 검증 실패를 해당 오류 코드로 구별한다.
+- `invalid-decimals-2` → `T04.decimal-boundary / invalid-decimals`: EA 불가분·정밀도·scale 위반은 slot 타입/단위 검증 실패이므로 /response/error/code가 TYPE_INVALID다(계획 §3.3·§3.4).
 - `rounded-effects-3` → `T04.decimal-boundary / rounded-effects`: 금지 효과의 동일 scope 전후 원 행을 비교한다. 조회/거부 감사는 별도 scope다.
 - `rounded-effects-4` → `T04.decimal-boundary / rounded-effects`: 금지 효과의 동일 scope 전후 원 행을 비교한다. 조회/거부 감사는 별도 scope다.
 - `rounded-effects-5` → `T04.decimal-boundary / rounded-effects`: 금지 효과의 동일 scope 전후 원 행을 비교한다. 조회/거부 감사는 별도 scope다.
@@ -43,7 +43,7 @@ numeric(38,12)의 정밀도/scale와 EA 불가분 정책을 거부 outcome·원 
 numeric(38,12)의 정밀도/scale와 EA 불가분 정책을 거부 outcome·원 입력·영속 효과0으로 검증한다.
 
 - `invalid-decimals-1` → `T04.decimal-boundary / invalid-decimals`: 공개 명령의 구조화 outcome을 확인한다.
-- `invalid-decimals-2` → `T04.decimal-boundary / invalid-decimals`: 검증 실패를 해당 오류 코드로 구별한다.
+- `invalid-decimals-2` → `T04.decimal-boundary / invalid-decimals`: EA 불가분·정밀도·scale 위반은 slot 타입/단위 검증 실패이므로 /response/error/code가 TYPE_INVALID다(계획 §3.3·§3.4).
 - `rounded-effects-3` → `T04.decimal-boundary / rounded-effects`: 금지 효과의 동일 scope 전후 원 행을 비교한다. 조회/거부 감사는 별도 scope다.
 - `rounded-effects-4` → `T04.decimal-boundary / rounded-effects`: 금지 효과의 동일 scope 전후 원 행을 비교한다. 조회/거부 감사는 별도 scope다.
 - `rounded-effects-5` → `T04.decimal-boundary / rounded-effects`: 금지 효과의 동일 scope 전후 원 행을 비교한다. 조회/거부 감사는 별도 scope다.
@@ -63,7 +63,7 @@ numeric(38,12)의 정밀도/scale와 EA 불가분 정책을 거부 outcome·원 
 numeric(38,12)의 정밀도/scale와 EA 불가분 정책을 거부 outcome·원 입력·영속 효과0으로 검증한다.
 
 - `invalid-decimals-1` → `T04.decimal-boundary / invalid-decimals`: 공개 명령의 구조화 outcome을 확인한다.
-- `invalid-decimals-2` → `T04.decimal-boundary / invalid-decimals`: 검증 실패를 해당 오류 코드로 구별한다.
+- `invalid-decimals-2` → `T04.decimal-boundary / invalid-decimals`: EA 불가분·정밀도·scale 위반은 slot 타입/단위 검증 실패이므로 /response/error/code가 TYPE_INVALID다(계획 §3.3·§3.4).
 - `rounded-effects-3` → `T04.decimal-boundary / rounded-effects`: 금지 효과의 동일 scope 전후 원 행을 비교한다. 조회/거부 감사는 별도 scope다.
 - `rounded-effects-4` → `T04.decimal-boundary / rounded-effects`: 금지 효과의 동일 scope 전후 원 행을 비교한다. 조회/거부 감사는 별도 scope다.
 - `rounded-effects-5` → `T04.decimal-boundary / rounded-effects`: 금지 효과의 동일 scope 전후 원 행을 비교한다. 조회/거부 감사는 별도 scope다.
@@ -87,7 +87,7 @@ numeric(38,12)의 정밀도/scale와 EA 불가분 정책을 거부 outcome·원 
 - `eligible-after-hold-3` → `T04.hold-versus-disposal / eligible-after-hold`: 실물량·단위와 독립 손계산을 대조한다.
 - `eligible-after-hold-4` → `T04.hold-versus-disposal / eligible-after-hold`: 독립 원 행을 해당 범위에서 합산하며 부모와 자식을 이중 합산하지 않는다.
 - `decrease-evidence-5` → `T04.hold-versus-disposal / decrease-evidence`: 공개 명령의 구조화 outcome을 확인한다.
-- `decrease-evidence-6` → `T04.hold-versus-disposal / decrease-evidence`: 검증 실패를 해당 오류 코드로 구별한다.
+- `decrease-evidence-6` → `T04.hold-versus-disposal / decrease-evidence`: 응답의 구조화 오류 코드 /response/error/code가 FORBIDDEN다(계획 §3.4, contracts/command-response.schema.json).
 - `decrease-evidence-7` → `T04.hold-versus-disposal / decrease-evidence`: 금지 효과의 동일 scope 전후 원 행을 비교한다. 조회/거부 감사는 별도 scope다.
 - `decrease-evidence-8` → `T04.hold-versus-disposal / decrease-evidence`: 금지 효과의 동일 scope 전후 원 행을 비교한다. 조회/거부 감사는 별도 scope다.
 - `decrease-evidence-9` → `T04.hold-versus-disposal / decrease-evidence`: 허용된 denial 감사1과 금지된 업무 효과0을 분리한다.
@@ -107,7 +107,7 @@ numeric(38,12)의 정밀도/scale와 EA 불가분 정책을 거부 outcome·원 
 DB 수량·배분·성공 감사·outbox·COMMITTED 멱등 결과는 분리 commit할 수 없다.
 
 - `rollback-committed-result-1` → `T04.atomic-ledger / rollback-committed-result`: 공개 명령의 구조화 outcome을 확인한다.
-- `rollback-committed-result-2` → `T04.atomic-ledger / rollback-committed-result`: 검증 실패를 해당 오류 코드로 구별한다.
+- `rollback-committed-result-2` → `T04.atomic-ledger / rollback-committed-result`: 응답의 구조화 오류 코드 /response/error/code가 TRANSACTION_ROLLED_BACK다(계획 §3.4, contracts/command-response.schema.json).
 - `rollback-ledger-effects-3` → `T04.atomic-ledger / rollback-ledger-effects`: 금지 효과의 동일 scope 전후 원 행을 비교한다. 조회/거부 감사는 별도 scope다.
 - `rollback-ledger-effects-4` → `T04.atomic-ledger / rollback-ledger-effects`: 금지 효과의 동일 scope 전후 원 행을 비교한다. 조회/거부 감사는 별도 scope다.
 - `rollback-ledger-effects-5` → `T04.atomic-ledger / rollback-ledger-effects`: 금지 효과의 동일 scope 전후 원 행을 비교한다. 조회/거부 감사는 별도 scope다.
@@ -124,7 +124,7 @@ DB 수량·배분·성공 감사·outbox·COMMITTED 멱등 결과는 분리 comm
 DB 수량·배분·성공 감사·outbox·COMMITTED 멱등 결과는 분리 commit할 수 없다.
 
 - `rollback-committed-result-1` → `T04.atomic-ledger / rollback-committed-result`: 공개 명령의 구조화 outcome을 확인한다.
-- `rollback-committed-result-2` → `T04.atomic-ledger / rollback-committed-result`: 검증 실패를 해당 오류 코드로 구별한다.
+- `rollback-committed-result-2` → `T04.atomic-ledger / rollback-committed-result`: 응답의 구조화 오류 코드 /response/error/code가 TRANSACTION_ROLLED_BACK다(계획 §3.4, contracts/command-response.schema.json).
 - `rollback-ledger-effects-3` → `T04.atomic-ledger / rollback-ledger-effects`: 금지 효과의 동일 scope 전후 원 행을 비교한다. 조회/거부 감사는 별도 scope다.
 - `rollback-ledger-effects-4` → `T04.atomic-ledger / rollback-ledger-effects`: 금지 효과의 동일 scope 전후 원 행을 비교한다. 조회/거부 감사는 별도 scope다.
 - `rollback-ledger-effects-5` → `T04.atomic-ledger / rollback-ledger-effects`: 금지 효과의 동일 scope 전후 원 행을 비교한다. 조회/거부 감사는 별도 scope다.
@@ -141,7 +141,7 @@ DB 수량·배분·성공 감사·outbox·COMMITTED 멱등 결과는 분리 comm
 DB 수량·배분·성공 감사·outbox·COMMITTED 멱등 결과는 분리 commit할 수 없다.
 
 - `rollback-committed-result-1` → `T04.atomic-ledger / rollback-committed-result`: 공개 명령의 구조화 outcome을 확인한다.
-- `rollback-committed-result-2` → `T04.atomic-ledger / rollback-committed-result`: 검증 실패를 해당 오류 코드로 구별한다.
+- `rollback-committed-result-2` → `T04.atomic-ledger / rollback-committed-result`: 응답의 구조화 오류 코드 /response/error/code가 TRANSACTION_ROLLED_BACK다(계획 §3.4, contracts/command-response.schema.json).
 - `rollback-ledger-effects-3` → `T04.atomic-ledger / rollback-ledger-effects`: 금지 효과의 동일 scope 전후 원 행을 비교한다. 조회/거부 감사는 별도 scope다.
 - `rollback-ledger-effects-4` → `T04.atomic-ledger / rollback-ledger-effects`: 금지 효과의 동일 scope 전후 원 행을 비교한다. 조회/거부 감사는 별도 scope다.
 - `rollback-ledger-effects-5` → `T04.atomic-ledger / rollback-ledger-effects`: 금지 효과의 동일 scope 전후 원 행을 비교한다. 조회/거부 감사는 별도 scope다.
@@ -158,7 +158,7 @@ DB 수량·배분·성공 감사·outbox·COMMITTED 멱등 결과는 분리 comm
 DB 수량·배분·성공 감사·outbox·COMMITTED 멱등 결과는 분리 commit할 수 없다.
 
 - `rollback-committed-result-1` → `T04.atomic-ledger / rollback-committed-result`: 공개 명령의 구조화 outcome을 확인한다.
-- `rollback-committed-result-2` → `T04.atomic-ledger / rollback-committed-result`: 검증 실패를 해당 오류 코드로 구별한다.
+- `rollback-committed-result-2` → `T04.atomic-ledger / rollback-committed-result`: 응답의 구조화 오류 코드 /response/error/code가 TRANSACTION_ROLLED_BACK다(계획 §3.4, contracts/command-response.schema.json).
 - `rollback-ledger-effects-3` → `T04.atomic-ledger / rollback-ledger-effects`: 금지 효과의 동일 scope 전후 원 행을 비교한다. 조회/거부 감사는 별도 scope다.
 - `rollback-ledger-effects-4` → `T04.atomic-ledger / rollback-ledger-effects`: 금지 효과의 동일 scope 전후 원 행을 비교한다. 조회/거부 감사는 별도 scope다.
 - `rollback-ledger-effects-5` → `T04.atomic-ledger / rollback-ledger-effects`: 금지 효과의 동일 scope 전후 원 행을 비교한다. 조회/거부 감사는 별도 scope다.
@@ -175,11 +175,11 @@ DB 수량·배분·성공 감사·outbox·COMMITTED 멱등 결과는 분리 comm
 raw DB와 application 경계의 거부·수량 불변·bounded retry 및 실제 ordered lock trace/recheck를 각각 확인한다.
 
 - `guarded-primitives-1` → `T04.atomic-ledger / guarded-primitives`: 공개 명령의 구조화 outcome을 확인한다.
-- `guarded-primitives-2` → `T04.atomic-ledger / guarded-primitives`: 검증 실패를 해당 오류 코드로 구별한다.
+- `guarded-primitives-2` → `T04.atomic-ledger / guarded-primitives`: 응답의 구조화 오류 코드 /response/error/code가 RAW_CORE_WRITE_FORBIDDEN다(계획 §3.4, contracts/command-response.schema.json).
 - `guarded-primitives-3` → `T04.atomic-ledger / guarded-primitives`: 공개 명령의 구조화 outcome을 확인한다.
-- `guarded-primitives-4` → `T04.atomic-ledger / guarded-primitives`: 검증 실패를 해당 오류 코드로 구별한다.
+- `guarded-primitives-4` → `T04.atomic-ledger / guarded-primitives`: 고정 DB probe가 core UPDATE를 시도하면 권한 거부가 /response/error/code=DB_PRIVILEGE_DENIED로 구조화된다.
 - `guarded-primitives-5` → `T04.atomic-ledger / guarded-primitives`: 공개 명령의 구조화 outcome을 확인한다.
-- `guarded-primitives-6` → `T04.atomic-ledger / guarded-primitives`: 검증 실패를 해당 오류 코드로 구별한다.
+- `guarded-primitives-6` → `T04.atomic-ledger / guarded-primitives`: 응답의 구조화 오류 코드 /response/error/code가 STALE_REVISION다(계획 §3.4, contracts/command-response.schema.json).
 - `guarded-primitives-7` → `T04.atomic-ledger / guarded-primitives`: 금지 효과의 동일 scope 전후 원 행을 비교한다. 조회/거부 감사는 별도 scope다.
 - `guarded-primitives-8` → `T04.atomic-ledger / guarded-primitives`: 금지 효과의 동일 scope 전후 원 행을 비교한다. 조회/거부 감사는 별도 scope다.
 - `guarded-primitives-9` → `T04.atomic-ledger / guarded-primitives`: 금지 효과의 동일 scope 전후 원 행을 비교한다. 조회/거부 감사는 별도 scope다.

@@ -11,6 +11,9 @@
     그러면 "catalog-oracle-ids" assertion으로 "catalog-oracle-ids: /data/hostObservation/extractor/rawRows/catalogOracles의 실제 oracleId는 고정한 122개 identity/관계와 exact 일치하며 중복·누락을 거부한다."를 확인한다
     그러면 "all-named-observation-tuples" assertion으로 "all-named-observation-tuples: /data/hostObservation/extractor/rawRows/catalogObservations의 실제 ['oracleId', 'name', 'type', 'scope', 'operator']는 고정한 499개 identity/관계와 exact 일치하며 중복·누락을 거부한다."를 확인한다
     그러면 "input-snapshot-kind" assertion으로 "검증기가 요청한 입력 snapshot 종류를 그대로 읽었는지 확인한다. 준비 보고와 실제 runtime manifest를 섞지 않는다."를 확인한다
+    그러면 "preparation-clean-tree" assertion으로 "준비 보고(prepare.json)를 만든 checkout은 clean이었다(workingTreeDirty=false). dirty tree의 PREPARED는 이 입력이 아니다."를 확인한다
+    그러면 "verifier-clean-tree" assertion으로 "검증기가 실행된 현재 checkout도 clean이다."를 확인한다
+    그러면 "preparation-current-commit" assertion으로 "준비 보고의 codeCommit은 검증기가 읽은 현재 checkout HEAD와 같다. 이전 commit의 PREPARED 보고로 현재 준비 상태를 주장하지 않는다."를 확인한다
     그러면 "prepared-only" assertion으로 "prepared-only: /data/hostObservation/extractor/rawRows/gate/preparationStatus의 실제 equals 기대값은 'PREPARED'다. 미관찰·UNKNOWN은 정상값이 아니다."를 확인한다
     그러면 "runtime-not-run" assertion으로 "준비 보고 입력은 실행 증거가 없으므로 runtime은 NOT_RUN이다. 실제 runtime manifest의 상태를 고정하는 단언이 아니다."를 확인한다
     그러면 "whole-gate-open" assertion으로 "준비 보고만으로 전체 gate를 닫지 않는다."를 확인한다
@@ -29,6 +32,9 @@
     그러면 "catalog-oracle-ids" assertion으로 "catalog-oracle-ids: /data/hostObservation/extractor/rawRows/catalogOracles의 실제 oracleId는 고정한 122개 identity/관계와 exact 일치하며 중복·누락을 거부한다."를 확인한다
     그러면 "all-named-observation-tuples" assertion으로 "all-named-observation-tuples: /data/hostObservation/extractor/rawRows/catalogObservations의 실제 ['oracleId', 'name', 'type', 'scope', 'operator']는 고정한 499개 identity/관계와 exact 일치하며 중복·누락을 거부한다."를 확인한다
     그러면 "input-snapshot-kind" assertion으로 "검증기가 요청한 입력 snapshot 종류를 그대로 읽었는지 확인한다. 준비 보고와 실제 runtime manifest를 섞지 않는다."를 확인한다
+    그러면 "preparation-clean-tree" assertion으로 "준비 보고(prepare.json)를 만든 checkout은 clean이었다(workingTreeDirty=false). dirty tree의 PREPARED는 이 입력이 아니다."를 확인한다
+    그러면 "verifier-clean-tree" assertion으로 "검증기가 실행된 현재 checkout도 clean이다."를 확인한다
+    그러면 "preparation-current-commit" assertion으로 "준비 보고의 codeCommit은 검증기가 읽은 현재 checkout HEAD와 같다. 이전 commit의 PREPARED 보고로 현재 준비 상태를 주장하지 않는다."를 확인한다
     그러면 "baseline-input-valid" assertion으로 "같은 입력의 변조 전 사본은 유효해야 한다. 변조가 PASS→FAIL 전이를 만든 것만 거부 증거로 센다."를 확인한다
     그러면 "mutation-rejected" assertion으로 "mutation-rejected: /data/hostObservation/extractor/rawRows/validation/status의 실제 equals 기대값은 'FAIL'다. 미관찰·UNKNOWN은 정상값이 아니다."를 확인한다
     그러면 "specific-mutation-code" assertion으로 "specific-mutation-code: /data/hostObservation/extractor/rawRows/validation/issues의 실제 code는 고정한 1개 identity/관계와 exact 일치하며 중복·누락을 거부한다."를 확인한다
@@ -45,6 +51,9 @@
     그러면 "catalog-oracle-ids" assertion으로 "catalog-oracle-ids: /data/hostObservation/extractor/rawRows/catalogOracles의 실제 oracleId는 고정한 122개 identity/관계와 exact 일치하며 중복·누락을 거부한다."를 확인한다
     그러면 "all-named-observation-tuples" assertion으로 "all-named-observation-tuples: /data/hostObservation/extractor/rawRows/catalogObservations의 실제 ['oracleId', 'name', 'type', 'scope', 'operator']는 고정한 499개 identity/관계와 exact 일치하며 중복·누락을 거부한다."를 확인한다
     그러면 "input-snapshot-kind" assertion으로 "검증기가 요청한 입력 snapshot 종류를 그대로 읽었는지 확인한다. 준비 보고와 실제 runtime manifest를 섞지 않는다."를 확인한다
+    그러면 "preparation-clean-tree" assertion으로 "준비 보고(prepare.json)를 만든 checkout은 clean이었다(workingTreeDirty=false). dirty tree의 PREPARED는 이 입력이 아니다."를 확인한다
+    그러면 "verifier-clean-tree" assertion으로 "검증기가 실행된 현재 checkout도 clean이다."를 확인한다
+    그러면 "preparation-current-commit" assertion으로 "준비 보고의 codeCommit은 검증기가 읽은 현재 checkout HEAD와 같다. 이전 commit의 PREPARED 보고로 현재 준비 상태를 주장하지 않는다."를 확인한다
     그러면 "baseline-input-valid" assertion으로 "같은 입력의 변조 전 사본은 유효해야 한다. 변조가 PASS→FAIL 전이를 만든 것만 거부 증거로 센다."를 확인한다
     그러면 "mutation-rejected" assertion으로 "mutation-rejected: /data/hostObservation/extractor/rawRows/validation/status의 실제 equals 기대값은 'FAIL'다. 미관찰·UNKNOWN은 정상값이 아니다."를 확인한다
     그러면 "specific-mutation-code" assertion으로 "specific-mutation-code: /data/hostObservation/extractor/rawRows/validation/issues의 실제 code는 고정한 1개 identity/관계와 exact 일치하며 중복·누락을 거부한다."를 확인한다
@@ -98,6 +107,9 @@
     그러면 "catalog-oracle-ids" assertion으로 "catalog-oracle-ids: /data/hostObservation/extractor/rawRows/catalogOracles의 실제 oracleId는 고정한 122개 identity/관계와 exact 일치하며 중복·누락을 거부한다."를 확인한다
     그러면 "all-named-observation-tuples" assertion으로 "all-named-observation-tuples: /data/hostObservation/extractor/rawRows/catalogObservations의 실제 ['oracleId', 'name', 'type', 'scope', 'operator']는 고정한 499개 identity/관계와 exact 일치하며 중복·누락을 거부한다."를 확인한다
     그러면 "input-snapshot-kind" assertion으로 "검증기가 요청한 입력 snapshot 종류를 그대로 읽었는지 확인한다. 준비 보고와 실제 runtime manifest를 섞지 않는다."를 확인한다
+    그러면 "preparation-clean-tree" assertion으로 "준비 보고(prepare.json)를 만든 checkout은 clean이었다(workingTreeDirty=false). dirty tree의 PREPARED는 이 입력이 아니다."를 확인한다
+    그러면 "verifier-clean-tree" assertion으로 "검증기가 실행된 현재 checkout도 clean이다."를 확인한다
+    그러면 "preparation-current-commit" assertion으로 "준비 보고의 codeCommit은 검증기가 읽은 현재 checkout HEAD와 같다. 이전 commit의 PREPARED 보고로 현재 준비 상태를 주장하지 않는다."를 확인한다
     그러면 "baseline-input-valid" assertion으로 "같은 입력의 변조 전 사본은 유효해야 한다. 변조가 PASS→FAIL 전이를 만든 것만 거부 증거로 센다."를 확인한다
     그러면 "mutation-rejected" assertion으로 "mutation-rejected: /data/hostObservation/extractor/rawRows/validation/status의 실제 equals 기대값은 'FAIL'다. 미관찰·UNKNOWN은 정상값이 아니다."를 확인한다
     그러면 "specific-mutation-code" assertion으로 "specific-mutation-code: /data/hostObservation/extractor/rawRows/validation/issues의 실제 code는 고정한 1개 identity/관계와 exact 일치하며 중복·누락을 거부한다."를 확인한다
@@ -114,6 +126,9 @@
     그러면 "catalog-oracle-ids" assertion으로 "catalog-oracle-ids: /data/hostObservation/extractor/rawRows/catalogOracles의 실제 oracleId는 고정한 122개 identity/관계와 exact 일치하며 중복·누락을 거부한다."를 확인한다
     그러면 "all-named-observation-tuples" assertion으로 "all-named-observation-tuples: /data/hostObservation/extractor/rawRows/catalogObservations의 실제 ['oracleId', 'name', 'type', 'scope', 'operator']는 고정한 499개 identity/관계와 exact 일치하며 중복·누락을 거부한다."를 확인한다
     그러면 "input-snapshot-kind" assertion으로 "검증기가 요청한 입력 snapshot 종류를 그대로 읽었는지 확인한다. 준비 보고와 실제 runtime manifest를 섞지 않는다."를 확인한다
+    그러면 "preparation-clean-tree" assertion으로 "준비 보고(prepare.json)를 만든 checkout은 clean이었다(workingTreeDirty=false). dirty tree의 PREPARED는 이 입력이 아니다."를 확인한다
+    그러면 "verifier-clean-tree" assertion으로 "검증기가 실행된 현재 checkout도 clean이다."를 확인한다
+    그러면 "preparation-current-commit" assertion으로 "준비 보고의 codeCommit은 검증기가 읽은 현재 checkout HEAD와 같다. 이전 commit의 PREPARED 보고로 현재 준비 상태를 주장하지 않는다."를 확인한다
     그러면 "baseline-input-valid" assertion으로 "같은 입력의 변조 전 사본은 유효해야 한다. 변조가 PASS→FAIL 전이를 만든 것만 거부 증거로 센다."를 확인한다
     그러면 "mutation-rejected" assertion으로 "mutation-rejected: /data/hostObservation/extractor/rawRows/validation/status의 실제 equals 기대값은 'FAIL'다. 미관찰·UNKNOWN은 정상값이 아니다."를 확인한다
     그러면 "specific-mutation-code" assertion으로 "specific-mutation-code: /data/hostObservation/extractor/rawRows/validation/issues의 실제 code는 고정한 1개 identity/관계와 exact 일치하며 중복·누락을 거부한다."를 확인한다
@@ -184,6 +199,8 @@
     그러면 "runtime-artifacts-no-exit1" assertion으로 "필수 경로 artifact의 실제 exit code는 0이다. 의도된 RED(1)·NOT_RUN(2)·환경 오류(3)를 PASS artifact로 연결하지 않는다."를 확인한다
     그러면 "runtime-artifacts-no-exit2" assertion으로 "필수 경로 artifact의 실제 exit code는 0이다. 의도된 RED(1)·NOT_RUN(2)·환경 오류(3)를 PASS artifact로 연결하지 않는다."를 확인한다
     그러면 "runtime-artifacts-no-exit3" assertion으로 "필수 경로 artifact의 실제 exit code는 0이다. 의도된 RED(1)·NOT_RUN(2)·환경 오류(3)를 PASS artifact로 연결하지 않는다."를 확인한다
+    그러면 "runtime-artifacts-all-exit0" assertion으로 "모든 필수 경로 runtime artifact의 exitCode는 정수0이다. exitCode=0인 행만 고른 목록이 전체 목록과 같아야 하므로 4·137·문자열 등 다른 값이 하나라도 있으면 실패한다."를 확인한다
+    그러면 "runtime-artifacts-all-pass" assertion으로 "모든 필수 경로 runtime artifact의 status는 PASS다. PASS 행만 고른 목록이 전체 목록과 같아야 한다."를 확인한다
     그러면 "profile-links-000-scenarios" assertion으로 "T01.two-entrypoints/same-world의 필수 계층 scenarios profile에서 실제 PASS assertion link가 한 건 이상 있다. 다른 profile의 PASS로 대신하지 않는다."를 확인한다
     그러면 "artifact-kind-000-api_response" assertion으로 "T01.two-entrypoints/same-world에는 catalog artifactKind api_response의 실제 PASS artifact가 path·hash·크기·case·profile과 함께 연결된다."를 확인한다
     그러면 "artifact-kind-000-db_snapshot" assertion으로 "T01.two-entrypoints/same-world에는 catalog artifactKind db_snapshot의 실제 PASS artifact가 path·hash·크기·case·profile과 함께 연결된다."를 확인한다

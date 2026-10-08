@@ -7578,11 +7578,11 @@
             "actionId": "after-impersonation-db",
             "pointer": "/data/rawRows/audit",
             "where": {
-              "commandKey": "T10-successful-transfer-impersonated-acceptance"
+              "commandIdempotencyKey": "T10-successful-transfer-impersonated-acceptance"
             },
             "field": [
               "actorId",
-              "action",
+              "capabilityId",
               "outcome"
             ]
           },
@@ -7625,11 +7625,11 @@
             "actionId": "after-db",
             "pointer": "/data/rawRows/audit",
             "where": {
-              "commandKey": "T10-successful-transfer-transfer"
+              "commandIdempotencyKey": "T10-successful-transfer-transfer"
             },
             "field": [
               "actorId",
-              "action",
+              "capabilityId",
               "outcome"
             ]
           },
@@ -7672,7 +7672,7 @@
             "actionId": "after-db",
             "pointer": "/data/rawRows/audit",
             "where": {
-              "commandKey": "T10-successful-transfer-transfer"
+              "commandIdempotencyKey": "T10-successful-transfer-transfer"
             },
             "field": "transactionId"
           },
@@ -9672,11 +9672,11 @@
             "actionId": "after-impersonation-db",
             "pointer": "/data/rawRows/audit",
             "where": {
-              "commandKey": "T10-partial-commit-impersonated-acceptance"
+              "commandIdempotencyKey": "T10-partial-commit-impersonated-acceptance"
             },
             "field": [
               "actorId",
-              "action",
+              "capabilityId",
               "outcome"
             ]
           },
@@ -9719,11 +9719,11 @@
             "actionId": "after-db",
             "pointer": "/data/rawRows/audit",
             "where": {
-              "commandKey": "T10-partial-commit-partial-transfer"
+              "commandIdempotencyKey": "T10-partial-commit-partial-transfer"
             },
             "field": [
               "actorId",
-              "action",
+              "capabilityId",
               "outcome"
             ]
           },
@@ -9766,7 +9766,7 @@
             "actionId": "after-db",
             "pointer": "/data/rawRows/audit",
             "where": {
-              "commandKey": "T10-partial-commit-partial-transfer"
+              "commandIdempotencyKey": "T10-partial-commit-partial-transfer"
             },
             "field": "transactionId"
           },
@@ -11312,11 +11312,11 @@
             "actionId": "after-db",
             "pointer": "/data/rawRows/audit",
             "where": {
-              "commandKey": "T10-admin-emergency-decision"
+              "commandIdempotencyKey": "T10-admin-emergency-decision"
             },
             "field": [
               "actorId",
-              "action",
+              "capabilityId",
               "reason",
               "workId"
             ]
@@ -11750,7 +11750,7 @@
             "actionId": "after-db",
             "pointer": "/data/rawRows/audit",
             "where": {
-              "commandKey": "T10-ordinary-emergency-decision",
+              "commandIdempotencyKey": "T10-ordinary-emergency-decision",
               "outcome": "REJECTED"
             }
           },
@@ -12171,7 +12171,7 @@
             "actionId": "after-db",
             "pointer": "/data/rawRows/audit",
             "where": {
-              "commandKey": "T10-reason-missing-decision",
+              "commandIdempotencyKey": "T10-reason-missing-decision",
               "outcome": "REJECTED"
             }
           },
@@ -12594,7 +12594,7 @@
             "actionId": "after-db",
             "pointer": "/data/rawRows/audit",
             "where": {
-              "commandKey": "T10-resolve-no-proof-decision",
+              "commandIdempotencyKey": "T10-resolve-no-proof-decision",
               "outcome": "REJECTED"
             }
           },
@@ -13017,7 +13017,7 @@
             "actionId": "after-db",
             "pointer": "/data/rawRows/audit",
             "where": {
-              "commandKey": "T10-waive-wrong-authority-decision",
+              "commandIdempotencyKey": "T10-waive-wrong-authority-decision",
               "outcome": "REJECTED"
             }
           },

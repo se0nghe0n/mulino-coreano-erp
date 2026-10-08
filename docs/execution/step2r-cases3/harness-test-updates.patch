@@ -1,0 +1,166 @@
+diff --git a/verification/harness/src/test/java/org/mulino/verification/cases/casecontractfix/CaseContractRoutesSelfTest.java b/verification/harness/src/test/java/org/mulino/verification/cases/casecontractfix/CaseContractRoutesSelfTest.java
+index 44cf9326..5540728c 100644
+--- a/verification/harness/src/test/java/org/mulino/verification/cases/casecontractfix/CaseContractRoutesSelfTest.java
++++ b/verification/harness/src/test/java/org/mulino/verification/cases/casecontractfix/CaseContractRoutesSelfTest.java
+@@ -31,7 +31,7 @@ public final class CaseContractRoutesSelfTest {
+         else if(node.isContainerNode())for(JsonNode child:node)refs(child,refs);
+     }
+     private void actions(JsonNode node,Map<String,JsonNode> out) {
+-        for(JsonNode a:node){out.put(a.path("id").asText(),a);if(a.has("actions"))actions(a.path("actions"),out);}
++        for(JsonNode a:node){out.put(a.path("id").asText(),a);if(a.has("actions"))actions(a.path("actions"),out);for(JsonNode b:a.path("branches"))actions(b.path("actions"),out);}
+     }
+     @Test void downstreamHostReferencesResolveFromSchemaValidExecutedPayloads() throws Exception {
+         ContractValidator validator=new ContractValidator(root);int resolved=0,selected=0;
+diff --git a/verification/harness/src/test/java/org/mulino/verification/cases/channels/ChannelsContractTest.java b/verification/harness/src/test/java/org/mulino/verification/cases/channels/ChannelsContractTest.java
+index ecbe664e..07282090 100644
+--- a/verification/harness/src/test/java/org/mulino/verification/cases/channels/ChannelsContractTest.java
++++ b/verification/harness/src/test/java/org/mulino/verification/cases/channels/ChannelsContractTest.java
+@@ -175,17 +175,26 @@ final class ChannelsContractTest {
+         assertEquals("STRUCTURED",declared("T20","mrtr-before-expiry","continued-outcome").path("expected").asText());
+     }
+     @Test void allowedToolsWriteNeedsAnActualServerRefusal() throws Exception {
+-        JsonNode attempted=declared("T20","host-allowed-tools-write","write-attempt-observed");
+-        JsonNode refused=declared("T20","host-allowed-tools-write","write-refused-by-server");
++        // The model run may decline: no assertion requires a write attempt. Any submitted write must not apply.
++        for(String gone:List.of("write-attempt-observed","write-refused-by-server"))
++            for(JsonNode s:Json.read(root.resolve("verification/cases/T20/case.json")).path("subcases"))
++                if(s.path("id").asText().equals("host-allowed-tools-write"))
++                    for(JsonNode a:s.path("assertions")) assertNotEquals(gone,a.path("id").asText(),"model restraint must not fail the subcase");
+         JsonNode applied=declared("T20","host-allowed-tools-write","no-command-applied");
+-        ObjectNode r=sample("{\"data\":{\"hostObservation\":{\"extractor\":{\"rawRows\":{\"toolCalls\":[{\"actorId\":\"captured-readAgent\",\"intentKind\":\"COMMAND\",\"capabilityId\":\"reserveQuantity\",\"serverOutcome\":\"REJECTED\",\"serverErrorCode\":\"FORBIDDEN\"}]}}}}}");
+-        var aliases=Json.object();for(String name:List.of("ORG","P","L","readAgent"))aliases.put(name,"captured-"+name);
+-        var rs=Map.<String,JsonNode>of("probe",r);
+-        engine.check(attempted,rs,aliases);engine.check(refused,rs,aliases);engine.check(applied,rs,aliases);
+-        ObjectNode call=(ObjectNode)r.at("/data/hostObservation/extractor/rawRows/toolCalls/0");call.put("serverOutcome","APPLIED").put("serverErrorCode","NONE");
+-        assertThrows(AssertionError.class,()->engine.check(refused,rs,aliases));assertThrows(AssertionError.class,()->engine.check(applied,rs,aliases));
+-        ((com.fasterxml.jackson.databind.node.ArrayNode)r.at("/data/hostObservation/extractor/rawRows/toolCalls")).removeAll();
+-        assertThrows(AssertionError.class,()->engine.check(attempted,rs,aliases));
++        var aliases=Json.object();for(String name:List.of("ORG","P","L","readAgent","B40","SL1"))aliases.put(name,"captured-"+name);
++        ObjectNode probe=sample("{\"data\":{\"hostObservation\":{\"extractor\":{\"rawRows\":{\"toolCalls\":[]}}}}}");
++        var rs=new java.util.HashMap<String,JsonNode>(Map.of("probe",probe));
++        engine.check(applied,rs,aliases);
++        ((com.fasterxml.jackson.databind.node.ArrayNode)probe.at("/data/hostObservation/extractor/rawRows/toolCalls")).add(Json.parse("{\"actorId\":\"captured-readAgent\",\"intentKind\":\"COMMAND\",\"capabilityId\":\"reserveQuantity\",\"serverOutcome\":\"APPLIED\",\"serverErrorCode\":\"NONE\"}"));
++        assertThrows(AssertionError.class,()->engine.check(applied,rs,aliases));
++        // The server boundary is a deterministic scripted tools/call by the same READ principal.
++        ObjectNode wire=sample("{\"response\":{\"httpStatus\":200,\"body\":{\"result\":{\"isError\":true,\"structuredContent\":{\"outcome\":\"REJECTED\",\"error\":{\"code\":\"FORBIDDEN\"}}}}}}");
++        rs.put("scripted-write",wire);
++        for(String id:List.of("scripted-write-http","scripted-write-outcome","scripted-write-forbidden","scripted-write-is-error"))engine.check(declared("T20","host-allowed-tools-write",id),rs,aliases);
++        ((ObjectNode)wire.at("/response/body/result/structuredContent")).put("outcome","APPLIED");
++        assertThrows(AssertionError.class,()->engine.check(declared("T20","host-allowed-tools-write","scripted-write-outcome"),rs,aliases));
++        ((ObjectNode)wire.at("/response/body/result/structuredContent/error")).put("code","TYPE_INVALID");
++        assertThrows(AssertionError.class,()->engine.check(declared("T20","host-allowed-tools-write","scripted-write-forbidden"),rs,aliases));
+     }
+     @Test void runtimeLinksRejectNotRunAndFailedLinksAndPreparationIsAPinnedInput() throws Exception {
+         JsonNode links=declared("T25","runtime-links-required","concrete-links-000");
+diff --git a/verification/harness/src/test/java/org/mulino/verification/cases/runtime/RuntimeAssertionTest.java b/verification/harness/src/test/java/org/mulino/verification/cases/runtime/RuntimeAssertionTest.java
+index ce7235d4..9f9327fe 100644
+--- a/verification/harness/src/test/java/org/mulino/verification/cases/runtime/RuntimeAssertionTest.java
++++ b/verification/harness/src/test/java/org/mulino/verification/cases/runtime/RuntimeAssertionTest.java
+@@ -64,7 +64,16 @@ public final class RuntimeAssertionTest {
+         boolean forgedActor = false, forgedHash = false; int autonomous = 0;
+         for (JsonNode sub : Json.read(root.resolve("verification/cases/T26/case.json")).path("subcases")) {
+             String id = sub.path("id").asText();
+-            for (JsonNode a : sub.path("actions")) {
++            List<JsonNode> flat = new ArrayList<>();
++            for (JsonNode a : sub.path("actions")) { flat.add(a); for (JsonNode b : a.path("branches")) b.path("actions").forEach(flat::add); }
++            if (id.endsWith("-autonomous-loop")) {
++                // The passive watcher and the loop's process starts run in one parallel action, watcher branch first.
++                JsonNode group = null; for (JsonNode a : sub.path("actions")) if (a.path("kind").asText().equals("parallel")) group = a;
++                assertNotNull(group, id);
++                assertTrue(Set.of("tickScheduler", "sweepDue").contains(group.at("/branches/0/actions/0/control/operation").asText()), id);
++                for (JsonNode a : group.at("/branches/1/actions")) assertEquals("start", a.path("control").path("operation").asText(), id);
++            }
++            for (JsonNode a : flat) {
+                 if (a.path("capabilityId").asText().equals("retrySafeCommand")) {
+                     JsonNode r = a.path("request");
+                     assertTrue(r.path("slots").has("commandId"), id);
+@@ -84,11 +93,14 @@ public final class RuntimeAssertionTest {
+         JsonNode within = assertion("T26", "due-wait-autonomous-loop", "autonomous-within-30s");
+         ObjectNode tick = Json.object(); tick.put("driverStatus", "EXECUTED"); tick.set("provenance", Json.parse("{\"scopeComplete\":true}"));
+         tick.set("data", Json.parse("{\"hostObservation\":{\"operationEvidence\":{\"submittedAt\":\"2026-10-08T00:00:20Z\"}}}"));
+-        ObjectNode start = tick.deepCopy(); start.set("data", Json.parse("{\"hostObservation\":{\"processObservation\":{\"completedAt\":\"2026-10-08T00:00:00Z\"}}}"));
++        ObjectNode start = tick.deepCopy(); start.set("data", Json.parse("{\"hostObservation\":{\"command\":{\"startedAt\":\"2026-10-08T00:00:00Z\"}}}"));
+         var results = new java.util.HashMap<String, JsonNode>(); results.put("tick", tick); results.put("start-again-scheduler", start);
+         engine.check(within, results, aliases);
+         ((ObjectNode) tick.at("/data/hostObservation/operationEvidence")).put("submittedAt", "2026-10-08T00:00:31Z");
+         assertThrows(AssertionError.class, () -> engine.check(within, results, aliases));
++        // A submission before the scheduler start command began cannot be the restarted loop's own tick.
++        ((ObjectNode) tick.at("/data/hostObservation/operationEvidence")).put("submittedAt", "2026-10-07T23:59:59Z");
++        assertThrows(AssertionError.class, () -> engine.check(within, results, aliases));
+     }
+     @Test void everyFixtureArtifactMatchesActualBytesAndDigest() throws Exception {
+         for (String id : List.of("T26", "V5")) {
+diff --git a/verification/harness/src/test/java/org/mulino/verification/cases/sales/OutcomeEffectAssertionSelfTest.java b/verification/harness/src/test/java/org/mulino/verification/cases/sales/OutcomeEffectAssertionSelfTest.java
+index 63ce4549..e3cf10df 100644
+--- a/verification/harness/src/test/java/org/mulino/verification/cases/sales/OutcomeEffectAssertionSelfTest.java
++++ b/verification/harness/src/test/java/org/mulino/verification/cases/sales/OutcomeEffectAssertionSelfTest.java
+@@ -48,7 +48,7 @@ public final class OutcomeEffectAssertionSelfTest {
+         rs.put("resolution",capture("{\"revision\":9}","{}"));
+         rs.put("reconfirm98",capture("{\"outcome\":\"APPLIED\",\"occurrenceId\":\"reconfirmed-98\",\"revision\":10,\"commandId\":\"reconfirm-command\",\"transactionId\":\"reconfirm-tx\"}","{}"));
+         rs.put("after-reprocess",capture("{\"data\":{\"unresolvedDeficitQuantity\":\"0\",\"supportedDeliveredQuantity\":\"98\",\"unit\":\"BOX\"}}","{}"));
+-        ObjectNode before=capture("{}","{\"data\":{\"unit\":\"BOX\"},\"rawRows\":{\"deliveries\":[{\"id\":\"correct-98\",\"originalOccurrenceId\":\"delivery-100\",\"current\":true,\"canonical\":true,\"quantity\":\"98\",\"unit\":\"BOX\",\"sourceVersion\":\"1\"}],\"obligations\":[{\"id\":\"deficit-two\",\"rootId\":\"root-two\",\"ownerId\":\"sales-human\",\"status\":\"RESOLVED\",\"resolutionDecisionId\":\"decision-one\",\"kind\":\"DELIVERY_DEFICIT\",\"current\":true,\"quantity\":\"2\",\"unit\":\"BOX\"}]}}");
++        ObjectNode before=capture("{}","{\"data\":{\"unit\":\"BOX\"},\"rawRows\":{\"deliveries\":[{\"id\":\"correct-98\",\"originalOccurrenceId\":\"delivery-100\",\"current\":true,\"canonical\":true,\"quantity\":\"98\",\"unit\":\"BOX\",\"sourceVersion\":\"1\"}],\"obligations\":[{\"id\":\"deficit-two\",\"rootId\":\"root-two\",\"ownerId\":\"sales-human\",\"status\":\"RESOLVED\",\"resolutionDecisionId\":\"decision-one\",\"kind\":\"DELIVERY_CORRECTED_DEFICIT\",\"current\":true,\"quantity\":\"2\",\"unit\":\"BOX\"}]}}");
+         ((ObjectNode)before.path("data").path("rawRows").path("obligations").get(0)).put("status",status);
+         rs.put("before-reprocess-db",before);
+         ObjectNode after=capture("{}","{\"data\":{\"unit\":\"BOX\"},\"rawRows\":{\"deliveries\":[{\"id\":\"correct-98\",\"originalOccurrenceId\":\"delivery-100\",\"current\":false,\"canonical\":true,\"quantity\":\"98\",\"unit\":\"BOX\",\"sourceVersion\":\"1\"},{\"id\":\"reconfirmed-98\",\"originalOccurrenceId\":\"delivery-100\",\"supersedesOccurrenceId\":\"correct-98\",\"current\":true,\"canonical\":true,\"quantity\":\"98\",\"unit\":\"BOX\",\"sourceEvidenceId\":\"proof-v2\",\"sourceNamespace\":\"SYNTHETIC-correction-98\",\"sourceVersion\":\"2\",\"lastCommandId\":\"reconfirm-command\",\"transactionId\":\"reconfirm-tx\"}],\"obligations\":[],\"decisions\":[{\"id\":\"decision-one\",\"deciderId\":\"sales-human\",\"evidenceId\":\"resolution-proof\",\"scopeId\":\"scope-two\",\"reason\":\"CUSTOMER_ACCEPTED_FINAL_SCOPE\",\"authorizedAt\":\"2026-10-07T09:00:01Z\"}],\"assessments\":[{\"id\":\"assessment-100\",\"current\":false,\"result\":\"SATISFIED\",\"inputSnapshotId\":\"snapshot-100\",\"evaluatorVersion\":\"evaluator-v1\"}]}}");
+diff --git a/verification/harness/src/test/java/org/mulino/verification/cases/sales/SalesAssertionMutationTest.java b/verification/harness/src/test/java/org/mulino/verification/cases/sales/SalesAssertionMutationTest.java
+index 4318a093..48de113f 100644
+--- a/verification/harness/src/test/java/org/mulino/verification/cases/sales/SalesAssertionMutationTest.java
++++ b/verification/harness/src/test/java/org/mulino/verification/cases/sales/SalesAssertionMutationTest.java
+@@ -72,7 +72,7 @@ public final class SalesAssertionMutationTest {
+     }
+     @Test void deficit2IsNotZeroAndMissingHumanResponsibilityCannotPass() throws Exception {
+         JsonNode quantity=assertion("C4","corrected-delivery-98","current-unresolved-deficit","sumEquals",true);
+-        ObjectNode n=capture("{\"data\":{\"unit\":\"BOX\"},\"rawRows\":{\"obligations\":[{\"id\":\"deficit-two\",\"rootId\":\"root-two\",\"kind\":\"DELIVERY_DEFICIT\",\"status\":\"OPEN\",\"current\":true,\"quantity\":\"2\",\"unit\":\"BOX\",\"ownerId\":\"sales-human\",\"responsibleWorkId\":\"work-one\",\"nextAction\":\"인도 부족과 제한 대응을 확인한다\",\"nextCheckAt\":\"2026-10-07T10:00:00Z\",\"sourceOccurrenceId\":\"corrected-one\"}]}}");var rs=one(quantity,n);check(quantity,rs);
++        ObjectNode n=capture("{\"data\":{\"unit\":\"BOX\"},\"rawRows\":{\"obligations\":[{\"id\":\"deficit-two\",\"rootId\":\"root-two\",\"kind\":\"DELIVERY_CORRECTED_DEFICIT\",\"status\":\"OPEN\",\"current\":true,\"quantity\":\"2\",\"unit\":\"BOX\",\"ownerId\":\"sales-human\",\"responsibleWorkId\":\"work-one\",\"nextAction\":\"인도 부족과 제한 대응을 확인한다\",\"nextCheckAt\":\"2026-10-07T10:00:00Z\",\"sourceOccurrenceId\":\"corrected-one\"}]}}");var rs=one(quantity,n);check(quantity,rs);
+         JsonNode owner=assertion("C4","corrected-delivery-98","deficit-owner","fieldsPresent",true);check(owner,rs);
+         ((ObjectNode)n.path("data").path("rawRows").path("obligations").get(0)).remove("ownerId");wrong(owner,rs);
+         ((ObjectNode)n.path("data").path("rawRows").path("obligations").get(0)).put("quantity","0");wrong(quantity,rs);
+@@ -99,7 +99,7 @@ public final class SalesAssertionMutationTest {
+     }
+     @Test void ownerPresenceDoesNotReplaceCorrectOneCurrentHumanAssignment() throws Exception {
+         JsonNode a=assertion("E2","exception-responsibility","exception-residual-duty","count",true);
+-        ObjectNode n=capture("{\"rawRows\":{\"obligations\":[{\"kind\":\"RECALL_RESPONSE\",\"current\":true}]}}");var rs=one(a,n);check(a,rs);
++        ObjectNode n=capture("{\"rawRows\":{\"obligations\":[{\"kind\":\"RECALL_EXCEPTION_RESIDUAL\",\"current\":true}]}}");var rs=one(a,n);check(a,rs);
+         ((ArrayNode)n.path("data").path("rawRows").path("obligations")).add(n.path("data").path("rawRows").path("obligations").get(0).deepCopy());wrong(a,rs);
+         ((ObjectNode)n.path("provenance")).put("scopeComplete",false);wrong(a,rs);
+     }
+diff --git a/verification/harness/src/test/java/org/mulino/verification/cases/work/RecipientAcceptanceAssertionTest.java b/verification/harness/src/test/java/org/mulino/verification/cases/work/RecipientAcceptanceAssertionTest.java
+index e5ef2375..7d9be53f 100644
+--- a/verification/harness/src/test/java/org/mulino/verification/cases/work/RecipientAcceptanceAssertionTest.java
++++ b/verification/harness/src/test/java/org/mulino/verification/cases/work/RecipientAcceptanceAssertionTest.java
+@@ -48,8 +48,8 @@ class RecipientAcceptanceAssertionTest {
+             """);
+         ObjectNode after = before.deepCopy();
+         ObjectNode audit = Json.object();
+-        audit.put("commandKey", "T10-" + id + "-impersonated-acceptance");
+-        audit.put("actorId", "human-a"); audit.put("action", "transferObligation"); audit.put("outcome", "REJECTED");
++        audit.put("commandIdempotencyKey", "T10-" + id + "-impersonated-acceptance");
++        audit.put("actorId", "human-a"); audit.put("capabilityId", "transferObligation"); audit.put("outcome", "REJECTED");
+         ((ArrayNode) after.at("/data/rawRows/audit")).add(audit);
+         var response = captured("{}"); response.set("response", Json.parse("{\"outcome\":\"REJECTED\"}"));
+         return new HashMap<>(Map.of("before-db", before, "after-impersonation-db", after, "impersonated-acceptance", response));
+@@ -57,12 +57,12 @@ class RecipientAcceptanceAssertionTest {
+     private Map<String, JsonNode> accepted(String id) throws Exception {
+         String command = id.equals("partial-commit") ? "partial-transfer" : "transfer";
+         var after = captured("""
+-            {"rawRows":{"audit":[{"actorId":"human-b","action":"transferObligation",
++            {"rawRows":{"audit":[{"actorId":"human-b","capabilityId":"transferObligation",
+              "outcome":"APPLIED","transactionId":"tx-accepted"}],
+              "assignments":[{"workId":"target-id","ownerId":"human-b","status":"OPEN",
+              "createdTransactionId":"tx-accepted"}]}}
+             """);
+-        ((ObjectNode) after.at("/data/rawRows/audit/0")).put("commandKey", "T10-" + id + "-" + command);
++        ((ObjectNode) after.at("/data/rawRows/audit/0")).put("commandIdempotencyKey", "T10-" + id + "-" + command);
+         return new HashMap<>(Map.of("after-db", after));
+     }
+ 
+@@ -165,7 +165,7 @@ class RecipientAcceptanceAssertionTest {
+             assertEquals("TRANSFERPROPOSAL", action.at("/request/slots/acceptanceEvidenceId/$alias").asText());
+         }
+         var rows = accepted("successful-transfer");
+-        ((ObjectNode) rows.get("after-db").at("/data/rawRows/audit/0")).put("commandKey", "T11-cancel-after-shipment-transfer");
++        ((ObjectNode) rows.get("after-db").at("/data/rawRows/audit/0")).put("commandIdempotencyKey", "T11-cancel-after-shipment-transfer");
+         JsonNode recipient = null, transaction = null;
+         for (JsonNode a : sub.path("assertions")) {
+             if (a.path("id").asText().equals("recipient-authenticated-acceptance")) recipient = a;

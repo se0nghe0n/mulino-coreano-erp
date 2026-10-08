@@ -898,7 +898,7 @@
             "actionId": "after-db",
             "pointer": "/data/rawRows/audit",
             "where": {
-              "commandKey": "T05-custody-not-sale-app-write-reserve-customer",
+              "commandIdempotencyKey": "T05-custody-not-sale-app-write-reserve-customer",
               "outcome": "REJECTED"
             }
           },
@@ -2639,7 +2639,7 @@
             "actionId": "unconfirmed-db",
             "pointer": "/data/rawRows/audit",
             "where": {
-              "commandKey": "T05-manager-disposition-ordinary-confirm",
+              "commandIdempotencyKey": "T05-manager-disposition-ordinary-confirm",
               "outcome": "REJECTED"
             }
           },
