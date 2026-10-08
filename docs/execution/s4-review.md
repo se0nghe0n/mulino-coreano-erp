@@ -91,3 +91,26 @@ slice로 나눠 검토했다. P0–P2 지적마다 Opus xhigh skeptic이 반박�
 모든 확정 지적이 FIXED 또는 근거 있는 NOT_A_DEFECT가 되고, 통합본에서
 backend 전체·harness·prepare·native S1–S4가 통과하고, 같은 두 reviewer의
 closure 검토가 PASS해야 S4를 닫는다.
+
+## 수정과 closure 1차
+
+네 worker(`step3/s4h-sales`·`-recall`·`-settle`·`-native`)의 수정을
+통합했다. `26f5a076`에서 backend 495, harness 483, prepare PREPARED,
+native S4 3312·S3 594·S2 48·S1 21 bounded assertion이 모두 통과했다
+([증거](evidence/step3-s4/26f5a076/summary.json)). native S1은 미확인
+판매 적격을 0이 아닌 null로 내도록 고쳐 회복됐다.
+
+closure 1차는 사용자 요청에 따라 작게 했다. Opus xhigh와 Fable low가
+S4 전체를 한 번씩 보고, reviewer마다 Opus xhigh skeptic 1명이 지적을
+묶어 반박 검증했다. 확정 39건 중 Opus xhigh 기준 35건, Fable low 기준
+35건이 RESOLVED였다. Opus xhigh는 FAIL, Fable low는 PASS다. 반박되지
+않은 P2는 다음 두 가지다.
+
+- 두 번째 반품 보고를 자기 사건·시각·증거를 검증하지 않고 다른 관측의
+  canonical 수령에 중복으로 닫는다.
+- 대조 뒤 인도·수령 정정이 일어나면 정산이 UNSATISFIED로 바뀌지만
+  의무가 없고, NOT_OPEN gate가 모든 조정을 막는다(s4-settle-02 잔여).
+
+나머지는 P3다. Opus medium worker 1명(`step3/s4i-closure`)이 두 P2와
+비용이 낮은 P3를 고치고, 같은 두 reviewer가 다시 확인한다. 판정 원문은
+[closure 1차](evidence/s4-review/s4-closure-1.json)에 있다.

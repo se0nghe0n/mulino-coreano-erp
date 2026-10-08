@@ -1,0 +1,363 @@
+[
+ {
+  "reviewer": "opus-xhigh",
+  "verdict": "FAIL",
+  "resolution": [
+   "s4-sales-00: RESOLVED. FulfillmentCommands.java:38 now calls requireContinuousAuthority, defined at :46-58. It rejects an occurredAt earlier than pickedAt with TYPE_INVALID. It then re-assesses SELL and DISPATCH at the occurrence instant and at every Restriction or DispositionBase validFrom/validUntil/releasedAt boundary, LOT expiry and nextValidityBoundary up to now. FulfillmentPostgresTest covers it with dispatchDatedInsideAnEarlierHoldWindowIsRejectedWithZeroEffect and dispatchSpanningAnUnsweptSaleBasisGapIsRejectedWithZeroEffect.",
+   "s4-sales-01: RESOLVED. FulfillmentStockPrimitives.java:46-47 computes legitimacy as SELL∩DISPATCH for the dispatch customer at the delivery instant. A post-dispatch SELL-only hold or a SELL basis revocation now gives contribution 0 and a DELIVERY_RESTRICTION_RESPONSE duty (tests postDispatchSellOnlyHold… and postDispatchSellBasisRevocation…).",
+   "s4-sales-02: RESOLVED. Same root cause and fix as s4-sales-01 (FulfillmentStockPrimitives.java:46-47).",
+   "s4-sales-03: RESOLVED. DeliveryCorrection.java:23-30 (covered) counts only OPEN and WAIVED leaves as coverage. :31-35 opens a duty for each uncovered gap, keyed to the correcting canonical (sourceId=canonical, :35), so it no longer dedupes onto the old RESOLVED root. Test: correctedDeficitThatReemergesAfterItsRestorationResolutionGetsANewDuty (30→28→30 resolved→28 gives a new OPEN duty of 2).",
+   "s4-sales-04: PARTIAL. QualityEligibility.java:63,71 excludes segments at TRANSIT, CUSTOMER and SUPPLIER places from item-scope SELL eligibility, and native e1-noun-eligibility asserts 0. However, the exclusion is a denylist over the free-text Places.kind, and a sales destinationId may be a place of any kind (SalesCommands.java:17 only checks that it exists). Stock delivered to a place of any other kind (for example 'EXTERNAL_CUSTOMER', the customer place kind in the Step 2 V6/V7 fixtures) is again counted as unreserved SELL-eligible. The verifier recommended an INTERNAL_STORAGE/internal-custody allowlist. Residual is P3 because it depends on configuration. heldQuantity is unchanged; the verdict accepted that as debatable.",
+   "s4-sales-05: RESOLVED. DeliveryCommands.java:27 stores legitimateRangesJson (V30). DeliveryCorrection.java:15 intersects those ranges with [start,start+q), and falls back to the lower bound max(0,legit-(orig-q)) when no ranges are stored. Test correctionCreditsOnlyTheExactLegitimateCoordinatesOfTheCorrectedInterval gives 5, not 10.",
+   "s4-sales-06: RESOLVED. Same fix as s4-sales-03 (DeliveryCorrection.java:23-35).",
+   "s4-sales-07: RESOLVED. FulfillmentStockPrimitives.java:43 judges legitimacy on the transit leaf that was valid at the delivery instant. :53 transfers at max(at, leaf.validFrom), so both partial deliveries are now reconciled (test partialDeliveriesConfirmedOutOfChronologicalOrderAreBothReconciled). One limitation remains: the ledger dates the late-confirmed earlier delivery at the later leaf start (see new P3).",
+   "s4-sales-08: RESOLVED for the narrowed claim. DeliveryCommands.java:26 judges against SalesCommands.currentLine (SalesCommands.java:30), so a dueAt revised while cargo is in transit is honoured. This change introduces a new P2: a revision recorded after the delivery occurred is applied retroactively (see new_findings).",
+   "s4-sales-09: RESOLVED. Observations, Deliveries and DeliveryCorrections use effectiveAt=occurredAt (DeliveryCommands.java:19,27; DeliveryCorrection.java:31). SalesQueries.java:20 hides a CONFIRMED state that is not yet visible at knownAt. Test: deliveryReadsUseOccurrenceTimeAndConfirmationVisibleOnlyFromItsKnownAt.",
+   "s4-sales-10: RESOLVED. FulfillmentCommands.java:31 authorizes the replaced allocation's TARGET/ITEM/PLACE/WORK, and :38 authorizes the PLACE of the transit destination. Tests: dispatchRequiresAuthorityOverTheTransitDestination and replaceAllocationRequiresAuthorityOverTheReplacedAllocationScope.",
+   "s4-sales-11: RESOLVED. Same fix as s4-sales-08, with the same new retroactive-revision defect.",
+   "s4-sales-12: RESOLVED. Same fix as s4-sales-09.",
+   "s4-sales-13: RESOLVED. Same fix as s4-sales-03.",
+   "s4-sales-14: RESOLVED. Same fix as s4-sales-03 (98→100 resolved→98 gets a new typed duty).",
+   "s4-recall-00: RESOLVED. Physical facts are now investigation-scoped: V31 adds Actions.investigationId and a per-investigation terminal exclusion constraint. RecallCommands.java:43-46 adds root-level recovery overlap checks, and :68 and the partition logic use clip (RecallPartition.clip). Re-recovery returns CONFLICT/RECALL_RANGE_ALREADY_RECOVERED instead of an SQL error. Test: rescopeAfterRecoveryCarriesPhysicalFactsAndClosesTruthfully.",
+   "s4-recall-01: RESOLVED. RecallCommands.java:51 requires DISPOSED to be recorded by a HUMAN with a disposeQuantity grant and a current ManagementAuthority on every scope value (manager(), :81), on top of the current exact ADMIN approval in approval(). Test recallDisposalNeedsCurrentHumanManagerConfirmation and native e2-dispose25-without-manager-denied. A typed RECALL_DISPOSITION_CLEARANCE is still absent, as the worker disclosed.",
+   "s4-recall-02: RESOLVED for the narrowed claim. ReturnCommands.java:34 provisional intake records the observed range, :27 checks current authorization only at confirmation, a later authorization may be used, and duplicate reports close via :40. The duplicate-closure path introduces a new P2 (see new_findings).",
+   "s4-recall-03: RESOLVED. RecallQueries.java:16 known() derives status, currentScopeId, revision and closedAt from immutable Scopes, Approvals and Closures visible at knownAt (test historicalRecallReadsUseStateKnownAtThatTime).",
+   "s4-recall-04: RESOLVED. ReturnCommands.java:72-74 uses everyPermitted/every and ManagementCoverage.covers, which requires every value of some dimension to be covered. Recall admin() and manager() use the same rule (test authorizingManagerIsRecheckedOnEveryPlaceOfTheReturn).",
+   "s4-recall-05: PARTIAL. ADMIN gating now has a negative test (nonAdminCannotRecordExceptionOrCloseRecall, mutation-checked) and the closure-denial test uses a valid RECALL_CLOSURE canonical. The returnId recovery branch and the customer-leaf recovery path remain untested, as the worker declared (residual P3, coverage only).",
+   "s4-recall-06: RESOLVED. ReturnEvidence.java:20 binds RETURN_DISPOSITION_* to a confirmed return, using decisionId as identity and the decision time (after arrival, at or before knownAt) as effectiveFrom. Backend end-to-end test dispositionWithLaterDecisionDateRecordsDutyAndKeepsQcHold. No native step was added.",
+   "s4-recall-07: RESOLVED. The per-investigation terminal-disjoint constraint (V31) and the investigation-wide partition check reject contradictory SAFE/CONSUMED_LOST over a v1 DISPOSED range (test disposalUnderEarlierVersionStaysDisposedAndBlocksContradictoryTerminalLabels).",
+   "s4-recall-08: RESOLVED. RecallCommands.java:45-46 returns HELD RECALL_PARTITION_CONFLICT for CONSUMED_LOST/EXCEPTION over recovered stock still held (RecallStockPrimitives.heldQuantity) and for RECOVERED over CONSUMED_LOST (test consumedLostOrExceptionOverStillHeldRecoveredRangeIsHeld).",
+   "s4-recall-09: RESOLVED. The same eventId is deduplicated (ReturnCommands.java:34 plus a V31 unique index), and already-received-range reports close via the duplicate path. That closure path has the new P2 described in new_findings.",
+   "s4-settle-00: RESOLVED. SettlementCommands.java:58 matches against recognizedQuantity and adds a cumulative per-kind line overlap check against ordered quantity (60+45 case: DIFFERENCE, qd 5; test excessReceiptIsBilledOnlyUpToRecognizedContribution).",
+   "s4-settle-01: RESOLVED. A single predicate, SettlementState.java:45, requires qd=0, remaining=0, no currency or scope difference and contribution CURRENT. It is shared by the resolver (SettlementResponsibilities.java:35) and getSettlement (test amountAdjustmentCannotResolveQuantityDifference).",
+   "s4-settle-02: PARTIAL; residual P2 is open. Reads, resolution and matching now re-derive the contribution (SettlementState.java:25,40), so getSettlement no longer shows SATISFIED. No SETTLEMENT_DIFFERENCE duty is opened at correction time (DeliveryCorrection.correctionImpact has no settlement hook; the worker requested this but it was not done). The new SETTLEMENT_DIFFERENCE_NOT_OPEN gate (SettlementCommands.java:65) also blocks every adjustment, so the difference stays ownerless and cannot be acted on (see new_findings).",
+   "s4-settle-03: RESOLVED. Zero-amount adjustments are rejected (SettlementCommands.java:65), and a quantity difference closes only by MANAGER waiver (SettlementState.java:45).",
+   "s4-settle-04: RESOLVED. Adjustments require a DIFFERENCE match with an OPEN duty (SettlementCommands.java:65).",
+   "s4-settle-05: RESOLVED. The fxSnapshot slot and the original must both be present or both absent (SettlementCommands.java:50), and the canonical INVOICE review holds an original snapshot (SettlementEvidence) (test fxSnapshotInOriginalCannotBeDroppedBySlot).",
+   "s4-settle-06: RESOLVED. relatedInvoiceId is required and attested (SettlementCommands.java:47). An owned review duty is opened, and the original's getSettlement lists corrections and is UNVERIFIED while that duty is open (test creditNoteKeepsOriginalUnverifiedWithOwnedReviewDuty).",
+   "s4-settle-07: RESOLVED. INVOICED records only the fresh non-overlapping recognized quantity, and nothing for DOMESTIC_TAX (SettlementCommands.java:63; INVOICED total 100 in the test).",
+   "s4-settle-08: RESOLVED. Same gate as s4-settle-04 (test resolvedDifferenceAcceptsNoFurtherAdjustment).",
+   "s4-settle-09: RESOLVED. SettlementState.contribution re-verifies the PURCHASE PHYSICAL_RECEIPT canonical (SettlementState.java:25) (test supersededReceiptChainUnverifiesSettlementAndBlocksMatchAndClosure).",
+   "s4-native-00: RESOLVED. e1-noun and e1-verb now assert sameSet workIds={WORK,SALES_WORK}, ledgerRows of the obligations and contributions against JDBC rows, ledgerOwners, bound humanDuties, and verb identity data.ID=$WORK (S4WorldOracle.java; e1-final.json).",
+   "s4-native-01: PARTIAL; residual P3. ReceiptCommands.java:58 re-reads custody from all verified chains on every confirm, so a slot-less duplicate confirm is now HELD EVIDENCE_CONFLICT. A conflicting chain linked after the first confirm still produces no duty or record until someone confirms again, and the custody-A segment stays fulfillable (requireWarehouse is unchanged).",
+   "s4-native-02: RESOLVED. API-level humanDuties with Work, subject and quantity binding and exact counts are applied to both e1-noun and e1-verb.",
+   "s4-native-03: RESOLVED (P3). humanDuties now requires {kind, where, count}, counts exactly, rejects unbound or duplicate duties of a listed kind, and rejects kind-only specs.",
+   "Declared NOT_FIXED unverified P3s are NOT_RESOLVED and non-blocking at P3: sales unverifiedP3-1 (a correction does not re-scope DELIVERY_RESTRICTION_RESPONSE), recall P3-1 (traceRecall leg authorization), native duplicate custody scenario B (custody cannot be attached after a slot-less first confirm), RECALL_INVESTIGATION closure path, and unidentified/unauthorized return intake (T18)."
+  ],
+  "p3": [
+   {
+    "severity": "P3",
+    "title": "Out-of-order partial delivery is moved in the ledger at the later leaf start, so asOf reads disagree and returns dated in the gap are rejected",
+    "file": "backend/src/main/java/com/mulino/domain/inventory/FulfillmentStockPrimitives.java",
+    "line": 53,
+    "failure_scenario": "1. Dispatch [0,30) at T1. Delivery A [0,20) occurs at T3 and is confirmed first. Delivery B [20,30) occurs at T2 and is confirmed later.\n2. B's customer-place segment gets validFrom T3, while the Delivery row says occurredAt T2.\n3. For asOf in [T2,T3), getDeliveries shows B but getInventory still shows the 10 in transit.\n4. A return of B's goods with occurredAt in [T2,T3) reaches ReturnStockPrimitives.receive, then replaceRange, then leaf(c,seg,at). That throws REJECTED REVISION_CONFLICT on every retry, the same permanent-rejection pattern s4-sales-07 removed for deliveries.",
+    "evidence": "FulfillmentStockPrimitives.java:53 sets `Instant transferAt=instant(selected.get(\"validFrom\")).isAfter(at)?instant(selected.get(\"validFrom\")):at` and uses it for transferRangeReleasingCustody, while DeliveryTransfers and Deliveries keep occurredAt=at. The s4h-sales README discloses the ledger timing.",
+    "fix": "Record the transfer from the ancestor leaf that was valid at `at` with true valid-time history, or give later consumers of that segment a reconciliation path for gap-dated facts."
+   },
+   {
+    "severity": "P3",
+    "title": "[residual s4-sales-04] Item-scope sale eligibility excludes outside-warehouse stock by a place-kind denylist over free-text Places.kind",
+    "file": "backend/src/main/java/com/mulino/application/quality/QualityEligibility.java",
+    "line": 63,
+    "failure_scenario": "A deployment models customer sites as Places.kind 'EXTERNAL_CUSTOMER', the vocabulary of the Step 2 V6/V7 fixtures, or any other non-listed kind. SalesCommands accepts any existing place as destinationId. After delivering 20, getObject or getWork at item scope again report the delivered 20 as eligible and unreserved, which is the s4-sales-04 defect. Write paths still reject it (requireWarehouse), so read and write disagree.",
+    "evidence": "QualityEligibility.java:63 is `OUTSIDE_WAREHOUSE=Set.of(\"TRANSIT\",\"CUSTOMER\",\"SUPPLIER\")`, and :71 skips only those kinds. SalesCommands.java:17 only checks that the destination place exists. No place-kind enumeration exists in the CDS, the migrations or contracts/domain-vocabulary.json. The verifier recommended excluding non-INTERNAL_STORAGE places or requiring internal custody.",
+    "fix": "Assess SELL eligibility only for INTERNAL_STORAGE segments with an internal custodian, the same predicate requireWarehouse uses, or enforce a closed Places.kind vocabulary."
+   },
+   {
+    "severity": "P3",
+    "title": "The dispatch continuous-authority check collects boundaries from every Restriction and DispositionBasis in the organization and rejects when there are more than 500",
+    "file": "backend/src/main/java/com/mulino/application/inventory/FulfillmentCommands.java",
+    "line": 55,
+    "failure_scenario": "In a busy organization, a truthful dispatch backdated by a day (occurredAt at or after the pick) collects every Restriction and DispositionBasis validFrom, validUntil and releasedAt boundary in (at, now], for any segment, controlScope or item. Past 500 instants the command returns REJECTED INSUFFICIENT_ELIGIBLE_QUANTITY 'too fragmented' even though the allocation's own authority was continuous. prepare also runs twice per command, each time doing two full assess calls per instant.",
+    "evidence": "FulfillmentCommands.java:55-58 loops `for(var row:r.rows(c,table))` over all Restrictions and DispositionBases without filtering by controlScope or segment, and has `if(checked.size()>500)throw new DomainError(\"REJECTED\",...)`.",
+    "fix": "Restrict candidate boundaries to rows whose controlScope or segment projects onto the allocation range, and to the item's lot, regulatory decisions and policy."
+   },
+   {
+    "severity": "P3",
+    "title": "Recall re-scope keeps the v1 RECALL_EXCLUDED_SCOPE duty OPEN over a range that is now inside the current scope",
+    "file": "backend/src/main/java/com/mulino/application/trade/recall/RecallCommands.java",
+    "line": 70,
+    "failure_scenario": "1. Investigation [0,60). v1 scope is [0,25), which opens an excluded-scope duty for [25,60).\n2. An ADMIN re-scopes v2 to [0,50) and records an EXCEPTION over [25,50), which carries its own residual duty.\n3. The v1 excluded-scope review for [25,60) stays OPEN, so [25,50) has both an 'excluded' review and an in-scope exception residual. The stale duty can only be waived by an ADMIN.",
+    "evidence": "openExcluded (RecallCommands.java:70) only prevents opening another excluded duty. Nothing narrows or retires the earlier version's excluded duty when a later version includes its range. rescopeAfterRecoveryCarriesPhysicalFactsAndClosesTruthfully asserts this state.",
+    "fix": "On re-scope, mark the part of an open earlier excluded-scope duty that the new version covers as superseded or invalid, through an audited duty re-scope."
+   }
+  ],
+  "verified": [
+   {
+    "kind": "NEW",
+    "severity": "P2",
+    "title": "Delivery timeliness is judged against the order revision current at confirmation, so a revision recorded after the delivery occurred rewrites past compliance",
+    "file": "backend/src/main/java/com/mulino/application/trade/sales/DeliveryCommands.java",
+    "line": 26,
+    "failure_scenario": "1. Order line v1 is 100 with dueAt T+100. Dispatch 30 at T; the allocation is CONSUMED.\n2. The carrier delivers at T+50, on time. The provisional observation is recorded at T+55.\n3. At T+60 the customer pulls the order's due date for the remaining 70 to T+40. reviseSalesOrder is APPLIED: no allocation is EXECUTABLE or SUSPENDED, and dueAt is not a preserved term.\n4. At T+70 the proof of delivery is verified and recordDelivery runs. sales.currentLine returns v2, and occurredAt T+50 is after v2's dueAt T+40, so legitimate=0 and legitimateRanges=[].\n5. Result: Work goal and invoice contribution are 0, and a DELIVERY_RESTRICTION_RESPONSE for 30 is opened. That duty kind has no resolve or waive path (ObligationClosureCatalog.java:48), so it blocks closeWork permanently.\n6. Confirming the same delivery at T+58, before the revision, would have recognized all 30. The outcome depends on confirmation order.\nMirror case: a late delivery at T+120 is followed by a retroactive extension to T+200 before confirmation. It is credited in full and the past violation disappears, although plan line 202 says a due-date change keeps 원 약속·현재 약속·과거 위반.",
+    "evidence": "DeliveryCommands.java:26 calls `var line=sales.currentLine(c,row.get(\"salesLineId\").toString())` and zeroes legitimate when occurredAt is after line.dueAt. SalesCommands.java:30 currentLine resolves the revision current at the caller's knownAt, not the revision in force at the delivery's occurredAt. SalesRows gives revisions effectiveAt equal to their recording time, so the in-force revision is derivable but unused. In the new test deliveryInsideAnAgreedDueDateExtensionCountsAndADeliveryAfterAShortenedDueDateDoesNot, both revisions are recorded before the delivery occurs, so this path is untested.",
+    "fix": "Judge the delivery against the order line in force at the delivery occurredAt: the latest revision with effectiveAt at or before occurredAt in the previousLineId chain. Record the current promise separately for history. Add a test where the revision is recorded after the occurrence but before confirmation, in both directions.",
+    "verdict": {
+     "index": 0,
+     "refuted": false,
+     "adjusted_severity": "P3",
+     "reasoning": "The scenario is reachable, so I could not refute it. DeliveryCommands.java:26 calls sales.currentLine. SalesCommands.java:30 resolves the revision through the mutable Orders.currentRevision pointer at confirmation time, not the revision in force at the delivery's occurredAt. reviseSalesOrder (SalesCommands.java:23) is blocked only by EXECUTABLE/SUSPENDED allocations or by changes to preserved terms. dueAt is not a preserved term, and valid() (line 18) has no future-date check. So a revision recorded between occurrence and confirmation decides whether legitimate is 30 or 0. Confirming before the revision gives a different, permanent result, because Delivery rows are never re-judged. The new test (FulfillmentPostgresTest:328) records both revisions before each delivery, so this order dependence is untested. It also contradicts D12 ('기한변경 후 위반 유지') and plan :144/:202. I downgrade to P3 for three reasons. (a) The harmful direction requires a sales user to enter a dueAt that is already in the past when the revision is recorded (T+40 entered at T+60). That is an unusual input, and the system is then applying the contract exactly as stated. (b) In the lenient direction, the past violation survives where the Work goal carries a dueAt: AssessmentService.java:37/92 recomputes the goal as of the GoalVersion dueAt using deliveries whose occurredAt is at or before that time, and deadlineViolated is sticky. (c) The trigger window is only the gap between POD occurrence and verification. The unclosable DELIVERY_RESTRICTION_RESPONSE is the existing fail-closed catalog design (ObligationClosureCatalog.java:48), not new behaviour. The fix direction (in-force-at-occurredAt revision via previousLineId/effectiveAt) is correct and cheap.",
+     "index_note": ""
+    }
+   },
+   {
+    "kind": "NEW",
+    "severity": "P2",
+    "title": "A second return report is closed as a duplicate against another observation's canonical receipt without verifying its own event, time or evidence",
+    "file": "backend/src/main/java/com/mulino/application/trade/TradeObservationRemedy.java",
+    "line": 19,
+    "failure_scenario": "1. Delivery of 30. Authorization A1 covers [0,10). Observation O1 (event E1) is confirmed with canonical C1, creating Receipt R1 for [0,10).\n2. The customer later ships 10 more boxes. Ops issue authorization A2. authorizeReturn does not subtract ranges already received, so A2 can again cover [0,10).\n3. An agent with only the receiveReturn RECORD capability records observation O2: a different eventId E2, occurredAt two weeks later, and the default range [0,10).\n4. The agent confirms receiveReturn{returnId:O2, canonicalOccurrenceId:C1}. existing=R1 overlaps. same() compares only range, delivery, customer, item, lot, unit and place, not occurredAt or event. The canonical equals R1's.\n5. requireCanonical verifies C1 against O1, not O2. r.confirmed(O2) runs, then reconcileDuplicateReturnObservation marks O2's RETURN_RECONCILIATION RESOLVED with basis VERIFIED_TRADE_OBSERVATION and evidence C1.\n6. Result: E2 was never matched or verified, the goods that physically arrived are in no ledger, and no duty remains.",
+    "evidence": "TradeObservationRemedy.java:19-29 checks only CONFIRMED state, subject keys and range, then calls service.applyTradeObservation with the prior receipt's canonical. Unlike apply(), it has no occurredAt equality check and no evidence binding O2's event to C1. ResponsibilityService.java:106 sets status RESOLVED with basis VERIFIED_TRADE_OBSERVATION. ReturnCommands.java:38-40 is the duplicate branch: it verifies the canonical against prior.observationId, then confirms the new observation. ObligationClosureCatalog.java:45 defines RETURN_RECONCILIATION closure as 'verified receiveReturn confirmation of the same observation'. Plan §6 line 208 keeps reconciliation responsibility when event linkage is unconfirmed. Test otherReportsOfReceivedReturnCloseAgainstTheOneReceipt confirms the second report with the first report's canonical.",
+    "fix": "Close a duplicate report only when its own event or claim has been reconciled to the same canonical through matchSourceIdentity/linkCanonicalOccurrence, and require an equal occurredAt. Otherwise keep the duty open, or close it with a typed human reconciliation or waiver decision.",
+    "verdict": {
+     "index": 1,
+     "refuted": false,
+     "adjusted_severity": "P2",
+     "reasoning": "Confirmed. In the duplicate branch (ReturnCommands.java:40), the canonical is verified only against the prior receipt's observation (prior.observationId). TradeObservationRemedy.reconcileDuplicateReturnObservation (lines 19-29) checks CONFIRMED state, subject keys and an exact range, then resolves the RETURN_RECONCILIATION duty through service.applyTradeObservation (basis VERIFIED_TRADE_OBSERVATION, ResponsibilityService:109). Unlike apply() (line 35) and the self/new branches (ReturnCommands:38/41, which check eventId against fact.occurrenceIdentity), it never checks occurredAt and never checks that O2's eventId is a chain of the canonical. Intake also never validates that eventId exists as an evidence Event (prepare only calls uuid(s,\"eventId\")). authorizeReturn (line 25) checks only that the range is inside the delivery, not against ranges already received, so a second authorization over [0,10) is accepted. The worker's own test (ReturnGatewayPostgresTest:179, the 'late' report under a new authorization) codifies exactly this path. If the second arrival is real goods booked against an already-returned range, a holder of the RECORD capability closes the only duty by citing another observation's canonical, and the goods sit outside any ledger with no owner. This contradicts plan §6 :208 (an unconfirmed event link keeps the reconciliation responsibility). The infrastructure for a proper link exists (matchSourceIdentity/linkCanonicalOccurrence in EvidenceReconciliationCommands), and the s4h-recall README says no waiver path exists for wrong return observations, so this branch is being used as an unverified closure path. Mitigation: it needs a mis-scoped manager authorization plus an agent choosing C1 (citing its own C2 is HELD), so P2 rather than P1."
+    }
+   },
+   {
+    "kind": "NEW",
+    "severity": "P2",
+    "title": "[residual s4-settle-02] A post-match delivery or receipt correction leaves an UNSATISFIED settlement with no duty, and the new NOT_OPEN gate blocks every adjustment",
+    "file": "backend/src/main/java/com/mulino/application/trade/settlement/SettlementCommands.java",
+    "line": 65,
+    "failure_scenario": "1. Sale line 100 at 1000 KRW. Delivery 100. The SALE invoice for 100 is matched as MATCHED, with no duty.\n2. A verified correction sets the delivery to 98. correctionImpact opens only DELIVERY_CORRECTED_DEFICIT 2.\n3. getSettlement now returns contributionState CHANGED, result UNSATISFIED, currentQuantityDifference 2.\n4. A MANAGER waives the deficit duty ('customer accepts 98').\n5. Result: no owner exists for the 2-unit / 2000 KRW overbilling, and nothing can act on it:\n   - recordSettlementAdjustment returns REJECTED SETTLEMENT_DIFFERENCE_NOT_OPEN, because dutyRootId is null.\n   - matchInvoice returns INVOICE_ALREADY_MATCHED.\n   - The settlement stays UNSATISFIED permanently.\nThe same happens to a DIFFERENCE match whose duty was RESOLVED before the correction, and to a PURCHASE match whose receipt chain is superseded (UNVERIFIED, no settlement duty).",
+    "evidence": "SettlementState.java:40-45 re-derives the contribution at read and closure time only. DeliveryCorrection.correctionImpact (DeliveryCorrection.java:27-37) never touches Matches or opens SETTLEMENT_DIFFERENCE. SettlementCommands.java:65 rejects adjustments unless the match is DIFFERENCE and state.open(dutyRootId) holds. The s4h-settle README lists this hook as an unfulfilled request to the sales owner. The verdict's narrowed claim was that 'the difference can be left with no owner'.",
+    "fix": "When a delivery correction or receipt-chain change alters the recognized contribution of a reference that has Matches, open a SETTLEMENT_DIFFERENCE duty keyed to the correction for each such Match, in the same transaction, and let adjustments and resolution target that duty. Add a SALE PostgreSQL test: match, correct to 98, waive the deficit, then expect an open settlement duty.",
+    "verdict": {
+     "index": 2,
+     "refuted": false,
+     "adjusted_severity": "P2",
+     "reasoning": "The scenario is reachable. DeliveryCorrection.correctionImpact (DeliveryCorrection.java:27-36) opens only DELIVERY_CORRECTED_DEFICIT and has no settlement hook (grep: SETTLEMENT_DIFFERENCE is created only at SettlementCommands:53/61). After a MANAGER waives the deficit, SettlementState.assess (lines 38-46) reports CHANGED/UNSATISFIED, and no OPEN duty owns the overbilling. Two parts of the claim are wrong, though. First, this is not a NEW defect: it is the residual of s4-settle-02, which the s4h-settle README declares open ('MATCHED 송장은 정정 뒤 owner 있는 정산 의무가 없다'). Second, the NOT_OPEN gate (SettlementCommands:65) is not causal. Even without it, an adjustment cannot make a CHANGED match SATISFIED (assess requires state CURRENT and the immutable qd==0), adjustments never create duties, and the gate is the correct fix for s4-settle-04/08. A CREDIT_NOTE related to the original opens a review duty (SettlementCommands:53), which gives a manual owner path, but that duty closes only by waiver and the original stays UNSATISFIED and ownerless afterwards. This is the same open P2 as claim 5; count it once."
+    }
+   },
+   {
+    "kind": "UNRESOLVED",
+    "claim": "s4-sales-04: PARTIAL. QualityEligibility.java:63,71 excludes segments at TRANSIT, CUSTOMER and SUPPLIER places from item-scope SELL eligibility, and native e1-noun-eligibility asserts 0. However, the exclusion is a denylist over the free-text Places.kind, and a sales destinationId may be a place of any kind (SalesCommands.java:17 only checks that it exists). Stock delivered to a place of any other kind (for example 'EXTERNAL_CUSTOMER', the customer place kind in the Step 2 V6/V7 fixtures) is again counted as unreserved SELL-eligible. The verifier recommended an INTERNAL_STORAGE/internal-custody allowlist. Residual is P3 because it depends on configuration. heldQuantity is unchanged; the verdict accepted that as debatable.",
+    "verdict": {
+     "index": 3,
+     "refuted": false,
+     "adjusted_severity": "P3",
+     "reasoning": "Confirmed as a residual. QualityEligibility.java:63/71 excludes stock using a denylist {TRANSIT, CUSTOMER, SUPPLIER} over Places.kind. Places.kind is unconstrained VARCHAR(40) (V5__inventory.sql:145, no CHECK), places are seeded rather than created through validated commands, and SalesCommands.valid (line 17) checks only that the destination exists. The repository's own Step 2 fixtures use the kinds EXTERNAL_CUSTOMER (102 occurrences) and INTERNAL_WAREHOUSE, so a delivered segment at an 'EXTERNAL_CUSTOMER' place would again count as unreserved SELL-eligible stock. Write paths still demand INTERNAL_STORAGE (FulfillmentCommands.requireWarehouse:68), so the E1 fixture (CUSTOMER) passes and there is no ledger effect. P3, depending on configuration. An allowlist matching requireWarehouse would close it."
+    }
+   },
+   {
+    "kind": "UNRESOLVED",
+    "claim": "s4-recall-05: PARTIAL. ADMIN gating now has a negative test (nonAdminCannotRecordExceptionOrCloseRecall, mutation-checked) and the closure-denial test uses a valid RECALL_CLOSURE canonical. The returnId recovery branch and the customer-leaf recovery path remain untested, as the worker declared (residual P3, coverage only).",
+    "verdict": {
+     "index": 4,
+     "refuted": false,
+     "adjusted_severity": "P3",
+     "reasoning": "Confirmed. nonAdminCannotRecordExceptionOrCloseRecall (RecallGatewayPostgresTest:103) adds the ADMIN negative oracle for both EXCEPTION and closeRecall, with FORBIDDEN and zero-effect checks, and the closure-denial test now uses a RECALL_CLOSURE canonical. A grep of the recall tests finds no use of the returnId slot for recordRecovery, and every recovery still starts from the warehouse root segment. The worker's README (line 38) states that the customer-leaf and returnId tests were not written. This was a coverage gap, not a product defect (per the original verdict), and the key parts are fixed. Residual P3."
+    }
+   },
+   {
+    "kind": "UNRESOLVED",
+    "claim": "s4-settle-02: PARTIAL; residual P2 is open. Reads, resolution and matching now re-derive the contribution (SettlementState.java:25,40), so getSettlement no longer shows SATISFIED. No SETTLEMENT_DIFFERENCE duty is opened at correction time (DeliveryCorrection.correctionImpact has no settlement hook; the worker requested this but it was not done). The new SETTLEMENT_DIFFERENCE_NOT_OPEN gate (SettlementCommands.java:65) also blocks every adjustment, so the difference stays ownerless and cannot be acted on (see new_findings).",
+    "verdict": {
+     "index": 5,
+     "refuted": false,
+     "adjusted_severity": "P2",
+     "reasoning": "Confirmed PARTIAL. The read side is fixed: SettlementState.assess (lines 38-46) re-derives the contribution, so getSettlement, resolution and matching report CHANGED/UNSATISFIED or UNVERIFIED instead of SATISFIED. The verifier's narrowed claim also covered 'the difference can be left with no owner', and that is still true. correctionImpact (DeliveryCorrection.java:27-36) opens no SETTLEMENT_DIFFERENCE, and the s4h-settle README lists the sales-side hook as an unfulfilled request. After the logistics deficit is waived, an UNSATISFIED settlement has no OPEN duty. This breaks the same invariant ('an unresolved settlement difference keeps an owned duty', plan §6 정산) that s4-settle-04/08 were accepted as P2 for. The residual stays P2. Claim 2 is the same defect."
+    }
+   },
+   {
+    "kind": "UNRESOLVED",
+    "claim": "s4-native-01: PARTIAL; residual P3. ReceiptCommands.java:58 re-reads custody from all verified chains on every confirm, so a slot-less duplicate confirm is now HELD EVIDENCE_CONFLICT. A conflicting chain linked after the first confirm still produces no duty or record until someone confirms again, and the custody-A segment stays fulfillable (requireWarehouse is unchanged).",
+    "verdict": {
+     "index": 6,
+     "refuted": false,
+     "adjusted_severity": "P3",
+     "reasoning": "Confirmed PARTIAL. ReceiptCommands.java:58 now reads custody statements from all verified chains on every confirm, and line 61 compares the duplicate source with the recorded segment custodian. A slot-less duplicate confirm is therefore HELD EVIDENCE_CONFLICT with no effect. Nothing re-checks custody when the evidence link is made (the README's cross-owner request to EvidenceReconciliation is not done), and requireWarehouse (FulfillmentCommands:68) still checks only for some internal custodian. So a segment recorded with custody A stays reservable and dispatchable while verified sources name {A,B}. One nuance: when source B was recorded as its own provisional observation, as in the verified scenario, its RECEIPT_RECONCILIATION duty stays OPEN because its confirm is now HELD. An owner therefore exists, and 'no duty' holds only for evidence linked without an observation. There is no double count, no authorization bypass, and linking requires a human MATCHED review. Residual P3."
+    }
+   },
+   {
+    "kind": "UNRESOLVED",
+    "claim": "Declared NOT_FIXED unverified P3s are NOT_RESOLVED and non-blocking at P3: sales unverifiedP3-1 (a correction does not re-scope DELIVERY_RESTRICTION_RESPONSE), recall P3-1 (traceRecall leg authorization), native duplicate custody scenario B (custody cannot be attached after a slot-less first confirm), RECALL_INVESTIGATION closure path, and unidentified/unauthorized return intake (T18).",
+    "verdict": {
+     "index": 7,
+     "refuted": false,
+     "adjusted_severity": "P3",
+     "reasoning": "Each item is real, and its README declares it not fixed. (1) Sales unverifiedP3-1: s4h-sales README:32 'NOT_FIXED'. correctionImpact still re-scopes only the deficit, so DELIVERY_RESTRICTION_RESPONSE keeps the stale quantity, but the duty exists. (2) Recall P3-1: RecallQueries authorizes LegEvents with the recall's ITEM/WORK (x.get(\"workId\")) while the other trace branches use the record's own workId. This is a same-organization read-scope leak limited to leg events of the recalled physical scope, with no write effect. (3) Native scenario B: README:39 NOT_FIXED. It fails closed as HELD with no wrong effect. (4) RECALL_INVESTIGATION: README:43 says the closure resolution is not done. The duty stays OPEN, and only an ADMIN waiver, which mislabels completion, closes it. (5) T18 unidentified/unauthorized return intake: README:130 lists it as remaining; the contract case is red. None of these rises above P3: none corrupts a ledger, bypasses a write authorization, or lets a duty vanish. All are NOT_RESOLVED and do not block at P3."
+    }
+   }
+  ]
+ },
+ {
+  "reviewer": "fable-low",
+  "verdict": "PASS",
+  "resolution": [
+   "s4-sales-00 (P1) RESOLVED — FulfillmentCommands.java:35 now calls requireContinuousAuthority (:53-62): occurrence < pickedAt is TYPE_INVALID; SELL and DISPATCH are re-assessed with a historical DomainContext at the occurrence instant and at every Restriction/DispositionBase validFrom/validUntil/releasedAt, LOT expiry and returned nextValidityBoundary up to now, REJECTED/INSUFFICIENT_ELIGIBLE_QUANTITY otherwise. Regression tests dispatchDatedInsideAnEarlierHoldWindowIsRejectedWithZeroEffect / dispatchSpanningAnUnsweptSaleBasisGap… (FulfillmentPostgresTest:302,…) assert zero ledger effect.",
+   "s4-sales-01 (P1) RESOLVED — FulfillmentStockPrimitives.java:44-46: legitimacy = SELL ∩ DISPATCH assessed for the order customer on the transit leaf at the delivery instant; DeliveryCommands.java:24 opens DELIVERY_RESTRICTION_RESPONSE for the violated remainder. Test postDispatchSellOnlyHoldMakesTheDeliveryAViolationWithResponseDuty (FulfillmentPostgresTest:294).",
+   "s4-sales-02 (P1) RESOLVED — same code path as s4-sales-01; post-dispatch SELL hold and SELL basis revocation covered by postDispatchSellBasisRevocationMakesTheDeliveryAViolationWithResponseDuty.",
+   "s4-sales-03 (P1) RESOLVED — DeliveryCorrection.java:19-27 replaces the high-water mark with covered(): only OPEN/WAIVED valid assignments cover [0,deficit); RESOLVED leaves do not; a new root keyed on the correcting canonical (sourceId=canonical) avoids dedupe onto the old RESOLVED root. Test correctedDeficitThatReemergesAfterItsRestorationResolutionGetsANewDuty asserts a second root, 1 OPEN duty of quantity 2 and HELD on stale resolution.",
+   "s4-sales-04 (P1) RESOLVED — QualityEligibility.java:62-75: segments at TRANSIT/CUSTOMER/SUPPLIER places are DENIED for SELL in item-scope reads; policy-unresolved reads return null/UNKNOWN. Native e1-noun-eligibility now asserts eligible 0 / unreserved 0 (author.py:160) and the suite passes. heldQuantity still includes customer-place stock; plan line 122 (현재 위치의 active physical segment 합산) and D05 (고객보관60→보유100) count customer-held stock in 보유량, so the unchanged held figure is not a defect.",
+   "s4-sales-05 (P2) RESOLVED — V30 adds Deliveries.legitimateRangesJson written at confirmation (DeliveryCommands.java:23, rangesJson); DeliveryCorrection.recognized() (:11) intersects stored coordinates with [start,start+q) and falls back to the conservative lower bound max(0, legit-(orig-q)) when coordinates are absent/inconsistent. Test correctionCreditsOnlyTheExactLegitimateCoordinatesOfTheCorrectedInterval asserts stored [20,30), credit 5 on a 25-correction.",
+   "s4-sales-06 (P2) RESOLVED — same root cause and fix as s4-sales-03.",
+   "s4-sales-07 (P2) PARTIAL (residual P3) — FulfillmentStockPrimitives.java:40-42 judges legitimacy on the leaf that held the range at the true occurrence time, and :51-52 transfers at the current leaf's validFrom so the out-of-order confirmation is no longer rejected; test partialDeliveriesConfirmedOutOfChronologicalOrderAreBothReconciled. Residual: the ledger child is dated at the later leaf start while Delivery/DeliveryTransfer keep the true time, so getInventory asOf between the two deliveries still shows the earlier-occurred range in transit (worker-declared).",
+   "s4-sales-08 (P2) RESOLVED — DeliveryCommands.java:22 judges destination/customer/dueAt against SalesCommands.currentLine (SalesCommands.java:30, current order revision at knownAt). Test deliveryInsideAnAgreedDueDateExtensionCountsAndADeliveryAfterAShortenedDueDateDoesNot.",
+   "s4-sales-09 (P2) RESOLVED — Observations, Deliveries and DeliveryCorrections rows now get effectiveAt = occurredAt (DeliveryCommands.java:19,23; DeliveryCorrection.java:16); SalesQueries.observations() (:20) projects CONFIRMED state only from Deliveries visible at knownAt. Test deliveryReadsUseOccurrenceTimeAndConfirmationVisibleOnlyFromItsKnownAt.",
+   "s4-sales-10 (P2) RESOLVED — FulfillmentCommands.java:29 authorizes the replaced allocation's segment scope (TARGET/ITEM/PLACE/WORK) on replace; :35 authorizes PLACE=[transit] on dispatch. Tests dispatchRequiresAuthorityOverTheTransitDestination, replaceAllocationRequiresAuthorityOverTheReplacedAllocationScope.",
+   "s4-sales-11 (P2) RESOLVED — same fix as s4-sales-08.",
+   "s4-sales-12 (P2) RESOLVED — same fix as s4-sales-09 (SalesQueries.java:14-20 valid-time axis is now occurrence time).",
+   "s4-sales-13 (P2) RESOLVED — same fix as s4-sales-03.",
+   "s4-sales-14 (P2) RESOLVED — same fix as s4-sales-03 (98→100 resolve→98 opens a new root; FulfillmentPostgresTest:335-343).",
+   "s4-recall-00 (P1) RESOLVED — V31 adds Actions.investigationId and re-keys recall_terminal_disjoint per investigation; RecallCommands.java:40-48 computes recovered/terminal/partition over all investigation facts clipped to the current scope (RecallPartition.clip :20-25), root re-recovery is CONFLICT/RECALL_RANGE_ALREADY_RECOVERED instead of an SQL error; closeRecall (:63-67) verifies each action's canonical against its own scopeId. Test rescopeAfterRecoveryCarriesPhysicalFactsAndClosesTruthfully.",
+   "s4-recall-01 (P1) RESOLVED — RecallCommands.java:46-47: DISPOSED now requires manager(c,\"disposeQuantity\",scopes): HUMAN recorder, disposeQuantity grant on every scope value and a current disposeQuantity ManagementAuthority covering the scope (ManagementCoverage.java:12-14), in addition to the exact ADMIN approval re-check. Test recallDisposalNeedsCurrentHumanManagerConfirmation; native E2 step e2-dispose25-without-manager-denied observed REJECTED/FORBIDDEN. Shape differs from the Step-2 dispositionBasisId contract (worker-declared), not a plan violation.",
+   "s4-recall-02 (P2) PARTIAL (residual P3) — ReturnCommands.java:23-26,72-73: provisional receiveReturn records the observed range (within the authorization) and defers authorization currency to confirmation; confirmation may cite a later covering authorization (:68); another report of an already-received range confirms against the one Receipt and closes its duty (:76-80, TradeObservationRemedy.java:22-34). Tests partialArrivalRecordsObservedQuantityAndClosesItsDuty, otherReportsOfReceivedReturnCloseAgainstTheOneReceipt, lateArrivalIsRecordedAndConfirmedOnlyUnderCurrentAuthorization. Residual: a provisional report whose range is simply wrong (e.g. 10 reported, 8 verified) still leaves a RETURN_RECONCILIATION duty with no waiver (ObligationClosureCatalog: autoClosure only); worker-declared.",
+   "s4-recall-03 (P2) RESOLVED — RecallQueries.java:15-21 known(): status/currentScopeId/revision/closedAt derived from immutable Scopes/Approvals/Closures visible at knownAt; view no longer requires the mutable pointer. Test historicalRecallReadsUseStateKnownAtThatTime (INVESTIGATING before scope, APPROVED/no closedAt before close). Investigations row itself remains mutable (P3-3 partial), reads no longer depend on it.",
+   "s4-recall-04 (P2) RESOLVED — ReturnCommands.manager/every/everyPermitted (:70-72, :77) and RecallCommands.manager (:73) check capability on every scope value and ManagementAuthority coverage of all values of a dimension (ManagementCoverage.java:12-14); receiving custodian re-check uses everyPermitted (:48). Test authorizingManagerIsRecheckedOnEveryPlaceOfTheReturn (PLACE C only → FORBIDDEN).",
+   "s4-recall-05 (P2) PARTIAL (residual P3) — nonAdminCannotRecordExceptionOrCloseRecall (RecallGatewayPostgresTest) asserts REJECTED/FORBIDDEN with 0 Actions/Closures for a second human operator, mutation-checked RED; the formerly vacuous closure-denial test now asserts RECALL_RESIDUAL_UNKNOWN with a valid RECALL_CLOSURE original. Customer-leaf and returnId recovery paths remain untested (worker-declared).",
+   "s4-recall-06 (P2) RESOLVED — ReturnEvidence.java:19-24: RETURN_DISPOSITION_* claims require a confirmed Receipt for the observation, use decisionId as occurrence identity and the decision occurredAt (≥ arrival, ≤ knownAt) as effectiveFrom; semantic hash includes decisionId/decidedAt. PG test dispositionWithLaterDecisionDateRecordsDutyAndKeepsQcHold exercises the full decide path (FORBIDDEN without QC authority, RETURN_RESALE duty, outbox, QC hold retained, pre-arrival decision rejected). No native step (declared).",
+   "s4-recall-07 (P2) RESOLVED — same fix as s4-recall-00; test disposalUnderEarlierVersionStaysDisposedAndBlocksContradictoryTerminalLabels (v2 SAFE/CONSUMED_LOST over v1 DISPOSED → HELD/RECALL_PARTITION_CONFLICT).",
+   "s4-recall-08 (P2) RESOLVED — RecallCommands.java:42-44: CONSUMED_LOST/EXCEPTION over a RECOVERED range still held in the ledger (RecallStockPrimitives.heldQuantity :31) and RECOVERED over CONSUMED_LOST are HELD/RECALL_PARTITION_CONFLICT. Test consumedLostOrExceptionOverStillHeldRecoveredRangeIsHeld.",
+   "s4-recall-09 (P2) RESOLVED — ReturnCommands.java:72: same eventId returns the existing observation, a different scope is CONFLICT; V31 unique (organizationId,eventId) on Observations; already-returned-range reports close against the receipt. Test sameReturnEventObservedTwiceCreatesOneObservationAndOneDuty.",
+   "s4-settle-00 (P1) RESOLVED — SettlementCommands.match (:62-66) compares against SettlementState.recognized(contribution) (recognizedQuantity = contributedQuantity, SettlementFactsAdapter.java:34,37) and flags line-cumulative overrun as scopeDifference; V32 relaxes quantity>=0 so a 0-recognized billing stays a DIFFERENCE with a duty. Test excessReceiptIsBilledOnlyUpToRecognizedContribution.",
+   "s4-settle-01 (P1) RESOLVED — SettlementState.assess (:30-45) is the single predicate: SATISFIED only with remaining 0, quantityDifference 0, no currency/scope difference and CURRENT contribution; SettlementResponsibilities.requireResolution (:26-28) HELDs otherwise. Test amountAdjustmentCannotResolveQuantityDifference (resolve HELD, duty OPEN, view UNSATISFIED).",
+   "s4-settle-02 (P2) PARTIAL (residual P3) — SettlementQueries.java:19 and the resolver re-derive the current recognized contribution at every read/closure (contributionState CURRENT/CHANGED/UNVERIFIED, currentQuantityDifference exposed); SettlementStateTest + supersededReceiptChainUnverifiesSettlementAndBlocksMatchAndClosure. Residual: a MATCHED invoice whose delivery/receipt is corrected afterwards gets no owned SETTLEMENT_DIFFERENCE duty (only the logistics DELIVERY_CORRECTED_DEFICIT / UNVERIFIED read); worker requested the hook from the sales owner.",
+   "s4-settle-03 (P2) RESOLVED — zero-amount adjustment is TYPE_INVALID (SettlementCommands.java:82); quantity difference never closes by amount (settle-01 predicate), only by decideQuantityDutyWaiver.",
+   "s4-settle-04 (P2) RESOLVED — SettlementCommands.adjustment (:81-82): PROPOSE/CONFIRM require match.status DIFFERENCE and an OPEN assignment of match.dutyRootId (SettlementState.open :48-50, Assignments are the ObligationReferences table updated in place), else REJECTED/SETTLEMENT_DIFFERENCE_NOT_OPEN (vocabulary added). Test resolvedDifferenceAcceptsNoFurtherAdjustment.",
+   "s4-settle-05 (P2) RESOLVED — SettlementCommands.java:47 holds when original.fxSnapshot presence differs from the slot; SettlementEvidence.java:23 holds canonical review when fxPair is null but original/payload carry a snapshot. Test fxSnapshotInOriginalCannotBeDroppedBySlot.",
+   "s4-settle-06 (P2) RESOLVED — relatedInvoiceId is mandatory for CREDIT_NOTE/CORRECTION and attested by the original (SettlementCommands.java:42-45); recording opens a SETTLEMENT_DIFFERENCE review duty with owner/nextAction/nextCheck (:52) that only the MANAGER waiver closes (SettlementResponsibilities.java:22); getSettlement of the original lists corrections/reviewDutyRootIds and reports UNVERIFIED while review is open (SettlementQueries.java:21-22). Test creditNoteKeepsOriginalUnverifiedWithOwnedReviewDuty.",
+   "s4-settle-07 (P2) RESOLVED — SettlementCommands.java:73-74 records INVOICED only for the fresh non-overlapping recognized quantity (min over reference and line) and never for DOMESTIC_TAX.",
+   "s4-settle-08 (P2) RESOLVED — same fix as s4-settle-04 (stale proposal confirm after RESOLVED is REJECTED; result stays SATISFIED/0).",
+   "s4-settle-09 (P2) RESOLVED — SettlementState.contribution (:19-23) re-verifies the PHYSICAL_RECEIPT canonical chain via TradeEvidence.requireCanonical for PURCHASE; a corrected source makes match HELD/EVIDENCE_UNVERIFIED, read UNVERIFIED, resolution HELD. Test supersededReceiptChainUnverifiesSettlementAndBlocksMatchAndClosure.",
+   "s4-native-00 (P2) RESOLVED (oracle) — NativeS4TradeMain.java:136-142 adds ledgerRows/sameSet/ledgerOwners operators implemented in S4WorldOracle.java; e1-noun/e1-verb are compared field-by-field with mulino_work_read_obligationreferences / workcontributions JDBC rows and workIds asserted as exactly {WORK,SALES_WORK} before the noun/verb parity check. ApplicationQueries unchanged (verifier already judged the product side non-defective).",
+   "s4-native-01 (P2) RESOLVED — ReceiptCommands.java:55-59: every confirm (with or without slot, duplicate or first) collects custodians from all VERIFIED chains (evidencedCustodians :76-87); >1 custodian is HELD/EVIDENCE_CONFLICT; a duplicate source whose named custodian differs from the segment custodian is HELD. Tests secondVerifiedSourceNamingAnotherCustodianHoldsEveryConfirmWithoutEffect, conflictingCustodySourcesLinkedBeforeFirstConfirmCreateNoStock (RED on old code).",
+   "s4-native-02 (P2) RESOLVED — same oracle fix as s4-native-00; humanDuties (bound to Work/subject/quantity, exact counts, human owner, nextAction/nextCheck) applied to both e1-noun and e1-verb API responses (author.py).",
+   "s4-native-03 (P3) RESOLVED (oracle) / NOT_A_DEFECT (product) — S4WorldOracle.humanDuties (:33-50) rejects kind-only specs, binds each duty by where-clause with exact count and fails on unbound/duplicate open duties of a listed kind; C1 binds to the revoked basis, C4 to the delivery deficit, E2 to the residual duty. S4WorldOracleTest shows RED on the previous flow JSON.",
+   "Worker-declared NOT_FIXED — unverifiedP3-1 (DELIVERY_RESTRICTION_RESPONSE not re-scoped on correction): NOT_RESOLVED, P3. DELIVERY_RESTRICTION_RESPONSE has no resolution/waiver (ObligationClosureCatalog) so the stale quantity stays an open human duty; fail-closed over-obligation, no lost duty or wrong effect.",
+   "Worker-declared NOT_FIXED — recall P3-1 (traceRecall leg events authorized with the investigation's WORK): NOT_RESOLVED, P3. RecallQueries.java:22 filters mulino.trade.shipment.LegEvents with WORK=[x.workId] (recall work) instead of the shipment's work; a reader holding the recall Work scope sees leg events of shipments whose work scope they lack. Read-side scope leak, no write effect.",
+   "Worker-declared NOT_FIXED — duplicate custody scenario B (first confirm omits slot, custody cannot be attached later): NOT_RESOLVED, P3. Still HELD/EVIDENCE_UNVERIFIED on a later slot (ReceiptCommands.java:59 duplicate branch requires named=={recorded}); fail-closed, no wrong custody is written."
+  ],
+  "p3": [
+   {
+    "severity": "P3",
+    "title": "Backdated dispatch is rejected outright once the org has >500 authority boundaries after the occurrence time",
+    "file": "backend/src/main/java/com/mulino/application/inventory/FulfillmentCommands.java",
+    "line": 58,
+    "failure_scenario": "requireContinuousAuthority adds validFrom/validUntil/releasedAt of every Restrictions and DispositionBases row in the organization (not only those touching the segment/item) that falls in (occurredAt, now]. In an organization with more than 500 such instants since the dispatch occurrence (a few days of QC activity on unrelated items), every dispatch with a past occurredAt is REJECTED/INSUFFICIENT_ELIGIBLE_QUANTITY 'history too fragmented' even though the allocation was continuously eligible.",
+    "evidence": "FulfillmentCommands.java:57-58: `for(String table:List.of(\"Restrictions\",\"DispositionBases\"))for(var row:r.rows(c,table)){add.accept(row.get(\"validFrom\"));…}` with no segment/item/controlScope filter, and `if(checked.size()>500)throw new DomainError(\"REJECTED\",\"INSUFFICIENT_ELIGIBLE_QUANTITY\",…)`.",
+    "fix": "Filter boundary rows to those that can project onto the segment (same controlScope/item/genealogy ancestors) before collecting instants, or rely solely on QualityEligibility.nextValidityBoundary iteration; keep the cap as a last resort."
+   },
+   {
+    "severity": "P3",
+    "title": "Out-of-order partial delivery reintroduces the asOf disagreement between Delivery and inventory for that case",
+    "file": "backend/src/main/java/com/mulino/domain/inventory/FulfillmentStockPrimitives.java",
+    "line": 51,
+    "failure_scenario": "Dispatch 30 at T1; delivery A [0,20) occurred T3 confirmed first; delivery B [20,30) occurred T2<T3 confirmed later. Delivery/DeliveryTransfer rows carry T2 but the customer-place segment gets validFrom=T3 (transferAt = leaf validFrom). getDeliveries asOf in [T2,T3) returns B as delivered while getInventory at the same asOf shows [20,30) still in transit (the s4-sales-09/12 disagreement, now limited to this path).",
+    "evidence": "FulfillmentStockPrimitives.java:51: `Instant transferAt=instant(selected.get(\"validFrom\")).isAfter(at)?instant(selected.get(\"validFrom\")):at;` while :52 inserts DeliveryTransfers with occurredAt=at. Worker README s4-sales-07 declares this limitation.",
+    "fix": "Record the genealogy child with validFrom=at and let replaceRange accept a child earlier than the current leaf when the leaf was itself created by a later-dated sibling delivery, or surface an explicit unknown ('LEDGER_DATED_AT_LEAF_START') on inventory reads for that range."
+   },
+   {
+    "severity": "P3",
+    "title": "RECOVERED prerequisites and conflicts for recall processing span all investigations on the same root segment",
+    "file": "backend/src/main/java/com/mulino/application/trade/recall/RecallCommands.java",
+    "line": 123,
+    "failure_scenario": "Two investigations A and B on the same root segment: A records RECOVERED [0,25). Under B (its own ADMIN approval), DISPOSED [0,25) is accepted because recoveredOnRoot is computed from all Actions on the root regardless of investigationId, and B's own RECOVERED [0,25) is refused with RECALL_RANGE_ALREADY_RECOVERED. B's closure partition then counts a DISPOSED whose recovery fact belongs to A.",
+    "evidence": "RecallCommands.java:123 `var recoveredOnRoot=existing.stream().filter(x->\"RECOVERED\".equals(x.get(\"kind\"))&&root.equals(x.get(\"rootSegmentId\"))).toList();` and :147 `var recovered=recoveredOnRoot…` used for the DISPOSED prerequisite; `facts` (per investigation) is used only for the terminal partition.",
+    "fix": "Use investigation-scoped RECOVERED facts for the DISPOSED prerequisite, and make the root-wide check a distinct CONFLICT that names the other investigation."
+   },
+   {
+    "severity": "P3",
+    "title": "CONSUMED_LOST/EXCEPTION over stock that never left the warehouse is still accepted while the ledger holds it",
+    "file": "backend/src/main/java/com/mulino/application/trade/recall/RecallCommands.java",
+    "line": 126,
+    "failure_scenario": "Investigation opened on a warehouse segment (no dispatch). An actor records CONSUMED_LOST [0,25) with a verified RECALL_CONSUMED_LOST canonical. recoveredOverlap is empty (no RECOVERED action), so the heldQuantity guard never runs; the closure partition reports 25 consumed/lost while QuantitySegments still hold those 25 units under the recall restriction.",
+    "evidence": "RecallCommands.java:126: `if(Set.of(\"CONSUMED_LOST\",\"EXCEPTION\").contains(kind))for(var held:recoveredOverlap)if(stock.heldQuantity(…)>0)throw …` — the held-stock check is only applied to ranges that have a RECOVERED action.",
+    "fix": "Apply heldQuantity(root, start, q) to the whole CONSUMED_LOST/EXCEPTION range, not only to the RECOVERED overlap."
+   },
+   {
+    "severity": "P3",
+    "title": "Duplicate return observation is closed by citing another observation's canonical without verifying its own evidence",
+    "file": "backend/src/main/java/com/mulino/application/trade/returns/ReturnCommands.java",
+    "line": 280,
+    "failure_scenario": "O1 confirmed as Receipt R1 for [0,10). A second provisional observation O2 (new eventId, same range) is recorded. The RECORD actor confirms O2 passing R1's canonicalOccurrenceId: requireCanonical is run against O1's scope, O2 is marked CONFIRMED and its RETURN_RECONCILIATION duty resolves, although no verified source was ever linked to O2. Any same-range provisional report can thus be closed by reference alone; O2 is CONFIRMED with no Receipt and ReturnQueries still reports it PROVISIONAL (worker-declared).",
+    "evidence": "ReturnCommands.java:280: `evidence.requireCanonical(c,canonical,\"RETURN_RECEIPT\",prior.get(\"itemId\")…,prior.get(\"observationId\")…);r.confirmed(c,t.get(\"ID\")…);remedy.reconcileDuplicateReturnObservation(…)` — physicalScopeId checked is prior.observationId, not t.ID.",
+    "fix": "Require a verified chain whose physical scope is O2 (or an explicit DUPLICATE_REPORT reconciliation decision) before closing O2's duty, and project O2 as DUPLICATE_OF R1 in ReturnQueries."
+   },
+   {
+    "severity": "P3",
+    "title": "ManagementCoverage accepts authority that fully covers any single dimension, regardless of the others",
+    "file": "backend/src/main/java/com/mulino/application/trade/recall/ManagementCoverage.java",
+    "line": 14,
+    "failure_scenario": "authorizeReturn/decideReturnDisposition/approveRecall/disposeQuantity with scopes {ITEM:[P], PLACE:[C,W], WORK:[w]}: a manager whose only ManagementAuthority row is ITEM=P passes coverage even though no PLACE value is covered, because covers() returns true when the values of any one dimension are all matched.",
+    "evidence": "ManagementCoverage.java:14: `return scopes.entrySet().stream().anyMatch(d->!d.getValue().isEmpty()&&d.getValue().stream().allMatch(v->rows.stream().anyMatch(…)));`",
+    "fix": "Document that a ManagementAuthority row is dimension-wide authority (ITEM-wide covers all places) or, if per-value authority on every dimension is intended by plan §7.1, require coverage of every dimension present in the scope map."
+   }
+  ],
+  "verified": [
+   {
+    "kind": "UNRESOLVED",
+    "claim": "s4-sales-07 (P2) PARTIAL (residual P3) — FulfillmentStockPrimitives.java:40-42 judges legitimacy on the leaf that held the range at the true occurrence time, and :51-52 transfers at the current leaf's validFrom so the out-of-order confirmation is no longer rejected; test partialDeliveriesConfirmedOutOfChronologicalOrderAreBothReconciled. Residual: the ledger child is dated at the later leaf start while Delivery/DeliveryTransfer keep the true time, so getInventory asOf between the two deliveries still shows the earlier-occurred range in transit (worker-declared).",
+    "verdict": {
+     "index": 0,
+     "refuted": false,
+     "adjusted_severity": "P3",
+     "reasoning": "Checked at the 7e6c7e00 tree. FulfillmentStockPrimitives.java:42-43 picks the transit leaf that held the range at `at` for the SELL∩DISPATCH legitimacy check. :53 sets transferAt=max(at, selected.validFrom), and :55 keeps DeliveryTransfers.occurredAt=at. So the out-of-order confirmation is no longer rejected. Test FulfillmentPostgresTest:321 confirms A[0,20)@t0+20 first, then B[20,30)@t0+10, and asserts transit 0, customer 30, Delivery occurredAt t0+10 and no open reconciliation or restriction duty, so the main P2 is fixed. The residual is real. StockPrimitives.replaceRange retires the parent at `at`: when A is confirmed the original [0,30) leaf gets retiredAt=T3, and B's customer child is created at validFrom=T3. InventoryQueries.java:125 shows segments by validFrom/retiredAt against asOf. An asOf between T2 and T3 therefore shows 30 units in transit and 0 at the customer, but the true state is 20 in transit and 10 delivered. The ledger movement time also disagrees with Delivery.occurredAt (D06). The original reviewer's suggested fix (max(at, leaf.validFrom)) accepts this trade-off. Only a historical read is wrong; no current quantity, duty or effect is affected, so P3."
+    }
+   },
+   {
+    "kind": "UNRESOLVED",
+    "claim": "s4-recall-02 (P2) PARTIAL (residual P3) — ReturnCommands.java:23-26,72-73: provisional receiveReturn records the observed range (within the authorization) and defers authorization currency to confirmation; confirmation may cite a later covering authorization (:68); another report of an already-received range confirms against the one Receipt and closes its duty (:76-80, TradeObservationRemedy.java:22-34). Tests partialArrivalRecordsObservedQuantityAndClosesItsDuty, otherReportsOfReceivedReturnCloseAgainstTheOneReceipt, lateArrivalIsRecordedAndConfirmedOnlyUnderCurrentAuthorization. Residual: a provisional report whose range is simply wrong (e.g. 10 reported, 8 verified) still leaves a RETURN_RECONCILIATION duty with no waiver (ObligationClosureCatalog: autoClosure only); worker-declared.",
+    "verdict": {
+     "index": 1,
+     "refuted": false,
+     "adjusted_severity": "P3",
+     "reasoning": "Fixed parts confirmed. ReturnCommands.java:23 lets a provisional report carry startQuantity/quantity/unit. :27 checks authorization currency only at confirmation. :68 lets confirmation use a later covering authorization. :37-40 plus TradeObservationRemedy.java:19-29 close a duplicate report's duty against the single Receipt. The residual is real. Confirmation requires the canonical's quantity and range to equal the observation (:38/:41 requireCanonical with t.quantity). The duplicate path requires same(t,prior) on an exact range (:37), otherwise it returns HELD EVIDENCE_CONFLICT. ObligationClosureCatalog.java:45 gives RETURN_RECONCILIATION only an autoClosure, with no resolution and no waiver. So a provisional report of 10 whose verified evidence says 8 can never be confirmed, linked or waived, and its OPEN duty blocks closeWork (ResponsibilityService.requireSettled) until it is transferred. It is reachable without a miscount: observed() at :70 defaults to the full authorization range when the quantity slots are omitted. I kept P3 rather than P2 because an accurate count now avoids the dead end, nothing is double-counted and no stock is created, the duty keeps a human owner, and S3 RECEIPT_RECONCILIATION has the same exact-match-or-nothing design. The worker declares this gap."
+    }
+   },
+   {
+    "kind": "UNRESOLVED",
+    "claim": "s4-recall-05 (P2) PARTIAL (residual P3) — nonAdminCannotRecordExceptionOrCloseRecall (RecallGatewayPostgresTest) asserts REJECTED/FORBIDDEN with 0 Actions/Closures for a second human operator, mutation-checked RED; the formerly vacuous closure-denial test now asserts RECALL_RESIDUAL_UNKNOWN with a valid RECALL_CLOSURE original. Customer-leaf and returnId recovery paths remain untested (worker-declared).",
+    "verdict": {
+     "index": 2,
+     "refuted": false,
+     "adjusted_severity": "P3",
+     "reasoning": "RecallGatewayPostgresTest nonAdminCannotRecordExceptionOrCloseRecall is not vacuous. The operator() fixture grants the operator every recall capability plus disposeQuantity, so the FORBIDDEN can only come from admin(). The test asserts zero Actions, zero RECALL_EXCEPTION_RESIDUAL duties and zero Closures. The worker reports the test went RED under each admin() deletion mutation. exact25RecoveredThenSame25DisposedLeavesUnknown25AndCannotClose (:44) now builds a valid CLOSURE proof and asserts HELD/RECALL_RESIDUAL_UNKNOWN with zero closures. The residual is real. grep finds no recordRecovery with returnId in the backend tests, and every recordRecovery in e2-flow.json uses rootSegmentId=$e2-receipt60.segment with currentPlaceId=$W. So recovery from a customer/delivered leaf and the returnId branch have no coverage. This is a coverage gap, not a known product defect, so P3."
+    }
+   },
+   {
+    "kind": "UNRESOLVED",
+    "claim": "s4-settle-02 (P2) PARTIAL (residual P3) — SettlementQueries.java:19 and the resolver re-derive the current recognized contribution at every read/closure (contributionState CURRENT/CHANGED/UNVERIFIED, currentQuantityDifference exposed); SettlementStateTest + supersededReceiptChainUnverifiesSettlementAndBlocksMatchAndClosure. Residual: a MATCHED invoice whose delivery/receipt is corrected afterwards gets no owned SETTLEMENT_DIFFERENCE duty (only the logistics DELIVERY_CORRECTED_DEFICIT / UNVERIFIED read); worker requested the hook from the sales owner.",
+    "verdict": {
+     "index": 3,
+     "refuted": false,
+     "adjusted_severity": "P3",
+     "reasoning": "SettlementQueries.java:20 calls SettlementState.assess. SettlementState.java:38 re-derives the recognized contribution on every call, and :45-46 return CHANGED→UNSATISFIED or UNVERIFIED, so the stale-SATISFIED read is fixed. For SALE, SettlementFactsAdapter:34 uses DeliveryCorrection.deliveryCredit, which returns the latest correction's legitimateQuantity, so a corrected delivery now shows the change. The residual is real. grep finds SETTLEMENT_DIFFERENCE only in the settlement package and the catalog, and DeliveryCorrection.correctionImpact (:27-36) opens only DELIVERY_CORRECTED_DEFICIT. A MATCHED invoice whose delivery is corrected afterwards therefore gets no owned settlement duty. Per the s4h-settle record, adjustments need DIFFERENCE status and an OPEN SETTLEMENT_DIFFERENCE duty, so this UNSATISFIED match has neither an owner nor a closure path once the logistics deficit is waived. That falls short of §6 and E1, which expect an owned settlement duty. The wrong result itself is fixed and the difference is visible in the read, so P3; the worker declares this and requests the sales-side hook."
+    }
+   },
+   {
+    "kind": "UNRESOLVED",
+    "claim": "Worker-declared NOT_FIXED — unverifiedP3-1 (DELIVERY_RESTRICTION_RESPONSE not re-scoped on correction): NOT_RESOLVED, P3. DELIVERY_RESTRICTION_RESPONSE has no resolution/waiver (ObligationClosureCatalog) so the stale quantity stays an open human duty; fail-closed over-obligation, no lost duty or wrong effect.",
+    "verdict": {
+     "index": 4,
+     "refuted": false,
+     "adjusted_severity": "P3",
+     "reasoning": "DeliveryCommands.java:27 opens DELIVERY_RESTRICTION_RESPONSE with quantity violated=quantity−legitimate. DeliveryCorrection.correctionImpact (:27-36) inserts the correction, marks invalidation and opens only DELIVERY_CORRECTED_DEFICIT for (d.legitimateQuantity − recognized). It never re-scopes the restriction-response duty. With delivery 30, legitimate 0 and a correction to 28, the response duty stays at 30 and deficit=0, so the 2-unit physical shortfall gets no duty either. ObligationClosureCatalog.java:48 gives the kind no resolution or waiver, so the duty is fail-closed. The stale quantity over-states the obligation but loses no duty and causes no wrong effect. This contradicts the §4.3 re-evaluation rule only mildly. P3, and the worker declares it NOT_FIXED."
+    }
+   },
+   {
+    "kind": "UNRESOLVED",
+    "claim": "Worker-declared NOT_FIXED — recall P3-1 (traceRecall leg events authorized with the investigation's WORK): NOT_RESOLVED, P3. RecallQueries.java:22 filters mulino.trade.shipment.LegEvents with WORK=[x.workId] (recall work) instead of the shipment's work; a reader holding the recall Work scope sees leg events of shipments whose work scope they lack. Read-side scope leak, no write effect.",
+    "verdict": {
+     "index": 5,
+     "refuted": false,
+     "adjusted_severity": "P3",
+     "reasoning": "RecallQueries.java:24 authorizes the LegEvents branch with WORK=x.get(\"workId\") and ITEM=x.get(\"itemId\"), where x is the investigation or scope row. The deliveries, dispatches, returns and receipts branches on the same line use each record's own workId. IdentityAuthorization.java:77-78 checks only the dimensions a grant restricts. A reader whose grant restricts WORK to the recall work (plus item and place) therefore passes for leg events of a purchase or shipment Work they cannot read directly. This is a real read-scope inconsistency with no write effect, and the leaked data is limited to leg events of the connected physical range. P3, and the worker declares it NOT_FIXED."
+    }
+   },
+   {
+    "kind": "UNRESOLVED",
+    "claim": "Worker-declared NOT_FIXED — duplicate custody scenario B (first confirm omits slot, custody cannot be attached later): NOT_RESOLVED, P3. Still HELD/EVIDENCE_UNVERIFIED on a later slot (ReceiptCommands.java:59 duplicate branch requires named=={recorded}); fail-closed, no wrong custody is written.",
+    "verdict": {
+     "index": 6,
+     "refuted": false,
+     "adjusted_severity": "P3",
+     "reasoning": "ReceiptCommands.java:59 records custody only when the slot is present. A first confirm without the slot creates the segment with custodianId=null even if the verified evidence names S, because named={S} does not trigger the throw at :58. A later confirm of a duplicate source carrying slot S reaches :61, where `custodian!=null&&!custodian.equals(recorded)` (S vs null) returns HELD EVIDENCE_CONFLICT. No command can attach custody later: the only custody-assigning transferRange callers are return and recall, and no capability records custody. FulfillmentCommands.java:68 requireWarehouse needs an internal custodian, so the received stock stays unreservable. This is fail-closed and writes no wrong custody; it is triggered by an operator omitting the slot. P3, and the worker declares it NOT_FIXED."
+    }
+   }
+  ]
+ }
+]
