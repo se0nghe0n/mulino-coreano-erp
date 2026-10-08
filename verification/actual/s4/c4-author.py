@@ -3,7 +3,8 @@
 import copy,json,pathlib,re,uuid
 D=pathlib.Path(__file__).resolve().parent
 T='2026-10-07T09:00:02Z'; N='2026-10-08T09:00:00Z'
-def write(name,obj): (D/name).write_text(json.dumps(obj,ensure_ascii=False,indent=2)+'\n')
+import sys;sys.path.insert(0,str(pathlib.Path(__file__).resolve().parent));import subjects
+def write(name,obj): (D/name).write_text(json.dumps(subjects.declare(obj),ensure_ascii=False,indent=2)+'\n')
 def declare_capabilities(definition):
  # A verb without its pinned capability makes the whole definition non-VALID
  # (plan §8); the product then HOLDs every goal pinned to it.

@@ -3,8 +3,9 @@
 import copy,json,pathlib,uuid
 OUT=pathlib.Path(__file__).resolve().parent
 T='2026-10-07T09:00:02Z'; NEXT='2026-10-08T09:00:00Z'; UNTIL='2026-10-31T00:00:00Z'
+import sys;sys.path.insert(0,str(pathlib.Path(__file__).resolve().parent));import subjects
 def load(name):return json.loads((OUT/name).read_text())
-def write(name,obj):(OUT/name).write_text(json.dumps(obj,ensure_ascii=False,indent=2)+'\n')
+def write(name,obj):(OUT/name).write_text(json.dumps(subjects.declare(obj),ensure_ascii=False,indent=2)+'\n')
 def declare_capabilities(definition):
  # A verb without its pinned capability makes the whole definition non-VALID
  # (plan §8); the product then HOLDs every goal pinned to it.
@@ -48,6 +49,9 @@ fixture['aliases']['RECALL_ADMIN']={'type':'ManagementAuthority','actorAlias':'s
 # E2's own SELL/DISPATCH regulator originals use these namespaces below.
 fixture['aliases']['REGPOL']['sourceNamespace']='native-s4-e2-sell-regulator'
 fixture['aliases']['REGDISPATCH']['sourceNamespace']='native-s4-e2-dispatch-regulator'
+# Recall evidence originals are claimed against the RecallScope noun.
+for noun in ['Recall','RecallScope']:
+ if noun not in {n['name'] for n in fixture['aliases']['DEF']['content']['nouns']}:fixture['aliases']['DEF']['content']['nouns'].append({'name':noun,'core':True})
 declare_capabilities(fixture['aliases']['DEF']['content'])
 write('e2-fixture.json',fixture)
 a=[{'id':'e2-setup','type':'setup','fixtureRef':'verification/actual/s4/e2-fixture.json','organizationAlias':'ORG'}]

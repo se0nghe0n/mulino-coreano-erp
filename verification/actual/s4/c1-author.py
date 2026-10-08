@@ -12,7 +12,8 @@ import copy,json,pathlib,re,uuid
 D=pathlib.Path(__file__).resolve().parent
 T='2026-10-07T09:00:02Z';N='2026-10-08T09:00:00Z';UNTIL='2026-10-31T00:00:00Z'
 SEG='$c1-receipt60.segment'
-def write(name,obj):(D/name).write_text(json.dumps(obj,ensure_ascii=False,indent=2)+'\n')
+import sys;sys.path.insert(0,str(pathlib.Path(__file__).resolve().parent));import subjects
+def write(name,obj):(D/name).write_text(json.dumps(subjects.declare(obj),ensure_ascii=False,indent=2)+'\n')
 def cmd(i,cap,slots,rev=0,bind=None,intent='COMMAND',outcome='APPLIED',actor=None,assertions=None,refs=None):
  a=dict(id=i,type='command',capability=cap,request=dict(intentKind=intent,definitionVersion='definition-v1',capabilityId=cap,expectedRevision=rev,commandIdempotencyKey=i,slots=slots,provenance={},subjectRefs=refs or [dict(type='Work',id='$SALES_WORK')]),outcome=outcome)
  if bind:a['bind']=bind

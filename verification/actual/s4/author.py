@@ -4,7 +4,8 @@ import copy,json,pathlib,uuid
 root=pathlib.Path(__file__).resolve().parents[3]
 out=root/'verification/actual/s4'
 T='2026-10-07T09:00:02Z';NEXT='2026-10-08T09:00:00Z'
-def write(name,value): (out/name).write_text(json.dumps(value,ensure_ascii=False,indent=2)+'\n')
+import sys;sys.path.insert(0,str(pathlib.Path(__file__).resolve().parent));import subjects
+def write(name,value): (out/name).write_text(json.dumps(subjects.declare(value),ensure_ascii=False,indent=2)+'\n')
 def declare_capabilities(definition):
  # A verb without its pinned capability makes the whole definition non-VALID
  # (plan §8); the product then HOLDs every goal pinned to it.
@@ -42,7 +43,7 @@ for actor in fixture['actors'].values():
 for cap,cls in classes.items():
  fixture['aliases']['CPOL']['content']['rules'][cap]={'effectClass':cls}
  if cap not in {v['name'] for v in fixture['aliases']['DEF']['content']['verbs']}:fixture['aliases']['DEF']['content']['verbs'].append({'name':cap,'intentKind':'RECORD' if cap in ['recordDelivery','recordObservedMovement','receiveReturn','recordInvoice'] else 'COMMAND','capabilityId':cap,'stage':'DRAFT','slots':{}})
-for noun in ['SalesOrder','SalesOrderLine','DeliveryObservation','Delivery','Return']:
+for noun in ['SalesOrder','SalesOrderLine','DeliveryObservation','Delivery','Return','Invoice']:
  if noun not in {n['name'] for n in fixture['aliases']['DEF']['content']['nouns']}:fixture['aliases']['DEF']['content']['nouns'].append({'name':noun,'core':True})
 fixture['aliases']['RETURN_AUTH']={'type':'ManagementAuthority','actorAlias':'supervisor','capabilityId':'authorizeReturn','validFrom':'2026-10-01T00:00:00Z','validUntil':'2026-10-31T23:59:59Z'}
 fixture['aliases']['DEF']['content']['attributes'].append({'nounType':'Delivery','name':'quantity','type':'DECIMAL','referenceType':None,'unit':'BOX','decimalPlaces':0,'minimumCount':1,'maximumCount':1,'requiredStage':'READ','core':True}) if not any(x['nounType']=='Delivery' and x['name']=='quantity' for x in fixture['aliases']['DEF']['content']['attributes']) else None
@@ -86,7 +87,7 @@ a += [command('e1-delivery-confirm','recordDelivery',{'observationId':'$DELIVERY
  {'id':'e1-delivery-revision','type':'query','capability':'getObject','request':{'id':'$DELIVERY','scope':{'organizationId':'$ORG','objectType':'Delivery'},'asOf':T,'knownAt':T},'bind':{'DELIVERY_REV':'/data/revision'}},
  command('e1-return-authorize10','authorizeReturn',{'deliveryId':'$DELIVERY','startQuantity':'0','quantity':'10','unit':'BOX','destinationId':'$W','validUntil':'2026-10-31T00:00:00Z','reason':'실제 고객 반품10 접수'},actor='supervisor',revision='$DELIVERY_REV',refs=[{'type':'Work','id':'$SALES_WORK'}],bind={'RETURN_AUTHORIZATION':'/effects/authorizationId'}),
  {'id':'RETURN_EVENT','type':'uuid','alias':'RETURN_EVENT'},
- command('e1-return-intake10','receiveReturn',{'authorizationId':'$RETURN_AUTHORIZATION','eventId':'$RETURN_EVENT','occurredAt':T,'nextCheckAt':NEXT},intent='RECORD',bind={'RETURN':'/effects/returnId'})]
+ command('e1-return-intake10','receiveReturn',{'authorizationId':'$RETURN_AUTHORIZATION','eventId':'$RETURN_EVENT','occurredAt':T,'nextCheckAt':NEXT},intent='RECORD',bind={'RETURN':'/effects/returnId'},refs=[{'type':'Work','id':'$SALES_WORK'}])]
 ret={'returnId':'$RETURN','kind':'RETURN_RECEIPT','eventId':'$RETURN_EVENT','deliveryId':'$DELIVERY','customerId':'$C','itemId':'$P','lotId':'$L','rangeRootId':'$DISPATCH_RANGE','startQuantity':'0','quantity':'10','unit':'BOX','placeId':'$W','workId':'$SALES_WORK','occurredAt':T}
 a += [original('e1-return-original','RETURN_RECEIPT',ret,'$RETURN','10',subject='RETURN',subjectid='$RETURN',work='$SALES_WORK')]
 a += link('e1-return-original','$RETURN','10',refs=[{'type':'Work','id':'$SALES_WORK'}])
