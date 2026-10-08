@@ -64,16 +64,17 @@ authoritative 자료 유무 확인은 코드 재사용과 구별한다.
 
 ## 완료 보고와 증거
 
-증거 기록은 `verification/manifest.json`(없는 파일)이 아니라 저장소의 실제
-pipeline이다. 실행은 `./verify`·`verification/actual/sN/run.sh`, 연결·조립은
+증거는 저장소의 실제 pipeline에서 인용한다. 실행은 `./verify`·
+`verification/actual/sN/run.sh`, 연결·조립은
 `verification/coverage`의 receipt·index·`assemble.py`·`validate.py`,
 결과는
 `verification/harness/target/evidence/runtime-manifest.json`이다.
 증거 class(index의 ACTUAL/SELFTEST/CONTRACT_RED와 보고 범주 STUB/LOGIC_REVIEW)와
 보고 규칙은
 [저장소 harness](../ontology-scenario-testing/references/repository-harness.md)를
-따른다. PASS는 manifest item/profile `status`가 `PASS`인 것뿐이다
-(`validate.py`의 `VALID`는 일관성). `--actual` profile 실행은 엄격한 조건에서만
+따른다. PASS는 manifest item/profile `status`가 `PASS`이고 `validate.py`가 현재
+입력에 대해 exit0인 경우만 쓴다(`VALID`는 일관성). `--actual` profile 실행은
+엄격한 조건에서만
 coverage receipt를 만들고 현재 actual driver는 `api`·`fixture`·`db`만 공급하므로
 mcp·client·model 등 나머지 runtime 주장은 `NOT_RUN`이다. native `actual-sN` 결과는
 한정된 custody 증거로 따로 보고한다.

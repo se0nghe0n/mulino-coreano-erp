@@ -47,7 +47,7 @@
 | V1 | v1 업무/v2 정의·evaluator: 과거 의미+현재 제한, 미지원 보류 owner/효과0 |
 | V2 | 예약40/실물60의 분할+신규20 경합, 부모소비0. 실제50 정정 후 실행배분≤50·부족 책임 |
 | V3 | eligibility 조회 뒤 QC hold commit→출고0. 역순 출고이력+후속책임. 옛해제로 새보류 덮기0 |
-| V4 | READ grant의 노출된 모든 direct/nested/batch/projection/MCP/worker 면(실행 중 열거가 요구. 열거 subcase `exposed-write-surface`는 `enumerateWriteSurface` 계약·adapter 전까지 NOT_RUN) 우회효과0. atomic batch rollback·내부move 우회0 |
+| V4 | READ grant의 노출된 모든 direct/nested/batch/projection/MCP/worker 면(실행 중 열거가 요구. 열거 subcase `exposed-write-surface`는 `enumerateWriteSurface` 계약은 정의됐고 실제 adapter 전까지 NOT_RUN) 우회효과0. atomic batch rollback·내부move 우회0 |
 | V5 | queue 뒤 DB WAITING만 남겨 전체restart, due 전진·2worker·장애에서도 재개/책임1·중복0 |
 | V6 | 수령60 commit/응답유실·newtoken/newRPC/동시retry 효과1. 동일key40 conflict·타주체 누출0 |
 | V7 | enqueue/인가검사 직후 grant철회·restart: 직렬화 순서에 맞는 새효과0/기효과보존·차단책임 |

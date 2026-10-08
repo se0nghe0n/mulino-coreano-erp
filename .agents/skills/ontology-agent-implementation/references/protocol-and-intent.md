@@ -54,7 +54,14 @@ provenance `USER|CONTEXT|APPROVED_DEFAULT`를 검증한다. decimal은 단위
 MRTR는 지원 method의 `resultType=input_required` 결과에
 `inputRequests` 또는 `requestState`를 넣고, 같은 요청의 retry에서
 대응 `inputResponses`와 정확한 state를 받는다. Client가 선언하지 않은
-elicitation을 요구하지 않는다. 무결성·주체·method/의도·TTL을 검사하고
+elicitation을 요구하지 않는다. 무결성·주체·method/의도·TTL을 검사한다.
+
+TTL은 [s0-protocol.md](../../../../contracts/mcp/s0-protocol.md)의
+"MRTR requestState(S5 계약)" 절을 따른다. 발급 시각 기준 600초이며
+599초 continuation은 정상, 601초는 `REQUEST_STATE_EXPIRED`다. 개발/CI
+값이며 운영 SLA가 아니다. 문서·생성기·T20 fixture를 함께 바꾸고,
+미발행 code는 vocabulary의 PENDING/knownOpenGaps로 추적한다.
+
 single-use 승인 소비는 DB에서 원자적으로 강제한다. accept 문자열은
 서버의 행동 승인 결정을 대신하지 않는다. 미지원 client에는 명시적
 추가 입력 경로 또는 미지원 결과를 제공한다.
