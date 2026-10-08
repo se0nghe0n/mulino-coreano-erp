@@ -1,0 +1,51 @@
+{
+  "$id": "urn:mulino:fixture-place-kinds:1",
+  "version": "1.0.0",
+  "description": "Normative Place.kind vocabulary and custodian internality of acceptance fixtures (contracts/fixture-place-kinds.md). Aligned with the product vocabulary of docs/execution/s2-inventory/contracts.md (moveQuantity) and the read-only custody rule of backend QualityEligibility.custody/FulfillmentCommands.requireWarehouse. ./verify prepare (ContractValidator.placeKindProblems) rejects a fixture Place without a kind, a kind outside this list and an internal-storage segment without an internal custodian.",
+  "productRefs": [
+    "docs/execution/s2-inventory/contracts.md (moveQuantity: both Place.kind INTERNAL_STORAGE and a confirmed internal custodian)",
+    "backend/src/main/java/com/mulino/application/quality/QualityEligibility.java (custody: INTERNAL_STORAGE+internal custodian CONFIRMED; TRANSIT/CUSTOMER/SUPPLIER/EXTERNAL_* OUTSIDE; any other kind UNRECOGNIZED -> UNKNOWN, eligible 0)",
+    "backend/src/main/java/com/mulino/domain/inventory/InventoryRepository.java (internalCustodian: an actor of the organization of kind HUMAN or AGENT)"
+  ],
+  "kinds": [
+    {
+      "kind": "INTERNAL_STORAGE",
+      "custody": "INTERNAL",
+      "meaning": "Controlled internal storage of the fixture organization (warehouse). Stock here is in confirmed custody only when its segment names an internal custodian; only then can other conditions make it sale/dispatch eligible."
+    },
+    {
+      "kind": "TRANSIT",
+      "custody": "OUTSIDE",
+      "meaning": "In transport (vessel, truck, carrier leg). Held history, never sale-eligible stock; eligibility is a known 0."
+    },
+    {
+      "kind": "CUSTOMER",
+      "custody": "OUTSIDE",
+      "meaning": "A customer's place (delivered or customer site). Outside internal custody; eligibility is a known 0."
+    },
+    {
+      "kind": "SUPPLIER",
+      "custody": "OUTSIDE",
+      "meaning": "A supplier's or origin place before handover. Outside internal custody; eligibility is a known 0."
+    },
+    {
+      "kind": "EXTERNAL_PORT",
+      "custody": "OUTSIDE",
+      "meaning": "A port, customs or bonded area outside internal custody (declared EXTERNAL_* kind). Eligibility is a known 0."
+    }
+  ],
+  "internalCustodianAliasTypes": ["Human", "Agent"],
+  "externalCustodianAliasTypes": ["Organization", "Customer", "Supplier", "Manufacturer"],
+  "unrecognizedKindControl": {
+    "field": "kindControl",
+    "value": "UNRECOGNIZED_PLACE_KIND",
+    "meaning": "Explicit negative control: the Place deliberately carries a kind outside this vocabulary (not starting with EXTERNAL_) so the case can assert that the product reports eligibility UNKNOWN with eligible 0 instead of a known 0 or a positive quantity. Only allowed with that kind; a fixture never relies on an undeclared kind."
+  },
+  "retiredFixtureKinds": [
+    {"kind": "INTERNAL_WAREHOUSE", "replacement": "INTERNAL_STORAGE"},
+    {"kind": "WAREHOUSE", "replacement": "INTERNAL_STORAGE"},
+    {"kind": "PORT", "replacement": "EXTERNAL_PORT"},
+    {"kind": "TRANSPORT", "replacement": "TRANSIT"},
+    {"kind": "EXTERNAL_CUSTOMER", "replacement": "CUSTOMER"}
+  ]
+}

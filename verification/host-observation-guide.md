@@ -207,8 +207,8 @@ selftest의 `sentinel.txt`에는 가상 marker 두 개가 있다. 발견0·틀�
 tickScheduler/sweepDue의 `operationEvidence.submissionStatus`는 실제 독립
 rows에 기록된 `SUBMITTED` 또는 `NO_TASK`다. SUBMITTED에는 실제 `taskId`,
 `invocationHandle`, `submittedAt`을 모두 둔다. submittedAt은 해당 host
-command의 시작·종료 사이여야 한다. 자율 loop group의 수동 watcher는 시작
-대신 관찰 경계(아래 "자연 tick 수동 관찰")부터 잰다. NO_TASK에는 세 field를 넣지 않는다.
+command의 시작·종료 사이여야 한다. 수동 watcher는 시작 대신 요청의
+`observeFrom`(아래 "자연 tick 수동 관찰")부터 잰다. NO_TASK에는 세 field를 넣지 않는다.
 미관찰 task를 NO_TASK로 치환하지 않고 원행·scope·실제 command evidence를
 같이 검사한다. 제출 ACK에는 runtimeTask terminal을 넣지 않는다.
 
@@ -254,6 +254,7 @@ tickScheduler/sweepDue 요청에 아래 세 parameter를 두면 수동 관찰이
 | `trigger` | `OBSERVE_NEXT_NATURAL_TICK`만 | harness는 아무것도 실행하지 않고 다음 자연 tick을 관찰만 한다 |
 | `observationWindowSeconds` | 정수 1–30 | 관찰 창. 계획 §10 개발/CI 관찰 제한30초 |
 | `triggeredBy` | `SCHEDULER_LOOP` | 기대하는 제출 주체 |
+| `observeFrom` | ISO-8601 instant, harness가 해석 | 관찰 창의 시작. case는 쓰지 않는다 |
 
 세 값은 watcher 설정이다. scheduler 증거가 아니다. 이전 계약은
 `operationEvidence`에 같은 세 값을 되돌려 달라고 했다. 요청을 그대로
@@ -274,12 +275,20 @@ scheduler가 실제로 한 일은 extractor `rawRows.schedulerSubmissions[]`로
 
 `HostObservationValidator`(`naturalTick`)가 다음을 요구한다.
 
-- 관찰 창의 시작은 관찰 경계다. 자율 loop group의 watcher이면
-  `CaseRunner`가 group의 어떤 branch도 제출하기 직전에 잡은 harness 시각
-  (`parallel` 결과의 `data.observationBoundaryAt`)이고, 그 밖의 watcher는
-  자기 command 시작 시각이다. watcher command는 경계보다 먼저 시작했다고
-  주장할 수 없다. extractor는 scheduler의 지속 제출 기록을 읽으므로 watcher
-  thread가 늦게 떠도 경계 뒤의 제출을 잃지 않는다.
+- 관찰 창은 `[observeFrom, observeFrom+observationWindowSeconds]`다.
+  `observeFrom`은 `CaseRunner.controlRequest`가 watcher 요청 parameter에
+  넣어 host adapter에 보낸다(step2r round 6). 자율 loop group의 watcher면
+  group의 어떤 branch도 제출하기 직전에 잡은 harness 시각(`parallel` 결과의
+  `data.observationBoundaryAt`과 같은 값)이고, group 밖 watcher(T26
+  `lot-expiry-autonomous-loop`의 `repeat-sweep`)면 그 watcher를 dispatch하기
+  직전의 harness 시각이다. case가 `observeFrom`을 직접 쓰면
+  `runtimeProfileProblems`가 준비 실패로 낸다. host adapter의 extractor는
+  scheduler의 지속 제출 기록에서 이 창 안의 행만 읽는다. 그래서 늦게 뜬
+  watcher thread도 경계 뒤 제출을 잃지 않고, group 밖 반복 watcher가 앞선
+  sweep의 행을 자기 관찰로 보고하지 않는다. validator는 `observeFrom`이
+  없으면 거부하고, 경계 값이 있으면 같아야 한다. watcher command는
+  `observeFrom`보다 먼저 시작할 수 없고 `observeFrom+observationWindowSeconds`
+  뒤에 끝날 수 없다.
 - `rawRows.schedulerSubmissions`가 배열로 있다. 행마다 위 field가 비어
   있지 않고 schedulerId가 요청과 같으며, submittedAt이 관찰 경계부터
   `observationWindowSeconds` 안이다.
@@ -288,8 +297,8 @@ scheduler가 실제로 한 일은 extractor `rawRows.schedulerSubmissions[]`로
   안에 행이 없다. NO_TASK는 자율 발견 실패를 그대로 드러내는 관찰이며
   case assertion에서 실패한다.
 - host `command`는 watcher의 실제 argv/구간이다. 구간은
-  `observationWindowSeconds`를 넘지 않는다. SUBMITTED의 submittedAt은 관찰
-  경계 이후, watcher command 종료 이전이다.
+  `observationWindowSeconds`를 넘지 않는다. SUBMITTED의 submittedAt은
+  `observeFrom` 이후, watcher command 종료 이전이다.
 - argv에 `tickScheduler`·`sweepDue`·`resumeWork`·`fakeWorker` 호출을
   넣지 않는다. 명백한 trigger를 막는 guard다.
 - extractor는 independent·readOnly다.
@@ -343,7 +352,8 @@ schema가 거부한다. runtimeProfile이 없는 fixture는 harness tick fixture
 
 api·worker처럼 스스로 제출하지 않는 process는 group 밖에서 순서대로
 시작한다. group 안에서는 loop process 기동과 첫 tick만 관찰 창을 쓴다.
-watcher branch를 먼저 두고, 관찰 창은 group 직전의 관찰 경계에서 시작한다.
+watcher branch를 먼저 두고, 관찰 창은 group 직전의 관찰 경계(watcher 요청의
+`observeFrom`)에서 시작한다.
 `parallel`은 barrier가 아니지만 창의 시작이 watcher thread의 기동 시각이
 아니라 경계이고 extractor가 지속 제출 기록을 읽으므로, watcher가 늦게 떠도
 경계 뒤의 첫 제출을 놓치지 않는다. 남은 지연은 watcher가 창 끝(경계+30초)
@@ -469,6 +479,7 @@ probe `outcome`은 `contracts/domain-vocabulary.json`의 명령 outcome과
 - 적용 정책(아래 표)에 따라 항목의 `kind`가 정하는 probe class 중 요청한
   class마다 그 항목의 probe 행이 있어야 한다. extractor의 `writeCapable`과
   무관하다. `@readonly` entity set도 쓰기 거부를 보여야 하기 때문이다.
+  QUERY capability를 부르는 tool·action만 아래 QUERY 면제로 빠진다.
   정책에 없는 kind, 그 kind가 나올 수 없는 surface의 항목은 거부한다.
 - `probeCoverage`는 요청 probeClass와 정확히 같다. `applicableTargets`는
   harness가 정책으로 다시 센 적용 항목 수와 같아야 한다. extractor가 적게
@@ -485,6 +496,20 @@ probe `outcome`은 `contracts/domain-vocabulary.json`의 명령 outcome과
 | `TOOL` | MCP_SERVER_DISCOVER·MCP_TOOLS_LIST | MCP_TOOL_CALL |
 | `WORKER_HANDLER` | WORKER_HANDLER_REGISTRY | WORKER_HANDLER_SUBMIT |
 | `MANAGEMENT_ENDPOINT` | MANAGEMENT_ENDPOINTS | MANAGEMENT_ENDPOINT_WRITE |
+
+QUERY 면제(step2r round 6). `TOOL`·`BOUND_ACTION`·`UNBOUND_ACTION` 항목이
+하나의 QUERY capability를 부르면 FUNCTION처럼 적용 probe class가 없다.
+READ 주체의 getInventory 호출은 성공한 읽기이고 그 결과를 정직하게 담을
+probe outcome이 없기 때문이다. 면제는 harness가 계산한다. 조건은 셋이다.
+`allowlistRef`의 hash로 묶인 bytes(`contracts/acceptance-capabilities.json`)에서
+그 `capabilityId`의 `kind`가 `QUERY`이고, `writeCapable=false`이며, 항목
+이름(`itemId`)이 그 capability id이거나 `.`·`/` 뒤에 그 id로 끝난다. 그래서
+다른 이름의 명령 항목이 QUERY id를 빌려 면제받을 수 없다. COMMAND·RECORD
+항목, `capabilityId`가 없거나 목록 밖인 항목(예: 범용 `query`·`command`
+dispatcher action), `writeCapable=true` 항목은 표의 probe를 모두 받는다.
+범용 dispatcher의 probe는 쓰기 형태의 요청을 보내 거부(REJECTED 등)를
+관찰한다. 면제 항목도 `applicableTargets` 재계산에서 빠질 뿐 열거·hash·
+allowlist 대조는 그대로다.
 
 서비스가 제공하지 않는 경로(navigation이 없는 entity의 nested 쓰기, draft가
 아닌 entity의 activation)도 probe하고 `NOT_EXPOSED`로 기록한다. 존재하지 않는

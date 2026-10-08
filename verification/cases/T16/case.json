@@ -1101,6 +1101,42 @@
           }
         },
         {
+          "id": "confirmed-eligible-control",
+          "op": "decimalEquals",
+          "source": {
+            "actionId": "confirmed-api",
+            "pointer": "/response/data/eligibleQuantity"
+          },
+          "expected": "60",
+          "requirementRefs": [
+            "D16"
+          ],
+          "evidenceRefs": [
+            "confirmed-api:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseKey": "T16-provisional-holds"
+          },
+          "oracleExplanation": "양성 대조: 확인 수령 직후·보류 전에는 INTERNAL_STORAGE W에서 내부 custodian이 보관하는 TRANSIT60 유래 60 BOX가 모든 조건 허용이라 판매 적격 60 BOX다. 그래서 임시 접수의 0과 QC만 해제한 뒤의 0은 장소 종류가 아니라 임시 상태와 남은 RECALL60 때문이다.",
+          "oracleRef": {
+            "oracleId": "T16.provisional-and-independent-holds",
+            "observationNames": [
+              "eligible-after-QC-only-release"
+            ]
+          },
+          "unit": "BOX",
+          "unitSource": {
+            "actionId": "confirmed-api",
+            "pointer": "/response/data/unit"
+          }
+        },
+        {
           "id": "receipt-transit-double-creation-5",
           "op": "sumEquals",
           "source": {

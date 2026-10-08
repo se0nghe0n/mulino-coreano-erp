@@ -77,8 +77,24 @@ exit code를 출력하며 `verification/harness/target/wrapper-commands.json`에
     닫힌 gap의 항목이 남으면 실패한다.
   - **감사 field와 tick profile**: `ContractValidator.auditFieldProblems`
     (공개되지 않은 감사 source·field·where)와 `runtimeProfileProblems`
-    (fixture runtimeProfile과 tick 방식, 자율 loop 패턴,
-    `verification/host-observation-guide.md`)가 어긋나면 준비 문제다.
+    (fixture runtimeProfile과 tick 방식, 자율 loop 패턴, case가 직접 쓴
+    watcher `observeFrom`, `verification/host-observation-guide.md`)가
+    어긋나면 준비 문제다.
+  - **fixture 장소 종류**: `ContractValidator.placeKindProblems`가 subcase
+    fixture(baseRefs 포함)의 모든 Place alias에
+    `contracts/fixture-place-kinds.json`의 kind(INTERNAL_STORAGE·TRANSIT·
+    CUSTOMER·SUPPLIER·EXTERNAL_PORT)를 요구한다. 어휘 밖 kind는
+    `kindControl=UNRECOGNIZED_PLACE_KIND`로 선언한 반례만 받는다.
+    baseline.places는 alias kind와 같아야 하고, INTERNAL_STORAGE에 있는
+    segment는 같은 조직의 Human/Agent alias를 `custodianAlias`로 가져야
+    한다. kind 누락·옛 kind(INTERNAL_WAREHOUSE·WAREHOUSE·PORT·TRANSPORT)는
+    준비 실패다(step2r round 6).
+  - **Streamable HTTP transport header**: `ContractValidator.wireTransportProblems`가
+    `route=wire`·`transport=streamable-http` 요청에 `Accept:
+    application/json, text/event-stream`을 요구하고 Origin을 금지한다.
+    예외는 그 action의 `/response/httpStatus`를 406(Accept) 또는
+    403(Origin)으로 고정한 transport 반례 하나뿐이다
+    (`contracts/mcp/s0-protocol.md`).
   - **정의되지 않은 host 조작**: `type=process` control의 operation이
     `contracts/acceptance-host-observation.schema.json`의 operation enum에
     없으면 문제로 센다(`ContractValidator.hostOperationProblems`).
@@ -404,14 +420,18 @@ lock은 잡지 않는다. 중단 검사와 호출 사이의 경쟁이나 이미 
 `route=wire`의 request는 raw HTTP header/body, content type, protocol,
 JSON-RPC ID, MRTR state/inputResponses/effect key를 그대로 전달할 수 있다.
 harness가 공격 입력을 정상화하거나 header/body mismatch를 수선하지
-않는다. 이전 wire result의 state도 `$result`로 추출한다. adapter의 실제
+않는다. 그래서 Streamable HTTP 요청의 `Accept`·`Origin`은 case가 계약대로
+쓴다. adapter가 빠진 Accept를 보충하지 않는다(위 prepare의 transport
+header 검사). 이전 wire result의 state도 `$result`로 추출한다. adapter의 실제
 artifact는 Authorization/Cookie/token/비밀을 redact하고 원문 hash와
 검증된 인증 metadata를 따로 둔다. committed artifact에 credential 원문을
 저장하지 않는다.
 
 ## fixture와 실제 실행 port
 
-fixture는 전체 `acceptance-fixture.schema.json`을 따른다. 가상 정책임을
+fixture는 전체 `acceptance-fixture.schema.json`을 따른다. Place.kind와
+보관자 내부성은 [fixture 장소 종류 계약](../contracts/fixture-place-kinds.md)을
+따른다. 가상 정책임을
 `synthetic:true`로 표시한다. clock에는 asOf/knownAt/시간대/정밀도/기한
 끝점, versions에는 definition/evaluator/policy를 고정한다. 조직·주체·
 issuer/audience, 구체 role capability/grant actions·scope·유효기간·revision,

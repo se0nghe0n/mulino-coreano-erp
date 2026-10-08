@@ -12,6 +12,9 @@ def _instant(base,seconds):
  from datetime import datetime,timedelta,timezone
  return (datetime.fromisoformat(base.replace('Z','+00:00'))+timedelta(seconds=seconds)).astimezone(timezone.utc).strftime('%Y-%m-%dT%H:%M:%SZ')
 MRTR_EXPIRED_AT=_instant(TIME,MRTR_TTL_SECONDS+1);MRTR_BEFORE_EXPIRY_AT=_instant(TIME,MRTR_TTL_SECONDS-1)
+# Streamable HTTP Accept of contracts/mcp/s0-protocol.md; a request without it is answered 406 before any JSON-RPC processing.
+MCP_ACCEPT='application/json, text/event-stream'
+assert '`Accept`는 `'+MCP_ACCEPT+'`' in (ROOT/'contracts/mcp/s0-protocol.md').read_text(),'s0-protocol.md Accept differs from MCP_ACCEPT'
 SCOPE={'organizationId':{'$alias':'ORG'},'itemId':{'$alias':'P'},'lotId':{'$alias':'L'}}
 CAT=json.loads((ROOT/'verification/requirements/mandatory-oracles.json').read_text())
 ALL=CAT['requiredCaseIds'];DS=CAT['requirementIds']
@@ -36,7 +39,9 @@ def clock(i,t):return {'id':i,'kind':'control','control':{'type':'clock','operat
 def wire(i,method,args=None,rpc=None,headers=None,meta=None,actor='reader',transport='streamable-http'):
  body={'jsonrpc':'2.0','id':rpc or i,'method':method,'params':args or {}}
  body['params']['_meta']=meta if meta is not None else {'io.modelcontextprotocol/protocolVersion':'2026-07-28','io.modelcontextprotocol/clientInfo':{'name':'ontology-channel-contract','version':'1.0.0'},'io.modelcontextprotocol/clientCapabilities':{'elicitation':{'form':{}}}}
- h={'MCP-Protocol-Version':'2026-07-28','Mcp-Method':method,'Content-Type':'application/json','Origin':'https://isolated-client.example.invalid'}
+ # contracts/mcp/s0-protocol.md "독립 요청": every Streamable HTTP request sends this Accept. No contract declares an
+ # allowed Origin and an Origin-less request is accepted, so only the bad-origin negative sends an Origin.
+ h={'MCP-Protocol-Version':'2026-07-28','Mcp-Method':method,'Accept':MCP_ACCEPT,'Content-Type':'application/json'}
  if args and 'name' in args:h['Mcp-Name']=args['name']
  if headers:h.update(headers)
  return {'id':i,'kind':'invoke','actorRef':actor,'route':'wire','protocolOperation':method,'request':{'transport':transport,'httpMethod':'POST','headers':h,'body':body,'credentialProfileRef':actor},'evidenceRefs':[i+':redacted-raw-wire',i+':authenticated-context',i+':server-response']}
@@ -81,15 +86,17 @@ def fixture(cid):
   # Only the requestState subject binding distinguishes its negative call.
   actors['otherPrincipal']['roleCapabilities']=list(actors['writer']['roleCapabilities'])
   actors['otherPrincipal']['grant']['actions']=list(actors['writer']['grant']['actions'])
- aliases={'ORG':{'type':'Organization'},'P':{'type':'TradeItem','unit':'BOX'},'P2':{'type':'TradeItem','name':'동명이인 비스킷','unit':'BOX'},'L':{'type':'ManufacturerLot','itemAlias':'P','manufacturerAlias':'M'},'M':{'type':'Manufacturer'},'W':{'type':'Place'},'W2':{'type':'Place'},'C':{'type':'Customer'},'C2':{'type':'Customer'},'SUP':{'type':'Supplier'},'SL1':{'type':'SalesOrderLine','salesWorkAlias':'S1'},'O1':{'type':'Work'},'S1':{'type':'Work'}}
- for a,q in [('A60','60'),('B40','40')]:aliases[a]={'type':'QuantitySegment','itemAlias':'P','lotAlias':'L','locationAlias':'W','quantity':q,'unit':'BOX','physicalScope':cid+'-'+a}
+ aliases={'ORG':{'type':'Organization'},'P':{'type':'TradeItem','unit':'BOX'},'P2':{'type':'TradeItem','name':'동명이인 비스킷','unit':'BOX'},'L':{'type':'ManufacturerLot','itemAlias':'P','manufacturerAlias':'M'},'M':{'type':'Manufacturer'},'W':{'type':'Place','kind':'INTERNAL_STORAGE'},'W2':{'type':'Place','kind':'INTERNAL_STORAGE'},'C':{'type':'Customer'},'C2':{'type':'Customer'},'SUP':{'type':'Supplier'},'SL1':{'type':'SalesOrderLine','salesWorkAlias':'S1'},'O1':{'type':'Work'},'S1':{'type':'Work'}}
+ for a,q in [('A60','60'),('B40','40')]:aliases[a]={'type':'QuantitySegment','itemAlias':'P','lotAlias':'L','locationAlias':'W','custodianAlias':'warehouse','quantity':q,'unit':'BOX','physicalScope':cid+'-'+a}
  for e in ['receipt60','receipt40','qc60','hold40','regulatory60','disposition60','customerConditions60','delivery','temperature']:aliases[e]={'type':'DocumentVersion'}
  for a in actors:aliases[a]={'type':'Human' if a in ['reader','writer','manager'] else 'Agent'}
  aliases['supervisor']={'type':'Human'}
+ # contracts/fixture-place-kinds.json: stock at INTERNAL_STORAGE is in confirmed custody only under an internal custodian.
+ aliases['warehouse']={'type':'Human','name':'내부 창고 보관 담당'}
  evidence=[]
  for i,kind in enumerate(['receipt60','receipt40','qc60','hold40','regulatory60','disposition60','customerConditions60','delivery','temperature']):
   evidence.append({'alias':kind,'sha256':str(i+1)*64,'sourceNamespace':'synthetic-warehouse','externalEventId':cid+'-'+kind,'sourceVersion':'1','occurredAt':TIME,'recordedAt':KNOWN})
- f={'schemaVersion':'1.0.0','fixtureId':cid+'-CHANNEL-BASELINE','synthetic':True,'baseRefs':[],'clock':{'asOf':TIME,'knownAt':KNOWN,'timezone':'Asia/Seoul','precision':'SECOND','deadlineInclusive':True},'versions':{'definition':'definition-v1','evaluator':'evaluator-v1','policy':'SYNTHETIC-policy-v1'},'actors':actors,'aliases':aliases,'baseline':{'setupIsExecutionCoverage':False,'segments':[{'alias':'A60','quantity':'60','unit':'BOX','locationAlias':'W','lotAlias':'L'},{'alias':'B40','quantity':'40','unit':'BOX','locationAlias':'W','lotAlias':'L'}],'works':[{'alias':'O1','kind':'PURCHASE','status':'WAITING','goal':{'quantity':'100','unit':'BOX','endpoint':'ARRIVED','quantityMode':'CUMULATIVE_EVENT','destinationAlias':'W','dueAt':'2026-10-09T09:00:00Z'},'waitReason':'B40 품질 후속 근거 대기','resumePredicate':{'evidenceAlias':'hold40','decision':'RESOLVED'},'verifierAlias':'reader','nextCheckAt':NEXT,'overdueAction':'supervisor에게 품질 근거 확인 요청'},{'alias':'S1','kind':'SALES','status':'ACTIVE','customerAlias':'C','goal':{'quantity':'30','unit':'BOX','endpoint':'DELIVERED','quantityMode':'CUMULATIVE_EVENT','dueAt':'2026-10-09T09:00:00Z'}}],'restrictions':[{'segmentAlias':'B40','quantity':'40','unit':'BOX','kind':'QC','status':'ACTIVE','evidenceAlias':'hold40'}],'eligibilityBases':[{'segmentAlias':'A60','action':'SELL','quantity':'60','unit':'BOX','qcEvidenceAlias':'qc60','regulatoryEvidenceAlias':'regulatory60','dispositionEvidenceAlias':'disposition60','customerEvidenceAlias':'customerConditions60'}],'relations':[{'sourceAlias':'L','targetAlias':'A60','type':'LOT_QUANTITY'},{'sourceAlias':'L','targetAlias':'B40','type':'LOT_QUANTITY'},{'sourceAlias':'A60','targetAlias':'S1','type':'SUBJECT_OF'},{'sourceAlias':'S1','targetAlias':'C','type':'CUSTOMER'}],'policy':{'synthetic':True,'actions':['READ','RECORD','COMMAND'],'purchaseDecisionRole':'MANAGER','allowanceEvidenceRequired':['qc','regulatory','disposition','customer'],'actualLegalComplianceClaimed':False,'deletionEnabled':False},'identitySources':{'ambiguousItemNames':['P','P2'],'approvedDefaultUnit':'BOX','defaultSource':'SYNTHETIC-policy-v1'},'traceabilitySeed':{'workAlias':'S1','customerAlias':'C','segmentAlias':'A60','relationType':'SUBJECT_OF','effectClass':'READ_CANDIDATE_ONLY','quantity':'30','unit':'BOX'}},'evidence':evidence,'responsibilities':[{'scope':{'workAlias':'O1','segments':['B40']},'ownerAlias':'reader','supervisorAlias':'supervisor','nextAction':'검사 근거 확인','nextCheckAt':NEXT},{'scope':{'workAlias':'S1'},'ownerAlias':'writer','supervisorAlias':'supervisor','nextAction':'인도 증거 확인','nextCheckAt':NEXT}]}
+ f={'schemaVersion':'1.0.0','fixtureId':cid+'-CHANNEL-BASELINE','synthetic':True,'baseRefs':[],'clock':{'asOf':TIME,'knownAt':KNOWN,'timezone':'Asia/Seoul','precision':'SECOND','deadlineInclusive':True},'versions':{'definition':'definition-v1','evaluator':'evaluator-v1','policy':'SYNTHETIC-policy-v1'},'actors':actors,'aliases':aliases,'baseline':{'setupIsExecutionCoverage':False,'segments':[{'alias':'A60','quantity':'60','unit':'BOX','locationAlias':'W','custodianAlias':'warehouse','lotAlias':'L'},{'alias':'B40','quantity':'40','unit':'BOX','locationAlias':'W','custodianAlias':'warehouse','lotAlias':'L'}],'works':[{'alias':'O1','kind':'PURCHASE','status':'WAITING','goal':{'quantity':'100','unit':'BOX','endpoint':'ARRIVED','quantityMode':'CUMULATIVE_EVENT','destinationAlias':'W','dueAt':'2026-10-09T09:00:00Z'},'waitReason':'B40 품질 후속 근거 대기','resumePredicate':{'evidenceAlias':'hold40','decision':'RESOLVED'},'verifierAlias':'reader','nextCheckAt':NEXT,'overdueAction':'supervisor에게 품질 근거 확인 요청'},{'alias':'S1','kind':'SALES','status':'ACTIVE','customerAlias':'C','goal':{'quantity':'30','unit':'BOX','endpoint':'DELIVERED','quantityMode':'CUMULATIVE_EVENT','dueAt':'2026-10-09T09:00:00Z'}}],'restrictions':[{'segmentAlias':'B40','quantity':'40','unit':'BOX','kind':'QC','status':'ACTIVE','evidenceAlias':'hold40'}],'eligibilityBases':[{'segmentAlias':'A60','action':'SELL','quantity':'60','unit':'BOX','qcEvidenceAlias':'qc60','regulatoryEvidenceAlias':'regulatory60','dispositionEvidenceAlias':'disposition60','customerEvidenceAlias':'customerConditions60'}],'relations':[{'sourceAlias':'L','targetAlias':'A60','type':'LOT_QUANTITY'},{'sourceAlias':'L','targetAlias':'B40','type':'LOT_QUANTITY'},{'sourceAlias':'A60','targetAlias':'S1','type':'SUBJECT_OF'},{'sourceAlias':'S1','targetAlias':'C','type':'CUSTOMER'}],'policy':{'synthetic':True,'actions':['READ','RECORD','COMMAND'],'purchaseDecisionRole':'MANAGER','allowanceEvidenceRequired':['qc','regulatory','disposition','customer'],'actualLegalComplianceClaimed':False,'deletionEnabled':False},'identitySources':{'ambiguousItemNames':['P','P2'],'approvedDefaultUnit':'BOX','defaultSource':'SYNTHETIC-policy-v1'},'traceabilitySeed':{'workAlias':'S1','customerAlias':'C','segmentAlias':'A60','relationType':'SUBJECT_OF','effectClass':'READ_CANDIDATE_ONLY','quantity':'30','unit':'BOX'}},'evidence':evidence,'responsibilities':[{'scope':{'workAlias':'O1','segments':['B40']},'ownerAlias':'reader','supervisorAlias':'supervisor','nextAction':'검사 근거 확인','nextCheckAt':NEXT},{'scope':{'workAlias':'S1'},'ownerAlias':'writer','supervisorAlias':'supervisor','nextAction':'인도 증거 확인','nextCheckAt':NEXT}]}
  if cid=='T20':
   # Synthetic versioned protocol config, not an operating SLA: MRTR TTL boundary pair.
   f['baseline']['mrtr']={'requestStateTtlSeconds':MRTR_TTL_SECONDS,'issuedAt':TIME,'source':'SYNTHETIC-policy-v1'}
@@ -180,15 +187,16 @@ T20.append(sub('T20','destination-canonical-approval','입력 보완 뒤 새 has
 # Official 2026-07-28 wire errors (contracts/mcp/s0-protocol.md; spec basic +
 # transports/streamable-http): mirrored header missing/mismatch -> 400 -32020
 # HeaderMismatch; required _meta field missing or malformed -> 400 -32602;
-# unsupported version -> 400 -32022 with data.supported/requested. 401/403
-# are rejected before JSON-RPC processing and need no JSON-RPC body.
+# unsupported version -> 400 -32022 with data.supported/requested. 401/403/406
+# are rejected before JSON-RPC processing and need no JSON-RPC body; 406 is the
+# missing Accept of wire-missing-accept (s0-protocol.md "독립 요청").
 # missing-meta omits the whole _meta object. basic/index "Per-request protocol
 # fields": a request missing a required field is malformed and MUST be rejected
 # with -32602 and HTTP 400. There is no body value for the mirrored header to
 # mismatch, so -32602 is pinned. A malformed optional clientInfo is also -32602
 # with HTTP 400, like every other JSON-RPC error of this binding.
 o='T20.mcp-stateless-wire'
-variants=['discover','method-mismatch','name-mismatch','version-mismatch','unsupported-version','missing-meta','missing-client-info','invalid-client-info','missing-capabilities','unauthenticated','bad-origin','initialize-not-required','server-request-not-required','stdio','old-protocol']
+variants=['discover','method-mismatch','name-mismatch','version-mismatch','unsupported-version','missing-meta','missing-client-info','invalid-client-info','missing-capabilities','unauthenticated','bad-origin','missing-accept','initialize-not-required','server-request-not-required','stdio','old-protocol']
 WIRE_ERRORS={'method-mismatch':-32020,'name-mismatch':-32020,'version-mismatch':-32020,'unsupported-version':-32022,'old-protocol':-32022,'missing-meta':-32602,'invalid-client-info':-32602,'missing-capabilities':-32602}
 for v in variants:
  w=wire('wire','server/discover')
@@ -204,6 +212,7 @@ for v in variants:
  elif v=='invalid-client-info':w['request']['body']['params']['_meta']['io.modelcontextprotocol/clientInfo']='ontology-channel-contract';expected='error';http=400
  elif v=='unauthenticated':w['actorRef']='anonymous';w['request']['credentialProfileRef']='anonymous';expected='error';http=401
  elif v=='bad-origin':w['request']['headers']['Origin']='https://untrusted.example.invalid';expected='error';http=403
+ elif v=='missing-accept':del w['request']['headers']['Accept'];expected='error';http=406
  elif v=='initialize-not-required':w['request']['connectionState']={'initialized':False,'sessionId':None}
  elif v=='server-request-not-required':w['request']['clientAcceptsServerRequests']=False
  elif v=='stdio':w['request']['transport']='stdio';w['request']['headers']={};w['request'].pop('httpMethod',None);w['request']['credentialProfileRef']='readAgent';w['actorRef']='readAgent'

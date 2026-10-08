@@ -67,6 +67,18 @@ lockProbeScopeOnly는 fixture가 지정한 segment/allocation/fence 세 scope의
 - `new-dispatch-quantity-primary` → `C1.revoked-disposition / new-dispatch`: 실제 독립DB의 해당 명령 효과 원행 quantity 합계는0이며, 같은 실물CON40 원행에서 관찰한 단위는BOX다. 완료된 빈 효과 scope만0으로 합산하며 누락/null/미구현은 거부한다.
 
 
+## unrecognized-place-kind
+
+같은 조건의 위탁40 두 묶음 중 INTERNAL_STORAGE W의 40만 SELL 적격40·ALLOWED다. 계약 어휘 밖 kind `WAREHOUSE`(kindControl=UNRECOGNIZED_PLACE_KIND)의 40은 적격0·UNKNOWN이다. 품목 범위는 보유80·적격40이다(`contracts/fixture-place-kinds.md`, step2r round 6).
+
+- `known-kind-eligible-40` → `C1.initial-eligibility / sell-eligible`: 양성 대조. 내부 보관 위탁40의 적격은 40 BOX다.
+- `known-kind-allowed` → `C1.initial-eligibility / sell-eligible`: 같은 위탁40의 판정은 ALLOWED다.
+- `unrecognized-kind-eligible-0` → `C1.initial-eligibility / sell-eligible`: 어휘 밖 장소의 같은 조건 40은 적격 0 BOX다.
+- `unrecognized-kind-unknown` → `C1.initial-eligibility / sell-eligible`: 그 0은 DENIED가 아니라 UNKNOWN이다.
+- `item-held-80` → `C1.initial-eligibility / sell-eligible`: 품목 보유는 40+40=80 BOX다.
+- `item-eligible-40` → `C1.initial-eligibility / sell-eligible`: 품목 적격은 내부 보관 40 BOX뿐이다.
+- `installed-physical-rows` → `C1.initial-eligibility / held`: 두 실물의 ID·수량·단위·위치가 독립 원행에 있다.
+
 ## 실행 증거
 
 공통 실행 기록은 [inventory 최종 증거](../T03/evidence/inventory-final/README.md)에 있다.

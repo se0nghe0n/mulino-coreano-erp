@@ -27,7 +27,8 @@ public final class HostObservationValidator {
      * instant captured immediately before the group's branches were submitted (CaseRunner). The observation window then
      * starts there instead of at the watcher command's own start, so a watcher thread that starts late still reads the
      * scheduler's durable submission rows from the same boundary and the window anchor is shared with the case's
-     * autonomous-within-30s assertion. null keeps the watcher command start as the anchor.
+     * autonomous-within-30s assertion. Since step2r round 6 the window anchor is the request's harness-resolved observeFrom
+     * (CaseRunner.controlRequest), which the host adapter also receives; when observationBoundary is given it must equal it.
      */
     public static void validate(ContractValidator validator, JsonNode resolvedControl, StepResult result, boolean requireActualHost, Instant observationBoundary) throws IOException {
         if(!"process".equals(resolvedControl.path("type").asText())) return;
@@ -95,6 +96,8 @@ public final class HostObservationValidator {
     static final int MAX_NATURAL_TICK_WINDOW_SECONDS=30;
     /** Watcher configuration of a passive natural-tick observation. These are request parameters, never scheduler evidence. */
     static final List<String> PASSIVE_PARAMETERS=List.of("trigger","triggeredBy","observationWindowSeconds");
+    /** Harness-resolved start of a passive watcher's observation window (CaseRunner.controlRequest); never authored by a case. */
+    public static final String OBSERVE_FROM="observeFrom";
     /** A passive natural-tick watcher request (OBSERVE_NEXT_NATURAL_TICK parameters on tickScheduler/sweepDue). */
     static boolean passiveWatch(JsonNode control) {
         if(!"process".equals(control.path("type").asText()) || !Set.of("tickScheduler","sweepDue").contains(control.path("operation").asText())) return false;
@@ -107,7 +110,7 @@ public final class HostObservationValidator {
         ContractValidator.require(Json.required(requested,"schedulerId").equals(identity.path("schedulerId").asText()),"Scheduler submission belongs to a different requested scheduler");
         ContractValidator.require(Set.of("SUBMITTED","NO_TASK").contains(identity.path("submissionStatus").asText()),"Scheduler submissionStatus must be an observed SUBMITTED or NO_TASK");
         if(identity.path("submissionStatus").asText().equals("SUBMITTED")) {
-            Instant submitted=instant(identity,"submittedAt"),from=passive && boundary!=null ? boundary : instant(host.path("command"),"startedAt");
+            Instant submitted=instant(identity,"submittedAt"),from=passive && requested.path(OBSERVE_FROM).isTextual() ? instant(requested,OBSERVE_FROM) : instant(host.path("command"),"startedAt");
             ContractValidator.require(!submitted.isBefore(from) && !submitted.isAfter(instant(host.path("command"),"completedAt")),"Scheduler submission timestamp is outside actual command observation");
         }
         for(String key:PASSIVE_PARAMETERS) ContractValidator.require(!identity.has(key),
@@ -132,10 +135,16 @@ public final class HostObservationValidator {
         ContractValidator.require(window.isIntegralNumber() && window.asInt()>=1 && window.asInt()<=MAX_NATURAL_TICK_WINDOW_SECONDS,"observationWindowSeconds must be an integer 1.."+MAX_NATURAL_TICK_WINDOW_SECONDS+" (plan §10)");
         Instant commandStart=instant(command,"startedAt"),end=instant(command,"completedAt");
         ContractValidator.require(!end.isAfter(commandStart.plusSeconds(window.asLong())),"Passive observation command outlasted observationWindowSeconds");
-        // With a pre-group boundary the window starts there; the watcher reads durable rows, so a late watcher thread
-        // cannot lose a submission made after the boundary, and it cannot have started before the group existed.
-        if(boundary!=null) ContractValidator.require(!commandStart.isBefore(boundary),"Passive watcher command started before the harness observation boundary");
-        Instant start=boundary!=null ? boundary : commandStart,limit=start.plusSeconds(window.asLong());
+        // The window is [observeFrom, observeFrom+window]. CaseRunner resolves observeFrom into the request the host adapter
+        // receives (the group boundary, or the instant before a standalone watcher is dispatched), so the extractor reads the
+        // scheduler's durable rows from the same instant: a late watcher thread cannot lose a submission made after it, and
+        // a standalone repeat watcher cannot report an earlier sweep's row. The command cannot start before it or end after
+        // the window closes.
+        ContractValidator.require(requested.path(OBSERVE_FROM).isTextual(),"Passive watcher request lacks the harness-resolved "+OBSERVE_FROM+" observation boundary");
+        Instant start=instant(requested,OBSERVE_FROM),limit=start.plusSeconds(window.asLong());
+        if(boundary!=null) ContractValidator.require(start.equals(boundary),"Passive watcher "+OBSERVE_FROM+" differs from the harness observation boundary");
+        ContractValidator.require(!commandStart.isBefore(start),"Passive watcher command started before the harness observation boundary ("+OBSERVE_FROM+")");
+        ContractValidator.require(!end.isAfter(limit),"Passive watcher command completed after "+OBSERVE_FROM+"+observationWindowSeconds");
         ContractValidator.require(host.path("extractor").path("readOnly").asBoolean(false) && host.path("extractor").path("independent").asBoolean(false),"Passive tick observation needs an independent read-only extractor");
         for(JsonNode arg:command.path("argv")) {
             String a=arg.asText().toLowerCase(Locale.ROOT);
@@ -243,7 +252,8 @@ public final class HostObservationValidator {
      * kind needs, whatever the extractor says about writeCapable. An OData entity set gets every entity write route
      * (direct, deep insert, upsert, $batch changeset, draft activation, nested navigation); a route the service does not
      * offer is still probed and answers NOT_EXPOSED. Actions get their own call and a $batch changeset; functions are
-     * read-only by OData definition. The harness recomputes applicableTargets from this table, not from the extractor.
+     * read-only by OData definition. A tool or action that calls a QUERY capability is exempt the same way (queryExempt,
+     * step2r round 6). The harness recomputes applicableTargets from this table, not from the extractor.
      */
     static final Map<String,Set<String>> PROBE_POLICY=Map.of(
         "ENTITY_SET",Set.of("DIRECT_CREATE","DIRECT_UPDATE","DIRECT_DELETE","DEEP_INSERT","UPSERT","BATCH_CHANGESET","DRAFT_ACTIVATE",
@@ -254,6 +264,20 @@ public final class HostObservationValidator {
         "TOOL",Set.of("MCP_TOOL_CALL"),
         "WORKER_HANDLER",Set.of("WORKER_HANDLER_SUBMIT"),
         "MANAGEMENT_ENDPOINT",Set.of("MANAGEMENT_ENDPOINT_WRITE"));
+    /**
+     * Item kinds that call one public capability. Such an item whose capability is a QUERY in the hash-bound allowlist bytes
+     * (contracts/acceptance-capabilities.json kind, recomputed here, never the extractor's word) has no write route to probe:
+     * a READ actor's call is a successful read, which no probe outcome describes. It is exempt like FUNCTION, but only when
+     * writeCapable=false and the item's own name is that capability id (itemId equals it or ends with "."/"/" + it), so a
+     * command item cannot borrow a QUERY capabilityId. COMMAND/RECORD items, items with no or an unknown capabilityId (for
+     * example a generic query/command dispatcher action) and writeCapable items keep the full policy.
+     */
+    static final Set<String> QUERY_EXEMPT_ITEM_KINDS=Set.of("TOOL","BOUND_ACTION","UNBOUND_ACTION");
+    static boolean queryExempt(JsonNode item,Map<String,String> capabilityKinds) {
+        if(!QUERY_EXEMPT_ITEM_KINDS.contains(item.path("kind").asText()) || item.path("writeCapable").asBoolean(false) || !item.path("capabilityId").isTextual()) return false;
+        String capability=item.path("capabilityId").asText(),name=item.path("itemId").asText();
+        return "QUERY".equals(capabilityKinds.get(capability)) && (name.equals(capability) || name.endsWith("."+capability) || name.endsWith("/"+capability));
+    }
     /** The surfaces each item kind can be enumerated from. */
     static final Map<String,Set<String>> KIND_SURFACES=Map.of(
         "ENTITY_SET",Set.of("ODATA_METADATA"),"BOUND_ACTION",Set.of("ODATA_METADATA"),"UNBOUND_ACTION",Set.of("ODATA_METADATA"),"FUNCTION",Set.of("ODATA_METADATA"),
@@ -275,8 +299,8 @@ public final class HostObservationValidator {
         ContractValidator.require(Json.sha256(file(validator,allowlistRef)).equals(allowlistSha),"Requested allowlistSha256 differs from the committed allowlist bytes "+allowlistRef);
         boolean bound=false;for(JsonNode a:host.path("inputArtifacts")) if(a.path("path").asText().equals(allowlistRef) && a.path("sha256").asText().equals(allowlistSha)) bound=true;
         ContractValidator.require(bound,"The enumeration's allowlist is not bound by hash in inputArtifacts: "+allowlistRef);
-        Set<String> allowlist=new HashSet<>();
-        for(JsonNode capability:Json.read(file(validator,allowlistRef)).path("capabilities")) allowlist.add(Json.required(capability,"id"));
+        Set<String> allowlist=new HashSet<>();Map<String,String> capabilityKinds=new HashMap<>();
+        for(JsonNode capability:Json.read(file(validator,allowlistRef)).path("capabilities")) {allowlist.add(Json.required(capability,"id"));capabilityKinds.put(capability.path("id").asText(),capability.path("kind").asText());}
         ContractValidator.require(!allowlist.isEmpty(),"Allowlist has no capability ids: "+allowlistRef);
         Set<String> outcomes=new HashSet<>(PROBE_TRANSPORT_OUTCOMES);
         for(JsonNode o:Json.read(file(validator,"contracts/domain-vocabulary.json")).path("outcomes")) outcomes.add(Json.required(o,"outcome"));
@@ -297,7 +321,7 @@ public final class HostObservationValidator {
             ContractValidator.require(surfaces.contains(surface) && items.add(key),"Surface item is unrequested or duplicated: "+key);
             ContractValidator.require(PROBE_POLICY.containsKey(kind),"Surface item kind has no probe applicability policy: "+key+" "+kind);
             ContractValidator.require(KIND_SURFACES.get(kind).contains(surface),"Surface item kind "+kind+" cannot be enumerated from "+surface+": "+key);
-            for(String probeClass:PROBE_POLICY.get(kind)) if(classes.contains(probeClass)) applicableByClass.computeIfAbsent(probeClass,k->new TreeSet<>()).add(key);
+            if(!queryExempt(item,capabilityKinds)) for(String probeClass:PROBE_POLICY.get(kind)) if(classes.contains(probeClass)) applicableByClass.computeIfAbsent(probeClass,k->new TreeSet<>()).add(key);
             actualCounts.merge(surface,1,Integer::sum);
             boolean listed=item.path("capabilityId").isTextual() && allowlist.contains(item.path("capabilityId").asText());
             ContractValidator.require(item.path("allowlisted").isBoolean() && item.path("allowlisted").asBoolean()==listed,"Surface item allowlisted differs from the committed allowlist: "+key);

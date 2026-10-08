@@ -1054,22 +1054,26 @@
       "type": "ManufacturerLot"
     },
     "W": {
-      "type": "Place"
+      "type": "Place",
+      "kind": "INTERNAL_STORAGE"
     },
     "TRANSIT": {
-      "type": "Place"
+      "type": "Place",
+      "kind": "TRANSIT"
     },
     "C": {
       "type": "Customer"
     },
     "CUSTOMER": {
-      "type": "Place"
+      "type": "Place",
+      "kind": "CUSTOMER"
     },
     "SUPPLIER": {
       "type": "Supplier"
     },
     "SUPPLIER_PLACE": {
-      "type": "Place"
+      "type": "Place",
+      "kind": "SUPPLIER"
     },
     "supervisor": {
       "type": "Human"
@@ -1135,7 +1139,8 @@
         "eligibility-packaging-unapproved-A-BOX-019",
         "eligibility-packaging-unapproved-A-BOX-020"
       ],
-      "expiresAt": "2026-10-20T00:00:00Z"
+      "expiresAt": "2026-10-20T00:00:00Z",
+      "custodianAlias": "receiver"
     },
     "B": {
       "type": "QuantitySegment",
@@ -1168,7 +1173,8 @@
         "eligibility-packaging-unapproved-B-BOX-019",
         "eligibility-packaging-unapproved-B-BOX-020"
       ],
-      "expiresAt": "2026-10-25T00:00:00Z"
+      "expiresAt": "2026-10-25T00:00:00Z",
+      "custodianAlias": "receiver"
     },
     "EARLY": {
       "type": "QuantitySegment",
@@ -1201,7 +1207,8 @@
         "eligibility-packaging-unapproved-EARLY-BOX-019",
         "eligibility-packaging-unapproved-EARLY-BOX-020"
       ],
-      "expiresAt": "2026-10-10T00:00:00Z"
+      "expiresAt": "2026-10-10T00:00:00Z",
+      "custodianAlias": "receiver"
     },
     "U": {
       "type": "QuantitySegment",
@@ -1233,7 +1240,8 @@
         "eligibility-packaging-unapproved-U-BOX-018",
         "eligibility-packaging-unapproved-U-BOX-019",
         "eligibility-packaging-unapproved-U-BOX-020"
-      ]
+      ],
+      "custodianAlias": "receiver"
     },
     "OTHERPACK": {
       "type": "QuantitySegment",
@@ -1266,7 +1274,8 @@
         "eligibility-packaging-unapproved-OTHERPACK-BOX-019",
         "eligibility-packaging-unapproved-OTHERPACK-BOX-020"
       ],
-      "packagingVersion": "other-box-v1"
+      "packagingVersion": "other-box-v1",
+      "custodianAlias": "receiver"
     },
     "delivery-proof": {
       "type": "DocumentVersion",

@@ -632,11 +632,11 @@
     },
     "W": {
       "type": "Place",
-      "kind": "WAREHOUSE"
+      "kind": "INTERNAL_STORAGE"
     },
     "W2": {
       "type": "Place",
-      "kind": "INTERNAL_WAREHOUSE"
+      "kind": "INTERNAL_STORAGE"
     },
     "C_PLACE": {
       "type": "Place",
@@ -650,7 +650,8 @@
       "unit": "BOX",
       "locationAlias": "W",
       "physicalScope": "safe-retry-revoked-blocked-physical-20",
-      "revision": 1
+      "revision": 1,
+      "custodianAlias": "warehouse"
     },
     "BASE_ORDER_LINE": {
       "type": "SalesOrderLine",
@@ -757,7 +758,8 @@
         "revision": 1,
         "physicalScope": "safe-retry-revoked-blocked-physical-20",
         "lotAlias": "L",
-        "locationAlias": "W"
+        "locationAlias": "W",
+        "custodianAlias": "warehouse"
       }
     ],
     "policies": [

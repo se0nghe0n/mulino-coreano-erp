@@ -145,6 +145,8 @@ public final class ContractValidator {
             List<JsonNode> ticks=new ArrayList<>();
             for(JsonNode a:all) if(isProcess(a,"tickScheduler") || isProcess(a,"sweepDue")) ticks.add(a);
             if(ticks.isEmpty()) continue;
+            for(JsonNode t:ticks) if(t.path("control").path("parameters").has(HostObservationValidator.OBSERVE_FROM))
+                problems.add(where+"/"+t.path("id").asText()+": "+HostObservationValidator.OBSERVE_FROM+" is resolved by the harness (CaseRunner) from the observation boundary; a case does not author it");
             JsonNode profile=runtimeProfile(sub.path("fixtureRef").asText(),new HashSet<>());
             boolean anyPassive=false,anyHarness=false;
             for(JsonNode t:ticks) {if(passive(t)) anyPassive=true; else anyHarness=true;}
@@ -222,6 +224,108 @@ public final class ContractValidator {
             }
         }
         return problems;
+    }
+    /**
+     * contracts/fixture-place-kinds.json (step2r round 6). A product treats only INTERNAL_STORAGE under an internal custodian as
+     * confirmed custody, TRANSIT/CUSTOMER/SUPPLIER/EXTERNAL_* as outside custody (a known 0) and any other kind as unknown,
+     * so a fixture Place without a contract kind makes its eligibility oracles depend on an uncontracted adapter mapping.
+     * Every Place alias of a subcase fixture (and its baseRefs) therefore needs a contract kind; a kind outside the vocabulary
+     * is accepted only as the declared negative control (kindControl=UNRECOGNIZED_PLACE_KIND, not an EXTERNAL_* kind).
+     * baseline.places repeats the alias kind. A segment located (alias or baseline.segments, locationAlias/placeAlias) at
+     * INTERNAL_STORAGE names an internal custodian: a Human/Agent alias of the place's organization.
+     */
+    public List<String> placeKindProblems(JsonNode caseFile) throws IOException {
+        JsonNode contract=Json.read(path("contracts/fixture-place-kinds.json"));
+        Set<String> kinds=new HashSet<>(),internal=new HashSet<>();
+        for(JsonNode k:contract.path("kinds")) kinds.add(Json.required(k,"kind"));
+        for(JsonNode t:contract.path("internalCustodianAliasTypes")) internal.add(t.asText());
+        String controlField=contract.path("unrecognizedKindControl").path("field").asText(),controlValue=contract.path("unrecognizedKindControl").path("value").asText();
+        List<String> problems=new ArrayList<>();Set<String> seen=new HashSet<>();
+        for(JsonNode sub:caseFile.path("subcases")) {
+            Deque<String> refs=new ArrayDeque<>();refs.add(sub.path("fixtureRef").asText());
+            while(!refs.isEmpty()) {
+                String ref=refs.pop();
+                if(ref.isBlank() || !seen.add(ref) || !Files.isRegularFile(path(ref))) continue;
+                JsonNode fixture=Json.read(path(ref));JsonNode aliases=fixture.path("aliases");
+                for(JsonNode base:fixture.path("baseRefs")) refs.add(base.asText());
+                String where=caseFile.path("caseId").asText()+" "+ref;
+                for(var it=aliases.fields();it.hasNext();) {
+                    var e=it.next();JsonNode a=e.getValue();
+                    if(!a.path("type").asText().equals("Place")) continue;
+                    String kind=a.path("kind").asText(null);
+                    if(a.has(controlField)) {
+                        if(!controlValue.equals(a.path(controlField).asText()) || kind==null || kinds.contains(kind) || kind.startsWith("EXTERNAL_"))
+                            problems.add(where+": Place "+e.getKey()+" "+controlField+" must be "+controlValue+" on a kind outside the vocabulary (and not EXTERNAL_*), found "+a.path(controlField)+"/"+kind);
+                    } else if(kind==null) problems.add(where+": Place "+e.getKey()+" has no kind; use one of "+new TreeSet<>(kinds)+" (contracts/fixture-place-kinds.json)");
+                    else if(!kinds.contains(kind)) problems.add(where+": Place "+e.getKey()+" kind "+kind+" is not in the fixture place vocabulary "+new TreeSet<>(kinds)+" (contracts/fixture-place-kinds.json)");
+                }
+                for(JsonNode place:fixture.path("baseline").path("places")) {
+                    JsonNode a=aliases.path(place.path("alias").asText());
+                    if(!a.path("type").asText().equals("Place")) problems.add(where+": baseline.places "+place.path("alias").asText()+" is not a Place alias");
+                    else if(place.has("kind") && !place.path("kind").equals(a.path("kind"))) problems.add(where+": baseline.places "+place.path("alias").asText()+" kind "+place.path("kind").asText()+" differs from the alias kind "+a.path("kind").asText());
+                }
+                Map<String,List<JsonNode>> segments=new LinkedHashMap<>();
+                for(var it=aliases.fields();it.hasNext();) {var e=it.next();if(e.getValue().path("type").asText().equals("QuantitySegment")) segments.computeIfAbsent(e.getKey(),k->new ArrayList<>()).add(e.getValue());}
+                for(JsonNode s:fixture.path("baseline").path("segments")) if(s.path("alias").isTextual()) segments.computeIfAbsent(s.path("alias").asText(),k->new ArrayList<>()).add(s);
+                for(var e:segments.entrySet()) {
+                    String location=null,custodian=null;
+                    for(JsonNode r:e.getValue()) {
+                        for(String key:List.of("locationAlias","placeAlias")) if(location==null && r.path(key).isTextual()) location=r.path(key).asText();
+                        if(custodian==null && r.path("custodianAlias").isTextual()) custodian=r.path("custodianAlias").asText();
+                    }
+                    if(custodian!=null && !aliases.has(custodian)) problems.add(where+": segment "+e.getKey()+" custodianAlias "+custodian+" is not a fixture alias");
+                    JsonNode place=location==null?null:aliases.get(location);
+                    if(place==null || !place.path("type").asText().equals("Place") || !"INTERNAL_STORAGE".equals(place.path("kind").asText()) || place.has(controlField)) continue;
+                    JsonNode holder=custodian==null?null:aliases.get(custodian);
+                    if(holder==null || !internal.contains(holder.path("type").asText()))
+                        problems.add(where+": segment "+e.getKey()+" at INTERNAL_STORAGE "+location+" needs an internal custodian (a "+internal+" alias), found "+(custodian==null?"none":custodian+" "+(holder==null?"":holder.path("type").asText())));
+                    else if(place.has("organizationAlias") && holder.has("organizationAlias") && !place.path("organizationAlias").equals(holder.path("organizationAlias")))
+                        problems.add(where+": segment "+e.getKey()+" custodian "+custodian+" belongs to "+holder.path("organizationAlias").asText()+", not to the organization of "+location);
+                }
+            }
+        }
+        return problems;
+    }
+    /** The Accept every Streamable HTTP request sends (contracts/mcp/s0-protocol.md "독립 요청"). */
+    public static final String MCP_ACCEPT="application/json, text/event-stream";
+    /**
+     * contracts/mcp/s0-protocol.md: a Streamable HTTP request without Accept: application/json, text/event-stream is answered
+     * 406 and a request with an Origin outside the allowlist 403, before any JSON-RPC processing, and the relative order of
+     * these transport rejections and the other error rows is not fixed. No contract or fixture declares an allowed Origin
+     * (an Origin-less request is accepted). A wire request that omits/changes Accept or sends an Origin therefore makes every
+     * other expectation of its subcase unsatisfiable for a conforming server, unless it is the transport negative itself:
+     * the subcase pins that action's /response/httpStatus to 406 (Accept) or 403 (Origin), and a request breaks only one of
+     * the two headers so the expected status is unambiguous.
+     */
+    public List<String> wireTransportProblems(JsonNode caseFile) {
+        List<String> problems=new ArrayList<>();
+        for(JsonNode sub:caseFile.path("subcases")) {
+            String where=caseFile.path("caseId").asText()+"/"+sub.path("id").asText();
+            List<JsonNode> all=new ArrayList<>();collect(sub.path("actions"),all);
+            List<JsonNode> requests=new ArrayList<>();
+            for(JsonNode a:all) {requests.add(a);if(a.has("call")) requests.add(a.path("call"));}
+            for(JsonNode a:requests) {
+                JsonNode request=a.path("request");
+                if(!a.path("route").asText().equals("wire") || !request.path("transport").asText().equals("streamable-http")) continue;
+                String accept=null;boolean origin=false;
+                for(var it=request.path("headers").fields();it.hasNext();) {var h=it.next();String name=h.getKey().toLowerCase(Locale.ROOT);
+                    if(name.equals("accept")) accept=h.getValue().asText();
+                    if(name.equals("origin")) origin=true;}
+                boolean badAccept=!MCP_ACCEPT.equals(accept);
+                String id=a.path("id").asText();
+                if(badAccept && origin) {problems.add(where+"/"+id+": a Streamable HTTP request breaks both Accept and Origin; the expected transport rejection (406 or 403) is ambiguous");continue;}
+                if(!badAccept && !origin) continue;
+                int status=badAccept?406:403;
+                if(!pinsHttpStatus(sub,id,status)) problems.add(where+"/"+id+": Streamable HTTP request "+(badAccept?"without Accept: "+MCP_ACCEPT:"with an Origin no contract allowlists")
+                    +" is answered "+status+" before JSON-RPC processing; send the required Accept and no Origin, or pin /response/httpStatus equals "+status+" as the transport negative (contracts/mcp/s0-protocol.md)");
+            }
+        }
+        return problems;
+    }
+    private static boolean pinsHttpStatus(JsonNode sub,String actionId,int status) {
+        for(JsonNode assertion:sub.path("assertions")) if(assertion.path("op").asText().equals("equals") && assertion.path("source").path("actionId").asText().equals(actionId)
+                && assertion.path("source").path("pointer").asText().equals("/response/httpStatus") && assertion.path("expected").isIntegralNumber() && assertion.path("expected").asInt()==status) return true;
+        return false;
     }
     private static boolean isProcess(JsonNode a,String operation) {
         return a.path("kind").asText().equals("control") && a.path("control").path("type").asText().equals("process") && a.path("control").path("operation").asText().equals(operation);

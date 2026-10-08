@@ -467,6 +467,26 @@
     그러면 "wire-raw-MCP-Protocol-Version" assertion으로 "wire-raw-MCP-Protocol-Version: /data/transcript/request/headers/MCP-Protocol-Version의 실제 equals 기대값은 '2026-07-28'다. 미관찰·UNKNOWN은 정상값이 아니다."를 확인한다
     그러면 "wire-raw-Mcp-Method" assertion으로 "wire-raw-Mcp-Method: /data/transcript/request/headers/Mcp-Method의 실제 equals 기대값은 'server/discover'다. 미관찰·UNKNOWN은 정상값이 아니다."를 확인한다
     그러면 "wire-raw-meta" assertion으로 "wire-raw-meta: /data/transcript/request/body/params/_meta의 실제 equals 기대값은 {'io.modelcontextprotocol/protocolVersion': '2026-07-28', 'io.modelcontextprotocol/clientInfo': {'name': 'ontology-channel-contract', 'version': '1.0.0'}, 'io.modelcontextprotocol/clientCapabilities': {'elicitation': {'form': {}}}}다. 미관찰·UNKNOWN은 정상값이 아니다."를 확인한다
+  시나리오: raw stateless MCP missing-accept
+    먼저 사례 파일 "verification/cases/T20/case.json"의 "wire-missing-accept"를 준비한다
+    만일 "시스템" 역할이 "setup" 행동을 수행한다
+    만일 "reader" 역할이 "noun" 행동을 수행한다
+    만일 "시스템" 역할이 "db-before" 행동을 수행한다
+    만일 "reader" 역할이 "wire" 행동을 수행한다
+    만일 "reader" 역할이 "after" 행동을 수행한다
+    만일 "시스템" 역할이 "db-after" 행동을 수행한다
+    그러면 "wire-http" assertion으로 "wire-http: /response/httpStatus의 실제 equals 기대값은 406다. 미관찰·UNKNOWN은 정상값이 아니다."를 확인한다
+    그러면 "unchanged-segments" assertion으로 "승인·실물·배분·업무·외부효과의 전후 원행을 exact 대조한다. 허용 감사는 이 불변 대상에서 분리한다."를 확인한다
+    그러면 "unchanged-movements" assertion으로 "승인·실물·배분·업무·외부효과의 전후 원행을 exact 대조한다. 허용 감사는 이 불변 대상에서 분리한다."를 확인한다
+    그러면 "unchanged-allocations" assertion으로 "승인·실물·배분·업무·외부효과의 전후 원행을 exact 대조한다. 허용 감사는 이 불변 대상에서 분리한다."를 확인한다
+    그러면 "unchanged-approvals" assertion으로 "승인·실물·배분·업무·외부효과의 전후 원행을 exact 대조한다. 허용 감사는 이 불변 대상에서 분리한다."를 확인한다
+    그러면 "unchanged-works" assertion으로 "승인·실물·배분·업무·외부효과의 전후 원행을 exact 대조한다. 허용 감사는 이 불변 대상에서 분리한다."를 확인한다
+    그러면 "unchanged-outbox" assertion으로 "승인·실물·배분·업무·외부효과의 전후 원행을 exact 대조한다. 허용 감사는 이 불변 대상에서 분리한다."를 확인한다
+    그러면 "wire-raw-method" assertion으로 "wire-raw-method: /data/transcript/request/body/method의 실제 equals 기대값은 'server/discover'다. 미관찰·UNKNOWN은 정상값이 아니다."를 확인한다
+    그러면 "wire-raw-jsonrpc-id" assertion으로 "wire-raw-jsonrpc-id: /data/transcript/request/body/id의 실제 equals 기대값은 'wire'다. 미관찰·UNKNOWN은 정상값이 아니다."를 확인한다
+    그러면 "wire-raw-MCP-Protocol-Version" assertion으로 "wire-raw-MCP-Protocol-Version: /data/transcript/request/headers/MCP-Protocol-Version의 실제 equals 기대값은 '2026-07-28'다. 미관찰·UNKNOWN은 정상값이 아니다."를 확인한다
+    그러면 "wire-raw-Mcp-Method" assertion으로 "wire-raw-Mcp-Method: /data/transcript/request/headers/Mcp-Method의 실제 equals 기대값은 'server/discover'다. 미관찰·UNKNOWN은 정상값이 아니다."를 확인한다
+    그러면 "wire-raw-meta" assertion으로 "wire-raw-meta: /data/transcript/request/body/params/_meta의 실제 equals 기대값은 {'io.modelcontextprotocol/protocolVersion': '2026-07-28', 'io.modelcontextprotocol/clientInfo': {'name': 'ontology-channel-contract', 'version': '1.0.0'}, 'io.modelcontextprotocol/clientCapabilities': {'elicitation': {'form': {}}}}다. 미관찰·UNKNOWN은 정상값이 아니다."를 확인한다
   시나리오: raw stateless MCP initialize-not-required
     먼저 사례 파일 "verification/cases/T20/case.json"의 "wire-initialize-not-required"를 준비한다
     만일 "시스템" 역할이 "setup" 행동을 수행한다
