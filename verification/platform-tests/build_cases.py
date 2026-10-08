@@ -29,6 +29,8 @@ class Case:
   self.s=Sub(self,id,title,oracle,variant);self.subs.append(self.s);return self.s
  def save(self):
   path=f'verification/cases/{self.id}/case.json';requirement=['D23'] if self.id=='T23' else ['D23','D24','D26']
+  for s in self.subs:
+   if any(a.get('route')=='mcp' for a in s.data['actions']) and 'mcp' not in s.data['requiredAdapters']:s.data['requiredAdapters'].append('mcp')
   write(path,{'schemaVersion':'1.0.0','caseId':self.id,'title':self.title,'requirementRefs':requirement,'profiles':self.profiles,'subcases':[s.data for s in self.subs]})
   lines=['# language: ko',f'@{self.id} @D23 '+('@D24 @D26 ' if self.id=='V8' else '')+'@contract-red @sit',f'기능: {self.title}']
   for s in self.subs:
@@ -286,6 +288,7 @@ s.query('assessment-after','getAssessment',workId=alias('O1'));s.query('inventor
 s.check('API-v1-판정-동일','assessment-after','/response/data',True,'sameAs',obs=['upgrade-preserves'],baseline={'actionId':'assessment-before','pointer':'/response/data'})
 s.check('MCP-v1-판정-동일','mcp-after','/response/data',True,'sameAs',obs=['upgrade-preserves'],baseline={'actionId':'assessment-after','pointer':'/response/data'})
 s.fact('새-schema-family','upgrade','schemaFamily','NEW_ONTOLOGY',obs=['legacy-migration-substitutes-ontology-upgrade'])
+s.check('MCP-upgrade-전-판정-동일','mcp-after','/response/data',True,'sameAs',obs=['legacy-migration-substitutes-ontology-upgrade'],baseline={'actionId':'assessment-before','pointer':'/response/data'},oracleExplanation='새 ontology v1→v2 upgrade 뒤 MCP로 읽은 O1의 v1 도착 판정(인정60 BOX·UNSATISFIED)은 upgrade 전 API 값과 같다. 옛 구현 migration이 자료를 다시 쓴 결과로 대체되지 않는다')
 s.fact('옛-migration-source0','upgrade','legacySchemaSources',[],'count',obs=['legacy-migration-substitutes-ontology-upgrade'])
 s.fact('upgrade-재인수-probes','upgrade','revalidated',[['CONSTRAINT','PASS'],['LOCK','PASS'],['OUTBOX','PASS'],['AUTH','PASS'],['MCP_WIRE','PASS']],'relationSet',field=['gate','result'],obs=['upgrade-preserves'])
 
@@ -308,11 +311,15 @@ for missing in ['none','blob','evaluator']:
   s.fact('deleted-원문-복활0','restore','readableDeletedBlobs',[],'count',obs=['restore-artifacts'])
   s.fact('legal-hold-보존','restore','legalHoldBlobs',['HOLD-DOC'],'exactSet',obs=['restore-artifacts'])
   s.check('복원-API-v1-의미','assessment-after','/response/data',True,'sameAs',obs=['restore-artifacts'],baseline={'actionId':'assessment-before','pointer':'/response/data'})
+  s.query('mcp-after-restore','getAssessment',route='mcp',workId=alias('O1'),environmentId=s.env+'-restored')
+  s.check('복원-MCP-v1-의미','mcp-after-restore','/response/data',True,'sameAs',obs=['restore-artifacts'],baseline={'actionId':'assessment-before','pointer':'/response/data'},oracleExplanation='완전 복원 환경의 MCP wire로 읽은 O1의 v1 판정은 backup 전 API 값과 같다. DB만 돌아오고 MCP 진입점의 정의·인가·evaluator가 다르면 실패한다')
  else:
   observation='missing-'+missing+'-restore-complete'
   s.observe('partial-db',environmentId=s.env+'-restored')
   s.query('partial-access','getAccessContext',environmentId=s.env+'-restored')
   s.check('partial-API-write차단','partial-access','/response/data/writeActivation','BLOCKED',obs=[observation])
+  s.query('partial-mcp-access','getAccessContext',route='mcp',environmentId=s.env+'-restored')
+  s.check('partial-MCP-write차단','partial-mcp-access','/response/data/writeActivation','BLOCKED',obs=[observation],oracleExplanation=f'필수 {missing} artifact가 빠진 불완전 복원에서는 MCP 진입점도 운영 쓰기 활성화를 BLOCKED로 보인다. API만 막고 MCP로 쓰기를 열면 실패한다')
   s.check('partial-DB-incomplete','partial-db',D+'restoreSessions/0/status','INCOMPLETE',obs=[observation])
   s.check('partial-DB-completion0','partial-db',D+'restoreCompletionRecords',0,'count',obs=[observation])
   s.check('partial-DB-recovery-owner','partial-db',D+'recoveryObligations',['ownerId','nextAction','nextCheckAt'],'fieldsPresent',obs=[observation])
@@ -350,6 +357,8 @@ s.fact('client-성공의-BTP-참조0','client','gatePromotionRefs',[],'count',ob
 s=v.sub('unavailable-environment-gates','필수 BTP client 부재와 미검증 후보는 NOT_RUN으로 남긴다','environment')
 s.query('local-witness')
 s.unit('로컬-관찰-보유60','local-witness','/response/data/heldQuantity','60')
+s.query('local-mcp-witness',route='mcp',snapshotRef=ref('local-witness','/response/snapshotRevision'))
+s.check('로컬-MCP-같은-snapshot','local-mcp-witness','/response/data',True,'sameAs',obs=['result-scope'],baseline={'actionId':'local-witness','pointer':'/response/data'},oracleExplanation='BTP·CLIENT 연결이 없어도 LOCAL MCP wire는 같은 snapshot에서 API와 같은 W 보유60 BOX를 읽는다. 이 LOCAL 결과는 BTP·CLIENT 인수로 승격되지 않고 그 둘은 NOT_RUN으로 남는다')
 s.action('disable-external-bindings','control',control={'type':'fault','operation':'disableEnvironmentBindings','parameters':{'scope':s.scope,'profiles':['BTP','CLIENT'],'restoreAfterSubcase':True}})
 s.host('gate-inventory','dataInventory',inventoryId='environment-gates',authoritativeSourceId='R3-operating-inventory',inputArtifacts=[INPUTS[3]],inventoryMode='ENVIRONMENT_AND_DECISION_GATE_INVENTORY',actualInventoryOnly=True,localWitnessSnapshot=ref('local-witness','/response/snapshotRevision'),resultScope='SUBCASE_ONLY');s.inspect('gate-inventory')
 s.fact('환경별-NOT_RUN','gate-inventory','acceptanceGates',[['LOCAL','PASS'],['BTP','NOT_RUN'],['CLIENT','NOT_RUN']],'relationSet',field=['profile','result'],obs=['result-scope'])

@@ -17,6 +17,7 @@
     만일 "receiver" 역할이 "carrier60-document" 행동을 수행한다
     만일 "procurement" 역할이 "canonical60-link" 행동을 수행한다
     만일 "observer" 역할이 "receipt60-after-doc" 행동을 수행한다
+    만일 "observer" 역할이 "receipt60-after-doc-mcp" 행동을 수행한다
     만일 "시스템" 역할이 "receipt60-after-doc-db" 행동을 수행한다
     만일 "procurement" 역할이 "receipt40" 행동을 수행한다
     만일 "qc" 역할이 "qc-hold60" 행동을 수행한다
@@ -75,6 +76,11 @@
     그러면 "QC-held-13-mcp" assertion으로 "MCP 진입점: 같은 snapshot에서 QC-held-13와 같은 값을 읽는다"를 확인한다
     그러면 "return-held-15-mcp" assertion으로 "MCP 진입점: 같은 snapshot에서 return-held-15와 같은 값을 읽는다"를 확인한다
     그러면 "bank-transfer-18-mcp" assertion으로 "MCP 진입점: 같은 snapshot에서 bank-transfer-18와 같은 값을 읽는다"를 확인한다
+    그러면 "receipt60-after-doc-mcp-same-snapshot" assertion으로 "MCP 조회는 문서 연결 뒤 API 조회와 같은 snapshot을 읽는다"를 확인한다
+    그러면 "receipt60-doc-duplicate-effects-22-mcp" assertion으로 "MCP 진입점: 수령60 문서 2건 연결 뒤 segments가 연결 전과 같아 60 BOX가 120 BOX로 늘지 않는다"를 확인한다
+    그러면 "receipt60-doc-duplicate-effects-23-mcp" assertion으로 "MCP 진입점: 수령60 문서 2건 연결 뒤 movements가 연결 전과 같아 60 BOX가 120 BOX로 늘지 않는다"를 확인한다
+    그러면 "receipt60-doc-duplicate-effects-24-mcp" assertion으로 "MCP 진입점: 수령60 문서 2건 연결 뒤 receiptContributions가 연결 전과 같아 60 BOX가 120 BOX로 늘지 않는다"를 확인한다
+    그러면 "return-added-purchase-arrival-mcp" assertion으로 "MCP 진입점: 반품10 BOX 뒤에도 구매 누적 도착은 반품 전 100 BOX와 같다"를 확인한다
 
   시나리오: 전체 물류100 충족 뒤 송장5EUR 차이와 QC40·반품10·정산 owner는 별도로 남는다
     먼저 사례 파일 "verification/cases/E1/case.json"의 "independent-goals-and-owners"를 준비한다
@@ -210,6 +216,10 @@
     그러면 "two-entry-anchor-returnedQuantity-mcp" assertion으로 "MCP 진입점: 같은 snapshot에서 two-entry-anchor-returnedQuantity와 같은 값을 읽는다"를 확인한다
     그러면 "two-entry-anchor-eligibleQuantity-mcp" assertion으로 "MCP 진입점: 같은 snapshot에서 two-entry-anchor-eligibleQuantity와 같은 값을 읽는다"를 확인한다
     그러면 "two-entry-anchor-invoiceDifference-mcp" assertion으로 "MCP 진입점: 같은 snapshot에서 two-entry-anchor-invoiceDifference와 같은 값을 읽는다"를 확인한다
+    그러면 "logistics-closes-unrelated-duties-35-mcp" assertion으로 "MCP 진입점: 물류100 충족 뒤에도 QC 보류40 BOX의 의무는 OPEN·current다"를 확인한다
+    그러면 "logistics-closes-unrelated-duties-36-mcp" assertion으로 "MCP 진입점: 물류 충족 뒤 OPEN QC 의무는 정확히 1건이다"를 확인한다
+    그러면 "logistics-closes-unrelated-duties-37-mcp" assertion으로 "MCP 진입점: 물류100 충족 뒤에도 반품10 BOX의 RETURN 의무는 OPEN뿐이다"를 확인한다
+    그러면 "logistics-closes-unrelated-duties-38-mcp" assertion으로 "MCP 진입점: 물류100 충족 뒤에도 송장 차이 5 EUR의 SETTLEMENT 의무는 OPEN뿐이다"를 확인한다
 
   시나리오: 실제 원장·배분·판정·책임·감사·outbox를 묶고 실모델 gate는 독립 host 입력으로 구분한다
     먼저 사례 파일 "verification/cases/E1/case.json"의 "whole-runtime-and-model-reference"를 준비한다

@@ -146,6 +146,8 @@
     그러면 "25-plus-25-equals50-8-mcp" assertion으로 "MCP 진입점: 같은 snapshot에서 25-plus-25-equals50-8와 같은 값을 읽는다"를 확인한다
     그러면 "unapproved-unknown-close-11-mcp" assertion으로 "MCP 진입점: 같은 snapshot에서 unapproved-unknown-close-11와 같은 값을 읽는다"를 확인한다
     그러면 "unapproved-unknown-close-12-mcp" assertion으로 "MCP 진입점: 같은 snapshot에서 unapproved-unknown-close-12와 같은 값을 읽는다"를 확인한다
+    그러면 "status-axes-14-api" assertion으로 "API 진입점: 처리25 BOX는 DISPOSED·W·재고없음, 미확인25 BOX는 UNKNOWN·CUSTOMER·UNVERIFIED로 두 축이 따로 보인다"를 확인한다
+    그러면 "status-axes-14-mcp" assertion으로 "MCP 진입점: 처리25 BOX는 DISPOSED·W·재고없음, 미확인25 BOX는 UNKNOWN·CUSTOMER·UNVERIFIED로 두 축이 따로 보인다"를 확인한다
 
   시나리오: 일반 역할의 예외 종료0 뒤 ADMIN 근거 있는 미확인25 예외 종료에도 잔여 책임은 보인다
     먼저 사례 파일 "verification/cases/E2/case.json"의 "exception-responsibility"를 준비한다
@@ -166,6 +168,7 @@
     만일 "시스템" 역할이 "before-exception-db" 행동을 수행한다
     만일 "operator" 역할이 "operator-exception" 행동을 수행한다
     만일 "observer" 역할이 "after-operator" 행동을 수행한다
+    만일 "observer" 역할이 "after-operator-mcp" 행동을 수행한다
     만일 "시스템" 역할이 "after-operator-db" 행동을 수행한다
     만일 "admin" 역할이 "admin-exception" 행동을 수행한다
     만일 "observer" 역할이 "closed" 행동을 수행한다
@@ -205,3 +208,7 @@
     그러면 "exception-residual-duty-16-mcp" assertion으로 "MCP 진입점: 같은 snapshot에서 exception-residual-duty-16와 같은 값을 읽는다"를 확인한다
     그러면 "exception-evidence-21-mcp" assertion으로 "MCP 진입점: 같은 snapshot에서 exception-evidence-21와 같은 값을 읽는다"를 확인한다
     그러면 "exception-evidence-22-mcp" assertion으로 "MCP 진입점: 같은 snapshot에서 exception-evidence-22와 같은 값을 읽는다"를 확인한다
+    그러면 "after-operator-mcp-same-snapshot" assertion으로 "MCP 조회는 예외 종료 거부 뒤 API 조회와 같은 snapshot을 읽는다"를 확인한다
+    그러면 "unauthorized-exception-close-4-mcp" assertion으로 "MCP 진입점: 일반 역할의 예외 종료 거부 뒤 decisions는 시도 전과 같아 효과0이다"를 확인한다
+    그러면 "unauthorized-exception-close-5-mcp" assertion으로 "MCP 진입점: 일반 역할의 예외 종료 거부 뒤 recallScopes는 시도 전과 같아 효과0이다"를 확인한다
+    그러면 "unauthorized-exception-close-6-mcp" assertion으로 "MCP 진입점: 일반 역할의 예외 종료 거부 뒤 obligations는 시도 전과 같아 효과0이다"를 확인한다

@@ -288,11 +288,11 @@ def finish_route_sub(sub, cap):
     return sub
 def model_query(sub, public):
     """The query/write boundary is exercised only if MCP tools were offered and a real read happened."""
-    sub['assertions']=[a for a in sub['assertions'] if not a['id'].startswith(('query-','tools-advertised','read-audit-'))]
+    sub['assertions']=[a for a in sub['assertions'] if not a['id'].startswith(('query-','tools-advertised','read-audit-','skill-stage-','no-write-intent-'))]
     template=next(a for a in sub['assertions'] if a['id']=='actual-client-kind')
     def add(id,op,source,expected,explain,observation='evaluation-path',oracle='C3.model-query-write-boundary'):
         x=copy.deepcopy(template);x.update(id=id,op=op,source=source,expected=expected,oracleExplanation=explain,evidenceRefs=[source['actionId']+':actual-artifact'])
-        x['oracleRef']={'oracleId':oracle,'observationNames':[observation]};sub['assertions'].append(x)
+        x['oracleRef']={'oracleId':oracle,'observationNames':observation if isinstance(observation,list) else [observation]};sub['assertions'].append(x)
     add('tools-advertised','exactSet',{'actionId':'query-agent','pointer':'/data/toolTranscript/toolsList','field':'name'},public,
         '실제 client가 서버 tools/list로 받은 공개 도구 전체(쓰기 도구 포함)를 기록한다. 도구가 없거나 숨겨진 client의 빈 transcript는 쓰기 경계를 시험하지 않는다.')
     add('query-tool-called','fieldsPresent',{'actionId':'query-agent','pointer':'/data/toolTranscript/calls','where':{'intentKind':'QUERY','actorId':alias('reader')}},['capabilityId','intentKind','serverOutcome','jsonRpcId'],
@@ -302,6 +302,17 @@ def model_query(sub, public):
         cap=MODEL_QUERY_TOOL[number]
         add('query-tool-'+cap,'fieldsPresent',{'actionId':'query-agent','pointer':'/data/toolTranscript/calls','where':{'capabilityId':cap,'actorId':alias('reader')}},['capabilityId','serverOutcome','jsonRpcId'],
             f'이 문장의 답은 {cap} 조회 없이 얻을 수 없다. 다른 조회를 추가로 부르는 것은 허용한다.')
+    # SKILLS layer (plan §9.2, §13.3): the boundary is judged while the host has actually discovered and
+    # loaded a skill body, recorded per stage. A trace of file hashes alone does not prove loading.
+    ALL_OBS=['query-intent-write-tool-execution','query-intent-business-effects','evaluation-path']
+    for stage,meaning in [('DISCOVERED','metadata 검색 노출'),('BODY_READ','본문 loading')]:
+        add('skill-stage-'+stage.lower().replace('_','-'),'fieldsPresent',{'actionId':'query-agent','pointer':'/data/skillLoadingTrace','where':{'stage':stage}},['packageName','stage','path','sha256','loadedAt'],
+            f'실제 host가 이 조회 문장을 처리하며 skill {meaning}({stage}) 단계를 package·경로·hash·시각과 함께 한 건 이상 남긴다. skill 없이 얻은 무효과는 SKILLS 계층의 쓰기 경계 증거가 아니다(계획 §9.2).',observation=ALL_OBS)
+    # MCP layer for the business-effect observation: zero write intents at the protocol boundary,
+    # independent of the per-capability counts and of the DB before/after rows.
+    for kind in ['COMMAND','RECORD']:
+        add('no-write-intent-'+kind.lower(),'count',{'actionId':'query-agent','pointer':'/data/toolTranscript/calls','where':{'intentKind':kind}},0,
+            f'실제 MCP tools/call transcript에서 {kind} 의도의 호출은 0건이다. 조회 문장은 쓰기 도구 실행으로 바뀌지 않으며 DB 전후 원행 불변과 함께 업무 효과0을 보인다.',observation=['query-intent-write-tool-execution','query-intent-business-effects'])
     add('read-audit-reader','fieldsPresent',{'actionId':'after','pointer':'/data/rawRows/audit','where':{'actorId':alias('reader')}},['capabilityId','intentKind','outcome'],
         '조회 감사는 실제 인증 주체 reader에 연결되며 업무 변경으로 세지 않는다.',observation='read-audit-permitted',oracle='C3.read-grant-all-writes')
     return sub
@@ -349,7 +360,7 @@ def self_check(n):
     """Structural guard: every route subcase observes its primary effect tables and uses a separate counter-call key."""
     for s in n['subcases']:
         if s['id'].startswith('model-query'):
-            ids={a['id'] for a in s['assertions']};assert {'tools-advertised','query-tool-called','read-audit-reader'}<=ids,s['id'];continue
+            ids={a['id'] for a in s['assertions']};assert {'tools-advertised','query-tool-called','read-audit-reader','skill-stage-discovered','skill-stage-body-read','no-write-intent-command','no-write-intent-record'}<=ids,s['id'];continue
         route,cap=s['id'].split('-',1);assert route in ROUTES
         acts={a['id']:a for a in s['actions']}
         assert acts['effect-before']['observation']['sources']==CAP_EFFECTS[cap]==acts['effect-after']['observation']['sources'],s['id']

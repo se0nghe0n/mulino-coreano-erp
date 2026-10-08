@@ -780,6 +780,54 @@
           ]
         },
         {
+          "id": "receipt60-after-doc-mcp",
+          "kind": "query",
+          "actorRef": "observer",
+          "route": "mcp",
+          "capabilityId": "getObject",
+          "request": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseId": "E1",
+              "scenarioId": "full-flow-quantities"
+            },
+            "subjectRefs": [
+              {
+                "type": "TradeItem",
+                "id": {
+                  "$alias": "P"
+                }
+              }
+            ],
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z",
+            "include": [
+              "inventory",
+              "trade",
+              "evidence",
+              "assessments",
+              "obligations",
+              "audit",
+              "outbox"
+            ],
+            "snapshotRef": {
+              "$result": {
+                "actionId": "receipt60-after-doc",
+                "pointer": "/response/snapshotRevision"
+              }
+            }
+          },
+          "evidenceRefs": [
+            "receipt60-after-doc-mcp:mcp-response",
+            "receipt60-after-doc-mcp:actual-mcp-artifact"
+          ]
+        },
+        {
           "id": "receipt60-after-doc-db",
           "kind": "observe",
           "observation": {
@@ -3800,6 +3848,222 @@
             "observationNames": [
               "bank-transfer"
             ]
+          }
+        },
+        {
+          "id": "receipt60-after-doc-mcp-same-snapshot",
+          "op": "equals",
+          "source": {
+            "actionId": "receipt60-after-doc-mcp",
+            "pointer": "/response/snapshotRevision"
+          },
+          "expected": {
+            "$result": {
+              "actionId": "receipt60-after-doc",
+              "pointer": "/response/snapshotRevision"
+            }
+          },
+          "requirementRefs": [
+            "D05",
+            "D09",
+            "D13",
+            "D15",
+            "D16",
+            "D17",
+            "D18",
+            "D19"
+          ],
+          "evidenceRefs": [
+            "receipt60-after-doc-mcp:mcp-response"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "E1",
+            "scenarioId": "full-flow-quantities"
+          },
+          "oracleExplanation": "MCP 조회는 문서 연결 뒤 API 조회와 같은 snapshotRevision을 읽는다.",
+          "oracleRef": {
+            "oracleId": "E1.full-flow-quantities",
+            "observationNames": [
+              "receipt60-doc-duplicate-effects"
+            ]
+          }
+        },
+        {
+          "id": "receipt60-doc-duplicate-effects-22-mcp",
+          "op": "sameAs",
+          "source": {
+            "actionId": "receipt60-after-doc-mcp",
+            "pointer": "/response/data/effectLedger/segments"
+          },
+          "expected": null,
+          "requirementRefs": [
+            "D05",
+            "D09",
+            "D13",
+            "D15",
+            "D16",
+            "D17",
+            "D18",
+            "D19"
+          ],
+          "evidenceRefs": [
+            "receipt60-after-doc-mcp:mcp-response"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "E1",
+            "scenarioId": "full-flow-quantities"
+          },
+          "oracleExplanation": "stateless MCP 진입점에서 같은 snapshot으로 읽은 같은 값이다. API와 같은 서버 판정·원장을 읽어야 하며 다른 계산이나 캐시를 쓰면 실패한다(계획 §3.4, §9.1, §13.1 D20). 수령60의 운송·창고 증빙 두 개를 연결한 뒤 MCP로 읽은 effectLedger/segments는 문서 연결 전 API의 값과 같다. 증빙이 늘어도 실물 60 BOX가 120이 되지 않는다.",
+          "oracleRef": {
+            "oracleId": "E1.full-flow-quantities",
+            "observationNames": [
+              "receipt60-doc-duplicate-effects"
+            ]
+          },
+          "baseline": {
+            "actionId": "receipt60-before-doc",
+            "pointer": "/response/data/effectLedger/segments"
+          }
+        },
+        {
+          "id": "receipt60-doc-duplicate-effects-23-mcp",
+          "op": "sameAs",
+          "source": {
+            "actionId": "receipt60-after-doc-mcp",
+            "pointer": "/response/data/effectLedger/movements"
+          },
+          "expected": null,
+          "requirementRefs": [
+            "D05",
+            "D09",
+            "D13",
+            "D15",
+            "D16",
+            "D17",
+            "D18",
+            "D19"
+          ],
+          "evidenceRefs": [
+            "receipt60-after-doc-mcp:mcp-response"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "E1",
+            "scenarioId": "full-flow-quantities"
+          },
+          "oracleExplanation": "stateless MCP 진입점에서 같은 snapshot으로 읽은 같은 값이다. API와 같은 서버 판정·원장을 읽어야 하며 다른 계산이나 캐시를 쓰면 실패한다(계획 §3.4, §9.1, §13.1 D20). 수령60의 운송·창고 증빙 두 개를 연결한 뒤 MCP로 읽은 effectLedger/movements는 문서 연결 전 API의 값과 같다. 증빙이 늘어도 실물 60 BOX가 120이 되지 않는다.",
+          "oracleRef": {
+            "oracleId": "E1.full-flow-quantities",
+            "observationNames": [
+              "receipt60-doc-duplicate-effects"
+            ]
+          },
+          "baseline": {
+            "actionId": "receipt60-before-doc",
+            "pointer": "/response/data/effectLedger/movements"
+          }
+        },
+        {
+          "id": "receipt60-doc-duplicate-effects-24-mcp",
+          "op": "sameAs",
+          "source": {
+            "actionId": "receipt60-after-doc-mcp",
+            "pointer": "/response/data/effectLedger/receiptContributions"
+          },
+          "expected": null,
+          "requirementRefs": [
+            "D05",
+            "D09",
+            "D13",
+            "D15",
+            "D16",
+            "D17",
+            "D18",
+            "D19"
+          ],
+          "evidenceRefs": [
+            "receipt60-after-doc-mcp:mcp-response"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "E1",
+            "scenarioId": "full-flow-quantities"
+          },
+          "oracleExplanation": "stateless MCP 진입점에서 같은 snapshot으로 읽은 같은 값이다. API와 같은 서버 판정·원장을 읽어야 하며 다른 계산이나 캐시를 쓰면 실패한다(계획 §3.4, §9.1, §13.1 D20). 수령60의 운송·창고 증빙 두 개를 연결한 뒤 MCP로 읽은 effectLedger/receiptContributions는 문서 연결 전 API의 값과 같다. 증빙이 늘어도 실물 60 BOX가 120이 되지 않는다.",
+          "oracleRef": {
+            "oracleId": "E1.full-flow-quantities",
+            "observationNames": [
+              "receipt60-doc-duplicate-effects"
+            ]
+          },
+          "baseline": {
+            "actionId": "receipt60-before-doc",
+            "pointer": "/response/data/effectLedger/receiptContributions"
+          }
+        },
+        {
+          "id": "return-added-purchase-arrival-mcp",
+          "op": "sameAs",
+          "source": {
+            "actionId": "e1-mcp",
+            "pointer": "/response/data/purchaseArrivalQuantity"
+          },
+          "expected": null,
+          "requirementRefs": [
+            "D05",
+            "D09",
+            "D13",
+            "D15",
+            "D16",
+            "D17",
+            "D18",
+            "D19"
+          ],
+          "evidenceRefs": [
+            "e1-mcp:mcp-response"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "E1",
+            "scenarioId": "full-flow-quantities"
+          },
+          "oracleExplanation": "stateless MCP 진입점에서 같은 snapshot으로 읽은 같은 값이다. API와 같은 서버 판정·원장을 읽어야 하며 다른 계산이나 캐시를 쓰면 실패한다(계획 §3.4, §9.1, §13.1 D20). 반품10 BOX 접수 뒤 MCP로 읽은 구매 누적 도착은 반품 전 API 값(100 BOX)과 같다. 반품은 원 구매 도착의 새 기여가 아니다(계획 §6 구매·운송).",
+          "oracleRef": {
+            "oracleId": "E1.full-flow-quantities",
+            "observationNames": [
+              "return-added-purchase-arrival"
+            ]
+          },
+          "baseline": {
+            "actionId": "before-return",
+            "pointer": "/response/data/purchaseArrivalQuantity"
           }
         }
       ],
@@ -10593,6 +10857,198 @@
             "actionId": "noun-mcp",
             "pointer": "/response/data/linkedSummary/quantities/invoiceDifferenceUnit"
           }
+        },
+        {
+          "id": "logistics-closes-unrelated-duties-35-mcp",
+          "op": "relationSet",
+          "source": {
+            "actionId": "goals-mcp",
+            "pointer": "/response/data/obligations",
+            "where": {
+              "id": {
+                "$result": {
+                  "actionId": "qc-hold40",
+                  "pointer": "/response/obligationId"
+                }
+              }
+            },
+            "field": [
+              "status",
+              "current"
+            ]
+          },
+          "expected": [
+            [
+              "OPEN",
+              true
+            ]
+          ],
+          "requirementRefs": [
+            "D05",
+            "D09",
+            "D13",
+            "D15",
+            "D16",
+            "D17",
+            "D18",
+            "D19"
+          ],
+          "evidenceRefs": [
+            "goals-mcp:mcp-response"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "E1",
+            "scenarioId": "independent-goals-and-owners"
+          },
+          "oracleExplanation": "stateless MCP 진입점에서 같은 snapshot으로 읽은 같은 값이다. API와 같은 서버 판정·원장을 읽어야 하며 다른 계산이나 캐시를 쓰면 실패한다(계획 §3.4, §9.1, §13.1 D20). 구매 도착 목표가 SATISFIED여도 MCP로 읽은 QC 보류40의 의무는 OPEN·current로 남는다.",
+          "oracleRef": {
+            "oracleId": "E1.independent-goals-and-owners",
+            "observationNames": [
+              "logistics-closes-unrelated-duties"
+            ]
+          }
+        },
+        {
+          "id": "logistics-closes-unrelated-duties-36-mcp",
+          "op": "count",
+          "source": {
+            "actionId": "goals-mcp",
+            "pointer": "/response/data/obligations",
+            "where": {
+              "kind": "QC",
+              "current": true,
+              "status": "OPEN"
+            }
+          },
+          "expected": 1,
+          "requirementRefs": [
+            "D05",
+            "D09",
+            "D13",
+            "D15",
+            "D16",
+            "D17",
+            "D18",
+            "D19"
+          ],
+          "evidenceRefs": [
+            "goals-mcp:mcp-response"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "E1",
+            "scenarioId": "independent-goals-and-owners"
+          },
+          "oracleExplanation": "stateless MCP 진입점에서 같은 snapshot으로 읽은 같은 값이다. API와 같은 서버 판정·원장을 읽어야 하며 다른 계산이나 캐시를 쓰면 실패한다(계획 §3.4, §9.1, §13.1 D20). 물류 충족 뒤 MCP로 읽은 OPEN QC 의무는 정확히 1건이다(hold60은 QC_PASS로 RESOLVED).",
+          "oracleRef": {
+            "oracleId": "E1.independent-goals-and-owners",
+            "observationNames": [
+              "logistics-closes-unrelated-duties"
+            ]
+          }
+        },
+        {
+          "id": "logistics-closes-unrelated-duties-37-mcp",
+          "op": "exactSet",
+          "source": {
+            "actionId": "goals-mcp",
+            "pointer": "/response/data/obligations",
+            "where": {
+              "kind": "RETURN",
+              "current": true
+            },
+            "field": "status"
+          },
+          "expected": [
+            "OPEN"
+          ],
+          "requirementRefs": [
+            "D05",
+            "D09",
+            "D13",
+            "D15",
+            "D16",
+            "D17",
+            "D18",
+            "D19"
+          ],
+          "evidenceRefs": [
+            "goals-mcp:mcp-response"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "E1",
+            "scenarioId": "independent-goals-and-owners"
+          },
+          "oracleExplanation": "stateless MCP 진입점에서 같은 snapshot으로 읽은 같은 값이다. API와 같은 서버 판정·원장을 읽어야 하며 다른 계산이나 캐시를 쓰면 실패한다(계획 §3.4, §9.1, §13.1 D20). 물류100 충족은 반품10 BOX의 RETURN 의무를 닫지 않는다. MCP로 읽은 현재 RETURN 의무 status는 OPEN뿐이다.",
+          "oracleRef": {
+            "oracleId": "E1.independent-goals-and-owners",
+            "observationNames": [
+              "logistics-closes-unrelated-duties"
+            ]
+          }
+        },
+        {
+          "id": "logistics-closes-unrelated-duties-38-mcp",
+          "op": "exactSet",
+          "source": {
+            "actionId": "goals-mcp",
+            "pointer": "/response/data/obligations",
+            "where": {
+              "kind": "SETTLEMENT",
+              "current": true
+            },
+            "field": "status"
+          },
+          "expected": [
+            "OPEN"
+          ],
+          "requirementRefs": [
+            "D05",
+            "D09",
+            "D13",
+            "D15",
+            "D16",
+            "D17",
+            "D18",
+            "D19"
+          ],
+          "evidenceRefs": [
+            "goals-mcp:mcp-response"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "E1",
+            "scenarioId": "independent-goals-and-owners"
+          },
+          "oracleExplanation": "stateless MCP 진입점에서 같은 snapshot으로 읽은 같은 값이다. API와 같은 서버 판정·원장을 읽어야 하며 다른 계산이나 캐시를 쓰면 실패한다(계획 §3.4, §9.1, §13.1 D20). 물류100 충족은 송장 차이 5 EUR의 SETTLEMENT 의무를 닫지 않는다. MCP로 읽은 현재 SETTLEMENT 의무 status는 OPEN뿐이다.",
+          "oracleRef": {
+            "oracleId": "E1.independent-goals-and-owners",
+            "observationNames": [
+              "logistics-closes-unrelated-duties"
+            ]
+          }
         }
       ],
       "oracleExplanation": "가상 fixture는 선행 실물·정책·증거 입력만 설치한다. 검증하는 주문·승인·예약·출고·인도·반품·회수·정정 효과는 각각 공개 명령으로 실행한다. 전체 물류100 충족 뒤 송장5EUR 차이와 QC40·반품10·정산 owner는 별도로 남는다의 수량과 책임은 고정 기대값과 원 행·응답을 함께 검증한다."
@@ -12955,8 +13411,8 @@
               "artifacts": [
                 {
                   "path": "verification/requirements/mandatory-oracles.json",
-                  "sha256": "61968b22cde1f35922df323d964599228d8dfbbe71b0ee32192b59de0a9f5ed9",
-                  "sizeBytes": 363175,
+                  "sha256": "c11872247e9023ff80f5f7dcc6512d8446982e5b3787dac437d79dde68e5a57e",
+                  "sizeBytes": 363267,
                   "scope": {
                     "caseId": "E1",
                     "evidenceKind": "NORMATIVE_AND_CURRENT_GATE_INPUT"

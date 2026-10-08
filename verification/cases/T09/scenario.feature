@@ -198,3 +198,5 @@
     그러면 "throughout-same-input-scope" assertion으로 "구간 처음100·끝0의 같은 실물 경로에서 세 목표를 구별한다. same-trajectory-three-goals의 독립 고정 기대값을 대조한다."를 확인한다
     그러면 "state-same-assessment-input-snapshot" assertion으로 "구간 처음100·끝0의 같은 실물 경로에서 세 목표를 구별한다. same-trajectory-three-goals의 독립 고정 기대값을 대조한다."를 확인한다
     그러면 "throughout-same-assessment-input-snapshot" assertion으로 "구간 처음100·끝0의 같은 실물 경로에서 세 목표를 구별한다. same-trajectory-three-goals의 독립 고정 기대값을 대조한다."를 확인한다
+    그러면 "initial-held100-api" assertion으로 "구간 시작 API 조회의 W 보유는 100 BOX다"를 확인한다
+    그러면 "final-held-db0" assertion으로 "구간 끝 독립 DB에서 W의 활성 실물 원행은 0개로 보유 0 BOX다"를 확인한다

@@ -892,7 +892,7 @@
         "coverage-link",
         "result-separation"
       ],
-      "contractSha256": "b02ff4fd8b5342ebb3f78015b0b5048bda7aecf4b64e4626e0ff4d9f339a5ade"
+      "contractSha256": "2c02ed5a5845a697e84826fdbc916243d9c0a07843025e23c56f0bef8cef5a9c"
     },
     "T25.evidence-manifest-and-entrypoints": {
       "caseId": "T25",
@@ -900,7 +900,7 @@
         "evidence-fields",
         "wrapper-truth"
       ],
-      "contractSha256": "375f6b1876e33b9f7caf0063328f1deffbd8db328b5b84682da4b0129bf9147d"
+      "contractSha256": "e244630f48807033c41f3e8fb564169c3d8778a6d6b8f4357b39414b848f0547"
     },
     "T25.model-corpus-and-budget": {
       "caseId": "T25",
@@ -1354,6 +1354,26 @@
       ],
       "runtimeEvidence": "NOT_RUN",
       "closureReview": "PENDING step2 re-review closure"
+    },
+    {
+      "reason": "Step2 round-2 profiles item 2: the four T25 observations independent-traceability/coverage-link, result-separation and evidence-manifest-and-entrypoints/evidence-fields, wrapper-truth carried the generic default artifactKinds [api_response, db_snapshot] (484 of 499 observations share it). T25 never calls the business API or reads the business DB; its evidence is the coverage verifier report over the runtime manifest (and the wrapper command record). An api_response/db_snapshot produced by T25 could only be a padded probe. The kinds now name the artifacts T25 actually produces. Not a weakening: requiredLayers, expected predicates and observation names are unchanged, and the DB/API/MCP/SKILLS evidence requirement moved to where it is checkable: T25 runtime-links-required now requires, for every other named observation, a PASS assertion link on each required profile and a PASS artifact of each catalog artifactKind (db_snapshot included), and evidence-wrapper-fields requires db_snapshot/api_response/protocol_transcript artifact rows and mcp/skills/scenarios records and wrappers.",
+      "sourceSections": [
+        "13.4",
+        "13.1"
+      ],
+      "sourceMeaningChanged": false,
+      "changedObservations": [
+        "T25.evidence-manifest-and-entrypoints/evidence-fields",
+        "T25.evidence-manifest-and-entrypoints/wrapper-truth",
+        "T25.independent-traceability/coverage-link",
+        "T25.independent-traceability/result-separation"
+      ],
+      "previousArtifactKinds": [
+        "api_response",
+        "db_snapshot"
+      ],
+      "runtimeEvidence": "NOT_RUN",
+      "closureReview": "PENDING step2 round-2 adversarial review"
     }
   ]
 }
