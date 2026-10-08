@@ -29,7 +29,7 @@ public final class ObligationClosureCatalog {
   kind("REGULATORY_REVIEW","current verified regulatory decision/submission version of the same procedure","recordRegulatoryDecision/recordSubmission of the procedure",null,"같은 절차의 현재 검증된 기관 결과로 해소한다");
   kind("EXTERNAL_RECONCILIATION","verified CONFIRMED_SUCCESS result evidence for every outbox effect of the decision",null,null,"recordExternalReconciliation로 외부 결과를 확정한다");
   kind("DELIVERY_CORRECTED_DEFICIT","current verified PHYSICAL_DELIVERY correction whose recognized quantity restores the exact duty range",null,MANAGER,"정정된 실제 인도의 부족량을 대조하거나 MANAGER 면제 결정을 받는다");
-  kind("SETTLEMENT_DIFFERENCE","MANAGER-confirmed settlement adjustments leaving zero remaining difference for the exact invoice match",null,MANAGER,"정산 조정 확정 또는 MANAGER 면제 결정을 받는다");
+  kind("SETTLEMENT_DIFFERENCE","MANAGER-confirmed settlement adjustments proposed for this root leaving zero remaining difference for the exact invoice match, or (contribution-change root) the current verified canonical restoring the contribution with a SATISFIED match",null,MANAGER,"정산 조정 확정 또는 MANAGER 면제 결정을 받는다");
   kind("RECEIPT_SHORTFALL",null,"verified receipt contribution of the purchase line range",MANAGER,"남은 발주 수령을 대조하거나 MANAGER 면제 결정을 받는다");
   kind("RECEIPT_EXCESS",null,null,MANAGER,"초과 수령량을 대조하거나 MANAGER 면제 결정을 받는다");
   kind("RECEIPT_UNALLOCATED",null,null,MANAGER,"미배분 수령량을 대조하거나 MANAGER 면제 결정을 받는다");

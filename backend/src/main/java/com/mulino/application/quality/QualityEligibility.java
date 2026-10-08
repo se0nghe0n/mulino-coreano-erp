@@ -61,16 +61,27 @@ public class QualityEligibility implements InventoryReadFacts,QueryHandler {
  public static List<Map<String,Object>>dto(Collection<QualityRanges.Range>ranges){return QualityRanges.union(ranges).stream().map(x->Map.<String,Object>of("startQuantity",InventoryQuantity.text(x.start()),"quantity",InventoryQuantity.text(x.end().subtract(x.start())))).toList();}
  /**
   * Only stock in controlled internal storage under a confirmed internal custodian can be sale-eligible (plan §4.2, §6), matching
-  * the fulfillment write gate (FulfillmentCommands.requireWarehouse). A place with any explicit other kind (in transit, delivered
-  * to a customer, at a supplier, or a free-text kind such as EXTERNAL_CUSTOMER) is OUTSIDE and never counted. A place whose kind
-  * is unrecorded, or internal storage whose custodian is unrecorded, is UNCONFIRMED: not counted, but reported as unknown rather
-  * than a known zero (plan §3.1).
+  * the fulfillment write gate (FulfillmentCommands.requireWarehouse). Only an explicit external place kind (in transit, delivered
+  * to a customer, at a supplier, or an EXTERNAL_* kind) is OUTSIDE and a known zero. A place whose kind is unrecorded, internal
+  * storage whose custodian is unrecorded, or a kind outside the place vocabulary (for example a free-text WAREHOUSE) is not
+  * counted but reported as unknown rather than a known zero (plan §3.1): an unrecognized kind is not evidence of external custody.
   */
- private enum Custody{CONFIRMED,UNCONFIRMED,OUTSIDE}
+ private enum Custody{CONFIRMED,UNCONFIRMED,UNRECOGNIZED,OUTSIDE}
+ static final Set<String> EXTERNAL_PLACE_KINDS=Set.of("TRANSIT","CUSTOMER","SUPPLIER");
  private Custody custody(DomainContext c,Map<String,Object> segment){
   Object kind=r.object(c,"Places",(String)segment.get("placeId")).get("kind");
-  if(kind!=null&&!"INTERNAL_STORAGE".equals(kind))return Custody.OUTSIDE;
-  return kind!=null&&segment.get("custodianId")!=null&&r.internalCustodian(c,(String)segment.get("custodianId"))?Custody.CONFIRMED:Custody.UNCONFIRMED;
+  if(kind==null)return Custody.UNCONFIRMED;
+  if("INTERNAL_STORAGE".equals(kind))return segment.get("custodianId")!=null&&r.internalCustodian(c,(String)segment.get("custodianId"))?Custody.CONFIRMED:Custody.UNCONFIRMED;
+  return EXTERNAL_PLACE_KINDS.contains(kind)||kind.toString().startsWith("EXTERNAL_")?Custody.OUTSIDE:Custody.UNRECOGNIZED;
+ }
+ /** The custody condition applied to a segment result for SELL/DISPATCH, shared by the item-scope read and evaluateEligibility. */
+ private Result withCustody(DomainContext c,Map<String,Object> segment,java.util.function.Supplier<Result> assessed){
+  var custody=custody(c,segment);
+  if(custody==Custody.OUTSIDE)return new Result("DENIED",BigDecimal.ZERO,List.of(),List.of(Map.of("condition","CUSTODY","state","DENIED")),List.of(),List.of(),null);
+  var result=assessed.get();if(custody==Custody.CONFIRMED){var conditions=new ArrayList<>(result.conditions());conditions.add(Map.of("condition","CUSTODY","state","ALLOWED"));return new Result(result.state(),result.eligibleQuantity(),result.ranges(),List.copyOf(conditions),result.evidenceRefs(),result.unknowns(),result.nextValidityBoundary());}
+  var u=new TreeSet<String>(result.unknowns());u.add("CUSTODY_UNCONFIRMED");if(custody==Custody.UNRECOGNIZED)u.add("PLACE_KIND_UNRECOGNIZED");
+  var conditions=new ArrayList<>(result.conditions());conditions.add(Map.of("condition","CUSTODY","state","UNKNOWN"));
+  return new Result("UNKNOWN",BigDecimal.ZERO,List.of(),List.copyOf(conditions),result.evidenceRefs(),List.copyOf(u),result.nextValidityBoundary());
  }
  /**
   * Item-scope SELL facts. Stock that is in transit or at a customer/supplier place is held history, not sale-eligible warehouse
@@ -79,7 +90,7 @@ public class QualityEligibility implements InventoryReadFacts,QueryHandler {
   */
  public Facts read(DomainContext c,String operation,String itemId,Map<String,Object>scope,List<Map<String,Object>>segments){
   BigDecimal eligible=BigDecimal.ZERO,reserved=BigDecimal.ZERO,unreserved=BigDecimal.ZERO;var unknowns=new TreeSet<String>();var refs=new TreeSet<String>();boolean partial=false,undeterminable=false;
-  for(var segment:segments){Result result;var custody=custody(c,segment);if(custody==Custody.OUTSIDE)result=new Result("DENIED",BigDecimal.ZERO,List.of(),List.of(),List.of(),List.of(),null);else result=assess(c,segment,"SELL",(String)scope.get("customerId"));if(custody==Custody.UNCONFIRMED){var u=new TreeSet<String>(result.unknowns());u.add("CUSTODY_UNCONFIRMED");result=new Result("UNKNOWN",BigDecimal.ZERO,List.of(),result.conditions(),result.evidenceRefs(),List.copyOf(u),result.nextValidityBoundary());}undeterminable|=result.unknowns().contains("CURRENT_ELIGIBILITY_POLICY_UNRESOLVED");eligible=eligible.add(result.eligibleQuantity());unknowns.addAll(result.unknowns());refs.addAll(result.evidenceRefs());partial|=!"ALLOWED".equals(result.state());
+  for(var segment:segments){Result result=withCustody(c,segment,()->assess(c,segment,"SELL",(String)scope.get("customerId")));undeterminable|=result.unknowns().contains("CURRENT_ELIGIBILITY_POLICY_UNRESOLVED");eligible=eligible.add(result.eligibleQuantity());unknowns.addAll(result.unknowns());refs.addAll(result.evidenceRefs());partial|=!"ALLOWED".equals(result.state());
    var allocations=r.rows(c,"SegmentAllocations").stream().filter(a->segment.get("ID").equals(a.get("segmentId"))&&Set.of("EXECUTABLE","SUSPENDED").contains(a.get("state"))).toList();var ranges=new ArrayList<QualityRanges.Range>();BigDecimal unidentified=BigDecimal.ZERO;for(var a:allocations){reserved=reserved.add((BigDecimal)a.get("quantity"));if(a.get("startQuantity")==null)unidentified=unidentified.add((BigDecimal)a.get("quantity"));else ranges.add(range(a));}
    unreserved=unreserved.add(QualityRanges.quantity(QualityRanges.subtract(result.ranges(),ranges)).subtract(unidentified).max(BigDecimal.ZERO));
   }
@@ -98,5 +109,7 @@ public class QualityEligibility implements InventoryReadFacts,QueryHandler {
   var current=new DomainContext(c.organizationId(),c.actorId(),c.stableRequestOwner(),auth.now(),auth.now());var result=assess(current,segment,action,customerId);BigDecimal required=(BigDecimal)allocation.get("quantity");boolean enough=allocation.get("startQuantity") instanceof BigDecimal start?QualityRanges.quantity(QualityRanges.intersect(result.ranges(),List.of(new QualityRanges.Range(start,start.add(required))))).compareTo(required)>=0:"ALLOWED".equals(result.state())&&result.eligibleQuantity().compareTo(StockPrimitives.amount(segment))>=0;
   if(!enough)throw new DomainError("REJECTED","INSUFFICIENT_ELIGIBLE_QUANTITY","Current exact allocation intersection is insufficient");auth.authorizeScopes(c,capability,Map.of("TARGET",List.of((String)segment.get("ID")),"ITEM",List.of((String)segment.get("itemId")),"PLACE",List.of((String)segment.get("placeId"))));return result;
  }
- public QueryResult query(DomainContext c,QueryRequest q){if(!Set.of("action","customerId","itemId").containsAll(q.filters().keySet()))throw DomainError.invalid("Unsupported eligibility filter");String id=q.id();if(id==null)throw DomainError.invalid("Segment ID required");var segment=r.object(c,"QuantitySegments",id);auth.authorizeScopes(c,q.operation(),Map.of("TARGET",List.of(id),"ITEM",List.of((String)segment.get("itemId")),"PLACE",List.of((String)segment.get("placeId"))));String action=q.filters().getOrDefault("action","SELL").toString();if(!Set.of("SELL","DISPATCH","DISPOSE","INTERNAL_MOVE").contains(action))throw DomainError.invalid("Unsupported eligibility action");var result=assess(c,segment,action,Objects.toString(q.filters().get("customerId"),null));var data=new LinkedHashMap<String,Object>();data.putAll(Map.of("segmentId",id,"itemId",segment.get("itemId"),"action",action,"unit",segment.get("unit"),"eligibilityStatus",result.state(),"conditions",result.conditions(),"allowedRanges",dto(result.ranges())));data.put("eligibleQuantity",result.unknowns().contains("CURRENT_ELIGIBILITY_POLICY_UNRESOLVED")?null:InventoryQuantity.text(result.eligibleQuantity()));data.put("nextValidityBoundary",result.nextValidityBoundary());return new QueryResult(data,q.scope(),result.unknowns(),List.of(),result.evidenceRefs(),null);}
+ public QueryResult query(DomainContext c,QueryRequest q){if(!Set.of("action","customerId","itemId").containsAll(q.filters().keySet()))throw DomainError.invalid("Unsupported eligibility filter");String id=q.id();if(id==null)throw DomainError.invalid("Segment ID required");var segment=r.object(c,"QuantitySegments",id);auth.authorizeScopes(c,q.operation(),Map.of("TARGET",List.of(id),"ITEM",List.of((String)segment.get("itemId")),"PLACE",List.of((String)segment.get("placeId"))));String action=q.filters().getOrDefault("action","SELL").toString();if(!Set.of("SELL","DISPATCH","DISPOSE","INTERNAL_MOVE").contains(action))throw DomainError.invalid("Unsupported eligibility action");String customer=Objects.toString(q.filters().get("customerId"),null);
+  // SELL and DISPATCH require controlled internal custody like the item-scope read and the fulfillment write gate (plan §4.2, §6).
+  var result=Set.of("SELL","DISPATCH").contains(action)?withCustody(c,segment,()->assess(c,segment,action,customer)):assess(c,segment,action,customer);var data=new LinkedHashMap<String,Object>();data.putAll(Map.of("segmentId",id,"itemId",segment.get("itemId"),"action",action,"unit",segment.get("unit"),"eligibilityStatus",result.state(),"conditions",result.conditions(),"allowedRanges",dto(result.ranges())));data.put("eligibleQuantity",result.unknowns().contains("CURRENT_ELIGIBILITY_POLICY_UNRESOLVED")?null:InventoryQuantity.text(result.eligibleQuantity()));data.put("nextValidityBoundary",result.nextValidityBoundary());return new QueryResult(data,q.scope(),result.unknowns(),List.of(),result.evidenceRefs(),null);}
 }

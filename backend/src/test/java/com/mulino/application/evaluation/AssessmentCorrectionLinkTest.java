@@ -21,8 +21,8 @@ class AssessmentCorrectionLinkTest {
  AssessmentRepository assessments;EvidenceRepository evidence;DeliveryCorrectionPort port;AssessmentCorrectionImpact impact;
  @SuppressWarnings("unchecked") @BeforeEach void fixture(){
   assessments=mock(AssessmentRepository.class);evidence=mock(EvidenceRepository.class);port=mock(DeliveryCorrectionPort.class);
-  when(assessments.rows(eq(c),anyString())).thenReturn(List.of());
-  when(assessments.rows(c,"mulino.trade.sales.Deliveries")).thenReturn(List.of(Map.of("ID",DELIVERY,"observationId",SCOPE)));
+  when(assessments.rows(any(),anyString())).thenReturn(List.of());
+  when(assessments.rows(any(),eq("mulino.trade.sales.Deliveries"))).thenReturn(List.of(Map.of("ID",DELIVERY,"observationId",SCOPE)));
   when(evidence.require(eq("CanonicalOccurrences"),eq(ORG),anyString())).thenThrow(DomainError.forbidden());
   ObjectProvider<ResponsibilityService> duties=mock(ObjectProvider.class);ObjectProvider<DeliveryCorrectionPort> ports=mock(ObjectProvider.class);when(ports.stream()).thenAnswer(i->java.util.stream.Stream.of(port));
   ObjectProvider<com.mulino.application.trade.SettlementContributionPort> settlements=mock(ObjectProvider.class);when(settlements.stream()).thenAnswer(i->java.util.stream.Stream.empty());
@@ -31,7 +31,8 @@ class AssessmentCorrectionLinkTest {
  @Test void deliveryCorrectionWrittenAfterKnownAtReachesExactOriginalDelivery(){
   doReturn(new LinkedHashMap<String,Object>(Map.of("ID",CANONICAL,"organizationId",ORG,"kind","PHYSICAL_DELIVERY","supersedesId",PRIOR,"physicalScopeId",SCOPE,"recordedAt",KNOWN.plusSeconds(1)))).when(evidence).require("CanonicalOccurrences",ORG,CANONICAL);
   impact.evidenceLinked(c,CLAIM,CANONICAL);
-  verify(port).correctionImpact(c,DELIVERY,CANONICAL);
+  // The correction reads through a context whose knownAt covers exactly the canonical written after the request knownAt (plan §4.2).
+  verify(port).correctionImpact(c.knownThrough(KNOWN.plusSeconds(1)),DELIVERY,CANONICAL);
  }
  @Test void ordinaryCanonicalHasNoDeliveryCorrection(){
   doReturn(new LinkedHashMap<String,Object>(Map.of("ID",CANONICAL,"organizationId",ORG,"kind","PHYSICAL_RECEIPT","physicalScopeId",SCOPE,"recordedAt",KNOWN.plusSeconds(1)))).when(evidence).require("CanonicalOccurrences",ORG,CANONICAL);
