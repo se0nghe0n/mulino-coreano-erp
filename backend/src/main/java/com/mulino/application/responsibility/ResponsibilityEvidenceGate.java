@@ -47,11 +47,14 @@ public class ResponsibilityEvidenceGate implements ResponsibilityEvidence {
   var credit=creditRow(c);credit.putAll(Map.of("bindingId",bindingId,"rootId",root,"scopeId",leaf.get("ID"),"assignmentId",assignment.get("ID"),"startQuantity",start,"quantity",quantity));r.insert("ResolutionCredits",credit);
  }
  private Map<String,Object> creditRow(DomainContext c){var row=new LinkedHashMap<String,Object>();row.put("organizationId",c.organizationId());row.put("ID",UUID.randomUUID().toString());row.put("revision",0);row.put("createdAt",c.knownAt());row.put("recordedAt",c.knownAt());return row;}
- public void requireWaiver(DomainContext c,String kind,String root,String evidence,String reason){
+ /** Typed decision only: exact kind action, approved, unexpired, this assignment at this revision, and the stated reason. */
+ public void requireWaiver(DomainContext c,String kind,String root,String assignmentId,int assignmentRevision,String approvalId,String reason){
   if(reason==null||reason.isBlank())throw DomainError.invalid("Waiver reason required");
-  var approval=require("Approvals",c,evidence);
-  if(!"APPROVED".equals(approval.get("decision"))||!("WAIVE_"+kind).equals(approval.get("action"))||!clock.instant().isBefore(java.time.Instant.parse(approval.get("expiresAt").toString())))throw DomainError.invalid("Authorized kind waiver decision required");
-  var assignment=r.require("Assignments",c.organizationId(),approval.get("targetId").toString());
+  var approval=require("Approvals",c,approvalId);
+  if(!"APPROVED".equals(approval.get("decision"))||!("WAIVE_"+kind).equals(approval.get("action"))||approval.get("expiresAt")==null||!clock.instant().isBefore(instant(approval.get("expiresAt"))))throw DomainError.invalid("Authorized kind waiver decision required");
+  if(!assignmentId.equals(String.valueOf(approval.get("targetId")))||!(approval.get("targetRevision") instanceof Number n)||n.intValue()!=assignmentRevision||!root.equals(String.valueOf(approval.get("proposalId"))))throw DomainError.invalid("Waiver decision is bound to a different duty or revision");
+  var assignment=r.require("Assignments",c.organizationId(),assignmentId);
   if(!root.equals(assignment.get("rootId"))||!"OPEN".equals(assignment.get("status")))throw DomainError.invalid("Waiver target mismatch");
  }
+ private static java.time.Instant instant(Object v){return v instanceof java.time.Instant t?t:v instanceof java.sql.Timestamp s?s.toInstant():java.time.Instant.parse(v.toString());}
 }
