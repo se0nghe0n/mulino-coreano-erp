@@ -32,25 +32,45 @@ class LayerRoutes(unittest.TestCase):
                 record = json.loads(rpath.read_text()); review(record); rpath.write_text(json.dumps(record))
             return self.run_check(tmp)
 
-    def test_known_open_is_listed_with_owner(self):
+    # No real KNOWN_OPEN gap remains (step2r round 4 closed T20 x3 and V4 x1). The counterexamples recreate the V4 one
+    # by dropping the MCP leg of mixed-atomic-batch.
+    KNOWN_V4 = {'status': 'KNOWN_OPEN', 'oracleId': 'V4.all-alternate-write-paths', 'observationName': 'mixed-batch-allowed-partial-effects',
+                'layer': 'MCP', 'owner': 'V4 case owner (counterexample)', 'reason': 'MCP leg removed in this test copy',
+                'closeWhen': 'the MCP leg is restored'}
+
+    @staticmethod
+    def drop_mcp_batch(case):
+        for sub in case['subcases']:
+            if sub['id'] == 'mixed-atomic-batch':
+                sub['actions'] = [a for a in sub['actions'] if not a['id'].startswith('mcp-batch')]
+                sub['assertions'] = [a for a in sub['assertions'] if not a['id'].startswith('mcp-batch-')]
+
+    def test_repository_has_no_known_open_gap(self):
         done = self.run_check(ROOT)
-        self.assertIn('KNOWN_OPEN V4 case owner', done.stdout)
-        self.assertIn('"knownOpen": 4', done.stdout)
+        self.assertNotIn('KNOWN_OPEN', done.stdout)
+        self.assertIn('"knownOpen": 0', done.stdout)
+
+    def test_removed_mcp_batch_leg_is_an_unexplained_gap(self):
+        done = self.mutate('V4', self.drop_mcp_batch)
+        self.assertEqual(1, done.returncode, done.stdout)
+        self.assertIn('unexplained layer route gap V4 V4.all-alternate-write-paths/mixed-batch-allowed-partial-effects MCP', done.stdout)
+
+    def test_known_open_is_listed_with_owner(self):
+        done = self.mutate('V4', self.drop_mcp_batch, lambda record: record['entries'].append(dict(self.KNOWN_V4)))
+        self.assertEqual(0, done.returncode, done.stdout)
+        self.assertIn('KNOWN_OPEN V4 case owner (counterexample)', done.stdout)
+        self.assertIn('"knownOpen": 1', done.stdout)
 
     def test_stale_known_open_entry_fails(self):
         # A closed gap whose entry stays in the list would silently re-open the allowlist: the list must be exact.
-        def add(record):
-            record['entries'].append(dict(record['entries'][-1], observationName='authorized-control-effects'))
-        done = self.mutate('V4', lambda case: None, add)
+        done = self.mutate('V4', lambda case: None, lambda record: record['entries'].append(dict(self.KNOWN_V4)))
         self.assertEqual(1, done.returncode, done.stdout)
         self.assertIn('stale layer-route review entry', done.stdout)
 
     def test_known_open_without_owner_or_closing_condition_fails(self):
         for field in ('owner', 'closeWhen', 'reason'):
             with self.subTest(field=field):
-                def strip(record):
-                    entry = next(e for e in record['entries'] if e['status'] == 'KNOWN_OPEN'); entry[field] = ' '
-                done = self.mutate('V4', lambda case: None, strip)
+                done = self.mutate('V4', self.drop_mcp_batch, lambda record: record['entries'].append(dict(self.KNOWN_V4, **{field: ' '})))
                 self.assertEqual(1, done.returncode, done.stdout)
                 self.assertIn('unexplained layer route gap', done.stdout)
 

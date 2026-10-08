@@ -1129,7 +1129,7 @@
     그러면 "no-fake-receipt" assertion으로 "독립 DB 원 행을 정확한 대상 scope로 세어 중복·누락을 거부한다."를 확인한다
     그러면 "timeout-never-satisfied" assertion으로 "시간 경과·queue 성공이 증거 없는 목표를 충족시키지 않는다."를 확인한다
     그러면 "queue-empty-after-restart" assertion으로 "재시작 뒤 terminal 관찰 시점에도 queue message0이다. 재발견은 DB due index에서만 온다."를 확인한다
-    그러면 "autonomous-trigger-loop" assertion으로 "제출 identity는 harness tick이 아니라 scheduler loop의 자연 tick에서 나왔다."를 확인한다
+    그러면 "autonomous-trigger-loop" assertion으로 "관찰 창의 첫 제출(operationEvidence의 taskId) 행을 scheduler가 직접 기록한 제출 원행에서 읽으면 제출 주체는 scheduler loop다. 요청 parameter의 되풀이가 아니라 scheduler 기록이며 harness tick이 만든 제출이면 실패한다."를 확인한다
     그러면 "autonomous-within-30s" assertion으로 "scheduler process 시작 command가 시작된 뒤 30초(개발/CI 관찰 제한, plan §10) 안에 자율 제출이 관찰된다. 제출은 시작 command보다 앞설 수 없다."를 확인한다
     그러면 "autonomous-attempt-source" assertion으로 "독립 DB attempt 원행도 scheduler loop가 시작한 시도만 있다. harness tick이나 API 호출로 시작한 시도는 없다."를 확인한다
 
@@ -1224,7 +1224,7 @@
     그러면 "repeat-db-expiry-assignment-rootId-linked" assertion으로 "자동 sweep가 만든 assignment는 같은 snapshot의 만료 의무·stable root·책임 업무에 연결된다. 이름이나 count만 같은 별도 책임으로 대신하지 않는다."를 확인한다
     그러면 "repeat-db-expiry-assignment-workId-linked" assertion으로 "자동 sweep가 만든 assignment는 같은 snapshot의 만료 의무·stable root·책임 업무에 연결된다. 이름이나 count만 같은 별도 책임으로 대신하지 않는다."를 확인한다
     그러면 "repeat-expiry-assignment-identity-kept" assertion으로 "반복 sweep는 동일한 현재 OPEN assignment 원 행·ID·owner·supervisor·다음 행동·확인 시점을 유지한다."를 확인한다
-    그러면 "autonomous-trigger-loop" assertion으로 "제출 identity는 harness tick이 아니라 scheduler loop의 자연 tick에서 나왔다."를 확인한다
+    그러면 "autonomous-trigger-loop" assertion으로 "관찰 창의 첫 제출(operationEvidence의 taskId) 행을 scheduler가 직접 기록한 제출 원행에서 읽으면 제출 주체는 scheduler loop다. 요청 parameter의 되풀이가 아니라 scheduler 기록이며 harness tick이 만든 제출이면 실패한다."를 확인한다
     그러면 "autonomous-within-30s" assertion으로 "scheduler process 시작 command가 시작된 뒤 30초(개발/CI 관찰 제한, plan §10) 안에 자율 제출이 관찰된다. 제출은 시작 command보다 앞설 수 없다."를 확인한다
     그러면 "autonomous-attempt-source" assertion으로 "독립 DB attempt 원행도 scheduler loop가 시작한 시도만 있다. harness tick이나 API 호출로 시작한 시도는 없다."를 확인한다
 
@@ -1268,6 +1268,6 @@
     그러면 "after-duty-one" assertion으로 "독립 DB 원 행을 정확한 대상 scope로 세어 중복·누락을 거부한다."를 확인한다
     그러면 "intake-link-confirmed" assertion으로 "해당 scope의 각 실제 원 행 값과 고정 기대값을 대조한다."를 확인한다
     그러면 "canonical-intake-linked-duty" assertion으로 "재시도에서 같은 접수와 단 하나 의무를 연결한다."를 확인한다
-    그러면 "autonomous-trigger-loop" assertion으로 "제출 identity는 harness tick이 아니라 scheduler loop의 자연 tick에서 나왔다."를 확인한다
+    그러면 "autonomous-trigger-loop" assertion으로 "관찰 창의 첫 제출(operationEvidence의 taskId) 행을 scheduler가 직접 기록한 제출 원행에서 읽으면 제출 주체는 scheduler loop다. 요청 parameter의 되풀이가 아니라 scheduler 기록이며 harness tick이 만든 제출이면 실패한다."를 확인한다
     그러면 "autonomous-within-30s" assertion으로 "scheduler process 시작 command가 시작된 뒤 30초(개발/CI 관찰 제한, plan §10) 안에 자율 제출이 관찰된다. 제출은 시작 command보다 앞설 수 없다."를 확인한다
     그러면 "autonomous-attempt-source" assertion으로 "독립 DB attempt 원행도 scheduler loop가 시작한 시도만 있다. harness tick이나 API 호출로 시작한 시도는 없다."를 확인한다

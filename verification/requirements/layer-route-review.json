@@ -2,7 +2,7 @@
   "schemaVersion": "1.0.0",
   "recordType": "LAYER_ROUTE_REVIEW",
   "description": "Reviewed exceptions to the observation-level MCP/SKILLS layer route check (check_layer_routes.py). EXEMPT: the observation is not about what that layer returns. KNOWN_OPEN: a real gap with a named owner; ./verify prepare lists it and the coverage assembler keeps the observation NOT_RUN until the owner closes it and deletes the entry. An entry that no longer matches a gap fails the check.",
-  "recordedIn": "docs/execution/step2r-harness3/README.md",
+  "recordedIn": "docs/execution/step2r-harness3/README.md; KNOWN_OPEN entries closed in docs/execution/step2r-round4/README.md",
   "entries": [
     {
       "status": "EXEMPT",
@@ -11,42 +11,6 @@
       "layer": "MCP",
       "owner": "harness/coverage owner",
       "reason": "Reads the independent host model-gate inputs (catalog oracle, R8 status, model plan). The oracle MCP layer is exercised by actual-runtime-observation through runtime-mcp in the same subcase; an MCP business read cannot prove the model gate separation."
-    },
-    {
-      "status": "KNOWN_OPEN",
-      "oracleId": "T20.skills-real-loading-and-meaning",
-      "observationName": "allowed-tools-as-server-authorization",
-      "layer": "SKILLS",
-      "owner": "T20 case owner (verification/mcp-tests/author_cases.py, step2r cases-a)",
-      "reason": "No linked assertion reads skill-loading evidence (a skillLoading/loading/referenceReads stage or a skills/skill_loading_trace coverage row), so the observation has no SKILLS-layer evidence.",
-      "closeWhen": "A linked T20 assertion reads the skill-loading stage of the host or agent result, and check_layer_routes.py reports no gap."
-    },
-    {
-      "status": "KNOWN_OPEN",
-      "oracleId": "T20.skills-real-loading-and-meaning",
-      "observationName": "document-instruction-authority",
-      "layer": "SKILLS",
-      "owner": "T20 case owner (verification/mcp-tests/author_cases.py, step2r cases-a)",
-      "reason": "host-malicious-document reads toolCalls counts and unchanged DB rows but no skill-loading stage, so the document-versus-skill authority is not observed on the SKILLS layer.",
-      "closeWhen": "A linked T20 assertion reads the skill-loading stage of the host or agent result, and check_layer_routes.py reports no gap."
-    },
-    {
-      "status": "KNOWN_OPEN",
-      "oracleId": "T20.skills-real-loading-and-meaning",
-      "observationName": "skill-hash-as-loading-proof",
-      "layer": "MCP",
-      "owner": "T20 case owner (verification/mcp-tests/author_cases.py, step2r cases-a)",
-      "reason": "No linked assertion reads an MCP/wire route result or a protocol transcript. The oracle-level requiredLayers MCP may be an over-approximation for this observation.",
-      "closeWhen": "A linked assertion reads an MCP route result or protocol transcript, or a normative lock reviewUpdate narrows requiredLayers."
-    },
-    {
-      "status": "KNOWN_OPEN",
-      "oracleId": "V4.all-alternate-write-paths",
-      "observationName": "mixed-batch-allowed-partial-effects",
-      "layer": "MCP",
-      "owner": "V4 case owner (verification/cases/V4/author_review_fixes.py, step2r cases-c)",
-      "reason": "The mixed batch runs on the batch route; no linked assertion reads an MCP result. The oracle-level requiredLayers MCP is likely an over-approximation for this observation.",
-      "closeWhen": "A linked assertion reads an MCP route result, or a normative lock reviewUpdate narrows requiredLayers for this observation."
     }
   ]
 }

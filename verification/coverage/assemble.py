@@ -454,16 +454,44 @@ class Assembly:
             rows, problems = module.review(self.root)
         except FileNotFoundError:
             self.issue('NOT_RUN', 'Layer route check/review source missing', True)
-            return
+            return []
         except (ValueError, KeyError, TypeError, OSError, AttributeError, json.JSONDecodeError) as error:
             self.issue('FAIL', 'Layer route check failed: ' + str(error), True)
-            return
+            return []
         for problem in problems:
             self.issue('FAIL', 'Layer route check: ' + problem, True)
-        for status, _case_id, oracle_id, name, layer, owner in rows:
+        known_open = []
+        for status, case_id, oracle_id, name, layer, owner in rows:
             observation = observations.get((oracle_id, name))
             if status == 'KNOWN_OPEN' and observation is not None:
                 observation.setdefault('layerRouteGaps', []).append({'layer': layer, 'owner': owner, 'status': 'KNOWN_OPEN'})
+            if status == 'KNOWN_OPEN':
+                known_open.append({'check': 'layer-routes', 'gap': f'{case_id} {oracle_id}/{name} {layer}', 'owner': owner})
+        return known_open
+
+    def vocabulary(self):
+        """Case vocabulary check (verification/cases/check_vocabulary.py), the same review() that ./verify prepare runs as
+        caseAssetChecks 'vocabulary'. A name outside contracts/domain-vocabulary.json or contracts/audit-observation-fields.json
+        is a preparation failure. Pending entries are Step 3 vocabulary addition requests; they are returned as known-open gaps
+        with their owner so the manifest lists them instead of hiding them."""
+        module_ref = 'verification/cases/check_vocabulary.py'
+        try:
+            for ref in (module_ref, 'contracts/domain-vocabulary.json', 'contracts/audit-observation-fields.json'):
+                self.descriptor(ref)
+            spec = importlib.util.spec_from_file_location('coverage_case_vocabulary', self.file(module_ref))
+            module = importlib.util.module_from_spec(spec)
+            spec.loader.exec_module(module)
+            problems, pending = module.review()
+        except FileNotFoundError:
+            self.issue('NOT_RUN', 'Case vocabulary check/contract source missing', True)
+            return []
+        except (ValueError, KeyError, TypeError, OSError, AttributeError, json.JSONDecodeError) as error:
+            self.issue('FAIL', 'Case vocabulary check failed: ' + str(error), True)
+            return []
+        for problem in problems:
+            self.issue('FAIL', 'Case vocabulary check: ' + problem, True)
+        return [{'check': 'vocabulary', 'gap': key, 'owner': info['owner'], 'cases': info['cases'], 'planRef': info['planRef']}
+                for key, info in sorted(pending.items())]
 
     def fixture_bundle(self, ref, visited=None):
         visited = set() if visited is None else visited
@@ -1078,7 +1106,7 @@ class Assembly:
                 self.descriptor(ref)
         _, observations = self.catalog()
         declarations = self.declarations(observations)
-        self.layer_routes(observations)
+        known_open = self.layer_routes(observations) + self.vocabulary()
         preparation = 'FAIL' if any(p['status'] == 'FAIL' for p in self.preparation_problems) else 'NOT_RUN'
         if check_preparation and not self.preparation_problems:
             command = [str(self.root / 'verify'), 'prepare']
@@ -1158,7 +1186,7 @@ class Assembly:
                 'expectedCaseIds': CASE_IDS, 'oracleCount': len({k[0] for k in observations}), 'observationCount': len(observations),
                 'cases': declarations, 'runtimeArtifacts': runtime_artifacts, 'runtimeArtifactDescriptors': list(runtime_descriptors.values()), 'namedObservations': list(observations.values()), 'profiles': clean_profiles, 'model': model,
                 'inputArtifacts': sorted(self.sources.values(), key=lambda d: d['path']), 'coverageProblems': self.problems,
-                'preparationProblems': self.preparation_problems, 'semanticOracleEquivalence': 'REQUIRES_CASE_AND_RUNTIME_REVIEW',
+                'preparationProblems': self.preparation_problems, 'knownOpenGaps': known_open, 'semanticOracleEquivalence': 'REQUIRES_CASE_AND_RUNTIME_REVIEW',
                 'assemblyEvidenceClass': 'FILESYSTEM_READ_ONLY', 'selftestIsProductEvidence': False}
 
 
@@ -1205,7 +1233,7 @@ def validate_saved(root, value, index_ref='verification/coverage/runtime-evidenc
     if index is None:
         raise ValueError('Runtime evidence index missing/invalid')
     current = assembly.assemble(index)
-    for key in ['cases', 'runtimeArtifacts', 'runtimeArtifactDescriptors', 'namedObservations', 'profiles', 'model', 'runtimeStatus', 'artifactCoverageStatus', 'coverageProblems', 'preparationProblems']:
+    for key in ['cases', 'runtimeArtifacts', 'runtimeArtifactDescriptors', 'namedObservations', 'profiles', 'model', 'runtimeStatus', 'artifactCoverageStatus', 'coverageProblems', 'preparationProblems', 'knownOpenGaps']:
         if value.get(key) != current.get(key):
             raise ValueError('Manifest differs from re-read actual evidence: ' + key)
     if value.get('preparationStatus') == 'PREPARED':

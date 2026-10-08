@@ -13,8 +13,10 @@ import java.util.concurrent.TimeUnit;
  * Each one is the single owner-maintained source of its rule, so preparation calls it instead of
  * re-implementing it: the normative catalog/lock validator (the same one the coverage assembler loads),
  * the observation-level MCP/SKILLS layer route review (also loaded by the assembler), the cases-b review
- * invariants, the derived observation-binding drift checks (T08, V4, V6, V7 content and every bindings
- * file's hash stamps) and the generator reproduction tests (T01/T20/T25/C3/T26 and V4/T06/T22/T24/T23/V8).
+ * invariants, the case vocabulary check (outcomes, error codes, obligation kinds and audit row fields against
+ * contracts/domain-vocabulary.json and contracts/audit-observation-fields.json; the assembler loads the same review()),
+ * the derived observation-binding drift checks (T08, V4, V6, V7 content and every bindings file's hash stamps) and the
+ * generator reproduction tests (T01/T20/T25/C3/T26 and V4/T06/T22/T24/T23/V8).
  * None of them writes the repository: generators run in temporary copies. A missing interpreter or script
  * fails closed. Output lines starting with KNOWN_OPEN are recorded gaps with a named owner; they are
  * copied into the record and the preparation report instead of being hidden in the output tail.
@@ -26,6 +28,7 @@ final class PreparationAssetChecks {
         new Check("normative-catalog-lock","verification/requirements/validate_catalog.py",List.of("verification/requirements/validate_catalog.py")),
         new Check("layer-routes","verification/requirements/check_layer_routes.py",List.of("verification/requirements/check_layer_routes.py")),
         new Check("cases-b-invariants","verification/cases/V2/cases_b_invariants.py",List.of("verification/cases/V2/cases_b_invariants.py")),
+        new Check("vocabulary","verification/cases/check_vocabulary.py",List.of("verification/cases/check_vocabulary.py","--check")),
         new Check("t08-observation-bindings","verification/cases/T08/bind_observations.py",List.of("verification/cases/T08/bind_observations.py","--check")),
         new Check("v4-observation-bindings",BIND_VX,List.of(BIND_VX,"V4","--check")),
         new Check("v6-observation-bindings",BIND_VX,List.of(BIND_VX,"V6","--check")),

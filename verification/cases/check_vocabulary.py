@@ -20,8 +20,12 @@ entry that no case uses any more is itself a problem, so the list cannot go stal
 
 Negative assertions (notEquals, absent) are not checked: forbidding a value is not using it.
 
+Every pending entry is printed as a KNOWN_OPEN line with its owner, so ./verify prepare (caseAssetChecks
+"vocabulary") copies it into knownOpenGaps instead of hiding it in the output tail; the coverage assembler
+loads review() and records the same entries. review() is the single implementation both use.
+
 Usage: python3 -I verification/cases/check_vocabulary.py [--check] [--json]
-  default  print problems and pending usage, exit 0
+  default  print problems and KNOWN_OPEN pending entries, exit 0
   --check  exit 1 when any problem exists
 """
 import json
@@ -41,6 +45,7 @@ AUDIT_FIELDS = {}
 for f in AUDIT['fields']:
     AUDIT_FIELDS.setdefault(f['source'], {})[f['name']] = f['presence']
 QUERY_AUDIT_OUTCOMES = {'READ', 'REJECTED'}
+PENDING_OWNER = 'Step 3 vocabulary owner (contracts/domain-vocabulary.json)'
 
 # Vocabulary addition requests (docs/execution/step2r-cases3/README.md). key -> (cases, plan, reason)
 PENDING = {
@@ -237,7 +242,11 @@ def walk_fixture(node, path, where):
             walk_fixture(value, path, where)
 
 
-def main(argv):
+def review():
+    """Check every committed case and fixture. Returns (problems, pending): pending maps 'kind name' to the cases
+    that use it, its plan reference, reason and owner. Safe to call more than once."""
+    problems.clear()
+    used.clear()
     for path in sorted((ROOT / 'verification/cases').glob('*/case.json')):
         check_case(path)
     for path in sorted((ROOT / 'verification/cases').glob('*/**/*.json')):
@@ -252,17 +261,23 @@ def main(argv):
             walk_fixture(data, '', str(rel))
     stale = sorted(f'{k[0]} {k[1]}' for k in PENDING if k not in used)
     problems.extend(f'pending entry {s} is used by no case; remove it' for s in stale)
-    report = {'status': 'VALID' if not problems else 'INVALID', 'problems': problems,
-              'pending': {f'{k[0]} {k[1]}': {'cases': sorted(used.get(k, [])), 'planRef': PENDING[k][1], 'reason': PENDING[k][2]} for k in PENDING}}
+    pending = {f'{k[0]} {k[1]}': {'cases': sorted(used.get(k, [])), 'planRef': PENDING[k][1], 'reason': PENDING[k][2], 'owner': PENDING_OWNER}
+               for k in PENDING}
+    return list(problems), pending
+
+
+def main(argv):
+    found, pending = review()
+    report = {'status': 'VALID' if not found else 'INVALID', 'problems': found, 'pending': pending}
     if '--json' in argv:
         print(json.dumps(report, ensure_ascii=False, indent=2))
     else:
-        for p in problems:
+        for p in found:
             print('PROBLEM', p)
-        for key, info in report['pending'].items():
-            print('PENDING', key, ','.join(info['cases']), info['planRef'])
-        print(json.dumps({'status': report['status'], 'problems': len(problems), 'pending': len(PENDING)}))
-    return 1 if problems and '--check' in argv else 0
+        for key, info in pending.items():
+            print(f'KNOWN_OPEN {info["owner"]}\t{key}\t{",".join(info["cases"])}\t{info["planRef"]}')
+        print(json.dumps({'status': report['status'], 'problems': len(found), 'knownOpen': len(pending)}))
+    return 1 if found and '--check' in argv else 0
 
 
 if __name__ == '__main__':

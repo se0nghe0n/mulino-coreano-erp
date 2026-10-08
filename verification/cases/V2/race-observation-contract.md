@@ -157,9 +157,9 @@ EXECUTABLE_ALLOCATION 행은 `allocations`에서 state=EXECUTABLE·active인
 복사하고 다시 계산하지 않는다. 제품 응답이나 API projection을 읽어
 만들지 않는다. case는 이 파생에만 기대지 않도록 부족 의무 원행
 (`obligations`의 id=정정 응답 obligationId)의 quantity·unit을 직접 읽어
-`shortage-obligation-row-quantity`로 부족 행과 대조한다. 이 파생 규칙을
-harness 공통 observer 계약(harness-guide.md)에 옮기는 일은 harness 소유자
-몫이다.
+`shortage-obligation-row-quantity`로 부족 행과 대조한다. 이 파생 규칙은
+harness 공통 observer 계약(`verification/harness-guide.md` "독립 observer의
+논리 원행 계약")에도 있다.
 
 ## 남은 일
 

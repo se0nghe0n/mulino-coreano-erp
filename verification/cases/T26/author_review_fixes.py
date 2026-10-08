@@ -129,8 +129,13 @@ def autonomous(base,new_id,trigger_id,db_id):
             a['control']['parameters'].update(trigger='OBSERVE_NEXT_NATURAL_TICK',observationWindowSeconds=30,triggeredBy='SCHEDULER_LOOP')
     origin=next(x for x in s['assertions'] if x['id'].endswith('-origin'))
     s['assertions'] += [
-        assertion_like(s,origin['id'],id='autonomous-trigger-loop',source={'actionId':trigger_id,'pointer':'/data/hostObservation/operationEvidence/triggeredBy'},expected='SCHEDULER_LOOP',
-            oracleExplanation='제출 identity는 harness tick이 아니라 scheduler loop의 자연 tick에서 나왔다.'),
+        # submittedBy comes from the scheduler's own submission rows (extractor rawRows), never from operationEvidence:
+        # trigger/triggeredBy are watcher request parameters, so an observer echoing them would prove nothing
+        # (HostObservationValidator.naturalTick rejects them in operationEvidence).
+        assertion_like(s,origin['id'],id='autonomous-trigger-loop',op='exactSet',
+            source={'actionId':trigger_id,'pointer':'/data/hostObservation/extractor/rawRows/schedulerSubmissions',
+                    'where':{'taskId':ref(trigger_id,'/data/hostObservation/operationEvidence/taskId')},'field':'submittedBy'},expected=['SCHEDULER_LOOP'],
+            oracleExplanation='관찰 창의 첫 제출(operationEvidence의 taskId) 행을 scheduler가 직접 기록한 제출 원행에서 읽으면 제출 주체는 scheduler loop다. 요청 parameter의 되풀이가 아니라 scheduler 기록이며 harness tick이 만든 제출이면 실패한다.'),
         assertion_like(s,origin['id'],id='autonomous-within-30s',op='timeAtMostSeconds',source={'actionId':trigger_id,'pointer':'/data/hostObservation/operationEvidence/submittedAt'},
             baseline={'actionId':start_id,'pointer':'/data/hostObservation/command/startedAt'},expected='30',
             oracleExplanation='scheduler process 시작 command가 시작된 뒤 30초(개발/CI 관찰 제한, plan §10) 안에 자율 제출이 관찰된다. 제출은 시작 command보다 앞설 수 없다.'),

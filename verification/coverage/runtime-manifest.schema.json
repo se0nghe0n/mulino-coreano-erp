@@ -166,6 +166,22 @@
         "$ref": "#/$defs/problem"
       }
     },
+    "knownOpenGaps": {
+      "description": "Recorded open gaps with a named owner (layer-route KNOWN_OPEN entries and pending vocabulary addition requests). Listing them is not a waiver: a layer-route gap keeps its observation NOT_RUN.",
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["check", "gap", "owner"],
+        "properties": {
+          "check": {"enum": ["layer-routes", "vocabulary"]},
+          "gap": {"type": "string", "minLength": 1},
+          "owner": {"type": "string", "minLength": 1},
+          "cases": {"type": "array", "items": {"type": "string"}},
+          "planRef": {"type": "string"}
+        },
+        "additionalProperties": false
+      }
+    },
     "semanticOracleEquivalence": {
       "const": "REQUIRES_CASE_AND_RUNTIME_REVIEW"
     },

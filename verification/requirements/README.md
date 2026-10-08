@@ -180,9 +180,9 @@ python3 verification/requirements/check_layer_routes.py --include-db # DB 참고
 python3 -m unittest discover -s verification/requirements -p 'test_layer_routes.py'
 ```
 
-검토한 예외는 E1 model-reference 하나(host 모델 gate 입력)다. 다른
-소유자의 열린 항목(T20 3개, V4 1개)은 `KNOWN_OPEN`으로 보고하고
-실패시키지 않는다. 결과 `VALID`는 선언 구조의 일관성일 뿐 runtime
+검토한 예외는 E1 model-reference 하나(host 모델 gate 입력)다. 3라운드에
+`KNOWN_OPEN`으로 기록한 열린 항목(T20 3개, V4 1개)은 4라운드에 case가 해당
+layer 증거를 읽게 되어 모두 닫았고 목록에서 지웠다(아래 4라운드 절). 결과 `VALID`는 선언 구조의 일관성일 뿐 runtime
 PASS가 아니다. API layer는 검사하지 않는다. 효과 관찰은 DB 원행이
 artifact이고 명령 응답은 같은 oracle의 다른 관찰에서 API로 읽기
 때문이다.
@@ -210,11 +210,11 @@ d84f2942의 catalog 변경 뒤 T08만 다시 만들었고 V4·V6·V7·C3는 이�
 catalogSha256(61968b22…)을 유지했는데 prepare는 이를 보지 못했다.
 
 - `check_derived_bindings.py`는 모든 bindings 파일의 `caseHash`·
-  `catalogSha256`이 현재 입력의 sha256과 같은지 본다. C3는
-  `author_prerequisites.py`가 catalogSha256을 갱신하지 않아 harness
-  worker가 생성기 실행만으로 고칠 수 없다. 이 한 건을 owner·종료 조건과
-  함께 script의 KNOWN_OPEN으로 기록했다. stamp가 맞춰지면 이 항목이
-  stale로 실패하므로 함께 지운다.
+  `catalogSha256`이 현재 입력의 sha256과 같은지 본다. 3라운드에는 C3
+  `author_prerequisites.py`가 catalogSha256을 갱신하지 않아 KNOWN_OPEN 한
+  건이 있었다. 4라운드에 생성기가 catalogSha256도 다시 계산하고 C3
+  observation 목록이 catalog와 같은지 확인하게 했다. 다시 만든 bindings를
+  commit하고 KNOWN_OPEN 항목을 지웠다. 지금 목록은 비어 있다.
 - `test_case_generators_reproduce.py`는 V4 `author_review_fixes.py`,
   T06 `author_contracts.py`(T06·T22·T24), `platform-tests/build_cases.py`
   (T23·V8)를 임시 복사본에서 실행하고 쓰는 디렉터리 전체가 commit과
@@ -227,3 +227,19 @@ catalogSha256(61968b22…)을 유지했는데 prepare는 이를 보지 못했다
 python3 verification/requirements/check_derived_bindings.py
 python3 -m unittest discover -s verification/requirements -p 'test_case_generators_reproduce.py'
 ```
+
+## layer route KNOWN_OPEN 종료(2026-10-08, 4라운드)
+
+requiredLayers를 좁히는 lock reviewUpdate는 쓰지 않았다. 네 gap 모두 case가
+해당 layer의 결과를 실제로 읽게 해서 닫았다. 근거는
+`docs/execution/step2r-round4/README.md`에 있다.
+
+| observation | layer | 닫은 방법 |
+|---|---|---|
+| T20 `allowed-tools-as-server-authorization` | SKILLS | host-allowed-tools-write가 `requireDiscovery`·`requireBodyRead`로 skill을 실제로 loading하게 하고, loading 원행의 DISCOVERED·BODY_READ를 각각 1개로 센다. skill이 쓰이지 않아서 쓰기0이 저절로 맞는 경우를 막는다 |
+| T20 `document-instruction-authority` | SKILLS | host-malicious-document가 skill 본문 BODY_READ 1개를 세고, BODY_READ 행의 package가 `ontology-work-coordinator` 하나뿐임을 본다. 첨부 문서를 skill로 loading하지 않는다 |
+| T20 `skill-hash-as-loading-proof` | MCP | host-hash-only가 protocol transcript(`toolCalls`)의 COMMAND·RECORD 쓰기 호출0을 센다 |
+| V4 `mixed-batch-allowed-partial-effects` | MCP | mixed-atomic-batch에 같은 혼합 연산을 JSON-RPC batch 배열 하나로 보내는 MCP 경로를 더했다. HTTP 400·`-32600`·tool result 없음·허용 RECORD의 COMMITTED command0·claim0·조직 범위 원행 불변을 본다 |
+
+`check_layer_routes.py`는 KNOWN_OPEN 0이다. 시험은 V4 MCP 경로를 지운
+임시 복사본으로 unexplained·KNOWN_OPEN·stale 세 판정을 계속 확인한다.

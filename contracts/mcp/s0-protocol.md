@@ -90,6 +90,35 @@ local server는 loopback에 bind한다. 요청 artifact는 Authorization을
 `[REDACTED_SECRET]`으로 치환하며 response credential echo를 발견하면
 저장을 중단한다. 이 fixture 인증은 운영 OAuth/IAS discovery 인수가 아니다.
 
+## MRTR requestState(S5 계약)
+
+S0 adapter는 MRTR를 구현하지 않는다. 이 절은 S5 adapter가 지킬 값을
+고정한다. 계획 §9.1은 `requestState`를 주체·method/의도·TTL에 묶고
+무결성을 검증하라고 하지만 TTL 수치는 정하지 않았다. 테스트 계약은
+아래 값을 쓴다.
+
+- `requestState` TTL은 600초다(`requestStateTtlSeconds=600`). 기준은
+  state를 발급한 시각이다. 발급 뒤 599초의 continuation은 정상 처리하고
+  (T20 `before-expiry`는 STRUCTURED), 601초의 continuation은
+  `REQUEST_STATE_EXPIRED`로 거부한다. T20
+  fixture `baseline.mrtr.requestStateTtlSeconds`와 두 경계 시각
+  (09:09:59Z·09:10:01Z)은 `verification/mcp-tests/author_cases.py`의
+  `MRTR_TTL_SECONDS` 하나에서 계산한다. 생성기는 이 문서의 값과 다르면
+  실행을 멈춘다.
+- 이 값은 계획 §10의 versioned config와 같은 성격의 개발/CI 값이다.
+  운영 SLA가 아니며 deployment profile에서 다시 정할 수 있다. 그때는
+  이 문서, 생성기 상수, T20 fixture를 함께 바꾼다.
+- 만료 외의 결속 실패 code도 T20이 고정한다. 변조는
+  `REQUEST_STATE_INTEGRITY_FAILED`, 다른 주체는
+  `REQUEST_STATE_PRINCIPAL_MISMATCH`, 다른 intent는
+  `REQUEST_STATE_INTENT_MISMATCH`, 맞지 않는 응답은
+  `INPUT_RESPONSE_UNMATCHED`, 이미 소비한 single-use state는
+  `REQUEST_STATE_CONSUMED`다. 이 code들은 아직
+  `contracts/domain-vocabulary.json`에 없다. Step 3 추가 요청이며
+  `verification/cases/check_vocabulary.py`의 PENDING 항목이다.
+- TTL 안의 state도 업무 승인 자체가 아니다. 승인 소비의 single-use는
+  DB에서 원자적으로 강제한다(계획 §9.1).
+
 ## 실제 인수
 
 `verification/platform/protocol/wire_probe.py`는 실제 endpoint를 호출한다.

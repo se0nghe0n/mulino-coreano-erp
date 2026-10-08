@@ -6,7 +6,9 @@ Idempotent post-processor over verification/cases/V4/case.json. It owns:
   observations, the unchanged-effect-<source> and reader-command-not-committed
   assertions, and the authorized counter-call's own idempotency key;
 - the whole exposed-write-surface subcase (enumeration of the running system's write
-  surface, plan §4.2 "실제 노출된 direct/nested/batch/projection 경로 모두 검사").
+  surface, plan §4.2 "실제 노출된 direct/nested/batch/projection 경로 모두 검사");
+- the MCP leg of mixed-atomic-batch (actions mcp-batch*, assertions mcp-batch-*): the same mixed
+  operations as one JSON-RPC batch array, rejected as a whole with zero partial effect.
 It rewrites the V4 Korean feature from the JSON and refreshes observation-bindings.json
 through verification/cases/V7/bind_observations.py.
 
@@ -156,6 +158,60 @@ def wire(aid, method, actor='reader', args=None):
             'evidenceRefs': [aid + ':redacted-raw-wire', aid + ':authenticated-context', aid + ':server-response']}
 
 
+MIXED = 'mixed-atomic-batch'
+MCP_BATCH_SOURCES = ['segments', 'movements', 'allocations', 'approvals', 'works', 'obligations', 'outbox', 'commands', 'claims',
+                     'stocktakes']
+MCP_BATCH_ACTIONS = ('mcp-batch-before', 'mcp-batch', 'mcp-batch-after-snapshot', 'mcp-batch-after')
+
+
+def mixed_batch_mcp(sub):
+    """MCP leg of the mixed batch (plan §13.2 V4 MCP path, contracts/mcp/s0-protocol.md "batch ... 거부").
+    MCP has no changeset: the same allowed RECORD and forbidden dispatch sent as one JSON-RPC batch array must be
+    rejected as an invalid request as a whole, and the allowed RECORD must leave no partial effect."""
+    acts = [a for a in sub['actions'] if a['id'] not in MCP_BATCH_ACTIONS]
+    sub['assertions'] = [a for a in sub['assertions'] if not a['id'].startswith('mcp-batch-')]
+    batch = next(a for a in acts if a['id'] == 'batch')
+    calls = []
+    for op in batch['request']['operations']:
+        args = rekey(copy.deepcopy(op), op['commandIdempotencyKey'], op['commandIdempotencyKey'] + '-mcp')
+        calls.append({'jsonrpc': '2.0', 'id': 'mcp-batch-' + op['capabilityId'], 'method': 'tools/call',
+                      'params': {'name': op['capabilityId'], 'arguments': args}})
+    call = wire('mcp-batch', 'tools/call', actor=batch['actorRef'])
+    meta = call['request']['body']['params']['_meta']
+    for c in calls:
+        c['params']['_meta'] = copy.deepcopy(meta)
+    call['request']['body'] = calls
+    allowed_key = batch['request']['operations'][0]['commandIdempotencyKey'] + '-mcp'
+    acts += [observe('mcp-batch-before', 'after-snapshot', MCP_BATCH_SOURCES, ORG_SCOPE), call,
+             snapshot_query('mcp-batch-after-snapshot'), observe('mcp-batch-after', 'mcp-batch-after-snapshot', MCP_BATCH_SOURCES, ORG_SCOPE)]
+    sub['actions'] = acts
+    if 'wire' not in sub['requiredAdapters']:
+        sub['requiredAdapters'].append('wire')
+    o = 'mixed-batch-allowed-partial-effects'
+    x = [assertion('mcp-batch-http', 'equals', {'actionId': 'mcp-batch', 'pointer': '/response/httpStatus'}, 400,
+                   'MCP에는 changeset이 없다. 허용된 RECORD와 금지된 출고를 한 JSON-RPC batch 배열로 보내면 envelope 자체가 '
+                   '유효하지 않은 요청이라 HTTP 400이다(contracts/mcp/s0-protocol.md: batch와 malformed 입력은 거부한다).', o),
+         assertion('mcp-batch-invalid-request', 'equals', {'actionId': 'mcp-batch', 'pointer': '/response/body/error/code'}, -32600,
+                   'batch 배열은 JSON-RPC Invalid Request(-32600)로 한 번에 거부한다. 요소별 tool result로 나눠 일부를 실행하지 않는다.', o),
+         assertion('mcp-batch-no-tool-result', 'absent', {'actionId': 'mcp-batch', 'pointer': '/response/body/result'}, None,
+                   '거부된 batch 응답에는 tool result가 없다. 허용 요소만 실행한 결과를 돌려주지 않는다.', o),
+         assertion('mcp-batch-allowed-record-not-committed', 'count',
+                   {'actionId': 'mcp-batch-after', 'pointer': '/data/rawRows/commands',
+                    'where': {'commandIdempotencyKey': allowed_key, 'status': 'COMMITTED'}}, 0,
+                   'batch 안의 허용된 recordStocktake는 MCP 경로에서도 COMMITTED command를 남기지 않는다(부분 효과0).', o, scope=ORG_SCOPE),
+         assertion('mcp-batch-allowed-claims0', 'count',
+                   {'actionId': 'mcp-batch-after', 'pointer': '/data/rawRows/claims', 'where': {'commandIdempotencyKey': allowed_key}}, 0,
+                   '허용된 RECORD의 실행 claim도 0이다. 거부 전에 일부 요소가 실행 단계에 들어가지 않았다.', o, scope=ORG_SCOPE)]
+    for table in MCP_BATCH_SOURCES:
+        if table == 'commands':
+            continue  # a REJECTED protocol attempt may leave no record or a rejected one; COMMITTED is counted above
+        x.append(assertion('mcp-batch-unchanged-' + table, 'sameAs', {'actionId': 'mcp-batch-after', 'pointer': '/data/rawRows/' + table}, True,
+                           f'MCP batch 전후 조직 범위의 {table} 원행 전체가 같다. 허용된 RECORD(stocktakes 포함)와 금지된 출고 모두 효과0이다.',
+                           o, {'actionId': 'mcp-batch-before', 'pointer': '/data/rawRows/' + table}, ORG_SCOPE))
+    sub['assertions'] += x
+    return sub
+
+
 def snapshot_query(aid):
     return {'id': aid, 'kind': 'query', 'actorRef': 'delegator', 'route': 'api', 'capabilityId': 'getInventory',
             'request': {'scope': copy.deepcopy(CASE_SCOPE), 'asOf': NOW, 'knownAt': NOW}, 'evidenceRefs': [aid + ':actual-artifact']}
@@ -258,7 +314,8 @@ def explain_map(case):
     out = {}
     for s in case['subcases']:
         for a in s['assertions']:
-            if s['id'] == SURFACE or a['id'].startswith(('unchanged-effect-', 'reader-command-not-committed')):
+            if s['id'] == SURFACE or a['id'].startswith(('unchanged-effect-', 'reader-command-not-committed')) \
+                    or (s['id'] == MIXED and a['id'].startswith('mcp-batch-')):
                 out[(s['id'], a['id'])] = a['oracleExplanation']
     return out
 
@@ -294,6 +351,11 @@ def previous_texts(text):
 def self_check(case):
     for s in case['subcases']:
         parts = s['id'].split('-', 1)
+        if s['id'] == MIXED:
+            acts = {a['id']: a for a in s['actions']}
+            assert isinstance(acts['mcp-batch']['request']['body'], list) and len(acts['mcp-batch']['request']['body']) == 2, s['id']
+            assert {'mcp-batch-http', 'mcp-batch-invalid-request', 'mcp-batch-allowed-record-not-committed'} <= {a['id'] for a in s['assertions']}
+            continue
         if s['id'] == SURFACE:
             ids = {a['id'] for a in s['assertions']}
             assert {'surfaces-enumerated', 'no-unlisted-write-surface', 'probes-none-committed',
@@ -318,6 +380,8 @@ def build():
         parts = s['id'].split('-', 1)
         if len(parts) == 2 and parts[0] in ROUTES and parts[1] in FAMILIES:
             route_subcase(s)
+        if s['id'] == MIXED:
+            mixed_batch_mcp(s)
     case['subcases'].append(surface_subcase(template))
     self_check(case)
     return case

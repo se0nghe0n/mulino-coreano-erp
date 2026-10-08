@@ -162,7 +162,32 @@
       "minProperties": 1
     },
     "baseline": {
-      "type": "object"
+      "type": "object",
+      "properties": {
+        "runtimeProfile": {
+          "description": "Scheduler/sweeper tick semantics of the fixture (verification/host-observation-guide.md, runtimeProfile). controlledTicks=true and pausedUntilTickControl=true: the loops submit nothing by themselves and each harness tickScheduler/sweepDue request causes exactly that tick. controlledTicks=false and pausedUntilTickControl=false: the loops run on their own tickSeconds and only a passive OBSERVE_NEXT_NATURAL_TICK watcher observes them. A fixture without runtimeProfile is a harness-tick fixture.",
+          "type": "object",
+          "properties": {
+            "controlledTicks": {"type": "boolean"},
+            "pausedUntilTickControl": {"type": "boolean"},
+            "tickSeconds": {"type": "integer", "minimum": 1},
+            "claimTTLSeconds": {"type": "integer", "minimum": 1},
+            "heartbeatSeconds": {"type": "integer", "minimum": 1},
+            "observationLimitSeconds": {"type": "integer", "minimum": 1, "maximum": 30}
+          },
+          "required": ["controlledTicks", "pausedUntilTickControl"],
+          "allOf": [
+            {
+              "if": {"properties": {"controlledTicks": {"const": false}}},
+              "then": {"properties": {"pausedUntilTickControl": {"const": false}}}
+            },
+            {
+              "if": {"properties": {"pausedUntilTickControl": {"const": false}}},
+              "then": {"properties": {"controlledTicks": {"const": false}}}
+            }
+          ]
+        }
+      }
     },
     "evidence": {
       "type": "array",

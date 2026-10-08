@@ -246,28 +246,83 @@ tickScheduler/sweepDue 요청에 아래 세 parameter를 두면 수동 관찰이
 | `observationWindowSeconds` | 정수 1–30 | 관찰 창. 계획 §10 개발/CI 관찰 제한30초 |
 | `triggeredBy` | `SCHEDULER_LOOP` | 기대하는 제출 주체 |
 
+세 값은 watcher 설정이다. scheduler 증거가 아니다. 이전 계약은
+`operationEvidence`에 같은 세 값을 되돌려 달라고 했다. 요청을 그대로
+복사하는 observer도 통과했으므로 증거가 되지 못했다. 지금은
+`operationEvidence`에 세 key가 있으면 schema와 validator가 모두 거부한다.
+
+scheduler가 실제로 한 일은 extractor `rawRows.schedulerSubmissions[]`로
+돌려준다. scheduler가 스스로 남긴 제출 기록(제출 표·log)을 독립 extractor가
+읽은 행이다.
+
+| rawRows.schedulerSubmissions[] field | 내용 |
+|---|---|
+| `schedulerId` | 요청 schedulerId와 같다 |
+| `tickId`(tickScheduler) / `sweepId`(sweepDue) | scheduler가 붙인 실행 단위 ID |
+| `taskId`, `invocationHandle` | 제출한 technical task identity |
+| `submittedAt` | scheduler가 기록한 제출 시각 |
+| `submittedBy` | 제출을 시작한 주체. 자연 tick이면 `SCHEDULER_LOOP` |
+
 `HostObservationValidator`(`naturalTick`)가 다음을 요구한다.
 
-- 독립 extractor가 읽은 scheduler 원행의 `operationEvidence`에 같은
-  `trigger`·`observationWindowSeconds`·`triggeredBy`가 있다. 값은 요청과
-  같아야 하며 원행에서 나온다(StepResult 요약이 아니다). `triggeredBy`는
-  case assertion(`autonomous-trigger-loop`)이 다시 읽는다.
-- host `command`는 관찰자(watcher)의 실제 argv/구간이다. 구간은
-  `observationWindowSeconds`를 넘지 않고, SUBMITTED의 `submittedAt`은
-  command 시작부터 창 안에 있다. NO_TASK는 창 안에 제출이 없었다는 실제
-  관찰이며 자율 발견 실패로 case assertion에서 드러난다.
+- `rawRows.schedulerSubmissions`가 배열로 있다. 행마다 위 field가 비어
+  있지 않고 schedulerId가 요청과 같으며, submittedAt이 command 시작부터
+  `observationWindowSeconds` 안이다.
+- SUBMITTED면 `operationEvidence`의 tickId 또는 sweepId·taskId·
+  invocationHandle·submittedAt이 창 안 가장 이른 행과 같다. NO_TASK면 창
+  안에 행이 없다. NO_TASK는 자율 발견 실패를 그대로 드러내는 관찰이며
+  case assertion에서 실패한다.
+- host `command`는 watcher의 실제 argv/구간이다. 구간은
+  `observationWindowSeconds`를 넘지 않는다.
 - argv에 `tickScheduler`·`sweepDue`·`resumeWork`·`fakeWorker` 호출을
-  넣지 않는다. 이 검사는 명백한 trigger를 막는 guard다. 자율성의 증거는
-  독립 원행의 제출 주체와 case의 DB attempt 원행(`autonomous-attempt-source`)이다.
+  넣지 않는다. 명백한 trigger를 막는 guard다.
 - extractor는 independent·readOnly다.
-- 수동 parameter가 없는 harness tick/sweep은 원행이 `trigger=
-  OBSERVE_NEXT_NATURAL_TICK`이나 `triggeredBy=SCHEDULER_LOOP`를 주장하면
-  거부한다. harness가 일으킨 tick을 자연 tick으로 바꿔 부를 수 없다.
+- 수동 parameter가 없는 harness tick/sweep에서 schedulerSubmissions 행이
+  `submittedBy=SCHEDULER_LOOP`를 주장하면 거부한다. harness가 일으킨
+  tick을 자연 tick으로 바꿔 부를 수 없다.
 
-schema(`acceptance-host-observation.schema.json`)는 tickScheduler/sweepDue
-`operationEvidence`에 세 field를 허용하고 `trigger`가 있으면 나머지 둘을
-요구한다. 운영 process가 sweeper loop를 실제로 실행하는지의 deployment
-profile 검사는 아직 없다(T26 case·deployment 소유자 후속).
+T26 `autonomous-trigger-loop` assertion은 `operationEvidence.taskId`로
+고른 schedulerSubmissions 행의 `submittedBy`가 정확히 `{SCHEDULER_LOOP}`인지
+본다. 요청 parameter의 복사로는 이 값을 만들 수 없다. 자율성의 다른 증거는
+case의 DB attempt 원행(`autonomous-attempt-source`)이다. 운영 process가
+sweeper loop를 실제로 실행하는지의 deployment profile 검사는 아직 없다
+(T26 case·deployment 소유자 후속).
+
+## runtimeProfile과 자율 loop 패턴
+
+fixture `baseline.runtimeProfile`(`contracts/acceptance-fixture.schema.json`)은
+scheduler·sweeper loop가 tick을 어떻게 일으키는지 정한다. 정의된 조합은
+둘뿐이다.
+
+| controlledTicks | pausedUntilTickControl | 의미 | 쓰는 subcase |
+|---|---|---|---|
+| `true` | `true` | loop는 스스로 아무것도 제출하지 않는다. harness tickScheduler/sweepDue 요청 하나가 정확히 그 tick 하나를 일으킨다 | harness tick subcase(T26 rediscovery·expiry·guard, V5) |
+| `false` | `false` | loop가 자기 `tickSeconds`로 돈다. harness는 수동 watcher(OBSERVE_NEXT_NATURAL_TICK)로 관찰만 한다 | T26 `*-autonomous-loop` |
+
+runtimeProfile이 있으면 두 flag가 모두 필요하고, 섞인 조합(true/false)은
+schema가 거부한다. runtimeProfile이 없는 fixture는 harness tick fixture로
+본다. `tickSeconds`·`claimTTLSeconds`·`heartbeatSeconds`는 1 이상의 정수,
+`observationLimitSeconds`는 1–30이다(계획 §10).
+
+`./verify prepare`(`ContractValidator.runtimeProfileProblems`)는 subcase마다
+다음을 검사한다.
+
+- 한 subcase에 harness tick과 수동 watcher가 섞이면 거부한다. 한 profile로
+  두 제출의 주체를 가를 수 없다.
+- harness tick은 controlledTicks=true·pausedUntilTickControl=true fixture에서만,
+  수동 watcher는 둘 다 false인 명시 runtimeProfile에서만 쓴다.
+- 자율 loop 패턴. 첫 수동 watcher는 top-level `parallel` action의 branch 0
+  첫 action이다. 나머지 branch는 process `start`만 한다. 그 process는 이
+  시점에 멈춰 있어야 한다. 즉 clock advance 전에 `stop`하고, 그 뒤 parallel
+  안에서 다시 `start`한다. `restart`는 쓰지 않는다. stop과 start 사이가
+  없어서 watcher보다 먼저 loop가 제출할 수 있기 때문이다.
+
+watcher branch를 먼저 두는 이유는 순서다. watcher가 관찰을 시작한 뒤에
+loop가 살아나야 첫 자연 tick이 관찰 창 안에 들어온다. `parallel`은 barrier가
+아니어서 watcher가 비정상적으로 늦으면 첫 제출을 놓칠 수 있다. 그때 결과는
+NO_TASK나 창 밖 행이며 fail-closed다. 거짓 PASS는 나오지 않는다. 30초
+기준은 scheduler·sweeper start command의
+`/data/hostObservation/command/startedAt`에서 잰다(`autonomous-within-30s`).
 
 ## verifyCoverage 입력 snapshot
 
@@ -292,6 +347,22 @@ T25 verifyCoverage는 `inputSnapshotKind`로 고정한 한 입력만 읽는다.
   `{snapshotKind, path, sha256}`이고 요청 종류·묶인 파일과 같다.
   REQUIRED_PATH_RUNTIME_EVIDENCE면 `input.currentExecution`도 요청과 같다.
 - `mutation`이 `none`이 아니면 `rawRows.mutatedInput.mutation`이 요청과 같다.
+- PREPARATION이면 `rawRows.input`에 아래 네 field가 있다(`preparationInput`).
+  준비 보고가 어느 commit의 clean tree에서 나왔는지, verifier가 어느
+  checkout에서 읽었는지를 같이 남긴다.
+
+  | rawRows.input field | 형식 | 원천과 validator 검사 |
+  |---|---|---|
+  | `codeCommit` | 40 또는 64자리 소문자 hex | 묶인 준비 보고 bytes의 `codeCommit`과 같다 |
+  | `workingTreeDirty` | boolean | 묶인 준비 보고 bytes의 `workingTreeDirty`와 같다 |
+  | `checkoutCommit` | 40 또는 64자리 소문자 hex | verifier가 실행된 checkout의 HEAD |
+  | `checkoutDirty` | boolean | verifier가 실행된 checkout의 변경 여부 |
+
+  validator는 형식과 준비 보고와의 일치만 강제한다. 이 보고가 현재 clean
+  checkout의 것인지(`workingTreeDirty=false`, `checkoutDirty=false`,
+  `codeCommit`=`checkoutCommit`)는 T25 PREPARATION subcase의 assertion이
+  판정한다. 그래서 낡거나 dirty인 준비 보고는 형식 오류가 아니라 case
+  FAIL로 드러난다.
 - `rawRows.assertionLinks[]`와 `rawRows.namedObservations[].assertionLinks[]`의
   status는 PASS·FAIL·NOT_RUN·CURRENT_EXECUTION이다. CURRENT_EXECUTION은
   REQUIRED_PATH_RUNTIME_EVIDENCE에서 currentExecution case의 link에만, 그리고
@@ -303,7 +374,7 @@ T25가 읽는 rawRows 출력은 다음과 같다. 값의 의미와 기대값은 
 
 | rawRows 경로 | 내용 |
 |---|---|
-| `input` | 위 snapshotKind·path·sha256(·currentExecution) |
+| `input` | 위 snapshotKind·path·sha256(·currentExecution). PREPARATION이면 아래 commit·clean 4 field도 |
 | `requiredCases`, `requirementIds` | 읽은 registry/catalog의 41 case, D01–D26 |
 | `catalogOracles[]`, `catalogObservations[]` | oracleId / oracleId·name·type·scope·operator 원문 tuple |
 | `namedObservations[]` | catalog 선언순 observation과 그 `assertionLinks[]`(caseId·subcaseId·assertionId·profile·status·evidenceRefs) |

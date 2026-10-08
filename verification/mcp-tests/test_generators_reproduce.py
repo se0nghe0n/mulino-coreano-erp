@@ -26,10 +26,12 @@ class GeneratorsReproduceCommittedFiles(unittest.TestCase):
 
     def test_channel_cases(self):
         outputs = [f'verification/cases/{c}/{f}' for c in ['T01', 'T20', 'T25'] for f in ['case.json', 'fixture.json', 'scenario.feature']]
-        self.run_generator('verification/mcp-tests/author_cases.py', ['verification/requirements/mandatory-oracles.json', 'contracts/acceptance-capabilities.json'] + outputs, outputs)
+        self.run_generator('verification/mcp-tests/author_cases.py', ['verification/requirements/mandatory-oracles.json', 'contracts/acceptance-capabilities.json',
+                                                                    'contracts/mcp/s0-protocol.md'] + outputs, outputs)
 
     def test_c3_post_processor_is_a_fixed_point(self):
-        self.run_generator('verification/cases/C3/author_prerequisites.py', ['verification/cases/C3', 'contracts/acceptance-capabilities.json'],
+        self.run_generator('verification/cases/C3/author_prerequisites.py', ['verification/cases/C3', 'contracts/acceptance-capabilities.json',
+                                                                             'verification/requirements/mandatory-oracles.json'],
                            [f'verification/cases/C3/{f}' for f in ['case.json', 'scenario.feature', 'observation-bindings.json', 'fixture-closeRecall.json', 'fixture-emergencyReassign.json', 'fixture-dispatchPurchaseOrder.json', 'recipient-acceptance.json']])
 
     def test_t26_post_processor_is_a_fixed_point(self):
