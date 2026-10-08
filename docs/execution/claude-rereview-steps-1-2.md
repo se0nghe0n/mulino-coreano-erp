@@ -17,7 +17,7 @@ harness·coverage·model·고위험 case다. Step 3 actual adapter는 제외했�
 - 첫 실행은 사용량 한도로 40개 agent가 실패했고 같은 script를 resume해
   나머지를 실행했다. 최종 81 agent 완료, 오류0이다.
 - 결과: slice별 판정은 10개 모두 FAIL이다. 확정 지적 54건(P0 1, P1
-  19, P2 27, P3 7), 반박 17건, 미검증 P3 15건이다. 확정 지적의 원문,
+  18, P2 29, P3 6), 반박 17건, 미검증 P3 15건이다. 확정 지적의 원문,
   반박 근거는 [evidence](evidence/claude-rereview/)에 보존했다.
 
 ## 확정 지적과 수정 소유자
