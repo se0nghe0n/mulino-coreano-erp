@@ -94,6 +94,7 @@ public final class Main {
             }
             problems.addAll(preparation.feature(path,c));
             problems.addAll(validator.oracleSourceProblems(c));
+            problems.addAll(validator.errorPointerProblems(c));
         }
         for(String id:expected) if(!cases.containsKey(id)) problems.add("Missing required case "+id);
         for(int i=1;i<=26;i++) if(!covered.contains(String.format("D%02d",i))) problems.add("Missing requirement assertion "+String.format("D%02d",i));
@@ -106,9 +107,11 @@ public final class Main {
         if(!Files.isRegularFile(catalog)) problems.add("Missing independent normative oracle catalog");
         List<String> attributionGaps=new ArrayList<>();
         if(Files.isRegularFile(catalog)) CatalogLinkValidator.validate(validator,Json.read(catalog),cases,problems,attributionGaps);
+        // The normative catalog/lock validator and the owner-maintained case-asset checks; the assembler loads the same lock validator.
+        ArrayNode assetChecks=PreparationAssetChecks.run(validator.root(),problems);
         String status=problems.isEmpty()?"PREPARED":"FAIL";ObjectNode report=base(validator.root(),mode,status,problems.isEmpty()?0:1);
         report.put("gateComplete",false).put("runtimeStatus","NOT_RUN").put("runtimeComplete",false).put("preparedCases",cases.size()).put("preparedSubcases",subcases).put("preparedAssertions",assertions);
-        report.set("preparationProblems",Json.MAPPER.valueToTree(problems));report.set("artifactKindAttributionGaps",Json.MAPPER.valueToTree(attributionGaps));report.put("artifactCoverageStatus","NOT_RUN");report.put("semanticOracleEquivalence","REQUIRES_CASE_REVIEW");
+        report.set("preparationProblems",Json.MAPPER.valueToTree(problems));report.set("artifactKindAttributionGaps",Json.MAPPER.valueToTree(attributionGaps));report.set("caseAssetChecks",assetChecks);report.put("artifactCoverageStatus","NOT_RUN");report.put("semanticOracleEquivalence","REQUIRES_CASE_REVIEW");
         Json.write(validator.root().resolve("verification/harness/target/evidence/"+mode+".json"),report);System.out.println(report.toPrettyString());return problems.isEmpty()?0:1;
     }
     private static ObjectNode base(Path root,String profile,String status,int exit) throws IOException,InterruptedException {

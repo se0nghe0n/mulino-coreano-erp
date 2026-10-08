@@ -66,6 +66,60 @@ final class CatalogLinkValidator {
         for(JsonNode source:catalog.path("sourceFiles"))
             if(!Json.sha256(validator.path(source.path("path").asText())).equals(source.path("sha256").asText()))
                 problems.add("Normative source hash drift "+source.path("path"));
+        requiredProfileReachability(catalog,cases,problems);
+    }
+
+    /** Catalog requiredLayers to execution profiles; identical to verification/coverage/assemble.py LAYER_PROFILE. */
+    static final Map<String,String> LAYER_PROFILE=Map.of("UNIT","contracts","API","scenarios","DB","scenarios","MCP","mcp","SKILLS","skills",
+        "MODEL","model","LOCAL_DEPLOYMENT","local-deployment","BTP_DEPLOYMENT","btp-deployment","REGULATORY_REVIEW","regulatory");
+    static final Set<String> PROFILES=Set.of("schema","contracts","scenarios","recovery","mcp","skills","model","local-deployment","btp-deployment","regulatory");
+
+    /**
+     * Same rule as the coverage assembler: an observation whose oracle requiredLayers demand a profile on which no
+     * linked case assertion executes can never reach a clause state, so it would stay NOT_RUN forever while the
+     * declaration looked complete. Links exist only on the case's declared profiles; {@code deployment} expands to
+     * local-deployment and btp-deployment, and a subcase asserting a REGULATORY_REVIEW observation is also on the
+     * separate regulatory evidence profile. Declaring the profile is necessary, not sufficient (case review).
+     */
+    static void requiredProfileReachability(JsonNode catalog,Map<String,JsonNode> cases,List<String> problems) {
+        Map<String,JsonNode> oracles=new HashMap<>();
+        for(JsonNode oracle:catalog.path("oracles")) oracles.put(oracle.path("oracleId").asText(),oracle);
+        Map<String,Set<String>> linked=new LinkedHashMap<>();
+        for(JsonNode c:cases.values()) {
+            String caseId=c.path("caseId").asText();
+            List<String> declared=new ArrayList<>();
+            for(JsonNode p:c.path("profiles")) if(p.asText().equals("deployment")) {declared.add("local-deployment");declared.add("btp-deployment");} else declared.add(p.asText());
+            Set<String> unknown=new TreeSet<>(declared);unknown.removeAll(PROFILES);
+            if(!unknown.isEmpty()) problems.add("Case declares unknown verification profile(s): "+caseId+" "+unknown);
+            for(JsonNode sub:c.path("subcases")) {
+                Set<String> subProfiles=new LinkedHashSet<>(declared);
+                for(JsonNode assertion:sub.path("assertions")) {
+                    JsonNode oracle=oracles.get(assertion.path("oracleRef").path("oracleId").asText());
+                    if(oracle==null || !oracle.path("caseId").asText().equals(caseId) || !contains(oracle.path("requiredLayers"),"REGULATORY_REVIEW")) continue;
+                    for(JsonNode name:assertion.path("oracleRef").path("observationNames")) for(JsonNode o:oracle.path("expectedObservations"))
+                        if(o.path("name").asText().equals(name.asText())) subProfiles.add("regulatory");
+                }
+                for(JsonNode assertion:sub.path("assertions")) {
+                    JsonNode ref=assertion.path("oracleRef");JsonNode oracle=oracles.get(ref.path("oracleId").asText());
+                    if(oracle==null || !oracle.path("caseId").asText().equals(caseId)) continue;
+                    for(JsonNode name:ref.path("observationNames")) {
+                        boolean known=false;for(JsonNode o:oracle.path("expectedObservations")) known|=o.path("name").asText().equals(name.asText());
+                        if(known) linked.computeIfAbsent(ref.path("oracleId").asText()+"/"+name.asText(),k->new TreeSet<>()).addAll(subProfiles);
+                    }
+                }
+            }
+        }
+        for(JsonNode oracle:catalog.path("oracles")) {
+            Set<String> required=new TreeSet<>();
+            for(JsonNode layer:oracle.path("requiredLayers")) if(LAYER_PROFILE.containsKey(layer.asText())) required.add(LAYER_PROFILE.get(layer.asText()));
+            for(JsonNode observation:oracle.path("expectedObservations")) {
+                String key=oracle.path("oracleId").asText()+"/"+observation.path("name").asText();
+                Set<String> profiles=linked.get(key);
+                if(profiles==null) continue; // reported as an unlinked normative observation
+                for(String profile:required) if(!profiles.contains(profile))
+                    problems.add("Unreachable required profile: "+key+" requires "+profile+" but case "+oracle.path("caseId").asText()+" links no assertion on that profile");
+            }
+        }
     }
 
     private static boolean fixedQuantityAssertion(JsonNode assertion,JsonNode observation) {
