@@ -449,7 +449,8 @@
               "quantity": {
                 "value": "60",
                 "unit": "BOX"
-              }
+              },
+              "action": "SELL"
             },
             "expectedRevision": {
               "$result": {
@@ -1217,6 +1218,78 @@
             "scenarioId": "reserve-pick-dispatch"
           },
           "oracleExplanation": "second-reservation-same60는 100 보유 중 적격60의 예약·피킹·출고와 중복 배분을 대조한다의 독립 고정값과 실제 원 행을 대조한다.",
+          "oracleRef": {
+            "oracleId": "T17.reserve-pick-dispatch",
+            "observationNames": [
+              "second-reservation-same60"
+            ]
+          }
+        },
+        {
+          "id": "second-reservation-same60-code",
+          "op": "equals",
+          "source": {
+            "actionId": "second-reserve",
+            "pointer": "/response/error/code"
+          },
+          "expected": "INSUFFICIENT_ELIGIBLE_QUANTITY",
+          "requirementRefs": [
+            "D17"
+          ],
+          "evidenceRefs": [
+            "second-reserve:actual-response-or-host-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "T17",
+            "scenarioId": "reserve-pick-dispatch"
+          },
+          "oracleExplanation": "같은 A60에 SELL 예약60이 이미 있어 미예약 적격은0 BOX다. 두 번째 주문의 예약60은 REJECTED·INSUFFICIENT_ELIGIBLE_QUANTITY다(계획 §3.4·§4.2).",
+          "oracleRef": {
+            "oracleId": "T17.reserve-pick-dispatch",
+            "observationNames": [
+              "second-reservation-same60"
+            ]
+          }
+        },
+        {
+          "id": "second-reservation-same60-line-allocation0",
+          "op": "count",
+          "source": {
+            "actionId": "after-second-db",
+            "pointer": "/data/rawRows/allocations",
+            "where": {
+              "orderLineId": {
+                "$result": {
+                  "actionId": "second-order",
+                  "pointer": "/response/line/id"
+                }
+              }
+            }
+          },
+          "expected": 0,
+          "requirementRefs": [
+            "D17"
+          ],
+          "evidenceRefs": [
+            "after-second-db:raw-rows"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "T17",
+            "scenarioId": "reserve-pick-dispatch"
+          },
+          "oracleExplanation": "거부 뒤 두 번째 주문 line을 가리키는 배분 원행은0개다. 같은 실물60을 두 주문에 중복 배분하지 않는다.",
           "oracleRef": {
             "oracleId": "T17.reserve-pick-dispatch",
             "observationNames": [
@@ -4177,6 +4250,1302 @@
         }
       ],
       "oracleExplanation": "가상 fixture는 선행 실물·정책·증거 입력만 설치한다. 검증하는 주문·승인·예약·출고·인도·반품·회수·정정 효과는 각각 공개 명령으로 실행한다. 출고30 뒤 SELL 금지에도 확인 인도20과 운송10을 보존하고 위반·회수 책임을 남긴다의 수량과 책임은 고정 기대값과 원 행·응답을 함께 검증한다."
+    },
+    {
+      "id": "post-dispatch-expiry",
+      "title": "출고30 뒤 처분 허용이 만료돼도 실제 인도20과 운송10을 보존하고 위반 대응 책임을 남긴다",
+      "fixtureRef": "verification/cases/T17/fixtures/post-dispatch-expiry.json",
+      "requiredAdapters": [
+        "fixture",
+        "api",
+        "db",
+        "clock"
+      ],
+      "actions": [
+        {
+          "id": "setup",
+          "kind": "installFixture",
+          "evidenceRefs": [
+            "setup:fixture-installation"
+          ]
+        },
+        {
+          "id": "order",
+          "kind": "invoke",
+          "actorRef": "sales",
+          "route": "api",
+          "capabilityId": "createSalesOrder",
+          "request": {
+            "intentKind": "COMMAND",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "createSalesOrder",
+            "subjectRefs": [
+              {
+                "type": "TradeItem",
+                "id": {
+                  "$alias": "P"
+                }
+              }
+            ],
+            "slots": {
+              "customerId": {
+                "$alias": "C"
+              },
+              "quantity": {
+                "value": "30",
+                "unit": "BOX"
+              },
+              "destinationId": {
+                "$alias": "CUSTOMER"
+              },
+              "deliveryEndpoint": "CUSTOMER_ACCEPTED",
+              "packagingVersion": "sealed-box-v1",
+              "dueAt": "2026-10-07T10:00:00Z"
+            },
+            "expectedRevision": 1,
+            "commandIdempotencyKey": "T17-post-dispatch-expiry-order",
+            "evidenceRefs": [
+              {
+                "$alias": "delivery-proof"
+              }
+            ],
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseId": "T17",
+              "scenarioId": "post-dispatch-expiry"
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z"
+          },
+          "evidenceRefs": [
+            "order:api-response",
+            "order:actual-command-artifact"
+          ]
+        },
+        {
+          "id": "reserve",
+          "kind": "invoke",
+          "actorRef": "sales",
+          "route": "api",
+          "capabilityId": "reserveQuantity",
+          "request": {
+            "intentKind": "COMMAND",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "reserveQuantity",
+            "subjectRefs": [
+              {
+                "type": "TradeItem",
+                "id": {
+                  "$alias": "P"
+                }
+              }
+            ],
+            "slots": {
+              "orderLineId": {
+                "$result": {
+                  "actionId": "order",
+                  "pointer": "/response/line/id"
+                }
+              },
+              "segmentId": {
+                "$alias": "A"
+              },
+              "quantity": {
+                "value": "30",
+                "unit": "BOX"
+              },
+              "action": "SELL"
+            },
+            "expectedRevision": 1,
+            "commandIdempotencyKey": "T17-post-dispatch-expiry-reserve",
+            "evidenceRefs": [
+              {
+                "$alias": "delivery-proof"
+              }
+            ],
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseId": "T17",
+              "scenarioId": "post-dispatch-expiry"
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z"
+          },
+          "evidenceRefs": [
+            "reserve:api-response",
+            "reserve:actual-command-artifact"
+          ]
+        },
+        {
+          "id": "pick",
+          "kind": "invoke",
+          "actorRef": "sales",
+          "route": "api",
+          "capabilityId": "pickQuantity",
+          "request": {
+            "intentKind": "COMMAND",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "pickQuantity",
+            "subjectRefs": [
+              {
+                "type": "TradeItem",
+                "id": {
+                  "$alias": "P"
+                }
+              }
+            ],
+            "slots": {
+              "allocationId": {
+                "$result": {
+                  "actionId": "reserve",
+                  "pointer": "/response/allocationId"
+                }
+              },
+              "quantity": {
+                "value": "30",
+                "unit": "BOX"
+              }
+            },
+            "expectedRevision": {
+              "$result": {
+                "actionId": "reserve",
+                "pointer": "/response/revision"
+              }
+            },
+            "commandIdempotencyKey": "T17-post-dispatch-expiry-pick",
+            "evidenceRefs": [
+              {
+                "$alias": "delivery-proof"
+              }
+            ],
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseId": "T17",
+              "scenarioId": "post-dispatch-expiry"
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z"
+          },
+          "evidenceRefs": [
+            "pick:api-response",
+            "pick:actual-command-artifact"
+          ]
+        },
+        {
+          "id": "dispatch",
+          "kind": "invoke",
+          "actorRef": "sales",
+          "route": "api",
+          "capabilityId": "dispatchQuantity",
+          "request": {
+            "intentKind": "COMMAND",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "dispatchQuantity",
+            "subjectRefs": [
+              {
+                "type": "TradeItem",
+                "id": {
+                  "$alias": "P"
+                }
+              }
+            ],
+            "slots": {
+              "allocationId": {
+                "$result": {
+                  "actionId": "reserve",
+                  "pointer": "/response/allocationId"
+                }
+              },
+              "originId": {
+                "$alias": "W"
+              },
+              "destinationId": {
+                "$alias": "CUSTOMER"
+              },
+              "cargoPlaceId": {
+                "$alias": "TRANSIT"
+              },
+              "quantity": {
+                "value": "30",
+                "unit": "BOX"
+              }
+            },
+            "expectedRevision": {
+              "$result": {
+                "actionId": "pick",
+                "pointer": "/response/revision"
+              }
+            },
+            "commandIdempotencyKey": "T17-post-dispatch-expiry-dispatch",
+            "evidenceRefs": [
+              {
+                "$alias": "delivery-proof"
+              }
+            ],
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseId": "T17",
+              "scenarioId": "post-dispatch-expiry"
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z"
+          },
+          "evidenceRefs": [
+            "dispatch:api-response",
+            "dispatch:actual-command-artifact"
+          ]
+        },
+        {
+          "id": "expiry-advance",
+          "kind": "control",
+          "control": {
+            "type": "clock",
+            "operation": "advanceTo",
+            "parameters": {
+              "asOf": "2026-10-07T09:06:00Z",
+              "knownAt": "2026-10-07T09:06:00Z",
+              "timezone": "Asia/Seoul",
+              "scope": {
+                "organizationId": {
+                  "$alias": "ORG"
+                },
+                "itemId": {
+                  "$alias": "P"
+                },
+                "caseId": "T17",
+                "scenarioId": "post-dispatch-expiry"
+              }
+            }
+          },
+          "evidenceRefs": [
+            "expiry-advance:actual-clock-ack"
+          ]
+        },
+        {
+          "id": "before-delivery",
+          "kind": "query",
+          "actorRef": "observer",
+          "route": "api",
+          "capabilityId": "getObject",
+          "request": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseId": "T17",
+              "scenarioId": "post-dispatch-expiry"
+            },
+            "subjectRefs": [
+              {
+                "type": "TradeItem",
+                "id": {
+                  "$alias": "P"
+                }
+              }
+            ],
+            "asOf": "2026-10-07T09:06:00Z",
+            "knownAt": "2026-10-07T09:06:00Z",
+            "include": [
+              "inventory",
+              "trade",
+              "evidence",
+              "assessments",
+              "obligations",
+              "audit",
+              "outbox"
+            ]
+          },
+          "evidenceRefs": [
+            "before-delivery:api-response"
+          ]
+        },
+        {
+          "id": "before-delivery-db",
+          "kind": "observe",
+          "observation": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseId": "T17",
+              "scenarioId": "post-dispatch-expiry"
+            },
+            "snapshotRef": {
+              "$result": {
+                "actionId": "before-delivery",
+                "pointer": "/response/snapshotRevision"
+              }
+            },
+            "asOf": "2026-10-07T09:06:00Z",
+            "knownAt": "2026-10-07T09:06:00Z",
+            "sources": [
+              "segments",
+              "movements",
+              "allocations",
+              "deliveries",
+              "claims",
+              "assessments",
+              "obligations",
+              "restrictions",
+              "audit",
+              "outbox"
+            ]
+          },
+          "evidenceRefs": [
+            "before-delivery-db:raw-rows",
+            "before-delivery-db:source-query",
+            "before-delivery-db:snapshot"
+          ]
+        },
+        {
+          "id": "delivery",
+          "kind": "invoke",
+          "actorRef": "receiver",
+          "route": "api",
+          "capabilityId": "recordDelivery",
+          "request": {
+            "intentKind": "RECORD",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "recordDelivery",
+            "subjectRefs": [
+              {
+                "type": "TradeItem",
+                "id": {
+                  "$alias": "P"
+                }
+              }
+            ],
+            "slots": {
+              "dispatchId": {
+                "$result": {
+                  "actionId": "dispatch",
+                  "pointer": "/response/id"
+                }
+              },
+              "cargoScopeId": {
+                "$result": {
+                  "actionId": "dispatch",
+                  "pointer": "/response/cargoScope/id"
+                }
+              },
+              "allocationId": {
+                "$result": {
+                  "actionId": "reserve",
+                  "pointer": "/response/allocationId"
+                }
+              },
+              "quantity": {
+                "value": "20",
+                "unit": "BOX"
+              },
+              "sourceEvidenceId": {
+                "$alias": "delivery-20"
+              },
+              "occurredAt": "2026-10-07T09:06:00Z"
+            },
+            "expectedRevision": {
+              "$result": {
+                "actionId": "dispatch",
+                "pointer": "/response/revision"
+              }
+            },
+            "commandIdempotencyKey": "T17-post-dispatch-expiry-delivery",
+            "evidenceRefs": [
+              {
+                "$alias": "delivery-proof"
+              }
+            ],
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseId": "T17",
+              "scenarioId": "post-dispatch-expiry"
+            },
+            "asOf": "2026-10-07T09:06:00Z",
+            "knownAt": "2026-10-07T09:06:00Z"
+          },
+          "evidenceRefs": [
+            "delivery:api-response",
+            "delivery:actual-command-artifact"
+          ]
+        },
+        {
+          "id": "after-delivery",
+          "kind": "query",
+          "actorRef": "observer",
+          "route": "api",
+          "capabilityId": "getObject",
+          "request": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseId": "T17",
+              "scenarioId": "post-dispatch-expiry"
+            },
+            "subjectRefs": [
+              {
+                "type": "TradeItem",
+                "id": {
+                  "$alias": "P"
+                }
+              }
+            ],
+            "asOf": "2026-10-07T09:06:00Z",
+            "knownAt": "2026-10-07T09:06:00Z",
+            "include": [
+              "inventory",
+              "trade",
+              "evidence",
+              "assessments",
+              "obligations",
+              "audit",
+              "outbox"
+            ]
+          },
+          "evidenceRefs": [
+            "after-delivery:api-response"
+          ]
+        },
+        {
+          "id": "after-delivery-db",
+          "kind": "observe",
+          "observation": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseId": "T17",
+              "scenarioId": "post-dispatch-expiry"
+            },
+            "snapshotRef": {
+              "$result": {
+                "actionId": "after-delivery",
+                "pointer": "/response/snapshotRevision"
+              }
+            },
+            "asOf": "2026-10-07T09:06:00Z",
+            "knownAt": "2026-10-07T09:06:00Z",
+            "sources": [
+              "segments",
+              "movements",
+              "allocations",
+              "deliveries",
+              "claims",
+              "assessments",
+              "obligations",
+              "restrictions",
+              "audit",
+              "outbox"
+            ]
+          },
+          "evidenceRefs": [
+            "after-delivery-db:raw-rows",
+            "after-delivery-db:source-query",
+            "after-delivery-db:snapshot"
+          ]
+        }
+      ],
+      "assertions": [
+        {
+          "id": "actual-delivered-1",
+          "op": "decimalEquals",
+          "source": {
+            "actionId": "after-delivery",
+            "pointer": "/response/data/deliveredQuantity"
+          },
+          "expected": "20",
+          "requirementRefs": [
+            "D17"
+          ],
+          "evidenceRefs": [
+            "after-delivery:actual-response-or-host-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "T17",
+            "scenarioId": "post-dispatch-expiry"
+          },
+          "oracleExplanation": "처분 허용 만료 뒤에도 고객이 실제로 받은 인도20 BOX를 사실로 보존한다. API와 canonical 인도 원행이 같은 20 BOX다.",
+          "oracleRef": {
+            "oracleId": "T17.post-dispatch-expiry",
+            "observationNames": [
+              "actual-delivered"
+            ]
+          },
+          "unit": "BOX",
+          "unitSource": {
+            "actionId": "after-delivery",
+            "pointer": "/response/data/unit"
+          }
+        },
+        {
+          "id": "actual-delivered-2",
+          "op": "sumEquals",
+          "source": {
+            "actionId": "after-delivery-db",
+            "pointer": "/data/rawRows/deliveries",
+            "where": {
+              "canonical": true
+            },
+            "field": "quantity"
+          },
+          "expected": "20",
+          "requirementRefs": [
+            "D17"
+          ],
+          "evidenceRefs": [
+            "after-delivery-db:raw-rows"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "T17",
+            "scenarioId": "post-dispatch-expiry"
+          },
+          "oracleExplanation": "처분 허용 만료 뒤에도 고객이 실제로 받은 인도20 BOX를 사실로 보존한다. API와 canonical 인도 원행이 같은 20 BOX다.",
+          "oracleRef": {
+            "oracleId": "T17.post-dispatch-expiry",
+            "observationNames": [
+              "actual-delivered"
+            ]
+          },
+          "unit": "BOX",
+          "unitSource": {
+            "actionId": "after-delivery-db",
+            "pointer": "/data/rawRows/deliveries",
+            "field": "unit",
+            "where": {
+              "canonical": true
+            }
+          }
+        },
+        {
+          "id": "remaining-transit-3",
+          "op": "decimalEquals",
+          "source": {
+            "actionId": "after-delivery",
+            "pointer": "/response/data/inTransitQuantity"
+          },
+          "expected": "10",
+          "requirementRefs": [
+            "D17"
+          ],
+          "evidenceRefs": [
+            "after-delivery:actual-response-or-host-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "T17",
+            "scenarioId": "post-dispatch-expiry"
+          },
+          "oracleExplanation": "출고30 중 인도되지 않은 10 BOX는 TRANSIT에 그대로 남는다(30−20). 만료를 이유로 운송 물량을 지우거나 창고로 되돌리지 않는다.",
+          "oracleRef": {
+            "oracleId": "T17.post-dispatch-expiry",
+            "observationNames": [
+              "remaining-transit"
+            ]
+          },
+          "unit": "BOX",
+          "unitSource": {
+            "actionId": "after-delivery",
+            "pointer": "/response/data/unit"
+          }
+        },
+        {
+          "id": "remaining-transit-4",
+          "op": "sumEquals",
+          "source": {
+            "actionId": "after-delivery-db",
+            "pointer": "/data/rawRows/segments",
+            "where": {
+              "locationId": {
+                "$alias": "TRANSIT"
+              },
+              "active": true
+            },
+            "field": "quantity"
+          },
+          "expected": "10",
+          "requirementRefs": [
+            "D17"
+          ],
+          "evidenceRefs": [
+            "after-delivery-db:raw-rows"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "T17",
+            "scenarioId": "post-dispatch-expiry"
+          },
+          "oracleExplanation": "출고30 중 인도되지 않은 10 BOX는 TRANSIT에 그대로 남는다(30−20). 만료를 이유로 운송 물량을 지우거나 창고로 되돌리지 않는다.",
+          "oracleRef": {
+            "oracleId": "T17.post-dispatch-expiry",
+            "observationNames": [
+              "remaining-transit"
+            ]
+          },
+          "unit": "BOX",
+          "unitSource": {
+            "actionId": "after-delivery-db",
+            "pointer": "/data/rawRows/segments",
+            "field": "unit",
+            "where": {
+              "locationId": {
+                "$alias": "TRANSIT"
+              },
+              "active": true
+            }
+          }
+        },
+        {
+          "id": "new-warehouse-dispatch-5",
+          "op": "decimalDelta",
+          "source": {
+            "actionId": "after-delivery",
+            "pointer": "/response/data/warehouseDispatchQuantity"
+          },
+          "expected": "0",
+          "requirementRefs": [
+            "D17"
+          ],
+          "evidenceRefs": [
+            "after-delivery:actual-response-or-host-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "T17",
+            "scenarioId": "post-dispatch-expiry"
+          },
+          "oracleExplanation": "인도 기록은 새 창고 출고를 만들지 않는다. 출고 수량 delta0 BOX, DISPATCH 원행 전후 동일.",
+          "oracleRef": {
+            "oracleId": "T17.post-dispatch-expiry",
+            "observationNames": [
+              "new-warehouse-dispatch"
+            ]
+          },
+          "baseline": {
+            "actionId": "before-delivery",
+            "pointer": "/response/data/warehouseDispatchQuantity"
+          },
+          "unit": "BOX",
+          "unitSource": {
+            "actionId": "after-delivery",
+            "pointer": "/response/data/unit"
+          },
+          "baselineUnitSource": {
+            "actionId": "before-delivery",
+            "pointer": "/response/data/unit"
+          }
+        },
+        {
+          "id": "new-warehouse-dispatch-6",
+          "op": "sameAs",
+          "source": {
+            "actionId": "after-delivery-db",
+            "pointer": "/data/rawRows/movements",
+            "where": {
+              "kind": "DISPATCH"
+            },
+            "field": [
+              "id",
+              "quantity"
+            ]
+          },
+          "expected": null,
+          "requirementRefs": [
+            "D17"
+          ],
+          "evidenceRefs": [
+            "after-delivery-db:raw-rows"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "T17",
+            "scenarioId": "post-dispatch-expiry"
+          },
+          "oracleExplanation": "인도 기록은 새 창고 출고를 만들지 않는다. 출고 수량 delta0 BOX, DISPATCH 원행 전후 동일.",
+          "oracleRef": {
+            "oracleId": "T17.post-dispatch-expiry",
+            "observationNames": [
+              "new-warehouse-dispatch"
+            ]
+          },
+          "baseline": {
+            "actionId": "before-delivery-db",
+            "pointer": "/data/rawRows/movements",
+            "where": {
+              "kind": "DISPATCH"
+            },
+            "field": [
+              "id",
+              "quantity"
+            ]
+          }
+        },
+        {
+          "id": "new-executable-allocation-7",
+          "op": "sameAs",
+          "source": {
+            "actionId": "after-delivery-db",
+            "pointer": "/data/rawRows/allocations",
+            "field": [
+              "id",
+              "segmentId",
+              "status",
+              "quantity"
+            ]
+          },
+          "expected": null,
+          "requirementRefs": [
+            "D17"
+          ],
+          "evidenceRefs": [
+            "after-delivery-db:raw-rows"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "T17",
+            "scenarioId": "post-dispatch-expiry"
+          },
+          "oracleExplanation": "인도 기록은 새 실행 배분을 만들지 않는다. 배분 원행과 API effect ledger가 전후 같다.",
+          "oracleRef": {
+            "oracleId": "T17.post-dispatch-expiry",
+            "observationNames": [
+              "new-executable-allocation"
+            ]
+          },
+          "baseline": {
+            "actionId": "before-delivery-db",
+            "pointer": "/data/rawRows/allocations",
+            "field": [
+              "id",
+              "segmentId",
+              "status",
+              "quantity"
+            ]
+          }
+        },
+        {
+          "id": "new-executable-allocation-8",
+          "op": "sameAs",
+          "source": {
+            "actionId": "after-delivery",
+            "pointer": "/response/data/effectLedger/allocations"
+          },
+          "expected": null,
+          "requirementRefs": [
+            "D17"
+          ],
+          "evidenceRefs": [
+            "after-delivery:actual-response-or-host-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "T17",
+            "scenarioId": "post-dispatch-expiry"
+          },
+          "oracleExplanation": "인도 기록은 새 실행 배분을 만들지 않는다. 배분 원행과 API effect ledger가 전후 같다.",
+          "oracleRef": {
+            "oracleId": "T17.post-dispatch-expiry",
+            "observationNames": [
+              "new-executable-allocation"
+            ]
+          },
+          "baseline": {
+            "actionId": "before-delivery",
+            "pointer": "/response/data/effectLedger/allocations"
+          }
+        },
+        {
+          "id": "fact-not-permission-9",
+          "op": "exactSet",
+          "source": {
+            "actionId": "after-delivery-db",
+            "pointer": "/data/rawRows/deliveries",
+            "where": {
+              "id": {
+                "$result": {
+                  "actionId": "delivery",
+                  "pointer": "/response/id"
+                }
+              }
+            },
+            "field": "canonical"
+          },
+          "expected": [
+            true
+          ],
+          "requirementRefs": [
+            "D17"
+          ],
+          "evidenceRefs": [
+            "after-delivery-db:raw-rows"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "T17",
+            "scenarioId": "post-dispatch-expiry"
+          },
+          "oracleExplanation": "만료 뒤 인도는 확정 사실이지만 정상 이행 허가가 아니다. 인도 원행은 canonical이고 인도 목표 판정은 UNSATISFIED다.",
+          "oracleRef": {
+            "oracleId": "T17.post-dispatch-expiry",
+            "observationNames": [
+              "fact-not-permission"
+            ]
+          }
+        },
+        {
+          "id": "fact-not-permission-10",
+          "op": "exactSet",
+          "source": {
+            "actionId": "after-delivery-db",
+            "pointer": "/data/rawRows/assessments",
+            "where": {
+              "goalKind": "DELIVERY",
+              "current": true
+            },
+            "field": "result"
+          },
+          "expected": [
+            "UNSATISFIED"
+          ],
+          "requirementRefs": [
+            "D17"
+          ],
+          "evidenceRefs": [
+            "after-delivery-db:raw-rows"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "T17",
+            "scenarioId": "post-dispatch-expiry"
+          },
+          "oracleExplanation": "만료 뒤 인도는 확정 사실이지만 정상 이행 허가가 아니다. 인도 원행은 canonical이고 인도 목표 판정은 UNSATISFIED다.",
+          "oracleRef": {
+            "oracleId": "T17.post-dispatch-expiry",
+            "observationNames": [
+              "fact-not-permission"
+            ]
+          }
+        },
+        {
+          "id": "fact-not-permission-12",
+          "op": "equals",
+          "source": {
+            "actionId": "after-delivery",
+            "pointer": "/response/data/deliveryAssessment"
+          },
+          "expected": "UNSATISFIED",
+          "requirementRefs": [
+            "D17"
+          ],
+          "evidenceRefs": [
+            "after-delivery:actual-response-or-host-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "T17",
+            "scenarioId": "post-dispatch-expiry"
+          },
+          "oracleExplanation": "만료 뒤 인도는 확정 사실이지만 정상 이행 허가가 아니다. 인도 원행은 canonical이고 인도 목표 판정은 UNSATISFIED다.",
+          "oracleRef": {
+            "oracleId": "T17.post-dispatch-expiry",
+            "observationNames": [
+              "fact-not-permission"
+            ]
+          }
+        },
+        {
+          "id": "expiry-violation-duty-13",
+          "op": "count",
+          "source": {
+            "actionId": "after-delivery-db",
+            "pointer": "/data/rawRows/obligations",
+            "where": {
+              "kind": "VIOLATION_RESPONSE",
+              "current": true
+            }
+          },
+          "expected": 1,
+          "requirementRefs": [
+            "D17"
+          ],
+          "evidenceRefs": [
+            "after-delivery-db:raw-rows"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "T17",
+            "scenarioId": "post-dispatch-expiry"
+          },
+          "oracleExplanation": "만료 뒤 인도의 위반 대응 의무 VIOLATION_RESPONSE가 현재 하나 OPEN이며 owner sales, nextAction \"인도 부족과 제한 대응을 확인한다\", nextCheckAt 2026-10-07T10:00:00Z다. API와 DB가 같다.",
+          "oracleRef": {
+            "oracleId": "T17.post-dispatch-expiry",
+            "observationNames": [
+              "late-restriction-duty"
+            ]
+          }
+        },
+        {
+          "id": "expiry-violation-duty-14",
+          "op": "exactSet",
+          "source": {
+            "actionId": "after-delivery-db",
+            "pointer": "/data/rawRows/obligations",
+            "where": {
+              "kind": "VIOLATION_RESPONSE",
+              "current": true
+            },
+            "field": "ownerId"
+          },
+          "expected": [
+            {
+              "$alias": "sales"
+            }
+          ],
+          "requirementRefs": [
+            "D17"
+          ],
+          "evidenceRefs": [
+            "after-delivery-db:raw-rows"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "T17",
+            "scenarioId": "post-dispatch-expiry"
+          },
+          "oracleExplanation": "만료 뒤 인도의 위반 대응 의무 VIOLATION_RESPONSE가 현재 하나 OPEN이며 owner sales, nextAction \"인도 부족과 제한 대응을 확인한다\", nextCheckAt 2026-10-07T10:00:00Z다. API와 DB가 같다.",
+          "oracleRef": {
+            "oracleId": "T17.post-dispatch-expiry",
+            "observationNames": [
+              "late-restriction-duty"
+            ]
+          }
+        },
+        {
+          "id": "expiry-violation-duty-15",
+          "op": "exactSet",
+          "source": {
+            "actionId": "after-delivery-db",
+            "pointer": "/data/rawRows/obligations",
+            "where": {
+              "kind": "VIOLATION_RESPONSE",
+              "current": true
+            },
+            "field": "status"
+          },
+          "expected": [
+            "OPEN"
+          ],
+          "requirementRefs": [
+            "D17"
+          ],
+          "evidenceRefs": [
+            "after-delivery-db:raw-rows"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "T17",
+            "scenarioId": "post-dispatch-expiry"
+          },
+          "oracleExplanation": "만료 뒤 인도의 위반 대응 의무 VIOLATION_RESPONSE가 현재 하나 OPEN이며 owner sales, nextAction \"인도 부족과 제한 대응을 확인한다\", nextCheckAt 2026-10-07T10:00:00Z다. API와 DB가 같다.",
+          "oracleRef": {
+            "oracleId": "T17.post-dispatch-expiry",
+            "observationNames": [
+              "late-restriction-duty"
+            ]
+          }
+        },
+        {
+          "id": "expiry-violation-duty-16",
+          "op": "exactSet",
+          "source": {
+            "actionId": "after-delivery-db",
+            "pointer": "/data/rawRows/obligations",
+            "where": {
+              "kind": "VIOLATION_RESPONSE",
+              "current": true
+            },
+            "field": "nextAction"
+          },
+          "expected": [
+            "인도 부족과 제한 대응을 확인한다"
+          ],
+          "requirementRefs": [
+            "D17"
+          ],
+          "evidenceRefs": [
+            "after-delivery-db:raw-rows"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "T17",
+            "scenarioId": "post-dispatch-expiry"
+          },
+          "oracleExplanation": "만료 뒤 인도의 위반 대응 의무 VIOLATION_RESPONSE가 현재 하나 OPEN이며 owner sales, nextAction \"인도 부족과 제한 대응을 확인한다\", nextCheckAt 2026-10-07T10:00:00Z다. API와 DB가 같다.",
+          "oracleRef": {
+            "oracleId": "T17.post-dispatch-expiry",
+            "observationNames": [
+              "late-restriction-duty"
+            ]
+          }
+        },
+        {
+          "id": "expiry-violation-duty-17",
+          "op": "exactSet",
+          "source": {
+            "actionId": "after-delivery-db",
+            "pointer": "/data/rawRows/obligations",
+            "where": {
+              "kind": "VIOLATION_RESPONSE",
+              "current": true
+            },
+            "field": "nextCheckAt"
+          },
+          "expected": [
+            "2026-10-07T10:00:00Z"
+          ],
+          "requirementRefs": [
+            "D17"
+          ],
+          "evidenceRefs": [
+            "after-delivery-db:raw-rows"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "T17",
+            "scenarioId": "post-dispatch-expiry"
+          },
+          "oracleExplanation": "만료 뒤 인도의 위반 대응 의무 VIOLATION_RESPONSE가 현재 하나 OPEN이며 owner sales, nextAction \"인도 부족과 제한 대응을 확인한다\", nextCheckAt 2026-10-07T10:00:00Z다. API와 DB가 같다.",
+          "oracleRef": {
+            "oracleId": "T17.post-dispatch-expiry",
+            "observationNames": [
+              "late-restriction-duty"
+            ]
+          }
+        },
+        {
+          "id": "expiry-violation-duty-18",
+          "op": "fieldsPresent",
+          "source": {
+            "actionId": "after-delivery-db",
+            "pointer": "/data/rawRows/obligations",
+            "where": {
+              "kind": "VIOLATION_RESPONSE",
+              "current": true
+            }
+          },
+          "expected": [
+            "id",
+            "rootId",
+            "ownerId",
+            "responsibleWorkId",
+            "nextAction",
+            "nextCheckAt",
+            "sourceOccurrenceId"
+          ],
+          "requirementRefs": [
+            "D17"
+          ],
+          "evidenceRefs": [
+            "after-delivery-db:raw-rows"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "T17",
+            "scenarioId": "post-dispatch-expiry"
+          },
+          "oracleExplanation": "만료 뒤 인도의 위반 대응 의무 VIOLATION_RESPONSE가 현재 하나 OPEN이며 owner sales, nextAction \"인도 부족과 제한 대응을 확인한다\", nextCheckAt 2026-10-07T10:00:00Z다. API와 DB가 같다.",
+          "oracleRef": {
+            "oracleId": "T17.post-dispatch-expiry",
+            "observationNames": [
+              "late-restriction-duty"
+            ]
+          }
+        },
+        {
+          "id": "expiry-violation-duty-19",
+          "op": "sameAs",
+          "source": {
+            "actionId": "after-delivery",
+            "pointer": "/response/data/obligations",
+            "where": {
+              "kind": "VIOLATION_RESPONSE",
+              "current": true
+            },
+            "field": [
+              "id",
+              "rootId",
+              "ownerId",
+              "status",
+              "nextAction",
+              "nextCheckAt"
+            ]
+          },
+          "expected": null,
+          "requirementRefs": [
+            "D17"
+          ],
+          "evidenceRefs": [
+            "after-delivery:actual-response-or-host-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "T17",
+            "scenarioId": "post-dispatch-expiry"
+          },
+          "oracleExplanation": "만료 뒤 인도의 위반 대응 의무 VIOLATION_RESPONSE가 현재 하나 OPEN이며 owner sales, nextAction \"인도 부족과 제한 대응을 확인한다\", nextCheckAt 2026-10-07T10:00:00Z다. API와 DB가 같다.",
+          "oracleRef": {
+            "oracleId": "T17.post-dispatch-expiry",
+            "observationNames": [
+              "late-restriction-duty"
+            ]
+          },
+          "baseline": {
+            "actionId": "after-delivery-db",
+            "pointer": "/data/rawRows/obligations",
+            "where": {
+              "kind": "VIOLATION_RESPONSE",
+              "current": true
+            },
+            "field": [
+              "id",
+              "rootId",
+              "ownerId",
+              "status",
+              "nextAction",
+              "nextCheckAt"
+            ]
+          }
+        }
+      ],
+      "oracleExplanation": "가상 fixture는 선행 실물·정책·증거 입력만 설치한다. 처분 허용(DISPOSITION)은 09:05:00Z까지이고 출고30은 그 전 09:00에 실행한다. 업무 시계를 09:06:00Z로 옮긴 뒤 실제 인도20을 기록한다. 현재 SELL 부적격을 이유로 인도 사실을 지우지 않고, 남은 운송10을 보존하며 위반 대응 의무를 남긴다(계획 §6 사실 기록과 실행 권한, §13.1 D17)."
     },
     {
       "id": "claim-falseclaim",
@@ -11248,7 +12617,7 @@
             },
             "expectedRevision": {
               "$result": {
-                "actionId": "replace",
+                "actionId": "hold",
                 "pointer": "/response/revision"
               }
             },
