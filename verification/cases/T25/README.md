@@ -48,3 +48,42 @@ R8 전 제안 수용값을 업무 SLA로 확정하지 않는다.
 
 새 제품·host·model·규제·BTP 결과는 이 디렉터리에서 만들지 않는다.
 현재 고정 검사와 Gherkin RED는 계약 준비의 증거다.
+
+## 2라운드 profile·artifact 연결(2026-10-08)
+
+PASS link가 하나 있다는 것만으로는 필수 계층을 지났는지 알 수 없다.
+API profile의 PASS 하나로 MCP를 요구하는 관찰이 통과했고, DB
+snapshot이 없는 관찰도 통과했다. verifyCoverage 출력 계약을 아래처럼
+넓힌다. 실제 verifier 구현은 Step 3/S6 소유다.
+
+- runtime-links-required: T25 자신을 뺀 모든 named observation i에 대해
+  - `namedObservations/i/assertionLinks`에 catalog requiredLayers가
+    대응하는 profile마다 `status=PASS`·`profile=<p>` link가 한 건
+    이상 있다(`profile-links-NNN-<p>`). 대응은 assembler의
+    LAYER_PROFILE과 같다(UNIT→contracts, API/DB→scenarios,
+    MCP→mcp, SKILLS→skills, MODEL→model, LOCAL/BTP→local-/
+    btp-deployment, REGULATORY_REVIEW→regulatory).
+  - `namedObservations/i/artifacts`에 catalog artifactKinds마다
+    `artifactKind=<k>`·`status=PASS` artifact가 path·sha256·크기·
+    case·subcase·profile과 함께 있다(`artifact-kind-NNN-<k>`).
+  - `profiles`에 10개 profile 결과가 각자 한 행이며 모두 PASS다
+    (`profile-result-<p>`).
+- evidence-wrapper-fields: 모든 기록이 `profile`을 가진다. mcp 기록은
+  protocol·tool·DB version, skills 기록은 skill·client·protocol
+  version을 가진다. scenarios·mcp wrapper는 DB·protocol version을
+  드러낸다. 평면 `artifacts`에 db_snapshot(DB version 포함),
+  api_response, protocol_transcript(protocol version 포함) 행이 있다.
+- actual-model-usage-required: M60×3 각 실행의
+  `protocolTranscriptStatus=VERIFIED`, `skillDiscoveryStatus`·
+  `skillBodyStatus=OBSERVED`를 요구하고, trace artifact hash를 검증하지
+  못한 attempt는 0이다.
+
+catalog의 T25 네 관찰(coverage-link, result-separation, evidence-
+fields, wrapper-truth)은 기본값 `api_response`·`db_snapshot`을
+artifactKinds로 갖고 있었다. T25는 업무 API를 부르거나 업무 DB를 읽지
+않으므로 이 artifact를 스스로 만들 수 없다. DB 관찰을 T25에 덧붙이면
+coverage와 무관한 형식적 probe가 된다. 그래서 규범 lock 절차로
+`coverage_report`·`runtime_manifest`(evidence 두 관찰은
+`wrapper_record` 추가)로 바로잡았다. requiredLayers·기대 predicate·
+관찰 이름은 그대로다. DB·API·MCP·SKILLS 증거 요구는 위의 per-profile·
+per-artifactKind 검사로 옮겨 오히려 강해졌다(lock `reviewUpdates[2]`).
