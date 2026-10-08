@@ -3,7 +3,7 @@
   "rationale": {
     "timestampWidening": "R1 absolute instant policy. Explicit CDS Timestamp columns are stored TIMESTAMPTZ; CQN roundtrip and time predicates prove UTC/offset/session timezones.",
     "notNullStrengthening": "Flyway enforces mandatory domain facts above nullable CDS default. Database nullability never weakens compiler requirements; only enumerated mandatory columns may differ.",
-    "scope": "Fresh V1–V29 PostgreSQL comparison: exact 1865 column names, sizes, decimal scales, PKs; only explicit timestamp widening and NOT NULL strengthening."
+    "scope": "Fresh V1–V30 PostgreSQL comparison: exact 1866 column names, sizes, decimal scales, PKs; only explicit timestamp widening and NOT NULL strengthening."
   },
   "timestampWidening": [
     "mulino_commands_approvalconsumptions.consumedat",
@@ -1136,10 +1136,10 @@
     "mulino_trade_shipment_shipments.revision",
     "mulino_trade_shipment_shipments.state"
   ],
-  "baseline": "1414cfe5305192cc7915fcb35db76e97c411617b",
-  "observedColumnCount": 1865,
-  "observedArtifactSha256": "29f62fe9982d31ecf609b54d7928c7649ed41ab7e4e506258058ca85d225a96b",
-  "scope": "S4 V1–V29 exact current CDS/Flyway comparison; earlier S3 1432 columns plus exact 433 additions",
+  "baseline": "2e1d90cc",
+  "observedColumnCount": 1866,
+  "observedArtifactSha256": "d4f7913ab53620be2ea46e4de7ae708bfc79781bf8b5585e9055e976ebc9be07",
+  "scope": "S4 V1–V30 exact current CDS/Flyway comparison; earlier S3 1432 columns plus exact 434 additions",
   "reviewedAdditions": {
     "mulino_commands_approvalconsumptions.consumedat": {
       "migration": "database/migrations/V8__commands.sql",
@@ -5468,6 +5468,11 @@
       "migration": "database/migrations/V29__settlement_scope_difference.sql",
       "cds": "backend/db/settlement.cds",
       "notNullStrengtheningReason": "같은 수령·인도 기여에 대한 누적 송장 중복을 별도 정산 차이로 불변 보존한다(D19)."
+    },
+    "mulino_trade_sales_deliveries.legitimaterangesjson": {
+      "migration": "database/migrations/V30__delivery_legitimate_ranges.sql",
+      "cds": "backend/db/sales.cds",
+      "nullableReason": "확정 인도의 정당한 실물 좌표를 불변 JSON 배열로 보존해 인도 정정이 정확한 범위를 교차하게 한다. V30 이전 행과 다른 모듈의 직접 fixture에는 좌표가 없어 nullable이며 없으면 보수적 하한을 쓴다(s4-sales-05)."
     }
   },
   "exactColumnInventory": [
@@ -6906,6 +6911,7 @@
     "mulino_trade_sales_deliveries.id",
     "mulino_trade_sales_deliveries.itemid",
     "mulino_trade_sales_deliveries.legitimatequantity",
+    "mulino_trade_sales_deliveries.legitimaterangesjson",
     "mulino_trade_sales_deliveries.lotid",
     "mulino_trade_sales_deliveries.observationid",
     "mulino_trade_sales_deliveries.occurredat",
@@ -7565,6 +7571,7 @@
     "mulino_trade_sales_deliveries.id",
     "mulino_trade_sales_deliveries.itemid",
     "mulino_trade_sales_deliveries.legitimatequantity",
+    "mulino_trade_sales_deliveries.legitimaterangesjson",
     "mulino_trade_sales_deliveries.lotid",
     "mulino_trade_sales_deliveries.observationid",
     "mulino_trade_sales_deliveries.occurredat",

@@ -27,6 +27,11 @@ REVIEWED = {
         "cds": "backend/db/inventory.cds",
         "notNullStrengtheningReason": "관측 인도 범위 중 정당한 인도 기여량을 0 이상 원 수량 이하의 필수 값으로 보존한다(8eb247d8).",
     },
+    "mulino_trade_sales_deliveries.legitimaterangesjson": {
+        "migration": "database/migrations/V30__delivery_legitimate_ranges.sql",
+        "cds": "backend/db/sales.cds",
+        "nullableReason": "확정 인도의 정당한 실물 좌표를 불변 JSON 배열로 보존해 인도 정정이 정확한 범위를 교차하게 한다. V30 이전 행과 다른 모듈의 직접 fixture에는 좌표가 없어 nullable이며 없으면 보수적 하한을 쓴다(s4-sales-05).",
+    },
     "mulino_trade_settlement_matches.scopedifference": {
         "migration": "database/migrations/V29__settlement_scope_difference.sql",
         "cds": "backend/db/settlement.cds",

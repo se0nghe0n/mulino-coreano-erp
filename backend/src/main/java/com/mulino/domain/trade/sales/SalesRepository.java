@@ -15,5 +15,6 @@ public class SalesRepository {
  public Map<String,Object> subject(String org,String e,String id){return db.run(Select.from(entity(e)).where(x->x.get("organizationId").eq(org).and(x.get("ID").eq(id)))).first().map(x->(Map<String,Object>)new LinkedHashMap<String,Object>(x)).orElseThrow(DomainError::forbidden);}
  public void insert(String e,Map<String,Object> row){db.run(Insert.into(entity(e)).entry(row));}
  public void update(DomainContext c,String e,String id,Map<String,Object> row){db.run(Update.entity(entity(e)).data(row).where(x->x.get("organizationId").eq(c.organizationId()).and(x.get("ID").eq(id))));}
- public void fence(DomainContext c,String key){jdbc.queryForList("SELECT pg_advisory_xact_lock(hashtextextended(?,0))",c.organizationId()+"|"+key);}
+ /** Same lock namespace (organization:key) as the gateway and the other repositories, so one key names exactly one lock (plan §4.2). */
+ public void fence(DomainContext c,String key){jdbc.queryForList("SELECT pg_advisory_xact_lock(hashtextextended(?,0))",c.organizationId()+":"+key);}
 }
