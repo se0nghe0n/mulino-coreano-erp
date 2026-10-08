@@ -80,3 +80,26 @@ source/fixture hash는 `evidence/review-authority/checks.json`에 남겼다.
 
 V4는 같은 20개 원천과 같은 key 재사용을 쓰지만 이 worker의 소유가
 아니어서 고치지 않았다.
+
+## 2라운드 profile 도달성 수정(2026-10-08)
+
+profile 선언만으로는 SKILLS·MCP 계층을 실제로 지났는지 알 수 없다.
+`model-query-write-boundary`의 세 관찰은 이제 각자 그 계층을 읽는
+assertion에 연결된다.
+
+- `skill-stage-discovered`, `skill-stage-body-read`: 실제 host의
+  `skillLoadingTrace`에 `stage`가 `DISCOVERED`·`BODY_READ`인 행이 각각
+  한 건 이상 있고 `packageName`·`stage`·`path`·`sha256`·`loadedAt`을
+  가진다. 세 관찰 모두에 연결한다. stage 어휘는 T20 host loading과
+  같다(계획 §9.2 metadata→본문→참고 자료). 어느 package를 읽을지는
+  모델이 정하므로 package 이름은 고정하지 않는다.
+- `no-write-intent-command`, `no-write-intent-record`: MCP tools/call
+  transcript에서 COMMAND·RECORD 의도 호출이 0건이다.
+  `query-intent-write-tool-execution`과 `query-intent-business-effects`
+  에 연결해 DB 전후 불변과 protocol 경계를 함께 본다.
+- 기존 `skill-loaded-files`는 그대로 둔다. hash 목록만으로는 loading을
+  증명하지 못하므로 stage 행이 추가 조건이다.
+
+skill을 읽지 않고 답한 실제 client는 이 subcase를 통과하지 못한다.
+SKILLS 계층이 catalog의 필수 계층이기 때문이다. 실제 client 실행은
+NOT_RUN이다.

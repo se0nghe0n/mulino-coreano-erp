@@ -13843,6 +13843,10 @@
     그러면 "tools-advertised" assertion으로 "evaluation-path tools-advertised"를 확인한다
     그러면 "query-tool-called" assertion으로 "evaluation-path query-tool-called"를 확인한다
     그러면 "query-tool-getInventory" assertion으로 "evaluation-path query-tool-getInventory"를 확인한다
+    그러면 "skill-stage-discovered" assertion으로 "query-intent-write-tool-execution skill-stage-discovered"를 확인한다
+    그러면 "skill-stage-body-read" assertion으로 "query-intent-write-tool-execution skill-stage-body-read"를 확인한다
+    그러면 "no-write-intent-command" assertion으로 "query-intent-write-tool-execution no-write-intent-command"를 확인한다
+    그러면 "no-write-intent-record" assertion으로 "query-intent-write-tool-execution no-write-intent-record"를 확인한다
     그러면 "read-audit-reader" assertion으로 "read-audit-permitted read-audit-reader"를 확인한다
 
   @uat @model
@@ -13969,6 +13973,10 @@
     그러면 "usage-complete" assertion으로 "evaluation-path usage-complete"를 확인한다
     그러면 "tools-advertised" assertion으로 "evaluation-path tools-advertised"를 확인한다
     그러면 "query-tool-called" assertion으로 "evaluation-path query-tool-called"를 확인한다
+    그러면 "skill-stage-discovered" assertion으로 "query-intent-write-tool-execution skill-stage-discovered"를 확인한다
+    그러면 "skill-stage-body-read" assertion으로 "query-intent-write-tool-execution skill-stage-body-read"를 확인한다
+    그러면 "no-write-intent-command" assertion으로 "query-intent-write-tool-execution no-write-intent-command"를 확인한다
+    그러면 "no-write-intent-record" assertion으로 "query-intent-write-tool-execution no-write-intent-record"를 확인한다
     그러면 "read-audit-reader" assertion으로 "read-audit-permitted read-audit-reader"를 확인한다
 
   @uat @model
@@ -14096,6 +14104,10 @@
     그러면 "tools-advertised" assertion으로 "evaluation-path tools-advertised"를 확인한다
     그러면 "query-tool-called" assertion으로 "evaluation-path query-tool-called"를 확인한다
     그러면 "query-tool-getObligations" assertion으로 "evaluation-path query-tool-getObligations"를 확인한다
+    그러면 "skill-stage-discovered" assertion으로 "query-intent-write-tool-execution skill-stage-discovered"를 확인한다
+    그러면 "skill-stage-body-read" assertion으로 "query-intent-write-tool-execution skill-stage-body-read"를 확인한다
+    그러면 "no-write-intent-command" assertion으로 "query-intent-write-tool-execution no-write-intent-command"를 확인한다
+    그러면 "no-write-intent-record" assertion으로 "query-intent-write-tool-execution no-write-intent-record"를 확인한다
     그러면 "read-audit-reader" assertion으로 "read-audit-permitted read-audit-reader"를 확인한다
 
   @uat @model
@@ -14222,6 +14234,10 @@
     그러면 "usage-complete" assertion으로 "evaluation-path usage-complete"를 확인한다
     그러면 "tools-advertised" assertion으로 "evaluation-path tools-advertised"를 확인한다
     그러면 "query-tool-called" assertion으로 "evaluation-path query-tool-called"를 확인한다
+    그러면 "skill-stage-discovered" assertion으로 "query-intent-write-tool-execution skill-stage-discovered"를 확인한다
+    그러면 "skill-stage-body-read" assertion으로 "query-intent-write-tool-execution skill-stage-body-read"를 확인한다
+    그러면 "no-write-intent-command" assertion으로 "query-intent-write-tool-execution no-write-intent-command"를 확인한다
+    그러면 "no-write-intent-record" assertion으로 "query-intent-write-tool-execution no-write-intent-record"를 확인한다
     그러면 "read-audit-reader" assertion으로 "read-audit-permitted read-audit-reader"를 확인한다
 
   @uat @model
@@ -14349,6 +14365,10 @@
     그러면 "tools-advertised" assertion으로 "evaluation-path tools-advertised"를 확인한다
     그러면 "query-tool-called" assertion으로 "evaluation-path query-tool-called"를 확인한다
     그러면 "query-tool-getInventory" assertion으로 "evaluation-path query-tool-getInventory"를 확인한다
+    그러면 "skill-stage-discovered" assertion으로 "query-intent-write-tool-execution skill-stage-discovered"를 확인한다
+    그러면 "skill-stage-body-read" assertion으로 "query-intent-write-tool-execution skill-stage-body-read"를 확인한다
+    그러면 "no-write-intent-command" assertion으로 "query-intent-write-tool-execution no-write-intent-command"를 확인한다
+    그러면 "no-write-intent-record" assertion으로 "query-intent-write-tool-execution no-write-intent-record"를 확인한다
     그러면 "read-audit-reader" assertion으로 "read-audit-permitted read-audit-reader"를 확인한다
 
   @uat @model
@@ -14475,6 +14495,10 @@
     그러면 "usage-complete" assertion으로 "evaluation-path usage-complete"를 확인한다
     그러면 "tools-advertised" assertion으로 "evaluation-path tools-advertised"를 확인한다
     그러면 "query-tool-called" assertion으로 "evaluation-path query-tool-called"를 확인한다
+    그러면 "skill-stage-discovered" assertion으로 "query-intent-write-tool-execution skill-stage-discovered"를 확인한다
+    그러면 "skill-stage-body-read" assertion으로 "query-intent-write-tool-execution skill-stage-body-read"를 확인한다
+    그러면 "no-write-intent-command" assertion으로 "query-intent-write-tool-execution no-write-intent-command"를 확인한다
+    그러면 "no-write-intent-record" assertion으로 "query-intent-write-tool-execution no-write-intent-record"를 확인한다
     그러면 "read-audit-reader" assertion으로 "read-audit-permitted read-audit-reader"를 확인한다
 
   @uat @model
@@ -14601,6 +14625,10 @@
     그러면 "usage-complete" assertion으로 "evaluation-path usage-complete"를 확인한다
     그러면 "tools-advertised" assertion으로 "evaluation-path tools-advertised"를 확인한다
     그러면 "query-tool-called" assertion으로 "evaluation-path query-tool-called"를 확인한다
+    그러면 "skill-stage-discovered" assertion으로 "query-intent-write-tool-execution skill-stage-discovered"를 확인한다
+    그러면 "skill-stage-body-read" assertion으로 "query-intent-write-tool-execution skill-stage-body-read"를 확인한다
+    그러면 "no-write-intent-command" assertion으로 "query-intent-write-tool-execution no-write-intent-command"를 확인한다
+    그러면 "no-write-intent-record" assertion으로 "query-intent-write-tool-execution no-write-intent-record"를 확인한다
     그러면 "read-audit-reader" assertion으로 "read-audit-permitted read-audit-reader"를 확인한다
 
   @uat @model
@@ -14728,6 +14756,10 @@
     그러면 "tools-advertised" assertion으로 "evaluation-path tools-advertised"를 확인한다
     그러면 "query-tool-called" assertion으로 "evaluation-path query-tool-called"를 확인한다
     그러면 "query-tool-getObligations" assertion으로 "evaluation-path query-tool-getObligations"를 확인한다
+    그러면 "skill-stage-discovered" assertion으로 "query-intent-write-tool-execution skill-stage-discovered"를 확인한다
+    그러면 "skill-stage-body-read" assertion으로 "query-intent-write-tool-execution skill-stage-body-read"를 확인한다
+    그러면 "no-write-intent-command" assertion으로 "query-intent-write-tool-execution no-write-intent-command"를 확인한다
+    그러면 "no-write-intent-record" assertion으로 "query-intent-write-tool-execution no-write-intent-record"를 확인한다
     그러면 "read-audit-reader" assertion으로 "read-audit-permitted read-audit-reader"를 확인한다
 
   @uat @model
@@ -14855,6 +14887,10 @@
     그러면 "tools-advertised" assertion으로 "evaluation-path tools-advertised"를 확인한다
     그러면 "query-tool-called" assertion으로 "evaluation-path query-tool-called"를 확인한다
     그러면 "query-tool-traceLot" assertion으로 "evaluation-path query-tool-traceLot"를 확인한다
+    그러면 "skill-stage-discovered" assertion으로 "query-intent-write-tool-execution skill-stage-discovered"를 확인한다
+    그러면 "skill-stage-body-read" assertion으로 "query-intent-write-tool-execution skill-stage-body-read"를 확인한다
+    그러면 "no-write-intent-command" assertion으로 "query-intent-write-tool-execution no-write-intent-command"를 확인한다
+    그러면 "no-write-intent-record" assertion으로 "query-intent-write-tool-execution no-write-intent-record"를 확인한다
     그러면 "read-audit-reader" assertion으로 "read-audit-permitted read-audit-reader"를 확인한다
 
   @uat @model
@@ -14981,6 +15017,10 @@
     그러면 "usage-complete" assertion으로 "evaluation-path usage-complete"를 확인한다
     그러면 "tools-advertised" assertion으로 "evaluation-path tools-advertised"를 확인한다
     그러면 "query-tool-called" assertion으로 "evaluation-path query-tool-called"를 확인한다
+    그러면 "skill-stage-discovered" assertion으로 "query-intent-write-tool-execution skill-stage-discovered"를 확인한다
+    그러면 "skill-stage-body-read" assertion으로 "query-intent-write-tool-execution skill-stage-body-read"를 확인한다
+    그러면 "no-write-intent-command" assertion으로 "query-intent-write-tool-execution no-write-intent-command"를 확인한다
+    그러면 "no-write-intent-record" assertion으로 "query-intent-write-tool-execution no-write-intent-record"를 확인한다
     그러면 "read-audit-reader" assertion으로 "read-audit-permitted read-audit-reader"를 확인한다
 
   @uat @model
@@ -15108,6 +15148,10 @@
     그러면 "tools-advertised" assertion으로 "evaluation-path tools-advertised"를 확인한다
     그러면 "query-tool-called" assertion으로 "evaluation-path query-tool-called"를 확인한다
     그러면 "query-tool-getInventory" assertion으로 "evaluation-path query-tool-getInventory"를 확인한다
+    그러면 "skill-stage-discovered" assertion으로 "query-intent-write-tool-execution skill-stage-discovered"를 확인한다
+    그러면 "skill-stage-body-read" assertion으로 "query-intent-write-tool-execution skill-stage-body-read"를 확인한다
+    그러면 "no-write-intent-command" assertion으로 "query-intent-write-tool-execution no-write-intent-command"를 확인한다
+    그러면 "no-write-intent-record" assertion으로 "query-intent-write-tool-execution no-write-intent-record"를 확인한다
     그러면 "read-audit-reader" assertion으로 "read-audit-permitted read-audit-reader"를 확인한다
 
   @uat @model
@@ -15234,6 +15278,10 @@
     그러면 "usage-complete" assertion으로 "evaluation-path usage-complete"를 확인한다
     그러면 "tools-advertised" assertion으로 "evaluation-path tools-advertised"를 확인한다
     그러면 "query-tool-called" assertion으로 "evaluation-path query-tool-called"를 확인한다
+    그러면 "skill-stage-discovered" assertion으로 "query-intent-write-tool-execution skill-stage-discovered"를 확인한다
+    그러면 "skill-stage-body-read" assertion으로 "query-intent-write-tool-execution skill-stage-body-read"를 확인한다
+    그러면 "no-write-intent-command" assertion으로 "query-intent-write-tool-execution no-write-intent-command"를 확인한다
+    그러면 "no-write-intent-record" assertion으로 "query-intent-write-tool-execution no-write-intent-record"를 확인한다
     그러면 "read-audit-reader" assertion으로 "read-audit-permitted read-audit-reader"를 확인한다
 
   @uat @model
@@ -15361,6 +15409,10 @@
     그러면 "tools-advertised" assertion으로 "evaluation-path tools-advertised"를 확인한다
     그러면 "query-tool-called" assertion으로 "evaluation-path query-tool-called"를 확인한다
     그러면 "query-tool-getObligations" assertion으로 "evaluation-path query-tool-getObligations"를 확인한다
+    그러면 "skill-stage-discovered" assertion으로 "query-intent-write-tool-execution skill-stage-discovered"를 확인한다
+    그러면 "skill-stage-body-read" assertion으로 "query-intent-write-tool-execution skill-stage-body-read"를 확인한다
+    그러면 "no-write-intent-command" assertion으로 "query-intent-write-tool-execution no-write-intent-command"를 확인한다
+    그러면 "no-write-intent-record" assertion으로 "query-intent-write-tool-execution no-write-intent-record"를 확인한다
     그러면 "read-audit-reader" assertion으로 "read-audit-permitted read-audit-reader"를 확인한다
 
   @uat @model
@@ -15487,6 +15539,10 @@
     그러면 "usage-complete" assertion으로 "evaluation-path usage-complete"를 확인한다
     그러면 "tools-advertised" assertion으로 "evaluation-path tools-advertised"를 확인한다
     그러면 "query-tool-called" assertion으로 "evaluation-path query-tool-called"를 확인한다
+    그러면 "skill-stage-discovered" assertion으로 "query-intent-write-tool-execution skill-stage-discovered"를 확인한다
+    그러면 "skill-stage-body-read" assertion으로 "query-intent-write-tool-execution skill-stage-body-read"를 확인한다
+    그러면 "no-write-intent-command" assertion으로 "query-intent-write-tool-execution no-write-intent-command"를 확인한다
+    그러면 "no-write-intent-record" assertion으로 "query-intent-write-tool-execution no-write-intent-record"를 확인한다
     그러면 "read-audit-reader" assertion으로 "read-audit-permitted read-audit-reader"를 확인한다
 
   @uat @model
@@ -15614,6 +15670,10 @@
     그러면 "tools-advertised" assertion으로 "evaluation-path tools-advertised"를 확인한다
     그러면 "query-tool-called" assertion으로 "evaluation-path query-tool-called"를 확인한다
     그러면 "query-tool-getInventory" assertion으로 "evaluation-path query-tool-getInventory"를 확인한다
+    그러면 "skill-stage-discovered" assertion으로 "query-intent-write-tool-execution skill-stage-discovered"를 확인한다
+    그러면 "skill-stage-body-read" assertion으로 "query-intent-write-tool-execution skill-stage-body-read"를 확인한다
+    그러면 "no-write-intent-command" assertion으로 "query-intent-write-tool-execution no-write-intent-command"를 확인한다
+    그러면 "no-write-intent-record" assertion으로 "query-intent-write-tool-execution no-write-intent-record"를 확인한다
     그러면 "read-audit-reader" assertion으로 "read-audit-permitted read-audit-reader"를 확인한다
 
   @uat @model
@@ -15740,6 +15800,10 @@
     그러면 "usage-complete" assertion으로 "evaluation-path usage-complete"를 확인한다
     그러면 "tools-advertised" assertion으로 "evaluation-path tools-advertised"를 확인한다
     그러면 "query-tool-called" assertion으로 "evaluation-path query-tool-called"를 확인한다
+    그러면 "skill-stage-discovered" assertion으로 "query-intent-write-tool-execution skill-stage-discovered"를 확인한다
+    그러면 "skill-stage-body-read" assertion으로 "query-intent-write-tool-execution skill-stage-body-read"를 확인한다
+    그러면 "no-write-intent-command" assertion으로 "query-intent-write-tool-execution no-write-intent-command"를 확인한다
+    그러면 "no-write-intent-record" assertion으로 "query-intent-write-tool-execution no-write-intent-record"를 확인한다
     그러면 "read-audit-reader" assertion으로 "read-audit-permitted read-audit-reader"를 확인한다
 
   @uat @model
@@ -15866,6 +15930,10 @@
     그러면 "usage-complete" assertion으로 "evaluation-path usage-complete"를 확인한다
     그러면 "tools-advertised" assertion으로 "evaluation-path tools-advertised"를 확인한다
     그러면 "query-tool-called" assertion으로 "evaluation-path query-tool-called"를 확인한다
+    그러면 "skill-stage-discovered" assertion으로 "query-intent-write-tool-execution skill-stage-discovered"를 확인한다
+    그러면 "skill-stage-body-read" assertion으로 "query-intent-write-tool-execution skill-stage-body-read"를 확인한다
+    그러면 "no-write-intent-command" assertion으로 "query-intent-write-tool-execution no-write-intent-command"를 확인한다
+    그러면 "no-write-intent-record" assertion으로 "query-intent-write-tool-execution no-write-intent-record"를 확인한다
     그러면 "read-audit-reader" assertion으로 "read-audit-permitted read-audit-reader"를 확인한다
 
   @uat @model
@@ -15993,6 +16061,10 @@
     그러면 "tools-advertised" assertion으로 "evaluation-path tools-advertised"를 확인한다
     그러면 "query-tool-called" assertion으로 "evaluation-path query-tool-called"를 확인한다
     그러면 "query-tool-getObligations" assertion으로 "evaluation-path query-tool-getObligations"를 확인한다
+    그러면 "skill-stage-discovered" assertion으로 "query-intent-write-tool-execution skill-stage-discovered"를 확인한다
+    그러면 "skill-stage-body-read" assertion으로 "query-intent-write-tool-execution skill-stage-body-read"를 확인한다
+    그러면 "no-write-intent-command" assertion으로 "query-intent-write-tool-execution no-write-intent-command"를 확인한다
+    그러면 "no-write-intent-record" assertion으로 "query-intent-write-tool-execution no-write-intent-record"를 확인한다
     그러면 "read-audit-reader" assertion으로 "read-audit-permitted read-audit-reader"를 확인한다
 
   @uat @model
@@ -16120,6 +16192,10 @@
     그러면 "tools-advertised" assertion으로 "evaluation-path tools-advertised"를 확인한다
     그러면 "query-tool-called" assertion으로 "evaluation-path query-tool-called"를 확인한다
     그러면 "query-tool-traceLot" assertion으로 "evaluation-path query-tool-traceLot"를 확인한다
+    그러면 "skill-stage-discovered" assertion으로 "query-intent-write-tool-execution skill-stage-discovered"를 확인한다
+    그러면 "skill-stage-body-read" assertion으로 "query-intent-write-tool-execution skill-stage-body-read"를 확인한다
+    그러면 "no-write-intent-command" assertion으로 "query-intent-write-tool-execution no-write-intent-command"를 확인한다
+    그러면 "no-write-intent-record" assertion으로 "query-intent-write-tool-execution no-write-intent-record"를 확인한다
     그러면 "read-audit-reader" assertion으로 "read-audit-permitted read-audit-reader"를 확인한다
 
   @uat @model
@@ -16246,6 +16322,10 @@
     그러면 "usage-complete" assertion으로 "evaluation-path usage-complete"를 확인한다
     그러면 "tools-advertised" assertion으로 "evaluation-path tools-advertised"를 확인한다
     그러면 "query-tool-called" assertion으로 "evaluation-path query-tool-called"를 확인한다
+    그러면 "skill-stage-discovered" assertion으로 "query-intent-write-tool-execution skill-stage-discovered"를 확인한다
+    그러면 "skill-stage-body-read" assertion으로 "query-intent-write-tool-execution skill-stage-body-read"를 확인한다
+    그러면 "no-write-intent-command" assertion으로 "query-intent-write-tool-execution no-write-intent-command"를 확인한다
+    그러면 "no-write-intent-record" assertion으로 "query-intent-write-tool-execution no-write-intent-record"를 확인한다
     그러면 "read-audit-reader" assertion으로 "read-audit-permitted read-audit-reader"를 확인한다
 
   @uat @model
@@ -16373,6 +16453,10 @@
     그러면 "tools-advertised" assertion으로 "evaluation-path tools-advertised"를 확인한다
     그러면 "query-tool-called" assertion으로 "evaluation-path query-tool-called"를 확인한다
     그러면 "query-tool-getInventory" assertion으로 "evaluation-path query-tool-getInventory"를 확인한다
+    그러면 "skill-stage-discovered" assertion으로 "query-intent-write-tool-execution skill-stage-discovered"를 확인한다
+    그러면 "skill-stage-body-read" assertion으로 "query-intent-write-tool-execution skill-stage-body-read"를 확인한다
+    그러면 "no-write-intent-command" assertion으로 "query-intent-write-tool-execution no-write-intent-command"를 확인한다
+    그러면 "no-write-intent-record" assertion으로 "query-intent-write-tool-execution no-write-intent-record"를 확인한다
     그러면 "read-audit-reader" assertion으로 "read-audit-permitted read-audit-reader"를 확인한다
 
   @uat @model
@@ -16499,6 +16583,10 @@
     그러면 "usage-complete" assertion으로 "evaluation-path usage-complete"를 확인한다
     그러면 "tools-advertised" assertion으로 "evaluation-path tools-advertised"를 확인한다
     그러면 "query-tool-called" assertion으로 "evaluation-path query-tool-called"를 확인한다
+    그러면 "skill-stage-discovered" assertion으로 "query-intent-write-tool-execution skill-stage-discovered"를 확인한다
+    그러면 "skill-stage-body-read" assertion으로 "query-intent-write-tool-execution skill-stage-body-read"를 확인한다
+    그러면 "no-write-intent-command" assertion으로 "query-intent-write-tool-execution no-write-intent-command"를 확인한다
+    그러면 "no-write-intent-record" assertion으로 "query-intent-write-tool-execution no-write-intent-record"를 확인한다
     그러면 "read-audit-reader" assertion으로 "read-audit-permitted read-audit-reader"를 확인한다
 
   @uat @model
@@ -16626,6 +16714,10 @@
     그러면 "tools-advertised" assertion으로 "evaluation-path tools-advertised"를 확인한다
     그러면 "query-tool-called" assertion으로 "evaluation-path query-tool-called"를 확인한다
     그러면 "query-tool-getObligations" assertion으로 "evaluation-path query-tool-getObligations"를 확인한다
+    그러면 "skill-stage-discovered" assertion으로 "query-intent-write-tool-execution skill-stage-discovered"를 확인한다
+    그러면 "skill-stage-body-read" assertion으로 "query-intent-write-tool-execution skill-stage-body-read"를 확인한다
+    그러면 "no-write-intent-command" assertion으로 "query-intent-write-tool-execution no-write-intent-command"를 확인한다
+    그러면 "no-write-intent-record" assertion으로 "query-intent-write-tool-execution no-write-intent-record"를 확인한다
     그러면 "read-audit-reader" assertion으로 "read-audit-permitted read-audit-reader"를 확인한다
 
   @uat @model
@@ -16752,6 +16844,10 @@
     그러면 "usage-complete" assertion으로 "evaluation-path usage-complete"를 확인한다
     그러면 "tools-advertised" assertion으로 "evaluation-path tools-advertised"를 확인한다
     그러면 "query-tool-called" assertion으로 "evaluation-path query-tool-called"를 확인한다
+    그러면 "skill-stage-discovered" assertion으로 "query-intent-write-tool-execution skill-stage-discovered"를 확인한다
+    그러면 "skill-stage-body-read" assertion으로 "query-intent-write-tool-execution skill-stage-body-read"를 확인한다
+    그러면 "no-write-intent-command" assertion으로 "query-intent-write-tool-execution no-write-intent-command"를 확인한다
+    그러면 "no-write-intent-record" assertion으로 "query-intent-write-tool-execution no-write-intent-record"를 확인한다
     그러면 "read-audit-reader" assertion으로 "read-audit-permitted read-audit-reader"를 확인한다
 
   @uat @model
@@ -16879,6 +16975,10 @@
     그러면 "tools-advertised" assertion으로 "evaluation-path tools-advertised"를 확인한다
     그러면 "query-tool-called" assertion으로 "evaluation-path query-tool-called"를 확인한다
     그러면 "query-tool-getInventory" assertion으로 "evaluation-path query-tool-getInventory"를 확인한다
+    그러면 "skill-stage-discovered" assertion으로 "query-intent-write-tool-execution skill-stage-discovered"를 확인한다
+    그러면 "skill-stage-body-read" assertion으로 "query-intent-write-tool-execution skill-stage-body-read"를 확인한다
+    그러면 "no-write-intent-command" assertion으로 "query-intent-write-tool-execution no-write-intent-command"를 확인한다
+    그러면 "no-write-intent-record" assertion으로 "query-intent-write-tool-execution no-write-intent-record"를 확인한다
     그러면 "read-audit-reader" assertion으로 "read-audit-permitted read-audit-reader"를 확인한다
 
   @uat @model
@@ -17005,6 +17105,10 @@
     그러면 "usage-complete" assertion으로 "evaluation-path usage-complete"를 확인한다
     그러면 "tools-advertised" assertion으로 "evaluation-path tools-advertised"를 확인한다
     그러면 "query-tool-called" assertion으로 "evaluation-path query-tool-called"를 확인한다
+    그러면 "skill-stage-discovered" assertion으로 "query-intent-write-tool-execution skill-stage-discovered"를 확인한다
+    그러면 "skill-stage-body-read" assertion으로 "query-intent-write-tool-execution skill-stage-body-read"를 확인한다
+    그러면 "no-write-intent-command" assertion으로 "query-intent-write-tool-execution no-write-intent-command"를 확인한다
+    그러면 "no-write-intent-record" assertion으로 "query-intent-write-tool-execution no-write-intent-record"를 확인한다
     그러면 "read-audit-reader" assertion으로 "read-audit-permitted read-audit-reader"를 확인한다
 
   @uat @model
@@ -17131,6 +17235,10 @@
     그러면 "usage-complete" assertion으로 "evaluation-path usage-complete"를 확인한다
     그러면 "tools-advertised" assertion으로 "evaluation-path tools-advertised"를 확인한다
     그러면 "query-tool-called" assertion으로 "evaluation-path query-tool-called"를 확인한다
+    그러면 "skill-stage-discovered" assertion으로 "query-intent-write-tool-execution skill-stage-discovered"를 확인한다
+    그러면 "skill-stage-body-read" assertion으로 "query-intent-write-tool-execution skill-stage-body-read"를 확인한다
+    그러면 "no-write-intent-command" assertion으로 "query-intent-write-tool-execution no-write-intent-command"를 확인한다
+    그러면 "no-write-intent-record" assertion으로 "query-intent-write-tool-execution no-write-intent-record"를 확인한다
     그러면 "read-audit-reader" assertion으로 "read-audit-permitted read-audit-reader"를 확인한다
 
   @uat @model
@@ -17258,6 +17366,10 @@
     그러면 "tools-advertised" assertion으로 "evaluation-path tools-advertised"를 확인한다
     그러면 "query-tool-called" assertion으로 "evaluation-path query-tool-called"를 확인한다
     그러면 "query-tool-getObligations" assertion으로 "evaluation-path query-tool-getObligations"를 확인한다
+    그러면 "skill-stage-discovered" assertion으로 "query-intent-write-tool-execution skill-stage-discovered"를 확인한다
+    그러면 "skill-stage-body-read" assertion으로 "query-intent-write-tool-execution skill-stage-body-read"를 확인한다
+    그러면 "no-write-intent-command" assertion으로 "query-intent-write-tool-execution no-write-intent-command"를 확인한다
+    그러면 "no-write-intent-record" assertion으로 "query-intent-write-tool-execution no-write-intent-record"를 확인한다
     그러면 "read-audit-reader" assertion으로 "read-audit-permitted read-audit-reader"를 확인한다
 
   @uat @model
@@ -17385,6 +17497,10 @@
     그러면 "tools-advertised" assertion으로 "evaluation-path tools-advertised"를 확인한다
     그러면 "query-tool-called" assertion으로 "evaluation-path query-tool-called"를 확인한다
     그러면 "query-tool-traceLot" assertion으로 "evaluation-path query-tool-traceLot"를 확인한다
+    그러면 "skill-stage-discovered" assertion으로 "query-intent-write-tool-execution skill-stage-discovered"를 확인한다
+    그러면 "skill-stage-body-read" assertion으로 "query-intent-write-tool-execution skill-stage-body-read"를 확인한다
+    그러면 "no-write-intent-command" assertion으로 "query-intent-write-tool-execution no-write-intent-command"를 확인한다
+    그러면 "no-write-intent-record" assertion으로 "query-intent-write-tool-execution no-write-intent-record"를 확인한다
     그러면 "read-audit-reader" assertion으로 "read-audit-permitted read-audit-reader"를 확인한다
 
   @uat @model
@@ -17511,4 +17627,8 @@
     그러면 "usage-complete" assertion으로 "evaluation-path usage-complete"를 확인한다
     그러면 "tools-advertised" assertion으로 "evaluation-path tools-advertised"를 확인한다
     그러면 "query-tool-called" assertion으로 "evaluation-path query-tool-called"를 확인한다
+    그러면 "skill-stage-discovered" assertion으로 "query-intent-write-tool-execution skill-stage-discovered"를 확인한다
+    그러면 "skill-stage-body-read" assertion으로 "query-intent-write-tool-execution skill-stage-body-read"를 확인한다
+    그러면 "no-write-intent-command" assertion으로 "query-intent-write-tool-execution no-write-intent-command"를 확인한다
+    그러면 "no-write-intent-record" assertion으로 "query-intent-write-tool-execution no-write-intent-record"를 확인한다
     그러면 "read-audit-reader" assertion으로 "read-audit-permitted read-audit-reader"를 확인한다
