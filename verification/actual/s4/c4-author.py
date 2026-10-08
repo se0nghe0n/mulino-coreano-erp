@@ -47,6 +47,21 @@ def fixture():
  # Regulator originals below are renamed native-c4-*; the policies must name them.
  f['aliases']['REGPOL']['sourceNamespace']='native-c4-regulator'
  f['aliases']['REGDISPATCH']['sourceNamespace']='native-c4-dispatch-regulator'
+ # Duty closure (plan §5.3/§7.1/§7.2): resolve/waive by the owner, the typed waiver
+ # decision by a designated MANAGER-class human. Policy maps each waivable kind
+ # explicitly to its decision capability; there is no wildcard.
+ for who,a in f['actors'].items():
+  if who=='outsider':continue
+  for cap in ['resolveObligation','waiveObligation','decideQuantityDutyWaiver']:
+   if cap not in a['roleCapabilities']:a['roleCapabilities'].append(cap)
+   if cap not in a['grant']['actions']:a['grant']['actions'].append(cap)
+ rules=f['aliases']['CPOL']['content']['rules']
+ rules['resolveObligation']={'effectClass':'RESPONSIBILITY'}
+ rules['waiveObligation']={'effectClass':'RESPONSIBILITY','approvalAction':None,'approvalActions':{'WAIVE_DELIVERY_CORRECTED_DEFICIT':'decideQuantityDutyWaiver'}}
+ rules['decideQuantityDutyWaiver']={'effectClass':'RESPONSIBILITY_DECISION'}
+ for cap in ['resolveObligation','waiveObligation','decideQuantityDutyWaiver']:
+  if not any(x['name']==cap for x in f['aliases']['DEF']['content']['verbs']):f['aliases']['DEF']['content']['verbs'].append(dict(name=cap,intentKind='COMMAND',capabilityId=cap,stage='DRAFT',slots={}))
+ f['aliases']['WAIVE_AUTH']=dict(type='ManagementAuthority',actorAlias='supervisor',capabilityId='decideQuantityDutyWaiver',validFrom='2026-10-01T00:00:00Z',validUntil='2026-10-31T23:59:59Z')
  declare_capabilities(f['aliases']['DEF']['content'])
  return f
 # Preserve E1's public input choreography, retain only receipt100 and its own
@@ -114,16 +129,38 @@ content=next(x['fixture']['occurrence']['content'] for x in base if x['type']=='
 # EvidenceReconciliation requires a delivery correction to keep the original
 # event's source profile and subject: it is version 2 of that source event.
 delivered=next(x for x in base if x['type']=='original' and x['id']=='c4-delivery-original')
-for q,known,prev,rev in [('98','2026-10-07T09:00:03Z','$c4-delivery-original.event',1)]:
- i='c4-correction'+q;c=copy.deepcopy(content);c['quantity']=q;c['correctionOfDeliveryId']='$DELIVERY'
- a += [dict(id=i+'-clock',type='clock',instant=known),orig(i,'PHYSICAL_DELIVERY',c,'$DELIVERY_OBSERVATION',q,subject='DISPATCH',subjectid='$DISPATCH',known=known)]
+def correction(i,q,known,prev,rev,version):
+ c=copy.deepcopy(content);c['quantity']=q;c['correctionOfDeliveryId']='$DELIVERY'
+ out=[dict(id=i+'-clock',type='clock',instant=known),orig(i,'PHYSICAL_DELIVERY',c,'$DELIVERY_OBSERVATION',q,subject='DISPATCH',subjectid='$DISPATCH',known=known)]
  payload=json.dumps(c,separators=(',',':'))
  payload=re.sub(r'"\$([^" ]+)"',lambda m:'"${'+m.group(1)+'}"',payload)
- a += [cmd(i+'-event','correctEvidence',dict(subject=dict(kind='DISPATCH',id='$DISPATCH'),kind='PHYSICAL_DELIVERY',sourceNamespace=delivered['fixture']['sourceProfile']['namespace'],externalEventId=delivered['fixture']['occurrence']['externalEventId'],sourceVersion='2',effectiveFrom=T,timeZone='UTC',timePrecision='SECOND',valueState='KNOWN',payload=payload,supersedesId=prev,documentId='$'+i+'.document',assertion='명시적 실제 인도 정정',quantity=q,unit='BOX',evidenceType='EVENT'),rev=rev,intent='RECORD',bind={i+'.event':'/id',i+'.claim':'/claimId'})]+link(i,'$DELIVERY_OBSERVATION',q,version='2')
+ out += [cmd(i+'-event','correctEvidence',dict(subject=dict(kind='DISPATCH',id='$DISPATCH'),kind='PHYSICAL_DELIVERY',sourceNamespace=delivered['fixture']['sourceProfile']['namespace'],externalEventId=delivered['fixture']['occurrence']['externalEventId'],sourceVersion=version,effectiveFrom=T,timeZone='UTC',timePrecision='SECOND',valueState='KNOWN',payload=payload,supersedesId=prev,documentId='$'+i+'.document',assertion='명시적 실제 인도 정정',quantity=q,unit='BOX',evidenceType='EVENT'),rev=rev,intent='RECORD',bind={i+'.event':'/id',i+'.claim':'/claimId'})]+link(i,'$DELIVERY_OBSERVATION',q,version=version)
  # A correction keeps the original event's subject (the dispatch).
- a[-3]['request']['subjectRefs']=[{'type':'Dispatch','id':'$DISPATCH'}]
- # The corrected event is version 2 of the same source event; match that key.
- a[-2]['request']['slots']['sourceIdentity']=delivered['fixture']['sourceProfile']['namespace']+':'+delivered['fixture']['occurrence']['externalEventId']+':2'
+ out[-3]['request']['subjectRefs']=[{'type':'Dispatch','id':'$DISPATCH'}]
+ # The corrected event is a new version of the same source event; match that key.
+ out[-2]['request']['slots']['sourceIdentity']=delivered['fixture']['sourceProfile']['namespace']+':'+delivered['fixture']['occurrence']['externalEventId']+':'+version
+ return out
+a += correction('c4-correction98','98','2026-10-07T09:00:03Z','$c4-delivery-original.event',1,'2')
 a += [obs('c4-correct98-independent',[rows('mulino_evidence_events',dict(id='$c4-delivery-original.event'),1),rows('mulino_evidence_events',dict(id='$c4-correction98.event',supersedesid='$c4-delivery-original.event'),1),rows('mulino_work_read_assessmentreferences',dict(id='$PAST_ASSESSMENT',outcome='SATISFIED'),1),total('mulino_trade_sales_deliveries','quantity','100'),total('mulino_trade_sales_deliverycorrections','quantity','98'),total('mulino_trade_returns_receipts','quantity','20'),total('mulino_inventory_quantitysegments','quantity','20',dict(retiredat=None,placeid='$W')),total('mulino_inventory_quantitysegments','quantity','80',dict(retiredat=None,placeid='$CUSTOMER_PLACE')),total('mulino_inventory_quantitysegments','quantity','0',dict(retiredat=None,placeid='$TRANSIT')),total('mulino_work_read_obligationreferences','quantity','2',dict(kind='DELIVERY_CORRECTED_DEFICIT',status='OPEN',valid=True)),duties('DELIVERY_CORRECTED_DEFICIT')])]
 write('c4-history-return-correction.json',dict(schemaVersion='1.0.0',status='NOT_RUN',actions=a))
-write('c4-flow.json',dict(schemaVersion='1.0.0',status='NOT_RUN',requiredCases=['C4','T17_CONSUMED'],fullCaseCoverageClaimed=False,actions=[dict(id='c4-setup',type='setup',fixtureRef='verification/actual/s4/c4-fixture.json',organizationAlias='ORG')]+[dict(id='c4-include-'+x,type='include',scriptRef='verification/actual/s4/'+x+'.json') for x in ['c4-upstream','c4-delivery100','c4-history-return-correction']]))
+# C4 resolvedOrWaivedDutyRevival=0: the owner cannot resolve deficit2 with the
+# correction that created it, nor waive it without the typed decision; a
+# designated MANAGER-class human decides the waiver bound to this duty revision;
+# a further correction of the same actual 98 must not revive the waived duty.
+DEFICIT=dict(kind='DELIVERY_CORRECTED_DEFICIT',status='OPEN')
+w=[obs('c4-deficit2-target',[rows('mulino_work_read_obligationreferences',DEFICIT,1)],{'DEFICIT_ASSIGNMENT':dict(pointer='/rawRows/mulino_work_read_obligationreferences',where=DEFICIT,column='id'),'DEFICIT_REV':dict(pointer='/rawRows/mulino_work_read_obligationreferences',where=DEFICIT,column='revision')}),
+ cmd('c4-resolve-deficit2-with-own-correction','resolveObligation',dict(assignmentId='$DEFICIT_ASSIGNMENT',evidenceId='$c4-correction98.canonical'),rev='$DEFICIT_REV',outcome='HELD',assertions=[dict(pointer='/error/code',operator='equals',expected='EVIDENCE_UNVERIFIED')]),
+ cmd('c4-waive-deficit2-without-decision','waiveObligation',dict(assignmentId='$DEFICIT_ASSIGNMENT',reason='고객이 실제 98 인도를 최종 수용했다'),rev='$DEFICIT_REV',outcome='REJECTED'),
+ obs('c4-deficit2-still-open',[rows('mulino_work_read_obligationreferences',DEFICIT,1),rows('mulino_work_read_obligationreferences',dict(kind='DELIVERY_CORRECTED_DEFICIT'),1)]),
+ cmd('c4-manager-waiver-decision','decideQuantityDutyWaiver',dict(assignmentId='$DEFICIT_ASSIGNMENT',decision='APPROVE',reason='고객이 실제 98 인도를 최종 수용했다',validUntil='2026-10-31T00:00:00Z'),rev='$DEFICIT_REV',actor='supervisor',bind={'WAIVER_APPROVAL':'/effects/responsibility/approvalId'},assertions=[dict(pointer='/effects/responsibility/decision',operator='equals',expected='APPROVED'),dict(pointer='/effects/responsibility/authorityClass',operator='equals',expected='MANAGER')])]
+waive=cmd('c4-waive-deficit2','waiveObligation',dict(assignmentId='$DEFICIT_ASSIGNMENT',reason='고객이 실제 98 인도를 최종 수용했다'),rev='$DEFICIT_REV',assertions=[dict(pointer='/effects/responsibility/status',operator='equals',expected='WAIVED')])
+waive['request']['approvalId']='$WAIVER_APPROVAL'
+# Reusing the consumed single-use decision at the duty's current revision has no effect.
+reuse=cmd('c4-waive-deficit2-reuse','waiveObligation',dict(assignmentId='$DEFICIT_ASSIGNMENT',reason='고객이 실제 98 인도를 최종 수용했다'),rev='$WAIVED_REV',outcome='REJECTED')
+reuse['request']['approvalId']='$WAIVER_APPROVAL'
+WAIVED=dict(kind='DELIVERY_CORRECTED_DEFICIT',status='WAIVED',id='$DEFICIT_ASSIGNMENT')
+w += [waive,obs('c4-deficit2-waived',[rows('mulino_work_read_obligationreferences',WAIVED,1),rows('mulino_work_read_obligationreferences',DEFICIT,0)],{'WAIVED_REV':dict(pointer='/rawRows/mulino_work_read_obligationreferences',where=WAIVED,column='revision')}),reuse,obs('c4-deficit2-waived-once',[rows('mulino_work_read_obligationreferences',WAIVED,1),rows('mulino_work_read_obligationreferences',DEFICIT,0)])]
+w += correction('c4-correction98-reprocess','98','2026-10-07T09:00:05Z','$c4-correction98.event',2,'3')
+w += [obs('c4-waived-deficit-not-revived',[rows('mulino_evidence_events',dict(id='$c4-correction98-reprocess.event',supersedesid='$c4-correction98.event'),1),rows('mulino_trade_sales_deliverycorrections',dict(deliveryid='$DELIVERY'),2),rows('mulino_work_read_obligationreferences',DEFICIT,0),rows('mulino_work_read_obligationreferences',dict(kind='DELIVERY_CORRECTED_DEFICIT'),1),rows('mulino_work_read_obligationreferences',dict(kind='DELIVERY_CORRECTED_DEFICIT',status='WAIVED',id='$DEFICIT_ASSIGNMENT'),1),rows('mulino_work_read_assessmentreferences',dict(id='$PAST_ASSESSMENT',outcome='SATISFIED'),1),total('mulino_trade_sales_deliveries','quantity','100'),total('mulino_trade_returns_receipts','quantity','20')])]
+write('c4-duty-closure.json',dict(schemaVersion='1.0.0',status='NOT_RUN',actions=w))
+write('c4-flow.json',dict(schemaVersion='1.0.0',status='NOT_RUN',requiredCases=['C4','T17_CONSUMED'],fullCaseCoverageClaimed=False,actions=[dict(id='c4-setup',type='setup',fixtureRef='verification/actual/s4/c4-fixture.json',organizationAlias='ORG')]+[dict(id='c4-include-'+x,type='include',scriptRef='verification/actual/s4/'+x+'.json') for x in ['c4-upstream','c4-delivery100','c4-history-return-correction','c4-duty-closure']]))
