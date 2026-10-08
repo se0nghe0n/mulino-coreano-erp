@@ -72,8 +72,15 @@ capability allowlist에 있어야 하고 core entity는 노출하지 않거나
 probe 적용 여부는 `writeCapable`이 아니라 item kind로도 결정한다.
 readonly ENTITY_SET의 쓰기 거부, BOUND/UNBOUND_ACTION의 자기 call과
 BATCH_CHANGESET, TOOL·WORKER_HANDLER·MANAGEMENT_ENDPOINT의 대응 probe를
-빠뜨리지 않는다. `HostObservationValidator`가 적용 항목 수와 probe 행을
-재계산한다. kind별 전체 표는 아래 저장소 harness의 V4 절을 따른다.
+빠뜨리지 않는다. 다만 TOOL·BOUND_ACTION·UNBOUND_ACTION이 하나의
+QUERY capability를 부르면 적용 probe class가 없다. 면제는 hash로 묶인
+allowlist의 kind=QUERY, writeCapable=false, itemId가 capability id
+자체이거나 `.`·`/` 뒤 그 id인 이름을 harness가 확인할 때만 적용한다.
+COMMAND·RECORD·범용 dispatcher·id 없음/목록 밖·다른 이름의 항목은
+면제되지 않는다. readonly ENTITY_SET도 계속 probe한다.
+`HostObservationValidator`가 면제를 반영해 적용 수와 probe 행을
+재계산한다. 전체 표와 실제 adapter의 NOT_RUN은 아래 저장소 harness의
+V4 절을 따른다.
 
 이 열거와 우회 시도는 요구다. V4의 고정 route inventory 92개는 열거가
 아니며 `exposed-write-surface`가 실제 열거를 맡는다. host 조작
@@ -117,7 +124,19 @@ LogisticsUnit 안에 함께 둘 수 있지만 단일 LOT segment로 합치지 �
 
 보유는 active physical leaf를 한 번씩 합산한다. 행동별 적격은 현재
 QC/규제/고객 조건/처분 근거의 허용 scope 교집합이다. UNKNOWN은 confirmed
-eligible이 아니다. 신규 실행 배분은 적격 실물 이하이며 suspended 배분은
+eligible이 아니다. 장소·보관자 판정도 이 교집합에 포함한다.
+[fixture 장소 종류](../../../../contracts/fixture-place-kinds.md)의
+기계 원본은 같은 이름의 JSON이다. INTERNAL_STORAGE는 같은 조직의
+HUMAN/AGENT custodian이 확인돼야 내부 보관으로 판정한다.
+TRANSIT·CUSTOMER·SUPPLIER·EXTERNAL_PORT는 외부로 적격 확정0이다.
+제품의 그 밖 어휘 밖 kind(`EXTERNAL_*` 제외)는 UNKNOWN·적격0이며
+confirmed eligible에 넣지 않는다. 보유 사실은 보존하고 UNKNOWN을
+DENIED/확정0으로 바꾸지 않는다. fixture는 다섯 kind만 쓰며 명시
+`kindControl=UNRECOGNIZED_PLACE_KIND` 반례 외 미지 kind·누락 kind와
+내부 보관자 누락을 prepare가 거부한다. FixtureInstaller·native fixture와
+첫 수령 custodian slot의 남은 요청은 저장소 harness의 fixture 절을 따른다.
+
+신규 실행 배분은 적격 실물 이하이며 suspended 배분은
 실행 불가여도 기존 의무로 조회된다. QC/정정으로 줄어든 가능량은 과거
 예약 삭제가 아닌 부족 의무/대체 배분이다. replace는 원배분 비활성과
 대체배분 생성이 원자적이며 과거 예약 자동 부활이 없다.
@@ -153,6 +172,40 @@ RECORD는 권한 있는 주체·원천·scope와 claim 원문을 접수한다. c
 인도100 정정은 과거 판정 보존+현재 유효 의무2 평가다. 이미 해소/면제된
 의무는 부활시키지 않는다. 현재 projection/예약/판정/의무 재평가는 원자적
 또는 명시 pending이며 미확정 영향 범위의 후속 실행을 막는다.
+
+## S4 정산 복원·면제와 정정 영향 — D12/D19
+
+[S4 closure 3](../../../../docs/execution/s4k-closure/README.md)의
+`3addaefe` 구현 규칙을 보존한다. 수령/인도 기여를 복원해 Match가
+CURRENT이지만 SATISFIED가 아니고 열린 차이 root가 있으면 열린
+assignment를 다시 발행한다(`ResponsibilityService.reissueOpen`).
+owner·work·root는 유지하고 revision을 올리며 복원 nextAction·nextCheck와
+`CONTRIBUTION_RESTORED:<canonical>` basis를 기록한다. 같은 basis 재처리는
+revision을 다시 올리지 않는다. 정정 전 assignment revision에 묶인
+면제 결정은 실행 시 STALE_REVISION으로 거부하고, 현재 revision으로
+새 결정한 면제만 실행한다. 복원과 면제 실행 순서로 책임이 사라지면 안 된다.
+
+열린 root가 없을 때 CURRENT 잔여를 이미 유효하게 면제한 root가 덮으면
+새 root/follow-up을 열지 않는다. Match 자신의 root는 불변
+`originalDifference`, CURRENT 복원 root는 scope residual의
+`settlementDifference`를 비교한다. 금액이 다르거나 확인할 수 없으면
+새 책임을 여는 기존 fail-closed 규칙을 따른다. 새 CHANGED 정정의 의무와
+이미 면제한 같은 잔여의 자동 부활을 구별한다.
+
+`AssessmentCorrectionImpact`의 `evidenceLinked`·`apply` 영향 집합은
+IMPORTED Work를 제외한다. 가져온 행은 revision·pendingInvalidation을
+바꾸지 않고 knownAt 조회에 보존한다. 직접 대상으로 정정해도 IMPORTED
+Work에 무효화 표시나 FOLLOWUP_REVIEW를 만들지 않는다. 해당 참조 업무의
+후속 책임 위치는 work/responsibility owner의 S5 backlog다.
+
+PHYSICAL_DELIVERY 증거의 명시 invalidatesId는 UNVERIFIED Match에 owner
+있는 SETTLEMENT_DIFFERENCE를 연다. 일반 supersession 뒤 relink하지 않은
+SALE 인도는 Match UNVERIFIED와 owner 있는 FOLLOWUP_REVIEW로 남으며,
+단일 정산 root를 잇는 계약은 settlement owner의 S5 backlog다.
+이 두 DEFERRED 항목을 구현 완료로 안내하지 않는다. closure 기록의
+backend 513 tests와 native S1–S4 PASS는 이전 한정 증거이며 coverage
+manifest PASS가 아니다. 결합 `./verify scenarios --actual` 인수는
+그 기록에서 NOT_RUN이고 이번 skill 변경으로 해소되지 않는다.
 
 ## 목표·의무·인계 — D09/D10/D11/D12/D26
 

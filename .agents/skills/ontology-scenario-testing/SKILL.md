@@ -20,7 +20,8 @@ T01–T26, C1–C5, V1–V8, E1/E2가 인수 기준이다. 명사·동사 진입
   준비 gate의 vocabulary·binding·생성기 검사, 감사 원행, runtimeProfile·
   scheduler 제출 증거·관찰 경계, PREPARATION checkout 대조,
   RESULT_REVISION/RUNTIME_TASK_SNAPSHOT, MCP 오류 우선순위, receipt 조건,
-  V4 kind별 probe 정책과 V7 원행 primary 규칙이 있다.
+  Place.kind/내부 보관자 준비 검사, Accept·Origin 반례, -32600/-32602
+  구분, V4 QUERY 면제와 V7 원행 primary 규칙이 있다.
 - 테스트 계층을 설계할 때 [방법론](references/methodology.md)을 읽는다.
   #57에서 업무 시나리오·공통 SIT/UAT·보류 증거 원칙을 재사용했다.
 - 반례와 종단 수량을 작성할 때
@@ -62,7 +63,11 @@ oracle를 구현 결과에 맞추거나 실패 case를 삭제하지 않는다.
    수량·단위·상태·의무·담당을 적어 업무 독자가 읽을 수 있게 한다. 같은
    규칙의 입력 변형은 독립 subcase로 선언하며 Scenario Outline example도
    subcase 수에 포함한다.
-3. fixture는 독립 disposable DB/문서 저장소에 만든다. 실제 운영 자료,
+3. Place.kind는 fixture-place-kinds.json의 다섯 kind와 명시 반례 계약을
+   따른다. INTERNAL_STORAGE segment에 같은 조직의 Human/Agent 내부
+   보관자를 둔다. 어휘 밖 kind의 UNKNOWN·적격0과 외부 장소의 확정0을
+   구별한다. 누락·미선언 kind를 adapter 기본값으로 수선하지 않는다.
+   fixture는 독립 disposable DB/문서 저장소에 만든다. 실제 운영 자료,
    credential, 외부 발주·제출·이체를 사용하지 않는다. 조직·주체·grant,
    정의/evaluator/정책 버전, 품목/단위·LOT·구별 가능한 물량, 증거 hash와
    사건 ID, owner·기한을 고정한다. 미확인은 정상이나 수량0으로 바꾸지 않는다.
@@ -91,7 +96,10 @@ runtime의 결합을 검증한다. 테스트 전용 scripted agent는 정해진 
 
 V4의 우회 경로 집합은 고정 목록이 아니라 실행 중 시스템이 노출한 쓰기 면을
 열거해 만들어야 한다. kind별 요청 probe class는 `writeCapable`과 독립이며
-readonly entity set도 쓰기 거부를 관찰한다. `verification/cases/V4`의
+readonly entity set도 쓰기 거부를 관찰한다. TOOL·BOUND/UNBOUND_ACTION의
+QUERY 면제는 hash로 묶인 capability kind·writeCapable=false·정확한 이름을
+harness가 확인할 때만 적용한다. COMMAND·RECORD·범용 dispatcher를
+제외하지 않는다. `verification/cases/V4`의
 고정 inventory 92개는 열거가 아니고, `exposed-write-surface`는 계약이
 정의됐어도 실제 host adapter가
 없어 `NOT_RUN`이므로, 그 subcase가 실제 실행되어 PASS하기 전에는 V4의 노출 면 부분을
@@ -105,7 +113,10 @@ false/false runtimeProfile에서 자연 tick을 수동 관찰한다. 감사 이�
 PREPARATION commit/clean 필드도 공개 계약을 따른다(`repository-harness.md`).
 자율 scheduler·sweeper는 watcher group 전까지 기동하지 않는다.
 api·worker는 group 밖에서 시작하고 group의 loop start는 branch당 하나다.
-관찰 창은 `data.observationBoundaryAt`부터 잰다. snapshotRef는 API revision과
+관찰 창은 harness가 요청에 넣은 observeFrom부터 잰다(group에서는
+`data.observationBoundaryAt`, group 밖 watcher는 dispatch 직전이다).
+case는 observeFrom을 직접 쓰지 않고 extractor는 해당 창의 지속 제출
+행만 읽는다. 실제 watcher adapter는 NOT_RUN이다. snapshotRef는 API revision과
 runtime task snapshot을 구별한다. 고정 수량 primary의 source·baseline·
 unitSource·baselineUnitSource에는 `/data/data/` 파생값을 쓰지 않는다.
 
@@ -121,7 +132,11 @@ unitSource·baselineUnitSource에는 `/data/data/` 파생값을 쓰지 않는다
 grant·정책·제한을 commit 경계에서 다시 확인하는지, rollback이 원장·
 감사·outbox를 함께 되돌리는지, 재시작 뒤 의무의 owner/nextAction/
 nextCheck와 fencing이 남는지 검증한다. 큐 성공·알림 성공·Agent 종료를
-목표 충족이나 책임 종료로 단언하지 않는다.
+목표 충족이나 책임 종료로 단언하지 않는다. 정산 복원·면제와 IMPORTED
+정정 영향의 회귀는
+[서버 계약](../ontology-implementation/references/implementation-contracts.md)의
+S4 절을 따른다. closure의 한정 증거와 DEFERRED 후속 책임을 구별하고
+미실행 결합 scenarios 인수를 PASS로 바꾸지 않는다.
 
 ## UAT와 비용
 
