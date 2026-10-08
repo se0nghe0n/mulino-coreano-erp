@@ -75,7 +75,8 @@
         "approveRecall",
         "recordRecallNotice",
         "recordRecovery",
-        "closeRecall"
+        "closeRecall",
+        "disposeQuantity"
       ],
       "grant": {
         "delegatorAlias": "supervisor",
@@ -133,7 +134,8 @@
           "approveRecall",
           "recordRecallNotice",
           "recordRecovery",
-          "closeRecall"
+          "closeRecall",
+          "disposeQuantity"
         ],
         "scope": {
           "organizationAlias": "ORG"
@@ -202,7 +204,8 @@
         "approveRecall",
         "recordRecallNotice",
         "recordRecovery",
-        "closeRecall"
+        "closeRecall",
+        "disposeQuantity"
       ],
       "grant": {
         "delegatorAlias": "supervisor",
@@ -260,7 +263,8 @@
           "approveRecall",
           "recordRecallNotice",
           "recordRecovery",
-          "closeRecall"
+          "closeRecall",
+          "disposeQuantity"
         ],
         "scope": {
           "organizationAlias": "ORG"
@@ -1560,6 +1564,13 @@
       "type": "ManagementAuthority",
       "actorAlias": "supervisor",
       "capabilityId": "approveRecall",
+      "validFrom": "2026-10-01T00:00:00Z",
+      "validUntil": "2026-10-31T00:00:00Z"
+    },
+    "RECALL_DISPOSAL_MANAGER": {
+      "type": "ManagementAuthority",
+      "actorAlias": "reader",
+      "capabilityId": "disposeQuantity",
       "validFrom": "2026-10-01T00:00:00Z",
       "validUntil": "2026-10-31T00:00:00Z"
     }
