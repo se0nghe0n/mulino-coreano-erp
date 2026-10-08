@@ -34,7 +34,19 @@ T20 artifact가 실제로 있어야 한다.
 
 runtime-links-required는 link의 존재만 보지 않는다. 각 named observation에
 PASS link가 하나 이상 있고, 평면화한 link와 runtime artifact에 FAIL·
-NOT_RUN이 없으며, artifact exit code 1·2·3이 없어야 한다.
+NOT_RUN이 없어야 한다. artifact exit code는 1·2·3 각각0건에 더해
+`runtime-artifacts-all-exit0`·`runtime-artifacts-all-pass`가 전체 artifact의
+exitCode가 정수0, status가 PASS임을 요구한다. 필터한 목록이 전체 목록과
+같아야 하므로 4·137·문자열 '1' 같은 값도 실패한다.
+
+PREPARATION 입력을 읽는 다섯 subcase(coverage-none, dropOracle,
+dropObservation, skipCase, mandatoryWaiver)는 준비 보고가 지금 검증하는
+checkout의 것임을 요구한다. 검증기 rawRows `input`에 준비 보고의
+`codeCommit`·`workingTreeDirty`와 검증기가 읽은 현재 checkout의
+`checkoutCommit`·`checkoutDirty`를 둔다. 두 tree는 clean이고 두 commit은
+같아야 한다. 이 네 field는 verifyCoverage 출력 계약의 확장이며
+host-observation-guide.md·HostObservationValidator 반영은 harness 소유자에게
+요청했다(docs/execution/step2r-cases3/README.md).
 evidence-wrapper-fields는 법규 검토의 출처·관할·적용일·검토자와 실모델
 비용 승인 필드를 요구하고 waiver된 법규 검토를 거부한다. command/version/
 fixture hash/expected/observed/exit의 누락도 실패다. QA content review는

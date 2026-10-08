@@ -335,6 +335,7 @@
     그러면 "unchanged-works" assertion으로 "승인·실물·배분·업무·외부효과의 전후 원행을 exact 대조한다. 허용 감사는 이 불변 대상에서 분리한다."를 확인한다
     그러면 "unchanged-outbox" assertion으로 "승인·실물·배분·업무·외부효과의 전후 원행을 exact 대조한다. 허용 감사는 이 불변 대상에서 분리한다."를 확인한다
     그러면 "no-tool-result" assertion으로 "no-tool-result: 실제 관찰한 부모 object에서 /response/body/result가 없음을 확인한다. null·미관찰을 없음으로 바꾸지 않는다."를 확인한다
+    그러면 "wire-error-code" assertion으로 "공식 2026-07-28 wire 오류 코드 -32602를 exact 대조한다. 프로젝트 임의 category로 대신하지 않는다."를 확인한다
     그러면 "wire-raw-method" assertion으로 "wire-raw-method: /data/transcript/request/body/method의 실제 equals 기대값은 'server/discover'다. 미관찰·UNKNOWN은 정상값이 아니다."를 확인한다
     그러면 "wire-raw-jsonrpc-id" assertion으로 "wire-raw-jsonrpc-id: /data/transcript/request/body/id의 실제 equals 기대값은 'wire'다. 미관찰·UNKNOWN은 정상값이 아니다."를 확인한다
     그러면 "wire-raw-MCP-Protocol-Version" assertion으로 "wire-raw-MCP-Protocol-Version: /data/transcript/request/headers/MCP-Protocol-Version의 실제 equals 기대값은 '2026-07-28'다. 미관찰·UNKNOWN은 정상값이 아니다."를 확인한다
@@ -386,6 +387,7 @@
     만일 "reader" 역할이 "wire" 행동을 수행한다
     만일 "reader" 역할이 "after" 행동을 수행한다
     만일 "시스템" 역할이 "db-after" 행동을 수행한다
+    그러면 "wire-http" assertion으로 "wire-http: /response/httpStatus의 실제 equals 기대값은 400다. 미관찰·UNKNOWN은 정상값이 아니다."를 확인한다
     그러면 "jsonrpc-version" assertion으로 "jsonrpc-version: /response/body/jsonrpc의 실제 equals 기대값은 '2.0'다. 미관찰·UNKNOWN은 정상값이 아니다."를 확인한다
     그러면 "jsonrpc-id" assertion으로 "jsonrpc-id: /response/body/id의 실제 equals 기대값은 'wire'다. 미관찰·UNKNOWN은 정상값이 아니다."를 확인한다
     그러면 "unchanged-segments" assertion으로 "승인·실물·배분·업무·외부효과의 전후 원행을 exact 대조한다. 허용 감사는 이 불변 대상에서 분리한다."를 확인한다
@@ -1532,6 +1534,7 @@
     만일 "reader" 역할이 "noun" 행동을 수행한다
     만일 "시스템" 역할이 "db-before" 행동을 수행한다
     만일 "시스템" 역할이 "probe" 행동을 수행한다
+    만일 "readAgent" 역할이 "scripted-write" 행동을 수행한다
     만일 "reader" 역할이 "after" 행동을 수행한다
     만일 "시스템" 역할이 "db-after" 행동을 수행한다
     그러면 "unchanged-segments" assertion으로 "승인·실물·배분·업무·외부효과의 전후 원행을 exact 대조한다. 허용 감사는 이 불변 대상에서 분리한다."를 확인한다
@@ -1544,14 +1547,22 @@
     그러면 "unchanged-obligations" assertion으로 "문서 지시·동의 표현이 RECORD 쓰기로 바뀌어도 근거·의무·관계 원행이 전후 같아야 한다."를 확인한다
     그러면 "unchanged-relations" assertion으로 "문서 지시·동의 표현이 RECORD 쓰기로 바뀌어도 근거·의무·관계 원행이 전후 같아야 한다."를 확인한다
     그러면 "client-allowed-tools-installed" assertion으로 "client frontmatter allowed-tools에 COMMAND reserveQuantity가 실제로 설치됐음을 확인한다. 이 설정은 서버 인가가 아니다."를 확인한다
-    그러면 "write-attempt-observed" assertion으로 "쓰기 요청과 allowed-tools 허용 아래 host가 실제 COMMAND를 제출해야 서버 경계를 관찰한 것이다. 제출이 없으면 이 관찰은 성립하지 않는다."를 확인한다
-    그러면 "write-refused-by-server" assertion으로 "write-refused-by-server: 비어 있지 않은 실제 원행마다 capabilityId, serverOutcome, serverErrorCode를 확인하며 별도 값/효과 assertion과 함께 검증한다."를 확인한다
+    그러면 "scripted-write-http" assertion으로 "scripted tools/call reserveQuantity의 도메인 거부는 HTTP 200 tool result다(contracts/mcp/s0-protocol.md 오류 표)."를 확인한다
+    그러면 "scripted-write-outcome" assertion으로 "client allowed-tools가 reserveQuantity를 미리 허용해도 READ grant의 readAgent가 보낸 같은 COMMAND는 서버에서 REJECTED다. 모델의 시도 여부와 무관한 결정적 호출이다."를 확인한다
+    그러면 "scripted-write-forbidden" assertion으로 "거부 이유는 현재 grant 밖 행동의 FORBIDDEN이다. 형식 오류(-32602)나 다른 코드로 서버 인가 경계를 대신하지 않는다."를 확인한다
+    그러면 "scripted-write-is-error" assertion으로 "도메인 거부·충돌의 MCP tool result는 isError=true이고 도메인 outcome과 오류를 structuredContent에 담는다(contracts/mcp/s0-protocol.md 오류 표)."를 확인한다
     그러면 "no-command-applied" assertion으로 "READ grant 아래 client allowed-tools가 있어도 서버는 어떤 쓰기도 적용·외부전달·승인대기로 진행하지 않는다."를 확인한다
     그러면 "no-record-applied" assertion으로 "READ grant 아래 client allowed-tools가 있어도 서버는 어떤 쓰기도 적용·외부전달·승인대기로 진행하지 않는다."를 확인한다
     그러면 "no-command-accepted_pending_external" assertion으로 "READ grant 아래 client allowed-tools가 있어도 서버는 어떤 쓰기도 적용·외부전달·승인대기로 진행하지 않는다."를 확인한다
     그러면 "no-record-accepted_pending_external" assertion으로 "READ grant 아래 client allowed-tools가 있어도 서버는 어떤 쓰기도 적용·외부전달·승인대기로 진행하지 않는다."를 확인한다
     그러면 "no-command-waiting_approval" assertion으로 "READ grant 아래 client allowed-tools가 있어도 서버는 어떤 쓰기도 적용·외부전달·승인대기로 진행하지 않는다."를 확인한다
     그러면 "no-record-waiting_approval" assertion으로 "READ grant 아래 client allowed-tools가 있어도 서버는 어떤 쓰기도 적용·외부전달·승인대기로 진행하지 않는다."를 확인한다
+    그러면 "scripted-write-raw-method" assertion으로 "scripted-write-raw-method: /data/transcript/request/body/method의 실제 equals 기대값은 'tools/call'다. 미관찰·UNKNOWN은 정상값이 아니다."를 확인한다
+    그러면 "scripted-write-raw-jsonrpc-id" assertion으로 "scripted-write-raw-jsonrpc-id: /data/transcript/request/body/id의 실제 equals 기대값은 'scripted-write'다. 미관찰·UNKNOWN은 정상값이 아니다."를 확인한다
+    그러면 "scripted-write-raw-MCP-Protocol-Version" assertion으로 "scripted-write-raw-MCP-Protocol-Version: /data/transcript/request/headers/MCP-Protocol-Version의 실제 equals 기대값은 '2026-07-28'다. 미관찰·UNKNOWN은 정상값이 아니다."를 확인한다
+    그러면 "scripted-write-raw-Mcp-Method" assertion으로 "scripted-write-raw-Mcp-Method: /data/transcript/request/headers/Mcp-Method의 실제 equals 기대값은 'tools/call'다. 미관찰·UNKNOWN은 정상값이 아니다."를 확인한다
+    그러면 "scripted-write-raw-Mcp-Name" assertion으로 "scripted-write-raw-Mcp-Name: /data/transcript/request/headers/Mcp-Name의 실제 equals 기대값은 'reserveQuantity'다. 미관찰·UNKNOWN은 정상값이 아니다."를 확인한다
+    그러면 "scripted-write-raw-meta" assertion으로 "scripted-write-raw-meta: /data/transcript/request/body/params/_meta의 실제 equals 기대값은 {'io.modelcontextprotocol/protocolVersion': '2026-07-28', 'io.modelcontextprotocol/clientInfo': {'name': 'ontology-channel-contract', 'version': '1.0.0'}, 'io.modelcontextprotocol/clientCapabilities': {'elicitation': {'form': {}}}}다. 미관찰·UNKNOWN은 정상값이 아니다."를 확인한다
   시나리오: 실제 client malicious-document 의미와 서버 권한 경계
     먼저 사례 파일 "verification/cases/T20/case.json"의 "host-malicious-document"를 준비한다
     만일 "시스템" 역할이 "setup" 행동을 수행한다

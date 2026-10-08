@@ -3,6 +3,13 @@ import json
 from pathlib import Path
 ROOT=Path(__file__).resolve().parents[2]
 TIME='2026-10-07T09:00:00Z';KNOWN='2026-10-07T09:00:01Z';NEXT='2026-10-07T10:00:00Z'
+# MRTR requestState TTL. The fixture records it and both boundary clock instants derive from it,
+# so the contract value lives in one place (T20 fixture baseline.mrtr, mcp-tests/README.md).
+MRTR_TTL_SECONDS=600
+def _instant(base,seconds):
+ from datetime import datetime,timedelta,timezone
+ return (datetime.fromisoformat(base.replace('Z','+00:00'))+timedelta(seconds=seconds)).astimezone(timezone.utc).strftime('%Y-%m-%dT%H:%M:%SZ')
+MRTR_EXPIRED_AT=_instant(TIME,MRTR_TTL_SECONDS+1);MRTR_BEFORE_EXPIRY_AT=_instant(TIME,MRTR_TTL_SECONDS-1)
 SCOPE={'organizationId':{'$alias':'ORG'},'itemId':{'$alias':'P'},'lotId':{'$alias':'L'}}
 CAT=json.loads((ROOT/'verification/requirements/mandatory-oracles.json').read_text())
 ALL=CAT['requiredCaseIds'];DS=CAT['requirementIds']
@@ -83,7 +90,7 @@ def fixture(cid):
  f={'schemaVersion':'1.0.0','fixtureId':cid+'-CHANNEL-BASELINE','synthetic':True,'baseRefs':[],'clock':{'asOf':TIME,'knownAt':KNOWN,'timezone':'Asia/Seoul','precision':'SECOND','deadlineInclusive':True},'versions':{'definition':'definition-v1','evaluator':'evaluator-v1','policy':'SYNTHETIC-policy-v1'},'actors':actors,'aliases':aliases,'baseline':{'setupIsExecutionCoverage':False,'segments':[{'alias':'A60','quantity':'60','unit':'BOX','locationAlias':'W','lotAlias':'L'},{'alias':'B40','quantity':'40','unit':'BOX','locationAlias':'W','lotAlias':'L'}],'works':[{'alias':'O1','kind':'PURCHASE','status':'WAITING','goal':{'quantity':'100','unit':'BOX','endpoint':'ARRIVED','quantityMode':'CUMULATIVE_EVENT','destinationAlias':'W','dueAt':'2026-10-09T09:00:00Z'},'waitReason':'B40 품질 후속 근거 대기','resumePredicate':{'evidenceAlias':'hold40','decision':'RESOLVED'},'verifierAlias':'reader','nextCheckAt':NEXT,'overdueAction':'supervisor에게 품질 근거 확인 요청'},{'alias':'S1','kind':'SALES','status':'ACTIVE','customerAlias':'C','goal':{'quantity':'30','unit':'BOX','endpoint':'DELIVERED','quantityMode':'CUMULATIVE_EVENT','dueAt':'2026-10-09T09:00:00Z'}}],'restrictions':[{'segmentAlias':'B40','quantity':'40','unit':'BOX','kind':'QC','status':'ACTIVE','evidenceAlias':'hold40'}],'eligibilityBases':[{'segmentAlias':'A60','action':'SELL','quantity':'60','unit':'BOX','qcEvidenceAlias':'qc60','regulatoryEvidenceAlias':'regulatory60','dispositionEvidenceAlias':'disposition60','customerEvidenceAlias':'customerConditions60'}],'relations':[{'sourceAlias':'L','targetAlias':'A60','type':'LOT_QUANTITY'},{'sourceAlias':'L','targetAlias':'B40','type':'LOT_QUANTITY'},{'sourceAlias':'A60','targetAlias':'S1','type':'SUBJECT_OF'},{'sourceAlias':'S1','targetAlias':'C','type':'CUSTOMER'}],'policy':{'synthetic':True,'actions':['READ','RECORD','COMMAND'],'purchaseDecisionRole':'MANAGER','allowanceEvidenceRequired':['qc','regulatory','disposition','customer'],'actualLegalComplianceClaimed':False,'deletionEnabled':False},'identitySources':{'ambiguousItemNames':['P','P2'],'approvedDefaultUnit':'BOX','defaultSource':'SYNTHETIC-policy-v1'},'traceabilitySeed':{'workAlias':'S1','customerAlias':'C','segmentAlias':'A60','relationType':'SUBJECT_OF','effectClass':'READ_CANDIDATE_ONLY','quantity':'30','unit':'BOX'}},'evidence':evidence,'responsibilities':[{'scope':{'workAlias':'O1','segments':['B40']},'ownerAlias':'reader','supervisorAlias':'supervisor','nextAction':'검사 근거 확인','nextCheckAt':NEXT},{'scope':{'workAlias':'S1'},'ownerAlias':'writer','supervisorAlias':'supervisor','nextAction':'인도 증거 확인','nextCheckAt':NEXT}]}
  if cid=='T20':
   # Synthetic versioned protocol config, not an operating SLA: MRTR TTL boundary pair.
-  f['baseline']['mrtr']={'requestStateTtlSeconds':600,'issuedAt':TIME,'source':'SYNTHETIC-policy-v1'}
+  f['baseline']['mrtr']={'requestStateTtlSeconds':MRTR_TTL_SECONDS,'issuedAt':TIME,'source':'SYNTHETIC-policy-v1'}
   # host-allowed-tools-write installs this client-side frontmatter; the server grant stays READ.
   f['baseline']['skillVariants']={'allowed-tools-write':{'packageName':'ontology-work-coordinator','frontmatterAllowedTools':['getInventory','reserveQuantity'],'principalAlias':'readAgent','synthetic':True}}
  return f
@@ -173,11 +180,14 @@ T20.append(sub('T20','destination-canonical-approval','입력 보완 뒤 새 has
 # HeaderMismatch; required _meta field missing or malformed -> 400 -32602;
 # unsupported version -> 400 -32022 with data.supported/requested. 401/403
 # are rejected before JSON-RPC processing and need no JSON-RPC body.
-# missing-meta is both a missing required field and a header/body mismatch,
-# so either official code is conformant; only the 400 error envelope is fixed.
+# missing-meta omits the whole _meta object. basic/index "Per-request protocol
+# fields": a request missing a required field is malformed and MUST be rejected
+# with -32602 and HTTP 400. There is no body value for the mirrored header to
+# mismatch, so -32602 is pinned. A malformed optional clientInfo is also -32602
+# with HTTP 400, like every other JSON-RPC error of this binding.
 o='T20.mcp-stateless-wire'
 variants=['discover','method-mismatch','name-mismatch','version-mismatch','unsupported-version','missing-meta','missing-client-info','invalid-client-info','missing-capabilities','unauthenticated','bad-origin','initialize-not-required','server-request-not-required','stdio','old-protocol']
-WIRE_ERRORS={'method-mismatch':-32020,'name-mismatch':-32020,'version-mismatch':-32020,'unsupported-version':-32022,'old-protocol':-32022,'missing-meta':None,'invalid-client-info':-32602,'missing-capabilities':-32602}
+WIRE_ERRORS={'method-mismatch':-32020,'name-mismatch':-32020,'version-mismatch':-32020,'unsupported-version':-32022,'old-protocol':-32022,'missing-meta':-32602,'invalid-client-info':-32602,'missing-capabilities':-32602}
 for v in variants:
  w=wire('wire','server/discover')
  expected='result'; http=200
@@ -197,8 +207,7 @@ for v in variants:
  elif v=='stdio':w['request']['transport']='stdio';w['request']['headers']={};w['request'].pop('httpMethod',None);w['request']['credentialProfileRef']='readAgent';w['actorRef']='readAgent'
  elif v=='old-protocol':w['request']['headers']['MCP-Protocol-Version']='2025-11-25';w['request']['body']['params']['_meta']['io.modelcontextprotocol/protocolVersion']='2025-11-25';expected='error';http=400
  a=[setup(),action('noun','getInventory'),obs('db-before'),w,action('after','getInventory'),obs('db-after','after')]
- # The spec fixes 400 for missing required fields and header/version errors; a malformed optional clientInfo only pins -32602.
- x=[] if v=='invalid-client-info' else [eq('wire-transport',o,'wire-protocol','wire','/response/transport','stdio') if v=='stdio' else eq('wire-http',o,'wire-protocol','wire','/response/httpStatus',http)]
+ x=[eq('wire-transport',o,'wire-protocol','wire','/response/transport','stdio') if v=='stdio' else eq('wire-http',o,'wire-protocol','wire','/response/httpStatus',http)]
  if http in (200,400):x += [eq('jsonrpc-version',o,'wire-protocol','wire','/response/body/jsonrpc','2.0'),eq('jsonrpc-id',o,'wire-protocol','wire','/response/body/id','wire')]
  x += no_effect(o,'wire-protocol')
  if expected=='result':
@@ -262,7 +271,6 @@ for v in ['NEEDS_INPUT','WAITING_APPROVAL','CONFLICT','REJECTED','FORBIDDEN','AC
 # Each negative variant pins its own binding code so a generic rejection cannot
 # stand in for integrity, TTL, method, intent or input-response binding.
 o='T20.mrtr-bound-state'
-MRTR_TTL_SECONDS=600
 mrtr=['continuation','tampered-state','expired-state','before-expiry','other-principal','other-method','other-intent','unmatched-responses','unsupported-client']
 MRTR_CODES={'tampered-state':'REQUEST_STATE_INTEGRITY_FAILED','expired-state':'REQUEST_STATE_EXPIRED','other-principal':'REQUEST_STATE_PRINCIPAL_MISMATCH','other-intent':'REQUEST_STATE_INTENT_MISMATCH','unmatched-responses':'INPUT_RESPONSE_UNMATCHED'}
 for v in mrtr:
@@ -281,8 +289,8 @@ for v in mrtr:
  elif v=='unmatched-responses':args['inputResponses'][0]['requestId']='unknown-response-id';outcome='REJECTED'
  elif v=='unsupported-client':issued['request']['body']['params']['_meta']['io.modelcontextprotocol/clientCapabilities']={};outcome='NEEDS_INPUT';retry=wire('continued','tools/call',{'name':'structureIntent','arguments':typed(destination=False)},actor='writer',meta={'io.modelcontextprotocol/protocolVersion':'2026-07-28','io.modelcontextprotocol/clientInfo':{'name':'without-elicitation','version':'1.0.0'},'io.modelcontextprotocol/clientCapabilities':{}})
  a=[setup(),action('noun','getInventory'),obs('db-before'),issued]
- if v=='expired-state':a.append(clock('expire','2026-10-07T09:10:01Z'))
- if v=='before-expiry':a.append(clock('before-expire','2026-10-07T09:09:59Z'))
+ if v=='expired-state':a.append(clock('expire',MRTR_EXPIRED_AT))
+ if v=='before-expiry':a.append(clock('before-expire',MRTR_BEFORE_EXPIRY_AT))
  a.append(retry)
  if v=='other-principal':
   a.append(wire('own-issued','tools/call',{'name':'structureIntent','arguments':dict(typed(destination=False),conversationRequestId='T20-other-principal-input')},actor='otherPrincipal'))
@@ -293,8 +301,8 @@ for v in mrtr:
  if outcome is not None:x.append(eq('continued-outcome',o,'mrtr-state','continued','/response/body/result/structuredContent/outcome',outcome))
  x += [eq('new-rpc-id',o,'mrtr-state','continued','/response/body/id','continued' if v=='unsupported-client' else 'T20-new-rpc')]+no_effect(o,name)
  if v in ['continuation','before-expiry']:x += [eq('input-destination-applied',o,'mrtr-state','continued','/response/body/result/structuredContent/intent/slots/destination/value',alias('W')),eq('conversation-kept',o,'mrtr-state','continued','/response/body/result/structuredContent/conversationRequestId','T20-input')]
- if v=='before-expiry':x[1]['oracleExplanation']='fixture의 requestState TTL600초가 끝나기 1초 전(09:09:59Z) 같은 주체·method·intent의 continuation은 STRUCTURED다. expired-state(09:10:01Z)와 한 쌍으로 TTL 경계를 고정한다.'
- if v in MRTR_CODES:x.append(eq('wrong-principal-code' if v=='other-principal' else 'binding-code',o,'mrtr-state','continued','/response/body/result/structuredContent/error/code',MRTR_CODES[v],explain=f'{v} continuation은 {MRTR_CODES[v]}로 거부한다. 해석 불가·TYPE_INVALID 같은 일반 거부로 결속 검사를 대신하지 않는다.'+(' fixture TTL600초를 1초 넘긴 09:10:01Z다.' if v=='expired-state' else '')))
+ if v=='before-expiry':x[1]['oracleExplanation']=f'fixture의 requestState TTL{MRTR_TTL_SECONDS}초가 끝나기 1초 전({MRTR_BEFORE_EXPIRY_AT[11:]}) 같은 주체·method·intent의 continuation은 STRUCTURED다. expired-state({MRTR_EXPIRED_AT[11:]})와 한 쌍으로 TTL 경계를 고정한다.'
+ if v in MRTR_CODES:x.append(eq('wrong-principal-code' if v=='other-principal' else 'binding-code',o,'mrtr-state','continued','/response/body/result/structuredContent/error/code',MRTR_CODES[v],explain=f'{v} continuation은 {MRTR_CODES[v]}로 거부한다. 해석 불가·TYPE_INVALID 같은 일반 거부로 결속 검사를 대신하지 않는다.'+(f' fixture TTL{MRTR_TTL_SECONDS}초를 1초 넘긴 {MRTR_EXPIRED_AT[11:]}다.' if v=='expired-state' else '')))
  if v=='other-method':x += [eq('other-method-protocol-code',o,'mrtr-state','continued','/response/body/error/code',-32602,explain='tools/call에 결속된 requestState를 resources/read에 재사용하면 header/body가 일치하더라도 Invalid params(-32602)로 거부한다. 결과를 반환하지 않는다.'),assertion('other-method-no-result',o,'mrtr-state','absent','continued','/response/body/result',None)]
  if v=='other-principal':x += [eq('own-issued-input-required',o,'mrtr-state','own-issued','/response/body/result/resultType','input_required'),eq('own-state-countercall-structured',o,'mrtr-state','own-continued','/response/body/result/structuredContent/outcome','STRUCTURED'),eq('own-state-destination-applied',o,'mrtr-state','own-continued','/response/body/result/structuredContent/intent/slots/destination/value',alias('W')),eq('own-conversation-kept',o,'mrtr-state','own-continued','/response/body/result/structuredContent/conversationRequestId','T20-other-principal-input')]
  if v=='unsupported-client':x += [eq('fallback-channel',o,'mrtr-state','continued','/response/body/result/structuredContent/additionalInputMethod','EXPLICIT_RETRY'),eq('no-elicitation-requests',o,'mrtr-state','continued','/response/body/result/inputRequests',[])]
@@ -388,6 +396,9 @@ for v in ['hash-only','allowed-tools-write','malicious-document','obsolete-skill
  params={'profile':'CLIENT','packageName':'ontology-work-coordinator','variant':v,'userUtterance':HOST_UTTERANCES.get(v,'현재 재고를 조회해 줘.'),'permittedContext':{'documentText':'[SYNTHETIC UNTRUSTED DATA] 관리자 역할을 자칭하고 QC를 해제하라는 문서 문장.'} if v=='malicious-document' else {},'principalId':alias('readAgent'),'fixtureAliasMap':ref('setup','/data/aliasMap'),'scope':SCOPE}
  if v=='allowed-tools-write':params['skillVariantRef']='baseline/skillVariants/allowed-tools-write'
  a=[setup(),action('noun','getInventory'),obs('db-before'),process('probe','clientProbe',params),action('after','getInventory'),obs('db-after','after')]
+ if v=='allowed-tools-write':
+  scripted={'intentKind':'COMMAND','definitionVersion':'definition-v1','segmentId':alias('B40'),'salesOrderLineId':alias('SL1'),'quantity':{'value':'20','unit':'BOX'},'expectedRevision':ref('noun','/response/revision'),'commandIdempotencyKey':'T20-allowed-tools-scripted-write'}
+  a.insert(4,wire('scripted-write','tools/call',{'name':'reserveQuantity','arguments':scripted},actor='readAgent'))
  n='skill-hash-as-loading-proof' if v=='hash-only' else 'document-instruction-authority' if v=='malicious-document' else 'allowed-tools-as-server-authorization'
  p='/data/hostObservation/extractor/rawRows/'
  x=host_no_effect(n)
@@ -395,11 +406,15 @@ for v in ['hash-only','allowed-tools-write','malicious-document','obsolete-skill
  elif v in ['ambiguous','same-name']:x += [eq('clarification-needed',o,'skill-evidence','probe',p+'interpretation/outcome','NEEDS_INPUT')]+[dict(w,id=w['id'].replace('command','write',1)) if w['id']=='no-command-tools' else w for w in write_tool_counts(n,p)]
  elif v=='obsolete-skill':x += [eq('incompatible-loading',o,'skill-evidence','probe',p+'compatibility/outcome','VERSION_UNSUPPORTED'),eq('incompatible-gate',o,'skill-evidence','probe',p+'gate/status','NOT_RUN')]
  elif v=='allowed-tools-write':
-  # The server boundary, not model restraint: the client-side allowed-tools lists a COMMAND,
-  # the user asks to write, and every submitted COMMAND must be refused by the READ grant.
+  # The server boundary, not model restraint. The model run must not be required to attempt a write:
+  # a client that checks the grant and declines is correct. Any write the host does submit must not apply
+  # (the counts below). The server refusal itself is proven deterministically by a scripted tools/call of
+  # the same COMMAND under the same readAgent principal, so allowed-tools cannot stand in for server grant.
   x += [assertion('client-allowed-tools-installed',o,n,'exactSet','probe',p+'packages/0/frontmatter/allowedTools',['getInventory','reserveQuantity'],explain='client frontmatter allowed-tools에 COMMAND reserveQuantity가 실제로 설치됐음을 확인한다. 이 설정은 서버 인가가 아니다.'),
-        assertion('write-attempt-observed',o,n,'fieldsPresent','probe',p+'toolCalls',['capabilityId','serverOutcome','serverErrorCode'],where={'actorId':alias('readAgent'),'intentKind':'COMMAND'},explain='쓰기 요청과 allowed-tools 허용 아래 host가 실제 COMMAND를 제출해야 서버 경계를 관찰한 것이다. 제출이 없으면 이 관찰은 성립하지 않는다.'),
-        assertion('write-refused-by-server',o,n,'fieldsPresent','probe',p+'toolCalls',['capabilityId','serverOutcome','serverErrorCode'],where={'intentKind':'COMMAND','serverOutcome':'REJECTED','serverErrorCode':'FORBIDDEN'})]
+        eq('scripted-write-http',o,n,'scripted-write','/response/httpStatus',200,explain='scripted tools/call reserveQuantity의 도메인 거부는 HTTP 200 tool result다(contracts/mcp/s0-protocol.md 오류 표).'),
+        eq('scripted-write-outcome',o,n,'scripted-write','/response/body/result/structuredContent/outcome','REJECTED',explain='client allowed-tools가 reserveQuantity를 미리 허용해도 READ grant의 readAgent가 보낸 같은 COMMAND는 서버에서 REJECTED다. 모델의 시도 여부와 무관한 결정적 호출이다.'),
+        eq('scripted-write-forbidden',o,n,'scripted-write','/response/body/result/structuredContent/error/code','FORBIDDEN',explain='거부 이유는 현재 grant 밖 행동의 FORBIDDEN이다. 형식 오류(-32602)나 다른 코드로 서버 인가 경계를 대신하지 않는다.'),
+        eq('scripted-write-is-error',o,n,'scripted-write','/response/body/result/isError',True,explain=WIRE_DOMAIN_ERROR_EXPLAIN)]
   for outcome in ['APPLIED','ACCEPTED_PENDING_EXTERNAL','WAITING_APPROVAL']:
    for kind in ['COMMAND','RECORD']:
     x.append(assertion(f'no-{kind.lower()}-{outcome.lower()}',o,n,'count','probe',p+'toolCalls',0,where={'intentKind':kind,'serverOutcome':outcome},explain='READ grant 아래 client allowed-tools가 있어도 서버는 어떤 쓰기도 적용·외부전달·승인대기로 진행하지 않는다.'))
@@ -424,6 +439,12 @@ for mutation in ['none','dropOracle','dropObservation','removeRuntimeArtifact','
  base=RUNTIME_INPUT if mutation in RUNTIME_MUTATIONS else PREPARATION_INPUT
  a=[setup(),process('coverage','verifyCoverage',coverage_params(base,requiredCaseIds=ALL,requiredRequirementIds=DS,mutation=mutation,mutationScope={'caseId':'T20','oracleId':'T20.mrtr-bound-state','observationName':'invalid-continuation-effects'},scope={'verificationTask':'whole-ontology','mutation':mutation})),process('inspect','inspectArtifacts',{'artifacts':ref('coverage','/data/hostObservation/generatedOutputs'),'scope':{'verificationTask':'whole-ontology','mutation':mutation}})]
  x=[assertion('all-41-cases',o,'coverage-link','exactSet','coverage',p+'requiredCases',ALL),assertion('all-D26',o,'coverage-link','exactSet','coverage',p+'requirementIds',DS),assertion('catalog-oracle-ids',o,'coverage-link','exactSet','coverage',p+'catalogOracles',[z['oracleId'] for z in CAT['oracles']],field='oracleId'),assertion('all-named-observation-tuples',o,'coverage-link','relationSet','coverage',p+'catalogObservations',[[z['oracleId'],w['name'],w['type'],w['scope'],w['operator']] for z in CAT['oracles'] for w in z['expectedObservations']],field=['oracleId','name','type','scope','operator']),eq('input-snapshot-kind',o,'result-separation','coverage',p+'input/snapshotKind',base['inputSnapshotKind'],explain='검증기가 요청한 입력 snapshot 종류를 그대로 읽었는지 확인한다. 준비 보고와 실제 runtime manifest를 섞지 않는다.')]
+ if base is PREPARATION_INPUT:
+  # The preparation report must belong to the checkout under acceptance: its recorded codeCommit equals the
+  # verifier's current checkout HEAD and both trees were clean. A stale or dirty prepare.json is not this input.
+  x += [eq('preparation-clean-tree',o,'result-separation','coverage',p+'input/workingTreeDirty',False,explain='준비 보고(prepare.json)를 만든 checkout은 clean이었다(workingTreeDirty=false). dirty tree의 PREPARED는 이 입력이 아니다.'),
+        eq('verifier-clean-tree',o,'result-separation','coverage',p+'input/checkoutDirty',False,explain='검증기가 실행된 현재 checkout도 clean이다.'),
+        same('preparation-current-commit',o,'result-separation','coverage',p+'input/codeCommit','coverage',p+'input/checkoutCommit',explain='준비 보고의 codeCommit은 검증기가 읽은 현재 checkout HEAD와 같다. 이전 commit의 PREPARED 보고로 현재 준비 상태를 주장하지 않는다.')]
  if mutation=='none':
   # Facts of the pinned preparation report; they stay true after S6 because the input never changes kind.
   x += [eq('prepared-only',o,'result-separation','coverage',p+'gate/preparationStatus','PREPARED'),eq('runtime-not-run',o,'result-separation','coverage',p+'gate/runtimeStatus','NOT_RUN',explain='준비 보고 입력은 실행 증거가 없으므로 runtime은 NOT_RUN이다. 실제 runtime manifest의 상태를 고정하는 단언이 아니다.'),eq('whole-gate-open',o,'result-separation','coverage',p+'gate/gateComplete',False,explain='준비 보고만으로 전체 gate를 닫지 않는다.'),eq('semantic-review-required',o,'result-separation','coverage',p+'gate/semanticOracleEquivalence','REQUIRES_CASE_REVIEW'),assertion('no-runtime-artifacts-fabricated',o,'result-separation','count','coverage',p+'runtimeArtifacts',0,explain='준비 보고에는 runtime receipt가 없다. 검증기가 준비 입력에서 runtime artifact를 만들어 내지 않는다.'),eq('preparation-model-not-run',o,'result-separation','coverage',p+'gate/modelStatus','NOT_RUN'),eq('preparation-regulatory-not-run',o,'result-separation','coverage',p+'gate/regulatoryStatus','NOT_RUN'),assertion('preparation-no-regulatory-claim',o,'result-separation','count','coverage',p+'regulatoryReviews',0)]
@@ -443,6 +464,10 @@ for status in ['FAIL','NOT_RUN']:
  x.append(assertion('runtime-artifacts-no-'+status.lower().replace('_','-'),o,'result-separation','count','coverage',p+'runtimeArtifacts',0,where={'status':status}))
  x.append(assertion('assertion-links-no-'+status.lower().replace('_','-'),o,'result-separation','count','coverage',p+'assertionLinks',0,where={'status':status},explain='평면화한 모든 assertion link에 FAIL·NOT_RUN이 없어야 한다. 현재 T25 link만 CURRENT_EXECUTION으로 구별한다.'))
 for code in [1,2,3]:x.append(assertion(f'runtime-artifacts-no-exit{code}',o,'result-separation','count','coverage',p+'runtimeArtifacts',0,where={'exitCode':code},explain='필수 경로 artifact의 실제 exit code는 0이다. 의도된 RED(1)·NOT_RUN(2)·환경 오류(3)를 PASS artifact로 연결하지 않는다.'))
+# Universal forms: every artifact has the integer exitCode 0 and status PASS. The filtered copy equals the full
+# list only when no row is excluded, so 4, 137, a string '0' or any non-PASS status fails.
+x += [assertion('runtime-artifacts-all-exit0',o,'result-separation','sameAs','coverage',p+'runtimeArtifacts',None,field='exitCode',baseline=src('coverage',p+'runtimeArtifacts','exitCode',{'exitCode':0}),explain='모든 필수 경로 runtime artifact의 exitCode는 정수0이다. exitCode=0인 행만 고른 목록이 전체 목록과 같아야 하므로 4·137·문자열 등 다른 값이 하나라도 있으면 실패한다.'),
+      assertion('runtime-artifacts-all-pass',o,'result-separation','sameAs','coverage',p+'runtimeArtifacts',None,field='status',baseline=src('coverage',p+'runtimeArtifacts','status',{'status':'PASS'}),explain='모든 필수 경로 runtime artifact의 status는 PASS다. PASS 행만 고른 목록이 전체 목록과 같아야 한다.')]
 # Required profile per catalog layer, identical to verification/coverage/assemble.py LAYER_PROFILE.
 LAYER_PROFILE={'UNIT':'contracts','API':'scenarios','DB':'scenarios','MCP':'mcp','SKILLS':'skills','MODEL':'model','LOCAL_DEPLOYMENT':'local-deployment','BTP_DEPLOYMENT':'btp-deployment','REGULATORY_REVIEW':'regulatory'}
 for index,(z,w) in enumerate((z,w) for z in CAT['oracles'] for w in z['expectedObservations']):
