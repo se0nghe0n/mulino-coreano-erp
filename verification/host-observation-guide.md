@@ -119,6 +119,7 @@ driverProvenance는 각각 선언한 host metadata와 StepResult provenance의
 | inspectArtifacts | inspectionId / 이미 존재하는 artifacts[] | 요청한 모든 파일의 exact identity와 완전한 독립 관찰 |
 | scanArtifacts | scanId / artifacts[]와 literal patterns[] | 각 파일 전체 bytes/digest/발견 위치 목록 |
 | verifyCoverage | registryHash, catalogHash / inputSnapshotKind와 그 입력 path | 실제 registry/catalog/assertion/artifact 연결 report. 아래 "verifyCoverage 입력 snapshot" |
+| enumerateWriteSurface | environmentId, enumerationId, allowlistSha256 / surfaces·probeClasses·allowlistRef·actorRef·targetPolicy | 실행 중 시스템이 노출한 쓰기 면 열거와 probe 결과. 아래 "enumerateWriteSurface 쓰기 면 열거" |
 
 생성 작업의 `generatedOutputs`는 최소 하나다. 보존 bundle 구성, 복원 수량·
 계보·현재 의무·원문 hash·definition v1 판정·인가, schema FK/수량 제약·
@@ -319,6 +320,56 @@ T25가 읽는 rawRows 출력은 다음과 같다. 값의 의미와 기대값은 
 PREPARATION의 `gate.semanticOracleEquivalence`는 준비 보고의 값
 `REQUIRES_CASE_REVIEW`이고, assembler runtime manifest의 값은
 `REQUIRES_CASE_AND_RUNTIME_REVIEW`다. 두 입력의 성질이 달라서 맞추지 않는다.
+
+## enumerateWriteSurface 쓰기 면 열거
+
+V4 `exposed-write-surface`(계획 §4.2·§13.2 V4 "실제 노출된 direct/nested/
+batch/projection 경로 모두 검사")의 host 조작이다. 고정 경로 목록이 아니라
+host command가 실행 중인 시스템의 쓰기 면을 직접 읽고, 열거한 쓰기 가능
+항목에 READ grant 주체로 probe한다. 독립 read-only extractor가 결과를
+구조화한다. LOCAL profile 전용이다.
+
+요청 parameters는 `environmentId`, `enumerationId`, `actorRef`,
+`surfaces`(ODATA_METADATA·MCP_SERVER_DISCOVER·MCP_TOOLS_LIST·
+WORKER_HANDLER_REGISTRY·MANAGEMENT_ENDPOINTS 중 비지 않은 집합),
+`probeClasses`(DIRECT_CREATE·DIRECT_UPDATE·DIRECT_DELETE·DEEP_INSERT·UPSERT·
+BATCH_CHANGESET·DRAFT_ACTIVATE·NESTED_NAVIGATION_CREATE/UPDATE/DELETE·
+BOUND_ACTION·UNBOUND_ACTION·MCP_TOOL_CALL·WORKER_HANDLER_SUBMIT·
+MANAGEMENT_ENDPOINT_WRITE 중 비지 않은 집합), `allowlistRef`,
+`allowlistSha256`, `targetPolicy=SYNTHETIC_FIXTURE_ENTITIES_ONLY`다.
+`operationEvidence`는 `environmentId`·`enumerationId`·`allowlistSha256`이고
+요청과 같아야 한다. 결과는 `extractor.rawRows`의 네 표다.
+
+| rawRows 경로 | 행 |
+|---|---|
+| `surfaces[]` | surface, sourceRef(읽은 원문 artifact), itemCount, sha256 |
+| `surfaceItems[]` | surface, itemId, kind, writeCapable, capabilityId(없으면 null), allowlisted |
+| `probes[]` | probeId, surface, target(itemId), probeClass, outcome, committed, transcriptRef |
+| `probeCoverage[]` | probeClass, applicableTargets, probedTargets, complete |
+
+probe `outcome`은 `contracts/domain-vocabulary.json`의 명령 outcome과
+`NOT_EXPOSED`(경로·method 없음), `UNKNOWN`(시간초과·응답 유실 등 결과 미확인)
+이다. UNKNOWN을 거부로 세지 않는다. validator(`writeSurface`)는 다음을
+검사한다. extractor 값을 그대로 믿지 않고 harness가 다시 계산하는 부분이 있다.
+
+- `allowlistRef`의 저장소 bytes가 `allowlistSha256`과 같고 그 artifact가
+  `inputArtifacts`에 같은 hash로 묶여 있다.
+- `surfaces`는 요청 집합과 정확히 같고 각 `sourceRef`는 같은 sha256의
+  `observedArtifacts`다. `itemCount`는 그 surface의 `surfaceItems` 수와 같다.
+- `surfaceItems`의 (surface, itemId)는 중복이 없고, `allowlisted`는
+  harness가 allowlist bytes에서 다시 계산한 값(`capabilityId`가 allowlist의
+  capability id인가)과 같다. extractor가 목록 밖 쓰기 항목을 allowlisted로
+  적으면 실패한다.
+- `writeCapable=true`인 항목은 모두 probe 대상이다. probe는 요청한
+  probeClass·열거된 항목만 쓰고 transcript가 StepResult artifact로 연결된다.
+- `probeCoverage`는 요청 probeClass와 정확히 같고 `probedTargets`는 probe
+  행의 서로 다른 target 수, `complete`는 `applicableTargets==probedTargets`다.
+
+목록 밖 쓰기 면 0, probe commit 0, APPLIED 0, UNKNOWN 0, probe class별
+완전성은 V4 case assertion이 판정한다. 이 validator는 열거 결과가 연결·
+재계산 계약을 지키는지만 본다. 실제 열거 adapter는 아직 없어 이 subcase는
+`NOT_IMPLEMENTED`(NOT_RUN)다. harness 표본(`enumerateWriteSurface-rows.json`)은
+`CAPTURED_SELFTEST`이며 제품 증거가 아니다.
 
 ## 실행 증거와 미실행 범위
 

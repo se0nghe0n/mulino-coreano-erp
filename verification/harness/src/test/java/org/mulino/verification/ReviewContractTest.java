@@ -78,6 +78,25 @@ public final class ReviewContractTest {
         StepResult mismatch=captured("observe",observation(),null,true);((ObjectNode)mismatch.provenance()).set("snapshot",Json.parse("{\"id\":\"OTHER\"}"));
         assertTrue(assertThrows(IllegalArgumentException.class,()->runner(file,Map.of("read",readResult(),"observe",mismatch)).run(false)).getMessage().contains("provenance"));
     }
+    /** step2-closure P3: the observer receives the issuing request identity, never the issued revision, so echo is detectable. */
+    @Test void resultRevisionObserverGetsIssuingRequestIdentityNotTheRevision() throws Exception {
+        Path file=caseFile(List.of(read(),observeAction("observe",RESULT_REF,"[\"effects\"]")),List.of(assertion("zero","observe","/data/data/effects",Json.MAPPER.valueToTree(0))));
+        var seen=new java.util.concurrent.atomic.AtomicReference<JsonNode>();
+        // An echoing observer copies whatever snapshotRef it was handed into snapshotRevision.
+        var echo=new Captures(Map.of("read",readResult())) {public StepResult observe(String id,JsonNode request) {
+            seen.set(request);ObjectNode data=observation();data.set("snapshotRevision",request.path("snapshotRef"));return captured(id,data,null,true);}};
+        String reason=assertThrows(IllegalArgumentException.class,()->CaseRunner.harnessSelftest(new ContractValidator(root),echo,new AgentRunner.Scripted(),file,subcase).run(false)).getMessage();
+        assertTrue(reason.contains("snapshotRevision"),reason);
+        JsonNode request=seen.get();
+        assertEquals(CaseRunner.RESULT_REVISION,request.path("snapshotRef").asText());
+        assertFalse(request.toString().contains("revision-W"),"the issued revision must not reach the observer: "+request);
+        JsonNode source=request.path("snapshotSource");
+        assertEquals("read",source.path("actionId").asText());assertEquals("/response/snapshotRevision",source.path("pointer").asText());
+        assertEquals("qc",source.path("actorRef").asText());assertEquals("placeHold",source.path("capabilityId").asText());
+        assertTrue(source.path("actor").isObject() && source.path("request").isObject(),source.toString());
+        // A recomputing observer (here: the captured recomputed value) still passes.
+        assertEquals("PASS",runner(file,Map.of("read",readResult(),"observe",captured("observe",observation(),null,true))).run(false));
+    }
     @Test void directiveSnapshotUsesObserverTokenAndOrderedCaptureNotEcho() throws Exception {
         JsonNode directive=Json.MAPPER.valueToTree("CURRENT_COMMITTED");
         Path file=caseFile(List.of(observeAction("first",directive,"[\"effects\"]"),observeAction("observe",directive,"[\"effects\"]")),List.of(assertion("zero","observe","/data/data/effects",Json.MAPPER.valueToTree(0))));

@@ -56,11 +56,28 @@ exit code를 출력하며 `verification/harness/target/wrapper-commands.json`에
   - **규범 lock과 case 자산 검사**: `prepare.json`의 `caseAssetChecks`에
     command·script hash·exit를 남긴다. `verification/requirements/
     validate_catalog.py`(assembler가 쓰는 같은 lock 검증기, 빈·null lock도
-    FAIL), `verification/cases/V2/cases_b_invariants.py`,
+    FAIL), `verification/requirements/check_layer_routes.py`(관찰 단위
+    MCP·SKILLS 경로, assembler도 같은 검사를 읽는다),
+    `verification/cases/V2/cases_b_invariants.py`,
     `verification/cases/T08/bind_observations.py --check`,
-    `verification/mcp-tests/test_generators_reproduce.py`(생성기 출력과
-    commit 파일의 byte 동일성)다. 모두 읽기 전용이며 python이나 script가
-    없으면 실패한다.
+    `verification/cases/V7/bind_observations.py V4|V6|V7 --check`,
+    `verification/requirements/check_derived_bindings.py`(모든
+    observation-bindings.json의 caseHash·catalogSha256 stamp),
+    `verification/mcp-tests/test_generators_reproduce.py`와
+    `verification/requirements/test_case_generators_reproduce.py`(생성기
+    출력과 commit 파일의 byte 동일성, 임시 복사본에서 실행)다. 모두
+    저장소를 쓰지 않으며 python이나 script가 없으면 실패한다. 출력의
+    `KNOWN_OPEN` 행(owner가 기록된 열린 gap)은 check 기록의 `knownOpen`과
+    보고서 `knownOpenGaps`에 옮긴다. 목록은
+    `verification/requirements/layer-route-review.json`과
+    `check_derived_bindings.py`의 기록이며, 닫힌 gap의 항목이 남으면 실패한다.
+  - **정의되지 않은 host 조작**: `type=process` control의 operation이
+    `contracts/acceptance-host-observation.schema.json`의 operation enum에
+    없으면 문제로 센다(`ContractValidator.hostOperationProblems`).
+  - **실행 경로가 없는 증거**: 보고서 `runtimeGates`에 이 harness가 만들
+    수 없는 필수 증거를 이름으로 남긴다. 현재는 regulatory profile(T15
+    REGULATORY_REVIEW 관찰 3개)이다. `./verify regulatory`는 exit2
+    `NOT_RUN_GATED`만 보고하고 receipt를 쓰지 않는다.
   - **비정규 오류 pointer**: 아래 "응답 오류 envelope" 절.
 - `coverage`: `verification/model-binding/run prepare` 뒤
   `python3 verification/coverage/assemble.py --check-preparation`을 실행하고
@@ -73,18 +90,29 @@ exit code를 출력하며 `verification/harness/target/wrapper-commands.json`에
 - `schema`, `contracts`, `scenarios`, `recovery`, `mcp`, `skills`, `model`,
   `deployment`: 실제 adapter가 없는 현재는 `NOT_RUN`, exit2다. 선행
   profile과 미완료 gate를 보고한다. 모델·유료 배포를 호출하지 않는다.
-  보고서에는 assembler가 읽는 `discovered`·`started`·`completed`(이
-  profile에 선택된 subcase 수)와 `skipped=0`이 있다. `gateComplete`는 이
-  profile 자체의 gate다. 실제 driver(`--actual`)로 선택된 모든 subcase가
-  발견·시작·완료되고 PASS일 때만 true다. 선행 profile은
+  보고서에는 assembler가 읽는 `discovered`(저장소가 이 profile에 선언한
+  subcase 수)·`started`·`completed`(실행한 수)와 `skipped=0`,
+  `explicitCaseSelection`, 첫 case 전의 `preRun`(HEAD·git status·시각)이
+  있다. case 파일을 명시한 실행은 부분 실행이라 `discovered`가 실행 수보다
+  크고 `gateComplete=false`다. `gateComplete`는 이 profile 자체의 gate다.
+  case 파일을 명시하지 않은 실제 driver(`--actual`) 실행에서 선언된 모든
+  subcase가 시작·완료되고 PASS일 때만 true다. 선행 profile은
   `prerequisiteRuntimeComplete=false`로 남기고 assembler가 합성한다.
 - `--actual`의 schema~skills profile 실행은 coverage receipt를 만든다
   (`ExecutionReceiptProducer`). 조건을 하나라도 못 채우면 receipt를 쓰지
   않고 stdout `COVERAGE_RECEIPT {"status":"NOT_EMITTED",...}`로 이유를 낸다.
-  조건: 실제 driver, 모든 case가 PRODUCT 정책, 실행 action provenance에
-  selftest/captured/stub 표지 없음, 실행 전후 clean working tree,
-  `ACTUAL_BUILD_COMMIT`=기록 commit, `ACTUAL_SCHEMA_VERSION`·(scenarios
-  이후)`ACTUAL_DB_VERSION`·(mcp/skills)`ACTUAL_MCP_PROTOCOL_VERSION`.
+  조건: 실제 driver, 모든 case가 PRODUCT 정책, 실행 action provenance의
+  label 값(`source`·`adapter`·`adapterVersion`·`buildVersion`·
+  `snapshot.isolation`·`sourceQuery.mappingVersion`)에 selftest/canned/
+  stub/fake/captured/unimplemented 표지 없음(key나 `capturedAt` 같은 data는
+  보지 않는다), command가 profile 이름을 포함하고 case 파일 명시가 없음,
+  Main이 첫 case 전(`preRun`)과 실행 뒤에 직접 본 working tree가 같은
+  HEAD에서 clean, `ACTUAL_BUILD_COMMIT`=기록 commit,
+  `ACTUAL_SCHEMA_VERSION`·(scenarios 이후)`ACTUAL_DB_VERSION`·(mcp/skills)
+  `ACTUAL_MCP_PROTOCOL_VERSION`. receipt는 `workingTreeObservations`
+  (before/after)와 `buildIdentity`를 남긴다. backend가 build-info를
+  노출하지 않으므로 build commit은 관찰이 아니라 선언이며
+  `buildIdentity.source=DECLARED_ACTUAL_BUILD_COMMIT`로 그렇게 적는다.
   산출물은 `target/evidence/<profile>-receipt.json`, envelope 문서
   `target/evidence/receipts/<profile>-<runId>/`, 갱신된
   `target/evidence/actual-runtime-evidence-index.json`이다. 실행 identity의
@@ -245,10 +273,16 @@ observe의 요청 `scope`/`asOf`/`knownAt`은 결과의 같은 필드와 정확�
 같아야 한다. API의 logical read revision과 observer의 MVCC snapshot은
 다르다. `snapshotRef`는 둘 중 하나다.
 
-- `$result`로 받은 API `snapshotRevision`: observer는 권한 범위의 원행에서
-  projection revision을 독립 재계산해 `data.snapshotRevision`에 같은 값을
-  낸다. `data.snapshot.readMode=RESULT_REVISION`과 재계산 query
-  `snapshot.revisionQuery`가 필수다. API 값을 복사하지 않는다.
+- `$result`로 받은 API `snapshotRevision`: harness는 이 값을 observer에
+  넘기지 않는다. observer 요청에는 `snapshotRef=RESULT_REVISION`과
+  `snapshotSource`(그 revision을 발급한 action의 id·pointer·kind·route·
+  capabilityId·actorRef·fixture actor·해석된 request)가 간다. observer는
+  권한 범위의 원행에서 projection revision을 재계산해
+  `data.snapshotRevision`에 내고, harness가 보관한 발급 값과 비교한다.
+  `data.snapshot.readMode=RESULT_REVISION`과 재계산 query
+  `snapshot.revisionQuery`가 필수다. 요청에 값이 없으므로 복사(echo)는
+  불일치로 드러난다. 현재 actual observer(`ObserverSnapshot`)는 이
+  재계산을 구현하지 않아 `NOT_IMPLEMENTED`(NOT_RUN)다.
 - literal directive `CURRENT_COMMITTED`/`CURRENT_LOCK_WAIT`: 앞선 action이
   끝난 뒤의 새 read다. `readMode`가 directive와 같아야 하고
   `snapshotRevision`은 observer 자신의 값이다. 다른 literal은 schema가

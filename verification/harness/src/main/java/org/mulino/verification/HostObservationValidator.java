@@ -10,7 +10,7 @@ import java.util.*;
 /** Validates captured host evidence; never launches a command or implements product behavior. */
 public final class HostObservationValidator {
     private static final Set<String> READ_OPERATIONS=Set.of("inspectArtifacts","scanArtifacts");
-    private static final Set<String> LOCAL_ONLY=Set.of("archiveInventory","archiveRestore","dataInventory","schemaInstall","schemaUpgrade","compileSchema","compilerSchemaProbe","backup","restore","cutoverStage","inspectArtifacts","scanArtifacts","verifyCoverage");
+    private static final Set<String> LOCAL_ONLY=Set.of("archiveInventory","archiveRestore","dataInventory","schemaInstall","schemaUpgrade","compileSchema","compilerSchemaProbe","backup","restore","cutoverStage","inspectArtifacts","scanArtifacts","verifyCoverage","enumerateWriteSurface");
     private HostObservationValidator() {}
 
     /** resolvedControl is the already-resolved action.control object, not the enclosing action. */
@@ -76,6 +76,7 @@ public final class HostObservationValidator {
         if(operation.equals("scanArtifacts")) scan(validator,requested,host);
         if(Set.of("tickScheduler","sweepDue").contains(operation)) schedulerSubmission(requested,host);
         if(operation.equals("verifyCoverage")) coverageSnapshot(validator,requested,host,extractedRows);
+        if(operation.equals("enumerateWriteSurface")) writeSurface(validator,requested,host,extractedRows,result);
         if(operation.equals("awaitRuntimeTask")) runtimeTask(validator,requested,host,result);
         if(Set.of("start","stop","restart").contains(operation)) lifecycle(validator,requested,host,result);
     }
@@ -164,6 +165,82 @@ public final class HostObservationValidator {
             ContractValidator.require(own==status.equals("CURRENT_EXECUTION"),"Only the currentExecution case's links are CURRENT_EXECUTION, and all of them are: "+link.path("caseId").asText()+" "+status);
         }
     }
+    static final Set<String> WRITE_SURFACES=Set.of("ODATA_METADATA","MCP_SERVER_DISCOVER","MCP_TOOLS_LIST","WORKER_HANDLER_REGISTRY","MANAGEMENT_ENDPOINTS");
+    static final Set<String> PROBE_CLASSES=Set.of("DIRECT_CREATE","DIRECT_UPDATE","DIRECT_DELETE","DEEP_INSERT","UPSERT","BATCH_CHANGESET","DRAFT_ACTIVATE",
+        "NESTED_NAVIGATION_CREATE","NESTED_NAVIGATION_UPDATE","NESTED_NAVIGATION_DELETE","BOUND_ACTION","UNBOUND_ACTION","MCP_TOOL_CALL","WORKER_HANDLER_SUBMIT","MANAGEMENT_ENDPOINT_WRITE");
+    /** Transport-level probe results beside the command outcomes of contracts/domain-vocabulary.json. */
+    static final Set<String> PROBE_TRANSPORT_OUTCOMES=Set.of("NOT_EXPOSED","UNKNOWN");
+    static final String SYNTHETIC_TARGETS="SYNTHETIC_FIXTURE_ENTITIES_ONLY";
+    /**
+     * V4 exposed-write-surface (plan §4.2/§13.2 V4): the host command reads the running system's write surfaces itself
+     * (OData $metadata, MCP server/discover and tools/list, worker handler registry, management endpoints), probes every
+     * write-capable item with the requested probe classes as the READ-grant actor, and an independent read-only extractor
+     * records surfaces, items, probes and per-class coverage. The harness does not trust the extractor's own allowlist
+     * verdict: it re-reads the committed allowlist bytes and recomputes allowlisted for every item. It also requires every
+     * write-capable item to be probed and the per-class coverage counts to equal the probe rows. Whether any probe was
+     * APPLIED, committed or UNKNOWN is the case's oracle, not this validator's.
+     */
+    private static void writeSurface(ContractValidator validator,JsonNode requested,JsonNode host,JsonNode rows,StepResult result) throws IOException {
+        for(String key:List.of("environmentId","enumerationId","actorRef","allowlistRef","allowlistSha256","targetPolicy")) Json.required(requested,key);
+        ContractValidator.require(SYNTHETIC_TARGETS.equals(requested.path("targetPolicy").asText()),"enumerateWriteSurface probes only synthetic fixture entities (targetPolicy "+SYNTHETIC_TARGETS+")");
+        Set<String> surfaces=requestedSet(requested.path("surfaces"),WRITE_SURFACES,"surfaces"),classes=requestedSet(requested.path("probeClasses"),PROBE_CLASSES,"probeClasses");
+        String allowlistRef=requested.path("allowlistRef").asText(),allowlistSha=requested.path("allowlistSha256").asText();
+        ContractValidator.require(Json.sha256(file(validator,allowlistRef)).equals(allowlistSha),"Requested allowlistSha256 differs from the committed allowlist bytes "+allowlistRef);
+        boolean bound=false;for(JsonNode a:host.path("inputArtifacts")) if(a.path("path").asText().equals(allowlistRef) && a.path("sha256").asText().equals(allowlistSha)) bound=true;
+        ContractValidator.require(bound,"The enumeration's allowlist is not bound by hash in inputArtifacts: "+allowlistRef);
+        Set<String> allowlist=new HashSet<>();
+        for(JsonNode capability:Json.read(file(validator,allowlistRef)).path("capabilities")) allowlist.add(Json.required(capability,"id"));
+        ContractValidator.require(!allowlist.isEmpty(),"Allowlist has no capability ids: "+allowlistRef);
+        Set<String> outcomes=new HashSet<>(PROBE_TRANSPORT_OUTCOMES);
+        for(JsonNode o:Json.read(file(validator,"contracts/domain-vocabulary.json")).path("outcomes")) outcomes.add(Json.required(o,"outcome"));
+        Map<String,JsonNode> observed=new HashMap<>();for(JsonNode a:host.path("observedArtifacts")) observed.put(a.path("path").asText(),a);
+        Map<String,Integer> itemCounts=new HashMap<>();Set<String> seenSurfaces=new HashSet<>();
+        for(JsonNode row:rows.path("surfaces")) {
+            String surface=Json.required(row,"surface");
+            ContractValidator.require(surfaces.contains(surface) && seenSurfaces.add(surface),"Enumerated surface is unrequested or duplicated: "+surface);
+            JsonNode artifact=observed.get(row.path("sourceRef").asText());
+            ContractValidator.require(artifact!=null && artifact.path("sha256").equals(row.path("sha256")),"Surface source is not a hash-bound observed artifact: "+surface);
+            itemCounts.put(surface,row.path("itemCount").asInt(-1));
+        }
+        ContractValidator.require(seenSurfaces.equals(surfaces),"Enumeration omitted requested surfaces "+difference(surfaces,seenSurfaces));
+        Map<String,Integer> actualCounts=new HashMap<>();Set<String> items=new HashSet<>(),writable=new TreeSet<>();
+        for(JsonNode item:rows.path("surfaceItems")) {
+            String surface=Json.required(item,"surface"),key=surface+"|"+Json.required(item,"itemId");
+            ContractValidator.require(surfaces.contains(surface) && items.add(key),"Surface item is unrequested or duplicated: "+key);
+            actualCounts.merge(surface,1,Integer::sum);
+            boolean listed=item.path("capabilityId").isTextual() && allowlist.contains(item.path("capabilityId").asText());
+            ContractValidator.require(item.path("allowlisted").isBoolean() && item.path("allowlisted").asBoolean()==listed,"Surface item allowlisted differs from the committed allowlist: "+key);
+            if(item.path("writeCapable").asBoolean(false)) writable.add(key);
+        }
+        for(String surface:surfaces) ContractValidator.require(itemCounts.get(surface)==actualCounts.getOrDefault(surface,0),"Surface itemCount differs from its enumerated items: "+surface);
+        Set<String> probeIds=new HashSet<>(),probed=new HashSet<>();Map<String,Set<String>> targetsByClass=new HashMap<>();
+        for(JsonNode probe:rows.path("probes")) {
+            String id=Json.required(probe,"probeId"),surface=Json.required(probe,"surface"),probeClass=Json.required(probe,"probeClass"),key=surface+"|"+Json.required(probe,"target");
+            ContractValidator.require(probeIds.add(id),"Duplicate probe "+id);
+            ContractValidator.require(classes.contains(probeClass),"Probe uses an unrequested probe class: "+id+" "+probeClass);
+            ContractValidator.require(items.contains(key),"Probe target is not an enumerated surface item: "+id+" "+key);
+            ContractValidator.require(outcomes.contains(probe.path("outcome").asText()),"Unknown probe outcome "+probe.path("outcome").asText());
+            evidence(validator,Json.required(probe,"transcriptRef"),result);
+            probed.add(key);targetsByClass.computeIfAbsent(probeClass,k->new HashSet<>()).add(key);
+        }
+        ContractValidator.require(probed.containsAll(writable),"Write-capable surface items were enumerated but never probed: "+difference(writable,probed));
+        Set<String> coveredClasses=new HashSet<>();
+        for(JsonNode coverage:rows.path("probeCoverage")) {
+            String probeClass=Json.required(coverage,"probeClass");
+            ContractValidator.require(classes.contains(probeClass) && coveredClasses.add(probeClass),"Probe coverage class is unrequested or duplicated: "+probeClass);
+            int applicable=coverage.path("applicableTargets").asInt(-1),done=coverage.path("probedTargets").asInt(-1);
+            ContractValidator.require(done==targetsByClass.getOrDefault(probeClass,Set.of()).size(),"Probe coverage probedTargets differs from probe rows: "+probeClass);
+            ContractValidator.require(applicable>=done && coverage.path("complete").isBoolean() && coverage.path("complete").asBoolean()==(applicable==done),"Probe coverage completeness contradicts its counts: "+probeClass);
+        }
+        ContractValidator.require(coveredClasses.equals(classes),"Probe coverage omitted requested classes "+difference(classes,coveredClasses));
+    }
+    private static Set<String> requestedSet(JsonNode values,Set<String> vocabulary,String name) {
+        ContractValidator.require(values.isArray() && !values.isEmpty(),"enumerateWriteSurface requires a non-empty "+name+" list");
+        Set<String> set=new HashSet<>();
+        for(JsonNode v:values) ContractValidator.require(vocabulary.contains(v.asText()) && set.add(v.asText()),"Unknown or duplicate requested "+name+" entry "+v.asText());
+        return set;
+    }
+    private static Set<String> difference(Set<String> left,Set<String> right) {Set<String> d=new TreeSet<>(left);d.removeAll(right);return d;}
     private static void lifecycle(ContractValidator validator,JsonNode requested,JsonNode host,StepResult result) throws IOException {
         JsonNode observed=host.path("processObservation"),before=observed.path("before"),after=observed.path("after");
         String process=Json.required(requested,"processId");

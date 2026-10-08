@@ -49,6 +49,15 @@ public final class HostObservationValidatorTest {
             params.put("registryPath",dir+"coverage-registry.json").put("catalogPath",dir+"coverage-catalog.json").put("inputSnapshotKind","PREPARATION").put("preparationReportPath",dir+"coverage-preparation.json");
             for(String name:List.of("coverage-registry.json","coverage-catalog.json","coverage-preparation.json")) ((ArrayNode)host.path("inputArtifacts")).add(artifact(name));
         }
+        if(operation.equals("enumerateWriteSurface")) {
+            String allowlist="contracts/acceptance-capabilities.json";
+            params.put("environmentId","synthetic-environmentId").put("enumerationId","synthetic-enumerationId").put("actorRef","reader");
+            params.set("surfaces",Json.parse("[\"ODATA_METADATA\",\"MCP_TOOLS_LIST\"]"));params.set("probeClasses",Json.parse("[\"UNBOUND_ACTION\",\"MCP_TOOL_CALL\"]"));
+            params.put("allowlistRef",allowlist).put("allowlistSha256",Json.sha256(root.resolve(allowlist))).put("targetPolicy","SYNTHETIC_FIXTURE_ENTITIES_ONLY");
+            ObjectNode a=Json.object();a.put("path",allowlist).put("sha256",Json.sha256(root.resolve(allowlist))).put("sizeBytes",Files.size(root.resolve(allowlist))).put("completeness","COMPLETE");a.set("scope",Json.parse("{\"workspace\":\"host-selftest\"}"));
+            ((ArrayNode)host.path("inputArtifacts")).add(a);
+            for(String name:List.of("safe.txt","sentinel.txt")) {((ArrayNode)host.path("observedArtifacts")).add(artifact(name));inputs.add(artifact(name));}
+        }
         if(operation.equals("awaitRuntimeTask")) {
             JsonNode snap=Json.read(root.resolve(dir+"runtime-snapshot.json"));ObjectNode task=Json.object();
             for(String key:List.of("taskId","invocationHandle","origin","terminalStatus","completedAt")) task.set(key,snap.path(key));
@@ -68,6 +77,40 @@ public final class HostObservationValidatorTest {
     @Test void everyBoundedOperationAcceptsFixedObservationButDoesNotExecuteAProcess() throws Exception {
         JsonNode schema=Json.read(root.resolve("contracts/acceptance-host-observation.schema.json"));
         for(JsonNode op:schema.path("properties").path("operation").path("enum")) check(capture(op.asText()));
+    }
+    private String rejectSurface(java.util.function.Consumer<Capture> change) throws Exception {
+        Capture c=capture("enumerateWriteSurface");change.accept(c);
+        ObjectNode rows=(ObjectNode)c.host.path("extractor").path("rawRows");
+        // Mutated rows are written to a disposable copy so the extractor artifact still matches its bytes.
+        Path copy=Files.createTempFile(root.resolve("verification/harness/target"),"enumerate-rows-",".json");Json.write(copy,rows);
+        String ref=root.relativize(copy).toString();((ObjectNode)c.host.path("extractor")).put("rawRowsArtifactRef",ref);
+        ObjectNode a=Json.object();a.put("path",ref).put("sha256",Json.sha256(copy)).put("sizeBytes",Files.size(copy)).put("completeness","COMPLETE");a.set("scope",Json.parse("{\"workspace\":\"host-selftest\"}"));
+        ((ArrayNode)c.host.path("extractor").path("inputArtifacts")).set(0,a);
+        List<String> refs=new ArrayList<>(c.result.artifactRefs());refs.add(ref);
+        StepResult result=new StepResult(c.result.actionId(),c.result.driverStatus(),c.result.data(),null,c.result.reason(),c.result.provenance(),refs);
+        return assertThrows(IllegalArgumentException.class,()->HostObservationValidator.validate(new ContractValidator(root),c.control,result)).getMessage();
+    }
+    /** V4 exposed-write-surface: the enumeration contract is defined, and the harness recomputes what the extractor claims. */
+    @Test void writeSurfaceEnumerationIsCheckedAgainstTheCommittedAllowlistAndProbeRows() throws Exception {
+        check(capture("enumerateWriteSurface"));
+        assertTrue(rejectSurface(c->((ObjectNode)c.host.path("extractor").path("rawRows").path("surfaceItems").get(0)).put("writeCapable",true)).contains("never probed"));
+        assertTrue(rejectSurface(c->((ObjectNode)c.host.path("extractor").path("rawRows").path("surfaceItems").get(1)).put("capabilityId","rawCoreInsert")).contains("allowlist"),
+            "an extractor cannot mark an unlisted write item allowlisted");
+        assertTrue(rejectSurface(c->((ArrayNode)c.host.path("extractor").path("rawRows").path("surfaces")).remove(1)).contains("omitted requested surfaces"));
+        assertTrue(rejectSurface(c->((ObjectNode)c.host.path("extractor").path("rawRows").path("surfaces").get(0)).put("itemCount",5)).contains("itemCount"));
+        assertTrue(rejectSurface(c->((ObjectNode)c.host.path("extractor").path("rawRows").path("probeCoverage").get(0)).put("applicableTargets",2)).contains("completeness"));
+        assertTrue(rejectSurface(c->((ObjectNode)c.host.path("extractor").path("rawRows").path("probeCoverage").get(0)).put("probedTargets",0).put("complete",false)).contains("probedTargets"));
+        assertTrue(rejectSurface(c->((ArrayNode)c.host.path("extractor").path("rawRows").path("probeCoverage")).remove(1)).contains("omitted requested classes"));
+        assertTrue(rejectSurface(c->((ObjectNode)c.host.path("extractor").path("rawRows").path("probes").get(0)).put("target","Unknown")).contains("not an enumerated surface item"));
+        assertTrue(rejectSurface(c->((ObjectNode)c.host.path("extractor").path("rawRows").path("probes").get(0)).put("outcome","DENIED")).contains("outcome"));
+        assertTrue(rejectSurface(c->{((ObjectNode)c.control.path("parameters")).put("targetPolicy","ANY");c.host.set("requestedInputs",c.control.path("parameters").deepCopy());}).contains("synthetic"));
+    }
+    @Test void preparationRejectsAProcessOperationOutsideTheHostVocabulary() throws Exception {
+        ContractValidator v=new ContractValidator(root);
+        assertEquals(List.of(),v.hostOperationProblems(Json.read(root.resolve("verification/cases/V4/case.json"))),"enumerateWriteSurface is defined");
+        ObjectNode c=(ObjectNode)Json.parse("{\"caseId\":\"V4\",\"subcases\":[{\"id\":\"s\",\"actions\":[{\"id\":\"x\",\"kind\":\"control\",\"control\":{\"type\":\"process\",\"operation\":\"listEverything\",\"parameters\":{}}}]}]}");
+        List<String> problems=v.hostOperationProblems(c);
+        assertEquals(1,problems.size());assertTrue(problems.get(0).contains("listEverything is not defined"),problems.toString());
     }
     @Test void unavailableAdaptersRemainUnavailableAndAckCannotReplaceObservation() throws Exception {
         Capture c=capture("inspectArtifacts");StepResult missing=StepResult.missing("missing","actual process adapter NOT_IMPLEMENTED");

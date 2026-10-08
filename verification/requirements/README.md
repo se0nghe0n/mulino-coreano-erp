@@ -186,3 +186,44 @@ python3 -m unittest discover -s verification/requirements -p 'test_layer_routes.
 PASS가 아니다. API layer는 검사하지 않는다. 효과 관찰은 DB 원행이
 artifact이고 명령 응답은 같은 oracle의 다른 관찰에서 API로 읽기
 때문이다.
+
+### gate 연결과 기록된 예외 목록(2026-10-08, 3라운드)
+
+2라운드의 검사는 어떤 gate에도 연결되지 않았고 예외 목록이 script 안의
+상수였다. 3라운드에서 다음을 고쳤다.
+
+- 예외는 `layer-route-review.json`에 기록한다. 항목마다 `status`
+  (EXEMPT·KNOWN_OPEN), oracleId·observationName·layer, `owner`,
+  `reason`이 필수이고 KNOWN_OPEN은 `closeWhen`(종료 조건)도 필수다.
+  필드가 빠진 항목은 예외로 인정하지 않아 gap이 FAIL로 드러난다.
+- 목록은 정확해야 한다. gap이 아닌 항목(닫힌 gap의 남은 기록)은
+  `stale layer-route review entry`로 실패한다. owner가 gap을 닫으면
+  항목도 지워야 한다.
+- `./verify prepare`가 `caseAssetChecks`의 `layer-routes`로 실행하고
+  KNOWN_OPEN 행을 `knownOpenGaps`에 옮긴다. coverage assembler도
+  `review()`를 불러 같은 판정을 하고 KNOWN_OPEN 관찰을 NOT_RUN으로 둔다.
+
+## 파생 binding stamp와 생성기 재현(2026-10-08, 3라운드)
+
+`observation-bindings.json`은 case.json과 catalog에서 만든 파생 자료다.
+d84f2942의 catalog 변경 뒤 T08만 다시 만들었고 V4·V6·V7·C3는 이전
+catalogSha256(61968b22…)을 유지했는데 prepare는 이를 보지 못했다.
+
+- `check_derived_bindings.py`는 모든 bindings 파일의 `caseHash`·
+  `catalogSha256`이 현재 입력의 sha256과 같은지 본다. C3는
+  `author_prerequisites.py`가 catalogSha256을 갱신하지 않아 harness
+  worker가 생성기 실행만으로 고칠 수 없다. 이 한 건을 owner·종료 조건과
+  함께 script의 KNOWN_OPEN으로 기록했다. stamp가 맞춰지면 이 항목이
+  stale로 실패하므로 함께 지운다.
+- `test_case_generators_reproduce.py`는 V4 `author_review_fixes.py`,
+  T06 `author_contracts.py`(T06·T22·T24), `platform-tests/build_cases.py`
+  (T23·V8)를 임시 복사본에서 실행하고 쓰는 디렉터리 전체가 commit과
+  byte 단위로 같은지 본다. post-processor(C3·T26·V4)는 자기 출력에 대한
+  고정점(멱등)만 증명한다.
+- 둘 다 `./verify prepare`의 `caseAssetChecks`다. V4·V6·V7 내용 drift는
+  `V7/bind_observations.py V4|V6|V7 --check`가 따로 본다.
+
+```bash
+python3 verification/requirements/check_derived_bindings.py
+python3 -m unittest discover -s verification/requirements -p 'test_case_generators_reproduce.py'
+```
