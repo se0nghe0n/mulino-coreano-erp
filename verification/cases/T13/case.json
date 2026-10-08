@@ -13382,11 +13382,70 @@
             "asOf": "2026-10-07T09:00:00Z",
             "knownAt": "2026-10-07T09:00:01Z",
             "sources": [
-              "receiptContributions"
+              "receiptContributions",
+              "segments"
             ]
           },
           "evidenceRefs": [
             "return-db:actual-adapter-artifact"
+          ]
+        },
+        {
+          "id": "split40",
+          "kind": "invoke",
+          "actorRef": "warehouse",
+          "route": "api",
+          "capabilityId": "splitQuantity",
+          "request": {
+            "intentKind": "COMMAND",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "splitQuantity",
+            "subjectRefs": [
+              {
+                "type": "TradeItem",
+                "id": {
+                  "$alias": "P"
+                }
+              }
+            ],
+            "slots": {
+              "segmentId": {
+                "value": {
+                  "$result": {
+                    "actionId": "receipt40",
+                    "pointer": "/response/segmentId"
+                  }
+                },
+                "provenance": "CONTEXT"
+              },
+              "children": {
+                "value": [
+                  {
+                    "alias": "MOVE20",
+                    "quantity": "20",
+                    "unit": "BOX"
+                  },
+                  {
+                    "alias": "STAY20",
+                    "quantity": "20",
+                    "unit": "BOX"
+                  }
+                ],
+                "provenance": "USER"
+              },
+              "reason": {
+                "value": "부분 장소 이동 전 범위 분리",
+                "provenance": "USER"
+              }
+            },
+            "expectedRevision": 1,
+            "commandIdempotencyKey": "T13-partial-excess-return-relocation-split40",
+            "evidenceRefs": [
+              "need"
+            ]
+          },
+          "evidenceRefs": [
+            "split40:actual-adapter-artifact"
           ]
         },
         {
@@ -13411,8 +13470,8 @@
               "segmentId": {
                 "value": {
                   "$result": {
-                    "actionId": "receipt40",
-                    "pointer": "/response/segmentId"
+                    "actionId": "split40",
+                    "pointer": "/response/children/MOVE20/segmentId"
                   }
                 },
                 "provenance": "CONTEXT"
@@ -13496,7 +13555,8 @@
             "asOf": "2026-10-07T09:00:00Z",
             "knownAt": "2026-10-07T09:00:01Z",
             "sources": [
-              "receiptContributions"
+              "receiptContributions",
+              "segments"
             ]
           },
           "evidenceRefs": [
@@ -14231,6 +14291,121 @@
           }
         },
         {
+          "id": "dispatch-sale-applied",
+          "op": "equals",
+          "source": {
+            "actionId": "dispatch-sale",
+            "pointer": "/response/outcome"
+          },
+          "expected": "APPLIED",
+          "requirementRefs": [
+            "D13"
+          ],
+          "evidenceRefs": [
+            "dispatch-sale:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "T13",
+            "subcaseId": "partial-excess-return-relocation",
+            "itemId": {
+              "$alias": "P"
+            }
+          },
+          "oracleExplanation": "수령60에서 예약한 10 BOX가 실제로 출고됐다. 출고가 없으면 아래 반품은 원 구매 기여를 바꿀 기회가 없다.",
+          "oracleRef": {
+            "oracleId": "T13.partial-and-excess-contributions",
+            "observationNames": [
+              "return-added-to-purchase"
+            ]
+          }
+        },
+        {
+          "id": "return-applied",
+          "op": "equals",
+          "source": {
+            "actionId": "return",
+            "pointer": "/response/outcome"
+          },
+          "expected": "APPLIED",
+          "requirementRefs": [
+            "D13"
+          ],
+          "evidenceRefs": [
+            "return:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "T13",
+            "subcaseId": "partial-excess-return-relocation",
+            "itemId": {
+              "$alias": "P"
+            }
+          },
+          "oracleExplanation": "고객 반품10 실물 접수가 실제로 적용됐다. 이 결과가 있어야 뒤의 기여 불변이 반품 뒤의 관찰이다.",
+          "oracleRef": {
+            "oracleId": "T13.partial-and-excess-contributions",
+            "observationNames": [
+              "return-added-to-purchase"
+            ]
+          }
+        },
+        {
+          "id": "returned-at-W",
+          "op": "sumEquals",
+          "source": {
+            "actionId": "return-db",
+            "pointer": "/data/rawRows/segments",
+            "field": "quantity",
+            "where": {
+              "locationId": {
+                "$alias": "W"
+              },
+              "active": true
+            }
+          },
+          "expected": "105",
+          "requirementRefs": [
+            "D13"
+          ],
+          "evidenceRefs": [
+            "return-db:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "T13",
+            "subcaseId": "partial-excess-return-relocation",
+            "itemId": {
+              "$alias": "P"
+            }
+          },
+          "oracleExplanation": "수령 105 − 출고 10 + 반품 10 = W 활성 105 BOX다. 출고가 적용된 뒤이므로 반품10이 W에 실제로 들어온 것이다.",
+          "oracleRef": {
+            "oracleId": "T13.partial-and-excess-contributions",
+            "observationNames": [
+              "return-added-to-purchase"
+            ]
+          },
+          "unit": "BOX",
+          "unitSource": {
+            "actionId": "return-db",
+            "pointer": "/data/rawRows/segments",
+            "field": "unit",
+            "where": {
+              "locationId": {
+                "$alias": "W"
+              },
+              "active": true
+            }
+          }
+        },
+        {
           "id": "return-no-new-contribution",
           "op": "sameAs",
           "source": {
@@ -14264,6 +14439,140 @@
           "baseline": {
             "actionId": "receipt-db",
             "pointer": "/data/rawRows/receiptContributions"
+          }
+        },
+        {
+          "id": "move-applied",
+          "op": "equals",
+          "source": {
+            "actionId": "move",
+            "pointer": "/response/outcome"
+          },
+          "expected": "APPLIED",
+          "requirementRefs": [
+            "D13"
+          ],
+          "evidenceRefs": [
+            "move:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "T13",
+            "subcaseId": "partial-excess-return-relocation",
+            "itemId": {
+              "$alias": "P"
+            }
+          },
+          "oracleExplanation": "수령40에서 분할한 20 BOX의 W→W-alt 내부 이동이 실제로 적용됐다.",
+          "oracleRef": {
+            "oracleId": "T13.partial-and-excess-contributions",
+            "observationNames": [
+              "relocation-added-to-purchase"
+            ]
+          }
+        },
+        {
+          "id": "relocated-at-W-alt",
+          "op": "sumEquals",
+          "source": {
+            "actionId": "move-db",
+            "pointer": "/data/rawRows/segments",
+            "field": "quantity",
+            "where": {
+              "locationId": {
+                "$alias": "W-alt"
+              },
+              "active": true
+            }
+          },
+          "expected": "20",
+          "requirementRefs": [
+            "D13"
+          ],
+          "evidenceRefs": [
+            "move-db:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "T13",
+            "subcaseId": "partial-excess-return-relocation",
+            "itemId": {
+              "$alias": "P"
+            }
+          },
+          "oracleExplanation": "이동 뒤 W-alt의 활성 실물은 수령40 계보의 20 BOX다.",
+          "oracleRef": {
+            "oracleId": "T13.partial-and-excess-contributions",
+            "observationNames": [
+              "relocation-added-to-purchase"
+            ]
+          },
+          "unit": "BOX",
+          "unitSource": {
+            "actionId": "move-db",
+            "pointer": "/data/rawRows/segments",
+            "field": "unit",
+            "where": {
+              "locationId": {
+                "$alias": "W-alt"
+              },
+              "active": true
+            }
+          }
+        },
+        {
+          "id": "left-at-W",
+          "op": "sumEquals",
+          "source": {
+            "actionId": "move-db",
+            "pointer": "/data/rawRows/segments",
+            "field": "quantity",
+            "where": {
+              "locationId": {
+                "$alias": "W"
+              },
+              "active": true
+            }
+          },
+          "expected": "85",
+          "requirementRefs": [
+            "D13"
+          ],
+          "evidenceRefs": [
+            "move-db:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "T13",
+            "subcaseId": "partial-excess-return-relocation",
+            "itemId": {
+              "$alias": "P"
+            }
+          },
+          "oracleExplanation": "이동 뒤 W는 105 − 20 = 85 BOX다. 수령40의 나머지 20은 W에 남는다.",
+          "oracleRef": {
+            "oracleId": "T13.partial-and-excess-contributions",
+            "observationNames": [
+              "relocation-added-to-purchase"
+            ]
+          },
+          "unit": "BOX",
+          "unitSource": {
+            "actionId": "move-db",
+            "pointer": "/data/rawRows/segments",
+            "field": "unit",
+            "where": {
+              "locationId": {
+                "$alias": "W"
+              },
+              "active": true
+            }
           }
         },
         {

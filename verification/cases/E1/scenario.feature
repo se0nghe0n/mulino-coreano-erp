@@ -310,3 +310,23 @@
     그러면 "actual-runtime-observation-6-mcp" assertion으로 "MCP 진입점: 같은 snapshot에서 actual-runtime-observation-6와 같은 값을 읽는다"를 확인한다
     그러면 "actual-runtime-observation-7-mcp" assertion으로 "MCP 진입점: 같은 snapshot에서 actual-runtime-observation-7와 같은 값을 읽는다"를 확인한다
     그러면 "actual-runtime-observation-8-mcp" assertion으로 "MCP 진입점: 같은 snapshot에서 actual-runtime-observation-8와 같은 값을 읽는다"를 확인한다
+
+  시나리오: 수령 원본이 지명하지 않은 내부 보관자를 slot에 쓰면 수령60은 HELD이고 W에 실물·보관이 생기지 않는다
+    먼저 사례 파일 "verification/cases/E1/case.json"의 "receipt-custody-unverified"를 준비한다
+    만일 "시스템" 역할이 "setup" 행동을 수행한다
+    만일 "procurement" 역할이 "purchase" 행동을 수행한다
+    만일 "manager" 역할이 "approve-purchase" 행동을 수행한다
+    만일 "procurement" 역할이 "transmit-po" 행동을 수행한다
+    만일 "procurement" 역할이 "supplier-accept" 행동을 수행한다
+    만일 "procurement" 역할이 "shipment" 행동을 수행한다
+    만일 "procurement" 역할이 "leg-departure" 행동을 수행한다
+    만일 "procurement" 역할이 "receipt60" 행동을 수행한다
+    만일 "observer" 역할이 "after-receipt" 행동을 수행한다
+    만일 "observer" 역할이 "after-receipt-mcp" 행동을 수행한다
+    만일 "시스템" 역할이 "after-receipt-db" 행동을 수행한다
+    그러면 "custody-unverified-outcome" assertion으로 "원본이 지명하지 않은 보관자 slot의 수령60 = HELD"를 확인한다
+    그러면 "custody-unverified-code" assertion으로 "보류 이유 = EVIDENCE_UNVERIFIED"를 확인한다
+    그러면 "custody-unverified-no-stock-at-W" assertion으로 "W 활성 실물 = 0행"를 확인한다
+    그러면 "custody-unverified-no-custody" assertion으로 "procurement 보관 실물 = 0행"를 확인한다
+    그러면 "custody-unverified-no-receipt" assertion으로 "수령 원장 = 0행"를 확인한다
+    그러면 "custody-unverified-mcp-same-snapshot" assertion으로 "MCP 조회 snapshot = API 조회 snapshot"를 확인한다

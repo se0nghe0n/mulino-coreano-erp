@@ -159,12 +159,12 @@ public final class ContractValidator {
             if(anyHarness && !(controlled && paused)) problems.add(where+": harness tickScheduler/sweepDue requires runtimeProfile controlledTicks=true and pausedUntilTickControl=true");
             if(!anyPassive) continue;
             if(controlled || paused) problems.add(where+": passive natural-tick observation requires runtimeProfile controlledTicks=false and pausedUntilTickControl=false");
-            // step2r round 7: a NO_TASK watcher must observe at least one natural tick, so the period has to fit every window.
+            // step2r rounds 7-8: a NO_TASK watcher must observe two natural ticks, so two periods have to fit every window.
             JsonNode tickSeconds=profile.path("tickSeconds");
             for(JsonNode t:ticks) if(passive(t)) {
                 JsonNode window=t.path("control").path("parameters").path("observationWindowSeconds");
-                if(!tickSeconds.isIntegralNumber() || tickSeconds.asInt()<1 || window.isIntegralNumber() && tickSeconds.asInt()>window.asInt())
-                    problems.add(where+"/"+t.path("id").asText()+": passive natural-tick observation needs runtimeProfile tickSeconds, an integer 1..observationWindowSeconds, found "+tickSeconds);
+                if(!tickSeconds.isIntegralNumber() || tickSeconds.asInt()<1 || window.isIntegralNumber() && HostObservationValidator.NO_TASK_TICKS*tickSeconds.asLong()>window.asLong())
+                    problems.add(where+"/"+t.path("id").asText()+": passive natural-tick observation needs runtimeProfile tickSeconds, an integer 1..observationWindowSeconds/"+HostObservationValidator.NO_TASK_TICKS+", found "+tickSeconds);
             }
             JsonNode top=sub.path("actions");JsonNode group=null;int groupAt=-1;
             for(int i=0;i<top.size() && group==null;i++) {
@@ -296,17 +296,24 @@ public final class ContractValidator {
         return problems;
     }
     /**
-     * contracts/fixture-place-kinds.json directReceiptCustody (step2r round 7). A confirmReceipt whose slots name no fixture
-     * QuantitySegment is a direct receipt: there is no transit leaf whose custody it keeps, so the product (ReceiptCommands)
-     * records the received stock with no custodian unless the receivingCustodianId slot names one, and then reserve/pick/
-     * dispatch/move of it is SCOPE_INELIGIBLE. When such stock is used later (directly or through a split/move/hold/reserve
-     * result derived from it), the receipt must name an internal Human/Agent fixture actor with confirmReceipt authority for
-     * the place, the cited receipt original must name the same alias (fixtureContent.receivingCustodianAlias, hashed by its
-     * evidence row), and every confirm of the same receipt carries the same slot. A transit receipt never carries the slot.
+     * contracts/fixture-place-kinds.json transitReceipt and directReceiptCustody (step2r rounds 7 and 8). A confirmReceipt that
+     * names a fixture QuantitySegment (or the $result child of a splitQuantity of one) is a transit receipt. The product
+     * (ReceiptStockPrimitives.receive) accepts it only for one identified leaf at a TRANSIT place with the same item, LOT and
+     * unit and exactly the received quantity, into INTERNAL_STORAGE (partial cargo is split first); the received stock keeps
+     * the leaf custodian, which must then be internal when the stock is used. Any other confirmReceipt is a direct receipt:
+     * the product records the received stock with no custodian unless the receivingCustodianId slot names one, and then
+     * reserve/pick/dispatch/move of it is SCOPE_INELIGIBLE. When such stock is used later (directly or through a split/move/
+     * hold/reserve result derived from it), the receipt must name an internal Human/Agent fixture actor of the confirming
+     * actor's organization with confirmReceipt authority for the place, a cited receipt original must name the same alias
+     * (DocumentVersion fixtureContent.receivingCustodianAlias hashed by its evidence row, or an inline JSON document attached
+     * at runtime) and every confirm of the same receipt carries the same slot. A declared custody negative (custodyControl)
+     * instead names the product's first failing check, pins the outcome and error code, and proves zero effect.
      */
     public List<String> receiptCustodyProblems(JsonNode caseFile) throws IOException {
-        JsonNode contract=Json.read(path("contracts/fixture-place-kinds.json"));JsonNode rule=contract.path("directReceiptCustody");
+        JsonNode contract=Json.read(path("contracts/fixture-place-kinds.json"));JsonNode rule=contract.path("directReceiptCustody"),transit=contract.path("transitReceipt");
         String capability=Json.required(rule,"capability"),slot=Json.required(rule,"slot"),field=Json.required(rule,"originalField");
+        String controlField=Json.required(rule.path("custodyControl"),"field"),splitCapability=Json.required(transit,"splitCapability");
+        Map<String,String> controls=new LinkedHashMap<>();rule.path("custodyControl").path("values").fields().forEachRemaining(e->controls.put(e.getKey(),e.getValue().asText()));
         Set<String> internal=new HashSet<>(),usedBy=new HashSet<>(),derived=new HashSet<>();
         for(JsonNode t:contract.path("internalCustodianAliasTypes")) internal.add(t.asText());
         for(JsonNode t:rule.path("requiredWhenStockIsUsedBy")) usedBy.add(t.asText());
@@ -314,34 +321,68 @@ public final class ContractValidator {
         List<String> problems=new ArrayList<>();
         for(JsonNode sub:caseFile.path("subcases")) {
             String where=caseFile.path("caseId").asText()+"/"+sub.path("id").asText();
-            String ref=sub.path("fixtureRef").asText();
-            if(ref.isBlank() || !Files.isRegularFile(path(ref))) continue;
-            ObjectNode aliases=Json.object(),actors=Json.object();ArrayNode evidence=Json.array();
-            mergeFixture(ref,new HashSet<>(),aliases,actors,evidence);
             List<JsonNode> all=new ArrayList<>();collect(sub.path("actions"),all);
             List<JsonNode> actions=new ArrayList<>();for(JsonNode a:all) {actions.add(a);if(a.has("call")) actions.add(a.path("call"));}
-            Map<String,Set<String>> origins=new HashMap<>();Map<String,JsonNode> receipts=new LinkedHashMap<>();Map<String,List<String>> users=new LinkedHashMap<>();
+            for(JsonNode a:actions) if(a.has(controlField) && !capability.equals(a.path("capabilityId").asText(a.path("request").path("capabilityId").asText())))
+                problems.add(where+"/"+a.path("id").asText()+": "+controlField+" applies only to a "+capability+" action");
+            String ref=sub.path("fixtureRef").asText();
+            if(ref.isBlank() || !Files.isRegularFile(path(ref))) continue;
+            ObjectNode aliases=Json.object(),actors=Json.object();ArrayNode evidence=Json.array();Map<String,ObjectNode> leaves=new LinkedHashMap<>();
+            mergeFixture(ref,new HashSet<>(),aliases,actors,evidence);mergeSegments(ref,new HashSet<>(),leaves);
+            for(var it=aliases.fields();it.hasNext();) {var e=it.next();if(e.getValue().path("type").asText().equals("QuantitySegment")) {ObjectNode leaf=e.getValue().deepCopy();JsonNode row=leaves.get(e.getKey());
+                if(row!=null) for(var f=row.fields();f.hasNext();) {var x=f.next();if(!leaf.has(x.getKey())) leaf.set(x.getKey(),x.getValue());}
+                leaves.put(e.getKey(),leaf);}}
+            leaves.keySet().removeIf(k->!aliases.path(k).path("type").asText().equals("QuantitySegment"));
+            Map<String,JsonNode> byId=new HashMap<>();for(JsonNode a:actions) byId.putIfAbsent(a.path("id").asText(),a);
+            Map<String,ObjectNode> children=new HashMap<>();
+            Map<String,Set<String>> origins=new HashMap<>();Map<String,JsonNode> receipts=new LinkedHashMap<>();Map<String,ObjectNode> transitLeaf=new HashMap<>();Map<String,List<String>> users=new LinkedHashMap<>();
             for(JsonNode a:actions) {
                 String id=a.path("id").asText(),cap=a.path("capabilityId").asText(a.path("request").path("capabilityId").asText());
+                JsonNode slots=a.path("request").path("slots");
                 Set<String> from=new TreeSet<>();for(String r:resultRefs(a.path("request"))) from.addAll(origins.getOrDefault(r,Set.of()));
+                if(cap.equals(splitCapability)) splitChildren(id,slots,leaves,children);
                 if(cap.equals(capability)) {
-                    Set<String> segments=new TreeSet<>();for(String x:aliasRefs(a.path("request").path("slots"))) if(aliases.path(x).path("type").asText().equals("QuantitySegment")) segments.add(x);
-                    String custodian=slotAlias(a.path("request").path("slots").path(slot));
-                    if(!segments.isEmpty()) {if(a.path("request").path("slots").has(slot)) problems.add(where+"/"+id+": transit receipt of "+segments+" carries "+slot+"; a transit receipt keeps the leaf's custodian (contracts/fixture-place-kinds.json directReceiptCustody)");continue;}
+                    Map<String,ObjectNode> named=new LinkedHashMap<>();
+                    for(String x:aliasRefs(slots)) if(leaves.containsKey(x)) named.put(x,leaves.get(x));
+                    for(JsonNode r:resultNodes(slots)) {
+                        JsonNode source=byId.get(r.path("actionId").asText());
+                        if(source==null || !splitCapability.equals(source.path("capabilityId").asText(source.path("request").path("capabilityId").asText()))) continue;
+                        String key=r.path("actionId").asText()+r.path("pointer").asText();
+                        if(children.containsKey(key)) named.put(key,children.get(key));
+                        else if(splitSource(source.path("request").path("slots"),leaves,children)!=null)
+                            problems.add(where+"/"+id+": transit receipt names "+key+", which is not a "+transit.path("splitChildPointer").asText()+" of an explicit children entry of that split; the received leaf quantity cannot be checked");
+                    }
+                    if(!named.isEmpty()) {
+                        if(slots.has(slot)) problems.add(where+"/"+id+": transit receipt of "+named.keySet()+" carries "+slot+"; a transit receipt keeps the leaf's custodian (contracts/fixture-place-kinds.json directReceiptCustody)");
+                        if(a.has(controlField)) problems.add(where+"/"+id+": "+controlField+" declares a direct-receipt custody negative on a transit receipt");
+                        if(named.size()!=1) problems.add(where+"/"+id+": transit receipt names "+named.keySet()+"; the product consumes exactly one identified leaf");
+                        else {var e=named.entrySet().iterator().next();transitProblems(where+"/"+id,e.getKey(),e.getValue(),slots,aliases,transit,problems);transitLeaf.put(id,e.getValue());}
+                        receipts.put(id,a);origins.put(id,new TreeSet<>(Set.of(id)));
+                        continue;
+                    }
                     receipts.put(id,a);origins.put(id,new TreeSet<>(Set.of(id)));
-                    if(custodian!=null || a.path("request").path("slots").has(slot)) custodianProblems(where,a,custodian,slot,field,internal,aliases,actors,evidence,problems);
+                    if(a.has(controlField) && !slots.has(slot)) problems.add(where+"/"+id+": "+controlField+" needs the "+slot+" slot it refutes");
+                    if(a.has(controlField) || slots.has(slot)) custodianProblems(where,sub,a,actions,slot,field,internal,aliases,actors,evidence,byId,controlField,controls,problems);
                     continue;
                 }
                 if(from.isEmpty()) continue;
                 if(usedBy.contains(cap)) for(String r:from) users.computeIfAbsent(r,k->new ArrayList<>()).add(id+" "+cap);
                 if(derived.contains(cap)) origins.put(id,from);
             }
-            for(var e:users.entrySet()) if(!receipts.get(e.getKey()).path("request").path("slots").has(slot))
-                problems.add(where+"/"+e.getKey()+": direct receipt (no existing fixture QuantitySegment) is later used by "+e.getValue()+" but names no "+slot
-                    +"; a conforming product records the stock without custodian and rejects that use as SCOPE_INELIGIBLE (contracts/fixture-place-kinds.json directReceiptCustody)");
+            for(var e:users.entrySet()) {
+                JsonNode receipt=receipts.get(e.getKey());
+                if(transitLeaf.containsKey(e.getKey())) {
+                    String holder=transitLeaf.get(e.getKey()).path("custodianAlias").asText(null);
+                    if(holder==null || !internal.contains(aliases.path(holder).path("type").asText()))
+                        problems.add(where+"/"+e.getKey()+": transit receipt keeps the leaf custodian "+holder+", which is not an internal custodian, but its stock is used by "+e.getValue());
+                } else if(receipt.has(controlField)) problems.add(where+"/"+e.getKey()+": declared custody negative "+receipt.path(controlField).asText()+" creates no stock, but its result is used by "+e.getValue());
+                else if(!receipt.path("request").path("slots").has(slot))
+                    problems.add(where+"/"+e.getKey()+": direct receipt (no existing fixture QuantitySegment) is later used by "+e.getValue()+" but names no "+slot
+                        +"; a conforming product records the stock without custodian and rejects that use as SCOPE_INELIGIBLE (contracts/fixture-place-kinds.json directReceiptCustody)");
+            }
             Map<String,Set<String>> perReceipt=new LinkedHashMap<>();
             for(JsonNode a:actions) {
-                if(!a.path("capabilityId").asText(a.path("request").path("capabilityId").asText()).equals(capability)) continue;
+                if(!a.path("capabilityId").asText(a.path("request").path("capabilityId").asText()).equals(capability) || a.has(controlField)) continue;
                 JsonNode slots=a.path("request").path("slots");String key=plainText(slots.path("canonicalOccurrenceKey"));
                 if(key==null) key="idempotency:"+a.path("request").path("commandIdempotencyKey").asText();
                 String custodian=slots.has(slot)?String.valueOf(slotAlias(slots.path(slot))):"(none)";
@@ -351,43 +392,148 @@ public final class ContractValidator {
         }
         return problems;
     }
-    private void custodianProblems(String where,JsonNode receipt,String custodian,String slot,String field,Set<String> internal,JsonNode aliases,JsonNode actors,JsonNode evidence,List<String> problems) throws IOException {
-        String id=where+"/"+receipt.path("id").asText();
+    /** The fixture leaf (or explicit split child) a splitQuantity divides: its segmentId slot alias or $result child, else null. */
+    private static ObjectNode splitSource(JsonNode slots,Map<String,ObjectNode> leaves,Map<String,ObjectNode> children) {
+        JsonNode s=slots.path("segmentId");
+        String alias=slotAlias(s);if(alias!=null) return leaves.get(alias);
+        for(JsonNode r:resultNodes(s)) {ObjectNode c=children.get(r.path("actionId").asText()+r.path("pointer").asText());if(c!=null) return c;}
+        return null;
+    }
+    /** Explicit children of a split of a fixture leaf: {"alias","quantity","unit"} entries keyed by their $result pointer. */
+    private static void splitChildren(String id,JsonNode slots,Map<String,ObjectNode> leaves,Map<String,ObjectNode> children) {
+        ObjectNode source=splitSource(slots,leaves,children);if(source==null) return;
+        JsonNode list=slots.path("children").has("value")?slots.path("children").path("value"):slots.path("children");
+        for(JsonNode c:list) if(c.path("alias").isTextual()) {
+            ObjectNode child=source.deepCopy();child.set("quantity",c.path("quantity"));child.set("unit",c.path("unit"));
+            children.put(id+"/response/children/"+c.path("alias").asText()+"/segmentId",child);
+        }
+    }
+    private static List<JsonNode> resultNodes(JsonNode node) {List<JsonNode> out=new ArrayList<>();resultNodes(node,out);return out;}
+    private static void resultNodes(JsonNode node,List<JsonNode> out) {
+        if(node.isObject()) {if(node.path("$result").path("actionId").isTextual()) out.add(node.path("$result"));for(JsonNode v:node) resultNodes(v,out);}
+        else if(node.isArray()) for(JsonNode v:node) resultNodes(v,out);
+    }
+    private void transitProblems(String id,String name,ObjectNode leaf,JsonNode slots,JsonNode aliases,JsonNode rule,List<String> problems) {
+        String location=leaf.path("locationAlias").asText(leaf.path("placeAlias").asText(null)),kind=rule.path("leafPlaceKind").asText();
+        JsonNode place=location==null?null:aliases.get(location);
+        if(place==null || !kind.equals(place.path("kind").asText()))
+            problems.add(id+": transit receipt leaf "+name+" is at "+location+" (kind "+(place==null?"none":place.path("kind").asText())+"); the product accepts only a leaf at a "+kind
+                +" place ('Exact identified transit leaf required; split partial cargo first', contracts/fixture-place-kinds.json transitReceipt)");
+        for(JsonNode u:rule.path("unidentifiedIdentifiability")) if(leaf.path("identifiability").asText().equals(u.asText()))
+            problems.add(id+": transit receipt leaf "+name+" is "+u.asText()+"; the product accepts only an identified leaf");
+        if(leaf.has("identificationStatus") && !leaf.path("identificationStatus").asText().equals("CONFIRMED"))
+            problems.add(id+": transit receipt leaf "+name+" identificationStatus "+leaf.path("identificationStatus").asText()+" is not CONFIRMED");
+        JsonNode quantity=slots.path("quantity").has("value") && slots.path("quantity").has("unit")?slots.path("quantity"):slots.path("quantity").path("value");
+        String received=quantity.path("value").asText(null),unit=quantity.path("unit").asText(null);
+        String leafQuantity=leaf.path("quantity").asText(null),leafUnit=leaf.path("unit").asText(null);
+        if(received==null || leafQuantity==null) problems.add(id+": transit receipt of "+name+" needs a quantity slot and a leaf quantity to show the exact-leaf rule");
+        else if(new java.math.BigDecimal(received).compareTo(new java.math.BigDecimal(leafQuantity))!=0 || !Objects.equals(unit,leafUnit))
+            problems.add(id+": transit receipt quantity "+received+" "+unit+" differs from leaf "+name+" "+leafQuantity+" "+leafUnit+"; the product requires exactly the leaf quantity, so split partial cargo first (plan §4.2)");
+        for(String[] k:new String[][]{{"itemId","itemAlias"},{"lotId","lotAlias"}}) {
+            String asked=slotAlias(slots.path(k[0]));
+            if(asked!=null && leaf.path(k[1]).isTextual() && !asked.equals(leaf.path(k[1]).asText())) problems.add(id+": transit receipt "+k[0]+" "+asked+" differs from leaf "+name+" "+k[1]+" "+leaf.path(k[1]).asText());
+        }
+        String destination=null;for(String key:List.of("placeId","destinationId","locationId")) if(destination==null) destination=slotAlias(slots.path(key));
+        String into=rule.path("destinationPlaceKind").asText();
+        if(destination==null || !into.equals(aliases.path(destination).path("kind").asText())) problems.add(id+": transit receipt destination "+destination+" is not a "+into+" place");
+    }
+    /** baseline.segments rows by alias of a fixture and its baseRefs (later fixtures win). */
+    private void mergeSegments(String ref,Set<String> visiting,Map<String,ObjectNode> rows) throws IOException {
+        if(ref.isBlank() || !visiting.add(ref) || !Files.isRegularFile(path(ref))) return;
+        JsonNode fixture=Json.read(path(ref));
+        for(JsonNode base:fixture.path("baseRefs")) mergeSegments(base.asText(),visiting,rows);
+        for(JsonNode s:fixture.path("baseline").path("segments")) if(s.path("alias").isTextual()) rows.put(s.path("alias").asText(),(ObjectNode)s.deepCopy());
+    }
+    /**
+     * The receiving-custodian slot of a direct receipt. Problems are grouped like the product checks them (ReceiptCommands):
+     * SCOPE_INELIGIBLE at preparation (external actor, other organization, no confirmReceipt role/grant or place scope), then
+     * EVIDENCE_CONFLICT when the cited originals name different custodians, then EVIDENCE_UNVERIFIED when they do not name
+     * exactly the slot custodian. A positive receipt needs none; a declared custodyControl must equal the first one found.
+     * A malformed slot or a hash that does not bind the naming original is always a problem.
+     */
+    private void custodianProblems(String where,JsonNode sub,JsonNode receipt,List<JsonNode> actions,String slot,String field,Set<String> internal,JsonNode aliases,JsonNode actors,JsonNode evidence,
+                                   Map<String,JsonNode> byId,String controlField,Map<String,String> controls,List<String> problems) throws IOException {
+        String id=where+"/"+receipt.path("id").asText();JsonNode slots=receipt.path("request").path("slots");
+        String custodian=slotAlias(slots.path(slot));
         if(custodian==null) {problems.add(id+": "+slot+" must name a fixture alias ({\"$alias\":...} or {\"value\":{\"$alias\":...}})");return;}
-        JsonNode holder=aliases.get(custodian);
-        if(holder==null || !internal.contains(holder.path("type").asText())) {problems.add(id+": "+slot+" "+custodian+" is not an internal custodian (a "+internal+" alias)");return;}
-        JsonNode actor=actors.get(custodian);
-        boolean authority=false;
-        if(actor!=null) {
+        Map<String,List<String>> defects=new LinkedHashMap<>();for(String c:List.of("SCOPE_INELIGIBLE","EVIDENCE_CONFLICT","EVIDENCE_UNVERIFIED")) defects.put(c,new ArrayList<>());
+        JsonNode holder=aliases.get(custodian),actor=actors.get(custodian);
+        if(holder==null || !internal.contains(holder.path("type").asText())) defects.get("SCOPE_INELIGIBLE").add(slot+" "+custodian+" is not an internal custodian (a "+internal+" alias)");
+        else {
+            String organization=actors.path(receipt.path("actorRef").asText()).path("organizationAlias").asText(null);
+            for(JsonNode o:List.of(actor==null?Json.object():actor,holder)) if(organization!=null && o.path("organizationAlias").isTextual() && !organization.equals(o.path("organizationAlias").asText()))
+                defects.get("SCOPE_INELIGIBLE").add(slot+" "+custodian+" belongs to organization "+o.path("organizationAlias").asText()+", not to the confirming actor's "+organization);
             boolean role=false,grant=false;
-            for(JsonNode c:actor.path("roleCapabilities")) role|=c.asText().equals("confirmReceipt");
-            for(JsonNode c:actor.path("grant").path("actions")) grant|=c.asText().equals("confirmReceipt");
-            authority=role && grant;
+            if(actor!=null) {for(JsonNode c:actor.path("roleCapabilities")) role|=c.asText().equals("confirmReceipt");for(JsonNode c:actor.path("grant").path("actions")) grant|=c.asText().equals("confirmReceipt");}
+            if(!(role && grant)) defects.get("SCOPE_INELIGIBLE").add(slot+" "+custodian+" has no confirmReceipt role and grant; the product requires the receiving custodian's current receive authority");
+            String place=null;for(String key:List.of("locationId","placeId","destinationId")) if(place==null) place=slotAlias(slots.path(key));
+            if(actor!=null && place!=null) for(String key:List.of("placeAliases","places")) {
+                JsonNode scope=actor.path("grant").path("scope").path(key);
+                if(!scope.isArray()) continue;
+                boolean listed=false;for(JsonNode p:scope) listed|=p.asText().equals(place);
+                if(!listed) defects.get("SCOPE_INELIGIBLE").add(slot+" "+custodian+" grant scope "+key+" does not include the receipt place "+place);
+            }
         }
-        if(!authority) problems.add(id+": "+slot+" "+custodian+" has no confirmReceipt role and grant; the product requires the receiving custodian's current receive authority");
-        String place=null;JsonNode slots=receipt.path("request").path("slots");
-        for(String key:List.of("locationId","placeId","destinationId")) if(place==null) place=slotAlias(slots.path(key));
-        if(actor!=null && place!=null) for(String key:List.of("placeAliases","places")) {
-            JsonNode scope=actor.path("grant").path("scope").path(key);
-            if(!scope.isArray()) continue;
-            boolean listed=false;for(JsonNode p:scope) listed|=p.asText().equals(place);
-            if(!listed) problems.add(id+": "+slot+" "+custodian+" grant scope "+key+" does not include the receipt place "+place);
-        }
+        // Originals: cited DocumentVersion aliases and runtime-attached documents ($result of an earlier action).
+        Map<String,String> stated=new LinkedHashMap<>();Set<String> cited=new LinkedHashSet<>();
+        originals(receipt.path("request"),aliases,byId,new HashSet<>(Set.of(receipt.path("id").asText())),field,evidence,stated,cited,id,problems);
+        Set<String> names=new TreeSet<>(stated.values());
+        if(names.size()>1) defects.get("EVIDENCE_CONFLICT").add("cited receipt originals name different receiving custodians "+stated);
+        for(var e:stated.entrySet()) if(!e.getValue().equals(custodian)) defects.get("EVIDENCE_UNVERIFIED").add("receipt original "+e.getKey()+" names receiving custodian "+e.getValue()+", the slot "+custodian);
+        if(!names.contains(custodian)) defects.get("EVIDENCE_UNVERIFIED").add("no receipt original it cites ("+cited+") names "+custodian+" in "+field+"; the product accepts "+slot+" only when verified receipt evidence names it");
+        String first=null;for(var e:defects.entrySet()) if(first==null && !e.getValue().isEmpty()) first=e.getKey();
+        if(!receipt.has(controlField)) {for(List<String> d:defects.values()) for(String x:d) problems.add(id+": "+x);return;}
+        String control=receipt.path(controlField).asText();
+        if(!controls.containsKey(control)) {problems.add(id+": "+controlField+" "+control+" is not one of "+controls.keySet());return;}
+        if(!control.equals(first)) {problems.add(id+": "+controlField+" "+control+" is not the product's first failing receiving-custody check ("+(first==null?"none: the slot is valid and evidenced":first+" "+defects.get(first))+")");return;}
+        String action=receipt.path("id").asText();
+        if(!pinsResponse(sub,action,"/response/outcome",controls.get(control)) || !pinsResponse(sub,action,"/response/error/code",control))
+            problems.add(id+": declared custody negative "+control+" must pin /response/outcome equals "+controls.get(control)+" and /response/error/code equals "+control);
+        int at=-1;for(int i=0;i<actions.size();i++) if(actions.get(i)==receipt) at=i;
+        Set<String> later=new HashSet<>();for(int i=at+1;i<actions.size();i++) if(actions.get(i).path("kind").asText().equals("observe")) later.add(actions.get(i).path("id").asText());
+        boolean zero=false;
+        for(JsonNode x:sub.path("assertions")) zero|=x.path("op").asText().equals("count") && x.path("expected").isIntegralNumber() && x.path("expected").asInt()==0
+            && later.contains(x.path("source").path("actionId").asText()) && List.of("/data/rawRows/segments","/data/rawRows/receipts").contains(x.path("source").path("pointer").asText());
+        if(!zero) problems.add(id+": declared custody negative "+control+" must assert zero effect: a count 0 over /data/rawRows/segments or /data/rawRows/receipts of an observe action after it");
+    }
+    /** Collects the custody statements of the originals a request cites (see directReceiptCustody rule 2). */
+    private void originals(JsonNode request,JsonNode aliases,Map<String,JsonNode> byId,Set<String> visiting,String field,JsonNode evidence,
+                           Map<String,String> stated,Set<String> cited,String id,List<String> problems) throws IOException {
         Set<String> docs=new LinkedHashSet<>();
-        String cited=slotAlias(slots.path("evidenceId"));if(cited!=null) docs.add(cited);
-        for(JsonNode e:receipt.path("request").path("evidenceRefs")) {String x=e.isTextual()?e.asText():slotAlias(e);if(x!=null) docs.add(x);}
-        boolean named=false;
+        for(String x:aliasRefs(request.path("slots"))) if(aliases.path(x).path("type").asText().equals("DocumentVersion")) docs.add(x);
+        for(String x:aliasRefs(request.path("evidenceRefs"))) if(aliases.path(x).path("type").asText().equals("DocumentVersion")) docs.add(x);
+        List<JsonNode> evidenceNodes=new ArrayList<>();request.path("evidenceRefs").forEach(evidenceNodes::add);
+        for(var it=request.path("slots").fields();it.hasNext();) {var e=it.next();if(e.getKey().toLowerCase(Locale.ROOT).contains("evidence")) evidenceNodes.add(e.getValue());}
+        List<JsonNode> flat=new ArrayList<>();for(JsonNode n:evidenceNodes) {JsonNode v=n.has("value") && !n.has("$alias")?n.path("value"):n;if(v.isArray()) v.forEach(flat::add);else flat.add(v);}
+        for(JsonNode n:flat) {String x=plainText(n);if(x!=null && aliases.path(x).path("type").asText().equals("DocumentVersion")) docs.add(x);}
         for(String doc:docs) {
-            JsonNode a=aliases.path(doc);
-            if(!a.path("type").asText().equals("DocumentVersion") || !a.path("fixtureContent").has(field)) continue;
-            String stated=a.path("fixtureContent").path(field).asText();
-            if(!stated.equals(custodian)) {problems.add(id+": receipt original "+doc+" names receiving custodian "+stated+", the slot "+custodian);continue;}
-            named=true;
+            cited.add(doc);JsonNode a=aliases.path(doc);
+            if(!a.path("fixtureContent").has(field)) continue;
+            stated.put(doc,a.path("fixtureContent").path(field).asText());
             String expected=Json.sha256Text(CANONICAL.writeValueAsString(Json.MAPPER.treeToValue(a.path("fixtureContent"),Object.class)));
             boolean hashed=false;for(JsonNode row:evidence) if(row.path("alias").asText().equals(doc)) hashed|=row.path("sha256").asText().equals(expected);
-            if(!hashed) problems.add(id+": fixture evidence sha256 of "+doc+" is not the SHA-256 of its canonical fixtureContent, so the original naming "+custodian+" is not the hashed one");
+            if(!hashed) problems.add(id+": fixture evidence sha256 of "+doc+" is not the SHA-256 of its canonical fixtureContent, so the original naming "+stated.get(doc)+" is not the hashed one");
         }
-        if(!named) problems.add(id+": no receipt original it cites ("+docs+") names "+custodian+" in fixtureContent."+field+"; the product accepts "+slot+" only when verified receipt evidence names it");
+        for(JsonNode n:flat) for(JsonNode r:resultNodes(n)) {
+            String source=r.path("actionId").asText();JsonNode attached=byId.get(source);
+            if(attached==null || !visiting.add(source)) continue;
+            cited.add("$result "+source);
+            JsonNode document=attached.path("request").path("slots").path("document");
+            if(document.path("content").isTextual()) {
+                JsonNode content;try {content=Json.MAPPER.readTree(document.path("content").asText());} catch(IOException unstructured) {content=null;}
+                if(content!=null && content.path(field).isTextual()) {
+                    stated.put("$result "+source,content.path(field).asText());
+                    if(!document.path("sha256").asText().equals(Json.sha256Text(document.path("content").asText())))
+                        problems.add(id+": runtime original "+source+" sha256 is not the SHA-256 of its inline content naming "+content.path(field).asText());
+                }
+            }
+            originals(attached.path("request"),aliases,byId,visiting,field,evidence,stated,cited,id,problems);
+        }
+    }
+    private static boolean pinsResponse(JsonNode sub,String actionId,String pointer,String expected) {
+        for(JsonNode x:sub.path("assertions")) if(x.path("op").asText().equals("equals") && x.path("source").path("actionId").asText().equals(actionId)
+                && x.path("source").path("pointer").asText().equals(pointer) && x.path("expected").asText().equals(expected)) return true;
+        return false;
     }
     private static final com.fasterxml.jackson.databind.ObjectMapper CANONICAL=new com.fasterxml.jackson.databind.ObjectMapper().configure(com.fasterxml.jackson.databind.SerializationFeature.ORDER_MAP_ENTRIES_BY_KEYS,true);
     private void mergeFixture(String ref,Set<String> visiting,ObjectNode aliases,ObjectNode actors,ArrayNode evidence) throws IOException {

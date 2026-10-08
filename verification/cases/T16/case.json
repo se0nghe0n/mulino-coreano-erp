@@ -1224,7 +1224,7 @@
             "where": {
               "active": true,
               "locationId": {
-                "$alias": "PORT"
+                "$alias": "TRANSIT"
               }
             }
           },
@@ -1244,7 +1244,7 @@
             },
             "caseKey": "T16-provisional-holds"
           },
-          "oracleExplanation": "독립 원 행의 실물·수량·관계·범위를 정확히 대조한다.",
+          "oracleExplanation": "확인 수령은 TRANSIT 장소의 운송 leaf TRANSIT60을 소비해 W로 옮긴다. 확인 뒤 독립 원행에서 그 운송 장소에 남은 활성 실물은 0행이다. 운송 실물과 수령 실물이 함께 활성이면 같은 60이 두 번 생긴 것이다.",
           "oracleRef": {
             "oracleId": "T16.provisional-and-independent-holds",
             "observationNames": [

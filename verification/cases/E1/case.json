@@ -15576,6 +15576,887 @@
         }
       ],
       "oracleExplanation": "가상 fixture는 선행 실물·정책·증거 입력만 설치한다. 검증하는 주문·승인·예약·출고·인도·반품·회수·정정 효과는 각각 공개 명령으로 실행한다. 실제 원장·배분·판정·책임·감사·outbox를 묶고 실모델 gate는 독립 host 입력으로 구분한다의 수량과 책임은 고정 기대값과 원 행·응답을 함께 검증한다."
+    },
+    {
+      "id": "receipt-custody-unverified",
+      "title": "수령 원본이 지명하지 않은 내부 보관자를 slot에 쓰면 수령60은 HELD이고 W에 실물·보관이 생기지 않는다",
+      "fixtureRef": "verification/cases/E1/fixtures/full-flow-quantities.json",
+      "requiredAdapters": [
+        "fixture",
+        "api",
+        "db",
+        "mcp"
+      ],
+      "oracleExplanation": "E1 full-flow-quantities fixture와 구매·출하 선행 명령을 그대로 쓰고, 수령60만 receivingCustodianId를 procurement로 바꾼 선언 반례(custodyControl EVIDENCE_UNVERIFIED)다. 원본 warehouse-60은 receiver를 지명하므로 제품은 HELD·EVIDENCE_UNVERIFIED이고 W 실물0·보관0·수령 원장0이다. 양성 대조는 full-flow-quantities의 received-custody-control이다.",
+      "actions": [
+        {
+          "id": "setup",
+          "kind": "installFixture",
+          "evidenceRefs": [
+            "setup:fixture-installation"
+          ]
+        },
+        {
+          "id": "purchase",
+          "kind": "invoke",
+          "actorRef": "procurement",
+          "route": "api",
+          "capabilityId": "proposePurchase",
+          "request": {
+            "intentKind": "COMMAND",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "proposePurchase",
+            "subjectRefs": [
+              {
+                "type": "TradeItem",
+                "id": {
+                  "$alias": "P"
+                }
+              }
+            ],
+            "slots": {
+              "supplierId": {
+                "$alias": "SUPPLIER"
+              },
+              "quantity": {
+                "value": "100",
+                "unit": "BOX"
+              },
+              "unitPrice": {
+                "value": "1",
+                "unit": "EUR"
+              },
+              "currency": "EUR",
+              "destinationId": {
+                "$alias": "W"
+              },
+              "dueAt": "2026-10-07T10:00:00Z",
+              "endpoint": "ARRIVED",
+              "quantityMode": "CUMULATIVE_EVENT"
+            },
+            "expectedRevision": 1,
+            "commandIdempotencyKey": "E1-receipt-custody-unverified-purchase",
+            "evidenceRefs": [
+              {
+                "$alias": "delivery-proof"
+              }
+            ],
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseId": "E1",
+              "scenarioId": "full-flow-quantities"
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z"
+          },
+          "evidenceRefs": [
+            "purchase:api-response",
+            "purchase:actual-command-artifact"
+          ]
+        },
+        {
+          "id": "approve-purchase",
+          "kind": "invoke",
+          "actorRef": "manager",
+          "route": "api",
+          "capabilityId": "approvePurchase",
+          "request": {
+            "intentKind": "COMMAND",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "approvePurchase",
+            "subjectRefs": [
+              {
+                "type": "TradeItem",
+                "id": {
+                  "$alias": "P"
+                }
+              }
+            ],
+            "slots": {
+              "proposalId": {
+                "$result": {
+                  "actionId": "purchase",
+                  "pointer": "/response/proposalId"
+                }
+              },
+              "proposalHash": {
+                "$result": {
+                  "actionId": "purchase",
+                  "pointer": "/response/proposalHash"
+                }
+              },
+              "proposalRevision": {
+                "$result": {
+                  "actionId": "purchase",
+                  "pointer": "/response/proposalRevision"
+                }
+              },
+              "decision": "APPROVED",
+              "validUntil": "2026-10-31T23:59:59Z"
+            },
+            "expectedRevision": {
+              "$result": {
+                "actionId": "purchase",
+                "pointer": "/response/revision"
+              }
+            },
+            "commandIdempotencyKey": "E1-receipt-custody-unverified-approve-purchase",
+            "evidenceRefs": [
+              {
+                "$alias": "delivery-proof"
+              }
+            ],
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseId": "E1",
+              "scenarioId": "full-flow-quantities"
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z"
+          },
+          "evidenceRefs": [
+            "approve-purchase:api-response",
+            "approve-purchase:actual-command-artifact"
+          ]
+        },
+        {
+          "id": "transmit-po",
+          "kind": "invoke",
+          "actorRef": "procurement",
+          "route": "api",
+          "capabilityId": "dispatchPurchaseOrder",
+          "request": {
+            "intentKind": "COMMAND",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "dispatchPurchaseOrder",
+            "subjectRefs": [
+              {
+                "type": "TradeItem",
+                "id": {
+                  "$alias": "P"
+                }
+              }
+            ],
+            "slots": {
+              "proposalId": {
+                "$result": {
+                  "actionId": "purchase",
+                  "pointer": "/response/proposalId"
+                }
+              },
+              "approvalId": {
+                "$result": {
+                  "actionId": "approve-purchase",
+                  "pointer": "/response/approvalId"
+                }
+              },
+              "proposalHash": {
+                "$result": {
+                  "actionId": "purchase",
+                  "pointer": "/response/proposalHash"
+                }
+              },
+              "channel": "SYNTHETIC_EXTERNAL_RESPONDER"
+            },
+            "expectedRevision": {
+              "$result": {
+                "actionId": "approve-purchase",
+                "pointer": "/response/revision"
+              }
+            },
+            "commandIdempotencyKey": "E1-receipt-custody-unverified-transmit-po",
+            "evidenceRefs": [
+              {
+                "$alias": "delivery-proof"
+              }
+            ],
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseId": "E1",
+              "scenarioId": "full-flow-quantities"
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z"
+          },
+          "evidenceRefs": [
+            "transmit-po:api-response",
+            "transmit-po:actual-command-artifact"
+          ]
+        },
+        {
+          "id": "supplier-accept",
+          "kind": "invoke",
+          "actorRef": "procurement",
+          "route": "api",
+          "capabilityId": "recordSupplierReply",
+          "request": {
+            "intentKind": "RECORD",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "recordSupplierReply",
+            "subjectRefs": [
+              {
+                "type": "TradeItem",
+                "id": {
+                  "$alias": "P"
+                }
+              }
+            ],
+            "slots": {
+              "orderId": {
+                "$result": {
+                  "actionId": "transmit-po",
+                  "pointer": "/response/order/id"
+                }
+              },
+              "reply": "ACCEPTED",
+              "quantity": {
+                "value": "100",
+                "unit": "BOX"
+              },
+              "evidenceId": {
+                "$alias": "supplier-proof"
+              }
+            },
+            "expectedRevision": {
+              "$result": {
+                "actionId": "transmit-po",
+                "pointer": "/response/revision"
+              }
+            },
+            "commandIdempotencyKey": "E1-receipt-custody-unverified-supplier-accept",
+            "evidenceRefs": [
+              {
+                "$alias": "delivery-proof"
+              }
+            ],
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseId": "E1",
+              "scenarioId": "full-flow-quantities"
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z"
+          },
+          "evidenceRefs": [
+            "supplier-accept:api-response",
+            "supplier-accept:actual-command-artifact"
+          ]
+        },
+        {
+          "id": "shipment",
+          "kind": "invoke",
+          "actorRef": "procurement",
+          "route": "api",
+          "capabilityId": "createShipment",
+          "request": {
+            "intentKind": "COMMAND",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "createShipment",
+            "subjectRefs": [
+              {
+                "type": "TradeItem",
+                "id": {
+                  "$alias": "P"
+                }
+              }
+            ],
+            "slots": {
+              "orderId": {
+                "$result": {
+                  "actionId": "transmit-po",
+                  "pointer": "/response/order/id"
+                }
+              },
+              "segmentId": {
+                "$alias": "A"
+              },
+              "originId": {
+                "$alias": "SUPPLIER_PLACE"
+              },
+              "destinationId": {
+                "$alias": "W"
+              },
+              "quantity": {
+                "value": "100",
+                "unit": "BOX"
+              },
+              "mode": "SEA"
+            },
+            "expectedRevision": 1,
+            "commandIdempotencyKey": "E1-receipt-custody-unverified-shipment",
+            "evidenceRefs": [
+              {
+                "$alias": "delivery-proof"
+              }
+            ],
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseId": "E1",
+              "scenarioId": "full-flow-quantities"
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z"
+          },
+          "evidenceRefs": [
+            "shipment:api-response",
+            "shipment:actual-command-artifact"
+          ]
+        },
+        {
+          "id": "leg-departure",
+          "kind": "invoke",
+          "actorRef": "procurement",
+          "route": "api",
+          "capabilityId": "recordLegEvent",
+          "request": {
+            "intentKind": "RECORD",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "recordLegEvent",
+            "subjectRefs": [
+              {
+                "type": "TradeItem",
+                "id": {
+                  "$alias": "P"
+                }
+              }
+            ],
+            "slots": {
+              "shipmentId": {
+                "$result": {
+                  "actionId": "shipment",
+                  "pointer": "/response/shipmentId"
+                }
+              },
+              "eventKind": "DEPARTED",
+              "quantity": {
+                "value": "100",
+                "unit": "BOX"
+              },
+              "actual": true,
+              "evidenceId": {
+                "$alias": "supplier-proof"
+              }
+            },
+            "expectedRevision": {
+              "$result": {
+                "actionId": "shipment",
+                "pointer": "/response/revision"
+              }
+            },
+            "commandIdempotencyKey": "E1-receipt-custody-unverified-leg-departure",
+            "evidenceRefs": [
+              {
+                "$alias": "delivery-proof"
+              }
+            ],
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseId": "E1",
+              "scenarioId": "full-flow-quantities"
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z"
+          },
+          "evidenceRefs": [
+            "leg-departure:api-response",
+            "leg-departure:actual-command-artifact"
+          ]
+        },
+        {
+          "id": "receipt60",
+          "kind": "invoke",
+          "actorRef": "procurement",
+          "route": "api",
+          "capabilityId": "confirmReceipt",
+          "request": {
+            "intentKind": "COMMAND",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "confirmReceipt",
+            "subjectRefs": [
+              {
+                "type": "TradeItem",
+                "id": {
+                  "$alias": "P"
+                }
+              }
+            ],
+            "slots": {
+              "shipmentId": {
+                "$result": {
+                  "actionId": "shipment",
+                  "pointer": "/response/shipmentId"
+                }
+              },
+              "orderId": {
+                "$result": {
+                  "actionId": "transmit-po",
+                  "pointer": "/response/order/id"
+                }
+              },
+              "quantity": {
+                "value": "60",
+                "unit": "BOX"
+              },
+              "locationId": {
+                "$alias": "W"
+              },
+              "lotId": {
+                "$alias": "L"
+              },
+              "physicalScopeId": {
+                "$result": {
+                  "actionId": "shipment",
+                  "pointer": "/response/cargoScope/id"
+                }
+              },
+              "canonicalOccurrenceKey": "E1-RECEIPT-60",
+              "sourceNamespace": "SYNTHETIC-WAREHOUSE",
+              "externalEventId": "E1-WAREHOUSE-60",
+              "sourceVersion": "1",
+              "evidenceId": {
+                "$alias": "warehouse-60"
+              },
+              "receivingCustodianId": {
+                "$alias": "procurement"
+              }
+            },
+            "expectedRevision": {
+              "$result": {
+                "actionId": "leg-departure",
+                "pointer": "/response/revision"
+              }
+            },
+            "commandIdempotencyKey": "E1-receipt-custody-unverified-receipt60",
+            "evidenceRefs": [
+              {
+                "$alias": "delivery-proof"
+              }
+            ],
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseId": "E1",
+              "scenarioId": "full-flow-quantities"
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z"
+          },
+          "evidenceRefs": [
+            "receipt60:api-response",
+            "receipt60:actual-command-artifact"
+          ],
+          "custodyControl": "EVIDENCE_UNVERIFIED"
+        },
+        {
+          "id": "after-receipt",
+          "kind": "query",
+          "actorRef": "observer",
+          "route": "api",
+          "capabilityId": "getObject",
+          "request": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseId": "E1",
+              "scenarioId": "full-flow-quantities"
+            },
+            "subjectRefs": [
+              {
+                "type": "TradeItem",
+                "id": {
+                  "$alias": "P"
+                }
+              }
+            ],
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z",
+            "include": [
+              "inventory",
+              "trade",
+              "evidence",
+              "assessments",
+              "obligations",
+              "audit",
+              "outbox"
+            ]
+          },
+          "evidenceRefs": [
+            "after-receipt:api-response"
+          ]
+        },
+        {
+          "id": "after-receipt-mcp",
+          "kind": "query",
+          "actorRef": "observer",
+          "route": "mcp",
+          "capabilityId": "getObject",
+          "request": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseId": "E1",
+              "scenarioId": "full-flow-quantities"
+            },
+            "subjectRefs": [
+              {
+                "type": "TradeItem",
+                "id": {
+                  "$alias": "P"
+                }
+              }
+            ],
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z",
+            "include": [
+              "inventory",
+              "trade",
+              "evidence",
+              "assessments",
+              "obligations",
+              "audit",
+              "outbox"
+            ],
+            "snapshotRef": {
+              "$result": {
+                "actionId": "after-receipt",
+                "pointer": "/response/snapshotRevision"
+              }
+            }
+          },
+          "evidenceRefs": [
+            "after-receipt-mcp:mcp-response",
+            "after-receipt-mcp:actual-mcp-artifact"
+          ]
+        },
+        {
+          "id": "after-receipt-db",
+          "kind": "observe",
+          "observation": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseId": "E1",
+              "scenarioId": "full-flow-quantities"
+            },
+            "snapshotRef": {
+              "$result": {
+                "actionId": "after-receipt",
+                "pointer": "/response/snapshotRevision"
+              }
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z",
+            "sources": [
+              "segments",
+              "receipts",
+              "movements"
+            ]
+          },
+          "evidenceRefs": [
+            "after-receipt-db:raw-rows",
+            "after-receipt-db:source-query",
+            "after-receipt-db:snapshot"
+          ]
+        }
+      ],
+      "assertions": [
+        {
+          "id": "custody-unverified-outcome",
+          "op": "equals",
+          "source": {
+            "actionId": "receipt60",
+            "pointer": "/response/outcome"
+          },
+          "expected": "HELD",
+          "requirementRefs": [
+            "D05",
+            "D09",
+            "D13",
+            "D15",
+            "D16",
+            "D17",
+            "D18",
+            "D19"
+          ],
+          "evidenceRefs": [
+            "receipt60:api-response"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "E1",
+            "scenarioId": "full-flow-quantities"
+          },
+          "oracleExplanation": "반례: 수령60의 receivingCustodianId slot이 내부 actor procurement(W 수령 권한 있음)를 지명하지만 창고 원본 warehouse-60은 receiver를 지명한다. 보관자는 검증된 증거로만 알 수 있으므로(계획 §4.1–§4.2, §6) 제품은 수령을 HELD로 둔다. slot을 그대로 보관자로 쓰는 제품은 APPLIED를 내어 실패한다.",
+          "oracleRef": {
+            "oracleId": "E1.full-flow-quantities",
+            "observationNames": [
+              "receipt60-doc-duplicate-effects"
+            ]
+          }
+        },
+        {
+          "id": "custody-unverified-code",
+          "op": "equals",
+          "source": {
+            "actionId": "receipt60",
+            "pointer": "/response/error/code"
+          },
+          "expected": "EVIDENCE_UNVERIFIED",
+          "requirementRefs": [
+            "D05",
+            "D09",
+            "D13",
+            "D15",
+            "D16",
+            "D17",
+            "D18",
+            "D19"
+          ],
+          "evidenceRefs": [
+            "receipt60:api-response"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "E1",
+            "scenarioId": "full-flow-quantities"
+          },
+          "oracleExplanation": "보류 이유는 증거 미확인이다. 원본이 지명하지 않은 보관자다(권한 부족 SCOPE_INELIGIBLE이나 상충 EVIDENCE_CONFLICT가 아니다).",
+          "oracleRef": {
+            "oracleId": "E1.full-flow-quantities",
+            "observationNames": [
+              "receipt60-doc-duplicate-effects"
+            ]
+          }
+        },
+        {
+          "id": "custody-unverified-no-stock-at-W",
+          "op": "count",
+          "source": {
+            "actionId": "after-receipt-db",
+            "pointer": "/data/rawRows/segments",
+            "where": {
+              "locationId": {
+                "$alias": "W"
+              },
+              "active": true
+            }
+          },
+          "expected": 0,
+          "requirementRefs": [
+            "D05",
+            "D09",
+            "D13",
+            "D15",
+            "D16",
+            "D17",
+            "D18",
+            "D19"
+          ],
+          "evidenceRefs": [
+            "after-receipt-db:raw-rows"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "E1",
+            "scenarioId": "full-flow-quantities"
+          },
+          "oracleExplanation": "초기 W는 0이고 보류된 수령은 실물을 만들지 않는다. W에 활성 실물이 생기면 미확인 보관으로 재고를 만든 것이다.",
+          "oracleRef": {
+            "oracleId": "E1.full-flow-quantities",
+            "observationNames": [
+              "current-sell-eligible"
+            ]
+          }
+        },
+        {
+          "id": "custody-unverified-no-custody",
+          "op": "count",
+          "source": {
+            "actionId": "after-receipt-db",
+            "pointer": "/data/rawRows/segments",
+            "where": {
+              "custodianId": {
+                "$alias": "procurement"
+              }
+            }
+          },
+          "expected": 0,
+          "requirementRefs": [
+            "D05",
+            "D09",
+            "D13",
+            "D15",
+            "D16",
+            "D17",
+            "D18",
+            "D19"
+          ],
+          "evidenceRefs": [
+            "after-receipt-db:raw-rows"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "E1",
+            "scenarioId": "full-flow-quantities"
+          },
+          "oracleExplanation": "slot이 지명한 procurement를 보관자로 기록한 실물 행은 없다(활성·retired 모두).",
+          "oracleRef": {
+            "oracleId": "E1.full-flow-quantities",
+            "observationNames": [
+              "current-sell-eligible"
+            ]
+          }
+        },
+        {
+          "id": "custody-unverified-no-receipt",
+          "op": "count",
+          "source": {
+            "actionId": "after-receipt-db",
+            "pointer": "/data/rawRows/receipts"
+          },
+          "expected": 0,
+          "requirementRefs": [
+            "D05",
+            "D09",
+            "D13",
+            "D15",
+            "D16",
+            "D17",
+            "D18",
+            "D19"
+          ],
+          "evidenceRefs": [
+            "after-receipt-db:raw-rows"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "E1",
+            "scenarioId": "full-flow-quantities"
+          },
+          "oracleExplanation": "보류된 수령은 수령 원장 행을 남기지 않는다. 같은 수령을 증거가 지명한 보관자로 다시 확인할 수 있다.",
+          "oracleRef": {
+            "oracleId": "E1.full-flow-quantities",
+            "observationNames": [
+              "receipt60-doc-duplicate-effects"
+            ]
+          }
+        },
+        {
+          "id": "custody-unverified-mcp-same-snapshot",
+          "op": "equals",
+          "source": {
+            "actionId": "after-receipt-mcp",
+            "pointer": "/response/snapshotRevision"
+          },
+          "expected": {
+            "$result": {
+              "actionId": "after-receipt",
+              "pointer": "/response/snapshotRevision"
+            }
+          },
+          "requirementRefs": [
+            "D05",
+            "D09",
+            "D13",
+            "D15",
+            "D16",
+            "D17",
+            "D18",
+            "D19"
+          ],
+          "evidenceRefs": [
+            "after-receipt-mcp:mcp-response"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "E1",
+            "scenarioId": "full-flow-quantities"
+          },
+          "oracleExplanation": "MCP 조회는 보류 뒤 API 조회와 같은 snapshotRevision을 읽는다.",
+          "oracleRef": {
+            "oracleId": "E1.full-flow-quantities",
+            "observationNames": [
+              "receipt60-doc-duplicate-effects"
+            ]
+          }
+        }
+      ]
     }
   ]
 }

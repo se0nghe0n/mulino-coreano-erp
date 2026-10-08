@@ -255,7 +255,7 @@ tickScheduler/sweepDue 요청에 아래 세 parameter를 두면 수동 관찰이
 | `observationWindowSeconds` | 정수 1–30 | 관찰 창. 계획 §10 개발/CI 관찰 제한30초 |
 | `triggeredBy` | `SCHEDULER_LOOP` | 기대하는 제출 주체 |
 | `observeFrom` | ISO-8601 instant, harness가 해석 | 관찰 창의 시작. case는 쓰지 않는다 |
-| `naturalTickSeconds` | 정수 1–`observationWindowSeconds`, harness가 해석 | fixture `runtimeProfile.tickSeconds`. NO_TASK 최소 관찰 길이. case는 쓰지 않는다 |
+| `naturalTickSeconds` | 정수 1–`observationWindowSeconds`/2, harness가 해석 | fixture `runtimeProfile.tickSeconds`. NO_TASK는 이 값의 두 배를 관찰한다. case는 쓰지 않는다 |
 
 세 값은 watcher 설정이다. scheduler 증거가 아니다. 이전 계약은
 `operationEvidence`에 같은 세 값을 되돌려 달라고 했다. 요청을 그대로
@@ -298,16 +298,24 @@ scheduler가 실제로 한 일은 extractor `rawRows.schedulerSubmissions[]`로
   안에 행이 없다. NO_TASK는 자율 발견 실패를 그대로 드러내는 관찰이며
   case assertion에서 실패한다.
 - NO_TASK는 watcher가 다음 자연 tick을 실제로 지켜본 뒤에만 증거다
-  (step2r round 7). `CaseRunner.controlRequest`가 fixture
+  (step2r round 7·8). `CaseRunner.controlRequest`가 fixture
   `runtimeProfile.tickSeconds`를 `naturalTickSeconds`로 요청에 넣는다.
-  NO_TASK면 watcher command의 `completedAt`이 `observeFrom+naturalTickSeconds`
-  이후여야 하고, `naturalTickSeconds`가 없거나 1–`observationWindowSeconds`
-  밖이면 거부한다. 그래서 tick 1초인 loop에서 0.5초 만에 돌아온 watcher의
-  "제출 없음"으로, 이미 처리한 업무를 다음 tick에 다시 제출하는 sweeper가
-  T26 `repeat-no-due-task`를 통과하지 못한다. 창 전체(30초)를 요구하지
-  않는 것은 창 끝을 넘을 수 없다는 위 상한과 동시에 만족할 수 없기
-  때문이다. 수동 관찰 subcase의 fixture는 `tickSeconds`를 1–창 길이의
-  정수로 둬야 하고, case가 `naturalTickSeconds`를 직접 쓰면
+  NO_TASK면 watcher command의 `completedAt`이
+  `observeFrom+2×naturalTickSeconds` 이후여야 하고, `naturalTickSeconds`가
+  없거나 1–`observationWindowSeconds`/2 밖이면 거부한다. 한 tick으로는
+  부족하다(Step 2 closure review 5). `observeFrom`의 위상은 loop와 무관하고,
+  고정 지연 scheduler의 주기는 tick에 처리 시간을 더한 값이며, 제출 행은
+  tick이 시작된 뒤에 기록된다. 그래서 tick 1초 loop에서 +1.2초에 다시
+  제출하는 sweeper를 +1초에 끝난 watcher가 놓친다. 두 주기를 관찰하면 창
+  안에서 적어도 한 tick이 시작부터 기록까지 끝난다. tick 1초면 2초로 30초
+  창 안이다. 창 전체(30초)를 요구하지 않는 것은 창 끝을 넘을 수 없다는 위
+  상한과 동시에 만족할 수 없기 때문이다.
+- NO_TASK의 extractor는 watcher가 끝난 뒤 scheduler의 지속 제출 행을 읽는다.
+  `extractor.command.startedAt`이 watcher `command.completedAt`보다 앞서면
+  거부한다. 그래서 extractor는 `completedAt`까지 기록된 모든 행을 본다.
+  `completedAt` 뒤·창 안에 기록된 행도 읽으면 NO_TASK와 모순이므로
+  fail-closed다. 수동 관찰 subcase의 fixture는 `tickSeconds`를
+  1–창 길이/2의 정수로 둬야 하고, case가 `naturalTickSeconds`를 직접 쓰면
   `runtimeProfileProblems`가 준비 실패로 낸다.
 - host `command`는 watcher의 실제 argv/구간이다. 구간은
   `observationWindowSeconds`를 넘지 않는다. SUBMITTED의 submittedAt은

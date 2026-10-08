@@ -61,7 +61,8 @@ final class StepTwoRoundSevenRegressionTest {
         // T13: the move to W-alt and the reserve need the custody too; dropping the slot of receipt40 alone is caught.
         assertTrue(custodyProblems("T13","partial-excess-return-relocation",s->slots(s,"receipt40").remove("receivingCustodianId"),none).stream()
             .anyMatch(p->p.contains("receipt40") && p.contains("move moveQuantity")));
-        // A transit receipt keeps the transit leaf's custodian and never carries the slot (C2 receive60 confirms A60).
+        // A transit receipt keeps the transit leaf's custodian and never carries the slot (C2 receive60 confirms A60, a TRANSIT
+        // leaf since step2r round 8; StepTwoRoundEightRegressionTest pins the exact-leaf rule).
         assertTrue(custodyProblems("C2","cumulative-versus-state",s->slots(s,"receive60").set("receivingCustodianId",Json.parse("{\"$alias\":\"warehouse\"}")),none).stream()
             .anyMatch(p->p.contains("transit receipt")));
         // A direct receipt whose stock nobody reserves/dispatches/moves needs no slot (T07 two documents, one receipt).
@@ -69,6 +70,7 @@ final class StepTwoRoundSevenRegressionTest {
     }
     @Test void e1ProvesConfirmedInternalCustodyBeforeTheHolds() throws Exception {
         for(JsonNode s:caseJson("E1").path("subcases")) {
+            if(s.path("id").asText().equals("receipt-custody-unverified")) continue; // the step2r round 8 declared custody negative
             List<String> ids=new ArrayList<>();for(JsonNode a:s.path("actions")) ids.add(a.path("id").asText());
             int custody=ids.indexOf("received-custody-db");
             assertTrue(custody>ids.indexOf("receipt40") && custody<ids.indexOf("qc-hold60"),s.path("id").asText()+": control sits after both receipts and before the first hold");
@@ -96,14 +98,17 @@ final class StepTwoRoundSevenRegressionTest {
         assertTrue(actual.containsAll(List.of("W","W2")));
     }
 
-    // P3 (b): a NO_TASK passive observation lasts at least one natural tick after observeFrom.
-    private HostObservationValidatorTest.Capture noTask(String commandStart,String commandEnd,Integer tick) throws Exception {
+    // P3 (b): a NO_TASK passive observation lasts long enough after observeFrom (two natural ticks since step2r round 8) and
+    // its extractor reads the scheduler rows after the watcher completed.
+    HostObservationValidatorTest.Capture noTask(String commandStart,String commandEnd,Integer tick) throws Exception {return noTask(commandStart,commandEnd,tick,commandEnd);}
+    HostObservationValidatorTest.Capture noTask(String commandStart,String commandEnd,Integer tick,String extractorStart) throws Exception {
         HostObservationValidatorTest.Capture c=new HostObservationValidatorTest().capture("sweepDue","sweepDue-natural-rows.json");
         ObjectNode rows=(ObjectNode)c.host().path("extractor").path("rawRows");
         ObjectNode e=(ObjectNode)rows.path("operationEvidence");e.remove(List.of("taskId","invocationHandle","submittedAt"));e.put("submissionStatus","NO_TASK");
         rows.set("schedulerSubmissions",Json.array());
         ((ObjectNode)rows.path("command")).put("startedAt",commandStart).put("completedAt",commandEnd);
         c.host().set("command",rows.path("command").deepCopy());c.host().set("operationEvidence",e.deepCopy());
+        ((ObjectNode)c.host().path("extractor").path("command")).put("startedAt",extractorStart).put("completedAt",extractorStart);
         ObjectNode params=(ObjectNode)c.control().path("parameters");params.put("trigger","OBSERVE_NEXT_NATURAL_TICK").put("observationWindowSeconds",30).put("triggeredBy","SCHEDULER_LOOP");
         params.put("observeFrom",commandStart);if(tick!=null) params.put("naturalTickSeconds",tick);
         c.host().set("requestedInputs",params.deepCopy());
@@ -114,15 +119,15 @@ final class StepTwoRoundSevenRegressionTest {
         List<String> refs=new ArrayList<>(c.result().artifactRefs());refs.add(refPath);
         return new HostObservationValidatorTest.Capture(c.control(),c.host(),new StepResult(c.result().actionId(),c.result().driverStatus(),c.result().data(),null,c.result().reason(),c.result().provenance(),refs));
     }
-    private String rejection(HostObservationValidatorTest.Capture c) {
+    String rejection(HostObservationValidatorTest.Capture c) {
         return assertThrows(IllegalArgumentException.class,()->HostObservationValidator.validate(new ContractValidator(root),c.control(),c.result(),false,null)).getMessage();
     }
     @Test void noTaskObservationCoversAtLeastOneNaturalTick() throws Exception {
         ContractValidator v=new ContractValidator(root);
-        HostObservationValidatorTest.Capture full=noTask("2026-10-07T00:00:00Z","2026-10-07T00:00:01Z",1);
+        HostObservationValidatorTest.Capture full=noTask("2026-10-07T00:00:00Z","2026-10-07T00:00:02Z",1);
         HostObservationValidator.validate(v,full.control(),full.result(),false,null);
         // The closure review 4 shape: the watcher returned 0.5 s after observeFrom with tickSeconds=1.
-        assertTrue(rejection(noTask("2026-10-07T00:00:00Z","2026-10-07T00:00:00.500Z",1)).contains("ended before one natural tick"));
+        assertTrue(rejection(noTask("2026-10-07T00:00:00Z","2026-10-07T00:00:00.500Z",1)).contains("ended before 2 natural ticks"));
         assertTrue(rejection(noTask("2026-10-07T00:00:00Z","2026-10-07T00:00:03Z",null)).contains("naturalTickSeconds"));
         assertTrue(rejection(noTask("2026-10-07T00:00:00Z","2026-10-07T00:00:03Z",31)).contains("naturalTickSeconds must be"));
         // Prepare: a case does not author naturalTickSeconds, and passive subcases declare a tick that fits the window.
