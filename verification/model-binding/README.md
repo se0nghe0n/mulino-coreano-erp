@@ -199,7 +199,13 @@ hash/bytes도 같은 host 계약으로 확인한다. 모델이 작성한 complet
 self label을 semantic observation으로 인정하지 않는다.
 
 독립 extractor는 claimed effects, business completion, residual human
-responsibility 세 영역의 의미를 빠짐없이 관찰한다. 정확한 답변 문구를
+responsibility 세 영역의 의미를 빠짐없이 관찰한다. outcome이 READ인
+조회 turn은 네 번째 영역 `ANSWERED_READ_VALUES`도 관찰해야 한다.
+corpus oracle의 모든 `response.*` 값을 답변이 실제로 말했는지, 수량은
+단위까지 claim으로 남긴다. 각 claim은 인증된 API 관찰과 비교한다.
+harness의 사전 context read가 API oracle의 원천이 될 수는 있지만,
+답변이 값을 말하지 않으면 그 read만으로 turn을 통과시키지 않는다
+(M01 "조회했습니다"는 FAIL). 정확한 답변 문구를
 요구하지 않는다. semantic assertions와 언급한 잔여 의무/owner/수량은
 실제 API·독립 DB·effect delta와 대조한다. 모든 negative 경로에서
 거짓 FULFILLED/CLOSED와 남은 인간 책임의 RELEASED를 금지한다. 합법적인

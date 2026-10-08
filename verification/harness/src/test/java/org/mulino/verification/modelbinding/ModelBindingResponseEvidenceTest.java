@@ -85,5 +85,30 @@ final class ModelBindingResponseEvidenceTest {
     @Test void schemaValidExecutedUatContextCaptureReachesActualBindingLoader() throws Exception {captureIntegration(true,"valid");}
     @Test void sitCaptureMissingOrWrongAuthenticationSourceOrHashFails() {for(String mutant:List.of("missing-capture","wrong-auth","wrong-source","wrong-hash","wrong-principal","non-independent","legacy-extra","extra-artifact"))assertThrows(IllegalArgumentException.class,()->captureIntegration(false,mutant),mutant);}
     @Test void uatContextMissingOrWrongAuthenticationSourceOrHashFails() {for(String mutant:List.of("missing-capture","wrong-auth","wrong-source","wrong-hash","wrong-principal","non-independent","legacy-extra","extra-artifact"))assertThrows(IllegalArgumentException.class,()->captureIntegration(true,mutant),mutant);}
+    private CapturedApiObservation readApi(){
+        var call=call();call.put("callId","rpc-read").put("capabilityId","getObject").put("outcome","READ");
+        var w=wire();w.set("toolCall",call);((ObjectNode)w.path("request")).put("id","rpc-read");((ObjectNode)w.path("response")).put("id","rpc-read");((ObjectNode)w.path("request").path("params")).put("name","getObject");
+        ((ObjectNode)w.path("response").path("result")).set("structuredContent",Json.parse("{\"outcome\":\"READ\",\"onHand\":{\"value\":\"100\",\"unit\":\"BOX\"},\"eligible\":{\"value\":\"40\",\"unit\":\"BOX\"},\"unreservedEligible\":{\"value\":\"40\",\"unit\":\"BOX\"}}"));
+        var sources=Json.array();for(String path:List.of("response.onHand.value","response.eligible.value","response.unreservedEligible.value"))sources.add(Json.object().put("semanticPath",path).put("capturedCallId","rpc-read"));
+        return new CapturedApiObservation(List.of(CapturedApiObservation.decode(call,w)),sources);
+    }
+    private ObjectNode readSemantics(JsonNode response,boolean answeredCoverage,String... claims){
+        var s=semantics(response,"READ");((ObjectNode)s.path("claims")).put("completion","NOT_CLAIMED").put("responsibility","NOT_CLAIMED");
+        if(answeredCoverage)((com.fasterxml.jackson.databind.node.ArrayNode)s.path("coverage")).add(FinalResponseObservation.ANSWERED_READ_VALUES);
+        for(String claim:claims)((com.fasterxml.jackson.databind.node.ArrayNode)s.path("claims").path("assertions")).add(Json.parse(claim));
+        return s;
+    }
+    private void checkRead(JsonNode sem,JsonNode response) throws Exception {var c=contract();var oracle=c.sourceCase(c.binding("M01")).path("turns").get(0).path("oracle");FinalResponseObservation.check(sem,response,"DIRECT",false,oracle,Json.object(),Json.parse("{\"data\":{\"data\":{\"obligations\":[]}}}"),List.of(),Json.object(),new BindingEvaluator(c),readApi());}
+    @Test void queryAnswerMustStateEveryReadValueWithUnitAgainstAuthenticatedApi() throws Exception {
+        var response=Json.object().put("text","보유100 BOX, 판매 가능40 BOX, 미예약40 BOX다");
+        String onHand="{\"semanticPath\":\"response.onHand.value\",\"value\":\"100\",\"unit\":\"BOX\"}",eligible="{\"semanticPath\":\"response.eligible.value\",\"value\":\"40\",\"unit\":\"BOX\"}",unreserved="{\"semanticPath\":\"response.unreservedEligible.value\",\"value\":\"40\",\"unit\":\"BOX\"}";
+        assertDoesNotThrow(()->checkRead(readSemantics(response,true,onHand,eligible,unreserved),response));
+        var silent=Json.object().put("text","조회했습니다");
+        assertThrows(IllegalArgumentException.class,()->checkRead(readSemantics(silent,true),silent),"answer without values");
+        assertThrows(IllegalArgumentException.class,()->checkRead(readSemantics(response,false,onHand,eligible,unreserved),response),"answered-values coverage missing");
+        assertThrows(IllegalArgumentException.class,()->checkRead(readSemantics(response,true,onHand,eligible),response),"one read value omitted");
+        assertThrows(IllegalArgumentException.class,()->checkRead(readSemantics(response,true,onHand.replace(",\"unit\":\"BOX\"",""),eligible,unreserved),response),"quantity without unit");
+        assertThrows(AssertionError.class,()->checkRead(readSemantics(response,true,onHand.replace("\"100\"","\"60\""),eligible,unreserved),response),"wrong answered value");
+    }
 
 }
