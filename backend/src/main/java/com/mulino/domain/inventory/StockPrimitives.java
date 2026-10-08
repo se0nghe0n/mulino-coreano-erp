@@ -90,21 +90,25 @@ public final class StockPrimitives {
   }
   /** Relocates an identified interval and retains exact prefix/suffix identities. */
   public String transferRange(DomainContext c,String segmentId,BigDecimal start,BigDecimal q,String destination,Instant at,String evidence,String command,String kind){
-    return replaceRange(c,segmentId,start,q,destination,at,evidence,command,kind,false,null);
+    return replaceRange(c,segmentId,start,q,destination,at,evidence,command,kind,false,null,false);
+  }
+  /** Moves an interval out of internal custody (e.g. to the customer): custody becomes unknown unless later evidenced; ownership is untouched. */
+  public String transferRangeReleasingCustody(DomainContext c,String segmentId,BigDecimal start,BigDecimal q,String destination,Instant at,String evidence,String command,String kind){
+    return replaceRange(c,segmentId,start,q,destination,at,evidence,command,kind,false,null,true);
   }
   public String transferRange(DomainContext c,String segmentId,BigDecimal start,BigDecimal q,String destination,String custodian,Instant at,String evidence,String command,String kind){
-    if(!repository.internalCustodian(c,custodian))throw DomainError.invalid("Confirmed internal custodian required");return replaceRange(c,segmentId,start,q,destination,at,evidence,command,kind,false,custodian);
+    if(!repository.internalCustodian(c,custodian))throw DomainError.invalid("Confirmed internal custodian required");return replaceRange(c,segmentId,start,q,destination,at,evidence,command,kind,false,custodian,false);
   }
   public void disposeRange(DomainContext c,String segmentId,BigDecimal start,BigDecimal q,Instant at,String evidence,String command){
-    replaceRange(c,segmentId,start,q,null,at,evidence,command,"DISPOSE",true,null);
+    replaceRange(c,segmentId,start,q,null,at,evidence,command,"DISPOSE",true,null,false);
   }
-  private String replaceRange(DomainContext c,String segmentId,BigDecimal start,BigDecimal q,String destination,Instant at,String evidence,String command,String kind,boolean discard,String custodian){
+  private String replaceRange(DomainContext c,String segmentId,BigDecimal start,BigDecimal q,String destination,Instant at,String evidence,String command,String kind,boolean discard,String custodian,boolean releaseCustody){
     lockSources(c,List.of(segmentId));var source=leaf(c,segmentId,at);quantity(c,source,q.toPlainString(),(String)source.get("unit"));
     if(start.signum()<0||start.add(q).compareTo(amount(source))>0||"UNCERTAIN_MIXTURE".equals(source.get("mixtureStatus")))throw DomainError.invalid("Identified exact physical interval required");
     if(destination!=null)repository.current(c,"Places",destination);
     var children=new ArrayList<Map<String,Object>>();String selected=null;
     BigDecimal end=start.add(q);var intervals=new ArrayList<QualityRanges.Range>();if(start.signum()>0)intervals.add(new QualityRanges.Range(BigDecimal.ZERO,start));if(!discard)intervals.add(new QualityRanges.Range(start,end));if(end.compareTo(amount(source))<0)intervals.add(new QualityRanges.Range(end,amount(source)));
-    for(var range:intervals){boolean chosen=!discard&&range.start().compareTo(start)==0&&range.end().compareTo(end)==0;var child=child(c,source,range.end().subtract(range.start()),chosen?destination:(String)source.get("placeId"),at,evidence);if(chosen&&custodian!=null)child.put("custodianId",custodian);repository.insert("QuantitySegments",child);children.add(child);edge(c,source,child,amount(child),range.start(),BigDecimal.ZERO,chosen?kind:"RETAINED",false,at,evidence,command);if(chosen)selected=(String)child.get("ID");}
+    for(var range:intervals){boolean chosen=!discard&&range.start().compareTo(start)==0&&range.end().compareTo(end)==0;var child=child(c,source,range.end().subtract(range.start()),chosen?destination:(String)source.get("placeId"),at,evidence);if(chosen&&custodian!=null)child.put("custodianId",custodian);if(chosen&&releaseCustody)child.remove("custodianId");repository.insert("QuantitySegments",child);children.add(child);edge(c,source,child,amount(child),range.start(),BigDecimal.ZERO,chosen?kind:"RETAINED",false,at,evidence,command);if(chosen)selected=(String)child.get("ID");}
     repository.update(c,"QuantitySegments",segmentId,Map.of("retiredAt",at,"retirementRecordedAt",c.knownAt(),"revision",((Number)source.get("revision")).intValue()+1));
     transferAllocations(c,source,children,at,command);closeMembership(c,source,children,at);if(discard)movement(c,source,null,q,kind,at,evidence,command);return selected;
   }

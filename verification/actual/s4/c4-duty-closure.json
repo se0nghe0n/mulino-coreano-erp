@@ -1,0 +1,510 @@
+{
+  "schemaVersion": "1.0.0",
+  "status": "NOT_RUN",
+  "actions": [
+    {
+      "id": "c4-deficit2-target",
+      "type": "observe",
+      "assertions": [
+        {
+          "pointer": "/rawRows/mulino_work_read_obligationreferences",
+          "operator": "matchingRows",
+          "where": {
+            "kind": "DELIVERY_CORRECTED_DEFICIT",
+            "status": "OPEN"
+          },
+          "expected": 1
+        }
+      ],
+      "bindRows": {
+        "DEFICIT_ASSIGNMENT": {
+          "pointer": "/rawRows/mulino_work_read_obligationreferences",
+          "where": {
+            "kind": "DELIVERY_CORRECTED_DEFICIT",
+            "status": "OPEN"
+          },
+          "column": "id"
+        },
+        "DEFICIT_REV": {
+          "pointer": "/rawRows/mulino_work_read_obligationreferences",
+          "where": {
+            "kind": "DELIVERY_CORRECTED_DEFICIT",
+            "status": "OPEN"
+          },
+          "column": "revision"
+        }
+      }
+    },
+    {
+      "id": "c4-resolve-deficit2-with-own-correction",
+      "type": "command",
+      "capability": "resolveObligation",
+      "request": {
+        "intentKind": "COMMAND",
+        "definitionVersion": "definition-v1",
+        "capabilityId": "resolveObligation",
+        "expectedRevision": "$DEFICIT_REV",
+        "commandIdempotencyKey": "c4-resolve-deficit2-with-own-correction",
+        "slots": {
+          "assignmentId": "$DEFICIT_ASSIGNMENT",
+          "evidenceId": "$c4-correction98.canonical"
+        },
+        "provenance": {},
+        "subjectRefs": [
+          {
+            "type": "Work",
+            "id": "$SALES_WORK"
+          }
+        ]
+      },
+      "outcome": "HELD",
+      "assertions": [
+        {
+          "pointer": "/error/code",
+          "operator": "equals",
+          "expected": "EVIDENCE_UNVERIFIED"
+        }
+      ]
+    },
+    {
+      "id": "c4-waive-deficit2-without-decision",
+      "type": "command",
+      "capability": "waiveObligation",
+      "request": {
+        "intentKind": "COMMAND",
+        "definitionVersion": "definition-v1",
+        "capabilityId": "waiveObligation",
+        "expectedRevision": "$DEFICIT_REV",
+        "commandIdempotencyKey": "c4-waive-deficit2-without-decision",
+        "slots": {
+          "assignmentId": "$DEFICIT_ASSIGNMENT",
+          "reason": "고객이 실제 98 인도를 최종 수용했다"
+        },
+        "provenance": {},
+        "subjectRefs": [
+          {
+            "type": "Work",
+            "id": "$SALES_WORK"
+          }
+        ]
+      },
+      "outcome": "REJECTED"
+    },
+    {
+      "id": "c4-deficit2-still-open",
+      "type": "observe",
+      "assertions": [
+        {
+          "pointer": "/rawRows/mulino_work_read_obligationreferences",
+          "operator": "matchingRows",
+          "where": {
+            "kind": "DELIVERY_CORRECTED_DEFICIT",
+            "status": "OPEN"
+          },
+          "expected": 1
+        },
+        {
+          "pointer": "/rawRows/mulino_work_read_obligationreferences",
+          "operator": "matchingRows",
+          "where": {
+            "kind": "DELIVERY_CORRECTED_DEFICIT"
+          },
+          "expected": 1
+        }
+      ]
+    },
+    {
+      "id": "c4-manager-waiver-decision",
+      "type": "command",
+      "capability": "decideQuantityDutyWaiver",
+      "request": {
+        "intentKind": "COMMAND",
+        "definitionVersion": "definition-v1",
+        "capabilityId": "decideQuantityDutyWaiver",
+        "expectedRevision": "$DEFICIT_REV",
+        "commandIdempotencyKey": "c4-manager-waiver-decision",
+        "slots": {
+          "assignmentId": "$DEFICIT_ASSIGNMENT",
+          "decision": "APPROVE",
+          "reason": "고객이 실제 98 인도를 최종 수용했다",
+          "validUntil": "2026-10-31T00:00:00Z"
+        },
+        "provenance": {},
+        "subjectRefs": [
+          {
+            "type": "Work",
+            "id": "$SALES_WORK"
+          }
+        ]
+      },
+      "outcome": "APPLIED",
+      "bind": {
+        "WAIVER_APPROVAL": "/effects/responsibility/approvalId"
+      },
+      "actor": "supervisor",
+      "assertions": [
+        {
+          "pointer": "/effects/responsibility/decision",
+          "operator": "equals",
+          "expected": "APPROVED"
+        },
+        {
+          "pointer": "/effects/responsibility/authorityClass",
+          "operator": "equals",
+          "expected": "MANAGER"
+        }
+      ]
+    },
+    {
+      "id": "c4-waive-deficit2",
+      "type": "command",
+      "capability": "waiveObligation",
+      "request": {
+        "intentKind": "COMMAND",
+        "definitionVersion": "definition-v1",
+        "capabilityId": "waiveObligation",
+        "expectedRevision": "$DEFICIT_REV",
+        "commandIdempotencyKey": "c4-waive-deficit2",
+        "slots": {
+          "assignmentId": "$DEFICIT_ASSIGNMENT",
+          "reason": "고객이 실제 98 인도를 최종 수용했다"
+        },
+        "provenance": {},
+        "subjectRefs": [
+          {
+            "type": "Work",
+            "id": "$SALES_WORK"
+          }
+        ],
+        "approvalId": "$WAIVER_APPROVAL"
+      },
+      "outcome": "APPLIED",
+      "assertions": [
+        {
+          "pointer": "/effects/responsibility/status",
+          "operator": "equals",
+          "expected": "WAIVED"
+        }
+      ]
+    },
+    {
+      "id": "c4-deficit2-waived",
+      "type": "observe",
+      "assertions": [
+        {
+          "pointer": "/rawRows/mulino_work_read_obligationreferences",
+          "operator": "matchingRows",
+          "where": {
+            "kind": "DELIVERY_CORRECTED_DEFICIT",
+            "status": "WAIVED",
+            "id": "$DEFICIT_ASSIGNMENT"
+          },
+          "expected": 1
+        },
+        {
+          "pointer": "/rawRows/mulino_work_read_obligationreferences",
+          "operator": "matchingRows",
+          "where": {
+            "kind": "DELIVERY_CORRECTED_DEFICIT",
+            "status": "OPEN"
+          },
+          "expected": 0
+        }
+      ],
+      "bindRows": {
+        "WAIVED_REV": {
+          "pointer": "/rawRows/mulino_work_read_obligationreferences",
+          "where": {
+            "kind": "DELIVERY_CORRECTED_DEFICIT",
+            "status": "WAIVED",
+            "id": "$DEFICIT_ASSIGNMENT"
+          },
+          "column": "revision"
+        }
+      }
+    },
+    {
+      "id": "c4-waive-deficit2-reuse",
+      "type": "command",
+      "capability": "waiveObligation",
+      "request": {
+        "intentKind": "COMMAND",
+        "definitionVersion": "definition-v1",
+        "capabilityId": "waiveObligation",
+        "expectedRevision": "$WAIVED_REV",
+        "commandIdempotencyKey": "c4-waive-deficit2-reuse",
+        "slots": {
+          "assignmentId": "$DEFICIT_ASSIGNMENT",
+          "reason": "고객이 실제 98 인도를 최종 수용했다"
+        },
+        "provenance": {},
+        "subjectRefs": [
+          {
+            "type": "Work",
+            "id": "$SALES_WORK"
+          }
+        ],
+        "approvalId": "$WAIVER_APPROVAL"
+      },
+      "outcome": "REJECTED"
+    },
+    {
+      "id": "c4-deficit2-waived-once",
+      "type": "observe",
+      "assertions": [
+        {
+          "pointer": "/rawRows/mulino_work_read_obligationreferences",
+          "operator": "matchingRows",
+          "where": {
+            "kind": "DELIVERY_CORRECTED_DEFICIT",
+            "status": "WAIVED",
+            "id": "$DEFICIT_ASSIGNMENT"
+          },
+          "expected": 1
+        },
+        {
+          "pointer": "/rawRows/mulino_work_read_obligationreferences",
+          "operator": "matchingRows",
+          "where": {
+            "kind": "DELIVERY_CORRECTED_DEFICIT",
+            "status": "OPEN"
+          },
+          "expected": 0
+        }
+      ]
+    },
+    {
+      "id": "c4-correction98-reprocess-clock",
+      "type": "clock",
+      "instant": "2026-10-07T09:00:05Z"
+    },
+    {
+      "id": "c4-correction98-reprocess",
+      "type": "original",
+      "fixture": {
+        "synthetic": true,
+        "clock": {
+          "asOf": "2026-10-07T09:00:02Z",
+          "knownAt": "2026-10-07T09:00:05Z"
+        },
+        "sourceProfile": {
+          "namespace": "native-c4-c4-correction98-reprocess",
+          "policyVersion": "fixture-v1",
+          "nextAction": "가상 원본과 실제 범위 대조",
+          "nextCheckAt": "2026-10-08T09:00:00Z"
+        },
+        "occurrence": {
+          "kind": "PHYSICAL_DELIVERY",
+          "content": {
+            "deliveryEventId": "$DELIVERY_EVENT",
+            "dispatchId": "$DISPATCH",
+            "cargoScopeId": "$CARGO",
+            "salesLineId": "$SALES_LINE",
+            "customerId": "$C",
+            "itemId": "$P",
+            "lotId": "$L",
+            "rangeRootId": "$DISPATCH_RANGE",
+            "physicalScopeId": "$DELIVERY_OBSERVATION",
+            "startQuantity": "0",
+            "quantity": "98",
+            "unit": "BOX",
+            "placeId": "$CUSTOMER_PLACE",
+            "occurredAt": "2026-10-07T09:00:02Z",
+            "correctionOfDeliveryId": "$DELIVERY"
+          },
+          "externalEventId": "c4-correction98-reprocess",
+          "quantity": "98",
+          "unit": "BOX",
+          "assertion": "authored synthetic external original"
+        }
+      },
+      "binding": {
+        "organizationId": "$ORG",
+        "workId": "$SALES_WORK",
+        "itemId": "$P",
+        "actorId": "$reader",
+        "supervisorId": "$supervisor",
+        "physicalScopeId": "$DELIVERY_OBSERVATION",
+        "subjectId": "$DISPATCH",
+        "subjectKind": "DISPATCH",
+        "placeId": "$CUSTOMER_PLACE"
+      }
+    },
+    {
+      "id": "c4-correction98-reprocess-event",
+      "type": "command",
+      "capability": "correctEvidence",
+      "request": {
+        "intentKind": "RECORD",
+        "definitionVersion": "definition-v1",
+        "capabilityId": "correctEvidence",
+        "expectedRevision": 2,
+        "commandIdempotencyKey": "c4-correction98-reprocess-event",
+        "slots": {
+          "subject": {
+            "kind": "DISPATCH",
+            "id": "$DISPATCH"
+          },
+          "kind": "PHYSICAL_DELIVERY",
+          "sourceNamespace": "native-c4-c4-delivery-original",
+          "externalEventId": "c4-delivery-original",
+          "sourceVersion": "3",
+          "effectiveFrom": "2026-10-07T09:00:02Z",
+          "timeZone": "UTC",
+          "timePrecision": "SECOND",
+          "valueState": "KNOWN",
+          "payload": "{\"deliveryEventId\":\"${DELIVERY_EVENT}\",\"dispatchId\":\"${DISPATCH}\",\"cargoScopeId\":\"${CARGO}\",\"salesLineId\":\"${SALES_LINE}\",\"customerId\":\"${C}\",\"itemId\":\"${P}\",\"lotId\":\"${L}\",\"rangeRootId\":\"${DISPATCH_RANGE}\",\"physicalScopeId\":\"${DELIVERY_OBSERVATION}\",\"startQuantity\":\"0\",\"quantity\":\"98\",\"unit\":\"BOX\",\"placeId\":\"${CUSTOMER_PLACE}\",\"occurredAt\":\"2026-10-07T09:00:02Z\",\"correctionOfDeliveryId\":\"${DELIVERY}\"}",
+          "supersedesId": "$c4-correction98.event",
+          "documentId": "$c4-correction98-reprocess.document",
+          "assertion": "명시적 실제 인도 정정",
+          "quantity": "98",
+          "unit": "BOX",
+          "evidenceType": "EVENT"
+        },
+        "provenance": {},
+        "subjectRefs": [
+          {
+            "type": "Dispatch",
+            "id": "$DISPATCH"
+          }
+        ]
+      },
+      "outcome": "APPLIED",
+      "bind": {
+        "c4-correction98-reprocess.event": "/id",
+        "c4-correction98-reprocess.claim": "/claimId"
+      }
+    },
+    {
+      "id": "c4-correction98-reprocess-match",
+      "type": "command",
+      "capability": "matchSourceIdentity",
+      "request": {
+        "intentKind": "COMMAND",
+        "definitionVersion": "definition-v1",
+        "capabilityId": "matchSourceIdentity",
+        "expectedRevision": 1,
+        "commandIdempotencyKey": "c4-correction98-reprocess-match",
+        "slots": {
+          "claimId": "$c4-correction98-reprocess.claim",
+          "basisDocumentId": "$c4-correction98-reprocess.document",
+          "physicalScopeId": "$DELIVERY_OBSERVATION",
+          "policyVersion": "fixture-v1",
+          "sourceIdentity": "native-c4-c4-delivery-original:c4-delivery-original:3",
+          "quantity": "98",
+          "unit": "BOX",
+          "effectiveFrom": "2026-10-07T09:00:02Z",
+          "reason": "원본 정체성과 물량 대조"
+        },
+        "provenance": {},
+        "subjectRefs": [
+          {
+            "type": "Dispatch",
+            "id": "$DISPATCH"
+          }
+        ]
+      },
+      "outcome": "APPLIED",
+      "bind": {
+        "c4-correction98-reprocess.reconciliation": "/id"
+      }
+    },
+    {
+      "id": "c4-correction98-reprocess-link",
+      "type": "command",
+      "capability": "linkCanonicalOccurrence",
+      "request": {
+        "intentKind": "COMMAND",
+        "definitionVersion": "definition-v1",
+        "capabilityId": "linkCanonicalOccurrence",
+        "expectedRevision": 1,
+        "commandIdempotencyKey": "c4-correction98-reprocess-link",
+        "slots": {
+          "reconciliationId": "$c4-correction98-reprocess.reconciliation"
+        },
+        "provenance": {},
+        "subjectRefs": [
+          {
+            "type": "Dispatch",
+            "id": "$DISPATCH"
+          }
+        ]
+      },
+      "outcome": "APPLIED",
+      "bind": {
+        "c4-correction98-reprocess.canonical": "/id"
+      }
+    },
+    {
+      "id": "c4-waived-deficit-not-revived",
+      "type": "observe",
+      "assertions": [
+        {
+          "pointer": "/rawRows/mulino_evidence_events",
+          "operator": "matchingRows",
+          "where": {
+            "id": "$c4-correction98-reprocess.event",
+            "supersedesid": "$c4-correction98.event"
+          },
+          "expected": 1
+        },
+        {
+          "pointer": "/rawRows/mulino_trade_sales_deliverycorrections",
+          "operator": "matchingRows",
+          "where": {
+            "deliveryid": "$DELIVERY"
+          },
+          "expected": 2
+        },
+        {
+          "pointer": "/rawRows/mulino_work_read_obligationreferences",
+          "operator": "matchingRows",
+          "where": {
+            "kind": "DELIVERY_CORRECTED_DEFICIT",
+            "status": "OPEN"
+          },
+          "expected": 0
+        },
+        {
+          "pointer": "/rawRows/mulino_work_read_obligationreferences",
+          "operator": "matchingRows",
+          "where": {
+            "kind": "DELIVERY_CORRECTED_DEFICIT"
+          },
+          "expected": 1
+        },
+        {
+          "pointer": "/rawRows/mulino_work_read_obligationreferences",
+          "operator": "matchingRows",
+          "where": {
+            "kind": "DELIVERY_CORRECTED_DEFICIT",
+            "status": "WAIVED",
+            "id": "$DEFICIT_ASSIGNMENT"
+          },
+          "expected": 1
+        },
+        {
+          "pointer": "/rawRows/mulino_work_read_assessmentreferences",
+          "operator": "matchingRows",
+          "where": {
+            "id": "$PAST_ASSESSMENT",
+            "outcome": "SATISFIED"
+          },
+          "expected": 1
+        },
+        {
+          "pointer": "/rawRows/mulino_trade_sales_deliveries",
+          "operator": "sum",
+          "column": "quantity",
+          "expected": "100"
+        },
+        {
+          "pointer": "/rawRows/mulino_trade_returns_receipts",
+          "operator": "sum",
+          "column": "quantity",
+          "expected": "20"
+        }
+      ]
+    }
+  ]
+}

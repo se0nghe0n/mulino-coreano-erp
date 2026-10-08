@@ -23,11 +23,13 @@ public class PolicyCommandGuard implements CommandGuard {
    if(!everyScope(c,capability,p.scopes()))throw DomainError.forbidden();
    var selection=rule(c,capability);var rule=selection.rule();
    if(!p.effectClass().equals(rule.get("effectClass")))throw held("Effect class is unresolved");
-   String action=(String)rule.get("approvalAction");
+   String action=(String)rule.get("approvalAction");String decision=(String)rule.get("decisionCapability");
+   // Explicit per-subject approval actions (e.g. WAIVE_<duty kind>) map to their own decision capability; no wildcard.
+   if(p.approvalAction()!=null&&rule.get("approvalActions") instanceof Map<?,?> mapped&&mapped.get(p.approvalAction()) instanceof String selected){action=p.approvalAction();decision=selected;}
    if(!Objects.equals(action,p.approvalAction()))throw held("Approval policy mismatch");
    if(action==null){remember(c,capability,hash,p,List.of());rememberFacts(c,capability,hash,p,selection,null,null);return;}
    var a=approval(c,intent);String approver=(String)a.get("approverId");auth.fence(c,List.of(approver));
-   String decision=(String)rule.get("decisionCapability");if(decision==null)throw held("Decision capability is unresolved");
+   if(decision==null)throw held("Decision capability is unresolved");
    var actor=identity.actor(c.organizationId(),approver).orElseThrow(DomainError::forbidden);if(!"HUMAN".equals(actor.get("kind")))throw DomainError.forbidden();
    var ac=new DomainContext(c.organizationId(),approver,(String)actor.get("stableRequestOwner"),c.asOf(),c.knownAt());
    if(!everyScope(ac,decision,p.scopes())||!decision.equals(a.get("decisionCapability")))throw DomainError.forbidden();

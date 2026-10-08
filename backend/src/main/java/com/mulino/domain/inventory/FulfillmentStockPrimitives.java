@@ -38,7 +38,8 @@ public final class FulfillmentStockPrimitives implements DispatchCargoPort {
   for(var leaf:r.currentRows(c,"QuantitySegments"))if(leaf.get("retiredAt")==null&&"TRANSIT".equals(r.current(c,"Places",(String)leaf.get("placeId")).get("kind"))){var mapped=ranges.project(c,root,(String)leaf.get("ID"),start,q);if(QualityRanges.quantity(mapped).compareTo(q)==0&&mapped.size()==1){if(selected!=null)throw DomainError.invalid("Ambiguous transit identity");selected=leaf;local=mapped.getFirst();}}
   if(selected==null)throw new DomainError("HELD","PHYSICAL_SCOPE_UNCERTAIN","Dispatched physical range requires reconciliation");
   var eligibility=quality.assess(new DomainContext(c.organizationId(),c.actorId(),c.stableRequestOwner(),at,c.knownAt()),selected,"DISPATCH",(String)d.get("customerId"));BigDecimal legitimate=QualityRanges.quantity(QualityRanges.intersect(eligibility.ranges(),List.of(local)));
-  String leaf=stock.transferRange(c,(String)selected.get("ID"),local.start(),q,(String)d.get("destinationId"),at,canonical,command,"DELIVERY");
+  // Delivery hands the goods to the customer: our warehouse custody ends, ownership is not transferred (plan §4.2).
+  String leaf=stock.transferRangeReleasingCustody(c,(String)selected.get("ID"),local.start(),q,(String)d.get("destinationId"),at,canonical,command,"DELIVERY");
   var moved=row(c,id(),at);moved.putAll(Map.of("dispatchId",dispatchId,"canonicalId",canonical,"startQuantity",start,"quantity",q,"unit",d.get("unit"),"segmentId",leaf,"occurredAt",at,"commandId",command));moved.put("legitimateQuantity",legitimate);r.insert("DeliveryTransfers",moved);var result=new LinkedHashMap<String,Object>(moved);result.put("legitimateQuantity",legitimate);result.put("restrictionReasons",eligibility.unknowns());return result;
  }
 }

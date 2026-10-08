@@ -72,7 +72,10 @@
         "matchInvoice",
         "correctEvidence",
         "recordActivity",
-        "attachEvidence"
+        "attachEvidence",
+        "resolveObligation",
+        "waiveObligation",
+        "decideQuantityDutyWaiver"
       ],
       "grant": {
         "delegatorAlias": "supervisor",
@@ -127,7 +130,10 @@
           "matchInvoice",
           "correctEvidence",
           "recordActivity",
-          "attachEvidence"
+          "attachEvidence",
+          "resolveObligation",
+          "waiveObligation",
+          "decideQuantityDutyWaiver"
         ],
         "scope": {
           "organizationAlias": "ORG"
@@ -193,7 +199,10 @@
         "matchInvoice",
         "correctEvidence",
         "recordActivity",
-        "attachEvidence"
+        "attachEvidence",
+        "resolveObligation",
+        "waiveObligation",
+        "decideQuantityDutyWaiver"
       ],
       "grant": {
         "delegatorAlias": "supervisor",
@@ -248,7 +257,10 @@
           "matchInvoice",
           "correctEvidence",
           "recordActivity",
-          "attachEvidence"
+          "attachEvidence",
+          "resolveObligation",
+          "waiveObligation",
+          "decideQuantityDutyWaiver"
         ],
         "scope": {
           "organizationAlias": "ORG"
@@ -806,6 +818,27 @@
             "capabilityId": "recordActivity",
             "stage": "DRAFT",
             "slots": {}
+          },
+          {
+            "name": "resolveObligation",
+            "intentKind": "COMMAND",
+            "capabilityId": "resolveObligation",
+            "stage": "DRAFT",
+            "slots": {}
+          },
+          {
+            "name": "waiveObligation",
+            "intentKind": "COMMAND",
+            "capabilityId": "waiveObligation",
+            "stage": "DRAFT",
+            "slots": {}
+          },
+          {
+            "name": "decideQuantityDutyWaiver",
+            "intentKind": "COMMAND",
+            "capabilityId": "decideQuantityDutyWaiver",
+            "stage": "DRAFT",
+            "slots": {}
           }
         ],
         "relations": [],
@@ -1203,6 +1236,30 @@
             "inputSchemaVersion": "1.0.0",
             "outputSchemaVersion": "1.0.0",
             "supportedWorkMigration": []
+          },
+          {
+            "capabilityId": "resolveObligation",
+            "semanticVersion": "1.0.0",
+            "evaluatorVersion": "core-v1",
+            "inputSchemaVersion": "1.0.0",
+            "outputSchemaVersion": "1.0.0",
+            "supportedWorkMigration": []
+          },
+          {
+            "capabilityId": "waiveObligation",
+            "semanticVersion": "1.0.0",
+            "evaluatorVersion": "core-v1",
+            "inputSchemaVersion": "1.0.0",
+            "outputSchemaVersion": "1.0.0",
+            "supportedWorkMigration": []
+          },
+          {
+            "capabilityId": "decideQuantityDutyWaiver",
+            "semanticVersion": "1.0.0",
+            "evaluatorVersion": "core-v1",
+            "inputSchemaVersion": "1.0.0",
+            "outputSchemaVersion": "1.0.0",
+            "supportedWorkMigration": []
           }
         ]
       }
@@ -1368,6 +1425,19 @@
           },
           "correctEvidence": {
             "effectClass": "RECORD"
+          },
+          "resolveObligation": {
+            "effectClass": "RESPONSIBILITY"
+          },
+          "waiveObligation": {
+            "effectClass": "RESPONSIBILITY",
+            "approvalAction": null,
+            "approvalActions": {
+              "WAIVE_DELIVERY_CORRECTED_DEFICIT": "decideQuantityDutyWaiver"
+            }
+          },
+          "decideQuantityDutyWaiver": {
+            "effectClass": "RESPONSIBILITY_DECISION"
           }
         }
       },
@@ -1458,6 +1528,13 @@
       "type": "ManagementAuthority",
       "actorAlias": "supervisor",
       "capabilityId": "authorizeReturn",
+      "validFrom": "2026-10-01T00:00:00Z",
+      "validUntil": "2026-10-31T23:59:59Z"
+    },
+    "WAIVE_AUTH": {
+      "type": "ManagementAuthority",
+      "actorAlias": "supervisor",
+      "capabilityId": "decideQuantityDutyWaiver",
       "validFrom": "2026-10-01T00:00:00Z",
       "validUntil": "2026-10-31T23:59:59Z"
     }
