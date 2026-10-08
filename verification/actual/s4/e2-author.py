@@ -44,6 +44,10 @@ for cap,cls in classes.items():
  if cap not in {v['capabilityId'] for v in fixture['aliases']['DEF']['content']['verbs']}:fixture['aliases']['DEF']['content']['verbs'].append({'name':cap,'intentKind':'RECORD' if cap.startswith('record') else 'COMMAND','capabilityId':cap,'stage':'DRAFT','slots':{}})
 fixture['aliases']['RECALL_ADMIN']={'type':'ManagementAuthority','actorAlias':'supervisor','capabilityId':'approveRecall','validFrom':'2026-10-01T00:00:00Z','validUntil':UNTIL}
 # Fresh organization, same coherent LOT/item/place aliases: no stock/result seed.
+# The regulatory gateway binds each original to its policy's sourceNamespace;
+# E2's own SELL/DISPATCH regulator originals use these namespaces below.
+fixture['aliases']['REGPOL']['sourceNamespace']='native-s4-e2-sell-regulator'
+fixture['aliases']['REGDISPATCH']['sourceNamespace']='native-s4-e2-dispatch-regulator'
 declare_capabilities(fixture['aliases']['DEF']['content'])
 write('e2-fixture.json',fixture)
 a=[{'id':'e2-setup','type':'setup','fixtureRef':'verification/actual/s4/e2-fixture.json','organizationAlias':'ORG'}]

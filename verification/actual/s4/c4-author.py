@@ -41,6 +41,9 @@ def fixture():
  f['aliases']['CPOL']['content']['rules']['correctEvidence']={'effectClass':'RECORD'}
  for cap in ['correctEvidence','recordActivity']:
   if not any(x['name']==cap for x in f['aliases']['DEF']['content']['verbs']):f['aliases']['DEF']['content']['verbs'].append(dict(name=cap,intentKind='RECORD',capabilityId=cap,stage='DRAFT',slots={}))
+ # Regulator originals below are renamed native-c4-*; the policies must name them.
+ f['aliases']['REGPOL']['sourceNamespace']='native-c4-regulator'
+ f['aliases']['REGDISPATCH']['sourceNamespace']='native-c4-dispatch-regulator'
  declare_capabilities(f['aliases']['DEF']['content'])
  return f
 # Preserve E1's public input choreography, retain only receipt100 and its own

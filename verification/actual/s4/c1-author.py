@@ -42,6 +42,9 @@ for a in up:
  selected.append(a)
 selected+=dispatch
 text=json.dumps(selected).replace('native-s4','native-c1').replace('"60"','"100"').replace('"30"','"100"')
+# C1 reuses fixture.json, whose regulator policies name the native-s4 namespaces;
+# the regulatory gateway rejects an original from any other namespace.
+text=text.replace('native-c1-regulator','native-s4-regulator').replace('native-c1-dispatch-regulator','native-s4-dispatch-regulator')
 for value in set(re.findall(r'[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}',text)):
  text=text.replace(value,str(uuid.uuid5(uuid.NAMESPACE_URL,'c1:'+value)))
 selected=json.loads(text)
