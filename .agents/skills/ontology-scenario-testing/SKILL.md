@@ -17,15 +17,15 @@ T01–T26, C1–C5, V1–V8, E1/E2가 인수 기준이다. 명사·동사 진입
 - 새 사례를 쓰거나 실행·증거를 보고할 때 먼저
   [저장소 harness](references/repository-harness.md)를 읽는다. `./verify`
   명령과 exit code, case 구성, 실행 가능한 Gherkin 문법, NOT_RUN 처리,
-  증거 pipeline·class, 현재 도구가 만들 수 없는 PASS, V4 경로 열거 요구와
-  현재 한계, 명사·동사 비교가 있다.
+  오류 envelope·의무 `current`·자연 tick 관찰, 증거 pipeline·class, 실행 receipt
+  producer의 조건, V4 경로 열거 요구와 현재 한계, 명사·동사 비교가 있다.
 - 테스트 계층을 설계할 때 [방법론](references/methodology.md)을 읽는다.
   #57에서 업무 시나리오·공통 SIT/UAT·보류 증거 원칙을 재사용했다.
 - 반례와 종단 수량을 작성할 때
   [인수 oracle](references/acceptance-oracles.md)을 읽는다.
   상세 도메인 계약은 구현 계획을 기준으로 확인한다.
-- 새 사례는 [Gherkin 양식](assets/scenario.feature.template)에서 시작한다.
-  harness 문법을 따르는 양식이다. `HARNESS-EXAMPLE`은 문법 selftest 예제라
+- 새 시나리오 블록은 [Gherkin 양식](assets/scenario.feature.template)에서
+  시작한다. 기존 case의 `scenario.feature`에 붙이는 harness 문법 양식이다. `HARNESS-EXAMPLE`은 문법 selftest 예제라
   `oracleRef`가 없어 제품 case로 쓸 수 없다. 제품 case의 case.json·fixture 골격은
   `verification/cases/E1/` 같은 기존 case를 따르고, 새 반례는 고정 41개 case의
   새 subcase로 추가한다(`repository-harness.md`).
@@ -88,9 +88,16 @@ runtime의 결합을 검증한다. 테스트 전용 scripted agent는 정해진 
 메서드 호출 여부만 확인해서 업무 PASS를 주장하지 않는다.
 
 V4의 우회 경로 집합은 고정 목록이 아니라 실행 중 시스템이 노출한 쓰기 면을
-열거해 만들어야 한다. 현재 `verification/cases/V4`는 고정 inventory이고 이
-열거를 구현하지 않으므로 열거 subcase가 추가되기 전에는 V4의 노출 면 부분을
+열거해 만들어야 한다. `verification/cases/V4`의 고정 inventory 92개는 열거가
+아니고 열거 subcase `exposed-write-surface`는 host 조작 계약·adapter가 없어
+`NOT_RUN`이므로, 그 subcase가 실제 실행되어 PASS하기 전에는 V4의 노출 면 부분을
 PASS로 보고하지 않는다(`repository-harness.md`).
+
+명령 오류 코드는 응답의 `/response/error/code` 하나로만 읽고 `/response/code`·
+`errorCode` pointer를 쓰지 않는다(`./verify prepare`가 거부한다). 의무·판정
+원행의 `current`는 revision 유효성이며 `status`와 독립이다. 열린 의무는
+`current=true`와 `status=OPEN`을 함께 단언한다. 자율 loop는 harness tick이 아니라
+다음 자연 tick을 수동 관찰해 판정한다(`repository-harness.md`).
 
 거부·권한 없음·재시도 사례는 전후 상태를 비교해 금지된 수량 변경,
 배분·승인·업무·외부 요청 생성이 없음을 증명한다. 정책이 허용하는
@@ -142,9 +149,13 @@ profile `status`가 `PASS`인 것뿐이다. `validate.py`의 `VALID`는 일관�
 PASS 주장이 manifest에서 확인되지 않으면 `NOT_RUN`이다.
 `ACTUAL`·`SELFTEST`·`CONTRACT_RED`는 coverage index의 evidence class이고
 STUB·LOGIC_REVIEW는 보고서에서만 구별하는 범주다.
-현재 도구는 coverage PASS를 만들 수 없다(실행 receipt 생성 도구 없음,
-actual 모드 `gateComplete=false`). runtime 주장은 `NOT_RUN`이고 native
-`actual-sN` 결과는 한정된 custody 증거로 따로 보고한다.
+`./verify coverage`는 assembler(`--check-preparation`)의 exit code를 그대로 돌려준다.
+`--actual` profile 실행은 엄격한 조건에서만 `ExecutionReceiptProducer`로 receipt를
+만들고, 조건을 못 채우면 `NOT_EMITTED`와 이유를 낸다. 현재 actual driver는
+`api`·`fixture`·`db` adapter만 공급하므로 mcp·client·model·process·host가 필요한
+subcase는 `NOT_RUN`이고 manifest PASS를 주장할 수 없다. 이 차이를 receipt·report를
+손으로 만들어 메우지 않는다. native `actual-sN` 결과는 한정된 custody 증거로 따로
+보고한다.
 전체 gate는 D26개·C5개·V8개·E2개의 assertion/artifact 추적, 실제 필수
 경로 PASS, 미해결 실패·미실행·비용 증거 누락0을 확인한다. 추가 규제·
 운영 gate가 미해결이면 범위와 활성화 제한을 표시한다. Regression은

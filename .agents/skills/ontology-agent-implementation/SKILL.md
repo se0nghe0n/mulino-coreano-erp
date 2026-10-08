@@ -34,7 +34,8 @@ Adapter에서 물량·승인·목표 판정 규칙을 복제하지 않는다.
 - MCP tool·worker handler로 쓰기/조회 면을 노출하거나 조회 schema를 바꿀 때
   [implementation-contracts.md](../ontology-implementation/references/implementation-contracts.md)의
   "쓰기 노출 면과 조회 계약"을 읽는다. tool 목록과 worker registry도 V4
-  열거 요구 대상이다(현재 V4 case는 이 열거를 실행하지 않는다).
+  열거 요구 대상이다(열거 subcase `exposed-write-surface`는 host 조작 계약·adapter
+  전까지 `NOT_RUN`이다).
 - grants·approval, worker/outbox, 정의 호환, runtime package 또는
   client 인수를 구현할 때
   [runtime-and-client.md](references/runtime-and-client.md)를 읽는다.
@@ -78,7 +79,8 @@ Adapter에서 물량·승인·목표 판정 규칙을 복제하지 않는다.
 증거 class와 보고 규칙은
 [저장소 harness](../ontology-scenario-testing/references/repository-harness.md)를
 따른다. PASS는 manifest item/profile `status`가 `PASS`인 것뿐이며 `validate.py`의
-`VALID`는 일관성이다. 현재 도구는 coverage PASS를 만들 수 없어 runtime 주장은
+`VALID`는 일관성이다. `--actual` profile 실행만 엄격한 조건에서 coverage receipt를
+만들며 현재 actual driver에는 mcp·client·process adapter가 없어 해당 runtime 주장은
 `NOT_RUN`이다.
 `./verify mcp`와 `./verify skills`는 `--actual` 없이는 위반이 없어도 `NOT_RUN`(exit2)이고
 `--actual`로만 실제 driver를 쓴다. `./verify model`은 `--actual`을 받지 않으며 현재

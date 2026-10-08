@@ -69,11 +69,12 @@ capability allowlist에 있어야 하고 core entity는 노출하지 않거나
 `@readonly`·`@restrict`로 막는다. 규칙 없는 `404`나 "generic projection을
 만들지 않는다"는 관례만으로 충족했다고 하지 않는다.
 
-이 열거와 우회 시도는 요구이며 현재 `verification/cases/V4`는 이를 실행하지
-않는다. V4는 고정 route inventory이고 `$metadata`·`tools/list`·worker
-registry를 읽는 subcase가 없다. 따라서 열거 subcase가 추가되기 전에는 V4의
-노출 면 부분을 `NOT_RUN`으로 보고하고, 구현 PR은 직접 열거한 결과를 근거로
-남긴다. 열거 subcase는 V4/registry 소유자에게 요청한다
+이 열거와 우회 시도는 요구다. `verification/cases/V4`의 고정 route inventory
+92개는 열거가 아니며, 열거는 subcase `exposed-write-surface`가 맡는다. 이 subcase는
+host 조작 `enumerateWriteSurface`가 host-observation schema·guide와 adapter에 생기기
+전까지 `NOT_IMPLEMENTED`→`NOT_RUN`이다. 따라서 그 subcase가 실제 실행되어 PASS하기
+전에는 V4의 노출 면 부분을 `NOT_RUN`으로 보고하고, 구현은 직접 열거한 결과를
+handoff·checks에 근거로 남긴다. 남은 계약은 harness·catalog 소유자의 일이다
 (`ontology-scenario-testing`의 repository-harness, `docs/execution/step1r/
 cross-owner-requests.md`).
 
@@ -82,13 +83,17 @@ cross-owner-requests.md`).
 `getDefinition`은 같은 application query와 query schema를 공유한다. 명사에서
 연결 업무를, 업무에서 대상·물량·목표·근거를 반환하며 같은 ID와
 `snapshotRevision`/평가시점이면 결과가 같다. 응답은 `data`, `asOf`,
-`knownAt`, `scope`, `unknowns`, `conflicts`, `evidenceRefs`를 포함하고 목록은
-`nextCursor`도 반환한다. 목록은 안정된 ID tie-break와 cursor를 쓰고 page 사이 시점 변화를
-응답에 밝힌다. offset paging과 자유 SQL·허용 밖 filter/sort/relation을 만들지
+`knownAt`, `scope`, `unknowns`, `conflicts`, `evidenceRefs`, `nextCursor`를
+포함한다(계획 §3.4는 모든 조회 응답에 `nextCursor`를 둔다. 다음 page가
+없을 때의 값은 공개 schema가 정한다). 목록은 안정된 ID tie-break와 cursor를 쓰고
+page 사이 시점 변화를 응답에 밝힌다. offset paging과 자유 SQL·허용 밖 filter/sort/relation을 만들지
 않는다. 검색 결과로 다른 조직 객체의 존재를 드러내지 않는다. 오류는
 `TYPE_INVALID`, `VERSION_UNSUPPORTED`, `POLICY_UNRESOLVED`, `FORBIDDEN`,
 `STALE_REVISION`, `IDEMPOTENCY_CONFLICT`, `INSUFFICIENT_ELIGIBLE_QUANTITY`,
-`EVIDENCE_CONFLICT`처럼 구조화한다.
+`EVIDENCE_CONFLICT`처럼 구조화한다. 명령 오류 코드는 응답의 `error.code`
+(`contracts/command-response.schema.json`) 하나이며 최상위 `errorCode`·`code`를
+만들지 않는다. 의무·판정 원행의 `current`는 revision 유효성이고 `status`와
+독립이다. 해소된 의무도 대체되지 않았으면 `current=true`다.
 
 ## 수량 원장과 실행 배분 — D03/D04/D05/D16/D17/D18
 
