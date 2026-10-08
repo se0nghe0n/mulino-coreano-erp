@@ -198,6 +198,7 @@
     만일 "recorder" 역할이 "unknown" 행동을 수행한다
     만일 "시스템" 역할이 "db-before" 행동을 수행한다
     만일 "시스템" 역할이 "remote-before" 행동을 수행한다
+    만일 "operations" 역할이 "retry-target" 행동을 수행한다
     만일 "operations" 역할이 "retry" 행동을 수행한다
     만일 "시스템" 역할이 "retry-tick" 행동을 수행한다
     만일 "시스템" 역할이 "remote-after" 행동을 수행한다
@@ -206,6 +207,7 @@
     만일 "intake" 역할이 "api-duty-EXTERNAL_RECONCILIATION" 행동을 수행한다
     그러면 "unknown-state" assertion으로 "unknown state의 실제 값과 범위를 대조한다"를 확인한다
     그러면 "raw-unknown" assertion으로 "raw unknown의 실제 값과 범위를 대조한다"를 확인한다
+    그러면 "retry-server-derived-target" assertion으로 "서버 감사 원행에서 retrySafeCommand의 실행 주체는 인증된 operations이고 대상은 원 발주 전달 command 하나다. 요청은 commandId·사유만 보내며 원 actor·hash·멱등키·외부 operation ID를 payload로 주지 않는다(계획 §7.2)."를 확인한다
     그러면 "remote-request-count" assertion으로 "remote request count의 실제 값과 범위를 대조한다"를 확인한다
     그러면 "same-external-operation-0" assertion으로 "same external operation 0의 실제 값과 범위를 대조한다"를 확인한다
     그러면 "unknown-kept" assertion으로 "unknown kept의 실제 값과 범위를 대조한다"를 확인한다
@@ -229,6 +231,7 @@
     만일 "reconciler" 역할이 "reconcile" 행동을 수행한다
     만일 "recorder" 역할이 "reconciled" 행동을 수행한다
     만일 "시스템" 역할이 "db-reconciled" 행동을 수행한다
+    만일 "operations" 역할이 "retry-target" 행동을 수행한다
     만일 "operations" 역할이 "retry" 행동을 수행한다
     만일 "시스템" 역할이 "retry-tick" 행동을 수행한다
     만일 "시스템" 역할이 "remote-after" 행동을 수행한다
@@ -236,6 +239,7 @@
     만일 "시스템" 역할이 "db-after" 행동을 수행한다
     그러면 "unknown-state" assertion으로 "unknown state의 실제 값과 범위를 대조한다"를 확인한다
     그러면 "raw-unknown" assertion으로 "raw unknown의 실제 값과 범위를 대조한다"를 확인한다
+    그러면 "retry-server-derived-target" assertion으로 "서버 감사 원행에서 retrySafeCommand의 실행 주체는 인증된 operations이고 대상은 원 발주 전달 command 하나다. 요청은 commandId·사유만 보내며 원 actor·hash·멱등키·외부 operation ID를 payload로 주지 않는다(계획 §7.2)."를 확인한다
     그러면 "remote-request-count" assertion으로 "remote request count의 실제 값과 범위를 대조한다"를 확인한다
     그러면 "same-external-operation-0" assertion으로 "same external operation 0의 실제 값과 범위를 대조한다"를 확인한다
     그러면 "success-existing-result" assertion으로 "success existing result의 실제 값과 범위를 대조한다"를 확인한다
@@ -255,6 +259,7 @@
     만일 "reconciler" 역할이 "reconcile" 행동을 수행한다
     만일 "recorder" 역할이 "reconciled" 행동을 수행한다
     만일 "시스템" 역할이 "db-reconciled" 행동을 수행한다
+    만일 "operations" 역할이 "retry-target" 행동을 수행한다
     만일 "operations" 역할이 "retry" 행동을 수행한다
     만일 "시스템" 역할이 "retry-tick" 행동을 수행한다
     만일 "시스템" 역할이 "retry-terminal" 행동을 수행한다
@@ -264,6 +269,7 @@
     그러면 "unknown-state" assertion으로 "unknown state의 실제 값과 범위를 대조한다"를 확인한다
     그러면 "raw-unknown" assertion으로 "raw unknown의 실제 값과 범위를 대조한다"를 확인한다
     그러면 "confirmed-failure-before-retry" assertion으로 "confirmed failure before retry의 실제 값과 범위를 대조한다"를 확인한다
+    그러면 "retry-server-derived-target" assertion으로 "서버 감사 원행에서 retrySafeCommand의 실행 주체는 인증된 operations이고 대상은 원 발주 전달 command 하나다. 요청은 commandId·사유만 보내며 원 actor·hash·멱등키·외부 operation ID를 payload로 주지 않는다(계획 §7.2)."를 확인한다
     그러면 "remote-request-count" assertion으로 "remote request count의 실제 값과 범위를 대조한다"를 확인한다
     그러면 "same-external-operation-0" assertion으로 "same external operation 0의 실제 값과 범위를 대조한다"를 확인한다
     그러면 "same-external-operation-1" assertion으로 "same external operation 1의 실제 값과 범위를 대조한다"를 확인한다
@@ -285,6 +291,7 @@
     만일 "reconciler" 역할이 "reconcile" 행동을 수행한다
     만일 "recorder" 역할이 "reconciled" 행동을 수행한다
     만일 "시스템" 역할이 "db-reconciled" 행동을 수행한다
+    만일 "operations" 역할이 "retry-target" 행동을 수행한다
     만일 "operations" 역할이 "retry" 행동을 수행한다
     만일 "시스템" 역할이 "retry-tick" 행동을 수행한다
     만일 "시스템" 역할이 "remote-after" 행동을 수행한다
@@ -293,6 +300,7 @@
     그러면 "unknown-state" assertion으로 "unknown state의 실제 값과 범위를 대조한다"를 확인한다
     그러면 "raw-unknown" assertion으로 "raw unknown의 실제 값과 범위를 대조한다"를 확인한다
     그러면 "confirmed-failure-before-retry" assertion으로 "confirmed failure before retry의 실제 값과 범위를 대조한다"를 확인한다
+    그러면 "retry-server-derived-target" assertion으로 "서버 감사 원행에서 retrySafeCommand의 실행 주체는 인증된 operations이고 대상은 원 발주 전달 command 하나다. 요청은 commandId·사유만 보내며 원 actor·hash·멱등키·외부 operation ID를 payload로 주지 않는다(계획 §7.2)."를 확인한다
     그러면 "remote-request-count" assertion으로 "remote request count의 실제 값과 범위를 대조한다"를 확인한다
     그러면 "same-external-operation-0" assertion으로 "same external operation 0의 실제 값과 범위를 대조한다"를 확인한다
     그러면 "failure-retry-policy" assertion으로 "failure retry policy의 실제 값과 범위를 대조한다"를 확인한다
@@ -307,6 +315,7 @@
     만일 "recorder" 역할이 "unknown" 행동을 수행한다
     만일 "시스템" 역할이 "db-before" 행동을 수행한다
     만일 "시스템" 역할이 "remote-before" 행동을 수행한다
+    만일 "operations" 역할이 "retry-target" 행동을 수행한다
     만일 "operations" 역할이 "retry" 행동을 수행한다
     만일 "시스템" 역할이 "retry-tick" 행동을 수행한다
     만일 "시스템" 역할이 "remote-after" 행동을 수행한다
@@ -315,6 +324,7 @@
     만일 "intake" 역할이 "api-duty-EXTERNAL_RECONCILIATION" 행동을 수행한다
     그러면 "unknown-state" assertion으로 "unknown state의 실제 값과 범위를 대조한다"를 확인한다
     그러면 "raw-unknown" assertion으로 "raw unknown의 실제 값과 범위를 대조한다"를 확인한다
+    그러면 "retry-server-derived-target" assertion으로 "서버 감사 원행에서 retrySafeCommand의 실행 주체는 인증된 operations이고 대상은 원 발주 전달 command 하나다. 요청은 commandId·사유만 보내며 원 actor·hash·멱등키·외부 operation ID를 payload로 주지 않는다(계획 §7.2)."를 확인한다
     그러면 "remote-request-count" assertion으로 "remote request count의 실제 값과 범위를 대조한다"를 확인한다
     그러면 "same-external-operation-0" assertion으로 "same external operation 0의 실제 값과 범위를 대조한다"를 확인한다
     그러면 "unknown-kept" assertion으로 "unknown kept의 실제 값과 범위를 대조한다"를 확인한다
@@ -334,6 +344,7 @@
     만일 "시스템" 역할이 "db-before" 행동을 수행한다
     만일 "시스템" 역할이 "remote-before" 행동을 수행한다
     만일 "operations" 역할이 "cancel" 행동을 수행한다
+    만일 "operations" 역할이 "retry-target" 행동을 수행한다
     만일 "operations" 역할이 "retry" 행동을 수행한다
     만일 "시스템" 역할이 "retry-tick" 행동을 수행한다
     만일 "시스템" 역할이 "remote-after" 행동을 수행한다
@@ -342,6 +353,7 @@
     만일 "intake" 역할이 "api-duty-EXTERNAL_RECONCILIATION" 행동을 수행한다
     그러면 "unknown-state" assertion으로 "unknown state의 실제 값과 범위를 대조한다"를 확인한다
     그러면 "raw-unknown" assertion으로 "raw unknown의 실제 값과 범위를 대조한다"를 확인한다
+    그러면 "retry-server-derived-target" assertion으로 "서버 감사 원행에서 retrySafeCommand의 실행 주체는 인증된 operations이고 대상은 원 발주 전달 command 하나다. 요청은 commandId·사유만 보내며 원 actor·hash·멱등키·외부 operation ID를 payload로 주지 않는다(계획 §7.2)."를 확인한다
     그러면 "remote-request-count" assertion으로 "remote request count의 실제 값과 범위를 대조한다"를 확인한다
     그러면 "same-external-operation-0" assertion으로 "same external operation 0의 실제 값과 범위를 대조한다"를 확인한다
     그러면 "remote-cancel-not-sent" assertion으로 "remote cancel not sent의 실제 값과 범위를 대조한다"를 확인한다

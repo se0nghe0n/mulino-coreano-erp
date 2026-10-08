@@ -151,7 +151,7 @@
     만일 "시스템" 역할이 "inspect-sweep" 행동을 수행한다
     만일 "recorder" 역할이 "view-after" 행동을 수행한다
     만일 "시스템" 역할이 "db-after" 행동을 수행한다
-    그러면 "sweep-authenticated-reviewer" assertion으로 "sweep authenticated reviewer의 실제 값과 범위를 대조한다"를 확인한다
+    그러면 "sweep-authenticated-reviewer" assertion으로 "서버 감사 원행에서 보존 sweep 1건의 실행 주체는 인증된 config, 조직은 ORG-A, 정책은 retention-v1, sweep ID는 sweep-legal-hold다. harness가 서명을 요청한 provenance를 읽지 않는다(계획 §7.4)."를 확인한다
     그러면 "different-artifact-policies" assertion으로 "different artifact policies의 실제 값과 범위를 대조한다"를 확인한다
     그러면 "documents-unchanged" assertion으로 "documents unchanged의 실제 값과 범위를 대조한다"를 확인한다
     그러면 "tombstones-unchanged" assertion으로 "tombstones unchanged의 실제 값과 범위를 대조한다"를 확인한다
@@ -169,7 +169,7 @@
     만일 "시스템" 역할이 "inspect-sweep" 행동을 수행한다
     만일 "recorder" 역할이 "view-after" 행동을 수행한다
     만일 "시스템" 역할이 "db-after" 행동을 수행한다
-    그러면 "sweep-authenticated-reviewer" assertion으로 "sweep authenticated reviewer의 실제 값과 범위를 대조한다"를 확인한다
+    그러면 "sweep-authenticated-reviewer" assertion으로 "서버 감사 원행에서 보존 sweep 1건의 실행 주체는 인증된 config, 조직은 ORG-A, 정책은 retention-v1, sweep ID는 sweep-active-reference다. harness가 서명을 요청한 provenance를 읽지 않는다(계획 §7.4)."를 확인한다
     그러면 "different-artifact-policies" assertion으로 "different artifact policies의 실제 값과 범위를 대조한다"를 확인한다
     그러면 "documents-unchanged" assertion으로 "documents unchanged의 실제 값과 범위를 대조한다"를 확인한다
     그러면 "tombstones-unchanged" assertion으로 "tombstones unchanged의 실제 값과 범위를 대조한다"를 확인한다
@@ -187,7 +187,7 @@
     만일 "시스템" 역할이 "inspect-sweep" 행동을 수행한다
     만일 "recorder" 역할이 "view-after" 행동을 수행한다
     만일 "시스템" 역할이 "db-after" 행동을 수행한다
-    그러면 "sweep-authenticated-reviewer" assertion으로 "sweep authenticated reviewer의 실제 값과 범위를 대조한다"를 확인한다
+    그러면 "sweep-authenticated-reviewer" assertion으로 "서버 감사 원행에서 보존 sweep 1건의 실행 주체는 인증된 config, 조직은 ORG-A, 정책은 retention-v1, sweep ID는 sweep-R6-unconfirmed다. harness가 서명을 요청한 provenance를 읽지 않는다(계획 §7.4)."를 확인한다
     그러면 "different-artifact-policies" assertion으로 "different artifact policies의 실제 값과 범위를 대조한다"를 확인한다
     그러면 "documents-unchanged" assertion으로 "documents unchanged의 실제 값과 범위를 대조한다"를 확인한다
     그러면 "tombstones-unchanged" assertion으로 "tombstones unchanged의 실제 값과 범위를 대조한다"를 확인한다
@@ -205,7 +205,7 @@
     만일 "시스템" 역할이 "inspect-sweep" 행동을 수행한다
     만일 "recorder" 역할이 "view-after" 행동을 수행한다
     만일 "시스템" 역할이 "db-after" 행동을 수행한다
-    그러면 "sweep-authenticated-reviewer" assertion으로 "sweep authenticated reviewer의 실제 값과 범위를 대조한다"를 확인한다
+    그러면 "sweep-authenticated-reviewer" assertion으로 "서버 감사 원행에서 보존 sweep 1건의 실행 주체는 인증된 config, 조직은 ORG-A, 정책은 retention-v1, sweep ID는 sweep-authorized-delete다. harness가 서명을 요청한 provenance를 읽지 않는다(계획 §7.4)."를 확인한다
     그러면 "different-artifact-policies" assertion으로 "different artifact policies의 실제 값과 범위를 대조한다"를 확인한다
     그러면 "tombstone-one" assertion으로 "tombstone one의 실제 값과 범위를 대조한다"를 확인한다
     그러면 "delete-reconciliation" assertion으로 "delete reconciliation의 실제 값과 범위를 대조한다"를 확인한다
@@ -223,7 +223,7 @@
     만일 "시스템" 역할이 "db-after" 행동을 수행한다
     만일 "시스템" 역할이 "restore" 행동을 수행한다
     만일 "시스템" 역할이 "inspect-restore" 행동을 수행한다
-    그러면 "sweep-authenticated-reviewer" assertion으로 "sweep authenticated reviewer의 실제 값과 범위를 대조한다"를 확인한다
+    그러면 "sweep-authenticated-reviewer" assertion으로 "서버 감사 원행에서 보존 sweep 1건의 실행 주체는 인증된 config, 조직은 ORG-A, 정책은 retention-v1, sweep ID는 sweep-restore-deleted다. harness가 서명을 요청한 provenance를 읽지 않는다(계획 §7.4)."를 확인한다
     그러면 "different-artifact-policies" assertion으로 "different artifact policies의 실제 값과 범위를 대조한다"를 확인한다
     그러면 "tombstone-one" assertion으로 "tombstone one의 실제 값과 범위를 대조한다"를 확인한다
     그러면 "delete-reconciliation" assertion으로 "delete reconciliation의 실제 값과 범위를 대조한다"를 확인한다
