@@ -29,10 +29,14 @@ public final class FixtureInstaller {
         for(var it=fixture.path("aliases").fields();it.hasNext();) {var e=it.next();if(e.getValue().path("type").asText().equals("Organization")){if(orgAlias!=null)throw new UnsupportedOperationException("Multi-organization fixtures pending");orgAlias=e.getKey();}}
         if(orgAlias==null)throw new IllegalArgumentException("Organization alias required");
         String org=aliases.path(orgAlias).asText();
+        // A runner that installs several fixtures into one disposable DB names each
+        // organization's external alias; the authored alias key stays the contract.
+        String externalAlias=bundle.path("organizationExternalAlias").asText(orgAlias);
+        if(externalAlias.isBlank()||externalAlias.length()>80)throw new IllegalArgumentException("Organization external alias must be 1..80 characters");
         try(Connection c=DriverManager.getConnection(configuration.jdbcUrl(),configuration.username(),configuration.password())) {
             c.setAutoCommit(false);
             try {
-                seedTemporal(c,fixture,"INSERT INTO mulino_identity_Organizations(ID,externalAlias) VALUES(?,?)",org,orgAlias);
+                seedTemporal(c,fixture,"INSERT INTO mulino_identity_Organizations(ID,externalAlias) VALUES(?,?)",org,externalAlias);
                 for(String type:List.of("Human","Agent","Product","Manufacturer","Place","SpecificationVersion","PackagingVersion","TradeItem","ManufacturerLot","QuantitySegment","DefinitionVersion","PolicyVersion","Supplier","Customer","RegulatoryPolicy","ManagementAuthority"))
                     for(var it=fixture.path("aliases").fields();it.hasNext();) {var entry=it.next();JsonNode a=entry.getValue();if(!type.equals(a.path("type").asText()))continue;
                         String id=aliases.path(entry.getKey()).asText();String name=a.path("name").asText(entry.getKey());
@@ -78,7 +82,7 @@ public final class FixtureInstaller {
                     if(!configuration.issuer().equals(Json.required(a,"issuer"))||!configuration.audience().equals(Json.required(a,"audience")))throw new IllegalArgumentException("Fixture identity issuer/audience differs from backend");
                     var grant=a.path("grant");String delegator=ref(aliases,grant,"delegatorAlias"),grantId=UUID.randomUUID().toString();
                     var from=time(Json.required(grant,"validFrom"));var until=time(Json.required(grant,"validUntil"));
-                    seedTemporal(c,fixture,"INSERT INTO mulino_identity_ExternalIdentities(organizationId,ID,actorId,issuer,subject,organizationAlias) VALUES(?,?,?,?,?,?)",org,UUID.randomUUID().toString(),actor,configuration.issuer(),Json.required(a,"subject"),orgAlias);
+                    seedTemporal(c,fixture,"INSERT INTO mulino_identity_ExternalIdentities(organizationId,ID,actorId,issuer,subject,organizationAlias) VALUES(?,?,?,?,?,?)",org,UUID.randomUUID().toString(),actor,configuration.issuer(),Json.required(a,"subject"),externalAlias);
                     seedTemporal(c,fixture,"INSERT INTO mulino_identity_Memberships(organizationId,ID,actorId,validFrom,validUntil) VALUES(?,?,?,?,?)",org,UUID.randomUUID().toString(),actor,from,until);
                     seedTemporal(c,fixture,"INSERT INTO mulino_identity_Grants(organizationId,ID,actorId,delegatorId,validFrom,validUntil) VALUES(?,?,?,?,?,?)",org,grantId,actor,delegator,from,until);
                     // Only an explicit organization scope is supported; never broaden item/work-restricted grants.
@@ -90,7 +94,7 @@ public final class FixtureInstaller {
                 c.commit();
             } catch(Exception failure){c.rollback();throw failure;}
         }
-        var result=Json.object();result.set("aliasMap",aliases);result.put("fixtureHash",Json.required(bundle,"fixtureHash"));result.set("clock",fixture.path("clock"));if(bundle.hasNonNull("identityBindingHash"))result.set("identityBindingHash",bundle.path("identityBindingHash"));result.put("committed",true).put("businessExecutionClaimed",false);return result;
+        var result=Json.object();result.set("aliasMap",aliases);result.put("fixtureHash",Json.required(bundle,"fixtureHash"));result.set("clock",fixture.path("clock"));if(bundle.hasNonNull("identityBindingHash"))result.set("identityBindingHash",bundle.path("identityBindingHash"));result.put("organizationExternalAlias",externalAlias);result.put("committed",true).put("businessExecutionClaimed",false);return result;
     }
     static String contentHash(JsonNode content) throws java.security.NoSuchAlgorithmException {
         return java.util.HexFormat.of().formatHex(java.security.MessageDigest.getInstance("SHA-256").digest(content.toString().getBytes(java.nio.charset.StandardCharsets.UTF_8)));

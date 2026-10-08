@@ -14,6 +14,7 @@ public final class NativeS4TradeMain {
     private final ObjectNode actions=Json.object(),bindings=Json.object(),report=Json.object();
     private ActualAcceptanceDriver driver;
     private JsonNode actor,currentFixture;
+    private String externalOrganization;
     private String work;
     private int checks;
     private NativeS4TradeMain(Path root){this.root=root;}
@@ -26,8 +27,7 @@ public final class NativeS4TradeMain {
             var unbound=NativeS4FlowAliases.check(root,flowRef);if(!unbound.isEmpty())throw new IllegalArgumentException("Authored flow has unbound references: "+unbound);
             driver=new ActualAcceptanceDriver(root,ActualConfiguration.environment(System.getenv()));
             String ref="verification/actual/s4/fixture.json";JsonNode fixture=Json.read(root.resolve(ref));currentFixture=fixture;
-            var bundle=Json.object();bundle.set("fixture",fixture);bundle.set("bases",Json.array());bundle.put("fixtureHash",Json.sha256(root.resolve(ref)));
-            var installed=driver.installFixture("setup",bundle);capture(installed);available(installed);bindings.setAll((ObjectNode)installed.data().path("aliasMap"));actor=fixture.path("actors").path("reader");
+            var installed=install("setup",ref,fixture);bindings.setAll((ObjectNode)installed.data().path("aliasMap"));actor=resolveActor("reader");
             clock("2026-10-07T09:00:02Z");
             var script=Json.read(root.resolve(flowRef));report.put("flowRef",flowRef);
             for(JsonNode action:script.path("actions"))execute(action);
@@ -47,7 +47,7 @@ public final class NativeS4TradeMain {
             case "require-contract" -> throw new Unavailable(a.path("reason").asText());
             // A setup is an isolation boundary: a suite flow cannot read a previous organization's aliases.
             case "setup" -> {
-                String ref=Json.required(a,"fixtureRef");var fixture=Json.read(root.resolve(ref));currentFixture=fixture;var bundle=Json.object();bundle.set("fixture",fixture);bundle.set("bases",Json.array());bundle.put("fixtureHash",Json.sha256(root.resolve(ref)));var result=driver.installFixture(id,bundle);capture(result);available(result);bindings.removeAll();work=null;bindings.setAll((ObjectNode)result.data().path("aliasMap"));if(a.has("organizationAlias"))bindings.set("ORG",result.data().path("aliasMap").path(Json.required(a,"organizationAlias")));actor=fixture.path("actors").path("reader");
+                String ref=Json.required(a,"fixtureRef");var fixture=Json.read(root.resolve(ref));currentFixture=fixture;var result=install(id,ref,fixture);bindings.removeAll();work=null;bindings.setAll((ObjectNode)result.data().path("aliasMap"));if(a.has("organizationAlias"))bindings.set("ORG",result.data().path("aliasMap").path(Json.required(a,"organizationAlias")));actor=resolveActor("reader");
             }
             case "clock" -> clock(a.path("instant").asText());
             case "uuid" -> bindings.put(Json.required(a,"alias"),UUID.randomUUID().toString());
@@ -86,12 +86,27 @@ public final class NativeS4TradeMain {
             default -> throw new IllegalArgumentException("Unsupported authored S4 action "+type);
         }
     }
-    private JsonNode resolveActor(String name)throws Exception{return currentFixture.path("actors").path(name);}
+    /**
+     * Every setup is a new organization in the same disposable database. Its
+     * external alias carries the setup action id so a repeated or sibling
+     * fixture can neither collide with nor authenticate into an earlier one.
+     */
+    private StepResult install(String id,String ref,JsonNode fixture)throws Exception {
+        String orgAlias=null;for(var it=fixture.path("aliases").fields();it.hasNext();){var e=it.next();if(e.getValue().path("type").asText().equals("Organization"))orgAlias=e.getKey();}
+        if(orgAlias==null)throw new IllegalArgumentException("Organization alias required");
+        var bundle=Json.object();bundle.set("fixture",fixture);bundle.set("bases",Json.array());bundle.put("fixtureHash",Json.sha256(root.resolve(ref)));bundle.put("organizationExternalAlias",orgAlias+"@"+id);
+        var result=driver.installFixture(id,bundle);capture(result);available(result);
+        externalOrganization=result.data().path("organizationExternalAlias").asText();if(!externalOrganization.equals(orgAlias+"@"+id))throw new IllegalStateException(id+" installed organization external alias differs");
+        return result;
+    }
+    private JsonNode resolveActor(String name){JsonNode authored=currentFixture.path("actors").path(name);if(authored.isMissingNode())throw new IllegalArgumentException("Unknown fixture actor "+name);var bound=(ObjectNode)authored.deepCopy();bound.put("organizationAlias",externalOrganization);return bound;}
     private void assertions(String id,JsonNode data,JsonNode assertions) {
         for(JsonNode assertion:assertions) {
             JsonNode value=data.at(Json.required(assertion,"pointer"));require(!value.isMissingNode(),id+" missing observation "+assertion.path("pointer"));
             switch(Json.required(assertion,"operator")) {
                 case "equals" -> require(value.equals(resolve(assertion.path("expected"))),id+" expected "+resolve(assertion.path("expected"))+" observed "+value);
+                // Exact decimal equality: scale is presentation, value is not (plan §13 decimal strings).
+                case "decimalEquals" -> {require(value.isTextual()||value.isNumber(),id+" non-decimal observation "+value);require(new BigDecimal(value.asText()).compareTo(new BigDecimal(resolve(assertion.path("expected")).asText()))==0,id+" expected decimal "+resolve(assertion.path("expected"))+" observed "+value);}
                 case "size" -> require(value.size()==assertion.path("expected").asInt(),id+" expected rows "+assertion.path("expected")+" observed "+value.size());
                 case "sum" -> {BigDecimal sum=BigDecimal.ZERO;for(JsonNode row:value){if(assertion.has("where")&&!matches(row,resolve(assertion.path("where"))))continue;JsonNode quantity=row.path(Json.required(assertion,"column"));require(quantity.isTextual()||quantity.isNumber(),id+" missing/non-numeric amount "+row);sum=sum.add(new BigDecimal(quantity.asText()));}require(sum.compareTo(new BigDecimal(assertion.path("expected").asText()))==0,id+" expected sum "+assertion.path("expected")+" observed "+sum);}
                 case "humanDuties" -> {for(JsonNode kind:assertion.path("kinds")){int count=0;for(JsonNode duty:value){if(!kind.asText().equals(duty.path("kind").asText())||!"OPEN".equals(duty.path("status").asText())||!duty.path("valid").asBoolean())continue;String owner=duty.path("ownerid").asText();require(!owner.isBlank()&&!duty.path("nextaction").asText().isBlank()&&!duty.path("nextcheckat").asText().isBlank(),id+" residual duty lacks owner/next action/check "+kind);boolean human=false;for(JsonNode identity:data.at("/rawRows/mulino_identity_actors"))if(owner.equals(identity.path("id").asText())&&"HUMAN".equals(identity.path("kind").asText()))human=true;require(human,id+" residual duty owner is not a human "+kind);count++;}require(count>0,id+" missing separate open human duty "+kind);}}

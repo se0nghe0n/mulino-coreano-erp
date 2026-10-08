@@ -3,8 +3,16 @@
 import copy,json,pathlib,uuid
 OUT=pathlib.Path(__file__).resolve().parent
 T='2026-10-07T09:00:02Z'; NEXT='2026-10-08T09:00:00Z'; UNTIL='2026-10-31T00:00:00Z'
+import sys;sys.path.insert(0,str(pathlib.Path(__file__).resolve().parent));import subjects
 def load(name):return json.loads((OUT/name).read_text())
-def write(name,obj):(OUT/name).write_text(json.dumps(obj,ensure_ascii=False,indent=2)+'\n')
+def write(name,obj):(OUT/name).write_text(json.dumps(subjects.declare(obj),ensure_ascii=False,indent=2)+'\n')
+def declare_capabilities(definition):
+ # A verb without its pinned capability makes the whole definition non-VALID
+ # (plan §8); the product then HOLDs every goal pinned to it.
+ known={c['capabilityId'] for c in definition['capabilities']}
+ for verb in definition['verbs']:
+  if verb['capabilityId'] not in known:
+   definition['capabilities'].append({'capabilityId':verb['capabilityId'],'semanticVersion':'1.0.0','evaluatorVersion':'core-v1','inputSchemaVersion':'1.0.0','outputSchemaVersion':'1.0.0','supportedWorkMigration':[]});known.add(verb['capabilityId'])
 def cmd(name,cap,slots,bind=None,rev=0,actor=None,outcome='APPLIED',assertions=None,intent=None):
  a={'id':name,'type':'command','capability':cap,'outcome':outcome,'request':{'intentKind':intent or ('RECORD' if cap in ['recordRecovery','recordRecallNotice','recordDispositionBasis'] else 'COMMAND'),'definitionVersion':'definition-v1','capabilityId':cap,'expectedRevision':rev,'commandIdempotencyKey':name,'slots':slots,'provenance':{},'subjectRefs':[{'type':'Work','id':'$WORK'}]}}
  if bind:a['bind']=bind
@@ -37,6 +45,14 @@ for cap,cls in classes.items():
  if cap not in {v['capabilityId'] for v in fixture['aliases']['DEF']['content']['verbs']}:fixture['aliases']['DEF']['content']['verbs'].append({'name':cap,'intentKind':'RECORD' if cap.startswith('record') else 'COMMAND','capabilityId':cap,'stage':'DRAFT','slots':{}})
 fixture['aliases']['RECALL_ADMIN']={'type':'ManagementAuthority','actorAlias':'supervisor','capabilityId':'approveRecall','validFrom':'2026-10-01T00:00:00Z','validUntil':UNTIL}
 # Fresh organization, same coherent LOT/item/place aliases: no stock/result seed.
+# The regulatory gateway binds each original to its policy's sourceNamespace;
+# E2's own SELL/DISPATCH regulator originals use these namespaces below.
+fixture['aliases']['REGPOL']['sourceNamespace']='native-s4-e2-sell-regulator'
+fixture['aliases']['REGDISPATCH']['sourceNamespace']='native-s4-e2-dispatch-regulator'
+# Recall evidence originals are claimed against the RecallScope noun.
+for noun in ['Recall','RecallScope']:
+ if noun not in {n['name'] for n in fixture['aliases']['DEF']['content']['nouns']}:fixture['aliases']['DEF']['content']['nouns'].append({'name':noun,'core':True})
+declare_capabilities(fixture['aliases']['DEF']['content'])
 write('e2-fixture.json',fixture)
 a=[{'id':'e2-setup','type':'setup','fixtureRef':'verification/actual/s4/e2-fixture.json','organizationAlias':'ORG'}]
 up=load('e1-upstream.json')['actions']; selected=[]
@@ -61,6 +77,10 @@ for action in ['SELL','DISPATCH']:
  for cat in ['QC','CUSTOMER','COMMERCIAL']:
   old='s60-'+cat;fragment=[copy.deepcopy(x) for x in up if x['id'] in [old,old+'-match',old+'-link',old+'-decision']]
   text=json.dumps(fragment).replace('s60-'+cat,'e2-'+action.lower()+'-'+cat).replace('$receipt60.segment',SEG).replace('"SELL"','"'+action+'"')
+  # SELL and DISPATCH bases are distinct source decisions; one decision id
+  # with two contents is an evidence CONFLICT at the quality gateway.
+  decision=[x for x in fragment if x['type']=='original'][0]['fixture']['occurrence']['content']['sourceDecisionId']
+  text=text.replace(decision,str(uuid.uuid5(uuid.NAMESPACE_URL,'e2-'+action+':'+decision)))
   fragment=json.loads(text)
   for x in fragment:
    if x.get('capability')=='recordDispositionBasis':x['request']['intentKind']='RECORD'
@@ -85,7 +105,7 @@ a+=[revision('e2-pre-investigate','mulino_inventory_quantitysegments','E2_SEG_RE
 # canonical of the exact segment; the generic segment identity compares the
 # whole physical quantity60, not the released hold20.
 rel=orig('e2-qc-release','QUALITY_RELEASE',{'segmentId':SEG,'operation':'releaseHold','restrictionId':'$E2_QC'},SEG,'60','SEGMENT');a.append(rel);a+=link('e2-qc-release',SEG,'60')
-a+=[cmd('e2-release-qc20','releaseHold',{'restrictionId':'$E2_QC','evidenceId':'$e2-qc-release.document','reason':'현재 QC20 해제 근거'},rev='$E2_QC_REV'),revision('e2-allocation-after-holds','mulino_inventory_segmentallocations','E2_ALLOC_REV','$ALLOCATION'),cmd('e2-dispatch-denied-after-qc-release','dispatchQuantity',{'allocationId':'$ALLOCATION','transitPlaceId':'$TRANSIT','occurredAt':T,'evidenceRef':'synthetic-e2-denied'},rev='$E2_ALLOC_REV',outcome='HELD'),obs('e2-independent-holds',[rows('mulino_inventory_restrictions',{'category':'QC','state':'ACTIVE'},0),rows('mulino_inventory_restrictions',{'category':'RECALL_INVESTIGATION','state':'ACTIVE','quantity':'60'},3),rows('mulino_inventory_dispatches',{},0),rows('mulino_trade_recall_investigations',{'id':'$E2_INV','impactstate':'CANDIDATE'},1)])]
+a+=[cmd('e2-release-qc20','releaseHold',{'restrictionId':'$E2_QC','evidenceId':'$e2-qc-release.document','reason':'현재 QC20 해제 근거'},rev='$E2_QC_REV'),revision('e2-allocation-after-holds','mulino_inventory_segmentallocations','E2_ALLOC_REV','$ALLOCATION'),cmd('e2-dispatch-denied-after-qc-release','dispatchQuantity',{'allocationId':'$ALLOCATION','transitPlaceId':'$TRANSIT','occurredAt':T,'evidenceRef':'synthetic-e2-denied'},rev='$E2_ALLOC_REV',outcome='REJECTED',assertions=[{'pointer':'/error/code','operator':'equals','expected':'SCOPE_INELIGIBLE'},{'pointer':'/effects','operator':'equals','expected':{}}]),obs('e2-independent-holds',[rows('mulino_inventory_restrictions',{'category':'QC','state':'ACTIVE'},0),rows('mulino_inventory_restrictions',{'category':'RECALL_INVESTIGATION','state':'ACTIVE','quantity':'60'},3),rows('mulino_inventory_dispatches',{},0),rows('mulino_trade_recall_investigations',{'id':'$E2_INV','impactstate':'CANDIDATE'},1)])]
 a+=[cmd('e2-propose50','proposeRecall',{'investigationId':'$E2_INV','startQuantity':'0','quantity':'50','unit':'BOX','reason':'조사60 중 ADMIN 회수범위50 제안'},bind={'E2_SCOPE':'/effects/scopeId','E2_HASH':'/effects/scopeHash','E2_VERSION':'/effects/scopeVersion'}),cmd('e2-admin-approve50','approveRecall',{'scopeId':'$E2_SCOPE','scopeHash':'$E2_HASH','decision':'APPROVE','validUntil':UNTIL},actor='supervisor',bind={'E2_APPROVAL':'/effects/approvalId'})]
 def physical(name,kind,start,q,source=None,reason=None,partition=None):
  event='RECALL_'+{'RECOVERED':'RECOVERY','DISPOSED':'DISPOSAL'}.get(kind,kind);alias=name+'-actual-event'
@@ -108,10 +128,15 @@ a.append(obs('e2-accounted25-not50',[total('mulino_trade_recall_actions','quanti
 # Replace same-scope approval to prove old approval cannot cause another effect.
 a.append(cmd('e2-admin-reapprove50','approveRecall',{'scopeId':'$E2_SCOPE','scopeHash':'$E2_HASH','decision':'APPROVE','validUntil':UNTIL},actor='supervisor',bind={'E2_CURRENT_APPROVAL':'/effects/approvalId'}))
 exception=physical('e2-exception25','EXCEPTION','25','25',reason='가상 ADMIN 예외25: 미확인 물량 조사 책임 유지')
-a.append(cmd('e2-stale-approval-exception-denied','recordRecovery',exception,actor='supervisor',outcome='HELD',assertions=[eq('/error/code','RECALL_APPROVAL_STALE')]))
+# A copy: the later current-approval mutation must not rewrite this stale request.
+a.append(cmd('e2-stale-approval-exception-denied','recordRecovery',copy.deepcopy(exception),actor='supervisor',outcome='HELD',assertions=[eq('/error/code','RECALL_APPROVAL_STALE')]))
 exception['approvalId']='$E2_CURRENT_APPROVAL'
 a.append(cmd('e2-record-approved-exception25','recordRecovery',exception,actor='supervisor',bind={'E2_FINAL_HASH':'/effects/partitionHash','E2_RESIDUAL_DUTY':'/effects/residualDutyId'},assertions=[eq('/effects/partition/ACCOUNTED','50'),eq('/effects/partition/EXCEPTION','25'),eq('/effects/partition/UNKNOWN','0')]))
 close=physical('e2-closure-original','CLOSURE','0','50',partition='$E2_FINAL_HASH')
 a.append(cmd('e2-admin-close-with-residual','closeRecall',{'scopeId':'$E2_SCOPE','approvalId':'$E2_CURRENT_APPROVAL','scopeHash':'$E2_HASH','canonicalOccurrenceId':'$e2-closure-original.canonical','partitionHash':'$E2_FINAL_HASH'},actor='supervisor',assertions=[eq('/effects/residualResponsibilityRetained',True)]))
 a.append(obs('e2-final-independent',[rows('mulino_trade_recall_investigations',{'id':'$E2_INV','status':'CLOSED','impactstate':'CANDIDATE'},1),rows('mulino_trade_recall_closures',{'scopeid':'$E2_SCOPE'},1),rows('mulino_trade_recall_actions',{'scopeid':'$E2_SCOPE'},3),total('mulino_trade_recall_actions','quantity','25',{'scopeid':'$E2_SCOPE','kind':'EXCEPTION'}),total('mulino_inventory_quantitysegments','quantity','35',{'retiredat':None,'placeid':'$W'}),{'pointer':'/rawRows/mulino_work_read_obligationreferences','operator':'humanDuties','kinds':['RECALL_EXCEPTION_RESIDUAL','RECALL_EXCLUDED_SCOPE']},rows('mulino_work_read_obligationreferences',{'id':'$E2_RESIDUAL_DUTY','status':'OPEN','valid':True},1)]))
+# Allocation commands bind the sales Work the allocation belongs to; a purchase
+# Work subject is a TYPE_INVALID mismatch, not the intended HOLD.
+for x in a:
+ if x.get('capability') in ['pickQuantity','dispatchQuantity','releaseAllocation']:x['request']['subjectRefs']=[{'type':'Work','id':'$SALES_WORK'}]
 write('e2-flow.json',{'schemaVersion':'1.0.0','status':'NOT_RUN','requiredCases':['E2'],'fullCaseCoverageClaimed':False,'actions':a})

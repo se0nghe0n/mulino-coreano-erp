@@ -215,8 +215,8 @@
         "provenance": {},
         "subjectRefs": [
           {
-            "type": "Work",
-            "id": "$SALES_WORK"
+            "type": "Return",
+            "id": "$RETURN"
           }
         ]
       },
@@ -241,8 +241,8 @@
         "provenance": {},
         "subjectRefs": [
           {
-            "type": "Work",
-            "id": "$SALES_WORK"
+            "type": "Return",
+            "id": "$RETURN"
           }
         ]
       },
@@ -366,8 +366,8 @@
         "actorId": "$reader",
         "supervisorId": "$supervisor",
         "physicalScopeId": "$DELIVERY_OBSERVATION",
-        "subjectId": "$SALES_WORK",
-        "subjectKind": "WORK",
+        "subjectId": "$DISPATCH",
+        "subjectKind": "DISPATCH",
         "placeId": "$CUSTOMER_PLACE"
       }
     },
@@ -383,17 +383,17 @@
         "commandIdempotencyKey": "c4-correction98-event",
         "slots": {
           "subject": {
-            "kind": "WORK",
-            "id": "$SALES_WORK"
+            "kind": "DISPATCH",
+            "id": "$DISPATCH"
           },
           "kind": "PHYSICAL_DELIVERY",
-          "sourceNamespace": "native-c4-c4-correction98",
-          "externalEventId": "c4-correction98",
+          "sourceNamespace": "native-c4-c4-delivery-original",
+          "externalEventId": "c4-delivery-original",
           "sourceVersion": "2",
           "effectiveFrom": "2026-10-07T09:00:02Z",
           "timeZone": "UTC",
           "timePrecision": "SECOND",
-          "valueState": "PRESENT",
+          "valueState": "KNOWN",
           "payload": "{\"deliveryEventId\":\"${DELIVERY_EVENT}\",\"dispatchId\":\"${DISPATCH}\",\"cargoScopeId\":\"${CARGO}\",\"salesLineId\":\"${SALES_LINE}\",\"customerId\":\"${C}\",\"itemId\":\"${P}\",\"lotId\":\"${L}\",\"rangeRootId\":\"${DISPATCH_RANGE}\",\"physicalScopeId\":\"${DELIVERY_OBSERVATION}\",\"startQuantity\":\"0\",\"quantity\":\"98\",\"unit\":\"BOX\",\"placeId\":\"${CUSTOMER_PLACE}\",\"occurredAt\":\"2026-10-07T09:00:02Z\",\"correctionOfDeliveryId\":\"${DELIVERY}\"}",
           "supersedesId": "$c4-delivery-original.event",
           "documentId": "$c4-correction98.document",
@@ -405,8 +405,8 @@
         "provenance": {},
         "subjectRefs": [
           {
-            "type": "Work",
-            "id": "$SALES_WORK"
+            "type": "Dispatch",
+            "id": "$DISPATCH"
           }
         ]
       },
@@ -431,7 +431,7 @@
           "basisDocumentId": "$c4-correction98.document",
           "physicalScopeId": "$DELIVERY_OBSERVATION",
           "policyVersion": "fixture-v1",
-          "sourceIdentity": "native-c4-c4-correction98:c4-correction98:2",
+          "sourceIdentity": "native-c4-c4-delivery-original:c4-delivery-original:2",
           "quantity": "98",
           "unit": "BOX",
           "effectiveFrom": "2026-10-07T09:00:02Z",
@@ -440,8 +440,8 @@
         "provenance": {},
         "subjectRefs": [
           {
-            "type": "Work",
-            "id": "$SALES_WORK"
+            "type": "Dispatch",
+            "id": "$DISPATCH"
           }
         ]
       },
@@ -466,8 +466,8 @@
         "provenance": {},
         "subjectRefs": [
           {
-            "type": "Work",
-            "id": "$SALES_WORK"
+            "type": "Dispatch",
+            "id": "$DISPATCH"
           }
         ]
       },

@@ -28,7 +28,7 @@ public final class ActualAcceptanceDriver implements AcceptanceDriver, Independe
     public static ActualAcceptanceDriver fromEnvironment(Path root) {return new ActualAcceptanceDriver(root,ActualConfiguration.environment(System.getenv()));}
     @Override public Set<String> availableAdapters() {return Set.of("api","fixture","db");}
     @Override public StepResult installFixture(String id,JsonNode bundle) {
-        try {var bound=ActualFixtureBindings.bind(root,bundle,configuration);var data=fixtures.install(bound);var actors=bound.path("fixture").path("actors").elements();if(actors.hasNext())controlActor=actors.next().deepCopy();return executed(id,data,null,provenance(null,"JDBC_FIXTURE_INSTALL",false,null,null),data);}
+        try {var bound=ActualFixtureBindings.bind(root,bundle,configuration);var data=fixtures.install(bound);var actors=bound.path("fixture").path("actors").elements();if(actors.hasNext()){var control=(ObjectNode)actors.next().deepCopy();if(data.hasNonNull("organizationExternalAlias"))control.put("organizationAlias",data.path("organizationExternalAlias").asText());controlActor=control;}return executed(id,data,null,provenance(null,"JDBC_FIXTURE_INSTALL",false,null,null),data);}
         catch(UnsupportedOperationException unsupported){return StepResult.missing(id,"NOT_IMPLEMENTED: "+unsupported.getMessage());}
         catch(Exception failure){throw new IllegalStateException("Actual fixture transaction failed: "+SqlFailureSummary.safe(failure),failure);}
     }

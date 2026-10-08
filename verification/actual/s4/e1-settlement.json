@@ -182,8 +182,8 @@
         "provenance": {},
         "subjectRefs": [
           {
-            "type": "Work",
-            "id": "$WORK"
+            "type": "Invoice",
+            "id": "$INVOICE"
           }
         ]
       },
@@ -208,8 +208,8 @@
         "provenance": {},
         "subjectRefs": [
           {
-            "type": "Work",
-            "id": "$WORK"
+            "type": "Invoice",
+            "id": "$INVOICE"
           }
         ]
       },
@@ -245,12 +245,12 @@
       "assertions": [
         {
           "pointer": "/quantityDifference",
-          "operator": "equals",
+          "operator": "decimalEquals",
           "expected": "0"
         },
         {
           "pointer": "/originalDifference",
-          "operator": "equals",
+          "operator": "decimalEquals",
           "expected": "5"
         },
         {

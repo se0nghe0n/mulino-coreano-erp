@@ -12,7 +12,8 @@ import copy,json,pathlib,re,uuid
 D=pathlib.Path(__file__).resolve().parent
 T='2026-10-07T09:00:02Z';N='2026-10-08T09:00:00Z';UNTIL='2026-10-31T00:00:00Z'
 SEG='$c1-receipt60.segment'
-def write(name,obj):(D/name).write_text(json.dumps(obj,ensure_ascii=False,indent=2)+'\n')
+import sys;sys.path.insert(0,str(pathlib.Path(__file__).resolve().parent));import subjects
+def write(name,obj):(D/name).write_text(json.dumps(subjects.declare(obj),ensure_ascii=False,indent=2)+'\n')
 def cmd(i,cap,slots,rev=0,bind=None,intent='COMMAND',outcome='APPLIED',actor=None,assertions=None,refs=None):
  a=dict(id=i,type='command',capability=cap,request=dict(intentKind=intent,definitionVersion='definition-v1',capabilityId=cap,expectedRevision=rev,commandIdempotencyKey=i,slots=slots,provenance={},subjectRefs=refs or [dict(type='Work',id='$SALES_WORK')]),outcome=outcome)
  if bind:a['bind']=bind
@@ -42,6 +43,9 @@ for a in up:
  selected.append(a)
 selected+=dispatch
 text=json.dumps(selected).replace('native-s4','native-c1').replace('"60"','"100"').replace('"30"','"100"')
+# C1 reuses fixture.json, whose regulator policies name the native-s4 namespaces;
+# the regulatory gateway rejects an original from any other namespace.
+text=text.replace('native-c1-regulator','native-s4-regulator').replace('native-c1-dispatch-regulator','native-s4-dispatch-regulator')
 for value in set(re.findall(r'[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}',text)):
  text=text.replace(value,str(uuid.uuid5(uuid.NAMESPACE_URL,'c1:'+value)))
 selected=json.loads(text)

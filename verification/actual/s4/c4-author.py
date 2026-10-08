@@ -3,7 +3,15 @@
 import copy,json,pathlib,re,uuid
 D=pathlib.Path(__file__).resolve().parent
 T='2026-10-07T09:00:02Z'; N='2026-10-08T09:00:00Z'
-def write(name,obj): (D/name).write_text(json.dumps(obj,ensure_ascii=False,indent=2)+'\n')
+import sys;sys.path.insert(0,str(pathlib.Path(__file__).resolve().parent));import subjects
+def write(name,obj): (D/name).write_text(json.dumps(subjects.declare(obj),ensure_ascii=False,indent=2)+'\n')
+def declare_capabilities(definition):
+ # A verb without its pinned capability makes the whole definition non-VALID
+ # (plan §8); the product then HOLDs every goal pinned to it.
+ known={c['capabilityId'] for c in definition['capabilities']}
+ for verb in definition['verbs']:
+  if verb['capabilityId'] not in known:
+   definition['capabilities'].append({'capabilityId':verb['capabilityId'],'semanticVersion':'1.0.0','evaluatorVersion':'core-v1','inputSchemaVersion':'1.0.0','outputSchemaVersion':'1.0.0','supportedWorkMigration':[]});known.add(verb['capabilityId'])
 def cmd(i,cap,slots,rev=0,bind=None,intent='COMMAND',outcome='APPLIED',actor=None,assertions=None):
  a=dict(id=i,type='command',capability=cap,request=dict(intentKind=intent,definitionVersion='definition-v1',capabilityId=cap,expectedRevision=rev,commandIdempotencyKey=i,slots=slots,provenance={},subjectRefs=[dict(type='Work',id='$SALES_WORK')]),outcome=outcome)
  if bind:a['bind']=bind
@@ -28,12 +36,18 @@ def fixture():
  f=json.loads((D/'fixture.json').read_text());f['id']='c4-synthetic-setup'
  for who,a in f['actors'].items():
   if who=='outsider':continue
-  for cap in ['correctEvidence','recordActivity','assessGoal']:
+  # correctEvidence with documentId also records a claim, which EvidenceRecords
+  # authorizes as attachEvidence on the cited original document.
+  for cap in ['correctEvidence','recordActivity','assessGoal','attachEvidence']:
    if cap not in a['roleCapabilities']:a['roleCapabilities'].append(cap)
    if cap not in a['grant']['actions']:a['grant']['actions'].append(cap)
  f['aliases']['CPOL']['content']['rules']['correctEvidence']={'effectClass':'RECORD'}
  for cap in ['correctEvidence','recordActivity']:
   if not any(x['name']==cap for x in f['aliases']['DEF']['content']['verbs']):f['aliases']['DEF']['content']['verbs'].append(dict(name=cap,intentKind='RECORD',capabilityId=cap,stage='DRAFT',slots={}))
+ # Regulator originals below are renamed native-c4-*; the policies must name them.
+ f['aliases']['REGPOL']['sourceNamespace']='native-c4-regulator'
+ f['aliases']['REGDISPATCH']['sourceNamespace']='native-c4-dispatch-regulator'
+ declare_capabilities(f['aliases']['DEF']['content'])
  return f
 # Preserve E1's public input choreography, retain only receipt100 and its own
 # authoritative SELL/DISPATCH evidence. Do not copy any E1 expected results.
@@ -67,7 +81,9 @@ for a in selected:
 # regex replacement must also update original externalEventId/sourceIdentity.
 for a in selected:
  if a['type']=='original':
-  old=a['fixture']['occurrence']['externalEventId'];a['fixture']['occurrence']['externalEventId']='c4-'+old if not old.startswith('c4-') else old
+  # A source decision UUID is already fresh (uuid5 'c4:'); quality gateways
+  # require externalEventId to equal that decision id, so only names get prefixed.
+  old=a['fixture']['occurrence']['externalEventId'];a['fixture']['occurrence']['externalEventId']=old if old.startswith('c4-') or re.fullmatch(r'[0-9a-f-]{36}',old) else 'c4-'+old
 # sourceIdentity external part got prefixed by exact strings only if whole;
 # normalize from each original rather than infer a verified result.
 originals={a['id']:a for a in selected if a['type']=='original'}
@@ -95,12 +111,19 @@ a+=[orig('c4-return-original','RETURN_RECEIPT',r,'$RETURN','20',subject='RETURN'
 # Correct immutable physical delivery event through the public command; original
 # importer supplies bytes/document only, never a corrected canonical/effect.
 content=next(x['fixture']['occurrence']['content'] for x in base if x['type']=='original')
+# EvidenceReconciliation requires a delivery correction to keep the original
+# event's source profile and subject: it is version 2 of that source event.
+delivered=next(x for x in base if x['type']=='original' and x['id']=='c4-delivery-original')
 for q,known,prev,rev in [('98','2026-10-07T09:00:03Z','$c4-delivery-original.event',1)]:
  i='c4-correction'+q;c=copy.deepcopy(content);c['quantity']=q;c['correctionOfDeliveryId']='$DELIVERY'
- a += [dict(id=i+'-clock',type='clock',instant=known),orig(i,'PHYSICAL_DELIVERY',c,'$DELIVERY_OBSERVATION',q,known=known)]
+ a += [dict(id=i+'-clock',type='clock',instant=known),orig(i,'PHYSICAL_DELIVERY',c,'$DELIVERY_OBSERVATION',q,subject='DISPATCH',subjectid='$DISPATCH',known=known)]
  payload=json.dumps(c,separators=(',',':'))
  payload=re.sub(r'"\$([^" ]+)"',lambda m:'"${'+m.group(1)+'}"',payload)
- a += [cmd(i+'-event','correctEvidence',dict(subject=dict(kind='WORK',id='$SALES_WORK'),kind='PHYSICAL_DELIVERY',sourceNamespace='native-c4-'+i,externalEventId=i,sourceVersion='2',effectiveFrom=T,timeZone='UTC',timePrecision='SECOND',valueState='PRESENT',payload=payload,supersedesId=prev,documentId='$'+i+'.document',assertion='명시적 실제 인도 정정',quantity=q,unit='BOX',evidenceType='EVENT'),rev=rev,intent='RECORD',bind={i+'.event':'/id',i+'.claim':'/claimId'})]+link(i,'$DELIVERY_OBSERVATION',q,version='2')
+ a += [cmd(i+'-event','correctEvidence',dict(subject=dict(kind='DISPATCH',id='$DISPATCH'),kind='PHYSICAL_DELIVERY',sourceNamespace=delivered['fixture']['sourceProfile']['namespace'],externalEventId=delivered['fixture']['occurrence']['externalEventId'],sourceVersion='2',effectiveFrom=T,timeZone='UTC',timePrecision='SECOND',valueState='KNOWN',payload=payload,supersedesId=prev,documentId='$'+i+'.document',assertion='명시적 실제 인도 정정',quantity=q,unit='BOX',evidenceType='EVENT'),rev=rev,intent='RECORD',bind={i+'.event':'/id',i+'.claim':'/claimId'})]+link(i,'$DELIVERY_OBSERVATION',q,version='2')
+ # A correction keeps the original event's subject (the dispatch).
+ a[-3]['request']['subjectRefs']=[{'type':'Dispatch','id':'$DISPATCH'}]
+ # The corrected event is version 2 of the same source event; match that key.
+ a[-2]['request']['slots']['sourceIdentity']=delivered['fixture']['sourceProfile']['namespace']+':'+delivered['fixture']['occurrence']['externalEventId']+':2'
 a += [obs('c4-correct98-independent',[rows('mulino_evidence_events',dict(id='$c4-delivery-original.event'),1),rows('mulino_evidence_events',dict(id='$c4-correction98.event',supersedesid='$c4-delivery-original.event'),1),rows('mulino_work_read_assessmentreferences',dict(id='$PAST_ASSESSMENT',outcome='SATISFIED'),1),total('mulino_trade_sales_deliveries','quantity','100'),total('mulino_trade_sales_deliverycorrections','quantity','98'),total('mulino_trade_returns_receipts','quantity','20'),total('mulino_inventory_quantitysegments','quantity','20',dict(retiredat=None,placeid='$W')),total('mulino_inventory_quantitysegments','quantity','80',dict(retiredat=None,placeid='$CUSTOMER_PLACE')),total('mulino_inventory_quantitysegments','quantity','0',dict(retiredat=None,placeid='$TRANSIT')),total('mulino_work_read_obligationreferences','quantity','2',dict(kind='DELIVERY_CORRECTED_DEFICIT',status='OPEN',valid=True)),duties('DELIVERY_CORRECTED_DEFICIT')])]
 write('c4-history-return-correction.json',dict(schemaVersion='1.0.0',status='NOT_RUN',actions=a))
 write('c4-flow.json',dict(schemaVersion='1.0.0',status='NOT_RUN',requiredCases=['C4','T17_CONSUMED'],fullCaseCoverageClaimed=False,actions=[dict(id='c4-setup',type='setup',fixtureRef='verification/actual/s4/c4-fixture.json',organizationAlias='ORG')]+[dict(id='c4-include-'+x,type='include',scriptRef='verification/actual/s4/'+x+'.json') for x in ['c4-upstream','c4-delivery100','c4-history-return-correction']]))

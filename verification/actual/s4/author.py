@@ -1,10 +1,18 @@
 #!/usr/bin/env python3
 """Author deterministic S4 inputs; no database or product response is read here."""
-import copy,json,pathlib
+import copy,json,pathlib,uuid
 root=pathlib.Path(__file__).resolve().parents[3]
 out=root/'verification/actual/s4'
 T='2026-10-07T09:00:02Z';NEXT='2026-10-08T09:00:00Z'
-def write(name,value): (out/name).write_text(json.dumps(value,ensure_ascii=False,indent=2)+'\n')
+import sys;sys.path.insert(0,str(pathlib.Path(__file__).resolve().parent));import subjects
+def write(name,value): (out/name).write_text(json.dumps(subjects.declare(value),ensure_ascii=False,indent=2)+'\n')
+def declare_capabilities(definition):
+ # A verb without its pinned capability makes the whole definition non-VALID
+ # (plan §8); the product then HOLDs every goal pinned to it.
+ known={c['capabilityId'] for c in definition['capabilities']}
+ for verb in definition['verbs']:
+  if verb['capabilityId'] not in known:
+   definition['capabilities'].append({'capabilityId':verb['capabilityId'],'semanticVersion':'1.0.0','evaluatorVersion':'core-v1','inputSchemaVersion':'1.0.0','outputSchemaVersion':'1.0.0','supportedWorkMigration':[]});known.add(verb['capabilityId'])
 def command(id,capability,slots,bind=None,intent='COMMAND',revision=0,refs=None,actor=None,outcome='APPLIED',assertions=None):
  a={'id':id,'type':'command','capability':capability,'request':{'intentKind':intent,'definitionVersion':'definition-v1','capabilityId':capability,'expectedRevision':revision,'commandIdempotencyKey':id,'slots':slots,'provenance':{},'subjectRefs':refs or [{'type':'Work','id':'$WORK'}]},'outcome':outcome}
  if bind:a['bind']=bind
@@ -35,18 +43,24 @@ for actor in fixture['actors'].values():
 for cap,cls in classes.items():
  fixture['aliases']['CPOL']['content']['rules'][cap]={'effectClass':cls}
  if cap not in {v['name'] for v in fixture['aliases']['DEF']['content']['verbs']}:fixture['aliases']['DEF']['content']['verbs'].append({'name':cap,'intentKind':'RECORD' if cap in ['recordDelivery','recordObservedMovement','receiveReturn','recordInvoice'] else 'COMMAND','capabilityId':cap,'stage':'DRAFT','slots':{}})
-for noun in ['SalesOrder','SalesOrderLine','DeliveryObservation','Delivery','Return']:
+for noun in ['SalesOrder','SalesOrderLine','DeliveryObservation','Delivery','Return','Invoice','Dispatch']:
  if noun not in {n['name'] for n in fixture['aliases']['DEF']['content']['nouns']}:fixture['aliases']['DEF']['content']['nouns'].append({'name':noun,'core':True})
 fixture['aliases']['RETURN_AUTH']={'type':'ManagementAuthority','actorAlias':'supervisor','capabilityId':'authorizeReturn','validFrom':'2026-10-01T00:00:00Z','validUntil':'2026-10-31T23:59:59Z'}
 fixture['aliases']['DEF']['content']['attributes'].append({'nounType':'Delivery','name':'quantity','type':'DECIMAL','referenceType':None,'unit':'BOX','decimalPlaces':0,'minimumCount':1,'maximumCount':1,'requiredStage':'READ','core':True}) if not any(x['nounType']=='Delivery' and x['name']=='quantity' for x in fixture['aliases']['DEF']['content']['attributes']) else None
 if not any(x['name']=='delivered' for x in fixture['aliases']['DEF']['content']['goals']): fixture['aliases']['DEF']['content']['goals'].append({'name':'delivered','quantityMode':'CUMULATIVE_EVENT','endpoint':'DELIVERED','evaluatorVersion':'core-v1','predicate':{'operator':'quantitySum','property':'Delivery.quantity','minimum':{'value':'1','unit':'BOX'},'unit':'BOX','evidenceSelector':'VERIFIED_DISTINCT'}})
+declare_capabilities(fixture['aliases']['DEF']['content'])
 write('fixture.json',fixture)
 # All DISPATCH conditions arise from their own approved originals and gateway decisions.
 base=json.loads((out/'e1-upstream.json').read_text())['actions'];extras=[]
+sell_decisions=[a['fixture']['occurrence']['content']['sourceDecisionId'] for a in base if a['id'] in ['s60-QC','s60-CUSTOMER','s60-COMMERCIAL']]
 for a in base:
  if a['id'] in ['s60-QC','s60-QC-match','s60-QC-link','s60-QC-decision','s60-CUSTOMER','s60-CUSTOMER-match','s60-CUSTOMER-link','s60-CUSTOMER-decision','s60-COMMERCIAL','s60-COMMERCIAL-match','s60-COMMERCIAL-link','s60-COMMERCIAL-decision']:
-  x=json.loads(json.dumps(a).replace('s60-','dispatch-s60-').replace('"SELL"','"DISPATCH"'))
-  extras.append(x)
+  text=json.dumps(a).replace('s60-','dispatch-s60-').replace('"SELL"','"DISPATCH"')
+  # A DISPATCH basis is a separate source decision. Reusing the SELL decision
+  # id gives one occurrence identity two contents, which the gateway must
+  # reconcile as CONFLICT rather than a second verified basis.
+  for decision in sell_decisions:text=text.replace(decision,str(uuid.uuid5(uuid.NAMESPACE_URL,'s4-dispatch:'+decision)))
+  extras.append(json.loads(text))
 for a in base:
  if a['id'].startswith('reg-') or a['id'] in ['submit-reg','allow30','label-verified','draft-not-submitted']:
   x=json.loads(json.dumps(a).replace('reg-','dispatch-reg-').replace('native-s4-regulator','native-s4-dispatch-regulator').replace('$REGPOL','$REGDISPATCH').replace('$PROC','$DPROC').replace('"PROC','"DPROC').replace('"SELL"','"DISPATCH"').replace('"submit-reg"','"dispatch-submit-reg"').replace('"allow30"','"dispatch-allow30"').replace('"label-verified"','"dispatch-label-verified"').replace('"draft-not-submitted"','"dispatch-draft-not-submitted"'))
@@ -62,18 +76,21 @@ work['bind']={'SALES_WORK':'/effects/workId','SALES_WORK_REV':'/revision'}
 a=[work,command('e1-create-sales','createSalesOrder',{'workId':'$SALES_WORK','customerId':'$C','itemId':'$P','quantity':'30','unit':'BOX','price':'1','currency':'EUR','dueAt':'2026-10-31T00:00:00Z','destinationId':'$CUSTOMER_PLACE','deliveryEndpoint':'DELIVERED','qualityTerms':'가상 조건 충족','packageTerms':'가상 포장 조건 충족'},bind={'SALES_ORDER':'/effects/orderId','SALES_LINE':'/effects/lineId'},refs=[{'type':'Work','id':'$SALES_WORK'},{'type':'TradeItem','id':'$P'}]),
  {'id':'e1-segment-revision','type':'query','capability':'getObject','request':{'id':'$receipt60.segment','scope':{'organizationId':'$ORG','objectType':'QuantitySegment'},'asOf':T,'knownAt':T},'bind':{'RESERVE_SEGMENT_REV':'/data/revision'}},
  command('e1-reserve30','reserveQuantity',{'segmentId':'$receipt60.segment','salesLineId':'$SALES_LINE','startQuantity':'0','quantity':'30','unit':'BOX'},bind={'ALLOCATION':'/effects/allocationId','ALLOCATION_REV':'/revision'},revision='$RESERVE_SEGMENT_REV',refs=[{'type':'QuantitySegment','id':'$receipt60.segment'},{'type':'SalesOrderLine','id':'$SALES_LINE'}]),
- command('e1-pick30','pickQuantity',{'allocationId':'$ALLOCATION'},bind={'ALLOCATION_REV':'/revision'},revision='$ALLOCATION_REV'),
- command('e1-dispatch30','dispatchQuantity',{'allocationId':'$ALLOCATION','transitPlaceId':'$TRANSIT','occurredAt':T,'evidenceRef':'synthetic-e1-dispatch30'},bind={'DISPATCH':'/effects/dispatchId','CARGO':'/effects/cargoScopeId','TRANSIT_SEGMENT':'/effects/transitSegmentId','DISPATCH_RANGE':'/effects/rangeRootId'},revision='$ALLOCATION_REV'),
+ command('e1-pick30','pickQuantity',{'allocationId':'$ALLOCATION'},bind={'ALLOCATION_REV':'/revision'},revision='$ALLOCATION_REV',refs=[{'type':'Work','id':'$SALES_WORK'}]),
+ command('e1-dispatch30','dispatchQuantity',{'allocationId':'$ALLOCATION','transitPlaceId':'$TRANSIT','occurredAt':T,'evidenceRef':'synthetic-e1-dispatch30'},bind={'DISPATCH':'/effects/dispatchId','CARGO':'/effects/cargoScopeId','TRANSIT_SEGMENT':'/effects/transitSegmentId','DISPATCH_RANGE':'/effects/rangeRootId'},revision='$ALLOCATION_REV',refs=[{'type':'Work','id':'$SALES_WORK'}]),
  {'id':'DELIVERY_EVENT','type':'uuid','alias':'DELIVERY_EVENT'}, {'id':'DELIVERY_OBSERVATION','type':'uuid','alias':'DELIVERY_OBSERVATION'}]
 content={'deliveryEventId':'$DELIVERY_EVENT','dispatchId':'$DISPATCH','cargoScopeId':'$CARGO','salesLineId':'$SALES_LINE','customerId':'$C','itemId':'$P','lotId':'$L','rangeRootId':'$DISPATCH_RANGE','physicalScopeId':'$DELIVERY_OBSERVATION','startQuantity':'0','quantity':'30','unit':'BOX','placeId':'$CUSTOMER_PLACE','occurredAt':T}
-a += [original('e1-delivery-original','PHYSICAL_DELIVERY',content,'$DELIVERY_OBSERVATION','30',work='$SALES_WORK',subjectid='$SALES_WORK',place='$CUSTOMER_PLACE'),
+a += [original('e1-delivery-original','PHYSICAL_DELIVERY',content,'$DELIVERY_OBSERVATION','30',work='$SALES_WORK',subject='DISPATCH',subjectid='$DISPATCH',place='$CUSTOMER_PLACE'),
  command('e1-delivery-intake','recordDelivery',{'observationId':'$DELIVERY_OBSERVATION','eventId':'$e1-delivery-original.event','dispatchId':'$DISPATCH','cargoScopeId':'$CARGO','salesLineId':'$SALES_LINE','workId':'$SALES_WORK','customerId':'$C','itemId':'$P','lotId':'$L','rangeRootId':'$DISPATCH_RANGE','startQuantity':'0','quantity':'30','unit':'BOX','placeId':'$CUSTOMER_PLACE','occurredAt':T,'nextAction':'인도 원본 대조','nextCheckAt':NEXT},intent='RECORD',refs=[{'type':'Work','id':'$SALES_WORK'}])]
-a += link('e1-delivery-original','$DELIVERY_OBSERVATION','30',refs=[{'type':'Work','id':'$SALES_WORK'}])
+# The carrier delivery original is claimed about the dispatch (as in
+# FulfillmentPostgresTest): the product derives item/Work/place=destination from
+# it, as DeliveryEvidenceScope requires; the observation does not exist yet.
+a += link('e1-delivery-original','$DELIVERY_OBSERVATION','30')
 a += [command('e1-delivery-confirm','recordDelivery',{'observationId':'$DELIVERY_OBSERVATION','canonicalOccurrenceId':'$e1-delivery-original.canonical'},intent='RECORD',revision=1,bind={'DELIVERY':'/effects/deliveryId'},refs=[{'type':'Work','id':'$SALES_WORK'}]),
  {'id':'e1-delivery-revision','type':'query','capability':'getObject','request':{'id':'$DELIVERY','scope':{'organizationId':'$ORG','objectType':'Delivery'},'asOf':T,'knownAt':T},'bind':{'DELIVERY_REV':'/data/revision'}},
  command('e1-return-authorize10','authorizeReturn',{'deliveryId':'$DELIVERY','startQuantity':'0','quantity':'10','unit':'BOX','destinationId':'$W','validUntil':'2026-10-31T00:00:00Z','reason':'실제 고객 반품10 접수'},actor='supervisor',revision='$DELIVERY_REV',refs=[{'type':'Work','id':'$SALES_WORK'}],bind={'RETURN_AUTHORIZATION':'/effects/authorizationId'}),
  {'id':'RETURN_EVENT','type':'uuid','alias':'RETURN_EVENT'},
- command('e1-return-intake10','receiveReturn',{'authorizationId':'$RETURN_AUTHORIZATION','eventId':'$RETURN_EVENT','occurredAt':T,'nextCheckAt':NEXT},intent='RECORD',bind={'RETURN':'/effects/returnId'})]
+ command('e1-return-intake10','receiveReturn',{'authorizationId':'$RETURN_AUTHORIZATION','eventId':'$RETURN_EVENT','occurredAt':T,'nextCheckAt':NEXT},intent='RECORD',bind={'RETURN':'/effects/returnId'},refs=[{'type':'Work','id':'$SALES_WORK'}])]
 ret={'returnId':'$RETURN','kind':'RETURN_RECEIPT','eventId':'$RETURN_EVENT','deliveryId':'$DELIVERY','customerId':'$C','itemId':'$P','lotId':'$L','rangeRootId':'$DISPATCH_RANGE','startQuantity':'0','quantity':'10','unit':'BOX','placeId':'$W','workId':'$SALES_WORK','occurredAt':T}
 a += [original('e1-return-original','RETURN_RECEIPT',ret,'$RETURN','10',subject='RETURN',subjectid='$RETURN',work='$SALES_WORK')]
 a += link('e1-return-original','$RETURN','10',refs=[{'type':'Work','id':'$SALES_WORK'}])
@@ -87,7 +104,7 @@ b=[original('e1-invoice-input','INVOICE',inv,'$LINE','40',subject='PURCHASE_ORDE
  command('e1-record-invoice40','recordInvoice',{'invoiceKind':'COMMERCIAL','originalAmount':{'value':'8005','currency':'EUR','provenance':'USER'},'line':{'value':{'purchaseLineId':'$LINE','receiptOccurrenceId':'$receipt40.canonical','quantity':{'value':'40','unit':'BOX'},'unitPrice':{'value':'200.125','currency':'EUR'}},'provenance':'USER'},'evidence':'$e1-invoice-input.document'},intent='RECORD',revision='$PURCHASE_LINE_REV',bind={'INVOICE':'/invoiceId'}),
  original('e1-invoice-original','INVOICE',inv,'$INVOICE','40',subject='INVOICE',subjectid='$INVOICE')]
 b += link('e1-invoice-original','$INVOICE','40')
-b += [command('e1-match-invoice-gap5','matchInvoice',{'invoiceId':'$INVOICE','canonicalOccurrenceId':'$e1-invoice-original.canonical','evidence':'$e1-invoice-original.document'},revision=1,assertions=[{'pointer':'/quantityDifference','operator':'equals','expected':'0'},{'pointer':'/originalDifference','operator':'equals','expected':'5'},{'pointer':'/businessStatus','operator':'equals','expected':'DIFFERENCE'},{'pointer':'/settlementResult','operator':'equals','expected':'UNSATISFIED'},{'pointer':'/bankEffect','operator':'equals','expected':'0'}])]
+b += [command('e1-match-invoice-gap5','matchInvoice',{'invoiceId':'$INVOICE','canonicalOccurrenceId':'$e1-invoice-original.canonical','evidence':'$e1-invoice-original.document'},revision=1,assertions=[{'pointer':'/quantityDifference','operator':'decimalEquals','expected':'0'},{'pointer':'/originalDifference','operator':'decimalEquals','expected':'5'},{'pointer':'/businessStatus','operator':'equals','expected':'DIFFERENCE'},{'pointer':'/settlementResult','operator':'equals','expected':'UNSATISFIED'},{'pointer':'/bankEffect','operator':'equals','expected':'0'}])]
 write('e1-settlement.json',{'schemaVersion':'1.0.0','status':'NOT_RUN','actions':b})
 c=[{'id':'e1-current-sales-revision','type':'observe','bindRows':{'SALES_WORK_REV':{'pointer':'/rawRows/mulino_work_read_works','where':{'id':'$SALES_WORK'},'column':'revision'}}},command('e1-assess-sales30','assessGoal',{'workId':'$SALES_WORK'},revision='$SALES_WORK_REV',refs=[{'type':'Work','id':'$SALES_WORK'}],assertions=[{'pointer':'/assessment/outcome','operator':'equals','expected':'SATISFIED'}]),{'id':'e1-final-independent','type':'observe','assertions':[
  {'pointer':'/rawRows/mulino_inventory_quantitysegments','operator':'sum','column':'quantity','where':{'retiredat':None,'placeid':'$W'},'expected':'80'},

@@ -71,7 +71,8 @@
         "recordInvoice",
         "matchInvoice",
         "correctEvidence",
-        "recordActivity"
+        "recordActivity",
+        "attachEvidence"
       ],
       "grant": {
         "delegatorAlias": "supervisor",
@@ -125,7 +126,8 @@
           "recordInvoice",
           "matchInvoice",
           "correctEvidence",
-          "recordActivity"
+          "recordActivity",
+          "attachEvidence"
         ],
         "scope": {
           "organizationAlias": "ORG"
@@ -190,7 +192,8 @@
         "recordInvoice",
         "matchInvoice",
         "correctEvidence",
-        "recordActivity"
+        "recordActivity",
+        "attachEvidence"
       ],
       "grant": {
         "delegatorAlias": "supervisor",
@@ -244,7 +247,8 @@
           "recordInvoice",
           "matchInvoice",
           "correctEvidence",
-          "recordActivity"
+          "recordActivity",
+          "attachEvidence"
         ],
         "scope": {
           "organizationAlias": "ORG"
@@ -450,6 +454,14 @@
           },
           {
             "name": "Return",
+            "core": true
+          },
+          {
+            "name": "Invoice",
+            "core": true
+          },
+          {
+            "name": "Dispatch",
             "core": true
           }
         ],
@@ -1071,6 +1083,126 @@
             "inputSchemaVersion": "1.0.0",
             "outputSchemaVersion": "1.0.0",
             "supportedWorkMigration": []
+          },
+          {
+            "capabilityId": "createSalesOrder",
+            "semanticVersion": "1.0.0",
+            "evaluatorVersion": "core-v1",
+            "inputSchemaVersion": "1.0.0",
+            "outputSchemaVersion": "1.0.0",
+            "supportedWorkMigration": []
+          },
+          {
+            "capabilityId": "reviseSalesOrder",
+            "semanticVersion": "1.0.0",
+            "evaluatorVersion": "core-v1",
+            "inputSchemaVersion": "1.0.0",
+            "outputSchemaVersion": "1.0.0",
+            "supportedWorkMigration": []
+          },
+          {
+            "capabilityId": "recordDelivery",
+            "semanticVersion": "1.0.0",
+            "evaluatorVersion": "core-v1",
+            "inputSchemaVersion": "1.0.0",
+            "outputSchemaVersion": "1.0.0",
+            "supportedWorkMigration": []
+          },
+          {
+            "capabilityId": "recordObservedMovement",
+            "semanticVersion": "1.0.0",
+            "evaluatorVersion": "core-v1",
+            "inputSchemaVersion": "1.0.0",
+            "outputSchemaVersion": "1.0.0",
+            "supportedWorkMigration": []
+          },
+          {
+            "capabilityId": "reserveQuantity",
+            "semanticVersion": "1.0.0",
+            "evaluatorVersion": "core-v1",
+            "inputSchemaVersion": "1.0.0",
+            "outputSchemaVersion": "1.0.0",
+            "supportedWorkMigration": []
+          },
+          {
+            "capabilityId": "replaceAllocation",
+            "semanticVersion": "1.0.0",
+            "evaluatorVersion": "core-v1",
+            "inputSchemaVersion": "1.0.0",
+            "outputSchemaVersion": "1.0.0",
+            "supportedWorkMigration": []
+          },
+          {
+            "capabilityId": "pickQuantity",
+            "semanticVersion": "1.0.0",
+            "evaluatorVersion": "core-v1",
+            "inputSchemaVersion": "1.0.0",
+            "outputSchemaVersion": "1.0.0",
+            "supportedWorkMigration": []
+          },
+          {
+            "capabilityId": "releaseAllocation",
+            "semanticVersion": "1.0.0",
+            "evaluatorVersion": "core-v1",
+            "inputSchemaVersion": "1.0.0",
+            "outputSchemaVersion": "1.0.0",
+            "supportedWorkMigration": []
+          },
+          {
+            "capabilityId": "dispatchQuantity",
+            "semanticVersion": "1.0.0",
+            "evaluatorVersion": "core-v1",
+            "inputSchemaVersion": "1.0.0",
+            "outputSchemaVersion": "1.0.0",
+            "supportedWorkMigration": []
+          },
+          {
+            "capabilityId": "authorizeReturn",
+            "semanticVersion": "1.0.0",
+            "evaluatorVersion": "core-v1",
+            "inputSchemaVersion": "1.0.0",
+            "outputSchemaVersion": "1.0.0",
+            "supportedWorkMigration": []
+          },
+          {
+            "capabilityId": "receiveReturn",
+            "semanticVersion": "1.0.0",
+            "evaluatorVersion": "core-v1",
+            "inputSchemaVersion": "1.0.0",
+            "outputSchemaVersion": "1.0.0",
+            "supportedWorkMigration": []
+          },
+          {
+            "capabilityId": "recordInvoice",
+            "semanticVersion": "1.0.0",
+            "evaluatorVersion": "core-v1",
+            "inputSchemaVersion": "1.0.0",
+            "outputSchemaVersion": "1.0.0",
+            "supportedWorkMigration": []
+          },
+          {
+            "capabilityId": "matchInvoice",
+            "semanticVersion": "1.0.0",
+            "evaluatorVersion": "core-v1",
+            "inputSchemaVersion": "1.0.0",
+            "outputSchemaVersion": "1.0.0",
+            "supportedWorkMigration": []
+          },
+          {
+            "capabilityId": "correctEvidence",
+            "semanticVersion": "1.0.0",
+            "evaluatorVersion": "core-v1",
+            "inputSchemaVersion": "1.0.0",
+            "outputSchemaVersion": "1.0.0",
+            "supportedWorkMigration": []
+          },
+          {
+            "capabilityId": "recordActivity",
+            "semanticVersion": "1.0.0",
+            "evaluatorVersion": "core-v1",
+            "inputSchemaVersion": "1.0.0",
+            "outputSchemaVersion": "1.0.0",
+            "supportedWorkMigration": []
           }
         ]
       }
@@ -1291,7 +1423,7 @@
       "actorAlias": "reader",
       "version": "fixture-v1",
       "authority": "FICTIONAL-AUTHORITY",
-      "sourceNamespace": "native-s4-regulator",
+      "sourceNamespace": "native-c4-regulator",
       "action": "SELL",
       "validFrom": "2026-10-01T00:00:00Z",
       "validUntil": "2026-10-31T23:59:59Z",
@@ -1315,7 +1447,7 @@
       "actorAlias": "reader",
       "version": "fixture-v1",
       "authority": "FICTIONAL-AUTHORITY",
-      "sourceNamespace": "native-s4-dispatch-regulator",
+      "sourceNamespace": "native-c4-dispatch-regulator",
       "action": "DISPATCH",
       "validFrom": "2026-10-01T00:00:00Z",
       "validUntil": "2026-10-31T23:59:59Z",
