@@ -130,13 +130,13 @@
     그러면 "fact-not-permission-9" assertion으로 "만료 뒤 인도는 확정 사실이지만 정상 이행 허가가 아니다. 인도 원행은 canonical이고 인도 목표 판정은 UNSATISFIED다."를 확인한다
     그러면 "fact-not-permission-10" assertion으로 "만료 뒤 인도는 확정 사실이지만 정상 이행 허가가 아니다. 인도 원행은 canonical이고 인도 목표 판정은 UNSATISFIED다."를 확인한다
     그러면 "fact-not-permission-12" assertion으로 "만료 뒤 인도는 확정 사실이지만 정상 이행 허가가 아니다. 인도 원행은 canonical이고 인도 목표 판정은 UNSATISFIED다."를 확인한다
-    그러면 "expiry-violation-duty-13" assertion으로 "만료 뒤 인도의 위반 대응 의무 VIOLATION_RESPONSE가 현재 하나 OPEN이며 owner sales, nextAction "인도 부족과 제한 대응을 확인한다", nextCheckAt 2026-10-07T10:00:00Z다. API와 DB가 같다."를 확인한다
-    그러면 "expiry-violation-duty-14" assertion으로 "만료 뒤 인도의 위반 대응 의무 VIOLATION_RESPONSE가 현재 하나 OPEN이며 owner sales, nextAction "인도 부족과 제한 대응을 확인한다", nextCheckAt 2026-10-07T10:00:00Z다. API와 DB가 같다."를 확인한다
-    그러면 "expiry-violation-duty-15" assertion으로 "만료 뒤 인도의 위반 대응 의무 VIOLATION_RESPONSE가 현재 하나 OPEN이며 owner sales, nextAction "인도 부족과 제한 대응을 확인한다", nextCheckAt 2026-10-07T10:00:00Z다. API와 DB가 같다."를 확인한다
-    그러면 "expiry-violation-duty-16" assertion으로 "만료 뒤 인도의 위반 대응 의무 VIOLATION_RESPONSE가 현재 하나 OPEN이며 owner sales, nextAction "인도 부족과 제한 대응을 확인한다", nextCheckAt 2026-10-07T10:00:00Z다. API와 DB가 같다."를 확인한다
-    그러면 "expiry-violation-duty-17" assertion으로 "만료 뒤 인도의 위반 대응 의무 VIOLATION_RESPONSE가 현재 하나 OPEN이며 owner sales, nextAction "인도 부족과 제한 대응을 확인한다", nextCheckAt 2026-10-07T10:00:00Z다. API와 DB가 같다."를 확인한다
-    그러면 "expiry-violation-duty-18" assertion으로 "만료 뒤 인도의 위반 대응 의무 VIOLATION_RESPONSE가 현재 하나 OPEN이며 owner sales, nextAction "인도 부족과 제한 대응을 확인한다", nextCheckAt 2026-10-07T10:00:00Z다. API와 DB가 같다."를 확인한다
-    그러면 "expiry-violation-duty-19" assertion으로 "만료 뒤 인도의 위반 대응 의무 VIOLATION_RESPONSE가 현재 하나 OPEN이며 owner sales, nextAction "인도 부족과 제한 대응을 확인한다", nextCheckAt 2026-10-07T10:00:00Z다. API와 DB가 같다."를 확인한다
+    그러면 "expiry-violation-duty-13" assertion으로 "만료 뒤 인도의 위반 대응 의무 VIOLATION_RESPONSE가 현재 하나 OPEN이며 owner sales, nextAction 인도 부족과 제한 대응을 확인한다, nextCheckAt 2026-10-07T10:00:00Z다. API와 DB가 같다."를 확인한다
+    그러면 "expiry-violation-duty-14" assertion으로 "만료 뒤 인도의 위반 대응 의무 VIOLATION_RESPONSE가 현재 하나 OPEN이며 owner sales, nextAction 인도 부족과 제한 대응을 확인한다, nextCheckAt 2026-10-07T10:00:00Z다. API와 DB가 같다."를 확인한다
+    그러면 "expiry-violation-duty-15" assertion으로 "만료 뒤 인도의 위반 대응 의무 VIOLATION_RESPONSE가 현재 하나 OPEN이며 owner sales, nextAction 인도 부족과 제한 대응을 확인한다, nextCheckAt 2026-10-07T10:00:00Z다. API와 DB가 같다."를 확인한다
+    그러면 "expiry-violation-duty-16" assertion으로 "만료 뒤 인도의 위반 대응 의무 VIOLATION_RESPONSE가 현재 하나 OPEN이며 owner sales, nextAction 인도 부족과 제한 대응을 확인한다, nextCheckAt 2026-10-07T10:00:00Z다. API와 DB가 같다."를 확인한다
+    그러면 "expiry-violation-duty-17" assertion으로 "만료 뒤 인도의 위반 대응 의무 VIOLATION_RESPONSE가 현재 하나 OPEN이며 owner sales, nextAction 인도 부족과 제한 대응을 확인한다, nextCheckAt 2026-10-07T10:00:00Z다. API와 DB가 같다."를 확인한다
+    그러면 "expiry-violation-duty-18" assertion으로 "만료 뒤 인도의 위반 대응 의무 VIOLATION_RESPONSE가 현재 하나 OPEN이며 owner sales, nextAction 인도 부족과 제한 대응을 확인한다, nextCheckAt 2026-10-07T10:00:00Z다. API와 DB가 같다."를 확인한다
+    그러면 "expiry-violation-duty-19" assertion으로 "만료 뒤 인도의 위반 대응 의무 VIOLATION_RESPONSE가 현재 하나 OPEN이며 owner sales, nextAction 인도 부족과 제한 대응을 확인한다, nextCheckAt 2026-10-07T10:00:00Z다. API와 DB가 같다."를 확인한다
 
   시나리오: 원천 falseClaim 보고는 주장만 접수하며 정상 인도 효과0과 접수 책임을 남긴다
     먼저 사례 파일 "verification/cases/T17/case.json"의 "claim-falseclaim"를 준비한다
