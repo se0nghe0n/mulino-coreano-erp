@@ -56,7 +56,9 @@ public class AuthorityPrerequisiteAssertionsTest {
     @Test void allThreeRoutesUseTheIdenticalValidPayloadWithDifferentCurrentAuthority() throws Exception {
         for(String cap:List.of("dispatchPurchaseOrder","migrateWorkDefinition","transferObligation")) for(String route:List.of("api","mcp","worker")) {
             JsonNode sub=scenario(route,cap),denied=action(sub,"attempt"),allowed=action(sub,"authorized-same-input");
-            assertEquals(denied.path("request"),allowed.path("request"));assertEquals(route,allowed.path("route").asText());
+            ObjectNode deniedPayload=denied.path("request").deepCopy(),allowedPayload=allowed.path("request").deepCopy();
+            assertEquals("C3-"+route+"-"+cap+"-attempt",deniedPayload.remove("commandIdempotencyKey").asText());assertEquals("C3-"+route+"-"+cap+"-authorized",allowedPayload.remove("commandIdempotencyKey").asText());
+            assertEquals(deniedPayload,allowedPayload);assertEquals(route,allowed.path("route").asText());
             assertEquals("reader",denied.path("actorRef").asText());assertEquals("delegator",allowed.path("actorRef").asText());
             assertTrue(index(sub,"before")<index(sub,"attempt"));assertTrue(index(sub,"after")<index(sub,"authorized-same-input"));
             assertEquals("FORBIDDEN",assertion(sub,"attempt-code").path("expected").asText());
@@ -75,7 +77,7 @@ public class AuthorityPrerequisiteAssertionsTest {
     }
     @Test void outboxMustBindTheActualApprovalHashAndExternalOperationExactlyOnce() throws Exception {
         JsonNode sub=scenario("api","dispatchPurchaseOrder"),a=assertion(sub,"authorized-business-outbox-once");
-        String hash="a".repeat(64),key="C3-api-dispatchPurchaseOrder-attempt";
+        String hash="a".repeat(64),key="C3-api-dispatchPurchaseOrder-authorized";
         var observed=capture("{\"outbox\":[{\"capabilityId\":\"dispatchPurchaseOrder\",\"proposalId\":\"proposal\",\"proposalHash\":\""+hash+"\",\"approvalId\":\"approval\",\"externalOperationId\":\"external-op\",\"commandIdempotencyKey\":\""+key+"\"}]}","{}");
         var results=new HashMap<String,JsonNode>();results.put("authorized-after",observed);results.put("precondition-proposal",capture("{}","{\"data\":{\"proposalHash\":\""+hash+"\"}}"));results.put("precondition-approval",capture("{}","{\"approvalId\":\"approval\"}"));
         engine.check(a,results,aliases());ObjectNode row=(ObjectNode)observed.at("/data/rawRows/outbox/0");
@@ -83,6 +85,31 @@ public class AuthorityPrerequisiteAssertionsTest {
         row.put("externalOperationId","other-external-op");assertThrows(AssertionError.class,()->engine.check(a,results,aliases()));row.put("externalOperationId","external-op");
         ((com.fasterxml.jackson.databind.node.ArrayNode)observed.at("/data/rawRows/outbox")).add(row.deepCopy());assertThrows(AssertionError.class,()->engine.check(a,results,aliases()));
         results.put("precondition-approval",StepResult.missing("precondition-approval","no actual manager decision").toJson());assertThrows(AssertionError.class,()->engine.check(a,results,aliases()));
+    }
+    @Test void recallClosureRequiresAdminApprovalNoticeRecoveryDisposalBeforeTheCounterCall() throws Exception {
+        for(String route:List.of("api","mcp","worker")) {
+            JsonNode sub=scenario(route,"closeRecall");String previous="setup";
+            for(String next:List.of("precondition-recall","precondition-approval","precondition-notice","precondition-recovery","precondition-disposal","before","attempt","authorized-same-input")) {
+                assertTrue(index(sub,previous)<index(sub,next),previous+" must precede "+next);previous=next;
+            }
+            assertEquals("admin",action(sub,"precondition-approval").path("actorRef").asText());assertEquals("admin",action(sub,"authorized-same-input").path("actorRef").asText());
+            assertEquals("DISPOSED",action(sub,"precondition-disposal").at("/request/slots/outcome").asText());
+            assertEquals("precondition-disposal",action(sub,"attempt").at("/request/slots/partitionHash/$result/actionId").asText());
+            assertFalse(action(sub,"attempt").at("/request/slots").has("decision"),"closeRecall must not reuse approveRecall's payload");
+        }
+        JsonNode closure=assertion(scenario("api","closeRecall"),"authorized-business-recall-closure");
+        var rows=capture("{\"recallClosures\":[{\"recallId\":\"recall\",\"approvalId\":\"approval\",\"closedBy\":\"admin\",\"recoveredQuantity\":\"20\",\"disposedQuantity\":\"20\",\"exceptionQuantity\":\"0\",\"unknownQuantity\":\"0\",\"unit\":\"BOX\"}]}","{}");
+        var results=new HashMap<String,JsonNode>();results.put("authorized-after",rows);results.put("precondition-approval",capture("{}","{\"approvalId\":\"approval\"}"));
+        ObjectNode aliases=(ObjectNode)aliases();aliases.put("RECALL","recall").put("admin","admin");
+        engine.check(closure,results,aliases);
+        ((ObjectNode)rows.at("/data/rawRows/recallClosures/0")).put("unknownQuantity","20").put("disposedQuantity","0");assertThrows(AssertionError.class,()->engine.check(closure,results,aliases));
+        ((ObjectNode)rows.at("/data/rawRows/recallClosures/0")).put("unknownQuantity","0").put("disposedQuantity","20").put("closedBy","delegator");assertThrows(AssertionError.class,()->engine.check(closure,results,aliases));
+    }
+    @Test void emergencyReassignUsesItsOwnAdminPayloadNotTheHandoverPayload() throws Exception {
+        JsonNode sub=scenario("mcp","emergencyReassign");JsonNode slots=action(sub,"attempt").at("/request/slots");
+        assertEquals("DUTY",slots.at("/obligationId/$alias").asText());assertEquals("delegator",slots.at("/newOwnerId/$alias").asText());assertFalse(slots.has("handoverId"));
+        assertEquals("admin",action(sub,"authorized-same-input").path("actorRef").asText());
+        assertEquals("admin",assertion(sub,"authorized-committed-once").at("/source/where/stableRequestOwnerId/$alias").asText());
     }
     @Test void migrationPositiveActorIsTheCurrentHumanWorkOwner() throws Exception {
         JsonNode fixture=Json.read(root.resolve("verification/cases/C3/fixture-migrateWorkDefinition.json"));

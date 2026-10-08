@@ -8,11 +8,13 @@
     만일 "시스템" 역할이 "setup" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-before" 행동을 수행한다
     만일 "reader" 역할이 "access-before" 행동을 수행한다
     만일 "delegator" 역할이 "target-before" 행동을 수행한다
     만일 "reader" 역할이 "attempt" 행동을 수행한다
     만일 "delegator" 역할이 "after-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "after" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-after" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-target" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-after-snapshot" 행동을 수행한다
@@ -45,6 +47,8 @@
     그러면 "current-read-actions" assertion으로 "read-audit-permitted current-read-actions"를 확인한다
     그러면 "authorized-committed-once" assertion으로 "read-audit-permitted authorized-committed-once"를 확인한다
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
+    그러면 "unchanged-effect-genealogy" assertion으로 "inventory-effects unchanged-effect-genealogy"를 확인한다
+    그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 api/mergeQuantity 업무 효과0
@@ -52,11 +56,13 @@
     만일 "시스템" 역할이 "setup" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-before" 행동을 수행한다
     만일 "reader" 역할이 "access-before" 행동을 수행한다
     만일 "delegator" 역할이 "target-before" 행동을 수행한다
     만일 "reader" 역할이 "attempt" 행동을 수행한다
     만일 "delegator" 역할이 "after-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "after" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-after" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-target" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-after-snapshot" 행동을 수행한다
@@ -89,6 +95,8 @@
     그러면 "current-read-actions" assertion으로 "read-audit-permitted current-read-actions"를 확인한다
     그러면 "authorized-committed-once" assertion으로 "read-audit-permitted authorized-committed-once"를 확인한다
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
+    그러면 "unchanged-effect-genealogy" assertion으로 "inventory-effects unchanged-effect-genealogy"를 확인한다
+    그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 api/moveQuantity 업무 효과0
@@ -96,11 +104,13 @@
     만일 "시스템" 역할이 "setup" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-before" 행동을 수행한다
     만일 "reader" 역할이 "access-before" 행동을 수행한다
     만일 "delegator" 역할이 "target-before" 행동을 수행한다
     만일 "reader" 역할이 "attempt" 행동을 수행한다
     만일 "delegator" 역할이 "after-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "after" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-after" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-target" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-after-snapshot" 행동을 수행한다
@@ -133,6 +143,9 @@
     그러면 "current-read-actions" assertion으로 "read-audit-permitted current-read-actions"를 확인한다
     그러면 "authorized-committed-once" assertion으로 "read-audit-permitted authorized-committed-once"를 확인한다
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
+    그러면 "unchanged-effect-logisticsMemberships" assertion으로 "inventory-effects unchanged-effect-logisticsMemberships"를 확인한다
+    그러면 "unchanged-effect-custodyHandovers" assertion으로 "inventory-effects unchanged-effect-custodyHandovers"를 확인한다
+    그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 api/adjustQuantity 업무 효과0
@@ -140,11 +153,13 @@
     만일 "시스템" 역할이 "setup" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-before" 행동을 수행한다
     만일 "reader" 역할이 "access-before" 행동을 수행한다
     만일 "delegator" 역할이 "target-before" 행동을 수행한다
     만일 "reader" 역할이 "attempt" 행동을 수행한다
     만일 "delegator" 역할이 "after-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "after" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-after" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-target" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-after-snapshot" 행동을 수행한다
@@ -177,6 +192,9 @@
     그러면 "current-read-actions" assertion으로 "read-audit-permitted current-read-actions"를 확인한다
     그러면 "authorized-committed-once" assertion으로 "read-audit-permitted authorized-committed-once"를 확인한다
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
+    그러면 "unchanged-effect-adjustmentProposals" assertion으로 "inventory-effects unchanged-effect-adjustmentProposals"를 확인한다
+    그러면 "unchanged-effect-stocktakes" assertion으로 "inventory-effects unchanged-effect-stocktakes"를 확인한다
+    그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 api/reserveQuantity 업무 효과0
@@ -184,11 +202,13 @@
     만일 "시스템" 역할이 "setup" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-before" 행동을 수행한다
     만일 "reader" 역할이 "access-before" 행동을 수행한다
     만일 "delegator" 역할이 "target-before" 행동을 수행한다
     만일 "reader" 역할이 "attempt" 행동을 수행한다
     만일 "delegator" 역할이 "after-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "after" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-after" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-target" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-after-snapshot" 행동을 수행한다
@@ -221,6 +241,8 @@
     그러면 "current-read-actions" assertion으로 "read-audit-permitted current-read-actions"를 확인한다
     그러면 "authorized-committed-once" assertion으로 "read-audit-permitted authorized-committed-once"를 확인한다
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
+    그러면 "unchanged-effect-orders" assertion으로 "followup-effects unchanged-effect-orders"를 확인한다
+    그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 api/replaceAllocation 업무 효과0
@@ -228,11 +250,13 @@
     만일 "시스템" 역할이 "setup" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-before" 행동을 수행한다
     만일 "reader" 역할이 "access-before" 행동을 수행한다
     만일 "delegator" 역할이 "target-before" 행동을 수행한다
     만일 "reader" 역할이 "attempt" 행동을 수행한다
     만일 "delegator" 역할이 "after-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "after" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-after" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-target" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-after-snapshot" 행동을 수행한다
@@ -265,6 +289,8 @@
     그러면 "current-read-actions" assertion으로 "read-audit-permitted current-read-actions"를 확인한다
     그러면 "authorized-committed-once" assertion으로 "read-audit-permitted authorized-committed-once"를 확인한다
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
+    그러면 "unchanged-effect-orders" assertion으로 "followup-effects unchanged-effect-orders"를 확인한다
+    그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 api/pickQuantity 업무 효과0
@@ -272,11 +298,13 @@
     만일 "시스템" 역할이 "setup" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-before" 행동을 수행한다
     만일 "reader" 역할이 "access-before" 행동을 수행한다
     만일 "delegator" 역할이 "target-before" 행동을 수행한다
     만일 "reader" 역할이 "attempt" 행동을 수행한다
     만일 "delegator" 역할이 "after-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "after" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-after" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-target" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-after-snapshot" 행동을 수행한다
@@ -309,6 +337,8 @@
     그러면 "current-read-actions" assertion으로 "read-audit-permitted current-read-actions"를 확인한다
     그러면 "authorized-committed-once" assertion으로 "read-audit-permitted authorized-committed-once"를 확인한다
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
+    그러면 "unchanged-effect-logisticsMemberships" assertion으로 "inventory-effects unchanged-effect-logisticsMemberships"를 확인한다
+    그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 api/dispatchQuantity 업무 효과0
@@ -316,11 +346,13 @@
     만일 "시스템" 역할이 "setup" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-before" 행동을 수행한다
     만일 "reader" 역할이 "access-before" 행동을 수행한다
     만일 "delegator" 역할이 "target-before" 행동을 수행한다
     만일 "reader" 역할이 "attempt" 행동을 수행한다
     만일 "delegator" 역할이 "after-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "after" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-after" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-target" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-after-snapshot" 행동을 수행한다
@@ -353,6 +385,9 @@
     그러면 "current-read-actions" assertion으로 "read-audit-permitted current-read-actions"를 확인한다
     그러면 "authorized-committed-once" assertion으로 "read-audit-permitted authorized-committed-once"를 확인한다
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
+    그러면 "unchanged-effect-shipments" assertion으로 "followup-effects unchanged-effect-shipments"를 확인한다
+    그러면 "unchanged-effect-deliveries" assertion으로 "followup-effects unchanged-effect-deliveries"를 확인한다
+    그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 api/confirmReceipt 업무 효과0
@@ -360,11 +395,13 @@
     만일 "시스템" 역할이 "setup" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-before" 행동을 수행한다
     만일 "reader" 역할이 "access-before" 행동을 수행한다
     만일 "delegator" 역할이 "target-before" 행동을 수행한다
     만일 "reader" 역할이 "attempt" 행동을 수행한다
     만일 "delegator" 역할이 "after-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "after" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-after" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-target" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-after-snapshot" 행동을 수행한다
@@ -397,6 +434,9 @@
     그러면 "current-read-actions" assertion으로 "read-audit-permitted current-read-actions"를 확인한다
     그러면 "authorized-committed-once" assertion으로 "read-audit-permitted authorized-committed-once"를 확인한다
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
+    그러면 "unchanged-effect-receipts" assertion으로 "inventory-effects unchanged-effect-receipts"를 확인한다
+    그러면 "unchanged-effect-receiptContributions" assertion으로 "inventory-effects unchanged-effect-receiptContributions"를 확인한다
+    그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 api/disposeQuantity 업무 효과0
@@ -404,11 +444,13 @@
     만일 "시스템" 역할이 "setup" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-before" 행동을 수행한다
     만일 "reader" 역할이 "access-before" 행동을 수행한다
     만일 "delegator" 역할이 "target-before" 행동을 수행한다
     만일 "reader" 역할이 "attempt" 행동을 수행한다
     만일 "delegator" 역할이 "after-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "after" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-after" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-target" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-after-snapshot" 행동을 수행한다
@@ -441,6 +483,8 @@
     그러면 "current-read-actions" assertion으로 "read-audit-permitted current-read-actions"를 확인한다
     그러면 "authorized-committed-once" assertion으로 "read-audit-permitted authorized-committed-once"를 확인한다
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
+    그러면 "unchanged-effect-dispositions" assertion으로 "inventory-effects unchanged-effect-dispositions"를 확인한다
+    그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 api/createDraft 업무 효과0
@@ -448,11 +492,13 @@
     만일 "시스템" 역할이 "setup" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-before" 행동을 수행한다
     만일 "reader" 역할이 "access-before" 행동을 수행한다
     만일 "delegator" 역할이 "target-before" 행동을 수행한다
     만일 "reader" 역할이 "attempt" 행동을 수행한다
     만일 "delegator" 역할이 "after-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "after" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-after" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-target" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-after-snapshot" 행동을 수행한다
@@ -485,6 +531,8 @@
     그러면 "current-read-actions" assertion으로 "read-audit-permitted current-read-actions"를 확인한다
     그러면 "authorized-committed-once" assertion으로 "read-audit-permitted authorized-committed-once"를 확인한다
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
+    그러면 "unchanged-effect-goalVersions" assertion으로 "work-effects unchanged-effect-goalVersions"를 확인한다
+    그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 api/cancelDraft 업무 효과0
@@ -492,11 +540,13 @@
     만일 "시스템" 역할이 "setup" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-before" 행동을 수행한다
     만일 "reader" 역할이 "access-before" 행동을 수행한다
     만일 "delegator" 역할이 "target-before" 행동을 수행한다
     만일 "reader" 역할이 "attempt" 행동을 수행한다
     만일 "delegator" 역할이 "after-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "after" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-after" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-target" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-after-snapshot" 행동을 수행한다
@@ -529,6 +579,9 @@
     그러면 "current-read-actions" assertion으로 "read-audit-permitted current-read-actions"를 확인한다
     그러면 "authorized-committed-once" assertion으로 "read-audit-permitted authorized-committed-once"를 확인한다
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
+    그러면 "unchanged-effect-goalVersions" assertion으로 "work-effects unchanged-effect-goalVersions"를 확인한다
+    그러면 "unchanged-effect-workClosures" assertion으로 "work-effects unchanged-effect-workClosures"를 확인한다
+    그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 api/activateWork 업무 효과0
@@ -536,11 +589,13 @@
     만일 "시스템" 역할이 "setup" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-before" 행동을 수행한다
     만일 "reader" 역할이 "access-before" 행동을 수행한다
     만일 "delegator" 역할이 "target-before" 행동을 수행한다
     만일 "reader" 역할이 "attempt" 행동을 수행한다
     만일 "delegator" 역할이 "after-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "after" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-after" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-target" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-after-snapshot" 행동을 수행한다
@@ -573,6 +628,8 @@
     그러면 "current-read-actions" assertion으로 "read-audit-permitted current-read-actions"를 확인한다
     그러면 "authorized-committed-once" assertion으로 "read-audit-permitted authorized-committed-once"를 확인한다
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
+    그러면 "unchanged-effect-goalVersions" assertion으로 "work-effects unchanged-effect-goalVersions"를 확인한다
+    그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 api/waitWork 업무 효과0
@@ -580,11 +637,13 @@
     만일 "시스템" 역할이 "setup" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-before" 행동을 수행한다
     만일 "reader" 역할이 "access-before" 행동을 수행한다
     만일 "delegator" 역할이 "target-before" 행동을 수행한다
     만일 "reader" 역할이 "attempt" 행동을 수행한다
     만일 "delegator" 역할이 "after-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "after" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-after" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-target" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-after-snapshot" 행동을 수행한다
@@ -617,6 +676,8 @@
     그러면 "current-read-actions" assertion으로 "read-audit-permitted current-read-actions"를 확인한다
     그러면 "authorized-committed-once" assertion으로 "read-audit-permitted authorized-committed-once"를 확인한다
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
+    그러면 "unchanged-effect-goalVersions" assertion으로 "work-effects unchanged-effect-goalVersions"를 확인한다
+    그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 api/resumeWork 업무 효과0
@@ -624,11 +685,13 @@
     만일 "시스템" 역할이 "setup" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-before" 행동을 수행한다
     만일 "reader" 역할이 "access-before" 행동을 수행한다
     만일 "delegator" 역할이 "target-before" 행동을 수행한다
     만일 "reader" 역할이 "attempt" 행동을 수행한다
     만일 "delegator" 역할이 "after-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "after" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-after" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-target" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-after-snapshot" 행동을 수행한다
@@ -661,6 +724,8 @@
     그러면 "current-read-actions" assertion으로 "read-audit-permitted current-read-actions"를 확인한다
     그러면 "authorized-committed-once" assertion으로 "read-audit-permitted authorized-committed-once"를 확인한다
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
+    그러면 "unchanged-effect-goalVersions" assertion으로 "work-effects unchanged-effect-goalVersions"를 확인한다
+    그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 api/reviseGoal 업무 효과0
@@ -668,11 +733,13 @@
     만일 "시스템" 역할이 "setup" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-before" 행동을 수행한다
     만일 "reader" 역할이 "access-before" 행동을 수행한다
     만일 "delegator" 역할이 "target-before" 행동을 수행한다
     만일 "reader" 역할이 "attempt" 행동을 수행한다
     만일 "delegator" 역할이 "after-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "after" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-after" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-target" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-after-snapshot" 행동을 수행한다
@@ -705,6 +772,8 @@
     그러면 "current-read-actions" assertion으로 "read-audit-permitted current-read-actions"를 확인한다
     그러면 "authorized-committed-once" assertion으로 "read-audit-permitted authorized-committed-once"를 확인한다
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
+    그러면 "unchanged-effect-goalVersions" assertion으로 "work-effects unchanged-effect-goalVersions"를 확인한다
+    그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 api/closeWork 업무 효과0
@@ -712,11 +781,13 @@
     만일 "시스템" 역할이 "setup" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-before" 행동을 수행한다
     만일 "reader" 역할이 "access-before" 행동을 수행한다
     만일 "delegator" 역할이 "target-before" 행동을 수행한다
     만일 "reader" 역할이 "attempt" 행동을 수행한다
     만일 "delegator" 역할이 "after-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "after" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-after" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-target" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-after-snapshot" 행동을 수행한다
@@ -749,6 +820,8 @@
     그러면 "current-read-actions" assertion으로 "read-audit-permitted current-read-actions"를 확인한다
     그러면 "authorized-committed-once" assertion으로 "read-audit-permitted authorized-committed-once"를 확인한다
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
+    그러면 "unchanged-effect-workClosures" assertion으로 "work-effects unchanged-effect-workClosures"를 확인한다
+    그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 api/createFollowup 업무 효과0
@@ -756,11 +829,13 @@
     만일 "시스템" 역할이 "setup" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-before" 행동을 수행한다
     만일 "reader" 역할이 "access-before" 행동을 수행한다
     만일 "delegator" 역할이 "target-before" 행동을 수행한다
     만일 "reader" 역할이 "attempt" 행동을 수행한다
     만일 "delegator" 역할이 "after-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "after" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-after" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-target" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-after-snapshot" 행동을 수행한다
@@ -793,6 +868,8 @@
     그러면 "current-read-actions" assertion으로 "read-audit-permitted current-read-actions"를 확인한다
     그러면 "authorized-committed-once" assertion으로 "read-audit-permitted authorized-committed-once"를 확인한다
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
+    그러면 "unchanged-effect-workLinks" assertion으로 "work-effects unchanged-effect-workLinks"를 확인한다
+    그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 api/resolveObligation 업무 효과0
@@ -800,11 +877,13 @@
     만일 "시스템" 역할이 "setup" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-before" 행동을 수행한다
     만일 "reader" 역할이 "access-before" 행동을 수행한다
     만일 "delegator" 역할이 "target-before" 행동을 수행한다
     만일 "reader" 역할이 "attempt" 행동을 수행한다
     만일 "delegator" 역할이 "after-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "after" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-after" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-target" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-after-snapshot" 행동을 수행한다
@@ -837,6 +916,9 @@
     그러면 "current-read-actions" assertion으로 "read-audit-permitted current-read-actions"를 확인한다
     그러면 "authorized-committed-once" assertion으로 "read-audit-permitted authorized-committed-once"를 확인한다
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
+    그러면 "unchanged-effect-obligationResolutions" assertion으로 "work-effects unchanged-effect-obligationResolutions"를 확인한다
+    그러면 "unchanged-effect-dutyTransitions" assertion으로 "work-effects unchanged-effect-dutyTransitions"를 확인한다
+    그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 api/waiveObligation 업무 효과0
@@ -844,11 +926,13 @@
     만일 "시스템" 역할이 "setup" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-before" 행동을 수행한다
     만일 "reader" 역할이 "access-before" 행동을 수행한다
     만일 "delegator" 역할이 "target-before" 행동을 수행한다
     만일 "reader" 역할이 "attempt" 행동을 수행한다
     만일 "delegator" 역할이 "after-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "after" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-after" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-target" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-after-snapshot" 행동을 수행한다
@@ -881,6 +965,9 @@
     그러면 "current-read-actions" assertion으로 "read-audit-permitted current-read-actions"를 확인한다
     그러면 "authorized-committed-once" assertion으로 "read-audit-permitted authorized-committed-once"를 확인한다
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
+    그러면 "unchanged-effect-obligationResolutions" assertion으로 "work-effects unchanged-effect-obligationResolutions"를 확인한다
+    그러면 "unchanged-effect-dutyTransitions" assertion으로 "work-effects unchanged-effect-dutyTransitions"를 확인한다
+    그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 api/transferObligation 업무 효과0
@@ -888,11 +975,13 @@
     만일 "시스템" 역할이 "setup" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-before" 행동을 수행한다
     만일 "reader" 역할이 "access-before" 행동을 수행한다
     만일 "delegator" 역할이 "target-before" 행동을 수행한다
     만일 "reader" 역할이 "attempt" 행동을 수행한다
     만일 "delegator" 역할이 "after-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "after" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-after" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-target" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-after-snapshot" 행동을 수행한다
@@ -925,22 +1014,28 @@
     그러면 "current-read-actions" assertion으로 "read-audit-permitted current-read-actions"를 확인한다
     그러면 "authorized-committed-once" assertion으로 "read-audit-permitted authorized-committed-once"를 확인한다
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
-    그러면 "precondition-recipient-acceptance" assertion으로 "read-audit-permitted precondition-recipient-acceptance"를 확인한다
-    그러면 "precondition-recipient-binding" assertion으로 "read-audit-permitted precondition-recipient-binding"를 확인한다
-    그러면 "authorized-business-transfer-once" assertion으로 "read-audit-permitted authorized-business-transfer-once"를 확인한다
-    그러면 "precondition-denial-unchanged-recipientAcceptances" assertion으로 "read-audit-permitted precondition-denial-unchanged-recipientAcceptances"를 확인한다
-    그러면 "precondition-denial-unchanged-obligationTransfers" assertion으로 "read-audit-permitted precondition-denial-unchanged-obligationTransfers"를 확인한다
+    그러면 "precondition-recipient-acceptance" assertion으로 "work-effects precondition-recipient-acceptance"를 확인한다
+    그러면 "precondition-recipient-binding" assertion으로 "work-effects precondition-recipient-binding"를 확인한다
+    그러면 "authorized-business-transfer-once" assertion으로 "work-effects authorized-business-transfer-once"를 확인한다
+    그러면 "precondition-denial-unchanged-recipientAcceptances" assertion으로 "work-effects precondition-denial-unchanged-recipientAcceptances"를 확인한다
+    그러면 "precondition-denial-unchanged-obligationTransfers" assertion으로 "work-effects precondition-denial-unchanged-obligationTransfers"를 확인한다
+    그러면 "unchanged-effect-obligationTransfers" assertion으로 "work-effects unchanged-effect-obligationTransfers"를 확인한다
+    그러면 "unchanged-effect-dutyTransitions" assertion으로 "work-effects unchanged-effect-dutyTransitions"를 확인한다
+    그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
 
+  @sit
   시나리오: WRITE 역할·READ 위임에서 api/registerItem 업무 효과0
     먼저 사례 파일 "verification/cases/C3/case.json"의 "api-registerItem"를 준비한다
     만일 "시스템" 역할이 "setup" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-before" 행동을 수행한다
     만일 "reader" 역할이 "access-before" 행동을 수행한다
     만일 "delegator" 역할이 "target-before" 행동을 수행한다
     만일 "reader" 역할이 "attempt" 행동을 수행한다
     만일 "delegator" 역할이 "after-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "after" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-after" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-target" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-after-snapshot" 행동을 수행한다
@@ -973,6 +1068,10 @@
     그러면 "current-read-actions" assertion으로 "read-audit-permitted current-read-actions"를 확인한다
     그러면 "authorized-committed-once" assertion으로 "read-audit-permitted authorized-committed-once"를 확인한다
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
+    그러면 "unchanged-effect-items" assertion으로 "inventory-effects unchanged-effect-items"를 확인한다
+    그러면 "unchanged-effect-externalIdentifiers" assertion으로 "inventory-effects unchanged-effect-externalIdentifiers"를 확인한다
+    그러면 "unchanged-effect-unitConversions" assertion으로 "inventory-effects unchanged-effect-unitConversions"를 확인한다
+    그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 api/linkExternalId 업무 효과0
@@ -980,11 +1079,13 @@
     만일 "시스템" 역할이 "setup" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-before" 행동을 수행한다
     만일 "reader" 역할이 "access-before" 행동을 수행한다
     만일 "delegator" 역할이 "target-before" 행동을 수행한다
     만일 "reader" 역할이 "attempt" 행동을 수행한다
     만일 "delegator" 역할이 "after-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "after" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-after" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-target" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-after-snapshot" 행동을 수행한다
@@ -1017,6 +1118,8 @@
     그러면 "current-read-actions" assertion으로 "read-audit-permitted current-read-actions"를 확인한다
     그러면 "authorized-committed-once" assertion으로 "read-audit-permitted authorized-committed-once"를 확인한다
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
+    그러면 "unchanged-effect-externalIdentifiers" assertion으로 "inventory-effects unchanged-effect-externalIdentifiers"를 확인한다
+    그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 api/attachEvidence 업무 효과0
@@ -1024,11 +1127,13 @@
     만일 "시스템" 역할이 "setup" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-before" 행동을 수행한다
     만일 "reader" 역할이 "access-before" 행동을 수행한다
     만일 "delegator" 역할이 "target-before" 행동을 수행한다
     만일 "reader" 역할이 "attempt" 행동을 수행한다
     만일 "delegator" 역할이 "after-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "after" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-after" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-target" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-after-snapshot" 행동을 수행한다
@@ -1061,6 +1166,10 @@
     그러면 "current-read-actions" assertion으로 "read-audit-permitted current-read-actions"를 확인한다
     그러면 "authorized-committed-once" assertion으로 "read-audit-permitted authorized-committed-once"를 확인한다
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
+    그러면 "unchanged-effect-documents" assertion으로 "followup-effects unchanged-effect-documents"를 확인한다
+    그러면 "unchanged-effect-evidenceLinks" assertion으로 "followup-effects unchanged-effect-evidenceLinks"를 확인한다
+    그러면 "unchanged-effect-events" assertion으로 "followup-effects unchanged-effect-events"를 확인한다
+    그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 api/correctEvidence 업무 효과0
@@ -1068,11 +1177,13 @@
     만일 "시스템" 역할이 "setup" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-before" 행동을 수행한다
     만일 "reader" 역할이 "access-before" 행동을 수행한다
     만일 "delegator" 역할이 "target-before" 행동을 수행한다
     만일 "reader" 역할이 "attempt" 행동을 수행한다
     만일 "delegator" 역할이 "after-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "after" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-after" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-target" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-after-snapshot" 행동을 수행한다
@@ -1105,6 +1216,11 @@
     그러면 "current-read-actions" assertion으로 "read-audit-permitted current-read-actions"를 확인한다
     그러면 "authorized-committed-once" assertion으로 "read-audit-permitted authorized-committed-once"를 확인한다
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
+    그러면 "unchanged-effect-documents" assertion으로 "followup-effects unchanged-effect-documents"를 확인한다
+    그러면 "unchanged-effect-evidenceLinks" assertion으로 "followup-effects unchanged-effect-evidenceLinks"를 확인한다
+    그러면 "unchanged-effect-events" assertion으로 "followup-effects unchanged-effect-events"를 확인한다
+    그러면 "unchanged-effect-evidence_revisions" assertion으로 "followup-effects unchanged-effect-evidence_revisions"를 확인한다
+    그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 api/proposePurchase 업무 효과0
@@ -1112,11 +1228,13 @@
     만일 "시스템" 역할이 "setup" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-before" 행동을 수행한다
     만일 "reader" 역할이 "access-before" 행동을 수행한다
     만일 "delegator" 역할이 "target-before" 행동을 수행한다
     만일 "reader" 역할이 "attempt" 행동을 수행한다
     만일 "delegator" 역할이 "after-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "after" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-after" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-target" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-after-snapshot" 행동을 수행한다
@@ -1149,6 +1267,9 @@
     그러면 "current-read-actions" assertion으로 "read-audit-permitted current-read-actions"를 확인한다
     그러면 "authorized-committed-once" assertion으로 "read-audit-permitted authorized-committed-once"를 확인한다
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
+    그러면 "unchanged-effect-proposals" assertion으로 "followup-effects unchanged-effect-proposals"를 확인한다
+    그러면 "unchanged-effect-purchaseRevisions" assertion으로 "followup-effects unchanged-effect-purchaseRevisions"를 확인한다
+    그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 api/revisePurchase 업무 효과0
@@ -1156,11 +1277,13 @@
     만일 "시스템" 역할이 "setup" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-before" 행동을 수행한다
     만일 "reader" 역할이 "access-before" 행동을 수행한다
     만일 "delegator" 역할이 "target-before" 행동을 수행한다
     만일 "reader" 역할이 "attempt" 행동을 수행한다
     만일 "delegator" 역할이 "after-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "after" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-after" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-target" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-after-snapshot" 행동을 수행한다
@@ -1193,6 +1316,9 @@
     그러면 "current-read-actions" assertion으로 "read-audit-permitted current-read-actions"를 확인한다
     그러면 "authorized-committed-once" assertion으로 "read-audit-permitted authorized-committed-once"를 확인한다
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
+    그러면 "unchanged-effect-proposals" assertion으로 "followup-effects unchanged-effect-proposals"를 확인한다
+    그러면 "unchanged-effect-purchaseRevisions" assertion으로 "followup-effects unchanged-effect-purchaseRevisions"를 확인한다
+    그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 api/approvePurchase 업무 효과0
@@ -1200,11 +1326,13 @@
     만일 "시스템" 역할이 "setup" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-before" 행동을 수행한다
     만일 "reader" 역할이 "access-before" 행동을 수행한다
     만일 "delegator" 역할이 "target-before" 행동을 수행한다
     만일 "reader" 역할이 "attempt" 행동을 수행한다
     만일 "delegator" 역할이 "after-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "after" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-after" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-target" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-after-snapshot" 행동을 수행한다
@@ -1237,6 +1365,8 @@
     그러면 "current-read-actions" assertion으로 "read-audit-permitted current-read-actions"를 확인한다
     그러면 "authorized-committed-once" assertion으로 "read-audit-permitted authorized-committed-once"를 확인한다
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
+    그러면 "unchanged-effect-proposals" assertion으로 "followup-effects unchanged-effect-proposals"를 확인한다
+    그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 api/dispatchPurchaseOrder 업무 효과0
@@ -1246,11 +1376,13 @@
     만일 "manager" 역할이 "precondition-approval" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-before" 행동을 수행한다
     만일 "reader" 역할이 "access-before" 행동을 수행한다
     만일 "delegator" 역할이 "target-before" 행동을 수행한다
     만일 "reader" 역할이 "attempt" 행동을 수행한다
     만일 "delegator" 역할이 "after-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "after" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-after" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-target" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-after-snapshot" 행동을 수행한다
@@ -1283,20 +1415,26 @@
     그러면 "current-read-actions" assertion으로 "read-audit-permitted current-read-actions"를 확인한다
     그러면 "authorized-committed-once" assertion으로 "read-audit-permitted authorized-committed-once"를 확인한다
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
-    그러면 "precondition-approved" assertion으로 "read-audit-permitted precondition-approved"를 확인한다
-    그러면 "precondition-approval-record" assertion으로 "read-audit-permitted precondition-approval-record"를 확인한다
-    그러면 "authorized-business-outbox-once" assertion으로 "read-audit-permitted authorized-business-outbox-once"를 확인한다
+    그러면 "precondition-approved" assertion으로 "approval-effects precondition-approved"를 확인한다
+    그러면 "precondition-approval-record" assertion으로 "approval-effects precondition-approval-record"를 확인한다
+    그러면 "authorized-business-outbox-once" assertion으로 "external-outbox-effects authorized-business-outbox-once"를 확인한다
+    그러면 "unchanged-effect-purchaseOrders" assertion으로 "external-outbox-effects unchanged-effect-purchaseOrders"를 확인한다
+    그러면 "unchanged-effect-proposals" assertion으로 "followup-effects unchanged-effect-proposals"를 확인한다
+    그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
 
+  @sit
   시나리오: WRITE 역할·READ 위임에서 api/recordSupplierReply 업무 효과0
     먼저 사례 파일 "verification/cases/C3/case.json"의 "api-recordSupplierReply"를 준비한다
     만일 "시스템" 역할이 "setup" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-before" 행동을 수행한다
     만일 "reader" 역할이 "access-before" 행동을 수행한다
     만일 "delegator" 역할이 "target-before" 행동을 수행한다
     만일 "reader" 역할이 "attempt" 행동을 수행한다
     만일 "delegator" 역할이 "after-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "after" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-after" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-target" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-after-snapshot" 행동을 수행한다
@@ -1329,6 +1467,8 @@
     그러면 "current-read-actions" assertion으로 "read-audit-permitted current-read-actions"를 확인한다
     그러면 "authorized-committed-once" assertion으로 "read-audit-permitted authorized-committed-once"를 확인한다
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
+    그러면 "unchanged-effect-supplierCommitments" assertion으로 "followup-effects unchanged-effect-supplierCommitments"를 확인한다
+    그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 api/cancelPurchase 업무 효과0
@@ -1336,11 +1476,13 @@
     만일 "시스템" 역할이 "setup" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-before" 행동을 수행한다
     만일 "reader" 역할이 "access-before" 행동을 수행한다
     만일 "delegator" 역할이 "target-before" 행동을 수행한다
     만일 "reader" 역할이 "attempt" 행동을 수행한다
     만일 "delegator" 역할이 "after-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "after" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-after" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-target" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-after-snapshot" 행동을 수행한다
@@ -1373,6 +1515,9 @@
     그러면 "current-read-actions" assertion으로 "read-audit-permitted current-read-actions"를 확인한다
     그러면 "authorized-committed-once" assertion으로 "read-audit-permitted authorized-committed-once"를 확인한다
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
+    그러면 "unchanged-effect-cancellationRequests" assertion으로 "followup-effects unchanged-effect-cancellationRequests"를 확인한다
+    그러면 "unchanged-effect-purchaseOrders" assertion으로 "external-outbox-effects unchanged-effect-purchaseOrders"를 확인한다
+    그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 api/createShipment 업무 효과0
@@ -1380,11 +1525,13 @@
     만일 "시스템" 역할이 "setup" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-before" 행동을 수행한다
     만일 "reader" 역할이 "access-before" 행동을 수행한다
     만일 "delegator" 역할이 "target-before" 행동을 수행한다
     만일 "reader" 역할이 "attempt" 행동을 수행한다
     만일 "delegator" 역할이 "after-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "after" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-after" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-target" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-after-snapshot" 행동을 수행한다
@@ -1417,6 +1564,10 @@
     그러면 "current-read-actions" assertion으로 "read-audit-permitted current-read-actions"를 확인한다
     그러면 "authorized-committed-once" assertion으로 "read-audit-permitted authorized-committed-once"를 확인한다
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
+    그러면 "unchanged-effect-shipments" assertion으로 "followup-effects unchanged-effect-shipments"를 확인한다
+    그러면 "unchanged-effect-cargoAllocations" assertion으로 "followup-effects unchanged-effect-cargoAllocations"를 확인한다
+    그러면 "unchanged-effect-legs" assertion으로 "followup-effects unchanged-effect-legs"를 확인한다
+    그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 api/recordLegEvent 업무 효과0
@@ -1424,11 +1575,13 @@
     만일 "시스템" 역할이 "setup" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-before" 행동을 수행한다
     만일 "reader" 역할이 "access-before" 행동을 수행한다
     만일 "delegator" 역할이 "target-before" 행동을 수행한다
     만일 "reader" 역할이 "attempt" 행동을 수행한다
     만일 "delegator" 역할이 "after-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "after" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-after" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-target" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-after-snapshot" 행동을 수행한다
@@ -1461,6 +1614,9 @@
     그러면 "current-read-actions" assertion으로 "read-audit-permitted current-read-actions"를 확인한다
     그러면 "authorized-committed-once" assertion으로 "read-audit-permitted authorized-committed-once"를 확인한다
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
+    그러면 "unchanged-effect-legs" assertion으로 "followup-effects unchanged-effect-legs"를 확인한다
+    그러면 "unchanged-effect-events" assertion으로 "followup-effects unchanged-effect-events"를 확인한다
+    그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 api/recordHandover 업무 효과0
@@ -1468,11 +1624,13 @@
     만일 "시스템" 역할이 "setup" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-before" 행동을 수행한다
     만일 "reader" 역할이 "access-before" 행동을 수행한다
     만일 "delegator" 역할이 "target-before" 행동을 수행한다
     만일 "reader" 역할이 "attempt" 행동을 수행한다
     만일 "delegator" 역할이 "after-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "after" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-after" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-target" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-after-snapshot" 행동을 수행한다
@@ -1505,6 +1663,9 @@
     그러면 "current-read-actions" assertion으로 "read-audit-permitted current-read-actions"를 확인한다
     그러면 "authorized-committed-once" assertion으로 "read-audit-permitted authorized-committed-once"를 확인한다
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
+    그러면 "unchanged-effect-custodyHandovers" assertion으로 "inventory-effects unchanged-effect-custodyHandovers"를 확인한다
+    그러면 "unchanged-effect-events" assertion으로 "followup-effects unchanged-effect-events"를 확인한다
+    그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 api/prepareRegulatoryProcedure 업무 효과0
@@ -1512,11 +1673,13 @@
     만일 "시스템" 역할이 "setup" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-before" 행동을 수행한다
     만일 "reader" 역할이 "access-before" 행동을 수행한다
     만일 "delegator" 역할이 "target-before" 행동을 수행한다
     만일 "reader" 역할이 "attempt" 행동을 수행한다
     만일 "delegator" 역할이 "after-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "after" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-after" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-target" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-after-snapshot" 행동을 수행한다
@@ -1549,6 +1712,8 @@
     그러면 "current-read-actions" assertion으로 "read-audit-permitted current-read-actions"를 확인한다
     그러면 "authorized-committed-once" assertion으로 "read-audit-permitted authorized-committed-once"를 확인한다
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
+    그러면 "unchanged-effect-procedures" assertion으로 "followup-effects unchanged-effect-procedures"를 확인한다
+    그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 api/recordSubmission 업무 효과0
@@ -1556,11 +1721,13 @@
     만일 "시스템" 역할이 "setup" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-before" 행동을 수행한다
     만일 "reader" 역할이 "access-before" 행동을 수행한다
     만일 "delegator" 역할이 "target-before" 행동을 수행한다
     만일 "reader" 역할이 "attempt" 행동을 수행한다
     만일 "delegator" 역할이 "after-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "after" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-after" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-target" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-after-snapshot" 행동을 수행한다
@@ -1593,6 +1760,8 @@
     그러면 "current-read-actions" assertion으로 "read-audit-permitted current-read-actions"를 확인한다
     그러면 "authorized-committed-once" assertion으로 "read-audit-permitted authorized-committed-once"를 확인한다
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
+    그러면 "unchanged-effect-submissions" assertion으로 "followup-effects unchanged-effect-submissions"를 확인한다
+    그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 api/recordRegulatoryDecision 업무 효과0
@@ -1600,11 +1769,13 @@
     만일 "시스템" 역할이 "setup" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-before" 행동을 수행한다
     만일 "reader" 역할이 "access-before" 행동을 수행한다
     만일 "delegator" 역할이 "target-before" 행동을 수행한다
     만일 "reader" 역할이 "attempt" 행동을 수행한다
     만일 "delegator" 역할이 "after-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "after" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-after" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-target" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-after-snapshot" 행동을 수행한다
@@ -1637,6 +1808,9 @@
     그러면 "current-read-actions" assertion으로 "read-audit-permitted current-read-actions"를 확인한다
     그러면 "authorized-committed-once" assertion으로 "read-audit-permitted authorized-committed-once"를 확인한다
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
+    그러면 "unchanged-effect-regulatoryDecisions" assertion으로 "followup-effects unchanged-effect-regulatoryDecisions"를 확인한다
+    그러면 "unchanged-effect-restrictions" assertion으로 "inventory-effects unchanged-effect-restrictions"를 확인한다
+    그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 api/verifyLabel 업무 효과0
@@ -1644,11 +1818,13 @@
     만일 "시스템" 역할이 "setup" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-before" 행동을 수행한다
     만일 "reader" 역할이 "access-before" 행동을 수행한다
     만일 "delegator" 역할이 "target-before" 행동을 수행한다
     만일 "reader" 역할이 "attempt" 행동을 수행한다
     만일 "delegator" 역할이 "after-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "after" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-after" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-target" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-after-snapshot" 행동을 수행한다
@@ -1681,6 +1857,8 @@
     그러면 "current-read-actions" assertion으로 "read-audit-permitted current-read-actions"를 확인한다
     그러면 "authorized-committed-once" assertion으로 "read-audit-permitted authorized-committed-once"를 확인한다
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
+    그러면 "unchanged-effect-labels" assertion으로 "inventory-effects unchanged-effect-labels"를 확인한다
+    그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 api/receiveProvisional 업무 효과0
@@ -1688,11 +1866,13 @@
     만일 "시스템" 역할이 "setup" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-before" 행동을 수행한다
     만일 "reader" 역할이 "access-before" 행동을 수행한다
     만일 "delegator" 역할이 "target-before" 행동을 수행한다
     만일 "reader" 역할이 "attempt" 행동을 수행한다
     만일 "delegator" 역할이 "after-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "after" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-after" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-target" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-after-snapshot" 행동을 수행한다
@@ -1725,6 +1905,9 @@
     그러면 "current-read-actions" assertion으로 "read-audit-permitted current-read-actions"를 확인한다
     그러면 "authorized-committed-once" assertion으로 "read-audit-permitted authorized-committed-once"를 확인한다
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
+    그러면 "unchanged-effect-receipts" assertion으로 "inventory-effects unchanged-effect-receipts"를 확인한다
+    그러면 "unchanged-effect-events" assertion으로 "followup-effects unchanged-effect-events"를 확인한다
+    그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 api/placeHold 업무 효과0
@@ -1732,11 +1915,13 @@
     만일 "시스템" 역할이 "setup" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-before" 행동을 수행한다
     만일 "reader" 역할이 "access-before" 행동을 수행한다
     만일 "delegator" 역할이 "target-before" 행동을 수행한다
     만일 "reader" 역할이 "attempt" 행동을 수행한다
     만일 "delegator" 역할이 "after-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "after" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-after" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-target" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-after-snapshot" 행동을 수행한다
@@ -1769,6 +1954,8 @@
     그러면 "current-read-actions" assertion으로 "read-audit-permitted current-read-actions"를 확인한다
     그러면 "authorized-committed-once" assertion으로 "read-audit-permitted authorized-committed-once"를 확인한다
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
+    그러면 "unchanged-effect-restrictions" assertion으로 "inventory-effects unchanged-effect-restrictions"를 확인한다
+    그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 api/releaseHold 업무 효과0
@@ -1776,11 +1963,13 @@
     만일 "시스템" 역할이 "setup" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-before" 행동을 수행한다
     만일 "reader" 역할이 "access-before" 행동을 수행한다
     만일 "delegator" 역할이 "target-before" 행동을 수행한다
     만일 "reader" 역할이 "attempt" 행동을 수행한다
     만일 "delegator" 역할이 "after-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "after" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-after" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-target" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-after-snapshot" 행동을 수행한다
@@ -1813,6 +2002,8 @@
     그러면 "current-read-actions" assertion으로 "read-audit-permitted current-read-actions"를 확인한다
     그러면 "authorized-committed-once" assertion으로 "read-audit-permitted authorized-committed-once"를 확인한다
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
+    그러면 "unchanged-effect-restrictions" assertion으로 "inventory-effects unchanged-effect-restrictions"를 확인한다
+    그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 api/recordDispositionBasis 업무 효과0
@@ -1820,11 +2011,13 @@
     만일 "시스템" 역할이 "setup" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-before" 행동을 수행한다
     만일 "reader" 역할이 "access-before" 행동을 수행한다
     만일 "delegator" 역할이 "target-before" 행동을 수행한다
     만일 "reader" 역할이 "attempt" 행동을 수행한다
     만일 "delegator" 역할이 "after-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "after" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-after" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-target" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-after-snapshot" 행동을 수행한다
@@ -1857,6 +2050,8 @@
     그러면 "current-read-actions" assertion으로 "read-audit-permitted current-read-actions"를 확인한다
     그러면 "authorized-committed-once" assertion으로 "read-audit-permitted authorized-committed-once"를 확인한다
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
+    그러면 "unchanged-effect-dispositionBases" assertion으로 "inventory-effects unchanged-effect-dispositionBases"를 확인한다
+    그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 api/revokeDispositionBasis 업무 효과0
@@ -1864,11 +2059,13 @@
     만일 "시스템" 역할이 "setup" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-before" 행동을 수행한다
     만일 "reader" 역할이 "access-before" 행동을 수행한다
     만일 "delegator" 역할이 "target-before" 행동을 수행한다
     만일 "reader" 역할이 "attempt" 행동을 수행한다
     만일 "delegator" 역할이 "after-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "after" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-after" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-target" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-after-snapshot" 행동을 수행한다
@@ -1901,6 +2098,8 @@
     그러면 "current-read-actions" assertion으로 "read-audit-permitted current-read-actions"를 확인한다
     그러면 "authorized-committed-once" assertion으로 "read-audit-permitted authorized-committed-once"를 확인한다
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
+    그러면 "unchanged-effect-dispositionBases" assertion으로 "inventory-effects unchanged-effect-dispositionBases"를 확인한다
+    그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 api/recordStocktake 업무 효과0
@@ -1908,11 +2107,13 @@
     만일 "시스템" 역할이 "setup" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-before" 행동을 수행한다
     만일 "reader" 역할이 "access-before" 행동을 수행한다
     만일 "delegator" 역할이 "target-before" 행동을 수행한다
     만일 "reader" 역할이 "attempt" 행동을 수행한다
     만일 "delegator" 역할이 "after-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "after" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-after" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-target" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-after-snapshot" 행동을 수행한다
@@ -1945,6 +2146,8 @@
     그러면 "current-read-actions" assertion으로 "read-audit-permitted current-read-actions"를 확인한다
     그러면 "authorized-committed-once" assertion으로 "read-audit-permitted authorized-committed-once"를 확인한다
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
+    그러면 "unchanged-effect-stocktakes" assertion으로 "inventory-effects unchanged-effect-stocktakes"를 확인한다
+    그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 api/createSalesOrder 업무 효과0
@@ -1952,11 +2155,13 @@
     만일 "시스템" 역할이 "setup" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-before" 행동을 수행한다
     만일 "reader" 역할이 "access-before" 행동을 수행한다
     만일 "delegator" 역할이 "target-before" 행동을 수행한다
     만일 "reader" 역할이 "attempt" 행동을 수행한다
     만일 "delegator" 역할이 "after-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "after" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-after" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-target" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-after-snapshot" 행동을 수행한다
@@ -1989,6 +2194,8 @@
     그러면 "current-read-actions" assertion으로 "read-audit-permitted current-read-actions"를 확인한다
     그러면 "authorized-committed-once" assertion으로 "read-audit-permitted authorized-committed-once"를 확인한다
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
+    그러면 "unchanged-effect-orders" assertion으로 "followup-effects unchanged-effect-orders"를 확인한다
+    그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 api/reviseSalesOrder 업무 효과0
@@ -1996,11 +2203,13 @@
     만일 "시스템" 역할이 "setup" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-before" 행동을 수행한다
     만일 "reader" 역할이 "access-before" 행동을 수행한다
     만일 "delegator" 역할이 "target-before" 행동을 수행한다
     만일 "reader" 역할이 "attempt" 행동을 수행한다
     만일 "delegator" 역할이 "after-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "after" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-after" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-target" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-after-snapshot" 행동을 수행한다
@@ -2033,6 +2242,8 @@
     그러면 "current-read-actions" assertion으로 "read-audit-permitted current-read-actions"를 확인한다
     그러면 "authorized-committed-once" assertion으로 "read-audit-permitted authorized-committed-once"를 확인한다
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
+    그러면 "unchanged-effect-orders" assertion으로 "followup-effects unchanged-effect-orders"를 확인한다
+    그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 api/releaseAllocation 업무 효과0
@@ -2040,11 +2251,13 @@
     만일 "시스템" 역할이 "setup" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-before" 행동을 수행한다
     만일 "reader" 역할이 "access-before" 행동을 수행한다
     만일 "delegator" 역할이 "target-before" 행동을 수행한다
     만일 "reader" 역할이 "attempt" 행동을 수행한다
     만일 "delegator" 역할이 "after-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "after" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-after" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-target" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-after-snapshot" 행동을 수행한다
@@ -2077,6 +2290,8 @@
     그러면 "current-read-actions" assertion으로 "read-audit-permitted current-read-actions"를 확인한다
     그러면 "authorized-committed-once" assertion으로 "read-audit-permitted authorized-committed-once"를 확인한다
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
+    그러면 "unchanged-effect-orders" assertion으로 "followup-effects unchanged-effect-orders"를 확인한다
+    그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 api/recordDelivery 업무 효과0
@@ -2084,11 +2299,13 @@
     만일 "시스템" 역할이 "setup" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-before" 행동을 수행한다
     만일 "reader" 역할이 "access-before" 행동을 수행한다
     만일 "delegator" 역할이 "target-before" 행동을 수행한다
     만일 "reader" 역할이 "attempt" 행동을 수행한다
     만일 "delegator" 역할이 "after-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "after" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-after" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-target" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-after-snapshot" 행동을 수행한다
@@ -2121,6 +2338,9 @@
     그러면 "current-read-actions" assertion으로 "read-audit-permitted current-read-actions"를 확인한다
     그러면 "authorized-committed-once" assertion으로 "read-audit-permitted authorized-committed-once"를 확인한다
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
+    그러면 "unchanged-effect-deliveries" assertion으로 "followup-effects unchanged-effect-deliveries"를 확인한다
+    그러면 "unchanged-effect-events" assertion으로 "followup-effects unchanged-effect-events"를 확인한다
+    그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 api/recordObservedMovement 업무 효과0
@@ -2128,11 +2348,13 @@
     만일 "시스템" 역할이 "setup" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-before" 행동을 수행한다
     만일 "reader" 역할이 "access-before" 행동을 수행한다
     만일 "delegator" 역할이 "target-before" 행동을 수행한다
     만일 "reader" 역할이 "attempt" 행동을 수행한다
     만일 "delegator" 역할이 "after-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "after" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-after" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-target" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-after-snapshot" 행동을 수행한다
@@ -2165,6 +2387,9 @@
     그러면 "current-read-actions" assertion으로 "read-audit-permitted current-read-actions"를 확인한다
     그러면 "authorized-committed-once" assertion으로 "read-audit-permitted authorized-committed-once"를 확인한다
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
+    그러면 "unchanged-effect-events" assertion으로 "followup-effects unchanged-effect-events"를 확인한다
+    그러면 "unchanged-effect-reconciliations" assertion으로 "followup-effects unchanged-effect-reconciliations"를 확인한다
+    그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 api/authorizeReturn 업무 효과0
@@ -2172,11 +2397,13 @@
     만일 "시스템" 역할이 "setup" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-before" 행동을 수행한다
     만일 "reader" 역할이 "access-before" 행동을 수행한다
     만일 "delegator" 역할이 "target-before" 행동을 수행한다
     만일 "reader" 역할이 "attempt" 행동을 수행한다
     만일 "delegator" 역할이 "after-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "after" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-after" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-target" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-after-snapshot" 행동을 수행한다
@@ -2209,6 +2436,8 @@
     그러면 "current-read-actions" assertion으로 "read-audit-permitted current-read-actions"를 확인한다
     그러면 "authorized-committed-once" assertion으로 "read-audit-permitted authorized-committed-once"를 확인한다
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
+    그러면 "unchanged-effect-returns" assertion으로 "inventory-effects unchanged-effect-returns"를 확인한다
+    그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 api/receiveReturn 업무 효과0
@@ -2216,11 +2445,13 @@
     만일 "시스템" 역할이 "setup" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-before" 행동을 수행한다
     만일 "reader" 역할이 "access-before" 행동을 수행한다
     만일 "delegator" 역할이 "target-before" 행동을 수행한다
     만일 "reader" 역할이 "attempt" 행동을 수행한다
     만일 "delegator" 역할이 "after-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "after" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-after" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-target" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-after-snapshot" 행동을 수행한다
@@ -2253,6 +2484,9 @@
     그러면 "current-read-actions" assertion으로 "read-audit-permitted current-read-actions"를 확인한다
     그러면 "authorized-committed-once" assertion으로 "read-audit-permitted authorized-committed-once"를 확인한다
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
+    그러면 "unchanged-effect-returns" assertion으로 "inventory-effects unchanged-effect-returns"를 확인한다
+    그러면 "unchanged-effect-restrictions" assertion으로 "inventory-effects unchanged-effect-restrictions"를 확인한다
+    그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 api/decideReturnDisposition 업무 효과0
@@ -2260,11 +2494,13 @@
     만일 "시스템" 역할이 "setup" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-before" 행동을 수행한다
     만일 "reader" 역할이 "access-before" 행동을 수행한다
     만일 "delegator" 역할이 "target-before" 행동을 수행한다
     만일 "reader" 역할이 "attempt" 행동을 수행한다
     만일 "delegator" 역할이 "after-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "after" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-after" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-target" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-after-snapshot" 행동을 수행한다
@@ -2297,6 +2533,9 @@
     그러면 "current-read-actions" assertion으로 "read-audit-permitted current-read-actions"를 확인한다
     그러면 "authorized-committed-once" assertion으로 "read-audit-permitted authorized-committed-once"를 확인한다
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
+    그러면 "unchanged-effect-returns" assertion으로 "inventory-effects unchanged-effect-returns"를 확인한다
+    그러면 "unchanged-effect-dispositions" assertion으로 "inventory-effects unchanged-effect-dispositions"를 확인한다
+    그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 api/openInvestigation 업무 효과0
@@ -2304,11 +2543,13 @@
     만일 "시스템" 역할이 "setup" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-before" 행동을 수행한다
     만일 "reader" 역할이 "access-before" 행동을 수행한다
     만일 "delegator" 역할이 "target-before" 행동을 수행한다
     만일 "reader" 역할이 "attempt" 행동을 수행한다
     만일 "delegator" 역할이 "after-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "after" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-after" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-target" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-after-snapshot" 행동을 수행한다
@@ -2341,6 +2582,9 @@
     그러면 "current-read-actions" assertion으로 "read-audit-permitted current-read-actions"를 확인한다
     그러면 "authorized-committed-once" assertion으로 "read-audit-permitted authorized-committed-once"를 확인한다
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
+    그러면 "unchanged-effect-investigations" assertion으로 "followup-effects unchanged-effect-investigations"를 확인한다
+    그러면 "unchanged-effect-restrictions" assertion으로 "inventory-effects unchanged-effect-restrictions"를 확인한다
+    그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 api/proposeRecall 업무 효과0
@@ -2348,11 +2592,13 @@
     만일 "시스템" 역할이 "setup" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-before" 행동을 수행한다
     만일 "reader" 역할이 "access-before" 행동을 수행한다
     만일 "delegator" 역할이 "target-before" 행동을 수행한다
     만일 "reader" 역할이 "attempt" 행동을 수행한다
     만일 "delegator" 역할이 "after-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "after" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-after" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-target" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-after-snapshot" 행동을 수행한다
@@ -2385,20 +2631,26 @@
     그러면 "current-read-actions" assertion으로 "read-audit-permitted current-read-actions"를 확인한다
     그러면 "authorized-committed-once" assertion으로 "read-audit-permitted authorized-committed-once"를 확인한다
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
+    그러면 "unchanged-effect-recallScopes" assertion으로 "followup-effects unchanged-effect-recallScopes"를 확인한다
+    그러면 "unchanged-effect-investigations" assertion으로 "followup-effects unchanged-effect-investigations"를 확인한다
+    그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 api/approveRecall 업무 효과0
     먼저 사례 파일 "verification/cases/C3/case.json"의 "api-approveRecall"를 준비한다
     만일 "시스템" 역할이 "setup" 행동을 수행한다
+    만일 "delegator" 역할이 "precondition-recall" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-before" 행동을 수행한다
     만일 "reader" 역할이 "access-before" 행동을 수행한다
     만일 "delegator" 역할이 "target-before" 행동을 수행한다
     만일 "reader" 역할이 "attempt" 행동을 수행한다
     만일 "delegator" 역할이 "after-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "after" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-after" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-target" 행동을 수행한다
-    만일 "delegator" 역할이 "authorized-same-input" 행동을 수행한다
+    만일 "admin" 역할이 "authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-after-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "authorized-after" 행동을 수행한다
     그러면 "attempt-code" assertion으로 "work-effects attempt-code"를 확인한다
@@ -2429,20 +2681,27 @@
     그러면 "current-read-actions" assertion으로 "read-audit-permitted current-read-actions"를 확인한다
     그러면 "authorized-committed-once" assertion으로 "read-audit-permitted authorized-committed-once"를 확인한다
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
+    그러면 "authorized-business-recall-approval" assertion으로 "approval-effects authorized-business-recall-approval"를 확인한다
+    그러면 "unchanged-effect-recallScopes" assertion으로 "followup-effects unchanged-effect-recallScopes"를 확인한다
+    그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 api/recordRecallNotice 업무 효과0
     먼저 사례 파일 "verification/cases/C3/case.json"의 "api-recordRecallNotice"를 준비한다
     만일 "시스템" 역할이 "setup" 행동을 수행한다
+    만일 "delegator" 역할이 "precondition-recall" 행동을 수행한다
+    만일 "admin" 역할이 "precondition-approval" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-before" 행동을 수행한다
     만일 "reader" 역할이 "access-before" 행동을 수행한다
     만일 "delegator" 역할이 "target-before" 행동을 수행한다
     만일 "reader" 역할이 "attempt" 행동을 수행한다
     만일 "delegator" 역할이 "after-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "after" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-after" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-target" 행동을 수행한다
-    만일 "delegator" 역할이 "authorized-same-input" 행동을 수행한다
+    만일 "admin" 역할이 "authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-after-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "authorized-after" 행동을 수행한다
     그러면 "attempt-code" assertion으로 "work-effects attempt-code"를 확인한다
@@ -2473,18 +2732,28 @@
     그러면 "current-read-actions" assertion으로 "read-audit-permitted current-read-actions"를 확인한다
     그러면 "authorized-committed-once" assertion으로 "read-audit-permitted authorized-committed-once"를 확인한다
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
+    그러면 "precondition-approval-applied" assertion으로 "approval-effects precondition-approval-applied"를 확인한다
+    그러면 "precondition-approval-record" assertion으로 "approval-effects precondition-approval-record"를 확인한다
+    그러면 "authorized-business-notice" assertion으로 "followup-effects authorized-business-notice"를 확인한다
+    그러면 "unchanged-effect-notices" assertion으로 "followup-effects unchanged-effect-notices"를 확인한다
+    그러면 "unchanged-effect-recallScopes" assertion으로 "followup-effects unchanged-effect-recallScopes"를 확인한다
+    그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 api/recordRecovery 업무 효과0
     먼저 사례 파일 "verification/cases/C3/case.json"의 "api-recordRecovery"를 준비한다
     만일 "시스템" 역할이 "setup" 행동을 수행한다
+    만일 "delegator" 역할이 "precondition-recall" 행동을 수행한다
+    만일 "admin" 역할이 "precondition-approval" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-before" 행동을 수행한다
     만일 "reader" 역할이 "access-before" 행동을 수행한다
     만일 "delegator" 역할이 "target-before" 행동을 수행한다
     만일 "reader" 역할이 "attempt" 행동을 수행한다
     만일 "delegator" 역할이 "after-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "after" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-after" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-target" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-after-snapshot" 행동을 수행한다
@@ -2517,20 +2786,33 @@
     그러면 "current-read-actions" assertion으로 "read-audit-permitted current-read-actions"를 확인한다
     그러면 "authorized-committed-once" assertion으로 "read-audit-permitted authorized-committed-once"를 확인한다
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
+    그러면 "precondition-approval-applied" assertion으로 "approval-effects precondition-approval-applied"를 확인한다
+    그러면 "precondition-approval-record" assertion으로 "approval-effects precondition-approval-record"를 확인한다
+    그러면 "authorized-business-recovery" assertion으로 "inventory-effects authorized-business-recovery"를 확인한다
+    그러면 "unchanged-effect-recoveries" assertion으로 "inventory-effects unchanged-effect-recoveries"를 확인한다
+    그러면 "unchanged-effect-recallScopes" assertion으로 "followup-effects unchanged-effect-recallScopes"를 확인한다
+    그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 api/closeRecall 업무 효과0
     먼저 사례 파일 "verification/cases/C3/case.json"의 "api-closeRecall"를 준비한다
     만일 "시스템" 역할이 "setup" 행동을 수행한다
+    만일 "delegator" 역할이 "precondition-recall" 행동을 수행한다
+    만일 "admin" 역할이 "precondition-approval" 행동을 수행한다
+    만일 "admin" 역할이 "precondition-notice" 행동을 수행한다
+    만일 "delegator" 역할이 "precondition-recovery" 행동을 수행한다
+    만일 "delegator" 역할이 "precondition-disposal" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-before" 행동을 수행한다
     만일 "reader" 역할이 "access-before" 행동을 수행한다
     만일 "delegator" 역할이 "target-before" 행동을 수행한다
     만일 "reader" 역할이 "attempt" 행동을 수행한다
     만일 "delegator" 역할이 "after-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "after" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-after" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-target" 행동을 수행한다
-    만일 "delegator" 역할이 "authorized-same-input" 행동을 수행한다
+    만일 "admin" 역할이 "authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-after-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "authorized-after" 행동을 수행한다
     그러면 "attempt-code" assertion으로 "work-effects attempt-code"를 확인한다
@@ -2561,6 +2843,16 @@
     그러면 "current-read-actions" assertion으로 "read-audit-permitted current-read-actions"를 확인한다
     그러면 "authorized-committed-once" assertion으로 "read-audit-permitted authorized-committed-once"를 확인한다
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
+    그러면 "precondition-approval-applied" assertion으로 "approval-effects precondition-approval-applied"를 확인한다
+    그러면 "precondition-approval-record" assertion으로 "approval-effects precondition-approval-record"를 확인한다
+    그러면 "precondition-notice-applied" assertion으로 "followup-effects precondition-notice-applied"를 확인한다
+    그러면 "precondition-recovery-applied" assertion으로 "followup-effects precondition-recovery-applied"를 확인한다
+    그러면 "precondition-disposal-applied" assertion으로 "followup-effects precondition-disposal-applied"를 확인한다
+    그러면 "precondition-not-closed" assertion으로 "followup-effects precondition-not-closed"를 확인한다
+    그러면 "authorized-business-recall-closure" assertion으로 "followup-effects authorized-business-recall-closure"를 확인한다
+    그러면 "unchanged-effect-recallScopes" assertion으로 "followup-effects unchanged-effect-recallScopes"를 확인한다
+    그러면 "unchanged-effect-recallClosures" assertion으로 "followup-effects unchanged-effect-recallClosures"를 확인한다
+    그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 api/recordInvoice 업무 효과0
@@ -2568,11 +2860,13 @@
     만일 "시스템" 역할이 "setup" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-before" 행동을 수행한다
     만일 "reader" 역할이 "access-before" 행동을 수행한다
     만일 "delegator" 역할이 "target-before" 행동을 수행한다
     만일 "reader" 역할이 "attempt" 행동을 수행한다
     만일 "delegator" 역할이 "after-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "after" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-after" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-target" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-after-snapshot" 행동을 수행한다
@@ -2605,6 +2899,8 @@
     그러면 "current-read-actions" assertion으로 "read-audit-permitted current-read-actions"를 확인한다
     그러면 "authorized-committed-once" assertion으로 "read-audit-permitted authorized-committed-once"를 확인한다
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
+    그러면 "unchanged-effect-invoices" assertion으로 "followup-effects unchanged-effect-invoices"를 확인한다
+    그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 api/recordCharge 업무 효과0
@@ -2612,11 +2908,13 @@
     만일 "시스템" 역할이 "setup" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-before" 행동을 수행한다
     만일 "reader" 역할이 "access-before" 행동을 수행한다
     만일 "delegator" 역할이 "target-before" 행동을 수행한다
     만일 "reader" 역할이 "attempt" 행동을 수행한다
     만일 "delegator" 역할이 "after-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "after" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-after" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-target" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-after-snapshot" 행동을 수행한다
@@ -2649,6 +2947,9 @@
     그러면 "current-read-actions" assertion으로 "read-audit-permitted current-read-actions"를 확인한다
     그러면 "authorized-committed-once" assertion으로 "read-audit-permitted authorized-committed-once"를 확인한다
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
+    그러면 "unchanged-effect-charges" assertion으로 "followup-effects unchanged-effect-charges"를 확인한다
+    그러면 "unchanged-effect-invoices" assertion으로 "followup-effects unchanged-effect-invoices"를 확인한다
+    그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 api/matchInvoice 업무 효과0
@@ -2656,11 +2957,13 @@
     만일 "시스템" 역할이 "setup" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-before" 행동을 수행한다
     만일 "reader" 역할이 "access-before" 행동을 수행한다
     만일 "delegator" 역할이 "target-before" 행동을 수행한다
     만일 "reader" 역할이 "attempt" 행동을 수행한다
     만일 "delegator" 역할이 "after-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "after" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-after" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-target" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-after-snapshot" 행동을 수행한다
@@ -2693,6 +2996,10 @@
     그러면 "current-read-actions" assertion으로 "read-audit-permitted current-read-actions"를 확인한다
     그러면 "authorized-committed-once" assertion으로 "read-audit-permitted authorized-committed-once"를 확인한다
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
+    그러면 "unchanged-effect-purchaseMatches" assertion으로 "followup-effects unchanged-effect-purchaseMatches"를 확인한다
+    그러면 "unchanged-effect-saleMatches" assertion으로 "followup-effects unchanged-effect-saleMatches"를 확인한다
+    그러면 "unchanged-effect-invoiceDifferences" assertion으로 "followup-effects unchanged-effect-invoiceDifferences"를 확인한다
+    그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 api/recordSettlementAdjustment 업무 효과0
@@ -2700,11 +3007,13 @@
     만일 "시스템" 역할이 "setup" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-before" 행동을 수행한다
     만일 "reader" 역할이 "access-before" 행동을 수행한다
     만일 "delegator" 역할이 "target-before" 행동을 수행한다
     만일 "reader" 역할이 "attempt" 행동을 수행한다
     만일 "delegator" 역할이 "after-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "after" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-after" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-target" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-after-snapshot" 행동을 수행한다
@@ -2737,6 +3046,9 @@
     그러면 "current-read-actions" assertion으로 "read-audit-permitted current-read-actions"를 확인한다
     그러면 "authorized-committed-once" assertion으로 "read-audit-permitted authorized-committed-once"를 확인한다
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
+    그러면 "unchanged-effect-settlementAdjustments" assertion으로 "followup-effects unchanged-effect-settlementAdjustments"를 확인한다
+    그러면 "unchanged-effect-invoiceDifferences" assertion으로 "followup-effects unchanged-effect-invoiceDifferences"를 확인한다
+    그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 api/recordPaymentReference 업무 효과0
@@ -2744,11 +3056,13 @@
     만일 "시스템" 역할이 "setup" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-before" 행동을 수행한다
     만일 "reader" 역할이 "access-before" 행동을 수행한다
     만일 "delegator" 역할이 "target-before" 행동을 수행한다
     만일 "reader" 역할이 "attempt" 행동을 수행한다
     만일 "delegator" 역할이 "after-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "after" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-after" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-target" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-after-snapshot" 행동을 수행한다
@@ -2781,6 +3095,9 @@
     그러면 "current-read-actions" assertion으로 "read-audit-permitted current-read-actions"를 확인한다
     그러면 "authorized-committed-once" assertion으로 "read-audit-permitted authorized-committed-once"를 확인한다
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
+    그러면 "unchanged-effect-paymentReferences" assertion으로 "followup-effects unchanged-effect-paymentReferences"를 확인한다
+    그러면 "unchanged-effect-bankTransfers" assertion으로 "external-outbox-effects unchanged-effect-bankTransfers"를 확인한다
+    그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 api/createGrant 업무 효과0
@@ -2788,11 +3105,13 @@
     만일 "시스템" 역할이 "setup" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-before" 행동을 수행한다
     만일 "reader" 역할이 "access-before" 행동을 수행한다
     만일 "delegator" 역할이 "target-before" 행동을 수행한다
     만일 "reader" 역할이 "attempt" 행동을 수행한다
     만일 "delegator" 역할이 "after-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "after" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-after" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-target" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-after-snapshot" 행동을 수행한다
@@ -2825,6 +3144,8 @@
     그러면 "current-read-actions" assertion으로 "read-audit-permitted current-read-actions"를 확인한다
     그러면 "authorized-committed-once" assertion으로 "read-audit-permitted authorized-committed-once"를 확인한다
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
+    그러면 "unchanged-effect-validityBoundaries" assertion으로 "work-effects unchanged-effect-validityBoundaries"를 확인한다
+    그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 api/revokeGrant 업무 효과0
@@ -2832,11 +3153,13 @@
     만일 "시스템" 역할이 "setup" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-before" 행동을 수행한다
     만일 "reader" 역할이 "access-before" 행동을 수행한다
     만일 "delegator" 역할이 "target-before" 행동을 수행한다
     만일 "reader" 역할이 "attempt" 행동을 수행한다
     만일 "delegator" 역할이 "after-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "after" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-after" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-target" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-after-snapshot" 행동을 수행한다
@@ -2869,6 +3192,8 @@
     그러면 "current-read-actions" assertion으로 "read-audit-permitted current-read-actions"를 확인한다
     그러면 "authorized-committed-once" assertion으로 "read-audit-permitted authorized-committed-once"를 확인한다
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
+    그러면 "unchanged-effect-validityBoundaries" assertion으로 "work-effects unchanged-effect-validityBoundaries"를 확인한다
+    그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 api/assignCapability 업무 효과0
@@ -2876,11 +3201,13 @@
     만일 "시스템" 역할이 "setup" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-before" 행동을 수행한다
     만일 "reader" 역할이 "access-before" 행동을 수행한다
     만일 "delegator" 역할이 "target-before" 행동을 수행한다
     만일 "reader" 역할이 "attempt" 행동을 수행한다
     만일 "delegator" 역할이 "after-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "after" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-after" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-target" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-after-snapshot" 행동을 수행한다
@@ -2913,6 +3240,8 @@
     그러면 "current-read-actions" assertion으로 "read-audit-permitted current-read-actions"를 확인한다
     그러면 "authorized-committed-once" assertion으로 "read-audit-permitted authorized-committed-once"를 확인한다
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
+    그러면 "unchanged-effect-managementAuthorities" assertion으로 "work-effects unchanged-effect-managementAuthorities"를 확인한다
+    그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 api/revokeCapability 업무 효과0
@@ -2920,11 +3249,13 @@
     만일 "시스템" 역할이 "setup" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-before" 행동을 수행한다
     만일 "reader" 역할이 "access-before" 행동을 수행한다
     만일 "delegator" 역할이 "target-before" 행동을 수행한다
     만일 "reader" 역할이 "attempt" 행동을 수행한다
     만일 "delegator" 역할이 "after-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "after" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-after" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-target" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-after-snapshot" 행동을 수행한다
@@ -2957,6 +3288,8 @@
     그러면 "current-read-actions" assertion으로 "read-audit-permitted current-read-actions"를 확인한다
     그러면 "authorized-committed-once" assertion으로 "read-audit-permitted authorized-committed-once"를 확인한다
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
+    그러면 "unchanged-effect-managementAuthorities" assertion으로 "work-effects unchanged-effect-managementAuthorities"를 확인한다
+    그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 api/proposeHandover 업무 효과0
@@ -2964,11 +3297,13 @@
     만일 "시스템" 역할이 "setup" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-before" 행동을 수행한다
     만일 "reader" 역할이 "access-before" 행동을 수행한다
     만일 "delegator" 역할이 "target-before" 행동을 수행한다
     만일 "reader" 역할이 "attempt" 행동을 수행한다
     만일 "delegator" 역할이 "after-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "after" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-after" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-target" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-after-snapshot" 행동을 수행한다
@@ -3001,6 +3336,8 @@
     그러면 "current-read-actions" assertion으로 "read-audit-permitted current-read-actions"를 확인한다
     그러면 "authorized-committed-once" assertion으로 "read-audit-permitted authorized-committed-once"를 확인한다
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
+    그러면 "unchanged-effect-handovers" assertion으로 "work-effects unchanged-effect-handovers"를 확인한다
+    그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 api/acceptHandover 업무 효과0
@@ -3008,11 +3345,13 @@
     만일 "시스템" 역할이 "setup" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-before" 행동을 수행한다
     만일 "reader" 역할이 "access-before" 행동을 수행한다
     만일 "delegator" 역할이 "target-before" 행동을 수행한다
     만일 "reader" 역할이 "attempt" 행동을 수행한다
     만일 "delegator" 역할이 "after-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "after" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-after" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-target" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-after-snapshot" 행동을 수행한다
@@ -3045,6 +3384,8 @@
     그러면 "current-read-actions" assertion으로 "read-audit-permitted current-read-actions"를 확인한다
     그러면 "authorized-committed-once" assertion으로 "read-audit-permitted authorized-committed-once"를 확인한다
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
+    그러면 "unchanged-effect-handovers" assertion으로 "work-effects unchanged-effect-handovers"를 확인한다
+    그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 api/rejectHandover 업무 효과0
@@ -3052,11 +3393,13 @@
     만일 "시스템" 역할이 "setup" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-before" 행동을 수행한다
     만일 "reader" 역할이 "access-before" 행동을 수행한다
     만일 "delegator" 역할이 "target-before" 행동을 수행한다
     만일 "reader" 역할이 "attempt" 행동을 수행한다
     만일 "delegator" 역할이 "after-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "after" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-after" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-target" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-after-snapshot" 행동을 수행한다
@@ -3089,6 +3432,8 @@
     그러면 "current-read-actions" assertion으로 "read-audit-permitted current-read-actions"를 확인한다
     그러면 "authorized-committed-once" assertion으로 "read-audit-permitted authorized-committed-once"를 확인한다
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
+    그러면 "unchanged-effect-handovers" assertion으로 "work-effects unchanged-effect-handovers"를 확인한다
+    그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 api/emergencyReassign 업무 효과0
@@ -3096,13 +3441,15 @@
     만일 "시스템" 역할이 "setup" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-before" 행동을 수행한다
     만일 "reader" 역할이 "access-before" 행동을 수행한다
     만일 "delegator" 역할이 "target-before" 행동을 수행한다
     만일 "reader" 역할이 "attempt" 행동을 수행한다
     만일 "delegator" 역할이 "after-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "after" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-after" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-target" 행동을 수행한다
-    만일 "delegator" 역할이 "authorized-same-input" 행동을 수행한다
+    만일 "admin" 역할이 "authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-after-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "authorized-after" 행동을 수행한다
     그러면 "attempt-code" assertion으로 "work-effects attempt-code"를 확인한다
@@ -3133,6 +3480,11 @@
     그러면 "current-read-actions" assertion으로 "read-audit-permitted current-read-actions"를 확인한다
     그러면 "authorized-committed-once" assertion으로 "read-audit-permitted authorized-committed-once"를 확인한다
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
+    그러면 "precondition-current-owner" assertion으로 "work-effects precondition-current-owner"를 확인한다
+    그러면 "authorized-business-new-owner" assertion으로 "work-effects authorized-business-new-owner"를 확인한다
+    그러면 "authorized-business-emergency-audit" assertion으로 "work-effects authorized-business-emergency-audit"를 확인한다
+    그러면 "unchanged-effect-handovers" assertion으로 "work-effects unchanged-effect-handovers"를 확인한다
+    그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 api/createPolicyDraft 업무 효과0
@@ -3140,11 +3492,13 @@
     만일 "시스템" 역할이 "setup" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-before" 행동을 수행한다
     만일 "reader" 역할이 "access-before" 행동을 수행한다
     만일 "delegator" 역할이 "target-before" 행동을 수행한다
     만일 "reader" 역할이 "attempt" 행동을 수행한다
     만일 "delegator" 역할이 "after-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "after" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-after" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-target" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-after-snapshot" 행동을 수행한다
@@ -3177,6 +3531,8 @@
     그러면 "current-read-actions" assertion으로 "read-audit-permitted current-read-actions"를 확인한다
     그러면 "authorized-committed-once" assertion으로 "read-audit-permitted authorized-committed-once"를 확인한다
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
+    그러면 "unchanged-effect-policyDrafts" assertion으로 "work-effects unchanged-effect-policyDrafts"를 확인한다
+    그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 api/approvePolicy 업무 효과0
@@ -3184,11 +3540,13 @@
     만일 "시스템" 역할이 "setup" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-before" 행동을 수행한다
     만일 "reader" 역할이 "access-before" 행동을 수행한다
     만일 "delegator" 역할이 "target-before" 행동을 수행한다
     만일 "reader" 역할이 "attempt" 행동을 수행한다
     만일 "delegator" 역할이 "after-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "after" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-after" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-target" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-after-snapshot" 행동을 수행한다
@@ -3221,6 +3579,8 @@
     그러면 "current-read-actions" assertion으로 "read-audit-permitted current-read-actions"를 확인한다
     그러면 "authorized-committed-once" assertion으로 "read-audit-permitted authorized-committed-once"를 확인한다
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
+    그러면 "unchanged-effect-policyApprovals" assertion으로 "approval-effects unchanged-effect-policyApprovals"를 확인한다
+    그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 api/activatePolicy 업무 효과0
@@ -3228,11 +3588,13 @@
     만일 "시스템" 역할이 "setup" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-before" 행동을 수행한다
     만일 "reader" 역할이 "access-before" 행동을 수행한다
     만일 "delegator" 역할이 "target-before" 행동을 수행한다
     만일 "reader" 역할이 "attempt" 행동을 수행한다
     만일 "delegator" 역할이 "after-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "after" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-after" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-target" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-after-snapshot" 행동을 수행한다
@@ -3265,6 +3627,8 @@
     그러면 "current-read-actions" assertion으로 "read-audit-permitted current-read-actions"를 확인한다
     그러면 "authorized-committed-once" assertion으로 "read-audit-permitted authorized-committed-once"를 확인한다
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
+    그러면 "unchanged-effect-activePolicies" assertion으로 "work-effects unchanged-effect-activePolicies"를 확인한다
+    그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 api/retirePolicy 업무 효과0
@@ -3272,11 +3636,13 @@
     만일 "시스템" 역할이 "setup" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-before" 행동을 수행한다
     만일 "reader" 역할이 "access-before" 행동을 수행한다
     만일 "delegator" 역할이 "target-before" 행동을 수행한다
     만일 "reader" 역할이 "attempt" 행동을 수행한다
     만일 "delegator" 역할이 "after-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "after" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-after" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-target" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-after-snapshot" 행동을 수행한다
@@ -3309,6 +3675,8 @@
     그러면 "current-read-actions" assertion으로 "read-audit-permitted current-read-actions"를 확인한다
     그러면 "authorized-committed-once" assertion으로 "read-audit-permitted authorized-committed-once"를 확인한다
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
+    그러면 "unchanged-effect-activePolicies" assertion으로 "work-effects unchanged-effect-activePolicies"를 확인한다
+    그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 api/matchSourceIdentity 업무 효과0
@@ -3316,11 +3684,13 @@
     만일 "시스템" 역할이 "setup" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-before" 행동을 수행한다
     만일 "reader" 역할이 "access-before" 행동을 수행한다
     만일 "delegator" 역할이 "target-before" 행동을 수행한다
     만일 "reader" 역할이 "attempt" 행동을 수행한다
     만일 "delegator" 역할이 "after-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "after" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-after" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-target" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-after-snapshot" 행동을 수행한다
@@ -3353,6 +3723,8 @@
     그러면 "current-read-actions" assertion으로 "read-audit-permitted current-read-actions"를 확인한다
     그러면 "authorized-committed-once" assertion으로 "read-audit-permitted authorized-committed-once"를 확인한다
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
+    그러면 "unchanged-effect-identity_matches" assertion으로 "followup-effects unchanged-effect-identity_matches"를 확인한다
+    그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 api/linkCanonicalOccurrence 업무 효과0
@@ -3360,11 +3732,13 @@
     만일 "시스템" 역할이 "setup" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-before" 행동을 수행한다
     만일 "reader" 역할이 "access-before" 행동을 수행한다
     만일 "delegator" 역할이 "target-before" 행동을 수행한다
     만일 "reader" 역할이 "attempt" 행동을 수행한다
     만일 "delegator" 역할이 "after-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "after" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-after" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-target" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-after-snapshot" 행동을 수행한다
@@ -3397,6 +3771,9 @@
     그러면 "current-read-actions" assertion으로 "read-audit-permitted current-read-actions"를 확인한다
     그러면 "authorized-committed-once" assertion으로 "read-audit-permitted authorized-committed-once"를 확인한다
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
+    그러면 "unchanged-effect-canonical_links" assertion으로 "followup-effects unchanged-effect-canonical_links"를 확인한다
+    그러면 "unchanged-effect-canonicalOccurrences" assertion으로 "followup-effects unchanged-effect-canonicalOccurrences"를 확인한다
+    그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 api/resolveEvidenceConflict 업무 효과0
@@ -3404,11 +3781,13 @@
     만일 "시스템" 역할이 "setup" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-before" 행동을 수행한다
     만일 "reader" 역할이 "access-before" 행동을 수행한다
     만일 "delegator" 역할이 "target-before" 행동을 수행한다
     만일 "reader" 역할이 "attempt" 행동을 수행한다
     만일 "delegator" 역할이 "after-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "after" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-after" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-target" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-after-snapshot" 행동을 수행한다
@@ -3441,6 +3820,9 @@
     그러면 "current-read-actions" assertion으로 "read-audit-permitted current-read-actions"를 확인한다
     그러면 "authorized-committed-once" assertion으로 "read-audit-permitted authorized-committed-once"를 확인한다
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
+    그러면 "unchanged-effect-reconciliations" assertion으로 "followup-effects unchanged-effect-reconciliations"를 확인한다
+    그러면 "unchanged-effect-evidenceLinks" assertion으로 "followup-effects unchanged-effect-evidenceLinks"를 확인한다
+    그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 api/recordExternalReconciliation 업무 효과0
@@ -3448,11 +3830,13 @@
     만일 "시스템" 역할이 "setup" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-before" 행동을 수행한다
     만일 "reader" 역할이 "access-before" 행동을 수행한다
     만일 "delegator" 역할이 "target-before" 행동을 수행한다
     만일 "reader" 역할이 "attempt" 행동을 수행한다
     만일 "delegator" 역할이 "after-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "after" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-after" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-target" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-after-snapshot" 행동을 수행한다
@@ -3485,6 +3869,9 @@
     그러면 "current-read-actions" assertion으로 "read-audit-permitted current-read-actions"를 확인한다
     그러면 "authorized-committed-once" assertion으로 "read-audit-permitted authorized-committed-once"를 확인한다
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
+    그러면 "unchanged-effect-reconciliations" assertion으로 "followup-effects unchanged-effect-reconciliations"를 확인한다
+    그러면 "unchanged-effect-externalOperationResults" assertion으로 "external-outbox-effects unchanged-effect-externalOperationResults"를 확인한다
+    그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 api/createDefinitionDraft 업무 효과0
@@ -3492,11 +3879,13 @@
     만일 "시스템" 역할이 "setup" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-before" 행동을 수행한다
     만일 "reader" 역할이 "access-before" 행동을 수행한다
     만일 "delegator" 역할이 "target-before" 행동을 수행한다
     만일 "reader" 역할이 "attempt" 행동을 수행한다
     만일 "delegator" 역할이 "after-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "after" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-after" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-target" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-after-snapshot" 행동을 수행한다
@@ -3529,6 +3918,8 @@
     그러면 "current-read-actions" assertion으로 "read-audit-permitted current-read-actions"를 확인한다
     그러면 "authorized-committed-once" assertion으로 "read-audit-permitted authorized-committed-once"를 확인한다
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
+    그러면 "unchanged-effect-definitionPackages" assertion으로 "work-effects unchanged-effect-definitionPackages"를 확인한다
+    그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 api/validateDefinition 업무 효과0
@@ -3536,11 +3927,13 @@
     만일 "시스템" 역할이 "setup" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-before" 행동을 수행한다
     만일 "reader" 역할이 "access-before" 행동을 수행한다
     만일 "delegator" 역할이 "target-before" 행동을 수행한다
     만일 "reader" 역할이 "attempt" 행동을 수행한다
     만일 "delegator" 역할이 "after-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "after" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-after" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-target" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-after-snapshot" 행동을 수행한다
@@ -3573,6 +3966,9 @@
     그러면 "current-read-actions" assertion으로 "read-audit-permitted current-read-actions"를 확인한다
     그러면 "authorized-committed-once" assertion으로 "read-audit-permitted authorized-committed-once"를 확인한다
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
+    그러면 "unchanged-effect-regressionRuns" assertion으로 "work-effects unchanged-effect-regressionRuns"를 확인한다
+    그러면 "unchanged-effect-definitionPackages" assertion으로 "work-effects unchanged-effect-definitionPackages"를 확인한다
+    그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 api/submitDefinitionReview 업무 효과0
@@ -3580,11 +3976,13 @@
     만일 "시스템" 역할이 "setup" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-before" 행동을 수행한다
     만일 "reader" 역할이 "access-before" 행동을 수행한다
     만일 "delegator" 역할이 "target-before" 행동을 수행한다
     만일 "reader" 역할이 "attempt" 행동을 수행한다
     만일 "delegator" 역할이 "after-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "after" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-after" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-target" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-after-snapshot" 행동을 수행한다
@@ -3617,6 +4015,8 @@
     그러면 "current-read-actions" assertion으로 "read-audit-permitted current-read-actions"를 확인한다
     그러면 "authorized-committed-once" assertion으로 "read-audit-permitted authorized-committed-once"를 확인한다
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
+    그러면 "unchanged-effect-definitionPackages" assertion으로 "work-effects unchanged-effect-definitionPackages"를 확인한다
+    그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 api/approveDefinition 업무 효과0
@@ -3624,11 +4024,13 @@
     만일 "시스템" 역할이 "setup" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-before" 행동을 수행한다
     만일 "reader" 역할이 "access-before" 행동을 수행한다
     만일 "delegator" 역할이 "target-before" 행동을 수행한다
     만일 "reader" 역할이 "attempt" 행동을 수행한다
     만일 "delegator" 역할이 "after-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "after" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-after" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-target" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-after-snapshot" 행동을 수행한다
@@ -3661,6 +4063,8 @@
     그러면 "current-read-actions" assertion으로 "read-audit-permitted current-read-actions"를 확인한다
     그러면 "authorized-committed-once" assertion으로 "read-audit-permitted authorized-committed-once"를 확인한다
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
+    그러면 "unchanged-effect-definitionApprovals" assertion으로 "approval-effects unchanged-effect-definitionApprovals"를 확인한다
+    그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 api/publishDefinition 업무 효과0
@@ -3668,11 +4072,13 @@
     만일 "시스템" 역할이 "setup" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-before" 행동을 수행한다
     만일 "reader" 역할이 "access-before" 행동을 수행한다
     만일 "delegator" 역할이 "target-before" 행동을 수행한다
     만일 "reader" 역할이 "attempt" 행동을 수행한다
     만일 "delegator" 역할이 "after-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "after" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-after" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-target" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-after-snapshot" 행동을 수행한다
@@ -3705,6 +4111,8 @@
     그러면 "current-read-actions" assertion으로 "read-audit-permitted current-read-actions"를 확인한다
     그러면 "authorized-committed-once" assertion으로 "read-audit-permitted authorized-committed-once"를 확인한다
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
+    그러면 "unchanged-effect-definitionPackages" assertion으로 "work-effects unchanged-effect-definitionPackages"를 확인한다
+    그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 api/activateDefinition 업무 효과0
@@ -3712,11 +4120,13 @@
     만일 "시스템" 역할이 "setup" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-before" 행동을 수행한다
     만일 "reader" 역할이 "access-before" 행동을 수행한다
     만일 "delegator" 역할이 "target-before" 행동을 수행한다
     만일 "reader" 역할이 "attempt" 행동을 수행한다
     만일 "delegator" 역할이 "after-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "after" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-after" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-target" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-after-snapshot" 행동을 수행한다
@@ -3749,6 +4159,8 @@
     그러면 "current-read-actions" assertion으로 "read-audit-permitted current-read-actions"를 확인한다
     그러면 "authorized-committed-once" assertion으로 "read-audit-permitted authorized-committed-once"를 확인한다
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
+    그러면 "unchanged-effect-activeDefinitionPointers" assertion으로 "work-effects unchanged-effect-activeDefinitionPointers"를 확인한다
+    그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 api/retireDefinition 업무 효과0
@@ -3756,11 +4168,13 @@
     만일 "시스템" 역할이 "setup" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-before" 행동을 수행한다
     만일 "reader" 역할이 "access-before" 행동을 수행한다
     만일 "delegator" 역할이 "target-before" 행동을 수행한다
     만일 "reader" 역할이 "attempt" 행동을 수행한다
     만일 "delegator" 역할이 "after-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "after" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-after" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-target" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-after-snapshot" 행동을 수행한다
@@ -3793,6 +4207,8 @@
     그러면 "current-read-actions" assertion으로 "read-audit-permitted current-read-actions"를 확인한다
     그러면 "authorized-committed-once" assertion으로 "read-audit-permitted authorized-committed-once"를 확인한다
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
+    그러면 "unchanged-effect-activeDefinitionPointers" assertion으로 "work-effects unchanged-effect-activeDefinitionPointers"를 확인한다
+    그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 api/migrateWorkDefinition 업무 효과0
@@ -3807,11 +4223,13 @@
     만일 "configApprover" 역할이 "precondition-migration-approval" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-before" 행동을 수행한다
     만일 "reader" 역할이 "access-before" 행동을 수행한다
     만일 "delegator" 역할이 "target-before" 행동을 수행한다
     만일 "reader" 역할이 "attempt" 행동을 수행한다
     만일 "delegator" 역할이 "after-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "after" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-after" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-target" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-after-snapshot" 행동을 수행한다
@@ -3844,34 +4262,40 @@
     그러면 "current-read-actions" assertion으로 "read-audit-permitted current-read-actions"를 확인한다
     그러면 "authorized-committed-once" assertion으로 "read-audit-permitted authorized-committed-once"를 확인한다
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
-    그러면 "precondition-draft-applied" assertion으로 "read-audit-permitted precondition-draft-applied"를 확인한다
-    그러면 "precondition-validate-applied" assertion으로 "read-audit-permitted precondition-validate-applied"를 확인한다
-    그러면 "precondition-review-applied" assertion으로 "read-audit-permitted precondition-review-applied"를 확인한다
-    그러면 "precondition-publish-approval-applied" assertion으로 "read-audit-permitted precondition-publish-approval-applied"를 확인한다
-    그러면 "precondition-publish-applied" assertion으로 "read-audit-permitted precondition-publish-applied"를 확인한다
-    그러면 "precondition-migration-review-applied" assertion으로 "read-audit-permitted precondition-migration-review-applied"를 확인한다
-    그러면 "precondition-migration-approval-applied" assertion으로 "read-audit-permitted precondition-migration-approval-applied"를 확인한다
-    그러면 "precondition-published" assertion으로 "read-audit-permitted precondition-published"를 확인한다
-    그러면 "authorized-business-work-version" assertion으로 "read-audit-permitted authorized-business-work-version"를 확인한다
-    그러면 "authorized-business-migration-once" assertion으로 "read-audit-permitted authorized-business-migration-once"를 확인한다
-    그러면 "precondition-migration-approval-record" assertion으로 "read-audit-permitted precondition-migration-approval-record"를 확인한다
-    그러면 "authorized-business-goal-history" assertion으로 "read-audit-permitted authorized-business-goal-history"를 확인한다
-    그러면 "authorized-business-migration-goal-link" assertion으로 "read-audit-permitted authorized-business-migration-goal-link"를 확인한다
-    그러면 "precondition-denial-unchanged-workDefinitionMigrations" assertion으로 "read-audit-permitted precondition-denial-unchanged-workDefinitionMigrations"를 확인한다
-    그러면 "precondition-denial-unchanged-migrationMappings" assertion으로 "read-audit-permitted precondition-denial-unchanged-migrationMappings"를 확인한다
-    그러면 "precondition-denial-unchanged-migrationRegressions" assertion으로 "read-audit-permitted precondition-denial-unchanged-migrationRegressions"를 확인한다
-    그러면 "precondition-denial-unchanged-goalVersions" assertion으로 "read-audit-permitted precondition-denial-unchanged-goalVersions"를 확인한다
+    그러면 "precondition-draft-applied" assertion으로 "work-effects precondition-draft-applied"를 확인한다
+    그러면 "precondition-validate-applied" assertion으로 "work-effects precondition-validate-applied"를 확인한다
+    그러면 "precondition-review-applied" assertion으로 "work-effects precondition-review-applied"를 확인한다
+    그러면 "precondition-publish-approval-applied" assertion으로 "work-effects precondition-publish-approval-applied"를 확인한다
+    그러면 "precondition-publish-applied" assertion으로 "work-effects precondition-publish-applied"를 확인한다
+    그러면 "precondition-migration-review-applied" assertion으로 "work-effects precondition-migration-review-applied"를 확인한다
+    그러면 "precondition-migration-approval-applied" assertion으로 "work-effects precondition-migration-approval-applied"를 확인한다
+    그러면 "precondition-published" assertion으로 "work-effects precondition-published"를 확인한다
+    그러면 "authorized-business-work-version" assertion으로 "work-effects authorized-business-work-version"를 확인한다
+    그러면 "authorized-business-migration-once" assertion으로 "work-effects authorized-business-migration-once"를 확인한다
+    그러면 "precondition-migration-approval-record" assertion으로 "approval-effects precondition-migration-approval-record"를 확인한다
+    그러면 "authorized-business-goal-history" assertion으로 "work-effects authorized-business-goal-history"를 확인한다
+    그러면 "authorized-business-migration-goal-link" assertion으로 "work-effects authorized-business-migration-goal-link"를 확인한다
+    그러면 "precondition-denial-unchanged-workDefinitionMigrations" assertion으로 "work-effects precondition-denial-unchanged-workDefinitionMigrations"를 확인한다
+    그러면 "precondition-denial-unchanged-migrationMappings" assertion으로 "work-effects precondition-denial-unchanged-migrationMappings"를 확인한다
+    그러면 "precondition-denial-unchanged-migrationRegressions" assertion으로 "work-effects precondition-denial-unchanged-migrationRegressions"를 확인한다
+    그러면 "precondition-denial-unchanged-goalVersions" assertion으로 "work-effects precondition-denial-unchanged-goalVersions"를 확인한다
+    그러면 "unchanged-effect-workDefinitionMigrations" assertion으로 "work-effects unchanged-effect-workDefinitionMigrations"를 확인한다
+    그러면 "unchanged-effect-goalVersions" assertion으로 "work-effects unchanged-effect-goalVersions"를 확인한다
+    그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
 
+  @sit
   시나리오: WRITE 역할·READ 위임에서 api/createWork 업무 효과0
     먼저 사례 파일 "verification/cases/C3/case.json"의 "api-createWork"를 준비한다
     만일 "시스템" 역할이 "setup" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-before" 행동을 수행한다
     만일 "reader" 역할이 "access-before" 행동을 수행한다
     만일 "delegator" 역할이 "target-before" 행동을 수행한다
     만일 "reader" 역할이 "attempt" 행동을 수행한다
     만일 "delegator" 역할이 "after-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "after" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-after" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-target" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-after-snapshot" 행동을 수행한다
@@ -3904,6 +4328,9 @@
     그러면 "current-read-actions" assertion으로 "read-audit-permitted current-read-actions"를 확인한다
     그러면 "authorized-committed-once" assertion으로 "read-audit-permitted authorized-committed-once"를 확인한다
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
+    그러면 "unchanged-effect-goalVersions" assertion으로 "work-effects unchanged-effect-goalVersions"를 확인한다
+    그러면 "unchanged-effect-workLinks" assertion으로 "work-effects unchanged-effect-workLinks"를 확인한다
+    그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 api/recordActivity 업무 효과0
@@ -3911,11 +4338,13 @@
     만일 "시스템" 역할이 "setup" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-before" 행동을 수행한다
     만일 "reader" 역할이 "access-before" 행동을 수행한다
     만일 "delegator" 역할이 "target-before" 행동을 수행한다
     만일 "reader" 역할이 "attempt" 행동을 수행한다
     만일 "delegator" 역할이 "after-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "after" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-after" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-target" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-after-snapshot" 행동을 수행한다
@@ -3948,6 +4377,9 @@
     그러면 "current-read-actions" assertion으로 "read-audit-permitted current-read-actions"를 확인한다
     그러면 "authorized-committed-once" assertion으로 "read-audit-permitted authorized-committed-once"를 확인한다
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
+    그러면 "unchanged-effect-activities" assertion으로 "followup-effects unchanged-effect-activities"를 확인한다
+    그러면 "unchanged-effect-events" assertion으로 "followup-effects unchanged-effect-events"를 확인한다
+    그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 api/retrySafeCommand 업무 효과0
@@ -3955,11 +4387,13 @@
     만일 "시스템" 역할이 "setup" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-before" 행동을 수행한다
     만일 "reader" 역할이 "access-before" 행동을 수행한다
     만일 "delegator" 역할이 "target-before" 행동을 수행한다
     만일 "reader" 역할이 "attempt" 행동을 수행한다
     만일 "delegator" 역할이 "after-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "after" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-after" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-target" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-after-snapshot" 행동을 수행한다
@@ -3992,6 +4426,9 @@
     그러면 "current-read-actions" assertion으로 "read-audit-permitted current-read-actions"를 확인한다
     그러면 "authorized-committed-once" assertion으로 "read-audit-permitted authorized-committed-once"를 확인한다
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
+    그러면 "unchanged-effect-retryAttempts" assertion으로 "work-effects unchanged-effect-retryAttempts"를 확인한다
+    그러면 "unchanged-effect-executionAttempts" assertion으로 "work-effects unchanged-effect-executionAttempts"를 확인한다
+    그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 api/recordRelation 업무 효과0
@@ -3999,11 +4436,13 @@
     만일 "시스템" 역할이 "setup" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-before" 행동을 수행한다
     만일 "reader" 역할이 "access-before" 행동을 수행한다
     만일 "delegator" 역할이 "target-before" 행동을 수행한다
     만일 "reader" 역할이 "attempt" 행동을 수행한다
     만일 "delegator" 역할이 "after-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "after" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-after" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-target" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-after-snapshot" 행동을 수행한다
@@ -4036,6 +4475,8 @@
     그러면 "current-read-actions" assertion으로 "read-audit-permitted current-read-actions"를 확인한다
     그러면 "authorized-committed-once" assertion으로 "read-audit-permitted authorized-committed-once"를 확인한다
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
+    그러면 "unchanged-effect-workLinks" assertion으로 "work-effects unchanged-effect-workLinks"를 확인한다
+    그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 api/createWorkLink 업무 효과0
@@ -4043,11 +4484,13 @@
     만일 "시스템" 역할이 "setup" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-before" 행동을 수행한다
     만일 "reader" 역할이 "access-before" 행동을 수행한다
     만일 "delegator" 역할이 "target-before" 행동을 수행한다
     만일 "reader" 역할이 "attempt" 행동을 수행한다
     만일 "delegator" 역할이 "after-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "after" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-after" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-target" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-after-snapshot" 행동을 수행한다
@@ -4080,6 +4523,8 @@
     그러면 "current-read-actions" assertion으로 "read-audit-permitted current-read-actions"를 확인한다
     그러면 "authorized-committed-once" assertion으로 "read-audit-permitted authorized-committed-once"를 확인한다
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
+    그러면 "unchanged-effect-workLinks" assertion으로 "work-effects unchanged-effect-workLinks"를 확인한다
+    그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 api/emergencyRepair 업무 효과0
@@ -4087,11 +4532,13 @@
     만일 "시스템" 역할이 "setup" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-before" 행동을 수행한다
     만일 "reader" 역할이 "access-before" 행동을 수행한다
     만일 "delegator" 역할이 "target-before" 행동을 수행한다
     만일 "reader" 역할이 "attempt" 행동을 수행한다
     만일 "delegator" 역할이 "after-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "after" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-after" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-target" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-after-snapshot" 행동을 수행한다
@@ -4124,6 +4571,8 @@
     그러면 "current-read-actions" assertion으로 "read-audit-permitted current-read-actions"를 확인한다
     그러면 "authorized-committed-once" assertion으로 "read-audit-permitted authorized-committed-once"를 확인한다
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
+    그러면 "unchanged-effect-projections" assertion으로 "work-effects unchanged-effect-projections"를 확인한다
+    그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 mcp/splitQuantity 업무 효과0
@@ -4131,11 +4580,13 @@
     만일 "시스템" 역할이 "setup" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-before" 행동을 수행한다
     만일 "reader" 역할이 "access-before" 행동을 수행한다
     만일 "delegator" 역할이 "target-before" 행동을 수행한다
     만일 "reader" 역할이 "attempt" 행동을 수행한다
     만일 "delegator" 역할이 "after-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "after" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-after" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-target" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-after-snapshot" 행동을 수행한다
@@ -4168,6 +4619,8 @@
     그러면 "current-read-actions" assertion으로 "read-audit-permitted current-read-actions"를 확인한다
     그러면 "authorized-committed-once" assertion으로 "read-audit-permitted authorized-committed-once"를 확인한다
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
+    그러면 "unchanged-effect-genealogy" assertion으로 "inventory-effects unchanged-effect-genealogy"를 확인한다
+    그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 mcp/mergeQuantity 업무 효과0
@@ -4175,11 +4628,13 @@
     만일 "시스템" 역할이 "setup" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-before" 행동을 수행한다
     만일 "reader" 역할이 "access-before" 행동을 수행한다
     만일 "delegator" 역할이 "target-before" 행동을 수행한다
     만일 "reader" 역할이 "attempt" 행동을 수행한다
     만일 "delegator" 역할이 "after-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "after" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-after" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-target" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-after-snapshot" 행동을 수행한다
@@ -4212,6 +4667,8 @@
     그러면 "current-read-actions" assertion으로 "read-audit-permitted current-read-actions"를 확인한다
     그러면 "authorized-committed-once" assertion으로 "read-audit-permitted authorized-committed-once"를 확인한다
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
+    그러면 "unchanged-effect-genealogy" assertion으로 "inventory-effects unchanged-effect-genealogy"를 확인한다
+    그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 mcp/moveQuantity 업무 효과0
@@ -4219,11 +4676,13 @@
     만일 "시스템" 역할이 "setup" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-before" 행동을 수행한다
     만일 "reader" 역할이 "access-before" 행동을 수행한다
     만일 "delegator" 역할이 "target-before" 행동을 수행한다
     만일 "reader" 역할이 "attempt" 행동을 수행한다
     만일 "delegator" 역할이 "after-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "after" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-after" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-target" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-after-snapshot" 행동을 수행한다
@@ -4256,6 +4715,9 @@
     그러면 "current-read-actions" assertion으로 "read-audit-permitted current-read-actions"를 확인한다
     그러면 "authorized-committed-once" assertion으로 "read-audit-permitted authorized-committed-once"를 확인한다
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
+    그러면 "unchanged-effect-logisticsMemberships" assertion으로 "inventory-effects unchanged-effect-logisticsMemberships"를 확인한다
+    그러면 "unchanged-effect-custodyHandovers" assertion으로 "inventory-effects unchanged-effect-custodyHandovers"를 확인한다
+    그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 mcp/adjustQuantity 업무 효과0
@@ -4263,11 +4725,13 @@
     만일 "시스템" 역할이 "setup" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-before" 행동을 수행한다
     만일 "reader" 역할이 "access-before" 행동을 수행한다
     만일 "delegator" 역할이 "target-before" 행동을 수행한다
     만일 "reader" 역할이 "attempt" 행동을 수행한다
     만일 "delegator" 역할이 "after-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "after" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-after" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-target" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-after-snapshot" 행동을 수행한다
@@ -4300,6 +4764,9 @@
     그러면 "current-read-actions" assertion으로 "read-audit-permitted current-read-actions"를 확인한다
     그러면 "authorized-committed-once" assertion으로 "read-audit-permitted authorized-committed-once"를 확인한다
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
+    그러면 "unchanged-effect-adjustmentProposals" assertion으로 "inventory-effects unchanged-effect-adjustmentProposals"를 확인한다
+    그러면 "unchanged-effect-stocktakes" assertion으로 "inventory-effects unchanged-effect-stocktakes"를 확인한다
+    그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 mcp/reserveQuantity 업무 효과0
@@ -4307,11 +4774,13 @@
     만일 "시스템" 역할이 "setup" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-before" 행동을 수행한다
     만일 "reader" 역할이 "access-before" 행동을 수행한다
     만일 "delegator" 역할이 "target-before" 행동을 수행한다
     만일 "reader" 역할이 "attempt" 행동을 수행한다
     만일 "delegator" 역할이 "after-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "after" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-after" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-target" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-after-snapshot" 행동을 수행한다
@@ -4344,6 +4813,8 @@
     그러면 "current-read-actions" assertion으로 "read-audit-permitted current-read-actions"를 확인한다
     그러면 "authorized-committed-once" assertion으로 "read-audit-permitted authorized-committed-once"를 확인한다
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
+    그러면 "unchanged-effect-orders" assertion으로 "followup-effects unchanged-effect-orders"를 확인한다
+    그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 mcp/replaceAllocation 업무 효과0
@@ -4351,11 +4822,13 @@
     만일 "시스템" 역할이 "setup" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-before" 행동을 수행한다
     만일 "reader" 역할이 "access-before" 행동을 수행한다
     만일 "delegator" 역할이 "target-before" 행동을 수행한다
     만일 "reader" 역할이 "attempt" 행동을 수행한다
     만일 "delegator" 역할이 "after-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "after" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-after" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-target" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-after-snapshot" 행동을 수행한다
@@ -4388,6 +4861,8 @@
     그러면 "current-read-actions" assertion으로 "read-audit-permitted current-read-actions"를 확인한다
     그러면 "authorized-committed-once" assertion으로 "read-audit-permitted authorized-committed-once"를 확인한다
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
+    그러면 "unchanged-effect-orders" assertion으로 "followup-effects unchanged-effect-orders"를 확인한다
+    그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 mcp/pickQuantity 업무 효과0
@@ -4395,11 +4870,13 @@
     만일 "시스템" 역할이 "setup" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-before" 행동을 수행한다
     만일 "reader" 역할이 "access-before" 행동을 수행한다
     만일 "delegator" 역할이 "target-before" 행동을 수행한다
     만일 "reader" 역할이 "attempt" 행동을 수행한다
     만일 "delegator" 역할이 "after-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "after" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-after" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-target" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-after-snapshot" 행동을 수행한다
@@ -4432,6 +4909,8 @@
     그러면 "current-read-actions" assertion으로 "read-audit-permitted current-read-actions"를 확인한다
     그러면 "authorized-committed-once" assertion으로 "read-audit-permitted authorized-committed-once"를 확인한다
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
+    그러면 "unchanged-effect-logisticsMemberships" assertion으로 "inventory-effects unchanged-effect-logisticsMemberships"를 확인한다
+    그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 mcp/dispatchQuantity 업무 효과0
@@ -4439,11 +4918,13 @@
     만일 "시스템" 역할이 "setup" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-before" 행동을 수행한다
     만일 "reader" 역할이 "access-before" 행동을 수행한다
     만일 "delegator" 역할이 "target-before" 행동을 수행한다
     만일 "reader" 역할이 "attempt" 행동을 수행한다
     만일 "delegator" 역할이 "after-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "after" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-after" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-target" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-after-snapshot" 행동을 수행한다
@@ -4476,6 +4957,9 @@
     그러면 "current-read-actions" assertion으로 "read-audit-permitted current-read-actions"를 확인한다
     그러면 "authorized-committed-once" assertion으로 "read-audit-permitted authorized-committed-once"를 확인한다
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
+    그러면 "unchanged-effect-shipments" assertion으로 "followup-effects unchanged-effect-shipments"를 확인한다
+    그러면 "unchanged-effect-deliveries" assertion으로 "followup-effects unchanged-effect-deliveries"를 확인한다
+    그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 mcp/confirmReceipt 업무 효과0
@@ -4483,11 +4967,13 @@
     만일 "시스템" 역할이 "setup" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-before" 행동을 수행한다
     만일 "reader" 역할이 "access-before" 행동을 수행한다
     만일 "delegator" 역할이 "target-before" 행동을 수행한다
     만일 "reader" 역할이 "attempt" 행동을 수행한다
     만일 "delegator" 역할이 "after-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "after" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-after" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-target" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-after-snapshot" 행동을 수행한다
@@ -4520,6 +5006,9 @@
     그러면 "current-read-actions" assertion으로 "read-audit-permitted current-read-actions"를 확인한다
     그러면 "authorized-committed-once" assertion으로 "read-audit-permitted authorized-committed-once"를 확인한다
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
+    그러면 "unchanged-effect-receipts" assertion으로 "inventory-effects unchanged-effect-receipts"를 확인한다
+    그러면 "unchanged-effect-receiptContributions" assertion으로 "inventory-effects unchanged-effect-receiptContributions"를 확인한다
+    그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 mcp/disposeQuantity 업무 효과0
@@ -4527,11 +5016,13 @@
     만일 "시스템" 역할이 "setup" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-before" 행동을 수행한다
     만일 "reader" 역할이 "access-before" 행동을 수행한다
     만일 "delegator" 역할이 "target-before" 행동을 수행한다
     만일 "reader" 역할이 "attempt" 행동을 수행한다
     만일 "delegator" 역할이 "after-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "after" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-after" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-target" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-after-snapshot" 행동을 수행한다
@@ -4564,6 +5055,8 @@
     그러면 "current-read-actions" assertion으로 "read-audit-permitted current-read-actions"를 확인한다
     그러면 "authorized-committed-once" assertion으로 "read-audit-permitted authorized-committed-once"를 확인한다
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
+    그러면 "unchanged-effect-dispositions" assertion으로 "inventory-effects unchanged-effect-dispositions"를 확인한다
+    그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 mcp/createDraft 업무 효과0
@@ -4571,11 +5064,13 @@
     만일 "시스템" 역할이 "setup" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-before" 행동을 수행한다
     만일 "reader" 역할이 "access-before" 행동을 수행한다
     만일 "delegator" 역할이 "target-before" 행동을 수행한다
     만일 "reader" 역할이 "attempt" 행동을 수행한다
     만일 "delegator" 역할이 "after-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "after" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-after" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-target" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-after-snapshot" 행동을 수행한다
@@ -4608,6 +5103,8 @@
     그러면 "current-read-actions" assertion으로 "read-audit-permitted current-read-actions"를 확인한다
     그러면 "authorized-committed-once" assertion으로 "read-audit-permitted authorized-committed-once"를 확인한다
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
+    그러면 "unchanged-effect-goalVersions" assertion으로 "work-effects unchanged-effect-goalVersions"를 확인한다
+    그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 mcp/cancelDraft 업무 효과0
@@ -4615,11 +5112,13 @@
     만일 "시스템" 역할이 "setup" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-before" 행동을 수행한다
     만일 "reader" 역할이 "access-before" 행동을 수행한다
     만일 "delegator" 역할이 "target-before" 행동을 수행한다
     만일 "reader" 역할이 "attempt" 행동을 수행한다
     만일 "delegator" 역할이 "after-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "after" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-after" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-target" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-after-snapshot" 행동을 수행한다
@@ -4652,6 +5151,9 @@
     그러면 "current-read-actions" assertion으로 "read-audit-permitted current-read-actions"를 확인한다
     그러면 "authorized-committed-once" assertion으로 "read-audit-permitted authorized-committed-once"를 확인한다
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
+    그러면 "unchanged-effect-goalVersions" assertion으로 "work-effects unchanged-effect-goalVersions"를 확인한다
+    그러면 "unchanged-effect-workClosures" assertion으로 "work-effects unchanged-effect-workClosures"를 확인한다
+    그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 mcp/activateWork 업무 효과0
@@ -4659,11 +5161,13 @@
     만일 "시스템" 역할이 "setup" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-before" 행동을 수행한다
     만일 "reader" 역할이 "access-before" 행동을 수행한다
     만일 "delegator" 역할이 "target-before" 행동을 수행한다
     만일 "reader" 역할이 "attempt" 행동을 수행한다
     만일 "delegator" 역할이 "after-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "after" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-after" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-target" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-after-snapshot" 행동을 수행한다
@@ -4696,6 +5200,8 @@
     그러면 "current-read-actions" assertion으로 "read-audit-permitted current-read-actions"를 확인한다
     그러면 "authorized-committed-once" assertion으로 "read-audit-permitted authorized-committed-once"를 확인한다
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
+    그러면 "unchanged-effect-goalVersions" assertion으로 "work-effects unchanged-effect-goalVersions"를 확인한다
+    그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 mcp/waitWork 업무 효과0
@@ -4703,11 +5209,13 @@
     만일 "시스템" 역할이 "setup" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-before" 행동을 수행한다
     만일 "reader" 역할이 "access-before" 행동을 수행한다
     만일 "delegator" 역할이 "target-before" 행동을 수행한다
     만일 "reader" 역할이 "attempt" 행동을 수행한다
     만일 "delegator" 역할이 "after-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "after" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-after" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-target" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-after-snapshot" 행동을 수행한다
@@ -4740,6 +5248,8 @@
     그러면 "current-read-actions" assertion으로 "read-audit-permitted current-read-actions"를 확인한다
     그러면 "authorized-committed-once" assertion으로 "read-audit-permitted authorized-committed-once"를 확인한다
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
+    그러면 "unchanged-effect-goalVersions" assertion으로 "work-effects unchanged-effect-goalVersions"를 확인한다
+    그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 mcp/resumeWork 업무 효과0
@@ -4747,11 +5257,13 @@
     만일 "시스템" 역할이 "setup" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-before" 행동을 수행한다
     만일 "reader" 역할이 "access-before" 행동을 수행한다
     만일 "delegator" 역할이 "target-before" 행동을 수행한다
     만일 "reader" 역할이 "attempt" 행동을 수행한다
     만일 "delegator" 역할이 "after-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "after" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-after" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-target" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-after-snapshot" 행동을 수행한다
@@ -4784,6 +5296,8 @@
     그러면 "current-read-actions" assertion으로 "read-audit-permitted current-read-actions"를 확인한다
     그러면 "authorized-committed-once" assertion으로 "read-audit-permitted authorized-committed-once"를 확인한다
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
+    그러면 "unchanged-effect-goalVersions" assertion으로 "work-effects unchanged-effect-goalVersions"를 확인한다
+    그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 mcp/reviseGoal 업무 효과0
@@ -4791,11 +5305,13 @@
     만일 "시스템" 역할이 "setup" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-before" 행동을 수행한다
     만일 "reader" 역할이 "access-before" 행동을 수행한다
     만일 "delegator" 역할이 "target-before" 행동을 수행한다
     만일 "reader" 역할이 "attempt" 행동을 수행한다
     만일 "delegator" 역할이 "after-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "after" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-after" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-target" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-after-snapshot" 행동을 수행한다
@@ -4828,6 +5344,8 @@
     그러면 "current-read-actions" assertion으로 "read-audit-permitted current-read-actions"를 확인한다
     그러면 "authorized-committed-once" assertion으로 "read-audit-permitted authorized-committed-once"를 확인한다
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
+    그러면 "unchanged-effect-goalVersions" assertion으로 "work-effects unchanged-effect-goalVersions"를 확인한다
+    그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 mcp/closeWork 업무 효과0
@@ -4835,11 +5353,13 @@
     만일 "시스템" 역할이 "setup" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-before" 행동을 수행한다
     만일 "reader" 역할이 "access-before" 행동을 수행한다
     만일 "delegator" 역할이 "target-before" 행동을 수행한다
     만일 "reader" 역할이 "attempt" 행동을 수행한다
     만일 "delegator" 역할이 "after-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "after" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-after" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-target" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-after-snapshot" 행동을 수행한다
@@ -4872,6 +5392,8 @@
     그러면 "current-read-actions" assertion으로 "read-audit-permitted current-read-actions"를 확인한다
     그러면 "authorized-committed-once" assertion으로 "read-audit-permitted authorized-committed-once"를 확인한다
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
+    그러면 "unchanged-effect-workClosures" assertion으로 "work-effects unchanged-effect-workClosures"를 확인한다
+    그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 mcp/createFollowup 업무 효과0
@@ -4879,11 +5401,13 @@
     만일 "시스템" 역할이 "setup" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-before" 행동을 수행한다
     만일 "reader" 역할이 "access-before" 행동을 수행한다
     만일 "delegator" 역할이 "target-before" 행동을 수행한다
     만일 "reader" 역할이 "attempt" 행동을 수행한다
     만일 "delegator" 역할이 "after-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "after" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-after" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-target" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-after-snapshot" 행동을 수행한다
@@ -4916,6 +5440,8 @@
     그러면 "current-read-actions" assertion으로 "read-audit-permitted current-read-actions"를 확인한다
     그러면 "authorized-committed-once" assertion으로 "read-audit-permitted authorized-committed-once"를 확인한다
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
+    그러면 "unchanged-effect-workLinks" assertion으로 "work-effects unchanged-effect-workLinks"를 확인한다
+    그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 mcp/resolveObligation 업무 효과0
@@ -4923,11 +5449,13 @@
     만일 "시스템" 역할이 "setup" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-before" 행동을 수행한다
     만일 "reader" 역할이 "access-before" 행동을 수행한다
     만일 "delegator" 역할이 "target-before" 행동을 수행한다
     만일 "reader" 역할이 "attempt" 행동을 수행한다
     만일 "delegator" 역할이 "after-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "after" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-after" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-target" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-after-snapshot" 행동을 수행한다
@@ -4960,6 +5488,9 @@
     그러면 "current-read-actions" assertion으로 "read-audit-permitted current-read-actions"를 확인한다
     그러면 "authorized-committed-once" assertion으로 "read-audit-permitted authorized-committed-once"를 확인한다
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
+    그러면 "unchanged-effect-obligationResolutions" assertion으로 "work-effects unchanged-effect-obligationResolutions"를 확인한다
+    그러면 "unchanged-effect-dutyTransitions" assertion으로 "work-effects unchanged-effect-dutyTransitions"를 확인한다
+    그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 mcp/waiveObligation 업무 효과0
@@ -4967,11 +5498,13 @@
     만일 "시스템" 역할이 "setup" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-before" 행동을 수행한다
     만일 "reader" 역할이 "access-before" 행동을 수행한다
     만일 "delegator" 역할이 "target-before" 행동을 수행한다
     만일 "reader" 역할이 "attempt" 행동을 수행한다
     만일 "delegator" 역할이 "after-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "after" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-after" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-target" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-after-snapshot" 행동을 수행한다
@@ -5004,6 +5537,9 @@
     그러면 "current-read-actions" assertion으로 "read-audit-permitted current-read-actions"를 확인한다
     그러면 "authorized-committed-once" assertion으로 "read-audit-permitted authorized-committed-once"를 확인한다
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
+    그러면 "unchanged-effect-obligationResolutions" assertion으로 "work-effects unchanged-effect-obligationResolutions"를 확인한다
+    그러면 "unchanged-effect-dutyTransitions" assertion으로 "work-effects unchanged-effect-dutyTransitions"를 확인한다
+    그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 mcp/transferObligation 업무 효과0
@@ -5011,11 +5547,13 @@
     만일 "시스템" 역할이 "setup" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-before" 행동을 수행한다
     만일 "reader" 역할이 "access-before" 행동을 수행한다
     만일 "delegator" 역할이 "target-before" 행동을 수행한다
     만일 "reader" 역할이 "attempt" 행동을 수행한다
     만일 "delegator" 역할이 "after-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "after" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-after" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-target" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-after-snapshot" 행동을 수행한다
@@ -5048,22 +5586,28 @@
     그러면 "current-read-actions" assertion으로 "read-audit-permitted current-read-actions"를 확인한다
     그러면 "authorized-committed-once" assertion으로 "read-audit-permitted authorized-committed-once"를 확인한다
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
-    그러면 "precondition-recipient-acceptance" assertion으로 "read-audit-permitted precondition-recipient-acceptance"를 확인한다
-    그러면 "precondition-recipient-binding" assertion으로 "read-audit-permitted precondition-recipient-binding"를 확인한다
-    그러면 "authorized-business-transfer-once" assertion으로 "read-audit-permitted authorized-business-transfer-once"를 확인한다
-    그러면 "precondition-denial-unchanged-recipientAcceptances" assertion으로 "read-audit-permitted precondition-denial-unchanged-recipientAcceptances"를 확인한다
-    그러면 "precondition-denial-unchanged-obligationTransfers" assertion으로 "read-audit-permitted precondition-denial-unchanged-obligationTransfers"를 확인한다
+    그러면 "precondition-recipient-acceptance" assertion으로 "work-effects precondition-recipient-acceptance"를 확인한다
+    그러면 "precondition-recipient-binding" assertion으로 "work-effects precondition-recipient-binding"를 확인한다
+    그러면 "authorized-business-transfer-once" assertion으로 "work-effects authorized-business-transfer-once"를 확인한다
+    그러면 "precondition-denial-unchanged-recipientAcceptances" assertion으로 "work-effects precondition-denial-unchanged-recipientAcceptances"를 확인한다
+    그러면 "precondition-denial-unchanged-obligationTransfers" assertion으로 "work-effects precondition-denial-unchanged-obligationTransfers"를 확인한다
+    그러면 "unchanged-effect-obligationTransfers" assertion으로 "work-effects unchanged-effect-obligationTransfers"를 확인한다
+    그러면 "unchanged-effect-dutyTransitions" assertion으로 "work-effects unchanged-effect-dutyTransitions"를 확인한다
+    그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
 
+  @sit
   시나리오: WRITE 역할·READ 위임에서 mcp/registerItem 업무 효과0
     먼저 사례 파일 "verification/cases/C3/case.json"의 "mcp-registerItem"를 준비한다
     만일 "시스템" 역할이 "setup" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-before" 행동을 수행한다
     만일 "reader" 역할이 "access-before" 행동을 수행한다
     만일 "delegator" 역할이 "target-before" 행동을 수행한다
     만일 "reader" 역할이 "attempt" 행동을 수행한다
     만일 "delegator" 역할이 "after-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "after" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-after" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-target" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-after-snapshot" 행동을 수행한다
@@ -5096,6 +5640,10 @@
     그러면 "current-read-actions" assertion으로 "read-audit-permitted current-read-actions"를 확인한다
     그러면 "authorized-committed-once" assertion으로 "read-audit-permitted authorized-committed-once"를 확인한다
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
+    그러면 "unchanged-effect-items" assertion으로 "inventory-effects unchanged-effect-items"를 확인한다
+    그러면 "unchanged-effect-externalIdentifiers" assertion으로 "inventory-effects unchanged-effect-externalIdentifiers"를 확인한다
+    그러면 "unchanged-effect-unitConversions" assertion으로 "inventory-effects unchanged-effect-unitConversions"를 확인한다
+    그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 mcp/linkExternalId 업무 효과0
@@ -5103,11 +5651,13 @@
     만일 "시스템" 역할이 "setup" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-before" 행동을 수행한다
     만일 "reader" 역할이 "access-before" 행동을 수행한다
     만일 "delegator" 역할이 "target-before" 행동을 수행한다
     만일 "reader" 역할이 "attempt" 행동을 수행한다
     만일 "delegator" 역할이 "after-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "after" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-after" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-target" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-after-snapshot" 행동을 수행한다
@@ -5140,6 +5690,8 @@
     그러면 "current-read-actions" assertion으로 "read-audit-permitted current-read-actions"를 확인한다
     그러면 "authorized-committed-once" assertion으로 "read-audit-permitted authorized-committed-once"를 확인한다
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
+    그러면 "unchanged-effect-externalIdentifiers" assertion으로 "inventory-effects unchanged-effect-externalIdentifiers"를 확인한다
+    그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 mcp/attachEvidence 업무 효과0
@@ -5147,11 +5699,13 @@
     만일 "시스템" 역할이 "setup" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-before" 행동을 수행한다
     만일 "reader" 역할이 "access-before" 행동을 수행한다
     만일 "delegator" 역할이 "target-before" 행동을 수행한다
     만일 "reader" 역할이 "attempt" 행동을 수행한다
     만일 "delegator" 역할이 "after-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "after" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-after" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-target" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-after-snapshot" 행동을 수행한다
@@ -5184,6 +5738,10 @@
     그러면 "current-read-actions" assertion으로 "read-audit-permitted current-read-actions"를 확인한다
     그러면 "authorized-committed-once" assertion으로 "read-audit-permitted authorized-committed-once"를 확인한다
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
+    그러면 "unchanged-effect-documents" assertion으로 "followup-effects unchanged-effect-documents"를 확인한다
+    그러면 "unchanged-effect-evidenceLinks" assertion으로 "followup-effects unchanged-effect-evidenceLinks"를 확인한다
+    그러면 "unchanged-effect-events" assertion으로 "followup-effects unchanged-effect-events"를 확인한다
+    그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 mcp/correctEvidence 업무 효과0
@@ -5191,11 +5749,13 @@
     만일 "시스템" 역할이 "setup" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-before" 행동을 수행한다
     만일 "reader" 역할이 "access-before" 행동을 수행한다
     만일 "delegator" 역할이 "target-before" 행동을 수행한다
     만일 "reader" 역할이 "attempt" 행동을 수행한다
     만일 "delegator" 역할이 "after-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "after" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-after" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-target" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-after-snapshot" 행동을 수행한다
@@ -5228,6 +5788,11 @@
     그러면 "current-read-actions" assertion으로 "read-audit-permitted current-read-actions"를 확인한다
     그러면 "authorized-committed-once" assertion으로 "read-audit-permitted authorized-committed-once"를 확인한다
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
+    그러면 "unchanged-effect-documents" assertion으로 "followup-effects unchanged-effect-documents"를 확인한다
+    그러면 "unchanged-effect-evidenceLinks" assertion으로 "followup-effects unchanged-effect-evidenceLinks"를 확인한다
+    그러면 "unchanged-effect-events" assertion으로 "followup-effects unchanged-effect-events"를 확인한다
+    그러면 "unchanged-effect-evidence_revisions" assertion으로 "followup-effects unchanged-effect-evidence_revisions"를 확인한다
+    그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 mcp/proposePurchase 업무 효과0
@@ -5235,11 +5800,13 @@
     만일 "시스템" 역할이 "setup" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-before" 행동을 수행한다
     만일 "reader" 역할이 "access-before" 행동을 수행한다
     만일 "delegator" 역할이 "target-before" 행동을 수행한다
     만일 "reader" 역할이 "attempt" 행동을 수행한다
     만일 "delegator" 역할이 "after-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "after" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-after" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-target" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-after-snapshot" 행동을 수행한다
@@ -5272,6 +5839,9 @@
     그러면 "current-read-actions" assertion으로 "read-audit-permitted current-read-actions"를 확인한다
     그러면 "authorized-committed-once" assertion으로 "read-audit-permitted authorized-committed-once"를 확인한다
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
+    그러면 "unchanged-effect-proposals" assertion으로 "followup-effects unchanged-effect-proposals"를 확인한다
+    그러면 "unchanged-effect-purchaseRevisions" assertion으로 "followup-effects unchanged-effect-purchaseRevisions"를 확인한다
+    그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 mcp/revisePurchase 업무 효과0
@@ -5279,11 +5849,13 @@
     만일 "시스템" 역할이 "setup" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-before" 행동을 수행한다
     만일 "reader" 역할이 "access-before" 행동을 수행한다
     만일 "delegator" 역할이 "target-before" 행동을 수행한다
     만일 "reader" 역할이 "attempt" 행동을 수행한다
     만일 "delegator" 역할이 "after-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "after" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-after" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-target" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-after-snapshot" 행동을 수행한다
@@ -5316,6 +5888,9 @@
     그러면 "current-read-actions" assertion으로 "read-audit-permitted current-read-actions"를 확인한다
     그러면 "authorized-committed-once" assertion으로 "read-audit-permitted authorized-committed-once"를 확인한다
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
+    그러면 "unchanged-effect-proposals" assertion으로 "followup-effects unchanged-effect-proposals"를 확인한다
+    그러면 "unchanged-effect-purchaseRevisions" assertion으로 "followup-effects unchanged-effect-purchaseRevisions"를 확인한다
+    그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 mcp/approvePurchase 업무 효과0
@@ -5323,11 +5898,13 @@
     만일 "시스템" 역할이 "setup" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-before" 행동을 수행한다
     만일 "reader" 역할이 "access-before" 행동을 수행한다
     만일 "delegator" 역할이 "target-before" 행동을 수행한다
     만일 "reader" 역할이 "attempt" 행동을 수행한다
     만일 "delegator" 역할이 "after-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "after" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-after" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-target" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-after-snapshot" 행동을 수행한다
@@ -5360,6 +5937,8 @@
     그러면 "current-read-actions" assertion으로 "read-audit-permitted current-read-actions"를 확인한다
     그러면 "authorized-committed-once" assertion으로 "read-audit-permitted authorized-committed-once"를 확인한다
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
+    그러면 "unchanged-effect-proposals" assertion으로 "followup-effects unchanged-effect-proposals"를 확인한다
+    그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 mcp/dispatchPurchaseOrder 업무 효과0
@@ -5369,11 +5948,13 @@
     만일 "manager" 역할이 "precondition-approval" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-before" 행동을 수행한다
     만일 "reader" 역할이 "access-before" 행동을 수행한다
     만일 "delegator" 역할이 "target-before" 행동을 수행한다
     만일 "reader" 역할이 "attempt" 행동을 수행한다
     만일 "delegator" 역할이 "after-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "after" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-after" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-target" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-after-snapshot" 행동을 수행한다
@@ -5406,20 +5987,26 @@
     그러면 "current-read-actions" assertion으로 "read-audit-permitted current-read-actions"를 확인한다
     그러면 "authorized-committed-once" assertion으로 "read-audit-permitted authorized-committed-once"를 확인한다
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
-    그러면 "precondition-approved" assertion으로 "read-audit-permitted precondition-approved"를 확인한다
-    그러면 "precondition-approval-record" assertion으로 "read-audit-permitted precondition-approval-record"를 확인한다
-    그러면 "authorized-business-outbox-once" assertion으로 "read-audit-permitted authorized-business-outbox-once"를 확인한다
+    그러면 "precondition-approved" assertion으로 "approval-effects precondition-approved"를 확인한다
+    그러면 "precondition-approval-record" assertion으로 "approval-effects precondition-approval-record"를 확인한다
+    그러면 "authorized-business-outbox-once" assertion으로 "external-outbox-effects authorized-business-outbox-once"를 확인한다
+    그러면 "unchanged-effect-purchaseOrders" assertion으로 "external-outbox-effects unchanged-effect-purchaseOrders"를 확인한다
+    그러면 "unchanged-effect-proposals" assertion으로 "followup-effects unchanged-effect-proposals"를 확인한다
+    그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
 
+  @sit
   시나리오: WRITE 역할·READ 위임에서 mcp/recordSupplierReply 업무 효과0
     먼저 사례 파일 "verification/cases/C3/case.json"의 "mcp-recordSupplierReply"를 준비한다
     만일 "시스템" 역할이 "setup" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-before" 행동을 수행한다
     만일 "reader" 역할이 "access-before" 행동을 수행한다
     만일 "delegator" 역할이 "target-before" 행동을 수행한다
     만일 "reader" 역할이 "attempt" 행동을 수행한다
     만일 "delegator" 역할이 "after-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "after" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-after" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-target" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-after-snapshot" 행동을 수행한다
@@ -5452,6 +6039,8 @@
     그러면 "current-read-actions" assertion으로 "read-audit-permitted current-read-actions"를 확인한다
     그러면 "authorized-committed-once" assertion으로 "read-audit-permitted authorized-committed-once"를 확인한다
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
+    그러면 "unchanged-effect-supplierCommitments" assertion으로 "followup-effects unchanged-effect-supplierCommitments"를 확인한다
+    그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 mcp/cancelPurchase 업무 효과0
@@ -5459,11 +6048,13 @@
     만일 "시스템" 역할이 "setup" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-before" 행동을 수행한다
     만일 "reader" 역할이 "access-before" 행동을 수행한다
     만일 "delegator" 역할이 "target-before" 행동을 수행한다
     만일 "reader" 역할이 "attempt" 행동을 수행한다
     만일 "delegator" 역할이 "after-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "after" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-after" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-target" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-after-snapshot" 행동을 수행한다
@@ -5496,6 +6087,9 @@
     그러면 "current-read-actions" assertion으로 "read-audit-permitted current-read-actions"를 확인한다
     그러면 "authorized-committed-once" assertion으로 "read-audit-permitted authorized-committed-once"를 확인한다
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
+    그러면 "unchanged-effect-cancellationRequests" assertion으로 "followup-effects unchanged-effect-cancellationRequests"를 확인한다
+    그러면 "unchanged-effect-purchaseOrders" assertion으로 "external-outbox-effects unchanged-effect-purchaseOrders"를 확인한다
+    그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 mcp/createShipment 업무 효과0
@@ -5503,11 +6097,13 @@
     만일 "시스템" 역할이 "setup" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-before" 행동을 수행한다
     만일 "reader" 역할이 "access-before" 행동을 수행한다
     만일 "delegator" 역할이 "target-before" 행동을 수행한다
     만일 "reader" 역할이 "attempt" 행동을 수행한다
     만일 "delegator" 역할이 "after-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "after" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-after" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-target" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-after-snapshot" 행동을 수행한다
@@ -5540,6 +6136,10 @@
     그러면 "current-read-actions" assertion으로 "read-audit-permitted current-read-actions"를 확인한다
     그러면 "authorized-committed-once" assertion으로 "read-audit-permitted authorized-committed-once"를 확인한다
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
+    그러면 "unchanged-effect-shipments" assertion으로 "followup-effects unchanged-effect-shipments"를 확인한다
+    그러면 "unchanged-effect-cargoAllocations" assertion으로 "followup-effects unchanged-effect-cargoAllocations"를 확인한다
+    그러면 "unchanged-effect-legs" assertion으로 "followup-effects unchanged-effect-legs"를 확인한다
+    그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 mcp/recordLegEvent 업무 효과0
@@ -5547,11 +6147,13 @@
     만일 "시스템" 역할이 "setup" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-before" 행동을 수행한다
     만일 "reader" 역할이 "access-before" 행동을 수행한다
     만일 "delegator" 역할이 "target-before" 행동을 수행한다
     만일 "reader" 역할이 "attempt" 행동을 수행한다
     만일 "delegator" 역할이 "after-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "after" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-after" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-target" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-after-snapshot" 행동을 수행한다
@@ -5584,6 +6186,9 @@
     그러면 "current-read-actions" assertion으로 "read-audit-permitted current-read-actions"를 확인한다
     그러면 "authorized-committed-once" assertion으로 "read-audit-permitted authorized-committed-once"를 확인한다
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
+    그러면 "unchanged-effect-legs" assertion으로 "followup-effects unchanged-effect-legs"를 확인한다
+    그러면 "unchanged-effect-events" assertion으로 "followup-effects unchanged-effect-events"를 확인한다
+    그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 mcp/recordHandover 업무 효과0
@@ -5591,11 +6196,13 @@
     만일 "시스템" 역할이 "setup" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-before" 행동을 수행한다
     만일 "reader" 역할이 "access-before" 행동을 수행한다
     만일 "delegator" 역할이 "target-before" 행동을 수행한다
     만일 "reader" 역할이 "attempt" 행동을 수행한다
     만일 "delegator" 역할이 "after-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "after" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-after" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-target" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-after-snapshot" 행동을 수행한다
@@ -5628,6 +6235,9 @@
     그러면 "current-read-actions" assertion으로 "read-audit-permitted current-read-actions"를 확인한다
     그러면 "authorized-committed-once" assertion으로 "read-audit-permitted authorized-committed-once"를 확인한다
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
+    그러면 "unchanged-effect-custodyHandovers" assertion으로 "inventory-effects unchanged-effect-custodyHandovers"를 확인한다
+    그러면 "unchanged-effect-events" assertion으로 "followup-effects unchanged-effect-events"를 확인한다
+    그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 mcp/prepareRegulatoryProcedure 업무 효과0
@@ -5635,11 +6245,13 @@
     만일 "시스템" 역할이 "setup" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-before" 행동을 수행한다
     만일 "reader" 역할이 "access-before" 행동을 수행한다
     만일 "delegator" 역할이 "target-before" 행동을 수행한다
     만일 "reader" 역할이 "attempt" 행동을 수행한다
     만일 "delegator" 역할이 "after-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "after" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-after" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-target" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-after-snapshot" 행동을 수행한다
@@ -5672,6 +6284,8 @@
     그러면 "current-read-actions" assertion으로 "read-audit-permitted current-read-actions"를 확인한다
     그러면 "authorized-committed-once" assertion으로 "read-audit-permitted authorized-committed-once"를 확인한다
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
+    그러면 "unchanged-effect-procedures" assertion으로 "followup-effects unchanged-effect-procedures"를 확인한다
+    그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 mcp/recordSubmission 업무 효과0
@@ -5679,11 +6293,13 @@
     만일 "시스템" 역할이 "setup" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-before" 행동을 수행한다
     만일 "reader" 역할이 "access-before" 행동을 수행한다
     만일 "delegator" 역할이 "target-before" 행동을 수행한다
     만일 "reader" 역할이 "attempt" 행동을 수행한다
     만일 "delegator" 역할이 "after-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "after" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-after" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-target" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-after-snapshot" 행동을 수행한다
@@ -5716,6 +6332,8 @@
     그러면 "current-read-actions" assertion으로 "read-audit-permitted current-read-actions"를 확인한다
     그러면 "authorized-committed-once" assertion으로 "read-audit-permitted authorized-committed-once"를 확인한다
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
+    그러면 "unchanged-effect-submissions" assertion으로 "followup-effects unchanged-effect-submissions"를 확인한다
+    그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 mcp/recordRegulatoryDecision 업무 효과0
@@ -5723,11 +6341,13 @@
     만일 "시스템" 역할이 "setup" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-before" 행동을 수행한다
     만일 "reader" 역할이 "access-before" 행동을 수행한다
     만일 "delegator" 역할이 "target-before" 행동을 수행한다
     만일 "reader" 역할이 "attempt" 행동을 수행한다
     만일 "delegator" 역할이 "after-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "after" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-after" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-target" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-after-snapshot" 행동을 수행한다
@@ -5760,6 +6380,9 @@
     그러면 "current-read-actions" assertion으로 "read-audit-permitted current-read-actions"를 확인한다
     그러면 "authorized-committed-once" assertion으로 "read-audit-permitted authorized-committed-once"를 확인한다
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
+    그러면 "unchanged-effect-regulatoryDecisions" assertion으로 "followup-effects unchanged-effect-regulatoryDecisions"를 확인한다
+    그러면 "unchanged-effect-restrictions" assertion으로 "inventory-effects unchanged-effect-restrictions"를 확인한다
+    그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 mcp/verifyLabel 업무 효과0
@@ -5767,11 +6390,13 @@
     만일 "시스템" 역할이 "setup" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-before" 행동을 수행한다
     만일 "reader" 역할이 "access-before" 행동을 수행한다
     만일 "delegator" 역할이 "target-before" 행동을 수행한다
     만일 "reader" 역할이 "attempt" 행동을 수행한다
     만일 "delegator" 역할이 "after-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "after" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-after" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-target" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-after-snapshot" 행동을 수행한다
@@ -5804,6 +6429,8 @@
     그러면 "current-read-actions" assertion으로 "read-audit-permitted current-read-actions"를 확인한다
     그러면 "authorized-committed-once" assertion으로 "read-audit-permitted authorized-committed-once"를 확인한다
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
+    그러면 "unchanged-effect-labels" assertion으로 "inventory-effects unchanged-effect-labels"를 확인한다
+    그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 mcp/receiveProvisional 업무 효과0
@@ -5811,11 +6438,13 @@
     만일 "시스템" 역할이 "setup" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-before" 행동을 수행한다
     만일 "reader" 역할이 "access-before" 행동을 수행한다
     만일 "delegator" 역할이 "target-before" 행동을 수행한다
     만일 "reader" 역할이 "attempt" 행동을 수행한다
     만일 "delegator" 역할이 "after-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "after" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-after" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-target" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-after-snapshot" 행동을 수행한다
@@ -5848,6 +6477,9 @@
     그러면 "current-read-actions" assertion으로 "read-audit-permitted current-read-actions"를 확인한다
     그러면 "authorized-committed-once" assertion으로 "read-audit-permitted authorized-committed-once"를 확인한다
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
+    그러면 "unchanged-effect-receipts" assertion으로 "inventory-effects unchanged-effect-receipts"를 확인한다
+    그러면 "unchanged-effect-events" assertion으로 "followup-effects unchanged-effect-events"를 확인한다
+    그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 mcp/placeHold 업무 효과0
@@ -5855,11 +6487,13 @@
     만일 "시스템" 역할이 "setup" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-before" 행동을 수행한다
     만일 "reader" 역할이 "access-before" 행동을 수행한다
     만일 "delegator" 역할이 "target-before" 행동을 수행한다
     만일 "reader" 역할이 "attempt" 행동을 수행한다
     만일 "delegator" 역할이 "after-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "after" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-after" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-target" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-after-snapshot" 행동을 수행한다
@@ -5892,6 +6526,8 @@
     그러면 "current-read-actions" assertion으로 "read-audit-permitted current-read-actions"를 확인한다
     그러면 "authorized-committed-once" assertion으로 "read-audit-permitted authorized-committed-once"를 확인한다
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
+    그러면 "unchanged-effect-restrictions" assertion으로 "inventory-effects unchanged-effect-restrictions"를 확인한다
+    그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 mcp/releaseHold 업무 효과0
@@ -5899,11 +6535,13 @@
     만일 "시스템" 역할이 "setup" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-before" 행동을 수행한다
     만일 "reader" 역할이 "access-before" 행동을 수행한다
     만일 "delegator" 역할이 "target-before" 행동을 수행한다
     만일 "reader" 역할이 "attempt" 행동을 수행한다
     만일 "delegator" 역할이 "after-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "after" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-after" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-target" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-after-snapshot" 행동을 수행한다
@@ -5936,6 +6574,8 @@
     그러면 "current-read-actions" assertion으로 "read-audit-permitted current-read-actions"를 확인한다
     그러면 "authorized-committed-once" assertion으로 "read-audit-permitted authorized-committed-once"를 확인한다
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
+    그러면 "unchanged-effect-restrictions" assertion으로 "inventory-effects unchanged-effect-restrictions"를 확인한다
+    그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 mcp/recordDispositionBasis 업무 효과0
@@ -5943,11 +6583,13 @@
     만일 "시스템" 역할이 "setup" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-before" 행동을 수행한다
     만일 "reader" 역할이 "access-before" 행동을 수행한다
     만일 "delegator" 역할이 "target-before" 행동을 수행한다
     만일 "reader" 역할이 "attempt" 행동을 수행한다
     만일 "delegator" 역할이 "after-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "after" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-after" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-target" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-after-snapshot" 행동을 수행한다
@@ -5980,6 +6622,8 @@
     그러면 "current-read-actions" assertion으로 "read-audit-permitted current-read-actions"를 확인한다
     그러면 "authorized-committed-once" assertion으로 "read-audit-permitted authorized-committed-once"를 확인한다
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
+    그러면 "unchanged-effect-dispositionBases" assertion으로 "inventory-effects unchanged-effect-dispositionBases"를 확인한다
+    그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 mcp/revokeDispositionBasis 업무 효과0
@@ -5987,11 +6631,13 @@
     만일 "시스템" 역할이 "setup" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-before" 행동을 수행한다
     만일 "reader" 역할이 "access-before" 행동을 수행한다
     만일 "delegator" 역할이 "target-before" 행동을 수행한다
     만일 "reader" 역할이 "attempt" 행동을 수행한다
     만일 "delegator" 역할이 "after-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "after" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-after" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-target" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-after-snapshot" 행동을 수행한다
@@ -6024,6 +6670,8 @@
     그러면 "current-read-actions" assertion으로 "read-audit-permitted current-read-actions"를 확인한다
     그러면 "authorized-committed-once" assertion으로 "read-audit-permitted authorized-committed-once"를 확인한다
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
+    그러면 "unchanged-effect-dispositionBases" assertion으로 "inventory-effects unchanged-effect-dispositionBases"를 확인한다
+    그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 mcp/recordStocktake 업무 효과0
@@ -6031,11 +6679,13 @@
     만일 "시스템" 역할이 "setup" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-before" 행동을 수행한다
     만일 "reader" 역할이 "access-before" 행동을 수행한다
     만일 "delegator" 역할이 "target-before" 행동을 수행한다
     만일 "reader" 역할이 "attempt" 행동을 수행한다
     만일 "delegator" 역할이 "after-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "after" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-after" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-target" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-after-snapshot" 행동을 수행한다
@@ -6068,6 +6718,8 @@
     그러면 "current-read-actions" assertion으로 "read-audit-permitted current-read-actions"를 확인한다
     그러면 "authorized-committed-once" assertion으로 "read-audit-permitted authorized-committed-once"를 확인한다
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
+    그러면 "unchanged-effect-stocktakes" assertion으로 "inventory-effects unchanged-effect-stocktakes"를 확인한다
+    그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 mcp/createSalesOrder 업무 효과0
@@ -6075,11 +6727,13 @@
     만일 "시스템" 역할이 "setup" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-before" 행동을 수행한다
     만일 "reader" 역할이 "access-before" 행동을 수행한다
     만일 "delegator" 역할이 "target-before" 행동을 수행한다
     만일 "reader" 역할이 "attempt" 행동을 수행한다
     만일 "delegator" 역할이 "after-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "after" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-after" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-target" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-after-snapshot" 행동을 수행한다
@@ -6112,6 +6766,8 @@
     그러면 "current-read-actions" assertion으로 "read-audit-permitted current-read-actions"를 확인한다
     그러면 "authorized-committed-once" assertion으로 "read-audit-permitted authorized-committed-once"를 확인한다
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
+    그러면 "unchanged-effect-orders" assertion으로 "followup-effects unchanged-effect-orders"를 확인한다
+    그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 mcp/reviseSalesOrder 업무 효과0
@@ -6119,11 +6775,13 @@
     만일 "시스템" 역할이 "setup" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-before" 행동을 수행한다
     만일 "reader" 역할이 "access-before" 행동을 수행한다
     만일 "delegator" 역할이 "target-before" 행동을 수행한다
     만일 "reader" 역할이 "attempt" 행동을 수행한다
     만일 "delegator" 역할이 "after-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "after" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-after" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-target" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-after-snapshot" 행동을 수행한다
@@ -6156,6 +6814,8 @@
     그러면 "current-read-actions" assertion으로 "read-audit-permitted current-read-actions"를 확인한다
     그러면 "authorized-committed-once" assertion으로 "read-audit-permitted authorized-committed-once"를 확인한다
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
+    그러면 "unchanged-effect-orders" assertion으로 "followup-effects unchanged-effect-orders"를 확인한다
+    그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 mcp/releaseAllocation 업무 효과0
@@ -6163,11 +6823,13 @@
     만일 "시스템" 역할이 "setup" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-before" 행동을 수행한다
     만일 "reader" 역할이 "access-before" 행동을 수행한다
     만일 "delegator" 역할이 "target-before" 행동을 수행한다
     만일 "reader" 역할이 "attempt" 행동을 수행한다
     만일 "delegator" 역할이 "after-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "after" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-after" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-target" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-after-snapshot" 행동을 수행한다
@@ -6200,6 +6862,8 @@
     그러면 "current-read-actions" assertion으로 "read-audit-permitted current-read-actions"를 확인한다
     그러면 "authorized-committed-once" assertion으로 "read-audit-permitted authorized-committed-once"를 확인한다
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
+    그러면 "unchanged-effect-orders" assertion으로 "followup-effects unchanged-effect-orders"를 확인한다
+    그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 mcp/recordDelivery 업무 효과0
@@ -6207,11 +6871,13 @@
     만일 "시스템" 역할이 "setup" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-before" 행동을 수행한다
     만일 "reader" 역할이 "access-before" 행동을 수행한다
     만일 "delegator" 역할이 "target-before" 행동을 수행한다
     만일 "reader" 역할이 "attempt" 행동을 수행한다
     만일 "delegator" 역할이 "after-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "after" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-after" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-target" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-after-snapshot" 행동을 수행한다
@@ -6244,6 +6910,9 @@
     그러면 "current-read-actions" assertion으로 "read-audit-permitted current-read-actions"를 확인한다
     그러면 "authorized-committed-once" assertion으로 "read-audit-permitted authorized-committed-once"를 확인한다
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
+    그러면 "unchanged-effect-deliveries" assertion으로 "followup-effects unchanged-effect-deliveries"를 확인한다
+    그러면 "unchanged-effect-events" assertion으로 "followup-effects unchanged-effect-events"를 확인한다
+    그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 mcp/recordObservedMovement 업무 효과0
@@ -6251,11 +6920,13 @@
     만일 "시스템" 역할이 "setup" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-before" 행동을 수행한다
     만일 "reader" 역할이 "access-before" 행동을 수행한다
     만일 "delegator" 역할이 "target-before" 행동을 수행한다
     만일 "reader" 역할이 "attempt" 행동을 수행한다
     만일 "delegator" 역할이 "after-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "after" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-after" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-target" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-after-snapshot" 행동을 수행한다
@@ -6288,6 +6959,9 @@
     그러면 "current-read-actions" assertion으로 "read-audit-permitted current-read-actions"를 확인한다
     그러면 "authorized-committed-once" assertion으로 "read-audit-permitted authorized-committed-once"를 확인한다
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
+    그러면 "unchanged-effect-events" assertion으로 "followup-effects unchanged-effect-events"를 확인한다
+    그러면 "unchanged-effect-reconciliations" assertion으로 "followup-effects unchanged-effect-reconciliations"를 확인한다
+    그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 mcp/authorizeReturn 업무 효과0
@@ -6295,11 +6969,13 @@
     만일 "시스템" 역할이 "setup" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-before" 행동을 수행한다
     만일 "reader" 역할이 "access-before" 행동을 수행한다
     만일 "delegator" 역할이 "target-before" 행동을 수행한다
     만일 "reader" 역할이 "attempt" 행동을 수행한다
     만일 "delegator" 역할이 "after-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "after" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-after" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-target" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-after-snapshot" 행동을 수행한다
@@ -6332,6 +7008,8 @@
     그러면 "current-read-actions" assertion으로 "read-audit-permitted current-read-actions"를 확인한다
     그러면 "authorized-committed-once" assertion으로 "read-audit-permitted authorized-committed-once"를 확인한다
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
+    그러면 "unchanged-effect-returns" assertion으로 "inventory-effects unchanged-effect-returns"를 확인한다
+    그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 mcp/receiveReturn 업무 효과0
@@ -6339,11 +7017,13 @@
     만일 "시스템" 역할이 "setup" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-before" 행동을 수행한다
     만일 "reader" 역할이 "access-before" 행동을 수행한다
     만일 "delegator" 역할이 "target-before" 행동을 수행한다
     만일 "reader" 역할이 "attempt" 행동을 수행한다
     만일 "delegator" 역할이 "after-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "after" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-after" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-target" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-after-snapshot" 행동을 수행한다
@@ -6376,6 +7056,9 @@
     그러면 "current-read-actions" assertion으로 "read-audit-permitted current-read-actions"를 확인한다
     그러면 "authorized-committed-once" assertion으로 "read-audit-permitted authorized-committed-once"를 확인한다
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
+    그러면 "unchanged-effect-returns" assertion으로 "inventory-effects unchanged-effect-returns"를 확인한다
+    그러면 "unchanged-effect-restrictions" assertion으로 "inventory-effects unchanged-effect-restrictions"를 확인한다
+    그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 mcp/decideReturnDisposition 업무 효과0
@@ -6383,11 +7066,13 @@
     만일 "시스템" 역할이 "setup" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-before" 행동을 수행한다
     만일 "reader" 역할이 "access-before" 행동을 수행한다
     만일 "delegator" 역할이 "target-before" 행동을 수행한다
     만일 "reader" 역할이 "attempt" 행동을 수행한다
     만일 "delegator" 역할이 "after-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "after" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-after" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-target" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-after-snapshot" 행동을 수행한다
@@ -6420,6 +7105,9 @@
     그러면 "current-read-actions" assertion으로 "read-audit-permitted current-read-actions"를 확인한다
     그러면 "authorized-committed-once" assertion으로 "read-audit-permitted authorized-committed-once"를 확인한다
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
+    그러면 "unchanged-effect-returns" assertion으로 "inventory-effects unchanged-effect-returns"를 확인한다
+    그러면 "unchanged-effect-dispositions" assertion으로 "inventory-effects unchanged-effect-dispositions"를 확인한다
+    그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 mcp/openInvestigation 업무 효과0
@@ -6427,11 +7115,13 @@
     만일 "시스템" 역할이 "setup" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-before" 행동을 수행한다
     만일 "reader" 역할이 "access-before" 행동을 수행한다
     만일 "delegator" 역할이 "target-before" 행동을 수행한다
     만일 "reader" 역할이 "attempt" 행동을 수행한다
     만일 "delegator" 역할이 "after-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "after" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-after" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-target" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-after-snapshot" 행동을 수행한다
@@ -6464,6 +7154,9 @@
     그러면 "current-read-actions" assertion으로 "read-audit-permitted current-read-actions"를 확인한다
     그러면 "authorized-committed-once" assertion으로 "read-audit-permitted authorized-committed-once"를 확인한다
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
+    그러면 "unchanged-effect-investigations" assertion으로 "followup-effects unchanged-effect-investigations"를 확인한다
+    그러면 "unchanged-effect-restrictions" assertion으로 "inventory-effects unchanged-effect-restrictions"를 확인한다
+    그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 mcp/proposeRecall 업무 효과0
@@ -6471,11 +7164,13 @@
     만일 "시스템" 역할이 "setup" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-before" 행동을 수행한다
     만일 "reader" 역할이 "access-before" 행동을 수행한다
     만일 "delegator" 역할이 "target-before" 행동을 수행한다
     만일 "reader" 역할이 "attempt" 행동을 수행한다
     만일 "delegator" 역할이 "after-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "after" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-after" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-target" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-after-snapshot" 행동을 수행한다
@@ -6508,20 +7203,26 @@
     그러면 "current-read-actions" assertion으로 "read-audit-permitted current-read-actions"를 확인한다
     그러면 "authorized-committed-once" assertion으로 "read-audit-permitted authorized-committed-once"를 확인한다
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
+    그러면 "unchanged-effect-recallScopes" assertion으로 "followup-effects unchanged-effect-recallScopes"를 확인한다
+    그러면 "unchanged-effect-investigations" assertion으로 "followup-effects unchanged-effect-investigations"를 확인한다
+    그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 mcp/approveRecall 업무 효과0
     먼저 사례 파일 "verification/cases/C3/case.json"의 "mcp-approveRecall"를 준비한다
     만일 "시스템" 역할이 "setup" 행동을 수행한다
+    만일 "delegator" 역할이 "precondition-recall" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-before" 행동을 수행한다
     만일 "reader" 역할이 "access-before" 행동을 수행한다
     만일 "delegator" 역할이 "target-before" 행동을 수행한다
     만일 "reader" 역할이 "attempt" 행동을 수행한다
     만일 "delegator" 역할이 "after-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "after" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-after" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-target" 행동을 수행한다
-    만일 "delegator" 역할이 "authorized-same-input" 행동을 수행한다
+    만일 "admin" 역할이 "authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-after-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "authorized-after" 행동을 수행한다
     그러면 "attempt-code" assertion으로 "work-effects attempt-code"를 확인한다
@@ -6552,20 +7253,27 @@
     그러면 "current-read-actions" assertion으로 "read-audit-permitted current-read-actions"를 확인한다
     그러면 "authorized-committed-once" assertion으로 "read-audit-permitted authorized-committed-once"를 확인한다
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
+    그러면 "authorized-business-recall-approval" assertion으로 "approval-effects authorized-business-recall-approval"를 확인한다
+    그러면 "unchanged-effect-recallScopes" assertion으로 "followup-effects unchanged-effect-recallScopes"를 확인한다
+    그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 mcp/recordRecallNotice 업무 효과0
     먼저 사례 파일 "verification/cases/C3/case.json"의 "mcp-recordRecallNotice"를 준비한다
     만일 "시스템" 역할이 "setup" 행동을 수행한다
+    만일 "delegator" 역할이 "precondition-recall" 행동을 수행한다
+    만일 "admin" 역할이 "precondition-approval" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-before" 행동을 수행한다
     만일 "reader" 역할이 "access-before" 행동을 수행한다
     만일 "delegator" 역할이 "target-before" 행동을 수행한다
     만일 "reader" 역할이 "attempt" 행동을 수행한다
     만일 "delegator" 역할이 "after-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "after" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-after" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-target" 행동을 수행한다
-    만일 "delegator" 역할이 "authorized-same-input" 행동을 수행한다
+    만일 "admin" 역할이 "authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-after-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "authorized-after" 행동을 수행한다
     그러면 "attempt-code" assertion으로 "work-effects attempt-code"를 확인한다
@@ -6596,18 +7304,28 @@
     그러면 "current-read-actions" assertion으로 "read-audit-permitted current-read-actions"를 확인한다
     그러면 "authorized-committed-once" assertion으로 "read-audit-permitted authorized-committed-once"를 확인한다
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
+    그러면 "precondition-approval-applied" assertion으로 "approval-effects precondition-approval-applied"를 확인한다
+    그러면 "precondition-approval-record" assertion으로 "approval-effects precondition-approval-record"를 확인한다
+    그러면 "authorized-business-notice" assertion으로 "followup-effects authorized-business-notice"를 확인한다
+    그러면 "unchanged-effect-notices" assertion으로 "followup-effects unchanged-effect-notices"를 확인한다
+    그러면 "unchanged-effect-recallScopes" assertion으로 "followup-effects unchanged-effect-recallScopes"를 확인한다
+    그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 mcp/recordRecovery 업무 효과0
     먼저 사례 파일 "verification/cases/C3/case.json"의 "mcp-recordRecovery"를 준비한다
     만일 "시스템" 역할이 "setup" 행동을 수행한다
+    만일 "delegator" 역할이 "precondition-recall" 행동을 수행한다
+    만일 "admin" 역할이 "precondition-approval" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-before" 행동을 수행한다
     만일 "reader" 역할이 "access-before" 행동을 수행한다
     만일 "delegator" 역할이 "target-before" 행동을 수행한다
     만일 "reader" 역할이 "attempt" 행동을 수행한다
     만일 "delegator" 역할이 "after-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "after" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-after" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-target" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-after-snapshot" 행동을 수행한다
@@ -6640,20 +7358,33 @@
     그러면 "current-read-actions" assertion으로 "read-audit-permitted current-read-actions"를 확인한다
     그러면 "authorized-committed-once" assertion으로 "read-audit-permitted authorized-committed-once"를 확인한다
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
+    그러면 "precondition-approval-applied" assertion으로 "approval-effects precondition-approval-applied"를 확인한다
+    그러면 "precondition-approval-record" assertion으로 "approval-effects precondition-approval-record"를 확인한다
+    그러면 "authorized-business-recovery" assertion으로 "inventory-effects authorized-business-recovery"를 확인한다
+    그러면 "unchanged-effect-recoveries" assertion으로 "inventory-effects unchanged-effect-recoveries"를 확인한다
+    그러면 "unchanged-effect-recallScopes" assertion으로 "followup-effects unchanged-effect-recallScopes"를 확인한다
+    그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 mcp/closeRecall 업무 효과0
     먼저 사례 파일 "verification/cases/C3/case.json"의 "mcp-closeRecall"를 준비한다
     만일 "시스템" 역할이 "setup" 행동을 수행한다
+    만일 "delegator" 역할이 "precondition-recall" 행동을 수행한다
+    만일 "admin" 역할이 "precondition-approval" 행동을 수행한다
+    만일 "admin" 역할이 "precondition-notice" 행동을 수행한다
+    만일 "delegator" 역할이 "precondition-recovery" 행동을 수행한다
+    만일 "delegator" 역할이 "precondition-disposal" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-before" 행동을 수행한다
     만일 "reader" 역할이 "access-before" 행동을 수행한다
     만일 "delegator" 역할이 "target-before" 행동을 수행한다
     만일 "reader" 역할이 "attempt" 행동을 수행한다
     만일 "delegator" 역할이 "after-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "after" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-after" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-target" 행동을 수행한다
-    만일 "delegator" 역할이 "authorized-same-input" 행동을 수행한다
+    만일 "admin" 역할이 "authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-after-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "authorized-after" 행동을 수행한다
     그러면 "attempt-code" assertion으로 "work-effects attempt-code"를 확인한다
@@ -6684,6 +7415,16 @@
     그러면 "current-read-actions" assertion으로 "read-audit-permitted current-read-actions"를 확인한다
     그러면 "authorized-committed-once" assertion으로 "read-audit-permitted authorized-committed-once"를 확인한다
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
+    그러면 "precondition-approval-applied" assertion으로 "approval-effects precondition-approval-applied"를 확인한다
+    그러면 "precondition-approval-record" assertion으로 "approval-effects precondition-approval-record"를 확인한다
+    그러면 "precondition-notice-applied" assertion으로 "followup-effects precondition-notice-applied"를 확인한다
+    그러면 "precondition-recovery-applied" assertion으로 "followup-effects precondition-recovery-applied"를 확인한다
+    그러면 "precondition-disposal-applied" assertion으로 "followup-effects precondition-disposal-applied"를 확인한다
+    그러면 "precondition-not-closed" assertion으로 "followup-effects precondition-not-closed"를 확인한다
+    그러면 "authorized-business-recall-closure" assertion으로 "followup-effects authorized-business-recall-closure"를 확인한다
+    그러면 "unchanged-effect-recallScopes" assertion으로 "followup-effects unchanged-effect-recallScopes"를 확인한다
+    그러면 "unchanged-effect-recallClosures" assertion으로 "followup-effects unchanged-effect-recallClosures"를 확인한다
+    그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 mcp/recordInvoice 업무 효과0
@@ -6691,11 +7432,13 @@
     만일 "시스템" 역할이 "setup" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-before" 행동을 수행한다
     만일 "reader" 역할이 "access-before" 행동을 수행한다
     만일 "delegator" 역할이 "target-before" 행동을 수행한다
     만일 "reader" 역할이 "attempt" 행동을 수행한다
     만일 "delegator" 역할이 "after-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "after" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-after" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-target" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-after-snapshot" 행동을 수행한다
@@ -6728,6 +7471,8 @@
     그러면 "current-read-actions" assertion으로 "read-audit-permitted current-read-actions"를 확인한다
     그러면 "authorized-committed-once" assertion으로 "read-audit-permitted authorized-committed-once"를 확인한다
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
+    그러면 "unchanged-effect-invoices" assertion으로 "followup-effects unchanged-effect-invoices"를 확인한다
+    그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 mcp/recordCharge 업무 효과0
@@ -6735,11 +7480,13 @@
     만일 "시스템" 역할이 "setup" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-before" 행동을 수행한다
     만일 "reader" 역할이 "access-before" 행동을 수행한다
     만일 "delegator" 역할이 "target-before" 행동을 수행한다
     만일 "reader" 역할이 "attempt" 행동을 수행한다
     만일 "delegator" 역할이 "after-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "after" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-after" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-target" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-after-snapshot" 행동을 수행한다
@@ -6772,6 +7519,9 @@
     그러면 "current-read-actions" assertion으로 "read-audit-permitted current-read-actions"를 확인한다
     그러면 "authorized-committed-once" assertion으로 "read-audit-permitted authorized-committed-once"를 확인한다
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
+    그러면 "unchanged-effect-charges" assertion으로 "followup-effects unchanged-effect-charges"를 확인한다
+    그러면 "unchanged-effect-invoices" assertion으로 "followup-effects unchanged-effect-invoices"를 확인한다
+    그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 mcp/matchInvoice 업무 효과0
@@ -6779,11 +7529,13 @@
     만일 "시스템" 역할이 "setup" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-before" 행동을 수행한다
     만일 "reader" 역할이 "access-before" 행동을 수행한다
     만일 "delegator" 역할이 "target-before" 행동을 수행한다
     만일 "reader" 역할이 "attempt" 행동을 수행한다
     만일 "delegator" 역할이 "after-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "after" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-after" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-target" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-after-snapshot" 행동을 수행한다
@@ -6816,6 +7568,10 @@
     그러면 "current-read-actions" assertion으로 "read-audit-permitted current-read-actions"를 확인한다
     그러면 "authorized-committed-once" assertion으로 "read-audit-permitted authorized-committed-once"를 확인한다
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
+    그러면 "unchanged-effect-purchaseMatches" assertion으로 "followup-effects unchanged-effect-purchaseMatches"를 확인한다
+    그러면 "unchanged-effect-saleMatches" assertion으로 "followup-effects unchanged-effect-saleMatches"를 확인한다
+    그러면 "unchanged-effect-invoiceDifferences" assertion으로 "followup-effects unchanged-effect-invoiceDifferences"를 확인한다
+    그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 mcp/recordSettlementAdjustment 업무 효과0
@@ -6823,11 +7579,13 @@
     만일 "시스템" 역할이 "setup" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-before" 행동을 수행한다
     만일 "reader" 역할이 "access-before" 행동을 수행한다
     만일 "delegator" 역할이 "target-before" 행동을 수행한다
     만일 "reader" 역할이 "attempt" 행동을 수행한다
     만일 "delegator" 역할이 "after-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "after" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-after" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-target" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-after-snapshot" 행동을 수행한다
@@ -6860,6 +7618,9 @@
     그러면 "current-read-actions" assertion으로 "read-audit-permitted current-read-actions"를 확인한다
     그러면 "authorized-committed-once" assertion으로 "read-audit-permitted authorized-committed-once"를 확인한다
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
+    그러면 "unchanged-effect-settlementAdjustments" assertion으로 "followup-effects unchanged-effect-settlementAdjustments"를 확인한다
+    그러면 "unchanged-effect-invoiceDifferences" assertion으로 "followup-effects unchanged-effect-invoiceDifferences"를 확인한다
+    그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 mcp/recordPaymentReference 업무 효과0
@@ -6867,11 +7628,13 @@
     만일 "시스템" 역할이 "setup" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-before" 행동을 수행한다
     만일 "reader" 역할이 "access-before" 행동을 수행한다
     만일 "delegator" 역할이 "target-before" 행동을 수행한다
     만일 "reader" 역할이 "attempt" 행동을 수행한다
     만일 "delegator" 역할이 "after-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "after" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-after" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-target" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-after-snapshot" 행동을 수행한다
@@ -6904,6 +7667,9 @@
     그러면 "current-read-actions" assertion으로 "read-audit-permitted current-read-actions"를 확인한다
     그러면 "authorized-committed-once" assertion으로 "read-audit-permitted authorized-committed-once"를 확인한다
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
+    그러면 "unchanged-effect-paymentReferences" assertion으로 "followup-effects unchanged-effect-paymentReferences"를 확인한다
+    그러면 "unchanged-effect-bankTransfers" assertion으로 "external-outbox-effects unchanged-effect-bankTransfers"를 확인한다
+    그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 mcp/createGrant 업무 효과0
@@ -6911,11 +7677,13 @@
     만일 "시스템" 역할이 "setup" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-before" 행동을 수행한다
     만일 "reader" 역할이 "access-before" 행동을 수행한다
     만일 "delegator" 역할이 "target-before" 행동을 수행한다
     만일 "reader" 역할이 "attempt" 행동을 수행한다
     만일 "delegator" 역할이 "after-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "after" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-after" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-target" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-after-snapshot" 행동을 수행한다
@@ -6948,6 +7716,8 @@
     그러면 "current-read-actions" assertion으로 "read-audit-permitted current-read-actions"를 확인한다
     그러면 "authorized-committed-once" assertion으로 "read-audit-permitted authorized-committed-once"를 확인한다
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
+    그러면 "unchanged-effect-validityBoundaries" assertion으로 "work-effects unchanged-effect-validityBoundaries"를 확인한다
+    그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 mcp/revokeGrant 업무 효과0
@@ -6955,11 +7725,13 @@
     만일 "시스템" 역할이 "setup" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-before" 행동을 수행한다
     만일 "reader" 역할이 "access-before" 행동을 수행한다
     만일 "delegator" 역할이 "target-before" 행동을 수행한다
     만일 "reader" 역할이 "attempt" 행동을 수행한다
     만일 "delegator" 역할이 "after-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "after" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-after" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-target" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-after-snapshot" 행동을 수행한다
@@ -6992,6 +7764,8 @@
     그러면 "current-read-actions" assertion으로 "read-audit-permitted current-read-actions"를 확인한다
     그러면 "authorized-committed-once" assertion으로 "read-audit-permitted authorized-committed-once"를 확인한다
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
+    그러면 "unchanged-effect-validityBoundaries" assertion으로 "work-effects unchanged-effect-validityBoundaries"를 확인한다
+    그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 mcp/assignCapability 업무 효과0
@@ -6999,11 +7773,13 @@
     만일 "시스템" 역할이 "setup" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-before" 행동을 수행한다
     만일 "reader" 역할이 "access-before" 행동을 수행한다
     만일 "delegator" 역할이 "target-before" 행동을 수행한다
     만일 "reader" 역할이 "attempt" 행동을 수행한다
     만일 "delegator" 역할이 "after-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "after" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-after" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-target" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-after-snapshot" 행동을 수행한다
@@ -7036,6 +7812,8 @@
     그러면 "current-read-actions" assertion으로 "read-audit-permitted current-read-actions"를 확인한다
     그러면 "authorized-committed-once" assertion으로 "read-audit-permitted authorized-committed-once"를 확인한다
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
+    그러면 "unchanged-effect-managementAuthorities" assertion으로 "work-effects unchanged-effect-managementAuthorities"를 확인한다
+    그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 mcp/revokeCapability 업무 효과0
@@ -7043,11 +7821,13 @@
     만일 "시스템" 역할이 "setup" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-before" 행동을 수행한다
     만일 "reader" 역할이 "access-before" 행동을 수행한다
     만일 "delegator" 역할이 "target-before" 행동을 수행한다
     만일 "reader" 역할이 "attempt" 행동을 수행한다
     만일 "delegator" 역할이 "after-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "after" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-after" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-target" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-after-snapshot" 행동을 수행한다
@@ -7080,6 +7860,8 @@
     그러면 "current-read-actions" assertion으로 "read-audit-permitted current-read-actions"를 확인한다
     그러면 "authorized-committed-once" assertion으로 "read-audit-permitted authorized-committed-once"를 확인한다
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
+    그러면 "unchanged-effect-managementAuthorities" assertion으로 "work-effects unchanged-effect-managementAuthorities"를 확인한다
+    그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 mcp/proposeHandover 업무 효과0
@@ -7087,11 +7869,13 @@
     만일 "시스템" 역할이 "setup" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-before" 행동을 수행한다
     만일 "reader" 역할이 "access-before" 행동을 수행한다
     만일 "delegator" 역할이 "target-before" 행동을 수행한다
     만일 "reader" 역할이 "attempt" 행동을 수행한다
     만일 "delegator" 역할이 "after-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "after" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-after" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-target" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-after-snapshot" 행동을 수행한다
@@ -7124,6 +7908,8 @@
     그러면 "current-read-actions" assertion으로 "read-audit-permitted current-read-actions"를 확인한다
     그러면 "authorized-committed-once" assertion으로 "read-audit-permitted authorized-committed-once"를 확인한다
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
+    그러면 "unchanged-effect-handovers" assertion으로 "work-effects unchanged-effect-handovers"를 확인한다
+    그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 mcp/acceptHandover 업무 효과0
@@ -7131,11 +7917,13 @@
     만일 "시스템" 역할이 "setup" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-before" 행동을 수행한다
     만일 "reader" 역할이 "access-before" 행동을 수행한다
     만일 "delegator" 역할이 "target-before" 행동을 수행한다
     만일 "reader" 역할이 "attempt" 행동을 수행한다
     만일 "delegator" 역할이 "after-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "after" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-after" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-target" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-after-snapshot" 행동을 수행한다
@@ -7168,6 +7956,8 @@
     그러면 "current-read-actions" assertion으로 "read-audit-permitted current-read-actions"를 확인한다
     그러면 "authorized-committed-once" assertion으로 "read-audit-permitted authorized-committed-once"를 확인한다
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
+    그러면 "unchanged-effect-handovers" assertion으로 "work-effects unchanged-effect-handovers"를 확인한다
+    그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 mcp/rejectHandover 업무 효과0
@@ -7175,11 +7965,13 @@
     만일 "시스템" 역할이 "setup" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-before" 행동을 수행한다
     만일 "reader" 역할이 "access-before" 행동을 수행한다
     만일 "delegator" 역할이 "target-before" 행동을 수행한다
     만일 "reader" 역할이 "attempt" 행동을 수행한다
     만일 "delegator" 역할이 "after-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "after" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-after" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-target" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-after-snapshot" 행동을 수행한다
@@ -7212,6 +8004,8 @@
     그러면 "current-read-actions" assertion으로 "read-audit-permitted current-read-actions"를 확인한다
     그러면 "authorized-committed-once" assertion으로 "read-audit-permitted authorized-committed-once"를 확인한다
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
+    그러면 "unchanged-effect-handovers" assertion으로 "work-effects unchanged-effect-handovers"를 확인한다
+    그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 mcp/emergencyReassign 업무 효과0
@@ -7219,13 +8013,15 @@
     만일 "시스템" 역할이 "setup" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-before" 행동을 수행한다
     만일 "reader" 역할이 "access-before" 행동을 수행한다
     만일 "delegator" 역할이 "target-before" 행동을 수행한다
     만일 "reader" 역할이 "attempt" 행동을 수행한다
     만일 "delegator" 역할이 "after-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "after" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-after" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-target" 행동을 수행한다
-    만일 "delegator" 역할이 "authorized-same-input" 행동을 수행한다
+    만일 "admin" 역할이 "authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-after-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "authorized-after" 행동을 수행한다
     그러면 "attempt-code" assertion으로 "work-effects attempt-code"를 확인한다
@@ -7256,6 +8052,11 @@
     그러면 "current-read-actions" assertion으로 "read-audit-permitted current-read-actions"를 확인한다
     그러면 "authorized-committed-once" assertion으로 "read-audit-permitted authorized-committed-once"를 확인한다
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
+    그러면 "precondition-current-owner" assertion으로 "work-effects precondition-current-owner"를 확인한다
+    그러면 "authorized-business-new-owner" assertion으로 "work-effects authorized-business-new-owner"를 확인한다
+    그러면 "authorized-business-emergency-audit" assertion으로 "work-effects authorized-business-emergency-audit"를 확인한다
+    그러면 "unchanged-effect-handovers" assertion으로 "work-effects unchanged-effect-handovers"를 확인한다
+    그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 mcp/createPolicyDraft 업무 효과0
@@ -7263,11 +8064,13 @@
     만일 "시스템" 역할이 "setup" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-before" 행동을 수행한다
     만일 "reader" 역할이 "access-before" 행동을 수행한다
     만일 "delegator" 역할이 "target-before" 행동을 수행한다
     만일 "reader" 역할이 "attempt" 행동을 수행한다
     만일 "delegator" 역할이 "after-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "after" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-after" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-target" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-after-snapshot" 행동을 수행한다
@@ -7300,6 +8103,8 @@
     그러면 "current-read-actions" assertion으로 "read-audit-permitted current-read-actions"를 확인한다
     그러면 "authorized-committed-once" assertion으로 "read-audit-permitted authorized-committed-once"를 확인한다
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
+    그러면 "unchanged-effect-policyDrafts" assertion으로 "work-effects unchanged-effect-policyDrafts"를 확인한다
+    그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 mcp/approvePolicy 업무 효과0
@@ -7307,11 +8112,13 @@
     만일 "시스템" 역할이 "setup" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-before" 행동을 수행한다
     만일 "reader" 역할이 "access-before" 행동을 수행한다
     만일 "delegator" 역할이 "target-before" 행동을 수행한다
     만일 "reader" 역할이 "attempt" 행동을 수행한다
     만일 "delegator" 역할이 "after-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "after" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-after" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-target" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-after-snapshot" 행동을 수행한다
@@ -7344,6 +8151,8 @@
     그러면 "current-read-actions" assertion으로 "read-audit-permitted current-read-actions"를 확인한다
     그러면 "authorized-committed-once" assertion으로 "read-audit-permitted authorized-committed-once"를 확인한다
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
+    그러면 "unchanged-effect-policyApprovals" assertion으로 "approval-effects unchanged-effect-policyApprovals"를 확인한다
+    그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 mcp/activatePolicy 업무 효과0
@@ -7351,11 +8160,13 @@
     만일 "시스템" 역할이 "setup" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-before" 행동을 수행한다
     만일 "reader" 역할이 "access-before" 행동을 수행한다
     만일 "delegator" 역할이 "target-before" 행동을 수행한다
     만일 "reader" 역할이 "attempt" 행동을 수행한다
     만일 "delegator" 역할이 "after-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "after" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-after" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-target" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-after-snapshot" 행동을 수행한다
@@ -7388,6 +8199,8 @@
     그러면 "current-read-actions" assertion으로 "read-audit-permitted current-read-actions"를 확인한다
     그러면 "authorized-committed-once" assertion으로 "read-audit-permitted authorized-committed-once"를 확인한다
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
+    그러면 "unchanged-effect-activePolicies" assertion으로 "work-effects unchanged-effect-activePolicies"를 확인한다
+    그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 mcp/retirePolicy 업무 효과0
@@ -7395,11 +8208,13 @@
     만일 "시스템" 역할이 "setup" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-before" 행동을 수행한다
     만일 "reader" 역할이 "access-before" 행동을 수행한다
     만일 "delegator" 역할이 "target-before" 행동을 수행한다
     만일 "reader" 역할이 "attempt" 행동을 수행한다
     만일 "delegator" 역할이 "after-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "after" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-after" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-target" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-after-snapshot" 행동을 수행한다
@@ -7432,6 +8247,8 @@
     그러면 "current-read-actions" assertion으로 "read-audit-permitted current-read-actions"를 확인한다
     그러면 "authorized-committed-once" assertion으로 "read-audit-permitted authorized-committed-once"를 확인한다
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
+    그러면 "unchanged-effect-activePolicies" assertion으로 "work-effects unchanged-effect-activePolicies"를 확인한다
+    그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 mcp/matchSourceIdentity 업무 효과0
@@ -7439,11 +8256,13 @@
     만일 "시스템" 역할이 "setup" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-before" 행동을 수행한다
     만일 "reader" 역할이 "access-before" 행동을 수행한다
     만일 "delegator" 역할이 "target-before" 행동을 수행한다
     만일 "reader" 역할이 "attempt" 행동을 수행한다
     만일 "delegator" 역할이 "after-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "after" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-after" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-target" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-after-snapshot" 행동을 수행한다
@@ -7476,6 +8295,8 @@
     그러면 "current-read-actions" assertion으로 "read-audit-permitted current-read-actions"를 확인한다
     그러면 "authorized-committed-once" assertion으로 "read-audit-permitted authorized-committed-once"를 확인한다
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
+    그러면 "unchanged-effect-identity_matches" assertion으로 "followup-effects unchanged-effect-identity_matches"를 확인한다
+    그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 mcp/linkCanonicalOccurrence 업무 효과0
@@ -7483,11 +8304,13 @@
     만일 "시스템" 역할이 "setup" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-before" 행동을 수행한다
     만일 "reader" 역할이 "access-before" 행동을 수행한다
     만일 "delegator" 역할이 "target-before" 행동을 수행한다
     만일 "reader" 역할이 "attempt" 행동을 수행한다
     만일 "delegator" 역할이 "after-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "after" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-after" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-target" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-after-snapshot" 행동을 수행한다
@@ -7520,6 +8343,9 @@
     그러면 "current-read-actions" assertion으로 "read-audit-permitted current-read-actions"를 확인한다
     그러면 "authorized-committed-once" assertion으로 "read-audit-permitted authorized-committed-once"를 확인한다
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
+    그러면 "unchanged-effect-canonical_links" assertion으로 "followup-effects unchanged-effect-canonical_links"를 확인한다
+    그러면 "unchanged-effect-canonicalOccurrences" assertion으로 "followup-effects unchanged-effect-canonicalOccurrences"를 확인한다
+    그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 mcp/resolveEvidenceConflict 업무 효과0
@@ -7527,11 +8353,13 @@
     만일 "시스템" 역할이 "setup" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-before" 행동을 수행한다
     만일 "reader" 역할이 "access-before" 행동을 수행한다
     만일 "delegator" 역할이 "target-before" 행동을 수행한다
     만일 "reader" 역할이 "attempt" 행동을 수행한다
     만일 "delegator" 역할이 "after-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "after" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-after" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-target" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-after-snapshot" 행동을 수행한다
@@ -7564,6 +8392,9 @@
     그러면 "current-read-actions" assertion으로 "read-audit-permitted current-read-actions"를 확인한다
     그러면 "authorized-committed-once" assertion으로 "read-audit-permitted authorized-committed-once"를 확인한다
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
+    그러면 "unchanged-effect-reconciliations" assertion으로 "followup-effects unchanged-effect-reconciliations"를 확인한다
+    그러면 "unchanged-effect-evidenceLinks" assertion으로 "followup-effects unchanged-effect-evidenceLinks"를 확인한다
+    그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 mcp/recordExternalReconciliation 업무 효과0
@@ -7571,11 +8402,13 @@
     만일 "시스템" 역할이 "setup" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-before" 행동을 수행한다
     만일 "reader" 역할이 "access-before" 행동을 수행한다
     만일 "delegator" 역할이 "target-before" 행동을 수행한다
     만일 "reader" 역할이 "attempt" 행동을 수행한다
     만일 "delegator" 역할이 "after-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "after" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-after" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-target" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-after-snapshot" 행동을 수행한다
@@ -7608,6 +8441,9 @@
     그러면 "current-read-actions" assertion으로 "read-audit-permitted current-read-actions"를 확인한다
     그러면 "authorized-committed-once" assertion으로 "read-audit-permitted authorized-committed-once"를 확인한다
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
+    그러면 "unchanged-effect-reconciliations" assertion으로 "followup-effects unchanged-effect-reconciliations"를 확인한다
+    그러면 "unchanged-effect-externalOperationResults" assertion으로 "external-outbox-effects unchanged-effect-externalOperationResults"를 확인한다
+    그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 mcp/createDefinitionDraft 업무 효과0
@@ -7615,11 +8451,13 @@
     만일 "시스템" 역할이 "setup" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-before" 행동을 수행한다
     만일 "reader" 역할이 "access-before" 행동을 수행한다
     만일 "delegator" 역할이 "target-before" 행동을 수행한다
     만일 "reader" 역할이 "attempt" 행동을 수행한다
     만일 "delegator" 역할이 "after-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "after" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-after" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-target" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-after-snapshot" 행동을 수행한다
@@ -7652,6 +8490,8 @@
     그러면 "current-read-actions" assertion으로 "read-audit-permitted current-read-actions"를 확인한다
     그러면 "authorized-committed-once" assertion으로 "read-audit-permitted authorized-committed-once"를 확인한다
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
+    그러면 "unchanged-effect-definitionPackages" assertion으로 "work-effects unchanged-effect-definitionPackages"를 확인한다
+    그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 mcp/validateDefinition 업무 효과0
@@ -7659,11 +8499,13 @@
     만일 "시스템" 역할이 "setup" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-before" 행동을 수행한다
     만일 "reader" 역할이 "access-before" 행동을 수행한다
     만일 "delegator" 역할이 "target-before" 행동을 수행한다
     만일 "reader" 역할이 "attempt" 행동을 수행한다
     만일 "delegator" 역할이 "after-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "after" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-after" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-target" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-after-snapshot" 행동을 수행한다
@@ -7696,6 +8538,9 @@
     그러면 "current-read-actions" assertion으로 "read-audit-permitted current-read-actions"를 확인한다
     그러면 "authorized-committed-once" assertion으로 "read-audit-permitted authorized-committed-once"를 확인한다
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
+    그러면 "unchanged-effect-regressionRuns" assertion으로 "work-effects unchanged-effect-regressionRuns"를 확인한다
+    그러면 "unchanged-effect-definitionPackages" assertion으로 "work-effects unchanged-effect-definitionPackages"를 확인한다
+    그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 mcp/submitDefinitionReview 업무 효과0
@@ -7703,11 +8548,13 @@
     만일 "시스템" 역할이 "setup" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-before" 행동을 수행한다
     만일 "reader" 역할이 "access-before" 행동을 수행한다
     만일 "delegator" 역할이 "target-before" 행동을 수행한다
     만일 "reader" 역할이 "attempt" 행동을 수행한다
     만일 "delegator" 역할이 "after-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "after" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-after" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-target" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-after-snapshot" 행동을 수행한다
@@ -7740,6 +8587,8 @@
     그러면 "current-read-actions" assertion으로 "read-audit-permitted current-read-actions"를 확인한다
     그러면 "authorized-committed-once" assertion으로 "read-audit-permitted authorized-committed-once"를 확인한다
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
+    그러면 "unchanged-effect-definitionPackages" assertion으로 "work-effects unchanged-effect-definitionPackages"를 확인한다
+    그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 mcp/approveDefinition 업무 효과0
@@ -7747,11 +8596,13 @@
     만일 "시스템" 역할이 "setup" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-before" 행동을 수행한다
     만일 "reader" 역할이 "access-before" 행동을 수행한다
     만일 "delegator" 역할이 "target-before" 행동을 수행한다
     만일 "reader" 역할이 "attempt" 행동을 수행한다
     만일 "delegator" 역할이 "after-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "after" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-after" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-target" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-after-snapshot" 행동을 수행한다
@@ -7784,6 +8635,8 @@
     그러면 "current-read-actions" assertion으로 "read-audit-permitted current-read-actions"를 확인한다
     그러면 "authorized-committed-once" assertion으로 "read-audit-permitted authorized-committed-once"를 확인한다
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
+    그러면 "unchanged-effect-definitionApprovals" assertion으로 "approval-effects unchanged-effect-definitionApprovals"를 확인한다
+    그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 mcp/publishDefinition 업무 효과0
@@ -7791,11 +8644,13 @@
     만일 "시스템" 역할이 "setup" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-before" 행동을 수행한다
     만일 "reader" 역할이 "access-before" 행동을 수행한다
     만일 "delegator" 역할이 "target-before" 행동을 수행한다
     만일 "reader" 역할이 "attempt" 행동을 수행한다
     만일 "delegator" 역할이 "after-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "after" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-after" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-target" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-after-snapshot" 행동을 수행한다
@@ -7828,6 +8683,8 @@
     그러면 "current-read-actions" assertion으로 "read-audit-permitted current-read-actions"를 확인한다
     그러면 "authorized-committed-once" assertion으로 "read-audit-permitted authorized-committed-once"를 확인한다
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
+    그러면 "unchanged-effect-definitionPackages" assertion으로 "work-effects unchanged-effect-definitionPackages"를 확인한다
+    그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 mcp/activateDefinition 업무 효과0
@@ -7835,11 +8692,13 @@
     만일 "시스템" 역할이 "setup" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-before" 행동을 수행한다
     만일 "reader" 역할이 "access-before" 행동을 수행한다
     만일 "delegator" 역할이 "target-before" 행동을 수행한다
     만일 "reader" 역할이 "attempt" 행동을 수행한다
     만일 "delegator" 역할이 "after-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "after" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-after" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-target" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-after-snapshot" 행동을 수행한다
@@ -7872,6 +8731,8 @@
     그러면 "current-read-actions" assertion으로 "read-audit-permitted current-read-actions"를 확인한다
     그러면 "authorized-committed-once" assertion으로 "read-audit-permitted authorized-committed-once"를 확인한다
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
+    그러면 "unchanged-effect-activeDefinitionPointers" assertion으로 "work-effects unchanged-effect-activeDefinitionPointers"를 확인한다
+    그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 mcp/retireDefinition 업무 효과0
@@ -7879,11 +8740,13 @@
     만일 "시스템" 역할이 "setup" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-before" 행동을 수행한다
     만일 "reader" 역할이 "access-before" 행동을 수행한다
     만일 "delegator" 역할이 "target-before" 행동을 수행한다
     만일 "reader" 역할이 "attempt" 행동을 수행한다
     만일 "delegator" 역할이 "after-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "after" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-after" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-target" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-after-snapshot" 행동을 수행한다
@@ -7916,6 +8779,8 @@
     그러면 "current-read-actions" assertion으로 "read-audit-permitted current-read-actions"를 확인한다
     그러면 "authorized-committed-once" assertion으로 "read-audit-permitted authorized-committed-once"를 확인한다
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
+    그러면 "unchanged-effect-activeDefinitionPointers" assertion으로 "work-effects unchanged-effect-activeDefinitionPointers"를 확인한다
+    그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 mcp/migrateWorkDefinition 업무 효과0
@@ -7930,11 +8795,13 @@
     만일 "configApprover" 역할이 "precondition-migration-approval" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-before" 행동을 수행한다
     만일 "reader" 역할이 "access-before" 행동을 수행한다
     만일 "delegator" 역할이 "target-before" 행동을 수행한다
     만일 "reader" 역할이 "attempt" 행동을 수행한다
     만일 "delegator" 역할이 "after-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "after" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-after" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-target" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-after-snapshot" 행동을 수행한다
@@ -7967,34 +8834,40 @@
     그러면 "current-read-actions" assertion으로 "read-audit-permitted current-read-actions"를 확인한다
     그러면 "authorized-committed-once" assertion으로 "read-audit-permitted authorized-committed-once"를 확인한다
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
-    그러면 "precondition-draft-applied" assertion으로 "read-audit-permitted precondition-draft-applied"를 확인한다
-    그러면 "precondition-validate-applied" assertion으로 "read-audit-permitted precondition-validate-applied"를 확인한다
-    그러면 "precondition-review-applied" assertion으로 "read-audit-permitted precondition-review-applied"를 확인한다
-    그러면 "precondition-publish-approval-applied" assertion으로 "read-audit-permitted precondition-publish-approval-applied"를 확인한다
-    그러면 "precondition-publish-applied" assertion으로 "read-audit-permitted precondition-publish-applied"를 확인한다
-    그러면 "precondition-migration-review-applied" assertion으로 "read-audit-permitted precondition-migration-review-applied"를 확인한다
-    그러면 "precondition-migration-approval-applied" assertion으로 "read-audit-permitted precondition-migration-approval-applied"를 확인한다
-    그러면 "precondition-published" assertion으로 "read-audit-permitted precondition-published"를 확인한다
-    그러면 "authorized-business-work-version" assertion으로 "read-audit-permitted authorized-business-work-version"를 확인한다
-    그러면 "authorized-business-migration-once" assertion으로 "read-audit-permitted authorized-business-migration-once"를 확인한다
-    그러면 "precondition-migration-approval-record" assertion으로 "read-audit-permitted precondition-migration-approval-record"를 확인한다
-    그러면 "authorized-business-goal-history" assertion으로 "read-audit-permitted authorized-business-goal-history"를 확인한다
-    그러면 "authorized-business-migration-goal-link" assertion으로 "read-audit-permitted authorized-business-migration-goal-link"를 확인한다
-    그러면 "precondition-denial-unchanged-workDefinitionMigrations" assertion으로 "read-audit-permitted precondition-denial-unchanged-workDefinitionMigrations"를 확인한다
-    그러면 "precondition-denial-unchanged-migrationMappings" assertion으로 "read-audit-permitted precondition-denial-unchanged-migrationMappings"를 확인한다
-    그러면 "precondition-denial-unchanged-migrationRegressions" assertion으로 "read-audit-permitted precondition-denial-unchanged-migrationRegressions"를 확인한다
-    그러면 "precondition-denial-unchanged-goalVersions" assertion으로 "read-audit-permitted precondition-denial-unchanged-goalVersions"를 확인한다
+    그러면 "precondition-draft-applied" assertion으로 "work-effects precondition-draft-applied"를 확인한다
+    그러면 "precondition-validate-applied" assertion으로 "work-effects precondition-validate-applied"를 확인한다
+    그러면 "precondition-review-applied" assertion으로 "work-effects precondition-review-applied"를 확인한다
+    그러면 "precondition-publish-approval-applied" assertion으로 "work-effects precondition-publish-approval-applied"를 확인한다
+    그러면 "precondition-publish-applied" assertion으로 "work-effects precondition-publish-applied"를 확인한다
+    그러면 "precondition-migration-review-applied" assertion으로 "work-effects precondition-migration-review-applied"를 확인한다
+    그러면 "precondition-migration-approval-applied" assertion으로 "work-effects precondition-migration-approval-applied"를 확인한다
+    그러면 "precondition-published" assertion으로 "work-effects precondition-published"를 확인한다
+    그러면 "authorized-business-work-version" assertion으로 "work-effects authorized-business-work-version"를 확인한다
+    그러면 "authorized-business-migration-once" assertion으로 "work-effects authorized-business-migration-once"를 확인한다
+    그러면 "precondition-migration-approval-record" assertion으로 "approval-effects precondition-migration-approval-record"를 확인한다
+    그러면 "authorized-business-goal-history" assertion으로 "work-effects authorized-business-goal-history"를 확인한다
+    그러면 "authorized-business-migration-goal-link" assertion으로 "work-effects authorized-business-migration-goal-link"를 확인한다
+    그러면 "precondition-denial-unchanged-workDefinitionMigrations" assertion으로 "work-effects precondition-denial-unchanged-workDefinitionMigrations"를 확인한다
+    그러면 "precondition-denial-unchanged-migrationMappings" assertion으로 "work-effects precondition-denial-unchanged-migrationMappings"를 확인한다
+    그러면 "precondition-denial-unchanged-migrationRegressions" assertion으로 "work-effects precondition-denial-unchanged-migrationRegressions"를 확인한다
+    그러면 "precondition-denial-unchanged-goalVersions" assertion으로 "work-effects precondition-denial-unchanged-goalVersions"를 확인한다
+    그러면 "unchanged-effect-workDefinitionMigrations" assertion으로 "work-effects unchanged-effect-workDefinitionMigrations"를 확인한다
+    그러면 "unchanged-effect-goalVersions" assertion으로 "work-effects unchanged-effect-goalVersions"를 확인한다
+    그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
 
+  @sit
   시나리오: WRITE 역할·READ 위임에서 mcp/createWork 업무 효과0
     먼저 사례 파일 "verification/cases/C3/case.json"의 "mcp-createWork"를 준비한다
     만일 "시스템" 역할이 "setup" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-before" 행동을 수행한다
     만일 "reader" 역할이 "access-before" 행동을 수행한다
     만일 "delegator" 역할이 "target-before" 행동을 수행한다
     만일 "reader" 역할이 "attempt" 행동을 수행한다
     만일 "delegator" 역할이 "after-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "after" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-after" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-target" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-after-snapshot" 행동을 수행한다
@@ -8027,6 +8900,9 @@
     그러면 "current-read-actions" assertion으로 "read-audit-permitted current-read-actions"를 확인한다
     그러면 "authorized-committed-once" assertion으로 "read-audit-permitted authorized-committed-once"를 확인한다
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
+    그러면 "unchanged-effect-goalVersions" assertion으로 "work-effects unchanged-effect-goalVersions"를 확인한다
+    그러면 "unchanged-effect-workLinks" assertion으로 "work-effects unchanged-effect-workLinks"를 확인한다
+    그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 mcp/recordActivity 업무 효과0
@@ -8034,11 +8910,13 @@
     만일 "시스템" 역할이 "setup" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-before" 행동을 수행한다
     만일 "reader" 역할이 "access-before" 행동을 수행한다
     만일 "delegator" 역할이 "target-before" 행동을 수행한다
     만일 "reader" 역할이 "attempt" 행동을 수행한다
     만일 "delegator" 역할이 "after-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "after" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-after" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-target" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-after-snapshot" 행동을 수행한다
@@ -8071,6 +8949,9 @@
     그러면 "current-read-actions" assertion으로 "read-audit-permitted current-read-actions"를 확인한다
     그러면 "authorized-committed-once" assertion으로 "read-audit-permitted authorized-committed-once"를 확인한다
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
+    그러면 "unchanged-effect-activities" assertion으로 "followup-effects unchanged-effect-activities"를 확인한다
+    그러면 "unchanged-effect-events" assertion으로 "followup-effects unchanged-effect-events"를 확인한다
+    그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 mcp/retrySafeCommand 업무 효과0
@@ -8078,11 +8959,13 @@
     만일 "시스템" 역할이 "setup" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-before" 행동을 수행한다
     만일 "reader" 역할이 "access-before" 행동을 수행한다
     만일 "delegator" 역할이 "target-before" 행동을 수행한다
     만일 "reader" 역할이 "attempt" 행동을 수행한다
     만일 "delegator" 역할이 "after-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "after" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-after" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-target" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-after-snapshot" 행동을 수행한다
@@ -8115,6 +8998,9 @@
     그러면 "current-read-actions" assertion으로 "read-audit-permitted current-read-actions"를 확인한다
     그러면 "authorized-committed-once" assertion으로 "read-audit-permitted authorized-committed-once"를 확인한다
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
+    그러면 "unchanged-effect-retryAttempts" assertion으로 "work-effects unchanged-effect-retryAttempts"를 확인한다
+    그러면 "unchanged-effect-executionAttempts" assertion으로 "work-effects unchanged-effect-executionAttempts"를 확인한다
+    그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 mcp/recordRelation 업무 효과0
@@ -8122,11 +9008,13 @@
     만일 "시스템" 역할이 "setup" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-before" 행동을 수행한다
     만일 "reader" 역할이 "access-before" 행동을 수행한다
     만일 "delegator" 역할이 "target-before" 행동을 수행한다
     만일 "reader" 역할이 "attempt" 행동을 수행한다
     만일 "delegator" 역할이 "after-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "after" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-after" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-target" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-after-snapshot" 행동을 수행한다
@@ -8159,6 +9047,8 @@
     그러면 "current-read-actions" assertion으로 "read-audit-permitted current-read-actions"를 확인한다
     그러면 "authorized-committed-once" assertion으로 "read-audit-permitted authorized-committed-once"를 확인한다
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
+    그러면 "unchanged-effect-workLinks" assertion으로 "work-effects unchanged-effect-workLinks"를 확인한다
+    그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 mcp/createWorkLink 업무 효과0
@@ -8166,11 +9056,13 @@
     만일 "시스템" 역할이 "setup" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-before" 행동을 수행한다
     만일 "reader" 역할이 "access-before" 행동을 수행한다
     만일 "delegator" 역할이 "target-before" 행동을 수행한다
     만일 "reader" 역할이 "attempt" 행동을 수행한다
     만일 "delegator" 역할이 "after-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "after" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-after" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-target" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-after-snapshot" 행동을 수행한다
@@ -8203,6 +9095,8 @@
     그러면 "current-read-actions" assertion으로 "read-audit-permitted current-read-actions"를 확인한다
     그러면 "authorized-committed-once" assertion으로 "read-audit-permitted authorized-committed-once"를 확인한다
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
+    그러면 "unchanged-effect-workLinks" assertion으로 "work-effects unchanged-effect-workLinks"를 확인한다
+    그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 mcp/emergencyRepair 업무 효과0
@@ -8210,11 +9104,13 @@
     만일 "시스템" 역할이 "setup" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-before" 행동을 수행한다
     만일 "reader" 역할이 "access-before" 행동을 수행한다
     만일 "delegator" 역할이 "target-before" 행동을 수행한다
     만일 "reader" 역할이 "attempt" 행동을 수행한다
     만일 "delegator" 역할이 "after-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "after" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-after" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-target" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-after-snapshot" 행동을 수행한다
@@ -8247,6 +9143,8 @@
     그러면 "current-read-actions" assertion으로 "read-audit-permitted current-read-actions"를 확인한다
     그러면 "authorized-committed-once" assertion으로 "read-audit-permitted authorized-committed-once"를 확인한다
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
+    그러면 "unchanged-effect-projections" assertion으로 "work-effects unchanged-effect-projections"를 확인한다
+    그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 worker/splitQuantity 업무 효과0
@@ -8254,11 +9152,13 @@
     만일 "시스템" 역할이 "setup" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-before" 행동을 수행한다
     만일 "reader" 역할이 "access-before" 행동을 수행한다
     만일 "delegator" 역할이 "target-before" 행동을 수행한다
     만일 "reader" 역할이 "attempt" 행동을 수행한다
     만일 "delegator" 역할이 "after-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "after" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-after" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-target" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-after-snapshot" 행동을 수행한다
@@ -8291,6 +9191,8 @@
     그러면 "current-read-actions" assertion으로 "read-audit-permitted current-read-actions"를 확인한다
     그러면 "authorized-committed-once" assertion으로 "read-audit-permitted authorized-committed-once"를 확인한다
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
+    그러면 "unchanged-effect-genealogy" assertion으로 "inventory-effects unchanged-effect-genealogy"를 확인한다
+    그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 worker/mergeQuantity 업무 효과0
@@ -8298,11 +9200,13 @@
     만일 "시스템" 역할이 "setup" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-before" 행동을 수행한다
     만일 "reader" 역할이 "access-before" 행동을 수행한다
     만일 "delegator" 역할이 "target-before" 행동을 수행한다
     만일 "reader" 역할이 "attempt" 행동을 수행한다
     만일 "delegator" 역할이 "after-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "after" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-after" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-target" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-after-snapshot" 행동을 수행한다
@@ -8335,6 +9239,8 @@
     그러면 "current-read-actions" assertion으로 "read-audit-permitted current-read-actions"를 확인한다
     그러면 "authorized-committed-once" assertion으로 "read-audit-permitted authorized-committed-once"를 확인한다
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
+    그러면 "unchanged-effect-genealogy" assertion으로 "inventory-effects unchanged-effect-genealogy"를 확인한다
+    그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 worker/moveQuantity 업무 효과0
@@ -8342,11 +9248,13 @@
     만일 "시스템" 역할이 "setup" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-before" 행동을 수행한다
     만일 "reader" 역할이 "access-before" 행동을 수행한다
     만일 "delegator" 역할이 "target-before" 행동을 수행한다
     만일 "reader" 역할이 "attempt" 행동을 수행한다
     만일 "delegator" 역할이 "after-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "after" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-after" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-target" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-after-snapshot" 행동을 수행한다
@@ -8379,6 +9287,9 @@
     그러면 "current-read-actions" assertion으로 "read-audit-permitted current-read-actions"를 확인한다
     그러면 "authorized-committed-once" assertion으로 "read-audit-permitted authorized-committed-once"를 확인한다
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
+    그러면 "unchanged-effect-logisticsMemberships" assertion으로 "inventory-effects unchanged-effect-logisticsMemberships"를 확인한다
+    그러면 "unchanged-effect-custodyHandovers" assertion으로 "inventory-effects unchanged-effect-custodyHandovers"를 확인한다
+    그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 worker/adjustQuantity 업무 효과0
@@ -8386,11 +9297,13 @@
     만일 "시스템" 역할이 "setup" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-before" 행동을 수행한다
     만일 "reader" 역할이 "access-before" 행동을 수행한다
     만일 "delegator" 역할이 "target-before" 행동을 수행한다
     만일 "reader" 역할이 "attempt" 행동을 수행한다
     만일 "delegator" 역할이 "after-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "after" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-after" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-target" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-after-snapshot" 행동을 수행한다
@@ -8423,6 +9336,9 @@
     그러면 "current-read-actions" assertion으로 "read-audit-permitted current-read-actions"를 확인한다
     그러면 "authorized-committed-once" assertion으로 "read-audit-permitted authorized-committed-once"를 확인한다
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
+    그러면 "unchanged-effect-adjustmentProposals" assertion으로 "inventory-effects unchanged-effect-adjustmentProposals"를 확인한다
+    그러면 "unchanged-effect-stocktakes" assertion으로 "inventory-effects unchanged-effect-stocktakes"를 확인한다
+    그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 worker/reserveQuantity 업무 효과0
@@ -8430,11 +9346,13 @@
     만일 "시스템" 역할이 "setup" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-before" 행동을 수행한다
     만일 "reader" 역할이 "access-before" 행동을 수행한다
     만일 "delegator" 역할이 "target-before" 행동을 수행한다
     만일 "reader" 역할이 "attempt" 행동을 수행한다
     만일 "delegator" 역할이 "after-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "after" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-after" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-target" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-after-snapshot" 행동을 수행한다
@@ -8467,6 +9385,8 @@
     그러면 "current-read-actions" assertion으로 "read-audit-permitted current-read-actions"를 확인한다
     그러면 "authorized-committed-once" assertion으로 "read-audit-permitted authorized-committed-once"를 확인한다
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
+    그러면 "unchanged-effect-orders" assertion으로 "followup-effects unchanged-effect-orders"를 확인한다
+    그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 worker/replaceAllocation 업무 효과0
@@ -8474,11 +9394,13 @@
     만일 "시스템" 역할이 "setup" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-before" 행동을 수행한다
     만일 "reader" 역할이 "access-before" 행동을 수행한다
     만일 "delegator" 역할이 "target-before" 행동을 수행한다
     만일 "reader" 역할이 "attempt" 행동을 수행한다
     만일 "delegator" 역할이 "after-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "after" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-after" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-target" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-after-snapshot" 행동을 수행한다
@@ -8511,6 +9433,8 @@
     그러면 "current-read-actions" assertion으로 "read-audit-permitted current-read-actions"를 확인한다
     그러면 "authorized-committed-once" assertion으로 "read-audit-permitted authorized-committed-once"를 확인한다
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
+    그러면 "unchanged-effect-orders" assertion으로 "followup-effects unchanged-effect-orders"를 확인한다
+    그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 worker/pickQuantity 업무 효과0
@@ -8518,11 +9442,13 @@
     만일 "시스템" 역할이 "setup" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-before" 행동을 수행한다
     만일 "reader" 역할이 "access-before" 행동을 수행한다
     만일 "delegator" 역할이 "target-before" 행동을 수행한다
     만일 "reader" 역할이 "attempt" 행동을 수행한다
     만일 "delegator" 역할이 "after-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "after" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-after" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-target" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-after-snapshot" 행동을 수행한다
@@ -8555,6 +9481,8 @@
     그러면 "current-read-actions" assertion으로 "read-audit-permitted current-read-actions"를 확인한다
     그러면 "authorized-committed-once" assertion으로 "read-audit-permitted authorized-committed-once"를 확인한다
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
+    그러면 "unchanged-effect-logisticsMemberships" assertion으로 "inventory-effects unchanged-effect-logisticsMemberships"를 확인한다
+    그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 worker/dispatchQuantity 업무 효과0
@@ -8562,11 +9490,13 @@
     만일 "시스템" 역할이 "setup" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-before" 행동을 수행한다
     만일 "reader" 역할이 "access-before" 행동을 수행한다
     만일 "delegator" 역할이 "target-before" 행동을 수행한다
     만일 "reader" 역할이 "attempt" 행동을 수행한다
     만일 "delegator" 역할이 "after-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "after" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-after" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-target" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-after-snapshot" 행동을 수행한다
@@ -8599,6 +9529,9 @@
     그러면 "current-read-actions" assertion으로 "read-audit-permitted current-read-actions"를 확인한다
     그러면 "authorized-committed-once" assertion으로 "read-audit-permitted authorized-committed-once"를 확인한다
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
+    그러면 "unchanged-effect-shipments" assertion으로 "followup-effects unchanged-effect-shipments"를 확인한다
+    그러면 "unchanged-effect-deliveries" assertion으로 "followup-effects unchanged-effect-deliveries"를 확인한다
+    그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 worker/confirmReceipt 업무 효과0
@@ -8606,11 +9539,13 @@
     만일 "시스템" 역할이 "setup" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-before" 행동을 수행한다
     만일 "reader" 역할이 "access-before" 행동을 수행한다
     만일 "delegator" 역할이 "target-before" 행동을 수행한다
     만일 "reader" 역할이 "attempt" 행동을 수행한다
     만일 "delegator" 역할이 "after-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "after" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-after" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-target" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-after-snapshot" 행동을 수행한다
@@ -8643,6 +9578,9 @@
     그러면 "current-read-actions" assertion으로 "read-audit-permitted current-read-actions"를 확인한다
     그러면 "authorized-committed-once" assertion으로 "read-audit-permitted authorized-committed-once"를 확인한다
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
+    그러면 "unchanged-effect-receipts" assertion으로 "inventory-effects unchanged-effect-receipts"를 확인한다
+    그러면 "unchanged-effect-receiptContributions" assertion으로 "inventory-effects unchanged-effect-receiptContributions"를 확인한다
+    그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 worker/disposeQuantity 업무 효과0
@@ -8650,11 +9588,13 @@
     만일 "시스템" 역할이 "setup" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-before" 행동을 수행한다
     만일 "reader" 역할이 "access-before" 행동을 수행한다
     만일 "delegator" 역할이 "target-before" 행동을 수행한다
     만일 "reader" 역할이 "attempt" 행동을 수행한다
     만일 "delegator" 역할이 "after-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "after" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-after" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-target" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-after-snapshot" 행동을 수행한다
@@ -8687,6 +9627,8 @@
     그러면 "current-read-actions" assertion으로 "read-audit-permitted current-read-actions"를 확인한다
     그러면 "authorized-committed-once" assertion으로 "read-audit-permitted authorized-committed-once"를 확인한다
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
+    그러면 "unchanged-effect-dispositions" assertion으로 "inventory-effects unchanged-effect-dispositions"를 확인한다
+    그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 worker/createDraft 업무 효과0
@@ -8694,11 +9636,13 @@
     만일 "시스템" 역할이 "setup" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-before" 행동을 수행한다
     만일 "reader" 역할이 "access-before" 행동을 수행한다
     만일 "delegator" 역할이 "target-before" 행동을 수행한다
     만일 "reader" 역할이 "attempt" 행동을 수행한다
     만일 "delegator" 역할이 "after-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "after" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-after" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-target" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-after-snapshot" 행동을 수행한다
@@ -8731,6 +9675,8 @@
     그러면 "current-read-actions" assertion으로 "read-audit-permitted current-read-actions"를 확인한다
     그러면 "authorized-committed-once" assertion으로 "read-audit-permitted authorized-committed-once"를 확인한다
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
+    그러면 "unchanged-effect-goalVersions" assertion으로 "work-effects unchanged-effect-goalVersions"를 확인한다
+    그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 worker/cancelDraft 업무 효과0
@@ -8738,11 +9684,13 @@
     만일 "시스템" 역할이 "setup" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-before" 행동을 수행한다
     만일 "reader" 역할이 "access-before" 행동을 수행한다
     만일 "delegator" 역할이 "target-before" 행동을 수행한다
     만일 "reader" 역할이 "attempt" 행동을 수행한다
     만일 "delegator" 역할이 "after-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "after" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-after" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-target" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-after-snapshot" 행동을 수행한다
@@ -8775,6 +9723,9 @@
     그러면 "current-read-actions" assertion으로 "read-audit-permitted current-read-actions"를 확인한다
     그러면 "authorized-committed-once" assertion으로 "read-audit-permitted authorized-committed-once"를 확인한다
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
+    그러면 "unchanged-effect-goalVersions" assertion으로 "work-effects unchanged-effect-goalVersions"를 확인한다
+    그러면 "unchanged-effect-workClosures" assertion으로 "work-effects unchanged-effect-workClosures"를 확인한다
+    그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 worker/activateWork 업무 효과0
@@ -8782,11 +9733,13 @@
     만일 "시스템" 역할이 "setup" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-before" 행동을 수행한다
     만일 "reader" 역할이 "access-before" 행동을 수행한다
     만일 "delegator" 역할이 "target-before" 행동을 수행한다
     만일 "reader" 역할이 "attempt" 행동을 수행한다
     만일 "delegator" 역할이 "after-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "after" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-after" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-target" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-after-snapshot" 행동을 수행한다
@@ -8819,6 +9772,8 @@
     그러면 "current-read-actions" assertion으로 "read-audit-permitted current-read-actions"를 확인한다
     그러면 "authorized-committed-once" assertion으로 "read-audit-permitted authorized-committed-once"를 확인한다
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
+    그러면 "unchanged-effect-goalVersions" assertion으로 "work-effects unchanged-effect-goalVersions"를 확인한다
+    그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 worker/waitWork 업무 효과0
@@ -8826,11 +9781,13 @@
     만일 "시스템" 역할이 "setup" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-before" 행동을 수행한다
     만일 "reader" 역할이 "access-before" 행동을 수행한다
     만일 "delegator" 역할이 "target-before" 행동을 수행한다
     만일 "reader" 역할이 "attempt" 행동을 수행한다
     만일 "delegator" 역할이 "after-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "after" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-after" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-target" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-after-snapshot" 행동을 수행한다
@@ -8863,6 +9820,8 @@
     그러면 "current-read-actions" assertion으로 "read-audit-permitted current-read-actions"를 확인한다
     그러면 "authorized-committed-once" assertion으로 "read-audit-permitted authorized-committed-once"를 확인한다
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
+    그러면 "unchanged-effect-goalVersions" assertion으로 "work-effects unchanged-effect-goalVersions"를 확인한다
+    그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 worker/resumeWork 업무 효과0
@@ -8870,11 +9829,13 @@
     만일 "시스템" 역할이 "setup" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-before" 행동을 수행한다
     만일 "reader" 역할이 "access-before" 행동을 수행한다
     만일 "delegator" 역할이 "target-before" 행동을 수행한다
     만일 "reader" 역할이 "attempt" 행동을 수행한다
     만일 "delegator" 역할이 "after-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "after" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-after" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-target" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-after-snapshot" 행동을 수행한다
@@ -8907,6 +9868,8 @@
     그러면 "current-read-actions" assertion으로 "read-audit-permitted current-read-actions"를 확인한다
     그러면 "authorized-committed-once" assertion으로 "read-audit-permitted authorized-committed-once"를 확인한다
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
+    그러면 "unchanged-effect-goalVersions" assertion으로 "work-effects unchanged-effect-goalVersions"를 확인한다
+    그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 worker/reviseGoal 업무 효과0
@@ -8914,11 +9877,13 @@
     만일 "시스템" 역할이 "setup" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-before" 행동을 수행한다
     만일 "reader" 역할이 "access-before" 행동을 수행한다
     만일 "delegator" 역할이 "target-before" 행동을 수행한다
     만일 "reader" 역할이 "attempt" 행동을 수행한다
     만일 "delegator" 역할이 "after-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "after" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-after" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-target" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-after-snapshot" 행동을 수행한다
@@ -8951,6 +9916,8 @@
     그러면 "current-read-actions" assertion으로 "read-audit-permitted current-read-actions"를 확인한다
     그러면 "authorized-committed-once" assertion으로 "read-audit-permitted authorized-committed-once"를 확인한다
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
+    그러면 "unchanged-effect-goalVersions" assertion으로 "work-effects unchanged-effect-goalVersions"를 확인한다
+    그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 worker/closeWork 업무 효과0
@@ -8958,11 +9925,13 @@
     만일 "시스템" 역할이 "setup" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-before" 행동을 수행한다
     만일 "reader" 역할이 "access-before" 행동을 수행한다
     만일 "delegator" 역할이 "target-before" 행동을 수행한다
     만일 "reader" 역할이 "attempt" 행동을 수행한다
     만일 "delegator" 역할이 "after-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "after" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-after" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-target" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-after-snapshot" 행동을 수행한다
@@ -8995,6 +9964,8 @@
     그러면 "current-read-actions" assertion으로 "read-audit-permitted current-read-actions"를 확인한다
     그러면 "authorized-committed-once" assertion으로 "read-audit-permitted authorized-committed-once"를 확인한다
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
+    그러면 "unchanged-effect-workClosures" assertion으로 "work-effects unchanged-effect-workClosures"를 확인한다
+    그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 worker/createFollowup 업무 효과0
@@ -9002,11 +9973,13 @@
     만일 "시스템" 역할이 "setup" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-before" 행동을 수행한다
     만일 "reader" 역할이 "access-before" 행동을 수행한다
     만일 "delegator" 역할이 "target-before" 행동을 수행한다
     만일 "reader" 역할이 "attempt" 행동을 수행한다
     만일 "delegator" 역할이 "after-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "after" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-after" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-target" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-after-snapshot" 행동을 수행한다
@@ -9039,6 +10012,8 @@
     그러면 "current-read-actions" assertion으로 "read-audit-permitted current-read-actions"를 확인한다
     그러면 "authorized-committed-once" assertion으로 "read-audit-permitted authorized-committed-once"를 확인한다
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
+    그러면 "unchanged-effect-workLinks" assertion으로 "work-effects unchanged-effect-workLinks"를 확인한다
+    그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 worker/resolveObligation 업무 효과0
@@ -9046,11 +10021,13 @@
     만일 "시스템" 역할이 "setup" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-before" 행동을 수행한다
     만일 "reader" 역할이 "access-before" 행동을 수행한다
     만일 "delegator" 역할이 "target-before" 행동을 수행한다
     만일 "reader" 역할이 "attempt" 행동을 수행한다
     만일 "delegator" 역할이 "after-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "after" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-after" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-target" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-after-snapshot" 행동을 수행한다
@@ -9083,6 +10060,9 @@
     그러면 "current-read-actions" assertion으로 "read-audit-permitted current-read-actions"를 확인한다
     그러면 "authorized-committed-once" assertion으로 "read-audit-permitted authorized-committed-once"를 확인한다
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
+    그러면 "unchanged-effect-obligationResolutions" assertion으로 "work-effects unchanged-effect-obligationResolutions"를 확인한다
+    그러면 "unchanged-effect-dutyTransitions" assertion으로 "work-effects unchanged-effect-dutyTransitions"를 확인한다
+    그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 worker/waiveObligation 업무 효과0
@@ -9090,11 +10070,13 @@
     만일 "시스템" 역할이 "setup" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-before" 행동을 수행한다
     만일 "reader" 역할이 "access-before" 행동을 수행한다
     만일 "delegator" 역할이 "target-before" 행동을 수행한다
     만일 "reader" 역할이 "attempt" 행동을 수행한다
     만일 "delegator" 역할이 "after-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "after" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-after" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-target" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-after-snapshot" 행동을 수행한다
@@ -9127,6 +10109,9 @@
     그러면 "current-read-actions" assertion으로 "read-audit-permitted current-read-actions"를 확인한다
     그러면 "authorized-committed-once" assertion으로 "read-audit-permitted authorized-committed-once"를 확인한다
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
+    그러면 "unchanged-effect-obligationResolutions" assertion으로 "work-effects unchanged-effect-obligationResolutions"를 확인한다
+    그러면 "unchanged-effect-dutyTransitions" assertion으로 "work-effects unchanged-effect-dutyTransitions"를 확인한다
+    그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 worker/transferObligation 업무 효과0
@@ -9134,11 +10119,13 @@
     만일 "시스템" 역할이 "setup" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-before" 행동을 수행한다
     만일 "reader" 역할이 "access-before" 행동을 수행한다
     만일 "delegator" 역할이 "target-before" 행동을 수행한다
     만일 "reader" 역할이 "attempt" 행동을 수행한다
     만일 "delegator" 역할이 "after-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "after" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-after" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-target" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-after-snapshot" 행동을 수행한다
@@ -9171,22 +10158,28 @@
     그러면 "current-read-actions" assertion으로 "read-audit-permitted current-read-actions"를 확인한다
     그러면 "authorized-committed-once" assertion으로 "read-audit-permitted authorized-committed-once"를 확인한다
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
-    그러면 "precondition-recipient-acceptance" assertion으로 "read-audit-permitted precondition-recipient-acceptance"를 확인한다
-    그러면 "precondition-recipient-binding" assertion으로 "read-audit-permitted precondition-recipient-binding"를 확인한다
-    그러면 "authorized-business-transfer-once" assertion으로 "read-audit-permitted authorized-business-transfer-once"를 확인한다
-    그러면 "precondition-denial-unchanged-recipientAcceptances" assertion으로 "read-audit-permitted precondition-denial-unchanged-recipientAcceptances"를 확인한다
-    그러면 "precondition-denial-unchanged-obligationTransfers" assertion으로 "read-audit-permitted precondition-denial-unchanged-obligationTransfers"를 확인한다
+    그러면 "precondition-recipient-acceptance" assertion으로 "work-effects precondition-recipient-acceptance"를 확인한다
+    그러면 "precondition-recipient-binding" assertion으로 "work-effects precondition-recipient-binding"를 확인한다
+    그러면 "authorized-business-transfer-once" assertion으로 "work-effects authorized-business-transfer-once"를 확인한다
+    그러면 "precondition-denial-unchanged-recipientAcceptances" assertion으로 "work-effects precondition-denial-unchanged-recipientAcceptances"를 확인한다
+    그러면 "precondition-denial-unchanged-obligationTransfers" assertion으로 "work-effects precondition-denial-unchanged-obligationTransfers"를 확인한다
+    그러면 "unchanged-effect-obligationTransfers" assertion으로 "work-effects unchanged-effect-obligationTransfers"를 확인한다
+    그러면 "unchanged-effect-dutyTransitions" assertion으로 "work-effects unchanged-effect-dutyTransitions"를 확인한다
+    그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
 
+  @sit
   시나리오: WRITE 역할·READ 위임에서 worker/registerItem 업무 효과0
     먼저 사례 파일 "verification/cases/C3/case.json"의 "worker-registerItem"를 준비한다
     만일 "시스템" 역할이 "setup" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-before" 행동을 수행한다
     만일 "reader" 역할이 "access-before" 행동을 수행한다
     만일 "delegator" 역할이 "target-before" 행동을 수행한다
     만일 "reader" 역할이 "attempt" 행동을 수행한다
     만일 "delegator" 역할이 "after-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "after" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-after" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-target" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-after-snapshot" 행동을 수행한다
@@ -9219,6 +10212,10 @@
     그러면 "current-read-actions" assertion으로 "read-audit-permitted current-read-actions"를 확인한다
     그러면 "authorized-committed-once" assertion으로 "read-audit-permitted authorized-committed-once"를 확인한다
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
+    그러면 "unchanged-effect-items" assertion으로 "inventory-effects unchanged-effect-items"를 확인한다
+    그러면 "unchanged-effect-externalIdentifiers" assertion으로 "inventory-effects unchanged-effect-externalIdentifiers"를 확인한다
+    그러면 "unchanged-effect-unitConversions" assertion으로 "inventory-effects unchanged-effect-unitConversions"를 확인한다
+    그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 worker/linkExternalId 업무 효과0
@@ -9226,11 +10223,13 @@
     만일 "시스템" 역할이 "setup" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-before" 행동을 수행한다
     만일 "reader" 역할이 "access-before" 행동을 수행한다
     만일 "delegator" 역할이 "target-before" 행동을 수행한다
     만일 "reader" 역할이 "attempt" 행동을 수행한다
     만일 "delegator" 역할이 "after-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "after" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-after" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-target" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-after-snapshot" 행동을 수행한다
@@ -9263,6 +10262,8 @@
     그러면 "current-read-actions" assertion으로 "read-audit-permitted current-read-actions"를 확인한다
     그러면 "authorized-committed-once" assertion으로 "read-audit-permitted authorized-committed-once"를 확인한다
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
+    그러면 "unchanged-effect-externalIdentifiers" assertion으로 "inventory-effects unchanged-effect-externalIdentifiers"를 확인한다
+    그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 worker/attachEvidence 업무 효과0
@@ -9270,11 +10271,13 @@
     만일 "시스템" 역할이 "setup" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-before" 행동을 수행한다
     만일 "reader" 역할이 "access-before" 행동을 수행한다
     만일 "delegator" 역할이 "target-before" 행동을 수행한다
     만일 "reader" 역할이 "attempt" 행동을 수행한다
     만일 "delegator" 역할이 "after-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "after" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-after" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-target" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-after-snapshot" 행동을 수행한다
@@ -9307,6 +10310,10 @@
     그러면 "current-read-actions" assertion으로 "read-audit-permitted current-read-actions"를 확인한다
     그러면 "authorized-committed-once" assertion으로 "read-audit-permitted authorized-committed-once"를 확인한다
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
+    그러면 "unchanged-effect-documents" assertion으로 "followup-effects unchanged-effect-documents"를 확인한다
+    그러면 "unchanged-effect-evidenceLinks" assertion으로 "followup-effects unchanged-effect-evidenceLinks"를 확인한다
+    그러면 "unchanged-effect-events" assertion으로 "followup-effects unchanged-effect-events"를 확인한다
+    그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 worker/correctEvidence 업무 효과0
@@ -9314,11 +10321,13 @@
     만일 "시스템" 역할이 "setup" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-before" 행동을 수행한다
     만일 "reader" 역할이 "access-before" 행동을 수행한다
     만일 "delegator" 역할이 "target-before" 행동을 수행한다
     만일 "reader" 역할이 "attempt" 행동을 수행한다
     만일 "delegator" 역할이 "after-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "after" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-after" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-target" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-after-snapshot" 행동을 수행한다
@@ -9351,6 +10360,11 @@
     그러면 "current-read-actions" assertion으로 "read-audit-permitted current-read-actions"를 확인한다
     그러면 "authorized-committed-once" assertion으로 "read-audit-permitted authorized-committed-once"를 확인한다
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
+    그러면 "unchanged-effect-documents" assertion으로 "followup-effects unchanged-effect-documents"를 확인한다
+    그러면 "unchanged-effect-evidenceLinks" assertion으로 "followup-effects unchanged-effect-evidenceLinks"를 확인한다
+    그러면 "unchanged-effect-events" assertion으로 "followup-effects unchanged-effect-events"를 확인한다
+    그러면 "unchanged-effect-evidence_revisions" assertion으로 "followup-effects unchanged-effect-evidence_revisions"를 확인한다
+    그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 worker/proposePurchase 업무 효과0
@@ -9358,11 +10372,13 @@
     만일 "시스템" 역할이 "setup" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-before" 행동을 수행한다
     만일 "reader" 역할이 "access-before" 행동을 수행한다
     만일 "delegator" 역할이 "target-before" 행동을 수행한다
     만일 "reader" 역할이 "attempt" 행동을 수행한다
     만일 "delegator" 역할이 "after-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "after" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-after" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-target" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-after-snapshot" 행동을 수행한다
@@ -9395,6 +10411,9 @@
     그러면 "current-read-actions" assertion으로 "read-audit-permitted current-read-actions"를 확인한다
     그러면 "authorized-committed-once" assertion으로 "read-audit-permitted authorized-committed-once"를 확인한다
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
+    그러면 "unchanged-effect-proposals" assertion으로 "followup-effects unchanged-effect-proposals"를 확인한다
+    그러면 "unchanged-effect-purchaseRevisions" assertion으로 "followup-effects unchanged-effect-purchaseRevisions"를 확인한다
+    그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 worker/revisePurchase 업무 효과0
@@ -9402,11 +10421,13 @@
     만일 "시스템" 역할이 "setup" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-before" 행동을 수행한다
     만일 "reader" 역할이 "access-before" 행동을 수행한다
     만일 "delegator" 역할이 "target-before" 행동을 수행한다
     만일 "reader" 역할이 "attempt" 행동을 수행한다
     만일 "delegator" 역할이 "after-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "after" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-after" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-target" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-after-snapshot" 행동을 수행한다
@@ -9439,6 +10460,9 @@
     그러면 "current-read-actions" assertion으로 "read-audit-permitted current-read-actions"를 확인한다
     그러면 "authorized-committed-once" assertion으로 "read-audit-permitted authorized-committed-once"를 확인한다
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
+    그러면 "unchanged-effect-proposals" assertion으로 "followup-effects unchanged-effect-proposals"를 확인한다
+    그러면 "unchanged-effect-purchaseRevisions" assertion으로 "followup-effects unchanged-effect-purchaseRevisions"를 확인한다
+    그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 worker/approvePurchase 업무 효과0
@@ -9446,11 +10470,13 @@
     만일 "시스템" 역할이 "setup" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-before" 행동을 수행한다
     만일 "reader" 역할이 "access-before" 행동을 수행한다
     만일 "delegator" 역할이 "target-before" 행동을 수행한다
     만일 "reader" 역할이 "attempt" 행동을 수행한다
     만일 "delegator" 역할이 "after-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "after" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-after" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-target" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-after-snapshot" 행동을 수행한다
@@ -9483,6 +10509,8 @@
     그러면 "current-read-actions" assertion으로 "read-audit-permitted current-read-actions"를 확인한다
     그러면 "authorized-committed-once" assertion으로 "read-audit-permitted authorized-committed-once"를 확인한다
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
+    그러면 "unchanged-effect-proposals" assertion으로 "followup-effects unchanged-effect-proposals"를 확인한다
+    그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 worker/dispatchPurchaseOrder 업무 효과0
@@ -9492,11 +10520,13 @@
     만일 "manager" 역할이 "precondition-approval" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-before" 행동을 수행한다
     만일 "reader" 역할이 "access-before" 행동을 수행한다
     만일 "delegator" 역할이 "target-before" 행동을 수행한다
     만일 "reader" 역할이 "attempt" 행동을 수행한다
     만일 "delegator" 역할이 "after-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "after" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-after" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-target" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-after-snapshot" 행동을 수행한다
@@ -9529,20 +10559,26 @@
     그러면 "current-read-actions" assertion으로 "read-audit-permitted current-read-actions"를 확인한다
     그러면 "authorized-committed-once" assertion으로 "read-audit-permitted authorized-committed-once"를 확인한다
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
-    그러면 "precondition-approved" assertion으로 "read-audit-permitted precondition-approved"를 확인한다
-    그러면 "precondition-approval-record" assertion으로 "read-audit-permitted precondition-approval-record"를 확인한다
-    그러면 "authorized-business-outbox-once" assertion으로 "read-audit-permitted authorized-business-outbox-once"를 확인한다
+    그러면 "precondition-approved" assertion으로 "approval-effects precondition-approved"를 확인한다
+    그러면 "precondition-approval-record" assertion으로 "approval-effects precondition-approval-record"를 확인한다
+    그러면 "authorized-business-outbox-once" assertion으로 "external-outbox-effects authorized-business-outbox-once"를 확인한다
+    그러면 "unchanged-effect-purchaseOrders" assertion으로 "external-outbox-effects unchanged-effect-purchaseOrders"를 확인한다
+    그러면 "unchanged-effect-proposals" assertion으로 "followup-effects unchanged-effect-proposals"를 확인한다
+    그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
 
+  @sit
   시나리오: WRITE 역할·READ 위임에서 worker/recordSupplierReply 업무 효과0
     먼저 사례 파일 "verification/cases/C3/case.json"의 "worker-recordSupplierReply"를 준비한다
     만일 "시스템" 역할이 "setup" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-before" 행동을 수행한다
     만일 "reader" 역할이 "access-before" 행동을 수행한다
     만일 "delegator" 역할이 "target-before" 행동을 수행한다
     만일 "reader" 역할이 "attempt" 행동을 수행한다
     만일 "delegator" 역할이 "after-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "after" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-after" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-target" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-after-snapshot" 행동을 수행한다
@@ -9575,6 +10611,8 @@
     그러면 "current-read-actions" assertion으로 "read-audit-permitted current-read-actions"를 확인한다
     그러면 "authorized-committed-once" assertion으로 "read-audit-permitted authorized-committed-once"를 확인한다
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
+    그러면 "unchanged-effect-supplierCommitments" assertion으로 "followup-effects unchanged-effect-supplierCommitments"를 확인한다
+    그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 worker/cancelPurchase 업무 효과0
@@ -9582,11 +10620,13 @@
     만일 "시스템" 역할이 "setup" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-before" 행동을 수행한다
     만일 "reader" 역할이 "access-before" 행동을 수행한다
     만일 "delegator" 역할이 "target-before" 행동을 수행한다
     만일 "reader" 역할이 "attempt" 행동을 수행한다
     만일 "delegator" 역할이 "after-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "after" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-after" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-target" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-after-snapshot" 행동을 수행한다
@@ -9619,6 +10659,9 @@
     그러면 "current-read-actions" assertion으로 "read-audit-permitted current-read-actions"를 확인한다
     그러면 "authorized-committed-once" assertion으로 "read-audit-permitted authorized-committed-once"를 확인한다
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
+    그러면 "unchanged-effect-cancellationRequests" assertion으로 "followup-effects unchanged-effect-cancellationRequests"를 확인한다
+    그러면 "unchanged-effect-purchaseOrders" assertion으로 "external-outbox-effects unchanged-effect-purchaseOrders"를 확인한다
+    그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 worker/createShipment 업무 효과0
@@ -9626,11 +10669,13 @@
     만일 "시스템" 역할이 "setup" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-before" 행동을 수행한다
     만일 "reader" 역할이 "access-before" 행동을 수행한다
     만일 "delegator" 역할이 "target-before" 행동을 수행한다
     만일 "reader" 역할이 "attempt" 행동을 수행한다
     만일 "delegator" 역할이 "after-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "after" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-after" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-target" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-after-snapshot" 행동을 수행한다
@@ -9663,6 +10708,10 @@
     그러면 "current-read-actions" assertion으로 "read-audit-permitted current-read-actions"를 확인한다
     그러면 "authorized-committed-once" assertion으로 "read-audit-permitted authorized-committed-once"를 확인한다
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
+    그러면 "unchanged-effect-shipments" assertion으로 "followup-effects unchanged-effect-shipments"를 확인한다
+    그러면 "unchanged-effect-cargoAllocations" assertion으로 "followup-effects unchanged-effect-cargoAllocations"를 확인한다
+    그러면 "unchanged-effect-legs" assertion으로 "followup-effects unchanged-effect-legs"를 확인한다
+    그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 worker/recordLegEvent 업무 효과0
@@ -9670,11 +10719,13 @@
     만일 "시스템" 역할이 "setup" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-before" 행동을 수행한다
     만일 "reader" 역할이 "access-before" 행동을 수행한다
     만일 "delegator" 역할이 "target-before" 행동을 수행한다
     만일 "reader" 역할이 "attempt" 행동을 수행한다
     만일 "delegator" 역할이 "after-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "after" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-after" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-target" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-after-snapshot" 행동을 수행한다
@@ -9707,6 +10758,9 @@
     그러면 "current-read-actions" assertion으로 "read-audit-permitted current-read-actions"를 확인한다
     그러면 "authorized-committed-once" assertion으로 "read-audit-permitted authorized-committed-once"를 확인한다
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
+    그러면 "unchanged-effect-legs" assertion으로 "followup-effects unchanged-effect-legs"를 확인한다
+    그러면 "unchanged-effect-events" assertion으로 "followup-effects unchanged-effect-events"를 확인한다
+    그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 worker/recordHandover 업무 효과0
@@ -9714,11 +10768,13 @@
     만일 "시스템" 역할이 "setup" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-before" 행동을 수행한다
     만일 "reader" 역할이 "access-before" 행동을 수행한다
     만일 "delegator" 역할이 "target-before" 행동을 수행한다
     만일 "reader" 역할이 "attempt" 행동을 수행한다
     만일 "delegator" 역할이 "after-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "after" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-after" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-target" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-after-snapshot" 행동을 수행한다
@@ -9751,6 +10807,9 @@
     그러면 "current-read-actions" assertion으로 "read-audit-permitted current-read-actions"를 확인한다
     그러면 "authorized-committed-once" assertion으로 "read-audit-permitted authorized-committed-once"를 확인한다
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
+    그러면 "unchanged-effect-custodyHandovers" assertion으로 "inventory-effects unchanged-effect-custodyHandovers"를 확인한다
+    그러면 "unchanged-effect-events" assertion으로 "followup-effects unchanged-effect-events"를 확인한다
+    그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 worker/prepareRegulatoryProcedure 업무 효과0
@@ -9758,11 +10817,13 @@
     만일 "시스템" 역할이 "setup" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-before" 행동을 수행한다
     만일 "reader" 역할이 "access-before" 행동을 수행한다
     만일 "delegator" 역할이 "target-before" 행동을 수행한다
     만일 "reader" 역할이 "attempt" 행동을 수행한다
     만일 "delegator" 역할이 "after-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "after" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-after" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-target" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-after-snapshot" 행동을 수행한다
@@ -9795,6 +10856,8 @@
     그러면 "current-read-actions" assertion으로 "read-audit-permitted current-read-actions"를 확인한다
     그러면 "authorized-committed-once" assertion으로 "read-audit-permitted authorized-committed-once"를 확인한다
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
+    그러면 "unchanged-effect-procedures" assertion으로 "followup-effects unchanged-effect-procedures"를 확인한다
+    그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 worker/recordSubmission 업무 효과0
@@ -9802,11 +10865,13 @@
     만일 "시스템" 역할이 "setup" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-before" 행동을 수행한다
     만일 "reader" 역할이 "access-before" 행동을 수행한다
     만일 "delegator" 역할이 "target-before" 행동을 수행한다
     만일 "reader" 역할이 "attempt" 행동을 수행한다
     만일 "delegator" 역할이 "after-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "after" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-after" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-target" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-after-snapshot" 행동을 수행한다
@@ -9839,6 +10904,8 @@
     그러면 "current-read-actions" assertion으로 "read-audit-permitted current-read-actions"를 확인한다
     그러면 "authorized-committed-once" assertion으로 "read-audit-permitted authorized-committed-once"를 확인한다
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
+    그러면 "unchanged-effect-submissions" assertion으로 "followup-effects unchanged-effect-submissions"를 확인한다
+    그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 worker/recordRegulatoryDecision 업무 효과0
@@ -9846,11 +10913,13 @@
     만일 "시스템" 역할이 "setup" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-before" 행동을 수행한다
     만일 "reader" 역할이 "access-before" 행동을 수행한다
     만일 "delegator" 역할이 "target-before" 행동을 수행한다
     만일 "reader" 역할이 "attempt" 행동을 수행한다
     만일 "delegator" 역할이 "after-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "after" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-after" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-target" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-after-snapshot" 행동을 수행한다
@@ -9883,6 +10952,9 @@
     그러면 "current-read-actions" assertion으로 "read-audit-permitted current-read-actions"를 확인한다
     그러면 "authorized-committed-once" assertion으로 "read-audit-permitted authorized-committed-once"를 확인한다
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
+    그러면 "unchanged-effect-regulatoryDecisions" assertion으로 "followup-effects unchanged-effect-regulatoryDecisions"를 확인한다
+    그러면 "unchanged-effect-restrictions" assertion으로 "inventory-effects unchanged-effect-restrictions"를 확인한다
+    그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 worker/verifyLabel 업무 효과0
@@ -9890,11 +10962,13 @@
     만일 "시스템" 역할이 "setup" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-before" 행동을 수행한다
     만일 "reader" 역할이 "access-before" 행동을 수행한다
     만일 "delegator" 역할이 "target-before" 행동을 수행한다
     만일 "reader" 역할이 "attempt" 행동을 수행한다
     만일 "delegator" 역할이 "after-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "after" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-after" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-target" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-after-snapshot" 행동을 수행한다
@@ -9927,6 +11001,8 @@
     그러면 "current-read-actions" assertion으로 "read-audit-permitted current-read-actions"를 확인한다
     그러면 "authorized-committed-once" assertion으로 "read-audit-permitted authorized-committed-once"를 확인한다
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
+    그러면 "unchanged-effect-labels" assertion으로 "inventory-effects unchanged-effect-labels"를 확인한다
+    그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 worker/receiveProvisional 업무 효과0
@@ -9934,11 +11010,13 @@
     만일 "시스템" 역할이 "setup" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-before" 행동을 수행한다
     만일 "reader" 역할이 "access-before" 행동을 수행한다
     만일 "delegator" 역할이 "target-before" 행동을 수행한다
     만일 "reader" 역할이 "attempt" 행동을 수행한다
     만일 "delegator" 역할이 "after-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "after" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-after" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-target" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-after-snapshot" 행동을 수행한다
@@ -9971,6 +11049,9 @@
     그러면 "current-read-actions" assertion으로 "read-audit-permitted current-read-actions"를 확인한다
     그러면 "authorized-committed-once" assertion으로 "read-audit-permitted authorized-committed-once"를 확인한다
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
+    그러면 "unchanged-effect-receipts" assertion으로 "inventory-effects unchanged-effect-receipts"를 확인한다
+    그러면 "unchanged-effect-events" assertion으로 "followup-effects unchanged-effect-events"를 확인한다
+    그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 worker/placeHold 업무 효과0
@@ -9978,11 +11059,13 @@
     만일 "시스템" 역할이 "setup" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-before" 행동을 수행한다
     만일 "reader" 역할이 "access-before" 행동을 수행한다
     만일 "delegator" 역할이 "target-before" 행동을 수행한다
     만일 "reader" 역할이 "attempt" 행동을 수행한다
     만일 "delegator" 역할이 "after-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "after" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-after" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-target" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-after-snapshot" 행동을 수행한다
@@ -10015,6 +11098,8 @@
     그러면 "current-read-actions" assertion으로 "read-audit-permitted current-read-actions"를 확인한다
     그러면 "authorized-committed-once" assertion으로 "read-audit-permitted authorized-committed-once"를 확인한다
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
+    그러면 "unchanged-effect-restrictions" assertion으로 "inventory-effects unchanged-effect-restrictions"를 확인한다
+    그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 worker/releaseHold 업무 효과0
@@ -10022,11 +11107,13 @@
     만일 "시스템" 역할이 "setup" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-before" 행동을 수행한다
     만일 "reader" 역할이 "access-before" 행동을 수행한다
     만일 "delegator" 역할이 "target-before" 행동을 수행한다
     만일 "reader" 역할이 "attempt" 행동을 수행한다
     만일 "delegator" 역할이 "after-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "after" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-after" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-target" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-after-snapshot" 행동을 수행한다
@@ -10059,6 +11146,8 @@
     그러면 "current-read-actions" assertion으로 "read-audit-permitted current-read-actions"를 확인한다
     그러면 "authorized-committed-once" assertion으로 "read-audit-permitted authorized-committed-once"를 확인한다
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
+    그러면 "unchanged-effect-restrictions" assertion으로 "inventory-effects unchanged-effect-restrictions"를 확인한다
+    그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 worker/recordDispositionBasis 업무 효과0
@@ -10066,11 +11155,13 @@
     만일 "시스템" 역할이 "setup" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-before" 행동을 수행한다
     만일 "reader" 역할이 "access-before" 행동을 수행한다
     만일 "delegator" 역할이 "target-before" 행동을 수행한다
     만일 "reader" 역할이 "attempt" 행동을 수행한다
     만일 "delegator" 역할이 "after-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "after" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-after" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-target" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-after-snapshot" 행동을 수행한다
@@ -10103,6 +11194,8 @@
     그러면 "current-read-actions" assertion으로 "read-audit-permitted current-read-actions"를 확인한다
     그러면 "authorized-committed-once" assertion으로 "read-audit-permitted authorized-committed-once"를 확인한다
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
+    그러면 "unchanged-effect-dispositionBases" assertion으로 "inventory-effects unchanged-effect-dispositionBases"를 확인한다
+    그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 worker/revokeDispositionBasis 업무 효과0
@@ -10110,11 +11203,13 @@
     만일 "시스템" 역할이 "setup" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-before" 행동을 수행한다
     만일 "reader" 역할이 "access-before" 행동을 수행한다
     만일 "delegator" 역할이 "target-before" 행동을 수행한다
     만일 "reader" 역할이 "attempt" 행동을 수행한다
     만일 "delegator" 역할이 "after-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "after" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-after" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-target" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-after-snapshot" 행동을 수행한다
@@ -10147,6 +11242,8 @@
     그러면 "current-read-actions" assertion으로 "read-audit-permitted current-read-actions"를 확인한다
     그러면 "authorized-committed-once" assertion으로 "read-audit-permitted authorized-committed-once"를 확인한다
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
+    그러면 "unchanged-effect-dispositionBases" assertion으로 "inventory-effects unchanged-effect-dispositionBases"를 확인한다
+    그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 worker/recordStocktake 업무 효과0
@@ -10154,11 +11251,13 @@
     만일 "시스템" 역할이 "setup" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-before" 행동을 수행한다
     만일 "reader" 역할이 "access-before" 행동을 수행한다
     만일 "delegator" 역할이 "target-before" 행동을 수행한다
     만일 "reader" 역할이 "attempt" 행동을 수행한다
     만일 "delegator" 역할이 "after-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "after" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-after" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-target" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-after-snapshot" 행동을 수행한다
@@ -10191,6 +11290,8 @@
     그러면 "current-read-actions" assertion으로 "read-audit-permitted current-read-actions"를 확인한다
     그러면 "authorized-committed-once" assertion으로 "read-audit-permitted authorized-committed-once"를 확인한다
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
+    그러면 "unchanged-effect-stocktakes" assertion으로 "inventory-effects unchanged-effect-stocktakes"를 확인한다
+    그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 worker/createSalesOrder 업무 효과0
@@ -10198,11 +11299,13 @@
     만일 "시스템" 역할이 "setup" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-before" 행동을 수행한다
     만일 "reader" 역할이 "access-before" 행동을 수행한다
     만일 "delegator" 역할이 "target-before" 행동을 수행한다
     만일 "reader" 역할이 "attempt" 행동을 수행한다
     만일 "delegator" 역할이 "after-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "after" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-after" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-target" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-after-snapshot" 행동을 수행한다
@@ -10235,6 +11338,8 @@
     그러면 "current-read-actions" assertion으로 "read-audit-permitted current-read-actions"를 확인한다
     그러면 "authorized-committed-once" assertion으로 "read-audit-permitted authorized-committed-once"를 확인한다
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
+    그러면 "unchanged-effect-orders" assertion으로 "followup-effects unchanged-effect-orders"를 확인한다
+    그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 worker/reviseSalesOrder 업무 효과0
@@ -10242,11 +11347,13 @@
     만일 "시스템" 역할이 "setup" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-before" 행동을 수행한다
     만일 "reader" 역할이 "access-before" 행동을 수행한다
     만일 "delegator" 역할이 "target-before" 행동을 수행한다
     만일 "reader" 역할이 "attempt" 행동을 수행한다
     만일 "delegator" 역할이 "after-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "after" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-after" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-target" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-after-snapshot" 행동을 수행한다
@@ -10279,6 +11386,8 @@
     그러면 "current-read-actions" assertion으로 "read-audit-permitted current-read-actions"를 확인한다
     그러면 "authorized-committed-once" assertion으로 "read-audit-permitted authorized-committed-once"를 확인한다
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
+    그러면 "unchanged-effect-orders" assertion으로 "followup-effects unchanged-effect-orders"를 확인한다
+    그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 worker/releaseAllocation 업무 효과0
@@ -10286,11 +11395,13 @@
     만일 "시스템" 역할이 "setup" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-before" 행동을 수행한다
     만일 "reader" 역할이 "access-before" 행동을 수행한다
     만일 "delegator" 역할이 "target-before" 행동을 수행한다
     만일 "reader" 역할이 "attempt" 행동을 수행한다
     만일 "delegator" 역할이 "after-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "after" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-after" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-target" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-after-snapshot" 행동을 수행한다
@@ -10323,6 +11434,8 @@
     그러면 "current-read-actions" assertion으로 "read-audit-permitted current-read-actions"를 확인한다
     그러면 "authorized-committed-once" assertion으로 "read-audit-permitted authorized-committed-once"를 확인한다
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
+    그러면 "unchanged-effect-orders" assertion으로 "followup-effects unchanged-effect-orders"를 확인한다
+    그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 worker/recordDelivery 업무 효과0
@@ -10330,11 +11443,13 @@
     만일 "시스템" 역할이 "setup" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-before" 행동을 수행한다
     만일 "reader" 역할이 "access-before" 행동을 수행한다
     만일 "delegator" 역할이 "target-before" 행동을 수행한다
     만일 "reader" 역할이 "attempt" 행동을 수행한다
     만일 "delegator" 역할이 "after-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "after" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-after" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-target" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-after-snapshot" 행동을 수행한다
@@ -10367,6 +11482,9 @@
     그러면 "current-read-actions" assertion으로 "read-audit-permitted current-read-actions"를 확인한다
     그러면 "authorized-committed-once" assertion으로 "read-audit-permitted authorized-committed-once"를 확인한다
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
+    그러면 "unchanged-effect-deliveries" assertion으로 "followup-effects unchanged-effect-deliveries"를 확인한다
+    그러면 "unchanged-effect-events" assertion으로 "followup-effects unchanged-effect-events"를 확인한다
+    그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 worker/recordObservedMovement 업무 효과0
@@ -10374,11 +11492,13 @@
     만일 "시스템" 역할이 "setup" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-before" 행동을 수행한다
     만일 "reader" 역할이 "access-before" 행동을 수행한다
     만일 "delegator" 역할이 "target-before" 행동을 수행한다
     만일 "reader" 역할이 "attempt" 행동을 수행한다
     만일 "delegator" 역할이 "after-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "after" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-after" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-target" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-after-snapshot" 행동을 수행한다
@@ -10411,6 +11531,9 @@
     그러면 "current-read-actions" assertion으로 "read-audit-permitted current-read-actions"를 확인한다
     그러면 "authorized-committed-once" assertion으로 "read-audit-permitted authorized-committed-once"를 확인한다
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
+    그러면 "unchanged-effect-events" assertion으로 "followup-effects unchanged-effect-events"를 확인한다
+    그러면 "unchanged-effect-reconciliations" assertion으로 "followup-effects unchanged-effect-reconciliations"를 확인한다
+    그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 worker/authorizeReturn 업무 효과0
@@ -10418,11 +11541,13 @@
     만일 "시스템" 역할이 "setup" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-before" 행동을 수행한다
     만일 "reader" 역할이 "access-before" 행동을 수행한다
     만일 "delegator" 역할이 "target-before" 행동을 수행한다
     만일 "reader" 역할이 "attempt" 행동을 수행한다
     만일 "delegator" 역할이 "after-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "after" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-after" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-target" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-after-snapshot" 행동을 수행한다
@@ -10455,6 +11580,8 @@
     그러면 "current-read-actions" assertion으로 "read-audit-permitted current-read-actions"를 확인한다
     그러면 "authorized-committed-once" assertion으로 "read-audit-permitted authorized-committed-once"를 확인한다
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
+    그러면 "unchanged-effect-returns" assertion으로 "inventory-effects unchanged-effect-returns"를 확인한다
+    그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 worker/receiveReturn 업무 효과0
@@ -10462,11 +11589,13 @@
     만일 "시스템" 역할이 "setup" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-before" 행동을 수행한다
     만일 "reader" 역할이 "access-before" 행동을 수행한다
     만일 "delegator" 역할이 "target-before" 행동을 수행한다
     만일 "reader" 역할이 "attempt" 행동을 수행한다
     만일 "delegator" 역할이 "after-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "after" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-after" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-target" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-after-snapshot" 행동을 수행한다
@@ -10499,6 +11628,9 @@
     그러면 "current-read-actions" assertion으로 "read-audit-permitted current-read-actions"를 확인한다
     그러면 "authorized-committed-once" assertion으로 "read-audit-permitted authorized-committed-once"를 확인한다
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
+    그러면 "unchanged-effect-returns" assertion으로 "inventory-effects unchanged-effect-returns"를 확인한다
+    그러면 "unchanged-effect-restrictions" assertion으로 "inventory-effects unchanged-effect-restrictions"를 확인한다
+    그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 worker/decideReturnDisposition 업무 효과0
@@ -10506,11 +11638,13 @@
     만일 "시스템" 역할이 "setup" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-before" 행동을 수행한다
     만일 "reader" 역할이 "access-before" 행동을 수행한다
     만일 "delegator" 역할이 "target-before" 행동을 수행한다
     만일 "reader" 역할이 "attempt" 행동을 수행한다
     만일 "delegator" 역할이 "after-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "after" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-after" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-target" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-after-snapshot" 행동을 수행한다
@@ -10543,6 +11677,9 @@
     그러면 "current-read-actions" assertion으로 "read-audit-permitted current-read-actions"를 확인한다
     그러면 "authorized-committed-once" assertion으로 "read-audit-permitted authorized-committed-once"를 확인한다
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
+    그러면 "unchanged-effect-returns" assertion으로 "inventory-effects unchanged-effect-returns"를 확인한다
+    그러면 "unchanged-effect-dispositions" assertion으로 "inventory-effects unchanged-effect-dispositions"를 확인한다
+    그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 worker/openInvestigation 업무 효과0
@@ -10550,11 +11687,13 @@
     만일 "시스템" 역할이 "setup" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-before" 행동을 수행한다
     만일 "reader" 역할이 "access-before" 행동을 수행한다
     만일 "delegator" 역할이 "target-before" 행동을 수행한다
     만일 "reader" 역할이 "attempt" 행동을 수행한다
     만일 "delegator" 역할이 "after-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "after" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-after" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-target" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-after-snapshot" 행동을 수행한다
@@ -10587,6 +11726,9 @@
     그러면 "current-read-actions" assertion으로 "read-audit-permitted current-read-actions"를 확인한다
     그러면 "authorized-committed-once" assertion으로 "read-audit-permitted authorized-committed-once"를 확인한다
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
+    그러면 "unchanged-effect-investigations" assertion으로 "followup-effects unchanged-effect-investigations"를 확인한다
+    그러면 "unchanged-effect-restrictions" assertion으로 "inventory-effects unchanged-effect-restrictions"를 확인한다
+    그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 worker/proposeRecall 업무 효과0
@@ -10594,11 +11736,13 @@
     만일 "시스템" 역할이 "setup" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-before" 행동을 수행한다
     만일 "reader" 역할이 "access-before" 행동을 수행한다
     만일 "delegator" 역할이 "target-before" 행동을 수행한다
     만일 "reader" 역할이 "attempt" 행동을 수행한다
     만일 "delegator" 역할이 "after-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "after" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-after" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-target" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-after-snapshot" 행동을 수행한다
@@ -10631,20 +11775,26 @@
     그러면 "current-read-actions" assertion으로 "read-audit-permitted current-read-actions"를 확인한다
     그러면 "authorized-committed-once" assertion으로 "read-audit-permitted authorized-committed-once"를 확인한다
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
+    그러면 "unchanged-effect-recallScopes" assertion으로 "followup-effects unchanged-effect-recallScopes"를 확인한다
+    그러면 "unchanged-effect-investigations" assertion으로 "followup-effects unchanged-effect-investigations"를 확인한다
+    그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 worker/approveRecall 업무 효과0
     먼저 사례 파일 "verification/cases/C3/case.json"의 "worker-approveRecall"를 준비한다
     만일 "시스템" 역할이 "setup" 행동을 수행한다
+    만일 "delegator" 역할이 "precondition-recall" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-before" 행동을 수행한다
     만일 "reader" 역할이 "access-before" 행동을 수행한다
     만일 "delegator" 역할이 "target-before" 행동을 수행한다
     만일 "reader" 역할이 "attempt" 행동을 수행한다
     만일 "delegator" 역할이 "after-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "after" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-after" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-target" 행동을 수행한다
-    만일 "delegator" 역할이 "authorized-same-input" 행동을 수행한다
+    만일 "admin" 역할이 "authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-after-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "authorized-after" 행동을 수행한다
     그러면 "attempt-code" assertion으로 "work-effects attempt-code"를 확인한다
@@ -10675,20 +11825,27 @@
     그러면 "current-read-actions" assertion으로 "read-audit-permitted current-read-actions"를 확인한다
     그러면 "authorized-committed-once" assertion으로 "read-audit-permitted authorized-committed-once"를 확인한다
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
+    그러면 "authorized-business-recall-approval" assertion으로 "approval-effects authorized-business-recall-approval"를 확인한다
+    그러면 "unchanged-effect-recallScopes" assertion으로 "followup-effects unchanged-effect-recallScopes"를 확인한다
+    그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 worker/recordRecallNotice 업무 효과0
     먼저 사례 파일 "verification/cases/C3/case.json"의 "worker-recordRecallNotice"를 준비한다
     만일 "시스템" 역할이 "setup" 행동을 수행한다
+    만일 "delegator" 역할이 "precondition-recall" 행동을 수행한다
+    만일 "admin" 역할이 "precondition-approval" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-before" 행동을 수행한다
     만일 "reader" 역할이 "access-before" 행동을 수행한다
     만일 "delegator" 역할이 "target-before" 행동을 수행한다
     만일 "reader" 역할이 "attempt" 행동을 수행한다
     만일 "delegator" 역할이 "after-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "after" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-after" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-target" 행동을 수행한다
-    만일 "delegator" 역할이 "authorized-same-input" 행동을 수행한다
+    만일 "admin" 역할이 "authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-after-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "authorized-after" 행동을 수행한다
     그러면 "attempt-code" assertion으로 "work-effects attempt-code"를 확인한다
@@ -10719,18 +11876,28 @@
     그러면 "current-read-actions" assertion으로 "read-audit-permitted current-read-actions"를 확인한다
     그러면 "authorized-committed-once" assertion으로 "read-audit-permitted authorized-committed-once"를 확인한다
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
+    그러면 "precondition-approval-applied" assertion으로 "approval-effects precondition-approval-applied"를 확인한다
+    그러면 "precondition-approval-record" assertion으로 "approval-effects precondition-approval-record"를 확인한다
+    그러면 "authorized-business-notice" assertion으로 "followup-effects authorized-business-notice"를 확인한다
+    그러면 "unchanged-effect-notices" assertion으로 "followup-effects unchanged-effect-notices"를 확인한다
+    그러면 "unchanged-effect-recallScopes" assertion으로 "followup-effects unchanged-effect-recallScopes"를 확인한다
+    그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 worker/recordRecovery 업무 효과0
     먼저 사례 파일 "verification/cases/C3/case.json"의 "worker-recordRecovery"를 준비한다
     만일 "시스템" 역할이 "setup" 행동을 수행한다
+    만일 "delegator" 역할이 "precondition-recall" 행동을 수행한다
+    만일 "admin" 역할이 "precondition-approval" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-before" 행동을 수행한다
     만일 "reader" 역할이 "access-before" 행동을 수행한다
     만일 "delegator" 역할이 "target-before" 행동을 수행한다
     만일 "reader" 역할이 "attempt" 행동을 수행한다
     만일 "delegator" 역할이 "after-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "after" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-after" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-target" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-after-snapshot" 행동을 수행한다
@@ -10763,20 +11930,33 @@
     그러면 "current-read-actions" assertion으로 "read-audit-permitted current-read-actions"를 확인한다
     그러면 "authorized-committed-once" assertion으로 "read-audit-permitted authorized-committed-once"를 확인한다
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
+    그러면 "precondition-approval-applied" assertion으로 "approval-effects precondition-approval-applied"를 확인한다
+    그러면 "precondition-approval-record" assertion으로 "approval-effects precondition-approval-record"를 확인한다
+    그러면 "authorized-business-recovery" assertion으로 "inventory-effects authorized-business-recovery"를 확인한다
+    그러면 "unchanged-effect-recoveries" assertion으로 "inventory-effects unchanged-effect-recoveries"를 확인한다
+    그러면 "unchanged-effect-recallScopes" assertion으로 "followup-effects unchanged-effect-recallScopes"를 확인한다
+    그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 worker/closeRecall 업무 효과0
     먼저 사례 파일 "verification/cases/C3/case.json"의 "worker-closeRecall"를 준비한다
     만일 "시스템" 역할이 "setup" 행동을 수행한다
+    만일 "delegator" 역할이 "precondition-recall" 행동을 수행한다
+    만일 "admin" 역할이 "precondition-approval" 행동을 수행한다
+    만일 "admin" 역할이 "precondition-notice" 행동을 수행한다
+    만일 "delegator" 역할이 "precondition-recovery" 행동을 수행한다
+    만일 "delegator" 역할이 "precondition-disposal" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-before" 행동을 수행한다
     만일 "reader" 역할이 "access-before" 행동을 수행한다
     만일 "delegator" 역할이 "target-before" 행동을 수행한다
     만일 "reader" 역할이 "attempt" 행동을 수행한다
     만일 "delegator" 역할이 "after-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "after" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-after" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-target" 행동을 수행한다
-    만일 "delegator" 역할이 "authorized-same-input" 행동을 수행한다
+    만일 "admin" 역할이 "authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-after-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "authorized-after" 행동을 수행한다
     그러면 "attempt-code" assertion으로 "work-effects attempt-code"를 확인한다
@@ -10807,6 +11987,16 @@
     그러면 "current-read-actions" assertion으로 "read-audit-permitted current-read-actions"를 확인한다
     그러면 "authorized-committed-once" assertion으로 "read-audit-permitted authorized-committed-once"를 확인한다
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
+    그러면 "precondition-approval-applied" assertion으로 "approval-effects precondition-approval-applied"를 확인한다
+    그러면 "precondition-approval-record" assertion으로 "approval-effects precondition-approval-record"를 확인한다
+    그러면 "precondition-notice-applied" assertion으로 "followup-effects precondition-notice-applied"를 확인한다
+    그러면 "precondition-recovery-applied" assertion으로 "followup-effects precondition-recovery-applied"를 확인한다
+    그러면 "precondition-disposal-applied" assertion으로 "followup-effects precondition-disposal-applied"를 확인한다
+    그러면 "precondition-not-closed" assertion으로 "followup-effects precondition-not-closed"를 확인한다
+    그러면 "authorized-business-recall-closure" assertion으로 "followup-effects authorized-business-recall-closure"를 확인한다
+    그러면 "unchanged-effect-recallScopes" assertion으로 "followup-effects unchanged-effect-recallScopes"를 확인한다
+    그러면 "unchanged-effect-recallClosures" assertion으로 "followup-effects unchanged-effect-recallClosures"를 확인한다
+    그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 worker/recordInvoice 업무 효과0
@@ -10814,11 +12004,13 @@
     만일 "시스템" 역할이 "setup" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-before" 행동을 수행한다
     만일 "reader" 역할이 "access-before" 행동을 수행한다
     만일 "delegator" 역할이 "target-before" 행동을 수행한다
     만일 "reader" 역할이 "attempt" 행동을 수행한다
     만일 "delegator" 역할이 "after-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "after" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-after" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-target" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-after-snapshot" 행동을 수행한다
@@ -10851,6 +12043,8 @@
     그러면 "current-read-actions" assertion으로 "read-audit-permitted current-read-actions"를 확인한다
     그러면 "authorized-committed-once" assertion으로 "read-audit-permitted authorized-committed-once"를 확인한다
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
+    그러면 "unchanged-effect-invoices" assertion으로 "followup-effects unchanged-effect-invoices"를 확인한다
+    그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 worker/recordCharge 업무 효과0
@@ -10858,11 +12052,13 @@
     만일 "시스템" 역할이 "setup" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-before" 행동을 수행한다
     만일 "reader" 역할이 "access-before" 행동을 수행한다
     만일 "delegator" 역할이 "target-before" 행동을 수행한다
     만일 "reader" 역할이 "attempt" 행동을 수행한다
     만일 "delegator" 역할이 "after-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "after" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-after" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-target" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-after-snapshot" 행동을 수행한다
@@ -10895,6 +12091,9 @@
     그러면 "current-read-actions" assertion으로 "read-audit-permitted current-read-actions"를 확인한다
     그러면 "authorized-committed-once" assertion으로 "read-audit-permitted authorized-committed-once"를 확인한다
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
+    그러면 "unchanged-effect-charges" assertion으로 "followup-effects unchanged-effect-charges"를 확인한다
+    그러면 "unchanged-effect-invoices" assertion으로 "followup-effects unchanged-effect-invoices"를 확인한다
+    그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 worker/matchInvoice 업무 효과0
@@ -10902,11 +12101,13 @@
     만일 "시스템" 역할이 "setup" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-before" 행동을 수행한다
     만일 "reader" 역할이 "access-before" 행동을 수행한다
     만일 "delegator" 역할이 "target-before" 행동을 수행한다
     만일 "reader" 역할이 "attempt" 행동을 수행한다
     만일 "delegator" 역할이 "after-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "after" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-after" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-target" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-after-snapshot" 행동을 수행한다
@@ -10939,6 +12140,10 @@
     그러면 "current-read-actions" assertion으로 "read-audit-permitted current-read-actions"를 확인한다
     그러면 "authorized-committed-once" assertion으로 "read-audit-permitted authorized-committed-once"를 확인한다
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
+    그러면 "unchanged-effect-purchaseMatches" assertion으로 "followup-effects unchanged-effect-purchaseMatches"를 확인한다
+    그러면 "unchanged-effect-saleMatches" assertion으로 "followup-effects unchanged-effect-saleMatches"를 확인한다
+    그러면 "unchanged-effect-invoiceDifferences" assertion으로 "followup-effects unchanged-effect-invoiceDifferences"를 확인한다
+    그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 worker/recordSettlementAdjustment 업무 효과0
@@ -10946,11 +12151,13 @@
     만일 "시스템" 역할이 "setup" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-before" 행동을 수행한다
     만일 "reader" 역할이 "access-before" 행동을 수행한다
     만일 "delegator" 역할이 "target-before" 행동을 수행한다
     만일 "reader" 역할이 "attempt" 행동을 수행한다
     만일 "delegator" 역할이 "after-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "after" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-after" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-target" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-after-snapshot" 행동을 수행한다
@@ -10983,6 +12190,9 @@
     그러면 "current-read-actions" assertion으로 "read-audit-permitted current-read-actions"를 확인한다
     그러면 "authorized-committed-once" assertion으로 "read-audit-permitted authorized-committed-once"를 확인한다
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
+    그러면 "unchanged-effect-settlementAdjustments" assertion으로 "followup-effects unchanged-effect-settlementAdjustments"를 확인한다
+    그러면 "unchanged-effect-invoiceDifferences" assertion으로 "followup-effects unchanged-effect-invoiceDifferences"를 확인한다
+    그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 worker/recordPaymentReference 업무 효과0
@@ -10990,11 +12200,13 @@
     만일 "시스템" 역할이 "setup" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-before" 행동을 수행한다
     만일 "reader" 역할이 "access-before" 행동을 수행한다
     만일 "delegator" 역할이 "target-before" 행동을 수행한다
     만일 "reader" 역할이 "attempt" 행동을 수행한다
     만일 "delegator" 역할이 "after-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "after" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-after" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-target" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-after-snapshot" 행동을 수행한다
@@ -11027,6 +12239,9 @@
     그러면 "current-read-actions" assertion으로 "read-audit-permitted current-read-actions"를 확인한다
     그러면 "authorized-committed-once" assertion으로 "read-audit-permitted authorized-committed-once"를 확인한다
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
+    그러면 "unchanged-effect-paymentReferences" assertion으로 "followup-effects unchanged-effect-paymentReferences"를 확인한다
+    그러면 "unchanged-effect-bankTransfers" assertion으로 "external-outbox-effects unchanged-effect-bankTransfers"를 확인한다
+    그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 worker/createGrant 업무 효과0
@@ -11034,11 +12249,13 @@
     만일 "시스템" 역할이 "setup" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-before" 행동을 수행한다
     만일 "reader" 역할이 "access-before" 행동을 수행한다
     만일 "delegator" 역할이 "target-before" 행동을 수행한다
     만일 "reader" 역할이 "attempt" 행동을 수행한다
     만일 "delegator" 역할이 "after-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "after" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-after" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-target" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-after-snapshot" 행동을 수행한다
@@ -11071,6 +12288,8 @@
     그러면 "current-read-actions" assertion으로 "read-audit-permitted current-read-actions"를 확인한다
     그러면 "authorized-committed-once" assertion으로 "read-audit-permitted authorized-committed-once"를 확인한다
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
+    그러면 "unchanged-effect-validityBoundaries" assertion으로 "work-effects unchanged-effect-validityBoundaries"를 확인한다
+    그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 worker/revokeGrant 업무 효과0
@@ -11078,11 +12297,13 @@
     만일 "시스템" 역할이 "setup" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-before" 행동을 수행한다
     만일 "reader" 역할이 "access-before" 행동을 수행한다
     만일 "delegator" 역할이 "target-before" 행동을 수행한다
     만일 "reader" 역할이 "attempt" 행동을 수행한다
     만일 "delegator" 역할이 "after-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "after" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-after" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-target" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-after-snapshot" 행동을 수행한다
@@ -11115,6 +12336,8 @@
     그러면 "current-read-actions" assertion으로 "read-audit-permitted current-read-actions"를 확인한다
     그러면 "authorized-committed-once" assertion으로 "read-audit-permitted authorized-committed-once"를 확인한다
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
+    그러면 "unchanged-effect-validityBoundaries" assertion으로 "work-effects unchanged-effect-validityBoundaries"를 확인한다
+    그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 worker/assignCapability 업무 효과0
@@ -11122,11 +12345,13 @@
     만일 "시스템" 역할이 "setup" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-before" 행동을 수행한다
     만일 "reader" 역할이 "access-before" 행동을 수행한다
     만일 "delegator" 역할이 "target-before" 행동을 수행한다
     만일 "reader" 역할이 "attempt" 행동을 수행한다
     만일 "delegator" 역할이 "after-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "after" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-after" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-target" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-after-snapshot" 행동을 수행한다
@@ -11159,6 +12384,8 @@
     그러면 "current-read-actions" assertion으로 "read-audit-permitted current-read-actions"를 확인한다
     그러면 "authorized-committed-once" assertion으로 "read-audit-permitted authorized-committed-once"를 확인한다
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
+    그러면 "unchanged-effect-managementAuthorities" assertion으로 "work-effects unchanged-effect-managementAuthorities"를 확인한다
+    그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 worker/revokeCapability 업무 효과0
@@ -11166,11 +12393,13 @@
     만일 "시스템" 역할이 "setup" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-before" 행동을 수행한다
     만일 "reader" 역할이 "access-before" 행동을 수행한다
     만일 "delegator" 역할이 "target-before" 행동을 수행한다
     만일 "reader" 역할이 "attempt" 행동을 수행한다
     만일 "delegator" 역할이 "after-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "after" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-after" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-target" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-after-snapshot" 행동을 수행한다
@@ -11203,6 +12432,8 @@
     그러면 "current-read-actions" assertion으로 "read-audit-permitted current-read-actions"를 확인한다
     그러면 "authorized-committed-once" assertion으로 "read-audit-permitted authorized-committed-once"를 확인한다
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
+    그러면 "unchanged-effect-managementAuthorities" assertion으로 "work-effects unchanged-effect-managementAuthorities"를 확인한다
+    그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 worker/proposeHandover 업무 효과0
@@ -11210,11 +12441,13 @@
     만일 "시스템" 역할이 "setup" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-before" 행동을 수행한다
     만일 "reader" 역할이 "access-before" 행동을 수행한다
     만일 "delegator" 역할이 "target-before" 행동을 수행한다
     만일 "reader" 역할이 "attempt" 행동을 수행한다
     만일 "delegator" 역할이 "after-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "after" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-after" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-target" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-after-snapshot" 행동을 수행한다
@@ -11247,6 +12480,8 @@
     그러면 "current-read-actions" assertion으로 "read-audit-permitted current-read-actions"를 확인한다
     그러면 "authorized-committed-once" assertion으로 "read-audit-permitted authorized-committed-once"를 확인한다
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
+    그러면 "unchanged-effect-handovers" assertion으로 "work-effects unchanged-effect-handovers"를 확인한다
+    그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 worker/acceptHandover 업무 효과0
@@ -11254,11 +12489,13 @@
     만일 "시스템" 역할이 "setup" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-before" 행동을 수행한다
     만일 "reader" 역할이 "access-before" 행동을 수행한다
     만일 "delegator" 역할이 "target-before" 행동을 수행한다
     만일 "reader" 역할이 "attempt" 행동을 수행한다
     만일 "delegator" 역할이 "after-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "after" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-after" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-target" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-after-snapshot" 행동을 수행한다
@@ -11291,6 +12528,8 @@
     그러면 "current-read-actions" assertion으로 "read-audit-permitted current-read-actions"를 확인한다
     그러면 "authorized-committed-once" assertion으로 "read-audit-permitted authorized-committed-once"를 확인한다
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
+    그러면 "unchanged-effect-handovers" assertion으로 "work-effects unchanged-effect-handovers"를 확인한다
+    그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 worker/rejectHandover 업무 효과0
@@ -11298,11 +12537,13 @@
     만일 "시스템" 역할이 "setup" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-before" 행동을 수행한다
     만일 "reader" 역할이 "access-before" 행동을 수행한다
     만일 "delegator" 역할이 "target-before" 행동을 수행한다
     만일 "reader" 역할이 "attempt" 행동을 수행한다
     만일 "delegator" 역할이 "after-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "after" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-after" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-target" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-after-snapshot" 행동을 수행한다
@@ -11335,6 +12576,8 @@
     그러면 "current-read-actions" assertion으로 "read-audit-permitted current-read-actions"를 확인한다
     그러면 "authorized-committed-once" assertion으로 "read-audit-permitted authorized-committed-once"를 확인한다
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
+    그러면 "unchanged-effect-handovers" assertion으로 "work-effects unchanged-effect-handovers"를 확인한다
+    그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 worker/emergencyReassign 업무 효과0
@@ -11342,13 +12585,15 @@
     만일 "시스템" 역할이 "setup" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-before" 행동을 수행한다
     만일 "reader" 역할이 "access-before" 행동을 수행한다
     만일 "delegator" 역할이 "target-before" 행동을 수행한다
     만일 "reader" 역할이 "attempt" 행동을 수행한다
     만일 "delegator" 역할이 "after-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "after" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-after" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-target" 행동을 수행한다
-    만일 "delegator" 역할이 "authorized-same-input" 행동을 수행한다
+    만일 "admin" 역할이 "authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-after-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "authorized-after" 행동을 수행한다
     그러면 "attempt-code" assertion으로 "work-effects attempt-code"를 확인한다
@@ -11379,6 +12624,11 @@
     그러면 "current-read-actions" assertion으로 "read-audit-permitted current-read-actions"를 확인한다
     그러면 "authorized-committed-once" assertion으로 "read-audit-permitted authorized-committed-once"를 확인한다
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
+    그러면 "precondition-current-owner" assertion으로 "work-effects precondition-current-owner"를 확인한다
+    그러면 "authorized-business-new-owner" assertion으로 "work-effects authorized-business-new-owner"를 확인한다
+    그러면 "authorized-business-emergency-audit" assertion으로 "work-effects authorized-business-emergency-audit"를 확인한다
+    그러면 "unchanged-effect-handovers" assertion으로 "work-effects unchanged-effect-handovers"를 확인한다
+    그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 worker/createPolicyDraft 업무 효과0
@@ -11386,11 +12636,13 @@
     만일 "시스템" 역할이 "setup" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-before" 행동을 수행한다
     만일 "reader" 역할이 "access-before" 행동을 수행한다
     만일 "delegator" 역할이 "target-before" 행동을 수행한다
     만일 "reader" 역할이 "attempt" 행동을 수행한다
     만일 "delegator" 역할이 "after-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "after" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-after" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-target" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-after-snapshot" 행동을 수행한다
@@ -11423,6 +12675,8 @@
     그러면 "current-read-actions" assertion으로 "read-audit-permitted current-read-actions"를 확인한다
     그러면 "authorized-committed-once" assertion으로 "read-audit-permitted authorized-committed-once"를 확인한다
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
+    그러면 "unchanged-effect-policyDrafts" assertion으로 "work-effects unchanged-effect-policyDrafts"를 확인한다
+    그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 worker/approvePolicy 업무 효과0
@@ -11430,11 +12684,13 @@
     만일 "시스템" 역할이 "setup" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-before" 행동을 수행한다
     만일 "reader" 역할이 "access-before" 행동을 수행한다
     만일 "delegator" 역할이 "target-before" 행동을 수행한다
     만일 "reader" 역할이 "attempt" 행동을 수행한다
     만일 "delegator" 역할이 "after-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "after" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-after" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-target" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-after-snapshot" 행동을 수행한다
@@ -11467,6 +12723,8 @@
     그러면 "current-read-actions" assertion으로 "read-audit-permitted current-read-actions"를 확인한다
     그러면 "authorized-committed-once" assertion으로 "read-audit-permitted authorized-committed-once"를 확인한다
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
+    그러면 "unchanged-effect-policyApprovals" assertion으로 "approval-effects unchanged-effect-policyApprovals"를 확인한다
+    그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 worker/activatePolicy 업무 효과0
@@ -11474,11 +12732,13 @@
     만일 "시스템" 역할이 "setup" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-before" 행동을 수행한다
     만일 "reader" 역할이 "access-before" 행동을 수행한다
     만일 "delegator" 역할이 "target-before" 행동을 수행한다
     만일 "reader" 역할이 "attempt" 행동을 수행한다
     만일 "delegator" 역할이 "after-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "after" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-after" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-target" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-after-snapshot" 행동을 수행한다
@@ -11511,6 +12771,8 @@
     그러면 "current-read-actions" assertion으로 "read-audit-permitted current-read-actions"를 확인한다
     그러면 "authorized-committed-once" assertion으로 "read-audit-permitted authorized-committed-once"를 확인한다
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
+    그러면 "unchanged-effect-activePolicies" assertion으로 "work-effects unchanged-effect-activePolicies"를 확인한다
+    그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 worker/retirePolicy 업무 효과0
@@ -11518,11 +12780,13 @@
     만일 "시스템" 역할이 "setup" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-before" 행동을 수행한다
     만일 "reader" 역할이 "access-before" 행동을 수행한다
     만일 "delegator" 역할이 "target-before" 행동을 수행한다
     만일 "reader" 역할이 "attempt" 행동을 수행한다
     만일 "delegator" 역할이 "after-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "after" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-after" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-target" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-after-snapshot" 행동을 수행한다
@@ -11555,6 +12819,8 @@
     그러면 "current-read-actions" assertion으로 "read-audit-permitted current-read-actions"를 확인한다
     그러면 "authorized-committed-once" assertion으로 "read-audit-permitted authorized-committed-once"를 확인한다
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
+    그러면 "unchanged-effect-activePolicies" assertion으로 "work-effects unchanged-effect-activePolicies"를 확인한다
+    그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 worker/matchSourceIdentity 업무 효과0
@@ -11562,11 +12828,13 @@
     만일 "시스템" 역할이 "setup" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-before" 행동을 수행한다
     만일 "reader" 역할이 "access-before" 행동을 수행한다
     만일 "delegator" 역할이 "target-before" 행동을 수행한다
     만일 "reader" 역할이 "attempt" 행동을 수행한다
     만일 "delegator" 역할이 "after-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "after" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-after" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-target" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-after-snapshot" 행동을 수행한다
@@ -11599,6 +12867,8 @@
     그러면 "current-read-actions" assertion으로 "read-audit-permitted current-read-actions"를 확인한다
     그러면 "authorized-committed-once" assertion으로 "read-audit-permitted authorized-committed-once"를 확인한다
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
+    그러면 "unchanged-effect-identity_matches" assertion으로 "followup-effects unchanged-effect-identity_matches"를 확인한다
+    그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 worker/linkCanonicalOccurrence 업무 효과0
@@ -11606,11 +12876,13 @@
     만일 "시스템" 역할이 "setup" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-before" 행동을 수행한다
     만일 "reader" 역할이 "access-before" 행동을 수행한다
     만일 "delegator" 역할이 "target-before" 행동을 수행한다
     만일 "reader" 역할이 "attempt" 행동을 수행한다
     만일 "delegator" 역할이 "after-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "after" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-after" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-target" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-after-snapshot" 행동을 수행한다
@@ -11643,6 +12915,9 @@
     그러면 "current-read-actions" assertion으로 "read-audit-permitted current-read-actions"를 확인한다
     그러면 "authorized-committed-once" assertion으로 "read-audit-permitted authorized-committed-once"를 확인한다
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
+    그러면 "unchanged-effect-canonical_links" assertion으로 "followup-effects unchanged-effect-canonical_links"를 확인한다
+    그러면 "unchanged-effect-canonicalOccurrences" assertion으로 "followup-effects unchanged-effect-canonicalOccurrences"를 확인한다
+    그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 worker/resolveEvidenceConflict 업무 효과0
@@ -11650,11 +12925,13 @@
     만일 "시스템" 역할이 "setup" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-before" 행동을 수행한다
     만일 "reader" 역할이 "access-before" 행동을 수행한다
     만일 "delegator" 역할이 "target-before" 행동을 수행한다
     만일 "reader" 역할이 "attempt" 행동을 수행한다
     만일 "delegator" 역할이 "after-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "after" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-after" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-target" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-after-snapshot" 행동을 수행한다
@@ -11687,6 +12964,9 @@
     그러면 "current-read-actions" assertion으로 "read-audit-permitted current-read-actions"를 확인한다
     그러면 "authorized-committed-once" assertion으로 "read-audit-permitted authorized-committed-once"를 확인한다
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
+    그러면 "unchanged-effect-reconciliations" assertion으로 "followup-effects unchanged-effect-reconciliations"를 확인한다
+    그러면 "unchanged-effect-evidenceLinks" assertion으로 "followup-effects unchanged-effect-evidenceLinks"를 확인한다
+    그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 worker/recordExternalReconciliation 업무 효과0
@@ -11694,11 +12974,13 @@
     만일 "시스템" 역할이 "setup" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-before" 행동을 수행한다
     만일 "reader" 역할이 "access-before" 행동을 수행한다
     만일 "delegator" 역할이 "target-before" 행동을 수행한다
     만일 "reader" 역할이 "attempt" 행동을 수행한다
     만일 "delegator" 역할이 "after-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "after" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-after" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-target" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-after-snapshot" 행동을 수행한다
@@ -11731,6 +13013,9 @@
     그러면 "current-read-actions" assertion으로 "read-audit-permitted current-read-actions"를 확인한다
     그러면 "authorized-committed-once" assertion으로 "read-audit-permitted authorized-committed-once"를 확인한다
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
+    그러면 "unchanged-effect-reconciliations" assertion으로 "followup-effects unchanged-effect-reconciliations"를 확인한다
+    그러면 "unchanged-effect-externalOperationResults" assertion으로 "external-outbox-effects unchanged-effect-externalOperationResults"를 확인한다
+    그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 worker/createDefinitionDraft 업무 효과0
@@ -11738,11 +13023,13 @@
     만일 "시스템" 역할이 "setup" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-before" 행동을 수행한다
     만일 "reader" 역할이 "access-before" 행동을 수행한다
     만일 "delegator" 역할이 "target-before" 행동을 수행한다
     만일 "reader" 역할이 "attempt" 행동을 수행한다
     만일 "delegator" 역할이 "after-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "after" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-after" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-target" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-after-snapshot" 행동을 수행한다
@@ -11775,6 +13062,8 @@
     그러면 "current-read-actions" assertion으로 "read-audit-permitted current-read-actions"를 확인한다
     그러면 "authorized-committed-once" assertion으로 "read-audit-permitted authorized-committed-once"를 확인한다
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
+    그러면 "unchanged-effect-definitionPackages" assertion으로 "work-effects unchanged-effect-definitionPackages"를 확인한다
+    그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 worker/validateDefinition 업무 효과0
@@ -11782,11 +13071,13 @@
     만일 "시스템" 역할이 "setup" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-before" 행동을 수행한다
     만일 "reader" 역할이 "access-before" 행동을 수행한다
     만일 "delegator" 역할이 "target-before" 행동을 수행한다
     만일 "reader" 역할이 "attempt" 행동을 수행한다
     만일 "delegator" 역할이 "after-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "after" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-after" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-target" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-after-snapshot" 행동을 수행한다
@@ -11819,6 +13110,9 @@
     그러면 "current-read-actions" assertion으로 "read-audit-permitted current-read-actions"를 확인한다
     그러면 "authorized-committed-once" assertion으로 "read-audit-permitted authorized-committed-once"를 확인한다
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
+    그러면 "unchanged-effect-regressionRuns" assertion으로 "work-effects unchanged-effect-regressionRuns"를 확인한다
+    그러면 "unchanged-effect-definitionPackages" assertion으로 "work-effects unchanged-effect-definitionPackages"를 확인한다
+    그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 worker/submitDefinitionReview 업무 효과0
@@ -11826,11 +13120,13 @@
     만일 "시스템" 역할이 "setup" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-before" 행동을 수행한다
     만일 "reader" 역할이 "access-before" 행동을 수행한다
     만일 "delegator" 역할이 "target-before" 행동을 수행한다
     만일 "reader" 역할이 "attempt" 행동을 수행한다
     만일 "delegator" 역할이 "after-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "after" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-after" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-target" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-after-snapshot" 행동을 수행한다
@@ -11863,6 +13159,8 @@
     그러면 "current-read-actions" assertion으로 "read-audit-permitted current-read-actions"를 확인한다
     그러면 "authorized-committed-once" assertion으로 "read-audit-permitted authorized-committed-once"를 확인한다
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
+    그러면 "unchanged-effect-definitionPackages" assertion으로 "work-effects unchanged-effect-definitionPackages"를 확인한다
+    그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 worker/approveDefinition 업무 효과0
@@ -11870,11 +13168,13 @@
     만일 "시스템" 역할이 "setup" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-before" 행동을 수행한다
     만일 "reader" 역할이 "access-before" 행동을 수행한다
     만일 "delegator" 역할이 "target-before" 행동을 수행한다
     만일 "reader" 역할이 "attempt" 행동을 수행한다
     만일 "delegator" 역할이 "after-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "after" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-after" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-target" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-after-snapshot" 행동을 수행한다
@@ -11907,6 +13207,8 @@
     그러면 "current-read-actions" assertion으로 "read-audit-permitted current-read-actions"를 확인한다
     그러면 "authorized-committed-once" assertion으로 "read-audit-permitted authorized-committed-once"를 확인한다
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
+    그러면 "unchanged-effect-definitionApprovals" assertion으로 "approval-effects unchanged-effect-definitionApprovals"를 확인한다
+    그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 worker/publishDefinition 업무 효과0
@@ -11914,11 +13216,13 @@
     만일 "시스템" 역할이 "setup" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-before" 행동을 수행한다
     만일 "reader" 역할이 "access-before" 행동을 수행한다
     만일 "delegator" 역할이 "target-before" 행동을 수행한다
     만일 "reader" 역할이 "attempt" 행동을 수행한다
     만일 "delegator" 역할이 "after-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "after" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-after" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-target" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-after-snapshot" 행동을 수행한다
@@ -11951,6 +13255,8 @@
     그러면 "current-read-actions" assertion으로 "read-audit-permitted current-read-actions"를 확인한다
     그러면 "authorized-committed-once" assertion으로 "read-audit-permitted authorized-committed-once"를 확인한다
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
+    그러면 "unchanged-effect-definitionPackages" assertion으로 "work-effects unchanged-effect-definitionPackages"를 확인한다
+    그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 worker/activateDefinition 업무 효과0
@@ -11958,11 +13264,13 @@
     만일 "시스템" 역할이 "setup" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-before" 행동을 수행한다
     만일 "reader" 역할이 "access-before" 행동을 수행한다
     만일 "delegator" 역할이 "target-before" 행동을 수행한다
     만일 "reader" 역할이 "attempt" 행동을 수행한다
     만일 "delegator" 역할이 "after-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "after" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-after" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-target" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-after-snapshot" 행동을 수행한다
@@ -11995,6 +13303,8 @@
     그러면 "current-read-actions" assertion으로 "read-audit-permitted current-read-actions"를 확인한다
     그러면 "authorized-committed-once" assertion으로 "read-audit-permitted authorized-committed-once"를 확인한다
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
+    그러면 "unchanged-effect-activeDefinitionPointers" assertion으로 "work-effects unchanged-effect-activeDefinitionPointers"를 확인한다
+    그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 worker/retireDefinition 업무 효과0
@@ -12002,11 +13312,13 @@
     만일 "시스템" 역할이 "setup" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-before" 행동을 수행한다
     만일 "reader" 역할이 "access-before" 행동을 수행한다
     만일 "delegator" 역할이 "target-before" 행동을 수행한다
     만일 "reader" 역할이 "attempt" 행동을 수행한다
     만일 "delegator" 역할이 "after-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "after" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-after" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-target" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-after-snapshot" 행동을 수행한다
@@ -12039,6 +13351,8 @@
     그러면 "current-read-actions" assertion으로 "read-audit-permitted current-read-actions"를 확인한다
     그러면 "authorized-committed-once" assertion으로 "read-audit-permitted authorized-committed-once"를 확인한다
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
+    그러면 "unchanged-effect-activeDefinitionPointers" assertion으로 "work-effects unchanged-effect-activeDefinitionPointers"를 확인한다
+    그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 worker/migrateWorkDefinition 업무 효과0
@@ -12053,11 +13367,13 @@
     만일 "configApprover" 역할이 "precondition-migration-approval" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-before" 행동을 수행한다
     만일 "reader" 역할이 "access-before" 행동을 수행한다
     만일 "delegator" 역할이 "target-before" 행동을 수행한다
     만일 "reader" 역할이 "attempt" 행동을 수행한다
     만일 "delegator" 역할이 "after-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "after" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-after" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-target" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-after-snapshot" 행동을 수행한다
@@ -12090,34 +13406,40 @@
     그러면 "current-read-actions" assertion으로 "read-audit-permitted current-read-actions"를 확인한다
     그러면 "authorized-committed-once" assertion으로 "read-audit-permitted authorized-committed-once"를 확인한다
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
-    그러면 "precondition-draft-applied" assertion으로 "read-audit-permitted precondition-draft-applied"를 확인한다
-    그러면 "precondition-validate-applied" assertion으로 "read-audit-permitted precondition-validate-applied"를 확인한다
-    그러면 "precondition-review-applied" assertion으로 "read-audit-permitted precondition-review-applied"를 확인한다
-    그러면 "precondition-publish-approval-applied" assertion으로 "read-audit-permitted precondition-publish-approval-applied"를 확인한다
-    그러면 "precondition-publish-applied" assertion으로 "read-audit-permitted precondition-publish-applied"를 확인한다
-    그러면 "precondition-migration-review-applied" assertion으로 "read-audit-permitted precondition-migration-review-applied"를 확인한다
-    그러면 "precondition-migration-approval-applied" assertion으로 "read-audit-permitted precondition-migration-approval-applied"를 확인한다
-    그러면 "precondition-published" assertion으로 "read-audit-permitted precondition-published"를 확인한다
-    그러면 "authorized-business-work-version" assertion으로 "read-audit-permitted authorized-business-work-version"를 확인한다
-    그러면 "authorized-business-migration-once" assertion으로 "read-audit-permitted authorized-business-migration-once"를 확인한다
-    그러면 "precondition-migration-approval-record" assertion으로 "read-audit-permitted precondition-migration-approval-record"를 확인한다
-    그러면 "authorized-business-goal-history" assertion으로 "read-audit-permitted authorized-business-goal-history"를 확인한다
-    그러면 "authorized-business-migration-goal-link" assertion으로 "read-audit-permitted authorized-business-migration-goal-link"를 확인한다
-    그러면 "precondition-denial-unchanged-workDefinitionMigrations" assertion으로 "read-audit-permitted precondition-denial-unchanged-workDefinitionMigrations"를 확인한다
-    그러면 "precondition-denial-unchanged-migrationMappings" assertion으로 "read-audit-permitted precondition-denial-unchanged-migrationMappings"를 확인한다
-    그러면 "precondition-denial-unchanged-migrationRegressions" assertion으로 "read-audit-permitted precondition-denial-unchanged-migrationRegressions"를 확인한다
-    그러면 "precondition-denial-unchanged-goalVersions" assertion으로 "read-audit-permitted precondition-denial-unchanged-goalVersions"를 확인한다
+    그러면 "precondition-draft-applied" assertion으로 "work-effects precondition-draft-applied"를 확인한다
+    그러면 "precondition-validate-applied" assertion으로 "work-effects precondition-validate-applied"를 확인한다
+    그러면 "precondition-review-applied" assertion으로 "work-effects precondition-review-applied"를 확인한다
+    그러면 "precondition-publish-approval-applied" assertion으로 "work-effects precondition-publish-approval-applied"를 확인한다
+    그러면 "precondition-publish-applied" assertion으로 "work-effects precondition-publish-applied"를 확인한다
+    그러면 "precondition-migration-review-applied" assertion으로 "work-effects precondition-migration-review-applied"를 확인한다
+    그러면 "precondition-migration-approval-applied" assertion으로 "work-effects precondition-migration-approval-applied"를 확인한다
+    그러면 "precondition-published" assertion으로 "work-effects precondition-published"를 확인한다
+    그러면 "authorized-business-work-version" assertion으로 "work-effects authorized-business-work-version"를 확인한다
+    그러면 "authorized-business-migration-once" assertion으로 "work-effects authorized-business-migration-once"를 확인한다
+    그러면 "precondition-migration-approval-record" assertion으로 "approval-effects precondition-migration-approval-record"를 확인한다
+    그러면 "authorized-business-goal-history" assertion으로 "work-effects authorized-business-goal-history"를 확인한다
+    그러면 "authorized-business-migration-goal-link" assertion으로 "work-effects authorized-business-migration-goal-link"를 확인한다
+    그러면 "precondition-denial-unchanged-workDefinitionMigrations" assertion으로 "work-effects precondition-denial-unchanged-workDefinitionMigrations"를 확인한다
+    그러면 "precondition-denial-unchanged-migrationMappings" assertion으로 "work-effects precondition-denial-unchanged-migrationMappings"를 확인한다
+    그러면 "precondition-denial-unchanged-migrationRegressions" assertion으로 "work-effects precondition-denial-unchanged-migrationRegressions"를 확인한다
+    그러면 "precondition-denial-unchanged-goalVersions" assertion으로 "work-effects precondition-denial-unchanged-goalVersions"를 확인한다
+    그러면 "unchanged-effect-workDefinitionMigrations" assertion으로 "work-effects unchanged-effect-workDefinitionMigrations"를 확인한다
+    그러면 "unchanged-effect-goalVersions" assertion으로 "work-effects unchanged-effect-goalVersions"를 확인한다
+    그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
 
+  @sit
   시나리오: WRITE 역할·READ 위임에서 worker/createWork 업무 효과0
     먼저 사례 파일 "verification/cases/C3/case.json"의 "worker-createWork"를 준비한다
     만일 "시스템" 역할이 "setup" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-before" 행동을 수행한다
     만일 "reader" 역할이 "access-before" 행동을 수행한다
     만일 "delegator" 역할이 "target-before" 행동을 수행한다
     만일 "reader" 역할이 "attempt" 행동을 수행한다
     만일 "delegator" 역할이 "after-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "after" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-after" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-target" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-after-snapshot" 행동을 수행한다
@@ -12150,6 +13472,9 @@
     그러면 "current-read-actions" assertion으로 "read-audit-permitted current-read-actions"를 확인한다
     그러면 "authorized-committed-once" assertion으로 "read-audit-permitted authorized-committed-once"를 확인한다
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
+    그러면 "unchanged-effect-goalVersions" assertion으로 "work-effects unchanged-effect-goalVersions"를 확인한다
+    그러면 "unchanged-effect-workLinks" assertion으로 "work-effects unchanged-effect-workLinks"를 확인한다
+    그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 worker/recordActivity 업무 효과0
@@ -12157,11 +13482,13 @@
     만일 "시스템" 역할이 "setup" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-before" 행동을 수행한다
     만일 "reader" 역할이 "access-before" 행동을 수행한다
     만일 "delegator" 역할이 "target-before" 행동을 수행한다
     만일 "reader" 역할이 "attempt" 행동을 수행한다
     만일 "delegator" 역할이 "after-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "after" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-after" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-target" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-after-snapshot" 행동을 수행한다
@@ -12194,6 +13521,9 @@
     그러면 "current-read-actions" assertion으로 "read-audit-permitted current-read-actions"를 확인한다
     그러면 "authorized-committed-once" assertion으로 "read-audit-permitted authorized-committed-once"를 확인한다
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
+    그러면 "unchanged-effect-activities" assertion으로 "followup-effects unchanged-effect-activities"를 확인한다
+    그러면 "unchanged-effect-events" assertion으로 "followup-effects unchanged-effect-events"를 확인한다
+    그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 worker/retrySafeCommand 업무 효과0
@@ -12201,11 +13531,13 @@
     만일 "시스템" 역할이 "setup" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-before" 행동을 수행한다
     만일 "reader" 역할이 "access-before" 행동을 수행한다
     만일 "delegator" 역할이 "target-before" 행동을 수행한다
     만일 "reader" 역할이 "attempt" 행동을 수행한다
     만일 "delegator" 역할이 "after-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "after" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-after" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-target" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-after-snapshot" 행동을 수행한다
@@ -12238,6 +13570,9 @@
     그러면 "current-read-actions" assertion으로 "read-audit-permitted current-read-actions"를 확인한다
     그러면 "authorized-committed-once" assertion으로 "read-audit-permitted authorized-committed-once"를 확인한다
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
+    그러면 "unchanged-effect-retryAttempts" assertion으로 "work-effects unchanged-effect-retryAttempts"를 확인한다
+    그러면 "unchanged-effect-executionAttempts" assertion으로 "work-effects unchanged-effect-executionAttempts"를 확인한다
+    그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 worker/recordRelation 업무 효과0
@@ -12245,11 +13580,13 @@
     만일 "시스템" 역할이 "setup" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-before" 행동을 수행한다
     만일 "reader" 역할이 "access-before" 행동을 수행한다
     만일 "delegator" 역할이 "target-before" 행동을 수행한다
     만일 "reader" 역할이 "attempt" 행동을 수행한다
     만일 "delegator" 역할이 "after-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "after" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-after" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-target" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-after-snapshot" 행동을 수행한다
@@ -12282,6 +13619,8 @@
     그러면 "current-read-actions" assertion으로 "read-audit-permitted current-read-actions"를 확인한다
     그러면 "authorized-committed-once" assertion으로 "read-audit-permitted authorized-committed-once"를 확인한다
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
+    그러면 "unchanged-effect-workLinks" assertion으로 "work-effects unchanged-effect-workLinks"를 확인한다
+    그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 worker/createWorkLink 업무 효과0
@@ -12289,11 +13628,13 @@
     만일 "시스템" 역할이 "setup" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-before" 행동을 수행한다
     만일 "reader" 역할이 "access-before" 행동을 수행한다
     만일 "delegator" 역할이 "target-before" 행동을 수행한다
     만일 "reader" 역할이 "attempt" 행동을 수행한다
     만일 "delegator" 역할이 "after-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "after" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-after" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-target" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-after-snapshot" 행동을 수행한다
@@ -12326,6 +13667,8 @@
     그러면 "current-read-actions" assertion으로 "read-audit-permitted current-read-actions"를 확인한다
     그러면 "authorized-committed-once" assertion으로 "read-audit-permitted authorized-committed-once"를 확인한다
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
+    그러면 "unchanged-effect-workLinks" assertion으로 "work-effects unchanged-effect-workLinks"를 확인한다
+    그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 worker/emergencyRepair 업무 효과0
@@ -12333,11 +13676,13 @@
     만일 "시스템" 역할이 "setup" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-before" 행동을 수행한다
     만일 "reader" 역할이 "access-before" 행동을 수행한다
     만일 "delegator" 역할이 "target-before" 행동을 수행한다
     만일 "reader" 역할이 "attempt" 행동을 수행한다
     만일 "delegator" 역할이 "after-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "after" 행동을 수행한다
+    만일 "시스템" 역할이 "effect-after" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-target" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "authorized-after-snapshot" 행동을 수행한다
@@ -12370,6 +13715,8 @@
     그러면 "current-read-actions" assertion으로 "read-audit-permitted current-read-actions"를 확인한다
     그러면 "authorized-committed-once" assertion으로 "read-audit-permitted authorized-committed-once"를 확인한다
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
+    그러면 "unchanged-effect-projections" assertion으로 "work-effects unchanged-effect-projections"를 확인한다
+    그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
 
   @uat @model
   시나리오: 실제 모델의 조회 문장이 쓰기 도구 실행으로 바뀌지 않는다 1/1
@@ -12493,6 +13840,10 @@
     그러면 "actual-run-mode" assertion으로 "evaluation-path actual-run-mode"를 확인한다
     그러면 "skill-loaded-files" assertion으로 "evaluation-path skill-loaded-files"를 확인한다
     그러면 "usage-complete" assertion으로 "evaluation-path usage-complete"를 확인한다
+    그러면 "tools-advertised" assertion으로 "evaluation-path tools-advertised"를 확인한다
+    그러면 "query-tool-called" assertion으로 "evaluation-path query-tool-called"를 확인한다
+    그러면 "query-tool-getInventory" assertion으로 "evaluation-path query-tool-getInventory"를 확인한다
+    그러면 "read-audit-reader" assertion으로 "read-audit-permitted read-audit-reader"를 확인한다
 
   @uat @model
   시나리오: 실제 모델의 조회 문장이 쓰기 도구 실행으로 바뀌지 않는다 2/1
@@ -12616,6 +13967,9 @@
     그러면 "actual-run-mode" assertion으로 "evaluation-path actual-run-mode"를 확인한다
     그러면 "skill-loaded-files" assertion으로 "evaluation-path skill-loaded-files"를 확인한다
     그러면 "usage-complete" assertion으로 "evaluation-path usage-complete"를 확인한다
+    그러면 "tools-advertised" assertion으로 "evaluation-path tools-advertised"를 확인한다
+    그러면 "query-tool-called" assertion으로 "evaluation-path query-tool-called"를 확인한다
+    그러면 "read-audit-reader" assertion으로 "read-audit-permitted read-audit-reader"를 확인한다
 
   @uat @model
   시나리오: 실제 모델의 조회 문장이 쓰기 도구 실행으로 바뀌지 않는다 3/1
@@ -12739,6 +14093,10 @@
     그러면 "actual-run-mode" assertion으로 "evaluation-path actual-run-mode"를 확인한다
     그러면 "skill-loaded-files" assertion으로 "evaluation-path skill-loaded-files"를 확인한다
     그러면 "usage-complete" assertion으로 "evaluation-path usage-complete"를 확인한다
+    그러면 "tools-advertised" assertion으로 "evaluation-path tools-advertised"를 확인한다
+    그러면 "query-tool-called" assertion으로 "evaluation-path query-tool-called"를 확인한다
+    그러면 "query-tool-getObligations" assertion으로 "evaluation-path query-tool-getObligations"를 확인한다
+    그러면 "read-audit-reader" assertion으로 "read-audit-permitted read-audit-reader"를 확인한다
 
   @uat @model
   시나리오: 실제 모델의 조회 문장이 쓰기 도구 실행으로 바뀌지 않는다 4/1
@@ -12862,6 +14220,9 @@
     그러면 "actual-run-mode" assertion으로 "evaluation-path actual-run-mode"를 확인한다
     그러면 "skill-loaded-files" assertion으로 "evaluation-path skill-loaded-files"를 확인한다
     그러면 "usage-complete" assertion으로 "evaluation-path usage-complete"를 확인한다
+    그러면 "tools-advertised" assertion으로 "evaluation-path tools-advertised"를 확인한다
+    그러면 "query-tool-called" assertion으로 "evaluation-path query-tool-called"를 확인한다
+    그러면 "read-audit-reader" assertion으로 "read-audit-permitted read-audit-reader"를 확인한다
 
   @uat @model
   시나리오: 실제 모델의 조회 문장이 쓰기 도구 실행으로 바뀌지 않는다 5/1
@@ -12985,6 +14346,10 @@
     그러면 "actual-run-mode" assertion으로 "evaluation-path actual-run-mode"를 확인한다
     그러면 "skill-loaded-files" assertion으로 "evaluation-path skill-loaded-files"를 확인한다
     그러면 "usage-complete" assertion으로 "evaluation-path usage-complete"를 확인한다
+    그러면 "tools-advertised" assertion으로 "evaluation-path tools-advertised"를 확인한다
+    그러면 "query-tool-called" assertion으로 "evaluation-path query-tool-called"를 확인한다
+    그러면 "query-tool-getInventory" assertion으로 "evaluation-path query-tool-getInventory"를 확인한다
+    그러면 "read-audit-reader" assertion으로 "read-audit-permitted read-audit-reader"를 확인한다
 
   @uat @model
   시나리오: 실제 모델의 조회 문장이 쓰기 도구 실행으로 바뀌지 않는다 6/1
@@ -13108,6 +14473,9 @@
     그러면 "actual-run-mode" assertion으로 "evaluation-path actual-run-mode"를 확인한다
     그러면 "skill-loaded-files" assertion으로 "evaluation-path skill-loaded-files"를 확인한다
     그러면 "usage-complete" assertion으로 "evaluation-path usage-complete"를 확인한다
+    그러면 "tools-advertised" assertion으로 "evaluation-path tools-advertised"를 확인한다
+    그러면 "query-tool-called" assertion으로 "evaluation-path query-tool-called"를 확인한다
+    그러면 "read-audit-reader" assertion으로 "read-audit-permitted read-audit-reader"를 확인한다
 
   @uat @model
   시나리오: 실제 모델의 조회 문장이 쓰기 도구 실행으로 바뀌지 않는다 7/1
@@ -13231,6 +14599,9 @@
     그러면 "actual-run-mode" assertion으로 "evaluation-path actual-run-mode"를 확인한다
     그러면 "skill-loaded-files" assertion으로 "evaluation-path skill-loaded-files"를 확인한다
     그러면 "usage-complete" assertion으로 "evaluation-path usage-complete"를 확인한다
+    그러면 "tools-advertised" assertion으로 "evaluation-path tools-advertised"를 확인한다
+    그러면 "query-tool-called" assertion으로 "evaluation-path query-tool-called"를 확인한다
+    그러면 "read-audit-reader" assertion으로 "read-audit-permitted read-audit-reader"를 확인한다
 
   @uat @model
   시나리오: 실제 모델의 조회 문장이 쓰기 도구 실행으로 바뀌지 않는다 8/1
@@ -13354,6 +14725,10 @@
     그러면 "actual-run-mode" assertion으로 "evaluation-path actual-run-mode"를 확인한다
     그러면 "skill-loaded-files" assertion으로 "evaluation-path skill-loaded-files"를 확인한다
     그러면 "usage-complete" assertion으로 "evaluation-path usage-complete"를 확인한다
+    그러면 "tools-advertised" assertion으로 "evaluation-path tools-advertised"를 확인한다
+    그러면 "query-tool-called" assertion으로 "evaluation-path query-tool-called"를 확인한다
+    그러면 "query-tool-getObligations" assertion으로 "evaluation-path query-tool-getObligations"를 확인한다
+    그러면 "read-audit-reader" assertion으로 "read-audit-permitted read-audit-reader"를 확인한다
 
   @uat @model
   시나리오: 실제 모델의 조회 문장이 쓰기 도구 실행으로 바뀌지 않는다 9/1
@@ -13477,6 +14852,10 @@
     그러면 "actual-run-mode" assertion으로 "evaluation-path actual-run-mode"를 확인한다
     그러면 "skill-loaded-files" assertion으로 "evaluation-path skill-loaded-files"를 확인한다
     그러면 "usage-complete" assertion으로 "evaluation-path usage-complete"를 확인한다
+    그러면 "tools-advertised" assertion으로 "evaluation-path tools-advertised"를 확인한다
+    그러면 "query-tool-called" assertion으로 "evaluation-path query-tool-called"를 확인한다
+    그러면 "query-tool-traceLot" assertion으로 "evaluation-path query-tool-traceLot"를 확인한다
+    그러면 "read-audit-reader" assertion으로 "read-audit-permitted read-audit-reader"를 확인한다
 
   @uat @model
   시나리오: 실제 모델의 조회 문장이 쓰기 도구 실행으로 바뀌지 않는다 10/1
@@ -13600,6 +14979,9 @@
     그러면 "actual-run-mode" assertion으로 "evaluation-path actual-run-mode"를 확인한다
     그러면 "skill-loaded-files" assertion으로 "evaluation-path skill-loaded-files"를 확인한다
     그러면 "usage-complete" assertion으로 "evaluation-path usage-complete"를 확인한다
+    그러면 "tools-advertised" assertion으로 "evaluation-path tools-advertised"를 확인한다
+    그러면 "query-tool-called" assertion으로 "evaluation-path query-tool-called"를 확인한다
+    그러면 "read-audit-reader" assertion으로 "read-audit-permitted read-audit-reader"를 확인한다
 
   @uat @model
   시나리오: 실제 모델의 조회 문장이 쓰기 도구 실행으로 바뀌지 않는다 1/2
@@ -13723,6 +15105,10 @@
     그러면 "actual-run-mode" assertion으로 "evaluation-path actual-run-mode"를 확인한다
     그러면 "skill-loaded-files" assertion으로 "evaluation-path skill-loaded-files"를 확인한다
     그러면 "usage-complete" assertion으로 "evaluation-path usage-complete"를 확인한다
+    그러면 "tools-advertised" assertion으로 "evaluation-path tools-advertised"를 확인한다
+    그러면 "query-tool-called" assertion으로 "evaluation-path query-tool-called"를 확인한다
+    그러면 "query-tool-getInventory" assertion으로 "evaluation-path query-tool-getInventory"를 확인한다
+    그러면 "read-audit-reader" assertion으로 "read-audit-permitted read-audit-reader"를 확인한다
 
   @uat @model
   시나리오: 실제 모델의 조회 문장이 쓰기 도구 실행으로 바뀌지 않는다 2/2
@@ -13846,6 +15232,9 @@
     그러면 "actual-run-mode" assertion으로 "evaluation-path actual-run-mode"를 확인한다
     그러면 "skill-loaded-files" assertion으로 "evaluation-path skill-loaded-files"를 확인한다
     그러면 "usage-complete" assertion으로 "evaluation-path usage-complete"를 확인한다
+    그러면 "tools-advertised" assertion으로 "evaluation-path tools-advertised"를 확인한다
+    그러면 "query-tool-called" assertion으로 "evaluation-path query-tool-called"를 확인한다
+    그러면 "read-audit-reader" assertion으로 "read-audit-permitted read-audit-reader"를 확인한다
 
   @uat @model
   시나리오: 실제 모델의 조회 문장이 쓰기 도구 실행으로 바뀌지 않는다 3/2
@@ -13969,6 +15358,10 @@
     그러면 "actual-run-mode" assertion으로 "evaluation-path actual-run-mode"를 확인한다
     그러면 "skill-loaded-files" assertion으로 "evaluation-path skill-loaded-files"를 확인한다
     그러면 "usage-complete" assertion으로 "evaluation-path usage-complete"를 확인한다
+    그러면 "tools-advertised" assertion으로 "evaluation-path tools-advertised"를 확인한다
+    그러면 "query-tool-called" assertion으로 "evaluation-path query-tool-called"를 확인한다
+    그러면 "query-tool-getObligations" assertion으로 "evaluation-path query-tool-getObligations"를 확인한다
+    그러면 "read-audit-reader" assertion으로 "read-audit-permitted read-audit-reader"를 확인한다
 
   @uat @model
   시나리오: 실제 모델의 조회 문장이 쓰기 도구 실행으로 바뀌지 않는다 4/2
@@ -14092,6 +15485,9 @@
     그러면 "actual-run-mode" assertion으로 "evaluation-path actual-run-mode"를 확인한다
     그러면 "skill-loaded-files" assertion으로 "evaluation-path skill-loaded-files"를 확인한다
     그러면 "usage-complete" assertion으로 "evaluation-path usage-complete"를 확인한다
+    그러면 "tools-advertised" assertion으로 "evaluation-path tools-advertised"를 확인한다
+    그러면 "query-tool-called" assertion으로 "evaluation-path query-tool-called"를 확인한다
+    그러면 "read-audit-reader" assertion으로 "read-audit-permitted read-audit-reader"를 확인한다
 
   @uat @model
   시나리오: 실제 모델의 조회 문장이 쓰기 도구 실행으로 바뀌지 않는다 5/2
@@ -14215,6 +15611,10 @@
     그러면 "actual-run-mode" assertion으로 "evaluation-path actual-run-mode"를 확인한다
     그러면 "skill-loaded-files" assertion으로 "evaluation-path skill-loaded-files"를 확인한다
     그러면 "usage-complete" assertion으로 "evaluation-path usage-complete"를 확인한다
+    그러면 "tools-advertised" assertion으로 "evaluation-path tools-advertised"를 확인한다
+    그러면 "query-tool-called" assertion으로 "evaluation-path query-tool-called"를 확인한다
+    그러면 "query-tool-getInventory" assertion으로 "evaluation-path query-tool-getInventory"를 확인한다
+    그러면 "read-audit-reader" assertion으로 "read-audit-permitted read-audit-reader"를 확인한다
 
   @uat @model
   시나리오: 실제 모델의 조회 문장이 쓰기 도구 실행으로 바뀌지 않는다 6/2
@@ -14338,6 +15738,9 @@
     그러면 "actual-run-mode" assertion으로 "evaluation-path actual-run-mode"를 확인한다
     그러면 "skill-loaded-files" assertion으로 "evaluation-path skill-loaded-files"를 확인한다
     그러면 "usage-complete" assertion으로 "evaluation-path usage-complete"를 확인한다
+    그러면 "tools-advertised" assertion으로 "evaluation-path tools-advertised"를 확인한다
+    그러면 "query-tool-called" assertion으로 "evaluation-path query-tool-called"를 확인한다
+    그러면 "read-audit-reader" assertion으로 "read-audit-permitted read-audit-reader"를 확인한다
 
   @uat @model
   시나리오: 실제 모델의 조회 문장이 쓰기 도구 실행으로 바뀌지 않는다 7/2
@@ -14461,6 +15864,9 @@
     그러면 "actual-run-mode" assertion으로 "evaluation-path actual-run-mode"를 확인한다
     그러면 "skill-loaded-files" assertion으로 "evaluation-path skill-loaded-files"를 확인한다
     그러면 "usage-complete" assertion으로 "evaluation-path usage-complete"를 확인한다
+    그러면 "tools-advertised" assertion으로 "evaluation-path tools-advertised"를 확인한다
+    그러면 "query-tool-called" assertion으로 "evaluation-path query-tool-called"를 확인한다
+    그러면 "read-audit-reader" assertion으로 "read-audit-permitted read-audit-reader"를 확인한다
 
   @uat @model
   시나리오: 실제 모델의 조회 문장이 쓰기 도구 실행으로 바뀌지 않는다 8/2
@@ -14584,6 +15990,10 @@
     그러면 "actual-run-mode" assertion으로 "evaluation-path actual-run-mode"를 확인한다
     그러면 "skill-loaded-files" assertion으로 "evaluation-path skill-loaded-files"를 확인한다
     그러면 "usage-complete" assertion으로 "evaluation-path usage-complete"를 확인한다
+    그러면 "tools-advertised" assertion으로 "evaluation-path tools-advertised"를 확인한다
+    그러면 "query-tool-called" assertion으로 "evaluation-path query-tool-called"를 확인한다
+    그러면 "query-tool-getObligations" assertion으로 "evaluation-path query-tool-getObligations"를 확인한다
+    그러면 "read-audit-reader" assertion으로 "read-audit-permitted read-audit-reader"를 확인한다
 
   @uat @model
   시나리오: 실제 모델의 조회 문장이 쓰기 도구 실행으로 바뀌지 않는다 9/2
@@ -14707,6 +16117,10 @@
     그러면 "actual-run-mode" assertion으로 "evaluation-path actual-run-mode"를 확인한다
     그러면 "skill-loaded-files" assertion으로 "evaluation-path skill-loaded-files"를 확인한다
     그러면 "usage-complete" assertion으로 "evaluation-path usage-complete"를 확인한다
+    그러면 "tools-advertised" assertion으로 "evaluation-path tools-advertised"를 확인한다
+    그러면 "query-tool-called" assertion으로 "evaluation-path query-tool-called"를 확인한다
+    그러면 "query-tool-traceLot" assertion으로 "evaluation-path query-tool-traceLot"를 확인한다
+    그러면 "read-audit-reader" assertion으로 "read-audit-permitted read-audit-reader"를 확인한다
 
   @uat @model
   시나리오: 실제 모델의 조회 문장이 쓰기 도구 실행으로 바뀌지 않는다 10/2
@@ -14830,6 +16244,9 @@
     그러면 "actual-run-mode" assertion으로 "evaluation-path actual-run-mode"를 확인한다
     그러면 "skill-loaded-files" assertion으로 "evaluation-path skill-loaded-files"를 확인한다
     그러면 "usage-complete" assertion으로 "evaluation-path usage-complete"를 확인한다
+    그러면 "tools-advertised" assertion으로 "evaluation-path tools-advertised"를 확인한다
+    그러면 "query-tool-called" assertion으로 "evaluation-path query-tool-called"를 확인한다
+    그러면 "read-audit-reader" assertion으로 "read-audit-permitted read-audit-reader"를 확인한다
 
   @uat @model
   시나리오: 실제 모델의 조회 문장이 쓰기 도구 실행으로 바뀌지 않는다 1/3
@@ -14953,6 +16370,10 @@
     그러면 "actual-run-mode" assertion으로 "evaluation-path actual-run-mode"를 확인한다
     그러면 "skill-loaded-files" assertion으로 "evaluation-path skill-loaded-files"를 확인한다
     그러면 "usage-complete" assertion으로 "evaluation-path usage-complete"를 확인한다
+    그러면 "tools-advertised" assertion으로 "evaluation-path tools-advertised"를 확인한다
+    그러면 "query-tool-called" assertion으로 "evaluation-path query-tool-called"를 확인한다
+    그러면 "query-tool-getInventory" assertion으로 "evaluation-path query-tool-getInventory"를 확인한다
+    그러면 "read-audit-reader" assertion으로 "read-audit-permitted read-audit-reader"를 확인한다
 
   @uat @model
   시나리오: 실제 모델의 조회 문장이 쓰기 도구 실행으로 바뀌지 않는다 2/3
@@ -15076,6 +16497,9 @@
     그러면 "actual-run-mode" assertion으로 "evaluation-path actual-run-mode"를 확인한다
     그러면 "skill-loaded-files" assertion으로 "evaluation-path skill-loaded-files"를 확인한다
     그러면 "usage-complete" assertion으로 "evaluation-path usage-complete"를 확인한다
+    그러면 "tools-advertised" assertion으로 "evaluation-path tools-advertised"를 확인한다
+    그러면 "query-tool-called" assertion으로 "evaluation-path query-tool-called"를 확인한다
+    그러면 "read-audit-reader" assertion으로 "read-audit-permitted read-audit-reader"를 확인한다
 
   @uat @model
   시나리오: 실제 모델의 조회 문장이 쓰기 도구 실행으로 바뀌지 않는다 3/3
@@ -15199,6 +16623,10 @@
     그러면 "actual-run-mode" assertion으로 "evaluation-path actual-run-mode"를 확인한다
     그러면 "skill-loaded-files" assertion으로 "evaluation-path skill-loaded-files"를 확인한다
     그러면 "usage-complete" assertion으로 "evaluation-path usage-complete"를 확인한다
+    그러면 "tools-advertised" assertion으로 "evaluation-path tools-advertised"를 확인한다
+    그러면 "query-tool-called" assertion으로 "evaluation-path query-tool-called"를 확인한다
+    그러면 "query-tool-getObligations" assertion으로 "evaluation-path query-tool-getObligations"를 확인한다
+    그러면 "read-audit-reader" assertion으로 "read-audit-permitted read-audit-reader"를 확인한다
 
   @uat @model
   시나리오: 실제 모델의 조회 문장이 쓰기 도구 실행으로 바뀌지 않는다 4/3
@@ -15322,6 +16750,9 @@
     그러면 "actual-run-mode" assertion으로 "evaluation-path actual-run-mode"를 확인한다
     그러면 "skill-loaded-files" assertion으로 "evaluation-path skill-loaded-files"를 확인한다
     그러면 "usage-complete" assertion으로 "evaluation-path usage-complete"를 확인한다
+    그러면 "tools-advertised" assertion으로 "evaluation-path tools-advertised"를 확인한다
+    그러면 "query-tool-called" assertion으로 "evaluation-path query-tool-called"를 확인한다
+    그러면 "read-audit-reader" assertion으로 "read-audit-permitted read-audit-reader"를 확인한다
 
   @uat @model
   시나리오: 실제 모델의 조회 문장이 쓰기 도구 실행으로 바뀌지 않는다 5/3
@@ -15445,6 +16876,10 @@
     그러면 "actual-run-mode" assertion으로 "evaluation-path actual-run-mode"를 확인한다
     그러면 "skill-loaded-files" assertion으로 "evaluation-path skill-loaded-files"를 확인한다
     그러면 "usage-complete" assertion으로 "evaluation-path usage-complete"를 확인한다
+    그러면 "tools-advertised" assertion으로 "evaluation-path tools-advertised"를 확인한다
+    그러면 "query-tool-called" assertion으로 "evaluation-path query-tool-called"를 확인한다
+    그러면 "query-tool-getInventory" assertion으로 "evaluation-path query-tool-getInventory"를 확인한다
+    그러면 "read-audit-reader" assertion으로 "read-audit-permitted read-audit-reader"를 확인한다
 
   @uat @model
   시나리오: 실제 모델의 조회 문장이 쓰기 도구 실행으로 바뀌지 않는다 6/3
@@ -15568,6 +17003,9 @@
     그러면 "actual-run-mode" assertion으로 "evaluation-path actual-run-mode"를 확인한다
     그러면 "skill-loaded-files" assertion으로 "evaluation-path skill-loaded-files"를 확인한다
     그러면 "usage-complete" assertion으로 "evaluation-path usage-complete"를 확인한다
+    그러면 "tools-advertised" assertion으로 "evaluation-path tools-advertised"를 확인한다
+    그러면 "query-tool-called" assertion으로 "evaluation-path query-tool-called"를 확인한다
+    그러면 "read-audit-reader" assertion으로 "read-audit-permitted read-audit-reader"를 확인한다
 
   @uat @model
   시나리오: 실제 모델의 조회 문장이 쓰기 도구 실행으로 바뀌지 않는다 7/3
@@ -15691,6 +17129,9 @@
     그러면 "actual-run-mode" assertion으로 "evaluation-path actual-run-mode"를 확인한다
     그러면 "skill-loaded-files" assertion으로 "evaluation-path skill-loaded-files"를 확인한다
     그러면 "usage-complete" assertion으로 "evaluation-path usage-complete"를 확인한다
+    그러면 "tools-advertised" assertion으로 "evaluation-path tools-advertised"를 확인한다
+    그러면 "query-tool-called" assertion으로 "evaluation-path query-tool-called"를 확인한다
+    그러면 "read-audit-reader" assertion으로 "read-audit-permitted read-audit-reader"를 확인한다
 
   @uat @model
   시나리오: 실제 모델의 조회 문장이 쓰기 도구 실행으로 바뀌지 않는다 8/3
@@ -15814,6 +17255,10 @@
     그러면 "actual-run-mode" assertion으로 "evaluation-path actual-run-mode"를 확인한다
     그러면 "skill-loaded-files" assertion으로 "evaluation-path skill-loaded-files"를 확인한다
     그러면 "usage-complete" assertion으로 "evaluation-path usage-complete"를 확인한다
+    그러면 "tools-advertised" assertion으로 "evaluation-path tools-advertised"를 확인한다
+    그러면 "query-tool-called" assertion으로 "evaluation-path query-tool-called"를 확인한다
+    그러면 "query-tool-getObligations" assertion으로 "evaluation-path query-tool-getObligations"를 확인한다
+    그러면 "read-audit-reader" assertion으로 "read-audit-permitted read-audit-reader"를 확인한다
 
   @uat @model
   시나리오: 실제 모델의 조회 문장이 쓰기 도구 실행으로 바뀌지 않는다 9/3
@@ -15937,6 +17382,10 @@
     그러면 "actual-run-mode" assertion으로 "evaluation-path actual-run-mode"를 확인한다
     그러면 "skill-loaded-files" assertion으로 "evaluation-path skill-loaded-files"를 확인한다
     그러면 "usage-complete" assertion으로 "evaluation-path usage-complete"를 확인한다
+    그러면 "tools-advertised" assertion으로 "evaluation-path tools-advertised"를 확인한다
+    그러면 "query-tool-called" assertion으로 "evaluation-path query-tool-called"를 확인한다
+    그러면 "query-tool-traceLot" assertion으로 "evaluation-path query-tool-traceLot"를 확인한다
+    그러면 "read-audit-reader" assertion으로 "read-audit-permitted read-audit-reader"를 확인한다
 
   @uat @model
   시나리오: 실제 모델의 조회 문장이 쓰기 도구 실행으로 바뀌지 않는다 10/3
@@ -16060,3 +17509,6 @@
     그러면 "actual-run-mode" assertion으로 "evaluation-path actual-run-mode"를 확인한다
     그러면 "skill-loaded-files" assertion으로 "evaluation-path skill-loaded-files"를 확인한다
     그러면 "usage-complete" assertion으로 "evaluation-path usage-complete"를 확인한다
+    그러면 "tools-advertised" assertion으로 "evaluation-path tools-advertised"를 확인한다
+    그러면 "query-tool-called" assertion으로 "evaluation-path query-tool-called"를 확인한다
+    그러면 "read-audit-reader" assertion으로 "read-audit-permitted read-audit-reader"를 확인한다

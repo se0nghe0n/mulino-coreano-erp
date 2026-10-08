@@ -148,6 +148,60 @@ final class ChannelsContractTest {
         var rs=Map.<String,JsonNode>of("probe",r);check(a,rs);
         ((ObjectNode)r.path("data").path("hostObservation").path("extractor").path("rawRows").path("toolCalls").get(0)).put("intentKind","COMMAND");assertThrows(AssertionError.class,()->check(a,rs));
     }
+    @Test void clientRecordToolCallCannotHideBehindReadResult() throws Exception {
+        JsonNode a=declared("T20","host-malicious-document","no-record-tools");
+        ObjectNode r=sample("{\"data\":{\"hostObservation\":{\"extractor\":{\"rawRows\":{\"toolCalls\":[{\"intentKind\":\"QUERY\"}]}}}}}");
+        var rs=Map.<String,JsonNode>of("probe",r);check(a,rs);
+        ((ObjectNode)r.path("data").path("hostObservation").path("extractor").path("rawRows").path("toolCalls").get(0)).put("intentKind","RECORD");assertThrows(AssertionError.class,()->check(a,rs));
+    }
+    @Test void officialWireErrorCodeIsRequiredNotProjectCategory() throws Exception {
+        JsonNode code=declared("T20","wire-name-mismatch","wire-error-code");
+        ObjectNode r=sample("{\"response\":{\"httpStatus\":400,\"body\":{\"jsonrpc\":\"2.0\",\"id\":\"wire\",\"error\":{\"code\":-32020,\"message\":\"Header mismatch\",\"data\":{}}}}}");
+        var rs=Map.<String,JsonNode>of("wire",r);check(code,rs);
+        ((ObjectNode)r.at("/response/body/error")).put("code",-32602).set("data",Json.parse("{\"category\":\"PROTOCOL\"}"));assertThrows(AssertionError.class,()->check(code,rs));
+        JsonNode supported=declared("T20","wire-unsupported-version","unsupported-version-supported");
+        ObjectNode u=sample("{\"response\":{\"body\":{\"error\":{\"code\":-32022,\"data\":{\"supported\":[\"2026-07-28\"],\"requested\":\"1900-01-01\"}}}}}");
+        var us=Map.<String,JsonNode>of("wire",u);check(supported,us);check(declared("T20","wire-unsupported-version","unsupported-version-requested"),us);
+        ((ObjectNode)u.at("/response/body/error/data")).set("supported",Json.parse("[\"2025-11-25\",\"2026-07-28\"]"));assertThrows(AssertionError.class,()->check(supported,us));
+        for(JsonNode s:Json.read(root.resolve("verification/cases/T20/case.json")).path("subcases"))for(JsonNode a:s.path("assertions"))
+            assertFalse(a.path("source").path("pointer").asText().endsWith("/error/data/category"),"Project-invented error category must not be an oracle");
+    }
+    @Test void mrtrNegativeVariantsPinTheirOwnBindingCode() throws Exception {
+        JsonNode a=declared("T20","mrtr-tampered-state","binding-code");
+        ObjectNode r=sample("{\"response\":{\"body\":{\"result\":{\"structuredContent\":{\"outcome\":\"REJECTED\",\"error\":{\"code\":\"REQUEST_STATE_INTEGRITY_FAILED\"}}}}}}");
+        var rs=Map.<String,JsonNode>of("continued",r);check(a,rs);
+        ((ObjectNode)r.at("/response/body/result/structuredContent/error")).put("code","TYPE_INVALID");assertThrows(AssertionError.class,()->check(a,rs));
+        assertEquals("REQUEST_STATE_EXPIRED",declared("T20","mrtr-expired-state","binding-code").path("expected").asText());
+        assertEquals("STRUCTURED",declared("T20","mrtr-before-expiry","continued-outcome").path("expected").asText());
+    }
+    @Test void allowedToolsWriteNeedsAnActualServerRefusal() throws Exception {
+        JsonNode attempted=declared("T20","host-allowed-tools-write","write-attempt-observed");
+        JsonNode refused=declared("T20","host-allowed-tools-write","write-refused-by-server");
+        JsonNode applied=declared("T20","host-allowed-tools-write","no-command-applied");
+        ObjectNode r=sample("{\"data\":{\"hostObservation\":{\"extractor\":{\"rawRows\":{\"toolCalls\":[{\"actorId\":\"captured-readAgent\",\"intentKind\":\"COMMAND\",\"capabilityId\":\"reserveQuantity\",\"serverOutcome\":\"REJECTED\",\"serverErrorCode\":\"FORBIDDEN\"}]}}}}}");
+        var aliases=Json.object();for(String name:List.of("ORG","P","L","readAgent"))aliases.put(name,"captured-"+name);
+        var rs=Map.<String,JsonNode>of("probe",r);
+        engine.check(attempted,rs,aliases);engine.check(refused,rs,aliases);engine.check(applied,rs,aliases);
+        ObjectNode call=(ObjectNode)r.at("/data/hostObservation/extractor/rawRows/toolCalls/0");call.put("serverOutcome","APPLIED").put("serverErrorCode","NONE");
+        assertThrows(AssertionError.class,()->engine.check(refused,rs,aliases));assertThrows(AssertionError.class,()->engine.check(applied,rs,aliases));
+        ((com.fasterxml.jackson.databind.node.ArrayNode)r.at("/data/hostObservation/extractor/rawRows/toolCalls")).removeAll();
+        assertThrows(AssertionError.class,()->engine.check(attempted,rs,aliases));
+    }
+    @Test void runtimeLinksRejectNotRunAndFailedLinksAndPreparationIsAPinnedInput() throws Exception {
+        JsonNode links=declared("T25","runtime-links-required","concrete-links-000");
+        ObjectNode r=sample("{\"data\":{\"hostObservation\":{\"extractor\":{\"rawRows\":{\"namedObservations\":[{\"assertionLinks\":[{\"caseId\":\"T01\",\"subcaseId\":\"same-world\",\"assertionId\":\"same-snapshotRevision\",\"profile\":\"scenarios\",\"status\":\"NOT_RUN\",\"evidenceRefs\":[\"captured\"]}]}],\"assertionLinks\":[{\"status\":\"NOT_RUN\"}],\"runtimeArtifacts\":[{\"status\":\"PASS\",\"exitCode\":1}]}}}}}");
+        var rs=Map.<String,JsonNode>of("coverage",r);
+        assertThrows(AssertionError.class,()->check(links,rs));
+        assertThrows(AssertionError.class,()->check(declared("T25","runtime-links-required","assertion-links-no-not-run"),rs));
+        assertThrows(AssertionError.class,()->check(declared("T25","runtime-links-required","runtime-artifacts-no-exit1"),rs));
+        JsonNode none=Json.read(root.resolve("verification/cases/T25/case.json")).path("subcases").get(0);
+        assertEquals("coverage-none",none.path("id").asText());
+        JsonNode params=none.path("actions").get(1).path("control").path("parameters");
+        assertEquals("PREPARATION",params.path("inputSnapshotKind").asText());assertFalse(params.has("manifestPath"),"Preparation expectations must not read the live runtime manifest");
+        for(JsonNode s:Json.read(root.resolve("verification/cases/T25/case.json")).path("subcases"))for(JsonNode a:s.path("actions"))
+            if(a.path("control").path("parameters").path("manifestPath").asText().endsWith("runtime-manifest.json"))
+                assertTrue(Set.of("REQUIRED_PATH_RUNTIME_EVIDENCE","APPROVED_MODEL_EXECUTION_EVIDENCE").contains(a.path("control").path("parameters").path("inputSnapshotKind").asText()),s.path("id").asText());
+    }
     @Test void mandatoryCaseDropAndDuplicateAreRejected() throws Exception {
         JsonNode a=declared("T25","coverage-none","all-41-cases");
         JsonNode catalog=Json.read(root.resolve("verification/requirements/mandatory-oracles.json"));

@@ -758,7 +758,11 @@
         "approveRecall",
         "closeRecall",
         "emergencyReassign",
-        "getInventory"
+        "getInventory",
+        "recordRecallNotice",
+        "getObject",
+        "getEvidence",
+        "getWork"
       ],
       "grant": {
         "delegatorAlias": "delegator",
@@ -766,7 +770,11 @@
           "approveRecall",
           "closeRecall",
           "emergencyReassign",
-          "getInventory"
+          "getInventory",
+          "recordRecallNotice",
+          "getObject",
+          "getEvidence",
+          "getWork"
         ],
         "scope": {
           "organizationAlias": "ORG-A",
@@ -1728,6 +1736,26 @@
     "invalidAudience": {
       "type": "Human",
       "organizationAlias": "ORG-A"
+    },
+    "INVESTIGATION": {
+      "type": "Investigation",
+      "organizationAlias": "ORG-A"
+    },
+    "RECALL-NOTICE-DOC": {
+      "type": "DocumentVersion",
+      "organizationAlias": "ORG-A"
+    },
+    "RECALL-RECOVERY-DOC": {
+      "type": "DocumentVersion",
+      "organizationAlias": "ORG-A"
+    },
+    "RECALL-DISPOSAL-DOC": {
+      "type": "DocumentVersion",
+      "organizationAlias": "ORG-A"
+    },
+    "RECALL-CLOSURE-DOC": {
+      "type": "DocumentVersion",
+      "organizationAlias": "ORG-A"
     }
   },
   "baseline": {
@@ -1947,9 +1975,16 @@
       "RECALL": {
         "revision": 1,
         "state": "PROPOSED",
+        "investigationAlias": "INVESTIGATION",
+        "rootSegmentAlias": "A20",
+        "lotAlias": "L",
+        "itemAlias": "P",
+        "workAlias": "WORK",
+        "startQuantity": "0",
         "quantity": "20",
         "unit": "BOX",
-        "scopeVersion": "1"
+        "scopeVersion": "1",
+        "scopeHash": "1450994a2bf04f08ef3c6ae7d782532c8755633e3884b1fc818099f42b61c2f2"
       },
       "REGULATORY": {
         "revision": 1,
@@ -1991,6 +2026,22 @@
         "cargoScopeAlias": "CARGO",
         "quantity": "20",
         "unit": "BOX"
+      },
+      "INVESTIGATION": {
+        "revision": 1,
+        "state": "PROPOSED",
+        "impactState": "CANDIDATE",
+        "segmentAlias": "A20",
+        "lotAlias": "L",
+        "itemAlias": "P",
+        "workAlias": "WORK",
+        "startQuantity": "0",
+        "quantity": "20",
+        "unit": "BOX",
+        "ownerAlias": "warehouse",
+        "supervisorAlias": "supervisor",
+        "nextAction": "회수 scope 승인과 실물 처리 대조",
+        "nextCheckAt": "2026-10-07T10:00:00Z"
       }
     },
     "policies": {
@@ -2016,6 +2067,34 @@
         "mediaType": "text/plain",
         "immutable": true,
         "sha256": "4b398be9cfce00b636b953a9438da62d83df1a18c49cd62a6cddcfbc797cfe1a"
+      },
+      {
+        "alias": "RECALL-NOTICE-DOC",
+        "path": "verification/cases/C3/recall-evidence/recall-notice-doc.json",
+        "mediaType": "application/json",
+        "immutable": true,
+        "sha256": "3b68f08163ae1276a544dd39954d97f0c11a8118ae5a1d37a007f71b8698c551"
+      },
+      {
+        "alias": "RECALL-RECOVERY-DOC",
+        "path": "verification/cases/C3/recall-evidence/recall-recovery-doc.json",
+        "mediaType": "application/json",
+        "immutable": true,
+        "sha256": "896fa2ed8327d29ad90efc25b2b3112e5220712c81d9b68a550ca8de3d742622"
+      },
+      {
+        "alias": "RECALL-DISPOSAL-DOC",
+        "path": "verification/cases/C3/recall-evidence/recall-disposal-doc.json",
+        "mediaType": "application/json",
+        "immutable": true,
+        "sha256": "a6d20d844dd45c7f957b992c40dbb5e777c927ce0cd85a38c8d19fb138fb307b"
+      },
+      {
+        "alias": "RECALL-CLOSURE-DOC",
+        "path": "verification/cases/C3/recall-evidence/recall-closure-doc.json",
+        "mediaType": "application/json",
+        "immutable": true,
+        "sha256": "78ad5131e767de9f85978c7cf5888b196fdceaf513fb5dfe4037b6356b266f8e"
       }
     ],
     "sourceProfiles": [
@@ -2042,7 +2121,18 @@
       "nextCheckAt": "2026-10-07T10:00:00Z"
     },
     "fixtureClassification": "SYNTHETIC_INPUT_AND_PRIOR_FACTS",
-    "operationUnderTest": "closeRecall"
+    "operationUnderTest": "closeRecall",
+    "managementAuthorities": [
+      {
+        "actorAlias": "admin",
+        "capabilityId": "approveRecall",
+        "scopeKind": "ORGANIZATION",
+        "scopeAlias": "ORG-A",
+        "validFrom": "2026-10-07T00:00:00Z",
+        "validUntil": "2026-10-08T00:00:00Z",
+        "revokedAt": null
+      }
+    ]
   },
   "evidence": [
     {
@@ -2050,6 +2140,42 @@
       "sha256": "4b398be9cfce00b636b953a9438da62d83df1a18c49cd62a6cddcfbc797cfe1a",
       "sourceNamespace": "fixture-warehouse",
       "externalEventId": "receipt60-input",
+      "sourceVersion": "1",
+      "occurredAt": "2026-10-07T09:00:00Z",
+      "recordedAt": "2026-10-07T09:00:00Z"
+    },
+    {
+      "alias": "RECALL-NOTICE-DOC",
+      "sha256": "3b68f08163ae1276a544dd39954d97f0c11a8118ae5a1d37a007f71b8698c551",
+      "sourceNamespace": "synthetic-recall-evidence",
+      "externalEventId": "C3-recall-notice-doc",
+      "sourceVersion": "1",
+      "occurredAt": "2026-10-07T09:00:00Z",
+      "recordedAt": "2026-10-07T09:00:00Z"
+    },
+    {
+      "alias": "RECALL-RECOVERY-DOC",
+      "sha256": "896fa2ed8327d29ad90efc25b2b3112e5220712c81d9b68a550ca8de3d742622",
+      "sourceNamespace": "synthetic-recall-evidence",
+      "externalEventId": "C3-recall-recovery-doc",
+      "sourceVersion": "1",
+      "occurredAt": "2026-10-07T09:00:00Z",
+      "recordedAt": "2026-10-07T09:00:00Z"
+    },
+    {
+      "alias": "RECALL-DISPOSAL-DOC",
+      "sha256": "a6d20d844dd45c7f957b992c40dbb5e777c927ce0cd85a38c8d19fb138fb307b",
+      "sourceNamespace": "synthetic-recall-evidence",
+      "externalEventId": "C3-recall-disposal-doc",
+      "sourceVersion": "1",
+      "occurredAt": "2026-10-07T09:00:00Z",
+      "recordedAt": "2026-10-07T09:00:00Z"
+    },
+    {
+      "alias": "RECALL-CLOSURE-DOC",
+      "sha256": "78ad5131e767de9f85978c7cf5888b196fdceaf513fb5dfe4037b6356b266f8e",
+      "sourceNamespace": "synthetic-recall-evidence",
+      "externalEventId": "C3-recall-closure-doc",
       "sourceVersion": "1",
       "occurredAt": "2026-10-07T09:00:00Z",
       "recordedAt": "2026-10-07T09:00:00Z"

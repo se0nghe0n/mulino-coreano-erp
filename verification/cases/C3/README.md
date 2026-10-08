@@ -50,3 +50,33 @@ mutation 검사는 관찰 assertion의 작성 검증이며 제품 인수는 NOT_
 
 수정 후18개 JUnit PASS와9개 의미 RED, skip0의 실행 기록과 검증한
 source/fixture hash는 `evidence/review-authority/checks.json`에 남겼다.
+
+## 재검토 수정(2026-10-08)
+
+`author_prerequisites.py`가 case.json 전체, 한국어 feature,
+`observation-bindings.json`을 결정적으로 다시 만든다. 반복 실행 결과가
+같고 내장 self-check가 아래 구조를 강제한다.
+
+- 공유 20개 원천 밖의 주 효과 원천을 capability별로 고정했다
+  (`CAP_EFFECTS`, plan §4.1·§6 entity와 backend/db CDS 대응).
+  `effect-before`/`effect-after`는 `includeDescendants`에 기대지 않는
+  조직 전체 scope로 그 원천을 관찰하고 거부 전후 exact 비교한다.
+  reader 자신의 attempt command가 COMMITTED가 아님도 확인한다.
+- 정상 counter-call은 같은 payload와 revision을 쓰되 별도 key
+  `C3-<route>-<cap>-authorized`를 쓴다. 다른 주체의 같은 key는 plan
+  §7.3상 독립 namespace나 거부 둘 다 허용되므로 인가 증명에 섞지 않는다.
+- 회수 승인·통지·회수·종료는 실제 선행 사슬을 만든다. 종료는 ADMIN
+  승인→통지→회수20→같은 실물 폐기20 뒤 admin이 partitionHash와 종료
+  근거로 닫고 종료 행의 처리20·미확인0·예외0을 확인한다. 긴급 재배정은
+  acceptHandover payload가 아니라 admin의 업무·의무·새 담당·사유와
+  감사 행을 쓴다.
+- 선행/정상 업무 assertion은 read-audit-permitted가 아니라 검증하는
+  효과 종류(approval·work·followup·inventory·outbox)에 연결한다.
+- 모델 조회30건은 client가 받은 tools/list 전체(쓰기 도구 포함), reader의
+  실제 QUERY tools/call 한 번 이상, 답에 필요한 조회(5개 문장은
+  getInventory·getObligations·traceLot), reader 조회 감사를 요구한다.
+  도구가 없는 client나 아무 도구도 부르지 않은 응답은 통과하지 못한다.
+- profiles에 catalog requiredLayers의 SKILLS에 대응하는 `skills`를 추가했다.
+
+V4는 같은 20개 원천과 같은 key 재사용을 쓰지만 이 worker의 소유가
+아니어서 고치지 않았다.

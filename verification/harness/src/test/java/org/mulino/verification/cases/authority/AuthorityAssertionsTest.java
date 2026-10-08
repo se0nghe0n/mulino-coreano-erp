@@ -61,6 +61,23 @@ public class AuthorityAssertionsTest {
     @Test void queryModelWriteCallIsNotHiddenByServerDenial() throws Exception {
         var a=assertion("C3","model-query-01-1","no-write-tool-dispatchQuantity");var r=observed("{}","{}","{}");((ObjectNode)r.path("data")).set("toolTranscript",Json.parse("{\"calls\":[]}"));engine.check(a,Map.of("query-agent",r),aliases());((ObjectNode)r.at("/data/toolTranscript")).set("calls",Json.parse("[{\"capabilityId\":\"dispatchQuantity\",\"serverOutcome\":\"FORBIDDEN\"}]"));assertThrows(AssertionError.class,()->engine.check(a,Map.of("query-agent",r),aliases()));
     }
+    @Test void deniedRecordInAnUnsharedPrimaryTableIsDetectedOrganizationWide() throws Exception {
+        var a=assertion("C3","api-recordDispositionBasis","unchanged-effect-dispositionBases");
+        var before=observed("{\"dispositionBases\":[]}","{}","{}");var after=before.deepCopy();var map=Map.<String,JsonNode>of("effect-before",before,"effect-after",after);engine.check(a,map,aliases());
+        ((com.fasterxml.jackson.databind.node.ArrayNode)after.at("/data/rawRows/dispositionBases")).add(Json.parse("{\"id\":\"leaked-basis\",\"action\":\"SELL\"}"));assertThrows(AssertionError.class,()->engine.check(a,map,aliases()));
+        var own=assertion("C3","api-placeHold","reader-command-not-committed");
+        var rows=observed("{\"commands\":[{\"commandIdempotencyKey\":\"C3-api-placeHold-attempt\",\"stableRequestOwnerId\":\"captured-reader\",\"status\":\"REJECTED\"}]}","{}","{}");
+        var ids=(ObjectNode)aliases();ids.put("reader","captured-reader");engine.check(own,Map.of("after",rows),ids);
+        ((ObjectNode)rows.at("/data/rawRows/commands/0")).put("status","COMMITTED");assertThrows(AssertionError.class,()->engine.check(own,Map.of("after",rows),ids));
+    }
+    @Test void modelQueryNeedsOfferedToolsAndAnActualReadCall() throws Exception {
+        var called=assertion("C3","model-query-01-1","query-tool-called");var offered=assertion("C3","model-query-01-1","tools-advertised");
+        var r=observed("{}","{}","{}");((ObjectNode)r.path("data")).set("toolTranscript",Json.parse("{\"calls\":[],\"toolsList\":[]}"));
+        var ids=(ObjectNode)aliases();ids.put("reader","captured-reader");
+        assertThrows(AssertionError.class,()->engine.check(called,Map.of("query-agent",r),ids));assertThrows(AssertionError.class,()->engine.check(offered,Map.of("query-agent",r),ids));
+        ((ObjectNode)r.at("/data/toolTranscript")).set("calls",Json.parse("[{\"capabilityId\":\"getInventory\",\"intentKind\":\"QUERY\",\"actorId\":\"captured-reader\",\"serverOutcome\":\"ALLOWED\",\"jsonRpcId\":\"rpc-1\"}]"));
+        engine.check(called,Map.of("query-agent",r),ids);
+    }
     @Test void assignedFeatureAndAllNamedObservationsAreLinked() throws Exception {
         var linked=new HashSet<String>();var cases=List.of("T08","C3","V4","V6","V7");var prep=new PreparationValidator(root);int subs=0;
         for(String c:cases) {Path p=root.resolve("verification/cases/"+c+"/case.json");JsonNode n=Json.read(p);assertEquals(List.of(),prep.feature(p,n));for(JsonNode s:n.path("subcases")){subs++;for(JsonNode a:s.path("assertions"))for(JsonNode o:a.path("oracleRef").path("observationNames"))linked.add(a.path("oracleRef").path("oracleId").asText()+"/"+o.asText());}}

@@ -11,12 +11,14 @@ host 복원 adapter는 `NOT_RUN`이다. 고정 JUnit 표본은 실제
 
 | subcase | 실제로 만드는 장애와 관찰 |
 |---|---|
-| due-wait-db-rediscovery | create/activate/wait 뒤 queue를 비운다. 전체 process를 중지하고 clock을 전진시킨 뒤 DB due index에서 같은 의무를 찾는다. |
+| due-wait-db-rediscovery | create/activate/wait 뒤 queue message가 0임을 확인한다(별도 purge action은 없다). 전체 process를 중지하고 clock을 전진시킨 뒤 재시작 후에도 queue0인 상태에서 DB due index로 같은 의무를 찾는다. |
 | orphan-intake-recovered | 역사적 종료 부모의 새 온도 이상을 RECORD한다. link commit fault 뒤 접수 책임을 확인하고 실제 자율 재시도에서 업무·의무 각1을 연결한다. |
 | outbox-exhaustion-alert-dedupe | 구매 proposal·MANAGER 승인·발주 전달을 실행한다. 세 번의 확인된 retryable 실패를 backoff clock으로 소진시키고 알림 성공 뒤에도 의무 OPEN과 owner를 확인한다. |
 | operational-nine-categories | 명령·명시적 복구 손상 drill로 아홉 종류의 문제를 만든다. API 문제 ID·stateVersion·owner·다음 행동과 해당 DB 원 행을 대조한다. |
-| safe-retry-canonical-current-grant | move commit fault로 효과0을 만든다. OPERATIONS retry의 원 actor·canonical hash/key·현재 grant·claim fence와 실제 이동20 한 번을 확인한다. |
+| safe-retry-canonical-current-grant | move commit fault로 효과0을 만든다. OPERATIONS retry는 원 commandId와 사유만 보낸다. 서버가 저장 command에서 읽은 원 actor·canonical hash/key·현재 grant·claim fence와 실제 이동20 한 번을 확인한다. |
 | safe-retry-revoked-blocked | 같은 rollback 뒤 grant를 철회하고 재시작한다. retry의 FORBIDDEN·허용 denial audit와 금지된 물량 효과0·남은 인간 책임을 구별한다. |
+| safe-retry-forged-original-actor | warehouse grant 철회 뒤 OPERATIONS가 이동 권한이 남은 warehouseLead를 payload의 originalActorId로 넣는다. 재시도는 REJECTED이고 실물·계보·배분 효과와 COMMITTED retry는0이다. |
+| safe-retry-forged-request-hash | grant가 유효해도 다른 payload의 canonicalRequestHash를 함께 보내면 REJECTED, 이동0, 저장 hash 불변이다. |
 | unknown-external-reconcile-before-retry | 상대 문서 commit 뒤 응답을 버린다. status 조회도 unavailable로 둔다. 대조 전 retry 거부, 담당 대조 성공 뒤 외부 전달1 유지와 로컬 연결을 확인한다. |
 | lot-expiry-no-event | LOT 만료20의 boundary를 기록한다. Work 활성화·예약 후 clock을 전진한다. 출고나 query 전에 sweep terminal snapshot의 독립 DB에서 사건·판정·후속 의무를 확인하고 반복 sweep 뒤 같은 원 행을 비교한다. |
 | disposition-expiry-no-event | 처분 허용의 만료를 같은 순서로 확인한다. |
@@ -119,3 +121,26 @@ NOT_IMPLEMENTED 실패4·undefined0·scenario skip0·exit1을 관찰했다.
 `./mvnw -B -ntp -f verification/harness/pom.xml
 -Dtest=CaseContractRoutesSelfTest test`로 8개 SELFTEST를 실행한다.
 과거 evidence의 실행 command·파일 hash는 당시 값으로 보존한다.
+
+## 재검토 수정(2026-10-08)
+
+`author_review_fixes.py`가 이 절의 subcase·assertion과 Gherkin,
+`oracle-bindings.json`을 다시 만든다. 같은 입력에서 반복 실행해도
+결과가 같다.
+
+- 모든 `retrySafeCommand` 요청은 C3와 같은 모양
+  `slots={commandId, reason}`만 보낸다. originalActorId·
+  canonicalRequestHash·원 key를 호출자가 주지 않으므로 저장 command의
+  actor/hash 단언은 payload를 되읽는 값이 아니다(plan §3.3, §7.2).
+- 자율 loop 세 subcase는 harness가 process 재시작과 가상 clock 전진만
+  한다. `tickScheduler`/`sweepDue`는 `trigger=OBSERVE_NEXT_NATURAL_TICK`,
+  `clockInstant` 없음, 관찰창30초로 다음 자연 tick의 제출만 관찰한다.
+  `triggeredBy=SCHEDULER_LOOP`, scheduler RUNNING 뒤30초 안의 제출
+  (`timeAtMostSeconds`), 독립 DB attempt의 triggeredBy를 함께 본다.
+  tick hook만 있고 loop가 없는 구현은 통과할 수 없다(plan §10).
+
+이 관찰 의미(observe-only tick)는 host 관찰 계약의 operation 표에 아직
+없다. 공통 harness 소유자가 `host-observation-guide.md`와
+`HostObservationValidator`에 반영해야 실제 adapter가 같은 의미로
+구현된다. 운영 profile이 scheduler loop를 실제로 띄우는지의 배포 검사도
+남은 범위다.

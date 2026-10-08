@@ -1,5 +1,12 @@
 #!/usr/bin/env python3
-"""Author C3 valid-input counterexamples only; no product transition or PASS evidence."""
+"""Author C3 valid-input counterexamples and no-effect oracles; no product transition or PASS evidence.
+
+Idempotent post-processor over verification/cases/C3/case.json. It owns every
+action/assertion whose id starts with precondition-, effect-, authorized-effect-,
+authorized-business-, unchanged-effect-, reader-command- or query-, rewrites the
+C3 Korean feature from the JSON, and refreshes observation-bindings.json.
+Run: python3 -I verification/cases/C3/author_prerequisites.py
+"""
 import copy
 import hashlib
 import json
@@ -10,6 +17,52 @@ DIR = ROOT / 'verification/cases/C3'
 NOW = '2026-10-07T09:00:00Z'
 END = '2026-10-08T00:00:00Z'
 CAPS = ('dispatchPurchaseOrder', 'migrateWorkDefinition', 'transferObligation')
+RECALL_CAPS = ('approveRecall', 'recordRecallNotice', 'recordRecovery', 'closeRecall')
+PREREQUISITE_CAPS = CAPS + RECALL_CAPS + ('emergencyReassign',)
+ROUTES = ('api', 'mcp', 'worker')
+ORG_SCOPE = {'organizationId': {'$alias': 'ORG-A'}}
+# Primary effect sources of each COMMAND/RECORD capability that the shared 20-source
+# observation does not already cover (plan §4.1/§6 entity catalog, backend/db/*.cds).
+# A READ-grant denial must leave each of them unchanged organization-wide (plan §13.2 C3).
+CAP_EFFECTS = {
+ 'splitQuantity':['genealogy'],'mergeQuantity':['genealogy'],'moveQuantity':['logisticsMemberships','custodyHandovers'],
+ 'adjustQuantity':['adjustmentProposals','stocktakes'],'reserveQuantity':['orders'],'replaceAllocation':['orders'],'releaseAllocation':['orders'],
+ 'pickQuantity':['logisticsMemberships'],'dispatchQuantity':['shipments','deliveries'],'confirmReceipt':['receipts','receiptContributions'],
+ 'disposeQuantity':['dispositions'],
+ 'createDraft':['goalVersions'],'cancelDraft':['goalVersions','workClosures'],'activateWork':['goalVersions'],'waitWork':['goalVersions'],
+ 'resumeWork':['goalVersions'],'reviseGoal':['goalVersions'],'closeWork':['workClosures'],'createFollowup':['workLinks'],'createWork':['goalVersions','workLinks'],
+ 'resolveObligation':['obligationResolutions','dutyTransitions'],'waiveObligation':['obligationResolutions','dutyTransitions'],'transferObligation':['obligationTransfers','dutyTransitions'],
+ 'registerItem':['items','externalIdentifiers','unitConversions'],'linkExternalId':['externalIdentifiers'],
+ 'attachEvidence':['documents','evidenceLinks','events'],'correctEvidence':['documents','evidenceLinks','events','evidence_revisions'],
+ 'proposePurchase':['proposals','purchaseRevisions'],'revisePurchase':['proposals','purchaseRevisions'],'approvePurchase':['proposals'],
+ 'dispatchPurchaseOrder':['purchaseOrders','proposals'],'recordSupplierReply':['supplierCommitments'],'cancelPurchase':['cancellationRequests','purchaseOrders'],
+ 'createShipment':['shipments','cargoAllocations','legs'],'recordLegEvent':['legs','events'],'recordHandover':['custodyHandovers','events'],
+ 'prepareRegulatoryProcedure':['procedures'],'recordSubmission':['submissions'],'recordRegulatoryDecision':['regulatoryDecisions','restrictions'],'verifyLabel':['labels'],
+ 'receiveProvisional':['receipts','events'],'placeHold':['restrictions'],'releaseHold':['restrictions'],
+ 'recordDispositionBasis':['dispositionBases'],'revokeDispositionBasis':['dispositionBases'],'recordStocktake':['stocktakes'],
+ 'createSalesOrder':['orders'],'reviseSalesOrder':['orders'],'recordDelivery':['deliveries','events'],'recordObservedMovement':['events','reconciliations'],
+ 'authorizeReturn':['returns'],'receiveReturn':['returns','restrictions'],'decideReturnDisposition':['returns','dispositions'],
+ 'openInvestigation':['investigations','restrictions'],'proposeRecall':['recallScopes','investigations'],'approveRecall':['recallScopes'],
+ 'recordRecallNotice':['notices','recallScopes'],'recordRecovery':['recoveries','recallScopes'],'closeRecall':['recallScopes','recallClosures'],
+ 'recordInvoice':['invoices'],'recordCharge':['charges','invoices'],'matchInvoice':['purchaseMatches','saleMatches','invoiceDifferences'],
+ 'recordSettlementAdjustment':['settlementAdjustments','invoiceDifferences'],'recordPaymentReference':['paymentReferences','bankTransfers'],
+ 'createGrant':['validityBoundaries'],'revokeGrant':['validityBoundaries'],'assignCapability':['managementAuthorities'],'revokeCapability':['managementAuthorities'],
+ 'proposeHandover':['handovers'],'acceptHandover':['handovers'],'rejectHandover':['handovers'],'emergencyReassign':['handovers'],
+ 'createPolicyDraft':['policyDrafts'],'approvePolicy':['policyApprovals'],'activatePolicy':['activePolicies'],'retirePolicy':['activePolicies'],
+ 'matchSourceIdentity':['identity_matches'],'linkCanonicalOccurrence':['canonical_links','canonicalOccurrences'],
+ 'resolveEvidenceConflict':['reconciliations','evidenceLinks'],'recordExternalReconciliation':['reconciliations','externalOperationResults'],
+ 'createDefinitionDraft':['definitionPackages'],'validateDefinition':['regressionRuns','definitionPackages'],'submitDefinitionReview':['definitionPackages'],
+ 'approveDefinition':['definitionApprovals'],'publishDefinition':['definitionPackages'],'activateDefinition':['activeDefinitionPointers'],
+ 'retireDefinition':['activeDefinitionPointers'],'migrateWorkDefinition':['workDefinitionMigrations','goalVersions'],
+ 'recordActivity':['activities','events'],'retrySafeCommand':['retryAttempts','executionAttempts'],'recordRelation':['workLinks'],
+ 'createWorkLink':['workLinks'],'emergencyRepair':['projections']}
+EFFECT_OBSERVATION = {**{t:'inventory-effects' for t in ['genealogy','logisticsMemberships','custodyHandovers','adjustmentProposals','stocktakes','receipts','receiptContributions','dispositions','items','externalIdentifiers','unitConversions','restrictions','dispositionBases','returns','labels','recoveries']},
+ **{t:'work-effects' for t in ['goalVersions','workClosures','workLinks','obligationResolutions','dutyTransitions','obligationTransfers','handovers','definitionPackages','regressionRuns','activeDefinitionPointers','workDefinitionMigrations','policyDrafts','activePolicies','validityBoundaries','managementAuthorities','projections','retryAttempts','executionAttempts']},
+ **{t:'approval-effects' for t in ['policyApprovals','definitionApprovals']},
+ **{t:'external-outbox-effects' for t in ['purchaseOrders','bankTransfers','externalOperationResults']}}
+MODEL_QUERY_TOOL = {'01':'getInventory','03':'getObligations','05':'getInventory','08':'getObligations','09':'traceLot'}
+OWNED_ACTION_PREFIXES = ('precondition-','effect-','authorized-effect-')
+OWNED_ASSERTION_PREFIXES = ('precondition-','authorized-business-','unchanged-effect-','reader-command-','query-','tools-advertised','read-audit-')
 def alias(name): return {'$alias': name}
 def typed(value, provenance='CONTEXT'): return {'value':value,'provenance':provenance}
 def ref(action, pointer): return {'$result': {'actionId': action, 'pointer': pointer}}
@@ -22,9 +75,12 @@ def invoke(sub, id, actor, cap, slots, revision=1, subject=None):
                        'subjectRefs':subject or [],'slots':slots,'asOf':NOW,'knownAt':NOW,
                        'expectedRevision':revision,'commandIdempotencyKey':'C3-'+sub['id']+'-'+id},
             'evidenceRefs':[id+':actual-artifact']}
-def check(sub, id, action, pointer, expected, op='equals', field=None, where=None):
-    value=copy.deepcopy(sub['assertions'][-1]);value.update(id=id,op=op,source={'actionId':action,'pointer':pointer},expected=expected,
-        evidenceRefs=[action+':actual-artifact'],oracleExplanation='현재 권한 외 업무 전제를 성립시키고 승인·수락·전환 결과와 같은 command의 실제 효과를 대조한다.')
+def check(sub, id, action, pointer, expected, op='equals', field=None, where=None, observation='work-effects', explain=None):
+    """Positive prerequisite/counter-call assertion bound to the effect class it validates (not read-audit)."""
+    value=copy.deepcopy(next(a for a in sub['assertions'] if a['id']=='attempt-code'))
+    value.update(id=id,op=op,source={'actionId':action,'pointer':pointer},expected=expected,evidenceRefs=[action+':actual-artifact'],
+        oracleExplanation=explain or '현재 권한 외 업무 전제를 성립시키고 승인·수락·전환 결과와 같은 command의 실제 효과를 대조한다.')
+    value['oracleRef']={'oracleId':'C3.read-grant-all-writes','observationNames':[observation]}
     value.pop('baseline',None)
     if field:value['source']['field']=field
     if where:value['source']['where']=where
@@ -76,6 +132,7 @@ def patch_sub(sub, cap):
     sub['actions']=[a for a in sub['actions'] if not a['id'].startswith('precondition-')]
     sub['assertions']=[a for a in sub['assertions'] if not a['id'].startswith('precondition-') and not a['id'].startswith('authorized-business-')]
     actions={a['id']:a for a in sub['actions']};denied=actions['attempt'];positive=actions['authorized-same-input']
+    auth_key='C3-'+sub['id']+'-authorized'
     pre=[]
     if cap=='dispatchPurchaseOrder':
         query=copy.deepcopy(actions['target-before']);query['id']='precondition-proposal';query['request']={'objectId':alias('PROPOSAL')};query['evidenceRefs']=['precondition-proposal:actual-artifact'];pre.append(query)
@@ -90,9 +147,9 @@ def patch_sub(sub, cap):
             a['request']['slots']={'proposalId':typed(alias('PROPOSAL')),'proposalHash':typed(ref('target-before','/response/data/proposalHash')),
                 'approvalId':typed(ref('precondition-approval','/response/approvalId')),'channel':typed('fixture-local-outbox','USER'),'externalOperationId':typed(alias('EXTERNAL-OP'),'USER')}
             a['request']['expectedRevision']=ref('target-before','/response/data/proposalRevision')
-        check(sub,'precondition-approved','precondition-approval','/response/outcome','APPLIED')
-        check(sub,'precondition-approval-record','before','/data/rawRows/approvals',[[ref('precondition-approval','/response/approvalId'),alias('PROPOSAL'),ref('precondition-proposal','/response/data/proposalHash'),ref('precondition-proposal','/response/data/proposalRevision'),alias('manager'),'APPROVE',NOW,END,'SINGLE_ORDER_REVISION']],'relationSet',field=['id','proposalId','proposalHash','proposalRevision','approverId','decision','decidedAt','validUntil','consumptionPolicy'],where={'id':ref('precondition-approval','/response/approvalId')})
-        check(sub,'authorized-business-outbox-once','authorized-after','/data/rawRows/outbox',[[alias('PROPOSAL'),ref('precondition-proposal','/response/data/proposalHash'),ref('precondition-approval','/response/approvalId'),alias('EXTERNAL-OP'),positive['request']['commandIdempotencyKey']]],'relationSet',field=['proposalId','proposalHash','approvalId','externalOperationId','commandIdempotencyKey'],where={'capabilityId':cap})
+        check(sub,'precondition-approved','precondition-approval','/response/outcome','APPLIED',observation='approval-effects')
+        check(sub,'precondition-approval-record','before','/data/rawRows/approvals',[[ref('precondition-approval','/response/approvalId'),alias('PROPOSAL'),ref('precondition-proposal','/response/data/proposalHash'),ref('precondition-proposal','/response/data/proposalRevision'),alias('manager'),'APPROVE',NOW,END,'SINGLE_ORDER_REVISION']],'relationSet',field=['id','proposalId','proposalHash','proposalRevision','approverId','decision','decidedAt','validUntil','consumptionPolicy'],where={'id':ref('precondition-approval','/response/approvalId')},observation='approval-effects')
+        check(sub,'authorized-business-outbox-once','authorized-after','/data/rawRows/outbox',[[alias('PROPOSAL'),ref('precondition-proposal','/response/data/proposalHash'),ref('precondition-approval','/response/approvalId'),alias('EXTERNAL-OP'),auth_key]],'relationSet',field=['proposalId','proposalHash','approvalId','externalOperationId','commandIdempotencyKey'],where={'capabilityId':cap},observation='external-outbox-effects')
     elif cap=='migrateWorkDefinition':
         package={'nounTypes':[{'name':'QuantitySegment','coreRef':'QuantitySegment'}],'verbDefinitions':[{'name':'arrive','kind':'WORK','slotTypes':{'item':'TradeItem','destination':'Place','quantity':'DecimalWithUnit'},'endpoint':'ARRIVED'}],
             'goalTemplates':[{'name':'default','quantity':'100','unit':'BOX','quantityMode':'CUMULATIVE_EVENT','endpoint':'ARRIVED','evaluatorId':'arrival-v1','evaluatorVersion':'arrival-v1','evidencePolicyVersion':'synthetic-authority-v1','dueAt':'2026-10-09T18:00:00+09:00'}],
@@ -117,8 +174,8 @@ def patch_sub(sub, cap):
         check(sub,'authorized-business-work-version','authorized-after','/data/rawRows/works',[[alias('WORK'),'definition-v2',target]],'relationSet',field=['id','definitionVersion','definitionId'],where={'id':alias('WORK')})
         for observation in ['before','after','authorized-after']:
             actions[observation]['observation']['sources']+= [x for x in ['workDefinitionMigrations','migrationMappings','migrationRegressions','goalVersions'] if x not in actions[observation]['observation']['sources']]
-        check(sub,'authorized-business-migration-once','authorized-after','/data/rawRows/workDefinitionMigrations',[[alias('WORK'),target,'C3-v1-to-v2',ref('precondition-migration-approval','/response/approvalId'),positive['request']['commandIdempotencyKey']]],'relationSet',field=['workId','targetDefinitionId','migrationId','approvalId','commandIdempotencyKey'],where={'workId':alias('WORK')})
-        check(sub,'precondition-migration-approval-record','before','/data/rawRows/approvals',[[ref('precondition-migration-approval','/response/approvalId'),target,ref('precondition-publish','/response/hash'),ref('precondition-migration-review','/response/reviewId'),alias('configApprover'),'WORK_MIGRATION','APPROVED',NOW,END]],'relationSet',field=['id','definitionId','hash','reviewId','decisionActorId','reviewKind','decision','validFrom','validUntil'],where={'id':ref('precondition-migration-approval','/response/approvalId')})
+        check(sub,'authorized-business-migration-once','authorized-after','/data/rawRows/workDefinitionMigrations',[[alias('WORK'),target,'C3-v1-to-v2',ref('precondition-migration-approval','/response/approvalId'),auth_key]],'relationSet',field=['workId','targetDefinitionId','migrationId','approvalId','commandIdempotencyKey'],where={'workId':alias('WORK')})
+        check(sub,'precondition-migration-approval-record','before','/data/rawRows/approvals',[[ref('precondition-migration-approval','/response/approvalId'),target,ref('precondition-publish','/response/hash'),ref('precondition-migration-review','/response/reviewId'),alias('configApprover'),'WORK_MIGRATION','APPROVED',NOW,END]],'relationSet',field=['id','definitionId','hash','reviewId','decisionActorId','reviewKind','decision','validFrom','validUntil'],where={'id':ref('precondition-migration-approval','/response/approvalId')},observation='approval-effects')
         check(sub,'authorized-business-goal-history','authorized-after','/data/rawRows/goalVersions',[[alias('GOAL-V1'),'definition-v1','ARRIVED','100','BOX'],[ref('authorized-same-input','/response/goalVersionId'),'definition-v2','ARRIVED','100','BOX']],'relationSet',field=['id','definitionVersion','endpoint','quantity','unit'])
         check(sub,'authorized-business-migration-goal-link','authorized-after','/data/rawRows/workDefinitionMigrations',[[alias('WORK'),alias('GOAL-V1'),ref('authorized-same-input','/response/goalVersionId'),alias('delegator'),ref('precondition-migration-approval','/response/approvalId'),'C3-v1-to-v2']],'relationSet',field=['workId','previousGoalVersionId','goalVersionId','actorId','approvalId','migrationId'],where={'workId':alias('WORK')})
     elif cap=='transferObligation':
@@ -136,15 +193,139 @@ def patch_sub(sub, cap):
         check(sub,'precondition-recipient-binding','before','/data/rawRows/recipientAcceptances',[[alias('RECIPIENT-ACCEPTANCE'),1,1,False,'2026-10-07T08:00:00Z','2026-10-07T08:00:00Z','ONE_TRANSFER',hashlib.sha256((DIR/'recipient-acceptance.json').read_bytes()).hexdigest(),{'organizationId':alias('ORG-A'),'segmentId':alias('A20'),'quantity':'20','unit':'BOX'}]],'relationSet',field=['id','expectedSourceRevision','expectedTargetRevision','consumed','acceptedAt','validFrom','consumptionPolicy','sha256','scope'])
         for observation in ['before','after','authorized-after']:
             actions[observation]['observation']['sources']+= [x for x in ['recipientAcceptances','obligationTransfers'] if x not in actions[observation]['observation']['sources']]
-        check(sub,'authorized-business-transfer-once','authorized-after','/data/rawRows/obligationTransfers',[[alias('DUTY'),alias('WORK2'),alias('WORK'),alias('warehouse'),alias('RECIPIENT-ACCEPTANCE'),'20','BOX',positive['request']['commandIdempotencyKey']]],'relationSet',field=['sourceObligationId','sourceWorkId','targetWorkId','acceptingOwnerId','acceptanceEvidenceId','quantity','unit','commandIdempotencyKey'])
+        check(sub,'authorized-business-transfer-once','authorized-after','/data/rawRows/obligationTransfers',[[alias('DUTY'),alias('WORK2'),alias('WORK'),alias('warehouse'),alias('RECIPIENT-ACCEPTANCE'),'20','BOX',auth_key]],'relationSet',field=['sourceObligationId','sourceWorkId','targetWorkId','acceptingOwnerId','acceptanceEvidenceId','quantity','unit','commandIdempotencyKey'])
+    if cap in RECALL_CAPS:
+        # Plan §6/§13.1 D18·§13.3 E2: recall decisions need a current ADMIN approval of the exact scope;
+        # closure needs notice, recovery and disposal of the whole approved scope and a closure record.
+        query=copy.deepcopy(actions['target-before']);query.update(id='precondition-recall',actorRef='delegator',request={'objectId':alias('RECALL')},evidenceRefs=['precondition-recall:actual-artifact']);pre.append(query)
+        scope=lambda:{'recallId':alias('RECALL'),'scopeVersion':ref('precondition-recall','/response/data/scopeVersion'),'scopeHash':ref('precondition-recall','/response/data/scopeHash')}
+        approval_slots=dict(scope(),decision='APPROVED',validUntil=END,reason='승인 scope20의 회수 결정')
+        approved=lambda:dict(scope(),approvalId=ref('precondition-approval','/response/approvalId'))
+        notice_slots=lambda:dict(approved(),noticeEvidenceId=alias('RECALL-NOTICE-DOC'),noticedAt=NOW,channel='SYNTHETIC_CUSTOMER_NOTICE')
+        recovery_slots=lambda outcome,doc:dict(approved(),quantity={'value':'20','unit':'BOX'},physicalScopeId=alias('A20'),currentLocationId=alias('W2'),outcome=outcome,evidenceId=alias(doc),occurredAt=NOW)
+        subject=[{'type':'Recall','id':alias('RECALL')}]
+        if cap!='approveRecall':
+            pre.append(invoke(sub,'precondition-approval','admin','approveRecall',approval_slots,ref('precondition-recall','/response/data/revision'),subject))
+            check(sub,'precondition-approval-applied','precondition-approval','/response/outcome','APPLIED',observation='approval-effects')
+            check(sub,'precondition-approval-record','before','/data/rawRows/approvals',[[ref('precondition-approval','/response/approvalId'),alias('admin'),'APPROVED']],'relationSet',field=['id','approverId','decision'],where={'id':ref('precondition-approval','/response/approvalId')},observation='approval-effects',
+                explain='회수 승인은 ADMIN management authority를 가진 admin이 정확한 scope hash/version에 대해 먼저 확정한다.')
+        if cap=='closeRecall':
+            pre.append(invoke(sub,'precondition-notice','admin','recordRecallNotice',notice_slots(),ref('precondition-recall','/response/data/revision'),subject))
+            pre[-1]['request']['intentKind']='RECORD'
+            pre.append(invoke(sub,'precondition-recovery','delegator','recordRecovery',recovery_slots('RECOVERED','RECALL-RECOVERY-DOC'),ref('precondition-recall','/response/data/revision'),subject))
+            pre[-1]['request']['intentKind']='RECORD'
+            pre.append(invoke(sub,'precondition-disposal','delegator','recordRecovery',recovery_slots('DISPOSED','RECALL-DISPOSAL-DOC'),ref('precondition-recovery','/response/revision'),subject))
+            pre[-1]['request']['intentKind']='RECORD'
+            for id in ['precondition-notice','precondition-recovery','precondition-disposal']:check(sub,id+'-applied',id,'/response/outcome','APPLIED',observation='followup-effects')
+        if cap=='approveRecall':slots=approval_slots
+        elif cap=='recordRecallNotice':slots=notice_slots()
+        elif cap=='recordRecovery':slots=recovery_slots('RECOVERED','RECALL-RECOVERY-DOC')
+        else:slots=dict(approved(),partitionHash=ref('precondition-disposal','/response/partitionHash'),closureEvidenceId=alias('RECALL-CLOSURE-DOC'),reason='승인 scope20 전부 회수 후 같은 실물 폐기 대조 완료')
+        for a in [denied,positive]:a['request']['slots']=copy.deepcopy(slots);a['request']['subjectRefs']=subject;a['request']['evidenceRefs']=[alias('DOC')]
+        positive['actorRef']='admin' if cap in ['approveRecall','closeRecall','recordRecallNotice'] else 'delegator'
+        for observation in ['before','after','authorized-after']:
+            actions[observation]['observation']['sources']+= [x for x in ['recallScopes','recallClosures','notices','recoveries'] if x not in actions[observation]['observation']['sources']]
+        if cap=='approveRecall':
+            check(sub,'authorized-business-recall-approval','authorized-after','/data/rawRows/approvals',[[ref('authorized-same-input','/response/approvalId'),alias('admin'),'APPROVED']],'relationSet',field=['id','approverId','decision'],where={'id':ref('authorized-same-input','/response/approvalId')},observation='approval-effects')
+        elif cap=='recordRecallNotice':
+            check(sub,'authorized-business-notice','authorized-after','/data/rawRows/notices',[[alias('RECALL'),ref('precondition-approval','/response/approvalId'),alias('RECALL-NOTICE-DOC')]],'relationSet',field=['recallId','approvalId','evidenceId'],where={'recallId':alias('RECALL')},observation='followup-effects')
+        elif cap=='recordRecovery':
+            check(sub,'authorized-business-recovery','authorized-after','/data/rawRows/recoveries',[[alias('RECALL'),ref('precondition-approval','/response/approvalId'),'20','BOX','RECOVERED',alias('W2')]],'relationSet',field=['recallId','approvalId','quantity','unit','outcome','currentLocationId'],where={'recallId':alias('RECALL')},observation='inventory-effects')
+        else:
+            check(sub,'precondition-not-closed','before','/data/rawRows/recallClosures',0,'count',where={'recallId':alias('RECALL')},observation='followup-effects')
+            check(sub,'authorized-business-recall-closure','authorized-after','/data/rawRows/recallClosures',[[alias('RECALL'),ref('precondition-approval','/response/approvalId'),alias('admin'),'20','20','0','0','BOX']],'relationSet',
+                field=['recallId','approvalId','closedBy','recoveredQuantity','disposedQuantity','exceptionQuantity','unknownQuantity','unit'],where={'recallId':alias('RECALL')},observation='followup-effects',
+                explain='회수20·같은 실물 폐기20은 처리량20이며 미확인0·예외0일 때만 ADMIN이 종료한다. 회수와 폐기를 더해40으로 세지 않는다.')
+    if cap=='emergencyReassign':
+        # Plan §5/§7.2: ADMIN reassigns the current responsibility with its own reason and audit, not acceptHandover's payload.
+        actions['target-before']['request']={'objectId':alias('WORK')};actions['authorized-target']['request']={'objectId':alias('WORK')}
+        slots={'workId':alias('WORK'),'obligationId':alias('DUTY'),'newOwnerId':alias('delegator'),'reason':'기존 담당 부재로 즉시 후속 대응','effectiveAt':NOW}
+        for a in [denied,positive]:a['request']['slots']=copy.deepcopy(slots);a['request']['subjectRefs']=[{'type':'Work','id':alias('WORK')}]
+        positive['actorRef']='admin'
+        check(sub,'precondition-current-owner','before','/data/rawRows/works',[alias('warehouse')],'equals',field='ownerId',where={'id':alias('WORK')})
+        check(sub,'authorized-business-new-owner','authorized-after','/data/rawRows/works',[alias('delegator')],'equals',field='ownerId',where={'id':alias('WORK')})
+        check(sub,'authorized-business-emergency-audit','authorized-after','/data/rawRows/audit',[[alias('admin'),'emergencyReassign','기존 담당 부재로 즉시 후속 대응',alias('WORK')]],'relationSet',field=['actorId','capabilityId','reason','workId'],where={'commandIdempotencyKey':auth_key})
     if cap in ['migrateWorkDefinition','transferObligation']:
         for name in (['workDefinitionMigrations','migrationMappings','migrationRegressions','goalVersions'] if cap=='migrateWorkDefinition' else ['recipientAcceptances','obligationTransfers']):
             check(sub,'precondition-denial-unchanged-'+name,'after','/data/rawRows/'+name,True,'sameAs')
             sub['assertions'][-1]['baseline']={'actionId':'before','pointer':'/data/rawRows/'+name}
-    # Both calls use literally the same business payload/revision after prerequisite state is captured.
-    positive['request']=copy.deepcopy(denied['request'])
     sub['actions'][1:1]=pre
     return sub
+
+def effect_observe(id, snapshot, sources):
+    return {'id':id,'kind':'observe','observation':{'scope':copy.deepcopy(ORG_SCOPE),'snapshotRef':ref(snapshot,'/response/snapshotRevision'),'asOf':NOW,'knownAt':NOW,'sources':list(sources)},'evidenceRefs':[id+':actual-artifact']}
+def finish_route_sub(sub, cap):
+    """Every api/mcp/worker denial: organization-wide primary effect tables and the reader's own command."""
+    sub['actions']=[a for a in sub['actions'] if not a['id'].startswith(('effect-','authorized-effect-'))]
+    sub['assertions']=[a for a in sub['assertions'] if not a['id'].startswith(('unchanged-effect-','reader-command-'))]
+    actions={a['id']:a for a in sub['actions']};denied=actions['attempt'];positive=actions['authorized-same-input']
+    attempt_key='C3-'+sub['id']+'-attempt';auth_key='C3-'+sub['id']+'-authorized'
+    # Same business payload and revision; a separate key keeps cross-principal key semantics (plan §7.3 allows
+    # an independent namespace or a refusal) out of the authority proof.
+    request=copy.deepcopy(denied['request']);request['commandIdempotencyKey']=auth_key
+    if positive['request'].get('expectedRevision')!=denied['request'].get('expectedRevision'):request['expectedRevision']=positive['request']['expectedRevision']
+    positive['request']=request
+    for a in sub['assertions']:
+        if a['id']=='authorized-committed-once':
+            a['source']['where'].update(commandIdempotencyKey=auth_key,stableRequestOwnerId=alias(positive['actorRef']))
+    sources=CAP_EFFECTS[cap]
+    ids=[a['id'] for a in sub['actions']]
+    sub['actions'].insert(ids.index('before')+1,effect_observe('effect-before','before-snapshot',sources))
+    ids=[a['id'] for a in sub['actions']]
+    sub['actions'].insert(ids.index('after')+1,effect_observe('effect-after','after-snapshot',sources))
+    template=next(a for a in sub['assertions'] if a['id']=='unchanged-segments')
+    for t in sources:
+        x=copy.deepcopy(template);x.update(id='unchanged-effect-'+t,source={'actionId':'effect-after','pointer':'/data/rawRows/'+t},baseline={'actionId':'effect-before','pointer':'/data/rawRows/'+t},
+            evidenceRefs=['effect-after:actual-artifact','effect-before:actual-artifact'],scope=copy.deepcopy(ORG_SCOPE),
+            oracleExplanation=f'{cap}의 주 효과 원천 {t} 원행 전체를 조직 범위에서 거부 전후 exact 대조한다. 공용20개 원천에 없는 실제 업무 효과를 놓치지 않는다.')
+        x['oracleRef']={'oracleId':'C3.read-grant-all-writes','observationNames':[EFFECT_OBSERVATION.get(t,'followup-effects')]}
+        sub['assertions'].append(x)
+    x=copy.deepcopy(next(a for a in sub['assertions'] if a['id']=='followup-effects-rows0'))
+    x.update(id='reader-command-not-committed',source={'actionId':'after','pointer':'/data/rawRows/commands','where':{'commandIdempotencyKey':attempt_key,'stableRequestOwnerId':alias('reader'),'status':'COMMITTED'}},
+        oracleExplanation='거부된 reader 자신의 command record는 COMMITTED가 아니다. REJECTED record와 거부 감사는 허용된 별도 기록이다.')
+    x['oracleRef']={'oracleId':'C3.read-grant-all-writes','observationNames':['work-effects']}
+    sub['assertions'].append(x)
+    return sub
+def model_query(sub, public):
+    """The query/write boundary is exercised only if MCP tools were offered and a real read happened."""
+    sub['assertions']=[a for a in sub['assertions'] if not a['id'].startswith(('query-','tools-advertised','read-audit-'))]
+    template=next(a for a in sub['assertions'] if a['id']=='actual-client-kind')
+    def add(id,op,source,expected,explain,observation='evaluation-path',oracle='C3.model-query-write-boundary'):
+        x=copy.deepcopy(template);x.update(id=id,op=op,source=source,expected=expected,oracleExplanation=explain,evidenceRefs=[source['actionId']+':actual-artifact'])
+        x['oracleRef']={'oracleId':oracle,'observationNames':[observation]};sub['assertions'].append(x)
+    add('tools-advertised','exactSet',{'actionId':'query-agent','pointer':'/data/toolTranscript/toolsList','field':'name'},public,
+        '실제 client가 서버 tools/list로 받은 공개 도구 전체(쓰기 도구 포함)를 기록한다. 도구가 없거나 숨겨진 client의 빈 transcript는 쓰기 경계를 시험하지 않는다.')
+    add('query-tool-called','fieldsPresent',{'actionId':'query-agent','pointer':'/data/toolTranscript/calls','where':{'intentKind':'QUERY','actorId':alias('reader')}},['capabilityId','intentKind','serverOutcome','jsonRpcId'],
+        '조회 문장은 인증된 reader의 실제 MCP QUERY tools/call을 한 번 이상 남긴다. 아무 도구도 부르지 않은 응답은 의도 해석의 증거가 아니다.')
+    number=sub['id'].split('-')[2]
+    if number in MODEL_QUERY_TOOL:
+        cap=MODEL_QUERY_TOOL[number]
+        add('query-tool-'+cap,'fieldsPresent',{'actionId':'query-agent','pointer':'/data/toolTranscript/calls','where':{'capabilityId':cap,'actorId':alias('reader')}},['capabilityId','serverOutcome','jsonRpcId'],
+            f'이 문장의 답은 {cap} 조회 없이 얻을 수 없다. 다른 조회를 추가로 부르는 것은 허용한다.')
+    add('read-audit-reader','fieldsPresent',{'actionId':'after','pointer':'/data/rawRows/audit','where':{'actorId':alias('reader')}},['capabilityId','intentKind','outcome'],
+        '조회 감사는 실제 인증 주체 reader에 연결되며 업무 변경으로 세지 않는다.',observation='read-audit-permitted',oracle='C3.read-grant-all-writes')
+    return sub
+
+def prepare_recall_fixture(cap):
+    path=DIR/('fixture-'+cap+'.json');f=json.loads(path.read_text());b=f['baseline']
+    names=['approveRecall','closeRecall','recordRecallNotice','emergencyReassign','getObject','getEvidence','getWork','getInventory']
+    allow(f['actors']['admin'],names)
+    authorities=[{'actorAlias':'admin','capabilityId':c,'scopeKind':'ORGANIZATION','scopeAlias':'ORG-A','validFrom':'2026-10-07T00:00:00Z','validUntil':END,'revokedAt':None} for c in (['approveRecall'] if cap in RECALL_CAPS else ['emergencyReassign'])]
+    b['managementAuthorities']=authorities
+    if cap in RECALL_CAPS:
+        f['aliases']['INVESTIGATION']={'type':'Investigation','organizationAlias':'ORG-A'}
+        b['priorEntities']['INVESTIGATION']={'revision':1,'state':'PROPOSED','impactState':'CANDIDATE','segmentAlias':'A20','lotAlias':'L','itemAlias':'P','workAlias':'WORK','startQuantity':'0','quantity':'20','unit':'BOX','ownerAlias':'warehouse','supervisorAlias':'supervisor','nextAction':'회수 scope 승인과 실물 처리 대조','nextCheckAt':'2026-10-07T10:00:00Z'}
+        recall={'revision':1,'state':'PROPOSED','investigationAlias':'INVESTIGATION','rootSegmentAlias':'A20','lotAlias':'L','itemAlias':'P','workAlias':'WORK','startQuantity':'0','quantity':'20','unit':'BOX','scopeVersion':'1'}
+        recall['scopeHash']=hashlib.sha256(json.dumps({k:v for k,v in recall.items() if k not in ['revision','state']},sort_keys=True,separators=(',',':')).encode()).hexdigest()
+        b['priorEntities']['RECALL']=recall
+        for doc,kind,text in [('RECALL-NOTICE-DOC','RECALL_NOTICE','가상 고객 회수 통지 20BOX'),('RECALL-RECOVERY-DOC','RECALL_RECOVERY','가상 회수 실물 20BOX W2 입고'),('RECALL-DISPOSAL-DOC','RECALL_DISPOSAL','가상 회수 실물 20BOX 폐기 확인'),('RECALL-CLOSURE-DOC','RECALL_CLOSURE','가상 회수 종료 대조 처리20 미확인0')]:
+            content=json.dumps({'synthetic':True,'kind':kind,'recallAlias':'RECALL','scopeQuantity':'20','unit':'BOX','statement':text},ensure_ascii=False,sort_keys=True)+'\n'
+            (DIR/'recall-evidence').mkdir(exist_ok=True);(DIR/'recall-evidence'/(doc.lower()+'.json')).write_text(content)
+            digest=hashlib.sha256(content.encode()).hexdigest()
+            f['aliases'][doc]={'type':'DocumentVersion','organizationAlias':'ORG-A'}
+            f['evidence']=[x for x in f['evidence'] if x.get('alias')!=doc]+[{'alias':doc,'sha256':digest,'sourceNamespace':'synthetic-recall-evidence','externalEventId':'C3-'+doc.lower(),'sourceVersion':'1','occurredAt':NOW,'recordedAt':NOW}]
+            b['documents']=[x for x in b['documents'] if x['alias']!=doc]+[{'alias':doc,'path':'verification/cases/C3/recall-evidence/'+doc.lower()+'.json','mediaType':'application/json','immutable':True,'sha256':digest}]
+    save(path,f)
 
 def compact_sub(s):
     lines=['    {']
@@ -154,24 +335,44 @@ def compact_sub(s):
             lines.extend('        '+dump(a)+(',' if i<len(v)-1 else '') for i,a in enumerate(v));lines.append('      ],')
         else:lines.append('      '+json.dumps(k)+': '+json.dumps(v,ensure_ascii=False)+',')
     lines[-1]=lines[-1].rstrip(',');lines.append('    }');return '\n'.join(lines)
-def main():
-    path=DIR/'case.json';original=path.read_text();n=json.loads(original)
-    for cap in CAPS:prepare_fixture(cap)
+def render_case(n):
+    head=['{']+['  '+json.dumps(k)+': '+json.dumps(v,ensure_ascii=False)+',' for k,v in n.items() if k!='subcases']
+    return '\n'.join(head+['  "subcases": [',',\n'.join(compact_sub(s) for s in n['subcases']),'  ]','}'])+'\n'
+def render_feature(n, header):
+    lines=header[:]
     for s in n['subcases']:
-        if s['id'] not in {r+'-'+c for c in CAPS for r in ['api','mcp','worker']}:continue
-        marker='    {\n      "id": '+json.dumps(s['id'])+',';start=original.index(marker);end=original.find('\n    }',start)+len('\n    }')
-        original=original[:start]+compact_sub(patch_sub(s,s['id'].split('-',1)[1]))+original[end:]
-    path.write_text(original)
-    feature=DIR/'scenario.feature';text=feature.read_text()
-    for s in n['subcases']:
-        if s['id'] not in {r+'-'+c for c in CAPS for r in ['api','mcp','worker']}:continue
-        marker='  시나리오: '+s['title'];start=text.index(marker);end=text.find('\n  시나리오:',start+1)
-        if end<0:end=len(text)
-        lines=[marker,f'    먼저 사례 파일 "verification/cases/C3/case.json"의 "{s["id"]}"를 준비한다']
+        lines += ['','  @uat @model' if s['id'].startswith('model-query') else '  @sit','  시나리오: '+s['title'],f'    먼저 사례 파일 "verification/cases/C3/case.json"의 "{s["id"]}"를 준비한다']
         lines += [f'    만일 "{a.get("actorRef","시스템")}" 역할이 "{a["id"]}" 행동을 수행한다' for a in s['actions']]
         lines += [f'    그러면 "{a["id"]}" assertion으로 "{a["oracleRef"]["observationNames"][0]} {a["id"]}"를 확인한다' for a in s['assertions']]
-        text=text[:start]+'\n'.join(lines)+'\n'+text[end:]
-    feature.write_text(text)
+    return '\n'.join(lines)+'\n'
+def self_check(n):
+    """Structural guard: every route subcase observes its primary effect tables and uses a separate counter-call key."""
+    for s in n['subcases']:
+        if s['id'].startswith('model-query'):
+            ids={a['id'] for a in s['assertions']};assert {'tools-advertised','query-tool-called','read-audit-reader'}<=ids,s['id'];continue
+        route,cap=s['id'].split('-',1);assert route in ROUTES
+        acts={a['id']:a for a in s['actions']}
+        assert acts['effect-before']['observation']['sources']==CAP_EFFECTS[cap]==acts['effect-after']['observation']['sources'],s['id']
+        assert {'unchanged-effect-'+t for t in CAP_EFFECTS[cap]}<={a['id'] for a in s['assertions']},s['id']
+        assert acts['attempt']['request']['commandIdempotencyKey']!=acts['authorized-same-input']['request']['commandIdempotencyKey'],s['id']
+        strip=lambda r:{k:v for k,v in r.items() if k not in ['commandIdempotencyKey','expectedRevision']}
+        assert strip(acts['attempt']['request'])==strip(acts['authorized-same-input']['request']),s['id']
+        assert all(x['oracleRef']['observationNames']!=['read-audit-permitted'] for x in s['assertions'] if x['id'].startswith(('precondition-','authorized-business-'))),s['id']
+def main():
+    path=DIR/'case.json';n=json.loads(path.read_text())
+    public=[c['id'] for c in json.loads((ROOT/'contracts/acceptance-capabilities.json').read_text())['capabilities']]
+    for cap in CAPS:prepare_fixture(cap)
+    for cap in RECALL_CAPS+('emergencyReassign',):prepare_recall_fixture(cap)
+    if 'skills' not in n['profiles']:n['profiles'].append('skills')
+    for s in n['subcases']:
+        if s['id'].startswith('model-query'):model_query(s,public);continue
+        cap=s['id'].split('-',1)[1]
+        if cap in PREREQUISITE_CAPS:patch_sub(s,cap)
+        finish_route_sub(s,cap)
+    self_check(n)
+    path.write_text(render_case(n))
+    feature=DIR/'scenario.feature';header=feature.read_text().split('\n')[:3]
+    feature.write_text(render_feature(n,header))
     bindings=DIR/'observation-bindings.json';b=json.loads(bindings.read_text());b['caseHash']=hashlib.sha256(path.read_bytes()).hexdigest()
     for observation in b['observations']:
         observation['bindings']=[{'subcaseId':s['id'],'assertionId':a['id'],'pointer':f'/subcases/{i}/assertions/{j}','actionId':a['source']['actionId'],'op':a['op']}

@@ -26,3 +26,42 @@ DB approval1/state consumption1을 각각 관찰한다. 일반 입력수집 stat
 분리한다. 실제 모델에 oracle·typed 답안·예상 tool을 넣지 않는다.
 host/model/usage가 없으면 해당 실행은 NOT_RUN이다. 고정 selftest는
 parser와 AssertionEngine의 거부 성질만 검증하며 실제 결과를 만들지 않는다.
+
+## 재검토 수정(2026-10-08)
+
+case.json·fixture·Gherkin은 `verification/mcp-tests/author_cases.py`의
+출력이다. 손으로 고치지 않고 generator를 고친 뒤 다시 만든다.
+
+- wire 오류는 공식 2026-07-28 코드로 검증한다. header 누락/불일치는
+  400·-32020, 필수 `_meta` 누락은 400·-32602, 미지원 version은
+  400·-32022와 `data.supported=["2026-07-28"]`·`data.requested`다.
+  프로젝트가 만든 `error.data.category`는 oracle에서 뺐다. `_meta`
+  전체 누락은 두 규칙이 겹쳐 -32602와 -32020이 모두 규격에 맞으므로
+  400 오류 envelope만 고정한다. 401/403은 JSON-RPC 처리 전 거부라
+  HTTP status와 업무 효과0만 본다. 값이 있으나 형식이 틀린
+  clientInfo는 -32602로 거부한다(`wire-invalid-client-info`).
+- tools/list는 별도 request로 보내고 HTTP200(stdio는 transport),
+  jsonrpc·id echo, resultType=complete, raw method·header·meta를
+  모두 검증한다.
+- MRTR state TTL은 fixture `baseline.mrtr.requestStateTtlSeconds=600`이다.
+  09:09:59Z continuation은 STRUCTURED, 09:10:01Z는
+  REQUEST_STATE_EXPIRED다. 변조·주체·intent·응답 불일치는 각각
+  REQUEST_STATE_INTEGRITY_FAILED·REQUEST_STATE_PRINCIPAL_MISMATCH·
+  REQUEST_STATE_INTENT_MISMATCH·INPUT_RESPONSE_UNMATCHED를 고정한다.
+  다른 intent는 slot이 같은 createWork로 바꿔 타입 오류가 결속 검사를
+  대신하지 못하게 했다. 다른 method는 header와 body가 일치하는
+  resources/read로 보내며 -32602와 결과 없음을 요구한다.
+- 여섯 skill은 계획 §9.2 절차마다 다른 문장·필수 QUERY 호출·금지
+  command·해당 업무 의무를 가진다. 필수 호출은 한 번 이상(subset)으로
+  검사하고 호출 순서나 횟수를 고정 답안으로 삼지 않는다. reference와
+  tool 단계는 여러 번 관찰돼도 된다.
+- host 변형은 COMMAND와 RECORD 호출을 각각0으로 센다. 근거 연결·
+  의무·관계 원행도 전후 비교하고 client 주체를 readAgent로 고정한다.
+  `host-allowed-tools-write`는 fixture의 `skillVariants`로 frontmatter
+  allowed-tools에 reserveQuantity를 설치하고 쓰기를 요청한다. host가
+  실제 COMMAND를 제출해야 하며 서버는 REJECTED·FORBIDDEN으로 거부하고
+  적용·외부전달·승인대기 쓰기는0이다.
+
+계획 §9.1 문장과 catalog clause의 clientInfo 표현은 이 worktree에서
+고치지 않았다. 공식 규격상 clientInfo는 optional이며 이 case는
+"값이 있으면 검증한다"로 해석한다.
