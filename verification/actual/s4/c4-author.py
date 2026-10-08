@@ -4,6 +4,13 @@ import copy,json,pathlib,re,uuid
 D=pathlib.Path(__file__).resolve().parent
 T='2026-10-07T09:00:02Z'; N='2026-10-08T09:00:00Z'
 def write(name,obj): (D/name).write_text(json.dumps(obj,ensure_ascii=False,indent=2)+'\n')
+def declare_capabilities(definition):
+ # A verb without its pinned capability makes the whole definition non-VALID
+ # (plan §8); the product then HOLDs every goal pinned to it.
+ known={c['capabilityId'] for c in definition['capabilities']}
+ for verb in definition['verbs']:
+  if verb['capabilityId'] not in known:
+   definition['capabilities'].append({'capabilityId':verb['capabilityId'],'semanticVersion':'1.0.0','evaluatorVersion':'core-v1','inputSchemaVersion':'1.0.0','outputSchemaVersion':'1.0.0','supportedWorkMigration':[]});known.add(verb['capabilityId'])
 def cmd(i,cap,slots,rev=0,bind=None,intent='COMMAND',outcome='APPLIED',actor=None,assertions=None):
  a=dict(id=i,type='command',capability=cap,request=dict(intentKind=intent,definitionVersion='definition-v1',capabilityId=cap,expectedRevision=rev,commandIdempotencyKey=i,slots=slots,provenance={},subjectRefs=[dict(type='Work',id='$SALES_WORK')]),outcome=outcome)
  if bind:a['bind']=bind
@@ -34,6 +41,7 @@ def fixture():
  f['aliases']['CPOL']['content']['rules']['correctEvidence']={'effectClass':'RECORD'}
  for cap in ['correctEvidence','recordActivity']:
   if not any(x['name']==cap for x in f['aliases']['DEF']['content']['verbs']):f['aliases']['DEF']['content']['verbs'].append(dict(name=cap,intentKind='RECORD',capabilityId=cap,stage='DRAFT',slots={}))
+ declare_capabilities(f['aliases']['DEF']['content'])
  return f
 # Preserve E1's public input choreography, retain only receipt100 and its own
 # authoritative SELL/DISPATCH evidence. Do not copy any E1 expected results.

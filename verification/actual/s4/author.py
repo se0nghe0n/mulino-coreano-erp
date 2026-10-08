@@ -5,6 +5,13 @@ root=pathlib.Path(__file__).resolve().parents[3]
 out=root/'verification/actual/s4'
 T='2026-10-07T09:00:02Z';NEXT='2026-10-08T09:00:00Z'
 def write(name,value): (out/name).write_text(json.dumps(value,ensure_ascii=False,indent=2)+'\n')
+def declare_capabilities(definition):
+ # A verb without its pinned capability makes the whole definition non-VALID
+ # (plan §8); the product then HOLDs every goal pinned to it.
+ known={c['capabilityId'] for c in definition['capabilities']}
+ for verb in definition['verbs']:
+  if verb['capabilityId'] not in known:
+   definition['capabilities'].append({'capabilityId':verb['capabilityId'],'semanticVersion':'1.0.0','evaluatorVersion':'core-v1','inputSchemaVersion':'1.0.0','outputSchemaVersion':'1.0.0','supportedWorkMigration':[]});known.add(verb['capabilityId'])
 def command(id,capability,slots,bind=None,intent='COMMAND',revision=0,refs=None,actor=None,outcome='APPLIED',assertions=None):
  a={'id':id,'type':'command','capability':capability,'request':{'intentKind':intent,'definitionVersion':'definition-v1','capabilityId':capability,'expectedRevision':revision,'commandIdempotencyKey':id,'slots':slots,'provenance':{},'subjectRefs':refs or [{'type':'Work','id':'$WORK'}]},'outcome':outcome}
  if bind:a['bind']=bind
@@ -40,6 +47,7 @@ for noun in ['SalesOrder','SalesOrderLine','DeliveryObservation','Delivery','Ret
 fixture['aliases']['RETURN_AUTH']={'type':'ManagementAuthority','actorAlias':'supervisor','capabilityId':'authorizeReturn','validFrom':'2026-10-01T00:00:00Z','validUntil':'2026-10-31T23:59:59Z'}
 fixture['aliases']['DEF']['content']['attributes'].append({'nounType':'Delivery','name':'quantity','type':'DECIMAL','referenceType':None,'unit':'BOX','decimalPlaces':0,'minimumCount':1,'maximumCount':1,'requiredStage':'READ','core':True}) if not any(x['nounType']=='Delivery' and x['name']=='quantity' for x in fixture['aliases']['DEF']['content']['attributes']) else None
 if not any(x['name']=='delivered' for x in fixture['aliases']['DEF']['content']['goals']): fixture['aliases']['DEF']['content']['goals'].append({'name':'delivered','quantityMode':'CUMULATIVE_EVENT','endpoint':'DELIVERED','evaluatorVersion':'core-v1','predicate':{'operator':'quantitySum','property':'Delivery.quantity','minimum':{'value':'1','unit':'BOX'},'unit':'BOX','evidenceSelector':'VERIFIED_DISTINCT'}})
+declare_capabilities(fixture['aliases']['DEF']['content'])
 write('fixture.json',fixture)
 # All DISPATCH conditions arise from their own approved originals and gateway decisions.
 base=json.loads((out/'e1-upstream.json').read_text())['actions'];extras=[]

@@ -5,6 +5,13 @@ OUT=pathlib.Path(__file__).resolve().parent
 T='2026-10-07T09:00:02Z'; NEXT='2026-10-08T09:00:00Z'; UNTIL='2026-10-31T00:00:00Z'
 def load(name):return json.loads((OUT/name).read_text())
 def write(name,obj):(OUT/name).write_text(json.dumps(obj,ensure_ascii=False,indent=2)+'\n')
+def declare_capabilities(definition):
+ # A verb without its pinned capability makes the whole definition non-VALID
+ # (plan §8); the product then HOLDs every goal pinned to it.
+ known={c['capabilityId'] for c in definition['capabilities']}
+ for verb in definition['verbs']:
+  if verb['capabilityId'] not in known:
+   definition['capabilities'].append({'capabilityId':verb['capabilityId'],'semanticVersion':'1.0.0','evaluatorVersion':'core-v1','inputSchemaVersion':'1.0.0','outputSchemaVersion':'1.0.0','supportedWorkMigration':[]});known.add(verb['capabilityId'])
 def cmd(name,cap,slots,bind=None,rev=0,actor=None,outcome='APPLIED',assertions=None,intent=None):
  a={'id':name,'type':'command','capability':cap,'outcome':outcome,'request':{'intentKind':intent or ('RECORD' if cap in ['recordRecovery','recordRecallNotice','recordDispositionBasis'] else 'COMMAND'),'definitionVersion':'definition-v1','capabilityId':cap,'expectedRevision':rev,'commandIdempotencyKey':name,'slots':slots,'provenance':{},'subjectRefs':[{'type':'Work','id':'$WORK'}]}}
  if bind:a['bind']=bind
@@ -37,6 +44,7 @@ for cap,cls in classes.items():
  if cap not in {v['capabilityId'] for v in fixture['aliases']['DEF']['content']['verbs']}:fixture['aliases']['DEF']['content']['verbs'].append({'name':cap,'intentKind':'RECORD' if cap.startswith('record') else 'COMMAND','capabilityId':cap,'stage':'DRAFT','slots':{}})
 fixture['aliases']['RECALL_ADMIN']={'type':'ManagementAuthority','actorAlias':'supervisor','capabilityId':'approveRecall','validFrom':'2026-10-01T00:00:00Z','validUntil':UNTIL}
 # Fresh organization, same coherent LOT/item/place aliases: no stock/result seed.
+declare_capabilities(fixture['aliases']['DEF']['content'])
 write('e2-fixture.json',fixture)
 a=[{'id':'e2-setup','type':'setup','fixtureRef':'verification/actual/s4/e2-fixture.json','organizationAlias':'ORG'}]
 up=load('e1-upstream.json')['actions']; selected=[]
