@@ -14,7 +14,8 @@ public final class StockPrimitives {
   public Map<String,Object> leaf(DomainContext c,String id,Instant at) {
     if(at.isAfter(c.knownAt()))throw DomainError.invalid("Future actual occurrence rejected");
     var s=repository.current(c,"QuantitySegments",id);
-    if(s.get("retiredAt")!=null || instant(s.get("validFrom")).isAfter(at)) throw conflict("Physical parent already consumed or not effective");
+    if(s.get("retiredAt")!=null) throw new DomainError("CONFLICT","STALE_REVISION","Physical parent already consumed");
+    if(instant(s.get("validFrom")).isAfter(at)) throw DomainError.invalid("Occurrence precedes the physical segment");
     return s;
   }
   public List<String> fences(Map<String,Object> s) {
@@ -65,14 +66,14 @@ public final class StockPrimitives {
     if(!Set.of("DISPOSE","ADJUST_DECREASE").contains(kind))throw DomainError.invalid("Unsupported decrease");
     lockSources(c,List.of(parent));var s=leaf(c,parent,at);BigDecimal decrease=quantity(c,s,value,unit),remaining=amount(s).subtract(decrease);
     if(remaining.signum()<0)throw DomainError.invalid("Decrease exceeds physical leaf");
-    if(kind.equals("DISPOSE")&&!repository.currentRows(c,"SegmentAllocations").stream().filter(a->parent.equals(a.get("segmentId"))).noneMatch(a->Set.of("EXECUTABLE","SUSPENDED").contains(a.get("state"))))throw conflict("Resolve allocation responsibility before disposing stock");
+    if(kind.equals("DISPOSE")&&!repository.currentRows(c,"SegmentAllocations").stream().filter(a->parent.equals(a.get("segmentId"))).noneMatch(a->Set.of("EXECUTABLE","SUSPENDED").contains(a.get("state"))))throw new DomainError("REJECTED","ALLOCATION_UNRESOLVED","Resolve allocation responsibility before disposing stock");
     List<String> children=replace(c,List.of(s),remaining.signum()==0?List.of():List.of(remaining),(String)s.get("placeId"),at,evidence,command,kind);
     movement(c,s,null,decrease,kind,at,evidence,command);return children;
   }
   public List<String> adjust(DomainContext c,String parent,String stocktakeId,Object value,String unit,String direction,Instant at,String evidence,String command,String reason) {
     var keys=new TreeSet<>(fences(repository.current(c,"QuantitySegments",parent)));keys.add("inventory/stocktake/"+stocktakeId);repository.fence(c,keys);
     var s=leaf(c,parent,at);var count=repository.current(c,"Stocktakes",stocktakeId);var delta=quantity(c,s,value,unit);
-    if(repository.currentRows(c,"StockAdjustments").stream().anyMatch(a->stocktakeId.equals(a.get("stocktakeId"))))throw conflict("Stocktake difference already applied");
+    if(repository.currentRows(c,"StockAdjustments").stream().anyMatch(a->stocktakeId.equals(a.get("stocktakeId"))))throw new DomainError("CONFLICT","STOCKTAKE_ALREADY_APPLIED","Stocktake difference already applied");
     if(at.isBefore(instant(count.get("occurredAt"))))throw DomainError.invalid("Adjustment precedes stocktake occurrence");
     BigDecimal difference=((BigDecimal)count.get("observedQuantity")).subtract(amount(s));
     if(!parent.equals(count.get("segmentId"))||!unit.equals(count.get("unit"))||difference.abs().compareTo(delta)!=0||difference.signum()!=(direction.equals("INCREASE")?1:-1))throw DomainError.invalid("Adjustment must reconcile this stocktake difference");
@@ -184,5 +185,4 @@ public final class StockPrimitives {
   public static Instant instant(Object v){return v instanceof Instant i?i:Instant.parse(v.toString());}
   public static BigDecimal amount(Map<String,Object> s){return (BigDecimal)s.get("quantity");}
   public static String id(){return UUID.randomUUID().toString();}
-  private static DomainError conflict(String message){return new DomainError("REJECTED","REVISION_CONFLICT",message);}
 }

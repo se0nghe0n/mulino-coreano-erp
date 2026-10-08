@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "urn:mulino:command-response:1",
-  "$comment": "Canonical structured error pointer (plan §3.4): the error code of a command response is at the RFC6901 pointer /error/code relative to the response object. Acceptance cases read it as /response/error/code for api/mcp invoke and for await of an invoked command, and as /response/body/result/structuredContent/error/code for a raw MCP wire result. /errorCode, /code and other top-level code fields are not part of this contract.",
+  "$comment": "Outcome and error code meanings are listed in contracts/domain-vocabulary.json. Canonical structured error pointer (plan §3.4): the error code of a command response is at the RFC6901 pointer /error/code relative to the response object. Acceptance cases read it as /response/error/code for api/mcp invoke and for await of an invoked command, and as /response/body/result/structuredContent/error/code for a raw MCP wire result. /errorCode, /code and other top-level code fields are not part of this contract.",
   "type": "object",
   "required": [
     "outcome",
@@ -12,7 +12,6 @@
       "enum": [
         "APPLIED",
         "ACCEPTED_PENDING_EXTERNAL",
-        "PENDING_EXTERNAL",
         "WAITING_APPROVAL",
         "NEEDS_INPUT",
         "REJECTED",

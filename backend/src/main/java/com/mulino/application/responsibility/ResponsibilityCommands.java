@@ -41,15 +41,15 @@ public class ResponsibilityCommands implements CommandHandler {
   if(ObligationClosureCatalog.closure(String.valueOf(subject.get("kind"))).waivable()){approvalAction="WAIVE_"+subject.get("kind");proposalId=subject.get("rootId").toString();proposalRevision=1;}
  }
  if(ObligationClosureCatalog.DECISION_CAPABILITIES.contains(cap))effect="RESPONSIBILITY_DECISION";
- if("emergencyReassign".equals(cap)){approvalAction="EMERGENCY_REASSIGN";proposalId=p.get("proposalId").toString();proposalRevision=((Number)p.get("proposalRevision")).intValue();}
+ // emergencyReassign is the ADMIN command itself (plan §5.3): no approval action, the designation is checked at execution.
  var scopes=new LinkedHashMap<String,List<String>>();String targetWork=p.get("targetWorkId")==null?(subject.get("targetWorkId")==null?workId:subject.get("targetWorkId").toString()):p.get("targetWorkId").toString();
- scopes.put("WORK",Set.of("acceptHandover","rejectHandover").contains(cap)?List.of(targetWork):targetWork.equals(workId)?List.of(workId):List.of(workId,targetWork));var actors=new HashSet<String>();if(p.get("recipientId")!=null)actors.add(p.get("recipientId").toString());if(subject.get("recipientId")!=null)actors.add(subject.get("recipientId").toString());for(String wid:new TreeSet<>(List.of(workId,targetWork))){var w=works.require(c,wid,false);actors.add(w.get("ownerId").toString());actors.add(w.get("supervisorId").toString());}return new CommandPreparation(scopes,new TreeSet<>(List.of("work:"+workId,"work:"+targetWork,"responsibility:"+workId)).stream().toList(),actors,effect,approvalAction,proposalId,proposalRevision,subject.get("ID").toString(),((Number)subject.get("revision")).intValue());}
+ scopes.put("WORK",Set.of("acceptHandover","rejectHandover").contains(cap)?List.of(targetWork):targetWork.equals(workId)?List.of(workId):List.of(workId,targetWork));var actors=new HashSet<String>();for(String key:List.of("recipientId","newOwnerId"))if(p.get(key)!=null)actors.add(p.get(key).toString());if(subject.get("recipientId")!=null)actors.add(subject.get("recipientId").toString());for(String wid:new TreeSet<>(List.of(workId,targetWork))){var w=works.require(c,wid,false);actors.add(w.get("ownerId").toString());actors.add(w.get("supervisorId").toString());}return new CommandPreparation(scopes,new TreeSet<>(List.of("work:"+workId,"work:"+targetWork,"responsibility:"+workId)).stream().toList(),actors,effect,approvalAction,proposalId,proposalRevision,subject.get("ID").toString(),((Number)subject.get("revision")).intValue());}
  public Map<String,Object> execute(DomainContext c,Map<String,Object>i){var p=slots(i);String cap=i.get("capabilityId").toString();var result=switch(cap){
- case "emergencyReassign"->service.emergency(c,p);case "createObligation", "openObligation"->service.openDuty(c,p);
+ case "emergencyReassign"->{designated(c,cap,p.get("workId").toString(),"Designated emergency reassignment authority required");yield service.emergency(c,p);}case "createObligation", "openObligation"->service.openDuty(c,p);
  case "resolveObligation"->{var a=repository.require("Assignments",c.organizationId(),p.get("assignmentId").toString());if(!ObligationClosureCatalog.closure(String.valueOf(a.get("kind"))).resolvable())throw ObligationClosureCatalog.held(a,cap);yield service.settle(c,p,false);}
  case "waiveObligation"->{var a=repository.require("Assignments",c.organizationId(),p.get("assignmentId").toString());if(!ObligationClosureCatalog.closure(String.valueOf(a.get("kind"))).waivable())throw ObligationClosureCatalog.held(a,cap);if(!(i.get("approvalId") instanceof String approval))throw DomainError.forbidden();var decision=approvals.find(c,approval).orElseThrow(DomainError::forbidden);if(!designatedAuthority(identities,clock.instant(),c.organizationId(),String.valueOf(decision.get("approverId")),String.valueOf(decision.get("decisionCapability")),a.get("workId").toString()))throw new DomainError("REJECTED","FORBIDDEN","Waiver decider is no longer the designated authority");yield service.waive(c,p,approval);}
  case "decideQuantityDutyWaiver","decideQualityDutyWaiver","decideRecallDutyWaiver"->decideWaiver(c,i,p,cap);
- case "transferObligation"->service.propose(c,p,true);case "proposeHandover"->service.propose(c,p,false);case "acceptHandover"->service.decide(c,p.get("handoverId").toString(),"ACCEPTED");case "rejectHandover"->service.decide(c,p.get("handoverId").toString(),"REJECTED");case "expireHandover"->service.decide(c,p.get("handoverId").toString(),"EXPIRED");default->throw DomainError.unsupported();};return Map.of("outcome","APPLIED","effects",Map.of("responsibility",result));}
+ case "transferObligation"->service.propose(c,p,true);case "proposeHandover"->service.propose(c,p,false);case "acceptHandover"->service.decide(c,p.get("handoverId").toString(),"ACCEPTED");case "rejectHandover"->service.decide(c,p.get("handoverId").toString(),"REJECTED");case "expireHandover"->service.decide(c,p.get("handoverId").toString(),"EXPIRED");default->throw DomainError.unsupported();};var response=new LinkedHashMap<String,Object>();response.put("outcome","APPLIED");response.put("effects",Map.of("responsibility",result));if("emergencyReassign".equals(cap))response.put("workId",result.get("workId"));return response;}
  /**
   * Typed per-kind waiver decision (plan §5.3, §7.1): the designated human of the kind's authority
   * class binds an immutable approval to the exact waiveObligation intent hash, its WORK scope hash,
@@ -68,7 +68,7 @@ public class ResponsibilityCommands implements CommandHandler {
   if(!closure.waivable())throw ObligationClosureCatalog.held(a,"waiveObligation");
   if(!closure.waiverCapability().equals(cap))throw new DomainError("REJECTED","FORBIDDEN","Waiver of this duty kind requires the "+closure.authorityClass()+" decision");
   String workId=a.get("workId").toString();
-  designated(c,cap,workId);
+  designated(c,cap,workId,"Designated waiver authority required");
   var selection=policy.rule(c,"waiveObligation");String action="WAIVE_"+a.get("kind");
   if(!(selection.rule().get("approvalActions") instanceof Map<?,?> mapped)||!cap.equals(mapped.get(action)))throw new DomainError("HELD","POLICY_UNRESOLVED","Current policy does not assign this waiver decision");
   var waive=new LinkedHashMap<String,Object>();waive.put("intentKind","COMMAND");waive.put("definitionVersion",i.get("definitionVersion"));waive.put("capabilityId","waiveObligation");waive.put("capabilityVersion",semanticVersion());
@@ -85,11 +85,11 @@ public class ResponsibilityCommands implements CommandHandler {
   result.put("waiverIntentHash",hash);result.put("targetRevision",row.get("targetRevision"));result.put("expiresAt",until.toString());result.put("reason",reason);result.put("singleUse",true);
   return result;
  }
- /** The decider is a current human with the kind's decision capability in scope and a designated management authority. */
- private void designated(DomainContext c,String cap,String workId){
+ /** The decider (waiver) or emergency reassigner is a current human with the capability in scope and a designated management authority. */
+ private void designated(DomainContext c,String cap,String workId,String missing){
   if(!"HUMAN".equals(identities.actor(c.organizationId(),c.actorId()).orElseThrow(DomainError::forbidden).get("kind")))throw DomainError.forbidden();
   if(!auth.permittedScopes(c,cap,Map.of("WORK",List.of(workId))))throw DomainError.forbidden();
-  if(!designatedAuthority(identities,clock.instant(),c.organizationId(),c.actorId(),cap,workId))throw new DomainError("REJECTED","FORBIDDEN","Designated waiver authority required");
+  if(!designatedAuthority(identities,clock.instant(),c.organizationId(),c.actorId(),cap,workId))throw new DomainError("REJECTED","FORBIDDEN",missing);
  }
  static boolean designatedAuthority(IdentityRepository identities,Instant now,String org,String actor,String cap,String workId){
   return identities.rows("ManagementAuthorities",org).stream().anyMatch(x->actor.equals(x.get("actorId"))&&cap.equals(x.get("capabilityId"))&&active(x,now)&&("ORGANIZATION".equals(x.get("scopeKind"))&&org.equals(x.get("scopeId"))||"WORK".equals(x.get("scopeKind"))&&workId.equals(x.get("scopeId"))));

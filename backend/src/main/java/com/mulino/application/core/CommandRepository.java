@@ -28,7 +28,7 @@ public class CommandRepository {
     db.run(Insert.into("mulino.commands.CommandRecords").entry(row));return id;
   }
   public void finish(DomainContext c,String id,Map<String,Object> intent,String hash,Map<String,Object> result,java.time.Instant now,Map<String,Object> auditFacts){
-    String outcome=(String)result.get("outcome");String state=Set.of("REJECTED","CONFLICT","NEEDS_INPUT","WAITING_APPROVAL","HELD").contains(outcome)?"REJECTED":"COMMITTED";
+    String outcome=(String)result.get("outcome");String state=CommandOutcomes.NOT_APPLIED.contains(outcome)?"REJECTED":"COMMITTED";
     db.run(Update.entity("mulino.commands.CommandRecords").byId(id).data(Map.of("state",state,"resultJson",encode(result),"completedAt",now)));
     audit(c,id,intent,hash,result,now,auditFacts);
   }
