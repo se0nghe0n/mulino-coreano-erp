@@ -69,12 +69,25 @@ capability allowlist에 있어야 하고 core entity는 노출하지 않거나
 `@readonly`·`@restrict`로 막는다. 규칙 없는 `404`나 "generic projection을
 만들지 않는다"는 관례만으로 충족했다고 하지 않는다.
 
+probe 적용 여부는 `writeCapable`이 아니라 item kind로도 결정한다.
+readonly ENTITY_SET의 쓰기 거부, BOUND/UNBOUND_ACTION의 자기 call과
+BATCH_CHANGESET, TOOL·WORKER_HANDLER·MANAGEMENT_ENDPOINT의 대응 probe를
+빠뜨리지 않는다. `HostObservationValidator`가 적용 항목 수와 probe 행을
+재계산한다. kind별 전체 표는 아래 저장소 harness의 V4 절을 따른다.
+
 이 열거와 우회 시도는 요구다. V4의 고정 route inventory 92개는 열거가
 아니며 `exposed-write-surface`가 실제 열거를 맡는다. host 조작
 `enumerateWriteSurface`의 schema·guide 계약은 정의됐고 실제 adapter는 없다.
 열거 subcase가 실제 PASS하기 전에는 V4 노출 면 인수를 `NOT_RUN`으로
 보고하고 수동 열거는 handoff·checks에 남긴다. 정확한 계약과 cross-owner
 요청은 [저장소 harness](../../ontology-scenario-testing/references/repository-harness.md)를 따른다.
+
+query/복구 관찰을 연결할 때 API revision의 `RESULT_REVISION`과 task
+terminal의 `RUNTIME_TASK_SNAPSHOT`을 구별한다. 전자는 원행 재계산,
+후자는 task identity·await 결과·snapshot artifact bytes로 검증한다.
+실제 observer의 두 mode와 verifyCoverage host 출력은 Step 3 actual
+소유이며 아직 `NOT_RUN`이다. PREPARATION 제품 validator의 checkout
+대조를 실제 host 구현 완료로 보고하지 않는다.
 
 **조회 두 진입점.** `getObject`·`searchObjects`·`getWork`·`searchWorks`·
 `getInventory`·`getObligations`·`traceLot`·`getEvidence`·`getAssessment`·

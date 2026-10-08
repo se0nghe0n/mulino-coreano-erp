@@ -34,6 +34,16 @@ JSON 또는 요청 범위 SSE response를 처리한다. Origin 검증과 endpoin
 `WAITING_APPROVAL`, `CONFLICT`, `FORBIDDEN`, `ACCEPTED_PENDING_EXTERNAL`을
 합치지 않는다. Tool 실행 오류를 성공 text 하나로 감추지 않는다.
 
+S0의 [오류와 경계](../../../../contracts/mcp/s0-protocol.md)는 body 검사를
+mirrored header보다 먼저 한다. JSON parse 실패는 -32700, batch 배열·
+object가 아닌 본문·jsonrpc/id/method/params 형식 위반은 -32600이다.
+envelope이 유효할 때만 header 누락/불일치 -32020을 판정한다.
+Mcp-Name이 없는 V4 tools/call batch도 -32600이며, 유효한 단일 object의
+T20 method/header 불일치는 -32020이다. 인증·Origin·Accept·Content-Type
+transport 거부와 다른 오류의 상대 순서는 이 계약이 정하지 않는다.
+backend의 현재 검사 순서는 round 5 소스 확인이며 전체 wire 실행
+인수의 증거가 아니다.
+
 ## 입력 초안 → canonical proposal → 효과
 
 `intentKind=QUERY|RECORD|COMMAND`, definitionVersion/capabilityId,
