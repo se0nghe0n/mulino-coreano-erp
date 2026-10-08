@@ -21,12 +21,14 @@ public final class NativeS4TradeMain {
     private void run()throws Exception {
         int exit=3;report.put("recordType","S4_ACTUAL_NATIVE_TRADE_RECEIPT").put("status","NOT_RUN").put("gateComplete",false).put("fullCaseCoverageClaimed",false).put("startedAt",Instant.now().toString());report.set("actions",actions);
         try {
+            String flowRef=System.getProperty("verification.actual.flowRef","verification/actual/s4/flow.json");
+            // Authoring defects stop before any fixture or product effect exists.
+            var unbound=NativeS4FlowAliases.check(root,flowRef);if(!unbound.isEmpty())throw new IllegalArgumentException("Authored flow has unbound references: "+unbound);
             driver=new ActualAcceptanceDriver(root,ActualConfiguration.environment(System.getenv()));
             String ref="verification/actual/s4/fixture.json";JsonNode fixture=Json.read(root.resolve(ref));currentFixture=fixture;
             var bundle=Json.object();bundle.set("fixture",fixture);bundle.set("bases",Json.array());bundle.put("fixtureHash",Json.sha256(root.resolve(ref)));
             var installed=driver.installFixture("setup",bundle);capture(installed);available(installed);bindings.setAll((ObjectNode)installed.data().path("aliasMap"));actor=fixture.path("actors").path("reader");
             clock("2026-10-07T09:00:02Z");
-            String flowRef=System.getProperty("verification.actual.flowRef","verification/actual/s4/flow.json");
             var script=Json.read(root.resolve(flowRef));report.put("flowRef",flowRef);
             for(JsonNode action:script.path("actions"))execute(action);
             report.put("status","PASS").put("boundedAssertions",checks).put("fixtureHash",Json.sha256(root.resolve(ref))).put("flowHash",Json.sha256(root.resolve(flowRef))).put("buildCommit",ActualConfiguration.environment(System.getenv()).buildVersion()).put("limitation","Bounded S4 HTTP/JDBC assertions only; normative T17-T19/C1/C4/E1/E2 full case coverage, paid model, regulatory and BTP acceptance remain separate");exit=0;
@@ -43,8 +45,9 @@ public final class NativeS4TradeMain {
         switch(type) {
             case "include" -> {for(JsonNode nested:Json.read(root.resolve(Json.required(a,"scriptRef"))).path("actions"))execute(nested);}
             case "require-contract" -> throw new Unavailable(a.path("reason").asText());
+            // A setup is an isolation boundary: a suite flow cannot read a previous organization's aliases.
             case "setup" -> {
-                String ref=Json.required(a,"fixtureRef");var fixture=Json.read(root.resolve(ref));currentFixture=fixture;var bundle=Json.object();bundle.set("fixture",fixture);bundle.set("bases",Json.array());bundle.put("fixtureHash",Json.sha256(root.resolve(ref)));var result=driver.installFixture(id,bundle);capture(result);available(result);bindings.setAll((ObjectNode)result.data().path("aliasMap"));if(a.has("organizationAlias"))bindings.set("ORG",result.data().path("aliasMap").path(Json.required(a,"organizationAlias")));actor=fixture.path("actors").path("reader");
+                String ref=Json.required(a,"fixtureRef");var fixture=Json.read(root.resolve(ref));currentFixture=fixture;var bundle=Json.object();bundle.set("fixture",fixture);bundle.set("bases",Json.array());bundle.put("fixtureHash",Json.sha256(root.resolve(ref)));var result=driver.installFixture(id,bundle);capture(result);available(result);bindings.removeAll();work=null;bindings.setAll((ObjectNode)result.data().path("aliasMap"));if(a.has("organizationAlias"))bindings.set("ORG",result.data().path("aliasMap").path(Json.required(a,"organizationAlias")));actor=fixture.path("actors").path("reader");
             }
             case "clock" -> clock(a.path("instant").asText());
             case "uuid" -> bindings.put(Json.required(a,"alias"),UUID.randomUUID().toString());
