@@ -63,6 +63,24 @@ public final class ContractValidator {
             }
         return problems;
     }
+    /**
+     * A process control whose operation is not in the host-observation vocabulary (contracts/acceptance-host-observation.schema.json
+     * operation enum) can never yield a valid host observation. The case schema allows any operation string, so preparation
+     * rejects it here instead of reporting the subcase prepared and failing closed only at runtime.
+     */
+    public List<String> hostOperationProblems(JsonNode caseFile) throws IOException {
+        Set<String> defined=new HashSet<>();
+        for(JsonNode op:Json.read(path("contracts/acceptance-host-observation.schema.json")).path("properties").path("operation").path("enum")) defined.add(op.asText());
+        List<String> problems=new ArrayList<>();
+        for(JsonNode sub:caseFile.path("subcases")) {
+            List<JsonNode> actions=new ArrayList<>();collect(sub.path("actions"),actions);
+            for(JsonNode action:actions) if(action.path("kind").asText().equals("control") && action.path("control").path("type").asText().equals("process")
+                    && !defined.contains(action.path("control").path("operation").asText()))
+                problems.add(caseFile.path("caseId").asText()+"/"+sub.path("id").asText()+"/"+action.path("id").asText()+": process operation "
+                    +action.path("control").path("operation").asText()+" is not defined in contracts/acceptance-host-observation.schema.json");
+        }
+        return problems;
+    }
     public Path root() { return root; }
     public Path path(String relative) {
         Path p=root.resolve(relative).normalize();

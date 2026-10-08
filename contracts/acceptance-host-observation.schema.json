@@ -28,6 +28,7 @@
         "inspectArtifacts",
         "scanArtifacts",
         "verifyCoverage",
+        "enumerateWriteSurface",
         "start",
         "stop",
         "restart"
@@ -1447,6 +1448,224 @@
           },
           "generatedOutputs": {
             "minItems": 1
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "operation": {
+            "const": "enumerateWriteSurface"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "operationEvidence": {
+            "type": "object",
+            "properties": {
+              "environmentId": {
+                "type": "string",
+                "minLength": 1
+              },
+              "enumerationId": {
+                "type": "string",
+                "minLength": 1
+              },
+              "allowlistSha256": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$"
+              }
+            },
+            "required": [
+              "environmentId",
+              "enumerationId",
+              "allowlistSha256"
+            ],
+            "additionalProperties": false
+          },
+          "observedArtifacts": {
+            "minItems": 1
+          },
+          "extractor": {
+            "required": [
+              "rawRows",
+              "rawRowsArtifactRef"
+            ],
+            "properties": {
+              "rawRows": {
+                "type": "object",
+                "required": [
+                  "surfaces",
+                  "surfaceItems",
+                  "probes",
+                  "probeCoverage"
+                ],
+                "properties": {
+                  "surfaces": {
+                    "type": "array",
+                    "minItems": 1,
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "surface": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "sourceRef": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "itemCount": {
+                          "type": "integer",
+                          "minimum": 0
+                        },
+                        "sha256": {
+                          "type": "string",
+                          "pattern": "^[0-9a-f]{64}$"
+                        }
+                      },
+                      "required": [
+                        "surface",
+                        "sourceRef",
+                        "itemCount",
+                        "sha256"
+                      ],
+                      "additionalProperties": false
+                    }
+                  },
+                  "surfaceItems": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "surface": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "itemId": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "kind": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "writeCapable": {
+                          "type": "boolean"
+                        },
+                        "capabilityId": {
+                          "type": [
+                            "string",
+                            "null"
+                          ],
+                          "minLength": 1
+                        },
+                        "allowlisted": {
+                          "type": "boolean"
+                        }
+                      },
+                      "required": [
+                        "surface",
+                        "itemId",
+                        "kind",
+                        "writeCapable",
+                        "capabilityId",
+                        "allowlisted"
+                      ],
+                      "additionalProperties": false
+                    }
+                  },
+                  "probes": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "probeId": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "surface": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "target": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "probeClass": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "outcome": {
+                          "enum": [
+                            "APPLIED",
+                            "ACCEPTED_PENDING_EXTERNAL",
+                            "WAITING_APPROVAL",
+                            "NEEDS_INPUT",
+                            "REJECTED",
+                            "CONFLICT",
+                            "HELD",
+                            "NOT_EXPOSED",
+                            "UNKNOWN"
+                          ],
+                          "description": "Command outcome of contracts/domain-vocabulary.json, NOT_EXPOSED when the route does not exist or does not accept the method, UNKNOWN when no result was observed (timeout, lost response). UNKNOWN is never counted as a rejection."
+                        },
+                        "committed": {
+                          "type": "boolean"
+                        },
+                        "transcriptRef": {
+                          "type": "string",
+                          "minLength": 1
+                        }
+                      },
+                      "required": [
+                        "probeId",
+                        "surface",
+                        "target",
+                        "probeClass",
+                        "outcome",
+                        "committed",
+                        "transcriptRef"
+                      ],
+                      "additionalProperties": false
+                    }
+                  },
+                  "probeCoverage": {
+                    "type": "array",
+                    "minItems": 1,
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "probeClass": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "applicableTargets": {
+                          "type": "integer",
+                          "minimum": 0
+                        },
+                        "probedTargets": {
+                          "type": "integer",
+                          "minimum": 0
+                        },
+                        "complete": {
+                          "type": "boolean"
+                        }
+                      },
+                      "required": [
+                        "probeClass",
+                        "applicableTargets",
+                        "probedTargets",
+                        "complete"
+                      ],
+                      "additionalProperties": false
+                    }
+                  }
+                }
+              }
+            }
           }
         }
       }
