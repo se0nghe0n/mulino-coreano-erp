@@ -116,7 +116,7 @@ public class EvidenceReconciliation {
       var canonicalIds=r.rows("Verifications",c.organizationId()).stream().filter(x->relatedClaims.contains(x.get("claimId"))&&"VERIFIED".equals(x.get("verdict"))).map(x->x.get("canonicalOccurrenceId").toString()).collect(java.util.stream.Collectors.toSet());
       if(r.rows("CanonicalOccurrences",c.organizationId()).stream().anyMatch(x->canonicalIds.contains(x.get("ID"))&&!input.physicalScopeId().equals(x.get("physicalScopeId"))))decision="CONFLICT";
       Set<String> overlapping=external||response||receipt||trade?Set.of(input.physicalScopeId()):r.overlappingScopes(c.organizationId(),input.physicalScopeId());
-      if(r.rows("CanonicalOccurrences",c.organizationId()).stream().anyMatch(x->!input.physicalScopeId().equals(x.get("physicalScopeId"))&&overlapping.contains(x.get("physicalScopeId"))&&event.get("kind").equals(x.get("kind"))))decision="CONFLICT";
+      if(r.rows("CanonicalOccurrences",c.organizationId()).stream().anyMatch(x->x.get("physicalScopeId")!=null&&!input.physicalScopeId().equals(x.get("physicalScopeId"))&&overlapping.contains(x.get("physicalScopeId"))&&event.get("kind").equals(x.get("kind"))))decision="CONFLICT";
     }
     if(!trade&&input.physicalScopeId()!=null && r.rows("CanonicalOccurrences",c.organizationId()).stream().anyMatch(x->input.physicalScopeId().equals(x.get("physicalScopeId"))&&event.get("kind").equals(x.get("kind"))&&!input.effectiveFrom().equals(instant(x.get("effectiveFrom")))))decision="CONFLICT";
     if(!trade&&input.physicalScopeId()!=null && r.rows("CanonicalOccurrences",c.organizationId()).stream().anyMatch(x->input.physicalScopeId().equals(x.get("physicalScopeId"))&&event.get("kind").equals(x.get("kind"))
