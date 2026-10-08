@@ -2984,7 +2984,7 @@
             "restrictionId": "$E2_QC"
           },
           "externalEventId": "e2-qc-release",
-          "quantity": "20",
+          "quantity": "60",
           "unit": "BOX",
           "assertion": "authored synthetic external original"
         }
@@ -2999,6 +2999,66 @@
         "subjectId": "$e2-receipt60.segment",
         "subjectKind": "SEGMENT",
         "placeId": "$W"
+      }
+    },
+    {
+      "id": "e2-qc-release-match",
+      "type": "command",
+      "capability": "matchSourceIdentity",
+      "outcome": "APPLIED",
+      "request": {
+        "intentKind": "COMMAND",
+        "definitionVersion": "definition-v1",
+        "capabilityId": "matchSourceIdentity",
+        "expectedRevision": 1,
+        "commandIdempotencyKey": "e2-qc-release-match",
+        "slots": {
+          "claimId": "$e2-qc-release.claim",
+          "basisDocumentId": "$e2-qc-release.document",
+          "physicalScopeId": "$e2-receipt60.segment",
+          "policyVersion": "fixture-v1",
+          "sourceIdentity": "native-s4-e2-qc-release:e2-qc-release:1",
+          "quantity": "60",
+          "unit": "BOX",
+          "effectiveFrom": "2026-10-07T09:00:02Z",
+          "reason": "원본과 동일 물리 범위 대조"
+        },
+        "provenance": {},
+        "subjectRefs": [
+          {
+            "type": "Work",
+            "id": "$WORK"
+          }
+        ]
+      },
+      "bind": {
+        "e2-qc-release.reconciliation": "/id"
+      }
+    },
+    {
+      "id": "e2-qc-release-link",
+      "type": "command",
+      "capability": "linkCanonicalOccurrence",
+      "outcome": "APPLIED",
+      "request": {
+        "intentKind": "COMMAND",
+        "definitionVersion": "definition-v1",
+        "capabilityId": "linkCanonicalOccurrence",
+        "expectedRevision": 1,
+        "commandIdempotencyKey": "e2-qc-release-link",
+        "slots": {
+          "reconciliationId": "$e2-qc-release.reconciliation"
+        },
+        "provenance": {},
+        "subjectRefs": [
+          {
+            "type": "Work",
+            "id": "$WORK"
+          }
+        ]
+      },
+      "bind": {
+        "e2-qc-release.canonical": "/id"
       }
     },
     {
@@ -3071,7 +3131,7 @@
       "type": "observe",
       "assertions": [
         {
-          "pointer": "/rawRows/mulino_quality_restrictions",
+          "pointer": "/rawRows/mulino_inventory_restrictions",
           "operator": "matchingRows",
           "where": {
             "category": "QC",
@@ -3080,7 +3140,7 @@
           "expected": 0
         },
         {
-          "pointer": "/rawRows/mulino_quality_restrictions",
+          "pointer": "/rawRows/mulino_inventory_restrictions",
           "operator": "matchingRows",
           "where": {
             "category": "RECALL_INVESTIGATION",
@@ -3090,7 +3150,7 @@
           "expected": 3
         },
         {
-          "pointer": "/rawRows/mulino_trade_sales_dispatches",
+          "pointer": "/rawRows/mulino_inventory_dispatches",
           "operator": "matchingRows",
           "where": {},
           "expected": 0
@@ -3605,7 +3665,7 @@
       "actor": "supervisor",
       "assertions": [
         {
-          "pointer": "/reasonCode",
+          "pointer": "/error/code",
           "operator": "equals",
           "expected": "RECALL_RESIDUAL_UNKNOWN"
         }
@@ -3835,7 +3895,7 @@
       "actor": "supervisor",
       "assertions": [
         {
-          "pointer": "/reasonCode",
+          "pointer": "/error/code",
           "operator": "equals",
           "expected": "RECALL_APPROVAL_STALE"
         }
@@ -4099,7 +4159,7 @@
           }
         },
         {
-          "pointer": "/rawRows/mulino_responsibility_assignments",
+          "pointer": "/rawRows/mulino_work_read_obligationreferences",
           "operator": "humanDuties",
           "kinds": [
             "RECALL_EXCEPTION_RESIDUAL",
@@ -4107,7 +4167,7 @@
           ]
         },
         {
-          "pointer": "/rawRows/mulino_responsibility_assignments",
+          "pointer": "/rawRows/mulino_work_read_obligationreferences",
           "operator": "matchingRows",
           "where": {
             "id": "$E2_RESIDUAL_DUTY",
