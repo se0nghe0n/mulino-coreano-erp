@@ -18,7 +18,9 @@ T01–T26, C1–C5, V1–V8, E1/E2가 인수 기준이다. 명사·동사 진입
   [저장소 harness](references/repository-harness.md)를 읽는다. `./verify`
   명령과 exit code, case 구성, 실행 가능한 Gherkin 문법, NOT_RUN 처리,
   준비 gate의 vocabulary·binding·생성기 검사, 감사 원행, runtimeProfile·
-  scheduler 제출 증거, PREPARATION 입력 결속, receipt 조건과 V4 열거 한계가 있다.
+  scheduler 제출 증거·관찰 경계, PREPARATION checkout 대조,
+  RESULT_REVISION/RUNTIME_TASK_SNAPSHOT, MCP 오류 우선순위, receipt 조건,
+  V4 kind별 probe 정책과 V7 원행 primary 규칙이 있다.
 - 테스트 계층을 설계할 때 [방법론](references/methodology.md)을 읽는다.
   #57에서 업무 시나리오·공통 SIT/UAT·보류 증거 원칙을 재사용했다.
 - 반례와 종단 수량을 작성할 때
@@ -88,8 +90,10 @@ runtime의 결합을 검증한다. 테스트 전용 scripted agent는 정해진 
 메서드 호출 여부만 확인해서 업무 PASS를 주장하지 않는다.
 
 V4의 우회 경로 집합은 고정 목록이 아니라 실행 중 시스템이 노출한 쓰기 면을
-열거해 만들어야 한다. `verification/cases/V4`의 고정 inventory 92개는 열거가
-아니고 열거 subcase `exposed-write-surface`는 계약이 정의됐어도 실제 host adapter가
+열거해 만들어야 한다. kind별 요청 probe class는 `writeCapable`과 독립이며
+readonly entity set도 쓰기 거부를 관찰한다. `verification/cases/V4`의
+고정 inventory 92개는 열거가 아니고, `exposed-write-surface`는 계약이
+정의됐어도 실제 host adapter가
 없어 `NOT_RUN`이므로, 그 subcase가 실제 실행되어 PASS하기 전에는 V4의 노출 면 부분을
 PASS로 보고하지 않는다(`repository-harness.md`).
 
@@ -99,6 +103,11 @@ PASS로 보고하지 않는다(`repository-harness.md`).
 `current=true`와 `status=OPEN`을 함께 단언한다. 자율 loop는 harness tick이 아니라
 false/false runtimeProfile에서 자연 tick을 수동 관찰한다. 감사 이름·presence와
 PREPARATION commit/clean 필드도 공개 계약을 따른다(`repository-harness.md`).
+자율 scheduler·sweeper는 watcher group 전까지 기동하지 않는다.
+api·worker는 group 밖에서 시작하고 group의 loop start는 branch당 하나다.
+관찰 창은 `data.observationBoundaryAt`부터 잰다. snapshotRef는 API revision과
+runtime task snapshot을 구별한다. 고정 수량 primary의 source·baseline·
+unitSource·baselineUnitSource에는 `/data/data/` 파생값을 쓰지 않는다.
 
 거부·권한 없음·재시도 사례는 전후 상태를 비교해 금지된 수량 변경,
 배분·승인·업무·외부 요청 생성이 없음을 증명한다. 정책이 허용하는

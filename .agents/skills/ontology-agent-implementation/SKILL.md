@@ -35,10 +35,13 @@ Adapter에서 물량·승인·목표 판정 규칙을 복제하지 않는다.
   [implementation-contracts.md](../ontology-implementation/references/implementation-contracts.md)의
   "쓰기 노출 면과 조회 계약"을 읽는다. tool 목록과 worker registry도 V4
   열거 요구 대상이다(`enumerateWriteSurface` 계약은 정의됐고 실제 host adapter가
-  없어 열거 subcase `exposed-write-surface`는 `NOT_RUN`이다).
+  없어 열거 subcase `exposed-write-surface`는 `NOT_RUN`이다). probe class는
+  item kind별 정책도 따르며 readonly 항목을 임의 제외하지 않는다.
 - grants·approval, worker/outbox, 정의 호환, runtime package 또는
   client 인수를 구현할 때
   [runtime-and-client.md](references/runtime-and-client.md)를 읽는다.
+  자율 loop의 group 전 기동 금지·관찰 경계, runtime snapshot과 V7 원행
+  primary를 실제 adapter 구현 완료와 구별한다.
 
 참고 자료는 해당 작업에 필요한 것만 읽는다. 명령 이름은 설계 계약이며
 구현된 공개 schema와 대조한 뒤 사용한다.

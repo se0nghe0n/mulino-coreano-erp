@@ -37,6 +37,9 @@ harness 가이드의 prepare 절을 따른다.
 - `observation-binding-stamps`: 모든 bindings의 case·catalog hash를 검사한다.
 - `generators-reproduce`, `case-generators-reproduce`: 임시 복사본에서
   생성기 출력과 commit된 bytes를 비교한다. 저장소 출력물을 고치지 않는다.
+  다만 MCP 생성기 검사는 T01/T20/T25의 파생 재현과 C3/T26의
+  post-processor fixed point를 구별한다. 비소유 부분의 손 편집까지
+  검출한다는 보장은 없다(Step 2 후속 소유).
 
 script·Python 누락, stale binding, 생성기 drift는 준비 실패다.
 `vocabulary`는 `verification/cases/check_vocabulary.py --check`로
@@ -127,6 +130,13 @@ case-local capability를 만들지 않는다. 공통 schema·runner·registry·c
   `./verify prepare`는 `/response/code`나 `/response/…/errorCode`·`error_code`
   pointer를 `not the canonical error envelope`로 거부한다. 새 assertion은 처음부터
   `/response/error/code`를 읽는다.
+- MCP wire는 [s0-protocol.md](../../../../contracts/mcp/s0-protocol.md)의
+  오류 우선순위를 따른다. JSON parse 실패(-32700), batch 배열·object가
+  아닌 본문·형식 위반(-32600)을 mirrored header 누락/불일치(-32020)보다
+  먼저 판정한다. header는 유효한 단일 envelope에서만 대조한다.
+  Mcp-Name이 없는 V4 batch도 -32600이고, 유효한 단일 object의 T20
+  method/header 불일치는 -32020이다. 인증·Origin·Accept·Content-Type의
+  transport 거부와 다른 오류 사이의 순서는 이 규칙이 정하지 않는다.
 - `obligations`·`assessments` 원행의 `current`는 **행 유효성**(대체·정정되지 않은
   revision인가)이며 `status`와 독립이다. 해소된 의무도 `current=true`일 수 있다.
   "현재 열린 의무"는 `{"current":true,"status":"OPEN"}`처럼 둘을 함께 쓴다.
@@ -151,10 +161,25 @@ case-local capability를 만들지 않는다. 공통 schema·runner·registry·c
   함께 둔다. true/true는 harness tick만, false/false는 자율 loop다.
   profile 부재는 harness tick fixture다. 혼합 flag나 한 subcase에서
   harness tick·수동 watcher 혼용은 준비 문제다.
-- 자율 loop는 clock advance 전 process를 stop하고, top-level `parallel`의
-  branch 0 첫 action에 watcher, 나머지 branch에는 멈춘 process의 start만
-  둔다. restart는 쓰지 않는다. prepare가 이 패턴을 검사한다.
-  parallel은 barrier가 아니며 watcher가 늦으면 NO_TASK/창 밖 관찰로 닫힌다.
+- 자율 loop의 scheduler·due-sweeper는 watcher group 전까지 기동하지
+  않는다. installFixture 뒤 group 앞의 fault·seed·조회·관찰·clock 전진
+  중에도 loop process가 실행 중이면 준비 실패다. api·worker는 group
+  밖에서 시작하고, 장애 후 clock 전진 뒤의 재기동도 group 밖에서 한다.
+  top-level `parallel`의 branch 0 첫 action에 수동 watcher를 두고,
+  나머지 branch에는 loop process `start` 하나씩만 둔다. lot-expiry의
+  scheduler와 due-sweeper도 별도 branch다. `restart`는 쓰지 않는다.
+  이미 실행 중인 process의 start는 lifecycle 검사가 거부한다.
+- `CaseRunner.parallel`은 어떤 branch도 제출하기 전에 harness 시각을
+  잡아 group 결과의 `data.observationBoundaryAt`에 남긴다. 자연 tick
+  창은 watcher thread 기동 시각이 아니라 이 경계부터 잰다.
+  `parallel`은 barrier가 아니지만 extractor가 scheduler의 지속 제출
+  기록을 읽으므로 경계 뒤 제출을 놓치지 않는다. watcher command의
+  시작은 경계보다 빠를 수 없고, SUBMITTED의 submittedAt은 경계부터
+  command 종료 사이이면서 1–30초 관찰 창 안이어야 한다.
+  `autonomous-within-30s`의 baseline은 `<group>/data/observationBoundaryAt`,
+  `autonomous-after-loop-start`는 loop start command의 startedAt 하한과
+  이후 30초를 따로 본다. 창 끝 뒤에야 시작한 watcher는 NO_TASK·창 밖
+  행으로 fail-closed다. 경계와 scheduler 시계는 LOCAL 동일 host를 전제한다.
 - watcher 요청의 `trigger=OBSERVE_NEXT_NATURAL_TICK`,
   `observationWindowSeconds`(1–30), `triggeredBy=SCHEDULER_LOOP`는 설정이다.
   이를 tickScheduler/sweepDue `operationEvidence`에 echo하면 계약 실패다.
@@ -165,8 +190,15 @@ case-local capability를 만들지 않는다. 공통 schema·runner·registry·c
 - verifyCoverage의 PREPARATION `rawRows.input`에는 `codeCommit`,
   `workingTreeDirty`, `checkoutCommit`, `checkoutDirty`를 둔다.
   validator는 commit 형식(40/64자리 소문자 hex)·boolean과 묶인 준비 보고의
-  앞 두 값 일치를 검사한다. 현재 checkout과 commit 일치·두 tree clean은
-  T25 assertion이 판정한다. 낡거나 dirty인 보고를 준비 성공으로 숨기지 않는다.
+  앞 두 값 일치를 검사한다. 제품 실행(`requireActualHost=true`)에서는
+  `checkoutMatchesHarness`가 뒤 두 값을 같은 저장소에서 harness가 읽은
+  `git rev-parse HEAD`·`git status --porcelain`과 대조한다. selftest의
+  고정 checkout은 이 제품 비교 대상이 아니다. 준비 보고와 현재 checkout의
+  commit 일치·두 tree clean은 T25 assertion이 판정한다.
+  낡거나 dirty인 보고를 준비 성공으로 숨기지 않는다. `assemble.py`는
+  coverage manifest를 만들 뿐 T25 host의 input snapshot·currentExecution·
+  mutatedInput·CURRENT_EXECUTION link를 내지 않는다. 그 출력과 checkout
+  관찰은 Step 3 verifyCoverage actual adapter 소유이며 T25는 `NOT_RUN`이다.
 
 ## 증거 pipeline과 증거 class
 
@@ -236,9 +268,10 @@ custody 증거라 그대로 coverage receipt가 되지 않는다. 같은 disposa
 요구: V4 경로 집합은 고정 목록이 아니라 실행 중 시스템이 실제 노출한 면에서
 만든다. OData/CAP service의 `$metadata` entity set·action·function, MCP
 `server/discover`·`tools/list`, worker handler registry, 관리/actuator endpoint를
-읽고, 열거한 쓰기 가능 항목에 `$batch` changeset, deep insert, upsert, draft
-activation, nested navigation의 생성·수정·삭제를 시도한다. capability allowlist에
-없는 쓰기 가능 항목은 FAIL이다. core entity는 노출하지 않거나 `@readonly`·
+읽고, 열거 항목의 kind에 적용되는 probe class를 시도한다. `$batch`
+changeset, deep insert, upsert, draft activation, nested navigation도 포함한다.
+capability allowlist에 없는 쓰기 가능 항목은 FAIL이다. core entity는
+노출하지 않거나 `@readonly`·
 `@restrict`로 막고 READ grant 주체의 우회 효과가 0임을 전후 DB 관찰로 증명한다.
 존재하지 않는 경로의 404만으로는 부족하다. 계획 §4.2·§13.2 V4는 "실제 노출된
 direct/nested/batch/projection 경로 모두 검사"를 요구하고 위 열거 수단은 이 skill이
@@ -246,22 +279,73 @@ CAP 노출 면에서 구체화한 것이다.
 
 현재 V4는 route inventory 92개와 `exposed-write-surface` 1개다.
 `enumerateWriteSurface`는 host-observation schema·guide에 정의돼 있다.
-원행은 surfaces·surfaceItems·probes·probeCoverage이며 validator가 allowlist와
-완전성을 재계산한다. 실제 host adapter는 없어 열거 subcase는
+원행은 surfaces·surfaceItems·probes·probeCoverage다.
+`HostObservationValidator.PROBE_POLICY`와 `KIND_SURFACES`가 다음 적용 정책을
+고정한다. kind에 적용되는 class 중 요청한 class마다 probe 행이 필요하다.
+`writeCapable=false`인 readonly entity set도 쓰기 거부를 관찰한다.
+
+| item kind | 허용 surface | 적용 probe class |
+|---|---|---|
+| `ENTITY_SET` | ODATA_METADATA | DIRECT_CREATE·DIRECT_UPDATE·DIRECT_DELETE·DEEP_INSERT·UPSERT·BATCH_CHANGESET·DRAFT_ACTIVATE·NESTED_NAVIGATION_CREATE·NESTED_NAVIGATION_UPDATE·NESTED_NAVIGATION_DELETE |
+| `BOUND_ACTION` | ODATA_METADATA | BOUND_ACTION·BATCH_CHANGESET |
+| `UNBOUND_ACTION` | ODATA_METADATA | UNBOUND_ACTION·BATCH_CHANGESET |
+| `FUNCTION` | ODATA_METADATA | 없음 |
+| `TOOL` | MCP_SERVER_DISCOVER·MCP_TOOLS_LIST | MCP_TOOL_CALL |
+| `WORKER_HANDLER` | WORKER_HANDLER_REGISTRY | WORKER_HANDLER_SUBMIT |
+| `MANAGEMENT_ENDPOINT` | MANAGEMENT_ENDPOINTS | MANAGEMENT_ENDPOINT_WRITE |
+
+정책에 없는 kind·맞지 않는 surface는 거부한다. `writeCapable=true` 항목은
+별도로 모두 probe 대상이며 FUNCTION도 이 규칙을 면제받지 않는다.
+없는 navigation·draft 경로도 시도하고 `NOT_EXPOSED`로 기록한다.
+validator는 allowlist bytes와 `applicableTargets`를 다시 계산하고
+`probedTargets`·`complete`를 실제 probe 행과 대조한다. 적용 항목이 있는데
+0/0 complete=true로 줄이는 것은 실패다. 404만으로 효과0을 증명하지
+않으며 V4의 전후 DB assertion이 필요하다. kind 자체의 정직한 분류는
+extractor에 남은 신뢰다. 실제 host adapter는 없어 열거 subcase는
 `NOT_IMPLEMENTED`→`NOT_RUN`이다. 계약 정의나 selftest 표본은 실제 열거가 아니다.
 
 열거 subcase의 실제 PASS 전에는 V4 노출 면 인수를 `NOT_RUN`으로 보고한다.
 projection·tool·handler 변경 시 수동 열거 결과는 Task handoff·checks에 남긴다.
 남은 실제 adapter·coverage 인수와 관련 소유자는
-[이번 cross-owner 기록](../../../../docs/execution/step1r-sync4/README.md)을 따른다.
+[이번 cross-owner 기록](../../../../docs/execution/step1r-sync5/README.md)과
+[Step 2 round 5](../../../../docs/execution/step2r-round5/README.md)를 따른다.
 
 ## 명사·동사 조회와 query 계약(계획 §3.4)
 
-API의 logical revision과 DB MVCC snapshot은 다르다. `$result` revision은
-observer 요청에 값으로 넘기지 않는다. `snapshotRef=RESULT_REVISION`과
-발급 action의 `snapshotSource`를 보내고 독립 재계산 결과를 harness가
-보관한 값과 비교한다(harness 가이드 snapshot 절). 현재 actual observer의
-재계산은 `NOT_IMPLEMENTED`이므로 이 관찰은 `NOT_RUN`이다.
+API의 logical revision, runtime task terminal snapshot과 DB MVCC snapshot은
+서로 다르다. `$result`로 받은 값 자체를 observer에 보내지 않는다.
+[harness 가이드](../../../../verification/harness-guide.md)의 snapshot 절에
+따라 요청·보고·검증을 구별한다.
+
+- API revision은 `snapshotRef=RESULT_REVISION`이다. `snapshotSource`에는
+  발급 action의 id·pointer·kind·route·capabilityId·actorRef·fixture actor·
+  해석된 request만 보낸다. observer는 권한 범위의 원행에서 projection
+  revision을 독립 재계산해 `data.snapshotRevision`,
+  `data.snapshot.readMode=RESULT_REVISION`, `snapshot.revisionQuery`를 낸다.
+  harness는 보관한 발급 revision과 비교한다.
+- `awaitRuntimeTask` control의
+  `/data/hostObservation/runtimeTask/snapshot/id`를 참조한 observe는
+  `snapshotRef=RUNTIME_TASK_SNAPSHOT`이다. `snapshotSource`는 발급 action의
+  id·pointer, `operation=awaitRuntimeTask`, 해석된 schedulerId·taskId·
+  invocationHandle·scope를 보내며 snapshot id는 숨긴다. observer는 task
+  identity로 host snapshot artifact를 스스로 찾아 읽고
+  `data.snapshot.readMode=RUNTIME_TASK_SNAPSHOT`과
+  `snapshot.runtimeTaskSnapshot={schedulerId, taskId, invocationHandle,
+  snapshotId, artifactRef, sha256}`을 낸다. harness는 schedulerId를 요청과,
+  taskId·invocationHandle·artifactRef를 await 결과의 runtimeTask와,
+  snapshotId를 보관한 발급 값과 대조한다. artifact bytes의 SHA-256도
+  직접 계산하며 해당 파일은 이 observe의 `artifactRefs`에 있어야 한다.
+  DB read의 `snapshot.capturedAt`은 task `completedAt`보다 이르면 안 된다.
+  `data.snapshotRevision`은 observer 자신의 값이다.
+- literal `CURRENT_COMMITTED`·`CURRENT_LOCK_WAIT`는 앞선 action 뒤의
+  새 read이며 readMode가 directive와 같아야 한다. `data.snapshot.id`는
+  모든 mode에서 observer 자신의 DB snapshot token이고 echo는 거부된다.
+
+prepare의 `ContractValidator.snapshotRefProblems`는 `$result` 참조가
+invoke/query/start의 `/response/snapshotRevision` 또는 위 awaitRuntimeTask
+snapshot id인 경우만 받는다. 다른 pointer는 준비 실패다. 두 read mode의
+실제 `ObserverSnapshot` 구현은 Step 3 actual 소유이며 현재
+`NOT_IMPLEMENTED`→`NOT_RUN`이다. harness selftest 성공과 구별한다.
 
 같은 ID·`snapshotRevision`·`asOf`/`knownAt`·`scope`로 두 진입점
 (`getObject`/`getWork`, `searchObjects`/`searchWorks` 등)을 호출한다.
@@ -272,3 +356,25 @@ observer 요청에 값으로 넘기지 않는다. `snapshotRef=RESULT_REVISION`�
 tie-break가 결정적인지, page 사이의 시점 변화가 응답에 밝혀지는지로 확인한다.
 다른 조직 객체의 존재 노출 여부도 관찰한다. 목표 판정은 물류 도착과 정산을
 독립 assertion으로 둔다.
+
+## 고정 수량 primary와 V7 원행
+
+수량 primary는 독립 기대값·단위·operator를 실제 응답 또는 DB 원행과
+대조한다. 원행 집계에는 case가 고정한 `where`를 쓴다.
+`CatalogLinkValidator.fixedQuantityAssertion`은 source·baseline·unitSource·
+baselineUnitSource 중 하나라도 `/data/data/` 파생 pointer이면 고정 수량
+primary로 세지 않는다. observer derivation을 원행에서 재계산해 일치해도
+이 primary를 대신하지 못한다.
+
+V7 세 subcase의 `new-effect-quantity0`은 `after` 관찰의
+`/data/rawRows/movements`에서 `kind=DISPATCH`,
+`commandIdempotencyKey=new20`을 고정 filter로 쓰고 `sumEquals 0 BOX`를
+단언한다. 단위는 active segment 원행에서 읽는다. 보조
+`no-new-dispatch-rows`는 전후 DISPATCH 원행 전체가 같은지 검사하고,
+restart 사례의 baseline은 `prior-committed`다. 새 미허용 효과0과
+기확정 효과 보존을 함께 본다. 실제 V7 새 assertion 인수는 `NOT_RUN`이다.
+
+다른 case의 `/data/data/` 보조 assertion은 아직 case가 derivation filter를
+고정하지 않는 gap이 남아 있다. C4·E1·E2·T17·T18·T23·T26·V2·V8의
+104줄은 Step 2 후속 소유이며 이 round의 primary 수정으로 해소됐다고
+보고하지 않는다.

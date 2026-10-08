@@ -25,6 +25,15 @@ FDE 권한을 구별한다. 미설정 정책은 효과 없이 확인 대상으�
 재인가/대조 행동이 남아야 한다. direct/nested/batch/projection,
 MCP/worker/blob/운영 명령도 같은 경계를 검사한다.
 
+V7의 새 효과0 primary는 `after`의 movements 원행에서
+kind=DISPATCH·commandIdempotencyKey=new20을 고정해 `sumEquals 0 BOX`로
+읽고, active segment 원행의 단위와 대조한다. 전후 DISPATCH 원행 불변도
+별도로 검사한다(restart baseline은 prior-committed다).
+`/data/data/` derivation은 고정 수량 primary가 아니다. source뿐 아니라
+baseline·unitSource·baselineUnitSource에도 같은 제한을 적용한다.
+상세는 [저장소 harness](../../ontology-scenario-testing/references/repository-harness.md)의
+V7 절을 따른다. 새 assertion의 실제 제품 인수는 `NOT_RUN`이다.
+
 **출고 이후 현재 DENIED:** 승인된 dispatch30이 이미 배분을 CONSUMED로
 만든 뒤 회수 제한이 확정됐다. 실제 인도20, 운송중10 보고를 받는다.
 현재 SELL 부적격을 이유로 사실을 삭제하지 않는다. RECORD 주체·원천·
@@ -56,6 +65,15 @@ owner/nextAction/nextCheck를 보존한다. queue 전달·alert 성공은 의무
 claim 중복, 프로세스 재시작, 큐 비어 있음, retry 소진을 주입해 owner와
 중복효과0을 관찰한다. test profile의 가상 시계/barrier를 우선 쓰고
 1초 tick/5초 TTL/1초 heartbeat/30초 관찰을 운영 SLA로 선언하지 않는다.
+
+자율 loop fixture의 scheduler·due-sweeper는 watcher group 전의 seed·
+장애·조회·관찰·clock 전진 중에도 기동하지 않는다. api·worker는 group
+밖에서 시작하고, group branch 0 첫 action은 수동 watcher, 나머지는
+loop process start 하나씩이다. 자연 tick 창은 group의
+`data.observationBoundaryAt`부터 재며 extractor가 지속 제출 기록을 읽는다.
+host await 뒤 DB 관찰은 `RUNTIME_TASK_SNAPSHOT`을 사용한다. observer의
+요청·보고·artifact 검증과 실제 adapter의 `NOT_RUN` 상태는 위 저장소
+harness의 runtimeProfile·snapshot 절을 따른다.
 
 외부 응답 유실은 UNKNOWN_EXTERNAL이다. 안정된 externalOperationId와
 상대 멱등/상태 조회 또는 담당 대조로 확정한다. 확인된 성공은 다시
