@@ -18,9 +18,19 @@ public final class BindingContract {
         validator.schema("verification/model-binding/registry.schema.json",registry);
         corpus=Json.read(validator.path(registry.path("corpusRef").asText()));
         require(Json.sha256(validator.path(registry.path("corpusRef").asText())).equals(registry.path("corpusSha256").asText()),"Closed corpus hash drift");
+        // generate.py rewrites registry/binding hashes, so their agreement is no fence. The corpus
+        // must equal the bytes pinned by the reviewed normative lock outside the binding directory.
+        requireReviewedCorpus(Json.read(validator.path(LOCK)),registry.path("corpusRef").asText(),Json.sha256(validator.path(registry.path("corpusRef").asText())));
         pathRegistry=Json.read(validator.path("verification/model-binding/semantic-paths.json"));
         require(pathRegistry.path("corpusSha256").equals(registry.path("corpusSha256")),"Mapping source hash drift");
         for(JsonNode m:pathRegistry.path("paths")) require(paths.put(Json.required(m,"semanticPath"),m)==null,"Duplicate semantic path");
+    }
+    static final String LOCK="verification/requirements/normative-contract-lock.json";
+    static void requireReviewedCorpus(JsonNode lock,String corpusRef,String actualSha256) {
+        List<String> pins=new ArrayList<>();
+        for(JsonNode pin:lock.path("pinnedArtifacts")) if(pin.path("oracleId").asText().equals("T25.model-corpus-and-budget")&&pin.path("path").asText().equals(corpusRef)) pins.add(pin.path("sha256").asText());
+        require(pins.size()==1,"Normative lock lacks exactly one reviewed model corpus pin");
+        require(pins.get(0).matches("[a-f0-9]{64}")&&pins.get(0).equals(actualSha256),"Model corpus differs from the reviewed normative lock pin; regeneration cannot approve oracle edits");
     }
     public JsonNode binding(String id) throws IOException {
         for(JsonNode e:registry.path("cases")) if(e.path("caseId").asText().equals(id)) {
@@ -107,7 +117,7 @@ public final class BindingContract {
     }
     private String git(String... args) throws IOException {var command=new ArrayList<String>();command.add("git");command.addAll(List.of(args));Process process=new ProcessBuilder(command).directory(validator.root().toFile()).start();String output=new String(process.getInputStream().readAllBytes(),java.nio.charset.StandardCharsets.UTF_8);try{require(process.waitFor()==0,"Cannot record actual Git evidence");}catch(InterruptedException e){Thread.currentThread().interrupt();throw new IOException(e);}return output;}
     private com.fasterxml.jackson.databind.node.ArrayNode inputArtifacts() throws IOException {
-        var artifacts=Json.array();Set<Path> files=new TreeSet<>();files.add(validator.path(registry.path("corpusRef").asText()));
+        var artifacts=Json.array();Set<Path> files=new TreeSet<>();files.add(validator.path(registry.path("corpusRef").asText()));files.add(validator.path(LOCK));
         for(String ref:List.of("verification/model-binding/registry.json","verification/model-binding/semantic-paths.json","verification/model-binding/binding.schema.json","verification/model-binding/registry.schema.json","verification/model-binding/physical-columns.schema.json","verification/model-binding/observer-rows.schema.json","verification/model-binding/captured-api.schema.json","verification/model-binding/final-response-observation.schema.json","verification/model-binding/capture-artifacts.schema.json"))files.add(validator.path(ref));
         for(JsonNode e:registry.path("cases")){files.add(validator.path(e.path("bindingRef").asText()));JsonNode b=binding(e.path("caseId").asText());files.add(validator.path(b.path("fixtureRef").asText()));files.add(validator.path(b.path("featureRef").asText()));}
         try(var source=Files.walk(validator.path("verification/harness/src/main/java/org/mulino/verification/modelbinding"))){source.filter(p->p.toString().endsWith(".java")).forEach(files::add);}

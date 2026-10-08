@@ -23,6 +23,13 @@ QUERY/RECORD/COMMAND는 사용자 의미이며 public capability의 실행
 
 ## 입력과 fixture
 
+`generate.py`는 corpus가 구조 검사를 통과하고 검토된 규범 lock의
+corpus pin과 bytes가 같을 때만 재생성한다. 다르면 `REFUSED`로 끝나고
+아무 파일도 쓰지 않는다. `run prepare`도 Java 준비 전에
+`model-corpus/validate.py`를 실행한다. BindingContract는 registry hash와
+별도로 같은 lock pin을 확인한다. 재생성된 hash끼리의 일치는 fence가
+아니다.
+
 `generate.py`는 object를 deep merge하고 list를 교체한다. 각 driver
 fixture는 독립 조직·주체·구체 grant·시계·버전·원천·기존 인간 책임과
 case의 기존 업무 사실을 설치한다. corpus의 oracle/expectedIntent는

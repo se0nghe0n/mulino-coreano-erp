@@ -21,5 +21,13 @@ final class ModelBindingContractTest {
     @Test void scriptedRecordSemanticsRemainRecord() throws Exception {var c=contract();assertEquals("RECORD",c.sourceCase(c.binding("M03")).path("turns").get(0).path("expectedIntent").path("intentKind").asText());}
     @Test void everyMilestoneRedPreservesNotRun() throws Exception {var c=contract();int count=0;for(var e:c.registry.path("cases")){var r=new ModelBindingRunner(c,e.path("caseId").asText(),"SIT",new UnimplementedDriver(),new AgentRunner.Scripted());r.execute("install");for(var t:c.binding(e.path("caseId").asText()).path("turns"))for(var s:t.path("steps"))r.execute(t.path("id").asText()+"/"+s.asText());r.verifyComplete();assertEquals("NOT_RUN",r.status());count+=r.evidence().path("perTurn").size();}assertEquals(73,count);}
     @Test void actualPortCannotRunWithoutR8() throws Exception {var c=contract();var a=new AgentRunner.Actual((id,route,actor,text,context)->{fail("Actual model called");return null;});var r=new ModelBindingRunner(c,"M01","UAT",new UnimplementedDriver(),a);r.execute("install");for(String s:new String[]{"context","before","agent","after","assert"})r.execute("turn-1/"+s);assertEquals("NOT_RUN",r.status());}
+    @Test void corpusMustEqualReviewedLockPinNotOnlyRegeneratedHashes() throws Exception {
+        var c=contract();var lock=Json.read(c.validator.path(BindingContract.LOCK));String ref=c.registry.path("corpusRef").asText(),sha=c.registry.path("corpusSha256").asText();
+        assertDoesNotThrow(()->BindingContract.requireReviewedCorpus(lock,ref,sha));
+        // A regenerated registry would carry the weakened corpus hash; the reviewed pin does not follow it.
+        assertThrows(IllegalArgumentException.class,()->BindingContract.requireReviewedCorpus(lock,ref,"0".repeat(64)));
+        var unpinned=(ObjectNode)lock.deepCopy();unpinned.set("pinnedArtifacts",Json.array());assertThrows(IllegalArgumentException.class,()->BindingContract.requireReviewedCorpus(unpinned,ref,sha));
+        var duplicate=(ObjectNode)lock.deepCopy();((ArrayNode)duplicate.path("pinnedArtifacts")).add(lock.path("pinnedArtifacts").get(0));assertThrows(IllegalArgumentException.class,()->BindingContract.requireReviewedCorpus(duplicate,ref,sha));
+    }
     @Test void duplicateOrReorderedMilestoneRejected() throws Exception {var c=contract();var r=new ModelBindingRunner(c,"M01","SIT",new UnimplementedDriver(),new AgentRunner.Scripted());assertThrows(IllegalArgumentException.class,()->r.execute("turn-1/agent"));}
 }

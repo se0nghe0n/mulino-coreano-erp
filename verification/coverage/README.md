@@ -134,6 +134,10 @@ semantic path를 model-binding registry/binding/source pointer와 대조한다.
 준비 report의 corpus/registry hash와 inputArtifacts의 모든 binding,
 fixture, feature, semantic path 및 runner/schema source hash도 직접 읽는다.
 동일 count를 유지하면서 다른 case/turn/pointer/path로 바꾸는 변조를 거부한다.
+binding hash끼리의 일치는 재생성으로 맞춰지므로, corpus 자체를
+`model-corpus/validate.py`로 검사하고 규범 lock의 T25 corpus pin과
+bytes가 같은지 확인한다. 기대값·maxNew·효과 class·의무를 count를
+유지한 채 바꾸고 binding을 재생성해도 준비 FAIL이다.
 기존 binding parser/schema 검사는 해당 작성자의 준비 report가 맡는다.
 
 실제 runtime은60 case×3회=180 unique attempt와73 turn×3회를 별도

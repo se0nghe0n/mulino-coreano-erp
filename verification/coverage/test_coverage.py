@@ -514,6 +514,23 @@ class CoverageSelftest(unittest.TestCase):
         self.assertEqual(499, len(observations))
         self.assertTrue(any(p['status'] == 'FAIL' and 'normative catalog' in p['reason'] for p in self.a.preparation_problems))
 
+    def test_regenerated_model_corpus_weakening_fails_model_preparation(self):
+        repository = HERE.parents[1]
+        for ref in ['verification/model-corpus/corpus.json', 'verification/model-corpus/corpus.schema.json',
+                    'verification/model-corpus/validate.py', 'verification/requirements/normative-contract-lock.json']:
+            target = self.root / ref
+            target.parent.mkdir(parents=True, exist_ok=True)
+            target.write_bytes((repository / ref).read_bytes())
+        self.a.model({}, {})
+        self.assertFalse([p for p in self.a.preparation_problems if 'Model corpus' in p['reason']])
+        corpus = json.loads((self.root / 'verification/model-corpus/corpus.json').read_text())
+        case = next(c for c in corpus['cases'] if c['id'] == 'M16')
+        next(a for t in case['turns'] for a in t['oracle']['assertions'] if a['path'] == 'response.onHand.value')['expected'] = '100'
+        self.write('verification/model-corpus/corpus.json', corpus)
+        self.a = m.Assembly(self.root, COMMIT)
+        self.a.model({}, {})
+        self.assertTrue(any(p['status'] == 'FAIL' and 'reviewed pin' in p['reason'] for p in self.a.preparation_problems))
+
     def test_binding_preparation_cannot_close_model_gate(self):
         corpus = {'cases': [{'id': f'M{i:02}', 'turns': [{}]} for i in range(1, 61)]}
         corpus['cases'][0]['turns'] += [{}] * 13

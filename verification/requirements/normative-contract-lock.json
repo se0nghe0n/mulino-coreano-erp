@@ -1322,6 +1322,13 @@
       "contractSha256": "d30cad556469874221c981d9d986f90d34caa0f04e9f591ee827b2495684d551"
     }
   },
+  "pinnedArtifacts": [
+    {
+      "oracleId": "T25.model-corpus-and-budget",
+      "path": "verification/model-corpus/corpus.json",
+      "sha256": "570ce4610e585c698aeed4043be449e9bb8951448fb57111bddb5c49ac1e65bb"
+    }
+  ],
   "reviewUpdates": [
     {
       "reason": "Sol xhigh catalog P2 omission review: not unknown/conflict; EXISTS_IN and normal THROUGHOUT; default MANAGER disposition/settlement confirmation boundaries",
@@ -1333,6 +1340,20 @@
       "sourceMeaningChanged": false,
       "runtimeEvidence": "NOT_RUN",
       "closureReview": "CLOSED: same Sol xhigh reviewer confirmed the three catalog P2 closures at 7f972dd (docs/execution/step-2-common-review.md)"
+    },
+    {
+      "reason": "Step2 re-review coverage-04: generate.py rewrote every corpus hash and nothing outside the corpus anchored it, so count-preserving model oracle weakening (expected values, maxNew, allowed/forbidden effects, obligations) passed preparation. The lock now pins the exact reviewed corpus bytes for T25.model-corpus-and-budget; a corpus change needs a reviewed lock update before generate.py, model-binding prepare or coverage assembly accept it.",
+      "sourceSections": [
+        "13.3",
+        "11 R8",
+        "9.2"
+      ],
+      "sourceMeaningChanged": false,
+      "pinnedArtifactPaths": [
+        "verification/model-corpus/corpus.json"
+      ],
+      "runtimeEvidence": "NOT_RUN",
+      "closureReview": "PENDING step2 re-review closure"
     }
   ]
 }

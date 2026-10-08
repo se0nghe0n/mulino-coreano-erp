@@ -10,6 +10,12 @@ def merge(a,b):
  for k,v in b.items(): r[k]=merge(r[k],v) if isinstance(v,dict) and isinstance(r.get(k),dict) else copy.deepcopy(v)
  return r
 corpus=ROOT/'verification/model-corpus/corpus.json'; D=json.loads(corpus.read_text()); H=hashlib.sha256(corpus.read_bytes()).hexdigest()
+# Regeneration rewrites every corpus hash, so it must never be the fence. Refuse unless the
+# corpus is structurally valid and equals the bytes pinned by the reviewed normative lock.
+import importlib.util, sys
+_spec=importlib.util.spec_from_file_location('model_corpus_validate',ROOT/'verification/model-corpus/validate.py'); _validator=importlib.util.module_from_spec(_spec); _spec.loader.exec_module(_validator)
+_refusal=_validator.validate(D)+_validator.reviewed_pin_errors(corpus,ROOT)
+if _refusal: sys.exit('REFUSED: model corpus is not the reviewed closed corpus: '+'; '.join(_refusal))
 paths={a['path'] for c in D['cases'] for t in c['turns'] for a in t['oracle']['assertions']}
 extra=set()
 for c in D['cases']:

@@ -5,6 +5,8 @@ ROOT=pathlib.Path(__file__).resolve().parents[2]
 HERE=pathlib.Path(__file__).resolve().parent
 EXPECTED_CASES={f'T{i:02}' for i in range(1,27)}|{f'C{i}' for i in range(1,6)}|{f'V{i}' for i in range(1,9)}|{'E1','E2'}
 EXPECTED_REQUIREMENTS={f'D{i:02}' for i in range(1,27)}
+MODEL_CORPUS_ORACLE='T25.model-corpus-and-budget'
+MODEL_CORPUS='verification/model-corpus/corpus.json'
 class CatalogError(ValueError):pass
 def require(condition,message):
  if not condition:raise CatalogError(message)
@@ -43,6 +45,18 @@ def check_lock(lock):
  for oid,contract in lock['oracleContracts'].items():
   require(isinstance(contract,dict) and isinstance(contract.get('caseId'),str) and isinstance(contract.get('observationNames'),list) and contract['observationNames'] and isinstance(contract.get('contractSha256'),str) and HEX64.fullmatch(contract['contractSha256']),f'{oid}: normative lock contract entry incomplete')
  require(isinstance(lock['reviewUpdates'],list),'normative lock reviewUpdates must be a list')
+ # Test assets a locked oracle depends on (e.g. the closed model corpus) are pinned here so a
+ # regenerated binding cannot silently follow a weakened source.
+ require(isinstance(lock.get('pinnedArtifacts'),list),'normative lock must pin closed fixture artifacts')
+ for pin in lock['pinnedArtifacts']:
+  require(isinstance(pin,dict) and set(pin)=={'oracleId','path','sha256'} and all(isinstance(pin[k],str) and pin[k].strip() for k in pin) and HEX64.fullmatch(pin['sha256']),'pinned artifact needs oracleId, path and sha256')
+ require(sum(1 for p in lock['pinnedArtifacts'] if p['oracleId']==MODEL_CORPUS_ORACLE and p['path']==MODEL_CORPUS)==1,f'{MODEL_CORPUS_ORACLE} must pin the exact reviewed model corpus bytes')
+def pinned_artifact(lock,oracle_id,path):
+ """Return the reviewed sha256 the normative lock pins for one repository file."""
+ check_lock(lock)
+ pins=[p['sha256'] for p in lock['pinnedArtifacts'] if p['oracleId']==oracle_id and p['path']==path]
+ require(len(pins)==1,f'{oracle_id} has no unique pin for {path}')
+ return pins[0]
 def read_lock(root=ROOT):
  return json.loads((pathlib.Path(root)/'verification/requirements/normative-contract-lock.json').read_text())
 def validate(catalog,lock=None,root=ROOT):
@@ -93,6 +107,12 @@ def validate(catalog,lock=None,root=ROOT):
   require(contract['caseId']==case and contract['observationNames']==names,f'{oid}: named observation omission/drift')
   require(contract['contractSha256']==digest(oracle),f'{oid}: fixed contract changed or weakened')
   observation_count+=len(observations)
+ for pin in lock['pinnedArtifacts']:
+  require(pin['oracleId'] in ids,f'{pin["oracleId"]}: pinned artifact belongs to an unknown oracle')
+  file=(pathlib.Path(root)/pin['path']).resolve()
+  require(file.is_relative_to(pathlib.Path(root).resolve()),f'{pin["path"]}: pinned artifact escapes repository')
+  require(file.is_file(),f'missing pinned fixture artifact {pin["path"]}')
+  require(hashlib.sha256(file.read_bytes()).hexdigest()==pin['sha256'],f'{pin["oracleId"]}: pinned fixture artifact drift {pin["path"]}; reviewed regeneration and lock update required')
  require(cases==EXPECTED_CASES,'missing case implementation contract')
  require(requirements==EXPECTED_REQUIREMENTS,'missing normative requirement mapping')
  # Cross-reference acyclicity keeps closure finite and reviewable.

@@ -568,6 +568,24 @@ class Assembly:
         bindings = {}
         case_count = len(corpus.get('cases', [])) if corpus else 0
         turn_count = sum(len(c.get('turns', [])) for c in corpus.get('cases', [])) if corpus else 0
+        if corpus is not None:
+            # Binding hashes only repeat whatever corpus.json holds; the independent corpus
+            # validator and the reviewed lock pin are what fix the model oracle.
+            try:
+                module_ref = 'verification/model-corpus/validate.py'
+                self.descriptor(module_ref)
+                self.descriptor('verification/model-corpus/corpus.schema.json')
+                spec = importlib.util.spec_from_file_location('coverage_corpus_validator', self.file(module_ref))
+                corpus_validator = importlib.util.module_from_spec(spec)
+                spec.loader.exec_module(corpus_validator)
+                corpus_errors = corpus_validator.validate(corpus) + corpus_validator.reviewed_pin_errors(
+                    self.file('verification/model-corpus/corpus.json'), self.root)
+                if corpus_errors:
+                    self.issue('FAIL', 'Model corpus validation/reviewed pin failed: ' + '; '.join(corpus_errors[:5]), True)
+            except FileNotFoundError:
+                self.issue('NOT_RUN', 'Model corpus validator source missing', True)
+            except (ValueError, KeyError, TypeError, AttributeError, OSError) as error:
+                self.issue('FAIL', 'Model corpus validator failed: ' + str(error), True)
         if registry and corpus and report:
             before = len(self.preparation_problems)
             bindings = self.model_bindings(corpus, registry, report)

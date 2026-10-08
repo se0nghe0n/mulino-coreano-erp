@@ -562,14 +562,42 @@ def validate(data):
     return errors
 
 
+ROOT = Path(__file__).resolve().parents[2]
+CANONICAL = Path(__file__).resolve().with_name('corpus.json')
+
+
+def reviewed_pin_errors(path, root=ROOT):
+    """The closed corpus must equal the bytes the reviewed normative lock pins.
+
+    Hash consistency between corpus, registry and bindings is not a fence: generate.py
+    rewrites all of them. Only the reviewed lock outside this directory anchors the oracle."""
+    try:
+        lock = json.loads((Path(root) / 'verification/requirements/normative-contract-lock.json').read_text())
+        pins = [p.get('sha256') for p in lock.get('pinnedArtifacts', [])
+                if isinstance(p, dict) and p.get('oracleId') == 'T25.model-corpus-and-budget'
+                and p.get('path') == 'verification/model-corpus/corpus.json']
+    except (OSError, ValueError, AttributeError) as exc:
+        return [f'reviewed corpus pin unreadable: {exc}']
+    if len(pins) != 1:
+        return ['normative lock lacks exactly one reviewed T25 corpus pin']
+    actual = hashlib.sha256(Path(path).read_bytes()).hexdigest()
+    if actual != pins[0]:
+        return [f'corpus bytes {actual} differ from reviewed lock pin {pins[0]}; '
+                'oracle edits need a reviewed lock update, not regeneration']
+    return []
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('path', nargs='?', type=Path,
-                        default=Path(__file__).with_name('corpus.json'))
+    parser.add_argument('path', nargs='?', type=Path, default=CANONICAL)
+    parser.add_argument('--skip-reviewed-pin', action='store_true',
+                        help='Structural check of a draft corpus only; never valid for preparation')
     args = parser.parse_args()
     try:
         data = json.loads(args.path.read_text())
         errors = validate(data)
+        if not args.skip_reviewed_pin:
+            errors += reviewed_pin_errors(args.path)
     except (ValueError, OSError, TypeError, KeyError, AttributeError, IndexError) as exc:
         errors = [f'invalid corpus: {exc}']
     if errors:

@@ -33,6 +33,21 @@ python3 verification/model-corpus/validate.py
 python3 -m unittest discover -s verification/model-corpus -p 'test_*.py' -v
 ```
 
+## 검토된 corpus bytes의 고정
+
+registry·binding·semantic path의 corpus hash는 `generate.py`가 현재
+corpus에서 다시 쓴다. 이 값끼리의 일치는 oracle 약화를 막지 못한다.
+`MANDATORY_ASSERTIONS`가 고정하지 않은 사례의 기대값·maxNew·허용/금지
+효과·의무를 바꿔도 구조 검사는 VALID일 수 있다. 그래서
+`verification/requirements/normative-contract-lock.json`의
+`pinnedArtifacts`가 T25.model-corpus-and-budget의 corpus bytes SHA-256을
+고정한다. `validate.py`는 이 pin과 다르면 INVALID다.
+`--skip-reviewed-pin`은 초안의 구조 검사 전용이며 준비 증거가 아니다.
+`generate.py`, `model-binding/run prepare`, Java BindingContract와
+coverage assembler도 같은 pin을 확인한다. corpus를 의도적으로 바꾸면
+근거·영향을 review하고 별도 commit에서 lock pin과 reviewUpdates를
+갱신한 뒤 binding을 재생성한다.
+
 `corpusIntegrity=VALID`와 validator unit tests의 성공은 데이터 작성의
 정합성만 증명한다. 실제 모델 해석률이나 업무 효과 PASS를 뜻하지
 않는다. root `./verify`와 실제 adapter의 제공 여부는 이 corpus가
