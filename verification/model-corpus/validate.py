@@ -56,6 +56,22 @@ MANDATORY_ASSERTIONS = {
 }
 
 
+LATIN_WORD = re.compile(r'[A-Za-zÀ-ÖØ-öø-ÿ]{3,}')
+
+
+def natural_latin_words(text):
+    """Italian/English words in the raw text, not IDs, units or camelCase field names (SKU, BOX, autoApprove)."""
+    return [w for w in LATIN_WORD.findall(text)
+            if any(ch.islower() for ch in w) and not re.search(r'[a-z][A-Z]', w)]
+
+
+def is_foreign_or_mixed(case):
+    """§13.3 minimum counts actual Italian/English text; the languages tag alone is only a claim."""
+    langs = case.get('languages', [])
+    text = ' '.join(t.get('input', {}).get('utterance', '') for t in case.get('turns', []) if isinstance(t, dict))
+    return bool(set(langs) & {'it', 'en'}) and bool(natural_latin_words(text))
+
+
 def effective_fixture(common, override):
     """Match corpus fixture semantics: recursive object merge, list replacement."""
     result = copy.deepcopy(common)
@@ -253,7 +269,7 @@ def validate(data):
         langs = case.get('languages', [])
         require(isinstance(langs, list) and langs and set(langs) <= {'ko', 'it', 'en'},
                 f'{cid}: invalid languages')
-        foreign += bool(set(langs) & {'it', 'en'})
+        foreign += is_foreign_or_mixed(case)
         refs = case.get('requirementRefs', [])
         require(bool(refs) and all(isinstance(r, str) and REQUIREMENT.fullmatch(r)
                                    for r in refs), f'{cid}: invalid requirement refs')
@@ -605,8 +621,8 @@ def main():
         return 1
     print(json.dumps({'corpusIntegrity': 'VALID', 'caseCount': 60,
                       'categoryCounts': CATEGORY_COUNTS, 'plannedAttempts': 180,
-                      'foreignOrMixedCases': sum(bool(set(c['languages']) & {'en', 'it'})
-                                                 for c in data['cases']),
+                      'foreignOrMixedCases': sum(is_foreign_or_mixed(c) for c in data['cases']),
+                      'foreignOrMixedTagged': sum(bool(set(c['languages']) & {'en', 'it'}) for c in data['cases']),
                       'modelAcceptance': 'NOT_RUN', 'usage': None, 'totalCost': None},
                      ensure_ascii=False, indent=2))
     return 0

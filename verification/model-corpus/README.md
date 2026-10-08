@@ -64,7 +64,10 @@ coverage assembler도 같은 pin을 확인한다. corpus를 의도적으로 바�
 | M51–M60 | 업무 예외·책임 | 10 |
 
 60개는 서로 다른 첫 원문·semantic focus·전체 oracle를 가진다.
-이탈리아어·영어 원문 또는 혼합 표현21개가 있다. 각3회 반복은 한
+이탈리아어·영어 원문 또는 혼합 표현 tag는21개다. validator는 tag가
+아니라 실제 원문의 이탈리아어·영어 단어(ID·단위·camelCase field 제외)를
+세며 현재19개다(M41·M49는 tag만 en이다). 계획 §13.3의 최소10은 이 실제
+원문 수로 판정한다. 각3회 반복은 한
 사례의 모든 turn을 같은 독립 fixture에서 끝까지 수행하는3개
 attempt다. 계획은180 attempts이며 실제 attempts는0개다. 확인 질문의
 구체 문구를 고정하지 않고 `missingSlots`에 맞는 확인을 요구한다.

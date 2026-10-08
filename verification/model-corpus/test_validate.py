@@ -25,6 +25,21 @@ class CorpusValidationTests(unittest.TestCase):
         self.assertEqual('NOT_RUN', self.data['status'])
         self.assertIsNone(self.data['executionPlan']['usage'])
 
+    def test_foreign_quota_counts_actual_text_not_language_tags(self):
+        self.assertEqual(19, sum(VALIDATOR.is_foreign_or_mixed(c) for c in self.data['cases']))
+        def koreanize(data):
+            replaced = 0
+            for case in data['cases']:
+                if VALIDATOR.is_foreign_or_mixed(case) and replaced < 10:
+                    for n, turn in enumerate(case['turns'], 1):
+                        turn['input']['utterance'] = f'{case["id"]} {n}번 요청을 한국어로 처리해줘.'
+                    replaced += 1
+        self.reject(koreanize, 'need at least 10 foreign/mixed cases')
+
+    def test_ids_units_and_camel_case_fields_are_not_foreign_text(self):
+        self.assertEqual([], VALIDATOR.natural_latin_words('SKU MB-01 DOC1 100 BOX EUR/KRW autoApprove ADMIN'))
+        self.assertEqual(['ricevute'], VALIDATOR.natural_latin_words('운송사 DOC2도 "ricevute 60 BOX"라 한다'))
+
     def test_missing_case(self):
         self.reject(lambda d: d['cases'].pop(), 'exactly 60')
 
