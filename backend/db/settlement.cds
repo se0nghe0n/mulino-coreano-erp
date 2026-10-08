@@ -16,7 +16,7 @@ entity Matches {
  scopeKind:String(16) not null; orderedQuantity:Decimal(38,12) not null; receivedQuantity:Decimal(38,12) not null; invoiceQuantity:Decimal(38,12) not null;
  quantity:Decimal(38,12) not null; unit:String(20) not null; unitPrice:Decimal(38,12) not null;
  orderedAmount:Decimal(38,12) not null; invoiceAmount:Decimal(38,12) not null; currency:String(3) not null; invoiceCurrency:String(3) not null;
- quantityDifference:Decimal(38,12) not null; priceDifference:Decimal(38,12) not null; originalDifference:Decimal(38,12); currencyDifference:Boolean not null;
+ quantityDifference:Decimal(38,12) not null; priceDifference:Decimal(38,12) not null; originalDifference:Decimal(38,12); currencyDifference:Boolean not null; scopeDifference:Boolean not null default false;
  status:String(24) not null; dutyRootId:UUID;
 }
 entity Charges {
