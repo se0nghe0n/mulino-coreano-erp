@@ -74,7 +74,7 @@ public final class HostObservationValidator {
         if(operation.equals("cutoverStage")) ContractValidator.require(Set.of("WRITE_FREEZE","FINAL_SNAPSHOT","RECONCILE","APPLY_VERSION","SMOKE_AUTH_RESUME","OPEN_WRITES","ROLLBACK_BEFORE_OPEN","STOP_AND_RECONCILE_AFTER_OPEN","FORWARD_REPAIR").contains(identity.path("stage").asText()),"Unknown bounded cutover stage");
         if(READ_OPERATIONS.contains(operation)) inspect(validator,requested,host,extracted);
         if(operation.equals("scanArtifacts")) scan(validator,requested,host);
-        if(Set.of("tickScheduler","sweepDue").contains(operation)) schedulerSubmission(requested,host);
+        if(Set.of("tickScheduler","sweepDue").contains(operation)) schedulerSubmission(operation,requested,host,extractedRows);
         if(operation.equals("verifyCoverage")) coverageSnapshot(validator,requested,host,extractedRows);
         if(operation.equals("enumerateWriteSurface")) writeSurface(validator,requested,host,extractedRows,result);
         if(operation.equals("awaitRuntimeTask")) runtimeTask(validator,requested,host,result);
@@ -83,7 +83,9 @@ public final class HostObservationValidator {
     static final String NATURAL_TICK="OBSERVE_NEXT_NATURAL_TICK",SCHEDULER_LOOP="SCHEDULER_LOOP";
     /** Plan §10 development/CI recovery profile: test observation limit 30 seconds. */
     static final int MAX_NATURAL_TICK_WINDOW_SECONDS=30;
-    private static void schedulerSubmission(JsonNode requested,JsonNode host) {
+    /** Watcher configuration of a passive natural-tick observation. These are request parameters, never scheduler evidence. */
+    static final List<String> PASSIVE_PARAMETERS=List.of("trigger","triggeredBy","observationWindowSeconds");
+    private static void schedulerSubmission(String operation,JsonNode requested,JsonNode host,JsonNode rows) {
         JsonNode identity=host.path("operationEvidence");
         ContractValidator.require(Json.required(requested,"schedulerId").equals(identity.path("schedulerId").asText()),"Scheduler submission belongs to a different requested scheduler");
         ContractValidator.require(Set.of("SUBMITTED","NO_TASK").contains(identity.path("submissionStatus").asText()),"Scheduler submissionStatus must be an observed SUBMITTED or NO_TASK");
@@ -91,34 +93,50 @@ public final class HostObservationValidator {
             Instant submitted=instant(identity,"submittedAt");
             ContractValidator.require(!submitted.isBefore(instant(host.path("command"),"startedAt")) && !submitted.isAfter(instant(host.path("command"),"completedAt")),"Scheduler submission timestamp is outside actual command observation");
         }
-        boolean passive=requested.has("trigger") || requested.has("triggeredBy") || requested.has("observationWindowSeconds");
-        if(passive) naturalTick(requested,host);
-        else ContractValidator.require(!NATURAL_TICK.equals(identity.path("trigger").asText()) && !SCHEDULER_LOOP.equals(identity.path("triggeredBy").asText()),
+        for(String key:PASSIVE_PARAMETERS) ContractValidator.require(!identity.has(key),
+            "operationEvidence."+key+" is a passive-watch request parameter; an echo of the request is not scheduler evidence (read schedulerSubmissions rows)");
+        boolean passive=false;for(String key:PASSIVE_PARAMETERS) passive|=requested.has(key);
+        if(passive) naturalTick(operation,requested,host,rows);
+        else for(JsonNode row:rows.path("schedulerSubmissions")) ContractValidator.require(!SCHEDULER_LOOP.equals(row.path("submittedBy").asText()),
             "A harness-triggered tick/sweep cannot be reported as the scheduler loop's own natural tick");
     }
     /**
      * Passive observation of the scheduler loop's next natural tick (T26 autonomous-loop subcases). The harness does not
-     * trigger anything: the host command only watches, read-only, for at most observationWindowSeconds, and the submission
-     * identity, trigger and triggeredBy come from independently extracted scheduler rows. The case's own DB assertions check
-     * that every attempt was started by the loop; this validator fixes the shape that makes that observation meaningful.
+     * trigger anything: the host command only watches, read-only, for at most observationWindowSeconds. trigger, triggeredBy
+     * and observationWindowSeconds stay request parameters; what the scheduler did comes from extractor rawRows
+     * schedulerSubmissions, the rows the scheduler itself recorded (schedulerId, tickId or sweepId, taskId, invocationHandle,
+     * submittedAt, submittedBy). The first submission in the window is the typed identity in operationEvidence. The case
+     * asserts submittedBy from those rows, so a value copied from the request cannot satisfy it.
      */
-    private static void naturalTick(JsonNode requested,JsonNode host) {
+    private static void naturalTick(String operation,JsonNode requested,JsonNode host,JsonNode rows) {
         JsonNode identity=host.path("operationEvidence"),command=host.path("command");
         ContractValidator.require(NATURAL_TICK.equals(requested.path("trigger").asText()),"Only trigger="+NATURAL_TICK+" is a defined passive scheduler observation");
         ContractValidator.require(SCHEDULER_LOOP.equals(requested.path("triggeredBy").asText()),"Passive tick observation requests triggeredBy="+SCHEDULER_LOOP);
         JsonNode window=requested.path("observationWindowSeconds");
         ContractValidator.require(window.isIntegralNumber() && window.asInt()>=1 && window.asInt()<=MAX_NATURAL_TICK_WINDOW_SECONDS,"observationWindowSeconds must be an integer 1.."+MAX_NATURAL_TICK_WINDOW_SECONDS+" (plan §10)");
-        for(String key:List.of("trigger","triggeredBy","observationWindowSeconds"))
-            ContractValidator.require(identity.has(key) && identity.path(key).equals(requested.path(key)),"Independently extracted scheduler rows must record "+key+" equal to the passive request");
-        Instant start=instant(command,"startedAt"),end=instant(command,"completedAt");
-        ContractValidator.require(!end.isAfter(start.plusSeconds(window.asLong())),"Passive observation command outlasted observationWindowSeconds");
-        if(identity.path("submissionStatus").asText().equals("SUBMITTED"))
-            ContractValidator.require(!instant(identity,"submittedAt").isAfter(start.plusSeconds(window.asLong())),"Natural tick submission observed outside the observation window");
+        Instant start=instant(command,"startedAt"),end=instant(command,"completedAt"),limit=start.plusSeconds(window.asLong());
+        ContractValidator.require(!end.isAfter(limit),"Passive observation command outlasted observationWindowSeconds");
         ContractValidator.require(host.path("extractor").path("readOnly").asBoolean(false) && host.path("extractor").path("independent").asBoolean(false),"Passive tick observation needs an independent read-only extractor");
         for(JsonNode arg:command.path("argv")) {
             String a=arg.asText().toLowerCase(Locale.ROOT);
             ContractValidator.require(!a.contains("tickscheduler") && !a.contains("sweepdue") && !a.contains("resumework") && !a.contains("fakeworker"),"Passive observation command must not trigger the scheduler, a sweep or a worker");
         }
+        ContractValidator.require(host.path("extractor").has("rawRows") && rows.path("schedulerSubmissions").isArray(),
+            "Passive tick observation needs extractor rawRows.schedulerSubmissions read from the scheduler's own submission records");
+        String runKey=operation.equals("sweepDue")?"sweepId":"tickId";
+        JsonNode first=null;
+        for(JsonNode row:rows.path("schedulerSubmissions")) {
+            ContractValidator.require(row.path("schedulerId").asText().equals(requested.path("schedulerId").asText()),"Scheduler submission row belongs to a different scheduler");
+            for(String key:List.of(runKey,"taskId","invocationHandle","submittedBy")) ContractValidator.require(row.path(key).isTextual() && !row.path(key).asText().isBlank(),"Scheduler submission row lacks scheduler-recorded "+key);
+            Instant at=instant(row,"submittedAt");
+            ContractValidator.require(!at.isBefore(start) && !at.isAfter(limit),"Scheduler submission row outside the observation window");
+            if(first==null || at.isBefore(instant(first,"submittedAt"))) first=row;
+        }
+        if(identity.path("submissionStatus").asText().equals("SUBMITTED")) {
+            ContractValidator.require(first!=null,"SUBMITTED natural tick has no scheduler-recorded submission row");
+            for(String key:List.of(runKey,"taskId","invocationHandle","submittedAt"))
+                ContractValidator.require(identity.path(key).equals(first.path(key)),"Natural tick identity "+key+" is not the first scheduler-recorded submission in the window");
+        } else ContractValidator.require(first==null,"NO_TASK natural tick contradicts scheduler-recorded submissions in the window");
     }
 
     static final Set<String> SNAPSHOT_KINDS=Set.of("PREPARATION","REQUIRED_PATH_RUNTIME_EVIDENCE","MODEL_BINDING_PREPARATION","APPROVED_MODEL_EXECUTION_EVIDENCE");
@@ -153,6 +171,7 @@ public final class HostObservationValidator {
         ContractValidator.require(in.path("snapshotKind").asText().equals(kind),"Verifier did not read the requested input snapshot kind");
         ContractValidator.require(in.path("path").equals(bound.path("path")) && in.path("sha256").equals(bound.path("sha256")),"Verifier input snapshot path/hash differs from the requested bound file");
         if(current) ContractValidator.require(in.path("currentExecution").equals(requested.path("currentExecution")),"Verifier currentExecution differs from request");
+        if(kind.equals("PREPARATION")) preparationInput(validator,in,bound);
         String mutation=requested.path("mutation").asText("none");
         if(!mutation.equals("none")) ContractValidator.require(rows.path("mutatedInput").path("mutation").asText().equals(mutation),"Verifier mutated a different input than requested");
         List<JsonNode> links=new ArrayList<>();
@@ -164,6 +183,20 @@ public final class HostObservationValidator {
             boolean own=current && link.path("caseId").asText().equals(currentCase);
             ContractValidator.require(own==status.equals("CURRENT_EXECUTION"),"Only the currentExecution case's links are CURRENT_EXECUTION, and all of them are: "+link.path("caseId").asText()+" "+status);
         }
+    }
+    static final java.util.regex.Pattern COMMIT=java.util.regex.Pattern.compile("[0-9a-f]{40}|[0-9a-f]{64}");
+    /**
+     * A PREPARATION input names the commit it was prepared from and whether that tree was clean (codeCommit, workingTreeDirty),
+     * and the verifier records the checkout it ran in (checkoutCommit, checkoutDirty). The first pair is recomputed here from the
+     * bound report bytes; whether the report belongs to the current clean checkout is the T25 case's assertion, so a stale or
+     * dirty preparation report fails as a case result rather than being accepted as current.
+     */
+    private static void preparationInput(ContractValidator validator,JsonNode in,JsonNode bound) throws IOException {
+        for(String key:List.of("codeCommit","checkoutCommit")) ContractValidator.require(in.path(key).isTextual() && COMMIT.matcher(in.path(key).asText()).matches(),"PREPARATION verifier input needs "+key+" (git commit)");
+        for(String key:List.of("workingTreeDirty","checkoutDirty")) ContractValidator.require(in.path(key).isBoolean(),"PREPARATION verifier input needs boolean "+key);
+        JsonNode report=Json.read(file(validator,bound.path("path").asText()));
+        ContractValidator.require(in.path("codeCommit").equals(report.path("codeCommit")),"PREPARATION input codeCommit differs from the bound preparation report");
+        ContractValidator.require(in.path("workingTreeDirty").equals(report.path("workingTreeDirty")),"PREPARATION input workingTreeDirty differs from the bound preparation report");
     }
     static final Set<String> WRITE_SURFACES=Set.of("ODATA_METADATA","MCP_SERVER_DISCOVER","MCP_TOOLS_LIST","WORKER_HANDLER_REGISTRY","MANAGEMENT_ENDPOINTS");
     static final Set<String> PROBE_CLASSES=Set.of("DIRECT_CREATE","DIRECT_UPDATE","DIRECT_DELETE","DEEP_INSERT","UPSERT","BATCH_CHANGESET","DRAFT_ACTIVATE",

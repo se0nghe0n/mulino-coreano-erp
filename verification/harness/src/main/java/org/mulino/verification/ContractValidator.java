@@ -81,6 +81,118 @@ public final class ContractValidator {
         }
         return problems;
     }
+    /**
+     * contracts/audit-observation-fields.json publishes the logical audit rows an independent observer returns under
+     * /data/rawRows/audit (command audit) and /data/rawRows/queryAudit (query audit). An audit assertion that reads another
+     * audit-like source, filters on a field that is not ALWAYS present, or projects/requires a field outside the contract
+     * cannot be satisfied by a correct product, so preparation rejects it. Forbidding values (notEquals/absent) still has
+     * to name published fields. Outcome and error-code values are checked by verification/cases/check_vocabulary.py.
+     */
+    public List<String> auditFieldProblems(JsonNode caseFile) throws IOException {
+        JsonNode contract=Json.read(path("contracts/audit-observation-fields.json"));
+        Map<String,Map<String,String>> published=new HashMap<>();
+        for(JsonNode source:contract.path("sources")) published.put(source.path("source").asText(),new HashMap<>());
+        for(JsonNode field:contract.path("fields")) published.computeIfAbsent(field.path("source").asText(),k->new HashMap<>()).put(field.path("name").asText(),field.path("presence").asText());
+        List<String> problems=new ArrayList<>();
+        String caseId=caseFile.path("caseId").asText();
+        for(JsonNode sub:caseFile.path("subcases")) {
+            List<JsonNode> actions=new ArrayList<>();collect(sub.path("actions"),actions);
+            for(JsonNode action:actions) for(JsonNode source:action.path("observation").path("sources"))
+                if(auditLike(source.asText()) && !published.containsKey(source.asText()))
+                    problems.add(caseId+"/"+sub.path("id").asText()+"/"+action.path("id").asText()+": observe source "+source.asText()+" is not a published audit source "+published.keySet()+" (contracts/audit-observation-fields.json)");
+            for(JsonNode assertion:sub.path("assertions")) for(String role:List.of("source","baseline","unitSource","baselineUnitSource")) {
+                JsonNode src=assertion.path(role);String pointer=src.path("pointer").asText();
+                if(!pointer.startsWith("/data/rawRows/")) continue;
+                String[] segments=pointer.substring("/data/rawRows/".length()).split("/",-1);
+                String name=segments[0].replace("~1","/").replace("~0","~");
+                if(!auditLike(name)) continue;
+                String where=caseId+"/"+sub.path("id").asText()+"/"+assertion.path("id").asText()+": "+role+" "+pointer;
+                Map<String,String> fields=published.get(name);
+                if(fields==null) {problems.add(where+" reads audit source "+name+", not one of "+published.keySet()+" (contracts/audit-observation-fields.json)");continue;}
+                List<String> named=new ArrayList<>();
+                if(segments.length>=3 && segments[1].matches("\\d+")) named.add(segments[2]);
+                else if(segments.length>=2 && !segments[1].matches("\\d+")) named.add(segments[1]);
+                if(src.path("field").isTextual()) named.add(src.path("field").asText());
+                for(JsonNode f:src.path("field")) named.add(f.asText());
+                if(role.equals("source") && assertion.path("op").asText().equals("fieldsPresent")) for(JsonNode f:assertion.path("expected")) named.add(f.asText());
+                for(String f:named) if(!fields.containsKey(f)) problems.add(where+" names audit field "+f+", not a published "+name+" field");
+                src.path("where").fieldNames().forEachRemaining(key->{
+                    if(!fields.containsKey(key)) problems.add(where+" filters on "+key+", not a published "+name+" field");
+                    else if(!fields.get(key).equals("ALWAYS")) problems.add(where+" filters on "+key+" ("+fields.get(key)+"); only ALWAYS audit fields may filter");
+                });
+            }
+        }
+        return problems;
+    }
+    private static boolean auditLike(String source) { return source.toLowerCase(Locale.ROOT).contains("audit"); }
+    /**
+     * Fixture runtimeProfile tick semantics (contracts/acceptance-fixture.schema.json, host-observation-guide.md):
+     * controlledTicks=true with pausedUntilTickControl=true means the scheduler and sweeper loops submit nothing by themselves
+     * and each harness tickScheduler/sweepDue request causes exactly that tick; controlledTicks=false with
+     * pausedUntilTickControl=false means the loops run on their own tick and only a passive OBSERVE_NEXT_NATURAL_TICK watcher may
+     * observe them. A fixture without runtimeProfile is a harness-tick fixture. A subcase that mixes the two cannot attribute a
+     * submission, so preparation rejects it. The autonomous-loop
+     * pattern is also fixed: the first passive watcher is the first action of the first branch of a parallel action whose
+     * other branches only start processes that are not running at that point (stopped before, never restart).
+     */
+    public List<String> runtimeProfileProblems(JsonNode caseFile) throws IOException {
+        List<String> problems=new ArrayList<>();
+        String caseId=caseFile.path("caseId").asText();
+        for(JsonNode sub:caseFile.path("subcases")) {
+            String where=caseId+"/"+sub.path("id").asText();
+            List<JsonNode> all=new ArrayList<>();collect(sub.path("actions"),all);
+            List<JsonNode> ticks=new ArrayList<>();
+            for(JsonNode a:all) if(isProcess(a,"tickScheduler") || isProcess(a,"sweepDue")) ticks.add(a);
+            if(ticks.isEmpty()) continue;
+            JsonNode profile=runtimeProfile(sub.path("fixtureRef").asText(),new HashSet<>());
+            boolean anyPassive=false,anyHarness=false;
+            for(JsonNode t:ticks) {if(passive(t)) anyPassive=true; else anyHarness=true;}
+            if(anyPassive && anyHarness) problems.add(where+": mixes harness tickScheduler/sweepDue with passive natural-tick observation; one fixture runtimeProfile cannot attribute both");
+            // Without a runtimeProfile the fixture is a harness-tick fixture (controlledTicks=true, pausedUntilTickControl=true).
+            if(profile==null) {if(anyPassive) problems.add(where+": passive natural-tick observation needs an explicit fixture baseline.runtimeProfile with controlledTicks=false and pausedUntilTickControl=false");continue;}
+            boolean controlled=profile.path("controlledTicks").asBoolean(true),paused=profile.path("pausedUntilTickControl").asBoolean(true);
+            if(anyHarness && !(controlled && paused)) problems.add(where+": harness tickScheduler/sweepDue requires runtimeProfile controlledTicks=true and pausedUntilTickControl=true");
+            if(!anyPassive) continue;
+            if(controlled || paused) problems.add(where+": passive natural-tick observation requires runtimeProfile controlledTicks=false and pausedUntilTickControl=false");
+            JsonNode top=sub.path("actions");JsonNode group=null;int groupAt=-1;
+            for(int i=0;i<top.size() && group==null;i++) {
+                JsonNode a=top.get(i);
+                if(a.path("kind").asText().equals("parallel")) {for(JsonNode b:a.path("branches")) for(JsonNode x:b.path("actions")) if(passive(x)) {group=a;groupAt=i;}}
+                else if(passive(a)) {problems.add(where+"/"+a.path("id").asText()+": the first passive watcher must run inside a parallel action with the process starts (autonomous-loop pattern)");group=Json.object();}
+            }
+            if(group==null || groupAt<0) continue;
+            JsonNode branches=group.path("branches");
+            JsonNode watcher=branches.path(0).path("actions").path(0);
+            if(!passive(watcher)) problems.add(where+"/"+group.path("id").asText()+": the watcher branch (first action OBSERVE_NEXT_NATURAL_TICK) must be branch 0");
+            Map<String,String> last=new HashMap<>();
+            for(int i=0;i<groupAt;i++) {List<JsonNode> before=new ArrayList<>();collect(Json.array().add(top.get(i)),before);
+                for(JsonNode a:before) if(a.path("kind").asText().equals("control") && Set.of("start","stop","restart").contains(a.path("control").path("operation").asText()))
+                    last.put(a.path("control").path("parameters").path("processId").asText(),a.path("control").path("operation").asText());}
+            int starts=0;
+            for(int b=1;b<branches.size();b++) for(JsonNode a:branches.get(b).path("actions")) {
+                if(!isProcess(a,"start")) {problems.add(where+"/"+group.path("id").asText()+": a non-watcher branch may only start processes, found "+a.path("id").asText());continue;}
+                starts++;String id=a.path("control").path("parameters").path("processId").asText();
+                if(Set.of("start","restart").contains(last.getOrDefault(id,"stop"))) problems.add(where+"/"+a.path("id").asText()+": process "+id+" is already running before the watcher starts; stop it before the clock advance");
+            }
+            if(starts==0 || branches.size()<2) problems.add(where+"/"+group.path("id").asText()+": the autonomous-loop group needs at least one process start branch after the watcher");
+            for(JsonNode a:all) if(isProcess(a,"restart")) problems.add(where+"/"+a.path("id").asText()+": a restart lets the loop submit before the watcher; split it into stop (before) and start (in the group)");
+        }
+        return problems;
+    }
+    private static boolean isProcess(JsonNode a,String operation) {
+        return a.path("kind").asText().equals("control") && a.path("control").path("type").asText().equals("process") && a.path("control").path("operation").asText().equals(operation);
+    }
+    private static boolean passive(JsonNode a) {
+        JsonNode p=a.path("control").path("parameters");
+        return (isProcess(a,"tickScheduler") || isProcess(a,"sweepDue")) && (p.has("trigger") || p.has("triggeredBy") || p.has("observationWindowSeconds"));
+    }
+    private JsonNode runtimeProfile(String ref,Set<String> visiting) throws IOException {
+        if(ref.isBlank() || !visiting.add(ref) || !Files.isRegularFile(path(ref))) return null;
+        JsonNode fixture=Json.read(path(ref));
+        if(fixture.path("baseline").has("runtimeProfile")) return fixture.path("baseline").path("runtimeProfile");
+        for(JsonNode base:fixture.path("baseRefs")) {JsonNode found=runtimeProfile(base.asText(),visiting);if(found!=null) return found;}
+        return null;
+    }
     public Path root() { return root; }
     public Path path(String relative) {
         Path p=root.resolve(relative).normalize();

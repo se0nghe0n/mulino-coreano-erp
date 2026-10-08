@@ -59,6 +59,9 @@ exit code를 출력하며 `verification/harness/target/wrapper-commands.json`에
     FAIL), `verification/requirements/check_layer_routes.py`(관찰 단위
     MCP·SKILLS 경로, assembler도 같은 검사를 읽는다),
     `verification/cases/V2/cases_b_invariants.py`,
+    `verification/cases/check_vocabulary.py --check`(case의 outcome·code·
+    의무 kind·감사 field를 공개 vocabulary와 감사 계약으로 검사, assembler도
+    같은 `review()`를 읽는다. 아래 "독립 observer의 논리 원행 계약"),
     `verification/cases/T08/bind_observations.py --check`,
     `verification/cases/V7/bind_observations.py V4|V6|V7 --check`,
     `verification/requirements/check_derived_bindings.py`(모든
@@ -69,8 +72,13 @@ exit code를 출력하며 `verification/harness/target/wrapper-commands.json`에
     저장소를 쓰지 않으며 python이나 script가 없으면 실패한다. 출력의
     `KNOWN_OPEN` 행(owner가 기록된 열린 gap)은 check 기록의 `knownOpen`과
     보고서 `knownOpenGaps`에 옮긴다. 목록은
-    `verification/requirements/layer-route-review.json`과
-    `check_derived_bindings.py`의 기록이며, 닫힌 gap의 항목이 남으면 실패한다.
+    `verification/requirements/layer-route-review.json`,
+    `check_derived_bindings.py`, `check_vocabulary.py` PENDING의 기록이며,
+    닫힌 gap의 항목이 남으면 실패한다.
+  - **감사 field와 tick profile**: `ContractValidator.auditFieldProblems`
+    (공개되지 않은 감사 source·field·where)와 `runtimeProfileProblems`
+    (fixture runtimeProfile과 tick 방식, 자율 loop 패턴,
+    `verification/host-observation-guide.md`)가 어긋나면 준비 문제다.
   - **정의되지 않은 host 조작**: `type=process` control의 operation이
     `contracts/acceptance-host-observation.schema.json`의 operation enum에
     없으면 문제로 센다(`ContractValidator.hostOperationProblems`).
@@ -431,6 +439,78 @@ actual prompt에 기대 capability/slot/typed intent/oracle를 넣지 않는다.
 문장·tool 순서는 고정 답안이 아니며 실제 milestone·효과·책임을 같은
 observer/oracle로 검사한다. 현재 actual client 구현과 비용 승인은 없으며
 모델 실행은 `NOT_RUN`이다.
+
+## 독립 observer의 논리 원행 계약
+
+observer가 `/data/rawRows/<source>`로 돌려주는 행의 이름은 case마다 정하지
+않는다. 공통 계약으로 고정한다. 같은 원천을 case마다 다른 이름으로 읽으면
+올바른 제품도 어느 한쪽 case에서 실패하기 때문이다.
+
+### 감사 원행(audit·queryAudit)
+
+[`contracts/audit-observation-fields.json`](../contracts/audit-observation-fields.json)
+(설명은 같은 이름의 `.md`)이 감사 원행의 SSOT다. source는 둘이다.
+
+| source | 의미 | 제품 원천 |
+|---|---|---|
+| `audit` | 명령 감사. rollback 뒤 따로 commit한 거부 감사와 replay 감사를 포함한다 | `CommandAudits` ⋈ `CommandRecords`(commandId) |
+| `queryAudit` | 조회 감사. 거부된 조회 포함. 계획 §7.4 "조회 감사는 업무 상태 변경과 구별한다" | 아직 없음(PENDING_PRODUCT, Step 3) |
+
+field마다 presence가 있다. `ALWAYS`는 모든 행에 값이 있고, `CONDITIONAL`은
+조건이 맞는 행에만 있다(예: `errorCode`는 outcome이 APPLIED·
+ACCEPTED_PENDING_EXTERNAL이 아닐 때). `PENDING`은 계획이 요구하지만
+backend가 아직 기록하지 않는 내용이다. case는 이 이름으로 읽고, 구현은
+Step 3 추가 요청이다. `AssertionEngine`은 `where` key가 source의 모든 행에
+있어야 하므로 `where`에는 ALWAYS field만 쓴다. CONDITIONAL·PENDING field는
+ALWAYS field로 고른 행에서 `field`로 투영한다. outcome 값은
+[domain vocabulary](../contracts/domain-vocabulary.md)의 명령 outcome이다.
+오류 code를 outcome 자리에 쓰지 않는다(FORBIDDEN 거부는
+`outcome=REJECTED`, `errorCode=FORBIDDEN`). `queryAudit.outcome`은 READ 또는
+REJECTED다. 이전 이름(`commandKey`, `action`, `result`, `kind`, `id`,
+`denialAudit` source 등)은 계약의 `retiredNames`가 새 이름으로 옮긴다.
+
+`./verify prepare`는 두 곳에서 이 계약을 강제하고, 어긋나면 준비 문제로
+보고한다.
+
+- `ContractValidator.auditFieldProblems`: 감사와 비슷한 이름의 observe
+  source나 `/data/rawRows/<source>` pointer가 공개된 source가 아니면 거부한다.
+  pointer 경로의 field, `source.field` 투영, `fieldsPresent` 기대 field가
+  그 source의 공개 field가 아니어도 거부한다. `where` key가 공개되지
+  않았거나 ALWAYS가 아니어도 거부한다. source·baseline·unitSource·
+  baselineUnitSource에 같은 규칙을 적용한다. notEquals·absent처럼 값을
+  금지하는 assertion도 공개 field 이름을 써야 한다.
+- caseAssetChecks `vocabulary`(`verification/cases/check_vocabulary.py
+  --check`): outcome·오류 code·code/outcome 짝·의무 kind와 감사 where의
+  presence·outcome 값을 vocabulary와 이 계약으로 검사한다. 아직 vocabulary에
+  없는 이름은 PENDING 목록에 계획 근거와 함께 둔다. 그 항목은
+  `KNOWN_OPEN` 줄로 출력되고, prepare.json `knownOpenGaps`와 coverage
+  manifest `knownOpenGaps`(assembler가 같은 `review()`를 부른다)에 owner와
+  함께 남는다. 쓰지 않는 PENDING 항목은 그 자체로 문제다.
+
+### observer 파생 원천(V2 promiseCoverage)
+
+어떤 rawRows source는 제품 표가 아니라 observer가 같은 snapshot의 다른
+원행으로 만드는 파생이다. 파생은 아래 조건을 지킨다. 원천 행은 같은
+observe의 rawRows에 함께 두고, SQL·parameter·mapping version은
+sourceEvidence에 남긴다. 값은 원행에서 그대로 복사하고 다시 계산하지
+않는다. 제품 응답이나 API projection을 읽지 않는다. case는 파생에만 기대지
+않고, 원행 하나 이상을 직접 읽어 파생과 대조한다.
+
+`promiseCoverage`(V2 `actual50-*`, 계획 §4.2 부족 의무와 대체 배분)의
+규칙은 다음과 같다. 상세는 `verification/cases/V2/race-observation-contract.md`다.
+
+| coverageKind | 원천 행 | sourceId | 복사하는 값 |
+|---|---|---|---|
+| `EXECUTABLE_ALLOCATION` | `allocations`에서 state=EXECUTABLE·active인 현재 배분 | allocation ID | promiseRootId·quantity·unit |
+| `SHORTAGE_OBLIGATION` | `obligations`에서 current=true·status=OPEN이고 같은 약속 root에 연결된 부족 의무 | obligation ID | promiseRootId·quantity·unit |
+
+한 원천 행은 한 번만 나온다. 같은 행을 두 번 세거나 빠뜨리면 약속 수량
+합이 틀려 case가 실패한다. V2는 `shortage-obligation-row-quantity`로 부족
+의무 원행(정정 응답의 obligationId)의 quantity·unit을 직접 읽는다.
+promiseCoverage 행은 harness가 rawRows에서 다시 계산하는
+`/data/data` derivation이 아니다. 원행 조합 규칙은 이 계약과 위 대조
+assertion으로 고정한다. 현재 actual observer는 이 파생을 구현하지 않아
+NOT_RUN이다(Step 3 `actual/` 소유).
 
 ## 현재 확인과 제한
 

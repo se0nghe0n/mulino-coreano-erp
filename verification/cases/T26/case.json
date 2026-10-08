@@ -37342,12 +37342,23 @@
         },
         {
           "id": "autonomous-trigger-loop",
-          "op": "equals",
+          "op": "exactSet",
           "source": {
             "actionId": "tick",
-            "pointer": "/data/hostObservation/operationEvidence/triggeredBy"
+            "pointer": "/data/hostObservation/extractor/rawRows/schedulerSubmissions",
+            "where": {
+              "taskId": {
+                "$result": {
+                  "actionId": "tick",
+                  "pointer": "/data/hostObservation/operationEvidence/taskId"
+                }
+              }
+            },
+            "field": "submittedBy"
           },
-          "expected": "SCHEDULER_LOOP",
+          "expected": [
+            "SCHEDULER_LOOP"
+          ],
           "requirementRefs": [
             "D26"
           ],
@@ -37363,7 +37374,7 @@
             "caseId": "T26",
             "subcaseId": "due-wait-autonomous-loop"
           },
-          "oracleExplanation": "제출 identity는 harness tick이 아니라 scheduler loop의 자연 tick에서 나왔다.",
+          "oracleExplanation": "관찰 창의 첫 제출(operationEvidence의 taskId) 행을 scheduler가 직접 기록한 제출 원행에서 읽으면 제출 주체는 scheduler loop다. 요청 parameter의 되풀이가 아니라 scheduler 기록이며 harness tick이 만든 제출이면 실패한다.",
           "oracleRef": {
             "oracleId": "T26.scheduler-recovery-and-operations",
             "observationNames": [
@@ -40871,12 +40882,23 @@
         },
         {
           "id": "autonomous-trigger-loop",
-          "op": "equals",
+          "op": "exactSet",
           "source": {
             "actionId": "sweep",
-            "pointer": "/data/hostObservation/operationEvidence/triggeredBy"
+            "pointer": "/data/hostObservation/extractor/rawRows/schedulerSubmissions",
+            "where": {
+              "taskId": {
+                "$result": {
+                  "actionId": "sweep",
+                  "pointer": "/data/hostObservation/operationEvidence/taskId"
+                }
+              }
+            },
+            "field": "submittedBy"
           },
-          "expected": "SCHEDULER_LOOP",
+          "expected": [
+            "SCHEDULER_LOOP"
+          ],
           "requirementRefs": [
             "D26"
           ],
@@ -40892,7 +40914,7 @@
             "caseId": "T26",
             "subcaseId": "lot-expiry-autonomous-loop"
           },
-          "oracleExplanation": "제출 identity는 harness tick이 아니라 scheduler loop의 자연 tick에서 나왔다.",
+          "oracleExplanation": "관찰 창의 첫 제출(operationEvidence의 taskId) 행을 scheduler가 직접 기록한 제출 원행에서 읽으면 제출 주체는 scheduler loop다. 요청 parameter의 되풀이가 아니라 scheduler 기록이며 harness tick이 만든 제출이면 실패한다.",
           "oracleRef": {
             "oracleId": "T26.boundary-index-and-emergency-repair",
             "observationNames": [
@@ -42280,12 +42302,23 @@
         },
         {
           "id": "autonomous-trigger-loop",
-          "op": "equals",
+          "op": "exactSet",
           "source": {
             "actionId": "tick",
-            "pointer": "/data/hostObservation/operationEvidence/triggeredBy"
+            "pointer": "/data/hostObservation/extractor/rawRows/schedulerSubmissions",
+            "where": {
+              "taskId": {
+                "$result": {
+                  "actionId": "tick",
+                  "pointer": "/data/hostObservation/operationEvidence/taskId"
+                }
+              }
+            },
+            "field": "submittedBy"
           },
-          "expected": "SCHEDULER_LOOP",
+          "expected": [
+            "SCHEDULER_LOOP"
+          ],
           "requirementRefs": [
             "D26"
           ],
@@ -42301,7 +42334,7 @@
             "caseId": "T26",
             "subcaseId": "orphan-intake-autonomous-loop"
           },
-          "oracleExplanation": "제출 identity는 harness tick이 아니라 scheduler loop의 자연 tick에서 나왔다.",
+          "oracleExplanation": "관찰 창의 첫 제출(operationEvidence의 taskId) 행을 scheduler가 직접 기록한 제출 원행에서 읽으면 제출 주체는 scheduler loop다. 요청 parameter의 되풀이가 아니라 scheduler 기록이며 harness tick이 만든 제출이면 실패한다.",
           "oracleRef": {
             "oracleId": "T26.scheduler-recovery-and-operations",
             "observationNames": [

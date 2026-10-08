@@ -79,15 +79,26 @@ public final class HostObservationValidatorTest {
         for(JsonNode op:schema.path("properties").path("operation").path("enum")) check(capture(op.asText()));
     }
     private String rejectSurface(java.util.function.Consumer<Capture> change) throws Exception {
-        Capture c=capture("enumerateWriteSurface");change.accept(c);
+        Capture c=capture("enumerateWriteSurface");change.accept(c);StepResult result=rebind(c);
+        return assertThrows(IllegalArgumentException.class,()->HostObservationValidator.validate(new ContractValidator(root),c.control,result)).getMessage();
+    }
+    /** Mutated rows are written to a disposable copy so the extractor artifact still matches its bytes. */
+    private StepResult rebind(Capture c) throws Exception {
         ObjectNode rows=(ObjectNode)c.host.path("extractor").path("rawRows");
-        // Mutated rows are written to a disposable copy so the extractor artifact still matches its bytes.
-        Path copy=Files.createTempFile(root.resolve("verification/harness/target"),"enumerate-rows-",".json");Json.write(copy,rows);
+        Path copy=Files.createTempFile(root.resolve("verification/harness/target"),"captured-rows-",".json");Json.write(copy,rows);
         String ref=root.relativize(copy).toString();((ObjectNode)c.host.path("extractor")).put("rawRowsArtifactRef",ref);
         ObjectNode a=Json.object();a.put("path",ref).put("sha256",Json.sha256(copy)).put("sizeBytes",Files.size(copy)).put("completeness","COMPLETE");a.set("scope",Json.parse("{\"workspace\":\"host-selftest\"}"));
+        String old=c.host.path("extractor").path("inputArtifacts").get(0).path("path").asText();
         ((ArrayNode)c.host.path("extractor").path("inputArtifacts")).set(0,a);
+        ArrayNode generated=(ArrayNode)c.host.path("generatedOutputs");
+        for(int i=0;i<generated.size();i++) if(generated.get(i).path("path").asText().equals(old)) generated.set(i,a.deepCopy());
         List<String> refs=new ArrayList<>(c.result.artifactRefs());refs.add(ref);
-        StepResult result=new StepResult(c.result.actionId(),c.result.driverStatus(),c.result.data(),null,c.result.reason(),c.result.provenance(),refs);
+        return new StepResult(c.result.actionId(),c.result.driverStatus(),c.result.data(),null,c.result.reason(),c.result.provenance(),refs);
+    }
+    /** Changes what the scheduler/verifier recorded (rows and the typed identity together) and returns the rejection message. */
+    private String rejectRows(Capture c,java.util.function.Consumer<ObjectNode> change) throws Exception {
+        ObjectNode rows=(ObjectNode)c.host.path("extractor").path("rawRows");change.accept(rows);
+        c.host.set("operationEvidence",rows.path("operationEvidence").deepCopy());StepResult result=rebind(c);
         return assertThrows(IllegalArgumentException.class,()->HostObservationValidator.validate(new ContractValidator(root),c.control,result)).getMessage();
     }
     /** V4 exposed-write-surface: the enumeration contract is defined, and the harness recomputes what the extractor claims. */
@@ -199,6 +210,38 @@ public final class HostObservationValidatorTest {
         Capture trigger=naturalTick("sweepDue","sweepDue-natural-trigger-rows.json");
         assertTrue(assertThrows(IllegalArgumentException.class,()->check(trigger)).getMessage().contains("must not trigger"));
         Capture writable=naturalTick("tickScheduler");((ObjectNode)writable.host.path("extractor")).put("readOnly",false);assertThrows(IllegalArgumentException.class,()->check(writable));
+    }
+    /** Round 4 item 5: the scheduler's own submission rows, not an echo of the watcher's request parameters, carry the evidence. */
+    @Test void naturalTickEvidenceComesFromSchedulerRowsNotRequestEchoes() throws Exception {
+        for(String key:List.of("trigger","triggeredBy","observationWindowSeconds")) {
+            Capture echo=naturalTick("tickScheduler");
+            String message=rejectRows(echo,r->((ObjectNode)r.path("operationEvidence")).set(key,echo.control.path("parameters").path(key).deepCopy()));
+            // The schema already forbids the field; the validator names the echo when a schema would allow it.
+            assertTrue(message.contains("echo") || message.contains(key),key+": "+message);
+        }
+        assertTrue(rejectRows(naturalTick("sweepDue"),r->r.remove("schedulerSubmissions")).contains("schedulerSubmissions"));
+        assertTrue(rejectRows(naturalTick("tickScheduler"),r->((ObjectNode)r.path("schedulerSubmissions").get(0)).remove("submittedBy")).contains("submittedBy"));
+        assertTrue(rejectRows(naturalTick("tickScheduler"),r->((ObjectNode)r.path("schedulerSubmissions").get(0)).put("taskId","another-task")).contains("first scheduler-recorded"));
+        assertTrue(rejectRows(naturalTick("sweepDue"),r->((ObjectNode)r.path("schedulerSubmissions").get(0)).put("sweepId","another-sweep")).contains("first scheduler-recorded"));
+        assertTrue(rejectRows(naturalTick("tickScheduler"),r->((ObjectNode)r.path("schedulerSubmissions").get(0)).put("schedulerId","other-scheduler")).contains("different scheduler"));
+        assertTrue(rejectRows(naturalTick("tickScheduler"),r->((ArrayNode)r.path("schedulerSubmissions")).add(((ObjectNode)r.path("schedulerSubmissions").get(0).deepCopy()).put("submittedAt","2026-10-07T00:00:40Z"))).contains("outside the observation window"));
+        // An earlier extra row means the identity is not the first submission of the window.
+        assertTrue(rejectRows(naturalTick("tickScheduler"),r->((ArrayNode)r.path("schedulerSubmissions")).add(((ObjectNode)r.path("schedulerSubmissions").get(0).deepCopy()).put("taskId","earlier").put("submittedAt","2026-10-07T00:00:01Z"))).contains("first scheduler-recorded"));
+        assertTrue(rejectRows(naturalTick("tickScheduler"),r->{ObjectNode e=(ObjectNode)r.path("operationEvidence");e.remove(List.of("taskId","invocationHandle","submittedAt"));e.put("submissionStatus","NO_TASK");}).contains("NO_TASK"));
+        // NO_TASK with no scheduler row in the window is a valid observation (the case's DB assertions then fail).
+        Capture none=naturalTick("tickScheduler");ObjectNode rows=(ObjectNode)none.host.path("extractor").path("rawRows");
+        ObjectNode e=(ObjectNode)rows.path("operationEvidence");e.remove(List.of("taskId","invocationHandle","submittedAt"));e.put("submissionStatus","NO_TASK");rows.set("schedulerSubmissions",Json.array());
+        none.host.set("operationEvidence",e.deepCopy());StepResult result=rebind(none);
+        HostObservationValidator.validate(new ContractValidator(root),none.control,result);
+    }
+    /** Round 4 item 4: a PREPARATION input names its commit and clean state, recomputed from the bound report bytes. */
+    @Test void preparationInputCarriesCommitAndCleanStateOfReportAndCheckout() throws Exception {
+        for(String key:List.of("codeCommit","workingTreeDirty","checkoutCommit","checkoutDirty"))
+            assertTrue(rejectRows(capture("verifyCoverage"),r->((ObjectNode)r.path("input")).remove(key)).contains(key),key);
+        assertTrue(rejectRows(capture("verifyCoverage"),r->((ObjectNode)r.path("input")).put("codeCommit","d".repeat(40))).contains("differs from the bound preparation report"));
+        assertTrue(rejectRows(capture("verifyCoverage"),r->((ObjectNode)r.path("input")).put("workingTreeDirty",true)).contains("differs from the bound preparation report"));
+        assertTrue(rejectRows(capture("verifyCoverage"),r->((ObjectNode)r.path("input")).put("checkoutDirty","false")).contains("checkoutDirty"));
+        assertTrue(rejectRows(capture("verifyCoverage"),r->((ObjectNode)r.path("input")).put("checkoutCommit","HEAD")).contains("checkoutCommit"));
     }
     private Capture coverage(String kind,java.util.function.Consumer<ObjectNode> change) throws Exception {
         Capture c=capture("verifyCoverage");reshape(c,p->{p.put("inputSnapshotKind",kind);change.accept(p);});return c;

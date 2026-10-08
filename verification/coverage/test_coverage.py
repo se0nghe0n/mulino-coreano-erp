@@ -422,27 +422,62 @@ class CoverageSelftest(unittest.TestCase):
         real = HERE.parents[1]
         a = m.Assembly(real, COMMIT)
         _, observations = a.catalog()
-        a.layer_routes(observations)
+        self.assertEqual([], a.layer_routes(observations), 'no KNOWN_OPEN layer gap remains in the repository')
         self.assertFalse([p for p in a.preparation_problems if 'Layer route' in p['reason']])
-        gaps = {k for k, o in observations.items() if o.get('layerRouteGaps')}
-        self.assertIn(('V4.all-alternate-write-paths', 'mixed-batch-allowed-partial-effects'), gaps)
-        self.assertEqual(4, len(gaps))
+        self.assertFalse({k for k, o in observations.items() if o.get('layerRouteGaps')})
+        # Counterexample copy: drop the MCP leg of V4 mixed-atomic-batch so the gap exists again.
         catalog = json.loads((real / 'verification/requirements/mandatory-oracles.json').read_text())
         for case_id in catalog['requiredCaseIds']:
             (self.root / f'verification/cases/{case_id}').mkdir(parents=True, exist_ok=True)
-            (self.root / f'verification/cases/{case_id}/case.json').write_bytes((real / f'verification/cases/{case_id}/case.json').read_bytes())
+            case = json.loads((real / f'verification/cases/{case_id}/case.json').read_text())
+            for sub in case['subcases']:
+                if sub['id'] == 'mixed-atomic-batch':
+                    sub['actions'] = [x for x in sub['actions'] if not x['id'].startswith('mcp-batch')]
+                    sub['assertions'] = [x for x in sub['assertions'] if not x['id'].startswith('mcp-batch-')]
+            (self.root / f'verification/cases/{case_id}/case.json').write_text(json.dumps(case))
         (self.root / 'verification/requirements').mkdir(parents=True, exist_ok=True)
         for name in ('mandatory-oracles.json', 'check_layer_routes.py'):
             (self.root / 'verification/requirements' / name).write_bytes((real / 'verification/requirements' / name).read_bytes())
         review = json.loads((real / 'verification/requirements/layer-route-review.json').read_text())
-        review['entries'] = [e for e in review['entries'] if e['observationName'] != 'mixed-batch-allowed-partial-effects']
-        review['entries'].append(dict(review['entries'][-1], observationName='closed-gap'))
-        (self.root / 'verification/requirements/layer-route-review.json').write_text(json.dumps(review))
+        known = dict(status='KNOWN_OPEN', oracleId='V4.all-alternate-write-paths', observationName='mixed-batch-allowed-partial-effects',
+                     layer='MCP', owner='V4 case owner (counterexample)', reason='MCP leg removed in this copy', closeWhen='MCP leg restored')
+        target = ('V4.all-alternate-write-paths', 'mixed-batch-allowed-partial-effects')
+        for entries, expect in [(review['entries'] + [known], 'known'), (review['entries'], 'unexplained'),
+                                (review['entries'] + [known, dict(known, observationName='closed-gap')], 'stale')]:
+            with self.subTest(expect=expect):
+                (self.root / 'verification/requirements/layer-route-review.json').write_text(json.dumps(dict(review, entries=entries)))
+                b = m.Assembly(self.root, COMMIT)
+                copied = copy.deepcopy(observations)
+                gaps = b.layer_routes(copied)
+                reasons = [p['reason'] for p in b.preparation_problems if p['status'] == 'FAIL']
+                if expect == 'known':
+                    self.assertEqual([], reasons)
+                    self.assertEqual([target], [k for k, o in copied.items() if o.get('layerRouteGaps')])
+                    self.assertEqual(['layer-routes'], [g['check'] for g in gaps])
+                elif expect == 'unexplained':
+                    self.assertTrue(any('unexplained layer route gap V4' in r for r in reasons), reasons)
+                else:
+                    self.assertTrue(any('stale layer-route review entry' in r for r in reasons), reasons)
+
+    def test_vocabulary_problems_fail_preparation_and_pending_entries_are_listed(self):
+        real = HERE.parents[1]
+        a = m.Assembly(real, COMMIT)
+        gaps = a.vocabulary()
+        self.assertFalse([p for p in a.preparation_problems if 'vocabulary' in p['reason']])
+        self.assertTrue(gaps and all(g['check'] == 'vocabulary' and g['owner'] for g in gaps))
+        # Counterexample copy: a retired audit field name in one case is a preparation failure.
+        (self.root / 'verification/cases').mkdir(parents=True, exist_ok=True)
+        for ref in ('verification/cases/check_vocabulary.py', 'contracts/domain-vocabulary.json', 'contracts/audit-observation-fields.json'):
+            (self.root / ref).parent.mkdir(parents=True, exist_ok=True)
+            (self.root / ref).write_bytes((real / ref).read_bytes())
+        case = {'caseId': 'X01', 'subcases': [{'id': 's', 'actions': [{'id': 'db', 'kind': 'observe'}], 'assertions': [
+            {'id': 'a', 'op': 'count', 'source': {'actionId': 'db', 'pointer': '/data/rawRows/audit', 'where': {'commandKey': 'k'}}, 'expected': 1}]}]}
+        (self.root / 'verification/cases/X01').mkdir(parents=True, exist_ok=True)
+        (self.root / 'verification/cases/X01/case.json').write_text(json.dumps(case))
         b = m.Assembly(self.root, COMMIT)
-        b.layer_routes(copy.deepcopy(observations))
+        b.vocabulary()
         reasons = [p['reason'] for p in b.preparation_problems if p['status'] == 'FAIL']
-        self.assertTrue(any('unexplained layer route gap V4' in r for r in reasons), reasons)
-        self.assertTrue(any('stale layer-route review entry' in r for r in reasons), reasons)
+        self.assertTrue(any('commandKey' in r for r in reasons), reasons)
 
     def test_runner_pass_is_rechecked_against_captured_bytes(self):
         self.assertEqual('PASS', self.captured_run('80')['status'])

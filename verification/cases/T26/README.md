@@ -135,8 +135,12 @@ NOT_IMPLEMENTED 실패4·undefined0·scenario skip0·exit1을 관찰했다.
 - 자율 loop 세 subcase는 harness가 process 재시작과 가상 clock 전진만
   한다. `tickScheduler`/`sweepDue`는 `trigger=OBSERVE_NEXT_NATURAL_TICK`,
   `clockInstant` 없음, 관찰창30초로 다음 자연 tick의 제출만 관찰한다.
-  `triggeredBy=SCHEDULER_LOOP`, scheduler 시작 command 뒤30초 안의 제출
-  (`timeAtMostSeconds`), 독립 DB attempt의 triggeredBy를 함께 본다.
+  scheduler가 직접 기록한 제출 원행(`rawRows.schedulerSubmissions`)에서
+  관찰 창 첫 제출의 `submittedBy=SCHEDULER_LOOP`(`autonomous-trigger-loop`),
+  scheduler 시작 command 뒤30초 안의 제출(`timeAtMostSeconds`), 독립 DB
+  attempt의 triggeredBy를 함께 본다. 요청 parameter `triggeredBy`를
+  `operationEvidence`에 되돌린 값은 증거가 아니며 validator가 거부한다
+  (step2r round 4).
   tick hook만 있고 loop가 없는 구현은 통과할 수 없다(plan §10).
 
 ## 자율 loop와 harness tick의 공존(step2r-cases3)
@@ -164,12 +168,9 @@ scheduler(lot-expiry는 due-sweeper) 시작 command의 `startedAt`이다.
 남은 한계: parallel은 barrier가 아니다. watcher host command가 process
 기동보다 늦게 시작되는 비정상 지연이 있으면 첫 제출을 놓쳐 NO_TASK가
 되고 subcase는 FAIL·NOT_RUN 쪽으로 닫힌다(잘못된 PASS는 없다).
-`pausedUntilTickControl`·`controlledTicks`의 정의를
-`host-observation-guide.md`와 fixture schema에 옮기는 일은 공통 harness
-소유자 몫이다.
-
-이 관찰 의미(observe-only tick)는 host 관찰 계약의 operation 표에 아직
-없다. 공통 harness 소유자가 `host-observation-guide.md`와
-`HostObservationValidator`에 반영해야 실제 adapter가 같은 의미로
-구현된다. 운영 profile이 scheduler loop를 실제로 띄우는지의 배포 검사도
-남은 범위다.
+`pausedUntilTickControl`·`controlledTicks`의 정의, 수동 watcher의
+scheduler 원행 계약과 자율 loop 패턴은 이제 `host-observation-guide.md`
+("자연 tick 수동 관찰", "runtimeProfile과 자율 loop 패턴"), fixture schema,
+`HostObservationValidator.naturalTick`, `ContractValidator.runtimeProfileProblems`
+에 있다(step2r round 4). 운영 profile이 scheduler loop를 실제로 띄우는지의
+배포 검사는 남은 범위다.
