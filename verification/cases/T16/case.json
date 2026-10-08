@@ -3460,6 +3460,53 @@
           ]
         },
         {
+          "id": "pick",
+          "kind": "invoke",
+          "actorRef": "warehouse",
+          "route": "api",
+          "capabilityId": "pickQuantity",
+          "request": {
+            "intentKind": "COMMAND",
+            "definitionVersion": "ontology-v1",
+            "capabilityId": "pickQuantity",
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "subjectRefs": [
+              {
+                "type": "QuantitySegment",
+                "id": {
+                  "$alias": "A20"
+                }
+              }
+            ],
+            "slots": {
+              "allocationId": {
+                "$result": {
+                  "actionId": "reserve",
+                  "pointer": "/response/allocationId"
+                }
+              }
+            },
+            "expectedRevision": {
+              "$result": {
+                "actionId": "reserve",
+                "pointer": "/response/revision"
+              }
+            },
+            "commandIdempotencyKey": "T16-expiry-sweeper-pick",
+            "evidenceRefs": [
+              {
+                "$alias": "operation-proof"
+              }
+            ],
+            "valueProvenance": "USER"
+          },
+          "evidenceRefs": [
+            "pick:actual-adapter-artifact"
+          ]
+        },
+        {
           "id": "reserved-api",
           "kind": "query",
           "actorRef": "warehouse",
@@ -3662,7 +3709,7 @@
             },
             "expectedRevision": {
               "$result": {
-                "actionId": "reserve",
+                "actionId": "pick",
                 "pointer": "/response/revision"
               }
             },
@@ -3790,6 +3837,99 @@
         }
       ],
       "assertions": [
+        {
+          "id": "pick-applied",
+          "op": "equals",
+          "source": {
+            "actionId": "pick",
+            "pointer": "/response/outcome"
+          },
+          "expected": "APPLIED",
+          "requirementRefs": [
+            "D16"
+          ],
+          "evidenceRefs": [
+            "pick:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseKey": "T16-expiry-sweeper"
+          },
+          "oracleExplanation": "만료 전 예약20을 warehouse가 pick한다. 그래서 뒤 출고가 거부되는 이유는 만료뿐이다. pick이 없으면 만료 처리가 없는 제품도 pick 누락(FulfillmentCommands \"Pick before dispatch required\")으로 출고를 거부해 이 subcase를 통과한다.",
+          "oracleRef": {
+            "oracleId": "T16.no-event-expiry",
+            "observationNames": [
+              "boundary-recheck"
+            ]
+          }
+        },
+        {
+          "id": "dispatch-after-sweep-rejected",
+          "op": "equals",
+          "source": {
+            "actionId": "dispatch",
+            "pointer": "/response/outcome"
+          },
+          "expected": "REJECTED",
+          "requirementRefs": [
+            "D16"
+          ],
+          "evidenceRefs": [
+            "dispatch:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseKey": "T16-expiry-sweeper"
+          },
+          "oracleExplanation": "sweeper가 만료 경계에서 예약을 SUSPENDED로 바꿨으므로 pick된 예약의 출고도 거부되고 이유는 INSUFFICIENT_ELIGIBLE_QUANTITY다(FulfillmentCommands \"Suspended allocation cannot execute\"). pick 누락의 TYPE_INVALID가 아니다.",
+          "oracleRef": {
+            "oracleId": "T16.no-event-expiry",
+            "observationNames": [
+              "boundary-recheck"
+            ]
+          }
+        },
+        {
+          "id": "dispatch-after-sweep-code",
+          "op": "equals",
+          "source": {
+            "actionId": "dispatch",
+            "pointer": "/response/error/code"
+          },
+          "expected": "INSUFFICIENT_ELIGIBLE_QUANTITY",
+          "requirementRefs": [
+            "D16"
+          ],
+          "evidenceRefs": [
+            "dispatch:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseKey": "T16-expiry-sweeper"
+          },
+          "oracleExplanation": "sweeper가 만료 경계에서 예약을 SUSPENDED로 바꿨으므로 pick된 예약의 출고도 거부되고 이유는 INSUFFICIENT_ELIGIBLE_QUANTITY다(FulfillmentCommands \"Suspended allocation cannot execute\"). pick 누락의 TYPE_INVALID가 아니다.",
+          "oracleRef": {
+            "oracleId": "T16.no-event-expiry",
+            "observationNames": [
+              "boundary-recheck"
+            ]
+          }
+        },
         {
           "id": "allocation-after-boundary-1",
           "op": "equals",
@@ -4513,6 +4653,53 @@
           ]
         },
         {
+          "id": "pick",
+          "kind": "invoke",
+          "actorRef": "warehouse",
+          "route": "api",
+          "capabilityId": "pickQuantity",
+          "request": {
+            "intentKind": "COMMAND",
+            "definitionVersion": "ontology-v1",
+            "capabilityId": "pickQuantity",
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "subjectRefs": [
+              {
+                "type": "QuantitySegment",
+                "id": {
+                  "$alias": "A20"
+                }
+              }
+            ],
+            "slots": {
+              "allocationId": {
+                "$result": {
+                  "actionId": "reserve",
+                  "pointer": "/response/allocationId"
+                }
+              }
+            },
+            "expectedRevision": {
+              "$result": {
+                "actionId": "reserve",
+                "pointer": "/response/revision"
+              }
+            },
+            "commandIdempotencyKey": "T16-expiry-delayed-sweep-pick",
+            "evidenceRefs": [
+              {
+                "$alias": "operation-proof"
+              }
+            ],
+            "valueProvenance": "USER"
+          },
+          "evidenceRefs": [
+            "pick:actual-adapter-artifact"
+          ]
+        },
+        {
           "id": "reserved-api",
           "kind": "query",
           "actorRef": "warehouse",
@@ -4678,7 +4865,7 @@
             },
             "expectedRevision": {
               "$result": {
-                "actionId": "reserve",
+                "actionId": "pick",
                 "pointer": "/response/revision"
               }
             },
@@ -4969,6 +5156,37 @@
         }
       ],
       "assertions": [
+        {
+          "id": "pick-applied",
+          "op": "equals",
+          "source": {
+            "actionId": "pick",
+            "pointer": "/response/outcome"
+          },
+          "expected": "APPLIED",
+          "requirementRefs": [
+            "D16"
+          ],
+          "evidenceRefs": [
+            "pick:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseKey": "T16-expiry-delayed-sweep"
+          },
+          "oracleExplanation": "만료 전 예약20을 warehouse가 pick한다. 그래서 뒤 출고가 거부되는 이유는 만료뿐이다. pick이 없으면 만료 처리가 없는 제품도 pick 누락(FulfillmentCommands \"Pick before dispatch required\")으로 출고를 거부해 이 subcase를 통과한다.",
+          "oracleRef": {
+            "oracleId": "T16.no-event-expiry",
+            "observationNames": [
+              "boundary-recheck"
+            ]
+          }
+        },
         {
           "id": "boundary-recheck-1",
           "op": "equals",

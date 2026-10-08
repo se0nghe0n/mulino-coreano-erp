@@ -91,6 +91,7 @@
     만일 "warehouse" 역할이 "before-api" 행동을 수행한다
     만일 "시스템" 역할이 "before-db" 행동을 수행한다
     만일 "sales" 역할이 "reserve" 행동을 수행한다
+    만일 "warehouse" 역할이 "pick" 행동을 수행한다
     만일 "warehouse" 역할이 "reserved-api" 행동을 수행한다
     만일 "시스템" 역할이 "reserved-db" 행동을 수행한다
     만일 "시스템" 역할이 "advance" 행동을 수행한다
@@ -100,6 +101,9 @@
     만일 "warehouse" 역할이 "after-api" 행동을 수행한다
     만일 "시스템" 역할이 "after-db" 행동을 수행한다
     만일 "sales" 역할이 "expiry-obligations" 행동을 수행한다
+    그러면 "pick-applied" assertion으로 "만료 전 예약20 warehouse pick = APPLIED, 출고 거부 이유는 만료뿐"를 확인한다
+    그러면 "dispatch-after-sweep-rejected" assertion으로 "sweep 뒤 pick된 예약20 출고 = REJECTED"를 확인한다
+    그러면 "dispatch-after-sweep-code" assertion으로 "거부 code = INSUFFICIENT_ELIGIBLE_QUANTITY"를 확인한다
     그러면 "allocation-after-boundary-1" assertion으로 "독립 원 행의 실물·수량·관계·범위를 정확히 대조한다."를 확인한다
     그러면 "post-expiry-dispatched-2" assertion으로 "실물량·단위와 독립 손계산을 대조한다."를 확인한다
     그러면 "post-expiry-dispatched-3" assertion으로 "독립 원 행의 실물·수량·관계·범위를 정확히 대조한다."를 확인한다
@@ -121,6 +125,7 @@
     만일 "warehouse" 역할이 "before-api" 행동을 수행한다
     만일 "시스템" 역할이 "before-db" 행동을 수행한다
     만일 "sales" 역할이 "reserve" 행동을 수행한다
+    만일 "warehouse" 역할이 "pick" 행동을 수행한다
     만일 "warehouse" 역할이 "reserved-api" 행동을 수행한다
     만일 "시스템" 역할이 "reserved-db" 행동을 수행한다
     만일 "시스템" 역할이 "sweep-delay" 행동을 수행한다
@@ -134,6 +139,7 @@
     만일 "warehouse" 역할이 "after-api" 행동을 수행한다
     만일 "시스템" 역할이 "after-db" 행동을 수행한다
     만일 "sales" 역할이 "expiry-obligations" 행동을 수행한다
+    그러면 "pick-applied" assertion으로 "만료 전 예약20 warehouse pick = APPLIED, 출고 거부 이유는 만료뿐"를 확인한다
     그러면 "boundary-recheck-1" assertion으로 "공개 명령의 구조화 outcome을 확인한다."를 확인한다
     그러면 "boundary-recheck-2" assertion으로 "응답의 구조화 오류 코드 /response/error/code가 INSUFFICIENT_ELIGIBLE_QUANTITY다(계획 §3.4, contracts/command-response.schema.json)."를 확인한다
     그러면 "post-expiry-dispatched-3" assertion으로 "명령 효과 scope에서 생성된 업무 원 행 수가0이다. 감사는 별도로 확인한다."를 확인한다

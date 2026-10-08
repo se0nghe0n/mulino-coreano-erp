@@ -68,12 +68,18 @@ final class StepTwoRoundNineRegressionTest {
         rejects("no earlier pickQuantity names that allocation",pick("T13",T13,s->{ArrayNode a=(ArrayNode)s.path("actions");ObjectNode p=action(s,"pick");drop(s,"actions","pick");
             a.insert(ids(s).indexOf("dispatch-sale")+1,p);}));
         rejects("an action before pick pick",pick("T13",T13,s->((ObjectNode)action(s,"dispatch-sale").path("request")).set("expectedRevision",result("reserve","/response/revision"))));
-        rejects("whose outcome the subcase pins to REJECTED",pick("T05",T05,s->assertion(s,"pick-before-dispatch-applied").put("expected","REJECTED")));
-        // A dispatch negative (only its outcome/error pinned, nothing reads its result) needs no pick: T05 with the dispatch pinned
-        // REJECTED and without the two holds that read its remainingSegmentId (T26's expiry guards are such negatives).
+        rejects("whose outcome the subcase pins to a value other than APPLIED",pick("T05",T05,s->assertion(s,"pick-before-dispatch-applied").put("expected","REJECTED")));
+        // An unpicked dispatch that nothing reads is a negative only when it pins a non-APPLIED outcome and an error code the
+        // product returns before the pick check (round 9 follow-up): T05 with the dispatch pinned REJECTED and without the two
+        // holds that read its remainingSegmentId fails until it also pins such a code (here FORBIDDEN), TYPE_INVALID does not count.
         Consumer<ObjectNode> negative=s->{drop(s,"actions","pick");drop(s,"assertions","pick-before-dispatch-applied");
             assertion(s,"ordinary-authorized-dispatch-after-confirmation-17").put("expected","REJECTED");};
-        assertEquals(List.of(),pick("T05",T05,negative.andThen(s->{drop(s,"actions","independent-qc");drop(s,"actions","independent-recall");})));
+        Consumer<ObjectNode> unread=s->{drop(s,"actions","independent-qc");drop(s,"actions","independent-recall");};
+        java.util.function.Function<String,Consumer<ObjectNode>> code=value->s->{ObjectNode x=assertion(s,"ordinary-authorized-dispatch-after-confirmation-17").deepCopy();
+            x.put("id","dispatch-code").put("expected",value);((ObjectNode)x.path("source")).put("pointer","/response/error/code");((ArrayNode)s.path("assertions")).add(x);};
+        rejects("is never picked, and the subcase does not pin",pick("T05",T05,negative.andThen(unread)));
+        rejects("is never picked, and the subcase does not pin",pick("T05",T05,negative.andThen(unread).andThen(code.apply("TYPE_INVALID"))));
+        assertEquals(List.of(),pick("T05",T05,negative.andThen(unread).andThen(code.apply("FORBIDDEN"))));
         // ... while a later action that uses its result still makes the dispatch one that must apply.
         rejects("no earlier pickQuantity names that allocation",pick("T05",T05,negative));
         // What the cases now say: the picker holds pickQuantity in role and grant, the pick sits between reserve and dispatch,
@@ -87,6 +93,64 @@ final class StepTwoRoundNineRegressionTest {
             JsonNode actor=Json.read(root.resolve(s.path("fixtureRef").asText())).path("actors").path(c[2]);
             assertTrue(actor.path("roleCapabilities").toString().contains("\"pickQuantity\"") && actor.path("grant").path("actions").toString().contains("\"pickQuantity\""),c[0]);
         }
+    }
+
+    // Round 9 follow-up: an installed (fixture) allocation is dispatched only when the fixture declares it picked; expiry
+    // negatives pick first and pin the guard's code, so a product without the guard cannot pass for the missing pick alone.
+    private List<String> pickWithFixture(String caseId,String subId,Consumer<ObjectNode> changeSub,Consumer<ObjectNode> changeFixture) throws Exception {
+        JsonNode c=caseJson(caseId);ObjectNode s=sub(c,subId).deepCopy();changeSub.accept(s);
+        ObjectNode fixture=(ObjectNode)Json.read(root.resolve(s.path("fixtureRef").asText()));changeFixture.accept(fixture);
+        Path p=Files.createTempFile(root.resolve("verification/harness/target"),"round9-fixture-",".json");Json.write(p,fixture);
+        s.put("fixtureRef",root.relativize(p).toString());
+        return new ContractValidator(root).pickBeforeDispatchProblems(only(c,s));
+    }
+    private static void unpick(JsonNode node) {
+        if(node.isObject()) {((ObjectNode)node).remove(List.of("pickedAt","pickedByAlias"));for(JsonNode v:node) unpick(v);}
+        else if(node.isArray()) for(JsonNode v:node) unpick(v);
+    }
+    private static void eachPicked(JsonNode node,Consumer<ObjectNode> change) {
+        if(node.isObject()) {if(node.has("pickedAt")) change.accept((ObjectNode)node);for(JsonNode v:node) eachPicked(v,change);}
+        else if(node.isArray()) for(JsonNode v:node) eachPicked(v,change);
+    }
+    @Test void fixtureAllocationsArePickedAndExpiryNegativesOnlyFailForTheExpiry() throws Exception {
+        // The follow-up shapes: every fixture-allocation dispatch (T04 rollback, T24 audit/retry, C3 authorized, V3 races, V7
+        // revocation, T08, C1) without a declared pick.
+        String[][] fixtureCases={{"T04","rollback-afterMovementBeforeAllocation"},{"T24","audit-rollback-and-retry"},{"C3","api-dispatchQuantity"},{"V3","dispatch-first"},
+            {"V3","hold-first"},{"V7","authorization-effect-first"},{"V7","restart-after-revoke"},{"T08","revoke-grant"},{"C1","revoked-basis"}};
+        for(String[] c:fixtureCases) {
+            assertEquals(List.of(),pickWithFixture(c[0],c[1],NONE,NONE),c[0]+"/"+c[1]);
+            rejects("has no picked state",pickWithFixture(c[0],c[1],NONE,StepTwoRoundNineRegressionTest::unpick));
+        }
+        rejects("is after the fixture clock knownAt",pickWithFixture("T04","rollback-afterMovementBeforeAllocation",NONE,f->eachPicked(f,x->x.put("pickedAt","2026-10-08T00:00:00Z"))));
+        rejects("is not an ISO-8601 instant",pickWithFixture("T04","rollback-afterMovementBeforeAllocation",NONE,f->eachPicked(f,x->x.put("pickedAt","yesterday"))));
+        rejects("which is not a fixture actor",pickWithFixture("T04","rollback-afterMovementBeforeAllocation",NONE,f->eachPicked(f,x->x.put("pickedByAlias","nobody"))));
+        // A picked fixture allocation picked again: the product answers 'Allocation already picked'.
+        rejects("rejects a second pick",pickWithFixture("T04","rollback-afterMovementBeforeAllocation",s->{ObjectNode p=Json.object();p.put("id","pick-again").put("kind","invoke").put("actorRef","warehouse").put("capabilityId","pickQuantity");
+            ObjectNode r=Json.object();r.put("capabilityId","pickQuantity");r.set("allocationId",Json.parse("{\"$alias\":\"ALLOC\"}"));p.set("request",r);
+            ((ArrayNode)s.path("actions")).insert(ids(s).indexOf("dispatch"),p);},NONE));
+        // An explicit pick action of an unpicked fixture allocation is the other accepted form.
+        assertEquals(List.of(),pickWithFixture("T04","rollback-afterMovementBeforeAllocation",s->{ObjectNode p=Json.object();p.put("id","pick").put("kind","invoke").put("actorRef","warehouse").put("capabilityId","pickQuantity");
+            ObjectNode r=Json.object();r.put("capabilityId","pickQuantity");r.set("allocationId",Json.parse("{\"$alias\":\"ALLOC\"}"));p.set("request",r);
+            ((ArrayNode)s.path("actions")).insert(ids(s).indexOf("dispatch"),p);},StepTwoRoundNineRegressionTest::unpick));
+        // T26 expiry guards and T16 expiry-sweeper: without the pick and the guard code a guard-less product passes; with the code
+        // alone (a code the product returns before the pick check) the negative still discriminates.
+        String[] guards={"lot-expiry-no-event","lot-expiry-delayed-guard","disposition-expiry-no-event","disposition-expiry-delayed-guard","grant-expiry-no-event",
+            "grant-expiry-delayed-guard","policy-expiry-no-event","policy-expiry-delayed-guard","lot-expiry-autonomous-loop"};
+        for(String g:guards) {
+            ObjectNode s=sub(caseJson("T26"),g);List<String> order=ids(s);
+            assertTrue(order.indexOf("reserve")<order.indexOf("pick") && order.indexOf("pick")<order.indexOf("advance"),g+": picked before the expiry boundary");
+            assertEquals("APPLIED",assertion(s,"guard-pick-applied").path("expected").asText(),g);
+            assertEquals(g.startsWith("grant")?"FORBIDDEN":"INSUFFICIENT_ELIGIBLE_QUANTITY",assertion(s,"guard-code").path("expected").asText(),g);
+            assertEquals("pick",action(s,"dispatch").at("/request/expectedRevision/$result/actionId").asText(),g);
+            assertTrue(Json.read(root.resolve(s.path("fixtureRef").asText())).at("/actors/warehouse/grant/actions").toString().contains("\"pickQuantity\""),g);
+            rejects("is never picked, and the subcase does not pin",pick("T26",g,x->{drop(x,"actions","pick");drop(x,"assertions","guard-pick-applied");drop(x,"assertions","guard-code");}));
+            assertEquals(List.of(),pick("T26",g,x->{drop(x,"actions","pick");drop(x,"assertions","guard-pick-applied");}));
+        }
+        rejects("is never picked, and the subcase does not pin",pick("T16","expiry-sweeper",x->{drop(x,"actions","pick");for(String a:List.of("pick-applied","dispatch-after-sweep-rejected","dispatch-after-sweep-code")) drop(x,"assertions",a);}));
+        ObjectNode t16=sub(caseJson("T16"),"expiry-sweeper");
+        assertEquals("INSUFFICIENT_ELIGIBLE_QUANTITY",assertion(t16,"dispatch-after-sweep-code").path("expected").asText());
+        assertEquals("pick",action(t16,"dispatch").at("/request/expectedRevision/$result/actionId").asText());
+        assertEquals("APPLIED",assertion(sub(caseJson("T16"),"expiry-delayed-sweep"),"pick-applied").path("expected").asText());
     }
 
     // P3 (a): a slot custodian that is no actor of the confirming organization is REJECTED FORBIDDEN, before SCOPE_INELIGIBLE.

@@ -397,42 +397,87 @@ public final class ContractValidator {
     /** Fulfilment capabilities whose order the product enforces (FulfillmentCommands, step2r round 9). */
     static final String PICK="pickQuantity",DISPATCH="dispatchQuantity";
     /**
-     * Pick before dispatch (step2r round 9, Step 2 closure review 6 P2). The product (FulfillmentCommands.prepare and
-     * FulfillmentStockPrimitives.dispatch, read only) rejects dispatchQuantity with INVALID 'Pick before dispatch required'
-     * when the allocation has no pickedAt; only pickQuantity (FulfillmentStockPrimitives.pick) sets it, and it increments the
-     * allocation revision. The adapter never creates a pick (harness-guide.md). So a dispatchQuantity whose allocationId is
-     * the $result of an earlier action of the subcase (a runtime allocation: reserveQuantity, replaceAllocation, or a split
-     * returning allocations) and that is expected to apply (its /response/outcome is pinned APPLIED, or a later action or an
-     * assertion reads another part of its result) needs an earlier pickQuantity naming the same $result (actionId and
-     * pointer) whose outcome is not pinned to anything but APPLIED, and an expectedRevision that is not the $result of an
-     * action before that pick (the pre-pick revision is stale). Fixture allocations ($alias) are installed state, not checked.
+     * Error codes FulfillmentCommands.prepare returns for a dispatch before it reaches the pick check (line 38: stale or
+     * terminal allocation, scope authorization, suspended allocation or current sale permission, warehouse custody) and the
+     * gateway's unsupported-version answer. A negative that pins one of these is decided before the missing pick matters.
      */
-    public List<String> pickBeforeDispatchProblems(JsonNode caseFile) {
+    static final Set<String> PRE_PICK_DISPATCH_CODES=Set.of("STALE_REVISION","FORBIDDEN","INSUFFICIENT_ELIGIBLE_QUANTITY","SCOPE_INELIGIBLE","VERSION_UNSUPPORTED");
+    /**
+     * Pick before dispatch (step2r round 9, Step 2 closure review 6 P2 and its follow-up). The product (FulfillmentCommands.prepare
+     * and FulfillmentStockPrimitives.dispatch, read only) rejects dispatchQuantity with INVALID 'Pick before dispatch required'
+     * when the allocation has no pickedAt; only pickQuantity (FulfillmentStockPrimitives.pick) sets it, rejects a second pick
+     * ('Allocation already picked') and increments the allocation revision. The adapter never creates a pick (harness-guide.md).
+     * For every dispatchQuantity of a subcase:
+     * - a fixture allocation ($alias of an Allocation) is installed state: the fixture declares it picked (pickedAt, not after
+     *   the fixture clock knownAt, and pickedByAlias naming a fixture actor, beside its state: alias, baseline.priorEntities,
+     *   baseline.allocations or baseline.allocation row) or an earlier pickQuantity of the subcase picks it; a declared pick
+     *   followed by another pick that is not pinned to fail is a problem;
+     * - a runtime allocation (the $result of an earlier action) that is expected to apply (outcome pinned APPLIED, or a later
+     *   action or an assertion reads another part of its result) needs an earlier pickQuantity naming the same $result;
+     * - an unpicked runtime allocation that is not expected to apply is a negative only when its outcome is pinned to a
+     *   non-APPLIED value and its error code to one of PRE_PICK_DISPATCH_CODES; otherwise a product without the rule under
+     *   test also rejects it, for the missing pick alone, and the subcase cannot tell them apart;
+     * - an earlier pick must not be pinned to an outcome other than APPLIED, and the dispatch expectedRevision must not be the
+     *   $result of an action before the pick (the pre-pick revision is stale).
+     * Pins of an asynchronous dispatch (a start call) are the assertions on its await action.
+     */
+    public List<String> pickBeforeDispatchProblems(JsonNode caseFile) throws IOException {
         List<String> problems=new ArrayList<>();
         for(JsonNode sub:caseFile.path("subcases")) {
             String where=caseFile.path("caseId").asText()+"/"+sub.path("id").asText();
             List<JsonNode> all=new ArrayList<>();collect(sub.path("actions"),all);
             List<JsonNode> actions=new ArrayList<>();for(JsonNode a:all) {actions.add(a);if(a.has("call")) actions.add(a.path("call"));}
             Map<String,Integer> index=new HashMap<>();for(int i=0;i<actions.size();i++) index.putIfAbsent(actions.get(i).path("id").asText(),i);
+            Map<String,Set<String>> pinIds=new HashMap<>();
+            for(JsonNode a:actions) if(a.has("call")) pinIds.computeIfAbsent(a.path("call").path("id").asText(),k->new HashSet<>()).add(a.path("id").asText());
+            Map<String,Set<String>> awaits=new HashMap<>();
+            for(JsonNode a:actions) if(a.path("kind").asText().equals("await")) for(var e:pinIds.entrySet()) if(e.getValue().contains(a.path("awaitActionId").asText())) awaits.computeIfAbsent(e.getKey(),k->new HashSet<>()).add(a.path("id").asText());
+            String ref=sub.path("fixtureRef").asText();
+            ObjectNode aliases=Json.object(),actors=Json.object();ArrayNode ignored=Json.array();Map<String,List<JsonNode>> declared=new HashMap<>();JsonNode clock=Json.object();
+            if(!ref.isBlank() && Files.isRegularFile(path(ref))) {mergeFixture(ref,new HashSet<>(),aliases,actors,ignored);allocationDeclarations(ref,new HashSet<>(),declared);clock=Json.read(path(ref)).path("clock");}
             for(int i=0;i<actions.size();i++) {
                 JsonNode d=actions.get(i);if(!DISPATCH.equals(capabilityOf(d))) continue;
-                List<JsonNode> allocation=resultNodes(allocationSlot(d));
-                if(allocation.size()!=1) continue;
-                String source=allocation.get(0).path("actionId").asText(),pointer=allocation.get(0).path("pointer").asText(),id=d.path("id").asText();
-                Integer produced=index.get(source);
-                if(produced==null || produced>=i || !expectedToApply(sub,actions,i,id)) continue;
+                String id=d.path("id").asText();JsonNode slot=allocationSlot(d);
+                Set<String> pinSources=new HashSet<>(Set.of(id));pinSources.addAll(awaits.getOrDefault(id,Set.of()));
+                String fixtureAllocation=slotAlias(slot);
+                List<JsonNode> runtime=resultNodes(slot);
+                if(fixtureAllocation==null && runtime.size()!=1) continue;
+                String source=fixtureAllocation==null?runtime.get(0).path("actionId").asText():null,pointer=fixtureAllocation==null?runtime.get(0).path("pointer").asText():null;
+                Integer produced=source==null?Integer.valueOf(-1):index.get(source);
+                if(fixtureAllocation!=null && !aliases.path(fixtureAllocation).path("type").asText().equals("Allocation")) continue;
+                if(produced==null || produced>=i) continue;
                 int pick=-1;
-                for(int k=produced+1;k<i;k++) if(PICK.equals(capabilityOf(actions.get(k))))
-                    for(JsonNode r:resultNodes(allocationSlot(actions.get(k)))) if(r.path("actionId").asText().equals(source) && r.path("pointer").asText().equals(pointer)) pick=k;
-                String what=where+"/"+id+": dispatchQuantity of the runtime allocation "+source+pointer+" ("+capabilityOf(actions.get(produced))+")";
-                if(pick<0) {
-                    problems.add(what+" is expected to apply, but no earlier pickQuantity names that allocation; the product rejects it 'Pick before dispatch required' (FulfillmentCommands) and the adapter never creates a pick, so the case inserts an explicit, authorized pick");
+                for(int k=produced+1;k<i;k++) if(PICK.equals(capabilityOf(actions.get(k)))) {
+                    JsonNode named=allocationSlot(actions.get(k));
+                    if(fixtureAllocation!=null) {if(fixtureAllocation.equals(slotAlias(named))) pick=k;}
+                    else for(JsonNode r:resultNodes(named)) if(r.path("actionId").asText().equals(source) && r.path("pointer").asText().equals(pointer)) pick=k;
+                }
+                String what=where+"/"+id+": dispatchQuantity of the "+(fixtureAllocation!=null?"fixture allocation "+fixtureAllocation:"runtime allocation "+source+pointer+" ("+capabilityOf(actions.get(produced))+")");
+                boolean fixturePicked=false;
+                if(fixtureAllocation!=null) {
+                    for(JsonNode row:declared.getOrDefault(fixtureAllocation,List.of())) if(row.has("pickedAt")) {
+                        fixturePicked=true;
+                        java.time.Instant at=null;try {at=java.time.Instant.parse(row.path("pickedAt").asText());} catch(RuntimeException bad) {problems.add(what+": fixture pickedAt "+row.path("pickedAt")+" is not an ISO-8601 instant");}
+                        if(at!=null && clock.path("knownAt").isTextual() && at.isAfter(java.time.Instant.parse(clock.path("knownAt").asText()))) problems.add(what+": fixture pickedAt "+at+" is after the fixture clock knownAt "+clock.path("knownAt").asText()+"; an installed pick is a past fact");
+                        String by=row.path("pickedByAlias").asText(null);
+                        if(by==null || !actors.has(by)) problems.add(what+": fixture pick names pickedByAlias "+by+", which is not a fixture actor; an installed pick records who picked");
+                    }
+                    if(!fixturePicked && pick<0) {problems.add(what+" has no picked state: the fixture declares no pickedAt (with pickedByAlias) for it and no earlier pickQuantity picks it, so the product rejects it 'Pick before dispatch required' before the behaviour the subcase tests");continue;}
+                    if(fixturePicked && pick>=0 && !pinnedTo(sub,Set.of(actions.get(pick).path("id").asText()),"/response/outcome",v->!v.equals("APPLIED")))
+                        problems.add(what+" is picked in the fixture and again by "+actions.get(pick).path("id").asText()+"; the product rejects a second pick ('Allocation already picked')");
+                } else if(pick<0) {
+                    if(expectedToApply(sub,actions,i,pinSources)) {
+                        problems.add(what+" is expected to apply, but no earlier pickQuantity names that allocation; the product rejects it 'Pick before dispatch required' (FulfillmentCommands) and the adapter never creates a pick, so the case inserts an explicit, authorized pick");
+                    } else if(!pinnedTo(sub,pinSources,"/response/outcome",v->!v.equals("APPLIED")) || !pinnedTo(sub,pinSources,"/response/error/code",PRE_PICK_DISPATCH_CODES::contains)) {
+                        problems.add(what+" is never picked, and the subcase does not pin a non-APPLIED outcome with an error code the product returns before the pick check "+new TreeSet<>(PRE_PICK_DISPATCH_CODES)
+                            +"; a product without the rule under test rejects it for the missing pick alone, so pick it first and pin the expected code");
+                    }
                     continue;
                 }
+                if(pick<0) continue;
                 String pickId=actions.get(pick).path("id").asText();
-                for(JsonNode x:sub.path("assertions")) if(x.path("op").asText().equals("equals") && x.path("source").path("actionId").asText().equals(pickId)
-                        && x.path("source").path("pointer").asText().equals("/response/outcome") && !x.path("expected").asText().equals("APPLIED"))
-                    problems.add(what+" relies on pick "+pickId+", whose outcome the subcase pins to "+x.path("expected").asText()+"; a refused pick leaves the allocation unpicked");
+                if(!fixturePicked && pinnedTo(sub,Set.of(pickId),"/response/outcome",v->!v.equals("APPLIED")))
+                    problems.add(what+" relies on pick "+pickId+", whose outcome the subcase pins to a value other than APPLIED; a refused pick leaves the allocation unpicked");
                 for(JsonNode r:resultNodes(d.path("request").path("expectedRevision"))) {
                     Integer at=index.get(r.path("actionId").asText());
                     if(at!=null && at<pick) problems.add(what+" sends expectedRevision from "+r.path("actionId").asText()+", an action before pick "+pickId
@@ -442,19 +487,35 @@ public final class ContractValidator {
         }
         return problems;
     }
+    /** Every declaration of a fixture allocation (alias entry, baseline.priorEntities entry, baseline.allocations/allocation row), baseRefs first. */
+    private void allocationDeclarations(String ref,Set<String> visiting,Map<String,List<JsonNode>> out) throws IOException {
+        if(ref.isBlank() || !visiting.add(ref) || !Files.isRegularFile(path(ref))) return;
+        JsonNode fixture=Json.read(path(ref));
+        for(JsonNode base:fixture.path("baseRefs")) allocationDeclarations(base.asText(),visiting,out);
+        fixture.path("aliases").fields().forEachRemaining(e->{if(e.getValue().path("type").asText().equals("Allocation")) out.computeIfAbsent(e.getKey(),k->new ArrayList<>()).add(e.getValue());});
+        fixture.path("baseline").path("priorEntities").fields().forEachRemaining(e->out.computeIfAbsent(e.getKey(),k->new ArrayList<>()).add(e.getValue()));
+        for(String key:List.of("allocations","allocation")) for(JsonNode row:fixture.path("baseline").path(key)) if(row.path("alias").isTextual()) out.computeIfAbsent(row.path("alias").asText(),k->new ArrayList<>()).add(row);
+    }
+    private static boolean pinnedTo(JsonNode sub,Set<String> actionIds,String pointer,java.util.function.Predicate<String> value) {
+        for(JsonNode x:sub.path("assertions")) if(x.path("op").asText().equals("equals") && actionIds.contains(x.path("source").path("actionId").asText())
+                && x.path("source").path("pointer").asText().equals(pointer) && x.path("expected").isTextual() && value.test(x.path("expected").asText())) return true;
+        return false;
+    }
     private static String capabilityOf(JsonNode a) {return a.path("capabilityId").asText(a.path("request").path("capabilityId").asText());}
     private static JsonNode allocationSlot(JsonNode a) {
         JsonNode slot=a.path("request").path("slots").path("allocationId");
         return slot.isMissingNode()?a.path("request").path("allocationId"):slot;
     }
-    /** A dispatch is expected to apply when its outcome is pinned APPLIED, or a later action or an assertion reads another part of its result. */
-    private static boolean expectedToApply(JsonNode sub,List<JsonNode> actions,int at,String id) {
+    /** A dispatch is expected to apply when its outcome is pinned APPLIED (on it or its await), or a later action or an assertion reads another part of its result. */
+    private static boolean expectedToApply(JsonNode sub,List<JsonNode> actions,int at,Set<String> ids) {
         java.util.function.Predicate<String> effect=p->!p.equals("/response/outcome") && !p.startsWith("/response/error");
+        String id=actions.get(at).path("id").asText();
         for(JsonNode x:sub.path("assertions")) {
             JsonNode s=x.path("source");String op=x.path("op").asText();
-            if(s.path("actionId").asText().equals(id)) {
-                if(s.path("pointer").asText().equals("/response/outcome")) {if(op.equals("equals") && x.path("expected").asText().equals("APPLIED")) return true;}
-                else if(effect.test(s.path("pointer").asText()) && !Set.of("absent","notEquals").contains(op)) return true;
+            if(ids.contains(s.path("actionId").asText())) {
+                String p=s.path("pointer").asText();
+                if(p.equals("/response/outcome")) {if(op.equals("equals") && x.path("expected").asText().equals("APPLIED")) return true;}
+                else if(p.startsWith("/response/") && effect.test(p) && !Set.of("absent","notEquals").contains(op)) return true;
             }
             for(JsonNode r:resultNodes(x)) if(r.path("actionId").asText().equals(id) && effect.test(r.path("pointer").asText())) return true;
         }

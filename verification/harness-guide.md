@@ -126,18 +126,31 @@ exit code를 출력하며 `verification/harness/target/wrapper-commands.json`에
     `/data/rawRows/segments`나 `/data/rawRows/receipts`의 count 0으로 효과
     0을 단언한다. 그 수령의 결과를 뒤에서 쓰지 않는다. 이 field는 harness
     선언이며 제품에 보내지 않는다. 예: E1 `receipt-custody-unverified`.
-  - **pick 뒤 출고**: `ContractValidator.pickBeforeDispatchProblems`가 실행 중
-    만든 배분(앞선 action의 `$result`인 allocationId: reserveQuantity·
-    replaceAllocation·배분을 돌려주는 split)의 dispatchQuantity가 적용될 것으로
-    기대되면(`/response/outcome` APPLIED 고정, 또는 뒤의 action·assertion이
-    결과의 다른 부분을 읽음) 같은 `$result`(actionId·pointer)를 지명하는 앞선
-    pickQuantity를 요구한다. 제품은 pickedAt 없는 배분의 출고를 INVALID
-    'Pick before dispatch required'로 거부하고(`FulfillmentCommands`), pick만
-    pickedAt을 기록하며 배분 revision을 올린다. adapter는 pick을 만들지
-    않는다(아래 "adapter가 … 암묵적으로 생성하지 않는다"). 그 pick의 outcome을
-    APPLIED 밖 값으로 고정하면 안 되고, 출고의 expectedRevision이 pick보다
-    앞선 action의 `$result`이면 stale revision이라 문제다. fixture 배분
-    (`$alias`)은 설치 상태라 이 규칙 밖이다(step2r round 9).
+  - **pick 뒤 출고**: `ContractValidator.pickBeforeDispatchProblems`가 모든
+    dispatchQuantity의 pick 상태를 검사한다(step2r round 9). 제품은 pickedAt
+    없는 배분의 출고를 INVALID 'Pick before dispatch required'로 거부하고
+    (`FulfillmentCommands`), pick만 pickedAt을 기록하며 두 번째 pick은
+    'Allocation already picked'로 거부하고 배분 revision을 올린다. adapter는
+    pick을 만들지 않는다(아래 "adapter가 … 암묵적으로 생성하지 않는다").
+    - fixture 배분(`$alias`의 Allocation)은 설치 상태다. fixture가 그 배분의
+      state를 적은 자리(alias, `baseline.priorEntities`, `baseline.allocations`/
+      `allocation` 행)에 `pickedAt`(fixture clock knownAt 이전의 ISO instant)과
+      `pickedByAlias`(fixture actor)를 선언하거나, 앞선 pickQuantity가 그
+      alias를 pick해야 한다. 선언된 pick 뒤에 실패로 고정하지 않은 pick이 또
+      있으면 문제다. FixtureInstaller가 pickedAt을 설치한다(Step 3).
+    - 실행 중 배분(앞선 action의 `$result`)의 출고가 적용될 것으로 기대되면
+      (`/response/outcome` APPLIED 고정, 또는 뒤의 action·assertion이 결과의
+      다른 부분을 읽음) 같은 `$result`(actionId·pointer)를 지명하는 앞선
+      pickQuantity가 있어야 한다.
+    - pick되지 않은 실행 중 배분의 출고는 APPLIED 밖 outcome과, 제품이 pick
+      검사 전에 내는 code(STALE_REVISION·FORBIDDEN·
+      INSUFFICIENT_ELIGIBLE_QUANTITY·SCOPE_INELIGIBLE·VERSION_UNSUPPORTED)를
+      고정한 반례일 때만 받는다. 아니면 검사 대상 규칙이 없는 제품도 pick
+      누락만으로 거부해 통과한다.
+    - 앞선 pick의 outcome을 APPLIED 밖으로 고정하면 안 되고, 출고
+      expectedRevision이 pick보다 앞선 action의 `$result`이면 stale
+      revision이라 문제다. 비동기 출고(start의 call)의 고정은 그 await
+      action의 assertion에서 읽는다.
   - **Streamable HTTP transport header**: `ContractValidator.wireTransportProblems`가
     `route=wire`·`transport=streamable-http` 요청의 Accept가
     `application/json`과 `text/event-stream`을 모두 나열하기를 요구하고

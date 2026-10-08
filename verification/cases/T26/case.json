@@ -10866,6 +10866,43 @@
           ]
         },
         {
+          "id": "pick",
+          "kind": "invoke",
+          "actorRef": "warehouse",
+          "route": "api",
+          "capabilityId": "pickQuantity",
+          "request": {
+            "intentKind": "COMMAND",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "pickQuantity",
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "caseId": "T26",
+              "subcaseId": "lot-expiry-no-event"
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:00Z",
+            "allocationId": {
+              "$result": {
+                "actionId": "reserve",
+                "pointer": "/response/allocationId"
+              }
+            },
+            "expectedRevision": {
+              "$result": {
+                "actionId": "reserve",
+                "pointer": "/response/revision"
+              }
+            },
+            "commandIdempotencyKey": "T26-lot-expiry-no-event-pick"
+          },
+          "evidenceRefs": [
+            "pick:actual-artifact"
+          ]
+        },
+        {
           "id": "before",
           "kind": "query",
           "actorRef": "operations",
@@ -11296,7 +11333,7 @@
             },
             "expectedRevision": {
               "$result": {
-                "actionId": "reserve",
+                "actionId": "pick",
                 "pointer": "/response/revision"
               }
             },
@@ -11941,6 +11978,36 @@
           }
         },
         {
+          "id": "guard-pick-applied",
+          "op": "equals",
+          "source": {
+            "actionId": "pick",
+            "pointer": "/response/outcome"
+          },
+          "expected": "APPLIED",
+          "requirementRefs": [
+            "D26"
+          ],
+          "evidenceRefs": [
+            "pick:actual-artifact"
+          ],
+          "scope": {
+            "normativeScope": "boundary-index",
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "T26",
+            "subcaseId": "lot-expiry-no-event"
+          },
+          "oracleExplanation": "만료 경계 전에 예약20을 pick한다. 그래서 뒤 출고를 거부할 이유는 만료뿐이다. pick이 없으면 만료 guard가 없는 제품도 pick 누락(TYPE_INVALID)으로 거부해 통과한다.",
+          "oracleRef": {
+            "oracleId": "T26.boundary-index-and-emergency-repair",
+            "observationNames": [
+              "boundary-index"
+            ]
+          }
+        },
+        {
           "id": "guard-outcome",
           "op": "equals",
           "source": {
@@ -11964,6 +12031,37 @@
             "subcaseId": "lot-expiry-no-event"
           },
           "oracleExplanation": "자동 정지 후에도 실제 commit guard가 만료 이후 출고를 거부한다. 중지 지연의 독립 인수는 delayed-guard 사례에 있다.",
+          "oracleRef": {
+            "oracleId": "T26.boundary-index-and-emergency-repair",
+            "observationNames": [
+              "boundary-index"
+            ]
+          }
+        },
+        {
+          "id": "guard-code",
+          "op": "equals",
+          "source": {
+            "actionId": "dispatch",
+            "pointer": "/response/error/code"
+          },
+          "expected": "INSUFFICIENT_ELIGIBLE_QUANTITY",
+          "requirementRefs": [
+            "D26"
+          ],
+          "evidenceRefs": [
+            "dispatch:actual-artifact",
+            "dispatch:source-rows"
+          ],
+          "scope": {
+            "normativeScope": "boundary-index",
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "T26",
+            "subcaseId": "lot-expiry-no-event"
+          },
+          "oracleExplanation": "LOT 만료 뒤 현재 판매 적격이 없다. 그래서 pick된 예약의 출고 거부 이유는 INSUFFICIENT_ELIGIBLE_QUANTITY이며 pick 누락의 TYPE_INVALID가 아니다(FulfillmentCommands, step2r round 9).",
           "oracleRef": {
             "oracleId": "T26.boundary-index-and-emergency-repair",
             "observationNames": [
@@ -14129,6 +14227,43 @@
           ]
         },
         {
+          "id": "pick",
+          "kind": "invoke",
+          "actorRef": "warehouse",
+          "route": "api",
+          "capabilityId": "pickQuantity",
+          "request": {
+            "intentKind": "COMMAND",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "pickQuantity",
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "caseId": "T26",
+              "subcaseId": "lot-expiry-delayed-guard"
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:00Z",
+            "allocationId": {
+              "$result": {
+                "actionId": "reserve",
+                "pointer": "/response/allocationId"
+              }
+            },
+            "expectedRevision": {
+              "$result": {
+                "actionId": "reserve",
+                "pointer": "/response/revision"
+              }
+            },
+            "commandIdempotencyKey": "T26-lot-expiry-delayed-guard-pick"
+          },
+          "evidenceRefs": [
+            "pick:actual-artifact"
+          ]
+        },
+        {
           "id": "before",
           "kind": "query",
           "actorRef": "operations",
@@ -14289,7 +14424,7 @@
             },
             "expectedRevision": {
               "$result": {
-                "actionId": "reserve",
+                "actionId": "pick",
                 "pointer": "/response/revision"
               }
             },
@@ -14872,6 +15007,36 @@
           }
         },
         {
+          "id": "guard-pick-applied",
+          "op": "equals",
+          "source": {
+            "actionId": "pick",
+            "pointer": "/response/outcome"
+          },
+          "expected": "APPLIED",
+          "requirementRefs": [
+            "D26"
+          ],
+          "evidenceRefs": [
+            "pick:actual-artifact"
+          ],
+          "scope": {
+            "normativeScope": "boundary-index",
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "T26",
+            "subcaseId": "lot-expiry-delayed-guard"
+          },
+          "oracleExplanation": "만료 경계 전에 예약20을 pick한다. 그래서 뒤 출고를 거부할 이유는 만료뿐이다. pick이 없으면 만료 guard가 없는 제품도 pick 누락(TYPE_INVALID)으로 거부해 통과한다.",
+          "oracleRef": {
+            "oracleId": "T26.boundary-index-and-emergency-repair",
+            "observationNames": [
+              "boundary-index"
+            ]
+          }
+        },
+        {
           "id": "guard-outcome",
           "op": "equals",
           "source": {
@@ -14895,6 +15060,37 @@
             "subcaseId": "lot-expiry-delayed-guard"
           },
           "oracleExplanation": "sweeper가 중지돼도 실제 commit guard가 만료 이후 출고를 거부한다.",
+          "oracleRef": {
+            "oracleId": "T26.boundary-index-and-emergency-repair",
+            "observationNames": [
+              "boundary-index"
+            ]
+          }
+        },
+        {
+          "id": "guard-code",
+          "op": "equals",
+          "source": {
+            "actionId": "dispatch",
+            "pointer": "/response/error/code"
+          },
+          "expected": "INSUFFICIENT_ELIGIBLE_QUANTITY",
+          "requirementRefs": [
+            "D26"
+          ],
+          "evidenceRefs": [
+            "dispatch:actual-artifact",
+            "dispatch:source-rows"
+          ],
+          "scope": {
+            "normativeScope": "boundary-index",
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "T26",
+            "subcaseId": "lot-expiry-delayed-guard"
+          },
+          "oracleExplanation": "LOT 만료 뒤 현재 판매 적격이 없다. 그래서 pick된 예약의 출고 거부 이유는 INSUFFICIENT_ELIGIBLE_QUANTITY이며 pick 누락의 TYPE_INVALID가 아니다(FulfillmentCommands, step2r round 9).",
           "oracleRef": {
             "oracleId": "T26.boundary-index-and-emergency-repair",
             "observationNames": [
@@ -15565,6 +15761,43 @@
           ]
         },
         {
+          "id": "pick",
+          "kind": "invoke",
+          "actorRef": "warehouse",
+          "route": "api",
+          "capabilityId": "pickQuantity",
+          "request": {
+            "intentKind": "COMMAND",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "pickQuantity",
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "caseId": "T26",
+              "subcaseId": "disposition-expiry-no-event"
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:00Z",
+            "allocationId": {
+              "$result": {
+                "actionId": "reserve",
+                "pointer": "/response/allocationId"
+              }
+            },
+            "expectedRevision": {
+              "$result": {
+                "actionId": "reserve",
+                "pointer": "/response/revision"
+              }
+            },
+            "commandIdempotencyKey": "T26-disposition-expiry-no-event-pick"
+          },
+          "evidenceRefs": [
+            "pick:actual-artifact"
+          ]
+        },
+        {
           "id": "before",
           "kind": "query",
           "actorRef": "operations",
@@ -15995,7 +16228,7 @@
             },
             "expectedRevision": {
               "$result": {
-                "actionId": "reserve",
+                "actionId": "pick",
                 "pointer": "/response/revision"
               }
             },
@@ -16640,6 +16873,36 @@
           }
         },
         {
+          "id": "guard-pick-applied",
+          "op": "equals",
+          "source": {
+            "actionId": "pick",
+            "pointer": "/response/outcome"
+          },
+          "expected": "APPLIED",
+          "requirementRefs": [
+            "D26"
+          ],
+          "evidenceRefs": [
+            "pick:actual-artifact"
+          ],
+          "scope": {
+            "normativeScope": "boundary-index",
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "T26",
+            "subcaseId": "disposition-expiry-no-event"
+          },
+          "oracleExplanation": "만료 경계 전에 예약20을 pick한다. 그래서 뒤 출고를 거부할 이유는 만료뿐이다. pick이 없으면 만료 guard가 없는 제품도 pick 누락(TYPE_INVALID)으로 거부해 통과한다.",
+          "oracleRef": {
+            "oracleId": "T26.boundary-index-and-emergency-repair",
+            "observationNames": [
+              "boundary-index"
+            ]
+          }
+        },
+        {
           "id": "guard-outcome",
           "op": "equals",
           "source": {
@@ -16663,6 +16926,37 @@
             "subcaseId": "disposition-expiry-no-event"
           },
           "oracleExplanation": "자동 정지 후에도 실제 commit guard가 만료 이후 출고를 거부한다. 중지 지연의 독립 인수는 delayed-guard 사례에 있다.",
+          "oracleRef": {
+            "oracleId": "T26.boundary-index-and-emergency-repair",
+            "observationNames": [
+              "boundary-index"
+            ]
+          }
+        },
+        {
+          "id": "guard-code",
+          "op": "equals",
+          "source": {
+            "actionId": "dispatch",
+            "pointer": "/response/error/code"
+          },
+          "expected": "INSUFFICIENT_ELIGIBLE_QUANTITY",
+          "requirementRefs": [
+            "D26"
+          ],
+          "evidenceRefs": [
+            "dispatch:actual-artifact",
+            "dispatch:source-rows"
+          ],
+          "scope": {
+            "normativeScope": "boundary-index",
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "T26",
+            "subcaseId": "disposition-expiry-no-event"
+          },
+          "oracleExplanation": "처분 근거 만료 뒤 현재 판매 적격이 없다. 그래서 pick된 예약의 출고 거부 이유는 INSUFFICIENT_ELIGIBLE_QUANTITY이며 pick 누락의 TYPE_INVALID가 아니다(FulfillmentCommands, step2r round 9).",
           "oracleRef": {
             "oracleId": "T26.boundary-index-and-emergency-repair",
             "observationNames": [
@@ -18828,6 +19122,43 @@
           ]
         },
         {
+          "id": "pick",
+          "kind": "invoke",
+          "actorRef": "warehouse",
+          "route": "api",
+          "capabilityId": "pickQuantity",
+          "request": {
+            "intentKind": "COMMAND",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "pickQuantity",
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "caseId": "T26",
+              "subcaseId": "disposition-expiry-delayed-guard"
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:00Z",
+            "allocationId": {
+              "$result": {
+                "actionId": "reserve",
+                "pointer": "/response/allocationId"
+              }
+            },
+            "expectedRevision": {
+              "$result": {
+                "actionId": "reserve",
+                "pointer": "/response/revision"
+              }
+            },
+            "commandIdempotencyKey": "T26-disposition-expiry-delayed-guard-pick"
+          },
+          "evidenceRefs": [
+            "pick:actual-artifact"
+          ]
+        },
+        {
           "id": "before",
           "kind": "query",
           "actorRef": "operations",
@@ -18988,7 +19319,7 @@
             },
             "expectedRevision": {
               "$result": {
-                "actionId": "reserve",
+                "actionId": "pick",
                 "pointer": "/response/revision"
               }
             },
@@ -19571,6 +19902,36 @@
           }
         },
         {
+          "id": "guard-pick-applied",
+          "op": "equals",
+          "source": {
+            "actionId": "pick",
+            "pointer": "/response/outcome"
+          },
+          "expected": "APPLIED",
+          "requirementRefs": [
+            "D26"
+          ],
+          "evidenceRefs": [
+            "pick:actual-artifact"
+          ],
+          "scope": {
+            "normativeScope": "boundary-index",
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "T26",
+            "subcaseId": "disposition-expiry-delayed-guard"
+          },
+          "oracleExplanation": "만료 경계 전에 예약20을 pick한다. 그래서 뒤 출고를 거부할 이유는 만료뿐이다. pick이 없으면 만료 guard가 없는 제품도 pick 누락(TYPE_INVALID)으로 거부해 통과한다.",
+          "oracleRef": {
+            "oracleId": "T26.boundary-index-and-emergency-repair",
+            "observationNames": [
+              "boundary-index"
+            ]
+          }
+        },
+        {
           "id": "guard-outcome",
           "op": "equals",
           "source": {
@@ -19594,6 +19955,37 @@
             "subcaseId": "disposition-expiry-delayed-guard"
           },
           "oracleExplanation": "sweeper가 중지돼도 실제 commit guard가 만료 이후 출고를 거부한다.",
+          "oracleRef": {
+            "oracleId": "T26.boundary-index-and-emergency-repair",
+            "observationNames": [
+              "boundary-index"
+            ]
+          }
+        },
+        {
+          "id": "guard-code",
+          "op": "equals",
+          "source": {
+            "actionId": "dispatch",
+            "pointer": "/response/error/code"
+          },
+          "expected": "INSUFFICIENT_ELIGIBLE_QUANTITY",
+          "requirementRefs": [
+            "D26"
+          ],
+          "evidenceRefs": [
+            "dispatch:actual-artifact",
+            "dispatch:source-rows"
+          ],
+          "scope": {
+            "normativeScope": "boundary-index",
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "T26",
+            "subcaseId": "disposition-expiry-delayed-guard"
+          },
+          "oracleExplanation": "처분 근거 만료 뒤 현재 판매 적격이 없다. 그래서 pick된 예약의 출고 거부 이유는 INSUFFICIENT_ELIGIBLE_QUANTITY이며 pick 누락의 TYPE_INVALID가 아니다(FulfillmentCommands, step2r round 9).",
           "oracleRef": {
             "oracleId": "T26.boundary-index-and-emergency-repair",
             "observationNames": [
@@ -20264,6 +20656,43 @@
           ]
         },
         {
+          "id": "pick",
+          "kind": "invoke",
+          "actorRef": "warehouse",
+          "route": "api",
+          "capabilityId": "pickQuantity",
+          "request": {
+            "intentKind": "COMMAND",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "pickQuantity",
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "caseId": "T26",
+              "subcaseId": "grant-expiry-no-event"
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:00Z",
+            "allocationId": {
+              "$result": {
+                "actionId": "reserve",
+                "pointer": "/response/allocationId"
+              }
+            },
+            "expectedRevision": {
+              "$result": {
+                "actionId": "reserve",
+                "pointer": "/response/revision"
+              }
+            },
+            "commandIdempotencyKey": "T26-grant-expiry-no-event-pick"
+          },
+          "evidenceRefs": [
+            "pick:actual-artifact"
+          ]
+        },
+        {
           "id": "before",
           "kind": "query",
           "actorRef": "operations",
@@ -20694,7 +21123,7 @@
             },
             "expectedRevision": {
               "$result": {
-                "actionId": "reserve",
+                "actionId": "pick",
                 "pointer": "/response/revision"
               }
             },
@@ -21339,6 +21768,36 @@
           }
         },
         {
+          "id": "guard-pick-applied",
+          "op": "equals",
+          "source": {
+            "actionId": "pick",
+            "pointer": "/response/outcome"
+          },
+          "expected": "APPLIED",
+          "requirementRefs": [
+            "D26"
+          ],
+          "evidenceRefs": [
+            "pick:actual-artifact"
+          ],
+          "scope": {
+            "normativeScope": "boundary-index",
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "T26",
+            "subcaseId": "grant-expiry-no-event"
+          },
+          "oracleExplanation": "만료 경계 전에 예약20을 pick한다. 그래서 뒤 출고를 거부할 이유는 만료뿐이다. pick이 없으면 만료 guard가 없는 제품도 pick 누락(TYPE_INVALID)으로 거부해 통과한다.",
+          "oracleRef": {
+            "oracleId": "T26.boundary-index-and-emergency-repair",
+            "observationNames": [
+              "boundary-index"
+            ]
+          }
+        },
+        {
           "id": "guard-outcome",
           "op": "equals",
           "source": {
@@ -21362,6 +21821,37 @@
             "subcaseId": "grant-expiry-no-event"
           },
           "oracleExplanation": "자동 정지 후에도 실제 commit guard가 만료 이후 출고를 거부한다. 중지 지연의 독립 인수는 delayed-guard 사례에 있다.",
+          "oracleRef": {
+            "oracleId": "T26.boundary-index-and-emergency-repair",
+            "observationNames": [
+              "boundary-index"
+            ]
+          }
+        },
+        {
+          "id": "guard-code",
+          "op": "equals",
+          "source": {
+            "actionId": "dispatch",
+            "pointer": "/response/error/code"
+          },
+          "expected": "FORBIDDEN",
+          "requirementRefs": [
+            "D26"
+          ],
+          "evidenceRefs": [
+            "dispatch:actual-artifact",
+            "dispatch:source-rows"
+          ],
+          "scope": {
+            "normativeScope": "boundary-index",
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "T26",
+            "subcaseId": "grant-expiry-no-event"
+          },
+          "oracleExplanation": "출고자 warehouse의 grant가 만료돼 scope 인가가 거부된다. 그래서 pick된 예약의 출고 거부 이유는 FORBIDDEN이며 pick 누락의 TYPE_INVALID가 아니다(FulfillmentCommands, step2r round 9).",
           "oracleRef": {
             "oracleId": "T26.boundary-index-and-emergency-repair",
             "observationNames": [
@@ -23527,6 +24017,43 @@
           ]
         },
         {
+          "id": "pick",
+          "kind": "invoke",
+          "actorRef": "warehouse",
+          "route": "api",
+          "capabilityId": "pickQuantity",
+          "request": {
+            "intentKind": "COMMAND",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "pickQuantity",
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "caseId": "T26",
+              "subcaseId": "grant-expiry-delayed-guard"
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:00Z",
+            "allocationId": {
+              "$result": {
+                "actionId": "reserve",
+                "pointer": "/response/allocationId"
+              }
+            },
+            "expectedRevision": {
+              "$result": {
+                "actionId": "reserve",
+                "pointer": "/response/revision"
+              }
+            },
+            "commandIdempotencyKey": "T26-grant-expiry-delayed-guard-pick"
+          },
+          "evidenceRefs": [
+            "pick:actual-artifact"
+          ]
+        },
+        {
           "id": "before",
           "kind": "query",
           "actorRef": "operations",
@@ -23687,7 +24214,7 @@
             },
             "expectedRevision": {
               "$result": {
-                "actionId": "reserve",
+                "actionId": "pick",
                 "pointer": "/response/revision"
               }
             },
@@ -24270,6 +24797,36 @@
           }
         },
         {
+          "id": "guard-pick-applied",
+          "op": "equals",
+          "source": {
+            "actionId": "pick",
+            "pointer": "/response/outcome"
+          },
+          "expected": "APPLIED",
+          "requirementRefs": [
+            "D26"
+          ],
+          "evidenceRefs": [
+            "pick:actual-artifact"
+          ],
+          "scope": {
+            "normativeScope": "boundary-index",
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "T26",
+            "subcaseId": "grant-expiry-delayed-guard"
+          },
+          "oracleExplanation": "만료 경계 전에 예약20을 pick한다. 그래서 뒤 출고를 거부할 이유는 만료뿐이다. pick이 없으면 만료 guard가 없는 제품도 pick 누락(TYPE_INVALID)으로 거부해 통과한다.",
+          "oracleRef": {
+            "oracleId": "T26.boundary-index-and-emergency-repair",
+            "observationNames": [
+              "boundary-index"
+            ]
+          }
+        },
+        {
           "id": "guard-outcome",
           "op": "equals",
           "source": {
@@ -24293,6 +24850,37 @@
             "subcaseId": "grant-expiry-delayed-guard"
           },
           "oracleExplanation": "sweeper가 중지돼도 실제 commit guard가 만료 이후 출고를 거부한다.",
+          "oracleRef": {
+            "oracleId": "T26.boundary-index-and-emergency-repair",
+            "observationNames": [
+              "boundary-index"
+            ]
+          }
+        },
+        {
+          "id": "guard-code",
+          "op": "equals",
+          "source": {
+            "actionId": "dispatch",
+            "pointer": "/response/error/code"
+          },
+          "expected": "FORBIDDEN",
+          "requirementRefs": [
+            "D26"
+          ],
+          "evidenceRefs": [
+            "dispatch:actual-artifact",
+            "dispatch:source-rows"
+          ],
+          "scope": {
+            "normativeScope": "boundary-index",
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "T26",
+            "subcaseId": "grant-expiry-delayed-guard"
+          },
+          "oracleExplanation": "출고자 warehouse의 grant가 만료돼 scope 인가가 거부된다. 그래서 pick된 예약의 출고 거부 이유는 FORBIDDEN이며 pick 누락의 TYPE_INVALID가 아니다(FulfillmentCommands, step2r round 9).",
           "oracleRef": {
             "oracleId": "T26.boundary-index-and-emergency-repair",
             "observationNames": [
@@ -24963,6 +25551,43 @@
           ]
         },
         {
+          "id": "pick",
+          "kind": "invoke",
+          "actorRef": "warehouse",
+          "route": "api",
+          "capabilityId": "pickQuantity",
+          "request": {
+            "intentKind": "COMMAND",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "pickQuantity",
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "caseId": "T26",
+              "subcaseId": "policy-expiry-no-event"
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:00Z",
+            "allocationId": {
+              "$result": {
+                "actionId": "reserve",
+                "pointer": "/response/allocationId"
+              }
+            },
+            "expectedRevision": {
+              "$result": {
+                "actionId": "reserve",
+                "pointer": "/response/revision"
+              }
+            },
+            "commandIdempotencyKey": "T26-policy-expiry-no-event-pick"
+          },
+          "evidenceRefs": [
+            "pick:actual-artifact"
+          ]
+        },
+        {
           "id": "before",
           "kind": "query",
           "actorRef": "operations",
@@ -25393,7 +26018,7 @@
             },
             "expectedRevision": {
               "$result": {
-                "actionId": "reserve",
+                "actionId": "pick",
                 "pointer": "/response/revision"
               }
             },
@@ -26038,6 +26663,36 @@
           }
         },
         {
+          "id": "guard-pick-applied",
+          "op": "equals",
+          "source": {
+            "actionId": "pick",
+            "pointer": "/response/outcome"
+          },
+          "expected": "APPLIED",
+          "requirementRefs": [
+            "D26"
+          ],
+          "evidenceRefs": [
+            "pick:actual-artifact"
+          ],
+          "scope": {
+            "normativeScope": "boundary-index",
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "T26",
+            "subcaseId": "policy-expiry-no-event"
+          },
+          "oracleExplanation": "만료 경계 전에 예약20을 pick한다. 그래서 뒤 출고를 거부할 이유는 만료뿐이다. pick이 없으면 만료 guard가 없는 제품도 pick 누락(TYPE_INVALID)으로 거부해 통과한다.",
+          "oracleRef": {
+            "oracleId": "T26.boundary-index-and-emergency-repair",
+            "observationNames": [
+              "boundary-index"
+            ]
+          }
+        },
+        {
           "id": "guard-outcome",
           "op": "equals",
           "source": {
@@ -26061,6 +26716,37 @@
             "subcaseId": "policy-expiry-no-event"
           },
           "oracleExplanation": "자동 정지 후에도 실제 commit guard가 만료 이후 출고를 거부한다. 중지 지연의 독립 인수는 delayed-guard 사례에 있다.",
+          "oracleRef": {
+            "oracleId": "T26.boundary-index-and-emergency-repair",
+            "observationNames": [
+              "boundary-index"
+            ]
+          }
+        },
+        {
+          "id": "guard-code",
+          "op": "equals",
+          "source": {
+            "actionId": "dispatch",
+            "pointer": "/response/error/code"
+          },
+          "expected": "INSUFFICIENT_ELIGIBLE_QUANTITY",
+          "requirementRefs": [
+            "D26"
+          ],
+          "evidenceRefs": [
+            "dispatch:actual-artifact",
+            "dispatch:source-rows"
+          ],
+          "scope": {
+            "normativeScope": "boundary-index",
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "T26",
+            "subcaseId": "policy-expiry-no-event"
+          },
+          "oracleExplanation": "적격 정책 만료 뒤 현재 판매 적격을 판정할 수 없다. 그래서 pick된 예약의 출고 거부 이유는 INSUFFICIENT_ELIGIBLE_QUANTITY이며 pick 누락의 TYPE_INVALID가 아니다(FulfillmentCommands, step2r round 9).",
           "oracleRef": {
             "oracleId": "T26.boundary-index-and-emergency-repair",
             "observationNames": [
@@ -28226,6 +28912,43 @@
           ]
         },
         {
+          "id": "pick",
+          "kind": "invoke",
+          "actorRef": "warehouse",
+          "route": "api",
+          "capabilityId": "pickQuantity",
+          "request": {
+            "intentKind": "COMMAND",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "pickQuantity",
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "caseId": "T26",
+              "subcaseId": "policy-expiry-delayed-guard"
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:00Z",
+            "allocationId": {
+              "$result": {
+                "actionId": "reserve",
+                "pointer": "/response/allocationId"
+              }
+            },
+            "expectedRevision": {
+              "$result": {
+                "actionId": "reserve",
+                "pointer": "/response/revision"
+              }
+            },
+            "commandIdempotencyKey": "T26-policy-expiry-delayed-guard-pick"
+          },
+          "evidenceRefs": [
+            "pick:actual-artifact"
+          ]
+        },
+        {
           "id": "before",
           "kind": "query",
           "actorRef": "operations",
@@ -28386,7 +29109,7 @@
             },
             "expectedRevision": {
               "$result": {
-                "actionId": "reserve",
+                "actionId": "pick",
                 "pointer": "/response/revision"
               }
             },
@@ -28969,6 +29692,36 @@
           }
         },
         {
+          "id": "guard-pick-applied",
+          "op": "equals",
+          "source": {
+            "actionId": "pick",
+            "pointer": "/response/outcome"
+          },
+          "expected": "APPLIED",
+          "requirementRefs": [
+            "D26"
+          ],
+          "evidenceRefs": [
+            "pick:actual-artifact"
+          ],
+          "scope": {
+            "normativeScope": "boundary-index",
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "T26",
+            "subcaseId": "policy-expiry-delayed-guard"
+          },
+          "oracleExplanation": "만료 경계 전에 예약20을 pick한다. 그래서 뒤 출고를 거부할 이유는 만료뿐이다. pick이 없으면 만료 guard가 없는 제품도 pick 누락(TYPE_INVALID)으로 거부해 통과한다.",
+          "oracleRef": {
+            "oracleId": "T26.boundary-index-and-emergency-repair",
+            "observationNames": [
+              "boundary-index"
+            ]
+          }
+        },
+        {
           "id": "guard-outcome",
           "op": "equals",
           "source": {
@@ -28992,6 +29745,37 @@
             "subcaseId": "policy-expiry-delayed-guard"
           },
           "oracleExplanation": "sweeper가 중지돼도 실제 commit guard가 만료 이후 출고를 거부한다.",
+          "oracleRef": {
+            "oracleId": "T26.boundary-index-and-emergency-repair",
+            "observationNames": [
+              "boundary-index"
+            ]
+          }
+        },
+        {
+          "id": "guard-code",
+          "op": "equals",
+          "source": {
+            "actionId": "dispatch",
+            "pointer": "/response/error/code"
+          },
+          "expected": "INSUFFICIENT_ELIGIBLE_QUANTITY",
+          "requirementRefs": [
+            "D26"
+          ],
+          "evidenceRefs": [
+            "dispatch:actual-artifact",
+            "dispatch:source-rows"
+          ],
+          "scope": {
+            "normativeScope": "boundary-index",
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "T26",
+            "subcaseId": "policy-expiry-delayed-guard"
+          },
+          "oracleExplanation": "적격 정책 만료 뒤 현재 판매 적격을 판정할 수 없다. 그래서 pick된 예약의 출고 거부 이유는 INSUFFICIENT_ELIGIBLE_QUANTITY이며 pick 누락의 TYPE_INVALID가 아니다(FulfillmentCommands, step2r round 9).",
           "oracleRef": {
             "oracleId": "T26.boundary-index-and-emergency-repair",
             "observationNames": [
@@ -37668,6 +38452,43 @@
           ]
         },
         {
+          "id": "pick",
+          "kind": "invoke",
+          "actorRef": "warehouse",
+          "route": "api",
+          "capabilityId": "pickQuantity",
+          "request": {
+            "intentKind": "COMMAND",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "pickQuantity",
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "caseId": "T26",
+              "subcaseId": "lot-expiry-autonomous-loop"
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:00Z",
+            "allocationId": {
+              "$result": {
+                "actionId": "reserve",
+                "pointer": "/response/allocationId"
+              }
+            },
+            "expectedRevision": {
+              "$result": {
+                "actionId": "reserve",
+                "pointer": "/response/revision"
+              }
+            },
+            "commandIdempotencyKey": "T26-lot-expiry-autonomous-loop-pick"
+          },
+          "evidenceRefs": [
+            "pick:actual-artifact"
+          ]
+        },
+        {
           "id": "before",
           "kind": "query",
           "actorRef": "operations",
@@ -38127,7 +38948,7 @@
             },
             "expectedRevision": {
               "$result": {
-                "actionId": "reserve",
+                "actionId": "pick",
                 "pointer": "/response/revision"
               }
             },
@@ -38772,6 +39593,36 @@
           }
         },
         {
+          "id": "guard-pick-applied",
+          "op": "equals",
+          "source": {
+            "actionId": "pick",
+            "pointer": "/response/outcome"
+          },
+          "expected": "APPLIED",
+          "requirementRefs": [
+            "D26"
+          ],
+          "evidenceRefs": [
+            "pick:actual-artifact"
+          ],
+          "scope": {
+            "normativeScope": "boundary-index",
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "T26",
+            "subcaseId": "lot-expiry-autonomous-loop"
+          },
+          "oracleExplanation": "만료 경계 전에 예약20을 pick한다. 그래서 뒤 출고를 거부할 이유는 만료뿐이다. pick이 없으면 만료 guard가 없는 제품도 pick 누락(TYPE_INVALID)으로 거부해 통과한다.",
+          "oracleRef": {
+            "oracleId": "T26.boundary-index-and-emergency-repair",
+            "observationNames": [
+              "boundary-index"
+            ]
+          }
+        },
+        {
           "id": "guard-outcome",
           "op": "equals",
           "source": {
@@ -38795,6 +39646,37 @@
             "subcaseId": "lot-expiry-autonomous-loop"
           },
           "oracleExplanation": "자동 정지 후에도 실제 commit guard가 만료 이후 출고를 거부한다. 중지 지연의 독립 인수는 delayed-guard 사례에 있다.",
+          "oracleRef": {
+            "oracleId": "T26.boundary-index-and-emergency-repair",
+            "observationNames": [
+              "boundary-index"
+            ]
+          }
+        },
+        {
+          "id": "guard-code",
+          "op": "equals",
+          "source": {
+            "actionId": "dispatch",
+            "pointer": "/response/error/code"
+          },
+          "expected": "INSUFFICIENT_ELIGIBLE_QUANTITY",
+          "requirementRefs": [
+            "D26"
+          ],
+          "evidenceRefs": [
+            "dispatch:actual-artifact",
+            "dispatch:source-rows"
+          ],
+          "scope": {
+            "normativeScope": "boundary-index",
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "T26",
+            "subcaseId": "lot-expiry-autonomous-loop"
+          },
+          "oracleExplanation": "LOT 만료 뒤 현재 판매 적격이 없다. 그래서 pick된 예약의 출고 거부 이유는 INSUFFICIENT_ELIGIBLE_QUANTITY이며 pick 누락의 TYPE_INVALID가 아니다(FulfillmentCommands, step2r round 9).",
           "oracleRef": {
             "oracleId": "T26.boundary-index-and-emergency-repair",
             "observationNames": [

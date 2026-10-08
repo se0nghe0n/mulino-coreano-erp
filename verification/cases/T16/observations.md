@@ -72,6 +72,9 @@ lockProbeScopeOnly는 fixture가 지정한 segment/allocation/fence 세 scope의
 
 예약20은 T까지 허용된다. queue 비어도 T 이후 sweeper가 정지/의무를 upsert하며 sweep 지연 중 출고 guard도 실제 현재조건을 재검증한다.
 
+- `pick-applied` → `T16.no-event-expiry / boundary-recheck`: 만료 전 예약20을 warehouse가 pick한다. 그래서 뒤 출고가 거부되는 이유는 만료뿐이다. pick이 없으면 만료 처리가 없는 제품도 pick 누락(FulfillmentCommands "Pick before dispatch required")으로 출고를 거부해 이 subcase를 통과한다.
+- `dispatch-after-sweep-rejected` → `T16.no-event-expiry / boundary-recheck`: sweeper가 만료 경계에서 예약을 SUSPENDED로 바꿨으므로 pick된 예약의 출고도 거부되고 이유는 INSUFFICIENT_ELIGIBLE_QUANTITY다(FulfillmentCommands "Suspended allocation cannot execute"). pick 누락의 TYPE_INVALID가 아니다.
+- `dispatch-after-sweep-code` → `T16.no-event-expiry / boundary-recheck`: sweeper가 만료 경계에서 예약을 SUSPENDED로 바꿨으므로 pick된 예약의 출고도 거부되고 이유는 INSUFFICIENT_ELIGIBLE_QUANTITY다(FulfillmentCommands "Suspended allocation cannot execute"). pick 누락의 TYPE_INVALID가 아니다.
 - `allocation-after-boundary-1` → `T16.no-event-expiry / allocation-after-boundary`: 독립 원 행의 실물·수량·관계·범위를 정확히 대조한다.
 - `post-expiry-dispatched-2` → `T16.no-event-expiry / post-expiry-dispatched`: 실물량·단위와 독립 손계산을 대조한다.
 - `post-expiry-dispatched-3` → `T16.no-event-expiry / post-expiry-dispatched`: 독립 원 행의 실물·수량·관계·범위를 정확히 대조한다.
@@ -91,6 +94,7 @@ lockProbeScopeOnly는 fixture가 지정한 segment/allocation/fence 세 scope의
 
 예약20은 T까지 허용된다. queue 비어도 T 이후 sweeper가 정지/의무를 upsert하며 sweep 지연 중 출고 guard도 실제 현재조건을 재검증한다.
 
+- `pick-applied` → `T16.no-event-expiry / boundary-recheck`: 만료 전 예약20을 warehouse가 pick한다. 그래서 뒤 출고가 거부되는 이유는 만료뿐이다. pick이 없으면 만료 처리가 없는 제품도 pick 누락(FulfillmentCommands "Pick before dispatch required")으로 출고를 거부해 이 subcase를 통과한다.
 - `boundary-recheck-1` → `T16.no-event-expiry / boundary-recheck`: 공개 명령의 구조화 outcome을 확인한다.
 - `boundary-recheck-2` → `T16.no-event-expiry / boundary-recheck`: 응답의 구조화 오류 코드 /response/error/code가 INSUFFICIENT_ELIGIBLE_QUANTITY다(계획 §3.4, contracts/command-response.schema.json).
 - `post-expiry-dispatched-3` → `T16.no-event-expiry / post-expiry-dispatched`: 명령 효과 scope에서 생성된 업무 원 행 수가0이다. 감사는 별도로 확인한다.
