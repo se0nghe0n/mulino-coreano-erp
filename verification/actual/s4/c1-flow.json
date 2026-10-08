@@ -1,0 +1,26 @@
+{
+  "schemaVersion": "1.0.0",
+  "status": "NOT_RUN",
+  "requiredCases": [
+    "C1"
+  ],
+  "fullCaseCoverageClaimed": false,
+  "actions": [
+    {
+      "id": "c1-setup",
+      "type": "setup",
+      "fixtureRef": "verification/actual/s4/fixture.json",
+      "organizationAlias": "ORG"
+    },
+    {
+      "id": "c1-include-c1-upstream",
+      "type": "include",
+      "scriptRef": "verification/actual/s4/c1-upstream.json"
+    },
+    {
+      "id": "c1-include-c1-sale-revocation",
+      "type": "include",
+      "scriptRef": "verification/actual/s4/c1-sale-revocation.json"
+    }
+  ]
+}
