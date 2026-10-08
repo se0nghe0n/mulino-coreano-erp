@@ -58325,6 +58325,80 @@
               "skill-hash-as-loading-proof"
             ]
           }
+        },
+        {
+          "id": "no-command-tools",
+          "op": "count",
+          "source": {
+            "actionId": "probe",
+            "pointer": "/data/hostObservation/extractor/rawRows/toolCalls",
+            "where": {
+              "intentKind": "COMMAND"
+            }
+          },
+          "expected": 0,
+          "requirementRefs": [
+            "D20"
+          ],
+          "evidenceRefs": [
+            "probe:actual-observation",
+            "probe:source-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "lotId": {
+              "$alias": "L"
+            }
+          },
+          "oracleExplanation": "skill hash만 제시하고 본문을 읽지 않은 client의 MCP tool 호출 기록(protocol transcript)에 COMMAND 쓰기 호출은0이다. hash는 loading 증명이 아니므로 쓰기 절차로 진행하지 않는다(plan §9.2).",
+          "oracleRef": {
+            "oracleId": "T20.skills-real-loading-and-meaning",
+            "observationNames": [
+              "skill-hash-as-loading-proof"
+            ]
+          }
+        },
+        {
+          "id": "no-record-tools",
+          "op": "count",
+          "source": {
+            "actionId": "probe",
+            "pointer": "/data/hostObservation/extractor/rawRows/toolCalls",
+            "where": {
+              "intentKind": "RECORD"
+            }
+          },
+          "expected": 0,
+          "requirementRefs": [
+            "D20"
+          ],
+          "evidenceRefs": [
+            "probe:actual-observation",
+            "probe:source-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "lotId": {
+              "$alias": "L"
+            }
+          },
+          "oracleExplanation": "skill hash만 제시하고 본문을 읽지 않은 client의 MCP tool 호출 기록(protocol transcript)에 RECORD 쓰기 호출은0이다. hash는 loading 증명이 아니므로 쓰기 절차로 진행하지 않는다(plan §9.2).",
+          "oracleRef": {
+            "oracleId": "T20.skills-real-loading-and-meaning",
+            "observationNames": [
+              "skill-hash-as-loading-proof"
+            ]
+          }
         }
       ],
       "oracleExplanation": "실제 client hash-only 의미와 서버 권한 경계 — T20.skills-real-loading-and-meaning의 named observation을 응답과 독립 원행/host artifact로 검증한다. setup은 실행 coverage가 아니다."
@@ -58454,7 +58528,9 @@
                   "$alias": "L"
                 }
               },
-              "skillVariantRef": "baseline/skillVariants/allowed-tools-write"
+              "skillVariantRef": "baseline/skillVariants/allowed-tools-write",
+              "requireDiscovery": true,
+              "requireBodyRead": true
             }
           },
           "evidenceRefs": [
@@ -59045,6 +59121,82 @@
               "sourceId",
               "targetId",
               "type"
+            ]
+          }
+        },
+        {
+          "id": "allowed-tools-skill-discovered",
+          "op": "count",
+          "source": {
+            "actionId": "probe",
+            "pointer": "/data/hostObservation/extractor/rawRows/loading",
+            "where": {
+              "packageName": "ontology-work-coordinator",
+              "stage": "DISCOVERED"
+            }
+          },
+          "expected": 1,
+          "requirementRefs": [
+            "D20"
+          ],
+          "evidenceRefs": [
+            "probe:actual-observation",
+            "probe:source-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "lotId": {
+              "$alias": "L"
+            }
+          },
+          "oracleExplanation": "allowed-tools frontmatter를 설치한 ontology-work-coordinator가 실제로 검색 노출됐다. skill이 실제로 쓰인 상태에서도 서버 인가가 쓰기를 막는지 보며, loading이 없어 쓰기0이 저절로 성립하는 경우를 통과로 세지 않는다.",
+          "oracleRef": {
+            "oracleId": "T20.skills-real-loading-and-meaning",
+            "observationNames": [
+              "allowed-tools-as-server-authorization"
+            ]
+          }
+        },
+        {
+          "id": "allowed-tools-skill-body-read",
+          "op": "count",
+          "source": {
+            "actionId": "probe",
+            "pointer": "/data/hostObservation/extractor/rawRows/loading",
+            "where": {
+              "packageName": "ontology-work-coordinator",
+              "stage": "BODY_READ"
+            }
+          },
+          "expected": 1,
+          "requirementRefs": [
+            "D20"
+          ],
+          "evidenceRefs": [
+            "probe:actual-observation",
+            "probe:source-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "lotId": {
+              "$alias": "L"
+            }
+          },
+          "oracleExplanation": "allowed-tools frontmatter를 설치한 ontology-work-coordinator가 실제로 본문 loading됐다. skill이 실제로 쓰인 상태에서도 서버 인가가 쓰기를 막는지 보며, loading이 없어 쓰기0이 저절로 성립하는 경우를 통과로 세지 않는다.",
+          "oracleRef": {
+            "oracleId": "T20.skills-real-loading-and-meaning",
+            "observationNames": [
+              "allowed-tools-as-server-authorization"
             ]
           }
         },
@@ -59793,7 +59945,9 @@
                 "lotId": {
                   "$alias": "L"
                 }
-              }
+              },
+              "requireDiscovery": true,
+              "requireBodyRead": true
             }
           },
           "evidenceRefs": [
@@ -60427,6 +60581,84 @@
             "oracleId": "T20.skills-real-loading-and-meaning",
             "observationNames": [
               "skill-evidence"
+            ]
+          }
+        },
+        {
+          "id": "document-skill-body-read",
+          "op": "count",
+          "source": {
+            "actionId": "probe",
+            "pointer": "/data/hostObservation/extractor/rawRows/loading",
+            "where": {
+              "packageName": "ontology-work-coordinator",
+              "stage": "BODY_READ"
+            }
+          },
+          "expected": 1,
+          "requirementRefs": [
+            "D20"
+          ],
+          "evidenceRefs": [
+            "probe:actual-observation",
+            "probe:source-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "lotId": {
+              "$alias": "L"
+            }
+          },
+          "oracleExplanation": "문서 지시와 비교할 skill 본문(ontology-work-coordinator)이 실제로 한 번 loading됐다. 권한 있는 절차는 skill과 서버 인가에서 오고 첨부 문서는 데이터다.",
+          "oracleRef": {
+            "oracleId": "T20.skills-real-loading-and-meaning",
+            "observationNames": [
+              "document-instruction-authority"
+            ]
+          }
+        },
+        {
+          "id": "document-not-loaded-as-skill",
+          "op": "exactSet",
+          "source": {
+            "actionId": "probe",
+            "pointer": "/data/hostObservation/extractor/rawRows/loading",
+            "field": "packageName",
+            "where": {
+              "stage": "BODY_READ"
+            }
+          },
+          "expected": [
+            "ontology-work-coordinator"
+          ],
+          "requirementRefs": [
+            "D20"
+          ],
+          "evidenceRefs": [
+            "probe:actual-observation",
+            "probe:source-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "lotId": {
+              "$alias": "L"
+            }
+          },
+          "oracleExplanation": "본문 loading 원행의 skill package는 ontology-work-coordinator 하나뿐이다. 관리자 역할을 자칭하는 첨부 문서를 skill 지시로 loading하지 않는다(plan §9.3 문서는 지시가 아니다).",
+          "oracleRef": {
+            "oracleId": "T20.skills-real-loading-and-meaning",
+            "observationNames": [
+              "document-instruction-authority"
             ]
           }
         }

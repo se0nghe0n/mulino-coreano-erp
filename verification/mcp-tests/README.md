@@ -87,8 +87,9 @@ allowed-tools 서버 거부와 T25 입력 종류의 내용은 각 case README에
 있다. MRTR requestState TTL은 생성기 상수 `MRTR_TTL_SECONDS`=600 하나에서
 나온다. fixture `baseline.mrtr.requestStateTtlSeconds`와 만료 직전·직후
 clock(09:09:59Z·09:10:01Z)이 모두 이 값에서 계산되므로 한쪽만 바꿀 수 없다.
-`contracts/mcp/s0-protocol.md`는 TTL을 아직 S5 남은 일로 적고 있어
-그 문서 소유자에게 600초 기록을 요청했다. 재현 확인 명령은 다음과 같다.
+`contracts/mcp/s0-protocol.md`의 MRTR 절도 600초를 기록한다. 생성기는
+그 문서의 `requestStateTtlSeconds=600`과 상수가 다르면 멈춘다. 재현 확인
+명령은 다음과 같다.
 
 ```sh
 python3 -I verification/mcp-tests/author_cases.py

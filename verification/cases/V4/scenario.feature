@@ -3307,6 +3307,10 @@
     만일 "recordOnly" 역할이 "batch" 행동을 수행한다
     만일 "delegator" 역할이 "after-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "after" 행동을 수행한다
+    만일 "시스템" 역할이 "mcp-batch-before" 행동을 수행한다
+    만일 "recordOnly" 역할이 "mcp-batch" 행동을 수행한다
+    만일 "delegator" 역할이 "mcp-batch-after-snapshot" 행동을 수행한다
+    만일 "시스템" 역할이 "mcp-batch-after" 행동을 수행한다
     그러면 "batch-code" assertion으로 "mixed-batch-allowed-partial-effects batch-code"를 확인한다
     그러면 "batch-outcome" assertion으로 "mixed-batch-allowed-partial-effects batch-outcome"를 확인한다
     그러면 "unchanged-segments" assertion으로 "mixed-batch-allowed-partial-effects unchanged-segments"를 확인한다
@@ -3328,6 +3332,20 @@
     그러면 "mixed-batch-allowed-partial-effects-rows0" assertion으로 "mixed-batch-allowed-partial-effects mixed-batch-allowed-partial-effects-rows0"를 확인한다
     그러면 "inventory-effects-rows0" assertion으로 "inventory-effects inventory-effects-rows0"를 확인한다
     그러면 "batch-terminal-operations" assertion으로 "same-auth-path batch-terminal-operations"를 확인한다
+    그러면 "mcp-batch-http" assertion으로 "MCP에는 changeset이 없다. 허용된 RECORD와 금지된 출고를 한 JSON-RPC batch 배열로 보내면 envelope 자체가 유효하지 않은 요청이라 HTTP 400이다(contracts/mcp/s0-protocol.md: batch와 malformed 입력은 거부한다)."를 확인한다
+    그러면 "mcp-batch-invalid-request" assertion으로 "batch 배열은 JSON-RPC Invalid Request(-32600)로 한 번에 거부한다. 요소별 tool result로 나눠 일부를 실행하지 않는다."를 확인한다
+    그러면 "mcp-batch-no-tool-result" assertion으로 "거부된 batch 응답에는 tool result가 없다. 허용 요소만 실행한 결과를 돌려주지 않는다."를 확인한다
+    그러면 "mcp-batch-allowed-record-not-committed" assertion으로 "batch 안의 허용된 recordStocktake는 MCP 경로에서도 COMMITTED command를 남기지 않는다(부분 효과0)."를 확인한다
+    그러면 "mcp-batch-allowed-claims0" assertion으로 "허용된 RECORD의 실행 claim도 0이다. 거부 전에 일부 요소가 실행 단계에 들어가지 않았다."를 확인한다
+    그러면 "mcp-batch-unchanged-segments" assertion으로 "MCP batch 전후 조직 범위의 segments 원행 전체가 같다. 허용된 RECORD(stocktakes 포함)와 금지된 출고 모두 효과0이다."를 확인한다
+    그러면 "mcp-batch-unchanged-movements" assertion으로 "MCP batch 전후 조직 범위의 movements 원행 전체가 같다. 허용된 RECORD(stocktakes 포함)와 금지된 출고 모두 효과0이다."를 확인한다
+    그러면 "mcp-batch-unchanged-allocations" assertion으로 "MCP batch 전후 조직 범위의 allocations 원행 전체가 같다. 허용된 RECORD(stocktakes 포함)와 금지된 출고 모두 효과0이다."를 확인한다
+    그러면 "mcp-batch-unchanged-approvals" assertion으로 "MCP batch 전후 조직 범위의 approvals 원행 전체가 같다. 허용된 RECORD(stocktakes 포함)와 금지된 출고 모두 효과0이다."를 확인한다
+    그러면 "mcp-batch-unchanged-works" assertion으로 "MCP batch 전후 조직 범위의 works 원행 전체가 같다. 허용된 RECORD(stocktakes 포함)와 금지된 출고 모두 효과0이다."를 확인한다
+    그러면 "mcp-batch-unchanged-obligations" assertion으로 "MCP batch 전후 조직 범위의 obligations 원행 전체가 같다. 허용된 RECORD(stocktakes 포함)와 금지된 출고 모두 효과0이다."를 확인한다
+    그러면 "mcp-batch-unchanged-outbox" assertion으로 "MCP batch 전후 조직 범위의 outbox 원행 전체가 같다. 허용된 RECORD(stocktakes 포함)와 금지된 출고 모두 효과0이다."를 확인한다
+    그러면 "mcp-batch-unchanged-claims" assertion으로 "MCP batch 전후 조직 범위의 claims 원행 전체가 같다. 허용된 RECORD(stocktakes 포함)와 금지된 출고 모두 효과0이다."를 확인한다
+    그러면 "mcp-batch-unchanged-stocktakes" assertion으로 "MCP batch 전후 조직 범위의 stocktakes 원행 전체가 같다. 허용된 RECORD(stocktakes 포함)와 금지된 출고 모두 효과0이다."를 확인한다
 
   @sit
   시나리오: 공개하지 않은 core CRUD QuantityMovement가 원장을 변경하지 못한다

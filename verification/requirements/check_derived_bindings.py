@@ -5,7 +5,7 @@ Each verification/cases/<ID>/observation-bindings.json is derived data stamped w
 case.json it was derived from (caseHash) and of the normative catalog it was bound against
 (catalogSha256). A stale stamp means the derived file was not regenerated after its input changed.
 The per-case generators' --check modes cover content; this check covers the stamps of every bindings
-file, including C3 whose post-processor refreshes caseHash only.
+file, including C3 whose post-processor refreshes caseHash and catalogSha256.
 
 A recorded KNOWN_OPEN entry (owner, reason, closeWhen) is listed but does not fail; an entry that no
 longer matches a stale stamp fails, so the list stays exact.
@@ -15,14 +15,9 @@ import argparse, hashlib, json, pathlib, sys
 
 ROOT = pathlib.Path(__file__).resolve().parents[2]
 CATALOG = 'verification/requirements/mandatory-oracles.json'
-KNOWN_OPEN = {
-    ('C3', 'catalogSha256'): {
-        'owner': 'C3 case owner (verification/cases/C3/author_prerequisites.py)',
-        'reason': 'author_prerequisites.py refreshes caseHash and bindings but never catalogSha256, so the stamp still names the '
-                  'catalog before d84f2942; a harness worker may only run the generator, which is a fixed point here.',
-        'closeWhen': 'author_prerequisites.py recomputes catalogSha256 and the regenerated C3 observation-bindings.json is committed.',
-    },
-}
+# Recorded open stamp gaps: {(caseId, field): {'owner', 'reason', 'closeWhen'}}. Empty since the C3 generator
+# recomputes catalogSha256 (step2r round 4); a new entry needs an owner and a closing condition.
+KNOWN_OPEN = {}
 
 
 def sha256(path):

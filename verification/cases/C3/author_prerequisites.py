@@ -394,11 +394,19 @@ def main():
     feature=DIR/'scenario.feature';header=feature.read_text().split('\n')[:3]
     feature.write_text(render_feature(n,header))
     bindings=DIR/'observation-bindings.json';b=json.loads(bindings.read_text());b['caseHash']=hashlib.sha256(path.read_bytes()).hexdigest()
+    # The bindings are derived from the case and bound against the normative catalog, so both stamps are recomputed
+    # (verification/requirements/check_derived_bindings.py). The observation list must still be the catalog's C3 list.
+    catalog_path=ROOT/'verification/requirements/mandatory-oracles.json'
+    b['catalogSha256']=hashlib.sha256(catalog_path.read_bytes()).hexdigest()
+    catalog=json.loads(catalog_path.read_text())
+    expected=[(o['oracleId'],x['name']) for o in catalog['oracles'] if o['caseId']=='C3' for x in o['expectedObservations']]
+    assert [(o['oracleId'],o['observationName']) for o in b['observations']]==expected,'C3 observation-bindings observations differ from the catalog'
     for observation in b['observations']:
         observation['bindings']=[{'subcaseId':s['id'],'assertionId':a['id'],'pointer':f'/subcases/{i}/assertions/{j}','actionId':a['source']['actionId'],'op':a['op']}
             for i,s in enumerate(n['subcases']) for j,a in enumerate(s['assertions']) if a.get('oracleRef',{}).get('oracleId')==observation['oracleId'] and observation['observationName'] in a.get('oracleRef',{}).get('observationNames',[])]
     old=bindings.read_text()
     old=re.sub(r'"caseHash": "[^"]+"', '"caseHash": '+json.dumps(b['caseHash']), old)
+    old=re.sub(r'"catalogSha256": "[^"]+"', '"catalogSha256": '+json.dumps(b['catalogSha256']), old)
     blocks=iter(b['observations'])
     def render_bindings(match):
         rows=next(blocks)['bindings']
