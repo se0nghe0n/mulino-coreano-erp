@@ -163,3 +163,26 @@ T25가 업무 DB를 읽으라고 하지 않는다.
   갱신했다. T08 `observation-bindings.json`의 `catalogSha256` 등
   준비 기록의 옛 hash는 당시 기록이다. T08은 소유자가
   `bind_observations.py`로 다시 만들어야 `--check`가 통과한다.
+
+## 관찰 단위 계층 경로 검사(2026-10-08, 2라운드)
+
+coverage assembler는 subcase의 모든 assertion을 case가 선언한 모든
+profile에 연결한다. 그래서 `mcp`·`skills` profile만 선언해도 MCP나
+skill loading 결과를 하나도 읽지 않는 관찰이 "도달 가능"으로 보인다.
+`check_layer_routes.py`는 MCP·SKILLS layer를 요구하는 관찰마다 연결
+assertion 중 하나 이상이 그 계층의 증거(MCP·wire route 응답, MCP 쓰기
+뒤의 독립 DB 관찰, protocol transcript, skill loading stage, profile·
+artifactKind 필터의 coverage 행)를 읽는지 정적으로 검사한다.
+
+```bash
+python3 verification/requirements/check_layer_routes.py            # MCP·SKILLS
+python3 verification/requirements/check_layer_routes.py --include-db # DB 참고 목록
+python3 -m unittest discover -s verification/requirements -p 'test_layer_routes.py'
+```
+
+검토한 예외는 E1 model-reference 하나(host 모델 gate 입력)다. 다른
+소유자의 열린 항목(T20 3개, V4 1개)은 `KNOWN_OPEN`으로 보고하고
+실패시키지 않는다. 결과 `VALID`는 선언 구조의 일관성일 뿐 runtime
+PASS가 아니다. API layer는 검사하지 않는다. 효과 관찰은 DB 원행이
+artifact이고 명령 응답은 같은 oracle의 다른 관찰에서 API로 읽기
+때문이다.
