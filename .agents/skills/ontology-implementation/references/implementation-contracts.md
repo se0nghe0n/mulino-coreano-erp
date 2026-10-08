@@ -66,17 +66,24 @@ numeric(38,12)다. 허용 정밀도를 넘으면 거부한다. 기준 단위 소
 따라서 서비스에 projection, action, MCP tool, worker handler, 관리
 endpoint를 추가·변경할 때마다 실제 노출 면을 열거한다. 쓰기 가능한 항목은
 capability allowlist에 있어야 하고 core entity는 노출하지 않거나
-`@readonly`·`@restrict`로 막는다. 열거와 우회 시도를 V4 case가 실행하며
-(`ontology-scenario-testing`의 repository-harness), 규칙 없는 `404`나
-"generic projection을 만들지 않는다"는 관례만으로 충족했다고 하지 않는다.
+`@readonly`·`@restrict`로 막는다. 규칙 없는 `404`나 "generic projection을
+만들지 않는다"는 관례만으로 충족했다고 하지 않는다.
+
+이 열거와 우회 시도는 요구이며 현재 `verification/cases/V4`는 이를 실행하지
+않는다. V4는 고정 route inventory이고 `$metadata`·`tools/list`·worker
+registry를 읽는 subcase가 없다. 따라서 열거 subcase가 추가되기 전에는 V4의
+노출 면 부분을 `NOT_RUN`으로 보고하고, 구현 PR은 직접 열거한 결과를 근거로
+남긴다. 열거 subcase는 V4/registry 소유자에게 요청한다
+(`ontology-scenario-testing`의 repository-harness, `docs/execution/step1r/
+cross-owner-requests.md`).
 
 **조회 두 진입점.** `getObject`·`searchObjects`·`getWork`·`searchWorks`·
 `getInventory`·`getObligations`·`traceLot`·`getEvidence`·`getAssessment`·
 `getDefinition`은 같은 application query와 query schema를 공유한다. 명사에서
 연결 업무를, 업무에서 대상·물량·목표·근거를 반환하며 같은 ID와
 `snapshotRevision`/평가시점이면 결과가 같다. 응답은 `data`, `asOf`,
-`knownAt`, `scope`, `unknowns`, `conflicts`, `evidenceRefs`, `nextCursor`를
-포함한다. 목록은 안정된 ID tie-break와 cursor를 쓰고 page 사이 시점 변화를
+`knownAt`, `scope`, `unknowns`, `conflicts`, `evidenceRefs`를 포함하고 목록은
+`nextCursor`도 반환한다. 목록은 안정된 ID tie-break와 cursor를 쓰고 page 사이 시점 변화를
 응답에 밝힌다. offset paging과 자유 SQL·허용 밖 filter/sort/relation을 만들지
 않는다. 검색 결과로 다른 조직 객체의 존재를 드러내지 않는다. 오류는
 `TYPE_INVALID`, `VERSION_UNSUPPORTED`, `POLICY_UNRESOLVED`, `FORBIDDEN`,
