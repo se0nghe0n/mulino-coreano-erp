@@ -21,8 +21,18 @@ public final class Main {
         if(args.length==0) throw new IllegalArgumentException("validate|prepare|coverage|red|profile <profile> [case.json...]");
         String mode=args[0],profile=mode.equals("profile") ? args[1] : mode;
         int start=mode.equals("profile") ? 2 : 1;
-        List<Path> paths=new ArrayList<>();
-        for(int i=start;i<args.length;i++) if(!args[i].startsWith("--")) paths.add(validator.path(args[i]));
+        List<Path> paths=new ArrayList<>();String manifest=null;
+        for(int i=start;i<args.length;i++) {
+            String arg=args[i];
+            if(arg.equals("--manifest")) {
+                if(i+1>=args.length || args[i+1].startsWith("--")) throw new IllegalArgumentException("--manifest requires a path");
+                manifest=args[++i];
+            } else if(arg.startsWith("--manifest=")) manifest=arg.substring("--manifest=".length());
+            else if(arg.equals("--all") && mode.equals("red")) continue;
+            else if(arg.startsWith("--")) throw new IllegalArgumentException("Unknown option "+arg);
+            else paths.add(validator.path(arg));
+        }
+        if(manifest!=null && !(mode.equals("profile") && RUN_MANIFEST_PROFILES.contains(profile))) throw new IllegalArgumentException("--manifest applies only to profile model/deployment");
         if(paths.isEmpty()) {
             Path cases=root.resolve("verification/cases");
             if(Files.isDirectory(cases)) try(var files=Files.walk(cases)) { files.filter(p->p.getFileName().toString().equals("case.json")).sorted().forEach(paths::add); }
@@ -34,7 +44,9 @@ public final class Main {
         }
         if(mode.equals("prepare") || mode.equals("coverage")) return prepare(validator,paths,mode);
         if(!mode.equals("profile") && !mode.equals("red")) throw new IllegalArgumentException("Unknown mode "+mode);
+        ObjectNode runManifest=mode.equals("profile") && RUN_MANIFEST_PROFILES.contains(profile) ? runManifest(validator,profile,manifest) : null;
         AcceptanceDriver driver=DriverFactory.create(root,mode.equals("red"));
+        AgentRunner agentRunner=mode.equals("red") ? new AgentRunner.Scripted() : AgentRunner.fromProperty(System.getProperty("verification.agentRunner","scripted"));
         boolean actual=driver instanceof org.mulino.verification.actual.ActualAcceptanceDriver;
         ArrayNode cases=Json.array();boolean anyFail=false,anyNotRun=false;
         int discovered=0,selected=0;
@@ -43,7 +55,7 @@ public final class Main {
             if(!mode.equals("red") && !contains(c.path("profiles"),profile)) continue;
             for(JsonNode sub:c.path("subcases")) {
                 selected++;
-                CaseRunner runner=new CaseRunner(validator,driver,new AgentRunner.Scripted(),path,Json.required(sub,"id"));
+                CaseRunner runner=new CaseRunner(validator,driver,agentRunner,path,Json.required(sub,"id"));
                 String status=runner.run(mode.equals("red")); anyFail|=status.equals("FAIL");anyNotRun|=status.equals("NOT_RUN");
                 cases.add(runner.evidence(status,System.getProperty("verification.command","Java acceptance harness")));
             }
@@ -55,6 +67,12 @@ public final class Main {
         for(JsonNode evidence:cases) for(JsonNode action:evidence.path("actions")) if(actual && action.path("driverStatus").asText().equals("EXECUTED")) actualExecutedActions++;
         report.put("driver",actual?"actual":"unimplemented");report.put("actualExecutedActions",actualExecutedActions);report.put("productRuntimeClaimed",actualExecutedActions>0);report.set("cases",cases);report.put("reason",selected==0?"NOT_IMPLEMENTED: product adapter/cases missing; failIfNoTests prevents PASS":"Required actions and observers must execute; unavailable adapters do not establish zero effects");
         report.set("prerequisiteProfiles",Json.MAPPER.valueToTree(prerequisites(profile)));report.put("prerequisiteRuntimeComplete",false);
+        report.put("agentRunner",agentRunner.kind());
+        if(runManifest!=null) {
+            report.set("runManifest",runManifest);
+            // Approval/account evidence alone runs nothing: the paid model/deployment runner is a separate gate.
+            if(status.equals("PASS")) {status="NOT_RUN";exit=2;report.put("status",status).put("exitCode",exit).put("gateComplete",false);}
+        }
         if(!mode.equals("red") && !actual) {report.put("gateComplete",false);report.put("status",anyFail?"FAIL":"NOT_RUN");report.put("exitCode",anyFail?1:2);exit=anyFail?1:2;}
         if(actual) report.put("gateComplete",false); // Prerequisite integration gates remain independently unverified.
         Json.write(root.resolve("verification/harness/target/evidence/"+profile+".json"),report);
@@ -75,6 +93,7 @@ public final class Main {
                 assertions++;for(JsonNode r:assertion.path("requirementRefs")) covered.add(r.asText());
             }
             problems.addAll(preparation.feature(path,c));
+            problems.addAll(validator.oracleSourceProblems(c));
         }
         for(String id:expected) if(!cases.containsKey(id)) problems.add("Missing required case "+id);
         for(int i=1;i<=26;i++) if(!covered.contains(String.format("D%02d",i))) problems.add("Missing requirement assertion "+String.format("D%02d",i));
@@ -85,14 +104,12 @@ public final class Main {
         }
         Path catalog=validator.path("verification/requirements/mandatory-oracles.json");
         if(!Files.isRegularFile(catalog)) problems.add("Missing independent normative oracle catalog");
-        else catalogLinks(validator,Json.read(catalog),cases,problems);
+        List<String> attributionGaps=new ArrayList<>();
+        if(Files.isRegularFile(catalog)) CatalogLinkValidator.validate(validator,Json.read(catalog),cases,problems,attributionGaps);
         String status=problems.isEmpty()?"PREPARED":"FAIL";ObjectNode report=base(validator.root(),mode,status,problems.isEmpty()?0:1);
         report.put("gateComplete",false).put("runtimeStatus","NOT_RUN").put("runtimeComplete",false).put("preparedCases",cases.size()).put("preparedSubcases",subcases).put("preparedAssertions",assertions);
-        report.set("preparationProblems",Json.MAPPER.valueToTree(problems));report.put("artifactCoverageStatus","NOT_RUN");report.put("semanticOracleEquivalence","REQUIRES_CASE_REVIEW");
+        report.set("preparationProblems",Json.MAPPER.valueToTree(problems));report.set("artifactKindAttributionGaps",Json.MAPPER.valueToTree(attributionGaps));report.put("artifactCoverageStatus","NOT_RUN");report.put("semanticOracleEquivalence","REQUIRES_CASE_REVIEW");
         Json.write(validator.root().resolve("verification/harness/target/evidence/"+mode+".json"),report);System.out.println(report.toPrettyString());return problems.isEmpty()?0:1;
-    }
-    private static void catalogLinks(ContractValidator validator,JsonNode catalog,Map<String,JsonNode> cases,List<String> problems) throws IOException {
-        CatalogLinkValidator.validate(validator,catalog,cases,problems);
     }
     private static ObjectNode base(Path root,String profile,String status,int exit) throws IOException,InterruptedException {
         ObjectNode r=Json.object();r.put("schemaVersion","1.0.0").put("recordType","ACCEPTANCE_HARNESS_REPORT").put("profile",profile).put("status",status).put("exitCode",exit).put("timestamp",Instant.now().toString()).put("command",System.getProperty("verification.command","Java acceptance harness"));
@@ -100,6 +117,20 @@ public final class Main {
         Process dirty=new ProcessBuilder("git","status","--porcelain").directory(root.toFile()).start();String changes=new String(dirty.getInputStream().readAllBytes());if(dirty.waitFor()!=0) throw new IOException("Cannot record working tree status");r.put("workingTreeDirty",!changes.isBlank());
         Path mainClass=root.resolve("verification/harness/target/classes/org/mulino/verification/Main.class");r.put("harnessMainClassSha256",Json.sha256(mainClass));
         r.put("javaVersion",System.getProperty("java.runtime.version")).put("harnessVersion","1.0.0").put("productRuntimeClaimed",false);return r;
+    }
+    static final Set<String> RUN_MANIFEST_PROFILES=Set.of("model","deployment");
+    /** Validates the plan §13.4 run manifest; a manifest never substitutes for executing the profile. */
+    static ObjectNode runManifest(ContractValidator validator,String profile,String manifest) throws IOException {
+        ObjectNode r=Json.object();
+        if(manifest==null) {r.putNull("path");r.put("status","ABSENT").put("notRunReason","NOT_RUN: "+profile+" requires --manifest with R8 approval/account evidence");return r;}
+        Path file=validator.path(manifest);
+        if(!Files.isRegularFile(file)) throw new IllegalArgumentException("Run manifest not found: "+manifest);
+        JsonNode m=Json.read(file);validator.schema("contracts/acceptance-run-manifest.schema.json",m);
+        if(!m.path("profile").asText().equals(profile)) throw new IllegalArgumentException("Run manifest profile "+m.path("profile").asText()+" differs from requested "+profile);
+        String approvalKey=profile.equals("model")?"modelApproval":"deploymentApproval";boolean approved=m.path("approvals").has(approvalKey);
+        r.put("path",validator.root().relativize(file).toString()).put("sha256",Json.sha256(file)).put("status","VALID").put("approvalEvidence",approved?"PRESENT":"ABSENT");
+        r.put("notRunReason",approved?"NOT_RUN: approval evidence recorded; the "+profile+" runner did not execute in this harness":"NOT_RUN: "+approvalKey+" (R8/BTP account evidence) absent; no paid model or deployment call made");
+        return r;
     }
     private static boolean contains(JsonNode array,String value) {for(JsonNode n:array) if(n.asText().equals(value)) return true;return false;}
     private static List<String> prerequisites(String profile) {return switch(profile) {

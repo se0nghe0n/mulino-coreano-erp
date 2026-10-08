@@ -2,6 +2,12 @@
   "schemaVersion": "1.0.0",
   "kind": "PUBLIC_ACCEPTANCE_CONTRACT_NOT_IMPLEMENTATION",
   "source": "docs/ontology-implementation-plan.md \u00a73\u2013\u00a78",
+  "adapterAliases": {
+    "actualClient": "client",
+    "independent-db-observer": "db",
+    "process-control": "process"
+  },
+  "adapterNotes": "requiredAdapters names are canonicalized through adapterAliases. Unknown names stay distinct, so no driver satisfies them implicitly. client/model are supplied only by an actual client runner (UAT); a scripted SIT runner never substitutes for them.",
   "capabilities": [
     {
       "id": "getObject",

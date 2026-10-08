@@ -7,6 +7,8 @@ import java.nio.file.*;
 import java.util.*;
 
 public final class ScenarioGlue {
+    /** Per-scenario verdicts for CaseFeatureTest; same JVM as the Cucumber launcher. */
+    static final java.util.concurrent.ConcurrentHashMap<String,String> STATUSES=new java.util.concurrent.ConcurrentHashMap<>();
     private CaseRunner runner;
     private int checked;
     private final Path root=Path.of(System.getProperty("repo.root")).toAbsolutePath().normalize();
@@ -29,14 +31,12 @@ public final class ScenarioGlue {
         if(runner==null) return;
         if(!scenario.isFailed()) runner.verifyComplete();
         String mode=System.getProperty("verification.mode","harness-selftest");
-        var report=runner.evidence(scenario.isFailed()?"FAIL":"PASS",System.getProperty("verification.command","Maven Cucumber"));
-        if(mode.equals("actual") && scenario.isFailed()) {
-            boolean unavailable=false,violation=false;
-            for(var assertion:report.path("assertions")) if(assertion.path("status").asText().equals("FAIL")) {
-                if(assertion.path("reason").asText().contains("NOT_IMPLEMENTED")) unavailable=true; else violation=true;
-            }
-            if(unavailable && !violation) report.put("status","NOT_RUN").put("runtimeComplete",false);
-        }
+        boolean actual=System.getProperty("verification.driver","").equals("actual") && !mode.equals("contract-red");
+        // Actual runs: Cucumber skips steps after the first failure, so evaluate every remaining assertion and
+        // classify by structured failureKind/driverStatus, never by searching message text.
+        String status=actual && scenario.isFailed() ? runner.verdictAfterStop() : scenario.isFailed()?"FAIL":"PASS";
+        var report=runner.evidence(status,System.getProperty("verification.command","Maven Cucumber"));
+        STATUSES.put(report.path("caseId").asText()+"/"+report.path("subcaseId").asText(),report.path("status").asText());
         String name=mode+"-"+report.path("caseId").asText()+"-"+report.path("subcaseId").asText();
         name=java.net.URLEncoder.encode(name,java.nio.charset.StandardCharsets.UTF_8);
         Json.write(root.resolve("verification/harness/target/evidence/"+name+".json"),report);

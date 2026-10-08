@@ -14,13 +14,19 @@ public final class HostObservationValidator {
     private HostObservationValidator() {}
 
     /** resolvedControl is the already-resolved action.control object, not the enclosing action. */
+    /** Harness selftest form: captured selftest evidence may be validated for internal consistency only. */
     public static void validate(ContractValidator validator, JsonNode resolvedControl, StepResult result) throws IOException {
+        validate(validator,resolvedControl,result,false);
+    }
+    /** requireActualHost: product profile runs accept only ACTUAL_HOST evidence from ACTUAL_HOST_PROCESS. */
+    public static void validate(ContractValidator validator, JsonNode resolvedControl, StepResult result, boolean requireActualHost) throws IOException {
         if(!"process".equals(resolvedControl.path("type").asText())) return;
         if(result.driverStatus()!=StepResult.DriverStatus.EXECUTED) return;
         JsonNode host=result.data()==null?null:result.data().get("hostObservation");
         ContractValidator.require(host!=null,"Process control requires independent hostObservation, not only command ACK");
         validator.schema("contracts/acceptance-host-observation.schema.json",host);
         String source=result.provenance().path("source").asText();
+        if(requireActualHost) ContractValidator.require(host.path("evidenceClass").asText().equals("ACTUAL_HOST") && source.equals("ACTUAL_HOST_PROCESS"),"Product run requires ACTUAL_HOST evidence from ACTUAL_HOST_PROCESS; captured selftest evidence is not product acceptance");
         ContractValidator.require(host.path("evidenceClass").asText().equals("CAPTURED_SELFTEST") ? source.equals("CANNED_CONTRACT_SELFTEST") : source.equals("ACTUAL_HOST_PROCESS"),"Host evidence class does not match actual versus captured provenance source");
         if(host.path("evidenceClass").asText().equals("ACTUAL_HOST")) {
             ContractValidator.require(result.provenance().path("independent").asBoolean(false),"Actual host evidence class requires independent provenance");

@@ -126,4 +126,38 @@ class CatalogLinkValidatorTest {
         ((ObjectNode)observation().path("expected")).put("value","0");first().put("op","decimalDelta").put("expected","0");
         first().set("baseline",source("quantity"));first().set("baselineUnitSource",source("unit"));assertFalse(check().isEmpty());
     }
+    private List<String> gaps() throws Exception {
+        List<String> errors=new ArrayList<>(),gaps=new ArrayList<>();CatalogLinkValidator.validate(validator,catalog,Map.of(caseNode.path("caseId").asText(),caseNode),errors,gaps);return gaps;
+    }
+    private void actions(String... kinds) {
+        ((ObjectNode)caseNode.path("subcases").get(0)).set("requiredAdapters",Json.array().add("api").add("db").add("fixture"));
+        ArrayNode actions=Json.array();for(String k:kinds) {String[] p=k.split(":");actions.add(Json.object().put("id",p[0]).put("kind",p[1]));}
+        ((ObjectNode)caseNode.path("subcases").get(0)).set("actions",actions);
+    }
+    @Test void dbSnapshotArtifactKindNeedsAnIndependentObserveInALinkedSubcase() throws Exception {
+        observation().set("artifactKinds",Json.array().add("api_response").add("db_snapshot"));
+        actions("after-db:observe");assertEquals(List.of(),check());
+        // The same assertions read from an API query: the API projection alone cannot satisfy db_snapshot.
+        actions("after-db:query");
+        assertTrue(check().stream().anyMatch(p->p.contains("requires db_snapshot") && p.contains(ORACLE+"/"+OBS)),check().toString());
+        observation().set("artifactKinds",Json.array().add("api_response"));assertEquals(List.of(),check());
+    }
+    @Test void dbSnapshotWithoutAnyDbAdapterIsCatalogLayerGapNotDoubleGated() throws Exception {
+        observation().set("artifactKinds",Json.array().add("db_snapshot"));actions("after-db:query");
+        ((ObjectNode)caseNode.path("subcases").get(0)).set("requiredAdapters",Json.array().add("coverage").add("host"));
+        assertEquals(List.of(),check());assertEquals(1,gaps().size());
+        ((ObjectNode)caseNode.path("subcases").get(0)).set("requiredAdapters",Json.array().add("db"));
+        assertEquals(1,check().size());assertEquals(List.of(),gaps());
+    }
+    @Test void siblingObservationObservedInSameSubcaseSharesTheDbSnapshot() throws Exception {
+        ObjectNode sibling=Json.object().put("name","sibling-db").put("type","state").put("operator","eq");sibling.set("artifactKinds",Json.array().add("db_snapshot"));
+        ((ArrayNode)catalog.path("oracles").get(0).path("expectedObservations")).add(sibling);
+        observation().set("artifactKinds",Json.array().add("db_snapshot"));
+        actions("after-db:query","raw:observe");
+        ObjectNode observed=Json.object().put("id","sibling-row").put("op","count").put("expected",1);observed.set("source",Json.object().put("actionId","raw").put("pointer","/data/rawRows/contributions"));
+        ObjectNode ref=Json.object().put("oracleId",ORACLE);ref.set("observationNames",Json.array().add("sibling-db"));observed.set("oracleRef",ref);
+        assertions().add(observed);assertEquals(List.of(),check());
+        assertions().remove(assertions().size()-1);
+        assertTrue(check().stream().anyMatch(p->p.contains("requires db_snapshot")));
+    }
 }

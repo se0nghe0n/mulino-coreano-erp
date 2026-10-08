@@ -9,9 +9,39 @@ import java.util.*;
 public final class ContractValidator {
     private final Path root;
     private final Set<String> capabilities=new HashSet<>();
+    private final Map<String,String> adapterAliases=new HashMap<>();
+    /** Adapter names that only an actual client/model host (UAT runner) can supply. */
+    public static final Set<String> CLIENT_ADAPTERS=Set.of("client","model");
+    /** Driver metadata is request-side provenance written by the harness port, never an independent oracle source. */
+    public static final List<String> NON_ORACLE_POINTERS=List.of("/provenance","/reason","/artifactRefs","/driverStatus","/actionId");
     public ContractValidator(Path root) throws IOException {
         this.root=root.toAbsolutePath().normalize();
-        for(JsonNode c:Json.read(root.resolve("contracts/acceptance-capabilities.json")).path("capabilities")) capabilities.add(Json.required(c,"id"));
+        JsonNode registry=Json.read(root.resolve("contracts/acceptance-capabilities.json"));
+        for(JsonNode c:registry.path("capabilities")) capabilities.add(Json.required(c,"id"));
+        registry.path("adapterAliases").fields().forEachRemaining(e->adapterAliases.put(e.getKey(),e.getValue().asText()));
+    }
+    /** Canonical adapter vocabulary; unknown names stay distinct so no driver can satisfy them implicitly. */
+    public String adapter(String name) { return adapterAliases.getOrDefault(name,name); }
+    public Set<String> adapters(Iterable<?> names) {
+        Set<String> out=new TreeSet<>();
+        for(Object n:names) out.add(adapter(n instanceof JsonNode j ? j.asText() : String.valueOf(n)));
+        return out;
+    }
+    /** UAT-only subcases need a real client/model host; a scripted SIT runner cannot substitute. */
+    public boolean requiresActualClient(JsonNode subcase) {
+        for(String a:adapters(subcase.path("requiredAdapters"))) if(CLIENT_ADAPTERS.contains(a)) return true;
+        return false;
+    }
+    /** Preparation problems for oracle sources that read harness-side driver metadata. */
+    public List<String> oracleSourceProblems(JsonNode caseFile) {
+        List<String> problems=new ArrayList<>();
+        for(JsonNode sub:caseFile.path("subcases")) for(JsonNode assertion:sub.path("assertions"))
+            for(String field:List.of("source","baseline","unitSource","baselineUnitSource")) if(assertion.has(field)) {
+                String pointer=assertion.path(field).path("pointer").asText();
+                for(String forbidden:NON_ORACLE_POINTERS) if(pointer.equals(forbidden) || pointer.startsWith(forbidden+"/"))
+                    problems.add(caseFile.path("caseId").asText()+"/"+sub.path("id").asText()+"/"+assertion.path("id").asText()+": "+field+" "+pointer+" reads driver request-side metadata, not an independent server/DB observation");
+            }
+        return problems;
     }
     public Path root() { return root; }
     public Path path(String relative) {
@@ -32,7 +62,8 @@ public final class ContractValidator {
             require(subs.add(Json.required(sub,"id")),"Duplicate subcase ID");
             fixture(Json.required(sub,"fixtureRef"));
             Set<String> ids=new HashSet<>(); List<JsonNode> all=new ArrayList<>(); collect(sub.path("actions"),all);
-            for(JsonNode a:all) { require(ids.add(Json.required(a,"id")),"Duplicate action ID"); checkAction(a); }
+            boolean uatOnly=requiresActualClient(sub);
+            for(JsonNode a:all) { require(ids.add(Json.required(a,"id")),"Duplicate action ID"); checkAction(a,uatOnly); }
             Set<String> starts=new HashSet<>(), awaited=new HashSet<>();
             for(JsonNode a:all) if(a.path("kind").asText().equals("start")) starts.add(Json.required(a,"id"));
             for(JsonNode a:all) if(a.path("kind").asText().equals("await")) {
@@ -85,14 +116,18 @@ public final class ContractValidator {
             require(errors.isEmpty(),"Invalid bounded transform declaration: "+errors);
         } catch(IOException e) {throw new IllegalArgumentException(e);}
     }
-    private void checkAction(JsonNode action) {
+    private void checkAction(JsonNode action,boolean uatOnly) {
         String kind=Json.required(action,"kind");
         if(Set.of("invoke","query").contains(kind) && !action.has("protocolOperation")) require(capabilities.contains(Json.required(action,"capabilityId")),"Unknown public capability "+action.path("capabilityId"));
-        if(kind.equals("start")) { String child=action.path("call").path("kind").asText(); require(Set.of("invoke","query").contains(child),"start call must be invoke/query"); checkAction(action.path("call")); }
+        if(kind.equals("start")) { String child=action.path("call").path("kind").asText(); require(Set.of("invoke","query").contains(child),"start call must be invoke/query"); checkAction(action.path("call"),uatOnly); }
         if(kind.equals("agent")) {
             JsonNode context=action.path("permittedContext");
             for(String forbidden:List.of("expected","assertions","oracle","oracleRef","intent","capabilityId","slots"))
                 require(!containsKey(context,forbidden),"Actual agent context contains planned answer/oracle: "+forbidden);
+            JsonNode capability=action.path("intent").path("capabilityId");
+            // SIT replays a declared typed intent; only UAT-only subcases may omit it.
+            if(capability.isMissingNode()) require(uatOnly,"Agent action without scripted typed intent must belong to a UAT-only subcase (requiredAdapters client/model)");
+            else require(capability.isTextual() && capabilities.contains(capability.asText()),"Unknown scripted agent capability "+capability);
         }
     }
     private static boolean containsKey(JsonNode node,String key) {

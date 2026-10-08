@@ -235,7 +235,7 @@
           "op": "unique",
           "source": {
             "actionId": "db-after",
-            "pointer": "/data/data/segments",
+            "pointer": "/data/rawRows/segments",
             "field": "physicalScope"
           },
           "expected": true,
@@ -257,7 +257,7 @@
           "op": "exactSet",
           "source": {
             "actionId": "db-after",
-            "pointer": "/data/data/segments",
+            "pointer": "/data/rawRows/segments",
             "field": "alias"
           },
           "expected": [
@@ -282,7 +282,7 @@
           "op": "relationSet",
           "source": {
             "actionId": "db-after",
-            "pointer": "/data/data/restrictions",
+            "pointer": "/data/rawRows/restrictions",
             "field": [
               "sourceCommandKey",
               "segmentAlias",
@@ -316,7 +316,7 @@
           "op": "equals",
           "source": {
             "actionId": "db-after",
-            "pointer": "/data/data/obligations/0/ownerAlias"
+            "pointer": "/data/rawRows/obligations/0/ownerAlias"
           },
           "expected": "qc",
           "requirementRefs": [
@@ -337,7 +337,7 @@
           "op": "timeEquals",
           "source": {
             "actionId": "db-after",
-            "pointer": "/data/data/obligations/0/nextCheckAt"
+            "pointer": "/data/rawRows/obligations/0/nextCheckAt"
           },
           "expected": "2026-10-07T10:00:00Z",
           "requirementRefs": [
@@ -379,7 +379,7 @@
           "op": "fieldsPresent",
           "source": {
             "actionId": "db-after",
-            "pointer": "/data/data/obligations"
+            "pointer": "/data/rawRows/obligations"
           },
           "expected": [
             "ownerAlias",
@@ -404,7 +404,7 @@
           "op": "sumEquals",
           "source": {
             "actionId": "db-after",
-            "pointer": "/data/data/segments",
+            "pointer": "/data/rawRows/segments",
             "field": "quantity"
           },
           "expected": "100",
@@ -423,7 +423,7 @@
           "unit": "BOX",
           "unitSource": {
             "actionId": "db-after",
-            "pointer": "/data/data/segments",
+            "pointer": "/data/rawRows/segments",
             "field": "unit"
           }
         }

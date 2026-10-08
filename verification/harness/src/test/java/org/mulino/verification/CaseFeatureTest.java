@@ -24,13 +24,17 @@ public final class CaseFeatureTest {
             Path file=validator.path(ref);var c=validator.caseFile(file);expected+=c.path("subcases").size();
             builder.selectors(DiscoverySelectors.selectFile(file.resolveSibling("scenario.feature").toFile()));
         }
+        ScenarioGlue.STATUSES.clear();
         var listener=new SummaryGeneratingListener();LauncherFactory.create().execute(builder.build(),listener);
         var summary=listener.getSummary();
         var r=Json.object();r.put("expectedScenarios",expected).put("discoveredScenarios",summary.getTestsFoundCount()).put("startedScenarios",summary.getTestsStartedCount()).put("skippedScenarios",summary.getTestsSkippedCount()).put("failedScenarios",summary.getTestsFailedCount());
         long unavailable=summary.getFailures().stream().filter(f->f.getException() instanceof AssertionError && f.getException().getMessage()!=null && f.getException().getMessage().contains("NOT_IMPLEMENTED")).count();
         boolean actual=System.getProperty("verification.driver","").equals("actual") && !System.getProperty("verification.mode","").equals("contract-red");
-        String status=!actual?"FAIL":summary.getTestsFailedCount()==0?"PASS":summary.getTestsFailedCount()==unavailable?"NOT_RUN":"FAIL";
+        // Actual mode uses each scenario's structured verdict; message text never turns a violation into NOT_RUN.
+        var verdicts=ScenarioGlue.STATUSES.values();
+        String status=!actual?"FAIL":verdicts.size()!=expected?"FAIL":verdicts.contains("FAIL")?"FAIL":verdicts.contains("NOT_RUN")?"NOT_RUN":summary.getTestsFailedCount()==0?"PASS":"FAIL";
         r.put("notImplementedAssertionFailures",unavailable).put("status",status).put("productCoverageClaimed",false);
+        r.set("scenarioVerdicts",Json.MAPPER.valueToTree(new java.util.TreeMap<>(ScenarioGlue.STATUSES)));
         r.set("failureReasons",Json.MAPPER.valueToTree(summary.getFailures().stream().map(f->f.getException().toString()).toList()));
         Json.write(root.resolve("verification/harness/target/evidence/feature-red-summary.json"),r);
         assertEquals(expected,summary.getTestsFoundCount(),"Scenario discovery count");

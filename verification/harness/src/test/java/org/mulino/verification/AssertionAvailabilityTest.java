@@ -45,7 +45,7 @@ public final class AssertionAvailabilityTest {
         public Set<String> availableAdapters(){return Set.of("CAPTURED_SELFTEST_ONLY");}
         public StepResult installFixture(String id,JsonNode f){return result(id);}public StepResult invoke(String id,String route,JsonNode actor,String cap,JsonNode q){return result(id);}public StepResult query(String id,String route,JsonNode actor,String cap,JsonNode q){return result(id);}public StepResult observe(String id,JsonNode q){return result(id);}public StepResult control(String id,JsonNode q){return result(id);}public StepResult start(String id,String route,JsonNode actor,String cap,JsonNode q){return result(id);}public StepResult await(String id,JsonNode h,int t){return result(id);}
     }
-    private CaseRunner runner(Path p,AcceptanceDriver driver) throws Exception {return new CaseRunner(new ContractValidator(root),driver,new AgentRunner.Scripted(),p,"hold-preserves-physical");}
+    private CaseRunner runner(Path p,AcceptanceDriver driver) throws Exception {return CaseRunner.harnessSelftest(new ContractValidator(root),driver,new AgentRunner.Scripted(),p,"hold-preserves-physical");}
     @Test void missingFixtureAliasIsNotRunButConfirmedIndependentViolationRemainsFail() throws Exception {
         Path p=preparedCase();var output=executed("observed",Json.object(),Json.parse("{\"quantity\":1,\"workId\":\"actual-work\"}"));CaseRunner r=runner(p,new Captures(Map.of("observed",output)));
         assertEquals("FAIL",r.run(false));var evidence=r.evidence("FAIL","SELFTEST");assertEquals("FAIL",evidence.path("assertions").get(0).path("status").asText());assertEquals("NOT_RUN",evidence.path("assertions").get(1).path("status").asText());

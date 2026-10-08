@@ -165,11 +165,15 @@
             "snapshotRef": {
               "oneOf": [
                 {
-                  "type": "string",
-                  "minLength": 1
+                  "enum": [
+                    "CURRENT_COMMITTED",
+                    "CURRENT_LOCK_WAIT"
+                  ],
+                  "description": "Read-mode directive: the observer takes a fresh read; never echoed as snapshot.id or snapshotRevision."
                 },
                 {
-                  "$ref": "#/$defs/resultReference"
+                  "$ref": "#/$defs/resultReference",
+                  "description": "API-issued projection revision the observer must recompute independently."
                 }
               ]
             },

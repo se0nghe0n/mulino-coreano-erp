@@ -1,0 +1,135 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://mulino.test/contracts/acceptance-run-manifest.schema.json",
+  "description": "Input manifest for ./verify model|deployment --manifest <path> (plan §11, §13.4). It records approval/account evidence references only. It never contains credentials, and it never substitutes for executing the profile.",
+  "type": "object",
+  "required": [
+    "schemaVersion",
+    "recordType",
+    "profile",
+    "approvals"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "const": "1.0.0"
+    },
+    "recordType": {
+      "const": "ACCEPTANCE_RUN_MANIFEST"
+    },
+    "profile": {
+      "enum": [
+        "model",
+        "deployment"
+      ]
+    },
+    "approvals": {
+      "type": "object",
+      "properties": {
+        "modelApproval": {
+          "$ref": "#/$defs/approval"
+        },
+        "deploymentApproval": {
+          "$ref": "#/$defs/approval"
+        }
+      },
+      "additionalProperties": false
+    },
+    "notes": {
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "profile": {
+            "const": "model"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "approvals": {
+            "not": {
+              "required": [
+                "deploymentApproval"
+              ]
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "profile": {
+            "const": "deployment"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "approvals": {
+            "not": {
+              "required": [
+                "modelApproval"
+              ]
+            }
+          }
+        }
+      }
+    }
+  ],
+  "$defs": {
+    "approval": {
+      "type": "object",
+      "required": [
+        "decisionRef",
+        "approvedBy",
+        "approvedAt",
+        "scope",
+        "costCeiling"
+      ],
+      "properties": {
+        "decisionRef": {
+          "type": "string",
+          "minLength": 1,
+          "description": "R8/R9 decision record path or ID."
+        },
+        "approvedBy": {
+          "type": "string",
+          "minLength": 1
+        },
+        "approvedAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "scope": {
+          "type": "object",
+          "description": "Approved client/model/repeat count or BTP account reference. Account references are identifiers, never secrets.",
+          "minProperties": 1
+        },
+        "costCeiling": {
+          "type": "object",
+          "required": [
+            "currency",
+            "amount"
+          ],
+          "properties": {
+            "currency": {
+              "type": "string",
+              "pattern": "^[A-Z]{3}$"
+            },
+            "amount": {
+              "type": "string",
+              "pattern": "^(0|[1-9][0-9]*)(\\.[0-9]+)?$"
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    }
+  }
+}
