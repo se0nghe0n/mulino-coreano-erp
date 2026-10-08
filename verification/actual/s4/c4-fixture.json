@@ -1,0 +1,1337 @@
+{
+  "schemaVersion": "1.0.0",
+  "fixtureId": "S4-ACTUAL-NATIVE-TRADE",
+  "synthetic": true,
+  "baseRefs": [],
+  "clock": {
+    "asOf": "2026-10-07T09:00:00Z",
+    "knownAt": "2026-10-07T09:00:01Z",
+    "timezone": "Asia/Seoul",
+    "precision": "SECOND",
+    "deadlineInclusive": true
+  },
+  "versions": {
+    "definition": "definition-v1",
+    "evaluator": "core-v1",
+    "policy": "fixture-v1"
+  },
+  "actors": {
+    "reader": {
+      "issuer": "https://mulino-native.invalid",
+      "subject": "s4-native-reader",
+      "audience": "isolated-ontology",
+      "organizationAlias": "ORG",
+      "roleCapabilities": [
+        "createWork",
+        "assessGoal",
+        "closeWork",
+        "matchSourceIdentity",
+        "linkCanonicalOccurrence",
+        "proposePurchase",
+        "revisePurchase",
+        "approvePurchase",
+        "dispatchPurchaseOrder",
+        "recordSupplierReply",
+        "cancelPurchase",
+        "createShipment",
+        "recordLegEvent",
+        "recordHandover",
+        "receiveProvisional",
+        "confirmReceipt",
+        "prepareRegulatoryProcedure",
+        "recordSubmission",
+        "recordRegulatoryDecision",
+        "verifyLabel",
+        "placeHold",
+        "releaseHold",
+        "recordDispositionBasis",
+        "revokeDispositionBasis",
+        "getObject",
+        "getWork",
+        "getInventory",
+        "getAssessment",
+        "getObligations",
+        "getEvidence",
+        "decideQuality",
+        "confirmCustomerConditions",
+        "confirmCommercialDisposition",
+        "decideRecallRestriction",
+        "reconcileEvidence",
+        "createSalesOrder",
+        "reviseSalesOrder",
+        "recordDelivery",
+        "recordObservedMovement",
+        "reserveQuantity",
+        "replaceAllocation",
+        "pickQuantity",
+        "releaseAllocation",
+        "dispatchQuantity",
+        "authorizeReturn",
+        "receiveReturn",
+        "recordInvoice",
+        "matchInvoice",
+        "correctEvidence",
+        "recordActivity"
+      ],
+      "grant": {
+        "delegatorAlias": "supervisor",
+        "actions": [
+          "createWork",
+          "assessGoal",
+          "closeWork",
+          "matchSourceIdentity",
+          "linkCanonicalOccurrence",
+          "proposePurchase",
+          "revisePurchase",
+          "approvePurchase",
+          "dispatchPurchaseOrder",
+          "recordSupplierReply",
+          "cancelPurchase",
+          "createShipment",
+          "recordLegEvent",
+          "recordHandover",
+          "receiveProvisional",
+          "confirmReceipt",
+          "prepareRegulatoryProcedure",
+          "recordSubmission",
+          "recordRegulatoryDecision",
+          "verifyLabel",
+          "placeHold",
+          "releaseHold",
+          "recordDispositionBasis",
+          "revokeDispositionBasis",
+          "getObject",
+          "getWork",
+          "getInventory",
+          "getAssessment",
+          "getObligations",
+          "getEvidence",
+          "decideQuality",
+          "confirmCustomerConditions",
+          "confirmCommercialDisposition",
+          "decideRecallRestriction",
+          "reconcileEvidence",
+          "createSalesOrder",
+          "reviseSalesOrder",
+          "recordDelivery",
+          "recordObservedMovement",
+          "reserveQuantity",
+          "replaceAllocation",
+          "pickQuantity",
+          "releaseAllocation",
+          "dispatchQuantity",
+          "authorizeReturn",
+          "receiveReturn",
+          "recordInvoice",
+          "matchInvoice",
+          "correctEvidence",
+          "recordActivity"
+        ],
+        "scope": {
+          "organizationAlias": "ORG"
+        },
+        "validFrom": "2026-10-01T00:00:00Z",
+        "validUntil": "2026-10-31T23:59:59Z",
+        "revision": 1
+      }
+    },
+    "supervisor": {
+      "issuer": "https://mulino-native.invalid",
+      "subject": "s4-native-supervisor",
+      "audience": "isolated-ontology",
+      "organizationAlias": "ORG",
+      "roleCapabilities": [
+        "createWork",
+        "assessGoal",
+        "closeWork",
+        "matchSourceIdentity",
+        "linkCanonicalOccurrence",
+        "proposePurchase",
+        "revisePurchase",
+        "approvePurchase",
+        "dispatchPurchaseOrder",
+        "recordSupplierReply",
+        "cancelPurchase",
+        "createShipment",
+        "recordLegEvent",
+        "recordHandover",
+        "receiveProvisional",
+        "confirmReceipt",
+        "prepareRegulatoryProcedure",
+        "recordSubmission",
+        "recordRegulatoryDecision",
+        "verifyLabel",
+        "placeHold",
+        "releaseHold",
+        "recordDispositionBasis",
+        "revokeDispositionBasis",
+        "getObject",
+        "getWork",
+        "getInventory",
+        "getAssessment",
+        "getObligations",
+        "getEvidence",
+        "decideQuality",
+        "confirmCustomerConditions",
+        "confirmCommercialDisposition",
+        "decideRecallRestriction",
+        "reconcileEvidence",
+        "createSalesOrder",
+        "reviseSalesOrder",
+        "recordDelivery",
+        "recordObservedMovement",
+        "reserveQuantity",
+        "replaceAllocation",
+        "pickQuantity",
+        "releaseAllocation",
+        "dispatchQuantity",
+        "authorizeReturn",
+        "receiveReturn",
+        "recordInvoice",
+        "matchInvoice",
+        "correctEvidence",
+        "recordActivity"
+      ],
+      "grant": {
+        "delegatorAlias": "supervisor",
+        "actions": [
+          "createWork",
+          "assessGoal",
+          "closeWork",
+          "matchSourceIdentity",
+          "linkCanonicalOccurrence",
+          "proposePurchase",
+          "revisePurchase",
+          "approvePurchase",
+          "dispatchPurchaseOrder",
+          "recordSupplierReply",
+          "cancelPurchase",
+          "createShipment",
+          "recordLegEvent",
+          "recordHandover",
+          "receiveProvisional",
+          "confirmReceipt",
+          "prepareRegulatoryProcedure",
+          "recordSubmission",
+          "recordRegulatoryDecision",
+          "verifyLabel",
+          "placeHold",
+          "releaseHold",
+          "recordDispositionBasis",
+          "revokeDispositionBasis",
+          "getObject",
+          "getWork",
+          "getInventory",
+          "getAssessment",
+          "getObligations",
+          "getEvidence",
+          "decideQuality",
+          "confirmCustomerConditions",
+          "confirmCommercialDisposition",
+          "decideRecallRestriction",
+          "reconcileEvidence",
+          "createSalesOrder",
+          "reviseSalesOrder",
+          "recordDelivery",
+          "recordObservedMovement",
+          "reserveQuantity",
+          "replaceAllocation",
+          "pickQuantity",
+          "releaseAllocation",
+          "dispatchQuantity",
+          "authorizeReturn",
+          "receiveReturn",
+          "recordInvoice",
+          "matchInvoice",
+          "correctEvidence",
+          "recordActivity"
+        ],
+        "scope": {
+          "organizationAlias": "ORG"
+        },
+        "validFrom": "2026-10-01T00:00:00Z",
+        "validUntil": "2026-10-31T23:59:59Z",
+        "revision": 1
+      }
+    },
+    "outsider": {
+      "issuer": "https://mulino-native.invalid",
+      "subject": "s4-native-outsider",
+      "audience": "isolated-ontology",
+      "organizationAlias": "ORG",
+      "roleCapabilities": [
+        "createWork",
+        "assessGoal",
+        "closeWork",
+        "matchSourceIdentity",
+        "linkCanonicalOccurrence",
+        "proposePurchase",
+        "revisePurchase",
+        "approvePurchase",
+        "dispatchPurchaseOrder",
+        "recordSupplierReply",
+        "cancelPurchase",
+        "createShipment",
+        "recordLegEvent",
+        "recordHandover",
+        "receiveProvisional",
+        "confirmReceipt",
+        "prepareRegulatoryProcedure",
+        "recordSubmission",
+        "recordRegulatoryDecision",
+        "verifyLabel",
+        "placeHold",
+        "releaseHold",
+        "recordDispositionBasis",
+        "revokeDispositionBasis",
+        "getObject",
+        "getWork",
+        "getInventory",
+        "getAssessment",
+        "getObligations",
+        "getEvidence",
+        "decideQuality",
+        "confirmCustomerConditions",
+        "confirmCommercialDisposition",
+        "decideRecallRestriction",
+        "reconcileEvidence"
+      ],
+      "grant": {
+        "delegatorAlias": "supervisor",
+        "actions": [
+          "getInventory",
+          "getObject",
+          "getWork"
+        ],
+        "scope": {
+          "organizationAlias": "ORG"
+        },
+        "validFrom": "2026-10-01T00:00:00Z",
+        "validUntil": "2026-10-31T23:59:59Z",
+        "revision": 1
+      }
+    }
+  },
+  "aliases": {
+    "ORG": {
+      "type": "Organization"
+    },
+    "reader": {
+      "type": "Human"
+    },
+    "supervisor": {
+      "type": "Human"
+    },
+    "P": {
+      "type": "TradeItem",
+      "name": "S1 비스킷",
+      "unit": "BOX",
+      "productAlias": "PRD",
+      "specificationVersionAlias": "SPEC",
+      "packagingVersionAlias": "PACK"
+    },
+    "M": {
+      "type": "Manufacturer"
+    },
+    "L": {
+      "type": "ManufacturerLot",
+      "itemAlias": "P",
+      "manufacturerAlias": "M",
+      "expiresAt": "2027-10-07T00:00:00Z"
+    },
+    "W": {
+      "type": "Place",
+      "kind": "INTERNAL_STORAGE"
+    },
+    "PRD": {
+      "type": "Product",
+      "name": "S1 synthetic biscuit product"
+    },
+    "SPEC": {
+      "type": "SpecificationVersion",
+      "productAlias": "PRD",
+      "version": "1",
+      "content": {
+        "description": "Synthetic S1 biscuit specification"
+      }
+    },
+    "PACK": {
+      "type": "PackagingVersion",
+      "productAlias": "PRD",
+      "version": "1",
+      "content": {
+        "unit": "BOX",
+        "description": "Synthetic S1 box packaging"
+      }
+    },
+    "DEF": {
+      "type": "DefinitionVersion",
+      "content": {
+        "organizationId": "00000000-0000-0000-0000-000000000001",
+        "id": "00000000-0000-0000-0000-000000000010",
+        "version": "definition-v1",
+        "parentVersionId": null,
+        "state": "PUBLISHED",
+        "contentHash": "",
+        "evaluatorVersion": "core-v1",
+        "schemaVersion": "1.0.0",
+        "nouns": [
+          {
+            "name": "Receipt",
+            "core": true
+          },
+          {
+            "name": "Work",
+            "core": true
+          },
+          {
+            "name": "TradeItem",
+            "core": true
+          },
+          {
+            "name": "QuantitySegment",
+            "core": true
+          },
+          {
+            "name": "PurchaseProposal",
+            "core": true
+          },
+          {
+            "name": "PurchaseOrder",
+            "core": true
+          },
+          {
+            "name": "Shipment",
+            "core": true
+          },
+          {
+            "name": "ShipmentCargo",
+            "core": true
+          },
+          {
+            "name": "ShipmentLeg",
+            "core": true
+          },
+          {
+            "name": "RegulatoryProcedure",
+            "core": true
+          },
+          {
+            "name": "Restriction",
+            "core": true
+          },
+          {
+            "name": "DispositionBasis",
+            "core": true
+          },
+          {
+            "name": "PurchaseOrderLine",
+            "core": true
+          },
+          {
+            "name": "ReceiptObservation",
+            "core": true
+          },
+          {
+            "name": "SalesOrder",
+            "core": true
+          },
+          {
+            "name": "SalesOrderLine",
+            "core": true
+          },
+          {
+            "name": "DeliveryObservation",
+            "core": true
+          },
+          {
+            "name": "Delivery",
+            "core": true
+          },
+          {
+            "name": "Return",
+            "core": true
+          }
+        ],
+        "attributes": [
+          {
+            "nounType": "Receipt",
+            "name": "quantity",
+            "type": "DECIMAL",
+            "referenceType": null,
+            "unit": "BOX",
+            "decimalPlaces": 0,
+            "minimumCount": 1,
+            "maximumCount": 1,
+            "requiredStage": "READ",
+            "core": true
+          },
+          {
+            "nounType": "Delivery",
+            "name": "quantity",
+            "type": "DECIMAL",
+            "referenceType": null,
+            "unit": "BOX",
+            "decimalPlaces": 0,
+            "minimumCount": 1,
+            "maximumCount": 1,
+            "requiredStage": "READ",
+            "core": true
+          }
+        ],
+        "verbs": [
+          {
+            "name": "createWork",
+            "intentKind": "COMMAND",
+            "capabilityId": "createWork",
+            "stage": "DRAFT",
+            "slots": {}
+          },
+          {
+            "name": "assessGoal",
+            "intentKind": "COMMAND",
+            "capabilityId": "assessGoal",
+            "stage": "DRAFT",
+            "slots": {}
+          },
+          {
+            "name": "closeWork",
+            "intentKind": "COMMAND",
+            "capabilityId": "closeWork",
+            "stage": "DRAFT",
+            "slots": {}
+          },
+          {
+            "name": "matchSourceIdentity",
+            "intentKind": "COMMAND",
+            "capabilityId": "matchSourceIdentity",
+            "stage": "DRAFT",
+            "slots": {}
+          },
+          {
+            "name": "linkCanonicalOccurrence",
+            "intentKind": "COMMAND",
+            "capabilityId": "linkCanonicalOccurrence",
+            "stage": "DRAFT",
+            "slots": {}
+          },
+          {
+            "name": "proposePurchase",
+            "intentKind": "COMMAND",
+            "capabilityId": "proposePurchase",
+            "stage": "DRAFT",
+            "slots": {}
+          },
+          {
+            "name": "revisePurchase",
+            "intentKind": "COMMAND",
+            "capabilityId": "revisePurchase",
+            "stage": "DRAFT",
+            "slots": {}
+          },
+          {
+            "name": "approvePurchase",
+            "intentKind": "COMMAND",
+            "capabilityId": "approvePurchase",
+            "stage": "DRAFT",
+            "slots": {}
+          },
+          {
+            "name": "dispatchPurchaseOrder",
+            "intentKind": "COMMAND",
+            "capabilityId": "dispatchPurchaseOrder",
+            "stage": "DRAFT",
+            "slots": {}
+          },
+          {
+            "name": "recordSupplierReply",
+            "intentKind": "RECORD",
+            "capabilityId": "recordSupplierReply",
+            "stage": "DRAFT",
+            "slots": {}
+          },
+          {
+            "name": "cancelPurchase",
+            "intentKind": "COMMAND",
+            "capabilityId": "cancelPurchase",
+            "stage": "DRAFT",
+            "slots": {}
+          },
+          {
+            "name": "createShipment",
+            "intentKind": "COMMAND",
+            "capabilityId": "createShipment",
+            "stage": "DRAFT",
+            "slots": {}
+          },
+          {
+            "name": "recordLegEvent",
+            "intentKind": "RECORD",
+            "capabilityId": "recordLegEvent",
+            "stage": "DRAFT",
+            "slots": {}
+          },
+          {
+            "name": "recordHandover",
+            "intentKind": "RECORD",
+            "capabilityId": "recordHandover",
+            "stage": "DRAFT",
+            "slots": {}
+          },
+          {
+            "name": "receiveProvisional",
+            "intentKind": "RECORD",
+            "capabilityId": "receiveProvisional",
+            "stage": "DRAFT",
+            "slots": {}
+          },
+          {
+            "name": "confirmReceipt",
+            "intentKind": "COMMAND",
+            "capabilityId": "confirmReceipt",
+            "stage": "DRAFT",
+            "slots": {}
+          },
+          {
+            "name": "prepareRegulatoryProcedure",
+            "intentKind": "COMMAND",
+            "capabilityId": "prepareRegulatoryProcedure",
+            "stage": "DRAFT",
+            "slots": {}
+          },
+          {
+            "name": "recordSubmission",
+            "intentKind": "RECORD",
+            "capabilityId": "recordSubmission",
+            "stage": "DRAFT",
+            "slots": {}
+          },
+          {
+            "name": "recordRegulatoryDecision",
+            "intentKind": "RECORD",
+            "capabilityId": "recordRegulatoryDecision",
+            "stage": "DRAFT",
+            "slots": {}
+          },
+          {
+            "name": "verifyLabel",
+            "intentKind": "RECORD",
+            "capabilityId": "verifyLabel",
+            "stage": "DRAFT",
+            "slots": {}
+          },
+          {
+            "name": "placeHold",
+            "intentKind": "COMMAND",
+            "capabilityId": "placeHold",
+            "stage": "DRAFT",
+            "slots": {}
+          },
+          {
+            "name": "releaseHold",
+            "intentKind": "COMMAND",
+            "capabilityId": "releaseHold",
+            "stage": "DRAFT",
+            "slots": {}
+          },
+          {
+            "name": "recordDispositionBasis",
+            "intentKind": "RECORD",
+            "capabilityId": "recordDispositionBasis",
+            "stage": "DRAFT",
+            "slots": {}
+          },
+          {
+            "name": "revokeDispositionBasis",
+            "intentKind": "COMMAND",
+            "capabilityId": "revokeDispositionBasis",
+            "stage": "DRAFT",
+            "slots": {}
+          },
+          {
+            "name": "getObject",
+            "intentKind": "QUERY",
+            "capabilityId": "getObject",
+            "stage": "READ",
+            "slots": {}
+          },
+          {
+            "name": "getWork",
+            "intentKind": "QUERY",
+            "capabilityId": "getWork",
+            "stage": "READ",
+            "slots": {}
+          },
+          {
+            "name": "getInventory",
+            "intentKind": "QUERY",
+            "capabilityId": "getInventory",
+            "stage": "READ",
+            "slots": {}
+          },
+          {
+            "name": "getAssessment",
+            "intentKind": "QUERY",
+            "capabilityId": "getAssessment",
+            "stage": "READ",
+            "slots": {}
+          },
+          {
+            "name": "getObligations",
+            "intentKind": "QUERY",
+            "capabilityId": "getObligations",
+            "stage": "READ",
+            "slots": {}
+          },
+          {
+            "name": "getEvidence",
+            "intentKind": "QUERY",
+            "capabilityId": "getEvidence",
+            "stage": "READ",
+            "slots": {}
+          },
+          {
+            "name": "createSalesOrder",
+            "intentKind": "COMMAND",
+            "capabilityId": "createSalesOrder",
+            "stage": "DRAFT",
+            "slots": {}
+          },
+          {
+            "name": "reviseSalesOrder",
+            "intentKind": "COMMAND",
+            "capabilityId": "reviseSalesOrder",
+            "stage": "DRAFT",
+            "slots": {}
+          },
+          {
+            "name": "recordDelivery",
+            "intentKind": "RECORD",
+            "capabilityId": "recordDelivery",
+            "stage": "DRAFT",
+            "slots": {}
+          },
+          {
+            "name": "recordObservedMovement",
+            "intentKind": "RECORD",
+            "capabilityId": "recordObservedMovement",
+            "stage": "DRAFT",
+            "slots": {}
+          },
+          {
+            "name": "reserveQuantity",
+            "intentKind": "COMMAND",
+            "capabilityId": "reserveQuantity",
+            "stage": "DRAFT",
+            "slots": {}
+          },
+          {
+            "name": "replaceAllocation",
+            "intentKind": "COMMAND",
+            "capabilityId": "replaceAllocation",
+            "stage": "DRAFT",
+            "slots": {}
+          },
+          {
+            "name": "pickQuantity",
+            "intentKind": "COMMAND",
+            "capabilityId": "pickQuantity",
+            "stage": "DRAFT",
+            "slots": {}
+          },
+          {
+            "name": "releaseAllocation",
+            "intentKind": "COMMAND",
+            "capabilityId": "releaseAllocation",
+            "stage": "DRAFT",
+            "slots": {}
+          },
+          {
+            "name": "dispatchQuantity",
+            "intentKind": "COMMAND",
+            "capabilityId": "dispatchQuantity",
+            "stage": "DRAFT",
+            "slots": {}
+          },
+          {
+            "name": "authorizeReturn",
+            "intentKind": "COMMAND",
+            "capabilityId": "authorizeReturn",
+            "stage": "DRAFT",
+            "slots": {}
+          },
+          {
+            "name": "receiveReturn",
+            "intentKind": "RECORD",
+            "capabilityId": "receiveReturn",
+            "stage": "DRAFT",
+            "slots": {}
+          },
+          {
+            "name": "recordInvoice",
+            "intentKind": "RECORD",
+            "capabilityId": "recordInvoice",
+            "stage": "DRAFT",
+            "slots": {}
+          },
+          {
+            "name": "matchInvoice",
+            "intentKind": "COMMAND",
+            "capabilityId": "matchInvoice",
+            "stage": "DRAFT",
+            "slots": {}
+          },
+          {
+            "name": "correctEvidence",
+            "intentKind": "RECORD",
+            "capabilityId": "correctEvidence",
+            "stage": "DRAFT",
+            "slots": {}
+          },
+          {
+            "name": "recordActivity",
+            "intentKind": "RECORD",
+            "capabilityId": "recordActivity",
+            "stage": "DRAFT",
+            "slots": {}
+          }
+        ],
+        "relations": [],
+        "goals": [
+          {
+            "name": "arrived",
+            "quantityMode": "CUMULATIVE_EVENT",
+            "endpoint": "ARRIVED",
+            "evaluatorVersion": "core-v1",
+            "predicate": {
+              "operator": "quantitySum",
+              "property": "Receipt.quantity",
+              "minimum": {
+                "value": "1",
+                "unit": "BOX"
+              },
+              "unit": "BOX",
+              "evidenceSelector": "VERIFIED_DISTINCT"
+            }
+          },
+          {
+            "name": "delivered",
+            "quantityMode": "CUMULATIVE_EVENT",
+            "endpoint": "DELIVERED",
+            "evaluatorVersion": "core-v1",
+            "predicate": {
+              "operator": "quantitySum",
+              "property": "Delivery.quantity",
+              "minimum": {
+                "value": "1",
+                "unit": "BOX"
+              },
+              "unit": "BOX",
+              "evidenceSelector": "VERIFIED_DISTINCT"
+            }
+          }
+        ],
+        "capabilities": [
+          {
+            "capabilityId": "createWork",
+            "semanticVersion": "1.0.0",
+            "evaluatorVersion": "core-v1",
+            "inputSchemaVersion": "1.0.0",
+            "outputSchemaVersion": "1.0.0",
+            "supportedWorkMigration": []
+          },
+          {
+            "capabilityId": "assessGoal",
+            "semanticVersion": "1.0.0",
+            "evaluatorVersion": "core-v1",
+            "inputSchemaVersion": "1.0.0",
+            "outputSchemaVersion": "1.0.0",
+            "supportedWorkMigration": []
+          },
+          {
+            "capabilityId": "closeWork",
+            "semanticVersion": "1.0.0",
+            "evaluatorVersion": "core-v1",
+            "inputSchemaVersion": "1.0.0",
+            "outputSchemaVersion": "1.0.0",
+            "supportedWorkMigration": []
+          },
+          {
+            "capabilityId": "matchSourceIdentity",
+            "semanticVersion": "1.0.0",
+            "evaluatorVersion": "core-v1",
+            "inputSchemaVersion": "1.0.0",
+            "outputSchemaVersion": "1.0.0",
+            "supportedWorkMigration": []
+          },
+          {
+            "capabilityId": "linkCanonicalOccurrence",
+            "semanticVersion": "1.0.0",
+            "evaluatorVersion": "core-v1",
+            "inputSchemaVersion": "1.0.0",
+            "outputSchemaVersion": "1.0.0",
+            "supportedWorkMigration": []
+          },
+          {
+            "capabilityId": "proposePurchase",
+            "semanticVersion": "1.0.0",
+            "evaluatorVersion": "core-v1",
+            "inputSchemaVersion": "1.0.0",
+            "outputSchemaVersion": "1.0.0",
+            "supportedWorkMigration": []
+          },
+          {
+            "capabilityId": "revisePurchase",
+            "semanticVersion": "1.0.0",
+            "evaluatorVersion": "core-v1",
+            "inputSchemaVersion": "1.0.0",
+            "outputSchemaVersion": "1.0.0",
+            "supportedWorkMigration": []
+          },
+          {
+            "capabilityId": "approvePurchase",
+            "semanticVersion": "1.0.0",
+            "evaluatorVersion": "core-v1",
+            "inputSchemaVersion": "1.0.0",
+            "outputSchemaVersion": "1.0.0",
+            "supportedWorkMigration": []
+          },
+          {
+            "capabilityId": "dispatchPurchaseOrder",
+            "semanticVersion": "1.0.0",
+            "evaluatorVersion": "core-v1",
+            "inputSchemaVersion": "1.0.0",
+            "outputSchemaVersion": "1.0.0",
+            "supportedWorkMigration": []
+          },
+          {
+            "capabilityId": "recordSupplierReply",
+            "semanticVersion": "1.0.0",
+            "evaluatorVersion": "core-v1",
+            "inputSchemaVersion": "1.0.0",
+            "outputSchemaVersion": "1.0.0",
+            "supportedWorkMigration": []
+          },
+          {
+            "capabilityId": "cancelPurchase",
+            "semanticVersion": "1.0.0",
+            "evaluatorVersion": "core-v1",
+            "inputSchemaVersion": "1.0.0",
+            "outputSchemaVersion": "1.0.0",
+            "supportedWorkMigration": []
+          },
+          {
+            "capabilityId": "createShipment",
+            "semanticVersion": "1.0.0",
+            "evaluatorVersion": "core-v1",
+            "inputSchemaVersion": "1.0.0",
+            "outputSchemaVersion": "1.0.0",
+            "supportedWorkMigration": []
+          },
+          {
+            "capabilityId": "recordLegEvent",
+            "semanticVersion": "1.0.0",
+            "evaluatorVersion": "core-v1",
+            "inputSchemaVersion": "1.0.0",
+            "outputSchemaVersion": "1.0.0",
+            "supportedWorkMigration": []
+          },
+          {
+            "capabilityId": "recordHandover",
+            "semanticVersion": "1.0.0",
+            "evaluatorVersion": "core-v1",
+            "inputSchemaVersion": "1.0.0",
+            "outputSchemaVersion": "1.0.0",
+            "supportedWorkMigration": []
+          },
+          {
+            "capabilityId": "receiveProvisional",
+            "semanticVersion": "1.0.0",
+            "evaluatorVersion": "core-v1",
+            "inputSchemaVersion": "1.0.0",
+            "outputSchemaVersion": "1.0.0",
+            "supportedWorkMigration": []
+          },
+          {
+            "capabilityId": "confirmReceipt",
+            "semanticVersion": "1.0.0",
+            "evaluatorVersion": "core-v1",
+            "inputSchemaVersion": "1.0.0",
+            "outputSchemaVersion": "1.0.0",
+            "supportedWorkMigration": []
+          },
+          {
+            "capabilityId": "prepareRegulatoryProcedure",
+            "semanticVersion": "1.0.0",
+            "evaluatorVersion": "core-v1",
+            "inputSchemaVersion": "1.0.0",
+            "outputSchemaVersion": "1.0.0",
+            "supportedWorkMigration": []
+          },
+          {
+            "capabilityId": "recordSubmission",
+            "semanticVersion": "1.0.0",
+            "evaluatorVersion": "core-v1",
+            "inputSchemaVersion": "1.0.0",
+            "outputSchemaVersion": "1.0.0",
+            "supportedWorkMigration": []
+          },
+          {
+            "capabilityId": "recordRegulatoryDecision",
+            "semanticVersion": "1.0.0",
+            "evaluatorVersion": "core-v1",
+            "inputSchemaVersion": "1.0.0",
+            "outputSchemaVersion": "1.0.0",
+            "supportedWorkMigration": []
+          },
+          {
+            "capabilityId": "verifyLabel",
+            "semanticVersion": "1.0.0",
+            "evaluatorVersion": "core-v1",
+            "inputSchemaVersion": "1.0.0",
+            "outputSchemaVersion": "1.0.0",
+            "supportedWorkMigration": []
+          },
+          {
+            "capabilityId": "placeHold",
+            "semanticVersion": "1.0.0",
+            "evaluatorVersion": "core-v1",
+            "inputSchemaVersion": "1.0.0",
+            "outputSchemaVersion": "1.0.0",
+            "supportedWorkMigration": []
+          },
+          {
+            "capabilityId": "releaseHold",
+            "semanticVersion": "1.0.0",
+            "evaluatorVersion": "core-v1",
+            "inputSchemaVersion": "1.0.0",
+            "outputSchemaVersion": "1.0.0",
+            "supportedWorkMigration": []
+          },
+          {
+            "capabilityId": "recordDispositionBasis",
+            "semanticVersion": "1.0.0",
+            "evaluatorVersion": "core-v1",
+            "inputSchemaVersion": "1.0.0",
+            "outputSchemaVersion": "1.0.0",
+            "supportedWorkMigration": []
+          },
+          {
+            "capabilityId": "revokeDispositionBasis",
+            "semanticVersion": "1.0.0",
+            "evaluatorVersion": "core-v1",
+            "inputSchemaVersion": "1.0.0",
+            "outputSchemaVersion": "1.0.0",
+            "supportedWorkMigration": []
+          },
+          {
+            "capabilityId": "getObject",
+            "semanticVersion": "1.0.0",
+            "evaluatorVersion": "core-v1",
+            "inputSchemaVersion": "1.0.0",
+            "outputSchemaVersion": "1.0.0",
+            "supportedWorkMigration": []
+          },
+          {
+            "capabilityId": "getWork",
+            "semanticVersion": "1.0.0",
+            "evaluatorVersion": "core-v1",
+            "inputSchemaVersion": "1.0.0",
+            "outputSchemaVersion": "1.0.0",
+            "supportedWorkMigration": []
+          },
+          {
+            "capabilityId": "getInventory",
+            "semanticVersion": "1.0.0",
+            "evaluatorVersion": "core-v1",
+            "inputSchemaVersion": "1.0.0",
+            "outputSchemaVersion": "1.0.0",
+            "supportedWorkMigration": []
+          },
+          {
+            "capabilityId": "getAssessment",
+            "semanticVersion": "1.0.0",
+            "evaluatorVersion": "core-v1",
+            "inputSchemaVersion": "1.0.0",
+            "outputSchemaVersion": "1.0.0",
+            "supportedWorkMigration": []
+          },
+          {
+            "capabilityId": "getObligations",
+            "semanticVersion": "1.0.0",
+            "evaluatorVersion": "core-v1",
+            "inputSchemaVersion": "1.0.0",
+            "outputSchemaVersion": "1.0.0",
+            "supportedWorkMigration": []
+          },
+          {
+            "capabilityId": "getEvidence",
+            "semanticVersion": "1.0.0",
+            "evaluatorVersion": "core-v1",
+            "inputSchemaVersion": "1.0.0",
+            "outputSchemaVersion": "1.0.0",
+            "supportedWorkMigration": []
+          }
+        ]
+      }
+    },
+    "EPOL": {
+      "type": "PolicyVersion",
+      "kind": "EVIDENCE",
+      "version": "fixture-v1",
+      "content": {},
+      "effectiveFrom": "2026-10-01T00:00:00Z",
+      "activate": true
+    },
+    "CTX": {
+      "type": "PolicyVersion",
+      "kind": "GOAL_CONTEXT",
+      "version": "fixture-timezone-v1",
+      "content": {
+        "timezone": "Asia/Seoul"
+      },
+      "effectiveFrom": "2026-10-01T00:00:00Z",
+      "activate": true
+    },
+    "CPOL": {
+      "type": "PolicyVersion",
+      "kind": "COMMAND",
+      "version": "native-command-fixture-v1",
+      "content": {
+        "rules": {
+          "createWork": {
+            "effectClass": "WORK"
+          },
+          "assessGoal": {
+            "effectClass": "ASSESSMENT"
+          },
+          "closeWork": {
+            "effectClass": "WORK"
+          },
+          "matchSourceIdentity": {
+            "effectClass": "RECONCILIATION"
+          },
+          "linkCanonicalOccurrence": {
+            "effectClass": "RECONCILIATION"
+          },
+          "proposePurchase": {
+            "effectClass": "PURCHASE"
+          },
+          "revisePurchase": {
+            "effectClass": "PURCHASE"
+          },
+          "approvePurchase": {
+            "effectClass": "PURCHASE"
+          },
+          "dispatchPurchaseOrder": {
+            "effectClass": "PURCHASE"
+          },
+          "recordSupplierReply": {
+            "effectClass": "PURCHASE"
+          },
+          "cancelPurchase": {
+            "effectClass": "PURCHASE"
+          },
+          "createShipment": {
+            "effectClass": "SHIPMENT_PLAN"
+          },
+          "recordLegEvent": {
+            "effectClass": "SHIPMENT_OBSERVATION"
+          },
+          "recordHandover": {
+            "effectClass": "SHIPMENT_OBSERVATION"
+          },
+          "receiveProvisional": {
+            "effectClass": "RECORD"
+          },
+          "confirmReceipt": {
+            "effectClass": "RECEIPT"
+          },
+          "prepareRegulatoryProcedure": {
+            "effectClass": "REGULATORY_RECORD"
+          },
+          "recordSubmission": {
+            "effectClass": "REGULATORY_RECORD"
+          },
+          "recordRegulatoryDecision": {
+            "effectClass": "REGULATORY_RECORD"
+          },
+          "verifyLabel": {
+            "effectClass": "REGULATORY_RECORD"
+          },
+          "placeHold": {
+            "effectClass": "QUALITY_CONTROL",
+            "categoryCapabilities": {
+              "QC": "decideQuality",
+              "CUSTOMER": "confirmCustomerConditions",
+              "COMMERCIAL": "confirmCommercialDisposition",
+              "RECALL": "decideRecallRestriction"
+            }
+          },
+          "releaseHold": {
+            "effectClass": "QUALITY_CONTROL",
+            "categoryCapabilities": {
+              "QC": "decideQuality",
+              "CUSTOMER": "confirmCustomerConditions",
+              "COMMERCIAL": "confirmCommercialDisposition",
+              "RECALL": "decideRecallRestriction"
+            }
+          },
+          "recordDispositionBasis": {
+            "effectClass": "QUALITY_CONTROL",
+            "categoryCapabilities": {
+              "QC": "decideQuality",
+              "CUSTOMER": "confirmCustomerConditions",
+              "COMMERCIAL": "confirmCommercialDisposition",
+              "RECALL": "decideRecallRestriction"
+            }
+          },
+          "revokeDispositionBasis": {
+            "effectClass": "QUALITY_CONTROL",
+            "categoryCapabilities": {
+              "QC": "decideQuality",
+              "CUSTOMER": "confirmCustomerConditions",
+              "COMMERCIAL": "confirmCommercialDisposition",
+              "RECALL": "decideRecallRestriction"
+            }
+          },
+          "createSalesOrder": {
+            "effectClass": "SALES_ORDER"
+          },
+          "reviseSalesOrder": {
+            "effectClass": "SALES_ORDER"
+          },
+          "recordDelivery": {
+            "effectClass": "RECORD"
+          },
+          "recordObservedMovement": {
+            "effectClass": "RECORD"
+          },
+          "reserveQuantity": {
+            "effectClass": "RESERVE"
+          },
+          "replaceAllocation": {
+            "effectClass": "RESERVE"
+          },
+          "pickQuantity": {
+            "effectClass": "ALLOCATION"
+          },
+          "releaseAllocation": {
+            "effectClass": "ALLOCATION"
+          },
+          "dispatchQuantity": {
+            "effectClass": "DISPATCH"
+          },
+          "authorizeReturn": {
+            "effectClass": "RETURN"
+          },
+          "receiveReturn": {
+            "effectClass": "RETURN"
+          },
+          "recordInvoice": {
+            "effectClass": "SETTLEMENT"
+          },
+          "matchInvoice": {
+            "effectClass": "SETTLEMENT"
+          },
+          "correctEvidence": {
+            "effectClass": "RECORD"
+          }
+        }
+      },
+      "effectiveFrom": "2026-10-01T00:00:00Z",
+      "activate": true
+    },
+    "SUP": {
+      "type": "Supplier",
+      "name": "Synthetic supplier"
+    },
+    "DEST": {
+      "type": "Place",
+      "kind": "INTERNAL_STORAGE"
+    },
+    "AUTH": {
+      "type": "ManagementAuthority",
+      "actorAlias": "supervisor",
+      "capabilityId": "approvePurchase",
+      "validFrom": "2026-10-01T00:00:00Z",
+      "validUntil": "2026-10-31T23:59:59Z"
+    },
+    "ELIG": {
+      "type": "PolicyVersion",
+      "kind": "ELIGIBILITY",
+      "version": "synthetic-eligibility-v1",
+      "content": {
+        "actions": {
+          "SELL": {
+            "requiredCategories": [
+              "QC",
+              "CUSTOMER",
+              "COMMERCIAL"
+            ]
+          },
+          "DISPATCH": {
+            "requiredCategories": [
+              "QC",
+              "CUSTOMER",
+              "COMMERCIAL"
+            ]
+          }
+        }
+      },
+      "effectiveFrom": "2026-10-01T00:00:00Z",
+      "activate": true
+    },
+    "TRANSIT": {
+      "type": "Place",
+      "kind": "TRANSIT"
+    },
+    "REGPOL": {
+      "type": "RegulatoryPolicy",
+      "actorAlias": "reader",
+      "version": "fixture-v1",
+      "authority": "FICTIONAL-AUTHORITY",
+      "sourceNamespace": "native-s4-regulator",
+      "action": "SELL",
+      "validFrom": "2026-10-01T00:00:00Z",
+      "validUntil": "2026-10-31T23:59:59Z",
+      "status": "ACTIVE",
+      "requiresLabel": true
+    },
+    "outsider": {
+      "type": "Human"
+    },
+    "C": {
+      "type": "Customer",
+      "name": "가상 B2B 고객"
+    },
+    "CUSTOMER_PLACE": {
+      "type": "Place",
+      "name": "가상 고객 장소",
+      "kind": "CUSTOMER"
+    },
+    "REGDISPATCH": {
+      "type": "RegulatoryPolicy",
+      "actorAlias": "reader",
+      "version": "fixture-v1",
+      "authority": "FICTIONAL-AUTHORITY",
+      "sourceNamespace": "native-s4-dispatch-regulator",
+      "action": "DISPATCH",
+      "validFrom": "2026-10-01T00:00:00Z",
+      "validUntil": "2026-10-31T23:59:59Z",
+      "status": "ACTIVE",
+      "requiresLabel": true
+    },
+    "RETURN_AUTH": {
+      "type": "ManagementAuthority",
+      "actorAlias": "supervisor",
+      "capabilityId": "authorizeReturn",
+      "validFrom": "2026-10-01T00:00:00Z",
+      "validUntil": "2026-10-31T23:59:59Z"
+    }
+  },
+  "baseline": {},
+  "evidence": [],
+  "responsibilities": [],
+  "id": "c4-synthetic-setup"
+}

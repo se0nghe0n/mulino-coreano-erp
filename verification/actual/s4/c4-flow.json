@@ -1,0 +1,32 @@
+{
+  "schemaVersion": "1.0.0",
+  "status": "NOT_RUN",
+  "requiredCases": [
+    "C4",
+    "T17_CONSUMED"
+  ],
+  "fullCaseCoverageClaimed": false,
+  "actions": [
+    {
+      "id": "c4-setup",
+      "type": "setup",
+      "fixtureRef": "verification/actual/s4/c4-fixture.json",
+      "organizationAlias": "ORG"
+    },
+    {
+      "id": "c4-include-c4-upstream",
+      "type": "include",
+      "scriptRef": "verification/actual/s4/c4-upstream.json"
+    },
+    {
+      "id": "c4-include-c4-delivery100",
+      "type": "include",
+      "scriptRef": "verification/actual/s4/c4-delivery100.json"
+    },
+    {
+      "id": "c4-include-c4-history-return-correction",
+      "type": "include",
+      "scriptRef": "verification/actual/s4/c4-history-return-correction.json"
+    }
+  ]
+}
