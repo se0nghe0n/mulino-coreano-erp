@@ -25,15 +25,18 @@
 
 | Step | 작업 | 실행 모델 / effort | 상태 |
 |---|---|---|---|
-| 1 | 새 skills와 실행 지침 | GPT-6.1 Sol / high | COMPLETE |
-| 2 | 전체 계획의 tests | GPT-6.1 Sol / high | COMPLETE |
-| 3 | 새 시스템 구현 | GPT-6.1 Sol / medium | ACTIVE |
-| 4 | 실제 E2E | GPT-6.1 Sol / low | PENDING |
-| 5 | 패턴 분석·refactor | GPT-6 Astra / high | PENDING |
-| 6 | 검증된 운영 매뉴얼 | GPT-6 Astra / low | PENDING |
+| 1 | 새 skills와 실행 지침 | GPT-6.1 Sol / high | COMPLETE (Claude 검토 재수행 중) |
+| 2 | 전체 계획의 tests | Claude Opus / high | COMPLETE (Claude 검토 재수행 중) |
+| 3 | 새 시스템 구현 | Claude Opus / medium | ACTIVE |
+| 4 | 실제 E2E | Claude Sonnet / medium | PENDING |
+| 5 | 패턴 분석·refactor | Claude Opus / high | PENDING |
+| 6 | 검증된 운영 매뉴얼 | Claude Opus / low | PENDING |
 | 7 | 미완료·실패 해소 반복 | 해당 작업의 모델 / effort | PENDING |
 
-매 Step의 필수 review는 GPT-6.1 Sol `xhigh`와 GPT-6 Astra `low`다.
+2026-10-08 Claude Code 인계 뒤 모델 지정은 [AGENTS.md](../../AGENTS.md)의
+표를 따른다. 매 Step의 필수 review는 Claude Opus `xhigh`와 Claude Fable
+`low`다. 아래의 Sol/Astra 기록은 Codex 시기의 사실 기록으로 보존한다.
+Codex 시기의 필수 review는 GPT-6.1 Sol `xhigh`와 GPT-6 Astra `low`였다.
 모든 산출물 통합·지적 수정·결합 checks까지 끝나야 Step를 닫는다.
 Step 1의 정적 checks와 두 실제 reviewer의 closure가 `fe0d8df`에서
 통과했다. 필수 지적이 모두 해결돼 Step 1은 `COMPLETE`다. 이 기록의
@@ -337,3 +340,44 @@ S4의 [소유권·필수 인수](step-3-s4.md)를 고정했다. 같은 기준선
 일곱 독립 worktree에서 공통 계약, 판매/인도, 재고 실행, 반품, 회수,
 정산, 실제 종단 adapter를 병렬 구현한다. 공유 계약의 OWN commit을
 먼저 연결하고 모든 결과는 Task branch의 결합 검사로 확인한다.
+
+## Claude 인계와 S4 통합본 실제 기준선
+
+2026-10-08 Codex가 S4 도중 멈춘 상태를 Claude Code coordinator가
+이어받았다. T3로 가져온 Codex 대화는 S2 종료에서 끝나지만 실제 Git은
+S4 cherry-pick 통합 중이었으므로 Git과 이 기록을 기준으로 판단한다.
+
+- 통합본은 `014045bf`부터 `d0ae28ca`까지 23개 commit 동안 컴파일되지
+  않았다. `ReturnCommands.java`의 `if(receive)` 닫는 괄호가 빠졌다.
+  worker 수정 `fd1fdeb8`을 `db38413d`로 통합해 해소했다. 이 구간의 Task
+  commit에 연결된 PASS 주장은 그 commit에서 빌드된 증거가 아니다.
+- 통합되지 않았던 `414aea2f`(DISPATCH/CARGO_SCOPE 증거 subject),
+  `ebec1696`(판매 revision의 asOf 투영), `1bba7be3`(회수 예외 책임 인계
+  test)를 각각 `468d4417`, `18aff0d6`, `50646c99`로 통합했다.
+- 커밋되지 않은 Codex worker WIP는 손실을 막기 위해 원 branch에 보존
+  commit으로 남겼다. 정산 `25c5f0f3`, C4 입력 `74786df6`, E2 입력
+  `b3db371d`이며 모두 미검증이다.
+- `50646c99`에서 첫 전체 backend 실행(`./mvnw -B -ntp -f
+  backend/pom.xml test`)은 420 tests 중 failure16·error44로 FAIL이다.
+  60건 중 약42건은 S4 `b60a3982`가 추가한
+  `AssessmentCorrectionImpact.evidenceLinked`의 canonical 조회 실패
+  (`Unavailable scope`)이며 S3 수령·운송 gateway의 회귀를 포함한다.
+  나머지는 반품 canonical insert7, 판매 Works update5, 재고3,
+  정산1, 인도 정정 NPE1, schema parity 열 수1(1863→1864)이다.
+- 이 기준선을 로컬 tag `step3-s4c-baseline`으로 고정하고 Claude Opus
+  medium worker 여섯 명이 독립 worktree에서 수정한다.
+
+| Subtask | branch / 절대 worktree | 소유 범위 |
+|---|---|---|
+| scope | `step3/s4c-scope` / `/Volumes/VideoStore/Developer/mulino-ontology-step3-s4c-scope` | evaluation·evidence core, S3 gateway·회수 tests |
+| returns | `step3/s4c-returns` / `/Volumes/VideoStore/Developer/mulino-ontology-step3-s4c-returns` | 반품 package와 tests |
+| sales | `step3/s4c-sales` / `/Volumes/VideoStore/Developer/mulino-ontology-step3-s4c-sales` | 판매 package와 tests |
+| fulfillment | `step3/s4c-fulfillment` / `/Volumes/VideoStore/Developer/mulino-ontology-step3-s4c-fulfillment` | 재고·QC·출고, T17 보강, V2/V3 DB 대기 증명 |
+| settlement | `step3/s4c-settlement` / `/Volumes/VideoStore/Developer/mulino-ontology-step3-s4c-settlement` | 정산, V29, schema parity |
+| flows | `step3/s4c-flows` / `/Volumes/VideoStore/Developer/mulino-ontology-step3-s4c-flows` | `verification/actual/s4`, C4·E2·C1 종단 입력 |
+
+긴 Maven 실행은 `/Volumes/VideoStore/Developer/.mulino-tools/with-slot.sh`가
+기계 전체에서 동시2개로 제한한다. 공용 환경은 같은 디렉터리의
+`env.sh`가 Java21·Node24 PATH·임시 JWT 공개키로 고정한다. 이미 닫은
+사용자 Step 1·2는 Claude Opus xhigh와 Fable low로 다시 검토 중이다.
+S4는 ACTIVE이며 S5·S6은 NOT_RUN이다.
