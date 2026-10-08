@@ -130,4 +130,8 @@ a.append(cmd('e2-record-approved-exception25','recordRecovery',exception,actor='
 close=physical('e2-closure-original','CLOSURE','0','50',partition='$E2_FINAL_HASH')
 a.append(cmd('e2-admin-close-with-residual','closeRecall',{'scopeId':'$E2_SCOPE','approvalId':'$E2_CURRENT_APPROVAL','scopeHash':'$E2_HASH','canonicalOccurrenceId':'$e2-closure-original.canonical','partitionHash':'$E2_FINAL_HASH'},actor='supervisor',assertions=[eq('/effects/residualResponsibilityRetained',True)]))
 a.append(obs('e2-final-independent',[rows('mulino_trade_recall_investigations',{'id':'$E2_INV','status':'CLOSED','impactstate':'CANDIDATE'},1),rows('mulino_trade_recall_closures',{'scopeid':'$E2_SCOPE'},1),rows('mulino_trade_recall_actions',{'scopeid':'$E2_SCOPE'},3),total('mulino_trade_recall_actions','quantity','25',{'scopeid':'$E2_SCOPE','kind':'EXCEPTION'}),total('mulino_inventory_quantitysegments','quantity','35',{'retiredat':None,'placeid':'$W'}),{'pointer':'/rawRows/mulino_work_read_obligationreferences','operator':'humanDuties','kinds':['RECALL_EXCEPTION_RESIDUAL','RECALL_EXCLUDED_SCOPE']},rows('mulino_work_read_obligationreferences',{'id':'$E2_RESIDUAL_DUTY','status':'OPEN','valid':True},1)]))
+# Allocation commands bind the sales Work the allocation belongs to; a purchase
+# Work subject is a TYPE_INVALID mismatch, not the intended HOLD.
+for x in a:
+ if x.get('capability') in ['pickQuantity','dispatchQuantity','releaseAllocation']:x['request']['subjectRefs']=[{'type':'Work','id':'$SALES_WORK'}]
 write('e2-flow.json',{'schemaVersion':'1.0.0','status':'NOT_RUN','requiredCases':['E2'],'fullCaseCoverageClaimed':False,'actions':a})
