@@ -78,7 +78,7 @@ public final class CaseRunner {
                 case "installFixture" -> dispatch(() -> driver.installFixture(id,fixtureBundle()));
                 case "invoke" -> dispatch(() -> a.has("protocolOperation") ? driver.wire(id,actor(a),Json.required(a,"protocolOperation"),resolve(a.path("request"))) : driver.invoke(id,Json.required(a,"route"),actor(a),Json.required(a,"capabilityId"),resolve(a.path("request"))));
                 case "query" -> dispatch(() -> a.has("protocolOperation") ? driver.wire(id,actor(a),Json.required(a,"protocolOperation"),resolve(a.path("request"))) : driver.query(id,Json.required(a,"route"),actor(a),Json.required(a,"capabilityId"),resolve(a.path("request"))));
-                case "observe" -> dispatch(() -> driver.observe(id,resolve(a.path("observation"))));
+                case "observe" -> dispatch(() -> driver.observe(id,observationRequest(a.path("observation"))));
                 case "control" -> dispatch(() -> driver.control(id,resolve(a.path("control"))));
                 case "agent" -> {
                     // A UAT-only subcase needs the real client host; the scripted runner must not stand in for it.
@@ -195,7 +195,8 @@ public final class CaseRunner {
     /**
      * The API's logical read revision and the observer's own MVCC snapshot are different things.
      * A $result-bound snapshotRef is a projection revision the observer must recompute from rows
-     * (readMode RESULT_REVISION, revisionQuery recorded). A literal directive asks for a fresh read
+     * (readMode RESULT_REVISION, revisionQuery recorded). The observer never receives the issued value
+     * (see observationRequest), so equality here is a recomputation check. A literal directive asks for a fresh read
      * (CURRENT_COMMITTED / CURRENT_LOCK_WAIT) and has no revision to equal. In both modes
      * snapshot.id is the observer's own token and must not echo the requested reference.
      */
@@ -328,6 +329,40 @@ public final class CaseRunner {
         bundle.set("bases",bases);return bundle;
     }
     private JsonNode resolve(JsonNode node) { return new ReferenceResolver(results,aliases).resolve(node); }
+    /** Read-mode directive sent to the observer in place of a $result-bound snapshotRef. */
+    public static final String RESULT_REVISION="RESULT_REVISION";
+    /**
+     * The observation request sent to the observer. A $result-bound snapshotRef is NOT resolved for the observer: it receives
+     * snapshotRef=RESULT_REVISION and snapshotSource, the identity of the request that issued the revision (action, route,
+     * capability, actor and that action's resolved request), and must recompute the projection revision from authoritative rows.
+     * The harness keeps the issued value and compares it afterwards, so copying the requested token is impossible and an
+     * echo is no longer indistinguishable from a recomputation.
+     */
+    JsonNode observationRequest(JsonNode declared) {
+        JsonNode resolved=resolve(declared),ref=declared.path("snapshotRef");
+        if(!ref.isObject() || !ref.has("$result")) return resolved;
+        ObjectNode request=(ObjectNode)resolved.deepCopy();request.put("snapshotRef",RESULT_REVISION);
+        String actionId=Json.required(ref.path("$result"),"actionId");
+        ObjectNode source=Json.object().put("actionId",actionId).put("pointer",Json.required(ref.path("$result"),"pointer"));
+        JsonNode issuing=findAction(subcase.path("actions"),actionId);
+        if(issuing!=null) {
+            JsonNode call=issuing.path("kind").asText().equals("start") ? issuing.path("call") : issuing;
+            for(String key:List.of("kind","route","capabilityId","protocolOperation","actorRef")) if(call.has(key)) source.set(key,call.path(key));
+            if(call.has("actorRef")) source.set("actor",actor(call));
+            if(call.has("request")) source.set("request",resolve(call.path("request")));
+        }
+        request.set("snapshotSource",source);
+        return request;
+    }
+    private static JsonNode findAction(JsonNode actions,String id) {
+        for(JsonNode a:actions) {
+            if(a.path("id").asText().equals(id)) return a;
+            JsonNode found=findAction(a.path("call").isObject()?Json.array().add(a.path("call")):Json.array(),id);
+            if(found!=null) return found;
+            for(JsonNode branch:a.path("branches")) {found=findAction(branch.path("actions"),id);if(found!=null) return found;}
+        }
+        return null;
+    }
     public void assertId(String id) {
         JsonNode assertion=assertionIndex.get(id); if(assertion==null) throw new IllegalArgumentException("Undeclared assertion "+id);
         asserted.add(id);ObjectNode evidence=Json.object(); evidence.put("assertionId",id);evidence.set("expected",assertion.path("expected"));evidence.set("source",assertion.path("source"));evidence.set("requirementRefs",assertion.path("requirementRefs"));evidence.set("evidenceRefs",assertion.path("evidenceRefs"));
