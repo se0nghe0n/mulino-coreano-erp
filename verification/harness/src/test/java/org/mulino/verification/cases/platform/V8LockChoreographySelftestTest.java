@@ -32,10 +32,10 @@ public final class V8LockChoreographySelftestTest {
         }
         Files.createDirectories(root.resolve("verification/harness/target"));Path p=Files.createTempFile(root.resolve("verification/harness/target"),"V8-lock-SELFTEST-",".json");Json.write(p,file);return p;
     }
-    private CaseRunner runner(Path p,CapturedLockDriver d) throws Exception {return new CaseRunner(new ContractValidator(root),d,new AgentRunner.Scripted(),p,SUBCASE);}
+    private CaseRunner runner(Path p,CapturedLockDriver d) throws Exception {return CaseRunner.harnessSelftest(new ContractValidator(root),d,new AgentRunner.Scripted(),p,SUBCASE);}
     private static class CapturedLockDriver implements AcceptanceDriver {
         final List<String> events=new ArrayList<>();boolean holderOpen,waiterResumed,holderCompleted;
-        final String mutation;
+        final String mutation;int snapshots;
         CapturedLockDriver(String mutation){this.mutation=mutation;}
         public Set<String> availableAdapters(){return Set.of("SELFTEST_CAPTURED_ONLY");}
         private StepResult captured(String id,JsonNode data,JsonNode response,JsonNode query,JsonNode snapshot) {
@@ -69,8 +69,11 @@ public final class V8LockChoreographySelftestTest {
         }
         public StepResult observe(String id,JsonNode request) {
             ObjectNode query=Json.object().put("statementId","SELFTEST-captured-locks").put("sql","SELFTEST captured catalogue rows; no SQL executed").put("mappingVersion","SELFTEST-v1");query.set("parameters",request.path("scope"));
-            ObjectNode snapshot=Json.object().put("id",request.path("snapshotRef").asText()).put("isolation","SELFTEST_CAPTURED").put("capturedAt","2026-10-07T09:00:01Z").put("artifactRef",ARTIFACT);
-            ObjectNode data=Json.object();data.set("snapshotRevision",request.path("snapshotRef"));for(String field:List.of("asOf","knownAt","scope"))data.set(field,request.path(field));data.put("scopeComplete",true).set("sourceQuery",query);data.set("snapshot",snapshot);
+            // The observer reports its own snapshot token and read mode; it never echoes the requested reference.
+            String ref=request.path("snapshotRef").asText();boolean directive=CaseRunner.SNAPSHOT_DIRECTIVES.contains(ref);
+            ObjectNode snapshot=Json.object().put("id","selftest-mvcc-"+(++snapshots)).put("isolation","SELFTEST_CAPTURED").put("capturedAt","2026-10-07T09:00:01Z").put("artifactRef",ARTIFACT).put("readMode",directive?ref:"RESULT_REVISION");
+            if(!directive) snapshot.set("revisionQuery",query);
+            ObjectNode data=Json.object();data.put("snapshotRevision",directive?"selftest-observer-world-"+snapshots:ref);for(String field:List.of("asOf","knownAt","scope"))data.set(field,request.path(field));data.put("scopeComplete",true).set("sourceQuery",query);data.set("snapshot",snapshot);
             ObjectNode rows=Json.object(),evidence=Json.object();
             for(JsonNode source:request.path("sources")) {
                 String name=source.asText();rows.set(name,Json.array());ObjectNode e=Json.object().put("complete",true).put("rowPointer","/rawRows/"+name).put("artifactRef",ARTIFACT);e.set("sourceQuery",query);evidence.set(name,e);
@@ -85,8 +88,19 @@ public final class V8LockChoreographySelftestTest {
                 rows.set("newAllocations",Json.array().add(Json.object().put("quantity","40").put("unit","BOX").put("status","EXECUTABLE")));
                 rows.set("obligations",Json.array().add(Json.object().put("id","captured-DUTY").put("ownerId","captured-procurement").put("status","OPEN").put("quantity","40").put("unit","BOX").put("nextAction","나머지 수령 확인").put("nextCheckAt","2026-10-08T09:00:00Z")));
             }
+            // Inventory values are derived from captured segment/allocation rows, never typed in directly.
+            boolean ledger=rows.has("segments") && rows.has("allocations");
+            if(ledger) {
+                rows.set("segments",Json.array().add(Json.object().put("segmentId","captured-A60").put("quantity","60").put("unit","BOX")));
+                ArrayNode allocations=Json.array().add(Json.object().put("allocationId","captured-ALLOC20").put("quantity","20").put("unit","BOX").put("status","EXECUTABLE"));
+                if(id.equals("after") || id.equals("lock-after")) allocations.add(Json.object().put("allocationId","captured-ALLOC40").put("quantity","40").put("unit","BOX").put("status","EXECUTABLE"));
+                rows.set("allocations",allocations);
+            }
             data.set("rawRows",rows);data.set("sourceEvidence",evidence);
-            data.set("data",Json.object().set("inventory",Json.object().put("heldQuantity","60").put("reservedQuantity",id.endsWith("after")?"60":"20").put("unit","BOX")));
+            if(ledger) {
+                data.set("data",Json.object().set("inventory",Json.object().put("heldQuantity","60").put("reservedQuantity",id.equals("after")||id.equals("lock-after")?"60":"20").put("unit","BOX")));
+                data.set("derivations",Json.parse("{\"/inventory/heldQuantity\":{\"rowPointer\":\"/rawRows/segments\",\"aggregate\":\"sum\",\"field\":\"quantity\",\"unitField\":\"unit\"},\"/inventory/unit\":{\"rowPointer\":\"/rawRows/segments\",\"aggregate\":\"distinct\",\"field\":\"unit\"},\"/inventory/reservedQuantity\":{\"rowPointer\":\"/rawRows/allocations\",\"where\":{\"status\":\"EXECUTABLE\"},\"aggregate\":\"sum\",\"field\":\"quantity\",\"unitField\":\"unit\"}}"));
+            } else data.set("data",Json.object());
             return captured(id,data,null,query,snapshot);
         }
         public StepResult invoke(String id,String route,JsonNode actor,String cap,JsonNode request){throw new AssertionError("Unexpected SELFTEST sync call");}
@@ -100,7 +114,7 @@ public final class V8LockChoreographySelftestTest {
     }
     @Test void upgradeLockSectionExecutesSameIdentityBoundWaitAndRevalidationContract() throws Exception {
         String subcase="upgrade-revalidate-transactions";CapturedLockDriver driver=new CapturedLockDriver("NONE");
-        CaseRunner runner=new CaseRunner(new ContractValidator(root),driver,new AgentRunner.Scripted(),casePath(subcase,false),subcase);
+        CaseRunner runner=CaseRunner.harnessSelftest(new ContractValidator(root),driver,new AgentRunner.Scripted(),casePath(subcase,false),subcase);
         assertEquals("PASS",runner.run(false));runner.verifyComplete();
         assertTrue(driver.events.indexOf("lock-waiter-before-release")<driver.events.indexOf("lock-resume40"));
     }
@@ -114,7 +128,7 @@ public final class V8LockChoreographySelftestTest {
         for(String mutation:List.of("NO_LOCK","WRONG_BLOCKER","STALE_REREAD")) assertEquals("FAIL",runner(casePath(false),new CapturedLockDriver(mutation)).run(false),mutation);
     }
     @Test void absentProductAdaptersRemainNotRunAndNeverInventLockRows() throws Exception {
-        CaseRunner runner=new CaseRunner(new ContractValidator(root),new UnimplementedDriver(),new AgentRunner.Scripted(),casePath(false),SUBCASE);
+        CaseRunner runner=CaseRunner.harnessSelftest(new ContractValidator(root),new UnimplementedDriver(),new AgentRunner.Scripted(),casePath(false),SUBCASE);
         assertEquals("NOT_RUN",runner.run(false));
         assertEquals("NOT_IMPLEMENTED",runner.results().get("waiter-before-release").path("driverStatus").asText());
         assertTrue(runner.results().get("waiter-before-release").path("data").isNull());

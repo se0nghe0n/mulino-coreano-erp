@@ -65,7 +65,7 @@ public final class WireAsyncContractTest {
         var branches=Json.array();for(String id:List.of("left","right")) {ObjectNode b=Json.object();b.put("id",id);b.set("actions",Json.array().add(start(id)));branches.add(b);}p.set("branches",branches);
         return caseFile(List.of(p,awaitAction("await-left","left"),awaitAction("await-right","right")),List.of(assertion("left-terminal","await-left"),assertion("right-terminal","await-right")));
     }
-    private CaseRunner runner(Path path,AcceptanceDriver driver) throws Exception {return new CaseRunner(new ContractValidator(root),driver,new AgentRunner.Scripted(),path,SUBCASE);}
+    private CaseRunner runner(Path path,AcceptanceDriver driver) throws Exception {return CaseRunner.harnessSelftest(new ContractValidator(root),driver,new AgentRunner.Scripted(),path,SUBCASE);}
     @Test void parallelRawWireUsesTypedAsyncPortPreservesHostileInputAndAwaitsEachHandle() throws Exception {
         CapturedAsync port=new CapturedAsync(false,false);CaseRunner r=runner(parallelCase(),port);assertEquals("PASS",r.run(false));r.verifyComplete();
         assertEquals(raw(),port.requests.get("left"));assertEquals(raw(),port.requests.get("right"));assertEquals(Map.of("left","tools/call","right","tools/call"),port.operations);

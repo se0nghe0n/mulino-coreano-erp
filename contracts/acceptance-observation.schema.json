@@ -52,7 +52,8 @@
       "properties": {
         "id": {
           "type": "string",
-          "minLength": 1
+          "minLength": 1,
+          "description": "The observer's own DB snapshot token (for example pg_current_snapshot()). Never the requested snapshotRef or a read-mode directive."
         },
         "isolation": {
           "type": "string",
@@ -65,6 +66,42 @@
         "artifactRef": {
           "type": "string",
           "minLength": 1
+        },
+        "readMode": {
+          "enum": [
+            "RESULT_REVISION",
+            "CURRENT_COMMITTED",
+            "CURRENT_LOCK_WAIT"
+          ],
+          "description": "RESULT_REVISION: snapshotRef is an API-issued projection revision that the observer recomputed from rows. CURRENT_*: the case asked for a fresh read; no revision equality applies."
+        },
+        "revisionQuery": {
+          "type": "object",
+          "properties": {
+            "statementId": {
+              "type": "string",
+              "minLength": 1
+            },
+            "sql": {
+              "type": "string",
+              "minLength": 1
+            },
+            "parameters": {
+              "type": "object"
+            },
+            "mappingVersion": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "required": [
+            "statementId",
+            "sql",
+            "parameters",
+            "mappingVersion"
+          ],
+          "additionalProperties": false,
+          "description": "Read-only query the observer used to recompute snapshotRevision independently from authoritative rows."
         }
       },
       "required": [
@@ -73,7 +110,26 @@
         "capturedAt",
         "artifactRef"
       ],
-      "additionalProperties": false
+      "additionalProperties": false,
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "readMode": {
+                "const": "RESULT_REVISION"
+              }
+            },
+            "required": [
+              "readMode"
+            ]
+          },
+          "then": {
+            "required": [
+              "revisionQuery"
+            ]
+          }
+        }
+      ]
     },
     "rawRows": {
       "type": "object",
@@ -85,7 +141,72 @@
       }
     },
     "data": {
-      "type": "object"
+      "type": "object",
+      "description": "Observer-derived values only. Every field must have a matching derivations entry that the harness recomputes from rawRows; free-form values are rejected."
+    },
+    "derivations": {
+      "type": "object",
+      "description": "Fixed-grammar derivation of each data field from requested rawRows; recomputed by the harness.",
+      "additionalProperties": {
+        "type": "object",
+        "properties": {
+          "rowPointer": {
+            "type": "string",
+            "pattern": "^/rawRows/.+"
+          },
+          "where": {
+            "type": "object",
+            "additionalProperties": {
+              "type": [
+                "string",
+                "number",
+                "boolean"
+              ]
+            }
+          },
+          "aggregate": {
+            "enum": [
+              "sum",
+              "count",
+              "single",
+              "distinct"
+            ]
+          },
+          "field": {
+            "type": "string",
+            "minLength": 1
+          },
+          "unitField": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "required": [
+          "rowPointer",
+          "aggregate"
+        ],
+        "additionalProperties": false,
+        "allOf": [
+          {
+            "if": {
+              "properties": {
+                "aggregate": {
+                  "enum": [
+                    "sum",
+                    "single",
+                    "distinct"
+                  ]
+                }
+              }
+            },
+            "then": {
+              "required": [
+                "field"
+              ]
+            }
+          }
+        ]
+      }
     },
     "sourceEvidence": {
       "type": "object",

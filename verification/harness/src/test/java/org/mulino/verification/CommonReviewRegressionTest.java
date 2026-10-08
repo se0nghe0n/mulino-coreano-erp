@@ -49,7 +49,7 @@ final class CommonReviewRegressionTest {
         public StepResult await(String id,JsonNode handle,int timeout){throw new AssertionError("Unexpected await");}
     }
     private CaseRunner runner(Path path,Map<String,StepResult> captures) throws Exception {
-        return new CaseRunner(new ContractValidator(root),new TestPort(){public StepResult control(String id,JsonNode requested){StepResult capture=captures.get(id);return new StepResult(id,capture.driverStatus(),capture.data(),capture.response(),capture.reason(),capture.provenance(),capture.artifactRefs());}},new AgentRunner.Scripted(),path,SUBCASE);
+        return CaseRunner.harnessSelftest(new ContractValidator(root),new TestPort(){public StepResult control(String id,JsonNode requested){StepResult capture=captures.get(id);return new StepResult(id,capture.driverStatus(),capture.data(),capture.response(),capture.reason(),capture.provenance(),capture.artifactRefs());}},new AgentRunner.Scripted(),path,SUBCASE);
     }
     @Test void actualTypedSubmissionReferencesResolveAndRequireMatchingAutonomousTerminal() throws Exception {
         for(String operation:List.of("tickScheduler","sweepDue")) {
@@ -85,7 +85,7 @@ final class CommonReviewRegressionTest {
             catch(InterruptedException interrupted) {Thread.currentThread().interrupt();}finally {if(id.equals("right")) rightStopped.countDown();}
             return StepResult.missing(id,"CAPTURED_SELFTEST local port finished; no product request");
         }};
-        CaseRunner runner=new CaseRunner(new ContractValidator(root),port,new AgentRunner.Scripted(),parallelCase(),SUBCASE);
+        CaseRunner runner=CaseRunner.harnessSelftest(new ContractValidator(root),port,new AgentRunner.Scripted(),parallelCase(),SUBCASE);
         ExecutorService caller=Executors.newSingleThreadExecutor();long started=System.nanoTime();
         try {
             Future<IOException> result=caller.submit(()->assertThrows(IOException.class,()->runner.execute("parallel")));result.get(3,TimeUnit.SECONDS);long elapsedMs=TimeUnit.NANOSECONDS.toMillis(System.nanoTime()-started);
@@ -100,7 +100,7 @@ final class CommonReviewRegressionTest {
             if(id.equals("right")) {try {while(release.getCount()>0) try {release.await();}catch(InterruptedException ignored) {/* Deliberately hostile local port, never an actual adapter. */}}finally{rightStopped.countDown();}}
             return StepResult.missing(id,"CAPTURED_SELFTEST no external mutation");
         }};
-        CaseRunner runner=new CaseRunner(new ContractValidator(root),port,new AgentRunner.Scripted(),parallelCase(),SUBCASE);ExecutorService caller=Executors.newSingleThreadExecutor();
+        CaseRunner runner=CaseRunner.harnessSelftest(new ContractValidator(root),port,new AgentRunner.Scripted(),parallelCase(),SUBCASE);ExecutorService caller=Executors.newSingleThreadExecutor();
         try {
             caller.submit(()->assertThrows(IOException.class,()->runner.execute("parallel"))).get(3,TimeUnit.SECONDS);
             JsonNode evidence=runner.evidence("PASS","CAPTURED_SELFTEST");JsonNode failure=evidence.path("parallelFailures").get(0);assertFalse(failure.path("cleanupComplete").asBoolean());assertTrue(Files.isRegularFile(root.resolve(failure.path("artifactRef").asText())));assertEquals("FAIL",evidence.path("status").asText());
@@ -138,7 +138,7 @@ final class CommonReviewRegressionTest {
             }
             public StepResult query(String id,String route,JsonNode actor,String cap,JsonNode request) {portCalls.incrementAndGet();return StepResult.missing(id,"CAPTURED_SELFTEST no product call");}
         };
-        CaseRunner runner=new CaseRunner(new ContractValidator(root),port,new AgentRunner.Scripted(),parallelCase(),SUBCASE);ExecutorService caller=Executors.newSingleThreadExecutor();
+        CaseRunner runner=CaseRunner.harnessSelftest(new ContractValidator(root),port,new AgentRunner.Scripted(),parallelCase(),SUBCASE);ExecutorService caller=Executors.newSingleThreadExecutor();
         try {
             Future<IOException> completion=caller.submit(()->assertThrows(IOException.class,()->runner.execute("parallel")));assertTrue(entered.await(1,TimeUnit.SECONDS));completion.get(3,TimeUnit.SECONDS);
             JsonNode failure=runner.evidence("PASS","CAPTURED_SELFTEST").path("parallelFailures").get(0);assertFalse(failure.path("cleanupComplete").asBoolean());assertEquals(0,portCalls.get());

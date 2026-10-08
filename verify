@@ -17,13 +17,19 @@ def finish(code):
     (OUT/'wrapper-commands.json').write_text(json.dumps({'entrypoint':['./verify']+sys.argv[1:],'timestamp':time.strftime('%Y-%m-%dT%H:%M:%SZ',time.gmtime()),'commands':records,'exitCode':code},indent=2)+'\n')
     sys.exit(code)
 if len(sys.argv)<2:
-    print('Usage: ./verify harness|contract-red|validate <case.json...>|prepare|coverage|schema|contracts|scenarios|recovery|mcp|skills|model|deployment',file=sys.stderr)
+    print('Usage: ./verify harness|contract-red|validate <case.json...>|prepare|coverage|schema|contracts|scenarios|recovery|mcp|skills | model --manifest <path> | deployment --manifest <path>',file=sys.stderr)
     finish(3)
 mode=sys.argv[1]; extras=sys.argv[2:]
 actual='--actual' in extras
 extras=[x for x in extras if x!='--actual']
+runner=[x.split('=',1)[1] for x in extras if x.startswith('--agent-runner=')]
+extras=[x for x in extras if not x.startswith('--agent-runner=')]
+if len(runner)>1 or (runner and runner[0] not in {'scripted','actual'}):
+    print('--agent-runner=scripted|actual may appear once',file=sys.stderr);finish(3)
 if actual and mode in {'contract-red','harness','prepare','coverage','validate','model','deployment'}:
     print('--actual requires a deterministic product profile',file=sys.stderr);finish(3)
+if any(x=='--manifest' or x.startswith('--manifest=') for x in extras) and mode not in {'model','deployment'}:
+    print('--manifest applies only to model/deployment',file=sys.stderr);finish(3)
 if mode not in {'harness','contract-red','validate','prepare','coverage','schema','contracts','scenarios','recovery','mcp','skills','model','deployment','actual-s1','actual-s2','actual-s3','actual-s4'}:
     print('Unknown verification profile: '+mode,file=sys.stderr);finish(3)
 if command(['java','-version']) or command([ROOT/'mvnw','-version']): finish(3)
@@ -65,4 +71,4 @@ if mode in {'actual-s1','actual-s2','actual-s3','actual-s4'}:
         print(mode+' accepts at most one fresh evidence directory',file=sys.stderr);finish(3)
     finish(command(['sh',ROOT/('verification/actual/'+mode.removeprefix('actual-')+'/run.sh')]+extras))
 args=['red']+extras if mode=='contract-red' else [mode]+extras if mode in {'validate','prepare','coverage'} else ['profile',mode]+extras
-finish(command(['java',f'-Dverification.driver={"actual" if actual else "unimplemented"}',f'-Drepo.root={ROOT}',f'-Dverification.command={shlex.join(["./verify",mode]+extras)}','-cp',classpath,'org.mulino.verification.Main']+args))
+finish(command(['java',f'-Dverification.driver={"actual" if actual else "unimplemented"}',f'-Dverification.agentRunner={runner[0] if runner else "scripted"}',f'-Drepo.root={ROOT}',f'-Dverification.command={shlex.join(["./verify",mode]+extras)}','-cp',classpath,'org.mulino.verification.Main']+args))

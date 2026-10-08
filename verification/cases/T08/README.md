@@ -11,7 +11,11 @@ payload의 조직·actor·역할과 문서의 ADMIN 지시는 권한이 아니�
 - grant: 최소 범위 발급·철회, revision/효력시각/boundary·감사/의무,
   scoped IDENTITY_ADMIN의 assignment/revoke와 FDE·업무 ADMIN의
   암묵적 권한 상향 거부를 구별한다.
-- actor/delegator/organization은 실제 인증 provenance의 ID와 비교한다.
+- actor/delegator/organization은 서버가 같은 commandIdempotencyKey로
+  남긴 감사 원행(`after` 관찰의 `audit`)에서 읽는다. driver의
+  `provenance.authenticatedActor`는 harness가 서명을 요청한 주체라서
+  oracle 원천이 아니다. payload-actor의 위조 actor는 이동 권한이 있는
+  warehouse라 payload를 믿는 서버는 이동을 적용해 실패한다.
   미설정 정책은 POLICY_UNRESOLVED, 업무 효과0이다.
 
 모든 거부의 전후 scope는 독립 DB snapshot이다. 감사와 rejected
@@ -23,7 +27,8 @@ command record는 업무 원행 불변 비교에서 제외한다. 실제 인가�
 
 작성 검증의 실제 명령·exit·scenario 수·파일 hash는
 `verification/cases/T08/evidence/authority-suite/checks.json`에 있다.
-`observation-bindings.json`은 이 case의 모든 catalog observation을
+`observation-bindings.json`은 `bind_observations.py`가 case.json에서
+생성하는 파생 파일이다(`--check`로 drift를 검사한다). 이 파일은 case의 모든 catalog observation을
 구체 subcase/action/assertion 및 JSON pointer에 연결한다.
 고정 수량 oracle의 primary와 보조 관계/assertion을 함께 보존한다.
 이 연결은 작성 증거이며 실제 제품 효과를 관측한 결과가 아니다.

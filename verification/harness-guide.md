@@ -19,6 +19,8 @@ exit code를 출력하며 `verification/harness/target/wrapper-commands.json`에
 ./verify prepare
 ./verify coverage
 ./verify scenarios
+./verify model --manifest <run-manifest.json>
+./verify deployment --manifest <run-manifest.json>
 ```
 
 - `harness`: 한국어 Cucumber smoke와 assertion/계약 selftest만 실행한다.
@@ -36,9 +38,23 @@ exit code를 출력하며 `verification/harness/target/wrapper-commands.json`에
   catalog를 검사한다. 준비 PASS는 `PREPARED`, runtime/artifact는
   `NOT_RUN`이며 제품 gate는 닫히지 않는다. semantic oracle equivalence는
   case review가 필요하다. JSON pointer 존재만으로 이를 증명하지 않는다.
+  catalog observation의 `artifactKinds`에 `db_snapshot`이 있으면 연결된
+  subcase 중 하나 이상이 독립 `observe` 결과를 source/baseline으로 읽는
+  assertion을 그 observation 또는 같은 oracle의 sibling observation에
+  연결해야 한다. API 응답만으로는 문제로 보고한다.
 - `schema`, `contracts`, `scenarios`, `recovery`, `mcp`, `skills`, `model`,
   `deployment`: 실제 adapter가 없는 현재는 `NOT_RUN`, exit2다. 선행
   profile과 미완료 gate를 보고한다. 모델·유료 배포를 호출하지 않는다.
+- `model|deployment --manifest <path>`(또는 `--manifest=<path>`):
+  `contracts/acceptance-run-manifest.schema.json`의 실행 manifest를 검증한다.
+  manifest를 case 파일로 읽지 않는다. 보고서 `runManifest`에 path·sha256·
+  승인 증거 유무를 남긴다. 승인 증거가 있어도 이 harness는 유료 모델이나
+  배포를 실행하지 않으므로 `NOT_RUN`, exit2다. manifest 없음은 `ABSENT`의
+  `NOT_RUN`이다. 다른 profile의 `--manifest`, 값 없는 `--manifest`,
+  profile 불일치, 알 수 없는 `--` option은 exit3 형식 오류다.
+- `--agent-runner=scripted|actual`: agent action의 runner를 고른다.
+  기본은 `scripted`(SIT)다. `actual`은 ServiceLoader로 설치된
+  `AgentRunner.ActualClientPort`가 정확히 하나여야 하며 없으면 exit3이다.
 
 exit0은 harness/준비 검증의 성공, exit1은 assertion/인수 계약 실패,
 exit2는 필수 경로 `NOT_RUN`, exit3은 환경·형식·discovery 오류다.
@@ -78,16 +94,31 @@ assertion selftest 전용이다. 해당 표본에 `EXECUTED` 문자열이 있어
 `requiredAdapters`, `actions`, `assertions`, `oracleExplanation`이 필수다.
 SIT/UAT는 같은 파일·fixture·oracle를 사용하며 runner만 교체한다.
 
+`requiredAdapters`는 계약이다. 이름은 `contracts/acceptance-capabilities.json`
+의 `adapterAliases`로 정규화한다(`actualClient→client`,
+`independent-db-observer→db`, `process-control→process`). 제품 실행
+(PRODUCT 정책)에서 driver `availableAdapters()`와 agent runner가 공급하지
+않는 adapter가 남으면 그 subcase는 확인된 FAIL이 없는 한 `NOT_RUN`이다.
+evidence의 `missingAdapters`에 이름을 남긴다. `client`/`model`은 실제
+client runner(UAT)만 공급하며 scripted runner는 대신하지 않는다.
+이런 UAT 전용 subcase의 agent action은 typed `intent` 없이
+`userUtterance`/`permittedContext`만 둘 수 있다. scripted SIT로 실행되면
+port를 호출하지 않고 `NOT_IMPLEMENTED`로 남는다. UAT 전용이 아닌 agent
+action은 공개 registry의 `intent.capabilityId`가 필수다. evidence의
+`agentRunner`/`agentActionRunners`는 실제 사용한 runner를 기록한다.
+
 각 assertion은 다음을 반드시 가진다.
 
 ```json
 {
   "id": "warehouse-held-80",
-  "op": "decimalEquals",
-  "source": {"actionId": "after-db", "pointer": "/data/data/heldQuantity"},
+  "op": "sumEquals",
+  "source": {"actionId": "after-db", "pointer": "/data/rawRows/segments",
+             "where": {"placeId": {"$alias": "W"}, "active": true}, "field": "quantity"},
   "expected": "80",
   "unit": "BOX",
-  "unitSource": {"actionId":"after-db", "pointer":"/data/data/unit"},
+  "unitSource": {"actionId":"after-db", "pointer":"/data/rawRows/segments",
+                 "where": {"placeId": {"$alias": "W"}, "active": true}, "field": "unit"},
   "requirementRefs": ["D17"],
   "evidenceRefs": ["after-db:rawRows", "after-db:sourceQuery", "after-db:snapshot"],
   "scope": {"itemAlias": "P", "placeAlias": "W"},
@@ -102,7 +133,22 @@ SIT/UAT는 같은 파일·fixture·oracle를 사용하며 runner만 교체한다
 version·효과·종료 조건의 conjunction을 검증했다고 주장하지 않는다.
 
 `source`는 StepResult JSON부터 읽는 RFC6901 pointer다. API 응답은
-`/response/...`, DB observation은 `/data/data/...`다. 배열 선택에는
+`/response/...`, DB observation은 원행 `/data/rawRows/<source>`다.
+수량 primary는 원행의 `sumEquals`/`count`와 고정 `where`로 둔다.
+`/data/data/...`는 observer가 `derivations`에 고정 문법으로 선언하고
+harness가 rawRows에서 다시 계산해 일치한 값만 허용한다. 각 scalar leaf의
+JSON pointer(예 `/inventory/heldQuantity`)마다 `rowPointer`(요청 source),
+literal `where`, `aggregate=sum|count|single|distinct`, `field`,
+선택적 `unitField`를 둔다. 선언 없는 값, 재계산과 다른 값, 배열·null
+값은 형식 오류다. API projection을 복사한 숫자는 통과하지 못한다.
+`/provenance`, `/reason`, `/artifactRefs`, `/driverStatus`, `/actionId`는
+driver가 스스로 쓴 요청 측 metadata라 oracle 원천이 아니다.
+`./verify prepare`가 이런 source를 문제로 보고한다. 예를 들어
+`provenance.authenticatedActor`는 harness가 서명을 요청한 주체다.
+서버가 검증한 주체는 감사·command 원행처럼 서버가 기록한 독립 관찰에서
+읽는다. assertion `scope`는 추적용 선언이며 harness가 원행을 거르지 않는다.
+실제 선택은 `source.where`와 observe 요청의 scope로만 강제한다.
+evidence는 `declaredScope`와 `scopeEnforced:false`를 남긴다. 배열 선택에는
 `where:{field:fixedValue}`와 `field:"quantity"`를 쓴다. `field:["id",
 "parentId","quantity"]`는 관계 tuple을 만든다. 필드가 누락되면 실패하며
 누락·UNKNOWN·CONFLICT를0이나 빈 배열로 바꾸지 않는다.
@@ -149,10 +195,22 @@ Scenario Outline의 example도 독립 subcase로 선언해 기대 수를 맞춘�
 명사/동사 조회는 snapshot token, scope, asOf와 knownAt을 함께 비교한다.
 같은 knownAt 문자열만으로 같은 DB snapshot이라고 주장하지 않는다.
 observe의 요청 `scope`/`asOf`/`knownAt`은 결과의 같은 필드와 정확히
-같아야 한다. 요청 `snapshotRef`는 실제 결과 `data.snapshotRevision`을
-지칭하며 `data.snapshot.id`도 같은 실제 DB snapshot token이어야 한다.
-logical version이나 시각만 같은 다른 DB snapshot을 대신하지 않는다.
-`data.snapshot`/`sourceQuery`는 provenance의 실제 값과 같아야 한다.
+같아야 한다. API의 logical read revision과 observer의 MVCC snapshot은
+다르다. `snapshotRef`는 둘 중 하나다.
+
+- `$result`로 받은 API `snapshotRevision`: observer는 권한 범위의 원행에서
+  projection revision을 독립 재계산해 `data.snapshotRevision`에 같은 값을
+  낸다. `data.snapshot.readMode=RESULT_REVISION`과 재계산 query
+  `snapshot.revisionQuery`가 필수다. API 값을 복사하지 않는다.
+- literal directive `CURRENT_COMMITTED`/`CURRENT_LOCK_WAIT`: 앞선 action이
+  끝난 뒤의 새 read다. `readMode`가 directive와 같아야 하고
+  `snapshotRevision`은 observer 자신의 값이다. 다른 literal은 schema가
+  거부한다.
+
+두 경우 모두 `data.snapshot.id`는 observer 자신의 DB snapshot token
+(예 `pg_current_snapshot()`)이다. 요청 참조나 directive와 같으면 echo로
+거부한다. 같은 subcase에서 `snapshot.capturedAt`은 앞선 관찰보다 이르면
+안 된다. `data.snapshot`/`sourceQuery`는 provenance의 실제 값과 같아야 한다.
 거부 사례는 대상 원장/배분/승인/업무 outbox의 금지 delta와 허용된 denial
 감사·inbox/대조 책임을 별도 assertion으로 둔다. 전체 DB 불변을 가정하지
 않는다. baseline 물량도 현재/누적 oracle의 scope에 포함하되 setup 자체를
@@ -266,6 +324,18 @@ UNAVAILABLE`, data/response, reason, provenance, artifactRefs를 가진다.
 이 상태와 서버 업무 outcome은 별개다. 미구현 결과는 data/response=null만
 반환한다. 관찰/설치/control/await/parallel child 중 하나라도 미실행이면
 전체 제품 case는 `NOT_RUN`이고 확인한 위반이 있으면 `FAIL`이다.
+미실행 action의 `$result`나 미설치 fixture의 `$alias`를 입력으로 쓰는
+후속 action은 port를 호출하지 않고 `NOT_IMPLEMENTED`로 남는다. 일부
+adapter만 있는 driver가 환경 오류(exit3)로 전체 profile을 끊지 않는다.
+
+`CaseRunner` 기본 정책은 PRODUCT다. 실행된 결과의 provenance
+`source`/`adapter`/`adapterVersion`/`buildVersion`에 `SELFTEST`,
+`CAPTURED`, `CANNED`가 있으면 제품 증거가 아니므로 거부한다(exit3).
+process control은 `ACTUAL_HOST`만 받는다. captured port를 쓰는 harness
+단위 시험만 `CaseRunner.harnessSelftest(...)`를 쓰며 그 결과는 제품 인수로
+세지 않는다. Gherkin actual 실행은 첫 실패 뒤 남은 assertion을 모두
+평가하고 구조화된 `failureKind`(`SOURCE_UNAVAILABLE`/`VIOLATION`)로
+`NOT_RUN`/`FAIL`을 정한다. 오류 문구 검색으로 분류하지 않는다.
 첫 availability assertion만 통과시키고 이후 미관찰을0으로 읽지 않는다.
 각 assertion은 source/baseline/unitSource/baselineUnitSource의 실행
 상태를 따로 검사한다. 실행된 source의 위반은 다른 source의 미실행에도
@@ -274,6 +344,7 @@ FAIL로 보존하고, 미실행 source의 assertion만 NOT_RUN으로 기록한�
 실제 관찰 scope가 아니므로 absence PASS를 만들지 않는다.
 
 `AgentRunner.Scripted`는 선언 typed intent를 실제 도구에 전달한다.
+typed intent가 없으면 만들어 내지 않고 `NOT_IMPLEMENTED`를 반환한다.
 `AgentRunner.ActualClientPort`는 raw userUtterance/permittedContext만 받는다.
 actual prompt에 기대 capability/slot/typed intent/oracle를 넣지 않는다.
 문장·tool 순서는 고정 답안이 아니며 실제 milestone·효과·책임을 같은

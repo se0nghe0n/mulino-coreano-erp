@@ -10,6 +10,14 @@ import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public final class CaseRunner {
+    /** PRODUCT rejects selftest/captured evidence and enforces declared adapters; HARNESS_SELFTEST is for harness unit tests only. */
+    public enum EvidencePolicy { PRODUCT, HARNESS_SELFTEST }
+    /** Observer read-mode directives a case may declare instead of an API-issued revision. */
+    public static final Set<String> SNAPSHOT_DIRECTIVES=Set.of("CURRENT_COMMITTED","CURRENT_LOCK_WAIT");
+    private final EvidencePolicy policy;
+    private volatile Set<String> observedAdapters;
+    private final Map<String,String> agentActionRunners=new ConcurrentHashMap<>();
+    private Instant lastObserverCapture;
     private final ContractValidator validator;
     private final AcceptanceDriver driver;
     private final AgentRunner agentRunner;
@@ -32,7 +40,14 @@ public final class CaseRunner {
     private JsonNode aliases=Json.object();
     private final Instant startedAt=Instant.now();
     public CaseRunner(ContractValidator validator,AcceptanceDriver driver,AgentRunner agentRunner,Path casePath,String subcaseId) throws IOException {
-        this.validator=validator; this.driver=driver; this.agentRunner=agentRunner;
+        this(validator,driver,agentRunner,casePath,subcaseId,EvidencePolicy.PRODUCT);
+    }
+    /** Harness unit tests with captured/canned ports. Never used by Main or product Gherkin runs. */
+    public static CaseRunner harnessSelftest(ContractValidator validator,AcceptanceDriver driver,AgentRunner agentRunner,Path casePath,String subcaseId) throws IOException {
+        return new CaseRunner(validator,driver,agentRunner,casePath,subcaseId,EvidencePolicy.HARNESS_SELFTEST);
+    }
+    private CaseRunner(ContractValidator validator,AcceptanceDriver driver,AgentRunner agentRunner,Path casePath,String subcaseId,EvidencePolicy policy) throws IOException {
+        this.validator=validator; this.driver=driver; this.agentRunner=agentRunner; this.policy=policy;
         this.caseFile=validator.caseFile(casePath);this.caseHash=Json.sha256(casePath);
         JsonNode selected=null; for(JsonNode s:caseFile.path("subcases")) if(s.path("id").asText().equals(subcaseId)) selected=s;
         if(selected==null) throw new IllegalArgumentException("Unknown subcase "+subcaseId);
@@ -51,16 +66,26 @@ public final class CaseRunner {
         ensureActive();
         String id=Json.required(a,"id"),kind=Json.required(a,"kind"); StepResult result;
         try {
-            boolean adaptersAvailable=!driver.availableAdapters().isEmpty();
+            Set<String> available=driver.availableAdapters();
+            if(observedAdapters==null) observedAdapters=Set.copyOf(available);
+            boolean adaptersAvailable=!available.isEmpty();
             // Metadata may block and ignore cancellation; fence again before dispatch.
             ensureActive();
-            result=!adaptersAvailable && !kind.equals("parallel") ? StepResult.missing(id,"NOT_IMPLEMENTED: no real product adapters installed") : switch(kind) {
+            if(kind.equals("agent")) agentActionRunners.put(id,agentRunner.kind());
+            String dependency=kind.equals("parallel") ? null : unavailableDependency(a);
+            result=!adaptersAvailable && !kind.equals("parallel") ? StepResult.missing(id,"NOT_IMPLEMENTED: no real product adapters installed")
+                : dependency!=null ? StepResult.missing(id,"NOT_IMPLEMENTED: "+dependency) : switch(kind) {
                 case "installFixture" -> dispatch(() -> driver.installFixture(id,fixtureBundle()));
                 case "invoke" -> dispatch(() -> a.has("protocolOperation") ? driver.wire(id,actor(a),Json.required(a,"protocolOperation"),resolve(a.path("request"))) : driver.invoke(id,Json.required(a,"route"),actor(a),Json.required(a,"capabilityId"),resolve(a.path("request"))));
                 case "query" -> dispatch(() -> a.has("protocolOperation") ? driver.wire(id,actor(a),Json.required(a,"protocolOperation"),resolve(a.path("request"))) : driver.query(id,Json.required(a,"route"),actor(a),Json.required(a,"capabilityId"),resolve(a.path("request"))));
                 case "observe" -> dispatch(() -> driver.observe(id,resolve(a.path("observation"))));
                 case "control" -> dispatch(() -> driver.control(id,resolve(a.path("control"))));
-                case "agent" -> dispatch(() -> agentRunner.run(id,Json.required(a,"route"),actor(a),resolve(a),driver));
+                case "agent" -> {
+                    // A UAT-only subcase needs the real client host; the scripted runner must not stand in for it.
+                    if(validator.requiresActualClient(subcase) && !agentRunner.actualClient())
+                        yield StepResult.missing(id,"NOT_IMPLEMENTED: subcase requires an actual client/model runner; "+agentRunner.kind()+" cannot substitute");
+                    yield dispatch(() -> agentRunner.run(id,Json.required(a,"route"),actor(a),resolve(a),driver));
+                }
                 case "start" -> {
                     JsonNode call=a.path("call");
                     yield dispatch(() -> call.has("protocolOperation")
@@ -79,12 +104,14 @@ public final class CaseRunner {
             if(!id.equals(result.actionId())) throw new IllegalArgumentException("Adapter actionId mismatch");
             ensureActive();
             validator.result(result,kind);
+            if(result.driverStatus()==StepResult.DriverStatus.EXECUTED && policy==EvidencePolicy.PRODUCT && selftestProvenance(result.provenance()))
+                throw new IllegalArgumentException("Selftest/captured/canned provenance is not product evidence: "+result.provenance().path("source").asText());
             if(result.driverStatus()==StepResult.DriverStatus.EXECUTED && kind.equals("control")) {
                 if(!result.data().path("controlType").asText().equals(a.path("control").path("type").asText()) || !result.data().path("operation").asText().equals(a.path("control").path("operation").asText()))
                     throw new IllegalArgumentException("Control ACK does not match requested control type/operation");
                 if(!result.data().hasNonNull("acknowledgedAt")) throw new IllegalArgumentException("Control ACK time absent");
                 JsonNode requested=resolve(a.path("control"));
-                HostObservationValidator.validate(validator,requested,result);
+                HostObservationValidator.validate(validator,requested,result,policy==EvidencePolicy.PRODUCT);
                 if(requested.path("type").asText().equals("barrier")) for(String field:List.of("barrierId","participantId","transactionId","point","state"))
                     if(!requested.path("parameters").hasNonNull(field) || !result.data().hasNonNull(field) || !result.data().path(field).equals(requested.path("parameters").path(field)))
                         throw new IllegalArgumentException("Barrier ACK differs from requested "+field);
@@ -99,8 +126,7 @@ public final class CaseRunner {
                 JsonNode requested=resolve(a.path("observation"));
                 for(String field:List.of("asOf","knownAt","scope")) if(!result.data().path(field).equals(requested.path(field)))
                     throw new IllegalArgumentException("Observer "+field+" differs from requested context");
-                if(!result.data().path("snapshotRevision").equals(requested.path("snapshotRef")) || !result.data().path("snapshot").path("id").equals(requested.path("snapshotRef")))
-                    throw new IllegalArgumentException("Observer actual snapshot id/snapshotRevision differs from requested snapshotRef");
+                observerSnapshot(a.path("observation").path("snapshotRef"),requested.path("snapshotRef"),result.data());
                 for(JsonNode source:requested.path("sources")) {
                     String name=source.asText();JsonNode rows=result.data().path("rawRows").path(name),evidence=result.data().path("sourceEvidence").path(name);
                     if(!rows.isArray() || !evidence.path("complete").asBoolean(false) || !evidence.path("rowPointer").asText().equals("/rawRows/"+name.replace("~","~0").replace("/","~1")))
@@ -110,6 +136,7 @@ public final class CaseRunner {
                 }
                 if(!result.data().path("snapshot").equals(result.provenance().path("snapshot")) || !result.data().path("sourceQuery").equals(result.provenance().path("sourceQuery")))
                     throw new IllegalArgumentException("Observer data snapshot/sourceQuery differ from actual provenance");
+                ObserverDerivations.verify(requested.path("sources"),result.data());
             }
             synchronized(executionGate) {
                 ensureActive();
@@ -126,6 +153,72 @@ public final class CaseRunner {
             }
             return result;
         } catch(RuntimeException e) { throw new IllegalArgumentException("Action "+id+": "+e.getMessage(),e); }
+    }
+    /**
+     * An action whose $alias/$result input comes from an action that did not execute cannot be sent;
+     * it is NOT_IMPLEMENTED (NOT_RUN), never an environment abort and never a fabricated value.
+     */
+    private String unavailableDependency(JsonNode node) {
+        if(node.isObject() && node.has("$alias")) {
+            for(JsonNode action:actionIndex.values()) if(action.path("kind").asText().equals("installFixture")) {
+                JsonNode r=results.get(action.path("id").asText());
+                if(r!=null && !"EXECUTED".equals(r.path("driverStatus").asText())) return "fixture alias depends on installFixture "+action.path("id").asText()+" which did not execute";
+            }
+            return null;
+        }
+        if(node.isObject() && node.has("$result")) {
+            JsonNode r=results.get(node.path("$result").path("actionId").asText());
+            return r!=null && !"EXECUTED".equals(r.path("driverStatus").asText()) ? "input depends on action "+node.path("$result").path("actionId").asText()+" which did not execute" : null;
+        }
+        if(node.isContainerNode()) for(JsonNode child:node) {String reason=unavailableDependency(child);if(reason!=null) return reason;}
+        return null;
+    }
+    /**
+     * Declared adapters are a contract: one the driver/runner does not supply keeps the subcase out of PASS.
+     * Uses the adapter set the driver reported when actions ran (metadata is never re-queried after a halt).
+     */
+    public Set<String> missingAdapters() {
+        if(policy!=EvidencePolicy.PRODUCT) return Set.of();
+        Set<String> missing=new TreeSet<>(validator.adapters(subcase.path("requiredAdapters")));
+        if(observedAdapters!=null) missing.removeAll(validator.adapters(observedAdapters));
+        missing.removeAll(validator.adapters(agentRunner.providedAdapters()));
+        return Collections.unmodifiableSet(missing);
+    }
+    /** Selftest ports label themselves; product runs must never count such evidence. */
+    static boolean selftestProvenance(JsonNode provenance) {
+        for(String key:List.of("source","adapter","adapterVersion","buildVersion")) {
+            String value=provenance.path(key).asText().toUpperCase(Locale.ROOT);
+            if(value.contains("SELFTEST") || value.contains("CAPTURED") || value.contains("CANNED")) return true;
+        }
+        return false;
+    }
+    /**
+     * The API's logical read revision and the observer's own MVCC snapshot are different things.
+     * A $result-bound snapshotRef is a projection revision the observer must recompute from rows
+     * (readMode RESULT_REVISION, revisionQuery recorded). A literal directive asks for a fresh read
+     * (CURRENT_COMMITTED / CURRENT_LOCK_WAIT) and has no revision to equal. In both modes
+     * snapshot.id is the observer's own token and must not echo the requested reference.
+     */
+    private void observerSnapshot(JsonNode declared,JsonNode requested,JsonNode data) {
+        JsonNode snapshot=data.path("snapshot");String readMode=snapshot.path("readMode").asText();
+        if(declared.isTextual()) {
+            if(!SNAPSHOT_DIRECTIVES.contains(declared.asText())) throw new IllegalArgumentException("Literal snapshotRef must be a read-mode directive "+SNAPSHOT_DIRECTIVES);
+            if(!readMode.equals(declared.asText())) throw new IllegalArgumentException("Observer snapshot readMode differs from requested directive "+declared.asText());
+            if(SNAPSHOT_DIRECTIVES.contains(data.path("snapshotRevision").asText())) throw new IllegalArgumentException("Observer snapshotRevision echoes a read-mode directive");
+        } else {
+            if(!readMode.equals("RESULT_REVISION")) throw new IllegalArgumentException("Result-bound snapshotRef requires observer readMode RESULT_REVISION");
+            if(!snapshot.path("revisionQuery").isObject()) throw new IllegalArgumentException("Observer must record the independent projection revision recomputation query");
+            if(!data.path("snapshotRevision").equals(requested)) throw new IllegalArgumentException("Observer independently recomputed snapshotRevision differs from requested snapshotRef");
+        }
+        if(snapshot.path("id").equals(requested) || SNAPSHOT_DIRECTIVES.contains(snapshot.path("id").asText()))
+            throw new IllegalArgumentException("Observer snapshot.id echoes the requested snapshotRef instead of its own DB snapshot token");
+        Instant captured;
+        try { captured=java.time.OffsetDateTime.parse(Json.required(snapshot,"capturedAt")).toInstant(); }
+        catch(java.time.format.DateTimeParseException e) { throw new IllegalArgumentException("Observer snapshot capturedAt is not an instant",e); }
+        synchronized(this) {
+            if(lastObserverCapture!=null && captured.isBefore(lastObserverCapture)) throw new IllegalArgumentException("Observer snapshot captured before an earlier observation in this subcase");
+            lastObserverCapture=captured;
+        }
     }
     @FunctionalInterface private interface PortDispatch { StepResult call() throws IOException; }
     private StepResult dispatch(PortDispatch call) throws IOException {
@@ -238,12 +331,16 @@ public final class CaseRunner {
     public void assertId(String id) {
         JsonNode assertion=assertionIndex.get(id); if(assertion==null) throw new IllegalArgumentException("Undeclared assertion "+id);
         asserted.add(id);ObjectNode evidence=Json.object(); evidence.put("assertionId",id);evidence.set("expected",assertion.path("expected"));evidence.set("source",assertion.path("source"));evidence.set("requirementRefs",assertion.path("requirementRefs"));evidence.set("evidenceRefs",assertion.path("evidenceRefs"));
+        // scope is declarative traceability; selection is enforced only by source.where and the observation request.
+        evidence.set("declaredScope",assertion.path("scope"));evidence.put("scopeEnforced",false);
+        AssertionEngine engine=new AssertionEngine();
         try {
-            AssertionEngine engine=new AssertionEngine();engine.requireSourcesAvailable(assertion,results);
+            engine.requireSourcesAvailable(assertion,results);
             if(containsAlias(assertion)) for(JsonNode action:actionIndex.values()) if(action.path("kind").asText().equals("installFixture")) engine.requireExecuted(Json.required(action,"id"),results);
-            engine.check(assertion,results,aliases); evidence.put("status","PASS");
         }
-        catch(AssertionError e) { evidence.put("status","FAIL").put("reason",e.getMessage());assertionResults.add(evidence);throw e; }
+        catch(AssertionError e) { evidence.put("status","FAIL").put("failureKind","SOURCE_UNAVAILABLE").put("reason",e.getMessage());assertionResults.add(evidence);throw e; }
+        try { engine.check(assertion,results,aliases); evidence.put("status","PASS"); }
+        catch(AssertionError e) { evidence.put("status","FAIL").put("failureKind","VIOLATION").put("reason",e.getMessage());assertionResults.add(evidence);throw e; }
         assertionResults.add(evidence);
     }
     public String run(boolean contractRed) throws IOException {
@@ -257,7 +354,24 @@ public final class CaseRunner {
             } else try { assertId(id); } catch(AssertionError e) { failed=true; }
         }
         boolean incomplete=!terminalStarts.containsAll(startedHandles.keySet()) || !runtimeTerminals.containsAll(runtimeSubmissions.keySet());
-        return failed ? "FAIL" : missing || incomplete ? "NOT_RUN" : "PASS";
+        return failed ? "FAIL" : missing || incomplete || !missingAdapters().isEmpty() ? "NOT_RUN" : "PASS";
+    }
+    /**
+     * Gherkin stops at the first failed step. For an honest scenario verdict, evaluate every assertion
+     * not yet asserted, without throwing, and classify by structured failureKind rather than message text.
+     */
+    public String verdictAfterStop() {
+        for(String id:assertionIndex.keySet()) if(!asserted.contains(id)) {
+            if(!sourcesExecuted(assertionIndex.get(id))) {
+                asserted.add(id);ObjectNode e=Json.object();e.put("assertionId",id).put("status","NOT_RUN").put("failureKind","SOURCE_UNAVAILABLE").put("reason","Assertion source unavailable; no zero effects inferred");assertionResults.add(e);
+            } else try { assertId(id); } catch(AssertionError ignored) { /* recorded with failureKind */ }
+        }
+        boolean violation=assertionResults.stream().anyMatch(e->"VIOLATION".equals(e.path("failureKind").asText()));
+        boolean unavailable=assertionResults.stream().anyMatch(e->"SOURCE_UNAVAILABLE".equals(e.path("failureKind").asText()))
+            || results.values().stream().anyMatch(r->!"EXECUTED".equals(r.path("driverStatus").asText())) || !results.keySet().containsAll(actionIndex.keySet());
+        if(violation || halted || !parallelFailures.isEmpty()) return "FAIL";
+        boolean incomplete=!terminalStarts.containsAll(startedHandles.keySet()) || !runtimeTerminals.containsAll(runtimeSubmissions.keySet());
+        return unavailable || incomplete || !missingAdapters().isEmpty() ? "NOT_RUN" : "PASS";
     }
     private boolean sourcesExecuted(JsonNode assertion) {
         for(String key:List.of("source","baseline","unitSource","baselineUnitSource")) if(assertion.has(key)) {
@@ -288,6 +402,7 @@ public final class CaseRunner {
         if(!runtimeTerminals.containsAll(runtimeSubmissions.keySet())) throw new AssertionError("Submitted scheduler task lacks matching runtime terminal observation");
         if(halted || !parallelFailures.isEmpty()) throw new AssertionError("Parallel cancellation/cleanup failure prevents completion");
         if(results.values().stream().anyMatch(r->!"EXECUTED".equals(r.path("driverStatus").asText()))) throw new AssertionError("Required adapter action NOT_IMPLEMENTED/UNAVAILABLE");
+        if(!missingAdapters().isEmpty()) throw new AssertionError("NOT_IMPLEMENTED: declared requiredAdapters not supplied by driver/runner "+missingAdapters());
     }
     public ObjectNode evidence(String status,String command) throws IOException {
         if(halted || !parallelFailures.isEmpty()) status="FAIL";
@@ -295,6 +410,8 @@ public final class CaseRunner {
         e.put("startedAt",startedAt.toString()).put("finishedAt",Instant.now().toString()).put("command",command);
         e.put("caseHash",caseHash);e.put("fixtureRef",Json.required(subcase,"fixtureRef")).put("fixtureHash",Json.sha256(validator.path(Json.required(subcase,"fixtureRef"))));
         e.set("versions",fixture.path("versions"));e.set("requiredAdapters",subcase.path("requiredAdapters"));
+        e.put("evidencePolicy",policy.name()).put("adapterCheck",policy==EvidencePolicy.PRODUCT?"ENFORCED":"SKIPPED_HARNESS_SELFTEST");
+        e.set("missingAdapters",Json.MAPPER.valueToTree(missingAdapters()));e.put("agentRunner",agentRunner.kind());e.set("agentActionRunners",Json.MAPPER.valueToTree(new TreeMap<>(agentActionRunners)));
         e.set("actions",Json.MAPPER.valueToTree(results));e.set("assertions",Json.MAPPER.valueToTree(assertionResults));
         e.set("parallelFailures",Json.MAPPER.valueToTree(parallelFailures));e.put("uncompletedRuntimeTasks",runtimeSubmissions.size()-runtimeTerminals.size());
         e.put("missingAssertions",assertionIndex.size()-asserted.size());e.put("productCoverageClaimed",false); return e;
