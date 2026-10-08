@@ -28,8 +28,9 @@ JSON 또는 요청 범위 SSE response를 처리한다. Origin 검증과 endpoin
 공식 header encoding/오류 계약대로 거부한다. stdio는 필요한 로컬
 인수에만 사용하며 같은 schema·protocol·제한된 자격을 적용한다.
 
-공식 오류의 실제 code를 확인해 `contracts/mcp-errors.md`에 domain
-outcome 매핑을 고정한다. malformed wire와 업무 `NEEDS_INPUT`,
+공식 오류의 실제 code를 확인해 `contracts/mcp/s0-protocol.md`의 "오류와
+경계" 표를 확장해 domain outcome 매핑을 고정한다. 매핑 파일은 이 하나뿐이며
+`contracts/mcp-errors.md`를 새로 만들지 않는다(계획 §9.1의 옛 경로). malformed wire와 업무 `NEEDS_INPUT`,
 `WAITING_APPROVAL`, `CONFLICT`, `FORBIDDEN`, `ACCEPTED_PENDING_EXTERNAL`을
 합치지 않는다. Tool 실행 오류를 성공 text 하나로 감추지 않는다.
 

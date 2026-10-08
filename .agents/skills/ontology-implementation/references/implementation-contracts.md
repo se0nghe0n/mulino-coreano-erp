@@ -50,12 +50,38 @@ numeric(38,12)다. 허용 정밀도를 넘으면 거부한다. 기준 단위 소
 5. effect class/scope를 application에서 검사한다. 내부 move를 고객 출고,
    반품·폐기·주문 이행의 우회 action으로 열지 않는다. raw ledger/core CRUD,
    direct/nested/batch/projection/MCP/worker 경로에도 같은 guard를 적용한다.
+   guard 대상은 아래 "쓰기 노출 면"의 열거 결과이며 고정 목록이 아니다.
 6. 효과·의무·판정 pending·audit·outbox·idem 결과를 한 DB transaction에
    기록한다. audit 실패는 rollback이다. 대형/외부 판정은 pending으로
    표시하고 즉시 SATISFIED를 반환하지 않는다.
 7. response의 outcome/revision/effect refs/nextAction을 보존한다. 외부 결과
    미확인은 ACCEPTED_PENDING_EXTERNAL 또는 해당 미확인 상태다. 오류에
    다른 조직의 객체 존재·token·비밀을 노출하지 않는다.
+
+## 쓰기 노출 면과 조회 계약 — D01/D08/V4/계획 §3.4/§4.2
+
+**쓰기 노출 면.** CAP은 노출한 CDS 항목에 generic CREATE/UPDATE/DELETE,
+`$batch` changeset, deep insert, upsert, draft activation handler를 자동으로
+붙인다. 이 경로는 command fence·grant 검사 밖에서 core를 바꿀 수 있다.
+따라서 서비스에 projection, action, MCP tool, worker handler, 관리
+endpoint를 추가·변경할 때마다 실제 노출 면을 열거한다. 쓰기 가능한 항목은
+capability allowlist에 있어야 하고 core entity는 노출하지 않거나
+`@readonly`·`@restrict`로 막는다. 열거와 우회 시도를 V4 case가 실행하며
+(`ontology-scenario-testing`의 repository-harness), 규칙 없는 `404`나
+"generic projection을 만들지 않는다"는 관례만으로 충족했다고 하지 않는다.
+
+**조회 두 진입점.** `getObject`·`searchObjects`·`getWork`·`searchWorks`·
+`getInventory`·`getObligations`·`traceLot`·`getEvidence`·`getAssessment`·
+`getDefinition`은 같은 application query와 query schema를 공유한다. 명사에서
+연결 업무를, 업무에서 대상·물량·목표·근거를 반환하며 같은 ID와
+`snapshotRevision`/평가시점이면 결과가 같다. 응답은 `data`, `asOf`,
+`knownAt`, `scope`, `unknowns`, `conflicts`, `evidenceRefs`, `nextCursor`를
+포함한다. 목록은 안정된 ID tie-break와 cursor를 쓰고 page 사이 시점 변화를
+응답에 밝힌다. offset paging과 자유 SQL·허용 밖 filter/sort/relation을 만들지
+않는다. 검색 결과로 다른 조직 객체의 존재를 드러내지 않는다. 오류는
+`TYPE_INVALID`, `VERSION_UNSUPPORTED`, `POLICY_UNRESOLVED`, `FORBIDDEN`,
+`STALE_REVISION`, `IDEMPOTENCY_CONFLICT`, `INSUFFICIENT_ELIGIBLE_QUANTITY`,
+`EVIDENCE_CONFLICT`처럼 구조화한다.
 
 ## 수량 원장과 실행 배분 — D03/D04/D05/D16/D17/D18
 

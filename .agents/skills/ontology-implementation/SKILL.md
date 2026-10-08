@@ -20,6 +20,8 @@ authoritative 자료 유무 확인은 코드 재사용과 구별한다.
 - 착수·stack 선택·Step 종료: [stage-gates.md](references/stage-gates.md)를 읽는다.
 - schema·evaluator·command·복구 변경:
   [implementation-contracts.md](references/implementation-contracts.md)를 읽는다.
+- 노출 면(projection/action/tool)이나 조회 query를 바꿀 때:
+  implementation-contracts.md의 "쓰기 노출 면과 조회 계약"을 읽는다.
 - 변경 범위·oracle·인수 증거:
   [case-routing.md](references/case-routing.md)에서 관련 D/T와 C/V/E를 찾고,
   계획 §13의 원문 fixture를 읽는다. 요약표만으로 fixture를 축소하지 않는다.
@@ -62,12 +64,18 @@ authoritative 자료 유무 확인은 코드 재사용과 구별한다.
 
 ## 완료 보고와 증거
 
-`verification/manifest.json`에는 requirement/case→실제 assertion→artifact,
-commit, schema/definition/evaluator/skill·client/model/DB/buildpack version,
-fixture hash, 정확한 command, timestamp, expected/observed,
-`PASS|FAIL|NOT_RUN`을 연결한다. wrapper가 없으면 실제 실행 명령을 기록하고
-`./verify …`가 실행됐다고 쓰지 않는다. 논리 review·문서/skill 검증·로컬
-결정적 테스트·실모델·규제 검토·BTP/client 결과를 분리한다.
+증거 기록은 `verification/manifest.json`(없는 파일)이 아니라 저장소의 실제
+pipeline이다. 실행은 `./verify`·`verification/actual/sN/run.sh`, 연결·조립은
+`verification/coverage`의 receipt·index·`assemble.py`·`validate.py`,
+결과는
+`verification/harness/target/evidence/runtime-manifest.json`이다.
+증거 class(ACTUAL/SELFTEST/CONTRACT_RED/STUB/LOGIC_REVIEW)와 보고 규칙은
+[저장소 harness](../ontology-scenario-testing/references/repository-harness.md)를
+따른다. ACTUAL receipt가 검증되지 않은 PASS 주장은 `NOT_RUN`이다.
+requirement/case→assertion→artifact, commit, version, fixture hash, 정확한
+command, expected/observed와 `PASS|FAIL|NOT_RUN`을 그 산출물에서 인용한다.
+논리 review·문서/skill 검증·로컬 결정적 테스트·실모델·규제 검토·BTP/client
+결과를 분리한다.
 
 handoff에는 Task/사용자 단계/S gate, baseline/worktree/ownership, commit과
 변경 파일, 통합 상태, checks 결과, 미해결 R 결정, 다음 행동을 남긴다.
