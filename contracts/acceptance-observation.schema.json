@@ -70,10 +70,11 @@
         "readMode": {
           "enum": [
             "RESULT_REVISION",
+            "RUNTIME_TASK_SNAPSHOT",
             "CURRENT_COMMITTED",
             "CURRENT_LOCK_WAIT"
           ],
-          "description": "RESULT_REVISION: snapshotRef is an API-issued projection revision that the observer recomputed from rows. CURRENT_*: the case asked for a fresh read; no revision equality applies."
+          "description": "RESULT_REVISION: snapshotRef is an API-issued projection revision that the observer recomputed from rows. RUNTIME_TASK_SNAPSHOT: snapshotRef is the host terminal snapshot of an awaitRuntimeTask; the observer bound its read to that task's host snapshot artifact (runtimeTaskSnapshot) and no revision equality applies. CURRENT_*: the case asked for a fresh read; no revision equality applies."
         },
         "revisionQuery": {
           "type": "object",
@@ -102,6 +103,45 @@
           ],
           "additionalProperties": false,
           "description": "Read-only query the observer used to recompute snapshotRevision independently from authoritative rows."
+        },
+        "runtimeTaskSnapshot": {
+          "type": "object",
+          "properties": {
+            "schedulerId": {
+              "type": "string",
+              "minLength": 1
+            },
+            "taskId": {
+              "type": "string",
+              "minLength": 1
+            },
+            "invocationHandle": {
+              "type": "string",
+              "minLength": 1
+            },
+            "snapshotId": {
+              "type": "string",
+              "minLength": 1
+            },
+            "artifactRef": {
+              "type": "string",
+              "minLength": 1
+            },
+            "sha256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            }
+          },
+          "required": [
+            "schedulerId",
+            "taskId",
+            "invocationHandle",
+            "snapshotId",
+            "artifactRef",
+            "sha256"
+          ],
+          "additionalProperties": false,
+          "description": "The host runtime snapshot the observer located from snapshotSource (schedulerId/taskId/invocationHandle) and read: its snapshotId, repository artifactRef and SHA-256 of the artifact bytes. The harness compares them with the awaitRuntimeTask result and the file."
         }
       },
       "required": [
@@ -127,6 +167,30 @@
             "required": [
               "revisionQuery"
             ]
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "readMode": {
+                "const": "RUNTIME_TASK_SNAPSHOT"
+              }
+            },
+            "required": [
+              "readMode"
+            ]
+          },
+          "then": {
+            "required": [
+              "runtimeTaskSnapshot"
+            ]
+          },
+          "else": {
+            "not": {
+              "required": [
+                "runtimeTaskSnapshot"
+              ]
+            }
           }
         }
       ]

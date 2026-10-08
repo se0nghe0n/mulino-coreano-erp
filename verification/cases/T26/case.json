@@ -36076,28 +36076,6 @@
           ]
         },
         {
-          "id": "start-app-scheduler",
-          "kind": "control",
-          "control": {
-            "type": "process",
-            "operation": "start",
-            "parameters": {
-              "scope": {
-                "organizationId": {
-                  "$alias": "ORG"
-                },
-                "caseId": "T26",
-                "subcaseId": "due-wait-autonomous-loop"
-              },
-              "processId": "scheduler",
-              "environmentId": "runtime-T26-due-wait-autonomous-loop-source"
-            }
-          },
-          "evidenceRefs": [
-            "start-app-scheduler:actual-artifact"
-          ]
-        },
-        {
           "id": "start-app-worker-a",
           "kind": "control",
           "control": {
@@ -36396,28 +36374,6 @@
           ]
         },
         {
-          "id": "stop-app-scheduler",
-          "kind": "control",
-          "control": {
-            "type": "process",
-            "operation": "stop",
-            "parameters": {
-              "scope": {
-                "organizationId": {
-                  "$alias": "ORG"
-                },
-                "caseId": "T26",
-                "subcaseId": "due-wait-autonomous-loop"
-              },
-              "processId": "scheduler",
-              "environmentId": "runtime-T26-due-wait-autonomous-loop-source"
-            }
-          },
-          "evidenceRefs": [
-            "stop-app-scheduler:actual-artifact"
-          ]
-        },
-        {
           "id": "stop-app-worker-a",
           "kind": "control",
           "control": {
@@ -36485,7 +36441,73 @@
           ]
         },
         {
-          "id": "restart-while-observing",
+          "id": "start-again-api",
+          "kind": "control",
+          "control": {
+            "type": "process",
+            "operation": "start",
+            "parameters": {
+              "scope": {
+                "organizationId": {
+                  "$alias": "ORG"
+                },
+                "caseId": "T26",
+                "subcaseId": "due-wait-autonomous-loop"
+              },
+              "processId": "api",
+              "environmentId": "runtime-T26-due-wait-autonomous-loop-source"
+            }
+          },
+          "evidenceRefs": [
+            "start-again-api:actual-artifact"
+          ]
+        },
+        {
+          "id": "start-again-worker-a",
+          "kind": "control",
+          "control": {
+            "type": "process",
+            "operation": "start",
+            "parameters": {
+              "scope": {
+                "organizationId": {
+                  "$alias": "ORG"
+                },
+                "caseId": "T26",
+                "subcaseId": "due-wait-autonomous-loop"
+              },
+              "processId": "worker-a",
+              "environmentId": "runtime-T26-due-wait-autonomous-loop-source"
+            }
+          },
+          "evidenceRefs": [
+            "start-again-worker-a:actual-artifact"
+          ]
+        },
+        {
+          "id": "start-again-worker-b",
+          "kind": "control",
+          "control": {
+            "type": "process",
+            "operation": "start",
+            "parameters": {
+              "scope": {
+                "organizationId": {
+                  "$alias": "ORG"
+                },
+                "caseId": "T26",
+                "subcaseId": "due-wait-autonomous-loop"
+              },
+              "processId": "worker-b",
+              "environmentId": "runtime-T26-due-wait-autonomous-loop-source"
+            }
+          },
+          "evidenceRefs": [
+            "start-again-worker-b:actual-artifact"
+          ]
+        },
+        {
+          "id": "start-loop-while-observing",
           "kind": "parallel",
           "timeoutSeconds": 90,
           "branches": [
@@ -36520,32 +36542,10 @@
               ]
             },
             {
-              "id": "process-restart",
+              "id": "loop-start-scheduler",
               "actions": [
                 {
-                  "id": "start-again-api",
-                  "kind": "control",
-                  "control": {
-                    "type": "process",
-                    "operation": "start",
-                    "parameters": {
-                      "scope": {
-                        "organizationId": {
-                          "$alias": "ORG"
-                        },
-                        "caseId": "T26",
-                        "subcaseId": "due-wait-autonomous-loop"
-                      },
-                      "processId": "api",
-                      "environmentId": "runtime-T26-due-wait-autonomous-loop-source"
-                    }
-                  },
-                  "evidenceRefs": [
-                    "start-again-api:actual-artifact"
-                  ]
-                },
-                {
-                  "id": "start-again-scheduler",
+                  "id": "start-scheduler",
                   "kind": "control",
                   "control": {
                     "type": "process",
@@ -36563,58 +36563,14 @@
                     }
                   },
                   "evidenceRefs": [
-                    "start-again-scheduler:actual-artifact"
-                  ]
-                },
-                {
-                  "id": "start-again-worker-a",
-                  "kind": "control",
-                  "control": {
-                    "type": "process",
-                    "operation": "start",
-                    "parameters": {
-                      "scope": {
-                        "organizationId": {
-                          "$alias": "ORG"
-                        },
-                        "caseId": "T26",
-                        "subcaseId": "due-wait-autonomous-loop"
-                      },
-                      "processId": "worker-a",
-                      "environmentId": "runtime-T26-due-wait-autonomous-loop-source"
-                    }
-                  },
-                  "evidenceRefs": [
-                    "start-again-worker-a:actual-artifact"
-                  ]
-                },
-                {
-                  "id": "start-again-worker-b",
-                  "kind": "control",
-                  "control": {
-                    "type": "process",
-                    "operation": "start",
-                    "parameters": {
-                      "scope": {
-                        "organizationId": {
-                          "$alias": "ORG"
-                        },
-                        "caseId": "T26",
-                        "subcaseId": "due-wait-autonomous-loop"
-                      },
-                      "processId": "worker-b",
-                      "environmentId": "runtime-T26-due-wait-autonomous-loop-source"
-                    }
-                  },
-                  "evidenceRefs": [
-                    "start-again-worker-b:actual-artifact"
+                    "start-scheduler:actual-artifact"
                   ]
                 }
               ]
             }
           ],
           "evidenceRefs": [
-            "restart-while-observing:actual-acks"
+            "start-loop-while-observing:actual-acks"
           ]
         },
         {
@@ -37405,7 +37361,7 @@
             "caseId": "T26",
             "subcaseId": "due-wait-autonomous-loop"
           },
-          "oracleExplanation": "scheduler process 시작 command가 시작된 뒤 30초(개발/CI 관찰 제한, plan §10) 안에 자율 제출이 관찰된다. 제출은 시작 command보다 앞설 수 없다.",
+          "oracleExplanation": "harness가 관찰 group을 시작하기 직전에 잡은 관찰 경계부터 30초(개발/CI 관찰 제한, plan §10) 안에 자율 제출이 관찰된다. validator의 관찰 창과 같은 기준이다.",
           "oracleRef": {
             "oracleId": "T26.scheduler-recovery-and-operations",
             "observationNames": [
@@ -37413,7 +37369,42 @@
             ]
           },
           "baseline": {
-            "actionId": "start-again-scheduler",
+            "actionId": "start-loop-while-observing",
+            "pointer": "/data/observationBoundaryAt"
+          }
+        },
+        {
+          "id": "autonomous-after-loop-start",
+          "op": "timeAtMostSeconds",
+          "source": {
+            "actionId": "tick",
+            "pointer": "/data/hostObservation/operationEvidence/submittedAt"
+          },
+          "expected": "30",
+          "requirementRefs": [
+            "D26"
+          ],
+          "evidenceRefs": [
+            "terminal:actual-artifact",
+            "terminal:source-rows"
+          ],
+          "scope": {
+            "normativeScope": "recovery-rediscovery",
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "T26",
+            "subcaseId": "due-wait-autonomous-loop"
+          },
+          "oracleExplanation": "제출은 멈춰 있던 loop process의 시작 command보다 앞설 수 없고 그 시작부터도 30초 안이다. 시작 전 제출은 다른 주체의 것이다.",
+          "oracleRef": {
+            "oracleId": "T26.scheduler-recovery-and-operations",
+            "observationNames": [
+              "recovery-rediscovery"
+            ]
+          },
+          "baseline": {
+            "actionId": "start-scheduler",
             "pointer": "/data/hostObservation/command/startedAt"
           }
         },
@@ -37452,7 +37443,7 @@
           }
         }
       ],
-      "oracleExplanation": "plan §10은 별도 이벤트나 사용자 요청 없이 scheduler/due sweeper가 DB에서 다시 찾아 test 관찰 제한30초 안에 처리하기를 요구한다. fixture runtimeProfile은 loop가 harness tick 없이 1초마다 스스로 돈다(controlledTicks=false, pausedUntilTickControl=false). harness는 process 중지·가상 clock 전진만 하고, 재시작과 tick의 OBSERVE_NEXT_NATURAL_TICK 수동 관찰을 한 parallel action으로 함께 시작해 loop의 첫 제출을 관찰 창 안에서 본다. tick hook만 있고 loop가 없는 구현은 30초 안에 제출을 만들지 못한다."
+      "oracleExplanation": "plan §10은 별도 이벤트나 사용자 요청 없이 scheduler/due sweeper가 DB에서 다시 찾아 test 관찰 제한30초 안에 처리하기를 요구한다. fixture runtimeProfile은 loop가 harness tick 없이 1초마다 스스로 돈다(controlledTicks=false, pausedUntilTickControl=false). 그래서 loop process는 장애·seed 단계 동안 한 번도 띄우지 않는다. harness는 api·worker 중지/시작과 가상 clock 전진만 하고, 수동 관찰(tick의 OBSERVE_NEXT_NATURAL_TICK)과 loop process 시작을 한 parallel action으로 함께 시작해 loop의 첫 제출을 harness 관찰 경계부터 30초 안에서 본다. tick hook만 있고 loop가 없는 구현은 30초 안에 제출을 만들지 못한다."
     },
     {
       "id": "lot-expiry-autonomous-loop",
@@ -37498,28 +37489,6 @@
           },
           "evidenceRefs": [
             "start-app-api:actual-artifact"
-          ]
-        },
-        {
-          "id": "start-app-scheduler",
-          "kind": "control",
-          "control": {
-            "type": "process",
-            "operation": "start",
-            "parameters": {
-              "scope": {
-                "organizationId": {
-                  "$alias": "ORG"
-                },
-                "caseId": "T26",
-                "subcaseId": "lot-expiry-autonomous-loop"
-              },
-              "processId": "scheduler",
-              "environmentId": "runtime-T26-lot-expiry-autonomous-loop-source"
-            }
-          },
-          "evidenceRefs": [
-            "start-app-scheduler:actual-artifact"
           ]
         },
         {
@@ -37788,50 +37757,6 @@
           ]
         },
         {
-          "id": "stop-sweeper",
-          "kind": "control",
-          "control": {
-            "type": "process",
-            "operation": "stop",
-            "parameters": {
-              "scope": {
-                "organizationId": {
-                  "$alias": "ORG"
-                },
-                "caseId": "T26",
-                "subcaseId": "lot-expiry-autonomous-loop"
-              },
-              "processId": "due-sweeper",
-              "environmentId": "runtime-T26-lot-expiry-autonomous-loop-source"
-            }
-          },
-          "evidenceRefs": [
-            "stop-sweeper:actual-artifact"
-          ]
-        },
-        {
-          "id": "stop-again-scheduler",
-          "kind": "control",
-          "control": {
-            "type": "process",
-            "operation": "stop",
-            "parameters": {
-              "scope": {
-                "organizationId": {
-                  "$alias": "ORG"
-                },
-                "caseId": "T26",
-                "subcaseId": "lot-expiry-autonomous-loop"
-              },
-              "processId": "scheduler",
-              "environmentId": "runtime-T26-lot-expiry-autonomous-loop-source"
-            }
-          },
-          "evidenceRefs": [
-            "stop-again-scheduler:actual-artifact"
-          ]
-        },
-        {
           "id": "advance",
           "kind": "control",
           "control": {
@@ -37855,7 +37780,7 @@
           ]
         },
         {
-          "id": "restart-while-observing",
+          "id": "start-loop-while-observing",
           "kind": "parallel",
           "timeoutSeconds": 90,
           "branches": [
@@ -37889,7 +37814,34 @@
               ]
             },
             {
-              "id": "process-restart",
+              "id": "loop-start-scheduler",
+              "actions": [
+                {
+                  "id": "start-scheduler",
+                  "kind": "control",
+                  "control": {
+                    "type": "process",
+                    "operation": "start",
+                    "parameters": {
+                      "scope": {
+                        "organizationId": {
+                          "$alias": "ORG"
+                        },
+                        "caseId": "T26",
+                        "subcaseId": "lot-expiry-autonomous-loop"
+                      },
+                      "processId": "scheduler",
+                      "environmentId": "runtime-T26-lot-expiry-autonomous-loop-source"
+                    }
+                  },
+                  "evidenceRefs": [
+                    "start-scheduler:actual-artifact"
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "loop-start-due-sweeper",
               "actions": [
                 {
                   "id": "start-sweeper",
@@ -37912,34 +37864,12 @@
                   "evidenceRefs": [
                     "start-sweeper:actual-artifact"
                   ]
-                },
-                {
-                  "id": "start-again-scheduler",
-                  "kind": "control",
-                  "control": {
-                    "type": "process",
-                    "operation": "start",
-                    "parameters": {
-                      "scope": {
-                        "organizationId": {
-                          "$alias": "ORG"
-                        },
-                        "caseId": "T26",
-                        "subcaseId": "lot-expiry-autonomous-loop"
-                      },
-                      "processId": "scheduler",
-                      "environmentId": "runtime-T26-lot-expiry-autonomous-loop-source"
-                    }
-                  },
-                  "evidenceRefs": [
-                    "start-again-scheduler:actual-artifact"
-                  ]
                 }
               ]
             }
           ],
           "evidenceRefs": [
-            "restart-while-observing:actual-acks"
+            "start-loop-while-observing:actual-acks"
           ]
         },
         {
@@ -40945,7 +40875,42 @@
             "caseId": "T26",
             "subcaseId": "lot-expiry-autonomous-loop"
           },
-          "oracleExplanation": "scheduler process 시작 command가 시작된 뒤 30초(개발/CI 관찰 제한, plan §10) 안에 자율 제출이 관찰된다. 제출은 시작 command보다 앞설 수 없다.",
+          "oracleExplanation": "harness가 관찰 group을 시작하기 직전에 잡은 관찰 경계부터 30초(개발/CI 관찰 제한, plan §10) 안에 자율 제출이 관찰된다. validator의 관찰 창과 같은 기준이다.",
+          "oracleRef": {
+            "oracleId": "T26.boundary-index-and-emergency-repair",
+            "observationNames": [
+              "boundary-index"
+            ]
+          },
+          "baseline": {
+            "actionId": "start-loop-while-observing",
+            "pointer": "/data/observationBoundaryAt"
+          }
+        },
+        {
+          "id": "autonomous-after-loop-start",
+          "op": "timeAtMostSeconds",
+          "source": {
+            "actionId": "sweep",
+            "pointer": "/data/hostObservation/operationEvidence/submittedAt"
+          },
+          "expected": "30",
+          "requirementRefs": [
+            "D26"
+          ],
+          "evidenceRefs": [
+            "sweep-terminal:actual-artifact",
+            "sweep-terminal:source-rows"
+          ],
+          "scope": {
+            "normativeScope": "boundary-index",
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "T26",
+            "subcaseId": "lot-expiry-autonomous-loop"
+          },
+          "oracleExplanation": "제출은 멈춰 있던 loop process의 시작 command보다 앞설 수 없고 그 시작부터도 30초 안이다. 시작 전 제출은 다른 주체의 것이다.",
           "oracleRef": {
             "oracleId": "T26.boundary-index-and-emergency-repair",
             "observationNames": [
@@ -40992,7 +40957,7 @@
           }
         }
       ],
-      "oracleExplanation": "plan §10은 별도 이벤트나 사용자 요청 없이 scheduler/due sweeper가 DB에서 다시 찾아 test 관찰 제한30초 안에 처리하기를 요구한다. fixture runtimeProfile은 loop가 harness tick 없이 1초마다 스스로 돈다(controlledTicks=false, pausedUntilTickControl=false). harness는 process 중지·가상 clock 전진만 하고, 재시작과 sweep의 OBSERVE_NEXT_NATURAL_TICK 수동 관찰을 한 parallel action으로 함께 시작해 loop의 첫 제출을 관찰 창 안에서 본다. tick hook만 있고 loop가 없는 구현은 30초 안에 제출을 만들지 못한다."
+      "oracleExplanation": "plan §10은 별도 이벤트나 사용자 요청 없이 scheduler/due sweeper가 DB에서 다시 찾아 test 관찰 제한30초 안에 처리하기를 요구한다. fixture runtimeProfile은 loop가 harness tick 없이 1초마다 스스로 돈다(controlledTicks=false, pausedUntilTickControl=false). 그래서 loop process는 장애·seed 단계 동안 한 번도 띄우지 않는다. harness는 api·worker 중지/시작과 가상 clock 전진만 하고, 수동 관찰(sweep의 OBSERVE_NEXT_NATURAL_TICK)과 loop process 시작을 한 parallel action으로 함께 시작해 loop의 첫 제출을 harness 관찰 경계부터 30초 안에서 본다. tick hook만 있고 loop가 없는 구현은 30초 안에 제출을 만들지 못한다."
     },
     {
       "id": "orphan-intake-autonomous-loop",
@@ -41038,28 +41003,6 @@
           },
           "evidenceRefs": [
             "start-app-api:actual-artifact"
-          ]
-        },
-        {
-          "id": "start-app-scheduler",
-          "kind": "control",
-          "control": {
-            "type": "process",
-            "operation": "start",
-            "parameters": {
-              "scope": {
-                "organizationId": {
-                  "$alias": "ORG"
-                },
-                "caseId": "T26",
-                "subcaseId": "orphan-intake-autonomous-loop"
-              },
-              "processId": "scheduler",
-              "environmentId": "runtime-T26-orphan-intake-autonomous-loop-source"
-            }
-          },
-          "evidenceRefs": [
-            "start-app-scheduler:actual-artifact"
           ]
         },
         {
@@ -41314,28 +41257,6 @@
           ]
         },
         {
-          "id": "stop-again-scheduler",
-          "kind": "control",
-          "control": {
-            "type": "process",
-            "operation": "stop",
-            "parameters": {
-              "scope": {
-                "organizationId": {
-                  "$alias": "ORG"
-                },
-                "caseId": "T26",
-                "subcaseId": "orphan-intake-autonomous-loop"
-              },
-              "processId": "scheduler",
-              "environmentId": "runtime-T26-orphan-intake-autonomous-loop-source"
-            }
-          },
-          "evidenceRefs": [
-            "stop-again-scheduler:actual-artifact"
-          ]
-        },
-        {
           "id": "stop-again-worker-a",
           "kind": "control",
           "control": {
@@ -41403,7 +41324,73 @@
           ]
         },
         {
-          "id": "restart-while-observing",
+          "id": "start-again-api",
+          "kind": "control",
+          "control": {
+            "type": "process",
+            "operation": "start",
+            "parameters": {
+              "scope": {
+                "organizationId": {
+                  "$alias": "ORG"
+                },
+                "caseId": "T26",
+                "subcaseId": "orphan-intake-autonomous-loop"
+              },
+              "processId": "api",
+              "environmentId": "runtime-T26-orphan-intake-autonomous-loop-source"
+            }
+          },
+          "evidenceRefs": [
+            "start-again-api:actual-artifact"
+          ]
+        },
+        {
+          "id": "start-again-worker-a",
+          "kind": "control",
+          "control": {
+            "type": "process",
+            "operation": "start",
+            "parameters": {
+              "scope": {
+                "organizationId": {
+                  "$alias": "ORG"
+                },
+                "caseId": "T26",
+                "subcaseId": "orphan-intake-autonomous-loop"
+              },
+              "processId": "worker-a",
+              "environmentId": "runtime-T26-orphan-intake-autonomous-loop-source"
+            }
+          },
+          "evidenceRefs": [
+            "start-again-worker-a:actual-artifact"
+          ]
+        },
+        {
+          "id": "start-again-worker-b",
+          "kind": "control",
+          "control": {
+            "type": "process",
+            "operation": "start",
+            "parameters": {
+              "scope": {
+                "organizationId": {
+                  "$alias": "ORG"
+                },
+                "caseId": "T26",
+                "subcaseId": "orphan-intake-autonomous-loop"
+              },
+              "processId": "worker-b",
+              "environmentId": "runtime-T26-orphan-intake-autonomous-loop-source"
+            }
+          },
+          "evidenceRefs": [
+            "start-again-worker-b:actual-artifact"
+          ]
+        },
+        {
+          "id": "start-loop-while-observing",
           "kind": "parallel",
           "timeoutSeconds": 90,
           "branches": [
@@ -41438,32 +41425,10 @@
               ]
             },
             {
-              "id": "process-restart",
+              "id": "loop-start-scheduler",
               "actions": [
                 {
-                  "id": "start-again-api",
-                  "kind": "control",
-                  "control": {
-                    "type": "process",
-                    "operation": "start",
-                    "parameters": {
-                      "scope": {
-                        "organizationId": {
-                          "$alias": "ORG"
-                        },
-                        "caseId": "T26",
-                        "subcaseId": "orphan-intake-autonomous-loop"
-                      },
-                      "processId": "api",
-                      "environmentId": "runtime-T26-orphan-intake-autonomous-loop-source"
-                    }
-                  },
-                  "evidenceRefs": [
-                    "start-again-api:actual-artifact"
-                  ]
-                },
-                {
-                  "id": "start-again-scheduler",
+                  "id": "start-scheduler",
                   "kind": "control",
                   "control": {
                     "type": "process",
@@ -41481,58 +41446,14 @@
                     }
                   },
                   "evidenceRefs": [
-                    "start-again-scheduler:actual-artifact"
-                  ]
-                },
-                {
-                  "id": "start-again-worker-a",
-                  "kind": "control",
-                  "control": {
-                    "type": "process",
-                    "operation": "start",
-                    "parameters": {
-                      "scope": {
-                        "organizationId": {
-                          "$alias": "ORG"
-                        },
-                        "caseId": "T26",
-                        "subcaseId": "orphan-intake-autonomous-loop"
-                      },
-                      "processId": "worker-a",
-                      "environmentId": "runtime-T26-orphan-intake-autonomous-loop-source"
-                    }
-                  },
-                  "evidenceRefs": [
-                    "start-again-worker-a:actual-artifact"
-                  ]
-                },
-                {
-                  "id": "start-again-worker-b",
-                  "kind": "control",
-                  "control": {
-                    "type": "process",
-                    "operation": "start",
-                    "parameters": {
-                      "scope": {
-                        "organizationId": {
-                          "$alias": "ORG"
-                        },
-                        "caseId": "T26",
-                        "subcaseId": "orphan-intake-autonomous-loop"
-                      },
-                      "processId": "worker-b",
-                      "environmentId": "runtime-T26-orphan-intake-autonomous-loop-source"
-                    }
-                  },
-                  "evidenceRefs": [
-                    "start-again-worker-b:actual-artifact"
+                    "start-scheduler:actual-artifact"
                   ]
                 }
               ]
             }
           ],
           "evidenceRefs": [
-            "restart-while-observing:actual-acks"
+            "start-loop-while-observing:actual-acks"
           ]
         },
         {
@@ -42365,7 +42286,7 @@
             "caseId": "T26",
             "subcaseId": "orphan-intake-autonomous-loop"
           },
-          "oracleExplanation": "scheduler process 시작 command가 시작된 뒤 30초(개발/CI 관찰 제한, plan §10) 안에 자율 제출이 관찰된다. 제출은 시작 command보다 앞설 수 없다.",
+          "oracleExplanation": "harness가 관찰 group을 시작하기 직전에 잡은 관찰 경계부터 30초(개발/CI 관찰 제한, plan §10) 안에 자율 제출이 관찰된다. validator의 관찰 창과 같은 기준이다.",
           "oracleRef": {
             "oracleId": "T26.scheduler-recovery-and-operations",
             "observationNames": [
@@ -42373,7 +42294,42 @@
             ]
           },
           "baseline": {
-            "actionId": "start-again-scheduler",
+            "actionId": "start-loop-while-observing",
+            "pointer": "/data/observationBoundaryAt"
+          }
+        },
+        {
+          "id": "autonomous-after-loop-start",
+          "op": "timeAtMostSeconds",
+          "source": {
+            "actionId": "tick",
+            "pointer": "/data/hostObservation/operationEvidence/submittedAt"
+          },
+          "expected": "30",
+          "requirementRefs": [
+            "D26"
+          ],
+          "evidenceRefs": [
+            "terminal:actual-artifact",
+            "terminal:source-rows"
+          ],
+          "scope": {
+            "normativeScope": "recovery-rediscovery",
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "T26",
+            "subcaseId": "orphan-intake-autonomous-loop"
+          },
+          "oracleExplanation": "제출은 멈춰 있던 loop process의 시작 command보다 앞설 수 없고 그 시작부터도 30초 안이다. 시작 전 제출은 다른 주체의 것이다.",
+          "oracleRef": {
+            "oracleId": "T26.scheduler-recovery-and-operations",
+            "observationNames": [
+              "recovery-rediscovery"
+            ]
+          },
+          "baseline": {
+            "actionId": "start-scheduler",
             "pointer": "/data/hostObservation/command/startedAt"
           }
         },
@@ -42412,7 +42368,7 @@
           }
         }
       ],
-      "oracleExplanation": "plan §10은 별도 이벤트나 사용자 요청 없이 scheduler/due sweeper가 DB에서 다시 찾아 test 관찰 제한30초 안에 처리하기를 요구한다. fixture runtimeProfile은 loop가 harness tick 없이 1초마다 스스로 돈다(controlledTicks=false, pausedUntilTickControl=false). harness는 process 중지·가상 clock 전진만 하고, 재시작과 tick의 OBSERVE_NEXT_NATURAL_TICK 수동 관찰을 한 parallel action으로 함께 시작해 loop의 첫 제출을 관찰 창 안에서 본다. tick hook만 있고 loop가 없는 구현은 30초 안에 제출을 만들지 못한다."
+      "oracleExplanation": "plan §10은 별도 이벤트나 사용자 요청 없이 scheduler/due sweeper가 DB에서 다시 찾아 test 관찰 제한30초 안에 처리하기를 요구한다. fixture runtimeProfile은 loop가 harness tick 없이 1초마다 스스로 돈다(controlledTicks=false, pausedUntilTickControl=false). 그래서 loop process는 장애·seed 단계 동안 한 번도 띄우지 않는다. harness는 api·worker 중지/시작과 가상 clock 전진만 하고, 수동 관찰(tick의 OBSERVE_NEXT_NATURAL_TICK)과 loop process 시작을 한 parallel action으로 함께 시작해 loop의 첫 제출을 harness 관찰 경계부터 30초 안에서 본다. tick hook만 있고 loop가 없는 구현은 30초 안에 제출을 만들지 못한다."
     }
   ]
 }

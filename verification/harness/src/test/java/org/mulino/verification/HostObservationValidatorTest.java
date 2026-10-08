@@ -109,7 +109,7 @@ public final class HostObservationValidatorTest {
             "an extractor cannot mark an unlisted write item allowlisted");
         assertTrue(rejectSurface(c->((ArrayNode)c.host.path("extractor").path("rawRows").path("surfaces")).remove(1)).contains("omitted requested surfaces"));
         assertTrue(rejectSurface(c->((ObjectNode)c.host.path("extractor").path("rawRows").path("surfaces").get(0)).put("itemCount",5)).contains("itemCount"));
-        assertTrue(rejectSurface(c->((ObjectNode)c.host.path("extractor").path("rawRows").path("probeCoverage").get(0)).put("applicableTargets",2)).contains("completeness"));
+        assertTrue(rejectSurface(c->((ObjectNode)c.host.path("extractor").path("rawRows").path("probeCoverage").get(0)).put("applicableTargets",2)).contains("applicability policy"));
         assertTrue(rejectSurface(c->((ObjectNode)c.host.path("extractor").path("rawRows").path("probeCoverage").get(0)).put("probedTargets",0).put("complete",false)).contains("probedTargets"));
         assertTrue(rejectSurface(c->((ArrayNode)c.host.path("extractor").path("rawRows").path("probeCoverage")).remove(1)).contains("omitted requested classes"));
         assertTrue(rejectSurface(c->((ObjectNode)c.host.path("extractor").path("rawRows").path("probes").get(0)).put("target","Unknown")).contains("not an enumerated surface item"));

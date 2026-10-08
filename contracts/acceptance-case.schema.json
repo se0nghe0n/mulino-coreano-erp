@@ -173,7 +173,7 @@
                 },
                 {
                   "$ref": "#/$defs/resultReference",
-                  "description": "API-issued projection revision the observer must recompute independently."
+                  "description": "Either an API-issued projection revision (/response/snapshotRevision of an invoke/query/start; observer request RESULT_REVISION, recomputed independently) or the host terminal snapshot id of an awaitRuntimeTask control (/data/hostObservation/runtimeTask/snapshot/id; observer request RUNTIME_TASK_SNAPSHOT, bound to the host snapshot artifact). ./verify prepare rejects any other pointer."
                 }
               ]
             },

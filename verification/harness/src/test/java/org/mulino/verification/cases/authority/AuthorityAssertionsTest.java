@@ -31,10 +31,20 @@ public class AuthorityAssertionsTest {
         map.put("after",StepResult.missing("after","observer missing; no factual zero").toJson());assertThrows(AssertionError.class,()->engine.check(a,map,aliases()));
     }
     @Test void zeroQuantityDeltaRejectsBaselineUnitMismatchUnknownAndMissing() throws Exception {
+        // step2r round 5: the primary sums the case-filtered DISPATCH rows of new20 itself (no observer-derived value).
         var a=assertion("V7","enqueue-then-revoke","new-effect-quantity0");
-        var before=observed("{}","{\"dispatchedQuantity\":\"0\",\"unit\":\"BOX\"}","{}");var after=before.deepCopy();var map=Map.<String,JsonNode>of("before",before,"after",after);engine.check(a,map,aliases());
-        ((ObjectNode)before.at("/data/data")).put("unit","KG");assertThrows(AssertionError.class,()->engine.check(a,map,aliases()));((ObjectNode)before.at("/data/data")).put("unit","BOX");
-        ((ObjectNode)after.at("/data/data")).put("dispatchedQuantity","UNKNOWN");assertThrows(AssertionError.class,()->engine.check(a,map,aliases()));((ObjectNode)after.at("/data/data")).remove("dispatchedQuantity");assertThrows(AssertionError.class,()->engine.check(a,map,aliases()));
+        var after=observed("{\"movements\":[{\"kind\":\"DISPATCH\",\"commandIdempotencyKey\":\"other\",\"quantity\":\"5\",\"unit\":\"BOX\"}],\"segments\":[{\"active\":true,\"unit\":\"BOX\"}]}","{}","{}");
+        var map=Map.<String,JsonNode>of("after",after);engine.check(a,map,aliases());
+        ((ObjectNode)after.at("/data/rawRows/segments/0")).put("unit","KG");assertThrows(AssertionError.class,()->engine.check(a,map,aliases()));((ObjectNode)after.at("/data/rawRows/segments/0")).put("unit","BOX");
+        var dispatch=(com.fasterxml.jackson.databind.node.ArrayNode)after.at("/data/rawRows/movements");
+        dispatch.add(Json.parse("{\"kind\":\"DISPATCH\",\"commandIdempotencyKey\":\"new20\",\"quantity\":\"20\",\"unit\":\"BOX\"}"));assertThrows(AssertionError.class,()->engine.check(a,map,aliases()));
+        ((ObjectNode)dispatch.get(1)).put("quantity","UNKNOWN");assertThrows(AssertionError.class,()->engine.check(a,map,aliases()));
+        assertThrows(AssertionError.class,()->engine.check(a,Map.of("after",StepResult.missing("after","observer missing; no factual zero").toJson()),aliases()));
+        // The supporting raw-row check catches a new dispatch recorded under any other key.
+        var rows=assertion("V7","enqueue-then-revoke","no-new-dispatch-rows");
+        var before=observed("{\"movements\":[]}","{}","{}");var later=observed("{\"movements\":[]}","{}","{}");var pair=Map.<String,JsonNode>of("before",before,"after",later);engine.check(rows,pair,aliases());
+        ((com.fasterxml.jackson.databind.node.ArrayNode)later.at("/data/rawRows/movements")).add(Json.parse("{\"kind\":\"DISPATCH\",\"commandIdempotencyKey\":\"renamed\",\"quantity\":\"20\",\"unit\":\"BOX\"}"));
+        assertThrows(AssertionError.class,()->engine.check(rows,pair,aliases()));
     }
     @Test void readonlyGrantRejectsMutationOfExistingRowsAndNewEffectEvenWithDeniedResponse() throws Exception {
         var a=assertion("C3","api-moveQuantity","unchanged-movements");

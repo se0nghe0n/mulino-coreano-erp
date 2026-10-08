@@ -1,8 +1,13 @@
 """Committed T01/T20/T25/C3/T26 contract files must equal their authoring scripts' output.
 
 Each generator runs in a disposable copy of only the inputs it reads, so the
-repository is never rewritten. A hand edit that bypasses a generator, or a
-generator change that was not re-run, fails here.
+repository is never rewritten. For T01/T20/T25 (author_cases.py derives every
+output from the catalog, capability registry and s0-protocol.md) a hand edit of
+an output, or a generator change that was not re-run, fails here.
+C3 and T26 are post-processors that read their own committed case.json, so these
+two tests prove only the fixed point (idempotence): a hand edit of a part the
+post-processor regenerates fails, but a hand edit of a part it does not own
+survives. Pinning those non-owned parts is open (step2r round 5 README).
 Run: python3 -m unittest discover -s verification/mcp-tests -p 'test_*.py' -v
 """
 import shutil, subprocess, sys, tempfile, unittest

@@ -20,6 +20,16 @@ public final class HostObservationValidator {
     }
     /** requireActualHost: product profile runs accept only ACTUAL_HOST evidence from ACTUAL_HOST_PROCESS. */
     public static void validate(ContractValidator validator, JsonNode resolvedControl, StepResult result, boolean requireActualHost) throws IOException {
+        validate(validator,resolvedControl,result,requireActualHost,null);
+    }
+    /**
+     * observationBoundary: for a passive natural-tick watcher that heads a parallel autonomous-loop group, the harness
+     * instant captured immediately before the group's branches were submitted (CaseRunner). The observation window then
+     * starts there instead of at the watcher command's own start, so a watcher thread that starts late still reads the
+     * scheduler's durable submission rows from the same boundary and the window anchor is shared with the case's
+     * autonomous-within-30s assertion. null keeps the watcher command start as the anchor.
+     */
+    public static void validate(ContractValidator validator, JsonNode resolvedControl, StepResult result, boolean requireActualHost, Instant observationBoundary) throws IOException {
         if(!"process".equals(resolvedControl.path("type").asText())) return;
         if(result.driverStatus()!=StepResult.DriverStatus.EXECUTED) return;
         JsonNode host=result.data()==null?null:result.data().get("hostObservation");
@@ -74,8 +84,8 @@ public final class HostObservationValidator {
         if(operation.equals("cutoverStage")) ContractValidator.require(Set.of("WRITE_FREEZE","FINAL_SNAPSHOT","RECONCILE","APPLY_VERSION","SMOKE_AUTH_RESUME","OPEN_WRITES","ROLLBACK_BEFORE_OPEN","STOP_AND_RECONCILE_AFTER_OPEN","FORWARD_REPAIR").contains(identity.path("stage").asText()),"Unknown bounded cutover stage");
         if(READ_OPERATIONS.contains(operation)) inspect(validator,requested,host,extracted);
         if(operation.equals("scanArtifacts")) scan(validator,requested,host);
-        if(Set.of("tickScheduler","sweepDue").contains(operation)) schedulerSubmission(operation,requested,host,extractedRows);
-        if(operation.equals("verifyCoverage")) coverageSnapshot(validator,requested,host,extractedRows);
+        if(Set.of("tickScheduler","sweepDue").contains(operation)) schedulerSubmission(operation,requested,host,extractedRows,observationBoundary);
+        if(operation.equals("verifyCoverage")) coverageSnapshot(validator,requested,host,extractedRows,requireActualHost);
         if(operation.equals("enumerateWriteSurface")) writeSurface(validator,requested,host,extractedRows,result);
         if(operation.equals("awaitRuntimeTask")) runtimeTask(validator,requested,host,result);
         if(Set.of("start","stop","restart").contains(operation)) lifecycle(validator,requested,host,result);
@@ -85,18 +95,24 @@ public final class HostObservationValidator {
     static final int MAX_NATURAL_TICK_WINDOW_SECONDS=30;
     /** Watcher configuration of a passive natural-tick observation. These are request parameters, never scheduler evidence. */
     static final List<String> PASSIVE_PARAMETERS=List.of("trigger","triggeredBy","observationWindowSeconds");
-    private static void schedulerSubmission(String operation,JsonNode requested,JsonNode host,JsonNode rows) {
+    /** A passive natural-tick watcher request (OBSERVE_NEXT_NATURAL_TICK parameters on tickScheduler/sweepDue). */
+    static boolean passiveWatch(JsonNode control) {
+        if(!"process".equals(control.path("type").asText()) || !Set.of("tickScheduler","sweepDue").contains(control.path("operation").asText())) return false;
+        for(String key:PASSIVE_PARAMETERS) if(control.path("parameters").has(key)) return true;
+        return false;
+    }
+    private static void schedulerSubmission(String operation,JsonNode requested,JsonNode host,JsonNode rows,Instant boundary) {
         JsonNode identity=host.path("operationEvidence");
+        boolean passive=false;for(String key:PASSIVE_PARAMETERS) passive|=requested.has(key);
         ContractValidator.require(Json.required(requested,"schedulerId").equals(identity.path("schedulerId").asText()),"Scheduler submission belongs to a different requested scheduler");
         ContractValidator.require(Set.of("SUBMITTED","NO_TASK").contains(identity.path("submissionStatus").asText()),"Scheduler submissionStatus must be an observed SUBMITTED or NO_TASK");
         if(identity.path("submissionStatus").asText().equals("SUBMITTED")) {
-            Instant submitted=instant(identity,"submittedAt");
-            ContractValidator.require(!submitted.isBefore(instant(host.path("command"),"startedAt")) && !submitted.isAfter(instant(host.path("command"),"completedAt")),"Scheduler submission timestamp is outside actual command observation");
+            Instant submitted=instant(identity,"submittedAt"),from=passive && boundary!=null ? boundary : instant(host.path("command"),"startedAt");
+            ContractValidator.require(!submitted.isBefore(from) && !submitted.isAfter(instant(host.path("command"),"completedAt")),"Scheduler submission timestamp is outside actual command observation");
         }
         for(String key:PASSIVE_PARAMETERS) ContractValidator.require(!identity.has(key),
             "operationEvidence."+key+" is a passive-watch request parameter; an echo of the request is not scheduler evidence (read schedulerSubmissions rows)");
-        boolean passive=false;for(String key:PASSIVE_PARAMETERS) passive|=requested.has(key);
-        if(passive) naturalTick(operation,requested,host,rows);
+        if(passive) naturalTick(operation,requested,host,rows,boundary);
         else for(JsonNode row:rows.path("schedulerSubmissions")) ContractValidator.require(!SCHEDULER_LOOP.equals(row.path("submittedBy").asText()),
             "A harness-triggered tick/sweep cannot be reported as the scheduler loop's own natural tick");
     }
@@ -108,14 +124,18 @@ public final class HostObservationValidator {
      * submittedAt, submittedBy). The first submission in the window is the typed identity in operationEvidence. The case
      * asserts submittedBy from those rows, so a value copied from the request cannot satisfy it.
      */
-    private static void naturalTick(String operation,JsonNode requested,JsonNode host,JsonNode rows) {
+    private static void naturalTick(String operation,JsonNode requested,JsonNode host,JsonNode rows,Instant boundary) {
         JsonNode identity=host.path("operationEvidence"),command=host.path("command");
         ContractValidator.require(NATURAL_TICK.equals(requested.path("trigger").asText()),"Only trigger="+NATURAL_TICK+" is a defined passive scheduler observation");
         ContractValidator.require(SCHEDULER_LOOP.equals(requested.path("triggeredBy").asText()),"Passive tick observation requests triggeredBy="+SCHEDULER_LOOP);
         JsonNode window=requested.path("observationWindowSeconds");
         ContractValidator.require(window.isIntegralNumber() && window.asInt()>=1 && window.asInt()<=MAX_NATURAL_TICK_WINDOW_SECONDS,"observationWindowSeconds must be an integer 1.."+MAX_NATURAL_TICK_WINDOW_SECONDS+" (plan §10)");
-        Instant start=instant(command,"startedAt"),end=instant(command,"completedAt"),limit=start.plusSeconds(window.asLong());
-        ContractValidator.require(!end.isAfter(limit),"Passive observation command outlasted observationWindowSeconds");
+        Instant commandStart=instant(command,"startedAt"),end=instant(command,"completedAt");
+        ContractValidator.require(!end.isAfter(commandStart.plusSeconds(window.asLong())),"Passive observation command outlasted observationWindowSeconds");
+        // With a pre-group boundary the window starts there; the watcher reads durable rows, so a late watcher thread
+        // cannot lose a submission made after the boundary, and it cannot have started before the group existed.
+        if(boundary!=null) ContractValidator.require(!commandStart.isBefore(boundary),"Passive watcher command started before the harness observation boundary");
+        Instant start=boundary!=null ? boundary : commandStart,limit=start.plusSeconds(window.asLong());
         ContractValidator.require(host.path("extractor").path("readOnly").asBoolean(false) && host.path("extractor").path("independent").asBoolean(false),"Passive tick observation needs an independent read-only extractor");
         for(JsonNode arg:command.path("argv")) {
             String a=arg.asText().toLowerCase(Locale.ROOT);
@@ -148,7 +168,7 @@ public final class HostObservationValidator {
      * stand in for runtime evidence or make runtime expectations contradict preparation ones. currentExecution names the case
      * whose own links are reported as CURRENT_EXECUTION instead of being required as a prerequisite PASS.
      */
-    private static void coverageSnapshot(ContractValidator validator,JsonNode requested,JsonNode host,JsonNode rows) throws IOException {
+    private static void coverageSnapshot(ContractValidator validator,JsonNode requested,JsonNode host,JsonNode rows,boolean requireActualHost) throws IOException {
         String kind=requested.path("inputSnapshotKind").asText();
         ContractValidator.require(SNAPSHOT_KINDS.contains(kind),"verifyCoverage requires inputSnapshotKind "+SNAPSHOT_KINDS);
         String input=switch(kind) {case "PREPARATION"->"preparationReportPath";case "MODEL_BINDING_PREPARATION"->"modelManifestPath";default->"manifestPath";};
@@ -171,7 +191,12 @@ public final class HostObservationValidator {
         ContractValidator.require(in.path("snapshotKind").asText().equals(kind),"Verifier did not read the requested input snapshot kind");
         ContractValidator.require(in.path("path").equals(bound.path("path")) && in.path("sha256").equals(bound.path("sha256")),"Verifier input snapshot path/hash differs from the requested bound file");
         if(current) ContractValidator.require(in.path("currentExecution").equals(requested.path("currentExecution")),"Verifier currentExecution differs from request");
-        if(kind.equals("PREPARATION")) preparationInput(validator,in,bound);
+        if(kind.equals("PREPARATION")) {
+            preparationInput(validator,in,bound);
+            // A product run compares the verifier's self-reported checkout with the harness's own git state of this
+            // repository, so a verifier cannot copy codeCommit into checkoutCommit and claim a clean checkout.
+            if(requireActualHost) checkoutMatchesHarness(in,harnessGitState(validator));
+        }
         String mutation=requested.path("mutation").asText("none");
         if(!mutation.equals("none")) ContractValidator.require(rows.path("mutatedInput").path("mutation").asText().equals(mutation),"Verifier mutated a different input than requested");
         List<JsonNode> links=new ArrayList<>();
@@ -185,6 +210,15 @@ public final class HostObservationValidator {
         }
     }
     static final java.util.regex.Pattern COMMIT=java.util.regex.Pattern.compile("[0-9a-f]{40}|[0-9a-f]{64}");
+    /** The verifier ran in the harness's checkout: checkoutCommit/checkoutDirty equal the harness's own git HEAD and status. */
+    static void checkoutMatchesHarness(JsonNode in,JsonNode harnessGit) {
+        ContractValidator.require(in.path("checkoutCommit").asText().equals(harnessGit.path("codeCommit").asText()),"PREPARATION input checkoutCommit differs from the harness's own git HEAD");
+        ContractValidator.require(in.path("checkoutDirty").isBoolean() && in.path("checkoutDirty").asBoolean()==harnessGit.path("workingTreeDirty").asBoolean(),"PREPARATION input checkoutDirty differs from the harness's own working tree status");
+    }
+    private static JsonNode harnessGitState(ContractValidator validator) throws IOException {
+        try {return Main.gitState(validator.root());}
+        catch(InterruptedException e) {Thread.currentThread().interrupt();throw new IOException("Interrupted while reading the harness git state",e);}
+    }
     /**
      * A PREPARATION input names the commit it was prepared from and whether that tree was clean (codeCommit, workingTreeDirty),
      * and the verifier records the checkout it ran in (checkoutCommit, checkoutDirty). The first pair is recomputed here from the
@@ -204,6 +238,26 @@ public final class HostObservationValidator {
     /** Transport-level probe results beside the command outcomes of contracts/domain-vocabulary.json. */
     static final Set<String> PROBE_TRANSPORT_OUTCOMES=Set.of("NOT_EXPOSED","UNKNOWN");
     static final String SYNTHETIC_TARGETS="SYNTHETIC_FIXTURE_ENTITIES_ONLY";
+    /**
+     * Applicability policy (host-observation-guide.md, enumerateWriteSurface): the probe classes every enumerated item of a
+     * kind needs, whatever the extractor says about writeCapable. An OData entity set gets every entity write route
+     * (direct, deep insert, upsert, $batch changeset, draft activation, nested navigation); a route the service does not
+     * offer is still probed and answers NOT_EXPOSED. Actions get their own call and a $batch changeset; functions are
+     * read-only by OData definition. The harness recomputes applicableTargets from this table, not from the extractor.
+     */
+    static final Map<String,Set<String>> PROBE_POLICY=Map.of(
+        "ENTITY_SET",Set.of("DIRECT_CREATE","DIRECT_UPDATE","DIRECT_DELETE","DEEP_INSERT","UPSERT","BATCH_CHANGESET","DRAFT_ACTIVATE",
+            "NESTED_NAVIGATION_CREATE","NESTED_NAVIGATION_UPDATE","NESTED_NAVIGATION_DELETE"),
+        "BOUND_ACTION",Set.of("BOUND_ACTION","BATCH_CHANGESET"),
+        "UNBOUND_ACTION",Set.of("UNBOUND_ACTION","BATCH_CHANGESET"),
+        "FUNCTION",Set.of(),
+        "TOOL",Set.of("MCP_TOOL_CALL"),
+        "WORKER_HANDLER",Set.of("WORKER_HANDLER_SUBMIT"),
+        "MANAGEMENT_ENDPOINT",Set.of("MANAGEMENT_ENDPOINT_WRITE"));
+    /** The surfaces each item kind can be enumerated from. */
+    static final Map<String,Set<String>> KIND_SURFACES=Map.of(
+        "ENTITY_SET",Set.of("ODATA_METADATA"),"BOUND_ACTION",Set.of("ODATA_METADATA"),"UNBOUND_ACTION",Set.of("ODATA_METADATA"),"FUNCTION",Set.of("ODATA_METADATA"),
+        "TOOL",Set.of("MCP_SERVER_DISCOVER","MCP_TOOLS_LIST"),"WORKER_HANDLER",Set.of("WORKER_HANDLER_REGISTRY"),"MANAGEMENT_ENDPOINT",Set.of("MANAGEMENT_ENDPOINTS"));
     /**
      * V4 exposed-write-surface (plan §4.2/§13.2 V4): the host command reads the running system's write surfaces itself
      * (OData $metadata, MCP server/discover and tools/list, worker handler registry, management endpoints), probes every
@@ -237,9 +291,13 @@ public final class HostObservationValidator {
         }
         ContractValidator.require(seenSurfaces.equals(surfaces),"Enumeration omitted requested surfaces "+difference(surfaces,seenSurfaces));
         Map<String,Integer> actualCounts=new HashMap<>();Set<String> items=new HashSet<>(),writable=new TreeSet<>();
+        Map<String,Set<String>> applicableByClass=new HashMap<>();
         for(JsonNode item:rows.path("surfaceItems")) {
-            String surface=Json.required(item,"surface"),key=surface+"|"+Json.required(item,"itemId");
+            String surface=Json.required(item,"surface"),key=surface+"|"+Json.required(item,"itemId"),kind=Json.required(item,"kind");
             ContractValidator.require(surfaces.contains(surface) && items.add(key),"Surface item is unrequested or duplicated: "+key);
+            ContractValidator.require(PROBE_POLICY.containsKey(kind),"Surface item kind has no probe applicability policy: "+key+" "+kind);
+            ContractValidator.require(KIND_SURFACES.get(kind).contains(surface),"Surface item kind "+kind+" cannot be enumerated from "+surface+": "+key);
+            for(String probeClass:PROBE_POLICY.get(kind)) if(classes.contains(probeClass)) applicableByClass.computeIfAbsent(probeClass,k->new TreeSet<>()).add(key);
             actualCounts.merge(surface,1,Integer::sum);
             boolean listed=item.path("capabilityId").isTextual() && allowlist.contains(item.path("capabilityId").asText());
             ContractValidator.require(item.path("allowlisted").isBoolean() && item.path("allowlisted").asBoolean()==listed,"Surface item allowlisted differs from the committed allowlist: "+key);
@@ -257,13 +315,20 @@ public final class HostObservationValidator {
             probed.add(key);targetsByClass.computeIfAbsent(probeClass,k->new HashSet<>()).add(key);
         }
         ContractValidator.require(probed.containsAll(writable),"Write-capable surface items were enumerated but never probed: "+difference(writable,probed));
+        for(String probeClass:classes) {
+            Set<String> applicable=applicableByClass.getOrDefault(probeClass,Set.of()),done=targetsByClass.getOrDefault(probeClass,Set.of());
+            ContractValidator.require(done.containsAll(applicable),"Items the applicability policy requires for "+probeClass+" were never probed with it: "+difference(applicable,done));
+        }
         Set<String> coveredClasses=new HashSet<>();
         for(JsonNode coverage:rows.path("probeCoverage")) {
             String probeClass=Json.required(coverage,"probeClass");
             ContractValidator.require(classes.contains(probeClass) && coveredClasses.add(probeClass),"Probe coverage class is unrequested or duplicated: "+probeClass);
             int applicable=coverage.path("applicableTargets").asInt(-1),done=coverage.path("probedTargets").asInt(-1);
-            ContractValidator.require(done==targetsByClass.getOrDefault(probeClass,Set.of()).size(),"Probe coverage probedTargets differs from probe rows: "+probeClass);
-            ContractValidator.require(applicable>=done && coverage.path("complete").isBoolean() && coverage.path("complete").asBoolean()==(applicable==done),"Probe coverage completeness contradicts its counts: "+probeClass);
+            Set<String> required=applicableByClass.getOrDefault(probeClass,Set.of()),targets=targetsByClass.getOrDefault(probeClass,Set.of());
+            ContractValidator.require(applicable==required.size(),"Probe coverage applicableTargets differs from the applicability policy over the enumerated items: "+probeClass+" "+applicable+" != "+required.size());
+            ContractValidator.require(done==targets.size(),"Probe coverage probedTargets differs from probe rows: "+probeClass);
+            Set<String> covered=new HashSet<>(required);covered.retainAll(targets);
+            ContractValidator.require(coverage.path("complete").isBoolean() && coverage.path("complete").asBoolean()==(covered.size()==required.size()),"Probe coverage completeness contradicts its counts: "+probeClass);
         }
         ContractValidator.require(coveredClasses.equals(classes),"Probe coverage omitted requested classes "+difference(classes,coveredClasses));
     }
