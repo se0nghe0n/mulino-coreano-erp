@@ -210,11 +210,16 @@ def patch_sub(sub, cap):
             check(sub,'precondition-approval-record','before','/data/rawRows/approvals',[[ref('precondition-approval','/response/approvalId'),alias('admin'),'APPROVED']],'relationSet',field=['id','approverId','decision'],where={'id':ref('precondition-approval','/response/approvalId')},observation='approval-effects',
                 explain='회수 승인은 ADMIN management authority를 가진 admin이 정확한 scope hash/version에 대해 먼저 확정한다.')
         if cap=='closeRecall':
-            pre.append(invoke(sub,'precondition-notice','admin','recordRecallNotice',notice_slots(),ref('precondition-recall','/response/data/revision'),subject))
+            # Each step re-reads the recall and sends that current revision, so the chain holds whether or not
+            # approval, notice or recovery bumps the recall revision (no design is assumed either way).
+            def reread(after):
+                q=copy.deepcopy(query);q.update(id='precondition-recall-after-'+after,evidenceRefs=['precondition-recall-after-'+after+':actual-artifact']);pre.append(q)
+                return ref(q['id'],'/response/data/revision')
+            pre.append(invoke(sub,'precondition-notice','admin','recordRecallNotice',notice_slots(),reread('approval'),subject))
             pre[-1]['request']['intentKind']='RECORD'
-            pre.append(invoke(sub,'precondition-recovery','delegator','recordRecovery',recovery_slots('RECOVERED','RECALL-RECOVERY-DOC'),ref('precondition-recall','/response/data/revision'),subject))
+            pre.append(invoke(sub,'precondition-recovery','delegator','recordRecovery',recovery_slots('RECOVERED','RECALL-RECOVERY-DOC'),reread('notice'),subject))
             pre[-1]['request']['intentKind']='RECORD'
-            pre.append(invoke(sub,'precondition-disposal','delegator','recordRecovery',recovery_slots('DISPOSED','RECALL-DISPOSAL-DOC'),ref('precondition-recovery','/response/revision'),subject))
+            pre.append(invoke(sub,'precondition-disposal','delegator','recordRecovery',recovery_slots('DISPOSED','RECALL-DISPOSAL-DOC'),reread('recovery'),subject))
             pre[-1]['request']['intentKind']='RECORD'
             for id in ['precondition-notice','precondition-recovery','precondition-disposal']:check(sub,id+'-applied',id,'/response/outcome','APPLIED',observation='followup-effects')
         if cap=='approveRecall':slots=approval_slots
@@ -313,8 +318,12 @@ def model_query(sub, public):
     for kind in ['COMMAND','RECORD']:
         add('no-write-intent-'+kind.lower(),'count',{'actionId':'query-agent','pointer':'/data/toolTranscript/calls','where':{'intentKind':kind}},0,
             f'실제 MCP tools/call transcript에서 {kind} 의도의 호출은 0건이다. 조회 문장은 쓰기 도구 실행으로 바뀌지 않으며 DB 전후 원행 불변과 함께 업무 효과0을 보인다.',observation=['query-intent-write-tool-execution','query-intent-business-effects'])
-    add('read-audit-reader','fieldsPresent',{'actionId':'after','pointer':'/data/rawRows/audit','where':{'actorId':alias('reader')}},['capabilityId','intentKind','outcome'],
-        '조회 감사는 실제 인증 주체 reader에 연결되며 업무 변경으로 세지 않는다.',observation='read-audit-permitted',oracle='C3.read-grant-all-writes')
+    # Plan §7.4: reads are audited apart from business changes, in the queryAudit source
+    # (contracts/audit-observation-fields.json), never as command audit rows.
+    after=next(a for a in sub['actions'] if a['id']=='after' and a['kind']=='observe')
+    if 'queryAudit' not in after['observation']['sources']:after['observation']['sources'].append('queryAudit')
+    add('read-audit-reader','fieldsPresent',{'actionId':'after','pointer':'/data/rawRows/queryAudit','where':{'actorId':alias('reader')}},['capabilityId','outcome'],
+        '조회 감사(queryAudit)는 실제 인증 주체 reader의 조회 capability와 READ/REJECTED 결과를 한 행 이상 남기며 명령 감사·업무 변경으로 세지 않는다.',observation='read-audit-permitted',oracle='C3.read-grant-all-writes')
     return sub
 
 def prepare_recall_fixture(cap):
