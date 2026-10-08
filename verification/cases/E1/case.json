@@ -484,6 +484,9 @@
               "sourceVersion": "1",
               "evidenceId": {
                 "$alias": "warehouse-60"
+              },
+              "receivingCustodianId": {
+                "$alias": "receiver"
               }
             },
             "expectedRevision": {
@@ -919,6 +922,9 @@
               "sourceVersion": "1",
               "evidenceId": {
                 "$alias": "warehouse-40"
+              },
+              "receivingCustodianId": {
+                "$alias": "receiver"
               }
             },
             "expectedRevision": {
@@ -949,6 +955,79 @@
           "evidenceRefs": [
             "receipt40:api-response",
             "receipt40:actual-command-artifact"
+          ]
+        },
+        {
+          "id": "received-custody",
+          "kind": "query",
+          "actorRef": "observer",
+          "route": "api",
+          "capabilityId": "getObject",
+          "request": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseId": "E1",
+              "scenarioId": "full-flow-quantities"
+            },
+            "subjectRefs": [
+              {
+                "type": "TradeItem",
+                "id": {
+                  "$alias": "P"
+                }
+              }
+            ],
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z",
+            "include": [
+              "inventory",
+              "trade",
+              "evidence",
+              "assessments",
+              "obligations",
+              "audit",
+              "outbox"
+            ]
+          },
+          "evidenceRefs": [
+            "received-custody:api-response"
+          ]
+        },
+        {
+          "id": "received-custody-db",
+          "kind": "observe",
+          "observation": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseId": "E1",
+              "scenarioId": "full-flow-quantities"
+            },
+            "snapshotRef": {
+              "$result": {
+                "actionId": "received-custody",
+                "pointer": "/response/snapshotRevision"
+              }
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z",
+            "sources": [
+              "segments"
+            ]
+          },
+          "evidenceRefs": [
+            "received-custody-db:raw-rows",
+            "received-custody-db:source-query",
+            "received-custody-db:snapshot"
           ]
         },
         {
@@ -2568,6 +2647,91 @@
           "unitSource": {
             "actionId": "e1-db",
             "pointer": "/data/data/unit"
+          }
+        },
+        {
+          "id": "received-custody-control",
+          "op": "relationSet",
+          "source": {
+            "actionId": "received-custody-db",
+            "pointer": "/data/rawRows/segments",
+            "where": {
+              "locationId": {
+                "$alias": "W"
+              },
+              "active": true
+            },
+            "field": [
+              "id",
+              "quantity",
+              "unit",
+              "locationId",
+              "custodianId"
+            ]
+          },
+          "expected": [
+            [
+              {
+                "$result": {
+                  "actionId": "receipt60",
+                  "pointer": "/response/segmentId"
+                }
+              },
+              "60",
+              "BOX",
+              {
+                "$alias": "W"
+              },
+              {
+                "$alias": "receiver"
+              }
+            ],
+            [
+              {
+                "$result": {
+                  "actionId": "receipt40",
+                  "pointer": "/response/segmentId"
+                }
+              },
+              "40",
+              "BOX",
+              {
+                "$alias": "W"
+              },
+              {
+                "$alias": "receiver"
+              }
+            ]
+          ],
+          "requirementRefs": [
+            "D05",
+            "D09",
+            "D13",
+            "D15",
+            "D16",
+            "D17",
+            "D18",
+            "D19"
+          ],
+          "evidenceRefs": [
+            "received-custody-db:raw-rows"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "E1",
+            "scenarioId": "full-flow-quantities"
+          },
+          "oracleExplanation": "양성 대조: 두 직접 수령 뒤·첫 QC 보류 전 독립 DB 원행에서 INTERNAL_STORAGE W의 활성 실물은 수령60·수령40 두 행뿐이고 둘 다 수령 원본과 명령 slot이 지명한 내부 보관자 receiver(확인한 procurement가 아님)가 보관한다. 그래서 뒤의 판매 적격0은 보관 미확인이 아니라 QC·기관·반품 보류 때문이며 예약·출고30도 보관 검사에 막히지 않는다.",
+          "oracleRef": {
+            "oracleId": "E1.full-flow-quantities",
+            "observationNames": [
+              "current-sell-eligible"
+            ]
           }
         },
         {
@@ -4536,6 +4700,9 @@
               "sourceVersion": "1",
               "evidenceId": {
                 "$alias": "warehouse-60"
+              },
+              "receivingCustodianId": {
+                "$alias": "receiver"
               }
             },
             "expectedRevision": {
@@ -4923,6 +5090,9 @@
               "sourceVersion": "1",
               "evidenceId": {
                 "$alias": "warehouse-40"
+              },
+              "receivingCustodianId": {
+                "$alias": "receiver"
               }
             },
             "expectedRevision": {
@@ -4953,6 +5123,79 @@
           "evidenceRefs": [
             "receipt40:api-response",
             "receipt40:actual-command-artifact"
+          ]
+        },
+        {
+          "id": "received-custody",
+          "kind": "query",
+          "actorRef": "observer",
+          "route": "api",
+          "capabilityId": "getObject",
+          "request": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseId": "E1",
+              "scenarioId": "independent-goals-and-owners"
+            },
+            "subjectRefs": [
+              {
+                "type": "TradeItem",
+                "id": {
+                  "$alias": "P"
+                }
+              }
+            ],
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z",
+            "include": [
+              "inventory",
+              "trade",
+              "evidence",
+              "assessments",
+              "obligations",
+              "audit",
+              "outbox"
+            ]
+          },
+          "evidenceRefs": [
+            "received-custody:api-response"
+          ]
+        },
+        {
+          "id": "received-custody-db",
+          "kind": "observe",
+          "observation": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseId": "E1",
+              "scenarioId": "independent-goals-and-owners"
+            },
+            "snapshotRef": {
+              "$result": {
+                "actionId": "received-custody",
+                "pointer": "/response/snapshotRevision"
+              }
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z",
+            "sources": [
+              "segments"
+            ]
+          },
+          "evidenceRefs": [
+            "received-custody-db:raw-rows",
+            "received-custody-db:source-query",
+            "received-custody-db:snapshot"
           ]
         },
         {
@@ -9093,6 +9336,91 @@
           }
         },
         {
+          "id": "received-custody-control",
+          "op": "relationSet",
+          "source": {
+            "actionId": "received-custody-db",
+            "pointer": "/data/rawRows/segments",
+            "where": {
+              "locationId": {
+                "$alias": "W"
+              },
+              "active": true
+            },
+            "field": [
+              "id",
+              "quantity",
+              "unit",
+              "locationId",
+              "custodianId"
+            ]
+          },
+          "expected": [
+            [
+              {
+                "$result": {
+                  "actionId": "receipt60",
+                  "pointer": "/response/segmentId"
+                }
+              },
+              "60",
+              "BOX",
+              {
+                "$alias": "W"
+              },
+              {
+                "$alias": "receiver"
+              }
+            ],
+            [
+              {
+                "$result": {
+                  "actionId": "receipt40",
+                  "pointer": "/response/segmentId"
+                }
+              },
+              "40",
+              "BOX",
+              {
+                "$alias": "W"
+              },
+              {
+                "$alias": "receiver"
+              }
+            ]
+          ],
+          "requirementRefs": [
+            "D05",
+            "D09",
+            "D13",
+            "D15",
+            "D16",
+            "D17",
+            "D18",
+            "D19"
+          ],
+          "evidenceRefs": [
+            "received-custody-db:raw-rows"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "E1",
+            "scenarioId": "independent-goals-and-owners"
+          },
+          "oracleExplanation": "양성 대조: 두 직접 수령 뒤·첫 QC 보류 전 독립 DB 원행에서 INTERNAL_STORAGE W의 활성 실물은 수령60·수령40 두 행뿐이고 둘 다 수령 원본과 명령 slot이 지명한 내부 보관자 receiver(확인한 procurement가 아님)가 보관한다. 그래서 뒤의 판매 적격0은 보관 미확인이 아니라 QC·기관·반품 보류 때문이며 예약·출고30도 보관 검사에 막히지 않는다.",
+          "oracleRef": {
+            "oracleId": "E1.independent-goals-and-owners",
+            "observationNames": [
+              "two-entry-snapshot"
+            ]
+          }
+        },
+        {
           "id": "two-entry-anchor-invoiceDifference",
           "op": "decimalEquals",
           "source": {
@@ -11574,6 +11902,9 @@
               "sourceVersion": "1",
               "evidenceId": {
                 "$alias": "warehouse-60"
+              },
+              "receivingCustodianId": {
+                "$alias": "receiver"
               }
             },
             "expectedRevision": {
@@ -11961,6 +12292,9 @@
               "sourceVersion": "1",
               "evidenceId": {
                 "$alias": "warehouse-40"
+              },
+              "receivingCustodianId": {
+                "$alias": "receiver"
               }
             },
             "expectedRevision": {
@@ -11991,6 +12325,79 @@
           "evidenceRefs": [
             "receipt40:api-response",
             "receipt40:actual-command-artifact"
+          ]
+        },
+        {
+          "id": "received-custody",
+          "kind": "query",
+          "actorRef": "observer",
+          "route": "api",
+          "capabilityId": "getObject",
+          "request": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseId": "E1",
+              "scenarioId": "whole-runtime-and-model-reference"
+            },
+            "subjectRefs": [
+              {
+                "type": "TradeItem",
+                "id": {
+                  "$alias": "P"
+                }
+              }
+            ],
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z",
+            "include": [
+              "inventory",
+              "trade",
+              "evidence",
+              "assessments",
+              "obligations",
+              "audit",
+              "outbox"
+            ]
+          },
+          "evidenceRefs": [
+            "received-custody:api-response"
+          ]
+        },
+        {
+          "id": "received-custody-db",
+          "kind": "observe",
+          "observation": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseId": "E1",
+              "scenarioId": "whole-runtime-and-model-reference"
+            },
+            "snapshotRef": {
+              "$result": {
+                "actionId": "received-custody",
+                "pointer": "/response/snapshotRevision"
+              }
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z",
+            "sources": [
+              "segments"
+            ]
+          },
+          "evidenceRefs": [
+            "received-custody-db:raw-rows",
+            "received-custody-db:source-query",
+            "received-custody-db:snapshot"
           ]
         },
         {
@@ -14859,6 +15266,91 @@
             "scenarioId": "whole-runtime-and-model-reference"
           },
           "oracleExplanation": "actual-runtime-observation는 실제 원장·배분·판정·책임·감사·outbox를 묶고 실모델 gate는 독립 host 입력으로 구분한다의 독립 고정값과 실제 원 행을 대조한다.",
+          "oracleRef": {
+            "oracleId": "E1.whole-runtime-and-model-reference",
+            "observationNames": [
+              "actual-runtime-observation"
+            ]
+          }
+        },
+        {
+          "id": "received-custody-control",
+          "op": "relationSet",
+          "source": {
+            "actionId": "received-custody-db",
+            "pointer": "/data/rawRows/segments",
+            "where": {
+              "locationId": {
+                "$alias": "W"
+              },
+              "active": true
+            },
+            "field": [
+              "id",
+              "quantity",
+              "unit",
+              "locationId",
+              "custodianId"
+            ]
+          },
+          "expected": [
+            [
+              {
+                "$result": {
+                  "actionId": "receipt60",
+                  "pointer": "/response/segmentId"
+                }
+              },
+              "60",
+              "BOX",
+              {
+                "$alias": "W"
+              },
+              {
+                "$alias": "receiver"
+              }
+            ],
+            [
+              {
+                "$result": {
+                  "actionId": "receipt40",
+                  "pointer": "/response/segmentId"
+                }
+              },
+              "40",
+              "BOX",
+              {
+                "$alias": "W"
+              },
+              {
+                "$alias": "receiver"
+              }
+            ]
+          ],
+          "requirementRefs": [
+            "D05",
+            "D09",
+            "D13",
+            "D15",
+            "D16",
+            "D17",
+            "D18",
+            "D19"
+          ],
+          "evidenceRefs": [
+            "received-custody-db:raw-rows"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "E1",
+            "scenarioId": "whole-runtime-and-model-reference"
+          },
+          "oracleExplanation": "양성 대조: 두 직접 수령 뒤·첫 QC 보류 전 독립 DB 원행에서 INTERNAL_STORAGE W의 활성 실물은 수령60·수령40 두 행뿐이고 둘 다 수령 원본과 명령 slot이 지명한 내부 보관자 receiver(확인한 procurement가 아님)가 보관한다. 그래서 뒤의 판매 적격0은 보관 미확인이 아니라 QC·기관·반품 보류 때문이며 예약·출고30도 보관 검사에 막히지 않는다.",
           "oracleRef": {
             "oracleId": "E1.whole-runtime-and-model-reference",
             "observationNames": [

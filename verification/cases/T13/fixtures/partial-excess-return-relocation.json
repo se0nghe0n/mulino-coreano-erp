@@ -750,6 +750,35 @@
     },
     "unauthorized": {
       "type": "Human"
+    },
+    "warehouse-receipt": {
+      "type": "DocumentVersion",
+      "fixtureContent": {
+        "synthetic": true,
+        "sourceNamespace": "synthetic-warehouse-receipt",
+        "externalEventId": "T13-partial-excess-return-relocation-warehouse-receipt",
+        "sourceVersion": "1",
+        "occurredAt": "2026-10-07T09:00:00Z",
+        "itemAlias": "P",
+        "lotAlias": "L",
+        "witnessKind": "warehouse-receipt",
+        "reportedQuantities": [
+          {
+            "value": "60",
+            "unit": "BOX"
+          },
+          {
+            "value": "40",
+            "unit": "BOX"
+          },
+          {
+            "value": "5",
+            "unit": "BOX"
+          }
+        ],
+        "receivingCustodianAlias": "warehouse"
+      },
+      "contentEncoding": "CANONICAL_JSON_UTF8"
     }
   },
   "baseline": {
@@ -1011,7 +1040,7 @@
     },
     {
       "alias": "warehouse-receipt",
-      "sha256": "c1cf4e684ad4bafbeb55764cc5ed608d8d6587124b854681f8a0de43a2ad3268",
+      "sha256": "95917796d154d02d5587b937d1a2534d9df25d87ffbf49e156ae743ad11829fa",
       "sourceNamespace": "synthetic-warehouse-receipt",
       "externalEventId": "T13-partial-excess-return-relocation-warehouse-receipt",
       "sourceVersion": "1",

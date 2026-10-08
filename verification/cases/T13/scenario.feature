@@ -356,6 +356,7 @@
     그러면 "plan-original-goal-version" assertion으로 "고정 oracle contribution-scope의 실제 값과 범위를 확인한다"를 확인한다
     그러면 "arrival-api100" assertion으로 "고정 oracle authorized-arrival-contribution의 실제 값과 범위를 확인한다"를 확인한다
     그러면 "held-db105" assertion으로 "고정 oracle excess-reconciliation의 실제 값과 범위를 확인한다"를 확인한다
+    그러면 "received-custody-control" assertion으로 "W 활성 실물 60·40·5 BOX, 셋 다 내부 보관자 warehouse"를 확인한다
     그러면 "arrival-db100" assertion으로 "고정 oracle authorized-arrival-contribution의 실제 값과 범위를 확인한다"를 확인한다
     그러면 "excess5" assertion으로 "고정 oracle excess-reconciliation의 실제 값과 범위를 확인한다"를 확인한다
     그러면 "excess-owner-one" assertion으로 "고정 oracle excess-owner의 실제 값과 범위를 확인한다"를 확인한다

@@ -303,14 +303,26 @@ public final class CaseRunner {
      * the scheduler's durable submission rows in [observeFrom, observeFrom+observationWindowSeconds] and the validator checks
      * the same window, so a group watcher cannot lose an early loop submission and a standalone repeat watcher does not
      * report an earlier sweep's row (host-observation-guide.md). observeFrom is harness-owned; a case never authors it.
+     * naturalTickSeconds (the fixture runtimeProfile tickSeconds) is resolved the same way.
      */
     private JsonNode controlRequest(String id,JsonNode action) {
         JsonNode control=resolve(action.path("control"));
         if(HostObservationValidator.passiveWatch(control) && control.path("parameters").isObject()) {
             Instant from=observationBoundaries.computeIfAbsent(id,k->Instant.now());
-            ObjectNode copy=((ObjectNode)control).deepCopy();((ObjectNode)copy.path("parameters")).put(HostObservationValidator.OBSERVE_FROM,from.toString());control=copy;
+            ObjectNode copy=((ObjectNode)control).deepCopy();((ObjectNode)copy.path("parameters")).put(HostObservationValidator.OBSERVE_FROM,from.toString());
+            // step2r round 7: the fixture's natural tick period travels with the request so a NO_TASK watcher is checked to
+            // have observed at least one tick (HostObservationValidator.naturalTick).
+            JsonNode tick=naturalTickSeconds();
+            if(tick!=null) ((ObjectNode)copy.path("parameters")).set(HostObservationValidator.NATURAL_TICK_SECONDS,tick);
+            control=copy;
         }
         resolvedControls.put(id,control);return control;
+    }
+    private JsonNode naturalTickSeconds() {
+        try {
+            JsonNode profile=validator.runtimeProfileOf(Json.required(subcase,"fixtureRef"));
+            return profile!=null && profile.path("tickSeconds").isIntegralNumber() ? profile.path("tickSeconds").deepCopy() : null;
+        } catch(IOException e) {throw new IllegalArgumentException("Fixture runtimeProfile is unreadable: "+e.getMessage(),e);}
     }
     private StepResult parallel(JsonNode action) throws IOException {
         // One deadline covers all branches; ExecutorService.close() would wait forever on a blocked port.

@@ -76,7 +76,7 @@ requestState, approval hash/revision과 externalOperationId는 이 S0 slice의
 |---|---|---|
 | 인증 누락/유효하지 않은 token | 401 | 인증 단계, business tool 실행0 |
 | 허용되지 않은 Origin | 403 | transport 거부, business tool 실행0 |
-| `Accept` 누락 또는 `application/json, text/event-stream` 아님 | 406 | transport 거부, JSON-RPC 처리·business tool 실행0 |
+| `Accept` 누락 또는 `application/json`과 `text/event-stream`을 모두 나열하지 않음 | 406 | transport 거부, JSON-RPC 처리·business tool 실행0 |
 | 필수 mirrored header 누락/불일치 | 400 | error.code=-32020 HeaderMismatch |
 | 지원하지 않는 version | 400 | error.code=-32022, data.supported/requested |
 | 지원하지 않는 RPC/modern initialize | 404 | error.code=-32601 |
@@ -119,6 +119,16 @@ Streamable HTTP 요청은 Origin을 보내지 않고, Origin을 보내는 요청
 없는 요청은 406 반례(T20 `wire-missing-accept`)뿐이다. `./verify prepare`
 (`ContractValidator.wireTransportProblems`)는 그 밖의 요청이 이 두 header를
 어기면 준비 실패로 낸다.
+
+406 판정은 문자열 일치가 아니라 media type 비교다. `Accept`를 `,`로
+나눈 각 범위에서 parameter를 떼고 대소문자를 무시해 비교하며, 두 type이
+모두 있으면 순서·공백·다른 범위·`q` 값과 무관하게 받아들인다. 예를 들어
+`text/event-stream, application/json`과
+`application/json;q=0.9, text/event-stream`은 406이 아니다. `q=0`인
+범위는 RFC 9110 §12.4.2의 "받지 않음"이라 나열로 세지 않고, `*/*`나
+`application/*` 같은 wildcard도 특정 type의 나열이 아니다. case 요청은
+위의 기본 값을 그대로 보내고, prepare 검사도 같은 media type 비교로
+Accept 위반을 판정한다(step2r round 7).
 local server는 loopback에 bind한다. 요청 artifact는 Authorization을
 `[REDACTED_SECRET]`으로 치환하며 response credential echo를 발견하면
 저장을 중단한다. 이 fixture 인증은 운영 OAuth/IAS discovery 인수가 아니다.

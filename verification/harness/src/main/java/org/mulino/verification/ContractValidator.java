@@ -1,6 +1,8 @@
 package org.mulino.verification;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.networknt.schema.*;
 import java.io.IOException;
 import java.nio.file.*;
@@ -145,8 +147,8 @@ public final class ContractValidator {
             List<JsonNode> ticks=new ArrayList<>();
             for(JsonNode a:all) if(isProcess(a,"tickScheduler") || isProcess(a,"sweepDue")) ticks.add(a);
             if(ticks.isEmpty()) continue;
-            for(JsonNode t:ticks) if(t.path("control").path("parameters").has(HostObservationValidator.OBSERVE_FROM))
-                problems.add(where+"/"+t.path("id").asText()+": "+HostObservationValidator.OBSERVE_FROM+" is resolved by the harness (CaseRunner) from the observation boundary; a case does not author it");
+            for(JsonNode t:ticks) for(String harnessOwned:List.of(HostObservationValidator.OBSERVE_FROM,HostObservationValidator.NATURAL_TICK_SECONDS)) if(t.path("control").path("parameters").has(harnessOwned))
+                problems.add(where+"/"+t.path("id").asText()+": "+harnessOwned+" is resolved by the harness (CaseRunner) from the observation boundary and the fixture runtimeProfile; a case does not author it");
             JsonNode profile=runtimeProfile(sub.path("fixtureRef").asText(),new HashSet<>());
             boolean anyPassive=false,anyHarness=false;
             for(JsonNode t:ticks) {if(passive(t)) anyPassive=true; else anyHarness=true;}
@@ -157,6 +159,13 @@ public final class ContractValidator {
             if(anyHarness && !(controlled && paused)) problems.add(where+": harness tickScheduler/sweepDue requires runtimeProfile controlledTicks=true and pausedUntilTickControl=true");
             if(!anyPassive) continue;
             if(controlled || paused) problems.add(where+": passive natural-tick observation requires runtimeProfile controlledTicks=false and pausedUntilTickControl=false");
+            // step2r round 7: a NO_TASK watcher must observe at least one natural tick, so the period has to fit every window.
+            JsonNode tickSeconds=profile.path("tickSeconds");
+            for(JsonNode t:ticks) if(passive(t)) {
+                JsonNode window=t.path("control").path("parameters").path("observationWindowSeconds");
+                if(!tickSeconds.isIntegralNumber() || tickSeconds.asInt()<1 || window.isIntegralNumber() && tickSeconds.asInt()>window.asInt())
+                    problems.add(where+"/"+t.path("id").asText()+": passive natural-tick observation needs runtimeProfile tickSeconds, an integer 1..observationWindowSeconds, found "+tickSeconds);
+            }
             JsonNode top=sub.path("actions");JsonNode group=null;int groupAt=-1;
             for(int i=0;i<top.size() && group==null;i++) {
                 JsonNode a=top.get(i);
@@ -286,11 +295,152 @@ public final class ContractValidator {
         }
         return problems;
     }
+    /**
+     * contracts/fixture-place-kinds.json directReceiptCustody (step2r round 7). A confirmReceipt whose slots name no fixture
+     * QuantitySegment is a direct receipt: there is no transit leaf whose custody it keeps, so the product (ReceiptCommands)
+     * records the received stock with no custodian unless the receivingCustodianId slot names one, and then reserve/pick/
+     * dispatch/move of it is SCOPE_INELIGIBLE. When such stock is used later (directly or through a split/move/hold/reserve
+     * result derived from it), the receipt must name an internal Human/Agent fixture actor with confirmReceipt authority for
+     * the place, the cited receipt original must name the same alias (fixtureContent.receivingCustodianAlias, hashed by its
+     * evidence row), and every confirm of the same receipt carries the same slot. A transit receipt never carries the slot.
+     */
+    public List<String> receiptCustodyProblems(JsonNode caseFile) throws IOException {
+        JsonNode contract=Json.read(path("contracts/fixture-place-kinds.json"));JsonNode rule=contract.path("directReceiptCustody");
+        String capability=Json.required(rule,"capability"),slot=Json.required(rule,"slot"),field=Json.required(rule,"originalField");
+        Set<String> internal=new HashSet<>(),usedBy=new HashSet<>(),derived=new HashSet<>();
+        for(JsonNode t:contract.path("internalCustodianAliasTypes")) internal.add(t.asText());
+        for(JsonNode t:rule.path("requiredWhenStockIsUsedBy")) usedBy.add(t.asText());
+        for(JsonNode t:rule.path("stockDerivedThrough")) derived.add(t.asText());
+        List<String> problems=new ArrayList<>();
+        for(JsonNode sub:caseFile.path("subcases")) {
+            String where=caseFile.path("caseId").asText()+"/"+sub.path("id").asText();
+            String ref=sub.path("fixtureRef").asText();
+            if(ref.isBlank() || !Files.isRegularFile(path(ref))) continue;
+            ObjectNode aliases=Json.object(),actors=Json.object();ArrayNode evidence=Json.array();
+            mergeFixture(ref,new HashSet<>(),aliases,actors,evidence);
+            List<JsonNode> all=new ArrayList<>();collect(sub.path("actions"),all);
+            List<JsonNode> actions=new ArrayList<>();for(JsonNode a:all) {actions.add(a);if(a.has("call")) actions.add(a.path("call"));}
+            Map<String,Set<String>> origins=new HashMap<>();Map<String,JsonNode> receipts=new LinkedHashMap<>();Map<String,List<String>> users=new LinkedHashMap<>();
+            for(JsonNode a:actions) {
+                String id=a.path("id").asText(),cap=a.path("capabilityId").asText(a.path("request").path("capabilityId").asText());
+                Set<String> from=new TreeSet<>();for(String r:resultRefs(a.path("request"))) from.addAll(origins.getOrDefault(r,Set.of()));
+                if(cap.equals(capability)) {
+                    Set<String> segments=new TreeSet<>();for(String x:aliasRefs(a.path("request").path("slots"))) if(aliases.path(x).path("type").asText().equals("QuantitySegment")) segments.add(x);
+                    String custodian=slotAlias(a.path("request").path("slots").path(slot));
+                    if(!segments.isEmpty()) {if(a.path("request").path("slots").has(slot)) problems.add(where+"/"+id+": transit receipt of "+segments+" carries "+slot+"; a transit receipt keeps the leaf's custodian (contracts/fixture-place-kinds.json directReceiptCustody)");continue;}
+                    receipts.put(id,a);origins.put(id,new TreeSet<>(Set.of(id)));
+                    if(custodian!=null || a.path("request").path("slots").has(slot)) custodianProblems(where,a,custodian,slot,field,internal,aliases,actors,evidence,problems);
+                    continue;
+                }
+                if(from.isEmpty()) continue;
+                if(usedBy.contains(cap)) for(String r:from) users.computeIfAbsent(r,k->new ArrayList<>()).add(id+" "+cap);
+                if(derived.contains(cap)) origins.put(id,from);
+            }
+            for(var e:users.entrySet()) if(!receipts.get(e.getKey()).path("request").path("slots").has(slot))
+                problems.add(where+"/"+e.getKey()+": direct receipt (no existing fixture QuantitySegment) is later used by "+e.getValue()+" but names no "+slot
+                    +"; a conforming product records the stock without custodian and rejects that use as SCOPE_INELIGIBLE (contracts/fixture-place-kinds.json directReceiptCustody)");
+            Map<String,Set<String>> perReceipt=new LinkedHashMap<>();
+            for(JsonNode a:actions) {
+                if(!a.path("capabilityId").asText(a.path("request").path("capabilityId").asText()).equals(capability)) continue;
+                JsonNode slots=a.path("request").path("slots");String key=plainText(slots.path("canonicalOccurrenceKey"));
+                if(key==null) key="idempotency:"+a.path("request").path("commandIdempotencyKey").asText();
+                String custodian=slots.has(slot)?String.valueOf(slotAlias(slots.path(slot))):"(none)";
+                perReceipt.computeIfAbsent(key,k->new TreeSet<>()).add(custodian);
+            }
+            for(var e:perReceipt.entrySet()) if(e.getValue().size()>1) problems.add(where+": confirmReceipt of the same receipt "+e.getKey()+" carries different "+slot+" values "+e.getValue()+"; every confirm/retry names the same custodian");
+        }
+        return problems;
+    }
+    private void custodianProblems(String where,JsonNode receipt,String custodian,String slot,String field,Set<String> internal,JsonNode aliases,JsonNode actors,JsonNode evidence,List<String> problems) throws IOException {
+        String id=where+"/"+receipt.path("id").asText();
+        if(custodian==null) {problems.add(id+": "+slot+" must name a fixture alias ({\"$alias\":...} or {\"value\":{\"$alias\":...}})");return;}
+        JsonNode holder=aliases.get(custodian);
+        if(holder==null || !internal.contains(holder.path("type").asText())) {problems.add(id+": "+slot+" "+custodian+" is not an internal custodian (a "+internal+" alias)");return;}
+        JsonNode actor=actors.get(custodian);
+        boolean authority=false;
+        if(actor!=null) {
+            boolean role=false,grant=false;
+            for(JsonNode c:actor.path("roleCapabilities")) role|=c.asText().equals("confirmReceipt");
+            for(JsonNode c:actor.path("grant").path("actions")) grant|=c.asText().equals("confirmReceipt");
+            authority=role && grant;
+        }
+        if(!authority) problems.add(id+": "+slot+" "+custodian+" has no confirmReceipt role and grant; the product requires the receiving custodian's current receive authority");
+        String place=null;JsonNode slots=receipt.path("request").path("slots");
+        for(String key:List.of("locationId","placeId","destinationId")) if(place==null) place=slotAlias(slots.path(key));
+        if(actor!=null && place!=null) for(String key:List.of("placeAliases","places")) {
+            JsonNode scope=actor.path("grant").path("scope").path(key);
+            if(!scope.isArray()) continue;
+            boolean listed=false;for(JsonNode p:scope) listed|=p.asText().equals(place);
+            if(!listed) problems.add(id+": "+slot+" "+custodian+" grant scope "+key+" does not include the receipt place "+place);
+        }
+        Set<String> docs=new LinkedHashSet<>();
+        String cited=slotAlias(slots.path("evidenceId"));if(cited!=null) docs.add(cited);
+        for(JsonNode e:receipt.path("request").path("evidenceRefs")) {String x=e.isTextual()?e.asText():slotAlias(e);if(x!=null) docs.add(x);}
+        boolean named=false;
+        for(String doc:docs) {
+            JsonNode a=aliases.path(doc);
+            if(!a.path("type").asText().equals("DocumentVersion") || !a.path("fixtureContent").has(field)) continue;
+            String stated=a.path("fixtureContent").path(field).asText();
+            if(!stated.equals(custodian)) {problems.add(id+": receipt original "+doc+" names receiving custodian "+stated+", the slot "+custodian);continue;}
+            named=true;
+            String expected=Json.sha256Text(CANONICAL.writeValueAsString(Json.MAPPER.treeToValue(a.path("fixtureContent"),Object.class)));
+            boolean hashed=false;for(JsonNode row:evidence) if(row.path("alias").asText().equals(doc)) hashed|=row.path("sha256").asText().equals(expected);
+            if(!hashed) problems.add(id+": fixture evidence sha256 of "+doc+" is not the SHA-256 of its canonical fixtureContent, so the original naming "+custodian+" is not the hashed one");
+        }
+        if(!named) problems.add(id+": no receipt original it cites ("+docs+") names "+custodian+" in fixtureContent."+field+"; the product accepts "+slot+" only when verified receipt evidence names it");
+    }
+    private static final com.fasterxml.jackson.databind.ObjectMapper CANONICAL=new com.fasterxml.jackson.databind.ObjectMapper().configure(com.fasterxml.jackson.databind.SerializationFeature.ORDER_MAP_ENTRIES_BY_KEYS,true);
+    private void mergeFixture(String ref,Set<String> visiting,ObjectNode aliases,ObjectNode actors,ArrayNode evidence) throws IOException {
+        if(ref.isBlank() || !visiting.add(ref) || !Files.isRegularFile(path(ref))) return;
+        JsonNode fixture=Json.read(path(ref));
+        for(JsonNode base:fixture.path("baseRefs")) mergeFixture(base.asText(),visiting,aliases,actors,evidence);
+        aliases.setAll((ObjectNode)(fixture.path("aliases").isObject()?fixture.path("aliases"):Json.object()));
+        actors.setAll((ObjectNode)(fixture.path("actors").isObject()?fixture.path("actors"):Json.object()));
+        evidence.addAll((ArrayNode)(fixture.path("evidence").isArray()?fixture.path("evidence"):Json.array()));
+    }
+    /** The alias a slot names: {"$alias":X} or the typed {"value":{"$alias":X}}; null otherwise. */
+    private static String slotAlias(JsonNode slot) {
+        if(slot.path("$alias").isTextual()) return slot.path("$alias").asText();
+        if(slot.path("value").path("$alias").isTextual()) return slot.path("value").path("$alias").asText();
+        return null;
+    }
+    private static String plainText(JsonNode slot) {
+        if(slot.isTextual()) return slot.asText();
+        if(slot.path("value").isTextual()) return slot.path("value").asText();
+        return null;
+    }
+    private static Set<String> resultRefs(JsonNode node) {Set<String> out=new TreeSet<>();walk(node,"$result",out);return out;}
+    private static Set<String> aliasRefs(JsonNode node) {Set<String> out=new TreeSet<>();walk(node,"$alias",out);return out;}
+    private static void walk(JsonNode node,String key,Set<String> out) {
+        if(node.isObject()) {
+            if(key.equals("$result") && node.path("$result").path("actionId").isTextual()) out.add(node.path("$result").path("actionId").asText());
+            if(key.equals("$alias") && node.path("$alias").isTextual()) out.add(node.path("$alias").asText());
+            for(JsonNode v:node) walk(v,key,out);
+        } else if(node.isArray()) for(JsonNode v:node) walk(v,key,out);
+    }
     /** The Accept every Streamable HTTP request sends (contracts/mcp/s0-protocol.md "독립 요청"). */
     public static final String MCP_ACCEPT="application/json, text/event-stream";
+    /** The media types a Streamable HTTP Accept must list (contracts/mcp/s0-protocol.md 406 row). */
+    static final Set<String> MCP_ACCEPT_TYPES=Set.of("application/json","text/event-stream");
     /**
-     * contracts/mcp/s0-protocol.md: a Streamable HTTP request without Accept: application/json, text/event-stream is answered
-     * 406 and a request with an Origin outside the allowlist 403, before any JSON-RPC processing, and the relative order of
+     * Whether an Accept header lists both MCP media types (step2r round 7): media ranges are compared case-insensitively
+     * without their parameters, in any order and with other ranges beside them. A range whose q parameter is 0 is
+     * "not acceptable" (RFC 9110 §12.4.2) and does not count, and a wildcard range does not list a specific type.
+     */
+    static boolean acceptsMcp(String accept) {
+        if(accept==null) return false;
+        Set<String> listed=new HashSet<>();
+        for(String range:accept.split(",")) {
+            String[] parts=range.split(";");String type=parts[0].strip().toLowerCase(Locale.ROOT);boolean refused=false;
+            for(int i=1;i<parts.length;i++) {String[] kv=parts[i].split("=",2);
+                if(kv.length==2 && kv[0].strip().equalsIgnoreCase("q") && kv[1].strip().matches("0(\\.0{0,3})?")) refused=true;}
+            if(!refused) listed.add(type);
+        }
+        return listed.containsAll(MCP_ACCEPT_TYPES);
+    }
+    /**
+     * contracts/mcp/s0-protocol.md: a Streamable HTTP request whose Accept does not list both application/json and
+     * text/event-stream (media-type comparison, acceptsMcp) is answered 406 and a request with an Origin outside the allowlist 403, before any JSON-RPC processing, and the relative order of
      * these transport rejections and the other error rows is not fixed. No contract or fixture declares an allowed Origin
      * (an Origin-less request is accepted). A wire request that omits/changes Accept or sends an Origin therefore makes every
      * other expectation of its subcase unsatisfiable for a conforming server, unless it is the transport negative itself:
@@ -311,12 +461,12 @@ public final class ContractValidator {
                 for(var it=request.path("headers").fields();it.hasNext();) {var h=it.next();String name=h.getKey().toLowerCase(Locale.ROOT);
                     if(name.equals("accept")) accept=h.getValue().asText();
                     if(name.equals("origin")) origin=true;}
-                boolean badAccept=!MCP_ACCEPT.equals(accept);
+                boolean badAccept=!acceptsMcp(accept);
                 String id=a.path("id").asText();
                 if(badAccept && origin) {problems.add(where+"/"+id+": a Streamable HTTP request breaks both Accept and Origin; the expected transport rejection (406 or 403) is ambiguous");continue;}
                 if(!badAccept && !origin) continue;
                 int status=badAccept?406:403;
-                if(!pinsHttpStatus(sub,id,status)) problems.add(where+"/"+id+": Streamable HTTP request "+(badAccept?"without Accept: "+MCP_ACCEPT:"with an Origin no contract allowlists")
+                if(!pinsHttpStatus(sub,id,status)) problems.add(where+"/"+id+": Streamable HTTP request "+(badAccept?"whose Accept does not list both "+new TreeSet<>(MCP_ACCEPT_TYPES):"with an Origin no contract allowlists")
                     +" is answered "+status+" before JSON-RPC processing; send the required Accept and no Origin, or pin /response/httpStatus equals "+status+" as the transport negative (contracts/mcp/s0-protocol.md)");
             }
         }
@@ -334,6 +484,8 @@ public final class ContractValidator {
         JsonNode p=a.path("control").path("parameters");
         return (isProcess(a,"tickScheduler") || isProcess(a,"sweepDue")) && (p.has("trigger") || p.has("triggeredBy") || p.has("observationWindowSeconds"));
     }
+    /** The fixture baseline.runtimeProfile of a fixture or its baseRefs, or null (a harness-tick fixture). */
+    public JsonNode runtimeProfileOf(String ref) throws IOException {return runtimeProfile(ref,new HashSet<>());}
     private JsonNode runtimeProfile(String ref,Set<String> visiting) throws IOException {
         if(ref.isBlank() || !visiting.add(ref) || !Files.isRegularFile(path(ref))) return null;
         JsonNode fixture=Json.read(path(ref));

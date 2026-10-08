@@ -1,11 +1,12 @@
 {
   "$id": "urn:mulino:fixture-place-kinds:1",
-  "version": "1.0.0",
-  "description": "Normative Place.kind vocabulary and custodian internality of acceptance fixtures (contracts/fixture-place-kinds.md). Aligned with the product vocabulary of docs/execution/s2-inventory/contracts.md (moveQuantity) and the read-only custody rule of backend QualityEligibility.custody/FulfillmentCommands.requireWarehouse. ./verify prepare (ContractValidator.placeKindProblems) rejects a fixture Place without a kind, a kind outside this list and an internal-storage segment without an internal custodian.",
+  "version": "1.1.0",
+  "description": "Normative Place.kind vocabulary and custodian internality of acceptance fixtures (contracts/fixture-place-kinds.md). Aligned with the product vocabulary of docs/execution/s2-inventory/contracts.md (moveQuantity) and the read-only custody rule of backend QualityEligibility.custody/FulfillmentCommands.requireWarehouse. ./verify prepare (ContractValidator.placeKindProblems) rejects a fixture Place without a kind, a kind outside this list an internal-storage segment without an internal custodian and (ContractValidator.receiptCustodyProblems) a direct receipt whose stock is later reserved, picked, dispatched or moved without an explicit, evidenced internal receiving custodian.",
   "productRefs": [
     "docs/execution/s2-inventory/contracts.md (moveQuantity: both Place.kind INTERNAL_STORAGE and a confirmed internal custodian)",
     "backend/src/main/java/com/mulino/application/quality/QualityEligibility.java (custody: INTERNAL_STORAGE+internal custodian CONFIRMED; TRANSIT/CUSTOMER/SUPPLIER/EXTERNAL_* OUTSIDE; any other kind UNRECOGNIZED -> UNKNOWN, eligible 0)",
-    "backend/src/main/java/com/mulino/domain/inventory/InventoryRepository.java (internalCustodian: an actor of the organization of kind HUMAN or AGENT)"
+    "backend/src/main/java/com/mulino/domain/inventory/InventoryRepository.java (internalCustodian: an actor of the organization of kind HUMAN or AGENT)",
+    "backend/src/main/java/com/mulino/application/trade/receipt/ReceiptCommands.java (confirmReceipt: optional receivingCustodianId only on a direct receipt; an internal HUMAN/AGENT with current confirmReceipt authority for the receipt's TARGET/ITEM/PLACE/WORK; the verified receipt chains that state custody must name the same custodian, else HELD EVIDENCE_UNVERIFIED/EVIDENCE_CONFLICT; a transit receipt keeps the transit leaf's custody and rejects the slot)"
   ],
   "kinds": [
     {
@@ -40,6 +41,20 @@
     "field": "kindControl",
     "value": "UNRECOGNIZED_PLACE_KIND",
     "meaning": "Explicit negative control: the Place deliberately carries a kind outside this vocabulary (not starting with EXTERNAL_) so the case can assert that the product reports eligibility UNKNOWN with eligible 0 instead of a known 0 or a positive quantity. Only allowed with that kind; a fixture never relies on an undeclared kind."
+  },
+  "directReceiptCustody": {
+    "meaning": "A confirmReceipt that does not confirm an existing fixture QuantitySegment (a direct receipt: no transit leaf whose custody it could keep) creates stock whose custodian comes only from the command slot. Without it the received segment has no custodian, so a conforming product rejects reserve/pick/dispatch/move of that stock with SCOPE_INELIGIBLE and reports its eligibility UNKNOWN. A case that later uses that stock names the receiving custodian explicitly (step2r round 7).",
+    "capability": "confirmReceipt",
+    "slot": "receivingCustodianId",
+    "originalField": "receivingCustodianAlias",
+    "requiredWhenStockIsUsedBy": ["reserveQuantity", "replaceAllocation", "pickQuantity", "dispatchQuantity", "moveQuantity"],
+    "stockDerivedThrough": ["splitQuantity", "moveQuantity", "placeHold", "releaseHold", "reserveQuantity", "replaceAllocation", "pickQuantity", "dispatchQuantity", "recordDelivery", "receiveReturn"],
+    "rules": [
+      "The slot names a fixture alias of an internalCustodianAliasTypes type that is a fixture actor holding confirmReceipt in roleCapabilities and grant.actions, with the receipt place in its grant place scope when that scope lists places.",
+      "At least one DocumentVersion alias the receipt cites (slot evidenceId or request evidenceRefs) names the same alias in fixtureContent.receivingCustodianAlias, none names another, and the fixture evidence sha256 of a naming alias is the SHA-256 of its canonical content (sorted keys, no whitespace, UTF-8). The adapter installs that alias as receivingCustodianId of the original and of the event payload.",
+      "Every confirmReceipt of the same receipt (same canonicalOccurrenceKey, else the same commandIdempotencyKey) carries the same slot value or none, so a retry or a duplicate source cannot change custody.",
+      "A transit receipt (one that names an existing fixture QuantitySegment) never carries the slot; it keeps the leaf's custodian."
+    ]
   },
   "retiredFixtureKinds": [
     {"kind": "INTERNAL_WAREHOUSE", "replacement": "INTERNAL_STORAGE"},

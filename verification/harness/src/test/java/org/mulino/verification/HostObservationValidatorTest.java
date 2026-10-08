@@ -193,6 +193,7 @@ public final class HostObservationValidatorTest {
         params.put("trigger","OBSERVE_NEXT_NATURAL_TICK").put("observationWindowSeconds",30).put("triggeredBy","SCHEDULER_LOOP");
         // CaseRunner resolves observeFrom; a standalone watcher's boundary is taken just before its dispatch (its command start here).
         params.put("observeFrom",c.host.path("command").path("startedAt").asText());
+        params.put("naturalTickSeconds",1); // step2r round 7: CaseRunner resolves the fixture runtimeProfile tickSeconds too
         c.host.set("requestedInputs",params.deepCopy());return c;
     }
     private static void reshape(Capture c,java.util.function.Consumer<ObjectNode> change) {
@@ -201,7 +202,7 @@ public final class HostObservationValidatorTest {
     @Test void naturalTickIsPassiveObservationWithinTheWindowAndNeverAHarnessTrigger() throws Exception {
         for(String op:List.of("tickScheduler","sweepDue")) check(naturalTick(op));
         // A harness-triggered tick (no passive request) cannot claim the loop's natural trigger recorded in the rows.
-        Capture relabel=naturalTick("tickScheduler");reshape(relabel,p->{p.remove("trigger");p.remove("triggeredBy");p.remove("observationWindowSeconds");p.remove("observeFrom");});
+        Capture relabel=naturalTick("tickScheduler");reshape(relabel,p->{p.remove("trigger");p.remove("triggeredBy");p.remove("observationWindowSeconds");p.remove("observeFrom");p.remove("naturalTickSeconds");});
         assertTrue(assertThrows(IllegalArgumentException.class,()->check(relabel)).getMessage().contains("cannot be reported"));
         Capture otherTrigger=naturalTick("tickScheduler");reshape(otherTrigger,p->p.put("trigger","HARNESS_TICK"));assertThrows(IllegalArgumentException.class,()->check(otherTrigger));
         Capture harness=naturalTick("tickScheduler");reshape(harness,p->p.put("triggeredBy","HARNESS"));assertThrows(IllegalArgumentException.class,()->check(harness));
