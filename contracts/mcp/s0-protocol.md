@@ -83,6 +83,24 @@ requestState, approval hash/revision과 externalOperationId는 이 S0 slice의
 | 잘못된 tool arguments/미지원 tool | 별도 protocol 오류 | 유효한 request ID와 error 보존 |
 | 업무 권한/revision/멱등 충돌 | 200 | resultType=complete, isError=true, structuredContent에 domain outcome |
 
+한 요청이 본문 envelope 오류와 mirrored header 오류를 함께 가지면
+envelope 오류 하나로 답한다. JSON parse 실패는 -32700, JSON-RPC batch
+배열·object가 아닌 본문·`jsonrpc`/`id`/`method`/`params` 형식 위반은
+400 -32600이다. mirrored header(`MCP-Protocol-Version`, `Mcp-Method`,
+tools/call의 `Mcp-Name`)의 누락/불일치(400 -32020)는 envelope이 유효할
+때만 판정한다. 인증·Origin·Accept·Content-Type 같은 transport 거부와
+다른 행 사이의 상대 순서는 이 절이 정하지 않는다.
+
+envelope 검사가 header 검사보다 먼저인 이유는 header가 비교할 단일
+method/name이 envelope이 유효할 때만 있기 때문이다. batch 배열에는
+요소마다 다른 method/name이 있어 `Mcp-Method`·`Mcp-Name`과 대조할 값이
+없다. 그래서 `Mcp-Name` 없이 tools/call 두 개를 담은 batch(V4
+`mixed-atomic-batch`의 `mcp-batch`)는 -32020이 아니라 -32600이다. 단일
+object 본문의 method가 `Mcp-Method`와 다른 요청(T20
+`wire-method-mismatch`)은 envelope이 유효하므로 -32020이다. 현재
+backend의 `PlatformMcp`(S0)와 `OntologyMcp`도 envelope(-32600)을 header
+(-32020)보다 먼저 검사한다(2026-10-08 소스 확인, 실행 인수 아님).
+
 Mcp-Name의 `=?base64?<UTF8base64>?=` 표기는 decode 후 본문과 비교한다.
 S0 schema에는 x-mcp-header가 없으므로 추가 매핑을 광고하지 않는다.
 Origin이 없으면 CLI 요청을 허용하며 있으면 허용 origin만 받는다.

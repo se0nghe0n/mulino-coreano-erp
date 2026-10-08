@@ -26,7 +26,8 @@
     그러면 "dispatch-result-outcome" assertion으로 "worker-auth dispatch-result-outcome"를 확인한다
     그러면 "new-dispatch-rows0" assertion으로 "worker-auth new-dispatch-rows0"를 확인한다
     그러면 "new20-command-not-committed" assertion으로 "worker-auth new20-command-not-committed"를 확인한다
-    그러면 "new-effect-quantity0" assertion으로 "new-effects-quantity new-effect-quantity0"를 확인한다
+    그러면 "new-effect-quantity0" assertion으로 "철회 뒤 new20 출고 DISPATCH 원행 수량 합 0 BOX"를 확인한다
+    그러면 "no-new-dispatch-rows" assertion으로 "철회 전후 DISPATCH movement 원행 불변, 다른 key의 새 출고 0"를 확인한다
     그러면 "blocked-duty-assignment1" assertion으로 "blocked-duty blocked-duty-assignment1"를 확인한다
     그러면 "blocked-duty-owner" assertion으로 "blocked-duty blocked-duty-owner"를 확인한다
     그러면 "blocked-duty-assignment-scope" assertion으로 "blocked-duty blocked-duty-assignment-scope"를 확인한다
@@ -58,7 +59,8 @@
     그러면 "new-dispatch-rows0" assertion으로 "linearization-evidence new-dispatch-rows0"를 확인한다
     그러면 "new20-command-not-committed" assertion으로 "linearization-evidence new20-command-not-committed"를 확인한다
     그러면 "revoke-is-only-new-fence-commit" assertion으로 "linearization-evidence revoke-is-only-new-fence-commit"를 확인한다
-    그러면 "new-effect-quantity0" assertion으로 "effect-if-revoke-commits-first new-effect-quantity0"를 확인한다
+    그러면 "new-effect-quantity0" assertion으로 "철회 뒤 new20 출고 DISPATCH 원행 수량 합 0 BOX"를 확인한다
+    그러면 "no-new-dispatch-rows" assertion으로 "철회 전후 DISPATCH movement 원행 불변, 다른 key의 새 출고 0"를 확인한다
     그러면 "blocked-or-post-revoke-duty-assignment1" assertion으로 "blocked-or-post-revoke-duty blocked-or-post-revoke-duty-assignment1"를 확인한다
     그러면 "blocked-or-post-revoke-duty-owner" assertion으로 "blocked-or-post-revoke-duty blocked-or-post-revoke-duty-owner"를 확인한다
     그러면 "blocked-or-post-revoke-duty-assignment-scope" assertion으로 "blocked-or-post-revoke-duty blocked-or-post-revoke-duty-assignment-scope"를 확인한다
@@ -146,7 +148,8 @@
     그러면 "safe-retry-original-owner-kept" assertion으로 "원 command record new20의 stableRequestOwner는 서버가 기록한 warehouse 그대로다. retry 요청자가 원 주체를 바꾸지 못한다(계획 §7.3)."를 확인한다
     그러면 "new-dispatch-rows0" assertion으로 "safe-retry new-dispatch-rows0"를 확인한다
     그러면 "new20-command-not-committed" assertion으로 "safe-retry new20-command-not-committed"를 확인한다
-    그러면 "new-effect-quantity0" assertion으로 "unauthorized-recovered-effects new-effect-quantity0"를 확인한다
+    그러면 "new-effect-quantity0" assertion으로 "철회 뒤 new20 출고 DISPATCH 원행 수량 합 0 BOX"를 확인한다
+    그러면 "no-new-dispatch-rows" assertion으로 "철회 전후 DISPATCH movement 원행 불변, 다른 key의 새 출고 0"를 확인한다
     그러면 "prior20-raw-preserved" assertion으로 "safe-retry prior20-raw-preserved"를 확인한다
     그러면 "prior20-still-total" assertion으로 "prior-committed-preserved prior20-still-total"를 확인한다
     그러면 "blocked-duty-after-restart-assignment1" assertion으로 "blocked-duty-after-restart blocked-duty-after-restart-assignment1"를 확인한다

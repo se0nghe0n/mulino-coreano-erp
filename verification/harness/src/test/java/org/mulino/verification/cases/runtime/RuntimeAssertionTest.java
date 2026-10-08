@@ -71,7 +71,19 @@ public final class RuntimeAssertionTest {
                 JsonNode group = null; for (JsonNode a : sub.path("actions")) if (a.path("kind").asText().equals("parallel")) group = a;
                 assertNotNull(group, id);
                 assertTrue(Set.of("tickScheduler", "sweepDue").contains(group.at("/branches/0/actions/0/control/operation").asText()), id);
-                for (JsonNode a : group.at("/branches/1/actions")) assertEquals("start", a.path("control").path("operation").asText(), id);
+                for (int b = 1; b < group.path("branches").size(); b++) {
+                    // One loop process start per branch; api/workers start before the group, outside the watcher window.
+                    assertEquals(1, group.at("/branches/" + b + "/actions").size(), id);
+                    JsonNode a = group.at("/branches/" + b + "/actions/0");
+                    assertEquals("start", a.path("control").path("operation").asText(), id);
+                    assertTrue(Set.of("scheduler", "due-sweeper").contains(a.at("/control/parameters/processId").asText()), id);
+                }
+                // A loop process never runs during the fault/seed phase (step2r round 5).
+                for (JsonNode a : sub.path("actions")) {
+                    if (a == group) break;
+                    if (Set.of("start", "stop", "restart").contains(a.at("/control/operation").asText()))
+                        assertFalse(Set.of("scheduler", "due-sweeper").contains(a.at("/control/parameters/processId").asText()), id + " " + a.path("id").asText());
+                }
             }
             for (JsonNode a : flat) {
                 if (a.path("capabilityId").asText().equals("retrySafeCommand")) {
@@ -87,20 +99,28 @@ public final class RuntimeAssertionTest {
                     assertFalse(a.path("control").path("parameters").has("clockInstant"), id);
                 }
             }
-            if (id.endsWith("-autonomous-loop")) { autonomous++; assertNotNull(assertion("T26", id, "autonomous-within-30s")); }
+            if (id.endsWith("-autonomous-loop")) { autonomous++; assertNotNull(assertion("T26", id, "autonomous-within-30s")); assertNotNull(assertion("T26", id, "autonomous-after-loop-start")); }
         }
         assertTrue(forgedActor && forgedHash); assertEquals(3, autonomous);
         JsonNode within = assertion("T26", "due-wait-autonomous-loop", "autonomous-within-30s");
+        JsonNode afterStart = assertion("T26", "due-wait-autonomous-loop", "autonomous-after-loop-start");
+        assertEquals("start-loop-while-observing", within.at("/baseline/actionId").asText());
+        assertEquals("/data/observationBoundaryAt", within.at("/baseline/pointer").asText());
+        assertEquals("start-scheduler", afterStart.at("/baseline/actionId").asText());
         ObjectNode tick = Json.object(); tick.put("driverStatus", "EXECUTED"); tick.set("provenance", Json.parse("{\"scopeComplete\":true}"));
         tick.set("data", Json.parse("{\"hostObservation\":{\"operationEvidence\":{\"submittedAt\":\"2026-10-08T00:00:20Z\"}}}"));
-        ObjectNode start = tick.deepCopy(); start.set("data", Json.parse("{\"hostObservation\":{\"command\":{\"startedAt\":\"2026-10-08T00:00:00Z\"}}}"));
-        var results = new java.util.HashMap<String, JsonNode>(); results.put("tick", tick); results.put("start-again-scheduler", start);
+        ObjectNode group = tick.deepCopy(); group.set("data", Json.parse("{\"observationBoundaryAt\":\"2026-10-08T00:00:00Z\"}"));
+        ObjectNode start = tick.deepCopy(); start.set("data", Json.parse("{\"hostObservation\":{\"command\":{\"startedAt\":\"2026-10-08T00:00:01Z\"}}}"));
+        var results = new java.util.HashMap<String, JsonNode>(); results.put("tick", tick); results.put("start-loop-while-observing", group); results.put("start-scheduler", start);
+        engine.check(within, results, aliases); engine.check(afterStart, results, aliases);
+        // 30 s from the harness observation boundary is the same window the watcher validator uses.
+        ((ObjectNode) tick.at("/data/hostObservation/operationEvidence")).put("submittedAt", "2026-10-08T00:00:30.500Z");
+        assertThrows(AssertionError.class, () -> engine.check(within, results, aliases));
+        engine.check(afterStart, results, aliases);
+        // A submission before the loop process start command began cannot be the started loop's own tick.
+        ((ObjectNode) tick.at("/data/hostObservation/operationEvidence")).put("submittedAt", "2026-10-08T00:00:00.500Z");
         engine.check(within, results, aliases);
-        ((ObjectNode) tick.at("/data/hostObservation/operationEvidence")).put("submittedAt", "2026-10-08T00:00:31Z");
-        assertThrows(AssertionError.class, () -> engine.check(within, results, aliases));
-        // A submission before the scheduler start command began cannot be the restarted loop's own tick.
-        ((ObjectNode) tick.at("/data/hostObservation/operationEvidence")).put("submittedAt", "2026-10-07T23:59:59Z");
-        assertThrows(AssertionError.class, () -> engine.check(within, results, aliases));
+        assertThrows(AssertionError.class, () -> engine.check(afterStart, results, aliases));
     }
     @Test void everyFixtureArtifactMatchesActualBytesAndDigest() throws Exception {
         for (String id : List.of("T26", "V5")) {

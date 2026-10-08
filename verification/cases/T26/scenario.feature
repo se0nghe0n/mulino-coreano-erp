@@ -1094,7 +1094,6 @@
     먼저 사례 파일 "verification/cases/T26/case.json"의 "due-wait-autonomous-loop"를 준비한다
     만일 "시스템" 역할이 "setup" 행동을 수행한다
     만일 "시스템" 역할이 "start-app-api" 행동을 수행한다
-    만일 "시스템" 역할이 "start-app-scheduler" 행동을 수행한다
     만일 "시스템" 역할이 "start-app-worker-a" 행동을 수행한다
     만일 "시스템" 역할이 "start-app-worker-b" 행동을 수행한다
     만일 "owner" 역할이 "create" 행동을 수행한다
@@ -1103,11 +1102,13 @@
     만일 "operations" 역할이 "before" 행동을 수행한다
     만일 "시스템" 역할이 "before-db" 행동을 수행한다
     만일 "시스템" 역할이 "stop-app-api" 행동을 수행한다
-    만일 "시스템" 역할이 "stop-app-scheduler" 행동을 수행한다
     만일 "시스템" 역할이 "stop-app-worker-a" 행동을 수행한다
     만일 "시스템" 역할이 "stop-app-worker-b" 행동을 수행한다
     만일 "시스템" 역할이 "advance" 행동을 수행한다
-    만일 "시스템" 역할이 "restart-while-observing" 행동을 수행한다
+    만일 "시스템" 역할이 "start-again-api" 행동을 수행한다
+    만일 "시스템" 역할이 "start-again-worker-a" 행동을 수행한다
+    만일 "시스템" 역할이 "start-again-worker-b" 행동을 수행한다
+    만일 "시스템" 역할이 "start-loop-while-observing" 행동을 수행한다
     만일 "시스템" 역할이 "terminal" 행동을 수행한다
     만일 "operations" 역할이 "api" 행동을 수행한다
     만일 "시스템" 역할이 "db" 행동을 수행한다
@@ -1130,14 +1131,14 @@
     그러면 "timeout-never-satisfied" assertion으로 "시간 경과·queue 성공이 증거 없는 목표를 충족시키지 않는다."를 확인한다
     그러면 "queue-empty-after-restart" assertion으로 "재시작 뒤 terminal 관찰 시점에도 queue message0이다. 재발견은 DB due index에서만 온다."를 확인한다
     그러면 "autonomous-trigger-loop" assertion으로 "관찰 창의 첫 제출(operationEvidence의 taskId) 행을 scheduler가 직접 기록한 제출 원행에서 읽으면 제출 주체는 scheduler loop다. 요청 parameter의 되풀이가 아니라 scheduler 기록이며 harness tick이 만든 제출이면 실패한다."를 확인한다
-    그러면 "autonomous-within-30s" assertion으로 "scheduler process 시작 command가 시작된 뒤 30초(개발/CI 관찰 제한, plan §10) 안에 자율 제출이 관찰된다. 제출은 시작 command보다 앞설 수 없다."를 확인한다
+    그러면 "autonomous-within-30s" assertion으로 "harness가 관찰 group을 시작하기 직전에 잡은 관찰 경계부터 30초(개발/CI 관찰 제한, plan §10) 안에 자율 제출이 관찰된다. validator의 관찰 창과 같은 기준이다."를 확인한다
+    그러면 "autonomous-after-loop-start" assertion으로 "제출은 멈춰 있던 loop process의 시작 command보다 앞설 수 없고 그 시작부터도 30초 안이다. 시작 전 제출은 다른 주체의 것이다."를 확인한다
     그러면 "autonomous-attempt-source" assertion으로 "독립 DB attempt 원행도 scheduler loop가 시작한 시도만 있다. harness tick이나 API 호출로 시작한 시도는 없다."를 확인한다
 
   시나리오: 새 사건 없이 lot 만료20을 정지하고 sweeper 지연에도 출고를 막는다 — harness tick/sweep 없이 scheduler loop가 스스로 찾는다
     먼저 사례 파일 "verification/cases/T26/case.json"의 "lot-expiry-autonomous-loop"를 준비한다
     만일 "시스템" 역할이 "setup" 행동을 수행한다
     만일 "시스템" 역할이 "start-app-api" 행동을 수행한다
-    만일 "시스템" 역할이 "start-app-scheduler" 행동을 수행한다
     만일 "시스템" 역할이 "start-app-worker-a" 행동을 수행한다
     만일 "시스템" 역할이 "start-app-worker-b" 행동을 수행한다
     만일 "owner" 역할이 "create" 행동을 수행한다
@@ -1145,10 +1146,8 @@
     만일 "warehouse" 역할이 "reserve" 행동을 수행한다
     만일 "operations" 역할이 "before" 행동을 수행한다
     만일 "시스템" 역할이 "before-db" 행동을 수행한다
-    만일 "시스템" 역할이 "stop-sweeper" 행동을 수행한다
-    만일 "시스템" 역할이 "stop-again-scheduler" 행동을 수행한다
     만일 "시스템" 역할이 "advance" 행동을 수행한다
-    만일 "시스템" 역할이 "restart-while-observing" 행동을 수행한다
+    만일 "시스템" 역할이 "start-loop-while-observing" 행동을 수행한다
     만일 "시스템" 역할이 "sweep-terminal" 행동을 수행한다
     만일 "시스템" 역할이 "sweep-db" 행동을 수행한다
     만일 "시스템" 역할이 "repeat-sweep" 행동을 수행한다
@@ -1225,14 +1224,14 @@
     그러면 "repeat-db-expiry-assignment-workId-linked" assertion으로 "자동 sweep가 만든 assignment는 같은 snapshot의 만료 의무·stable root·책임 업무에 연결된다. 이름이나 count만 같은 별도 책임으로 대신하지 않는다."를 확인한다
     그러면 "repeat-expiry-assignment-identity-kept" assertion으로 "반복 sweep는 동일한 현재 OPEN assignment 원 행·ID·owner·supervisor·다음 행동·확인 시점을 유지한다."를 확인한다
     그러면 "autonomous-trigger-loop" assertion으로 "관찰 창의 첫 제출(operationEvidence의 taskId) 행을 scheduler가 직접 기록한 제출 원행에서 읽으면 제출 주체는 scheduler loop다. 요청 parameter의 되풀이가 아니라 scheduler 기록이며 harness tick이 만든 제출이면 실패한다."를 확인한다
-    그러면 "autonomous-within-30s" assertion으로 "scheduler process 시작 command가 시작된 뒤 30초(개발/CI 관찰 제한, plan §10) 안에 자율 제출이 관찰된다. 제출은 시작 command보다 앞설 수 없다."를 확인한다
+    그러면 "autonomous-within-30s" assertion으로 "harness가 관찰 group을 시작하기 직전에 잡은 관찰 경계부터 30초(개발/CI 관찰 제한, plan §10) 안에 자율 제출이 관찰된다. validator의 관찰 창과 같은 기준이다."를 확인한다
+    그러면 "autonomous-after-loop-start" assertion으로 "제출은 멈춰 있던 loop process의 시작 command보다 앞설 수 없고 그 시작부터도 30초 안이다. 시작 전 제출은 다른 주체의 것이다."를 확인한다
     그러면 "autonomous-attempt-source" assertion으로 "독립 DB attempt 원행도 scheduler loop가 시작한 시도만 있다. harness tick이나 API 호출로 시작한 시도는 없다."를 확인한다
 
   시나리오: 종료된 부모 뒤 이상 접수의 연결 장애를 DB에서 복구한다 — harness tick/sweep 없이 scheduler loop가 스스로 찾는다
     먼저 사례 파일 "verification/cases/T26/case.json"의 "orphan-intake-autonomous-loop"를 준비한다
     만일 "시스템" 역할이 "setup" 행동을 수행한다
     만일 "시스템" 역할이 "start-app-api" 행동을 수행한다
-    만일 "시스템" 역할이 "start-app-scheduler" 행동을 수행한다
     만일 "시스템" 역할이 "start-app-worker-a" 행동을 수행한다
     만일 "시스템" 역할이 "start-app-worker-b" 행동을 수행한다
     만일 "시스템" 역할이 "link-fault" 행동을 수행한다
@@ -1241,11 +1240,13 @@
     만일 "시스템" 역할이 "before-db" 행동을 수행한다
     만일 "시스템" 역할이 "link-fault-clear" 행동을 수행한다
     만일 "시스템" 역할이 "stop-again-api" 행동을 수행한다
-    만일 "시스템" 역할이 "stop-again-scheduler" 행동을 수행한다
     만일 "시스템" 역할이 "stop-again-worker-a" 행동을 수행한다
     만일 "시스템" 역할이 "stop-again-worker-b" 행동을 수행한다
     만일 "시스템" 역할이 "advance" 행동을 수행한다
-    만일 "시스템" 역할이 "restart-while-observing" 행동을 수행한다
+    만일 "시스템" 역할이 "start-again-api" 행동을 수행한다
+    만일 "시스템" 역할이 "start-again-worker-a" 행동을 수행한다
+    만일 "시스템" 역할이 "start-again-worker-b" 행동을 수행한다
+    만일 "시스템" 역할이 "start-loop-while-observing" 행동을 수행한다
     만일 "시스템" 역할이 "terminal" 행동을 수행한다
     만일 "operations" 역할이 "api" 행동을 수행한다
     만일 "시스템" 역할이 "db" 행동을 수행한다
@@ -1269,5 +1270,6 @@
     그러면 "intake-link-confirmed" assertion으로 "해당 scope의 각 실제 원 행 값과 고정 기대값을 대조한다."를 확인한다
     그러면 "canonical-intake-linked-duty" assertion으로 "재시도에서 같은 접수와 단 하나 의무를 연결한다."를 확인한다
     그러면 "autonomous-trigger-loop" assertion으로 "관찰 창의 첫 제출(operationEvidence의 taskId) 행을 scheduler가 직접 기록한 제출 원행에서 읽으면 제출 주체는 scheduler loop다. 요청 parameter의 되풀이가 아니라 scheduler 기록이며 harness tick이 만든 제출이면 실패한다."를 확인한다
-    그러면 "autonomous-within-30s" assertion으로 "scheduler process 시작 command가 시작된 뒤 30초(개발/CI 관찰 제한, plan §10) 안에 자율 제출이 관찰된다. 제출은 시작 command보다 앞설 수 없다."를 확인한다
+    그러면 "autonomous-within-30s" assertion으로 "harness가 관찰 group을 시작하기 직전에 잡은 관찰 경계부터 30초(개발/CI 관찰 제한, plan §10) 안에 자율 제출이 관찰된다. validator의 관찰 창과 같은 기준이다."를 확인한다
+    그러면 "autonomous-after-loop-start" assertion으로 "제출은 멈춰 있던 loop process의 시작 command보다 앞설 수 없고 그 시작부터도 30초 안이다. 시작 전 제출은 다른 주체의 것이다."를 확인한다
     그러면 "autonomous-attempt-source" assertion으로 "독립 DB attempt 원행도 scheduler loop가 시작한 시도만 있다. harness tick이나 API 호출로 시작한 시도는 없다."를 확인한다

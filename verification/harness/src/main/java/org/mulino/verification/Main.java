@@ -131,6 +131,7 @@ public final class Main {
             problems.addAll(validator.hostOperationProblems(c));
             problems.addAll(validator.auditFieldProblems(c));
             problems.addAll(validator.runtimeProfileProblems(c));
+            problems.addAll(validator.snapshotRefProblems(c));
         }
         for(String id:expected) if(!cases.containsKey(id)) problems.add("Missing required case "+id);
         for(int i=1;i<=26;i++) if(!covered.contains(String.format("D%02d",i))) problems.add("Missing requirement assertion "+String.format("D%02d",i));

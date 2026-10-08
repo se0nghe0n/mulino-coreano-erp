@@ -45,7 +45,10 @@ SUSPENDED·대조 의무를 기록할 수 있으므로 모든 DB 행의 불변�
 검사한다. split 후 active8+12=20이고 retired 부모20을 더하지 않는다.
 
 각 `observe`는 명시된 organization·case/subcase·추가 대상 범위와 실제
-API snapshot token 또는 자율 task terminal snapshot token을 사용한다. `sources`의 모든 원 행은 read-only
+API snapshot token 또는 자율 task terminal snapshot token을 사용한다. terminal
+snapshot을 쓰는 `sweep-db`는 observer에 `RUNTIME_TASK_SNAPSHOT`과 task
+identity를 보내고 observer가 보고한 host snapshot artifact의 id·hash를
+대조한다(harness 가이드 snapshot 절, step2r round 5). `sources`의 모든 원 행은 read-only
 query/parameters/mapping version·source artifact·완전성·snapshot으로
 연결한다. adapter가 API projection을 복사하거나 빈 결과를 만들어서는
 안 된다. `movements`, `dutyTransitions`, `externalDeliveries` 등은 새 S0
@@ -137,7 +140,8 @@ NOT_IMPLEMENTED 실패4·undefined0·scenario skip0·exit1을 관찰했다.
   `clockInstant` 없음, 관찰창30초로 다음 자연 tick의 제출만 관찰한다.
   scheduler가 직접 기록한 제출 원행(`rawRows.schedulerSubmissions`)에서
   관찰 창 첫 제출의 `submittedBy=SCHEDULER_LOOP`(`autonomous-trigger-loop`),
-  scheduler 시작 command 뒤30초 안의 제출(`timeAtMostSeconds`), 독립 DB
+  scheduler 시작 command 뒤30초 안의 제출(`timeAtMostSeconds`; round 5부터
+  기준은 group 직전 관찰 경계이고 시작 command는 하한이다), 독립 DB
   attempt의 triggeredBy를 함께 본다. 요청 parameter `triggeredBy`를
   `operationEvidence`에 되돌린 값은 증거가 아니며 validator가 거부한다
   (step2r round 4).
@@ -154,20 +158,31 @@ case에서 고정한다.
 | `controlledTicks=true`, `pausedUntilTickControl=true` | harness tick 계열 fixture. scheduler·sweeper loop는 스스로 due 업무를 제출하지 않고, harness의 `tickScheduler`/`sweepDue` 요청이 그 tick 하나를 일으킨다. 제출은 그 요청 command 구간 안에 있다 |
 | `controlledTicks=false`, `pausedUntilTickControl=false` | `*-autonomous-loop` 전용 fixture(`fixtures/<subcase>.json`). loop가 harness 신호 없이1초마다 스스로 돈다 |
 
-자율 loop subcase는 loop가 가상 clock 전진에 반응할 수 있는 process를
-모두 먼저 멈춘다(lot-expiry는 due-sweeper와 scheduler). clock을 전진한
-뒤 그 process들의 start와 수동 watcher(`OBSERVE_NEXT_NATURAL_TICK`)를
-한 `parallel` action(`restart-while-observing`)으로 함께 시작한다. watcher
-branch가 먼저 제출되고 loop는 process가 뜬 뒤에만 제출할 수 있으므로,
-HostObservationValidator가 요구하는 "submittedAt은 watcher command 구간
-안" 조건을 만족한다. orphan-intake는 기존 restart를 중지(clock 전진
-전)와 시작(parallel 안)으로 나눴다. `autonomous-within-30s`의 기준은
-scheduler(lot-expiry는 due-sweeper) 시작 command의 `startedAt`이다.
-제출은 이 시각보다 앞설 수 없고30초 안이어야 한다.
+자율 loop subcase는 scheduler·due-sweeper(loop process)를 장애·seed 단계
+동안 한 번도 띄우지 않는다(step2r round 5). round 4까지는 scheduler가
+application과 함께 떠서 link fault·미연결 intake 기록·before-db를 지나
+clock 전진 직전에야 멈췄다. 1초 loop는 그 사이 UNLINKED intake를 다시 찾아
+연결할 수 있으므로 before-db의 UNLINKED나 watcher의 첫 제출이 제품의 처리
+지연에 따라 갈렸다. 지금은 api·worker만 먼저 띄우고, clock을 전진한 뒤
+api·worker를 group 밖에서 다시 시작한다. 그 다음 한 `parallel` action
+(`start-loop-while-observing`)의 branch 0에 수동 watcher
+(`OBSERVE_NEXT_NATURAL_TICK`), 나머지 branch마다 loop process start 하나를
+둔다(lot-expiry는 scheduler와 due-sweeper 두 branch).
 
-남은 한계: parallel은 barrier가 아니다. watcher host command가 process
-기동보다 늦게 시작되는 비정상 지연이 있으면 첫 제출을 놓쳐 NO_TASK가
-되고 subcase는 FAIL·NOT_RUN 쪽으로 닫힌다(잘못된 PASS는 없다).
+관찰 창은 `CaseRunner`가 group 제출 직전에 잡은 관찰 경계
+(`start-loop-while-observing`의 `/data/observationBoundaryAt`)에서 시작한다.
+`autonomous-within-30s`도 같은 경계에서 30초를 잰다. 제출이 loop process
+start command의 `startedAt`보다 앞서지 않고 그로부터도 30초 안인지는
+`autonomous-after-loop-start`가 본다(lot-expiry는 due-sweeper, 나머지는
+scheduler). 관찰 창 안에서 기동하는 것은 loop process뿐이다.
+
+남은 한계: parallel은 barrier가 아니다. 다만 창의 시작이 watcher thread의
+기동 시각이 아니라 group 직전의 경계이고 watcher extractor는 scheduler의
+지속 제출 기록을 읽으므로, watcher가 늦게 떠도 경계 뒤의 첫 제출은 남는다.
+watcher가 경계+30초 뒤까지 늦는 비정상 지연이면 NO_TASK·창 밖 행이 되고
+subcase는 FAIL·NOT_RUN 쪽으로 닫힌다(잘못된 PASS는 없다). 관찰 경계는
+harness host의 시계이고 submittedAt은 scheduler host의 시계다. LOCAL
+profile에서 같은 host를 전제한다.
 `pausedUntilTickControl`·`controlledTicks`의 정의, 수동 watcher의
 scheduler 원행 계약과 자율 loop 패턴은 이제 `host-observation-guide.md`
 ("자연 tick 수동 관찰", "runtimeProfile과 자율 loop 패턴"), fixture schema,

@@ -192,7 +192,8 @@ def mixed_batch_mcp(sub):
                    'MCP에는 changeset이 없다. 허용된 RECORD와 금지된 출고를 한 JSON-RPC batch 배열로 보내면 envelope 자체가 '
                    '유효하지 않은 요청이라 HTTP 400이다(contracts/mcp/s0-protocol.md: batch와 malformed 입력은 거부한다).', o),
          assertion('mcp-batch-invalid-request', 'equals', {'actionId': 'mcp-batch', 'pointer': '/response/body/error/code'}, -32600,
-                   'batch 배열은 JSON-RPC Invalid Request(-32600)로 한 번에 거부한다. 요소별 tool result로 나눠 일부를 실행하지 않는다.', o),
+                   'batch 배열은 JSON-RPC Invalid Request(-32600)로 한 번에 거부한다. 요소별 tool result로 나눠 일부를 실행하지 않는다. '
+                   'Mcp-Name header도 없지만 envelope 검사가 mirrored header 검사보다 먼저이므로 -32020이 아니다(contracts/mcp/s0-protocol.md 오류 우선순위).', o),
          assertion('mcp-batch-no-tool-result', 'absent', {'actionId': 'mcp-batch', 'pointer': '/response/body/result'}, None,
                    '거부된 batch 응답에는 tool result가 없다. 허용 요소만 실행한 결과를 돌려주지 않는다.', o),
          assertion('mcp-batch-allowed-record-not-committed', 'count',

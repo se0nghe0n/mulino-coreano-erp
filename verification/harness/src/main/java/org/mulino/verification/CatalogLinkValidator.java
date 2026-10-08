@@ -8,6 +8,8 @@ import java.util.*;
 /** Structural linkage only; supporting assertions and final semantic review remain necessary. */
 final class CatalogLinkValidator {
     private static final Set<String> EXACT_QUANTITY_OPS=Set.of("decimalEquals","sumEquals","decimalDelta");
+    /** Observer-derived data (ObserverDerivations); its derivation is chosen by the observer, not pinned by the case. */
+    static final String OBSERVER_DERIVED="/data/data/";
     private CatalogLinkValidator() {}
 
     static void validate(ContractValidator validator,JsonNode catalog,Map<String,JsonNode> cases,List<String> problems) throws IOException {
@@ -135,6 +137,10 @@ final class CatalogLinkValidator {
         JsonNode expectedUnit=observation.path("expected").path("unit");
         if(!expectedUnit.isTextual() || expectedUnit.asText().isBlank() || !expectedUnit.equals(assertion.path("unit"))) return false;
         if(!observedSource(assertion.path("source")) || !observedSource(assertion.path("unitSource"))) return false;
+        // A fixed-quantity primary reads authoritative rows or the server response, never an observer-derived /data/data
+        // value: the observer chooses the derivation's filter and aggregate, so arithmetic consistency would not prove the
+        // business filter (step2r round 5). Derived values may still support the observation.
+        for(String field:List.of("source","baseline","unitSource","baselineUnitSource")) if(assertion.path(field).path("pointer").asText().startsWith(OBSERVER_DERIVED)) return false;
         return !op.equals("decimalDelta") || (observedSource(assertion.path("baseline")) && observedSource(assertion.path("baselineUnitSource"))
             && !assertion.path("source").equals(assertion.path("baseline")));
     }

@@ -207,7 +207,8 @@ selftest의 `sentinel.txt`에는 가상 marker 두 개가 있다. 발견0·틀�
 tickScheduler/sweepDue의 `operationEvidence.submissionStatus`는 실제 독립
 rows에 기록된 `SUBMITTED` 또는 `NO_TASK`다. SUBMITTED에는 실제 `taskId`,
 `invocationHandle`, `submittedAt`을 모두 둔다. submittedAt은 해당 host
-command의 시작·종료 사이여야 한다. NO_TASK에는 세 field를 넣지 않는다.
+command의 시작·종료 사이여야 한다. 자율 loop group의 수동 watcher는 시작
+대신 관찰 경계(아래 "자연 tick 수동 관찰")부터 잰다. NO_TASK에는 세 field를 넣지 않는다.
 미관찰 task를 NO_TASK로 치환하지 않고 원행·scope·실제 command evidence를
 같이 검사한다. 제출 ACK에는 runtimeTask terminal을 넣지 않는다.
 
@@ -233,6 +234,14 @@ snapshot은 terminal completion 이후, await command completion까지 관찰된
 아니다. 실제 scheduler claim·업무 효과·책임 종료는 독립 DB assertion으로
 추가 검증한다. task terminal FAILED는 실제 종료 관찰이며 업무 성공이
 아니다. command exit0·제출 ACK·알림 전달만으로 terminal을 선언하지 않는다.
+
+이 terminal snapshot에서 독립 DB를 읽는 `observe`는 snapshotRef를
+`{"$result":{"actionId":"<await action>","pointer":"/data/hostObservation/runtimeTask/snapshot/id"}}`로
+둔다(T26 `*-expiry-no-event`·`lot-expiry-autonomous-loop`의 `sweep-db`). harness는
+이 값을 API projection revision으로 다루지 않는다. observer에는
+`snapshotRef=RUNTIME_TASK_SNAPSHOT`과 task identity만 보내고, observer가 보고한
+`snapshot.runtimeTaskSnapshot`(snapshotId·artifactRef·sha256)을 await 결과와
+artifact bytes로 대조한다. 규칙은 harness 가이드 snapshot 절에 있다.
 
 ## 자연 tick 수동 관찰(OBSERVE_NEXT_NATURAL_TICK)
 
@@ -265,15 +274,22 @@ scheduler가 실제로 한 일은 extractor `rawRows.schedulerSubmissions[]`로
 
 `HostObservationValidator`(`naturalTick`)가 다음을 요구한다.
 
+- 관찰 창의 시작은 관찰 경계다. 자율 loop group의 watcher이면
+  `CaseRunner`가 group의 어떤 branch도 제출하기 직전에 잡은 harness 시각
+  (`parallel` 결과의 `data.observationBoundaryAt`)이고, 그 밖의 watcher는
+  자기 command 시작 시각이다. watcher command는 경계보다 먼저 시작했다고
+  주장할 수 없다. extractor는 scheduler의 지속 제출 기록을 읽으므로 watcher
+  thread가 늦게 떠도 경계 뒤의 제출을 잃지 않는다.
 - `rawRows.schedulerSubmissions`가 배열로 있다. 행마다 위 field가 비어
-  있지 않고 schedulerId가 요청과 같으며, submittedAt이 command 시작부터
+  있지 않고 schedulerId가 요청과 같으며, submittedAt이 관찰 경계부터
   `observationWindowSeconds` 안이다.
 - SUBMITTED면 `operationEvidence`의 tickId 또는 sweepId·taskId·
   invocationHandle·submittedAt이 창 안 가장 이른 행과 같다. NO_TASK면 창
   안에 행이 없다. NO_TASK는 자율 발견 실패를 그대로 드러내는 관찰이며
   case assertion에서 실패한다.
 - host `command`는 watcher의 실제 argv/구간이다. 구간은
-  `observationWindowSeconds`를 넘지 않는다.
+  `observationWindowSeconds`를 넘지 않는다. SUBMITTED의 submittedAt은 관찰
+  경계 이후, watcher command 종료 이전이다.
 - argv에 `tickScheduler`·`sweepDue`·`resumeWork`·`fakeWorker` 호출을
   넣지 않는다. 명백한 trigger를 막는 guard다.
 - extractor는 independent·readOnly다.
@@ -312,17 +328,30 @@ schema가 거부한다. runtimeProfile이 없는 fixture는 harness tick fixture
 - harness tick은 controlledTicks=true·pausedUntilTickControl=true fixture에서만,
   수동 watcher는 둘 다 false인 명시 runtimeProfile에서만 쓴다.
 - 자율 loop 패턴. 첫 수동 watcher는 top-level `parallel` action의 branch 0
-  첫 action이다. 나머지 branch는 process `start`만 한다. 그 process는 이
-  시점에 멈춰 있어야 한다. 즉 clock advance 전에 `stop`하고, 그 뒤 parallel
-  안에서 다시 `start`한다. `restart`는 쓰지 않는다. stop과 start 사이가
-  없어서 watcher보다 먼저 loop가 제출할 수 있기 때문이다.
+  첫 action이다. 나머지 branch는 각각 process `start` 하나만 한다. 한
+  branch에 start를 여럿 두면 순서대로 실행되어 관찰 창을 기동 시간으로
+  써 버린다. `restart`는 쓰지 않는다. stop과 start 사이가 없어서 watcher보다
+  먼저 loop가 제출할 수 있기 때문이다.
+- group이 시작하는 process(loop process)는 group 전까지 한 번도 실행 중이면
+  안 된다. installFixture 뒤 group 앞의 모든 action(fault·seed 명령·조회·
+  관찰·clock 전진)에서 loop process가 멈춰 있어야 한다. 다른 process의
+  start/stop만 예외다. 자율 fixture의 loop는 1초마다 스스로 돌므로, 장애나
+  seed 단계에 떠 있으면 미연결 intake 같은 seed 상태를 before-db나 watcher
+  전에 처리해 버린다(step2r round 5, opus[1]). process는 case가 start하기
+  전에는 실행 중이 아니다. 실행 중이던 process를 start하면 lifecycle 검사가
+  거부한다.
 
-watcher branch를 먼저 두는 이유는 순서다. watcher가 관찰을 시작한 뒤에
-loop가 살아나야 첫 자연 tick이 관찰 창 안에 들어온다. `parallel`은 barrier가
-아니어서 watcher가 비정상적으로 늦으면 첫 제출을 놓칠 수 있다. 그때 결과는
-NO_TASK나 창 밖 행이며 fail-closed다. 거짓 PASS는 나오지 않는다. 30초
-기준은 scheduler·sweeper start command의
-`/data/hostObservation/command/startedAt`에서 잰다(`autonomous-within-30s`).
+api·worker처럼 스스로 제출하지 않는 process는 group 밖에서 순서대로
+시작한다. group 안에서는 loop process 기동과 첫 tick만 관찰 창을 쓴다.
+watcher branch를 먼저 두고, 관찰 창은 group 직전의 관찰 경계에서 시작한다.
+`parallel`은 barrier가 아니지만 창의 시작이 watcher thread의 기동 시각이
+아니라 경계이고 extractor가 지속 제출 기록을 읽으므로, watcher가 늦게 떠도
+경계 뒤의 첫 제출을 놓치지 않는다. 남은 지연은 watcher가 창 끝(경계+30초)
+뒤까지 늦는 경우뿐이며 그때는 NO_TASK·창 밖 행으로 fail-closed다. 30초
+기준은 validator와 같은 관찰 경계(`autonomous-within-30s`의 baseline
+`<group>/data/observationBoundaryAt`)다. 제출이 loop process start command의
+`/data/hostObservation/command/startedAt`보다 앞서지 않는지는
+`autonomous-after-loop-start`가 따로 본다.
 
 ## verifyCoverage 입력 snapshot
 
@@ -355,14 +384,18 @@ T25 verifyCoverage는 `inputSnapshotKind`로 고정한 한 입력만 읽는다.
   |---|---|---|
   | `codeCommit` | 40 또는 64자리 소문자 hex | 묶인 준비 보고 bytes의 `codeCommit`과 같다 |
   | `workingTreeDirty` | boolean | 묶인 준비 보고 bytes의 `workingTreeDirty`와 같다 |
-  | `checkoutCommit` | 40 또는 64자리 소문자 hex | verifier가 실행된 checkout의 HEAD |
-  | `checkoutDirty` | boolean | verifier가 실행된 checkout의 변경 여부 |
+  | `checkoutCommit` | 40 또는 64자리 소문자 hex | verifier가 실행된 checkout의 HEAD. 제품 실행에서는 harness git HEAD와 같다 |
+  | `checkoutDirty` | boolean | verifier가 실행된 checkout의 변경 여부. 제품 실행에서는 harness의 working tree 상태와 같다 |
 
-  validator는 형식과 준비 보고와의 일치만 강제한다. 이 보고가 현재 clean
-  checkout의 것인지(`workingTreeDirty=false`, `checkoutDirty=false`,
-  `codeCommit`=`checkoutCommit`)는 T25 PREPARATION subcase의 assertion이
-  판정한다. 그래서 낡거나 dirty인 준비 보고는 형식 오류가 아니라 case
-  FAIL로 드러난다.
+  validator는 형식과 준비 보고와의 일치를 강제한다. 제품 실행
+  (`requireActualHost=true`)에서는 `checkoutCommit`·`checkoutDirty`도 harness가
+  같은 저장소에서 직접 읽은 `git rev-parse HEAD`·`git status --porcelain`
+  결과와 같아야 한다(`checkoutMatchesHarness`). verifier가 `codeCommit`을
+  `checkoutCommit`에 복사하고 clean이라고 적는 것으로는 통과하지 못한다.
+  이 보고가 현재 clean checkout의 것인지(`workingTreeDirty=false`,
+  `checkoutDirty=false`, `codeCommit`=`checkoutCommit`)는 T25 PREPARATION
+  subcase의 assertion이 판정한다. 그래서 낡거나 dirty인 준비 보고는 형식
+  오류가 아니라 case FAIL로 드러난다.
 - `rawRows.assertionLinks[]`와 `rawRows.namedObservations[].assertionLinks[]`의
   status는 PASS·FAIL·NOT_RUN·CURRENT_EXECUTION이다. CURRENT_EXECUTION은
   REQUIRED_PATH_RUNTIME_EVIDENCE에서 currentExecution case의 link에만, 그리고
@@ -433,8 +466,32 @@ probe `outcome`은 `contracts/domain-vocabulary.json`의 명령 outcome과
   적으면 실패한다.
 - `writeCapable=true`인 항목은 모두 probe 대상이다. probe는 요청한
   probeClass·열거된 항목만 쓰고 transcript가 StepResult artifact로 연결된다.
-- `probeCoverage`는 요청 probeClass와 정확히 같고 `probedTargets`는 probe
-  행의 서로 다른 target 수, `complete`는 `applicableTargets==probedTargets`다.
+- 적용 정책(아래 표)에 따라 항목의 `kind`가 정하는 probe class 중 요청한
+  class마다 그 항목의 probe 행이 있어야 한다. extractor의 `writeCapable`과
+  무관하다. `@readonly` entity set도 쓰기 거부를 보여야 하기 때문이다.
+  정책에 없는 kind, 그 kind가 나올 수 없는 surface의 항목은 거부한다.
+- `probeCoverage`는 요청 probeClass와 정확히 같다. `applicableTargets`는
+  harness가 정책으로 다시 센 적용 항목 수와 같아야 한다. extractor가 적게
+  적으면(예: 적용 항목이 있는데 0/0 complete=true) 거부한다. `probedTargets`는
+  그 class probe 행의 서로 다른 target 수, `complete`는 적용 항목이 모두
+  probe되었는지다.
+
+| kind | 나올 수 있는 surface | 적용 probe class |
+|---|---|---|
+| `ENTITY_SET` | ODATA_METADATA | DIRECT_CREATE·DIRECT_UPDATE·DIRECT_DELETE·DEEP_INSERT·UPSERT·BATCH_CHANGESET·DRAFT_ACTIVATE·NESTED_NAVIGATION_CREATE/UPDATE/DELETE |
+| `BOUND_ACTION` | ODATA_METADATA | BOUND_ACTION·BATCH_CHANGESET |
+| `UNBOUND_ACTION` | ODATA_METADATA | UNBOUND_ACTION·BATCH_CHANGESET |
+| `FUNCTION` | ODATA_METADATA | 없음(OData function은 정의상 읽기다. writeCapable이면 위 규칙대로 probe한다) |
+| `TOOL` | MCP_SERVER_DISCOVER·MCP_TOOLS_LIST | MCP_TOOL_CALL |
+| `WORKER_HANDLER` | WORKER_HANDLER_REGISTRY | WORKER_HANDLER_SUBMIT |
+| `MANAGEMENT_ENDPOINT` | MANAGEMENT_ENDPOINTS | MANAGEMENT_ENDPOINT_WRITE |
+
+서비스가 제공하지 않는 경로(navigation이 없는 entity의 nested 쓰기, draft가
+아닌 entity의 activation)도 probe하고 `NOT_EXPOSED`로 기록한다. 존재하지 않는
+경로의 응답만으로 거부를 증명하지는 않으며 전후 DB 효과0은 V4 assertion이
+따로 본다. 이 정책은 harness와 같은 신뢰 수준의 extractor가 항목 `kind`를
+정직하게 적는다고 가정한다. 열거 자체의 누락은 surface 원문 artifact의
+`itemCount`·hash 대조와 고정 `batch-<family>` subcase가 보완한다.
 
 목록 밖 쓰기 면 0, probe commit 0, APPLIED 0, UNKNOWN 0, probe class별
 완전성은 V4 case assertion이 판정한다. 이 validator는 열거 결과가 연결·

@@ -1511,8 +1511,16 @@
                           "minLength": 1
                         },
                         "kind": {
-                          "type": "string",
-                          "minLength": 1
+                          "enum": [
+                            "ENTITY_SET",
+                            "BOUND_ACTION",
+                            "UNBOUND_ACTION",
+                            "FUNCTION",
+                            "TOOL",
+                            "WORKER_HANDLER",
+                            "MANAGEMENT_ENDPOINT"
+                          ],
+                          "description": "Item kind; fixes the probe classes that apply to the item (host-observation-guide.md applicability policy) and the surfaces it can come from."
                         },
                         "writeCapable": {
                           "type": "boolean"
@@ -1606,7 +1614,8 @@
                         },
                         "applicableTargets": {
                           "type": "integer",
-                          "minimum": 0
+                          "minimum": 0,
+                          "description": "Number of enumerated items whose kind makes this probe class applicable under the policy; the harness recomputes it."
                         },
                         "probedTargets": {
                           "type": "integer",

@@ -279,7 +279,7 @@ Scenario Outline의 example도 독립 subcase로 선언해 기대 수를 맞춘�
 같은 knownAt 문자열만으로 같은 DB snapshot이라고 주장하지 않는다.
 observe의 요청 `scope`/`asOf`/`knownAt`은 결과의 같은 필드와 정확히
 같아야 한다. API의 logical read revision과 observer의 MVCC snapshot은
-다르다. `snapshotRef`는 둘 중 하나다.
+다르다. `snapshotRef`는 셋 중 하나다.
 
 - `$result`로 받은 API `snapshotRevision`: harness는 이 값을 observer에
   넘기지 않는다. observer 요청에는 `snapshotRef=RESULT_REVISION`과
@@ -291,12 +291,34 @@ observe의 요청 `scope`/`asOf`/`knownAt`은 결과의 같은 필드와 정확�
   `snapshot.revisionQuery`가 필수다. 요청에 값이 없으므로 복사(echo)는
   불일치로 드러난다. 현재 actual observer(`ObserverSnapshot`)는 이
   재계산을 구현하지 않아 `NOT_IMPLEMENTED`(NOT_RUN)다.
+- `$result`로 받은 host runtime snapshot id(`awaitRuntimeTask` control의
+  `/data/hostObservation/runtimeTask/snapshot/id`): projection revision이
+  아니므로 DB 원행에서 재계산할 수 없다. observer 요청에는
+  `snapshotRef=RUNTIME_TASK_SNAPSHOT`과 `snapshotSource`(발급 action의
+  id·pointer, `operation=awaitRuntimeTask`, 해석된 `schedulerId`·`taskId`·
+  `invocationHandle`·`scope`)가 간다. snapshot id 자체는 보내지 않는다.
+  observer는 그 task의 host snapshot artifact를 스스로 찾아 읽고
+  `data.snapshot.readMode=RUNTIME_TASK_SNAPSHOT`과
+  `snapshot.runtimeTaskSnapshot={schedulerId, taskId, invocationHandle,
+  snapshotId, artifactRef, sha256}`을 낸다. harness는 schedulerId를 요청과,
+  taskId·invocationHandle·artifactRef를 await 결과의 `runtimeTask`와,
+  snapshotId를 보관한 발급 값과 비교하고 artifact bytes의 SHA-256을 직접
+  계산해 대조한다. 그 artifact는 이 관찰의 `artifactRefs`에 있어야 하고
+  observer의 `snapshot.capturedAt`은 task `completedAt`보다 이르면 안 된다.
+  `snapshotRevision`은 observer 자신의 값이다. 현재 actual observer는 이
+  mode도 구현하지 않아 `NOT_IMPLEMENTED`(NOT_RUN)다.
 - literal directive `CURRENT_COMMITTED`/`CURRENT_LOCK_WAIT`: 앞선 action이
   끝난 뒤의 새 read다. `readMode`가 directive와 같아야 하고
   `snapshotRevision`은 observer 자신의 값이다. 다른 literal은 schema가
   거부한다.
 
-두 경우 모두 `data.snapshot.id`는 observer 자신의 DB snapshot token
+`./verify prepare`(`ContractValidator.snapshotRefProblems`)는 `$result`
+snapshotRef가 invoke/query/start의 `/response/snapshotRevision`이거나
+`awaitRuntimeTask` control의 `/data/hostObservation/runtimeTask/snapshot/id`인
+경우만 받는다. 다른 pointer는 RESULT_REVISION으로 보내져도 원행에서 재계산할
+수 없어 올바른 제품도 통과하지 못하므로 준비 문제다.
+
+모든 경우 `data.snapshot.id`는 observer 자신의 DB snapshot token
 (예 `pg_current_snapshot()`)이다. 요청 참조나 directive와 같으면 echo로
 거부한다. 같은 subcase에서 `snapshot.capturedAt`은 앞선 관찰보다 이르면
 안 된다. `data.snapshot`/`sourceQuery`는 provenance의 실제 값과 같아야 한다.

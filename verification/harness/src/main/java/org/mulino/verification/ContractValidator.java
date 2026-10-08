@@ -133,7 +133,8 @@ public final class ContractValidator {
      * observe them. A fixture without runtimeProfile is a harness-tick fixture. A subcase that mixes the two cannot attribute a
      * submission, so preparation rejects it. The autonomous-loop
      * pattern is also fixed: the first passive watcher is the first action of the first branch of a parallel action whose
-     * other branches only start processes that are not running at that point (stopped before, never restart).
+     * other branches each start exactly one process that is not running at that point (never restart), and such a loop
+     * process is not running at any fault/seed/observation action between setup and that group (step2r round 5).
      */
     public List<String> runtimeProfileProblems(JsonNode caseFile) throws IOException {
         List<String> problems=new ArrayList<>();
@@ -168,14 +169,57 @@ public final class ContractValidator {
             for(int i=0;i<groupAt;i++) {List<JsonNode> before=new ArrayList<>();collect(Json.array().add(top.get(i)),before);
                 for(JsonNode a:before) if(a.path("kind").asText().equals("control") && Set.of("start","stop","restart").contains(a.path("control").path("operation").asText()))
                     last.put(a.path("control").path("parameters").path("processId").asText(),a.path("control").path("operation").asText());}
-            int starts=0;
-            for(int b=1;b<branches.size();b++) for(JsonNode a:branches.get(b).path("actions")) {
-                if(!isProcess(a,"start")) {problems.add(where+"/"+group.path("id").asText()+": a non-watcher branch may only start processes, found "+a.path("id").asText());continue;}
-                starts++;String id=a.path("control").path("parameters").path("processId").asText();
-                if(Set.of("start","restart").contains(last.getOrDefault(id,"stop"))) problems.add(where+"/"+a.path("id").asText()+": process "+id+" is already running before the watcher starts; stop it before the clock advance");
+            int starts=0;Set<String> loops=new LinkedHashSet<>();
+            for(int b=1;b<branches.size();b++) {
+                if(branches.get(b).path("actions").size()!=1) problems.add(where+"/"+group.path("id").asText()+": each non-watcher branch starts exactly one process; serialized starts in one branch use up the observation window");
+                for(JsonNode a:branches.get(b).path("actions")) {
+                    if(!isProcess(a,"start")) {problems.add(where+"/"+group.path("id").asText()+": a non-watcher branch may only start processes, found "+a.path("id").asText());continue;}
+                    starts++;String id=a.path("control").path("parameters").path("processId").asText();loops.add(id);
+                    if(Set.of("start","restart").contains(last.getOrDefault(id,"stop"))) problems.add(where+"/"+a.path("id").asText()+": process "+id+" is already running before the watcher starts; stop it before the clock advance");
+                }
             }
             if(starts==0 || branches.size()<2) problems.add(where+"/"+group.path("id").asText()+": the autonomous-loop group needs at least one process start branch after the watcher");
+            // A loop process started by the group must not run during the fault/seed/observation phase either: a free-running
+            // loop would consume the seeded state (for example an UNLINKED intake) before before-db or before the watcher.
+            Map<String,Boolean> running=new HashMap<>();Set<String> reported=new HashSet<>();
+            for(int i=0;i<groupAt;i++) {List<JsonNode> before=new ArrayList<>();collect(Json.array().add(top.get(i)),before);
+                for(JsonNode a:before) {
+                    if(a.path("kind").asText().equals("parallel") || a.path("kind").asText().equals("installFixture")) continue;
+                    String operation=a.path("control").path("operation").asText();
+                    if(a.path("kind").asText().equals("control") && a.path("control").path("type").asText().equals("process") && Set.of("start","stop","restart").contains(operation)) {
+                        running.put(a.path("control").path("parameters").path("processId").asText(),!operation.equals("stop"));continue;
+                    }
+                    for(String loop:loops) if(running.getOrDefault(loop,false) && reported.add(loop))
+                        problems.add(where+"/"+a.path("id").asText()+": loop process "+loop+" (started by the watcher group) is running during the fault/seed phase; keep it stopped from setup until the autonomous-loop group");
+                }
+            }
             for(JsonNode a:all) if(isProcess(a,"restart")) problems.add(where+"/"+a.path("id").asText()+": a restart lets the loop submit before the watcher; split it into stop (before) and start (in the group)");
+        }
+        return problems;
+    }
+    /**
+     * A $result-bound observe snapshotRef has exactly two meanings (harness-guide.md snapshot section): an API projection
+     * revision (/response/snapshotRevision of an invoke/query/start; the observer gets RESULT_REVISION and recomputes it) or
+     * the host terminal snapshot id of an awaitRuntimeTask control (/data/hostObservation/runtimeTask/snapshot/id; the
+     * observer gets RUNTIME_TASK_SNAPSHOT and binds its read to that host artifact). Any other pointer would be sent as
+     * RESULT_REVISION and could never be recomputed from rows, so a correct product could not pass it.
+     */
+    public List<String> snapshotRefProblems(JsonNode caseFile) {
+        List<String> problems=new ArrayList<>();
+        for(JsonNode sub:caseFile.path("subcases")) {
+            String where=caseFile.path("caseId").asText()+"/"+sub.path("id").asText();
+            List<JsonNode> all=new ArrayList<>();collect(sub.path("actions"),all);
+            Map<String,JsonNode> byId=new HashMap<>();
+            for(JsonNode a:all) {byId.put(a.path("id").asText(),a);if(a.has("call")) byId.put(a.path("call").path("id").asText(),a);}
+            for(JsonNode a:all) {
+                JsonNode ref=a.path("observation").path("snapshotRef");
+                if(!a.path("kind").asText().equals("observe") || !ref.isObject() || !ref.has("$result")) continue;
+                String pointer=ref.path("$result").path("pointer").asText();JsonNode issuing=byId.get(ref.path("$result").path("actionId").asText());
+                boolean api=issuing!=null && Set.of("invoke","query","start").contains(issuing.path("kind").asText()) && pointer.equals(CaseRunner.API_REVISION_POINTER);
+                boolean runtime=issuing!=null && CaseRunner.isRuntimeTaskAwait(issuing) && pointer.equals(CaseRunner.RUNTIME_SNAPSHOT_POINTER);
+                if(!api && !runtime) problems.add(where+"/"+a.path("id").asText()+": snapshotRef "+ref.path("$result")+" is neither an API "+CaseRunner.API_REVISION_POINTER
+                    +" of an invoke/query/start nor the "+CaseRunner.RUNTIME_SNAPSHOT_POINTER+" of an awaitRuntimeTask control");
+            }
         }
         return problems;
     }

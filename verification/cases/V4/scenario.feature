@@ -3333,7 +3333,7 @@
     그러면 "inventory-effects-rows0" assertion으로 "inventory-effects inventory-effects-rows0"를 확인한다
     그러면 "batch-terminal-operations" assertion으로 "same-auth-path batch-terminal-operations"를 확인한다
     그러면 "mcp-batch-http" assertion으로 "MCP에는 changeset이 없다. 허용된 RECORD와 금지된 출고를 한 JSON-RPC batch 배열로 보내면 envelope 자체가 유효하지 않은 요청이라 HTTP 400이다(contracts/mcp/s0-protocol.md: batch와 malformed 입력은 거부한다)."를 확인한다
-    그러면 "mcp-batch-invalid-request" assertion으로 "batch 배열은 JSON-RPC Invalid Request(-32600)로 한 번에 거부한다. 요소별 tool result로 나눠 일부를 실행하지 않는다."를 확인한다
+    그러면 "mcp-batch-invalid-request" assertion으로 "batch 배열은 JSON-RPC Invalid Request(-32600)로 한 번에 거부한다. 요소별 tool result로 나눠 일부를 실행하지 않는다. Mcp-Name header도 없지만 envelope 검사가 mirrored header 검사보다 먼저이므로 -32020이 아니다(contracts/mcp/s0-protocol.md 오류 우선순위)."를 확인한다
     그러면 "mcp-batch-no-tool-result" assertion으로 "거부된 batch 응답에는 tool result가 없다. 허용 요소만 실행한 결과를 돌려주지 않는다."를 확인한다
     그러면 "mcp-batch-allowed-record-not-committed" assertion으로 "batch 안의 허용된 recordStocktake는 MCP 경로에서도 COMMITTED command를 남기지 않는다(부분 효과0)."를 확인한다
     그러면 "mcp-batch-allowed-claims0" assertion으로 "허용된 RECORD의 실행 claim도 0이다. 거부 전에 일부 요소가 실행 단계에 들어가지 않았다."를 확인한다

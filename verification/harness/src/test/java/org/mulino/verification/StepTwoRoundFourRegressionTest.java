@@ -68,10 +68,12 @@ final class StepTwoRoundFourRegressionTest {
         ObjectNode swapped=sub(t26,"due-wait-autonomous-loop").deepCopy();
         for(JsonNode a:swapped.path("actions")) if(a.path("kind").asText().equals("parallel")) {ArrayNode b=(ArrayNode)a.path("branches");JsonNode first=b.remove(0);b.add(first);}
         assertTrue(v.runtimeProfileProblems(only(t26,swapped)).stream().anyMatch(p->p.contains("branch 0")),v.runtimeProfileProblems(only(t26,swapped)).toString());
-        // The loop process is still running when the watcher starts (its stop before the clock advance removed).
+        // The loop process is already running when the watcher starts (started before the clock advance, never stopped).
         ObjectNode running=sub(t26,"due-wait-autonomous-loop").deepCopy();
         ArrayNode acts=(ArrayNode)running.path("actions");
-        for(int i=acts.size()-1;i>=0;i--) if(acts.get(i).path("control").path("operation").asText().equals("stop") && acts.get(i).path("control").path("parameters").path("processId").asText().equals("scheduler")) acts.remove(i);
+        for(int i=0;i<acts.size();i++) if(acts.get(i).path("kind").asText().equals("parallel")) {
+            ObjectNode early=acts.get(i).path("branches").get(1).path("actions").get(0).deepCopy();early.put("id","start-loop-early");acts.insert(i-1,early);break;
+        }
         assertTrue(v.runtimeProfileProblems(only(t26,running)).stream().anyMatch(p->p.contains("already running")),v.runtimeProfileProblems(only(t26,running)).toString());
         // A watcher outside a parallel group.
         ObjectNode bare=sub(t26,"due-wait-autonomous-loop").deepCopy();ArrayNode list=(ArrayNode)bare.path("actions");

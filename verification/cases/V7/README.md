@@ -49,3 +49,16 @@ V7 claim fence와 timeout 이후 metadata dispatch 경계의 후속 검사·
   감사 원행(actor delegator, retrySafeCommand, REJECTED)과 원
   command new20의 stableRequestOwner(warehouse) 보존을 확인한다.
 - `observation-bindings.json`은 `bind_observations.py V7`로 만든다.
+
+## 고정 수량 primary(step2r round 5)
+
+세 철회 우선 subcase의 `new-effect-quantity0`은 예전에는 observer가 낸
+`/data/data/dispatchedQuantity`의 decimalDelta였다. 그 값의 filter·집계는
+observer가 고르므로(`ObserverDerivations`) 아무 행도 고르지 않는 filter로도
+0을 만들 수 있었다. 지금 primary는 `after`의 `movements` 원행을 case가 고정한
+filter(`kind=DISPATCH`, `commandIdempotencyKey=new20`)로 골라 harness가 직접
+더한 `sumEquals 0 BOX`다. 단위는 같은 관찰의 active segment 원행에서 읽는다.
+보조 assertion `no-new-dispatch-rows`는 전후(restart 분기는
+`prior-committed` 대비) `kind=DISPATCH` 원행 전체가 같은지 본다. 다른 key로
+기록된 새 출고도 잡는다. `CatalogLinkValidator`는 이제 `/data/data/` 값을
+읽는 assertion을 고정 수량 primary로 세지 않는다.

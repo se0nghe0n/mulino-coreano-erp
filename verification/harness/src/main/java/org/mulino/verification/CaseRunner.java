@@ -30,6 +30,8 @@ public final class CaseRunner {
     private record RuntimeIdentity(String schedulerId,String taskId,String invocationHandle) {}
     private record RuntimeSubmission(String actionId,JsonNode scope,JsonNode environment,JsonNode evidenceClass,Instant submittedAt) {}
     private final Map<RuntimeIdentity,RuntimeSubmission> runtimeSubmissions=new ConcurrentHashMap<>();
+    /** Harness instant captured right before an autonomous-loop parallel group starts, keyed by its watcher action id. */
+    private final Map<String,Instant> observationBoundaries=new ConcurrentHashMap<>();
     private final Set<RuntimeIdentity> runtimeTerminals=ConcurrentHashMap.newKeySet();
     private final List<ObjectNode> parallelFailures=new CopyOnWriteArrayList<>();
     private final Object executionGate=new Object();
@@ -111,7 +113,7 @@ public final class CaseRunner {
                     throw new IllegalArgumentException("Control ACK does not match requested control type/operation");
                 if(!result.data().hasNonNull("acknowledgedAt")) throw new IllegalArgumentException("Control ACK time absent");
                 JsonNode requested=resolve(a.path("control"));
-                HostObservationValidator.validate(validator,requested,result,policy==EvidencePolicy.PRODUCT);
+                HostObservationValidator.validate(validator,requested,result,policy==EvidencePolicy.PRODUCT,observationBoundaries.get(id));
                 if(requested.path("type").asText().equals("barrier")) for(String field:List.of("barrierId","participantId","transactionId","point","state"))
                     if(!requested.path("parameters").hasNonNull(field) || !result.data().hasNonNull(field) || !result.data().path(field).equals(requested.path("parameters").path(field)))
                         throw new IllegalArgumentException("Barrier ACK differs from requested "+field);
@@ -126,7 +128,7 @@ public final class CaseRunner {
                 JsonNode requested=resolve(a.path("observation"));
                 for(String field:List.of("asOf","knownAt","scope")) if(!result.data().path(field).equals(requested.path(field)))
                     throw new IllegalArgumentException("Observer "+field+" differs from requested context");
-                observerSnapshot(a.path("observation").path("snapshotRef"),requested.path("snapshotRef"),result.data());
+                observerSnapshot(a.path("observation").path("snapshotRef"),requested.path("snapshotRef"),result);
                 for(JsonNode source:requested.path("sources")) {
                     String name=source.asText();JsonNode rows=result.data().path("rawRows").path(name),evidence=result.data().path("sourceEvidence").path(name);
                     if(!rows.isArray() || !evidence.path("complete").asBoolean(false) || !evidence.path("rowPointer").asText().equals("/rawRows/"+name.replace("~","~0").replace("/","~1")))
@@ -194,24 +196,29 @@ public final class CaseRunner {
     }
     /**
      * The API's logical read revision and the observer's own MVCC snapshot are different things.
-     * A $result-bound snapshotRef is a projection revision the observer must recompute from rows
+     * A $result-bound snapshotRef from an API read is a projection revision the observer must recompute from rows
      * (readMode RESULT_REVISION, revisionQuery recorded). The observer never receives the issued value
-     * (see observationRequest), so equality here is a recomputation check. A literal directive asks for a fresh read
-     * (CURRENT_COMMITTED / CURRENT_LOCK_WAIT) and has no revision to equal. In both modes
+     * (see observationRequest), so equality here is a recomputation check. A $result-bound snapshotRef from an
+     * awaitRuntimeTask terminal is a host runtime snapshot id, not a projection revision: nothing can recompute it from
+     * DB rows, so it has its own read mode (RUNTIME_TASK_SNAPSHOT, see runtimeTaskSnapshot). A literal directive asks for
+     * a fresh read (CURRENT_COMMITTED / CURRENT_LOCK_WAIT) and has no revision to equal. In every mode
      * snapshot.id is the observer's own token and must not echo the requested reference.
      */
-    private void observerSnapshot(JsonNode declared,JsonNode requested,JsonNode data) {
+    private void observerSnapshot(JsonNode declared,JsonNode requested,StepResult result) throws IOException {
+        JsonNode data=result.data();
         JsonNode snapshot=data.path("snapshot");String readMode=snapshot.path("readMode").asText();
         if(declared.isTextual()) {
             if(!SNAPSHOT_DIRECTIVES.contains(declared.asText())) throw new IllegalArgumentException("Literal snapshotRef must be a read-mode directive "+SNAPSHOT_DIRECTIVES);
             if(!readMode.equals(declared.asText())) throw new IllegalArgumentException("Observer snapshot readMode differs from requested directive "+declared.asText());
             if(SNAPSHOT_DIRECTIVES.contains(data.path("snapshotRevision").asText())) throw new IllegalArgumentException("Observer snapshotRevision echoes a read-mode directive");
+        } else if(runtimeTaskReference(declared)!=null) {
+            runtimeTaskSnapshot(runtimeTaskReference(declared),requested,result);
         } else {
-            if(!readMode.equals("RESULT_REVISION")) throw new IllegalArgumentException("Result-bound snapshotRef requires observer readMode RESULT_REVISION");
+            if(!readMode.equals(RESULT_REVISION)) throw new IllegalArgumentException("Result-bound snapshotRef requires observer readMode RESULT_REVISION");
             if(!snapshot.path("revisionQuery").isObject()) throw new IllegalArgumentException("Observer must record the independent projection revision recomputation query");
             if(!data.path("snapshotRevision").equals(requested)) throw new IllegalArgumentException("Observer independently recomputed snapshotRevision differs from requested snapshotRef");
         }
-        if(snapshot.path("id").equals(requested) || SNAPSHOT_DIRECTIVES.contains(snapshot.path("id").asText()))
+        if(snapshot.path("id").equals(requested) || SNAPSHOT_DIRECTIVES.contains(snapshot.path("id").asText()) || READ_MODES.contains(snapshot.path("id").asText()))
             throw new IllegalArgumentException("Observer snapshot.id echoes the requested snapshotRef instead of its own DB snapshot token");
         Instant captured;
         try { captured=java.time.OffsetDateTime.parse(Json.required(snapshot,"capturedAt")).toInstant(); }
@@ -220,6 +227,48 @@ public final class CaseRunner {
             if(lastObserverCapture!=null && captured.isBefore(lastObserverCapture)) throw new IllegalArgumentException("Observer snapshot captured before an earlier observation in this subcase");
             lastObserverCapture=captured;
         }
+    }
+    /**
+     * RUNTIME_TASK_SNAPSHOT: the case reads the DB at the terminal of an autonomous scheduler task
+     * (/data/hostObservation/runtimeTask/snapshot/id of an awaitRuntimeTask control). The observer is told which task
+     * (snapshotSource schedulerId/taskId/invocationHandle), not the snapshot id. It must locate that task's host snapshot
+     * artifact itself and report it in snapshot.runtimeTaskSnapshot: the task identity, the snapshotId read from the
+     * artifact, the artifactRef and the SHA-256 of its bytes. The harness checks the reported snapshotId against the
+     * id it kept from the await result, the artifactRef against that result, the hash against the file bytes, that the
+     * artifact is linked to this observation, and that the observer's DB read was not captured before the task terminal.
+     * snapshotRevision is the observer's own value; there is no projection revision to equal.
+     */
+    private void runtimeTaskSnapshot(JsonNode issuing,JsonNode requested,StepResult result) throws IOException {
+        JsonNode data=result.data(),snapshot=data.path("snapshot"),reported=snapshot.path("runtimeTaskSnapshot");
+        if(!RUNTIME_TASK_SNAPSHOT.equals(snapshot.path("readMode").asText())) throw new IllegalArgumentException("Runtime-task-bound snapshotRef requires observer readMode "+RUNTIME_TASK_SNAPSHOT);
+        if(!reported.isObject()) throw new IllegalArgumentException("Observer must report the host runtime snapshot it bound its read to (snapshot.runtimeTaskSnapshot)");
+        JsonNode parameters=resolve(issuing.path("control").path("parameters"));
+        JsonNode terminal=results.get(Json.required(issuing,"id"));
+        if(terminal==null) throw new IllegalArgumentException("Runtime task snapshot source did not execute");
+        JsonNode task=terminal.path("data").path("hostObservation").path("runtimeTask");
+        if(!reported.path("schedulerId").equals(parameters.path("schedulerId"))) throw new IllegalArgumentException("Observer runtime snapshot belongs to a different scheduler");
+        for(String key:List.of("taskId","invocationHandle")) if(!reported.path(key).equals(task.path(key))) throw new IllegalArgumentException("Observer runtime snapshot "+key+" differs from the awaited task");
+        if(!reported.path("snapshotId").equals(requested)) throw new IllegalArgumentException("Observer runtime snapshotId differs from the host snapshot of the awaited task terminal");
+        String artifact=Json.required(reported,"artifactRef");
+        if(!artifact.equals(task.path("snapshot").path("artifactRef").asText())) throw new IllegalArgumentException("Observer runtime snapshot artifact differs from the awaited task's host snapshot artifact");
+        if(!result.artifactRefs().contains(artifact) || !java.nio.file.Files.isRegularFile(validator.path(artifact))) throw new IllegalArgumentException("Observer runtime snapshot artifact is not linked to this observation");
+        if(!Json.sha256(validator.path(artifact)).equals(reported.path("sha256").asText())) throw new IllegalArgumentException("Observer runtime snapshot sha256 differs from the host snapshot artifact bytes");
+        if(!Json.read(validator.path(artifact)).path("snapshotId").equals(requested)) throw new IllegalArgumentException("Host runtime snapshot artifact names a different snapshotId");
+        Instant captured=java.time.OffsetDateTime.parse(Json.required(snapshot,"capturedAt")).toInstant();
+        if(captured.isBefore(Instant.parse(Json.required(task,"completedAt")))) throw new IllegalArgumentException("Observer DB read was captured before the awaited runtime task terminal");
+        String revision=data.path("snapshotRevision").asText();
+        if(data.path("snapshotRevision").equals(requested) || READ_MODES.contains(revision)) throw new IllegalArgumentException("Observer snapshotRevision echoes the runtime snapshot reference or a read mode");
+    }
+    /** The awaitRuntimeTask control a $result snapshotRef points at with the runtime snapshot pointer, or null. */
+    private JsonNode runtimeTaskReference(JsonNode declared) {
+        if(!declared.isObject() || !declared.has("$result")) return null;
+        JsonNode ref=declared.path("$result");
+        if(!RUNTIME_SNAPSHOT_POINTER.equals(ref.path("pointer").asText())) return null;
+        JsonNode issuing=findAction(subcase.path("actions"),ref.path("actionId").asText());
+        return issuing!=null && isRuntimeTaskAwait(issuing) ? issuing : null;
+    }
+    static boolean isRuntimeTaskAwait(JsonNode action) {
+        return action.path("kind").asText().equals("control") && action.path("control").path("type").asText().equals("process") && action.path("control").path("operation").asText().equals("awaitRuntimeTask");
     }
     @FunctionalInterface private interface PortDispatch { StepResult call() throws IOException; }
     private StepResult dispatch(PortDispatch call) throws IOException {
@@ -252,6 +301,14 @@ public final class CaseRunner {
         List<Future<List<StepResult>>> futures=new ArrayList<>();List<StepResult> children=new ArrayList<>();
         long deadline=System.nanoTime()+TimeUnit.SECONDS.toNanos(action.path("timeoutSeconds").asInt(30));
         Throwable failure=null;boolean interrupted=false;
+        // Autonomous-loop group: branch 0 starts with a passive natural-tick watcher. The observation window is anchored at
+        // this instant, before any branch (watcher or process start) is submitted, so the watcher thread's own start latency
+        // cannot move the window past the loop's first submission (host-observation-guide.md, observation boundary).
+        JsonNode watcher=action.path("branches").path(0).path("actions").path(0);
+        Instant boundary=null;
+        if(watcher.path("kind").asText().equals("control") && HostObservationValidator.passiveWatch(watcher.path("control"))) {
+            boundary=Instant.now();observationBoundaries.put(Json.required(watcher,"id"),boundary);
+        }
         try {
             for(JsonNode branch:action.path("branches")) futures.add(pool.submit(() -> {
                 synchronized(executionGate) {ensureActive();activeBranches.incrementAndGet();}
@@ -313,6 +370,7 @@ public final class CaseRunner {
         List<String> artifacts=children.stream().flatMap(r->r.artifactRefs().stream()).distinct().toList();
         ObjectNode p=Json.object();p.put("adapter","harness-parallel-submission").put("adapterVersion","1.0.0").put("buildVersion","1.0.0").putNull("authenticatedActor").put("source","REAL_ADAPTER_ACKS").put("independent",false).put("scopeComplete",true).putNull("sourceQuery").putNull("snapshot");
         ObjectNode data=Json.object();data.set("childActionIds",Json.MAPPER.valueToTree(children.stream().map(StepResult::actionId).toList()));data.put("submissionAcknowledged",true).put("transactionCompletionClaimed",false);
+        if(boundary!=null) data.put("observationBoundaryAt",boundary.toString());
         return new StepResult(Json.required(action,"id"),StepResult.DriverStatus.EXECUTED,data,null,null,p,artifacts);
     }
     private JsonNode actor(JsonNode action) {
@@ -329,27 +387,46 @@ public final class CaseRunner {
         bundle.set("bases",bases);return bundle;
     }
     private JsonNode resolve(JsonNode node) { return new ReferenceResolver(results,aliases).resolve(node); }
-    /** Read-mode directive sent to the observer in place of a $result-bound snapshotRef. */
+    /** Read-mode directive sent to the observer in place of a $result-bound API snapshotRevision. */
     public static final String RESULT_REVISION="RESULT_REVISION";
+    /** Read-mode directive sent to the observer in place of a $result-bound host runtime task snapshot id. */
+    public static final String RUNTIME_TASK_SNAPSHOT="RUNTIME_TASK_SNAPSHOT";
+    /** The only host pointer a snapshotRef may bind: the terminal snapshot id of an awaitRuntimeTask control. */
+    public static final String RUNTIME_SNAPSHOT_POINTER="/data/hostObservation/runtimeTask/snapshot/id";
+    /** The only API pointer a snapshotRef may bind: the projection revision of an invoke/query/start response. */
+    public static final String API_REVISION_POINTER="/response/snapshotRevision";
+    static final Set<String> READ_MODES=Set.of("CURRENT_COMMITTED","CURRENT_LOCK_WAIT",RESULT_REVISION,RUNTIME_TASK_SNAPSHOT);
     /**
-     * The observation request sent to the observer. A $result-bound snapshotRef is NOT resolved for the observer: it receives
-     * snapshotRef=RESULT_REVISION and snapshotSource, the identity of the request that issued the revision (action, route,
-     * capability, actor and that action's resolved request), and must recompute the projection revision from authoritative rows.
-     * The harness keeps the issued value and compares it afterwards, so copying the requested token is impossible and an
-     * echo is no longer indistinguishable from a recomputation.
+     * The observation request sent to the observer. A $result-bound snapshotRef is NOT resolved for the observer.
+     * For an API projection revision it receives snapshotRef=RESULT_REVISION and snapshotSource, the identity of the
+     * request that issued the revision (action, route, capability, actor and that action's resolved request), and must
+     * recompute the projection revision from authoritative rows. For the terminal snapshot of an awaitRuntimeTask it
+     * receives snapshotRef=RUNTIME_TASK_SNAPSHOT and snapshotSource with the awaited task identity (schedulerId, taskId,
+     * invocationHandle, scope), and must bind its read to that task's host snapshot artifact. The harness keeps the
+     * issued value and compares it afterwards, so copying the requested token is impossible and an echo is no longer
+     * indistinguishable from a recomputation or a binding.
      */
     JsonNode observationRequest(JsonNode declared) {
         JsonNode resolved=resolve(declared),ref=declared.path("snapshotRef");
         if(!ref.isObject() || !ref.has("$result")) return resolved;
-        ObjectNode request=(ObjectNode)resolved.deepCopy();request.put("snapshotRef",RESULT_REVISION);
+        ObjectNode request=(ObjectNode)resolved.deepCopy();
         String actionId=Json.required(ref.path("$result"),"actionId");
         ObjectNode source=Json.object().put("actionId",actionId).put("pointer",Json.required(ref.path("$result"),"pointer"));
         JsonNode issuing=findAction(subcase.path("actions"),actionId);
-        if(issuing!=null) {
-            JsonNode call=issuing.path("kind").asText().equals("start") ? issuing.path("call") : issuing;
-            for(String key:List.of("kind","route","capabilityId","protocolOperation","actorRef")) if(call.has(key)) source.set(key,call.path(key));
-            if(call.has("actorRef")) source.set("actor",actor(call));
-            if(call.has("request")) source.set("request",resolve(call.path("request")));
+        JsonNode runtime=runtimeTaskReference(ref);
+        if(runtime!=null) {
+            request.put("snapshotRef",RUNTIME_TASK_SNAPSHOT);
+            JsonNode parameters=resolve(runtime.path("control").path("parameters"));
+            source.put("kind","control").put("operation","awaitRuntimeTask");
+            for(String key:List.of("schedulerId","taskId","invocationHandle","scope")) if(parameters.has(key)) source.set(key,parameters.path(key));
+        } else {
+            request.put("snapshotRef",RESULT_REVISION);
+            if(issuing!=null) {
+                JsonNode call=issuing.path("kind").asText().equals("start") ? issuing.path("call") : issuing;
+                for(String key:List.of("kind","route","capabilityId","protocolOperation","actorRef")) if(call.has(key)) source.set(key,call.path(key));
+                if(call.has("actorRef")) source.set("actor",actor(call));
+                if(call.has("request")) source.set("request",resolve(call.path("request")));
+            }
         }
         request.set("snapshotSource",source);
         return request;
