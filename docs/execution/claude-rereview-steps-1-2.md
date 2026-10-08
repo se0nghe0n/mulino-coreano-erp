@@ -22,11 +22,15 @@ harness·coverage·model·고위험 case다. Step 3 actual adapter는 제외했�
 
 ## 확정 지적과 수정 소유자
 
-수정은 해당 사용자 Step의 지정 모델로 수행한다. Step 1은 GPT-6.1 Sol
-high, Step 2는 Claude Opus high다. 모든 worker는 `7b540e8f`에서 만든
+수정은 해당 사용자 Step의 지정 모델로 수행한다. Step 1은 Claude Sonnet
+5.5 high(사용자 변경), Step 2는 Claude Opus high다. 모든 worker는 `7b540e8f`에서 만든
 독립 worktree에서 작업하고 coordinator만 통합한다.
 
-### step1 — `step1r/skills` / GPT-6.1 Sol high (T3 delegate)
+### step1 — `step1r/skills` / Claude Sonnet 5.5 high
+
+GPT-6.1 Sol high 위임은 Codex 사용량 한도로 변경 없이 실패했다. 사용자가
+Step 1을 Claude Sonnet 5.5 high로 바꿨다. T3 위임 경로의 rate limit 두
+번 뒤 in-process subagent로 같은 모델을 실행했다.
 
 | ID | 판정 등급 | 원 등급 | reviewer | 지적 | 위치 |
 |---|---|---|---|---|---|
