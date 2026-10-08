@@ -313,7 +313,7 @@ class CoverageSelftest(unittest.TestCase):
                     metric = dict(usage=dict(inputTokens=10, outputTokens=2), cost=dict(amount='0.01', currency='USD', pricingRef='pricing-v1'))
                     call = dict(callId=f'{entry["caseId"]}/{repeat}/{tid}', caseId=entry['caseId'], repeat=repeat,
                                 turnId=tid, provider='test-provider', model='model-v1', artifactRefs=['raw.json'], **copy.deepcopy(metric))
-                    turns.append(dict(turnId=tid, selectedPathId=path, status='PASS', actualModelCalls=1,
+                    turns.append(dict(turnId=tid, selectedPathId=path, status='PASS', actualModelCalls=1, intentMatch=True,
                                       assertionResults=[dict(assertionId=aid, semanticPath=b['semanticPath'], status='PASS') for aid, b in assertions.items()],
                                       modelCalls=[call], **metric))
                 n = len(turns)
@@ -329,6 +329,39 @@ class CoverageSelftest(unittest.TestCase):
         if recapture:
             receipt['_artifactDocuments'] = [{'modelAttempts': copy.deepcopy(runtime['attempts'])}]
         return self.a.model({}, {'model': {'status': 'PASS', '_report': runtime, '_receipt': receipt}})
+
+    def structured_turns(self, runtime, corpus_status):
+        corpus = json.loads((HERE.parents[1] / 'verification/model-corpus/corpus.json').read_text())
+        status = {(c['id'], f'turn-{i}'): t['expectedIntent']['status'] for c in corpus['cases'] for i, t in enumerate(c['turns'], 1)}
+        return [t for a in runtime['attempts'] for t in a['turnResults'] if status[(a['caseId'], t['turnId'])] == corpus_status]
+
+    def test_clear_structured_intent_rate_uses_every_structured_turn_and_95_percent(self):
+        runtime, receipt = self.model_runtime_fixture()
+        model = self.model_check(runtime, receipt)
+        self.assertEqual('PASS', model['status'])
+        self.assertEqual(dict(matched=186, total=186, rate='1.0000', minimumRatio='0.95'), model['clearStructuredIntent'])
+        structured = self.structured_turns(runtime, 'STRUCTURED')
+        self.assertEqual(186, len(structured))  # 62 STRUCTURED turns x3, not only the 20 clear_synonyms cases
+        for turn in structured[:9]:
+            turn['intentMatch'] = False
+        self.a = m.Assembly(self.root, COMMIT)
+        model = self.model_check(runtime, receipt)
+        self.assertEqual('PASS', model['status'], 'a 177/186 structuring rate meets the proposal')
+        structured[9]['intentMatch'] = False
+        self.a = m.Assembly(self.root, COMMIT)
+        model = self.model_check(runtime, receipt)
+        self.assertEqual('FAIL', model['status'], '176/186 is below 0.95')
+
+    def test_ambiguous_turn_mismatch_and_missing_intent_metric(self):
+        runtime, receipt = self.model_runtime_fixture()
+        self.structured_turns(runtime, 'NEEDS_INPUT')[0]['intentMatch'] = False
+        self.assertEqual('FAIL', self.model_check(runtime, receipt)['status'])
+        runtime, receipt = self.model_runtime_fixture()
+        del self.structured_turns(runtime, 'STRUCTURED')[0]['intentMatch']
+        self.a = m.Assembly(self.root, COMMIT)
+        model = self.model_check(runtime, receipt)
+        self.assertEqual('NOT_RUN', model['status'])
+        self.assertIsNone(model['clearStructuredIntent'])
 
     def test_full_common_plus_selected_negative_path_protocol_is_accepted(self):
         for selected in ['SERVER_REJECTION', 'EVIDENCED_PREFLIGHT_STOP']:

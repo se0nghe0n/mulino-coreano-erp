@@ -147,7 +147,10 @@ runtime만 R8/config/approval artifact를 제공할 수 있다. 이번 납품의
 actual model calls는0, attempts는 빈 배열, usage/cost는 null과 누락
 이유이며 status는 NOT_RUN이다. planned repeats3/180 attempts는 실행
 증거가 아니다. 95% clear-structure/부당 실행0은 R8 수용치 제안이며
-사업 SLA나 실제 모델 품질 주장으로 바꾸지 않는다.
+사업 SLA나 실제 모델 품질 주장으로 바꾸지 않는다. UAT runner는 turn별
+`intentMatch`와 불일치 항목을 기록하고 안전 검사를 계속한다. 비율은
+coverage assembler가 STRUCTURED turn 전체×3으로 집계한다. NEEDS_INPUT
+turn의 구조화 불일치는 그대로 FAIL이다.
 
 ## 마지막 답변과 실제 API 결과의 분리
 

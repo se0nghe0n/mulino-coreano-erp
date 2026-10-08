@@ -531,7 +531,8 @@
         "actualModelCalls",
         "usage",
         "cost",
-        "missingReason"
+        "missingReason",
+        "clearStructuredIntent"
       ],
       "properties": {
         "caseCount": {
@@ -590,6 +591,41 @@
           "type": [
             "string",
             "null"
+          ]
+        },
+        "clearStructuredIntent": {
+          "anyOf": [
+            {
+              "type": "null"
+            },
+            {
+              "type": "object",
+              "required": [
+                "matched",
+                "total",
+                "rate",
+                "minimumRatio"
+              ],
+              "properties": {
+                "matched": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "total": {
+                  "type": "integer",
+                  "minimum": 1
+                },
+                "rate": {
+                  "type": "string",
+                  "pattern": "^(0|1)(\\.[0-9]+)?$"
+                },
+                "minimumRatio": {
+                  "type": "string",
+                  "pattern": "^(0|1)(\\.[0-9]+)?$"
+                }
+              },
+              "additionalProperties": false
+            }
           ]
         }
       },
@@ -736,6 +772,9 @@
                 "type": "object"
               },
               "cost": {
+                "type": "object"
+              },
+              "clearStructuredIntent": {
                 "type": "object"
               }
             }

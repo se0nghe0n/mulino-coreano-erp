@@ -3,6 +3,13 @@ from decimal import Decimal, InvalidOperation, localcontext
 import re
 
 
+def decimal_ratio(value):
+    """A proposed acceptance ratio from the corpus, e.g. '0.95'; anything else is a format failure."""
+    if not isinstance(value, str) or not re.fullmatch(r'0(?:\.\d+)?|1(?:\.0+)?', value):
+        raise ValueError('Acceptance ratio must be a decimal string between 0 and 1')
+    return Decimal(value)
+
+
 def metrics(record):
     """Missing observations stay incomplete; observed invalid values are failures."""
     if not isinstance(record, dict):

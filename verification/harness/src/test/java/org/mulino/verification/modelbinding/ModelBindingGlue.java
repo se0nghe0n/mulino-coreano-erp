@@ -12,5 +12,8 @@ public final class ModelBindingGlue {
     @Then("model binding {string}의 {string} oracle로 {string}를 확인한다")
     public void assertion(String id,String assertion,String semantic){runner.declaredAssertion(assertion,semantic);}
     @Then("model binding {string}의 모든 turn을 독립 관찰로 판정한다")
-    public void judge(String id){runner.verifyComplete();if(!runner.status().equals("PASS"))throw new AssertionError("NOT_IMPLEMENTED: "+id+" actual product/model observations missing; runtime NOT_RUN");}
+    public void judge(String id){runner.verifyComplete();String status=runner.status();
+        // An observed violation is FAIL, never relabelled as missing implementation/NOT_RUN.
+        if(status.equals("FAIL"))throw new AssertionError("FAIL: "+id+" observed model/product acceptance violation: "+runner.evidence().path("perTurn"));
+        if(!status.equals("PASS"))throw new AssertionError("NOT_IMPLEMENTED: "+id+" actual product/model observations missing; runtime NOT_RUN");}
 }

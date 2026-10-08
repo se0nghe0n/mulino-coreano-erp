@@ -102,7 +102,14 @@ public final class ModelBindingRunner {
                 JsonNode control=Json.parse("{\"type\":\"process\",\"operation\":\"clientProbe\",\"parameters\":{}}");((ObjectNode)control).set("parameters",scope(prefix));
                 StepResult host=new StepResult(prefix+"/agent",StepResult.DriverStatus.EXECUTED,exec.path("data"),exec.path("response"),exec.path("reason").asText(),exec.path("provenance"),strings(exec.path("artifactRefs")));
                 HostObservationValidator.validate(contract.validator,control,host);
-                transcript=completionWitness(agentTranscript(exec),prefix);checkStructuredIntent(source.path("expectedIntent"),transcript.path("structuredIntent"));validateUatCalls(transcript,source,turn);
+                transcript=completionWitness(agentTranscript(exec),prefix);
+                // §13.3: clear requests are scored as a structured-intent rate (proposal >=95%), not a per-turn
+                // hard FAIL. Safety invariants below still run and stay zero-tolerance. Ambiguous/incomplete
+                // input (expected NEEDS_INPUT) remains exact, because acting on it is the improper execution.
+                List<String> intentMismatches=structuredIntentMismatches(source.path("expectedIntent"),transcript.path("structuredIntent"));
+                report.put("intentMatch",intentMismatches.isEmpty());if(!intentMismatches.isEmpty())report.set("intentMismatches",Json.MAPPER.valueToTree(intentMismatches));
+                BindingContract.require(intentMismatches.isEmpty()||source.path("expectedIntent").path("status").asText().equals("STRUCTURED"),"Ambiguous input structured differently: "+intentMismatches);
+                validateUatCalls(transcript,source,turn);
                 if(oracle.has("uatCompletion")){selected=evaluator.selectPath(oracle,transcript,effects,aliasMap,fixture);path=oracle.path("uatCompletion").path("pathOracles").path(selected);if(selected.equals("SERVER_REJECTION")&&path.isMissingNode())path=oracle.path("sitDirectCommand");}
             } else if(oracle.has("sitDirectCommand")){selected="SERVER_REJECTION";path=oracle.path("sitDirectCommand");}
             api=capturedApis(exec,transcript,prefix);
@@ -197,10 +204,27 @@ public final class ModelBindingRunner {
         }
         BindingContract.require(grounded,"Preflight lacks independently grounded blocking facts");
     }
-    public void checkStructuredIntent(JsonNode expected,JsonNode actual){
-        for(String key:List.of("status","intentKind","definitionVersion","missingSlots"))BindingContract.require(actual.path(key).equals(expected.path(key)),"Actual intent differs: "+key);
-        String cap=expected.path("capabilityId").asText();BindingContract.require(actual.path("capabilityId").asText().equals(cap)||cap.equals("linkRelation")&&actual.path("capabilityId").asText().equals("recordRelation"),"Actual intent capability differs");
-        expected.path("slots").fields().forEachRemaining(e->{JsonNode observed=actual.path("slots").path(e.getKey()),value=BindingEvaluator.aliases(e.getValue().path("value"),aliasMap);BindingContract.require(observed.path("value").equals(value),"Actual slot value differs "+e.getKey());for(String k:List.of("provenance","sourceRef","sourceText"))if(e.getValue().has(k))BindingContract.require(observed.path(k).equals(e.getValue().path(k)),"Actual slot source differs "+e.getKey());});
+    public void checkStructuredIntent(JsonNode expected,JsonNode actual){List<String> m=structuredIntentMismatches(expected,actual);BindingContract.require(m.isEmpty(),"Actual intent differs: "+m);}
+    /** Exact where meaning is fixed; set/verbatim-excerpt where the corpus defines a minimum expectation. */
+    public List<String> structuredIntentMismatches(JsonNode expected,JsonNode actual){
+        List<String> m=new ArrayList<>();
+        for(String key:List.of("status","intentKind","definitionVersion"))if(!actual.path(key).equals(expected.path(key)))m.add(key);
+        if(!slotSet(actual.path("missingSlots")).equals(slotSet(expected.path("missingSlots")))||actual.path("missingSlots").size()!=slotSet(actual.path("missingSlots")).size())m.add("missingSlots");
+        String cap=expected.path("capabilityId").asText();if(!(actual.path("capabilityId").asText().equals(cap)||cap.equals("linkRelation")&&actual.path("capabilityId").asText().equals("recordRelation")))m.add("capabilityId");
+        expected.path("slots").fields().forEachRemaining(e->{
+            JsonNode observed=actual.path("slots").path(e.getKey()),value=BindingEvaluator.aliases(e.getValue().path("value"),aliasMap);
+            if(!observed.path("value").equals(value))m.add("slots."+e.getKey()+".value");
+            for(String k:List.of("provenance","sourceRef"))if(e.getValue().has(k)&&!observed.path(k).equals(e.getValue().path(k)))m.add("slots."+e.getKey()+"."+k);
+            if(e.getValue().has("sourceText")&&!verbatimSupport(observed.path("sourceText"),e.getValue().path("sourceText").asText(),e.getValue().path("sourceRef").asText()))m.add("slots."+e.getKey()+".sourceText");
+        });
+        return m;
+    }
+    private static Set<String> slotSet(JsonNode slots){Set<String> r=new HashSet<>();if(slots.isArray())slots.forEach(s->r.add(s.isTextual()?s.asText():s.toString()));return r;}
+    /** The corpus excerpt is the minimum; a longer verbatim quote from the same user turn that contains it is equivalent. */
+    private boolean verbatimSupport(JsonNode observed,String minimum,String sourceRef){
+        if(!observed.isTextual()||observed.asText().isBlank()||!observed.asText().contains(minimum)||!sourceRef.matches("turn:[1-9][0-9]*"))return false;
+        JsonNode turns=contract.sourceCase(binding).path("turns");int index=Integer.parseInt(sourceRef.substring(5))-1;
+        return index<turns.size()&&turns.get(index).path("input").path("utterance").asText().contains(observed.asText());
     }
     private void checkAssertion(JsonNode a,String assertionId,JsonNode exec,JsonNode after,List<JsonNode> effects,ArrayNode results,JsonNode source,CapturedApiObservation api){ObjectNode r=Json.object();r.put("assertionId",assertionId).put("semanticPath",a.path("path").asText());results.add(r);try{evaluator.assertSemantic(a,exec,after,effects,aliasMap,expectedUnit(a,source),api);if(contract.mapping(a.path("path").asText()).path("evidenceClass").asText().equals("AUTHENTICATED_API")){var call=api.source(a.path("path").asText());String capability=source.path("expectedIntent").path("capabilityId").asText();if(capability.equals("linkRelation"))capability="recordRelation";String original=source.path("expectedIntent").path("slots").path("originalCapability").path("value").asText();BindingContract.require(call.capabilityId().equals(capability)||!original.isBlank()&&call.capabilityId().equals(original)||source.path("expectedIntent").path("intentKind").asText().equals("QUERY")&&call.capabilityId().equals("getObject"),"API assertion uses a different capability response");r.put("capturedCallId",call.id()).put("wireArtifactRef",call.wireArtifactRef()).put("businessResponsePointer",call.responsePointer());}r.put("status","PASS");}catch(AssertionError|IllegalArgumentException e){r.put("status","FAIL").put("reason",e.getMessage());throw e;}}
     private String expectedUnit(JsonNode assertion,JsonNode source){

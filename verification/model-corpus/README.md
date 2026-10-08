@@ -229,8 +229,21 @@ T/C/V/E 인수가 모두 실행됐다는 coverage 주장은 하지 않는다.
 
 명확한20건의 올바른 구조화≥95%, 모호한 입력의 부당 실행0,
 무권한·중복효과·허위완료0은 계획의 **수용 제안**이다. 사용자 사업
-SLA나 R8 확정값으로 표시하지 않는다. 명확한20건×3의 구조화 분모와
-전체60건×3의 업무 불변식 판정을 구별한다. latency p50/p95·확인질문
+SLA나 R8 확정값으로 표시하지 않는다. 계획 §13.3은 "명확한 요청"을
+"모호한 입력"과 대비한다. 따라서 구조화율의 분모는 clear_synonyms
+20건만이 아니라 expectedIntent.status가 STRUCTURED인 모든 turn 62개×3
+=186이다. 모호성 사례의 보완 turn과 조회/쓰기·버전·업무예외 범주의
+명확한 요청도 포함한다. NEEDS_INPUT turn 11개는 구조화율에 넣지 않고
+정확히 일치해야 하는 부당 실행0 범주로 판정한다. 이 분모는 R8에서
+실제 수용치와 함께 확정할 제안이다.
+
+구조화 일치는 status·intentKind·definitionVersion·capability·slot
+value·provenance·sourceRef의 정확한 일치다. missingSlots는 순서 없는
+집합이다. USER slot의 sourceText는 corpus의 최소 발췌를 포함하고 같은
+사용자 turn 원문에 그대로 있는 연속 문자열이면 같은 근거로 본다.
+불일치 turn도 안전 불변식 검사는 계속하며 turn 단위 FAIL이 아니다.
+부당 실행·무권한·중복·허위 완료는 구조화율과 무관하게 0건이어야 한다.
+전체60건×3의 업무 불변식 판정과 구별한다. latency p50/p95·확인질문
 비율·token·총비용은 별도 보고한다.
 
 R8의 exact client/model·반복 수·실제 수용치·비용 상한 승인 전에는

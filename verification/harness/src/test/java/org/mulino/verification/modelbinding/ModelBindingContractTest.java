@@ -3,6 +3,7 @@ import org.mulino.verification.*;
 import com.fasterxml.jackson.databind.node.*;
 import org.junit.jupiter.api.Test;
 import java.nio.file.*;
+import java.util.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 final class ModelBindingContractTest {
@@ -28,6 +29,24 @@ final class ModelBindingContractTest {
         assertThrows(IllegalArgumentException.class,()->BindingContract.requireReviewedCorpus(lock,ref,"0".repeat(64)));
         var unpinned=(ObjectNode)lock.deepCopy();unpinned.set("pinnedArtifacts",Json.array());assertThrows(IllegalArgumentException.class,()->BindingContract.requireReviewedCorpus(unpinned,ref,sha));
         var duplicate=(ObjectNode)lock.deepCopy();((ArrayNode)duplicate.path("pinnedArtifacts")).add(lock.path("pinnedArtifacts").get(0));assertThrows(IllegalArgumentException.class,()->BindingContract.requireReviewedCorpus(duplicate,ref,sha));
+    }
+    @Test void intentMetricAcceptsLongerVerbatimQuoteAndSetOrderButNotInventedTextOrValue() throws Exception {
+        var c=contract();var r=new ModelBindingRunner(c,"M01","UAT",new UnimplementedDriver(),new AgentRunner.Actual((a,b,d,e,f)->{throw new AssertionError("No model call");}));
+        var expected=c.sourceCase(c.binding("M01")).path("turns").get(0).path("expectedIntent");
+        assertEquals(List.of(),r.structuredIntentMismatches(expected,expected));
+        var longer=(ObjectNode)expected.deepCopy();((ObjectNode)longer.path("slots").path("action")).put("sourceText","팔 수 있는 양");
+        assertEquals(List.of(),r.structuredIntentMismatches(expected,longer),"longer verbatim excerpt containing the minimum is the same meaning");
+        var invented=(ObjectNode)expected.deepCopy();((ObjectNode)invented.path("slots").path("action")).put("sourceText","팔 수 있는 모든 양");
+        assertEquals(List.of("slots.action.sourceText"),r.structuredIntentMismatches(expected,invented));
+        var unrelated=(ObjectNode)expected.deepCopy();((ObjectNode)unrelated.path("slots").path("action")).put("sourceText","현재 보유량");
+        assertEquals(List.of("slots.action.sourceText"),r.structuredIntentMismatches(expected,unrelated));
+        var wrongValue=(ObjectNode)expected.deepCopy();((ObjectNode)wrongValue.path("slots").path("action")).put("value","DISPATCH");
+        assertEquals(List.of("slots.action.value"),r.structuredIntentMismatches(expected,wrongValue));
+        var m25=c.sourceCase(c.binding("M25")).path("turns").get(0).path("expectedIntent");var r25=new ModelBindingRunner(c,"M25","UAT",new UnimplementedDriver(),new AgentRunner.Actual((a,b,d,e,f)->{throw new AssertionError("No model call");}));
+        var reordered=(ObjectNode)m25.deepCopy();var slots=Json.array();for(int i=m25.path("missingSlots").size()-1;i>=0;i--)slots.add(m25.path("missingSlots").get(i));reordered.set("missingSlots",slots);
+        assertTrue(m25.path("missingSlots").size()>=2);assertEquals(List.of(),r25.structuredIntentMismatches(m25,reordered),"missingSlots is a set");
+        var duplicated=(ObjectNode)m25.deepCopy();((ArrayNode)duplicated.path("missingSlots")).add(m25.path("missingSlots").get(0));assertEquals(List.of("missingSlots"),r25.structuredIntentMismatches(m25,duplicated));
+        assertThrows(IllegalArgumentException.class,()->r.checkStructuredIntent(expected,wrongValue));
     }
     @Test void duplicateOrReorderedMilestoneRejected() throws Exception {var c=contract();var r=new ModelBindingRunner(c,"M01","SIT",new UnimplementedDriver(),new AgentRunner.Scripted());assertThrows(IllegalArgumentException.class,()->r.execute("turn-1/agent"));}
 }

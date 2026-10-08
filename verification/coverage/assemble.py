@@ -627,6 +627,11 @@ class Assembly:
             state, attempts = 'FAIL', []
         wanted = {(f'M{i:02}', n) for i in range(1, 61) for n in range(1, 4)}
         actual = set()
+        # §13.3 proposal: correct structuring of clear requests >=95%. A clear request is every turn the
+        # corpus expects as STRUCTURED (not only the clear_synonyms category); NEEDS_INPUT turns stay exact.
+        expected_status = {(c.get('id'), f'turn-{i}'): t.get('expectedIntent', {}).get('status')
+                           for c in (corpus or {}).get('cases', []) for i, t in enumerate(c.get('turns', []), 1)}
+        intent_matched, intent_total, intent_complete = 0, 0, True
         for attempt in attempts:
             pair = (attempt.get('caseId'), attempt.get('repeat'))
             if type(pair[1]) is not int or not isinstance(pair[0], str) or pair not in wanted or pair in actual:
@@ -658,6 +663,15 @@ class Assembly:
             for turn in turns:
                 if turn.get('status') == 'FAIL' or any(a.get('status') == 'FAIL' for a in turn.get('assertionResults', [])):
                     state = 'FAIL'
+                match, wanted_status = turn.get('intentMatch'), expected_status.get((attempt.get('caseId'), turn.get('turnId')))
+                if type(match) is not bool:
+                    intent_complete = False
+                elif wanted_status == 'STRUCTURED':
+                    intent_total += 1
+                    intent_matched += match
+                elif not match:
+                    self.issue('FAIL', 'Ambiguous/incomplete input was structured differently: ' + str((attempt.get('caseId'), turn.get('turnId'))))
+                    state = 'FAIL'
                 binding = getattr(self, 'model_turn_bindings', {}).get((attempt.get('caseId'), turn.get('turnId')))
                 try:
                     if turn.get('status') != 'PASS' or not binding or not model_validation.selected_assertions(turn, binding):
@@ -676,11 +690,21 @@ class Assembly:
                 state = 'FAIL'
         else:
             complete = False
+        clear_intent = None
+        if complete and intent_complete and intent_total:
+            minimum = model_validation.decimal_ratio((corpus or {}).get('acceptanceProposal', {}).get('clearStructuredMinimumRatio'))
+            rate = model_validation.Decimal(intent_matched) / model_validation.Decimal(intent_total)
+            clear_intent = {'matched': intent_matched, 'total': intent_total, 'rate': str(rate.quantize(model_validation.Decimal('0.0001'))), 'minimumRatio': str(minimum)}
+            if rate < minimum:
+                self.issue('FAIL', f'Clear structured intent rate {intent_matched}/{intent_total} is below the proposed minimum {minimum}')
+                state = 'FAIL'
+        elif complete:
+            complete = False
         if not complete and state != 'FAIL':
             state = 'NOT_RUN'
         if not runtime:
             usage, cost, calls = None, None, None
-        return {'caseCount': case_count, 'turnCount': turn_count, 'plannedRepeats': 3, 'preparationStatus': prepared, 'status': state,
+        return {'caseCount': case_count, 'turnCount': turn_count, 'plannedRepeats': 3, 'preparationStatus': prepared, 'status': state, 'clearStructuredIntent': clear_intent,
                 'actualModelCalls': calls, 'usage': usage, 'cost': cost, 'missingReason': None if state == 'PASS' else 'Actual per-case repeats, per-turn assertions, usage/cost and versioned artifacts incomplete'}
 
     def assemble(self, index=None, check_preparation=False):
