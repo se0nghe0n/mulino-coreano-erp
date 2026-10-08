@@ -22,7 +22,8 @@ Step 1 소유 경로(skills, `docs/execution/step1r/**`) 밖의 수정이 필요
 
 ## 2. Step 1 담당 모델 표기 (coordinator)
 
-- `docs/execution/claude-rereview-steps-1-2.md`(25행 부근 소유자 문구와
-  `### step1` 제목)와 `docs/execution/task-status.md`(27행 부근)는 Step 1을
-  GPT-6.1 Sol high로 적는다. `AGENTS.md`의 표(Step 1 = Claude Sonnet 5.5 high,
-  `41d3c613`)와 다르다. 두 파일은 coordinator 문서라 이 branch에서 고치지 않았다.
+- `docs/execution/claude-rereview-steps-1-2.md`는 `b93b6363`에서 이미 Claude
+  Sonnet 5.5 high로 바로잡혔다.
+- `docs/execution/task-status.md` 28행의 Step 1 행("GPT-6.1 Sol / high")은
+  아직 `AGENTS.md`의 표(Step 1 = Claude Sonnet 5.5 high, `41d3c613`)와 다르다.
+  coordinator 문서라 이 branch에서 고치지 않았다.
