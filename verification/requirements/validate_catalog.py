@@ -28,10 +28,29 @@ def check_schema(value,schema,path='$'):
   if schema.get('uniqueItems'):require(len({json.dumps(x,sort_keys=True) for x in value})==len(value),f'{path}: duplicate items')
   for i,item in enumerate(value):check_schema(item,schema.get('items',{}),f'{path}[{i}]')
 def digest(o):return hashlib.sha256(json.dumps(o,ensure_ascii=False,sort_keys=True,separators=(',',':')).encode()).hexdigest()
+HEX64=re.compile(r'[a-f0-9]{64}')
+def check_lock(lock):
+ """A parsed but empty/null/non-object lock must never disable the drift fence."""
+ require(isinstance(lock,dict),'normative lock must be an object; empty/null/array lock disables nothing')
+ for key in ('schemaVersion','sourceFiles','requiredCaseIds','requirementIds','oracleContracts','reviewUpdates'):
+  require(key in lock,f'normative lock missing {key}')
+ require(isinstance(lock['sourceFiles'],list) and lock['sourceFiles'],'normative lock needs source file hashes')
+ for source in lock['sourceFiles']:
+  require(isinstance(source,dict) and isinstance(source.get('path'),str) and source['path'].strip() and isinstance(source.get('sha256'),str) and HEX64.fullmatch(source['sha256']),'normative lock source entry needs path and sha256')
+ require(isinstance(lock['requiredCaseIds'],list) and set(lock['requiredCaseIds'])==EXPECTED_CASES and len(lock['requiredCaseIds'])==len(EXPECTED_CASES),'normative lock case IDs drift')
+ require(isinstance(lock['requirementIds'],list) and set(lock['requirementIds'])==EXPECTED_REQUIREMENTS and len(lock['requirementIds'])==len(EXPECTED_REQUIREMENTS),'normative lock requirement IDs drift')
+ require(isinstance(lock['oracleContracts'],dict) and lock['oracleContracts'],'normative lock has no oracle contracts')
+ for oid,contract in lock['oracleContracts'].items():
+  require(isinstance(contract,dict) and isinstance(contract.get('caseId'),str) and isinstance(contract.get('observationNames'),list) and contract['observationNames'] and isinstance(contract.get('contractSha256'),str) and HEX64.fullmatch(contract['contractSha256']),f'{oid}: normative lock contract entry incomplete')
+ require(isinstance(lock['reviewUpdates'],list),'normative lock reviewUpdates must be a list')
+def read_lock(root=ROOT):
+ return json.loads((pathlib.Path(root)/'verification/requirements/normative-contract-lock.json').read_text())
 def validate(catalog,lock=None,root=ROOT):
  schema=json.loads((HERE/'mandatory-oracles.schema.json').read_text())
  check_schema(catalog,schema)
- lock=lock or json.loads((HERE/'normative-contract-lock.json').read_text())
+ # Only an absent argument reads the file; a falsy parsed lock is checked, never replaced.
+ if lock is None:lock=read_lock(root)
+ check_lock(lock)
  require(set(catalog['requiredCaseIds'])==EXPECTED_CASES,'required case IDs must be exactly41 independently named cases')
  require(set(catalog['requirementIds'])==EXPECTED_REQUIREMENTS,'requirements must be D01-D26')
  require(catalog['sourceFiles']==lock['sourceFiles'],'source manifest drift')

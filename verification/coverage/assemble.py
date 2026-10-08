@@ -121,8 +121,11 @@ class Assembly:
         catalog = self.read('verification/requirements/mandatory-oracles.json', True)
         if catalog is None:
             return [], {}
+        problems_before = len(self.preparation_problems)
         lock = self.read('verification/requirements/normative-contract-lock.json', True)
-        if lock:
+        # Any lock bytes that parsed (including {}, null, [] or 0) must pass the independent
+        # validator. A falsy lock is a FAIL, never a reason to skip the drift fence.
+        if len(self.preparation_problems) == problems_before:
             try:
                 module_ref = 'verification/requirements/validate_catalog.py'
                 self.descriptor(module_ref)
@@ -130,6 +133,7 @@ class Assembly:
                 spec = importlib.util.spec_from_file_location('coverage_normative_validator', self.file(module_ref))
                 validator = importlib.util.module_from_spec(spec)
                 spec.loader.exec_module(validator)
+                validator.check_lock(lock)
                 validator.validate(catalog, lock, self.root)
             except FileNotFoundError:
                 self.issue('NOT_RUN', 'Independent catalog validator/schema source missing', True)

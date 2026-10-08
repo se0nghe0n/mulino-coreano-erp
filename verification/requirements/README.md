@@ -87,6 +87,11 @@ python3 verification/requirements/validate_catalog.py
 python3 -m unittest discover -s verification/requirements -p 'test_catalog.py' -v
 ```
 
+validator는 lock 자체의 형태부터 확인한다. 파일이 있으나 `{}`, `null`,
+`[]`, `0`처럼 비었거나 object가 아니면 lock 검사를 건너뛰지 않고
+INVALID다. coverage assembler도 parse된 lock은 항상 이 validator에
+넘긴다. 파일이 없으면 NOT_RUN이다.
+
 validator는 schema, 고유 41 case/D26, D/T 연결, source 파일 hash,
 교차 참조, 필수 수량/책임 필드와 별도 `normative-contract-lock.json`의
 고정 oracle·관찰·전체 계약 hash를 검사한다. T17 정상 인도 oracle 제거,
@@ -103,7 +108,10 @@ lock은 catalog 삭제·약화의 drift fence다. source 완전성을 자동 증
 
 Sol xhigh의 catalog P2 검토는 계획에 있던 세 계약의 누락을 확인했다.
 이번 변경은 원문 정책을 확대하지 않고 catalog와 lock을 명시적으로
-갱신한다. 같은 reviewer의 closure 검토와 실제 실행 인수는 남아 있다.
+갱신한다. 같은 Sol xhigh reviewer가 `7f972dd`에서 세 P2의 closure를
+확인했다([공통 검토 기록](../../docs/execution/step-2-common-review.md)).
+lock의 `reviewUpdates[0].closureReview`도 이 결과로 갱신했다. 실제
+실행 인수는 남아 있다.
 
 - §3.2: `T07.typed-relations-and-predicates`에 확정 true/false의 부정,
   `not(UNKNOWN/CONFLICT)=UNVERIFIED`와 conflict flag 보존을 추가했다.

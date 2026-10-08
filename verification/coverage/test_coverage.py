@@ -465,6 +465,38 @@ class CoverageSelftest(unittest.TestCase):
         self.a.model_bindings(corpus, registry, report)
         self.assertTrue(any('154 immutable' in p['reason'] and p['status'] == 'FAIL' for p in self.a.preparation_problems))
 
+    def copy_catalog_inputs(self):
+        repository = HERE.parents[1]
+        catalog = json.loads((repository / 'verification/requirements/mandatory-oracles.json').read_text())
+        refs = ['verification/requirements/mandatory-oracles.json', 'verification/requirements/normative-contract-lock.json',
+                'verification/requirements/validate_catalog.py', 'verification/requirements/mandatory-oracles.schema.json']
+        refs += [d['path'] for d in catalog['sourceFiles']]
+        for ref in refs:
+            target = self.root / ref
+            target.parent.mkdir(parents=True, exist_ok=True)
+            target.write_bytes((repository / ref).read_bytes())
+        return catalog
+
+    def test_empty_null_or_non_object_lock_cannot_disable_contract_lock(self):
+        for lock in [{}, None, [], 0, {'oracleContracts': {}}]:
+            with self.subTest(lock=lock):
+                self.a = m.Assembly(self.root, COMMIT)
+                catalog = self.copy_catalog_inputs()
+                e1 = next(o for o in catalog['oracles'] if o['oracleId'] == 'E1.full-flow-quantities')
+                held = next(o for o in e1['expectedObservations'] if o['type'] == 'quantity' and o['expected']['value'] == '80')
+                held['expected']['value'] = '100'
+                self.write('verification/requirements/mandatory-oracles.json', catalog)
+                (self.root / 'verification/requirements/normative-contract-lock.json').write_text(json.dumps(lock))
+                self.a.catalog()
+                self.assertTrue(any(p['status'] == 'FAIL' and 'normative catalog' in p['reason'] for p in self.a.preparation_problems),
+                                self.a.preparation_problems)
+
+    def test_missing_lock_is_not_run_not_pass(self):
+        self.copy_catalog_inputs()
+        (self.root / 'verification/requirements/normative-contract-lock.json').unlink()
+        self.a.catalog()
+        self.assertTrue(any(p['status'] == 'NOT_RUN' and 'normative-contract-lock' in p['reason'] for p in self.a.preparation_problems))
+
     def test_count_preserving_normative_contract_weakening_is_rejected(self):
         repository = HERE.parents[1]
         catalog = json.loads((repository / 'verification/requirements/mandatory-oracles.json').read_text())
