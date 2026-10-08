@@ -28,7 +28,7 @@ final class S2JdbcObservation {
         Map.entry("grants",new Source("mulino_identity_Grants","ID,revision,actorId,delegatorId,validFrom,validUntil,revokedAt",null)),
         Map.entry("capabilityAssignments",new Source("mulino_identity_CapabilityAssignments","ID,revision,actorId,capabilityId,scopeKind,scopeId,validFrom,validUntil,revokedAt",null)));
     static ObjectNode capture(ActualConfiguration config,JsonNode request) throws Exception {
-        if(request.hasNonNull("snapshotRef"))throw new UnsupportedOperationException("Independent shared-world projection hash reconstruction pending");
+        String readMode=ObserverSnapshot.readMode(request);
         if(request.path("sources").isEmpty())throw new IllegalArgumentException("Raw sources required");
         for(JsonNode source:request.path("sources"))if(!SOURCES.containsKey(source.asText()))throw new UnsupportedOperationException("Raw source "+source.asText()+" not mapped");
         JsonNode scope=request.path("scope");UUID.fromString(Json.required(scope,"organizationId"));
@@ -36,7 +36,7 @@ final class S2JdbcObservation {
         var raw=Json.object();var queries=Json.array();String mvcc;
         try(var c=DriverManager.getConnection(config.jdbcUrl(),config.username(),config.password())) {
             c.setAutoCommit(false);c.setReadOnly(true);c.setTransactionIsolation(Connection.TRANSACTION_REPEATABLE_READ);
-            try(var s=c.createStatement();var rows=s.executeQuery("SELECT pg_current_snapshot()::text")){rows.next();mvcc=rows.getString(1);}
+            mvcc=ObserverSnapshot.token(c);
             for(JsonNode requested:request.path("sources")) {
                 String name=requested.asText();Source source=SOURCES.get(name);List<Object> parameters=new ArrayList<>();parameters.add(scope.path("organizationId").asText());
                 String select=Arrays.stream(source.columns().split(",")).map(column->"r."+column+" AS \""+(column.equals("ID")?"id":column)+"\"").collect(java.util.stream.Collectors.joining(","));
@@ -60,7 +60,7 @@ final class S2JdbcObservation {
             }c.commit();
         }
         var result=Json.object();result.put("snapshotRevision",mvcc).put("asOf",Json.required(request,"asOf")).put("knownAt",Json.required(request,"knownAt")).put("scopeComplete",true);result.set("scope",scope);var sourceEvidence=Json.object();for(JsonNode query:queries){var individual=(ObjectNode)query.deepCopy();String name=Json.required(individual,"source");individual.remove("source");var evidence=Json.object();evidence.put("complete",true).put("rowPointer","/rawRows/"+name);evidence.set("sourceQuery",individual);sourceEvidence.set(name,evidence);}result.set("sourceEvidence",sourceEvidence);result.set("sourceQuery",sourceEvidence.path(request.path("sources").get(0).asText()).path("sourceQuery"));result.set("rawRows",raw);result.set("data",Json.object());
-        var snapshot=Json.object();snapshot.put("id",mvcc).put("isolation","REPEATABLE_READ").put("capturedAt",Instant.now().toString());result.set("snapshot",snapshot);return result;
+        result.set("snapshot",ObserverSnapshot.snapshot(mvcc,readMode,request));return result;
     }
     private S2JdbcObservation() {}
 }
