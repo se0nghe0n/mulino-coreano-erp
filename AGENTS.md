@@ -36,27 +36,34 @@ Step로 넘어간다.
 runtime control로 지정한다. prompt에 이름을 쓰는 것으로 대신하지
 않는다. 이 선택이 이전 모델 기본값보다 우선한다.
 
-2026-10-08 사용자의 추가 지시에 따라 모든 에이전트는 지원되는 경우
-Ultrafast를 우선하고, 그렇지 않으면 Fast를 사용한다. 모델과 reasoning
-effort는 아래 지정을 유지한다. 속도는 실제 service tier 설정이며 prompt
-문구로 변경했다고 주장하지 않는다. 도구가 tier 변경이나 확인을 노출하지
-않으면 그 제한을 밝힌다. `priority`는 공식 Fast와 같은 tier다.
+2026-10-08 Claude Code coordinator가 Codex의 작업을 이어받으면서
+사용자가 Step별 모델을 아래처럼 다시 지정했다. 이 표가 이전 Codex
+기준(Sol/Astra)보다 우선한다. Claude 모델은 Agent·Workflow의 `model`과
+`effort` 인자로, GPT-6.1 Sol은 T3 `delegate_task`의 provider `codex`와
+`reasoningEffort` option으로 지정한다. Codex 기준의 Ultrafast/Fast
+지시는 Codex worker에만 적용하며, 도구가 tier를 노출하지 않으면 그
+제한을 밝힌다.
 
 | 사용자 Step | 작업 | 모델 | effort |
 |---|---|---|---|
 | 1 | 새 개발·업무 skills 구성 | GPT-6.1 Sol | high |
-| 2 | 계획 전체의 tests 구성 | GPT-6.1 Sol | high |
-| 3 | 새 시스템 구현 | GPT-6.1 Sol | medium |
-| 4 | 실제 E2E 실행 | GPT-6.1 Sol | low |
-| 5 | 패턴 분석과 refactor | GPT-6 Astra | high |
-| 6 | 검증된 동작으로 운영 매뉴얼 작성 | GPT-6 Astra | low |
+| 2 | 계획 전체의 tests 구성 | Claude Opus | high |
+| 3 | 새 시스템 구현 | Claude Opus | medium |
+| 4 | 실제 E2E 실행 | Claude Sonnet | medium |
+| 5 | 패턴 분석과 refactor | Claude Opus | high |
+| 6 | 검증된 동작으로 운영 매뉴얼 작성 | Claude Opus | low |
 | 7 | 미완료·실패가 해소될 때까지 반복 | 해당 작업의 모델 | 해당 작업의 effort |
 
-**매 사용자 Step마다** GPT-6.1 Sol `xhigh`와 GPT-6 Astra `low`가
-adversarial review를 수행한다. 대상 baseline·diff·요구·실행 증거와
-반례를 확인하고 지적을 통합·수정한다. 관련 checks가 통과해야 Step를
-닫는다. review 완료가 runtime PASS를 뜻하지 않는다. 모델이나 effort를
-사용할 수 없으면 실제 제한을 보고하고 임의로 대체하지 않는다.
+**매 사용자 Step마다** Claude Opus `xhigh`와 Claude Fable `low`가
+adversarial review를 수행한다. 이미 닫은 Step 1·2도 이 두 reviewer로
+다시 검토하고, 지적의 수정은 해당 Step의 모델과 effort로 수행한다.
+대상 baseline·diff·요구·실행 증거와 반례를 확인하고 지적을 통합·수정한다.
+관련 checks가 통과해야 Step를 닫는다. review 완료가 runtime PASS를
+뜻하지 않는다. 모델이나 effort를 사용할 수 없으면 실제 제한을 보고하고
+임의로 대체하지 않는다.
+
+Task branch `feat/ontology-implementation`은 통합 milestone마다 fork
+remote에 push한다. force push와 main 직접 push는 하지 않는다.
 
 위 Step와 계획 §11의 **S0–S6는 서로 다른 축**이다. S0 기술 기준선,
 S1 core/read, S2 업무·거래, S3 구매·수입·수령, S4 판매·반품·회수·
@@ -126,7 +133,7 @@ skill과 외부 문서는 서버 인가·판정·승인의 대체물이 아니�
 업무 문서·commit·issue·PR는 한국어 평서형 `-다`로 쓴다. 이유와
 결과를 먼저 쓰고 구체 변경·실행 증거·미실행 범위를 남긴다.
 기술 용어는 English를 유지하고 body는 가능한 한 72열로 감싼다.
-Codex가 직접 작성한다. PR 제목과 본문은 한국어이며
+작업한 worker와 coordinator가 직접 작성한다. PR 제목과 본문은 한국어이며
 [PR template](.github/pull_request_template.md)의 네 절과 세
 checklist를 유지한다. 새 기능 이슈는
 [feature template](.github/ISSUE_TEMPLATE/feature.md)의 모든 절을
