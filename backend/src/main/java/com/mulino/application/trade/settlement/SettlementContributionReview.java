@@ -13,6 +13,7 @@ import org.springframework.stereotype.Component;
  * settlement predicate. When the recognized contribution no longer equals the matched one, a SETTLEMENT_DIFFERENCE
  * duty keyed to the correcting canonical (a new root per correction) is opened with the work owner and a next action,
  * so the difference is never ownerless and adjustments have an open duty to target (plan §6 정산, §4.3, §5.3).
+ * A correction that restores the contribution but leaves the match unsatisfied, with no open root of the match, opens one too.
  */
 @Component
 public class SettlementContributionReview implements SettlementContributionPort {
@@ -27,7 +28,11 @@ public class SettlementContributionReview implements SettlementContributionPort 
   var opened=new ArrayList<String>();
   for(var match:r.rows(c,"Matches")){if(match.get("occurrenceId")==null||!chain.contains(match.get("occurrenceId").toString()))continue;
    String invoiceId=match.get("invoiceId").toString();r.fence(c,"settlement/invoice/"+invoiceId);
-   var assessed=state.assess(c,match,r.rows(c,"Adjustments"));if("CURRENT".equals(assessed.get("contributionState")))continue;
+   var assessed=state.assess(c,match,r.rows(c,"Adjustments"));
+   // A current (restored) contribution leaves nothing to own only when the match is SATISFIED; an open contribution-change root
+   // then closes by the restoring canonical (SettlementResponsibilities). Otherwise the remaining difference (for example a confirmed
+   // adjustment of an earlier, now restored, correction) must be owned: by an open root of this match, or by a new root here.
+   if("CURRENT".equals(assessed.get("contributionState"))&&("SATISFIED".equals(assessed.get("result"))||state.matchRoots(c,match).stream().anyMatch(root->state.open(c,root))))continue;
    var invoice=r.require(c,"Invoices",invoiceId);String workId=invoice.get("workId").toString();
    var target=works.require(c,workId,true);if("CLOSED".equals(target.get("status")))target=works.ensureFollowup(c,workId,canonicalId,KIND,NEXT,c.knownAt().plusSeconds(3600));
    var residual=new TreeMap<String,Object>();residual.put("invoiceId",invoiceId);residual.put("matchId",match.get("ID"));residual.put("currency",invoice.get("currency"));residual.put("contributionCanonicalId",canonicalId);residual.put("contributionState",assessed.get("contributionState"));

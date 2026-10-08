@@ -13,7 +13,10 @@ import org.springframework.stereotype.Component;
 public class AssessmentCorrectionImpact implements EvidenceCorrectionImpact {
  private final AssessmentService service;private final AssessmentRepository repository;private final ObjectProvider<ResponsibilityService> duties;private final ObjectMapper json=new ObjectMapper();private final ObjectProvider<com.mulino.application.trade.DeliveryCorrectionPort> deliveryCorrections;private final com.mulino.domain.evidence.EvidenceRepository evidence;private final ObjectProvider<com.mulino.application.trade.SettlementContributionPort> settlements;
  public AssessmentCorrectionImpact(AssessmentService service,AssessmentRepository repository,ObjectProvider<ResponsibilityService> duties,ObjectProvider<com.mulino.application.trade.DeliveryCorrectionPort> deliveryCorrections,com.mulino.domain.evidence.EvidenceRepository evidence,ObjectProvider<com.mulino.application.trade.SettlementContributionPort> settlements){this.settlements=settlements;this.service=service;this.repository=repository;this.duties=duties;this.deliveryCorrections=deliveryCorrections;this.evidence=evidence;}
- public void apply(DomainContext c,Correction correction){
+ public void apply(DomainContext request,Correction correction){
+  // The correcting evidence row was recorded in this transaction after the request knownAt (moving clock); re-derive through a
+  // context that covers exactly that row (plan §4.2 lock-then-reread, §4.3 정정 재평가).
+  var c=request.knownThrough(recordedAt(request,correction.currentId()));
   var ids=affected(c,correction.previousId(),correction.currentId(),correction.affectedWorkIds());
   var occurrences=relatedOccurrences(c,correction.previousId());
   for(String id:ids){
@@ -30,11 +33,28 @@ public class AssessmentCorrectionImpact implements EvidenceCorrectionImpact {
       duty.ensureCorrectionDuty(c,id,occurrence.get("ID").toString(),profile.get("nextAction").toString(),instant(profile.get("nextCheckAt")));
     }
   }
+  // A receipt canonical is never superseded by a new canonical (EvidenceReconciliation only supersedes deliveries), so a corrected
+  // receipt chain reaches settlement here: every invoice match on that receipt now reads UNVERIFIED and settlement opens its own
+  // owned SETTLEMENT_DIFFERENCE in this transaction (plan §6 정산 "정산 차이는 별도 미해결 목표", §4.3, §5.3).
+  for(var occurrence:occurrences)if("PHYSICAL_RECEIPT".equals(occurrence.get("kind"))){
+   var settlement=settlements.stream().toList();if(settlement.size()>1)throw new DomainError("HELD","FOLLOWUP_UNAVAILABLE","Exact settlement contribution provider required");
+   if(settlement.size()==1)settlement.getFirst().contributionChanged(c,occurrence.get("ID").toString());
+  }
  }
- public void evidenceLinked(DomainContext c,String claimId,String canonicalId){
-  for(String id:affected(c,claimId,canonicalId,Set.of()))service.invalidate(c,id);
+ /** recordedAt of the exact correcting evidence row and the claims this correction recorded on it (no knownAt filter). */
+ private Instant recordedAt(DomainContext c,String id){
+  Instant latest=null;
+  for(String table:List.of("Events","Claims","DocumentVersions"))for(var row:evidence.rows(table,c.organizationId()))if((id.equals(row.get("ID"))||"Claims".equals(table)&&id.equals(row.get("eventId")))&&row.get("recordedAt")!=null){var at=instant(row.get("recordedAt"));if(latest==null||at.isAfter(latest))latest=at;}
+  return latest;
+ }
+ public void evidenceLinked(DomainContext request,String claimId,String canonicalId){
   // This transaction appended the canonical after the request knownAt fence; read the exact written row, never the historical view.
-  var canonical=evidence.require("CanonicalOccurrences",c.organizationId(),canonicalId);
+  var canonical=evidence.require("CanonicalOccurrences",request.organizationId(),canonicalId);
+  // Under a moving clock the canonical and its verification are recorded after the request knownAt. Invalidation, correction and
+  // settlement re-derivation must read exactly these just-written rows, so knowledge time is extended to cover them and no
+  // further (plan §4.2 lock-then-reread, §4.3 정정 재평가). asOf is unchanged.
+  var c=request.knownThrough(written(request,canonicalId,canonical));
+  for(String id:affected(c,claimId,canonicalId,Set.of()))service.invalidate(c,id);
   if("PHYSICAL_DELIVERY".equals(canonical.get("kind"))&&canonical.get("supersedesId")!=null){
    var deliveries=repository.rows(c,"mulino.trade.sales.Deliveries").stream().filter(x->Objects.equals(x.get("observationId"),canonical.get("physicalScopeId"))).toList();
    if(deliveries.size()!=1)throw new DomainError("HELD","EVIDENCE_UNVERIFIED","Delivery correction requires one applied original delivery");
@@ -46,6 +66,12 @@ public class AssessmentCorrectionImpact implements EvidenceCorrectionImpact {
    var settlement=settlements.stream().toList();if(settlement.size()>1)throw new DomainError("HELD","FOLLOWUP_UNAVAILABLE","Exact settlement contribution provider required");
    if(settlement.size()==1)settlement.getFirst().contributionChanged(c,canonicalId);
   }
+ }
+ /** Latest recordedAt among the canonical row and the verification/link rows this link wrote for it. */
+ private Instant written(DomainContext c,String canonicalId,Map<String,Object> canonical){
+  Instant latest=instant(canonical.get("recordedAt"));
+  for(String table:List.of("Verifications","EvidenceLinks"))for(var row:evidence.rows(table,c.organizationId()))if(canonicalId.equals(row.get("canonicalOccurrenceId"))&&row.get("recordedAt")!=null){var at=instant(row.get("recordedAt"));if(at.isAfter(latest))latest=at;}
+  return latest;
  }
  private record Raw(String kind,Map<String,Object> row){}
  private Raw rawEvidence(DomainContext c,String id){

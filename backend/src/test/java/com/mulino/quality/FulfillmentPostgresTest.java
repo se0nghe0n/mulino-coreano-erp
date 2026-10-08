@@ -47,7 +47,7 @@ class FulfillmentPostgresTest {
   record("mulino_evidence_SourceProfiles",profile,map("revision",1,"recordedBy",actor,"namespace","quality-source","policyVersion","fixture-v1","intakeOwnerId",actor,"supervisorId",actor,"nextAction","Review source","nextCheckAt",Timestamp.from(now.plusSeconds(60))));
   var rules=new TreeMap<String,Object>();for(String cap:caps){String effect=List.of("createDraft","activateWork").contains(cap)?"WORK":List.of("attachEvidence","recordActivity").contains(cap)?"RECORD":List.of("matchSourceIdentity","linkCanonicalOccurrence").contains(cap)?"RECONCILIATION":cap.startsWith("recordRegulatory")||cap.equals("recordSubmission")||cap.equals("prepareRegulatoryProcedure")?"REGULATORY_RECORD":Set.of("reserveQuantity","replaceAllocation").contains(cap)?"RESERVE":Set.of("pickQuantity","releaseAllocation").contains(cap)?"ALLOCATION":cap.equals("dispatchQuantity")?"DISPATCH":cap.equals("splitQuantity")?"SPLIT":cap.equals("adjustQuantity")?"ADJUSTMENT":cap.equals("recordStocktake")?"RECORD_STOCKTAKE":cap.equals("recordDelivery")||cap.equals("correctEvidence")?"RECORD":Set.of("resolveObligation","waiveObligation","proposeHandover","acceptHandover","createObligation","emergencyReassign").contains(cap)?"RESPONSIBILITY":Set.of("decideQuantityDutyWaiver","decideQualityDutyWaiver","decideRecallDutyWaiver").contains(cap)?"RESPONSIBILITY_DECISION":Set.of("createSalesOrder","reviseSalesOrder").contains(cap)?"SALES_ORDER":Set.of("recordInvoice","matchInvoice","recordSettlementAdjustment").contains(cap)?"SETTLEMENT":"QUALITY_CONTROL";rules.put(cap,map("effectClass",effect,"approvalAction",null,"categoryCapabilities",map("QC","decideQuality","CUSTOMER","confirmCustomerConditions","COMMERCIAL","confirmCommercialDisposition","RECALL","decideRecallRestriction")));}
   // Per-kind waiver authority is explicit policy (plan §7.1 default: MANAGER for quantity differences, QC for quality).
-  rules.put("waiveObligation",map("effectClass","RESPONSIBILITY","approvalAction",null,"approvalActions",map("WAIVE_DELIVERY_CORRECTED_DEFICIT","decideQuantityDutyWaiver","WAIVE_RETURN_QC_REVIEW","decideQualityDutyWaiver","WAIVE_RECALL_INVESTIGATION","decideRecallDutyWaiver")));
+  rules.put("waiveObligation",map("effectClass","RESPONSIBILITY","approvalAction",null,"approvalActions",map("WAIVE_DELIVERY_CORRECTED_DEFICIT","decideQuantityDutyWaiver","WAIVE_RETURN_QC_REVIEW","decideQualityDutyWaiver","WAIVE_RECALL_INVESTIGATION","decideRecallDutyWaiver","WAIVE_SETTLEMENT_DIFFERENCE","decideQuantityDutyWaiver")));
   policy("COMMAND",json.writeValueAsString(map("rules",rules)));policy("EVIDENCE","{}");policy("ELIGIBILITY","{\"actions\":{\"SELL\":{\"requiredCategories\":[\"QC\",\"CUSTOMER\",\"COMMERCIAL\"]},\"DISPATCH\":{\"requiredCategories\":[\"QC\",\"CUSTOMER\",\"COMMERCIAL\"]}}}");
   record("mulino_trade_regulatory_Policies",regPolicy,map("recordedBy",actor,"version","fixture-v1","authority","FICTIONAL_TEST_AUTHORITY","sourceNamespace","quality-source","action","SELL","validFrom",Timestamp.from(now.minusSeconds(10)),"validUntil",Timestamp.from(now.plusSeconds(1000)),"fictional",true,"status","ACTIVE","requiresLabel",false));
   SecurityContextHolder.getContext().setAuthentication(new JwtAuthenticationToken(Jwt.withTokenValue("local-test").header("alg","RS256").issuer("https://fixture.invalid").subject("quality").claim("organizationId",org).build(),List.of()));
@@ -440,4 +440,112 @@ class FulfillmentPostgresTest {
 
  // unverified P3 (plan §3.1 decimal precision): an allocation coordinate finer than the item unit is rejected up front.
  @Test void reservationCoordinateFinerThanTheItemScaleIsRejected(){allow("100");var fine=apply(envelope("reserveQuantity",map("segmentId",segment,"salesLineId",salesLine,"startQuantity","0.5","quantity","20","unit","EA"),0));assertEquals("REJECTED",fine.get("outcome"),fine.toString());assertEquals("TYPE_INVALID",code(fine));assertEquals(0,count("SELECT COUNT(*) FROM mulino_inventory_SegmentAllocations"));}
+
+ // ---- s4j closure 2 (plan §4.2 lock-then-reread, §4.3 정정 재평가, §5.3, §6 정산, §7.1) ----
+ @org.springframework.test.context.bean.override.mockito.MockitoSpyBean com.mulino.application.trade.settlement.SettlementCommands settlementCommands;
+ /** Production-like clock: every server instant is strictly later than the previous one (1 ms ticks survive timestamp storage). */
+ void advancingClock(){var tick=new java.util.concurrent.atomic.AtomicLong();when(clock.instant()).thenAnswer(x->now.plusMillis(tick.incrementAndGet()));}
+ record Delivered(Map<String,Object> content,String deliveryId,String event,String external,String canonical){}
+ Delivered delivered30(){allow("100");allowDispatch();String dispatch=dispatched("0","30");var content=deliveryReport(dispatch,"0","30",destination);String ids=intakeDelivery(content);var review=matchDelivery(content,ids);assertEquals("APPLIED",review.get("outcome"),review.toString());run("linkCanonicalOccurrence",map("reconciliationId",review.get("id")),1);String original=canonicalOf(ids.split("\\|")[0]);run("recordDelivery",map("observationId",content.get("physicalScopeId"),"canonicalOccurrenceId",original),1);
+  String deliveryId=jdbc.queryForObject("SELECT ID FROM mulino_trade_sales_Deliveries WHERE observationId=?",String.class,content.get("physicalScopeId"));return new Delivered(content,deliveryId,jdbc.queryForObject("SELECT eventId FROM mulino_evidence_Claims WHERE ID=?",String.class,ids.split("\\|")[0]),ids.split("\\|")[2],original);}
+ /** SALE invoice of 30 EA for the delivery at the given unit price; {invoiceId, original bytes}. */
+ String[] invoice30(String deliveryId,String unitPrice){String amount=new BigDecimal(unitPrice).multiply(new BigDecimal("30")).stripTrailingZeros().toPlainString();var source=map("sourceNamespace","quality-source","sourceKey",id(),"sourceVersion","1","lineId",salesLine,"referenceId",deliveryId,"scopeKind","SALE","invoiceKind","COMMERCIAL","itemId",item,"quantity","30","unit","EA","unitPrice",unitPrice,"originalAmount",amount,"currency","KRW","occurredAt",now.toString());String bytes=write(source);
+  String doc=attachJson(map("kind","SALES_ORDER_LINE","id",salesLine),bytes);var invoice=effects(run("recordInvoice",map("invoiceKind","COMMERCIAL","originalAmount",map("value",amount,"currency","KRW"),"scopeKind","SALE","line",map("saleLineId",salesLine,"deliveryId",deliveryId,"quantity",map("value","30","unit","EA"),"unitPrice",map("value",unitPrice,"currency","KRW")),"evidence",doc),1));return new String[]{invoice.get("invoiceId").toString(),bytes};}
+ Map<String,Object> matchEnvelope(String[] invoice){String[] proof=invoiceFact(invoice[0],"INVOICE",invoice[1],"30");return envelope("matchInvoice",map("invoiceId",invoice[0],"canonicalOccurrenceId",proof[1],"evidence",proof[0]),1);}
+ /** Settlement adjustment through the gateway with a verified INVOICE-subject original; CONFIRM carries the proposal and policy. */
+ Map<String,Object> adjust(String iid,String mode,String amount,String reason,Map<String,Object> proposed,String rootId){var original=map("invoiceId",iid,"mode",mode,"amount",amount,"currency","KRW","reason",reason,"occurredAt",now.toString(),"externalEventId",id());if(proposed!=null)original.putAll(map("proposalId",proposed.get("adjustmentId"),"proposalHash",proposed.get("proposalHash"),"policyVersion","fixture-v1"));String[] proof=invoiceFact(iid,"SETTLEMENT_ADJUSTMENT",write(original),null);
+  var slots=map("invoiceId",iid,"mode",mode,"amount",map("value",amount,"currency","KRW"),"reason",reason,"evidence",proof[0],"canonicalOccurrenceId",proof[1]);if(proposed!=null)slots.putAll(map("proposalId",proposed.get("adjustmentId"),"proposalHash",proposed.get("proposalHash"),"policyVersion","fixture-v1"));if(rootId!=null)slots.put("dutyRootId",rootId);return apply(envelope("recordSettlementAdjustment",slots,1));}
+ void settlementManager(){insert("mulino_identity_ManagementAuthorities",map("organizationId",org,"ID",id(),"actorId",actor,"capabilityId","recordSettlementAdjustment","scopeKind","ORGANIZATION","scopeId",org,"validFrom",Timestamp.from(now.minusSeconds(1000)),"validUntil",Timestamp.from(now.plusSeconds(10000)),"revision",1));}
+ List<Map<String,Object>> settlementDuties(String status){return jdbc.queryForList("SELECT o.ID AS assignment,o.rootId AS root,o.ownerId AS owner,o.nextAction AS next,o.nextCheckAt AS check,r.sourceId AS source FROM mulino_work_read_ObligationReferences o JOIN mulino_responsibility_Roots r ON r.ID=o.rootId WHERE o.kind='SETTLEMENT_DIFFERENCE' AND o.status=? ORDER BY r.recordedAt,r.ID",status);}
+ Map<String,Object> settlementWaiver(String assignment,String reason){var approval=effectsOf(waiverDecision("manager","decideQuantityDutyWaiver",assignment,"APPROVE",reason));var request=envelope("waiveObligation",map("assignmentId",assignment,"reason",reason),revision(assignment));request.put("approvalId",approval.get("approvalId"));return apply(request);}
+
+ /** MUST 1: with the production-like advancing clock the corrected canonical is recorded after the request knownAt; the link still
+  * applies, the deficit duty opens and settlement re-derives the match from the just-written correction (old code: HELD). */
+ @Test void deliveryCorrectionLinksUnderAnAdvancingClockAndOpensDeficitAndSettlementDuties(){var d=delivered30();var invoice=invoice30(d.deliveryId(),"1");advancingClock();var matched=apply(matchEnvelope(invoice));assertEquals("APPLIED",matched.get("outcome"),matched.toString());assertEquals("MATCHED",matched.get("businessStatus"));
+  var v2=correctDelivery(d.content(),d.external(),d.deliveryId(),d.event(),"28",2);
+  var deficitDuty=deficit("OPEN");assertNotNull(deficitDuty);assertEquals(0,new BigDecimal("2").compareTo((BigDecimal)deficitDuty.get("quantity")));
+  assertEquals(0,new BigDecimal("28").compareTo(sum("SELECT quantity FROM mulino_trade_sales_DeliveryCorrections WHERE deliveryId=?",d.deliveryId())));
+  var open=settlementDuties("OPEN");assertEquals(1,open.size(),open.toString());assertEquals(v2[0],open.getFirst().get("source"));assertEquals(actor,open.getFirst().get("owner"));assertNotNull(open.getFirst().get("next"));assertNotNull(open.getFirst().get("check"));}
+
+ /** MUST 2: a match whose knownAt was fixed before a concurrent delivery correction committed re-reads the contribution under the
+  * delivery-correction lock, so it records the corrected 28 as a DIFFERENCE with its own duty instead of MATCHED on stale 30. */
+ @Test void matchFixedBeforeACommittedCorrectionRereadsTheContributionUnderItsLock()throws Exception{var d=delivered30();var invoice=invoice30(d.deliveryId(),"1");var match=matchEnvelope(invoice);advancingClock();
+  var paused=new java.util.concurrent.CountDownLatch(1);var release=new java.util.concurrent.CountDownLatch(1);var once=new java.util.concurrent.atomic.AtomicBoolean();var security=SecurityContextHolder.getContext().getAuthentication();
+  // The match transaction has fixed its request knownAt and pauses before its fences; the correction then commits entirely.
+  doAnswer(x->{if("matchInvoice".equals(((Map<?,?>)x.getArgument(1)).get("capabilityId"))&&once.compareAndSet(false,true)){paused.countDown();await(release);}return x.callRealMethod();}).when(settlementCommands).prepare(any(),any());
+  var pool=java.util.concurrent.Executors.newSingleThreadExecutor();
+  try{var pending=pool.submit(()->{SecurityContextHolder.getContext().setAuthentication(security);return apply(match);});assertTrue(paused.await(20,java.util.concurrent.TimeUnit.SECONDS));
+   var v2=correctDelivery(d.content(),d.external(),d.deliveryId(),d.event(),"28",2);assertEquals(0,settlementDuties("OPEN").size(),"no match existed when the correction committed");
+   release.countDown();var result=pending.get(30,java.util.concurrent.TimeUnit.SECONDS);assertEquals("APPLIED",result.get("outcome"),result.toString());
+   assertEquals("DIFFERENCE",result.get("businessStatus"),result.toString());assertEquals(0,new BigDecimal("28").compareTo(new BigDecimal(result.get("receivedQuantity").toString())));assertEquals(0,new BigDecimal("2").compareTo(new BigDecimal(result.get("quantityDifference").toString())));
+   assertEquals(v2[0],jdbc.queryForObject("SELECT occurrenceId FROM mulino_trade_settlement_Matches WHERE invoiceId=?",String.class,invoice[0]));
+   var open=settlementDuties("OPEN");assertEquals(1,open.size(),open.toString());assertEquals(actor,open.getFirst().get("owner"));assertNotNull(open.getFirst().get("next"));}
+  finally{release.countDown();pool.shutdown();pool.awaitTermination(30,java.util.concurrent.TimeUnit.SECONDS);reset(settlementCommands);}}
+
+ /** MUST 3 (astra[0]): 30→28 opens a contribution root; a confirmed −2 adjustment and a typed MANAGER waiver close it; restoring 30
+  * makes the contribution CURRENT but the match UNSATISFIED (+2 remains), so a new owned root opens and the adjustment path accepts. */
+ @Test void restorationAfterAdjustmentAndWaiverOpensAnOwnedSettlementDifference(){var d=delivered30();var invoice=invoice30(d.deliveryId(),"1");assertEquals("MATCHED",apply(matchEnvelope(invoice)).get("businessStatus"));String iid=invoice[0];settlementManager();
+  var v2=correctDelivery(d.content(),d.external(),d.deliveryId(),d.event(),"28",2);var first=settlementDuties("OPEN");assertEquals(1,first.size(),first.toString());String r1=first.getFirst().get("root").toString();
+  var proposed=adjust(iid,"PROPOSE","-2","정정 인도 28에 맞춘 감액",null,null);assertEquals("APPLIED",proposed.get("outcome"),proposed.toString());
+  var confirmed=adjust(iid,"CONFIRM","-2","정정 인도 28에 맞춘 감액",proposed,null);assertEquals("APPLIED",confirmed.get("outcome"),confirmed.toString());
+  // A CHANGED contribution cannot be SATISFIED by an amount: the root closes only by the typed MANAGER waiver.
+  var resolved=resolve(first.getFirst().get("assignment").toString(),confirmed.get("adjustmentId").toString());assertEquals("HELD",resolved.get("outcome"),resolved.toString());
+  var waived=settlementWaiver(first.getFirst().get("assignment").toString(),"고객과 28 기준 감액에 합의했다");assertEquals("APPLIED",waived.get("outcome"),waived.toString());assertEquals(0,settlementDuties("OPEN").size());
+  var v3=correctDelivery(d.content(),d.external(),d.deliveryId(),v2[1],"30",3);
+  var owned=settlementDuties("OPEN");assertEquals(1,owned.size(),"restored contribution with a confirmed -2 leaves +2 that must be owned: "+owned);assertEquals(v3[0],owned.getFirst().get("source"));assertEquals(actor,owned.getFirst().get("owner"));assertNotNull(owned.getFirst().get("next"));assertNotNull(owned.getFirst().get("check"));String r2=owned.getFirst().get("root").toString();assertNotEquals(r1,r2);
+  var view=(Map<?,?>)((Map<?,?>)read("getObject",iid,map("organizationId",org,"objectType","Invoice","itemId",item),clock.instant(),clock.instant()).get("data")).get("settlement");assertEquals("CURRENT",view.get("contributionState"));assertEquals("UNSATISFIED",view.get("result"));assertEquals(true,view.get("differenceDutyOpen"));
+  // The difference is reconcilable again: +2 is proposed for the new root, confirmed, and resolves it with a SATISFIED match.
+  var back=adjust(iid,"PROPOSE","2","복원 인도 30에 맞춘 감액 취소",null,null);assertEquals("APPLIED",back.get("outcome"),back.toString());
+  var backConfirmed=adjust(iid,"CONFIRM","2","복원 인도 30에 맞춘 감액 취소",back,null);assertEquals("APPLIED",backConfirmed.get("outcome"),backConfirmed.toString());
+  var closed=resolve(owned.getFirst().get("assignment").toString(),backConfirmed.get("adjustmentId").toString());assertEquals("APPLIED",closed.get("outcome"),closed.toString());assertEquals(0,settlementDuties("OPEN").size());
+  assertEquals(r1,proposed.get("dutyRootId"));assertEquals(r2,back.get("dutyRootId"));
+  // Reprocessing the restoring correction opens nothing new.
+  runtime.requestContext().run(ctx->{return new org.springframework.transaction.support.TransactionTemplate(transactions).execute(st->settlementReview.getObject().contributionChanged(new DomainContext(org,actor,actor,clock.instant(),clock.instant()),v3[0]));});assertEquals(0,settlementDuties("OPEN").size());assertEquals(2,count("SELECT COUNT(*) FROM mulino_responsibility_Roots WHERE kind='SETTLEMENT_DIFFERENCE'"));}
+
+ /** MUST 3 (opus[3]): 30→28 opens a contribution root; restoring 30 with no adjustment makes the match SATISFIED again. The root is
+  * resolved only by the restoring canonical, not by the correction that opened it or the superseded original. */
+ @Test void restoredContributionResolvesItsChangeRootOnlyByTheRestoringCanonical(){var d=delivered30();var invoice=invoice30(d.deliveryId(),"1");assertEquals("MATCHED",apply(matchEnvelope(invoice)).get("businessStatus"));
+  var v2=correctDelivery(d.content(),d.external(),d.deliveryId(),d.event(),"28",2);var open=settlementDuties("OPEN");assertEquals(1,open.size());String assignment=open.getFirst().get("assignment").toString();
+  var early=resolve(assignment,v2[0]);assertEquals("HELD",early.get("outcome"),early.toString());
+  var v3=correctDelivery(d.content(),d.external(),d.deliveryId(),v2[1],"30",3);assertEquals(1,settlementDuties("OPEN").size(),"a SATISFIED restoration opens no new root");
+  for(String wrong:List.of(v2[0],d.canonical())){var r=resolve(assignment,wrong);assertEquals("HELD",r.get("outcome"),r.toString());}
+  var resolved=resolve(assignment,v3[0]);assertEquals("APPLIED",resolved.get("outcome"),resolved.toString());assertEquals(1,count("SELECT COUNT(*) FROM mulino_work_read_ObligationReferences WHERE ID=? AND status='RESOLVED' AND evidenceId=?",assignment,v3[0]));assertEquals(0,settlementDuties("OPEN").size());}
+
+ /** SHOULD opus[4]: a proposal is bound to the root that was open when it was proposed. After that root is waived and a contribution
+  * change opens another root, the old proposal cannot be confirmed against the new root. */
+ @Test void adjustmentProposalIsBoundToItsTargetDutyRoot(){var d=delivered30();var invoice=invoice30(d.deliveryId(),"1.1");var match=apply(matchEnvelope(invoice));assertEquals("DIFFERENCE",match.get("businessStatus"),match.toString());String iid=invoice[0];settlementManager();
+  var original=settlementDuties("OPEN");assertEquals(1,original.size());String r0=original.getFirst().get("root").toString();
+  var stale=adjust(iid,"PROPOSE","-3","단가 차이 감액",null,null);assertEquals("APPLIED",stale.get("outcome"),stale.toString());
+  correctDelivery(d.content(),d.external(),d.deliveryId(),d.event(),"28",2);assertEquals(2,settlementDuties("OPEN").size());
+  // Two open roots: an unnamed adjustment is ambiguous; naming the other root changes the proposal identity.
+  var unnamed=adjust(iid,"CONFIRM","-3","단가 차이 감액",stale,null);assertEquals("REJECTED",unnamed.get("outcome"),unnamed.toString());
+  String r1=settlementDuties("OPEN").stream().map(x->x.get("root").toString()).filter(x->!x.equals(r0)).findFirst().orElseThrow();
+  var other=adjust(iid,"CONFIRM","-3","단가 차이 감액",stale,r1);assertEquals("HELD",other.get("outcome"),other.toString());assertEquals("APPROVAL_HASH_MISMATCH",code(other));
+  var waived=settlementWaiver(original.getFirst().get("assignment").toString(),"단가 차이를 별도 계약으로 정리했다");assertEquals("APPLIED",waived.get("outcome"),waived.toString());
+  var afterClose=adjust(iid,"CONFIRM","-3","단가 차이 감액",stale,null);assertEquals("HELD",afterClose.get("outcome"),afterClose.toString());assertEquals("APPROVAL_HASH_MISMATCH",code(afterClose));
+  var closedRoot=adjust(iid,"CONFIRM","-3","단가 차이 감액",stale,r0);assertEquals("REJECTED",closedRoot.get("outcome"),closedRoot.toString());assertEquals("SETTLEMENT_DIFFERENCE_NOT_OPEN",code(closedRoot));
+  assertEquals(0,count("SELECT COUNT(*) FROM mulino_trade_settlement_Adjustments WHERE status='CONFIRMED'"));assertEquals(r0,stale.get("dutyRootId"));}
+
+ /** SHOULD astra[1]: the contribution roots a settlement read lists are those known at its knownAt. The public getObject at a knownAt
+  * before the correction is already FORBIDDEN (the correction mutates the Work row the invoice read gates on), so the regression is
+  * asserted on the shared SettlementState read used by getObject/getSettlement. */
+ @Autowired com.mulino.application.trade.settlement.SettlementState settlementState;
+ @Test void historicalSettlementReadDoesNotListALaterContributionRoot(){var d=delivered30();var invoice=invoice30(d.deliveryId(),"1");assertEquals("MATCHED",apply(matchEnvelope(invoice)).get("businessStatus"));Instant before=now;
+  correctDelivery(d.content(),d.external(),d.deliveryId(),d.event(),"28",2);String root=settlementDuties("OPEN").getFirst().get("root").toString();
+  var match=jdbc.queryForMap("SELECT ID FROM mulino_trade_settlement_Matches WHERE invoiceId=?",invoice[0]);
+  java.util.function.Function<Instant,List<String>> roots=at->runtime.requestContext().run(ctx->{return new org.springframework.transaction.support.TransactionTemplate(transactions).execute(st->settlementState.matchRoots(new DomainContext(org,actor,actor,at,at),Map.of("ID",match.get("id"))));});
+  assertEquals(List.of(),roots.apply(before));assertEquals(List.of(root),roots.apply(now));
+  var current=(Map<?,?>)read("getObject",invoice[0],map("organizationId",org,"objectType","Invoice","itemId",item),now,now).get("data");assertEquals(List.of(root),current.get("contributionDutyRootIds"));}
+
+ /** SHOULD opus[5]/[6]: only explicit external place kinds are a known zero; an unrecognized kind (WAREHOUSE) is unknown, and the
+  * segment-scope evaluateEligibility applies the same custody condition for SELL and DISPATCH. */
+ @Test void unrecognizedPlaceKindIsUnknownCustodyAndSegmentEligibilityAppliesCustody(){allow("100");insert("mulino_identity_CapabilityAssignments",map("organizationId",org,"ID",id(),"actorId",actor,"capabilityId","evaluateEligibility","scopeKind","ORGANIZATION","scopeId",org,"validFrom",Timestamp.from(now.minusSeconds(1000)),"validUntil",Timestamp.from(now.plusSeconds(10000))));insert("mulino_identity_GrantActions",map("organizationId",org,"grantId",grant,"capabilityId","evaluateEligibility"));
+  var internal=(Map<?,?>)read("evaluateEligibility",segment,map("organizationId",org),now,now).get("data");assertEquals("ALLOWED",internal.get("eligibilityStatus"),internal.toString());assertEquals("100",internal.get("eligibleQuantity"));
+  jdbc.update("UPDATE mulino_inventory_Places SET kind='WAREHOUSE' WHERE ID=?",place);
+  var held=read("getInventory",null,map("organizationId",org,"itemId",item),now,now);var values=(Map<?,?>)held.get("data");assertEquals("0",values.get("eligibleQuantity"));assertEquals("UNKNOWN",values.get("eligibilityStatus"));assertTrue(held.get("unknowns").toString().contains("PLACE_KIND_UNRECOGNIZED"),held.toString());assertTrue(held.get("unknowns").toString().contains("CUSTODY_UNCONFIRMED"),held.toString());
+  var unrecognized=read("evaluateEligibility",segment,map("organizationId",org),now,now);assertEquals("UNKNOWN",((Map<?,?>)unrecognized.get("data")).get("eligibilityStatus"),unrecognized.toString());assertTrue(unrecognized.get("unknowns").toString().contains("PLACE_KIND_UNRECOGNIZED"));
+  jdbc.update("UPDATE mulino_inventory_Places SET kind='CUSTOMER' WHERE ID=?",place);
+  var outside=read("evaluateEligibility",segment,map("organizationId",org),now,now);var outsideData=(Map<?,?>)outside.get("data");assertEquals("DENIED",outsideData.get("eligibilityStatus"),outside.toString());assertEquals("0",outsideData.get("eligibleQuantity"));assertEquals(List.of(),outside.get("unknowns"));
+  jdbc.update("UPDATE mulino_inventory_Places SET kind='INTERNAL_STORAGE' WHERE ID=?",place);String unrecorded=id();record("mulino_inventory_QuantitySegments",unrecorded,map("itemId",item,"lotId",lot,"identificationStatus","CONFIRMED","quantity",new BigDecimal("5"),"unit","EA","placeId",place,"controlScope","quality","validFrom",Timestamp.from(now.minusSeconds(10)),"mixtureStatus","IDENTIFIED","ownerId",actor));
+  var noCustodian=read("evaluateEligibility",unrecorded,map("organizationId",org),now,now);assertEquals("UNKNOWN",((Map<?,?>)noCustodian.get("data")).get("eligibilityStatus"),noCustodian.toString());assertTrue(noCustodian.get("unknowns").toString().contains("CUSTODY_UNCONFIRMED"));}
 }
