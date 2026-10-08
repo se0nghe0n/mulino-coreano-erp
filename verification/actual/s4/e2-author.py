@@ -128,7 +128,8 @@ a.append(obs('e2-accounted25-not50',[total('mulino_trade_recall_actions','quanti
 # Replace same-scope approval to prove old approval cannot cause another effect.
 a.append(cmd('e2-admin-reapprove50','approveRecall',{'scopeId':'$E2_SCOPE','scopeHash':'$E2_HASH','decision':'APPROVE','validUntil':UNTIL},actor='supervisor',bind={'E2_CURRENT_APPROVAL':'/effects/approvalId'}))
 exception=physical('e2-exception25','EXCEPTION','25','25',reason='가상 ADMIN 예외25: 미확인 물량 조사 책임 유지')
-a.append(cmd('e2-stale-approval-exception-denied','recordRecovery',exception,actor='supervisor',outcome='HELD',assertions=[eq('/error/code','RECALL_APPROVAL_STALE')]))
+# A copy: the later current-approval mutation must not rewrite this stale request.
+a.append(cmd('e2-stale-approval-exception-denied','recordRecovery',copy.deepcopy(exception),actor='supervisor',outcome='HELD',assertions=[eq('/error/code','RECALL_APPROVAL_STALE')]))
 exception['approvalId']='$E2_CURRENT_APPROVAL'
 a.append(cmd('e2-record-approved-exception25','recordRecovery',exception,actor='supervisor',bind={'E2_FINAL_HASH':'/effects/partitionHash','E2_RESIDUAL_DUTY':'/effects/residualDutyId'},assertions=[eq('/effects/partition/ACCOUNTED','50'),eq('/effects/partition/EXCEPTION','25'),eq('/effects/partition/UNKNOWN','0')]))
 close=physical('e2-closure-original','CLOSURE','0','50',partition='$E2_FINAL_HASH')
