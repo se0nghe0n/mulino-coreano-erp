@@ -6237,7 +6237,8 @@
             "quantity": "20",
             "unit": "BOX",
             "expectedRevision": 1,
-            "commandIdempotencyKey": "CANONICAL-MOVE-safe-retry-canonical-current-grant"
+            "commandIdempotencyKey": "CANONICAL-MOVE-safe-retry-canonical-current-grant",
+            "evidenceRef": "synthetic-T26-safe-retry-canonical-current-grant-original-basis"
           },
           "evidenceRefs": [
             "original:actual-artifact"
@@ -6947,7 +6948,8 @@
             "quantity": "20",
             "unit": "BOX",
             "expectedRevision": 1,
-            "commandIdempotencyKey": "CANONICAL-MOVE-safe-retry-revoked-blocked"
+            "commandIdempotencyKey": "CANONICAL-MOVE-safe-retry-revoked-blocked",
+            "evidenceRef": "synthetic-T26-safe-retry-revoked-blocked-original-basis"
           },
           "evidenceRefs": [
             "original:actual-artifact"
@@ -8028,7 +8030,8 @@
             "quantity": "20",
             "unit": "BOX",
             "expectedRevision": 1,
-            "commandIdempotencyKey": "CANONICAL-MOVE-safe-retry-forged-original-actor"
+            "commandIdempotencyKey": "CANONICAL-MOVE-safe-retry-forged-original-actor",
+            "evidenceRef": "synthetic-T26-safe-retry-forged-original-actor-original-basis"
           },
           "evidenceRefs": [
             "original:actual-artifact"
@@ -9103,7 +9106,8 @@
             "quantity": "20",
             "unit": "BOX",
             "expectedRevision": 1,
-            "commandIdempotencyKey": "CANONICAL-MOVE-safe-retry-forged-request-hash"
+            "commandIdempotencyKey": "CANONICAL-MOVE-safe-retry-forged-request-hash",
+            "evidenceRef": "synthetic-T26-safe-retry-forged-request-hash-original-basis"
           },
           "evidenceRefs": [
             "original:actual-artifact"
@@ -11340,7 +11344,10 @@
             "destinationId": {
               "$alias": "C_PLACE"
             },
-            "commandIdempotencyKey": "T26-lot-expiry-no-event-dispatch"
+            "commandIdempotencyKey": "T26-lot-expiry-no-event-dispatch",
+            "cargoPlaceId": {
+              "$alias": "TRANSIT"
+            }
           },
           "evidenceRefs": [
             "dispatch:actual-artifact"
@@ -14431,7 +14438,10 @@
             "destinationId": {
               "$alias": "C_PLACE"
             },
-            "commandIdempotencyKey": "T26-lot-expiry-delayed-guard-dispatch"
+            "commandIdempotencyKey": "T26-lot-expiry-delayed-guard-dispatch",
+            "cargoPlaceId": {
+              "$alias": "TRANSIT"
+            }
           },
           "evidenceRefs": [
             "dispatch:actual-artifact"
@@ -16235,7 +16245,10 @@
             "destinationId": {
               "$alias": "C_PLACE"
             },
-            "commandIdempotencyKey": "T26-disposition-expiry-no-event-dispatch"
+            "commandIdempotencyKey": "T26-disposition-expiry-no-event-dispatch",
+            "cargoPlaceId": {
+              "$alias": "TRANSIT"
+            }
           },
           "evidenceRefs": [
             "dispatch:actual-artifact"
@@ -19326,7 +19339,10 @@
             "destinationId": {
               "$alias": "C_PLACE"
             },
-            "commandIdempotencyKey": "T26-disposition-expiry-delayed-guard-dispatch"
+            "commandIdempotencyKey": "T26-disposition-expiry-delayed-guard-dispatch",
+            "cargoPlaceId": {
+              "$alias": "TRANSIT"
+            }
           },
           "evidenceRefs": [
             "dispatch:actual-artifact"
@@ -21130,7 +21146,10 @@
             "destinationId": {
               "$alias": "C_PLACE"
             },
-            "commandIdempotencyKey": "T26-grant-expiry-no-event-dispatch"
+            "commandIdempotencyKey": "T26-grant-expiry-no-event-dispatch",
+            "cargoPlaceId": {
+              "$alias": "TRANSIT"
+            }
           },
           "evidenceRefs": [
             "dispatch:actual-artifact"
@@ -24221,7 +24240,10 @@
             "destinationId": {
               "$alias": "C_PLACE"
             },
-            "commandIdempotencyKey": "T26-grant-expiry-delayed-guard-dispatch"
+            "commandIdempotencyKey": "T26-grant-expiry-delayed-guard-dispatch",
+            "cargoPlaceId": {
+              "$alias": "TRANSIT"
+            }
           },
           "evidenceRefs": [
             "dispatch:actual-artifact"
@@ -26025,7 +26047,10 @@
             "destinationId": {
               "$alias": "C_PLACE"
             },
-            "commandIdempotencyKey": "T26-policy-expiry-no-event-dispatch"
+            "commandIdempotencyKey": "T26-policy-expiry-no-event-dispatch",
+            "cargoPlaceId": {
+              "$alias": "TRANSIT"
+            }
           },
           "evidenceRefs": [
             "dispatch:actual-artifact"
@@ -29116,7 +29141,10 @@
             "destinationId": {
               "$alias": "C_PLACE"
             },
-            "commandIdempotencyKey": "T26-policy-expiry-delayed-guard-dispatch"
+            "commandIdempotencyKey": "T26-policy-expiry-delayed-guard-dispatch",
+            "cargoPlaceId": {
+              "$alias": "TRANSIT"
+            }
           },
           "evidenceRefs": [
             "dispatch:actual-artifact"
@@ -32936,7 +32964,8 @@
             "quantity": "8",
             "unit": "BOX",
             "expectedRevision": 1,
-            "commandIdempotencyKey": "T26-restore-complete-split"
+            "commandIdempotencyKey": "T26-restore-complete-split",
+            "evidenceRef": "synthetic-T26-restore-complete-split-basis"
           },
           "evidenceRefs": [
             "split:actual-artifact"
@@ -34301,7 +34330,8 @@
             "quantity": "8",
             "unit": "BOX",
             "expectedRevision": 1,
-            "commandIdempotencyKey": "T26-restore-missing-blob-split"
+            "commandIdempotencyKey": "T26-restore-missing-blob-split",
+            "evidenceRef": "synthetic-T26-restore-missing-blob-split-basis"
           },
           "evidenceRefs": [
             "split:actual-artifact"
@@ -35696,7 +35726,8 @@
             "quantity": "8",
             "unit": "BOX",
             "expectedRevision": 1,
-            "commandIdempotencyKey": "T26-restore-missing-v1-evaluator-split"
+            "commandIdempotencyKey": "T26-restore-missing-v1-evaluator-split",
+            "evidenceRef": "synthetic-T26-restore-missing-v1-evaluator-split-basis"
           },
           "evidenceRefs": [
             "split:actual-artifact"
@@ -38955,7 +38986,10 @@
             "destinationId": {
               "$alias": "C_PLACE"
             },
-            "commandIdempotencyKey": "T26-lot-expiry-autonomous-loop-dispatch"
+            "commandIdempotencyKey": "T26-lot-expiry-autonomous-loop-dispatch",
+            "cargoPlaceId": {
+              "$alias": "TRANSIT"
+            }
           },
           "evidenceRefs": [
             "dispatch:actual-artifact"

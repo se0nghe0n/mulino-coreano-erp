@@ -143,14 +143,58 @@
       "roleCapabilities": [
         "revokeGrant",
         "getWork",
-        "searchOperationalIssues"
+        "searchOperationalIssues",
+        "getInventory",
+        "getEvidence",
+        "getInbox",
+        "retrySafeCommand",
+        "emergencyRepair",
+        "createWork",
+        "activateWork",
+        "waitWork",
+        "moveQuantity",
+        "reserveQuantity",
+        "pickQuantity",
+        "dispatchQuantity",
+        "splitQuantity",
+        "placeHold",
+        "recordActivity",
+        "attachEvidence",
+        "recordExternalReconciliation",
+        "proposePurchase",
+        "dispatchPurchaseOrder",
+        "approvePurchase",
+        "activatePolicy",
+        "activateDefinition"
       ],
       "grant": {
         "delegatorAlias": "supervisor",
         "actions": [
           "revokeGrant",
           "getWork",
-          "searchOperationalIssues"
+          "searchOperationalIssues",
+          "getInventory",
+          "getEvidence",
+          "getInbox",
+          "retrySafeCommand",
+          "emergencyRepair",
+          "createWork",
+          "activateWork",
+          "waitWork",
+          "moveQuantity",
+          "reserveQuantity",
+          "pickQuantity",
+          "dispatchQuantity",
+          "splitQuantity",
+          "placeHold",
+          "recordActivity",
+          "attachEvidence",
+          "recordExternalReconciliation",
+          "proposePurchase",
+          "dispatchPurchaseOrder",
+          "approvePurchase",
+          "activatePolicy",
+          "activateDefinition"
         ],
         "scope": {
           "organizationAlias": "ORG",
@@ -177,7 +221,29 @@
           "capabilityIds": [
             "revokeGrant",
             "getWork",
-            "searchOperationalIssues"
+            "searchOperationalIssues",
+            "getInventory",
+            "getEvidence",
+            "getInbox",
+            "retrySafeCommand",
+            "emergencyRepair",
+            "createWork",
+            "activateWork",
+            "waitWork",
+            "moveQuantity",
+            "reserveQuantity",
+            "pickQuantity",
+            "dispatchQuantity",
+            "splitQuantity",
+            "placeHold",
+            "recordActivity",
+            "attachEvidence",
+            "recordExternalReconciliation",
+            "proposePurchase",
+            "dispatchPurchaseOrder",
+            "approvePurchase",
+            "activatePolicy",
+            "activateDefinition"
           ]
         },
         "validFrom": "2026-10-01T00:00:00Z",
@@ -231,6 +297,7 @@
           "capabilityIds": [
             "moveQuantity",
             "reserveQuantity",
+            "pickQuantity",
             "dispatchQuantity",
             "splitQuantity"
           ]
@@ -691,6 +758,11 @@
     "foreign": {
       "type": "Human",
       "organizationAlias": "OTHER_ORG"
+    },
+    "TRANSIT": {
+      "type": "Place",
+      "name": "출고 운송 구간",
+      "kind": "TRANSIT"
     }
   },
   "baseline": {

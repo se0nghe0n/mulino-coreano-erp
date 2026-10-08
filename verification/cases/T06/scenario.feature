@@ -44,7 +44,8 @@
     그러면 "STOCK_RECONCILIATION-responsibility" assertion으로 "STOCK_RECONCILIATION responsibility의 실제 값과 범위를 대조한다"를 확인한다
     그러면 "STOCK_RECONCILIATION-human-owner" assertion으로 "STOCK_RECONCILIATION human owner의 실제 값과 범위를 대조한다"를 확인한다
     그러면 "STOCK_RECONCILIATION-api-responsibility" assertion으로 "STOCK_RECONCILIATION api responsibility의 실제 값과 범위를 대조한다"를 확인한다
-    그러면 "pending-rejection" assertion으로 "pending rejection의 실제 값과 범위를 대조한다"를 확인한다
+    그러면 "pending-rejection" assertion으로 "정정 중인 기출고100의 배분은 이미 소비됐다. 2 BOX를 다시 출고하려는 잘 갖춘 요청도 충돌로 거부된다"를 확인한다
+    그러면 "pending-code" assertion으로 "거부 이유는 소비된 배분(STALE_REVISION)이다. 정정이 2 BOX를 출고 가능한 실물로 되살리는 제품은 이 출고를 적용한다"를 확인한다
     그러면 "pending-movements" assertion으로 "pending movements의 실제 값과 범위를 대조한다"를 확인한다
     그러면 "pending-allocations" assertion으로 "pending allocations의 실제 값과 범위를 대조한다"를 확인한다
     그러면 "pending-outbox" assertion으로 "pending outbox의 실제 값과 범위를 대조한다"를 확인한다

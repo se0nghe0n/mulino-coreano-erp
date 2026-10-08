@@ -653,7 +653,27 @@
         "getWork",
         "searchObjects",
         "searchOperationalIssues",
-        "getPolicy"
+        "getPolicy",
+        "recordActivity",
+        "attachEvidence",
+        "correctEvidence",
+        "confirmReceipt",
+        "createWork",
+        "matchSourceIdentity",
+        "linkCanonicalOccurrence",
+        "resolveEvidenceConflict",
+        "recordExternalReconciliation",
+        "retrySafeCommand",
+        "dispatchPurchaseOrder",
+        "cancelPurchase",
+        "reserveQuantity",
+        "dispatchQuantity",
+        "placeHold",
+        "releaseHold",
+        "assignCapability",
+        "createPolicyDraft",
+        "approvePolicy",
+        "activatePolicy"
       ],
       "grant": {
         "delegatorAlias": "supervisor",
@@ -668,7 +688,27 @@
           "getWork",
           "searchObjects",
           "searchOperationalIssues",
-          "getPolicy"
+          "getPolicy",
+          "recordActivity",
+          "attachEvidence",
+          "correctEvidence",
+          "confirmReceipt",
+          "createWork",
+          "matchSourceIdentity",
+          "linkCanonicalOccurrence",
+          "resolveEvidenceConflict",
+          "recordExternalReconciliation",
+          "retrySafeCommand",
+          "dispatchPurchaseOrder",
+          "cancelPurchase",
+          "reserveQuantity",
+          "dispatchQuantity",
+          "placeHold",
+          "releaseHold",
+          "assignCapability",
+          "createPolicyDraft",
+          "approvePolicy",
+          "activatePolicy"
         ],
         "scope": {
           "organizationAlias": "ORG-A",
@@ -798,7 +838,11 @@
     },
     "old-allocation": {
       "type": "Allocation",
-      "revision": 1
+      "revision": 1,
+      "segmentAlias": "Q100",
+      "quantity": "100",
+      "unit": "BOX",
+      "state": "CONSUMED"
     },
     "receipt-occurrence": {
       "type": "CanonicalOccurrence"
@@ -842,6 +886,12 @@
     "correction98": {
       "type": "DocumentVersion",
       "organizationAlias": "ORG-A"
+    },
+    "TRANSIT": {
+      "type": "Place",
+      "organizationAlias": "ORG-A",
+      "name": "출고 운송 구간",
+      "kind": "TRANSIT"
     }
   },
   "baseline": {

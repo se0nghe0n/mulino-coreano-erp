@@ -142,15 +142,38 @@ exit code를 출력하며 `verification/harness/target/wrapper-commands.json`에
       (`/response/outcome` APPLIED 고정, 또는 뒤의 action·assertion이 결과의
       다른 부분을 읽음) 같은 `$result`(actionId·pointer)를 지명하는 앞선
       pickQuantity가 있어야 한다.
-    - pick되지 않은 실행 중 배분의 출고는 APPLIED 밖 outcome과, 제품이 pick
-      검사 전에 내는 code(STALE_REVISION·FORBIDDEN·
-      INSUFFICIENT_ELIGIBLE_QUANTITY·SCOPE_INELIGIBLE·VERSION_UNSUPPORTED)를
-      고정한 반례일 때만 받는다. 아니면 검사 대상 규칙이 없는 제품도 pick
-      누락만으로 거부해 통과한다.
+    - pick되지 않은 실행 중 배분의 출고는 APPLIED 밖 outcome과, case가 pick 전
+      이유를 보이는 code를 고정한 반례일 때만 받는다(round 10). FORBIDDEN은
+      actor에게 현재 출고 권한이 없음, VERSION_UNSUPPORTED는 다른 정의 버전,
+      STALE_REVISION은 앞선 action이 소비한 배분을 보여야 한다. 같은 code가
+      pick 뒤 검사(revision 대조, 운송 PLACE 인가, DISPATCH·연속 권한)에서도
+      나오므로 code만으로는 받지 않는다. fixture가 종결(CONSUMED·RELEASED·
+      REPLACED, priorHistory DISPATCH)로 선언한 배분은 STALE_REVISION 고정이면
+      pick이 필요 없다.
     - 앞선 pick의 outcome을 APPLIED 밖으로 고정하면 안 되고, 출고
       expectedRevision이 pick보다 앞선 action의 `$result`이면 stale
       revision이라 문제다. 비동기 출고(start의 call)의 고정은 그 await
       action의 assertion에서 읽는다.
+  - **실행 전제(round 10)**: 적용을 기대하는 명령마다 제품 검사 사슬을 순서대로
+    맞춘다(`contracts/execution-preconditions.json`,
+    `docs/execution/step2r-round10/precondition-audit.md`).
+    `dispatchTransitProblems`는 배분을 지명한 모든 출고에 `cargoPlaceId`의
+    fixture TRANSIT 장소를, FORBIDDEN 반례가 아니면 출고 actor·위임자의 grant
+    장소 scope에 그 장소를 요구한다(fixture-place-kinds.json dispatchTransit).
+    `occurrenceTimeProblems`는 제품 시계(fixture clock asOf에서 시작해 clock
+    control의 instant·asOf·knownAt으로만 움직임)로 발생 시각(명시
+    occurredAt, 없으면 요청 asOf, 없으면 시계)이 시계보다 뒤가 아니고, 출고가
+    pick 시계나 fixture `pickedAt`보다 앞서지 않으며, 인도가 출고보다 앞서지
+    않음을 본다. `grantAuthorityProblems`는 grant scope `capabilityIds`가 grant
+    action을 모두 담고, fixture actor인 위임자가 위임한 action을 모두 가지며,
+    적용을 기대하는 COMMAND·RECORD의 actor가 capability와 유효한 grant, 제품이
+    인가하는 장소를 가짐을 본다. `commandBasisProblems`는 출고·재고 명령의
+    근거를, `warehouseCustodyProblems`는 예약·출고·이동하는 fixture 실물의
+    INTERNAL_STORAGE·내부 보관자와 이동 목적지를 본다. pick 없는 출고 반례는
+    code만이 아니라 case가 보이는 pick 전 이유(권한 없음·다른 정의 버전·이미
+    소비된 배분)가 있어야 하고, 배분을 지명하지 않은 출고는 route 수준 FORBIDDEN
+    거부만 받는다. 수동 NO_TASK 관찰의 scheduler 주기 기록 의존은
+    `runtimeGates`의 `SCHEDULER_CYCLE_RECORD`로 이름을 남긴다.
   - **Streamable HTTP transport header**: `ContractValidator.wireTransportProblems`가
     `route=wire`·`transport=streamable-http` 요청의 Accept가
     `application/json`과 `text/event-stream`을 모두 나열하기를 요구하고

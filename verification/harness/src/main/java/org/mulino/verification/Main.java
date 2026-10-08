@@ -136,6 +136,11 @@ public final class Main {
             problems.addAll(validator.placeKindProblems(c));
             problems.addAll(validator.receiptCustodyProblems(c));
             problems.addAll(validator.pickBeforeDispatchProblems(c));
+            problems.addAll(validator.dispatchTransitProblems(c));
+            problems.addAll(validator.occurrenceTimeProblems(c));
+            problems.addAll(validator.grantAuthorityProblems(c));
+            problems.addAll(validator.commandBasisProblems(c));
+            problems.addAll(validator.warehouseCustodyProblems(c));
         }
         for(String id:expected) if(!cases.containsKey(id)) problems.add("Missing required case "+id);
         for(int i=1;i<=26;i++) if(!covered.contains(String.format("D%02d",i))) problems.add("Missing requirement assertion "+String.format("D%02d",i));
@@ -183,8 +188,34 @@ public final class Main {
             }
         ObjectNode gate=Json.object().put("profile","regulatory").put("status","NOT_RUN_GATED").put("reason",REGULATORY_GATE);
         gate.set("subcases",Json.MAPPER.valueToTree(subcases));gate.set("observations",Json.MAPPER.valueToTree(observations));
-        gates.add(gate);return gates;
+        gates.add(gate);
+        gates.add(schedulerCycleGate(cases));return gates;
     }
+    static final String SCHEDULER_CYCLE_GATE="NOT_RUN_GATED: a passive NO_TASK observation is evidence only with a scheduler-recorded natural cycle that started at or after "
+        +"observeFrom and completed inside the watch (rawRows.schedulerCycles: schedulerId, tickId/sweepId, startedAt, completedAt, startedBy=SCHEDULER_LOOP; "
+        +"HostObservationValidator.naturalTick). Plan section 10 does not name that record and the backend scheduler/sweeper does not write it yet, so these "
+        +"assertions stay fail-closed until the Step 3 backend records cycle completions and the host extractor reads them";
+    /**
+     * Step 2 closure review 7 P3: the passive NO_TASK assertions depend on a backend cycle-completion record that neither the plan
+     * nor the backend provides yet. Every assertion that pins a passive natural-tick watcher's submissionStatus to NO_TASK is named here.
+     */
+    static ObjectNode schedulerCycleGate(Map<String,JsonNode> cases) {
+        Set<String> subcases=new TreeSet<>(),assertions=new TreeSet<>(),observations=new TreeSet<>();
+        for(var entry:cases.entrySet()) for(JsonNode sub:entry.getValue().path("subcases")) {
+            Set<String> passive=new HashSet<>();List<JsonNode> all=new ArrayList<>();collectActions(sub.path("actions"),all);
+            for(JsonNode a:all) {JsonNode p=a.path("control").path("parameters");
+                if(a.path("kind").asText().equals("control") && Set.of("tickScheduler","sweepDue").contains(a.path("control").path("operation").asText())
+                    && (p.has("trigger") || p.has("triggeredBy") || p.has("observationWindowSeconds"))) passive.add(a.path("id").asText());}
+            for(JsonNode x:sub.path("assertions")) if(passive.contains(x.path("source").path("actionId").asText()) && x.path("source").path("pointer").asText().endsWith("/submissionStatus") && "NO_TASK".equals(x.path("expected").asText())) {
+                String key=entry.getKey()+"/"+sub.path("id").asText();subcases.add(key);assertions.add(key+"/"+x.path("id").asText());
+                for(JsonNode n:x.path("oracleRef").path("observationNames")) observations.add(x.path("oracleRef").path("oracleId").asText()+"/"+n.asText());
+            }
+        }
+        ObjectNode gate=Json.object().put("profile","recovery").put("gate","SCHEDULER_CYCLE_RECORD").put("status","NOT_RUN_GATED").put("reason",SCHEDULER_CYCLE_GATE);
+        gate.set("subcases",Json.MAPPER.valueToTree(subcases));gate.set("assertions",Json.MAPPER.valueToTree(assertions));gate.set("observations",Json.MAPPER.valueToTree(observations));
+        return gate;
+    }
+    private static void collectActions(JsonNode actions,List<JsonNode> out) {for(JsonNode a:actions) {out.add(a);for(JsonNode b:a.path("branches")) collectActions(b.path("actions"),out);}}
     private static List<Path> discoverCases(Path root) throws IOException {
         List<Path> found=new ArrayList<>();Path cases=root.resolve("verification/cases");
         if(Files.isDirectory(cases)) try(var files=Files.walk(cases)) { files.filter(p->p.getFileName().toString().equals("case.json")).sorted().forEach(found::add); }

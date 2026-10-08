@@ -83,11 +83,28 @@ EXPIRY_GUARDS={'lot-expiry-no-event':'lot','lot-expiry-delayed-guard':'lot','dis
 GUARD_CODES={'lot':'INSUFFICIENT_ELIGIBLE_QUANTITY','disposition':'INSUFFICIENT_ELIGIBLE_QUANTITY','policy':'INSUFFICIENT_ELIGIBLE_QUANTITY','grant':'FORBIDDEN'}
 GUARD_REASONS={'lot':'LOT 만료 뒤 현재 판매 적격이 없다','disposition':'처분 근거 만료 뒤 현재 판매 적격이 없다','policy':'적격 정책 만료 뒤 현재 판매 적격을 판정할 수 없다',
     'grant':'출고자 warehouse의 grant가 만료돼 scope 인가가 거부된다'}
+# step2r round 10 (closure review 7): the grant's own capability scope lists every grant action (a faithful installer
+# intersects or rejects a grant whose scope.capabilityIds omits one of its actions), and the dispatch names the TRANSIT
+# place it moves the goods to (FulfillmentCommands transitPlaceId, corpus slot cargoPlaceId) so a guard-less product
+# reaches APPLIED instead of TYPE_INVALID 'Transit place required'.
+TRANSIT_PLACE={'type':'Place','name':'출고 운송 구간','kind':'TRANSIT'}
 def grant_pick(fixture_ref):
     path=ROOT/fixture_ref;f=json.loads(path.read_text());w=f['actors']['warehouse']
-    for key in (w['roleCapabilities'],w['grant']['actions']):
+    keys=[w['roleCapabilities'],w['grant']['actions']]
+    if isinstance(w['grant']['scope'].get('capabilityIds'),list):keys.append(w['grant']['scope']['capabilityIds'])
+    for key in keys:
         if 'pickQuantity' not in key:key.insert(key.index('dispatchQuantity'),'pickQuantity')
+    f['aliases'].setdefault('TRANSIT',copy.deepcopy(TRANSIT_PLACE))
     dump(path,f)
+def transit_dispatch(sub):
+    r=by_id(sub['actions'],'dispatch')['request'];assert 'allocationId' in r,sub['id']
+    r.setdefault('cargoPlaceId',alias('TRANSIT'))
+# Inventory commands carry their basis (InventoryCommands.prepare requires evidenceRef; plan section 4.2 '근거'): the
+# original move of the safe-retry subcases and the split of the restore subcases name a synthetic basis reference.
+BASIS_ACTIONS={'safe-retry-canonical-current-grant':'original','safe-retry-revoked-blocked':'original','restore-complete':'split',
+    'restore-missing-blob':'split','restore-missing-v1-evaluator':'split'}
+def name_basis(sub):
+    a=by_id(sub['actions'],BASIS_ACTIONS[sub['id']]);a['request'].setdefault('evidenceRef','synthetic-T26-'+sub['id']+'-'+a['id']+'-basis')
 def pick_before_guard(sub):
     kind=EXPIRY_GUARDS[sub['id']];acts=sub['actions']
     acts[:]=[a for a in acts if a['id']!='pick']
@@ -229,7 +246,8 @@ def main():
     subs={s['id']:s for s in c['subcases']}
     for sub in c['subcases']:
         fix_safe_retry(sub)
-        if sub['id'] in EXPIRY_GUARDS:grant_pick(sub['fixtureRef']);pick_before_guard(sub)
+        if sub['id'] in EXPIRY_GUARDS:grant_pick(sub['fixtureRef']);pick_before_guard(sub);transit_dispatch(sub)
+        if sub['id'] in BASIS_ACTIONS:name_basis(sub)
     due=subs['due-wait-db-rediscovery'];due['assertions']=[a for a in due['assertions'] if not a['id'].startswith(OWNED_ASSERTIONS)]
     due['assertions'].append(assertion_like(due,'empty-message-queue',id='queue-empty-after-restart',source={'actionId':'db','pointer':'/data/rawRows/queueMessages'},expected=0,
         oracleExplanation='재시작 뒤 terminal 관찰 시점에도 queue message0이다. 재발견은 DB due index에서만 온다.'))

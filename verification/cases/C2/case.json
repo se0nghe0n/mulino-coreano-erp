@@ -346,6 +346,29 @@
           }
         },
         {
+          "id": "clock-dispatch60",
+          "kind": "control",
+          "evidenceRefs": [
+            "clock-dispatch60:actual-artifact"
+          ],
+          "control": {
+            "type": "clock",
+            "operation": "advanceTo",
+            "parameters": {
+              "instant": "2026-10-06T09:00:00Z",
+              "knownAt": "2026-10-06T09:00:00Z",
+              "timezone": "Asia/Seoul",
+              "scope": {
+                "organizationId": {
+                  "$alias": "ORG"
+                },
+                "caseId": "C2",
+                "subcaseId": "cumulative-versus-state"
+              }
+            }
+          }
+        },
+        {
           "id": "dispatch60",
           "kind": "invoke",
           "evidenceRefs": [
@@ -380,6 +403,9 @@
               "occurredAt": "2026-10-06T09:00:00Z",
               "destinationId": {
                 "$alias": "CUSTOMER"
+              },
+              "cargoPlaceId": {
+                "$alias": "TRANSIT"
               }
             },
             "expectedRevision": {
@@ -394,6 +420,29 @@
                 "$alias": "DOC"
               }
             ]
+          }
+        },
+        {
+          "id": "clock-receive40",
+          "kind": "control",
+          "evidenceRefs": [
+            "clock-receive40:actual-artifact"
+          ],
+          "control": {
+            "type": "clock",
+            "operation": "advanceTo",
+            "parameters": {
+              "instant": "2026-10-07T01:30:00Z",
+              "knownAt": "2026-10-07T01:30:00Z",
+              "timezone": "Asia/Seoul",
+              "scope": {
+                "organizationId": {
+                  "$alias": "ORG"
+                },
+                "caseId": "C2",
+                "subcaseId": "cumulative-versus-state"
+              }
+            }
           }
         },
         {
@@ -444,6 +493,29 @@
                 "$alias": "DOC"
               }
             ]
+          }
+        },
+        {
+          "id": "clock-known",
+          "kind": "control",
+          "evidenceRefs": [
+            "clock-known:actual-artifact"
+          ],
+          "control": {
+            "type": "clock",
+            "operation": "advanceTo",
+            "parameters": {
+              "instant": "2026-10-07T04:00:00Z",
+              "knownAt": "2026-10-07T04:00:00Z",
+              "timezone": "Asia/Seoul",
+              "scope": {
+                "organizationId": {
+                  "$alias": "ORG"
+                },
+                "caseId": "C2",
+                "subcaseId": "cumulative-versus-state"
+              }
+            }
           }
         },
         {

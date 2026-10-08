@@ -653,7 +653,27 @@
         "getWork",
         "searchObjects",
         "searchOperationalIssues",
-        "getPolicy"
+        "getPolicy",
+        "recordActivity",
+        "attachEvidence",
+        "correctEvidence",
+        "confirmReceipt",
+        "createWork",
+        "matchSourceIdentity",
+        "linkCanonicalOccurrence",
+        "resolveEvidenceConflict",
+        "recordExternalReconciliation",
+        "retrySafeCommand",
+        "dispatchPurchaseOrder",
+        "cancelPurchase",
+        "reserveQuantity",
+        "dispatchQuantity",
+        "placeHold",
+        "releaseHold",
+        "assignCapability",
+        "createPolicyDraft",
+        "approvePolicy",
+        "activatePolicy"
       ],
       "grant": {
         "delegatorAlias": "supervisor",
@@ -668,7 +688,27 @@
           "getWork",
           "searchObjects",
           "searchOperationalIssues",
-          "getPolicy"
+          "getPolicy",
+          "recordActivity",
+          "attachEvidence",
+          "correctEvidence",
+          "confirmReceipt",
+          "createWork",
+          "matchSourceIdentity",
+          "linkCanonicalOccurrence",
+          "resolveEvidenceConflict",
+          "recordExternalReconciliation",
+          "retrySafeCommand",
+          "dispatchPurchaseOrder",
+          "cancelPurchase",
+          "reserveQuantity",
+          "dispatchQuantity",
+          "placeHold",
+          "releaseHold",
+          "assignCapability",
+          "createPolicyDraft",
+          "approvePolicy",
+          "activatePolicy"
         ],
         "scope": {
           "organizationAlias": "ORG-A",
@@ -842,6 +882,12 @@
     "dispatch-basis": {
       "type": "DocumentVersion",
       "organizationAlias": "ORG-A"
+    },
+    "TRANSIT": {
+      "type": "Place",
+      "organizationAlias": "ORG-A",
+      "name": "출고 운송 구간",
+      "kind": "TRANSIT"
     }
   },
   "baseline": {
