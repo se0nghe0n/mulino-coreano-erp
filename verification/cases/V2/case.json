@@ -142,7 +142,7 @@
                   "provenance": "USER"
                 },
                 "orderLineId": {
-                  "$alias": "ORDER"
+                  "$alias": "ORDER2"
                 },
                 "testBarrier": "afterInitialReadBeforeLocks"
               },
@@ -489,7 +489,7 @@
                 "provenance": "USER"
               },
               "orderLineId": {
-                "$alias": "ORDER"
+                "$alias": "ORDER2"
               }
             },
             "expectedRevision": {
@@ -816,6 +816,54 @@
           }
         },
         {
+          "id": "new-demand-promise-20",
+          "op": "sumEquals",
+          "source": {
+            "actionId": "after-db",
+            "pointer": "/data/rawRows/obligations",
+            "where": {
+              "rootId": {
+                "$alias": "PROMISE2"
+              }
+            },
+            "field": "quantity"
+          },
+          "expected": "20",
+          "requirementRefs": [
+            "D17"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseKey": "V2-split-commits-first"
+          },
+          "evidenceRefs": [
+            "after-db:actual-adapter-artifact"
+          ],
+          "unit": "BOX",
+          "unitSource": {
+            "actionId": "after-db",
+            "pointer": "/data/rawRows/obligations",
+            "where": {
+              "rootId": {
+                "$alias": "PROMISE2"
+              }
+            },
+            "field": "unit"
+          },
+          "oracleExplanation": "신규 주문 ORDER2의 약속20은 기존 약속40과 별도 root로 보존된다.",
+          "oracleRef": {
+            "oracleId": "V2.split-reserve-race",
+            "observationNames": [
+              "existing-obligation"
+            ]
+          }
+        },
+        {
           "id": "new-executable-reservation-7",
           "op": "decimalAtMost",
           "source": {
@@ -884,6 +932,42 @@
             "observationNames": [
               "new-executable-reservation"
             ]
+          }
+        },
+        {
+          "id": "new-executable-reservation-api-exact",
+          "op": "decimalEquals",
+          "source": {
+            "actionId": "after-api",
+            "pointer": "/response/data/newExecutableReservationQuantity"
+          },
+          "expected": "0",
+          "requirementRefs": [
+            "D17"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseKey": "V2-split-commits-first"
+          },
+          "evidenceRefs": [
+            "after-api:actual-adapter-artifact"
+          ],
+          "oracleExplanation": "API 신규 실행 예약은 DB 원 행과 같은 0이다.",
+          "oracleRef": {
+            "oracleId": "V2.split-reserve-race",
+            "observationNames": [
+              "new-executable-reservation"
+            ]
+          },
+          "unit": "BOX",
+          "unitSource": {
+            "actionId": "after-api",
+            "pointer": "/response/data/unit"
           }
         },
         {
@@ -966,6 +1050,42 @@
               "active": true
             },
             "field": "unit"
+          }
+        },
+        {
+          "id": "all-executable-reservations-api-exact",
+          "op": "decimalEquals",
+          "source": {
+            "actionId": "after-api",
+            "pointer": "/response/data/executableReservedQuantity"
+          },
+          "expected": "40",
+          "requirementRefs": [
+            "D17"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseKey": "V2-split-commits-first"
+          },
+          "evidenceRefs": [
+            "after-api:actual-adapter-artifact"
+          ],
+          "oracleExplanation": "API 실행 예약 합계는 같은 snapshot의 DB EXECUTABLE 합계 40과 정확히 같다. 상한만으로는 이중 합산이나 유실을 잡지 못한다(AGENTS.md 명사/동사 동일 수량).",
+          "oracleRef": {
+            "oracleId": "V2.split-reserve-race",
+            "observationNames": [
+              "all-executable-reservations"
+            ]
+          },
+          "unit": "BOX",
+          "unitSource": {
+            "actionId": "after-api",
+            "pointer": "/response/data/unit"
           }
         },
         {
@@ -1831,7 +1951,7 @@
                 "provenance": "USER"
               },
               "orderLineId": {
-                "$alias": "ORDER"
+                "$alias": "ORDER2"
               }
             },
             "expectedRevision": 1,
@@ -2482,6 +2602,54 @@
           }
         },
         {
+          "id": "new-demand-promise-20",
+          "op": "sumEquals",
+          "source": {
+            "actionId": "after-db",
+            "pointer": "/data/rawRows/obligations",
+            "where": {
+              "rootId": {
+                "$alias": "PROMISE2"
+              }
+            },
+            "field": "quantity"
+          },
+          "expected": "20",
+          "requirementRefs": [
+            "D17"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseKey": "V2-reserve-commits-first"
+          },
+          "evidenceRefs": [
+            "after-db:actual-adapter-artifact"
+          ],
+          "unit": "BOX",
+          "unitSource": {
+            "actionId": "after-db",
+            "pointer": "/data/rawRows/obligations",
+            "where": {
+              "rootId": {
+                "$alias": "PROMISE2"
+              }
+            },
+            "field": "unit"
+          },
+          "oracleExplanation": "신규 주문 ORDER2의 약속20은 기존 약속40과 별도 root로 보존된다.",
+          "oracleRef": {
+            "oracleId": "V2.split-reserve-race",
+            "observationNames": [
+              "existing-obligation"
+            ]
+          }
+        },
+        {
           "id": "new-executable-reservation-7",
           "op": "decimalAtMost",
           "source": {
@@ -2529,7 +2697,9 @@
                   "actionId": "winner",
                   "pointer": "/response/allocationId"
                 }
-              }
+              },
+              "active": true,
+              "state": "EXECUTABLE"
             },
             "field": "quantity"
           },
@@ -2549,7 +2719,7 @@
             },
             "caseKey": "V2-reserve-commits-first"
           },
-          "oracleExplanation": "독립 원 행을 해당 범위에서 합산하며 부모와 자식을 이중 합산하지 않는다.",
+          "oracleExplanation": "신규 예약20은 별도 주문 ORDER2의 현재 EXECUTABLE 배분 한 번이다. 명시 분할로 자식에 이관된 뒤 비활성 이력 행을 더하지 않는다(계획 §6 대체+원배분 비활성).",
           "oracleRef": {
             "oracleId": "V2.split-reserve-race",
             "observationNames": [
@@ -2566,9 +2736,47 @@
                   "actionId": "winner",
                   "pointer": "/response/allocationId"
                 }
-              }
+              },
+              "active": true,
+              "state": "EXECUTABLE"
             },
             "field": "unit"
+          }
+        },
+        {
+          "id": "new-executable-reservation-api-exact",
+          "op": "decimalEquals",
+          "source": {
+            "actionId": "after-api",
+            "pointer": "/response/data/newExecutableReservationQuantity"
+          },
+          "expected": "20",
+          "requirementRefs": [
+            "D17"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseKey": "V2-reserve-commits-first"
+          },
+          "evidenceRefs": [
+            "after-api:actual-adapter-artifact"
+          ],
+          "oracleExplanation": "API 신규 실행 예약은 DB 원 행과 같은 20이다.",
+          "oracleRef": {
+            "oracleId": "V2.split-reserve-race",
+            "observationNames": [
+              "new-executable-reservation"
+            ]
+          },
+          "unit": "BOX",
+          "unitSource": {
+            "actionId": "after-api",
+            "pointer": "/response/data/unit"
           }
         },
         {
@@ -2651,6 +2859,42 @@
               "active": true
             },
             "field": "unit"
+          }
+        },
+        {
+          "id": "all-executable-reservations-api-exact",
+          "op": "decimalEquals",
+          "source": {
+            "actionId": "after-api",
+            "pointer": "/response/data/executableReservedQuantity"
+          },
+          "expected": "60",
+          "requirementRefs": [
+            "D17"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseKey": "V2-reserve-commits-first"
+          },
+          "evidenceRefs": [
+            "after-api:actual-adapter-artifact"
+          ],
+          "oracleExplanation": "API 실행 예약 합계는 같은 snapshot의 DB EXECUTABLE 합계 60과 정확히 같다. 상한만으로는 이중 합산이나 유실을 잡지 못한다(AGENTS.md 명사/동사 동일 수량).",
+          "oracleRef": {
+            "oracleId": "V2.split-reserve-race",
+            "observationNames": [
+              "all-executable-reservations"
+            ]
+          },
+          "unit": "BOX",
+          "unitSource": {
+            "actionId": "after-api",
+            "pointer": "/response/data/unit"
           }
         },
         {
@@ -3503,7 +3747,8 @@
               "retryAttempts",
               "dbPrivileges",
               "boundaries",
-              "transactions"
+              "transactions",
+              "promiseCoverage"
             ]
           },
           "evidenceRefs": [
@@ -3786,6 +4031,140 @@
               "active": true
             },
             "field": "unit"
+          }
+        },
+        {
+          "id": "promise-coverage-conserved-60",
+          "op": "sumEquals",
+          "source": {
+            "actionId": "after-db",
+            "pointer": "/data/rawRows/promiseCoverage",
+            "where": {
+              "promiseRootId": {
+                "$alias": "PROMISE"
+              }
+            },
+            "field": "quantity"
+          },
+          "expected": "60",
+          "requirementRefs": [
+            "D17"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseKey": "V2-actual50-correction"
+          },
+          "evidenceRefs": [
+            "after-db:actual-adapter-artifact"
+          ],
+          "unit": "BOX",
+          "unitSource": {
+            "actionId": "after-db",
+            "pointer": "/data/rawRows/promiseCoverage",
+            "where": {
+              "promiseRootId": {
+                "$alias": "PROMISE"
+              }
+            },
+            "field": "unit"
+          },
+          "oracleExplanation": "약속60은 정정 뒤 현재 EXECUTABLE 배분과 현재 부족 의무로 정확히 한 번씩 덮인다. promiseCoverage는 두 원천을 promiseRootId별로 합친 독립 read-only 관찰이다. 실행50+부족10, 전부 정지 시 실행0+부족60은 통과하고 실행50+부족60 이중 집계나 실행0+부족10 유실은 실패한다(계획 §4.2 부족 의무와 대체 배분).",
+          "oracleRef": {
+            "oracleId": "V2.actual50-correction",
+            "observationNames": [
+              "minimum-shortage-duty"
+            ]
+          }
+        },
+        {
+          "id": "promise-coverage-kinds",
+          "op": "fieldsPresent",
+          "source": {
+            "actionId": "after-db",
+            "pointer": "/data/rawRows/promiseCoverage",
+            "where": {
+              "promiseRootId": {
+                "$alias": "PROMISE"
+              }
+            }
+          },
+          "expected": [
+            "coverageKind",
+            "sourceId",
+            "quantity",
+            "unit"
+          ],
+          "requirementRefs": [
+            "D17"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseKey": "V2-actual50-correction"
+          },
+          "evidenceRefs": [
+            "after-db:actual-adapter-artifact"
+          ],
+          "oracleExplanation": "약속60은 정정 뒤 현재 EXECUTABLE 배분과 현재 부족 의무로 정확히 한 번씩 덮인다. promiseCoverage는 두 원천을 promiseRootId별로 합친 독립 read-only 관찰이다. 실행50+부족10, 전부 정지 시 실행0+부족60은 통과하고 실행50+부족60 이중 집계나 실행0+부족10 유실은 실패한다(계획 §4.2 부족 의무와 대체 배분).",
+          "oracleRef": {
+            "oracleId": "V2.actual50-correction",
+            "observationNames": [
+              "minimum-shortage-duty"
+            ]
+          }
+        },
+        {
+          "id": "promise-coverage-shortage-is-correction-duty",
+          "op": "exactSet",
+          "source": {
+            "actionId": "after-db",
+            "pointer": "/data/rawRows/promiseCoverage",
+            "where": {
+              "promiseRootId": {
+                "$alias": "PROMISE"
+              },
+              "coverageKind": "SHORTAGE_OBLIGATION"
+            },
+            "field": "sourceId"
+          },
+          "expected": [
+            {
+              "$result": {
+                "actionId": "correct",
+                "pointer": "/response/obligationId"
+              }
+            }
+          ],
+          "requirementRefs": [
+            "D17"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseKey": "V2-actual50-correction"
+          },
+          "evidenceRefs": [
+            "after-db:actual-adapter-artifact"
+          ],
+          "oracleExplanation": "약속60은 정정 뒤 현재 EXECUTABLE 배분과 현재 부족 의무로 정확히 한 번씩 덮인다. promiseCoverage는 두 원천을 promiseRootId별로 합친 독립 read-only 관찰이다. 실행50+부족10, 전부 정지 시 실행0+부족60은 통과하고 실행50+부족60 이중 집계나 실행0+부족10 유실은 실패한다(계획 §4.2 부족 의무와 대체 배분). 부족 쪽 행은 정정 명령이 반환한 바로 그 부족 의무 하나다.",
+          "oracleRef": {
+            "oracleId": "V2.actual50-correction",
+            "observationNames": [
+              "shortage-duty"
+            ]
           }
         },
         {

@@ -25,10 +25,13 @@
     그러면 "active-physical-4" assertion으로 "실물량·단위와 독립 손계산을 대조한다."를 확인한다
     그러면 "active-physical-5" assertion으로 "실물량·단위와 독립 손계산을 대조한다."를 확인한다
     그러면 "existing-obligation-6" assertion으로 "독립 원 행을 해당 범위에서 합산하며 부모와 자식을 이중 합산하지 않는다."를 확인한다
+    그러면 "new-demand-promise-20" assertion으로 "신규 주문 ORDER2의 약속20은 별도 root로 보존된다"를 확인한다
     그러면 "new-executable-reservation-7" assertion으로 "실물량·단위와 독립 손계산을 대조한다."를 확인한다
     그러면 "new-executable-reservation-8" assertion으로 "독립 DB의 완전한 명령/행동 scope에서 해당 효과 원 행이0개다. 누락과 빈 결과를 혼동하지 않는다."를 확인한다
+    그러면 "new-executable-reservation-api-exact" assertion으로 "API 신규 실행 예약은 DB 원 행과 정확히 같다"를 확인한다
     그러면 "all-executable-reservations-9" assertion으로 "실물량·단위와 독립 손계산을 대조한다."를 확인한다
     그러면 "all-executable-reservations-10" assertion으로 "독립 원 행을 해당 범위에서 합산하며 부모와 자식을 이중 합산하지 않는다."를 확인한다
+    그러면 "all-executable-reservations-api-exact" assertion으로 "API 실행 예약 합계는 DB 원 행 합계와 정확히 같다"를 확인한다
     그러면 "retired-parent-reconsumption-11" assertion으로 "공개 명령의 구조화 outcome을 확인한다."를 확인한다
     그러면 "retired-parent-reconsumption-12" assertion으로 "금지 효과의 동일 scope 전후 원 행을 비교한다. 조회/거부 감사는 별도 scope다."를 확인한다
     그러면 "retired-parent-reconsumption-13" assertion으로 "금지 효과의 동일 scope 전후 원 행을 비교한다. 조회/거부 감사는 별도 scope다."를 확인한다
@@ -71,10 +74,13 @@
     그러면 "active-physical-4" assertion으로 "실물량·단위와 독립 손계산을 대조한다."를 확인한다
     그러면 "active-physical-5" assertion으로 "실물량·단위와 독립 손계산을 대조한다."를 확인한다
     그러면 "existing-obligation-6" assertion으로 "독립 원 행을 해당 범위에서 합산하며 부모와 자식을 이중 합산하지 않는다."를 확인한다
+    그러면 "new-demand-promise-20" assertion으로 "신규 주문 ORDER2의 약속20은 별도 root로 보존된다"를 확인한다
     그러면 "new-executable-reservation-7" assertion으로 "실물량·단위와 독립 손계산을 대조한다."를 확인한다
     그러면 "new-executable-reservation-8" assertion으로 "독립 원 행을 해당 범위에서 합산하며 부모와 자식을 이중 합산하지 않는다."를 확인한다
+    그러면 "new-executable-reservation-api-exact" assertion으로 "API 신규 실행 예약은 DB 원 행과 정확히 같다"를 확인한다
     그러면 "all-executable-reservations-9" assertion으로 "실물량·단위와 독립 손계산을 대조한다."를 확인한다
     그러면 "all-executable-reservations-10" assertion으로 "독립 원 행을 해당 범위에서 합산하며 부모와 자식을 이중 합산하지 않는다."를 확인한다
+    그러면 "all-executable-reservations-api-exact" assertion으로 "API 실행 예약 합계는 DB 원 행 합계와 정확히 같다"를 확인한다
     그러면 "retired-parent-reconsumption-11" assertion으로 "공개 명령의 구조화 outcome을 확인한다."를 확인한다
     그러면 "retired-parent-reconsumption-12" assertion으로 "금지 효과의 동일 scope 전후 원 행을 비교한다. 조회/거부 감사는 별도 scope다."를 확인한다
     그러면 "retired-parent-reconsumption-13" assertion으로 "금지 효과의 동일 scope 전후 원 행을 비교한다. 조회/거부 감사는 별도 scope다."를 확인한다
@@ -108,6 +114,9 @@
     그러면 "promised-obligation-total-5" assertion으로 "독립 원 행을 해당 범위에서 합산하며 부모와 자식을 이중 합산하지 않는다."를 확인한다
     그러면 "minimum-shortage-duty-6" assertion으로 "실물량·단위와 독립 손계산을 대조한다."를 확인한다
     그러면 "minimum-shortage-duty-7" assertion으로 "독립 read-only DB SUM query는 원 행 scope의 부족 하한10을 검증한다. product API projection을 복사하지 않는다."를 확인한다
+    그러면 "promise-coverage-conserved-60" assertion으로 "약속60은 실행 배분과 부족 의무로 정확히 한 번 덮인다"를 확인한다
+    그러면 "promise-coverage-kinds" assertion으로 "약속 coverage 행은 종류·원천·수량·단위를 가진다"를 확인한다
+    그러면 "promise-coverage-shortage-is-correction-duty" assertion으로 "부족 쪽 coverage는 정정이 만든 부족 의무 하나다"를 확인한다
     그러면 "shortage-duty-8" assertion으로 "해당 obligation root/scope의 현재 유효 assignment는 하나다. 의무 root는 실제 명령/대조/sweeper가 반환한 obligationId로 한정한다."를 확인한다
     그러면 "shortage-duty-9" assertion으로 "책임자의 실제 ID와 다음 행동·확인 시각에 공백이 없어야 한다. 의무 root는 실제 명령/대조/sweeper가 반환한 obligationId로 한정한다."를 확인한다
     그러면 "shortage-duty-10" assertion으로 "fixture의 지정된 인간 owner/supervisor와 고정 후속 행동/시각이 유지된다. 의무 root는 실제 명령/대조/sweeper가 반환한 obligationId로 한정한다."를 확인한다
