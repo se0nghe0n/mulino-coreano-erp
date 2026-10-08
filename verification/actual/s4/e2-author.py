@@ -73,6 +73,10 @@ for action in ['SELL','DISPATCH']:
  for cat in ['QC','CUSTOMER','COMMERCIAL']:
   old='s60-'+cat;fragment=[copy.deepcopy(x) for x in up if x['id'] in [old,old+'-match',old+'-link',old+'-decision']]
   text=json.dumps(fragment).replace('s60-'+cat,'e2-'+action.lower()+'-'+cat).replace('$receipt60.segment',SEG).replace('"SELL"','"'+action+'"')
+  # SELL and DISPATCH bases are distinct source decisions; one decision id
+  # with two contents is an evidence CONFLICT at the quality gateway.
+  decision=[x for x in fragment if x['type']=='original'][0]['fixture']['occurrence']['content']['sourceDecisionId']
+  text=text.replace(decision,str(uuid.uuid5(uuid.NAMESPACE_URL,'e2-'+action+':'+decision)))
   fragment=json.loads(text)
   for x in fragment:
    if x.get('capability')=='recordDispositionBasis':x['request']['intentKind']='RECORD'
