@@ -51,6 +51,54 @@ fail-closed다. 명시적 PENDING만 owner·근거가 있는 `KNOWN_OPEN`으로 
 같은 필드에 드러난다. assembler는 같은 `review()`를 읽고 `validate.py`는
 현재 입력과 다시 대조한다. 검사 exit0이 gap 해소나 제품 PASS는 아니다.
 
+## fixture 장소 종류와 transport 준비 검사
+
+장소 종류의 기계 원본은
+[fixture-place-kinds.json](../../../../contracts/fixture-place-kinds.json),
+의미와 보관자 규칙은
+[fixture-place-kinds.md](../../../../contracts/fixture-place-kinds.md)다.
+fixture(baseRefs 포함)의 모든 Place alias에 kind를 적고
+`baseline.places`의 kind도 alias와 같게 둔다.
+
+- `INTERNAL_STORAGE`의 segment는 같은 조직의 Human/Agent alias를
+  `custodianAlias`로 가진다. 내부 보관이 확인돼야 QC·규제·고객·처분
+  조건으로 판매·출고 적격을 판단한다. Organization·Customer·Supplier·
+  Manufacturer alias는 내부 보관자가 아니다.
+- `TRANSIT`·`CUSTOMER`·`SUPPLIER`·`EXTERNAL_PORT`는 외부 장소이며
+  적격은 확정 0이다. 수입 운송 화물의 내부 보관자는 확인 수령 때
+  이어받지만 외부 장소에서 적격을 만들지 않는다.
+- 어휘 밖 kind는 Place alias의
+  `kindControl=UNRECOGNIZED_PLACE_KIND`로 선언한 반례만 쓴다.
+  kind는 어휘 밖이고 `EXTERNAL_`로 시작하지 않아야 한다. 제품은 이를
+  UNKNOWN·적격0으로 보고 confirmed eligible에 넣지 않는다. 확정 0인
+  외부 장소와 구별한다. 제품이 모든 `EXTERNAL_*`를 외부로 보더라도
+  fixture는 선언한 `EXTERNAL_PORT`만 쓴다.
+
+`ContractValidator.placeKindProblems`는 kind 누락·미선언 어휘 밖 kind·
+`baseline.places` 불일치·내부 보관자 없는 INTERNAL_STORAGE segment를
+prepare 문제로 낸다. 옛 WAREHOUSE·INTERNAL_WAREHOUSE·PORT·TRANSPORT를
+기본값이나 묵시 mapping으로 수선하지 않는다. C1
+`unrecognized-place-kind`는 다른 조건이 같은 위탁40의
+INTERNAL_STORAGE 적격40·ALLOWED와 WAREHOUSE 반례 적격0·UNKNOWN을
+비교한다. T16 `confirmed-eligible-control`과 T17
+`eligibility-positive-control`은 장소 오류만으로 적격0이 통과하지 않게
+하는 양성 대조다. 이 fixture 계약과 selftest는 제품 실행 인수가 아니다.
+
+Streamable HTTP의 `route=wire` 요청은
+`Accept: application/json, text/event-stream`을 보내고 Origin을 생략한다.
+Origin은 T20 `wire-bad-origin`의 허용 목록 밖 403 반례에만 둔다.
+Accept 누락은 T20 `wire-missing-accept`의 406 반례다. 두 경우 모두
+업무 효과0을 단언한다. `ContractValidator.wireTransportProblems`는
+해당 action의 `/response/httpStatus`를 각각 403·406으로 고정한 반례만
+예외로 받고, Accept 누락/변경·Origin 포함이나 두 위반을 함께 가진
+요청은 거부한다. raw adapter가 header를 보충하거나 바꾸지 않는다.
+
+Step 3 FixtureInstaller의 kind 기본값 제거·반례 그대로 설치, native
+fixture의 kind/내부 보관자 전환은 cross-owner 요청이다. E1·T13 첫 수령의
+`receivingCustodianId` slot도 receipt 계약과 함께 정해야 한다.
+[round 6 기록](../../../../docs/execution/step2r-round6/README.md)의 남은
+범위이며 이 skill 변경으로 구현됐다고 보고하지 않는다.
+
 ## case 한 개의 구성
 
 `verification/cases/<ID>/`의 `case.json`, `fixture.json`(또는 `fixtures/`),
@@ -133,10 +181,16 @@ case-local capability를 만들지 않는다. 공통 schema·runner·registry·c
 - MCP wire는 [s0-protocol.md](../../../../contracts/mcp/s0-protocol.md)의
   오류 우선순위를 따른다. JSON parse 실패(-32700), batch 배열·object가
   아닌 본문·형식 위반(-32600)을 mirrored header 누락/불일치(-32020)보다
-  먼저 판정한다. header는 유효한 단일 envelope에서만 대조한다.
+  먼저 판정한다. `params` 형식 위반은 object·array가 아닌 값일 때다.
+  object 안의 필수 `_meta` 누락이나 clientInfo·clientCapabilities 내용
+  오류는 400 -32602다(T20 `wire-missing-meta`, `wire-invalid-client-info`,
+  `wire-missing-capabilities`). `_meta` 누락은 비교할 version 값이 없어
+  -32020이 아니다. header는 유효한 단일 envelope에서만 대조한다.
   Mcp-Name이 없는 V4 batch도 -32600이고, 유효한 단일 object의 T20
-  method/header 불일치는 -32020이다. 인증·Origin·Accept·Content-Type의
+  method/name header 불일치는 -32020이다. 인증·Origin·Accept·Content-Type의
   transport 거부와 다른 오류 사이의 순서는 이 규칙이 정하지 않는다.
+  OntologyMcp의 meta/clientInfo/name 오류 불일치는 round 6의 Step 3
+  cross-owner 요청이며 새 wire 실행 인수는 `NOT_RUN`이다.
 - `obligations`·`assessments` 원행의 `current`는 **행 유효성**(대체·정정되지 않은
   revision인가)이며 `status`와 독립이다. 해소된 의무도 `current=true`일 수 있다.
   "현재 열린 의무"는 `{"current":true,"status":"OPEN"}`처럼 둘을 함께 쓴다.
@@ -169,13 +223,20 @@ case-local capability를 만들지 않는다. 공통 schema·runner·registry·c
   나머지 branch에는 loop process `start` 하나씩만 둔다. lot-expiry의
   scheduler와 due-sweeper도 별도 branch다. `restart`는 쓰지 않는다.
   이미 실행 중인 process의 start는 lifecycle 검사가 거부한다.
-- `CaseRunner.parallel`은 어떤 branch도 제출하기 전에 harness 시각을
-  잡아 group 결과의 `data.observationBoundaryAt`에 남긴다. 자연 tick
-  창은 watcher thread 기동 시각이 아니라 이 경계부터 잰다.
-  `parallel`은 barrier가 아니지만 extractor가 scheduler의 지속 제출
-  기록을 읽으므로 경계 뒤 제출을 놓치지 않는다. watcher command의
-  시작은 경계보다 빠를 수 없고, SUBMITTED의 submittedAt은 경계부터
-  command 종료 사이이면서 1–30초 관찰 창 안이어야 한다.
+- `CaseRunner.controlRequest`는 수동 watcher(passiveWatch) 요청의
+  parameter에 `observeFrom`을 넣어 host adapter로 보낸다. group watcher는
+  어떤 branch도 제출하기 직전 잡은 harness 시각(group 결과의
+  `data.observationBoundaryAt`과 같은 값), group 밖 반복 watcher는
+  dispatch 직전의 harness 시각이다. case가 `observeFrom`을 직접 쓰면
+  `ContractValidator.runtimeProfileProblems`가 prepare에서 거부한다.
+  자연 tick 창은 `[observeFrom, observeFrom+observationWindowSeconds]`다.
+  extractor는 지속 제출 기록에서 이 창 안의 행만 읽는다. `parallel`은
+  barrier가 아니지만 늦게 뜬 watcher도 경계 뒤 제출을 읽고, 단독 반복
+  watcher는 앞선 sweep 행을 자기 관찰로 보고하지 않는다.
+  validator는 observeFrom 누락·group 경계와 불일치를 거부한다.
+  watcher command는 observeFrom 전에 시작하거나 창 끝 뒤에 끝날 수
+  없고, SUBMITTED의 submittedAt은 observeFrom부터 command 종료 사이이며
+  1–30초 관찰 창 안이어야 한다.
   `autonomous-within-30s`의 baseline은 `<group>/data/observationBoundaryAt`,
   `autonomous-after-loop-start`는 loop start command의 startedAt 하한과
   이후 30초를 따로 본다. 창 끝 뒤에야 시작한 watcher는 NO_TASK·창 밖
@@ -187,6 +248,8 @@ case-local capability를 만들지 않는다. 공통 schema·runner·registry·c
   SUBMITTED identity는 관찰 창 안 가장 이른 제출 행과 일치해야 하고,
   NO_TASK는 행이 없어야 한다. T26은 그 행의 `submittedBy`를 단언한다.
   자연 tick 증거를 만들려고 harness tick·sweep·resumeWork를 실행하지 않는다.
+  observeFrom 전달·검증은 harness 계약이며 실제 watcher host adapter와
+  extractor 구현/인수는 Step 3 actual 소유, `NOT_RUN`이다.
 - verifyCoverage의 PREPARATION `rawRows.input`에는 `codeCommit`,
   `workingTreeDirty`, `checkoutCommit`, `checkoutDirty`를 둔다.
   validator는 commit 형식(40/64자리 소문자 hex)·boolean과 묶인 준비 보고의
@@ -281,8 +344,9 @@ CAP 노출 면에서 구체화한 것이다.
 `enumerateWriteSurface`는 host-observation schema·guide에 정의돼 있다.
 원행은 surfaces·surfaceItems·probes·probeCoverage다.
 `HostObservationValidator.PROBE_POLICY`와 `KIND_SURFACES`가 다음 적용 정책을
-고정한다. kind에 적용되는 class 중 요청한 class마다 probe 행이 필요하다.
-`writeCapable=false`인 readonly entity set도 쓰기 거부를 관찰한다.
+고정한다. 아래 QUERY 면제가 아닌 항목은 kind에 적용되는 class 중
+요청한 class마다 probe 행이 필요하다. `writeCapable=false`인 readonly
+entity set도 쓰기 거부를 관찰한다.
 
 | item kind | 허용 surface | 적용 probe class |
 |---|---|---|
@@ -293,6 +357,19 @@ CAP 노출 면에서 구체화한 것이다.
 | `TOOL` | MCP_SERVER_DISCOVER·MCP_TOOLS_LIST | MCP_TOOL_CALL |
 | `WORKER_HANDLER` | WORKER_HANDLER_REGISTRY | WORKER_HANDLER_SUBMIT |
 | `MANAGEMENT_ENDPOINT` | MANAGEMENT_ENDPOINTS | MANAGEMENT_ENDPOINT_WRITE |
+
+QUERY 면제는 `TOOL`·`BOUND_ACTION`·`UNBOUND_ACTION`에만 적용한다.
+harness가 hash로 묶인 allowlist bytes
+([acceptance-capabilities.json](../../../../contracts/acceptance-capabilities.json))를
+읽어 다음 세 조건을 모두 확인할 때 FUNCTION처럼 적용 probe class를
+비운다: capabilityId의 kind가 QUERY, `writeCapable=false`, `itemId`가
+그 capability id 자체이거나 `.`·`/` 뒤 그 id로 끝나는 이름이다.
+extractor는 capabilityId와 이름을 실제 노출 면대로 적는다.
+COMMAND·RECORD, id 없음·목록 밖, QUERY id를 빌린 다른 이름, 범용
+`query`·`command` dispatcher와 writeCapable 항목은 면제되지 않는다.
+범용 dispatcher에는 쓰기 요청을 보내 거부와 효과0을 관찰한다.
+면제 항목도 열거·hash·allowlist 대조에는 남고 applicableTargets 계산에서만
+빠진다. READ_ONLY_NO_EFFECT라는 probe outcome은 추가하지 않았다.
 
 정책에 없는 kind·맞지 않는 surface는 거부한다. `writeCapable=true` 항목은
 별도로 모두 probe 대상이며 FUNCTION도 이 규칙을 면제받지 않는다.
@@ -308,7 +385,8 @@ extractor에 남은 신뢰다. 실제 host adapter는 없어 열거 subcase는
 projection·tool·handler 변경 시 수동 열거 결과는 Task handoff·checks에 남긴다.
 남은 실제 adapter·coverage 인수와 관련 소유자는
 [이번 cross-owner 기록](../../../../docs/execution/step1r-sync5/README.md)과
-[Step 2 round 5](../../../../docs/execution/step2r-round5/README.md)를 따른다.
+[Step 2 round 5](../../../../docs/execution/step2r-round5/README.md),
+[round 6 요청](../../../../docs/execution/step2r-round6/README.md)을 따른다.
 
 ## 명사·동사 조회와 query 계약(계획 §3.4)
 

@@ -69,8 +69,14 @@ claim 중복, 프로세스 재시작, 큐 비어 있음, retry 소진을 주입�
 자율 loop fixture의 scheduler·due-sweeper는 watcher group 전의 seed·
 장애·조회·관찰·clock 전진 중에도 기동하지 않는다. api·worker는 group
 밖에서 시작하고, group branch 0 첫 action은 수동 watcher, 나머지는
-loop process start 하나씩이다. 자연 tick 창은 group의
-`data.observationBoundaryAt`부터 재며 extractor가 지속 제출 기록을 읽는다.
+loop process start 하나씩이다. CaseRunner가 수동 watcher 요청에
+`observeFrom`을 넣는다. group에서는 `data.observationBoundaryAt`과 같은
+시각, group 밖 반복 watcher에서는 dispatch 직전 시각이다. case는 이 값을
+직접 쓰지 않는다. extractor는 지속 제출 기록에서
+`[observeFrom, observeFrom+observationWindowSeconds]` 안의 행만 읽고
+앞선 sweep 행을 재사용하지 않는다. watcher command는 observeFrom 전에
+시작하거나 창 끝 뒤에 끝날 수 없다. 실제 host adapter의 전달값 처리와
+제품 인수는 Step 3 actual 소유, `NOT_RUN`이다.
 host await 뒤 DB 관찰은 `RUNTIME_TASK_SNAPSHOT`을 사용한다. observer의
 요청·보고·artifact 검증과 실제 adapter의 `NOT_RUN` 상태는 위 저장소
 harness의 runtimeProfile·snapshot 절을 따른다.

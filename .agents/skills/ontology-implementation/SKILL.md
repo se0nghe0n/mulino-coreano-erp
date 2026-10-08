@@ -22,8 +22,13 @@ authoritative 자료 유무 확인은 코드 재사용과 구별한다.
   [implementation-contracts.md](references/implementation-contracts.md)를 읽는다.
 - 노출 면(projection/action/tool)이나 조회 query를 바꿀 때:
   implementation-contracts.md의 "쓰기 노출 면과 조회 계약"을 읽는다.
-  kind별 probe 정책, API revision과 runtime task snapshot의 관찰 계약,
-  PREPARATION checkout 대조와 실제 adapter의 미실행 범위를 구별한다.
+  kind별 probe 정책과 QUERY 면제, API revision과 runtime task snapshot의
+  관찰 계약, PREPARATION checkout 대조와 실제 adapter의 미실행 범위를
+  구별한다.
+- 적격성·fixture·정정/정산을 바꿀 때: implementation-contracts.md의
+  "수량 원장과 실행 배분"과 "S4 정산 복원·면제와 정정 영향"을 읽는다.
+  Place.kind/내부 보관자, UNKNOWN과 외부 장소의 확정0, 복원 assignment
+  재발행·면제 잔여 부활 금지·IMPORTED 제외와 S5 잔여를 보존한다.
 - 변경 범위·oracle·인수 증거:
   [case-routing.md](references/case-routing.md)에서 관련 D/T와 C/V/E를 찾고,
   계획 §13의 원문 fixture를 읽는다. 요약표만으로 fixture를 축소하지 않는다.

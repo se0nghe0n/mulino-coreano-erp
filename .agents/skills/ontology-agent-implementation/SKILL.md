@@ -31,17 +31,20 @@ Adapter에서 물량·승인·목표 판정 규칙을 복제하지 않는다.
 
 - MCP wire, MRTR, 입력 초안과 최종 효과를 구현할 때
   [protocol-and-intent.md](references/protocol-and-intent.md)를 읽는다.
+  Accept 필수·Origin 반례 한정, envelope -32600과 params 내용 -32602,
+  mirrored header -32020을 구별하고 backend의 cross-owner gap을 보존한다.
 - MCP tool·worker handler로 쓰기/조회 면을 노출하거나 조회 schema를 바꿀 때
   [implementation-contracts.md](../ontology-implementation/references/implementation-contracts.md)의
   "쓰기 노출 면과 조회 계약"을 읽는다. tool 목록과 worker registry도 V4
   열거 요구 대상이다(`enumerateWriteSurface` 계약은 정의됐고 실제 host adapter가
   없어 열거 subcase `exposed-write-surface`는 `NOT_RUN`이다). probe class는
-  item kind별 정책도 따르며 readonly 항목을 임의 제외하지 않는다.
+  item kind별 정책과 hash로 묶인 QUERY capability 면제를 따른다.
+  readonly ENTITY_SET·COMMAND·RECORD·범용 dispatcher는 probe를 유지한다.
 - grants·approval, worker/outbox, 정의 호환, runtime package 또는
   client 인수를 구현할 때
   [runtime-and-client.md](references/runtime-and-client.md)를 읽는다.
-  자율 loop의 group 전 기동 금지·관찰 경계, runtime snapshot과 V7 원행
-  primary를 실제 adapter 구현 완료와 구별한다.
+  자율 loop의 group 전 기동 금지·watcher observeFrom, runtime snapshot과
+  V7 원행 primary를 실제 adapter 구현 완료와 구별한다.
 
 참고 자료는 해당 작업에 필요한 것만 읽는다. 명령 이름은 설계 계약이며
 구현된 공개 schema와 대조한 뒤 사용한다.

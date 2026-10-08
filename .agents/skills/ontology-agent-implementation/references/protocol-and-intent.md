@@ -22,8 +22,14 @@ SDK의 stateless 옵션 하나는 protocol 준수 증거가 아니다.
 독립 adapter와 compatibility test가 있는 경우에만 표시한다.
 
 원격 기본값은 인증된 Streamable HTTP다. 각 메시지는 독립 POST이며
-JSON 또는 요청 범위 SSE response를 처리한다. Origin 검증과 endpoint
-인증을 구현한다. `MCP-Protocol-Version`, `Mcp-Method`, 필요한 `Mcp-Name`
+JSON 또는 요청 범위 SSE response를 처리한다. S0/T20/V4 요청은
+`Accept: application/json, text/event-stream`과 `Content-Type: application/json`을
+보낸다. Origin 검증과 endpoint 인증을 구현한다. case의 Origin은
+`wire-bad-origin`의 허용 목록 밖 403 반례에만 보내고, Accept 누락은
+`wire-missing-accept`의 406 반례다. JSON-RPC 처리·업무 효과0을 검사한다.
+prepare는 반례의 `/response/httpStatus` 고정값을 확인한다. 두 위반을
+함께 넣거나 adapter가 raw header를 보충하지 않는다.
+`MCP-Protocol-Version`, `Mcp-Method`, 필요한 `Mcp-Name`
 및 채택한 `x-mcp-header`의 header/body 일치를 검사한다. 잘못된 표기는
 공식 header encoding/오류 계약대로 거부한다. stdio는 필요한 로컬
 인수에만 사용하며 같은 schema·protocol·제한된 자격을 적용한다.
@@ -36,13 +42,23 @@ JSON 또는 요청 범위 SSE response를 처리한다. Origin 검증과 endpoin
 
 S0의 [오류와 경계](../../../../contracts/mcp/s0-protocol.md)는 body 검사를
 mirrored header보다 먼저 한다. JSON parse 실패는 -32700, batch 배열·
-object가 아닌 본문·jsonrpc/id/method/params 형식 위반은 -32600이다.
-envelope이 유효할 때만 header 누락/불일치 -32020을 판정한다.
+object가 아닌 본문·jsonrpc/id/method/params 형식 위반은 400 -32600이다.
+params의 형식 위반은 object·array가 아닌 값일 때만 해당한다. object
+안의 필수 `_meta` 누락, clientInfo·clientCapabilities 내용 오류는
+400 -32602다(`wire-missing-meta`, `wire-invalid-client-info`,
+`wire-missing-capabilities`). `_meta` 누락은 비교할 version 값이 없어
+HeaderMismatch(-32020)로 분류하지 않는다. envelope이 유효할 때만
+mirrored header 누락/불일치 -32020을 판정하며 tools/call의 Mcp-Name
+불일치도 여기에 속한다.
 Mcp-Name이 없는 V4 tools/call batch도 -32600이며, 유효한 단일 object의
 T20 method/header 불일치는 -32020이다. 인증·Origin·Accept·Content-Type
 transport 거부와 다른 오류의 상대 순서는 이 계약이 정하지 않는다.
-backend의 현재 검사 순서는 round 5 소스 확인이며 전체 wire 실행
-인수의 증거가 아니다.
+envelope 우선 순서는 backend 소스 확인이며 전체 wire 실행 인수의
+증거가 아니다. OntologyMcp의 `_meta`·clientCapabilities 누락, clientInfo
+검사, Mcp-Name 불일치 code는
+[round 6](../../../../docs/execution/step2r-round6/README.md)의 Step 3
+cross-owner 요청이다. 이 문서 갱신을 backend 수정이나 T20/S5 wire
+PASS로 세지 않는다.
 
 ## 입력 초안 → canonical proposal → 효과
 
