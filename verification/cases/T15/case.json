@@ -2922,6 +2922,42 @@
               "legal-eligibility"
             ]
           }
+        },
+        {
+          "id": "confirmed-eligible-agency-allowed0",
+          "op": "count",
+          "source": {
+            "actionId": "db",
+            "pointer": "/data/rawRows/eligibilityComponents",
+            "where": {
+              "condition": "AGENCY",
+              "result": "ALLOWED"
+            }
+          },
+          "expected": 0,
+          "requirementRefs": [
+            "D15"
+          ],
+          "evidenceRefs": [
+            "db:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "T15",
+            "subcaseId": "missing-officialSource",
+            "itemId": {
+              "$alias": "P"
+            }
+          },
+          "oracleExplanation": "검토 근거가 빠진 규제 정책으로는 독립 DB의 AGENCY 적격 구성요소가 ALLOWED인 행이 0개다. API의 확정 판매 적격0 BOX가 원장 판정과 같은지 대조한다.",
+          "oracleRef": {
+            "oracleId": "T15.unresolved-real-policy",
+            "observationNames": [
+              "confirmed-eligible"
+            ]
+          }
         }
       ],
       "oracleExplanation": "가상 입력 fixture에서 모든 명령을 실제 서버에 전달하고 원행·단위·증거·인간 책임을 독립 대조한다. 미구현은 NOT_RUN이며 표본 검사는 제품 PASS가 아니다."
@@ -3456,6 +3492,42 @@
               "legal-eligibility"
             ]
           }
+        },
+        {
+          "id": "confirmed-eligible-agency-allowed0",
+          "op": "count",
+          "source": {
+            "actionId": "db",
+            "pointer": "/data/rawRows/eligibilityComponents",
+            "where": {
+              "condition": "AGENCY",
+              "result": "ALLOWED"
+            }
+          },
+          "expected": 0,
+          "requirementRefs": [
+            "D15"
+          ],
+          "evidenceRefs": [
+            "db:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "T15",
+            "subcaseId": "missing-applicableDate",
+            "itemId": {
+              "$alias": "P"
+            }
+          },
+          "oracleExplanation": "검토 근거가 빠진 규제 정책으로는 독립 DB의 AGENCY 적격 구성요소가 ALLOWED인 행이 0개다. API의 확정 판매 적격0 BOX가 원장 판정과 같은지 대조한다.",
+          "oracleRef": {
+            "oracleId": "T15.unresolved-real-policy",
+            "observationNames": [
+              "confirmed-eligible"
+            ]
+          }
         }
       ],
       "oracleExplanation": "가상 입력 fixture에서 모든 명령을 실제 서버에 전달하고 원행·단위·증거·인간 책임을 독립 대조한다. 미구현은 NOT_RUN이며 표본 검사는 제품 PASS가 아니다."
@@ -3986,6 +4058,42 @@
             "oracleId": "T15.unresolved-real-policy",
             "observationNames": [
               "legal-eligibility"
+            ]
+          }
+        },
+        {
+          "id": "confirmed-eligible-agency-allowed0",
+          "op": "count",
+          "source": {
+            "actionId": "db",
+            "pointer": "/data/rawRows/eligibilityComponents",
+            "where": {
+              "condition": "AGENCY",
+              "result": "ALLOWED"
+            }
+          },
+          "expected": 0,
+          "requirementRefs": [
+            "D15"
+          ],
+          "evidenceRefs": [
+            "db:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "T15",
+            "subcaseId": "missing-reviewer",
+            "itemId": {
+              "$alias": "P"
+            }
+          },
+          "oracleExplanation": "검토 근거가 빠진 규제 정책으로는 독립 DB의 AGENCY 적격 구성요소가 ALLOWED인 행이 0개다. API의 확정 판매 적격0 BOX가 원장 판정과 같은지 대조한다.",
+          "oracleRef": {
+            "oracleId": "T15.unresolved-real-policy",
+            "observationNames": [
+              "confirmed-eligible"
             ]
           }
         }

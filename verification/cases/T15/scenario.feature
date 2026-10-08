@@ -75,6 +75,7 @@
     그러면 "activation-blocked-error" assertion으로 "고정 oracle regulatory-gate의 실제 값과 범위를 확인한다"를 확인한다
     그러면 "fixture-not-official" assertion으로 "고정 oracle regulatory-gate의 실제 값과 범위를 확인한다"를 확인한다
     그러면 "agency-unknown" assertion으로 "고정 oracle legal-eligibility의 실제 값과 범위를 확인한다"를 확인한다
+    그러면 "confirmed-eligible-agency-allowed0" assertion으로 "검토 근거 없는 정책에서 DB의 AGENCY ALLOWED 원행은 0개로 확정 판매 적격 0 BOX다"를 확인한다
 
   시나리오: 실제 규제 applicableDate 누락은 운영 허용을 만들지 않는다
     먼저 사례 파일 "verification/cases/T15/case.json"의 "missing-applicableDate"를 준비한다
@@ -93,6 +94,7 @@
     그러면 "activation-blocked-error" assertion으로 "고정 oracle regulatory-gate의 실제 값과 범위를 확인한다"를 확인한다
     그러면 "fixture-not-official" assertion으로 "고정 oracle regulatory-gate의 실제 값과 범위를 확인한다"를 확인한다
     그러면 "agency-unknown" assertion으로 "고정 oracle legal-eligibility의 실제 값과 범위를 확인한다"를 확인한다
+    그러면 "confirmed-eligible-agency-allowed0" assertion으로 "검토 근거 없는 정책에서 DB의 AGENCY ALLOWED 원행은 0개로 확정 판매 적격 0 BOX다"를 확인한다
 
   시나리오: 실제 규제 reviewer 누락은 운영 허용을 만들지 않는다
     먼저 사례 파일 "verification/cases/T15/case.json"의 "missing-reviewer"를 준비한다
@@ -111,3 +113,4 @@
     그러면 "activation-blocked-error" assertion으로 "고정 oracle regulatory-gate의 실제 값과 범위를 확인한다"를 확인한다
     그러면 "fixture-not-official" assertion으로 "고정 oracle regulatory-gate의 실제 값과 범위를 확인한다"를 확인한다
     그러면 "agency-unknown" assertion으로 "고정 oracle legal-eligibility의 실제 값과 범위를 확인한다"를 확인한다
+    그러면 "confirmed-eligible-agency-allowed0" assertion으로 "검토 근거 없는 정책에서 DB의 AGENCY ALLOWED 원행은 0개로 확정 판매 적격 0 BOX다"를 확인한다
