@@ -79,8 +79,8 @@ public class ApplicationCommands {
     Map<String,Object> facts=new LinkedHashMap<>(current.auditFacts(c,cap,prep,intent));facts.put("subjectBindings",subjects.stream().map(SubjectBinding::facts).toList());facts.put("scope",prep.scopes());facts.put("effectClass",prep.effectClass());facts.put("definitionVersion",intent.get("definitionVersion"));facts.put("capabilityVersion",intent.get("capabilityVersion"));if(prep.currentRevision()!=null)facts.put("beforeRevision",prep.currentRevision());if(prep.targetId()!=null)facts.put("targetId",prep.targetId());
     String id=repository.begin(c,intent,hash,clock.instant(),prep);Map<String,Object> result;String previous=CommandExecution.enter(id);
     try{result=new LinkedHashMap<>(h.execute(c,intent));}finally{CommandExecution.exit(previous);}
-    if(!Set.of("APPLIED","ACCEPTED_PENDING_EXTERNAL","PENDING_EXTERNAL","WAITING_APPROVAL","NEEDS_INPUT","REJECTED","CONFLICT","HELD").contains(result.get("outcome")))throw new IllegalStateException("Invalid handler command outcome");
-    if(Set.of("REJECTED","CONFLICT","NEEDS_INPUT","WAITING_APPROVAL","HELD").contains(result.get("outcome")))throw new DomainError((String)result.get("outcome"),"COMMAND_NOT_APPLIED","Command did not apply");
+    if(!CommandOutcomes.ALL.contains(result.get("outcome")))throw new IllegalStateException("Invalid handler command outcome");
+    if(CommandOutcomes.NOT_APPLIED.contains(result.get("outcome")))throw new DomainError((String)result.get("outcome"),"COMMAND_NOT_APPLIED","Command did not apply");
     if(!h.mutatesAuthorization(cap))auth.authorizeScopes(c,cap,prep.scopes());current.verifyCommit(c,cap,hash,prep,intent,h.mutatesAuthorization(cap));if(!claim.isEmpty())leases.getObject().fenceAndVerify(c,claim);
     current.consume(c,prep,intent,id);
     result.put("commandId",id);result.put("canonicalIntentHash",hash);result.put("proposalRevision",prep.proposalRevision()>0?prep.proposalRevision():1);

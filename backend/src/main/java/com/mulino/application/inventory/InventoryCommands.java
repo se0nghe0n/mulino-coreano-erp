@@ -53,7 +53,7 @@ public final class InventoryCommands implements CommandHandler {
       if(sources.size()<2)throw DomainError.invalid("Two merge parents required");
       if(!(slots.get("expectedRevisions") instanceof Map<?,?> revisions)||revisions.size()!=sources.size())throw DomainError.invalid("Every merge parent revision required");
       for(var s:sources) {
-        Object expected=revisions.get(s.get("ID"));if(!(expected instanceof Integer)||!expected.equals(s.get("revision")))throw new DomainError("REJECTED","REVISION_CONFLICT","Merge parent revision changed");
+        Object expected=revisions.get(s.get("ID"));if(!(expected instanceof Integer)||!expected.equals(s.get("revision")))throw new DomainError("CONFLICT","STALE_REVISION","Merge parent revision changed");
         for(String key:List.of("itemId","lotId","unit","placeId","controlScope","custodianId","ownerId","identificationStatus"))if(!Objects.equals(first.get(key),s.get(key)))throw DomainError.invalid("Incompatible merge "+key);
       }
     }
@@ -71,7 +71,7 @@ public final class InventoryCommands implements CommandHandler {
       if(capability.equals("adjustQuantity")) {
         String direction=text(slots,"direction",40);if(!Set.of("INCREASE","DECREASE").contains(direction))throw DomainError.invalid("Adjustment direction required");
         var count=repository.current(c,"Stocktakes",uuid(slots,"stocktakeId"));
-        if(repository.currentRows(c,"StockAdjustments").stream().anyMatch(a->count.get("ID").equals(a.get("stocktakeId"))))throw new DomainError("REJECTED","REVISION_CONFLICT","Stocktake difference already applied");
+        if(repository.currentRows(c,"StockAdjustments").stream().anyMatch(a->count.get("ID").equals(a.get("stocktakeId"))))throw new DomainError("CONFLICT","STOCKTAKE_ALREADY_APPLIED","Stocktake difference already applied");
         if(at.isBefore(StockPrimitives.instant(count.get("occurredAt"))))throw DomainError.invalid("Adjustment precedes stocktake occurrence");
         BigDecimal difference=((BigDecimal)count.get("observedQuantity")).subtract(StockPrimitives.amount(first));
         if(!first.get("ID").equals(count.get("segmentId"))||!first.get("unit").equals(count.get("unit"))||difference.abs().compareTo(q)!=0||difference.signum()!=(direction.equals("INCREASE")?1:-1))throw DomainError.invalid("Adjustment must reconcile this stocktake difference");

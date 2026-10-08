@@ -14,6 +14,8 @@ import java.util.*;
 public final class ObligationClosureCatalog {
  public static final String MANAGER="decideQuantityDutyWaiver",QC="decideQualityDutyWaiver",ADMIN="decideRecallDutyWaiver";
  public static final Set<String> DECISION_CAPABILITIES=Set.of(MANAGER,QC,ADMIN);
+ /** decideReturnDisposition decisions; each creates the RETURN_&lt;decision&gt; execution duty. */
+ public static final List<String> RETURN_DECISIONS=List.of("REVIEW","RESALE","EXCHANGE","REFUND","DISPOSE");
  public record Closure(String kind,String resolution,String autoClosure,String waiverCapability,String nextAction){
   public boolean resolvable(){return resolution!=null;}
   public boolean waivable(){return waiverCapability!=null;}
@@ -51,9 +53,13 @@ public final class ObligationClosureCatalog {
   kind("UNVERIFIED_SOURCE_REVIEW",null,null,null,"원천 관측을 대조해 확정 또는 미확인을 유지한다");
   kind("RUNTIME_RECOVERY",null,null,null,"실행 복구 원인을 확인하고 안전한 재시도를 결정한다");
   kind("INVENTORY_VALIDITY",null,null,null,"정지된 배분과 현재 적격성을 검토한다");
+  // decideReturnDisposition execution duties (ReturnCommands decision set); closure undefined by the plan.
+  for(String decision:RETURN_DECISIONS)kind("RETURN_"+decision,null,null,null,"반품 처분 결정을 별도로 실행하고 결과를 기록한다");
  }
  private ObligationClosureCatalog(){}
- /** RETURN_<decision> execution duties from decideReturnDisposition have no defined closure. */
+ /** Every kind the product may create (contracts/domain-vocabulary.json obligationKinds). */
+ public static boolean known(String kind){return KINDS.containsKey(kind);}
+ /** Unknown kinds only appear in rows created before the closed vocabulary; they stay fail-closed. */
  public static Closure closure(String kind){
   var known=KINDS.get(kind);if(known!=null)return known;
   return new Closure(kind,null,null,null,"정의되지 않은 의무 종료 경로다; 담당자가 계속 책임진다");
