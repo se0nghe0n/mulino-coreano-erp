@@ -44,6 +44,7 @@
     그러면 "due-obligation-discovered" assertion으로 "해당 scope의 각 실제 원 행 값과 고정 기대값을 대조한다."를 확인한다
     그러면 "no-fake-receipt" assertion으로 "독립 DB 원 행을 정확한 대상 scope로 세어 중복·누락을 거부한다."를 확인한다
     그러면 "timeout-never-satisfied" assertion으로 "시간 경과·queue 성공이 증거 없는 목표를 충족시키지 않는다."를 확인한다
+    그러면 "queue-empty-after-restart" assertion으로 "재시작 뒤 terminal 관찰 시점에도 queue message0이다. 재발견은 DB due index에서만 온다."를 확인한다
 
   시나리오: 종료된 부모 뒤 이상 접수의 연결 장애를 DB에서 복구한다
     먼저 사례 파일 "verification/cases/T26/case.json"의 "orphan-intake-recovered"를 준비한다
@@ -221,8 +222,8 @@
     그러면 "canonical-key-kept" assertion으로 "해당 scope의 각 실제 원 행 값과 고정 기대값을 대조한다."를 확인한다
     그러면 "current-grant-rechecked" assertion으로 "해당 scope의 각 실제 원 행 값과 고정 기대값을 대조한다."를 확인한다
     그러면 "safe-retry-fence-used" assertion으로 "운영 retry의 확정 명령이 현재 claim fence token을 사용한다."를 확인한다
-    그러면 "safe-retry-original-actor" assertion으로 "OPERATIONS credential을 원 업무 actor로 대체하지 않는다."를 확인한다
-    그러면 "retry-canonical-hash" assertion으로 "재시도는 원 canonical hash를 바꾸지 않는다."를 확인한다
+    그러면 "safe-retry-original-actor" assertion으로 "저장된 원 command의 actor는 원 요청을 인증한 warehouse다. retry payload는 actor를 전달하지 않으므로 서버가 저장 원행에서 다시 읽은 값이다."를 확인한다
+    그러면 "retry-canonical-hash" assertion으로 "저장 command의 canonical hash는 원 요청 응답의 hash와 같다. retry payload는 hash를 전달하지 않는다."를 확인한다
     그러면 "moved-20" assertion으로 "rollback0 + 안전 retry20 = 실제 이동20 한 번이다."를 확인한다
 
   시나리오: 원 grant 철회 뒤 OPERATIONS retry도 새 효과를 만들지 못한다
@@ -260,6 +261,63 @@
     그러면 "api-owner" assertion으로 "API가 DB와 같은 인간 주 책임자를 반환한다."를 확인한다
     그러면 "api-action" assertion으로 "이름이 같은 Boolean 대신 실제 다음 행동을 확인한다."를 확인한다
     그러면 "api-check" assertion으로 "고정 업무 시계의 다음 확인 시점을 검사한다."를 확인한다
+
+  시나리오: 철회된 원 actor 대신 payload가 지목한 actor로 재시도할 수 없다
+    먼저 사례 파일 "verification/cases/T26/case.json"의 "safe-retry-forged-original-actor"를 준비한다
+    만일 "시스템" 역할이 "setup" 행동을 수행한다
+    만일 "시스템" 역할이 "start-app-api" 행동을 수행한다
+    만일 "시스템" 역할이 "start-app-scheduler" 행동을 수행한다
+    만일 "시스템" 역할이 "start-app-worker-a" 행동을 수행한다
+    만일 "시스템" 역할이 "start-app-worker-b" 행동을 수행한다
+    만일 "시스템" 역할이 "commit-fault" 행동을 수행한다
+    만일 "warehouse" 역할이 "original" 행동을 수행한다
+    만일 "operations" 역할이 "before" 행동을 수행한다
+    만일 "시스템" 역할이 "before-db" 행동을 수행한다
+    만일 "시스템" 역할이 "clear-commit-fault" 행동을 수행한다
+    만일 "supervisor" 역할이 "revoke" 행동을 수행한다
+    만일 "시스템" 역할이 "restart-api" 행동을 수행한다
+    만일 "시스템" 역할이 "restart-scheduler" 행동을 수행한다
+    만일 "시스템" 역할이 "restart-worker-a" 행동을 수행한다
+    만일 "시스템" 역할이 "restart-worker-b" 행동을 수행한다
+    만일 "operations" 역할이 "retry" 행동을 수행한다
+    만일 "operations" 역할이 "api" 행동을 수행한다
+    만일 "시스템" 역할이 "db" 행동을 수행한다
+    그러면 "forged-actor-rejected" assertion으로 "payload의 originalActorId는 권한이 아니다. 저장된 원 actor의 철회된 grant 때문에 또는 허용되지 않은 필드 때문에 거부되며 어느 경우도 효과를 만들지 않는다."를 확인한다
+    그러면 "db-segments-unchanged" assertion으로 "허용된 audit·대조 책임과 분리해 금지된 업무 효과 전후 원 행을 비교한다."를 확인한다
+    그러면 "db-genealogy-unchanged" assertion으로 "허용된 audit·대조 책임과 분리해 금지된 업무 효과 전후 원 행을 비교한다."를 확인한다
+    그러면 "db-movements-unchanged" assertion으로 "허용된 audit·대조 책임과 분리해 금지된 업무 효과 전후 원 행을 비교한다."를 확인한다
+    그러면 "db-allocations-unchanged" assertion으로 "허용된 audit·대조 책임과 분리해 금지된 업무 효과 전후 원 행을 비교한다."를 확인한다
+    그러면 "db-quantity-delta-zero" assertion으로 "전후 보유량20−20=0BOX다. 현재와 baseline 단위를 모두 검사한다."를 확인한다
+    그러면 "db-current-assignment-one" assertion으로 "독립 DB 원 행을 정확한 대상 scope로 세어 중복·누락을 거부한다."를 확인한다
+    그러면 "db-owner" assertion으로 "해당 scope의 각 실제 원 행 값과 고정 기대값을 대조한다."를 확인한다
+    그러면 "db-duty-status" assertion으로 "해당 scope의 각 실제 원 행 값과 고정 기대값을 대조한다."를 확인한다
+    그러면 "db-next-action" assertion으로 "해당 scope의 각 실제 원 행 값과 고정 기대값을 대조한다."를 확인한다
+    그러면 "db-next-check" assertion으로 "해당 scope의 각 실제 원 행 값과 고정 기대값을 대조한다."를 확인한다
+    그러면 "api-owner" assertion으로 "API가 DB와 같은 인간 주 책임자를 반환한다."를 확인한다
+    그러면 "api-action" assertion으로 "이름이 같은 Boolean 대신 실제 다음 행동을 확인한다."를 확인한다
+    그러면 "api-check" assertion으로 "고정 업무 시계의 다음 확인 시점을 검사한다."를 확인한다
+    그러면 "forged-actor-no-committed-retry" assertion으로 "위조된 actor로 시도한 retry는 COMMITTED command를 남기지 않는다."를 확인한다
+
+  시나리오: 호출자가 제시한 다른 canonical hash로 안전 재시도할 수 없다
+    먼저 사례 파일 "verification/cases/T26/case.json"의 "safe-retry-forged-request-hash"를 준비한다
+    만일 "시스템" 역할이 "setup" 행동을 수행한다
+    만일 "시스템" 역할이 "start-app-api" 행동을 수행한다
+    만일 "시스템" 역할이 "start-app-scheduler" 행동을 수행한다
+    만일 "시스템" 역할이 "start-app-worker-a" 행동을 수행한다
+    만일 "시스템" 역할이 "start-app-worker-b" 행동을 수행한다
+    만일 "시스템" 역할이 "commit-fault" 행동을 수행한다
+    만일 "warehouse" 역할이 "original" 행동을 수행한다
+    만일 "operations" 역할이 "before" 행동을 수행한다
+    만일 "시스템" 역할이 "before-db" 행동을 수행한다
+    만일 "시스템" 역할이 "clear-commit-fault" 행동을 수행한다
+    만일 "operations" 역할이 "retry" 행동을 수행한다
+    만일 "operations" 역할이 "api" 행동을 수행한다
+    만일 "시스템" 역할이 "db" 행동을 수행한다
+    그러면 "before-movement-zero" assertion으로 "독립 DB 원 행을 정확한 대상 scope로 세어 중복·누락을 거부한다."를 확인한다
+    그러면 "forged-hash-rejected" assertion으로 "저장 hash와 다른 호출자 hash로는 재시도하지 않는다."를 확인한다
+    그러면 "forged-hash-no-movement" assertion으로 "거부된 위조 hash 재시도는 실제 이동을 만들지 않는다."를 확인한다
+    그러면 "forged-hash-no-committed-retry" assertion으로 "위조 hash retry는 COMMITTED command를 남기지 않는다."를 확인한다
+    그러면 "stored-hash-unchanged" assertion으로 "원 canonical key의 저장 command hash는 원 응답의 hash 그대로이며 호출자 hash로 바뀌지 않는다. 거부된 retry record는 별도 허용 기록이다."를 확인한다
 
   시나리오: UNKNOWN_EXTERNAL은 대조 전에 재발행하지 않고 확인 성공을 연결한다
     먼저 사례 파일 "verification/cases/T26/case.json"의 "unknown-external-reconcile-before-retry"를 준비한다
@@ -1031,3 +1089,189 @@
     그러면 "api-evidence-hash" assertion으로 "API도 같은 불변 문서 hash를 반환하며 파일 부재 여부는 별도 가용성으로 보존한다."를 확인한다
     그러면 "api-evidence-availability" assertion으로 "URI 존재만으로 실제 원문 가용성을 확정하지 않는다."를 확인한다
     그러면 "restore-execution-state" assertion으로 "누락된 blob/evaluator로 후속 실행을 열지 않는다."를 확인한다
+
+  시나리오: 큐 메시지 없이 DB의 due 의무와 대기를 재발견한다 — harness tick/sweep 없이 scheduler loop가 스스로 찾는다
+    먼저 사례 파일 "verification/cases/T26/case.json"의 "due-wait-autonomous-loop"를 준비한다
+    만일 "시스템" 역할이 "setup" 행동을 수행한다
+    만일 "시스템" 역할이 "start-app-api" 행동을 수행한다
+    만일 "시스템" 역할이 "start-app-scheduler" 행동을 수행한다
+    만일 "시스템" 역할이 "start-app-worker-a" 행동을 수행한다
+    만일 "시스템" 역할이 "start-app-worker-b" 행동을 수행한다
+    만일 "owner" 역할이 "create" 행동을 수행한다
+    만일 "owner" 역할이 "create-activate" 행동을 수행한다
+    만일 "owner" 역할이 "wait" 행동을 수행한다
+    만일 "operations" 역할이 "before" 행동을 수행한다
+    만일 "시스템" 역할이 "before-db" 행동을 수행한다
+    만일 "시스템" 역할이 "stop-app-api" 행동을 수행한다
+    만일 "시스템" 역할이 "stop-app-scheduler" 행동을 수행한다
+    만일 "시스템" 역할이 "stop-app-worker-a" 행동을 수행한다
+    만일 "시스템" 역할이 "stop-app-worker-b" 행동을 수행한다
+    만일 "시스템" 역할이 "advance" 행동을 수행한다
+    만일 "시스템" 역할이 "start-again-api" 행동을 수행한다
+    만일 "시스템" 역할이 "start-again-scheduler" 행동을 수행한다
+    만일 "시스템" 역할이 "start-again-worker-a" 행동을 수행한다
+    만일 "시스템" 역할이 "start-again-worker-b" 행동을 수행한다
+    만일 "시스템" 역할이 "tick" 행동을 수행한다
+    만일 "시스템" 역할이 "terminal" 행동을 수행한다
+    만일 "operations" 역할이 "api" 행동을 수행한다
+    만일 "시스템" 역할이 "db" 행동을 수행한다
+    그러면 "terminal-origin" assertion으로 "실제 scheduler가 자율 생성한 task의 종료를 관찰한다."를 확인한다
+    그러면 "terminal-terminal" assertion으로 "제출 ACK가 아니라 실제 task terminal을 확인한다."를 확인한다
+    그러면 "db-current-assignment-one" assertion으로 "독립 DB 원 행을 정확한 대상 scope로 세어 중복·누락을 거부한다."를 확인한다
+    그러면 "db-owner" assertion으로 "해당 scope의 각 실제 원 행 값과 고정 기대값을 대조한다."를 확인한다
+    그러면 "db-duty-status" assertion으로 "해당 scope의 각 실제 원 행 값과 고정 기대값을 대조한다."를 확인한다
+    그러면 "db-next-action" assertion으로 "해당 scope의 각 실제 원 행 값과 고정 기대값을 대조한다."를 확인한다
+    그러면 "db-next-check" assertion으로 "해당 scope의 각 실제 원 행 값과 고정 기대값을 대조한다."를 확인한다
+    그러면 "api-owner" assertion으로 "API가 DB와 같은 인간 주 책임자를 반환한다."를 확인한다
+    그러면 "api-action" assertion으로 "이름이 같은 Boolean 대신 실제 다음 행동을 확인한다."를 확인한다
+    그러면 "api-check" assertion으로 "고정 업무 시계의 다음 확인 시점을 검사한다."를 확인한다
+    그러면 "durable-wait-before" assertion으로 "해당 scope의 각 실제 원 행 값과 고정 기대값을 대조한다."를 확인한다
+    그러면 "empty-message-queue" assertion으로 "독립 DB 원 행을 정확한 대상 scope로 세어 중복·누락을 거부한다."를 확인한다
+    그러면 "discovery-source-db" assertion으로 "해당 scope의 각 실제 원 행 값과 고정 기대값을 대조한다."를 확인한다
+    그러면 "attempt-cause-due" assertion으로 "해당 scope의 각 실제 원 행 값과 고정 기대값을 대조한다."를 확인한다
+    그러면 "due-obligation-discovered" assertion으로 "해당 scope의 각 실제 원 행 값과 고정 기대값을 대조한다."를 확인한다
+    그러면 "no-fake-receipt" assertion으로 "독립 DB 원 행을 정확한 대상 scope로 세어 중복·누락을 거부한다."를 확인한다
+    그러면 "timeout-never-satisfied" assertion으로 "시간 경과·queue 성공이 증거 없는 목표를 충족시키지 않는다."를 확인한다
+    그러면 "queue-empty-after-restart" assertion으로 "재시작 뒤 terminal 관찰 시점에도 queue message0이다. 재발견은 DB due index에서만 온다."를 확인한다
+    그러면 "autonomous-trigger-loop" assertion으로 "제출 identity는 harness tick이 아니라 scheduler loop의 자연 tick에서 나왔다."를 확인한다
+    그러면 "autonomous-within-30s" assertion으로 "scheduler process가 RUNNING이 된 뒤 30초(개발/CI 관찰 제한, plan §10) 안에 자율 제출이 관찰된다."를 확인한다
+    그러면 "autonomous-attempt-source" assertion으로 "독립 DB attempt 원행도 scheduler loop가 시작한 시도만 있다. harness tick이나 API 호출로 시작한 시도는 없다."를 확인한다
+
+  시나리오: 새 사건 없이 lot 만료20을 정지하고 sweeper 지연에도 출고를 막는다 — harness tick/sweep 없이 scheduler loop가 스스로 찾는다
+    먼저 사례 파일 "verification/cases/T26/case.json"의 "lot-expiry-autonomous-loop"를 준비한다
+    만일 "시스템" 역할이 "setup" 행동을 수행한다
+    만일 "시스템" 역할이 "start-app-api" 행동을 수행한다
+    만일 "시스템" 역할이 "start-app-scheduler" 행동을 수행한다
+    만일 "시스템" 역할이 "start-app-worker-a" 행동을 수행한다
+    만일 "시스템" 역할이 "start-app-worker-b" 행동을 수행한다
+    만일 "owner" 역할이 "create" 행동을 수행한다
+    만일 "owner" 역할이 "create-activate" 행동을 수행한다
+    만일 "warehouse" 역할이 "reserve" 행동을 수행한다
+    만일 "operations" 역할이 "before" 행동을 수행한다
+    만일 "시스템" 역할이 "before-db" 행동을 수행한다
+    만일 "시스템" 역할이 "stop-sweeper" 행동을 수행한다
+    만일 "시스템" 역할이 "advance" 행동을 수행한다
+    만일 "시스템" 역할이 "start-sweeper" 행동을 수행한다
+    만일 "시스템" 역할이 "sweep" 행동을 수행한다
+    만일 "시스템" 역할이 "sweep-terminal" 행동을 수행한다
+    만일 "시스템" 역할이 "sweep-db" 행동을 수행한다
+    만일 "시스템" 역할이 "repeat-sweep" 행동을 수행한다
+    만일 "operations" 역할이 "repeat-api" 행동을 수행한다
+    만일 "시스템" 역할이 "repeat-db" 행동을 수행한다
+    만일 "시스템" 역할이 "stop-again-sweeper" 행동을 수행한다
+    만일 "warehouse" 역할이 "dispatch" 행동을 수행한다
+    만일 "operations" 역할이 "guard-api" 행동을 수행한다
+    만일 "시스템" 역할이 "guard-db" 행동을 수행한다
+    만일 "operations" 역할이 "api" 행동을 수행한다
+    만일 "시스템" 역할이 "db" 행동을 수행한다
+    그러면 "sweep-terminal-origin" assertion으로 "실제 scheduler가 자율 생성한 task의 종료를 관찰한다."를 확인한다
+    그러면 "sweep-terminal-terminal" assertion으로 "제출 ACK가 아니라 실제 task terminal을 확인한다."를 확인한다
+    그러면 "boundary-index-deadline" assertion으로 "별도 이벤트 전에 scope의 다음 실제 유효 경계를 등록한다."를 확인한다
+    그러면 "boundary-cause" assertion으로 "해당 scope의 각 실제 원 행 값과 고정 기대값을 대조한다."를 확인한다
+    그러면 "guard-db-segments-unchanged" assertion으로 "허용된 audit·대조 책임과 분리해 금지된 업무 효과 전후 원 행을 비교한다."를 확인한다
+    그러면 "guard-db-genealogy-unchanged" assertion으로 "허용된 audit·대조 책임과 분리해 금지된 업무 효과 전후 원 행을 비교한다."를 확인한다
+    그러면 "guard-db-movements-unchanged" assertion으로 "허용된 audit·대조 책임과 분리해 금지된 업무 효과 전후 원 행을 비교한다."를 확인한다
+    그러면 "guard-db-quantity-delta-zero" assertion으로 "전후 보유량20−20=0BOX다. 현재와 baseline 단위를 모두 검사한다."를 확인한다
+    그러면 "guard-no-consumed-allocation" assertion으로 "독립 DB 원 행을 정확한 대상 scope로 세어 중복·누락을 거부한다."를 확인한다
+    그러면 "guard-original-allocation-kept" assertion으로 "실행 거부가 기존 예약을 삭제·대체하지 않는다. SUSPENDED 대조 전이는 허용한다."를 확인한다
+    그러면 "guard-allocation-quantity-kept" assertion으로 "예약20의 미해결 책임 수량을 보존한다."를 확인한다
+    그러면 "no-new-event" assertion으로 "독립 DB 원 행을 정확한 대상 scope로 세어 중복·누락을 거부한다."를 확인한다
+    그러면 "dispatch-outbox-zero" assertion으로 "독립 DB 원 행을 정확한 대상 scope로 세어 중복·누락을 거부한다."를 확인한다
+    그러면 "guard-outcome" assertion으로 "자동 정지 후에도 실제 commit guard가 만료 이후 출고를 거부한다. 중지 지연의 독립 인수는 delayed-guard 사례에 있다."를 확인한다
+    그러면 "allocation-suspended" assertion으로 "해당 scope의 각 실제 원 행 값과 고정 기대값을 대조한다."를 확인한다
+    그러면 "expiry-duty-one" assertion으로 "독립 DB 원 행을 정확한 대상 scope로 세어 중복·누락을 거부한다."를 확인한다
+    그러면 "db-current-assignment-one" assertion으로 "독립 DB 원 행을 정확한 대상 scope로 세어 중복·누락을 거부한다."를 확인한다
+    그러면 "db-owner" assertion으로 "해당 scope의 각 실제 원 행 값과 고정 기대값을 대조한다."를 확인한다
+    그러면 "db-duty-status" assertion으로 "해당 scope의 각 실제 원 행 값과 고정 기대값을 대조한다."를 확인한다
+    그러면 "db-next-action" assertion으로 "해당 scope의 각 실제 원 행 값과 고정 기대값을 대조한다."를 확인한다
+    그러면 "db-next-check" assertion으로 "해당 scope의 각 실제 원 행 값과 고정 기대값을 대조한다."를 확인한다
+    그러면 "api-owner" assertion으로 "API가 DB와 같은 인간 주 책임자를 반환한다."를 확인한다
+    그러면 "api-action" assertion으로 "이름이 같은 Boolean 대신 실제 다음 행동을 확인한다."를 확인한다
+    그러면 "api-check" assertion으로 "고정 업무 시계의 다음 확인 시점을 검사한다."를 확인한다
+    그러면 "held-20" assertion으로 "유효성 만료는 실제 물량 감소가 아니다.20BOX가 남는다."를 확인한다
+    그러면 "api-executable-zero" assertion으로 "예약20은 책임으로 보존하지만 신규 실행 가능 배분0BOX다."를 확인한다
+    그러면 "sweep-db-expiry-event-one" assertion으로 "독립 원 행의 발생·판정·후속 책임을 고정 기대값과 대조한다."를 확인한다
+    그러면 "sweep-db-goal-refresh-one" assertion으로 "독립 원 행의 발생·판정·후속 책임을 고정 기대값과 대조한다."를 확인한다
+    그러면 "sweep-db-goal-still-unverified" assertion으로 "독립 원 행의 발생·판정·후속 책임을 고정 기대값과 대조한다."를 확인한다
+    그러면 "sweep-db-goal-refresh-time" assertion으로 "독립 원 행의 발생·판정·후속 책임을 고정 기대값과 대조한다."를 확인한다
+    그러면 "sweep-db-followup-open-one" assertion으로 "독립 원 행의 발생·판정·후속 책임을 고정 기대값과 대조한다."를 확인한다
+    그러면 "sweep-db-allocation-suspended" assertion으로 "독립 원 행의 발생·판정·후속 책임을 고정 기대값과 대조한다."를 확인한다
+    그러면 "sweep-db-no-user-business-event" assertion으로 "독립 원 행의 발생·판정·후속 책임을 고정 기대값과 대조한다."를 확인한다
+    그러면 "repeat-db-expiry-event-one" assertion으로 "독립 원 행의 발생·판정·후속 책임을 고정 기대값과 대조한다."를 확인한다
+    그러면 "repeat-db-goal-refresh-one" assertion으로 "독립 원 행의 발생·판정·후속 책임을 고정 기대값과 대조한다."를 확인한다
+    그러면 "repeat-db-goal-still-unverified" assertion으로 "독립 원 행의 발생·판정·후속 책임을 고정 기대값과 대조한다."를 확인한다
+    그러면 "repeat-db-goal-refresh-time" assertion으로 "독립 원 행의 발생·판정·후속 책임을 고정 기대값과 대조한다."를 확인한다
+    그러면 "repeat-db-followup-open-one" assertion으로 "독립 원 행의 발생·판정·후속 책임을 고정 기대값과 대조한다."를 확인한다
+    그러면 "repeat-db-allocation-suspended" assertion으로 "독립 원 행의 발생·판정·후속 책임을 고정 기대값과 대조한다."를 확인한다
+    그러면 "repeat-db-no-user-business-event" assertion으로 "독립 원 행의 발생·판정·후속 책임을 고정 기대값과 대조한다."를 확인한다
+    그러면 "repeat-no-due-task" assertion으로 "같은 만료 경계는 이미 처리됐다. 반복 sweep에서 새 자율 task를 만들지 않는다."를 확인한다
+    그러면 "repeat-events-identity-kept" assertion으로 "반복 sweep는 같은 만료 사건·현재 판정·후속 의무 원 행과 ID를 유지한다."를 확인한다
+    그러면 "repeat-assessments-identity-kept" assertion으로 "반복 sweep는 같은 만료 사건·현재 판정·후속 의무 원 행과 ID를 유지한다."를 확인한다
+    그러면 "repeat-obligations-identity-kept" assertion으로 "반복 sweep는 같은 만료 사건·현재 판정·후속 의무 원 행과 ID를 유지한다."를 확인한다
+    그러면 "before-no-expiry-events" assertion으로 "만료 이전 baseline에는 해당 만료 사건·재평가·후속 의무가 없다. sweep가 만들 효과를 먼저 seed해 통과하지 않는다."를 확인한다
+    그러면 "before-no-expiry-assessments" assertion으로 "만료 이전 baseline에는 해당 만료 사건·재평가·후속 의무가 없다. sweep가 만들 효과를 먼저 seed해 통과하지 않는다."를 확인한다
+    그러면 "before-no-expiry-obligations" assertion으로 "만료 이전 baseline에는 해당 만료 사건·재평가·후속 의무가 없다. sweep가 만들 효과를 먼저 seed해 통과하지 않는다."를 확인한다
+    그러면 "sweep-db-followup-responsibility-present" assertion으로 "사용자 요청 전에 자동 만료 의무의 실제 ID·root·책임 업무·인간 owner·supervisor·다음 행동·확인 시점이 모두 존재해야 한다. 빈 원 행이나 owner 없는 OPEN은 통과하지 못한다."를 확인한다
+    그러면 "sweep-db-followup-responsibility-values" assertion으로 "자동 만료 의무는 fixture의 인간 책임자·감독자·다음 행동·확인 시점을 갖는다. 뒤 출고의 책임 복구로 대신하지 않는다."를 확인한다
+    그러면 "sweep-db-current-expiry-assignment-one" assertion으로 "자동 생성된 만료 후속 의무의 현재 OPEN assignment는 하나다. 초기 활성화 의무와 구별하고 빈 행·중복 assignment를 거부한다."를 확인한다
+    그러면 "sweep-db-expiry-assignment-responsibility-present" assertion으로 "자동 sweep의 같은 snapshot에 실제 assignment ID·의무·root·업무와 인간 책임 필드가 모두 있어야 한다."를 확인한다
+    그러면 "sweep-db-expiry-assignment-responsibility-values" assertion으로 "자동 sweep가 current OPEN assignment의 owner·supervisor·다음 행동·확인 시점을 함께 upsert한다."를 확인한다
+    그러면 "sweep-db-expiry-assignment-obligationId-linked" assertion으로 "자동 sweep가 만든 assignment는 같은 snapshot의 만료 의무·stable root·책임 업무에 연결된다. 이름이나 count만 같은 별도 책임으로 대신하지 않는다."를 확인한다
+    그러면 "sweep-db-expiry-assignment-rootId-linked" assertion으로 "자동 sweep가 만든 assignment는 같은 snapshot의 만료 의무·stable root·책임 업무에 연결된다. 이름이나 count만 같은 별도 책임으로 대신하지 않는다."를 확인한다
+    그러면 "sweep-db-expiry-assignment-workId-linked" assertion으로 "자동 sweep가 만든 assignment는 같은 snapshot의 만료 의무·stable root·책임 업무에 연결된다. 이름이나 count만 같은 별도 책임으로 대신하지 않는다."를 확인한다
+    그러면 "repeat-db-followup-responsibility-present" assertion으로 "사용자 요청 전에 자동 만료 의무의 실제 ID·root·책임 업무·인간 owner·supervisor·다음 행동·확인 시점이 모두 존재해야 한다. 빈 원 행이나 owner 없는 OPEN은 통과하지 못한다."를 확인한다
+    그러면 "repeat-db-followup-responsibility-values" assertion으로 "자동 만료 의무는 fixture의 인간 책임자·감독자·다음 행동·확인 시점을 갖는다. 뒤 출고의 책임 복구로 대신하지 않는다."를 확인한다
+    그러면 "repeat-db-current-expiry-assignment-one" assertion으로 "자동 생성된 만료 후속 의무의 현재 OPEN assignment는 하나다. 초기 활성화 의무와 구별하고 빈 행·중복 assignment를 거부한다."를 확인한다
+    그러면 "repeat-db-expiry-assignment-responsibility-present" assertion으로 "자동 sweep의 같은 snapshot에 실제 assignment ID·의무·root·업무와 인간 책임 필드가 모두 있어야 한다."를 확인한다
+    그러면 "repeat-db-expiry-assignment-responsibility-values" assertion으로 "자동 sweep가 current OPEN assignment의 owner·supervisor·다음 행동·확인 시점을 함께 upsert한다."를 확인한다
+    그러면 "repeat-db-expiry-assignment-obligationId-linked" assertion으로 "자동 sweep가 만든 assignment는 같은 snapshot의 만료 의무·stable root·책임 업무에 연결된다. 이름이나 count만 같은 별도 책임으로 대신하지 않는다."를 확인한다
+    그러면 "repeat-db-expiry-assignment-rootId-linked" assertion으로 "자동 sweep가 만든 assignment는 같은 snapshot의 만료 의무·stable root·책임 업무에 연결된다. 이름이나 count만 같은 별도 책임으로 대신하지 않는다."를 확인한다
+    그러면 "repeat-db-expiry-assignment-workId-linked" assertion으로 "자동 sweep가 만든 assignment는 같은 snapshot의 만료 의무·stable root·책임 업무에 연결된다. 이름이나 count만 같은 별도 책임으로 대신하지 않는다."를 확인한다
+    그러면 "repeat-expiry-assignment-identity-kept" assertion으로 "반복 sweep는 동일한 현재 OPEN assignment 원 행·ID·owner·supervisor·다음 행동·확인 시점을 유지한다."를 확인한다
+    그러면 "autonomous-trigger-loop" assertion으로 "제출 identity는 harness tick이 아니라 scheduler loop의 자연 tick에서 나왔다."를 확인한다
+    그러면 "autonomous-within-30s" assertion으로 "scheduler process가 RUNNING이 된 뒤 30초(개발/CI 관찰 제한, plan §10) 안에 자율 제출이 관찰된다."를 확인한다
+    그러면 "autonomous-attempt-source" assertion으로 "독립 DB attempt 원행도 scheduler loop가 시작한 시도만 있다. harness tick이나 API 호출로 시작한 시도는 없다."를 확인한다
+
+  시나리오: 종료된 부모 뒤 이상 접수의 연결 장애를 DB에서 복구한다 — harness tick/sweep 없이 scheduler loop가 스스로 찾는다
+    먼저 사례 파일 "verification/cases/T26/case.json"의 "orphan-intake-autonomous-loop"를 준비한다
+    만일 "시스템" 역할이 "setup" 행동을 수행한다
+    만일 "시스템" 역할이 "start-app-api" 행동을 수행한다
+    만일 "시스템" 역할이 "start-app-scheduler" 행동을 수행한다
+    만일 "시스템" 역할이 "start-app-worker-a" 행동을 수행한다
+    만일 "시스템" 역할이 "start-app-worker-b" 행동을 수행한다
+    만일 "시스템" 역할이 "link-fault" 행동을 수행한다
+    만일 "receiver" 역할이 "anomaly" 행동을 수행한다
+    만일 "operations" 역할이 "before" 행동을 수행한다
+    만일 "시스템" 역할이 "before-db" 행동을 수행한다
+    만일 "시스템" 역할이 "link-fault-clear" 행동을 수행한다
+    만일 "시스템" 역할이 "restart-api" 행동을 수행한다
+    만일 "시스템" 역할이 "restart-scheduler" 행동을 수행한다
+    만일 "시스템" 역할이 "restart-worker-a" 행동을 수행한다
+    만일 "시스템" 역할이 "restart-worker-b" 행동을 수행한다
+    만일 "시스템" 역할이 "advance" 행동을 수행한다
+    만일 "시스템" 역할이 "tick" 행동을 수행한다
+    만일 "시스템" 역할이 "terminal" 행동을 수행한다
+    만일 "operations" 역할이 "api" 행동을 수행한다
+    만일 "시스템" 역할이 "db" 행동을 수행한다
+    그러면 "terminal-origin" assertion으로 "실제 scheduler가 자율 생성한 task의 종료를 관찰한다."를 확인한다
+    그러면 "terminal-terminal" assertion으로 "제출 ACK가 아니라 실제 task terminal을 확인한다."를 확인한다
+    그러면 "db-current-assignment-one" assertion으로 "독립 DB 원 행을 정확한 대상 scope로 세어 중복·누락을 거부한다."를 확인한다
+    그러면 "db-owner" assertion으로 "해당 scope의 각 실제 원 행 값과 고정 기대값을 대조한다."를 확인한다
+    그러면 "db-duty-status" assertion으로 "해당 scope의 각 실제 원 행 값과 고정 기대값을 대조한다."를 확인한다
+    그러면 "db-next-action" assertion으로 "해당 scope의 각 실제 원 행 값과 고정 기대값을 대조한다."를 확인한다
+    그러면 "db-next-check" assertion으로 "해당 scope의 각 실제 원 행 값과 고정 기대값을 대조한다."를 확인한다
+    그러면 "api-owner" assertion으로 "API가 DB와 같은 인간 주 책임자를 반환한다."를 확인한다
+    그러면 "api-action" assertion으로 "이름이 같은 Boolean 대신 실제 다음 행동을 확인한다."를 확인한다
+    그러면 "api-check" assertion으로 "고정 업무 시계의 다음 확인 시점을 검사한다."를 확인한다
+    그러면 "before-new-work-zero" assertion으로 "독립 DB 원 행을 정확한 대상 scope로 세어 중복·누락을 거부한다."를 확인한다
+    그러면 "before-link-pending" assertion으로 "해당 scope의 각 실제 원 행 값과 고정 기대값을 대조한다."를 확인한다
+    그러면 "before-intake-owner" assertion으로 "해당 scope의 각 실제 원 행 값과 고정 기대값을 대조한다."를 확인한다
+    그러면 "before-intake-action" assertion으로 "해당 scope의 각 실제 원 행 값과 고정 기대값을 대조한다."를 확인한다
+    그러면 "before-intake-check" assertion으로 "해당 scope의 각 실제 원 행 값과 고정 기대값을 대조한다."를 확인한다
+    그러면 "after-work-one" assertion으로 "독립 DB 원 행을 정확한 대상 scope로 세어 중복·누락을 거부한다."를 확인한다
+    그러면 "after-duty-one" assertion으로 "독립 DB 원 행을 정확한 대상 scope로 세어 중복·누락을 거부한다."를 확인한다
+    그러면 "intake-link-confirmed" assertion으로 "해당 scope의 각 실제 원 행 값과 고정 기대값을 대조한다."를 확인한다
+    그러면 "canonical-intake-linked-duty" assertion으로 "재시도에서 같은 접수와 단 하나 의무를 연결한다."를 확인한다
+    그러면 "autonomous-trigger-loop" assertion으로 "제출 identity는 harness tick이 아니라 scheduler loop의 자연 tick에서 나왔다."를 확인한다
+    그러면 "autonomous-within-30s" assertion으로 "scheduler process가 RUNNING이 된 뒤 30초(개발/CI 관찰 제한, plan §10) 안에 자율 제출이 관찰된다."를 확인한다
+    그러면 "autonomous-attempt-source" assertion으로 "독립 DB attempt 원행도 scheduler loop가 시작한 시도만 있다. harness tick이나 API 호출로 시작한 시도는 없다."를 확인한다

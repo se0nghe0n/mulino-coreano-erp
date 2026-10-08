@@ -58,7 +58,37 @@ public final class RuntimeAssertionTest {
                 for (JsonNode observation : oracle.path("expectedObservations"))
                     required.add(oracle.path("oracleId").asText() + ":" + observation.path("name").asText());
         }
-        assertEquals(24, subcases); assertEquals(14, required.size()); assertEquals(required, actual);
+        assertEquals(29, subcases); assertEquals(14, required.size()); assertEquals(required, actual);
+    }
+    @Test void retryCarriesNoCallerIdentityAndAutonomousLoopsHaveNoHarnessTrigger() throws Exception {
+        boolean forgedActor = false, forgedHash = false; int autonomous = 0;
+        for (JsonNode sub : Json.read(root.resolve("verification/cases/T26/case.json")).path("subcases")) {
+            String id = sub.path("id").asText();
+            for (JsonNode a : sub.path("actions")) {
+                if (a.path("capabilityId").asText().equals("retrySafeCommand")) {
+                    JsonNode r = a.path("request");
+                    assertTrue(r.path("slots").has("commandId"), id);
+                    assertEquals(id.equals("safe-retry-forged-original-actor"), r.has("originalActorId"), id);
+                    assertEquals(id.equals("safe-retry-forged-request-hash"), r.has("canonicalRequestHash"), id);
+                    forgedActor |= r.has("originalActorId"); forgedHash |= r.has("canonicalRequestHash");
+                }
+                String op = a.path("control").path("operation").asText();
+                if (id.endsWith("-autonomous-loop") && Set.of("tickScheduler", "sweepDue").contains(op)) {
+                    assertEquals("OBSERVE_NEXT_NATURAL_TICK", a.path("control").path("parameters").path("trigger").asText(), id);
+                    assertFalse(a.path("control").path("parameters").has("clockInstant"), id);
+                }
+            }
+            if (id.endsWith("-autonomous-loop")) { autonomous++; assertNotNull(assertion("T26", id, "autonomous-within-30s")); }
+        }
+        assertTrue(forgedActor && forgedHash); assertEquals(3, autonomous);
+        JsonNode within = assertion("T26", "due-wait-autonomous-loop", "autonomous-within-30s");
+        ObjectNode tick = Json.object(); tick.put("driverStatus", "EXECUTED"); tick.set("provenance", Json.parse("{\"scopeComplete\":true}"));
+        tick.set("data", Json.parse("{\"hostObservation\":{\"operationEvidence\":{\"submittedAt\":\"2026-10-08T00:00:20Z\"}}}"));
+        ObjectNode start = tick.deepCopy(); start.set("data", Json.parse("{\"hostObservation\":{\"processObservation\":{\"completedAt\":\"2026-10-08T00:00:00Z\"}}}"));
+        var results = new java.util.HashMap<String, JsonNode>(); results.put("tick", tick); results.put("start-again-scheduler", start);
+        engine.check(within, results, aliases);
+        ((ObjectNode) tick.at("/data/hostObservation/operationEvidence")).put("submittedAt", "2026-10-08T00:00:31Z");
+        assertThrows(AssertionError.class, () -> engine.check(within, results, aliases));
     }
     @Test void everyFixtureArtifactMatchesActualBytesAndDigest() throws Exception {
         for (String id : List.of("T26", "V5")) {

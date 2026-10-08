@@ -108,6 +108,12 @@
           "pointer": "/response/data/assessment/result"
         },
         {
+          "subcaseId": "due-wait-db-rediscovery",
+          "assertionId": "queue-empty-after-restart",
+          "actionId": "db",
+          "pointer": "/data/rawRows/queueMessages"
+        },
+        {
           "subcaseId": "orphan-intake-recovered",
           "assertionId": "terminal-origin",
           "actionId": "terminal",
@@ -486,6 +492,126 @@
           "pointer": "/response/data/responsibility/nextCheckAt"
         },
         {
+          "subcaseId": "safe-retry-forged-original-actor",
+          "assertionId": "forged-actor-rejected",
+          "actionId": "retry",
+          "pointer": "/response/outcome"
+        },
+        {
+          "subcaseId": "safe-retry-forged-original-actor",
+          "assertionId": "db-segments-unchanged",
+          "actionId": "db",
+          "pointer": "/data/rawRows/segments"
+        },
+        {
+          "subcaseId": "safe-retry-forged-original-actor",
+          "assertionId": "db-genealogy-unchanged",
+          "actionId": "db",
+          "pointer": "/data/rawRows/genealogy"
+        },
+        {
+          "subcaseId": "safe-retry-forged-original-actor",
+          "assertionId": "db-movements-unchanged",
+          "actionId": "db",
+          "pointer": "/data/rawRows/movements"
+        },
+        {
+          "subcaseId": "safe-retry-forged-original-actor",
+          "assertionId": "db-allocations-unchanged",
+          "actionId": "db",
+          "pointer": "/data/rawRows/allocations"
+        },
+        {
+          "subcaseId": "safe-retry-forged-original-actor",
+          "assertionId": "db-quantity-delta-zero",
+          "actionId": "db",
+          "pointer": "/data/data/heldQuantity"
+        },
+        {
+          "subcaseId": "safe-retry-forged-original-actor",
+          "assertionId": "db-current-assignment-one",
+          "actionId": "db",
+          "pointer": "/data/rawRows/assignments"
+        },
+        {
+          "subcaseId": "safe-retry-forged-original-actor",
+          "assertionId": "db-owner",
+          "actionId": "db",
+          "pointer": "/data/rawRows/assignments"
+        },
+        {
+          "subcaseId": "safe-retry-forged-original-actor",
+          "assertionId": "db-duty-status",
+          "actionId": "db",
+          "pointer": "/data/rawRows/obligations"
+        },
+        {
+          "subcaseId": "safe-retry-forged-original-actor",
+          "assertionId": "db-next-action",
+          "actionId": "db",
+          "pointer": "/data/rawRows/assignments"
+        },
+        {
+          "subcaseId": "safe-retry-forged-original-actor",
+          "assertionId": "db-next-check",
+          "actionId": "db",
+          "pointer": "/data/rawRows/assignments"
+        },
+        {
+          "subcaseId": "safe-retry-forged-original-actor",
+          "assertionId": "api-owner",
+          "actionId": "api",
+          "pointer": "/response/data/responsibility/ownerId"
+        },
+        {
+          "subcaseId": "safe-retry-forged-original-actor",
+          "assertionId": "api-action",
+          "actionId": "api",
+          "pointer": "/response/data/responsibility/nextAction"
+        },
+        {
+          "subcaseId": "safe-retry-forged-original-actor",
+          "assertionId": "api-check",
+          "actionId": "api",
+          "pointer": "/response/data/responsibility/nextCheckAt"
+        },
+        {
+          "subcaseId": "safe-retry-forged-original-actor",
+          "assertionId": "forged-actor-no-committed-retry",
+          "actionId": "db",
+          "pointer": "/data/rawRows/commands"
+        },
+        {
+          "subcaseId": "safe-retry-forged-request-hash",
+          "assertionId": "before-movement-zero",
+          "actionId": "before-db",
+          "pointer": "/data/rawRows/movements"
+        },
+        {
+          "subcaseId": "safe-retry-forged-request-hash",
+          "assertionId": "forged-hash-rejected",
+          "actionId": "retry",
+          "pointer": "/response/outcome"
+        },
+        {
+          "subcaseId": "safe-retry-forged-request-hash",
+          "assertionId": "forged-hash-no-movement",
+          "actionId": "db",
+          "pointer": "/data/rawRows/movements"
+        },
+        {
+          "subcaseId": "safe-retry-forged-request-hash",
+          "assertionId": "forged-hash-no-committed-retry",
+          "actionId": "db",
+          "pointer": "/data/rawRows/commands"
+        },
+        {
+          "subcaseId": "safe-retry-forged-request-hash",
+          "assertionId": "stored-hash-unchanged",
+          "actionId": "db",
+          "pointer": "/data/rawRows/commands"
+        },
+        {
           "subcaseId": "unknown-external-reconcile-before-retry",
           "assertionId": "terminal-origin",
           "actionId": "terminal",
@@ -550,6 +676,264 @@
           "assertionId": "local-outbox-linked",
           "actionId": "db",
           "pointer": "/data/rawRows/outbox"
+        },
+        {
+          "subcaseId": "due-wait-autonomous-loop",
+          "assertionId": "terminal-origin",
+          "actionId": "terminal",
+          "pointer": "/data/hostObservation/runtimeTask/origin"
+        },
+        {
+          "subcaseId": "due-wait-autonomous-loop",
+          "assertionId": "terminal-terminal",
+          "actionId": "terminal",
+          "pointer": "/data/hostObservation/runtimeTask/terminalStatus"
+        },
+        {
+          "subcaseId": "due-wait-autonomous-loop",
+          "assertionId": "db-current-assignment-one",
+          "actionId": "db",
+          "pointer": "/data/rawRows/assignments"
+        },
+        {
+          "subcaseId": "due-wait-autonomous-loop",
+          "assertionId": "db-owner",
+          "actionId": "db",
+          "pointer": "/data/rawRows/assignments"
+        },
+        {
+          "subcaseId": "due-wait-autonomous-loop",
+          "assertionId": "db-duty-status",
+          "actionId": "db",
+          "pointer": "/data/rawRows/obligations"
+        },
+        {
+          "subcaseId": "due-wait-autonomous-loop",
+          "assertionId": "db-next-action",
+          "actionId": "db",
+          "pointer": "/data/rawRows/assignments"
+        },
+        {
+          "subcaseId": "due-wait-autonomous-loop",
+          "assertionId": "db-next-check",
+          "actionId": "db",
+          "pointer": "/data/rawRows/assignments"
+        },
+        {
+          "subcaseId": "due-wait-autonomous-loop",
+          "assertionId": "api-owner",
+          "actionId": "api",
+          "pointer": "/response/data/responsibility/ownerId"
+        },
+        {
+          "subcaseId": "due-wait-autonomous-loop",
+          "assertionId": "api-action",
+          "actionId": "api",
+          "pointer": "/response/data/responsibility/nextAction"
+        },
+        {
+          "subcaseId": "due-wait-autonomous-loop",
+          "assertionId": "api-check",
+          "actionId": "api",
+          "pointer": "/response/data/responsibility/nextCheckAt"
+        },
+        {
+          "subcaseId": "due-wait-autonomous-loop",
+          "assertionId": "durable-wait-before",
+          "actionId": "before-db",
+          "pointer": "/data/rawRows/works"
+        },
+        {
+          "subcaseId": "due-wait-autonomous-loop",
+          "assertionId": "empty-message-queue",
+          "actionId": "before-db",
+          "pointer": "/data/rawRows/queueMessages"
+        },
+        {
+          "subcaseId": "due-wait-autonomous-loop",
+          "assertionId": "discovery-source-db",
+          "actionId": "db",
+          "pointer": "/data/rawRows/attempts"
+        },
+        {
+          "subcaseId": "due-wait-autonomous-loop",
+          "assertionId": "attempt-cause-due",
+          "actionId": "db",
+          "pointer": "/data/rawRows/attempts"
+        },
+        {
+          "subcaseId": "due-wait-autonomous-loop",
+          "assertionId": "due-obligation-discovered",
+          "actionId": "db",
+          "pointer": "/data/rawRows/obligations"
+        },
+        {
+          "subcaseId": "due-wait-autonomous-loop",
+          "assertionId": "no-fake-receipt",
+          "actionId": "db",
+          "pointer": "/data/rawRows/movements"
+        },
+        {
+          "subcaseId": "due-wait-autonomous-loop",
+          "assertionId": "timeout-never-satisfied",
+          "actionId": "api",
+          "pointer": "/response/data/assessment/result"
+        },
+        {
+          "subcaseId": "due-wait-autonomous-loop",
+          "assertionId": "queue-empty-after-restart",
+          "actionId": "db",
+          "pointer": "/data/rawRows/queueMessages"
+        },
+        {
+          "subcaseId": "due-wait-autonomous-loop",
+          "assertionId": "autonomous-trigger-loop",
+          "actionId": "tick",
+          "pointer": "/data/hostObservation/operationEvidence/triggeredBy"
+        },
+        {
+          "subcaseId": "due-wait-autonomous-loop",
+          "assertionId": "autonomous-within-30s",
+          "actionId": "tick",
+          "pointer": "/data/hostObservation/operationEvidence/submittedAt"
+        },
+        {
+          "subcaseId": "due-wait-autonomous-loop",
+          "assertionId": "autonomous-attempt-source",
+          "actionId": "db",
+          "pointer": "/data/rawRows/attempts"
+        },
+        {
+          "subcaseId": "orphan-intake-autonomous-loop",
+          "assertionId": "terminal-origin",
+          "actionId": "terminal",
+          "pointer": "/data/hostObservation/runtimeTask/origin"
+        },
+        {
+          "subcaseId": "orphan-intake-autonomous-loop",
+          "assertionId": "terminal-terminal",
+          "actionId": "terminal",
+          "pointer": "/data/hostObservation/runtimeTask/terminalStatus"
+        },
+        {
+          "subcaseId": "orphan-intake-autonomous-loop",
+          "assertionId": "db-current-assignment-one",
+          "actionId": "db",
+          "pointer": "/data/rawRows/assignments"
+        },
+        {
+          "subcaseId": "orphan-intake-autonomous-loop",
+          "assertionId": "db-owner",
+          "actionId": "db",
+          "pointer": "/data/rawRows/assignments"
+        },
+        {
+          "subcaseId": "orphan-intake-autonomous-loop",
+          "assertionId": "db-duty-status",
+          "actionId": "db",
+          "pointer": "/data/rawRows/obligations"
+        },
+        {
+          "subcaseId": "orphan-intake-autonomous-loop",
+          "assertionId": "db-next-action",
+          "actionId": "db",
+          "pointer": "/data/rawRows/assignments"
+        },
+        {
+          "subcaseId": "orphan-intake-autonomous-loop",
+          "assertionId": "db-next-check",
+          "actionId": "db",
+          "pointer": "/data/rawRows/assignments"
+        },
+        {
+          "subcaseId": "orphan-intake-autonomous-loop",
+          "assertionId": "api-owner",
+          "actionId": "api",
+          "pointer": "/response/data/responsibility/ownerId"
+        },
+        {
+          "subcaseId": "orphan-intake-autonomous-loop",
+          "assertionId": "api-action",
+          "actionId": "api",
+          "pointer": "/response/data/responsibility/nextAction"
+        },
+        {
+          "subcaseId": "orphan-intake-autonomous-loop",
+          "assertionId": "api-check",
+          "actionId": "api",
+          "pointer": "/response/data/responsibility/nextCheckAt"
+        },
+        {
+          "subcaseId": "orphan-intake-autonomous-loop",
+          "assertionId": "before-new-work-zero",
+          "actionId": "before-db",
+          "pointer": "/data/rawRows/works"
+        },
+        {
+          "subcaseId": "orphan-intake-autonomous-loop",
+          "assertionId": "before-link-pending",
+          "actionId": "before-db",
+          "pointer": "/data/rawRows/intake"
+        },
+        {
+          "subcaseId": "orphan-intake-autonomous-loop",
+          "assertionId": "before-intake-owner",
+          "actionId": "before-db",
+          "pointer": "/data/rawRows/intake"
+        },
+        {
+          "subcaseId": "orphan-intake-autonomous-loop",
+          "assertionId": "before-intake-action",
+          "actionId": "before-db",
+          "pointer": "/data/rawRows/intake"
+        },
+        {
+          "subcaseId": "orphan-intake-autonomous-loop",
+          "assertionId": "before-intake-check",
+          "actionId": "before-db",
+          "pointer": "/data/rawRows/intake"
+        },
+        {
+          "subcaseId": "orphan-intake-autonomous-loop",
+          "assertionId": "after-work-one",
+          "actionId": "db",
+          "pointer": "/data/rawRows/works"
+        },
+        {
+          "subcaseId": "orphan-intake-autonomous-loop",
+          "assertionId": "after-duty-one",
+          "actionId": "db",
+          "pointer": "/data/rawRows/obligations"
+        },
+        {
+          "subcaseId": "orphan-intake-autonomous-loop",
+          "assertionId": "intake-link-confirmed",
+          "actionId": "db",
+          "pointer": "/data/rawRows/intake"
+        },
+        {
+          "subcaseId": "orphan-intake-autonomous-loop",
+          "assertionId": "canonical-intake-linked-duty",
+          "actionId": "db",
+          "pointer": "/data/rawRows/intake/0/obligationId"
+        },
+        {
+          "subcaseId": "orphan-intake-autonomous-loop",
+          "assertionId": "autonomous-trigger-loop",
+          "actionId": "tick",
+          "pointer": "/data/hostObservation/operationEvidence/triggeredBy"
+        },
+        {
+          "subcaseId": "orphan-intake-autonomous-loop",
+          "assertionId": "autonomous-within-30s",
+          "actionId": "tick",
+          "pointer": "/data/hostObservation/operationEvidence/submittedAt"
+        },
+        {
+          "subcaseId": "orphan-intake-autonomous-loop",
+          "assertionId": "autonomous-attempt-source",
+          "actionId": "db",
+          "pointer": "/data/rawRows/attempts"
         }
       ],
       "operational-results": [
@@ -2850,6 +3234,408 @@
           "assertionId": "no-execution-on-activation",
           "actionId": "db",
           "pointer": "/data/rawRows/movements"
+        },
+        {
+          "subcaseId": "lot-expiry-autonomous-loop",
+          "assertionId": "sweep-terminal-origin",
+          "actionId": "sweep-terminal",
+          "pointer": "/data/hostObservation/runtimeTask/origin"
+        },
+        {
+          "subcaseId": "lot-expiry-autonomous-loop",
+          "assertionId": "sweep-terminal-terminal",
+          "actionId": "sweep-terminal",
+          "pointer": "/data/hostObservation/runtimeTask/terminalStatus"
+        },
+        {
+          "subcaseId": "lot-expiry-autonomous-loop",
+          "assertionId": "boundary-index-deadline",
+          "actionId": "before-db",
+          "pointer": "/data/rawRows/validityBoundaries"
+        },
+        {
+          "subcaseId": "lot-expiry-autonomous-loop",
+          "assertionId": "boundary-cause",
+          "actionId": "before-db",
+          "pointer": "/data/rawRows/validityBoundaries"
+        },
+        {
+          "subcaseId": "lot-expiry-autonomous-loop",
+          "assertionId": "guard-db-segments-unchanged",
+          "actionId": "guard-db",
+          "pointer": "/data/rawRows/segments"
+        },
+        {
+          "subcaseId": "lot-expiry-autonomous-loop",
+          "assertionId": "guard-db-genealogy-unchanged",
+          "actionId": "guard-db",
+          "pointer": "/data/rawRows/genealogy"
+        },
+        {
+          "subcaseId": "lot-expiry-autonomous-loop",
+          "assertionId": "guard-db-movements-unchanged",
+          "actionId": "guard-db",
+          "pointer": "/data/rawRows/movements"
+        },
+        {
+          "subcaseId": "lot-expiry-autonomous-loop",
+          "assertionId": "guard-db-quantity-delta-zero",
+          "actionId": "guard-db",
+          "pointer": "/data/data/heldQuantity"
+        },
+        {
+          "subcaseId": "lot-expiry-autonomous-loop",
+          "assertionId": "guard-no-consumed-allocation",
+          "actionId": "guard-db",
+          "pointer": "/data/rawRows/allocations"
+        },
+        {
+          "subcaseId": "lot-expiry-autonomous-loop",
+          "assertionId": "guard-original-allocation-kept",
+          "actionId": "guard-db",
+          "pointer": "/data/rawRows/allocations/0/id"
+        },
+        {
+          "subcaseId": "lot-expiry-autonomous-loop",
+          "assertionId": "guard-allocation-quantity-kept",
+          "actionId": "guard-db",
+          "pointer": "/data/rawRows/allocations/0/quantity"
+        },
+        {
+          "subcaseId": "lot-expiry-autonomous-loop",
+          "assertionId": "no-new-event",
+          "actionId": "db",
+          "pointer": "/data/rawRows/events"
+        },
+        {
+          "subcaseId": "lot-expiry-autonomous-loop",
+          "assertionId": "dispatch-outbox-zero",
+          "actionId": "db",
+          "pointer": "/data/rawRows/outbox"
+        },
+        {
+          "subcaseId": "lot-expiry-autonomous-loop",
+          "assertionId": "guard-outcome",
+          "actionId": "dispatch",
+          "pointer": "/response/outcome"
+        },
+        {
+          "subcaseId": "lot-expiry-autonomous-loop",
+          "assertionId": "allocation-suspended",
+          "actionId": "db",
+          "pointer": "/data/rawRows/allocations"
+        },
+        {
+          "subcaseId": "lot-expiry-autonomous-loop",
+          "assertionId": "expiry-duty-one",
+          "actionId": "db",
+          "pointer": "/data/rawRows/obligations"
+        },
+        {
+          "subcaseId": "lot-expiry-autonomous-loop",
+          "assertionId": "db-current-assignment-one",
+          "actionId": "db",
+          "pointer": "/data/rawRows/assignments"
+        },
+        {
+          "subcaseId": "lot-expiry-autonomous-loop",
+          "assertionId": "db-owner",
+          "actionId": "db",
+          "pointer": "/data/rawRows/assignments"
+        },
+        {
+          "subcaseId": "lot-expiry-autonomous-loop",
+          "assertionId": "db-duty-status",
+          "actionId": "db",
+          "pointer": "/data/rawRows/obligations"
+        },
+        {
+          "subcaseId": "lot-expiry-autonomous-loop",
+          "assertionId": "db-next-action",
+          "actionId": "db",
+          "pointer": "/data/rawRows/assignments"
+        },
+        {
+          "subcaseId": "lot-expiry-autonomous-loop",
+          "assertionId": "db-next-check",
+          "actionId": "db",
+          "pointer": "/data/rawRows/assignments"
+        },
+        {
+          "subcaseId": "lot-expiry-autonomous-loop",
+          "assertionId": "api-owner",
+          "actionId": "api",
+          "pointer": "/response/data/responsibility/ownerId"
+        },
+        {
+          "subcaseId": "lot-expiry-autonomous-loop",
+          "assertionId": "api-action",
+          "actionId": "api",
+          "pointer": "/response/data/responsibility/nextAction"
+        },
+        {
+          "subcaseId": "lot-expiry-autonomous-loop",
+          "assertionId": "api-check",
+          "actionId": "api",
+          "pointer": "/response/data/responsibility/nextCheckAt"
+        },
+        {
+          "subcaseId": "lot-expiry-autonomous-loop",
+          "assertionId": "held-20",
+          "actionId": "db",
+          "pointer": "/data/rawRows/segments"
+        },
+        {
+          "subcaseId": "lot-expiry-autonomous-loop",
+          "assertionId": "api-executable-zero",
+          "actionId": "api",
+          "pointer": "/response/data/executableAllocationQuantity"
+        },
+        {
+          "subcaseId": "lot-expiry-autonomous-loop",
+          "assertionId": "sweep-db-expiry-event-one",
+          "actionId": "sweep-db",
+          "pointer": "/data/rawRows/events"
+        },
+        {
+          "subcaseId": "lot-expiry-autonomous-loop",
+          "assertionId": "sweep-db-goal-refresh-one",
+          "actionId": "sweep-db",
+          "pointer": "/data/rawRows/assessments"
+        },
+        {
+          "subcaseId": "lot-expiry-autonomous-loop",
+          "assertionId": "sweep-db-goal-still-unverified",
+          "actionId": "sweep-db",
+          "pointer": "/data/rawRows/assessments"
+        },
+        {
+          "subcaseId": "lot-expiry-autonomous-loop",
+          "assertionId": "sweep-db-goal-refresh-time",
+          "actionId": "sweep-db",
+          "pointer": "/data/rawRows/assessments"
+        },
+        {
+          "subcaseId": "lot-expiry-autonomous-loop",
+          "assertionId": "sweep-db-followup-open-one",
+          "actionId": "sweep-db",
+          "pointer": "/data/rawRows/obligations"
+        },
+        {
+          "subcaseId": "lot-expiry-autonomous-loop",
+          "assertionId": "sweep-db-allocation-suspended",
+          "actionId": "sweep-db",
+          "pointer": "/data/rawRows/allocations"
+        },
+        {
+          "subcaseId": "lot-expiry-autonomous-loop",
+          "assertionId": "sweep-db-no-user-business-event",
+          "actionId": "sweep-db",
+          "pointer": "/data/rawRows/events"
+        },
+        {
+          "subcaseId": "lot-expiry-autonomous-loop",
+          "assertionId": "repeat-db-expiry-event-one",
+          "actionId": "repeat-db",
+          "pointer": "/data/rawRows/events"
+        },
+        {
+          "subcaseId": "lot-expiry-autonomous-loop",
+          "assertionId": "repeat-db-goal-refresh-one",
+          "actionId": "repeat-db",
+          "pointer": "/data/rawRows/assessments"
+        },
+        {
+          "subcaseId": "lot-expiry-autonomous-loop",
+          "assertionId": "repeat-db-goal-still-unverified",
+          "actionId": "repeat-db",
+          "pointer": "/data/rawRows/assessments"
+        },
+        {
+          "subcaseId": "lot-expiry-autonomous-loop",
+          "assertionId": "repeat-db-goal-refresh-time",
+          "actionId": "repeat-db",
+          "pointer": "/data/rawRows/assessments"
+        },
+        {
+          "subcaseId": "lot-expiry-autonomous-loop",
+          "assertionId": "repeat-db-followup-open-one",
+          "actionId": "repeat-db",
+          "pointer": "/data/rawRows/obligations"
+        },
+        {
+          "subcaseId": "lot-expiry-autonomous-loop",
+          "assertionId": "repeat-db-allocation-suspended",
+          "actionId": "repeat-db",
+          "pointer": "/data/rawRows/allocations"
+        },
+        {
+          "subcaseId": "lot-expiry-autonomous-loop",
+          "assertionId": "repeat-db-no-user-business-event",
+          "actionId": "repeat-db",
+          "pointer": "/data/rawRows/events"
+        },
+        {
+          "subcaseId": "lot-expiry-autonomous-loop",
+          "assertionId": "repeat-no-due-task",
+          "actionId": "repeat-sweep",
+          "pointer": "/data/hostObservation/operationEvidence/submissionStatus"
+        },
+        {
+          "subcaseId": "lot-expiry-autonomous-loop",
+          "assertionId": "repeat-events-identity-kept",
+          "actionId": "repeat-db",
+          "pointer": "/data/rawRows/events"
+        },
+        {
+          "subcaseId": "lot-expiry-autonomous-loop",
+          "assertionId": "repeat-assessments-identity-kept",
+          "actionId": "repeat-db",
+          "pointer": "/data/rawRows/assessments"
+        },
+        {
+          "subcaseId": "lot-expiry-autonomous-loop",
+          "assertionId": "repeat-obligations-identity-kept",
+          "actionId": "repeat-db",
+          "pointer": "/data/rawRows/obligations"
+        },
+        {
+          "subcaseId": "lot-expiry-autonomous-loop",
+          "assertionId": "before-no-expiry-events",
+          "actionId": "before-db",
+          "pointer": "/data/rawRows/events"
+        },
+        {
+          "subcaseId": "lot-expiry-autonomous-loop",
+          "assertionId": "before-no-expiry-assessments",
+          "actionId": "before-db",
+          "pointer": "/data/rawRows/assessments"
+        },
+        {
+          "subcaseId": "lot-expiry-autonomous-loop",
+          "assertionId": "before-no-expiry-obligations",
+          "actionId": "before-db",
+          "pointer": "/data/rawRows/obligations"
+        },
+        {
+          "subcaseId": "lot-expiry-autonomous-loop",
+          "assertionId": "sweep-db-followup-responsibility-present",
+          "actionId": "sweep-db",
+          "pointer": "/data/rawRows/obligations"
+        },
+        {
+          "subcaseId": "lot-expiry-autonomous-loop",
+          "assertionId": "sweep-db-followup-responsibility-values",
+          "actionId": "sweep-db",
+          "pointer": "/data/rawRows/obligations"
+        },
+        {
+          "subcaseId": "lot-expiry-autonomous-loop",
+          "assertionId": "sweep-db-current-expiry-assignment-one",
+          "actionId": "sweep-db",
+          "pointer": "/data/rawRows/assignments"
+        },
+        {
+          "subcaseId": "lot-expiry-autonomous-loop",
+          "assertionId": "sweep-db-expiry-assignment-responsibility-present",
+          "actionId": "sweep-db",
+          "pointer": "/data/rawRows/assignments"
+        },
+        {
+          "subcaseId": "lot-expiry-autonomous-loop",
+          "assertionId": "sweep-db-expiry-assignment-responsibility-values",
+          "actionId": "sweep-db",
+          "pointer": "/data/rawRows/assignments"
+        },
+        {
+          "subcaseId": "lot-expiry-autonomous-loop",
+          "assertionId": "sweep-db-expiry-assignment-obligationId-linked",
+          "actionId": "sweep-db",
+          "pointer": "/data/rawRows/assignments"
+        },
+        {
+          "subcaseId": "lot-expiry-autonomous-loop",
+          "assertionId": "sweep-db-expiry-assignment-rootId-linked",
+          "actionId": "sweep-db",
+          "pointer": "/data/rawRows/assignments"
+        },
+        {
+          "subcaseId": "lot-expiry-autonomous-loop",
+          "assertionId": "sweep-db-expiry-assignment-workId-linked",
+          "actionId": "sweep-db",
+          "pointer": "/data/rawRows/assignments"
+        },
+        {
+          "subcaseId": "lot-expiry-autonomous-loop",
+          "assertionId": "repeat-db-followup-responsibility-present",
+          "actionId": "repeat-db",
+          "pointer": "/data/rawRows/obligations"
+        },
+        {
+          "subcaseId": "lot-expiry-autonomous-loop",
+          "assertionId": "repeat-db-followup-responsibility-values",
+          "actionId": "repeat-db",
+          "pointer": "/data/rawRows/obligations"
+        },
+        {
+          "subcaseId": "lot-expiry-autonomous-loop",
+          "assertionId": "repeat-db-current-expiry-assignment-one",
+          "actionId": "repeat-db",
+          "pointer": "/data/rawRows/assignments"
+        },
+        {
+          "subcaseId": "lot-expiry-autonomous-loop",
+          "assertionId": "repeat-db-expiry-assignment-responsibility-present",
+          "actionId": "repeat-db",
+          "pointer": "/data/rawRows/assignments"
+        },
+        {
+          "subcaseId": "lot-expiry-autonomous-loop",
+          "assertionId": "repeat-db-expiry-assignment-responsibility-values",
+          "actionId": "repeat-db",
+          "pointer": "/data/rawRows/assignments"
+        },
+        {
+          "subcaseId": "lot-expiry-autonomous-loop",
+          "assertionId": "repeat-db-expiry-assignment-obligationId-linked",
+          "actionId": "repeat-db",
+          "pointer": "/data/rawRows/assignments"
+        },
+        {
+          "subcaseId": "lot-expiry-autonomous-loop",
+          "assertionId": "repeat-db-expiry-assignment-rootId-linked",
+          "actionId": "repeat-db",
+          "pointer": "/data/rawRows/assignments"
+        },
+        {
+          "subcaseId": "lot-expiry-autonomous-loop",
+          "assertionId": "repeat-db-expiry-assignment-workId-linked",
+          "actionId": "repeat-db",
+          "pointer": "/data/rawRows/assignments"
+        },
+        {
+          "subcaseId": "lot-expiry-autonomous-loop",
+          "assertionId": "repeat-expiry-assignment-identity-kept",
+          "actionId": "repeat-db",
+          "pointer": "/data/rawRows/assignments"
+        },
+        {
+          "subcaseId": "lot-expiry-autonomous-loop",
+          "assertionId": "autonomous-trigger-loop",
+          "actionId": "sweep",
+          "pointer": "/data/hostObservation/operationEvidence/triggeredBy"
+        },
+        {
+          "subcaseId": "lot-expiry-autonomous-loop",
+          "assertionId": "autonomous-within-30s",
+          "actionId": "sweep",
+          "pointer": "/data/hostObservation/operationEvidence/submittedAt"
+        },
+        {
+          "subcaseId": "lot-expiry-autonomous-loop",
+          "assertionId": "autonomous-attempt-source",
+          "actionId": "sweep-db",
+          "pointer": "/data/rawRows/attempts"
         }
       ],
       "safe-runbook": [
