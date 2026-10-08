@@ -293,9 +293,7 @@
     그러면 "unchanged-policies" assertion으로 "grant-exceeding-write unchanged-policies"를 확인한다
     그러면 "unchanged-relations" assertion으로 "grant-exceeding-write unchanged-relations"를 확인한다
     그러면 "role-or-payload-escalation-rows0" assertion으로 "role-or-payload-escalation role-or-payload-escalation-rows0"를 확인한다
-    그러면 "verified-auth-actor" assertion으로 "server-authority verified-auth-actor"를 확인한다
-    그러면 "verified-auth-org" assertion으로 "server-authority verified-auth-org"를 확인한다
-    그러면 "verified-delegator" assertion으로 "server-authority verified-delegator"를 확인한다
+    그러면 "server-recorded-identity" assertion으로 "server-authority 서버가 기록한 감사 원행의 인증 actor·조직·위임자"를 확인한다
 
   @sit
   시나리오: 서버 인증·역할·현재 위임·정책의 교집합 payload-actor
@@ -325,9 +323,7 @@
     그러면 "unchanged-policies" assertion으로 "grant-exceeding-write unchanged-policies"를 확인한다
     그러면 "unchanged-relations" assertion으로 "grant-exceeding-write unchanged-relations"를 확인한다
     그러면 "role-or-payload-escalation-rows0" assertion으로 "role-or-payload-escalation role-or-payload-escalation-rows0"를 확인한다
-    그러면 "verified-auth-actor" assertion으로 "server-authority verified-auth-actor"를 확인한다
-    그러면 "verified-auth-org" assertion으로 "server-authority verified-auth-org"를 확인한다
-    그러면 "verified-delegator" assertion으로 "server-authority verified-delegator"를 확인한다
+    그러면 "server-recorded-identity" assertion으로 "server-authority 서버가 기록한 감사 원행의 인증 actor·조직·위임자"를 확인한다
 
   @sit
   시나리오: 서버 인증·역할·현재 위임·정책의 교집합 document-admin
@@ -357,9 +353,7 @@
     그러면 "unchanged-policies" assertion으로 "grant-exceeding-write unchanged-policies"를 확인한다
     그러면 "unchanged-relations" assertion으로 "grant-exceeding-write unchanged-relations"를 확인한다
     그러면 "role-or-payload-escalation-rows0" assertion으로 "role-or-payload-escalation role-or-payload-escalation-rows0"를 확인한다
-    그러면 "verified-auth-actor" assertion으로 "server-authority verified-auth-actor"를 확인한다
-    그러면 "verified-auth-org" assertion으로 "server-authority verified-auth-org"를 확인한다
-    그러면 "verified-delegator" assertion으로 "server-authority verified-delegator"를 확인한다
+    그러면 "server-recorded-identity" assertion으로 "server-authority 서버가 기록한 감사 원행의 인증 actor·조직·위임자"를 확인한다
 
   @sit
   시나리오: 서버 인증·역할·현재 위임·정책의 교집합 fde-business
@@ -389,9 +383,7 @@
     그러면 "unchanged-policies" assertion으로 "grant-exceeding-write unchanged-policies"를 확인한다
     그러면 "unchanged-relations" assertion으로 "grant-exceeding-write unchanged-relations"를 확인한다
     그러면 "role-or-payload-escalation-rows0" assertion으로 "role-or-payload-escalation role-or-payload-escalation-rows0"를 확인한다
-    그러면 "verified-auth-actor" assertion으로 "server-authority verified-auth-actor"를 확인한다
-    그러면 "verified-auth-org" assertion으로 "server-authority verified-auth-org"를 확인한다
-    그러면 "verified-delegator" assertion으로 "server-authority verified-delegator"를 확인한다
+    그러면 "server-recorded-identity" assertion으로 "server-authority 서버가 기록한 감사 원행의 인증 actor·조직·위임자"를 확인한다
 
   @sit
   시나리오: 서버 인증·역할·현재 위임·정책의 교집합 admin-business
@@ -421,9 +413,7 @@
     그러면 "unchanged-policies" assertion으로 "grant-exceeding-write unchanged-policies"를 확인한다
     그러면 "unchanged-relations" assertion으로 "grant-exceeding-write unchanged-relations"를 확인한다
     그러면 "role-or-payload-escalation-rows0" assertion으로 "role-or-payload-escalation role-or-payload-escalation-rows0"를 확인한다
-    그러면 "verified-auth-actor" assertion으로 "server-authority verified-auth-actor"를 확인한다
-    그러면 "verified-auth-org" assertion으로 "server-authority verified-auth-org"를 확인한다
-    그러면 "verified-delegator" assertion으로 "server-authority verified-delegator"를 확인한다
+    그러면 "server-recorded-identity" assertion으로 "server-authority 서버가 기록한 감사 원행의 인증 actor·조직·위임자"를 확인한다
 
   @sit
   시나리오: 서버 인증·역할·현재 위임·정책의 교집합 unresolved-policy
@@ -453,9 +443,7 @@
     그러면 "unchanged-policies" assertion으로 "grant-exceeding-write unchanged-policies"를 확인한다
     그러면 "unchanged-relations" assertion으로 "grant-exceeding-write unchanged-relations"를 확인한다
     그러면 "role-or-payload-escalation-rows0" assertion으로 "role-or-payload-escalation role-or-payload-escalation-rows0"를 확인한다
-    그러면 "verified-auth-actor" assertion으로 "server-authority verified-auth-actor"를 확인한다
-    그러면 "verified-auth-org" assertion으로 "server-authority verified-auth-org"를 확인한다
-    그러면 "verified-delegator" assertion으로 "server-authority verified-delegator"를 확인한다
+    그러면 "server-recorded-identity" assertion으로 "server-authority 서버가 기록한 감사 원행의 인증 actor·조직·위임자"를 확인한다
 
   @sit
   시나리오: grant와 identity 관리 범위를 검증한다: issue-within-scope
