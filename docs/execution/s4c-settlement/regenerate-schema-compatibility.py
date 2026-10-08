@@ -32,6 +32,11 @@ REVIEWED = {
         "cds": "backend/db/settlement.cds",
         "notNullStrengtheningReason": "같은 수령·인도 기여에 대한 누적 송장 중복을 별도 정산 차이로 불변 보존한다(D19).",
     },
+    "mulino_trade_recall_actions.investigationid": {
+        "migration": "database/migrations/V31__recall_investigation_facts.sql",
+        "cds": "backend/db/recall.cds",
+        "notNullStrengtheningReason": "회수 실물 처리를 scope version이 아닌 조사 root 범위의 사실로 묶어 재-scope 뒤에도 최종 분류가 version을 넘어 서로소이게 한다(D18, plan §6).",
+    },
 }
 
 

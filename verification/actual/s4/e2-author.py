@@ -44,6 +44,13 @@ for cap,cls in classes.items():
  fixture['aliases']['CPOL']['content']['rules'][cap]={'effectClass':cls}
  if cap not in {v['capabilityId'] for v in fixture['aliases']['DEF']['content']['verbs']}:fixture['aliases']['DEF']['content']['verbs'].append({'name':cap,'intentKind':'RECORD' if cap.startswith('record') else 'COMMAND','capabilityId':cap,'stage':'DRAFT','slots':{}})
 fixture['aliases']['RECALL_ADMIN']={'type':'ManagementAuthority','actorAlias':'supervisor','capabilityId':'approveRecall','validFrom':'2026-10-01T00:00:00Z','validUntil':UNTIL}
+# Plan §7.1: recall disposal is a stock decrease; the recorder needs the current human MANAGER
+# disposal confirmation (reader), separate from the ADMIN scope approval (supervisor).
+for name in ['reader','supervisor']:
+ actor=fixture['actors'][name]
+ if 'disposeQuantity' not in actor['roleCapabilities']:actor['roleCapabilities'].append('disposeQuantity')
+ if 'disposeQuantity' not in actor['grant']['actions']:actor['grant']['actions'].append('disposeQuantity')
+fixture['aliases']['RECALL_DISPOSAL_MANAGER']={'type':'ManagementAuthority','actorAlias':'reader','capabilityId':'disposeQuantity','validFrom':'2026-10-01T00:00:00Z','validUntil':UNTIL}
 # Fresh organization, same coherent LOT/item/place aliases: no stock/result seed.
 # The regulatory gateway binds each original to its policy's sourceNamespace;
 # E2's own SELL/DISPATCH regulator originals use these namespaces below.
@@ -121,6 +128,7 @@ recover=physical('e2-recover25','RECOVERED','0','25',SEG)
 a.append(cmd('e2-record-recover25','recordRecovery',recover,bind={'E2_RECOVERED_LEAF':'/effects/currentSegmentId'},assertions=[eq('/effects/partition/ACCOUNTED','0'),eq('/effects/partition/UNKNOWN','50')]))
 a.append(cmd('e2-repeat-recovery-denied','recordRecovery',recover,outcome='CONFLICT'))
 dispose=physical('e2-dispose-same25','DISPOSED','0','25','$E2_RECOVERED_LEAF')
+a.append(cmd('e2-dispose25-without-manager-denied','recordRecovery',copy.deepcopy(dispose),actor='supervisor',outcome='REJECTED',assertions=[eq('/error/code','FORBIDDEN')]))
 a.append(cmd('e2-record-dispose25','recordRecovery',dispose,bind={'E2_PARTIAL_HASH':'/effects/partitionHash'},assertions=[eq('/effects/partition/RECOVERED','25'),eq('/effects/partition/DISPOSED','25'),eq('/effects/partition/ACCOUNTED','25'),eq('/effects/partition/UNKNOWN','25')]))
 a.append(cmd('e2-repeat-disposal-denied','recordRecovery',dispose,outcome='CONFLICT'))
 a.append(cmd('e2-close-unknown25-denied','closeRecall',{'scopeId':'$E2_SCOPE','approvalId':'$E2_APPROVAL','scopeHash':'$E2_HASH','canonicalOccurrenceId':'$e2-dispose-same25.canonical','partitionHash':'$E2_PARTIAL_HASH'},actor='supervisor',outcome='HELD',assertions=[eq('/error/code','RECALL_RESIDUAL_UNKNOWN')]))

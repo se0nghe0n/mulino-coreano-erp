@@ -24,7 +24,7 @@ entity Approvals {
 entity Actions {
  key organizationId : UUID; key ID : UUID; revision : Integer;
  createdAt : Timestamp; recordedAt : Timestamp; occurredAt : Timestamp;
- scopeId : UUID; approvalId : UUID; canonicalOccurrenceId : UUID;
+ scopeId : UUID; investigationId : UUID; approvalId : UUID; canonicalOccurrenceId : UUID;
  actualEventId : UUID; kind : String(40); rootSegmentId : UUID;
  startQuantity : Decimal(38,12); quantity : Decimal(38,12); unit : String(40);
  sourceSegmentId : UUID; currentSegmentId : UUID; currentPlaceId : UUID;

@@ -3558,6 +3558,48 @@
       }
     },
     {
+      "id": "e2-dispose25-without-manager-denied",
+      "type": "command",
+      "capability": "recordRecovery",
+      "outcome": "REJECTED",
+      "request": {
+        "intentKind": "RECORD",
+        "definitionVersion": "definition-v1",
+        "capabilityId": "recordRecovery",
+        "expectedRevision": 0,
+        "commandIdempotencyKey": "e2-dispose25-without-manager-denied",
+        "slots": {
+          "actualEventId": "$e2-dispose-same25-actual-event",
+          "scopeId": "$E2_SCOPE",
+          "scopeHash": "$E2_HASH",
+          "rootSegmentId": "$e2-receipt60.segment",
+          "startQuantity": "0",
+          "quantity": "25",
+          "unit": "BOX",
+          "currentPlaceId": "$W",
+          "sourceSegmentId": "$E2_RECOVERED_LEAF",
+          "approvalId": "$E2_APPROVAL",
+          "canonicalOccurrenceId": "$e2-dispose-same25.canonical",
+          "kind": "DISPOSED"
+        },
+        "provenance": {},
+        "subjectRefs": [
+          {
+            "type": "Work",
+            "id": "$WORK"
+          }
+        ]
+      },
+      "actor": "supervisor",
+      "assertions": [
+        {
+          "pointer": "/error/code",
+          "operator": "equals",
+          "expected": "FORBIDDEN"
+        }
+      ]
+    },
+    {
       "id": "e2-record-dispose25",
       "type": "command",
       "capability": "recordRecovery",

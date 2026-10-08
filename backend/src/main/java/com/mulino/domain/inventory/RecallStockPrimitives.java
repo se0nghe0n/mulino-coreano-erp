@@ -28,5 +28,7 @@ public final class RecallStockPrimitives {
   }
   stock.disposeRange(c,segment,projected.start(),q,at,evidence,CommandExecution.commandId());
  }
+ /** Quantity of a root interval that the current ledger still holds in any active leaf (recovered stock not yet disposed or adjusted). */
+ public BigDecimal heldQuantity(DomainContext c,String root,BigDecimal start,BigDecimal q){var total=BigDecimal.ZERO;for(var leaf:r.currentRows(c,"QuantitySegments"))if(leaf.get("retiredAt")==null)total=total.add(QualityRanges.quantity(ranges.project(c,root,leaf.get("ID").toString(),start,q)));return total;}
  private QualityRanges.Range requireRange(DomainContext c,String root,BigDecimal start,BigDecimal q,String segment){var s=r.current(c,"QuantitySegments",segment);var rootRow=r.current(c,"QuantitySegments",root);var fences=new TreeSet<>(stock.fences(s));fences.addAll(stock.fences(rootRow));r.fence(c,fences);s=r.current(c,"QuantitySegments",segment);if(!Objects.equals(rootRow.get("itemId"),s.get("itemId"))||!Objects.equals(rootRow.get("lotId"),s.get("lotId"))||!Objects.equals(rootRow.get("unit"),s.get("unit"))||s.get("retiredAt")!=null)throw DomainError.invalid("Current recall physical leaf required");var mapped=ranges.project(c,root,segment,start,q);if(mapped.size()!=1||QualityRanges.quantity(mapped).compareTo(q)!=0)throw DomainError.invalid("Recall interval must map to one exact current physical subset");return mapped.getFirst();}
 }
