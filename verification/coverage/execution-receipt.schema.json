@@ -12,7 +12,9 @@
     "reportArtifact",
     "inputs",
     "artifacts",
-    "workingTreeClean"
+    "workingTreeClean",
+    "workingTreeObservations",
+    "buildIdentity"
   ],
   "properties": {
     "schemaVersion": {
@@ -293,6 +295,81 @@
         },
         "additionalProperties": false
       }
+    },
+    "workingTreeObservations": {
+      "description": "git HEAD and status observed by the harness before the first case ran (before) and after the run (after). Both clean at codeCommit; the assembler also compares before with the report's preRun.",
+      "type": "object",
+      "required": [
+        "before",
+        "after"
+      ],
+      "properties": {
+        "before": {
+          "type": "object",
+          "required": [
+            "codeCommit",
+            "clean",
+            "observedAt"
+          ],
+          "properties": {
+            "codeCommit": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{40}$"
+            },
+            "clean": {
+              "const": true
+            },
+            "observedAt": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "additionalProperties": false
+        },
+        "after": {
+          "type": "object",
+          "required": [
+            "codeCommit",
+            "clean",
+            "observedAt"
+          ],
+          "properties": {
+            "codeCommit": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{40}$"
+            },
+            "clean": {
+              "const": true
+            },
+            "observedAt": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    },
+    "buildIdentity": {
+      "description": "Backend build identity. DECLARED_ACTUAL_BUILD_COMMIT: the ACTUAL_BUILD_COMMIT declaration; the harness cannot observe the running backend's build (no build-info endpoint).",
+      "type": "object",
+      "required": [
+        "commit",
+        "source"
+      ],
+      "properties": {
+        "commit": {
+          "type": "string",
+          "minLength": 1
+        },
+        "source": {
+          "enum": [
+            "DECLARED_ACTUAL_BUILD_COMMIT"
+          ]
+        }
+      },
+      "additionalProperties": false
     }
   },
   "additionalProperties": false

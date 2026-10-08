@@ -30,14 +30,19 @@ class CoverageSelftest(unittest.TestCase):
     def protocol_fixture(self, profile='schema'):
         # Deliberately counterfactual protocol data: shape acceptance is not product execution.
         identity = dict(runId='test-run', hostId='test-host', workspaceId='test-workspace', actorId='test-actor')
-        command = dict(argv=['java', 'acceptance'], display='java acceptance', exitCode=0,
+        command = dict(argv=['./verify', 'deployment' if profile.endswith('-deployment') else profile, '--actual'], display='java acceptance', exitCode=0,
                        startedAt='2026-10-07T00:00:00Z', completedAt='2026-10-07T00:01:00Z')
         versions = dict(schema='ontology-v1', definition='definition-v1', evaluator='evaluator-v1', policy='synthetic-policy-v1',
                         tool='java21', db='postgres18', protocol='mcp-v1', client='client-v1', model='model-v1', prompt='prompt-v1', skill='skill-v1')
         report = dict(status='PASS', profile=profile, codeCommit=COMMIT, command=command['display'], exitCode=0,
-                      executionIdentity=identity, gateComplete=True, discovered=1, started=1, completed=1, skipped=0, cases=[])
+                      executionIdentity=identity, gateComplete=True, discovered=1, started=1, completed=1, skipped=0, cases=[],
+                      workingTreeDirty=False, explicitCaseSelection=False, timestamp='2026-10-07T00:01:00Z',
+                      preRun=dict(codeCommit=COMMIT, workingTreeDirty=False, observedAt='2026-10-07T00:00:00Z'))
+        tree = dict(before=dict(codeCommit=COMMIT, clean=True, observedAt='2026-10-07T00:00:00Z'),
+                    after=dict(codeCommit=COMMIT, clean=True, observedAt='2026-10-07T00:01:00Z'))
         receipt = dict(schemaVersion='1.0.0', evidenceClass='ACTUAL', codeCommit=COMMIT, workingTreeClean=True, executionIdentity=identity, command=command, versions=versions,
-                       inputs=[self.write('input.json', {'input': 'fixed'})], artifacts=[], reportArtifact=self.write('report.json', report))
+                       inputs=[self.write('input.json', {'input': 'fixed'})], artifacts=[], reportArtifact=self.write('report.json', report),
+                       workingTreeObservations=tree, buildIdentity=dict(commit=COMMIT, source='DECLARED_ACTUAL_BUILD_COMMIT'))
         raw = dict(scope={'environmentId': 'test-workspace'}, evidenceClass='ACTUAL_RUNTIME', executionIdentity=identity, command=command, versions=versions,
                    provenance={'source': 'ACTUAL_RUNTIME', 'independent': True}, profileResult=report, observations={})
         receipt['artifacts'] = [dict(self.write('raw.json', raw), scope=raw['scope'], completeness='COMPLETE')]
@@ -155,7 +160,7 @@ class CoverageSelftest(unittest.TestCase):
         self.assertIsNone(self.receipt_check(report, receipt, raw, 'btp-deployment'))
 
     def test_actual_failure_preserved_without_receipt(self):
-        self.write('failure.json', {'status': 'FAIL', 'reason': 'Observed duplicate effect'})
+        self.write('failure.json', {'status': 'FAIL', 'profile': 'schema', 'reason': 'Observed duplicate effect'})
         profiles = self.a.profiles({'profiles': [{'profile': 'schema', 'reportRef': 'failure.json', 'receiptRef': 'absent.json', 'evidenceClass': 'ACTUAL'}]})
         self.assertEqual('FAIL', profiles['schema']['status'])
 
@@ -224,7 +229,7 @@ class CoverageSelftest(unittest.TestCase):
                 self.assertEqual(accepted, self.receipt_check(report, receipt, raw, 'regulatory') is not None)
 
     def test_red_and_selftest_are_not_actual_profile_pass(self):
-        self.write('pass.json', {'status': 'PASS', 'gateComplete': True})
+        self.write('pass.json', {'status': 'PASS', 'profile': 'schema', 'gateComplete': True})
         for evidence_class in ('SELFTEST', 'CONTRACT_RED'):
             profiles = self.a.profiles({'profiles': [{'profile': 'schema', 'reportRef': 'pass.json', 'evidenceClass': evidence_class}]})
             self.assertEqual('NOT_RUN', profiles['schema']['status'])
@@ -247,13 +252,13 @@ class CoverageSelftest(unittest.TestCase):
 
     def test_waiver_cannot_replace_model_or_btp(self):
         for profile in ('model', 'btp-deployment'):
-            self.write('waiver.json', {'status': 'WAIVED', 'waiver': 'no account'})
+            self.write('waiver.json', {'status': 'WAIVED', 'profile': profile, 'waiver': 'no account'})
             p = self.a.profiles({'profiles': [{'profile': profile, 'reportRef': 'waiver.json', 'evidenceClass': 'ACTUAL', 'receiptRef': 'missing.json'}]})
             self.assertEqual('NOT_RUN', p[profile]['status'])
             self.assertTrue(any(i['status'] == 'FAIL' and 'Waiver' in i['reason'] for i in self.a.problems))
 
     def test_unknown_and_duplicate_profiles_rejected(self):
-        self.write('pass.json', {'status': 'NOT_RUN'})
+        self.write('pass.json', {'status': 'NOT_RUN', 'profile': 'schema'})
         entry = {'profile': 'schema', 'reportRef': 'pass.json', 'evidenceClass': 'SELFTEST'}
         self.a.profiles({'profiles': [entry, entry, dict(entry, profile='unsupported')]})
         self.assertEqual(2, sum(p['status'] == 'FAIL' for p in self.a.problems))
@@ -315,6 +320,129 @@ class CoverageSelftest(unittest.TestCase):
         self.assertIsNotNone(checked)
         self.a.run_case(declaration, {'schema': {'_report': report, '_receipt': checked, 'status': 'PASS'}})
         return declaration
+
+    def provenance_run(self, provenance, kind='observe'):
+        declaration, case, fixture = self.declaration()
+        declaration['_sub']['actions'][0]['kind'] = kind
+        report, receipt, raw = self.protocol_fixture()
+        action = {'actionId': 'read', 'driverStatus': 'EXECUTED', 'response': {'quantity': '80'}, 'provenance': provenance, 'artifactRefs': ['raw.json']}
+        assertion = dict(assertionId='quantity', op='decimalEquals', expected='80', source=declaration['_sub']['assertions'][0]['source'], status='PASS', observed='80')
+        run = dict(caseId='T01', subcaseId='only', status='PASS', runtimeComplete=True, caseHash=case['sha256'], fixtureHash=fixture['sha256'],
+                   versions=receipt['versions'], startedAt='2026-10-07T00:00:01Z', finishedAt='2026-10-07T00:00:03Z', actions={'read': action}, assertions=[assertion])
+        report['cases'] = [run]
+        raw['observations'] = {'read': copy.deepcopy(action)}
+        raw['profileResult'] = copy.deepcopy(report)
+        receipt['inputs'].extend([case, fixture])
+        checked = self.receipt_check(report, receipt, raw)
+        self.assertIsNotNone(checked)
+        self.a.run_case(declaration, {'schema': {'_report': report, '_receipt': checked, 'status': 'PASS'}})
+        return declaration
+
+    def test_actual_observe_snapshot_is_not_a_selftest_marker(self):
+        # step2-closure P2: every real observe provenance carries snapshot.capturedAt; the marker check reads labels only.
+        snapshot = {'id': '811:811:', 'isolation': 'REPEATABLE_READ', 'capturedAt': '2026-10-07T00:00:02Z', 'artifactRef': 'raw.json',
+                    'readMode': 'CURRENT_COMMITTED'}
+        query = {'statementId': 's1-physical-segments-v1', 'sql': 'SELECT * FROM segments', 'parameters': {}, 'mappingVersion': '1.0.0'}
+        actual = {'adapter': 'actual-http-jdbc', 'adapterVersion': '2.0.0', 'buildVersion': COMMIT, 'source': 'POSTGRESQL_JDBC', 'independent': True,
+                  'scopeComplete': True, 'sourceQuery': query, 'snapshot': snapshot}
+        self.assertIsNone(m.provenance_marker(actual))
+        self.assertEqual('PASS', self.provenance_run(actual)['status'])
+        for label, value in [('source', 'CANNED_CONTRACT_SELFTEST'), ('adapter', 'V8-lock-SELFTEST'), ('buildVersion', 'stub-build')]:
+            with self.subTest(label=label):
+                self.a = m.Assembly(self.root, COMMIT)
+                self.assertEqual('FAIL', self.provenance_run(dict(actual, **{label: value}))['status'])
+                self.assertTrue(any('Canned/stub action' in p['reason'] for p in self.a.problems), self.a.problems)
+        self.a = m.Assembly(self.root, COMMIT)
+        self.assertEqual('FAIL', self.provenance_run(dict(actual, snapshot=dict(snapshot, isolation='SELFTEST_CAPTURED')))['status'])
+
+    def test_selection_contract_violation_contradicts_a_runner_pass(self):
+        # A regressed evaluator that treats a missing filter field as non-matching reports count 0 (vacuous no-effect PASS).
+        results = {'x': {'data': {'rows': [{'quantity': '5'}], 'v': None}}}
+        count = dict(op='count', source=dict(actionId='x', pointer='/data/rows', where={'status': 'APPLIED'}), expected=0)
+        self.assertIs(False, m.independent_verdict(count, results))
+        self.assertIn('filter field missing', m.record_problem(count, dict(op='count', where={'status': 'APPLIED'}, observed=[]), results))
+        field = dict(op='sumEquals', source=dict(actionId='x', pointer='/data/rows', field='committed'), expected='0')
+        self.assertIs(False, m.independent_verdict(field, results))
+        for pointer in ('/data/v', '/data/missing'):
+            with self.subTest(pointer=pointer):
+                self.assertIs(False, m.independent_verdict(dict(op='present', source=dict(actionId='x', pointer=pointer), expected=True), results))
+        # Undecidable inputs stay undecidable: no captured result, or an alias the bytes cannot bind.
+        self.assertIsNone(m.independent_verdict(dict(count, source=dict(count['source'], actionId='absent')), results))
+        self.assertIsNone(m.independent_verdict(dict(count, source=dict(count['source'], where={'status': {'$alias': 'A'}})), results))
+
+    def test_profile_pass_needs_matching_profile_and_every_declared_subcase(self):
+        report, receipt, raw = self.protocol_fixture('schema')
+        report['cases'] = [{'caseId': 'T01', 'subcaseId': 'only'}]
+        raw['profileResult'] = report
+        self.receipt_check(report, receipt, raw)
+        entry = [{'profile': 'schema', 'reportRef': 'report.json', 'receiptRef': 'receipt.json', 'evidenceClass': 'ACTUAL'}]
+        one = [{'caseId': 'T01', 'subcaseId': 'only', 'profile': 'schema'}]
+        self.assertEqual('PASS', self.a.profiles({'profiles': entry}, one)['schema']['status'])
+        two = one + [{'caseId': 'T02', 'subcaseId': 'other', 'profile': 'schema'}]
+        partial = self.a.profiles({'profiles': entry}, two)['schema']
+        self.assertEqual('NOT_RUN', partial['status'])
+        self.assertIn('1 declared schema subcases did not run', partial['missingReason'])
+        for change in ({'explicitCaseSelection': True}, {'explicitCaseSelection': None}):
+            with self.subTest(change=change):
+                mutated = dict(report, **change)
+                raw['profileResult'] = mutated
+                self.receipt_check(mutated, receipt, raw)
+                self.assertEqual('NOT_RUN', self.a.profiles({'profiles': entry}, one)['schema']['status'])
+        other = dict(report, profile='contracts')
+        raw['profileResult'] = other
+        self.receipt_check(other, receipt, raw)
+        self.a = m.Assembly(self.root, COMMIT)
+        self.assertEqual('NOT_RUN', self.a.profiles({'profiles': entry}, one)['schema']['status'])
+        self.assertTrue(any('produced for profile contracts' in p['reason'] for p in self.a.problems))
+
+    def test_receipt_needs_named_profile_and_clean_tree_before_and_after(self):
+        for mutate, reason in [
+                (lambda r, c: c['command'].update(argv=['./verify', 'contracts', '--actual']), 'does not name profile'),
+                (lambda r, c: r['preRun'].update(workingTreeDirty=True), 'before and after'),
+                (lambda r, c: r.pop('preRun'), 'before and after'),
+                (lambda r, c: r['preRun'].update(codeCommit='b' * 40), 'before and after'),
+                (lambda r, c: c['workingTreeObservations']['before'].update(clean=False), 'before and after'),
+                (lambda r, c: c.pop('workingTreeObservations'), 'before and after'),
+                (lambda r, c: r.update(workingTreeDirty=True), 'before and after')]:
+            with self.subTest(reason=reason):
+                self.a = m.Assembly(self.root, COMMIT)
+                report, receipt, raw = self.protocol_fixture()
+                mutate(report, receipt)
+                raw['profileResult'] = report
+                raw['command'] = receipt['command']
+                self.assertIsNone(self.receipt_check(report, receipt, raw))
+                self.assertTrue(any(reason in p['reason'] for p in self.a.problems), self.a.problems)
+
+    def test_regulatory_profile_is_a_named_not_run_gate(self):
+        record = self.a.profiles({})['regulatory']
+        self.assertEqual('NOT_RUN', record['status'])
+        self.assertTrue(record['missingReason'].startswith('NOT_RUN_GATED: no regulatory runner'))
+
+    def test_layer_route_known_open_marks_observation_and_stale_entry_fails_preparation(self):
+        real = HERE.parents[1]
+        a = m.Assembly(real, COMMIT)
+        _, observations = a.catalog()
+        a.layer_routes(observations)
+        self.assertFalse([p for p in a.preparation_problems if 'Layer route' in p['reason']])
+        gaps = {k for k, o in observations.items() if o.get('layerRouteGaps')}
+        self.assertIn(('V4.all-alternate-write-paths', 'mixed-batch-allowed-partial-effects'), gaps)
+        self.assertEqual(4, len(gaps))
+        catalog = json.loads((real / 'verification/requirements/mandatory-oracles.json').read_text())
+        for case_id in catalog['requiredCaseIds']:
+            (self.root / f'verification/cases/{case_id}').mkdir(parents=True, exist_ok=True)
+            (self.root / f'verification/cases/{case_id}/case.json').write_bytes((real / f'verification/cases/{case_id}/case.json').read_bytes())
+        (self.root / 'verification/requirements').mkdir(parents=True, exist_ok=True)
+        for name in ('mandatory-oracles.json', 'check_layer_routes.py'):
+            (self.root / 'verification/requirements' / name).write_bytes((real / 'verification/requirements' / name).read_bytes())
+        review = json.loads((real / 'verification/requirements/layer-route-review.json').read_text())
+        review['entries'] = [e for e in review['entries'] if e['observationName'] != 'mixed-batch-allowed-partial-effects']
+        review['entries'].append(dict(review['entries'][-1], observationName='closed-gap'))
+        (self.root / 'verification/requirements/layer-route-review.json').write_text(json.dumps(review))
+        b = m.Assembly(self.root, COMMIT)
+        b.layer_routes(copy.deepcopy(observations))
+        reasons = [p['reason'] for p in b.preparation_problems if p['status'] == 'FAIL']
+        self.assertTrue(any('unexplained layer route gap V4' in r for r in reasons), reasons)
+        self.assertTrue(any('stale layer-route review entry' in r for r in reasons), reasons)
 
     def test_runner_pass_is_rechecked_against_captured_bytes(self):
         self.assertEqual('PASS', self.captured_run('80')['status'])

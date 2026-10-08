@@ -28,6 +28,30 @@ LAYER_PROFILE = {'UNIT': 'contracts', 'API': 'scenarios', 'DB': 'scenarios', 'MC
 ARTIFACT_CLASSES = {'ACTUAL', 'ACTUAL_HOST', 'ACTUAL_RUNTIME'}
 BAD_MARKERS = ('selftest', 'canned', 'stub', 'fake', 'captured', 'unimplemented')
 REGULATORY_REVIEW_FIELDS = ('officialSourceRef', 'jurisdiction', 'applicableDate', 'reviewerId', 'reviewedAt')
+# Adapter label fields of an action provenance (same list as ExecutionReceiptProducer.PROVENANCE_LABELS). Only these values
+# are matched against BAD_MARKERS: the provenance also carries data such as snapshot.capturedAt or SQL text.
+PROVENANCE_LABELS = (('source',), ('adapter',), ('adapterVersion',), ('buildVersion',), ('snapshot', 'isolation'), ('sourceQuery', 'mappingVersion'))
+# plan §13.4 records the official source/applicable date/reviewer separately; no ./verify entrypoint or approved runner
+# produces a regulatory report or receipt, so the profile is a named NOT_RUN gate, never silently reachable evidence.
+REGULATORY_GATE_REASON = ('NOT_RUN_GATED: no regulatory runner. ./verify regulatory reports NOT_RUN; a reviewed regulatory '
+                          'record (official source, jurisdiction, applicable date, reviewer) and an approved runner that '
+                          'reruns the T15 subcases are required before any regulatory receipt exists')
+
+
+def provenance_marker(provenance):
+    """The first BAD_MARKERS hit among the provenance label values, or None (structural; keys and data are not scanned)."""
+    if not isinstance(provenance, dict) or not nonempty(provenance.get('source')):
+        return 'provenance source label missing'
+    for path in PROVENANCE_LABELS:
+        value = provenance
+        for key in path:
+            value = value.get(key) if isinstance(value, dict) else None
+        if isinstance(value, (str, int, float, bool)):
+            text = str(value).lower()
+            hit = next((marker for marker in BAD_MARKERS if marker in text), None)
+            if hit:
+                return '/'.join(path) + ' label carries ' + hit
+    return None
 
 
 def status_of(values):
@@ -59,6 +83,11 @@ def pointer(node, path):
     return node
 
 
+def profile_names(profile):
+    """Names a report/command may use for an index profile (Main runs both deployment profiles as 'deployment')."""
+    return (profile, 'deployment') if profile.endswith('-deployment') else (profile,)
+
+
 def effective_profiles(profiles):
     return [effective for profile in profiles for effective in (['local-deployment', 'btp-deployment'] if profile == 'deployment' else [profile])]
 
@@ -79,6 +108,12 @@ DECIMAL = re.compile(r'-?(0|[1-9][0-9]*)(\.[0-9]+)?')
 
 class NotRecheckable(Exception):
     """The independent re-evaluation cannot decide; it never turns into PASS or FAIL by itself."""
+
+
+class SelectionViolation(Exception):
+    """The captured bytes violate the runner's selection contract (AssertionEngine.select): a missing or null pointer value,
+    a non-array where/field source, or a row without the filter or projected field. The Java engine fails such an assertion,
+    so a runner PASS over these bytes is contradicted rather than undecidable."""
 
 
 def has_reference(node):
@@ -126,24 +161,37 @@ def resolve_refs(node, results, aliases=None):
 
 
 def recheck_select(results, source, aliases=None):
-    """Mirror of the runner's documented pointer/where/field projection over captured StepResults."""
-    if not isinstance(source, dict):
+    """Mirror of the runner's pointer/where/field projection (AssertionEngine.select) over captured StepResults.
+
+    NotRecheckable: the inputs needed to decide are not in the bytes (no captured result for the action, an unresolvable
+    $alias/$result in where). SelectionViolation: the captured bytes are there and the Java contract fails on them."""
+    if not isinstance(source, dict) or source.get('actionId') not in results:
         raise NotRecheckable()
     where = resolve_refs(source['where'], results, aliases) if 'where' in source else None
+    if where is not None and not isinstance(where, dict):
+        raise NotRecheckable()
     try:
         value = pointer(results[source['actionId']], source['pointer'])
     except (KeyError, IndexError, TypeError, ValueError) as error:
-        raise NotRecheckable() from error
+        raise SelectionViolation('Missing observed value at ' + str(source.get('pointer'))) from error
     if value is None:
-        raise NotRecheckable()
+        raise SelectionViolation('Null observed value at ' + str(source.get('pointer')))
     if where is not None:
-        if not isinstance(value, list) or not isinstance(where, dict) or any(not isinstance(r, dict) or any(r.get(k) is None for k in where) for r in value):
-            raise NotRecheckable()
+        if not isinstance(value, list):
+            raise SelectionViolation('where source must be an array')
+        for row in value:
+            missing = [k for k in where if not isinstance(row, dict) or row.get(k) is None]
+            if missing:
+                raise SelectionViolation('filter field missing: ' + missing[0])
         value = [r for r in value if all(same_json(r[k], v) for k, v in where.items())]
     if 'field' in source:
         names = source['field'] if isinstance(source['field'], list) else [source['field']]
-        if not isinstance(value, list) or any(not isinstance(r, dict) or r.get(n) is None for r in value for n in names):
-            raise NotRecheckable()
+        if not isinstance(value, list):
+            raise SelectionViolation('field projection source must be an array')
+        for row in value:
+            missing = [n for n in names if not isinstance(row, dict) or row.get(n) is None]
+            if missing:
+                raise SelectionViolation('projected field missing: ' + str(missing[0]))
         value = [[r[n] for n in names] if isinstance(source['field'], list) else r[names[0]] for r in value]
     return value
 
@@ -223,9 +271,12 @@ def independent_verdict(declared, results, aliases=None):
         return evaluate(declared, expected, value, unit, base, base_unit)
     except NotRecheckable:
         return None
+    except SelectionViolation:
+        return False
 
 
 RECORD_KEYS = ('unit', 'baseline', 'unitSource', 'baselineUnitSource')
+BASELINE_OPS = ('decimalDelta', 'sameAs', 'timeAtMostSeconds')
 
 
 def record_problem(declared, record, results, aliases=None):
@@ -256,6 +307,11 @@ def record_problem(declared, record, results, aliases=None):
             projected = recheck_select(results, declared[source_key], aliases)
         except NotRecheckable:
             continue
+        except SelectionViolation as violation:
+            # The Java engine records a baseline only when it selects; other operators ignore an unselectable baseline.
+            if source_key == 'baseline' and declared.get('op') not in BASELINE_OPS:
+                continue
+            return f'captured bytes violate the selection contract for {source_key}: {violation}'
         if record.get(record_key) is None or not same_json(projected, record[record_key]):
             return f'recorded {record_key} differs from the projection of captured bytes'
     if 'resolvedExpected' in record:
@@ -384,6 +440,31 @@ class Assembly:
                 self.issue('FAIL', str(error), True)
         return oracles, observations
 
+    def layer_routes(self, observations):
+        """Observation-level MCP/SKILLS route review (verification/requirements/check_layer_routes.py), the same check that
+        ./verify prepare runs. Unexplained gaps and stale/malformed review entries are preparation failures; a recorded
+        KNOWN_OPEN gap marks its observation so the observation stays NOT_RUN until the owner closes the gap."""
+        module_ref = 'verification/requirements/check_layer_routes.py'
+        try:
+            self.descriptor(module_ref)
+            self.descriptor('verification/requirements/layer-route-review.json')
+            spec = importlib.util.spec_from_file_location('coverage_layer_routes', self.file(module_ref))
+            module = importlib.util.module_from_spec(spec)
+            spec.loader.exec_module(module)
+            rows, problems = module.review(self.root)
+        except FileNotFoundError:
+            self.issue('NOT_RUN', 'Layer route check/review source missing', True)
+            return
+        except (ValueError, KeyError, TypeError, OSError, AttributeError, json.JSONDecodeError) as error:
+            self.issue('FAIL', 'Layer route check failed: ' + str(error), True)
+            return
+        for problem in problems:
+            self.issue('FAIL', 'Layer route check: ' + problem, True)
+        for status, _case_id, oracle_id, name, layer, owner in rows:
+            observation = observations.get((oracle_id, name))
+            if status == 'KNOWN_OPEN' and observation is not None:
+                observation.setdefault('layerRouteGaps', []).append({'layer': layer, 'owner': owner, 'status': 'KNOWN_OPEN'})
+
     def fixture_bundle(self, ref, visited=None):
         visited = set() if visited is None else visited
         if ref in visited:
@@ -494,6 +575,8 @@ class Assembly:
                 raise ValueError('Report command differs from actual receipt display')
             if not isinstance(command.get('argv'), list) or not command['argv'] or any(not nonempty(v) for v in command['argv']):
                 raise ValueError('Missing actual command argv')
+            if not set(profile_names(profile)) & set(command['argv']):
+                raise ValueError(f'Receipt command argv does not name profile {profile}')
             if type(command.get('exitCode')) is not int or command['exitCode'] != report.get('exitCode'):
                 raise ValueError('Receipt/report exit code differs')
             if type(report.get('exitCode')) is not int or report['exitCode'] < 0:
@@ -552,6 +635,15 @@ class Assembly:
                 raise ValueError('Report commit differs from actual receipt')
             if receipt.get('workingTreeClean') is not True:
                 raise ValueError('Actual run from a dirty or unrecorded working tree cannot identify the tested code commit')
+            # Clean at the same HEAD both before the first case ran and after the run (observed by the harness, not only
+            # stated in the post-run report).
+            tree = receipt.get('workingTreeObservations')
+            before = report.get('preRun')
+            if (not isinstance(tree, dict) or any(not isinstance(tree.get(k), dict) or tree[k].get('clean') is not True or tree[k].get('codeCommit') != self.commit
+                                                  for k in ('before', 'after'))
+                    or not isinstance(before, dict) or before.get('workingTreeDirty') is not False or before.get('codeCommit') != self.commit
+                    or tree['before'].get('observedAt') != before.get('observedAt') or report.get('workingTreeDirty') is not False):
+                raise ValueError('Actual run lacks a clean same-commit working tree observed before and after execution')
             if profile.endswith('-deployment') and receipt.get('environment') != ('BTP' if profile == 'btp-deployment' else 'LOCAL'):
                 raise ValueError('Deployment environment cannot substitute LOCAL for BTP')
             if profile == 'regulatory':
@@ -583,8 +675,11 @@ class Assembly:
             self.issue('FAIL', f'Invalid actual receipt {ref}: {error}')
         return None
 
-    def profiles(self, index):
+    def profiles(self, index, declarations=None):
         by_profile = {}
+        declared = {}
+        for declaration in declarations or []:
+            declared.setdefault(declaration['profile'], set()).add((declaration['caseId'], declaration['subcaseId']))
         for item in index.get('profiles', []):
             profile = item.get('profile')
             if profile not in PROFILES or profile in by_profile:
@@ -592,6 +687,9 @@ class Assembly:
                 continue
             report = self.read(item.get('reportRef'))
             record = {'profile': profile, 'status': 'NOT_RUN', 'prerequisiteProfiles': PREREQUISITES[profile], 'missingReason': 'Actual profile evidence unavailable'}
+            if report and report.get('profile') not in profile_names(profile):
+                self.issue('FAIL', f'Indexed {profile} report was produced for profile {report.get("profile")}')
+                report = None
             if report:
                 record['reportArtifact'] = self.descriptor(item['reportRef'])
                 observed_fail = report.get('status') == 'FAIL' or any(a.get('status') == 'FAIL' for a in report.get('assertionResults', []))
@@ -605,14 +703,21 @@ class Assembly:
                     if observed_fail:
                         record['status'] = self.issue('FAIL', f'Observed runtime failure: {profile}')
                     elif report.get('status') == 'PASS' and receipt and report.get('gateComplete') is True and report.get('skipped', 0) == 0 and report.get('discovered', 0) > 0 and report.get('discovered') == report.get('started') == report.get('completed'):
-                        record['status'], record['missingReason'] = 'PASS', None
+                        ran = {(c.get('caseId'), c.get('subcaseId')) for c in report.get('cases', []) if isinstance(c, dict)}
+                        missing = declared.get(profile, set()) - ran if declarations is not None else set()
+                        if report.get('explicitCaseSelection') is not False or missing:
+                            record['missingReason'] = (f'Profile report covers a subset: {len(missing)} declared {profile} subcases did not run'
+                                                       if missing else 'Explicit case-file selection is a partial profile run')
+                        else:
+                            record['status'], record['missingReason'] = 'PASS', None
                     elif report.get('waiver') or report.get('status') not in ('PASS', 'FAIL', 'NOT_RUN'):
                         self.issue('FAIL', f'Waiver/invalid actual runtime status: {profile}')
                 else:
                     record['missingReason'] = 'Preparation/SELFTEST/CONTRACT_RED is not product runtime'
             by_profile[profile] = record
         for profile in PROFILES:
-            by_profile.setdefault(profile, {'profile': profile, 'status': 'NOT_RUN', 'prerequisiteProfiles': PREREQUISITES[profile], 'missingReason': 'Required profile report missing; no waiver'})
+            by_profile.setdefault(profile, {'profile': profile, 'status': 'NOT_RUN', 'prerequisiteProfiles': PREREQUISITES[profile],
+                                            'missingReason': REGULATORY_GATE_REASON if profile == 'regulatory' else 'Required profile report missing; no waiver'})
         for profile in PROFILES:
             record = by_profile[profile]
             if record['status'] == 'PASS' and any(by_profile[p]['status'] != 'PASS' for p in PREREQUISITES[profile]):
@@ -672,8 +777,9 @@ class Assembly:
                 provenance = actual.get('provenance', {})
                 if provenance.get('scopeComplete') is not True or not actual.get('artifactRefs'):
                     complete = False
-                if any(marker in json.dumps(provenance).lower() for marker in BAD_MARKERS):
-                    raise ValueError('Canned/stub action cannot become actual execution')
+                marker = provenance_marker(provenance)
+                if marker:
+                    raise ValueError(f'Canned/stub action cannot become actual execution: {aid} {marker}')
                 if not any(document.get('observations', {}).get(aid) == actual for document in receipt['_artifactDocuments']):
                     raise ValueError('Action result differs from captured artifact bytes')
                 if action.get('kind') == 'observe' and (provenance.get('independent') is not True or not provenance.get('sourceQuery') or not provenance.get('snapshot')):
@@ -972,6 +1078,7 @@ class Assembly:
                 self.descriptor(ref)
         _, observations = self.catalog()
         declarations = self.declarations(observations)
+        self.layer_routes(observations)
         preparation = 'FAIL' if any(p['status'] == 'FAIL' for p in self.preparation_problems) else 'NOT_RUN'
         if check_preparation and not self.preparation_problems:
             command = [str(self.root / 'verify'), 'prepare']
@@ -990,7 +1097,7 @@ class Assembly:
                     preparation = self.issue('FAIL', 'Preparation compiled parser hash differs from current class', True)
             else:
                 preparation = self.issue('FAIL', 'Fresh preparation parser/schema/registry check failed', True)
-        profiles = self.profiles(index)
+        profiles = self.profiles(index, declarations)
         for declaration in declarations:
             self.run_case(declaration, profiles)
         runtime_artifacts = []
@@ -1023,6 +1130,11 @@ class Assembly:
             for profile in observation['requiredProfiles']:
                 clause_states = [link['status'] for link in observation['assertionLinks'] if link['profile'] == profile]
                 states.append(status_of(clause_states + [profiles[profile]['status']]) if clause_states else 'NOT_RUN')
+            if observation.get('layerRouteGaps'):
+                # A recorded KNOWN_OPEN gap: no linked assertion reads that layer, so the observation cannot be PASS.
+                states.append('NOT_RUN')
+                self.issue('NOT_RUN', f'Known-open layer route gap keeps {observation["oracleId"]}/{observation["observationName"]} NOT_RUN: '
+                                      + ', '.join(f'{g["layer"]} owner {g["owner"]}' for g in observation['layerRouteGaps']))
             observation['status'] = status_of(states)
         model = self.model(index, profiles)
         if self.working_tree_dirty:

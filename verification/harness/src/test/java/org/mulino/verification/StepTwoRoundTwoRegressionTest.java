@@ -62,11 +62,16 @@ final class StepTwoRoundTwoRegressionTest {
             Path script=temp.resolve(check.script());Files.createDirectories(script.getParent());
             Files.writeString(script,check.name().equals("cases-b-invariants")?"import sys\nprint('1 problem')\nsys.exit(1)\n":"print('ok')\n");
         }
-        // The generator check runs unittest discovery; an empty test directory passes discovery only when a module exists.
-        Files.writeString(temp.resolve("verification/mcp-tests/test_generators_reproduce.py"),"import unittest\nclass T(unittest.TestCase):\n    def test_ok(self): pass\n");
+        // Generator checks run unittest discovery; an empty test directory passes discovery only when a module exists.
+        for(var check:PreparationAssetChecks.CHECKS) if(check.argv().contains("unittest"))
+            Files.writeString(temp.resolve(check.script()),"import unittest\nclass T(unittest.TestCase):\n    def test_ok(self): pass\n");
+        // KNOWN_OPEN lines are copied into the record rather than hidden in the output tail.
+        Path routes=temp.resolve("verification/requirements/check_layer_routes.py");Files.writeString(routes,"print('KNOWN_OPEN owner-x\\tV4\\tV4.o/n\\tMCP')\n");
         problems.clear();ArrayNode records=PreparationAssetChecks.run(temp,problems);
         assertEquals(1,problems.size(),problems.toString());assertTrue(problems.get(0).contains("cases-b-invariants exit=1"));
         for(JsonNode r:records) assertTrue(r.path("scriptSha256").asText().matches("[0-9a-f]{64}"));
+        JsonNode layer=null;for(JsonNode r:records) if(r.path("name").asText().equals("layer-routes")) layer=r;
+        assertNotNull(layer);assertEquals("PASS",layer.path("status").asText());assertEquals(1,layer.path("knownOpen").size());assertTrue(layer.path("knownOpen").get(0).asText().startsWith("KNOWN_OPEN owner-x"));
     }
     // Item 3: runtime assertion records carry op/unit/where/field and the post-projection compared value.
     @Test void assertionRecordsCarryOperatorUnitAndComparedValues() throws Exception {
@@ -105,7 +110,10 @@ final class StepTwoRoundTwoRegressionTest {
         Path receipt=root.resolve("verification/harness/target/evidence/scenarios-receipt.json");Files.deleteIfExists(receipt);
         assertEquals(2,Main.execute(new String[]{"profile","scenarios",EXAMPLE}));
         JsonNode report=Json.read(root.resolve("verification/harness/target/evidence/scenarios.json"));
-        assertEquals(1,report.path("discovered").asInt());assertEquals(1,report.path("started").asInt());assertEquals(1,report.path("completed").asInt());assertEquals(0,report.path("skipped").asInt());
+        // An explicit case file is a subset: discovered counts every subcase the repository declares for the profile.
+        assertTrue(report.path("discovered").asInt()>1,report.path("discovered").toString());assertEquals(1,report.path("selectedSubcases").asInt());
+        assertEquals(1,report.path("started").asInt());assertEquals(1,report.path("completed").asInt());assertEquals(0,report.path("skipped").asInt());
+        assertTrue(report.path("explicitCaseSelection").asBoolean());assertTrue(report.path("preRun").path("codeCommit").asText().matches("[0-9a-f]{40}"));
         assertFalse(report.path("gateComplete").asBoolean());assertFalse(report.has("executionIdentity"));
         assertFalse(Files.exists(receipt),"the unimplemented driver can never emit a coverage receipt");
         assertThrows(IllegalArgumentException.class,()->Main.execute(new String[]{"coverage"}),"coverage is the assembler, not the Java preparation report");
@@ -124,8 +132,20 @@ final class StepTwoRoundTwoRegressionTest {
     }
     @Test void receiptGateRefusesEverythingButACleanActualProductRun() throws Exception {
         String commit="b".repeat(40);ObjectNode versions=Json.parse("{\"schema\":\"ontology-v1\",\"db\":\"postgres-18\",\"build\":\""+commit+"\"}").deepCopy();
-        ObjectNode report=Json.object().put("codeCommit",commit).put("workingTreeDirty",false);
+        ObjectNode report=Json.object().put("codeCommit",commit).put("workingTreeDirty",false).put("explicitCaseSelection",false);
+        report.set("preRun",Json.object().put("codeCommit",commit).put("workingTreeDirty",false).put("observedAt","2026-10-08T00:00:00Z"));
         ArrayNode good=Json.array().add(actualLike("ACTUAL_HTTP","PRODUCT"));
+        assertNull(ExecutionReceiptProducer.refusal(run(root,report,versions),true,good,false),"a clean actual product run is eligible");
+        assertTrue(ExecutionReceiptProducer.refusal(run(root,report,versions),true,good,true).contains("after the run"));
+        ObjectNode dirtyBefore=report.deepCopy();((ObjectNode)dirtyBefore.path("preRun")).put("workingTreeDirty",true);
+        assertTrue(ExecutionReceiptProducer.refusal(run(root,dirtyBefore,versions),true,good,false).contains("before the run"));
+        ObjectNode movedHead=report.deepCopy();((ObjectNode)movedHead.path("preRun")).put("codeCommit","c".repeat(40));
+        assertTrue(ExecutionReceiptProducer.refusal(run(root,movedHead,versions),true,good,false).contains("before the run"));
+        ObjectNode noPreRun=report.deepCopy();noPreRun.remove("preRun");
+        assertTrue(ExecutionReceiptProducer.refusal(run(root,noPreRun,versions),true,good,false).contains("before the run"));
+        assertTrue(ExecutionReceiptProducer.refusal(run(root,report.deepCopy().put("explicitCaseSelection",true),versions),true,good,false).contains("explicit case-file selection"));
+        var otherProfile=new ExecutionReceiptProducer.Run(root,"scenarios",report,"r",List.of("./verify","mcp","--actual"),"./verify mcp",Instant.now(),Instant.now(),List.of(),versions);
+        assertTrue(ExecutionReceiptProducer.refusal(otherProfile,true,good,false).contains("does not name profile"));
         assertNotNull(ExecutionReceiptProducer.refusal(run(root,report,versions),false,good),"not the actual driver");
         assertTrue(ExecutionReceiptProducer.refusal(run(root,report,versions),true,Json.array().add(actualLike("ACTUAL_HTTP","HARNESS_SELFTEST"))).contains("PRODUCT"));
         assertTrue(ExecutionReceiptProducer.refusal(run(root,report,versions),true,Json.array().add(actualLike("CANNED_CONTRACT_SELFTEST","PRODUCT"))).contains("selftest"));
@@ -136,6 +156,32 @@ final class StepTwoRoundTwoRegressionTest {
         assertEquals(List.of("ACTUAL_SCHEMA_VERSION","ACTUAL_DB_VERSION","ACTUAL_MCP_PROTOCOL_VERSION","ACTUAL_BUILD_COMMIT"),missing);
         ObjectNode status=ExecutionReceiptProducer.emit(new ContractValidator(root),run(root,report,versions),true,good,missing);
         assertEquals("NOT_EMITTED",status.path("status").asText());
+    }
+    /** An actual observe action with a real observer snapshot (capturedAt, sourceQuery, revisionQuery). */
+    private ObjectNode actualObserve(String source,String isolation) {
+        ObjectNode c=actualLike("ACTUAL_HTTP","PRODUCT");ObjectNode action=(ObjectNode)c.path("actions").path("read");
+        ObjectNode query=Json.object().put("statementId","s1-physical-segments-v1").put("sql","SELECT quantity FROM segments WHERE organization_id = ?").put("mappingVersion","1.0.0");query.set("parameters",Json.object());
+        ObjectNode snapshot=Json.object().put("id","811:811:").put("isolation",isolation).put("capturedAt","2026-10-08T00:00:30Z").put("artifactRef","verification/harness/target/evidence/actual/read-1.json").put("readMode","RESULT_REVISION");
+        snapshot.set("revisionQuery",query);
+        ObjectNode provenance=(ObjectNode)action.path("provenance");provenance.put("source",source).put("adapter","actual-http-jdbc").put("adapterVersion","2.0.0");provenance.set("sourceQuery",query);provenance.set("snapshot",snapshot);
+        ObjectNode data=Json.object();data.set("snapshot",snapshot);data.set("sourceQuery",query);action.set("data",data);
+        return c;
+    }
+    /** step2-closure P2: the selftest marker check is structural, so a real observe snapshot (capturedAt) is not a marker. */
+    @Test void actualObserveWithSnapshotIsEligibleAndSelftestLabelsAreRefused() throws Exception {
+        assertNull(ExecutionReceiptProducer.actionMarker(Json.array().add(actualObserve("POSTGRESQL_JDBC","REPEATABLE_READ").path("actions").path("read"))));
+        assertTrue(actualObserve("POSTGRESQL_JDBC","REPEATABLE_READ").path("actions").toString().toLowerCase(Locale.ROOT).contains("captured"),
+            "the counterexample must contain the substring that the old whole-JSON scan refused");
+        String commit="b".repeat(40);ObjectNode versions=Json.parse("{\"schema\":\"ontology-v1\",\"db\":\"postgres-18\",\"build\":\""+commit+"\"}").deepCopy();
+        ObjectNode report=Json.object().put("codeCommit",commit).put("workingTreeDirty",false).put("explicitCaseSelection",false);
+        report.set("preRun",Json.object().put("codeCommit",commit).put("workingTreeDirty",false).put("observedAt","2026-10-08T00:00:00Z"));
+        assertNull(ExecutionReceiptProducer.refusal(run(root,report,versions),true,Json.array().add(actualObserve("POSTGRESQL_JDBC","REPEATABLE_READ")),false));
+        for(ObjectNode selftest:List.of(actualObserve("CANNED_CONTRACT_SELFTEST","REPEATABLE_READ"),actualObserve("POSTGRESQL_JDBC","SELFTEST_CAPTURED"))) {
+            String reason=ExecutionReceiptProducer.refusal(run(root,report,versions),true,Json.array().add(selftest),false);
+            assertNotNull(reason);assertTrue(reason.contains("selftest provenance label"),reason);
+        }
+        ObjectNode stub=actualObserve("POSTGRESQL_JDBC","REPEATABLE_READ");((ObjectNode)stub.path("actions").path("read").path("provenance")).put("adapter","stub-adapter");
+        assertTrue(ExecutionReceiptProducer.refusal(run(root,report,versions),true,Json.array().add(stub),false).contains("/adapter"));
     }
     /** Format only, in a disposable directory: the written receipt validates and the real assembler accepts it. */
     @Test void writtenReceiptIsAcceptedByTheCoverageAssembler(@TempDir Path base) throws Exception {
@@ -149,9 +195,11 @@ final class StepTwoRoundTwoRegressionTest {
         Files.createDirectories(base.resolve("verification/fixtures"));Files.writeString(base.resolve("verification/fixtures/base.json"),"{}\n");
         Files.createDirectories(base.resolve("verification/harness/target/evidence/actual"));
         Files.writeString(base.resolve("verification/harness/target/evidence/actual/read-1.json"),"{\"httpStatus\":200}\n",StandardCharsets.UTF_8);
-        ArrayNode cases=Json.array().add(actualLike("ACTUAL_HTTP","PRODUCT"));
+        ArrayNode cases=Json.array().add(actualObserve("POSTGRESQL_JDBC","REPEATABLE_READ"));
         ObjectNode report=Json.object();report.put("schemaVersion","1.0.0").put("profile","scenarios").put("status","PASS").put("exitCode",0).put("command","./verify scenarios").put("codeCommit",commit)
-            .put("workingTreeDirty",false).put("gateComplete",true).put("discovered",1).put("started",1).put("completed",1).put("skipped",0).put("harnessMainClassSha256","0".repeat(64));
+            .put("workingTreeDirty",false).put("gateComplete",true).put("discovered",1).put("started",1).put("completed",1).put("skipped",0).put("harnessMainClassSha256","0".repeat(64))
+            .put("explicitCaseSelection",false).put("timestamp","2026-10-08T00:01:00Z");
+        report.set("preRun",Json.object().put("codeCommit",commit).put("workingTreeDirty",false).put("observedAt","2026-10-08T00:00:00Z"));
         report.set("executionIdentity",Json.parse("{\"runId\":\"run-1\",\"hostId\":\"host-1\",\"workspaceId\":\"workspace-1\",\"actorId\":\"actor-1\"}"));report.set("cases",cases);
         Json.write(base.resolve("verification/harness/target/evidence/scenarios.json"),report);
         ObjectNode versions=Json.parse("{\"schema\":\"ontology-v1\",\"db\":\"postgres-18\",\"build\":\""+commit+"\",\"tool\":\"harness\",\"definition\":\"definition-v1\",\"evaluator\":\"evaluator-v1\",\"policy\":\"policy-v1\"}").deepCopy();

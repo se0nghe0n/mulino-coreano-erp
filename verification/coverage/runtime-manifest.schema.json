@@ -452,7 +452,35 @@
             "NOT_RUN"
           ]
         },
-        "expected": {}
+        "expected": {},
+        "layerRouteGaps": {
+          "description": "KNOWN_OPEN observation-level layer route gaps (verification/requirements/layer-route-review.json). While any is present the observation cannot be PASS.",
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "layer",
+              "owner",
+              "status"
+            ],
+            "properties": {
+              "layer": {
+                "enum": [
+                  "MCP",
+                  "SKILLS"
+                ]
+              },
+              "owner": {
+                "type": "string",
+                "minLength": 1
+              },
+              "status": {
+                "const": "KNOWN_OPEN"
+              }
+            },
+            "additionalProperties": false
+          }
+        }
       },
       "additionalProperties": false
     },

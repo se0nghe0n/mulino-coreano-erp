@@ -19,9 +19,16 @@ import java.util.*;
  *
  * <p>Only {@link #emit} decides eligibility, and it refuses whenever the run was not an actual product run: the driver must be
  * the actual adapter, every case must have run under the PRODUCT evidence policy, every executed action must carry
- * non-selftest provenance, the checkout must be clean before and after the run, the backend build commit must be the
- * recorded code commit, and the real versions must be supplied. Harness selftests, the unimplemented driver, RED and
- * preparation never reach {@link #write}. A refusal is reported in the profile run output and leaves the profile NOT_RUN.
+ * non-selftest provenance labels, the command must name the profile and select the whole discovered profile (no explicit
+ * case files), the checkout must be clean at the same HEAD when Main observed it before the first case and again after the
+ * run, the declared backend build commit (ACTUAL_BUILD_COMMIT) must be the recorded code commit, and the real versions must
+ * be supplied. Harness selftests, the unimplemented driver, RED and preparation never reach {@link #write}. A refusal is
+ * reported in the profile run output and leaves the profile NOT_RUN.
+ *
+ * <p>Limit: the harness cannot observe which code the running backend was built from. The backend exposes no build-info
+ * endpoint, so the build commit stays a declaration and the receipt records it as {@code buildIdentity.source=
+ * DECLARED_ACTUAL_BUILD_COMMIT}. The S-step native runners ({@code ./verify actual-sN}) build and launch the backend from
+ * the checked-out tree themselves; the {@code ./verify <profile> --actual} path does not.
  */
 final class ExecutionReceiptProducer {
     static final Set<String> RECEIPT_PROFILES=Set.of("schema","contracts","scenarios","recovery","mcp","skills");
@@ -67,22 +74,52 @@ final class ExecutionReceiptProducer {
         return v;
     }
 
+    /**
+     * Provenance label fields an adapter uses to name itself. Only these values are matched against {@link #BAD_MARKERS}:
+     * the whole provenance also carries data (snapshot.capturedAt, sourceQuery SQL, parameters) whose keys or values may
+     * contain a marker substring without saying anything about the adapter, as every real observe snapshot does.
+     */
+    static final List<String> PROVENANCE_LABELS=List.of("/source","/adapter","/adapterVersion","/buildVersion","/snapshot/isolation","/sourceQuery/mappingVersion");
+
+    /** The first selftest/stub label among executed actions, or null. Structural: label values only, never keys or data. */
+    static String actionMarker(JsonNode actions) {
+        for(JsonNode action:actions) if("EXECUTED".equals(action.path("driverStatus").asText())) {
+            JsonNode provenance=action.path("provenance");
+            if(!provenance.isObject() || provenance.path("source").asText().isBlank()) return "action "+action.path("actionId").asText()+" has no provenance source label";
+            for(String label:PROVENANCE_LABELS) {
+                JsonNode value=provenance.at(label);
+                if(!value.isValueNode()) continue;
+                String text=value.asText().toLowerCase(Locale.ROOT);
+                for(String marker:BAD_MARKERS) if(text.contains(marker)) return "action "+action.path("actionId").asText()+" carries selftest provenance label "+label+"="+value.asText();
+            }
+        }
+        return null;
+    }
+
     /** Returns null when eligible, otherwise the refusal reason. */
     static String refusal(Run run,boolean actualDriver,ArrayNode cases) throws IOException,InterruptedException {
+        return refusal(run,actualDriver,cases,dirty(run.root()));
+    }
+    /** dirtyAfter is the gate's own git status after the report was written (tests pass it explicitly). */
+    static String refusal(Run run,boolean actualDriver,ArrayNode cases,boolean dirtyAfter) {
         if(!actualDriver) return "driver is not the actual product adapter";
         if(!RECEIPT_PROFILES.contains(run.profile())) return "profile "+run.profile()+" has no coverage receipt (model/deployment need their own approved runner)";
         if(cases.isEmpty()) return "no subcase selected";
         for(JsonNode c:cases) {
             if(!"PRODUCT".equals(c.path("evidencePolicy").asText())) return "case "+c.path("caseId").asText()+"/"+c.path("subcaseId").asText()+" did not run under the PRODUCT evidence policy";
-            for(JsonNode action:c.path("actions")) if("EXECUTED".equals(action.path("driverStatus").asText())) {
-                String provenance=action.path("provenance").toString().toLowerCase(Locale.ROOT);
-                for(String marker:BAD_MARKERS) if(provenance.contains(marker)) return "action "+action.path("actionId").asText()+" carries selftest provenance";
-            }
+            String marker=actionMarker(c.path("actions"));
+            if(marker!=null) return marker;
         }
         String labels=(run.versions().toString()+run.display()+String.join(" ",run.argv())).toLowerCase(Locale.ROOT);
         for(String marker:BAD_MARKERS) if(labels.contains(marker)) return "command/versions carry selftest marker "+marker;
+        if(!run.argv().contains(run.profile())) return "command argv does not name profile "+run.profile();
+        if(run.report().path("explicitCaseSelection").asBoolean(true)) return "explicit case-file selection is a partial profile run; only the whole discovered profile can carry a coverage receipt";
         if(!run.versions().path("build").asText().equals(run.report().path("codeCommit").asText())) return "ACTUAL_BUILD_COMMIT differs from the recorded code commit";
-        if(run.report().path("workingTreeDirty").asBoolean(true) || dirty(run.root())) return "working tree dirty before or after the run; codeCommit would not identify the tested code";
+        // Observed by Main before the first case ran (preRun) and by Main/this gate after the run; never taken from the report alone.
+        JsonNode before=run.report().path("preRun");
+        if(!before.path("workingTreeDirty").isBoolean() || before.path("workingTreeDirty").asBoolean() || !before.path("codeCommit").asText().equals(run.report().path("codeCommit").asText()))
+            return "working tree was dirty, or HEAD differed, before the run; codeCommit would not identify the tested code";
+        if(run.report().path("workingTreeDirty").asBoolean(true) || dirtyAfter) return "working tree dirty after the run; codeCommit would not identify the tested code";
         return null;
     }
 
@@ -135,6 +172,12 @@ final class ExecutionReceiptProducer {
         receipt.set("reportArtifact",descriptor(validator,run.reportRef()));
         receipt.set("inputs",Json.MAPPER.valueToTree(inputs.values()));receipt.set("artifacts",artifacts);
         receipt.set("caseVersions",caseVersions);receipt.put("environment","LOCAL").put("workingTreeClean",true);
+        ObjectNode tree=Json.object();
+        tree.set("before",Json.object().put("codeCommit",report.path("preRun").path("codeCommit").asText()).put("clean",!report.path("preRun").path("workingTreeDirty").asBoolean(true)).put("observedAt",report.path("preRun").path("observedAt").asText()));
+        tree.set("after",Json.object().put("codeCommit",report.path("codeCommit").asText()).put("clean",!report.path("workingTreeDirty").asBoolean(true)).put("observedAt",report.path("timestamp").asText()));
+        receipt.set("workingTreeObservations",tree);
+        // The backend build commit is the ACTUAL_BUILD_COMMIT declaration; no build-info endpoint lets the harness observe it.
+        receipt.set("buildIdentity",Json.object().put("commit",run.versions().path("build").asText()).put("source","DECLARED_ACTUAL_BUILD_COMMIT"));
         validator.schema("verification/coverage/execution-receipt.schema.json",receipt);
         String receiptRef=EVIDENCE_DIR+"/"+run.profile()+"-receipt.json";
         Json.write(root.resolve(receiptRef),receipt);
