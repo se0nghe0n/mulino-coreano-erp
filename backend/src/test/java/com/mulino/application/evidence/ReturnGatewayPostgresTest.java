@@ -152,4 +152,72 @@ class ReturnGatewayPostgresTest {
   var evidenced=confirmWithCustodian(named,ACTOR);assertEquals("APPLIED",evidenced.get("outcome"),evidenced.toString());
   assertEquals(1,jdbc.queryForObject("SELECT count(*) FROM mulino_inventory_QuantitySegments WHERE retiredAt IS NULL AND placeId=? AND custodianId=? AND quantity=10",Integer.class,PLACE,ACTOR));assertEquals(1,jdbc.queryForObject("SELECT count(*) FROM mulino_inventory_QuantitySegments WHERE retiredAt IS NULL AND placeId=? AND custodianId IS NULL",Integer.class,PLACE));
   assertEquals(0,jdbc.queryForObject("SELECT count(*) FROM mulino_inventory_QuantitySegments WHERE retiredAt IS NULL AND placeId=? AND ownerId IS DISTINCT FROM ?",Integer.class,PLACE,ACTOR));}
+
+ // ---- s4h-recall regressions (plan §4.3, §5.3, §6 반품, §7.1) ----
+ String authorize(String start,String quantity){return run("authorizeReturn",Map.of("deliveryId",DELIVERY,"startQuantity",start,"quantity",quantity,"unit","BOX","destinationId",PLACE,"validUntil",Instant.now().plusSeconds(3600).toString(),"reason","Synthetic return"),0).get("authorizationId").toString();}
+ Map<String,Object> observe(Map<String,Object> slots){return request(()->gateway.execute(command("receiveReturn",uuid(),slots,0)));}
+ Map<String,Object> observeSlots(String authorization,String event,Object... extra){var m=new LinkedHashMap<String,Object>(Map.of("authorizationId",authorization,"eventId",event,"occurredAt",OCCURRED.toString(),"nextCheckAt",Instant.now().plusSeconds(3600).toString()));for(int n=0;n<extra.length;n+=2)m.put(extra[n].toString(),extra[n+1]);return m;}
+ String returnId(Map<String,Object> result){assertEquals("APPLIED",result.get("outcome"),result.toString());return ((Map<?,?>)result.get("effects")).get("returnId").toString();}
+ int openReconciliation(){return jdbc.queryForObject("SELECT count(*) FROM mulino_work_read_ObligationReferences WHERE kind='RETURN_RECONCILIATION' AND status='OPEN' AND valid",Integer.class);}
+ String placeQuantity(){return jdbc.queryForObject("SELECT COALESCE(SUM(quantity),0)::text FROM mulino_inventory_QuantitySegments WHERE retiredAt IS NULL AND placeId=?",String.class,PLACE);}
+ String code(Map<String,Object> result){return String.valueOf(((Map<?,?>)result.get("error")).get("code"));}
+
+ /** Finding 2(a): the provisional record keeps what physically arrived (8), not the authorized 10, and its duty closes on confirmation. */
+ @Test void partialArrivalRecordsObservedQuantityAndClosesItsDuty(){
+  String authorization=authorize("0","10");String observation=returnId(observe(observeSlots(authorization,uuid(),"startQuantity","0","quantity","8","unit","BOX")));
+  assertEquals(0,new java.math.BigDecimal("8").compareTo(jdbc.queryForObject("SELECT quantity FROM mulino_trade_returns_Observations WHERE ID=?",java.math.BigDecimal.class,observation)));
+  var beyond=observe(observeSlots(authorization,uuid(),"startQuantity","5","quantity","8","unit","BOX"));assertEquals("REJECTED",beyond.get("outcome"),beyond.toString());
+  assertEquals("APPLIED",confirm(canonical(observation,null),uuid()).get("outcome"));assertEquals("8.000000000000",placeQuantity());assertEquals(0,openReconciliation());}
+
+ /** Finding 9: re-processing the same physical return event creates one observation and one duty; a different scope for it is a conflict. */
+ @Test void sameReturnEventObservedTwiceCreatesOneObservationAndOneDuty(){
+  String authorization=authorize("0","10"),event=uuid();String first=returnId(observe(observeSlots(authorization,event)));String second=returnId(observe(observeSlots(authorization,event)));
+  assertEquals(first,second);assertEquals(1,count("mulino_trade_returns_Observations"));assertEquals(1,openReconciliation());
+  var other=observe(observeSlots(authorization,event,"startQuantity","0","quantity","5","unit","BOX"));assertEquals("HELD",other.get("outcome"),other.toString());assertEquals("EVIDENCE_CONFLICT",code(other));assertEquals(1,count("mulino_trade_returns_Observations"));}
+
+ /** Findings 2(b)/9: other reports of an already received return link the one verified canonical receipt and close their duties without new stock. */
+ @Test void otherReportsOfReceivedReturnCloseAgainstTheOneReceipt(){
+  String authorization=authorize("0","10");String carrier=returnId(observe(observeSlots(authorization,uuid())));String warehouse=returnId(observe(observeSlots(authorization,uuid())));
+  Fact fact=canonical(carrier,null);var first=confirm(fact,uuid());assertEquals("APPLIED",first.get("outcome"),first.toString());assertEquals(1,openReconciliation());
+  var duplicate=request(()->gateway.execute(command("receiveReturn",uuid(),Map.of("returnId",warehouse,"canonicalOccurrenceId",fact.canonical(),"nextCheckAt",Instant.now().plusSeconds(3600).toString()),0)));assertEquals("APPLIED",duplicate.get("outcome"),duplicate.toString());
+  assertEquals(((Map<?,?>)first.get("effects")).get("receiptId"),((Map<?,?>)duplicate.get("effects")).get("receiptId"));
+  String late=returnId(observe(observeSlots(authorize("0","10"),uuid())));var already=request(()->gateway.execute(command("receiveReturn",uuid(),Map.of("returnId",late,"canonicalOccurrenceId",fact.canonical(),"nextCheckAt",Instant.now().plusSeconds(3600).toString()),0)));assertEquals("APPLIED",already.get("outcome"),already.toString());
+  assertEquals(1,count("mulino_trade_returns_Receipts"));assertEquals("10.000000000000",placeQuantity());assertEquals(1,jdbc.queryForObject("SELECT count(*) FROM mulino_inventory_QuantityMovements WHERE kind='RETURN_MOVE'",Integer.class));assertEquals(0,openReconciliation());}
+
+ /** Finding 2(c): an arrival after a policy change is still recorded; confirmation needs a current authorization, which may be a later one. */
+ @Test void lateArrivalIsRecordedAndConfirmedOnlyUnderCurrentAuthorization(){
+  String expired=authorize("0","10");org.mockito.Mockito.when(localPolicy.rule(org.mockito.ArgumentMatchers.any(),org.mockito.ArgumentMatchers.anyString())).thenReturn(new com.mulino.application.policy.PolicyCommandGuard.Selection(Map.of("effectClass","RETURN"),"b".repeat(64),uuid(),"fixture-2"));
+  String observation=returnId(observe(observeSlots(expired,uuid())));assertEquals(1,openReconciliation());Fact fact=canonical(observation,null);
+  var stale=confirm(fact,uuid());assertNotEquals("APPLIED",stale.get("outcome"),stale.toString());assertEquals(0,count("mulino_trade_returns_Receipts"));
+  String current=authorize("0","10");var applied=request(()->gateway.execute(command("receiveReturn",uuid(),Map.of("returnId",observation,"canonicalOccurrenceId",fact.canonical(),"authorizationId",current,"nextCheckAt",Instant.now().plusSeconds(3600).toString()),0)));assertEquals("APPLIED",applied.get("outcome"),applied.toString());
+  assertEquals(current,jdbc.queryForObject("SELECT authorizationId FROM mulino_trade_returns_Receipts",String.class));assertEquals("10.000000000000",placeQuantity());assertEquals(0,openReconciliation());}
+
+ /** Finding 4: the authorizing manager's current permission must cover every place of the return, not one alternative. */
+ @Test void authorizingManagerIsRecheckedOnEveryPlaceOfTheReturn(){
+  Fact fact=canonical(provisional(uuid(),"10"),null);
+  jdbc.update("DELETE FROM mulino_identity_GrantActions WHERE organizationId=? AND grantId=? AND capabilityId='authorizeReturn'",ORG,GRANT);String narrowed=uuid();jdbc.update("INSERT INTO mulino_identity_Grants(organizationId,ID,actorId,delegatorId,validFrom,validUntil) VALUES(?,?,?,?,CURRENT_TIMESTAMP-INTERVAL '1 day',CURRENT_TIMESTAMP+INTERVAL '1 day')",ORG,narrowed,ACTOR,ACTOR);jdbc.update("INSERT INTO mulino_identity_GrantActions VALUES(?,?,'authorizeReturn')",ORG,narrowed);jdbc.update("INSERT INTO mulino_identity_GrantScopes VALUES(?,?,'PLACE',?)",ORG,narrowed,CUSTOMER_PLACE);
+  var customerOnly=confirm(fact,uuid());assertEquals("REJECTED",customerOnly.get("outcome"),customerOnly.toString());assertEquals("FORBIDDEN",code(customerOnly));assertEquals(0,count("mulino_trade_returns_Receipts"));
+  jdbc.update("INSERT INTO mulino_identity_GrantScopes VALUES(?,?,'PLACE',?)",ORG,narrowed,PLACE);jdbc.update("UPDATE mulino_identity_ManagementAuthorities SET revokedAt=CURRENT_TIMESTAMP WHERE capabilityId='authorizeReturn'");jdbc.update("INSERT INTO mulino_identity_ManagementAuthorities(organizationId,ID,actorId,capabilityId,scopeKind,scopeId,validFrom,validUntil) VALUES(?,?,?,'authorizeReturn','PLACE',?,CURRENT_TIMESTAMP-INTERVAL '1 day',CURRENT_TIMESTAMP+INTERVAL '1 day')",ORG,uuid(),ACTOR,CUSTOMER_PLACE);
+  var authorityCustomerOnly=confirm(fact,uuid());assertEquals("REJECTED",authorityCustomerOnly.get("outcome"),authorityCustomerOnly.toString());assertEquals("FORBIDDEN",code(authorityCustomerOnly));assertEquals(0,count("mulino_trade_returns_Receipts"));
+  jdbc.update("INSERT INTO mulino_identity_ManagementAuthorities(organizationId,ID,actorId,capabilityId,scopeKind,scopeId,validFrom,validUntil) VALUES(?,?,?,'authorizeReturn','PLACE',?,CURRENT_TIMESTAMP-INTERVAL '1 day',CURRENT_TIMESTAMP+INTERVAL '1 day')",ORG,uuid(),ACTOR,PLACE);
+  assertEquals("APPLIED",confirm(fact,uuid()).get("outcome"));}
+
+ /** Finding 6: a disposition decided after the return is canonicalized with its own decision time; it records a duty and outbox review but never releases the QC hold. */
+ String disposition(String observation,String kind,Instant decidedAt){
+  var row=jdbc.queryForMap("SELECT * FROM mulino_trade_returns_Observations WHERE ID=?",observation);var body=new LinkedHashMap<String,Object>();body.put("returnId",observation);body.put("kind",kind);body.put("decisionId",uuid());for(String key:List.of("eventId","deliveryId","customerId","itemId","lotId","rangeRootId","startQuantity","quantity","unit","placeId","workId"))body.put(key,Objects.toString(row.get(key.toLowerCase())));body.put("occurredAt",decidedAt.toString());String source;try{source=new com.fasterxml.jackson.databind.ObjectMapper().writeValueAsString(body);}catch(Exception e){throw new IllegalStateException(e);}byte[] bytes=source.getBytes(java.nio.charset.StandardCharsets.UTF_8);
+  String doc=request(()->records.attachDocument(new DocumentInput(new Subject(SubjectKind.RETURN,observation),"warehouse",uuid(),"application/json",LocalBlobStore.hash(bytes),"SYNTHETIC",null),bytes)).get("id").toString();String event=request(()->records.recordActivity(new EventInput(new Subject(SubjectKind.RETURN,observation),kind,"warehouse",uuid(),"1",new EffectiveTime(decidedAt,null,"UTC","SECOND"),ValueState.KNOWN,source,null,null))).get("id").toString();String quantity=body.get("quantity").toString();String claim=request(()->records.recordClaim(new ClaimInput(event,doc,"Return disposition decision",quantity,"BOX",ValueState.KNOWN,null))).get("id").toString();
+  return request(()->new TransactionTemplate(tx).execute(status->{var e=repository.require("Events",ORG,event);var c=auth.context(Instant.now(),Instant.now());var review=reconciliation.match(c,new EvidenceReconciliation.Review(claim,doc,observation,null,"synthetic-v1",e.get("sourceNamespace")+":"+e.get("externalEventId")+":"+e.get("sourceVersion"),quantity,"BOX",decidedAt,"Disposition decision original matched"),"matchSourceIdentity");assertEquals("MATCHED",review.get("outcome"),review.toString());return reconciliation.link(c,review.get("id").toString()).get("id").toString();}));
+ }
+ @Test void dispositionWithLaterDecisionDateRecordsDutyAndKeepsQcHold(){
+  String observation=provisional(uuid(),"10");var received=confirm(canonical(observation,null),uuid());assertEquals("APPLIED",received.get("outcome"),received.toString());String receipt=((Map<?,?>)received.get("effects")).get("receiptId").toString();
+  jdbc.update("INSERT INTO mulino_identity_ManagementAuthorities(organizationId,ID,actorId,capabilityId,scopeKind,scopeId,validFrom,validUntil) VALUES(?,?,?,'decideReturnDisposition','ORGANIZATION',?,CURRENT_TIMESTAMP-INTERVAL '1 day',CURRENT_TIMESTAMP+INTERVAL '1 day')",ORG,uuid(),ACTOR,ORG);
+  org.mockito.Mockito.when(localPolicy.rule(org.mockito.ArgumentMatchers.any(),org.mockito.ArgumentMatchers.eq("decideReturnDisposition"))).thenReturn(new com.mulino.application.policy.PolicyCommandGuard.Selection(Map.of("effectClass","RETURN","categoryCapabilities",Map.of("QC","releaseHold","ADMIN","approveRecall")),"a".repeat(64),uuid(),"fixture"));
+  String evidence=disposition(observation,"RETURN_DISPOSITION_RESALE",OCCURRED.plusSeconds(3600));var slots=Map.<String,Object>of("returnId",receipt,"decision","RESALE","evidenceId",evidence,"reason","QC reviewed packaging","nextCheckAt",Instant.now().plusSeconds(3600).toString());
+  var withoutQc=request(()->gateway.execute(command("decideReturnDisposition",uuid(),slots,0)));assertEquals("REJECTED",withoutQc.get("outcome"),withoutQc.toString());assertEquals("FORBIDDEN",code(withoutQc));assertEquals(0,count("mulino_trade_returns_Dispositions"));
+  jdbc.update("INSERT INTO mulino_identity_CapabilityAssignments(organizationId,ID,actorId,capabilityId,scopeKind,scopeId,validFrom,validUntil) VALUES(?,?,?,'releaseHold','ORGANIZATION',?,CURRENT_TIMESTAMP-INTERVAL '1 day',CURRENT_TIMESTAMP+INTERVAL '1 day')",ORG,uuid(),ACTOR,ORG);jdbc.update("INSERT INTO mulino_identity_GrantActions VALUES(?,?,'releaseHold')",ORG,GRANT);
+  var decided=request(()->gateway.execute(command("decideReturnDisposition",uuid(),slots,0)));assertEquals("APPLIED",decided.get("outcome"),decided.toString());
+  assertEquals(1,count("mulino_trade_returns_Dispositions"));assertEquals(1,jdbc.queryForObject("SELECT count(*) FROM mulino_work_read_ObligationReferences WHERE kind='RETURN_RESALE' AND status='OPEN' AND valid AND ownerId IS NOT NULL",Integer.class));
+  assertEquals(1,jdbc.queryForObject("SELECT count(*) FROM mulino_runtime_Outbox WHERE operation='returnDispositionReview'",Integer.class));
+  assertEquals(1,jdbc.queryForObject("SELECT count(*) FROM mulino_inventory_Restrictions WHERE category='QC' AND state='ACTIVE' AND action='ALL'",Integer.class));
+  var beforeReturn=request(()->{try{disposition(observation,"RETURN_DISPOSITION_DISPOSE",OCCURRED.minusSeconds(60));return "MATCHED";}catch(AssertionError|RuntimeException e){return "REFUSED";}});assertEquals("REFUSED",beforeReturn);}
 }

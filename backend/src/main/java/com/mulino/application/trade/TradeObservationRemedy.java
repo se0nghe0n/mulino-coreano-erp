@@ -15,6 +15,19 @@ public final class TradeObservationRemedy {
  public TradeObservationRemedy(SalesRepository sales,ReturnRepository returns,InventoryRepository inventory,TradeEvidence evidence,ResponsibilityRepository duties,ResponsibilityService service){this.sales=sales;this.returns=returns;this.inventory=inventory;this.evidence=evidence;this.duties=duties;this.service=service;}
  public void reconcileDeliveryObservation(DomainContext c,String observationId,String deliveryId){apply(c,sales.require(c,"Observations",observationId),sales.require(c,"Deliveries",deliveryId),"DELIVERY_RECONCILIATION","PHYSICAL_DELIVERY","DELIVERY");}
  public void reconcileReturnObservation(DomainContext c,String observationId,String receiptId){apply(c,returns.require(c,"Observations",observationId),returns.require(c,"Receipts",receiptId),"RETURN_RECONCILIATION","RETURN_RECEIPT","RETURN_MOVE");}
+ /** A second report of an already received physical return closes its own duty against the one verified receipt (plan §4.3·§5.3); it never moves stock. */
+ public void reconcileDuplicateReturnObservation(DomainContext c,String observationId,String receiptId){
+  var observation=returns.require(c,"Observations",observationId);var actual=returns.require(c,"Receipts",receiptId);
+  if(!"CONFIRMED".equals(observation.get("state"))||observationId.equals(actual.get("observationId")))throw DomainError.invalid("Confirmed duplicate return observation required");
+  for(String key:List.of("workId","deliveryId","itemId","lotId","rangeRootId","unit","placeId","customerId"))if(!Objects.equals(observation.get(key),actual.get(key)))throw DomainError.invalid("Duplicate return subject differs");
+  for(String key:List.of("startQuantity","quantity"))if(decimal(observation,key).compareTo(decimal(actual,key))!=0)throw DomainError.invalid("Duplicate return physical range differs");
+  String canonical=actual.get("canonicalOccurrenceId").toString();evidence.requireCanonical(c,canonical,"RETURN_RECEIPT",actual.get("itemId").toString(),actual.get("observationId").toString(),decimal(actual,"quantity"),actual.get("unit").toString());
+  duties.fence(c.organizationId(),actual.get("workId").toString());
+  for(var root:duties.rows("Roots",c.organizationId()))if("RETURN_RECONCILIATION".equals(root.get("kind")))try{
+   var scope=new com.fasterxml.jackson.databind.ObjectMapper().readTree(root.get("scopeJson").toString());
+   if(observationId.equals(scope.path("domainSourceId").asText())&&observation.get("workId").equals(scope.path("originalWorkId").asText()))service.applyTradeObservation(c,new Completion(root.get("ID").toString(),"RETURN_RECONCILIATION",canonical,actual.get("ID").toString()));
+  }catch(java.io.IOException e){throw DomainError.invalid("Invalid trade reconciliation scope");}
+ }
  private void apply(DomainContext c,Map<String,Object> observation,Map<String,Object> actual,String dutyKind,String eventKind,String movementKind){
   if(!"CONFIRMED".equals(observation.get("state"))||!Objects.equals(observation.get("ID"),actual.get("observationId")))throw DomainError.invalid("Applied confirmed exact trade observation required");
   for(String key:List.of("workId","itemId","lotId","rangeRootId","unit","placeId","customerId"))if(!Objects.equals(observation.get(key),actual.get(key)))throw DomainError.invalid("Applied trade observation subject differs");
