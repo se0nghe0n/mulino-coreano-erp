@@ -36,7 +36,9 @@ def fixture():
  f=json.loads((D/'fixture.json').read_text());f['id']='c4-synthetic-setup'
  for who,a in f['actors'].items():
   if who=='outsider':continue
-  for cap in ['correctEvidence','recordActivity','assessGoal']:
+  # correctEvidence with documentId also records a claim, which EvidenceRecords
+  # authorizes as attachEvidence on the cited original document.
+  for cap in ['correctEvidence','recordActivity','assessGoal','attachEvidence']:
    if cap not in a['roleCapabilities']:a['roleCapabilities'].append(cap)
    if cap not in a['grant']['actions']:a['grant']['actions'].append(cap)
  f['aliases']['CPOL']['content']['rules']['correctEvidence']={'effectClass':'RECORD'}
