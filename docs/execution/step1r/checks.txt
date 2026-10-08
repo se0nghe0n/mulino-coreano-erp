@@ -1,0 +1,48 @@
+# step1r skills 검증 기록 (Claude Sonnet 5.5 high, branch step1r/skills)
+base 7b540e8f, 검증 시점 HEAD 73e498d5 (이후 이 파일만 추가)
+
+## 1. frontmatter·상대 링크·.claude 링크·참조 파일 존재·stale 용어
+$ python3 step1r-check.py (임시 스크립트, repo 밖)
+frontmatter ontology-agent-implementation OK 159
+frontmatter ontology-implementation OK 127
+frontmatter ontology-scenario-testing OK 96
+relative links checked 27
+link ontology-implementation -> ../../.agents/skills/ontology-implementation OK
+link ontology-agent-implementation -> ../../.agents/skills/ontology-agent-implementation OK
+link ontology-scenario-testing -> ../../.agents/skills/ontology-scenario-testing OK
+exists verification/harness-guide.md True
+exists verification/coverage/assemble.py True
+exists verification/coverage/validate.py True
+exists verification/coverage/runtime-evidence-index.json True
+exists verification/cases/registry.json True
+exists verification/requirements/mandatory-oracles.json True
+exists contracts/mcp/s0-protocol.md True
+exists verification/actual/s4/run.sh True
+exists verification/coverage/execution-receipt.schema.json True
+exists verification/harness-manifest.json True
+stale-term @pending 2
+stale-term assets/evidence.json 0
+stale-term Sol xhigh 0
+stale-term Astra 0
+verification/manifest.json mentions: ['증거 기록은 `verification/manifest.json`(없는 파일)이 아니라 저장소의 실제', '증거는 저장소의 실제 pipeline에서 인용한다(`verification/manifest.json`은 없다).', '`verification/manifest.json`이 아니다(이 파일은 없다).']
+exit 0
+
+## 2. git diff --check
+$ git diff --check 7b540e8f..HEAD
+exit 0 (공백 오류 없음)
+
+## 3. harness 구조 확인 (양식 문법의 실행 가능성)
+$ ./verify harness
+Tests run: 432, Failures: 0, Errors: 0, Skipped: 0 / exit 0 (harness selftest이며 제품 증거 아님)
+$ ./verify validate <HARNESS-EXAMPLE case.json을 verification/harness/target/step1r-template/에 복사하고 양식의 세 단계 문장 형태로 feature를 생성한 사례>
+PREPARATION_SCHEMA_VALID HARNESS-EXAMPLE ... exitCode=0
+$ ./verify contract-red <같은 사례>
+feature-red-summary.json: expectedScenarios=1 discoveredScenarios=1 startedScenarios=1 skippedScenarios=0 notImplementedAssertionFailures=1 status=FAIL productCoverageClaimed=false; exitCode=1 (의도한 NOT_IMPLEMENTED RED)
+임시 사례 디렉터리는 삭제했다(git status clean).
+
+## 4. 기존 inventory 영향
+$ python3 verification/platform/inventory/check.py
+status PASS (assets/evidence.json 삭제가 S0 inventory 검사에 영향 없음)
+
+## 미실행
+제품 runtime(./verify scenarios --actual, actual-sN), coverage assemble/validate는 실행하지 않았다(skill 문서 변경만 해당). 실모델·BTP 미실행.
