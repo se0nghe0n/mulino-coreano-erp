@@ -115,6 +115,34 @@ class CoverageSelftest(unittest.TestCase):
                 mutation(receipt)
                 self.assertIsNone(self.receipt_check(report, receipt, raw))
 
+    def raw_capture_check(self, referenced, versions=None, case_versions=None):
+        report, receipt, raw = self.protocol_fixture()
+        capture = dict(self.write('evidence/read-1.json', {'httpStatus': 200}), scope={'actionId': 'read'}, completeness='COMPLETE', role='RAW_CAPTURE')
+        if referenced:
+            raw['observations'] = {'read': {'actionId': 'read', 'artifactRefs': ['evidence/read-1.json']}}
+        receipt = copy.deepcopy(receipt)
+        receipt['versions'].update(versions or {})
+        raw['versions'] = receipt['versions']
+        if case_versions is not None:
+            receipt['caseVersions'] = case_versions
+        receipt['reportArtifact'] = self.write('report.json', report)
+        receipt['artifacts'] = [dict(self.write('raw.json', raw), scope=raw['scope'], completeness='COMPLETE'), capture]
+        self.write('receipt.json', receipt)
+        return self.a.receipt(report, 'receipt.json', 'schema', 'report.json')
+
+    def test_raw_capture_is_bound_by_hash_and_must_be_referenced_by_an_envelope(self):
+        # The Java producer binds adapter bytes as RAW_CAPTURE: they cannot carry the final command interval.
+        self.assertIsNotNone(self.raw_capture_check(True))
+        self.assertIsNone(self.raw_capture_check(False))
+        self.assertTrue(any('Raw capture is not referenced' in p['reason'] for p in self.a.problems))
+
+    def test_per_case_versions_need_exact_case_entries(self):
+        self.assertIsNone(self.raw_capture_check(True, versions={'policy': 'PER_CASE'}))
+        self.assertTrue(any('PER_CASE versions need' in p['reason'] for p in self.a.problems))
+        entry = {'caseId': 'T01', 'subcaseId': 'only', 'versions': {'definition': 'd', 'evaluator': 'e', 'policy': 'p'}}
+        self.assertIsNone(self.raw_capture_check(True, versions={'policy': 'PER_CASE'}, case_versions=[entry, entry]))
+        self.assertIsNotNone(self.raw_capture_check(True, versions={'policy': 'PER_CASE'}, case_versions=[entry]))
+
     def test_actual_missing_artifact_is_not_run(self):
         report, receipt, raw = self.protocol_fixture()
         (self.root / 'raw.json').unlink()

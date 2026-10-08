@@ -185,6 +185,13 @@
           },
           "completeness": {
             "const": "COMPLETE"
+          },
+          "role": {
+            "description": "ENVELOPE (default): a JSON document carrying the receipt's executionIdentity/command/versions, ACTUAL evidenceClass, independent ACTUAL_ provenance and profileResult or observations. RAW_CAPTURE: bytes an adapter captured during the run (an action's artifactRefs). Raw captures are bound by path/hash/bytes/scope only and must be referenced by an envelope observation.",
+            "enum": [
+              "ENVELOPE",
+              "RAW_CAPTURE"
+            ]
           }
         },
         "additionalProperties": false
@@ -240,6 +247,52 @@
     "workingTreeClean": {
       "description": "git status --porcelain was empty for the executed checkout; a dirty run cannot identify codeCommit (plan §13.4).",
       "const": true
+    },
+    "caseVersions": {
+      "description": "Per executed case/subcase fixture versions when one run installs fixtures with different definition/evaluator/policy versions. A top-level versions value of PER_CASE requires an exact entry here.",
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "caseId",
+          "subcaseId",
+          "versions"
+        ],
+        "properties": {
+          "caseId": {
+            "type": "string",
+            "minLength": 1
+          },
+          "subcaseId": {
+            "type": "string",
+            "minLength": 1
+          },
+          "versions": {
+            "type": "object",
+            "required": [
+              "definition",
+              "evaluator",
+              "policy"
+            ],
+            "properties": {
+              "definition": {
+                "type": "string",
+                "minLength": 1
+              },
+              "evaluator": {
+                "type": "string",
+                "minLength": 1
+              },
+              "policy": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false
+      }
     }
   },
   "additionalProperties": false

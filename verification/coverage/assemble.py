@@ -517,6 +517,7 @@ class Assembly:
                 self.checked_descriptor(artifact)
             output_paths = set()
             documents = []
+            raw_paths = set()
             for artifact in receipt['artifacts']:
                 actual = self.checked_descriptor(artifact)
                 if '/src/test/' in '/' + actual['path'] or actual['path'].startswith(('verification/coverage/checks/', 'verification/model-corpus/checks/')):
@@ -524,9 +525,21 @@ class Assembly:
                 if actual['path'] in output_paths:
                     raise ValueError('Duplicate canonical actual artifact path')
                 output_paths.add(actual['path'])
+                if not isinstance(artifact.get('scope'), dict) or not artifact['scope'] or artifact.get('completeness') != 'COMPLETE':
+                    raise ValueError('Actual artifact scope/completeness missing')
+                role = artifact.get('role', 'ENVELOPE')
+                if role == 'RAW_CAPTURE':
+                    # Adapter bytes captured during the run cannot know the final command interval or exit code, so they
+                    # are bound by path/hash/bytes/scope only. They count only when an envelope observation references them.
+                    if actual['path'] == self.descriptor(report_ref)['path'] or any(marker in actual['path'].lower() for marker in BAD_MARKERS):
+                        raise ValueError('Raw capture path cannot be the report or a selftest artifact')
+                    raw_paths.add(actual['path'])
+                    continue
+                if role != 'ENVELOPE':
+                    raise ValueError('Unknown actual artifact role')
                 content = json.loads(self.file(actual['path']).read_text())
                 documents.append(content)
-                if not isinstance(artifact.get('scope'), dict) or not artifact['scope'] or artifact.get('completeness') != 'COMPLETE' or content.get('scope') != artifact['scope']:
+                if content.get('scope') != artifact['scope']:
                     raise ValueError('Actual artifact scope/completeness differs from captured bytes')
                 if content.get('evidenceClass') not in ARTIFACT_CLASSES or content.get('executionIdentity') != identity or content.get('command') != command or content.get('versions') != versions:
                     raise ValueError('Actual artifact execution identity/command/versions differ from receipt')
@@ -550,6 +563,16 @@ class Assembly:
                     raise ValueError('Fictional fixture/selftest policy cannot become regulatory acceptance')
             if not any(document.get('profileResult') == report for document in documents):
                 raise ValueError('Actual profile report lacks matching independently captured artifact bytes')
+            referenced = {self.descriptor(ref)['path'] for document in documents for result in (document.get('observations') or {}).values()
+                          if isinstance(result, dict) for ref in result.get('artifactRefs', [])}
+            if not raw_paths <= referenced:
+                raise ValueError('Raw capture is not referenced by any captured action observation')
+            case_versions = receipt.get('caseVersions', [])
+            keys = [(v.get('caseId'), v.get('subcaseId')) for v in case_versions if isinstance(v, dict)]
+            if not isinstance(case_versions, list) or len(keys) != len(case_versions) or len(set(keys)) != len(keys):
+                raise ValueError('caseVersions needs unique case/subcase entries')
+            if any(versions.get(k) == 'PER_CASE' for k in ('definition', 'evaluator', 'policy')) and not case_versions:
+                raise ValueError('PER_CASE versions need exact caseVersions entries')
             receipt['_artifactPaths'] = output_paths
             receipt['_artifactDocuments'] = documents
             receipt['_descriptors'] = {self.descriptor(a['path'])['path']: dict(self.descriptor(a['path']), scope=a['scope'], completeness=a['completeness']) for a in receipt['artifacts']}
@@ -621,8 +644,15 @@ class Assembly:
         try:
             if run.get('caseHash') != declaration['caseHash'] or not declaration['fixtureArtifacts'] or run.get('fixtureHash') != declaration['fixtureArtifacts'][0]['sha256']:
                 raise ValueError('Runtime case/fixture hash differs from actual files')
-            if any(run.get('versions', {}).get(k) != receipt['versions'].get(k) for k in ['definition', 'evaluator', 'policy']):
-                raise ValueError('Case versions differ from command receipt')
+            per_case = [v.get('versions', {}) for v in receipt.get('caseVersions', []) if v.get('caseId') == declaration['caseId'] and v.get('subcaseId') == declaration['subcaseId']]
+            for k in ['definition', 'evaluator', 'policy']:
+                wanted = receipt['versions'].get(k)
+                if wanted == 'PER_CASE' or per_case:
+                    if len(per_case) != 1:
+                        raise ValueError('Case versions missing from command receipt caseVersions')
+                    wanted = per_case[0].get(k)
+                if run.get('versions', {}).get(k) != wanted or not nonempty(wanted) or wanted == 'PER_CASE':
+                    raise ValueError('Case versions differ from command receipt')
             if not instant(receipt['command']['startedAt']) <= instant(run.get('startedAt')) <= instant(run.get('finishedAt')) <= instant(receipt['command']['completedAt']):
                 raise ValueError('Case interval is outside actual command interval')
             required_inputs = {self.descriptor(f'verification/cases/{declaration["caseId"]}/case.json')['path']} | {d['path'] for d in declaration['fixtureArtifacts']}

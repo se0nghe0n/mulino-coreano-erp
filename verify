@@ -32,6 +32,19 @@ if any(x=='--manifest' or x.startswith('--manifest=') for x in extras) and mode 
     print('--manifest applies only to model/deployment',file=sys.stderr);finish(3)
 if mode not in {'harness','contract-red','validate','prepare','coverage','schema','contracts','scenarios','recovery','mcp','skills','model','deployment','actual-s1','actual-s2','actual-s3','actual-s4'}:
     print('Unknown verification profile: '+mode,file=sys.stderr);finish(3)
+if mode=='coverage':
+    # Plan §13.4 coverage verifier: the assembler re-reads every case/catalog/receipt byte and runs a fresh ./verify prepare
+    # itself (--check-preparation). Model-binding preparation is its separate prepared input. Exit code is the assembler's.
+    index=[]
+    rest=list(extras)
+    while rest:
+        item=rest.pop(0)
+        if item=='--index' and rest: index=['--index',rest.pop(0)]
+        elif item.startswith('--index='): index=['--index',item.split('=',1)[1]]
+        else:
+            print('coverage accepts only --index <runtime-evidence-index.json>',file=sys.stderr);finish(3)
+    if command([ROOT/'verification/model-binding/run','prepare']): print('model-binding preparation did not complete; the assembler reports model preparation as missing',file=sys.stderr)
+    finish(command([sys.executable,ROOT/'verification/coverage/assemble.py','--check-preparation']+index))
 if command(['java','-version']) or command([ROOT/'mvnw','-version']): finish(3)
 maven=[ROOT/'mvnw','-B','-ntp','-f',POM]
 if mode=='harness':
@@ -70,5 +83,6 @@ if mode in {'actual-s1','actual-s2','actual-s3','actual-s4'}:
     if len(extras)>1:
         print(mode+' accepts at most one fresh evidence directory',file=sys.stderr);finish(3)
     finish(command(['sh',ROOT/('verification/actual/'+mode.removeprefix('actual-')+'/run.sh')]+extras))
-args=['red']+extras if mode=='contract-red' else [mode]+extras if mode in {'validate','prepare','coverage'} else ['profile',mode]+extras
-finish(command(['java',f'-Dverification.driver={"actual" if actual else "unimplemented"}',f'-Dverification.agentRunner={runner[0] if runner else "scripted"}',f'-Drepo.root={ROOT}',f'-Dverification.command={shlex.join(["./verify",mode]+extras)}','-cp',classpath,'org.mulino.verification.Main']+args))
+args=['red']+extras if mode=='contract-red' else [mode]+extras if mode in {'validate','prepare'} else ['profile',mode]+extras
+argv=['./verify']+sys.argv[1:]
+finish(command(['java',f'-Dverification.driver={"actual" if actual else "unimplemented"}',f'-Dverification.agentRunner={runner[0] if runner else "scripted"}',f'-Drepo.root={ROOT}',f'-Dverification.command={shlex.join(["./verify",mode]+extras)}',f'-Dverification.argv={json.dumps(argv)}','-cp',classpath,'org.mulino.verification.Main']+args))

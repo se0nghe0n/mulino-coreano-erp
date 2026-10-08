@@ -18,7 +18,7 @@ public final class Main {
     static int execute(String[] args) throws Exception {
         Path root=Path.of(System.getProperty("repo.root",".")).toAbsolutePath().normalize();
         ContractValidator validator=new ContractValidator(root);
-        if(args.length==0) throw new IllegalArgumentException("validate|prepare|coverage|red|profile <profile> [case.json...]");
+        if(args.length==0) throw new IllegalArgumentException("validate|prepare|red|profile <profile> [case.json...]");
         String mode=args[0],profile=mode.equals("profile") ? args[1] : mode;
         int start=mode.equals("profile") ? 2 : 1;
         List<Path> paths=new ArrayList<>();String manifest=null;
@@ -42,27 +42,34 @@ public final class Main {
             for(Path path:paths) { JsonNode c=validator.caseFile(path);System.out.println("PREPARATION_SCHEMA_VALID "+c.path("caseId").asText()+" "+root.relativize(path)); }
             return 0;
         }
-        if(mode.equals("prepare") || mode.equals("coverage")) return prepare(validator,paths,mode);
+        if(mode.equals("coverage")) throw new IllegalArgumentException("coverage is assembled by verification/coverage/assemble.py (./verify coverage), not by the Java preparation report");
+        if(mode.equals("prepare")) return prepare(validator,paths,mode);
         if(!mode.equals("profile") && !mode.equals("red")) throw new IllegalArgumentException("Unknown mode "+mode);
         ObjectNode runManifest=mode.equals("profile") && RUN_MANIFEST_PROFILES.contains(profile) ? runManifest(validator,profile,manifest) : null;
+        Instant runStarted=Instant.now();
         AcceptanceDriver driver=DriverFactory.create(root,mode.equals("red"));
         AgentRunner agentRunner=mode.equals("red") ? new AgentRunner.Scripted() : AgentRunner.fromProperty(System.getProperty("verification.agentRunner","scripted"));
         boolean actual=driver instanceof org.mulino.verification.actual.ActualAcceptanceDriver;
         ArrayNode cases=Json.array();boolean anyFail=false,anyNotRun=false;
-        int discovered=0,selected=0;
+        int discovered=0,selected=0,started=0,completed=0;List<Path> selectedFiles=new ArrayList<>();
         for(Path path:paths) {
             JsonNode c=validator.caseFile(path); discovered+=c.path("subcases").size();
             if(!mode.equals("red") && !contains(c.path("profiles"),profile)) continue;
+            selectedFiles.add(path);
             for(JsonNode sub:c.path("subcases")) {
                 selected++;
                 CaseRunner runner=new CaseRunner(validator,driver,agentRunner,path,Json.required(sub,"id"));
+                started++;
                 String status=runner.run(mode.equals("red")); anyFail|=status.equals("FAIL");anyNotRun|=status.equals("NOT_RUN");
                 cases.add(runner.evidence(status,System.getProperty("verification.command","Java acceptance harness")));
+                completed++;
             }
         }
         String status=anyFail ? "FAIL" : anyNotRun || selected==0 ? "NOT_RUN" : "PASS";
         int exit=status.equals("FAIL")?1:status.equals("NOT_RUN")?2:0;
-        ObjectNode report=base(root,profile,status,exit);report.put("discoveredSubcases",discovered).put("selectedSubcases",selected).put("gateComplete",status.equals("PASS"));
+        ObjectNode report=base(root,profile,status,exit);report.put("discoveredSubcases",discovered).put("selectedSubcases",selected);
+        // Assembler fields: discovered/started/completed count the profile's selected subcases; skipped is always0 (no skip path).
+        report.put("discovered",selected).put("started",started).put("completed",completed).put("skipped",0);
         int actualExecutedActions=0;
         for(JsonNode evidence:cases) for(JsonNode action:evidence.path("actions")) if(actual && action.path("driverStatus").asText().equals("EXECUTED")) actualExecutedActions++;
         report.put("driver",actual?"actual":"unimplemented");report.put("actualExecutedActions",actualExecutedActions);report.put("productRuntimeClaimed",actualExecutedActions>0);report.set("cases",cases);report.put("reason",selected==0?"NOT_IMPLEMENTED: product adapter/cases missing; failIfNoTests prevents PASS":"Required actions and observers must execute; unavailable adapters do not establish zero effects");
@@ -71,12 +78,33 @@ public final class Main {
         if(runManifest!=null) {
             report.set("runManifest",runManifest);
             // Approval/account evidence alone runs nothing: the paid model/deployment runner is a separate gate.
-            if(status.equals("PASS")) {status="NOT_RUN";exit=2;report.put("status",status).put("exitCode",exit).put("gateComplete",false);}
+            if(status.equals("PASS")) {status="NOT_RUN";exit=2;report.put("status",status).put("exitCode",exit);}
         }
-        if(!mode.equals("red") && !actual) {report.put("gateComplete",false);report.put("status",anyFail?"FAIL":"NOT_RUN");report.put("exitCode",anyFail?1:2);exit=anyFail?1:2;}
-        if(actual) report.put("gateComplete",false); // Prerequisite integration gates remain independently unverified.
-        Json.write(root.resolve("verification/harness/target/evidence/"+profile+".json"),report);
-        System.out.println(report.toPrettyString());return exit;
+        if(!mode.equals("red") && !actual) {report.put("status",anyFail?"FAIL":"NOT_RUN");report.put("exitCode",anyFail?1:2);exit=anyFail?1:2;status=report.path("status").asText();}
+        // gateComplete is this profile's own gate: an actual-driver run whose every selected subcase was discovered, started and
+        // completed with PASS and none skipped. Prerequisite profiles stay separate (prerequisiteRuntimeComplete=false); the
+        // coverage assembler composes them and refuses PASS when a prerequisite is not PASS.
+        boolean gate=mode.equals("profile") && actual && runManifest==null && status.equals("PASS") && selected>0 && selected==started && started==completed;
+        report.put("gateComplete",gate);
+        Map<String,String> env=System.getenv();
+        List<String> missingVersions=new ArrayList<>();ObjectNode versions=null;
+        if(mode.equals("profile") && actual) {
+            report.set("executionIdentity",ExecutionReceiptProducer.identity(root,env));
+            versions=ExecutionReceiptProducer.versions(profile,env,cases,missingVersions);
+        }
+        String reportRef="verification/harness/target/evidence/"+profile+".json";
+        Json.write(root.resolve(reportRef),report);
+        System.out.println(report.toPrettyString());
+        if(mode.equals("profile") && actual) {
+            List<String> argv=new ArrayList<>();
+            JsonNode declaredArgv=Json.parse(System.getProperty("verification.argv","[]"));
+            for(JsonNode a:declaredArgv) argv.add(a.asText());
+            if(argv.isEmpty()) argv.addAll(List.of("./verify",profile,"--actual"));
+            var run=new ExecutionReceiptProducer.Run(root,profile,report,reportRef,argv,System.getProperty("verification.command","Java acceptance harness"),runStarted,Instant.now(),selectedFiles,versions);
+            ObjectNode receipt=ExecutionReceiptProducer.emit(validator,run,true,cases,missingVersions);
+            System.out.println("COVERAGE_RECEIPT "+receipt);
+        }
+        return exit;
     }
     private static int prepare(ContractValidator validator,List<Path> paths,String mode) throws Exception {
         Set<String> expected=new LinkedHashSet<>();for(int i=1;i<=26;i++) expected.add(String.format("T%02d",i));for(int i=1;i<=5;i++) expected.add("C"+i);for(int i=1;i<=8;i++) expected.add("V"+i);expected.add("E1");expected.add("E2");

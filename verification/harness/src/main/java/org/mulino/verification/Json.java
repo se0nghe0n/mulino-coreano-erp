@@ -25,5 +25,9 @@ public final class Json {
         try { return java.util.HexFormat.of().formatHex(MessageDigest.getInstance("SHA-256").digest(Files.readAllBytes(file))); }
         catch (NoSuchAlgorithmException e) { throw new IllegalStateException(e); }
     }
+    public static String sha256Text(String text) {
+        try { return java.util.HexFormat.of().formatHex(MessageDigest.getInstance("SHA-256").digest(text.getBytes(java.nio.charset.StandardCharsets.UTF_8))); }
+        catch (NoSuchAlgorithmException e) { throw new IllegalStateException(e); }
+    }
     private Json() {}
 }
