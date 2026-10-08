@@ -540,6 +540,20 @@
               "submittedAt": {
                 "type": "string",
                 "format": "date-time"
+              },
+              "trigger": {
+                "const": "OBSERVE_NEXT_NATURAL_TICK",
+                "description": "Passive observation of the scheduler loop's next natural tick; the harness triggers nothing (host-observation-guide.md)."
+              },
+              "observationWindowSeconds": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 30
+              },
+              "triggeredBy": {
+                "type": "string",
+                "minLength": 1,
+                "description": "Who started the submission, from independently extracted scheduler rows."
               }
             },
             "required": [
@@ -595,7 +609,13 @@
                   }
                 }
               }
-            ]
+            ],
+            "dependentRequired": {
+              "trigger": [
+                "observationWindowSeconds",
+                "triggeredBy"
+              ]
+            }
           }
         },
         "not": {
@@ -701,6 +721,20 @@
               "submittedAt": {
                 "type": "string",
                 "format": "date-time"
+              },
+              "trigger": {
+                "const": "OBSERVE_NEXT_NATURAL_TICK",
+                "description": "Passive observation of the scheduler loop's next natural tick; the harness triggers nothing (host-observation-guide.md)."
+              },
+              "observationWindowSeconds": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 30
+              },
+              "triggeredBy": {
+                "type": "string",
+                "minLength": 1,
+                "description": "Who started the submission, from independently extracted scheduler rows."
               }
             },
             "required": [
@@ -756,7 +790,13 @@
                   }
                 }
               }
-            ]
+            ],
+            "dependentRequired": {
+              "trigger": [
+                "observationWindowSeconds",
+                "triggeredBy"
+              ]
+            }
           }
         },
         "not": {

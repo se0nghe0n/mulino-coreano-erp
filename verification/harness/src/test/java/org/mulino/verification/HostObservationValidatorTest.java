@@ -21,8 +21,9 @@ public final class HostObservationValidatorTest {
         ObjectNode c=Json.object();c.set("argv",Json.MAPPER.valueToTree(List.of("CAPTURED_CONTRACT_SELFTEST_ONLY",operation)));
         c.put("exitCode",0).put("startedAt","2026-10-07T00:00:00Z").put("completedAt","2026-10-07T00:00:03Z").put("transcriptRef",dir+"transcript.txt").put("redacted",true);return c;
     }
-    Capture capture(String operation) throws Exception {
-        JsonNode rows=Json.read(root.resolve(dir+operation+"-rows.json"));ObjectNode params=Json.object();params.set("scope",Json.parse("{\"workspace\":\"host-selftest\"}"));
+    Capture capture(String operation) throws Exception {return capture(operation,operation+"-rows.json");}
+    Capture capture(String operation,String rowsName) throws Exception {
+        JsonNode rows=Json.read(root.resolve(dir+rowsName));ObjectNode params=Json.object();params.set("scope",Json.parse("{\"workspace\":\"host-selftest\"}"));
         if(rows.path("operationEvidence").has("schedulerId")) params.set("schedulerId",rows.path("operationEvidence").path("schedulerId"));
         ObjectNode host=Json.object();host.put("schemaVersion","1.0.0").put("evidenceClass","CAPTURED_SELFTEST").put("operation",operation).put("scopeComplete",true);
         host.set("scope",params.path("scope").deepCopy());host.set("command",command(operation));host.set("toolVersions",Json.parse("[{\"name\":\"CAPTURED_SELFTEST_ONLY\",\"version\":\"1.0.0\"}]"));
@@ -30,9 +31,9 @@ public final class HostObservationValidatorTest {
         ObjectNode env=Json.object();env.put("profile",profile).put("hostId","synthetic-host").put("workspaceId","host-selftest").put("isolated",true);host.set("environment",env);
         host.set("inputArtifacts",Json.array());host.set("generatedOutputs",Json.array());host.set("observedArtifacts",Json.array());host.set("operationEvidence",rows.path("operationEvidence").deepCopy());
         ObjectNode extractor=Json.object();extractor.put("name","fixed-contract-capture").put("version","1.0.0").put("source","FILESYSTEM_READ_ONLY").put("independent",true).put("readOnly",true);extractor.set("command",command("read-only-extract"));
-        ArrayNode inputs=Json.array();inputs.add(artifact(operation+"-rows.json"));extractor.set("inputArtifacts",inputs);extractor.set("rawRows",rows.deepCopy());extractor.put("rawRowsArtifactRef",dir+operation+"-rows.json");host.set("extractor",extractor);
-        List<String> refs=new ArrayList<>(List.of(dir+"transcript.txt",dir+operation+"-rows.json"));
-        if(GENERATES.contains(operation)) ((ArrayNode)host.path("generatedOutputs")).add(artifact(operation+"-rows.json"));
+        ArrayNode inputs=Json.array();inputs.add(artifact(rowsName));extractor.set("inputArtifacts",inputs);extractor.set("rawRows",rows.deepCopy());extractor.put("rawRowsArtifactRef",dir+rowsName);host.set("extractor",extractor);
+        List<String> refs=new ArrayList<>(List.of(dir+"transcript.txt",dir+rowsName));
+        if(GENERATES.contains(operation)) ((ArrayNode)host.path("generatedOutputs")).add(artifact(rowsName));
         if(Set.of("inspectArtifacts","scanArtifacts").contains(operation)) {
             ArrayNode list=Json.array();list.add(artifact("safe.txt"));list.add(artifact("sentinel.txt"));params.set("artifacts",list.deepCopy());host.set("observedArtifacts",list.deepCopy());list.forEach(inputs::add);
             if(operation.equals("scanArtifacts")) {
@@ -43,6 +44,10 @@ public final class HostObservationValidatorTest {
                     read.set("findings",a.path("path").asText().endsWith("sentinel.txt")?Json.parse("[{\"patternId\":\"virtual-secret\",\"byteOffset\":15,\"lengthBytes\":25},{\"patternId\":\"virtual-secret\",\"byteOffset\":41,\"lengthBytes\":25}]"):Json.array());reads.add(read);
                 }host.set("reads",reads);
             }
+        }
+        if(operation.equals("verifyCoverage")) {
+            params.put("registryPath",dir+"coverage-registry.json").put("catalogPath",dir+"coverage-catalog.json").put("inputSnapshotKind","PREPARATION").put("preparationReportPath",dir+"coverage-preparation.json");
+            for(String name:List.of("coverage-registry.json","coverage-catalog.json","coverage-preparation.json")) ((ArrayNode)host.path("inputArtifacts")).add(artifact(name));
         }
         if(operation.equals("awaitRuntimeTask")) {
             JsonNode snap=Json.read(root.resolve(dir+"runtime-snapshot.json"));ObjectNode task=Json.object();
@@ -126,6 +131,51 @@ public final class HostObservationValidatorTest {
         assertThrows(IllegalArgumentException.class,()->check(scope));
         Capture requested=capture("backup");((ObjectNode)requested.control.path("parameters")).put("backupId","different");assertThrows(IllegalArgumentException.class,()->check(requested));
         Capture future=capture("awaitRuntimeTask");((ObjectNode)future.host.path("runtimeTask").path("snapshot")).put("capturedAt","2026-10-07T00:00:05Z");assertThrows(IllegalArgumentException.class,()->check(future));
+    }
+    private Capture naturalTick(String operation) throws Exception {return naturalTick(operation,operation+"-natural-rows.json");}
+    private Capture naturalTick(String operation,String rowsName) throws Exception {
+        Capture c=capture(operation,rowsName);ObjectNode params=(ObjectNode)c.control.path("parameters");
+        c.host.set("command",Json.read(root.resolve(dir+rowsName)).path("command").deepCopy()); // the watcher's own argv/interval
+        params.put("trigger","OBSERVE_NEXT_NATURAL_TICK").put("observationWindowSeconds",30).put("triggeredBy","SCHEDULER_LOOP");
+        c.host.set("requestedInputs",params.deepCopy());return c;
+    }
+    private static void reshape(Capture c,java.util.function.Consumer<ObjectNode> change) {
+        ObjectNode params=(ObjectNode)c.control.path("parameters");change.accept(params);c.host.set("requestedInputs",params.deepCopy());
+    }
+    @Test void naturalTickIsPassiveObservationWithinTheWindowAndNeverAHarnessTrigger() throws Exception {
+        for(String op:List.of("tickScheduler","sweepDue")) check(naturalTick(op));
+        // A harness-triggered tick (no passive request) cannot claim the loop's natural trigger recorded in the rows.
+        Capture relabel=naturalTick("tickScheduler");reshape(relabel,p->{p.remove("trigger");p.remove("triggeredBy");p.remove("observationWindowSeconds");});
+        assertTrue(assertThrows(IllegalArgumentException.class,()->check(relabel)).getMessage().contains("cannot be reported"));
+        Capture otherTrigger=naturalTick("tickScheduler");reshape(otherTrigger,p->p.put("trigger","HARNESS_TICK"));assertThrows(IllegalArgumentException.class,()->check(otherTrigger));
+        Capture harness=naturalTick("tickScheduler");reshape(harness,p->p.put("triggeredBy","HARNESS"));assertThrows(IllegalArgumentException.class,()->check(harness));
+        for(int window:List.of(0,31)) {Capture w=naturalTick("sweepDue");reshape(w,p->p.put("observationWindowSeconds",window));assertThrows(IllegalArgumentException.class,()->check(w),""+window);}
+        Capture shortWindow=naturalTick("tickScheduler");reshape(shortWindow,p->p.put("observationWindowSeconds",2));assertThrows(IllegalArgumentException.class,()->check(shortWindow));
+        Capture longCommand=naturalTick("tickScheduler","tickScheduler-natural-long-rows.json");
+        assertTrue(assertThrows(IllegalArgumentException.class,()->check(longCommand)).getMessage().contains("outlasted"));
+        Capture trigger=naturalTick("sweepDue","sweepDue-natural-trigger-rows.json");
+        assertTrue(assertThrows(IllegalArgumentException.class,()->check(trigger)).getMessage().contains("must not trigger"));
+        Capture writable=naturalTick("tickScheduler");((ObjectNode)writable.host.path("extractor")).put("readOnly",false);assertThrows(IllegalArgumentException.class,()->check(writable));
+    }
+    private Capture coverage(String kind,java.util.function.Consumer<ObjectNode> change) throws Exception {
+        Capture c=capture("verifyCoverage");reshape(c,p->{p.put("inputSnapshotKind",kind);change.accept(p);});return c;
+    }
+    @Test void verifyCoverageReadsExactlyTheRequestedInputSnapshot() throws Exception {
+        check(capture("verifyCoverage"));
+        Capture none=coverage("PREPARATION",p->p.remove("inputSnapshotKind"));assertThrows(IllegalArgumentException.class,()->check(none));
+        Capture unknown=coverage("LIVE",p->{});assertThrows(IllegalArgumentException.class,()->check(unknown));
+        // A preparation request that also points at the runtime manifest, or a runtime request without its manifest/currentExecution.
+        Capture mixed=coverage("PREPARATION",p->p.put("manifestPath",dir+"coverage-preparation.json"));assertThrows(IllegalArgumentException.class,()->check(mixed));
+        Capture runtime=coverage("REQUIRED_PATH_RUNTIME_EVIDENCE",p->{p.remove("preparationReportPath");p.put("manifestPath",dir+"coverage-preparation.json");});
+        assertThrows(IllegalArgumentException.class,()->check(runtime),"currentExecution required");
+        Capture kindMismatch=coverage("REQUIRED_PATH_RUNTIME_EVIDENCE",p->{p.remove("preparationReportPath");p.put("manifestPath",dir+"coverage-preparation.json");p.set("currentExecution",Json.object().put("caseId","T25"));});
+        assertTrue(assertThrows(IllegalArgumentException.class,()->check(kindMismatch)).getMessage().contains("input snapshot kind"));
+        Capture currentOnPrep=coverage("PREPARATION",p->p.set("currentExecution",Json.object().put("caseId","T25")));assertThrows(IllegalArgumentException.class,()->check(currentOnPrep));
+        Capture unbound=capture("verifyCoverage");((ArrayNode)unbound.host.path("inputArtifacts")).remove(2);assertThrows(IllegalArgumentException.class,()->check(unbound));
+        Capture registry=capture("verifyCoverage");((ArrayNode)registry.host.path("inputArtifacts")).set(0,artifact("coverage-catalog.json").put("path",dir+"coverage-registry.json"));
+        assertThrows(IllegalArgumentException.class,()->check(registry),"registry hash must be the read bytes");
+        Capture otherInput=coverage("PREPARATION",p->p.put("preparationReportPath",dir+"coverage-catalog.json"));assertThrows(IllegalArgumentException.class,()->check(otherInput));
+        Capture mutation=coverage("PREPARATION",p->p.put("mutation","dropOracle"));assertThrows(IllegalArgumentException.class,()->check(mutation));
     }
     @Test void lifecycleNeedsRequestedProcessNewInstanceAndActualTerminalSnapshot() throws Exception {
         for(String op:List.of("start","stop","restart")) check(capture(op));
