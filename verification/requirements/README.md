@@ -137,3 +137,29 @@ transaction/경합, DB/API/MCP, skill loading, 실제 모델, 법규와 BTP는
 이 디렉터리 작성 과정에서 실행하지 않았다. 전체 인수·coverage는
 `NOT_RUN`이다. catalog의 내용 검토와 case/assertion의 전체 연결은
 Task integration에서 확인해야 한다.
+
+## T25 artifactKinds 정정(2026-10-08, 2라운드)
+
+`T25.independent-traceability`의 coverage-link·result-separation과
+`T25.evidence-manifest-and-entrypoints`의 evidence-fields·wrapper-truth는
+499개 중 484개가 공유하는 기본값 `api_response`·`db_snapshot`을
+artifactKinds로 갖고 있었다. T25는 coverage verifier의 출력만
+관찰하므로 이 두 artifact를 만들 수 없고, harness는 이를
+`artifactKindAttributionGaps`로 보고했다. 계획 §13.4는 coverage
+verifier가 각 case의 실제 assertion·artifact 연결을 확인하라고 할 뿐
+T25가 업무 DB를 읽으라고 하지 않는다.
+
+- 바꾼 값: coverage-link·result-separation은 `coverage_report`,
+  `runtime_manifest`. evidence-fields·wrapper-truth는 여기에
+  `wrapper_record`를 더한다.
+- 약화가 아닌 이유: requiredLayers·expected·관찰 이름·operator는
+  그대로다. 다른 관찰의 db_snapshot 등 artifactKind와 필수 profile
+  PASS link는 T25 runtime-links-required가 관찰마다 요구하도록
+  강화했다(`verification/cases/T25/README.md`).
+- lock: 두 oracle의 `contractSha256`을 갱신하고 `reviewUpdates[2]`에
+  이유·이전 값·바뀐 관찰을 남겼다. source 파일 hash는 그대로다.
+- 이 catalog bytes를 입력으로 고정한 `verification/cases/E1/case.json`의
+  `model-reference-host` inspectArtifacts descriptor(sha256·크기)를 함께
+  갱신했다. T08 `observation-bindings.json`의 `catalogSha256` 등
+  준비 기록의 옛 hash는 당시 기록이다. T08은 소유자가
+  `bind_observations.py`로 다시 만들어야 `--check`가 통과한다.
