@@ -515,6 +515,14 @@
       "extension": "§5.3 Handover"
     },
     {
+      "code": "PAYMENT_REFERENCE_ALREADY_RECORDED",
+      "outcomes": [
+        "CONFLICT"
+      ],
+      "meaning": "같은 송장에 같은 외부 지급 참조가 이미 기록됐다",
+      "extension": "§6 정산 지급참조, §4.3 중복 수신"
+    },
+    {
       "code": "PHYSICAL_SCOPE_UNCERTAIN",
       "outcomes": [
         "HELD"
@@ -662,6 +670,14 @@
       ],
       "meaning": "정정 송장은 원 송장과 인간이 검토해야 한다",
       "extension": "§6 정산 참조"
+    },
+    {
+      "code": "SETTLEMENT_DIFFERENCE_NOT_OPEN",
+      "outcomes": [
+        "REJECTED"
+      ],
+      "meaning": "정산 조정은 이 송장 대조의 열린 SETTLEMENT_DIFFERENCE 의무에만 기록한다(MATCHED 대조·해소/면제된 차이 제외)",
+      "extension": "§6 정산 차이는 별도 미해결 목표, §5.3 의무 비부활"
     },
     {
       "code": "SNAPSHOT_CHANGED",
