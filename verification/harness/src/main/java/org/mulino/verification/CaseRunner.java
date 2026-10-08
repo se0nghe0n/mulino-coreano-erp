@@ -331,6 +331,7 @@ public final class CaseRunner {
     public void assertId(String id) {
         JsonNode assertion=assertionIndex.get(id); if(assertion==null) throw new IllegalArgumentException("Undeclared assertion "+id);
         asserted.add(id);ObjectNode evidence=Json.object(); evidence.put("assertionId",id);evidence.set("expected",assertion.path("expected"));evidence.set("source",assertion.path("source"));evidence.set("requirementRefs",assertion.path("requirementRefs"));evidence.set("evidenceRefs",assertion.path("evidenceRefs"));
+        declaredComparison(evidence,assertion);
         // scope is declarative traceability; selection is enforced only by source.where and the observation request.
         evidence.set("declaredScope",assertion.path("scope"));evidence.put("scopeEnforced",false);
         AssertionEngine engine=new AssertionEngine();
@@ -340,8 +341,31 @@ public final class CaseRunner {
         }
         catch(AssertionError e) { evidence.put("status","FAIL").put("failureKind","SOURCE_UNAVAILABLE").put("reason",e.getMessage());assertionResults.add(evidence);throw e; }
         try { engine.check(assertion,results,aliases); evidence.put("status","PASS"); }
-        catch(AssertionError e) { evidence.put("status","FAIL").put("failureKind","VIOLATION").put("reason",e.getMessage());assertionResults.add(evidence);throw e; }
+        catch(AssertionError e) { evidence.put("status","FAIL").put("failureKind","VIOLATION").put("reason",e.getMessage());recordCompared(evidence,engine);assertionResults.add(evidence);throw e; }
+        recordCompared(evidence,engine);
         assertionResults.add(evidence);
+    }
+    /** op/unit/baseline/unit sources as declared, so the assembler can compare the record with the case and re-check it. */
+    private static void declaredComparison(ObjectNode evidence,JsonNode assertion) {
+        evidence.put("op",assertion.path("op").asText());
+        for(String key:List.of("unit","baseline","unitSource","baselineUnitSource")) if(assertion.has(key)) evidence.set(key,assertion.path(key));
+        if(assertion.path("source").has("where")) evidence.set("where",assertion.path("source").path("where"));
+        if(assertion.path("source").has("field")) evidence.set("field",assertion.path("source").path("field"));
+    }
+    /** The post-projection values actually compared (after where/field), with resolved references; absent is explicit. */
+    private static void recordCompared(ObjectNode evidence,AssertionEngine engine) {
+        JsonNode resolved=engine.resolvedAssertion();
+        if(resolved!=null) {
+            if(resolved.has("expected")) evidence.set("resolvedExpected",resolved.path("expected"));
+            if(resolved.path("source").has("where")) evidence.set("resolvedWhere",resolved.path("source").path("where"));
+        }
+        evidence.set("observed",compared(engine.observedValue()));
+        if(engine.observedUnit()!=null) evidence.set("observedUnit",compared(engine.observedUnit()));
+        if(engine.observedBaseline()!=null) evidence.set("observedBaseline",compared(engine.observedBaseline()));
+    }
+    private static JsonNode compared(JsonNode value) {
+        if(value==null) return Json.MAPPER.nullNode();
+        return value.isMissingNode() ? Json.object().put("observation","ABSENT") : value;
     }
     public String run(boolean contractRed) throws IOException {
         for(String id:actionIndex.keySet()) execute(id);
@@ -350,7 +374,7 @@ public final class CaseRunner {
         for(String id:assertionIndex.keySet()) {
             JsonNode assertion=assertionIndex.get(id);
             if(!contractRed && !sourcesExecuted(assertion)) {
-                ObjectNode e=Json.object();e.put("assertionId",id).put("status","NOT_RUN").put("reason","Assertion source unavailable; no zero effects inferred");e.set("expected",assertion.path("expected"));e.set("source",assertion.path("source"));e.putNull("observed");assertionResults.add(e);
+                ObjectNode e=Json.object();e.put("assertionId",id).put("status","NOT_RUN").put("reason","Assertion source unavailable; no zero effects inferred");e.set("expected",assertion.path("expected"));e.set("source",assertion.path("source"));declaredComparison(e,assertion);e.putNull("observed");assertionResults.add(e);
             } else try { assertId(id); } catch(AssertionError e) { failed=true; }
         }
         boolean incomplete=!terminalStarts.containsAll(startedHandles.keySet()) || !runtimeTerminals.containsAll(runtimeSubmissions.keySet());

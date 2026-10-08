@@ -48,7 +48,8 @@ case와 실제 실행의 review가 필요하며 단순 연결 검사로 증명�
 
 `runtime-evidence-index.json`은 현재 빈 실제 실행 목록이다. coordinator가
 실제 runner의 증거를 통합한 뒤 별도 경로를 `--index`로 지정할 수 있다.
-root `./verify`의 의미나 다른 작성자의 runner는 이 변경에서 수정하지 않는다.
+root `./verify coverage [--index <file>]`는 model-binding 준비 뒤 이
+assembler를 `--check-preparation`으로 실행하고 그 exit code를 돌려준다.
 
 ```json
 {
@@ -86,6 +87,17 @@ execution identity, command display, exitCode도 receipt와 같아야 한다.
 - 실제 actionId별 StepResult와 정확히 같은 `observations`를 기록한다.
   모델 실행은 모든 실제 `modelAttempts`를 같은 bytes에 연결한다.
 
+artifact descriptor의 `role`은 `ENVELOPE`(기본)이나 `RAW_CAPTURE`다.
+위 규칙은 ENVELOPE 문서에 적용한다. RAW_CAPTURE는 adapter가 실행 중
+capture한 action bytes(StepResult `artifactRefs`)다. 실행 중에 쓰여서 최종
+command 구간·exit code를 담을 수 없으므로 path/hash/bytes/scope/COMPLETE로만
+묶는다. 대신 어떤 ENVELOPE의 `observations` action이 그 파일을
+`artifactRefs`로 참조해야 하고(고아 capture 거부), report 파일이나 selftest
+표지 경로일 수 없다. 한 실행이 서로 다른 definition/evaluator/policy의
+fixture를 설치하면 receipt `versions`의 해당 값은 `PER_CASE`이고
+`caseVersions[]`에 case/subcase마다 정확히 한 항목을 둔다. case 결과의
+versions는 그 항목과 같아야 한다.
+
 assembler는 위 JSON을 직접 읽어 metadata뿐 아니라 실제 결과 payload도
 대조한다. label만 바꾼 canned/selftest source, 이미 알려진 test resource
 경로, 다른 execution identity, scope, hash, bytes나 action response를 거부한다.
@@ -93,6 +105,57 @@ JSON의 ACTUAL 표지는 외부 시스템의 진실성을 자동 증명하지 �
 실제 adapter·인증·독립 extractor의 실행 인수는 별도로 필요하다. 여기의
 검사는 무결성과 연결 계약이며 metadata를 위조한 시스템의 attestation을
 새로 발급하지 않는다. raw credential은 report나 artifact에 저장하지 않는다.
+
+## 실제 profile 실행의 receipt producer
+
+`./verify <schema|contracts|scenarios|recovery|mcp|skills> --actual`은
+실제 driver로 case를 실행한 뒤 `ExecutionReceiptProducer`
+(`verification/harness/src/main/java/org/mulino/verification/`)로 위 형식의
+receipt를 만든다. 내용은 다음과 같다.
+
+- profile 보고서 `target/evidence/<profile>.json`. `executionIdentity`,
+  `discovered`·`started`·`completed`·`skipped=0`, profile 자체의
+  `gateComplete`가 있다.
+- envelope `target/evidence/receipts/<profile>-<runId>/profile-result.json`
+  (`profileResult`=보고서)과 subcase마다 `case-<caseId>-<subcaseId>.json`
+  (`observations`=그 subcase의 action 결과). 둘 다 evidenceClass ACTUAL,
+  provenance `ACTUAL_HARNESS_PROFILE_RUN`이다.
+- action `artifactRefs`의 RAW_CAPTURE descriptor, 실행한 case·fixture·base·
+  registry·catalog의 inputs, `caseVersions`, `environment=LOCAL`,
+  `workingTreeClean=true`.
+- `target/evidence/<profile>-receipt.json`과 index 항목
+  `target/evidence/actual-runtime-evidence-index.json`.
+
+producer는 실제 driver, 모든 case의 PRODUCT 정책, selftest 표지 없는
+action provenance, 실행 전후 clean tree, `ACTUAL_BUILD_COMMIT`=codeCommit,
+실제 version 환경변수가 모두 있을 때만 쓴다. 아니면 이유와 함께
+`NOT_EMITTED`이고 그 profile은 assembler에서 NOT_RUN이다. harness
+selftest·RED·unimplemented driver는 이 경로에 오지 않는다. 형식 시험
+(`StepTwoRoundTwoRegressionTest`)은 버려지는 임시 디렉터리에서만 쓰고
+실제 assembler `receipt()`가 그 receipt를 받는지 확인한다. 제품 증거가
+아니다. model·deployment는 승인된 별도 runner가 필요해 producer가 없다.
+
+### native `actual-sN` 실행의 연결(Step 3 소유)
+
+`./verify actual-s1`…`actual-s4`의 `run-receipt.json`
+(`SN_DISPOSABLE_RUN_RECEIPT`)과 `actual-sN-native.json`은 소스·빌드·정리
+custody 증거다. case/subcase/assertion 단위 결과가 아니므로 그대로 coverage
+receipt가 되지 않는다. 연결 방법은 둘 중 하나다.
+
+1. native 실행이 띄운 같은 disposable backend·DB에 대해
+   `ACTUAL_BASE_URL`·`DB_URL` 등과 version 환경변수를 주고
+   `./verify scenarios --actual`(등)을 실행한다. 그러면 위 producer가 case
+   결과·receipt를 만든다. native custody 기록은 receipt `inputs`가 아니라
+   별도 보고로 인용한다.
+2. native runner가 직접 같은 형식을 낸다. report는 Main profile 보고서와
+   같은 field(`cases[]`의 caseId·subcaseId·status·caseHash·fixtureHash·
+   versions·startedAt·finishedAt·actions·assertions·runtimeComplete와
+   CaseRunner assertion 기록)를, receipt는 이 README의 ENVELOPE/RAW_CAPTURE
+   규칙을 따른다. `run-receipt.json`의 runId·hostId·명령 구간은 receipt
+   `executionIdentity`·`command`로 옮길 수 있지만 case 결과 없이 PASS가 될
+   수는 없다.
+
+`verification/actual/**`은 Step 3 소유다. 이 문서는 형식만 정한다.
 
 ## case·oracle·artifact 연결
 
@@ -108,10 +171,15 @@ case 결과는 caseHash·fixture/base hash·version·command interval·정확한
 EXECUTED이고 captured artifact의 StepResult와 같아야 한다. 독립 DB 관찰은
 query/snapshot/scopeComplete/independent를 요구한다. assertion의 실제
 source bytes를 observed로 남기며 미관찰을0이나 빈 배열로 바꾸지 않는다.
-runner의 PASS를 그대로 믿지 않는다. 참조(`$result`/`$alias`)가 없는
-assertion은 선언된 op·unit·where·field·baseline으로 캡처된 action bytes에서
-다시 판정하고, runner PASS와 모순되면 FAIL이다. 시간 연산과 참조가 있는
-assertion처럼 결정할 수 없는 경우는 판정하지 않고 review에 남긴다.
+runner의 PASS를 그대로 믿지 않는다. PASS 기록은 CaseRunner가 남긴
+`op`·`unit`·`where`·`field`·`baseline`·단위 source가 case 선언과 같고,
+`observed`(·`observedUnit`·`observedBaseline`)가 캡처된 action bytes를 같은
+규칙으로 projection한 값과 같아야 한다. 그 뒤 선언된 operator를 다시
+적용하고 runner PASS와 모순되면 FAIL이다. `$result`는 캡처 bytes에서,
+`$alias`는 실행된 installFixture의 `aliasMap`에서 푼다. bytes로 정할 수
+없으면 기록된 비교 값에 operator를 재적용한다. 시간 연산처럼 그것도
+결정할 수 없는 경우만 판정하지 않고 review에 남긴다. 기록이 없거나
+다르면 FAIL이다.
 일부 action/assertion/profile 미실행이나 skip은 NOT_RUN이다. 확인된 FAIL은
 receipt/artifact가 나중에 누락돼도 NOT_RUN으로 낮추지 않는다.
 

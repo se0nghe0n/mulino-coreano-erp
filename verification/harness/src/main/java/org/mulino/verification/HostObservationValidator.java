@@ -75,15 +75,93 @@ public final class HostObservationValidator {
         if(READ_OPERATIONS.contains(operation)) inspect(validator,requested,host,extracted);
         if(operation.equals("scanArtifacts")) scan(validator,requested,host);
         if(Set.of("tickScheduler","sweepDue").contains(operation)) schedulerSubmission(requested,host);
+        if(operation.equals("verifyCoverage")) coverageSnapshot(validator,requested,host,extractedRows);
         if(operation.equals("awaitRuntimeTask")) runtimeTask(validator,requested,host,result);
         if(Set.of("start","stop","restart").contains(operation)) lifecycle(validator,requested,host,result);
     }
+    static final String NATURAL_TICK="OBSERVE_NEXT_NATURAL_TICK",SCHEDULER_LOOP="SCHEDULER_LOOP";
+    /** Plan §10 development/CI recovery profile: test observation limit 30 seconds. */
+    static final int MAX_NATURAL_TICK_WINDOW_SECONDS=30;
     private static void schedulerSubmission(JsonNode requested,JsonNode host) {
         JsonNode identity=host.path("operationEvidence");
         ContractValidator.require(Json.required(requested,"schedulerId").equals(identity.path("schedulerId").asText()),"Scheduler submission belongs to a different requested scheduler");
+        ContractValidator.require(Set.of("SUBMITTED","NO_TASK").contains(identity.path("submissionStatus").asText()),"Scheduler submissionStatus must be an observed SUBMITTED or NO_TASK");
         if(identity.path("submissionStatus").asText().equals("SUBMITTED")) {
             Instant submitted=instant(identity,"submittedAt");
             ContractValidator.require(!submitted.isBefore(instant(host.path("command"),"startedAt")) && !submitted.isAfter(instant(host.path("command"),"completedAt")),"Scheduler submission timestamp is outside actual command observation");
+        }
+        boolean passive=requested.has("trigger") || requested.has("triggeredBy") || requested.has("observationWindowSeconds");
+        if(passive) naturalTick(requested,host);
+        else ContractValidator.require(!NATURAL_TICK.equals(identity.path("trigger").asText()) && !SCHEDULER_LOOP.equals(identity.path("triggeredBy").asText()),
+            "A harness-triggered tick/sweep cannot be reported as the scheduler loop's own natural tick");
+    }
+    /**
+     * Passive observation of the scheduler loop's next natural tick (T26 autonomous-loop subcases). The harness does not
+     * trigger anything: the host command only watches, read-only, for at most observationWindowSeconds, and the submission
+     * identity, trigger and triggeredBy come from independently extracted scheduler rows. The case's own DB assertions check
+     * that every attempt was started by the loop; this validator fixes the shape that makes that observation meaningful.
+     */
+    private static void naturalTick(JsonNode requested,JsonNode host) {
+        JsonNode identity=host.path("operationEvidence"),command=host.path("command");
+        ContractValidator.require(NATURAL_TICK.equals(requested.path("trigger").asText()),"Only trigger="+NATURAL_TICK+" is a defined passive scheduler observation");
+        ContractValidator.require(SCHEDULER_LOOP.equals(requested.path("triggeredBy").asText()),"Passive tick observation requests triggeredBy="+SCHEDULER_LOOP);
+        JsonNode window=requested.path("observationWindowSeconds");
+        ContractValidator.require(window.isIntegralNumber() && window.asInt()>=1 && window.asInt()<=MAX_NATURAL_TICK_WINDOW_SECONDS,"observationWindowSeconds must be an integer 1.."+MAX_NATURAL_TICK_WINDOW_SECONDS+" (plan §10)");
+        for(String key:List.of("trigger","triggeredBy","observationWindowSeconds"))
+            ContractValidator.require(identity.has(key) && identity.path(key).equals(requested.path(key)),"Independently extracted scheduler rows must record "+key+" equal to the passive request");
+        Instant start=instant(command,"startedAt"),end=instant(command,"completedAt");
+        ContractValidator.require(!end.isAfter(start.plusSeconds(window.asLong())),"Passive observation command outlasted observationWindowSeconds");
+        if(identity.path("submissionStatus").asText().equals("SUBMITTED"))
+            ContractValidator.require(!instant(identity,"submittedAt").isAfter(start.plusSeconds(window.asLong())),"Natural tick submission observed outside the observation window");
+        ContractValidator.require(host.path("extractor").path("readOnly").asBoolean(false) && host.path("extractor").path("independent").asBoolean(false),"Passive tick observation needs an independent read-only extractor");
+        for(JsonNode arg:command.path("argv")) {
+            String a=arg.asText().toLowerCase(Locale.ROOT);
+            ContractValidator.require(!a.contains("tickscheduler") && !a.contains("sweepdue") && !a.contains("resumework") && !a.contains("fakeworker"),"Passive observation command must not trigger the scheduler, a sweep or a worker");
+        }
+    }
+
+    static final Set<String> SNAPSHOT_KINDS=Set.of("PREPARATION","REQUIRED_PATH_RUNTIME_EVIDENCE","MODEL_BINDING_PREPARATION","APPROVED_MODEL_EXECUTION_EVIDENCE");
+    static final Set<String> LINK_STATUSES=Set.of("PASS","FAIL","NOT_RUN","CURRENT_EXECUTION");
+    /**
+     * verifyCoverage reads one named input snapshot (T25). inputSnapshotKind fixes which file is the input: PREPARATION reads
+     * the ./verify prepare report, REQUIRED_PATH_RUNTIME_EVIDENCE and APPROVED_MODEL_EXECUTION_EVIDENCE the actual runtime
+     * manifest, MODEL_BINDING_PREPARATION the model-binding preparation report. Mixing them would let a preparation report
+     * stand in for runtime evidence or make runtime expectations contradict preparation ones. currentExecution names the case
+     * whose own links are reported as CURRENT_EXECUTION instead of being required as a prerequisite PASS.
+     */
+    private static void coverageSnapshot(ContractValidator validator,JsonNode requested,JsonNode host,JsonNode rows) throws IOException {
+        String kind=requested.path("inputSnapshotKind").asText();
+        ContractValidator.require(SNAPSHOT_KINDS.contains(kind),"verifyCoverage requires inputSnapshotKind "+SNAPSHOT_KINDS);
+        String input=switch(kind) {case "PREPARATION"->"preparationReportPath";case "MODEL_BINDING_PREPARATION"->"modelManifestPath";default->"manifestPath";};
+        for(String key:List.of("preparationReportPath","modelManifestPath","manifestPath"))
+            ContractValidator.require(requested.has(key)==key.equals(input),"inputSnapshotKind "+kind+" reads exactly "+input+"; "+key+" "+(key.equals(input)?"missing":"not allowed"));
+        boolean current=kind.equals("REQUIRED_PATH_RUNTIME_EVIDENCE");
+        ContractValidator.require(requested.has("currentExecution")==current,"currentExecution belongs only to REQUIRED_PATH_RUNTIME_EVIDENCE");
+        String currentCase=current?Json.required(requested.path("currentExecution"),"caseId"):null;
+        if(current) ContractValidator.require(requested.path("currentExecution").size()==1,"currentExecution names only caseId");
+        Map<String,JsonNode> inputs=new HashMap<>();for(JsonNode a:host.path("inputArtifacts")) inputs.put(a.path("path").asText(),a);
+        for(String key:List.of(input,"registryPath","catalogPath")) {
+            String path=Json.required(requested,key);
+            ContractValidator.require(inputs.containsKey(path),"verifyCoverage input "+key+" is not bound by hash in inputArtifacts: "+path);
+        }
+        JsonNode identity=host.path("operationEvidence");
+        ContractValidator.require(identity.path("registryHash").equals(inputs.get(requested.path("registryPath").asText()).path("sha256")),"registryHash differs from the read registry bytes");
+        ContractValidator.require(identity.path("catalogHash").equals(inputs.get(requested.path("catalogPath").asText()).path("sha256")),"catalogHash differs from the read catalog bytes");
+        ContractValidator.require(host.path("extractor").has("rawRows"),"verifyCoverage returns structured extractor rawRows");
+        JsonNode in=rows.path("input");JsonNode bound=inputs.get(requested.path(input).asText());
+        ContractValidator.require(in.path("snapshotKind").asText().equals(kind),"Verifier did not read the requested input snapshot kind");
+        ContractValidator.require(in.path("path").equals(bound.path("path")) && in.path("sha256").equals(bound.path("sha256")),"Verifier input snapshot path/hash differs from the requested bound file");
+        if(current) ContractValidator.require(in.path("currentExecution").equals(requested.path("currentExecution")),"Verifier currentExecution differs from request");
+        String mutation=requested.path("mutation").asText("none");
+        if(!mutation.equals("none")) ContractValidator.require(rows.path("mutatedInput").path("mutation").asText().equals(mutation),"Verifier mutated a different input than requested");
+        List<JsonNode> links=new ArrayList<>();
+        rows.path("assertionLinks").forEach(links::add);
+        for(JsonNode observation:rows.path("namedObservations")) observation.path("assertionLinks").forEach(links::add);
+        for(JsonNode link:links) {
+            String status=link.path("status").asText();
+            ContractValidator.require(LINK_STATUSES.contains(status),"Unknown assertion link status "+status);
+            boolean own=current && link.path("caseId").asText().equals(currentCase);
+            ContractValidator.require(own==status.equals("CURRENT_EXECUTION"),"Only the currentExecution case's links are CURRENT_EXECUTION, and all of them are: "+link.path("caseId").asText()+" "+status);
         }
     }
     private static void lifecycle(ContractValidator validator,JsonNode requested,JsonNode host,StepResult result) throws IOException {

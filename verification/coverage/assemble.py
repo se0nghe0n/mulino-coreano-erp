@@ -93,20 +93,53 @@ def same_json(left, right):
     return json.dumps(left, sort_keys=True) == json.dumps(right, sort_keys=True)
 
 
-def recheck_select(results, source):
+ABSENT = {'observation': 'ABSENT'}
+
+
+def resolve_refs(node, results, aliases=None):
+    """Resolve $result from captured action bytes and $alias from the captured installFixture aliasMap.
+
+    The runner resolves the same references (ReferenceResolver). Anything else ($transform, a missing
+    alias map or source) cannot be re-derived here and is left undecidable, never guessed."""
+    if isinstance(node, dict):
+        if '$alias' in node:
+            if aliases is None or len(node) != 1 or not isinstance(node['$alias'], str) or aliases.get(node['$alias']) is None:
+                raise NotRecheckable()
+            return aliases[node['$alias']]
+        if '$result' in node:
+            ref = node['$result']
+            if len(node) != 1 or not isinstance(ref, dict):
+                raise NotRecheckable()
+            try:
+                value = pointer(results[ref['actionId']], ref['pointer'])
+            except (KeyError, IndexError, TypeError, ValueError) as error:
+                raise NotRecheckable() from error
+            if value is None:
+                raise NotRecheckable()
+            return value
+        if any(k.startswith('$') for k in node):
+            raise NotRecheckable()
+        return {k: resolve_refs(v, results, aliases) for k, v in node.items()}
+    if isinstance(node, list):
+        return [resolve_refs(v, results, aliases) for v in node]
+    return node
+
+
+def recheck_select(results, source, aliases=None):
     """Mirror of the runner's documented pointer/where/field projection over captured StepResults."""
-    if not isinstance(source, dict) or has_reference(source.get('where')):
+    if not isinstance(source, dict):
         raise NotRecheckable()
+    where = resolve_refs(source['where'], results, aliases) if 'where' in source else None
     try:
         value = pointer(results[source['actionId']], source['pointer'])
     except (KeyError, IndexError, TypeError, ValueError) as error:
         raise NotRecheckable() from error
     if value is None:
         raise NotRecheckable()
-    if 'where' in source:
-        if not isinstance(value, list) or any(not isinstance(r, dict) or any(r.get(k) is None for k in source['where']) for r in value):
+    if where is not None:
+        if not isinstance(value, list) or not isinstance(where, dict) or any(not isinstance(r, dict) or any(r.get(k) is None for k in where) for r in value):
             raise NotRecheckable()
-        value = [r for r in value if all(same_json(r[k], v) for k, v in source['where'].items())]
+        value = [r for r in value if all(same_json(r[k], v) for k, v in where.items())]
     if 'field' in source:
         names = source['field'] if isinstance(source['field'], list) else [source['field']]
         if not isinstance(value, list) or any(not isinstance(r, dict) or r.get(n) is None for r in value for n in names):
@@ -121,62 +154,136 @@ def recheck_decimal(value):
     return decimal.Decimal(value)
 
 
-def independent_verdict(declared, results):
+def evaluate(declared, expected, value, unit=None, base=None, base_unit=None):
+    """Apply one declared operator to already projected values. True/False, or None when undecidable."""
+    op = declared.get('op')
+    if op not in RECHECK_OPS:
+        return None
+    if op == 'absent':
+        return same_json(value, ABSENT)
+    if 'unit' in declared:
+        units = unit if isinstance(unit, list) else [unit]
+        if not units or any(not same_json(u, declared['unit']) for u in units):
+            return False
+    if op == 'equals':
+        return same_json(value, expected)
+    if op == 'notEquals':
+        return not same_json(value, expected)
+    if op == 'present':
+        return value is not None and not same_json(value, ABSENT)
+    if op in ('decimalEquals', 'decimalAtMost', 'decimalAtLeast', 'decimalDelta'):
+        left, right = recheck_decimal(value), recheck_decimal(expected)
+        if left is None or right is None:
+            return False
+        if op == 'decimalDelta':
+            if 'unit' in declared and base_unit is not None and any(not same_json(u, declared['unit']) for u in (base_unit if isinstance(base_unit, list) else [base_unit])):
+                return False
+            base_value = recheck_decimal(base)
+            return base_value is not None and left - base_value == right
+        return left == right if op == 'decimalEquals' else left <= right if op == 'decimalAtMost' else left >= right
+    if op == 'sumEquals':
+        parts = [recheck_decimal(v) for v in value] if isinstance(value, list) else [None]
+        right = recheck_decimal(expected)
+        return None not in parts and right is not None and sum(parts, decimal.Decimal(0)) == right
+    if op == 'count':
+        return isinstance(value, list) and type(expected) is int and len(value) == expected
+    if op in ('exactSet', 'relationSet'):
+        if not isinstance(value, list) or not isinstance(expected, list):
+            return False
+        observed = [json.dumps(v, sort_keys=True) for v in value]
+        wanted = [json.dumps(v, sort_keys=True) for v in expected]
+        return len(observed) == len(set(observed)) and set(observed) == set(wanted)
+    if op == 'sameAs':
+        return same_json(value, base)
+    if op == 'fieldsPresent':
+        return (isinstance(value, list) and bool(value) and isinstance(expected, list)
+                and all(isinstance(r, dict) and r.get(f) is not None and not (isinstance(r.get(f), str) and not r[f].strip()) for r in value for f in expected))
+    return None
+
+
+def independent_verdict(declared, results, aliases=None):
     """Re-evaluate a declared assertion from captured action bytes. True/False, or None when undecidable."""
-    op, expected = declared.get('op'), declared.get('expected')
-    if op not in RECHECK_OPS or has_reference(expected):
+    op = declared.get('op')
+    if op not in RECHECK_OPS:
         return None
     try:
+        expected = resolve_refs(declared.get('expected'), results, aliases)
         if op == 'absent':
+            if 'where' in declared.get('source', {}) or 'field' in declared.get('source', {}):
+                return None
             try:
                 pointer(results[declared['source']['actionId']], declared['source']['pointer'])
                 return False
             except (KeyError, IndexError):
                 return True
-        value = recheck_select(results, declared.get('source'))
-        if 'unit' in declared:
-            unit = recheck_select(results, declared.get('unitSource'))
-            units = unit if isinstance(unit, list) else [unit]
-            if not units or any(not same_json(u, declared['unit']) for u in units):
-                return False
-        if op == 'equals':
-            return same_json(value, expected)
-        if op == 'notEquals':
-            return not same_json(value, expected)
-        if op == 'present':
-            return True
-        if op in ('decimalEquals', 'decimalAtMost', 'decimalAtLeast', 'decimalDelta'):
-            left, right = recheck_decimal(value), recheck_decimal(expected)
-            if left is None or right is None:
-                return False
-            if op == 'decimalDelta':
-                if 'unit' in declared:
-                    base_unit = recheck_select(results, declared.get('baselineUnitSource'))
-                    if any(not same_json(u, declared['unit']) for u in (base_unit if isinstance(base_unit, list) else [base_unit])):
-                        return False
-                base = recheck_decimal(recheck_select(results, declared.get('baseline')))
-                return base is not None and left - base == right
-            return left == right if op == 'decimalEquals' else left <= right if op == 'decimalAtMost' else left >= right
-        if op == 'sumEquals':
-            parts = [recheck_decimal(v) for v in value] if isinstance(value, list) else [None]
-            right = recheck_decimal(expected)
-            return None not in parts and right is not None and sum(parts, decimal.Decimal(0)) == right
-        if op == 'count':
-            return isinstance(value, list) and type(expected) is int and len(value) == expected
-        if op in ('exactSet', 'relationSet'):
-            if not isinstance(value, list) or not isinstance(expected, list):
-                return False
-            observed = [json.dumps(v, sort_keys=True) for v in value]
-            wanted = [json.dumps(v, sort_keys=True) for v in expected]
-            return len(observed) == len(set(observed)) and set(observed) == set(wanted)
-        if op == 'sameAs':
-            return same_json(value, recheck_select(results, declared.get('baseline')))
-        if op == 'fieldsPresent':
-            return (isinstance(value, list) and value and isinstance(expected, list)
-                    and all(isinstance(r, dict) and r.get(f) is not None and not (isinstance(r.get(f), str) and not r[f].strip()) for r in value for f in expected))
+        value = recheck_select(results, declared.get('source'), aliases)
+        unit = recheck_select(results, declared.get('unitSource'), aliases) if 'unit' in declared else None
+        base = recheck_select(results, declared.get('baseline'), aliases) if op in ('decimalDelta', 'sameAs') else None
+        base_unit = recheck_select(results, declared.get('baselineUnitSource'), aliases) if op == 'decimalDelta' and 'unit' in declared else None
+        return evaluate(declared, expected, value, unit, base, base_unit)
     except NotRecheckable:
         return None
+
+
+RECORD_KEYS = ('unit', 'baseline', 'unitSource', 'baselineUnitSource')
+
+
+def record_problem(declared, record, results, aliases=None):
+    """Compare a runner assertion record with the declared assertion and the captured bytes it claims to have compared.
+
+    The runner records op/unit/where/field and the post-projection observed values (CaseRunner). A record that drops
+    them, changes them, or reports values the captured bytes do not contain is not evidence of that assertion."""
+    if record.get('op') != declared.get('op'):
+        return 'operator differs from the declared assertion'
+    for key in RECORD_KEYS:
+        if record.get(key) != declared.get(key):
+            return f'{key} differs from the declared assertion'
+    source = declared.get('source', {})
+    if record.get('where') != source.get('where') or record.get('field') != source.get('field'):
+        return 'where/field differs from the declared assertion'
+    if 'observed' not in record:
+        return 'record lacks the compared observed value'
+    if declared.get('op') == 'absent':
+        decided = independent_verdict(declared, results, aliases)
+        if decided is not None and decided != same_json(record['observed'], ABSENT):
+            return 'recorded absence differs from captured bytes'
+        return None
+    checks = [('source', 'observed'), ('unitSource', 'observedUnit')] + ([('baseline', 'observedBaseline')] if 'baseline' in declared else [])
+    for source_key, record_key in checks:
+        if source_key not in declared or (source_key == 'unitSource' and 'unit' not in declared):
+            continue
+        try:
+            projected = recheck_select(results, declared[source_key], aliases)
+        except NotRecheckable:
+            continue
+        if record.get(record_key) is None or not same_json(projected, record[record_key]):
+            return f'recorded {record_key} differs from the projection of captured bytes'
+    if 'resolvedExpected' in record:
+        try:
+            if not same_json(resolve_refs(declared.get('expected'), results, aliases), record['resolvedExpected']):
+                return 'recorded resolved expected value differs from captured references'
+        except NotRecheckable:
+            pass
     return None
+
+
+def recorded_verdict(declared, record):
+    """Re-apply the operator to the values the runner recorded (used when the bytes alone are undecidable)."""
+    expected = record.get('resolvedExpected', declared.get('expected'))
+    if has_reference(expected) or record.get('observed') is None:
+        return None
+    return evaluate(declared, expected, record['observed'], record.get('observedUnit'), record.get('observedBaseline'))
+
+
+def alias_map(sub, results):
+    """The aliasMap of the last executed installFixture action; aliases are bound only by the actual fixture install."""
+    aliases = None
+    for action in flatten(sub.get('actions', [])):
+        if action.get('kind') == 'installFixture':
+            data = (results.get(action.get('id')) or {}).get('data')
+            if isinstance(data, dict) and isinstance(data.get('aliasMap'), dict):
+                aliases = data['aliasMap']
+    return aliases
 
 
 class Assembly:
@@ -410,6 +517,7 @@ class Assembly:
                 self.checked_descriptor(artifact)
             output_paths = set()
             documents = []
+            raw_paths = set()
             for artifact in receipt['artifacts']:
                 actual = self.checked_descriptor(artifact)
                 if '/src/test/' in '/' + actual['path'] or actual['path'].startswith(('verification/coverage/checks/', 'verification/model-corpus/checks/')):
@@ -417,9 +525,21 @@ class Assembly:
                 if actual['path'] in output_paths:
                     raise ValueError('Duplicate canonical actual artifact path')
                 output_paths.add(actual['path'])
+                if not isinstance(artifact.get('scope'), dict) or not artifact['scope'] or artifact.get('completeness') != 'COMPLETE':
+                    raise ValueError('Actual artifact scope/completeness missing')
+                role = artifact.get('role', 'ENVELOPE')
+                if role == 'RAW_CAPTURE':
+                    # Adapter bytes captured during the run cannot know the final command interval or exit code, so they
+                    # are bound by path/hash/bytes/scope only. They count only when an envelope observation references them.
+                    if actual['path'] == self.descriptor(report_ref)['path'] or any(marker in actual['path'].lower() for marker in BAD_MARKERS):
+                        raise ValueError('Raw capture path cannot be the report or a selftest artifact')
+                    raw_paths.add(actual['path'])
+                    continue
+                if role != 'ENVELOPE':
+                    raise ValueError('Unknown actual artifact role')
                 content = json.loads(self.file(actual['path']).read_text())
                 documents.append(content)
-                if not isinstance(artifact.get('scope'), dict) or not artifact['scope'] or artifact.get('completeness') != 'COMPLETE' or content.get('scope') != artifact['scope']:
+                if content.get('scope') != artifact['scope']:
                     raise ValueError('Actual artifact scope/completeness differs from captured bytes')
                 if content.get('evidenceClass') not in ARTIFACT_CLASSES or content.get('executionIdentity') != identity or content.get('command') != command or content.get('versions') != versions:
                     raise ValueError('Actual artifact execution identity/command/versions differ from receipt')
@@ -443,6 +563,16 @@ class Assembly:
                     raise ValueError('Fictional fixture/selftest policy cannot become regulatory acceptance')
             if not any(document.get('profileResult') == report for document in documents):
                 raise ValueError('Actual profile report lacks matching independently captured artifact bytes')
+            referenced = {self.descriptor(ref)['path'] for document in documents for result in (document.get('observations') or {}).values()
+                          if isinstance(result, dict) for ref in result.get('artifactRefs', [])}
+            if not raw_paths <= referenced:
+                raise ValueError('Raw capture is not referenced by any captured action observation')
+            case_versions = receipt.get('caseVersions', [])
+            keys = [(v.get('caseId'), v.get('subcaseId')) for v in case_versions if isinstance(v, dict)]
+            if not isinstance(case_versions, list) or len(keys) != len(case_versions) or len(set(keys)) != len(keys):
+                raise ValueError('caseVersions needs unique case/subcase entries')
+            if any(versions.get(k) == 'PER_CASE' for k in ('definition', 'evaluator', 'policy')) and not case_versions:
+                raise ValueError('PER_CASE versions need exact caseVersions entries')
             receipt['_artifactPaths'] = output_paths
             receipt['_artifactDocuments'] = documents
             receipt['_descriptors'] = {self.descriptor(a['path'])['path']: dict(self.descriptor(a['path']), scope=a['scope'], completeness=a['completeness']) for a in receipt['artifacts']}
@@ -514,14 +644,22 @@ class Assembly:
         try:
             if run.get('caseHash') != declaration['caseHash'] or not declaration['fixtureArtifacts'] or run.get('fixtureHash') != declaration['fixtureArtifacts'][0]['sha256']:
                 raise ValueError('Runtime case/fixture hash differs from actual files')
-            if any(run.get('versions', {}).get(k) != receipt['versions'].get(k) for k in ['definition', 'evaluator', 'policy']):
-                raise ValueError('Case versions differ from command receipt')
+            per_case = [v.get('versions', {}) for v in receipt.get('caseVersions', []) if v.get('caseId') == declaration['caseId'] and v.get('subcaseId') == declaration['subcaseId']]
+            for k in ['definition', 'evaluator', 'policy']:
+                wanted = receipt['versions'].get(k)
+                if wanted == 'PER_CASE' or per_case:
+                    if len(per_case) != 1:
+                        raise ValueError('Case versions missing from command receipt caseVersions')
+                    wanted = per_case[0].get(k)
+                if run.get('versions', {}).get(k) != wanted or not nonempty(wanted) or wanted == 'PER_CASE':
+                    raise ValueError('Case versions differ from command receipt')
             if not instant(receipt['command']['startedAt']) <= instant(run.get('startedAt')) <= instant(run.get('finishedAt')) <= instant(receipt['command']['completedAt']):
                 raise ValueError('Case interval is outside actual command interval')
             required_inputs = {self.descriptor(f'verification/cases/{declaration["caseId"]}/case.json')['path']} | {d['path'] for d in declaration['fixtureArtifacts']}
             if not required_inputs <= {d.get('path') for d in receipt['inputs']}:
                 raise ValueError('Case/fixture/base input hash descriptors missing in receipt')
             action_results = run.get('actions', {})
+            aliases = alias_map(sub, action_results)
             expected_actions = {a['id']: a for a in flatten(sub.get('actions', []))}
             expected_assertions = {a['id']: a for a in sub.get('assertions', [])}
             observed_assertions = {a.get('assertionId'): a for a in run.get('assertions', [])}
@@ -553,10 +691,18 @@ class Assembly:
                 if state in ('PASS', 'FAIL'):
                     if actual.get('expected') != declared.get('expected') or actual.get('source') != declared.get('source'):
                         raise ValueError('Runtime assertion differs from declared oracle/source')
-                    # Do not take the runner's PASS on trust: re-evaluate what can be decided from the captured
-                    # action bytes with the declared op/unit/where/field/baseline. Undecidable cases are left to review.
-                    if state == 'PASS' and independent_verdict(declared, action_results) is False:
-                        raise ValueError(f'Runner PASS contradicts independent re-evaluation of {aid} over captured bytes')
+                    # Do not take the runner's PASS on trust: the record must restate the declared op/unit/where/field and
+                    # the post-projection values it compared, those values must be what the captured bytes project to, and
+                    # the operator is re-applied. Only what neither bytes nor record can decide is left to review.
+                    if state == 'PASS':
+                        problem = record_problem(declared, actual, action_results, aliases)
+                        if problem:
+                            raise ValueError(f'Runtime assertion record of {aid}: {problem}')
+                        verdict = independent_verdict(declared, action_results, aliases)
+                        if verdict is None:
+                            verdict = recorded_verdict(declared, actual)
+                        if verdict is False:
+                            raise ValueError(f'Runner PASS contradicts independent re-evaluation of {aid} over captured bytes')
                     sources = [declared[key] for key in ['source', 'baseline', 'unitSource', 'baselineUnitSource'] if key in declared]
                     observed = {}
                     for source in sources:

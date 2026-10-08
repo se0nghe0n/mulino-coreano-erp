@@ -34,7 +34,7 @@ exit code를 출력하며 `verification/harness/target/wrapper-commands.json`에
   하나를 실행한다. `contract-red --all`은 모든 case의 JSON 행동과 모든
   substantive assertion을 실행한다. 이 모드는 Gherkin discovery와
   구별하며 `red.json`의 미구현 assertion들을 기록한다.
-- `prepare`/`coverage`: case/assertion/Gherkin 연결, 독립 registry와 규범
+- `prepare`: case/assertion/Gherkin 연결, 독립 registry와 규범
   catalog를 검사한다. 준비 PASS는 `PREPARED`, runtime/artifact는
   `NOT_RUN`이며 제품 gate는 닫히지 않는다. semantic oracle equivalence는
   case review가 필요하다. JSON pointer 존재만으로 이를 증명하지 않는다.
@@ -42,9 +42,56 @@ exit code를 출력하며 `verification/harness/target/wrapper-commands.json`에
   subcase 중 하나 이상이 독립 `observe` 결과를 source/baseline으로 읽는
   assertion을 그 observation 또는 같은 oracle의 sibling observation에
   연결해야 한다. API 응답만으로는 문제로 보고한다.
+  coverage assembler와 같은 규칙으로 다음도 preparation 문제로 센다.
+  - **필수 profile 도달성**: oracle `requiredLayers`가 요구하는 profile
+    (UNIT→contracts, API/DB→scenarios, MCP→mcp, SKILLS→skills,
+    MODEL→model, LOCAL/BTP_DEPLOYMENT→local-/btp-deployment,
+    REGULATORY_REVIEW→regulatory)에 연결된 assertion이 하나도 없는
+    observation은 실행해도 영원히 NOT_RUN이다. `Unreachable required
+    profile: <oracle>/<observation> requires <profile> ...`로 보고한다.
+    case의 `deployment`는 두 deployment profile로 펼치고, REGULATORY_REVIEW
+    observation에 연결된 subcase는 별도 regulatory 증거 profile에도 둔다
+    (`CatalogLinkValidator.requiredProfileReachability`, `assemble.py`의
+    `declarations`).
+  - **규범 lock과 case 자산 검사**: `prepare.json`의 `caseAssetChecks`에
+    command·script hash·exit를 남긴다. `verification/requirements/
+    validate_catalog.py`(assembler가 쓰는 같은 lock 검증기, 빈·null lock도
+    FAIL), `verification/cases/V2/cases_b_invariants.py`,
+    `verification/cases/T08/bind_observations.py --check`,
+    `verification/mcp-tests/test_generators_reproduce.py`(생성기 출력과
+    commit 파일의 byte 동일성)다. 모두 읽기 전용이며 python이나 script가
+    없으면 실패한다.
+  - **비정규 오류 pointer**: 아래 "응답 오류 envelope" 절.
+- `coverage`: `verification/model-binding/run prepare` 뒤
+  `python3 verification/coverage/assemble.py --check-preparation`을 실행하고
+  assembler의 exit code(0 PASS, 1 FAIL, 2 NOT_RUN, 3 형식 오류)를 그대로
+  돌려준다. assembler가 새 `./verify prepare`를 직접 실행하고 receipt·
+  artifact bytes를 다시 읽는다. `--index <file>`로 실제 실행 index를 준다
+  (기본은 빈 `verification/coverage/runtime-evidence-index.json`). Java
+  `Main`의 `coverage` mode는 없다(형식 오류). 이전에는 `./verify coverage`가
+  준비 보고만 만들고 exit0을 냈다.
 - `schema`, `contracts`, `scenarios`, `recovery`, `mcp`, `skills`, `model`,
   `deployment`: 실제 adapter가 없는 현재는 `NOT_RUN`, exit2다. 선행
   profile과 미완료 gate를 보고한다. 모델·유료 배포를 호출하지 않는다.
+  보고서에는 assembler가 읽는 `discovered`·`started`·`completed`(이
+  profile에 선택된 subcase 수)와 `skipped=0`이 있다. `gateComplete`는 이
+  profile 자체의 gate다. 실제 driver(`--actual`)로 선택된 모든 subcase가
+  발견·시작·완료되고 PASS일 때만 true다. 선행 profile은
+  `prerequisiteRuntimeComplete=false`로 남기고 assembler가 합성한다.
+- `--actual`의 schema~skills profile 실행은 coverage receipt를 만든다
+  (`ExecutionReceiptProducer`). 조건을 하나라도 못 채우면 receipt를 쓰지
+  않고 stdout `COVERAGE_RECEIPT {"status":"NOT_EMITTED",...}`로 이유를 낸다.
+  조건: 실제 driver, 모든 case가 PRODUCT 정책, 실행 action provenance에
+  selftest/captured/stub 표지 없음, 실행 전후 clean working tree,
+  `ACTUAL_BUILD_COMMIT`=기록 commit, `ACTUAL_SCHEMA_VERSION`·(scenarios
+  이후)`ACTUAL_DB_VERSION`·(mcp/skills)`ACTUAL_MCP_PROTOCOL_VERSION`.
+  산출물은 `target/evidence/<profile>-receipt.json`, envelope 문서
+  `target/evidence/receipts/<profile>-<runId>/`, 갱신된
+  `target/evidence/actual-runtime-evidence-index.json`이다. 실행 identity의
+  `hostId`·`actorId`는 `ACTUAL_HOST_ID`·`ACTUAL_EXECUTION_ACTOR`(없으면
+  hostname·OS 사용자)다. harness selftest·RED·unimplemented driver는 이
+  경로에 오지 않는다. receipt는 무결성·연결 증거이며 adapter 뒤 시스템이
+  진짜라는 attestation이 아니다. 형식은 `verification/coverage/README.md`.
 - `model|deployment --manifest <path>`(또는 `--manifest=<path>`):
   `contracts/acceptance-run-manifest.schema.json`의 실행 manifest를 검증한다.
   manifest를 case 파일로 읽지 않는다. 보고서 `runManifest`에 path·sha256·
@@ -365,6 +412,33 @@ transaction/barrier/worker, source/기관 제출, actual host/model, BTP와 규�
 fixture/manifest에 확정하지 않는다. runtime artifact가 없으면 준비된
 assertion 수와 별개로 제품 gate를 미완료로 남긴다.
 
+## 응답 오류 envelope과 의무 행 유효성
+
+명령 응답의 오류 코드는 하나의 envelope에만 있다.
+`contracts/command-response.schema.json`의 `/error/code`(대문자 구조 코드)이며
+case는 api/mcp invoke와 그 await 결과에서 `/response/error/code`로 읽는다.
+`REJECTED`·`CONFLICT`는 `error`를 반드시 가지며 응답 최상위 `errorCode`·
+`code`는 계약이 금지한다. raw MCP wire의 tool 결과는 같은 envelope을
+`/response/body/result/structuredContent/error/code`로 읽는다. JSON-RPC
+protocol 오류(`/response/body/error/code`, 정수 -32xxx)는 공식 MCP의 다른
+envelope이라 허용한다.
+
+`./verify prepare`는 assertion source/baseline이 `/response/code`이거나
+`/response` 아래 마지막 segment가 `errorCode`·`error_code`인 pointer를
+`... is not the canonical error envelope /response/error/code`로 거부한다
+(`ContractValidator.errorPointerProblems`). 이런 assertion은 계약을 지킨
+제품에서 실패하고 계약을 어긴 제품에서 통과하기 때문이다.
+2026-10-08 `d21aee7c` 기준 남은 위반은 C1 3, T03 2, T04 11, T05 2,
+T16 3(`/response/errorCode`), T18 1(`/response/code`)의 22개다. 각 case
+소유자가 고친다.
+
+의무 원행(`obligations`)과 판정 원행(`assessments`)의 `current`는 그 행이
+현재 유효한 revision인지(대체·정정되지 않았는지)를 뜻한다. 상태(`status`:
+OPEN·RESOLVED·WAIVED 등)와 독립이다. 해소된 의무도 대체되지 않았으면
+`current=true`이고, 정정으로 대체된 과거 판정은 `current=false`로 남는다.
+따라서 "현재 열린 의무"는 `{"current":true,"status":"OPEN"}`처럼 두 조건을
+함께 쓴다. `current`만으로 미해결을 뜻하게 쓰지 않는다(C4·E1이 이 의미다).
+
 ## case 작성에 필요한 identity·원행·protocol 계약
 
 `expected`, `scope`, `source.where`, `baseline.where`와 단위 source의
@@ -464,6 +538,21 @@ host/runtime 검사는 `control(type=process)`의 명시 operation으로 선언�
 완료 증거를 구분한다. server/discover·skillLoading·modelEvaluation 등의
 pseudo label을 public business capability로 추가하지 않는다.
 
+
+## runtime assertion 기록
+
+`CaseRunner`의 assertion 기록(`evidence().assertions[]`)은 판정 결과만이
+아니라 선언과 비교 값을 함께 남긴다. `op`, 선언 `unit`·`baseline`·
+`unitSource`·`baselineUnitSource`, `source.where`·`source.field`를
+`where`·`field`로, 참조를 푼 `resolvedExpected`·`resolvedWhere`, 그리고
+where/field projection 뒤 실제 비교한 `observed`·`observedUnit`·
+`observedBaseline`이다. 부재(`absent`)는 `{"observation":"ABSENT"}`로 쓴다.
+coverage assembler는 PASS 기록의 op/unit/where/field가 case 선언과 같은지,
+`observed`가 capture된 action bytes를 같은 규칙으로 projection한 값과
+같은지 다시 확인하고 operator를 재적용한다. `$result`는 capture bytes에서,
+`$alias`는 실행된 installFixture의 `aliasMap`에서 푼다. bytes로 정할 수
+없는 경우에만 기록된 값으로 operator를 재적용하고, 그것도 안 되면
+review에 남긴다. 기록이 없거나 다르면 FAIL이다.
 
 ## assertion identity field allowlist
 

@@ -43,6 +43,26 @@ public final class ContractValidator {
             }
         return problems;
     }
+    /**
+     * contracts/command-response.schema.json fixes one structured error envelope: the code is at /error/code of the
+     * response object, read as /response/error/code (and /response/body/result/structuredContent/error/code over raw
+     * MCP wire). A case that reads /response/errorCode, /response/code or any other *errorCode field asserts a field
+     * the contract forbids, so a correct product cannot pass it while a non-conforming one can. JSON-RPC protocol
+     * errors (/response/body/error/code) are a different, official envelope and stay allowed.
+     */
+    public List<String> errorPointerProblems(JsonNode caseFile) {
+        List<String> problems=new ArrayList<>();
+        for(JsonNode sub:caseFile.path("subcases")) for(JsonNode assertion:sub.path("assertions"))
+            for(String field:List.of("source","baseline")) if(assertion.has(field)) {
+                String pointer=assertion.path(field).path("pointer").asText();
+                if(!pointer.equals("/response") && !pointer.startsWith("/response/")) continue;
+                String last=pointer.substring(pointer.lastIndexOf('/')+1);
+                if(pointer.equals("/response/code") || last.equals("errorCode") || last.equals("error_code"))
+                    problems.add(caseFile.path("caseId").asText()+"/"+sub.path("id").asText()+"/"+assertion.path("id").asText()+": "+field+" "+pointer
+                        +" is not the canonical error envelope /response/error/code (contracts/command-response.schema.json)");
+            }
+        return problems;
+    }
     public Path root() { return root; }
     public Path path(String relative) {
         Path p=root.resolve(relative).normalize();

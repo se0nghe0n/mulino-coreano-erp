@@ -115,6 +115,34 @@ class CoverageSelftest(unittest.TestCase):
                 mutation(receipt)
                 self.assertIsNone(self.receipt_check(report, receipt, raw))
 
+    def raw_capture_check(self, referenced, versions=None, case_versions=None):
+        report, receipt, raw = self.protocol_fixture()
+        capture = dict(self.write('evidence/read-1.json', {'httpStatus': 200}), scope={'actionId': 'read'}, completeness='COMPLETE', role='RAW_CAPTURE')
+        if referenced:
+            raw['observations'] = {'read': {'actionId': 'read', 'artifactRefs': ['evidence/read-1.json']}}
+        receipt = copy.deepcopy(receipt)
+        receipt['versions'].update(versions or {})
+        raw['versions'] = receipt['versions']
+        if case_versions is not None:
+            receipt['caseVersions'] = case_versions
+        receipt['reportArtifact'] = self.write('report.json', report)
+        receipt['artifacts'] = [dict(self.write('raw.json', raw), scope=raw['scope'], completeness='COMPLETE'), capture]
+        self.write('receipt.json', receipt)
+        return self.a.receipt(report, 'receipt.json', 'schema', 'report.json')
+
+    def test_raw_capture_is_bound_by_hash_and_must_be_referenced_by_an_envelope(self):
+        # The Java producer binds adapter bytes as RAW_CAPTURE: they cannot carry the final command interval.
+        self.assertIsNotNone(self.raw_capture_check(True))
+        self.assertIsNone(self.raw_capture_check(False))
+        self.assertTrue(any('Raw capture is not referenced' in p['reason'] for p in self.a.problems))
+
+    def test_per_case_versions_need_exact_case_entries(self):
+        self.assertIsNone(self.raw_capture_check(True, versions={'policy': 'PER_CASE'}))
+        self.assertTrue(any('PER_CASE versions need' in p['reason'] for p in self.a.problems))
+        entry = {'caseId': 'T01', 'subcaseId': 'only', 'versions': {'definition': 'd', 'evaluator': 'e', 'policy': 'p'}}
+        self.assertIsNone(self.raw_capture_check(True, versions={'policy': 'PER_CASE'}, case_versions=[entry, entry]))
+        self.assertIsNotNone(self.raw_capture_check(True, versions={'policy': 'PER_CASE'}, case_versions=[entry]))
+
     def test_actual_missing_artifact_is_not_run(self):
         report, receipt, raw = self.protocol_fixture()
         (self.root / 'raw.json').unlink()
@@ -250,7 +278,7 @@ class CoverageSelftest(unittest.TestCase):
         report, receipt, raw = self.protocol_fixture()
         action = {'actionId': 'read', 'driverStatus': 'EXECUTED', 'response': {'quantity': '80'},
                   'provenance': {'scopeComplete': True, 'source': 'ACTUAL_API'}, 'artifactRefs': ['raw.json']}
-        assertion = dict(assertionId='quantity', expected='80', source=declaration['_sub']['assertions'][0]['source'], status='PASS')
+        assertion = dict(assertionId='quantity', op='decimalEquals', expected='80', source=declaration['_sub']['assertions'][0]['source'], status='PASS', observed='80')
         run = dict(caseId='T01', subcaseId='only', status='PASS', runtimeComplete=True,
                    caseHash=case['sha256'], fixtureHash=fixture['sha256'], versions=receipt['versions'],
                    startedAt='2026-10-07T00:00:01Z', finishedAt='2026-10-07T00:00:03Z',
@@ -265,12 +293,16 @@ class CoverageSelftest(unittest.TestCase):
         self.a.run_case(declaration, {'schema': {'_report': report, '_receipt': checked, 'status': 'PASS'}})
         self.assertEqual('FAIL', declaration['status'])
 
-    def captured_run(self, observed_quantity):
+    def captured_run(self, observed_quantity, **record):
         declaration, case, fixture = self.declaration()
         report, receipt, raw = self.protocol_fixture()
         action = {'actionId': 'read', 'driverStatus': 'EXECUTED', 'response': {'quantity': observed_quantity},
                   'provenance': {'scopeComplete': True, 'source': 'ACTUAL_API'}, 'artifactRefs': ['raw.json']}
-        assertion = dict(assertionId='quantity', expected='80', source=declaration['_sub']['assertions'][0]['source'], status='PASS')
+        assertion = dict(assertionId='quantity', op='decimalEquals', expected='80', source=declaration['_sub']['assertions'][0]['source'], status='PASS',
+                         observed=observed_quantity)
+        assertion.update(record)
+        for key in [k for k, v in record.items() if v is None]:
+            del assertion[key]
         run = dict(caseId='T01', subcaseId='only', status='PASS', runtimeComplete=True,
                    caseHash=case['sha256'], fixtureHash=fixture['sha256'], versions=receipt['versions'],
                    startedAt='2026-10-07T00:00:01Z', finishedAt='2026-10-07T00:00:03Z',
@@ -291,6 +323,28 @@ class CoverageSelftest(unittest.TestCase):
         self.assertEqual('FAIL', declaration['status'])
         self.assertTrue(any('contradicts independent re-evaluation' in p['reason'] for p in self.a.problems))
 
+    def test_runtime_record_must_restate_operator_and_projected_value(self):
+        # coverage-08: the runner record carries op/unit/where/field and the post-projection compared value.
+        for record, reason in [(dict(op=None), 'operator differs'), (dict(op='decimalAtLeast'), 'operator differs'),
+                               (dict(observed=None), 'lacks the compared observed value'), (dict(observed='79'), 'recorded observed differs'),
+                               (dict(unit='BOX'), 'unit differs'), (dict(where={'k': 'A'}), 'where/field differs')]:
+            with self.subTest(record=record):
+                self.a = m.Assembly(self.root, COMMIT)
+                declaration = self.captured_run('80', **record)
+                self.assertEqual('FAIL', declaration['status'])
+                self.assertTrue(any(reason in p['reason'] for p in self.a.problems), self.a.problems)
+
+    def test_recorded_values_decide_when_captured_bytes_cannot(self):
+        declared = dict(op='decimalEquals', source=dict(actionId='x', pointer='/data/rows', where={'k': {'$alias': 'A'}}, field='q'), expected='80')
+        results = {'x': {'data': {'rows': [{'k': 'id-a', 'q': '80'}]}}}
+        self.assertIsNone(m.independent_verdict(declared, results))
+        self.assertIs(False, m.recorded_verdict(declared, dict(observed=['80'])))  # list is not one decimal
+        self.assertIs(True, m.independent_verdict(dict(declared, op='sumEquals'), results, {'A': 'id-a'}))
+        self.assertIs(False, m.independent_verdict(dict(declared, op='sumEquals'), results, {'A': 'other'}))
+        self.assertIs(False, m.recorded_verdict(dict(declared, op='sumEquals'), dict(observed=['70'])))
+        self.assertIn('differs', m.record_problem(dict(declared, op='sumEquals'), dict(op='sumEquals', where=declared['source']['where'], field='q', observed=[]),
+                                                   results, {'A': 'id-a'}))
+
     def test_independent_verdict_projection_ops_and_undecidable_references(self):
         results = {'x': {'data': {'rows': [{'k': 'A', 'q': '80', 'u': 'BOX'}, {'k': 'B', 'q': '20', 'u': 'BOX'}], 'v': '80', 'n': None}}}
         src = lambda pointer, **extra: dict(actionId='x', pointer=pointer, **extra)
@@ -306,7 +360,8 @@ class CoverageSelftest(unittest.TestCase):
             (dict(op='decimalAtMost', source=src('/data/v'), expected='79'), False),
             (dict(op='absent', source=src('/data/n'), expected=True), False),
             (dict(op='absent', source=src('/data/missing'), expected=True), True),
-            (dict(op='equals', source=src('/data/v'), expected={'$result': {'actionId': 'x', 'pointer': '/data/v'}}), None),
+            (dict(op='equals', source=src('/data/v'), expected={'$result': {'actionId': 'x', 'pointer': '/data/v'}}), True),
+            (dict(op='equals', source=src('/data/v'), expected={'$result': {'actionId': 'missing', 'pointer': '/data/v'}}), None),
             (dict(op='count', source=src('/data/rows', where={'k': {'$alias': 'A'}}), expected=1), None),
             (dict(op='timeEquals', source=src('/data/v'), expected='80'), None),
         ]
