@@ -1,0 +1,408 @@
+{
+  "schemaVersion": "1.0.0",
+  "status": "NOT_RUN",
+  "actions": [
+    {
+      "id": "c4-create-sales-work",
+      "type": "command",
+      "capability": "createWork",
+      "request": {
+        "intentKind": "COMMAND",
+        "definitionVersion": "definition-v1",
+        "capabilityId": "createWork",
+        "expectedRevision": 0,
+        "commandIdempotencyKey": "c4-create-sales-work",
+        "slots": {
+          "workType": "SALES",
+          "quantityMode": "CUMULATIVE_EVENT",
+          "endpoint": "DELIVERED",
+          "dueAt": "2026-10-31T00:00:00Z",
+          "evidencePolicyVersion": "fixture-v1",
+          "ownerId": "$reader",
+          "supervisorId": "$supervisor",
+          "quantity": {
+            "value": "100",
+            "unit": "BOX"
+          },
+          "period": {
+            "start": "2026-10-01T00:00:00Z",
+            "end": "2026-10-31T00:00:00Z",
+            "startInclusive": true,
+            "endInclusive": true
+          },
+          "eventKinds": [
+            "PHYSICAL_DELIVERY"
+          ],
+          "distinctContributionScope": {
+            "itemId": "$P"
+          }
+        },
+        "provenance": {},
+        "subjectRefs": [
+          {
+            "type": "TradeItem",
+            "id": "$P"
+          }
+        ]
+      },
+      "bind": {
+        "SALES_WORK": "/effects/workId",
+        "SALES_WORK_REV": "/revision"
+      }
+    },
+    {
+      "id": "c4-create-sales",
+      "type": "command",
+      "capability": "createSalesOrder",
+      "request": {
+        "intentKind": "COMMAND",
+        "definitionVersion": "definition-v1",
+        "capabilityId": "createSalesOrder",
+        "expectedRevision": 0,
+        "commandIdempotencyKey": "c4-create-sales",
+        "slots": {
+          "workId": "$SALES_WORK",
+          "customerId": "$C",
+          "itemId": "$P",
+          "quantity": "100",
+          "unit": "BOX",
+          "price": "1",
+          "currency": "EUR",
+          "dueAt": "2026-10-31T00:00:00Z",
+          "destinationId": "$CUSTOMER_PLACE",
+          "deliveryEndpoint": "DELIVERED",
+          "qualityTerms": "가상 조건 충족",
+          "packageTerms": "가상 포장 조건 충족"
+        },
+        "provenance": {},
+        "subjectRefs": [
+          {
+            "type": "Work",
+            "id": "$SALES_WORK"
+          },
+          {
+            "type": "TradeItem",
+            "id": "$P"
+          }
+        ]
+      },
+      "outcome": "APPLIED",
+      "bind": {
+        "SALES_ORDER": "/effects/orderId",
+        "SALES_LINE": "/effects/lineId"
+      }
+    },
+    {
+      "id": "c4-segment-revision",
+      "type": "query",
+      "capability": "getObject",
+      "request": {
+        "id": "$c4-receipt60.segment",
+        "scope": {
+          "organizationId": "$ORG",
+          "objectType": "QuantitySegment"
+        },
+        "asOf": "2026-10-07T09:00:02Z",
+        "knownAt": "2026-10-07T09:00:02Z"
+      },
+      "bind": {
+        "RESERVE_SEGMENT_REV": "/data/revision"
+      }
+    },
+    {
+      "id": "c4-reserve30",
+      "type": "command",
+      "capability": "reserveQuantity",
+      "request": {
+        "intentKind": "COMMAND",
+        "definitionVersion": "definition-v1",
+        "capabilityId": "reserveQuantity",
+        "expectedRevision": "$RESERVE_SEGMENT_REV",
+        "commandIdempotencyKey": "c4-reserve30",
+        "slots": {
+          "segmentId": "$c4-receipt60.segment",
+          "salesLineId": "$SALES_LINE",
+          "startQuantity": "0",
+          "quantity": "100",
+          "unit": "BOX"
+        },
+        "provenance": {},
+        "subjectRefs": [
+          {
+            "type": "QuantitySegment",
+            "id": "$c4-receipt60.segment"
+          },
+          {
+            "type": "SalesOrderLine",
+            "id": "$SALES_LINE"
+          }
+        ]
+      },
+      "outcome": "APPLIED",
+      "bind": {
+        "ALLOCATION": "/effects/allocationId",
+        "ALLOCATION_REV": "/revision"
+      }
+    },
+    {
+      "id": "c4-pick30",
+      "type": "command",
+      "capability": "pickQuantity",
+      "request": {
+        "intentKind": "COMMAND",
+        "definitionVersion": "definition-v1",
+        "capabilityId": "pickQuantity",
+        "expectedRevision": "$ALLOCATION_REV",
+        "commandIdempotencyKey": "c4-pick30",
+        "slots": {
+          "allocationId": "$ALLOCATION"
+        },
+        "provenance": {},
+        "subjectRefs": [
+          {
+            "type": "Work",
+            "id": "$WORK"
+          }
+        ]
+      },
+      "outcome": "APPLIED",
+      "bind": {
+        "ALLOCATION_REV": "/revision"
+      }
+    },
+    {
+      "id": "c4-dispatch30",
+      "type": "command",
+      "capability": "dispatchQuantity",
+      "request": {
+        "intentKind": "COMMAND",
+        "definitionVersion": "definition-v1",
+        "capabilityId": "dispatchQuantity",
+        "expectedRevision": "$ALLOCATION_REV",
+        "commandIdempotencyKey": "c4-dispatch30",
+        "slots": {
+          "allocationId": "$ALLOCATION",
+          "transitPlaceId": "$TRANSIT",
+          "occurredAt": "2026-10-07T09:00:02Z",
+          "evidenceRef": "synthetic-c4-dispatch30"
+        },
+        "provenance": {},
+        "subjectRefs": [
+          {
+            "type": "Work",
+            "id": "$WORK"
+          }
+        ]
+      },
+      "outcome": "APPLIED",
+      "bind": {
+        "DISPATCH": "/effects/dispatchId",
+        "CARGO": "/effects/cargoScopeId",
+        "TRANSIT_SEGMENT": "/effects/transitSegmentId",
+        "DISPATCH_RANGE": "/effects/rangeRootId"
+      }
+    },
+    {
+      "id": "c4-consumed-before-real-delivery",
+      "type": "observe",
+      "assertions": [
+        {
+          "pointer": "/rawRows/mulino_inventory_segmentallocations",
+          "operator": "matchingRows",
+          "where": {
+            "id": "$ALLOCATION",
+            "state": "CONSUMED"
+          },
+          "expected": 1
+        }
+      ]
+    },
+    {
+      "id": "DELIVERY_EVENT",
+      "type": "uuid",
+      "alias": "DELIVERY_EVENT"
+    },
+    {
+      "id": "DELIVERY_OBSERVATION",
+      "type": "uuid",
+      "alias": "DELIVERY_OBSERVATION"
+    },
+    {
+      "id": "c4-delivery-original",
+      "type": "original",
+      "fixture": {
+        "synthetic": true,
+        "clock": {
+          "asOf": "2026-10-07T09:00:02Z",
+          "knownAt": "2026-10-07T09:00:02Z"
+        },
+        "sourceProfile": {
+          "namespace": "native-c4-c4-delivery-original",
+          "policyVersion": "fixture-v1",
+          "nextAction": "원본 범위와 실제 효과 대조",
+          "nextCheckAt": "2026-10-08T09:00:00Z"
+        },
+        "occurrence": {
+          "kind": "PHYSICAL_DELIVERY",
+          "content": {
+            "deliveryEventId": "$DELIVERY_EVENT",
+            "dispatchId": "$DISPATCH",
+            "cargoScopeId": "$CARGO",
+            "salesLineId": "$SALES_LINE",
+            "customerId": "$C",
+            "itemId": "$P",
+            "lotId": "$L",
+            "rangeRootId": "$DISPATCH_RANGE",
+            "physicalScopeId": "$DELIVERY_OBSERVATION",
+            "startQuantity": "0",
+            "quantity": "100",
+            "unit": "BOX",
+            "placeId": "$CUSTOMER_PLACE",
+            "occurredAt": "2026-10-07T09:00:02Z"
+          },
+          "externalEventId": "c4-delivery-original",
+          "quantity": "100",
+          "unit": "BOX",
+          "assertion": "authored synthetic external original"
+        }
+      },
+      "binding": {
+        "organizationId": "$ORG",
+        "workId": "$SALES_WORK",
+        "itemId": "$P",
+        "actorId": "$reader",
+        "supervisorId": "$supervisor",
+        "physicalScopeId": "$DELIVERY_OBSERVATION",
+        "subjectId": "$SALES_WORK",
+        "subjectKind": "WORK",
+        "placeId": "$CUSTOMER_PLACE"
+      }
+    },
+    {
+      "id": "c4-delivery-intake",
+      "type": "command",
+      "capability": "recordDelivery",
+      "request": {
+        "intentKind": "RECORD",
+        "definitionVersion": "definition-v1",
+        "capabilityId": "recordDelivery",
+        "expectedRevision": 0,
+        "commandIdempotencyKey": "c4-delivery-intake",
+        "slots": {
+          "observationId": "$DELIVERY_OBSERVATION",
+          "eventId": "$c4-delivery-original.event",
+          "dispatchId": "$DISPATCH",
+          "cargoScopeId": "$CARGO",
+          "salesLineId": "$SALES_LINE",
+          "workId": "$SALES_WORK",
+          "customerId": "$C",
+          "itemId": "$P",
+          "lotId": "$L",
+          "rangeRootId": "$DISPATCH_RANGE",
+          "startQuantity": "0",
+          "quantity": "100",
+          "unit": "BOX",
+          "placeId": "$CUSTOMER_PLACE",
+          "occurredAt": "2026-10-07T09:00:02Z",
+          "nextAction": "인도 원본 대조",
+          "nextCheckAt": "2026-10-08T09:00:00Z"
+        },
+        "provenance": {},
+        "subjectRefs": [
+          {
+            "type": "Work",
+            "id": "$SALES_WORK"
+          }
+        ]
+      },
+      "outcome": "APPLIED"
+    },
+    {
+      "id": "c4-delivery-original-match",
+      "type": "command",
+      "capability": "matchSourceIdentity",
+      "request": {
+        "intentKind": "COMMAND",
+        "definitionVersion": "definition-v1",
+        "capabilityId": "matchSourceIdentity",
+        "expectedRevision": 1,
+        "commandIdempotencyKey": "c4-delivery-original-match",
+        "slots": {
+          "claimId": "$c4-delivery-original.claim",
+          "basisDocumentId": "$c4-delivery-original.document",
+          "physicalScopeId": "$DELIVERY_OBSERVATION",
+          "policyVersion": "fixture-v1",
+          "sourceIdentity": "native-c4-c4-delivery-original:c4-delivery-original:1",
+          "quantity": "100",
+          "unit": "BOX",
+          "effectiveFrom": "2026-10-07T09:00:02Z",
+          "reason": "동일 원본과 대상 범위 대조"
+        },
+        "provenance": {},
+        "subjectRefs": [
+          {
+            "type": "Work",
+            "id": "$SALES_WORK"
+          }
+        ]
+      },
+      "outcome": "APPLIED",
+      "bind": {
+        "c4-delivery-original.reconciliation": "/id"
+      }
+    },
+    {
+      "id": "c4-delivery-original-link",
+      "type": "command",
+      "capability": "linkCanonicalOccurrence",
+      "request": {
+        "intentKind": "COMMAND",
+        "definitionVersion": "definition-v1",
+        "capabilityId": "linkCanonicalOccurrence",
+        "expectedRevision": 1,
+        "commandIdempotencyKey": "c4-delivery-original-link",
+        "slots": {
+          "reconciliationId": "$c4-delivery-original.reconciliation"
+        },
+        "provenance": {},
+        "subjectRefs": [
+          {
+            "type": "Work",
+            "id": "$SALES_WORK"
+          }
+        ]
+      },
+      "outcome": "APPLIED",
+      "bind": {
+        "c4-delivery-original.canonical": "/id"
+      }
+    },
+    {
+      "id": "c4-delivery-confirm",
+      "type": "command",
+      "capability": "recordDelivery",
+      "request": {
+        "intentKind": "RECORD",
+        "definitionVersion": "definition-v1",
+        "capabilityId": "recordDelivery",
+        "expectedRevision": 1,
+        "commandIdempotencyKey": "c4-delivery-confirm",
+        "slots": {
+          "observationId": "$DELIVERY_OBSERVATION",
+          "canonicalOccurrenceId": "$c4-delivery-original.canonical"
+        },
+        "provenance": {},
+        "subjectRefs": [
+          {
+            "type": "Work",
+            "id": "$SALES_WORK"
+          }
+        ]
+      },
+      "outcome": "APPLIED",
+      "bind": {
+        "DELIVERY": "/effects/deliveryId"
+      }
+    }
+  ]
+}

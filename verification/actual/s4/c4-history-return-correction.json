@@ -1,0 +1,578 @@
+{
+  "schemaVersion": "1.0.0",
+  "status": "NOT_RUN",
+  "actions": [
+    {
+      "id": "c4-history100-before-return",
+      "type": "observe",
+      "assertions": [
+        {
+          "pointer": "/rawRows/mulino_trade_sales_deliveries",
+          "operator": "sum",
+          "column": "quantity",
+          "expected": "100"
+        },
+        {
+          "pointer": "/rawRows/mulino_inventory_quantitysegments",
+          "operator": "sum",
+          "column": "quantity",
+          "expected": "100",
+          "where": {
+            "retiredat": null,
+            "placeid": "$CUSTOMER_PLACE"
+          }
+        }
+      ],
+      "bindRows": {
+        "DELIVERY_REV": {
+          "pointer": "/rawRows/mulino_trade_sales_deliveries",
+          "where": {
+            "id": "$DELIVERY"
+          },
+          "column": "revision"
+        },
+        "SALES_REV": {
+          "pointer": "/rawRows/mulino_work_read_works",
+          "where": {
+            "id": "$SALES_WORK"
+          },
+          "column": "revision"
+        }
+      }
+    },
+    {
+      "id": "c4-assess-delivery100",
+      "type": "command",
+      "capability": "assessGoal",
+      "request": {
+        "intentKind": "COMMAND",
+        "definitionVersion": "definition-v1",
+        "capabilityId": "assessGoal",
+        "expectedRevision": "$SALES_REV",
+        "commandIdempotencyKey": "c4-assess-delivery100",
+        "slots": {
+          "workId": "$SALES_WORK"
+        },
+        "provenance": {},
+        "subjectRefs": [
+          {
+            "type": "Work",
+            "id": "$SALES_WORK"
+          }
+        ]
+      },
+      "outcome": "APPLIED",
+      "bind": {
+        "PAST_ASSESSMENT": "/effects/assessmentId"
+      },
+      "assertions": [
+        {
+          "pointer": "/assessment/outcome",
+          "operator": "equals",
+          "expected": "SATISFIED"
+        }
+      ]
+    },
+    {
+      "id": "c4-return-authorize20",
+      "type": "command",
+      "capability": "authorizeReturn",
+      "request": {
+        "intentKind": "COMMAND",
+        "definitionVersion": "definition-v1",
+        "capabilityId": "authorizeReturn",
+        "expectedRevision": "$DELIVERY_REV",
+        "commandIdempotencyKey": "c4-return-authorize20",
+        "slots": {
+          "deliveryId": "$DELIVERY",
+          "startQuantity": "0",
+          "quantity": "20",
+          "unit": "BOX",
+          "destinationId": "$W",
+          "validUntil": "2026-10-31T00:00:00Z",
+          "reason": "실제 반품20은 과거 인도와 별도 사건이다"
+        },
+        "provenance": {},
+        "subjectRefs": [
+          {
+            "type": "Work",
+            "id": "$SALES_WORK"
+          }
+        ]
+      },
+      "outcome": "APPLIED",
+      "bind": {
+        "RETURN_AUTHORIZATION": "/effects/authorizationId"
+      },
+      "actor": "supervisor"
+    },
+    {
+      "id": "c4-return-event",
+      "type": "uuid",
+      "alias": "RETURN_EVENT"
+    },
+    {
+      "id": "c4-return-intake20",
+      "type": "command",
+      "capability": "receiveReturn",
+      "request": {
+        "intentKind": "RECORD",
+        "definitionVersion": "definition-v1",
+        "capabilityId": "receiveReturn",
+        "expectedRevision": 0,
+        "commandIdempotencyKey": "c4-return-intake20",
+        "slots": {
+          "authorizationId": "$RETURN_AUTHORIZATION",
+          "eventId": "$RETURN_EVENT",
+          "occurredAt": "2026-10-07T09:00:02Z",
+          "nextCheckAt": "2026-10-08T09:00:00Z"
+        },
+        "provenance": {},
+        "subjectRefs": [
+          {
+            "type": "Work",
+            "id": "$SALES_WORK"
+          }
+        ]
+      },
+      "outcome": "APPLIED",
+      "bind": {
+        "RETURN": "/effects/returnId"
+      }
+    },
+    {
+      "id": "c4-return-original",
+      "type": "original",
+      "fixture": {
+        "synthetic": true,
+        "clock": {
+          "asOf": "2026-10-07T09:00:02Z",
+          "knownAt": "2026-10-07T09:00:02Z"
+        },
+        "sourceProfile": {
+          "namespace": "native-c4-c4-return-original",
+          "policyVersion": "fixture-v1",
+          "nextAction": "가상 원본과 실제 범위 대조",
+          "nextCheckAt": "2026-10-08T09:00:00Z"
+        },
+        "occurrence": {
+          "kind": "RETURN_RECEIPT",
+          "content": {
+            "returnId": "$RETURN",
+            "kind": "RETURN_RECEIPT",
+            "eventId": "$RETURN_EVENT",
+            "deliveryId": "$DELIVERY",
+            "customerId": "$C",
+            "itemId": "$P",
+            "lotId": "$L",
+            "rangeRootId": "$DISPATCH_RANGE",
+            "startQuantity": "0",
+            "quantity": "20",
+            "unit": "BOX",
+            "placeId": "$W",
+            "workId": "$SALES_WORK",
+            "occurredAt": "2026-10-07T09:00:02Z"
+          },
+          "externalEventId": "c4-return-original",
+          "quantity": "20",
+          "unit": "BOX",
+          "assertion": "authored synthetic external original"
+        }
+      },
+      "binding": {
+        "organizationId": "$ORG",
+        "workId": "$SALES_WORK",
+        "itemId": "$P",
+        "actorId": "$reader",
+        "supervisorId": "$supervisor",
+        "physicalScopeId": "$RETURN",
+        "subjectId": "$RETURN",
+        "subjectKind": "RETURN",
+        "placeId": "$W"
+      }
+    },
+    {
+      "id": "c4-return-original-match",
+      "type": "command",
+      "capability": "matchSourceIdentity",
+      "request": {
+        "intentKind": "COMMAND",
+        "definitionVersion": "definition-v1",
+        "capabilityId": "matchSourceIdentity",
+        "expectedRevision": 1,
+        "commandIdempotencyKey": "c4-return-original-match",
+        "slots": {
+          "claimId": "$c4-return-original.claim",
+          "basisDocumentId": "$c4-return-original.document",
+          "physicalScopeId": "$RETURN",
+          "policyVersion": "fixture-v1",
+          "sourceIdentity": "native-c4-c4-return-original:c4-return-original:1",
+          "quantity": "20",
+          "unit": "BOX",
+          "effectiveFrom": "2026-10-07T09:00:02Z",
+          "reason": "원본 정체성과 물량 대조"
+        },
+        "provenance": {},
+        "subjectRefs": [
+          {
+            "type": "Work",
+            "id": "$SALES_WORK"
+          }
+        ]
+      },
+      "outcome": "APPLIED",
+      "bind": {
+        "c4-return-original.reconciliation": "/id"
+      }
+    },
+    {
+      "id": "c4-return-original-link",
+      "type": "command",
+      "capability": "linkCanonicalOccurrence",
+      "request": {
+        "intentKind": "COMMAND",
+        "definitionVersion": "definition-v1",
+        "capabilityId": "linkCanonicalOccurrence",
+        "expectedRevision": 1,
+        "commandIdempotencyKey": "c4-return-original-link",
+        "slots": {
+          "reconciliationId": "$c4-return-original.reconciliation"
+        },
+        "provenance": {},
+        "subjectRefs": [
+          {
+            "type": "Work",
+            "id": "$SALES_WORK"
+          }
+        ]
+      },
+      "outcome": "APPLIED",
+      "bind": {
+        "c4-return-original.canonical": "/id"
+      }
+    },
+    {
+      "id": "c4-return-confirm20",
+      "type": "command",
+      "capability": "receiveReturn",
+      "request": {
+        "intentKind": "RECORD",
+        "definitionVersion": "definition-v1",
+        "capabilityId": "receiveReturn",
+        "expectedRevision": 0,
+        "commandIdempotencyKey": "c4-return-confirm20",
+        "slots": {
+          "returnId": "$RETURN",
+          "canonicalOccurrenceId": "$c4-return-original.canonical",
+          "nextCheckAt": "2026-10-08T09:00:00Z"
+        },
+        "provenance": {},
+        "subjectRefs": [
+          {
+            "type": "Work",
+            "id": "$SALES_WORK"
+          }
+        ]
+      },
+      "outcome": "APPLIED"
+    },
+    {
+      "id": "c4-return-distinct-history",
+      "type": "observe",
+      "assertions": [
+        {
+          "pointer": "/rawRows/mulino_trade_sales_deliveries",
+          "operator": "sum",
+          "column": "quantity",
+          "expected": "100"
+        },
+        {
+          "pointer": "/rawRows/mulino_trade_returns_receipts",
+          "operator": "sum",
+          "column": "quantity",
+          "expected": "20"
+        },
+        {
+          "pointer": "/rawRows/mulino_inventory_quantitysegments",
+          "operator": "sum",
+          "column": "quantity",
+          "expected": "20",
+          "where": {
+            "retiredat": null,
+            "placeid": "$W"
+          }
+        },
+        {
+          "pointer": "/rawRows/mulino_inventory_quantitysegments",
+          "operator": "sum",
+          "column": "quantity",
+          "expected": "80",
+          "where": {
+            "retiredat": null,
+            "placeid": "$CUSTOMER_PLACE"
+          }
+        }
+      ]
+    },
+    {
+      "id": "c4-correction98-clock",
+      "type": "clock",
+      "instant": "2026-10-07T09:00:03Z"
+    },
+    {
+      "id": "c4-correction98",
+      "type": "original",
+      "fixture": {
+        "synthetic": true,
+        "clock": {
+          "asOf": "2026-10-07T09:00:02Z",
+          "knownAt": "2026-10-07T09:00:03Z"
+        },
+        "sourceProfile": {
+          "namespace": "native-c4-c4-correction98",
+          "policyVersion": "fixture-v1",
+          "nextAction": "가상 원본과 실제 범위 대조",
+          "nextCheckAt": "2026-10-08T09:00:00Z"
+        },
+        "occurrence": {
+          "kind": "PHYSICAL_DELIVERY",
+          "content": {
+            "deliveryEventId": "$DELIVERY_EVENT",
+            "dispatchId": "$DISPATCH",
+            "cargoScopeId": "$CARGO",
+            "salesLineId": "$SALES_LINE",
+            "customerId": "$C",
+            "itemId": "$P",
+            "lotId": "$L",
+            "rangeRootId": "$DISPATCH_RANGE",
+            "physicalScopeId": "$DELIVERY_OBSERVATION",
+            "startQuantity": "0",
+            "quantity": "98",
+            "unit": "BOX",
+            "placeId": "$CUSTOMER_PLACE",
+            "occurredAt": "2026-10-07T09:00:02Z",
+            "correctionOfDeliveryId": "$DELIVERY"
+          },
+          "externalEventId": "c4-correction98",
+          "quantity": "98",
+          "unit": "BOX",
+          "assertion": "authored synthetic external original"
+        }
+      },
+      "binding": {
+        "organizationId": "$ORG",
+        "workId": "$SALES_WORK",
+        "itemId": "$P",
+        "actorId": "$reader",
+        "supervisorId": "$supervisor",
+        "physicalScopeId": "$DELIVERY_OBSERVATION",
+        "subjectId": "$SALES_WORK",
+        "subjectKind": "WORK",
+        "placeId": "$CUSTOMER_PLACE"
+      }
+    },
+    {
+      "id": "c4-correction98-event",
+      "type": "command",
+      "capability": "correctEvidence",
+      "request": {
+        "intentKind": "RECORD",
+        "definitionVersion": "definition-v1",
+        "capabilityId": "correctEvidence",
+        "expectedRevision": 1,
+        "commandIdempotencyKey": "c4-correction98-event",
+        "slots": {
+          "subject": {
+            "kind": "WORK",
+            "id": "$SALES_WORK"
+          },
+          "kind": "PHYSICAL_DELIVERY",
+          "sourceNamespace": "native-c4-c4-correction98",
+          "externalEventId": "c4-correction98",
+          "sourceVersion": "2",
+          "effectiveFrom": "2026-10-07T09:00:02Z",
+          "timeZone": "UTC",
+          "timePrecision": "SECOND",
+          "valueState": "PRESENT",
+          "payload": "{\"deliveryEventId\":\"${DELIVERY_EVENT}\",\"dispatchId\":\"${DISPATCH}\",\"cargoScopeId\":\"${CARGO}\",\"salesLineId\":\"${SALES_LINE}\",\"customerId\":\"${C}\",\"itemId\":\"${P}\",\"lotId\":\"${L}\",\"rangeRootId\":\"${DISPATCH_RANGE}\",\"physicalScopeId\":\"${DELIVERY_OBSERVATION}\",\"startQuantity\":\"0\",\"quantity\":\"98\",\"unit\":\"BOX\",\"placeId\":\"${CUSTOMER_PLACE}\",\"occurredAt\":\"2026-10-07T09:00:02Z\",\"correctionOfDeliveryId\":\"${DELIVERY}\"}",
+          "supersedesId": "$c4-delivery-original.event",
+          "documentId": "$c4-correction98.document",
+          "assertion": "명시적 실제 인도 정정",
+          "quantity": "98",
+          "unit": "BOX",
+          "evidenceType": "EVENT"
+        },
+        "provenance": {},
+        "subjectRefs": [
+          {
+            "type": "Work",
+            "id": "$SALES_WORK"
+          }
+        ]
+      },
+      "outcome": "APPLIED",
+      "bind": {
+        "c4-correction98.event": "/id",
+        "c4-correction98.claim": "/claimId"
+      }
+    },
+    {
+      "id": "c4-correction98-match",
+      "type": "command",
+      "capability": "matchSourceIdentity",
+      "request": {
+        "intentKind": "COMMAND",
+        "definitionVersion": "definition-v1",
+        "capabilityId": "matchSourceIdentity",
+        "expectedRevision": 1,
+        "commandIdempotencyKey": "c4-correction98-match",
+        "slots": {
+          "claimId": "$c4-correction98.claim",
+          "basisDocumentId": "$c4-correction98.document",
+          "physicalScopeId": "$DELIVERY_OBSERVATION",
+          "policyVersion": "fixture-v1",
+          "sourceIdentity": "native-c4-c4-correction98:c4-correction98:2",
+          "quantity": "98",
+          "unit": "BOX",
+          "effectiveFrom": "2026-10-07T09:00:02Z",
+          "reason": "원본 정체성과 물량 대조"
+        },
+        "provenance": {},
+        "subjectRefs": [
+          {
+            "type": "Work",
+            "id": "$SALES_WORK"
+          }
+        ]
+      },
+      "outcome": "APPLIED",
+      "bind": {
+        "c4-correction98.reconciliation": "/id"
+      }
+    },
+    {
+      "id": "c4-correction98-link",
+      "type": "command",
+      "capability": "linkCanonicalOccurrence",
+      "request": {
+        "intentKind": "COMMAND",
+        "definitionVersion": "definition-v1",
+        "capabilityId": "linkCanonicalOccurrence",
+        "expectedRevision": 1,
+        "commandIdempotencyKey": "c4-correction98-link",
+        "slots": {
+          "reconciliationId": "$c4-correction98.reconciliation"
+        },
+        "provenance": {},
+        "subjectRefs": [
+          {
+            "type": "Work",
+            "id": "$SALES_WORK"
+          }
+        ]
+      },
+      "outcome": "APPLIED",
+      "bind": {
+        "c4-correction98.canonical": "/id"
+      }
+    },
+    {
+      "id": "c4-correct98-independent",
+      "type": "observe",
+      "assertions": [
+        {
+          "pointer": "/rawRows/mulino_evidence_events",
+          "operator": "matchingRows",
+          "where": {
+            "id": "$c4-delivery-original.event"
+          },
+          "expected": 1
+        },
+        {
+          "pointer": "/rawRows/mulino_evidence_events",
+          "operator": "matchingRows",
+          "where": {
+            "id": "$c4-correction98.event",
+            "supersedesid": "$c4-delivery-original.event"
+          },
+          "expected": 1
+        },
+        {
+          "pointer": "/rawRows/mulino_work_read_assessmentreferences",
+          "operator": "matchingRows",
+          "where": {
+            "id": "$PAST_ASSESSMENT",
+            "outcome": "SATISFIED"
+          },
+          "expected": 1
+        },
+        {
+          "pointer": "/rawRows/mulino_trade_sales_deliveries",
+          "operator": "sum",
+          "column": "quantity",
+          "expected": "100"
+        },
+        {
+          "pointer": "/rawRows/mulino_trade_sales_deliverycorrections",
+          "operator": "sum",
+          "column": "quantity",
+          "expected": "98"
+        },
+        {
+          "pointer": "/rawRows/mulino_trade_returns_receipts",
+          "operator": "sum",
+          "column": "quantity",
+          "expected": "20"
+        },
+        {
+          "pointer": "/rawRows/mulino_inventory_quantitysegments",
+          "operator": "sum",
+          "column": "quantity",
+          "expected": "20",
+          "where": {
+            "retiredat": null,
+            "placeid": "$W"
+          }
+        },
+        {
+          "pointer": "/rawRows/mulino_inventory_quantitysegments",
+          "operator": "sum",
+          "column": "quantity",
+          "expected": "80",
+          "where": {
+            "retiredat": null,
+            "placeid": "$CUSTOMER_PLACE"
+          }
+        },
+        {
+          "pointer": "/rawRows/mulino_inventory_quantitysegments",
+          "operator": "sum",
+          "column": "quantity",
+          "expected": "0",
+          "where": {
+            "retiredat": null,
+            "placeid": "$TRANSIT"
+          }
+        },
+        {
+          "pointer": "/rawRows/mulino_work_read_obligationreferences",
+          "operator": "sum",
+          "column": "quantity",
+          "expected": "2",
+          "where": {
+            "kind": "DELIVERY_CORRECTED_DEFICIT",
+            "status": "OPEN",
+            "valid": true
+          }
+        },
+        {
+          "pointer": "/rawRows/mulino_work_read_obligationreferences",
+          "operator": "humanDuties",
+          "kinds": [
+            "DELIVERY_CORRECTED_DEFICIT"
+          ]
+        }
+      ]
+    }
+  ]
+}

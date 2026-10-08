@@ -1,0 +1,662 @@
+{
+  "schemaVersion": "1.0.0",
+  "status": "NOT_RUN",
+  "actions": [
+    {
+      "id": "c1-custody100-sale40",
+      "type": "query",
+      "capability": "getInventory",
+      "request": {
+        "scope": {
+          "organizationId": "$ORG",
+          "itemId": "$P",
+          "placeId": "$W"
+        },
+        "asOf": "2026-10-07T09:00:02Z",
+        "knownAt": "2026-10-07T09:00:02Z"
+      },
+      "assertions": [
+        {
+          "pointer": "/data/heldQuantity",
+          "operator": "equals",
+          "expected": "100"
+        },
+        {
+          "pointer": "/data/eligibleQuantity",
+          "operator": "equals",
+          "expected": "40"
+        },
+        {
+          "pointer": "/data/unreservedEligibleQuantity",
+          "operator": "equals",
+          "expected": "40"
+        },
+        {
+          "pointer": "/data/reservedQuantity",
+          "operator": "equals",
+          "expected": "0"
+        }
+      ]
+    },
+    {
+      "id": "c1-create-sales-work",
+      "type": "command",
+      "capability": "createWork",
+      "request": {
+        "intentKind": "COMMAND",
+        "definitionVersion": "definition-v1",
+        "capabilityId": "createWork",
+        "expectedRevision": 0,
+        "commandIdempotencyKey": "c1-create-sales-work",
+        "slots": {
+          "workType": "SALES",
+          "quantityMode": "CUMULATIVE_EVENT",
+          "endpoint": "DELIVERED",
+          "dueAt": "2026-10-31T00:00:00Z",
+          "evidencePolicyVersion": "fixture-v1",
+          "ownerId": "$reader",
+          "supervisorId": "$supervisor",
+          "quantity": {
+            "value": "40",
+            "unit": "BOX"
+          },
+          "period": {
+            "start": "2026-10-01T00:00:00Z",
+            "end": "2026-10-31T00:00:00Z",
+            "startInclusive": true,
+            "endInclusive": true
+          },
+          "eventKinds": [
+            "PHYSICAL_DELIVERY"
+          ],
+          "distinctContributionScope": {
+            "itemId": "$P"
+          }
+        },
+        "provenance": {},
+        "subjectRefs": [
+          {
+            "type": "TradeItem",
+            "id": "$P"
+          }
+        ]
+      },
+      "bind": {
+        "SALES_WORK": "/effects/workId",
+        "SALES_WORK_REV": "/revision"
+      }
+    },
+    {
+      "id": "c1-create-sales",
+      "type": "command",
+      "capability": "createSalesOrder",
+      "request": {
+        "intentKind": "COMMAND",
+        "definitionVersion": "definition-v1",
+        "capabilityId": "createSalesOrder",
+        "expectedRevision": 0,
+        "commandIdempotencyKey": "c1-create-sales",
+        "slots": {
+          "workId": "$SALES_WORK",
+          "customerId": "$C",
+          "itemId": "$P",
+          "quantity": "40",
+          "unit": "BOX",
+          "price": "1",
+          "currency": "EUR",
+          "dueAt": "2026-10-31T00:00:00Z",
+          "destinationId": "$CUSTOMER_PLACE",
+          "deliveryEndpoint": "DELIVERED",
+          "qualityTerms": "가상 조건 충족",
+          "packageTerms": "가상 포장 조건 충족"
+        },
+        "provenance": {},
+        "subjectRefs": [
+          {
+            "type": "Work",
+            "id": "$SALES_WORK"
+          },
+          {
+            "type": "TradeItem",
+            "id": "$P"
+          }
+        ]
+      },
+      "outcome": "APPLIED",
+      "bind": {
+        "SALES_ORDER": "/effects/orderId",
+        "SALES_LINE": "/effects/lineId"
+      }
+    },
+    {
+      "id": "c1-segment-revision",
+      "type": "observe",
+      "assertions": [],
+      "bindRows": {
+        "C1_SEG_REV": {
+          "pointer": "/rawRows/mulino_inventory_quantitysegments",
+          "where": {
+            "id": "$c1-receipt60.segment"
+          },
+          "column": "revision"
+        }
+      }
+    },
+    {
+      "id": "c1-reserve-custody60-denied",
+      "type": "command",
+      "capability": "reserveQuantity",
+      "request": {
+        "intentKind": "COMMAND",
+        "definitionVersion": "definition-v1",
+        "capabilityId": "reserveQuantity",
+        "expectedRevision": "$C1_SEG_REV",
+        "commandIdempotencyKey": "c1-reserve-custody60-denied",
+        "slots": {
+          "segmentId": "$c1-receipt60.segment",
+          "salesLineId": "$SALES_LINE",
+          "startQuantity": "40",
+          "quantity": "10",
+          "unit": "BOX"
+        },
+        "provenance": {},
+        "subjectRefs": [
+          {
+            "type": "QuantitySegment",
+            "id": "$c1-receipt60.segment"
+          },
+          {
+            "type": "SalesOrderLine",
+            "id": "$SALES_LINE"
+          }
+        ]
+      },
+      "outcome": "REJECTED",
+      "assertions": [
+        {
+          "pointer": "/error/code",
+          "operator": "equals",
+          "expected": "SCOPE_INELIGIBLE"
+        },
+        {
+          "pointer": "/effects",
+          "operator": "equals",
+          "expected": {}
+        }
+      ]
+    },
+    {
+      "id": "c1-reserve20",
+      "type": "command",
+      "capability": "reserveQuantity",
+      "request": {
+        "intentKind": "COMMAND",
+        "definitionVersion": "definition-v1",
+        "capabilityId": "reserveQuantity",
+        "expectedRevision": "$C1_SEG_REV",
+        "commandIdempotencyKey": "c1-reserve20",
+        "slots": {
+          "segmentId": "$c1-receipt60.segment",
+          "salesLineId": "$SALES_LINE",
+          "startQuantity": "0",
+          "quantity": "20",
+          "unit": "BOX"
+        },
+        "provenance": {},
+        "subjectRefs": [
+          {
+            "type": "QuantitySegment",
+            "id": "$c1-receipt60.segment"
+          },
+          {
+            "type": "SalesOrderLine",
+            "id": "$SALES_LINE"
+          }
+        ]
+      },
+      "outcome": "APPLIED",
+      "bind": {
+        "ALLOCATION": "/effects/allocationId",
+        "ALLOCATION_REV": "/revision"
+      }
+    },
+    {
+      "id": "c1-pick20",
+      "type": "command",
+      "capability": "pickQuantity",
+      "request": {
+        "intentKind": "COMMAND",
+        "definitionVersion": "definition-v1",
+        "capabilityId": "pickQuantity",
+        "expectedRevision": "$ALLOCATION_REV",
+        "commandIdempotencyKey": "c1-pick20",
+        "slots": {
+          "allocationId": "$ALLOCATION"
+        },
+        "provenance": {},
+        "subjectRefs": [
+          {
+            "type": "Work",
+            "id": "$SALES_WORK"
+          }
+        ]
+      },
+      "outcome": "APPLIED",
+      "bind": {
+        "ALLOCATION_REV": "/revision"
+      }
+    },
+    {
+      "id": "c1-reserved20-before-revoke",
+      "type": "query",
+      "capability": "getInventory",
+      "request": {
+        "scope": {
+          "organizationId": "$ORG",
+          "itemId": "$P",
+          "placeId": "$W"
+        },
+        "asOf": "2026-10-07T09:00:02Z",
+        "knownAt": "2026-10-07T09:00:02Z"
+      },
+      "assertions": [
+        {
+          "pointer": "/data/eligibleQuantity",
+          "operator": "equals",
+          "expected": "40"
+        },
+        {
+          "pointer": "/data/reservedQuantity",
+          "operator": "equals",
+          "expected": "20"
+        },
+        {
+          "pointer": "/data/unreservedEligibleQuantity",
+          "operator": "equals",
+          "expected": "20"
+        }
+      ]
+    },
+    {
+      "id": "c1-commercial-basis",
+      "type": "observe",
+      "assertions": [
+        {
+          "pointer": "/rawRows/mulino_inventory_dispositionbases",
+          "operator": "matchingRows",
+          "where": {
+            "category": "COMMERCIAL",
+            "action": "SELL",
+            "state": "ACTIVE",
+            "startquantity": "0",
+            "quantity": "40"
+          },
+          "expected": 1
+        }
+      ],
+      "bindRows": {
+        "C1_COMMERCIAL": {
+          "pointer": "/rawRows/mulino_inventory_dispositionbases",
+          "where": {
+            "category": "COMMERCIAL",
+            "action": "SELL",
+            "state": "ACTIVE"
+          },
+          "column": "id"
+        },
+        "C1_COMMERCIAL_REV": {
+          "pointer": "/rawRows/mulino_inventory_dispositionbases",
+          "where": {
+            "category": "COMMERCIAL",
+            "action": "SELL",
+            "state": "ACTIVE"
+          },
+          "column": "revision"
+        }
+      }
+    },
+    {
+      "id": "c1-revoke-commercial",
+      "type": "original",
+      "fixture": {
+        "synthetic": true,
+        "clock": {
+          "asOf": "2026-10-07T09:00:02Z",
+          "knownAt": "2026-10-07T09:00:02Z"
+        },
+        "sourceProfile": {
+          "namespace": "native-c1-c1-revoke-commercial",
+          "policyVersion": "fixture-v1",
+          "nextAction": "위탁 판매 허용 철회 범위 대조",
+          "nextCheckAt": "2026-10-08T09:00:00Z"
+        },
+        "occurrence": {
+          "kind": "COMMERCIAL_REVOKED",
+          "content": {
+            "segmentId": "$c1-receipt60.segment",
+            "operation": "revokeDispositionBasis",
+            "dispositionBasisId": "$C1_COMMERCIAL"
+          },
+          "externalEventId": "c1-revoke-commercial",
+          "quantity": "100",
+          "unit": "BOX",
+          "assertion": "authored synthetic consignment withdrawal original"
+        }
+      },
+      "binding": {
+        "organizationId": "$ORG",
+        "workId": "$WORK",
+        "itemId": "$P",
+        "actorId": "$reader",
+        "supervisorId": "$supervisor",
+        "physicalScopeId": "$c1-receipt60.segment",
+        "subjectId": "$c1-receipt60.segment",
+        "subjectKind": "SEGMENT",
+        "placeId": "$W"
+      }
+    },
+    {
+      "id": "c1-revoke-commercial-match",
+      "type": "command",
+      "capability": "matchSourceIdentity",
+      "request": {
+        "intentKind": "COMMAND",
+        "definitionVersion": "definition-v1",
+        "capabilityId": "matchSourceIdentity",
+        "expectedRevision": 1,
+        "commandIdempotencyKey": "c1-revoke-commercial-match",
+        "slots": {
+          "claimId": "$c1-revoke-commercial.claim",
+          "basisDocumentId": "$c1-revoke-commercial.document",
+          "physicalScopeId": "$c1-receipt60.segment",
+          "policyVersion": "fixture-v1",
+          "sourceIdentity": "native-c1-c1-revoke-commercial:c1-revoke-commercial:1",
+          "quantity": "100",
+          "unit": "BOX",
+          "effectiveFrom": "2026-10-07T09:00:02Z",
+          "reason": "철회 원본과 동일 물리 범위 대조"
+        },
+        "provenance": {},
+        "subjectRefs": [
+          {
+            "type": "QuantitySegment",
+            "id": "$c1-receipt60.segment"
+          }
+        ]
+      },
+      "outcome": "APPLIED",
+      "bind": {
+        "c1-revoke-commercial.reconciliation": "/id"
+      }
+    },
+    {
+      "id": "c1-revoke-commercial-link",
+      "type": "command",
+      "capability": "linkCanonicalOccurrence",
+      "request": {
+        "intentKind": "COMMAND",
+        "definitionVersion": "definition-v1",
+        "capabilityId": "linkCanonicalOccurrence",
+        "expectedRevision": 1,
+        "commandIdempotencyKey": "c1-revoke-commercial-link",
+        "slots": {
+          "reconciliationId": "$c1-revoke-commercial.reconciliation"
+        },
+        "provenance": {},
+        "subjectRefs": [
+          {
+            "type": "QuantitySegment",
+            "id": "$c1-receipt60.segment"
+          }
+        ]
+      },
+      "outcome": "APPLIED",
+      "bind": {
+        "c1-revoke-commercial.canonical": "/id"
+      }
+    },
+    {
+      "id": "c1-revoke-sell40",
+      "type": "command",
+      "capability": "revokeDispositionBasis",
+      "request": {
+        "intentKind": "COMMAND",
+        "definitionVersion": "definition-v1",
+        "capabilityId": "revokeDispositionBasis",
+        "expectedRevision": "$C1_COMMERCIAL_REV",
+        "commandIdempotencyKey": "c1-revoke-sell40",
+        "slots": {
+          "dispositionBasisId": "$C1_COMMERCIAL",
+          "evidenceId": "$c1-revoke-commercial.document",
+          "reason": "위탁 판매 허용 철회"
+        },
+        "provenance": {},
+        "subjectRefs": [
+          {
+            "type": "QuantitySegment",
+            "id": "$c1-receipt60.segment"
+          }
+        ]
+      },
+      "outcome": "APPLIED"
+    },
+    {
+      "id": "c1-after-revoke",
+      "type": "observe",
+      "assertions": [
+        {
+          "pointer": "/rawRows/mulino_inventory_dispositionbases",
+          "operator": "matchingRows",
+          "where": {
+            "category": "COMMERCIAL",
+            "action": "SELL",
+            "state": "ACTIVE"
+          },
+          "expected": 0
+        },
+        {
+          "pointer": "/rawRows/mulino_inventory_segmentallocations",
+          "operator": "matchingRows",
+          "where": {
+            "id": "$ALLOCATION",
+            "state": "SUSPENDED",
+            "quantity": "20"
+          },
+          "expected": 1
+        }
+      ],
+      "bindRows": {
+        "ALLOCATION_REV": {
+          "pointer": "/rawRows/mulino_inventory_segmentallocations",
+          "where": {
+            "id": "$ALLOCATION"
+          },
+          "column": "revision"
+        },
+        "C1_SEG_REV": {
+          "pointer": "/rawRows/mulino_inventory_quantitysegments",
+          "where": {
+            "id": "$c1-receipt60.segment"
+          },
+          "column": "revision"
+        }
+      }
+    },
+    {
+      "id": "c1-new-reserve-after-revoke-denied",
+      "type": "command",
+      "capability": "reserveQuantity",
+      "request": {
+        "intentKind": "COMMAND",
+        "definitionVersion": "definition-v1",
+        "capabilityId": "reserveQuantity",
+        "expectedRevision": "$C1_SEG_REV",
+        "commandIdempotencyKey": "c1-new-reserve-after-revoke-denied",
+        "slots": {
+          "segmentId": "$c1-receipt60.segment",
+          "salesLineId": "$SALES_LINE",
+          "startQuantity": "20",
+          "quantity": "20",
+          "unit": "BOX"
+        },
+        "provenance": {},
+        "subjectRefs": [
+          {
+            "type": "QuantitySegment",
+            "id": "$c1-receipt60.segment"
+          },
+          {
+            "type": "SalesOrderLine",
+            "id": "$SALES_LINE"
+          }
+        ]
+      },
+      "outcome": "REJECTED",
+      "assertions": [
+        {
+          "pointer": "/error/code",
+          "operator": "equals",
+          "expected": "SCOPE_INELIGIBLE"
+        },
+        {
+          "pointer": "/effects",
+          "operator": "equals",
+          "expected": {}
+        }
+      ]
+    },
+    {
+      "id": "c1-dispatch-after-revoke-denied",
+      "type": "command",
+      "capability": "dispatchQuantity",
+      "request": {
+        "intentKind": "COMMAND",
+        "definitionVersion": "definition-v1",
+        "capabilityId": "dispatchQuantity",
+        "expectedRevision": "$ALLOCATION_REV",
+        "commandIdempotencyKey": "c1-dispatch-after-revoke-denied",
+        "slots": {
+          "allocationId": "$ALLOCATION",
+          "transitPlaceId": "$TRANSIT",
+          "occurredAt": "2026-10-07T09:00:02Z",
+          "evidenceRef": "synthetic-c1-withdrawn-dispatch"
+        },
+        "provenance": {},
+        "subjectRefs": [
+          {
+            "type": "Work",
+            "id": "$SALES_WORK"
+          }
+        ]
+      },
+      "outcome": "REJECTED",
+      "assertions": [
+        {
+          "pointer": "/error/code",
+          "operator": "equals",
+          "expected": "SCOPE_INELIGIBLE"
+        },
+        {
+          "pointer": "/effects",
+          "operator": "equals",
+          "expected": {}
+        }
+      ]
+    },
+    {
+      "id": "c1-final-independent",
+      "type": "observe",
+      "assertions": [
+        {
+          "pointer": "/rawRows/mulino_inventory_quantitysegments",
+          "operator": "sum",
+          "column": "quantity",
+          "expected": "100",
+          "where": {
+            "retiredat": null,
+            "placeid": "$W"
+          }
+        },
+        {
+          "pointer": "/rawRows/mulino_inventory_quantitysegments",
+          "operator": "sum",
+          "column": "quantity",
+          "expected": "0",
+          "where": {
+            "retiredat": null,
+            "placeid": "$TRANSIT"
+          }
+        },
+        {
+          "pointer": "/rawRows/mulino_inventory_segmentallocations",
+          "operator": "matchingRows",
+          "where": {},
+          "expected": 1
+        },
+        {
+          "pointer": "/rawRows/mulino_inventory_segmentallocations",
+          "operator": "matchingRows",
+          "where": {
+            "id": "$ALLOCATION",
+            "state": "SUSPENDED",
+            "quantity": "20"
+          },
+          "expected": 1
+        },
+        {
+          "pointer": "/rawRows/mulino_inventory_dispatches",
+          "operator": "size",
+          "expected": 0
+        },
+        {
+          "pointer": "/rawRows/mulino_trade_sales_executioneffects",
+          "operator": "size",
+          "expected": 0
+        },
+        {
+          "pointer": "/rawRows/mulino_work_read_obligationreferences",
+          "operator": "humanDuties",
+          "kinds": [
+            "QUALITY_REVIEW"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "c1-after-revoke-responsibility",
+      "type": "query",
+      "capability": "getInventory",
+      "request": {
+        "scope": {
+          "organizationId": "$ORG",
+          "itemId": "$P",
+          "placeId": "$W"
+        },
+        "asOf": "2026-10-07T09:00:02Z",
+        "knownAt": "2026-10-07T09:00:02Z"
+      },
+      "assertions": [
+        {
+          "pointer": "/data/heldQuantity",
+          "operator": "equals",
+          "expected": "100"
+        },
+        {
+          "pointer": "/data/eligibleQuantity",
+          "operator": "equals",
+          "expected": "0"
+        },
+        {
+          "pointer": "/data/unreservedEligibleQuantity",
+          "operator": "equals",
+          "expected": "0"
+        },
+        {
+          "pointer": "/data/reservationResponsibilityQuantity",
+          "operator": "equals",
+          "expected": "20"
+        }
+      ]
+    }
+  ]
+}

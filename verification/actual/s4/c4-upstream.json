@@ -1,0 +1,2779 @@
+{
+  "schemaVersion": "1.0.0",
+  "status": "NOT_RUN",
+  "actions": [
+    {
+      "id": "c4-create-work",
+      "type": "command",
+      "capability": "createWork",
+      "request": {
+        "intentKind": "COMMAND",
+        "definitionVersion": "definition-v1",
+        "capabilityId": "createWork",
+        "expectedRevision": 0,
+        "commandIdempotencyKey": "c4-create-work",
+        "slots": {
+          "workType": "PURCHASE",
+          "quantityMode": "CUMULATIVE_EVENT",
+          "endpoint": "ARRIVED",
+          "dueAt": "2026-10-31T00:00:00Z",
+          "evidencePolicyVersion": "fixture-v1",
+          "ownerId": "$reader",
+          "supervisorId": "$supervisor",
+          "quantity": {
+            "value": "100",
+            "unit": "BOX"
+          },
+          "period": {
+            "start": "2026-10-01T00:00:00Z",
+            "end": "2026-10-31T00:00:00Z",
+            "startInclusive": true,
+            "endInclusive": true
+          },
+          "eventKinds": [
+            "PHYSICAL_RECEIPT"
+          ],
+          "distinctContributionScope": {
+            "itemId": "$P"
+          }
+        },
+        "provenance": {},
+        "subjectRefs": [
+          {
+            "type": "TradeItem",
+            "id": "$P"
+          }
+        ]
+      },
+      "bind": {
+        "WORK": "/effects/workId",
+        "WORK_REV": "/revision"
+      }
+    },
+    {
+      "id": "c4-proposal100",
+      "type": "command",
+      "capability": "proposePurchase",
+      "request": {
+        "intentKind": "COMMAND",
+        "definitionVersion": "definition-v1",
+        "capabilityId": "proposePurchase",
+        "expectedRevision": "$WORK_REV",
+        "commandIdempotencyKey": "c4-proposal100",
+        "slots": {
+          "workId": "$WORK",
+          "quantity": {
+            "value": "100",
+            "unit": "BOX"
+          },
+          "price": {
+            "value": "200",
+            "currency": "EUR"
+          },
+          "supplierId": "$SUP",
+          "destinationId": "$W",
+          "dueAt": "2026-10-31T00:00:00Z",
+          "endpoint": "ARRIVED",
+          "quantityMode": "CUMULATIVE_EVENT"
+        },
+        "provenance": {},
+        "subjectRefs": [
+          {
+            "type": "Work",
+            "id": "$WORK"
+          }
+        ]
+      },
+      "bind": {
+        "PROPOSAL": "/proposalId",
+        "PROPOSAL_HASH": "/proposalHash",
+        "PROPOSAL_REV": "/proposalRevision"
+      }
+    },
+    {
+      "id": "c4-approve100",
+      "type": "command",
+      "capability": "approvePurchase",
+      "request": {
+        "intentKind": "COMMAND",
+        "definitionVersion": "definition-v1",
+        "capabilityId": "approvePurchase",
+        "expectedRevision": "$PROPOSAL_REV",
+        "commandIdempotencyKey": "c4-approve100",
+        "slots": {
+          "proposalId": "$PROPOSAL",
+          "proposalHash": "$PROPOSAL_HASH",
+          "decision": "APPROVE",
+          "validUntil": "2026-10-31T00:00:00Z",
+          "conditions": []
+        },
+        "provenance": {},
+        "subjectRefs": [
+          {
+            "type": "Work",
+            "id": "$WORK"
+          }
+        ]
+      },
+      "bind": {
+        "APPROVAL": "/approvalId"
+      },
+      "actor": "supervisor"
+    },
+    {
+      "id": "c4-dispatch100",
+      "type": "command",
+      "capability": "dispatchPurchaseOrder",
+      "request": {
+        "intentKind": "COMMAND",
+        "definitionVersion": "definition-v1",
+        "capabilityId": "dispatchPurchaseOrder",
+        "expectedRevision": "$PROPOSAL_REV",
+        "commandIdempotencyKey": "c4-dispatch100",
+        "slots": {
+          "proposalId": "$PROPOSAL",
+          "proposalHash": "$PROPOSAL_HASH",
+          "approvalId": "$APPROVAL",
+          "channel": "SYNTHETIC",
+          "externalOperationId": "d56c03af-9fe5-5543-b810-9f75365a245a"
+        },
+        "provenance": {},
+        "subjectRefs": [
+          {
+            "type": "Work",
+            "id": "$WORK"
+          }
+        ]
+      },
+      "bind": {
+        "ORDER": "/objectId",
+        "LINE": "/poLineId"
+      }
+    },
+    {
+      "id": "c4-supplier-accept",
+      "type": "original",
+      "fixture": {
+        "synthetic": true,
+        "clock": {
+          "asOf": "2026-10-07T09:00:02Z",
+          "knownAt": "2026-10-07T09:00:02Z"
+        },
+        "sourceProfile": {
+          "namespace": "native-c4-supplier-accept",
+          "policyVersion": "fixture-v1",
+          "nextAction": "원본 범위와 실제 효과 대조",
+          "nextCheckAt": "2026-10-08T09:00:00Z"
+        },
+        "occurrence": {
+          "kind": "SUPPLIER_ACCEPT",
+          "content": {
+            "orderId": "$ORDER",
+            "itemId": "$P",
+            "reply": "ACCEPT",
+            "quantity": "100",
+            "unit": "BOX",
+            "proposalRevision": 1
+          },
+          "externalEventId": "c4-supplier-accept",
+          "quantity": "100",
+          "unit": "BOX",
+          "assertion": "authored synthetic external original"
+        }
+      },
+      "binding": {
+        "organizationId": "$ORG",
+        "workId": "$WORK",
+        "itemId": "$P",
+        "actorId": "$reader",
+        "supervisorId": "$supervisor",
+        "physicalScopeId": "$ORDER",
+        "subjectId": "$ORDER",
+        "subjectKind": "PURCHASE_ORDER",
+        "placeId": "$W"
+      }
+    },
+    {
+      "id": "c4-supplier-accept-match",
+      "type": "command",
+      "capability": "matchSourceIdentity",
+      "request": {
+        "intentKind": "COMMAND",
+        "definitionVersion": "definition-v1",
+        "capabilityId": "matchSourceIdentity",
+        "expectedRevision": 1,
+        "commandIdempotencyKey": "c4-supplier-accept-match",
+        "slots": {
+          "claimId": "$c4-supplier-accept.claim",
+          "basisDocumentId": "$c4-supplier-accept.document",
+          "physicalScopeId": "$ORDER",
+          "policyVersion": "fixture-v1",
+          "sourceIdentity": "native-c4-supplier-accept:c4-supplier-accept:1",
+          "quantity": "100",
+          "unit": "BOX",
+          "effectiveFrom": "2026-10-07T09:00:02Z",
+          "reason": "외부 ORIGINAL과 동일한 범위 대조"
+        },
+        "provenance": {},
+        "subjectRefs": [
+          {
+            "type": "PurchaseOrder",
+            "id": "$ORDER"
+          }
+        ]
+      },
+      "outcome": "APPLIED",
+      "bind": {
+        "c4-supplier-accept.reconciliation": "/id"
+      }
+    },
+    {
+      "id": "c4-supplier-accept-link",
+      "type": "command",
+      "capability": "linkCanonicalOccurrence",
+      "request": {
+        "intentKind": "COMMAND",
+        "definitionVersion": "definition-v1",
+        "capabilityId": "linkCanonicalOccurrence",
+        "expectedRevision": 1,
+        "commandIdempotencyKey": "c4-supplier-accept-link",
+        "slots": {
+          "reconciliationId": "$c4-supplier-accept.reconciliation"
+        },
+        "provenance": {},
+        "subjectRefs": [
+          {
+            "type": "PurchaseOrder",
+            "id": "$ORDER"
+          }
+        ]
+      },
+      "outcome": "APPLIED",
+      "bind": {
+        "c4-supplier-accept.canonical": "/id"
+      }
+    },
+    {
+      "id": "c4-supplier-accepted",
+      "type": "command",
+      "capability": "recordSupplierReply",
+      "request": {
+        "intentKind": "RECORD",
+        "definitionVersion": "definition-v1",
+        "capabilityId": "recordSupplierReply",
+        "expectedRevision": 1,
+        "commandIdempotencyKey": "c4-supplier-accepted",
+        "slots": {
+          "purchaseId": "$ORDER",
+          "reply": "ACCEPT",
+          "proposedQuantity": {
+            "value": "100",
+            "unit": "BOX"
+          },
+          "evidence": "$c4-supplier-accept.document",
+          "canonicalOccurrenceId": "$c4-supplier-accept.canonical"
+        },
+        "provenance": {},
+        "subjectRefs": [
+          {
+            "type": "PurchaseOrder",
+            "id": "$ORDER"
+          }
+        ]
+      },
+      "outcome": "APPLIED",
+      "bind": {
+        "LINE_REV": "/revision"
+      }
+    },
+    {
+      "id": "c4-shipment-plan",
+      "type": "command",
+      "capability": "createShipment",
+      "request": {
+        "intentKind": "COMMAND",
+        "definitionVersion": "definition-v1",
+        "capabilityId": "createShipment",
+        "expectedRevision": 0,
+        "commandIdempotencyKey": "c4-shipment-plan",
+        "slots": {
+          "originId": "$TRANSIT",
+          "destinationId": "$W",
+          "carrierRef": "synthetic-no-external-send",
+          "workId": "$WORK",
+          "cargo": [
+            {
+              "itemId": "$P",
+              "quantity": "100",
+              "unit": "BOX",
+              "allocations": [
+                {
+                  "poLineId": "$LINE",
+                  "quantity": "100"
+                }
+              ]
+            }
+          ],
+          "legs": [
+            {
+              "originId": "$TRANSIT",
+              "destinationId": "$W",
+              "carrierRef": "synthetic-no-external-send"
+            }
+          ]
+        },
+        "provenance": {},
+        "subjectRefs": []
+      },
+      "outcome": "APPLIED",
+      "bind": {
+        "SHIPMENT": "/effects/shipmentId",
+        "CARGO": "/effects/cargoIds/0",
+        "LEG": "/effects/legIds/0"
+      }
+    },
+    {
+      "id": "c4-shipment-physical-range",
+      "type": "uuid",
+      "alias": "SHIP_RANGE"
+    },
+    {
+      "id": "c4-ship-departure",
+      "type": "original",
+      "fixture": {
+        "synthetic": true,
+        "clock": {
+          "asOf": "2026-10-07T09:00:02Z",
+          "knownAt": "2026-10-07T09:00:02Z"
+        },
+        "sourceProfile": {
+          "namespace": "native-c4-ship-departure",
+          "policyVersion": "fixture-v1",
+          "nextAction": "원본 범위와 실제 효과 대조",
+          "nextCheckAt": "2026-10-08T09:00:00Z"
+        },
+        "occurrence": {
+          "kind": "SHIPMENT_DEPARTURE",
+          "content": {
+            "shipmentEventId": "7738febe-4111-526b-9826-dcd47a59e72e",
+            "shipmentId": "$SHIPMENT",
+            "cargoId": "$CARGO",
+            "legId": "$LEG",
+            "placeId": "$TRANSIT",
+            "physicalScopeId": "$SHIP_RANGE",
+            "quantity": "100",
+            "unit": "BOX",
+            "occurredAt": "2026-10-07T09:00:02Z",
+            "kind": "DEPARTURE"
+          },
+          "externalEventId": "c4-ship-departure",
+          "quantity": "100",
+          "unit": "BOX",
+          "assertion": "authored synthetic external original"
+        }
+      },
+      "binding": {
+        "organizationId": "$ORG",
+        "workId": "$WORK",
+        "itemId": "$P",
+        "actorId": "$reader",
+        "supervisorId": "$supervisor",
+        "physicalScopeId": "$SHIP_RANGE",
+        "subjectId": "$P",
+        "subjectKind": "ITEM",
+        "placeId": "$TRANSIT"
+      }
+    },
+    {
+      "id": "c4-ship-departure-match",
+      "type": "command",
+      "capability": "matchSourceIdentity",
+      "request": {
+        "intentKind": "COMMAND",
+        "definitionVersion": "definition-v1",
+        "capabilityId": "matchSourceIdentity",
+        "expectedRevision": 1,
+        "commandIdempotencyKey": "c4-ship-departure-match",
+        "slots": {
+          "claimId": "$c4-ship-departure.claim",
+          "basisDocumentId": "$c4-ship-departure.document",
+          "physicalScopeId": "$SHIP_RANGE",
+          "policyVersion": "fixture-v1",
+          "sourceIdentity": "native-c4-ship-departure:c4-ship-departure:1",
+          "quantity": "100",
+          "unit": "BOX",
+          "effectiveFrom": "2026-10-07T09:00:02Z",
+          "reason": "외부 ORIGINAL과 동일한 범위 대조"
+        },
+        "provenance": {},
+        "subjectRefs": [
+          {
+            "type": "TradeItem",
+            "id": "$P"
+          }
+        ]
+      },
+      "outcome": "APPLIED",
+      "bind": {
+        "c4-ship-departure.reconciliation": "/id"
+      }
+    },
+    {
+      "id": "c4-ship-departure-link",
+      "type": "command",
+      "capability": "linkCanonicalOccurrence",
+      "request": {
+        "intentKind": "COMMAND",
+        "definitionVersion": "definition-v1",
+        "capabilityId": "linkCanonicalOccurrence",
+        "expectedRevision": 1,
+        "commandIdempotencyKey": "c4-ship-departure-link",
+        "slots": {
+          "reconciliationId": "$c4-ship-departure.reconciliation"
+        },
+        "provenance": {},
+        "subjectRefs": [
+          {
+            "type": "TradeItem",
+            "id": "$P"
+          }
+        ]
+      },
+      "outcome": "APPLIED",
+      "bind": {
+        "c4-ship-departure.canonical": "/id"
+      }
+    },
+    {
+      "id": "c4-ship-departure-record",
+      "type": "command",
+      "capability": "recordLegEvent",
+      "request": {
+        "intentKind": "RECORD",
+        "definitionVersion": "definition-v1",
+        "capabilityId": "recordLegEvent",
+        "expectedRevision": 1,
+        "commandIdempotencyKey": "c4-ship-departure-record",
+        "slots": {
+          "shipmentId": "$SHIPMENT",
+          "cargoId": "$CARGO",
+          "legId": "$LEG",
+          "kind": "DEPARTURE",
+          "placeId": "$TRANSIT",
+          "physicalScopeId": "$SHIP_RANGE",
+          "occurrenceId": "$c4-ship-departure.canonical",
+          "quantity": "100",
+          "unit": "BOX",
+          "occurredAt": "2026-10-07T09:00:02Z"
+        },
+        "provenance": {},
+        "subjectRefs": [
+          {
+            "type": "Shipment",
+            "id": "$SHIPMENT"
+          }
+        ]
+      },
+      "outcome": "APPLIED",
+      "bind": {
+        "SHIP_REV": "/revision"
+      }
+    },
+    {
+      "id": "c4-ship-arrival",
+      "type": "original",
+      "fixture": {
+        "synthetic": true,
+        "clock": {
+          "asOf": "2026-10-07T09:00:02Z",
+          "knownAt": "2026-10-07T09:00:02Z"
+        },
+        "sourceProfile": {
+          "namespace": "native-c4-ship-arrival",
+          "policyVersion": "fixture-v1",
+          "nextAction": "원본 범위와 실제 효과 대조",
+          "nextCheckAt": "2026-10-08T09:00:00Z"
+        },
+        "occurrence": {
+          "kind": "SHIPMENT_ARRIVAL",
+          "content": {
+            "shipmentEventId": "b1cca3b1-9f9b-584f-ae97-7652b2b02bcd",
+            "shipmentId": "$SHIPMENT",
+            "cargoId": "$CARGO",
+            "legId": "$LEG",
+            "placeId": "$W",
+            "physicalScopeId": "$SHIP_RANGE",
+            "quantity": "100",
+            "unit": "BOX",
+            "occurredAt": "2026-10-07T09:00:02Z",
+            "kind": "ARRIVAL"
+          },
+          "externalEventId": "c4-ship-arrival",
+          "quantity": "100",
+          "unit": "BOX",
+          "assertion": "authored synthetic external original"
+        }
+      },
+      "binding": {
+        "organizationId": "$ORG",
+        "workId": "$WORK",
+        "itemId": "$P",
+        "actorId": "$reader",
+        "supervisorId": "$supervisor",
+        "physicalScopeId": "$SHIP_RANGE",
+        "subjectId": "$P",
+        "subjectKind": "ITEM",
+        "placeId": "$W"
+      }
+    },
+    {
+      "id": "c4-ship-arrival-match",
+      "type": "command",
+      "capability": "matchSourceIdentity",
+      "request": {
+        "intentKind": "COMMAND",
+        "definitionVersion": "definition-v1",
+        "capabilityId": "matchSourceIdentity",
+        "expectedRevision": 1,
+        "commandIdempotencyKey": "c4-ship-arrival-match",
+        "slots": {
+          "claimId": "$c4-ship-arrival.claim",
+          "basisDocumentId": "$c4-ship-arrival.document",
+          "physicalScopeId": "$SHIP_RANGE",
+          "policyVersion": "fixture-v1",
+          "sourceIdentity": "native-c4-ship-arrival:c4-ship-arrival:1",
+          "quantity": "100",
+          "unit": "BOX",
+          "effectiveFrom": "2026-10-07T09:00:02Z",
+          "reason": "외부 ORIGINAL과 동일한 범위 대조"
+        },
+        "provenance": {},
+        "subjectRefs": [
+          {
+            "type": "TradeItem",
+            "id": "$P"
+          }
+        ]
+      },
+      "outcome": "APPLIED",
+      "bind": {
+        "c4-ship-arrival.reconciliation": "/id"
+      }
+    },
+    {
+      "id": "c4-ship-arrival-link",
+      "type": "command",
+      "capability": "linkCanonicalOccurrence",
+      "request": {
+        "intentKind": "COMMAND",
+        "definitionVersion": "definition-v1",
+        "capabilityId": "linkCanonicalOccurrence",
+        "expectedRevision": 1,
+        "commandIdempotencyKey": "c4-ship-arrival-link",
+        "slots": {
+          "reconciliationId": "$c4-ship-arrival.reconciliation"
+        },
+        "provenance": {},
+        "subjectRefs": [
+          {
+            "type": "TradeItem",
+            "id": "$P"
+          }
+        ]
+      },
+      "outcome": "APPLIED",
+      "bind": {
+        "c4-ship-arrival.canonical": "/id"
+      }
+    },
+    {
+      "id": "c4-ship-arrival-record",
+      "type": "command",
+      "capability": "recordLegEvent",
+      "request": {
+        "intentKind": "RECORD",
+        "definitionVersion": "definition-v1",
+        "capabilityId": "recordLegEvent",
+        "expectedRevision": "$SHIP_REV",
+        "commandIdempotencyKey": "c4-ship-arrival-record",
+        "slots": {
+          "shipmentId": "$SHIPMENT",
+          "cargoId": "$CARGO",
+          "legId": "$LEG",
+          "kind": "ARRIVAL",
+          "placeId": "$W",
+          "physicalScopeId": "$SHIP_RANGE",
+          "occurrenceId": "$c4-ship-arrival.canonical",
+          "quantity": "100",
+          "unit": "BOX",
+          "occurredAt": "2026-10-07T09:00:02Z"
+        },
+        "provenance": {},
+        "subjectRefs": [
+          {
+            "type": "Shipment",
+            "id": "$SHIPMENT"
+          }
+        ]
+      },
+      "outcome": "APPLIED",
+      "bind": {
+        "SHIP_REV": "/revision"
+      }
+    },
+    {
+      "id": "c4-custody-handover",
+      "type": "original",
+      "fixture": {
+        "synthetic": true,
+        "clock": {
+          "asOf": "2026-10-07T09:00:02Z",
+          "knownAt": "2026-10-07T09:00:02Z"
+        },
+        "sourceProfile": {
+          "namespace": "native-c4-custody-handover",
+          "policyVersion": "fixture-v1",
+          "nextAction": "원본 범위와 실제 효과 대조",
+          "nextCheckAt": "2026-10-08T09:00:00Z"
+        },
+        "occurrence": {
+          "kind": "CUSTODY_HANDOVER",
+          "content": {
+            "shipmentEventId": "7f2efe1b-2deb-5b23-927e-e9d13754f597",
+            "shipmentId": "$SHIPMENT",
+            "cargoId": "$CARGO",
+            "legId": "$LEG",
+            "placeId": "$W",
+            "physicalScopeId": "$SHIP_RANGE",
+            "quantity": "100",
+            "unit": "BOX",
+            "occurredAt": "2026-10-07T09:00:02Z",
+            "fromCustodianId": "$reader",
+            "toCustodianId": "$supervisor"
+          },
+          "externalEventId": "c4-custody-handover",
+          "quantity": "100",
+          "unit": "BOX",
+          "assertion": "authored synthetic external original"
+        }
+      },
+      "binding": {
+        "organizationId": "$ORG",
+        "workId": "$WORK",
+        "itemId": "$P",
+        "actorId": "$reader",
+        "supervisorId": "$supervisor",
+        "physicalScopeId": "$SHIP_RANGE",
+        "subjectId": "$P",
+        "subjectKind": "ITEM",
+        "placeId": "$W"
+      }
+    },
+    {
+      "id": "c4-custody-handover-match",
+      "type": "command",
+      "capability": "matchSourceIdentity",
+      "request": {
+        "intentKind": "COMMAND",
+        "definitionVersion": "definition-v1",
+        "capabilityId": "matchSourceIdentity",
+        "expectedRevision": 1,
+        "commandIdempotencyKey": "c4-custody-handover-match",
+        "slots": {
+          "claimId": "$c4-custody-handover.claim",
+          "basisDocumentId": "$c4-custody-handover.document",
+          "physicalScopeId": "$SHIP_RANGE",
+          "policyVersion": "fixture-v1",
+          "sourceIdentity": "native-c4-custody-handover:c4-custody-handover:1",
+          "quantity": "100",
+          "unit": "BOX",
+          "effectiveFrom": "2026-10-07T09:00:02Z",
+          "reason": "외부 ORIGINAL과 동일한 범위 대조"
+        },
+        "provenance": {},
+        "subjectRefs": [
+          {
+            "type": "TradeItem",
+            "id": "$P"
+          }
+        ]
+      },
+      "outcome": "APPLIED",
+      "bind": {
+        "c4-custody-handover.reconciliation": "/id"
+      }
+    },
+    {
+      "id": "c4-custody-handover-link",
+      "type": "command",
+      "capability": "linkCanonicalOccurrence",
+      "request": {
+        "intentKind": "COMMAND",
+        "definitionVersion": "definition-v1",
+        "capabilityId": "linkCanonicalOccurrence",
+        "expectedRevision": 1,
+        "commandIdempotencyKey": "c4-custody-handover-link",
+        "slots": {
+          "reconciliationId": "$c4-custody-handover.reconciliation"
+        },
+        "provenance": {},
+        "subjectRefs": [
+          {
+            "type": "TradeItem",
+            "id": "$P"
+          }
+        ]
+      },
+      "outcome": "APPLIED",
+      "bind": {
+        "c4-custody-handover.canonical": "/id"
+      }
+    },
+    {
+      "id": "c4-handover-record",
+      "type": "command",
+      "capability": "recordHandover",
+      "request": {
+        "intentKind": "RECORD",
+        "definitionVersion": "definition-v1",
+        "capabilityId": "recordHandover",
+        "expectedRevision": "$SHIP_REV",
+        "commandIdempotencyKey": "c4-handover-record",
+        "slots": {
+          "shipmentId": "$SHIPMENT",
+          "cargoId": "$CARGO",
+          "legId": "$LEG",
+          "placeId": "$W",
+          "physicalScopeId": "$SHIP_RANGE",
+          "occurrenceId": "$c4-custody-handover.canonical",
+          "quantity": "100",
+          "unit": "BOX",
+          "occurredAt": "2026-10-07T09:00:02Z",
+          "fromCustodianId": "$reader",
+          "toCustodianId": "$supervisor"
+        },
+        "provenance": {},
+        "subjectRefs": [
+          {
+            "type": "Shipment",
+            "id": "$SHIPMENT"
+          }
+        ]
+      },
+      "outcome": "APPLIED"
+    },
+    {
+      "id": "c4-RANGE60",
+      "type": "uuid",
+      "alias": "RANGE60"
+    },
+    {
+      "id": "c4-receipt60",
+      "type": "original",
+      "fixture": {
+        "synthetic": true,
+        "clock": {
+          "asOf": "2026-10-07T09:00:02Z",
+          "knownAt": "2026-10-07T09:00:02Z"
+        },
+        "sourceProfile": {
+          "namespace": "native-c4-receipt60",
+          "policyVersion": "fixture-v1",
+          "nextAction": "원본 범위와 실제 효과 대조",
+          "nextCheckAt": "2026-10-08T09:00:00Z"
+        },
+        "occurrence": {
+          "kind": "PHYSICAL_RECEIPT",
+          "content": {
+            "rangeRootId": "$RANGE60",
+            "startQuantity": "0",
+            "itemId": "$P",
+            "lotId": "$L",
+            "placeId": "$W",
+            "workId": "$WORK",
+            "quantity": "100",
+            "unit": "BOX",
+            "occurredAt": "2026-10-07T09:00:02Z"
+          },
+          "externalEventId": "c4-receipt60",
+          "quantity": "100",
+          "unit": "BOX",
+          "assertion": "authored synthetic external original"
+        }
+      },
+      "binding": {
+        "organizationId": "$ORG",
+        "workId": "$WORK",
+        "itemId": "$P",
+        "actorId": "$reader",
+        "supervisorId": "$supervisor",
+        "physicalScopeId": "$RANGE60",
+        "subjectId": "$P",
+        "subjectKind": "ITEM",
+        "placeId": "$W"
+      }
+    },
+    {
+      "id": "c4-receipt60-provisional",
+      "type": "command",
+      "capability": "receiveProvisional",
+      "request": {
+        "intentKind": "RECORD",
+        "definitionVersion": "definition-v1",
+        "capabilityId": "receiveProvisional",
+        "expectedRevision": 0,
+        "commandIdempotencyKey": "c4-receipt60-provisional",
+        "slots": {
+          "eventId": "$c4-receipt60.event",
+          "rangeRootId": "$RANGE60",
+          "startQuantity": "0",
+          "quantity": "100",
+          "unit": "BOX",
+          "itemId": "$P",
+          "lotId": "$L",
+          "placeId": "$W",
+          "workId": "$WORK",
+          "ownerId": "$reader",
+          "supervisorId": "$supervisor",
+          "nextAction": "실물과 원본 사건 확인",
+          "nextCheckAt": "2026-10-08T09:00:00Z",
+          "occurredAt": "2026-10-07T09:00:02Z",
+          "purchaseLineId": "$LINE"
+        },
+        "provenance": {},
+        "subjectRefs": [
+          {
+            "type": "Work",
+            "id": "$WORK"
+          }
+        ]
+      },
+      "outcome": "APPLIED",
+      "bind": {
+        "c4-receipt60.observation": "/effects/receiptId"
+      }
+    },
+    {
+      "id": "c4-receipt60-match",
+      "type": "command",
+      "capability": "matchSourceIdentity",
+      "request": {
+        "intentKind": "COMMAND",
+        "definitionVersion": "definition-v1",
+        "capabilityId": "matchSourceIdentity",
+        "expectedRevision": 1,
+        "commandIdempotencyKey": "c4-receipt60-match",
+        "slots": {
+          "claimId": "$c4-receipt60.claim",
+          "basisDocumentId": "$c4-receipt60.document",
+          "physicalScopeId": "$RANGE60",
+          "policyVersion": "fixture-v1",
+          "sourceIdentity": "native-c4-receipt60:c4-receipt60:1",
+          "quantity": "100",
+          "unit": "BOX",
+          "effectiveFrom": "2026-10-07T09:00:02Z",
+          "reason": "외부 ORIGINAL과 동일한 범위 대조"
+        },
+        "provenance": {},
+        "subjectRefs": [
+          {
+            "type": "TradeItem",
+            "id": "$P"
+          }
+        ]
+      },
+      "outcome": "APPLIED",
+      "bind": {
+        "c4-receipt60.reconciliation": "/id"
+      }
+    },
+    {
+      "id": "c4-receipt60-link",
+      "type": "command",
+      "capability": "linkCanonicalOccurrence",
+      "request": {
+        "intentKind": "COMMAND",
+        "definitionVersion": "definition-v1",
+        "capabilityId": "linkCanonicalOccurrence",
+        "expectedRevision": 1,
+        "commandIdempotencyKey": "c4-receipt60-link",
+        "slots": {
+          "reconciliationId": "$c4-receipt60.reconciliation"
+        },
+        "provenance": {},
+        "subjectRefs": [
+          {
+            "type": "TradeItem",
+            "id": "$P"
+          }
+        ]
+      },
+      "outcome": "APPLIED",
+      "bind": {
+        "c4-receipt60.canonical": "/id"
+      }
+    },
+    {
+      "id": "c4-receipt60-confirm",
+      "type": "command",
+      "capability": "confirmReceipt",
+      "request": {
+        "intentKind": "COMMAND",
+        "definitionVersion": "definition-v1",
+        "capabilityId": "confirmReceipt",
+        "expectedRevision": 0,
+        "commandIdempotencyKey": "c4-receipt60-confirm",
+        "slots": {
+          "receiptId": "$c4-receipt60.observation",
+          "canonicalOccurrenceId": "$c4-receipt60.canonical",
+          "lotId": "$L"
+        },
+        "provenance": {},
+        "subjectRefs": [
+          {
+            "type": "Receipt",
+            "id": "$c4-receipt60.observation"
+          }
+        ]
+      },
+      "outcome": "APPLIED",
+      "bind": {
+        "c4-receipt60.segment": "/effects/segmentId"
+      }
+    },
+    {
+      "id": "c4-reg-draft",
+      "type": "original",
+      "fixture": {
+        "synthetic": true,
+        "clock": {
+          "asOf": "2026-10-07T09:00:02Z",
+          "knownAt": "2026-10-07T09:00:02Z"
+        },
+        "sourceProfile": {
+          "namespace": "native-c4-regulator",
+          "policyVersion": "fixture-v1",
+          "nextAction": "원본 범위와 실제 효과 대조",
+          "nextCheckAt": "2026-10-08T09:00:00Z"
+        },
+        "occurrence": {
+          "kind": "REGULATORY_DRAFT",
+          "content": {
+            "draft": "fictional dossier",
+            "itemId": "$P"
+          },
+          "externalEventId": "c4-reg-draft",
+          "quantity": "100",
+          "unit": "BOX",
+          "assertion": "authored synthetic external original"
+        }
+      },
+      "binding": {
+        "organizationId": "$ORG",
+        "workId": "$WORK",
+        "itemId": "$P",
+        "actorId": "$reader",
+        "supervisorId": "$supervisor",
+        "physicalScopeId": "$c4-receipt60.segment",
+        "subjectId": "$c4-receipt60.segment",
+        "subjectKind": "SEGMENT",
+        "placeId": "$W"
+      }
+    },
+    {
+      "id": "c4-reg-prepare",
+      "type": "command",
+      "capability": "prepareRegulatoryProcedure",
+      "request": {
+        "intentKind": "COMMAND",
+        "definitionVersion": "definition-v1",
+        "capabilityId": "prepareRegulatoryProcedure",
+        "expectedRevision": 0,
+        "commandIdempotencyKey": "c4-reg-prepare",
+        "slots": {
+          "itemId": "$P",
+          "lotId": "$L",
+          "physicalScopeId": "$c4-receipt60.segment",
+          "workId": "$WORK",
+          "policyId": "$REGPOL",
+          "documentVersionId": "$c4-reg-draft.document"
+        },
+        "provenance": {},
+        "subjectRefs": [
+          {
+            "type": "QuantitySegment",
+            "id": "$c4-receipt60.segment"
+          }
+        ]
+      },
+      "outcome": "APPLIED",
+      "bind": {
+        "PROC": "/effects/procedureId",
+        "PROC_VERSION": "/effects/procedureVersionId",
+        "PROC_REV": "/revision"
+      }
+    },
+    {
+      "id": "c4-reg-submitted",
+      "type": "original",
+      "fixture": {
+        "synthetic": true,
+        "clock": {
+          "asOf": "2026-10-07T09:00:02Z",
+          "knownAt": "2026-10-07T09:00:02Z"
+        },
+        "sourceProfile": {
+          "namespace": "native-c4-regulator",
+          "policyVersion": "fixture-v1",
+          "nextAction": "원본 범위와 실제 효과 대조",
+          "nextCheckAt": "2026-10-08T09:00:00Z"
+        },
+        "occurrence": {
+          "kind": "REGULATORY_SUBMISSION",
+          "content": {
+            "regulatoryEventId": "bdef458e-c653-58d5-bafe-203a5723b7e4",
+            "procedureId": "$PROC",
+            "procedureVersionId": "$PROC_VERSION",
+            "itemId": "$P",
+            "lotId": "$L",
+            "physicalScopeId": "$c4-receipt60.segment",
+            "authority": "FICTIONAL-AUTHORITY",
+            "policyVersion": "fixture-v1",
+            "occurredAt": "2026-10-07T09:00:02Z"
+          },
+          "externalEventId": "c4-reg-submitted",
+          "quantity": null,
+          "unit": null,
+          "assertion": "authored synthetic external original"
+        }
+      },
+      "binding": {
+        "organizationId": "$ORG",
+        "workId": "$WORK",
+        "itemId": "$P",
+        "actorId": "$reader",
+        "supervisorId": "$supervisor",
+        "physicalScopeId": "$c4-receipt60.segment",
+        "subjectId": "$c4-receipt60.segment",
+        "subjectKind": "SEGMENT",
+        "placeId": "$W"
+      }
+    },
+    {
+      "id": "c4-reg-submitted-match",
+      "type": "command",
+      "capability": "matchSourceIdentity",
+      "request": {
+        "intentKind": "COMMAND",
+        "definitionVersion": "definition-v1",
+        "capabilityId": "matchSourceIdentity",
+        "expectedRevision": 1,
+        "commandIdempotencyKey": "c4-reg-submitted-match",
+        "slots": {
+          "claimId": "$c4-reg-submitted.claim",
+          "basisDocumentId": "$c4-reg-submitted.document",
+          "physicalScopeId": "$c4-receipt60.segment",
+          "policyVersion": "fixture-v1",
+          "sourceIdentity": "native-c4-regulator:c4-reg-submitted:1",
+          "effectiveFrom": "2026-10-07T09:00:02Z",
+          "reason": "외부 ORIGINAL과 동일한 범위 대조"
+        },
+        "provenance": {},
+        "subjectRefs": [
+          {
+            "type": "QuantitySegment",
+            "id": "$c4-receipt60.segment"
+          }
+        ]
+      },
+      "outcome": "APPLIED",
+      "bind": {
+        "c4-reg-submitted.reconciliation": "/id"
+      }
+    },
+    {
+      "id": "c4-reg-submitted-link",
+      "type": "command",
+      "capability": "linkCanonicalOccurrence",
+      "request": {
+        "intentKind": "COMMAND",
+        "definitionVersion": "definition-v1",
+        "capabilityId": "linkCanonicalOccurrence",
+        "expectedRevision": 1,
+        "commandIdempotencyKey": "c4-reg-submitted-link",
+        "slots": {
+          "reconciliationId": "$c4-reg-submitted.reconciliation"
+        },
+        "provenance": {},
+        "subjectRefs": [
+          {
+            "type": "QuantitySegment",
+            "id": "$c4-receipt60.segment"
+          }
+        ]
+      },
+      "outcome": "APPLIED",
+      "bind": {
+        "c4-reg-submitted.canonical": "/id"
+      }
+    },
+    {
+      "id": "c4-submit-reg",
+      "type": "command",
+      "capability": "recordSubmission",
+      "request": {
+        "intentKind": "RECORD",
+        "definitionVersion": "definition-v1",
+        "capabilityId": "recordSubmission",
+        "expectedRevision": "$PROC_REV",
+        "commandIdempotencyKey": "c4-submit-reg",
+        "slots": {
+          "procedureId": "$PROC",
+          "occurredAt": "2026-10-07T09:00:02Z",
+          "occurrenceId": "$c4-reg-submitted.canonical"
+        },
+        "provenance": {},
+        "subjectRefs": [
+          {
+            "type": "QuantitySegment",
+            "id": "$c4-receipt60.segment"
+          }
+        ]
+      },
+      "outcome": "APPLIED",
+      "bind": {
+        "PROC_VERSION": "/effects/procedureVersionId",
+        "PROC_REV": "/revision"
+      }
+    },
+    {
+      "id": "c4-reg-allow30",
+      "type": "original",
+      "fixture": {
+        "synthetic": true,
+        "clock": {
+          "asOf": "2026-10-07T09:00:02Z",
+          "knownAt": "2026-10-07T09:00:02Z"
+        },
+        "sourceProfile": {
+          "namespace": "native-c4-regulator",
+          "policyVersion": "fixture-v1",
+          "nextAction": "원본 범위와 실제 효과 대조",
+          "nextCheckAt": "2026-10-08T09:00:00Z"
+        },
+        "occurrence": {
+          "kind": "REGULATORY_DECISION",
+          "content": {
+            "regulatoryEventId": "c1ea7bcb-3473-5705-9d24-01d48d836324",
+            "procedureId": "$PROC",
+            "procedureVersionId": "$PROC_VERSION",
+            "itemId": "$P",
+            "lotId": "$L",
+            "physicalScopeId": "$c4-receipt60.segment",
+            "authority": "FICTIONAL-AUTHORITY",
+            "policyVersion": "fixture-v1",
+            "decision": "ALLOWED",
+            "action": "SELL",
+            "startQuantity": "0",
+            "quantity": "100",
+            "unit": "BOX",
+            "validFrom": "2026-10-07T09:00:02Z",
+            "validUntil": "2026-10-31T00:00:00Z"
+          },
+          "externalEventId": "c4-reg-allow30",
+          "quantity": "100",
+          "unit": "BOX",
+          "assertion": "authored synthetic external original"
+        }
+      },
+      "binding": {
+        "organizationId": "$ORG",
+        "workId": "$WORK",
+        "itemId": "$P",
+        "actorId": "$reader",
+        "supervisorId": "$supervisor",
+        "physicalScopeId": "$c4-receipt60.segment",
+        "subjectId": "$c4-receipt60.segment",
+        "subjectKind": "SEGMENT",
+        "placeId": "$W"
+      }
+    },
+    {
+      "id": "c4-reg-allow30-match",
+      "type": "command",
+      "capability": "matchSourceIdentity",
+      "request": {
+        "intentKind": "COMMAND",
+        "definitionVersion": "definition-v1",
+        "capabilityId": "matchSourceIdentity",
+        "expectedRevision": 1,
+        "commandIdempotencyKey": "c4-reg-allow30-match",
+        "slots": {
+          "claimId": "$c4-reg-allow30.claim",
+          "basisDocumentId": "$c4-reg-allow30.document",
+          "physicalScopeId": "$c4-receipt60.segment",
+          "policyVersion": "fixture-v1",
+          "sourceIdentity": "native-c4-regulator:c4-reg-allow30:1",
+          "quantity": "100",
+          "unit": "BOX",
+          "effectiveFrom": "2026-10-07T09:00:02Z",
+          "reason": "외부 ORIGINAL과 동일한 범위 대조"
+        },
+        "provenance": {},
+        "subjectRefs": [
+          {
+            "type": "QuantitySegment",
+            "id": "$c4-receipt60.segment"
+          }
+        ]
+      },
+      "outcome": "APPLIED",
+      "bind": {
+        "c4-reg-allow30.reconciliation": "/id"
+      }
+    },
+    {
+      "id": "c4-reg-allow30-link",
+      "type": "command",
+      "capability": "linkCanonicalOccurrence",
+      "request": {
+        "intentKind": "COMMAND",
+        "definitionVersion": "definition-v1",
+        "capabilityId": "linkCanonicalOccurrence",
+        "expectedRevision": 1,
+        "commandIdempotencyKey": "c4-reg-allow30-link",
+        "slots": {
+          "reconciliationId": "$c4-reg-allow30.reconciliation"
+        },
+        "provenance": {},
+        "subjectRefs": [
+          {
+            "type": "QuantitySegment",
+            "id": "$c4-receipt60.segment"
+          }
+        ]
+      },
+      "outcome": "APPLIED",
+      "bind": {
+        "c4-reg-allow30.canonical": "/id"
+      }
+    },
+    {
+      "id": "c4-allow30",
+      "type": "command",
+      "capability": "recordRegulatoryDecision",
+      "request": {
+        "intentKind": "RECORD",
+        "definitionVersion": "definition-v1",
+        "capabilityId": "recordRegulatoryDecision",
+        "expectedRevision": "$PROC_REV",
+        "commandIdempotencyKey": "c4-allow30",
+        "slots": {
+          "procedureId": "$PROC",
+          "occurrenceId": "$c4-reg-allow30.canonical",
+          "decision": "ALLOWED",
+          "action": "SELL",
+          "startQuantity": "0",
+          "quantity": "100",
+          "unit": "BOX",
+          "validFrom": "2026-10-07T09:00:02Z",
+          "validUntil": "2026-10-31T00:00:00Z"
+        },
+        "provenance": {},
+        "subjectRefs": [
+          {
+            "type": "QuantitySegment",
+            "id": "$c4-receipt60.segment"
+          }
+        ]
+      },
+      "outcome": "APPLIED",
+      "bind": {
+        "PROC_REV": "/revision"
+      }
+    },
+    {
+      "id": "c4-reg-label",
+      "type": "original",
+      "fixture": {
+        "synthetic": true,
+        "clock": {
+          "asOf": "2026-10-07T09:00:02Z",
+          "knownAt": "2026-10-07T09:00:02Z"
+        },
+        "sourceProfile": {
+          "namespace": "native-c4-regulator",
+          "policyVersion": "fixture-v1",
+          "nextAction": "원본 범위와 실제 효과 대조",
+          "nextCheckAt": "2026-10-08T09:00:00Z"
+        },
+        "occurrence": {
+          "kind": "LABEL_VERIFICATION",
+          "content": {
+            "regulatoryEventId": "6da52af8-f864-536d-8073-2af724303fb4",
+            "procedureId": "$PROC",
+            "procedureVersionId": "$PROC_VERSION",
+            "itemId": "$P",
+            "lotId": "$L",
+            "physicalScopeId": "$c4-receipt60.segment",
+            "authority": "FICTIONAL-AUTHORITY",
+            "policyVersion": "fixture-v1",
+            "decision": "VERIFIED",
+            "packagingVersionId": "$PACK",
+            "specificationVersionId": "$SPEC",
+            "validFrom": "2026-10-07T09:00:02Z",
+            "validUntil": "2026-10-31T00:00:00Z"
+          },
+          "externalEventId": "c4-reg-label",
+          "quantity": null,
+          "unit": null,
+          "assertion": "authored synthetic external original"
+        }
+      },
+      "binding": {
+        "organizationId": "$ORG",
+        "workId": "$WORK",
+        "itemId": "$P",
+        "actorId": "$reader",
+        "supervisorId": "$supervisor",
+        "physicalScopeId": "$c4-receipt60.segment",
+        "subjectId": "$c4-receipt60.segment",
+        "subjectKind": "SEGMENT",
+        "placeId": "$W"
+      }
+    },
+    {
+      "id": "c4-reg-label-match",
+      "type": "command",
+      "capability": "matchSourceIdentity",
+      "request": {
+        "intentKind": "COMMAND",
+        "definitionVersion": "definition-v1",
+        "capabilityId": "matchSourceIdentity",
+        "expectedRevision": 1,
+        "commandIdempotencyKey": "c4-reg-label-match",
+        "slots": {
+          "claimId": "$c4-reg-label.claim",
+          "basisDocumentId": "$c4-reg-label.document",
+          "physicalScopeId": "$c4-receipt60.segment",
+          "policyVersion": "fixture-v1",
+          "sourceIdentity": "native-c4-regulator:c4-reg-label:1",
+          "effectiveFrom": "2026-10-07T09:00:02Z",
+          "reason": "외부 ORIGINAL과 동일한 범위 대조"
+        },
+        "provenance": {},
+        "subjectRefs": [
+          {
+            "type": "QuantitySegment",
+            "id": "$c4-receipt60.segment"
+          }
+        ]
+      },
+      "outcome": "APPLIED",
+      "bind": {
+        "c4-reg-label.reconciliation": "/id"
+      }
+    },
+    {
+      "id": "c4-reg-label-link",
+      "type": "command",
+      "capability": "linkCanonicalOccurrence",
+      "request": {
+        "intentKind": "COMMAND",
+        "definitionVersion": "definition-v1",
+        "capabilityId": "linkCanonicalOccurrence",
+        "expectedRevision": 1,
+        "commandIdempotencyKey": "c4-reg-label-link",
+        "slots": {
+          "reconciliationId": "$c4-reg-label.reconciliation"
+        },
+        "provenance": {},
+        "subjectRefs": [
+          {
+            "type": "QuantitySegment",
+            "id": "$c4-receipt60.segment"
+          }
+        ]
+      },
+      "outcome": "APPLIED",
+      "bind": {
+        "c4-reg-label.canonical": "/id"
+      }
+    },
+    {
+      "id": "c4-label-verified",
+      "type": "command",
+      "capability": "verifyLabel",
+      "request": {
+        "intentKind": "RECORD",
+        "definitionVersion": "definition-v1",
+        "capabilityId": "verifyLabel",
+        "expectedRevision": "$PROC_REV",
+        "commandIdempotencyKey": "c4-label-verified",
+        "slots": {
+          "procedureId": "$PROC",
+          "occurrenceId": "$c4-reg-label.canonical",
+          "decision": "VERIFIED",
+          "packagingVersionId": "$PACK",
+          "specificationVersionId": "$SPEC",
+          "validFrom": "2026-10-07T09:00:02Z",
+          "validUntil": "2026-10-31T00:00:00Z"
+        },
+        "provenance": {},
+        "subjectRefs": [
+          {
+            "type": "QuantitySegment",
+            "id": "$c4-receipt60.segment"
+          }
+        ]
+      },
+      "outcome": "APPLIED"
+    },
+    {
+      "id": "c4-s60-QC",
+      "type": "original",
+      "fixture": {
+        "synthetic": true,
+        "clock": {
+          "asOf": "2026-10-07T09:00:02Z",
+          "knownAt": "2026-10-07T09:00:02Z"
+        },
+        "sourceProfile": {
+          "namespace": "native-c4-s60-QC",
+          "policyVersion": "fixture-v1",
+          "nextAction": "원본 범위와 실제 효과 대조",
+          "nextCheckAt": "2026-10-08T09:00:00Z"
+        },
+        "occurrence": {
+          "kind": "QUALITY_DECISION_recordDispositionBasis_QC",
+          "content": {
+            "segmentId": "$c4-receipt60.segment",
+            "operation": "recordDispositionBasis",
+            "action": "SELL",
+            "category": "QC",
+            "startQuantity": "0",
+            "quantity": "100",
+            "unit": "BOX",
+            "validFrom": "2026-10-07T09:00:02Z",
+            "validUntil": "2026-10-31T00:00:00Z",
+            "workId": "$WORK",
+            "sourceDecisionId": "3ab72da1-7314-534b-95ff-2effca670524",
+            "sourceVersion": "1"
+          },
+          "externalEventId": "c4-3ab72da1-7314-534b-95ff-2effca670524",
+          "quantity": "100",
+          "unit": "BOX",
+          "assertion": "authored synthetic external original"
+        }
+      },
+      "binding": {
+        "organizationId": "$ORG",
+        "workId": "$WORK",
+        "itemId": "$P",
+        "actorId": "$reader",
+        "supervisorId": "$supervisor",
+        "physicalScopeId": "$c4-receipt60.segment",
+        "subjectId": "$c4-receipt60.segment",
+        "subjectKind": "SEGMENT",
+        "placeId": "$W"
+      }
+    },
+    {
+      "id": "c4-s60-QC-match",
+      "type": "command",
+      "capability": "matchSourceIdentity",
+      "request": {
+        "intentKind": "COMMAND",
+        "definitionVersion": "definition-v1",
+        "capabilityId": "matchSourceIdentity",
+        "expectedRevision": 1,
+        "commandIdempotencyKey": "c4-s60-QC-match",
+        "slots": {
+          "claimId": "$c4-s60-QC.claim",
+          "basisDocumentId": "$c4-s60-QC.document",
+          "physicalScopeId": "$c4-receipt60.segment",
+          "policyVersion": "fixture-v1",
+          "sourceIdentity": "native-c4-s60-QC:c4-3ab72da1-7314-534b-95ff-2effca670524:1",
+          "quantity": "100",
+          "unit": "BOX",
+          "effectiveFrom": "2026-10-07T09:00:02Z",
+          "reason": "외부 ORIGINAL과 동일한 범위 대조"
+        },
+        "provenance": {},
+        "subjectRefs": [
+          {
+            "type": "QuantitySegment",
+            "id": "$c4-receipt60.segment"
+          }
+        ]
+      },
+      "outcome": "APPLIED",
+      "bind": {
+        "c4-s60-QC.reconciliation": "/id"
+      }
+    },
+    {
+      "id": "c4-s60-QC-link",
+      "type": "command",
+      "capability": "linkCanonicalOccurrence",
+      "request": {
+        "intentKind": "COMMAND",
+        "definitionVersion": "definition-v1",
+        "capabilityId": "linkCanonicalOccurrence",
+        "expectedRevision": 1,
+        "commandIdempotencyKey": "c4-s60-QC-link",
+        "slots": {
+          "reconciliationId": "$c4-s60-QC.reconciliation"
+        },
+        "provenance": {},
+        "subjectRefs": [
+          {
+            "type": "QuantitySegment",
+            "id": "$c4-receipt60.segment"
+          }
+        ]
+      },
+      "outcome": "APPLIED",
+      "bind": {
+        "c4-s60-QC.canonical": "/id"
+      }
+    },
+    {
+      "id": "c4-s60-QC-decision",
+      "type": "command",
+      "capability": "recordDispositionBasis",
+      "request": {
+        "intentKind": "RECORD",
+        "definitionVersion": "definition-v1",
+        "capabilityId": "recordDispositionBasis",
+        "expectedRevision": 0,
+        "commandIdempotencyKey": "c4-s60-QC-decision",
+        "slots": {
+          "segmentId": "$c4-receipt60.segment",
+          "action": "SELL",
+          "category": "QC",
+          "startQuantity": "0",
+          "quantity": "100",
+          "unit": "BOX",
+          "validFrom": "2026-10-07T09:00:02Z",
+          "validUntil": "2026-10-31T00:00:00Z",
+          "workId": "$WORK",
+          "evidenceId": "$c4-s60-QC.document",
+          "reason": "원본의 정확한 행동 범위를 판정",
+          "nextCheckAt": "2026-10-08T09:00:00Z"
+        },
+        "provenance": {},
+        "subjectRefs": [
+          {
+            "type": "QuantitySegment",
+            "id": "$c4-receipt60.segment"
+          }
+        ]
+      },
+      "outcome": "APPLIED"
+    },
+    {
+      "id": "c4-s60-CUSTOMER",
+      "type": "original",
+      "fixture": {
+        "synthetic": true,
+        "clock": {
+          "asOf": "2026-10-07T09:00:02Z",
+          "knownAt": "2026-10-07T09:00:02Z"
+        },
+        "sourceProfile": {
+          "namespace": "native-c4-s60-CUSTOMER",
+          "policyVersion": "fixture-v1",
+          "nextAction": "원본 범위와 실제 효과 대조",
+          "nextCheckAt": "2026-10-08T09:00:00Z"
+        },
+        "occurrence": {
+          "kind": "QUALITY_DECISION_recordDispositionBasis_CUSTOMER",
+          "content": {
+            "segmentId": "$c4-receipt60.segment",
+            "operation": "recordDispositionBasis",
+            "action": "SELL",
+            "category": "CUSTOMER",
+            "startQuantity": "0",
+            "quantity": "100",
+            "unit": "BOX",
+            "validFrom": "2026-10-07T09:00:02Z",
+            "validUntil": "2026-10-31T00:00:00Z",
+            "workId": "$WORK",
+            "sourceDecisionId": "5f631236-0a72-5ef5-8d95-ff21f9fee58a",
+            "sourceVersion": "1"
+          },
+          "externalEventId": "c4-5f631236-0a72-5ef5-8d95-ff21f9fee58a",
+          "quantity": "100",
+          "unit": "BOX",
+          "assertion": "authored synthetic external original"
+        }
+      },
+      "binding": {
+        "organizationId": "$ORG",
+        "workId": "$WORK",
+        "itemId": "$P",
+        "actorId": "$reader",
+        "supervisorId": "$supervisor",
+        "physicalScopeId": "$c4-receipt60.segment",
+        "subjectId": "$c4-receipt60.segment",
+        "subjectKind": "SEGMENT",
+        "placeId": "$W"
+      }
+    },
+    {
+      "id": "c4-s60-CUSTOMER-match",
+      "type": "command",
+      "capability": "matchSourceIdentity",
+      "request": {
+        "intentKind": "COMMAND",
+        "definitionVersion": "definition-v1",
+        "capabilityId": "matchSourceIdentity",
+        "expectedRevision": 1,
+        "commandIdempotencyKey": "c4-s60-CUSTOMER-match",
+        "slots": {
+          "claimId": "$c4-s60-CUSTOMER.claim",
+          "basisDocumentId": "$c4-s60-CUSTOMER.document",
+          "physicalScopeId": "$c4-receipt60.segment",
+          "policyVersion": "fixture-v1",
+          "sourceIdentity": "native-c4-s60-CUSTOMER:c4-5f631236-0a72-5ef5-8d95-ff21f9fee58a:1",
+          "quantity": "100",
+          "unit": "BOX",
+          "effectiveFrom": "2026-10-07T09:00:02Z",
+          "reason": "외부 ORIGINAL과 동일한 범위 대조"
+        },
+        "provenance": {},
+        "subjectRefs": [
+          {
+            "type": "QuantitySegment",
+            "id": "$c4-receipt60.segment"
+          }
+        ]
+      },
+      "outcome": "APPLIED",
+      "bind": {
+        "c4-s60-CUSTOMER.reconciliation": "/id"
+      }
+    },
+    {
+      "id": "c4-s60-CUSTOMER-link",
+      "type": "command",
+      "capability": "linkCanonicalOccurrence",
+      "request": {
+        "intentKind": "COMMAND",
+        "definitionVersion": "definition-v1",
+        "capabilityId": "linkCanonicalOccurrence",
+        "expectedRevision": 1,
+        "commandIdempotencyKey": "c4-s60-CUSTOMER-link",
+        "slots": {
+          "reconciliationId": "$c4-s60-CUSTOMER.reconciliation"
+        },
+        "provenance": {},
+        "subjectRefs": [
+          {
+            "type": "QuantitySegment",
+            "id": "$c4-receipt60.segment"
+          }
+        ]
+      },
+      "outcome": "APPLIED",
+      "bind": {
+        "c4-s60-CUSTOMER.canonical": "/id"
+      }
+    },
+    {
+      "id": "c4-s60-CUSTOMER-decision",
+      "type": "command",
+      "capability": "recordDispositionBasis",
+      "request": {
+        "intentKind": "RECORD",
+        "definitionVersion": "definition-v1",
+        "capabilityId": "recordDispositionBasis",
+        "expectedRevision": 0,
+        "commandIdempotencyKey": "c4-s60-CUSTOMER-decision",
+        "slots": {
+          "segmentId": "$c4-receipt60.segment",
+          "action": "SELL",
+          "category": "CUSTOMER",
+          "startQuantity": "0",
+          "quantity": "100",
+          "unit": "BOX",
+          "validFrom": "2026-10-07T09:00:02Z",
+          "validUntil": "2026-10-31T00:00:00Z",
+          "workId": "$WORK",
+          "evidenceId": "$c4-s60-CUSTOMER.document",
+          "reason": "원본의 정확한 행동 범위를 판정",
+          "nextCheckAt": "2026-10-08T09:00:00Z"
+        },
+        "provenance": {},
+        "subjectRefs": [
+          {
+            "type": "QuantitySegment",
+            "id": "$c4-receipt60.segment"
+          }
+        ]
+      },
+      "outcome": "APPLIED"
+    },
+    {
+      "id": "c4-s60-COMMERCIAL",
+      "type": "original",
+      "fixture": {
+        "synthetic": true,
+        "clock": {
+          "asOf": "2026-10-07T09:00:02Z",
+          "knownAt": "2026-10-07T09:00:02Z"
+        },
+        "sourceProfile": {
+          "namespace": "native-c4-s60-COMMERCIAL",
+          "policyVersion": "fixture-v1",
+          "nextAction": "원본 범위와 실제 효과 대조",
+          "nextCheckAt": "2026-10-08T09:00:00Z"
+        },
+        "occurrence": {
+          "kind": "QUALITY_DECISION_recordDispositionBasis_COMMERCIAL",
+          "content": {
+            "segmentId": "$c4-receipt60.segment",
+            "operation": "recordDispositionBasis",
+            "action": "SELL",
+            "category": "COMMERCIAL",
+            "startQuantity": "0",
+            "quantity": "100",
+            "unit": "BOX",
+            "validFrom": "2026-10-07T09:00:02Z",
+            "validUntil": "2026-10-31T00:00:00Z",
+            "workId": "$WORK",
+            "sourceDecisionId": "38621522-c934-502a-826f-ad5da67be64b",
+            "sourceVersion": "1"
+          },
+          "externalEventId": "c4-38621522-c934-502a-826f-ad5da67be64b",
+          "quantity": "100",
+          "unit": "BOX",
+          "assertion": "authored synthetic external original"
+        }
+      },
+      "binding": {
+        "organizationId": "$ORG",
+        "workId": "$WORK",
+        "itemId": "$P",
+        "actorId": "$reader",
+        "supervisorId": "$supervisor",
+        "physicalScopeId": "$c4-receipt60.segment",
+        "subjectId": "$c4-receipt60.segment",
+        "subjectKind": "SEGMENT",
+        "placeId": "$W"
+      }
+    },
+    {
+      "id": "c4-s60-COMMERCIAL-match",
+      "type": "command",
+      "capability": "matchSourceIdentity",
+      "request": {
+        "intentKind": "COMMAND",
+        "definitionVersion": "definition-v1",
+        "capabilityId": "matchSourceIdentity",
+        "expectedRevision": 1,
+        "commandIdempotencyKey": "c4-s60-COMMERCIAL-match",
+        "slots": {
+          "claimId": "$c4-s60-COMMERCIAL.claim",
+          "basisDocumentId": "$c4-s60-COMMERCIAL.document",
+          "physicalScopeId": "$c4-receipt60.segment",
+          "policyVersion": "fixture-v1",
+          "sourceIdentity": "native-c4-s60-COMMERCIAL:c4-38621522-c934-502a-826f-ad5da67be64b:1",
+          "quantity": "100",
+          "unit": "BOX",
+          "effectiveFrom": "2026-10-07T09:00:02Z",
+          "reason": "외부 ORIGINAL과 동일한 범위 대조"
+        },
+        "provenance": {},
+        "subjectRefs": [
+          {
+            "type": "QuantitySegment",
+            "id": "$c4-receipt60.segment"
+          }
+        ]
+      },
+      "outcome": "APPLIED",
+      "bind": {
+        "c4-s60-COMMERCIAL.reconciliation": "/id"
+      }
+    },
+    {
+      "id": "c4-s60-COMMERCIAL-link",
+      "type": "command",
+      "capability": "linkCanonicalOccurrence",
+      "request": {
+        "intentKind": "COMMAND",
+        "definitionVersion": "definition-v1",
+        "capabilityId": "linkCanonicalOccurrence",
+        "expectedRevision": 1,
+        "commandIdempotencyKey": "c4-s60-COMMERCIAL-link",
+        "slots": {
+          "reconciliationId": "$c4-s60-COMMERCIAL.reconciliation"
+        },
+        "provenance": {},
+        "subjectRefs": [
+          {
+            "type": "QuantitySegment",
+            "id": "$c4-receipt60.segment"
+          }
+        ]
+      },
+      "outcome": "APPLIED",
+      "bind": {
+        "c4-s60-COMMERCIAL.canonical": "/id"
+      }
+    },
+    {
+      "id": "c4-s60-COMMERCIAL-decision",
+      "type": "command",
+      "capability": "recordDispositionBasis",
+      "request": {
+        "intentKind": "RECORD",
+        "definitionVersion": "definition-v1",
+        "capabilityId": "recordDispositionBasis",
+        "expectedRevision": 0,
+        "commandIdempotencyKey": "c4-s60-COMMERCIAL-decision",
+        "slots": {
+          "segmentId": "$c4-receipt60.segment",
+          "action": "SELL",
+          "category": "COMMERCIAL",
+          "startQuantity": "0",
+          "quantity": "100",
+          "unit": "BOX",
+          "validFrom": "2026-10-07T09:00:02Z",
+          "validUntil": "2026-10-31T00:00:00Z",
+          "workId": "$WORK",
+          "evidenceId": "$c4-s60-COMMERCIAL.document",
+          "reason": "원본의 정확한 행동 범위를 판정",
+          "nextCheckAt": "2026-10-08T09:00:00Z"
+        },
+        "provenance": {},
+        "subjectRefs": [
+          {
+            "type": "QuantitySegment",
+            "id": "$c4-receipt60.segment"
+          }
+        ]
+      },
+      "outcome": "APPLIED"
+    },
+    {
+      "id": "c4-dispatch-s60-QC",
+      "type": "original",
+      "fixture": {
+        "synthetic": true,
+        "clock": {
+          "asOf": "2026-10-07T09:00:02Z",
+          "knownAt": "2026-10-07T09:00:02Z"
+        },
+        "sourceProfile": {
+          "namespace": "native-c4-dispatch-s60-QC",
+          "policyVersion": "fixture-v1",
+          "nextAction": "원본 범위와 실제 효과 대조",
+          "nextCheckAt": "2026-10-08T09:00:00Z"
+        },
+        "occurrence": {
+          "kind": "QUALITY_DECISION_recordDispositionBasis_QC",
+          "content": {
+            "segmentId": "$c4-receipt60.segment",
+            "operation": "recordDispositionBasis",
+            "action": "DISPATCH",
+            "category": "QC",
+            "startQuantity": "0",
+            "quantity": "100",
+            "unit": "BOX",
+            "validFrom": "2026-10-07T09:00:02Z",
+            "validUntil": "2026-10-31T00:00:00Z",
+            "workId": "$WORK",
+            "sourceDecisionId": "3ab72da1-7314-534b-95ff-2effca670524",
+            "sourceVersion": "1"
+          },
+          "externalEventId": "c4-3ab72da1-7314-534b-95ff-2effca670524",
+          "quantity": "100",
+          "unit": "BOX",
+          "assertion": "authored synthetic external original"
+        }
+      },
+      "binding": {
+        "organizationId": "$ORG",
+        "workId": "$WORK",
+        "itemId": "$P",
+        "actorId": "$reader",
+        "supervisorId": "$supervisor",
+        "physicalScopeId": "$c4-receipt60.segment",
+        "subjectId": "$c4-receipt60.segment",
+        "subjectKind": "SEGMENT",
+        "placeId": "$W"
+      }
+    },
+    {
+      "id": "c4-dispatch-s60-QC-match",
+      "type": "command",
+      "capability": "matchSourceIdentity",
+      "request": {
+        "intentKind": "COMMAND",
+        "definitionVersion": "definition-v1",
+        "capabilityId": "matchSourceIdentity",
+        "expectedRevision": 1,
+        "commandIdempotencyKey": "c4-dispatch-s60-QC-match",
+        "slots": {
+          "claimId": "$c4-dispatch-s60-QC.claim",
+          "basisDocumentId": "$c4-dispatch-s60-QC.document",
+          "physicalScopeId": "$c4-receipt60.segment",
+          "policyVersion": "fixture-v1",
+          "sourceIdentity": "native-c4-dispatch-s60-QC:c4-3ab72da1-7314-534b-95ff-2effca670524:1",
+          "quantity": "100",
+          "unit": "BOX",
+          "effectiveFrom": "2026-10-07T09:00:02Z",
+          "reason": "외부 ORIGINAL과 동일한 범위 대조"
+        },
+        "provenance": {},
+        "subjectRefs": [
+          {
+            "type": "QuantitySegment",
+            "id": "$c4-receipt60.segment"
+          }
+        ]
+      },
+      "outcome": "APPLIED",
+      "bind": {
+        "c4-dispatch-s60-QC.reconciliation": "/id"
+      }
+    },
+    {
+      "id": "c4-dispatch-s60-QC-link",
+      "type": "command",
+      "capability": "linkCanonicalOccurrence",
+      "request": {
+        "intentKind": "COMMAND",
+        "definitionVersion": "definition-v1",
+        "capabilityId": "linkCanonicalOccurrence",
+        "expectedRevision": 1,
+        "commandIdempotencyKey": "c4-dispatch-s60-QC-link",
+        "slots": {
+          "reconciliationId": "$c4-dispatch-s60-QC.reconciliation"
+        },
+        "provenance": {},
+        "subjectRefs": [
+          {
+            "type": "QuantitySegment",
+            "id": "$c4-receipt60.segment"
+          }
+        ]
+      },
+      "outcome": "APPLIED",
+      "bind": {
+        "c4-dispatch-s60-QC.canonical": "/id"
+      }
+    },
+    {
+      "id": "c4-dispatch-s60-QC-decision",
+      "type": "command",
+      "capability": "recordDispositionBasis",
+      "request": {
+        "intentKind": "RECORD",
+        "definitionVersion": "definition-v1",
+        "capabilityId": "recordDispositionBasis",
+        "expectedRevision": 0,
+        "commandIdempotencyKey": "c4-dispatch-s60-QC-decision",
+        "slots": {
+          "segmentId": "$c4-receipt60.segment",
+          "action": "DISPATCH",
+          "category": "QC",
+          "startQuantity": "0",
+          "quantity": "100",
+          "unit": "BOX",
+          "validFrom": "2026-10-07T09:00:02Z",
+          "validUntil": "2026-10-31T00:00:00Z",
+          "workId": "$WORK",
+          "evidenceId": "$c4-dispatch-s60-QC.document",
+          "reason": "원본의 정확한 행동 범위를 판정",
+          "nextCheckAt": "2026-10-08T09:00:00Z"
+        },
+        "provenance": {},
+        "subjectRefs": [
+          {
+            "type": "QuantitySegment",
+            "id": "$c4-receipt60.segment"
+          }
+        ]
+      },
+      "outcome": "APPLIED"
+    },
+    {
+      "id": "c4-dispatch-s60-CUSTOMER",
+      "type": "original",
+      "fixture": {
+        "synthetic": true,
+        "clock": {
+          "asOf": "2026-10-07T09:00:02Z",
+          "knownAt": "2026-10-07T09:00:02Z"
+        },
+        "sourceProfile": {
+          "namespace": "native-c4-dispatch-s60-CUSTOMER",
+          "policyVersion": "fixture-v1",
+          "nextAction": "원본 범위와 실제 효과 대조",
+          "nextCheckAt": "2026-10-08T09:00:00Z"
+        },
+        "occurrence": {
+          "kind": "QUALITY_DECISION_recordDispositionBasis_CUSTOMER",
+          "content": {
+            "segmentId": "$c4-receipt60.segment",
+            "operation": "recordDispositionBasis",
+            "action": "DISPATCH",
+            "category": "CUSTOMER",
+            "startQuantity": "0",
+            "quantity": "100",
+            "unit": "BOX",
+            "validFrom": "2026-10-07T09:00:02Z",
+            "validUntil": "2026-10-31T00:00:00Z",
+            "workId": "$WORK",
+            "sourceDecisionId": "5f631236-0a72-5ef5-8d95-ff21f9fee58a",
+            "sourceVersion": "1"
+          },
+          "externalEventId": "c4-5f631236-0a72-5ef5-8d95-ff21f9fee58a",
+          "quantity": "100",
+          "unit": "BOX",
+          "assertion": "authored synthetic external original"
+        }
+      },
+      "binding": {
+        "organizationId": "$ORG",
+        "workId": "$WORK",
+        "itemId": "$P",
+        "actorId": "$reader",
+        "supervisorId": "$supervisor",
+        "physicalScopeId": "$c4-receipt60.segment",
+        "subjectId": "$c4-receipt60.segment",
+        "subjectKind": "SEGMENT",
+        "placeId": "$W"
+      }
+    },
+    {
+      "id": "c4-dispatch-s60-CUSTOMER-match",
+      "type": "command",
+      "capability": "matchSourceIdentity",
+      "request": {
+        "intentKind": "COMMAND",
+        "definitionVersion": "definition-v1",
+        "capabilityId": "matchSourceIdentity",
+        "expectedRevision": 1,
+        "commandIdempotencyKey": "c4-dispatch-s60-CUSTOMER-match",
+        "slots": {
+          "claimId": "$c4-dispatch-s60-CUSTOMER.claim",
+          "basisDocumentId": "$c4-dispatch-s60-CUSTOMER.document",
+          "physicalScopeId": "$c4-receipt60.segment",
+          "policyVersion": "fixture-v1",
+          "sourceIdentity": "native-c4-dispatch-s60-CUSTOMER:c4-5f631236-0a72-5ef5-8d95-ff21f9fee58a:1",
+          "quantity": "100",
+          "unit": "BOX",
+          "effectiveFrom": "2026-10-07T09:00:02Z",
+          "reason": "외부 ORIGINAL과 동일한 범위 대조"
+        },
+        "provenance": {},
+        "subjectRefs": [
+          {
+            "type": "QuantitySegment",
+            "id": "$c4-receipt60.segment"
+          }
+        ]
+      },
+      "outcome": "APPLIED",
+      "bind": {
+        "c4-dispatch-s60-CUSTOMER.reconciliation": "/id"
+      }
+    },
+    {
+      "id": "c4-dispatch-s60-CUSTOMER-link",
+      "type": "command",
+      "capability": "linkCanonicalOccurrence",
+      "request": {
+        "intentKind": "COMMAND",
+        "definitionVersion": "definition-v1",
+        "capabilityId": "linkCanonicalOccurrence",
+        "expectedRevision": 1,
+        "commandIdempotencyKey": "c4-dispatch-s60-CUSTOMER-link",
+        "slots": {
+          "reconciliationId": "$c4-dispatch-s60-CUSTOMER.reconciliation"
+        },
+        "provenance": {},
+        "subjectRefs": [
+          {
+            "type": "QuantitySegment",
+            "id": "$c4-receipt60.segment"
+          }
+        ]
+      },
+      "outcome": "APPLIED",
+      "bind": {
+        "c4-dispatch-s60-CUSTOMER.canonical": "/id"
+      }
+    },
+    {
+      "id": "c4-dispatch-s60-CUSTOMER-decision",
+      "type": "command",
+      "capability": "recordDispositionBasis",
+      "request": {
+        "intentKind": "RECORD",
+        "definitionVersion": "definition-v1",
+        "capabilityId": "recordDispositionBasis",
+        "expectedRevision": 0,
+        "commandIdempotencyKey": "c4-dispatch-s60-CUSTOMER-decision",
+        "slots": {
+          "segmentId": "$c4-receipt60.segment",
+          "action": "DISPATCH",
+          "category": "CUSTOMER",
+          "startQuantity": "0",
+          "quantity": "100",
+          "unit": "BOX",
+          "validFrom": "2026-10-07T09:00:02Z",
+          "validUntil": "2026-10-31T00:00:00Z",
+          "workId": "$WORK",
+          "evidenceId": "$c4-dispatch-s60-CUSTOMER.document",
+          "reason": "원본의 정확한 행동 범위를 판정",
+          "nextCheckAt": "2026-10-08T09:00:00Z"
+        },
+        "provenance": {},
+        "subjectRefs": [
+          {
+            "type": "QuantitySegment",
+            "id": "$c4-receipt60.segment"
+          }
+        ]
+      },
+      "outcome": "APPLIED"
+    },
+    {
+      "id": "c4-dispatch-s60-COMMERCIAL",
+      "type": "original",
+      "fixture": {
+        "synthetic": true,
+        "clock": {
+          "asOf": "2026-10-07T09:00:02Z",
+          "knownAt": "2026-10-07T09:00:02Z"
+        },
+        "sourceProfile": {
+          "namespace": "native-c4-dispatch-s60-COMMERCIAL",
+          "policyVersion": "fixture-v1",
+          "nextAction": "원본 범위와 실제 효과 대조",
+          "nextCheckAt": "2026-10-08T09:00:00Z"
+        },
+        "occurrence": {
+          "kind": "QUALITY_DECISION_recordDispositionBasis_COMMERCIAL",
+          "content": {
+            "segmentId": "$c4-receipt60.segment",
+            "operation": "recordDispositionBasis",
+            "action": "DISPATCH",
+            "category": "COMMERCIAL",
+            "startQuantity": "0",
+            "quantity": "100",
+            "unit": "BOX",
+            "validFrom": "2026-10-07T09:00:02Z",
+            "validUntil": "2026-10-31T00:00:00Z",
+            "workId": "$WORK",
+            "sourceDecisionId": "38621522-c934-502a-826f-ad5da67be64b",
+            "sourceVersion": "1"
+          },
+          "externalEventId": "c4-38621522-c934-502a-826f-ad5da67be64b",
+          "quantity": "100",
+          "unit": "BOX",
+          "assertion": "authored synthetic external original"
+        }
+      },
+      "binding": {
+        "organizationId": "$ORG",
+        "workId": "$WORK",
+        "itemId": "$P",
+        "actorId": "$reader",
+        "supervisorId": "$supervisor",
+        "physicalScopeId": "$c4-receipt60.segment",
+        "subjectId": "$c4-receipt60.segment",
+        "subjectKind": "SEGMENT",
+        "placeId": "$W"
+      }
+    },
+    {
+      "id": "c4-dispatch-s60-COMMERCIAL-match",
+      "type": "command",
+      "capability": "matchSourceIdentity",
+      "request": {
+        "intentKind": "COMMAND",
+        "definitionVersion": "definition-v1",
+        "capabilityId": "matchSourceIdentity",
+        "expectedRevision": 1,
+        "commandIdempotencyKey": "c4-dispatch-s60-COMMERCIAL-match",
+        "slots": {
+          "claimId": "$c4-dispatch-s60-COMMERCIAL.claim",
+          "basisDocumentId": "$c4-dispatch-s60-COMMERCIAL.document",
+          "physicalScopeId": "$c4-receipt60.segment",
+          "policyVersion": "fixture-v1",
+          "sourceIdentity": "native-c4-dispatch-s60-COMMERCIAL:c4-38621522-c934-502a-826f-ad5da67be64b:1",
+          "quantity": "100",
+          "unit": "BOX",
+          "effectiveFrom": "2026-10-07T09:00:02Z",
+          "reason": "외부 ORIGINAL과 동일한 범위 대조"
+        },
+        "provenance": {},
+        "subjectRefs": [
+          {
+            "type": "QuantitySegment",
+            "id": "$c4-receipt60.segment"
+          }
+        ]
+      },
+      "outcome": "APPLIED",
+      "bind": {
+        "c4-dispatch-s60-COMMERCIAL.reconciliation": "/id"
+      }
+    },
+    {
+      "id": "c4-dispatch-s60-COMMERCIAL-link",
+      "type": "command",
+      "capability": "linkCanonicalOccurrence",
+      "request": {
+        "intentKind": "COMMAND",
+        "definitionVersion": "definition-v1",
+        "capabilityId": "linkCanonicalOccurrence",
+        "expectedRevision": 1,
+        "commandIdempotencyKey": "c4-dispatch-s60-COMMERCIAL-link",
+        "slots": {
+          "reconciliationId": "$c4-dispatch-s60-COMMERCIAL.reconciliation"
+        },
+        "provenance": {},
+        "subjectRefs": [
+          {
+            "type": "QuantitySegment",
+            "id": "$c4-receipt60.segment"
+          }
+        ]
+      },
+      "outcome": "APPLIED",
+      "bind": {
+        "c4-dispatch-s60-COMMERCIAL.canonical": "/id"
+      }
+    },
+    {
+      "id": "c4-dispatch-s60-COMMERCIAL-decision",
+      "type": "command",
+      "capability": "recordDispositionBasis",
+      "request": {
+        "intentKind": "RECORD",
+        "definitionVersion": "definition-v1",
+        "capabilityId": "recordDispositionBasis",
+        "expectedRevision": 0,
+        "commandIdempotencyKey": "c4-dispatch-s60-COMMERCIAL-decision",
+        "slots": {
+          "segmentId": "$c4-receipt60.segment",
+          "action": "DISPATCH",
+          "category": "COMMERCIAL",
+          "startQuantity": "0",
+          "quantity": "100",
+          "unit": "BOX",
+          "validFrom": "2026-10-07T09:00:02Z",
+          "validUntil": "2026-10-31T00:00:00Z",
+          "workId": "$WORK",
+          "evidenceId": "$c4-dispatch-s60-COMMERCIAL.document",
+          "reason": "원본의 정확한 행동 범위를 판정",
+          "nextCheckAt": "2026-10-08T09:00:00Z"
+        },
+        "provenance": {},
+        "subjectRefs": [
+          {
+            "type": "QuantitySegment",
+            "id": "$c4-receipt60.segment"
+          }
+        ]
+      },
+      "outcome": "APPLIED"
+    },
+    {
+      "id": "c4-dispatch-reg-draft",
+      "type": "original",
+      "fixture": {
+        "synthetic": true,
+        "clock": {
+          "asOf": "2026-10-07T09:00:02Z",
+          "knownAt": "2026-10-07T09:00:02Z"
+        },
+        "sourceProfile": {
+          "namespace": "native-c4-dispatch-regulator",
+          "policyVersion": "fixture-v1",
+          "nextAction": "원본 범위와 실제 효과 대조",
+          "nextCheckAt": "2026-10-08T09:00:00Z"
+        },
+        "occurrence": {
+          "kind": "REGULATORY_DRAFT",
+          "content": {
+            "draft": "fictional dossier",
+            "itemId": "$P"
+          },
+          "externalEventId": "c4-dispatch-reg-draft",
+          "quantity": "100",
+          "unit": "BOX",
+          "assertion": "authored synthetic external original"
+        }
+      },
+      "binding": {
+        "organizationId": "$ORG",
+        "workId": "$WORK",
+        "itemId": "$P",
+        "actorId": "$reader",
+        "supervisorId": "$supervisor",
+        "physicalScopeId": "$c4-receipt60.segment",
+        "subjectId": "$c4-receipt60.segment",
+        "subjectKind": "SEGMENT",
+        "placeId": "$W"
+      }
+    },
+    {
+      "id": "c4-dispatch-reg-prepare",
+      "type": "command",
+      "capability": "prepareRegulatoryProcedure",
+      "request": {
+        "intentKind": "COMMAND",
+        "definitionVersion": "definition-v1",
+        "capabilityId": "prepareRegulatoryProcedure",
+        "expectedRevision": 0,
+        "commandIdempotencyKey": "c4-dispatch-reg-prepare",
+        "slots": {
+          "itemId": "$P",
+          "lotId": "$L",
+          "physicalScopeId": "$c4-receipt60.segment",
+          "workId": "$WORK",
+          "policyId": "$REGDISPATCH",
+          "documentVersionId": "$c4-dispatch-reg-draft.document"
+        },
+        "provenance": {},
+        "subjectRefs": [
+          {
+            "type": "QuantitySegment",
+            "id": "$c4-receipt60.segment"
+          }
+        ]
+      },
+      "outcome": "APPLIED",
+      "bind": {
+        "DPROC": "/effects/procedureId",
+        "DPROC_VERSION": "/effects/procedureVersionId",
+        "DPROC_REV": "/revision"
+      }
+    },
+    {
+      "id": "c4-dispatch-reg-submitted",
+      "type": "original",
+      "fixture": {
+        "synthetic": true,
+        "clock": {
+          "asOf": "2026-10-07T09:00:02Z",
+          "knownAt": "2026-10-07T09:00:02Z"
+        },
+        "sourceProfile": {
+          "namespace": "native-c4-dispatch-regulator",
+          "policyVersion": "fixture-v1",
+          "nextAction": "원본 범위와 실제 효과 대조",
+          "nextCheckAt": "2026-10-08T09:00:00Z"
+        },
+        "occurrence": {
+          "kind": "REGULATORY_SUBMISSION",
+          "content": {
+            "regulatoryEventId": "bdef458e-c653-58d5-bafe-203a5723b7e4",
+            "procedureId": "$DPROC",
+            "procedureVersionId": "$DPROC_VERSION",
+            "itemId": "$P",
+            "lotId": "$L",
+            "physicalScopeId": "$c4-receipt60.segment",
+            "authority": "FICTIONAL-AUTHORITY",
+            "policyVersion": "fixture-v1",
+            "occurredAt": "2026-10-07T09:00:02Z"
+          },
+          "externalEventId": "c4-dispatch-reg-submitted",
+          "quantity": null,
+          "unit": null,
+          "assertion": "authored synthetic external original"
+        }
+      },
+      "binding": {
+        "organizationId": "$ORG",
+        "workId": "$WORK",
+        "itemId": "$P",
+        "actorId": "$reader",
+        "supervisorId": "$supervisor",
+        "physicalScopeId": "$c4-receipt60.segment",
+        "subjectId": "$c4-receipt60.segment",
+        "subjectKind": "SEGMENT",
+        "placeId": "$W"
+      }
+    },
+    {
+      "id": "c4-dispatch-reg-submitted-match",
+      "type": "command",
+      "capability": "matchSourceIdentity",
+      "request": {
+        "intentKind": "COMMAND",
+        "definitionVersion": "definition-v1",
+        "capabilityId": "matchSourceIdentity",
+        "expectedRevision": 1,
+        "commandIdempotencyKey": "c4-dispatch-reg-submitted-match",
+        "slots": {
+          "claimId": "$c4-dispatch-reg-submitted.claim",
+          "basisDocumentId": "$c4-dispatch-reg-submitted.document",
+          "physicalScopeId": "$c4-receipt60.segment",
+          "policyVersion": "fixture-v1",
+          "sourceIdentity": "native-c4-dispatch-regulator:c4-dispatch-reg-submitted:1",
+          "effectiveFrom": "2026-10-07T09:00:02Z",
+          "reason": "외부 ORIGINAL과 동일한 범위 대조"
+        },
+        "provenance": {},
+        "subjectRefs": [
+          {
+            "type": "QuantitySegment",
+            "id": "$c4-receipt60.segment"
+          }
+        ]
+      },
+      "outcome": "APPLIED",
+      "bind": {
+        "c4-dispatch-reg-submitted.reconciliation": "/id"
+      }
+    },
+    {
+      "id": "c4-dispatch-reg-submitted-link",
+      "type": "command",
+      "capability": "linkCanonicalOccurrence",
+      "request": {
+        "intentKind": "COMMAND",
+        "definitionVersion": "definition-v1",
+        "capabilityId": "linkCanonicalOccurrence",
+        "expectedRevision": 1,
+        "commandIdempotencyKey": "c4-dispatch-reg-submitted-link",
+        "slots": {
+          "reconciliationId": "$c4-dispatch-reg-submitted.reconciliation"
+        },
+        "provenance": {},
+        "subjectRefs": [
+          {
+            "type": "QuantitySegment",
+            "id": "$c4-receipt60.segment"
+          }
+        ]
+      },
+      "outcome": "APPLIED",
+      "bind": {
+        "c4-dispatch-reg-submitted.canonical": "/id"
+      }
+    },
+    {
+      "id": "c4-dispatch-submit-reg",
+      "type": "command",
+      "capability": "recordSubmission",
+      "request": {
+        "intentKind": "RECORD",
+        "definitionVersion": "definition-v1",
+        "capabilityId": "recordSubmission",
+        "expectedRevision": "$DPROC_REV",
+        "commandIdempotencyKey": "c4-dispatch-submit-reg",
+        "slots": {
+          "procedureId": "$DPROC",
+          "occurredAt": "2026-10-07T09:00:02Z",
+          "occurrenceId": "$c4-dispatch-reg-submitted.canonical"
+        },
+        "provenance": {},
+        "subjectRefs": [
+          {
+            "type": "QuantitySegment",
+            "id": "$c4-receipt60.segment"
+          }
+        ]
+      },
+      "outcome": "APPLIED",
+      "bind": {
+        "DPROC_VERSION": "/effects/procedureVersionId",
+        "DPROC_REV": "/revision"
+      }
+    },
+    {
+      "id": "c4-dispatch-reg-allow30",
+      "type": "original",
+      "fixture": {
+        "synthetic": true,
+        "clock": {
+          "asOf": "2026-10-07T09:00:02Z",
+          "knownAt": "2026-10-07T09:00:02Z"
+        },
+        "sourceProfile": {
+          "namespace": "native-c4-dispatch-regulator",
+          "policyVersion": "fixture-v1",
+          "nextAction": "원본 범위와 실제 효과 대조",
+          "nextCheckAt": "2026-10-08T09:00:00Z"
+        },
+        "occurrence": {
+          "kind": "REGULATORY_DECISION",
+          "content": {
+            "regulatoryEventId": "c1ea7bcb-3473-5705-9d24-01d48d836324",
+            "procedureId": "$DPROC",
+            "procedureVersionId": "$DPROC_VERSION",
+            "itemId": "$P",
+            "lotId": "$L",
+            "physicalScopeId": "$c4-receipt60.segment",
+            "authority": "FICTIONAL-AUTHORITY",
+            "policyVersion": "fixture-v1",
+            "decision": "ALLOWED",
+            "action": "DISPATCH",
+            "startQuantity": "0",
+            "quantity": "100",
+            "unit": "BOX",
+            "validFrom": "2026-10-07T09:00:02Z",
+            "validUntil": "2026-10-31T00:00:00Z"
+          },
+          "externalEventId": "c4-dispatch-reg-allow30",
+          "quantity": "100",
+          "unit": "BOX",
+          "assertion": "authored synthetic external original"
+        }
+      },
+      "binding": {
+        "organizationId": "$ORG",
+        "workId": "$WORK",
+        "itemId": "$P",
+        "actorId": "$reader",
+        "supervisorId": "$supervisor",
+        "physicalScopeId": "$c4-receipt60.segment",
+        "subjectId": "$c4-receipt60.segment",
+        "subjectKind": "SEGMENT",
+        "placeId": "$W"
+      }
+    },
+    {
+      "id": "c4-dispatch-reg-allow30-match",
+      "type": "command",
+      "capability": "matchSourceIdentity",
+      "request": {
+        "intentKind": "COMMAND",
+        "definitionVersion": "definition-v1",
+        "capabilityId": "matchSourceIdentity",
+        "expectedRevision": 1,
+        "commandIdempotencyKey": "c4-dispatch-reg-allow30-match",
+        "slots": {
+          "claimId": "$c4-dispatch-reg-allow30.claim",
+          "basisDocumentId": "$c4-dispatch-reg-allow30.document",
+          "physicalScopeId": "$c4-receipt60.segment",
+          "policyVersion": "fixture-v1",
+          "sourceIdentity": "native-c4-dispatch-regulator:c4-dispatch-reg-allow30:1",
+          "quantity": "100",
+          "unit": "BOX",
+          "effectiveFrom": "2026-10-07T09:00:02Z",
+          "reason": "외부 ORIGINAL과 동일한 범위 대조"
+        },
+        "provenance": {},
+        "subjectRefs": [
+          {
+            "type": "QuantitySegment",
+            "id": "$c4-receipt60.segment"
+          }
+        ]
+      },
+      "outcome": "APPLIED",
+      "bind": {
+        "c4-dispatch-reg-allow30.reconciliation": "/id"
+      }
+    },
+    {
+      "id": "c4-dispatch-reg-allow30-link",
+      "type": "command",
+      "capability": "linkCanonicalOccurrence",
+      "request": {
+        "intentKind": "COMMAND",
+        "definitionVersion": "definition-v1",
+        "capabilityId": "linkCanonicalOccurrence",
+        "expectedRevision": 1,
+        "commandIdempotencyKey": "c4-dispatch-reg-allow30-link",
+        "slots": {
+          "reconciliationId": "$c4-dispatch-reg-allow30.reconciliation"
+        },
+        "provenance": {},
+        "subjectRefs": [
+          {
+            "type": "QuantitySegment",
+            "id": "$c4-receipt60.segment"
+          }
+        ]
+      },
+      "outcome": "APPLIED",
+      "bind": {
+        "c4-dispatch-reg-allow30.canonical": "/id"
+      }
+    },
+    {
+      "id": "c4-dispatch-allow30",
+      "type": "command",
+      "capability": "recordRegulatoryDecision",
+      "request": {
+        "intentKind": "RECORD",
+        "definitionVersion": "definition-v1",
+        "capabilityId": "recordRegulatoryDecision",
+        "expectedRevision": "$DPROC_REV",
+        "commandIdempotencyKey": "c4-dispatch-allow30",
+        "slots": {
+          "procedureId": "$DPROC",
+          "occurrenceId": "$c4-dispatch-reg-allow30.canonical",
+          "decision": "ALLOWED",
+          "action": "DISPATCH",
+          "startQuantity": "0",
+          "quantity": "100",
+          "unit": "BOX",
+          "validFrom": "2026-10-07T09:00:02Z",
+          "validUntil": "2026-10-31T00:00:00Z"
+        },
+        "provenance": {},
+        "subjectRefs": [
+          {
+            "type": "QuantitySegment",
+            "id": "$c4-receipt60.segment"
+          }
+        ]
+      },
+      "outcome": "APPLIED",
+      "bind": {
+        "DPROC_REV": "/revision"
+      }
+    },
+    {
+      "id": "c4-dispatch-reg-label",
+      "type": "original",
+      "fixture": {
+        "synthetic": true,
+        "clock": {
+          "asOf": "2026-10-07T09:00:02Z",
+          "knownAt": "2026-10-07T09:00:02Z"
+        },
+        "sourceProfile": {
+          "namespace": "native-c4-dispatch-regulator",
+          "policyVersion": "fixture-v1",
+          "nextAction": "원본 범위와 실제 효과 대조",
+          "nextCheckAt": "2026-10-08T09:00:00Z"
+        },
+        "occurrence": {
+          "kind": "LABEL_VERIFICATION",
+          "content": {
+            "regulatoryEventId": "6da52af8-f864-536d-8073-2af724303fb4",
+            "procedureId": "$DPROC",
+            "procedureVersionId": "$DPROC_VERSION",
+            "itemId": "$P",
+            "lotId": "$L",
+            "physicalScopeId": "$c4-receipt60.segment",
+            "authority": "FICTIONAL-AUTHORITY",
+            "policyVersion": "fixture-v1",
+            "decision": "VERIFIED",
+            "packagingVersionId": "$PACK",
+            "specificationVersionId": "$SPEC",
+            "validFrom": "2026-10-07T09:00:02Z",
+            "validUntil": "2026-10-31T00:00:00Z"
+          },
+          "externalEventId": "c4-dispatch-reg-label",
+          "quantity": null,
+          "unit": null,
+          "assertion": "authored synthetic external original"
+        }
+      },
+      "binding": {
+        "organizationId": "$ORG",
+        "workId": "$WORK",
+        "itemId": "$P",
+        "actorId": "$reader",
+        "supervisorId": "$supervisor",
+        "physicalScopeId": "$c4-receipt60.segment",
+        "subjectId": "$c4-receipt60.segment",
+        "subjectKind": "SEGMENT",
+        "placeId": "$W"
+      }
+    },
+    {
+      "id": "c4-dispatch-reg-label-match",
+      "type": "command",
+      "capability": "matchSourceIdentity",
+      "request": {
+        "intentKind": "COMMAND",
+        "definitionVersion": "definition-v1",
+        "capabilityId": "matchSourceIdentity",
+        "expectedRevision": 1,
+        "commandIdempotencyKey": "c4-dispatch-reg-label-match",
+        "slots": {
+          "claimId": "$c4-dispatch-reg-label.claim",
+          "basisDocumentId": "$c4-dispatch-reg-label.document",
+          "physicalScopeId": "$c4-receipt60.segment",
+          "policyVersion": "fixture-v1",
+          "sourceIdentity": "native-c4-dispatch-regulator:c4-dispatch-reg-label:1",
+          "effectiveFrom": "2026-10-07T09:00:02Z",
+          "reason": "외부 ORIGINAL과 동일한 범위 대조"
+        },
+        "provenance": {},
+        "subjectRefs": [
+          {
+            "type": "QuantitySegment",
+            "id": "$c4-receipt60.segment"
+          }
+        ]
+      },
+      "outcome": "APPLIED",
+      "bind": {
+        "c4-dispatch-reg-label.reconciliation": "/id"
+      }
+    },
+    {
+      "id": "c4-dispatch-reg-label-link",
+      "type": "command",
+      "capability": "linkCanonicalOccurrence",
+      "request": {
+        "intentKind": "COMMAND",
+        "definitionVersion": "definition-v1",
+        "capabilityId": "linkCanonicalOccurrence",
+        "expectedRevision": 1,
+        "commandIdempotencyKey": "c4-dispatch-reg-label-link",
+        "slots": {
+          "reconciliationId": "$c4-dispatch-reg-label.reconciliation"
+        },
+        "provenance": {},
+        "subjectRefs": [
+          {
+            "type": "QuantitySegment",
+            "id": "$c4-receipt60.segment"
+          }
+        ]
+      },
+      "outcome": "APPLIED",
+      "bind": {
+        "c4-dispatch-reg-label.canonical": "/id"
+      }
+    },
+    {
+      "id": "c4-dispatch-label-verified",
+      "type": "command",
+      "capability": "verifyLabel",
+      "request": {
+        "intentKind": "RECORD",
+        "definitionVersion": "definition-v1",
+        "capabilityId": "verifyLabel",
+        "expectedRevision": "$DPROC_REV",
+        "commandIdempotencyKey": "c4-dispatch-label-verified",
+        "slots": {
+          "procedureId": "$DPROC",
+          "occurrenceId": "$c4-dispatch-reg-label.canonical",
+          "decision": "VERIFIED",
+          "packagingVersionId": "$PACK",
+          "specificationVersionId": "$SPEC",
+          "validFrom": "2026-10-07T09:00:02Z",
+          "validUntil": "2026-10-31T00:00:00Z"
+        },
+        "provenance": {},
+        "subjectRefs": [
+          {
+            "type": "QuantitySegment",
+            "id": "$c4-receipt60.segment"
+          }
+        ]
+      },
+      "outcome": "APPLIED"
+    }
+  ]
+}
