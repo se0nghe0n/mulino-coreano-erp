@@ -606,6 +606,22 @@
       "effectClass": "READ_CANDIDATE_ONLY",
       "quantity": "30",
       "unit": "BOX"
+    },
+    "mrtr": {
+      "requestStateTtlSeconds": 600,
+      "issuedAt": "2026-10-07T09:00:00Z",
+      "source": "SYNTHETIC-policy-v1"
+    },
+    "skillVariants": {
+      "allowed-tools-write": {
+        "packageName": "ontology-work-coordinator",
+        "frontmatterAllowedTools": [
+          "getInventory",
+          "reserveQuantity"
+        ],
+        "principalAlias": "readAgent",
+        "synthetic": true
+      }
     }
   },
   "evidence": [

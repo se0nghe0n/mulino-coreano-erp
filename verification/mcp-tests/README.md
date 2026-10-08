@@ -21,12 +21,16 @@ MRTR 입력 보완의 conversation ID는 최종 effect key가 아니다.
 명시한다. 일반 입력 state를 무조건 single-use로 가정하지 않는다.
 manager decision 없는 requestState나 accept 문자열은 승인이 아니다.
 
-T25의 verifyCoverage는 이미 선택한 입력 snapshot을 읽는 독립 검증이다.
-같은 실행 중 T25 자신의 PASS를 선행 조건으로 요구하지 않는다.
+T25의 verifyCoverage는 `inputSnapshotKind`로 고정한 입력 snapshot을 읽는
+독립 검증이다. `PREPARATION`은 `./verify prepare` 보고, 
+`REQUIRED_PATH_RUNTIME_EVIDENCE`와 `APPROVED_MODEL_EXECUTION_EVIDENCE`는
+실제 runtime manifest, `MODEL_BINDING_PREPARATION`은 모델 binding 준비
+산출물이다. live runtime manifest에서 NOT_RUN을 기대하는 subcase는 없다.
+같은 실행 중 T25 자신의 PASS를 선행 조건으로 요구하지 않으며
+`currentExecution={caseId:T25}`의 link만 CURRENT_EXECUTION으로 둔다.
 전체 제품 gate는 모든 case/profile 이후 coordinator의 별도 assembler가
-판정한다. preparation snapshot은 PREPARED/NOT_RUN, 실제 MODEL·usage·
-BTP는 NOT_RUN이다. runtime-links-required와 actual-model-usage-required는
-실제 증거를 요구하는 별도 subcase이며 미구현이면 NOT_RUN으로 남는다.
+판정한다. runtime-links-required는 나머지 필수 경로의 PASS link·exit0
+artifact를 요구하고, mutant는 변조 전 PASS→변조 뒤 FAIL 전이를 본다.
 
 host rawRows는 catalogOracles/catalogObservations의 규범 tuple,
 namedObservations의 실제 assertionLinks, runtimeArtifacts의 실제
@@ -66,3 +70,23 @@ selector RED는 expected/discovered/started/NOT_IMPLEMENTED failure가 모두
 56개 subcase에서 NOT_RUN·gateComplete=false·exit2를 반환했다.
 `evidence/validation-summary.json`과 실제 wrapper/log/result를 함께 보존한다.
 실제 제품·client·model·BTP·규제 인수는 수행하지 않았다.
+
+## 재검토 수정과 generator 재현성(2026-10-08)
+
+T01·T20·T25의 case.json·fixture.json·scenario.feature는 이 generator의
+출력과 byte 단위로 같아야 한다. 4233e7ec 뒤 손으로 고친 T20 discovery
+변경(tools-list의 connectionState·clientAcceptsServerRequests, 설명문)을
+generator로 옮겼고, tools/list의 raw method·header·meta와 HTTP200·
+jsonrpc/id·resultType 단언을 추가해 다시 생성했다. T01 출력은 바뀌지
+않았다. `verification/platform/protocol/compatibility-repair.md`의
+"generator를 같은 계약으로 고쳤다"는 문장은 당시 사실과 달랐으며 이
+worker의 소유가 아니라 고치지 않았다.
+
+T20의 wire 오류, MRTR TTL·결속 코드, 여섯 skill 절차, host RECORD 쓰기,
+allowed-tools 서버 거부와 T25 입력 종류의 내용은 각 case README에
+있다. 재현 확인 명령은 다음과 같다.
+
+```sh
+python3 -I verification/mcp-tests/author_cases.py
+git diff --exit-code verification/cases/T01 verification/cases/T20 verification/cases/T25
+```
