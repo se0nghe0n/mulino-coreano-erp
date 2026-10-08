@@ -26,6 +26,7 @@ LAYER_PROFILE = {'UNIT': 'contracts', 'API': 'scenarios', 'DB': 'scenarios', 'MC
                  'MODEL': 'model', 'LOCAL_DEPLOYMENT': 'local-deployment', 'BTP_DEPLOYMENT': 'btp-deployment', 'REGULATORY_REVIEW': 'regulatory'}
 ARTIFACT_CLASSES = {'ACTUAL', 'ACTUAL_HOST', 'ACTUAL_RUNTIME'}
 BAD_MARKERS = ('selftest', 'canned', 'stub', 'fake', 'captured', 'unimplemented')
+REGULATORY_REVIEW_FIELDS = ('officialSourceRef', 'jurisdiction', 'applicableDate', 'reviewerId', 'reviewedAt')
 
 
 def status_of(values):
@@ -213,7 +214,16 @@ class Assembly:
                 self.issue('FAIL', f'Case declares unknown verification profile(s): {case_id} {unknown_profiles}', True)
             for sub in case.get('subcases', []):
                 bundle = self.fixture_bundle(sub.get('fixtureRef'))
-                for profile in effective_profiles(case.get('profiles', [])):
+                sub_profiles = effective_profiles(case.get('profiles', []))
+                # REGULATORY_REVIEW is not a case-declarable execution profile (plan §13.4 records the
+                # official source/applicable date/reviewer separately). A subcase that asserts such an
+                # observation is also declared on the separate regulatory evidence profile, so the
+                # observation is reachable only through an actual reviewed regulatory receipt.
+                if 'regulatory' not in sub_profiles and any(
+                        'regulatory' in observations.get((a.get('oracleRef', {}).get('oracleId'), name), {}).get('requiredProfiles', [])
+                        for a in sub.get('assertions', []) for name in a.get('oracleRef', {}).get('observationNames', [])):
+                    sub_profiles = sub_profiles + ['regulatory']
+                for profile in sub_profiles:
                     declarations.append({'caseId': case_id, 'subcaseId': sub.get('id'), 'profile': profile, 'status': 'NOT_RUN',
                                          'caseHash': self.descriptor(case_ref)['sha256'], 'fixtureArtifacts': bundle,
                                          'assertions': [], '_sub': sub})
@@ -225,7 +235,7 @@ class Assembly:
                         if observation is None or observation['caseId'] != case_id:
                             self.issue('FAIL', f'Unknown/wrong-case oracle observation: {case_id}/{key}', True)
                         else:
-                            for profile in effective_profiles(case.get('profiles', [])):
+                            for profile in sub_profiles:
                                 observation['assertionLinks'].append({'caseId': case_id, 'subcaseId': sub.get('id'), 'assertionId': assertion.get('id'),
                                                                        'profile': profile, 'status': 'NOT_RUN', 'evidenceRefs': assertion.get('evidenceRefs', [])})
         for observation in observations.values():
@@ -312,6 +322,13 @@ class Assembly:
                 raise ValueError('Report commit differs from actual receipt')
             if profile.endswith('-deployment') and receipt.get('environment') != ('BTP' if profile == 'btp-deployment' else 'LOCAL'):
                 raise ValueError('Deployment environment cannot substitute LOCAL for BTP')
+            if profile == 'regulatory':
+                review = receipt.get('regulatoryReview')
+                if not isinstance(review, dict) or any(not nonempty(review.get(k)) for k in REGULATORY_REVIEW_FIELDS):
+                    raise ValueError('Regulatory evidence needs official source, jurisdiction, applicable date, reviewer and review time')
+                instant(review['reviewedAt'])
+                if review.get('fictionalFixture') is not False or any(m in json.dumps(review).lower() for m in BAD_MARKERS + ('synthetic', 'fictional-policy')):
+                    raise ValueError('Fictional fixture/selftest policy cannot become regulatory acceptance')
             if not any(document.get('profileResult') == report for document in documents):
                 raise ValueError('Actual profile report lacks matching independently captured artifact bytes')
             receipt['_artifactPaths'] = output_paths

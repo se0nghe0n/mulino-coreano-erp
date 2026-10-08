@@ -111,7 +111,14 @@ actual 증거가 없으면 두 배열은 빈 배열이고 전체 runtime은 NOT_
 schema→contracts→scenarios/recovery→mcp/skills→model/deployment의 필수
 선행을 확인한다. local-deployment와 btp-deployment는 별도 profile이며
 case의 기존 deployment 선언을 둘로 펼친다. regulatory도 별도 필수
-profile이다. 관찰의 requiredLayers는 각 필수 profile에 연결한다.
+profile이다. case schema는 regulatory를 실행 profile로 선언하지 않는다.
+계획 §13.4는 법규 검토의 출처·적용일·검토자를 따로 기록하게 한다.
+그래서 REGULATORY_REVIEW 관찰에 연결된 assertion을 가진 subcase만
+regulatory evidence profile에도 선언한다(현재 T15의 missing-* 3개).
+이 profile의 ACTUAL receipt는 `regulatoryReview`의 officialSourceRef·
+jurisdiction·applicableDate·reviewerId·reviewedAt과
+`fictionalFixture=false`가 필요하다. 가상 fixture나 synthetic 정책은
+규제 인수가 아니다. 관찰의 requiredLayers는 각 필수 profile에 연결한다.
 그 경로에 실행 assertion이 없으면 해당 관찰을 PASS로 바꾸지 않는다.
 
 필수 profile에 연결된 assertion이 하나도 없는 관찰은 실행해도 영원히

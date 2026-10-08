@@ -178,6 +178,23 @@ class CoverageSelftest(unittest.TestCase):
         mutated = {p['reason'] for p in b.preparation_problems if 'Unreachable required profile' in p['reason']}
         self.assertEqual(13, len([r for r in mutated - baseline if 'case T09 ' in r and 'requires contracts' in r]))
 
+    def test_regulatory_review_observation_reachable_only_through_reviewed_receipt(self):
+        a = m.Assembly(HERE.parents[1], COMMIT)
+        _, observations = a.catalog()
+        declarations = a.declarations(observations)
+        self.assertFalse([p for p in a.preparation_problems if 'case T15 ' in p['reason']])
+        regulatory = {d['subcaseId'] for d in declarations if d['caseId'] == 'T15' and d['profile'] == 'regulatory'}
+        self.assertEqual({'missing-officialSource', 'missing-applicableDate', 'missing-reviewer'}, regulatory)
+        review = dict(officialSourceRef='MFDS-notice-2026-01', jurisdiction='KR', applicableDate='2026-10-01',
+                      reviewerId='qa-regulatory-reviewer', reviewedAt='2026-10-07T00:00:00Z', fictionalFixture=False)
+        for mutant, accepted in [(None, False), (dict(review, reviewerId=''), False), (dict(review, fictionalFixture=True), False),
+                                 (dict(review, officialSourceRef='synthetic-policy-v1'), False), (review, True)]:
+            with self.subTest(review=mutant):
+                report, receipt, raw = self.protocol_fixture('regulatory')
+                if mutant is not None:
+                    receipt['regulatoryReview'] = mutant
+                self.assertEqual(accepted, self.receipt_check(report, receipt, raw, 'regulatory') is not None)
+
     def test_red_and_selftest_are_not_actual_profile_pass(self):
         self.write('pass.json', {'status': 'PASS', 'gateComplete': True})
         for evidence_class in ('SELFTEST', 'CONTRACT_RED'):
