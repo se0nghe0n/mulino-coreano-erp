@@ -72,10 +72,12 @@ def flatten(actions):
 
 
 class Assembly:
-    def __init__(self, root, commit=None):
+    def __init__(self, root, commit=None, working_tree_dirty=None):
         self.root = pathlib.Path(root).resolve()
         self.commit = commit or subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=self.root, text=True).strip()
-        self.working_tree_dirty = True if commit else bool(subprocess.check_output(['git', 'status', '--porcelain'], cwd=self.root, text=True).strip())
+        if working_tree_dirty is None:
+            working_tree_dirty = True if commit else bool(subprocess.check_output(['git', 'status', '--porcelain'], cwd=self.root, text=True).strip())
+        self.working_tree_dirty = working_tree_dirty
         self.problems, self.sources, self.preparation_problems = [], {}, []
 
     def issue(self, status, message, preparation=False):
@@ -320,6 +322,8 @@ class Assembly:
                     raise ValueError('Canned/stub artifact cannot become ACTUAL')
             if report.get('codeCommit') != receipt.get('codeCommit'):
                 raise ValueError('Report commit differs from actual receipt')
+            if receipt.get('workingTreeClean') is not True:
+                raise ValueError('Actual run from a dirty or unrecorded working tree cannot identify the tested code commit')
             if profile.endswith('-deployment') and receipt.get('environment') != ('BTP' if profile == 'btp-deployment' else 'LOCAL'):
                 raise ValueError('Deployment environment cannot substitute LOCAL for BTP')
             if profile == 'regulatory':
@@ -695,7 +699,9 @@ class Assembly:
             transcript.write_text(completed.stdout + completed.stderr)
             self.descriptor(str(transcript))
             report = self.read('verification/harness/target/evidence/prepare.json', True)
-            if completed.returncode == 0 and report and report.get('status') == 'PREPARED' and report.get('codeCommit') == self.commit and report.get('preparedCases') == 41 and not report.get('preparationProblems'):
+            if report and report.get('workingTreeDirty') is not False:
+                preparation = self.issue('NOT_RUN', 'Preparation ran on a dirty/unrecorded working tree; codeCommit does not identify it', True)
+            elif completed.returncode == 0 and report and report.get('status') == 'PREPARED' and report.get('codeCommit') == self.commit and report.get('preparedCases') == 41 and not report.get('preparationProblems'):
                 if report.get('harnessMainClassSha256') == self.descriptor('verification/harness/target/classes/org/mulino/verification/Main.class')['sha256']:
                     preparation = 'PREPARED'
                 else:
@@ -737,12 +743,15 @@ class Assembly:
                 states.append(status_of(clause_states + [profiles[profile]['status']]) if clause_states else 'NOT_RUN')
             observation['status'] = status_of(states)
         model = self.model(index, profiles)
+        if self.working_tree_dirty:
+            # §13.4: evidence must name the exact code commit. Uncommitted changes break that link.
+            self.issue('NOT_RUN', 'Working tree is dirty; codeCommit does not identify the assembled code and evidence inputs')
         preparation = 'FAIL' if any(p['status'] == 'FAIL' for p in self.preparation_problems) else 'PREPARED' if preparation == 'PREPARED' and model['preparationStatus'] == 'PREPARED' else 'NOT_RUN'
         states = [d['status'] for d in declarations] + [o['status'] for o in observations.values()] + [p['status'] for p in profiles.values()] + [model['status']] + [p['status'] for p in self.problems]
         runtime = status_of(states)
         if any(p['status'] == 'FAIL' for p in self.preparation_problems):
             runtime = 'FAIL'
-        complete = runtime == 'PASS' and preparation == 'PREPARED' and not self.preparation_problems
+        complete = runtime == 'PASS' and preparation == 'PREPARED' and not self.preparation_problems and self.working_tree_dirty is False
         status = 'PASS' if complete else 'FAIL' if runtime == 'FAIL' else 'NOT_RUN'
         for declaration in declarations:
             declaration.pop('_sub', None)
@@ -766,6 +775,8 @@ def validate_manifest(value):
     if value.get('status') not in ('PASS', 'FAIL', 'NOT_RUN'):
         raise ValueError('Invalid runtime aggregate status')
     complete = value.get('status') == 'PASS'
+    if complete and value.get('workingTreeDirty') is not False:
+        raise ValueError('PASS from a dirty working tree does not identify the tested code commit')
     if any(value.get(k) is not complete for k in ['gateComplete', 'runtimeComplete', 'productRuntimeClaimed']):
         raise ValueError('Completion flags contradict runtime status')
     if value.get('exitCode') != {'PASS': 0, 'FAIL': 1, 'NOT_RUN': 2}[value['status']]:
@@ -792,6 +803,8 @@ def validate_saved(root, value, index_ref='verification/coverage/runtime-evidenc
     assembly = Assembly(root)
     if value.get('codeCommit') != assembly.commit:
         raise ValueError('Manifest baseline differs from current commit')
+    if value.get('workingTreeDirty') is not assembly.working_tree_dirty:
+        raise ValueError('Manifest working tree state differs from current checkout')
     for descriptor in value.get('inputArtifacts', []):
         assembly.checked_descriptor(descriptor)
     index = assembly.read(index_ref)

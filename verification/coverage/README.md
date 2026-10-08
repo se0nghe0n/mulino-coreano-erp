@@ -22,6 +22,16 @@ exit2다. 형식·환경 오류는 exit3이다. 출력 파일은 Git에 commit�
 `validate.py`의 exit0은 저장 manifest가 현재 입력과 일치한다는 뜻이다.
 manifest가 NOT_RUN이면 제품 PASS가 아니다.
 
+PASS는 깨끗한 working tree에서만 가능하다. 계획 §13.4는 증거가 시험한
+code commit을 정확히 지목하도록 요구한다. 커밋되지 않은 변경이 있으면
+assembler가 NOT_RUN 문제를 남기고, `validate_manifest`는
+`workingTreeDirty=true`인 PASS를 거부한다. schema의 PASS 분기도
+`workingTreeDirty=false`를 요구한다. `validate.py`는 저장 manifest의
+working tree 상태를 현재 checkout과 대조한다. 각 ACTUAL receipt에는
+실행한 checkout의 `workingTreeClean=true`가 필요하다.
+`--check-preparation`도 `prepare.json`의 workingTreeDirty가 false여야
+PREPARED로 인정한다.
+
 `--check-preparation`은 case·registry·catalog·fixture의 필수 입력이 모두
 존재할 때 현재 checkout의 `./verify prepare`를 새로 실행한다. 실제
 Gherkin Pickle/parser, JSON Schema와 정확한 registry 검사를 재사용한다.

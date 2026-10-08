@@ -11,7 +11,8 @@
     "versions",
     "reportArtifact",
     "inputs",
-    "artifacts"
+    "artifacts",
+    "workingTreeClean"
   ],
   "properties": {
     "schemaVersion": {
@@ -235,6 +236,10 @@
         }
       },
       "additionalProperties": false
+    },
+    "workingTreeClean": {
+      "description": "git status --porcelain was empty for the executed checkout; a dirty run cannot identify codeCommit (plan §13.4).",
+      "const": true
     }
   },
   "additionalProperties": false

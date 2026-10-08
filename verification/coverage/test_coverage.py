@@ -36,7 +36,7 @@ class CoverageSelftest(unittest.TestCase):
                         tool='java21', db='postgres18', protocol='mcp-v1', client='client-v1', model='model-v1', prompt='prompt-v1', skill='skill-v1')
         report = dict(status='PASS', profile=profile, codeCommit=COMMIT, command=command['display'], exitCode=0,
                       executionIdentity=identity, gateComplete=True, discovered=1, started=1, completed=1, skipped=0, cases=[])
-        receipt = dict(schemaVersion='1.0.0', evidenceClass='ACTUAL', codeCommit=COMMIT, executionIdentity=identity, command=command, versions=versions,
+        receipt = dict(schemaVersion='1.0.0', evidenceClass='ACTUAL', codeCommit=COMMIT, workingTreeClean=True, executionIdentity=identity, command=command, versions=versions,
                        inputs=[self.write('input.json', {'input': 'fixed'})], artifacts=[], reportArtifact=self.write('report.json', report))
         raw = dict(scope={'environmentId': 'test-workspace'}, evidenceClass='ACTUAL_RUNTIME', executionIdentity=identity, command=command, versions=versions,
                    provenance={'source': 'ACTUAL_RUNTIME', 'independent': True}, profileResult=report, observations={})
@@ -597,6 +597,33 @@ class CoverageSelftest(unittest.TestCase):
         mutant['coverageProblems'].append({'status': 'FAIL', 'reason': 'Observed violation'})
         with self.assertRaises(ValueError):
             m.validate_manifest(mutant)
+
+    def test_dirty_working_tree_cannot_identify_a_pass(self):
+        report, receipt, raw = self.protocol_fixture()
+        for value in (False, None):
+            with self.subTest(workingTreeClean=value):
+                mutant = copy.deepcopy(receipt)
+                if value is None:
+                    del mutant['workingTreeClean']
+                else:
+                    mutant['workingTreeClean'] = value
+                self.assertIsNone(self.receipt_check(report, mutant, raw))
+        result = self.consistent_not_run_manifest()
+        forged = dict(copy.deepcopy(result), status='PASS', exitCode=0, gateComplete=True, runtimeComplete=True,
+                      productRuntimeClaimed=True, workingTreeDirty=True)
+        with self.assertRaisesRegex(ValueError, 'dirty'):
+            m.validate_manifest(forged)
+        dirty = m.Assembly(HERE.parents[1], COMMIT, working_tree_dirty=True).assemble({'profiles': []})
+        self.assertTrue(any(p['status'] == 'NOT_RUN' and 'dirty' in p['reason'] for p in dirty['coverageProblems']))
+        self.assertFalse(dirty['gateComplete'])
+
+    def test_saved_manifest_cannot_hide_working_tree_state(self):
+        root = HERE.parents[1]
+        result = m.Assembly(root).assemble({'profiles': []})
+        mutant = copy.deepcopy(result)
+        mutant['workingTreeDirty'] = not result['workingTreeDirty']
+        with self.assertRaisesRegex(ValueError, 'working tree'):
+            m.validate_saved(root, mutant)
 
     def test_saved_manifest_reassembly_rejects_forged_observation_status(self):
         root = HERE.parents[1]
