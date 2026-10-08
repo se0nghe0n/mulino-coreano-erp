@@ -17,8 +17,8 @@ T01–T26, C1–C5, V1–V8, E1/E2가 인수 기준이다. 명사·동사 진입
 - 새 사례를 쓰거나 실행·증거를 보고할 때 먼저
   [저장소 harness](references/repository-harness.md)를 읽는다. `./verify`
   명령과 exit code, case 구성, 실행 가능한 Gherkin 문법, NOT_RUN 처리,
-  오류 envelope·의무 `current`·자연 tick 관찰, 증거 pipeline·class, 실행 receipt
-  producer의 조건, V4 경로 열거 요구와 현재 한계, 명사·동사 비교가 있다.
+  준비 gate의 vocabulary·binding·생성기 검사, 감사 원행, runtimeProfile·
+  scheduler 제출 증거, PREPARATION 입력 결속, receipt 조건과 V4 열거 한계가 있다.
 - 테스트 계층을 설계할 때 [방법론](references/methodology.md)을 읽는다.
   #57에서 업무 시나리오·공통 SIT/UAT·보류 증거 원칙을 재사용했다.
 - 반례와 종단 수량을 작성할 때
@@ -89,15 +89,16 @@ runtime의 결합을 검증한다. 테스트 전용 scripted agent는 정해진 
 
 V4의 우회 경로 집합은 고정 목록이 아니라 실행 중 시스템이 노출한 쓰기 면을
 열거해 만들어야 한다. `verification/cases/V4`의 고정 inventory 92개는 열거가
-아니고 열거 subcase `exposed-write-surface`는 host 조작 계약·adapter가 없어
-`NOT_RUN`이므로, 그 subcase가 실제 실행되어 PASS하기 전에는 V4의 노출 면 부분을
+아니고 열거 subcase `exposed-write-surface`는 계약이 정의됐어도 실제 host adapter가
+없어 `NOT_RUN`이므로, 그 subcase가 실제 실행되어 PASS하기 전에는 V4의 노출 면 부분을
 PASS로 보고하지 않는다(`repository-harness.md`).
 
 명령 오류 코드는 응답의 `/response/error/code` 하나로만 읽고 `/response/code`·
 `errorCode` pointer를 쓰지 않는다(`./verify prepare`가 거부한다). 의무·판정
 원행의 `current`는 revision 유효성이며 `status`와 독립이다. 열린 의무는
 `current=true`와 `status=OPEN`을 함께 단언한다. 자율 loop는 harness tick이 아니라
-다음 자연 tick을 수동 관찰해 판정한다(`repository-harness.md`).
+false/false runtimeProfile에서 자연 tick을 수동 관찰한다. 감사 이름·presence와
+PREPARATION commit/clean 필드도 공개 계약을 따른다(`repository-harness.md`).
 
 거부·권한 없음·재시도 사례는 전후 상태를 비교해 금지된 수량 변경,
 배분·승인·업무·외부 요청 생성이 없음을 증명한다. 정책이 허용하는
@@ -145,8 +146,9 @@ case 결과는 PASS/FAIL/NOT_RUN이다. skip, 접속 실패, `NOT_IMPLEMENTED`,
 `./verify`는 구현된 entrypoint이며 모드와 exit code는
 `repository-harness.md`에 있다. 실제 command·version·exit code·codeCommit·
 receipt 경로를 보고에 인용한다. PASS는 `runtime-manifest.json`의 해당 item이나
-profile `status`가 `PASS`인 것뿐이다. `validate.py`의 `VALID`는 일관성만 뜻하며
-PASS 주장이 manifest에서 확인되지 않으면 `NOT_RUN`이다.
+profile `status`가 `PASS`이고 `python3 verification/coverage/validate.py`가
+현재 입력에 대해 exit0인 경우만 쓴다. `VALID`는 일관성만 뜻하며 manifest의
+PASS가 없거나 검증이 실패하면 PASS로 인용하지 않는다.
 `ACTUAL`·`SELFTEST`·`CONTRACT_RED`는 coverage index의 evidence class이고
 STUB·LOGIC_REVIEW는 보고서에서만 구별하는 범주다.
 `./verify coverage`는 assembler(`--check-preparation`)의 exit code를 그대로 돌려준다.

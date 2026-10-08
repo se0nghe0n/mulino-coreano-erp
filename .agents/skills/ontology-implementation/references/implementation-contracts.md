@@ -69,14 +69,12 @@ capability allowlist에 있어야 하고 core entity는 노출하지 않거나
 `@readonly`·`@restrict`로 막는다. 규칙 없는 `404`나 "generic projection을
 만들지 않는다"는 관례만으로 충족했다고 하지 않는다.
 
-이 열거와 우회 시도는 요구다. `verification/cases/V4`의 고정 route inventory
-92개는 열거가 아니며, 열거는 subcase `exposed-write-surface`가 맡는다. 이 subcase는
-host 조작 `enumerateWriteSurface`가 host-observation schema·guide와 adapter에 생기기
-전까지 `NOT_IMPLEMENTED`→`NOT_RUN`이다. 따라서 그 subcase가 실제 실행되어 PASS하기
-전에는 V4의 노출 면 부분을 `NOT_RUN`으로 보고하고, 구현은 직접 열거한 결과를
-handoff·checks에 근거로 남긴다. 남은 계약은 harness·catalog 소유자의 일이다
-(`ontology-scenario-testing`의 repository-harness, `docs/execution/step1r/
-cross-owner-requests.md`).
+이 열거와 우회 시도는 요구다. V4의 고정 route inventory 92개는 열거가
+아니며 `exposed-write-surface`가 실제 열거를 맡는다. host 조작
+`enumerateWriteSurface`의 schema·guide 계약은 정의됐고 실제 adapter는 없다.
+열거 subcase가 실제 PASS하기 전에는 V4 노출 면 인수를 `NOT_RUN`으로
+보고하고 수동 열거는 handoff·checks에 남긴다. 정확한 계약과 cross-owner
+요청은 [저장소 harness](../../ontology-scenario-testing/references/repository-harness.md)를 따른다.
 
 **조회 두 진입점.** `getObject`·`searchObjects`·`getWork`·`searchWorks`·
 `getInventory`·`getObligations`·`traceLot`·`getEvidence`·`getAssessment`·

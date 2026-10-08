@@ -34,8 +34,8 @@ Adapter에서 물량·승인·목표 판정 규칙을 복제하지 않는다.
 - MCP tool·worker handler로 쓰기/조회 면을 노출하거나 조회 schema를 바꿀 때
   [implementation-contracts.md](../ontology-implementation/references/implementation-contracts.md)의
   "쓰기 노출 면과 조회 계약"을 읽는다. tool 목록과 worker registry도 V4
-  열거 요구 대상이다(열거 subcase `exposed-write-surface`는 host 조작 계약·adapter
-  전까지 `NOT_RUN`이다).
+  열거 요구 대상이다(`enumerateWriteSurface` 계약은 정의됐고 실제 host adapter가
+  없어 열거 subcase `exposed-write-surface`는 `NOT_RUN`이다).
 - grants·approval, worker/outbox, 정의 호환, runtime package 또는
   client 인수를 구현할 때
   [runtime-and-client.md](references/runtime-and-client.md)를 읽는다.
@@ -72,14 +72,15 @@ Adapter에서 물량·승인·목표 판정 규칙을 복제하지 않는다.
 없으면 `NOT_RUN`이다. 구조 검증, wire 검증, client 발견/로딩,
 실제 tool 실행, 실모델 의미 평가는 서로 다른 증거다.
 
-증거는 저장소의 실제 pipeline에서 인용한다(`verification/manifest.json`은 없다).
+증거는 저장소의 실제 pipeline에서 인용한다.
 실행은 `./verify`·`verification/actual/sN/run.sh`, receipt·index·조립은
 `verification/coverage`, 결과는
 `verification/harness/target/evidence/runtime-manifest.json`이다.
 증거 class와 보고 규칙은
 [저장소 harness](../ontology-scenario-testing/references/repository-harness.md)를
-따른다. PASS는 manifest item/profile `status`가 `PASS`인 것뿐이며 `validate.py`의
-`VALID`는 일관성이다. `--actual` profile 실행만 엄격한 조건에서 coverage receipt를
+따른다. PASS는 manifest item/profile `status`가 `PASS`이고 `validate.py`가 현재
+입력에 대해 exit0인 경우만 쓴다. `VALID`는 일관성이다. `--actual` profile
+실행만 엄격한 조건에서 coverage receipt를
 만들며 현재 actual driver에는 mcp·client·process adapter가 없어 해당 runtime 주장은
 `NOT_RUN`이다.
 `./verify mcp`와 `./verify skills`는 `--actual` 없이는 위반이 없어도 `NOT_RUN`(exit2)이고
