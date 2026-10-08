@@ -28,6 +28,9 @@ S4의 각 구현은 Task branch에 순차 통합 중이다. 이 기록은 coordi
 | 일부 새 조회가 미지원 filter·시점·연결 대상 인가를 생략함 | 명사/동사 양 경로에서 같은 scope·현재 권한·asOf/knownAt을 검증해야 한다. |
 | 회수 보류의 controlScope와 필수 policy/기간 필드가 불일치함 | 실제 segment의 controlScope와 유효한 정책 근거로 생성하고 출고 거부를 검증해야 한다. |
 | 동일 recordedAt에서 주문·승인 최신값 선택이 모호함 | 명시 revision/현재 포인터로 결정하고 옛 허용의 재사용을 거부해야 한다. |
+| 직접 수령 segment의 보관 주체가 언제나 미확인이라 창고 예약이 불가능함 | s4e-custody에서 검증된 수령 증거가 지명한 내부 보관 주체만 기록하도록 S3 계약을 개정했다. native E1·E2·C4·C1·suite PASS(`docs/execution/s4e-custody/README.md`). |
+| 반품 접수가 반품 물량의 보관 주체를 확인 actor로 둠(`ReturnStockPrimitives`) | 수령 개정과 같은 근거 원칙으로 바꿀지 결정이 필요하다. 미변경. |
+| C4 정정 부족2(DELIVERY_CORRECTED_DEFICIT)를 권한 있게 해소·면제할 공개 경로 없음 | kind resolver가 없어 resolveObligation이 VERSION_UNSUPPORTED이고, waiver 승인 기록을 만드는 명령이 없다. `resolvedOrWaivedDutyRevival=0`은 NOT_RUN이다. |
 
 각 수정의 OWN commit과 원본 실행 증거는 담당자의
 `docs/execution/s4-*` 기록에서 통합한다. 위 표의 수정 표기는 source

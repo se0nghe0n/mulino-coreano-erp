@@ -20,6 +20,15 @@ public class TradeEvidence {
 
   public Map<String,Object> requireCanonical(DomainContext c,String id,String kind,String itemId,
       String physicalScopeId,BigDecimal quantity,String unit){
+    var verified=verifiedCanonical(c,id,kind,itemId,physicalScopeId,quantity,unit);
+    if(verified.isEmpty())throw unverified();
+    return verified.getFirst();
+  }
+
+  /** Every current verified original/claim/event chain of one exact canonical fact; empty when none qualifies. */
+  public List<Map<String,Object>> verifiedCanonical(DomainContext c,String id,String kind,String itemId,
+      String physicalScopeId,BigDecimal quantity,String unit){
+    var chains=new ArrayList<Map<String,Object>>();
     var occurrence=repository.require("CanonicalOccurrences",c.organizationId(),EvidenceTypes.uuid(id));
     authorizer.authorizeScopes(c,"getEvidence",EvidenceTypes.scopes(occurrence));
     if(!visible(occurrence,c)||!kind.equals(occurrence.get("kind"))||!Objects.equals(itemId,occurrence.get("itemId"))||!Objects.equals(physicalScopeId,occurrence.get("physicalScopeId"))||!decimal(quantity,occurrence.get("quantity"))||!Objects.equals(unit,occurrence.get("unit"))||!"KNOWN".equals(occurrence.get("valueState"))||!"COMPLETE".equals(occurrence.get("reassessmentState")))throw unverified();
@@ -36,9 +45,9 @@ public class TradeEvidence {
       if(repository.rows("Claims",c.organizationId()).stream().anyMatch(x->visible(x,c)&&claim.get("ID").equals(x.get("supersedesId")))||repository.rows("Events",c.organizationId()).stream().anyMatch(x->visible(x,c)&&(event.get("ID").equals(x.get("supersedesId"))||event.get("ID").equals(x.get("invalidatesId"))))||repository.rows("DocumentVersions",c.organizationId()).stream().anyMatch(x->visible(x,c)&&doc.get("ID").equals(x.get("supersedesId"))))continue;
       var inbox=repository.rows("InboxRecords",c.organizationId()).stream().filter(x->visible(x,c)&&Objects.equals(event.get("sourceNamespace"),x.get("sourceNamespace"))&&Objects.equals(event.get("externalEventId"),x.get("externalEventId"))&&Objects.equals(event.get("sourceVersion"),x.get("sourceVersion"))).toList();
       if(inbox.size()!=1||"CONFLICT".equals(inbox.getFirst().get("state")))continue;
-      var result=new LinkedHashMap<String,Object>(occurrence);result.put("verificationId",verification.get("ID"));result.put("evidenceRefs",List.of(id,verification.get("ID"),claim.get("ID"),event.get("ID"),doc.get("ID")));return result;
+      var result=new LinkedHashMap<String,Object>(occurrence);result.put("verificationId",verification.get("ID"));result.put("evidenceRefs",List.of(id,verification.get("ID"),claim.get("ID"),event.get("ID"),doc.get("ID")));chains.add(result);
     }
-    throw unverified();
+    return List.copyOf(chains);
   }
   private static boolean decimal(BigDecimal expected,Object value){return expected==null?value==null:value instanceof BigDecimal actual&&expected.compareTo(actual)==0;}
   private static boolean visible(Map<String,Object> row,DomainContext c){return !EvidenceTypes.instant(row.get("recordedAt")).isAfter(c.knownAt())&&(row.get("effectiveFrom")==null||!EvidenceTypes.instant(row.get("effectiveFrom")).isAfter(c.asOf()))&&(row.get("effectiveUntil")==null||c.asOf().isBefore(EvidenceTypes.instant(row.get("effectiveUntil"))));}
