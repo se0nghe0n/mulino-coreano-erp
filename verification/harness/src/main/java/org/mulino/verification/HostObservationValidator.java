@@ -98,6 +98,12 @@ public final class HostObservationValidator {
     static final List<String> PASSIVE_PARAMETERS=List.of("trigger","triggeredBy","observationWindowSeconds");
     /** Harness-resolved start of a passive watcher's observation window (CaseRunner.controlRequest); never authored by a case. */
     public static final String OBSERVE_FROM="observeFrom";
+    /**
+     * The fixture runtimeProfile tickSeconds, resolved by CaseRunner into a passive watcher request (step2r round 7). A
+     * NO_TASK observation must have watched at least one natural tick after observeFrom, otherwise a watcher that returns
+     * before the loop's next tick would report "nothing due" for a sweeper that re-submits already handled work.
+     */
+    public static final String NATURAL_TICK_SECONDS="naturalTickSeconds";
     /** A passive natural-tick watcher request (OBSERVE_NEXT_NATURAL_TICK parameters on tickScheduler/sweepDue). */
     static boolean passiveWatch(JsonNode control) {
         if(!"process".equals(control.path("type").asText()) || !Set.of("tickScheduler","sweepDue").contains(control.path("operation").asText())) return false;
@@ -160,6 +166,14 @@ public final class HostObservationValidator {
             Instant at=instant(row,"submittedAt");
             ContractValidator.require(!at.isBefore(start) && !at.isAfter(limit),"Scheduler submission row outside the observation window");
             if(first==null || at.isBefore(instant(first,"submittedAt"))) first=row;
+        }
+        JsonNode tick=requested.path(NATURAL_TICK_SECONDS);
+        if(!tick.isMissingNode()) ContractValidator.require(tick.isIntegralNumber() && tick.asInt()>=1 && tick.asInt()<=window.asInt(),
+            NATURAL_TICK_SECONDS+" must be an integer 1..observationWindowSeconds (fixture runtimeProfile tickSeconds)");
+        if(identity.path("submissionStatus").asText().equals("NO_TASK")) {
+            // An absence is only evidence after the loop has had its next tick inside the observed interval.
+            ContractValidator.require(tick.isIntegralNumber(),"NO_TASK passive observation needs the harness-resolved "+NATURAL_TICK_SECONDS+" (fixture runtimeProfile tickSeconds)");
+            ContractValidator.require(!end.isBefore(start.plusSeconds(tick.asLong())),"NO_TASK passive observation ended before one natural tick ("+NATURAL_TICK_SECONDS+") after "+OBSERVE_FROM+"; it cannot show that the next tick submitted nothing");
         }
         if(identity.path("submissionStatus").asText().equals("SUBMITTED")) {
             ContractValidator.require(first!=null,"SUBMITTED natural tick has no scheduler-recorded submission row");

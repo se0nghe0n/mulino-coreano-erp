@@ -43,7 +43,10 @@ def c1_fixture():
     twin['segmentAlias'] = 'UNK40'
     twin['basisProposalHash'] = hashlib.sha256(b'C1-unrecognized-place-kind UNK40 SELL basis v1').hexdigest()
     b['eligibilityFacts'] = facts + [twin]
-    b['policies']['saleSourcePlaceAliases'] = ['W']
+    # step2r round 7 (closure review 4 P3): keep the source fixture's sale-source places and add the negative place, so the
+    # place kind is the only difference between CON40 and UNK40 (no fixture policy confirms UNK40 false).
+    sources = list(b['policies'].get('saleSourcePlaceAliases', []))
+    b['policies']['saleSourcePlaceAliases'] = sources + ([] if 'W-UNRECOGNIZED' in sources else ['W-UNRECOGNIZED'])
     for actor in f['actors'].values():
         scope = actor['grant']['scope']
         for key, old, new in [('segmentAliases', 'CUS60', 'UNK40'), ('physicalRootAliases', 'CUS60', 'UNK40')]:

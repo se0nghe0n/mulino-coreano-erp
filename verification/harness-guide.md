@@ -78,7 +78,8 @@ exit code를 출력하며 `verification/harness/target/wrapper-commands.json`에
   - **감사 field와 tick profile**: `ContractValidator.auditFieldProblems`
     (공개되지 않은 감사 source·field·where)와 `runtimeProfileProblems`
     (fixture runtimeProfile과 tick 방식, 자율 loop 패턴, case가 직접 쓴
-    watcher `observeFrom`, `verification/host-observation-guide.md`)가
+    watcher `observeFrom`·`naturalTickSeconds`, 수동 관찰 fixture의
+    `tickSeconds` 누락·창 초과, `verification/host-observation-guide.md`)가
     어긋나면 준비 문제다.
   - **fixture 장소 종류**: `ContractValidator.placeKindProblems`가 subcase
     fixture(baseRefs 포함)의 모든 Place alias에
@@ -89,9 +90,21 @@ exit code를 출력하며 `verification/harness/target/wrapper-commands.json`에
     segment는 같은 조직의 Human/Agent alias를 `custodianAlias`로 가져야
     한다. kind 누락·옛 kind(INTERNAL_WAREHOUSE·WAREHOUSE·PORT·TRANSPORT)는
     준비 실패다(step2r round 6).
+  - **직접 수령의 보관자**: `ContractValidator.receiptCustodyProblems`가
+    기존 fixture QuantitySegment를 확인하지 않는 confirmReceipt(직접 수령)의
+    실물을 뒤에서 예약·배분 교체·pick·출고·이동하는 subcase에
+    `receivingCustodianId` slot을 요구한다. slot은 confirmReceipt 권한과
+    수령 장소 scope를 가진 내부 Human/Agent fixture actor여야 하고, 인용한
+    수령 원본(DocumentVersion `fixtureContent.receivingCustodianAlias`)이 같은
+    alias를 지명하며 그 evidence sha256이 canonical content의 hash여야 한다.
+    같은 수령의 모든 confirm은 같은 slot을 보내고, 운송 수령은 slot을 보내지
+    않는다(`contracts/fixture-place-kinds.json` directReceiptCustody, step2r
+    round 7).
   - **Streamable HTTP transport header**: `ContractValidator.wireTransportProblems`가
-    `route=wire`·`transport=streamable-http` 요청에 `Accept:
-    application/json, text/event-stream`을 요구하고 Origin을 금지한다.
+    `route=wire`·`transport=streamable-http` 요청의 Accept가
+    `application/json`과 `text/event-stream`을 모두 나열하기를 요구하고
+    Origin을 금지한다. 문자열 일치가 아니라 media type 비교다(순서·공백·
+    대소문자·parameter 무관, `q=0` 범위와 wildcard는 나열이 아님, round 7).
     예외는 그 action의 `/response/httpStatus`를 406(Accept) 또는
     403(Origin)으로 고정한 transport 반례 하나뿐이다
     (`contracts/mcp/s0-protocol.md`).

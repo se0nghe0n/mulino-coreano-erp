@@ -12391,6 +12391,12 @@
                   "$alias": "intake"
                 },
                 "provenance": "CONTEXT"
+              },
+              "receivingCustodianId": {
+                "value": {
+                  "$alias": "warehouse"
+                },
+                "provenance": "CONTEXT"
               }
             },
             "expectedRevision": 1,
@@ -12483,6 +12489,12 @@
                   "$alias": "intake"
                 },
                 "provenance": "CONTEXT"
+              },
+              "receivingCustodianId": {
+                "value": {
+                  "$alias": "warehouse"
+                },
+                "provenance": "CONTEXT"
               }
             },
             "expectedRevision": 1,
@@ -12573,6 +12585,12 @@
               "ownerId": {
                 "value": {
                   "$alias": "intake"
+                },
+                "provenance": "CONTEXT"
+              },
+              "receivingCustodianId": {
+                "value": {
+                  "$alias": "warehouse"
                 },
                 "provenance": "CONTEXT"
               }
@@ -13857,6 +13875,90 @@
             "actionId": "receipt-db",
             "pointer": "/data/rawRows/segments",
             "field": "unit"
+          }
+        },
+        {
+          "id": "received-custody-control",
+          "op": "relationSet",
+          "source": {
+            "actionId": "receipt-db",
+            "pointer": "/data/rawRows/segments",
+            "where": {
+              "locationId": {
+                "$alias": "W"
+              },
+              "active": true
+            },
+            "field": [
+              "id",
+              "quantity",
+              "unit",
+              "custodianId"
+            ]
+          },
+          "expected": [
+            [
+              {
+                "$result": {
+                  "actionId": "receipt60",
+                  "pointer": "/response/segmentId"
+                }
+              },
+              "60",
+              "BOX",
+              {
+                "$alias": "warehouse"
+              }
+            ],
+            [
+              {
+                "$result": {
+                  "actionId": "receipt40",
+                  "pointer": "/response/segmentId"
+                }
+              },
+              "40",
+              "BOX",
+              {
+                "$alias": "warehouse"
+              }
+            ],
+            [
+              {
+                "$result": {
+                  "actionId": "receipt5",
+                  "pointer": "/response/segmentId"
+                }
+              },
+              "5",
+              "BOX",
+              {
+                "$alias": "warehouse"
+              }
+            ]
+          ],
+          "requirementRefs": [
+            "D13"
+          ],
+          "evidenceRefs": [
+            "receipt-db:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "T13",
+            "subcaseId": "partial-excess-return-relocation",
+            "itemId": {
+              "$alias": "P"
+            }
+          },
+          "oracleExplanation": "양성 대조: 세 직접 수령 뒤 W의 활성 실물 60·40·5 BOX는 수령 원본과 명령 slot이 지명한 내부 보관자 warehouse가 보관한다. 그래서 수령60의 예약·출고와 수령40의 W-alt 이동이 보관 미확인으로 막히지 않고, 이동 뒤 구매 기여 불변을 실제로 관찰한다.",
+          "oracleRef": {
+            "oracleId": "T13.partial-and-excess-contributions",
+            "observationNames": [
+              "relocation-added-to-purchase"
+            ]
           }
         },
         {

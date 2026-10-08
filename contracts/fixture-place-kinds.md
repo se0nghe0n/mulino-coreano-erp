@@ -68,12 +68,60 @@ CUSTOMER, SUPPLIER_PLACE·IT-origin은 SUPPLIER, PORT·IT-port·KR-port는
 EXTERNAL_PORT다. 전환 기록과 script는
 `docs/execution/step2r-round6/`에 있다.
 
+## 직접 수령의 보관자
+
+기존 fixture QuantitySegment를 확인하지 않는 confirmReceipt는 직접
+수령이다. 이어받을 운송 leaf가 없으므로 수령한 실물의 보관자는 명령의
+`receivingCustodianId` slot에서만 생긴다. slot이 없으면 제품
+(`ReceiptCommands`, 읽기만)은 보관자 없는 segment를 만들고, 그 실물의
+예약·pick·출고·이동은 SCOPE_INELIGIBLE, 적격은 UNKNOWN이다. 계약을 지키는
+제품이 E1과 T13 `partial-excess-return-relocation`의 예약·출고30·W-alt
+이동을 만들 수 없었다(Step 2 closure review 4, P2). 기계 규칙은
+[fixture-place-kinds.json](fixture-place-kinds.json)의
+`directReceiptCustody`이고 `ContractValidator.receiptCustodyProblems`가
+`./verify prepare`에서 강제한다.
+
+- 직접 수령의 실물(또는 그 실물에서 split·이동·보류·예약으로 이어진
+  결과)을 뒤에서 `reserveQuantity`·`replaceAllocation`·`pickQuantity`·
+  `dispatchQuantity`·`moveQuantity`로 쓰면 그 수령은 slot을 보낸다.
+- slot은 같은 조직의 Human/Agent alias이며 fixture actor로서
+  confirmReceipt role과 grant를 갖고, grant의 장소 scope가 있으면 수령
+  장소를 포함한다. 제품은 수령 보관자에게 그 장소의 현재 수령 권한을
+  요구한다.
+- 인용한 수령 원본(slot `evidenceId`나 요청 `evidenceRefs`의
+  DocumentVersion alias)의 `fixtureContent.receivingCustodianAlias`가 같은
+  alias를 지명한다. 다른 보관자를 지명하는 원본은 없어야 하고, 지명한
+  원본의 fixture evidence sha256은 canonical content(key 정렬, 공백 없음,
+  UTF-8)의 SHA-256이다. adapter는 그 alias를 원본과 event payload의
+  `receivingCustodianId`로 설치한다. 제품은 검증된 수령 증거가 지명한
+  보관자만 slot으로 받기 때문이다.
+- 같은 수령(같은 `canonicalOccurrenceKey`, 없으면 같은
+  `commandIdempotencyKey`)의 모든 confirm·retry는 같은 slot 값을 보내거나
+  모두 보내지 않는다. 중복 출처나 재시도가 보관자를 바꾸지 못한다.
+- 운송 수령(기존 fixture QuantitySegment를 확인하는 수령)은 slot을 보내지
+  않는다. leaf의 보관자를 이어받는다.
+
+적용 case는 다음과 같다. 보관자는 확인한 actor와 다르게 둘 수 있으면
+다르게 두어, 호출자에서 보관자를 추론하는 제품이 양성 대조에서 드러나게
+했다.
+
+| case | 수령 | 보관자 | 원본 | 양성 대조 |
+|---|---|---|---|---|
+| E1 세 subcase | receipt60·receipt40(procurement가 확인) | receiver(내부 Human, confirmReceipt grant 추가) | warehouse-60·warehouse-40 | `received-custody-control`: 두 수령 뒤·첫 QC 보류 전 W 활성 실물은 수령60·수령40 두 행이고 보관자는 receiver다 |
+| T13 `partial-excess-return-relocation` | receipt60·receipt40·receipt5(warehouse가 확인) | warehouse(그 장소의 유일한 수령 권한자) | warehouse-receipt(새 DocumentVersion alias) | `received-custody-control`: W 활성 실물 60·40·5의 보관자는 warehouse다 |
+
+그 밖의 직접 수령(T02·T06·T07·T09·T11·T12·T21·T22·C3·V1·V6·V8)은 수령한
+실물을 뒤에서 예약·출고·이동하지 않아 slot이 필요 없다. 그 case의 기대는
+수령 자체·기여·멱등·권한이다. 그 실물의 양의 판매 적격을 단언하는
+case도 없다.
+
 ## 남은 범위
 
 - `verification/actual/**`의 native fixture와 Step 3
   `FixtureInstaller`(kind 기본값 `WAREHOUSE`)는 Step 3 소유다. 이 계약을
-  따르도록 바꾸는 일은 cross-owner 요청이다.
-- 처음 수령(기존 운송 segment가 없는 confirmReceipt)의 보관자는 fixture가
-  아니라 명령 slot이 정한다. case 요청이 수령 보관자를 보내지 않는
-  경우의 판매 가능성은 이 계약이 닫지 않는다
-  (`docs/execution/step2r-round6/README.md`).
+  따르도록 바꾸는 일은 cross-owner 요청이다. FixtureInstaller는 수령 원본의
+  `receivingCustodianAlias`를 원본 bytes와 event payload의
+  `receivingCustodianId`로 설치해야 한다(round 7 cross-owner 요청).
+- INTERNAL_STORAGE에서 보관자가 미확인·외부인 segment의 선언 반례와,
+  location 없는 segment의 보고는 아직 없다
+  (`docs/execution/step2r-round7/README.md` DEFERRED).

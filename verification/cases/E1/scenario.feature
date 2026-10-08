@@ -20,6 +20,8 @@
     만일 "observer" 역할이 "receipt60-after-doc-mcp" 행동을 수행한다
     만일 "시스템" 역할이 "receipt60-after-doc-db" 행동을 수행한다
     만일 "procurement" 역할이 "receipt40" 행동을 수행한다
+    만일 "observer" 역할이 "received-custody" 행동을 수행한다
+    만일 "시스템" 역할이 "received-custody-db" 행동을 수행한다
     만일 "qc" 역할이 "qc-hold60" 행동을 수행한다
     만일 "qc" 역할이 "qc-hold40" 행동을 수행한다
     만일 "qc" 역할이 "qc-pass60" 행동을 수행한다
@@ -49,6 +51,7 @@
     그러면 "return-received-8" assertion으로 "return-received"를 확인한다
     그러면 "current-sell-eligible-9" assertion으로 "current-sell-eligible"를 확인한다
     그러면 "current-sell-eligible-10" assertion으로 "current-sell-eligible"를 확인한다
+    그러면 "received-custody-control" assertion으로 "보류 전 W 활성 실물 = 수령60 BOX·수령40 BOX, 둘 다 내부 보관자 receiver"를 확인한다
     그러면 "agency-unverified-held-11" assertion으로 "agency-unverified-held"를 확인한다
     그러면 "agency-unverified-held-12" assertion으로 "agency-unverified-held"를 확인한다
     그러면 "agency-unverified-held-axis70" assertion으로 "규제 축 UNKNOWN 구매 수령분은 QC 상태와 독립으로 70 BOX다"를 확인한다
@@ -99,6 +102,8 @@
     만일 "observer" 역할이 "receipt60-after-doc" 행동을 수행한다
     만일 "시스템" 역할이 "receipt60-after-doc-db" 행동을 수행한다
     만일 "procurement" 역할이 "receipt40" 행동을 수행한다
+    만일 "observer" 역할이 "received-custody" 행동을 수행한다
+    만일 "시스템" 역할이 "received-custody-db" 행동을 수행한다
     만일 "qc" 역할이 "qc-hold60" 행동을 수행한다
     만일 "qc" 역할이 "qc-hold40" 행동을 수행한다
     만일 "qc" 역할이 "qc-pass60" 행동을 수행한다
@@ -179,6 +184,7 @@
     그러면 "two-entry-anchor-deliveredQuantity" assertion으로 "linkedSummary 과거 인도는 30 BOX다"를 확인한다
     그러면 "two-entry-anchor-returnedQuantity" assertion으로 "linkedSummary 반품은 10 BOX다"를 확인한다
     그러면 "two-entry-anchor-eligibleQuantity" assertion으로 "linkedSummary 현재 판매 적격은 0 BOX다"를 확인한다
+    그러면 "received-custody-control" assertion으로 "보류 전 W 활성 실물 = 수령60 BOX·수령40 BOX, 둘 다 내부 보관자 receiver"를 확인한다
     그러면 "two-entry-anchor-invoiceDifference" assertion으로 "linkedSummary 송장 차이는 5 EUR다"를 확인한다
     그러면 "logistics-closes-unrelated-duties-35" assertion으로 "logistics-closes-unrelated-duties"를 확인한다
     그러면 "logistics-closes-unrelated-duties-36" assertion으로 "logistics-closes-unrelated-duties"를 확인한다
@@ -239,6 +245,8 @@
     만일 "observer" 역할이 "receipt60-after-doc" 행동을 수행한다
     만일 "시스템" 역할이 "receipt60-after-doc-db" 행동을 수행한다
     만일 "procurement" 역할이 "receipt40" 행동을 수행한다
+    만일 "observer" 역할이 "received-custody" 행동을 수행한다
+    만일 "시스템" 역할이 "received-custody-db" 행동을 수행한다
     만일 "qc" 역할이 "qc-hold60" 행동을 수행한다
     만일 "qc" 역할이 "qc-hold40" 행동을 수행한다
     만일 "qc" 역할이 "qc-pass60" 행동을 수행한다
@@ -296,6 +304,7 @@
     그러면 "model-reference-27" assertion으로 "model-reference"를 확인한다
     그러면 "actual-runtime-observation-28" assertion으로 "actual-runtime-observation"를 확인한다
     그러면 "actual-runtime-observation-29" assertion으로 "actual-runtime-observation"를 확인한다
+    그러면 "received-custody-control" assertion으로 "보류 전 W 활성 실물 = 수령60 BOX·수령40 BOX, 둘 다 내부 보관자 receiver"를 확인한다
     그러면 "runtime-mcp-same-snapshot" assertion으로 "MCP 조회는 API 조회와 같은 snapshot을 읽는다"를 확인한다
     그러면 "actual-runtime-observation-5-mcp" assertion으로 "MCP 진입점: 같은 snapshot에서 actual-runtime-observation-5와 같은 값을 읽는다"를 확인한다
     그러면 "actual-runtime-observation-6-mcp" assertion으로 "MCP 진입점: 같은 snapshot에서 actual-runtime-observation-6와 같은 값을 읽는다"를 확인한다

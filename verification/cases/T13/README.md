@@ -34,7 +34,7 @@ identity는 strict alias/result ref를 사용하며 고정 수량 기대값은 �
 | T13.partial-and-excess-contributions / authorized-arrival-contribution | partial-excess-return-relocation/arrival-api100, partial-excess-return-relocation/arrival-db100 |
 | T13.partial-and-excess-contributions / excess-reconciliation | partial-excess-return-relocation/held-db105, partial-excess-return-relocation/excess5 |
 | T13.partial-and-excess-contributions / return-added-to-purchase | partial-excess-return-relocation/return-no-new-contribution |
-| T13.partial-and-excess-contributions / relocation-added-to-purchase | partial-excess-return-relocation/relocation-no-new-contribution |
+| T13.partial-and-excess-contributions / relocation-added-to-purchase | partial-excess-return-relocation/relocation-no-new-contribution, partial-excess-return-relocation/received-custody-control |
 | T13.partial-and-excess-contributions / contribution-scope | partial-excess-return-relocation/plan-original-goal, partial-excess-return-relocation/plan-original-goal-version, partial-excess-return-relocation/distinct-contributions, partial-excess-return-relocation/canonical-contributions, partial-excess-return-relocation/new-goal80, partial-excess-return-relocation/new-goal-revision |
 | T13.partial-and-excess-contributions / excess-owner | partial-excess-return-relocation/excess-owner-one, partial-excess-return-relocation/excess-owner-owner |
 
