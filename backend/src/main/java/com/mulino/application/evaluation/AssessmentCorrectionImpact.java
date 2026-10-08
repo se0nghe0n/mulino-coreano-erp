@@ -36,7 +36,11 @@ public class AssessmentCorrectionImpact implements EvidenceCorrectionImpact {
   // A receipt canonical is never superseded by a new canonical (EvidenceReconciliation only supersedes deliveries), so a corrected
   // receipt chain reaches settlement here: every invoice match on that receipt now reads UNVERIFIED and settlement opens its own
   // owned SETTLEMENT_DIFFERENCE in this transaction (plan §6 정산 "정산 차이는 별도 미해결 목표", §4.3, §5.3).
-  for(var occurrence:occurrences)if("PHYSICAL_RECEIPT".equals(occurrence.get("kind"))){
+  // A delivery canonical is normally superseded by a relinked correcting canonical, which reaches settlement through evidenceLinked.
+  // An invalidating correction never relinks, so its delivery matches read UNVERIFIED with no settlement owner unless settlement
+  // re-derives them here as well (plan §6 정산, §4.3, §5.3).
+  boolean invalidates=evidence.rows("Events",c.organizationId()).stream().anyMatch(x->correction.currentId().equals(x.get("ID"))&&x.get("invalidatesId")!=null);
+  for(var occurrence:occurrences)if("PHYSICAL_RECEIPT".equals(occurrence.get("kind"))||invalidates&&"PHYSICAL_DELIVERY".equals(occurrence.get("kind"))){
    var settlement=settlements.stream().toList();if(settlement.size()>1)throw new DomainError("HELD","FOLLOWUP_UNAVAILABLE","Exact settlement contribution provider required");
    if(settlement.size()==1)settlement.getFirst().contributionChanged(c,occurrence.get("ID").toString());
   }
@@ -92,6 +96,10 @@ public class AssessmentCorrectionImpact implements EvidenceCorrectionImpact {
     }
     for(var credit:repository.rows(c,"mulino.work.WorkContributions"))if(Objects.equals(occurrence.get("ID"),credit.get("occurrenceId")))ids.add(credit.get("targetWorkId").toString());
   }
+  // An IMPORTED S1 Work is an immutable reference (V9 work_lifecycle_guard); later evidence does not rewrite it, it only affects
+  // command-managed Works (plan §5.1 "폐쇄 업무의 원 사건을 다시 쓰는 reopen은 기본 action으로 제공하지 않는다", §4.3).
+  // Imported rows never change after import, so the knownAt view sees them; a command Work this transaction just rewrote stays included.
+  for(var work:repository.rows(c,"mulino.work.read.Works"))if("IMPORTED".equals(work.get("lifecycleMode")))ids.remove(Objects.toString(work.get("ID"),""));
   return ids;
  }
  private List<Map<String,Object>> relatedOccurrences(DomainContext c,String id){

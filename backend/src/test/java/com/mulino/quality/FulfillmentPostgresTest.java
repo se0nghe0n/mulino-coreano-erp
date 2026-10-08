@@ -537,6 +537,44 @@ class FulfillmentPostgresTest {
   assertEquals(List.of(),roots.apply(before));assertEquals(List.of(root),roots.apply(now));
   var current=(Map<?,?>)read("getObject",invoice[0],map("organizationId",org,"objectType","Invoice","itemId",item),now,now).get("data");assertEquals(List.of(root),current.get("contributionDutyRootIds"));}
 
+ // ---- s4k closure 3 (plan §4.3 정정 재평가·"의무의 해소/면제 결정이 이미 유효하면 자동 부활시키지 않는다", §5.3 waive 현재 scope/revision, §6 정산) ----
+ /** MUST opus3[0]/[4]/[5]: a MANAGER waiver decided while the contribution read 28 is bound to that revision. A restoring correction
+  * re-issues the open root, so executing the earlier decision afterwards is refused and the remaining +2 keeps its owner (old code:
+  * the waiver executed and the CURRENT/UNSATISFIED difference had no open duty). */
+ @Test void waiverDecidedBeforeARestoringCorrectionCannotCloseTheRestoredDifference(){var d=delivered30();var invoice=invoice30(d.deliveryId(),"1");assertEquals("MATCHED",apply(matchEnvelope(invoice)).get("businessStatus"));String iid=invoice[0];settlementManager();
+  var v2=correctDelivery(d.content(),d.external(),d.deliveryId(),d.event(),"28",2);var first=settlementDuties("OPEN");assertEquals(1,first.size(),first.toString());String assignment=first.getFirst().get("assignment").toString(),r1=first.getFirst().get("root").toString();
+  var proposed=adjust(iid,"PROPOSE","-2","정정 인도 28에 맞춘 감액",null,null);assertEquals("APPLIED",proposed.get("outcome"),proposed.toString());
+  var confirmed=adjust(iid,"CONFIRM","-2","정정 인도 28에 맞춘 감액",proposed,null);assertEquals("APPLIED",confirmed.get("outcome"),confirmed.toString());
+  String reason="고객과 28 기준 감액에 합의했다";int decided=revision(assignment);var approval=effectsOf(waiverDecision("manager","decideQuantityDutyWaiver",assignment,"APPROVE",reason));assertEquals("APPROVED",approval.get("decision"));
+  var v3=correctDelivery(d.content(),d.external(),d.deliveryId(),v2[1],"30",3);
+  // At the decision revision the command is stale; at the re-issued revision the decision's revision binding no longer matches.
+  var stale=envelope("waiveObligation",map("assignmentId",assignment,"reason",reason),decided);stale.put("approvalId",approval.get("approvalId"));var staleResult=apply(stale);assertNotEquals("APPLIED",staleResult.get("outcome"),staleResult.toString());assertEquals("STALE_REVISION",code(staleResult),staleResult.toString());
+  assertTrue(revision(assignment)>decided,"the restoration re-issues the open assignment");
+  var rebound=envelope("waiveObligation",map("assignmentId",assignment,"reason",reason),revision(assignment));rebound.put("approvalId",approval.get("approvalId"));var reboundResult=apply(rebound);assertEquals("REJECTED",reboundResult.get("outcome"),reboundResult.toString());
+  var owned=settlementDuties("OPEN");assertEquals(1,owned.size(),owned.toString());assertEquals(r1,owned.getFirst().get("root"));assertEquals(assignment,owned.getFirst().get("assignment"));assertEquals(actor,owned.getFirst().get("owner"));assertTrue(owned.getFirst().get("next").toString().startsWith("복원된"),owned.toString());assertNotNull(owned.getFirst().get("check"));
+  var view=(Map<?,?>)((Map<?,?>)read("getObject",iid,map("organizationId",org,"objectType","Invoice","itemId",item),clock.instant(),clock.instant()).get("data")).get("settlement");assertEquals("CURRENT",view.get("contributionState"));assertEquals("UNSATISFIED",view.get("result"));assertEquals(true,view.get("differenceDutyOpen"));
+  // Reprocessing the same restoration does not re-issue again; a decision taken at the current revision (after the restoration) executes.
+  int reissued=revision(assignment);runtime.requestContext().run(ctx->{return new org.springframework.transaction.support.TransactionTemplate(transactions).execute(st->settlementReview.getObject().contributionChanged(new DomainContext(org,actor,actor,clock.instant(),clock.instant()),v3[0]));});assertEquals(reissued,revision(assignment));
+  var fresh=settlementWaiver(assignment,"복원 뒤 남은 +2도 고객과 정리했다");assertEquals("APPLIED",fresh.get("outcome"),fresh.toString());assertEquals(0,settlementDuties("OPEN").size());assertEquals(1,count("SELECT COUNT(*) FROM mulino_responsibility_Roots WHERE kind='SETTLEMENT_DIFFERENCE'"));}
+
+ /** SHOULD opus3[1]: the original price difference (R0) and the 30→28 contribution change (R1) are both MANAGER-waived. Restoring 30
+  * returns exactly the residual R0 already waived, so no new root opens (old code: a third root and follow-up duty). */
+ @Test void restorationToAnAlreadyWaivedOriginalDifferenceDoesNotReviveIt(){var d=delivered30();var invoice=invoice30(d.deliveryId(),"1.1");var match=apply(matchEnvelope(invoice));assertEquals("DIFFERENCE",match.get("businessStatus"),match.toString());String iid=invoice[0];settlementManager();
+  var r0=settlementDuties("OPEN");assertEquals(1,r0.size());assertEquals("APPLIED",settlementWaiver(r0.getFirst().get("assignment").toString(),"단가 차이를 별도 계약으로 정리했다").get("outcome"));
+  var v2=correctDelivery(d.content(),d.external(),d.deliveryId(),d.event(),"28",2);var r1=settlementDuties("OPEN");assertEquals(1,r1.size(),"a new correction is a new duty: "+r1);assertEquals(v2[0],r1.getFirst().get("source"));
+  assertEquals("APPLIED",settlementWaiver(r1.getFirst().get("assignment").toString(),"28 인도 차이를 고객과 정리했다").get("outcome"));
+  correctDelivery(d.content(),d.external(),d.deliveryId(),v2[1],"30",3);
+  assertEquals(0,settlementDuties("OPEN").size(),settlementDuties("OPEN").toString());assertEquals(2,count("SELECT COUNT(*) FROM mulino_responsibility_Roots WHERE kind='SETTLEMENT_DIFFERENCE'"));}
+
+ /** SHOULD opus3[2]: a SALE delivery event invalidated after the match never relinks; the match reads UNVERIFIED and settlement now owns
+  * it with a SETTLEMENT_DIFFERENCE keyed to the invalidated delivery canonical (old code: only the evidence follow-up duty). */
+ @Test void invalidatedDeliveryEvidenceOpensAnOwnedSettlementDifference()throws Exception{var d=delivered30();var invoice=invoice30(d.deliveryId(),"1");assertEquals("MATCHED",apply(matchEnvelope(invoice)).get("businessStatus"));now=now.plusSeconds(1);
+  var subject=map("kind","DISPATCH","id",d.content().get("dispatchId"));String bytes=json.writeValueAsString(map("invalidates",d.event(),"reason","원 인도 보고 무효"));
+  var doc=run("attachEvidence",map("subject",subject,"sourceNamespace","quality-source","sourceReference",id(),"mediaType","application/json","expectedHash",com.mulino.adapters.blob.LocalBlobStore.hash(bytes.getBytes()),"provenance","SYNTHETIC","contentBase64",Base64.getEncoder().encodeToString(bytes.getBytes())),null).get("id").toString();
+  run("correctEvidence",map("subject",subject,"kind","PHYSICAL_DELIVERY","sourceNamespace","quality-source","externalEventId",d.external(),"sourceVersion","2","effectiveFrom",d.content().get("occurredAt"),"timeZone","UTC","timePrecision","SECOND","valueState","KNOWN","payload",bytes,"supersedesId",d.event(),"invalidatesId",d.event(),"documentId",doc,"assertion","Delivery report invalidated","quantity","30","unit","EA","evidenceType","EVENT"),1);
+  var view=(Map<?,?>)((Map<?,?>)read("getObject",invoice[0],map("organizationId",org,"objectType","Invoice","itemId",item),clock.instant(),clock.instant()).get("data")).get("settlement");assertEquals("UNVERIFIED",view.get("contributionState"),view.toString());
+  var open=settlementDuties("OPEN");assertEquals(1,open.size(),open.toString());assertEquals(d.canonical(),open.getFirst().get("source"));assertEquals(actor,open.getFirst().get("owner"));assertNotNull(open.getFirst().get("next"));assertNotNull(open.getFirst().get("check"));}
+
  /** SHOULD opus[5]/[6]: only explicit external place kinds are a known zero; an unrecognized kind (WAREHOUSE) is unknown, and the
   * segment-scope evaluateEligibility applies the same custody condition for SELL and DISPATCH. */
  @Test void unrecognizedPlaceKindIsUnknownCustodyAndSegmentEligibilityAppliesCustody(){allow("100");insert("mulino_identity_CapabilityAssignments",map("organizationId",org,"ID",id(),"actorId",actor,"capabilityId","evaluateEligibility","scopeKind","ORGANIZATION","scopeId",org,"validFrom",Timestamp.from(now.minusSeconds(1000)),"validUntil",Timestamp.from(now.plusSeconds(10000))));insert("mulino_identity_GrantActions",map("organizationId",org,"grantId",grant,"capabilityId","evaluateEligibility"));
