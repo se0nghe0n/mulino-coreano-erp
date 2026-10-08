@@ -3104,7 +3104,7 @@
       "id": "e2-dispatch-denied-after-qc-release",
       "type": "command",
       "capability": "dispatchQuantity",
-      "outcome": "HELD",
+      "outcome": "REJECTED",
       "request": {
         "intentKind": "COMMAND",
         "definitionVersion": "definition-v1",
@@ -3124,7 +3124,19 @@
             "id": "$SALES_WORK"
           }
         ]
-      }
+      },
+      "assertions": [
+        {
+          "pointer": "/error/code",
+          "operator": "equals",
+          "expected": "SCOPE_INELIGIBLE"
+        },
+        {
+          "pointer": "/effects",
+          "operator": "equals",
+          "expected": {}
+        }
+      ]
     },
     {
       "id": "e2-independent-holds",
