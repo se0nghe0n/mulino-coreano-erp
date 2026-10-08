@@ -1244,7 +1244,7 @@
             "actionId": "retired-parent",
             "pointer": "/response/outcome"
           },
-          "expected": "REJECTED",
+          "expected": "CONFLICT",
           "requirementRefs": [
             "D17"
           ],
@@ -1260,7 +1260,38 @@
             },
             "caseKey": "V2-split-commits-first"
           },
-          "oracleExplanation": "공개 명령의 구조화 outcome을 확인한다.",
+          "oracleExplanation": "분할로 retired된 부모 A60을 다시 예약하면 CONFLICT다. 소모된 물리 부모는 이미 바뀐 대상이다(contracts/domain-vocabulary.json STALE_REVISION=CONFLICT, 계획 §4.2 부모 재소비 금지).",
+          "oracleRef": {
+            "oracleId": "V2.split-reserve-race",
+            "observationNames": [
+              "retired-parent-reconsumption"
+            ]
+          }
+        },
+        {
+          "id": "retired-parent-reconsumption-code",
+          "op": "equals",
+          "source": {
+            "actionId": "retired-parent",
+            "pointer": "/response/error/code"
+          },
+          "expected": "STALE_REVISION",
+          "requirementRefs": [
+            "D17"
+          ],
+          "evidenceRefs": [
+            "retired-parent:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseKey": "V2-split-commits-first"
+          },
+          "oracleExplanation": "거부 이유는 retired 부모의 STALE_REVISION이다. 수량 부족 같은 다른 이유로 부모 재소비 금지를 대신하지 않는다.",
           "oracleRef": {
             "oracleId": "V2.split-reserve-race",
             "observationNames": [
@@ -1383,8 +1414,8 @@
             "actionId": "after-db",
             "pointer": "/data/rawRows/audit",
             "where": {
-              "commandKey": "V2-split-commits-first-retired-parent",
-              "outcome": "REJECTED"
+              "commandIdempotencyKey": "V2-split-commits-first-retired-parent",
+              "outcome": "CONFLICT"
             }
           },
           "expected": 1,
@@ -1403,7 +1434,7 @@
             },
             "caseKey": "V2-split-commits-first"
           },
-          "oracleExplanation": "허용된 denial 감사1과 금지된 업무 효과0을 분리한다.",
+          "oracleExplanation": "retired 부모 예약 시도의 CONFLICT 감사1과 금지된 업무 효과0을 분리한다.",
           "oracleRef": {
             "oracleId": "V2.split-reserve-race",
             "observationNames": [
@@ -2663,7 +2694,7 @@
                 "dataPointer": "/contenderOutcome",
                 "rowPointer": "/rawRows/audit",
                 "where": {
-                  "commandKey": "V2-reserve-commits-first-contender-call"
+                  "commandIdempotencyKey": "V2-reserve-commits-first-contender-call"
                 },
                 "aggregate": "single",
                 "field": "outcome"
@@ -2956,7 +2987,7 @@
                 "provenance": "USER"
               },
               "orderLineId": {
-                "$alias": "ORDER"
+                "$alias": "ORDER3"
               }
             },
             "expectedRevision": {
@@ -3539,7 +3570,7 @@
             "actionId": "retired-parent",
             "pointer": "/response/outcome"
           },
-          "expected": "REJECTED",
+          "expected": "CONFLICT",
           "requirementRefs": [
             "D17"
           ],
@@ -3555,7 +3586,38 @@
             },
             "caseKey": "V2-reserve-commits-first"
           },
-          "oracleExplanation": "공개 명령의 구조화 outcome을 확인한다.",
+          "oracleExplanation": "분할로 retired된 부모 A60을 다시 예약하면 CONFLICT다. 소모된 물리 부모는 이미 바뀐 대상이다(contracts/domain-vocabulary.json STALE_REVISION=CONFLICT, 계획 §4.2 부모 재소비 금지).",
+          "oracleRef": {
+            "oracleId": "V2.split-reserve-race",
+            "observationNames": [
+              "retired-parent-reconsumption"
+            ]
+          }
+        },
+        {
+          "id": "retired-parent-reconsumption-code",
+          "op": "equals",
+          "source": {
+            "actionId": "retired-parent",
+            "pointer": "/response/error/code"
+          },
+          "expected": "STALE_REVISION",
+          "requirementRefs": [
+            "D17"
+          ],
+          "evidenceRefs": [
+            "retired-parent:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseKey": "V2-reserve-commits-first"
+          },
+          "oracleExplanation": "미충족 주문량10이 남은 ORDER3에 대한 1 BOX 예약이므로 주문량 부족으로 거부될 수 없다. 거부 이유는 retired 부모의 STALE_REVISION이어야 하며, retired 부모를 살아 있는 60으로 보는 제품은 APPLIED나 다른 코드로 드러난다.",
           "oracleRef": {
             "oracleId": "V2.split-reserve-race",
             "observationNames": [
@@ -3678,8 +3740,8 @@
             "actionId": "after-db",
             "pointer": "/data/rawRows/audit",
             "where": {
-              "commandKey": "V2-reserve-commits-first-retired-parent",
-              "outcome": "REJECTED"
+              "commandIdempotencyKey": "V2-reserve-commits-first-retired-parent",
+              "outcome": "CONFLICT"
             }
           },
           "expected": 1,
@@ -3698,7 +3760,7 @@
             },
             "caseKey": "V2-reserve-commits-first"
           },
-          "oracleExplanation": "허용된 denial 감사1과 금지된 업무 효과0을 분리한다.",
+          "oracleExplanation": "retired 부모 예약 시도의 CONFLICT 감사1과 금지된 업무 효과0을 분리한다.",
           "oracleRef": {
             "oracleId": "V2.split-reserve-race",
             "observationNames": [
@@ -4445,37 +4507,6 @@
           }
         },
         {
-          "id": "contender-outcome-not-pending-external",
-          "op": "notEquals",
-          "source": {
-            "actionId": "terminal",
-            "pointer": "/response/outcome"
-          },
-          "expected": "PENDING_EXTERNAL",
-          "requirementRefs": [
-            "D17"
-          ],
-          "evidenceRefs": [
-            "terminal:actual-adapter-artifact"
-          ],
-          "scope": {
-            "organizationId": {
-              "$alias": "ORG"
-            },
-            "itemId": {
-              "$alias": "P"
-            },
-            "caseKey": "V2-reserve-commits-first"
-          },
-          "oracleExplanation": "contender 분할의 결과는 APPLIED 또는 CONFLICT 둘 중 하나다. command-response outcome enum에서 PENDING_EXTERNAL를 제외한다. 두 결과 모두 아래 불변식과 기록 일치를 함께 만족해야 한다(계획 §4.2, §13.2 V2).",
-          "oracleRef": {
-            "oracleId": "V2.split-reserve-race",
-            "observationNames": [
-              "allocation-transfer"
-            ]
-          }
-        },
-        {
           "id": "contender-outcome-not-held",
           "op": "notEquals",
           "source": {
@@ -4549,7 +4580,7 @@
             "actionId": "raced-db",
             "pointer": "/data/rawRows/audit",
             "where": {
-              "commandKey": "V2-reserve-commits-first-contender-call",
+              "commandIdempotencyKey": "V2-reserve-commits-first-contender-call",
               "outcome": "CONFLICT"
             },
             "field": "errorCode"
@@ -4600,7 +4631,7 @@
             "actionId": "after-db",
             "pointer": "/data/rawRows/audit",
             "where": {
-              "commandKey": "V2-reserve-commits-first-contender-call",
+              "commandIdempotencyKey": "V2-reserve-commits-first-contender-call",
               "outcome": "CONFLICT"
             },
             "field": "actorId"
@@ -4633,7 +4664,7 @@
             "actionId": "after-db",
             "pointer": "/data/rawRows/audit",
             "where": {
-              "commandKey": "V2-reserve-commits-first-explicit-fresh-split",
+              "commandIdempotencyKey": "V2-reserve-commits-first-explicit-fresh-split",
               "outcome": "APPLIED"
             },
             "field": "actorId"
@@ -4977,6 +5008,105 @@
             "observationNames": [
               "allocation-transfer"
             ]
+          }
+        },
+        {
+          "id": "final-alloc40-on-child40",
+          "op": "sameAs",
+          "source": {
+            "actionId": "after-db",
+            "pointer": "/data/rawRows/allocations",
+            "where": {
+              "rootId": {
+                "$alias": "ALLOC"
+              },
+              "state": "EXECUTABLE",
+              "active": true
+            },
+            "field": "segmentId"
+          },
+          "expected": null,
+          "requirementRefs": [
+            "D17"
+          ],
+          "evidenceRefs": [
+            "after-db:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseKey": "V2-reserve-commits-first"
+          },
+          "oracleExplanation": "기존 배분 ALLOC40은 40 BOX 자식 segment 위에만 있다. 20 BOX 자식에 40 배분을 얹는 이관은 실물 초과 예약이다(계획 §4.2 기존 배분 1회 이관·동일 실물 초과 금지).",
+          "oracleRef": {
+            "oracleId": "V2.split-reserve-race",
+            "observationNames": [
+              "allocation-transfer"
+            ]
+          },
+          "baseline": {
+            "actionId": "after-db",
+            "pointer": "/data/rawRows/segments",
+            "where": {
+              "active": true,
+              "quantity": "40"
+            },
+            "field": "id"
+          }
+        },
+        {
+          "id": "final-winner20-on-child20",
+          "op": "sameAs",
+          "source": {
+            "actionId": "after-db",
+            "pointer": "/data/rawRows/allocations",
+            "where": {
+              "rootId": {
+                "$result": {
+                  "actionId": "winner-terminal",
+                  "pointer": "/response/allocationId"
+                }
+              },
+              "state": "EXECUTABLE",
+              "active": true
+            },
+            "field": "segmentId"
+          },
+          "expected": null,
+          "requirementRefs": [
+            "D17"
+          ],
+          "evidenceRefs": [
+            "after-db:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseKey": "V2-reserve-commits-first"
+          },
+          "oracleExplanation": "경합 승자 예약20은 20 BOX 자식 segment 위에 있다. 40 자식은 ALLOC40으로 이미 가득 차므로 다른 배치는 초과 예약이다(계획 §4.2).",
+          "oracleRef": {
+            "oracleId": "V2.split-reserve-race",
+            "observationNames": [
+              "allocation-transfer"
+            ]
+          },
+          "baseline": {
+            "actionId": "after-db",
+            "pointer": "/data/rawRows/segments",
+            "where": {
+              "active": true,
+              "quantity": "20"
+            },
+            "field": "id"
           }
         }
       ],
@@ -5616,6 +5746,63 @@
             "oracleId": "V2.actual50-correction",
             "observationNames": [
               "shortage-duty"
+            ]
+          }
+        },
+        {
+          "id": "shortage-obligation-row-quantity",
+          "op": "sameAs",
+          "source": {
+            "actionId": "after-db",
+            "pointer": "/data/rawRows/obligations",
+            "where": {
+              "id": {
+                "$result": {
+                  "actionId": "correct",
+                  "pointer": "/response/obligationId"
+                }
+              }
+            },
+            "field": [
+              "quantity",
+              "unit"
+            ]
+          },
+          "expected": null,
+          "requirementRefs": [
+            "D17"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseKey": "V2-actual50-correction"
+          },
+          "evidenceRefs": [
+            "after-db:actual-adapter-artifact"
+          ],
+          "oracleExplanation": "정정 명령이 반환한 부족 의무의 obligations 원행 수량·단위를 직접 읽어 promiseCoverage의 부족 행과 같음을 확인한다. promiseCoverage는 같은 snapshot의 allocations·obligations 원행에서 observer가 만든 파생이며 제품 projection이 아니다(race-observation-contract.md). 실행 배분 합과 이 원행 수량의 합이 약속60이다.",
+          "oracleRef": {
+            "oracleId": "V2.actual50-correction",
+            "observationNames": [
+              "shortage-duty"
+            ]
+          },
+          "baseline": {
+            "actionId": "after-db",
+            "pointer": "/data/rawRows/promiseCoverage",
+            "where": {
+              "promiseRootId": {
+                "$alias": "PROMISE"
+              },
+              "coverageKind": "SHORTAGE_OBLIGATION"
+            },
+            "field": [
+              "quantity",
+              "unit"
             ]
           }
         },

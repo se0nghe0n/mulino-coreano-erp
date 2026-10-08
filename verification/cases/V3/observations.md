@@ -89,6 +89,10 @@ v1 release는 OLD_HOLD만 참조한다. 현재 v2 hold와 출고0을 보존하�
 - `newly-dispatched-2` → `V3.late-old-qc-release / newly-dispatched`: 실물량·단위와 독립 손계산을 대조한다.
 - `newly-dispatched-3` → `V3.late-old-qc-release / newly-dispatched`: 독립 원 행의 실물·수량·관계·범위를 정확히 대조한다.
 - `late-release-overwrites-new-hold-4` → `V3.late-old-qc-release / late-release-overwrites-new-hold`: 독립 원 행의 실물·수량·관계·범위를 정확히 대조한다.
+- `apply-old-release-not-applied` → `V3.late-old-qc-release / late-release-overwrites-new-hold`: 대체된 OLD_HOLD(v1)를 늦은 v1 해제 claim으로 해제하는 명령은 APPLIED가 아니다. 새 v2 보류를 덮거나 대체된 제한을 되살려 해제할 수 없다(계획 §13.2 V3, oracle: 검증된 인과 순서 없이 늦은 옛 해제는 새 보류를 덮지 못한다).
+- `apply-old-release-not-external` → `V3.late-old-qc-release / late-release-overwrites-new-hold`: 늦은 옛 해제는 외부 전달 대기로도 적용되지 않는다.
+- `old-hold-not-released` → `V3.late-old-qc-release / late-release-overwrites-new-hold`: 대체된 OLD_HOLD 원행이 늦은 v1 해제로 RELEASED가 되지 않는다. 대체 상태로 남는다.
+- `old-release-no-applied-audit` → `V3.late-old-qc-release / late-release-overwrites-new-hold`: 늦은 옛 해제 명령의 APPLIED 감사는 0건이다(contracts/audit-observation-fields.json).
 - `newly-dispatched-5` → `V3.late-old-qc-release / newly-dispatched`: 공개 명령의 구조화 outcome을 확인한다.
 - `newly-dispatched-6` → `V3.late-old-qc-release / newly-dispatched`: 검증 실패를 해당 오류 코드로 구별한다.
 - `source-order-reconciliation-7` → `V3.late-old-qc-release / source-order-reconciliation`: 해당 obligation root/scope의 현재 유효 assignment는 하나다. 의무 root는 실제 명령/대조/sweeper가 반환한 obligationId로 한정한다.

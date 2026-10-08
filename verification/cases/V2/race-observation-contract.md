@@ -115,10 +115,10 @@ backend `FulfillmentPostgresTest.v2ReserveFirst`는 후자다.
 harness에는 조건부 assertion이 없으므로 같은 조건을 두 경로에서 같은
 값이 되는 비교로 표현했다.
 
-1. 응답 outcome은 APPLIED 또는 CONFLICT다(나머지 enum 6개 notEquals).
+1. 응답 outcome은 APPLIED 또는 CONFLICT다(contracts/domain-vocabulary.json의 나머지 outcome 5개 notEquals).
 2. 응답 outcome은 같은 거래의 감사 원행 outcome과 같다. `raced-db`
    observer는 `data.data.contenderOutcome`을 derivation
-   `{rowPointer:/rawRows/audit, where:{commandKey:<contender key>},
+   `{rowPointer:/rawRows/audit, where:{commandIdempotencyKey:<contender key>},
    aggregate:single, field:outcome}`로 낸다(observe scope의
    `derivedContenderOutcome`).
 3. 감사 원행이 CONFLICT인 경우의 `errorCode` 집합과 contender
@@ -148,6 +148,18 @@ assertion(예: outcome별 guard)을 요청한다.
 `coverageKind=SHORTAGE_OBLIGATION`, `sourceId`=obligation ID다. 각 행은
 `promiseRootId`, `quantity`, `unit`을 가진다. 같은 원천을 두 번 세지
 않으며 SQL·parameter·mapping version은 sourceEvidence에 남긴다.
+
+`promiseCoverage`는 제품이 내보내는 projection이 아니다. 독립 observer가
+같은 snapshot의 `allocations`·`obligations` 원행만으로 만드는 파생이다.
+EXECUTABLE_ALLOCATION 행은 `allocations`에서 state=EXECUTABLE·active인
+행을, SHORTAGE_OBLIGATION 행은 `obligations`에서 current=true·status=OPEN인
+부족 의무 행을 promise root로 묶는다. quantity·unit은 원행 값을 그대로
+복사하고 다시 계산하지 않는다. 제품 응답이나 API projection을 읽어
+만들지 않는다. case는 이 파생에만 기대지 않도록 부족 의무 원행
+(`obligations`의 id=정정 응답 obligationId)의 quantity·unit을 직접 읽어
+`shortage-obligation-row-quantity`로 부족 행과 대조한다. 이 파생 규칙을
+harness 공통 observer 계약(harness-guide.md)에 옮기는 일은 harness 소유자
+몫이다.
 
 ## 남은 일
 

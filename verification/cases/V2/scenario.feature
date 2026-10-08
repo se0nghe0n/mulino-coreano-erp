@@ -36,11 +36,12 @@
     그러면 "all-executable-reservations-9" assertion으로 "실물량·단위와 독립 손계산을 대조한다."를 확인한다
     그러면 "all-executable-reservations-10" assertion으로 "독립 원 행을 해당 범위에서 합산하며 부모와 자식을 이중 합산하지 않는다."를 확인한다
     그러면 "all-executable-reservations-api-exact" assertion으로 "API 실행 예약 합계는 DB 원 행 합계와 정확히 같다"를 확인한다
-    그러면 "retired-parent-reconsumption-11" assertion으로 "공개 명령의 구조화 outcome을 확인한다."를 확인한다
+    그러면 "retired-parent-reconsumption-11" assertion으로 "retired 부모 A60 재예약은 CONFLICT다"를 확인한다
+    그러면 "retired-parent-reconsumption-code" assertion으로 "retired 부모 재예약 거부 코드는 STALE_REVISION이다"를 확인한다
     그러면 "retired-parent-reconsumption-12" assertion으로 "금지 효과의 동일 scope 전후 원 행을 비교한다. 조회/거부 감사는 별도 scope다."를 확인한다
     그러면 "retired-parent-reconsumption-13" assertion으로 "금지 효과의 동일 scope 전후 원 행을 비교한다. 조회/거부 감사는 별도 scope다."를 확인한다
     그러면 "retired-parent-reconsumption-14" assertion으로 "금지 효과의 동일 scope 전후 원 행을 비교한다. 조회/거부 감사는 별도 scope다."를 확인한다
-    그러면 "retired-parent-reconsumption-15" assertion으로 "허용된 denial 감사1과 금지된 업무 효과0을 분리한다."를 확인한다
+    그러면 "retired-parent-reconsumption-15" assertion으로 "retired 부모 예약 시도의 CONFLICT 감사가 1건 남는다"를 확인한다
     그러면 "allocation-transfer-16" assertion으로 "독립 원 행의 실물·수량·관계·범위를 정확히 대조한다."를 확인한다
     그러면 "allocation-transfer-17" assertion으로 "독립 원 행의 실물·수량·관계·범위를 정확히 대조한다."를 확인한다
     그러면 "allocation-transfer-18" assertion으로 "독립 원 행의 실물·수량·관계·범위를 정확히 대조한다."를 확인한다
@@ -96,11 +97,12 @@
     그러면 "all-executable-reservations-9" assertion으로 "실물량·단위와 독립 손계산을 대조한다."를 확인한다
     그러면 "all-executable-reservations-10" assertion으로 "독립 원 행을 해당 범위에서 합산하며 부모와 자식을 이중 합산하지 않는다."를 확인한다
     그러면 "all-executable-reservations-api-exact" assertion으로 "API 실행 예약 합계는 DB 원 행 합계와 정확히 같다"를 확인한다
-    그러면 "retired-parent-reconsumption-11" assertion으로 "공개 명령의 구조화 outcome을 확인한다."를 확인한다
+    그러면 "retired-parent-reconsumption-11" assertion으로 "retired 부모 A60 재예약은 CONFLICT다"를 확인한다
+    그러면 "retired-parent-reconsumption-code" assertion으로 "미충족 주문량10의 ORDER3 예약 1 BOX도 retired 부모라 STALE_REVISION으로 거부된다"를 확인한다
     그러면 "retired-parent-reconsumption-12" assertion으로 "금지 효과의 동일 scope 전후 원 행을 비교한다. 조회/거부 감사는 별도 scope다."를 확인한다
     그러면 "retired-parent-reconsumption-13" assertion으로 "금지 효과의 동일 scope 전후 원 행을 비교한다. 조회/거부 감사는 별도 scope다."를 확인한다
     그러면 "retired-parent-reconsumption-14" assertion으로 "금지 효과의 동일 scope 전후 원 행을 비교한다. 조회/거부 감사는 별도 scope다."를 확인한다
-    그러면 "retired-parent-reconsumption-15" assertion으로 "허용된 denial 감사1과 금지된 업무 효과0을 분리한다."를 확인한다
+    그러면 "retired-parent-reconsumption-15" assertion으로 "retired 부모 예약 시도의 CONFLICT 감사가 1건 남는다"를 확인한다
     그러면 "allocation-transfer-16" assertion으로 "독립 원 행의 실물·수량·관계·범위를 정확히 대조한다."를 확인한다
     그러면 "allocation-transfer-18" assertion으로 "독립 원 행의 실물·수량·관계·범위를 정확히 대조한다."를 확인한다
     그러면 "allocation-transfer-19" assertion으로 "실제 첫 read 뒤 두 번째 거래를 commit하기 전 barrier reached ACK다."를 확인한다
@@ -121,7 +123,6 @@
     그러면 "contender-outcome-not-waiting-approval" assertion으로 "contender 분할의 결과는 APPLIED 또는 CONFLICT 둘 중 하나다. command-response outcome enum에서 WAITING_APPROVAL를 제외한다. 두 결과 모두 아래 불변식과 기록 일치를 함께 만족해야 한다(계획 §4.2, §13.2 V2)."를 확인한다
     그러면 "contender-outcome-not-needs-input" assertion으로 "contender 분할의 결과는 APPLIED 또는 CONFLICT 둘 중 하나다. command-response outcome enum에서 NEEDS_INPUT를 제외한다. 두 결과 모두 아래 불변식과 기록 일치를 함께 만족해야 한다(계획 §4.2, §13.2 V2)."를 확인한다
     그러면 "contender-outcome-not-accepted-pending-external" assertion으로 "contender 분할의 결과는 APPLIED 또는 CONFLICT 둘 중 하나다. command-response outcome enum에서 ACCEPTED_PENDING_EXTERNAL를 제외한다. 두 결과 모두 아래 불변식과 기록 일치를 함께 만족해야 한다(계획 §4.2, §13.2 V2)."를 확인한다
-    그러면 "contender-outcome-not-pending-external" assertion으로 "contender 분할의 결과는 APPLIED 또는 CONFLICT 둘 중 하나다. command-response outcome enum에서 PENDING_EXTERNAL를 제외한다. 두 결과 모두 아래 불변식과 기록 일치를 함께 만족해야 한다(계획 §4.2, §13.2 V2)."를 확인한다
     그러면 "contender-outcome-not-held" assertion으로 "contender 분할의 결과는 APPLIED 또는 CONFLICT 둘 중 하나다. command-response outcome enum에서 HELD를 제외한다. 두 결과 모두 아래 불변식과 기록 일치를 함께 만족해야 한다(계획 §4.2, §13.2 V2)."를 확인한다
     그러면 "contender-reported-equals-recorded" assertion으로 "contender 응답 outcome은 같은 거래가 남긴 감사 원행의 outcome(raced-db derivation contenderOutcome)과 같다. 응답만 CONFLICT로 꾸미고 실제로 적용하거나 그 반대로 보고하면 실패한다."를 확인한다
     그러면 "contender-conflict-is-stale-revision" assertion으로 "contender가 CONFLICT면 감사 오류 코드는 STALE_REVISION이고 lock 뒤 재검증도 STALE_REVISION이다. APPLIED면 두 쪽 모두 빈 집합이다. 재검증이 STALE인데 적용하면(낡은 의도를 몰래 실행) 또는 재검증이 최신인데 충돌로 거부하면 실패한다(계획 §4.2)."를 확인한다
@@ -133,6 +134,8 @@
     그러면 "final-parent-retired" assertion으로 "최종적으로 A60은 retired다."를 확인한다
     그러면 "final-no-allocation-on-retired-parent" assertion으로 "retired A60을 가리키는 active 배분은0이다. 분할은 기존·신규 배분을 모두 자식으로 옮긴다."를 확인한다
     그러면 "final-allocations-exactly-once" assertion으로 "최종 실행 배분도 ALLOC 40 BOX와 신규 예약 20 BOX 각각 한 번이다(합 60 = 실물 60)."를 확인한다
+    그러면 "final-alloc40-on-child40" assertion으로 "ALLOC 40 BOX는 40 BOX 자식 위에 있다"를 확인한다
+    그러면 "final-winner20-on-child20" assertion으로 "승자 예약 20 BOX는 20 BOX 자식 위에 있다"를 확인한다
 
   시나리오: 실제50 정정은 약속60과 부족10 책임을 보존한다
     먼저 사례 파일 "verification/cases/V2/case.json"의 "actual50-correction"를 준비한다
@@ -152,6 +155,7 @@
     그러면 "promise-coverage-conserved-60" assertion으로 "약속60은 실행 배분과 부족 의무로 정확히 한 번 덮인다"를 확인한다
     그러면 "promise-coverage-kinds" assertion으로 "약속 coverage 행은 종류·원천·수량·단위를 가진다"를 확인한다
     그러면 "promise-coverage-shortage-is-correction-duty" assertion으로 "부족 쪽 coverage는 정정이 만든 부족 의무 하나다"를 확인한다
+    그러면 "shortage-obligation-row-quantity" assertion으로 "정정이 만든 부족 의무 원행의 수량·단위는 promiseCoverage 부족 행과 같다(실행 배분 + 부족 = 약속60)"를 확인한다
     그러면 "shortage-duty-8" assertion으로 "해당 obligation root/scope의 현재 유효 assignment는 하나다. 의무 root는 실제 명령/대조/sweeper가 반환한 obligationId로 한정한다."를 확인한다
     그러면 "shortage-duty-9" assertion으로 "책임자의 실제 ID와 다음 행동·확인 시각에 공백이 없어야 한다. 의무 root는 실제 명령/대조/sweeper가 반환한 obligationId로 한정한다."를 확인한다
     그러면 "shortage-duty-10" assertion으로 "fixture의 지정된 인간 owner/supervisor와 고정 후속 행동/시각이 유지된다. 의무 root는 실제 명령/대조/sweeper가 반환한 obligationId로 한정한다."를 확인한다

@@ -3898,6 +3898,142 @@
           }
         },
         {
+          "id": "apply-old-release-not-applied",
+          "op": "notEquals",
+          "source": {
+            "actionId": "apply-old-release",
+            "pointer": "/response/outcome"
+          },
+          "expected": "APPLIED",
+          "requirementRefs": [
+            "D17"
+          ],
+          "evidenceRefs": [
+            "after-db:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseKey": "V3-late-v1-release"
+          },
+          "oracleExplanation": "대체된 OLD_HOLD(v1)를 늦은 v1 해제 claim으로 해제하는 명령은 APPLIED가 아니다. 새 v2 보류를 덮거나 대체된 제한을 되살려 해제할 수 없다(계획 §13.2 V3, oracle: 검증된 인과 순서 없이 늦은 옛 해제는 새 보류를 덮지 못한다).",
+          "oracleRef": {
+            "oracleId": "V3.late-old-qc-release",
+            "observationNames": [
+              "late-release-overwrites-new-hold"
+            ]
+          }
+        },
+        {
+          "id": "apply-old-release-not-external",
+          "op": "notEquals",
+          "source": {
+            "actionId": "apply-old-release",
+            "pointer": "/response/outcome"
+          },
+          "expected": "ACCEPTED_PENDING_EXTERNAL",
+          "requirementRefs": [
+            "D17"
+          ],
+          "evidenceRefs": [
+            "after-db:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseKey": "V3-late-v1-release"
+          },
+          "oracleExplanation": "늦은 옛 해제는 외부 전달 대기로도 적용되지 않는다.",
+          "oracleRef": {
+            "oracleId": "V3.late-old-qc-release",
+            "observationNames": [
+              "late-release-overwrites-new-hold"
+            ]
+          }
+        },
+        {
+          "id": "old-hold-not-released",
+          "op": "notEquals",
+          "source": {
+            "actionId": "after-db",
+            "pointer": "/data/rawRows/restrictions",
+            "where": {
+              "id": {
+                "$alias": "OLD_HOLD"
+              }
+            },
+            "field": "state"
+          },
+          "expected": [
+            "RELEASED"
+          ],
+          "requirementRefs": [
+            "D17"
+          ],
+          "evidenceRefs": [
+            "after-db:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseKey": "V3-late-v1-release"
+          },
+          "oracleExplanation": "대체된 OLD_HOLD 원행이 늦은 v1 해제로 RELEASED가 되지 않는다. 대체 상태로 남는다.",
+          "oracleRef": {
+            "oracleId": "V3.late-old-qc-release",
+            "observationNames": [
+              "late-release-overwrites-new-hold"
+            ]
+          }
+        },
+        {
+          "id": "old-release-no-applied-audit",
+          "op": "count",
+          "source": {
+            "actionId": "after-db",
+            "pointer": "/data/rawRows/audit",
+            "where": {
+              "commandIdempotencyKey": "V3-late-v1-release-apply-old-release",
+              "outcome": "APPLIED"
+            }
+          },
+          "expected": 0,
+          "requirementRefs": [
+            "D17"
+          ],
+          "evidenceRefs": [
+            "after-db:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseKey": "V3-late-v1-release"
+          },
+          "oracleExplanation": "늦은 옛 해제 명령의 APPLIED 감사는 0건이다(contracts/audit-observation-fields.json).",
+          "oracleRef": {
+            "oracleId": "V3.late-old-qc-release",
+            "observationNames": [
+              "late-release-overwrites-new-hold"
+            ]
+          }
+        },
+        {
           "id": "newly-dispatched-5",
           "op": "equals",
           "source": {

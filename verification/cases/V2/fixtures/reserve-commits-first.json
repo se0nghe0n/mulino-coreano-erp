@@ -55,7 +55,8 @@
           ],
           "workAliases": [
             "S1",
-            "S2"
+            "S2",
+            "S3"
           ],
           "placeAliases": [
             "W",
@@ -106,7 +107,8 @@
           ],
           "workAliases": [
             "S1",
-            "S2"
+            "S2",
+            "S3"
           ],
           "placeAliases": [
             "W",
@@ -160,7 +162,8 @@
           ],
           "workAliases": [
             "S1",
-            "S2"
+            "S2",
+            "S3"
           ],
           "placeAliases": [
             "W",
@@ -216,7 +219,8 @@
           ],
           "workAliases": [
             "S1",
-            "S2"
+            "S2",
+            "S3"
           ],
           "placeAliases": [
             "W",
@@ -266,7 +270,8 @@
           ],
           "workAliases": [
             "S1",
-            "S2"
+            "S2",
+            "S3"
           ],
           "placeAliases": [
             "W",
@@ -327,7 +332,8 @@
           ],
           "workAliases": [
             "S1",
-            "S2"
+            "S2",
+            "S3"
           ],
           "placeAliases": [
             "W",
@@ -388,7 +394,8 @@
           ],
           "workAliases": [
             "S1",
-            "S2"
+            "S2",
+            "S3"
           ],
           "placeAliases": [
             "W",
@@ -475,6 +482,24 @@
       "destinationAlias": "CUSTOMER"
     },
     "PROMISE2": {
+      "type": "ObligationRoot"
+    },
+    "S3": {
+      "type": "Work",
+      "kind": "SALES",
+      "state": "ACTIVE",
+      "ownerAlias": "sales",
+      "revision": 1
+    },
+    "ORDER3": {
+      "type": "SalesOrderLine",
+      "workAlias": "S3",
+      "quantity": "10",
+      "unit": "BOX",
+      "customerAlias": "CUSTOMER",
+      "destinationAlias": "CUSTOMER"
+    },
+    "PROMISE3": {
       "type": "ObligationRoot"
     },
     "warehouse": {
@@ -674,6 +699,14 @@
         "state": "ACTIVE",
         "quantity": "20",
         "unit": "BOX"
+      },
+      {
+        "alias": "S3",
+        "ownerAlias": "sales",
+        "supervisorAlias": "supervisor",
+        "state": "ACTIVE",
+        "quantity": "10",
+        "unit": "BOX"
       }
     ],
     "additionalSalesPromises": [
@@ -683,9 +716,16 @@
         "unit": "BOX",
         "ownerAlias": "sales",
         "stableRootAlias": "PROMISE2"
+      },
+      {
+        "scopeAlias": "S3",
+        "quantity": "10",
+        "unit": "BOX",
+        "ownerAlias": "sales",
+        "stableRootAlias": "PROMISE3"
       }
     ],
-    "newDemandNote": "ORDER(40)는 기존 ALLOC40으로 이미 모두 덮였다. 경합하는 신규 예약20은 별도 주문 ORDER2(20)·업무 S2·약속 PROMISE2를 대상으로 해 초과 예약 없이 실물60을 채운다."
+    "newDemandNote": "ORDER(40)는 기존 ALLOC40으로 이미 모두 덮였다. 경합하는 신규 예약20은 별도 주문 ORDER2(20)·업무 S2·약속 PROMISE2를 대상으로 해 초과 예약 없이 실물60을 채운다. ORDER3(10)·업무 S3·약속 PROMISE3은 배분 없는 미충족 주문량10이다. retired-parent 예약 시도가 주문량 부족이 아니라 retired 부모 때문에만 거부되도록 둔다."
   },
   "evidence": [
     {
@@ -758,6 +798,16 @@
       "scope": {
         "itemAlias": "P",
         "workAlias": "S2"
+      },
+      "ownerAlias": "sales",
+      "supervisorAlias": "supervisor",
+      "nextAction": "근거 대조 후 대체 배분 검토",
+      "nextCheckAt": "2026-10-07T10:00:00Z"
+    },
+    {
+      "scope": {
+        "itemAlias": "P",
+        "workAlias": "S3"
       },
       "ownerAlias": "sales",
       "supervisorAlias": "supervisor",

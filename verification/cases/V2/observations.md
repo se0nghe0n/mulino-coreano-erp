@@ -37,11 +37,12 @@ pg_catalog 관찰과 `lockRevalidations` trace다.
 - `all-executable-reservations-9` → `V2.split-reserve-race / all-executable-reservations`: 실물량·단위와 독립 손계산을 대조한다.
 - `all-executable-reservations-10` → `V2.split-reserve-race / all-executable-reservations`: 독립 원 행을 해당 범위에서 합산하며 부모와 자식을 이중 합산하지 않는다.
 - `all-executable-reservations-api-exact` → `V2.split-reserve-race / all-executable-reservations`: API 실행 예약 합계는 같은 snapshot의 DB EXECUTABLE 합계 40과 정확히 같다. 상한만으로는 이중 합산이나 유실을 잡지 못한다(AGENTS.md 명사/동사 동일 수량).
-- `retired-parent-reconsumption-11` → `V2.split-reserve-race / retired-parent-reconsumption`: 공개 명령의 구조화 outcome을 확인한다.
+- `retired-parent-reconsumption-11` → `V2.split-reserve-race / retired-parent-reconsumption`: 분할로 retired된 부모 A60을 다시 예약하면 CONFLICT다. 소모된 물리 부모는 이미 바뀐 대상이다(contracts/domain-vocabulary.json STALE_REVISION=CONFLICT, 계획 §4.2 부모 재소비 금지).
+- `retired-parent-reconsumption-code` → `V2.split-reserve-race / retired-parent-reconsumption`: 거부 이유는 retired 부모의 STALE_REVISION이다. 수량 부족 같은 다른 이유로 부모 재소비 금지를 대신하지 않는다.
 - `retired-parent-reconsumption-12` → `V2.split-reserve-race / retired-parent-reconsumption`: 금지 효과의 동일 scope 전후 원 행을 비교한다. 조회/거부 감사는 별도 scope다.
 - `retired-parent-reconsumption-13` → `V2.split-reserve-race / retired-parent-reconsumption`: 금지 효과의 동일 scope 전후 원 행을 비교한다. 조회/거부 감사는 별도 scope다.
 - `retired-parent-reconsumption-14` → `V2.split-reserve-race / retired-parent-reconsumption`: 금지 효과의 동일 scope 전후 원 행을 비교한다. 조회/거부 감사는 별도 scope다.
-- `retired-parent-reconsumption-15` → `V2.split-reserve-race / retired-parent-reconsumption`: 허용된 denial 감사1과 금지된 업무 효과0을 분리한다.
+- `retired-parent-reconsumption-15` → `V2.split-reserve-race / retired-parent-reconsumption`: retired 부모 예약 시도의 CONFLICT 감사1과 금지된 업무 효과0을 분리한다.
 - `allocation-transfer-16` → `V2.split-reserve-race / allocation-transfer`: 독립 원 행의 실물·수량·관계·범위를 정확히 대조한다.
 - `allocation-transfer-17` → `V2.split-reserve-race / allocation-transfer`: 독립 원 행의 실물·수량·관계·범위를 정확히 대조한다.
 - `allocation-transfer-18` → `V2.split-reserve-race / allocation-transfer`: 독립 원 행의 실물·수량·관계·범위를 정확히 대조한다.
@@ -77,11 +78,12 @@ pg_catalog 관찰과 `lockRevalidations` trace다.
 - `all-executable-reservations-9` → `V2.split-reserve-race / all-executable-reservations`: 실물량·단위와 독립 손계산을 대조한다.
 - `all-executable-reservations-10` → `V2.split-reserve-race / all-executable-reservations`: 독립 원 행을 해당 범위에서 합산하며 부모와 자식을 이중 합산하지 않는다.
 - `all-executable-reservations-api-exact` → `V2.split-reserve-race / all-executable-reservations`: API 실행 예약 합계는 같은 snapshot의 DB EXECUTABLE 합계 60과 정확히 같다. 상한만으로는 이중 합산이나 유실을 잡지 못한다(AGENTS.md 명사/동사 동일 수량).
-- `retired-parent-reconsumption-11` → `V2.split-reserve-race / retired-parent-reconsumption`: 공개 명령의 구조화 outcome을 확인한다.
+- `retired-parent-reconsumption-11` → `V2.split-reserve-race / retired-parent-reconsumption`: 분할로 retired된 부모 A60을 다시 예약하면 CONFLICT다. 소모된 물리 부모는 이미 바뀐 대상이다(contracts/domain-vocabulary.json STALE_REVISION=CONFLICT, 계획 §4.2 부모 재소비 금지).
+- `retired-parent-reconsumption-code` → `V2.split-reserve-race / retired-parent-reconsumption`: 미충족 주문량10이 남은 ORDER3에 대한 1 BOX 예약이므로 주문량 부족으로 거부될 수 없다. 거부 이유는 retired 부모의 STALE_REVISION이어야 하며, retired 부모를 살아 있는 60으로 보는 제품은 APPLIED나 다른 코드로 드러난다.
 - `retired-parent-reconsumption-12` → `V2.split-reserve-race / retired-parent-reconsumption`: 금지 효과의 동일 scope 전후 원 행을 비교한다. 조회/거부 감사는 별도 scope다.
 - `retired-parent-reconsumption-13` → `V2.split-reserve-race / retired-parent-reconsumption`: 금지 효과의 동일 scope 전후 원 행을 비교한다. 조회/거부 감사는 별도 scope다.
 - `retired-parent-reconsumption-14` → `V2.split-reserve-race / retired-parent-reconsumption`: 금지 효과의 동일 scope 전후 원 행을 비교한다. 조회/거부 감사는 별도 scope다.
-- `retired-parent-reconsumption-15` → `V2.split-reserve-race / retired-parent-reconsumption`: 허용된 denial 감사1과 금지된 업무 효과0을 분리한다.
+- `retired-parent-reconsumption-15` → `V2.split-reserve-race / retired-parent-reconsumption`: retired 부모 예약 시도의 CONFLICT 감사1과 금지된 업무 효과0을 분리한다.
 - `allocation-transfer-16` → `V2.split-reserve-race / allocation-transfer`: 독립 원 행의 실물·수량·관계·범위를 정확히 대조한다.
 - `allocation-transfer-18` → `V2.split-reserve-race / allocation-transfer`: 독립 원 행의 실물·수량·관계·범위를 정확히 대조한다.
 - `allocation-transfer-19` → `V2.split-reserve-race / allocation-transfer`: contender는 초기 read 뒤 scope lock 전에 실제로 멈췄다(barrier reached ACK).
@@ -102,7 +104,6 @@ pg_catalog 관찰과 `lockRevalidations` trace다.
 - `contender-outcome-not-waiting-approval` → `V2.split-reserve-race / allocation-transfer`: contender 분할의 결과는 APPLIED 또는 CONFLICT 둘 중 하나다. command-response outcome enum에서 WAITING_APPROVAL를 제외한다. 두 결과 모두 아래 불변식과 기록 일치를 함께 만족해야 한다(계획 §4.2, §13.2 V2).
 - `contender-outcome-not-needs-input` → `V2.split-reserve-race / allocation-transfer`: contender 분할의 결과는 APPLIED 또는 CONFLICT 둘 중 하나다. command-response outcome enum에서 NEEDS_INPUT를 제외한다. 두 결과 모두 아래 불변식과 기록 일치를 함께 만족해야 한다(계획 §4.2, §13.2 V2).
 - `contender-outcome-not-accepted-pending-external` → `V2.split-reserve-race / allocation-transfer`: contender 분할의 결과는 APPLIED 또는 CONFLICT 둘 중 하나다. command-response outcome enum에서 ACCEPTED_PENDING_EXTERNAL를 제외한다. 두 결과 모두 아래 불변식과 기록 일치를 함께 만족해야 한다(계획 §4.2, §13.2 V2).
-- `contender-outcome-not-pending-external` → `V2.split-reserve-race / allocation-transfer`: contender 분할의 결과는 APPLIED 또는 CONFLICT 둘 중 하나다. command-response outcome enum에서 PENDING_EXTERNAL를 제외한다. 두 결과 모두 아래 불변식과 기록 일치를 함께 만족해야 한다(계획 §4.2, §13.2 V2).
 - `contender-outcome-not-held` → `V2.split-reserve-race / allocation-transfer`: contender 분할의 결과는 APPLIED 또는 CONFLICT 둘 중 하나다. command-response outcome enum에서 HELD를 제외한다. 두 결과 모두 아래 불변식과 기록 일치를 함께 만족해야 한다(계획 §4.2, §13.2 V2).
 - `contender-reported-equals-recorded` → `V2.split-reserve-race / allocation-transfer`: contender 응답 outcome은 같은 거래가 남긴 감사 원행의 outcome(raced-db derivation contenderOutcome)과 같다. 응답만 CONFLICT로 꾸미고 실제로 적용하거나 그 반대로 보고하면 실패한다.
 - `contender-conflict-is-stale-revision` → `V2.split-reserve-race / allocation-transfer`: contender가 CONFLICT면 감사 오류 코드는 STALE_REVISION이고 lock 뒤 재검증도 STALE_REVISION이다. APPLIED면 두 쪽 모두 빈 집합이다. 재검증이 STALE인데 적용하면(낡은 의도를 몰래 실행) 또는 재검증이 최신인데 충돌로 거부하면 실패한다(계획 §4.2).
@@ -114,6 +115,8 @@ pg_catalog 관찰과 `lockRevalidations` trace다.
 - `final-parent-retired` → `V2.split-reserve-race / retired-parent-reconsumption`: 최종적으로 A60은 retired다.
 - `final-no-allocation-on-retired-parent` → `V2.split-reserve-race / allocation-transfer`: retired A60을 가리키는 active 배분은0이다. 분할은 기존·신규 배분을 모두 자식으로 옮긴다.
 - `final-allocations-exactly-once` → `V2.split-reserve-race / allocation-transfer`: 최종 실행 배분도 ALLOC 40 BOX와 신규 예약 20 BOX 각각 한 번이다(합 60 = 실물 60).
+- `final-alloc40-on-child40` → `V2.split-reserve-race / allocation-transfer`: 기존 배분 ALLOC40은 40 BOX 자식 segment 위에만 있다. 20 BOX 자식에 40 배분을 얹는 이관은 실물 초과 예약이다(계획 §4.2 기존 배분 1회 이관·동일 실물 초과 금지).
+- `final-winner20-on-child20` → `V2.split-reserve-race / allocation-transfer`: 경합 승자 예약20은 20 BOX 자식 segment 위에 있다. 40 자식은 ALLOC40으로 이미 가득 차므로 다른 배치는 초과 예약이다(계획 §4.2).
 
 ## actual50-correction
 
@@ -129,6 +132,7 @@ pg_catalog 관찰과 `lockRevalidations` trace다.
 - `promise-coverage-conserved-60` → `V2.actual50-correction / minimum-shortage-duty`: 약속60은 정정 뒤 현재 EXECUTABLE 배분과 현재 부족 의무로 정확히 한 번씩 덮인다. promiseCoverage는 두 원천을 promiseRootId별로 합친 독립 read-only 관찰이다. 실행50+부족10, 전부 정지 시 실행0+부족60은 통과하고 실행50+부족60 이중 집계나 실행0+부족10 유실은 실패한다(계획 §4.2 부족 의무와 대체 배분).
 - `promise-coverage-kinds` → `V2.actual50-correction / minimum-shortage-duty`: 약속60은 정정 뒤 현재 EXECUTABLE 배분과 현재 부족 의무로 정확히 한 번씩 덮인다. promiseCoverage는 두 원천을 promiseRootId별로 합친 독립 read-only 관찰이다. 실행50+부족10, 전부 정지 시 실행0+부족60은 통과하고 실행50+부족60 이중 집계나 실행0+부족10 유실은 실패한다(계획 §4.2 부족 의무와 대체 배분).
 - `promise-coverage-shortage-is-correction-duty` → `V2.actual50-correction / shortage-duty`: 약속60은 정정 뒤 현재 EXECUTABLE 배분과 현재 부족 의무로 정확히 한 번씩 덮인다. promiseCoverage는 두 원천을 promiseRootId별로 합친 독립 read-only 관찰이다. 실행50+부족10, 전부 정지 시 실행0+부족60은 통과하고 실행50+부족60 이중 집계나 실행0+부족10 유실은 실패한다(계획 §4.2 부족 의무와 대체 배분). 부족 쪽 행은 정정 명령이 반환한 바로 그 부족 의무 하나다.
+- `shortage-obligation-row-quantity` → `V2.actual50-correction / shortage-duty`: 정정 명령이 반환한 부족 의무의 obligations 원행 수량·단위를 직접 읽어 promiseCoverage의 부족 행과 같음을 확인한다. promiseCoverage는 같은 snapshot의 allocations·obligations 원행에서 observer가 만든 파생이며 제품 projection이 아니다(race-observation-contract.md). 실행 배분 합과 이 원행 수량의 합이 약속60이다.
 - `shortage-duty-8` → `V2.actual50-correction / shortage-duty`: 해당 obligation root/scope의 현재 유효 assignment는 하나다. 의무 root는 실제 명령/대조/sweeper가 반환한 obligationId로 한정한다.
 - `shortage-duty-9` → `V2.actual50-correction / shortage-duty`: 책임자의 실제 ID와 다음 행동·확인 시각에 공백이 없어야 한다. 의무 root는 실제 명령/대조/sweeper가 반환한 obligationId로 한정한다.
 - `shortage-duty-10` → `V2.actual50-correction / shortage-duty`: fixture의 지정된 인간 owner/supervisor와 고정 후속 행동/시각이 유지된다. 의무 root는 실제 명령/대조/sweeper가 반환한 obligationId로 한정한다.
