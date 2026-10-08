@@ -91,15 +91,116 @@
         {
           "pointer": "/rawRows/mulino_work_read_obligationreferences",
           "operator": "humanDuties",
-          "kinds": [
-            "QUALITY_REVIEW",
-            "RETURN_QC_REVIEW",
-            "RETURN_COMMERCIAL_REVIEW",
-            "RETURN_SETTLEMENT_REVIEW",
-            "SETTLEMENT_DIFFERENCE"
+          "duties": [
+            {
+              "kind": "QUALITY_REVIEW",
+              "where": {
+                "workid": "$WORK",
+                "scope.physicalScopeId": "$receipt40.segment",
+                "quantity": "40",
+                "unit": "BOX",
+                "scope.residual.category": "QC"
+              },
+              "count": 1
+            },
+            {
+              "kind": "RETURN_QC_REVIEW",
+              "where": {
+                "workid": "$SALES_WORK",
+                "scope.domainSourceId": "$RETURN_RECEIPT"
+              },
+              "count": 1
+            },
+            {
+              "kind": "RETURN_COMMERCIAL_REVIEW",
+              "where": {
+                "workid": "$SALES_WORK",
+                "scope.domainSourceId": "$RETURN_RECEIPT"
+              },
+              "count": 1
+            },
+            {
+              "kind": "RETURN_SETTLEMENT_REVIEW",
+              "where": {
+                "workid": "$SALES_WORK",
+                "scope.domainSourceId": "$RETURN_RECEIPT"
+              },
+              "count": 1
+            },
+            {
+              "kind": "SETTLEMENT_DIFFERENCE",
+              "where": {
+                "workid": "$WORK",
+                "scope.domainSourceId": "$INVOICE",
+                "scope.residual.invoiceId": "$INVOICE"
+              },
+              "count": 1
+            }
           ]
+        },
+        {
+          "pointer": "/rawRows/mulino_inventory_quantitysegments",
+          "operator": "matchingRows",
+          "where": {
+            "retiredat": null,
+            "placeid": "$W",
+            "custodianid": "$supervisor",
+            "ownerid": null
+          },
+          "expected": 2
+        },
+        {
+          "pointer": "/rawRows/mulino_inventory_quantitysegments",
+          "operator": "matchingRows",
+          "where": {
+            "retiredat": null,
+            "placeid": "$W",
+            "custodianid": null,
+            "ownerid": null,
+            "quantity": "10"
+          },
+          "expected": 1
+        },
+        {
+          "pointer": "/rawRows/mulino_inventory_quantitysegments",
+          "operator": "matchingRows",
+          "where": {
+            "retiredat": null,
+            "placeid": "$CUSTOMER_PLACE",
+            "custodianid": null,
+            "ownerid": null
+          },
+          "expected": 1
+        },
+        {
+          "pointer": "/rawRows/mulino_inventory_quantitysegments",
+          "operator": "matchingRows",
+          "where": {
+            "retiredat": null
+          },
+          "expected": 4
+        },
+        {
+          "pointer": "/rawRows/mulino_runtime_outbox",
+          "operator": "matchingRows",
+          "where": {},
+          "expected": 1
+        },
+        {
+          "pointer": "/rawRows/mulino_runtime_outbox",
+          "operator": "matchingRows",
+          "where": {
+            "operation": "dispatchPurchaseOrder"
+          },
+          "expected": 1
         }
-      ]
+      ],
+      "bind": {
+        "E1_LEDGER_OBLIGATIONS": "/rawRows/mulino_work_read_obligationreferences",
+        "E1_LEDGER_WORKS": "/rawRows/mulino_work_read_works",
+        "E1_LEDGER_CONTRIBUTIONS": "/rawRows/mulino_work_workcontributions",
+        "E1_ACTORS": "/rawRows/mulino_identity_actors"
+      }
     },
     {
       "id": "e1-current-warehouse",
@@ -140,13 +241,108 @@
         "asOf": "2026-10-07T09:00:02Z",
         "knownAt": "2026-10-07T09:00:02Z"
       },
+      "assertions": [
+        {
+          "pointer": "/data/workIds",
+          "operator": "sameSet",
+          "expected": [
+            "$WORK",
+            "$SALES_WORK"
+          ]
+        },
+        {
+          "pointer": "/data/obligations",
+          "operator": "ledgerRows",
+          "expected": "$E1_LEDGER_OBLIGATIONS",
+          "where": {
+            "workid": [
+              "$WORK",
+              "$SALES_WORK"
+            ]
+          }
+        },
+        {
+          "pointer": "/data/obligations",
+          "operator": "humanDuties",
+          "duties": [
+            {
+              "kind": "QUALITY_REVIEW",
+              "where": {
+                "workid": "$WORK",
+                "scope.physicalScopeId": "$receipt40.segment",
+                "quantity": "40",
+                "unit": "BOX",
+                "scope.residual.category": "QC"
+              },
+              "count": 1
+            },
+            {
+              "kind": "RETURN_QC_REVIEW",
+              "where": {
+                "workid": "$SALES_WORK",
+                "scope.domainSourceId": "$RETURN_RECEIPT"
+              },
+              "count": 1
+            },
+            {
+              "kind": "RETURN_COMMERCIAL_REVIEW",
+              "where": {
+                "workid": "$SALES_WORK",
+                "scope.domainSourceId": "$RETURN_RECEIPT"
+              },
+              "count": 1
+            },
+            {
+              "kind": "RETURN_SETTLEMENT_REVIEW",
+              "where": {
+                "workid": "$SALES_WORK",
+                "scope.domainSourceId": "$RETURN_RECEIPT"
+              },
+              "count": 1
+            },
+            {
+              "kind": "SETTLEMENT_DIFFERENCE",
+              "where": {
+                "workid": "$WORK",
+                "scope.domainSourceId": "$INVOICE",
+                "scope.residual.invoiceId": "$INVOICE"
+              },
+              "count": 1
+            }
+          ],
+          "actors": "$E1_ACTORS"
+        },
+        {
+          "pointer": "/data/ownerIds",
+          "operator": "ledgerOwners",
+          "works": "$E1_LEDGER_WORKS",
+          "obligations": "$E1_LEDGER_OBLIGATIONS",
+          "workIds": [
+            "$WORK",
+            "$SALES_WORK"
+          ]
+        },
+        {
+          "pointer": "/data/contributions",
+          "operator": "ledgerRows",
+          "expected": "$E1_LEDGER_CONTRIBUTIONS",
+          "where": {
+            "targetworkid": [
+              "$WORK",
+              "$SALES_WORK"
+            ]
+          }
+        }
+      ],
       "bind": {
         "E1_SNAPSHOT": "/snapshotRevision",
         "E1_WORK_IDS": "/data/workIds",
         "E1_DUTIES": "/data/obligations",
         "E1_CONTRIBUTIONS": "/data/contributions",
         "E1_OWNERS": "/data/ownerIds",
-        "E1_EVIDENCE": "/data/evidenceRefs"
+        "E1_EVIDENCE": "/data/evidenceRefs",
+        "E1_HELD": "/data/heldQuantity",
+        "E1_ELIGIBLE": "/data/eligibleQuantity"
       }
     },
     {
@@ -164,6 +360,112 @@
         "snapshotRef": "$E1_SNAPSHOT"
       },
       "assertions": [
+        {
+          "pointer": "/data/ID",
+          "operator": "equals",
+          "expected": "$WORK"
+        },
+        {
+          "pointer": "/data/workId",
+          "operator": "equals",
+          "expected": "$WORK"
+        },
+        {
+          "pointer": "/data/kind",
+          "operator": "equals",
+          "expected": "PURCHASE"
+        },
+        {
+          "pointer": "/data/workIds",
+          "operator": "sameSet",
+          "expected": [
+            "$WORK",
+            "$SALES_WORK"
+          ]
+        },
+        {
+          "pointer": "/data/obligations",
+          "operator": "ledgerRows",
+          "expected": "$E1_LEDGER_OBLIGATIONS",
+          "where": {
+            "workid": [
+              "$WORK",
+              "$SALES_WORK"
+            ]
+          }
+        },
+        {
+          "pointer": "/data/obligations",
+          "operator": "humanDuties",
+          "duties": [
+            {
+              "kind": "QUALITY_REVIEW",
+              "where": {
+                "workid": "$WORK",
+                "scope.physicalScopeId": "$receipt40.segment",
+                "quantity": "40",
+                "unit": "BOX",
+                "scope.residual.category": "QC"
+              },
+              "count": 1
+            },
+            {
+              "kind": "RETURN_QC_REVIEW",
+              "where": {
+                "workid": "$SALES_WORK",
+                "scope.domainSourceId": "$RETURN_RECEIPT"
+              },
+              "count": 1
+            },
+            {
+              "kind": "RETURN_COMMERCIAL_REVIEW",
+              "where": {
+                "workid": "$SALES_WORK",
+                "scope.domainSourceId": "$RETURN_RECEIPT"
+              },
+              "count": 1
+            },
+            {
+              "kind": "RETURN_SETTLEMENT_REVIEW",
+              "where": {
+                "workid": "$SALES_WORK",
+                "scope.domainSourceId": "$RETURN_RECEIPT"
+              },
+              "count": 1
+            },
+            {
+              "kind": "SETTLEMENT_DIFFERENCE",
+              "where": {
+                "workid": "$WORK",
+                "scope.domainSourceId": "$INVOICE",
+                "scope.residual.invoiceId": "$INVOICE"
+              },
+              "count": 1
+            }
+          ],
+          "actors": "$E1_ACTORS"
+        },
+        {
+          "pointer": "/data/ownerIds",
+          "operator": "ledgerOwners",
+          "works": "$E1_LEDGER_WORKS",
+          "obligations": "$E1_LEDGER_OBLIGATIONS",
+          "workIds": [
+            "$WORK",
+            "$SALES_WORK"
+          ]
+        },
+        {
+          "pointer": "/data/contributions",
+          "operator": "ledgerRows",
+          "expected": "$E1_LEDGER_CONTRIBUTIONS",
+          "where": {
+            "targetworkid": [
+              "$WORK",
+              "$SALES_WORK"
+            ]
+          }
+        },
         {
           "pointer": "/snapshotRevision",
           "operator": "equals",
@@ -193,6 +495,42 @@
           "pointer": "/data/evidenceRefs",
           "operator": "equals",
           "expected": "$E1_EVIDENCE"
+        },
+        {
+          "pointer": "/data/heldQuantity",
+          "operator": "equals",
+          "expected": "$E1_HELD"
+        },
+        {
+          "pointer": "/data/eligibleQuantity",
+          "operator": "equals",
+          "expected": "$E1_ELIGIBLE"
+        }
+      ]
+    },
+    {
+      "id": "e1-noun-eligibility",
+      "type": "query",
+      "capability": "getObject",
+      "request": {
+        "id": "$P",
+        "scope": {
+          "organizationId": "$ORG",
+          "itemId": "$P"
+        },
+        "asOf": "2026-10-07T09:00:02Z",
+        "knownAt": "2026-10-07T09:00:02Z"
+      },
+      "assertions": [
+        {
+          "pointer": "/data/eligibleQuantity",
+          "operator": "decimalEquals",
+          "expected": "0"
+        },
+        {
+          "pointer": "/data/unreservedEligibleQuantity",
+          "operator": "decimalEquals",
+          "expected": "0"
         }
       ]
     }

@@ -29,6 +29,13 @@ final class ActualS4FlowAliasTest {
   for(String alias:new String[]{"$ALLOCATION","${LATER}","$RANGE60","$receipt40.segment","$receipt.canonical"})assertTrue(errors.stream().anyMatch(e->e.contains("unbound "+alias)),alias);
   assertNotNull(Json.read(dir.resolve("bad-flow.json")));
  }
+ /** Aliases inside bound duty specs and ledger inputs are checked too, not only expected/where. */
+ @Test void unboundAliasInsideBoundDutyOrLedgerInputIsReported(@org.junit.jupiter.api.io.TempDir Path temp)throws Exception {
+  Path dir=temp.resolve(NativeS4FlowAliases.DIRECTORY);Files.createDirectories(dir);Files.copy(root.resolve(NativeS4FlowAliases.BASE_FIXTURE),temp.resolve(NativeS4FlowAliases.BASE_FIXTURE));
+  Files.writeString(dir.resolve("duty-flow.json"),"{\"actions\":[{\"id\":\"o\",\"type\":\"observe\",\"assertions\":[{\"pointer\":\"/rawRows/x\",\"operator\":\"humanDuties\",\"duties\":[{\"kind\":\"QUALITY_REVIEW\",\"where\":{\"workid\":\"$NOT_BOUND\"},\"count\":1}],\"actors\":\"$NO_ACTORS\"}]}]}");
+  var errors=NativeS4FlowAliases.check(temp,NativeS4FlowAliases.DIRECTORY+"/duty-flow.json");
+  assertEquals(2,errors.size(),errors.toString());assertTrue(errors.stream().anyMatch(e->e.contains("unbound $NOT_BOUND")));assertTrue(errors.stream().anyMatch(e->e.contains("unbound $NO_ACTORS")));
+ }
  @Test void observedTableMustExistInMigrations(@org.junit.jupiter.api.io.TempDir Path temp)throws Exception {
   Path dir=temp.resolve(NativeS4FlowAliases.DIRECTORY);Files.createDirectories(dir);Files.copy(root.resolve(NativeS4FlowAliases.BASE_FIXTURE),temp.resolve(NativeS4FlowAliases.BASE_FIXTURE));
   Files.createDirectories(temp.resolve("database/migrations"));Files.writeString(temp.resolve("database/migrations/V1__x.sql"),"CREATE TABLE mulino_inventory_Restrictions(id int);");

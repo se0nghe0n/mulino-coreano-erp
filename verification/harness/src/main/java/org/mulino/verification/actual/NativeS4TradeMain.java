@@ -17,6 +17,10 @@ public final class NativeS4TradeMain {
     private String externalOrganization;
     private String work;
     private int checks;
+    /** Authored oracle assertions only; checks also counts HTTP/outcome/binding plumbing. */
+    private int oracleAssertions;
+    /** Actions whose authored assertions all executed and held. */
+    private final Set<String> asserted=new TreeSet<>();
     private NativeS4TradeMain(Path root){this.root=root;}
     public static void main(String[] args)throws Exception {new NativeS4TradeMain(Path.of(System.getProperty("repo.root",".")).toAbsolutePath().normalize()).run();}
     private void run()throws Exception {
@@ -31,10 +35,11 @@ public final class NativeS4TradeMain {
             clock("2026-10-07T09:00:02Z");
             var script=Json.read(root.resolve(flowRef));report.put("flowRef",flowRef);
             for(JsonNode action:script.path("actions"))execute(action);
+            report.set("contractCases",contractCoverage(script.path("requiredCases")));
             report.put("status","PASS").put("boundedAssertions",checks).put("fixtureHash",Json.sha256(root.resolve(ref))).put("flowHash",Json.sha256(root.resolve(flowRef))).put("buildCommit",ActualConfiguration.environment(System.getenv()).buildVersion()).put("limitation","Bounded S4 HTTP/JDBC assertions only; normative T17-T19/C1/C4/E1/E2 full case coverage, paid model, regulatory and BTP acceptance remain separate");exit=0;
         }catch(Throwable failure){boolean assertion=failure instanceof AssertionError,unavailable=failure instanceof Unavailable;report.put("status",assertion?"FAIL":"NOT_RUN").put("failure",failure.getClass().getSimpleName()+": "+failure.getMessage());exit=assertion?1:unavailable?2:3;}
         finally {
-            report.put("finishedAt",Instant.now().toString()).put("exitCode",exit).put("boundedAssertions",checks);
+            report.put("finishedAt",Instant.now().toString()).put("exitCode",exit).put("boundedAssertions",checks).put("authoredOracleAssertions",oracleAssertions);
             Path out=Path.of(System.getProperty("verification.actual.output",root.resolve("verification/harness/target/evidence/actual-s4-native").toString())).toAbsolutePath().normalize();Files.createDirectories(out);Json.write(out.resolve("actual-s4-native.json"),report);
             for(JsonNode action:actions)for(JsonNode artifact:action.path("artifactRefs")){Path source=root.resolve(artifact.asText()).normalize(),target=out.resolve(artifact.asText()).normalize();if(!source.startsWith(root)||!target.startsWith(out))throw new IllegalArgumentException("Artifact escapes custody");Files.createDirectories(target.getParent());Files.copy(source,target,StandardCopyOption.REPLACE_EXISTING);}
             System.out.println(report.toPrettyString());
@@ -42,6 +47,24 @@ public final class NativeS4TradeMain {
     }
     private void execute(JsonNode a)throws Exception {
         String id=Json.required(a,"id"),type=Json.required(a,"type");
+        executeAction(a,id,type);
+        if(Set.of("command","query","observe").contains(type)&&a.path("assertions").size()>0)asserted.add(id);
+    }
+    /**
+     * acceptance-contract.json names, per case key, the authored actions that
+     * observe it. A flow claiming a case must have asserted every mapped
+     * action; unmapped keys are reported NOT_RUN rather than silently passed.
+     */
+    private ObjectNode contractCoverage(JsonNode requiredCases)throws java.io.IOException {
+        var contract=Json.read(root.resolve("verification/actual/s4/acceptance-contract.json")).path("assertionMap");var result=Json.object();var required=new HashSet<String>();for(JsonNode c:requiredCases)required.add(c.asText());
+        for(var cases=contract.fields();cases.hasNext();){var c=cases.next();if(c.getKey().startsWith("_"))continue;var keys=Json.object();
+            for(var it=c.getValue().fields();it.hasNext();){var e=it.next();var entry=Json.object();entry.set("actions",e.getValue());boolean all=e.getValue().size()>0;for(JsonNode action:e.getValue())all&=asserted.contains(action.asText());
+                String status=e.getValue().isEmpty()?"UNMAPPED":all?"ASSERTED":"NOT_RUN";entry.put("status",status);keys.set(e.getKey(),entry);
+                if(required.contains(c.getKey())&&status.equals("NOT_RUN"))require(false,"Flow requires "+c.getKey()+" but did not assert contract key "+e.getKey()+" via "+e.getValue());}
+            result.set(c.getKey(),keys);}
+        return result;
+    }
+    private void executeAction(JsonNode a,String id,String type)throws Exception {
         switch(type) {
             case "include" -> {for(JsonNode nested:Json.read(root.resolve(Json.required(a,"scriptRef"))).path("actions"))execute(nested);}
             case "require-contract" -> throw new Unavailable(a.path("reason").asText());
@@ -102,6 +125,7 @@ public final class NativeS4TradeMain {
     private JsonNode resolveActor(String name){JsonNode authored=currentFixture.path("actors").path(name);if(authored.isMissingNode())throw new IllegalArgumentException("Unknown fixture actor "+name);var bound=(ObjectNode)authored.deepCopy();bound.put("organizationAlias",externalOrganization);return bound;}
     private void assertions(String id,JsonNode data,JsonNode assertions) {
         for(JsonNode assertion:assertions) {
+            oracleAssertions++;
             JsonNode value=data.at(Json.required(assertion,"pointer"));require(!value.isMissingNode(),id+" missing observation "+assertion.path("pointer"));
             switch(Json.required(assertion,"operator")) {
                 case "equals" -> require(value.equals(resolve(assertion.path("expected"))),id+" expected "+resolve(assertion.path("expected"))+" observed "+value);
@@ -109,13 +133,20 @@ public final class NativeS4TradeMain {
                 case "decimalEquals" -> {require(value.isTextual()||value.isNumber(),id+" non-decimal observation "+value);require(new BigDecimal(value.asText()).compareTo(new BigDecimal(resolve(assertion.path("expected")).asText()))==0,id+" expected decimal "+resolve(assertion.path("expected"))+" observed "+value);}
                 case "size" -> require(value.size()==assertion.path("expected").asInt(),id+" expected rows "+assertion.path("expected")+" observed "+value.size());
                 case "sum" -> {BigDecimal sum=BigDecimal.ZERO;for(JsonNode row:value){if(assertion.has("where")&&!matches(row,resolve(assertion.path("where"))))continue;JsonNode quantity=row.path(Json.required(assertion,"column"));require(quantity.isTextual()||quantity.isNumber(),id+" missing/non-numeric amount "+row);sum=sum.add(new BigDecimal(quantity.asText()));}require(sum.compareTo(new BigDecimal(assertion.path("expected").asText()))==0,id+" expected sum "+assertion.path("expected")+" observed "+sum);}
-                case "humanDuties" -> {for(JsonNode kind:assertion.path("kinds")){int count=0;for(JsonNode duty:value){if(!kind.asText().equals(duty.path("kind").asText())||!"OPEN".equals(duty.path("status").asText())||!duty.path("valid").asBoolean())continue;String owner=duty.path("ownerid").asText();require(!owner.isBlank()&&!duty.path("nextaction").asText().isBlank()&&!duty.path("nextcheckat").asText().isBlank(),id+" residual duty lacks owner/next action/check "+kind);boolean human=false;for(JsonNode identity:data.at("/rawRows/mulino_identity_actors"))if(owner.equals(identity.path("id").asText())&&"HUMAN".equals(identity.path("kind").asText()))human=true;require(human,id+" residual duty owner is not a human "+kind);count++;}require(count>0,id+" missing separate open human duty "+kind);}}
+                // Each duty is bound to its exact Work/subject/quantity and counted exactly;
+                // every other open duty of a listed kind fails (no kind-only match).
+                case "humanDuties" -> {require(!assertion.has("kinds"),id+" kind-only humanDuties is not an oracle; bind each duty");S4WorldOracle.humanDuties(this::require,id,value,resolve(assertion.path("duties")),assertion.has("actors")?resolve(assertion.path("actors")):data.at("/rawRows/mulino_identity_actors"));}
+                // Product rows compared field-by-field with the independent JDBC ledger rows.
+                case "ledgerRows" -> S4WorldOracle.ledgerRows(this::require,id,value,resolve(assertion.path("expected")),resolve(assertion.path("where")));
+                case "sameSet" -> {var expected=resolve(assertion.path("expected"));require(value.isArray()&&expected.isArray(),id+" sameSet needs arrays");require(S4WorldOracle.set(this::require,id,value).equals(S4WorldOracle.set(this::require,id,expected)),id+" expected set "+expected+" observed "+value);}
+                // ownerIds of a world read: owners of the ledger Works plus owners of their open valid duties.
+                case "ledgerOwners" -> S4WorldOracle.ledgerOwners(this::require,id,value,resolve(assertion.path("works")),resolve(assertion.path("obligations")),resolve(assertion.path("workIds")));
                 case "matchingRows" -> {int count=0;for(JsonNode row:value)if(matches(row,resolve(assertion.path("where"))))count++;require(count==assertion.path("expected").asInt(),id+" expected matching rows "+assertion.path("expected")+" observed "+count);}
                 default -> throw new IllegalArgumentException("Unsupported independent assertion operator");
             }
         }
     }
-    private boolean matches(JsonNode row,JsonNode expected){for(var it=expected.fields();it.hasNext();){var e=it.next();if(!row.path(e.getKey()).equals(e.getValue()))return false;}return true;}
+    private boolean matches(JsonNode row,JsonNode expected){return S4WorldOracle.matches(row,expected);}
     private void original(String id,JsonNode fixture,JsonNode binding)throws Exception {
         var bundle=Json.object();bundle.put("fixturePhase","S4_ORIGINAL").put("fixtureHash",java.util.HexFormat.of().formatHex(java.security.MessageDigest.getInstance("SHA-256").digest(fixture.toString().getBytes(java.nio.charset.StandardCharsets.UTF_8))));bundle.set("fixture",fixture);bundle.set("binding",binding);
         var result=driver.installFixture(id,bundle);capture(result);available(result);require(result.data().path("sourceContentSha256").equals(result.data().path("blobReadbackSha256")),"Original blob custody mismatch");

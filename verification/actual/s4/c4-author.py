@@ -31,7 +31,7 @@ def total(table,col,q,where=None):
  a=dict(pointer='/rawRows/'+table,operator='sum',column=col,expected=q)
  if where is not None:a['where']=where
  return a
-def duties(*k):return dict(pointer='/rawRows/mulino_work_read_obligationreferences',operator='humanDuties',kinds=list(k))
+def duties(*specs):return dict(pointer='/rawRows/mulino_work_read_obligationreferences',operator='humanDuties',duties=list(specs))
 def fixture():
  f=json.loads((D/'fixture.json').read_text());f['id']='c4-synthetic-setup'
  for who,a in f['actors'].items():
@@ -141,7 +141,7 @@ def correction(i,q,known,prev,rev,version):
  out[-2]['request']['slots']['sourceIdentity']=delivered['fixture']['sourceProfile']['namespace']+':'+delivered['fixture']['occurrence']['externalEventId']+':'+version
  return out
 a += correction('c4-correction98','98','2026-10-07T09:00:03Z','$c4-delivery-original.event',1,'2')
-a += [obs('c4-correct98-independent',[rows('mulino_evidence_events',dict(id='$c4-delivery-original.event'),1),rows('mulino_evidence_events',dict(id='$c4-correction98.event',supersedesid='$c4-delivery-original.event'),1),rows('mulino_work_read_assessmentreferences',dict(id='$PAST_ASSESSMENT',outcome='SATISFIED'),1),total('mulino_trade_sales_deliveries','quantity','100'),total('mulino_trade_sales_deliverycorrections','quantity','98'),total('mulino_trade_returns_receipts','quantity','20'),total('mulino_inventory_quantitysegments','quantity','20',dict(retiredat=None,placeid='$W')),total('mulino_inventory_quantitysegments','quantity','80',dict(retiredat=None,placeid='$CUSTOMER_PLACE')),total('mulino_inventory_quantitysegments','quantity','0',dict(retiredat=None,placeid='$TRANSIT')),total('mulino_work_read_obligationreferences','quantity','2',dict(kind='DELIVERY_CORRECTED_DEFICIT',status='OPEN',valid=True)),duties('DELIVERY_CORRECTED_DEFICIT')])]
+a += [obs('c4-correct98-independent',[rows('mulino_evidence_events',dict(id='$c4-delivery-original.event'),1),rows('mulino_evidence_events',dict(id='$c4-correction98.event',supersedesid='$c4-delivery-original.event'),1),rows('mulino_work_read_assessmentreferences',dict(id='$PAST_ASSESSMENT',outcome='SATISFIED'),1),total('mulino_trade_sales_deliveries','quantity','100'),total('mulino_trade_sales_deliverycorrections','quantity','98'),total('mulino_trade_returns_receipts','quantity','20'),total('mulino_inventory_quantitysegments','quantity','20',dict(retiredat=None,placeid='$W')),total('mulino_inventory_quantitysegments','quantity','80',dict(retiredat=None,placeid='$CUSTOMER_PLACE')),total('mulino_inventory_quantitysegments','quantity','0',dict(retiredat=None,placeid='$TRANSIT')),total('mulino_work_read_obligationreferences','quantity','2',dict(kind='DELIVERY_CORRECTED_DEFICIT',status='OPEN',valid=True)),duties(dict(kind='DELIVERY_CORRECTED_DEFICIT',where={'workid':'$SALES_WORK','scope.deliveryId':'$DELIVERY','quantity':'2','unit':'BOX','scope.startQuantity':'0','scope.endQuantity':'2'},count=1))])]
 write('c4-history-return-correction.json',dict(schemaVersion='1.0.0',status='NOT_RUN',actions=a))
 # C4 resolvedOrWaivedDutyRevival=0: the owner cannot resolve deficit2 with the
 # correction that created it, nor waive it without the typed decision; a

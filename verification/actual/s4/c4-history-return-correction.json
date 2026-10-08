@@ -568,8 +568,19 @@
         {
           "pointer": "/rawRows/mulino_work_read_obligationreferences",
           "operator": "humanDuties",
-          "kinds": [
-            "DELIVERY_CORRECTED_DEFICIT"
+          "duties": [
+            {
+              "kind": "DELIVERY_CORRECTED_DEFICIT",
+              "where": {
+                "workid": "$SALES_WORK",
+                "scope.deliveryId": "$DELIVERY",
+                "quantity": "2",
+                "unit": "BOX",
+                "scope.startQuantity": "0",
+                "scope.endQuantity": "2"
+              },
+              "count": 1
+            }
           ]
         }
       ]

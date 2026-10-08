@@ -42,7 +42,8 @@ public final class NativeS4FlowAliases {
             default -> errors.add(flow+": "+id+" unsupported action type "+type);
         }
     }
-    private void assertionRefs(String id,JsonNode a){for(JsonNode x:a.path("assertions")){need(id,x.path("expected"),"assertion");need(id,x.path("where"),"assertion where");}}
+    /** Every alias inside an assertion (expected, where, bound duties, ledger inputs) must be bound before use. */
+    private void assertionRefs(String id,JsonNode a){for(JsonNode x:a.path("assertions"))need(id,x,"assertion");}
     /** Mirrors NativeS4TradeMain.resolve: `${KEY}` templates first, otherwise a whole `$KEY` value. */
     private void need(String id,JsonNode node,String where) {
         if(node.isTextual()){String text=node.asText();if(text.contains("${")){var m=TEMPLATE.matcher(text);while(m.find())if(!bound.contains(m.group(1)))errors.add(flow+": "+id+" "+where+" reads unbound ${"+m.group(1)+"}");}else if(text.startsWith("$")&&!bound.contains(text.substring(1)))errors.add(flow+": "+id+" "+where+" reads unbound $"+text.substring(1));}
