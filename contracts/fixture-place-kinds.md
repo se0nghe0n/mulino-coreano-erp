@@ -201,9 +201,9 @@ case도 없다.
 출고는 배분 범위를 창고 보관에서 운송 장소로 옮기는 명령이다(계획 §6).
 제품 `FulfillmentCommands`는 pick 검사 뒤에 `transitPlaceId`(TYPE_INVALID),
 Place.kind TRANSIT('Transit place required'), 그 장소의 PLACE 인가
-(FORBIDDEN)를 차례로 본다. round 9가 pick을 채우자 이 검사가 T05·C3·V7·V3·
-T24·T04·T13·C2·T09·T11·T16·T26의 출고를 막는 첫 검사가 됐다(Step 2
-closure review 7, P1). 기계 규칙은 [fixture-place-kinds.json](fixture-place-kinds.json)의
+(FORBIDDEN)를 차례로 본다. round 9가 pick을 채우자 T05·C3·V7·V3·T24·T04·T13의
+적용·실행 시점 기대가 이 검사에서 막혔고, C2·T09·T11·T16·T26의 출고도
+장소를 지명하지 않았다(Step 2 closure review 7, P1). 기계 규칙은 [fixture-place-kinds.json](fixture-place-kinds.json)의
 `dispatchTransit`(1.4.0)이고 `ContractValidator.dispatchTransitProblems`가
 강제한다.
 
