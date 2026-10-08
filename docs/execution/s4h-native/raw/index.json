@@ -1,0 +1,236 @@
+[
+  {
+    "attempt": "suite-1",
+    "profile": "actual-s4",
+    "commit": "99eb026e7d6b1fc692b9b1fa7042ac9c3683d6d0",
+    "jarSha256": "0cf5331707869d63d794f96d90c67c9849828d49955bb4c99306c6f848e2893d",
+    "flowRef": "verification/actual/s4/flow.json",
+    "status": "FAIL",
+    "nativeStatus": "FAIL",
+    "boundedAssertions": 2172,
+    "authoredOracleAssertions": 132,
+    "exitCode": 1,
+    "firstFailure": "AssertionError: e1-noun-eligibility expected decimal \"0\" observed \"20\"",
+    "contractCases": null
+  },
+  {
+    "attempt": "e2-1",
+    "profile": "actual-s4",
+    "commit": "99eb026e7d6b1fc692b9b1fa7042ac9c3683d6d0",
+    "jarSha256": "0cf5331707869d63d794f96d90c67c9849828d49955bb4c99306c6f848e2893d",
+    "flowRef": "verification/actual/s4/e2-flow.json",
+    "status": "PASS",
+    "nativeStatus": "PASS",
+    "boundedAssertions": 426,
+    "authoredOracleAssertions": 66,
+    "exitCode": 0,
+    "firstFailure": null,
+    "contractCases": {
+      "E1": {
+        "purchaseCumulative": "NOT_RUN",
+        "warehouseCurrent": "NOT_RUN",
+        "historicalDelivered": "NOT_RUN",
+        "returned": "NOT_RUN",
+        "currentEligible": "NOT_RUN",
+        "invoiceDifference": "NOT_RUN",
+        "bankEffects": "NOT_RUN",
+        "unresolvedHumanDuties": "NOT_RUN",
+        "entrypointParity": "NOT_RUN"
+      },
+      "E2": {
+        "physical": "UNMAPPED",
+        "qcHold": "UNMAPPED",
+        "recallHold": "ASSERTED",
+        "adminScope": "ASSERTED",
+        "recovered": "ASSERTED",
+        "disposedSameRecovered": "ASSERTED",
+        "uniqueProcessed": "ASSERTED",
+        "unknownResidual": "ASSERTED",
+        "normalCloseAllowed": "ASSERTED",
+        "exceptionRetainsResponsibility": "ASSERTED"
+      },
+      "C1": {
+        "newReservationAfterRevoke": "NOT_RUN",
+        "newDispatchAfterRevoke": "NOT_RUN",
+        "existingResponsibilityRetained": "NOT_RUN"
+      },
+      "C4": {
+        "historicalDelivered": "NOT_RUN",
+        "actualReturn": "NOT_RUN",
+        "separateCorrectedActual": "NOT_RUN",
+        "newResidualDuty": "NOT_RUN",
+        "resolvedOrWaivedDutyRevival": "NOT_RUN"
+      },
+      "postDispatchRecall": {
+        "actualDelivered": "UNMAPPED",
+        "inTransit": "UNMAPPED",
+        "newDispatch": "UNMAPPED",
+        "falseOrUnmatchedNormalEffect": "UNMAPPED"
+      },
+      "V2": {
+        "evidenceOwner": "UNMAPPED",
+        "requiredPath": "UNMAPPED"
+      },
+      "V3": {
+        "evidenceOwner": "UNMAPPED",
+        "requiredPath": "UNMAPPED"
+      }
+    }
+  },
+  {
+    "attempt": "c1-1",
+    "profile": "actual-s4",
+    "commit": "99eb026e7d6b1fc692b9b1fa7042ac9c3683d6d0",
+    "jarSha256": "0cf5331707869d63d794f96d90c67c9849828d49955bb4c99306c6f848e2893d",
+    "flowRef": "verification/actual/s4/c1-flow.json",
+    "status": "PASS",
+    "nativeStatus": "PASS",
+    "boundedAssertions": 309,
+    "authoredOracleAssertions": 27,
+    "exitCode": 0,
+    "firstFailure": null,
+    "contractCases": {
+      "E1": {
+        "purchaseCumulative": "NOT_RUN",
+        "warehouseCurrent": "NOT_RUN",
+        "historicalDelivered": "NOT_RUN",
+        "returned": "NOT_RUN",
+        "currentEligible": "NOT_RUN",
+        "invoiceDifference": "NOT_RUN",
+        "bankEffects": "NOT_RUN",
+        "unresolvedHumanDuties": "NOT_RUN",
+        "entrypointParity": "NOT_RUN"
+      },
+      "E2": {
+        "physical": "UNMAPPED",
+        "qcHold": "UNMAPPED",
+        "recallHold": "NOT_RUN",
+        "adminScope": "NOT_RUN",
+        "recovered": "NOT_RUN",
+        "disposedSameRecovered": "NOT_RUN",
+        "uniqueProcessed": "NOT_RUN",
+        "unknownResidual": "NOT_RUN",
+        "normalCloseAllowed": "NOT_RUN",
+        "exceptionRetainsResponsibility": "NOT_RUN"
+      },
+      "C1": {
+        "newReservationAfterRevoke": "ASSERTED",
+        "newDispatchAfterRevoke": "ASSERTED",
+        "existingResponsibilityRetained": "ASSERTED"
+      },
+      "C4": {
+        "historicalDelivered": "NOT_RUN",
+        "actualReturn": "NOT_RUN",
+        "separateCorrectedActual": "NOT_RUN",
+        "newResidualDuty": "NOT_RUN",
+        "resolvedOrWaivedDutyRevival": "NOT_RUN"
+      },
+      "postDispatchRecall": {
+        "actualDelivered": "UNMAPPED",
+        "inTransit": "UNMAPPED",
+        "newDispatch": "UNMAPPED",
+        "falseOrUnmatchedNormalEffect": "UNMAPPED"
+      },
+      "V2": {
+        "evidenceOwner": "UNMAPPED",
+        "requiredPath": "UNMAPPED"
+      },
+      "V3": {
+        "evidenceOwner": "UNMAPPED",
+        "requiredPath": "UNMAPPED"
+      }
+    }
+  },
+  {
+    "attempt": "c4-1",
+    "profile": "actual-s4",
+    "commit": "99eb026e7d6b1fc692b9b1fa7042ac9c3683d6d0",
+    "jarSha256": "0cf5331707869d63d794f96d90c67c9849828d49955bb4c99306c6f848e2893d",
+    "flowRef": "verification/actual/s4/c4-flow.json",
+    "status": "PASS",
+    "nativeStatus": "PASS",
+    "boundedAssertions": 397,
+    "authoredOracleAssertions": 38,
+    "exitCode": 0,
+    "firstFailure": null,
+    "contractCases": {
+      "E1": {
+        "purchaseCumulative": "NOT_RUN",
+        "warehouseCurrent": "NOT_RUN",
+        "historicalDelivered": "NOT_RUN",
+        "returned": "NOT_RUN",
+        "currentEligible": "NOT_RUN",
+        "invoiceDifference": "NOT_RUN",
+        "bankEffects": "NOT_RUN",
+        "unresolvedHumanDuties": "NOT_RUN",
+        "entrypointParity": "NOT_RUN"
+      },
+      "E2": {
+        "physical": "UNMAPPED",
+        "qcHold": "UNMAPPED",
+        "recallHold": "NOT_RUN",
+        "adminScope": "NOT_RUN",
+        "recovered": "NOT_RUN",
+        "disposedSameRecovered": "NOT_RUN",
+        "uniqueProcessed": "NOT_RUN",
+        "unknownResidual": "NOT_RUN",
+        "normalCloseAllowed": "NOT_RUN",
+        "exceptionRetainsResponsibility": "NOT_RUN"
+      },
+      "C1": {
+        "newReservationAfterRevoke": "NOT_RUN",
+        "newDispatchAfterRevoke": "NOT_RUN",
+        "existingResponsibilityRetained": "NOT_RUN"
+      },
+      "C4": {
+        "historicalDelivered": "ASSERTED",
+        "actualReturn": "ASSERTED",
+        "separateCorrectedActual": "ASSERTED",
+        "newResidualDuty": "ASSERTED",
+        "resolvedOrWaivedDutyRevival": "ASSERTED"
+      },
+      "postDispatchRecall": {
+        "actualDelivered": "UNMAPPED",
+        "inTransit": "UNMAPPED",
+        "newDispatch": "UNMAPPED",
+        "falseOrUnmatchedNormalEffect": "UNMAPPED"
+      },
+      "V2": {
+        "evidenceOwner": "UNMAPPED",
+        "requiredPath": "UNMAPPED"
+      },
+      "V3": {
+        "evidenceOwner": "UNMAPPED",
+        "requiredPath": "UNMAPPED"
+      }
+    }
+  },
+  {
+    "attempt": "s3-1",
+    "profile": "actual-s3",
+    "commit": "99eb026e7d6b1fc692b9b1fa7042ac9c3683d6d0",
+    "jarSha256": "0cf5331707869d63d794f96d90c67c9849828d49955bb4c99306c6f848e2893d",
+    "flowRef": null,
+    "status": "PASS",
+    "nativeStatus": "PASS",
+    "boundedAssertions": 594,
+    "authoredOracleAssertions": null,
+    "exitCode": 0,
+    "firstFailure": null,
+    "contractCases": null
+  },
+  {
+    "attempt": "s2-1",
+    "profile": "actual-s2",
+    "commit": "99eb026e7d6b1fc692b9b1fa7042ac9c3683d6d0",
+    "jarSha256": "0cf5331707869d63d794f96d90c67c9849828d49955bb4c99306c6f848e2893d",
+    "flowRef": null,
+    "status": "PASS",
+    "nativeStatus": "PASS",
+    "boundedAssertions": 48,
+    "authoredOracleAssertions": null,
+    "exitCode": 0,
+    "firstFailure": null,
+    "contractCases": null
+  }
+]
