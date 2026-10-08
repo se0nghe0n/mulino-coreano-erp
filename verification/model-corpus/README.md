@@ -33,6 +33,21 @@ python3 verification/model-corpus/validate.py
 python3 -m unittest discover -s verification/model-corpus -p 'test_*.py' -v
 ```
 
+## 검토된 corpus bytes의 고정
+
+registry·binding·semantic path의 corpus hash는 `generate.py`가 현재
+corpus에서 다시 쓴다. 이 값끼리의 일치는 oracle 약화를 막지 못한다.
+`MANDATORY_ASSERTIONS`가 고정하지 않은 사례의 기대값·maxNew·허용/금지
+효과·의무를 바꿔도 구조 검사는 VALID일 수 있다. 그래서
+`verification/requirements/normative-contract-lock.json`의
+`pinnedArtifacts`가 T25.model-corpus-and-budget의 corpus bytes SHA-256을
+고정한다. `validate.py`는 이 pin과 다르면 INVALID다.
+`--skip-reviewed-pin`은 초안의 구조 검사 전용이며 준비 증거가 아니다.
+`generate.py`, `model-binding/run prepare`, Java BindingContract와
+coverage assembler도 같은 pin을 확인한다. corpus를 의도적으로 바꾸면
+근거·영향을 review하고 별도 commit에서 lock pin과 reviewUpdates를
+갱신한 뒤 binding을 재생성한다.
+
 `corpusIntegrity=VALID`와 validator unit tests의 성공은 데이터 작성의
 정합성만 증명한다. 실제 모델 해석률이나 업무 효과 PASS를 뜻하지
 않는다. root `./verify`와 실제 adapter의 제공 여부는 이 corpus가
@@ -49,7 +64,10 @@ python3 -m unittest discover -s verification/model-corpus -p 'test_*.py' -v
 | M51–M60 | 업무 예외·책임 | 10 |
 
 60개는 서로 다른 첫 원문·semantic focus·전체 oracle를 가진다.
-이탈리아어·영어 원문 또는 혼합 표현21개가 있다. 각3회 반복은 한
+이탈리아어·영어 원문 또는 혼합 표현 tag는21개다. validator는 tag가
+아니라 실제 원문의 이탈리아어·영어 단어(ID·단위·camelCase field 제외)를
+세며 현재19개다(M41·M49는 tag만 en이다). 계획 §13.3의 최소10은 이 실제
+원문 수로 판정한다. 각3회 반복은 한
 사례의 모든 turn을 같은 독립 fixture에서 끝까지 수행하는3개
 attempt다. 계획은180 attempts이며 실제 attempts는0개다. 확인 질문의
 구체 문구를 고정하지 않고 `missingSlots`에 맞는 확인을 요구한다.
@@ -214,8 +232,21 @@ T/C/V/E 인수가 모두 실행됐다는 coverage 주장은 하지 않는다.
 
 명확한20건의 올바른 구조화≥95%, 모호한 입력의 부당 실행0,
 무권한·중복효과·허위완료0은 계획의 **수용 제안**이다. 사용자 사업
-SLA나 R8 확정값으로 표시하지 않는다. 명확한20건×3의 구조화 분모와
-전체60건×3의 업무 불변식 판정을 구별한다. latency p50/p95·확인질문
+SLA나 R8 확정값으로 표시하지 않는다. 계획 §13.3은 "명확한 요청"을
+"모호한 입력"과 대비한다. 따라서 구조화율의 분모는 clear_synonyms
+20건만이 아니라 expectedIntent.status가 STRUCTURED인 모든 turn 62개×3
+=186이다. 모호성 사례의 보완 turn과 조회/쓰기·버전·업무예외 범주의
+명확한 요청도 포함한다. NEEDS_INPUT turn 11개는 구조화율에 넣지 않고
+정확히 일치해야 하는 부당 실행0 범주로 판정한다. 이 분모는 R8에서
+실제 수용치와 함께 확정할 제안이다.
+
+구조화 일치는 status·intentKind·definitionVersion·capability·slot
+value·provenance·sourceRef의 정확한 일치다. missingSlots는 순서 없는
+집합이다. USER slot의 sourceText는 corpus의 최소 발췌를 포함하고 같은
+사용자 turn 원문에 그대로 있는 연속 문자열이면 같은 근거로 본다.
+불일치 turn도 안전 불변식 검사는 계속하며 turn 단위 FAIL이 아니다.
+부당 실행·무권한·중복·허위 완료는 구조화율과 무관하게 0건이어야 한다.
+전체60건×3의 업무 불변식 판정과 구별한다. latency p50/p95·확인질문
 비율·token·총비용은 별도 보고한다.
 
 R8의 exact client/model·반복 수·실제 수용치·비용 상한 승인 전에는

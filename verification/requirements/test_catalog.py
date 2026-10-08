@@ -59,4 +59,13 @@ class NormativeCatalogTests(unittest.TestCase):
   self.rejected(lambda c:self.oracle(c,'T19.settlement-manager-decision')['expectedObservations'].remove(self.observation(c,'T19.settlement-manager-decision','ordinary-write-confirmed-settlement-effects')))
  def test_weaken_settlement_manager_positive(self):
   self.rejected(lambda c:self.observation(c,'T19.settlement-manager-decision','authorized-confirmation-count').update(expected=0))
+ def test_empty_or_falsy_lock_is_rejected_not_replaced(self):
+  lock=json.loads((HERE/'normative-contract-lock.json').read_text())
+  for bad in ({},[],0,'',False):
+   with self.subTest(lock=bad),self.assertRaises(CatalogError):validate(self.catalog,bad)
+  for key in ('oracleContracts','sourceFiles','requiredCaseIds'):
+   broken=copy.deepcopy(lock);broken[key]={} if key=='oracleContracts' else []
+   with self.subTest(key=key),self.assertRaises(CatalogError):validate(self.catalog,broken)
+  weak=copy.deepcopy(lock);next(iter(weak['oracleContracts'].values()))['contractSha256']=''
+  with self.assertRaises(CatalogError):validate(self.catalog,weak)
 if __name__=='__main__':unittest.main()

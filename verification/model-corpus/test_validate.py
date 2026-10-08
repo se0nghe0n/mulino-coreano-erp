@@ -25,6 +25,21 @@ class CorpusValidationTests(unittest.TestCase):
         self.assertEqual('NOT_RUN', self.data['status'])
         self.assertIsNone(self.data['executionPlan']['usage'])
 
+    def test_foreign_quota_counts_actual_text_not_language_tags(self):
+        self.assertEqual(19, sum(VALIDATOR.is_foreign_or_mixed(c) for c in self.data['cases']))
+        def koreanize(data):
+            replaced = 0
+            for case in data['cases']:
+                if VALIDATOR.is_foreign_or_mixed(case) and replaced < 10:
+                    for n, turn in enumerate(case['turns'], 1):
+                        turn['input']['utterance'] = f'{case["id"]} {n}번 요청을 한국어로 처리해줘.'
+                    replaced += 1
+        self.reject(koreanize, 'need at least 10 foreign/mixed cases')
+
+    def test_ids_units_and_camel_case_fields_are_not_foreign_text(self):
+        self.assertEqual([], VALIDATOR.natural_latin_words('SKU MB-01 DOC1 100 BOX EUR/KRW autoApprove ADMIN'))
+        self.assertEqual(['ricevute'], VALIDATOR.natural_latin_words('운송사 DOC2도 "ricevute 60 BOX"라 한다'))
+
     def test_missing_case(self):
         self.reject(lambda d: d['cases'].pop(), 'exactly 60')
 
@@ -328,6 +343,61 @@ class CorpusValidationTests(unittest.TestCase):
     def test_completion_cannot_union_both_path_effects(self):
         self.reject(lambda d: d['cases'][46]['turns'][0]['oracle']['uatCompletion'].__setitem__(
             'effectComposition', 'ALL_PATHS_COMBINED'), 'only selected completion path effects')
+
+
+class ReviewedCorpusPinTests(unittest.TestCase):
+    """Count-preserving oracle weakening must not survive by regenerating bindings."""
+    ROOT = HERE.resolve().parents[1]
+
+    def copy_tree(self, temp):
+        import shutil
+        for ref in ['verification/model-corpus', 'verification/model-binding']:
+            shutil.copytree(self.ROOT / ref, Path(temp) / ref, ignore=shutil.ignore_patterns('__pycache__'))
+        (Path(temp) / 'verification/requirements').mkdir(parents=True)
+        shutil.copy(self.ROOT / 'verification/requirements/normative-contract-lock.json',
+                    Path(temp) / 'verification/requirements/normative-contract-lock.json')
+        return Path(temp)
+
+    def weaken(self, root, case_id, change):
+        path = root / 'verification/model-corpus/corpus.json'
+        data = json.loads(path.read_text())
+        change(next(c for c in data['cases'] if c['id'] == case_id))
+        path.write_text(json.dumps(data, ensure_ascii=False, indent=2) + '\n')
+        return path, data
+
+    def test_canonical_corpus_matches_reviewed_pin(self):
+        self.assertEqual([], VALIDATOR.reviewed_pin_errors(HERE / 'corpus.json'))
+
+    def test_m16_e1_quantity_weakening_is_structurally_valid_but_pin_rejected(self):
+        import subprocess, sys, tempfile
+        def held_100(case):
+            for turn in case['turns']:
+                for assertion in turn['oracle']['assertions']:
+                    if assertion['path'] == 'response.onHand.value':
+                        assertion['expected'] = '100'
+        with tempfile.TemporaryDirectory() as temp:
+            root = self.copy_tree(temp)
+            path, data = self.weaken(root, 'M16', held_100)
+            self.assertEqual([], VALIDATOR.validate(data))  # the structural validator alone misses it
+            self.assertTrue(VALIDATOR.reviewed_pin_errors(path, root))
+            registry = (root / 'verification/model-binding/registry.json').read_bytes()
+            done = subprocess.run([sys.executable, '-I', str(root / 'verification/model-binding/generate.py')],
+                                  capture_output=True, text=True)
+            self.assertNotEqual(0, done.returncode)
+            self.assertIn('REFUSED', done.stderr)
+            self.assertEqual(registry, (root / 'verification/model-binding/registry.json').read_bytes())
+
+    def test_effect_bound_and_allowed_class_weakening_is_pin_rejected(self):
+        import tempfile
+        mutations = {
+            'M08': lambda case: [e.update(maxNew=e['maxNew'] + 1) for t in case['turns'] for e in t['oracle']['allowedEffects'] if e['class'] != 'READ_AUDIT'],
+            'M03': lambda case: [t['oracle']['assertions'].pop() for t in case['turns'][:1]],
+        }
+        for case_id, change in mutations.items():
+            with self.subTest(case=case_id), tempfile.TemporaryDirectory() as temp:
+                root = self.copy_tree(temp)
+                path, _ = self.weaken(root, case_id, change)
+                self.assertTrue(VALIDATOR.reviewed_pin_errors(path, root))
 
 
 if __name__ == '__main__':

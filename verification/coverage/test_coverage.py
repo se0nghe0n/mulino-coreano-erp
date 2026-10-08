@@ -36,7 +36,7 @@ class CoverageSelftest(unittest.TestCase):
                         tool='java21', db='postgres18', protocol='mcp-v1', client='client-v1', model='model-v1', prompt='prompt-v1', skill='skill-v1')
         report = dict(status='PASS', profile=profile, codeCommit=COMMIT, command=command['display'], exitCode=0,
                       executionIdentity=identity, gateComplete=True, discovered=1, started=1, completed=1, skipped=0, cases=[])
-        receipt = dict(schemaVersion='1.0.0', evidenceClass='ACTUAL', codeCommit=COMMIT, executionIdentity=identity, command=command, versions=versions,
+        receipt = dict(schemaVersion='1.0.0', evidenceClass='ACTUAL', codeCommit=COMMIT, workingTreeClean=True, executionIdentity=identity, command=command, versions=versions,
                        inputs=[self.write('input.json', {'input': 'fixed'})], artifacts=[], reportArtifact=self.write('report.json', report))
         raw = dict(scope={'environmentId': 'test-workspace'}, evidenceClass='ACTUAL_RUNTIME', executionIdentity=identity, command=command, versions=versions,
                    provenance={'source': 'ACTUAL_RUNTIME', 'independent': True}, profileResult=report, observations={})
@@ -131,6 +131,70 @@ class CoverageSelftest(unittest.TestCase):
         profiles = self.a.profiles({'profiles': [{'profile': 'schema', 'reportRef': 'failure.json', 'receiptRef': 'absent.json', 'evidenceClass': 'ACTUAL'}]})
         self.assertEqual('FAIL', profiles['schema']['status'])
 
+    def reachability_problems(self, profiles):
+        # One linked assertion; the oracle requires UNIT(contracts) and API/DB(scenarios).
+        self.write('verification/cases/registry.json', {'expectedCases': 41, 'expectedSubcases': 1, 'cases': []})
+        self.write('verification/cases/T04/case.json', {'caseId': 'T04', 'profiles': profiles, 'subcases': [{
+            'id': 'one', 'fixtureRef': 'fixture.json', 'assertions': [{
+                'id': 'a1', 'oracleRef': {'oracleId': 'T04.decimal-boundary', 'observationNames': ['invalid-decimals']}}]}]})
+        self.write('fixture.json', {'baseRefs': []})
+        observations = {('T04.decimal-boundary', 'invalid-decimals'): {
+            'oracleId': 'T04.decimal-boundary', 'observationName': 'invalid-decimals', 'caseId': 'T04',
+            'requiredProfiles': ['contracts', 'scenarios'], 'assertionLinks': [], 'status': 'NOT_RUN', 'expected': 'REJECTED'}}
+        self.a.declarations(observations)
+        return [p for p in self.a.preparation_problems if 'Unreachable required profile' in p['reason'] or 'unknown verification profile' in p['reason']]
+
+    def test_required_profile_without_case_assertion_fails_preparation(self):
+        problems = self.reachability_problems(['scenarios'])
+        self.assertEqual(1, len(problems))
+        self.assertEqual('FAIL', problems[0]['status'])
+        self.assertIn('requires contracts', problems[0]['reason'])
+
+    def test_every_required_profile_linked_has_no_reachability_problem(self):
+        self.assertEqual([], self.reachability_problems(['contracts', 'scenarios']))
+
+    def test_unknown_case_profile_cannot_satisfy_a_required_profile(self):
+        problems = self.reachability_problems(['scenarios', 'contract'])
+        self.assertTrue(any(p['status'] == 'FAIL' and 'unknown verification profile' in p['reason'] for p in problems))
+        self.assertTrue(any('requires contracts' in p['reason'] for p in problems))
+
+    def test_real_repository_reports_every_unreachable_required_profile(self):
+        # Mutation over the real repository: dropping one declared case profile must surface.
+        a = m.Assembly(HERE.parents[1], COMMIT)
+        _, observations = a.catalog()
+        a.declarations(observations)
+        baseline = {p['reason'] for p in a.preparation_problems if 'Unreachable required profile' in p['reason']}
+        self.assertFalse(any('case T04 ' in r or 'case T09 ' in r or 'case T12 ' in r or 'case T23 ' in r or 'case V8 ' in r for r in baseline))
+        b = m.Assembly(HERE.parents[1], COMMIT)
+        original = b.read
+        def without_contracts(ref, preparation=False):
+            value = original(ref, preparation)
+            if ref == 'verification/cases/T09/case.json':
+                value = dict(value, profiles=[p for p in value['profiles'] if p != 'contracts'])
+            return value
+        b.read = without_contracts
+        _, observations = b.catalog()
+        b.declarations(observations)
+        mutated = {p['reason'] for p in b.preparation_problems if 'Unreachable required profile' in p['reason']}
+        self.assertEqual(13, len([r for r in mutated - baseline if 'case T09 ' in r and 'requires contracts' in r]))
+
+    def test_regulatory_review_observation_reachable_only_through_reviewed_receipt(self):
+        a = m.Assembly(HERE.parents[1], COMMIT)
+        _, observations = a.catalog()
+        declarations = a.declarations(observations)
+        self.assertFalse([p for p in a.preparation_problems if 'case T15 ' in p['reason']])
+        regulatory = {d['subcaseId'] for d in declarations if d['caseId'] == 'T15' and d['profile'] == 'regulatory'}
+        self.assertEqual({'missing-officialSource', 'missing-applicableDate', 'missing-reviewer'}, regulatory)
+        review = dict(officialSourceRef='MFDS-notice-2026-01', jurisdiction='KR', applicableDate='2026-10-01',
+                      reviewerId='qa-regulatory-reviewer', reviewedAt='2026-10-07T00:00:00Z', fictionalFixture=False)
+        for mutant, accepted in [(None, False), (dict(review, reviewerId=''), False), (dict(review, fictionalFixture=True), False),
+                                 (dict(review, officialSourceRef='synthetic-policy-v1'), False), (review, True)]:
+            with self.subTest(review=mutant):
+                report, receipt, raw = self.protocol_fixture('regulatory')
+                if mutant is not None:
+                    receipt['regulatoryReview'] = mutant
+                self.assertEqual(accepted, self.receipt_check(report, receipt, raw, 'regulatory') is not None)
+
     def test_red_and_selftest_are_not_actual_profile_pass(self):
         self.write('pass.json', {'status': 'PASS', 'gateComplete': True})
         for evidence_class in ('SELFTEST', 'CONTRACT_RED'):
@@ -201,6 +265,55 @@ class CoverageSelftest(unittest.TestCase):
         self.a.run_case(declaration, {'schema': {'_report': report, '_receipt': checked, 'status': 'PASS'}})
         self.assertEqual('FAIL', declaration['status'])
 
+    def captured_run(self, observed_quantity):
+        declaration, case, fixture = self.declaration()
+        report, receipt, raw = self.protocol_fixture()
+        action = {'actionId': 'read', 'driverStatus': 'EXECUTED', 'response': {'quantity': observed_quantity},
+                  'provenance': {'scopeComplete': True, 'source': 'ACTUAL_API'}, 'artifactRefs': ['raw.json']}
+        assertion = dict(assertionId='quantity', expected='80', source=declaration['_sub']['assertions'][0]['source'], status='PASS')
+        run = dict(caseId='T01', subcaseId='only', status='PASS', runtimeComplete=True,
+                   caseHash=case['sha256'], fixtureHash=fixture['sha256'], versions=receipt['versions'],
+                   startedAt='2026-10-07T00:00:01Z', finishedAt='2026-10-07T00:00:03Z',
+                   actions={'read': action}, assertions=[assertion])
+        report['cases'] = [run]
+        raw['observations'] = {'read': copy.deepcopy(action)}
+        raw['profileResult'] = copy.deepcopy(report)
+        receipt['inputs'].extend([case, fixture])
+        checked = self.receipt_check(report, receipt, raw)
+        self.assertIsNotNone(checked)
+        self.a.run_case(declaration, {'schema': {'_report': report, '_receipt': checked, 'status': 'PASS'}})
+        return declaration
+
+    def test_runner_pass_is_rechecked_against_captured_bytes(self):
+        self.assertEqual('PASS', self.captured_run('80')['status'])
+        self.a = m.Assembly(self.root, COMMIT)
+        declaration = self.captured_run('100')  # consistent capture, but the runner claimed PASS for 80
+        self.assertEqual('FAIL', declaration['status'])
+        self.assertTrue(any('contradicts independent re-evaluation' in p['reason'] for p in self.a.problems))
+
+    def test_independent_verdict_projection_ops_and_undecidable_references(self):
+        results = {'x': {'data': {'rows': [{'k': 'A', 'q': '80', 'u': 'BOX'}, {'k': 'B', 'q': '20', 'u': 'BOX'}], 'v': '80', 'n': None}}}
+        src = lambda pointer, **extra: dict(actionId='x', pointer=pointer, **extra)
+        cases = [
+            (dict(op='count', source=src('/data/rows', where={'k': 'A'}), expected=1), True),
+            (dict(op='count', source=src('/data/rows', where={'k': 'A'}), expected=2), False),
+            (dict(op='sumEquals', source=src('/data/rows', field='q'), expected='100'), True),
+            (dict(op='sumEquals', source=src('/data/rows', field='q'), expected='90'), False),
+            (dict(op='exactSet', source=src('/data/rows', field=['k', 'q']), expected=[['B', '20'], ['A', '80']]), True),
+            (dict(op='exactSet', source=src('/data/rows', field=['k', 'q']), expected=[['A', '80']]), False),
+            (dict(op='decimalEquals', source=src('/data/v'), expected='80.0', unit='BOX', unitSource=src('/data/rows', field='u')), True),
+            (dict(op='decimalEquals', source=src('/data/v'), expected='80', unit='EA', unitSource=src('/data/rows', field='u')), False),
+            (dict(op='decimalAtMost', source=src('/data/v'), expected='79'), False),
+            (dict(op='absent', source=src('/data/n'), expected=True), False),
+            (dict(op='absent', source=src('/data/missing'), expected=True), True),
+            (dict(op='equals', source=src('/data/v'), expected={'$result': {'actionId': 'x', 'pointer': '/data/v'}}), None),
+            (dict(op='count', source=src('/data/rows', where={'k': {'$alias': 'A'}}), expected=1), None),
+            (dict(op='timeEquals', source=src('/data/v'), expected='80'), None),
+        ]
+        for declared, verdict in cases:
+            with self.subTest(declared=declared):
+                self.assertEqual(verdict, m.independent_verdict(declared, results))
+
     def test_missing_model_usage_remains_null_and_not_run(self):
         model = self.a.model({}, {})
         self.assertEqual('NOT_RUN', model['status'])
@@ -249,7 +362,7 @@ class CoverageSelftest(unittest.TestCase):
                     metric = dict(usage=dict(inputTokens=10, outputTokens=2), cost=dict(amount='0.01', currency='USD', pricingRef='pricing-v1'))
                     call = dict(callId=f'{entry["caseId"]}/{repeat}/{tid}', caseId=entry['caseId'], repeat=repeat,
                                 turnId=tid, provider='test-provider', model='model-v1', artifactRefs=['raw.json'], **copy.deepcopy(metric))
-                    turns.append(dict(turnId=tid, selectedPathId=path, status='PASS', actualModelCalls=1,
+                    turns.append(dict(turnId=tid, selectedPathId=path, status='PASS', actualModelCalls=1, intentMatch=True,
                                       assertionResults=[dict(assertionId=aid, semanticPath=b['semanticPath'], status='PASS') for aid, b in assertions.items()],
                                       modelCalls=[call], **metric))
                 n = len(turns)
@@ -265,6 +378,39 @@ class CoverageSelftest(unittest.TestCase):
         if recapture:
             receipt['_artifactDocuments'] = [{'modelAttempts': copy.deepcopy(runtime['attempts'])}]
         return self.a.model({}, {'model': {'status': 'PASS', '_report': runtime, '_receipt': receipt}})
+
+    def structured_turns(self, runtime, corpus_status):
+        corpus = json.loads((HERE.parents[1] / 'verification/model-corpus/corpus.json').read_text())
+        status = {(c['id'], f'turn-{i}'): t['expectedIntent']['status'] for c in corpus['cases'] for i, t in enumerate(c['turns'], 1)}
+        return [t for a in runtime['attempts'] for t in a['turnResults'] if status[(a['caseId'], t['turnId'])] == corpus_status]
+
+    def test_clear_structured_intent_rate_uses_every_structured_turn_and_95_percent(self):
+        runtime, receipt = self.model_runtime_fixture()
+        model = self.model_check(runtime, receipt)
+        self.assertEqual('PASS', model['status'])
+        self.assertEqual(dict(matched=186, total=186, rate='1.0000', minimumRatio='0.95'), model['clearStructuredIntent'])
+        structured = self.structured_turns(runtime, 'STRUCTURED')
+        self.assertEqual(186, len(structured))  # 62 STRUCTURED turns x3, not only the 20 clear_synonyms cases
+        for turn in structured[:9]:
+            turn['intentMatch'] = False
+        self.a = m.Assembly(self.root, COMMIT)
+        model = self.model_check(runtime, receipt)
+        self.assertEqual('PASS', model['status'], 'a 177/186 structuring rate meets the proposal')
+        structured[9]['intentMatch'] = False
+        self.a = m.Assembly(self.root, COMMIT)
+        model = self.model_check(runtime, receipt)
+        self.assertEqual('FAIL', model['status'], '176/186 is below 0.95')
+
+    def test_ambiguous_turn_mismatch_and_missing_intent_metric(self):
+        runtime, receipt = self.model_runtime_fixture()
+        self.structured_turns(runtime, 'NEEDS_INPUT')[0]['intentMatch'] = False
+        self.assertEqual('FAIL', self.model_check(runtime, receipt)['status'])
+        runtime, receipt = self.model_runtime_fixture()
+        del self.structured_turns(runtime, 'STRUCTURED')[0]['intentMatch']
+        self.a = m.Assembly(self.root, COMMIT)
+        model = self.model_check(runtime, receipt)
+        self.assertEqual('NOT_RUN', model['status'])
+        self.assertIsNone(model['clearStructuredIntent'])
 
     def test_full_common_plus_selected_negative_path_protocol_is_accepted(self):
         for selected in ['SERVER_REJECTION', 'EVIDENCED_PREFLIGHT_STOP']:
@@ -418,6 +564,38 @@ class CoverageSelftest(unittest.TestCase):
         self.a.model_bindings(corpus, registry, report)
         self.assertTrue(any('154 immutable' in p['reason'] and p['status'] == 'FAIL' for p in self.a.preparation_problems))
 
+    def copy_catalog_inputs(self):
+        repository = HERE.parents[1]
+        catalog = json.loads((repository / 'verification/requirements/mandatory-oracles.json').read_text())
+        refs = ['verification/requirements/mandatory-oracles.json', 'verification/requirements/normative-contract-lock.json',
+                'verification/requirements/validate_catalog.py', 'verification/requirements/mandatory-oracles.schema.json']
+        refs += [d['path'] for d in catalog['sourceFiles']]
+        for ref in refs:
+            target = self.root / ref
+            target.parent.mkdir(parents=True, exist_ok=True)
+            target.write_bytes((repository / ref).read_bytes())
+        return catalog
+
+    def test_empty_null_or_non_object_lock_cannot_disable_contract_lock(self):
+        for lock in [{}, None, [], 0, {'oracleContracts': {}}]:
+            with self.subTest(lock=lock):
+                self.a = m.Assembly(self.root, COMMIT)
+                catalog = self.copy_catalog_inputs()
+                e1 = next(o for o in catalog['oracles'] if o['oracleId'] == 'E1.full-flow-quantities')
+                held = next(o for o in e1['expectedObservations'] if o['type'] == 'quantity' and o['expected']['value'] == '80')
+                held['expected']['value'] = '100'
+                self.write('verification/requirements/mandatory-oracles.json', catalog)
+                (self.root / 'verification/requirements/normative-contract-lock.json').write_text(json.dumps(lock))
+                self.a.catalog()
+                self.assertTrue(any(p['status'] == 'FAIL' and 'normative catalog' in p['reason'] for p in self.a.preparation_problems),
+                                self.a.preparation_problems)
+
+    def test_missing_lock_is_not_run_not_pass(self):
+        self.copy_catalog_inputs()
+        (self.root / 'verification/requirements/normative-contract-lock.json').unlink()
+        self.a.catalog()
+        self.assertTrue(any(p['status'] == 'NOT_RUN' and 'normative-contract-lock' in p['reason'] for p in self.a.preparation_problems))
+
     def test_count_preserving_normative_contract_weakening_is_rejected(self):
         repository = HERE.parents[1]
         catalog = json.loads((repository / 'verification/requirements/mandatory-oracles.json').read_text())
@@ -435,6 +613,23 @@ class CoverageSelftest(unittest.TestCase):
         self.assertEqual(499, len(observations))
         self.assertTrue(any(p['status'] == 'FAIL' and 'normative catalog' in p['reason'] for p in self.a.preparation_problems))
 
+    def test_regenerated_model_corpus_weakening_fails_model_preparation(self):
+        repository = HERE.parents[1]
+        for ref in ['verification/model-corpus/corpus.json', 'verification/model-corpus/corpus.schema.json',
+                    'verification/model-corpus/validate.py', 'verification/requirements/normative-contract-lock.json']:
+            target = self.root / ref
+            target.parent.mkdir(parents=True, exist_ok=True)
+            target.write_bytes((repository / ref).read_bytes())
+        self.a.model({}, {})
+        self.assertFalse([p for p in self.a.preparation_problems if 'Model corpus' in p['reason']])
+        corpus = json.loads((self.root / 'verification/model-corpus/corpus.json').read_text())
+        case = next(c for c in corpus['cases'] if c['id'] == 'M16')
+        next(a for t in case['turns'] for a in t['oracle']['assertions'] if a['path'] == 'response.onHand.value')['expected'] = '100'
+        self.write('verification/model-corpus/corpus.json', corpus)
+        self.a = m.Assembly(self.root, COMMIT)
+        self.a.model({}, {})
+        self.assertTrue(any(p['status'] == 'FAIL' and 'reviewed pin' in p['reason'] for p in self.a.preparation_problems))
+
     def test_binding_preparation_cannot_close_model_gate(self):
         corpus = {'cases': [{'id': f'M{i:02}', 'turns': [{}]} for i in range(1, 61)]}
         corpus['cases'][0]['turns'] += [{}] * 13
@@ -447,13 +642,25 @@ class CoverageSelftest(unittest.TestCase):
         self.assertEqual('NOT_RUN', model['status'])
         self.assertTrue(any(i['status'] == 'FAIL' for i in self.a.problems))
 
+    def consistent_not_run_manifest(self):
+        # Mutation tests below need a NOT_RUN manifest. Repository-state preparation FAILs, such as
+        # cross-owner unreachable required profiles, are asserted by their own tests.
+        result = copy.deepcopy(m.Assembly(HERE.parents[1]).assemble({'profiles': []}))
+        result['preparationProblems'] = [p for p in result['preparationProblems'] if p['status'] != 'FAIL']
+        result['coverageProblems'] = [p for p in result['coverageProblems'] if p['status'] != 'FAIL']
+        result.update(status='NOT_RUN', exitCode=2, runtimeStatus='NOT_RUN', artifactCoverageStatus='NOT_RUN',
+                      preparationStatus='NOT_RUN' if result['preparationStatus'] == 'FAIL' else result['preparationStatus'])
+        return m.validate_manifest(result)
+
     def test_real_baseline_absence_is_complete_499_not_run_inventory(self):
         root = HERE.parents[1]
         result = m.Assembly(root).assemble({'profiles': []})
         m.validate_manifest(result)
         self.assertEqual(122, result['oracleCount'])
         self.assertEqual(499, result['observationCount'])
-        self.assertEqual('NOT_RUN', result['status'])
+        # No runtime evidence: NOT_RUN, or FAIL only from observed preparation defects.
+        self.assertIn(result['status'], ('NOT_RUN', 'FAIL'))
+        self.assertEqual(result['status'] == 'FAIL', any(p['status'] == 'FAIL' for p in result['preparationProblems'] + result['coverageProblems']))
         self.assertFalse(result['gateComplete'])
         self.assertFalse(result['productRuntimeClaimed'])
         self.assertEqual('NOT_RUN', result['model']['status'])
@@ -461,7 +668,7 @@ class CoverageSelftest(unittest.TestCase):
         self.assertTrue(all(o['status'] == 'NOT_RUN' for o in result['namedObservations']))
 
     def test_forged_summary_completion_and_downgrade_rejected(self):
-        result = m.Assembly(HERE.parents[1]).assemble({'profiles': []})
+        result = self.consistent_not_run_manifest()
         for flag in ['gateComplete', 'runtimeComplete', 'productRuntimeClaimed']:
             with self.subTest(flag=flag):
                 mutant = copy.deepcopy(result)
@@ -473,6 +680,33 @@ class CoverageSelftest(unittest.TestCase):
         with self.assertRaises(ValueError):
             m.validate_manifest(mutant)
 
+    def test_dirty_working_tree_cannot_identify_a_pass(self):
+        report, receipt, raw = self.protocol_fixture()
+        for value in (False, None):
+            with self.subTest(workingTreeClean=value):
+                mutant = copy.deepcopy(receipt)
+                if value is None:
+                    del mutant['workingTreeClean']
+                else:
+                    mutant['workingTreeClean'] = value
+                self.assertIsNone(self.receipt_check(report, mutant, raw))
+        result = self.consistent_not_run_manifest()
+        forged = dict(copy.deepcopy(result), status='PASS', exitCode=0, gateComplete=True, runtimeComplete=True,
+                      productRuntimeClaimed=True, workingTreeDirty=True)
+        with self.assertRaisesRegex(ValueError, 'dirty'):
+            m.validate_manifest(forged)
+        dirty = m.Assembly(HERE.parents[1], COMMIT, working_tree_dirty=True).assemble({'profiles': []})
+        self.assertTrue(any(p['status'] == 'NOT_RUN' and 'dirty' in p['reason'] for p in dirty['coverageProblems']))
+        self.assertFalse(dirty['gateComplete'])
+
+    def test_saved_manifest_cannot_hide_working_tree_state(self):
+        root = HERE.parents[1]
+        result = m.Assembly(root).assemble({'profiles': []})
+        mutant = copy.deepcopy(result)
+        mutant['workingTreeDirty'] = not result['workingTreeDirty']
+        with self.assertRaisesRegex(ValueError, 'working tree'):
+            m.validate_saved(root, mutant)
+
     def test_saved_manifest_reassembly_rejects_forged_observation_status(self):
         root = HERE.parents[1]
         result = m.Assembly(root).assemble({'profiles': []})
@@ -483,7 +717,7 @@ class CoverageSelftest(unittest.TestCase):
             m.validate_saved(root, mutant)
 
     def test_observed_case_failure_cannot_be_downgraded_to_not_run(self):
-        result = m.Assembly(HERE.parents[1]).assemble({'profiles': []})
+        result = self.consistent_not_run_manifest()
         result['cases'] = [{'caseId': 'T01', 'subcaseId': 'one', 'profile': 'scenarios', 'status': 'FAIL'}]
         with self.assertRaises(ValueError):
             m.validate_manifest(result)

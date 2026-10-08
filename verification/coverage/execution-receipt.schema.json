@@ -11,7 +11,8 @@
     "versions",
     "reportArtifact",
     "inputs",
-    "artifacts"
+    "artifacts",
+    "workingTreeClean"
   ],
   "properties": {
     "schemaVersion": {
@@ -197,6 +198,48 @@
         "MODEL",
         "REGULATORY"
       ]
+    },
+    "regulatoryReview": {
+      "description": "Required for the regulatory profile: actual official-source review record (plan §13.4, R4). Fictional fixtures never qualify.",
+      "type": "object",
+      "required": [
+        "officialSourceRef",
+        "jurisdiction",
+        "applicableDate",
+        "reviewerId",
+        "reviewedAt",
+        "fictionalFixture"
+      ],
+      "properties": {
+        "officialSourceRef": {
+          "type": "string",
+          "minLength": 1
+        },
+        "jurisdiction": {
+          "type": "string",
+          "minLength": 1
+        },
+        "applicableDate": {
+          "type": "string",
+          "minLength": 1
+        },
+        "reviewerId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "reviewedAt": {
+          "type": "string",
+          "minLength": 1
+        },
+        "fictionalFixture": {
+          "const": false
+        }
+      },
+      "additionalProperties": false
+    },
+    "workingTreeClean": {
+      "description": "git status --porcelain was empty for the executed checkout; a dirty run cannot identify codeCommit (plan §13.4).",
+      "const": true
     }
   },
   "additionalProperties": false

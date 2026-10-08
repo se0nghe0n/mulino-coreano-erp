@@ -107,7 +107,7 @@ def make_fixture(env,variant):
  return {'schemaVersion':'1.0.0','fixtureId':env,'synthetic':True,'baseRefs':[],'clock':{'asOf':T,'knownAt':K,'timezone':'Asia/Seoul','precision':'SECOND','deadlineInclusive':True},'versions':{'definition':'definition-v1','evaluator':'evaluator-v1','policy':'SYNTHETIC-platform-v1','candidateCompiler':'7.1.1','schema':'ontology-v1'},'actors':actors,'aliases':aliases,'baseline':baseline,'evidence':[{'alias':'receipt-evidence','sha256':INPUTS[4]['sha256'],'sourceNamespace':'synthetic-platform-warehouse','externalEventId':'R60','sourceVersion':'1','occurredAt':'2026-10-06T09:00:00Z','recordedAt':'2026-10-06T09:00:01Z'}],'responsibilities':([] if variant=='fresh' else [{'scope':{'workAlias':'O1','remainingQuantity':'40','unit':'BOX'},'ownerAlias':'procurement','supervisorAlias':'supervisor','nextAction':'나머지 수령 확인','nextCheckAt':'2026-10-08T09:00:00Z'}])+[{'scope':{'environmentId':env},'ownerAlias':'dataOwner','supervisorAlias':'supervisor','nextAction':'복구 자료와 미해결 책임 대조','nextCheckAt':'2026-10-08T09:00:00Z'}]}
 
 # T23: source preservation and cutover boundaries.
-t=Case('T23','자료를 보존하고 새 schema와 cutover의 경계를 검증한다',['schema','recovery','deployment'])
+t=Case('T23','자료를 보존하고 새 schema와 cutover의 경계를 검증한다',['schema','scenarios','recovery','deployment'])
 s=t.sub('archive-inventory-roundtrip','파일 inventory와 보존 ref를 isolated 환경에서 hash로 복원한다','archive')
 s.host('inventory','archiveInventory',repositoryId='new-ontology-fork',baselineCommit=B2,inventoryId='archive-inventory',inputArtifacts=[INPUTS[0]],inventoryMode='TREE_METADATA_HASH_ONLY',preservationCommit='ae02ff63751714510db4d93a39498b8d51b3697c',requiredFields=['currentHash','classification','replacementPath','archiveRef','owner','validation'])
 s.inspect('inventory')
@@ -210,7 +210,7 @@ for recovery in ['forward','approved-snapshot']:
  s.check('대조-책임-유지','after',D+'recoveryObligations',['ownerId','nextAction','nextCheckAt'],'fieldsPresent',obs=['recovery-boundaries'])
 
 # V8 platform execution gates.
-v=Case('V8','빈 설치와 upgrade 복원 및 환경별 실제 인수를 대조한다',['schema','contracts','recovery','mcp','deployment'])
+v=Case('V8','빈 설치와 upgrade 복원 및 환경별 실제 인수를 대조한다',['schema','contracts','scenarios','recovery','mcp','deployment'])
 s=v.sub('fresh-install-manifest-cqn','exact manifest로 빈 DB를 설치하고 CQN read/action과 outbox를 검증한다','fresh','fresh')
 s.host('install','schemaInstall',schemaVersion='ontology-v1',migrationOwner='Flyway',databaseInitialState='EMPTY',inputArtifacts=[INPUTS[2],INPUTS[3]],selectedStackManifest=ref('setup','/data/runtimeBindings/selectedStackManifest'));s.inspect('install')
 s.invoke('receipt','confirmReceipt',{'quantity':{'value':'60','unit':'BOX'},'itemId':alias('P'),'lotId':alias('LOT'),'placeId':alias('W'),'sourceEventId':'R60','evidenceRef':'receipt-evidence'},subjectRefs=[{'type':'TradeItem','id':alias('P')}])

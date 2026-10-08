@@ -2,6 +2,7 @@
 """Read-only evidence assembly. No product adapter, model call, deployment or waiver."""
 import argparse
 import datetime as dt
+import decimal
 import hashlib
 import importlib.util
 import json
@@ -26,6 +27,7 @@ LAYER_PROFILE = {'UNIT': 'contracts', 'API': 'scenarios', 'DB': 'scenarios', 'MC
                  'MODEL': 'model', 'LOCAL_DEPLOYMENT': 'local-deployment', 'BTP_DEPLOYMENT': 'btp-deployment', 'REGULATORY_REVIEW': 'regulatory'}
 ARTIFACT_CLASSES = {'ACTUAL', 'ACTUAL_HOST', 'ACTUAL_RUNTIME'}
 BAD_MARKERS = ('selftest', 'canned', 'stub', 'fake', 'captured', 'unimplemented')
+REGULATORY_REVIEW_FIELDS = ('officialSourceRef', 'jurisdiction', 'applicableDate', 'reviewerId', 'reviewedAt')
 
 
 def status_of(values):
@@ -70,11 +72,120 @@ def flatten(actions):
     return result
 
 
+RECHECK_OPS = {'equals', 'notEquals', 'present', 'absent', 'decimalEquals', 'decimalAtMost', 'decimalAtLeast', 'sumEquals',
+               'decimalDelta', 'count', 'exactSet', 'relationSet', 'sameAs', 'fieldsPresent'}
+DECIMAL = re.compile(r'-?(0|[1-9][0-9]*)(\.[0-9]+)?')
+
+
+class NotRecheckable(Exception):
+    """The independent re-evaluation cannot decide; it never turns into PASS or FAIL by itself."""
+
+
+def has_reference(node):
+    if isinstance(node, dict):
+        return any(k.startswith('$') for k in node) or any(has_reference(v) for v in node.values())
+    if isinstance(node, list):
+        return any(has_reference(v) for v in node)
+    return False
+
+
+def same_json(left, right):
+    return json.dumps(left, sort_keys=True) == json.dumps(right, sort_keys=True)
+
+
+def recheck_select(results, source):
+    """Mirror of the runner's documented pointer/where/field projection over captured StepResults."""
+    if not isinstance(source, dict) or has_reference(source.get('where')):
+        raise NotRecheckable()
+    try:
+        value = pointer(results[source['actionId']], source['pointer'])
+    except (KeyError, IndexError, TypeError, ValueError) as error:
+        raise NotRecheckable() from error
+    if value is None:
+        raise NotRecheckable()
+    if 'where' in source:
+        if not isinstance(value, list) or any(not isinstance(r, dict) or any(r.get(k) is None for k in source['where']) for r in value):
+            raise NotRecheckable()
+        value = [r for r in value if all(same_json(r[k], v) for k, v in source['where'].items())]
+    if 'field' in source:
+        names = source['field'] if isinstance(source['field'], list) else [source['field']]
+        if not isinstance(value, list) or any(not isinstance(r, dict) or r.get(n) is None for r in value for n in names):
+            raise NotRecheckable()
+        value = [[r[n] for n in names] if isinstance(source['field'], list) else r[names[0]] for r in value]
+    return value
+
+
+def recheck_decimal(value):
+    if not isinstance(value, str) or not DECIMAL.fullmatch(value):
+        return None
+    return decimal.Decimal(value)
+
+
+def independent_verdict(declared, results):
+    """Re-evaluate a declared assertion from captured action bytes. True/False, or None when undecidable."""
+    op, expected = declared.get('op'), declared.get('expected')
+    if op not in RECHECK_OPS or has_reference(expected):
+        return None
+    try:
+        if op == 'absent':
+            try:
+                pointer(results[declared['source']['actionId']], declared['source']['pointer'])
+                return False
+            except (KeyError, IndexError):
+                return True
+        value = recheck_select(results, declared.get('source'))
+        if 'unit' in declared:
+            unit = recheck_select(results, declared.get('unitSource'))
+            units = unit if isinstance(unit, list) else [unit]
+            if not units or any(not same_json(u, declared['unit']) for u in units):
+                return False
+        if op == 'equals':
+            return same_json(value, expected)
+        if op == 'notEquals':
+            return not same_json(value, expected)
+        if op == 'present':
+            return True
+        if op in ('decimalEquals', 'decimalAtMost', 'decimalAtLeast', 'decimalDelta'):
+            left, right = recheck_decimal(value), recheck_decimal(expected)
+            if left is None or right is None:
+                return False
+            if op == 'decimalDelta':
+                if 'unit' in declared:
+                    base_unit = recheck_select(results, declared.get('baselineUnitSource'))
+                    if any(not same_json(u, declared['unit']) for u in (base_unit if isinstance(base_unit, list) else [base_unit])):
+                        return False
+                base = recheck_decimal(recheck_select(results, declared.get('baseline')))
+                return base is not None and left - base == right
+            return left == right if op == 'decimalEquals' else left <= right if op == 'decimalAtMost' else left >= right
+        if op == 'sumEquals':
+            parts = [recheck_decimal(v) for v in value] if isinstance(value, list) else [None]
+            right = recheck_decimal(expected)
+            return None not in parts and right is not None and sum(parts, decimal.Decimal(0)) == right
+        if op == 'count':
+            return isinstance(value, list) and type(expected) is int and len(value) == expected
+        if op in ('exactSet', 'relationSet'):
+            if not isinstance(value, list) or not isinstance(expected, list):
+                return False
+            observed = [json.dumps(v, sort_keys=True) for v in value]
+            wanted = [json.dumps(v, sort_keys=True) for v in expected]
+            return len(observed) == len(set(observed)) and set(observed) == set(wanted)
+        if op == 'sameAs':
+            return same_json(value, recheck_select(results, declared.get('baseline')))
+        if op == 'fieldsPresent':
+            return (isinstance(value, list) and value and isinstance(expected, list)
+                    and all(isinstance(r, dict) and r.get(f) is not None and not (isinstance(r.get(f), str) and not r[f].strip()) for r in value for f in expected))
+    except NotRecheckable:
+        return None
+    return None
+
+
 class Assembly:
-    def __init__(self, root, commit=None):
+    def __init__(self, root, commit=None, working_tree_dirty=None):
         self.root = pathlib.Path(root).resolve()
         self.commit = commit or subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=self.root, text=True).strip()
-        self.working_tree_dirty = True if commit else bool(subprocess.check_output(['git', 'status', '--porcelain'], cwd=self.root, text=True).strip())
+        if working_tree_dirty is None:
+            working_tree_dirty = True if commit else bool(subprocess.check_output(['git', 'status', '--porcelain'], cwd=self.root, text=True).strip())
+        self.working_tree_dirty = working_tree_dirty
         self.problems, self.sources, self.preparation_problems = [], {}, []
 
     def issue(self, status, message, preparation=False):
@@ -121,8 +232,11 @@ class Assembly:
         catalog = self.read('verification/requirements/mandatory-oracles.json', True)
         if catalog is None:
             return [], {}
+        problems_before = len(self.preparation_problems)
         lock = self.read('verification/requirements/normative-contract-lock.json', True)
-        if lock:
+        # Any lock bytes that parsed (including {}, null, [] or 0) must pass the independent
+        # validator. A falsy lock is a FAIL, never a reason to skip the drift fence.
+        if len(self.preparation_problems) == problems_before:
             try:
                 module_ref = 'verification/requirements/validate_catalog.py'
                 self.descriptor(module_ref)
@@ -130,6 +244,7 @@ class Assembly:
                 spec = importlib.util.spec_from_file_location('coverage_normative_validator', self.file(module_ref))
                 validator = importlib.util.module_from_spec(spec)
                 spec.loader.exec_module(validator)
+                validator.check_lock(lock)
                 validator.validate(catalog, lock, self.root)
             except FileNotFoundError:
                 self.issue('NOT_RUN', 'Independent catalog validator/schema source missing', True)
@@ -204,9 +319,21 @@ class Assembly:
                 registered = entry.get('subcaseIds', [])
                 if len(ids) != len(set(ids)) or len(registered) != len(set(registered)) or set(ids) != set(registered):
                     self.issue('FAIL', f'Registry subcase identity mismatch: {case_id}', True)
+            unknown_profiles = sorted(set(effective_profiles(case.get('profiles', []))) - set(PROFILES))
+            if unknown_profiles:
+                self.issue('FAIL', f'Case declares unknown verification profile(s): {case_id} {unknown_profiles}', True)
             for sub in case.get('subcases', []):
                 bundle = self.fixture_bundle(sub.get('fixtureRef'))
-                for profile in effective_profiles(case.get('profiles', [])):
+                sub_profiles = effective_profiles(case.get('profiles', []))
+                # REGULATORY_REVIEW is not a case-declarable execution profile (plan §13.4 records the
+                # official source/applicable date/reviewer separately). A subcase that asserts such an
+                # observation is also declared on the separate regulatory evidence profile, so the
+                # observation is reachable only through an actual reviewed regulatory receipt.
+                if 'regulatory' not in sub_profiles and any(
+                        'regulatory' in observations.get((a.get('oracleRef', {}).get('oracleId'), name), {}).get('requiredProfiles', [])
+                        for a in sub.get('assertions', []) for name in a.get('oracleRef', {}).get('observationNames', [])):
+                    sub_profiles = sub_profiles + ['regulatory']
+                for profile in sub_profiles:
                     declarations.append({'caseId': case_id, 'subcaseId': sub.get('id'), 'profile': profile, 'status': 'NOT_RUN',
                                          'caseHash': self.descriptor(case_ref)['sha256'], 'fixtureArtifacts': bundle,
                                          'assertions': [], '_sub': sub})
@@ -218,12 +345,21 @@ class Assembly:
                         if observation is None or observation['caseId'] != case_id:
                             self.issue('FAIL', f'Unknown/wrong-case oracle observation: {case_id}/{key}', True)
                         else:
-                            for profile in effective_profiles(case.get('profiles', [])):
+                            for profile in sub_profiles:
                                 observation['assertionLinks'].append({'caseId': case_id, 'subcaseId': sub.get('id'), 'assertionId': assertion.get('id'),
                                                                        'profile': profile, 'status': 'NOT_RUN', 'evidenceRefs': assertion.get('evidenceRefs', [])})
         for observation in observations.values():
             if not observation['assertionLinks']:
                 self.issue('NOT_RUN', f'Unlinked observation: {observation["oracleId"]}/{observation["observationName"]}', True)
+                continue
+            # requiredLayers map to required profiles. A profile that no case assertion executes on can
+            # never yield a clause state, so the observation would stay NOT_RUN forever while the
+            # declaration looked complete. That is a preparation defect, not a runtime gap.
+            linked = {link['profile'] for link in observation['assertionLinks']}
+            for profile in observation['requiredProfiles']:
+                if profile not in linked:
+                    self.issue('FAIL', f'Unreachable required profile: {observation["oracleId"]}/{observation["observationName"]} '
+                                       f'requires {profile} but case {observation["caseId"]} links no assertion on that profile', True)
         if registry and (registry.get('expectedCases') != 41 or registry.get('expectedSubcases') != len({(d['caseId'], d['subcaseId']) for d in declarations})):
             self.issue('FAIL', 'Registry discovery counts differ from declaration inputs', True)
         return declarations
@@ -294,8 +430,17 @@ class Assembly:
                     raise ValueError('Canned/stub artifact cannot become ACTUAL')
             if report.get('codeCommit') != receipt.get('codeCommit'):
                 raise ValueError('Report commit differs from actual receipt')
+            if receipt.get('workingTreeClean') is not True:
+                raise ValueError('Actual run from a dirty or unrecorded working tree cannot identify the tested code commit')
             if profile.endswith('-deployment') and receipt.get('environment') != ('BTP' if profile == 'btp-deployment' else 'LOCAL'):
                 raise ValueError('Deployment environment cannot substitute LOCAL for BTP')
+            if profile == 'regulatory':
+                review = receipt.get('regulatoryReview')
+                if not isinstance(review, dict) or any(not nonempty(review.get(k)) for k in REGULATORY_REVIEW_FIELDS):
+                    raise ValueError('Regulatory evidence needs official source, jurisdiction, applicable date, reviewer and review time')
+                instant(review['reviewedAt'])
+                if review.get('fictionalFixture') is not False or any(m in json.dumps(review).lower() for m in BAD_MARKERS + ('synthetic', 'fictional-policy')):
+                    raise ValueError('Fictional fixture/selftest policy cannot become regulatory acceptance')
             if not any(document.get('profileResult') == report for document in documents):
                 raise ValueError('Actual profile report lacks matching independently captured artifact bytes')
             receipt['_artifactPaths'] = output_paths
@@ -408,6 +553,10 @@ class Assembly:
                 if state in ('PASS', 'FAIL'):
                     if actual.get('expected') != declared.get('expected') or actual.get('source') != declared.get('source'):
                         raise ValueError('Runtime assertion differs from declared oracle/source')
+                    # Do not take the runner's PASS on trust: re-evaluate what can be decided from the captured
+                    # action bytes with the declared op/unit/where/field/baseline. Undecidable cases are left to review.
+                    if state == 'PASS' and independent_verdict(declared, action_results) is False:
+                        raise ValueError(f'Runner PASS contradicts independent re-evaluation of {aid} over captured bytes')
                     sources = [declared[key] for key in ['source', 'baseline', 'unitSource', 'baselineUnitSource'] if key in declared]
                     observed = {}
                     for source in sources:
@@ -552,6 +701,24 @@ class Assembly:
         bindings = {}
         case_count = len(corpus.get('cases', [])) if corpus else 0
         turn_count = sum(len(c.get('turns', [])) for c in corpus.get('cases', [])) if corpus else 0
+        if corpus is not None:
+            # Binding hashes only repeat whatever corpus.json holds; the independent corpus
+            # validator and the reviewed lock pin are what fix the model oracle.
+            try:
+                module_ref = 'verification/model-corpus/validate.py'
+                self.descriptor(module_ref)
+                self.descriptor('verification/model-corpus/corpus.schema.json')
+                spec = importlib.util.spec_from_file_location('coverage_corpus_validator', self.file(module_ref))
+                corpus_validator = importlib.util.module_from_spec(spec)
+                spec.loader.exec_module(corpus_validator)
+                corpus_errors = corpus_validator.validate(corpus) + corpus_validator.reviewed_pin_errors(
+                    self.file('verification/model-corpus/corpus.json'), self.root)
+                if corpus_errors:
+                    self.issue('FAIL', 'Model corpus validation/reviewed pin failed: ' + '; '.join(corpus_errors[:5]), True)
+            except FileNotFoundError:
+                self.issue('NOT_RUN', 'Model corpus validator source missing', True)
+            except (ValueError, KeyError, TypeError, AttributeError, OSError) as error:
+                self.issue('FAIL', 'Model corpus validator failed: ' + str(error), True)
         if registry and corpus and report:
             before = len(self.preparation_problems)
             bindings = self.model_bindings(corpus, registry, report)
@@ -572,6 +739,11 @@ class Assembly:
             state, attempts = 'FAIL', []
         wanted = {(f'M{i:02}', n) for i in range(1, 61) for n in range(1, 4)}
         actual = set()
+        # §13.3 proposal: correct structuring of clear requests >=95%. A clear request is every turn the
+        # corpus expects as STRUCTURED (not only the clear_synonyms category); NEEDS_INPUT turns stay exact.
+        expected_status = {(c.get('id'), f'turn-{i}'): t.get('expectedIntent', {}).get('status')
+                           for c in (corpus or {}).get('cases', []) for i, t in enumerate(c.get('turns', []), 1)}
+        intent_matched, intent_total, intent_complete = 0, 0, True
         for attempt in attempts:
             pair = (attempt.get('caseId'), attempt.get('repeat'))
             if type(pair[1]) is not int or not isinstance(pair[0], str) or pair not in wanted or pair in actual:
@@ -603,6 +775,15 @@ class Assembly:
             for turn in turns:
                 if turn.get('status') == 'FAIL' or any(a.get('status') == 'FAIL' for a in turn.get('assertionResults', [])):
                     state = 'FAIL'
+                match, wanted_status = turn.get('intentMatch'), expected_status.get((attempt.get('caseId'), turn.get('turnId')))
+                if type(match) is not bool:
+                    intent_complete = False
+                elif wanted_status == 'STRUCTURED':
+                    intent_total += 1
+                    intent_matched += match
+                elif not match:
+                    self.issue('FAIL', 'Ambiguous/incomplete input was structured differently: ' + str((attempt.get('caseId'), turn.get('turnId'))))
+                    state = 'FAIL'
                 binding = getattr(self, 'model_turn_bindings', {}).get((attempt.get('caseId'), turn.get('turnId')))
                 try:
                     if turn.get('status') != 'PASS' or not binding or not model_validation.selected_assertions(turn, binding):
@@ -621,11 +802,21 @@ class Assembly:
                 state = 'FAIL'
         else:
             complete = False
+        clear_intent = None
+        if complete and intent_complete and intent_total:
+            minimum = model_validation.decimal_ratio((corpus or {}).get('acceptanceProposal', {}).get('clearStructuredMinimumRatio'))
+            rate = model_validation.Decimal(intent_matched) / model_validation.Decimal(intent_total)
+            clear_intent = {'matched': intent_matched, 'total': intent_total, 'rate': str(rate.quantize(model_validation.Decimal('0.0001'))), 'minimumRatio': str(minimum)}
+            if rate < minimum:
+                self.issue('FAIL', f'Clear structured intent rate {intent_matched}/{intent_total} is below the proposed minimum {minimum}')
+                state = 'FAIL'
+        elif complete:
+            complete = False
         if not complete and state != 'FAIL':
             state = 'NOT_RUN'
         if not runtime:
             usage, cost, calls = None, None, None
-        return {'caseCount': case_count, 'turnCount': turn_count, 'plannedRepeats': 3, 'preparationStatus': prepared, 'status': state,
+        return {'caseCount': case_count, 'turnCount': turn_count, 'plannedRepeats': 3, 'preparationStatus': prepared, 'status': state, 'clearStructuredIntent': clear_intent,
                 'actualModelCalls': calls, 'usage': usage, 'cost': cost, 'missingReason': None if state == 'PASS' else 'Actual per-case repeats, per-turn assertions, usage/cost and versioned artifacts incomplete'}
 
     def assemble(self, index=None, check_preparation=False):
@@ -644,7 +835,9 @@ class Assembly:
             transcript.write_text(completed.stdout + completed.stderr)
             self.descriptor(str(transcript))
             report = self.read('verification/harness/target/evidence/prepare.json', True)
-            if completed.returncode == 0 and report and report.get('status') == 'PREPARED' and report.get('codeCommit') == self.commit and report.get('preparedCases') == 41 and not report.get('preparationProblems'):
+            if report and report.get('workingTreeDirty') is not False:
+                preparation = self.issue('NOT_RUN', 'Preparation ran on a dirty/unrecorded working tree; codeCommit does not identify it', True)
+            elif completed.returncode == 0 and report and report.get('status') == 'PREPARED' and report.get('codeCommit') == self.commit and report.get('preparedCases') == 41 and not report.get('preparationProblems'):
                 if report.get('harnessMainClassSha256') == self.descriptor('verification/harness/target/classes/org/mulino/verification/Main.class')['sha256']:
                     preparation = 'PREPARED'
                 else:
@@ -686,12 +879,15 @@ class Assembly:
                 states.append(status_of(clause_states + [profiles[profile]['status']]) if clause_states else 'NOT_RUN')
             observation['status'] = status_of(states)
         model = self.model(index, profiles)
+        if self.working_tree_dirty:
+            # §13.4: evidence must name the exact code commit. Uncommitted changes break that link.
+            self.issue('NOT_RUN', 'Working tree is dirty; codeCommit does not identify the assembled code and evidence inputs')
         preparation = 'FAIL' if any(p['status'] == 'FAIL' for p in self.preparation_problems) else 'PREPARED' if preparation == 'PREPARED' and model['preparationStatus'] == 'PREPARED' else 'NOT_RUN'
         states = [d['status'] for d in declarations] + [o['status'] for o in observations.values()] + [p['status'] for p in profiles.values()] + [model['status']] + [p['status'] for p in self.problems]
         runtime = status_of(states)
         if any(p['status'] == 'FAIL' for p in self.preparation_problems):
             runtime = 'FAIL'
-        complete = runtime == 'PASS' and preparation == 'PREPARED' and not self.preparation_problems
+        complete = runtime == 'PASS' and preparation == 'PREPARED' and not self.preparation_problems and self.working_tree_dirty is False
         status = 'PASS' if complete else 'FAIL' if runtime == 'FAIL' else 'NOT_RUN'
         for declaration in declarations:
             declaration.pop('_sub', None)
@@ -715,6 +911,8 @@ def validate_manifest(value):
     if value.get('status') not in ('PASS', 'FAIL', 'NOT_RUN'):
         raise ValueError('Invalid runtime aggregate status')
     complete = value.get('status') == 'PASS'
+    if complete and value.get('workingTreeDirty') is not False:
+        raise ValueError('PASS from a dirty working tree does not identify the tested code commit')
     if any(value.get(k) is not complete for k in ['gateComplete', 'runtimeComplete', 'productRuntimeClaimed']):
         raise ValueError('Completion flags contradict runtime status')
     if value.get('exitCode') != {'PASS': 0, 'FAIL': 1, 'NOT_RUN': 2}[value['status']]:
@@ -741,6 +939,8 @@ def validate_saved(root, value, index_ref='verification/coverage/runtime-evidenc
     assembly = Assembly(root)
     if value.get('codeCommit') != assembly.commit:
         raise ValueError('Manifest baseline differs from current commit')
+    if value.get('workingTreeDirty') is not assembly.working_tree_dirty:
+        raise ValueError('Manifest working tree state differs from current checkout')
     for descriptor in value.get('inputArtifacts', []):
         assembly.checked_descriptor(descriptor)
     index = assembly.read(index_ref)

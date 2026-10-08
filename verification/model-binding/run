@@ -10,6 +10,9 @@ if mode in ('selftest','gherkin-red'):
  tests='ModelBindingContractTest,ModelBindingEvaluatorTest,ModelBindingResponseEvidenceTest' if mode=='selftest' else 'ModelBindingFeatureRed'
  raise SystemExit(subprocess.call(base+['-Dtest='+tests,'-Dverification.command=verification/model-binding/run '+mode+' '+profile,'-Dmodel.binding.profile='+profile,'test'],cwd=root))
 if mode not in ('prepare','red'): sys.exit('prepare|red|selftest|gherkin-red required')
+# Bindings only repeat corpus hashes; the reviewed lock pin and the corpus validator are the fence.
+corpus_check=subprocess.call([sys.executable,'-I',str(root/'verification/model-corpus/validate.py')],cwd=root)
+if corpus_check: raise SystemExit(corpus_check)
 code=subprocess.call(base+['-Dmaven.test.skip=true','package','dependency:build-classpath','-Dmdep.outputFile=target/model-binding-classpath.txt'],cwd=root)
 if code: raise SystemExit(code)
 cp=str(root/'verification/harness/target/classes')+os.pathsep+(root/'verification/harness/target/model-binding-classpath.txt').read_text().strip()

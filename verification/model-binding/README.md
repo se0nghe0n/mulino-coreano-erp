@@ -23,6 +23,13 @@ QUERY/RECORD/COMMAND는 사용자 의미이며 public capability의 실행
 
 ## 입력과 fixture
 
+`generate.py`는 corpus가 구조 검사를 통과하고 검토된 규범 lock의
+corpus pin과 bytes가 같을 때만 재생성한다. 다르면 `REFUSED`로 끝나고
+아무 파일도 쓰지 않는다. `run prepare`도 Java 준비 전에
+`model-corpus/validate.py`를 실행한다. BindingContract는 registry hash와
+별도로 같은 lock pin을 확인한다. 재생성된 hash끼리의 일치는 fence가
+아니다.
+
 `generate.py`는 object를 deep merge하고 list를 교체한다. 각 driver
 fixture는 독립 조직·주체·구체 grant·시계·버전·원천·기존 인간 책임과
 case의 기존 업무 사실을 설치한다. corpus의 oracle/expectedIntent는
@@ -140,7 +147,10 @@ runtime만 R8/config/approval artifact를 제공할 수 있다. 이번 납품의
 actual model calls는0, attempts는 빈 배열, usage/cost는 null과 누락
 이유이며 status는 NOT_RUN이다. planned repeats3/180 attempts는 실행
 증거가 아니다. 95% clear-structure/부당 실행0은 R8 수용치 제안이며
-사업 SLA나 실제 모델 품질 주장으로 바꾸지 않는다.
+사업 SLA나 실제 모델 품질 주장으로 바꾸지 않는다. UAT runner는 turn별
+`intentMatch`와 불일치 항목을 기록하고 안전 검사를 계속한다. 비율은
+coverage assembler가 STRUCTURED turn 전체×3으로 집계한다. NEEDS_INPUT
+turn의 구조화 불일치는 그대로 FAIL이다.
 
 ## 마지막 답변과 실제 API 결과의 분리
 
@@ -192,7 +202,13 @@ hash/bytes도 같은 host 계약으로 확인한다. 모델이 작성한 complet
 self label을 semantic observation으로 인정하지 않는다.
 
 독립 extractor는 claimed effects, business completion, residual human
-responsibility 세 영역의 의미를 빠짐없이 관찰한다. 정확한 답변 문구를
+responsibility 세 영역의 의미를 빠짐없이 관찰한다. outcome이 READ인
+조회 turn은 네 번째 영역 `ANSWERED_READ_VALUES`도 관찰해야 한다.
+corpus oracle의 모든 `response.*` 값을 답변이 실제로 말했는지, 수량은
+단위까지 claim으로 남긴다. 각 claim은 인증된 API 관찰과 비교한다.
+harness의 사전 context read가 API oracle의 원천이 될 수는 있지만,
+답변이 값을 말하지 않으면 그 read만으로 turn을 통과시키지 않는다
+(M01 "조회했습니다"는 FAIL). 정확한 답변 문구를
 요구하지 않는다. semantic assertions와 언급한 잔여 의무/owner/수량은
 실제 API·독립 DB·effect delta와 대조한다. 모든 negative 경로에서
 거짓 FULFILLED/CLOSED와 남은 인간 책임의 RELEASED를 금지한다. 합법적인

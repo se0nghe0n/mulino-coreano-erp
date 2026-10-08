@@ -22,6 +22,16 @@ exit2다. 형식·환경 오류는 exit3이다. 출력 파일은 Git에 commit�
 `validate.py`의 exit0은 저장 manifest가 현재 입력과 일치한다는 뜻이다.
 manifest가 NOT_RUN이면 제품 PASS가 아니다.
 
+PASS는 깨끗한 working tree에서만 가능하다. 계획 §13.4는 증거가 시험한
+code commit을 정확히 지목하도록 요구한다. 커밋되지 않은 변경이 있으면
+assembler가 NOT_RUN 문제를 남기고, `validate_manifest`는
+`workingTreeDirty=true`인 PASS를 거부한다. schema의 PASS 분기도
+`workingTreeDirty=false`를 요구한다. `validate.py`는 저장 manifest의
+working tree 상태를 현재 checkout과 대조한다. 각 ACTUAL receipt에는
+실행한 checkout의 `workingTreeClean=true`가 필요하다.
+`--check-preparation`도 `prepare.json`의 workingTreeDirty가 false여야
+PREPARED로 인정한다.
+
 `--check-preparation`은 case·registry·catalog·fixture의 필수 입력이 모두
 존재할 때 현재 checkout의 `./verify prepare`를 새로 실행한다. 실제
 Gherkin Pickle/parser, JSON Schema와 정확한 registry 검사를 재사용한다.
@@ -98,6 +108,10 @@ case 결과는 caseHash·fixture/base hash·version·command interval·정확한
 EXECUTED이고 captured artifact의 StepResult와 같아야 한다. 독립 DB 관찰은
 query/snapshot/scopeComplete/independent를 요구한다. assertion의 실제
 source bytes를 observed로 남기며 미관찰을0이나 빈 배열로 바꾸지 않는다.
+runner의 PASS를 그대로 믿지 않는다. 참조(`$result`/`$alias`)가 없는
+assertion은 선언된 op·unit·where·field·baseline으로 캡처된 action bytes에서
+다시 판정하고, runner PASS와 모순되면 FAIL이다. 시간 연산과 참조가 있는
+assertion처럼 결정할 수 없는 경우는 판정하지 않고 review에 남긴다.
 일부 action/assertion/profile 미실행이나 skip은 NOT_RUN이다. 확인된 FAIL은
 receipt/artifact가 나중에 누락돼도 NOT_RUN으로 낮추지 않는다.
 
@@ -111,8 +125,23 @@ actual 증거가 없으면 두 배열은 빈 배열이고 전체 runtime은 NOT_
 schema→contracts→scenarios/recovery→mcp/skills→model/deployment의 필수
 선행을 확인한다. local-deployment와 btp-deployment는 별도 profile이며
 case의 기존 deployment 선언을 둘로 펼친다. regulatory도 별도 필수
-profile이다. 관찰의 requiredLayers는 각 필수 profile에 연결한다.
+profile이다. case schema는 regulatory를 실행 profile로 선언하지 않는다.
+계획 §13.4는 법규 검토의 출처·적용일·검토자를 따로 기록하게 한다.
+그래서 REGULATORY_REVIEW 관찰에 연결된 assertion을 가진 subcase만
+regulatory evidence profile에도 선언한다(현재 T15의 missing-* 3개).
+이 profile의 ACTUAL receipt는 `regulatoryReview`의 officialSourceRef·
+jurisdiction·applicableDate·reviewerId·reviewedAt과
+`fictionalFixture=false`가 필요하다. 가상 fixture나 synthetic 정책은
+규제 인수가 아니다. 관찰의 requiredLayers는 각 필수 profile에 연결한다.
 그 경로에 실행 assertion이 없으면 해당 관찰을 PASS로 바꾸지 않는다.
+
+필수 profile에 연결된 assertion이 하나도 없는 관찰은 실행해도 영원히
+NOT_RUN이다. 준비 단계에서 이를 `Unreachable required profile` FAIL로
+보고하므로 preparationStatus는 PREPARED가 될 수 없다. 링크는 case가
+선언한 profile에서만 생기므로 case의 `profiles`가 oracle의
+requiredLayers를 모두 덮어야 한다. 알 수 없는 profile 선언도 FAIL이다.
+profile 선언은 필요조건일 뿐이다. 그 profile에서 실제 MCP·skill 경로를
+지나는 action인지는 case review가 확인한다.
 
 T25의 verifyCoverage는 지정된 입력 snapshot의 연결·누락·상태 분류를
 검사한다. snapshot 자체나 T25 결과가 전체 gate PASS일 필요는 없다.
@@ -126,6 +155,10 @@ semantic path를 model-binding registry/binding/source pointer와 대조한다.
 준비 report의 corpus/registry hash와 inputArtifacts의 모든 binding,
 fixture, feature, semantic path 및 runner/schema source hash도 직접 읽는다.
 동일 count를 유지하면서 다른 case/turn/pointer/path로 바꾸는 변조를 거부한다.
+binding hash끼리의 일치는 재생성으로 맞춰지므로, corpus 자체를
+`model-corpus/validate.py`로 검사하고 규범 lock의 T25 corpus pin과
+bytes가 같은지 확인한다. 기대값·maxNew·효과 class·의무를 count를
+유지한 채 바꾸고 binding을 재생성해도 준비 FAIL이다.
 기존 binding parser/schema 검사는 해당 작성자의 준비 report가 맡는다.
 
 실제 runtime은60 case×3회=180 unique attempt와73 turn×3회를 별도
