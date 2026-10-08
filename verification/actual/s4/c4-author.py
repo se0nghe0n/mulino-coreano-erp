@@ -41,7 +41,8 @@ up=json.loads((D/'e1-upstream.json').read_text())['actions']; dispatch=json.load
 selected=[]
 for a in up:
  i=a['id']
- if a['type'] in ['observe','query','parallel'] or i.startswith(('unidentified','sourceB','receipt40','s40','RANGE40','RANGE5','other-actor','assess-')):continue
+ # receipt40 and its QC hold40 belong to E1 only; C4 keeps the receipt100 path.
+ if a['type'] in ['observe','query','parallel'] or i.startswith(('unidentified','sourceB','receipt40','s40','e1-qc-hold40','RANGE40','RANGE5','other-actor','assess-')):continue
  if a['type']=='uuid' and i!='RANGE60' and i!='shipment-physical-range':continue
  if i=='receipt60-confirm':a=copy.deepcopy(a);a['type']='command'
  selected.append(a)
@@ -56,6 +57,10 @@ ids=[a['id'] for a in selected]
 for i in sorted(ids,key=len,reverse=True):
  text=text.replace('"'+i+'"','"c4-'+i+'"').replace('$'+i+'.','$c4-'+i+'.').replace('"'+i+'.','"c4-'+i+'.')
 selected=json.loads(text)
+# Only action IDs are prefixed; uuid domain aliases such as RANGE60 stay bound
+# under the name every receipt reference reads.
+for a in selected:
+ if a['type']=='uuid':a['alias']=a['alias'][3:] if a['alias'].startswith('c4-') else a['alias']
 for a in selected:
  a.pop('assertions',None)
  if a['type']=='command':a['request']['commandIdempotencyKey']=a['id']
@@ -75,7 +80,7 @@ base=copy.deepcopy(json.loads((D/'e1-sales-return.json').read_text())['actions']
 # Sales/dispatch/delivery100; explicit consumed allocation assertion before delivery.
 cut=next(i for i,a in enumerate(base) if a['id']=='e1-delivery-revision')
 base=base[:cut]
-s=json.dumps(base).replace('e1-','c4-').replace('native-s4','native-c4').replace('"30"','"100"').replace('$receipt60.','$c4-receipt60.').replace('$RANGE60','$c4-receipt60.segment')
+s=json.dumps(base).replace('e1-','c4-').replace('native-s4','native-c4').replace('"30"','"100"').replace('$receipt60.','$c4-receipt60.')
 base=json.loads(s)
 for a in base:
  if a['type']=='command':a['request']['commandIdempotencyKey']=a['id']
@@ -85,7 +90,7 @@ base.insert(idx,obs('c4-consumed-before-real-delivery',[rows('mulino_inventory_s
 write('c4-delivery100.json',dict(schemaVersion='1.0.0',status='NOT_RUN',actions=base))
 a=[obs('c4-history100-before-return',[total('mulino_trade_sales_deliveries','quantity','100'),total('mulino_inventory_quantitysegments','quantity','100',dict(retiredat=None,placeid='$CUSTOMER_PLACE'))],{'DELIVERY_REV':dict(pointer='/rawRows/mulino_trade_sales_deliveries',where=dict(id='$DELIVERY'),column='revision'),'SALES_REV':dict(pointer='/rawRows/mulino_work_read_works',where=dict(id='$SALES_WORK'),column='revision')})]
 a+=[cmd('c4-assess-delivery100','assessGoal',dict(workId='$SALES_WORK'),rev='$SALES_REV',bind={'PAST_ASSESSMENT':'/effects/assessmentId'},assertions=[dict(pointer='/assessment/outcome',operator='equals',expected='SATISFIED')]),cmd('c4-return-authorize20','authorizeReturn',dict(deliveryId='$DELIVERY',startQuantity='0',quantity='20',unit='BOX',destinationId='$W',validUntil='2026-10-31T00:00:00Z',reason='실제 반품20은 과거 인도와 별도 사건이다'),rev='$DELIVERY_REV',actor='supervisor',bind={'RETURN_AUTHORIZATION':'/effects/authorizationId'}),dict(id='c4-return-event',type='uuid',alias='RETURN_EVENT'),cmd('c4-return-intake20','receiveReturn',dict(authorizationId='$RETURN_AUTHORIZATION',eventId='$RETURN_EVENT',occurredAt=T,nextCheckAt=N),intent='RECORD',bind={'RETURN':'/effects/returnId'})]
-r=dict(returnId='$RETURN',kind='RETURN_RECEIPT',eventId='$RETURN_EVENT',deliveryId='$DELIVERY',customerId='$C',itemId='$P',lotId='$L',rangeRootId='$c4-receipt60.segment',startQuantity='0',quantity='20',unit='BOX',placeId='$W',workId='$SALES_WORK',occurredAt=T)
+r=dict(returnId='$RETURN',kind='RETURN_RECEIPT',eventId='$RETURN_EVENT',deliveryId='$DELIVERY',customerId='$C',itemId='$P',lotId='$L',rangeRootId='$DISPATCH_RANGE',startQuantity='0',quantity='20',unit='BOX',placeId='$W',workId='$SALES_WORK',occurredAt=T)
 a+=[orig('c4-return-original','RETURN_RECEIPT',r,'$RETURN','20',subject='RETURN',subjectid='$RETURN',place='$W')]+link('c4-return-original','$RETURN','20')+[cmd('c4-return-confirm20','receiveReturn',dict(returnId='$RETURN',canonicalOccurrenceId='$c4-return-original.canonical',nextCheckAt=N),intent='RECORD'),obs('c4-return-distinct-history',[total('mulino_trade_sales_deliveries','quantity','100'),total('mulino_trade_returns_receipts','quantity','20'),total('mulino_inventory_quantitysegments','quantity','20',dict(retiredat=None,placeid='$W')),total('mulino_inventory_quantitysegments','quantity','80',dict(retiredat=None,placeid='$CUSTOMER_PLACE'))])]
 # Correct immutable physical delivery event through the public command; original
 # importer supplies bytes/document only, never a corrected canonical/effect.
@@ -96,6 +101,6 @@ for q,known,prev,rev in [('98','2026-10-07T09:00:03Z','$c4-delivery-original.eve
  payload=json.dumps(c,separators=(',',':'))
  payload=re.sub(r'"\$([^" ]+)"',lambda m:'"${'+m.group(1)+'}"',payload)
  a += [cmd(i+'-event','correctEvidence',dict(subject=dict(kind='WORK',id='$SALES_WORK'),kind='PHYSICAL_DELIVERY',sourceNamespace='native-c4-'+i,externalEventId=i,sourceVersion='2',effectiveFrom=T,timeZone='UTC',timePrecision='SECOND',valueState='PRESENT',payload=payload,supersedesId=prev,documentId='$'+i+'.document',assertion='명시적 실제 인도 정정',quantity=q,unit='BOX',evidenceType='EVENT'),rev=rev,intent='RECORD',bind={i+'.event':'/id',i+'.claim':'/claimId'})]+link(i,'$DELIVERY_OBSERVATION',q,version='2')
-a += [obs('c4-correct98-independent',[rows('mulino_evidence_events',dict(id='$c4-delivery-original.event'),1),rows('mulino_evidence_events',dict(id='$c4-correction98.event',supersedesid='$c4-delivery-original.event'),1),rows('mulino_work_read_assessments',dict(id='$PAST_ASSESSMENT',outcome='SATISFIED'),1),total('mulino_trade_sales_deliveries','quantity','100'),total('mulino_trade_sales_deliverycorrections','quantity','98'),total('mulino_trade_returns_receipts','quantity','20'),total('mulino_inventory_quantitysegments','quantity','20',dict(retiredat=None,placeid='$W')),total('mulino_inventory_quantitysegments','quantity','80',dict(retiredat=None,placeid='$CUSTOMER_PLACE')),total('mulino_inventory_quantitysegments','quantity','0',dict(retiredat=None,placeid='$TRANSIT')),total('mulino_work_read_obligationreferences','quantity','2',dict(kind='DELIVERY_CORRECTED_DEFICIT',status='OPEN',valid=True)),duties('DELIVERY_CORRECTED_DEFICIT')])]
+a += [obs('c4-correct98-independent',[rows('mulino_evidence_events',dict(id='$c4-delivery-original.event'),1),rows('mulino_evidence_events',dict(id='$c4-correction98.event',supersedesid='$c4-delivery-original.event'),1),rows('mulino_work_read_assessmentreferences',dict(id='$PAST_ASSESSMENT',outcome='SATISFIED'),1),total('mulino_trade_sales_deliveries','quantity','100'),total('mulino_trade_sales_deliverycorrections','quantity','98'),total('mulino_trade_returns_receipts','quantity','20'),total('mulino_inventory_quantitysegments','quantity','20',dict(retiredat=None,placeid='$W')),total('mulino_inventory_quantitysegments','quantity','80',dict(retiredat=None,placeid='$CUSTOMER_PLACE')),total('mulino_inventory_quantitysegments','quantity','0',dict(retiredat=None,placeid='$TRANSIT')),total('mulino_work_read_obligationreferences','quantity','2',dict(kind='DELIVERY_CORRECTED_DEFICIT',status='OPEN',valid=True)),duties('DELIVERY_CORRECTED_DEFICIT')])]
 write('c4-history-return-correction.json',dict(schemaVersion='1.0.0',status='NOT_RUN',actions=a))
 write('c4-flow.json',dict(schemaVersion='1.0.0',status='NOT_RUN',requiredCases=['C4','T17_CONSUMED'],fullCaseCoverageClaimed=False,actions=[dict(id='c4-setup',type='setup',fixtureRef='verification/actual/s4/c4-fixture.json',organizationAlias='ORG')]+[dict(id='c4-include-'+x,type='include',scriptRef='verification/actual/s4/'+x+'.json') for x in ['c4-upstream','c4-delivery100','c4-history-return-correction']]))

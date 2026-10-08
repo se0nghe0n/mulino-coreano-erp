@@ -165,7 +165,7 @@
             "customerId": "$C",
             "itemId": "$P",
             "lotId": "$L",
-            "rangeRootId": "$c4-receipt60.segment",
+            "rangeRootId": "$DISPATCH_RANGE",
             "startQuantity": "0",
             "quantity": "20",
             "unit": "BOX",
@@ -344,7 +344,7 @@
             "customerId": "$C",
             "itemId": "$P",
             "lotId": "$L",
-            "rangeRootId": "$c4-receipt60.segment",
+            "rangeRootId": "$DISPATCH_RANGE",
             "physicalScopeId": "$DELIVERY_OBSERVATION",
             "startQuantity": "0",
             "quantity": "98",
@@ -394,7 +394,7 @@
           "timeZone": "UTC",
           "timePrecision": "SECOND",
           "valueState": "PRESENT",
-          "payload": "{\"deliveryEventId\":\"${DELIVERY_EVENT}\",\"dispatchId\":\"${DISPATCH}\",\"cargoScopeId\":\"${CARGO}\",\"salesLineId\":\"${SALES_LINE}\",\"customerId\":\"${C}\",\"itemId\":\"${P}\",\"lotId\":\"${L}\",\"rangeRootId\":\"${c4-receipt60.segment}\",\"physicalScopeId\":\"${DELIVERY_OBSERVATION}\",\"startQuantity\":\"0\",\"quantity\":\"98\",\"unit\":\"BOX\",\"placeId\":\"${CUSTOMER_PLACE}\",\"occurredAt\":\"2026-10-07T09:00:02Z\",\"correctionOfDeliveryId\":\"${DELIVERY}\"}",
+          "payload": "{\"deliveryEventId\":\"${DELIVERY_EVENT}\",\"dispatchId\":\"${DISPATCH}\",\"cargoScopeId\":\"${CARGO}\",\"salesLineId\":\"${SALES_LINE}\",\"customerId\":\"${C}\",\"itemId\":\"${P}\",\"lotId\":\"${L}\",\"rangeRootId\":\"${DISPATCH_RANGE}\",\"physicalScopeId\":\"${DELIVERY_OBSERVATION}\",\"startQuantity\":\"0\",\"quantity\":\"98\",\"unit\":\"BOX\",\"placeId\":\"${CUSTOMER_PLACE}\",\"occurredAt\":\"2026-10-07T09:00:02Z\",\"correctionOfDeliveryId\":\"${DELIVERY}\"}",
           "supersedesId": "$c4-delivery-original.event",
           "documentId": "$c4-correction98.document",
           "assertion": "명시적 실제 인도 정정",
@@ -498,7 +498,7 @@
           "expected": 1
         },
         {
-          "pointer": "/rawRows/mulino_work_read_assessments",
+          "pointer": "/rawRows/mulino_work_read_assessmentreferences",
           "operator": "matchingRows",
           "where": {
             "id": "$PAST_ASSESSMENT",
