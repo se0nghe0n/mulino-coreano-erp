@@ -30,8 +30,10 @@ SIT의 scripted agent와 UAT의 실제 model은 같은 fixture·시나리오·�
 모델의 표현과 중간 경로는 달라질 수 있으므로 허용 효과와 최종 책임을
 검증한다. 통합 경로를 mock으로 바꿔 통과시키지 않는다.
 
-미구현 `@pending` 사례는 목록과 이유를 별도 출력하고 NOT_RUN으로
-보고한다. 태그 삭제는 기능 구현과 실제 SIT 통과 증거가 있을 때 한다.
-UAT 사전 조건이 없으면 skip 이유를 기록하고 PASS에서 제외한다.
+미구현 사례는 suite에 남기고 `NOT_IMPLEMENTED` assertion RED(skip0)로
+실패시킨다. 제품 미실행은 profile/subcase `NOT_RUN`과 `./verify` exit2로
+보고하며 `@pending` 태그는 쓰지 않는다. 구현과 실제 SIT 통과 증거가 있을 때만
+해당 profile을 PASS로 올린다([저장소 harness](repository-harness.md)).
+UAT 사전 조건이 없으면 원인을 기록하고 해당 UAT를 NOT_RUN으로 둔다.
 실제 model 호출은 승인한 비용 범위에서 수행하며 runtime/model·실행별
 결과·실패 원인·token·비용·최종 업무 상태를 기록한다.

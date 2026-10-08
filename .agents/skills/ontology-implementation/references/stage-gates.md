@@ -7,21 +7,13 @@
 통합 인수 관문이다. 예를 들어 사용자 단계1의 skill 작성은 S5 전체의
 완료가 아니며, 단계2의 테스트 준비는 S0 기술 검증의 성공이 아니다.
 
-| 사용자 단계 | 산출물과 지정 실행 모델/effort |
-|---|---|
-| 1 | 개발 skill 작성: GPT-6.1 Sol high |
-| 2 | 테스트 구현: GPT-6.1 Sol high |
-| 3 | 애플리케이션 구현: GPT-6.1 Sol medium |
-| 4 | E2E 검증·교정: GPT-6.1 Sol low |
-| 5 | 재사용 패턴/추상화 검토와 구현 refactoring: GPT-6 Astra high |
-| 6 | 검증된 실제 동작으로 운영 매뉴얼 작성: GPT-6 Astra low |
-| 7 | 지정 순서를 반복해 남은 실패/공백 해소 |
-
-각 사용자 단계의 통합 산출물은 다음 단계 전에 실제 GPT-6.1 Sol xhigh와
-GPT-6 Astra low의 review를 받는다. coordinator가 두 결과를 대조하고
-조치할 지적을 통합·재검증해야 단계를 닫는다. prompt에 모델 이름을 적는
-것은 runtime model/effort 선택이 아니다. 지원되지 않으면 실제 제한을
-보고하며 성공한 review처럼 표시하지 않는다.
+단계별 모델·effort와 매 단계의 adversarial reviewer(이미 닫은 Step 1·2의
+재검토 포함)는 저장소 루트 [AGENTS.md](../../../../AGENTS.md)의 현재 표가
+단일 원본이다. 이 skill에 표를 복제하지 않는다. AGENTS.md가 바뀌면 그
+표를 따른다. 단계의 통합 산출물은 지정 reviewer의 검토와 지적 통합·수정·
+재검증 뒤에 닫는다. prompt에 모델 이름을 적는 것은 runtime model/effort
+선택이 아니며, 지정 모델을 쓸 수 없으면 실제 제한을 보고하고 성공한
+review처럼 표시하지 않는다.
 
 테스트를 먼저 만드는 사용자 순서를 S gate의 순환 의존으로 바꾸지 않는다.
 테스트 단계에서는 계획의 공개 계약·fixture·oracle와 필요한 harness를
@@ -70,15 +62,16 @@ Flyway만 DDL을 실행하며 CAP 자동 deployer와 경쟁시키지 않는다.
 ## S0–S6 종료 증거의 위치
 
 정확한 acceptance는 계획 §11·§13을 따른다. 이 표는 해당 작업을 찾는
-index다. 앞선 seed/stub 통과는 뒤의 전체 command gate를 대신하지 않는다.
+index이며 빠진 항목은 계획 원문이 우선한다. 앞선 seed/stub 통과는 뒤의
+전체 command gate를 대신하지 않는다.
 
 | Gate | 반드시 함께 통합하는 범위 |
 |---|---|
-| S0 | 추적 issue/Phase/fork, 보존 ref·자료 inventory, exact stack decision, schema 소유, auth/MCP 계약 |
-| S1 | 정의/type/cardinality, item/LOT/segment/계보, 사건/문서, 조직/grant/read, 빈 DB·CQN·두 진입점 |
+| S0 | 추적 위치(R2는 로컬 추적 확정), 보존 ref·자료 inventory, exact stack decision, schema 소유, auth/MCP 계약 |
+| S1 | 정의/type/cardinality, item/LOT/segment/계보, 사건/문서, 조직/grant/read, 빈 DB·CQN·두 진입점, D02–D08 기본 tests, V1 schema compatibility |
 | S2 | GoalVersion/evaluator, 의무/인계, approval/idem/audit, outbox/claim/reconciler와 core C2/C3/C5·V1/V4–V7 |
-| S3 | 구매100→실수령60+40, canonical 증거, 운송/기관/QC 독립 범위, 잔여 책임, 실제 수령 V6 |
-| S4 | C1/C4, 판매/인도/반품/회수/정산, V2/V3, E1과 겹친 제한·회수 oracle |
+| S3 | 구매100→실수령60+40, canonical 증거, 운송/기관/QC 독립 범위, 초과/부족·부분 기관처리·겹친 제한·취소 잔여 의무, D13–D16·C1/C5 관련 tests, 실제 수령 V6 |
+| S4 | C1/C4, 판매/부분 인도·거부/반품·정정/회수 대조·추적 후보/정산·송장 차이, V2/V3, E1과 겹친 제한·회수 oracle |
 | S5 | 전체 MCP/action 경로, 6 운영 skills, 실제 client 발견/로딩/호출, 정의 전환/MRTR, 전체 V1/V4–V7, 승인된 실모델 |
 | S6 | V8 새 ontology v1→v2, 운영 identity/TLS/binding, retention·restore·cutover, 모든 D/C/V/E 실제 인수 |
 
@@ -96,7 +89,7 @@ blockedStep, evidencePath`를 기록한다. 미정 이유·안전한 상태·결
 | 결정 | 닫을 근거 / 닫히지 않은 범위의 처리 |
 |---|---|
 | R1 stack | S0 exact manifest+spike logs / CAP 확정 주장 금지 |
-| R2 추적 | 실제 fork issue·Phase·board 경계 / 기존 board scope 자동 변경 금지 |
+| R2 추적 | 로컬 추적으로 확정(`docs/execution/decisions.md`) / 원격 issue·board·repository 설정 변경 금지 |
 | R3 자료 | authoritative DB/blob/외부 효과/의무 존재 inventory / fresh fixture와 자료 cutover 분리 |
 | R4 품목·규제 | 공식 source·관할·적용일·확인자 있는 policy / 법적 허용 미확인 |
 | R5 신원·책임 | local fixture와 실제 identity/grant/승인자/intake owner/supervisor mapping / 해당 scope 활성화 금지 |

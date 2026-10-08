@@ -31,6 +31,10 @@ Adapter에서 물량·승인·목표 판정 규칙을 복제하지 않는다.
 
 - MCP wire, MRTR, 입력 초안과 최종 효과를 구현할 때
   [protocol-and-intent.md](references/protocol-and-intent.md)를 읽는다.
+- MCP tool·worker handler로 쓰기/조회 면을 노출하거나 조회 schema를 바꿀 때
+  [implementation-contracts.md](../ontology-implementation/references/implementation-contracts.md)의
+  "쓰기 노출 면과 조회 계약"을 읽는다. tool 목록과 worker registry도 V4
+  열거 대상이다.
 - grants·approval, worker/outbox, 정의 호환, runtime package 또는
   client 인수를 구현할 때
   [runtime-and-client.md](references/runtime-and-client.md)를 읽는다.
@@ -67,10 +71,14 @@ Adapter에서 물량·승인·목표 판정 규칙을 복제하지 않는다.
 없으면 `NOT_RUN`이다. 구조 검증, wire 검증, client 발견/로딩,
 실제 tool 실행, 실모델 의미 평가는 서로 다른 증거다.
 
-`verification/manifest.json`에는 commit, 관련 version, fixture hash,
-실행 command·시각, expected/observed, artifact와 PASS/FAIL/NOT_RUN을
-연결한다. `./verify mcp`, `./verify skills`, `./verify model`은 계획의
-납품 entrypoint다. 파일이 존재하고 실제 command/exit code가 확인된
-경우에만 실행 가능하다고 보고한다. 유료 모델과 배포는 확정된 비용
-범위의 승인 안에서 실행한다. 필수 client/model/BTP 미인수를 성공이나
-비대상으로 바꾸지 않는다.
+증거는 저장소의 실제 pipeline에서 인용한다(`verification/manifest.json`은 없다).
+실행은 `./verify`·`verification/actual/sN/run.sh`, receipt·index·조립은
+`verification/coverage`, 결과는
+`verification/harness/target/evidence/runtime-manifest.json`이다.
+증거 class와 보고 규칙은
+[저장소 harness](../ontology-scenario-testing/references/repository-harness.md)를
+따른다. ACTUAL receipt가 검증되지 않은 PASS 주장은 `NOT_RUN`이다.
+`./verify mcp`, `./verify skills`, `./verify model`은 해당 profile의 실제 adapter가
+연결되기 전에는 `NOT_RUN`(exit2)이다. 실제 command와 exit code를 확인한 결과만
+보고한다. 유료 모델과 배포는 확정된 비용 범위의 승인 안에서 실행한다. 필수
+client/model/BTP 미인수를 성공이나 비대상으로 바꾸지 않는다.

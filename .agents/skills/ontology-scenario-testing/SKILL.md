@@ -14,15 +14,20 @@ T01–T26, C1–C5, V1–V8, E1/E2가 인수 기준이다. 명사·동사 진입
 
 ## 읽을 자료
 
+- 새 사례를 쓰거나 실행·증거를 보고할 때 먼저
+  [저장소 harness](references/repository-harness.md)를 읽는다. `./verify`
+  명령과 exit code, case 구성, 실행 가능한 Gherkin 문법, NOT_RUN 처리,
+  증거 pipeline·class, V4 경로 열거, 명사·동사 비교가 있다.
 - 테스트 계층을 설계할 때 [방법론](references/methodology.md)을 읽는다.
   #57에서 업무 시나리오·공통 SIT/UAT·보류 증거 원칙을 재사용했다.
 - 반례와 종단 수량을 작성할 때
   [인수 oracle](references/acceptance-oracles.md)을 읽는다.
   상세 도메인 계약은 구현 계획을 기준으로 확인한다.
-- 새 사례는 [Gherkin 양식](assets/scenario.feature.template)을 복사해
-  목표·fixture·행동·assertion을 구체화한다.
-- 실행 결과는 [증거 양식](assets/evidence.json)을 복사해 실제 값으로
-  채운다. 이 양식 자체는 실행된 테스트나 PASS 증거가 아니다.
+- 새 사례는 [Gherkin 양식](assets/scenario.feature.template)에서 시작한다.
+  harness 문법을 따르는 양식이며 case.json·fixture는
+  `verification/harness/src/test/resources/examples/HARNESS-EXAMPLE/`를 복사한다.
+- 별도 증거 양식은 없다. 실행 증거는 `./verify`와 `verification/coverage`
+  pipeline이 만든 receipt·manifest뿐이며 손으로 채운 JSON은 PASS 증거가 아니다.
 
 ## 테스트 선행과 Step gate
 
@@ -47,9 +52,11 @@ oracle를 구현 결과에 맞추거나 실패 case를 삭제하지 않는다.
 
 1. D 요구와 T/C/V/E case를 연결하고 정상·예외·경계 결과를 정한다.
    ID 개수만 맞추지 말고 각 연결에 실제 assertion과 artifact를 둔다.
-2. `# language: ko` Gherkin으로 업무 프로세스를 표현한다. 단계는
-   수행 역할·대상·행동으로 시작하고 `그러면`은 수량·상태·의무·담당을
-   검증한다. 같은 규칙의 입력 변형에만 Scenario Outline을 쓴다.
+2. `# language: ko` Gherkin으로 업무 프로세스를 표현한다. 단계는 harness의
+   세 문장 형태를 따르고(`repository-harness.md`), `그러면`의 설명 인자에
+   수량·단위·상태·의무·담당을 적어 업무 독자가 읽을 수 있게 한다. 같은
+   규칙의 입력 변형은 독립 subcase로 선언하며 Scenario Outline example도
+   subcase 수에 포함한다.
 3. fixture는 독립 disposable DB/문서 저장소에 만든다. 실제 운영 자료,
    credential, 외부 발주·제출·이체를 사용하지 않는다. 조직·주체·grant,
    정의/evaluator/정책 버전, 품목/단위·LOT·구별 가능한 물량, 증거 hash와
@@ -72,9 +79,13 @@ runtime의 결합을 검증한다. 테스트 전용 scripted agent는 정해진 
 
 응답의 정확한 수량·판정·구조화 outcome을 검증하고 DB 원장·배분·
 의무·감사·outbox와 대조한다. 명사와 동사 조회는 같은 ID·snapshot과
-평가시점에서 비교한다. 테스트가 호출하는 실제 command·인증 주체와
+평가시점에서 필드별로 비교하고 paging 안정성도 확인한다
+(`repository-harness.md`). 테스트가 호출하는 실제 command·인증 주체와
 효과 scope를 기록한다. 응답 필드 존재, 오류 문구, UI 라벨, 내부
 메서드 호출 여부만 확인해서 업무 PASS를 주장하지 않는다.
+
+V4의 우회 경로 집합은 고정 목록이 아니라 실행 중 시스템이 노출한 쓰기 면을
+열거해 만든다(`repository-harness.md`).
 
 거부·권한 없음·재시도 사례는 전후 상태를 비교해 금지된 수량 변경,
 배분·승인·업무·외부 요청 생성이 없음을 증명한다. 정책이 허용하는
@@ -113,14 +124,17 @@ UAT/배포는 NOT_RUN과 원인으로 기록한다. R8의 실제 수용치·비�
 
 ## 증거와 완료 판정
 
-case 결과는 PASS/FAIL/NOT_RUN이다. `@pending`, skip, 접속 실패,
+case 결과는 PASS/FAIL/NOT_RUN이다. skip, 접속 실패, `NOT_IMPLEMENTED`,
 일부 단계만 실행한 사례는 전체 PASS가 아니다. 부분 실행은 단계별
 결과와 중단 이유를 남기고 전체 case는 미실행 부분 때문에 NOT_RUN,
 확인된 위반이 있으면 FAIL로 기록한다. 논리검토·테스트 작성·mock 결과·
 규제 검토·local/BTP/client 검증을 각각 구분한다.
 
-계획의 `./verify ...`는 납품할 entrypoint 계약이다. 실제 구현 여부를
-확인하고 실행한 내부 command/version·exit code를 증거에 넣는다.
+`./verify`는 구현된 entrypoint이며 모드와 exit code는
+`repository-harness.md`에 있다. 실제 command·version·exit code·codeCommit·
+receipt 경로를 보고에 인용한다. ACTUAL receipt를 `assemble.py`가 받아들이고
+`validate.py`가 VALID로 확인하지 않은 PASS 주장은 `NOT_RUN`이다.
+SELFTEST·CONTRACT_RED·STUB·LOGIC_REVIEW는 evidence class로 구별한다.
 전체 gate는 D26개·C5개·V8개·E2개의 assertion/artifact 추적, 실제 필수
 경로 PASS, 미해결 실패·미실행·비용 증거 누락0을 확인한다. 추가 규제·
 운영 gate가 미해결이면 범위와 활성화 제한을 표시한다. Regression은
