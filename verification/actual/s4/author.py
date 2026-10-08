@@ -43,7 +43,7 @@ for actor in fixture['actors'].values():
 for cap,cls in classes.items():
  fixture['aliases']['CPOL']['content']['rules'][cap]={'effectClass':cls}
  if cap not in {v['name'] for v in fixture['aliases']['DEF']['content']['verbs']}:fixture['aliases']['DEF']['content']['verbs'].append({'name':cap,'intentKind':'RECORD' if cap in ['recordDelivery','recordObservedMovement','receiveReturn','recordInvoice'] else 'COMMAND','capabilityId':cap,'stage':'DRAFT','slots':{}})
-for noun in ['SalesOrder','SalesOrderLine','DeliveryObservation','Delivery','Return','Invoice']:
+for noun in ['SalesOrder','SalesOrderLine','DeliveryObservation','Delivery','Return','Invoice','Dispatch']:
  if noun not in {n['name'] for n in fixture['aliases']['DEF']['content']['nouns']}:fixture['aliases']['DEF']['content']['nouns'].append({'name':noun,'core':True})
 fixture['aliases']['RETURN_AUTH']={'type':'ManagementAuthority','actorAlias':'supervisor','capabilityId':'authorizeReturn','validFrom':'2026-10-01T00:00:00Z','validUntil':'2026-10-31T23:59:59Z'}
 fixture['aliases']['DEF']['content']['attributes'].append({'nounType':'Delivery','name':'quantity','type':'DECIMAL','referenceType':None,'unit':'BOX','decimalPlaces':0,'minimumCount':1,'maximumCount':1,'requiredStage':'READ','core':True}) if not any(x['nounType']=='Delivery' and x['name']=='quantity' for x in fixture['aliases']['DEF']['content']['attributes']) else None
@@ -80,10 +80,11 @@ a=[work,command('e1-create-sales','createSalesOrder',{'workId':'$SALES_WORK','cu
  command('e1-dispatch30','dispatchQuantity',{'allocationId':'$ALLOCATION','transitPlaceId':'$TRANSIT','occurredAt':T,'evidenceRef':'synthetic-e1-dispatch30'},bind={'DISPATCH':'/effects/dispatchId','CARGO':'/effects/cargoScopeId','TRANSIT_SEGMENT':'/effects/transitSegmentId','DISPATCH_RANGE':'/effects/rangeRootId'},revision='$ALLOCATION_REV',refs=[{'type':'Work','id':'$SALES_WORK'}]),
  {'id':'DELIVERY_EVENT','type':'uuid','alias':'DELIVERY_EVENT'}, {'id':'DELIVERY_OBSERVATION','type':'uuid','alias':'DELIVERY_OBSERVATION'}]
 content={'deliveryEventId':'$DELIVERY_EVENT','dispatchId':'$DISPATCH','cargoScopeId':'$CARGO','salesLineId':'$SALES_LINE','customerId':'$C','itemId':'$P','lotId':'$L','rangeRootId':'$DISPATCH_RANGE','physicalScopeId':'$DELIVERY_OBSERVATION','startQuantity':'0','quantity':'30','unit':'BOX','placeId':'$CUSTOMER_PLACE','occurredAt':T}
-a += [original('e1-delivery-original','PHYSICAL_DELIVERY',content,'$DELIVERY_OBSERVATION','30',work='$SALES_WORK',subject='DELIVERY_OBSERVATION',subjectid='$DELIVERY_OBSERVATION',place='$CUSTOMER_PLACE'),
+a += [original('e1-delivery-original','PHYSICAL_DELIVERY',content,'$DELIVERY_OBSERVATION','30',work='$SALES_WORK',subject='DISPATCH',subjectid='$DISPATCH',place='$CUSTOMER_PLACE'),
  command('e1-delivery-intake','recordDelivery',{'observationId':'$DELIVERY_OBSERVATION','eventId':'$e1-delivery-original.event','dispatchId':'$DISPATCH','cargoScopeId':'$CARGO','salesLineId':'$SALES_LINE','workId':'$SALES_WORK','customerId':'$C','itemId':'$P','lotId':'$L','rangeRootId':'$DISPATCH_RANGE','startQuantity':'0','quantity':'30','unit':'BOX','placeId':'$CUSTOMER_PLACE','occurredAt':T,'nextAction':'인도 원본 대조','nextCheckAt':NEXT},intent='RECORD',refs=[{'type':'Work','id':'$SALES_WORK'}])]
-# The delivery original is claimed about the observation itself: the product
-# derives its item/Work/place from that row, as DeliveryEvidenceScope requires.
+# The carrier delivery original is claimed about the dispatch (as in
+# FulfillmentPostgresTest): the product derives item/Work/place=destination from
+# it, as DeliveryEvidenceScope requires; the observation does not exist yet.
 a += link('e1-delivery-original','$DELIVERY_OBSERVATION','30')
 a += [command('e1-delivery-confirm','recordDelivery',{'observationId':'$DELIVERY_OBSERVATION','canonicalOccurrenceId':'$e1-delivery-original.canonical'},intent='RECORD',revision=1,bind={'DELIVERY':'/effects/deliveryId'},refs=[{'type':'Work','id':'$SALES_WORK'}]),
  {'id':'e1-delivery-revision','type':'query','capability':'getObject','request':{'id':'$DELIVERY','scope':{'organizationId':'$ORG','objectType':'Delivery'},'asOf':T,'knownAt':T},'bind':{'DELIVERY_REV':'/data/revision'}},
