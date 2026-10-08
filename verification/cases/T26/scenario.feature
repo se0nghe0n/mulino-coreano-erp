@@ -364,6 +364,7 @@
     만일 "owner" 역할이 "create" 행동을 수행한다
     만일 "owner" 역할이 "create-activate" 행동을 수행한다
     만일 "warehouse" 역할이 "reserve" 행동을 수행한다
+    만일 "warehouse" 역할이 "pick" 행동을 수행한다
     만일 "operations" 역할이 "before" 행동을 수행한다
     만일 "시스템" 역할이 "before-db" 행동을 수행한다
     만일 "시스템" 역할이 "stop-sweeper" 행동을 수행한다
@@ -394,7 +395,9 @@
     그러면 "guard-allocation-quantity-kept" assertion으로 "예약20의 미해결 책임 수량을 보존한다."를 확인한다
     그러면 "no-new-event" assertion으로 "독립 DB 원 행을 정확한 대상 scope로 세어 중복·누락을 거부한다."를 확인한다
     그러면 "dispatch-outbox-zero" assertion으로 "독립 DB 원 행을 정확한 대상 scope로 세어 중복·누락을 거부한다."를 확인한다
+    그러면 "guard-pick-applied" assertion으로 "만료 경계 전에 예약20을 pick한다. 그래서 뒤 출고를 거부할 이유는 만료뿐이다. pick이 없으면 만료 guard가 없는 제품도 pick 누락(TYPE_INVALID)으로 거부해 통과한다."를 확인한다
     그러면 "guard-outcome" assertion으로 "자동 정지 후에도 실제 commit guard가 만료 이후 출고를 거부한다. 중지 지연의 독립 인수는 delayed-guard 사례에 있다."를 확인한다
+    그러면 "guard-code" assertion으로 "LOT 만료 뒤 현재 판매 적격이 없다. 그래서 pick된 예약의 출고 거부 이유는 INSUFFICIENT_ELIGIBLE_QUANTITY이며 pick 누락의 TYPE_INVALID가 아니다(FulfillmentCommands, step2r round 9)."를 확인한다
     그러면 "allocation-suspended" assertion으로 "해당 scope의 각 실제 원 행 값과 고정 기대값을 대조한다."를 확인한다
     그러면 "expiry-duty-one" assertion으로 "독립 DB 원 행을 정확한 대상 scope로 세어 중복·누락을 거부한다."를 확인한다
     그러면 "db-current-assignment-one" assertion으로 "독립 DB 원 행을 정확한 대상 scope로 세어 중복·누락을 거부한다."를 확인한다
@@ -454,6 +457,7 @@
     만일 "시스템" 역할이 "start-app-worker-a" 행동을 수행한다
     만일 "시스템" 역할이 "start-app-worker-b" 행동을 수행한다
     만일 "warehouse" 역할이 "reserve" 행동을 수행한다
+    만일 "warehouse" 역할이 "pick" 행동을 수행한다
     만일 "operations" 역할이 "before" 행동을 수행한다
     만일 "시스템" 역할이 "before-db" 행동을 수행한다
     만일 "시스템" 역할이 "stop-sweeper" 행동을 수행한다
@@ -474,7 +478,9 @@
     그러면 "guard-allocation-quantity-kept" assertion으로 "예약20의 미해결 책임 수량을 보존한다."를 확인한다
     그러면 "no-new-event" assertion으로 "독립 DB 원 행을 정확한 대상 scope로 세어 중복·누락을 거부한다."를 확인한다
     그러면 "dispatch-outbox-zero" assertion으로 "독립 DB 원 행을 정확한 대상 scope로 세어 중복·누락을 거부한다."를 확인한다
+    그러면 "guard-pick-applied" assertion으로 "만료 경계 전에 예약20을 pick한다. 그래서 뒤 출고를 거부할 이유는 만료뿐이다. pick이 없으면 만료 guard가 없는 제품도 pick 누락(TYPE_INVALID)으로 거부해 통과한다."를 확인한다
     그러면 "guard-outcome" assertion으로 "sweeper가 중지돼도 실제 commit guard가 만료 이후 출고를 거부한다."를 확인한다
+    그러면 "guard-code" assertion으로 "LOT 만료 뒤 현재 판매 적격이 없다. 그래서 pick된 예약의 출고 거부 이유는 INSUFFICIENT_ELIGIBLE_QUANTITY이며 pick 누락의 TYPE_INVALID가 아니다(FulfillmentCommands, step2r round 9)."를 확인한다
     그러면 "allocation-suspended" assertion으로 "해당 scope의 각 실제 원 행 값과 고정 기대값을 대조한다."를 확인한다
     그러면 "expiry-duty-one" assertion으로 "독립 DB 원 행을 정확한 대상 scope로 세어 중복·누락을 거부한다."를 확인한다
     그러면 "db-current-assignment-one" assertion으로 "독립 DB 원 행을 정확한 대상 scope로 세어 중복·누락을 거부한다."를 확인한다
@@ -498,6 +504,7 @@
     만일 "owner" 역할이 "create" 행동을 수행한다
     만일 "owner" 역할이 "create-activate" 행동을 수행한다
     만일 "warehouse" 역할이 "reserve" 행동을 수행한다
+    만일 "warehouse" 역할이 "pick" 행동을 수행한다
     만일 "operations" 역할이 "before" 행동을 수행한다
     만일 "시스템" 역할이 "before-db" 행동을 수행한다
     만일 "시스템" 역할이 "stop-sweeper" 행동을 수행한다
@@ -528,7 +535,9 @@
     그러면 "guard-allocation-quantity-kept" assertion으로 "예약20의 미해결 책임 수량을 보존한다."를 확인한다
     그러면 "no-new-event" assertion으로 "독립 DB 원 행을 정확한 대상 scope로 세어 중복·누락을 거부한다."를 확인한다
     그러면 "dispatch-outbox-zero" assertion으로 "독립 DB 원 행을 정확한 대상 scope로 세어 중복·누락을 거부한다."를 확인한다
+    그러면 "guard-pick-applied" assertion으로 "만료 경계 전에 예약20을 pick한다. 그래서 뒤 출고를 거부할 이유는 만료뿐이다. pick이 없으면 만료 guard가 없는 제품도 pick 누락(TYPE_INVALID)으로 거부해 통과한다."를 확인한다
     그러면 "guard-outcome" assertion으로 "자동 정지 후에도 실제 commit guard가 만료 이후 출고를 거부한다. 중지 지연의 독립 인수는 delayed-guard 사례에 있다."를 확인한다
+    그러면 "guard-code" assertion으로 "처분 근거 만료 뒤 현재 판매 적격이 없다. 그래서 pick된 예약의 출고 거부 이유는 INSUFFICIENT_ELIGIBLE_QUANTITY이며 pick 누락의 TYPE_INVALID가 아니다(FulfillmentCommands, step2r round 9)."를 확인한다
     그러면 "allocation-suspended" assertion으로 "해당 scope의 각 실제 원 행 값과 고정 기대값을 대조한다."를 확인한다
     그러면 "expiry-duty-one" assertion으로 "독립 DB 원 행을 정확한 대상 scope로 세어 중복·누락을 거부한다."를 확인한다
     그러면 "db-current-assignment-one" assertion으로 "독립 DB 원 행을 정확한 대상 scope로 세어 중복·누락을 거부한다."를 확인한다
@@ -588,6 +597,7 @@
     만일 "시스템" 역할이 "start-app-worker-a" 행동을 수행한다
     만일 "시스템" 역할이 "start-app-worker-b" 행동을 수행한다
     만일 "warehouse" 역할이 "reserve" 행동을 수행한다
+    만일 "warehouse" 역할이 "pick" 행동을 수행한다
     만일 "operations" 역할이 "before" 행동을 수행한다
     만일 "시스템" 역할이 "before-db" 행동을 수행한다
     만일 "시스템" 역할이 "stop-sweeper" 행동을 수행한다
@@ -608,7 +618,9 @@
     그러면 "guard-allocation-quantity-kept" assertion으로 "예약20의 미해결 책임 수량을 보존한다."를 확인한다
     그러면 "no-new-event" assertion으로 "독립 DB 원 행을 정확한 대상 scope로 세어 중복·누락을 거부한다."를 확인한다
     그러면 "dispatch-outbox-zero" assertion으로 "독립 DB 원 행을 정확한 대상 scope로 세어 중복·누락을 거부한다."를 확인한다
+    그러면 "guard-pick-applied" assertion으로 "만료 경계 전에 예약20을 pick한다. 그래서 뒤 출고를 거부할 이유는 만료뿐이다. pick이 없으면 만료 guard가 없는 제품도 pick 누락(TYPE_INVALID)으로 거부해 통과한다."를 확인한다
     그러면 "guard-outcome" assertion으로 "sweeper가 중지돼도 실제 commit guard가 만료 이후 출고를 거부한다."를 확인한다
+    그러면 "guard-code" assertion으로 "처분 근거 만료 뒤 현재 판매 적격이 없다. 그래서 pick된 예약의 출고 거부 이유는 INSUFFICIENT_ELIGIBLE_QUANTITY이며 pick 누락의 TYPE_INVALID가 아니다(FulfillmentCommands, step2r round 9)."를 확인한다
     그러면 "allocation-suspended" assertion으로 "해당 scope의 각 실제 원 행 값과 고정 기대값을 대조한다."를 확인한다
     그러면 "expiry-duty-one" assertion으로 "독립 DB 원 행을 정확한 대상 scope로 세어 중복·누락을 거부한다."를 확인한다
     그러면 "db-current-assignment-one" assertion으로 "독립 DB 원 행을 정확한 대상 scope로 세어 중복·누락을 거부한다."를 확인한다
@@ -632,6 +644,7 @@
     만일 "owner" 역할이 "create" 행동을 수행한다
     만일 "owner" 역할이 "create-activate" 행동을 수행한다
     만일 "warehouse" 역할이 "reserve" 행동을 수행한다
+    만일 "warehouse" 역할이 "pick" 행동을 수행한다
     만일 "operations" 역할이 "before" 행동을 수행한다
     만일 "시스템" 역할이 "before-db" 행동을 수행한다
     만일 "시스템" 역할이 "stop-sweeper" 행동을 수행한다
@@ -662,7 +675,9 @@
     그러면 "guard-allocation-quantity-kept" assertion으로 "예약20의 미해결 책임 수량을 보존한다."를 확인한다
     그러면 "no-new-event" assertion으로 "독립 DB 원 행을 정확한 대상 scope로 세어 중복·누락을 거부한다."를 확인한다
     그러면 "dispatch-outbox-zero" assertion으로 "독립 DB 원 행을 정확한 대상 scope로 세어 중복·누락을 거부한다."를 확인한다
+    그러면 "guard-pick-applied" assertion으로 "만료 경계 전에 예약20을 pick한다. 그래서 뒤 출고를 거부할 이유는 만료뿐이다. pick이 없으면 만료 guard가 없는 제품도 pick 누락(TYPE_INVALID)으로 거부해 통과한다."를 확인한다
     그러면 "guard-outcome" assertion으로 "자동 정지 후에도 실제 commit guard가 만료 이후 출고를 거부한다. 중지 지연의 독립 인수는 delayed-guard 사례에 있다."를 확인한다
+    그러면 "guard-code" assertion으로 "출고자 warehouse의 grant가 만료돼 scope 인가가 거부된다. 그래서 pick된 예약의 출고 거부 이유는 FORBIDDEN이며 pick 누락의 TYPE_INVALID가 아니다(FulfillmentCommands, step2r round 9)."를 확인한다
     그러면 "allocation-suspended" assertion으로 "해당 scope의 각 실제 원 행 값과 고정 기대값을 대조한다."를 확인한다
     그러면 "expiry-duty-one" assertion으로 "독립 DB 원 행을 정확한 대상 scope로 세어 중복·누락을 거부한다."를 확인한다
     그러면 "db-current-assignment-one" assertion으로 "독립 DB 원 행을 정확한 대상 scope로 세어 중복·누락을 거부한다."를 확인한다
@@ -722,6 +737,7 @@
     만일 "시스템" 역할이 "start-app-worker-a" 행동을 수행한다
     만일 "시스템" 역할이 "start-app-worker-b" 행동을 수행한다
     만일 "warehouse" 역할이 "reserve" 행동을 수행한다
+    만일 "warehouse" 역할이 "pick" 행동을 수행한다
     만일 "operations" 역할이 "before" 행동을 수행한다
     만일 "시스템" 역할이 "before-db" 행동을 수행한다
     만일 "시스템" 역할이 "stop-sweeper" 행동을 수행한다
@@ -742,7 +758,9 @@
     그러면 "guard-allocation-quantity-kept" assertion으로 "예약20의 미해결 책임 수량을 보존한다."를 확인한다
     그러면 "no-new-event" assertion으로 "독립 DB 원 행을 정확한 대상 scope로 세어 중복·누락을 거부한다."를 확인한다
     그러면 "dispatch-outbox-zero" assertion으로 "독립 DB 원 행을 정확한 대상 scope로 세어 중복·누락을 거부한다."를 확인한다
+    그러면 "guard-pick-applied" assertion으로 "만료 경계 전에 예약20을 pick한다. 그래서 뒤 출고를 거부할 이유는 만료뿐이다. pick이 없으면 만료 guard가 없는 제품도 pick 누락(TYPE_INVALID)으로 거부해 통과한다."를 확인한다
     그러면 "guard-outcome" assertion으로 "sweeper가 중지돼도 실제 commit guard가 만료 이후 출고를 거부한다."를 확인한다
+    그러면 "guard-code" assertion으로 "출고자 warehouse의 grant가 만료돼 scope 인가가 거부된다. 그래서 pick된 예약의 출고 거부 이유는 FORBIDDEN이며 pick 누락의 TYPE_INVALID가 아니다(FulfillmentCommands, step2r round 9)."를 확인한다
     그러면 "allocation-suspended" assertion으로 "해당 scope의 각 실제 원 행 값과 고정 기대값을 대조한다."를 확인한다
     그러면 "expiry-duty-one" assertion으로 "독립 DB 원 행을 정확한 대상 scope로 세어 중복·누락을 거부한다."를 확인한다
     그러면 "db-current-assignment-one" assertion으로 "독립 DB 원 행을 정확한 대상 scope로 세어 중복·누락을 거부한다."를 확인한다
@@ -766,6 +784,7 @@
     만일 "owner" 역할이 "create" 행동을 수행한다
     만일 "owner" 역할이 "create-activate" 행동을 수행한다
     만일 "warehouse" 역할이 "reserve" 행동을 수행한다
+    만일 "warehouse" 역할이 "pick" 행동을 수행한다
     만일 "operations" 역할이 "before" 행동을 수행한다
     만일 "시스템" 역할이 "before-db" 행동을 수행한다
     만일 "시스템" 역할이 "stop-sweeper" 행동을 수행한다
@@ -796,7 +815,9 @@
     그러면 "guard-allocation-quantity-kept" assertion으로 "예약20의 미해결 책임 수량을 보존한다."를 확인한다
     그러면 "no-new-event" assertion으로 "독립 DB 원 행을 정확한 대상 scope로 세어 중복·누락을 거부한다."를 확인한다
     그러면 "dispatch-outbox-zero" assertion으로 "독립 DB 원 행을 정확한 대상 scope로 세어 중복·누락을 거부한다."를 확인한다
+    그러면 "guard-pick-applied" assertion으로 "만료 경계 전에 예약20을 pick한다. 그래서 뒤 출고를 거부할 이유는 만료뿐이다. pick이 없으면 만료 guard가 없는 제품도 pick 누락(TYPE_INVALID)으로 거부해 통과한다."를 확인한다
     그러면 "guard-outcome" assertion으로 "자동 정지 후에도 실제 commit guard가 만료 이후 출고를 거부한다. 중지 지연의 독립 인수는 delayed-guard 사례에 있다."를 확인한다
+    그러면 "guard-code" assertion으로 "적격 정책 만료 뒤 현재 판매 적격을 판정할 수 없다. 그래서 pick된 예약의 출고 거부 이유는 INSUFFICIENT_ELIGIBLE_QUANTITY이며 pick 누락의 TYPE_INVALID가 아니다(FulfillmentCommands, step2r round 9)."를 확인한다
     그러면 "allocation-suspended" assertion으로 "해당 scope의 각 실제 원 행 값과 고정 기대값을 대조한다."를 확인한다
     그러면 "expiry-duty-one" assertion으로 "독립 DB 원 행을 정확한 대상 scope로 세어 중복·누락을 거부한다."를 확인한다
     그러면 "db-current-assignment-one" assertion으로 "독립 DB 원 행을 정확한 대상 scope로 세어 중복·누락을 거부한다."를 확인한다
@@ -856,6 +877,7 @@
     만일 "시스템" 역할이 "start-app-worker-a" 행동을 수행한다
     만일 "시스템" 역할이 "start-app-worker-b" 행동을 수행한다
     만일 "warehouse" 역할이 "reserve" 행동을 수행한다
+    만일 "warehouse" 역할이 "pick" 행동을 수행한다
     만일 "operations" 역할이 "before" 행동을 수행한다
     만일 "시스템" 역할이 "before-db" 행동을 수행한다
     만일 "시스템" 역할이 "stop-sweeper" 행동을 수행한다
@@ -876,7 +898,9 @@
     그러면 "guard-allocation-quantity-kept" assertion으로 "예약20의 미해결 책임 수량을 보존한다."를 확인한다
     그러면 "no-new-event" assertion으로 "독립 DB 원 행을 정확한 대상 scope로 세어 중복·누락을 거부한다."를 확인한다
     그러면 "dispatch-outbox-zero" assertion으로 "독립 DB 원 행을 정확한 대상 scope로 세어 중복·누락을 거부한다."를 확인한다
+    그러면 "guard-pick-applied" assertion으로 "만료 경계 전에 예약20을 pick한다. 그래서 뒤 출고를 거부할 이유는 만료뿐이다. pick이 없으면 만료 guard가 없는 제품도 pick 누락(TYPE_INVALID)으로 거부해 통과한다."를 확인한다
     그러면 "guard-outcome" assertion으로 "sweeper가 중지돼도 실제 commit guard가 만료 이후 출고를 거부한다."를 확인한다
+    그러면 "guard-code" assertion으로 "적격 정책 만료 뒤 현재 판매 적격을 판정할 수 없다. 그래서 pick된 예약의 출고 거부 이유는 INSUFFICIENT_ELIGIBLE_QUANTITY이며 pick 누락의 TYPE_INVALID가 아니다(FulfillmentCommands, step2r round 9)."를 확인한다
     그러면 "allocation-suspended" assertion으로 "해당 scope의 각 실제 원 행 값과 고정 기대값을 대조한다."를 확인한다
     그러면 "expiry-duty-one" assertion으로 "독립 DB 원 행을 정확한 대상 scope로 세어 중복·누락을 거부한다."를 확인한다
     그러면 "db-current-assignment-one" assertion으로 "독립 DB 원 행을 정확한 대상 scope로 세어 중복·누락을 거부한다."를 확인한다
@@ -1144,6 +1168,7 @@
     만일 "owner" 역할이 "create" 행동을 수행한다
     만일 "owner" 역할이 "create-activate" 행동을 수행한다
     만일 "warehouse" 역할이 "reserve" 행동을 수행한다
+    만일 "warehouse" 역할이 "pick" 행동을 수행한다
     만일 "operations" 역할이 "before" 행동을 수행한다
     만일 "시스템" 역할이 "before-db" 행동을 수행한다
     만일 "시스템" 역할이 "advance" 행동을 수행한다
@@ -1172,7 +1197,9 @@
     그러면 "guard-allocation-quantity-kept" assertion으로 "예약20의 미해결 책임 수량을 보존한다."를 확인한다
     그러면 "no-new-event" assertion으로 "독립 DB 원 행을 정확한 대상 scope로 세어 중복·누락을 거부한다."를 확인한다
     그러면 "dispatch-outbox-zero" assertion으로 "독립 DB 원 행을 정확한 대상 scope로 세어 중복·누락을 거부한다."를 확인한다
+    그러면 "guard-pick-applied" assertion으로 "만료 경계 전에 예약20을 pick한다. 그래서 뒤 출고를 거부할 이유는 만료뿐이다. pick이 없으면 만료 guard가 없는 제품도 pick 누락(TYPE_INVALID)으로 거부해 통과한다."를 확인한다
     그러면 "guard-outcome" assertion으로 "자동 정지 후에도 실제 commit guard가 만료 이후 출고를 거부한다. 중지 지연의 독립 인수는 delayed-guard 사례에 있다."를 확인한다
+    그러면 "guard-code" assertion으로 "LOT 만료 뒤 현재 판매 적격이 없다. 그래서 pick된 예약의 출고 거부 이유는 INSUFFICIENT_ELIGIBLE_QUANTITY이며 pick 누락의 TYPE_INVALID가 아니다(FulfillmentCommands, step2r round 9)."를 확인한다
     그러면 "allocation-suspended" assertion으로 "해당 scope의 각 실제 원 행 값과 고정 기대값을 대조한다."를 확인한다
     그러면 "expiry-duty-one" assertion으로 "독립 DB 원 행을 정확한 대상 scope로 세어 중복·누락을 거부한다."를 확인한다
     그러면 "db-current-assignment-one" assertion으로 "독립 DB 원 행을 정확한 대상 scope로 세어 중복·누락을 거부한다."를 확인한다

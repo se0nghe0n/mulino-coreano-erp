@@ -79,7 +79,8 @@ exit code를 출력하며 `verification/harness/target/wrapper-commands.json`에
     (공개되지 않은 감사 source·field·where)와 `runtimeProfileProblems`
     (fixture runtimeProfile과 tick 방식, 자율 loop 패턴, case가 직접 쓴
     watcher `observeFrom`·`naturalTickSeconds`, 수동 관찰 fixture의
-    `tickSeconds` 누락·창 절반 초과(NO_TASK는 두 tick을 관찰한다),
+    `tickSeconds` 누락·창 절반 초과(NO_TASK는 두 tick을 관찰하고, 관찰 구간
+    안에서 완료된 scheduler 주기 기록 `rawRows.schedulerCycles`를 요구한다),
     `verification/host-observation-guide.md`)가
     어긋나면 준비 문제다.
   - **fixture 장소 종류**: `ContractValidator.placeKindProblems`가 subcase
@@ -103,23 +104,53 @@ exit code를 출력하며 `verification/harness/target/wrapper-commands.json`에
   - **직접 수령의 보관자**: 그 밖의 confirmReceipt(직접 수령)의 실물을 뒤에서
     예약·배분 교체·pick·출고·이동하는 subcase에 `receivingCustodianId` slot을
     요구한다. slot은 확인한 actor와 같은 조직이며 confirmReceipt 권한과 수령
-    장소 scope를 가진 내부 Human/Agent fixture actor여야 한다. 인용한 수령
-    원본이 같은 alias를 지명해야 한다. 원본은 증거 slot(evidenceId·
-    evidenceIds·verifiedEvidenceIds 등)과 요청 evidenceRefs의 DocumentVersion
-    alias(`fixtureContent.receivingCustodianAlias`, evidence sha256은
-    canonical content의 hash)와, `$result`로 인용한 앞선 action이 첨부한
-    문서(그 action이 인용한 alias와 inline JSON content)다. 같은 수령의 모든
+    장소 scope를 가진 내부 Human/Agent fixture actor여야 한다. 수령의 canonical
+    occurrence를 검증한 basis 원본이 같은 alias를 지명해야 한다. basis 원본은
+    `verificationBasisSlots`(evidenceId·evidenceIds·verifiedEvidenceIds)의
+    DocumentVersion alias(`fixtureContent.receivingCustodianAlias`, evidence
+    sha256은 canonical content의 hash)와, 그 slot이 `$result`로 인용한 앞선
+    action이 첨부한 문서(그 action의 document·basis slot alias와 inline JSON
+    content), 그리고 같은 `canonicalOccurrenceKey`의 앞선 confirmReceipt의
+    basis다. 요청 evidenceRefs는 증인이라 세지 않는다(제품은 occurrence의
+    검증된 chain에서만 보관자를 읽는다, round 9). 같은 수령의 모든
     confirm은 같은 slot을 보내고, 운송 수령은 slot을 보내지 않는다(directReceiptCustody,
     step2r round 7·8).
   - **보관자 반례 선언**: slot을 가진 confirmReceipt action에
-    `custodyControl`(SCOPE_INELIGIBLE·EVIDENCE_CONFLICT·EVIDENCE_UNVERIFIED)을
-    두면 위 검사를 뒤집는다. 선언 값은 제품이 처음 걸리는 검사여야 한다
-    (권한·조직 → 원본끼리 상충 → 원본이 slot을 지명하지 않음). subcase는 그
+    `custodyControl`(FORBIDDEN·SCOPE_INELIGIBLE·EVIDENCE_CONFLICT·
+    EVIDENCE_UNVERIFIED)을 두면 위 검사를 뒤집는다. 선언 값은 제품이 처음
+    걸리는 검사여야 한다(확인한 조직의 actor 아님·다른 조직 FORBIDDEN →
+    Human/Agent·권한·장소 SCOPE_INELIGIBLE → basis 원본끼리 상충 → basis
+    원본이 slot을 지명하지 않음). subcase는 그
     action의 `/response/outcome`(REJECTED 또는 HELD)과
     `/response/error/code`를 고정하고, 뒤의 observe에서
     `/data/rawRows/segments`나 `/data/rawRows/receipts`의 count 0으로 효과
     0을 단언한다. 그 수령의 결과를 뒤에서 쓰지 않는다. 이 field는 harness
     선언이며 제품에 보내지 않는다. 예: E1 `receipt-custody-unverified`.
+  - **pick 뒤 출고**: `ContractValidator.pickBeforeDispatchProblems`가 모든
+    dispatchQuantity의 pick 상태를 검사한다(step2r round 9). 제품은 pickedAt
+    없는 배분의 출고를 INVALID 'Pick before dispatch required'로 거부하고
+    (`FulfillmentCommands`), pick만 pickedAt을 기록하며 두 번째 pick은
+    'Allocation already picked'로 거부하고 배분 revision을 올린다. adapter는
+    pick을 만들지 않는다(아래 "adapter가 … 암묵적으로 생성하지 않는다").
+    - fixture 배분(`$alias`의 Allocation)은 설치 상태다. fixture가 그 배분의
+      state를 적은 자리(alias, `baseline.priorEntities`, `baseline.allocations`/
+      `allocation` 행)에 `pickedAt`(fixture clock knownAt 이전의 ISO instant)과
+      `pickedByAlias`(fixture actor)를 선언하거나, 앞선 pickQuantity가 그
+      alias를 pick해야 한다. 선언된 pick 뒤에 실패로 고정하지 않은 pick이 또
+      있으면 문제다. FixtureInstaller가 pickedAt을 설치한다(Step 3).
+    - 실행 중 배분(앞선 action의 `$result`)의 출고가 적용될 것으로 기대되면
+      (`/response/outcome` APPLIED 고정, 또는 뒤의 action·assertion이 결과의
+      다른 부분을 읽음) 같은 `$result`(actionId·pointer)를 지명하는 앞선
+      pickQuantity가 있어야 한다.
+    - pick되지 않은 실행 중 배분의 출고는 APPLIED 밖 outcome과, 제품이 pick
+      검사 전에 내는 code(STALE_REVISION·FORBIDDEN·
+      INSUFFICIENT_ELIGIBLE_QUANTITY·SCOPE_INELIGIBLE·VERSION_UNSUPPORTED)를
+      고정한 반례일 때만 받는다. 아니면 검사 대상 규칙이 없는 제품도 pick
+      누락만으로 거부해 통과한다.
+    - 앞선 pick의 outcome을 APPLIED 밖으로 고정하면 안 되고, 출고
+      expectedRevision이 pick보다 앞선 action의 `$result`이면 stale
+      revision이라 문제다. 비동기 출고(start의 call)의 고정은 그 await
+      action의 assertion에서 읽는다.
   - **Streamable HTTP transport header**: `ContractValidator.wireTransportProblems`가
     `route=wire`·`transport=streamable-http` 요청의 Accept가
     `application/json`과 `text/event-stream`을 모두 나열하기를 요구하고

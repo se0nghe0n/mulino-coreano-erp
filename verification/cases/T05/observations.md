@@ -74,6 +74,7 @@ lockProbeScopeOnly는 fixture가 지정한 segment/allocation/fence 세 scope의
 - `manager-decision-binding-13` → `T05.disposition-manager-decision / manager-decision-binding`: 독립 원 행의 실물·수량·관계·범위를 정확히 대조한다.
 - `ordinary-authorized-reservation-after-confirmation-14` → `T05.disposition-manager-decision / ordinary-authorized-reservation-after-confirmation`: 실물량·단위와 독립 손계산을 대조한다.
 - `ordinary-authorized-reservation-after-confirmation-15` → `T05.disposition-manager-decision / ordinary-authorized-reservation-after-confirmation`: 실물량·단위와 독립 손계산을 대조한다.
+- `pick-before-dispatch-applied` → `T05.disposition-manager-decision / ordinary-authorized-dispatch-after-confirmation`: 출고 전 예약10을 warehouse가 pick한다. 제품은 pick되지 않은 배분의 출고를 거부하므로(FulfillmentCommands "Pick before dispatch required") 이 pick이 있어야 일반 출고가 실행된다. pick은 실행 단계이며 새 인간 승인이 아니다.
 - `ordinary-authorized-dispatch-after-confirmation-16` → `T05.disposition-manager-decision / ordinary-authorized-dispatch-after-confirmation`: 독립 원 행을 해당 범위에서 합산하며 부모와 자식을 이중 합산하지 않는다.
 - `ordinary-authorized-dispatch-after-confirmation-17` → `T05.disposition-manager-decision / ordinary-authorized-dispatch-after-confirmation`: 공개 명령의 구조화 outcome을 확인한다.
 - `new-human-approval-added-to-reservation-or-dispatch-18` → `T05.disposition-manager-decision / new-human-approval-added-to-reservation-or-dispatch`: 독립 원 행의 실물·수량·관계·범위를 정확히 대조한다.

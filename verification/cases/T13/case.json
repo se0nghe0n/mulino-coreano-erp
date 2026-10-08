@@ -12397,6 +12397,12 @@
                   "$alias": "warehouse"
                 },
                 "provenance": "CONTEXT"
+              },
+              "evidenceId": {
+                "value": {
+                  "$alias": "warehouse-receipt"
+                },
+                "provenance": "CONTEXT"
               }
             },
             "expectedRevision": 1,
@@ -12495,6 +12501,12 @@
                   "$alias": "warehouse"
                 },
                 "provenance": "CONTEXT"
+              },
+              "evidenceId": {
+                "value": {
+                  "$alias": "warehouse-receipt"
+                },
+                "provenance": "CONTEXT"
               }
             },
             "expectedRevision": 1,
@@ -12591,6 +12603,12 @@
               "receivingCustodianId": {
                 "value": {
                   "$alias": "warehouse"
+                },
+                "provenance": "CONTEXT"
+              },
+              "evidenceId": {
+                "value": {
+                  "$alias": "warehouse-receipt"
                 },
                 "provenance": "CONTEXT"
               }
@@ -13123,6 +13141,50 @@
           ]
         },
         {
+          "id": "pick",
+          "kind": "invoke",
+          "actorRef": "sales",
+          "route": "api",
+          "capabilityId": "pickQuantity",
+          "request": {
+            "intentKind": "COMMAND",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "pickQuantity",
+            "subjectRefs": [
+              {
+                "type": "TradeItem",
+                "id": {
+                  "$alias": "P"
+                }
+              }
+            ],
+            "slots": {
+              "allocationId": {
+                "value": {
+                  "$result": {
+                    "actionId": "reserve",
+                    "pointer": "/response/allocationId"
+                  }
+                },
+                "provenance": "CONTEXT"
+              }
+            },
+            "expectedRevision": {
+              "$result": {
+                "actionId": "reserve",
+                "pointer": "/response/revision"
+              }
+            },
+            "commandIdempotencyKey": "T13-partial-excess-return-relocation-pick",
+            "evidenceRefs": [
+              "need"
+            ]
+          },
+          "evidenceRefs": [
+            "pick:actual-adapter-artifact"
+          ]
+        },
+        {
           "id": "dispatch-sale",
           "kind": "invoke",
           "actorRef": "sales",
@@ -13159,7 +13221,7 @@
             },
             "expectedRevision": {
               "$result": {
-                "actionId": "reserve",
+                "actionId": "pick",
                 "pointer": "/response/revision"
               }
             },
@@ -14287,6 +14349,38 @@
             "oracleId": "T13.partial-and-excess-contributions",
             "observationNames": [
               "contribution-scope"
+            ]
+          }
+        },
+        {
+          "id": "pick-applied",
+          "op": "equals",
+          "source": {
+            "actionId": "pick",
+            "pointer": "/response/outcome"
+          },
+          "expected": "APPLIED",
+          "requirementRefs": [
+            "D13"
+          ],
+          "evidenceRefs": [
+            "pick:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "T13",
+            "subcaseId": "partial-excess-return-relocation",
+            "itemId": {
+              "$alias": "P"
+            }
+          },
+          "oracleExplanation": "수령60에서 예약한 10 BOX를 출고 전에 실제로 pick한다. 제품은 pick되지 않은 배분의 출고를 거부하므로(FulfillmentCommands \"Pick before dispatch required\") 이 pick이 없으면 출고·인도·반품이 모두 실행되지 않는다. pick은 배분 revision을 올리므로 출고의 expectedRevision은 pick 결과를 쓴다.",
+          "oracleRef": {
+            "oracleId": "T13.partial-and-excess-contributions",
+            "observationNames": [
+              "return-added-to-purchase"
             ]
           }
         },

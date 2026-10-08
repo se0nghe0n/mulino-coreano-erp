@@ -100,14 +100,22 @@ public final class HostObservationValidator {
     public static final String OBSERVE_FROM="observeFrom";
     /**
      * The fixture runtimeProfile tickSeconds, resolved by CaseRunner into a passive watcher request (step2r round 7). A
-     * NO_TASK observation must have watched two natural ticks after observeFrom (step2r round 8): observeFrom has an
-     * arbitrary phase against the loop, and a fixed-delay scheduler's period is the tick plus its processing time, so one
-     * tick does not guarantee that a tick started and recorded its submission inside the watched interval. The extractor
-     * must also start reading the scheduler's rows only after the watcher completed, so it sees every row up to completedAt.
+     * NO_TASK observation must last at least two natural ticks after observeFrom (step2r round 8), and its extractor starts
+     * reading the scheduler's rows only after the watcher completed, so it sees every row up to completedAt. Two ticks are a
+     * lower bound, not a proof: a fixed-delay loop whose processing exceeds one tick can finish, inside the interval, the
+     * cycle that began before observeFrom and submit in its next cycle after the watcher ended (Step 2 closure review 6).
+     * The proof is SCHEDULER_CYCLES (step2r round 9).
      */
     public static final String NATURAL_TICK_SECONDS="naturalTickSeconds";
-    /** Natural tick periods a NO_TASK passive observation must cover after observeFrom (step2r round 8). */
+    /** Natural tick periods a NO_TASK passive observation must last after observeFrom (step2r round 8); a lower bound only. */
     public static final int NO_TASK_TICKS=2;
+    /**
+     * Extractor rawRows source of the scheduler's own cycle-completion records (step2r round 9): schedulerId, tickId
+     * (tickScheduler) or sweepId (sweepDue), startedAt, completedAt and startedBy. NO_TASK is evidence only when a natural
+     * cycle (startedBy=SCHEDULER_LOOP) started at or after observeFrom and completed by the watcher's completedAt, and no
+     * submission row lies in the window; otherwise the observation is incomplete, not NO_TASK.
+     */
+    public static final String SCHEDULER_CYCLES="schedulerCycles";
     /** A passive natural-tick watcher request (OBSERVE_NEXT_NATURAL_TICK parameters on tickScheduler/sweepDue). */
     static boolean passiveWatch(JsonNode control) {
         if(!"process".equals(control.path("type").asText()) || !Set.of("tickScheduler","sweepDue").contains(control.path("operation").asText())) return false;
@@ -175,13 +183,27 @@ public final class HostObservationValidator {
         if(!tick.isMissingNode()) ContractValidator.require(tick.isIntegralNumber() && tick.asInt()>=1 && NO_TASK_TICKS*tick.asLong()<=window.asLong(),
             NATURAL_TICK_SECONDS+" must be an integer 1..observationWindowSeconds/"+NO_TASK_TICKS+" (fixture runtimeProfile tickSeconds)");
         if(identity.path("submissionStatus").asText().equals("NO_TASK")) {
-            // An absence is only evidence after the loop has had a full tick inside the observed interval, whatever the
-            // phase of observeFrom and the scheduler's processing delay: two tick periods, still inside the window.
+            // A minimum watch of two tick periods, still inside the window. It does not by itself show that a cycle ran
+            // inside the interval: that is the scheduler-recorded completed cycle checked below (step2r round 9).
             ContractValidator.require(tick.isIntegralNumber(),"NO_TASK passive observation needs the harness-resolved "+NATURAL_TICK_SECONDS+" (fixture runtimeProfile tickSeconds)");
             ContractValidator.require(!end.isBefore(start.plusSeconds(NO_TASK_TICKS*tick.asLong())),"NO_TASK passive observation ended before "+NO_TASK_TICKS+" natural ticks ("+NATURAL_TICK_SECONDS+") after "+OBSERVE_FROM+"; it cannot show that the next tick submitted nothing");
             // The extractor reads the durable submission rows only after the watcher completed, so no row up to completedAt is missed.
             ContractValidator.require(!instant(host.path("extractor").path("command"),"startedAt").isBefore(end),
                 "NO_TASK passive observation needs the extractor to read scheduler rows after the watcher completed (extractor command startedAt >= watcher completedAt)");
+            // step2r round 9: an absence of submissions is NO_TASK only after a natural cycle that the scheduler itself recorded
+            // as completed ran entirely inside [observeFrom, completedAt]; a cycle that began before observeFrom does not count.
+            ContractValidator.require(rows.path(SCHEDULER_CYCLES).isArray(),
+                "NO_TASK passive observation needs extractor rawRows."+SCHEDULER_CYCLES+", the scheduler's own cycle-completion records");
+            boolean completed=false;
+            for(JsonNode cycle:rows.path(SCHEDULER_CYCLES)) {
+                ContractValidator.require(cycle.path("schedulerId").asText().equals(requested.path("schedulerId").asText()),"Scheduler cycle row belongs to a different scheduler");
+                for(String key:List.of(runKey,"startedBy")) ContractValidator.require(cycle.path(key).isTextual() && !cycle.path(key).asText().isBlank(),"Scheduler cycle row lacks scheduler-recorded "+key);
+                Instant began=instant(cycle,"startedAt"),done=instant(cycle,"completedAt");
+                ContractValidator.require(!done.isBefore(began),"Scheduler cycle row completed before it started");
+                completed|=SCHEDULER_LOOP.equals(cycle.path("startedBy").asText()) && !began.isBefore(start) && !done.isAfter(end);
+            }
+            ContractValidator.require(completed,"NO_TASK passive observation has no scheduler-recorded natural cycle (startedBy="+SCHEDULER_LOOP+") that started at or after "+OBSERVE_FROM
+                +" and completed by the watcher's completedAt; without a completed cycle the absence of submissions is an incomplete observation, not NO_TASK");
         }
         if(identity.path("submissionStatus").asText().equals("SUBMITTED")) {
             ContractValidator.require(first!=null,"SUBMITTED natural tick has no scheduler-recorded submission row");

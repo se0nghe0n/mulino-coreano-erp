@@ -72,6 +72,40 @@ def forged_hash(base):
         assertion_like(base,'before-movement-zero',id='forged-hash-no-committed-retry',source={'actionId':'db','pointer':'/data/rawRows/commands','where':{'commandIdempotencyKey':'T26-safe-retry-forged-request-hash-retry','status':'COMMITTED'}},expected=0,oracleExplanation='위조 hash retry는 COMMITTED command를 남기지 않는다.'),
         assertion_like(base,'retry-canonical-hash',id='stored-hash-unchanged',source={'actionId':'db','pointer':'/data/rawRows/commands','field':'requestHash','where':{'commandIdempotencyKey':'CANONICAL-MOVE-safe-retry-forged-request-hash'}},oracleExplanation='원 canonical key의 저장 command hash는 원 응답의 hash 그대로이며 호출자 hash로 바뀌지 않는다. 거부된 retry record는 별도 허용 기록이다.')]
     return s
+# step2r round 9 (Step 2 closure review 6 follow-up): the expiry guard negatives pick the reservation before the boundary,
+# so the only remaining reason to reject the dispatch is the expiry, and pin the code the product's guard returns.
+# FulfillmentCommands.prepare (read only): grant expiry fails the scope authorization (FORBIDDEN, line 28) and a lot,
+# disposition-basis or eligibility-policy expiry fails the suspended/current-sale check (INSUFFICIENT_ELIGIBLE_QUANTITY,
+# line 38: 'Suspended allocation cannot execute' after the sweep, 'Current exact sale permission denied' before it), both
+# before the pick check ('Pick before dispatch required', TYPE_INVALID). Without the pick a guard-less product also rejected.
+EXPIRY_GUARDS={'lot-expiry-no-event':'lot','lot-expiry-delayed-guard':'lot','disposition-expiry-no-event':'disposition','disposition-expiry-delayed-guard':'disposition',
+    'grant-expiry-no-event':'grant','grant-expiry-delayed-guard':'grant','policy-expiry-no-event':'policy','policy-expiry-delayed-guard':'policy'}
+GUARD_CODES={'lot':'INSUFFICIENT_ELIGIBLE_QUANTITY','disposition':'INSUFFICIENT_ELIGIBLE_QUANTITY','policy':'INSUFFICIENT_ELIGIBLE_QUANTITY','grant':'FORBIDDEN'}
+GUARD_REASONS={'lot':'LOT 만료 뒤 현재 판매 적격이 없다','disposition':'처분 근거 만료 뒤 현재 판매 적격이 없다','policy':'적격 정책 만료 뒤 현재 판매 적격을 판정할 수 없다',
+    'grant':'출고자 warehouse의 grant가 만료돼 scope 인가가 거부된다'}
+def grant_pick(fixture_ref):
+    path=ROOT/fixture_ref;f=json.loads(path.read_text());w=f['actors']['warehouse']
+    for key in (w['roleCapabilities'],w['grant']['actions']):
+        if 'pickQuantity' not in key:key.insert(key.index('dispatchQuantity'),'pickQuantity')
+    dump(path,f)
+def pick_before_guard(sub):
+    kind=EXPIRY_GUARDS[sub['id']];acts=sub['actions']
+    acts[:]=[a for a in acts if a['id']!='pick']
+    reserve=by_id(acts,'reserve');r=reserve['request'];dispatch=by_id(acts,'dispatch')
+    assert reserve['actorRef']==dispatch['actorRef']=='warehouse',sub['id']
+    pick={'id':'pick','kind':'invoke','actorRef':'warehouse','route':'api','capabilityId':'pickQuantity',
+        'request':{'intentKind':'COMMAND','definitionVersion':r['definitionVersion'],'capabilityId':'pickQuantity','scope':copy.deepcopy(r['scope']),'asOf':r['asOf'],'knownAt':r['knownAt'],
+            'allocationId':ref('reserve','/response/allocationId'),'expectedRevision':ref('reserve','/response/revision'),'commandIdempotencyKey':'T26-'+sub['id']+'-pick'},
+        'evidenceRefs':['pick:actual-artifact']}
+    acts.insert(acts.index(reserve)+1,pick)
+    dispatch['request']['expectedRevision']=ref('pick','/response/revision')
+    sub['assertions']=[a for a in sub['assertions'] if a['id'] not in ('guard-pick-applied','guard-code')]
+    at=[a['id'] for a in sub['assertions']].index('guard-outcome')
+    picked=assertion_like(sub,'guard-outcome',id='guard-pick-applied',source={'actionId':'pick','pointer':'/response/outcome'},expected='APPLIED',evidenceRefs=['pick:actual-artifact'],
+        oracleExplanation='만료 경계 전에 예약20을 pick한다. 그래서 뒤 출고를 거부할 이유는 만료뿐이다. pick이 없으면 만료 guard가 없는 제품도 pick 누락(TYPE_INVALID)으로 거부해 통과한다.')
+    code=assertion_like(sub,'guard-outcome',id='guard-code',source={'actionId':'dispatch','pointer':'/response/error/code'},expected=GUARD_CODES[kind],
+        oracleExplanation=GUARD_REASONS[kind]+'. 그래서 pick된 예약의 출고 거부 이유는 '+GUARD_CODES[kind]+'이며 pick 누락의 TYPE_INVALID가 아니다(FulfillmentCommands, step2r round 9).')
+    sub['assertions'][at:at]=[picked];sub['assertions'].insert(at+2,code)
 AUTONOMOUS_PROFILE={'controlledTicks':False,'pausedUntilTickControl':False}
 def autonomous_fixture(base_ref,new_id):
     """Same seeded state as the base fixture, but the scheduler/sweeper loop runs on its own 1s tick.
@@ -193,7 +227,9 @@ def main():
     c=json.loads(CASE.read_text())
     c['subcases']=[s for s in c['subcases'] if s['id'] not in NEW_SUBCASES]
     subs={s['id']:s for s in c['subcases']}
-    for sub in c['subcases']:fix_safe_retry(sub)
+    for sub in c['subcases']:
+        fix_safe_retry(sub)
+        if sub['id'] in EXPIRY_GUARDS:grant_pick(sub['fixtureRef']);pick_before_guard(sub)
     due=subs['due-wait-db-rediscovery'];due['assertions']=[a for a in due['assertions'] if not a['id'].startswith(OWNED_ASSERTIONS)]
     due['assertions'].append(assertion_like(due,'empty-message-queue',id='queue-empty-after-restart',source={'actionId':'db','pointer':'/data/rawRows/queueMessages'},expected=0,
         oracleExplanation='재시작 뒤 terminal 관찰 시점에도 queue message0이다. 재발견은 DB due index에서만 온다.'))

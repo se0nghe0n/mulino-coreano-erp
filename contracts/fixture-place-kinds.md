@@ -121,22 +121,30 @@ closure review 5, P2). 적용 결과는 다음과 같다.
 - 직접 수령의 실물(또는 그 실물에서 split·이동·보류·예약으로 이어진
   결과)을 뒤에서 `reserveQuantity`·`replaceAllocation`·`pickQuantity`·
   `dispatchQuantity`·`moveQuantity`로 쓰면 그 수령은 slot을 보낸다.
-- slot은 확인한 actor와 같은 조직(`organizationAlias`)의 Human/Agent
-  alias이며 fixture actor로서 confirmReceipt role과 grant를 갖고, grant의
-  장소 scope가 있으면 수령 장소를 포함한다. 제품은 수령 보관자에게 그
-  장소의 현재 수령 권한을 요구한다.
-- 인용한 수령 원본이 같은 alias를 지명한다. 원본은 증거 slot(`evidenceId`·
-  `evidenceIds`·`verifiedEvidenceIds`·`evidence` 등)과 요청 `evidenceRefs`의
-  DocumentVersion alias(`$alias`, typed `value`, alias 이름 문자열)와,
-  `$result`로 인용한 앞선 action이 첨부한 문서(그 action이 인용한
-  DocumentVersion alias, 그리고 inline JSON content가 밝힌
-  `receivingCustodianAlias`)다. DocumentVersion은
-  `fixtureContent.receivingCustodianAlias`로 지명하며 fixture evidence
-  sha256은 canonical content(key 정렬, 공백 없음, UTF-8)의 SHA-256이다.
-  inline 문서의 sha256은 content의 SHA-256이다. 다른 보관자를 지명하는
-  원본은 없어야 한다. adapter는 그 alias를 원본과 event payload의
-  `receivingCustodianId`로 설치한다. 제품은 검증된 수령 증거가 지명한
-  보관자만 slot으로 받기 때문이다.
+- slot은 확인한 actor와 같은 조직(`organizationAlias`)의 fixture actor다.
+  actor가 아니거나 다른 조직이면 제품은 확인한 조직의 actor에서 찾지
+  못해 REJECTED FORBIDDEN을 낸다(`identity.actor(...).orElseThrow(forbidden)`).
+  그 actor는 Human/Agent alias이며 confirmReceipt role과 grant를 갖고, grant의
+  장소 scope가 있으면 수령 장소를 포함한다. 아니면 SCOPE_INELIGIBLE이다.
+  제품은 수령 보관자에게 그 장소의 현재 수령 권한을 요구한다.
+- 수령의 canonical occurrence를 검증한 원본(verification basis)이 같은
+  alias를 지명한다. 제품은 그 occurrence의 검증된 chain에서만 보관자를
+  읽는다(`ReceiptCommands.evidencedCustodians`,
+  `TradeEvidence.verifiedCanonical`). 그래서 원본은 basis slot
+  (`verificationBasisSlots`: `evidenceId`·`evidenceIds`·
+  `verifiedEvidenceIds`)의 DocumentVersion alias(`$alias`, typed `value`,
+  alias 이름 문자열)와, basis slot이 `$result`로 인용한 앞선 action이
+  첨부한 문서(그 action의 document·basis slot이 지명한 DocumentVersion
+  alias, 그리고 inline JSON content가 밝힌 `receivingCustodianAlias`)다.
+  같은 `canonicalOccurrenceKey`의 앞선 confirmReceipt(중복 출처)의 basis도
+  같은 occurrence의 chain이므로 센다. 요청 `evidenceRefs`와 다른 slot은
+  증인일 뿐 검증 basis가 아니어서 세지 않는다(step2r round 9).
+  DocumentVersion은 `fixtureContent.receivingCustodianAlias`로 지명하며
+  fixture evidence sha256은 canonical content(key 정렬, 공백 없음, UTF-8)의
+  SHA-256이다. inline 문서의 sha256은 content의 SHA-256이다. 다른 보관자를
+  지명하는 basis 원본은 없어야 한다. adapter는 각 basis 원본을 수령
+  canonical occurrence의 검증된 chain으로 설치하고, 그 alias를 원본과 event
+  payload의 `receivingCustodianId`로 설치한다.
 - 같은 수령(같은 `canonicalOccurrenceKey`, 없으면 같은
   `commandIdempotencyKey`)의 모든 confirm·retry는 같은 slot 값을 보내거나
   모두 보내지 않는다. 중복 출처나 재시도가 보관자를 바꾸지 못한다.
@@ -147,13 +155,16 @@ closure review 5, P2). 적용 결과는 다음과 같다.
 위 규칙은 양성 대조만 쓰게 했다. 그래서 slot을 증거·권한 확인 없이 그대로
 보관자로 쓰는 제품도 모든 case를 통과했다(Step 2 closure review 5, P3).
 slot을 가진 confirmReceipt action에 `custodyControl`을 두면 제품의 거부를
-단언하는 반례가 된다. 값은 SCOPE_INELIGIBLE(outcome REJECTED),
-EVIDENCE_CONFLICT(HELD), EVIDENCE_UNVERIFIED(HELD)다.
+단언하는 반례가 된다. 값은 FORBIDDEN(outcome REJECTED, round 9),
+SCOPE_INELIGIBLE(REJECTED), EVIDENCE_CONFLICT(HELD), EVIDENCE_UNVERIFIED(HELD)다.
 
-- 선언 값은 제품(`ReceiptCommands`)이 처음 걸리는 검사여야 한다. 준비
-  단계의 권한·조직(외부 actor, 다른 조직, confirmReceipt role·grant나 장소
-  scope 없음)이 먼저고, 원본끼리 다른 보관자를 지명하면 EVIDENCE_CONFLICT,
-  원본이 정확히 slot 보관자를 지명하지 않으면 EVIDENCE_UNVERIFIED다.
+- 선언 값은 제품(`ReceiptCommands`)이 처음 걸리는 검사여야 한다. 확인한
+  조직의 actor가 아니면(actor 아님, 다른 조직) FORBIDDEN이 먼저다. 다음이
+  준비 단계의 SCOPE_INELIGIBLE(Human/Agent 아님, confirmReceipt role·grant나
+  장소 scope 없음)이다. 그 뒤 basis 원본끼리 다른 보관자를 지명하면
+  EVIDENCE_CONFLICT, basis 원본이 정확히 slot 보관자를 지명하지 않으면
+  EVIDENCE_UNVERIFIED다. 요청 `evidenceRefs`의 증인 문서는 이 분류에 들지
+  않는다(Step 2 closure review 6, P3).
 - subcase는 그 action의 `/response/outcome`과 `/response/error/code`를
   고정하고, 뒤의 observe action에서 `/data/rawRows/segments`나
   `/data/rawRows/receipts`의 count 0으로 효과 0을 단언한다.
@@ -174,8 +185,8 @@ warehouse-60은 receiver를 지명한다. 기대는 HELD·EVIDENCE_UNVERIFIED, W
 
 | case | 수령 | 보관자 | 원본 | 양성 대조 |
 |---|---|---|---|---|
-| E1 세 subcase | receipt60·receipt40(procurement가 확인) | receiver(내부 Human, confirmReceipt grant 추가) | warehouse-60·warehouse-40 | `received-custody-control`: 두 수령 뒤·첫 QC 보류 전 W 활성 실물은 수령60·수령40 두 행이고 보관자는 receiver다 |
-| T13 `partial-excess-return-relocation` | receipt60·receipt40·receipt5(warehouse가 확인) | warehouse(그 장소의 유일한 수령 권한자) | warehouse-receipt(새 DocumentVersion alias) | `received-custody-control`: W 활성 실물 60·40·5의 보관자는 warehouse다 |
+| E1 세 subcase | receipt60·receipt40(procurement가 확인) | receiver(내부 Human, confirmReceipt grant 추가) | warehouse-60·warehouse-40(`evidenceId` basis slot) | `received-custody-control`: 두 수령 뒤·첫 QC 보류 전 W 활성 실물은 수령60·수령40 두 행이고 보관자는 receiver다 |
+| T13 `partial-excess-return-relocation` | receipt60·receipt40·receipt5(warehouse가 확인) | warehouse(그 장소의 유일한 수령 권한자) | warehouse-receipt(새 DocumentVersion alias). round 9부터 요청 evidenceRefs와 함께 `evidenceId` basis slot에도 둔다 | `received-custody-control`: W 활성 실물 60·40·5의 보관자는 warehouse다 |
 
 T13은 receipt40의 20 BOX를 W-alt로 옮기기 전에 20+20으로 나눈다
 (`split40`). 제품 moveQuantity는 leaf 전체를 옮기기 때문이다(round 8).

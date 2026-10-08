@@ -314,6 +314,8 @@ public final class ContractValidator {
         String capability=Json.required(rule,"capability"),slot=Json.required(rule,"slot"),field=Json.required(rule,"originalField");
         String controlField=Json.required(rule.path("custodyControl"),"field"),splitCapability=Json.required(transit,"splitCapability");
         Map<String,String> controls=new LinkedHashMap<>();rule.path("custodyControl").path("values").fields().forEachRemaining(e->controls.put(e.getKey(),e.getValue().asText()));
+        List<String> basis=new ArrayList<>();for(JsonNode b:rule.path("verificationBasisSlots")) basis.add(b.asText());
+        require(!basis.isEmpty(),"contracts/fixture-place-kinds.json directReceiptCustody.verificationBasisSlots is empty");
         Set<String> internal=new HashSet<>(),usedBy=new HashSet<>(),derived=new HashSet<>();
         for(JsonNode t:contract.path("internalCustodianAliasTypes")) internal.add(t.asText());
         for(JsonNode t:rule.path("requiredWhenStockIsUsedBy")) usedBy.add(t.asText());
@@ -362,7 +364,7 @@ public final class ContractValidator {
                     }
                     receipts.put(id,a);origins.put(id,new TreeSet<>(Set.of(id)));
                     if(a.has(controlField) && !slots.has(slot)) problems.add(where+"/"+id+": "+controlField+" needs the "+slot+" slot it refutes");
-                    if(a.has(controlField) || slots.has(slot)) custodianProblems(where,sub,a,actions,slot,field,internal,aliases,actors,evidence,byId,controlField,controls,problems);
+                    if(a.has(controlField) || slots.has(slot)) custodianProblems(where,sub,a,actions,slot,field,basis,internal,aliases,actors,evidence,byId,controlField,controls,problems);
                     continue;
                 }
                 if(from.isEmpty()) continue;
@@ -391,6 +393,134 @@ public final class ContractValidator {
             for(var e:perReceipt.entrySet()) if(e.getValue().size()>1) problems.add(where+": confirmReceipt of the same receipt "+e.getKey()+" carries different "+slot+" values "+e.getValue()+"; every confirm/retry names the same custodian");
         }
         return problems;
+    }
+    /** Fulfilment capabilities whose order the product enforces (FulfillmentCommands, step2r round 9). */
+    static final String PICK="pickQuantity",DISPATCH="dispatchQuantity";
+    /**
+     * Error codes FulfillmentCommands.prepare returns for a dispatch before it reaches the pick check (line 38: stale or
+     * terminal allocation, scope authorization, suspended allocation or current sale permission, warehouse custody) and the
+     * gateway's unsupported-version answer. A negative that pins one of these is decided before the missing pick matters.
+     */
+    static final Set<String> PRE_PICK_DISPATCH_CODES=Set.of("STALE_REVISION","FORBIDDEN","INSUFFICIENT_ELIGIBLE_QUANTITY","SCOPE_INELIGIBLE","VERSION_UNSUPPORTED");
+    /**
+     * Pick before dispatch (step2r round 9, Step 2 closure review 6 P2 and its follow-up). The product (FulfillmentCommands.prepare
+     * and FulfillmentStockPrimitives.dispatch, read only) rejects dispatchQuantity with INVALID 'Pick before dispatch required'
+     * when the allocation has no pickedAt; only pickQuantity (FulfillmentStockPrimitives.pick) sets it, rejects a second pick
+     * ('Allocation already picked') and increments the allocation revision. The adapter never creates a pick (harness-guide.md).
+     * For every dispatchQuantity of a subcase:
+     * - a fixture allocation ($alias of an Allocation) is installed state: the fixture declares it picked (pickedAt, not after
+     *   the fixture clock knownAt, and pickedByAlias naming a fixture actor, beside its state: alias, baseline.priorEntities,
+     *   baseline.allocations or baseline.allocation row) or an earlier pickQuantity of the subcase picks it; a declared pick
+     *   followed by another pick that is not pinned to fail is a problem;
+     * - a runtime allocation (the $result of an earlier action) that is expected to apply (outcome pinned APPLIED, or a later
+     *   action or an assertion reads another part of its result) needs an earlier pickQuantity naming the same $result;
+     * - an unpicked runtime allocation that is not expected to apply is a negative only when its outcome is pinned to a
+     *   non-APPLIED value and its error code to one of PRE_PICK_DISPATCH_CODES; otherwise a product without the rule under
+     *   test also rejects it, for the missing pick alone, and the subcase cannot tell them apart;
+     * - an earlier pick must not be pinned to an outcome other than APPLIED, and the dispatch expectedRevision must not be the
+     *   $result of an action before the pick (the pre-pick revision is stale).
+     * Pins of an asynchronous dispatch (a start call) are the assertions on its await action.
+     */
+    public List<String> pickBeforeDispatchProblems(JsonNode caseFile) throws IOException {
+        List<String> problems=new ArrayList<>();
+        for(JsonNode sub:caseFile.path("subcases")) {
+            String where=caseFile.path("caseId").asText()+"/"+sub.path("id").asText();
+            List<JsonNode> all=new ArrayList<>();collect(sub.path("actions"),all);
+            List<JsonNode> actions=new ArrayList<>();for(JsonNode a:all) {actions.add(a);if(a.has("call")) actions.add(a.path("call"));}
+            Map<String,Integer> index=new HashMap<>();for(int i=0;i<actions.size();i++) index.putIfAbsent(actions.get(i).path("id").asText(),i);
+            Map<String,Set<String>> pinIds=new HashMap<>();
+            for(JsonNode a:actions) if(a.has("call")) pinIds.computeIfAbsent(a.path("call").path("id").asText(),k->new HashSet<>()).add(a.path("id").asText());
+            Map<String,Set<String>> awaits=new HashMap<>();
+            for(JsonNode a:actions) if(a.path("kind").asText().equals("await")) for(var e:pinIds.entrySet()) if(e.getValue().contains(a.path("awaitActionId").asText())) awaits.computeIfAbsent(e.getKey(),k->new HashSet<>()).add(a.path("id").asText());
+            String ref=sub.path("fixtureRef").asText();
+            ObjectNode aliases=Json.object(),actors=Json.object();ArrayNode ignored=Json.array();Map<String,List<JsonNode>> declared=new HashMap<>();JsonNode clock=Json.object();
+            if(!ref.isBlank() && Files.isRegularFile(path(ref))) {mergeFixture(ref,new HashSet<>(),aliases,actors,ignored);allocationDeclarations(ref,new HashSet<>(),declared);clock=Json.read(path(ref)).path("clock");}
+            for(int i=0;i<actions.size();i++) {
+                JsonNode d=actions.get(i);if(!DISPATCH.equals(capabilityOf(d))) continue;
+                String id=d.path("id").asText();JsonNode slot=allocationSlot(d);
+                Set<String> pinSources=new HashSet<>(Set.of(id));pinSources.addAll(awaits.getOrDefault(id,Set.of()));
+                String fixtureAllocation=slotAlias(slot);
+                List<JsonNode> runtime=resultNodes(slot);
+                if(fixtureAllocation==null && runtime.size()!=1) continue;
+                String source=fixtureAllocation==null?runtime.get(0).path("actionId").asText():null,pointer=fixtureAllocation==null?runtime.get(0).path("pointer").asText():null;
+                Integer produced=source==null?Integer.valueOf(-1):index.get(source);
+                if(fixtureAllocation!=null && !aliases.path(fixtureAllocation).path("type").asText().equals("Allocation")) continue;
+                if(produced==null || produced>=i) continue;
+                int pick=-1;
+                for(int k=produced+1;k<i;k++) if(PICK.equals(capabilityOf(actions.get(k)))) {
+                    JsonNode named=allocationSlot(actions.get(k));
+                    if(fixtureAllocation!=null) {if(fixtureAllocation.equals(slotAlias(named))) pick=k;}
+                    else for(JsonNode r:resultNodes(named)) if(r.path("actionId").asText().equals(source) && r.path("pointer").asText().equals(pointer)) pick=k;
+                }
+                String what=where+"/"+id+": dispatchQuantity of the "+(fixtureAllocation!=null?"fixture allocation "+fixtureAllocation:"runtime allocation "+source+pointer+" ("+capabilityOf(actions.get(produced))+")");
+                boolean fixturePicked=false;
+                if(fixtureAllocation!=null) {
+                    for(JsonNode row:declared.getOrDefault(fixtureAllocation,List.of())) if(row.has("pickedAt")) {
+                        fixturePicked=true;
+                        java.time.Instant at=null;try {at=java.time.Instant.parse(row.path("pickedAt").asText());} catch(RuntimeException bad) {problems.add(what+": fixture pickedAt "+row.path("pickedAt")+" is not an ISO-8601 instant");}
+                        if(at!=null && clock.path("knownAt").isTextual() && at.isAfter(java.time.Instant.parse(clock.path("knownAt").asText()))) problems.add(what+": fixture pickedAt "+at+" is after the fixture clock knownAt "+clock.path("knownAt").asText()+"; an installed pick is a past fact");
+                        String by=row.path("pickedByAlias").asText(null);
+                        if(by==null || !actors.has(by)) problems.add(what+": fixture pick names pickedByAlias "+by+", which is not a fixture actor; an installed pick records who picked");
+                    }
+                    if(!fixturePicked && pick<0) {problems.add(what+" has no picked state: the fixture declares no pickedAt (with pickedByAlias) for it and no earlier pickQuantity picks it, so the product rejects it 'Pick before dispatch required' before the behaviour the subcase tests");continue;}
+                    if(fixturePicked && pick>=0 && !pinnedTo(sub,Set.of(actions.get(pick).path("id").asText()),"/response/outcome",v->!v.equals("APPLIED")))
+                        problems.add(what+" is picked in the fixture and again by "+actions.get(pick).path("id").asText()+"; the product rejects a second pick ('Allocation already picked')");
+                } else if(pick<0) {
+                    if(expectedToApply(sub,actions,i,pinSources)) {
+                        problems.add(what+" is expected to apply, but no earlier pickQuantity names that allocation; the product rejects it 'Pick before dispatch required' (FulfillmentCommands) and the adapter never creates a pick, so the case inserts an explicit, authorized pick");
+                    } else if(!pinnedTo(sub,pinSources,"/response/outcome",v->!v.equals("APPLIED")) || !pinnedTo(sub,pinSources,"/response/error/code",PRE_PICK_DISPATCH_CODES::contains)) {
+                        problems.add(what+" is never picked, and the subcase does not pin a non-APPLIED outcome with an error code the product returns before the pick check "+new TreeSet<>(PRE_PICK_DISPATCH_CODES)
+                            +"; a product without the rule under test rejects it for the missing pick alone, so pick it first and pin the expected code");
+                    }
+                    continue;
+                }
+                if(pick<0) continue;
+                String pickId=actions.get(pick).path("id").asText();
+                if(!fixturePicked && pinnedTo(sub,Set.of(pickId),"/response/outcome",v->!v.equals("APPLIED")))
+                    problems.add(what+" relies on pick "+pickId+", whose outcome the subcase pins to a value other than APPLIED; a refused pick leaves the allocation unpicked");
+                for(JsonNode r:resultNodes(d.path("request").path("expectedRevision"))) {
+                    Integer at=index.get(r.path("actionId").asText());
+                    if(at!=null && at<pick) problems.add(what+" sends expectedRevision from "+r.path("actionId").asText()+", an action before pick "+pickId
+                        +"; the pick increments the allocation revision, so expectedRevision chains to the pick result or a later read");
+                }
+            }
+        }
+        return problems;
+    }
+    /** Every declaration of a fixture allocation (alias entry, baseline.priorEntities entry, baseline.allocations/allocation row), baseRefs first. */
+    private void allocationDeclarations(String ref,Set<String> visiting,Map<String,List<JsonNode>> out) throws IOException {
+        if(ref.isBlank() || !visiting.add(ref) || !Files.isRegularFile(path(ref))) return;
+        JsonNode fixture=Json.read(path(ref));
+        for(JsonNode base:fixture.path("baseRefs")) allocationDeclarations(base.asText(),visiting,out);
+        fixture.path("aliases").fields().forEachRemaining(e->{if(e.getValue().path("type").asText().equals("Allocation")) out.computeIfAbsent(e.getKey(),k->new ArrayList<>()).add(e.getValue());});
+        fixture.path("baseline").path("priorEntities").fields().forEachRemaining(e->out.computeIfAbsent(e.getKey(),k->new ArrayList<>()).add(e.getValue()));
+        for(String key:List.of("allocations","allocation")) for(JsonNode row:fixture.path("baseline").path(key)) if(row.path("alias").isTextual()) out.computeIfAbsent(row.path("alias").asText(),k->new ArrayList<>()).add(row);
+    }
+    private static boolean pinnedTo(JsonNode sub,Set<String> actionIds,String pointer,java.util.function.Predicate<String> value) {
+        for(JsonNode x:sub.path("assertions")) if(x.path("op").asText().equals("equals") && actionIds.contains(x.path("source").path("actionId").asText())
+                && x.path("source").path("pointer").asText().equals(pointer) && x.path("expected").isTextual() && value.test(x.path("expected").asText())) return true;
+        return false;
+    }
+    private static String capabilityOf(JsonNode a) {return a.path("capabilityId").asText(a.path("request").path("capabilityId").asText());}
+    private static JsonNode allocationSlot(JsonNode a) {
+        JsonNode slot=a.path("request").path("slots").path("allocationId");
+        return slot.isMissingNode()?a.path("request").path("allocationId"):slot;
+    }
+    /** A dispatch is expected to apply when its outcome is pinned APPLIED (on it or its await), or a later action or an assertion reads another part of its result. */
+    private static boolean expectedToApply(JsonNode sub,List<JsonNode> actions,int at,Set<String> ids) {
+        java.util.function.Predicate<String> effect=p->!p.equals("/response/outcome") && !p.startsWith("/response/error");
+        String id=actions.get(at).path("id").asText();
+        for(JsonNode x:sub.path("assertions")) {
+            JsonNode s=x.path("source");String op=x.path("op").asText();
+            if(ids.contains(s.path("actionId").asText())) {
+                String p=s.path("pointer").asText();
+                if(p.equals("/response/outcome")) {if(op.equals("equals") && x.path("expected").asText().equals("APPLIED")) return true;}
+                else if(p.startsWith("/response/") && effect.test(p) && !Set.of("absent","notEquals").contains(op)) return true;
+            }
+            for(JsonNode r:resultNodes(x)) if(r.path("actionId").asText().equals(id) && effect.test(r.path("pointer").asText())) return true;
+        }
+        for(int k=at+1;k<actions.size();k++) for(JsonNode r:resultNodes(actions.get(k).path("request"))) if(r.path("actionId").asText().equals(id)) return true;
+        return false;
     }
     /** The fixture leaf (or explicit split child) a splitQuantity divides: its segmentId slot alias or $result child, else null. */
     private static ObjectNode splitSource(JsonNode slots,Map<String,ObjectNode> leaves,Map<String,ObjectNode> children) {
@@ -446,37 +576,51 @@ public final class ContractValidator {
     }
     /**
      * The receiving-custodian slot of a direct receipt. Problems are grouped like the product checks them (ReceiptCommands):
-     * SCOPE_INELIGIBLE at preparation (external actor, other organization, no confirmReceipt role/grant or place scope), then
-     * EVIDENCE_CONFLICT when the cited originals name different custodians, then EVIDENCE_UNVERIFIED when they do not name
-     * exactly the slot custodian. A positive receipt needs none; a declared custodyControl must equal the first one found.
-     * A malformed slot or a hash that does not bind the naming original is always a problem.
+     * FORBIDDEN when the slot is not an actor of the confirming organization (identity.actor(...).orElseThrow(forbidden):
+     * no fixture actor, or another organization), then SCOPE_INELIGIBLE at preparation (not an internal Human/Agent, no
+     * confirmReceipt role/grant or place scope), then EVIDENCE_CONFLICT when the verification-basis originals of the
+     * receipt's canonical occurrence name different custodians, then EVIDENCE_UNVERIFIED when they do not name exactly the
+     * slot custodian (step2r round 9: only verification bases count, see originals). A positive receipt needs none; a
+     * declared custodyControl must equal the first one found. A malformed slot or a hash that does not bind the naming
+     * original is always a problem.
      */
-    private void custodianProblems(String where,JsonNode sub,JsonNode receipt,List<JsonNode> actions,String slot,String field,Set<String> internal,JsonNode aliases,JsonNode actors,JsonNode evidence,
+    private void custodianProblems(String where,JsonNode sub,JsonNode receipt,List<JsonNode> actions,String slot,String field,List<String> basis,Set<String> internal,JsonNode aliases,JsonNode actors,JsonNode evidence,
                                    Map<String,JsonNode> byId,String controlField,Map<String,String> controls,List<String> problems) throws IOException {
         String id=where+"/"+receipt.path("id").asText();JsonNode slots=receipt.path("request").path("slots");
         String custodian=slotAlias(slots.path(slot));
         if(custodian==null) {problems.add(id+": "+slot+" must name a fixture alias ({\"$alias\":...} or {\"value\":{\"$alias\":...}})");return;}
-        Map<String,List<String>> defects=new LinkedHashMap<>();for(String c:List.of("SCOPE_INELIGIBLE","EVIDENCE_CONFLICT","EVIDENCE_UNVERIFIED")) defects.put(c,new ArrayList<>());
+        Map<String,List<String>> defects=new LinkedHashMap<>();for(String c:List.of("FORBIDDEN","SCOPE_INELIGIBLE","EVIDENCE_CONFLICT","EVIDENCE_UNVERIFIED")) defects.put(c,new ArrayList<>());
         JsonNode holder=aliases.get(custodian),actor=actors.get(custodian);
+        String organization=actors.path(receipt.path("actorRef").asText()).path("organizationAlias").asText(null);
+        if(actor==null) defects.get("FORBIDDEN").add(slot+" "+custodian+" is not a fixture actor; the product looks the custodian up among the confirming organization's actors and answers REJECTED FORBIDDEN");
+        else for(JsonNode o:List.of(actor,holder==null?Json.object():holder)) if(organization!=null && o.path("organizationAlias").isTextual() && !organization.equals(o.path("organizationAlias").asText()))
+            defects.get("FORBIDDEN").add(slot+" "+custodian+" belongs to organization "+o.path("organizationAlias").asText()+", not to the confirming actor's "+organization+"; the product finds no such actor in that organization (REJECTED FORBIDDEN)");
         if(holder==null || !internal.contains(holder.path("type").asText())) defects.get("SCOPE_INELIGIBLE").add(slot+" "+custodian+" is not an internal custodian (a "+internal+" alias)");
-        else {
-            String organization=actors.path(receipt.path("actorRef").asText()).path("organizationAlias").asText(null);
-            for(JsonNode o:List.of(actor==null?Json.object():actor,holder)) if(organization!=null && o.path("organizationAlias").isTextual() && !organization.equals(o.path("organizationAlias").asText()))
-                defects.get("SCOPE_INELIGIBLE").add(slot+" "+custodian+" belongs to organization "+o.path("organizationAlias").asText()+", not to the confirming actor's "+organization);
+        if(actor!=null) {
             boolean role=false,grant=false;
-            if(actor!=null) {for(JsonNode c:actor.path("roleCapabilities")) role|=c.asText().equals("confirmReceipt");for(JsonNode c:actor.path("grant").path("actions")) grant|=c.asText().equals("confirmReceipt");}
+            for(JsonNode c:actor.path("roleCapabilities")) role|=c.asText().equals("confirmReceipt");
+            for(JsonNode c:actor.path("grant").path("actions")) grant|=c.asText().equals("confirmReceipt");
             if(!(role && grant)) defects.get("SCOPE_INELIGIBLE").add(slot+" "+custodian+" has no confirmReceipt role and grant; the product requires the receiving custodian's current receive authority");
             String place=null;for(String key:List.of("locationId","placeId","destinationId")) if(place==null) place=slotAlias(slots.path(key));
-            if(actor!=null && place!=null) for(String key:List.of("placeAliases","places")) {
+            if(place!=null) for(String key:List.of("placeAliases","places")) {
                 JsonNode scope=actor.path("grant").path("scope").path(key);
                 if(!scope.isArray()) continue;
                 boolean listed=false;for(JsonNode p:scope) listed|=p.asText().equals(place);
                 if(!listed) defects.get("SCOPE_INELIGIBLE").add(slot+" "+custodian+" grant scope "+key+" does not include the receipt place "+place);
             }
         }
-        // Originals: cited DocumentVersion aliases and runtime-attached documents ($result of an earlier action).
-        Map<String,String> stated=new LinkedHashMap<>();Set<String> cited=new LinkedHashSet<>();
-        originals(receipt.path("request"),aliases,byId,new HashSet<>(Set.of(receipt.path("id").asText())),field,evidence,stated,cited,id,problems);
+        // Originals: the verification bases of the receipt's canonical occurrence only (step2r round 9). The product reads the
+        // custodians of the verified chains of that occurrence (ReceiptCommands.evidencedCustodians, TradeEvidence.verifiedCanonical),
+        // not request-level evidenceRefs: the receipt's own basis slots, a runtime-attached original cited there, and the basis of
+        // every earlier confirmReceipt of the same canonicalOccurrenceKey (a duplicate source adds a verified chain).
+        Map<String,String> stated=new LinkedHashMap<>();Set<String> cited=new LinkedHashSet<>();Set<String> visiting=new HashSet<>(Set.of(receipt.path("id").asText()));
+        originals(receipt.path("request"),false,basis,aliases,byId,visiting,field,evidence,stated,cited,id,problems);
+        String key=plainText(slots.path("canonicalOccurrenceKey"));
+        if(key!=null) for(JsonNode other:actions) {
+            if(other==receipt) break;
+            if(capabilityOf(other).equals(capabilityOf(receipt)) && key.equals(plainText(other.path("request").path("slots").path("canonicalOccurrenceKey"))) && visiting.add(other.path("id").asText()))
+                originals(other.path("request"),false,basis,aliases,byId,visiting,field,evidence,stated,cited,id,problems);
+        }
         Set<String> names=new TreeSet<>(stated.values());
         if(names.size()>1) defects.get("EVIDENCE_CONFLICT").add("cited receipt originals name different receiving custodians "+stated);
         for(var e:stated.entrySet()) if(!e.getValue().equals(custodian)) defects.get("EVIDENCE_UNVERIFIED").add("receipt original "+e.getKey()+" names receiving custodian "+e.getValue()+", the slot "+custodian);
@@ -496,14 +640,19 @@ public final class ContractValidator {
             && later.contains(x.path("source").path("actionId").asText()) && List.of("/data/rawRows/segments","/data/rawRows/receipts").contains(x.path("source").path("pointer").asText());
         if(!zero) problems.add(id+": declared custody negative "+control+" must assert zero effect: a count 0 over /data/rawRows/segments or /data/rawRows/receipts of an observe action after it");
     }
-    /** Collects the custody statements of the originals a request cites (see directReceiptCustody rule 2). */
-    private void originals(JsonNode request,JsonNode aliases,Map<String,JsonNode> byId,Set<String> visiting,String field,JsonNode evidence,
+    /**
+     * Collects the custody statements of the verification-basis originals a request names (directReceiptCustody rule 2,
+     * step2r round 9): DocumentVersion aliases in its verificationBasisSlots (and, for a runtime attachment, its document
+     * slot), and the documents earlier actions attached at runtime when a basis slot cites their $result. Request-level
+     * evidenceRefs and other slots are witnesses, not verification bases, and do not count.
+     */
+    private void originals(JsonNode request,boolean attached,List<String> basis,JsonNode aliases,Map<String,JsonNode> byId,Set<String> visiting,String field,JsonNode evidence,
                            Map<String,String> stated,Set<String> cited,String id,List<String> problems) throws IOException {
+        List<JsonNode> evidenceNodes=new ArrayList<>();
+        for(String key:basis) if(request.path("slots").has(key)) evidenceNodes.add(request.path("slots").path(key));
+        if(attached && request.path("slots").has("document")) evidenceNodes.add(request.path("slots").path("document"));
         Set<String> docs=new LinkedHashSet<>();
-        for(String x:aliasRefs(request.path("slots"))) if(aliases.path(x).path("type").asText().equals("DocumentVersion")) docs.add(x);
-        for(String x:aliasRefs(request.path("evidenceRefs"))) if(aliases.path(x).path("type").asText().equals("DocumentVersion")) docs.add(x);
-        List<JsonNode> evidenceNodes=new ArrayList<>();request.path("evidenceRefs").forEach(evidenceNodes::add);
-        for(var it=request.path("slots").fields();it.hasNext();) {var e=it.next();if(e.getKey().toLowerCase(Locale.ROOT).contains("evidence")) evidenceNodes.add(e.getValue());}
+        for(JsonNode n:evidenceNodes) for(String x:aliasRefs(n)) if(aliases.path(x).path("type").asText().equals("DocumentVersion")) docs.add(x);
         List<JsonNode> flat=new ArrayList<>();for(JsonNode n:evidenceNodes) {JsonNode v=n.has("value") && !n.has("$alias")?n.path("value"):n;if(v.isArray()) v.forEach(flat::add);else flat.add(v);}
         for(JsonNode n:flat) {String x=plainText(n);if(x!=null && aliases.path(x).path("type").asText().equals("DocumentVersion")) docs.add(x);}
         for(String doc:docs) {
@@ -515,10 +664,10 @@ public final class ContractValidator {
             if(!hashed) problems.add(id+": fixture evidence sha256 of "+doc+" is not the SHA-256 of its canonical fixtureContent, so the original naming "+stated.get(doc)+" is not the hashed one");
         }
         for(JsonNode n:flat) for(JsonNode r:resultNodes(n)) {
-            String source=r.path("actionId").asText();JsonNode attached=byId.get(source);
-            if(attached==null || !visiting.add(source)) continue;
+            String source=r.path("actionId").asText();JsonNode attachment=byId.get(source);
+            if(attachment==null || !visiting.add(source)) continue;
             cited.add("$result "+source);
-            JsonNode document=attached.path("request").path("slots").path("document");
+            JsonNode document=attachment.path("request").path("slots").path("document");
             if(document.path("content").isTextual()) {
                 JsonNode content;try {content=Json.MAPPER.readTree(document.path("content").asText());} catch(IOException unstructured) {content=null;}
                 if(content!=null && content.path(field).isTextual()) {
@@ -527,7 +676,7 @@ public final class ContractValidator {
                         problems.add(id+": runtime original "+source+" sha256 is not the SHA-256 of its inline content naming "+content.path(field).asText());
                 }
             }
-            originals(attached.path("request"),aliases,byId,visiting,field,evidence,stated,cited,id,problems);
+            originals(attachment.path("request"),true,basis,aliases,byId,visiting,field,evidence,stated,cited,id,problems);
         }
     }
     private static boolean pinsResponse(JsonNode sub,String actionId,String pointer,String expected) {

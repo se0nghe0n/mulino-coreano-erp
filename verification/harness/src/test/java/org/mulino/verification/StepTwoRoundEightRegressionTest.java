@@ -92,7 +92,8 @@ final class StepTwoRoundEightRegressionTest {
         // Without the declaration the same receipt is an ordinary preparation problem (the original names receiver).
         rejects("names receiving custodian receiver, the slot procurement",problems("E1",neg,x->action(x,"receipt60").remove("custodyControl"),NONE));
         rejects("is not the product's first failing",problems("E1",neg,x->action(x,"receipt60").put("custodyControl","SCOPE_INELIGIBLE"),NONE));
-        rejects("is not one of",problems("E1",neg,x->action(x,"receipt60").put("custodyControl","FORBIDDEN"),NONE));
+        // step2r round 9: FORBIDDEN is a defined value (a slot outside the confirming organization's actors); TYPE_INVALID is not.
+        rejects("is not one of",problems("E1",neg,x->action(x,"receipt60").put("custodyControl","TYPE_INVALID"),NONE));
         rejects("must pin /response/outcome",problems("E1",neg,x->dropAssertion(x,"custody-unverified-outcome"),NONE));
         rejects("must pin /response/outcome",problems("E1",neg,x->dropAssertion(x,"custody-unverified-code"),NONE));
         rejects("must assert zero effect",problems("E1",neg,x->{for(String id:List.of("custody-unverified-no-stock-at-W","custody-unverified-no-custody","custody-unverified-no-receipt")) dropAssertion(x,id);},NONE));
@@ -106,9 +107,15 @@ final class StepTwoRoundEightRegressionTest {
             if(a.path("id").asText().equals("custody-unverified-outcome")) ((ObjectNode)a).put("expected","REJECTED");
             if(a.path("id").asText().equals("custody-unverified-code")) ((ObjectNode)a).put("expected","SCOPE_INELIGIBLE");}};
         assertEquals(List.of(),problems("E1",neg,x->{pin.accept(x);action(x,"receipt60").put("custodyControl","SCOPE_INELIGIBLE");slots(x,"receipt60").set("receivingCustodianId",Json.parse("{\"$alias\":\"observer\"}"));},NONE));
-        assertEquals(List.of(),problems("E1",neg,x->{action(x,"receipt60").put("custodyControl","EVIDENCE_CONFLICT");
-            for(JsonNode a:x.path("assertions")) if(a.path("id").asText().equals("custody-unverified-code")) ((ObjectNode)a).put("expected","EVIDENCE_CONFLICT");},
+        // EVIDENCE_CONFLICT needs two verification-basis originals of the receipt's canonical occurrence that disagree (step2r
+        // round 9, closure review 6 P3): delivery-proof as a verifiedEvidenceIds basis naming procurement beside warehouse-60
+        // naming receiver. The same document cited only in request evidenceRefs is a witness the product never reads, so
+        // there the first failing check stays EVIDENCE_UNVERIFIED.
+        Consumer<ObjectNode> conflict=x->{action(x,"receipt60").put("custodyControl","EVIDENCE_CONFLICT");
+            for(JsonNode a:x.path("assertions")) if(a.path("id").asText().equals("custody-unverified-code")) ((ObjectNode)a).put("expected","EVIDENCE_CONFLICT");};
+        assertEquals(List.of(),problems("E1",neg,x->{conflict.accept(x);slots(x,"receipt60").set("verifiedEvidenceIds",Json.parse("[{\"$alias\":\"delivery-proof\"}]"));},
             f->nameCustodian(f,"delivery-proof","procurement")));
+        rejects("is not the product's first failing receiving-custody check (EVIDENCE_UNVERIFIED",problems("E1",neg,conflict,f->nameCustodian(f,"delivery-proof","procurement")));
         // Originals: verifiedEvidenceIds count, a runtime-attached JSON original counts, and the custodian's organization is checked.
         assertEquals(List.of(),problems("E1","full-flow-quantities",x->{ObjectNode sl=slots(x,"receipt60");sl.set("verifiedEvidenceIds",Json.array().add(sl.path("evidenceId")));sl.remove("evidenceId");},NONE));
         rejects("names receiving custodian qc",problems("E1","full-flow-quantities",x->slots(x,"receipt60").set("verifiedEvidenceIds",Json.parse("[{\"$alias\":\"delivery-proof\"}]")),f->nameCustodian(f,"delivery-proof","qc")));

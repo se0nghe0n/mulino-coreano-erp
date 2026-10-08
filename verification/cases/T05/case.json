@@ -2227,6 +2227,53 @@
           ]
         },
         {
+          "id": "pick",
+          "kind": "invoke",
+          "actorRef": "warehouse",
+          "route": "api",
+          "capabilityId": "pickQuantity",
+          "request": {
+            "intentKind": "COMMAND",
+            "definitionVersion": "ontology-v1",
+            "capabilityId": "pickQuantity",
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "subjectRefs": [
+              {
+                "type": "QuantitySegment",
+                "id": {
+                  "$alias": "CON40"
+                }
+              }
+            ],
+            "slots": {
+              "allocationId": {
+                "$result": {
+                  "actionId": "reserve",
+                  "pointer": "/response/allocationId"
+                }
+              }
+            },
+            "expectedRevision": {
+              "$result": {
+                "actionId": "reserve",
+                "pointer": "/response/revision"
+              }
+            },
+            "commandIdempotencyKey": "T05-manager-disposition-pick",
+            "evidenceRefs": [
+              {
+                "$alias": "operation-proof"
+              }
+            ],
+            "valueProvenance": "USER"
+          },
+          "evidenceRefs": [
+            "pick:actual-adapter-artifact"
+          ]
+        },
+        {
           "id": "dispatch",
           "kind": "invoke",
           "actorRef": "ordinary",
@@ -2265,7 +2312,7 @@
             },
             "expectedRevision": {
               "$result": {
-                "actionId": "reserve",
+                "actionId": "pick",
                 "pointer": "/response/revision"
               }
             },
@@ -3128,6 +3175,37 @@
               "state": "EXECUTABLE"
             },
             "field": "unit"
+          }
+        },
+        {
+          "id": "pick-before-dispatch-applied",
+          "op": "equals",
+          "source": {
+            "actionId": "pick",
+            "pointer": "/response/outcome"
+          },
+          "expected": "APPLIED",
+          "requirementRefs": [
+            "D05"
+          ],
+          "evidenceRefs": [
+            "pick:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseKey": "T05-manager-disposition"
+          },
+          "oracleExplanation": "출고 전 예약10을 warehouse가 pick한다. 제품은 pick되지 않은 배분의 출고를 거부하므로(FulfillmentCommands \"Pick before dispatch required\") 이 pick이 있어야 일반 출고가 실행된다. pick은 실행 단계이며 새 인간 승인이 아니다.",
+          "oracleRef": {
+            "oracleId": "T05.disposition-manager-decision",
+            "observationNames": [
+              "ordinary-authorized-dispatch-after-confirmation"
+            ]
           }
         },
         {
