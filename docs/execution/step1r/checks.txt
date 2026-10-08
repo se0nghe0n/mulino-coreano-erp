@@ -67,3 +67,23 @@ V4/case.json(92 subcase, 열거 subcase 없음), verification/actual/s*/receipt.
 ## R2-5. 미실행
 ./verify harness·validate·contract-red·prepare는 실행하지 않았다(skill 문서만 변경, 양식 파일 불변).
 V4 열거 subcase 구현과 타 소유 문서(claude-rereview-steps-1-2.md, task-status.md) 정정은 cross-owner-requests.md로 요청.
+
+# ROUND 3 (branch step1r/skills-r3, base 48d616e3, Claude Sonnet 5.5 high)
+## R3-1. frontmatter·상대 링크·.claude 링크 (인라인 python3 -I)
+frontmatter 3개 skill: name(디렉터리명과 일치)·description OK
+relative links checked 27, broken 0 (cross-owner-requests.md 포함)
+.claude/skills 3개가 SKILL.md를 가진 실제 디렉터리로 해석됨 OK
+## R3-2. git diff --check
+exit 0
+## R3-3. 변경하지 않은 것
+acceptance-oracles.md diff 없음(hash 잠금 유지)
+$ python3 verification/platform/inventory/check.py -> status PASS
+$ python3 verification/requirements/validate_catalog.py -> structure VALID, catalogStatus NOT_RUN, exit 0
+## R3-4. 근거 대조(코드·문서 읽기)
+verify(coverage 분기: model-binding prepare + assemble.py --check-preparation, --actual 거부),
+Main.java(coverage mode 예외, discovered/started/completed/skipped·gateComplete 규칙, prepare의 PreparationAssetChecks·errorPointerProblems),
+ExecutionReceiptProducer.java(refusal 조건·NOT_EMITTED·버전 환경변수), ActualAcceptanceDriver.availableAdapters()=api,fixture,db,
+harness-guide.md·coverage/README.md·host-observation-guide.md(자연 tick), V4/README.md·registry.json(93 subcase, exposed-write-surface),
+acceptance-case.schema.json(caseId pattern), 계획 §3.4·§4.2·§13.2·§13.4 문구
+## R3-5. 미실행
+./verify harness·prepare·coverage·scenarios --actual는 실행하지 않았다(skill 문서만 변경, Java·Maven 빌드 없음).
