@@ -17,5 +17,11 @@ public final class RecallPartition {
   result.put("RECOVERED",QualityRanges.quantity(actions.stream().filter(x->"RECOVERED".equals(x.get("kind"))).map(RecallPartition::range).toList()));
   result.put("ACCOUNTED",q.subtract(result.get("UNKNOWN")));return Collections.unmodifiableMap(result);
  }
+ /** Investigation facts projected onto one scope version: parts outside the version are not counted, never dropped. */
+ public static List<Map<String,Object>> clip(BigDecimal start,BigDecimal q,List<Map<String,Object>> actions){
+  var full=new QualityRanges.Range(start,start.add(q));var out=new ArrayList<Map<String,Object>>();
+  for(var a:actions){var r=range(a);var lo=r.start().max(full.start());var hi=r.end().min(full.end());if(lo.compareTo(hi)>=0)continue;var copy=new LinkedHashMap<String,Object>(a);copy.put("startQuantity",lo);copy.put("quantity",hi.subtract(lo));out.add(copy);}
+  return out;
+ }
  public static QualityRanges.Range range(Map<String,Object>x){var s=(BigDecimal)x.get("startQuantity");return new QualityRanges.Range(s,s.add((BigDecimal)x.get("quantity")));}
 }
