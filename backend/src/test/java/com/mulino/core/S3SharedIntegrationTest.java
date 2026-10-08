@@ -131,9 +131,9 @@ class S3SharedIntegrationTest {
   @Test void distinctExpiryBoundariesHaveSeparateStableDuties(){
     var applied=execute(command(false,"origin"));assertEquals("APPLIED",applied.get("outcome"),applied.toString());String source=applied.get("commandId").toString();
     var transaction=new org.springframework.transaction.support.TransactionTemplate(transactions);
-    for(String boundary:List.of("permission-v1:2026-10-08T00:00:00Z","permission-v1:2026-10-08T00:00:00Z","permission-v2:2026-10-09T00:00:00Z"))transaction.executeWithoutResult(s->runtime.requestContext().run(ctx->{Instant now=Instant.now();impact.recorded(new DomainContext(org,actor,actor,now,now),work,boundary,"VALIDITY_EXPIRED",segment,"Review expiry",now.plusSeconds(3600),source);return null;}));
+    for(String boundary:List.of("permission-v1:2026-10-08T00:00:00Z","permission-v1:2026-10-08T00:00:00Z","permission-v2:2026-10-09T00:00:00Z"))transaction.executeWithoutResult(s->runtime.requestContext().run(ctx->{Instant now=Instant.now();impact.recorded(new DomainContext(org,actor,actor,now,now),work,boundary,"INVENTORY_VALIDITY",segment,"Review expiry",now.plusSeconds(3600),source);return null;}));
     assertEquals(3,jdbc.queryForObject("SELECT count(*) FROM mulino_responsibility_Roots WHERE organizationId=?",Integer.class,org));
-    assertEquals(2,jdbc.queryForObject("SELECT count(*) FROM mulino_responsibility_Roots WHERE organizationId=? AND kind='VALIDITY_EXPIRED'",Integer.class,org));
+    assertEquals(2,jdbc.queryForObject("SELECT count(*) FROM mulino_responsibility_Roots WHERE organizationId=? AND kind='INVENTORY_VALIDITY'",Integer.class,org));
   }
   @Test void nounAndVerbShareWorldSnapshotAndPreserveCustomerContext(){
     Instant now=Instant.now();String customer=id();
