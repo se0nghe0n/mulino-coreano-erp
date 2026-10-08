@@ -1,0 +1,40 @@
+"""Committed T01/T20/T25/C3/T26 contract files must equal their authoring scripts' output.
+
+Each generator runs in a disposable copy of only the inputs it reads, so the
+repository is never rewritten. A hand edit that bypasses a generator, or a
+generator change that was not re-run, fails here.
+Run: python3 -m unittest discover -s verification/mcp-tests -p 'test_*.py' -v
+"""
+import shutil, subprocess, sys, tempfile, unittest
+from pathlib import Path
+ROOT = Path(__file__).resolve().parents[2]
+
+def copy(rel, dest):
+    target = dest / rel
+    target.parent.mkdir(parents=True, exist_ok=True)
+    (shutil.copytree if (ROOT / rel).is_dir() else shutil.copy2)(ROOT / rel, target)
+
+class GeneratorsReproduceCommittedFiles(unittest.TestCase):
+    def run_generator(self, script, inputs, outputs):
+        with tempfile.TemporaryDirectory() as tmp:
+            dest = Path(tmp)
+            for rel in inputs + [script]: copy(rel, dest)
+            done = subprocess.run([sys.executable, '-I', str(dest / script)], cwd=dest, capture_output=True, text=True)
+            self.assertEqual(0, done.returncode, done.stderr)
+            for rel in outputs:
+                self.assertEqual((ROOT / rel).read_bytes(), (dest / rel).read_bytes(), rel + ' differs from generator output')
+
+    def test_channel_cases(self):
+        outputs = [f'verification/cases/{c}/{f}' for c in ['T01', 'T20', 'T25'] for f in ['case.json', 'fixture.json', 'scenario.feature']]
+        self.run_generator('verification/mcp-tests/author_cases.py', ['verification/requirements/mandatory-oracles.json', 'contracts/acceptance-capabilities.json'] + outputs, outputs)
+
+    def test_c3_post_processor_is_a_fixed_point(self):
+        self.run_generator('verification/cases/C3/author_prerequisites.py', ['verification/cases/C3', 'contracts/acceptance-capabilities.json'],
+                           [f'verification/cases/C3/{f}' for f in ['case.json', 'scenario.feature', 'observation-bindings.json', 'fixture-closeRecall.json', 'fixture-emergencyReassign.json', 'fixture-dispatchPurchaseOrder.json', 'recipient-acceptance.json']])
+
+    def test_t26_post_processor_is_a_fixed_point(self):
+        self.run_generator('verification/cases/T26/author_review_fixes.py', ['verification/cases/T26'],
+                           [f'verification/cases/T26/{f}' for f in ['case.json', 'scenario.feature', 'oracle-bindings.json', 'fixtures/safe-retry-forged-original-actor.json']])
+
+if __name__ == '__main__':
+    unittest.main()
