@@ -75,6 +75,14 @@ schema/definition/evaluator/policy/tool과 실제 경로별 DB/protocol 또는
 client/model/prompt/skill version이 필요하다. receipt.reportArtifact는
 report의 현재 path/hash/sizeBytes와 정확히 같아야 한다. report의 commit,
 execution identity, command display, exitCode도 receipt와 같아야 한다.
+index의 profile 이름은 report의 `profile`(deployment 두 profile은
+`deployment`도 허용)과 같고 receipt `command.argv`에 들어 있어야 한다. 한
+실행을 다른 profile로 index하면 FAIL이다. receipt는
+`workingTreeObservations.before/after`가 assembly commit에서 clean이고
+`before.observedAt`이 report `preRun`과 같아야 하며 report의
+`preRun.workingTreeDirty`·`workingTreeDirty`가 모두 false여야 한다.
+`buildIdentity.source=DECLARED_ACTUAL_BUILD_COMMIT`는 build commit이 관찰이
+아닌 선언임을 적는다.
 
 `inputs[]`는 사용한 case·fixture·base의 실제 path/hash/sizeBytes를 포함한다.
 `artifacts[]`에는 같은 descriptor와 scope/completeness=COMPLETE를 둔다.
@@ -114,21 +122,30 @@ JSON의 ACTUAL 표지는 외부 시스템의 진실성을 자동 증명하지 �
 receipt를 만든다. 내용은 다음과 같다.
 
 - profile 보고서 `target/evidence/<profile>.json`. `executionIdentity`,
-  `discovered`·`started`·`completed`·`skipped=0`, profile 자체의
-  `gateComplete`가 있다.
+  `discovered`(저장소가 그 profile에 선언한 subcase 수)·`started`·
+  `completed`·`skipped=0`, `explicitCaseSelection`, 첫 case 전의
+  `preRun`(HEAD·git status·시각), profile 자체의 `gateComplete`가 있다.
 - envelope `target/evidence/receipts/<profile>-<runId>/profile-result.json`
   (`profileResult`=보고서)과 subcase마다 `case-<caseId>-<subcaseId>.json`
   (`observations`=그 subcase의 action 결과). 둘 다 evidenceClass ACTUAL,
   provenance `ACTUAL_HARNESS_PROFILE_RUN`이다.
 - action `artifactRefs`의 RAW_CAPTURE descriptor, 실행한 case·fixture·base·
   registry·catalog의 inputs, `caseVersions`, `environment=LOCAL`,
-  `workingTreeClean=true`.
+  `workingTreeClean=true`, `workingTreeObservations`(before=`preRun`,
+  after=실행 뒤), `buildIdentity`.
 - `target/evidence/<profile>-receipt.json`과 index 항목
   `target/evidence/actual-runtime-evidence-index.json`.
 
 producer는 실제 driver, 모든 case의 PRODUCT 정책, selftest 표지 없는
-action provenance, 실행 전후 clean tree, `ACTUAL_BUILD_COMMIT`=codeCommit,
-실제 version 환경변수가 모두 있을 때만 쓴다. 아니면 이유와 함께
+action provenance label, profile 이름을 포함한 command, case 파일을 명시하지
+않은 전체 profile 실행, Main이 첫 case 전과 실행 뒤에 본 같은 HEAD의 clean
+tree, `ACTUAL_BUILD_COMMIT`=codeCommit, 실제 version 환경변수가 모두 있을
+때만 쓴다. selftest 표지는 provenance label 값(`source`·`adapter`·
+`adapterVersion`·`buildVersion`·`snapshot.isolation`·
+`sourceQuery.mappingVersion`)에서만 찾는다. 실제 observe의
+`snapshot.capturedAt` 같은 key·data를 표지로 오인하면 올바른 실행이
+receipt를 얻을 수 없기 때문이다. assembler `run_case`도 같은 label 검사를
+한다(`provenance_marker`). 아니면 이유와 함께
 `NOT_EMITTED`이고 그 profile은 assembler에서 NOT_RUN이다. harness
 selftest·RED·unimplemented driver는 이 경로에 오지 않는다. 형식 시험
 (`StepTwoRoundTwoRegressionTest`)은 버려지는 임시 디렉터리에서만 쓰고
@@ -179,7 +196,12 @@ runner의 PASS를 그대로 믿지 않는다. PASS 기록은 CaseRunner가 남�
 `$alias`는 실행된 installFixture의 `aliasMap`에서 푼다. bytes로 정할 수
 없으면 기록된 비교 값에 operator를 재적용한다. 시간 연산처럼 그것도
 결정할 수 없는 경우만 판정하지 않고 review에 남긴다. 기록이 없거나
-다르면 FAIL이다.
+다르면 FAIL이다. 캡처 bytes가 runner의 선택 계약(`AssertionEngine.select`)을
+어기면, 곧 pointer 값이 없거나 null이고 where·field 원행에 filter·projection
+field가 없거나 null이면 판정 불가가 아니라 runner PASS와의 모순(FAIL)이다.
+filter field가 없는 행을 "불일치"로 세어 count 0을 PASS로 만드는 evaluator
+회귀를 막는다. 판정 불가는 결과 없는 action이나 풀 수 없는
+`$alias`/`$result`뿐이다.
 일부 action/assertion/profile 미실행이나 skip은 NOT_RUN이다. 확인된 FAIL은
 receipt/artifact가 나중에 누락돼도 NOT_RUN으로 낮추지 않는다.
 
@@ -208,8 +230,26 @@ NOT_RUN이다. 준비 단계에서 이를 `Unreachable required profile` FAIL로
 보고하므로 preparationStatus는 PREPARED가 될 수 없다. 링크는 case가
 선언한 profile에서만 생기므로 case의 `profiles`가 oracle의
 requiredLayers를 모두 덮어야 한다. 알 수 없는 profile 선언도 FAIL이다.
-profile 선언은 필요조건일 뿐이다. 그 profile에서 실제 MCP·skill 경로를
-지나는 action인지는 case review가 확인한다.
+profile 선언은 필요조건일 뿐이다. 관찰 단위 경로는
+`verification/requirements/check_layer_routes.py`가 정적으로 본다.
+MCP·SKILLS layer가 필요한 관찰마다 연결 assertion 하나 이상이 그 layer의
+증거를 읽어야 한다. assembler는 이 검사를 그대로 불러(`layer_routes`)
+설명 없는 gap이나 닫힌 gap의 남은 기록을 preparation FAIL로 센다.
+`layer-route-review.json`의 KNOWN_OPEN gap은 owner와 종료 조건이 기록된
+열린 gap이며, 그 관찰에 `layerRouteGaps`를 붙이고 실행 결과와 무관하게
+NOT_RUN으로 둔다(coverage problem에 이유를 남긴다).
+
+regulatory profile을 만드는 entrypoint나 승인된 runner는 없다.
+`./verify regulatory`는 exit2 `NOT_RUN_GATED`만 보고하고, assembler는
+index에 regulatory 항목이 없으면 그 profile의 missingReason을
+`NOT_RUN_GATED: no regulatory runner ...`로 적는다. `./verify prepare`의
+`runtimeGates`도 같은 gate와 T15 subcase·관찰을 이름으로 남긴다. 준비
+도달성은 통과하지만 실행 증거는 이 gate가 열리기 전까지 만들 수 없다.
+
+profile PASS는 index의 report·receipt가 그 profile의 것이고, report
+`explicitCaseSelection=false`이며, 그 profile의 모든 선언(case/subcase)이
+report `cases[]`에 있을 때만이다. case 파일을 명시한 부분 실행은
+`gateComplete=true`를 주장하더라도 profile PASS가 아니다.
 
 T25의 verifyCoverage는 지정된 입력 snapshot의 연결·누락·상태 분류를
 검사한다. snapshot 자체나 T25 결과가 전체 gate PASS일 필요는 없다.
