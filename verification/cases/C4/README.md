@@ -24,15 +24,15 @@ snapshot artifact와 함께 반환해야 한다. 미확인/상충은 0으로 바
 | C4.return-not-correction | historical-delivery → return-not-correction:historical-delivery-1, return-not-correction:historical-delivery-2 |
 | C4.return-not-correction | new-return → return-not-correction:new-return-3, return-not-correction:new-return-4 |
 | C4.return-not-correction | duplicate-return-material-effects → return-not-correction:duplicate-return-material-effects-5, return-not-correction:duplicate-return-material-effects-6, return-not-correction:duplicate-return-material-effects-7, return-not-correction:duplicate-return-material-effects-8 |
-| C4.return-not-correction | return-overwrites-delivery-to80 → return-not-correction:return-overwrites-delivery-to80-9, return-not-correction:return-overwrites-delivery-to80-12 |
+| C4.return-not-correction | return-overwrites-delivery-to80 → return-not-correction:return-overwrites-delivery-to80-9, return-not-correction:return-overwrites-delivery-to80-12, return-not-correction:return-overwrites-delivery-to80-13, return-not-correction:return-overwrites-delivery-to80-14, return-not-correction:return-overwrites-delivery-to80-15 |
 | C4.return-not-correction | physical-reference → return-not-correction:physical-reference-10, return-not-correction:physical-reference-11 |
+| C4.corrected-delivery-98 | historical-assessment → corrected-delivery-98:historical-assessment-1, corrected-delivery-98:historical-assessment-2, corrected-delivery-98:historical-assessment-7, corrected-delivery-98:historical-assessment-8, corrected-delivery-98:historical-assessment-9, corrected-delivery-98:historical-assessment-10 |
 | C4.corrected-delivery-98 | currently-supported-delivery → corrected-delivery-98:currently-supported-delivery-3, corrected-delivery-98:currently-supported-delivery-4 |
 | C4.corrected-delivery-98 | current-unresolved-deficit → corrected-delivery-98:current-unresolved-deficit-5, corrected-delivery-98:current-unresolved-deficit-6 |
-| C4.corrected-delivery-98 | historical-assessment → corrected-delivery-98:historical-assessment-1, corrected-delivery-98:historical-assessment-2, corrected-delivery-98:historical-assessment-7, corrected-delivery-98:historical-assessment-8, corrected-delivery-98:historical-assessment-9, corrected-delivery-98:historical-assessment-10 |
 | C4.corrected-delivery-98 | deficit-owner → corrected-delivery-98:deficit-owner-11, corrected-delivery-98:deficit-owner-12, corrected-delivery-98:deficit-owner-13, corrected-delivery-98:deficit-owner-14, corrected-delivery-98:deficit-owner-15, corrected-delivery-98:deficit-owner-16, corrected-delivery-98:deficit-owner-17 |
 | C4.resolved-debt-no-resurrection | new-unresolved-deficit → resolved-no-resurrection-resolved:new-unresolved-deficit-1, resolved-no-resurrection-resolved:new-unresolved-deficit-2, resolved-no-resurrection-waived:new-unresolved-deficit-1, resolved-no-resurrection-waived:new-unresolved-deficit-2 |
 | C4.resolved-debt-no-resurrection | resolved-debt-resurrection → resolved-no-resurrection-resolved:resolved-debt-resurrection-3, resolved-no-resurrection-waived:resolved-debt-resurrection-3 |
-| C4.resolved-debt-no-resurrection | valid-resolution → resolved-no-resurrection-resolved:valid-resolution-4, resolved-no-resurrection-resolved:valid-resolution-5, resolved-no-resurrection-resolved:valid-resolution-6, resolved-no-resurrection-waived:valid-resolution-4, resolved-no-resurrection-waived:valid-resolution-5, resolved-no-resurrection-waived:valid-resolution-6 |
+| C4.resolved-debt-no-resurrection | valid-resolution → resolved-no-resurrection-resolved:valid-resolution-4, resolved-no-resurrection-resolved:valid-resolution-5, resolved-no-resurrection-resolved:valid-resolution-6, resolved-no-resurrection-resolved:reconfirm-applied-7, resolved-no-resurrection-resolved:reconfirm-new-occurrence-8, resolved-no-resurrection-resolved:reconfirm-new-revision-9, resolved-no-resurrection-resolved:reconfirm-baseline-98-10, resolved-no-resurrection-resolved:reconfirm-canonical-revision-11, resolved-no-resurrection-resolved:reconfirm-effective-98-12, resolved-no-resurrection-resolved:reconfirm-old-revision-13, resolved-no-resurrection-resolved:reconfirm-same-responsibility-id-14, resolved-no-resurrection-waived:valid-resolution-4, resolved-no-resurrection-waived:valid-resolution-5, resolved-no-resurrection-waived:valid-resolution-6, resolved-no-resurrection-waived:reconfirm-applied-7, resolved-no-resurrection-waived:reconfirm-new-occurrence-8, resolved-no-resurrection-waived:reconfirm-new-revision-9, resolved-no-resurrection-waived:reconfirm-baseline-98-10, resolved-no-resurrection-waived:reconfirm-canonical-revision-11, resolved-no-resurrection-waived:reconfirm-effective-98-12, resolved-no-resurrection-waived:reconfirm-old-revision-13, resolved-no-resurrection-waived:reconfirm-same-responsibility-id-14 |
 
 검증 증거는 evidence/에 보존했다. 최종 전체 harness143개
 (판매 표본·mutant13개 포함)는 PASS이며 JSON schema는 유효하다. 이 case의 실제 Gherkin
@@ -69,3 +69,14 @@ reconfirm-old-revision-13, reconfirm-same-responsibility-id-14다.
 독립 SELFTEST이며 통합 harness check는 coordinator가 수행한다.
 정확한 argv·버전·source hash·log는
 C4/evidence/review-outcomes/selftest-commands.json에 보존했다.
+
+## 2026-10-08 재검토 수정
+
+- return-not-correction은 반품 뒤 같은 snapshot의 getAssessment가
+  SATISFIED이고, 주문 업무의 current 판정 원행이 SATISFIED뿐이며,
+  DELIVERY_DEFICIT 의무가 0건임을 확인한다. 반품 전 판정은 기준선이다.
+- 의무 원행의 `current`는 status와 독립인 행 유효성이다. 해소·면제된
+  부족2는 `current=true`·RESOLVED/WAIVED로 남는다(E1과 같은 의미).
+- resolved/waived의 duty 조회는 kind DELIVERY_DEFICIT·status OPEN
+  filter로 해소 대상을 좁힌다. 다른 의무를 해소하면 valid-resolution-4와
+  new-unresolved-deficit-2가 실패한다.
