@@ -79,7 +79,9 @@ final class StepTwoRoundNineRegressionTest {
             x.put("id","dispatch-code").put("expected",value);((ObjectNode)x.path("source")).put("pointer","/response/error/code");((ArrayNode)s.path("assertions")).add(x);};
         rejects("is never picked, and the subcase does not pin",pick("T05",T05,negative.andThen(unread)));
         rejects("is never picked, and the subcase does not pin",pick("T05",T05,negative.andThen(unread).andThen(code.apply("TYPE_INVALID"))));
-        assertEquals(List.of(),pick("T05",T05,negative.andThen(unread).andThen(code.apply("FORBIDDEN"))));
+        // step2r round 10 (closure review 7 P3): FORBIDDEN alone no longer counts, because the transit PLACE authorization after
+        // the pick also answers FORBIDDEN; the authorized ordinary dispatcher shows no pre-pick reason (StepTwoRoundTenRegressionTest).
+        rejects("is never picked, and the subcase does not pin",pick("T05",T05,negative.andThen(unread).andThen(code.apply("FORBIDDEN"))));
         // ... while a later action that uses its result still makes the dispatch one that must apply.
         rejects("no earlier pickQuantity names that allocation",pick("T05",T05,negative));
         // What the cases now say: the picker holds pickQuantity in role and grant, the pick sits between reserve and dispatch,
@@ -144,7 +146,10 @@ final class StepTwoRoundNineRegressionTest {
             assertEquals("pick",action(s,"dispatch").at("/request/expectedRevision/$result/actionId").asText(),g);
             assertTrue(Json.read(root.resolve(s.path("fixtureRef").asText())).at("/actors/warehouse/grant/actions").toString().contains("\"pickQuantity\""),g);
             rejects("is never picked, and the subcase does not pin",pick("T26",g,x->{drop(x,"actions","pick");drop(x,"assertions","guard-pick-applied");drop(x,"assertions","guard-code");}));
-            assertEquals(List.of(),pick("T26",g,x->{drop(x,"actions","pick");drop(x,"assertions","guard-pick-applied");}));
+            // step2r round 10: the code alone is accepted only when the case shows its pre-pick reason (the expired grant at
+            // the dispatch clock); a LOT, disposition or policy expiry does not show that INSUFFICIENT_ELIGIBLE_QUANTITY precedes the pick.
+            List<String> codeOnly=pick("T26",g,x->{drop(x,"actions","pick");drop(x,"assertions","guard-pick-applied");});
+            if(g.startsWith("grant")) assertEquals(List.of(),codeOnly,g);else rejects("is never picked, and the subcase does not pin",codeOnly);
         }
         rejects("is never picked, and the subcase does not pin",pick("T16","expiry-sweeper",x->{drop(x,"actions","pick");for(String a:List.of("pick-applied","dispatch-after-sweep-rejected","dispatch-after-sweep-code")) drop(x,"assertions",a);}));
         ObjectNode t16=sub(caseJson("T16"),"expiry-sweeper");

@@ -196,6 +196,29 @@ T13은 receipt40의 20 BOX를 W-alt로 옮기기 전에 20+20으로 나눈다
 수령 자체·기여·멱등·권한이다. 그 실물의 양의 판매 적격을 단언하는
 case도 없다.
 
+## 출고 운송 장소
+
+출고는 배분 범위를 창고 보관에서 운송 장소로 옮기는 명령이다(계획 §6).
+제품 `FulfillmentCommands`는 pick 검사 뒤에 `transitPlaceId`(TYPE_INVALID),
+Place.kind TRANSIT('Transit place required'), 그 장소의 PLACE 인가
+(FORBIDDEN)를 차례로 본다. round 9가 pick을 채우자 T05·C3·V7·V3·T24·T04·T13의
+적용·실행 시점 기대가 이 검사에서 막혔고, C2·T09·T11·T16·T26의 출고도
+장소를 지명하지 않았다(Step 2 closure review 7, P1). 기계 규칙은 [fixture-place-kinds.json](fixture-place-kinds.json)의
+`dispatchTransit`(1.4.0)이고 `ContractValidator.dispatchTransitProblems`가
+강제한다.
+
+- 배분을 지명한 모든 출고(`slots.allocationId` 또는 요청 최상위
+  `allocationId`)는 같은 객체에 `cargoPlaceId`로 fixture TRANSIT 장소를
+  지명한다. corpus slot은 C4·E1·E2·T17·T18이 쓰던 `cargoPlaceId`이고 Step 3
+  adapter가 제품 slot `transitPlaceId`로 옮긴다. adapter는 장소를 고르지
+  않는다. 반례도 양성 출고의 잘 갖춘 사본이어서 장소 누락이 거부 이유가
+  되지 않는다.
+- FORBIDDEN으로 고정한 반례가 아니면, 출고 actor와 fixture actor인 위임자의
+  grant가 장소를 나열할 때 그 TRANSIT 장소를 담는다.
+- TRANSIT 장소가 없던 fixture에는 `TRANSIT`(이름 '출고 운송 구간')을 더하고
+  출고 권한자와 그 위임자의 장소 scope에 넣었다(round 10
+  `author_round10.py`, T06·T26 생성기).
+
 ## 남은 범위
 
 - `verification/actual/**`의 native fixture와 Step 3

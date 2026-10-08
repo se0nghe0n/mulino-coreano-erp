@@ -1,14 +1,15 @@
 {
   "$id": "urn:mulino:fixture-place-kinds:1",
-  "version": "1.3.0",
-  "description": "Normative Place.kind vocabulary and custodian internality of acceptance fixtures (contracts/fixture-place-kinds.md). Aligned with the product vocabulary of docs/execution/s2-inventory/contracts.md (moveQuantity), the read-only custody rule of backend QualityEligibility.custody/FulfillmentCommands.requireWarehouse and the receipt rule of ReceiptStockPrimitives.receive. ./verify prepare (ContractValidator.placeKindProblems) rejects a fixture Place without a kind, a kind outside this list and an internal-storage segment without an internal custodian; (ContractValidator.receiptCustodyProblems) rejects a transit receipt whose leaf is not an identified exact-quantity leaf at a TRANSIT place, and a direct receipt whose stock is later reserved, picked, dispatched or moved without an explicit, evidenced internal receiving custodian unless the receipt is a declared custody negative.",
+  "version": "1.4.0",
+  "description": "Normative Place.kind vocabulary and custodian internality of acceptance fixtures (contracts/fixture-place-kinds.md). Aligned with the product vocabulary of docs/execution/s2-inventory/contracts.md (moveQuantity), the read-only custody rule of backend QualityEligibility.custody/FulfillmentCommands.requireWarehouse and the receipt rule of ReceiptStockPrimitives.receive. ./verify prepare (ContractValidator.placeKindProblems) rejects a fixture Place without a kind, a kind outside this list and an internal-storage segment without an internal custodian; (ContractValidator.receiptCustodyProblems) rejects a transit receipt whose leaf is not an identified exact-quantity leaf at a TRANSIT place, and a direct receipt whose stock is later reserved, picked, dispatched or moved without an explicit, evidenced internal receiving custodian unless the receipt is a declared custody negative; (ContractValidator.dispatchTransitProblems) rejects a dispatchQuantity that names an allocation but no fixture Place of kind TRANSIT in cargoPlaceId, or whose dispatching actor (or fixture-actor delegator) lists grant places without it.",
   "productRefs": [
     "docs/execution/s2-inventory/contracts.md (moveQuantity: both Place.kind INTERNAL_STORAGE and a confirmed internal custodian)",
     "backend/src/main/java/com/mulino/application/quality/QualityEligibility.java (custody: INTERNAL_STORAGE+internal custodian CONFIRMED; TRANSIT/CUSTOMER/SUPPLIER/EXTERNAL_* OUTSIDE; any other kind UNRECOGNIZED -> UNKNOWN, eligible 0)",
     "backend/src/main/java/com/mulino/domain/inventory/InventoryRepository.java (internalCustodian: an actor of the organization of kind HUMAN or AGENT)",
     "backend/src/main/java/com/mulino/application/trade/receipt/ReceiptCommands.java (confirmReceipt: optional receivingCustodianId only on a direct receipt; the slot is looked up among the confirming organization's actors, else REJECTED FORBIDDEN; it must be an internal HUMAN/AGENT (else SCOPE_INELIGIBLE) with current confirmReceipt authority for the receipt's TARGET/ITEM/PLACE/WORK (else SCOPE_INELIGIBLE); the verified chains of the receipt's canonical occurrence (TradeEvidence.verifiedCanonical) that state custody must name the same custodian, else HELD EVIDENCE_CONFLICT/EVIDENCE_UNVERIFIED; a transit receipt keeps the transit leaf's custody and rejects the slot)",
     "backend/src/main/java/com/mulino/domain/inventory/ReceiptStockPrimitives.java (receive: destination Place.kind INTERNAL_STORAGE; a transit receipt consumes exactly one identified (identificationStatus CONFIRMED) leaf at a TRANSIT place with the same item, LOT, unit and exactly the received quantity, else INVALID 'Exact identified transit leaf required; split partial cargo first'; the received segment keeps the leaf owner and custodian)",
-    "docs/execution/s3-receipt/contracts.md (transitSegmentId: exact same item/LOT/quantity/unit TRANSIT leaf; partial cargo is split first)"
+    "docs/execution/s3-receipt/contracts.md (transitSegmentId: exact same item/LOT/quantity/unit TRANSIT leaf; partial cargo is split first)",
+    "backend/src/main/java/com/mulino/application/inventory/FulfillmentCommands.java (dispatchQuantity, after the pick check: uuid(slots,'transitPlaceId') else TYPE_INVALID 'Invalid transitPlaceId'; Place.kind TRANSIT else TYPE_INVALID 'Transit place required'; auth.authorizeScopes(dispatchQuantity, TARGET/ITEM/WORK and PLACE [transit]) else FORBIDDEN; FulfillmentStockPrimitives.dispatch moves the allocation range to that place)"
   ],
   "kinds": [
     {
@@ -84,6 +85,18 @@
       "The receipt quantity slot (value and unit) equals the leaf quantity and unit as decimals; a split child carries the quantity and unit of its children entry.",
       "The receipt itemId and lotId aliases, when present, equal the leaf itemAlias and lotAlias.",
       "The receipt place (placeId, destinationId or locationId alias) is a Place alias of kind INTERNAL_STORAGE."
+    ]
+  },
+  "dispatchTransit": {
+    "meaning": "plan section 6 defines dispatch as the command that moves the allocation from warehouse custody to a transport location, and the product requires the request to name that TRANSIT place (step2r round 10, Step 2 closure review 7 P1). The corpus slot is cargoPlaceId (C4/E1/E2/T17/T18 since step2r cases-b); the Step 3 adapter maps it to the product slot transitPlaceId and never chooses the place itself.",
+    "capability": "dispatchQuantity",
+    "slot": "cargoPlaceId",
+    "productSlot": "transitPlaceId",
+    "placeKind": "TRANSIT",
+    "rules": [
+      "Every dispatchQuantity that names an allocation (slots.allocationId or a request-level allocationId, as an alias or one $result) names a transit place in the same object as the allocation: cargoPlaceId (or transitPlaceId) as {\"$alias\":...} or typed {\"value\":{\"$alias\":...}}. Negatives are well-formed copies of the positive dispatch, so a missing place never decides them.",
+      "The named alias is a fixture Place of kind TRANSIT.",
+      "Unless the subcase pins the dispatch /response/error/code to FORBIDDEN, the dispatching actor's grant place scope (placeAliases or places), when the grant lists places, includes the transit place, and so does the place scope of a delegator that is a fixture actor (IdentityAuthorization checks the delegator for the same PLACE target)."
     ]
   },
   "retiredFixtureKinds": [

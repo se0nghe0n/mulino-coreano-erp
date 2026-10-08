@@ -397,51 +397,56 @@ public final class ContractValidator {
     /** Fulfilment capabilities whose order the product enforces (FulfillmentCommands, step2r round 9). */
     static final String PICK="pickQuantity",DISPATCH="dispatchQuantity";
     /**
-     * Error codes FulfillmentCommands.prepare returns for a dispatch before it reaches the pick check (line 38: stale or
-     * terminal allocation, scope authorization, suspended allocation or current sale permission, warehouse custody) and the
-     * gateway's unsupported-version answer. A negative that pins one of these is decided before the missing pick matters.
-     */
-    static final Set<String> PRE_PICK_DISPATCH_CODES=Set.of("STALE_REVISION","FORBIDDEN","INSUFFICIENT_ELIGIBLE_QUANTITY","SCOPE_INELIGIBLE","VERSION_UNSUPPORTED");
-    /**
-     * Pick before dispatch (step2r round 9, Step 2 closure review 6 P2 and its follow-up). The product (FulfillmentCommands.prepare
-     * and FulfillmentStockPrimitives.dispatch, read only) rejects dispatchQuantity with INVALID 'Pick before dispatch required'
+     * Pick before dispatch (step2r rounds 9-10, Step 2 closure reviews 6 and 7). The product (FulfillmentCommands.prepare and
+     * FulfillmentStockPrimitives.dispatch, read only) rejects dispatchQuantity with INVALID 'Pick before dispatch required'
      * when the allocation has no pickedAt; only pickQuantity (FulfillmentStockPrimitives.pick) sets it, rejects a second pick
      * ('Allocation already picked') and increments the allocation revision. The adapter never creates a pick (harness-guide.md).
      * For every dispatchQuantity of a subcase:
      * - a fixture allocation ($alias of an Allocation) is installed state: the fixture declares it picked (pickedAt, not after
      *   the fixture clock knownAt, and pickedByAlias naming a fixture actor, beside its state: alias, baseline.priorEntities,
      *   baseline.allocations or baseline.allocation row) or an earlier pickQuantity of the subcase picks it; a declared pick
-     *   followed by another pick that is not pinned to fail is a problem;
+     *   followed by another pick that is not pinned to fail is a problem. A fixture allocation the fixture declares terminal
+     *   (CONSUMED, RELEASED, REPLACED, or the allocation of a baseline.priorHistory DISPATCH) needs no pick when the dispatch
+     *   pins STALE_REVISION: the terminal-allocation check is the first one;
      * - a runtime allocation (the $result of an earlier action) that is expected to apply (outcome pinned APPLIED, or a later
      *   action or an assertion reads another part of its result) needs an earlier pickQuantity naming the same $result;
-     * - an unpicked runtime allocation that is not expected to apply is a negative only when its outcome is pinned to a
-     *   non-APPLIED value and its error code to one of PRE_PICK_DISPATCH_CODES; otherwise a product without the rule under
-     *   test also rejects it, for the missing pick alone, and the subcase cannot tell them apart;
+     * - an unpicked runtime allocation that is not expected to apply is a negative only when it pins a non-APPLIED outcome and
+     *   a code whose earlier check the case shows (prePickReason, contracts/execution-preconditions.json prePickDispatch):
+     *   FORBIDDEN for an actor without current dispatch authority, VERSION_UNSUPPORTED for another definition version and
+     *   STALE_REVISION for an allocation an earlier action consumed. The same codes also come from later checks (an
+     *   expectedRevision mismatch after prepare, the transit PLACE authorization, the DISPATCH and continuous-authority
+     *   assessments), so a pinned code alone does not show that the negative is decided before the pick (closure review 7 P3);
+     * - a dispatch that names no allocation at all is malformed for every product, so it is accepted only as a route-level
+     *   denial pinned FORBIDDEN (batch or worker route, or a subject of another organization);
      * - an earlier pick must not be pinned to an outcome other than APPLIED, and the dispatch expectedRevision must not be the
      *   $result of an action before the pick (the pre-pick revision is stale).
      * Pins of an asynchronous dispatch (a start call) are the assertions on its await action.
      */
     public List<String> pickBeforeDispatchProblems(JsonNode caseFile) throws IOException {
+        JsonNode rule=Json.read(path("contracts/execution-preconditions.json")).path("prePickDispatch");
+        Set<String> terminal=new HashSet<>(),revoking=new HashSet<>();
+        for(JsonNode s:rule.path("terminalStates")) terminal.add(s.asText());
+        for(JsonNode s:rule.path("revokingCapabilities")) revoking.add(s.asText());
         List<String> problems=new ArrayList<>();
         for(JsonNode sub:caseFile.path("subcases")) {
             String where=caseFile.path("caseId").asText()+"/"+sub.path("id").asText();
-            List<JsonNode> all=new ArrayList<>();collect(sub.path("actions"),all);
-            List<JsonNode> actions=new ArrayList<>();for(JsonNode a:all) {actions.add(a);if(a.has("call")) actions.add(a.path("call"));}
+            List<JsonNode> actions=actionsOf(sub);
             Map<String,Integer> index=new HashMap<>();for(int i=0;i<actions.size();i++) index.putIfAbsent(actions.get(i).path("id").asText(),i);
-            Map<String,Set<String>> pinIds=new HashMap<>();
-            for(JsonNode a:actions) if(a.has("call")) pinIds.computeIfAbsent(a.path("call").path("id").asText(),k->new HashSet<>()).add(a.path("id").asText());
-            Map<String,Set<String>> awaits=new HashMap<>();
-            for(JsonNode a:actions) if(a.path("kind").asText().equals("await")) for(var e:pinIds.entrySet()) if(e.getValue().contains(a.path("awaitActionId").asText())) awaits.computeIfAbsent(e.getKey(),k->new HashSet<>()).add(a.path("id").asText());
+            Map<String,Set<String>> awaits=awaitIds(actions);
             String ref=sub.path("fixtureRef").asText();
-            ObjectNode aliases=Json.object(),actors=Json.object();ArrayNode ignored=Json.array();Map<String,List<JsonNode>> declared=new HashMap<>();JsonNode clock=Json.object();
-            if(!ref.isBlank() && Files.isRegularFile(path(ref))) {mergeFixture(ref,new HashSet<>(),aliases,actors,ignored);allocationDeclarations(ref,new HashSet<>(),declared);clock=Json.read(path(ref)).path("clock");}
+            ObjectNode aliases=Json.object(),actors=Json.object();ArrayNode ignored=Json.array();Map<String,List<JsonNode>> declared=new HashMap<>();JsonNode clock=Json.object();JsonNode fixture=Json.object();
+            if(!ref.isBlank() && Files.isRegularFile(path(ref))) {mergeFixture(ref,new HashSet<>(),aliases,actors,ignored);allocationDeclarations(ref,new HashSet<>(),declared);fixture=Json.read(path(ref));clock=fixture.path("clock");}
+            List<java.time.Instant> clocks=clocks(sub,actions);
             for(int i=0;i<actions.size();i++) {
                 JsonNode d=actions.get(i);if(!DISPATCH.equals(capabilityOf(d))) continue;
                 String id=d.path("id").asText();JsonNode slot=allocationSlot(d);
                 Set<String> pinSources=new HashSet<>(Set.of(id));pinSources.addAll(awaits.getOrDefault(id,Set.of()));
                 String fixtureAllocation=slotAlias(slot);
                 List<JsonNode> runtime=resultNodes(slot);
-                if(fixtureAllocation==null && runtime.size()!=1) continue;
+                if(fixtureAllocation==null && runtime.size()!=1) {
+                    if(!routeDenial(sub,d,pinSources,aliases,actors)) problems.add(where+"/"+id+": dispatchQuantity names no allocation (an alias or one $result in allocationId), so every product rejects it as malformed; name the allocation (picked) or, for a route-level denial, pin /response/error/code FORBIDDEN on the batch/worker route or with a subject of another organization");
+                    continue;
+                }
                 String source=fixtureAllocation==null?runtime.get(0).path("actionId").asText():null,pointer=fixtureAllocation==null?runtime.get(0).path("pointer").asText():null;
                 Integer produced=source==null?Integer.valueOf(-1):index.get(source);
                 if(fixtureAllocation!=null && !aliases.path(fixtureAllocation).path("type").asText().equals("Allocation")) continue;
@@ -462,15 +467,20 @@ public final class ContractValidator {
                         String by=row.path("pickedByAlias").asText(null);
                         if(by==null || !actors.has(by)) problems.add(what+": fixture pick names pickedByAlias "+by+", which is not a fixture actor; an installed pick records who picked");
                     }
+                    boolean consumed=fixtureTerminal(fixtureAllocation,declared,fixture,terminal);
+                    if(!fixturePicked && pick<0 && consumed && pinnedTo(sub,pinSources,"/response/error/code","STALE_REVISION"::equals)) continue;
                     if(!fixturePicked && pick<0) {problems.add(what+" has no picked state: the fixture declares no pickedAt (with pickedByAlias) for it and no earlier pickQuantity picks it, so the product rejects it 'Pick before dispatch required' before the behaviour the subcase tests");continue;}
                     if(fixturePicked && pick>=0 && !pinnedTo(sub,Set.of(actions.get(pick).path("id").asText()),"/response/outcome",v->!v.equals("APPLIED")))
                         problems.add(what+" is picked in the fixture and again by "+actions.get(pick).path("id").asText()+"; the product rejects a second pick ('Allocation already picked')");
                 } else if(pick<0) {
                     if(expectedToApply(sub,actions,i,pinSources)) {
                         problems.add(what+" is expected to apply, but no earlier pickQuantity names that allocation; the product rejects it 'Pick before dispatch required' (FulfillmentCommands) and the adapter never creates a pick, so the case inserts an explicit, authorized pick");
-                    } else if(!pinnedTo(sub,pinSources,"/response/outcome",v->!v.equals("APPLIED")) || !pinnedTo(sub,pinSources,"/response/error/code",PRE_PICK_DISPATCH_CODES::contains)) {
-                        problems.add(what+" is never picked, and the subcase does not pin a non-APPLIED outcome with an error code the product returns before the pick check "+new TreeSet<>(PRE_PICK_DISPATCH_CODES)
-                            +"; a product without the rule under test rejects it for the missing pick alone, so pick it first and pin the expected code");
+                    } else {
+                        String code=pinnedValue(sub,pinSources,"/response/error/code");
+                        String reason=!pinnedTo(sub,pinSources,"/response/outcome",v->!v.equals("APPLIED")) || code==null?null
+                            :prePickReason(code,sub,actions,i,source,pointer,clocks.get(i),aliases,actors,fixture,revoking);
+                        if(reason==null) problems.add(what+" is never picked, and the subcase does not pin a non-APPLIED outcome with a code whose earlier check the case shows (FORBIDDEN for an actor without current dispatch authority, VERSION_UNSUPPORTED for another definition version, STALE_REVISION for an allocation an earlier action consumed; pinned "
+                            +code+"); a product without the rule under test rejects it for the missing pick alone, so pick it first and pin the expected code");
                     }
                     continue;
                 }
@@ -482,6 +492,335 @@ public final class ContractValidator {
                     Integer at=index.get(r.path("actionId").asText());
                     if(at!=null && at<pick) problems.add(what+" sends expectedRevision from "+r.path("actionId").asText()+", an action before pick "+pickId
                         +"; the pick increments the allocation revision, so expectedRevision chains to the pick result or a later read");
+                }
+            }
+        }
+        return problems;
+    }
+    /** The reason the case shows for a pre-pick code of an unpicked runtime dispatch, or null (contracts/execution-preconditions.json prePickDispatch). */
+    private static String prePickReason(String code,JsonNode sub,List<JsonNode> actions,int at,String source,String pointer,java.time.Instant clock,JsonNode aliases,JsonNode actors,JsonNode fixture,Set<String> revoking) {
+        JsonNode d=actions.get(at);
+        switch(code) {
+            case "FORBIDDEN" -> {
+                JsonNode actor=actors.get(d.path("actorRef").asText());
+                if(actor==null) return "actor "+d.path("actorRef").asText()+" is no fixture actor";
+                if(!contains(actor.path("roleCapabilities"),DISPATCH) || !contains(actor.path("grant").path("actions"),DISPATCH)) return "actor lacks "+DISPATCH;
+                if(clock!=null && !grantValidAt(actor.path("grant"),clock)) return "grant not valid at "+clock;
+                for(int k=0;k<at;k++) if(revoking.contains(capabilityOf(actions.get(k)))) return "earlier "+capabilityOf(actions.get(k));
+                return null;
+            }
+            case "VERSION_UNSUPPORTED" -> {
+                String asked=d.path("request").path("definitionVersion").asText(null),installed=fixture.path("versions").path("definition").asText(null);
+                return asked!=null && installed!=null && !asked.equals(installed)?"definitionVersion "+asked:null;
+            }
+            case "STALE_REVISION" -> {
+                for(int k=0;k<at;k++) if(Set.of(DISPATCH,"releaseAllocation","replaceAllocation").contains(capabilityOf(actions.get(k))))
+                    for(JsonNode r:resultNodes(allocationSlot(actions.get(k)))) if(r.path("actionId").asText().equals(source) && r.path("pointer").asText().equals(pointer)) return "consumed by "+actions.get(k).path("id").asText();
+                return null;
+            }
+            default -> {return null;}
+        }
+    }
+    /** A fixture allocation the fixture declares terminal: a terminal state/status beside it, or the allocation of a baseline.priorHistory DISPATCH. */
+    private static boolean fixtureTerminal(String name,Map<String,List<JsonNode>> declared,JsonNode fixture,Set<String> terminal) {
+        for(JsonNode row:declared.getOrDefault(name,List.of())) for(String key:List.of("state","status")) if(terminal.contains(row.path(key).asText())) return true;
+        for(JsonNode h:fixture.path("baseline").path("priorHistory")) if(h.path("kind").asText().equals("DISPATCH") && name.equals(h.path("allocationAlias").asText())) return true;
+        return false;
+    }
+    /** A dispatch without an allocation that is a route-level denial: pinned FORBIDDEN on the batch/worker route or naming a subject of another organization. */
+    private static boolean routeDenial(JsonNode sub,JsonNode d,Set<String> pins,JsonNode aliases,JsonNode actors) {
+        if(!pinnedTo(sub,pins,"/response/error/code","FORBIDDEN"::equals)) return false;
+        if(Set.of("batch","worker").contains(d.path("route").asText())) return true;
+        String org=actors.path(d.path("actorRef").asText()).path("organizationAlias").asText(null);
+        for(String a:aliasRefs(d.path("request"))) {String other=aliases.path(a).path("organizationAlias").asText(null);if(org!=null && other!=null && !org.equals(other)) return true;}
+        return false;
+    }
+    // ---- step2r round 10: product check chain preconditions (contracts/execution-preconditions.json, fixture-place-kinds.json dispatchTransit) ----
+    /** Actions of a subcase in declaration order, a start's call right after the start. */
+    private static List<JsonNode> actionsOf(JsonNode sub) {
+        List<JsonNode> all=new ArrayList<>();collect(sub.path("actions"),all);
+        List<JsonNode> actions=new ArrayList<>();for(JsonNode a:all) {actions.add(a);if(a.has("call")) actions.add(a.path("call"));}
+        return actions;
+    }
+    /** The await action ids that carry the pins of each start call id. */
+    private static Map<String,Set<String>> awaitIds(List<JsonNode> actions) {
+        Map<String,Set<String>> pinIds=new HashMap<>();
+        for(JsonNode a:actions) if(a.has("call")) pinIds.computeIfAbsent(a.path("call").path("id").asText(),k->new HashSet<>()).add(a.path("id").asText());
+        Map<String,Set<String>> awaits=new HashMap<>();
+        for(JsonNode a:actions) if(a.path("kind").asText().equals("await")) for(var e:pinIds.entrySet()) if(e.getValue().contains(a.path("awaitActionId").asText())) awaits.computeIfAbsent(e.getKey(),k->new HashSet<>()).add(a.path("id").asText());
+        return awaits;
+    }
+    private Set<String> pins(List<JsonNode> actions,int i) {
+        String id=actions.get(i).path("id").asText();Set<String> out=new HashSet<>(Set.of(id));out.addAll(awaitIds(actions).getOrDefault(id,Set.of()));return out;
+    }
+    /** expectedToApply without a pinned error code or a pinned non-APPLIED outcome (a negative may still read /response fields). */
+    private boolean applies(JsonNode sub,List<JsonNode> actions,int i) {
+        Set<String> ids=pins(actions,i);
+        return expectedToApply(sub,actions,i,ids) && pinnedValue(sub,ids,"/response/error/code")==null && !pinnedTo(sub,ids,"/response/outcome",v->!v.equals("APPLIED"));
+    }
+    private static String pinnedValue(JsonNode sub,Set<String> actionIds,String pointer) {
+        for(JsonNode x:sub.path("assertions")) if(x.path("op").asText().equals("equals") && actionIds.contains(x.path("source").path("actionId").asText())
+                && x.path("source").path("pointer").asText().equals(pointer) && x.path("expected").isTextual()) return x.path("expected").asText();
+        return null;
+    }
+    private static boolean contains(JsonNode array,String value) {for(JsonNode v:array) if(v.asText().equals(value)) return true;return false;}
+    private static java.time.Instant instant(JsonNode node) {
+        String text=node.isTextual()?node.asText():node.path("value").isTextual()?node.path("value").asText():null;
+        if(text==null) return null;
+        try {return java.time.Instant.parse(text);} catch(RuntimeException bad) {return null;}
+    }
+    private static boolean grantValidAt(JsonNode grant,java.time.Instant at) {
+        java.time.Instant from=instant(grant.path("validFrom")),until=instant(grant.path("validUntil"));
+        return from!=null && until!=null && !at.isBefore(from) && at.isBefore(until);
+    }
+    /** The fixture clock asOf of a fixture or its baseRefs. */
+    private java.time.Instant fixtureClock(String ref,Set<String> visiting) throws IOException {
+        if(ref.isBlank() || !visiting.add(ref) || !Files.isRegularFile(path(ref))) return null;
+        JsonNode fixture=Json.read(path(ref));
+        java.time.Instant own=instant(fixture.path("clock").path("asOf"));if(own!=null) return own;
+        for(JsonNode base:fixture.path("baseRefs")) {java.time.Instant found=fixtureClock(base.asText(),visiting);if(found!=null) return found;}
+        return null;
+    }
+    /**
+     * The product clock at each action (contracts/execution-preconditions.json clock): the fixture clock asOf, set by every
+     * clock control to its instant, else asOf, else knownAt parameter.
+     */
+    private List<java.time.Instant> clocks(JsonNode sub,List<JsonNode> actions) throws IOException {
+        java.time.Instant now=fixtureClock(sub.path("fixtureRef").asText(),new HashSet<>());List<java.time.Instant> out=new ArrayList<>();
+        for(JsonNode a:actions) {
+            if(a.path("kind").asText().equals("control") && a.path("control").path("type").asText().equals("clock")) {
+                JsonNode p=a.path("control").path("parameters");
+                for(String key:List.of("instant","asOf","knownAt")) {java.time.Instant t=instant(p.path(key));if(t!=null) {now=t;break;}}
+            }
+            out.add(now);
+        }
+        return out;
+    }
+    /** The object of a dispatch request that carries its allocation (slots, else the request), or a missing node. */
+    private static JsonNode allocationHolder(JsonNode a) {
+        JsonNode slots=a.path("request").path("slots");
+        return slots.has("allocationId")?slots:a.path("request").has("allocationId")?a.path("request"):com.fasterxml.jackson.databind.node.MissingNode.getInstance();
+    }
+    private static List<String> grantPlaces(JsonNode actor) {
+        JsonNode scope=actor.path("grant").path("scope");
+        for(String key:List.of("placeAliases","places")) if(scope.path(key).isArray()) {List<String> out=new ArrayList<>();for(JsonNode p:scope.path(key)) out.add(p.asText());return out;}
+        return null;
+    }
+    /** The acting actor and, when it is a fixture actor, its delegator: both are checked for the same targets (IdentityAuthorization). */
+    private static List<String> authorityChain(String actorRef,JsonNode actors) {
+        List<String> out=new ArrayList<>();String current=actorRef;
+        while(current!=null && actors.has(current) && !out.contains(current)) {out.add(current);String d=actors.path(current).path("grant").path("delegatorAlias").asText(null);current=d==null || d.equals(current)?null:d;}
+        return out;
+    }
+    /**
+     * contracts/fixture-place-kinds.json dispatchTransit (step2r round 10, Step 2 closure review 7 P1). After the pick the product
+     * reads transitPlaceId (TYPE_INVALID), requires Place.kind TRANSIT ('Transit place required') and authorizes the PLACE
+     * [transit] target (FORBIDDEN). Every dispatch that names an allocation names a fixture TRANSIT place in cargoPlaceId beside
+     * the allocation, and unless the dispatch pins FORBIDDEN, every actor of its authority chain that lists grant places lists it.
+     */
+    public List<String> dispatchTransitProblems(JsonNode caseFile) throws IOException {
+        JsonNode rule=Json.read(path("contracts/fixture-place-kinds.json")).path("dispatchTransit");
+        String capability=Json.required(rule,"capability"),slot=Json.required(rule,"slot"),productSlot=Json.required(rule,"productSlot"),kind=Json.required(rule,"placeKind");
+        List<String> problems=new ArrayList<>();
+        for(JsonNode sub:caseFile.path("subcases")) {
+            String where=caseFile.path("caseId").asText()+"/"+sub.path("id").asText();
+            List<JsonNode> actions=actionsOf(sub);
+            ObjectNode aliases=Json.object(),actors=Json.object();ArrayNode ignored=Json.array();
+            String ref=sub.path("fixtureRef").asText();
+            if(!ref.isBlank() && Files.isRegularFile(path(ref))) mergeFixture(ref,new HashSet<>(),aliases,actors,ignored);
+            for(int i=0;i<actions.size();i++) {
+                JsonNode d=actions.get(i);if(!capability.equals(capabilityOf(d))) continue;
+                JsonNode holder=allocationHolder(d);if(holder.isMissingNode()) continue;
+                String id=where+"/"+d.path("id").asText();
+                String transit=slotAlias(holder.path(slot));if(transit==null) transit=slotAlias(holder.path(productSlot));
+                if(transit==null) {problems.add(id+": "+capability+" names an allocation but no "+kind+" place in "+slot+"; the product rejects it after the pick (TYPE_INVALID 'Invalid "+productSlot+"'), so name the fixture "+kind+" place the goods move to (contracts/fixture-place-kinds.json dispatchTransit)");continue;}
+                if(!aliases.path(transit).path("type").asText().equals("Place") || !kind.equals(aliases.path(transit).path("kind").asText())) {
+                    problems.add(id+": "+slot+" "+transit+" is not a fixture Place of kind "+kind+" (found "+aliases.path(transit).path("kind").asText("none")+"); the product answers TYPE_INVALID 'Transit place required'");continue;}
+                if(pinnedTo(sub,pins(actions,i),"/response/error/code","FORBIDDEN"::equals)) continue;
+                for(String who:authorityChain(d.path("actorRef").asText(),actors)) {
+                    List<String> places=grantPlaces(actors.path(who));
+                    if(places!=null && !places.contains(transit)) problems.add(id+": the grant of "+who+" lists places "+places+" without the transit place "+transit+"; the product authorizes PLACE ["+transit+"] for the dispatch (FORBIDDEN)");
+                }
+            }
+        }
+        return problems;
+    }
+    /**
+     * contracts/execution-preconditions.json occurrence (step2r round 10, closure review 7 P2). With the product clock of
+     * clocks(), an action's occurrence is its explicit occurredAt, else the request asOf, else the clock. requireContinuousAuthority
+     * rejects a dispatch dated before its authorized pick and observeDelivery a delivery before its dispatch; no actual occurrence
+     * may lie after the clock.
+     */
+    public List<String> occurrenceTimeProblems(JsonNode caseFile) throws IOException {
+        Set<String> preTime=Set.of("FORBIDDEN","STALE_REVISION","SCOPE_INELIGIBLE","VERSION_UNSUPPORTED");
+        List<String> problems=new ArrayList<>();
+        for(JsonNode sub:caseFile.path("subcases")) {
+            String where=caseFile.path("caseId").asText()+"/"+sub.path("id").asText();
+            List<JsonNode> actions=actionsOf(sub);List<java.time.Instant> clocks=clocks(sub,actions);
+            ObjectNode aliases=Json.object(),actors=Json.object();ArrayNode ignored=Json.array();Map<String,List<JsonNode>> declared=new HashMap<>();
+            String ref=sub.path("fixtureRef").asText();
+            if(!ref.isBlank() && Files.isRegularFile(path(ref))) {mergeFixture(ref,new HashSet<>(),aliases,actors,ignored);allocationDeclarations(ref,new HashSet<>(),declared);}
+            Map<String,java.time.Instant> picked=new HashMap<>(),dispatched=new HashMap<>();
+            for(int i=0;i<actions.size();i++) {
+                JsonNode a=actions.get(i);String cap=capabilityOf(a);java.time.Instant now=clocks.get(i);
+                if(cap.isBlank() || now==null || !a.has("request")) continue;
+                String id=where+"/"+a.path("id").asText();Set<String> pins=pins(actions,i);
+                JsonNode holder=a.path("request").path("slots").has("occurredAt")?a.path("request").path("slots"):a.path("request");
+                java.time.Instant explicit=instant(holder.path("occurredAt"));
+                java.time.Instant occurrence=explicit!=null?explicit:instant(a.path("request").path("asOf"));if(occurrence==null) occurrence=now;
+                if(PICK.equals(cap)) for(JsonNode r:resultNodes(allocationSlot(a))) picked.put(r.path("actionId").asText()+r.path("pointer").asText(),now);
+                String code=pinnedValue(sub,pins,"/response/error/code");
+                boolean applies=applies(sub,actions,i);
+                if(explicit!=null && explicit.isAfter(now) && (applies || code==null || !preTime.contains(code)))
+                    problems.add(id+": occurredAt "+explicit+" is after the product clock "+now+" at this action; the product rejects a future actual occurrence (contracts/execution-preconditions.json occurrence)");
+                if(DISPATCH.equals(cap)) {
+                    dispatched.put(a.path("id").asText(),occurrence);
+                    if(code!=null && preTime.contains(code)) continue;
+                    java.time.Instant pick=null;String alloc=slotAlias(allocationSlot(a));
+                    if(alloc!=null) for(JsonNode row:declared.getOrDefault(alloc,List.of())) if(row.has("pickedAt")) pick=instant(row.path("pickedAt"));
+                    for(JsonNode r:resultNodes(allocationSlot(a))) pick=picked.getOrDefault(r.path("actionId").asText()+r.path("pointer").asText(),pick);
+                    if(occurrence.isAfter(now)) problems.add(id+": dispatch occurrence "+occurrence+" is after the product clock "+now);
+                    if(pick!=null && occurrence.isBefore(pick)) problems.add(id+": dispatch occurrence "+occurrence+" precedes its authorized pick at "+pick
+                        +"; the product answers TYPE_INVALID 'Dispatch occurrence cannot precede its authorized pick' (requireContinuousAuthority). Pick earlier on the clock (a fixture past-fact pick, or a clock advance between pick and dispatch) or date the dispatch at or after the pick");
+                }
+                if(cap.equals("recordDelivery") && applies) for(JsonNode r:resultNodes(a.path("request"))) {
+                    java.time.Instant d=dispatched.get(r.path("actionId").asText());
+                    if(d!=null && occurrence.isBefore(d)) {problems.add(id+": delivery occurrence "+occurrence+" precedes the dispatch "+r.path("actionId").asText()+" at "+d+"; the product rejects 'Delivery outside dispatched exact range or time' (FulfillmentStockPrimitives.observeDelivery)");break;}
+                }
+            }
+        }
+        return problems;
+    }
+    /**
+     * contracts/execution-preconditions.json grantAuthority (step2r round 10). Fixture level: a grant scope's capabilityIds list
+     * every grant action, and a fixture-actor delegator holds every action it delegates. Action level: a COMMAND/RECORD action the
+     * subcase expects to apply is performed by a fixture actor holding the capability (role, grant, capabilityIds) with a grant
+     * valid at the clock, and every authority-chain actor that lists grant places lists the places the product authorizes.
+     */
+    public List<String> grantAuthorityProblems(JsonNode caseFile) throws IOException {
+        JsonNode rule=Json.read(path("contracts/execution-preconditions.json")).path("grantAuthority");String capabilityScope=Json.required(rule,"capabilityScopeField");
+        Map<String,String> kinds=new HashMap<>();
+        for(JsonNode c:Json.read(path("contracts/acceptance-capabilities.json")).path("capabilities")) kinds.put(c.path("id").asText(),c.path("kind").asText());
+        List<String> problems=new ArrayList<>();Set<String> seen=new HashSet<>();
+        for(JsonNode sub:caseFile.path("subcases")) {
+            String where=caseFile.path("caseId").asText()+"/"+sub.path("id").asText(),ref=sub.path("fixtureRef").asText();
+            if(ref.isBlank() || !Files.isRegularFile(path(ref))) continue;
+            ObjectNode aliases=Json.object(),actors=Json.object();ArrayNode ignored=Json.array();mergeFixture(ref,new HashSet<>(),aliases,actors,ignored);
+            Map<String,ObjectNode> rows=new LinkedHashMap<>();mergeSegments(ref,new HashSet<>(),rows);Map<String,List<JsonNode>> declared=new HashMap<>();allocationDeclarations(ref,new HashSet<>(),declared);
+            if(seen.add(ref)) for(var it=actors.fields();it.hasNext();) {
+                var e=it.next();JsonNode grant=e.getValue().path("grant");
+                JsonNode ids=grant.path("scope").path(capabilityScope);
+                if(ids.isArray()) for(JsonNode action:grant.path("actions")) if(!contains(ids,action.asText()))
+                    problems.add(caseFile.path("caseId").asText()+" "+ref+": actor "+e.getKey()+" grant action "+action.asText()+" is missing from its grant scope "+capabilityScope+"; an installer intersects or rejects the inconsistent grant, so the action is FORBIDDEN");
+                String d=grant.path("delegatorAlias").asText(null);
+                if(d!=null && !d.equals(e.getKey()) && actors.has(d)) for(JsonNode action:grant.path("actions"))
+                    if(!contains(actors.path(d).path("roleCapabilities"),action.asText()) || !contains(actors.path(d).path("grant").path("actions"),action.asText()))
+                        problems.add(caseFile.path("caseId").asText()+" "+ref+": delegator "+d+" of "+e.getKey()+" does not hold the delegated action "+action.asText()+" in roleCapabilities and grant.actions; the product checks the delegator for the same capability (IdentityAuthorization, plan section 7.1)");
+            }
+            List<JsonNode> actions=actionsOf(sub);List<java.time.Instant> clocks=clocks(sub,actions);
+            for(int i=0;i<actions.size();i++) {
+                JsonNode a=actions.get(i);String cap=capabilityOf(a);
+                if(!Set.of("COMMAND","RECORD").contains(kinds.getOrDefault(cap,"")) || !Set.of("invoke","query").contains(a.path("kind").asText()) || !applies(sub,actions,i)) continue;
+                String id=where+"/"+a.path("id").asText(),who=a.path("actorRef").asText();JsonNode actor=actors.get(who);
+                if(actor==null) {problems.add(id+": "+cap+" is expected to apply but "+who+" is no fixture actor");continue;}
+                JsonNode grant=actor.path("grant");
+                if(!contains(actor.path("roleCapabilities"),cap) || !contains(grant.path("actions"),cap) || grant.path("scope").path(capabilityScope).isArray() && !contains(grant.path("scope").path(capabilityScope),cap))
+                    problems.add(id+": "+cap+" is expected to apply but "+who+" does not hold it in roleCapabilities, grant.actions"+(grant.path("scope").has(capabilityScope)?" and grant.scope."+capabilityScope:"")+" (IdentityAuthorization: FORBIDDEN)");
+                if(clocks.get(i)!=null && grant.has("validFrom") && !grantValidAt(grant,clocks.get(i))) problems.add(id+": the grant of "+who+" ("+grant.path("validFrom").asText()+".."+grant.path("validUntil").asText()+") is not valid at the product clock "+clocks.get(i)+" of this action");
+                for(String place:authorizedPlaces(a,cap,aliases,rows,declared)) for(String chain:authorityChain(who,actors)) {
+                    List<String> places=grantPlaces(actors.path(chain));
+                    if(places!=null && !places.contains(place)) problems.add(id+": "+cap+" is expected to apply but the grant of "+chain+" lists places "+places+" without "+place+", which the product authorizes for it (PLACE scope, FORBIDDEN)");
+                }
+            }
+        }
+        return problems;
+    }
+    /** The place of a fixture segment: its alias or baseline.segments locationAlias/placeAlias. */
+    private static String segmentPlace(String segment,JsonNode aliases,Map<String,ObjectNode> rows) {
+        for(JsonNode r:List.of(aliases.path(segment),rows.getOrDefault(segment,Json.object()))) for(String key:List.of("locationAlias","placeAlias")) if(r.path(key).isTextual()) return r.path(key).asText();
+        return null;
+    }
+    private static String segmentCustodian(String segment,JsonNode aliases,Map<String,ObjectNode> rows) {
+        for(JsonNode r:List.of(aliases.path(segment),rows.getOrDefault(segment,Json.object()))) if(r.path("custodianAlias").isTextual()) return r.path("custodianAlias").asText();
+        return null;
+    }
+    /**
+     * The fixture segment an action works on: a reserve/split/move segment slot or its declared QuantitySegment subject (the
+     * product binds QuantitySegment to the command target, so the adapter maps the subject to segmentId), or the segment of a
+     * fixture allocation it names.
+     */
+    private static String fixtureSegment(JsonNode a,String cap,JsonNode aliases,Map<String,List<JsonNode>> declared) {
+        JsonNode slots=a.path("request").path("slots"),req=a.path("request");
+        if(Set.of("reserveQuantity","splitQuantity","moveQuantity").contains(cap)) {
+            List<String> named=new ArrayList<>();
+            for(String key:List.of("segmentId","sourceSegmentId")) {String s=slotAlias(slots.path(key));if(s==null) s=slotAlias(req.path(key));if(s!=null) named.add(s);}
+            for(JsonNode ref:req.path("subjectRefs")) if(ref.path("type").asText().equals("QuantitySegment") && slotAlias(ref.path("id"))!=null) named.add(slotAlias(ref.path("id")));
+            for(String s:named) if(aliases.path(s).path("type").asText().equals("QuantitySegment")) return s;
+        }
+        if(Set.of(PICK,DISPATCH,"releaseAllocation","replaceAllocation").contains(cap)) {
+            String alloc=slotAlias(allocationSlot(a));
+            if(alloc!=null) for(JsonNode row:declared.getOrDefault(alloc,List.of())) if(row.path("segmentAlias").isTextual() && aliases.path(row.path("segmentAlias").asText()).path("type").asText().equals("QuantitySegment")) return row.path("segmentAlias").asText();
+        }
+        return null;
+    }
+    private static List<String> authorizedPlaces(JsonNode a,String cap,JsonNode aliases,Map<String,ObjectNode> rows,Map<String,List<JsonNode>> declared) {
+        List<String> out=new ArrayList<>();JsonNode slots=a.path("request").path("slots"),req=a.path("request");
+        String segment=fixtureSegment(a,cap,aliases,declared);
+        if(segment!=null) {String place=segmentPlace(segment,aliases,rows);if(place!=null) out.add(place);}
+        if(cap.equals("moveQuantity")) {String dest=slotAlias(slots.path("destinationId"));if(dest==null) dest=slotAlias(req.path("destinationId"));if(dest!=null && aliases.path(dest).path("type").asText().equals("Place")) out.add(dest);}
+        if(cap.equals("confirmReceipt")) for(String key:List.of("placeId","destinationId","locationId")) {String p=slotAlias(slots.path(key));if(p!=null) {if(aliases.path(p).path("type").asText().equals("Place")) out.add(p);break;}}
+        return out;
+    }
+    /**
+     * contracts/execution-preconditions.json commandBasis (step2r round 10). dispatchQuantity and the stock commands require an
+     * evidenceRef (FulfillmentCommands, InventoryCommands); a command the subcase expects to apply names a basis anywhere in its request.
+     */
+    public List<String> commandBasisProblems(JsonNode caseFile) throws IOException {
+        JsonNode rule=Json.read(path("contracts/execution-preconditions.json")).path("commandBasis");
+        Set<String> caps=new HashSet<>(),fields=new HashSet<>();for(JsonNode c:rule.path("capabilities")) caps.add(c.asText());for(JsonNode f:rule.path("fields")) fields.add(f.asText());
+        List<String> problems=new ArrayList<>();
+        for(JsonNode sub:caseFile.path("subcases")) {
+            List<JsonNode> actions=actionsOf(sub);
+            for(int i=0;i<actions.size();i++) {
+                JsonNode a=actions.get(i);String cap=capabilityOf(a);
+                if(!caps.contains(cap) || !a.has("request") || !applies(sub,actions,i) || namesBasis(a.path("request"),fields)) continue;
+                problems.add(caseFile.path("caseId").asText()+"/"+sub.path("id").asText()+"/"+a.path("id").asText()+": "+cap+" is expected to apply but names no basis ("+new TreeSet<>(fields)+"); the product requires an evidenceRef (contracts/execution-preconditions.json commandBasis)");
+            }
+        }
+        return problems;
+    }
+    private static boolean namesBasis(JsonNode node,Set<String> fields) {
+        if(node.isObject()) {
+            for(var it=node.fields();it.hasNext();) {var e=it.next();
+                if(fields.contains(e.getKey()) && !(e.getValue().isArray() && e.getValue().isEmpty()) && !e.getValue().isNull() && !(e.getValue().isTextual() && e.getValue().asText().isBlank())) return true;
+                if(namesBasis(e.getValue(),fields)) return true;}
+        } else if(node.isArray()) for(JsonNode v:node) if(namesBasis(v,fields)) return true;
+        return false;
+    }
+    /**
+     * contracts/execution-preconditions.json warehouseCustody (step2r round 10). requireWarehouse and moveQuantity accept only stock at
+     * INTERNAL_STORAGE under an internal Human/Agent custodian; a move goes to another INTERNAL_STORAGE place.
+     */
+    public List<String> warehouseCustodyProblems(JsonNode caseFile) throws IOException {
+        JsonNode contract=Json.read(path("contracts/fixture-place-kinds.json"));Set<String> internal=new HashSet<>();for(JsonNode t:contract.path("internalCustodianAliasTypes")) internal.add(t.asText());
+        Set<String> caps=new HashSet<>();for(JsonNode c:Json.read(path("contracts/execution-preconditions.json")).path("warehouseCustody").path("capabilities")) caps.add(c.asText());
+        List<String> problems=new ArrayList<>();
+        for(JsonNode sub:caseFile.path("subcases")) {
+            String ref=sub.path("fixtureRef").asText();if(ref.isBlank() || !Files.isRegularFile(path(ref))) continue;
+            ObjectNode aliases=Json.object(),actors=Json.object();ArrayNode ignored=Json.array();mergeFixture(ref,new HashSet<>(),aliases,actors,ignored);
+            Map<String,ObjectNode> rows=new LinkedHashMap<>();mergeSegments(ref,new HashSet<>(),rows);Map<String,List<JsonNode>> declared=new HashMap<>();allocationDeclarations(ref,new HashSet<>(),declared);
+            List<JsonNode> actions=actionsOf(sub);
+            for(int i=0;i<actions.size();i++) {
+                JsonNode a=actions.get(i);String cap=capabilityOf(a);
+                if(!caps.contains(cap) || !applies(sub,actions,i)) continue;
+                String segment=fixtureSegment(a,cap,aliases,declared);if(segment==null) continue;
+                String id=caseFile.path("caseId").asText()+"/"+sub.path("id").asText()+"/"+a.path("id").asText(),place=segmentPlace(segment,aliases,rows),holder=segmentCustodian(segment,aliases,rows);
+                if(place==null || !"INTERNAL_STORAGE".equals(aliases.path(place).path("kind").asText()) || holder==null || !internal.contains(aliases.path(holder).path("type").asText()))
+                    problems.add(id+": "+cap+" is expected to apply to fixture segment "+segment+" at "+place+" (custodian "+holder+"), but the product requires INTERNAL_STORAGE under an internal Human/Agent custodian (FulfillmentCommands.requireWarehouse, InventoryCommands moveQuantity)");
+                if(cap.equals("moveQuantity")) {
+                    String dest=slotAlias(a.path("request").path("slots").path("destinationId"));if(dest==null) dest=slotAlias(a.path("request").path("destinationId"));
+                    if(dest!=null && (!"INTERNAL_STORAGE".equals(aliases.path(dest).path("kind").asText()) || dest.equals(place)))
+                        problems.add(id+": moveQuantity of "+segment+" goes to "+dest+"; the product moves only between distinct INTERNAL_STORAGE places");
                 }
             }
         }

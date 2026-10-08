@@ -1017,8 +1017,11 @@
             },
             "expectedRevision": 1,
             "commandIdempotencyKey": "T06-inconsistent-after-dispatch-dispatch-pending",
-            "segmentId": {
-              "$alias": "Q100"
+            "allocationId": {
+              "$alias": "old-allocation"
+            },
+            "cargoPlaceId": {
+              "$alias": "TRANSIT"
             },
             "quantity": "2",
             "unit": "BOX"
@@ -1418,7 +1421,7 @@
             "actionId": "dispatch-pending",
             "pointer": "/response/outcome"
           },
-          "expected": "REJECTED",
+          "expected": "CONFLICT",
           "requirementRefs": [
             "D06"
           ],
@@ -1436,7 +1439,40 @@
             "caseId": "T06",
             "subcaseId": "inconsistent-after-dispatch"
           },
-          "oracleExplanation": "pending rejection의 실제 값과 범위를 대조한다",
+          "oracleExplanation": "정정 중인 기출고100의 배분은 이미 소비됐다. 2 BOX를 다시 출고하려는 잘 갖춘 요청도 충돌로 거부된다",
+          "oracleRef": {
+            "oracleId": "T06.bitemporal-correction",
+            "observationNames": [
+              "correction-not-fake-movement"
+            ]
+          }
+        },
+        {
+          "id": "pending-code",
+          "op": "equals",
+          "source": {
+            "actionId": "dispatch-pending",
+            "pointer": "/response/error/code"
+          },
+          "expected": "STALE_REVISION",
+          "requirementRefs": [
+            "D06"
+          ],
+          "evidenceRefs": [
+            "dispatch-pending:actual-artifact",
+            "dispatch-pending:raw-source"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG-A"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "T06",
+            "subcaseId": "inconsistent-after-dispatch"
+          },
+          "oracleExplanation": "거부 이유는 소비된 배분(STALE_REVISION)이다. 정정이 2 BOX를 출고 가능한 실물로 되살리는 제품은 이 출고를 적용한다",
           "oracleRef": {
             "oracleId": "T06.bitemporal-correction",
             "observationNames": [

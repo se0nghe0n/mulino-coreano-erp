@@ -29,6 +29,14 @@ ROLES = {
     'intake': READS,
     'supervisor': READS,
 }
+# step2r round 10: IdentityAuthorization.permittedScopes checks a delegated grant against its delegator for the same
+# capability and targets (plan section 7.1: a human delegator grants only within its own authority). The supervisor that
+# delegates every grant below therefore holds every delegated grant action in its role and grant.
+for _who,_caps in list(ROLES.items()):
+    for _cap in (READS if _who in ['readAgent','worker'] else _caps):
+        if _cap not in ROLES['supervisor']: ROLES['supervisor']=ROLES['supervisor']+[_cap]
+# Dispatch moves the goods to a TRANSIT place named by the request (FulfillmentCommands transitPlaceId; corpus slot cargoPlaceId).
+TRANSIT_PLACE={'type':'Place','organizationAlias':'ORG-A','name':'출고 운송 구간','kind':'TRANSIT'}
 # Command audit and query audit are separate logical sources (contracts/audit-observation-fields.json, plan §7.4).
 TABLES = ['events','evidence_revisions','claims','inbox','identity_matches','canonical_links','movements','segments','allocations','assessments','obligations','assignments','audit','outbox','command_records','restrictions','source_profiles','policies','documents','tombstones','deletion_log','domain_records']
 
@@ -145,9 +153,16 @@ def build_t06():
     for t in ['movements','segments','allocations']:s.unchanged(t,'correction-not-fake-movement')
     s.ass('projection-pending','view-after','/response/data/projectionStatus','PENDING','correction-not-fake-movement')
     s.duty('correction-not-fake-movement','STOCK_RECONCILIATION')
-    s.invoke('dispatch-pending','dispatchQuantity','warehouse',{'segmentId':alias('Q100'),'quantity':'2','unit':'BOX'})
+    # step2r round 10 (closure review 7 P3): a well-formed dispatch of the corrected dispatch's own allocation. It names the
+    # consumed old-allocation and a TRANSIT place, so the only reason to refuse it is that the allocation is already consumed:
+    # FulfillmentCommands answers CONFLICT STALE_REVISION ('Allocation terminal or replaced') before any other check. A product
+    # that reopens the corrected 2 BOX as dispatchable stock (a fake movement) applies it instead.
+    s.fixture['aliases']['TRANSIT']=copy.deepcopy(TRANSIT_PLACE)
+    s.fixture['aliases']['old-allocation'].update({'segmentAlias':'Q100','quantity':'100','unit':'BOX','state':'CONSUMED'})
+    s.invoke('dispatch-pending','dispatchQuantity','warehouse',{'allocationId':alias('old-allocation'),'cargoPlaceId':alias('TRANSIT'),'quantity':'2','unit':'BOX'})
     s.query('pending-check');s.db('pending-db','pending-check',['movements','allocations','outbox'])
-    s.ass('pending-rejection','dispatch-pending','/response/outcome','REJECTED','correction-not-fake-movement')
+    s.ass('pending-rejection','dispatch-pending','/response/outcome','CONFLICT','correction-not-fake-movement',explain='정정 중인 기출고100의 배분은 이미 소비됐다. 2 BOX를 다시 출고하려는 잘 갖춘 요청도 충돌로 거부된다')
+    s.ass('pending-code','dispatch-pending','/response/error/code','STALE_REVISION','correction-not-fake-movement',explain='거부 이유는 소비된 배분(STALE_REVISION)이다. 정정이 2 BOX를 출고 가능한 실물로 되살리는 제품은 이 출고를 적용한다')
     for t in ['movements','allocations','outbox']:s.ass('pending-'+t,'pending-db','/data/rawRows/'+t,True,'correction-not-fake-movement','sameAs',baseline=('db-after','/data/rawRows/'+t))
     s.finish()
     for incl,status,sid in [(True,'SATISFIED','inclusive-deadline'),(False,'UNSATISFIED','exclusive-deadline')]:
@@ -370,7 +385,8 @@ def build_t24():
     s=c.sub('audit-rollback-and-retry','감사저장 실패는 모든 거래효과를 rollback하고 같은key로 재시도한다',o,{'quantities':[{'alias':'A60','quantity':'60','unit':'BOX','physicalScope':'A60-physical'}],'allocation':[{'alias':'old-allocation','segmentAlias':'A60','workAlias':'S1','quantity':'20','unit':'BOX','status':'EXECUTABLE','revision':1,'pickedAt':'2026-10-07T00:00:00Z','pickedByAlias':'warehouse'}],'eligibilityBasis':{'segmentAlias':'A60','action':'DISPATCH','syntheticQCEvidence':'PASS','syntheticRegulatoryEvidence':'ALLOWED','dispositionScope':'20 BOX','effectiveUntil':'2026-10-31T00:00:00Z'}})
     basis=s.payload('dispatch-basis',{'QC':'PASS','regulatory':'ALLOWED','disposition':'20 BOX','scope':'A60'})
     s.before();s.control('fault','fault','install',{'faultId':'audit-persist-failure','point':'AUDIT_INSERT','commandKey':'T24-audit-effect','failure':'PERSISTENCE_ERROR'})
-    request={'segmentId':alias('A60'),'allocationId':alias('old-allocation'),'workId':alias('S1'),'quantity':'20','unit':'BOX','destinationId':alias('C'),'commandIdempotencyKey':'T24-audit-effect','evidenceRefs':[alias('dispatch-basis')]}
+    s.fixture['aliases']['TRANSIT']=copy.deepcopy(TRANSIT_PLACE)
+    request={'segmentId':alias('A60'),'allocationId':alias('old-allocation'),'workId':alias('S1'),'quantity':'20','unit':'BOX','destinationId':alias('C'),'cargoPlaceId':alias('TRANSIT'),'commandIdempotencyKey':'T24-audit-effect','evidenceRefs':[alias('dispatch-basis')]}
     s.invoke('fail','dispatchQuantity','warehouse',request);s.after()
     for table,obs in [('domain_records','committed-domain-effects'),('movements','committed-ledger-effects'),('allocations','committed-allocation-effects'),('obligations','committed-duty-effects'),('assignments','committed-duty-effects'),('outbox','committed-outbox-effects'),('command_records','committed-idempotency-result')]:s.unchanged(table,obs)
     s.ass('audit-error','fail','/response/error/code','AUDIT_PERSISTENCE_FAILED','committed-domain-effects')
