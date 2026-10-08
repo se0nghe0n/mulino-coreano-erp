@@ -46,3 +46,24 @@ status PASS (assets/evidence.json 삭제가 S0 inventory 검사에 영향 없음
 
 ## 미실행
 제품 runtime(./verify scenarios --actual, actual-sN), coverage assemble/validate는 실행하지 않았다(skill 문서 변경만 해당). 실모델·BTP 미실행.
+
+# ROUND 2 (branch step1r/skills-r2, base b93b6363, Claude Sonnet 5.5 high)
+## R2-1. frontmatter·상대 링크·.claude 링크 (임시 python, repo 밖 실행 아님: 인라인)
+frontmatter 3개 skill: name·description 존재 OK
+relative links checked 27, broken 0 (cross-owner-requests.md 포함)
+.claude/skills 3개 symlink가 .agents/skills 실제 디렉터리를 가리킴 OK
+## R2-2. git diff --check b93b6363..HEAD
+exit 0
+## R2-3. 변경하지 않은 것 확인
+acceptance-oracles.md diff 없음(hash 잠금 유지)
+$ python3 verification/platform/inventory/check.py
+status PASS
+## R2-4. 근거 대조(코드 읽기)
+./verify(--actual 허용 모드), Main.java:55,59(non-actual NOT_RUN, actual gateComplete=false),
+ScenarioGlue.java(assertion 둘째 인자 humanExplanation), assemble.py(receipt/PASS 조건,
+manifest 경로 verification/harness/target/evidence/runtime-manifest.json),
+validate.py(VALID=일관성), runtime-evidence-index.schema.json(evidenceClass 3값),
+V4/case.json(92 subcase, 열거 subcase 없음), verification/actual/s*/receipt.py(recordType)
+## R2-5. 미실행
+./verify harness·validate·contract-red·prepare는 실행하지 않았다(skill 문서만 변경, 양식 파일 불변).
+V4 열거 subcase 구현과 타 소유 문서(claude-rereview-steps-1-2.md, task-status.md) 정정은 cross-owner-requests.md로 요청.

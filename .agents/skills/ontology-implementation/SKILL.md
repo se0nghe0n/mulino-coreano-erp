@@ -69,9 +69,13 @@ pipeline이다. 실행은 `./verify`·`verification/actual/sN/run.sh`, 연결·�
 `verification/coverage`의 receipt·index·`assemble.py`·`validate.py`,
 결과는
 `verification/harness/target/evidence/runtime-manifest.json`이다.
-증거 class(ACTUAL/SELFTEST/CONTRACT_RED/STUB/LOGIC_REVIEW)와 보고 규칙은
+증거 class(index의 ACTUAL/SELFTEST/CONTRACT_RED와 보고 범주 STUB/LOGIC_REVIEW)와
+보고 규칙은
 [저장소 harness](../ontology-scenario-testing/references/repository-harness.md)를
-따른다. ACTUAL receipt가 검증되지 않은 PASS 주장은 `NOT_RUN`이다.
+따른다. PASS는 manifest item/profile `status`가 `PASS`인 것뿐이다
+(`validate.py`의 `VALID`는 일관성). 현재 도구는 coverage PASS를 만들 수 없어
+runtime 주장은 `NOT_RUN`이고 native `actual-sN` 결과는 한정된 custody 증거로
+따로 보고한다.
 requirement/case→assertion→artifact, commit, version, fixture hash, 정확한
 command, expected/observed와 `PASS|FAIL|NOT_RUN`을 그 산출물에서 인용한다.
 논리 review·문서/skill 검증·로컬 결정적 테스트·실모델·규제 검토·BTP/client
