@@ -170,6 +170,24 @@ class ReceiptGatewayPostgresTest {
   var silent=provisional(uuid(),"40",true,null,null,null);var unnamed=confirm(silent,canonical(silent,null),uuid(),CUSTODIAN);assertEquals("HELD",unnamed.get("outcome"),unnamed.toString());assertEquals("EVIDENCE_UNVERIFIED",code(unnamed));assertNoReceiptEffect();
   var split=provisional(uuid(),"20",true,null,CUSTODIAN,ACTOR);var conflict=confirm(split,canonical(split,null),uuid(),CUSTODIAN);assertEquals("HELD",conflict.get("outcome"),conflict.toString());assertEquals("EVIDENCE_CONFLICT",code(conflict));assertNoReceiptEffect();
   var retry=confirm(named,occurrence,uuid(),CUSTODIAN);assertEquals("APPLIED",retry.get("outcome"),retry.toString());assertEquals(CUSTODIAN,jdbc.queryForObject("SELECT custodianId FROM mulino_inventory_QuantitySegments",String.class));}
+ /** Plan §4.1–§4.3, D07: a second verified source naming another custodian is a conflict, whether or not the confirm carries the slot. */
+ @Test void secondVerifiedSourceNamingAnotherCustodianHoldsEveryConfirmWithoutEffect(){custodyActors();
+  var a=provisional(uuid(),"60",true,null,CUSTODIAN,CUSTODIAN);String occurrence=canonical(a,null);var first=confirm(a,occurrence,uuid(),CUSTODIAN);assertEquals("APPLIED",first.get("outcome"),first.toString());String segment=((Map<?,?>)first.get("effects")).get("segmentId").toString();
+  var b=provisional(a.root(),"60",true,null,UNAUTHORIZED,UNAUTHORIZED);assertEquals(occurrence,canonical(b,occurrence));
+  int segments=count("mulino_inventory_QuantitySegments"),movements=count("mulino_inventory_QuantityMovements"),receipts=count("mulino_trade_receipt_Receipts");
+  var slotless=confirm(b,occurrence,uuid());assertEquals("HELD",slotless.get("outcome"),slotless.toString());assertEquals("EVIDENCE_CONFLICT",code(slotless));assertEquals(Map.of(),slotless.get("effects"));
+  var withSlot=confirm(b,occurrence,uuid(),CUSTODIAN);assertEquals("HELD",withSlot.get("outcome"),withSlot.toString());assertEquals("EVIDENCE_CONFLICT",code(withSlot));
+  assertEquals(segments,count("mulino_inventory_QuantitySegments"));assertEquals(movements,count("mulino_inventory_QuantityMovements"));assertEquals(receipts,count("mulino_trade_receipt_Receipts"));
+  assertEquals(CUSTODIAN,jdbc.queryForObject("SELECT custodianId FROM mulino_inventory_QuantitySegments WHERE ID=?",String.class,segment));
+  assertEquals("PROVISIONAL",jdbc.queryForObject("SELECT state FROM mulino_trade_receipt_Observations WHERE ID=?",String.class,b.provisional()));
+ }
+ /** The same conflict before any physical effect: two linked sources naming different custodians create no stock. */
+ @Test void conflictingCustodySourcesLinkedBeforeFirstConfirmCreateNoStock(){custodyActors();
+  var a=provisional(uuid(),"60",true,null,CUSTODIAN,CUSTODIAN);String occurrence=canonical(a,null);var b=provisional(a.root(),"60",true,null,UNAUTHORIZED,UNAUTHORIZED);assertEquals(occurrence,canonical(b,occurrence));
+  var slotless=confirm(a,occurrence,uuid());assertEquals("HELD",slotless.get("outcome"),slotless.toString());assertEquals("EVIDENCE_CONFLICT",code(slotless));assertNoReceiptEffect();
+  var silentSecond=provisional(uuid(),"40",true,null,CUSTODIAN,CUSTODIAN);String second=canonical(silentSecond,null);var unnamed=provisional(silentSecond.root(),"40",true,null,null,null);assertEquals(second,canonical(unnamed,second));
+  var agreed=confirm(unnamed,second,uuid(),CUSTODIAN);assertEquals("APPLIED",agreed.get("outcome"),agreed.toString());assertEquals(CUSTODIAN,jdbc.queryForObject("SELECT custodianId FROM mulino_inventory_QuantitySegments WHERE retiredAt IS NULL",String.class));
+ }
  @Test void nonInternalUnauthorizedOrUnknownReceivingCustodianIsRejected(){custodyActors();
   var external=provisional(uuid(),"60",true,null,EXTERNAL,EXTERNAL);var notInternal=confirm(external,canonical(external,null),uuid(),EXTERNAL);assertEquals("REJECTED",notInternal.get("outcome"),notInternal.toString());assertEquals("SCOPE_INELIGIBLE",code(notInternal));assertNoReceiptEffect();
   var unauthorized=provisional(uuid(),"40",true,null,UNAUTHORIZED,UNAUTHORIZED);var noAuthority=confirm(unauthorized,canonical(unauthorized,null),uuid(),UNAUTHORIZED);assertEquals("REJECTED",noAuthority.get("outcome"),noAuthority.toString());assertEquals("SCOPE_INELIGIBLE",code(noAuthority));assertNoReceiptEffect();

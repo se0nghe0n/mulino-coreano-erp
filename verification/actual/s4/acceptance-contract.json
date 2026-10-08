@@ -3,13 +3,179 @@
   "gateComplete": false,
   "status": "NOT_RUN",
   "cases": {
-    "E1": {"purchaseCumulative": "100", "warehouseCurrent": "80", "historicalDelivered": "30", "returned": "10", "currentEligible": "0", "invoiceDifference": "5", "bankEffects": 0, "unresolvedHumanDuties": ["QC", "RETURN", "SETTLEMENT"], "entrypointParity": "same ID and snapshot"},
-    "E2": {"physical": "60", "qcHold": "20", "recallHold": "60", "adminScope": "50", "recovered": "25", "disposedSameRecovered": "25", "uniqueProcessed": "25", "unknownResidual": "25", "normalCloseAllowed": false, "exceptionRetainsResponsibility": true},
-    "C1": {"newReservationAfterRevoke": "0", "newDispatchAfterRevoke": "0", "existingResponsibilityRetained": true},
-    "C4": {"historicalDelivered": "100", "actualReturn": "20", "separateCorrectedActual": "98", "newResidualDuty": "2", "resolvedOrWaivedDutyRevival": "0"},
-    "postDispatchRecall": {"actualDelivered": "20", "inTransit": "10", "newDispatch": "0", "falseOrUnmatchedNormalEffect": "0"},
-    "V2": {"evidenceOwner": "inventory", "requiredPath": "real PostgreSQL deterministic transaction barrier"},
-    "V3": {"evidenceOwner": "inventory", "requiredPath": "real PostgreSQL deterministic transaction barrier"}
+    "E1": {
+      "purchaseCumulative": "100",
+      "warehouseCurrent": "80",
+      "historicalDelivered": "30",
+      "returned": "10",
+      "currentEligible": "0",
+      "invoiceDifference": "5",
+      "bankEffects": 0,
+      "unresolvedHumanDuties": [
+        "QC",
+        "RETURN",
+        "SETTLEMENT"
+      ],
+      "entrypointParity": "same ID and snapshot"
+    },
+    "E2": {
+      "physical": "60",
+      "qcHold": "20",
+      "recallHold": "60",
+      "adminScope": "50",
+      "recovered": "25",
+      "disposedSameRecovered": "25",
+      "uniqueProcessed": "25",
+      "unknownResidual": "25",
+      "normalCloseAllowed": false,
+      "exceptionRetainsResponsibility": true
+    },
+    "C1": {
+      "newReservationAfterRevoke": "0",
+      "newDispatchAfterRevoke": "0",
+      "existingResponsibilityRetained": true
+    },
+    "C4": {
+      "historicalDelivered": "100",
+      "actualReturn": "20",
+      "separateCorrectedActual": "98",
+      "newResidualDuty": "2",
+      "resolvedOrWaivedDutyRevival": "0"
+    },
+    "postDispatchRecall": {
+      "actualDelivered": "20",
+      "inTransit": "10",
+      "newDispatch": "0",
+      "falseOrUnmatchedNormalEffect": "0"
+    },
+    "V2": {
+      "evidenceOwner": "inventory",
+      "requiredPath": "real PostgreSQL deterministic transaction barrier"
+    },
+    "V3": {
+      "evidenceOwner": "inventory",
+      "requiredPath": "real PostgreSQL deterministic transaction barrier"
+    }
   },
-  "limitations": ["Contract expectations are not runtime observations", "No paid model, regulatory or BTP acceptance"]
+  "limitations": [
+    "Contract expectations are not runtime observations",
+    "No paid model, regulatory or BTP acceptance"
+  ],
+  "assertionMap": {
+    "_comment": "Each contract key names the authored native actions whose assertions observe it. NativeS4TradeMain reports per key ASSERTED/NOT_RUN/UNMAPPED and fails a flow whose requiredCases name a key it did not assert. UNMAPPED keys have no native assertion and stay NOT_RUN.",
+    "E1": {
+      "purchaseCumulative": [
+        "e1-final-independent"
+      ],
+      "warehouseCurrent": [
+        "e1-final-independent",
+        "e1-current-warehouse"
+      ],
+      "historicalDelivered": [
+        "e1-final-independent"
+      ],
+      "returned": [
+        "e1-final-independent"
+      ],
+      "currentEligible": [
+        "e1-current-warehouse",
+        "e1-noun-eligibility"
+      ],
+      "invoiceDifference": [
+        "e1-match-invoice-gap5",
+        "e1-final-independent"
+      ],
+      "bankEffects": [
+        "e1-final-independent"
+      ],
+      "unresolvedHumanDuties": [
+        "e1-final-independent",
+        "e1-noun",
+        "e1-verb"
+      ],
+      "entrypointParity": [
+        "e1-noun",
+        "e1-verb"
+      ]
+    },
+    "E2": {
+      "physical": [],
+      "qcHold": [],
+      "recallHold": [
+        "e2-independent-holds"
+      ],
+      "adminScope": [
+        "e2-record-recover25"
+      ],
+      "recovered": [
+        "e2-record-dispose25",
+        "e2-accounted25-not50"
+      ],
+      "disposedSameRecovered": [
+        "e2-record-dispose25",
+        "e2-accounted25-not50"
+      ],
+      "uniqueProcessed": [
+        "e2-record-dispose25"
+      ],
+      "unknownResidual": [
+        "e2-record-dispose25",
+        "e2-close-unknown25-denied"
+      ],
+      "normalCloseAllowed": [
+        "e2-close-unknown25-denied"
+      ],
+      "exceptionRetainsResponsibility": [
+        "e2-admin-close-with-residual",
+        "e2-final-independent"
+      ]
+    },
+    "C1": {
+      "newReservationAfterRevoke": [
+        "c1-new-reserve-after-revoke-denied",
+        "c1-final-independent"
+      ],
+      "newDispatchAfterRevoke": [
+        "c1-dispatch-after-revoke-denied",
+        "c1-final-independent"
+      ],
+      "existingResponsibilityRetained": [
+        "c1-after-revoke",
+        "c1-after-revoke-responsibility",
+        "c1-final-independent"
+      ]
+    },
+    "C4": {
+      "historicalDelivered": [
+        "c4-history100-before-return",
+        "c4-return-distinct-history"
+      ],
+      "actualReturn": [
+        "c4-return-distinct-history"
+      ],
+      "separateCorrectedActual": [
+        "c4-correct98-independent"
+      ],
+      "newResidualDuty": [
+        "c4-correct98-independent"
+      ],
+      "resolvedOrWaivedDutyRevival": [
+        "c4-waived-deficit-not-revived"
+      ]
+    },
+    "postDispatchRecall": {
+      "actualDelivered": [],
+      "inTransit": [],
+      "newDispatch": [],
+      "falseOrUnmatchedNormalEffect": []
+    },
+    "V2": {
+      "evidenceOwner": [],
+      "requiredPath": []
+    },
+    "V3": {
+      "evidenceOwner": [],
+      "requiredPath": []
+    }
+  }
 }

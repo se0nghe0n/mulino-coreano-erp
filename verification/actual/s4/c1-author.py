@@ -105,7 +105,9 @@ s+=[dict(id=name,type='original',fixture=dict(synthetic=True,clock=dict(asOf=T,k
   total('mulino_inventory_quantitysegments','quantity','0',dict(retiredat=None,placeid='$TRANSIT')),
   rows('mulino_inventory_segmentallocations',{},1),rows('mulino_inventory_segmentallocations',dict(id='$ALLOCATION',state='SUSPENDED',quantity='20'),1),
   dict(pointer='/rawRows/mulino_inventory_dispatches',operator='size',expected=0),dict(pointer='/rawRows/mulino_trade_sales_executioneffects',operator='size',expected=0),
-  dict(pointer='/rawRows/mulino_work_read_obligationreferences',operator='humanDuties',kinds=['QUALITY_REVIEW'])]),
+  # The revocation's QUALITY_REVIEW is bound to the revoked basis itself (its
+  # Work, quantity40 and COMMERCIAL category), not to any duty of that kind.
+  dict(pointer='/rawRows/mulino_work_read_obligationreferences',operator='humanDuties',duties=[dict(kind='QUALITY_REVIEW',where={'workid':'$WORK','scope.domainSourceId':'$C1_COMMERCIAL','quantity':'40','unit':'BOX','scope.residual.category':'COMMERCIAL','scope.residual.action':'SELL'},count=1)])]),
  inventory('c1-after-revoke-responsibility',[eq('/data/heldQuantity','100'),eq('/data/eligibleQuantity','0'),eq('/data/unreservedEligibleQuantity','0'),eq('/data/reservationResponsibilityQuantity','20')])]
 write('c1-sale-revocation.json',dict(schemaVersion='1.0.0',status='NOT_RUN',actions=s))
 write('c1-flow.json',dict(schemaVersion='1.0.0',status='NOT_RUN',requiredCases=['C1'],fullCaseCoverageClaimed=False,actions=[dict(id='c1-setup',type='setup',fixtureRef='verification/actual/s4/fixture.json',organizationAlias='ORG')]+[dict(id='c1-include-'+x,type='include',scriptRef='verification/actual/s4/'+x+'.json') for x in ['c1-upstream','c1-sale-revocation']]))

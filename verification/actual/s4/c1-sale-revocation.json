@@ -616,8 +616,19 @@
         {
           "pointer": "/rawRows/mulino_work_read_obligationreferences",
           "operator": "humanDuties",
-          "kinds": [
-            "QUALITY_REVIEW"
+          "duties": [
+            {
+              "kind": "QUALITY_REVIEW",
+              "where": {
+                "workid": "$WORK",
+                "scope.domainSourceId": "$C1_COMMERCIAL",
+                "quantity": "40",
+                "unit": "BOX",
+                "scope.residual.category": "COMMERCIAL",
+                "scope.residual.action": "SELL"
+              },
+              "count": 1
+            }
           ]
         }
       ]

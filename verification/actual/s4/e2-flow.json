@@ -3439,7 +3439,19 @@
             "id": "$WORK"
           }
         ]
-      }
+      },
+      "assertions": [
+        {
+          "pointer": "/error/code",
+          "operator": "equals",
+          "expected": "RECALL_EVENT_ALREADY_APPLIED"
+        },
+        {
+          "pointer": "/effects",
+          "operator": "equals",
+          "expected": {}
+        }
+      ]
     },
     {
       "id": "e2-dispose-same25-actual-event",
@@ -3690,7 +3702,19 @@
             "id": "$WORK"
           }
         ]
-      }
+      },
+      "assertions": [
+        {
+          "pointer": "/error/code",
+          "operator": "equals",
+          "expected": "RECALL_EVENT_ALREADY_APPLIED"
+        },
+        {
+          "pointer": "/effects",
+          "operator": "equals",
+          "expected": {}
+        }
+      ]
     },
     {
       "id": "e2-close-unknown25-denied",
@@ -4217,9 +4241,28 @@
         {
           "pointer": "/rawRows/mulino_work_read_obligationreferences",
           "operator": "humanDuties",
-          "kinds": [
-            "RECALL_EXCEPTION_RESIDUAL",
-            "RECALL_EXCLUDED_SCOPE"
+          "duties": [
+            {
+              "kind": "RECALL_EXCEPTION_RESIDUAL",
+              "where": {
+                "id": "$E2_RESIDUAL_DUTY",
+                "workid": "$WORK",
+                "scope.residual.scopeId": "$E2_SCOPE",
+                "quantity": "25",
+                "unit": "BOX"
+              },
+              "count": 1
+            },
+            {
+              "kind": "RECALL_EXCLUDED_SCOPE",
+              "where": {
+                "workid": "$WORK",
+                "scope.residual.scopeId": "$E2_SCOPE",
+                "quantity": "10",
+                "unit": "BOX"
+              },
+              "count": 1
+            }
           ]
         },
         {

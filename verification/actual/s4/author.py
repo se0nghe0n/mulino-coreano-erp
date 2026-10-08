@@ -118,6 +118,18 @@ b=[original('e1-invoice-input','INVOICE',inv,'$LINE','40',subject='PURCHASE_ORDE
 b += link('e1-invoice-original','$INVOICE','40')
 b += [command('e1-match-invoice-gap5','matchInvoice',{'invoiceId':'$INVOICE','canonicalOccurrenceId':'$e1-invoice-original.canonical','evidence':'$e1-invoice-original.document'},revision=1,assertions=[{'pointer':'/quantityDifference','operator':'decimalEquals','expected':'0'},{'pointer':'/originalDifference','operator':'decimalEquals','expected':'5'},{'pointer':'/businessStatus','operator':'equals','expected':'DIFFERENCE'},{'pointer':'/settlementResult','operator':'equals','expected':'UNSATISFIED'},{'pointer':'/bankEffect','operator':'equals','expected':'0'}])]
 write('e1-settlement.json',{'schemaVersion':'1.0.0','status':'NOT_RUN','actions':b})
+# Each of the plan §13.3 E1 human duties bound to its exact Work and source:
+# QC on receipt40's segment, the three return reviews on the return receipt
+# of the sales Work, and the invoice money gap on the purchase Work.
+E1_HUMAN_DUTIES=[{'kind':'QUALITY_REVIEW','where':{'workid':'$WORK','scope.physicalScopeId':'$receipt40.segment','quantity':'40','unit':'BOX','scope.residual.category':'QC'},'count':1}]+[{'kind':k,'where':{'workid':'$SALES_WORK','scope.domainSourceId':'$RETURN_RECEIPT'},'count':1} for k in ['RETURN_QC_REVIEW','RETURN_COMMERCIAL_REVIEW','RETURN_SETTLEMENT_REVIEW']]+[{'kind':'SETTLEMENT_DIFFERENCE','where':{'workid':'$WORK','scope.domainSourceId':'$INVOICE','scope.residual.invoiceId':'$INVOICE'},'count':1}]
+def world_content():
+ """API content of a world read checked against the independent JDBC ledger."""
+ works=['$WORK','$SALES_WORK']
+ return [{'pointer':'/data/workIds','operator':'sameSet','expected':works},
+  {'pointer':'/data/obligations','operator':'ledgerRows','expected':'$E1_LEDGER_OBLIGATIONS','where':{'workid':works}},
+  {'pointer':'/data/obligations','operator':'humanDuties','duties':E1_HUMAN_DUTIES,'actors':'$E1_ACTORS'},
+  {'pointer':'/data/ownerIds','operator':'ledgerOwners','works':'$E1_LEDGER_WORKS','obligations':'$E1_LEDGER_OBLIGATIONS','workIds':works},
+  {'pointer':'/data/contributions','operator':'ledgerRows','expected':'$E1_LEDGER_CONTRIBUTIONS','where':{'targetworkid':works}}]
 c=[{'id':'e1-current-sales-revision','type':'observe','bindRows':{'SALES_WORK_REV':{'pointer':'/rawRows/mulino_work_read_works','where':{'id':'$SALES_WORK'},'column':'revision'}}},command('e1-assess-sales30','assessGoal',{'workId':'$SALES_WORK'},revision='$SALES_WORK_REV',refs=[{'type':'Work','id':'$SALES_WORK'}],assertions=[{'pointer':'/assessment/outcome','operator':'equals','expected':'SATISFIED'}]),{'id':'e1-final-independent','type':'observe','assertions':[
  {'pointer':'/rawRows/mulino_inventory_quantitysegments','operator':'sum','column':'quantity','where':{'retiredat':None,'placeid':'$W'},'expected':'80'},
  {'pointer':'/rawRows/mulino_trade_receipt_receipts','operator':'sum','column':'contributedquantity','expected':'100'},
@@ -125,8 +137,25 @@ c=[{'id':'e1-current-sales-revision','type':'observe','bindRows':{'SALES_WORK_RE
  {'pointer':'/rawRows/mulino_trade_returns_receipts','operator':'sum','column':'quantity','expected':'10'},
  {'pointer':'/rawRows/mulino_trade_settlement_matches','operator':'sum','column':'originaldifference','expected':'5'},
  {'pointer':'/rawRows/mulino_trade_settlement_paymentreferences','operator':'size','expected':0},
- {'pointer':'/rawRows/mulino_work_read_obligationreferences','operator':'humanDuties','kinds':['QUALITY_REVIEW','RETURN_QC_REVIEW','RETURN_COMMERCIAL_REVIEW','RETURN_SETTLEMENT_REVIEW','SETTLEMENT_DIFFERENCE']} ]},
+ {'pointer':'/rawRows/mulino_work_read_obligationreferences','operator':'humanDuties','duties':E1_HUMAN_DUTIES},
+ # Custody is observed, not inferred: receipt-derived W stock names the
+ # evidenced supervisor; the return and customer-site stock name no custodian;
+ # no segment ever records an owner (plan §4.1/§4.2).
+ {'pointer':'/rawRows/mulino_inventory_quantitysegments','operator':'matchingRows','where':{'retiredat':None,'placeid':'$W','custodianid':'$supervisor','ownerid':None},'expected':2},
+ {'pointer':'/rawRows/mulino_inventory_quantitysegments','operator':'matchingRows','where':{'retiredat':None,'placeid':'$W','custodianid':None,'ownerid':None,'quantity':'10'},'expected':1},
+ {'pointer':'/rawRows/mulino_inventory_quantitysegments','operator':'matchingRows','where':{'retiredat':None,'placeid':'$CUSTOMER_PLACE','custodianid':None,'ownerid':None},'expected':1},
+ {'pointer':'/rawRows/mulino_inventory_quantitysegments','operator':'matchingRows','where':{'retiredat':None},'expected':4},
+ # Settlement records a payment reference at most; no bank or payment outbox
+ # operation may be enqueued (plan §6 지급 참조≠은행 이체).
+ {'pointer':'/rawRows/mulino_runtime_outbox','operator':'matchingRows','where':{},'expected':1},
+ {'pointer':'/rawRows/mulino_runtime_outbox','operator':'matchingRows','where':{'operation':'dispatchPurchaseOrder'},'expected':1} ],
+ 'bind':{'E1_LEDGER_OBLIGATIONS':'/rawRows/mulino_work_read_obligationreferences','E1_LEDGER_WORKS':'/rawRows/mulino_work_read_works','E1_LEDGER_CONTRIBUTIONS':'/rawRows/mulino_work_workcontributions','E1_ACTORS':'/rawRows/mulino_identity_actors'}},
  {'id':'e1-current-warehouse','type':'query','capability':'getInventory','request':{'scope':{'organizationId':'$ORG','itemId':'$P','placeId':'$W'},'asOf':T,'knownAt':T},'assertions':[{'pointer':'/data/heldQuantity','operator':'equals','expected':'80'},{'pointer':'/data/eligibleQuantity','operator':'equals','expected':'0'}]},
- {'id':'e1-noun','type':'query','capability':'getObject','request':{'id':'$P','scope':{'organizationId':'$ORG','itemId':'$P'},'asOf':T,'knownAt':T},'bind':{'E1_SNAPSHOT':'/snapshotRevision','E1_WORK_IDS':'/data/workIds','E1_DUTIES':'/data/obligations','E1_CONTRIBUTIONS':'/data/contributions','E1_OWNERS':'/data/ownerIds','E1_EVIDENCE':'/data/evidenceRefs'}},
- {'id':'e1-verb','type':'query','capability':'getWork','request':{'id':'$WORK','scope':{'organizationId':'$ORG','itemId':'$P'},'asOf':T,'knownAt':T,'snapshotRef':'$E1_SNAPSHOT'},'assertions':[{'pointer':'/snapshotRevision','operator':'equals','expected':'$E1_SNAPSHOT'},{'pointer':'/data/workIds','operator':'equals','expected':'$E1_WORK_IDS'},{'pointer':'/data/obligations','operator':'equals','expected':'$E1_DUTIES'},{'pointer':'/data/contributions','operator':'equals','expected':'$E1_CONTRIBUTIONS'},{'pointer':'/data/ownerIds','operator':'equals','expected':'$E1_OWNERS'},{'pointer':'/data/evidenceRefs','operator':'equals','expected':'$E1_EVIDENCE'}]}]
+ {'id':'e1-noun','type':'query','capability':'getObject','request':{'id':'$P','scope':{'organizationId':'$ORG','itemId':'$P'},'asOf':T,'knownAt':T},'assertions':world_content(),'bind':{'E1_SNAPSHOT':'/snapshotRevision','E1_WORK_IDS':'/data/workIds','E1_DUTIES':'/data/obligations','E1_CONTRIBUTIONS':'/data/contributions','E1_OWNERS':'/data/ownerIds','E1_EVIDENCE':'/data/evidenceRefs','E1_HELD':'/data/heldQuantity','E1_ELIGIBLE':'/data/eligibleQuantity'}},
+ # The verb answers for $WORK itself and carries the same independently checked
+ # world; parity is then checked on non-vacuous, ledger-verified content.
+ {'id':'e1-verb','type':'query','capability':'getWork','request':{'id':'$WORK','scope':{'organizationId':'$ORG','itemId':'$P'},'asOf':T,'knownAt':T,'snapshotRef':'$E1_SNAPSHOT'},'assertions':[{'pointer':'/data/ID','operator':'equals','expected':'$WORK'},{'pointer':'/data/workId','operator':'equals','expected':'$WORK'},{'pointer':'/data/kind','operator':'equals','expected':'PURCHASE'}]+world_content()+[{'pointer':'/snapshotRevision','operator':'equals','expected':'$E1_SNAPSHOT'},{'pointer':'/data/workIds','operator':'equals','expected':'$E1_WORK_IDS'},{'pointer':'/data/obligations','operator':'equals','expected':'$E1_DUTIES'},{'pointer':'/data/contributions','operator':'equals','expected':'$E1_CONTRIBUTIONS'},{'pointer':'/data/ownerIds','operator':'equals','expected':'$E1_OWNERS'},{'pointer':'/data/evidenceRefs','operator':'equals','expected':'$E1_EVIDENCE'},{'pointer':'/data/heldQuantity','operator':'equals','expected':'$E1_HELD'},{'pointer':'/data/eligibleQuantity','operator':'equals','expected':'$E1_ELIGIBLE'}]},
+ # Item-wide: delivered customer-site stock and the QC/return-held W stock are
+ # not eligible for our action (plan §4.2), so eligible is 0 for both entrypoints.
+ {'id':'e1-noun-eligibility','type':'query','capability':'getObject','request':{'id':'$P','scope':{'organizationId':'$ORG','itemId':'$P'},'asOf':T,'knownAt':T},'assertions':[{'pointer':'/data/eligibleQuantity','operator':'decimalEquals','expected':'0'},{'pointer':'/data/unreservedEligibleQuantity','operator':'decimalEquals','expected':'0'}]}]
 write('e1-final.json',{'schemaVersion':'1.0.0','status':'NOT_RUN','actions':c})
