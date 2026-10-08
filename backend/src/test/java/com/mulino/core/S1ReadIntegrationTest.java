@@ -87,9 +87,9 @@ class S1ReadIntegrationTest {
     var n=(Map<?,?>)noun.get("data");var v=(Map<?,?>)verb.get("data");
     for(String key:List.of("itemId","workIds","heldQuantity","eligibleQuantity","eligibilityStatus","cumulativeArrival","unit","ownerIds","nextActions","evidenceRefs"))assertEquals(n.get(key),v.get(key));
     assertEquals("100",n.get("heldQuantity"));
-    // S3 exposes the proven executable subset: unknown permissions prove no
-    // executable quantity, while the status and missing-fact reasons stay UNKNOWN.
-    assertEquals("0",n.get("eligibleQuantity"));assertEquals("UNKNOWN",n.get("eligibilityStatus"));
+    // No current eligibility policy: the confirmed SELL subset cannot be determined,
+    // so the quantity stays null (unknown), never zero (plan §3.1, §6; AGENTS.md).
+    assertTrue(n.containsKey("eligibleQuantity"));assertNull(n.get("eligibleQuantity"));assertNull(n.get("unreservedEligibleQuantity"));assertEquals("UNKNOWN",n.get("eligibilityStatus"));
     assertTrue(((List<?>)noun.get("unknowns")).contains("CURRENT_ELIGIBILITY_POLICY_UNRESOLVED"));
     assertTrue(((List<?>)noun.get("unknowns")).contains("QC_AUTHORITY_UNCONFIRMED"));
     // No authoritative confirmed Receipts exist in this snapshot: this sum is
@@ -146,7 +146,7 @@ class S1ReadIntegrationTest {
       assertEquals(List.of(),differences,"Only enumerated Timestamp widening and mandatory NOT NULL strengthening are eligible for the explicit inventory; other shape changes must be corrected in source");
       assertEquals(((Number)policy.get("observedColumnCount")).intValue(),actual.size(),"Explicit combined inventory column count");
       assertEquals(new TreeSet<>((List<String>)policy.get("exactColumnInventory")),new TreeSet<>(actual.keySet()),"Every installed column has explicit S4 inventory identity");
-      assertEquals(434,((List<?>)policy.get("s4AddedColumnInventory")).size(),"Exact S3 1432 plus S4 434 delta (V31 recall Actions.investigationId, V29 scopeDifference, V24 legitimateQuantity)");
+      assertEquals(435,((List<?>)policy.get("s4AddedColumnInventory")).size(),"Exact S3 1432 plus S4 435 delta (V31 recall Actions.investigationId, V30 legitimateRangesJson, V29 scopeDifference, V24 legitimateQuantity)");
       assertEquals(new TreeSet<>((List<String>)policy.get("timestampWidening")),timestamps,"Explicit absolute-instant column list");assertEquals(new TreeSet<>((List<String>)policy.get("notNullStrengthening")),strengthening,"Explicit required-domain column list");
       assertEquals(primaryKeys(connection,"s4_compiler_expected"),primaryKeys(connection,"public"),"Exact CDS/Flyway primary key identity and ordering");
     }

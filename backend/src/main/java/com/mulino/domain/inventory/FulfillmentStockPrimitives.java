@@ -37,9 +37,21 @@ public final class FulfillmentStockPrimitives implements DispatchCargoPort {
   String root=(String)d.get("rangeRootId");Map<String,Object> selected=null;QualityRanges.Range local=null;
   for(var leaf:r.currentRows(c,"QuantitySegments"))if(leaf.get("retiredAt")==null&&"TRANSIT".equals(r.current(c,"Places",(String)leaf.get("placeId")).get("kind"))){var mapped=ranges.project(c,root,(String)leaf.get("ID"),start,q);if(QualityRanges.quantity(mapped).compareTo(q)==0&&mapped.size()==1){if(selected!=null)throw DomainError.invalid("Ambiguous transit identity");selected=leaf;local=mapped.getFirst();}}
   if(selected==null)throw new DomainError("HELD","PHYSICAL_SCOPE_UNCERTAIN","Dispatched physical range requires reconciliation");
-  var eligibility=quality.assess(new DomainContext(c.organizationId(),c.actorId(),c.stableRequestOwner(),at,c.knownAt()),selected,"DISPATCH",(String)d.get("customerId"));BigDecimal legitimate=QualityRanges.quantity(QualityRanges.intersect(eligibility.ranges(),List.of(local)));
-  // Delivery hands the goods to the customer: our warehouse custody ends, ownership is not transferred (plan §4.2).
-  String leaf=stock.transferRangeReleasingCustody(c,(String)selected.get("ID"),local.start(),q,(String)d.get("destinationId"),at,canonical,command,"DELIVERY");
-  var moved=row(c,id(),at);moved.putAll(Map.of("dispatchId",dispatchId,"canonicalId",canonical,"startQuantity",start,"quantity",q,"unit",d.get("unit"),"segmentId",leaf,"occurredAt",at,"commandId",command));moved.put("legitimateQuantity",legitimate);r.insert("DeliveryTransfers",moved);var result=new LinkedHashMap<String,Object>(moved);result.put("legitimateQuantity",legitimate);result.put("restrictionReasons",eligibility.unknowns());return result;
+  // Legitimacy is judged at the actual delivery instant on the transit leaf that held the range then. A later partial delivery
+  // confirmed first may already have split the transit leaf after `at` (plan §6, D06: late facts are kept).
+  Map<String,Object> then=selected;QualityRanges.Range thenLocal=local;
+  if(instant(selected.get("validFrom")).isAfter(at))for(var leaf:r.currentRows(c,"QuantitySegments"))if(!instant(leaf.get("validFrom")).isAfter(at)&&(leaf.get("retiredAt")==null||instant(leaf.get("retiredAt")).isAfter(at))&&"TRANSIT".equals(r.current(c,"Places",(String)leaf.get("placeId")).get("kind"))){var mapped=ranges.project(c,root,(String)leaf.get("ID"),start,q);if(QualityRanges.quantity(mapped).compareTo(q)==0&&mapped.size()==1){then=leaf;thenLocal=mapped.getFirst();}}
+  // A sale delivery is legitimate only where SELL and DISPATCH both still held for this customer (plan §6 사실 기록과 실행 권한:
+  // a delivery after a recall, a SELL withdrawal or a permission expiry keeps fact, violation and response duty).
+  var historical=new DomainContext(c.organizationId(),c.actorId(),c.stableRequestOwner(),at,c.knownAt());var sale=quality.assess(historical,then,"SELL",(String)d.get("customerId"));var dispatch=quality.assess(historical,then,"DISPATCH",(String)d.get("customerId"));
+  var legitimateLocal=QualityRanges.intersect(QualityRanges.intersect(sale.ranges(),dispatch.ranges()),List.of(thenLocal));BigDecimal legitimate=QualityRanges.quantity(legitimateLocal);
+  BigDecimal offset=start.subtract(thenLocal.start());var legitimateRanges=QualityRanges.union(legitimateLocal).stream().map(x->new QualityRanges.Range(x.start().add(offset),x.end().add(offset))).toList();
+  var reasons=new TreeSet<String>(sale.unknowns());reasons.addAll(dispatch.unknowns());
+  // Delivery hands the goods to the customer: our warehouse custody ends, ownership is not transferred (plan §4.2). The ledger
+  // cannot date a child before its parent leaf, so an out-of-order confirmation transfers at the leaf's start while the Delivery
+  // keeps the true occurrence time.
+  Instant transferAt=instant(selected.get("validFrom")).isAfter(at)?instant(selected.get("validFrom")):at;
+  String leaf=stock.transferRangeReleasingCustody(c,(String)selected.get("ID"),local.start(),q,(String)d.get("destinationId"),transferAt,canonical,command,"DELIVERY");
+  var moved=row(c,id(),at);moved.putAll(Map.of("dispatchId",dispatchId,"canonicalId",canonical,"startQuantity",start,"quantity",q,"unit",d.get("unit"),"segmentId",leaf,"occurredAt",at,"commandId",command));moved.put("legitimateQuantity",legitimate);r.insert("DeliveryTransfers",moved);var result=new LinkedHashMap<String,Object>(moved);result.put("legitimateQuantity",legitimate);result.put("legitimateRanges",legitimateRanges);result.put("restrictionReasons",List.copyOf(reasons));return result;
  }
 }

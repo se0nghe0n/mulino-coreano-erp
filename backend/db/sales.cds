@@ -97,6 +97,7 @@ entity Deliveries {
  segmentId:UUID;
  occurredAt:Timestamp;
  legitimateQuantity:Decimal(38,12);
+ legitimateRangesJson:LargeString;
 }
 entity ExecutionEffects {
  key organizationId:UUID; key ID:UUID;
