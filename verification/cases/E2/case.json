@@ -8,7 +8,8 @@
     "D18"
   ],
   "profiles": [
-    "scenarios"
+    "scenarios",
+    "mcp"
   ],
   "subcases": [
     {
@@ -18,7 +19,8 @@
       "requiredAdapters": [
         "fixture",
         "api",
-        "db"
+        "db",
+        "mcp"
       ],
       "actions": [
         {
@@ -984,6 +986,54 @@
           },
           "evidenceRefs": [
             "after-dispatch:api-response"
+          ]
+        },
+        {
+          "id": "after-dispatch-mcp",
+          "kind": "query",
+          "actorRef": "observer",
+          "route": "mcp",
+          "capabilityId": "getObject",
+          "request": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseId": "E2",
+              "scenarioId": "overlapping-holds"
+            },
+            "subjectRefs": [
+              {
+                "type": "TradeItem",
+                "id": {
+                  "$alias": "P"
+                }
+              }
+            ],
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z",
+            "include": [
+              "inventory",
+              "trade",
+              "evidence",
+              "assessments",
+              "obligations",
+              "audit",
+              "outbox"
+            ],
+            "snapshotRef": {
+              "$result": {
+                "actionId": "after-dispatch",
+                "pointer": "/response/snapshotRevision"
+              }
+            }
+          },
+          "evidenceRefs": [
+            "after-dispatch-mcp:mcp-response",
+            "after-dispatch-mcp:actual-mcp-artifact"
           ]
         },
         {
@@ -2490,6 +2540,337 @@
               "dispatched-after-QC-only-release"
             ]
           }
+        },
+        {
+          "id": "after-dispatch-mcp-same-snapshot",
+          "op": "equals",
+          "source": {
+            "actionId": "after-dispatch-mcp",
+            "pointer": "/response/snapshotRevision"
+          },
+          "expected": {
+            "$result": {
+              "actionId": "after-dispatch",
+              "pointer": "/response/snapshotRevision"
+            }
+          },
+          "requirementRefs": [
+            "D03",
+            "D16",
+            "D18"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "E2",
+            "scenarioId": "overlapping-holds"
+          },
+          "evidenceRefs": [
+            "after-dispatch-mcp:mcp-response"
+          ],
+          "oracleExplanation": "MCP 조회는 API 조회와 같은 snapshotRevision을 읽는다.",
+          "oracleRef": {
+            "oracleId": "E2.overlapping-holds",
+            "observationNames": [
+              "physical-held"
+            ]
+          }
+        },
+        {
+          "id": "physical-held-1-mcp",
+          "op": "decimalEquals",
+          "source": {
+            "actionId": "after-dispatch-mcp",
+            "pointer": "/response/data/heldQuantity"
+          },
+          "expected": "60",
+          "requirementRefs": [
+            "D03",
+            "D16",
+            "D18"
+          ],
+          "evidenceRefs": [
+            "after-dispatch-mcp:mcp-response"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "E2",
+            "scenarioId": "overlapping-holds"
+          },
+          "oracleExplanation": "stateless MCP 진입점에서 같은 snapshot으로 읽은 같은 값이다. API와 같은 서버 판정·원장을 읽어야 하며 다른 계산이나 캐시를 쓰면 실패한다(계획 §3.4, §9.1, §13.1 D20). physical-held는 동일 LOT60의 QC20만 해제해도 회수 조사60 제한과 조사 책임은 남는다의 독립 고정값과 실제 원 행을 대조한다.",
+          "oracleRef": {
+            "oracleId": "E2.overlapping-holds",
+            "observationNames": [
+              "physical-held"
+            ]
+          },
+          "unit": "BOX",
+          "unitSource": {
+            "actionId": "after-dispatch-mcp",
+            "pointer": "/response/data/unit"
+          }
+        },
+        {
+          "id": "dispatched-after-QC-only-release-3-mcp",
+          "op": "decimalDelta",
+          "source": {
+            "actionId": "after-dispatch-mcp",
+            "pointer": "/response/data/warehouseDispatchQuantity"
+          },
+          "expected": "0",
+          "requirementRefs": [
+            "D03",
+            "D16",
+            "D18"
+          ],
+          "evidenceRefs": [
+            "after-dispatch-mcp:mcp-response"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "E2",
+            "scenarioId": "overlapping-holds"
+          },
+          "oracleExplanation": "stateless MCP 진입점에서 같은 snapshot으로 읽은 같은 값이다. API와 같은 서버 판정·원장을 읽어야 하며 다른 계산이나 캐시를 쓰면 실패한다(계획 §3.4, §9.1, §13.1 D20). dispatched-after-QC-only-release는 동일 LOT60의 QC20만 해제해도 회수 조사60 제한과 조사 책임은 남는다의 독립 고정값과 실제 원 행을 대조한다.",
+          "oracleRef": {
+            "oracleId": "E2.overlapping-holds",
+            "observationNames": [
+              "dispatched-after-QC-only-release"
+            ]
+          },
+          "baseline": {
+            "actionId": "before-dispatch",
+            "pointer": "/response/data/warehouseDispatchQuantity"
+          },
+          "unit": "BOX",
+          "unitSource": {
+            "actionId": "after-dispatch-mcp",
+            "pointer": "/response/data/unit"
+          },
+          "baselineUnitSource": {
+            "actionId": "before-dispatch",
+            "pointer": "/response/data/unit"
+          }
+        },
+        {
+          "id": "dispatched-after-QC-only-release-6-mcp",
+          "op": "sameAs",
+          "source": {
+            "actionId": "after-dispatch-mcp",
+            "pointer": "/response/data/effectLedger/movements"
+          },
+          "expected": null,
+          "requirementRefs": [
+            "D03",
+            "D16",
+            "D18"
+          ],
+          "evidenceRefs": [
+            "after-dispatch-mcp:mcp-response"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "E2",
+            "scenarioId": "overlapping-holds"
+          },
+          "oracleExplanation": "stateless MCP 진입점에서 같은 snapshot으로 읽은 같은 값이다. API와 같은 서버 판정·원장을 읽어야 하며 다른 계산이나 캐시를 쓰면 실패한다(계획 §3.4, §9.1, §13.1 D20). dispatched-after-QC-only-release는 동일 LOT60의 QC20만 해제해도 회수 조사60 제한과 조사 책임은 남는다의 독립 고정값과 실제 원 행을 대조한다.",
+          "oracleRef": {
+            "oracleId": "E2.overlapping-holds",
+            "observationNames": [
+              "dispatched-after-QC-only-release"
+            ]
+          },
+          "baseline": {
+            "actionId": "before-dispatch",
+            "pointer": "/response/data/effectLedger/movements"
+          }
+        },
+        {
+          "id": "dispatched-after-QC-only-release-7-mcp",
+          "op": "sameAs",
+          "source": {
+            "actionId": "after-dispatch-mcp",
+            "pointer": "/response/data/effectLedger/allocations"
+          },
+          "expected": null,
+          "requirementRefs": [
+            "D03",
+            "D16",
+            "D18"
+          ],
+          "evidenceRefs": [
+            "after-dispatch-mcp:mcp-response"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "E2",
+            "scenarioId": "overlapping-holds"
+          },
+          "oracleExplanation": "stateless MCP 진입점에서 같은 snapshot으로 읽은 같은 값이다. API와 같은 서버 판정·원장을 읽어야 하며 다른 계산이나 캐시를 쓰면 실패한다(계획 §3.4, §9.1, §13.1 D20). dispatched-after-QC-only-release는 동일 LOT60의 QC20만 해제해도 회수 조사60 제한과 조사 책임은 남는다의 독립 고정값과 실제 원 행을 대조한다.",
+          "oracleRef": {
+            "oracleId": "E2.overlapping-holds",
+            "observationNames": [
+              "dispatched-after-QC-only-release"
+            ]
+          },
+          "baseline": {
+            "actionId": "before-dispatch",
+            "pointer": "/response/data/effectLedger/allocations"
+          }
+        },
+        {
+          "id": "recall-hold-8-mcp",
+          "op": "equals",
+          "source": {
+            "actionId": "after-dispatch-mcp",
+            "pointer": "/response/data/recallRestrictionStatus"
+          },
+          "expected": "ACTIVE",
+          "requirementRefs": [
+            "D03",
+            "D16",
+            "D18"
+          ],
+          "evidenceRefs": [
+            "after-dispatch-mcp:mcp-response"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "E2",
+            "scenarioId": "overlapping-holds"
+          },
+          "oracleExplanation": "stateless MCP 진입점에서 같은 snapshot으로 읽은 같은 값이다. API와 같은 서버 판정·원장을 읽어야 하며 다른 계산이나 캐시를 쓰면 실패한다(계획 §3.4, §9.1, §13.1 D20). recall-hold는 동일 LOT60의 QC20만 해제해도 회수 조사60 제한과 조사 책임은 남는다의 독립 고정값과 실제 원 행을 대조한다.",
+          "oracleRef": {
+            "oracleId": "E2.overlapping-holds",
+            "observationNames": [
+              "recall-hold"
+            ]
+          }
+        },
+        {
+          "id": "candidate-as-confirmed-contamination-12-mcp",
+          "op": "equals",
+          "source": {
+            "actionId": "after-dispatch-mcp",
+            "pointer": "/response/data/contaminationStatus"
+          },
+          "expected": "UNKNOWN",
+          "requirementRefs": [
+            "D03",
+            "D16",
+            "D18"
+          ],
+          "evidenceRefs": [
+            "after-dispatch-mcp:mcp-response"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "E2",
+            "scenarioId": "overlapping-holds"
+          },
+          "oracleExplanation": "stateless MCP 진입점에서 같은 snapshot으로 읽은 같은 값이다. API와 같은 서버 판정·원장을 읽어야 하며 다른 계산이나 캐시를 쓰면 실패한다(계획 §3.4, §9.1, §13.1 D20). candidate-as-confirmed-contamination는 동일 LOT60의 QC20만 해제해도 회수 조사60 제한과 조사 책임은 남는다의 독립 고정값과 실제 원 행을 대조한다.",
+          "oracleRef": {
+            "oracleId": "E2.overlapping-holds",
+            "observationNames": [
+              "candidate-as-confirmed-contamination"
+            ]
+          }
+        },
+        {
+          "id": "investigation-duty-19-mcp",
+          "op": "sameAs",
+          "source": {
+            "actionId": "after-dispatch-mcp",
+            "pointer": "/response/data/obligations",
+            "where": {
+              "kind": "RECALL_RESPONSE",
+              "current": true
+            },
+            "field": [
+              "id",
+              "rootId",
+              "ownerId",
+              "status",
+              "nextAction",
+              "nextCheckAt"
+            ]
+          },
+          "expected": null,
+          "requirementRefs": [
+            "D03",
+            "D16",
+            "D18"
+          ],
+          "evidenceRefs": [
+            "after-dispatch-mcp:mcp-response"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "E2",
+            "scenarioId": "overlapping-holds"
+          },
+          "oracleExplanation": "stateless MCP 진입점에서 같은 snapshot으로 읽은 같은 값이다. API와 같은 서버 판정·원장을 읽어야 하며 다른 계산이나 캐시를 쓰면 실패한다(계획 §3.4, §9.1, §13.1 D20). investigation-duty는 동일 LOT60의 QC20만 해제해도 회수 조사60 제한과 조사 책임은 남는다의 독립 고정값과 실제 원 행을 대조한다.",
+          "oracleRef": {
+            "oracleId": "E2.overlapping-holds",
+            "observationNames": [
+              "investigation-duty"
+            ]
+          },
+          "baseline": {
+            "actionId": "after-dispatch-db",
+            "pointer": "/data/rawRows/obligations",
+            "where": {
+              "kind": "RECALL_RESPONSE",
+              "current": true
+            },
+            "field": [
+              "id",
+              "rootId",
+              "ownerId",
+              "status",
+              "nextAction",
+              "nextCheckAt"
+            ]
+          }
         }
       ],
       "oracleExplanation": "가상 fixture는 선행 실물·정책·증거 입력만 설치한다. 검증하는 주문·승인·예약·출고·인도·반품·회수·정정 효과는 각각 공개 명령으로 실행한다. 동일 LOT60의 QC20만 해제해도 회수 조사60 제한과 조사 책임은 남는다의 수량과 책임은 고정 기대값과 원 행·응답을 함께 검증한다."
@@ -2501,7 +2882,8 @@
       "requiredAdapters": [
         "fixture",
         "api",
-        "db"
+        "db",
+        "mcp"
       ],
       "actions": [
         {
@@ -3231,6 +3613,54 @@
           ]
         },
         {
+          "id": "after-dispatch-mcp",
+          "kind": "query",
+          "actorRef": "observer",
+          "route": "mcp",
+          "capabilityId": "getObject",
+          "request": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseId": "E2",
+              "scenarioId": "qc-release-only-control"
+            },
+            "subjectRefs": [
+              {
+                "type": "TradeItem",
+                "id": {
+                  "$alias": "P"
+                }
+              }
+            ],
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z",
+            "include": [
+              "inventory",
+              "trade",
+              "evidence",
+              "assessments",
+              "obligations",
+              "audit",
+              "outbox"
+            ],
+            "snapshotRef": {
+              "$result": {
+                "actionId": "after-dispatch",
+                "pointer": "/response/snapshotRevision"
+              }
+            }
+          },
+          "evidenceRefs": [
+            "after-dispatch-mcp:mcp-response",
+            "after-dispatch-mcp:actual-mcp-artifact"
+          ]
+        },
+        {
           "id": "after-dispatch-db",
           "kind": "observe",
           "observation": {
@@ -3477,6 +3907,92 @@
               "dispatched-after-QC-only-release"
             ]
           }
+        },
+        {
+          "id": "after-dispatch-mcp-same-snapshot",
+          "op": "equals",
+          "source": {
+            "actionId": "after-dispatch-mcp",
+            "pointer": "/response/snapshotRevision"
+          },
+          "expected": {
+            "$result": {
+              "actionId": "after-dispatch",
+              "pointer": "/response/snapshotRevision"
+            }
+          },
+          "requirementRefs": [
+            "D03",
+            "D16",
+            "D18"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "E2",
+            "scenarioId": "qc-release-only-control"
+          },
+          "evidenceRefs": [
+            "after-dispatch-mcp:mcp-response"
+          ],
+          "oracleExplanation": "MCP 조회는 API 조회와 같은 snapshotRevision을 읽는다.",
+          "oracleRef": {
+            "oracleId": "E2.overlapping-holds",
+            "observationNames": [
+              "dispatched-after-QC-only-release"
+            ]
+          }
+        },
+        {
+          "id": "control-warehouse-dispatch40-mcp",
+          "op": "decimalDelta",
+          "source": {
+            "actionId": "after-dispatch-mcp",
+            "pointer": "/response/data/warehouseDispatchQuantity"
+          },
+          "expected": "40",
+          "requirementRefs": [
+            "D03",
+            "D16",
+            "D18"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "E2",
+            "scenarioId": "qc-release-only-control"
+          },
+          "evidenceRefs": [
+            "after-dispatch-mcp:mcp-response"
+          ],
+          "oracleExplanation": "stateless MCP 진입점에서 같은 snapshot으로 읽은 같은 값이다. API와 같은 서버 판정·원장을 읽어야 하며 다른 계산이나 캐시를 쓰면 실패한다(계획 §3.4, §9.1, §13.1 D20). 대조군: 회수 보류가 없으면 같은 형식의 출고40은 APPLIED이고 창고 출고40·배분 CONSUMED가 실제로 생긴다. overlapping-holds의 거부가 요청 형식이나 revision 때문이 아님을 보인다.",
+          "oracleRef": {
+            "oracleId": "E2.overlapping-holds",
+            "observationNames": [
+              "dispatched-after-QC-only-release"
+            ]
+          },
+          "baseline": {
+            "actionId": "before-dispatch",
+            "pointer": "/response/data/warehouseDispatchQuantity"
+          },
+          "unit": "BOX",
+          "unitSource": {
+            "actionId": "after-dispatch-mcp",
+            "pointer": "/response/data/unit"
+          },
+          "baselineUnitSource": {
+            "actionId": "before-dispatch",
+            "pointer": "/response/data/unit"
+          }
         }
       ],
       "oracleExplanation": "대조군이다. overlapping-holds와 같은 fixture·예약·분할·피킹·QC20 보류/해제와 같은 형식의 출고40 요청을 쓰되 회수 조사와 회수 보류60만 뺀다. 같은 요청이 여기서 APPLIED이고 overlapping-holds에서 REJECTED이면 거부 원인은 형식·revision·피킹 누락이 아니라 회수 보류다."
@@ -3488,7 +4004,8 @@
       "requiredAdapters": [
         "fixture",
         "api",
-        "db"
+        "db",
+        "mcp"
       ],
       "actions": [
         {
@@ -4522,6 +5039,54 @@
           },
           "evidenceRefs": [
             "after-close:api-response"
+          ]
+        },
+        {
+          "id": "after-close-mcp",
+          "kind": "query",
+          "actorRef": "observer",
+          "route": "mcp",
+          "capabilityId": "getObject",
+          "request": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseId": "E2",
+              "scenarioId": "same-25-not-50"
+            },
+            "subjectRefs": [
+              {
+                "type": "TradeItem",
+                "id": {
+                  "$alias": "P"
+                }
+              }
+            ],
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z",
+            "include": [
+              "inventory",
+              "trade",
+              "evidence",
+              "assessments",
+              "obligations",
+              "audit",
+              "outbox"
+            ],
+            "snapshotRef": {
+              "$result": {
+                "actionId": "after-close",
+                "pointer": "/response/snapshotRevision"
+              }
+            }
+          },
+          "evidenceRefs": [
+            "after-close-mcp:mcp-response",
+            "after-close-mcp:actual-mcp-artifact"
           ]
         },
         {
@@ -5681,6 +6246,276 @@
             "pointer": "/data/rawRows/disposedMembers",
             "field": "boxSerial"
           }
+        },
+        {
+          "id": "after-close-mcp-same-snapshot",
+          "op": "equals",
+          "source": {
+            "actionId": "after-close-mcp",
+            "pointer": "/response/snapshotRevision"
+          },
+          "expected": {
+            "$result": {
+              "actionId": "after-close",
+              "pointer": "/response/snapshotRevision"
+            }
+          },
+          "requirementRefs": [
+            "D03",
+            "D16",
+            "D18"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "E2",
+            "scenarioId": "same-25-not-50"
+          },
+          "evidenceRefs": [
+            "after-close-mcp:mcp-response"
+          ],
+          "oracleExplanation": "MCP 조회는 API 조회와 같은 snapshotRevision을 읽는다.",
+          "oracleRef": {
+            "oracleId": "E2.same-25-not-50",
+            "observationNames": [
+              "unique-recovered"
+            ]
+          }
+        },
+        {
+          "id": "unique-recovered-1-mcp",
+          "op": "decimalEquals",
+          "source": {
+            "actionId": "after-close-mcp",
+            "pointer": "/response/data/recoveredQuantity"
+          },
+          "expected": "25",
+          "requirementRefs": [
+            "D03",
+            "D16",
+            "D18"
+          ],
+          "evidenceRefs": [
+            "after-close-mcp:mcp-response"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "E2",
+            "scenarioId": "same-25-not-50"
+          },
+          "oracleExplanation": "stateless MCP 진입점에서 같은 snapshot으로 읽은 같은 값이다. API와 같은 서버 판정·원장을 읽어야 하며 다른 계산이나 캐시를 쓰면 실패한다(계획 §3.4, §9.1, §13.1 D20). unique-recovered는 승인50 중 회수25와 동일 실물 폐기25는 최종25이며 미확인25의 종료를 막는다의 독립 고정값과 실제 원 행을 대조한다.",
+          "oracleRef": {
+            "oracleId": "E2.same-25-not-50",
+            "observationNames": [
+              "unique-recovered"
+            ]
+          },
+          "unit": "BOX",
+          "unitSource": {
+            "actionId": "after-close-mcp",
+            "pointer": "/response/data/unit"
+          }
+        },
+        {
+          "id": "unique-finally-processed-3-mcp",
+          "op": "decimalEquals",
+          "source": {
+            "actionId": "after-close-mcp",
+            "pointer": "/response/data/processedQuantity"
+          },
+          "expected": "25",
+          "requirementRefs": [
+            "D03",
+            "D16",
+            "D18"
+          ],
+          "evidenceRefs": [
+            "after-close-mcp:mcp-response"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "E2",
+            "scenarioId": "same-25-not-50"
+          },
+          "oracleExplanation": "stateless MCP 진입점에서 같은 snapshot으로 읽은 같은 값이다. API와 같은 서버 판정·원장을 읽어야 하며 다른 계산이나 캐시를 쓰면 실패한다(계획 §3.4, §9.1, §13.1 D20). unique-finally-processed는 승인50 중 회수25와 동일 실물 폐기25는 최종25이며 미확인25의 종료를 막는다의 독립 고정값과 실제 원 행을 대조한다.",
+          "oracleRef": {
+            "oracleId": "E2.same-25-not-50",
+            "observationNames": [
+              "unique-finally-processed"
+            ]
+          },
+          "unit": "BOX",
+          "unitSource": {
+            "actionId": "after-close-mcp",
+            "pointer": "/response/data/unit"
+          }
+        },
+        {
+          "id": "unknown-5-mcp",
+          "op": "decimalEquals",
+          "source": {
+            "actionId": "after-close-mcp",
+            "pointer": "/response/data/unknownQuantity"
+          },
+          "expected": "25",
+          "requirementRefs": [
+            "D03",
+            "D16",
+            "D18"
+          ],
+          "evidenceRefs": [
+            "after-close-mcp:mcp-response"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "E2",
+            "scenarioId": "same-25-not-50"
+          },
+          "oracleExplanation": "stateless MCP 진입점에서 같은 snapshot으로 읽은 같은 값이다. API와 같은 서버 판정·원장을 읽어야 하며 다른 계산이나 캐시를 쓰면 실패한다(계획 §3.4, §9.1, §13.1 D20). unknown는 승인50 중 회수25와 동일 실물 폐기25는 최종25이며 미확인25의 종료를 막는다의 독립 고정값과 실제 원 행을 대조한다.",
+          "oracleRef": {
+            "oracleId": "E2.same-25-not-50",
+            "observationNames": [
+              "unknown"
+            ]
+          },
+          "unit": "BOX",
+          "unitSource": {
+            "actionId": "after-close-mcp",
+            "pointer": "/response/data/unit"
+          }
+        },
+        {
+          "id": "25-plus-25-equals50-8-mcp",
+          "op": "sameAs",
+          "source": {
+            "actionId": "after-close-mcp",
+            "pointer": "/response/data/effectLedger/recallScopes"
+          },
+          "expected": null,
+          "requirementRefs": [
+            "D03",
+            "D16",
+            "D18"
+          ],
+          "evidenceRefs": [
+            "after-close-mcp:mcp-response"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "E2",
+            "scenarioId": "same-25-not-50"
+          },
+          "oracleExplanation": "stateless MCP 진입점에서 같은 snapshot으로 읽은 같은 값이다. API와 같은 서버 판정·원장을 읽어야 하며 다른 계산이나 캐시를 쓰면 실패한다(계획 §3.4, §9.1, §13.1 D20). 25-plus-25-equals50는 승인50 중 회수25와 동일 실물 폐기25는 최종25이며 미확인25의 종료를 막는다의 독립 고정값과 실제 원 행을 대조한다.",
+          "oracleRef": {
+            "oracleId": "E2.same-25-not-50",
+            "observationNames": [
+              "25-plus-25-equals50"
+            ]
+          },
+          "baseline": {
+            "actionId": "before-close",
+            "pointer": "/response/data/effectLedger/recallScopes"
+          }
+        },
+        {
+          "id": "unapproved-unknown-close-11-mcp",
+          "op": "sameAs",
+          "source": {
+            "actionId": "after-close-mcp",
+            "pointer": "/response/data/effectLedger/decisions"
+          },
+          "expected": null,
+          "requirementRefs": [
+            "D03",
+            "D16",
+            "D18"
+          ],
+          "evidenceRefs": [
+            "after-close-mcp:mcp-response"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "E2",
+            "scenarioId": "same-25-not-50"
+          },
+          "oracleExplanation": "stateless MCP 진입점에서 같은 snapshot으로 읽은 같은 값이다. API와 같은 서버 판정·원장을 읽어야 하며 다른 계산이나 캐시를 쓰면 실패한다(계획 §3.4, §9.1, §13.1 D20). unapproved-unknown-close는 승인50 중 회수25와 동일 실물 폐기25는 최종25이며 미확인25의 종료를 막는다의 독립 고정값과 실제 원 행을 대조한다.",
+          "oracleRef": {
+            "oracleId": "E2.same-25-not-50",
+            "observationNames": [
+              "unapproved-unknown-close"
+            ]
+          },
+          "baseline": {
+            "actionId": "before-close",
+            "pointer": "/response/data/effectLedger/decisions"
+          }
+        },
+        {
+          "id": "unapproved-unknown-close-12-mcp",
+          "op": "sameAs",
+          "source": {
+            "actionId": "after-close-mcp",
+            "pointer": "/response/data/effectLedger/obligations"
+          },
+          "expected": null,
+          "requirementRefs": [
+            "D03",
+            "D16",
+            "D18"
+          ],
+          "evidenceRefs": [
+            "after-close-mcp:mcp-response"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "E2",
+            "scenarioId": "same-25-not-50"
+          },
+          "oracleExplanation": "stateless MCP 진입점에서 같은 snapshot으로 읽은 같은 값이다. API와 같은 서버 판정·원장을 읽어야 하며 다른 계산이나 캐시를 쓰면 실패한다(계획 §3.4, §9.1, §13.1 D20). unapproved-unknown-close는 승인50 중 회수25와 동일 실물 폐기25는 최종25이며 미확인25의 종료를 막는다의 독립 고정값과 실제 원 행을 대조한다.",
+          "oracleRef": {
+            "oracleId": "E2.same-25-not-50",
+            "observationNames": [
+              "unapproved-unknown-close"
+            ]
+          },
+          "baseline": {
+            "actionId": "before-close",
+            "pointer": "/response/data/effectLedger/obligations"
+          }
         }
       ],
       "oracleExplanation": "가상 fixture는 선행 실물·정책·증거 입력만 설치한다. 검증하는 주문·승인·예약·출고·인도·반품·회수·정정 효과는 각각 공개 명령으로 실행한다. 승인50 중 회수25와 동일 실물 폐기25는 최종25이며 미확인25의 종료를 막는다의 수량과 책임은 고정 기대값과 원 행·응답을 함께 검증한다."
@@ -5692,7 +6527,8 @@
       "requiredAdapters": [
         "fixture",
         "api",
-        "db"
+        "db",
+        "mcp"
       ],
       "actions": [
         {
@@ -6877,6 +7713,54 @@
           },
           "evidenceRefs": [
             "closed:api-response"
+          ]
+        },
+        {
+          "id": "closed-mcp",
+          "kind": "query",
+          "actorRef": "observer",
+          "route": "mcp",
+          "capabilityId": "getObject",
+          "request": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseId": "E2",
+              "scenarioId": "exception-responsibility"
+            },
+            "subjectRefs": [
+              {
+                "type": "TradeItem",
+                "id": {
+                  "$alias": "P"
+                }
+              }
+            ],
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z",
+            "include": [
+              "inventory",
+              "trade",
+              "evidence",
+              "assessments",
+              "obligations",
+              "audit",
+              "outbox"
+            ],
+            "snapshotRef": {
+              "$result": {
+                "actionId": "closed",
+                "pointer": "/response/snapshotRevision"
+              }
+            }
+          },
+          "evidenceRefs": [
+            "closed-mcp:mcp-response",
+            "closed-mcp:actual-mcp-artifact"
           ]
         },
         {
@@ -8244,6 +9128,219 @@
             "actionId": "closed-db",
             "pointer": "/data/rawRows/disposedMembers",
             "field": "boxSerial"
+          }
+        },
+        {
+          "id": "closed-mcp-same-snapshot",
+          "op": "equals",
+          "source": {
+            "actionId": "closed-mcp",
+            "pointer": "/response/snapshotRevision"
+          },
+          "expected": {
+            "$result": {
+              "actionId": "closed",
+              "pointer": "/response/snapshotRevision"
+            }
+          },
+          "requirementRefs": [
+            "D03",
+            "D16",
+            "D18"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "E2",
+            "scenarioId": "exception-responsibility"
+          },
+          "evidenceRefs": [
+            "closed-mcp:mcp-response"
+          ],
+          "oracleExplanation": "MCP 조회는 API 조회와 같은 snapshotRevision을 읽는다.",
+          "oracleRef": {
+            "oracleId": "E2.exception-responsibility",
+            "observationNames": [
+              "exception-unresolved-scope"
+            ]
+          }
+        },
+        {
+          "id": "exception-unresolved-scope-8-mcp",
+          "op": "decimalEquals",
+          "source": {
+            "actionId": "closed-mcp",
+            "pointer": "/response/data/approvedUnresolvedExceptionQuantity"
+          },
+          "expected": "25",
+          "requirementRefs": [
+            "D03",
+            "D16",
+            "D18"
+          ],
+          "evidenceRefs": [
+            "closed-mcp:mcp-response"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "E2",
+            "scenarioId": "exception-responsibility"
+          },
+          "oracleExplanation": "stateless MCP 진입점에서 같은 snapshot으로 읽은 같은 값이다. API와 같은 서버 판정·원장을 읽어야 하며 다른 계산이나 캐시를 쓰면 실패한다(계획 §3.4, §9.1, §13.1 D20). exception-unresolved-scope는 일반 역할의 예외 종료0 뒤 ADMIN 근거 있는 미확인25 예외 종료에도 잔여 책임은 보인다의 독립 고정값과 실제 원 행을 대조한다.",
+          "oracleRef": {
+            "oracleId": "E2.exception-responsibility",
+            "observationNames": [
+              "exception-unresolved-scope"
+            ]
+          },
+          "unit": "BOX",
+          "unitSource": {
+            "actionId": "closed-mcp",
+            "pointer": "/response/data/unit"
+          }
+        },
+        {
+          "id": "exception-residual-duty-16-mcp",
+          "op": "sameAs",
+          "source": {
+            "actionId": "closed-mcp",
+            "pointer": "/response/data/obligations",
+            "where": {
+              "kind": "RECALL_RESPONSE",
+              "current": true
+            },
+            "field": [
+              "id",
+              "rootId",
+              "ownerId",
+              "status",
+              "nextAction",
+              "nextCheckAt"
+            ]
+          },
+          "expected": null,
+          "requirementRefs": [
+            "D03",
+            "D16",
+            "D18"
+          ],
+          "evidenceRefs": [
+            "closed-mcp:mcp-response"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "E2",
+            "scenarioId": "exception-responsibility"
+          },
+          "oracleExplanation": "stateless MCP 진입점에서 같은 snapshot으로 읽은 같은 값이다. API와 같은 서버 판정·원장을 읽어야 하며 다른 계산이나 캐시를 쓰면 실패한다(계획 §3.4, §9.1, §13.1 D20). exception-residual-duty는 일반 역할의 예외 종료0 뒤 ADMIN 근거 있는 미확인25 예외 종료에도 잔여 책임은 보인다의 독립 고정값과 실제 원 행을 대조한다.",
+          "oracleRef": {
+            "oracleId": "E2.exception-responsibility",
+            "observationNames": [
+              "exception-residual-duty"
+            ]
+          },
+          "baseline": {
+            "actionId": "closed-db",
+            "pointer": "/data/rawRows/obligations",
+            "where": {
+              "kind": "RECALL_RESPONSE",
+              "current": true
+            },
+            "field": [
+              "id",
+              "rootId",
+              "ownerId",
+              "status",
+              "nextAction",
+              "nextCheckAt"
+            ]
+          }
+        },
+        {
+          "id": "exception-evidence-21-mcp",
+          "op": "equals",
+          "source": {
+            "actionId": "closed-mcp",
+            "pointer": "/response/data/recallStatus"
+          },
+          "expected": "CLOSED_WITH_UNRESOLVED_EXCEPTION",
+          "requirementRefs": [
+            "D03",
+            "D16",
+            "D18"
+          ],
+          "evidenceRefs": [
+            "closed-mcp:mcp-response"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "E2",
+            "scenarioId": "exception-responsibility"
+          },
+          "oracleExplanation": "stateless MCP 진입점에서 같은 snapshot으로 읽은 같은 값이다. API와 같은 서버 판정·원장을 읽어야 하며 다른 계산이나 캐시를 쓰면 실패한다(계획 §3.4, §9.1, §13.1 D20). exception-evidence는 일반 역할의 예외 종료0 뒤 ADMIN 근거 있는 미확인25 예외 종료에도 잔여 책임은 보인다의 독립 고정값과 실제 원 행을 대조한다.",
+          "oracleRef": {
+            "oracleId": "E2.exception-responsibility",
+            "observationNames": [
+              "exception-evidence"
+            ]
+          }
+        },
+        {
+          "id": "exception-evidence-22-mcp",
+          "op": "decimalEquals",
+          "source": {
+            "actionId": "closed-mcp",
+            "pointer": "/response/data/processedQuantity"
+          },
+          "expected": "25",
+          "requirementRefs": [
+            "D03",
+            "D16",
+            "D18"
+          ],
+          "evidenceRefs": [
+            "closed-mcp:mcp-response"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "E2",
+            "scenarioId": "exception-responsibility"
+          },
+          "oracleExplanation": "stateless MCP 진입점에서 같은 snapshot으로 읽은 같은 값이다. API와 같은 서버 판정·원장을 읽어야 하며 다른 계산이나 캐시를 쓰면 실패한다(계획 §3.4, §9.1, §13.1 D20). exception-evidence는 일반 역할의 예외 종료0 뒤 ADMIN 근거 있는 미확인25 예외 종료에도 잔여 책임은 보인다의 독립 고정값과 실제 원 행을 대조한다.",
+          "oracleRef": {
+            "oracleId": "E2.exception-responsibility",
+            "observationNames": [
+              "exception-evidence"
+            ]
+          },
+          "unit": "BOX",
+          "unitSource": {
+            "actionId": "closed-mcp",
+            "pointer": "/response/data/unit"
           }
         }
       ],

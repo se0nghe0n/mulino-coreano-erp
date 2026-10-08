@@ -23,6 +23,7 @@
     만일 "sales" 역할이 "dispatch40-target" 행동을 수행한다
     만일 "sales" 역할이 "dispatch40" 행동을 수행한다
     만일 "observer" 역할이 "after-dispatch" 행동을 수행한다
+    만일 "observer" 역할이 "after-dispatch-mcp" 행동을 수행한다
     만일 "시스템" 역할이 "after-dispatch-db" 행동을 수행한다
     그러면 "physical-held-1" assertion으로 "physical-held"를 확인한다
     그러면 "physical-held-2" assertion으로 "physical-held"를 확인한다
@@ -57,6 +58,14 @@
     그러면 "dispatch40-denial-audit" assertion으로 "출고40: 출고 거부 감사가 정확히 1건 남는다"를 확인한다
     그러면 "recall-suspends-untouched40-before" assertion으로 "출고 전: QC가 닿지 않은 자식40의 배분은 회수 보류만으로 SUSPENDED이고 소비되지 않는다"를 확인한다
     그러면 "recall-suspends-untouched40-after" assertion으로 "출고 시도 뒤: QC가 닿지 않은 자식40의 배분은 회수 보류만으로 SUSPENDED이고 소비되지 않는다"를 확인한다
+    그러면 "after-dispatch-mcp-same-snapshot" assertion으로 "MCP 조회는 API 조회와 같은 snapshot을 읽는다"를 확인한다
+    그러면 "physical-held-1-mcp" assertion으로 "MCP 진입점: 같은 snapshot에서 physical-held-1와 같은 값을 읽는다"를 확인한다
+    그러면 "dispatched-after-QC-only-release-3-mcp" assertion으로 "MCP 진입점: 같은 snapshot에서 dispatched-after-QC-only-release-3와 같은 값을 읽는다"를 확인한다
+    그러면 "dispatched-after-QC-only-release-6-mcp" assertion으로 "MCP 진입점: 같은 snapshot에서 dispatched-after-QC-only-release-6와 같은 값을 읽는다"를 확인한다
+    그러면 "dispatched-after-QC-only-release-7-mcp" assertion으로 "MCP 진입점: 같은 snapshot에서 dispatched-after-QC-only-release-7와 같은 값을 읽는다"를 확인한다
+    그러면 "recall-hold-8-mcp" assertion으로 "MCP 진입점: 같은 snapshot에서 recall-hold-8와 같은 값을 읽는다"를 확인한다
+    그러면 "candidate-as-confirmed-contamination-12-mcp" assertion으로 "MCP 진입점: 같은 snapshot에서 candidate-as-confirmed-contamination-12와 같은 값을 읽는다"를 확인한다
+    그러면 "investigation-duty-19-mcp" assertion으로 "MCP 진입점: 같은 snapshot에서 investigation-duty-19와 같은 값을 읽는다"를 확인한다
 
   시나리오: 회수 보류가 없으면 같은 QC20 해제 뒤 같은 형식의 출고40이 적용된다(대조군)
     먼저 사례 파일 "verification/cases/E2/case.json"의 "qc-release-only-control"를 준비한다
@@ -75,12 +84,15 @@
     만일 "sales" 역할이 "dispatch40-target" 행동을 수행한다
     만일 "sales" 역할이 "dispatch40" 행동을 수행한다
     만일 "observer" 역할이 "after-dispatch" 행동을 수행한다
+    만일 "observer" 역할이 "after-dispatch-mcp" 행동을 수행한다
     만일 "시스템" 역할이 "after-dispatch-db" 행동을 수행한다
     그러면 "control-dispatch40-applied" assertion으로 "대조군: 회수 보류가 없으면 같은 형식의 출고40은 APPLIED다"를 확인한다
     그러면 "control-warehouse-dispatch40" assertion으로 "대조군: 창고 출고량이 40 BOX 늘어난다"를 확인한다
     그러면 "control-dispatch40-movement" assertion으로 "대조군: 출고40의 실제 이동 원행 합계가 40 BOX다"를 확인한다
     그러면 "control-allocation40-consumed" assertion으로 "대조군: 자식40의 배분은 CONSUMED다"를 확인한다
     그러면 "control-qc-release-applied" assertion으로 "대조군: QC20 해제는 APPLIED다"를 확인한다
+    그러면 "after-dispatch-mcp-same-snapshot" assertion으로 "MCP 조회는 API 조회와 같은 snapshot을 읽는다"를 확인한다
+    그러면 "control-warehouse-dispatch40-mcp" assertion으로 "MCP 진입점: 같은 snapshot에서 control-warehouse-dispatch40와 같은 값을 읽는다"를 확인한다
 
   시나리오: 승인50 중 회수25와 동일 실물 폐기25는 최종25이며 미확인25의 종료를 막는다
     먼저 사례 파일 "verification/cases/E2/case.json"의 "same-25-not-50"를 준비한다
@@ -101,6 +113,7 @@
     만일 "시스템" 역할이 "before-close-db" 행동을 수행한다
     만일 "admin" 역할이 "false-close" 행동을 수행한다
     만일 "observer" 역할이 "after-close" 행동을 수행한다
+    만일 "observer" 역할이 "after-close-mcp" 행동을 수행한다
     만일 "시스템" 역할이 "after-close-db" 행동을 수행한다
     그러면 "unique-recovered-1" assertion으로 "unique-recovered"를 확인한다
     그러면 "unique-recovered-2" assertion으로 "unique-recovered"를 확인한다
@@ -126,6 +139,13 @@
     그러면 "status-axes-20" assertion으로 "status-axes"를 확인한다
     그러면 "status-axes-21" assertion으로 "status-axes"를 확인한다
     그러면 "status-axes-22" assertion으로 "status-axes"를 확인한다
+    그러면 "after-close-mcp-same-snapshot" assertion으로 "MCP 조회는 API 조회와 같은 snapshot을 읽는다"를 확인한다
+    그러면 "unique-recovered-1-mcp" assertion으로 "MCP 진입점: 같은 snapshot에서 unique-recovered-1와 같은 값을 읽는다"를 확인한다
+    그러면 "unique-finally-processed-3-mcp" assertion으로 "MCP 진입점: 같은 snapshot에서 unique-finally-processed-3와 같은 값을 읽는다"를 확인한다
+    그러면 "unknown-5-mcp" assertion으로 "MCP 진입점: 같은 snapshot에서 unknown-5와 같은 값을 읽는다"를 확인한다
+    그러면 "25-plus-25-equals50-8-mcp" assertion으로 "MCP 진입점: 같은 snapshot에서 25-plus-25-equals50-8와 같은 값을 읽는다"를 확인한다
+    그러면 "unapproved-unknown-close-11-mcp" assertion으로 "MCP 진입점: 같은 snapshot에서 unapproved-unknown-close-11와 같은 값을 읽는다"를 확인한다
+    그러면 "unapproved-unknown-close-12-mcp" assertion으로 "MCP 진입점: 같은 snapshot에서 unapproved-unknown-close-12와 같은 값을 읽는다"를 확인한다
 
   시나리오: 일반 역할의 예외 종료0 뒤 ADMIN 근거 있는 미확인25 예외 종료에도 잔여 책임은 보인다
     먼저 사례 파일 "verification/cases/E2/case.json"의 "exception-responsibility"를 준비한다
@@ -149,6 +169,7 @@
     만일 "시스템" 역할이 "after-operator-db" 행동을 수행한다
     만일 "admin" 역할이 "admin-exception" 행동을 수행한다
     만일 "observer" 역할이 "closed" 행동을 수행한다
+    만일 "observer" 역할이 "closed-mcp" 행동을 수행한다
     만일 "시스템" 역할이 "closed-db" 행동을 수행한다
     그러면 "unauthorized-exception-close-1" assertion으로 "unauthorized-exception-close"를 확인한다
     그러면 "unauthorized-exception-close-2" assertion으로 "unauthorized-exception-close"를 확인한다
@@ -179,3 +200,8 @@
     그러면 "exception-evidence-27" assertion으로 "exception-evidence"를 확인한다
     그러면 "exception-evidence-28" assertion으로 "exception-evidence"를 확인한다
     그러면 "exception-evidence-29" assertion으로 "exception-evidence"를 확인한다
+    그러면 "closed-mcp-same-snapshot" assertion으로 "MCP 조회는 API 조회와 같은 snapshot을 읽는다"를 확인한다
+    그러면 "exception-unresolved-scope-8-mcp" assertion으로 "MCP 진입점: 같은 snapshot에서 exception-unresolved-scope-8와 같은 값을 읽는다"를 확인한다
+    그러면 "exception-residual-duty-16-mcp" assertion으로 "MCP 진입점: 같은 snapshot에서 exception-residual-duty-16와 같은 값을 읽는다"를 확인한다
+    그러면 "exception-evidence-21-mcp" assertion으로 "MCP 진입점: 같은 snapshot에서 exception-evidence-21와 같은 값을 읽는다"를 확인한다
+    그러면 "exception-evidence-22-mcp" assertion으로 "MCP 진입점: 같은 snapshot에서 exception-evidence-22와 같은 값을 읽는다"를 확인한다
