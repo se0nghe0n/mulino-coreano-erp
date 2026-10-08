@@ -1,0 +1,83 @@
+{
+ "recordType": "S4_COMBINED_CHECKS",
+ "codeCommit": "de8d19eaf81ac15903d4e11f717faf148331c464",
+ "recordedBy": "Claude Code coordinator",
+ "checks": [
+  {
+   "name": "backend clean package",
+   "command": "./mvnw -B -ntp -f backend/pom.xml -Dmulino.evidence.blob-root=<tmp> clean package",
+   "exit": 0,
+   "tests": 444,
+   "failures": 0,
+   "errors": 0,
+   "skipped": 0,
+   "log": "backend.log.gz",
+   "jarSha256": "a9e22724c47109ec63967049e0b7771bc8bbd2f788777562cab25d56d6d592da"
+  },
+  {
+   "name": "harness",
+   "command": "./verify harness",
+   "exit": 0,
+   "tests": 461,
+   "failures": 0,
+   "errors": 0,
+   "skipped": 0,
+   "log": "harness.log.gz"
+  },
+  {
+   "name": "prepare",
+   "command": "./verify prepare",
+   "exit": 1,
+   "status": "FAIL",
+   "subcases": 797,
+   "assertions": 21788,
+   "problems": 5,
+   "note": "T24 sweep-authenticated-reviewer reads harness provenance; new Step 2 gate, fix in Step 2 round 2 (step2r/cases-c)",
+   "log": "prepare.log.gz"
+  },
+  {
+   "name": "S4 build reuse",
+   "command": "python3 verification/actual/s4/build.py --reuse-backend",
+   "exit": 1,
+   "note": "refused: backend source/JAR drift after clean package; full build required",
+   "receipt": "s4-run-receipt-reuse-refused.json"
+  },
+  {
+   "name": "S4 build",
+   "command": "python3 verification/actual/s4/build.py",
+   "exit": 0,
+   "log": "s4-build2.log.gz"
+  },
+  {
+   "name": "S4 native suite",
+   "command": "./verify actual-s4 <fresh dir>",
+   "exit": 0,
+   "status": "PASS",
+   "boundedAssertions": 1718,
+   "flows": [
+    "E1",
+    "E2",
+    "C1",
+    "C4"
+   ],
+   "receipt": "s4-run-receipt-2.json",
+   "native": "actual-s4-native.json.gz"
+  },
+  {
+   "name": "S3 regression",
+   "command": "python3 verification/actual/s3/build.py && ./verify actual-s3 <fresh dir>",
+   "exit": 0,
+   "status": "PASS",
+   "receipt": "s3-run-receipt.json"
+  }
+ ],
+ "notRun": [
+  "V2/V3/postDispatchRecall native (covered only by backend PostgreSQL tests)",
+  "paid model/client UAT",
+  "BTP",
+  "regulatory submission",
+  "bank/tax effects",
+  "S1/S2 native re-run at this commit"
+ ],
+ "gateComplete": false
+}
