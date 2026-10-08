@@ -1,0 +1,4122 @@
+{
+  "schemaVersion": "1.0.0",
+  "status": "NOT_RUN",
+  "requiredCases": [
+    "E2"
+  ],
+  "fullCaseCoverageClaimed": false,
+  "actions": [
+    {
+      "id": "e2-setup",
+      "type": "setup",
+      "fixtureRef": "verification/actual/s4/e2-fixture.json",
+      "organizationAlias": "ORG"
+    },
+    {
+      "id": "e2-create-work",
+      "type": "command",
+      "capability": "createWork",
+      "request": {
+        "intentKind": "COMMAND",
+        "definitionVersion": "definition-v1",
+        "capabilityId": "createWork",
+        "expectedRevision": 0,
+        "commandIdempotencyKey": "e2-create-work",
+        "slots": {
+          "workType": "PURCHASE",
+          "quantityMode": "CUMULATIVE_EVENT",
+          "endpoint": "ARRIVED",
+          "dueAt": "2026-10-31T00:00:00Z",
+          "evidencePolicyVersion": "fixture-v1",
+          "ownerId": "$reader",
+          "supervisorId": "$supervisor",
+          "quantity": {
+            "value": "60",
+            "unit": "BOX"
+          },
+          "period": {
+            "start": "2026-10-01T00:00:00Z",
+            "end": "2026-10-31T00:00:00Z",
+            "startInclusive": true,
+            "endInclusive": true
+          },
+          "eventKinds": [
+            "PHYSICAL_RECEIPT"
+          ],
+          "distinctContributionScope": {
+            "itemId": "$P"
+          }
+        },
+        "provenance": {},
+        "subjectRefs": [
+          {
+            "type": "TradeItem",
+            "id": "$P"
+          }
+        ]
+      },
+      "bind": {
+        "WORK": "/effects/workId",
+        "WORK_REV": "/revision"
+      }
+    },
+    {
+      "id": "e2-proposal100",
+      "type": "command",
+      "capability": "proposePurchase",
+      "request": {
+        "intentKind": "COMMAND",
+        "definitionVersion": "definition-v1",
+        "capabilityId": "proposePurchase",
+        "expectedRevision": "$WORK_REV",
+        "commandIdempotencyKey": "e2-proposal100",
+        "slots": {
+          "workId": "$WORK",
+          "quantity": {
+            "value": "60",
+            "unit": "BOX"
+          },
+          "price": {
+            "value": "200",
+            "currency": "EUR"
+          },
+          "supplierId": "$SUP",
+          "destinationId": "$W",
+          "dueAt": "2026-10-31T00:00:00Z",
+          "endpoint": "ARRIVED",
+          "quantityMode": "CUMULATIVE_EVENT"
+        },
+        "provenance": {},
+        "subjectRefs": [
+          {
+            "type": "Work",
+            "id": "$WORK"
+          }
+        ]
+      },
+      "bind": {
+        "PROPOSAL": "/proposalId",
+        "PROPOSAL_HASH": "/proposalHash",
+        "PROPOSAL_REV": "/proposalRevision"
+      }
+    },
+    {
+      "id": "e2-approve100",
+      "type": "command",
+      "capability": "approvePurchase",
+      "request": {
+        "intentKind": "COMMAND",
+        "definitionVersion": "definition-v1",
+        "capabilityId": "approvePurchase",
+        "expectedRevision": "$PROPOSAL_REV",
+        "commandIdempotencyKey": "e2-approve100",
+        "slots": {
+          "proposalId": "$PROPOSAL",
+          "proposalHash": "$PROPOSAL_HASH",
+          "decision": "APPROVE",
+          "validUntil": "2026-10-31T00:00:00Z",
+          "conditions": []
+        },
+        "provenance": {},
+        "subjectRefs": [
+          {
+            "type": "Work",
+            "id": "$WORK"
+          }
+        ]
+      },
+      "bind": {
+        "APPROVAL": "/approvalId"
+      },
+      "actor": "supervisor"
+    },
+    {
+      "id": "e2-dispatch100",
+      "type": "command",
+      "capability": "dispatchPurchaseOrder",
+      "request": {
+        "intentKind": "COMMAND",
+        "definitionVersion": "definition-v1",
+        "capabilityId": "dispatchPurchaseOrder",
+        "expectedRevision": "$PROPOSAL_REV",
+        "commandIdempotencyKey": "e2-dispatch100",
+        "slots": {
+          "proposalId": "$PROPOSAL",
+          "proposalHash": "$PROPOSAL_HASH",
+          "approvalId": "$APPROVAL",
+          "channel": "SYNTHETIC",
+          "externalOperationId": "e65878bd-944a-513b-a12b-34ee4fe0c656"
+        },
+        "provenance": {},
+        "subjectRefs": [
+          {
+            "type": "Work",
+            "id": "$WORK"
+          }
+        ]
+      },
+      "bind": {
+        "ORDER": "/objectId",
+        "LINE": "/poLineId"
+      }
+    },
+    {
+      "id": "e2-supplier-accept",
+      "type": "original",
+      "fixture": {
+        "synthetic": true,
+        "clock": {
+          "asOf": "2026-10-07T09:00:02Z",
+          "knownAt": "2026-10-07T09:00:02Z"
+        },
+        "sourceProfile": {
+          "namespace": "native-s4-e2-supplier-accept",
+          "policyVersion": "fixture-v1",
+          "nextAction": "원본 범위와 실제 효과 대조",
+          "nextCheckAt": "2026-10-08T09:00:00Z"
+        },
+        "occurrence": {
+          "kind": "SUPPLIER_ACCEPT",
+          "content": {
+            "orderId": "$ORDER",
+            "itemId": "$P",
+            "reply": "ACCEPT",
+            "quantity": "60",
+            "unit": "BOX",
+            "proposalRevision": 1
+          },
+          "externalEventId": "e2-supplier-accept",
+          "quantity": "60",
+          "unit": "BOX",
+          "assertion": "authored synthetic external original"
+        }
+      },
+      "binding": {
+        "organizationId": "$ORG",
+        "workId": "$WORK",
+        "itemId": "$P",
+        "actorId": "$reader",
+        "supervisorId": "$supervisor",
+        "physicalScopeId": "$ORDER",
+        "subjectId": "$ORDER",
+        "subjectKind": "PURCHASE_ORDER",
+        "placeId": "$W"
+      }
+    },
+    {
+      "id": "e2-e2-supplier-accept-match",
+      "type": "command",
+      "capability": "matchSourceIdentity",
+      "request": {
+        "intentKind": "COMMAND",
+        "definitionVersion": "definition-v1",
+        "capabilityId": "matchSourceIdentity",
+        "expectedRevision": 1,
+        "commandIdempotencyKey": "e2-e2-supplier-accept-match",
+        "slots": {
+          "claimId": "$e2-supplier-accept.claim",
+          "basisDocumentId": "$e2-supplier-accept.document",
+          "physicalScopeId": "$ORDER",
+          "policyVersion": "fixture-v1",
+          "sourceIdentity": "native-s4-e2-supplier-accept:e2-supplier-accept:1",
+          "quantity": "60",
+          "unit": "BOX",
+          "effectiveFrom": "2026-10-07T09:00:02Z",
+          "reason": "외부 ORIGINAL과 동일한 범위 대조"
+        },
+        "provenance": {},
+        "subjectRefs": [
+          {
+            "type": "PurchaseOrder",
+            "id": "$ORDER"
+          }
+        ]
+      },
+      "outcome": "APPLIED",
+      "bind": {
+        "e2-supplier-accept.reconciliation": "/id"
+      },
+      "assertions": [
+        {
+          "pointer": "/evidenceStatus",
+          "operator": "equals",
+          "expected": "MATCHED"
+        }
+      ]
+    },
+    {
+      "id": "e2-e2-supplier-accept-link",
+      "type": "command",
+      "capability": "linkCanonicalOccurrence",
+      "request": {
+        "intentKind": "COMMAND",
+        "definitionVersion": "definition-v1",
+        "capabilityId": "linkCanonicalOccurrence",
+        "expectedRevision": 1,
+        "commandIdempotencyKey": "e2-e2-supplier-accept-link",
+        "slots": {
+          "reconciliationId": "$e2-supplier-accept.reconciliation"
+        },
+        "provenance": {},
+        "subjectRefs": [
+          {
+            "type": "PurchaseOrder",
+            "id": "$ORDER"
+          }
+        ]
+      },
+      "outcome": "APPLIED",
+      "bind": {
+        "e2-supplier-accept.canonical": "/id"
+      },
+      "assertions": [
+        {
+          "pointer": "/evidenceStatus",
+          "operator": "equals",
+          "expected": "VERIFIED_RECORD_ONLY"
+        }
+      ]
+    },
+    {
+      "id": "e2-e2-supplier-accepted",
+      "type": "command",
+      "capability": "recordSupplierReply",
+      "request": {
+        "intentKind": "RECORD",
+        "definitionVersion": "definition-v1",
+        "capabilityId": "recordSupplierReply",
+        "expectedRevision": 1,
+        "commandIdempotencyKey": "e2-e2-supplier-accepted",
+        "slots": {
+          "purchaseId": "$ORDER",
+          "reply": "ACCEPT",
+          "proposedQuantity": {
+            "value": "60",
+            "unit": "BOX"
+          },
+          "evidence": "$e2-supplier-accept.document",
+          "canonicalOccurrenceId": "$e2-supplier-accept.canonical"
+        },
+        "provenance": {},
+        "subjectRefs": [
+          {
+            "type": "PurchaseOrder",
+            "id": "$ORDER"
+          }
+        ]
+      },
+      "outcome": "APPLIED",
+      "bind": {
+        "LINE_REV": "/revision"
+      }
+    },
+    {
+      "id": "e2-RANGE60",
+      "type": "uuid",
+      "alias": "e2-RANGE60"
+    },
+    {
+      "id": "e2-receipt60",
+      "type": "original",
+      "fixture": {
+        "synthetic": true,
+        "clock": {
+          "asOf": "2026-10-07T09:00:02Z",
+          "knownAt": "2026-10-07T09:00:02Z"
+        },
+        "sourceProfile": {
+          "namespace": "native-s4-e2-receipt60",
+          "policyVersion": "fixture-v1",
+          "nextAction": "원본 범위와 실제 효과 대조",
+          "nextCheckAt": "2026-10-08T09:00:00Z"
+        },
+        "occurrence": {
+          "kind": "PHYSICAL_RECEIPT",
+          "content": {
+            "rangeRootId": "$e2-RANGE60",
+            "startQuantity": "0",
+            "itemId": "$P",
+            "lotId": "$L",
+            "placeId": "$W",
+            "workId": "$WORK",
+            "quantity": "60",
+            "unit": "BOX",
+            "occurredAt": "2026-10-07T09:00:02Z"
+          },
+          "externalEventId": "e2-receipt60",
+          "quantity": "60",
+          "unit": "BOX",
+          "assertion": "authored synthetic external original"
+        }
+      },
+      "binding": {
+        "organizationId": "$ORG",
+        "workId": "$WORK",
+        "itemId": "$P",
+        "actorId": "$reader",
+        "supervisorId": "$supervisor",
+        "physicalScopeId": "$e2-RANGE60",
+        "subjectId": "$P",
+        "subjectKind": "ITEM",
+        "placeId": "$W"
+      }
+    },
+    {
+      "id": "e2-e2-receipt60-provisional",
+      "type": "command",
+      "capability": "receiveProvisional",
+      "request": {
+        "intentKind": "RECORD",
+        "definitionVersion": "definition-v1",
+        "capabilityId": "receiveProvisional",
+        "expectedRevision": 0,
+        "commandIdempotencyKey": "e2-e2-receipt60-provisional",
+        "slots": {
+          "eventId": "$e2-receipt60.event",
+          "rangeRootId": "$e2-RANGE60",
+          "startQuantity": "0",
+          "quantity": "60",
+          "unit": "BOX",
+          "itemId": "$P",
+          "lotId": "$L",
+          "placeId": "$W",
+          "workId": "$WORK",
+          "ownerId": "$reader",
+          "supervisorId": "$supervisor",
+          "nextAction": "실물과 원본 사건 확인",
+          "nextCheckAt": "2026-10-08T09:00:00Z",
+          "occurredAt": "2026-10-07T09:00:02Z",
+          "purchaseLineId": "$LINE"
+        },
+        "provenance": {},
+        "subjectRefs": [
+          {
+            "type": "Work",
+            "id": "$WORK"
+          }
+        ]
+      },
+      "outcome": "APPLIED",
+      "bind": {
+        "e2-receipt60.observation": "/effects/receiptId"
+      }
+    },
+    {
+      "id": "e2-e2-receipt60-match",
+      "type": "command",
+      "capability": "matchSourceIdentity",
+      "request": {
+        "intentKind": "COMMAND",
+        "definitionVersion": "definition-v1",
+        "capabilityId": "matchSourceIdentity",
+        "expectedRevision": 1,
+        "commandIdempotencyKey": "e2-e2-receipt60-match",
+        "slots": {
+          "claimId": "$e2-receipt60.claim",
+          "basisDocumentId": "$e2-receipt60.document",
+          "physicalScopeId": "$e2-RANGE60",
+          "policyVersion": "fixture-v1",
+          "sourceIdentity": "native-s4-e2-receipt60:e2-receipt60:1",
+          "quantity": "60",
+          "unit": "BOX",
+          "effectiveFrom": "2026-10-07T09:00:02Z",
+          "reason": "외부 ORIGINAL과 동일한 범위 대조"
+        },
+        "provenance": {},
+        "subjectRefs": [
+          {
+            "type": "TradeItem",
+            "id": "$P"
+          }
+        ]
+      },
+      "outcome": "APPLIED",
+      "bind": {
+        "e2-receipt60.reconciliation": "/id"
+      },
+      "assertions": [
+        {
+          "pointer": "/evidenceStatus",
+          "operator": "equals",
+          "expected": "MATCHED"
+        }
+      ]
+    },
+    {
+      "id": "e2-e2-receipt60-link",
+      "type": "command",
+      "capability": "linkCanonicalOccurrence",
+      "request": {
+        "intentKind": "COMMAND",
+        "definitionVersion": "definition-v1",
+        "capabilityId": "linkCanonicalOccurrence",
+        "expectedRevision": 1,
+        "commandIdempotencyKey": "e2-e2-receipt60-link",
+        "slots": {
+          "reconciliationId": "$e2-receipt60.reconciliation"
+        },
+        "provenance": {},
+        "subjectRefs": [
+          {
+            "type": "TradeItem",
+            "id": "$P"
+          }
+        ]
+      },
+      "outcome": "APPLIED",
+      "bind": {
+        "e2-receipt60.canonical": "/id"
+      },
+      "assertions": [
+        {
+          "pointer": "/evidenceStatus",
+          "operator": "equals",
+          "expected": "VERIFIED_RECORD_ONLY"
+        }
+      ]
+    },
+    {
+      "id": "e2-e2-receipt60-confirm",
+      "type": "command",
+      "capability": "confirmReceipt",
+      "request": {
+        "intentKind": "COMMAND",
+        "definitionVersion": "definition-v1",
+        "capabilityId": "confirmReceipt",
+        "expectedRevision": 0,
+        "commandIdempotencyKey": "e2-e2-receipt60-confirm-stable",
+        "slots": {
+          "receiptId": "$e2-receipt60.observation",
+          "canonicalOccurrenceId": "$e2-receipt60.canonical",
+          "lotId": "$L"
+        },
+        "provenance": {},
+        "subjectRefs": [
+          {
+            "type": "Receipt",
+            "id": "$e2-receipt60.observation"
+          }
+        ]
+      },
+      "outcome": "APPLIED",
+      "bind": {
+        "e2-receipt60.segment": "/effects/segmentId"
+      }
+    },
+    {
+      "id": "e2-sell-QC",
+      "type": "original",
+      "fixture": {
+        "synthetic": true,
+        "clock": {
+          "asOf": "2026-10-07T09:00:02Z",
+          "knownAt": "2026-10-07T09:00:02Z"
+        },
+        "sourceProfile": {
+          "namespace": "native-s4-e2-sell-QC",
+          "policyVersion": "fixture-v1",
+          "nextAction": "원본 범위와 실제 효과 대조",
+          "nextCheckAt": "2026-10-08T09:00:00Z"
+        },
+        "occurrence": {
+          "kind": "QUALITY_DECISION_recordDispositionBasis_QC",
+          "content": {
+            "segmentId": "$e2-receipt60.segment",
+            "operation": "recordDispositionBasis",
+            "action": "SELL",
+            "category": "QC",
+            "startQuantity": "0",
+            "quantity": "60",
+            "unit": "BOX",
+            "validFrom": "2026-10-07T09:00:02Z",
+            "validUntil": "2026-10-31T00:00:00Z",
+            "workId": "$WORK",
+            "sourceDecisionId": "c202fefe-1407-53ce-98b4-7dcd1a61c76c",
+            "sourceVersion": "1"
+          },
+          "externalEventId": "c202fefe-1407-53ce-98b4-7dcd1a61c76c",
+          "quantity": "60",
+          "unit": "BOX",
+          "assertion": "authored synthetic external original"
+        }
+      },
+      "binding": {
+        "organizationId": "$ORG",
+        "workId": "$WORK",
+        "itemId": "$P",
+        "actorId": "$reader",
+        "supervisorId": "$supervisor",
+        "physicalScopeId": "$e2-receipt60.segment",
+        "subjectId": "$e2-receipt60.segment",
+        "subjectKind": "SEGMENT",
+        "placeId": "$W"
+      }
+    },
+    {
+      "id": "e2-sell-QC-match",
+      "type": "command",
+      "capability": "matchSourceIdentity",
+      "request": {
+        "intentKind": "COMMAND",
+        "definitionVersion": "definition-v1",
+        "capabilityId": "matchSourceIdentity",
+        "expectedRevision": 1,
+        "commandIdempotencyKey": "e2-sell-QC-match",
+        "slots": {
+          "claimId": "$e2-sell-QC.claim",
+          "basisDocumentId": "$e2-sell-QC.document",
+          "physicalScopeId": "$e2-receipt60.segment",
+          "policyVersion": "fixture-v1",
+          "sourceIdentity": "native-s4-e2-sell-QC:c202fefe-1407-53ce-98b4-7dcd1a61c76c:1",
+          "quantity": "60",
+          "unit": "BOX",
+          "effectiveFrom": "2026-10-07T09:00:02Z",
+          "reason": "외부 ORIGINAL과 동일한 범위 대조"
+        },
+        "provenance": {},
+        "subjectRefs": [
+          {
+            "type": "QuantitySegment",
+            "id": "$e2-receipt60.segment"
+          }
+        ]
+      },
+      "outcome": "APPLIED",
+      "bind": {
+        "e2-sell-QC.reconciliation": "/id"
+      },
+      "assertions": [
+        {
+          "pointer": "/evidenceStatus",
+          "operator": "equals",
+          "expected": "MATCHED"
+        }
+      ]
+    },
+    {
+      "id": "e2-sell-QC-link",
+      "type": "command",
+      "capability": "linkCanonicalOccurrence",
+      "request": {
+        "intentKind": "COMMAND",
+        "definitionVersion": "definition-v1",
+        "capabilityId": "linkCanonicalOccurrence",
+        "expectedRevision": 1,
+        "commandIdempotencyKey": "e2-sell-QC-link",
+        "slots": {
+          "reconciliationId": "$e2-sell-QC.reconciliation"
+        },
+        "provenance": {},
+        "subjectRefs": [
+          {
+            "type": "QuantitySegment",
+            "id": "$e2-receipt60.segment"
+          }
+        ]
+      },
+      "outcome": "APPLIED",
+      "bind": {
+        "e2-sell-QC.canonical": "/id"
+      },
+      "assertions": [
+        {
+          "pointer": "/evidenceStatus",
+          "operator": "equals",
+          "expected": "VERIFIED_RECORD_ONLY"
+        }
+      ]
+    },
+    {
+      "id": "e2-sell-QC-decision",
+      "type": "command",
+      "capability": "recordDispositionBasis",
+      "request": {
+        "intentKind": "RECORD",
+        "definitionVersion": "definition-v1",
+        "capabilityId": "recordDispositionBasis",
+        "expectedRevision": 0,
+        "commandIdempotencyKey": "e2-sell-QC-decision",
+        "slots": {
+          "segmentId": "$e2-receipt60.segment",
+          "action": "SELL",
+          "category": "QC",
+          "startQuantity": "0",
+          "quantity": "60",
+          "unit": "BOX",
+          "validFrom": "2026-10-07T09:00:02Z",
+          "validUntil": "2026-10-31T00:00:00Z",
+          "workId": "$WORK",
+          "evidenceId": "$e2-sell-QC.document",
+          "reason": "원본의 정확한 행동 범위를 판정",
+          "nextCheckAt": "2026-10-08T09:00:00Z"
+        },
+        "provenance": {},
+        "subjectRefs": [
+          {
+            "type": "QuantitySegment",
+            "id": "$e2-receipt60.segment"
+          }
+        ]
+      },
+      "outcome": "APPLIED"
+    },
+    {
+      "id": "e2-sell-CUSTOMER",
+      "type": "original",
+      "fixture": {
+        "synthetic": true,
+        "clock": {
+          "asOf": "2026-10-07T09:00:02Z",
+          "knownAt": "2026-10-07T09:00:02Z"
+        },
+        "sourceProfile": {
+          "namespace": "native-s4-e2-sell-CUSTOMER",
+          "policyVersion": "fixture-v1",
+          "nextAction": "원본 범위와 실제 효과 대조",
+          "nextCheckAt": "2026-10-08T09:00:00Z"
+        },
+        "occurrence": {
+          "kind": "QUALITY_DECISION_recordDispositionBasis_CUSTOMER",
+          "content": {
+            "segmentId": "$e2-receipt60.segment",
+            "operation": "recordDispositionBasis",
+            "action": "SELL",
+            "category": "CUSTOMER",
+            "startQuantity": "0",
+            "quantity": "60",
+            "unit": "BOX",
+            "validFrom": "2026-10-07T09:00:02Z",
+            "validUntil": "2026-10-31T00:00:00Z",
+            "workId": "$WORK",
+            "sourceDecisionId": "365fa362-2068-5674-adcd-fd479d1dcc4e",
+            "sourceVersion": "1"
+          },
+          "externalEventId": "365fa362-2068-5674-adcd-fd479d1dcc4e",
+          "quantity": "60",
+          "unit": "BOX",
+          "assertion": "authored synthetic external original"
+        }
+      },
+      "binding": {
+        "organizationId": "$ORG",
+        "workId": "$WORK",
+        "itemId": "$P",
+        "actorId": "$reader",
+        "supervisorId": "$supervisor",
+        "physicalScopeId": "$e2-receipt60.segment",
+        "subjectId": "$e2-receipt60.segment",
+        "subjectKind": "SEGMENT",
+        "placeId": "$W"
+      }
+    },
+    {
+      "id": "e2-sell-CUSTOMER-match",
+      "type": "command",
+      "capability": "matchSourceIdentity",
+      "request": {
+        "intentKind": "COMMAND",
+        "definitionVersion": "definition-v1",
+        "capabilityId": "matchSourceIdentity",
+        "expectedRevision": 1,
+        "commandIdempotencyKey": "e2-sell-CUSTOMER-match",
+        "slots": {
+          "claimId": "$e2-sell-CUSTOMER.claim",
+          "basisDocumentId": "$e2-sell-CUSTOMER.document",
+          "physicalScopeId": "$e2-receipt60.segment",
+          "policyVersion": "fixture-v1",
+          "sourceIdentity": "native-s4-e2-sell-CUSTOMER:365fa362-2068-5674-adcd-fd479d1dcc4e:1",
+          "quantity": "60",
+          "unit": "BOX",
+          "effectiveFrom": "2026-10-07T09:00:02Z",
+          "reason": "외부 ORIGINAL과 동일한 범위 대조"
+        },
+        "provenance": {},
+        "subjectRefs": [
+          {
+            "type": "QuantitySegment",
+            "id": "$e2-receipt60.segment"
+          }
+        ]
+      },
+      "outcome": "APPLIED",
+      "bind": {
+        "e2-sell-CUSTOMER.reconciliation": "/id"
+      },
+      "assertions": [
+        {
+          "pointer": "/evidenceStatus",
+          "operator": "equals",
+          "expected": "MATCHED"
+        }
+      ]
+    },
+    {
+      "id": "e2-sell-CUSTOMER-link",
+      "type": "command",
+      "capability": "linkCanonicalOccurrence",
+      "request": {
+        "intentKind": "COMMAND",
+        "definitionVersion": "definition-v1",
+        "capabilityId": "linkCanonicalOccurrence",
+        "expectedRevision": 1,
+        "commandIdempotencyKey": "e2-sell-CUSTOMER-link",
+        "slots": {
+          "reconciliationId": "$e2-sell-CUSTOMER.reconciliation"
+        },
+        "provenance": {},
+        "subjectRefs": [
+          {
+            "type": "QuantitySegment",
+            "id": "$e2-receipt60.segment"
+          }
+        ]
+      },
+      "outcome": "APPLIED",
+      "bind": {
+        "e2-sell-CUSTOMER.canonical": "/id"
+      },
+      "assertions": [
+        {
+          "pointer": "/evidenceStatus",
+          "operator": "equals",
+          "expected": "VERIFIED_RECORD_ONLY"
+        }
+      ]
+    },
+    {
+      "id": "e2-sell-CUSTOMER-decision",
+      "type": "command",
+      "capability": "recordDispositionBasis",
+      "request": {
+        "intentKind": "RECORD",
+        "definitionVersion": "definition-v1",
+        "capabilityId": "recordDispositionBasis",
+        "expectedRevision": 0,
+        "commandIdempotencyKey": "e2-sell-CUSTOMER-decision",
+        "slots": {
+          "segmentId": "$e2-receipt60.segment",
+          "action": "SELL",
+          "category": "CUSTOMER",
+          "startQuantity": "0",
+          "quantity": "60",
+          "unit": "BOX",
+          "validFrom": "2026-10-07T09:00:02Z",
+          "validUntil": "2026-10-31T00:00:00Z",
+          "workId": "$WORK",
+          "evidenceId": "$e2-sell-CUSTOMER.document",
+          "reason": "원본의 정확한 행동 범위를 판정",
+          "nextCheckAt": "2026-10-08T09:00:00Z"
+        },
+        "provenance": {},
+        "subjectRefs": [
+          {
+            "type": "QuantitySegment",
+            "id": "$e2-receipt60.segment"
+          }
+        ]
+      },
+      "outcome": "APPLIED"
+    },
+    {
+      "id": "e2-sell-COMMERCIAL",
+      "type": "original",
+      "fixture": {
+        "synthetic": true,
+        "clock": {
+          "asOf": "2026-10-07T09:00:02Z",
+          "knownAt": "2026-10-07T09:00:02Z"
+        },
+        "sourceProfile": {
+          "namespace": "native-s4-e2-sell-COMMERCIAL",
+          "policyVersion": "fixture-v1",
+          "nextAction": "원본 범위와 실제 효과 대조",
+          "nextCheckAt": "2026-10-08T09:00:00Z"
+        },
+        "occurrence": {
+          "kind": "QUALITY_DECISION_recordDispositionBasis_COMMERCIAL",
+          "content": {
+            "segmentId": "$e2-receipt60.segment",
+            "operation": "recordDispositionBasis",
+            "action": "SELL",
+            "category": "COMMERCIAL",
+            "startQuantity": "0",
+            "quantity": "60",
+            "unit": "BOX",
+            "validFrom": "2026-10-07T09:00:02Z",
+            "validUntil": "2026-10-31T00:00:00Z",
+            "workId": "$WORK",
+            "sourceDecisionId": "028ad842-9d0e-5df4-8b95-50d61194641f",
+            "sourceVersion": "1"
+          },
+          "externalEventId": "028ad842-9d0e-5df4-8b95-50d61194641f",
+          "quantity": "60",
+          "unit": "BOX",
+          "assertion": "authored synthetic external original"
+        }
+      },
+      "binding": {
+        "organizationId": "$ORG",
+        "workId": "$WORK",
+        "itemId": "$P",
+        "actorId": "$reader",
+        "supervisorId": "$supervisor",
+        "physicalScopeId": "$e2-receipt60.segment",
+        "subjectId": "$e2-receipt60.segment",
+        "subjectKind": "SEGMENT",
+        "placeId": "$W"
+      }
+    },
+    {
+      "id": "e2-sell-COMMERCIAL-match",
+      "type": "command",
+      "capability": "matchSourceIdentity",
+      "request": {
+        "intentKind": "COMMAND",
+        "definitionVersion": "definition-v1",
+        "capabilityId": "matchSourceIdentity",
+        "expectedRevision": 1,
+        "commandIdempotencyKey": "e2-sell-COMMERCIAL-match",
+        "slots": {
+          "claimId": "$e2-sell-COMMERCIAL.claim",
+          "basisDocumentId": "$e2-sell-COMMERCIAL.document",
+          "physicalScopeId": "$e2-receipt60.segment",
+          "policyVersion": "fixture-v1",
+          "sourceIdentity": "native-s4-e2-sell-COMMERCIAL:028ad842-9d0e-5df4-8b95-50d61194641f:1",
+          "quantity": "60",
+          "unit": "BOX",
+          "effectiveFrom": "2026-10-07T09:00:02Z",
+          "reason": "외부 ORIGINAL과 동일한 범위 대조"
+        },
+        "provenance": {},
+        "subjectRefs": [
+          {
+            "type": "QuantitySegment",
+            "id": "$e2-receipt60.segment"
+          }
+        ]
+      },
+      "outcome": "APPLIED",
+      "bind": {
+        "e2-sell-COMMERCIAL.reconciliation": "/id"
+      },
+      "assertions": [
+        {
+          "pointer": "/evidenceStatus",
+          "operator": "equals",
+          "expected": "MATCHED"
+        }
+      ]
+    },
+    {
+      "id": "e2-sell-COMMERCIAL-link",
+      "type": "command",
+      "capability": "linkCanonicalOccurrence",
+      "request": {
+        "intentKind": "COMMAND",
+        "definitionVersion": "definition-v1",
+        "capabilityId": "linkCanonicalOccurrence",
+        "expectedRevision": 1,
+        "commandIdempotencyKey": "e2-sell-COMMERCIAL-link",
+        "slots": {
+          "reconciliationId": "$e2-sell-COMMERCIAL.reconciliation"
+        },
+        "provenance": {},
+        "subjectRefs": [
+          {
+            "type": "QuantitySegment",
+            "id": "$e2-receipt60.segment"
+          }
+        ]
+      },
+      "outcome": "APPLIED",
+      "bind": {
+        "e2-sell-COMMERCIAL.canonical": "/id"
+      },
+      "assertions": [
+        {
+          "pointer": "/evidenceStatus",
+          "operator": "equals",
+          "expected": "VERIFIED_RECORD_ONLY"
+        }
+      ]
+    },
+    {
+      "id": "e2-sell-COMMERCIAL-decision",
+      "type": "command",
+      "capability": "recordDispositionBasis",
+      "request": {
+        "intentKind": "RECORD",
+        "definitionVersion": "definition-v1",
+        "capabilityId": "recordDispositionBasis",
+        "expectedRevision": 0,
+        "commandIdempotencyKey": "e2-sell-COMMERCIAL-decision",
+        "slots": {
+          "segmentId": "$e2-receipt60.segment",
+          "action": "SELL",
+          "category": "COMMERCIAL",
+          "startQuantity": "0",
+          "quantity": "60",
+          "unit": "BOX",
+          "validFrom": "2026-10-07T09:00:02Z",
+          "validUntil": "2026-10-31T00:00:00Z",
+          "workId": "$WORK",
+          "evidenceId": "$e2-sell-COMMERCIAL.document",
+          "reason": "원본의 정확한 행동 범위를 판정",
+          "nextCheckAt": "2026-10-08T09:00:00Z"
+        },
+        "provenance": {},
+        "subjectRefs": [
+          {
+            "type": "QuantitySegment",
+            "id": "$e2-receipt60.segment"
+          }
+        ]
+      },
+      "outcome": "APPLIED"
+    },
+    {
+      "id": "e2-sell-reg-draft",
+      "type": "original",
+      "fixture": {
+        "synthetic": true,
+        "clock": {
+          "asOf": "2026-10-07T09:00:02Z",
+          "knownAt": "2026-10-07T09:00:02Z"
+        },
+        "sourceProfile": {
+          "namespace": "native-s4-e2-sell-regulator",
+          "policyVersion": "fixture-v1",
+          "nextAction": "원본 범위와 실제 효과 대조",
+          "nextCheckAt": "2026-10-08T09:00:00Z"
+        },
+        "occurrence": {
+          "kind": "REGULATORY_DRAFT",
+          "content": {
+            "draft": "fictional dossier",
+            "itemId": "$P"
+          },
+          "externalEventId": "e2-sell-reg-draft",
+          "quantity": "60",
+          "unit": "BOX",
+          "assertion": "authored synthetic external original"
+        }
+      },
+      "binding": {
+        "organizationId": "$ORG",
+        "workId": "$WORK",
+        "itemId": "$P",
+        "actorId": "$reader",
+        "supervisorId": "$supervisor",
+        "physicalScopeId": "$e2-receipt60.segment",
+        "subjectId": "$e2-receipt60.segment",
+        "subjectKind": "SEGMENT",
+        "placeId": "$W"
+      }
+    },
+    {
+      "id": "e2-sell-reg-prepare",
+      "type": "command",
+      "capability": "prepareRegulatoryProcedure",
+      "request": {
+        "intentKind": "COMMAND",
+        "definitionVersion": "definition-v1",
+        "capabilityId": "prepareRegulatoryProcedure",
+        "expectedRevision": 0,
+        "commandIdempotencyKey": "e2-sell-reg-prepare",
+        "slots": {
+          "itemId": "$P",
+          "lotId": "$L",
+          "physicalScopeId": "$e2-receipt60.segment",
+          "workId": "$WORK",
+          "policyId": "$REGPOL",
+          "documentVersionId": "$e2-sell-reg-draft.document"
+        },
+        "provenance": {},
+        "subjectRefs": [
+          {
+            "type": "QuantitySegment",
+            "id": "$e2-receipt60.segment"
+          }
+        ]
+      },
+      "outcome": "APPLIED",
+      "bind": {
+        "E2_SELL_PROC": "/effects/procedureId",
+        "E2_SELL_PROC_VERSION": "/effects/procedureVersionId",
+        "E2_SELL_PROC_REV": "/revision"
+      },
+      "assertions": [
+        {
+          "pointer": "/status",
+          "operator": "equals",
+          "expected": "PREPARED"
+        }
+      ]
+    },
+    {
+      "id": "e2-sell-reg-submitted",
+      "type": "original",
+      "fixture": {
+        "synthetic": true,
+        "clock": {
+          "asOf": "2026-10-07T09:00:02Z",
+          "knownAt": "2026-10-07T09:00:02Z"
+        },
+        "sourceProfile": {
+          "namespace": "native-s4-e2-sell-regulator",
+          "policyVersion": "fixture-v1",
+          "nextAction": "원본 범위와 실제 효과 대조",
+          "nextCheckAt": "2026-10-08T09:00:00Z"
+        },
+        "occurrence": {
+          "kind": "REGULATORY_SUBMISSION",
+          "content": {
+            "regulatoryEventId": "4da37d87-2728-51c0-9a66-b306abd83631",
+            "procedureId": "$E2_SELL_PROC",
+            "procedureVersionId": "$E2_SELL_PROC_VERSION",
+            "itemId": "$P",
+            "lotId": "$L",
+            "physicalScopeId": "$e2-receipt60.segment",
+            "authority": "FICTIONAL-AUTHORITY",
+            "policyVersion": "fixture-v1",
+            "occurredAt": "2026-10-07T09:00:02Z"
+          },
+          "externalEventId": "e2-sell-reg-submitted",
+          "quantity": null,
+          "unit": null,
+          "assertion": "authored synthetic external original"
+        }
+      },
+      "binding": {
+        "organizationId": "$ORG",
+        "workId": "$WORK",
+        "itemId": "$P",
+        "actorId": "$reader",
+        "supervisorId": "$supervisor",
+        "physicalScopeId": "$e2-receipt60.segment",
+        "subjectId": "$e2-receipt60.segment",
+        "subjectKind": "SEGMENT",
+        "placeId": "$W"
+      }
+    },
+    {
+      "id": "e2-sell-reg-submitted-match",
+      "type": "command",
+      "capability": "matchSourceIdentity",
+      "request": {
+        "intentKind": "COMMAND",
+        "definitionVersion": "definition-v1",
+        "capabilityId": "matchSourceIdentity",
+        "expectedRevision": 1,
+        "commandIdempotencyKey": "e2-sell-reg-submitted-match",
+        "slots": {
+          "claimId": "$e2-sell-reg-submitted.claim",
+          "basisDocumentId": "$e2-sell-reg-submitted.document",
+          "physicalScopeId": "$e2-receipt60.segment",
+          "policyVersion": "fixture-v1",
+          "sourceIdentity": "native-s4-e2-sell-regulator:e2-sell-reg-submitted:1",
+          "effectiveFrom": "2026-10-07T09:00:02Z",
+          "reason": "외부 ORIGINAL과 동일한 범위 대조"
+        },
+        "provenance": {},
+        "subjectRefs": [
+          {
+            "type": "QuantitySegment",
+            "id": "$e2-receipt60.segment"
+          }
+        ]
+      },
+      "outcome": "APPLIED",
+      "bind": {
+        "e2-sell-reg-submitted.reconciliation": "/id"
+      },
+      "assertions": [
+        {
+          "pointer": "/evidenceStatus",
+          "operator": "equals",
+          "expected": "MATCHED"
+        }
+      ]
+    },
+    {
+      "id": "e2-sell-reg-submitted-link",
+      "type": "command",
+      "capability": "linkCanonicalOccurrence",
+      "request": {
+        "intentKind": "COMMAND",
+        "definitionVersion": "definition-v1",
+        "capabilityId": "linkCanonicalOccurrence",
+        "expectedRevision": 1,
+        "commandIdempotencyKey": "e2-sell-reg-submitted-link",
+        "slots": {
+          "reconciliationId": "$e2-sell-reg-submitted.reconciliation"
+        },
+        "provenance": {},
+        "subjectRefs": [
+          {
+            "type": "QuantitySegment",
+            "id": "$e2-receipt60.segment"
+          }
+        ]
+      },
+      "outcome": "APPLIED",
+      "bind": {
+        "e2-sell-reg-submitted.canonical": "/id"
+      },
+      "assertions": [
+        {
+          "pointer": "/evidenceStatus",
+          "operator": "equals",
+          "expected": "VERIFIED_RECORD_ONLY"
+        }
+      ]
+    },
+    {
+      "id": "e2-sell-submit-reg",
+      "type": "command",
+      "capability": "recordSubmission",
+      "request": {
+        "intentKind": "RECORD",
+        "definitionVersion": "definition-v1",
+        "capabilityId": "recordSubmission",
+        "expectedRevision": "$E2_SELL_PROC_REV",
+        "commandIdempotencyKey": "e2-sell-submit-reg",
+        "slots": {
+          "procedureId": "$E2_SELL_PROC",
+          "occurredAt": "2026-10-07T09:00:02Z",
+          "occurrenceId": "$e2-sell-reg-submitted.canonical"
+        },
+        "provenance": {},
+        "subjectRefs": [
+          {
+            "type": "QuantitySegment",
+            "id": "$e2-receipt60.segment"
+          }
+        ]
+      },
+      "outcome": "APPLIED",
+      "bind": {
+        "E2_SELL_PROC_VERSION": "/effects/procedureVersionId",
+        "E2_SELL_PROC_REV": "/revision"
+      },
+      "assertions": [
+        {
+          "pointer": "/status",
+          "operator": "equals",
+          "expected": "SUBMITTED"
+        }
+      ]
+    },
+    {
+      "id": "e2-sell-reg-allow30",
+      "type": "original",
+      "fixture": {
+        "synthetic": true,
+        "clock": {
+          "asOf": "2026-10-07T09:00:02Z",
+          "knownAt": "2026-10-07T09:00:02Z"
+        },
+        "sourceProfile": {
+          "namespace": "native-s4-e2-sell-regulator",
+          "policyVersion": "fixture-v1",
+          "nextAction": "원본 범위와 실제 효과 대조",
+          "nextCheckAt": "2026-10-08T09:00:00Z"
+        },
+        "occurrence": {
+          "kind": "REGULATORY_DECISION",
+          "content": {
+            "regulatoryEventId": "ecd3c875-d58c-52f5-91a4-affeb91d6029",
+            "procedureId": "$E2_SELL_PROC",
+            "procedureVersionId": "$E2_SELL_PROC_VERSION",
+            "itemId": "$P",
+            "lotId": "$L",
+            "physicalScopeId": "$e2-receipt60.segment",
+            "authority": "FICTIONAL-AUTHORITY",
+            "policyVersion": "fixture-v1",
+            "decision": "ALLOWED",
+            "action": "SELL",
+            "startQuantity": "0",
+            "quantity": "60",
+            "unit": "BOX",
+            "validFrom": "2026-10-07T09:00:02Z",
+            "validUntil": "2026-10-31T00:00:00Z"
+          },
+          "externalEventId": "e2-sell-reg-allow30",
+          "quantity": "60",
+          "unit": "BOX",
+          "assertion": "authored synthetic external original"
+        }
+      },
+      "binding": {
+        "organizationId": "$ORG",
+        "workId": "$WORK",
+        "itemId": "$P",
+        "actorId": "$reader",
+        "supervisorId": "$supervisor",
+        "physicalScopeId": "$e2-receipt60.segment",
+        "subjectId": "$e2-receipt60.segment",
+        "subjectKind": "SEGMENT",
+        "placeId": "$W"
+      }
+    },
+    {
+      "id": "e2-sell-reg-allow30-match",
+      "type": "command",
+      "capability": "matchSourceIdentity",
+      "request": {
+        "intentKind": "COMMAND",
+        "definitionVersion": "definition-v1",
+        "capabilityId": "matchSourceIdentity",
+        "expectedRevision": 1,
+        "commandIdempotencyKey": "e2-sell-reg-allow30-match",
+        "slots": {
+          "claimId": "$e2-sell-reg-allow30.claim",
+          "basisDocumentId": "$e2-sell-reg-allow30.document",
+          "physicalScopeId": "$e2-receipt60.segment",
+          "policyVersion": "fixture-v1",
+          "sourceIdentity": "native-s4-e2-sell-regulator:e2-sell-reg-allow30:1",
+          "quantity": "60",
+          "unit": "BOX",
+          "effectiveFrom": "2026-10-07T09:00:02Z",
+          "reason": "외부 ORIGINAL과 동일한 범위 대조"
+        },
+        "provenance": {},
+        "subjectRefs": [
+          {
+            "type": "QuantitySegment",
+            "id": "$e2-receipt60.segment"
+          }
+        ]
+      },
+      "outcome": "APPLIED",
+      "bind": {
+        "e2-sell-reg-allow30.reconciliation": "/id"
+      },
+      "assertions": [
+        {
+          "pointer": "/evidenceStatus",
+          "operator": "equals",
+          "expected": "MATCHED"
+        }
+      ]
+    },
+    {
+      "id": "e2-sell-reg-allow30-link",
+      "type": "command",
+      "capability": "linkCanonicalOccurrence",
+      "request": {
+        "intentKind": "COMMAND",
+        "definitionVersion": "definition-v1",
+        "capabilityId": "linkCanonicalOccurrence",
+        "expectedRevision": 1,
+        "commandIdempotencyKey": "e2-sell-reg-allow30-link",
+        "slots": {
+          "reconciliationId": "$e2-sell-reg-allow30.reconciliation"
+        },
+        "provenance": {},
+        "subjectRefs": [
+          {
+            "type": "QuantitySegment",
+            "id": "$e2-receipt60.segment"
+          }
+        ]
+      },
+      "outcome": "APPLIED",
+      "bind": {
+        "e2-sell-reg-allow30.canonical": "/id"
+      },
+      "assertions": [
+        {
+          "pointer": "/evidenceStatus",
+          "operator": "equals",
+          "expected": "VERIFIED_RECORD_ONLY"
+        }
+      ]
+    },
+    {
+      "id": "e2-sell-allow60",
+      "type": "command",
+      "capability": "recordRegulatoryDecision",
+      "request": {
+        "intentKind": "RECORD",
+        "definitionVersion": "definition-v1",
+        "capabilityId": "recordRegulatoryDecision",
+        "expectedRevision": "$E2_SELL_PROC_REV",
+        "commandIdempotencyKey": "e2-sell-allow60",
+        "slots": {
+          "procedureId": "$E2_SELL_PROC",
+          "occurrenceId": "$e2-sell-reg-allow30.canonical",
+          "decision": "ALLOWED",
+          "action": "SELL",
+          "startQuantity": "0",
+          "quantity": "60",
+          "unit": "BOX",
+          "validFrom": "2026-10-07T09:00:02Z",
+          "validUntil": "2026-10-31T00:00:00Z"
+        },
+        "provenance": {},
+        "subjectRefs": [
+          {
+            "type": "QuantitySegment",
+            "id": "$e2-receipt60.segment"
+          }
+        ]
+      },
+      "outcome": "APPLIED",
+      "bind": {
+        "E2_SELL_PROC_REV": "/revision"
+      }
+    },
+    {
+      "id": "e2-sell-reg-label",
+      "type": "original",
+      "fixture": {
+        "synthetic": true,
+        "clock": {
+          "asOf": "2026-10-07T09:00:02Z",
+          "knownAt": "2026-10-07T09:00:02Z"
+        },
+        "sourceProfile": {
+          "namespace": "native-s4-e2-sell-regulator",
+          "policyVersion": "fixture-v1",
+          "nextAction": "원본 범위와 실제 효과 대조",
+          "nextCheckAt": "2026-10-08T09:00:00Z"
+        },
+        "occurrence": {
+          "kind": "LABEL_VERIFICATION",
+          "content": {
+            "regulatoryEventId": "22259fec-9003-5e5d-b66e-c7f5a677e545",
+            "procedureId": "$E2_SELL_PROC",
+            "procedureVersionId": "$E2_SELL_PROC_VERSION",
+            "itemId": "$P",
+            "lotId": "$L",
+            "physicalScopeId": "$e2-receipt60.segment",
+            "authority": "FICTIONAL-AUTHORITY",
+            "policyVersion": "fixture-v1",
+            "decision": "VERIFIED",
+            "packagingVersionId": "$PACK",
+            "specificationVersionId": "$SPEC",
+            "validFrom": "2026-10-07T09:00:02Z",
+            "validUntil": "2026-10-31T00:00:00Z"
+          },
+          "externalEventId": "e2-sell-reg-label",
+          "quantity": null,
+          "unit": null,
+          "assertion": "authored synthetic external original"
+        }
+      },
+      "binding": {
+        "organizationId": "$ORG",
+        "workId": "$WORK",
+        "itemId": "$P",
+        "actorId": "$reader",
+        "supervisorId": "$supervisor",
+        "physicalScopeId": "$e2-receipt60.segment",
+        "subjectId": "$e2-receipt60.segment",
+        "subjectKind": "SEGMENT",
+        "placeId": "$W"
+      }
+    },
+    {
+      "id": "e2-sell-reg-label-match",
+      "type": "command",
+      "capability": "matchSourceIdentity",
+      "request": {
+        "intentKind": "COMMAND",
+        "definitionVersion": "definition-v1",
+        "capabilityId": "matchSourceIdentity",
+        "expectedRevision": 1,
+        "commandIdempotencyKey": "e2-sell-reg-label-match",
+        "slots": {
+          "claimId": "$e2-sell-reg-label.claim",
+          "basisDocumentId": "$e2-sell-reg-label.document",
+          "physicalScopeId": "$e2-receipt60.segment",
+          "policyVersion": "fixture-v1",
+          "sourceIdentity": "native-s4-e2-sell-regulator:e2-sell-reg-label:1",
+          "effectiveFrom": "2026-10-07T09:00:02Z",
+          "reason": "외부 ORIGINAL과 동일한 범위 대조"
+        },
+        "provenance": {},
+        "subjectRefs": [
+          {
+            "type": "QuantitySegment",
+            "id": "$e2-receipt60.segment"
+          }
+        ]
+      },
+      "outcome": "APPLIED",
+      "bind": {
+        "e2-sell-reg-label.reconciliation": "/id"
+      },
+      "assertions": [
+        {
+          "pointer": "/evidenceStatus",
+          "operator": "equals",
+          "expected": "MATCHED"
+        }
+      ]
+    },
+    {
+      "id": "e2-sell-reg-label-link",
+      "type": "command",
+      "capability": "linkCanonicalOccurrence",
+      "request": {
+        "intentKind": "COMMAND",
+        "definitionVersion": "definition-v1",
+        "capabilityId": "linkCanonicalOccurrence",
+        "expectedRevision": 1,
+        "commandIdempotencyKey": "e2-sell-reg-label-link",
+        "slots": {
+          "reconciliationId": "$e2-sell-reg-label.reconciliation"
+        },
+        "provenance": {},
+        "subjectRefs": [
+          {
+            "type": "QuantitySegment",
+            "id": "$e2-receipt60.segment"
+          }
+        ]
+      },
+      "outcome": "APPLIED",
+      "bind": {
+        "e2-sell-reg-label.canonical": "/id"
+      },
+      "assertions": [
+        {
+          "pointer": "/evidenceStatus",
+          "operator": "equals",
+          "expected": "VERIFIED_RECORD_ONLY"
+        }
+      ]
+    },
+    {
+      "id": "e2-sell-label-verified",
+      "type": "command",
+      "capability": "verifyLabel",
+      "request": {
+        "intentKind": "RECORD",
+        "definitionVersion": "definition-v1",
+        "capabilityId": "verifyLabel",
+        "expectedRevision": "$E2_SELL_PROC_REV",
+        "commandIdempotencyKey": "e2-sell-label-verified",
+        "slots": {
+          "procedureId": "$E2_SELL_PROC",
+          "occurrenceId": "$e2-sell-reg-label.canonical",
+          "decision": "VERIFIED",
+          "packagingVersionId": "$PACK",
+          "specificationVersionId": "$SPEC",
+          "validFrom": "2026-10-07T09:00:02Z",
+          "validUntil": "2026-10-31T00:00:00Z"
+        },
+        "provenance": {},
+        "subjectRefs": [
+          {
+            "type": "QuantitySegment",
+            "id": "$e2-receipt60.segment"
+          }
+        ]
+      },
+      "outcome": "APPLIED"
+    },
+    {
+      "id": "e2-dispatch-QC",
+      "type": "original",
+      "fixture": {
+        "synthetic": true,
+        "clock": {
+          "asOf": "2026-10-07T09:00:02Z",
+          "knownAt": "2026-10-07T09:00:02Z"
+        },
+        "sourceProfile": {
+          "namespace": "native-s4-e2-dispatch-QC",
+          "policyVersion": "fixture-v1",
+          "nextAction": "원본 범위와 실제 효과 대조",
+          "nextCheckAt": "2026-10-08T09:00:00Z"
+        },
+        "occurrence": {
+          "kind": "QUALITY_DECISION_recordDispositionBasis_QC",
+          "content": {
+            "segmentId": "$e2-receipt60.segment",
+            "operation": "recordDispositionBasis",
+            "action": "DISPATCH",
+            "category": "QC",
+            "startQuantity": "0",
+            "quantity": "60",
+            "unit": "BOX",
+            "validFrom": "2026-10-07T09:00:02Z",
+            "validUntil": "2026-10-31T00:00:00Z",
+            "workId": "$WORK",
+            "sourceDecisionId": "c202fefe-1407-53ce-98b4-7dcd1a61c76c",
+            "sourceVersion": "1"
+          },
+          "externalEventId": "c202fefe-1407-53ce-98b4-7dcd1a61c76c",
+          "quantity": "60",
+          "unit": "BOX",
+          "assertion": "authored synthetic external original"
+        }
+      },
+      "binding": {
+        "organizationId": "$ORG",
+        "workId": "$WORK",
+        "itemId": "$P",
+        "actorId": "$reader",
+        "supervisorId": "$supervisor",
+        "physicalScopeId": "$e2-receipt60.segment",
+        "subjectId": "$e2-receipt60.segment",
+        "subjectKind": "SEGMENT",
+        "placeId": "$W"
+      }
+    },
+    {
+      "id": "e2-dispatch-QC-match",
+      "type": "command",
+      "capability": "matchSourceIdentity",
+      "request": {
+        "intentKind": "COMMAND",
+        "definitionVersion": "definition-v1",
+        "capabilityId": "matchSourceIdentity",
+        "expectedRevision": 1,
+        "commandIdempotencyKey": "e2-dispatch-QC-match",
+        "slots": {
+          "claimId": "$e2-dispatch-QC.claim",
+          "basisDocumentId": "$e2-dispatch-QC.document",
+          "physicalScopeId": "$e2-receipt60.segment",
+          "policyVersion": "fixture-v1",
+          "sourceIdentity": "native-s4-e2-dispatch-QC:c202fefe-1407-53ce-98b4-7dcd1a61c76c:1",
+          "quantity": "60",
+          "unit": "BOX",
+          "effectiveFrom": "2026-10-07T09:00:02Z",
+          "reason": "외부 ORIGINAL과 동일한 범위 대조"
+        },
+        "provenance": {},
+        "subjectRefs": [
+          {
+            "type": "QuantitySegment",
+            "id": "$e2-receipt60.segment"
+          }
+        ]
+      },
+      "outcome": "APPLIED",
+      "bind": {
+        "e2-dispatch-QC.reconciliation": "/id"
+      },
+      "assertions": [
+        {
+          "pointer": "/evidenceStatus",
+          "operator": "equals",
+          "expected": "MATCHED"
+        }
+      ]
+    },
+    {
+      "id": "e2-dispatch-QC-link",
+      "type": "command",
+      "capability": "linkCanonicalOccurrence",
+      "request": {
+        "intentKind": "COMMAND",
+        "definitionVersion": "definition-v1",
+        "capabilityId": "linkCanonicalOccurrence",
+        "expectedRevision": 1,
+        "commandIdempotencyKey": "e2-dispatch-QC-link",
+        "slots": {
+          "reconciliationId": "$e2-dispatch-QC.reconciliation"
+        },
+        "provenance": {},
+        "subjectRefs": [
+          {
+            "type": "QuantitySegment",
+            "id": "$e2-receipt60.segment"
+          }
+        ]
+      },
+      "outcome": "APPLIED",
+      "bind": {
+        "e2-dispatch-QC.canonical": "/id"
+      },
+      "assertions": [
+        {
+          "pointer": "/evidenceStatus",
+          "operator": "equals",
+          "expected": "VERIFIED_RECORD_ONLY"
+        }
+      ]
+    },
+    {
+      "id": "e2-dispatch-QC-decision",
+      "type": "command",
+      "capability": "recordDispositionBasis",
+      "request": {
+        "intentKind": "RECORD",
+        "definitionVersion": "definition-v1",
+        "capabilityId": "recordDispositionBasis",
+        "expectedRevision": 0,
+        "commandIdempotencyKey": "e2-dispatch-QC-decision",
+        "slots": {
+          "segmentId": "$e2-receipt60.segment",
+          "action": "DISPATCH",
+          "category": "QC",
+          "startQuantity": "0",
+          "quantity": "60",
+          "unit": "BOX",
+          "validFrom": "2026-10-07T09:00:02Z",
+          "validUntil": "2026-10-31T00:00:00Z",
+          "workId": "$WORK",
+          "evidenceId": "$e2-dispatch-QC.document",
+          "reason": "원본의 정확한 행동 범위를 판정",
+          "nextCheckAt": "2026-10-08T09:00:00Z"
+        },
+        "provenance": {},
+        "subjectRefs": [
+          {
+            "type": "QuantitySegment",
+            "id": "$e2-receipt60.segment"
+          }
+        ]
+      },
+      "outcome": "APPLIED"
+    },
+    {
+      "id": "e2-dispatch-CUSTOMER",
+      "type": "original",
+      "fixture": {
+        "synthetic": true,
+        "clock": {
+          "asOf": "2026-10-07T09:00:02Z",
+          "knownAt": "2026-10-07T09:00:02Z"
+        },
+        "sourceProfile": {
+          "namespace": "native-s4-e2-dispatch-CUSTOMER",
+          "policyVersion": "fixture-v1",
+          "nextAction": "원본 범위와 실제 효과 대조",
+          "nextCheckAt": "2026-10-08T09:00:00Z"
+        },
+        "occurrence": {
+          "kind": "QUALITY_DECISION_recordDispositionBasis_CUSTOMER",
+          "content": {
+            "segmentId": "$e2-receipt60.segment",
+            "operation": "recordDispositionBasis",
+            "action": "DISPATCH",
+            "category": "CUSTOMER",
+            "startQuantity": "0",
+            "quantity": "60",
+            "unit": "BOX",
+            "validFrom": "2026-10-07T09:00:02Z",
+            "validUntil": "2026-10-31T00:00:00Z",
+            "workId": "$WORK",
+            "sourceDecisionId": "365fa362-2068-5674-adcd-fd479d1dcc4e",
+            "sourceVersion": "1"
+          },
+          "externalEventId": "365fa362-2068-5674-adcd-fd479d1dcc4e",
+          "quantity": "60",
+          "unit": "BOX",
+          "assertion": "authored synthetic external original"
+        }
+      },
+      "binding": {
+        "organizationId": "$ORG",
+        "workId": "$WORK",
+        "itemId": "$P",
+        "actorId": "$reader",
+        "supervisorId": "$supervisor",
+        "physicalScopeId": "$e2-receipt60.segment",
+        "subjectId": "$e2-receipt60.segment",
+        "subjectKind": "SEGMENT",
+        "placeId": "$W"
+      }
+    },
+    {
+      "id": "e2-dispatch-CUSTOMER-match",
+      "type": "command",
+      "capability": "matchSourceIdentity",
+      "request": {
+        "intentKind": "COMMAND",
+        "definitionVersion": "definition-v1",
+        "capabilityId": "matchSourceIdentity",
+        "expectedRevision": 1,
+        "commandIdempotencyKey": "e2-dispatch-CUSTOMER-match",
+        "slots": {
+          "claimId": "$e2-dispatch-CUSTOMER.claim",
+          "basisDocumentId": "$e2-dispatch-CUSTOMER.document",
+          "physicalScopeId": "$e2-receipt60.segment",
+          "policyVersion": "fixture-v1",
+          "sourceIdentity": "native-s4-e2-dispatch-CUSTOMER:365fa362-2068-5674-adcd-fd479d1dcc4e:1",
+          "quantity": "60",
+          "unit": "BOX",
+          "effectiveFrom": "2026-10-07T09:00:02Z",
+          "reason": "외부 ORIGINAL과 동일한 범위 대조"
+        },
+        "provenance": {},
+        "subjectRefs": [
+          {
+            "type": "QuantitySegment",
+            "id": "$e2-receipt60.segment"
+          }
+        ]
+      },
+      "outcome": "APPLIED",
+      "bind": {
+        "e2-dispatch-CUSTOMER.reconciliation": "/id"
+      },
+      "assertions": [
+        {
+          "pointer": "/evidenceStatus",
+          "operator": "equals",
+          "expected": "MATCHED"
+        }
+      ]
+    },
+    {
+      "id": "e2-dispatch-CUSTOMER-link",
+      "type": "command",
+      "capability": "linkCanonicalOccurrence",
+      "request": {
+        "intentKind": "COMMAND",
+        "definitionVersion": "definition-v1",
+        "capabilityId": "linkCanonicalOccurrence",
+        "expectedRevision": 1,
+        "commandIdempotencyKey": "e2-dispatch-CUSTOMER-link",
+        "slots": {
+          "reconciliationId": "$e2-dispatch-CUSTOMER.reconciliation"
+        },
+        "provenance": {},
+        "subjectRefs": [
+          {
+            "type": "QuantitySegment",
+            "id": "$e2-receipt60.segment"
+          }
+        ]
+      },
+      "outcome": "APPLIED",
+      "bind": {
+        "e2-dispatch-CUSTOMER.canonical": "/id"
+      },
+      "assertions": [
+        {
+          "pointer": "/evidenceStatus",
+          "operator": "equals",
+          "expected": "VERIFIED_RECORD_ONLY"
+        }
+      ]
+    },
+    {
+      "id": "e2-dispatch-CUSTOMER-decision",
+      "type": "command",
+      "capability": "recordDispositionBasis",
+      "request": {
+        "intentKind": "RECORD",
+        "definitionVersion": "definition-v1",
+        "capabilityId": "recordDispositionBasis",
+        "expectedRevision": 0,
+        "commandIdempotencyKey": "e2-dispatch-CUSTOMER-decision",
+        "slots": {
+          "segmentId": "$e2-receipt60.segment",
+          "action": "DISPATCH",
+          "category": "CUSTOMER",
+          "startQuantity": "0",
+          "quantity": "60",
+          "unit": "BOX",
+          "validFrom": "2026-10-07T09:00:02Z",
+          "validUntil": "2026-10-31T00:00:00Z",
+          "workId": "$WORK",
+          "evidenceId": "$e2-dispatch-CUSTOMER.document",
+          "reason": "원본의 정확한 행동 범위를 판정",
+          "nextCheckAt": "2026-10-08T09:00:00Z"
+        },
+        "provenance": {},
+        "subjectRefs": [
+          {
+            "type": "QuantitySegment",
+            "id": "$e2-receipt60.segment"
+          }
+        ]
+      },
+      "outcome": "APPLIED"
+    },
+    {
+      "id": "e2-dispatch-COMMERCIAL",
+      "type": "original",
+      "fixture": {
+        "synthetic": true,
+        "clock": {
+          "asOf": "2026-10-07T09:00:02Z",
+          "knownAt": "2026-10-07T09:00:02Z"
+        },
+        "sourceProfile": {
+          "namespace": "native-s4-e2-dispatch-COMMERCIAL",
+          "policyVersion": "fixture-v1",
+          "nextAction": "원본 범위와 실제 효과 대조",
+          "nextCheckAt": "2026-10-08T09:00:00Z"
+        },
+        "occurrence": {
+          "kind": "QUALITY_DECISION_recordDispositionBasis_COMMERCIAL",
+          "content": {
+            "segmentId": "$e2-receipt60.segment",
+            "operation": "recordDispositionBasis",
+            "action": "DISPATCH",
+            "category": "COMMERCIAL",
+            "startQuantity": "0",
+            "quantity": "60",
+            "unit": "BOX",
+            "validFrom": "2026-10-07T09:00:02Z",
+            "validUntil": "2026-10-31T00:00:00Z",
+            "workId": "$WORK",
+            "sourceDecisionId": "028ad842-9d0e-5df4-8b95-50d61194641f",
+            "sourceVersion": "1"
+          },
+          "externalEventId": "028ad842-9d0e-5df4-8b95-50d61194641f",
+          "quantity": "60",
+          "unit": "BOX",
+          "assertion": "authored synthetic external original"
+        }
+      },
+      "binding": {
+        "organizationId": "$ORG",
+        "workId": "$WORK",
+        "itemId": "$P",
+        "actorId": "$reader",
+        "supervisorId": "$supervisor",
+        "physicalScopeId": "$e2-receipt60.segment",
+        "subjectId": "$e2-receipt60.segment",
+        "subjectKind": "SEGMENT",
+        "placeId": "$W"
+      }
+    },
+    {
+      "id": "e2-dispatch-COMMERCIAL-match",
+      "type": "command",
+      "capability": "matchSourceIdentity",
+      "request": {
+        "intentKind": "COMMAND",
+        "definitionVersion": "definition-v1",
+        "capabilityId": "matchSourceIdentity",
+        "expectedRevision": 1,
+        "commandIdempotencyKey": "e2-dispatch-COMMERCIAL-match",
+        "slots": {
+          "claimId": "$e2-dispatch-COMMERCIAL.claim",
+          "basisDocumentId": "$e2-dispatch-COMMERCIAL.document",
+          "physicalScopeId": "$e2-receipt60.segment",
+          "policyVersion": "fixture-v1",
+          "sourceIdentity": "native-s4-e2-dispatch-COMMERCIAL:028ad842-9d0e-5df4-8b95-50d61194641f:1",
+          "quantity": "60",
+          "unit": "BOX",
+          "effectiveFrom": "2026-10-07T09:00:02Z",
+          "reason": "외부 ORIGINAL과 동일한 범위 대조"
+        },
+        "provenance": {},
+        "subjectRefs": [
+          {
+            "type": "QuantitySegment",
+            "id": "$e2-receipt60.segment"
+          }
+        ]
+      },
+      "outcome": "APPLIED",
+      "bind": {
+        "e2-dispatch-COMMERCIAL.reconciliation": "/id"
+      },
+      "assertions": [
+        {
+          "pointer": "/evidenceStatus",
+          "operator": "equals",
+          "expected": "MATCHED"
+        }
+      ]
+    },
+    {
+      "id": "e2-dispatch-COMMERCIAL-link",
+      "type": "command",
+      "capability": "linkCanonicalOccurrence",
+      "request": {
+        "intentKind": "COMMAND",
+        "definitionVersion": "definition-v1",
+        "capabilityId": "linkCanonicalOccurrence",
+        "expectedRevision": 1,
+        "commandIdempotencyKey": "e2-dispatch-COMMERCIAL-link",
+        "slots": {
+          "reconciliationId": "$e2-dispatch-COMMERCIAL.reconciliation"
+        },
+        "provenance": {},
+        "subjectRefs": [
+          {
+            "type": "QuantitySegment",
+            "id": "$e2-receipt60.segment"
+          }
+        ]
+      },
+      "outcome": "APPLIED",
+      "bind": {
+        "e2-dispatch-COMMERCIAL.canonical": "/id"
+      },
+      "assertions": [
+        {
+          "pointer": "/evidenceStatus",
+          "operator": "equals",
+          "expected": "VERIFIED_RECORD_ONLY"
+        }
+      ]
+    },
+    {
+      "id": "e2-dispatch-COMMERCIAL-decision",
+      "type": "command",
+      "capability": "recordDispositionBasis",
+      "request": {
+        "intentKind": "RECORD",
+        "definitionVersion": "definition-v1",
+        "capabilityId": "recordDispositionBasis",
+        "expectedRevision": 0,
+        "commandIdempotencyKey": "e2-dispatch-COMMERCIAL-decision",
+        "slots": {
+          "segmentId": "$e2-receipt60.segment",
+          "action": "DISPATCH",
+          "category": "COMMERCIAL",
+          "startQuantity": "0",
+          "quantity": "60",
+          "unit": "BOX",
+          "validFrom": "2026-10-07T09:00:02Z",
+          "validUntil": "2026-10-31T00:00:00Z",
+          "workId": "$WORK",
+          "evidenceId": "$e2-dispatch-COMMERCIAL.document",
+          "reason": "원본의 정확한 행동 범위를 판정",
+          "nextCheckAt": "2026-10-08T09:00:00Z"
+        },
+        "provenance": {},
+        "subjectRefs": [
+          {
+            "type": "QuantitySegment",
+            "id": "$e2-receipt60.segment"
+          }
+        ]
+      },
+      "outcome": "APPLIED"
+    },
+    {
+      "id": "e2-dispatch-reg-draft",
+      "type": "original",
+      "fixture": {
+        "synthetic": true,
+        "clock": {
+          "asOf": "2026-10-07T09:00:02Z",
+          "knownAt": "2026-10-07T09:00:02Z"
+        },
+        "sourceProfile": {
+          "namespace": "native-s4-e2-dispatch-regulator",
+          "policyVersion": "fixture-v1",
+          "nextAction": "원본 범위와 실제 효과 대조",
+          "nextCheckAt": "2026-10-08T09:00:00Z"
+        },
+        "occurrence": {
+          "kind": "REGULATORY_DRAFT",
+          "content": {
+            "draft": "fictional dossier",
+            "itemId": "$P"
+          },
+          "externalEventId": "e2-dispatch-reg-draft",
+          "quantity": "60",
+          "unit": "BOX",
+          "assertion": "authored synthetic external original"
+        }
+      },
+      "binding": {
+        "organizationId": "$ORG",
+        "workId": "$WORK",
+        "itemId": "$P",
+        "actorId": "$reader",
+        "supervisorId": "$supervisor",
+        "physicalScopeId": "$e2-receipt60.segment",
+        "subjectId": "$e2-receipt60.segment",
+        "subjectKind": "SEGMENT",
+        "placeId": "$W"
+      }
+    },
+    {
+      "id": "e2-dispatch-reg-prepare",
+      "type": "command",
+      "capability": "prepareRegulatoryProcedure",
+      "request": {
+        "intentKind": "COMMAND",
+        "definitionVersion": "definition-v1",
+        "capabilityId": "prepareRegulatoryProcedure",
+        "expectedRevision": 0,
+        "commandIdempotencyKey": "e2-dispatch-reg-prepare",
+        "slots": {
+          "itemId": "$P",
+          "lotId": "$L",
+          "physicalScopeId": "$e2-receipt60.segment",
+          "workId": "$WORK",
+          "policyId": "$REGDISPATCH",
+          "documentVersionId": "$e2-dispatch-reg-draft.document"
+        },
+        "provenance": {},
+        "subjectRefs": [
+          {
+            "type": "QuantitySegment",
+            "id": "$e2-receipt60.segment"
+          }
+        ]
+      },
+      "outcome": "APPLIED",
+      "bind": {
+        "E2_DISPATCH_PROC": "/effects/procedureId",
+        "E2_DISPATCH_PROC_VERSION": "/effects/procedureVersionId",
+        "E2_DISPATCH_PROC_REV": "/revision"
+      },
+      "assertions": [
+        {
+          "pointer": "/status",
+          "operator": "equals",
+          "expected": "PREPARED"
+        }
+      ]
+    },
+    {
+      "id": "e2-dispatch-reg-submitted",
+      "type": "original",
+      "fixture": {
+        "synthetic": true,
+        "clock": {
+          "asOf": "2026-10-07T09:00:02Z",
+          "knownAt": "2026-10-07T09:00:02Z"
+        },
+        "sourceProfile": {
+          "namespace": "native-s4-e2-dispatch-regulator",
+          "policyVersion": "fixture-v1",
+          "nextAction": "원본 범위와 실제 효과 대조",
+          "nextCheckAt": "2026-10-08T09:00:00Z"
+        },
+        "occurrence": {
+          "kind": "REGULATORY_SUBMISSION",
+          "content": {
+            "regulatoryEventId": "4da37d87-2728-51c0-9a66-b306abd83631",
+            "procedureId": "$E2_DISPATCH_PROC",
+            "procedureVersionId": "$E2_DISPATCH_PROC_VERSION",
+            "itemId": "$P",
+            "lotId": "$L",
+            "physicalScopeId": "$e2-receipt60.segment",
+            "authority": "FICTIONAL-AUTHORITY",
+            "policyVersion": "fixture-v1",
+            "occurredAt": "2026-10-07T09:00:02Z"
+          },
+          "externalEventId": "e2-dispatch-reg-submitted",
+          "quantity": null,
+          "unit": null,
+          "assertion": "authored synthetic external original"
+        }
+      },
+      "binding": {
+        "organizationId": "$ORG",
+        "workId": "$WORK",
+        "itemId": "$P",
+        "actorId": "$reader",
+        "supervisorId": "$supervisor",
+        "physicalScopeId": "$e2-receipt60.segment",
+        "subjectId": "$e2-receipt60.segment",
+        "subjectKind": "SEGMENT",
+        "placeId": "$W"
+      }
+    },
+    {
+      "id": "e2-dispatch-reg-submitted-match",
+      "type": "command",
+      "capability": "matchSourceIdentity",
+      "request": {
+        "intentKind": "COMMAND",
+        "definitionVersion": "definition-v1",
+        "capabilityId": "matchSourceIdentity",
+        "expectedRevision": 1,
+        "commandIdempotencyKey": "e2-dispatch-reg-submitted-match",
+        "slots": {
+          "claimId": "$e2-dispatch-reg-submitted.claim",
+          "basisDocumentId": "$e2-dispatch-reg-submitted.document",
+          "physicalScopeId": "$e2-receipt60.segment",
+          "policyVersion": "fixture-v1",
+          "sourceIdentity": "native-s4-e2-dispatch-regulator:e2-dispatch-reg-submitted:1",
+          "effectiveFrom": "2026-10-07T09:00:02Z",
+          "reason": "외부 ORIGINAL과 동일한 범위 대조"
+        },
+        "provenance": {},
+        "subjectRefs": [
+          {
+            "type": "QuantitySegment",
+            "id": "$e2-receipt60.segment"
+          }
+        ]
+      },
+      "outcome": "APPLIED",
+      "bind": {
+        "e2-dispatch-reg-submitted.reconciliation": "/id"
+      },
+      "assertions": [
+        {
+          "pointer": "/evidenceStatus",
+          "operator": "equals",
+          "expected": "MATCHED"
+        }
+      ]
+    },
+    {
+      "id": "e2-dispatch-reg-submitted-link",
+      "type": "command",
+      "capability": "linkCanonicalOccurrence",
+      "request": {
+        "intentKind": "COMMAND",
+        "definitionVersion": "definition-v1",
+        "capabilityId": "linkCanonicalOccurrence",
+        "expectedRevision": 1,
+        "commandIdempotencyKey": "e2-dispatch-reg-submitted-link",
+        "slots": {
+          "reconciliationId": "$e2-dispatch-reg-submitted.reconciliation"
+        },
+        "provenance": {},
+        "subjectRefs": [
+          {
+            "type": "QuantitySegment",
+            "id": "$e2-receipt60.segment"
+          }
+        ]
+      },
+      "outcome": "APPLIED",
+      "bind": {
+        "e2-dispatch-reg-submitted.canonical": "/id"
+      },
+      "assertions": [
+        {
+          "pointer": "/evidenceStatus",
+          "operator": "equals",
+          "expected": "VERIFIED_RECORD_ONLY"
+        }
+      ]
+    },
+    {
+      "id": "e2-dispatch-submit-reg",
+      "type": "command",
+      "capability": "recordSubmission",
+      "request": {
+        "intentKind": "RECORD",
+        "definitionVersion": "definition-v1",
+        "capabilityId": "recordSubmission",
+        "expectedRevision": "$E2_DISPATCH_PROC_REV",
+        "commandIdempotencyKey": "e2-dispatch-submit-reg",
+        "slots": {
+          "procedureId": "$E2_DISPATCH_PROC",
+          "occurredAt": "2026-10-07T09:00:02Z",
+          "occurrenceId": "$e2-dispatch-reg-submitted.canonical"
+        },
+        "provenance": {},
+        "subjectRefs": [
+          {
+            "type": "QuantitySegment",
+            "id": "$e2-receipt60.segment"
+          }
+        ]
+      },
+      "outcome": "APPLIED",
+      "bind": {
+        "E2_DISPATCH_PROC_VERSION": "/effects/procedureVersionId",
+        "E2_DISPATCH_PROC_REV": "/revision"
+      },
+      "assertions": [
+        {
+          "pointer": "/status",
+          "operator": "equals",
+          "expected": "SUBMITTED"
+        }
+      ]
+    },
+    {
+      "id": "e2-dispatch-reg-allow30",
+      "type": "original",
+      "fixture": {
+        "synthetic": true,
+        "clock": {
+          "asOf": "2026-10-07T09:00:02Z",
+          "knownAt": "2026-10-07T09:00:02Z"
+        },
+        "sourceProfile": {
+          "namespace": "native-s4-e2-dispatch-regulator",
+          "policyVersion": "fixture-v1",
+          "nextAction": "원본 범위와 실제 효과 대조",
+          "nextCheckAt": "2026-10-08T09:00:00Z"
+        },
+        "occurrence": {
+          "kind": "REGULATORY_DECISION",
+          "content": {
+            "regulatoryEventId": "ecd3c875-d58c-52f5-91a4-affeb91d6029",
+            "procedureId": "$E2_DISPATCH_PROC",
+            "procedureVersionId": "$E2_DISPATCH_PROC_VERSION",
+            "itemId": "$P",
+            "lotId": "$L",
+            "physicalScopeId": "$e2-receipt60.segment",
+            "authority": "FICTIONAL-AUTHORITY",
+            "policyVersion": "fixture-v1",
+            "decision": "ALLOWED",
+            "action": "DISPATCH",
+            "startQuantity": "0",
+            "quantity": "60",
+            "unit": "BOX",
+            "validFrom": "2026-10-07T09:00:02Z",
+            "validUntil": "2026-10-31T00:00:00Z"
+          },
+          "externalEventId": "e2-dispatch-reg-allow30",
+          "quantity": "60",
+          "unit": "BOX",
+          "assertion": "authored synthetic external original"
+        }
+      },
+      "binding": {
+        "organizationId": "$ORG",
+        "workId": "$WORK",
+        "itemId": "$P",
+        "actorId": "$reader",
+        "supervisorId": "$supervisor",
+        "physicalScopeId": "$e2-receipt60.segment",
+        "subjectId": "$e2-receipt60.segment",
+        "subjectKind": "SEGMENT",
+        "placeId": "$W"
+      }
+    },
+    {
+      "id": "e2-dispatch-reg-allow30-match",
+      "type": "command",
+      "capability": "matchSourceIdentity",
+      "request": {
+        "intentKind": "COMMAND",
+        "definitionVersion": "definition-v1",
+        "capabilityId": "matchSourceIdentity",
+        "expectedRevision": 1,
+        "commandIdempotencyKey": "e2-dispatch-reg-allow30-match",
+        "slots": {
+          "claimId": "$e2-dispatch-reg-allow30.claim",
+          "basisDocumentId": "$e2-dispatch-reg-allow30.document",
+          "physicalScopeId": "$e2-receipt60.segment",
+          "policyVersion": "fixture-v1",
+          "sourceIdentity": "native-s4-e2-dispatch-regulator:e2-dispatch-reg-allow30:1",
+          "quantity": "60",
+          "unit": "BOX",
+          "effectiveFrom": "2026-10-07T09:00:02Z",
+          "reason": "외부 ORIGINAL과 동일한 범위 대조"
+        },
+        "provenance": {},
+        "subjectRefs": [
+          {
+            "type": "QuantitySegment",
+            "id": "$e2-receipt60.segment"
+          }
+        ]
+      },
+      "outcome": "APPLIED",
+      "bind": {
+        "e2-dispatch-reg-allow30.reconciliation": "/id"
+      },
+      "assertions": [
+        {
+          "pointer": "/evidenceStatus",
+          "operator": "equals",
+          "expected": "MATCHED"
+        }
+      ]
+    },
+    {
+      "id": "e2-dispatch-reg-allow30-link",
+      "type": "command",
+      "capability": "linkCanonicalOccurrence",
+      "request": {
+        "intentKind": "COMMAND",
+        "definitionVersion": "definition-v1",
+        "capabilityId": "linkCanonicalOccurrence",
+        "expectedRevision": 1,
+        "commandIdempotencyKey": "e2-dispatch-reg-allow30-link",
+        "slots": {
+          "reconciliationId": "$e2-dispatch-reg-allow30.reconciliation"
+        },
+        "provenance": {},
+        "subjectRefs": [
+          {
+            "type": "QuantitySegment",
+            "id": "$e2-receipt60.segment"
+          }
+        ]
+      },
+      "outcome": "APPLIED",
+      "bind": {
+        "e2-dispatch-reg-allow30.canonical": "/id"
+      },
+      "assertions": [
+        {
+          "pointer": "/evidenceStatus",
+          "operator": "equals",
+          "expected": "VERIFIED_RECORD_ONLY"
+        }
+      ]
+    },
+    {
+      "id": "e2-dispatch-allow60",
+      "type": "command",
+      "capability": "recordRegulatoryDecision",
+      "request": {
+        "intentKind": "RECORD",
+        "definitionVersion": "definition-v1",
+        "capabilityId": "recordRegulatoryDecision",
+        "expectedRevision": "$E2_DISPATCH_PROC_REV",
+        "commandIdempotencyKey": "e2-dispatch-allow60",
+        "slots": {
+          "procedureId": "$E2_DISPATCH_PROC",
+          "occurrenceId": "$e2-dispatch-reg-allow30.canonical",
+          "decision": "ALLOWED",
+          "action": "DISPATCH",
+          "startQuantity": "0",
+          "quantity": "60",
+          "unit": "BOX",
+          "validFrom": "2026-10-07T09:00:02Z",
+          "validUntil": "2026-10-31T00:00:00Z"
+        },
+        "provenance": {},
+        "subjectRefs": [
+          {
+            "type": "QuantitySegment",
+            "id": "$e2-receipt60.segment"
+          }
+        ]
+      },
+      "outcome": "APPLIED",
+      "bind": {
+        "E2_DISPATCH_PROC_REV": "/revision"
+      }
+    },
+    {
+      "id": "e2-dispatch-reg-label",
+      "type": "original",
+      "fixture": {
+        "synthetic": true,
+        "clock": {
+          "asOf": "2026-10-07T09:00:02Z",
+          "knownAt": "2026-10-07T09:00:02Z"
+        },
+        "sourceProfile": {
+          "namespace": "native-s4-e2-dispatch-regulator",
+          "policyVersion": "fixture-v1",
+          "nextAction": "원본 범위와 실제 효과 대조",
+          "nextCheckAt": "2026-10-08T09:00:00Z"
+        },
+        "occurrence": {
+          "kind": "LABEL_VERIFICATION",
+          "content": {
+            "regulatoryEventId": "22259fec-9003-5e5d-b66e-c7f5a677e545",
+            "procedureId": "$E2_DISPATCH_PROC",
+            "procedureVersionId": "$E2_DISPATCH_PROC_VERSION",
+            "itemId": "$P",
+            "lotId": "$L",
+            "physicalScopeId": "$e2-receipt60.segment",
+            "authority": "FICTIONAL-AUTHORITY",
+            "policyVersion": "fixture-v1",
+            "decision": "VERIFIED",
+            "packagingVersionId": "$PACK",
+            "specificationVersionId": "$SPEC",
+            "validFrom": "2026-10-07T09:00:02Z",
+            "validUntil": "2026-10-31T00:00:00Z"
+          },
+          "externalEventId": "e2-dispatch-reg-label",
+          "quantity": null,
+          "unit": null,
+          "assertion": "authored synthetic external original"
+        }
+      },
+      "binding": {
+        "organizationId": "$ORG",
+        "workId": "$WORK",
+        "itemId": "$P",
+        "actorId": "$reader",
+        "supervisorId": "$supervisor",
+        "physicalScopeId": "$e2-receipt60.segment",
+        "subjectId": "$e2-receipt60.segment",
+        "subjectKind": "SEGMENT",
+        "placeId": "$W"
+      }
+    },
+    {
+      "id": "e2-dispatch-reg-label-match",
+      "type": "command",
+      "capability": "matchSourceIdentity",
+      "request": {
+        "intentKind": "COMMAND",
+        "definitionVersion": "definition-v1",
+        "capabilityId": "matchSourceIdentity",
+        "expectedRevision": 1,
+        "commandIdempotencyKey": "e2-dispatch-reg-label-match",
+        "slots": {
+          "claimId": "$e2-dispatch-reg-label.claim",
+          "basisDocumentId": "$e2-dispatch-reg-label.document",
+          "physicalScopeId": "$e2-receipt60.segment",
+          "policyVersion": "fixture-v1",
+          "sourceIdentity": "native-s4-e2-dispatch-regulator:e2-dispatch-reg-label:1",
+          "effectiveFrom": "2026-10-07T09:00:02Z",
+          "reason": "외부 ORIGINAL과 동일한 범위 대조"
+        },
+        "provenance": {},
+        "subjectRefs": [
+          {
+            "type": "QuantitySegment",
+            "id": "$e2-receipt60.segment"
+          }
+        ]
+      },
+      "outcome": "APPLIED",
+      "bind": {
+        "e2-dispatch-reg-label.reconciliation": "/id"
+      },
+      "assertions": [
+        {
+          "pointer": "/evidenceStatus",
+          "operator": "equals",
+          "expected": "MATCHED"
+        }
+      ]
+    },
+    {
+      "id": "e2-dispatch-reg-label-link",
+      "type": "command",
+      "capability": "linkCanonicalOccurrence",
+      "request": {
+        "intentKind": "COMMAND",
+        "definitionVersion": "definition-v1",
+        "capabilityId": "linkCanonicalOccurrence",
+        "expectedRevision": 1,
+        "commandIdempotencyKey": "e2-dispatch-reg-label-link",
+        "slots": {
+          "reconciliationId": "$e2-dispatch-reg-label.reconciliation"
+        },
+        "provenance": {},
+        "subjectRefs": [
+          {
+            "type": "QuantitySegment",
+            "id": "$e2-receipt60.segment"
+          }
+        ]
+      },
+      "outcome": "APPLIED",
+      "bind": {
+        "e2-dispatch-reg-label.canonical": "/id"
+      },
+      "assertions": [
+        {
+          "pointer": "/evidenceStatus",
+          "operator": "equals",
+          "expected": "VERIFIED_RECORD_ONLY"
+        }
+      ]
+    },
+    {
+      "id": "e2-dispatch-label-verified",
+      "type": "command",
+      "capability": "verifyLabel",
+      "request": {
+        "intentKind": "RECORD",
+        "definitionVersion": "definition-v1",
+        "capabilityId": "verifyLabel",
+        "expectedRevision": "$E2_DISPATCH_PROC_REV",
+        "commandIdempotencyKey": "e2-dispatch-label-verified",
+        "slots": {
+          "procedureId": "$E2_DISPATCH_PROC",
+          "occurrenceId": "$e2-dispatch-reg-label.canonical",
+          "decision": "VERIFIED",
+          "packagingVersionId": "$PACK",
+          "specificationVersionId": "$SPEC",
+          "validFrom": "2026-10-07T09:00:02Z",
+          "validUntil": "2026-10-31T00:00:00Z"
+        },
+        "provenance": {},
+        "subjectRefs": [
+          {
+            "type": "QuantitySegment",
+            "id": "$e2-receipt60.segment"
+          }
+        ]
+      },
+      "outcome": "APPLIED"
+    },
+    {
+      "id": "e2-create-sales-work",
+      "type": "command",
+      "capability": "createWork",
+      "request": {
+        "intentKind": "COMMAND",
+        "definitionVersion": "definition-v1",
+        "capabilityId": "createWork",
+        "expectedRevision": 0,
+        "commandIdempotencyKey": "e2-create-sales-work",
+        "slots": {
+          "workType": "SALES",
+          "quantityMode": "CUMULATIVE_EVENT",
+          "endpoint": "DELIVERED",
+          "dueAt": "2026-10-31T00:00:00Z",
+          "evidencePolicyVersion": "fixture-v1",
+          "ownerId": "$reader",
+          "supervisorId": "$supervisor",
+          "quantity": {
+            "value": "60",
+            "unit": "BOX"
+          },
+          "period": {
+            "start": "2026-10-01T00:00:00Z",
+            "end": "2026-10-31T00:00:00Z",
+            "startInclusive": true,
+            "endInclusive": true
+          },
+          "eventKinds": [
+            "PHYSICAL_DELIVERY"
+          ],
+          "distinctContributionScope": {
+            "itemId": "$P"
+          }
+        },
+        "provenance": {},
+        "subjectRefs": [
+          {
+            "type": "TradeItem",
+            "id": "$P"
+          }
+        ]
+      },
+      "bind": {
+        "SALES_WORK": "/effects/workId",
+        "SALES_WORK_REV": "/revision"
+      }
+    },
+    {
+      "id": "e2-create-sales",
+      "type": "command",
+      "capability": "createSalesOrder",
+      "request": {
+        "intentKind": "COMMAND",
+        "definitionVersion": "definition-v1",
+        "capabilityId": "createSalesOrder",
+        "expectedRevision": 0,
+        "commandIdempotencyKey": "e2-create-sales",
+        "slots": {
+          "workId": "$SALES_WORK",
+          "customerId": "$C",
+          "itemId": "$P",
+          "quantity": "60",
+          "unit": "BOX",
+          "price": "1",
+          "currency": "EUR",
+          "dueAt": "2026-10-31T00:00:00Z",
+          "destinationId": "$CUSTOMER_PLACE",
+          "deliveryEndpoint": "DELIVERED",
+          "qualityTerms": "가상 조건 충족",
+          "packageTerms": "가상 포장 조건 충족"
+        },
+        "provenance": {},
+        "subjectRefs": [
+          {
+            "type": "Work",
+            "id": "$SALES_WORK"
+          },
+          {
+            "type": "TradeItem",
+            "id": "$P"
+          }
+        ]
+      },
+      "outcome": "APPLIED",
+      "bind": {
+        "SALES_ORDER": "/effects/orderId",
+        "SALES_LINE": "/effects/lineId"
+      }
+    },
+    {
+      "id": "e2-segment-revision",
+      "type": "query",
+      "capability": "getObject",
+      "request": {
+        "id": "$e2-receipt60.segment",
+        "scope": {
+          "organizationId": "$ORG",
+          "objectType": "QuantitySegment"
+        },
+        "asOf": "2026-10-07T09:00:02Z",
+        "knownAt": "2026-10-07T09:00:02Z"
+      },
+      "bind": {
+        "RESERVE_SEGMENT_REV": "/data/revision"
+      }
+    },
+    {
+      "id": "e2-reserve30",
+      "type": "command",
+      "capability": "reserveQuantity",
+      "request": {
+        "intentKind": "COMMAND",
+        "definitionVersion": "definition-v1",
+        "capabilityId": "reserveQuantity",
+        "expectedRevision": "$RESERVE_SEGMENT_REV",
+        "commandIdempotencyKey": "e2-reserve30",
+        "slots": {
+          "segmentId": "$e2-receipt60.segment",
+          "salesLineId": "$SALES_LINE",
+          "startQuantity": "0",
+          "quantity": "60",
+          "unit": "BOX"
+        },
+        "provenance": {},
+        "subjectRefs": [
+          {
+            "type": "QuantitySegment",
+            "id": "$e2-receipt60.segment"
+          },
+          {
+            "type": "SalesOrderLine",
+            "id": "$SALES_LINE"
+          }
+        ]
+      },
+      "outcome": "APPLIED",
+      "bind": {
+        "ALLOCATION": "/effects/allocationId",
+        "ALLOCATION_REV": "/revision"
+      }
+    },
+    {
+      "id": "e2-pick30",
+      "type": "command",
+      "capability": "pickQuantity",
+      "request": {
+        "intentKind": "COMMAND",
+        "definitionVersion": "definition-v1",
+        "capabilityId": "pickQuantity",
+        "expectedRevision": "$ALLOCATION_REV",
+        "commandIdempotencyKey": "e2-pick30",
+        "slots": {
+          "allocationId": "$ALLOCATION"
+        },
+        "provenance": {},
+        "subjectRefs": [
+          {
+            "type": "Work",
+            "id": "$WORK"
+          }
+        ]
+      },
+      "outcome": "APPLIED",
+      "bind": {
+        "ALLOCATION_REV": "/revision"
+      }
+    },
+    {
+      "id": "e2-qc20",
+      "type": "original",
+      "fixture": {
+        "synthetic": true,
+        "clock": {
+          "asOf": "2026-10-07T09:00:02Z",
+          "knownAt": "2026-10-07T09:00:02Z"
+        },
+        "sourceProfile": {
+          "namespace": "native-s4-e2-qc20",
+          "policyVersion": "fixture-v1",
+          "nextAction": "회수 범위와 잔여 책임 대조",
+          "nextCheckAt": "2026-10-08T09:00:00Z"
+        },
+        "occurrence": {
+          "kind": "QUALITY_DECISION_placeHold_QC",
+          "content": {
+            "segmentId": "$e2-receipt60.segment",
+            "operation": "placeHold",
+            "action": "ALL",
+            "category": "QC",
+            "startQuantity": "0",
+            "quantity": "20",
+            "unit": "BOX",
+            "validFrom": "2026-10-07T09:00:02Z",
+            "validUntil": "2026-10-31T00:00:00Z",
+            "workId": "$WORK",
+            "sourceDecisionId": "5ccd88ca-1510-5a39-a521-031d33351259",
+            "sourceVersion": "1"
+          },
+          "externalEventId": "5ccd88ca-1510-5a39-a521-031d33351259",
+          "quantity": "20",
+          "unit": "BOX",
+          "assertion": "authored synthetic external original"
+        }
+      },
+      "binding": {
+        "organizationId": "$ORG",
+        "workId": "$WORK",
+        "itemId": "$P",
+        "actorId": "$reader",
+        "supervisorId": "$supervisor",
+        "physicalScopeId": "$e2-receipt60.segment",
+        "subjectId": "$e2-receipt60.segment",
+        "subjectKind": "SEGMENT",
+        "placeId": "$W"
+      }
+    },
+    {
+      "id": "e2-qc20-match",
+      "type": "command",
+      "capability": "matchSourceIdentity",
+      "outcome": "APPLIED",
+      "request": {
+        "intentKind": "COMMAND",
+        "definitionVersion": "definition-v1",
+        "capabilityId": "matchSourceIdentity",
+        "expectedRevision": 1,
+        "commandIdempotencyKey": "e2-qc20-match",
+        "slots": {
+          "claimId": "$e2-qc20.claim",
+          "basisDocumentId": "$e2-qc20.document",
+          "physicalScopeId": "$e2-receipt60.segment",
+          "policyVersion": "fixture-v1",
+          "sourceIdentity": "native-s4-e2-qc20:5ccd88ca-1510-5a39-a521-031d33351259:1",
+          "quantity": "20",
+          "unit": "BOX",
+          "effectiveFrom": "2026-10-07T09:00:02Z",
+          "reason": "원본과 동일 물리 범위 대조"
+        },
+        "provenance": {},
+        "subjectRefs": [
+          {
+            "type": "Work",
+            "id": "$WORK"
+          }
+        ]
+      },
+      "bind": {
+        "e2-qc20.reconciliation": "/id"
+      }
+    },
+    {
+      "id": "e2-qc20-link",
+      "type": "command",
+      "capability": "linkCanonicalOccurrence",
+      "outcome": "APPLIED",
+      "request": {
+        "intentKind": "COMMAND",
+        "definitionVersion": "definition-v1",
+        "capabilityId": "linkCanonicalOccurrence",
+        "expectedRevision": 1,
+        "commandIdempotencyKey": "e2-qc20-link",
+        "slots": {
+          "reconciliationId": "$e2-qc20.reconciliation"
+        },
+        "provenance": {},
+        "subjectRefs": [
+          {
+            "type": "Work",
+            "id": "$WORK"
+          }
+        ]
+      },
+      "bind": {
+        "e2-qc20.canonical": "/id"
+      }
+    },
+    {
+      "id": "e2-pre-hold-segment",
+      "type": "observe",
+      "assertions": [],
+      "bindRows": {
+        "E2_SEG_REV": {
+          "pointer": "/rawRows/mulino_inventory_quantitysegments",
+          "where": {
+            "id": "$e2-receipt60.segment"
+          },
+          "column": "revision"
+        }
+      }
+    },
+    {
+      "id": "e2-place-qc20",
+      "type": "command",
+      "capability": "placeHold",
+      "outcome": "APPLIED",
+      "request": {
+        "intentKind": "COMMAND",
+        "definitionVersion": "definition-v1",
+        "capabilityId": "placeHold",
+        "expectedRevision": "$E2_SEG_REV",
+        "commandIdempotencyKey": "e2-place-qc20",
+        "slots": {
+          "segmentId": "$e2-receipt60.segment",
+          "action": "ALL",
+          "category": "QC",
+          "startQuantity": "0",
+          "quantity": "20",
+          "unit": "BOX",
+          "validFrom": "2026-10-07T09:00:02Z",
+          "validUntil": "2026-10-31T00:00:00Z",
+          "workId": "$WORK",
+          "evidenceId": "$e2-qc20.document",
+          "reason": "독립 QC20 보류",
+          "nextCheckAt": "2026-10-08T09:00:00Z"
+        },
+        "provenance": {},
+        "subjectRefs": [
+          {
+            "type": "Work",
+            "id": "$WORK"
+          }
+        ]
+      },
+      "bind": {
+        "E2_QC": "/effects/restrictionId",
+        "E2_QC_REV": "/revision"
+      }
+    },
+    {
+      "id": "e2-investigation-basis",
+      "type": "original",
+      "fixture": {
+        "synthetic": true,
+        "clock": {
+          "asOf": "2026-10-07T09:00:02Z",
+          "knownAt": "2026-10-07T09:00:02Z"
+        },
+        "sourceProfile": {
+          "namespace": "native-s4-e2-investigation-basis",
+          "policyVersion": "fixture-v1",
+          "nextAction": "회수 범위와 잔여 책임 대조",
+          "nextCheckAt": "2026-10-08T09:00:00Z"
+        },
+        "occurrence": {
+          "kind": "TEMPERATURE_ANOMALY",
+          "content": {
+            "itemId": "$P",
+            "lotId": "$L",
+            "quantity": "60",
+            "unit": "BOX",
+            "candidateOnly": true
+          },
+          "externalEventId": "e2-investigation-basis",
+          "quantity": "60",
+          "unit": "BOX",
+          "assertion": "authored synthetic external original"
+        }
+      },
+      "binding": {
+        "organizationId": "$ORG",
+        "workId": "$WORK",
+        "itemId": "$P",
+        "actorId": "$reader",
+        "supervisorId": "$supervisor",
+        "physicalScopeId": "$e2-receipt60.segment",
+        "subjectId": "$e2-receipt60.segment",
+        "subjectKind": "SEGMENT",
+        "placeId": "$W"
+      }
+    },
+    {
+      "id": "e2-pre-investigate",
+      "type": "observe",
+      "assertions": [],
+      "bindRows": {
+        "E2_SEG_REV": {
+          "pointer": "/rawRows/mulino_inventory_quantitysegments",
+          "where": {
+            "id": "$e2-receipt60.segment"
+          },
+          "column": "revision"
+        }
+      }
+    },
+    {
+      "id": "e2-open-investigation",
+      "type": "command",
+      "capability": "openInvestigation",
+      "outcome": "APPLIED",
+      "request": {
+        "intentKind": "COMMAND",
+        "definitionVersion": "definition-v1",
+        "capabilityId": "openInvestigation",
+        "expectedRevision": "$E2_SEG_REV",
+        "commandIdempotencyKey": "e2-open-investigation",
+        "slots": {
+          "segmentId": "$e2-receipt60.segment",
+          "itemId": "$P",
+          "lotId": "$L",
+          "workId": "$WORK",
+          "startQuantity": "0",
+          "quantity": "60",
+          "unit": "BOX",
+          "basisEvidenceId": "$e2-investigation-basis.event",
+          "occurredAt": "2026-10-07T09:00:02Z",
+          "nextAction": "미확인 물량과 조사 후보 확인",
+          "nextCheckAt": "2026-10-08T09:00:00Z"
+        },
+        "provenance": {},
+        "subjectRefs": [
+          {
+            "type": "Work",
+            "id": "$WORK"
+          }
+        ]
+      },
+      "bind": {
+        "E2_INV": "/effects/investigationId"
+      },
+      "assertions": [
+        {
+          "pointer": "/effects/impactState",
+          "operator": "equals",
+          "expected": "CANDIDATE"
+        }
+      ]
+    },
+    {
+      "id": "e2-qc-release",
+      "type": "original",
+      "fixture": {
+        "synthetic": true,
+        "clock": {
+          "asOf": "2026-10-07T09:00:02Z",
+          "knownAt": "2026-10-07T09:00:02Z"
+        },
+        "sourceProfile": {
+          "namespace": "native-s4-e2-qc-release",
+          "policyVersion": "fixture-v1",
+          "nextAction": "회수 범위와 잔여 책임 대조",
+          "nextCheckAt": "2026-10-08T09:00:00Z"
+        },
+        "occurrence": {
+          "kind": "QUALITY_RELEASE",
+          "content": {
+            "segmentId": "$e2-receipt60.segment",
+            "operation": "releaseHold",
+            "restrictionId": "$E2_QC"
+          },
+          "externalEventId": "e2-qc-release",
+          "quantity": "20",
+          "unit": "BOX",
+          "assertion": "authored synthetic external original"
+        }
+      },
+      "binding": {
+        "organizationId": "$ORG",
+        "workId": "$WORK",
+        "itemId": "$P",
+        "actorId": "$reader",
+        "supervisorId": "$supervisor",
+        "physicalScopeId": "$e2-receipt60.segment",
+        "subjectId": "$e2-receipt60.segment",
+        "subjectKind": "SEGMENT",
+        "placeId": "$W"
+      }
+    },
+    {
+      "id": "e2-release-qc20",
+      "type": "command",
+      "capability": "releaseHold",
+      "outcome": "APPLIED",
+      "request": {
+        "intentKind": "COMMAND",
+        "definitionVersion": "definition-v1",
+        "capabilityId": "releaseHold",
+        "expectedRevision": "$E2_QC_REV",
+        "commandIdempotencyKey": "e2-release-qc20",
+        "slots": {
+          "restrictionId": "$E2_QC",
+          "evidenceId": "$e2-qc-release.document",
+          "reason": "현재 QC20 해제 근거"
+        },
+        "provenance": {},
+        "subjectRefs": [
+          {
+            "type": "Work",
+            "id": "$WORK"
+          }
+        ]
+      }
+    },
+    {
+      "id": "e2-allocation-after-holds",
+      "type": "observe",
+      "assertions": [],
+      "bindRows": {
+        "E2_ALLOC_REV": {
+          "pointer": "/rawRows/mulino_inventory_segmentallocations",
+          "where": {
+            "id": "$ALLOCATION"
+          },
+          "column": "revision"
+        }
+      }
+    },
+    {
+      "id": "e2-dispatch-denied-after-qc-release",
+      "type": "command",
+      "capability": "dispatchQuantity",
+      "outcome": "HELD",
+      "request": {
+        "intentKind": "COMMAND",
+        "definitionVersion": "definition-v1",
+        "capabilityId": "dispatchQuantity",
+        "expectedRevision": "$E2_ALLOC_REV",
+        "commandIdempotencyKey": "e2-dispatch-denied-after-qc-release",
+        "slots": {
+          "allocationId": "$ALLOCATION",
+          "transitPlaceId": "$TRANSIT",
+          "occurredAt": "2026-10-07T09:00:02Z",
+          "evidenceRef": "synthetic-e2-denied"
+        },
+        "provenance": {},
+        "subjectRefs": [
+          {
+            "type": "Work",
+            "id": "$WORK"
+          }
+        ]
+      }
+    },
+    {
+      "id": "e2-independent-holds",
+      "type": "observe",
+      "assertions": [
+        {
+          "pointer": "/rawRows/mulino_quality_restrictions",
+          "operator": "matchingRows",
+          "where": {
+            "category": "QC",
+            "state": "ACTIVE"
+          },
+          "expected": 0
+        },
+        {
+          "pointer": "/rawRows/mulino_quality_restrictions",
+          "operator": "matchingRows",
+          "where": {
+            "category": "RECALL_INVESTIGATION",
+            "state": "ACTIVE",
+            "quantity": "60"
+          },
+          "expected": 3
+        },
+        {
+          "pointer": "/rawRows/mulino_trade_sales_dispatches",
+          "operator": "matchingRows",
+          "where": {},
+          "expected": 0
+        },
+        {
+          "pointer": "/rawRows/mulino_trade_recall_investigations",
+          "operator": "matchingRows",
+          "where": {
+            "id": "$E2_INV",
+            "impactstate": "CANDIDATE"
+          },
+          "expected": 1
+        }
+      ]
+    },
+    {
+      "id": "e2-propose50",
+      "type": "command",
+      "capability": "proposeRecall",
+      "outcome": "APPLIED",
+      "request": {
+        "intentKind": "COMMAND",
+        "definitionVersion": "definition-v1",
+        "capabilityId": "proposeRecall",
+        "expectedRevision": 0,
+        "commandIdempotencyKey": "e2-propose50",
+        "slots": {
+          "investigationId": "$E2_INV",
+          "startQuantity": "0",
+          "quantity": "50",
+          "unit": "BOX",
+          "reason": "조사60 중 ADMIN 회수범위50 제안"
+        },
+        "provenance": {},
+        "subjectRefs": [
+          {
+            "type": "Work",
+            "id": "$WORK"
+          }
+        ]
+      },
+      "bind": {
+        "E2_SCOPE": "/effects/scopeId",
+        "E2_HASH": "/effects/scopeHash",
+        "E2_VERSION": "/effects/scopeVersion"
+      }
+    },
+    {
+      "id": "e2-admin-approve50",
+      "type": "command",
+      "capability": "approveRecall",
+      "outcome": "APPLIED",
+      "request": {
+        "intentKind": "COMMAND",
+        "definitionVersion": "definition-v1",
+        "capabilityId": "approveRecall",
+        "expectedRevision": 0,
+        "commandIdempotencyKey": "e2-admin-approve50",
+        "slots": {
+          "scopeId": "$E2_SCOPE",
+          "scopeHash": "$E2_HASH",
+          "decision": "APPROVE",
+          "validUntil": "2026-10-31T00:00:00Z"
+        },
+        "provenance": {},
+        "subjectRefs": [
+          {
+            "type": "Work",
+            "id": "$WORK"
+          }
+        ]
+      },
+      "bind": {
+        "E2_APPROVAL": "/effects/approvalId"
+      },
+      "actor": "supervisor"
+    },
+    {
+      "id": "e2-recover25-actual-event",
+      "type": "uuid",
+      "alias": "e2-recover25-actual-event"
+    },
+    {
+      "id": "e2-recover25",
+      "type": "original",
+      "fixture": {
+        "synthetic": true,
+        "clock": {
+          "asOf": "2026-10-07T09:00:02Z",
+          "knownAt": "2026-10-07T09:00:02Z"
+        },
+        "sourceProfile": {
+          "namespace": "native-s4-e2-recover25",
+          "policyVersion": "fixture-v1",
+          "nextAction": "회수 범위와 잔여 책임 대조",
+          "nextCheckAt": "2026-10-08T09:00:00Z"
+        },
+        "occurrence": {
+          "kind": "RECALL_RECOVERY",
+          "content": {
+            "actualEventId": "$e2-recover25-actual-event",
+            "scopeId": "$E2_SCOPE",
+            "scopeVersion": "$E2_VERSION",
+            "scopeHash": "$E2_HASH",
+            "rootSegmentId": "$e2-receipt60.segment",
+            "itemId": "$P",
+            "lotId": "$L",
+            "startQuantity": "0",
+            "quantity": "25",
+            "unit": "BOX",
+            "eventKind": "RECALL_RECOVERY",
+            "occurredAt": "2026-10-07T09:00:02Z",
+            "currentPlaceId": "$W",
+            "sourceSegmentId": "$e2-receipt60.segment"
+          },
+          "externalEventId": "e2-recover25",
+          "quantity": "25",
+          "unit": "BOX",
+          "assertion": "authored synthetic external original"
+        }
+      },
+      "binding": {
+        "organizationId": "$ORG",
+        "workId": "$WORK",
+        "itemId": "$P",
+        "actorId": "$reader",
+        "supervisorId": "$supervisor",
+        "physicalScopeId": "$E2_SCOPE",
+        "subjectId": "$E2_SCOPE",
+        "subjectKind": "RECALL_SCOPE",
+        "placeId": "$W"
+      }
+    },
+    {
+      "id": "e2-recover25-match",
+      "type": "command",
+      "capability": "matchSourceIdentity",
+      "outcome": "APPLIED",
+      "request": {
+        "intentKind": "COMMAND",
+        "definitionVersion": "definition-v1",
+        "capabilityId": "matchSourceIdentity",
+        "expectedRevision": 1,
+        "commandIdempotencyKey": "e2-recover25-match",
+        "slots": {
+          "claimId": "$e2-recover25.claim",
+          "basisDocumentId": "$e2-recover25.document",
+          "physicalScopeId": "$E2_SCOPE",
+          "policyVersion": "fixture-v1",
+          "sourceIdentity": "native-s4-e2-recover25:e2-recover25:1",
+          "quantity": "25",
+          "unit": "BOX",
+          "effectiveFrom": "2026-10-07T09:00:02Z",
+          "reason": "원본과 동일 물리 범위 대조"
+        },
+        "provenance": {},
+        "subjectRefs": [
+          {
+            "type": "Work",
+            "id": "$WORK"
+          }
+        ]
+      },
+      "bind": {
+        "e2-recover25.reconciliation": "/id"
+      }
+    },
+    {
+      "id": "e2-recover25-link",
+      "type": "command",
+      "capability": "linkCanonicalOccurrence",
+      "outcome": "APPLIED",
+      "request": {
+        "intentKind": "COMMAND",
+        "definitionVersion": "definition-v1",
+        "capabilityId": "linkCanonicalOccurrence",
+        "expectedRevision": 1,
+        "commandIdempotencyKey": "e2-recover25-link",
+        "slots": {
+          "reconciliationId": "$e2-recover25.reconciliation"
+        },
+        "provenance": {},
+        "subjectRefs": [
+          {
+            "type": "Work",
+            "id": "$WORK"
+          }
+        ]
+      },
+      "bind": {
+        "e2-recover25.canonical": "/id"
+      }
+    },
+    {
+      "id": "e2-record-recover25",
+      "type": "command",
+      "capability": "recordRecovery",
+      "outcome": "APPLIED",
+      "request": {
+        "intentKind": "RECORD",
+        "definitionVersion": "definition-v1",
+        "capabilityId": "recordRecovery",
+        "expectedRevision": 0,
+        "commandIdempotencyKey": "e2-record-recover25",
+        "slots": {
+          "actualEventId": "$e2-recover25-actual-event",
+          "scopeId": "$E2_SCOPE",
+          "scopeHash": "$E2_HASH",
+          "rootSegmentId": "$e2-receipt60.segment",
+          "startQuantity": "0",
+          "quantity": "25",
+          "unit": "BOX",
+          "currentPlaceId": "$W",
+          "sourceSegmentId": "$e2-receipt60.segment",
+          "approvalId": "$E2_APPROVAL",
+          "canonicalOccurrenceId": "$e2-recover25.canonical",
+          "kind": "RECOVERED"
+        },
+        "provenance": {},
+        "subjectRefs": [
+          {
+            "type": "Work",
+            "id": "$WORK"
+          }
+        ]
+      },
+      "bind": {
+        "E2_RECOVERED_LEAF": "/effects/currentSegmentId"
+      },
+      "assertions": [
+        {
+          "pointer": "/effects/partition/ACCOUNTED",
+          "operator": "equals",
+          "expected": "0"
+        },
+        {
+          "pointer": "/effects/partition/UNKNOWN",
+          "operator": "equals",
+          "expected": "50"
+        }
+      ]
+    },
+    {
+      "id": "e2-repeat-recovery-denied",
+      "type": "command",
+      "capability": "recordRecovery",
+      "outcome": "CONFLICT",
+      "request": {
+        "intentKind": "RECORD",
+        "definitionVersion": "definition-v1",
+        "capabilityId": "recordRecovery",
+        "expectedRevision": 0,
+        "commandIdempotencyKey": "e2-repeat-recovery-denied",
+        "slots": {
+          "actualEventId": "$e2-recover25-actual-event",
+          "scopeId": "$E2_SCOPE",
+          "scopeHash": "$E2_HASH",
+          "rootSegmentId": "$e2-receipt60.segment",
+          "startQuantity": "0",
+          "quantity": "25",
+          "unit": "BOX",
+          "currentPlaceId": "$W",
+          "sourceSegmentId": "$e2-receipt60.segment",
+          "approvalId": "$E2_APPROVAL",
+          "canonicalOccurrenceId": "$e2-recover25.canonical",
+          "kind": "RECOVERED"
+        },
+        "provenance": {},
+        "subjectRefs": [
+          {
+            "type": "Work",
+            "id": "$WORK"
+          }
+        ]
+      }
+    },
+    {
+      "id": "e2-dispose-same25-actual-event",
+      "type": "uuid",
+      "alias": "e2-dispose-same25-actual-event"
+    },
+    {
+      "id": "e2-dispose-same25",
+      "type": "original",
+      "fixture": {
+        "synthetic": true,
+        "clock": {
+          "asOf": "2026-10-07T09:00:02Z",
+          "knownAt": "2026-10-07T09:00:02Z"
+        },
+        "sourceProfile": {
+          "namespace": "native-s4-e2-dispose-same25",
+          "policyVersion": "fixture-v1",
+          "nextAction": "회수 범위와 잔여 책임 대조",
+          "nextCheckAt": "2026-10-08T09:00:00Z"
+        },
+        "occurrence": {
+          "kind": "RECALL_DISPOSAL",
+          "content": {
+            "actualEventId": "$e2-dispose-same25-actual-event",
+            "scopeId": "$E2_SCOPE",
+            "scopeVersion": "$E2_VERSION",
+            "scopeHash": "$E2_HASH",
+            "rootSegmentId": "$e2-receipt60.segment",
+            "itemId": "$P",
+            "lotId": "$L",
+            "startQuantity": "0",
+            "quantity": "25",
+            "unit": "BOX",
+            "eventKind": "RECALL_DISPOSAL",
+            "occurredAt": "2026-10-07T09:00:02Z",
+            "currentPlaceId": "$W",
+            "sourceSegmentId": "$E2_RECOVERED_LEAF"
+          },
+          "externalEventId": "e2-dispose-same25",
+          "quantity": "25",
+          "unit": "BOX",
+          "assertion": "authored synthetic external original"
+        }
+      },
+      "binding": {
+        "organizationId": "$ORG",
+        "workId": "$WORK",
+        "itemId": "$P",
+        "actorId": "$reader",
+        "supervisorId": "$supervisor",
+        "physicalScopeId": "$E2_SCOPE",
+        "subjectId": "$E2_SCOPE",
+        "subjectKind": "RECALL_SCOPE",
+        "placeId": "$W"
+      }
+    },
+    {
+      "id": "e2-dispose-same25-match",
+      "type": "command",
+      "capability": "matchSourceIdentity",
+      "outcome": "APPLIED",
+      "request": {
+        "intentKind": "COMMAND",
+        "definitionVersion": "definition-v1",
+        "capabilityId": "matchSourceIdentity",
+        "expectedRevision": 1,
+        "commandIdempotencyKey": "e2-dispose-same25-match",
+        "slots": {
+          "claimId": "$e2-dispose-same25.claim",
+          "basisDocumentId": "$e2-dispose-same25.document",
+          "physicalScopeId": "$E2_SCOPE",
+          "policyVersion": "fixture-v1",
+          "sourceIdentity": "native-s4-e2-dispose-same25:e2-dispose-same25:1",
+          "quantity": "25",
+          "unit": "BOX",
+          "effectiveFrom": "2026-10-07T09:00:02Z",
+          "reason": "원본과 동일 물리 범위 대조"
+        },
+        "provenance": {},
+        "subjectRefs": [
+          {
+            "type": "Work",
+            "id": "$WORK"
+          }
+        ]
+      },
+      "bind": {
+        "e2-dispose-same25.reconciliation": "/id"
+      }
+    },
+    {
+      "id": "e2-dispose-same25-link",
+      "type": "command",
+      "capability": "linkCanonicalOccurrence",
+      "outcome": "APPLIED",
+      "request": {
+        "intentKind": "COMMAND",
+        "definitionVersion": "definition-v1",
+        "capabilityId": "linkCanonicalOccurrence",
+        "expectedRevision": 1,
+        "commandIdempotencyKey": "e2-dispose-same25-link",
+        "slots": {
+          "reconciliationId": "$e2-dispose-same25.reconciliation"
+        },
+        "provenance": {},
+        "subjectRefs": [
+          {
+            "type": "Work",
+            "id": "$WORK"
+          }
+        ]
+      },
+      "bind": {
+        "e2-dispose-same25.canonical": "/id"
+      }
+    },
+    {
+      "id": "e2-record-dispose25",
+      "type": "command",
+      "capability": "recordRecovery",
+      "outcome": "APPLIED",
+      "request": {
+        "intentKind": "RECORD",
+        "definitionVersion": "definition-v1",
+        "capabilityId": "recordRecovery",
+        "expectedRevision": 0,
+        "commandIdempotencyKey": "e2-record-dispose25",
+        "slots": {
+          "actualEventId": "$e2-dispose-same25-actual-event",
+          "scopeId": "$E2_SCOPE",
+          "scopeHash": "$E2_HASH",
+          "rootSegmentId": "$e2-receipt60.segment",
+          "startQuantity": "0",
+          "quantity": "25",
+          "unit": "BOX",
+          "currentPlaceId": "$W",
+          "sourceSegmentId": "$E2_RECOVERED_LEAF",
+          "approvalId": "$E2_APPROVAL",
+          "canonicalOccurrenceId": "$e2-dispose-same25.canonical",
+          "kind": "DISPOSED"
+        },
+        "provenance": {},
+        "subjectRefs": [
+          {
+            "type": "Work",
+            "id": "$WORK"
+          }
+        ]
+      },
+      "bind": {
+        "E2_PARTIAL_HASH": "/effects/partitionHash"
+      },
+      "assertions": [
+        {
+          "pointer": "/effects/partition/RECOVERED",
+          "operator": "equals",
+          "expected": "25"
+        },
+        {
+          "pointer": "/effects/partition/DISPOSED",
+          "operator": "equals",
+          "expected": "25"
+        },
+        {
+          "pointer": "/effects/partition/ACCOUNTED",
+          "operator": "equals",
+          "expected": "25"
+        },
+        {
+          "pointer": "/effects/partition/UNKNOWN",
+          "operator": "equals",
+          "expected": "25"
+        }
+      ]
+    },
+    {
+      "id": "e2-repeat-disposal-denied",
+      "type": "command",
+      "capability": "recordRecovery",
+      "outcome": "CONFLICT",
+      "request": {
+        "intentKind": "RECORD",
+        "definitionVersion": "definition-v1",
+        "capabilityId": "recordRecovery",
+        "expectedRevision": 0,
+        "commandIdempotencyKey": "e2-repeat-disposal-denied",
+        "slots": {
+          "actualEventId": "$e2-dispose-same25-actual-event",
+          "scopeId": "$E2_SCOPE",
+          "scopeHash": "$E2_HASH",
+          "rootSegmentId": "$e2-receipt60.segment",
+          "startQuantity": "0",
+          "quantity": "25",
+          "unit": "BOX",
+          "currentPlaceId": "$W",
+          "sourceSegmentId": "$E2_RECOVERED_LEAF",
+          "approvalId": "$E2_APPROVAL",
+          "canonicalOccurrenceId": "$e2-dispose-same25.canonical",
+          "kind": "DISPOSED"
+        },
+        "provenance": {},
+        "subjectRefs": [
+          {
+            "type": "Work",
+            "id": "$WORK"
+          }
+        ]
+      }
+    },
+    {
+      "id": "e2-close-unknown25-denied",
+      "type": "command",
+      "capability": "closeRecall",
+      "outcome": "HELD",
+      "request": {
+        "intentKind": "COMMAND",
+        "definitionVersion": "definition-v1",
+        "capabilityId": "closeRecall",
+        "expectedRevision": 0,
+        "commandIdempotencyKey": "e2-close-unknown25-denied",
+        "slots": {
+          "scopeId": "$E2_SCOPE",
+          "approvalId": "$E2_APPROVAL",
+          "scopeHash": "$E2_HASH",
+          "canonicalOccurrenceId": "$e2-dispose-same25.canonical",
+          "partitionHash": "$E2_PARTIAL_HASH"
+        },
+        "provenance": {},
+        "subjectRefs": [
+          {
+            "type": "Work",
+            "id": "$WORK"
+          }
+        ]
+      },
+      "actor": "supervisor",
+      "assertions": [
+        {
+          "pointer": "/reasonCode",
+          "operator": "equals",
+          "expected": "RECALL_RESIDUAL_UNKNOWN"
+        }
+      ]
+    },
+    {
+      "id": "e2-accounted25-not50",
+      "type": "observe",
+      "assertions": [
+        {
+          "pointer": "/rawRows/mulino_trade_recall_actions",
+          "operator": "sum",
+          "column": "quantity",
+          "expected": "25",
+          "where": {
+            "scopeid": "$E2_SCOPE",
+            "kind": "RECOVERED"
+          }
+        },
+        {
+          "pointer": "/rawRows/mulino_trade_recall_actions",
+          "operator": "sum",
+          "column": "quantity",
+          "expected": "25",
+          "where": {
+            "scopeid": "$E2_SCOPE",
+            "kind": "DISPOSED"
+          }
+        },
+        {
+          "pointer": "/rawRows/mulino_trade_recall_closures",
+          "operator": "matchingRows",
+          "where": {},
+          "expected": 0
+        },
+        {
+          "pointer": "/rawRows/mulino_inventory_quantitysegments",
+          "operator": "sum",
+          "column": "quantity",
+          "expected": "35",
+          "where": {
+            "retiredat": null,
+            "placeid": "$W"
+          }
+        }
+      ]
+    },
+    {
+      "id": "e2-admin-reapprove50",
+      "type": "command",
+      "capability": "approveRecall",
+      "outcome": "APPLIED",
+      "request": {
+        "intentKind": "COMMAND",
+        "definitionVersion": "definition-v1",
+        "capabilityId": "approveRecall",
+        "expectedRevision": 0,
+        "commandIdempotencyKey": "e2-admin-reapprove50",
+        "slots": {
+          "scopeId": "$E2_SCOPE",
+          "scopeHash": "$E2_HASH",
+          "decision": "APPROVE",
+          "validUntil": "2026-10-31T00:00:00Z"
+        },
+        "provenance": {},
+        "subjectRefs": [
+          {
+            "type": "Work",
+            "id": "$WORK"
+          }
+        ]
+      },
+      "bind": {
+        "E2_CURRENT_APPROVAL": "/effects/approvalId"
+      },
+      "actor": "supervisor"
+    },
+    {
+      "id": "e2-exception25-actual-event",
+      "type": "uuid",
+      "alias": "e2-exception25-actual-event"
+    },
+    {
+      "id": "e2-exception25",
+      "type": "original",
+      "fixture": {
+        "synthetic": true,
+        "clock": {
+          "asOf": "2026-10-07T09:00:02Z",
+          "knownAt": "2026-10-07T09:00:02Z"
+        },
+        "sourceProfile": {
+          "namespace": "native-s4-e2-exception25",
+          "policyVersion": "fixture-v1",
+          "nextAction": "회수 범위와 잔여 책임 대조",
+          "nextCheckAt": "2026-10-08T09:00:00Z"
+        },
+        "occurrence": {
+          "kind": "RECALL_EXCEPTION",
+          "content": {
+            "actualEventId": "$e2-exception25-actual-event",
+            "scopeId": "$E2_SCOPE",
+            "scopeVersion": "$E2_VERSION",
+            "scopeHash": "$E2_HASH",
+            "rootSegmentId": "$e2-receipt60.segment",
+            "itemId": "$P",
+            "lotId": "$L",
+            "startQuantity": "25",
+            "quantity": "25",
+            "unit": "BOX",
+            "eventKind": "RECALL_EXCEPTION",
+            "occurredAt": "2026-10-07T09:00:02Z",
+            "currentPlaceId": "$W",
+            "reason": "가상 ADMIN 예외25: 미확인 물량 조사 책임 유지"
+          },
+          "externalEventId": "e2-exception25",
+          "quantity": "25",
+          "unit": "BOX",
+          "assertion": "authored synthetic external original"
+        }
+      },
+      "binding": {
+        "organizationId": "$ORG",
+        "workId": "$WORK",
+        "itemId": "$P",
+        "actorId": "$reader",
+        "supervisorId": "$supervisor",
+        "physicalScopeId": "$E2_SCOPE",
+        "subjectId": "$E2_SCOPE",
+        "subjectKind": "RECALL_SCOPE",
+        "placeId": "$W"
+      }
+    },
+    {
+      "id": "e2-exception25-match",
+      "type": "command",
+      "capability": "matchSourceIdentity",
+      "outcome": "APPLIED",
+      "request": {
+        "intentKind": "COMMAND",
+        "definitionVersion": "definition-v1",
+        "capabilityId": "matchSourceIdentity",
+        "expectedRevision": 1,
+        "commandIdempotencyKey": "e2-exception25-match",
+        "slots": {
+          "claimId": "$e2-exception25.claim",
+          "basisDocumentId": "$e2-exception25.document",
+          "physicalScopeId": "$E2_SCOPE",
+          "policyVersion": "fixture-v1",
+          "sourceIdentity": "native-s4-e2-exception25:e2-exception25:1",
+          "quantity": "25",
+          "unit": "BOX",
+          "effectiveFrom": "2026-10-07T09:00:02Z",
+          "reason": "원본과 동일 물리 범위 대조"
+        },
+        "provenance": {},
+        "subjectRefs": [
+          {
+            "type": "Work",
+            "id": "$WORK"
+          }
+        ]
+      },
+      "bind": {
+        "e2-exception25.reconciliation": "/id"
+      }
+    },
+    {
+      "id": "e2-exception25-link",
+      "type": "command",
+      "capability": "linkCanonicalOccurrence",
+      "outcome": "APPLIED",
+      "request": {
+        "intentKind": "COMMAND",
+        "definitionVersion": "definition-v1",
+        "capabilityId": "linkCanonicalOccurrence",
+        "expectedRevision": 1,
+        "commandIdempotencyKey": "e2-exception25-link",
+        "slots": {
+          "reconciliationId": "$e2-exception25.reconciliation"
+        },
+        "provenance": {},
+        "subjectRefs": [
+          {
+            "type": "Work",
+            "id": "$WORK"
+          }
+        ]
+      },
+      "bind": {
+        "e2-exception25.canonical": "/id"
+      }
+    },
+    {
+      "id": "e2-stale-approval-exception-denied",
+      "type": "command",
+      "capability": "recordRecovery",
+      "outcome": "HELD",
+      "request": {
+        "intentKind": "RECORD",
+        "definitionVersion": "definition-v1",
+        "capabilityId": "recordRecovery",
+        "expectedRevision": 0,
+        "commandIdempotencyKey": "e2-stale-approval-exception-denied",
+        "slots": {
+          "actualEventId": "$e2-exception25-actual-event",
+          "scopeId": "$E2_SCOPE",
+          "scopeHash": "$E2_HASH",
+          "rootSegmentId": "$e2-receipt60.segment",
+          "startQuantity": "25",
+          "quantity": "25",
+          "unit": "BOX",
+          "currentPlaceId": "$W",
+          "reason": "가상 ADMIN 예외25: 미확인 물량 조사 책임 유지",
+          "approvalId": "$E2_CURRENT_APPROVAL",
+          "canonicalOccurrenceId": "$e2-exception25.canonical",
+          "kind": "EXCEPTION"
+        },
+        "provenance": {},
+        "subjectRefs": [
+          {
+            "type": "Work",
+            "id": "$WORK"
+          }
+        ]
+      },
+      "actor": "supervisor",
+      "assertions": [
+        {
+          "pointer": "/reasonCode",
+          "operator": "equals",
+          "expected": "RECALL_APPROVAL_STALE"
+        }
+      ]
+    },
+    {
+      "id": "e2-record-approved-exception25",
+      "type": "command",
+      "capability": "recordRecovery",
+      "outcome": "APPLIED",
+      "request": {
+        "intentKind": "RECORD",
+        "definitionVersion": "definition-v1",
+        "capabilityId": "recordRecovery",
+        "expectedRevision": 0,
+        "commandIdempotencyKey": "e2-record-approved-exception25",
+        "slots": {
+          "actualEventId": "$e2-exception25-actual-event",
+          "scopeId": "$E2_SCOPE",
+          "scopeHash": "$E2_HASH",
+          "rootSegmentId": "$e2-receipt60.segment",
+          "startQuantity": "25",
+          "quantity": "25",
+          "unit": "BOX",
+          "currentPlaceId": "$W",
+          "reason": "가상 ADMIN 예외25: 미확인 물량 조사 책임 유지",
+          "approvalId": "$E2_CURRENT_APPROVAL",
+          "canonicalOccurrenceId": "$e2-exception25.canonical",
+          "kind": "EXCEPTION"
+        },
+        "provenance": {},
+        "subjectRefs": [
+          {
+            "type": "Work",
+            "id": "$WORK"
+          }
+        ]
+      },
+      "bind": {
+        "E2_FINAL_HASH": "/effects/partitionHash",
+        "E2_RESIDUAL_DUTY": "/effects/residualDutyId"
+      },
+      "actor": "supervisor",
+      "assertions": [
+        {
+          "pointer": "/effects/partition/ACCOUNTED",
+          "operator": "equals",
+          "expected": "50"
+        },
+        {
+          "pointer": "/effects/partition/EXCEPTION",
+          "operator": "equals",
+          "expected": "25"
+        },
+        {
+          "pointer": "/effects/partition/UNKNOWN",
+          "operator": "equals",
+          "expected": "0"
+        }
+      ]
+    },
+    {
+      "id": "e2-closure-original-actual-event",
+      "type": "uuid",
+      "alias": "e2-closure-original-actual-event"
+    },
+    {
+      "id": "e2-closure-original",
+      "type": "original",
+      "fixture": {
+        "synthetic": true,
+        "clock": {
+          "asOf": "2026-10-07T09:00:02Z",
+          "knownAt": "2026-10-07T09:00:02Z"
+        },
+        "sourceProfile": {
+          "namespace": "native-s4-e2-closure-original",
+          "policyVersion": "fixture-v1",
+          "nextAction": "회수 범위와 잔여 책임 대조",
+          "nextCheckAt": "2026-10-08T09:00:00Z"
+        },
+        "occurrence": {
+          "kind": "RECALL_CLOSURE",
+          "content": {
+            "actualEventId": "$e2-closure-original-actual-event",
+            "scopeId": "$E2_SCOPE",
+            "scopeVersion": "$E2_VERSION",
+            "scopeHash": "$E2_HASH",
+            "rootSegmentId": "$e2-receipt60.segment",
+            "itemId": "$P",
+            "lotId": "$L",
+            "startQuantity": "0",
+            "quantity": "50",
+            "unit": "BOX",
+            "eventKind": "RECALL_CLOSURE",
+            "occurredAt": "2026-10-07T09:00:02Z",
+            "currentPlaceId": "$W",
+            "partitionHash": "$E2_FINAL_HASH"
+          },
+          "externalEventId": "e2-closure-original",
+          "quantity": "50",
+          "unit": "BOX",
+          "assertion": "authored synthetic external original"
+        }
+      },
+      "binding": {
+        "organizationId": "$ORG",
+        "workId": "$WORK",
+        "itemId": "$P",
+        "actorId": "$reader",
+        "supervisorId": "$supervisor",
+        "physicalScopeId": "$E2_SCOPE",
+        "subjectId": "$E2_SCOPE",
+        "subjectKind": "RECALL_SCOPE",
+        "placeId": "$W"
+      }
+    },
+    {
+      "id": "e2-closure-original-match",
+      "type": "command",
+      "capability": "matchSourceIdentity",
+      "outcome": "APPLIED",
+      "request": {
+        "intentKind": "COMMAND",
+        "definitionVersion": "definition-v1",
+        "capabilityId": "matchSourceIdentity",
+        "expectedRevision": 1,
+        "commandIdempotencyKey": "e2-closure-original-match",
+        "slots": {
+          "claimId": "$e2-closure-original.claim",
+          "basisDocumentId": "$e2-closure-original.document",
+          "physicalScopeId": "$E2_SCOPE",
+          "policyVersion": "fixture-v1",
+          "sourceIdentity": "native-s4-e2-closure-original:e2-closure-original:1",
+          "quantity": "50",
+          "unit": "BOX",
+          "effectiveFrom": "2026-10-07T09:00:02Z",
+          "reason": "원본과 동일 물리 범위 대조"
+        },
+        "provenance": {},
+        "subjectRefs": [
+          {
+            "type": "Work",
+            "id": "$WORK"
+          }
+        ]
+      },
+      "bind": {
+        "e2-closure-original.reconciliation": "/id"
+      }
+    },
+    {
+      "id": "e2-closure-original-link",
+      "type": "command",
+      "capability": "linkCanonicalOccurrence",
+      "outcome": "APPLIED",
+      "request": {
+        "intentKind": "COMMAND",
+        "definitionVersion": "definition-v1",
+        "capabilityId": "linkCanonicalOccurrence",
+        "expectedRevision": 1,
+        "commandIdempotencyKey": "e2-closure-original-link",
+        "slots": {
+          "reconciliationId": "$e2-closure-original.reconciliation"
+        },
+        "provenance": {},
+        "subjectRefs": [
+          {
+            "type": "Work",
+            "id": "$WORK"
+          }
+        ]
+      },
+      "bind": {
+        "e2-closure-original.canonical": "/id"
+      }
+    },
+    {
+      "id": "e2-admin-close-with-residual",
+      "type": "command",
+      "capability": "closeRecall",
+      "outcome": "APPLIED",
+      "request": {
+        "intentKind": "COMMAND",
+        "definitionVersion": "definition-v1",
+        "capabilityId": "closeRecall",
+        "expectedRevision": 0,
+        "commandIdempotencyKey": "e2-admin-close-with-residual",
+        "slots": {
+          "scopeId": "$E2_SCOPE",
+          "approvalId": "$E2_CURRENT_APPROVAL",
+          "scopeHash": "$E2_HASH",
+          "canonicalOccurrenceId": "$e2-closure-original.canonical",
+          "partitionHash": "$E2_FINAL_HASH"
+        },
+        "provenance": {},
+        "subjectRefs": [
+          {
+            "type": "Work",
+            "id": "$WORK"
+          }
+        ]
+      },
+      "actor": "supervisor",
+      "assertions": [
+        {
+          "pointer": "/effects/residualResponsibilityRetained",
+          "operator": "equals",
+          "expected": true
+        }
+      ]
+    },
+    {
+      "id": "e2-final-independent",
+      "type": "observe",
+      "assertions": [
+        {
+          "pointer": "/rawRows/mulino_trade_recall_investigations",
+          "operator": "matchingRows",
+          "where": {
+            "id": "$E2_INV",
+            "status": "CLOSED",
+            "impactstate": "CANDIDATE"
+          },
+          "expected": 1
+        },
+        {
+          "pointer": "/rawRows/mulino_trade_recall_closures",
+          "operator": "matchingRows",
+          "where": {
+            "scopeid": "$E2_SCOPE"
+          },
+          "expected": 1
+        },
+        {
+          "pointer": "/rawRows/mulino_trade_recall_actions",
+          "operator": "matchingRows",
+          "where": {
+            "scopeid": "$E2_SCOPE"
+          },
+          "expected": 3
+        },
+        {
+          "pointer": "/rawRows/mulino_trade_recall_actions",
+          "operator": "sum",
+          "column": "quantity",
+          "expected": "25",
+          "where": {
+            "scopeid": "$E2_SCOPE",
+            "kind": "EXCEPTION"
+          }
+        },
+        {
+          "pointer": "/rawRows/mulino_inventory_quantitysegments",
+          "operator": "sum",
+          "column": "quantity",
+          "expected": "35",
+          "where": {
+            "retiredat": null,
+            "placeid": "$W"
+          }
+        },
+        {
+          "pointer": "/rawRows/mulino_responsibility_assignments",
+          "operator": "humanDuties",
+          "kinds": [
+            "RECALL_EXCEPTION_RESIDUAL",
+            "RECALL_EXCLUDED_SCOPE"
+          ]
+        },
+        {
+          "pointer": "/rawRows/mulino_responsibility_assignments",
+          "operator": "matchingRows",
+          "where": {
+            "id": "$E2_RESIDUAL_DUTY",
+            "status": "OPEN",
+            "valid": true
+          },
+          "expected": 1
+        }
+      ]
+    }
+  ]
+}
