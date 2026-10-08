@@ -142,9 +142,8 @@
                   "provenance": "USER"
                 },
                 "orderLineId": {
-                  "$alias": "ORDER"
-                },
-                "testBarrier": "afterInitialReadBeforeLocks"
+                  "$alias": "ORDER2"
+                }
               },
               "expectedRevision": 1,
               "commandIdempotencyKey": "V2-split-commits-first-contender-call",
@@ -153,7 +152,11 @@
                   "$alias": "operation-proof"
                 }
               ],
-              "valueProvenance": "USER"
+              "valueProvenance": "USER",
+              "testTransactionId": "tx-contender",
+              "testParticipantId": "contender",
+              "testBarrierId": "V2-split-commits-first-race",
+              "testBarrierPoint": "AFTER_INITIAL_READ_BEFORE_SCOPE_LOCK"
             },
             "evidenceRefs": [
               "contender-call:actual-adapter-artifact"
@@ -170,15 +173,10 @@
             "type": "barrier",
             "operation": "waitReached",
             "parameters": {
-              "barrierId": "V2-split-commits-first-barrier",
+              "barrierId": "V2-split-commits-first-race",
               "participantId": "contender",
-              "transactionId": {
-                "$result": {
-                  "actionId": "contender",
-                  "pointer": "/data/transactionId"
-                }
-              },
-              "point": "afterInitialReadBeforeLocks",
+              "transactionId": "tx-contender",
+              "point": "AFTER_INITIAL_READ_BEFORE_SCOPE_LOCK",
               "state": "REACHED",
               "scope": {
                 "organizationId": {
@@ -197,63 +195,101 @@
         },
         {
           "id": "winner",
-          "kind": "invoke",
-          "actorRef": "warehouse",
-          "route": "api",
-          "capabilityId": "splitQuantity",
-          "request": {
-            "intentKind": "COMMAND",
-            "definitionVersion": "ontology-v1",
+          "kind": "start",
+          "call": {
+            "actorRef": "warehouse",
+            "route": "api",
             "capabilityId": "splitQuantity",
-            "organizationId": {
-              "$alias": "ORG"
-            },
-            "subjectRefs": [
-              {
-                "type": "QuantitySegment",
-                "id": {
-                  "$alias": "A60"
-                }
-              }
-            ],
-            "slots": {
-              "children": [
+            "request": {
+              "intentKind": "COMMAND",
+              "definitionVersion": "ontology-v1",
+              "capabilityId": "splitQuantity",
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "subjectRefs": [
                 {
-                  "value": "40",
+                  "type": "QuantitySegment",
+                  "id": {
+                    "$alias": "A60"
+                  }
+                }
+              ],
+              "slots": {
+                "children": [
+                  {
+                    "value": "40",
+                    "unit": "BOX",
+                    "provenance": "USER"
+                  },
+                  {
+                    "value": "20",
+                    "unit": "BOX",
+                    "provenance": "USER"
+                  }
+                ],
+                "loss": {
+                  "value": "0",
                   "unit": "BOX",
                   "provenance": "USER"
                 },
+                "allocationTransfer": [
+                  {
+                    "allocationId": {
+                      "$alias": "ALLOC"
+                    },
+                    "childIndex": 0
+                  }
+                ]
+              },
+              "expectedRevision": 1,
+              "commandIdempotencyKey": "V2-split-commits-first-winner",
+              "evidenceRefs": [
                 {
-                  "value": "20",
-                  "unit": "BOX",
-                  "provenance": "USER"
+                  "$alias": "operation-proof"
                 }
               ],
-              "loss": {
-                "value": "0",
-                "unit": "BOX",
-                "provenance": "USER"
-              },
-              "allocationTransfer": [
-                {
-                  "allocationId": {
-                    "$alias": "ALLOC"
-                  },
-                  "childIndex": 0
-                }
-              ]
+              "valueProvenance": "USER",
+              "testTransactionId": "tx-winner",
+              "testParticipantId": "winner",
+              "testBarrierId": "V2-split-commits-first-race",
+              "testBarrierPoint": "AFTER_SCOPE_LOCK"
             },
-            "expectedRevision": 1,
-            "commandIdempotencyKey": "V2-split-commits-first-winner",
+            "id": "winner-call",
+            "kind": "invoke",
             "evidenceRefs": [
-              {
-                "$alias": "operation-proof"
-              }
-            ],
-            "valueProvenance": "USER"
+              "winner-call:actual-adapter-artifact"
+            ]
           },
           "evidenceRefs": [
             "winner:actual-adapter-artifact"
+          ]
+        },
+        {
+          "id": "winner-reached",
+          "kind": "control",
+          "control": {
+            "type": "barrier",
+            "operation": "waitReached",
+            "parameters": {
+              "barrierId": "V2-split-commits-first-race",
+              "participantId": "winner",
+              "transactionId": "tx-winner",
+              "point": "AFTER_SCOPE_LOCK",
+              "state": "REACHED",
+              "scope": {
+                "organizationId": {
+                  "$alias": "ORG"
+                },
+                "itemId": {
+                  "$alias": "P"
+                },
+                "caseKey": "V2-split-commits-first"
+              }
+            }
+          },
+          "evidenceRefs": [
+            "winner-reached:actual-adapter-artifact"
           ]
         },
         {
@@ -263,15 +299,10 @@
             "type": "barrier",
             "operation": "resume",
             "parameters": {
-              "barrierId": "V2-split-commits-first-barrier",
+              "barrierId": "V2-split-commits-first-race",
               "participantId": "contender",
-              "transactionId": {
-                "$result": {
-                  "actionId": "contender",
-                  "pointer": "/data/transactionId"
-                }
-              },
-              "point": "afterInitialReadBeforeLocks",
+              "transactionId": "tx-contender",
+              "point": "AFTER_INITIAL_READ_BEFORE_SCOPE_LOCK",
               "state": "RESUMED",
               "scope": {
                 "organizationId": {
@@ -286,6 +317,92 @@
           },
           "evidenceRefs": [
             "resume:actual-adapter-artifact"
+          ]
+        },
+        {
+          "id": "contender-waits",
+          "kind": "observe",
+          "observation": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseKey": "V2-split-commits-first",
+              "segmentId": {
+                "$alias": "A60"
+              },
+              "lockProbe": {
+                "holderTransactionId": {
+                  "$result": {
+                    "actionId": "winner-reached",
+                    "pointer": "/data/database/transactionId"
+                  }
+                },
+                "waiterTransactionId": {
+                  "$result": {
+                    "actionId": "reached",
+                    "pointer": "/data/database/transactionId"
+                  }
+                },
+                "databaseCatalogs": [
+                  "pg_catalog.pg_locks",
+                  "pg_catalog.pg_stat_activity",
+                  "pg_catalog.pg_blocking_pids"
+                ],
+                "readOnly": true,
+                "waitUntil": "DATABASE_LOCK_WAIT",
+                "timeoutSeconds": 30
+              }
+            },
+            "snapshotRef": "CURRENT_LOCK_WAIT",
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z",
+            "sources": [
+              "lockWaits",
+              "databaseTransactions"
+            ]
+          },
+          "evidenceRefs": [
+            "contender-waits:actual-artifact"
+          ]
+        },
+        {
+          "id": "winner-resume",
+          "kind": "control",
+          "control": {
+            "type": "barrier",
+            "operation": "resume",
+            "parameters": {
+              "barrierId": "V2-split-commits-first-race",
+              "participantId": "winner",
+              "transactionId": "tx-winner",
+              "point": "AFTER_SCOPE_LOCK",
+              "state": "RESUMED",
+              "scope": {
+                "organizationId": {
+                  "$alias": "ORG"
+                },
+                "itemId": {
+                  "$alias": "P"
+                },
+                "caseKey": "V2-split-commits-first"
+              }
+            }
+          },
+          "evidenceRefs": [
+            "winner-resume:actual-adapter-artifact"
+          ]
+        },
+        {
+          "id": "winner-terminal",
+          "kind": "await",
+          "awaitActionId": "winner",
+          "timeoutSeconds": 30,
+          "evidenceRefs": [
+            "winner-terminal:actual-adapter-artifact"
           ]
         },
         {
@@ -339,6 +456,20 @@
               "transactionCommandKeys": [
                 "V2-split-commits-first-contender-call",
                 "V2-split-commits-first-winner"
+              ],
+              "transactionIds": [
+                {
+                  "$result": {
+                    "actionId": "reached",
+                    "pointer": "/data/database/transactionId"
+                  }
+                },
+                {
+                  "$result": {
+                    "actionId": "winner-reached",
+                    "pointer": "/data/database/transactionId"
+                  }
+                }
               ]
             },
             "snapshotRef": {
@@ -372,7 +503,9 @@
               "retryAttempts",
               "dbPrivileges",
               "boundaries",
-              "transactions"
+              "transactions",
+              "lockEvidence",
+              "lockRevalidations"
             ]
           },
           "evidenceRefs": [
@@ -489,12 +622,12 @@
                 "provenance": "USER"
               },
               "orderLineId": {
-                "$alias": "ORDER"
+                "$alias": "ORDER2"
               }
             },
             "expectedRevision": {
               "$result": {
-                "actionId": "winner",
+                "actionId": "winner-terminal",
                 "pointer": "/response/revision"
               }
             },
@@ -552,6 +685,20 @@
               "transactionCommandKeys": [
                 "V2-split-commits-first-contender-call",
                 "V2-split-commits-first-winner"
+              ],
+              "transactionIds": [
+                {
+                  "$result": {
+                    "actionId": "reached",
+                    "pointer": "/data/database/transactionId"
+                  }
+                },
+                {
+                  "$result": {
+                    "actionId": "winner-reached",
+                    "pointer": "/data/database/transactionId"
+                  }
+                }
               ]
             },
             "snapshotRef": {
@@ -585,7 +732,9 @@
               "retryAttempts",
               "dbPrivileges",
               "boundaries",
-              "transactions"
+              "transactions",
+              "lockEvidence",
+              "lockRevalidations"
             ]
           },
           "evidenceRefs": [
@@ -598,7 +747,7 @@
           "id": "allocation-transfer-1",
           "op": "equals",
           "source": {
-            "actionId": "winner",
+            "actionId": "winner-terminal",
             "pointer": "/response/outcome"
           },
           "expected": "APPLIED",
@@ -661,7 +810,7 @@
           "op": "equals",
           "source": {
             "actionId": "terminal",
-            "pointer": "/response/errorCode"
+            "pointer": "/response/error/code"
           },
           "expected": "STALE_REVISION",
           "requirementRefs": [
@@ -816,6 +965,54 @@
           }
         },
         {
+          "id": "new-demand-promise-20",
+          "op": "sumEquals",
+          "source": {
+            "actionId": "after-db",
+            "pointer": "/data/rawRows/obligations",
+            "where": {
+              "rootId": {
+                "$alias": "PROMISE2"
+              }
+            },
+            "field": "quantity"
+          },
+          "expected": "20",
+          "requirementRefs": [
+            "D17"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseKey": "V2-split-commits-first"
+          },
+          "evidenceRefs": [
+            "after-db:actual-adapter-artifact"
+          ],
+          "unit": "BOX",
+          "unitSource": {
+            "actionId": "after-db",
+            "pointer": "/data/rawRows/obligations",
+            "where": {
+              "rootId": {
+                "$alias": "PROMISE2"
+              }
+            },
+            "field": "unit"
+          },
+          "oracleExplanation": "신규 주문 ORDER2의 약속20은 기존 약속40과 별도 root로 보존된다.",
+          "oracleRef": {
+            "oracleId": "V2.split-reserve-race",
+            "observationNames": [
+              "existing-obligation"
+            ]
+          }
+        },
+        {
           "id": "new-executable-reservation-7",
           "op": "decimalAtMost",
           "source": {
@@ -884,6 +1081,42 @@
             "observationNames": [
               "new-executable-reservation"
             ]
+          }
+        },
+        {
+          "id": "new-executable-reservation-api-exact",
+          "op": "decimalEquals",
+          "source": {
+            "actionId": "after-api",
+            "pointer": "/response/data/newExecutableReservationQuantity"
+          },
+          "expected": "0",
+          "requirementRefs": [
+            "D17"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseKey": "V2-split-commits-first"
+          },
+          "evidenceRefs": [
+            "after-api:actual-adapter-artifact"
+          ],
+          "oracleExplanation": "API 신규 실행 예약은 DB 원 행과 같은 0이다.",
+          "oracleRef": {
+            "oracleId": "V2.split-reserve-race",
+            "observationNames": [
+              "new-executable-reservation"
+            ]
+          },
+          "unit": "BOX",
+          "unitSource": {
+            "actionId": "after-api",
+            "pointer": "/response/data/unit"
           }
         },
         {
@@ -966,6 +1199,42 @@
               "active": true
             },
             "field": "unit"
+          }
+        },
+        {
+          "id": "all-executable-reservations-api-exact",
+          "op": "decimalEquals",
+          "source": {
+            "actionId": "after-api",
+            "pointer": "/response/data/executableReservedQuantity"
+          },
+          "expected": "40",
+          "requirementRefs": [
+            "D17"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseKey": "V2-split-commits-first"
+          },
+          "evidenceRefs": [
+            "after-api:actual-adapter-artifact"
+          ],
+          "oracleExplanation": "API 실행 예약 합계는 같은 snapshot의 DB EXECUTABLE 합계 40과 정확히 같다. 상한만으로는 이중 합산이나 유실을 잡지 못한다(AGENTS.md 명사/동사 동일 수량).",
+          "oracleRef": {
+            "oracleId": "V2.split-reserve-race",
+            "observationNames": [
+              "all-executable-reservations"
+            ]
+          },
+          "unit": "BOX",
+          "unitSource": {
+            "actionId": "after-api",
+            "pointer": "/response/data/unit"
           }
         },
         {
@@ -1205,7 +1474,7 @@
               },
               {
                 "$result": {
-                  "actionId": "winner",
+                  "actionId": "winner-terminal",
                   "pointer": "/response/children/0/segmentId"
                 }
               },
@@ -1312,48 +1581,12 @@
             },
             "caseKey": "V2-split-commits-first"
           },
-          "oracleExplanation": "실제 첫 read 뒤 두 번째 거래를 commit하기 전 barrier reached ACK다.",
+          "oracleExplanation": "contender는 초기 read 뒤 scope lock 전에 실제로 멈췄다(barrier reached ACK).",
           "oracleRef": {
             "oracleId": "V2.split-reserve-race",
             "observationNames": [
               "allocation-transfer"
             ]
-          }
-        },
-        {
-          "id": "allocation-transfer-22",
-          "op": "sameAs",
-          "source": {
-            "actionId": "reached",
-            "pointer": "/data/transactionId"
-          },
-          "expected": true,
-          "requirementRefs": [
-            "D17"
-          ],
-          "evidenceRefs": [
-            "reached:actual-adapter-artifact",
-            "terminal:actual-adapter-artifact"
-          ],
-          "scope": {
-            "organizationId": {
-              "$alias": "ORG"
-            },
-            "itemId": {
-              "$alias": "P"
-            },
-            "caseKey": "V2-split-commits-first"
-          },
-          "oracleExplanation": "barrier와 terminal await는 같은 contender transaction을 관찰한다.",
-          "oracleRef": {
-            "oracleId": "V2.split-reserve-race",
-            "observationNames": [
-              "allocation-transfer"
-            ]
-          },
-          "baseline": {
-            "actionId": "terminal",
-            "pointer": "/data/transactionId"
           }
         },
         {
@@ -1388,6 +1621,370 @@
           }
         },
         {
+          "id": "race-contender-initial-scope",
+          "op": "equals",
+          "source": {
+            "actionId": "reached",
+            "pointer": "/data/initialRead/scopeId"
+          },
+          "expected": {
+            "$alias": "A60"
+          },
+          "requirementRefs": [
+            "D17"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseKey": "V2-split-commits-first"
+          },
+          "evidenceRefs": [
+            "reached:actual-adapter-artifact"
+          ],
+          "oracleExplanation": "contender의 barrier ACK는 일시정지 전에 실제로 읽은 초기 관점(대상·revision 또는 적격량)과 실제 PostgreSQL transaction 식별자를 artifact와 함께 보고한다. 초기 read 없이 멈춘 hook은 이 관점을 보일 수 없다(race-observation-contract.md).",
+          "oracleRef": {
+            "oracleId": "V2.split-reserve-race",
+            "observationNames": [
+              "allocation-transfer"
+            ]
+          }
+        },
+        {
+          "id": "race-contender-initial-revision",
+          "op": "equals",
+          "source": {
+            "actionId": "reached",
+            "pointer": "/data/initialRead/revision"
+          },
+          "expected": 1,
+          "requirementRefs": [
+            "D17"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseKey": "V2-split-commits-first"
+          },
+          "evidenceRefs": [
+            "reached:actual-adapter-artifact"
+          ],
+          "oracleExplanation": "contender의 barrier ACK는 일시정지 전에 실제로 읽은 초기 관점(대상·revision 또는 적격량)과 실제 PostgreSQL transaction 식별자를 artifact와 함께 보고한다. 초기 read 없이 멈춘 hook은 이 관점을 보일 수 없다(race-observation-contract.md).",
+          "oracleRef": {
+            "oracleId": "V2.split-reserve-race",
+            "observationNames": [
+              "allocation-transfer"
+            ]
+          }
+        },
+        {
+          "id": "race-contender-waits-on-winner-lock",
+          "op": "relationSet",
+          "source": {
+            "actionId": "contender-waits",
+            "pointer": "/data/rawRows/lockWaits",
+            "field": [
+              "scopeId",
+              "transactionId",
+              "blockingTransactionId",
+              "granted",
+              "holderGranted",
+              "waitEventType",
+              "source"
+            ]
+          },
+          "expected": [
+            [
+              {
+                "$alias": "A60"
+              },
+              {
+                "$result": {
+                  "actionId": "reached",
+                  "pointer": "/data/database/transactionId"
+                }
+              },
+              {
+                "$result": {
+                  "actionId": "winner-reached",
+                  "pointer": "/data/database/transactionId"
+                }
+              },
+              false,
+              true,
+              "Lock",
+              "pg_catalog"
+            ]
+          ],
+          "requirementRefs": [
+            "D17"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseKey": "V2-split-commits-first"
+          },
+          "evidenceRefs": [
+            "contender-waits:actual-artifact"
+          ],
+          "oracleExplanation": "winner가 scope lock을 잡고 commit 전 멈춘 동안 재개된 contender는 같은 scope lock에서 실제로 기다린다. 독립 read-only connection이 pg_locks·pg_stat_activity·pg_blocking_pids로 이를 관찰한 뒤에만 winner를 놓는다. 순차 실행이나 hook 위치 오류는 이 WAIT를 만들 수 없다(계획 §4.2, V8 lock 계약).",
+          "oracleRef": {
+            "oracleId": "V2.split-reserve-race",
+            "observationNames": [
+              "allocation-transfer"
+            ]
+          }
+        },
+        {
+          "id": "race-both-transactions-open-at-wait",
+          "op": "relationSet",
+          "source": {
+            "actionId": "contender-waits",
+            "pointer": "/data/rawRows/databaseTransactions",
+            "field": [
+              "transactionId",
+              "status",
+              "lockState"
+            ]
+          },
+          "expected": [
+            [
+              {
+                "$result": {
+                  "actionId": "winner-reached",
+                  "pointer": "/data/database/transactionId"
+                }
+              },
+              "OPEN",
+              "HOLDING_SCOPE_LOCK"
+            ],
+            [
+              {
+                "$result": {
+                  "actionId": "reached",
+                  "pointer": "/data/database/transactionId"
+                }
+              },
+              "OPEN",
+              "WAITING_SCOPE_LOCK"
+            ]
+          ],
+          "requirementRefs": [
+            "D17"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseKey": "V2-split-commits-first"
+          },
+          "evidenceRefs": [
+            "contender-waits:actual-artifact"
+          ],
+          "oracleExplanation": "winner가 scope lock을 잡고 commit 전 멈춘 동안 재개된 contender는 같은 scope lock에서 실제로 기다린다. 독립 read-only connection이 pg_locks·pg_stat_activity·pg_blocking_pids로 이를 관찰한 뒤에만 winner를 놓는다. 순차 실행이나 hook 위치 오류는 이 WAIT를 만들 수 없다(계획 §4.2, V8 lock 계약). 이 시점 두 transaction은 모두 OPEN이므로 contender의 초기 read는 winner commit 전에 시작된 같은 transaction 안에 있다.",
+          "oracleRef": {
+            "oracleId": "V2.split-reserve-race",
+            "observationNames": [
+              "allocation-transfer"
+            ]
+          }
+        },
+        {
+          "id": "race-distinct-db-transactions",
+          "op": "notEquals",
+          "source": {
+            "actionId": "reached",
+            "pointer": "/data/database/transactionId"
+          },
+          "expected": {
+            "$result": {
+              "actionId": "winner-reached",
+              "pointer": "/data/database/transactionId"
+            }
+          },
+          "requirementRefs": [
+            "D17"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseKey": "V2-split-commits-first"
+          },
+          "evidenceRefs": [
+            "reached:actual-adapter-artifact",
+            "winner-reached:actual-adapter-artifact"
+          ],
+          "oracleExplanation": "두 참가자는 서로 다른 실제 DB transaction이다.",
+          "oracleRef": {
+            "oracleId": "V2.split-reserve-race",
+            "observationNames": [
+              "allocation-transfer"
+            ]
+          }
+        },
+        {
+          "id": "race-winner-reached-after-lock",
+          "op": "equals",
+          "source": {
+            "actionId": "winner-reached",
+            "pointer": "/data/state"
+          },
+          "expected": "REACHED",
+          "requirementRefs": [
+            "D17"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseKey": "V2-split-commits-first"
+          },
+          "evidenceRefs": [
+            "winner-reached:actual-adapter-artifact"
+          ],
+          "oracleExplanation": "winner는 scope lock 획득 뒤 commit 전 지점에 실제로 멈췄다.",
+          "oracleRef": {
+            "oracleId": "V2.split-reserve-race",
+            "observationNames": [
+              "allocation-transfer"
+            ]
+          }
+        },
+        {
+          "id": "race-contender-revalidated-after-lock",
+          "op": "relationSet",
+          "source": {
+            "actionId": "raced-db",
+            "pointer": "/data/rawRows/lockRevalidations",
+            "where": {
+              "transactionId": {
+                "$result": {
+                  "actionId": "reached",
+                  "pointer": "/data/database/transactionId"
+                }
+              }
+            },
+            "field": [
+              "scopeId",
+              "transactionId",
+              "requestedRevision",
+              "point",
+              "result"
+            ]
+          },
+          "expected": [
+            [
+              {
+                "$alias": "A60"
+              },
+              {
+                "$result": {
+                  "actionId": "reached",
+                  "pointer": "/data/database/transactionId"
+                }
+              },
+              1,
+              "AFTER_SCOPE_LOCK",
+              "STALE_REVISION"
+            ]
+          ],
+          "requirementRefs": [
+            "D17"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseKey": "V2-split-commits-first"
+          },
+          "evidenceRefs": [
+            "raced-db:actual-adapter-artifact"
+          ],
+          "oracleExplanation": "contender는 lock을 얻은 뒤 현재 상태를 다시 읽고 결정한다. 재검증 trace는 실제 application transaction의 SQL/CQN으로 기록하며 오류 응답에서 만들지 않는다(계획 §4.2 lock 뒤 재조회).",
+          "oracleRef": {
+            "oracleId": "V2.split-reserve-race",
+            "observationNames": [
+              "allocation-transfer"
+            ]
+          }
+        },
+        {
+          "id": "race-split-lock-reread-revision2",
+          "op": "relationSet",
+          "source": {
+            "actionId": "raced-db",
+            "pointer": "/data/rawRows/lockRevalidations",
+            "where": {
+              "transactionId": {
+                "$result": {
+                  "actionId": "reached",
+                  "pointer": "/data/database/transactionId"
+                }
+              }
+            },
+            "field": [
+              "scopeId",
+              "lockedRevision",
+              "requestedRevision"
+            ]
+          },
+          "expected": [
+            [
+              {
+                "$alias": "A60"
+              },
+              2,
+              1
+            ]
+          ],
+          "requirementRefs": [
+            "D17"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseKey": "V2-split-commits-first"
+          },
+          "evidenceRefs": [
+            "raced-db:actual-adapter-artifact"
+          ],
+          "oracleExplanation": "split 한 거래가 A60을 retired로 바꿔 revision1→2가 된다. contender는 lock 뒤 2를 읽고 요청 revision1과 비교해 STALE_REVISION을 낸다(V8 lock 계약과 같은 재검증).",
+          "oracleRef": {
+            "oracleId": "V2.split-reserve-race",
+            "observationNames": [
+              "allocation-transfer"
+            ]
+          }
+        },
+        {
           "id": "genuine-two-transactions",
           "op": "count",
           "source": {
@@ -1399,7 +1996,7 @@
             "D17"
           ],
           "evidenceRefs": [
-            "winner:actual-adapter-artifact"
+            "raced-db:actual-adapter-artifact"
           ],
           "scope": {
             "organizationId": {
@@ -1410,7 +2007,7 @@
             },
             "caseKey": "V2-split-commits-first"
           },
-          "oracleExplanation": "독립 DB transaction 원 행이 contender와 winner 각 하나씩이다. command ID로 거래 증거를 대신하지 않는다.",
+          "oracleExplanation": "독립 DB transaction 원 행이 contender와 winner 각 하나씩이다. command ID로 거래 증거를 대신하지 않는다. application 원장의 거래 행은 보조 증거이며 경합 증거는 contender-waits의 pg_catalog 관찰이다.",
           "oracleRef": {
             "oracleId": "V2.split-reserve-race",
             "observationNames": [
@@ -1431,7 +2028,7 @@
             "D17"
           ],
           "evidenceRefs": [
-            "winner:actual-adapter-artifact"
+            "raced-db:actual-adapter-artifact"
           ],
           "scope": {
             "organizationId": {
@@ -1442,7 +2039,7 @@
             },
             "caseKey": "V2-split-commits-first"
           },
-          "oracleExplanation": "서로 다른 실제 DB transaction ID가 중복되지 않는다.",
+          "oracleExplanation": "서로 다른 실제 DB transaction ID가 중복되지 않는다. application 원장의 거래 행은 보조 증거이며 경합 증거는 contender-waits의 pg_catalog 관찰이다.",
           "oracleRef": {
             "oracleId": "V2.split-reserve-race",
             "observationNames": [
@@ -1466,7 +2063,7 @@
             "D17"
           ],
           "evidenceRefs": [
-            "winner:actual-adapter-artifact"
+            "raced-db:actual-adapter-artifact"
           ],
           "scope": {
             "organizationId": {
@@ -1477,7 +2074,7 @@
             },
             "caseKey": "V2-split-commits-first"
           },
-          "oracleExplanation": "실제 거래는 분할과 예약 각각이며 mock lock이나 제출 ACK만으로 대신하지 않는다.",
+          "oracleExplanation": "실제 거래는 분할과 예약 각각이며 mock lock이나 제출 ACK만으로 대신하지 않는다. application 원장의 거래 행은 보조 증거이며 경합 증거는 contender-waits의 pg_catalog 관찰이다.",
           "oracleRef": {
             "oracleId": "V2.split-reserve-race",
             "observationNames": [
@@ -1599,7 +2196,7 @@
           }
         }
       ],
-      "oracleExplanation": "실물60/기존 약속40은 보존된다. 신규20 경합은20 이하이며 기존 배분은 한 번만 자식으로 이관한다. stale contender는 revision conflict이고 explicit fresh split은 별도 명령이다."
+      "oracleExplanation": "실물60/기존 약속40은 보존되고 신규 주문 ORDER2의 실행 배분은 20 이하다. 기존 배분은 한 번만 자식으로 이관한다. contender는 초기 read 뒤 멈추고, winner가 같은 scope lock을 잡은 채 멈춘 동안 재개돼 그 lock에서 실제로 기다린다. winner commit 뒤 contender는 lock 아래에서 revision을 다시 읽어 CONFLICT/STALE_REVISION이다. explicit fresh split은 별도 명령이다."
     },
     {
       "id": "reserve-commits-first",
@@ -1751,8 +2348,7 @@
                     },
                     "childIndex": 0
                   }
-                ],
-                "testBarrier": "afterInitialReadBeforeLocks"
+                ]
               },
               "expectedRevision": 1,
               "commandIdempotencyKey": "V2-reserve-commits-first-contender-call",
@@ -1761,7 +2357,11 @@
                   "$alias": "operation-proof"
                 }
               ],
-              "valueProvenance": "USER"
+              "valueProvenance": "USER",
+              "testTransactionId": "tx-contender",
+              "testParticipantId": "contender",
+              "testBarrierId": "V2-reserve-commits-first-race",
+              "testBarrierPoint": "AFTER_INITIAL_READ_BEFORE_SCOPE_LOCK"
             },
             "evidenceRefs": [
               "contender-call:actual-adapter-artifact"
@@ -1778,15 +2378,10 @@
             "type": "barrier",
             "operation": "waitReached",
             "parameters": {
-              "barrierId": "V2-reserve-commits-first-barrier",
+              "barrierId": "V2-reserve-commits-first-race",
               "participantId": "contender",
-              "transactionId": {
-                "$result": {
-                  "actionId": "contender",
-                  "pointer": "/data/transactionId"
-                }
-              },
-              "point": "afterInitialReadBeforeLocks",
+              "transactionId": "tx-contender",
+              "point": "AFTER_INITIAL_READ_BEFORE_SCOPE_LOCK",
               "state": "REACHED",
               "scope": {
                 "organizationId": {
@@ -1805,46 +2400,84 @@
         },
         {
           "id": "winner",
-          "kind": "invoke",
-          "actorRef": "sales",
-          "route": "api",
-          "capabilityId": "reserveQuantity",
-          "request": {
-            "intentKind": "COMMAND",
-            "definitionVersion": "ontology-v1",
+          "kind": "start",
+          "call": {
+            "actorRef": "sales",
+            "route": "api",
             "capabilityId": "reserveQuantity",
-            "organizationId": {
-              "$alias": "ORG"
-            },
-            "subjectRefs": [
-              {
-                "type": "QuantitySegment",
-                "id": {
-                  "$alias": "A60"
-                }
-              }
-            ],
-            "slots": {
-              "quantity": {
-                "value": "20",
-                "unit": "BOX",
-                "provenance": "USER"
+            "request": {
+              "intentKind": "COMMAND",
+              "definitionVersion": "ontology-v1",
+              "capabilityId": "reserveQuantity",
+              "organizationId": {
+                "$alias": "ORG"
               },
-              "orderLineId": {
-                "$alias": "ORDER"
-              }
+              "subjectRefs": [
+                {
+                  "type": "QuantitySegment",
+                  "id": {
+                    "$alias": "A60"
+                  }
+                }
+              ],
+              "slots": {
+                "quantity": {
+                  "value": "20",
+                  "unit": "BOX",
+                  "provenance": "USER"
+                },
+                "orderLineId": {
+                  "$alias": "ORDER2"
+                }
+              },
+              "expectedRevision": 1,
+              "commandIdempotencyKey": "V2-reserve-commits-first-winner",
+              "evidenceRefs": [
+                {
+                  "$alias": "operation-proof"
+                }
+              ],
+              "valueProvenance": "USER",
+              "testTransactionId": "tx-winner",
+              "testParticipantId": "winner",
+              "testBarrierId": "V2-reserve-commits-first-race",
+              "testBarrierPoint": "AFTER_SCOPE_LOCK"
             },
-            "expectedRevision": 1,
-            "commandIdempotencyKey": "V2-reserve-commits-first-winner",
+            "id": "winner-call",
+            "kind": "invoke",
             "evidenceRefs": [
-              {
-                "$alias": "operation-proof"
-              }
-            ],
-            "valueProvenance": "USER"
+              "winner-call:actual-adapter-artifact"
+            ]
           },
           "evidenceRefs": [
             "winner:actual-adapter-artifact"
+          ]
+        },
+        {
+          "id": "winner-reached",
+          "kind": "control",
+          "control": {
+            "type": "barrier",
+            "operation": "waitReached",
+            "parameters": {
+              "barrierId": "V2-reserve-commits-first-race",
+              "participantId": "winner",
+              "transactionId": "tx-winner",
+              "point": "AFTER_SCOPE_LOCK",
+              "state": "REACHED",
+              "scope": {
+                "organizationId": {
+                  "$alias": "ORG"
+                },
+                "itemId": {
+                  "$alias": "P"
+                },
+                "caseKey": "V2-reserve-commits-first"
+              }
+            }
+          },
+          "evidenceRefs": [
+            "winner-reached:actual-adapter-artifact"
           ]
         },
         {
@@ -1854,15 +2487,10 @@
             "type": "barrier",
             "operation": "resume",
             "parameters": {
-              "barrierId": "V2-reserve-commits-first-barrier",
+              "barrierId": "V2-reserve-commits-first-race",
               "participantId": "contender",
-              "transactionId": {
-                "$result": {
-                  "actionId": "contender",
-                  "pointer": "/data/transactionId"
-                }
-              },
-              "point": "afterInitialReadBeforeLocks",
+              "transactionId": "tx-contender",
+              "point": "AFTER_INITIAL_READ_BEFORE_SCOPE_LOCK",
               "state": "RESUMED",
               "scope": {
                 "organizationId": {
@@ -1877,6 +2505,92 @@
           },
           "evidenceRefs": [
             "resume:actual-adapter-artifact"
+          ]
+        },
+        {
+          "id": "contender-waits",
+          "kind": "observe",
+          "observation": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseKey": "V2-reserve-commits-first",
+              "segmentId": {
+                "$alias": "A60"
+              },
+              "lockProbe": {
+                "holderTransactionId": {
+                  "$result": {
+                    "actionId": "winner-reached",
+                    "pointer": "/data/database/transactionId"
+                  }
+                },
+                "waiterTransactionId": {
+                  "$result": {
+                    "actionId": "reached",
+                    "pointer": "/data/database/transactionId"
+                  }
+                },
+                "databaseCatalogs": [
+                  "pg_catalog.pg_locks",
+                  "pg_catalog.pg_stat_activity",
+                  "pg_catalog.pg_blocking_pids"
+                ],
+                "readOnly": true,
+                "waitUntil": "DATABASE_LOCK_WAIT",
+                "timeoutSeconds": 30
+              }
+            },
+            "snapshotRef": "CURRENT_LOCK_WAIT",
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z",
+            "sources": [
+              "lockWaits",
+              "databaseTransactions"
+            ]
+          },
+          "evidenceRefs": [
+            "contender-waits:actual-artifact"
+          ]
+        },
+        {
+          "id": "winner-resume",
+          "kind": "control",
+          "control": {
+            "type": "barrier",
+            "operation": "resume",
+            "parameters": {
+              "barrierId": "V2-reserve-commits-first-race",
+              "participantId": "winner",
+              "transactionId": "tx-winner",
+              "point": "AFTER_SCOPE_LOCK",
+              "state": "RESUMED",
+              "scope": {
+                "organizationId": {
+                  "$alias": "ORG"
+                },
+                "itemId": {
+                  "$alias": "P"
+                },
+                "caseKey": "V2-reserve-commits-first"
+              }
+            }
+          },
+          "evidenceRefs": [
+            "winner-resume:actual-adapter-artifact"
+          ]
+        },
+        {
+          "id": "winner-terminal",
+          "kind": "await",
+          "awaitActionId": "winner",
+          "timeoutSeconds": 30,
+          "evidenceRefs": [
+            "winner-terminal:actual-adapter-artifact"
           ]
         },
         {
@@ -1930,6 +2644,20 @@
               "transactionCommandKeys": [
                 "V2-reserve-commits-first-contender-call",
                 "V2-reserve-commits-first-winner"
+              ],
+              "transactionIds": [
+                {
+                  "$result": {
+                    "actionId": "reached",
+                    "pointer": "/data/database/transactionId"
+                  }
+                },
+                {
+                  "$result": {
+                    "actionId": "winner-reached",
+                    "pointer": "/data/database/transactionId"
+                  }
+                }
               ]
             },
             "snapshotRef": {
@@ -1963,7 +2691,9 @@
               "retryAttempts",
               "dbPrivileges",
               "boundaries",
-              "transactions"
+              "transactions",
+              "lockEvidence",
+              "lockRevalidations"
             ]
           },
           "evidenceRefs": [
@@ -2019,7 +2749,7 @@
                 {
                   "allocationId": {
                     "$result": {
-                      "actionId": "winner",
+                      "actionId": "winner-terminal",
                       "pointer": "/response/allocationId"
                     }
                   },
@@ -2029,7 +2759,7 @@
             },
             "expectedRevision": {
               "$result": {
-                "actionId": "winner",
+                "actionId": "winner-terminal",
                 "pointer": "/response/revision"
               }
             },
@@ -2218,6 +2948,20 @@
               "transactionCommandKeys": [
                 "V2-reserve-commits-first-contender-call",
                 "V2-reserve-commits-first-winner"
+              ],
+              "transactionIds": [
+                {
+                  "$result": {
+                    "actionId": "reached",
+                    "pointer": "/data/database/transactionId"
+                  }
+                },
+                {
+                  "$result": {
+                    "actionId": "winner-reached",
+                    "pointer": "/data/database/transactionId"
+                  }
+                }
               ]
             },
             "snapshotRef": {
@@ -2251,7 +2995,9 @@
               "retryAttempts",
               "dbPrivileges",
               "boundaries",
-              "transactions"
+              "transactions",
+              "lockEvidence",
+              "lockRevalidations"
             ]
           },
           "evidenceRefs": [
@@ -2264,7 +3010,7 @@
           "id": "allocation-transfer-1",
           "op": "equals",
           "source": {
-            "actionId": "winner",
+            "actionId": "winner-terminal",
             "pointer": "/response/outcome"
           },
           "expected": "APPLIED",
@@ -2327,7 +3073,7 @@
           "op": "equals",
           "source": {
             "actionId": "terminal",
-            "pointer": "/response/errorCode"
+            "pointer": "/response/error/code"
           },
           "expected": "STALE_REVISION",
           "requirementRefs": [
@@ -2482,6 +3228,54 @@
           }
         },
         {
+          "id": "new-demand-promise-20",
+          "op": "sumEquals",
+          "source": {
+            "actionId": "after-db",
+            "pointer": "/data/rawRows/obligations",
+            "where": {
+              "rootId": {
+                "$alias": "PROMISE2"
+              }
+            },
+            "field": "quantity"
+          },
+          "expected": "20",
+          "requirementRefs": [
+            "D17"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseKey": "V2-reserve-commits-first"
+          },
+          "evidenceRefs": [
+            "after-db:actual-adapter-artifact"
+          ],
+          "unit": "BOX",
+          "unitSource": {
+            "actionId": "after-db",
+            "pointer": "/data/rawRows/obligations",
+            "where": {
+              "rootId": {
+                "$alias": "PROMISE2"
+              }
+            },
+            "field": "unit"
+          },
+          "oracleExplanation": "신규 주문 ORDER2의 약속20은 기존 약속40과 별도 root로 보존된다.",
+          "oracleRef": {
+            "oracleId": "V2.split-reserve-race",
+            "observationNames": [
+              "existing-obligation"
+            ]
+          }
+        },
+        {
           "id": "new-executable-reservation-7",
           "op": "decimalAtMost",
           "source": {
@@ -2526,10 +3320,12 @@
             "where": {
               "rootId": {
                 "$result": {
-                  "actionId": "winner",
+                  "actionId": "winner-terminal",
                   "pointer": "/response/allocationId"
                 }
-              }
+              },
+              "active": true,
+              "state": "EXECUTABLE"
             },
             "field": "quantity"
           },
@@ -2549,7 +3345,7 @@
             },
             "caseKey": "V2-reserve-commits-first"
           },
-          "oracleExplanation": "독립 원 행을 해당 범위에서 합산하며 부모와 자식을 이중 합산하지 않는다.",
+          "oracleExplanation": "신규 예약20은 별도 주문 ORDER2의 현재 EXECUTABLE 배분 한 번이다. 명시 분할로 자식에 이관된 뒤 비활성 이력 행을 더하지 않는다(계획 §6 대체+원배분 비활성).",
           "oracleRef": {
             "oracleId": "V2.split-reserve-race",
             "observationNames": [
@@ -2563,12 +3359,50 @@
             "where": {
               "rootId": {
                 "$result": {
-                  "actionId": "winner",
+                  "actionId": "winner-terminal",
                   "pointer": "/response/allocationId"
                 }
-              }
+              },
+              "active": true,
+              "state": "EXECUTABLE"
             },
             "field": "unit"
+          }
+        },
+        {
+          "id": "new-executable-reservation-api-exact",
+          "op": "decimalEquals",
+          "source": {
+            "actionId": "after-api",
+            "pointer": "/response/data/newExecutableReservationQuantity"
+          },
+          "expected": "20",
+          "requirementRefs": [
+            "D17"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseKey": "V2-reserve-commits-first"
+          },
+          "evidenceRefs": [
+            "after-api:actual-adapter-artifact"
+          ],
+          "oracleExplanation": "API 신규 실행 예약은 DB 원 행과 같은 20이다.",
+          "oracleRef": {
+            "oracleId": "V2.split-reserve-race",
+            "observationNames": [
+              "new-executable-reservation"
+            ]
+          },
+          "unit": "BOX",
+          "unitSource": {
+            "actionId": "after-api",
+            "pointer": "/response/data/unit"
           }
         },
         {
@@ -2651,6 +3485,42 @@
               "active": true
             },
             "field": "unit"
+          }
+        },
+        {
+          "id": "all-executable-reservations-api-exact",
+          "op": "decimalEquals",
+          "source": {
+            "actionId": "after-api",
+            "pointer": "/response/data/executableReservedQuantity"
+          },
+          "expected": "60",
+          "requirementRefs": [
+            "D17"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseKey": "V2-reserve-commits-first"
+          },
+          "evidenceRefs": [
+            "after-api:actual-adapter-artifact"
+          ],
+          "oracleExplanation": "API 실행 예약 합계는 같은 snapshot의 DB EXECUTABLE 합계 60과 정확히 같다. 상한만으로는 이중 합산이나 유실을 잡지 못한다(AGENTS.md 명사/동사 동일 수량).",
+          "oracleRef": {
+            "oracleId": "V2.split-reserve-race",
+            "observationNames": [
+              "all-executable-reservations"
+            ]
+          },
+          "unit": "BOX",
+          "unitSource": {
+            "actionId": "after-api",
+            "pointer": "/response/data/unit"
           }
         },
         {
@@ -2997,48 +3867,12 @@
             },
             "caseKey": "V2-reserve-commits-first"
           },
-          "oracleExplanation": "실제 첫 read 뒤 두 번째 거래를 commit하기 전 barrier reached ACK다.",
+          "oracleExplanation": "contender는 초기 read 뒤 scope lock 전에 실제로 멈췄다(barrier reached ACK).",
           "oracleRef": {
             "oracleId": "V2.split-reserve-race",
             "observationNames": [
               "allocation-transfer"
             ]
-          }
-        },
-        {
-          "id": "allocation-transfer-22",
-          "op": "sameAs",
-          "source": {
-            "actionId": "reached",
-            "pointer": "/data/transactionId"
-          },
-          "expected": true,
-          "requirementRefs": [
-            "D17"
-          ],
-          "evidenceRefs": [
-            "reached:actual-adapter-artifact",
-            "terminal:actual-adapter-artifact"
-          ],
-          "scope": {
-            "organizationId": {
-              "$alias": "ORG"
-            },
-            "itemId": {
-              "$alias": "P"
-            },
-            "caseKey": "V2-reserve-commits-first"
-          },
-          "oracleExplanation": "barrier와 terminal await는 같은 contender transaction을 관찰한다.",
-          "oracleRef": {
-            "oracleId": "V2.split-reserve-race",
-            "observationNames": [
-              "allocation-transfer"
-            ]
-          },
-          "baseline": {
-            "actionId": "terminal",
-            "pointer": "/data/transactionId"
           }
         },
         {
@@ -3073,6 +3907,318 @@
           }
         },
         {
+          "id": "race-contender-initial-scope",
+          "op": "equals",
+          "source": {
+            "actionId": "reached",
+            "pointer": "/data/initialRead/scopeId"
+          },
+          "expected": {
+            "$alias": "A60"
+          },
+          "requirementRefs": [
+            "D17"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseKey": "V2-reserve-commits-first"
+          },
+          "evidenceRefs": [
+            "reached:actual-adapter-artifact"
+          ],
+          "oracleExplanation": "contender의 barrier ACK는 일시정지 전에 실제로 읽은 초기 관점(대상·revision 또는 적격량)과 실제 PostgreSQL transaction 식별자를 artifact와 함께 보고한다. 초기 read 없이 멈춘 hook은 이 관점을 보일 수 없다(race-observation-contract.md).",
+          "oracleRef": {
+            "oracleId": "V2.split-reserve-race",
+            "observationNames": [
+              "allocation-transfer"
+            ]
+          }
+        },
+        {
+          "id": "race-contender-initial-revision",
+          "op": "equals",
+          "source": {
+            "actionId": "reached",
+            "pointer": "/data/initialRead/revision"
+          },
+          "expected": 1,
+          "requirementRefs": [
+            "D17"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseKey": "V2-reserve-commits-first"
+          },
+          "evidenceRefs": [
+            "reached:actual-adapter-artifact"
+          ],
+          "oracleExplanation": "contender의 barrier ACK는 일시정지 전에 실제로 읽은 초기 관점(대상·revision 또는 적격량)과 실제 PostgreSQL transaction 식별자를 artifact와 함께 보고한다. 초기 read 없이 멈춘 hook은 이 관점을 보일 수 없다(race-observation-contract.md).",
+          "oracleRef": {
+            "oracleId": "V2.split-reserve-race",
+            "observationNames": [
+              "allocation-transfer"
+            ]
+          }
+        },
+        {
+          "id": "race-contender-waits-on-winner-lock",
+          "op": "relationSet",
+          "source": {
+            "actionId": "contender-waits",
+            "pointer": "/data/rawRows/lockWaits",
+            "field": [
+              "scopeId",
+              "transactionId",
+              "blockingTransactionId",
+              "granted",
+              "holderGranted",
+              "waitEventType",
+              "source"
+            ]
+          },
+          "expected": [
+            [
+              {
+                "$alias": "A60"
+              },
+              {
+                "$result": {
+                  "actionId": "reached",
+                  "pointer": "/data/database/transactionId"
+                }
+              },
+              {
+                "$result": {
+                  "actionId": "winner-reached",
+                  "pointer": "/data/database/transactionId"
+                }
+              },
+              false,
+              true,
+              "Lock",
+              "pg_catalog"
+            ]
+          ],
+          "requirementRefs": [
+            "D17"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseKey": "V2-reserve-commits-first"
+          },
+          "evidenceRefs": [
+            "contender-waits:actual-artifact"
+          ],
+          "oracleExplanation": "winner가 scope lock을 잡고 commit 전 멈춘 동안 재개된 contender는 같은 scope lock에서 실제로 기다린다. 독립 read-only connection이 pg_locks·pg_stat_activity·pg_blocking_pids로 이를 관찰한 뒤에만 winner를 놓는다. 순차 실행이나 hook 위치 오류는 이 WAIT를 만들 수 없다(계획 §4.2, V8 lock 계약).",
+          "oracleRef": {
+            "oracleId": "V2.split-reserve-race",
+            "observationNames": [
+              "allocation-transfer"
+            ]
+          }
+        },
+        {
+          "id": "race-both-transactions-open-at-wait",
+          "op": "relationSet",
+          "source": {
+            "actionId": "contender-waits",
+            "pointer": "/data/rawRows/databaseTransactions",
+            "field": [
+              "transactionId",
+              "status",
+              "lockState"
+            ]
+          },
+          "expected": [
+            [
+              {
+                "$result": {
+                  "actionId": "winner-reached",
+                  "pointer": "/data/database/transactionId"
+                }
+              },
+              "OPEN",
+              "HOLDING_SCOPE_LOCK"
+            ],
+            [
+              {
+                "$result": {
+                  "actionId": "reached",
+                  "pointer": "/data/database/transactionId"
+                }
+              },
+              "OPEN",
+              "WAITING_SCOPE_LOCK"
+            ]
+          ],
+          "requirementRefs": [
+            "D17"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseKey": "V2-reserve-commits-first"
+          },
+          "evidenceRefs": [
+            "contender-waits:actual-artifact"
+          ],
+          "oracleExplanation": "winner가 scope lock을 잡고 commit 전 멈춘 동안 재개된 contender는 같은 scope lock에서 실제로 기다린다. 독립 read-only connection이 pg_locks·pg_stat_activity·pg_blocking_pids로 이를 관찰한 뒤에만 winner를 놓는다. 순차 실행이나 hook 위치 오류는 이 WAIT를 만들 수 없다(계획 §4.2, V8 lock 계약). 이 시점 두 transaction은 모두 OPEN이므로 contender의 초기 read는 winner commit 전에 시작된 같은 transaction 안에 있다.",
+          "oracleRef": {
+            "oracleId": "V2.split-reserve-race",
+            "observationNames": [
+              "allocation-transfer"
+            ]
+          }
+        },
+        {
+          "id": "race-distinct-db-transactions",
+          "op": "notEquals",
+          "source": {
+            "actionId": "reached",
+            "pointer": "/data/database/transactionId"
+          },
+          "expected": {
+            "$result": {
+              "actionId": "winner-reached",
+              "pointer": "/data/database/transactionId"
+            }
+          },
+          "requirementRefs": [
+            "D17"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseKey": "V2-reserve-commits-first"
+          },
+          "evidenceRefs": [
+            "reached:actual-adapter-artifact",
+            "winner-reached:actual-adapter-artifact"
+          ],
+          "oracleExplanation": "두 참가자는 서로 다른 실제 DB transaction이다.",
+          "oracleRef": {
+            "oracleId": "V2.split-reserve-race",
+            "observationNames": [
+              "allocation-transfer"
+            ]
+          }
+        },
+        {
+          "id": "race-winner-reached-after-lock",
+          "op": "equals",
+          "source": {
+            "actionId": "winner-reached",
+            "pointer": "/data/state"
+          },
+          "expected": "REACHED",
+          "requirementRefs": [
+            "D17"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseKey": "V2-reserve-commits-first"
+          },
+          "evidenceRefs": [
+            "winner-reached:actual-adapter-artifact"
+          ],
+          "oracleExplanation": "winner는 scope lock 획득 뒤 commit 전 지점에 실제로 멈췄다.",
+          "oracleRef": {
+            "oracleId": "V2.split-reserve-race",
+            "observationNames": [
+              "allocation-transfer"
+            ]
+          }
+        },
+        {
+          "id": "race-contender-revalidated-after-lock",
+          "op": "relationSet",
+          "source": {
+            "actionId": "raced-db",
+            "pointer": "/data/rawRows/lockRevalidations",
+            "where": {
+              "transactionId": {
+                "$result": {
+                  "actionId": "reached",
+                  "pointer": "/data/database/transactionId"
+                }
+              }
+            },
+            "field": [
+              "scopeId",
+              "transactionId",
+              "requestedRevision",
+              "point",
+              "result"
+            ]
+          },
+          "expected": [
+            [
+              {
+                "$alias": "A60"
+              },
+              {
+                "$result": {
+                  "actionId": "reached",
+                  "pointer": "/data/database/transactionId"
+                }
+              },
+              1,
+              "AFTER_SCOPE_LOCK",
+              "STALE_REVISION"
+            ]
+          ],
+          "requirementRefs": [
+            "D17"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseKey": "V2-reserve-commits-first"
+          },
+          "evidenceRefs": [
+            "raced-db:actual-adapter-artifact"
+          ],
+          "oracleExplanation": "contender는 lock을 얻은 뒤 현재 상태를 다시 읽고 결정한다. 재검증 trace는 실제 application transaction의 SQL/CQN으로 기록하며 오류 응답에서 만들지 않는다(계획 §4.2 lock 뒤 재조회).",
+          "oracleRef": {
+            "oracleId": "V2.split-reserve-race",
+            "observationNames": [
+              "allocation-transfer"
+            ]
+          }
+        },
+        {
           "id": "genuine-two-transactions",
           "op": "count",
           "source": {
@@ -3084,7 +4230,7 @@
             "D17"
           ],
           "evidenceRefs": [
-            "winner:actual-adapter-artifact"
+            "raced-db:actual-adapter-artifact"
           ],
           "scope": {
             "organizationId": {
@@ -3095,7 +4241,7 @@
             },
             "caseKey": "V2-reserve-commits-first"
           },
-          "oracleExplanation": "독립 DB transaction 원 행이 contender와 winner 각 하나씩이다. command ID로 거래 증거를 대신하지 않는다.",
+          "oracleExplanation": "독립 DB transaction 원 행이 contender와 winner 각 하나씩이다. command ID로 거래 증거를 대신하지 않는다. application 원장의 거래 행은 보조 증거이며 경합 증거는 contender-waits의 pg_catalog 관찰이다.",
           "oracleRef": {
             "oracleId": "V2.split-reserve-race",
             "observationNames": [
@@ -3116,7 +4262,7 @@
             "D17"
           ],
           "evidenceRefs": [
-            "winner:actual-adapter-artifact"
+            "raced-db:actual-adapter-artifact"
           ],
           "scope": {
             "organizationId": {
@@ -3127,7 +4273,7 @@
             },
             "caseKey": "V2-reserve-commits-first"
           },
-          "oracleExplanation": "서로 다른 실제 DB transaction ID가 중복되지 않는다.",
+          "oracleExplanation": "서로 다른 실제 DB transaction ID가 중복되지 않는다. application 원장의 거래 행은 보조 증거이며 경합 증거는 contender-waits의 pg_catalog 관찰이다.",
           "oracleRef": {
             "oracleId": "V2.split-reserve-race",
             "observationNames": [
@@ -3151,7 +4297,7 @@
             "D17"
           ],
           "evidenceRefs": [
-            "winner:actual-adapter-artifact"
+            "raced-db:actual-adapter-artifact"
           ],
           "scope": {
             "organizationId": {
@@ -3162,7 +4308,7 @@
             },
             "caseKey": "V2-reserve-commits-first"
           },
-          "oracleExplanation": "실제 거래는 분할과 예약 각각이며 mock lock이나 제출 ACK만으로 대신하지 않는다.",
+          "oracleExplanation": "실제 거래는 분할과 예약 각각이며 mock lock이나 제출 ACK만으로 대신하지 않는다. application 원장의 거래 행은 보조 증거이며 경합 증거는 contender-waits의 pg_catalog 관찰이다.",
           "oracleRef": {
             "oracleId": "V2.split-reserve-race",
             "observationNames": [
@@ -3284,7 +4430,7 @@
           }
         }
       ],
-      "oracleExplanation": "실물60/기존 약속40은 보존된다. 신규20 경합은20 이하이며 기존 배분은 한 번만 자식으로 이관한다. stale contender는 revision conflict이고 explicit fresh split은 별도 명령이다."
+      "oracleExplanation": "실물60/기존 약속40은 보존되고 신규 주문 ORDER2의 실행 배분은 20 이하다. 기존 배분은 한 번만 자식으로 이관한다. contender는 초기 read 뒤 멈추고, winner가 같은 scope lock을 잡은 채 멈춘 동안 재개돼 그 lock에서 실제로 기다린다. winner commit 뒤 contender는 lock 아래에서 revision을 다시 읽어 CONFLICT/STALE_REVISION이다. explicit fresh split은 별도 명령이다."
     },
     {
       "id": "actual50-correction",
@@ -3503,7 +4649,8 @@
               "retryAttempts",
               "dbPrivileges",
               "boundaries",
-              "transactions"
+              "transactions",
+              "promiseCoverage"
             ]
           },
           "evidenceRefs": [
@@ -3786,6 +4933,140 @@
               "active": true
             },
             "field": "unit"
+          }
+        },
+        {
+          "id": "promise-coverage-conserved-60",
+          "op": "sumEquals",
+          "source": {
+            "actionId": "after-db",
+            "pointer": "/data/rawRows/promiseCoverage",
+            "where": {
+              "promiseRootId": {
+                "$alias": "PROMISE"
+              }
+            },
+            "field": "quantity"
+          },
+          "expected": "60",
+          "requirementRefs": [
+            "D17"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseKey": "V2-actual50-correction"
+          },
+          "evidenceRefs": [
+            "after-db:actual-adapter-artifact"
+          ],
+          "unit": "BOX",
+          "unitSource": {
+            "actionId": "after-db",
+            "pointer": "/data/rawRows/promiseCoverage",
+            "where": {
+              "promiseRootId": {
+                "$alias": "PROMISE"
+              }
+            },
+            "field": "unit"
+          },
+          "oracleExplanation": "약속60은 정정 뒤 현재 EXECUTABLE 배분과 현재 부족 의무로 정확히 한 번씩 덮인다. promiseCoverage는 두 원천을 promiseRootId별로 합친 독립 read-only 관찰이다. 실행50+부족10, 전부 정지 시 실행0+부족60은 통과하고 실행50+부족60 이중 집계나 실행0+부족10 유실은 실패한다(계획 §4.2 부족 의무와 대체 배분).",
+          "oracleRef": {
+            "oracleId": "V2.actual50-correction",
+            "observationNames": [
+              "minimum-shortage-duty"
+            ]
+          }
+        },
+        {
+          "id": "promise-coverage-kinds",
+          "op": "fieldsPresent",
+          "source": {
+            "actionId": "after-db",
+            "pointer": "/data/rawRows/promiseCoverage",
+            "where": {
+              "promiseRootId": {
+                "$alias": "PROMISE"
+              }
+            }
+          },
+          "expected": [
+            "coverageKind",
+            "sourceId",
+            "quantity",
+            "unit"
+          ],
+          "requirementRefs": [
+            "D17"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseKey": "V2-actual50-correction"
+          },
+          "evidenceRefs": [
+            "after-db:actual-adapter-artifact"
+          ],
+          "oracleExplanation": "약속60은 정정 뒤 현재 EXECUTABLE 배분과 현재 부족 의무로 정확히 한 번씩 덮인다. promiseCoverage는 두 원천을 promiseRootId별로 합친 독립 read-only 관찰이다. 실행50+부족10, 전부 정지 시 실행0+부족60은 통과하고 실행50+부족60 이중 집계나 실행0+부족10 유실은 실패한다(계획 §4.2 부족 의무와 대체 배분).",
+          "oracleRef": {
+            "oracleId": "V2.actual50-correction",
+            "observationNames": [
+              "minimum-shortage-duty"
+            ]
+          }
+        },
+        {
+          "id": "promise-coverage-shortage-is-correction-duty",
+          "op": "exactSet",
+          "source": {
+            "actionId": "after-db",
+            "pointer": "/data/rawRows/promiseCoverage",
+            "where": {
+              "promiseRootId": {
+                "$alias": "PROMISE"
+              },
+              "coverageKind": "SHORTAGE_OBLIGATION"
+            },
+            "field": "sourceId"
+          },
+          "expected": [
+            {
+              "$result": {
+                "actionId": "correct",
+                "pointer": "/response/obligationId"
+              }
+            }
+          ],
+          "requirementRefs": [
+            "D17"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseKey": "V2-actual50-correction"
+          },
+          "evidenceRefs": [
+            "after-db:actual-adapter-artifact"
+          ],
+          "oracleExplanation": "약속60은 정정 뒤 현재 EXECUTABLE 배분과 현재 부족 의무로 정확히 한 번씩 덮인다. promiseCoverage는 두 원천을 promiseRootId별로 합친 독립 read-only 관찰이다. 실행50+부족10, 전부 정지 시 실행0+부족60은 통과하고 실행50+부족60 이중 집계나 실행0+부족10 유실은 실패한다(계획 §4.2 부족 의무와 대체 배분). 부족 쪽 행은 정정 명령이 반환한 바로 그 부족 의무 하나다.",
+          "oracleRef": {
+            "oracleId": "V2.actual50-correction",
+            "observationNames": [
+              "shortage-duty"
+            ]
           }
         },
         {

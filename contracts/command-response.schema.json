@@ -1,6 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "urn:mulino:command-response:1",
+  "$comment": "Canonical structured error pointer (plan §3.4): the error code of a command response is at the RFC6901 pointer /error/code relative to the response object. Acceptance cases read it as /response/error/code for api/mcp invoke and for await of an invoked command, and as /response/body/result/structuredContent/error/code for a raw MCP wire result. /errorCode, /code and other top-level code fields are not part of this contract.",
   "type": "object",
   "required": [
     "outcome",
@@ -35,7 +36,56 @@
       "type": "object"
     },
     "error": {
-      "type": "object"
+      "type": "object",
+      "required": [
+        "code"
+      ],
+      "properties": {
+        "code": {
+          "type": "string",
+          "pattern": "^[A-Z][A-Z0-9_]*$",
+          "$comment": "Structured code such as TYPE_INVALID, VERSION_UNSUPPORTED, POLICY_UNRESOLVED, FORBIDDEN, STALE_REVISION, IDEMPOTENCY_CONFLICT, INSUFFICIENT_ELIGIBLE_QUANTITY or EVIDENCE_CONFLICT (plan §3.4). It must not reveal secrets or other organizations' identifiers."
+        },
+        "message": {
+          "type": "string"
+        }
+      }
     }
-  }
+  },
+  "not": {
+    "anyOf": [
+      {
+        "required": [
+          "errorCode"
+        ]
+      },
+      {
+        "required": [
+          "code"
+        ]
+      }
+    ]
+  },
+  "allOf": [
+    {
+      "if": {
+        "required": [
+          "outcome"
+        ],
+        "properties": {
+          "outcome": {
+            "enum": [
+              "REJECTED",
+              "CONFLICT"
+            ]
+          }
+        }
+      },
+      "then": {
+        "required": [
+          "error"
+        ]
+      }
+    }
+  ]
 }

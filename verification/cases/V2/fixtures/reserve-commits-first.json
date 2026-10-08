@@ -54,7 +54,8 @@
             "A60"
           ],
           "workAliases": [
-            "S1"
+            "S1",
+            "S2"
           ],
           "placeAliases": [
             "W",
@@ -104,7 +105,8 @@
             "A60"
           ],
           "workAliases": [
-            "S1"
+            "S1",
+            "S2"
           ],
           "placeAliases": [
             "W",
@@ -157,7 +159,8 @@
             "A60"
           ],
           "workAliases": [
-            "S1"
+            "S1",
+            "S2"
           ],
           "placeAliases": [
             "W",
@@ -212,7 +215,8 @@
             "A60"
           ],
           "workAliases": [
-            "S1"
+            "S1",
+            "S2"
           ],
           "placeAliases": [
             "W",
@@ -261,7 +265,8 @@
             "A60"
           ],
           "workAliases": [
-            "S1"
+            "S1",
+            "S2"
           ],
           "placeAliases": [
             "W",
@@ -321,7 +326,8 @@
             "A60"
           ],
           "workAliases": [
-            "S1"
+            "S1",
+            "S2"
           ],
           "placeAliases": [
             "W",
@@ -381,7 +387,8 @@
             "A60"
           ],
           "workAliases": [
-            "S1"
+            "S1",
+            "S2"
           ],
           "placeAliases": [
             "W",
@@ -451,6 +458,24 @@
       "unit": "BOX",
       "customerAlias": "CUSTOMER",
       "destinationAlias": "CUSTOMER"
+    },
+    "S2": {
+      "type": "Work",
+      "kind": "SALES",
+      "state": "ACTIVE",
+      "ownerAlias": "sales",
+      "revision": 1
+    },
+    "ORDER2": {
+      "type": "SalesOrderLine",
+      "workAlias": "S2",
+      "quantity": "20",
+      "unit": "BOX",
+      "customerAlias": "CUSTOMER",
+      "destinationAlias": "CUSTOMER"
+    },
+    "PROMISE2": {
+      "type": "ObligationRoot"
     },
     "warehouse": {
       "type": "Human"
@@ -640,7 +665,27 @@
       "ownerAlias": "sales",
       "stableRootAlias": "PROMISE"
     },
-    "rolesAreDescriptiveNotImplicitAuthority": true
+    "rolesAreDescriptiveNotImplicitAuthority": true,
+    "additionalWorks": [
+      {
+        "alias": "S2",
+        "ownerAlias": "sales",
+        "supervisorAlias": "supervisor",
+        "state": "ACTIVE",
+        "quantity": "20",
+        "unit": "BOX"
+      }
+    ],
+    "additionalSalesPromises": [
+      {
+        "scopeAlias": "S2",
+        "quantity": "20",
+        "unit": "BOX",
+        "ownerAlias": "sales",
+        "stableRootAlias": "PROMISE2"
+      }
+    ],
+    "newDemandNote": "ORDER(40)는 기존 ALLOC40으로 이미 모두 덮였다. 경합하는 신규 예약20은 별도 주문 ORDER2(20)·업무 S2·약속 PROMISE2를 대상으로 해 초과 예약 없이 실물60을 채운다."
   },
   "evidence": [
     {
@@ -703,6 +748,16 @@
       "scope": {
         "itemAlias": "P",
         "workAlias": "S1"
+      },
+      "ownerAlias": "sales",
+      "supervisorAlias": "supervisor",
+      "nextAction": "근거 대조 후 대체 배분 검토",
+      "nextCheckAt": "2026-10-07T10:00:00Z"
+    },
+    {
+      "scope": {
+        "itemAlias": "P",
+        "workAlias": "S2"
       },
       "ownerAlias": "sales",
       "supervisorAlias": "supervisor",

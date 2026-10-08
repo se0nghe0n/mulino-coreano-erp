@@ -36,6 +36,7 @@
     만일 "receiver" 역할이 "return-authorize" 행동을 수행한다
     만일 "receiver" 역할이 "return" 행동을 수행한다
     만일 "observer" 역할이 "e1" 행동을 수행한다
+    만일 "observer" 역할이 "e1-mcp" 행동을 수행한다
     만일 "시스템" 역할이 "e1-db" 행동을 수행한다
     그러면 "purchase-cumulative-arrival-1" assertion으로 "purchase-cumulative-arrival"를 확인한다
     그러면 "purchase-cumulative-arrival-2" assertion으로 "purchase-cumulative-arrival"를 확인한다
@@ -49,6 +50,7 @@
     그러면 "current-sell-eligible-10" assertion으로 "current-sell-eligible"를 확인한다
     그러면 "agency-unverified-held-11" assertion으로 "agency-unverified-held"를 확인한다
     그러면 "agency-unverified-held-12" assertion으로 "agency-unverified-held"를 확인한다
+    그러면 "agency-unverified-held-axis70" assertion으로 "규제 축 UNKNOWN 구매 수령분은 QC 상태와 독립으로 70 BOX다"를 확인한다
     그러면 "QC-held-13" assertion으로 "QC-held"를 확인한다
     그러면 "QC-held-14" assertion으로 "QC-held"를 확인한다
     그러면 "return-held-15" assertion으로 "return-held"를 확인한다
@@ -63,6 +65,16 @@
     그러면 "receipt60-doc-duplicate-effects-24" assertion으로 "receipt60-doc-duplicate-effects"를 확인한다
     그러면 "return-added-purchase-arrival-25" assertion으로 "return-added-purchase-arrival"를 확인한다
     그러면 "receipt60-doc-duplicate-effects-26" assertion으로 "receipt60-doc-duplicate-effects"를 확인한다
+    그러면 "e1-mcp-same-snapshot" assertion으로 "MCP 조회는 API 조회와 같은 snapshot을 읽는다"를 확인한다
+    그러면 "purchase-cumulative-arrival-1-mcp" assertion으로 "MCP 진입점: 같은 snapshot에서 purchase-cumulative-arrival-1와 같은 값을 읽는다"를 확인한다
+    그러면 "warehouse-current-held-3-mcp" assertion으로 "MCP 진입점: 같은 snapshot에서 warehouse-current-held-3와 같은 값을 읽는다"를 확인한다
+    그러면 "historical-delivery-5-mcp" assertion으로 "MCP 진입점: 같은 snapshot에서 historical-delivery-5와 같은 값을 읽는다"를 확인한다
+    그러면 "return-received-7-mcp" assertion으로 "MCP 진입점: 같은 snapshot에서 return-received-7와 같은 값을 읽는다"를 확인한다
+    그러면 "current-sell-eligible-9-mcp" assertion으로 "MCP 진입점: 같은 snapshot에서 current-sell-eligible-9와 같은 값을 읽는다"를 확인한다
+    그러면 "agency-unverified-held-11-mcp" assertion으로 "MCP 진입점: 같은 snapshot에서 agency-unverified-held-11와 같은 값을 읽는다"를 확인한다
+    그러면 "QC-held-13-mcp" assertion으로 "MCP 진입점: 같은 snapshot에서 QC-held-13와 같은 값을 읽는다"를 확인한다
+    그러면 "return-held-15-mcp" assertion으로 "MCP 진입점: 같은 snapshot에서 return-held-15와 같은 값을 읽는다"를 확인한다
+    그러면 "bank-transfer-18-mcp" assertion으로 "MCP 진입점: 같은 snapshot에서 bank-transfer-18와 같은 값을 읽는다"를 확인한다
 
   시나리오: 전체 물류100 충족 뒤 송장5EUR 차이와 QC40·반품10·정산 owner는 별도로 남는다
     먼저 사례 파일 "verification/cases/E1/case.json"의 "independent-goals-and-owners"를 준비한다
@@ -102,8 +114,10 @@
     만일 "settlement" 역할이 "invoice" 행동을 수행한다
     만일 "settlement" 역할이 "match-invoice" 행동을 수행한다
     만일 "observer" 역할이 "goals" 행동을 수행한다
+    만일 "observer" 역할이 "goals-mcp" 행동을 수행한다
     만일 "시스템" 역할이 "goals-db" 행동을 수행한다
     만일 "observer" 역할이 "noun" 행동을 수행한다
+    만일 "observer" 역할이 "noun-mcp" 행동을 수행한다
     만일 "observer" 역할이 "verb" 행동을 수행한다
     그러면 "logistics-goal-1" assertion으로 "logistics-goal"를 확인한다
     그러면 "logistics-goal-2" assertion으로 "logistics-goal"를 확인한다
@@ -116,6 +130,9 @@
     그러면 "QC-duty-9" assertion으로 "QC-duty"를 확인한다
     그러면 "QC-duty-10" assertion으로 "QC-duty"를 확인한다
     그러면 "QC-duty-11" assertion으로 "QC-duty"를 확인한다
+    그러면 "QC-duty-hold60-resolved" assertion으로 "QC_PASS로 해제한 hold60 의무는 QC·RESOLVED·current로 남는다"를 확인한다
+    그러면 "QC-duty-hold60-resolution-evidence" assertion으로 "해소된 hold60 의무는 해소 결정 근거를 가진다"를 확인한다
+    그러면 "QC-duty-hold40-identity" assertion으로 "남은 OPEN QC 의무는 QC 보류40의 의무이고 owner는 qc다"를 확인한다
     그러면 "return-duty-12" assertion으로 "return-duty"를 확인한다
     그러면 "return-duty-13" assertion으로 "return-duty"를 확인한다
     그러면 "return-duty-14" assertion으로 "return-duty"를 확인한다
@@ -139,10 +156,60 @@
     그러면 "two-entry-snapshot-32" assertion으로 "two-entry-snapshot"를 확인한다
     그러면 "two-entry-snapshot-33" assertion으로 "two-entry-snapshot"를 확인한다
     그러면 "two-entry-snapshot-34" assertion으로 "two-entry-snapshot"를 확인한다
+    그러면 "two-entry-anchor-snapshot" assertion으로 "명사 linkedSummary의 snapshot은 goals 원장 관찰과 같다"를 확인한다
+    그러면 "two-entry-anchor-asOf" assertion으로 "명사 linkedSummary의 asOf는 고정 업무 시계와 같다"를 확인한다
+    그러면 "two-entry-anchor-knownAt" assertion으로 "명사 linkedSummary의 knownAt은 고정 업무 시계와 같다"를 확인한다
+    그러면 "two-entry-anchor-duty-fields" assertion으로 "명사 linkedSummary duties는 비어 있지 않고 필수 필드를 가진다"를 확인한다
+    그러면 "two-entry-anchor-qc-duty-ledger" assertion으로 "명사 linkedSummary의 OPEN QC 의무는 독립 원장 행과 같다"를 확인한다
+    그러면 "two-entry-anchor-return-duty-ledger" assertion으로 "명사 linkedSummary의 OPEN 반품 의무는 독립 원장 행과 같다"를 확인한다
+    그러면 "two-entry-anchor-settlement-duty-ledger" assertion으로 "명사 linkedSummary의 OPEN 정산 의무는 독립 원장 행과 같다"를 확인한다
+    그러면 "two-entry-anchor-qc-duty-identity" assertion으로 "명사 linkedSummary의 OPEN QC 의무는 QC 보류40의 의무다"를 확인한다
+    그러면 "two-entry-anchor-return-owner" assertion으로 "명사 linkedSummary의 반품 의무 owner는 receiver다"를 확인한다
+    그러면 "two-entry-anchor-settlement-owner" assertion으로 "명사 linkedSummary의 정산 의무 owner는 settlement다"를 확인한다
+    그러면 "two-entry-duties-noun-verb" assertion으로 "동사 linkedSummary duties는 명사와 같다"를 확인한다
+    그러면 "two-entry-anchor-purchaseArrivalQuantity" assertion으로 "linkedSummary 구매 누적 도착은 100 BOX다"를 확인한다
+    그러면 "two-entry-anchor-heldQuantity" assertion으로 "linkedSummary W 보유는 80 BOX다"를 확인한다
+    그러면 "two-entry-anchor-deliveredQuantity" assertion으로 "linkedSummary 과거 인도는 30 BOX다"를 확인한다
+    그러면 "two-entry-anchor-returnedQuantity" assertion으로 "linkedSummary 반품은 10 BOX다"를 확인한다
+    그러면 "two-entry-anchor-eligibleQuantity" assertion으로 "linkedSummary 현재 판매 적격은 0 BOX다"를 확인한다
+    그러면 "two-entry-anchor-invoiceDifference" assertion으로 "linkedSummary 송장 차이는 5 EUR다"를 확인한다
     그러면 "logistics-closes-unrelated-duties-35" assertion으로 "logistics-closes-unrelated-duties"를 확인한다
     그러면 "logistics-closes-unrelated-duties-36" assertion으로 "logistics-closes-unrelated-duties"를 확인한다
     그러면 "logistics-closes-unrelated-duties-37" assertion으로 "logistics-closes-unrelated-duties"를 확인한다
     그러면 "logistics-closes-unrelated-duties-38" assertion으로 "logistics-closes-unrelated-duties"를 확인한다
+    그러면 "goals-mcp-same-snapshot" assertion으로 "MCP 조회는 API 조회와 같은 snapshot을 읽는다"를 확인한다
+    그러면 "logistics-goal-1-mcp" assertion으로 "MCP 진입점: 같은 snapshot에서 logistics-goal-1와 같은 값을 읽는다"를 확인한다
+    그러면 "invoice-difference-3-mcp" assertion으로 "MCP 진입점: 같은 snapshot에서 invoice-difference-3와 같은 값을 읽는다"를 확인한다
+    그러면 "QC-duty-11-mcp" assertion으로 "MCP 진입점: 같은 snapshot에서 QC-duty-11와 같은 값을 읽는다"를 확인한다
+    그러면 "return-duty-18-mcp" assertion으로 "MCP 진입점: 같은 snapshot에서 return-duty-18와 같은 값을 읽는다"를 확인한다
+    그러면 "settlement-duty-25-mcp" assertion으로 "MCP 진입점: 같은 snapshot에서 settlement-duty-25와 같은 값을 읽는다"를 확인한다
+    그러면 "noun-mcp-same-snapshot" assertion으로 "MCP 조회는 API 조회와 같은 snapshot을 읽는다"를 확인한다
+    그러면 "two-entry-snapshot-26-mcp" assertion으로 "MCP 진입점: 같은 snapshot에서 two-entry-snapshot-26와 같은 값을 읽는다"를 확인한다
+    그러면 "two-entry-snapshot-27-mcp" assertion으로 "MCP 진입점: 같은 snapshot에서 two-entry-snapshot-27와 같은 값을 읽는다"를 확인한다
+    그러면 "two-entry-snapshot-28-mcp" assertion으로 "MCP 진입점: 같은 snapshot에서 two-entry-snapshot-28와 같은 값을 읽는다"를 확인한다
+    그러면 "two-entry-snapshot-29-mcp" assertion으로 "MCP 진입점: 같은 snapshot에서 two-entry-snapshot-29와 같은 값을 읽는다"를 확인한다
+    그러면 "two-entry-snapshot-30-mcp" assertion으로 "MCP 진입점: 같은 snapshot에서 two-entry-snapshot-30와 같은 값을 읽는다"를 확인한다
+    그러면 "two-entry-snapshot-31-mcp" assertion으로 "MCP 진입점: 같은 snapshot에서 two-entry-snapshot-31와 같은 값을 읽는다"를 확인한다
+    그러면 "two-entry-snapshot-32-mcp" assertion으로 "MCP 진입점: 같은 snapshot에서 two-entry-snapshot-32와 같은 값을 읽는다"를 확인한다
+    그러면 "two-entry-snapshot-33-mcp" assertion으로 "MCP 진입점: 같은 snapshot에서 two-entry-snapshot-33와 같은 값을 읽는다"를 확인한다
+    그러면 "two-entry-snapshot-34-mcp" assertion으로 "MCP 진입점: 같은 snapshot에서 two-entry-snapshot-34와 같은 값을 읽는다"를 확인한다
+    그러면 "two-entry-anchor-snapshot-mcp" assertion으로 "MCP 진입점: 같은 snapshot에서 two-entry-anchor-snapshot와 같은 값을 읽는다"를 확인한다
+    그러면 "two-entry-anchor-asOf-mcp" assertion으로 "MCP 진입점: 같은 snapshot에서 two-entry-anchor-asOf와 같은 값을 읽는다"를 확인한다
+    그러면 "two-entry-anchor-knownAt-mcp" assertion으로 "MCP 진입점: 같은 snapshot에서 two-entry-anchor-knownAt와 같은 값을 읽는다"를 확인한다
+    그러면 "two-entry-anchor-duty-fields-mcp" assertion으로 "MCP 진입점: 같은 snapshot에서 two-entry-anchor-duty-fields와 같은 값을 읽는다"를 확인한다
+    그러면 "two-entry-anchor-qc-duty-ledger-mcp" assertion으로 "MCP 진입점: 같은 snapshot에서 two-entry-anchor-qc-duty-ledger와 같은 값을 읽는다"를 확인한다
+    그러면 "two-entry-anchor-return-duty-ledger-mcp" assertion으로 "MCP 진입점: 같은 snapshot에서 two-entry-anchor-return-duty-ledger와 같은 값을 읽는다"를 확인한다
+    그러면 "two-entry-anchor-settlement-duty-ledger-mcp" assertion으로 "MCP 진입점: 같은 snapshot에서 two-entry-anchor-settlement-duty-ledger와 같은 값을 읽는다"를 확인한다
+    그러면 "two-entry-anchor-qc-duty-identity-mcp" assertion으로 "MCP 진입점: 같은 snapshot에서 two-entry-anchor-qc-duty-identity와 같은 값을 읽는다"를 확인한다
+    그러면 "two-entry-anchor-return-owner-mcp" assertion으로 "MCP 진입점: 같은 snapshot에서 two-entry-anchor-return-owner와 같은 값을 읽는다"를 확인한다
+    그러면 "two-entry-anchor-settlement-owner-mcp" assertion으로 "MCP 진입점: 같은 snapshot에서 two-entry-anchor-settlement-owner와 같은 값을 읽는다"를 확인한다
+    그러면 "two-entry-duties-noun-verb-mcp" assertion으로 "MCP 진입점: 같은 snapshot에서 two-entry-duties-noun-verb와 같은 값을 읽는다"를 확인한다
+    그러면 "two-entry-anchor-purchaseArrivalQuantity-mcp" assertion으로 "MCP 진입점: 같은 snapshot에서 two-entry-anchor-purchaseArrivalQuantity와 같은 값을 읽는다"를 확인한다
+    그러면 "two-entry-anchor-heldQuantity-mcp" assertion으로 "MCP 진입점: 같은 snapshot에서 two-entry-anchor-heldQuantity와 같은 값을 읽는다"를 확인한다
+    그러면 "two-entry-anchor-deliveredQuantity-mcp" assertion으로 "MCP 진입점: 같은 snapshot에서 two-entry-anchor-deliveredQuantity와 같은 값을 읽는다"를 확인한다
+    그러면 "two-entry-anchor-returnedQuantity-mcp" assertion으로 "MCP 진입점: 같은 snapshot에서 two-entry-anchor-returnedQuantity와 같은 값을 읽는다"를 확인한다
+    그러면 "two-entry-anchor-eligibleQuantity-mcp" assertion으로 "MCP 진입점: 같은 snapshot에서 two-entry-anchor-eligibleQuantity와 같은 값을 읽는다"를 확인한다
+    그러면 "two-entry-anchor-invoiceDifference-mcp" assertion으로 "MCP 진입점: 같은 snapshot에서 two-entry-anchor-invoiceDifference와 같은 값을 읽는다"를 확인한다
 
   시나리오: 실제 원장·배분·판정·책임·감사·outbox를 묶고 실모델 gate는 독립 host 입력으로 구분한다
     먼저 사례 파일 "verification/cases/E1/case.json"의 "whole-runtime-and-model-reference"를 준비한다
@@ -180,9 +247,11 @@
     만일 "observer" 역할이 "e1" 행동을 수행한다
     만일 "시스템" 역할이 "e1-db" 행동을 수행한다
     만일 "operator" 역할이 "unauthorized-approval" 행동을 수행한다
+    만일 "sales" 역할이 "consume-again-target" 행동을 수행한다
     만일 "sales" 역할이 "consume-again" 행동을 수행한다
     만일 "receiver" 역할이 "delivery-again" 행동을 수행한다
     만일 "observer" 역할이 "runtime" 행동을 수행한다
+    만일 "observer" 역할이 "runtime-mcp" 행동을 수행한다
     만일 "시스템" 역할이 "runtime-db" 행동을 수행한다
     만일 "시스템" 역할이 "model-reference-host" 행동을 수행한다
     그러면 "actual-runtime-observation-1" assertion으로 "actual-runtime-observation"를 확인한다
@@ -195,6 +264,8 @@
     그러면 "actual-runtime-observation-8" assertion으로 "actual-runtime-observation"를 확인한다
     그러면 "actual-runtime-observation-9" assertion으로 "actual-runtime-observation"를 확인한다
     그러면 "actual-runtime-observation-10" assertion으로 "actual-runtime-observation"를 확인한다
+    그러면 "actual-runtime-observation-10-reason" assertion으로 "이미 소비된 배분의 같은 형식 재출고는 INSUFFICIENT_ELIGIBLE_QUANTITY로 거부된다"를 확인한다
+    그러면 "actual-runtime-observation-10-audit" assertion으로 "재출고 거부 감사가 정확히 1건 남는다"를 확인한다
     그러면 "actual-runtime-observation-11" assertion으로 "actual-runtime-observation"를 확인한다
     그러면 "actual-runtime-observation-12" assertion으로 "actual-runtime-observation"를 확인한다
     그러면 "actual-runtime-observation-13" assertion으로 "actual-runtime-observation"를 확인한다
@@ -214,3 +285,8 @@
     그러면 "model-reference-27" assertion으로 "model-reference"를 확인한다
     그러면 "actual-runtime-observation-28" assertion으로 "actual-runtime-observation"를 확인한다
     그러면 "actual-runtime-observation-29" assertion으로 "actual-runtime-observation"를 확인한다
+    그러면 "runtime-mcp-same-snapshot" assertion으로 "MCP 조회는 API 조회와 같은 snapshot을 읽는다"를 확인한다
+    그러면 "actual-runtime-observation-5-mcp" assertion으로 "MCP 진입점: 같은 snapshot에서 actual-runtime-observation-5와 같은 값을 읽는다"를 확인한다
+    그러면 "actual-runtime-observation-6-mcp" assertion으로 "MCP 진입점: 같은 snapshot에서 actual-runtime-observation-6와 같은 값을 읽는다"를 확인한다
+    그러면 "actual-runtime-observation-7-mcp" assertion으로 "MCP 진입점: 같은 snapshot에서 actual-runtime-observation-7와 같은 값을 읽는다"를 확인한다
+    그러면 "actual-runtime-observation-8-mcp" assertion으로 "MCP 진입점: 같은 snapshot에서 actual-runtime-observation-8와 같은 값을 읽는다"를 확인한다

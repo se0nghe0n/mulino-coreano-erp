@@ -19,6 +19,7 @@
     만일 "시스템" 역할이 "before-duplicate-db" 행동을 수행한다
     만일 "receiver" 역할이 "duplicate-return" 행동을 수행한다
     만일 "observer" 역할이 "returned" 행동을 수행한다
+    만일 "observer" 역할이 "after-return-assessment" 행동을 수행한다
     만일 "시스템" 역할이 "returned-db" 행동을 수행한다
     그러면 "historical-delivery-1" assertion으로 "historical-delivery"를 확인한다
     그러면 "historical-delivery-2" assertion으로 "historical-delivery"를 확인한다
@@ -31,7 +32,10 @@
     그러면 "return-overwrites-delivery-to80-9" assertion으로 "return-overwrites-delivery-to80"를 확인한다
     그러면 "physical-reference-10" assertion으로 "physical-reference"를 확인한다
     그러면 "physical-reference-11" assertion으로 "physical-reference"를 확인한다
-    그러면 "return-overwrites-delivery-to80-12" assertion으로 "return-overwrites-delivery-to80"를 확인한다
+    그러면 "return-overwrites-delivery-to80-12" assertion으로 "반품 전 기준선 인도 판정은 SATISFIED다"를 확인한다
+    그러면 "return-overwrites-delivery-to80-13" assertion으로 "반품 뒤에도 인도 판정은 SATISFIED다"를 확인한다
+    그러면 "return-overwrites-delivery-to80-14" assertion으로 "반품 뒤 주문 업무의 현재 판정 원행은 SATISFIED뿐이다"를 확인한다
+    그러면 "return-overwrites-delivery-to80-15" assertion으로 "반품은 인도 부족 의무를 만들지 않는다"를 확인한다
 
   시나리오: 인도100의 실제98 정정은 과거 판정과 현재 부족2의 인간 책임을 함께 남긴다
     먼저 사례 파일 "verification/cases/C4/case.json"의 "corrected-delivery-98"를 준비한다

@@ -830,6 +830,56 @@
           ]
         },
         {
+          "id": "after-return-assessment",
+          "kind": "query",
+          "actorRef": "observer",
+          "route": "api",
+          "capabilityId": "getAssessment",
+          "request": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseId": "C4",
+              "scenarioId": "return-not-correction"
+            },
+            "subjectRefs": [
+              {
+                "type": "Work",
+                "id": {
+                  "$result": {
+                    "actionId": "order",
+                    "pointer": "/response/workId"
+                  }
+                }
+              }
+            ],
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z",
+            "include": [
+              "inventory",
+              "trade",
+              "evidence",
+              "assessments",
+              "obligations",
+              "audit",
+              "outbox"
+            ],
+            "snapshotRef": {
+              "$result": {
+                "actionId": "returned",
+                "pointer": "/response/snapshotRevision"
+              }
+            }
+          },
+          "evidenceRefs": [
+            "after-return-assessment:api-response"
+          ]
+        },
+        {
           "id": "returned-db",
           "kind": "observe",
           "observation": {
@@ -1377,7 +1427,124 @@
             "caseId": "C4",
             "scenarioId": "return-not-correction"
           },
-          "oracleExplanation": "return-overwrites-delivery-to80는 과거 인도100과 새 반품20을 분리하며 중복 반품·과거80 덮어쓰기를 막는다의 독립 고정값과 실제 원 행을 대조한다.",
+          "oracleExplanation": "반품 전 기준선: 인도100 뒤 인도 목표 판정은 SATISFIED다. 반품 뒤 판정과 대조하는 기준이며 이것만으로 반품이 정정이 아님을 증명하지 않는다.",
+          "oracleRef": {
+            "oracleId": "C4.return-not-correction",
+            "observationNames": [
+              "return-overwrites-delivery-to80"
+            ]
+          }
+        },
+        {
+          "id": "return-overwrites-delivery-to80-13",
+          "op": "equals",
+          "source": {
+            "actionId": "after-return-assessment",
+            "pointer": "/response/data/result"
+          },
+          "expected": "SATISFIED",
+          "requirementRefs": [
+            "D06",
+            "D12",
+            "D18"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "C4",
+            "scenarioId": "return-not-correction"
+          },
+          "evidenceRefs": [
+            "after-return-assessment:api-response"
+          ],
+          "oracleExplanation": "실제 반품20은 원 인도100에 연결된 새 실물 사건이지 인도100→80 정정이 아니다. 반품 뒤에도 주문 업무의 현재 인도 판정은 SATISFIED이고 인도 부족 의무는 생기지 않는다(계획 §4.3, §13.2 C4).",
+          "oracleRef": {
+            "oracleId": "C4.return-not-correction",
+            "observationNames": [
+              "return-overwrites-delivery-to80"
+            ]
+          }
+        },
+        {
+          "id": "return-overwrites-delivery-to80-14",
+          "op": "exactSet",
+          "source": {
+            "actionId": "returned-db",
+            "pointer": "/data/rawRows/assessments",
+            "where": {
+              "workId": {
+                "$result": {
+                  "actionId": "order",
+                  "pointer": "/response/workId"
+                }
+              },
+              "current": true
+            },
+            "field": "result"
+          },
+          "expected": [
+            "SATISFIED"
+          ],
+          "requirementRefs": [
+            "D06",
+            "D12",
+            "D18"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "C4",
+            "scenarioId": "return-not-correction"
+          },
+          "evidenceRefs": [
+            "returned-db:raw-rows"
+          ],
+          "oracleExplanation": "실제 반품20은 원 인도100에 연결된 새 실물 사건이지 인도100→80 정정이 아니다. 반품 뒤에도 주문 업무의 현재 인도 판정은 SATISFIED이고 인도 부족 의무는 생기지 않는다(계획 §4.3, §13.2 C4).",
+          "oracleRef": {
+            "oracleId": "C4.return-not-correction",
+            "observationNames": [
+              "return-overwrites-delivery-to80"
+            ]
+          }
+        },
+        {
+          "id": "return-overwrites-delivery-to80-15",
+          "op": "count",
+          "source": {
+            "actionId": "returned-db",
+            "pointer": "/data/rawRows/obligations",
+            "where": {
+              "kind": "DELIVERY_DEFICIT"
+            }
+          },
+          "expected": 0,
+          "requirementRefs": [
+            "D06",
+            "D12",
+            "D18"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "C4",
+            "scenarioId": "return-not-correction"
+          },
+          "evidenceRefs": [
+            "returned-db:raw-rows"
+          ],
+          "oracleExplanation": "실제 반품20은 원 인도100에 연결된 새 실물 사건이지 인도100→80 정정이 아니다. 반품 뒤에도 주문 업무의 현재 인도 판정은 SATISFIED이고 인도 부족 의무는 생기지 않는다(계획 §4.3, §13.2 C4).",
           "oracleRef": {
             "oracleId": "C4.return-not-correction",
             "observationNames": [
@@ -3486,7 +3653,11 @@
               "obligations",
               "audit",
               "outbox"
-            ]
+            ],
+            "filter": {
+              "kind": "DELIVERY_DEFICIT",
+              "status": "OPEN"
+            }
           },
           "evidenceRefs": [
             "duty:api-response"
@@ -5145,7 +5316,11 @@
               "obligations",
               "audit",
               "outbox"
-            ]
+            ],
+            "filter": {
+              "kind": "DELIVERY_DEFICIT",
+              "status": "OPEN"
+            }
           },
           "evidenceRefs": [
             "duty:api-response"

@@ -13,7 +13,8 @@
     "D19"
   ],
   "profiles": [
-    "scenarios"
+    "scenarios",
+    "mcp"
   ],
   "subcases": [
     {
@@ -23,7 +24,8 @@
       "requiredAdapters": [
         "fixture",
         "api",
-        "db"
+        "db",
+        "mcp"
       ],
       "actions": [
         {
@@ -1930,6 +1932,54 @@
           ]
         },
         {
+          "id": "e1-mcp",
+          "kind": "query",
+          "actorRef": "observer",
+          "route": "mcp",
+          "capabilityId": "getObject",
+          "request": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseId": "E1",
+              "scenarioId": "full-flow-quantities"
+            },
+            "subjectRefs": [
+              {
+                "type": "TradeItem",
+                "id": {
+                  "$alias": "P"
+                }
+              }
+            ],
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z",
+            "include": [
+              "inventory",
+              "trade",
+              "evidence",
+              "assessments",
+              "obligations",
+              "audit",
+              "outbox"
+            ],
+            "snapshotRef": {
+              "$result": {
+                "actionId": "e1",
+                "pointer": "/response/snapshotRevision"
+              }
+            }
+          },
+          "evidenceRefs": [
+            "e1-mcp:mcp-response",
+            "e1-mcp:actual-mcp-artifact"
+          ]
+        },
+        {
           "id": "e1-db",
           "kind": "observe",
           "observation": {
@@ -2524,6 +2574,8 @@
             "pointer": "/data/rawRows/segments",
             "where": {
               "regulatoryStatus": "UNKNOWN",
+              "QCHoldActive": false,
+              "originKind": "PURCHASE",
               "locationId": {
                 "$alias": "W"
               },
@@ -2555,7 +2607,7 @@
             "caseId": "E1",
             "scenarioId": "full-flow-quantities"
           },
-          "oracleExplanation": "agency-unverified-held는 구매100→수령60+40→허용30 판매→반품10으로 W80·과거인도30·적격0을 계산한다의 독립 고정값과 실제 원 행을 대조한다.",
+          "oracleExplanation": "기관미확인 보유30은 QC를 통과했고(QCHoldActive=false) 구매 수령분이며 규제 축이 UNKNOWN인 W의 활성 물량이다. 규제 축은 QC 축과 독립이므로 원 행 필터가 이 버킷을 명시한다(계획 §4.1 제한 축 독립, §13.3 E1 남은30 기관미확인).",
           "oracleRef": {
             "oracleId": "E1.full-flow-quantities",
             "observationNames": [
@@ -2569,11 +2621,75 @@
             "field": "unit",
             "where": {
               "regulatoryStatus": "UNKNOWN",
+              "QCHoldActive": false,
+              "originKind": "PURCHASE",
               "locationId": {
                 "$alias": "W"
               },
               "active": true
             }
+          }
+        },
+        {
+          "id": "agency-unverified-held-axis70",
+          "op": "sumEquals",
+          "source": {
+            "actionId": "e1-db",
+            "pointer": "/data/rawRows/segments",
+            "where": {
+              "regulatoryStatus": "UNKNOWN",
+              "originKind": "PURCHASE",
+              "locationId": {
+                "$alias": "W"
+              },
+              "active": true
+            },
+            "field": "quantity"
+          },
+          "expected": "70",
+          "requirementRefs": [
+            "D05",
+            "D09",
+            "D13",
+            "D15",
+            "D16",
+            "D17",
+            "D18",
+            "D19"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "E1",
+            "scenarioId": "full-flow-quantities"
+          },
+          "evidenceRefs": [
+            "e1-db:raw-rows"
+          ],
+          "unit": "BOX",
+          "unitSource": {
+            "actionId": "e1-db",
+            "pointer": "/data/rawRows/segments",
+            "field": "unit",
+            "where": {
+              "regulatoryStatus": "UNKNOWN",
+              "originKind": "PURCHASE",
+              "locationId": {
+                "$alias": "W"
+              },
+              "active": true
+            }
+          },
+          "oracleExplanation": "규제 축만 보면 기관 절차가 없는 구매 수령분은 QC 통과 나머지30과 QC 보류40을 합쳐 70이 UNKNOWN이다. QC 보류 물량을 규제 ALLOWED/NOT_APPLICABLE로 꾸미거나 규제 상태를 QC에 종속시키면 실패한다. 반품10의 규제 축은 계획이 정하지 않아 originKind PURCHASE로 제외한다.",
+          "oracleRef": {
+            "oracleId": "E1.full-flow-quantities",
+            "observationNames": [
+              "agency-unverified-held"
+            ]
           }
         },
         {
@@ -3250,6 +3366,441 @@
               "receipt60-doc-duplicate-effects"
             ]
           }
+        },
+        {
+          "id": "e1-mcp-same-snapshot",
+          "op": "equals",
+          "source": {
+            "actionId": "e1-mcp",
+            "pointer": "/response/snapshotRevision"
+          },
+          "expected": {
+            "$result": {
+              "actionId": "e1",
+              "pointer": "/response/snapshotRevision"
+            }
+          },
+          "requirementRefs": [
+            "D05",
+            "D09",
+            "D13",
+            "D15",
+            "D16",
+            "D17",
+            "D18",
+            "D19"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "E1",
+            "scenarioId": "full-flow-quantities"
+          },
+          "evidenceRefs": [
+            "e1-mcp:mcp-response"
+          ],
+          "oracleExplanation": "MCP 조회는 API 조회와 같은 snapshotRevision을 읽는다.",
+          "oracleRef": {
+            "oracleId": "E1.full-flow-quantities",
+            "observationNames": [
+              "purchase-cumulative-arrival"
+            ]
+          }
+        },
+        {
+          "id": "purchase-cumulative-arrival-1-mcp",
+          "op": "decimalEquals",
+          "source": {
+            "actionId": "e1-mcp",
+            "pointer": "/response/data/purchaseArrivalQuantity"
+          },
+          "expected": "100",
+          "requirementRefs": [
+            "D05",
+            "D09",
+            "D13",
+            "D15",
+            "D16",
+            "D17",
+            "D18",
+            "D19"
+          ],
+          "evidenceRefs": [
+            "e1-mcp:mcp-response"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "E1",
+            "scenarioId": "full-flow-quantities"
+          },
+          "oracleExplanation": "stateless MCP 진입점에서 같은 snapshot으로 읽은 같은 값이다. API와 같은 서버 판정·원장을 읽어야 하며 다른 계산이나 캐시를 쓰면 실패한다(계획 §3.4, §9.1, §13.1 D20). purchase-cumulative-arrival는 구매100→수령60+40→허용30 판매→반품10으로 W80·과거인도30·적격0을 계산한다의 독립 고정값과 실제 원 행을 대조한다.",
+          "oracleRef": {
+            "oracleId": "E1.full-flow-quantities",
+            "observationNames": [
+              "purchase-cumulative-arrival"
+            ]
+          },
+          "unit": "BOX",
+          "unitSource": {
+            "actionId": "e1-mcp",
+            "pointer": "/response/data/unit"
+          }
+        },
+        {
+          "id": "warehouse-current-held-3-mcp",
+          "op": "decimalEquals",
+          "source": {
+            "actionId": "e1-mcp",
+            "pointer": "/response/data/heldQuantity"
+          },
+          "expected": "80",
+          "requirementRefs": [
+            "D05",
+            "D09",
+            "D13",
+            "D15",
+            "D16",
+            "D17",
+            "D18",
+            "D19"
+          ],
+          "evidenceRefs": [
+            "e1-mcp:mcp-response"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "E1",
+            "scenarioId": "full-flow-quantities"
+          },
+          "oracleExplanation": "stateless MCP 진입점에서 같은 snapshot으로 읽은 같은 값이다. API와 같은 서버 판정·원장을 읽어야 하며 다른 계산이나 캐시를 쓰면 실패한다(계획 §3.4, §9.1, §13.1 D20). warehouse-current-held는 구매100→수령60+40→허용30 판매→반품10으로 W80·과거인도30·적격0을 계산한다의 독립 고정값과 실제 원 행을 대조한다.",
+          "oracleRef": {
+            "oracleId": "E1.full-flow-quantities",
+            "observationNames": [
+              "warehouse-current-held"
+            ]
+          },
+          "unit": "BOX",
+          "unitSource": {
+            "actionId": "e1-mcp",
+            "pointer": "/response/data/unit"
+          }
+        },
+        {
+          "id": "historical-delivery-5-mcp",
+          "op": "decimalEquals",
+          "source": {
+            "actionId": "e1-mcp",
+            "pointer": "/response/data/deliveredQuantity"
+          },
+          "expected": "30",
+          "requirementRefs": [
+            "D05",
+            "D09",
+            "D13",
+            "D15",
+            "D16",
+            "D17",
+            "D18",
+            "D19"
+          ],
+          "evidenceRefs": [
+            "e1-mcp:mcp-response"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "E1",
+            "scenarioId": "full-flow-quantities"
+          },
+          "oracleExplanation": "stateless MCP 진입점에서 같은 snapshot으로 읽은 같은 값이다. API와 같은 서버 판정·원장을 읽어야 하며 다른 계산이나 캐시를 쓰면 실패한다(계획 §3.4, §9.1, §13.1 D20). historical-delivery는 구매100→수령60+40→허용30 판매→반품10으로 W80·과거인도30·적격0을 계산한다의 독립 고정값과 실제 원 행을 대조한다.",
+          "oracleRef": {
+            "oracleId": "E1.full-flow-quantities",
+            "observationNames": [
+              "historical-delivery"
+            ]
+          },
+          "unit": "BOX",
+          "unitSource": {
+            "actionId": "e1-mcp",
+            "pointer": "/response/data/unit"
+          }
+        },
+        {
+          "id": "return-received-7-mcp",
+          "op": "decimalEquals",
+          "source": {
+            "actionId": "e1-mcp",
+            "pointer": "/response/data/returnedQuantity"
+          },
+          "expected": "10",
+          "requirementRefs": [
+            "D05",
+            "D09",
+            "D13",
+            "D15",
+            "D16",
+            "D17",
+            "D18",
+            "D19"
+          ],
+          "evidenceRefs": [
+            "e1-mcp:mcp-response"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "E1",
+            "scenarioId": "full-flow-quantities"
+          },
+          "oracleExplanation": "stateless MCP 진입점에서 같은 snapshot으로 읽은 같은 값이다. API와 같은 서버 판정·원장을 읽어야 하며 다른 계산이나 캐시를 쓰면 실패한다(계획 §3.4, §9.1, §13.1 D20). return-received는 구매100→수령60+40→허용30 판매→반품10으로 W80·과거인도30·적격0을 계산한다의 독립 고정값과 실제 원 행을 대조한다.",
+          "oracleRef": {
+            "oracleId": "E1.full-flow-quantities",
+            "observationNames": [
+              "return-received"
+            ]
+          },
+          "unit": "BOX",
+          "unitSource": {
+            "actionId": "e1-mcp",
+            "pointer": "/response/data/unit"
+          }
+        },
+        {
+          "id": "current-sell-eligible-9-mcp",
+          "op": "decimalEquals",
+          "source": {
+            "actionId": "e1-mcp",
+            "pointer": "/response/data/eligibleQuantity"
+          },
+          "expected": "0",
+          "requirementRefs": [
+            "D05",
+            "D09",
+            "D13",
+            "D15",
+            "D16",
+            "D17",
+            "D18",
+            "D19"
+          ],
+          "evidenceRefs": [
+            "e1-mcp:mcp-response"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "E1",
+            "scenarioId": "full-flow-quantities"
+          },
+          "oracleExplanation": "stateless MCP 진입점에서 같은 snapshot으로 읽은 같은 값이다. API와 같은 서버 판정·원장을 읽어야 하며 다른 계산이나 캐시를 쓰면 실패한다(계획 §3.4, §9.1, §13.1 D20). current-sell-eligible는 구매100→수령60+40→허용30 판매→반품10으로 W80·과거인도30·적격0을 계산한다의 독립 고정값과 실제 원 행을 대조한다.",
+          "oracleRef": {
+            "oracleId": "E1.full-flow-quantities",
+            "observationNames": [
+              "current-sell-eligible"
+            ]
+          },
+          "unit": "BOX",
+          "unitSource": {
+            "actionId": "e1-mcp",
+            "pointer": "/response/data/unit"
+          }
+        },
+        {
+          "id": "agency-unverified-held-11-mcp",
+          "op": "decimalEquals",
+          "source": {
+            "actionId": "e1-mcp",
+            "pointer": "/response/data/agencyUnverifiedHeldQuantity"
+          },
+          "expected": "30",
+          "requirementRefs": [
+            "D05",
+            "D09",
+            "D13",
+            "D15",
+            "D16",
+            "D17",
+            "D18",
+            "D19"
+          ],
+          "evidenceRefs": [
+            "e1-mcp:mcp-response"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "E1",
+            "scenarioId": "full-flow-quantities"
+          },
+          "oracleExplanation": "stateless MCP 진입점에서 같은 snapshot으로 읽은 같은 값이다. API와 같은 서버 판정·원장을 읽어야 하며 다른 계산이나 캐시를 쓰면 실패한다(계획 §3.4, §9.1, §13.1 D20). agency-unverified-held는 구매100→수령60+40→허용30 판매→반품10으로 W80·과거인도30·적격0을 계산한다의 독립 고정값과 실제 원 행을 대조한다.",
+          "oracleRef": {
+            "oracleId": "E1.full-flow-quantities",
+            "observationNames": [
+              "agency-unverified-held"
+            ]
+          },
+          "unit": "BOX",
+          "unitSource": {
+            "actionId": "e1-mcp",
+            "pointer": "/response/data/unit"
+          }
+        },
+        {
+          "id": "QC-held-13-mcp",
+          "op": "decimalEquals",
+          "source": {
+            "actionId": "e1-mcp",
+            "pointer": "/response/data/QCHeldQuantity"
+          },
+          "expected": "40",
+          "requirementRefs": [
+            "D05",
+            "D09",
+            "D13",
+            "D15",
+            "D16",
+            "D17",
+            "D18",
+            "D19"
+          ],
+          "evidenceRefs": [
+            "e1-mcp:mcp-response"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "E1",
+            "scenarioId": "full-flow-quantities"
+          },
+          "oracleExplanation": "stateless MCP 진입점에서 같은 snapshot으로 읽은 같은 값이다. API와 같은 서버 판정·원장을 읽어야 하며 다른 계산이나 캐시를 쓰면 실패한다(계획 §3.4, §9.1, §13.1 D20). QC-held는 구매100→수령60+40→허용30 판매→반품10으로 W80·과거인도30·적격0을 계산한다의 독립 고정값과 실제 원 행을 대조한다.",
+          "oracleRef": {
+            "oracleId": "E1.full-flow-quantities",
+            "observationNames": [
+              "QC-held"
+            ]
+          },
+          "unit": "BOX",
+          "unitSource": {
+            "actionId": "e1-mcp",
+            "pointer": "/response/data/unit"
+          }
+        },
+        {
+          "id": "return-held-15-mcp",
+          "op": "decimalEquals",
+          "source": {
+            "actionId": "e1-mcp",
+            "pointer": "/response/data/returnHeldQuantity"
+          },
+          "expected": "10",
+          "requirementRefs": [
+            "D05",
+            "D09",
+            "D13",
+            "D15",
+            "D16",
+            "D17",
+            "D18",
+            "D19"
+          ],
+          "evidenceRefs": [
+            "e1-mcp:mcp-response"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "E1",
+            "scenarioId": "full-flow-quantities"
+          },
+          "oracleExplanation": "stateless MCP 진입점에서 같은 snapshot으로 읽은 같은 값이다. API와 같은 서버 판정·원장을 읽어야 하며 다른 계산이나 캐시를 쓰면 실패한다(계획 §3.4, §9.1, §13.1 D20). return-held는 구매100→수령60+40→허용30 판매→반품10으로 W80·과거인도30·적격0을 계산한다의 독립 고정값과 실제 원 행을 대조한다.",
+          "oracleRef": {
+            "oracleId": "E1.full-flow-quantities",
+            "observationNames": [
+              "return-held"
+            ]
+          },
+          "unit": "BOX",
+          "unitSource": {
+            "actionId": "e1-mcp",
+            "pointer": "/response/data/unit"
+          }
+        },
+        {
+          "id": "bank-transfer-18-mcp",
+          "op": "equals",
+          "source": {
+            "actionId": "e1-mcp",
+            "pointer": "/response/data/bankTransferCount"
+          },
+          "expected": 0,
+          "requirementRefs": [
+            "D05",
+            "D09",
+            "D13",
+            "D15",
+            "D16",
+            "D17",
+            "D18",
+            "D19"
+          ],
+          "evidenceRefs": [
+            "e1-mcp:mcp-response"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "E1",
+            "scenarioId": "full-flow-quantities"
+          },
+          "oracleExplanation": "stateless MCP 진입점에서 같은 snapshot으로 읽은 같은 값이다. API와 같은 서버 판정·원장을 읽어야 하며 다른 계산이나 캐시를 쓰면 실패한다(계획 §3.4, §9.1, §13.1 D20). bank-transfer는 구매100→수령60+40→허용30 판매→반품10으로 W80·과거인도30·적격0을 계산한다의 독립 고정값과 실제 원 행을 대조한다.",
+          "oracleRef": {
+            "oracleId": "E1.full-flow-quantities",
+            "observationNames": [
+              "bank-transfer"
+            ]
+          }
         }
       ],
       "oracleExplanation": "가상 fixture는 선행 실물·정책·증거 입력만 설치한다. 검증하는 주문·승인·예약·출고·인도·반품·회수·정정 효과는 각각 공개 명령으로 실행한다. 구매100→수령60+40→허용30 판매→반품10으로 W80·과거인도30·적격0을 계산한다의 수량과 책임은 고정 기대값과 원 행·응답을 함께 검증한다."
@@ -3261,7 +3812,8 @@
       "requiredAdapters": [
         "fixture",
         "api",
-        "db"
+        "db",
+        "mcp"
       ],
       "actions": [
         {
@@ -5401,6 +5953,54 @@
           ]
         },
         {
+          "id": "goals-mcp",
+          "kind": "query",
+          "actorRef": "observer",
+          "route": "mcp",
+          "capabilityId": "getObject",
+          "request": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseId": "E1",
+              "scenarioId": "independent-goals-and-owners"
+            },
+            "subjectRefs": [
+              {
+                "type": "TradeItem",
+                "id": {
+                  "$alias": "P"
+                }
+              }
+            ],
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z",
+            "include": [
+              "inventory",
+              "trade",
+              "evidence",
+              "assessments",
+              "obligations",
+              "audit",
+              "outbox"
+            ],
+            "snapshotRef": {
+              "$result": {
+                "actionId": "goals",
+                "pointer": "/response/snapshotRevision"
+              }
+            }
+          },
+          "evidenceRefs": [
+            "goals-mcp:mcp-response",
+            "goals-mcp:actual-mcp-artifact"
+          ]
+        },
+        {
           "id": "goals-db",
           "kind": "observe",
           "observation": {
@@ -5487,6 +6087,54 @@
           },
           "evidenceRefs": [
             "noun:api-response"
+          ]
+        },
+        {
+          "id": "noun-mcp",
+          "kind": "query",
+          "actorRef": "observer",
+          "route": "mcp",
+          "capabilityId": "getObject",
+          "request": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseId": "E1",
+              "scenarioId": "independent-goals-and-owners"
+            },
+            "subjectRefs": [
+              {
+                "type": "TradeItem",
+                "id": {
+                  "$alias": "P"
+                }
+              }
+            ],
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z",
+            "include": [
+              "inventory",
+              "trade",
+              "evidence",
+              "assessments",
+              "obligations",
+              "audit",
+              "outbox"
+            ],
+            "snapshotRef": {
+              "$result": {
+                "actionId": "noun",
+                "pointer": "/response/snapshotRevision"
+              }
+            }
+          },
+          "evidenceRefs": [
+            "noun-mcp:mcp-response",
+            "noun-mcp:actual-mcp-artifact"
           ]
         },
         {
@@ -5740,7 +6388,8 @@
             "pointer": "/data/rawRows/obligations",
             "where": {
               "kind": "QC",
-              "current": true
+              "current": true,
+              "status": "OPEN"
             }
           },
           "expected": 1,
@@ -5767,7 +6416,7 @@
             "caseId": "E1",
             "scenarioId": "independent-goals-and-owners"
           },
-          "oracleExplanation": "QC-duty는 전체 물류100 충족 뒤 송장5EUR 차이와 QC40·반품10·정산 owner는 별도로 남는다의 독립 고정값과 실제 원 행을 대조한다.",
+          "oracleExplanation": "QC-duty는 전체 물류100 충족 뒤 송장5EUR 차이와 QC40·반품10·정산 owner는 별도로 남는다의 독립 고정값과 실제 원 행을 대조한다. current는 행의 현재 유효성(최신 version)이며 status와 독립이다. 해소된 의무도 current=true로 남고 status=RESOLVED로 구별한다(계획 §5.3 현재 유효성과 status 분리, C4와 같은 의미).",
           "oracleRef": {
             "oracleId": "E1.independent-goals-and-owners",
             "observationNames": [
@@ -5783,7 +6432,8 @@
             "pointer": "/data/rawRows/obligations",
             "where": {
               "kind": "QC",
-              "current": true
+              "current": true,
+              "status": "OPEN"
             },
             "field": "ownerId"
           },
@@ -5815,7 +6465,7 @@
             "caseId": "E1",
             "scenarioId": "independent-goals-and-owners"
           },
-          "oracleExplanation": "QC-duty는 전체 물류100 충족 뒤 송장5EUR 차이와 QC40·반품10·정산 owner는 별도로 남는다의 독립 고정값과 실제 원 행을 대조한다.",
+          "oracleExplanation": "QC-duty는 전체 물류100 충족 뒤 송장5EUR 차이와 QC40·반품10·정산 owner는 별도로 남는다의 독립 고정값과 실제 원 행을 대조한다. current는 행의 현재 유효성(최신 version)이며 status와 독립이다. 해소된 의무도 current=true로 남고 status=RESOLVED로 구별한다(계획 §5.3 현재 유효성과 status 분리, C4와 같은 의미).",
           "oracleRef": {
             "oracleId": "E1.independent-goals-and-owners",
             "observationNames": [
@@ -5836,7 +6486,8 @@
             "field": "status"
           },
           "expected": [
-            "OPEN"
+            "OPEN",
+            "RESOLVED"
           ],
           "requirementRefs": [
             "D05",
@@ -5861,7 +6512,7 @@
             "caseId": "E1",
             "scenarioId": "independent-goals-and-owners"
           },
-          "oracleExplanation": "QC-duty는 전체 물류100 충족 뒤 송장5EUR 차이와 QC40·반품10·정산 owner는 별도로 남는다의 독립 고정값과 실제 원 행을 대조한다.",
+          "oracleExplanation": "QC 보류는 60과 40 두 건이며 QC_PASS 해제는 hold60의 의무만 해소한다. 현재 유효한 QC 의무의 status 집합은 정확히 OPEN(hold40)과 RESOLVED(hold60)이다. current는 행의 현재 유효성(최신 version)이며 status와 독립이다. 해소된 의무도 current=true로 남고 status=RESOLVED로 구별한다(계획 §5.3 현재 유효성과 status 분리, C4와 같은 의미).",
           "oracleRef": {
             "oracleId": "E1.independent-goals-and-owners",
             "observationNames": [
@@ -5877,7 +6528,8 @@
             "pointer": "/data/rawRows/obligations",
             "where": {
               "kind": "QC",
-              "current": true
+              "current": true,
+              "status": "OPEN"
             },
             "field": "nextAction"
           },
@@ -5907,7 +6559,7 @@
             "caseId": "E1",
             "scenarioId": "independent-goals-and-owners"
           },
-          "oracleExplanation": "QC-duty는 전체 물류100 충족 뒤 송장5EUR 차이와 QC40·반품10·정산 owner는 별도로 남는다의 독립 고정값과 실제 원 행을 대조한다.",
+          "oracleExplanation": "QC-duty는 전체 물류100 충족 뒤 송장5EUR 차이와 QC40·반품10·정산 owner는 별도로 남는다의 독립 고정값과 실제 원 행을 대조한다. current는 행의 현재 유효성(최신 version)이며 status와 독립이다. 해소된 의무도 current=true로 남고 status=RESOLVED로 구별한다(계획 §5.3 현재 유효성과 status 분리, C4와 같은 의미).",
           "oracleRef": {
             "oracleId": "E1.independent-goals-and-owners",
             "observationNames": [
@@ -5923,7 +6575,8 @@
             "pointer": "/data/rawRows/obligations",
             "where": {
               "kind": "QC",
-              "current": true
+              "current": true,
+              "status": "OPEN"
             },
             "field": "nextCheckAt"
           },
@@ -5953,7 +6606,7 @@
             "caseId": "E1",
             "scenarioId": "independent-goals-and-owners"
           },
-          "oracleExplanation": "QC-duty는 전체 물류100 충족 뒤 송장5EUR 차이와 QC40·반품10·정산 owner는 별도로 남는다의 독립 고정값과 실제 원 행을 대조한다.",
+          "oracleExplanation": "QC-duty는 전체 물류100 충족 뒤 송장5EUR 차이와 QC40·반품10·정산 owner는 별도로 남는다의 독립 고정값과 실제 원 행을 대조한다. current는 행의 현재 유효성(최신 version)이며 status와 독립이다. 해소된 의무도 current=true로 남고 status=RESOLVED로 구별한다(계획 §5.3 현재 유효성과 status 분리, C4와 같은 의미).",
           "oracleRef": {
             "oracleId": "E1.independent-goals-and-owners",
             "observationNames": [
@@ -5969,7 +6622,8 @@
             "pointer": "/data/rawRows/obligations",
             "where": {
               "kind": "QC",
-              "current": true
+              "current": true,
+              "status": "OPEN"
             }
           },
           "expected": [
@@ -6004,7 +6658,7 @@
             "caseId": "E1",
             "scenarioId": "independent-goals-and-owners"
           },
-          "oracleExplanation": "QC-duty는 전체 물류100 충족 뒤 송장5EUR 차이와 QC40·반품10·정산 owner는 별도로 남는다의 독립 고정값과 실제 원 행을 대조한다.",
+          "oracleExplanation": "QC-duty는 전체 물류100 충족 뒤 송장5EUR 차이와 QC40·반품10·정산 owner는 별도로 남는다의 독립 고정값과 실제 원 행을 대조한다. current는 행의 현재 유효성(최신 version)이며 status와 독립이다. 해소된 의무도 current=true로 남고 status=RESOLVED로 구별한다(계획 §5.3 현재 유효성과 status 분리, C4와 같은 의미).",
           "oracleRef": {
             "oracleId": "E1.independent-goals-and-owners",
             "observationNames": [
@@ -6020,7 +6674,8 @@
             "pointer": "/response/data/obligations",
             "where": {
               "kind": "QC",
-              "current": true
+              "current": true,
+              "status": "OPEN"
             },
             "field": [
               "id",
@@ -6055,7 +6710,7 @@
             "caseId": "E1",
             "scenarioId": "independent-goals-and-owners"
           },
-          "oracleExplanation": "QC-duty는 전체 물류100 충족 뒤 송장5EUR 차이와 QC40·반품10·정산 owner는 별도로 남는다의 독립 고정값과 실제 원 행을 대조한다.",
+          "oracleExplanation": "QC-duty는 전체 물류100 충족 뒤 송장5EUR 차이와 QC40·반품10·정산 owner는 별도로 남는다의 독립 고정값과 실제 원 행을 대조한다. current는 행의 현재 유효성(최신 version)이며 status와 독립이다. 해소된 의무도 current=true로 남고 status=RESOLVED로 구별한다(계획 §5.3 현재 유효성과 status 분리, C4와 같은 의미).",
           "oracleRef": {
             "oracleId": "E1.independent-goals-and-owners",
             "observationNames": [
@@ -6067,7 +6722,8 @@
             "pointer": "/data/rawRows/obligations",
             "where": {
               "kind": "QC",
-              "current": true
+              "current": true,
+              "status": "OPEN"
             },
             "field": [
               "id",
@@ -6076,6 +6732,183 @@
               "status",
               "nextAction",
               "nextCheckAt"
+            ]
+          }
+        },
+        {
+          "id": "QC-duty-hold60-resolved",
+          "op": "relationSet",
+          "source": {
+            "actionId": "goals-db",
+            "pointer": "/data/rawRows/obligations",
+            "where": {
+              "id": {
+                "$result": {
+                  "actionId": "qc-hold60",
+                  "pointer": "/response/obligationId"
+                }
+              }
+            },
+            "field": [
+              "id",
+              "kind",
+              "status",
+              "current"
+            ]
+          },
+          "expected": [
+            [
+              {
+                "$result": {
+                  "actionId": "qc-hold60",
+                  "pointer": "/response/obligationId"
+                }
+              },
+              "QC",
+              "RESOLVED",
+              true
+            ]
+          ],
+          "requirementRefs": [
+            "D05",
+            "D09",
+            "D13",
+            "D15",
+            "D16",
+            "D17",
+            "D18",
+            "D19"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "E1",
+            "scenarioId": "independent-goals-and-owners"
+          },
+          "evidenceRefs": [
+            "goals-db:raw-rows"
+          ],
+          "oracleExplanation": "QC_PASS로 해제한 hold60의 의무는 삭제되거나 current=false로 숨지 않고 kind QC·RESOLVED·current=true로 남으며 해소 결정 근거를 가진다(계획 §5.3, s3-quality 계약: release는 해당 hold의 의무만 해소).",
+          "oracleRef": {
+            "oracleId": "E1.independent-goals-and-owners",
+            "observationNames": [
+              "QC-duty"
+            ]
+          }
+        },
+        {
+          "id": "QC-duty-hold60-resolution-evidence",
+          "op": "fieldsPresent",
+          "source": {
+            "actionId": "goals-db",
+            "pointer": "/data/rawRows/obligations",
+            "where": {
+              "id": {
+                "$result": {
+                  "actionId": "qc-hold60",
+                  "pointer": "/response/obligationId"
+                }
+              }
+            }
+          },
+          "expected": [
+            "id",
+            "rootId",
+            "ownerId",
+            "resolutionDecisionId"
+          ],
+          "requirementRefs": [
+            "D05",
+            "D09",
+            "D13",
+            "D15",
+            "D16",
+            "D17",
+            "D18",
+            "D19"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "E1",
+            "scenarioId": "independent-goals-and-owners"
+          },
+          "evidenceRefs": [
+            "goals-db:raw-rows"
+          ],
+          "oracleExplanation": "QC_PASS로 해제한 hold60의 의무는 삭제되거나 current=false로 숨지 않고 kind QC·RESOLVED·current=true로 남으며 해소 결정 근거를 가진다(계획 §5.3, s3-quality 계약: release는 해당 hold의 의무만 해소).",
+          "oracleRef": {
+            "oracleId": "E1.independent-goals-and-owners",
+            "observationNames": [
+              "QC-duty"
+            ]
+          }
+        },
+        {
+          "id": "QC-duty-hold40-identity",
+          "op": "relationSet",
+          "source": {
+            "actionId": "goals-db",
+            "pointer": "/data/rawRows/obligations",
+            "where": {
+              "kind": "QC",
+              "current": true,
+              "status": "OPEN"
+            },
+            "field": [
+              "id",
+              "ownerId"
+            ]
+          },
+          "expected": [
+            [
+              {
+                "$result": {
+                  "actionId": "qc-hold40",
+                  "pointer": "/response/obligationId"
+                }
+              },
+              {
+                "$alias": "qc"
+              }
+            ]
+          ],
+          "requirementRefs": [
+            "D05",
+            "D09",
+            "D13",
+            "D15",
+            "D16",
+            "D17",
+            "D18",
+            "D19"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "E1",
+            "scenarioId": "independent-goals-and-owners"
+          },
+          "evidenceRefs": [
+            "goals-db:raw-rows"
+          ],
+          "oracleExplanation": "남은 OPEN QC 의무는 QC 보류40이 만든 바로 그 의무이며 owner는 qc다. current는 행의 현재 유효성(최신 version)이며 status와 독립이다. 해소된 의무도 current=true로 남고 status=RESOLVED로 구별한다(계획 §5.3 현재 유효성과 status 분리, C4와 같은 의미).",
+          "oracleRef": {
+            "oracleId": "E1.independent-goals-and-owners",
+            "observationNames": [
+              "QC-duty"
             ]
           }
         },
@@ -7161,18 +7994,856 @@
           }
         },
         {
+          "id": "two-entry-anchor-snapshot",
+          "op": "equals",
+          "source": {
+            "actionId": "noun",
+            "pointer": "/response/data/linkedSummary/snapshotRevision"
+          },
+          "expected": {
+            "$result": {
+              "actionId": "goals",
+              "pointer": "/response/snapshotRevision"
+            }
+          },
+          "requirementRefs": [
+            "D05",
+            "D09",
+            "D13",
+            "D15",
+            "D16",
+            "D17",
+            "D18",
+            "D19"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "E1",
+            "scenarioId": "independent-goals-and-owners"
+          },
+          "evidenceRefs": [
+            "noun:api-response"
+          ],
+          "oracleExplanation": "명사 getObject와 동사 getWork의 linkedSummary가 서로 같을 뿐 아니라 같은 snapshot의 독립 원장과 고정 손계산에 맞아야 한다. 두 진입점이 같은 오래된 값이나 빈 배열을 내도 통과하지 않는다(계획 §3.4, §13.3 E1, step-3-s4 독립 원장 대조). linkedSummary의 snapshotRevision은 goals 조회와 goals-db 관찰이 사용한 바로 그 snapshot이다.",
+          "oracleRef": {
+            "oracleId": "E1.independent-goals-and-owners",
+            "observationNames": [
+              "two-entry-snapshot"
+            ]
+          }
+        },
+        {
+          "id": "two-entry-anchor-asOf",
+          "op": "timeEquals",
+          "source": {
+            "actionId": "noun",
+            "pointer": "/response/data/linkedSummary/asOf"
+          },
+          "expected": "2026-10-07T09:00:00Z",
+          "requirementRefs": [
+            "D05",
+            "D09",
+            "D13",
+            "D15",
+            "D16",
+            "D17",
+            "D18",
+            "D19"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "E1",
+            "scenarioId": "independent-goals-and-owners"
+          },
+          "evidenceRefs": [
+            "noun:api-response"
+          ],
+          "oracleExplanation": "명사 getObject와 동사 getWork의 linkedSummary가 서로 같을 뿐 아니라 같은 snapshot의 독립 원장과 고정 손계산에 맞아야 한다. 두 진입점이 같은 오래된 값이나 빈 배열을 내도 통과하지 않는다(계획 §3.4, §13.3 E1, step-3-s4 독립 원장 대조). fixture 업무 시계의 asOf다.",
+          "oracleRef": {
+            "oracleId": "E1.independent-goals-and-owners",
+            "observationNames": [
+              "two-entry-snapshot"
+            ]
+          }
+        },
+        {
+          "id": "two-entry-anchor-knownAt",
+          "op": "timeEquals",
+          "source": {
+            "actionId": "noun",
+            "pointer": "/response/data/linkedSummary/knownAt"
+          },
+          "expected": "2026-10-07T09:00:01Z",
+          "requirementRefs": [
+            "D05",
+            "D09",
+            "D13",
+            "D15",
+            "D16",
+            "D17",
+            "D18",
+            "D19"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "E1",
+            "scenarioId": "independent-goals-and-owners"
+          },
+          "evidenceRefs": [
+            "noun:api-response"
+          ],
+          "oracleExplanation": "명사 getObject와 동사 getWork의 linkedSummary가 서로 같을 뿐 아니라 같은 snapshot의 독립 원장과 고정 손계산에 맞아야 한다. 두 진입점이 같은 오래된 값이나 빈 배열을 내도 통과하지 않는다(계획 §3.4, §13.3 E1, step-3-s4 독립 원장 대조). fixture 업무 시계의 knownAt이다.",
+          "oracleRef": {
+            "oracleId": "E1.independent-goals-and-owners",
+            "observationNames": [
+              "two-entry-snapshot"
+            ]
+          }
+        },
+        {
+          "id": "two-entry-anchor-duty-fields",
+          "op": "fieldsPresent",
+          "source": {
+            "actionId": "noun",
+            "pointer": "/response/data/linkedSummary/duties"
+          },
+          "expected": [
+            "id",
+            "kind",
+            "ownerId",
+            "status",
+            "nextAction",
+            "nextCheckAt"
+          ],
+          "requirementRefs": [
+            "D05",
+            "D09",
+            "D13",
+            "D15",
+            "D16",
+            "D17",
+            "D18",
+            "D19"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "E1",
+            "scenarioId": "independent-goals-and-owners"
+          },
+          "evidenceRefs": [
+            "noun:api-response"
+          ],
+          "oracleExplanation": "명사 getObject와 동사 getWork의 linkedSummary가 서로 같을 뿐 아니라 같은 snapshot의 독립 원장과 고정 손계산에 맞아야 한다. 두 진입점이 같은 오래된 값이나 빈 배열을 내도 통과하지 않는다(계획 §3.4, §13.3 E1, step-3-s4 독립 원장 대조). duties는 비어 있을 수 없고 각 행은 의무 ID·종류·owner·상태·다음 행동·기한을 가진다.",
+          "oracleRef": {
+            "oracleId": "E1.independent-goals-and-owners",
+            "observationNames": [
+              "two-entry-snapshot"
+            ]
+          }
+        },
+        {
+          "id": "two-entry-anchor-qc-duty-ledger",
+          "op": "sameAs",
+          "source": {
+            "actionId": "noun",
+            "pointer": "/response/data/linkedSummary/duties",
+            "where": {
+              "kind": "QC",
+              "status": "OPEN"
+            },
+            "field": [
+              "id",
+              "ownerId",
+              "nextAction",
+              "nextCheckAt"
+            ]
+          },
+          "expected": null,
+          "requirementRefs": [
+            "D05",
+            "D09",
+            "D13",
+            "D15",
+            "D16",
+            "D17",
+            "D18",
+            "D19"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "E1",
+            "scenarioId": "independent-goals-and-owners"
+          },
+          "evidenceRefs": [
+            "noun:api-response",
+            "goals-db:raw-rows"
+          ],
+          "oracleExplanation": "명사 getObject와 동사 getWork의 linkedSummary가 서로 같을 뿐 아니라 같은 snapshot의 독립 원장과 고정 손계산에 맞아야 한다. 두 진입점이 같은 오래된 값이나 빈 배열을 내도 통과하지 않는다(계획 §3.4, §13.3 E1, step-3-s4 독립 원장 대조). OPEN QC 의무 행은 goals-db의 현재 OPEN QC 의무와 ID·owner·다음 행동·기한이 같다.",
+          "oracleRef": {
+            "oracleId": "E1.independent-goals-and-owners",
+            "observationNames": [
+              "two-entry-snapshot"
+            ]
+          },
+          "baseline": {
+            "actionId": "goals-db",
+            "pointer": "/data/rawRows/obligations",
+            "where": {
+              "kind": "QC",
+              "current": true,
+              "status": "OPEN"
+            },
+            "field": [
+              "id",
+              "ownerId",
+              "nextAction",
+              "nextCheckAt"
+            ]
+          }
+        },
+        {
+          "id": "two-entry-anchor-return-duty-ledger",
+          "op": "sameAs",
+          "source": {
+            "actionId": "noun",
+            "pointer": "/response/data/linkedSummary/duties",
+            "where": {
+              "kind": "RETURN",
+              "status": "OPEN"
+            },
+            "field": [
+              "id",
+              "ownerId",
+              "nextAction",
+              "nextCheckAt"
+            ]
+          },
+          "expected": null,
+          "requirementRefs": [
+            "D05",
+            "D09",
+            "D13",
+            "D15",
+            "D16",
+            "D17",
+            "D18",
+            "D19"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "E1",
+            "scenarioId": "independent-goals-and-owners"
+          },
+          "evidenceRefs": [
+            "noun:api-response",
+            "goals-db:raw-rows"
+          ],
+          "oracleExplanation": "명사 getObject와 동사 getWork의 linkedSummary가 서로 같을 뿐 아니라 같은 snapshot의 독립 원장과 고정 손계산에 맞아야 한다. 두 진입점이 같은 오래된 값이나 빈 배열을 내도 통과하지 않는다(계획 §3.4, §13.3 E1, step-3-s4 독립 원장 대조). OPEN RETURN 의무 행은 goals-db의 현재 OPEN RETURN 의무와 ID·owner·다음 행동·기한이 같다.",
+          "oracleRef": {
+            "oracleId": "E1.independent-goals-and-owners",
+            "observationNames": [
+              "two-entry-snapshot"
+            ]
+          },
+          "baseline": {
+            "actionId": "goals-db",
+            "pointer": "/data/rawRows/obligations",
+            "where": {
+              "kind": "RETURN",
+              "current": true,
+              "status": "OPEN"
+            },
+            "field": [
+              "id",
+              "ownerId",
+              "nextAction",
+              "nextCheckAt"
+            ]
+          }
+        },
+        {
+          "id": "two-entry-anchor-settlement-duty-ledger",
+          "op": "sameAs",
+          "source": {
+            "actionId": "noun",
+            "pointer": "/response/data/linkedSummary/duties",
+            "where": {
+              "kind": "SETTLEMENT",
+              "status": "OPEN"
+            },
+            "field": [
+              "id",
+              "ownerId",
+              "nextAction",
+              "nextCheckAt"
+            ]
+          },
+          "expected": null,
+          "requirementRefs": [
+            "D05",
+            "D09",
+            "D13",
+            "D15",
+            "D16",
+            "D17",
+            "D18",
+            "D19"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "E1",
+            "scenarioId": "independent-goals-and-owners"
+          },
+          "evidenceRefs": [
+            "noun:api-response",
+            "goals-db:raw-rows"
+          ],
+          "oracleExplanation": "명사 getObject와 동사 getWork의 linkedSummary가 서로 같을 뿐 아니라 같은 snapshot의 독립 원장과 고정 손계산에 맞아야 한다. 두 진입점이 같은 오래된 값이나 빈 배열을 내도 통과하지 않는다(계획 §3.4, §13.3 E1, step-3-s4 독립 원장 대조). OPEN SETTLEMENT 의무 행은 goals-db의 현재 OPEN SETTLEMENT 의무와 ID·owner·다음 행동·기한이 같다.",
+          "oracleRef": {
+            "oracleId": "E1.independent-goals-and-owners",
+            "observationNames": [
+              "two-entry-snapshot"
+            ]
+          },
+          "baseline": {
+            "actionId": "goals-db",
+            "pointer": "/data/rawRows/obligations",
+            "where": {
+              "kind": "SETTLEMENT",
+              "current": true,
+              "status": "OPEN"
+            },
+            "field": [
+              "id",
+              "ownerId",
+              "nextAction",
+              "nextCheckAt"
+            ]
+          }
+        },
+        {
+          "id": "two-entry-anchor-qc-duty-identity",
+          "op": "relationSet",
+          "source": {
+            "actionId": "noun",
+            "pointer": "/response/data/linkedSummary/duties",
+            "where": {
+              "kind": "QC",
+              "status": "OPEN"
+            },
+            "field": [
+              "id",
+              "ownerId"
+            ]
+          },
+          "expected": [
+            [
+              {
+                "$result": {
+                  "actionId": "qc-hold40",
+                  "pointer": "/response/obligationId"
+                }
+              },
+              {
+                "$alias": "qc"
+              }
+            ]
+          ],
+          "requirementRefs": [
+            "D05",
+            "D09",
+            "D13",
+            "D15",
+            "D16",
+            "D17",
+            "D18",
+            "D19"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "E1",
+            "scenarioId": "independent-goals-and-owners"
+          },
+          "evidenceRefs": [
+            "noun:api-response"
+          ],
+          "oracleExplanation": "명사 getObject와 동사 getWork의 linkedSummary가 서로 같을 뿐 아니라 같은 snapshot의 독립 원장과 고정 손계산에 맞아야 한다. 두 진입점이 같은 오래된 값이나 빈 배열을 내도 통과하지 않는다(계획 §3.4, §13.3 E1, step-3-s4 독립 원장 대조). OPEN QC 의무는 QC 보류40의 의무이고 owner는 qc다.",
+          "oracleRef": {
+            "oracleId": "E1.independent-goals-and-owners",
+            "observationNames": [
+              "two-entry-snapshot"
+            ]
+          }
+        },
+        {
+          "id": "two-entry-anchor-return-owner",
+          "op": "exactSet",
+          "source": {
+            "actionId": "noun",
+            "pointer": "/response/data/linkedSummary/duties",
+            "where": {
+              "kind": "RETURN",
+              "status": "OPEN"
+            },
+            "field": "ownerId"
+          },
+          "expected": [
+            {
+              "$alias": "receiver"
+            }
+          ],
+          "requirementRefs": [
+            "D05",
+            "D09",
+            "D13",
+            "D15",
+            "D16",
+            "D17",
+            "D18",
+            "D19"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "E1",
+            "scenarioId": "independent-goals-and-owners"
+          },
+          "evidenceRefs": [
+            "noun:api-response"
+          ],
+          "oracleExplanation": "명사 getObject와 동사 getWork의 linkedSummary가 서로 같을 뿐 아니라 같은 snapshot의 독립 원장과 고정 손계산에 맞아야 한다. 두 진입점이 같은 오래된 값이나 빈 배열을 내도 통과하지 않는다(계획 §3.4, §13.3 E1, step-3-s4 독립 원장 대조). OPEN RETURN 의무의 owner는 receiver다.",
+          "oracleRef": {
+            "oracleId": "E1.independent-goals-and-owners",
+            "observationNames": [
+              "two-entry-snapshot"
+            ]
+          }
+        },
+        {
+          "id": "two-entry-anchor-settlement-owner",
+          "op": "exactSet",
+          "source": {
+            "actionId": "noun",
+            "pointer": "/response/data/linkedSummary/duties",
+            "where": {
+              "kind": "SETTLEMENT",
+              "status": "OPEN"
+            },
+            "field": "ownerId"
+          },
+          "expected": [
+            {
+              "$alias": "settlement"
+            }
+          ],
+          "requirementRefs": [
+            "D05",
+            "D09",
+            "D13",
+            "D15",
+            "D16",
+            "D17",
+            "D18",
+            "D19"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "E1",
+            "scenarioId": "independent-goals-and-owners"
+          },
+          "evidenceRefs": [
+            "noun:api-response"
+          ],
+          "oracleExplanation": "명사 getObject와 동사 getWork의 linkedSummary가 서로 같을 뿐 아니라 같은 snapshot의 독립 원장과 고정 손계산에 맞아야 한다. 두 진입점이 같은 오래된 값이나 빈 배열을 내도 통과하지 않는다(계획 §3.4, §13.3 E1, step-3-s4 독립 원장 대조). OPEN SETTLEMENT 의무의 owner는 settlement다.",
+          "oracleRef": {
+            "oracleId": "E1.independent-goals-and-owners",
+            "observationNames": [
+              "two-entry-snapshot"
+            ]
+          }
+        },
+        {
+          "id": "two-entry-duties-noun-verb",
+          "op": "sameAs",
+          "source": {
+            "actionId": "noun",
+            "pointer": "/response/data/linkedSummary/duties"
+          },
+          "expected": null,
+          "requirementRefs": [
+            "D05",
+            "D09",
+            "D13",
+            "D15",
+            "D16",
+            "D17",
+            "D18",
+            "D19"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "E1",
+            "scenarioId": "independent-goals-and-owners"
+          },
+          "evidenceRefs": [
+            "noun:api-response",
+            "verb:api-response"
+          ],
+          "oracleExplanation": "명사 getObject와 동사 getWork의 linkedSummary가 서로 같을 뿐 아니라 같은 snapshot의 독립 원장과 고정 손계산에 맞아야 한다. 두 진입점이 같은 오래된 값이나 빈 배열을 내도 통과하지 않는다(계획 §3.4, §13.3 E1, step-3-s4 독립 원장 대조). 동사 진입점의 duties도 명사 진입점과 같다.",
+          "oracleRef": {
+            "oracleId": "E1.independent-goals-and-owners",
+            "observationNames": [
+              "two-entry-snapshot"
+            ]
+          },
+          "baseline": {
+            "actionId": "verb",
+            "pointer": "/response/data/linkedSummary/duties"
+          }
+        },
+        {
+          "id": "two-entry-anchor-purchaseArrivalQuantity",
+          "op": "decimalEquals",
+          "source": {
+            "actionId": "noun",
+            "pointer": "/response/data/linkedSummary/quantities/purchaseArrivalQuantity"
+          },
+          "expected": "100",
+          "requirementRefs": [
+            "D05",
+            "D09",
+            "D13",
+            "D15",
+            "D16",
+            "D17",
+            "D18",
+            "D19"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "E1",
+            "scenarioId": "independent-goals-and-owners"
+          },
+          "evidenceRefs": [
+            "noun:api-response"
+          ],
+          "oracleExplanation": "명사 getObject와 동사 getWork의 linkedSummary가 서로 같을 뿐 아니라 같은 snapshot의 독립 원장과 고정 손계산에 맞아야 한다. 두 진입점이 같은 오래된 값이나 빈 배열을 내도 통과하지 않는다(계획 §3.4, §13.3 E1, step-3-s4 독립 원장 대조). 손계산: 구매 누적 도착100, W 보유100−30+10=80, 과거 인도30, 반품10, 현재 판매 적격0.",
+          "oracleRef": {
+            "oracleId": "E1.independent-goals-and-owners",
+            "observationNames": [
+              "two-entry-snapshot"
+            ]
+          },
+          "unit": "BOX",
+          "unitSource": {
+            "actionId": "noun",
+            "pointer": "/response/data/linkedSummary/quantities/unit"
+          }
+        },
+        {
+          "id": "two-entry-anchor-heldQuantity",
+          "op": "decimalEquals",
+          "source": {
+            "actionId": "noun",
+            "pointer": "/response/data/linkedSummary/quantities/heldQuantity"
+          },
+          "expected": "80",
+          "requirementRefs": [
+            "D05",
+            "D09",
+            "D13",
+            "D15",
+            "D16",
+            "D17",
+            "D18",
+            "D19"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "E1",
+            "scenarioId": "independent-goals-and-owners"
+          },
+          "evidenceRefs": [
+            "noun:api-response"
+          ],
+          "oracleExplanation": "명사 getObject와 동사 getWork의 linkedSummary가 서로 같을 뿐 아니라 같은 snapshot의 독립 원장과 고정 손계산에 맞아야 한다. 두 진입점이 같은 오래된 값이나 빈 배열을 내도 통과하지 않는다(계획 §3.4, §13.3 E1, step-3-s4 독립 원장 대조). 손계산: 구매 누적 도착100, W 보유100−30+10=80, 과거 인도30, 반품10, 현재 판매 적격0.",
+          "oracleRef": {
+            "oracleId": "E1.independent-goals-and-owners",
+            "observationNames": [
+              "two-entry-snapshot"
+            ]
+          },
+          "unit": "BOX",
+          "unitSource": {
+            "actionId": "noun",
+            "pointer": "/response/data/linkedSummary/quantities/unit"
+          }
+        },
+        {
+          "id": "two-entry-anchor-deliveredQuantity",
+          "op": "decimalEquals",
+          "source": {
+            "actionId": "noun",
+            "pointer": "/response/data/linkedSummary/quantities/deliveredQuantity"
+          },
+          "expected": "30",
+          "requirementRefs": [
+            "D05",
+            "D09",
+            "D13",
+            "D15",
+            "D16",
+            "D17",
+            "D18",
+            "D19"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "E1",
+            "scenarioId": "independent-goals-and-owners"
+          },
+          "evidenceRefs": [
+            "noun:api-response"
+          ],
+          "oracleExplanation": "명사 getObject와 동사 getWork의 linkedSummary가 서로 같을 뿐 아니라 같은 snapshot의 독립 원장과 고정 손계산에 맞아야 한다. 두 진입점이 같은 오래된 값이나 빈 배열을 내도 통과하지 않는다(계획 §3.4, §13.3 E1, step-3-s4 독립 원장 대조). 손계산: 구매 누적 도착100, W 보유100−30+10=80, 과거 인도30, 반품10, 현재 판매 적격0.",
+          "oracleRef": {
+            "oracleId": "E1.independent-goals-and-owners",
+            "observationNames": [
+              "two-entry-snapshot"
+            ]
+          },
+          "unit": "BOX",
+          "unitSource": {
+            "actionId": "noun",
+            "pointer": "/response/data/linkedSummary/quantities/unit"
+          }
+        },
+        {
+          "id": "two-entry-anchor-returnedQuantity",
+          "op": "decimalEquals",
+          "source": {
+            "actionId": "noun",
+            "pointer": "/response/data/linkedSummary/quantities/returnedQuantity"
+          },
+          "expected": "10",
+          "requirementRefs": [
+            "D05",
+            "D09",
+            "D13",
+            "D15",
+            "D16",
+            "D17",
+            "D18",
+            "D19"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "E1",
+            "scenarioId": "independent-goals-and-owners"
+          },
+          "evidenceRefs": [
+            "noun:api-response"
+          ],
+          "oracleExplanation": "명사 getObject와 동사 getWork의 linkedSummary가 서로 같을 뿐 아니라 같은 snapshot의 독립 원장과 고정 손계산에 맞아야 한다. 두 진입점이 같은 오래된 값이나 빈 배열을 내도 통과하지 않는다(계획 §3.4, §13.3 E1, step-3-s4 독립 원장 대조). 손계산: 구매 누적 도착100, W 보유100−30+10=80, 과거 인도30, 반품10, 현재 판매 적격0.",
+          "oracleRef": {
+            "oracleId": "E1.independent-goals-and-owners",
+            "observationNames": [
+              "two-entry-snapshot"
+            ]
+          },
+          "unit": "BOX",
+          "unitSource": {
+            "actionId": "noun",
+            "pointer": "/response/data/linkedSummary/quantities/unit"
+          }
+        },
+        {
+          "id": "two-entry-anchor-eligibleQuantity",
+          "op": "decimalEquals",
+          "source": {
+            "actionId": "noun",
+            "pointer": "/response/data/linkedSummary/quantities/eligibleQuantity"
+          },
+          "expected": "0",
+          "requirementRefs": [
+            "D05",
+            "D09",
+            "D13",
+            "D15",
+            "D16",
+            "D17",
+            "D18",
+            "D19"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "E1",
+            "scenarioId": "independent-goals-and-owners"
+          },
+          "evidenceRefs": [
+            "noun:api-response"
+          ],
+          "oracleExplanation": "명사 getObject와 동사 getWork의 linkedSummary가 서로 같을 뿐 아니라 같은 snapshot의 독립 원장과 고정 손계산에 맞아야 한다. 두 진입점이 같은 오래된 값이나 빈 배열을 내도 통과하지 않는다(계획 §3.4, §13.3 E1, step-3-s4 독립 원장 대조). 손계산: 구매 누적 도착100, W 보유100−30+10=80, 과거 인도30, 반품10, 현재 판매 적격0.",
+          "oracleRef": {
+            "oracleId": "E1.independent-goals-and-owners",
+            "observationNames": [
+              "two-entry-snapshot"
+            ]
+          },
+          "unit": "BOX",
+          "unitSource": {
+            "actionId": "noun",
+            "pointer": "/response/data/linkedSummary/quantities/unit"
+          }
+        },
+        {
+          "id": "two-entry-anchor-invoiceDifference",
+          "op": "decimalEquals",
+          "source": {
+            "actionId": "noun",
+            "pointer": "/response/data/linkedSummary/quantities/invoiceDifference"
+          },
+          "expected": "5",
+          "requirementRefs": [
+            "D05",
+            "D09",
+            "D13",
+            "D15",
+            "D16",
+            "D17",
+            "D18",
+            "D19"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "E1",
+            "scenarioId": "independent-goals-and-owners"
+          },
+          "evidenceRefs": [
+            "noun:api-response"
+          ],
+          "oracleExplanation": "명사 getObject와 동사 getWork의 linkedSummary가 서로 같을 뿐 아니라 같은 snapshot의 독립 원장과 고정 손계산에 맞아야 한다. 두 진입점이 같은 오래된 값이나 빈 배열을 내도 통과하지 않는다(계획 §3.4, §13.3 E1, step-3-s4 독립 원장 대조). 손계산: 송장105 EUR−구매100 BOX×1 EUR=5 EUR.",
+          "oracleRef": {
+            "oracleId": "E1.independent-goals-and-owners",
+            "observationNames": [
+              "two-entry-snapshot"
+            ]
+          },
+          "unit": "EUR",
+          "unitSource": {
+            "actionId": "noun",
+            "pointer": "/response/data/linkedSummary/quantities/invoiceDifferenceUnit"
+          }
+        },
+        {
           "id": "logistics-closes-unrelated-duties-35",
-          "op": "count",
+          "op": "relationSet",
           "source": {
             "actionId": "goals-db",
             "pointer": "/data/rawRows/obligations",
             "where": {
-              "current": true,
-              "kind": "QC",
-              "status": "RESOLVED"
-            }
+              "id": {
+                "$result": {
+                  "actionId": "qc-hold40",
+                  "pointer": "/response/obligationId"
+                }
+              }
+            },
+            "field": [
+              "status",
+              "current"
+            ]
           },
-          "expected": 0,
+          "expected": [
+            [
+              "OPEN",
+              true
+            ]
+          ],
           "requirementRefs": [
             "D05",
             "D09",
@@ -7196,7 +8867,7 @@
             "caseId": "E1",
             "scenarioId": "independent-goals-and-owners"
           },
-          "oracleExplanation": "logistics-closes-unrelated-duties는 전체 물류100 충족 뒤 송장5EUR 차이와 QC40·반품10·정산 owner는 별도로 남는다의 독립 고정값과 실제 원 행을 대조한다.",
+          "oracleExplanation": "구매 도착 목표가 SATISFIED여도 QC 보류40의 의무는 닫히지 않고 OPEN·current로 남는다. hold60의 해소는 물류가 아니라 QC_PASS 해제 때문이다. current는 행의 현재 유효성(최신 version)이며 status와 독립이다. 해소된 의무도 current=true로 남고 status=RESOLVED로 구별한다(계획 §5.3 현재 유효성과 status 분리, C4와 같은 의미).",
           "oracleRef": {
             "oracleId": "E1.independent-goals-and-owners",
             "observationNames": [
@@ -7206,19 +8877,17 @@
         },
         {
           "id": "logistics-closes-unrelated-duties-36",
-          "op": "exactSet",
+          "op": "count",
           "source": {
             "actionId": "goals-db",
             "pointer": "/data/rawRows/obligations",
             "where": {
               "kind": "QC",
-              "current": true
-            },
-            "field": "status"
+              "current": true,
+              "status": "OPEN"
+            }
           },
-          "expected": [
-            "OPEN"
-          ],
+          "expected": 1,
           "requirementRefs": [
             "D05",
             "D09",
@@ -7242,7 +8911,7 @@
             "caseId": "E1",
             "scenarioId": "independent-goals-and-owners"
           },
-          "oracleExplanation": "logistics-closes-unrelated-duties는 전체 물류100 충족 뒤 송장5EUR 차이와 QC40·반품10·정산 owner는 별도로 남는다의 독립 고정값과 실제 원 행을 대조한다.",
+          "oracleExplanation": "물류 충족 뒤에도 OPEN QC 의무는 정확히 1건이다. current는 행의 현재 유효성(최신 version)이며 status와 독립이다. 해소된 의무도 current=true로 남고 status=RESOLVED로 구별한다(계획 §5.3 현재 유효성과 status 분리, C4와 같은 의미).",
           "oracleRef": {
             "oracleId": "E1.independent-goals-and-owners",
             "observationNames": [
@@ -7288,7 +8957,7 @@
             "caseId": "E1",
             "scenarioId": "independent-goals-and-owners"
           },
-          "oracleExplanation": "logistics-closes-unrelated-duties는 전체 물류100 충족 뒤 송장5EUR 차이와 QC40·반품10·정산 owner는 별도로 남는다의 독립 고정값과 실제 원 행을 대조한다.",
+          "oracleExplanation": "logistics-closes-unrelated-duties는 전체 물류100 충족 뒤 송장5EUR 차이와 QC40·반품10·정산 owner는 별도로 남는다의 독립 고정값과 실제 원 행을 대조한다. current는 행의 현재 유효성(최신 version)이며 status와 독립이다. 해소된 의무도 current=true로 남고 status=RESOLVED로 구별한다(계획 §5.3 현재 유효성과 status 분리, C4와 같은 의미).",
           "oracleRef": {
             "oracleId": "E1.independent-goals-and-owners",
             "observationNames": [
@@ -7334,12 +9003,1595 @@
             "caseId": "E1",
             "scenarioId": "independent-goals-and-owners"
           },
-          "oracleExplanation": "logistics-closes-unrelated-duties는 전체 물류100 충족 뒤 송장5EUR 차이와 QC40·반품10·정산 owner는 별도로 남는다의 독립 고정값과 실제 원 행을 대조한다.",
+          "oracleExplanation": "logistics-closes-unrelated-duties는 전체 물류100 충족 뒤 송장5EUR 차이와 QC40·반품10·정산 owner는 별도로 남는다의 독립 고정값과 실제 원 행을 대조한다. current는 행의 현재 유효성(최신 version)이며 status와 독립이다. 해소된 의무도 current=true로 남고 status=RESOLVED로 구별한다(계획 §5.3 현재 유효성과 status 분리, C4와 같은 의미).",
           "oracleRef": {
             "oracleId": "E1.independent-goals-and-owners",
             "observationNames": [
               "logistics-closes-unrelated-duties"
             ]
+          }
+        },
+        {
+          "id": "goals-mcp-same-snapshot",
+          "op": "equals",
+          "source": {
+            "actionId": "goals-mcp",
+            "pointer": "/response/snapshotRevision"
+          },
+          "expected": {
+            "$result": {
+              "actionId": "goals",
+              "pointer": "/response/snapshotRevision"
+            }
+          },
+          "requirementRefs": [
+            "D05",
+            "D09",
+            "D13",
+            "D15",
+            "D16",
+            "D17",
+            "D18",
+            "D19"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "E1",
+            "scenarioId": "independent-goals-and-owners"
+          },
+          "evidenceRefs": [
+            "goals-mcp:mcp-response"
+          ],
+          "oracleExplanation": "MCP 조회는 API 조회와 같은 snapshotRevision을 읽는다.",
+          "oracleRef": {
+            "oracleId": "E1.independent-goals-and-owners",
+            "observationNames": [
+              "logistics-goal"
+            ]
+          }
+        },
+        {
+          "id": "logistics-goal-1-mcp",
+          "op": "equals",
+          "source": {
+            "actionId": "goals-mcp",
+            "pointer": "/response/data/purchaseAssessment"
+          },
+          "expected": "SATISFIED",
+          "requirementRefs": [
+            "D05",
+            "D09",
+            "D13",
+            "D15",
+            "D16",
+            "D17",
+            "D18",
+            "D19"
+          ],
+          "evidenceRefs": [
+            "goals-mcp:mcp-response"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "E1",
+            "scenarioId": "independent-goals-and-owners"
+          },
+          "oracleExplanation": "stateless MCP 진입점에서 같은 snapshot으로 읽은 같은 값이다. API와 같은 서버 판정·원장을 읽어야 하며 다른 계산이나 캐시를 쓰면 실패한다(계획 §3.4, §9.1, §13.1 D20). logistics-goal는 전체 물류100 충족 뒤 송장5EUR 차이와 QC40·반품10·정산 owner는 별도로 남는다의 독립 고정값과 실제 원 행을 대조한다.",
+          "oracleRef": {
+            "oracleId": "E1.independent-goals-and-owners",
+            "observationNames": [
+              "logistics-goal"
+            ]
+          }
+        },
+        {
+          "id": "invoice-difference-3-mcp",
+          "op": "decimalEquals",
+          "source": {
+            "actionId": "goals-mcp",
+            "pointer": "/response/data/invoiceDifference"
+          },
+          "expected": "5",
+          "requirementRefs": [
+            "D05",
+            "D09",
+            "D13",
+            "D15",
+            "D16",
+            "D17",
+            "D18",
+            "D19"
+          ],
+          "evidenceRefs": [
+            "goals-mcp:mcp-response"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "E1",
+            "scenarioId": "independent-goals-and-owners"
+          },
+          "oracleExplanation": "stateless MCP 진입점에서 같은 snapshot으로 읽은 같은 값이다. API와 같은 서버 판정·원장을 읽어야 하며 다른 계산이나 캐시를 쓰면 실패한다(계획 §3.4, §9.1, §13.1 D20). invoice-difference는 전체 물류100 충족 뒤 송장5EUR 차이와 QC40·반품10·정산 owner는 별도로 남는다의 독립 고정값과 실제 원 행을 대조한다.",
+          "oracleRef": {
+            "oracleId": "E1.independent-goals-and-owners",
+            "observationNames": [
+              "invoice-difference"
+            ]
+          },
+          "unit": "EUR",
+          "unitSource": {
+            "actionId": "goals-mcp",
+            "pointer": "/response/data/invoiceDifferenceUnit"
+          }
+        },
+        {
+          "id": "QC-duty-11-mcp",
+          "op": "sameAs",
+          "source": {
+            "actionId": "goals-mcp",
+            "pointer": "/response/data/obligations",
+            "where": {
+              "kind": "QC",
+              "current": true,
+              "status": "OPEN"
+            },
+            "field": [
+              "id",
+              "rootId",
+              "ownerId",
+              "status",
+              "nextAction",
+              "nextCheckAt"
+            ]
+          },
+          "expected": null,
+          "requirementRefs": [
+            "D05",
+            "D09",
+            "D13",
+            "D15",
+            "D16",
+            "D17",
+            "D18",
+            "D19"
+          ],
+          "evidenceRefs": [
+            "goals-mcp:mcp-response"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "E1",
+            "scenarioId": "independent-goals-and-owners"
+          },
+          "oracleExplanation": "stateless MCP 진입점에서 같은 snapshot으로 읽은 같은 값이다. API와 같은 서버 판정·원장을 읽어야 하며 다른 계산이나 캐시를 쓰면 실패한다(계획 §3.4, §9.1, §13.1 D20). QC-duty는 전체 물류100 충족 뒤 송장5EUR 차이와 QC40·반품10·정산 owner는 별도로 남는다의 독립 고정값과 실제 원 행을 대조한다. current는 행의 현재 유효성(최신 version)이며 status와 독립이다. 해소된 의무도 current=true로 남고 status=RESOLVED로 구별한다(계획 §5.3 현재 유효성과 status 분리, C4와 같은 의미).",
+          "oracleRef": {
+            "oracleId": "E1.independent-goals-and-owners",
+            "observationNames": [
+              "QC-duty"
+            ]
+          },
+          "baseline": {
+            "actionId": "goals-db",
+            "pointer": "/data/rawRows/obligations",
+            "where": {
+              "kind": "QC",
+              "current": true,
+              "status": "OPEN"
+            },
+            "field": [
+              "id",
+              "rootId",
+              "ownerId",
+              "status",
+              "nextAction",
+              "nextCheckAt"
+            ]
+          }
+        },
+        {
+          "id": "return-duty-18-mcp",
+          "op": "sameAs",
+          "source": {
+            "actionId": "goals-mcp",
+            "pointer": "/response/data/obligations",
+            "where": {
+              "kind": "RETURN",
+              "current": true
+            },
+            "field": [
+              "id",
+              "rootId",
+              "ownerId",
+              "status",
+              "nextAction",
+              "nextCheckAt"
+            ]
+          },
+          "expected": null,
+          "requirementRefs": [
+            "D05",
+            "D09",
+            "D13",
+            "D15",
+            "D16",
+            "D17",
+            "D18",
+            "D19"
+          ],
+          "evidenceRefs": [
+            "goals-mcp:mcp-response"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "E1",
+            "scenarioId": "independent-goals-and-owners"
+          },
+          "oracleExplanation": "stateless MCP 진입점에서 같은 snapshot으로 읽은 같은 값이다. API와 같은 서버 판정·원장을 읽어야 하며 다른 계산이나 캐시를 쓰면 실패한다(계획 §3.4, §9.1, §13.1 D20). return-duty는 전체 물류100 충족 뒤 송장5EUR 차이와 QC40·반품10·정산 owner는 별도로 남는다의 독립 고정값과 실제 원 행을 대조한다.",
+          "oracleRef": {
+            "oracleId": "E1.independent-goals-and-owners",
+            "observationNames": [
+              "return-duty"
+            ]
+          },
+          "baseline": {
+            "actionId": "goals-db",
+            "pointer": "/data/rawRows/obligations",
+            "where": {
+              "kind": "RETURN",
+              "current": true
+            },
+            "field": [
+              "id",
+              "rootId",
+              "ownerId",
+              "status",
+              "nextAction",
+              "nextCheckAt"
+            ]
+          }
+        },
+        {
+          "id": "settlement-duty-25-mcp",
+          "op": "sameAs",
+          "source": {
+            "actionId": "goals-mcp",
+            "pointer": "/response/data/obligations",
+            "where": {
+              "kind": "SETTLEMENT",
+              "current": true
+            },
+            "field": [
+              "id",
+              "rootId",
+              "ownerId",
+              "status",
+              "nextAction",
+              "nextCheckAt"
+            ]
+          },
+          "expected": null,
+          "requirementRefs": [
+            "D05",
+            "D09",
+            "D13",
+            "D15",
+            "D16",
+            "D17",
+            "D18",
+            "D19"
+          ],
+          "evidenceRefs": [
+            "goals-mcp:mcp-response"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "E1",
+            "scenarioId": "independent-goals-and-owners"
+          },
+          "oracleExplanation": "stateless MCP 진입점에서 같은 snapshot으로 읽은 같은 값이다. API와 같은 서버 판정·원장을 읽어야 하며 다른 계산이나 캐시를 쓰면 실패한다(계획 §3.4, §9.1, §13.1 D20). settlement-duty는 전체 물류100 충족 뒤 송장5EUR 차이와 QC40·반품10·정산 owner는 별도로 남는다의 독립 고정값과 실제 원 행을 대조한다.",
+          "oracleRef": {
+            "oracleId": "E1.independent-goals-and-owners",
+            "observationNames": [
+              "settlement-duty"
+            ]
+          },
+          "baseline": {
+            "actionId": "goals-db",
+            "pointer": "/data/rawRows/obligations",
+            "where": {
+              "kind": "SETTLEMENT",
+              "current": true
+            },
+            "field": [
+              "id",
+              "rootId",
+              "ownerId",
+              "status",
+              "nextAction",
+              "nextCheckAt"
+            ]
+          }
+        },
+        {
+          "id": "noun-mcp-same-snapshot",
+          "op": "equals",
+          "source": {
+            "actionId": "noun-mcp",
+            "pointer": "/response/snapshotRevision"
+          },
+          "expected": {
+            "$result": {
+              "actionId": "noun",
+              "pointer": "/response/snapshotRevision"
+            }
+          },
+          "requirementRefs": [
+            "D05",
+            "D09",
+            "D13",
+            "D15",
+            "D16",
+            "D17",
+            "D18",
+            "D19"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "E1",
+            "scenarioId": "independent-goals-and-owners"
+          },
+          "evidenceRefs": [
+            "noun-mcp:mcp-response"
+          ],
+          "oracleExplanation": "MCP 조회는 API 조회와 같은 snapshotRevision을 읽는다.",
+          "oracleRef": {
+            "oracleId": "E1.independent-goals-and-owners",
+            "observationNames": [
+              "two-entry-snapshot"
+            ]
+          }
+        },
+        {
+          "id": "two-entry-snapshot-26-mcp",
+          "op": "sameAs",
+          "source": {
+            "actionId": "noun-mcp",
+            "pointer": "/response/data/linkedSummary/ids"
+          },
+          "expected": null,
+          "requirementRefs": [
+            "D05",
+            "D09",
+            "D13",
+            "D15",
+            "D16",
+            "D17",
+            "D18",
+            "D19"
+          ],
+          "evidenceRefs": [
+            "noun-mcp:mcp-response"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "E1",
+            "scenarioId": "independent-goals-and-owners"
+          },
+          "oracleExplanation": "stateless MCP 진입점에서 같은 snapshot으로 읽은 같은 값이다. API와 같은 서버 판정·원장을 읽어야 하며 다른 계산이나 캐시를 쓰면 실패한다(계획 §3.4, §9.1, §13.1 D20). two-entry-snapshot는 전체 물류100 충족 뒤 송장5EUR 차이와 QC40·반품10·정산 owner는 별도로 남는다의 독립 고정값과 실제 원 행을 대조한다.",
+          "oracleRef": {
+            "oracleId": "E1.independent-goals-and-owners",
+            "observationNames": [
+              "two-entry-snapshot"
+            ]
+          },
+          "baseline": {
+            "actionId": "verb",
+            "pointer": "/response/data/linkedSummary/ids"
+          }
+        },
+        {
+          "id": "two-entry-snapshot-27-mcp",
+          "op": "sameAs",
+          "source": {
+            "actionId": "noun-mcp",
+            "pointer": "/response/data/linkedSummary/snapshotRevision"
+          },
+          "expected": null,
+          "requirementRefs": [
+            "D05",
+            "D09",
+            "D13",
+            "D15",
+            "D16",
+            "D17",
+            "D18",
+            "D19"
+          ],
+          "evidenceRefs": [
+            "noun-mcp:mcp-response"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "E1",
+            "scenarioId": "independent-goals-and-owners"
+          },
+          "oracleExplanation": "stateless MCP 진입점에서 같은 snapshot으로 읽은 같은 값이다. API와 같은 서버 판정·원장을 읽어야 하며 다른 계산이나 캐시를 쓰면 실패한다(계획 §3.4, §9.1, §13.1 D20). two-entry-snapshot는 전체 물류100 충족 뒤 송장5EUR 차이와 QC40·반품10·정산 owner는 별도로 남는다의 독립 고정값과 실제 원 행을 대조한다.",
+          "oracleRef": {
+            "oracleId": "E1.independent-goals-and-owners",
+            "observationNames": [
+              "two-entry-snapshot"
+            ]
+          },
+          "baseline": {
+            "actionId": "verb",
+            "pointer": "/response/data/linkedSummary/snapshotRevision"
+          }
+        },
+        {
+          "id": "two-entry-snapshot-28-mcp",
+          "op": "sameAs",
+          "source": {
+            "actionId": "noun-mcp",
+            "pointer": "/response/data/linkedSummary/asOf"
+          },
+          "expected": null,
+          "requirementRefs": [
+            "D05",
+            "D09",
+            "D13",
+            "D15",
+            "D16",
+            "D17",
+            "D18",
+            "D19"
+          ],
+          "evidenceRefs": [
+            "noun-mcp:mcp-response"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "E1",
+            "scenarioId": "independent-goals-and-owners"
+          },
+          "oracleExplanation": "stateless MCP 진입점에서 같은 snapshot으로 읽은 같은 값이다. API와 같은 서버 판정·원장을 읽어야 하며 다른 계산이나 캐시를 쓰면 실패한다(계획 §3.4, §9.1, §13.1 D20). two-entry-snapshot는 전체 물류100 충족 뒤 송장5EUR 차이와 QC40·반품10·정산 owner는 별도로 남는다의 독립 고정값과 실제 원 행을 대조한다.",
+          "oracleRef": {
+            "oracleId": "E1.independent-goals-and-owners",
+            "observationNames": [
+              "two-entry-snapshot"
+            ]
+          },
+          "baseline": {
+            "actionId": "verb",
+            "pointer": "/response/data/linkedSummary/asOf"
+          }
+        },
+        {
+          "id": "two-entry-snapshot-29-mcp",
+          "op": "sameAs",
+          "source": {
+            "actionId": "noun-mcp",
+            "pointer": "/response/data/linkedSummary/knownAt"
+          },
+          "expected": null,
+          "requirementRefs": [
+            "D05",
+            "D09",
+            "D13",
+            "D15",
+            "D16",
+            "D17",
+            "D18",
+            "D19"
+          ],
+          "evidenceRefs": [
+            "noun-mcp:mcp-response"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "E1",
+            "scenarioId": "independent-goals-and-owners"
+          },
+          "oracleExplanation": "stateless MCP 진입점에서 같은 snapshot으로 읽은 같은 값이다. API와 같은 서버 판정·원장을 읽어야 하며 다른 계산이나 캐시를 쓰면 실패한다(계획 §3.4, §9.1, §13.1 D20). two-entry-snapshot는 전체 물류100 충족 뒤 송장5EUR 차이와 QC40·반품10·정산 owner는 별도로 남는다의 독립 고정값과 실제 원 행을 대조한다.",
+          "oracleRef": {
+            "oracleId": "E1.independent-goals-and-owners",
+            "observationNames": [
+              "two-entry-snapshot"
+            ]
+          },
+          "baseline": {
+            "actionId": "verb",
+            "pointer": "/response/data/linkedSummary/knownAt"
+          }
+        },
+        {
+          "id": "two-entry-snapshot-30-mcp",
+          "op": "sameAs",
+          "source": {
+            "actionId": "noun-mcp",
+            "pointer": "/response/data/linkedSummary/quantities"
+          },
+          "expected": null,
+          "requirementRefs": [
+            "D05",
+            "D09",
+            "D13",
+            "D15",
+            "D16",
+            "D17",
+            "D18",
+            "D19"
+          ],
+          "evidenceRefs": [
+            "noun-mcp:mcp-response"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "E1",
+            "scenarioId": "independent-goals-and-owners"
+          },
+          "oracleExplanation": "stateless MCP 진입점에서 같은 snapshot으로 읽은 같은 값이다. API와 같은 서버 판정·원장을 읽어야 하며 다른 계산이나 캐시를 쓰면 실패한다(계획 §3.4, §9.1, §13.1 D20). two-entry-snapshot는 전체 물류100 충족 뒤 송장5EUR 차이와 QC40·반품10·정산 owner는 별도로 남는다의 독립 고정값과 실제 원 행을 대조한다.",
+          "oracleRef": {
+            "oracleId": "E1.independent-goals-and-owners",
+            "observationNames": [
+              "two-entry-snapshot"
+            ]
+          },
+          "baseline": {
+            "actionId": "verb",
+            "pointer": "/response/data/linkedSummary/quantities"
+          }
+        },
+        {
+          "id": "two-entry-snapshot-31-mcp",
+          "op": "sameAs",
+          "source": {
+            "actionId": "noun-mcp",
+            "pointer": "/response/data/linkedSummary/evidenceRefs"
+          },
+          "expected": null,
+          "requirementRefs": [
+            "D05",
+            "D09",
+            "D13",
+            "D15",
+            "D16",
+            "D17",
+            "D18",
+            "D19"
+          ],
+          "evidenceRefs": [
+            "noun-mcp:mcp-response"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "E1",
+            "scenarioId": "independent-goals-and-owners"
+          },
+          "oracleExplanation": "stateless MCP 진입점에서 같은 snapshot으로 읽은 같은 값이다. API와 같은 서버 판정·원장을 읽어야 하며 다른 계산이나 캐시를 쓰면 실패한다(계획 §3.4, §9.1, §13.1 D20). two-entry-snapshot는 전체 물류100 충족 뒤 송장5EUR 차이와 QC40·반품10·정산 owner는 별도로 남는다의 독립 고정값과 실제 원 행을 대조한다.",
+          "oracleRef": {
+            "oracleId": "E1.independent-goals-and-owners",
+            "observationNames": [
+              "two-entry-snapshot"
+            ]
+          },
+          "baseline": {
+            "actionId": "verb",
+            "pointer": "/response/data/linkedSummary/evidenceRefs"
+          }
+        },
+        {
+          "id": "two-entry-snapshot-32-mcp",
+          "op": "sameAs",
+          "source": {
+            "actionId": "noun-mcp",
+            "pointer": "/response/data/linkedSummary/owners"
+          },
+          "expected": null,
+          "requirementRefs": [
+            "D05",
+            "D09",
+            "D13",
+            "D15",
+            "D16",
+            "D17",
+            "D18",
+            "D19"
+          ],
+          "evidenceRefs": [
+            "noun-mcp:mcp-response"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "E1",
+            "scenarioId": "independent-goals-and-owners"
+          },
+          "oracleExplanation": "stateless MCP 진입점에서 같은 snapshot으로 읽은 같은 값이다. API와 같은 서버 판정·원장을 읽어야 하며 다른 계산이나 캐시를 쓰면 실패한다(계획 §3.4, §9.1, §13.1 D20). two-entry-snapshot는 전체 물류100 충족 뒤 송장5EUR 차이와 QC40·반품10·정산 owner는 별도로 남는다의 독립 고정값과 실제 원 행을 대조한다.",
+          "oracleRef": {
+            "oracleId": "E1.independent-goals-and-owners",
+            "observationNames": [
+              "two-entry-snapshot"
+            ]
+          },
+          "baseline": {
+            "actionId": "verb",
+            "pointer": "/response/data/linkedSummary/owners"
+          }
+        },
+        {
+          "id": "two-entry-snapshot-33-mcp",
+          "op": "sameAs",
+          "source": {
+            "actionId": "noun-mcp",
+            "pointer": "/response/data/linkedSummary/nextActions"
+          },
+          "expected": null,
+          "requirementRefs": [
+            "D05",
+            "D09",
+            "D13",
+            "D15",
+            "D16",
+            "D17",
+            "D18",
+            "D19"
+          ],
+          "evidenceRefs": [
+            "noun-mcp:mcp-response"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "E1",
+            "scenarioId": "independent-goals-and-owners"
+          },
+          "oracleExplanation": "stateless MCP 진입점에서 같은 snapshot으로 읽은 같은 값이다. API와 같은 서버 판정·원장을 읽어야 하며 다른 계산이나 캐시를 쓰면 실패한다(계획 §3.4, §9.1, §13.1 D20). two-entry-snapshot는 전체 물류100 충족 뒤 송장5EUR 차이와 QC40·반품10·정산 owner는 별도로 남는다의 독립 고정값과 실제 원 행을 대조한다.",
+          "oracleRef": {
+            "oracleId": "E1.independent-goals-and-owners",
+            "observationNames": [
+              "two-entry-snapshot"
+            ]
+          },
+          "baseline": {
+            "actionId": "verb",
+            "pointer": "/response/data/linkedSummary/nextActions"
+          }
+        },
+        {
+          "id": "two-entry-snapshot-34-mcp",
+          "op": "sameAs",
+          "source": {
+            "actionId": "noun-mcp",
+            "pointer": "/response/data/linkedSummary/nextCheckAt"
+          },
+          "expected": null,
+          "requirementRefs": [
+            "D05",
+            "D09",
+            "D13",
+            "D15",
+            "D16",
+            "D17",
+            "D18",
+            "D19"
+          ],
+          "evidenceRefs": [
+            "noun-mcp:mcp-response"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "E1",
+            "scenarioId": "independent-goals-and-owners"
+          },
+          "oracleExplanation": "stateless MCP 진입점에서 같은 snapshot으로 읽은 같은 값이다. API와 같은 서버 판정·원장을 읽어야 하며 다른 계산이나 캐시를 쓰면 실패한다(계획 §3.4, §9.1, §13.1 D20). two-entry-snapshot는 전체 물류100 충족 뒤 송장5EUR 차이와 QC40·반품10·정산 owner는 별도로 남는다의 독립 고정값과 실제 원 행을 대조한다.",
+          "oracleRef": {
+            "oracleId": "E1.independent-goals-and-owners",
+            "observationNames": [
+              "two-entry-snapshot"
+            ]
+          },
+          "baseline": {
+            "actionId": "verb",
+            "pointer": "/response/data/linkedSummary/nextCheckAt"
+          }
+        },
+        {
+          "id": "two-entry-anchor-snapshot-mcp",
+          "op": "equals",
+          "source": {
+            "actionId": "noun-mcp",
+            "pointer": "/response/data/linkedSummary/snapshotRevision"
+          },
+          "expected": {
+            "$result": {
+              "actionId": "goals",
+              "pointer": "/response/snapshotRevision"
+            }
+          },
+          "requirementRefs": [
+            "D05",
+            "D09",
+            "D13",
+            "D15",
+            "D16",
+            "D17",
+            "D18",
+            "D19"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "E1",
+            "scenarioId": "independent-goals-and-owners"
+          },
+          "evidenceRefs": [
+            "noun-mcp:mcp-response"
+          ],
+          "oracleExplanation": "stateless MCP 진입점에서 같은 snapshot으로 읽은 같은 값이다. API와 같은 서버 판정·원장을 읽어야 하며 다른 계산이나 캐시를 쓰면 실패한다(계획 §3.4, §9.1, §13.1 D20). 명사 getObject와 동사 getWork의 linkedSummary가 서로 같을 뿐 아니라 같은 snapshot의 독립 원장과 고정 손계산에 맞아야 한다. 두 진입점이 같은 오래된 값이나 빈 배열을 내도 통과하지 않는다(계획 §3.4, §13.3 E1, step-3-s4 독립 원장 대조). linkedSummary의 snapshotRevision은 goals 조회와 goals-db 관찰이 사용한 바로 그 snapshot이다.",
+          "oracleRef": {
+            "oracleId": "E1.independent-goals-and-owners",
+            "observationNames": [
+              "two-entry-snapshot"
+            ]
+          }
+        },
+        {
+          "id": "two-entry-anchor-asOf-mcp",
+          "op": "timeEquals",
+          "source": {
+            "actionId": "noun-mcp",
+            "pointer": "/response/data/linkedSummary/asOf"
+          },
+          "expected": "2026-10-07T09:00:00Z",
+          "requirementRefs": [
+            "D05",
+            "D09",
+            "D13",
+            "D15",
+            "D16",
+            "D17",
+            "D18",
+            "D19"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "E1",
+            "scenarioId": "independent-goals-and-owners"
+          },
+          "evidenceRefs": [
+            "noun-mcp:mcp-response"
+          ],
+          "oracleExplanation": "stateless MCP 진입점에서 같은 snapshot으로 읽은 같은 값이다. API와 같은 서버 판정·원장을 읽어야 하며 다른 계산이나 캐시를 쓰면 실패한다(계획 §3.4, §9.1, §13.1 D20). 명사 getObject와 동사 getWork의 linkedSummary가 서로 같을 뿐 아니라 같은 snapshot의 독립 원장과 고정 손계산에 맞아야 한다. 두 진입점이 같은 오래된 값이나 빈 배열을 내도 통과하지 않는다(계획 §3.4, §13.3 E1, step-3-s4 독립 원장 대조). fixture 업무 시계의 asOf다.",
+          "oracleRef": {
+            "oracleId": "E1.independent-goals-and-owners",
+            "observationNames": [
+              "two-entry-snapshot"
+            ]
+          }
+        },
+        {
+          "id": "two-entry-anchor-knownAt-mcp",
+          "op": "timeEquals",
+          "source": {
+            "actionId": "noun-mcp",
+            "pointer": "/response/data/linkedSummary/knownAt"
+          },
+          "expected": "2026-10-07T09:00:01Z",
+          "requirementRefs": [
+            "D05",
+            "D09",
+            "D13",
+            "D15",
+            "D16",
+            "D17",
+            "D18",
+            "D19"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "E1",
+            "scenarioId": "independent-goals-and-owners"
+          },
+          "evidenceRefs": [
+            "noun-mcp:mcp-response"
+          ],
+          "oracleExplanation": "stateless MCP 진입점에서 같은 snapshot으로 읽은 같은 값이다. API와 같은 서버 판정·원장을 읽어야 하며 다른 계산이나 캐시를 쓰면 실패한다(계획 §3.4, §9.1, §13.1 D20). 명사 getObject와 동사 getWork의 linkedSummary가 서로 같을 뿐 아니라 같은 snapshot의 독립 원장과 고정 손계산에 맞아야 한다. 두 진입점이 같은 오래된 값이나 빈 배열을 내도 통과하지 않는다(계획 §3.4, §13.3 E1, step-3-s4 독립 원장 대조). fixture 업무 시계의 knownAt이다.",
+          "oracleRef": {
+            "oracleId": "E1.independent-goals-and-owners",
+            "observationNames": [
+              "two-entry-snapshot"
+            ]
+          }
+        },
+        {
+          "id": "two-entry-anchor-duty-fields-mcp",
+          "op": "fieldsPresent",
+          "source": {
+            "actionId": "noun-mcp",
+            "pointer": "/response/data/linkedSummary/duties"
+          },
+          "expected": [
+            "id",
+            "kind",
+            "ownerId",
+            "status",
+            "nextAction",
+            "nextCheckAt"
+          ],
+          "requirementRefs": [
+            "D05",
+            "D09",
+            "D13",
+            "D15",
+            "D16",
+            "D17",
+            "D18",
+            "D19"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "E1",
+            "scenarioId": "independent-goals-and-owners"
+          },
+          "evidenceRefs": [
+            "noun-mcp:mcp-response"
+          ],
+          "oracleExplanation": "stateless MCP 진입점에서 같은 snapshot으로 읽은 같은 값이다. API와 같은 서버 판정·원장을 읽어야 하며 다른 계산이나 캐시를 쓰면 실패한다(계획 §3.4, §9.1, §13.1 D20). 명사 getObject와 동사 getWork의 linkedSummary가 서로 같을 뿐 아니라 같은 snapshot의 독립 원장과 고정 손계산에 맞아야 한다. 두 진입점이 같은 오래된 값이나 빈 배열을 내도 통과하지 않는다(계획 §3.4, §13.3 E1, step-3-s4 독립 원장 대조). duties는 비어 있을 수 없고 각 행은 의무 ID·종류·owner·상태·다음 행동·기한을 가진다.",
+          "oracleRef": {
+            "oracleId": "E1.independent-goals-and-owners",
+            "observationNames": [
+              "two-entry-snapshot"
+            ]
+          }
+        },
+        {
+          "id": "two-entry-anchor-qc-duty-ledger-mcp",
+          "op": "sameAs",
+          "source": {
+            "actionId": "noun-mcp",
+            "pointer": "/response/data/linkedSummary/duties",
+            "where": {
+              "kind": "QC",
+              "status": "OPEN"
+            },
+            "field": [
+              "id",
+              "ownerId",
+              "nextAction",
+              "nextCheckAt"
+            ]
+          },
+          "expected": null,
+          "requirementRefs": [
+            "D05",
+            "D09",
+            "D13",
+            "D15",
+            "D16",
+            "D17",
+            "D18",
+            "D19"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "E1",
+            "scenarioId": "independent-goals-and-owners"
+          },
+          "evidenceRefs": [
+            "noun-mcp:mcp-response"
+          ],
+          "oracleExplanation": "stateless MCP 진입점에서 같은 snapshot으로 읽은 같은 값이다. API와 같은 서버 판정·원장을 읽어야 하며 다른 계산이나 캐시를 쓰면 실패한다(계획 §3.4, §9.1, §13.1 D20). 명사 getObject와 동사 getWork의 linkedSummary가 서로 같을 뿐 아니라 같은 snapshot의 독립 원장과 고정 손계산에 맞아야 한다. 두 진입점이 같은 오래된 값이나 빈 배열을 내도 통과하지 않는다(계획 §3.4, §13.3 E1, step-3-s4 독립 원장 대조). OPEN QC 의무 행은 goals-db의 현재 OPEN QC 의무와 ID·owner·다음 행동·기한이 같다.",
+          "oracleRef": {
+            "oracleId": "E1.independent-goals-and-owners",
+            "observationNames": [
+              "two-entry-snapshot"
+            ]
+          },
+          "baseline": {
+            "actionId": "goals-db",
+            "pointer": "/data/rawRows/obligations",
+            "where": {
+              "kind": "QC",
+              "current": true,
+              "status": "OPEN"
+            },
+            "field": [
+              "id",
+              "ownerId",
+              "nextAction",
+              "nextCheckAt"
+            ]
+          }
+        },
+        {
+          "id": "two-entry-anchor-return-duty-ledger-mcp",
+          "op": "sameAs",
+          "source": {
+            "actionId": "noun-mcp",
+            "pointer": "/response/data/linkedSummary/duties",
+            "where": {
+              "kind": "RETURN",
+              "status": "OPEN"
+            },
+            "field": [
+              "id",
+              "ownerId",
+              "nextAction",
+              "nextCheckAt"
+            ]
+          },
+          "expected": null,
+          "requirementRefs": [
+            "D05",
+            "D09",
+            "D13",
+            "D15",
+            "D16",
+            "D17",
+            "D18",
+            "D19"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "E1",
+            "scenarioId": "independent-goals-and-owners"
+          },
+          "evidenceRefs": [
+            "noun-mcp:mcp-response"
+          ],
+          "oracleExplanation": "stateless MCP 진입점에서 같은 snapshot으로 읽은 같은 값이다. API와 같은 서버 판정·원장을 읽어야 하며 다른 계산이나 캐시를 쓰면 실패한다(계획 §3.4, §9.1, §13.1 D20). 명사 getObject와 동사 getWork의 linkedSummary가 서로 같을 뿐 아니라 같은 snapshot의 독립 원장과 고정 손계산에 맞아야 한다. 두 진입점이 같은 오래된 값이나 빈 배열을 내도 통과하지 않는다(계획 §3.4, §13.3 E1, step-3-s4 독립 원장 대조). OPEN RETURN 의무 행은 goals-db의 현재 OPEN RETURN 의무와 ID·owner·다음 행동·기한이 같다.",
+          "oracleRef": {
+            "oracleId": "E1.independent-goals-and-owners",
+            "observationNames": [
+              "two-entry-snapshot"
+            ]
+          },
+          "baseline": {
+            "actionId": "goals-db",
+            "pointer": "/data/rawRows/obligations",
+            "where": {
+              "kind": "RETURN",
+              "current": true,
+              "status": "OPEN"
+            },
+            "field": [
+              "id",
+              "ownerId",
+              "nextAction",
+              "nextCheckAt"
+            ]
+          }
+        },
+        {
+          "id": "two-entry-anchor-settlement-duty-ledger-mcp",
+          "op": "sameAs",
+          "source": {
+            "actionId": "noun-mcp",
+            "pointer": "/response/data/linkedSummary/duties",
+            "where": {
+              "kind": "SETTLEMENT",
+              "status": "OPEN"
+            },
+            "field": [
+              "id",
+              "ownerId",
+              "nextAction",
+              "nextCheckAt"
+            ]
+          },
+          "expected": null,
+          "requirementRefs": [
+            "D05",
+            "D09",
+            "D13",
+            "D15",
+            "D16",
+            "D17",
+            "D18",
+            "D19"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "E1",
+            "scenarioId": "independent-goals-and-owners"
+          },
+          "evidenceRefs": [
+            "noun-mcp:mcp-response"
+          ],
+          "oracleExplanation": "stateless MCP 진입점에서 같은 snapshot으로 읽은 같은 값이다. API와 같은 서버 판정·원장을 읽어야 하며 다른 계산이나 캐시를 쓰면 실패한다(계획 §3.4, §9.1, §13.1 D20). 명사 getObject와 동사 getWork의 linkedSummary가 서로 같을 뿐 아니라 같은 snapshot의 독립 원장과 고정 손계산에 맞아야 한다. 두 진입점이 같은 오래된 값이나 빈 배열을 내도 통과하지 않는다(계획 §3.4, §13.3 E1, step-3-s4 독립 원장 대조). OPEN SETTLEMENT 의무 행은 goals-db의 현재 OPEN SETTLEMENT 의무와 ID·owner·다음 행동·기한이 같다.",
+          "oracleRef": {
+            "oracleId": "E1.independent-goals-and-owners",
+            "observationNames": [
+              "two-entry-snapshot"
+            ]
+          },
+          "baseline": {
+            "actionId": "goals-db",
+            "pointer": "/data/rawRows/obligations",
+            "where": {
+              "kind": "SETTLEMENT",
+              "current": true,
+              "status": "OPEN"
+            },
+            "field": [
+              "id",
+              "ownerId",
+              "nextAction",
+              "nextCheckAt"
+            ]
+          }
+        },
+        {
+          "id": "two-entry-anchor-qc-duty-identity-mcp",
+          "op": "relationSet",
+          "source": {
+            "actionId": "noun-mcp",
+            "pointer": "/response/data/linkedSummary/duties",
+            "where": {
+              "kind": "QC",
+              "status": "OPEN"
+            },
+            "field": [
+              "id",
+              "ownerId"
+            ]
+          },
+          "expected": [
+            [
+              {
+                "$result": {
+                  "actionId": "qc-hold40",
+                  "pointer": "/response/obligationId"
+                }
+              },
+              {
+                "$alias": "qc"
+              }
+            ]
+          ],
+          "requirementRefs": [
+            "D05",
+            "D09",
+            "D13",
+            "D15",
+            "D16",
+            "D17",
+            "D18",
+            "D19"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "E1",
+            "scenarioId": "independent-goals-and-owners"
+          },
+          "evidenceRefs": [
+            "noun-mcp:mcp-response"
+          ],
+          "oracleExplanation": "stateless MCP 진입점에서 같은 snapshot으로 읽은 같은 값이다. API와 같은 서버 판정·원장을 읽어야 하며 다른 계산이나 캐시를 쓰면 실패한다(계획 §3.4, §9.1, §13.1 D20). 명사 getObject와 동사 getWork의 linkedSummary가 서로 같을 뿐 아니라 같은 snapshot의 독립 원장과 고정 손계산에 맞아야 한다. 두 진입점이 같은 오래된 값이나 빈 배열을 내도 통과하지 않는다(계획 §3.4, §13.3 E1, step-3-s4 독립 원장 대조). OPEN QC 의무는 QC 보류40의 의무이고 owner는 qc다.",
+          "oracleRef": {
+            "oracleId": "E1.independent-goals-and-owners",
+            "observationNames": [
+              "two-entry-snapshot"
+            ]
+          }
+        },
+        {
+          "id": "two-entry-anchor-return-owner-mcp",
+          "op": "exactSet",
+          "source": {
+            "actionId": "noun-mcp",
+            "pointer": "/response/data/linkedSummary/duties",
+            "where": {
+              "kind": "RETURN",
+              "status": "OPEN"
+            },
+            "field": "ownerId"
+          },
+          "expected": [
+            {
+              "$alias": "receiver"
+            }
+          ],
+          "requirementRefs": [
+            "D05",
+            "D09",
+            "D13",
+            "D15",
+            "D16",
+            "D17",
+            "D18",
+            "D19"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "E1",
+            "scenarioId": "independent-goals-and-owners"
+          },
+          "evidenceRefs": [
+            "noun-mcp:mcp-response"
+          ],
+          "oracleExplanation": "stateless MCP 진입점에서 같은 snapshot으로 읽은 같은 값이다. API와 같은 서버 판정·원장을 읽어야 하며 다른 계산이나 캐시를 쓰면 실패한다(계획 §3.4, §9.1, §13.1 D20). 명사 getObject와 동사 getWork의 linkedSummary가 서로 같을 뿐 아니라 같은 snapshot의 독립 원장과 고정 손계산에 맞아야 한다. 두 진입점이 같은 오래된 값이나 빈 배열을 내도 통과하지 않는다(계획 §3.4, §13.3 E1, step-3-s4 독립 원장 대조). OPEN RETURN 의무의 owner는 receiver다.",
+          "oracleRef": {
+            "oracleId": "E1.independent-goals-and-owners",
+            "observationNames": [
+              "two-entry-snapshot"
+            ]
+          }
+        },
+        {
+          "id": "two-entry-anchor-settlement-owner-mcp",
+          "op": "exactSet",
+          "source": {
+            "actionId": "noun-mcp",
+            "pointer": "/response/data/linkedSummary/duties",
+            "where": {
+              "kind": "SETTLEMENT",
+              "status": "OPEN"
+            },
+            "field": "ownerId"
+          },
+          "expected": [
+            {
+              "$alias": "settlement"
+            }
+          ],
+          "requirementRefs": [
+            "D05",
+            "D09",
+            "D13",
+            "D15",
+            "D16",
+            "D17",
+            "D18",
+            "D19"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "E1",
+            "scenarioId": "independent-goals-and-owners"
+          },
+          "evidenceRefs": [
+            "noun-mcp:mcp-response"
+          ],
+          "oracleExplanation": "stateless MCP 진입점에서 같은 snapshot으로 읽은 같은 값이다. API와 같은 서버 판정·원장을 읽어야 하며 다른 계산이나 캐시를 쓰면 실패한다(계획 §3.4, §9.1, §13.1 D20). 명사 getObject와 동사 getWork의 linkedSummary가 서로 같을 뿐 아니라 같은 snapshot의 독립 원장과 고정 손계산에 맞아야 한다. 두 진입점이 같은 오래된 값이나 빈 배열을 내도 통과하지 않는다(계획 §3.4, §13.3 E1, step-3-s4 독립 원장 대조). OPEN SETTLEMENT 의무의 owner는 settlement다.",
+          "oracleRef": {
+            "oracleId": "E1.independent-goals-and-owners",
+            "observationNames": [
+              "two-entry-snapshot"
+            ]
+          }
+        },
+        {
+          "id": "two-entry-duties-noun-verb-mcp",
+          "op": "sameAs",
+          "source": {
+            "actionId": "noun-mcp",
+            "pointer": "/response/data/linkedSummary/duties"
+          },
+          "expected": null,
+          "requirementRefs": [
+            "D05",
+            "D09",
+            "D13",
+            "D15",
+            "D16",
+            "D17",
+            "D18",
+            "D19"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "E1",
+            "scenarioId": "independent-goals-and-owners"
+          },
+          "evidenceRefs": [
+            "noun-mcp:mcp-response"
+          ],
+          "oracleExplanation": "stateless MCP 진입점에서 같은 snapshot으로 읽은 같은 값이다. API와 같은 서버 판정·원장을 읽어야 하며 다른 계산이나 캐시를 쓰면 실패한다(계획 §3.4, §9.1, §13.1 D20). 명사 getObject와 동사 getWork의 linkedSummary가 서로 같을 뿐 아니라 같은 snapshot의 독립 원장과 고정 손계산에 맞아야 한다. 두 진입점이 같은 오래된 값이나 빈 배열을 내도 통과하지 않는다(계획 §3.4, §13.3 E1, step-3-s4 독립 원장 대조). 동사 진입점의 duties도 명사 진입점과 같다.",
+          "oracleRef": {
+            "oracleId": "E1.independent-goals-and-owners",
+            "observationNames": [
+              "two-entry-snapshot"
+            ]
+          },
+          "baseline": {
+            "actionId": "verb",
+            "pointer": "/response/data/linkedSummary/duties"
+          }
+        },
+        {
+          "id": "two-entry-anchor-purchaseArrivalQuantity-mcp",
+          "op": "decimalEquals",
+          "source": {
+            "actionId": "noun-mcp",
+            "pointer": "/response/data/linkedSummary/quantities/purchaseArrivalQuantity"
+          },
+          "expected": "100",
+          "requirementRefs": [
+            "D05",
+            "D09",
+            "D13",
+            "D15",
+            "D16",
+            "D17",
+            "D18",
+            "D19"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "E1",
+            "scenarioId": "independent-goals-and-owners"
+          },
+          "evidenceRefs": [
+            "noun-mcp:mcp-response"
+          ],
+          "oracleExplanation": "stateless MCP 진입점에서 같은 snapshot으로 읽은 같은 값이다. API와 같은 서버 판정·원장을 읽어야 하며 다른 계산이나 캐시를 쓰면 실패한다(계획 §3.4, §9.1, §13.1 D20). 명사 getObject와 동사 getWork의 linkedSummary가 서로 같을 뿐 아니라 같은 snapshot의 독립 원장과 고정 손계산에 맞아야 한다. 두 진입점이 같은 오래된 값이나 빈 배열을 내도 통과하지 않는다(계획 §3.4, §13.3 E1, step-3-s4 독립 원장 대조). 손계산: 구매 누적 도착100, W 보유100−30+10=80, 과거 인도30, 반품10, 현재 판매 적격0.",
+          "oracleRef": {
+            "oracleId": "E1.independent-goals-and-owners",
+            "observationNames": [
+              "two-entry-snapshot"
+            ]
+          },
+          "unit": "BOX",
+          "unitSource": {
+            "actionId": "noun-mcp",
+            "pointer": "/response/data/linkedSummary/quantities/unit"
+          }
+        },
+        {
+          "id": "two-entry-anchor-heldQuantity-mcp",
+          "op": "decimalEquals",
+          "source": {
+            "actionId": "noun-mcp",
+            "pointer": "/response/data/linkedSummary/quantities/heldQuantity"
+          },
+          "expected": "80",
+          "requirementRefs": [
+            "D05",
+            "D09",
+            "D13",
+            "D15",
+            "D16",
+            "D17",
+            "D18",
+            "D19"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "E1",
+            "scenarioId": "independent-goals-and-owners"
+          },
+          "evidenceRefs": [
+            "noun-mcp:mcp-response"
+          ],
+          "oracleExplanation": "stateless MCP 진입점에서 같은 snapshot으로 읽은 같은 값이다. API와 같은 서버 판정·원장을 읽어야 하며 다른 계산이나 캐시를 쓰면 실패한다(계획 §3.4, §9.1, §13.1 D20). 명사 getObject와 동사 getWork의 linkedSummary가 서로 같을 뿐 아니라 같은 snapshot의 독립 원장과 고정 손계산에 맞아야 한다. 두 진입점이 같은 오래된 값이나 빈 배열을 내도 통과하지 않는다(계획 §3.4, §13.3 E1, step-3-s4 독립 원장 대조). 손계산: 구매 누적 도착100, W 보유100−30+10=80, 과거 인도30, 반품10, 현재 판매 적격0.",
+          "oracleRef": {
+            "oracleId": "E1.independent-goals-and-owners",
+            "observationNames": [
+              "two-entry-snapshot"
+            ]
+          },
+          "unit": "BOX",
+          "unitSource": {
+            "actionId": "noun-mcp",
+            "pointer": "/response/data/linkedSummary/quantities/unit"
+          }
+        },
+        {
+          "id": "two-entry-anchor-deliveredQuantity-mcp",
+          "op": "decimalEquals",
+          "source": {
+            "actionId": "noun-mcp",
+            "pointer": "/response/data/linkedSummary/quantities/deliveredQuantity"
+          },
+          "expected": "30",
+          "requirementRefs": [
+            "D05",
+            "D09",
+            "D13",
+            "D15",
+            "D16",
+            "D17",
+            "D18",
+            "D19"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "E1",
+            "scenarioId": "independent-goals-and-owners"
+          },
+          "evidenceRefs": [
+            "noun-mcp:mcp-response"
+          ],
+          "oracleExplanation": "stateless MCP 진입점에서 같은 snapshot으로 읽은 같은 값이다. API와 같은 서버 판정·원장을 읽어야 하며 다른 계산이나 캐시를 쓰면 실패한다(계획 §3.4, §9.1, §13.1 D20). 명사 getObject와 동사 getWork의 linkedSummary가 서로 같을 뿐 아니라 같은 snapshot의 독립 원장과 고정 손계산에 맞아야 한다. 두 진입점이 같은 오래된 값이나 빈 배열을 내도 통과하지 않는다(계획 §3.4, §13.3 E1, step-3-s4 독립 원장 대조). 손계산: 구매 누적 도착100, W 보유100−30+10=80, 과거 인도30, 반품10, 현재 판매 적격0.",
+          "oracleRef": {
+            "oracleId": "E1.independent-goals-and-owners",
+            "observationNames": [
+              "two-entry-snapshot"
+            ]
+          },
+          "unit": "BOX",
+          "unitSource": {
+            "actionId": "noun-mcp",
+            "pointer": "/response/data/linkedSummary/quantities/unit"
+          }
+        },
+        {
+          "id": "two-entry-anchor-returnedQuantity-mcp",
+          "op": "decimalEquals",
+          "source": {
+            "actionId": "noun-mcp",
+            "pointer": "/response/data/linkedSummary/quantities/returnedQuantity"
+          },
+          "expected": "10",
+          "requirementRefs": [
+            "D05",
+            "D09",
+            "D13",
+            "D15",
+            "D16",
+            "D17",
+            "D18",
+            "D19"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "E1",
+            "scenarioId": "independent-goals-and-owners"
+          },
+          "evidenceRefs": [
+            "noun-mcp:mcp-response"
+          ],
+          "oracleExplanation": "stateless MCP 진입점에서 같은 snapshot으로 읽은 같은 값이다. API와 같은 서버 판정·원장을 읽어야 하며 다른 계산이나 캐시를 쓰면 실패한다(계획 §3.4, §9.1, §13.1 D20). 명사 getObject와 동사 getWork의 linkedSummary가 서로 같을 뿐 아니라 같은 snapshot의 독립 원장과 고정 손계산에 맞아야 한다. 두 진입점이 같은 오래된 값이나 빈 배열을 내도 통과하지 않는다(계획 §3.4, §13.3 E1, step-3-s4 독립 원장 대조). 손계산: 구매 누적 도착100, W 보유100−30+10=80, 과거 인도30, 반품10, 현재 판매 적격0.",
+          "oracleRef": {
+            "oracleId": "E1.independent-goals-and-owners",
+            "observationNames": [
+              "two-entry-snapshot"
+            ]
+          },
+          "unit": "BOX",
+          "unitSource": {
+            "actionId": "noun-mcp",
+            "pointer": "/response/data/linkedSummary/quantities/unit"
+          }
+        },
+        {
+          "id": "two-entry-anchor-eligibleQuantity-mcp",
+          "op": "decimalEquals",
+          "source": {
+            "actionId": "noun-mcp",
+            "pointer": "/response/data/linkedSummary/quantities/eligibleQuantity"
+          },
+          "expected": "0",
+          "requirementRefs": [
+            "D05",
+            "D09",
+            "D13",
+            "D15",
+            "D16",
+            "D17",
+            "D18",
+            "D19"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "E1",
+            "scenarioId": "independent-goals-and-owners"
+          },
+          "evidenceRefs": [
+            "noun-mcp:mcp-response"
+          ],
+          "oracleExplanation": "stateless MCP 진입점에서 같은 snapshot으로 읽은 같은 값이다. API와 같은 서버 판정·원장을 읽어야 하며 다른 계산이나 캐시를 쓰면 실패한다(계획 §3.4, §9.1, §13.1 D20). 명사 getObject와 동사 getWork의 linkedSummary가 서로 같을 뿐 아니라 같은 snapshot의 독립 원장과 고정 손계산에 맞아야 한다. 두 진입점이 같은 오래된 값이나 빈 배열을 내도 통과하지 않는다(계획 §3.4, §13.3 E1, step-3-s4 독립 원장 대조). 손계산: 구매 누적 도착100, W 보유100−30+10=80, 과거 인도30, 반품10, 현재 판매 적격0.",
+          "oracleRef": {
+            "oracleId": "E1.independent-goals-and-owners",
+            "observationNames": [
+              "two-entry-snapshot"
+            ]
+          },
+          "unit": "BOX",
+          "unitSource": {
+            "actionId": "noun-mcp",
+            "pointer": "/response/data/linkedSummary/quantities/unit"
+          }
+        },
+        {
+          "id": "two-entry-anchor-invoiceDifference-mcp",
+          "op": "decimalEquals",
+          "source": {
+            "actionId": "noun-mcp",
+            "pointer": "/response/data/linkedSummary/quantities/invoiceDifference"
+          },
+          "expected": "5",
+          "requirementRefs": [
+            "D05",
+            "D09",
+            "D13",
+            "D15",
+            "D16",
+            "D17",
+            "D18",
+            "D19"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "E1",
+            "scenarioId": "independent-goals-and-owners"
+          },
+          "evidenceRefs": [
+            "noun-mcp:mcp-response"
+          ],
+          "oracleExplanation": "stateless MCP 진입점에서 같은 snapshot으로 읽은 같은 값이다. API와 같은 서버 판정·원장을 읽어야 하며 다른 계산이나 캐시를 쓰면 실패한다(계획 §3.4, §9.1, §13.1 D20). 명사 getObject와 동사 getWork의 linkedSummary가 서로 같을 뿐 아니라 같은 snapshot의 독립 원장과 고정 손계산에 맞아야 한다. 두 진입점이 같은 오래된 값이나 빈 배열을 내도 통과하지 않는다(계획 §3.4, §13.3 E1, step-3-s4 독립 원장 대조). 손계산: 송장105 EUR−구매100 BOX×1 EUR=5 EUR.",
+          "oracleRef": {
+            "oracleId": "E1.independent-goals-and-owners",
+            "observationNames": [
+              "two-entry-snapshot"
+            ]
+          },
+          "unit": "EUR",
+          "unitSource": {
+            "actionId": "noun-mcp",
+            "pointer": "/response/data/linkedSummary/quantities/invoiceDifferenceUnit"
           }
         }
       ],
@@ -7353,7 +10605,8 @@
         "fixture",
         "api",
         "db",
-        "host"
+        "host",
+        "mcp"
       ],
       "actions": [
         {
@@ -9368,6 +12621,46 @@
           ]
         },
         {
+          "id": "consume-again-target",
+          "kind": "query",
+          "actorRef": "sales",
+          "route": "api",
+          "capabilityId": "getObject",
+          "request": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseId": "E1",
+              "scenarioId": "whole-runtime-and-model-reference"
+            },
+            "subjectRefs": [
+              {
+                "type": "Allocation",
+                "id": {
+                  "$result": {
+                    "actionId": "reserve",
+                    "pointer": "/response/allocationId"
+                  }
+                }
+              }
+            ],
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z",
+            "include": [
+              "inventory",
+              "trade",
+              "audit"
+            ]
+          },
+          "evidenceRefs": [
+            "consume-again-target:api-response"
+          ]
+        },
+        {
           "id": "consume-again",
           "kind": "invoke",
           "actorRef": "sales",
@@ -9392,21 +12685,24 @@
                   "pointer": "/response/allocationId"
                 }
               },
-              "quantity": {
-                "value": "30",
-                "unit": "BOX"
-              },
               "originId": {
                 "$alias": "W"
               },
               "destinationId": {
                 "$alias": "CUSTOMER"
+              },
+              "cargoPlaceId": {
+                "$alias": "TRANSIT"
+              },
+              "quantity": {
+                "value": "30",
+                "unit": "BOX"
               }
             },
             "expectedRevision": {
               "$result": {
-                "actionId": "delivery",
-                "pointer": "/response/revision"
+                "actionId": "consume-again-target",
+                "pointer": "/response/data/revision"
               }
             },
             "commandIdempotencyKey": "E1-whole-runtime-and-model-reference-consume-again",
@@ -9549,6 +12845,54 @@
           },
           "evidenceRefs": [
             "runtime:api-response"
+          ]
+        },
+        {
+          "id": "runtime-mcp",
+          "kind": "query",
+          "actorRef": "observer",
+          "route": "mcp",
+          "capabilityId": "getObject",
+          "request": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseId": "E1",
+              "scenarioId": "whole-runtime-and-model-reference"
+            },
+            "subjectRefs": [
+              {
+                "type": "TradeItem",
+                "id": {
+                  "$alias": "P"
+                }
+              }
+            ],
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z",
+            "include": [
+              "inventory",
+              "trade",
+              "evidence",
+              "assessments",
+              "obligations",
+              "audit",
+              "outbox"
+            ],
+            "snapshotRef": {
+              "$result": {
+                "actionId": "runtime",
+                "pointer": "/response/snapshotRevision"
+              }
+            }
+          },
+          "evidenceRefs": [
+            "runtime-mcp:mcp-response",
+            "runtime-mcp:actual-mcp-artifact"
           ]
         },
         {
@@ -10044,7 +13388,7 @@
           "op": "equals",
           "source": {
             "actionId": "unauthorized-approval",
-            "pointer": "/response/code"
+            "pointer": "/response/error/code"
           },
           "expected": "FORBIDDEN",
           "requirementRefs": [
@@ -10110,6 +13454,88 @@
             "scenarioId": "whole-runtime-and-model-reference"
           },
           "oracleExplanation": "actual-runtime-observation는 실제 원장·배분·판정·책임·감사·outbox를 묶고 실모델 gate는 독립 host 입력으로 구분한다의 독립 고정값과 실제 원 행을 대조한다.",
+          "oracleRef": {
+            "oracleId": "E1.whole-runtime-and-model-reference",
+            "observationNames": [
+              "actual-runtime-observation"
+            ]
+          }
+        },
+        {
+          "id": "actual-runtime-observation-10-reason",
+          "op": "equals",
+          "source": {
+            "actionId": "consume-again",
+            "pointer": "/response/error/code"
+          },
+          "expected": "INSUFFICIENT_ELIGIBLE_QUANTITY",
+          "requirementRefs": [
+            "D05",
+            "D09",
+            "D13",
+            "D15",
+            "D16",
+            "D17",
+            "D18",
+            "D19"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "E1",
+            "scenarioId": "whole-runtime-and-model-reference"
+          },
+          "evidenceRefs": [
+            "consume-again:actual-response-or-host-artifact"
+          ],
+          "oracleExplanation": "이미 출고·인도로 CONSUMED된 배분을 첫 출고와 같은 형식(cargoPlaceId TRANSIT, 직전 조회한 현재 revision)으로 다시 출고하면 실행 가능량이 없어 INSUFFICIENT_ELIGIBLE_QUANTITY로 거부되고 거부 감사가 1건 남는다. 형식 오류나 STALE_REVISION으로 거부되는 것은 이중소비 방지의 증거가 아니다(계획 §13.3).",
+          "oracleRef": {
+            "oracleId": "E1.whole-runtime-and-model-reference",
+            "observationNames": [
+              "actual-runtime-observation"
+            ]
+          }
+        },
+        {
+          "id": "actual-runtime-observation-10-audit",
+          "op": "count",
+          "source": {
+            "actionId": "runtime-db",
+            "pointer": "/data/rawRows/audit",
+            "where": {
+              "commandKey": "E1-whole-runtime-and-model-reference-consume-again",
+              "outcome": "REJECTED"
+            }
+          },
+          "expected": 1,
+          "requirementRefs": [
+            "D05",
+            "D09",
+            "D13",
+            "D15",
+            "D16",
+            "D17",
+            "D18",
+            "D19"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "E1",
+            "scenarioId": "whole-runtime-and-model-reference"
+          },
+          "evidenceRefs": [
+            "runtime-db:raw-rows"
+          ],
+          "oracleExplanation": "이미 출고·인도로 CONSUMED된 배분을 첫 출고와 같은 형식(cargoPlaceId TRANSIT, 직전 조회한 현재 revision)으로 다시 출고하면 실행 가능량이 없어 INSUFFICIENT_ELIGIBLE_QUANTITY로 거부되고 거부 감사가 1건 남는다. 형식 오류나 STALE_REVISION으로 거부되는 것은 이중소비 방지의 증거가 아니다(계획 §13.3).",
           "oracleRef": {
             "oracleId": "E1.whole-runtime-and-model-reference",
             "observationNames": [
@@ -10929,6 +14355,222 @@
             "observationNames": [
               "actual-runtime-observation"
             ]
+          }
+        },
+        {
+          "id": "runtime-mcp-same-snapshot",
+          "op": "equals",
+          "source": {
+            "actionId": "runtime-mcp",
+            "pointer": "/response/snapshotRevision"
+          },
+          "expected": {
+            "$result": {
+              "actionId": "runtime",
+              "pointer": "/response/snapshotRevision"
+            }
+          },
+          "requirementRefs": [
+            "D05",
+            "D09",
+            "D13",
+            "D15",
+            "D16",
+            "D17",
+            "D18",
+            "D19"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "E1",
+            "scenarioId": "whole-runtime-and-model-reference"
+          },
+          "evidenceRefs": [
+            "runtime-mcp:mcp-response"
+          ],
+          "oracleExplanation": "MCP 조회는 API 조회와 같은 snapshotRevision을 읽는다.",
+          "oracleRef": {
+            "oracleId": "E1.whole-runtime-and-model-reference",
+            "observationNames": [
+              "actual-runtime-observation"
+            ]
+          }
+        },
+        {
+          "id": "actual-runtime-observation-5-mcp",
+          "op": "sameAs",
+          "source": {
+            "actionId": "runtime-mcp",
+            "pointer": "/response/data/effectLedger/segments"
+          },
+          "expected": null,
+          "requirementRefs": [
+            "D05",
+            "D09",
+            "D13",
+            "D15",
+            "D16",
+            "D17",
+            "D18",
+            "D19"
+          ],
+          "evidenceRefs": [
+            "runtime-mcp:mcp-response"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "E1",
+            "scenarioId": "whole-runtime-and-model-reference"
+          },
+          "oracleExplanation": "stateless MCP 진입점에서 같은 snapshot으로 읽은 같은 값이다. API와 같은 서버 판정·원장을 읽어야 하며 다른 계산이나 캐시를 쓰면 실패한다(계획 §3.4, §9.1, §13.1 D20). actual-runtime-observation는 실제 원장·배분·판정·책임·감사·outbox를 묶고 실모델 gate는 독립 host 입력으로 구분한다의 독립 고정값과 실제 원 행을 대조한다.",
+          "oracleRef": {
+            "oracleId": "E1.whole-runtime-and-model-reference",
+            "observationNames": [
+              "actual-runtime-observation"
+            ]
+          },
+          "baseline": {
+            "actionId": "e1",
+            "pointer": "/response/data/effectLedger/segments"
+          }
+        },
+        {
+          "id": "actual-runtime-observation-6-mcp",
+          "op": "sameAs",
+          "source": {
+            "actionId": "runtime-mcp",
+            "pointer": "/response/data/effectLedger/allocations"
+          },
+          "expected": null,
+          "requirementRefs": [
+            "D05",
+            "D09",
+            "D13",
+            "D15",
+            "D16",
+            "D17",
+            "D18",
+            "D19"
+          ],
+          "evidenceRefs": [
+            "runtime-mcp:mcp-response"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "E1",
+            "scenarioId": "whole-runtime-and-model-reference"
+          },
+          "oracleExplanation": "stateless MCP 진입점에서 같은 snapshot으로 읽은 같은 값이다. API와 같은 서버 판정·원장을 읽어야 하며 다른 계산이나 캐시를 쓰면 실패한다(계획 §3.4, §9.1, §13.1 D20). actual-runtime-observation는 실제 원장·배분·판정·책임·감사·outbox를 묶고 실모델 gate는 독립 host 입력으로 구분한다의 독립 고정값과 실제 원 행을 대조한다.",
+          "oracleRef": {
+            "oracleId": "E1.whole-runtime-and-model-reference",
+            "observationNames": [
+              "actual-runtime-observation"
+            ]
+          },
+          "baseline": {
+            "actionId": "e1",
+            "pointer": "/response/data/effectLedger/allocations"
+          }
+        },
+        {
+          "id": "actual-runtime-observation-7-mcp",
+          "op": "sameAs",
+          "source": {
+            "actionId": "runtime-mcp",
+            "pointer": "/response/data/effectLedger/deliveries"
+          },
+          "expected": null,
+          "requirementRefs": [
+            "D05",
+            "D09",
+            "D13",
+            "D15",
+            "D16",
+            "D17",
+            "D18",
+            "D19"
+          ],
+          "evidenceRefs": [
+            "runtime-mcp:mcp-response"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "E1",
+            "scenarioId": "whole-runtime-and-model-reference"
+          },
+          "oracleExplanation": "stateless MCP 진입점에서 같은 snapshot으로 읽은 같은 값이다. API와 같은 서버 판정·원장을 읽어야 하며 다른 계산이나 캐시를 쓰면 실패한다(계획 §3.4, §9.1, §13.1 D20). actual-runtime-observation는 실제 원장·배분·판정·책임·감사·outbox를 묶고 실모델 gate는 독립 host 입력으로 구분한다의 독립 고정값과 실제 원 행을 대조한다.",
+          "oracleRef": {
+            "oracleId": "E1.whole-runtime-and-model-reference",
+            "observationNames": [
+              "actual-runtime-observation"
+            ]
+          },
+          "baseline": {
+            "actionId": "e1",
+            "pointer": "/response/data/effectLedger/deliveries"
+          }
+        },
+        {
+          "id": "actual-runtime-observation-8-mcp",
+          "op": "sameAs",
+          "source": {
+            "actionId": "runtime-mcp",
+            "pointer": "/response/data/effectLedger/receiptContributions"
+          },
+          "expected": null,
+          "requirementRefs": [
+            "D05",
+            "D09",
+            "D13",
+            "D15",
+            "D16",
+            "D17",
+            "D18",
+            "D19"
+          ],
+          "evidenceRefs": [
+            "runtime-mcp:mcp-response"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "E1",
+            "scenarioId": "whole-runtime-and-model-reference"
+          },
+          "oracleExplanation": "stateless MCP 진입점에서 같은 snapshot으로 읽은 같은 값이다. API와 같은 서버 판정·원장을 읽어야 하며 다른 계산이나 캐시를 쓰면 실패한다(계획 §3.4, §9.1, §13.1 D20). actual-runtime-observation는 실제 원장·배분·판정·책임·감사·outbox를 묶고 실모델 gate는 독립 host 입력으로 구분한다의 독립 고정값과 실제 원 행을 대조한다.",
+          "oracleRef": {
+            "oracleId": "E1.whole-runtime-and-model-reference",
+            "observationNames": [
+              "actual-runtime-observation"
+            ]
+          },
+          "baseline": {
+            "actionId": "e1",
+            "pointer": "/response/data/effectLedger/receiptContributions"
           }
         }
       ],
