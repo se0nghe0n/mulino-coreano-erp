@@ -28,6 +28,18 @@ def link(id,physical,quantity,refs=None):
  l=command(id+'-link','linkCanonicalOccurrence',{'reconciliationId':'$'+id+'.reconciliation'},bind={id+'.canonical':'/id'},revision=1,refs=refs)
  return [m,l]
 
+# Warehouse custody becomes known only from verified receipt evidence (S3
+# contract amendment, plan §4.1/§4.2): the warehouse receipt originals name the
+# receiving custodian and the confirm commands carry the same explicit slot.
+# The custodian is the supervisor, not the confirming reader, so nothing is
+# inferred from the acting identity. Ownership stays unknown.
+CUSTODY_RECEIPTS={'receipt60','receipt40'}
+def name_receiving_custody(actions):
+ for x in actions:
+  if x['type']=='original' and x['id'] in CUSTODY_RECEIPTS:x['fixture']['occurrence']['content']['receivingCustodianId']='$supervisor'
+  if x.get('capability')=='confirmReceipt' and x['request']['slots'].get('receiptId') in {'$'+r+'.observation' for r in CUSTODY_RECEIPTS}:x['request']['slots']['receivingCustodianId']='$supervisor'
+ return actions
+upstream=json.loads((out/'e1-upstream.json').read_text());name_receiving_custody(upstream['actions']);(out/'e1-upstream.json').write_text(json.dumps(upstream,indent=2)+'\n')
 fixture=json.loads((out/'fixture.json').read_text())
 fixture['aliases']['C']={'type':'Customer','name':'가상 B2B 고객'}
 fixture['aliases']['CUSTOMER_PLACE']={'type':'Place','name':'가상 고객 장소','kind':'CUSTOMER'}
