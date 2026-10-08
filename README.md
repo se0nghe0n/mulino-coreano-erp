@@ -23,11 +23,14 @@
 
 Java21·CAP·Maven·CDS/CQN·PostgreSQL은 S0에서 검증할 기술 후보다.
 exact 버전과 지원 조합은 아직 고정하지 않았다. 구현 계획의
-`./verify` 명령은 향후 제공할 계약이며 현재 실행 가능한 startup
-명령이 아니다. 새 구현의 실제 실행 명령은 검증 후 기록한다.
+`./verify`는 harness·준비 검사·actual-s1~s4 native 실행을 제공한다.
+`--actual` 없이 실행한 product profile은 NOT_RUN(exit 2)이다. 실행
+방법과 증거 분류는 `.agents/skills/ontology-scenario-testing/references/repository-harness.md`를
+따른다. 운영 startup 절차는 사용자 Step 6의 운영 매뉴얼에서 다룬다.
 
 사용자 작업은 skills → tests → 구현 → 실제 E2E → 패턴/refactor →
-운영 매뉴얼 순서다. 매 단계 Sol xhigh와 Astra low의 adversarial
+운영 매뉴얼 순서다. Step별 모델과 adversarial reviewer(현재 Claude
+Opus xhigh와 Fable low)는 [AGENTS.md](AGENTS.md)를 따른다. 매 단계
 review, 지적 수정, 통합 checks를 통과하고 미완료 작업을 반복한다.
 이 순서는 시스템 S0–S6의 필수 인수를 줄이거나 대체하지 않는다.
 
