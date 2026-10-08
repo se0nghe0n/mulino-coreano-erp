@@ -43,6 +43,17 @@ public class ResponsibilityService implements WorkResponsibility, com.mulino.app
  /** The approval ID is the guarded top-level decision; it binds this exact assignment, revision, reason and kind authority. */
  public Map<String,Object> waive(DomainContext c,Map<String,Object>p,String approvalId){String id=text(p,"assignmentId"),reason=text(p,"reason");var a=r.require("Assignments",c.organizationId(),id);r.fence(c.organizationId(),text(a,"rootId"));a=r.require("Assignments",c.organizationId(),id);if(!open(a))throw DomainError.invalid("Duty not open");evidence.requireWaiver(c,text(a,"kind"),text(a,"rootId"),id,((Number)a.get("revision")).intValue(),approvalId,reason);r.update("Assignments",c.organizationId(),id,Map.of("status","WAIVED","evidenceId",approvalId,"basis","WAIVER: "+reason,"revision",((Number)a.get("revision")).intValue()+1));return r.require("Assignments",c.organizationId(),id);}
  /**
+  * Re-issues every open assignment of one root for a changed basis (plan §5.3 waiveObligation "현재 scope/revision", §4.3 정정 재평가):
+  * the owner and work are unchanged, the revision is bumped and nextAction/nextCheck refreshed, so a waiver or other decision bound to
+  * the earlier revision no longer executes. Idempotent per basis: reprocessing the same basis changes nothing.
+  */
+ public List<String> reissueOpen(DomainContext c,String rootId,String nextAction,Instant nextCheckAt,String basis){
+  r.fence(c.organizationId(),rootId);var out=new ArrayList<String>();
+  for(var a:r.rows("Assignments",c.organizationId())){if(!rootId.equals(a.get("rootId"))||!open(a)||basis.equals(a.get("basis")))continue;
+   var update=new LinkedHashMap<String,Object>();update.put("nextAction",nextAction);update.put("nextCheckAt",nextCheckAt);update.put("basis",basis);update.put("revision",((Number)a.get("revision")).intValue()+1);r.update("Assignments",c.organizationId(),text(a,"ID"),update);out.add(text(a,"ID"));}
+  return List.copyOf(out);
+ }
+ /**
   * Emergency reassignment (plan §5.3, §7.1, §7.2): a separate ADMIN command with its own reason and audit, not
   * acceptHandover. The current owner is replaced atomically with every open assignment of the work; nothing is
   * accepted on the recipient's behalf (handoverAccepted=false) and no approval row is involved.
