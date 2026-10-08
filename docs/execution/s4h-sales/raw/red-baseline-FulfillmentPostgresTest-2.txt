@@ -1,0 +1,22 @@
+-------------------------------------------------------------------------------
+Test set: com.mulino.quality.FulfillmentPostgresTest
+-------------------------------------------------------------------------------
+Tests run: 2, Failures: 2, Errors: 0, Skipped: 0, Time elapsed: 19.18 s <<< FAILURE! -- in com.mulino.quality.FulfillmentPostgresTest
+com.mulino.quality.FulfillmentPostgresTest.dispatchDatedInsideAnEarlierHoldWindowIsRejectedWithZeroEffect -- Time elapsed: 7.884 s <<< FAILURE!
+org.opentest4j.AssertionFailedError: {revision=0, outcome=APPLIED, effects={organizationId=383d4c97-3afc-40b6-aa59-91dbf943bb07, ID=2b9ad24c-67a2-45ea-95b1-91a49cd5a221, revision=0, createdAt=2026-10-08T00:00:30Z, recordedAt=2026-10-08T00:00:30Z, allocationId=2b2f0543-56f0-4845-bb60-e4dbd4d76f02, customerId=d6a994ea-f547-4506-91e8-57685671d67e, workId=a96e4337-d2e7-4fa6-8364-6e3fa205b5d0, lotId=f76d8605-9427-4532-8468-923b3531cc8a, cargoScopeId=c6a18b27-f917-4b63-affa-afd2db4a857f, quantity=20, itemId=390abfe6-19a8-4f33-bb73-595f5afb94e4, salesLineId=343ec91c-e119-444a-ae0c-db7f705c2121, rangeRootId=3893e807-4a59-4cf2-bf5f-2685e5a37f34, startQuantity=0, commandId=ac996a55-797f-459f-9c1b-209950edf3cb, unit=EA, occurredAt=2026-10-08T00:00:15Z, destinationId=1fdc86f7-69e7-4f64-b975-02a65654ff54, transitSegmentId=87a881dc-ff76-40ed-86fc-0a91fac3694f, evidenceRef=late paperwork, dispatchId=2b9ad24c-67a2-45ea-95b1-91a49cd5a221}, commandId=ac996a55-797f-459f-9c1b-209950edf3cb, canonicalIntentHash=967d9dac3988c16d9aef8e851d3a2892ff4bde0a071765701267300edfce7376, proposalRevision=1} ==> expected: <REJECTED> but was: <APPLIED>
+	at org.junit.jupiter.api.AssertionFailureBuilder.build(AssertionFailureBuilder.java:158)
+	at org.junit.jupiter.api.AssertionFailureBuilder.buildAndThrow(AssertionFailureBuilder.java:139)
+	at org.junit.jupiter.api.AssertEquals.failNotEqual(AssertEquals.java:201)
+	at org.junit.jupiter.api.AssertEquals.assertEquals(AssertEquals.java:184)
+	at org.junit.jupiter.api.Assertions.assertEquals(Assertions.java:1199)
+	at com.mulino.quality.FulfillmentPostgresTest.dispatchDatedInsideAnEarlierHoldWindowIsRejectedWithZeroEffect(FulfillmentPostgresTest.java:308)
+
+com.mulino.quality.FulfillmentPostgresTest.dispatchSpanningAnUnsweptSaleBasisGapIsRejectedWithZeroEffect -- Time elapsed: 4.928 s <<< FAILURE!
+org.opentest4j.AssertionFailedError: {revision=0, outcome=APPLIED, effects={organizationId=85b2ccee-8e8f-484a-bf78-396c37213d1a, ID=68fba902-5b6a-453c-b464-ee320648722c, revision=0, createdAt=2026-10-08T00:00:40Z, recordedAt=2026-10-08T00:00:40Z, allocationId=375225ab-c466-4bfb-8615-90618a5cd43e, customerId=22505067-4866-4a31-9135-18d8a6c58bcc, workId=e101ead1-9a76-45c8-8465-693f93adb698, lotId=f0e4e5e8-2659-4b66-9af1-723b4deaebb6, cargoScopeId=9952014e-c987-405e-ac3f-1aab88a2a804, quantity=20, itemId=fd8aaf8a-a72d-4e34-b121-3409176e5ca8, salesLineId=736c6216-6b32-4c14-9347-bed6a4a61a8d, rangeRootId=6797b106-ad0a-41c6-9412-c4e4d5cfbe4f, startQuantity=0, commandId=5bb4b045-e69b-4143-803e-18792064413a, unit=EA, occurredAt=2026-10-08T00:00:10Z, destinationId=1e29056d-e005-440d-8020-910c24ece8e1, transitSegmentId=3e045439-feae-4011-9fc9-d51aa7c183fc, evidenceRef=late paperwork, dispatchId=68fba902-5b6a-453c-b464-ee320648722c}, commandId=5bb4b045-e69b-4143-803e-18792064413a, canonicalIntentHash=b16baab557dda27aab83ce975226c86756adac6e736e0e33f2804a064c78565d, proposalRevision=1} ==> expected: <REJECTED> but was: <APPLIED>
+	at org.junit.jupiter.api.AssertionFailureBuilder.build(AssertionFailureBuilder.java:158)
+	at org.junit.jupiter.api.AssertionFailureBuilder.buildAndThrow(AssertionFailureBuilder.java:139)
+	at org.junit.jupiter.api.AssertEquals.failNotEqual(AssertEquals.java:201)
+	at org.junit.jupiter.api.AssertEquals.assertEquals(AssertEquals.java:184)
+	at org.junit.jupiter.api.Assertions.assertEquals(Assertions.java:1199)
+	at com.mulino.quality.FulfillmentPostgresTest.dispatchSpanningAnUnsweptSaleBasisGapIsRejectedWithZeroEffect(FulfillmentPostgresTest.java:317)
+

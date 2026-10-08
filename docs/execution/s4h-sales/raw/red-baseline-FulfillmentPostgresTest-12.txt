@@ -1,0 +1,139 @@
+-------------------------------------------------------------------------------
+Test set: com.mulino.quality.FulfillmentPostgresTest
+-------------------------------------------------------------------------------
+Tests run: 14, Failures: 11, Errors: 1, Skipped: 0, Time elapsed: 91.45 s <<< FAILURE! -- in com.mulino.quality.FulfillmentPostgresTest
+com.mulino.quality.FulfillmentPostgresTest.dispatchRequiresAuthorityOverTheTransitDestination -- Time elapsed: 10.48 s <<< FAILURE!
+org.opentest4j.AssertionFailedError: {effects={organizationId=ad64a3a7-d7ae-4e0e-80f7-103f416e4f02, ID=60497ef1-1e9c-4919-96d2-f0fb9451497c, revision=0, createdAt=2026-10-08T00:00:00Z, recordedAt=2026-10-08T00:00:00Z, allocationId=6eec7ae9-3463-49fe-b433-1c9f3d61f457, startQuantity=0, rangeRootId=54703a23-4be7-49f9-b801-7b2e178cde68, salesLineId=f8f07966-d01c-4502-a28a-0143f452c6f8, itemId=9541a41b-b806-4673-9197-25745a948711, quantity=20, cargoScopeId=20c76011-55f7-4bb9-a8db-6b217f611384, lotId=66797e7d-1591-4c56-88db-6c9d4d51ccab, workId=a053123b-2ba3-44ec-91bd-8ae7b01a7dd0, customerId=a2d04d45-1cf7-428e-905d-49ad7000a6e1, commandId=c97a7a21-26cf-4424-8f2f-8fca72429577, evidenceRef=synthetic dispatch, transitSegmentId=5f63ab56-edc5-479b-a0ef-8183a9f6ab70, destinationId=bdf29ffb-d432-4cfe-babd-0a0a1783423d, occurredAt=2026-10-08T00:00:00Z, unit=EA, dispatchId=60497ef1-1e9c-4919-96d2-f0fb9451497c}, outcome=APPLIED, revision=0, commandId=c97a7a21-26cf-4424-8f2f-8fca72429577, canonicalIntentHash=7a79ae1fcce99405991be8e9c94d2c979468f1ac22c5f5ad80b0a33232a918d5, proposalRevision=1} ==> expected: <REJECTED> but was: <APPLIED>
+	at org.junit.jupiter.api.AssertionFailureBuilder.build(AssertionFailureBuilder.java:158)
+	at org.junit.jupiter.api.AssertionFailureBuilder.buildAndThrow(AssertionFailureBuilder.java:139)
+	at org.junit.jupiter.api.AssertEquals.failNotEqual(AssertEquals.java:201)
+	at org.junit.jupiter.api.AssertEquals.assertEquals(AssertEquals.java:184)
+	at org.junit.jupiter.api.Assertions.assertEquals(Assertions.java:1199)
+	at com.mulino.quality.FulfillmentPostgresTest.dispatchRequiresAuthorityOverTheTransitDestination(FulfillmentPostgresTest.java:356)
+
+com.mulino.quality.FulfillmentPostgresTest.deliveryInsideAnAgreedDueDateExtensionCountsAndADeliveryAfterAShortenedDueDateDoesNot -- Time elapsed: 6.573 s <<< FAILURE!
+org.opentest4j.AssertionFailedError: expected: <10> but was: <0>
+	at org.junit.jupiter.api.AssertionFailureBuilder.build(AssertionFailureBuilder.java:158)
+	at org.junit.jupiter.api.AssertionFailureBuilder.buildAndThrow(AssertionFailureBuilder.java:139)
+	at org.junit.jupiter.api.AssertEquals.failNotEqual(AssertEquals.java:201)
+	at org.junit.jupiter.api.AssertEquals.assertEquals(AssertEquals.java:184)
+	at org.junit.jupiter.api.AssertEquals.assertEquals(AssertEquals.java:179)
+	at org.junit.jupiter.api.Assertions.assertEquals(Assertions.java:1188)
+	at com.mulino.quality.FulfillmentPostgresTest.deliveryInsideAnAgreedDueDateExtensionCountsAndADeliveryAfterAShortenedDueDateDoesNot(FulfillmentPostgresTest.java:321)
+
+com.mulino.quality.FulfillmentPostgresTest.reservationCoordinateFinerThanTheItemScaleIsRejected -- Time elapsed: 2.637 s <<< FAILURE!
+org.opentest4j.AssertionFailedError: {effects={organizationId=4fffdf98-f061-4219-843b-3287e0834cf8, ID=18d18b05-3fc4-4ff0-9099-ca7580c0278e, revision=0, createdAt=2026-10-08T00:00:00Z, recordedAt=2026-10-08T00:00:00Z, orderLineId=dd12514e-0c80-4b64-9a0a-2ae6120f44be, rootId=3cbd0379-ae3f-4949-a9a4-1544d8f0ac0f, state=EXECUTABLE, segmentId=3cbd0379-ae3f-4949-a9a4-1544d8f0ac0f, quantity=20, unit=EA, workId=3b0789e5-ed76-4e6a-8477-5f9323591948, startQuantity=0.5, customerId=0294b0f4-6d62-4b29-99c1-1dd89ef41ba5, authorizationActorId=e43e40b2-680f-4a06-b044-d167762545fe, action=SELL, commandId=3f0f0fd1-2bee-4545-82d4-eaf514d884f0, nextValidityBoundary=2026-10-08T00:01:40.000001Z, allocationId=18d18b05-3fc4-4ff0-9099-ca7580c0278e}, outcome=APPLIED, revision=0, commandId=3f0f0fd1-2bee-4545-82d4-eaf514d884f0, canonicalIntentHash=128bc72a257ab449a224884c8d19e599f952a5b36bcd88fbd6f11e9399ef253b, proposalRevision=1} ==> expected: <REJECTED> but was: <APPLIED>
+	at org.junit.jupiter.api.AssertionFailureBuilder.build(AssertionFailureBuilder.java:158)
+	at org.junit.jupiter.api.AssertionFailureBuilder.buildAndThrow(AssertionFailureBuilder.java:139)
+	at org.junit.jupiter.api.AssertEquals.failNotEqual(AssertEquals.java:201)
+	at org.junit.jupiter.api.AssertEquals.assertEquals(AssertEquals.java:184)
+	at org.junit.jupiter.api.Assertions.assertEquals(Assertions.java:1199)
+	at com.mulino.quality.FulfillmentPostgresTest.reservationCoordinateFinerThanTheItemScaleIsRejected(FulfillmentPostgresTest.java:363)
+
+com.mulino.quality.FulfillmentPostgresTest.deliveryReadsUseOccurrenceTimeAndConfirmationVisibleOnlyFromItsKnownAt -- Time elapsed: 6.075 s <<< FAILURE!
+org.opentest4j.AssertionFailedError: {data=[], snapshotRevision=2f8570f2f9738c7834fe1e2142187c4407ce91cc14411fb3823680cd82181e50, asOf=2026-10-08T00:00:15Z, knownAt=2026-10-08T00:00:30Z, scope={itemId=23075200-b77d-477b-b802-b71760086209, organizationId=ab0d6bc9-2e46-421a-b634-bb21053f57f5}, unknowns=[], conflicts=[], evidenceRefs=[], nextCursor=null} ==> expected: <1> but was: <0>
+	at org.junit.jupiter.api.AssertionFailureBuilder.build(AssertionFailureBuilder.java:158)
+	at org.junit.jupiter.api.AssertionFailureBuilder.buildAndThrow(AssertionFailureBuilder.java:139)
+	at org.junit.jupiter.api.AssertEquals.failNotEqual(AssertEquals.java:201)
+	at org.junit.jupiter.api.AssertEquals.assertEquals(AssertEquals.java:152)
+	at org.junit.jupiter.api.Assertions.assertEquals(Assertions.java:590)
+	at com.mulino.quality.FulfillmentPostgresTest.deliveryReadsUseOccurrenceTimeAndConfirmationVisibleOnlyFromItsKnownAt(FulfillmentPostgresTest.java:349)
+
+com.mulino.quality.FulfillmentPostgresTest.partialDeliveriesConfirmedOutOfChronologicalOrderAreBothReconciled -- Time elapsed: 6.191 s <<< FAILURE!
+org.opentest4j.AssertionFailedError: {effects={}, error={message=Occurrence precedes the physical segment, code=TYPE_INVALID}, outcome=REJECTED} ==> expected: <APPLIED> but was: <REJECTED>
+	at org.junit.jupiter.api.AssertionFailureBuilder.build(AssertionFailureBuilder.java:158)
+	at org.junit.jupiter.api.AssertionFailureBuilder.buildAndThrow(AssertionFailureBuilder.java:139)
+	at org.junit.jupiter.api.AssertEquals.failNotEqual(AssertEquals.java:201)
+	at org.junit.jupiter.api.AssertEquals.assertEquals(AssertEquals.java:184)
+	at org.junit.jupiter.api.Assertions.assertEquals(Assertions.java:1199)
+	at com.mulino.quality.FulfillmentPostgresTest.run(FulfillmentPostgresTest.java:59)
+	at com.mulino.quality.FulfillmentPostgresTest.deliver(FulfillmentPostgresTest.java:96)
+	at com.mulino.quality.FulfillmentPostgresTest.partialDeliveriesConfirmedOutOfChronologicalOrderAreBothReconciled(FulfillmentPostgresTest.java:314)
+
+com.mulino.quality.FulfillmentPostgresTest.dispatchDatedInsideAnEarlierHoldWindowIsRejectedWithZeroEffect -- Time elapsed: 6.596 s <<< FAILURE!
+org.opentest4j.AssertionFailedError: {effects={organizationId=89ecc5be-1fe1-4ab7-8d07-5d2e3d7566b2, ID=822205a3-6532-4a33-801b-5b7653506e48, revision=0, createdAt=2026-10-08T00:00:30Z, recordedAt=2026-10-08T00:00:30Z, allocationId=14b8dc4f-013a-4baa-a00d-09df7c763d79, startQuantity=0, rangeRootId=70779764-2531-4ee3-b0d6-eddbbda680b9, salesLineId=f0317009-9c84-436a-b105-1bea79d62a74, itemId=5f9af9ed-635f-4db5-9796-f4359942f05a, quantity=20, cargoScopeId=a92aee27-6fe7-49bf-aa93-e138d1c7fe35, lotId=2d386dd9-a1c8-4817-9329-3d7e4f45c819, workId=e5ec22c8-16be-4f85-9caf-eb9a17be2138, customerId=f81d9f29-92f4-425d-bcb9-8d6da3fac1b2, commandId=dff67d0f-58e7-4f87-bc12-c3f125d333b5, evidenceRef=late paperwork, transitSegmentId=87e3a6f0-00f1-49fa-b2f3-4d10205989cb, destinationId=4cb6236a-ccba-4a3c-a9ad-5c6f07e0761d, occurredAt=2026-10-08T00:00:15Z, unit=EA, dispatchId=822205a3-6532-4a33-801b-5b7653506e48}, outcome=APPLIED, revision=0, commandId=dff67d0f-58e7-4f87-bc12-c3f125d333b5, canonicalIntentHash=22d50e7151041c9cb8ec3fb3a6b7a331f148c37a1f886499fe324f82129e6438, proposalRevision=1} ==> expected: <REJECTED> but was: <APPLIED>
+	at org.junit.jupiter.api.AssertionFailureBuilder.build(AssertionFailureBuilder.java:158)
+	at org.junit.jupiter.api.AssertionFailureBuilder.buildAndThrow(AssertionFailureBuilder.java:139)
+	at org.junit.jupiter.api.AssertEquals.failNotEqual(AssertEquals.java:201)
+	at org.junit.jupiter.api.AssertEquals.assertEquals(AssertEquals.java:184)
+	at org.junit.jupiter.api.Assertions.assertEquals(Assertions.java:1199)
+	at com.mulino.quality.FulfillmentPostgresTest.dispatchDatedInsideAnEarlierHoldWindowIsRejectedWithZeroEffect(FulfillmentPostgresTest.java:307)
+
+com.mulino.quality.FulfillmentPostgresTest.correctionCreditsOnlyTheExactLegitimateCoordinatesOfTheCorrectedInterval -- Time elapsed: 6.383 s <<< ERROR!
+org.springframework.jdbc.BadSqlGrammarException: StatementCallback; bad SQL grammar [SELECT legitimateRangesJson FROM mulino_trade_sales_Deliveries]
+	at org.springframework.jdbc.support.SQLStateSQLExceptionTranslator.doTranslate(SQLStateSQLExceptionTranslator.java:134)
+	at org.springframework.jdbc.support.AbstractFallbackSQLExceptionTranslator.translate(AbstractFallbackSQLExceptionTranslator.java:102)
+	at org.springframework.jdbc.support.AbstractFallbackSQLExceptionTranslator.translate(AbstractFallbackSQLExceptionTranslator.java:111)
+	at org.springframework.jdbc.core.JdbcTemplate.translateException(JdbcTemplate.java:1549)
+	at org.springframework.jdbc.core.JdbcTemplate.execute(JdbcTemplate.java:427)
+	at org.springframework.jdbc.core.JdbcTemplate.query(JdbcTemplate.java:491)
+	at org.springframework.jdbc.core.JdbcTemplate.query(JdbcTemplate.java:501)
+	at org.springframework.jdbc.core.JdbcTemplate.queryForObject(JdbcTemplate.java:533)
+	at org.springframework.jdbc.core.JdbcTemplate.queryForObject(JdbcTemplate.java:539)
+	at com.mulino.quality.FulfillmentPostgresTest.correctionCreditsOnlyTheExactLegitimateCoordinatesOfTheCorrectedInterval(FulfillmentPostgresTest.java:337)
+Caused by: org.postgresql.util.PSQLException: ERROR: column "legitimaterangesjson" does not exist
+  Position: 8
+	at org.postgresql.core.v3.QueryExecutorImpl.receiveErrorResponse(QueryExecutorImpl.java:2993)
+	at org.postgresql.core.v3.QueryExecutorImpl.processResults(QueryExecutorImpl.java:2656)
+	at org.postgresql.core.v3.QueryExecutorImpl.execute(QueryExecutorImpl.java:446)
+	at org.postgresql.jdbc.PgStatement.executeInternal(PgStatement.java:533)
+	at org.postgresql.jdbc.PgStatement.execute(PgStatement.java:449)
+	at org.postgresql.jdbc.PgStatement.executeWithFlags(PgStatement.java:371)
+	at org.postgresql.jdbc.PgStatement.executeCachedSql(PgStatement.java:356)
+	at org.postgresql.jdbc.PgStatement.executeWithFlags(PgStatement.java:332)
+	at org.postgresql.jdbc.PgStatement.executeQuery(PgStatement.java:282)
+	at com.zaxxer.hikari.pool.ProxyStatement.executeQuery(ProxyStatement.java:111)
+	at com.zaxxer.hikari.pool.HikariProxyStatement.executeQuery(HikariProxyStatement.java)
+	at org.springframework.jdbc.core.JdbcTemplate$1QueryStatementCallback.doInStatement(JdbcTemplate.java:478)
+	at org.springframework.jdbc.core.JdbcTemplate.execute(JdbcTemplate.java:412)
+	... 5 more
+
+com.mulino.quality.FulfillmentPostgresTest.replaceAllocationRequiresAuthorityOverTheReplacedAllocationScope -- Time elapsed: 2.554 s <<< FAILURE!
+org.opentest4j.AssertionFailedError: expected: <FORBIDDEN> but was: <INSUFFICIENT_ELIGIBLE_QUANTITY>
+	at org.junit.jupiter.api.AssertionFailureBuilder.build(AssertionFailureBuilder.java:158)
+	at org.junit.jupiter.api.AssertionFailureBuilder.buildAndThrow(AssertionFailureBuilder.java:139)
+	at org.junit.jupiter.api.AssertEquals.failNotEqual(AssertEquals.java:201)
+	at org.junit.jupiter.api.AssertEquals.assertEquals(AssertEquals.java:184)
+	at org.junit.jupiter.api.AssertEquals.assertEquals(AssertEquals.java:179)
+	at org.junit.jupiter.api.Assertions.assertEquals(Assertions.java:1188)
+	at com.mulino.quality.FulfillmentPostgresTest.replaceAllocationRequiresAuthorityOverTheReplacedAllocationScope(FulfillmentPostgresTest.java:360)
+
+com.mulino.quality.FulfillmentPostgresTest.correctedDeficitThatReemergesAfterItsRestorationResolutionGetsANewDuty -- Time elapsed: 6.616 s <<< FAILURE!
+org.opentest4j.AssertionFailedError: a re-emerged deficit 2 must have a current typed duty ==> expected: not <null>
+	at org.junit.jupiter.api.AssertionFailureBuilder.build(AssertionFailureBuilder.java:159)
+	at org.junit.jupiter.api.AssertionFailureBuilder.buildAndThrow(AssertionFailureBuilder.java:139)
+	at org.junit.jupiter.api.AssertNotNull.failNull(AssertNotNull.java:55)
+	at org.junit.jupiter.api.AssertNotNull.assertNotNull(AssertNotNull.java:40)
+	at org.junit.jupiter.api.Assertions.assertNotNull(Assertions.java:334)
+	at com.mulino.quality.FulfillmentPostgresTest.correctedDeficitThatReemergesAfterItsRestorationResolutionGetsANewDuty(FulfillmentPostgresTest.java:329)
+
+com.mulino.quality.FulfillmentPostgresTest.postDispatchSellBasisRevocationMakesTheDeliveryAViolationWithResponseDuty -- Time elapsed: 5.883 s <<< FAILURE!
+org.opentest4j.AssertionFailedError: expected: <0> but was: <20>
+	at org.junit.jupiter.api.AssertionFailureBuilder.build(AssertionFailureBuilder.java:158)
+	at org.junit.jupiter.api.AssertionFailureBuilder.buildAndThrow(AssertionFailureBuilder.java:139)
+	at org.junit.jupiter.api.AssertEquals.failNotEqual(AssertEquals.java:201)
+	at org.junit.jupiter.api.AssertEquals.assertEquals(AssertEquals.java:184)
+	at org.junit.jupiter.api.AssertEquals.assertEquals(AssertEquals.java:179)
+	at org.junit.jupiter.api.Assertions.assertEquals(Assertions.java:1188)
+	at com.mulino.quality.FulfillmentPostgresTest.postDispatchSellBasisRevocationMakesTheDeliveryAViolationWithResponseDuty(FulfillmentPostgresTest.java:299)
+
+com.mulino.quality.FulfillmentPostgresTest.itemScopeSaleEligibilityExcludesDispatchedAndDeliveredStockInNounAndVerbReads -- Time elapsed: 5.848 s <<< FAILURE!
+org.opentest4j.AssertionFailedError: expected: <70> but was: <100>
+	at org.junit.jupiter.api.AssertionFailureBuilder.build(AssertionFailureBuilder.java:158)
+	at org.junit.jupiter.api.AssertionFailureBuilder.buildAndThrow(AssertionFailureBuilder.java:139)
+	at org.junit.jupiter.api.AssertEquals.failNotEqual(AssertEquals.java:201)
+	at org.junit.jupiter.api.AssertEquals.assertEquals(AssertEquals.java:184)
+	at org.junit.jupiter.api.AssertEquals.assertEquals(AssertEquals.java:179)
+	at org.junit.jupiter.api.Assertions.assertEquals(Assertions.java:1188)
+	at com.mulino.quality.FulfillmentPostgresTest.itemScopeSaleEligibilityExcludesDispatchedAndDeliveredStockInNounAndVerbReads(FulfillmentPostgresTest.java:342)
+
+com.mulino.quality.FulfillmentPostgresTest.postDispatchSellOnlyHoldMakesTheDeliveryAViolationWithResponseDuty -- Time elapsed: 6.208 s <<< FAILURE!
+org.opentest4j.AssertionFailedError: expected: <0> but was: <20>
+	at org.junit.jupiter.api.AssertionFailureBuilder.build(AssertionFailureBuilder.java:158)
+	at org.junit.jupiter.api.AssertionFailureBuilder.buildAndThrow(AssertionFailureBuilder.java:139)
+	at org.junit.jupiter.api.AssertEquals.failNotEqual(AssertEquals.java:201)
+	at org.junit.jupiter.api.AssertEquals.assertEquals(AssertEquals.java:184)
+	at org.junit.jupiter.api.AssertEquals.assertEquals(AssertEquals.java:179)
+	at org.junit.jupiter.api.Assertions.assertEquals(Assertions.java:1188)
+	at com.mulino.quality.FulfillmentPostgresTest.postDispatchSellOnlyHoldMakesTheDeliveryAViolationWithResponseDuty(FulfillmentPostgresTest.java:295)
+
