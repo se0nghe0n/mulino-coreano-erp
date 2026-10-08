@@ -1,7 +1,7 @@
 {
   "recordType": "PREPARED_NORMATIVE_OBSERVATION_BINDINGS",
   "caseId": "V7",
-  "caseHash": "a09c68b842b8bf81abad220e154fb97bd6484a528d005e1487e22049c9a2ccc3",
+  "caseHash": "42c58073486bd395414fb36b35aecf273747a4b37fbae795b54f1e48fa5d44c8",
   "catalogSha256": "61968b22cde1f35922df323d964599228d8dfbbe71b0ee32192b59de0a9f5ed9",
   "productRuntimeClaimed": false,
   "runtimeStatus": "NOT_RUN",
@@ -67,10 +67,10 @@
       "observationName": "preserved-if-effect-commits-first",
       "runtimeStatus": "NOT_RUN",
       "primaryFixedQuantityAssertions": [
-        {"subcaseId":"authorization-effect-first","assertionId":"preserved20-quantity","pointer":"/subcases/2/assertions/16","actionId":"after","op":"sumEquals"}
+        {"subcaseId":"authorization-effect-first","assertionId":"preserved20-quantity","pointer":"/subcases/2/assertions/17","actionId":"after","op":"sumEquals"}
       ],
       "bindings": [
-        {"subcaseId":"authorization-effect-first","assertionId":"preserved20-quantity","pointer":"/subcases/2/assertions/16","actionId":"after","op":"sumEquals"}
+        {"subcaseId":"authorization-effect-first","assertionId":"preserved20-quantity","pointer":"/subcases/2/assertions/17","actionId":"after","op":"sumEquals"}
       ]
     },
     {
@@ -80,9 +80,9 @@
       "primaryFixedQuantityAssertions": [
       ],
       "bindings": [
-        {"subcaseId":"authorization-effect-first","assertionId":"post-revoke-code","pointer":"/subcases/2/assertions/14","actionId":"post-revoke","op":"equals"},
-        {"subcaseId":"authorization-effect-first","assertionId":"post-revoke-outcome","pointer":"/subcases/2/assertions/15","actionId":"post-revoke","op":"equals"},
-        {"subcaseId":"authorization-effect-first","assertionId":"effect-after-serialized-revoke-rows0","pointer":"/subcases/2/assertions/17","actionId":"after","op":"count"}
+        {"subcaseId":"authorization-effect-first","assertionId":"post-revoke-code","pointer":"/subcases/2/assertions/15","actionId":"post-revoke","op":"equals"},
+        {"subcaseId":"authorization-effect-first","assertionId":"post-revoke-outcome","pointer":"/subcases/2/assertions/16","actionId":"post-revoke","op":"equals"},
+        {"subcaseId":"authorization-effect-first","assertionId":"effect-after-serialized-revoke-rows0","pointer":"/subcases/2/assertions/18","actionId":"after","op":"count"}
       ]
     },
     {
@@ -100,12 +100,12 @@
         {"subcaseId":"authorization-revoke-first","assertionId":"revoke-is-only-new-fence-commit","pointer":"/subcases/1/assertions/11","actionId":"after","op":"relationSet"},
         {"subcaseId":"authorization-revoke-first","assertionId":"revoked-current-grant","pointer":"/subcases/1/assertions/16","actionId":"after","op":"relationSet"},
         {"subcaseId":"authorization-revoke-first","assertionId":"common-scope-fence","pointer":"/subcases/1/assertions/17","actionId":"after","op":"relationSet"},
-        {"subcaseId":"authorization-effect-first","assertionId":"effect20-applied","pointer":"/subcases/2/assertions/12","actionId":"dispatch-result","op":"equals"},
-        {"subcaseId":"authorization-effect-first","assertionId":"revoke-after-applied","pointer":"/subcases/2/assertions/13","actionId":"revoke-result","op":"equals"},
-        {"subcaseId":"authorization-effect-first","assertionId":"dispatch-terminal-before-revoke","pointer":"/subcases/2/assertions/18","actionId":"dispatch-result","op":"equals"},
-        {"subcaseId":"authorization-effect-first","assertionId":"linearization-order","pointer":"/subcases/2/assertions/19","actionId":"after","op":"relationSet"},
-        {"subcaseId":"authorization-effect-first","assertionId":"revoked-current-grant","pointer":"/subcases/2/assertions/23","actionId":"after","op":"relationSet"},
-        {"subcaseId":"authorization-effect-first","assertionId":"common-scope-fence","pointer":"/subcases/2/assertions/24","actionId":"after","op":"relationSet"}
+        {"subcaseId":"authorization-effect-first","assertionId":"effect20-applied","pointer":"/subcases/2/assertions/13","actionId":"dispatch-result","op":"equals"},
+        {"subcaseId":"authorization-effect-first","assertionId":"revoke-after-applied","pointer":"/subcases/2/assertions/14","actionId":"revoke-result","op":"equals"},
+        {"subcaseId":"authorization-effect-first","assertionId":"dispatch-terminal-before-revoke","pointer":"/subcases/2/assertions/19","actionId":"dispatch-result","op":"equals"},
+        {"subcaseId":"authorization-effect-first","assertionId":"linearization-order","pointer":"/subcases/2/assertions/20","actionId":"after","op":"relationSet"},
+        {"subcaseId":"authorization-effect-first","assertionId":"revoked-current-grant","pointer":"/subcases/2/assertions/24","actionId":"after","op":"relationSet"},
+        {"subcaseId":"authorization-effect-first","assertionId":"common-scope-fence","pointer":"/subcases/2/assertions/25","actionId":"after","op":"relationSet"}
       ]
     },
     {
@@ -128,17 +128,18 @@
         {"subcaseId":"authorization-effect-first","assertionId":"dispatch-ready-state","pointer":"/subcases/2/assertions/1","actionId":"dispatch-ready","op":"equals"},
         {"subcaseId":"authorization-effect-first","assertionId":"revoke-blocked-point","pointer":"/subcases/2/assertions/2","actionId":"revoke-blocked","op":"equals"},
         {"subcaseId":"authorization-effect-first","assertionId":"revoke-blocked-state","pointer":"/subcases/2/assertions/3","actionId":"revoke-blocked","op":"equals"},
-        {"subcaseId":"authorization-effect-first","assertionId":"dispatch-resume-point","pointer":"/subcases/2/assertions/4","actionId":"dispatch-resume","op":"equals"},
-        {"subcaseId":"authorization-effect-first","assertionId":"dispatch-resume-state","pointer":"/subcases/2/assertions/5","actionId":"dispatch-resume","op":"equals"},
-        {"subcaseId":"authorization-effect-first","assertionId":"revoke-resume-point","pointer":"/subcases/2/assertions/6","actionId":"revoke-resume","op":"equals"},
-        {"subcaseId":"authorization-effect-first","assertionId":"revoke-resume-state","pointer":"/subcases/2/assertions/7","actionId":"revoke-resume","op":"equals"},
-        {"subcaseId":"authorization-effect-first","assertionId":"dispatch-result-completed","pointer":"/subcases/2/assertions/8","actionId":"dispatch-result","op":"equals"},
-        {"subcaseId":"authorization-effect-first","assertionId":"dispatch-result-same-handle","pointer":"/subcases/2/assertions/9","actionId":"dispatch-result","op":"equals"},
-        {"subcaseId":"authorization-effect-first","assertionId":"revoke-result-completed","pointer":"/subcases/2/assertions/10","actionId":"revoke-result","op":"equals"},
-        {"subcaseId":"authorization-effect-first","assertionId":"revoke-result-same-handle","pointer":"/subcases/2/assertions/11","actionId":"revoke-result","op":"equals"},
-        {"subcaseId":"authorization-effect-first","assertionId":"blocked-or-post-revoke-duty-assignment1","pointer":"/subcases/2/assertions/20","actionId":"after","op":"count"},
-        {"subcaseId":"authorization-effect-first","assertionId":"blocked-or-post-revoke-duty-owner","pointer":"/subcases/2/assertions/21","actionId":"after","op":"relationSet"},
-        {"subcaseId":"authorization-effect-first","assertionId":"blocked-or-post-revoke-duty-assignment-scope","pointer":"/subcases/2/assertions/22","actionId":"after","op":"relationSet"}
+        {"subcaseId":"authorization-effect-first","assertionId":"race-distinct-db-transactions","pointer":"/subcases/2/assertions/4","actionId":"dispatch-ready","op":"notEquals"},
+        {"subcaseId":"authorization-effect-first","assertionId":"dispatch-resume-point","pointer":"/subcases/2/assertions/5","actionId":"dispatch-resume","op":"equals"},
+        {"subcaseId":"authorization-effect-first","assertionId":"dispatch-resume-state","pointer":"/subcases/2/assertions/6","actionId":"dispatch-resume","op":"equals"},
+        {"subcaseId":"authorization-effect-first","assertionId":"revoke-resume-point","pointer":"/subcases/2/assertions/7","actionId":"revoke-resume","op":"equals"},
+        {"subcaseId":"authorization-effect-first","assertionId":"revoke-resume-state","pointer":"/subcases/2/assertions/8","actionId":"revoke-resume","op":"equals"},
+        {"subcaseId":"authorization-effect-first","assertionId":"dispatch-result-completed","pointer":"/subcases/2/assertions/9","actionId":"dispatch-result","op":"equals"},
+        {"subcaseId":"authorization-effect-first","assertionId":"dispatch-result-same-handle","pointer":"/subcases/2/assertions/10","actionId":"dispatch-result","op":"equals"},
+        {"subcaseId":"authorization-effect-first","assertionId":"revoke-result-completed","pointer":"/subcases/2/assertions/11","actionId":"revoke-result","op":"equals"},
+        {"subcaseId":"authorization-effect-first","assertionId":"revoke-result-same-handle","pointer":"/subcases/2/assertions/12","actionId":"revoke-result","op":"equals"},
+        {"subcaseId":"authorization-effect-first","assertionId":"blocked-or-post-revoke-duty-assignment1","pointer":"/subcases/2/assertions/21","actionId":"after","op":"count"},
+        {"subcaseId":"authorization-effect-first","assertionId":"blocked-or-post-revoke-duty-owner","pointer":"/subcases/2/assertions/22","actionId":"after","op":"relationSet"},
+        {"subcaseId":"authorization-effect-first","assertionId":"blocked-or-post-revoke-duty-assignment-scope","pointer":"/subcases/2/assertions/23","actionId":"after","op":"relationSet"}
       ]
     },
     {
@@ -146,10 +147,10 @@
       "observationName": "unauthorized-recovered-effects",
       "runtimeStatus": "NOT_RUN",
       "primaryFixedQuantityAssertions": [
-        {"subcaseId":"restart-after-revoke","assertionId":"new-effect-quantity0","pointer":"/subcases/3/assertions/11","actionId":"after","op":"decimalDelta"}
+        {"subcaseId":"restart-after-revoke","assertionId":"new-effect-quantity0","pointer":"/subcases/3/assertions/13","actionId":"after","op":"decimalDelta"}
       ],
       "bindings": [
-        {"subcaseId":"restart-after-revoke","assertionId":"new-effect-quantity0","pointer":"/subcases/3/assertions/11","actionId":"after","op":"decimalDelta"}
+        {"subcaseId":"restart-after-revoke","assertionId":"new-effect-quantity0","pointer":"/subcases/3/assertions/13","actionId":"after","op":"decimalDelta"}
       ]
     },
     {
@@ -157,10 +158,10 @@
       "observationName": "prior-committed-preserved",
       "runtimeStatus": "NOT_RUN",
       "primaryFixedQuantityAssertions": [
-        {"subcaseId":"restart-after-revoke","assertionId":"prior20-still-total","pointer":"/subcases/3/assertions/13","actionId":"after","op":"sumEquals"}
+        {"subcaseId":"restart-after-revoke","assertionId":"prior20-still-total","pointer":"/subcases/3/assertions/15","actionId":"after","op":"sumEquals"}
       ],
       "bindings": [
-        {"subcaseId":"restart-after-revoke","assertionId":"prior20-still-total","pointer":"/subcases/3/assertions/13","actionId":"after","op":"sumEquals"}
+        {"subcaseId":"restart-after-revoke","assertionId":"prior20-still-total","pointer":"/subcases/3/assertions/15","actionId":"after","op":"sumEquals"}
       ]
     },
     {
@@ -170,9 +171,9 @@
       "primaryFixedQuantityAssertions": [
       ],
       "bindings": [
-        {"subcaseId":"restart-after-revoke","assertionId":"blocked-duty-after-restart-assignment1","pointer":"/subcases/3/assertions/14","actionId":"after","op":"count"},
-        {"subcaseId":"restart-after-revoke","assertionId":"blocked-duty-after-restart-owner","pointer":"/subcases/3/assertions/15","actionId":"after","op":"relationSet"},
-        {"subcaseId":"restart-after-revoke","assertionId":"blocked-duty-after-restart-assignment-scope","pointer":"/subcases/3/assertions/16","actionId":"after","op":"relationSet"}
+        {"subcaseId":"restart-after-revoke","assertionId":"blocked-duty-after-restart-assignment1","pointer":"/subcases/3/assertions/16","actionId":"after","op":"count"},
+        {"subcaseId":"restart-after-revoke","assertionId":"blocked-duty-after-restart-owner","pointer":"/subcases/3/assertions/17","actionId":"after","op":"relationSet"},
+        {"subcaseId":"restart-after-revoke","assertionId":"blocked-duty-after-restart-assignment-scope","pointer":"/subcases/3/assertions/18","actionId":"after","op":"relationSet"}
       ]
     },
     {
@@ -191,11 +192,13 @@
         {"subcaseId":"restart-after-revoke","assertionId":"old-worker-cancelled","pointer":"/subcases/3/assertions/6","actionId":"dispatch-result","op":"equals"},
         {"subcaseId":"restart-after-revoke","assertionId":"safe-retry-code","pointer":"/subcases/3/assertions/7","actionId":"safe-retry","op":"equals"},
         {"subcaseId":"restart-after-revoke","assertionId":"safe-retry-outcome","pointer":"/subcases/3/assertions/8","actionId":"safe-retry","op":"equals"},
-        {"subcaseId":"restart-after-revoke","assertionId":"new-dispatch-rows0","pointer":"/subcases/3/assertions/9","actionId":"after","op":"count"},
-        {"subcaseId":"restart-after-revoke","assertionId":"new20-command-not-committed","pointer":"/subcases/3/assertions/10","actionId":"after","op":"count"},
-        {"subcaseId":"restart-after-revoke","assertionId":"prior20-raw-preserved","pointer":"/subcases/3/assertions/12","actionId":"after","op":"sameAs"},
-        {"subcaseId":"restart-after-revoke","assertionId":"revoked-current-grant","pointer":"/subcases/3/assertions/17","actionId":"after","op":"relationSet"},
-        {"subcaseId":"restart-after-revoke","assertionId":"common-scope-fence","pointer":"/subcases/3/assertions/18","actionId":"after","op":"relationSet"}
+        {"subcaseId":"restart-after-revoke","assertionId":"safe-retry-server-recorded","pointer":"/subcases/3/assertions/9","actionId":"after","op":"relationSet"},
+        {"subcaseId":"restart-after-revoke","assertionId":"safe-retry-original-owner-kept","pointer":"/subcases/3/assertions/10","actionId":"after","op":"exactSet"},
+        {"subcaseId":"restart-after-revoke","assertionId":"new-dispatch-rows0","pointer":"/subcases/3/assertions/11","actionId":"after","op":"count"},
+        {"subcaseId":"restart-after-revoke","assertionId":"new20-command-not-committed","pointer":"/subcases/3/assertions/12","actionId":"after","op":"count"},
+        {"subcaseId":"restart-after-revoke","assertionId":"prior20-raw-preserved","pointer":"/subcases/3/assertions/14","actionId":"after","op":"sameAs"},
+        {"subcaseId":"restart-after-revoke","assertionId":"revoked-current-grant","pointer":"/subcases/3/assertions/19","actionId":"after","op":"relationSet"},
+        {"subcaseId":"restart-after-revoke","assertionId":"common-scope-fence","pointer":"/subcases/3/assertions/20","actionId":"after","op":"relationSet"}
       ]
     }
   ]

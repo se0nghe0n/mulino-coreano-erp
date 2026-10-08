@@ -82,6 +82,6 @@ public class AuthorityAssertionsTest {
         var linked=new HashSet<String>();var cases=List.of("T08","C3","V4","V6","V7");var prep=new PreparationValidator(root);int subs=0;
         for(String c:cases) {Path p=root.resolve("verification/cases/"+c+"/case.json");JsonNode n=Json.read(p);assertEquals(List.of(),prep.feature(p,n));for(JsonNode s:n.path("subcases")){subs++;for(JsonNode a:s.path("assertions"))for(JsonNode o:a.path("oracleRef").path("observationNames"))linked.add(a.path("oracleRef").path("oracleId").asText()+"/"+o.asText());}}
         var required=new HashSet<String>();for(JsonNode o:Json.read(root.resolve("verification/requirements/mandatory-oracles.json")).path("oracles"))if(cases.contains(o.path("caseId").asText()))for(JsonNode n:o.path("expectedObservations"))required.add(o.path("oracleId").asText()+"/"+n.path("name").asText());
-        assertEquals(54,required.size());assertEquals(required,linked);assertEquals(437,subs);
+        assertEquals(54,required.size());assertEquals(required,linked);assertEquals(438,subs);
     }
 }

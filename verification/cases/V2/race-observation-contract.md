@@ -94,10 +94,50 @@ WAIT 시점 waiter가 OPEN이므로 contender의 초기 read는 winner commit
 revision2를 읽고 요청 revision1과 비교해 `STALE_REVISION`이다. V3
 dispatch-first의 `lockedRevision`은 경합 직후 다시 조회한 segment
 revision과 같다. V3 hold-first의 재검증 결과는
-`INSUFFICIENT_ELIGIBLE_QUANTITY`다.
+`INSUFFICIENT_ELIGIBLE_QUANTITY`다. 재검증이 요청 revision과 같으면
+`result`는 `REVISION_CURRENT`다. `result`는 모든 행에 있으며 null이 아니다.
 
 `transactions`와 `locks` 원행은 application 원장의 보조 증거로
 유지한다. 경합 PASS의 근거는 위 독립 관찰과 재검증이다.
+
+## V2 reserve-commits-first의 두 허용 결과
+
+reserve가 먼저 commit한 뒤 contender 분할(요청 revision1)의 결과를
+계획은 하나로 고정하지 않는다. 계획 §13.2 V2는 불변식(실물60·기존
+의무40·신규 실행배분 최대20·부모 재소비0)만 정하고, §4.2는 lock 뒤
+revision을 다시 읽어 충돌이면 새 의도로 몰래 실행하지 말고 conflict를
+돌려주라고 한다. 예약이 A60의 revision을 올리는 구현은
+CONFLICT/STALE_REVISION·효과0이 맞다. 올리지 않는 구현은 요청 revision이
+여전히 최신이므로 두 배분을 한 번씩 자식으로 옮기는 APPLIED가 맞다.
+backend `FulfillmentPostgresTest.v2ReserveFirst`는 후자다.
+
+그래서 이 subcase는 결과를 고정하지 않고 아래 조건을 모두 요구한다.
+harness에는 조건부 assertion이 없으므로 같은 조건을 두 경로에서 같은
+값이 되는 비교로 표현했다.
+
+1. 응답 outcome은 APPLIED 또는 CONFLICT다(나머지 enum 6개 notEquals).
+2. 응답 outcome은 같은 거래의 감사 원행 outcome과 같다. `raced-db`
+   observer는 `data.data.contenderOutcome`을 derivation
+   `{rowPointer:/rawRows/audit, where:{commandKey:<contender key>},
+   aggregate:single, field:outcome}`로 낸다(observe scope의
+   `derivedContenderOutcome`).
+3. 감사 원행이 CONFLICT인 경우의 `errorCode` 집합과 contender
+   transaction의 `lockRevalidations` 중 `result=STALE_REVISION`인 행의
+   `result` 집합이 같다. CONFLICT면 둘 다 `[STALE_REVISION]`, APPLIED면
+   둘 다 빈 집합이다. 재검증이 STALE인데 적용하거나, 최신인데 충돌로
+   거부하거나, 다른 코드로 거부하면 실패한다.
+4. contender 감사가 CONFLICT인 경우와 뒤의 수렴 분할(현재 revision을
+   getObject로 다시 읽어 보내는 explicit-fresh-split) 감사가 APPLIED인
+   경우가 정확히 함께 성립한다(actorId 집합 비교). CONFLICT로 기록하고
+   분할 효과를 남기면 수렴 분할이 막혀 실패한다.
+5. 경합 직후와 최종 상태 모두 실행 배분은 ALLOC40·신규20이 각각 한
+   번이고 active 실물은 60이다. 최종 active 실물은 자식 40·20뿐이고
+   A60과 A60을 가리키는 active 배분은 없다.
+
+API 응답 자체의 `/response/error/code`는 CONFLICT일 때만 존재하므로
+조건부 비교가 없는 현재 harness로는 직접 고정하지 못한다. 감사 원행의
+코드와 응답 outcome으로 묶었다. 남은 한계는 harness 소유자에게 조건부
+assertion(예: outcome별 guard)을 요청한다.
 
 ## V2 actual50의 promiseCoverage
 

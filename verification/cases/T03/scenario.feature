@@ -90,7 +90,7 @@
     그러면 "invalid-results-8" assertion으로 "허용된 denial 감사1과 금지된 업무 효과0을 분리한다."를 확인한다
     그러면 "active-physical-identities" assertion으로 "현재 active 실물 identity를 한 번씩만 합산하며 중복 실물은 거부한다."를 확인한다
     그러면 "response-definition-version" assertion으로 "수량/제한을 읽는 실제 정의 버전은 고정 v1이며 다른 의미로 대체하지 않는다."를 확인한다
-    그러면 "cycle-specific-error" assertion으로 "active 자식에서 ancestor 부모로 되돌리는 edge는 계보 순환 오류로 거부한다."를 확인한다
+    그러면 "cycle-specific-error" assertion으로 "응답의 구조화 오류 코드 /response/error/code가 GENEALOGY_CYCLE다(계획 §3.4, contracts/command-response.schema.json)."를 확인한다
     그러면 "actual-baseline-physical-rows" assertion으로 "서버에 실제 설치된 시작 실물의 ID·decimal·unit을 원 행에서 확인한다. baseline 자체는 업무 실행 coverage가 아니다."를 확인한다
 
   시나리오: 잘못된 계보·합침 consumeRetiredParent를 거부한다
@@ -199,7 +199,7 @@
     그러면 "arbitrary-clean-selection-9" assertion으로 "금지 효과의 동일 scope 전후 원 행을 비교한다. 조회/거부 감사는 별도 scope다."를 확인한다
     그러면 "arbitrary-clean-selection-10" assertion으로 "허용된 denial 감사1과 금지된 업무 효과0을 분리한다."를 확인한다
     그러면 "trace-certainty-11" assertion으로 "계보의 영향 후보와 오염 확정을 구분한다."를 확인한다
-    그러면 "trace-certainty-12" assertion으로 "부분 해제는 실제 분리/검사 근거가 필요하다."를 확인한다
+    그러면 "trace-certainty-12" assertion으로 "응답의 구조화 오류 코드 /response/error/code가 SEPARATION_EVIDENCE_REQUIRED다(계획 §3.4, contracts/command-response.schema.json)."를 확인한다
     그러면 "trace-certainty-13" assertion으로 "독립 원 행의 실물·수량·관계·범위를 정확히 대조한다."를 확인한다
     그러면 "active-physical-identities" assertion으로 "현재 active 실물 identity를 한 번씩만 합산하며 중복 실물은 거부한다."를 확인한다
     그러면 "response-definition-version" assertion으로 "수량/제한을 읽는 실제 정의 버전은 고정 v1이며 다른 의미로 대체하지 않는다."를 확인한다

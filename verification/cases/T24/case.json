@@ -4712,7 +4712,8 @@
               "tombstones",
               "deletion_log",
               "obligations",
-              "assignments"
+              "assignments",
+              "audit"
             ]
           }
         }
@@ -4720,18 +4721,38 @@
       "assertions": [
         {
           "id": "sweep-authenticated-reviewer",
-          "op": "equals",
+          "op": "relationSet",
           "source": {
-            "actionId": "sweep",
-            "pointer": "/provenance/authenticatedActor/subject"
+            "actionId": "db-after",
+            "pointer": "/data/rawRows/audit",
+            "field": [
+              "actorId",
+              "organizationId",
+              "policyVersion",
+              "sweepId"
+            ],
+            "where": {
+              "action": "retentionSweep"
+            }
           },
-          "expected": "config",
+          "expected": [
+            [
+              {
+                "$alias": "config"
+              },
+              {
+                "$alias": "ORG-A"
+              },
+              "retention-v1",
+              "sweep-legal-hold"
+            ]
+          ],
           "requirementRefs": [
             "D24"
           ],
           "evidenceRefs": [
-            "sweep:actual-artifact",
-            "sweep:raw-source"
+            "db-after:actual-artifact",
+            "db-after:raw-source"
           ],
           "scope": {
             "organizationId": {
@@ -4743,7 +4764,7 @@
             "caseId": "T24",
             "subcaseId": "legal-hold"
           },
-          "oracleExplanation": "sweep authenticated reviewer의 실제 값과 범위를 대조한다",
+          "oracleExplanation": "서버 감사 원행에서 보존 sweep 1건의 실행 주체는 인증된 config, 조직은 ORG-A, 정책은 retention-v1, sweep ID는 sweep-legal-hold다. harness가 서명을 요청한 provenance를 읽지 않는다(계획 §7.4).",
           "oracleRef": {
             "oracleId": "T24.retention-legalhold-blob-restore",
             "observationNames": [
@@ -5289,7 +5310,8 @@
               "tombstones",
               "deletion_log",
               "obligations",
-              "assignments"
+              "assignments",
+              "audit"
             ]
           }
         }
@@ -5297,18 +5319,38 @@
       "assertions": [
         {
           "id": "sweep-authenticated-reviewer",
-          "op": "equals",
+          "op": "relationSet",
           "source": {
-            "actionId": "sweep",
-            "pointer": "/provenance/authenticatedActor/subject"
+            "actionId": "db-after",
+            "pointer": "/data/rawRows/audit",
+            "field": [
+              "actorId",
+              "organizationId",
+              "policyVersion",
+              "sweepId"
+            ],
+            "where": {
+              "action": "retentionSweep"
+            }
           },
-          "expected": "config",
+          "expected": [
+            [
+              {
+                "$alias": "config"
+              },
+              {
+                "$alias": "ORG-A"
+              },
+              "retention-v1",
+              "sweep-active-reference"
+            ]
+          ],
           "requirementRefs": [
             "D24"
           ],
           "evidenceRefs": [
-            "sweep:actual-artifact",
-            "sweep:raw-source"
+            "db-after:actual-artifact",
+            "db-after:raw-source"
           ],
           "scope": {
             "organizationId": {
@@ -5320,7 +5362,7 @@
             "caseId": "T24",
             "subcaseId": "active-reference"
           },
-          "oracleExplanation": "sweep authenticated reviewer의 실제 값과 범위를 대조한다",
+          "oracleExplanation": "서버 감사 원행에서 보존 sweep 1건의 실행 주체는 인증된 config, 조직은 ORG-A, 정책은 retention-v1, sweep ID는 sweep-active-reference다. harness가 서명을 요청한 provenance를 읽지 않는다(계획 §7.4).",
           "oracleRef": {
             "oracleId": "T24.retention-legalhold-blob-restore",
             "observationNames": [
@@ -5866,7 +5908,8 @@
               "tombstones",
               "deletion_log",
               "obligations",
-              "assignments"
+              "assignments",
+              "audit"
             ]
           }
         }
@@ -5874,18 +5917,38 @@
       "assertions": [
         {
           "id": "sweep-authenticated-reviewer",
-          "op": "equals",
+          "op": "relationSet",
           "source": {
-            "actionId": "sweep",
-            "pointer": "/provenance/authenticatedActor/subject"
+            "actionId": "db-after",
+            "pointer": "/data/rawRows/audit",
+            "field": [
+              "actorId",
+              "organizationId",
+              "policyVersion",
+              "sweepId"
+            ],
+            "where": {
+              "action": "retentionSweep"
+            }
           },
-          "expected": "config",
+          "expected": [
+            [
+              {
+                "$alias": "config"
+              },
+              {
+                "$alias": "ORG-A"
+              },
+              "retention-v1",
+              "sweep-R6-unconfirmed"
+            ]
+          ],
           "requirementRefs": [
             "D24"
           ],
           "evidenceRefs": [
-            "sweep:actual-artifact",
-            "sweep:raw-source"
+            "db-after:actual-artifact",
+            "db-after:raw-source"
           ],
           "scope": {
             "organizationId": {
@@ -5897,7 +5960,7 @@
             "caseId": "T24",
             "subcaseId": "R6-unconfirmed"
           },
-          "oracleExplanation": "sweep authenticated reviewer의 실제 값과 범위를 대조한다",
+          "oracleExplanation": "서버 감사 원행에서 보존 sweep 1건의 실행 주체는 인증된 config, 조직은 ORG-A, 정책은 retention-v1, sweep ID는 sweep-R6-unconfirmed다. harness가 서명을 요청한 provenance를 읽지 않는다(계획 §7.4).",
           "oracleRef": {
             "oracleId": "T24.retention-legalhold-blob-restore",
             "observationNames": [
@@ -6443,7 +6506,8 @@
               "tombstones",
               "deletion_log",
               "obligations",
-              "assignments"
+              "assignments",
+              "audit"
             ]
           }
         }
@@ -6451,18 +6515,38 @@
       "assertions": [
         {
           "id": "sweep-authenticated-reviewer",
-          "op": "equals",
+          "op": "relationSet",
           "source": {
-            "actionId": "sweep",
-            "pointer": "/provenance/authenticatedActor/subject"
+            "actionId": "db-after",
+            "pointer": "/data/rawRows/audit",
+            "field": [
+              "actorId",
+              "organizationId",
+              "policyVersion",
+              "sweepId"
+            ],
+            "where": {
+              "action": "retentionSweep"
+            }
           },
-          "expected": "config",
+          "expected": [
+            [
+              {
+                "$alias": "config"
+              },
+              {
+                "$alias": "ORG-A"
+              },
+              "retention-v1",
+              "sweep-authorized-delete"
+            ]
+          ],
           "requirementRefs": [
             "D24"
           ],
           "evidenceRefs": [
-            "sweep:actual-artifact",
-            "sweep:raw-source"
+            "db-after:actual-artifact",
+            "db-after:raw-source"
           ],
           "scope": {
             "organizationId": {
@@ -6474,7 +6558,7 @@
             "caseId": "T24",
             "subcaseId": "authorized-delete"
           },
-          "oracleExplanation": "sweep authenticated reviewer의 실제 값과 범위를 대조한다",
+          "oracleExplanation": "서버 감사 원행에서 보존 sweep 1건의 실행 주체는 인증된 config, 조직은 ORG-A, 정책은 retention-v1, sweep ID는 sweep-authorized-delete다. harness가 서명을 요청한 provenance를 읽지 않는다(계획 §7.4).",
           "oracleRef": {
             "oracleId": "T24.retention-legalhold-blob-restore",
             "observationNames": [
@@ -6949,7 +7033,8 @@
               "tombstones",
               "deletion_log",
               "obligations",
-              "assignments"
+              "assignments",
+              "audit"
             ]
           }
         },
@@ -7031,18 +7116,38 @@
       "assertions": [
         {
           "id": "sweep-authenticated-reviewer",
-          "op": "equals",
+          "op": "relationSet",
           "source": {
-            "actionId": "sweep",
-            "pointer": "/provenance/authenticatedActor/subject"
+            "actionId": "db-after",
+            "pointer": "/data/rawRows/audit",
+            "field": [
+              "actorId",
+              "organizationId",
+              "policyVersion",
+              "sweepId"
+            ],
+            "where": {
+              "action": "retentionSweep"
+            }
           },
-          "expected": "config",
+          "expected": [
+            [
+              {
+                "$alias": "config"
+              },
+              {
+                "$alias": "ORG-A"
+              },
+              "retention-v1",
+              "sweep-restore-deleted"
+            ]
+          ],
           "requirementRefs": [
             "D24"
           ],
           "evidenceRefs": [
-            "sweep:actual-artifact",
-            "sweep:raw-source"
+            "db-after:actual-artifact",
+            "db-after:raw-source"
           ],
           "scope": {
             "organizationId": {
@@ -7054,7 +7159,7 @@
             "caseId": "T24",
             "subcaseId": "restore-deleted"
           },
-          "oracleExplanation": "sweep authenticated reviewer의 실제 값과 범위를 대조한다",
+          "oracleExplanation": "서버 감사 원행에서 보존 sweep 1건의 실행 주체는 인증된 config, 조직은 ORG-A, 정책은 retention-v1, sweep ID는 sweep-restore-deleted다. harness가 서명을 요청한 provenance를 읽지 않는다(계획 §7.4).",
           "oracleRef": {
             "oracleId": "T24.retention-legalhold-blob-restore",
             "observationNames": [

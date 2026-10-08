@@ -6400,6 +6400,41 @@
           }
         },
         {
+          "id": "retry-target",
+          "kind": "query",
+          "evidenceRefs": [
+            "retry-target:actual-artifact"
+          ],
+          "actorRef": "operations",
+          "route": "api",
+          "capabilityId": "getObject",
+          "request": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG-A"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseId": "T22",
+              "subcaseId": "external-unknown"
+            },
+            "subjectRefs": [
+              {
+                "type": "CommandRecord",
+                "id": {
+                  "$result": {
+                    "actionId": "send",
+                    "pointer": "/response/commandId"
+                  }
+                }
+              }
+            ],
+            "asOf": "2026-10-07T00:00:00Z",
+            "knownAt": "2026-10-07T00:00:00Z"
+          }
+        },
+        {
           "id": "retry",
           "kind": "invoke",
           "evidenceRefs": [
@@ -6422,21 +6457,33 @@
               "caseId": "T22",
               "subcaseId": "external-unknown"
             },
-            "expectedRevision": 1,
+            "expectedRevision": {
+              "$result": {
+                "actionId": "retry-target",
+                "pointer": "/response/data/revision"
+              }
+            },
             "commandIdempotencyKey": "T22-external-unknown-retry",
-            "externalOperationId": {
-              "$result": {
-                "actionId": "send",
-                "pointer": "/response/externalOperationId"
+            "subjectRefs": [
+              {
+                "type": "CommandRecord",
+                "id": {
+                  "$result": {
+                    "actionId": "send",
+                    "pointer": "/response/commandId"
+                  }
+                }
               }
-            },
-            "originalCommandId": {
-              "$result": {
-                "actionId": "send",
-                "pointer": "/response/commandId"
-              }
-            },
-            "originalCommandIdempotencyKey": "T22-external-unknown-send"
+            ],
+            "slots": {
+              "commandId": {
+                "$result": {
+                  "actionId": "send",
+                  "pointer": "/response/commandId"
+                }
+              },
+              "reason": "외부 대조 상태와 원 canonical 명령·현재 위임을 다시 확인한다"
+            }
           }
         },
         {
@@ -6559,7 +6606,8 @@
               "outbox",
               "command_records",
               "assignments",
-              "domain_records"
+              "domain_records",
+              "audit"
             ]
           }
         },
@@ -6664,6 +6712,60 @@
             "oracleId": "T22.unknown-external-reconciliation",
             "observationNames": [
               "lost-response-state"
+            ]
+          }
+        },
+        {
+          "id": "retry-server-derived-target",
+          "op": "relationSet",
+          "source": {
+            "actionId": "db-after",
+            "pointer": "/data/rawRows/audit",
+            "field": [
+              "actorId",
+              "targetId",
+              "commandIdempotencyKey"
+            ],
+            "where": {
+              "action": "retrySafeCommand"
+            }
+          },
+          "expected": [
+            [
+              {
+                "$alias": "operations"
+              },
+              {
+                "$result": {
+                  "actionId": "send",
+                  "pointer": "/response/commandId"
+                }
+              },
+              "T22-external-unknown-retry"
+            ]
+          ],
+          "requirementRefs": [
+            "D22"
+          ],
+          "evidenceRefs": [
+            "db-after:actual-artifact",
+            "db-after:raw-source"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG-A"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "T22",
+            "subcaseId": "external-unknown"
+          },
+          "oracleExplanation": "서버 감사 원행에서 retrySafeCommand의 실행 주체는 인증된 operations이고 대상은 원 발주 전달 command 하나다. 요청은 commandId·사유만 보내며 원 actor·hash·멱등키·외부 operation ID를 payload로 주지 않는다(계획 §7.2).",
+          "oracleRef": {
+            "oracleId": "T22.unknown-external-reconciliation",
+            "observationNames": [
+              "external-transition"
             ]
           }
         },
@@ -7372,6 +7474,41 @@
           }
         },
         {
+          "id": "retry-target",
+          "kind": "query",
+          "evidenceRefs": [
+            "retry-target:actual-artifact"
+          ],
+          "actorRef": "operations",
+          "route": "api",
+          "capabilityId": "getObject",
+          "request": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG-A"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseId": "T22",
+              "subcaseId": "external-success"
+            },
+            "subjectRefs": [
+              {
+                "type": "CommandRecord",
+                "id": {
+                  "$result": {
+                    "actionId": "send",
+                    "pointer": "/response/commandId"
+                  }
+                }
+              }
+            ],
+            "asOf": "2026-10-07T00:00:00Z",
+            "knownAt": "2026-10-07T00:00:00Z"
+          }
+        },
+        {
           "id": "retry",
           "kind": "invoke",
           "evidenceRefs": [
@@ -7394,21 +7531,33 @@
               "caseId": "T22",
               "subcaseId": "external-success"
             },
-            "expectedRevision": 1,
+            "expectedRevision": {
+              "$result": {
+                "actionId": "retry-target",
+                "pointer": "/response/data/revision"
+              }
+            },
             "commandIdempotencyKey": "T22-external-success-retry",
-            "externalOperationId": {
-              "$result": {
-                "actionId": "send",
-                "pointer": "/response/externalOperationId"
+            "subjectRefs": [
+              {
+                "type": "CommandRecord",
+                "id": {
+                  "$result": {
+                    "actionId": "send",
+                    "pointer": "/response/commandId"
+                  }
+                }
               }
-            },
-            "originalCommandId": {
-              "$result": {
-                "actionId": "send",
-                "pointer": "/response/commandId"
-              }
-            },
-            "originalCommandIdempotencyKey": "T22-external-success-send"
+            ],
+            "slots": {
+              "commandId": {
+                "$result": {
+                  "actionId": "send",
+                  "pointer": "/response/commandId"
+                }
+              },
+              "reason": "외부 대조 상태와 원 canonical 명령·현재 위임을 다시 확인한다"
+            }
           }
         },
         {
@@ -7531,7 +7680,8 @@
               "outbox",
               "command_records",
               "assignments",
-              "domain_records"
+              "domain_records",
+              "audit"
             ]
           }
         }
@@ -7603,6 +7753,60 @@
             "oracleId": "T22.unknown-external-reconciliation",
             "observationNames": [
               "lost-response-state"
+            ]
+          }
+        },
+        {
+          "id": "retry-server-derived-target",
+          "op": "relationSet",
+          "source": {
+            "actionId": "db-after",
+            "pointer": "/data/rawRows/audit",
+            "field": [
+              "actorId",
+              "targetId",
+              "commandIdempotencyKey"
+            ],
+            "where": {
+              "action": "retrySafeCommand"
+            }
+          },
+          "expected": [
+            [
+              {
+                "$alias": "operations"
+              },
+              {
+                "$result": {
+                  "actionId": "send",
+                  "pointer": "/response/commandId"
+                }
+              },
+              "T22-external-success-retry"
+            ]
+          ],
+          "requirementRefs": [
+            "D22"
+          ],
+          "evidenceRefs": [
+            "db-after:actual-artifact",
+            "db-after:raw-source"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG-A"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "T22",
+            "subcaseId": "external-success"
+          },
+          "oracleExplanation": "서버 감사 원행에서 retrySafeCommand의 실행 주체는 인증된 operations이고 대상은 원 발주 전달 command 하나다. 요청은 commandId·사유만 보내며 원 actor·hash·멱등키·외부 operation ID를 payload로 주지 않는다(계획 §7.2).",
+          "oracleRef": {
+            "oracleId": "T22.unknown-external-reconciliation",
+            "observationNames": [
+              "external-transition"
             ]
           }
         },
@@ -8140,6 +8344,41 @@
           }
         },
         {
+          "id": "retry-target",
+          "kind": "query",
+          "evidenceRefs": [
+            "retry-target:actual-artifact"
+          ],
+          "actorRef": "operations",
+          "route": "api",
+          "capabilityId": "getObject",
+          "request": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG-A"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseId": "T22",
+              "subcaseId": "external-failure-retry"
+            },
+            "subjectRefs": [
+              {
+                "type": "CommandRecord",
+                "id": {
+                  "$result": {
+                    "actionId": "send",
+                    "pointer": "/response/commandId"
+                  }
+                }
+              }
+            ],
+            "asOf": "2026-10-07T00:00:00Z",
+            "knownAt": "2026-10-07T00:00:00Z"
+          }
+        },
+        {
           "id": "retry",
           "kind": "invoke",
           "evidenceRefs": [
@@ -8162,21 +8401,33 @@
               "caseId": "T22",
               "subcaseId": "external-failure-retry"
             },
-            "expectedRevision": 1,
+            "expectedRevision": {
+              "$result": {
+                "actionId": "retry-target",
+                "pointer": "/response/data/revision"
+              }
+            },
             "commandIdempotencyKey": "T22-external-failure-retry-retry",
-            "externalOperationId": {
-              "$result": {
-                "actionId": "send",
-                "pointer": "/response/externalOperationId"
+            "subjectRefs": [
+              {
+                "type": "CommandRecord",
+                "id": {
+                  "$result": {
+                    "actionId": "send",
+                    "pointer": "/response/commandId"
+                  }
+                }
               }
-            },
-            "originalCommandId": {
-              "$result": {
-                "actionId": "send",
-                "pointer": "/response/commandId"
-              }
-            },
-            "originalCommandIdempotencyKey": "T22-external-failure-retry-send"
+            ],
+            "slots": {
+              "commandId": {
+                "$result": {
+                  "actionId": "send",
+                  "pointer": "/response/commandId"
+                }
+              },
+              "reason": "외부 대조 상태와 원 canonical 명령·현재 위임을 다시 확인한다"
+            }
           }
         },
         {
@@ -8329,7 +8580,8 @@
               "outbox",
               "command_records",
               "assignments",
-              "domain_records"
+              "domain_records",
+              "audit"
             ]
           }
         }
@@ -8433,6 +8685,60 @@
             "subcaseId": "external-failure-retry"
           },
           "oracleExplanation": "confirmed failure before retry의 실제 값과 범위를 대조한다",
+          "oracleRef": {
+            "oracleId": "T22.unknown-external-reconciliation",
+            "observationNames": [
+              "external-transition"
+            ]
+          }
+        },
+        {
+          "id": "retry-server-derived-target",
+          "op": "relationSet",
+          "source": {
+            "actionId": "db-after",
+            "pointer": "/data/rawRows/audit",
+            "field": [
+              "actorId",
+              "targetId",
+              "commandIdempotencyKey"
+            ],
+            "where": {
+              "action": "retrySafeCommand"
+            }
+          },
+          "expected": [
+            [
+              {
+                "$alias": "operations"
+              },
+              {
+                "$result": {
+                  "actionId": "send",
+                  "pointer": "/response/commandId"
+                }
+              },
+              "T22-external-failure-retry-retry"
+            ]
+          ],
+          "requirementRefs": [
+            "D22"
+          ],
+          "evidenceRefs": [
+            "db-after:actual-artifact",
+            "db-after:raw-source"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG-A"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "T22",
+            "subcaseId": "external-failure-retry"
+          },
+          "oracleExplanation": "서버 감사 원행에서 retrySafeCommand의 실행 주체는 인증된 operations이고 대상은 원 발주 전달 command 하나다. 요청은 commandId·사유만 보내며 원 actor·hash·멱등키·외부 operation ID를 payload로 주지 않는다(계획 §7.2).",
           "oracleRef": {
             "oracleId": "T22.unknown-external-reconciliation",
             "observationNames": [
@@ -9047,6 +9353,41 @@
           }
         },
         {
+          "id": "retry-target",
+          "kind": "query",
+          "evidenceRefs": [
+            "retry-target:actual-artifact"
+          ],
+          "actorRef": "operations",
+          "route": "api",
+          "capabilityId": "getObject",
+          "request": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG-A"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseId": "T22",
+              "subcaseId": "external-failure-no-retry"
+            },
+            "subjectRefs": [
+              {
+                "type": "CommandRecord",
+                "id": {
+                  "$result": {
+                    "actionId": "send",
+                    "pointer": "/response/commandId"
+                  }
+                }
+              }
+            ],
+            "asOf": "2026-10-07T00:00:00Z",
+            "knownAt": "2026-10-07T00:00:00Z"
+          }
+        },
+        {
           "id": "retry",
           "kind": "invoke",
           "evidenceRefs": [
@@ -9069,21 +9410,33 @@
               "caseId": "T22",
               "subcaseId": "external-failure-no-retry"
             },
-            "expectedRevision": 1,
+            "expectedRevision": {
+              "$result": {
+                "actionId": "retry-target",
+                "pointer": "/response/data/revision"
+              }
+            },
             "commandIdempotencyKey": "T22-external-failure-no-retry-retry",
-            "externalOperationId": {
-              "$result": {
-                "actionId": "send",
-                "pointer": "/response/externalOperationId"
+            "subjectRefs": [
+              {
+                "type": "CommandRecord",
+                "id": {
+                  "$result": {
+                    "actionId": "send",
+                    "pointer": "/response/commandId"
+                  }
+                }
               }
-            },
-            "originalCommandId": {
-              "$result": {
-                "actionId": "send",
-                "pointer": "/response/commandId"
-              }
-            },
-            "originalCommandIdempotencyKey": "T22-external-failure-no-retry-send"
+            ],
+            "slots": {
+              "commandId": {
+                "$result": {
+                  "actionId": "send",
+                  "pointer": "/response/commandId"
+                }
+              },
+              "reason": "외부 대조 상태와 원 canonical 명령·현재 위임을 다시 확인한다"
+            }
           }
         },
         {
@@ -9206,7 +9559,8 @@
               "outbox",
               "command_records",
               "assignments",
-              "domain_records"
+              "domain_records",
+              "audit"
             ]
           }
         }
@@ -9310,6 +9664,60 @@
             "subcaseId": "external-failure-no-retry"
           },
           "oracleExplanation": "confirmed failure before retry의 실제 값과 범위를 대조한다",
+          "oracleRef": {
+            "oracleId": "T22.unknown-external-reconciliation",
+            "observationNames": [
+              "external-transition"
+            ]
+          }
+        },
+        {
+          "id": "retry-server-derived-target",
+          "op": "relationSet",
+          "source": {
+            "actionId": "db-after",
+            "pointer": "/data/rawRows/audit",
+            "field": [
+              "actorId",
+              "targetId",
+              "commandIdempotencyKey"
+            ],
+            "where": {
+              "action": "retrySafeCommand"
+            }
+          },
+          "expected": [
+            [
+              {
+                "$alias": "operations"
+              },
+              {
+                "$result": {
+                  "actionId": "send",
+                  "pointer": "/response/commandId"
+                }
+              },
+              "T22-external-failure-no-retry-retry"
+            ]
+          ],
+          "requirementRefs": [
+            "D22"
+          ],
+          "evidenceRefs": [
+            "db-after:actual-artifact",
+            "db-after:raw-source"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG-A"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "T22",
+            "subcaseId": "external-failure-no-retry"
+          },
+          "oracleExplanation": "서버 감사 원행에서 retrySafeCommand의 실행 주체는 인증된 operations이고 대상은 원 발주 전달 command 하나다. 요청은 commandId·사유만 보내며 원 actor·hash·멱등키·외부 operation ID를 payload로 주지 않는다(계획 §7.2).",
           "oracleRef": {
             "oracleId": "T22.unknown-external-reconciliation",
             "observationNames": [
@@ -9663,6 +10071,41 @@
           }
         },
         {
+          "id": "retry-target",
+          "kind": "query",
+          "evidenceRefs": [
+            "retry-target:actual-artifact"
+          ],
+          "actorRef": "operations",
+          "route": "api",
+          "capabilityId": "getObject",
+          "request": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG-A"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseId": "T22",
+              "subcaseId": "external-no-lookup"
+            },
+            "subjectRefs": [
+              {
+                "type": "CommandRecord",
+                "id": {
+                  "$result": {
+                    "actionId": "send",
+                    "pointer": "/response/commandId"
+                  }
+                }
+              }
+            ],
+            "asOf": "2026-10-07T00:00:00Z",
+            "knownAt": "2026-10-07T00:00:00Z"
+          }
+        },
+        {
           "id": "retry",
           "kind": "invoke",
           "evidenceRefs": [
@@ -9685,21 +10128,33 @@
               "caseId": "T22",
               "subcaseId": "external-no-lookup"
             },
-            "expectedRevision": 1,
+            "expectedRevision": {
+              "$result": {
+                "actionId": "retry-target",
+                "pointer": "/response/data/revision"
+              }
+            },
             "commandIdempotencyKey": "T22-external-no-lookup-retry",
-            "externalOperationId": {
-              "$result": {
-                "actionId": "send",
-                "pointer": "/response/externalOperationId"
+            "subjectRefs": [
+              {
+                "type": "CommandRecord",
+                "id": {
+                  "$result": {
+                    "actionId": "send",
+                    "pointer": "/response/commandId"
+                  }
+                }
               }
-            },
-            "originalCommandId": {
-              "$result": {
-                "actionId": "send",
-                "pointer": "/response/commandId"
-              }
-            },
-            "originalCommandIdempotencyKey": "T22-external-no-lookup-send"
+            ],
+            "slots": {
+              "commandId": {
+                "$result": {
+                  "actionId": "send",
+                  "pointer": "/response/commandId"
+                }
+              },
+              "reason": "외부 대조 상태와 원 canonical 명령·현재 위임을 다시 확인한다"
+            }
           }
         },
         {
@@ -9822,7 +10277,8 @@
               "outbox",
               "command_records",
               "assignments",
-              "domain_records"
+              "domain_records",
+              "audit"
             ]
           }
         },
@@ -9927,6 +10383,60 @@
             "oracleId": "T22.unknown-external-reconciliation",
             "observationNames": [
               "lost-response-state"
+            ]
+          }
+        },
+        {
+          "id": "retry-server-derived-target",
+          "op": "relationSet",
+          "source": {
+            "actionId": "db-after",
+            "pointer": "/data/rawRows/audit",
+            "field": [
+              "actorId",
+              "targetId",
+              "commandIdempotencyKey"
+            ],
+            "where": {
+              "action": "retrySafeCommand"
+            }
+          },
+          "expected": [
+            [
+              {
+                "$alias": "operations"
+              },
+              {
+                "$result": {
+                  "actionId": "send",
+                  "pointer": "/response/commandId"
+                }
+              },
+              "T22-external-no-lookup-retry"
+            ]
+          ],
+          "requirementRefs": [
+            "D22"
+          ],
+          "evidenceRefs": [
+            "db-after:actual-artifact",
+            "db-after:raw-source"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG-A"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "T22",
+            "subcaseId": "external-no-lookup"
+          },
+          "oracleExplanation": "서버 감사 원행에서 retrySafeCommand의 실행 주체는 인증된 operations이고 대상은 원 발주 전달 command 하나다. 요청은 commandId·사유만 보내며 원 actor·hash·멱등키·외부 operation ID를 payload로 주지 않는다(계획 §7.2).",
+          "oracleRef": {
+            "oracleId": "T22.unknown-external-reconciliation",
+            "observationNames": [
+              "external-transition"
             ]
           }
         },
@@ -10484,6 +10994,41 @@
           }
         },
         {
+          "id": "retry-target",
+          "kind": "query",
+          "evidenceRefs": [
+            "retry-target:actual-artifact"
+          ],
+          "actorRef": "operations",
+          "route": "api",
+          "capabilityId": "getObject",
+          "request": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG-A"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseId": "T22",
+              "subcaseId": "external-local-cancel"
+            },
+            "subjectRefs": [
+              {
+                "type": "CommandRecord",
+                "id": {
+                  "$result": {
+                    "actionId": "send",
+                    "pointer": "/response/commandId"
+                  }
+                }
+              }
+            ],
+            "asOf": "2026-10-07T00:00:00Z",
+            "knownAt": "2026-10-07T00:00:00Z"
+          }
+        },
+        {
           "id": "retry",
           "kind": "invoke",
           "evidenceRefs": [
@@ -10506,21 +11051,33 @@
               "caseId": "T22",
               "subcaseId": "external-local-cancel"
             },
-            "expectedRevision": 1,
+            "expectedRevision": {
+              "$result": {
+                "actionId": "retry-target",
+                "pointer": "/response/data/revision"
+              }
+            },
             "commandIdempotencyKey": "T22-external-local-cancel-retry",
-            "externalOperationId": {
-              "$result": {
-                "actionId": "send",
-                "pointer": "/response/externalOperationId"
+            "subjectRefs": [
+              {
+                "type": "CommandRecord",
+                "id": {
+                  "$result": {
+                    "actionId": "send",
+                    "pointer": "/response/commandId"
+                  }
+                }
               }
-            },
-            "originalCommandId": {
-              "$result": {
-                "actionId": "send",
-                "pointer": "/response/commandId"
-              }
-            },
-            "originalCommandIdempotencyKey": "T22-external-local-cancel-send"
+            ],
+            "slots": {
+              "commandId": {
+                "$result": {
+                  "actionId": "send",
+                  "pointer": "/response/commandId"
+                }
+              },
+              "reason": "외부 대조 상태와 원 canonical 명령·현재 위임을 다시 확인한다"
+            }
           }
         },
         {
@@ -10643,7 +11200,8 @@
               "outbox",
               "command_records",
               "assignments",
-              "domain_records"
+              "domain_records",
+              "audit"
             ]
           }
         },
@@ -10748,6 +11306,60 @@
             "oracleId": "T22.unknown-external-reconciliation",
             "observationNames": [
               "lost-response-state"
+            ]
+          }
+        },
+        {
+          "id": "retry-server-derived-target",
+          "op": "relationSet",
+          "source": {
+            "actionId": "db-after",
+            "pointer": "/data/rawRows/audit",
+            "field": [
+              "actorId",
+              "targetId",
+              "commandIdempotencyKey"
+            ],
+            "where": {
+              "action": "retrySafeCommand"
+            }
+          },
+          "expected": [
+            [
+              {
+                "$alias": "operations"
+              },
+              {
+                "$result": {
+                  "actionId": "send",
+                  "pointer": "/response/commandId"
+                }
+              },
+              "T22-external-local-cancel-retry"
+            ]
+          ],
+          "requirementRefs": [
+            "D22"
+          ],
+          "evidenceRefs": [
+            "db-after:actual-artifact",
+            "db-after:raw-source"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG-A"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "T22",
+            "subcaseId": "external-local-cancel"
+          },
+          "oracleExplanation": "서버 감사 원행에서 retrySafeCommand의 실행 주체는 인증된 operations이고 대상은 원 발주 전달 command 하나다. 요청은 commandId·사유만 보내며 원 actor·hash·멱등키·외부 operation ID를 payload로 주지 않는다(계획 §7.2).",
+          "oracleRef": {
+            "oracleId": "T22.unknown-external-reconciliation",
+            "observationNames": [
+              "external-transition"
             ]
           }
         },

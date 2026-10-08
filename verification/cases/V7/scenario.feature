@@ -86,6 +86,7 @@
     그러면 "dispatch-ready-state" assertion으로 "blocked-or-post-revoke-duty dispatch-ready-state"를 확인한다
     그러면 "revoke-blocked-point" assertion으로 "blocked-or-post-revoke-duty revoke-blocked-point"를 확인한다
     그러면 "revoke-blocked-state" assertion으로 "blocked-or-post-revoke-duty revoke-blocked-state"를 확인한다
+    그러면 "race-distinct-db-transactions" assertion으로 "출고와 철회는 각자 멈춘 시점의 실제 PostgreSQL transaction ID를 barrier ACK로 보고하며 서로 다르다. 요청의 tx label을 복사하지 않는다(V2 race-observation-contract.md)."를 확인한다
     그러면 "dispatch-resume-point" assertion으로 "blocked-or-post-revoke-duty dispatch-resume-point"를 확인한다
     그러면 "dispatch-resume-state" assertion으로 "blocked-or-post-revoke-duty dispatch-resume-state"를 확인한다
     그러면 "revoke-resume-point" assertion으로 "blocked-or-post-revoke-duty revoke-resume-point"를 확인한다
@@ -141,6 +142,8 @@
     그러면 "old-worker-cancelled" assertion으로 "safe-retry old-worker-cancelled"를 확인한다
     그러면 "safe-retry-code" assertion으로 "safe-retry safe-retry-code"를 확인한다
     그러면 "safe-retry-outcome" assertion으로 "safe-retry safe-retry-outcome"를 확인한다
+    그러면 "safe-retry-server-recorded" assertion으로 "서버 감사 원행에서 safe retry 실행 주체는 인증된 delegator, 행동은 retrySafeCommand, 결과는 REJECTED다. 요청은 commandId·사유·claim fencing token만 보내며 원 actor·hash·멱등키를 payload로 주지 않는다(계획 §7.2)."를 확인한다
+    그러면 "safe-retry-original-owner-kept" assertion으로 "원 command record new20의 stableRequestOwner는 서버가 기록한 warehouse 그대로다. retry 요청자가 원 주체를 바꾸지 못한다(계획 §7.3)."를 확인한다
     그러면 "new-dispatch-rows0" assertion으로 "safe-retry new-dispatch-rows0"를 확인한다
     그러면 "new20-command-not-committed" assertion으로 "safe-retry new20-command-not-committed"를 확인한다
     그러면 "new-effect-quantity0" assertion으로 "unauthorized-recovered-effects new-effect-quantity0"를 확인한다

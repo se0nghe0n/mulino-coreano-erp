@@ -90,19 +90,19 @@ class Sub:
         self.action(aid,'observe',observation={'scope':self.observer_scope,'snapshotRef':result(view,'/response/snapshotRevision'),'asOf':NOW,'knownAt':known,'sources':tables or TABLES})
     def before(self,tables=None): self.query('view-before');self.db('db-before','view-before',tables)
     def after(self,tables=None): self.query('view-after');self.db('db-after','view-after',tables)
-    def ass(self, aid, action,pointer,expected,obs,op='equals',field=None,where=None,baseline=None,unit=None,unitpointer=None):
+    def ass(self, aid, action,pointer,expected,obs,op='equals',field=None,where=None,baseline=None,unit=None,unitpointer=None,explain=None):
         source={'actionId':action,'pointer':pointer}
         if field:source['field']=field
         if where:source['where']=where
-        a={'id':aid,'op':op,'source':source,'expected':expected,'requirementRefs':['D'+self.case.cid[1:]],'evidenceRefs':[action+':actual-artifact',action+':raw-source'],'scope':copy.deepcopy(next((x['observation']['scope'] for x in self.data['actions'] if x['id']==action and x['kind']=='observe'),self.scope)),'oracleExplanation':aid.replace('-',' ')+'의 실제 값과 범위를 대조한다','oracleRef':{'oracleId':self.oracle,'observationNames':[obs]}}
+        a={'id':aid,'op':op,'source':source,'expected':expected,'requirementRefs':['D'+self.case.cid[1:]],'evidenceRefs':[action+':actual-artifact',action+':raw-source'],'scope':copy.deepcopy(next((x['observation']['scope'] for x in self.data['actions'] if x['id']==action and x['kind']=='observe'),self.scope)),'oracleExplanation':explain or aid.replace('-',' ')+'의 실제 값과 범위를 대조한다','oracleRef':{'oracleId':self.oracle,'observationNames':[obs]}}
         if baseline:a['baseline']={'actionId':baseline[0],'pointer':baseline[1]}
         if unit:
             a['unit']=unit;a['unitSource']={'actionId':action,'pointer':unitpointer or pointer.rsplit('/',1)[0]+'/unit'}
             if field:a['unitSource']['pointer']=pointer;a['unitSource']['field']='unit'
             if where:a['unitSource']['where']=where
         self.data['assertions'].append(a);return a
-    def raw(self, aid,table,expected,obs,op='equals',field=None,where=None,db='db-after'):
-        return self.ass(aid,db,'/data/rawRows/'+table,expected,obs,op,field,where)
+    def raw(self, aid,table,expected,obs,op='equals',field=None,where=None,db='db-after',explain=None):
+        return self.ass(aid,db,'/data/rawRows/'+table,expected,obs,op,field,where,explain=explain)
     def unchanged(self,table,obs,aid=None):
         return self.ass(aid or table+'-unchanged','db-after','/data/rawRows/'+table,True,obs,'sameAs',baseline=('db-before','/data/rawRows/'+table))
     def duty(self,obs,kind,action='원천·실물 범위 대조',owner='intake'):
@@ -302,10 +302,16 @@ def build_t22():
             if variant.startswith('failure'):
                 s.raw('confirmed-failure-before-retry','outbox',['CONFIRMED_FAILURE'],'external-transition','exactSet',field='state',db='db-reconciled')
         if variant=='local-cancel':s.invoke('cancel','cancelPurchase','operations',{'workId':alias('O1'),'reason':'로컬 취소 요청'})
-        s.invoke('retry','retrySafeCommand','operations',{'externalOperationId':result('send','/response/externalOperationId'),'originalCommandId':result('send','/response/commandId'),'originalCommandIdempotencyKey':f'T22-{s.sid}-send'})
+        # Plan §7.2: retry names only the original command record and a reason. The server derives the
+        # original actor, canonical hash, idempotency key and externalOperationId from that record.
+        original=[{'type':'CommandRecord','id':result('send','/response/commandId')}]
+        s.query('retry-target','getObject','operations',{'subjectRefs':original})
+        s.invoke('retry','retrySafeCommand','operations',{'subjectRefs':original,'expectedRevision':result('retry-target','/response/data/revision'),'slots':{'commandId':result('send','/response/commandId'),'reason':'외부 대조 상태와 원 canonical 명령·현재 위임을 다시 확인한다'}})
         s.control('retry-tick','process','tickScheduler',{'schedulerId':'outbox-scheduler','tickId':'retry-outbox-tick','asOf':NOW,'workId':alias('O1')})
         if variant=='failure-retry': s.control('retry-terminal','process','awaitRuntimeTask',{'schedulerId':'outbox-scheduler','taskId':result('retry-tick','/data/hostObservation/extractor/rawRows/tasks/0/taskId')})
-        s.control('remote-after','externalResponder','inspectRequests',{'receiverId':'purchase-peer','externalOperationId':result('send','/response/externalOperationId')});s.after(['outbox','command_records','assignments','domain_records'])
+        s.control('remote-after','externalResponder','inspectRequests',{'receiverId':'purchase-peer','externalOperationId':result('send','/response/externalOperationId')});s.after(['outbox','command_records','assignments','domain_records','audit'])
+        s.raw('retry-server-derived-target','audit',[[alias('operations'),result('send','/response/commandId'),f'T22-{s.sid}-retry']],'external-transition','relationSet',field=['actorId','targetId','commandIdempotencyKey'],where={'action':'retrySafeCommand'},
+              explain='서버 감사 원행에서 retrySafeCommand의 실행 주체는 인증된 operations이고 대상은 원 발주 전달 command 하나다. 요청은 commandId·사유만 보내며 원 actor·hash·멱등키·외부 operation ID를 payload로 주지 않는다(계획 §7.2).')
         count=2 if variant=='failure-retry' else 1
         obs='confirmed-success-reissue' if variant=='success' else 'unreconciled-external-reissue' if variant in ['unknown','no-lookup'] else 'external-transition'
         s.ass('remote-request-count','remote-after','/data/requests',count,obs,'count')
@@ -385,9 +391,12 @@ def build_t24():
         s.before(['policies','documents','tombstones','deletion_log','obligations','assignments'])
         if variant=='restore-deleted':s.control('backup','process','backup',{'environmentId':'retention-isolated','backupId':'old-backup','snapshotId':result('view-before','/response/snapshotRevision')})
         s.control('sweep','process','retentionSweep',{'actorRef':'config','environmentId':'retention-isolated','policyVersion':'retention-v1','sweepId':'sweep-'+variant,'profile':'SYNTHETIC_ONLY','asOf':NOW,'artifactIds':[alias('doc')]})
-        s.ass('sweep-authenticated-reviewer','sweep','/provenance/authenticatedActor/subject','config','retention-policy')
         s.control('inspect-sweep','process','inspectArtifacts',{'inspectionId':'inspect-'+variant,'artifacts':result('sweep','/data/hostObservation/generatedOutputs')})
-        s.after(['policies','documents','tombstones','deletion_log','obligations','assignments'])
+        s.after(['policies','documents','tombstones','deletion_log','obligations','assignments','audit'])
+        # The sweep's authenticated reviewer is read from the server-written audit row, not from the
+        # harness provenance that only echoes the identity the driver was asked to sign as.
+        s.raw('sweep-authenticated-reviewer','audit',[[alias('config'),alias('ORG-A'),'retention-v1','sweep-'+variant]],'retention-policy','relationSet',field=['actorId','organizationId','policyVersion','sweepId'],where={'action':'retentionSweep'},
+              explain='서버 감사 원행에서 보존 sweep 1건의 실행 주체는 인증된 config, 조직은 ORG-A, 정책은 retention-v1, sweep ID는 sweep-'+variant+'다. harness가 서명을 요청한 provenance를 읽지 않는다(계획 §7.4).')
         obs='legal-hold-delete' if variant=='legal-hold' else 'unresolved-reference-delete' if variant=='active-reference' else 'retention-policy'
         s.raw('different-artifact-policies','policies',[[x['artifactType'],x['retentionDays'],x['basis'],x['effectiveDate'],'REDACT' if x['artifactType']!='document' else 'TOMBSTONE_AND_BLOB_DELETE',alias('config')] for x in policy],'retention-policy','relationSet',field=['artifactType','retentionDays','basis','effectiveDate','deletionMethod','reviewerId'])
         if variant in ['legal-hold','active-reference','R6-unconfirmed']:

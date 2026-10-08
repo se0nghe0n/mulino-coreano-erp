@@ -29,6 +29,7 @@
     그러면 "retry-a-ready-state" assertion으로 "retry-result retry-a-ready-state"를 확인한다
     그러면 "retry-b-ready-point" assertion으로 "retry-result retry-b-ready-point"를 확인한다
     그러면 "retry-b-ready-state" assertion으로 "retry-result retry-b-ready-state"를 확인한다
+    그러면 "race-distinct-db-transactions" assertion으로 "동시 재시도 두 요청은 각자 멈춘 시점의 실제 PostgreSQL transaction ID를 barrier ACK로 보고하며 서로 다르다. 요청의 tx label을 복사하지 않는다(V2 race-observation-contract.md)."를 확인한다
     그러면 "resume-a-point" assertion으로 "retry-result resume-a-point"를 확인한다
     그러면 "resume-a-state" assertion으로 "retry-result resume-a-state"를 확인한다
     그러면 "resume-b-point" assertion으로 "retry-result resume-b-point"를 확인한다
@@ -84,6 +85,7 @@
     그러면 "retry-a-ready-state" assertion으로 "retry-result retry-a-ready-state"를 확인한다
     그러면 "retry-b-ready-point" assertion으로 "retry-result retry-b-ready-point"를 확인한다
     그러면 "retry-b-ready-state" assertion으로 "retry-result retry-b-ready-state"를 확인한다
+    그러면 "race-distinct-db-transactions" assertion으로 "동시 재시도 두 요청은 각자 멈춘 시점의 실제 PostgreSQL transaction ID를 barrier ACK로 보고하며 서로 다르다. 요청의 tx label을 복사하지 않는다(V2 race-observation-contract.md)."를 확인한다
     그러면 "resume-a-point" assertion으로 "retry-result resume-a-point"를 확인한다
     그러면 "resume-a-state" assertion으로 "retry-result resume-a-state"를 확인한다
     그러면 "resume-b-point" assertion으로 "retry-result resume-b-point"를 확인한다

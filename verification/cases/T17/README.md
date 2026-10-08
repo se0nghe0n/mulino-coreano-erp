@@ -10,6 +10,7 @@ fixture 설치는 입력이며 업무 효과나 승인 성공을 미리 저장�
 | reserve-pick-dispatch | 100 보유 중 적격60의 예약·피킹·출고와 중복 배분을 대조한다 |
 | normal-consumed-delivery | 출고30의 CONSUMED 배분을 참조한 정상 인도30은 신규 출고를 만들지 않는다 |
 | late-restriction-actual-delivery | 출고30 뒤 SELL 금지에도 확인 인도20과 운송10을 보존하고 위반·회수 책임을 남긴다 |
+| post-dispatch-expiry | 처분 허용 09:05 만료 전 출고30, 09:06 실제 인도20 기록 뒤 인도20·운송10 보존, 새 출고·배분0, 위반 대응 의무 OPEN(owner sales) |
 | claim-falseclaim | 원천 falseClaim 보고는 주장만 접수하며 정상 인도 효과0과 접수 책임을 남긴다 |
 | claim-unidentifiedscope | 원천 unidentifiedScope 보고는 주장만 접수하며 정상 인도 효과0과 접수 책임을 남긴다 |
 | claim-conflictingquantity | 원천 conflictingQuantity 보고는 주장만 접수하며 정상 인도 효과0과 접수 책임을 남긴다 |
@@ -38,7 +39,7 @@ snapshot artifact와 함께 반환해야 한다. 미확인/상충은 0으로 바
 | T17.reserve-pick-dispatch | dispatch-allocation → reserve-pick-dispatch:dispatch-allocation-18, reserve-pick-dispatch:dispatch-allocation-19 |
 | T17.reserve-pick-dispatch | in-transit-after-dispatch → reserve-pick-dispatch:in-transit-after-dispatch-14, reserve-pick-dispatch:in-transit-after-dispatch-15 |
 | T17.reserve-pick-dispatch | delivered-before-observation → reserve-pick-dispatch:delivered-before-observation-16, reserve-pick-dispatch:delivered-before-observation-17 |
-| T17.reserve-pick-dispatch | second-reservation-same60 → reserve-pick-dispatch:second-reservation-same60-7, reserve-pick-dispatch:second-reservation-same60-8, reserve-pick-dispatch:second-reservation-same60-9, reserve-pick-dispatch:second-reservation-same60-10, reserve-pick-dispatch:second-reservation-same60-11 |
+| T17.reserve-pick-dispatch | second-reservation-same60 → reserve-pick-dispatch:second-reservation-same60-code, reserve-pick-dispatch:second-reservation-same60-line-allocation0, reserve-pick-dispatch:second-reservation-same60-7, reserve-pick-dispatch:second-reservation-same60-8, reserve-pick-dispatch:second-reservation-same60-9, reserve-pick-dispatch:second-reservation-same60-10, reserve-pick-dispatch:second-reservation-same60-11 |
 | T17.normal-consumed-delivery | delivered → normal-consumed-delivery:delivered-1, normal-consumed-delivery:delivered-2 |
 | T17.normal-consumed-delivery | cargo-in-transit → normal-consumed-delivery:cargo-in-transit-3, normal-consumed-delivery:cargo-in-transit-4 |
 | T17.normal-consumed-delivery | delivery-assessment → normal-consumed-delivery:delivery-assessment-5, normal-consumed-delivery:delivery-assessment-6 |
@@ -100,3 +101,19 @@ released-executable-total-22, released-executable-rows-23이다.
 독립 SELFTEST이며 통합 harness check는 coordinator가 수행한다.
 정확한 argv·버전·source hash·log는
 C4/evidence/review-outcomes/selftest-commands.json에 보존했다.
+
+## Step 2 재검토 2차 보완
+
+- reserve-pick-dispatch의 second-reserve는 action SELL을 보내고
+  REJECTED에 더해 INSUFFICIENT_ELIGIBLE_QUANTITY와 두 번째 주문
+  line 배분0을 확인한다(이전에는 outcome만 봤다).
+- replacement-no-revival의 release-hold expectedRevision은 대상 제한을
+  만든 hold 응답에서 읽는다. 이전 판은 replace 응답의 revision을
+  썼는데 그것은 다른 aggregate의 revision이다.
+- post-dispatch-expiry는 계획 §13.1 D17 "출고 뒤 recall/만료에도 실제20
+  인도와 운송10 보존"의 만료 쪽이다. late-restriction-actual-delivery는
+  recall 보류 쪽이다. 같은 catalog oracle
+  T17.late-restriction-actual-delivery의 actual-delivered,
+  remaining-transit, new-warehouse-dispatch, new-executable-allocation,
+  fact-not-permission, late-restriction-duty에 연결했다. 회수 의무는
+  만료 쪽에 없으므로 RECALL_RESPONSE assertion은 넣지 않았다.

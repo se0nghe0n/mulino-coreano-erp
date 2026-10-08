@@ -284,9 +284,9 @@
           "op": "equals",
           "source": {
             "actionId": "invalid",
-            "pointer": "/response/errorCode"
+            "pointer": "/response/error/code"
           },
-          "expected": "QUANTITY_INVALID",
+          "expected": "TYPE_INVALID",
           "requirementRefs": [
             "D04"
           ],
@@ -302,7 +302,7 @@
             },
             "caseKey": "T04-indivisible-ea"
           },
-          "oracleExplanation": "검증 실패를 해당 오류 코드로 구별한다.",
+          "oracleExplanation": "EA 불가분·정밀도·scale 위반은 slot 타입/단위 검증 실패이므로 /response/error/code가 TYPE_INVALID다(계획 §3.3·§3.4).",
           "oracleRef": {
             "oracleId": "T04.decimal-boundary",
             "observationNames": [
@@ -1051,9 +1051,9 @@
           "op": "equals",
           "source": {
             "actionId": "invalid",
-            "pointer": "/response/errorCode"
+            "pointer": "/response/error/code"
           },
-          "expected": "QUANTITY_INVALID",
+          "expected": "TYPE_INVALID",
           "requirementRefs": [
             "D04"
           ],
@@ -1069,7 +1069,7 @@
             },
             "caseKey": "T04-scale-overflow"
           },
-          "oracleExplanation": "검증 실패를 해당 오류 코드로 구별한다.",
+          "oracleExplanation": "EA 불가분·정밀도·scale 위반은 slot 타입/단위 검증 실패이므로 /response/error/code가 TYPE_INVALID다(계획 §3.3·§3.4).",
           "oracleRef": {
             "oracleId": "T04.decimal-boundary",
             "observationNames": [
@@ -1818,9 +1818,9 @@
           "op": "equals",
           "source": {
             "actionId": "invalid",
-            "pointer": "/response/errorCode"
+            "pointer": "/response/error/code"
           },
-          "expected": "QUANTITY_INVALID",
+          "expected": "TYPE_INVALID",
           "requirementRefs": [
             "D04"
           ],
@@ -1836,7 +1836,7 @@
             },
             "caseKey": "T04-precision-overflow"
           },
-          "oracleExplanation": "검증 실패를 해당 오류 코드로 구별한다.",
+          "oracleExplanation": "EA 불가분·정밀도·scale 위반은 slot 타입/단위 검증 실패이므로 /response/error/code가 TYPE_INVALID다(계획 §3.3·§3.4).",
           "oracleRef": {
             "oracleId": "T04.decimal-boundary",
             "observationNames": [
@@ -3001,7 +3001,7 @@
           "op": "equals",
           "source": {
             "actionId": "ordinary-disposal",
-            "pointer": "/response/errorCode"
+            "pointer": "/response/error/code"
           },
           "expected": "FORBIDDEN",
           "requirementRefs": [
@@ -3019,7 +3019,7 @@
             },
             "caseKey": "T04-hold-dispose"
           },
-          "oracleExplanation": "검증 실패를 해당 오류 코드로 구별한다.",
+          "oracleExplanation": "응답의 구조화 오류 코드 /response/error/code가 FORBIDDEN다(계획 §3.4, contracts/command-response.schema.json).",
           "oracleRef": {
             "oracleId": "T04.hold-versus-disposal",
             "observationNames": [
@@ -3840,7 +3840,7 @@
           "op": "equals",
           "source": {
             "actionId": "dispatch",
-            "pointer": "/response/errorCode"
+            "pointer": "/response/error/code"
           },
           "expected": "TRANSACTION_ROLLED_BACK",
           "requirementRefs": [
@@ -3858,7 +3858,7 @@
             },
             "caseKey": "T04-rollback-afterMovementBeforeAllocation"
           },
-          "oracleExplanation": "검증 실패를 해당 오류 코드로 구별한다.",
+          "oracleExplanation": "응답의 구조화 오류 코드 /response/error/code가 TRANSACTION_ROLLED_BACK다(계획 §3.4, contracts/command-response.schema.json).",
           "oracleRef": {
             "oracleId": "T04.atomic-ledger",
             "observationNames": [
@@ -4524,7 +4524,7 @@
           "op": "equals",
           "source": {
             "actionId": "dispatch",
-            "pointer": "/response/errorCode"
+            "pointer": "/response/error/code"
           },
           "expected": "TRANSACTION_ROLLED_BACK",
           "requirementRefs": [
@@ -4542,7 +4542,7 @@
             },
             "caseKey": "T04-rollback-afterAllocationBeforeAudit"
           },
-          "oracleExplanation": "검증 실패를 해당 오류 코드로 구별한다.",
+          "oracleExplanation": "응답의 구조화 오류 코드 /response/error/code가 TRANSACTION_ROLLED_BACK다(계획 §3.4, contracts/command-response.schema.json).",
           "oracleRef": {
             "oracleId": "T04.atomic-ledger",
             "observationNames": [
@@ -5208,7 +5208,7 @@
           "op": "equals",
           "source": {
             "actionId": "dispatch",
-            "pointer": "/response/errorCode"
+            "pointer": "/response/error/code"
           },
           "expected": "TRANSACTION_ROLLED_BACK",
           "requirementRefs": [
@@ -5226,7 +5226,7 @@
             },
             "caseKey": "T04-rollback-afterAuditBeforeOutbox"
           },
-          "oracleExplanation": "검증 실패를 해당 오류 코드로 구별한다.",
+          "oracleExplanation": "응답의 구조화 오류 코드 /response/error/code가 TRANSACTION_ROLLED_BACK다(계획 §3.4, contracts/command-response.schema.json).",
           "oracleRef": {
             "oracleId": "T04.atomic-ledger",
             "observationNames": [
@@ -5892,7 +5892,7 @@
           "op": "equals",
           "source": {
             "actionId": "dispatch",
-            "pointer": "/response/errorCode"
+            "pointer": "/response/error/code"
           },
           "expected": "TRANSACTION_ROLLED_BACK",
           "requirementRefs": [
@@ -5910,7 +5910,7 @@
             },
             "caseKey": "T04-rollback-afterOutboxBeforeCommittedResult"
           },
-          "oracleExplanation": "검증 실패를 해당 오류 코드로 구별한다.",
+          "oracleExplanation": "응답의 구조화 오류 코드 /response/error/code가 TRANSACTION_ROLLED_BACK다(계획 §3.4, contracts/command-response.schema.json).",
           "oracleRef": {
             "oracleId": "T04.atomic-ledger",
             "observationNames": [
@@ -6808,7 +6808,7 @@
           "op": "equals",
           "source": {
             "actionId": "raw-api",
-            "pointer": "/response/errorCode"
+            "pointer": "/response/error/code"
           },
           "expected": "RAW_CORE_WRITE_FORBIDDEN",
           "requirementRefs": [
@@ -6832,7 +6832,7 @@
               ]
             }
           },
-          "oracleExplanation": "검증 실패를 해당 오류 코드로 구별한다.",
+          "oracleExplanation": "응답의 구조화 오류 코드 /response/error/code가 RAW_CORE_WRITE_FORBIDDEN다(계획 §3.4, contracts/command-response.schema.json).",
           "oracleRef": {
             "oracleId": "T04.atomic-ledger",
             "observationNames": [
@@ -6882,7 +6882,7 @@
           "op": "equals",
           "source": {
             "actionId": "raw-db",
-            "pointer": "/response/errorCode"
+            "pointer": "/response/error/code"
           },
           "expected": "DB_PRIVILEGE_DENIED",
           "requirementRefs": [
@@ -6906,7 +6906,7 @@
               ]
             }
           },
-          "oracleExplanation": "검증 실패를 해당 오류 코드로 구별한다.",
+          "oracleExplanation": "고정 DB probe가 core UPDATE를 시도하면 권한 거부가 /response/error/code=DB_PRIVILEGE_DENIED로 구조화된다.",
           "oracleRef": {
             "oracleId": "T04.atomic-ledger",
             "observationNames": [
@@ -6956,7 +6956,7 @@
           "op": "equals",
           "source": {
             "actionId": "stale",
-            "pointer": "/response/errorCode"
+            "pointer": "/response/error/code"
           },
           "expected": "STALE_REVISION",
           "requirementRefs": [
@@ -6980,7 +6980,7 @@
               ]
             }
           },
-          "oracleExplanation": "검증 실패를 해당 오류 코드로 구별한다.",
+          "oracleExplanation": "응답의 구조화 오류 코드 /response/error/code가 STALE_REVISION다(계획 §3.4, contracts/command-response.schema.json).",
           "oracleRef": {
             "oracleId": "T04.atomic-ledger",
             "observationNames": [
