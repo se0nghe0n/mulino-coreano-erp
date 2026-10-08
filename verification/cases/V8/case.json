@@ -24,7 +24,8 @@
         "fixture",
         "host",
         "api",
-        "db"
+        "db",
+        "mcp"
       ],
       "actions": [
         {
@@ -879,7 +880,8 @@
         "fixture",
         "host",
         "api",
-        "db"
+        "db",
+        "mcp"
       ],
       "actions": [
         {
@@ -3557,7 +3559,8 @@
         "fixture",
         "host",
         "api",
-        "db"
+        "db",
+        "mcp"
       ],
       "actions": [
         {
@@ -5062,6 +5065,40 @@
           }
         },
         {
+          "id": "MCP-upgrade-전-판정-동일",
+          "op": "sameAs",
+          "source": {
+            "actionId": "mcp-after",
+            "pointer": "/response/data"
+          },
+          "expected": true,
+          "requirementRefs": [
+            "D23",
+            "D24",
+            "D26"
+          ],
+          "evidenceRefs": [
+            "mcp-after:actual-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "environmentId": "V8-ontology-v1-v2-preserves"
+          },
+          "oracleExplanation": "새 ontology v1→v2 upgrade 뒤 MCP로 읽은 O1의 v1 도착 판정(인정60 BOX·UNSATISFIED)은 upgrade 전 API 값과 같다. 옛 구현 migration이 자료를 다시 쓴 결과로 대체되지 않는다",
+          "oracleRef": {
+            "oracleId": "V8.ontology-upgrade-preservation",
+            "observationNames": [
+              "legacy-migration-substitutes-ontology-upgrade"
+            ]
+          },
+          "baseline": {
+            "actionId": "assessment-before",
+            "pointer": "/response/data"
+          }
+        },
+        {
           "id": "옛-migration-source0",
           "op": "count",
           "source": {
@@ -5157,7 +5194,8 @@
         "fixture",
         "host",
         "api",
-        "db"
+        "db",
+        "mcp"
       ],
       "actions": [
         {
@@ -5489,6 +5527,29 @@
           },
           "evidenceRefs": [
             "evidence-after:actual-artifact"
+          ]
+        },
+        {
+          "id": "mcp-after-restore",
+          "kind": "query",
+          "actorRef": "reader",
+          "route": "mcp",
+          "capabilityId": "getAssessment",
+          "request": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "environmentId": "V8-restore-none-restored"
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z",
+            "workId": {
+              "$alias": "O1"
+            }
+          },
+          "evidenceRefs": [
+            "mcp-after-restore:actual-artifact"
           ]
         }
       ],
@@ -7012,6 +7073,40 @@
             "actionId": "assessment-before",
             "pointer": "/response/data"
           }
+        },
+        {
+          "id": "복원-MCP-v1-의미",
+          "op": "sameAs",
+          "source": {
+            "actionId": "mcp-after-restore",
+            "pointer": "/response/data"
+          },
+          "expected": true,
+          "requirementRefs": [
+            "D23",
+            "D24",
+            "D26"
+          ],
+          "evidenceRefs": [
+            "mcp-after-restore:actual-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "environmentId": "V8-restore-none-restored"
+          },
+          "oracleExplanation": "완전 복원 환경의 MCP wire로 읽은 O1의 v1 판정은 backup 전 API 값과 같다. DB만 돌아오고 MCP 진입점의 정의·인가·evaluator가 다르면 실패한다",
+          "oracleRef": {
+            "oracleId": "V8.db-blob-definition-restore",
+            "observationNames": [
+              "restore-artifacts"
+            ]
+          },
+          "baseline": {
+            "actionId": "assessment-before",
+            "pointer": "/response/data"
+          }
         }
       ],
       "oracleExplanation": "DB blob 정의 evaluator와 인가를 복원한다.가상 입력은 운영 자료나 실제 실행 증거가 아니다. 실행하지 않은 제품 경로는 NOT_RUN이다."
@@ -7024,7 +7119,8 @@
         "fixture",
         "host",
         "api",
-        "db"
+        "db",
+        "mcp"
       ],
       "actions": [
         {
@@ -7359,6 +7455,26 @@
           "evidenceRefs": [
             "partial-access:actual-artifact"
           ]
+        },
+        {
+          "id": "partial-mcp-access",
+          "kind": "query",
+          "actorRef": "reader",
+          "route": "mcp",
+          "capabilityId": "getAccessContext",
+          "request": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "environmentId": "V8-restore-blob-restored"
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z"
+          },
+          "evidenceRefs": [
+            "partial-mcp-access:actual-artifact"
+          ]
         }
       ],
       "assertions": [
@@ -7502,6 +7618,36 @@
             "environmentId": "V8-restore-blob-restored"
           },
           "oracleExplanation": "partial API write차단",
+          "oracleRef": {
+            "oracleId": "V8.db-blob-definition-restore",
+            "observationNames": [
+              "missing-blob-restore-complete"
+            ]
+          }
+        },
+        {
+          "id": "partial-MCP-write차단",
+          "op": "equals",
+          "source": {
+            "actionId": "partial-mcp-access",
+            "pointer": "/response/data/writeActivation"
+          },
+          "expected": "BLOCKED",
+          "requirementRefs": [
+            "D23",
+            "D24",
+            "D26"
+          ],
+          "evidenceRefs": [
+            "partial-mcp-access:actual-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "environmentId": "V8-restore-blob-restored"
+          },
+          "oracleExplanation": "필수 blob artifact가 빠진 불완전 복원에서는 MCP 진입점도 운영 쓰기 활성화를 BLOCKED로 보인다. API만 막고 MCP로 쓰기를 열면 실패한다",
           "oracleRef": {
             "oracleId": "V8.db-blob-definition-restore",
             "observationNames": [
@@ -7819,7 +7965,8 @@
         "fixture",
         "host",
         "api",
-        "db"
+        "db",
+        "mcp"
       ],
       "actions": [
         {
@@ -8154,6 +8301,26 @@
           "evidenceRefs": [
             "partial-access:actual-artifact"
           ]
+        },
+        {
+          "id": "partial-mcp-access",
+          "kind": "query",
+          "actorRef": "reader",
+          "route": "mcp",
+          "capabilityId": "getAccessContext",
+          "request": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "environmentId": "V8-restore-evaluator-restored"
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z"
+          },
+          "evidenceRefs": [
+            "partial-mcp-access:actual-artifact"
+          ]
         }
       ],
       "assertions": [
@@ -8297,6 +8464,36 @@
             "environmentId": "V8-restore-evaluator-restored"
           },
           "oracleExplanation": "partial API write차단",
+          "oracleRef": {
+            "oracleId": "V8.db-blob-definition-restore",
+            "observationNames": [
+              "missing-evaluator-restore-complete"
+            ]
+          }
+        },
+        {
+          "id": "partial-MCP-write차단",
+          "op": "equals",
+          "source": {
+            "actionId": "partial-mcp-access",
+            "pointer": "/response/data/writeActivation"
+          },
+          "expected": "BLOCKED",
+          "requirementRefs": [
+            "D23",
+            "D24",
+            "D26"
+          ],
+          "evidenceRefs": [
+            "partial-mcp-access:actual-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "environmentId": "V8-restore-evaluator-restored"
+          },
+          "oracleExplanation": "필수 evaluator artifact가 빠진 불완전 복원에서는 MCP 진입점도 운영 쓰기 활성화를 BLOCKED로 보인다. API만 막고 MCP로 쓰기를 열면 실패한다",
           "oracleRef": {
             "oracleId": "V8.db-blob-definition-restore",
             "observationNames": [
@@ -9516,7 +9713,8 @@
         "fixture",
         "host",
         "api",
-        "db"
+        "db",
+        "mcp"
       ],
       "actions": [
         {
@@ -9550,6 +9748,38 @@
           },
           "evidenceRefs": [
             "local-witness:actual-artifact"
+          ]
+        },
+        {
+          "id": "local-mcp-witness",
+          "kind": "query",
+          "actorRef": "reader",
+          "route": "mcp",
+          "capabilityId": "getInventory",
+          "request": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "environmentId": "V8-unavailable-environment-gates",
+              "itemId": {
+                "$alias": "P"
+              },
+              "placeId": {
+                "$alias": "W"
+              }
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z",
+            "snapshotRef": {
+              "$result": {
+                "actionId": "local-witness",
+                "pointer": "/response/snapshotRevision"
+              }
+            }
+          },
+          "evidenceRefs": [
+            "local-mcp-witness:actual-artifact"
           ]
         },
         {
@@ -9689,6 +9919,46 @@
           "unitSource": {
             "actionId": "local-witness",
             "pointer": "/response/data/unit"
+          }
+        },
+        {
+          "id": "로컬-MCP-같은-snapshot",
+          "op": "sameAs",
+          "source": {
+            "actionId": "local-mcp-witness",
+            "pointer": "/response/data"
+          },
+          "expected": true,
+          "requirementRefs": [
+            "D23",
+            "D24",
+            "D26"
+          ],
+          "evidenceRefs": [
+            "local-mcp-witness:actual-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "environmentId": "V8-unavailable-environment-gates",
+            "itemId": {
+              "$alias": "P"
+            },
+            "placeId": {
+              "$alias": "W"
+            }
+          },
+          "oracleExplanation": "BTP·CLIENT 연결이 없어도 LOCAL MCP wire는 같은 snapshot에서 API와 같은 W 보유60 BOX를 읽는다. 이 LOCAL 결과는 BTP·CLIENT 인수로 승격되지 않고 그 둘은 NOT_RUN으로 남는다",
+          "oracleRef": {
+            "oracleId": "V8.btp-client-separate-gates",
+            "observationNames": [
+              "result-scope"
+            ]
+          },
+          "baseline": {
+            "actionId": "local-witness",
+            "pointer": "/response/data"
           }
         },
         {
@@ -9906,7 +10176,8 @@
         "fixture",
         "host",
         "api",
-        "db"
+        "db",
+        "mcp"
       ],
       "actions": [
         {

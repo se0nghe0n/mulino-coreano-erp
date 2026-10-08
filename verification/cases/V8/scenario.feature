@@ -131,6 +131,7 @@
     그러면 "API-v1-판정-동일" assertion으로 "API v1 판정 동일"를 확인한다
     그러면 "MCP-v1-판정-동일" assertion으로 "MCP v1 판정 동일"를 확인한다
     그러면 "새-schema-family" assertion으로 "새 schema family"를 확인한다
+    그러면 "MCP-upgrade-전-판정-동일" assertion으로 "새 ontology v1→v2 upgrade 뒤 MCP로 읽은 O1의 v1 도착 판정(인정60 BOX·UNSATISFIED)은 upgrade 전 API 값과 같다. 옛 구현 migration이 자료를 다시 쓴 결과로 대체되지 않는다"를 확인한다
     그러면 "옛-migration-source0" assertion으로 "옛 migration source0"를 확인한다
     그러면 "upgrade-재인수-probes" assertion으로 "upgrade 재인수 probes"를 확인한다
 
@@ -146,6 +147,7 @@
     만일 "시스템" 역할이 "after" 행동을 수행한다
     만일 "reader" 역할이 "assessment-after" 행동을 수행한다
     만일 "reader" 역할이 "evidence-after" 행동을 수행한다
+    만일 "reader" 역할이 "mcp-after-restore" 행동을 수행한다
     그러면 "bundle-전수-종류" assertion으로 "bundle 전수 종류"를 확인한다
     그러면 "삭제전-백업-원본-positive" assertion으로 "삭제전 백업 원본 positive"를 확인한다
     그러면 "백업-원문-hash" assertion으로 "백업 원문 hash"를 확인한다
@@ -179,6 +181,7 @@
     그러면 "deleted-원문-복활0" assertion으로 "deleted 원문 복활0"를 확인한다
     그러면 "legal-hold-보존" assertion으로 "legal hold 보존"를 확인한다
     그러면 "복원-API-v1-의미" assertion으로 "복원 API v1 의미"를 확인한다
+    그러면 "복원-MCP-v1-의미" assertion으로 "완전 복원 환경의 MCP wire로 읽은 O1의 v1 판정은 backup 전 API 값과 같다. DB만 돌아오고 MCP 진입점의 정의·인가·evaluator가 다르면 실패한다"를 확인한다
 
   시나리오: 필수 blob 누락 복원을 완료로 표시하지 않는다
     먼저 사례 파일 "verification/cases/V8/case.json"의 "restore-blob"를 준비한다
@@ -192,10 +195,12 @@
     만일 "시스템" 역할이 "restore-inspect" 행동을 수행한다
     만일 "시스템" 역할이 "partial-db" 행동을 수행한다
     만일 "reader" 역할이 "partial-access" 행동을 수행한다
+    만일 "reader" 역할이 "partial-mcp-access" 행동을 수행한다
     그러면 "bundle-전수-종류" assertion으로 "bundle 전수 종류"를 확인한다
     그러면 "삭제전-백업-원본-positive" assertion으로 "삭제전 백업 원본 positive"를 확인한다
     그러면 "백업-원문-hash" assertion으로 "백업 원문 hash"를 확인한다
     그러면 "partial-API-write차단" assertion으로 "partial API write차단"를 확인한다
+    그러면 "partial-MCP-write차단" assertion으로 "필수 blob artifact가 빠진 불완전 복원에서는 MCP 진입점도 운영 쓰기 활성화를 BLOCKED로 보인다. API만 막고 MCP로 쓰기를 열면 실패한다"를 확인한다
     그러면 "partial-DB-incomplete" assertion으로 "partial DB incomplete"를 확인한다
     그러면 "partial-DB-completion0" assertion으로 "partial DB completion0"를 확인한다
     그러면 "partial-DB-recovery-owner" assertion으로 "partial DB recovery owner"를 확인한다
@@ -217,10 +222,12 @@
     만일 "시스템" 역할이 "restore-inspect" 행동을 수행한다
     만일 "시스템" 역할이 "partial-db" 행동을 수행한다
     만일 "reader" 역할이 "partial-access" 행동을 수행한다
+    만일 "reader" 역할이 "partial-mcp-access" 행동을 수행한다
     그러면 "bundle-전수-종류" assertion으로 "bundle 전수 종류"를 확인한다
     그러면 "삭제전-백업-원본-positive" assertion으로 "삭제전 백업 원본 positive"를 확인한다
     그러면 "백업-원문-hash" assertion으로 "백업 원문 hash"를 확인한다
     그러면 "partial-API-write차단" assertion으로 "partial API write차단"를 확인한다
+    그러면 "partial-MCP-write차단" assertion으로 "필수 evaluator artifact가 빠진 불완전 복원에서는 MCP 진입점도 운영 쓰기 활성화를 BLOCKED로 보인다. API만 막고 MCP로 쓰기를 열면 실패한다"를 확인한다
     그러면 "partial-DB-incomplete" assertion으로 "partial DB incomplete"를 확인한다
     그러면 "partial-DB-completion0" assertion으로 "partial DB completion0"를 확인한다
     그러면 "partial-DB-recovery-owner" assertion으로 "partial DB recovery owner"를 확인한다
@@ -265,10 +272,12 @@
     먼저 사례 파일 "verification/cases/V8/case.json"의 "unavailable-environment-gates"를 준비한다
     만일 "시스템" 역할이 "setup" 행동을 수행한다
     만일 "reader" 역할이 "local-witness" 행동을 수행한다
+    만일 "reader" 역할이 "local-mcp-witness" 행동을 수행한다
     만일 "시스템" 역할이 "disable-external-bindings" 행동을 수행한다
     만일 "시스템" 역할이 "gate-inventory" 행동을 수행한다
     만일 "시스템" 역할이 "gate-inventory-inspect" 행동을 수행한다
     그러면 "로컬-관찰-보유60" assertion으로 "로컬 관찰 보유60"를 확인한다
+    그러면 "로컬-MCP-같은-snapshot" assertion으로 "BTP·CLIENT 연결이 없어도 LOCAL MCP wire는 같은 snapshot에서 API와 같은 W 보유60 BOX를 읽는다. 이 LOCAL 결과는 BTP·CLIENT 인수로 승격되지 않고 그 둘은 NOT_RUN으로 남는다"를 확인한다
     그러면 "환경별-NOT_RUN" assertion으로 "환경별 NOT_RUN"를 확인한다
     그러면 "필수-gate-생략0" assertion으로 "필수 gate 생략0"를 확인한다
     그러면 "candidate-최종확정0" assertion으로 "candidate 최종확정0"를 확인한다
