@@ -6516,6 +6516,140 @@
             "actionId": "before-close",
             "pointer": "/response/data/effectLedger/obligations"
           }
+        },
+        {
+          "id": "status-axes-14-api",
+          "op": "relationSet",
+          "source": {
+            "actionId": "after-close",
+            "pointer": "/response/data/effectLedger/recallScopes",
+            "field": [
+              "physicalScopeId",
+              "finalDisposition",
+              "lastConfirmedPlaceId",
+              "currentControlStatus"
+            ]
+          },
+          "expected": [
+            [
+              {
+                "$result": {
+                  "actionId": "recover25",
+                  "pointer": "/response/physicalScope/id"
+                }
+              },
+              "DISPOSED",
+              {
+                "$alias": "W"
+              },
+              "NO_ACTIVE_PHYSICAL_STOCK"
+            ],
+            [
+              {
+                "$result": {
+                  "actionId": "recover25",
+                  "pointer": "/response/unrecoveredScope/id"
+                }
+              },
+              "UNKNOWN",
+              {
+                "$alias": "CUSTOMER"
+              },
+              "UNVERIFIED"
+            ]
+          ],
+          "requirementRefs": [
+            "D03",
+            "D16",
+            "D18"
+          ],
+          "evidenceRefs": [
+            "after-close:actual-response-or-host-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "E2",
+            "scenarioId": "same-25-not-50"
+          },
+          "oracleExplanation": "회수·폐기된 25 BOX는 DISPOSED·마지막 확인 위치 W·현재 물리 재고 없음, 미확인 25 BOX는 UNKNOWN·CUSTOMER·UNVERIFIED다. API 조회도 최종 처리와 현재 통제를 독립 축으로 보인다(계획 §6 반품·회수).",
+          "oracleRef": {
+            "oracleId": "E2.same-25-not-50",
+            "observationNames": [
+              "status-axes"
+            ]
+          }
+        },
+        {
+          "id": "status-axes-14-mcp",
+          "op": "relationSet",
+          "source": {
+            "actionId": "after-close-mcp",
+            "pointer": "/response/data/effectLedger/recallScopes",
+            "field": [
+              "physicalScopeId",
+              "finalDisposition",
+              "lastConfirmedPlaceId",
+              "currentControlStatus"
+            ]
+          },
+          "expected": [
+            [
+              {
+                "$result": {
+                  "actionId": "recover25",
+                  "pointer": "/response/physicalScope/id"
+                }
+              },
+              "DISPOSED",
+              {
+                "$alias": "W"
+              },
+              "NO_ACTIVE_PHYSICAL_STOCK"
+            ],
+            [
+              {
+                "$result": {
+                  "actionId": "recover25",
+                  "pointer": "/response/unrecoveredScope/id"
+                }
+              },
+              "UNKNOWN",
+              {
+                "$alias": "CUSTOMER"
+              },
+              "UNVERIFIED"
+            ]
+          ],
+          "requirementRefs": [
+            "D03",
+            "D16",
+            "D18"
+          ],
+          "evidenceRefs": [
+            "after-close-mcp:mcp-response"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "E2",
+            "scenarioId": "same-25-not-50"
+          },
+          "oracleExplanation": "stateless MCP 진입점에서 같은 snapshot으로 읽은 같은 값이다. API와 같은 서버 판정·원장을 읽어야 하며 다른 계산이나 캐시를 쓰면 실패한다(계획 §3.4, §9.1, §13.1 D20). 회수·폐기된 25 BOX는 DISPOSED·마지막 확인 위치 W·현재 물리 재고 없음, 미확인 25 BOX는 UNKNOWN·CUSTOMER·UNVERIFIED다. MCP 조회도 최종 처리와 현재 통제를 독립 축으로 보인다(계획 §6 반품·회수).",
+          "oracleRef": {
+            "oracleId": "E2.same-25-not-50",
+            "observationNames": [
+              "status-axes"
+            ]
+          }
         }
       ],
       "oracleExplanation": "가상 fixture는 선행 실물·정책·증거 입력만 설치한다. 검증하는 주문·승인·예약·출고·인도·반품·회수·정정 효과는 각각 공개 명령으로 실행한다. 승인50 중 회수25와 동일 실물 폐기25는 최종25이며 미확인25의 종료를 막는다의 수량과 책임은 고정 기대값과 원 행·응답을 함께 검증한다."
@@ -7546,6 +7680,54 @@
           },
           "evidenceRefs": [
             "after-operator:api-response"
+          ]
+        },
+        {
+          "id": "after-operator-mcp",
+          "kind": "query",
+          "actorRef": "observer",
+          "route": "mcp",
+          "capabilityId": "getObject",
+          "request": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseId": "E2",
+              "scenarioId": "exception-responsibility"
+            },
+            "subjectRefs": [
+              {
+                "type": "TradeItem",
+                "id": {
+                  "$alias": "P"
+                }
+              }
+            ],
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z",
+            "include": [
+              "inventory",
+              "trade",
+              "evidence",
+              "assessments",
+              "obligations",
+              "audit",
+              "outbox"
+            ],
+            "snapshotRef": {
+              "$result": {
+                "actionId": "after-operator",
+                "pointer": "/response/snapshotRevision"
+              }
+            }
+          },
+          "evidenceRefs": [
+            "after-operator-mcp:mcp-response",
+            "after-operator-mcp:actual-mcp-artifact"
           ]
         },
         {
@@ -9341,6 +9523,159 @@
           "unitSource": {
             "actionId": "closed-mcp",
             "pointer": "/response/data/unit"
+          }
+        },
+        {
+          "id": "after-operator-mcp-same-snapshot",
+          "op": "equals",
+          "source": {
+            "actionId": "after-operator-mcp",
+            "pointer": "/response/snapshotRevision"
+          },
+          "expected": {
+            "$result": {
+              "actionId": "after-operator",
+              "pointer": "/response/snapshotRevision"
+            }
+          },
+          "requirementRefs": [
+            "D03",
+            "D16",
+            "D18"
+          ],
+          "evidenceRefs": [
+            "after-operator-mcp:mcp-response"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "E2",
+            "scenarioId": "exception-responsibility"
+          },
+          "oracleExplanation": "MCP 조회는 일반 역할의 예외 종료 거부 뒤 API 조회와 같은 snapshotRevision을 읽는다.",
+          "oracleRef": {
+            "oracleId": "E2.exception-responsibility",
+            "observationNames": [
+              "unauthorized-exception-close"
+            ]
+          }
+        },
+        {
+          "id": "unauthorized-exception-close-4-mcp",
+          "op": "sameAs",
+          "source": {
+            "actionId": "after-operator-mcp",
+            "pointer": "/response/data/effectLedger/decisions"
+          },
+          "expected": null,
+          "requirementRefs": [
+            "D03",
+            "D16",
+            "D18"
+          ],
+          "evidenceRefs": [
+            "after-operator-mcp:mcp-response"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "E2",
+            "scenarioId": "exception-responsibility"
+          },
+          "oracleExplanation": "stateless MCP 진입점에서 같은 snapshot으로 읽은 같은 값이다. API와 같은 서버 판정·원장을 읽어야 하며 다른 계산이나 캐시를 쓰면 실패한다(계획 §3.4, §9.1, §13.1 D20). 일반 역할 operator의 미확인25 BOX 예외 종료는 FORBIDDEN이며 MCP로 읽은 effectLedger/decisions는 시도 전 API 값과 같다. 예외 결정·회수 범위·잔여 의무 효과0이다.",
+          "oracleRef": {
+            "oracleId": "E2.exception-responsibility",
+            "observationNames": [
+              "unauthorized-exception-close"
+            ]
+          },
+          "baseline": {
+            "actionId": "before-exception",
+            "pointer": "/response/data/effectLedger/decisions"
+          }
+        },
+        {
+          "id": "unauthorized-exception-close-5-mcp",
+          "op": "sameAs",
+          "source": {
+            "actionId": "after-operator-mcp",
+            "pointer": "/response/data/effectLedger/recallScopes"
+          },
+          "expected": null,
+          "requirementRefs": [
+            "D03",
+            "D16",
+            "D18"
+          ],
+          "evidenceRefs": [
+            "after-operator-mcp:mcp-response"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "E2",
+            "scenarioId": "exception-responsibility"
+          },
+          "oracleExplanation": "stateless MCP 진입점에서 같은 snapshot으로 읽은 같은 값이다. API와 같은 서버 판정·원장을 읽어야 하며 다른 계산이나 캐시를 쓰면 실패한다(계획 §3.4, §9.1, §13.1 D20). 일반 역할 operator의 미확인25 BOX 예외 종료는 FORBIDDEN이며 MCP로 읽은 effectLedger/recallScopes는 시도 전 API 값과 같다. 예외 결정·회수 범위·잔여 의무 효과0이다.",
+          "oracleRef": {
+            "oracleId": "E2.exception-responsibility",
+            "observationNames": [
+              "unauthorized-exception-close"
+            ]
+          },
+          "baseline": {
+            "actionId": "before-exception",
+            "pointer": "/response/data/effectLedger/recallScopes"
+          }
+        },
+        {
+          "id": "unauthorized-exception-close-6-mcp",
+          "op": "sameAs",
+          "source": {
+            "actionId": "after-operator-mcp",
+            "pointer": "/response/data/effectLedger/obligations"
+          },
+          "expected": null,
+          "requirementRefs": [
+            "D03",
+            "D16",
+            "D18"
+          ],
+          "evidenceRefs": [
+            "after-operator-mcp:mcp-response"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "E2",
+            "scenarioId": "exception-responsibility"
+          },
+          "oracleExplanation": "stateless MCP 진입점에서 같은 snapshot으로 읽은 같은 값이다. API와 같은 서버 판정·원장을 읽어야 하며 다른 계산이나 캐시를 쓰면 실패한다(계획 §3.4, §9.1, §13.1 D20). 일반 역할 operator의 미확인25 BOX 예외 종료는 FORBIDDEN이며 MCP로 읽은 effectLedger/obligations는 시도 전 API 값과 같다. 예외 결정·회수 범위·잔여 의무 효과0이다.",
+          "oracleRef": {
+            "oracleId": "E2.exception-responsibility",
+            "observationNames": [
+              "unauthorized-exception-close"
+            ]
+          },
+          "baseline": {
+            "actionId": "before-exception",
+            "pointer": "/response/data/effectLedger/obligations"
           }
         }
       ],
