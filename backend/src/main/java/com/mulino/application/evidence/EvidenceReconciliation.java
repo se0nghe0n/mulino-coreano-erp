@@ -43,7 +43,9 @@ public class EvidenceReconciliation {
     if(!c.actorId().equals(profile.get("intakeOwnerId"))&&!c.actorId().equals(profile.get("supervisorId")))throw DomainError.forbidden();
   }
   @Transactional
-  public Map<String,Object> match(DomainContext c,Review input,String capability) {
+  public Map<String,Object> match(DomainContext c,Review input,String capability) {return match(c,input,capability,true);}
+  /** record=false re-checks a persisted review at the link commit fence without writing a second review row (one review, one row). */
+  private Map<String,Object> match(DomainContext c,Review input,String capability,boolean record) {
     var claim=claim(c,input.claimId());authorizeReviewer(c,capability,claim);
     var event=r.require("Events",c.organizationId(),claim.get("eventId").toString());var profile=profile(c,claim);
     r.sourceFence(c.organizationId(),event.get("sourceNamespace").toString(),event.get("externalEventId").toString(),event.get("sourceVersion").toString());
@@ -137,6 +139,7 @@ public class EvidenceReconciliation {
     row.put("policyVersion",input.policyVersion());row.put("decision",decision);row.put("reason",input.reason());row.put("sourceIdentity",input.sourceIdentity());row.put("effectiveFrom",input.effectiveFrom());
     if(quantity!=null){row.put("quantity",quantity);row.put("unit",input.unit());}
     for(String field:List.of("intakeOwnerId","supervisorId","nextAction","nextCheckAt"))row.put(field,profile.get(field));
+    if(!record)return Map.of("outcome",decision,"inventoryEffects","NONE");
     r.insert("Reconciliations",row);
     return Map.of("id",row.get("ID"),"revision",1,"outcome",decision,"inventoryEffects","NONE");
   }
@@ -171,7 +174,7 @@ public class EvidenceReconciliation {
     if(!"MATCHED".equals(review.get("decision")))throw new DomainError("HELD","EVIDENCE_UNVERIFIED","Reconciliation remains unresolved");
     // Recheck all source, policy, original, identity and quantity checks at the current commit fence.
     var checked=match(c,new Review(review.get("claimId").toString(),review.get("basisDocumentId").toString(),review.get("physicalScopeId").toString(),Objects.toString(review.get("existingCanonicalId"),null),
-      review.get("policyVersion").toString(),review.get("sourceIdentity").toString(),Objects.toString(review.get("quantity"),null),Objects.toString(review.get("unit"),null),instant(review.get("effectiveFrom")),review.get("reason").toString()),"linkCanonicalOccurrence");
+      review.get("policyVersion").toString(),review.get("sourceIdentity").toString(),Objects.toString(review.get("quantity"),null),Objects.toString(review.get("unit"),null),instant(review.get("effectiveFrom")),review.get("reason").toString()),"linkCanonicalOccurrence",false);
     if(!"MATCHED".equals(checked.get("outcome")))throw new DomainError("HELD","EVIDENCE_UNVERIFIED","Current review checks failed");
     String physical=review.get("physicalScopeId").toString();String existing=Objects.toString(review.get("existingCanonicalId"),null);
     var event=r.require("Events",c.organizationId(),claim.get("eventId").toString());

@@ -42,6 +42,7 @@ public class SettlementState {
   if(match.get("originalDifference")==null){out.put("result","UNVERIFIED");return out;}
   BigDecimal original=decimal(match.get("originalDifference")),approved=adjustments.stream().filter(x->match.get("ID").equals(x.get("matchId"))&&"CONFIRMED".equals(x.get("status"))).map(x->decimal(x.get("amount"))).reduce(BigDecimal.ZERO,BigDecimal::add),remaining=original.subtract(approved);
   out.put("originalDifference",original);out.put("settlementDifference",remaining);
+  if(out.get("currentOriginalDifference") instanceof BigDecimal now)out.put("currentSettlementDifference",now.subtract(approved));
   boolean satisfied=remaining.signum()==0&&qd.signum()==0&&!cd&&!scope&&"CURRENT".equals(state);
   out.put("result","UNVERIFIED".equals(state)?"UNVERIFIED":satisfied?"SATISFIED":"UNSATISFIED");
   return out;
@@ -51,6 +52,13 @@ public class SettlementState {
  public boolean open(DomainContext c,Object rootId){
   if(rootId==null)return false;
   return r.externalRows(c,"mulino.work.read.ObligationReferences").stream().anyMatch(x->rootId.equals(x.get("rootId"))&&"OPEN".equals(x.get("status"))&&!Instant.parse(x.get("recordedAt").toString()).isAfter(c.knownAt()));
+ }
+
+ /** Every SETTLEMENT_DIFFERENCE root of one invoice match: its own match difference and any contribution-change roots. */
+ public List<String> matchRoots(DomainContext c,Map<String,Object> match){
+  var out=new ArrayList<String>();if(match.get("dutyRootId")!=null)out.add(match.get("dutyRootId").toString());var json=new ObjectMapper();
+  for(var root:r.externalRows(c,"mulino.responsibility.Roots")){if(!"SETTLEMENT_DIFFERENCE".equals(root.get("kind"))||out.contains(root.get("ID").toString()))continue;try{if(match.get("ID").toString().equals(json.readTree(root.get("scopeJson").toString()).path("residual").path("matchId").asText()))out.add(root.get("ID").toString());}catch(Exception e){throw DomainError.invalid("Settlement difference scope invalid");}}
+  return out;
  }
 
  /** SETTLEMENT_DIFFERENCE roots opened for a CREDIT_NOTE/CORRECTION invoice, keyed by the correction invoice. */
