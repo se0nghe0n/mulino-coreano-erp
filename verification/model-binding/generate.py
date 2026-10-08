@@ -23,11 +23,14 @@ for c in D['cases']:
   o=t['oracle']; extra.update(a['path'] for a in o.get('sitDirectCommand',{}).get('assertions',[]))
   for p in o.get('uatCompletion',{}).get('pathOracles',{}).values(): extra.update(a['path'] for a in p.get('assertions',[]))
 # Observer rows are read-only physical column mappings, not oracle-shaped projections.
+CANONICAL_RESPONSE_POINTERS={'response.errorCode':'/response/error/code'}
 mappings=[]
 for p in sorted(paths|extra):
  parts=p.split('.'); domain=parts[1] if len(parts)>1 else ''
  m={'semanticPath':p,'common':p in paths,'evidenceClass':{'response':'AUTHENTICATED_API','state':'INDEPENDENT_DB_ROWS','effects':'SCOPED_EFFECT_DELTA'}[parts[0]]}
- if parts[0]=='response': m.update(pointer='/response/'+ '/'.join(parts[1:]))
+ # The corpus keeps its semantic name; the wire location of a structured command error is the
+ # single canonical /response/error/code (plan §3.4, contracts/command-response.schema.json).
+ if parts[0]=='response': m.update(pointer=CANONICAL_RESPONSE_POINTERS.get(p,'/response/'+ '/'.join(parts[1:])))
  elif parts[0]=='state':
   # Dataset/column identifiers are the adapter's versioned read-only mapping contract.
   m.update(dataset=domain,attribute='.'.join(parts[2:]) or 'value',selector='ISOLATED_INSTALLATION_AND_ACTUAL_ENTITY_SCOPE',cardinality='EXACTLY_ONE',sourceColumnsRequired=True)
