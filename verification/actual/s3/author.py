@@ -164,5 +164,14 @@ raw('transit-moved-once',[sums('mulino_inventory_quantitysegments','quantity','6
 cmd('transit-retry','confirmReceipt',{'receiptId':'$transit60.observation','canonicalOccurrenceId':'$transit60.canonical','lotId':'$L'},revision=0,subject='$transit60.observation',noun='Receipt',key='transit60-confirm-stable');A[-1]['type']='parallel'
 raw('transit-retry-no-new-effect',[sums('mulino_inventory_quantitysegments','quantity','60',{'retiredat':None}),count('mulino_inventory_quantitymovements',1,{'kind':'RECEIPT_MOVE'}),count('mulino_trade_receipt_receipts',1,{'physicaleffect':'TRANSIT_MOVE'})])
 
+# Warehouse custody is known only from verified receipt evidence (plan §4.1/§4.2):
+# the direct warehouse receipt originals name the receiving custodian and every
+# confirm of them carries the same explicit slot, so SELL eligibility at W is
+# assessed, not left CUSTODY_UNCONFIRMED. The custodian is the supervisor, not
+# the confirming reader, so nothing is inferred from the acting identity.
+CUSTODY_RECEIPTS={'receipt60','receipt40'}
+for x in A:
+    if x['type']=='original' and x['id'] in CUSTODY_RECEIPTS:x['fixture']['occurrence']['content']['receivingCustodianId']='$supervisor'
+    if x.get('capability')=='confirmReceipt' and x['request']['slots'].get('receiptId') in {'$'+r+'.observation' for r in CUSTODY_RECEIPTS}:x['request']['slots']['receivingCustodianId']='$supervisor'
 flow['actions']=A
 (ROOT/'flow.json').write_text(json.dumps(flow,indent=2,ensure_ascii=False)+'\n')
