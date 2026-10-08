@@ -297,23 +297,43 @@ scheduler가 실제로 한 일은 extractor `rawRows.schedulerSubmissions[]`로
   invocationHandle·submittedAt이 창 안 가장 이른 행과 같다. NO_TASK면 창
   안에 행이 없다. NO_TASK는 자율 발견 실패를 그대로 드러내는 관찰이며
   case assertion에서 실패한다.
-- NO_TASK는 watcher가 다음 자연 tick을 실제로 지켜본 뒤에만 증거다
-  (step2r round 7·8). `CaseRunner.controlRequest`가 fixture
-  `runtimeProfile.tickSeconds`를 `naturalTickSeconds`로 요청에 넣는다.
-  NO_TASK면 watcher command의 `completedAt`이
-  `observeFrom+2×naturalTickSeconds` 이후여야 하고, `naturalTickSeconds`가
-  없거나 1–`observationWindowSeconds`/2 밖이면 거부한다. 한 tick으로는
-  부족하다(Step 2 closure review 5). `observeFrom`의 위상은 loop와 무관하고,
-  고정 지연 scheduler의 주기는 tick에 처리 시간을 더한 값이며, 제출 행은
-  tick이 시작된 뒤에 기록된다. 그래서 tick 1초 loop에서 +1.2초에 다시
-  제출하는 sweeper를 +1초에 끝난 watcher가 놓친다. 두 주기를 관찰하면 창
-  안에서 적어도 한 tick이 시작부터 기록까지 끝난다. tick 1초면 2초로 30초
-  창 안이다. 창 전체(30초)를 요구하지 않는 것은 창 끝을 넘을 수 없다는 위
-  상한과 동시에 만족할 수 없기 때문이다.
-- NO_TASK의 extractor는 watcher가 끝난 뒤 scheduler의 지속 제출 행을 읽는다.
-  `extractor.command.startedAt`이 watcher `command.completedAt`보다 앞서면
-  거부한다. 그래서 extractor는 `completedAt`까지 기록된 모든 행을 본다.
-  `completedAt` 뒤·창 안에 기록된 행도 읽으면 NO_TASK와 모순이므로
+- NO_TASK는 watcher가 최소 두 tick을 지켜봤을 때만 받는다(step2r round
+  7·8). `CaseRunner.controlRequest`가 fixture `runtimeProfile.tickSeconds`를
+  `naturalTickSeconds`로 요청에 넣는다. NO_TASK면 watcher command의
+  `completedAt`이 `observeFrom+2×naturalTickSeconds` 이후여야 하고,
+  `naturalTickSeconds`가 없거나 1–`observationWindowSeconds`/2 밖이면
+  거부한다. tick 1초면 2초로 30초 창 안이다. 창 전체(30초)를 요구하지 않는
+  것은 창 끝을 넘을 수 없다는 위 상한과 동시에 만족할 수 없기 때문이다.
+- 두 tick은 하한일 뿐 증명이 아니다. round 8 문서는 "두 주기를 관찰하면 창
+  안에서 적어도 한 tick이 시작부터 기록까지 끝난다"고 썼지만 틀렸다. 고정
+  지연 scheduler의 처리 시간이 한 tick을 넘을 수 있기 때문이다. tick 1초
+  loop의 현재 주기가 +1.2초에 끝나고 다음 주기가 +2.2초에 중복을
+  제출하면, +2초에 끝난 watcher와 +2.01초에 읽은 extractor는 제출 행을 보지
+  못한다(Step 2 closure review 6). 그래서 NO_TASK는 scheduler가 스스로 남긴
+  주기 완료 기록을 요구한다(step2r round 9). extractor는
+  `rawRows.schedulerCycles[]`를 돌려준다.
+
+  | rawRows.schedulerCycles[] field | 내용 |
+  |---|---|
+  | `schedulerId` | 요청 schedulerId와 같다 |
+  | `tickId`(tickScheduler) / `sweepId`(sweepDue) | scheduler가 붙인 주기 ID |
+  | `startedAt`, `completedAt` | scheduler가 기록한 주기 시작·완료 시각 |
+  | `startedBy` | 주기를 시작한 주체. 자연 주기면 `SCHEDULER_LOOP` |
+
+  `startedBy=SCHEDULER_LOOP`이고 `startedAt ≥ observeFrom`,
+  `completedAt ≤ watcher completedAt`인 행이 하나 이상 있어야 한다. 그 주기는
+  관찰 구간 안에서 처음부터 끝까지 돌았고, 창 안 제출 행이 없으므로 아무것도
+  제출하지 않았다. 그런 행이 없으면 제출이 없어도 미완료 관찰이며 NO_TASK가
+  아니다(fail-closed). observeFrom 전에 시작한 주기는 세지 않는다. 행마다
+  schedulerId가 요청과 같고 주기 ID·`startedBy`가 비어 있지 않으며
+  `completedAt`이 `startedAt`보다 앞서지 않아야 한다. round 9에서 backend
+  `application/runtime`의 sweeper·scheduler를 읽었지만 주기 완료 기록은 찾지
+  못했다. 그래서 실제 NO_TASK 관찰은 Step 3가 기록과 extractor를 제공할
+  때까지 통과하지 못한다(cross-owner 요청).
+- NO_TASK의 extractor는 watcher가 끝난 뒤 scheduler의 지속 제출 행과 주기
+  행을 읽는다. `extractor.command.startedAt`이 watcher `command.completedAt`보다
+  앞서면 거부한다. 그래서 extractor는 `completedAt`까지 기록된 모든 행을 본다.
+  `completedAt` 뒤·창 안에 기록된 제출 행도 읽으면 NO_TASK와 모순이므로
   fail-closed다. 수동 관찰 subcase의 fixture는 `tickSeconds`를
   1–창 길이/2의 정수로 둬야 하고, case가 `naturalTickSeconds`를 직접 쓰면
   `runtimeProfileProblems`가 준비 실패로 낸다.

@@ -67,6 +67,7 @@
     만일 "ordinary" 역할이 "reserve" 행동을 수행한다
     만일 "warehouse" 역할이 "reserved-api" 행동을 수행한다
     만일 "시스템" 역할이 "reserved-db" 행동을 수행한다
+    만일 "warehouse" 역할이 "pick" 행동을 수행한다
     만일 "ordinary" 역할이 "dispatch" 행동을 수행한다
     만일 "warehouse" 역할이 "after-api" 행동을 수행한다
     만일 "시스템" 역할이 "after-db" 행동을 수행한다
@@ -89,6 +90,7 @@
     그러면 "manager-decision-binding-13" assertion으로 "독립 원 행의 실물·수량·관계·범위를 정확히 대조한다."를 확인한다
     그러면 "ordinary-authorized-reservation-after-confirmation-14" assertion으로 "실물량·단위와 독립 손계산을 대조한다."를 확인한다
     그러면 "ordinary-authorized-reservation-after-confirmation-15" assertion으로 "실물량·단위와 독립 손계산을 대조한다."를 확인한다
+    그러면 "pick-before-dispatch-applied" assertion으로 "출고 전 예약10 warehouse pick = APPLIED, 새 인간 승인이 아닌 실행 단계"를 확인한다
     그러면 "ordinary-authorized-dispatch-after-confirmation-16" assertion으로 "독립 원 행을 해당 범위에서 합산하며 부모와 자식을 이중 합산하지 않는다."를 확인한다
     그러면 "ordinary-authorized-dispatch-after-confirmation-17" assertion으로 "공개 명령의 구조화 outcome을 확인한다."를 확인한다
     그러면 "new-human-approval-added-to-reservation-or-dispatch-18" assertion으로 "독립 원 행의 실물·수량·관계·범위를 정확히 대조한다."를 확인한다

@@ -106,6 +106,10 @@ final class StepTwoRoundSevenRegressionTest {
         ObjectNode rows=(ObjectNode)c.host().path("extractor").path("rawRows");
         ObjectNode e=(ObjectNode)rows.path("operationEvidence");e.remove(List.of("taskId","invocationHandle","submittedAt"));e.put("submissionStatus","NO_TASK");
         rows.set("schedulerSubmissions",Json.array());
+        // step2r round 9: the scheduler's own record of a natural cycle that ran entirely inside [observeFrom, completedAt].
+        ObjectNode cycle=Json.object();cycle.put("schedulerId",e.path("schedulerId").asText()).put("sweepId","synthetic-natural-cycle")
+            .put("startedAt",commandStart).put("completedAt",commandEnd).put("startedBy","SCHEDULER_LOOP");
+        rows.set("schedulerCycles",Json.array().add(cycle));
         ((ObjectNode)rows.path("command")).put("startedAt",commandStart).put("completedAt",commandEnd);
         c.host().set("command",rows.path("command").deepCopy());c.host().set("operationEvidence",e.deepCopy());
         ((ObjectNode)c.host().path("extractor").path("command")).put("startedAt",extractorStart).put("completedAt",extractorStart);

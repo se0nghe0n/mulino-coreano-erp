@@ -237,6 +237,8 @@ public final class HostObservationValidatorTest {
         none.host.set("operationEvidence",e.deepCopy());
         // step2r round 8: the extractor reads the scheduler rows after the watcher completed (00:00:03).
         ((ObjectNode)none.host.path("extractor").path("command")).put("startedAt","2026-10-07T00:00:03Z").put("completedAt","2026-10-07T00:00:04Z");
+        // step2r round 9: a natural cycle the scheduler recorded as completed inside [observeFrom, completedAt] proves the absence.
+        rows.set("schedulerCycles",Json.parse("[{\"schedulerId\":\"synthetic-schedulerId\",\"tickId\":\"synthetic-natural-cycle\",\"startedAt\":\"2026-10-07T00:00:01Z\",\"completedAt\":\"2026-10-07T00:00:02Z\",\"startedBy\":\"SCHEDULER_LOOP\"}]"));
         StepResult result=rebind(none);
         HostObservationValidator.validate(new ContractValidator(root),none.control,result);
     }

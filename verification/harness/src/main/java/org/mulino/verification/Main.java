@@ -135,6 +135,7 @@ public final class Main {
             problems.addAll(validator.wireTransportProblems(c));
             problems.addAll(validator.placeKindProblems(c));
             problems.addAll(validator.receiptCustodyProblems(c));
+            problems.addAll(validator.pickBeforeDispatchProblems(c));
         }
         for(String id:expected) if(!cases.containsKey(id)) problems.add("Missing required case "+id);
         for(int i=1;i<=26;i++) if(!covered.contains(String.format("D%02d",i))) problems.add("Missing requirement assertion "+String.format("D%02d",i));

@@ -339,6 +339,7 @@
     만일 "manager" 역할이 "disposition" 행동을 수행한다
     만일 "regulator" 역할이 "label" 행동을 수행한다
     만일 "sales" 역할이 "reserve" 행동을 수행한다
+    만일 "sales" 역할이 "pick" 행동을 수행한다
     만일 "sales" 역할이 "dispatch-sale" 행동을 수행한다
     만일 "source" 역할이 "delivery" 행동을 수행한다
     만일 "sales" 역할이 "return-approval" 행동을 수행한다
@@ -364,6 +365,7 @@
     그러면 "excess-owner-owner" assertion으로 "고정 oracle excess-owner의 실제 값과 범위를 확인한다"를 확인한다
     그러면 "distinct-contributions" assertion으로 "고정 oracle contribution-scope의 실제 값과 범위를 확인한다"를 확인한다
     그러면 "canonical-contributions" assertion으로 "고정 oracle contribution-scope의 실제 값과 범위를 확인한다"를 확인한다
+    그러면 "pick-applied" assertion으로 "출고 전 예약10 pick = APPLIED"를 확인한다
     그러면 "dispatch-sale-applied" assertion으로 "판매 출고10 = APPLIED"를 확인한다
     그러면 "return-applied" assertion으로 "반품10 접수 = APPLIED"를 확인한다
     그러면 "returned-at-W" assertion으로 "W 활성 = 105 − 10 + 10 = 105 BOX"를 확인한다
