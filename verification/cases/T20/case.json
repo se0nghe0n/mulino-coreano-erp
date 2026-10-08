@@ -22641,6 +22641,40 @@
           }
         },
         {
+          "id": "stdio-is-error",
+          "op": "equals",
+          "source": {
+            "actionId": "wire",
+            "pointer": "/response/body/result/isError"
+          },
+          "expected": true,
+          "requirementRefs": [
+            "D20"
+          ],
+          "evidenceRefs": [
+            "wire:actual-observation",
+            "wire:source-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "lotId": {
+              "$alias": "L"
+            }
+          },
+          "oracleExplanation": "도메인 거부·충돌의 MCP tool result는 isError=true이고 도메인 outcome과 오류를 structuredContent에 담는다(contracts/mcp/s0-protocol.md 오류 표).",
+          "oracleRef": {
+            "oracleId": "T20.mcp-stateless-wire",
+            "observationNames": [
+              "domain-parity"
+            ]
+          }
+        },
+        {
           "id": "unchanged-segments",
           "op": "sameAs",
           "source": {
@@ -26403,6 +26437,74 @@
           }
         },
         {
+          "id": "wire-domain-error-code",
+          "op": "equals",
+          "source": {
+            "actionId": "wire-result",
+            "pointer": "/response/body/result/structuredContent/error/code"
+          },
+          "expected": "IDEMPOTENCY_CONFLICT",
+          "requirementRefs": [
+            "D20"
+          ],
+          "evidenceRefs": [
+            "wire-result:actual-observation",
+            "wire-result:source-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "lotId": {
+              "$alias": "L"
+            }
+          },
+          "oracleExplanation": "같은 명령의 MCP tool result는 API와 같은 구조화 오류 코드 IDEMPOTENCY_CONFLICT를 structuredContent/error/code에 둔다. 다른 위치·문구로 대신하지 않는다(contracts/command-response.schema.json, s0-protocol.md).",
+          "oracleRef": {
+            "oracleId": "T20.mcp-stateless-wire",
+            "observationNames": [
+              "domain-parity"
+            ]
+          }
+        },
+        {
+          "id": "wire-is-error",
+          "op": "equals",
+          "source": {
+            "actionId": "wire-result",
+            "pointer": "/response/body/result/isError"
+          },
+          "expected": true,
+          "requirementRefs": [
+            "D20"
+          ],
+          "evidenceRefs": [
+            "wire-result:actual-observation",
+            "wire-result:source-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "lotId": {
+              "$alias": "L"
+            }
+          },
+          "oracleExplanation": "도메인 거부·충돌의 MCP tool result는 isError=true이고 도메인 outcome과 오류를 structuredContent에 담는다(contracts/mcp/s0-protocol.md 오류 표).",
+          "oracleRef": {
+            "oracleId": "T20.mcp-stateless-wire",
+            "observationNames": [
+              "domain-parity"
+            ]
+          }
+        },
+        {
           "id": "cross-route-replay-raw-method",
           "op": "equals",
           "source": {
@@ -27561,6 +27663,108 @@
           }
         },
         {
+          "id": "held-reservation-code",
+          "op": "equals",
+          "source": {
+            "actionId": "api-result",
+            "pointer": "/response/error/code"
+          },
+          "expected": "INSUFFICIENT_ELIGIBLE_QUANTITY",
+          "requirementRefs": [
+            "D20"
+          ],
+          "evidenceRefs": [
+            "api-result:actual-observation",
+            "api-result:source-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "lotId": {
+              "$alias": "L"
+            }
+          },
+          "oracleExplanation": "QC 보류 중인 B40 예약은 API에서 REJECTED·INSUFFICIENT_ELIGIBLE_QUANTITY다(계획 §3.4·§4.2).",
+          "oracleRef": {
+            "oracleId": "T20.mcp-stateless-wire",
+            "observationNames": [
+              "domain-parity"
+            ]
+          }
+        },
+        {
+          "id": "wire-domain-error-code",
+          "op": "equals",
+          "source": {
+            "actionId": "wire-result",
+            "pointer": "/response/body/result/structuredContent/error/code"
+          },
+          "expected": "INSUFFICIENT_ELIGIBLE_QUANTITY",
+          "requirementRefs": [
+            "D20"
+          ],
+          "evidenceRefs": [
+            "wire-result:actual-observation",
+            "wire-result:source-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "lotId": {
+              "$alias": "L"
+            }
+          },
+          "oracleExplanation": "같은 명령의 MCP tool result는 API와 같은 구조화 오류 코드 INSUFFICIENT_ELIGIBLE_QUANTITY를 structuredContent/error/code에 둔다. 다른 위치·문구로 대신하지 않는다(contracts/command-response.schema.json, s0-protocol.md).",
+          "oracleRef": {
+            "oracleId": "T20.mcp-stateless-wire",
+            "observationNames": [
+              "domain-parity"
+            ]
+          }
+        },
+        {
+          "id": "wire-is-error",
+          "op": "equals",
+          "source": {
+            "actionId": "wire-result",
+            "pointer": "/response/body/result/isError"
+          },
+          "expected": true,
+          "requirementRefs": [
+            "D20"
+          ],
+          "evidenceRefs": [
+            "wire-result:actual-observation",
+            "wire-result:source-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "lotId": {
+              "$alias": "L"
+            }
+          },
+          "oracleExplanation": "도메인 거부·충돌의 MCP tool result는 isError=true이고 도메인 outcome과 오류를 structuredContent에 담는다(contracts/mcp/s0-protocol.md 오류 표).",
+          "oracleRef": {
+            "oracleId": "T20.mcp-stateless-wire",
+            "observationNames": [
+              "domain-parity"
+            ]
+          }
+        },
+        {
           "id": "wire-result-raw-method",
           "op": "equals",
           "source": {
@@ -28530,6 +28734,74 @@
             }
           },
           "oracleExplanation": "forbidden-code: /response/error/code의 실제 equals 기대값은 \"FORBIDDEN\"다. 미관찰·UNKNOWN은 정상값이 아니다.",
+          "oracleRef": {
+            "oracleId": "T20.mcp-stateless-wire",
+            "observationNames": [
+              "domain-parity"
+            ]
+          }
+        },
+        {
+          "id": "wire-domain-error-code",
+          "op": "equals",
+          "source": {
+            "actionId": "wire-result",
+            "pointer": "/response/body/result/structuredContent/error/code"
+          },
+          "expected": "FORBIDDEN",
+          "requirementRefs": [
+            "D20"
+          ],
+          "evidenceRefs": [
+            "wire-result:actual-observation",
+            "wire-result:source-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "lotId": {
+              "$alias": "L"
+            }
+          },
+          "oracleExplanation": "같은 명령의 MCP tool result는 API와 같은 구조화 오류 코드 FORBIDDEN를 structuredContent/error/code에 둔다. 다른 위치·문구로 대신하지 않는다(contracts/command-response.schema.json, s0-protocol.md).",
+          "oracleRef": {
+            "oracleId": "T20.mcp-stateless-wire",
+            "observationNames": [
+              "domain-parity"
+            ]
+          }
+        },
+        {
+          "id": "wire-is-error",
+          "op": "equals",
+          "source": {
+            "actionId": "wire-result",
+            "pointer": "/response/body/result/isError"
+          },
+          "expected": true,
+          "requirementRefs": [
+            "D20"
+          ],
+          "evidenceRefs": [
+            "wire-result:actual-observation",
+            "wire-result:source-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "lotId": {
+              "$alias": "L"
+            }
+          },
+          "oracleExplanation": "도메인 거부·충돌의 MCP tool result는 isError=true이고 도메인 outcome과 오류를 structuredContent에 담는다(contracts/mcp/s0-protocol.md 오류 표).",
           "oracleRef": {
             "oracleId": "T20.mcp-stateless-wire",
             "observationNames": [
@@ -46901,11 +47173,10 @@
                 }
               },
               "credentialProfileRef": "manager",
-              "testBarrier": {
-                "barrierId": "T20-consume-left",
-                "participantId": "left",
-                "point": "BEFORE_MRTR_APPROVAL_CONSUMPTION"
-              }
+              "testTransactionId": "tx-left",
+              "testParticipantId": "left",
+              "testBarrierId": "T20-mrtr-approval-consumption",
+              "testBarrierPoint": "BEFORE_MRTR_APPROVAL_CONSUMPTION"
             },
             "evidenceRefs": [
               "call-left:redacted-raw-wire",
@@ -47044,11 +47315,10 @@
                 }
               },
               "credentialProfileRef": "manager",
-              "testBarrier": {
-                "barrierId": "T20-consume-right",
-                "participantId": "right",
-                "point": "BEFORE_MRTR_APPROVAL_CONSUMPTION"
-              }
+              "testTransactionId": "tx-right",
+              "testParticipantId": "right",
+              "testBarrierId": "T20-mrtr-approval-consumption",
+              "testBarrierPoint": "BEFORE_MRTR_APPROVAL_CONSUMPTION"
             },
             "evidenceRefs": [
               "call-right:redacted-raw-wire",
@@ -47067,14 +47337,9 @@
             "type": "barrier",
             "operation": "waitReached",
             "parameters": {
-              "barrierId": "T20-consume-left",
+              "barrierId": "T20-mrtr-approval-consumption",
               "participantId": "left",
-              "transactionId": {
-                "$result": {
-                  "actionId": "start-left",
-                  "pointer": "/data/transactionId"
-                }
-              },
+              "transactionId": "tx-left",
               "point": "BEFORE_MRTR_APPROVAL_CONSUMPTION",
               "state": "REACHED"
             }
@@ -47090,14 +47355,9 @@
             "type": "barrier",
             "operation": "waitReached",
             "parameters": {
-              "barrierId": "T20-consume-right",
+              "barrierId": "T20-mrtr-approval-consumption",
               "participantId": "right",
-              "transactionId": {
-                "$result": {
-                  "actionId": "start-right",
-                  "pointer": "/data/transactionId"
-                }
-              },
+              "transactionId": "tx-right",
               "point": "BEFORE_MRTR_APPROVAL_CONSUMPTION",
               "state": "REACHED"
             }
@@ -47113,14 +47373,9 @@
             "type": "barrier",
             "operation": "resume",
             "parameters": {
-              "barrierId": "T20-consume-left",
+              "barrierId": "T20-mrtr-approval-consumption",
               "participantId": "left",
-              "transactionId": {
-                "$result": {
-                  "actionId": "start-left",
-                  "pointer": "/data/transactionId"
-                }
-              },
+              "transactionId": "tx-left",
               "point": "BEFORE_MRTR_APPROVAL_CONSUMPTION",
               "state": "RESUMED"
             }
@@ -47145,14 +47400,9 @@
             "type": "barrier",
             "operation": "resume",
             "parameters": {
-              "barrierId": "T20-consume-right",
+              "barrierId": "T20-mrtr-approval-consumption",
               "participantId": "right",
-              "transactionId": {
-                "$result": {
-                  "actionId": "start-right",
-                  "pointer": "/data/transactionId"
-                }
-              },
+              "transactionId": "tx-right",
               "point": "BEFORE_MRTR_APPROVAL_CONSUMPTION",
               "state": "RESUMED"
             }
@@ -47540,6 +47790,45 @@
           "baseline": {
             "actionId": "db-before",
             "pointer": "/data/rawRows/outbox"
+          }
+        },
+        {
+          "id": "race-distinct-db-transactions",
+          "op": "notEquals",
+          "source": {
+            "actionId": "reached-left",
+            "pointer": "/data/database/transactionId"
+          },
+          "expected": {
+            "$result": {
+              "actionId": "reached-right",
+              "pointer": "/data/database/transactionId"
+            }
+          },
+          "requirementRefs": [
+            "D20"
+          ],
+          "evidenceRefs": [
+            "reached-left:actual-observation",
+            "reached-left:source-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "lotId": {
+              "$alias": "L"
+            }
+          },
+          "oracleExplanation": "두 참가자는 각자 멈춘 시점의 실제 PostgreSQL transaction ID를 ACK로 보고하며 서로 다르다. 요청의 tx-left·tx-right label을 복사하지 않는다(race-observation-contract.md).",
+          "oracleRef": {
+            "oracleId": "T20.mrtr-bound-state",
+            "observationNames": [
+              "mrtr-state"
+            ]
           }
         },
         {

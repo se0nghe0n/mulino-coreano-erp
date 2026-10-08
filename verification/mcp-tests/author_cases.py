@@ -45,6 +45,11 @@ def assertion(i,o,n,op,a,p,expected,field=None,where=None,baseline=None,unit=Fal
   x['unit']='BOX';x['unitSource']=src(a,'/data/rawRows/segments','unit') if a.startswith('db') else src(a,'/response/data/unit')
  return x
 
+# contracts/mcp/s0-protocol.md: a domain authority/revision/idempotency refusal is HTTP 200, resultType=complete,
+# isError=true and the domain outcome in structuredContent. The structured error code is the command-response
+# /error/code, read through the raw wire as /response/body/result/structuredContent/error/code.
+WIRE_DOMAIN_ERROR_EXPLAIN='도메인 거부·충돌의 MCP tool result는 isError=true이고 도메인 outcome과 오류를 structuredContent에 담는다(contracts/mcp/s0-protocol.md 오류 표).'
+DOMAIN_ERROR_CODE={'FORBIDDEN':'FORBIDDEN','CONFLICT':'IDEMPOTENCY_CONFLICT','REJECTED':'INSUFFICIENT_ELIGIBLE_QUANTITY'}
 def eq(i,o,n,a,p,v,**kw):return assertion(i,o,n,'equals',a,p,v,**kw)
 def same(i,o,n,a,p,b,bp,**kw):return assertion(i,o,n,'sameAs',a,p,None,baseline=src(b,bp),**kw)
 def rowset(i,o,n,a,table,fields,values,**kw):return assertion(i,o,n,'relationSet',a,'/data/rawRows/'+table,values,field=fields,**kw)
@@ -216,7 +221,7 @@ for v in variants:
 o='T20.mcp-stateless-wire'
 w=wire('wire','tools/call',{'name':'createDraft','arguments':typed()},actor='readAgent',transport='stdio');w['request']['headers']={};w['request'].pop('httpMethod',None)
 a=[setup(),action('noun','getInventory'),obs('db-before'),w,action('after','getInventory'),obs('db-after','after')]
-x=[eq('stdio-readonly-outcome',o,'wire-protocol','wire','/response/body/result/structuredContent/outcome','REJECTED'),eq('stdio-forbidden',o,'domain-parity','wire','/response/body/result/structuredContent/error/code','FORBIDDEN'),eq('stdio-transport',o,'wire-protocol','wire','/response/transport','stdio')]+no_effect(o,'domain-parity')
+x=[eq('stdio-readonly-outcome',o,'wire-protocol','wire','/response/body/result/structuredContent/outcome','REJECTED'),eq('stdio-forbidden',o,'domain-parity','wire','/response/body/result/structuredContent/error/code','FORBIDDEN'),eq('stdio-transport',o,'wire-protocol','wire','/response/transport','stdio'),eq('stdio-is-error',o,'domain-parity','wire','/response/body/result/isError',True,explain=WIRE_DOMAIN_ERROR_EXPLAIN)]+no_effect(o,'domain-parity')
 T20.append(sub('T20','stdio-readonly-write-denied','stdio도 현재 READ grant로 쓰기를 거부한다',o,a,x,['fixture','api','db','wire','stdio']))
 
 # API/MCP read projection and shared canonical command namespace.
@@ -246,6 +251,11 @@ for v in ['NEEDS_INPUT','WAITING_APPROVAL','CONFLICT','REJECTED','FORBIDDEN','AC
  elif v=='ACCEPTED_PENDING_EXTERNAL':x += [assertion('outbox-once',o,'domain-parity','count','db-after','/data/rawRows/outbox',1,where={'capabilityId':'dispatchPurchaseOrder'}),eq('external-unknown',o,'domain-parity','api-result','/response/externalState','UNKNOWN_EXTERNAL')]
  else:x+=no_effect(o,'domain-parity')
  if v=='FORBIDDEN':x.append(eq('forbidden-code',o,'domain-parity','api-result','/response/error/code','FORBIDDEN'))
+ if v=='REJECTED':x.append(eq('held-reservation-code',o,'domain-parity','api-result','/response/error/code','INSUFFICIENT_ELIGIBLE_QUANTITY',explain='QC 보류 중인 B40 예약은 API에서 REJECTED·INSUFFICIENT_ELIGIBLE_QUANTITY다(계획 §3.4·§4.2).'))
+ if v in DOMAIN_ERROR_CODE:
+  code=DOMAIN_ERROR_CODE[v]
+  x += [eq('wire-domain-error-code',o,'domain-parity','wire-result','/response/body/result/structuredContent/error/code',code,explain=f'같은 명령의 MCP tool result는 API와 같은 구조화 오류 코드 {code}를 structuredContent/error/code에 둔다. 다른 위치·문구로 대신하지 않는다(contracts/command-response.schema.json, s0-protocol.md).'),
+        eq('wire-is-error',o,'domain-parity','wire-result','/response/body/result/isError',True,explain=WIRE_DOMAIN_ERROR_EXPLAIN)]
  T20.append(sub('T20','domain-'+v.lower(),'API/MCP 도메인 '+v+' mapping과 동일 command namespace',o,a,x,['fixture','api','db','wire']))
 # MRTR issued state always comes from actual prior response, one bounded corruption only.
 # The fixture pins requestState TTL=600s from the issue instant (09:00:00Z).
@@ -313,19 +323,22 @@ for v,n in [('state-as-approval','requeststate-as-approval'),('accept-as-approva
 o='T20.mrtr-bound-state'
 a=[setup(),purchase_work(),action('proposal','proposePurchase',purchase_proposal('T20-mrtr-proposal'),'invoke',actor='writer'),action('noun','getInventory'),obs('db-before'),wire('approval-issued','tools/call',{'name':'approvePurchase','arguments':purchase_approval('T20-mrtr-approval-issued',collectDecision=True)},actor='manager')]
 starts=[]
+BARRIER='T20-mrtr-approval-consumption'
 for side in ['left','right']:
  args={'name':'approvePurchase','arguments':purchase_approval('T20-approval-'+side),'requestState':ref('approval-issued','/response/body/result/requestState'),'inputResponses':[{'requestId':ref('approval-issued','/response/body/result/inputRequests/0/requestId'),'value':{'decision':'APPROVE','proposalHash':ref('proposal','/response/proposalHash')}}]}
- call=wire('call-'+side,'tools/call',args,rpc='T20-approval-rpc-'+side,actor='manager');call['request']['testBarrier']={'barrierId':'T20-consume-'+side,'participantId':side,'point':'BEFORE_MRTR_APPROVAL_CONSUMPTION'}
+ # Test-only arming is the V8/V2 top-level request quartet (verification/cases/V2/race-observation-contract.md),
+ # outside the JSON-RPC body and the canonical intent hash; transactionId is a participant label.
+ call=wire('call-'+side,'tools/call',args,rpc='T20-approval-rpc-'+side,actor='manager');call['request'].update(testTransactionId='tx-'+side,testParticipantId=side,testBarrierId=BARRIER,testBarrierPoint='BEFORE_MRTR_APPROVAL_CONSUMPTION')
  starts.append({'id':side,'actions':[{'id':'start-'+side,'kind':'start','call':call,'evidenceRefs':['start-'+side+':actual-wire-submission']} ]})
 a.extend(branch['actions'][0] for branch in starts)
 for side in ['left','right']:
- a.append({'id':'reached-'+side,'kind':'control','control':{'type':'barrier','operation':'waitReached','parameters':{'barrierId':'T20-consume-'+side,'participantId':side,'transactionId':ref('start-'+side,'/data/transactionId'),'point':'BEFORE_MRTR_APPROVAL_CONSUMPTION','state':'REACHED'}},'evidenceRefs':['reached-'+side+':actual-barrier-ack']})
-a.append({'id':'resume-left','kind':'control','control':{'type':'barrier','operation':'resume','parameters':{'barrierId':'T20-consume-left','participantId':'left','transactionId':ref('start-left','/data/transactionId'),'point':'BEFORE_MRTR_APPROVAL_CONSUMPTION','state':'RESUMED'}},'evidenceRefs':['resume-left:actual-barrier-ack']})
+ a.append({'id':'reached-'+side,'kind':'control','control':{'type':'barrier','operation':'waitReached','parameters':{'barrierId':BARRIER,'participantId':side,'transactionId':'tx-'+side,'point':'BEFORE_MRTR_APPROVAL_CONSUMPTION','state':'REACHED'}},'evidenceRefs':['reached-'+side+':actual-barrier-ack']})
+a.append({'id':'resume-left','kind':'control','control':{'type':'barrier','operation':'resume','parameters':{'barrierId':BARRIER,'participantId':'left','transactionId':'tx-left','point':'BEFORE_MRTR_APPROVAL_CONSUMPTION','state':'RESUMED'}},'evidenceRefs':['resume-left:actual-barrier-ack']})
 a.append({'id':'left-terminal','kind':'await','awaitActionId':'start-left','timeoutSeconds':30,'evidenceRefs':['left-terminal:actual-terminal-and-commit']})
-a.append({'id':'resume-right','kind':'control','control':{'type':'barrier','operation':'resume','parameters':{'barrierId':'T20-consume-right','participantId':'right','transactionId':ref('start-right','/data/transactionId'),'point':'BEFORE_MRTR_APPROVAL_CONSUMPTION','state':'RESUMED'}},'evidenceRefs':['resume-right:actual-barrier-ack']})
+a.append({'id':'resume-right','kind':'control','control':{'type':'barrier','operation':'resume','parameters':{'barrierId':BARRIER,'participantId':'right','transactionId':'tx-right','point':'BEFORE_MRTR_APPROVAL_CONSUMPTION','state':'RESUMED'}},'evidenceRefs':['resume-right:actual-barrier-ack']})
 a.append({'id':'right-terminal','kind':'await','awaitActionId':'start-right','timeoutSeconds':30,'evidenceRefs':['right-terminal:actual-terminal-and-commit']})
 a += [action('after','getInventory'),obs('db-after','after')]
-x=[eq('first-input-required',o,'mrtr-state','approval-issued','/response/body/result/resultType','input_required'),eq('winner-approved',o,'mrtr-state','left-terminal','/response/body/result/structuredContent/outcome','APPLIED'),eq('loser-conflict',o,'mrtr-state','right-terminal','/response/body/result/structuredContent/outcome','CONFLICT'),eq('loser-state-consumed',o,'mrtr-state','right-terminal','/response/body/result/structuredContent/error/code','REQUEST_STATE_CONSUMED'),assertion('one-manager-approval',o,'mrtr-state','count','db-after','/data/rawRows/approvals',1,where={'proposalId':ref('proposal','/response/proposalId'),'decision':'APPROVE'}),assertion('one-state-consumption',o,'mrtr-state','count','db-after','/data/rawRows/commandResults',1,where={'kind':'MRTR_APPROVAL_STATE_CONSUMPTION','proposalId':ref('proposal','/response/proposalId')}),same('no-physical-approval-effect',o,'requeststate-as-approval','db-after','/data/rawRows/movements','db-before','/data/rawRows/movements'),same('no-dispatch-approval-effect',o,'accept-string-as-approval','db-after','/data/rawRows/outbox','db-before','/data/rawRows/outbox')]
+x=[eq('first-input-required',o,'mrtr-state','approval-issued','/response/body/result/resultType','input_required'),eq('winner-approved',o,'mrtr-state','left-terminal','/response/body/result/structuredContent/outcome','APPLIED'),eq('loser-conflict',o,'mrtr-state','right-terminal','/response/body/result/structuredContent/outcome','CONFLICT'),eq('loser-state-consumed',o,'mrtr-state','right-terminal','/response/body/result/structuredContent/error/code','REQUEST_STATE_CONSUMED'),assertion('one-manager-approval',o,'mrtr-state','count','db-after','/data/rawRows/approvals',1,where={'proposalId':ref('proposal','/response/proposalId'),'decision':'APPROVE'}),assertion('one-state-consumption',o,'mrtr-state','count','db-after','/data/rawRows/commandResults',1,where={'kind':'MRTR_APPROVAL_STATE_CONSUMPTION','proposalId':ref('proposal','/response/proposalId')}),same('no-physical-approval-effect',o,'requeststate-as-approval','db-after','/data/rawRows/movements','db-before','/data/rawRows/movements'),same('no-dispatch-approval-effect',o,'accept-string-as-approval','db-after','/data/rawRows/outbox','db-before','/data/rawRows/outbox'),assertion('race-distinct-db-transactions',o,'mrtr-state','notEquals','reached-left','/data/database/transactionId',ref('reached-right','/data/database/transactionId'),explain='두 참가자는 각자 멈춘 시점의 실제 PostgreSQL transaction ID를 ACK로 보고하며 서로 다르다. 요청의 tx-left·tx-right label을 복사하지 않는다(race-observation-contract.md).')]
 for side in ['left','right']:
  x += [eq(side+'-raw-new-rpc',o,'mrtr-state',side+'-terminal','/data/transcript/request/body/id','T20-approval-rpc-'+side),eq(side+'-effect-key',o,'mrtr-state',side+'-terminal','/data/transcript/request/body/params/arguments/commandIdempotencyKey','T20-approval-'+side),same(side+'-actual-issued-state',o,'mrtr-state',side+'-terminal','/data/transcript/request/body/params/requestState','approval-issued','/response/body/result/requestState'),eq(side+'-terminal-ack',o,'mrtr-state',side+'-terminal','/data/completed',True),same(side+'-same-handle',o,'mrtr-state',side+'-terminal','/data/invocationHandle','start-'+side,'/data/invocationHandle')]
 T20.append(sub('T20','mrtr-concurrent-approval-consumption','두 실제 wire 거래의 manager 승인 state single-use 소비',o,a,x,['fixture','api','db','wire','barrier']))

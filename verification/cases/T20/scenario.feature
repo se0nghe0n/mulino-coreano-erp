@@ -612,6 +612,7 @@
     그러면 "stdio-readonly-outcome" assertion으로 "stdio-readonly-outcome: /response/body/result/structuredContent/outcome의 실제 equals 기대값은 'REJECTED'다. 미관찰·UNKNOWN은 정상값이 아니다."를 확인한다
     그러면 "stdio-forbidden" assertion으로 "stdio-forbidden: /response/body/result/structuredContent/error/code의 실제 equals 기대값은 'FORBIDDEN'다. 미관찰·UNKNOWN은 정상값이 아니다."를 확인한다
     그러면 "stdio-transport" assertion으로 "stdio-transport: /response/transport의 실제 equals 기대값은 'stdio'다. 미관찰·UNKNOWN은 정상값이 아니다."를 확인한다
+    그러면 "stdio-is-error" assertion으로 "도메인 거부·충돌의 MCP tool result는 isError=true이고 도메인 outcome과 오류를 structuredContent에 담는다(contracts/mcp/s0-protocol.md 오류 표)."를 확인한다
     그러면 "unchanged-segments" assertion으로 "승인·실물·배분·업무·외부효과의 전후 원행을 exact 대조한다. 허용 감사는 이 불변 대상에서 분리한다."를 확인한다
     그러면 "unchanged-movements" assertion으로 "승인·실물·배분·업무·외부효과의 전후 원행을 exact 대조한다. 허용 감사는 이 불변 대상에서 분리한다."를 확인한다
     그러면 "unchanged-allocations" assertion으로 "승인·실물·배분·업무·외부효과의 전후 원행을 exact 대조한다. 허용 감사는 이 불변 대상에서 분리한다."를 확인한다
@@ -710,6 +711,8 @@
     그러면 "cross-route-work-id" assertion으로 "cross-route-work-id: cross-route-replay의 /response/body/result/structuredContent/workId와 first의 /response/workId를 같은 scope에서 exact 대조한다."를 확인한다
     그러면 "shared-namespace-effect-once" assertion으로 "shared-namespace-effect-once: /data/rawRows/works의 scope·filter를 만족하는 실제 원행은 정확히 1개다."를 확인한다
     그러면 "changed-payload-conflict" assertion으로 "changed-payload-conflict: /response/error/code의 실제 equals 기대값은 'IDEMPOTENCY_CONFLICT'다. 미관찰·UNKNOWN은 정상값이 아니다."를 확인한다
+    그러면 "wire-domain-error-code" assertion으로 "같은 명령의 MCP tool result는 API와 같은 구조화 오류 코드 IDEMPOTENCY_CONFLICT를 structuredContent/error/code에 둔다. 다른 위치·문구로 대신하지 않는다(contracts/command-response.schema.json, s0-protocol.md)."를 확인한다
+    그러면 "wire-is-error" assertion으로 "도메인 거부·충돌의 MCP tool result는 isError=true이고 도메인 outcome과 오류를 structuredContent에 담는다(contracts/mcp/s0-protocol.md 오류 표)."를 확인한다
     그러면 "cross-route-replay-raw-method" assertion으로 "cross-route-replay-raw-method: /data/transcript/request/body/method의 실제 equals 기대값은 'tools/call'다. 미관찰·UNKNOWN은 정상값이 아니다."를 확인한다
     그러면 "cross-route-replay-raw-jsonrpc-id" assertion으로 "cross-route-replay-raw-jsonrpc-id: /data/transcript/request/body/id의 실제 equals 기대값은 'cross-route-replay'다. 미관찰·UNKNOWN은 정상값이 아니다."를 확인한다
     그러면 "cross-route-replay-raw-MCP-Protocol-Version" assertion으로 "cross-route-replay-raw-MCP-Protocol-Version: /data/transcript/request/headers/MCP-Protocol-Version의 실제 equals 기대값은 '2026-07-28'다. 미관찰·UNKNOWN은 정상값이 아니다."를 확인한다
@@ -742,6 +745,9 @@
     그러면 "unchanged-approvals" assertion으로 "승인·실물·배분·업무·외부효과의 전후 원행을 exact 대조한다. 허용 감사는 이 불변 대상에서 분리한다."를 확인한다
     그러면 "unchanged-works" assertion으로 "승인·실물·배분·업무·외부효과의 전후 원행을 exact 대조한다. 허용 감사는 이 불변 대상에서 분리한다."를 확인한다
     그러면 "unchanged-outbox" assertion으로 "승인·실물·배분·업무·외부효과의 전후 원행을 exact 대조한다. 허용 감사는 이 불변 대상에서 분리한다."를 확인한다
+    그러면 "held-reservation-code" assertion으로 "QC 보류 중인 B40 예약은 API에서 REJECTED·INSUFFICIENT_ELIGIBLE_QUANTITY다(계획 §3.4·§4.2)."를 확인한다
+    그러면 "wire-domain-error-code" assertion으로 "같은 명령의 MCP tool result는 API와 같은 구조화 오류 코드 INSUFFICIENT_ELIGIBLE_QUANTITY를 structuredContent/error/code에 둔다. 다른 위치·문구로 대신하지 않는다(contracts/command-response.schema.json, s0-protocol.md)."를 확인한다
+    그러면 "wire-is-error" assertion으로 "도메인 거부·충돌의 MCP tool result는 isError=true이고 도메인 outcome과 오류를 structuredContent에 담는다(contracts/mcp/s0-protocol.md 오류 표)."를 확인한다
     그러면 "wire-result-raw-method" assertion으로 "wire-result-raw-method: /data/transcript/request/body/method의 실제 equals 기대값은 'tools/call'다. 미관찰·UNKNOWN은 정상값이 아니다."를 확인한다
     그러면 "wire-result-raw-jsonrpc-id" assertion으로 "wire-result-raw-jsonrpc-id: /data/transcript/request/body/id의 실제 equals 기대값은 'wire-result'다. 미관찰·UNKNOWN은 정상값이 아니다."를 확인한다
     그러면 "wire-result-raw-MCP-Protocol-Version" assertion으로 "wire-result-raw-MCP-Protocol-Version: /data/transcript/request/headers/MCP-Protocol-Version의 실제 equals 기대값은 '2026-07-28'다. 미관찰·UNKNOWN은 정상값이 아니다."를 확인한다
@@ -769,6 +775,8 @@
     그러면 "unchanged-works" assertion으로 "승인·실물·배분·업무·외부효과의 전후 원행을 exact 대조한다. 허용 감사는 이 불변 대상에서 분리한다."를 확인한다
     그러면 "unchanged-outbox" assertion으로 "승인·실물·배분·업무·외부효과의 전후 원행을 exact 대조한다. 허용 감사는 이 불변 대상에서 분리한다."를 확인한다
     그러면 "forbidden-code" assertion으로 "forbidden-code: /response/error/code의 실제 equals 기대값은 'FORBIDDEN'다. 미관찰·UNKNOWN은 정상값이 아니다."를 확인한다
+    그러면 "wire-domain-error-code" assertion으로 "같은 명령의 MCP tool result는 API와 같은 구조화 오류 코드 FORBIDDEN를 structuredContent/error/code에 둔다. 다른 위치·문구로 대신하지 않는다(contracts/command-response.schema.json, s0-protocol.md)."를 확인한다
+    그러면 "wire-is-error" assertion으로 "도메인 거부·충돌의 MCP tool result는 isError=true이고 도메인 outcome과 오류를 structuredContent에 담는다(contracts/mcp/s0-protocol.md 오류 표)."를 확인한다
     그러면 "wire-result-raw-method" assertion으로 "wire-result-raw-method: /data/transcript/request/body/method의 실제 equals 기대값은 'tools/call'다. 미관찰·UNKNOWN은 정상값이 아니다."를 확인한다
     그러면 "wire-result-raw-jsonrpc-id" assertion으로 "wire-result-raw-jsonrpc-id: /data/transcript/request/body/id의 실제 equals 기대값은 'wire-result'다. 미관찰·UNKNOWN은 정상값이 아니다."를 확인한다
     그러면 "wire-result-raw-MCP-Protocol-Version" assertion으로 "wire-result-raw-MCP-Protocol-Version: /data/transcript/request/headers/MCP-Protocol-Version의 실제 equals 기대값은 '2026-07-28'다. 미관찰·UNKNOWN은 정상값이 아니다."를 확인한다
@@ -1241,6 +1249,7 @@
     그러면 "one-state-consumption" assertion으로 "one-state-consumption: /data/rawRows/commandResults의 scope·filter를 만족하는 실제 원행은 정확히 1개다."를 확인한다
     그러면 "no-physical-approval-effect" assertion으로 "no-physical-approval-effect: db-after의 /data/rawRows/movements와 db-before의 /data/rawRows/movements를 같은 scope에서 exact 대조한다."를 확인한다
     그러면 "no-dispatch-approval-effect" assertion으로 "no-dispatch-approval-effect: db-after의 /data/rawRows/outbox와 db-before의 /data/rawRows/outbox를 같은 scope에서 exact 대조한다."를 확인한다
+    그러면 "race-distinct-db-transactions" assertion으로 "두 참가자는 각자 멈춘 시점의 실제 PostgreSQL transaction ID를 ACK로 보고하며 서로 다르다. 요청의 tx-left·tx-right label을 복사하지 않는다(race-observation-contract.md)."를 확인한다
     그러면 "left-raw-new-rpc" assertion으로 "left-raw-new-rpc: /data/transcript/request/body/id의 실제 equals 기대값은 'T20-approval-rpc-left'다. 미관찰·UNKNOWN은 정상값이 아니다."를 확인한다
     그러면 "left-effect-key" assertion으로 "left-effect-key: /data/transcript/request/body/params/arguments/commandIdempotencyKey의 실제 equals 기대값은 'T20-approval-left'다. 미관찰·UNKNOWN은 정상값이 아니다."를 확인한다
     그러면 "left-actual-issued-state" assertion으로 "left-actual-issued-state: left-terminal의 /data/transcript/request/body/params/requestState와 approval-issued의 /response/body/result/requestState를 같은 scope에서 exact 대조한다."를 확인한다
