@@ -526,13 +526,25 @@ class CoverageSelftest(unittest.TestCase):
         self.assertEqual('NOT_RUN', model['status'])
         self.assertTrue(any(i['status'] == 'FAIL' for i in self.a.problems))
 
+    def consistent_not_run_manifest(self):
+        # Mutation tests below need a NOT_RUN manifest. Repository-state preparation FAILs, such as
+        # cross-owner unreachable required profiles, are asserted by their own tests.
+        result = copy.deepcopy(m.Assembly(HERE.parents[1]).assemble({'profiles': []}))
+        result['preparationProblems'] = [p for p in result['preparationProblems'] if p['status'] != 'FAIL']
+        result['coverageProblems'] = [p for p in result['coverageProblems'] if p['status'] != 'FAIL']
+        result.update(status='NOT_RUN', exitCode=2, runtimeStatus='NOT_RUN', artifactCoverageStatus='NOT_RUN',
+                      preparationStatus='NOT_RUN' if result['preparationStatus'] == 'FAIL' else result['preparationStatus'])
+        return m.validate_manifest(result)
+
     def test_real_baseline_absence_is_complete_499_not_run_inventory(self):
         root = HERE.parents[1]
         result = m.Assembly(root).assemble({'profiles': []})
         m.validate_manifest(result)
         self.assertEqual(122, result['oracleCount'])
         self.assertEqual(499, result['observationCount'])
-        self.assertEqual('NOT_RUN', result['status'])
+        # No runtime evidence: NOT_RUN, or FAIL only from observed preparation defects.
+        self.assertIn(result['status'], ('NOT_RUN', 'FAIL'))
+        self.assertEqual(result['status'] == 'FAIL', any(p['status'] == 'FAIL' for p in result['preparationProblems'] + result['coverageProblems']))
         self.assertFalse(result['gateComplete'])
         self.assertFalse(result['productRuntimeClaimed'])
         self.assertEqual('NOT_RUN', result['model']['status'])
@@ -540,7 +552,7 @@ class CoverageSelftest(unittest.TestCase):
         self.assertTrue(all(o['status'] == 'NOT_RUN' for o in result['namedObservations']))
 
     def test_forged_summary_completion_and_downgrade_rejected(self):
-        result = m.Assembly(HERE.parents[1]).assemble({'profiles': []})
+        result = self.consistent_not_run_manifest()
         for flag in ['gateComplete', 'runtimeComplete', 'productRuntimeClaimed']:
             with self.subTest(flag=flag):
                 mutant = copy.deepcopy(result)
@@ -562,7 +574,7 @@ class CoverageSelftest(unittest.TestCase):
             m.validate_saved(root, mutant)
 
     def test_observed_case_failure_cannot_be_downgraded_to_not_run(self):
-        result = m.Assembly(HERE.parents[1]).assemble({'profiles': []})
+        result = self.consistent_not_run_manifest()
         result['cases'] = [{'caseId': 'T01', 'subcaseId': 'one', 'profile': 'scenarios', 'status': 'FAIL'}]
         with self.assertRaises(ValueError):
             m.validate_manifest(result)

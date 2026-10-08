@@ -17,8 +17,13 @@ class CoverageSchemaTest {
         Process process=new ProcessBuilder("python3","verification/coverage/assemble.py").directory(root.toFile()).redirectErrorStream(true).start();
         String output=new String(process.getInputStream().readAllBytes());
         int exit=process.waitFor();
-        assertEquals(2,exit,output);
-        return mapper.readTree(root.resolve("verification/harness/target/evidence/runtime-manifest.json").toFile());
+        // Without runtime evidence the gate is NOT_RUN(2), or FAIL(1) when preparation observed a
+        // structural defect such as an unreachable required profile. It is never PASS.
+        assertTrue(exit==1||exit==2,output);
+        JsonNode value=mapper.readTree(root.resolve("verification/harness/target/evidence/runtime-manifest.json").toFile());
+        assertEquals(exit,value.path("exitCode").asInt(),output);
+        assertNotEquals("PASS",value.path("status").asText());
+        return value;
     }
     @Test void currentNotRunAssemblySatisfiesNewAndBaseManifestSchemas() throws Exception {
         JsonNode value=assemble();ContractValidator validator=new ContractValidator(root);
