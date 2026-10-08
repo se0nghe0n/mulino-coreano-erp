@@ -20,8 +20,13 @@ Evidence of a layer (static classification of the declared source, not of runtim
   filtered by artifactKind db_snapshot or profile scenarios. The harness already enforces
   db_snapshot attribution (CatalogLinkValidator, sibling observations allowed).
 
-Exit 0: no unexplained gap. Exit 1: an observation without layer evidence that is neither
-an EXEMPTION (reviewed reason) nor a KNOWN_OPEN gap of another owner.
+Exceptions are recorded in layer-route-review.json, each with an owner and a reason: EXEMPT
+(reviewed: the observation is not about that layer) or KNOWN_OPEN (a real gap of a named owner,
+with a closing condition). ./verify prepare runs this check and lists KNOWN_OPEN rows; the coverage
+assembler loads review() and keeps every KNOWN_OPEN observation NOT_RUN.
+
+Exit 0: every gap is a recorded entry. Exit 1: an unexplained gap, a malformed entry, or an
+entry that no longer matches a gap (the list must be exact, so a closed gap forces its deletion).
 """
 import argparse, json, pathlib, sys
 
@@ -31,20 +36,53 @@ MCP_ROUTES = {'mcp', 'wire'}
 MCP_POINTERS = ('/toolTranscript', '/transcript', 'toolCalls', 'wireTranscripts', 'protocolTranscript')
 SKILL_POINTERS = ('skillLoading', '/loading', 'referenceReads', 'loadingObservations', 'skillDiscoveryStatus', 'skillBodyStatus')
 
-# Reviewed exemptions: the observation is not about what the MCP/SKILLS path returns.
-EXEMPTIONS = {
-    ('E1.whole-runtime-and-model-reference', 'model-reference', 'MCP'):
-        'Reads the independent host model-gate inputs (catalog oracle, R8 status, model plan). The oracle MCP layer '
-        'is exercised by actual-runtime-observation through runtime-mcp in the same subcase; an MCP business read '
-        'cannot prove the model gate separation.',
-}
-# Gaps owned by other workers; reported, not failed, until the owner closes them.
-KNOWN_OPEN = {
-    ('T20.skills-real-loading-and-meaning', 'allowed-tools-as-server-authorization', 'SKILLS'): 'T20 owner (cases-a)',
-    ('T20.skills-real-loading-and-meaning', 'document-instruction-authority', 'SKILLS'): 'T20 owner (cases-a)',
-    ('T20.skills-real-loading-and-meaning', 'skill-hash-as-loading-proof', 'MCP'): 'T20 owner (cases-a)',
-    ('V4.all-alternate-write-paths', 'mixed-batch-allowed-partial-effects', 'MCP'): 'V4 owner',
-}
+REVIEW = 'verification/requirements/layer-route-review.json'
+REVIEW_STATUSES = ('EXEMPT', 'KNOWN_OPEN')
+REQUIRED_ENTRY_FIELDS = ('status', 'oracleId', 'observationName', 'layer', 'owner', 'reason')
+
+
+def load_review(root):
+    """The recorded EXEMPT/KNOWN_OPEN list. Every entry names an owner and a reason; KNOWN_OPEN also a closing condition."""
+    review = json.loads((root / REVIEW).read_text())
+    entries, problems = {}, []
+    if review.get('schemaVersion') != '1.0.0' or review.get('recordType') != 'LAYER_ROUTE_REVIEW' or not isinstance(review.get('entries'), list):
+        return entries, ['layer-route review record has an unknown shape']
+    for entry in review['entries']:
+        if not isinstance(entry, dict) or any(not isinstance(entry.get(k), str) or not entry[k].strip() for k in REQUIRED_ENTRY_FIELDS):
+            problems.append(f'layer-route review entry lacks {"/".join(REQUIRED_ENTRY_FIELDS)}: {entry}')
+            continue
+        if entry['status'] not in REVIEW_STATUSES or entry['layer'] not in ('MCP', 'SKILLS'):
+            problems.append(f'layer-route review entry has unknown status/layer: {entry}')
+            continue
+        if entry['status'] == 'KNOWN_OPEN' and (not isinstance(entry.get('closeWhen'), str) or not entry['closeWhen'].strip()):
+            problems.append(f'KNOWN_OPEN entry needs closeWhen: {entry["oracleId"]}/{entry["observationName"]}')
+            continue
+        key = (entry['oracleId'], entry['observationName'], entry['layer'])
+        if key in entries:
+            problems.append(f'duplicate layer-route review entry {key}')
+        entries[key] = entry
+    return entries, problems
+
+
+def review(root):
+    """Classify every MCP/SKILLS gap against the recorded list.
+
+    Returns (rows, problems): rows are (status, caseId, oracleId, observationName, layer, owner) for every gap;
+    problems are unexplained gaps, malformed entries and entries that no longer match a gap (a stale allowlist)."""
+    entries, problems = load_review(root)
+    rows, matched = [], set()
+    for case_id, oracle_id, name, layer in gaps(root):
+        key = (oracle_id, name, layer)
+        entry = entries.get(key)
+        if entry is None:
+            rows.append(('GAP', case_id, oracle_id, name, layer, None))
+            problems.append(f'unexplained layer route gap {case_id} {oracle_id}/{name} {layer}')
+        else:
+            matched.add(key)
+            rows.append((entry['status'], case_id, oracle_id, name, layer, entry['owner']))
+    for key in sorted(set(entries) - matched):
+        problems.append(f'stale layer-route review entry (no longer a gap; delete it): {key[0]}/{key[1]} {key[2]}')
+    return rows, problems
 
 
 def flatten(actions):
@@ -135,21 +173,18 @@ def main():
     parser.add_argument('--root', type=pathlib.Path, default=ROOT)
     parser.add_argument('--include-db', action='store_true', help='also list DB layer gaps (informational)')
     args = parser.parse_args()
-    unexplained = []
-    for case_id, oracle_id, name, layer in gaps(args.root, ('MCP', 'SKILLS', 'DB') if args.include_db else ('MCP', 'SKILLS')):
-        key = (oracle_id, name, layer)
-        if key in EXEMPTIONS:
-            status = 'EXEMPT'
-        elif key in KNOWN_OPEN:
-            status = 'KNOWN_OPEN ' + KNOWN_OPEN[key]
-        elif layer == 'DB':
-            status = 'INFO'
-        else:
-            status = 'GAP'
-            unexplained.append(key)
-        print(f'{status}\t{case_id}\t{oracle_id}/{name}\t{layer}')
-    print(json.dumps({'status': 'FAIL' if unexplained else 'VALID', 'unexplainedGaps': len(unexplained), 'runtimeCoverage': 'NOT_RUN'}))
-    return 1 if unexplained else 0
+    rows, problems = review(args.root)
+    for status, case_id, oracle_id, name, layer, owner in rows:
+        print(f'{status}{" " + owner if status == "KNOWN_OPEN" else ""}\t{case_id}\t{oracle_id}/{name}\t{layer}')
+    if args.include_db:
+        for case_id, oracle_id, name, layer in gaps(args.root, ('DB',)):
+            print(f'INFO\t{case_id}\t{oracle_id}/{name}\t{layer}')
+    for problem in problems:
+        print('PROBLEM\t' + problem)
+    known_open = sum(1 for row in rows if row[0] == 'KNOWN_OPEN')
+    print(json.dumps({'status': 'FAIL' if problems else 'VALID', 'unexplainedGaps': sum(1 for row in rows if row[0] == 'GAP'),
+                      'knownOpen': known_open, 'problems': len(problems), 'runtimeCoverage': 'NOT_RUN'}))
+    return 1 if problems else 0
 
 
 if __name__ == '__main__':

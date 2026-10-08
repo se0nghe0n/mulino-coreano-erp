@@ -10,6 +10,7 @@ class LayerRoutes(unittest.TestCase):
         catalog = json.loads((ROOT / 'verification/requirements/mandatory-oracles.json').read_text())
         (tmp / 'verification/requirements').mkdir(parents=True)
         shutil.copy2(ROOT / 'verification/requirements/mandatory-oracles.json', tmp / 'verification/requirements/mandatory-oracles.json')
+        shutil.copy2(ROOT / 'verification/requirements/layer-route-review.json', tmp / 'verification/requirements/layer-route-review.json')
         for case_id in catalog['requiredCaseIds']:
             (tmp / f'verification/cases/{case_id}').mkdir(parents=True)
             shutil.copy2(ROOT / f'verification/cases/{case_id}/case.json', tmp / f'verification/cases/{case_id}/case.json')
@@ -21,12 +22,37 @@ class LayerRoutes(unittest.TestCase):
         done = self.run_check(ROOT)
         self.assertEqual(0, done.returncode, done.stdout + done.stderr)
 
-    def mutate(self, case_id, change):
+    def mutate(self, case_id, change, review=None):
         with tempfile.TemporaryDirectory() as name:
             tmp = pathlib.Path(name); self.copy(tmp)
             path = tmp / f'verification/cases/{case_id}/case.json'
             case = json.loads(path.read_text()); change(case); path.write_text(json.dumps(case))
+            if review:
+                rpath = tmp / 'verification/requirements/layer-route-review.json'
+                record = json.loads(rpath.read_text()); review(record); rpath.write_text(json.dumps(record))
             return self.run_check(tmp)
+
+    def test_known_open_is_listed_with_owner(self):
+        done = self.run_check(ROOT)
+        self.assertIn('KNOWN_OPEN V4 case owner', done.stdout)
+        self.assertIn('"knownOpen": 4', done.stdout)
+
+    def test_stale_known_open_entry_fails(self):
+        # A closed gap whose entry stays in the list would silently re-open the allowlist: the list must be exact.
+        def add(record):
+            record['entries'].append(dict(record['entries'][-1], observationName='authorized-control-effects'))
+        done = self.mutate('V4', lambda case: None, add)
+        self.assertEqual(1, done.returncode, done.stdout)
+        self.assertIn('stale layer-route review entry', done.stdout)
+
+    def test_known_open_without_owner_or_closing_condition_fails(self):
+        for field in ('owner', 'closeWhen', 'reason'):
+            with self.subTest(field=field):
+                def strip(record):
+                    entry = next(e for e in record['entries'] if e['status'] == 'KNOWN_OPEN'); entry[field] = ' '
+                done = self.mutate('V4', lambda case: None, strip)
+                self.assertEqual(1, done.returncode, done.stdout)
+                self.assertIn('unexplained layer route gap', done.stdout)
 
     def test_api_only_duty_check_is_a_gap(self):
         def drop(case):
