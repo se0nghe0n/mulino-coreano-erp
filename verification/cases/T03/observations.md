@@ -87,7 +87,7 @@ Q100=60+40, 합침100으로 돌아가도 retired 부모는 현재량에 더하�
 - `invalid-results-8` → `T03.cycle-and-retired-parent / invalid-results`: 허용된 denial 감사1과 금지된 업무 효과0을 분리한다.
 - `active-physical-identities` → `T03.cycle-and-retired-parent / invalid-results`: 현재 active 실물 identity를 한 번씩만 합산하며 중복 실물은 거부한다.
 - `response-definition-version` → `T03.cycle-and-retired-parent / invalid-results`: 수량/제한을 읽는 실제 정의 버전은 고정 v1이며 다른 의미로 대체하지 않는다.
-- `cycle-specific-error` → `T03.cycle-and-retired-parent / invalid-results`: active 자식에서 ancestor 부모로 되돌리는 edge는 계보 순환 오류로 거부한다.
+- `cycle-specific-error` → `T03.cycle-and-retired-parent / invalid-results`: 응답의 구조화 오류 코드 /response/error/code가 GENEALOGY_CYCLE다(계획 §3.4, contracts/command-response.schema.json).
 - `actual-baseline-physical-rows` → `T03.cycle-and-retired-parent / invalid-results`: 서버에 실제 설치된 시작 실물의 ID·decimal·unit을 원 행에서 확인한다. baseline 자체는 업무 실행 coverage가 아니다.
 
 ## reject-consumeRetiredParent
@@ -163,13 +163,13 @@ Q100=60+40, 합침100으로 돌아가도 retired 부모는 현재량에 더하�
 - `current-candidate-scope-3` → `T03.indistinguishable-mixture / current-candidate-scope`: 실물량·단위와 독립 손계산을 대조한다.
 - `current-candidate-scope-4` → `T03.indistinguishable-mixture / current-candidate-scope`: 실물량·단위와 독립 손계산을 대조한다.
 - `current-candidate-scope-5` → `T03.indistinguishable-mixture / current-candidate-scope`: 독립 원 행의 실물·수량·관계·범위를 정확히 대조한다.
-- `arbitrary-clean-selection-6` → `T03.indistinguishable-mixture / arbitrary-clean-selection`: 공개 명령의 구조화 outcome을 확인한다.
+- `arbitrary-clean-selection-6` → `T03.indistinguishable-mixture / arbitrary-clean-selection`: 분리 근거 없는 식별 불가능 혼합 물량의 임의 깨끗한 선택 해제는 효과 없이 HELD로 보류된다(D03 식별 불가능 혼합 범위 보류).
 - `arbitrary-clean-selection-7` → `T03.indistinguishable-mixture / arbitrary-clean-selection`: 금지 효과의 동일 scope 전후 원 행을 비교한다. 조회/거부 감사는 별도 scope다.
 - `arbitrary-clean-selection-8` → `T03.indistinguishable-mixture / arbitrary-clean-selection`: 금지 효과의 동일 scope 전후 원 행을 비교한다. 조회/거부 감사는 별도 scope다.
 - `arbitrary-clean-selection-9` → `T03.indistinguishable-mixture / arbitrary-clean-selection`: 금지 효과의 동일 scope 전후 원 행을 비교한다. 조회/거부 감사는 별도 scope다.
 - `arbitrary-clean-selection-10` → `T03.indistinguishable-mixture / arbitrary-clean-selection`: 허용된 denial 감사1과 금지된 업무 효과0을 분리한다.
 - `trace-certainty-11` → `T03.indistinguishable-mixture / trace-certainty`: 계보의 영향 후보와 오염 확정을 구분한다.
-- `trace-certainty-12` → `T03.indistinguishable-mixture / trace-certainty`: 부분 해제는 실제 분리/검사 근거가 필요하다.
+- `trace-certainty-12` → `T03.indistinguishable-mixture / trace-certainty`: 보류 이유는 정확한 분리 범위의 검증 증거가 없다는 EVIDENCE_UNVERIFIED다(contracts/domain-vocabulary.json EVIDENCE_UNVERIFIED=HELD, 계획 §4.2).
 - `trace-certainty-13` → `T03.indistinguishable-mixture / trace-certainty`: 독립 원 행의 실물·수량·관계·범위를 정확히 대조한다.
 - `active-physical-identities` → `T03.indistinguishable-mixture / source-affected`: 현재 active 실물 identity를 한 번씩만 합산하며 중복 실물은 거부한다.
 - `response-definition-version` → `T03.indistinguishable-mixture / source-affected`: 수량/제한을 읽는 실제 정의 버전은 고정 v1이며 다른 의미로 대체하지 않는다.

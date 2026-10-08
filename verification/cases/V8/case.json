@@ -1144,7 +1144,8 @@
               "externalEffects",
               "schemaCatalog",
               "restoreSessions",
-              "recoveryObligations"
+              "recoveryObligations",
+              "queryAudit"
             ]
           },
           "evidenceRefs": [
@@ -1530,12 +1531,27 @@
         },
         {
           "id": "허용-denial-audit",
-          "op": "equals",
+          "op": "relationSet",
           "source": {
             "actionId": "after",
-            "pointer": "/data/rawRows/denialAudit/0/outcome"
+            "pointer": "/data/rawRows/queryAudit",
+            "where": {
+              "actorId": {
+                "$alias": "outsider"
+              },
+              "capabilityId": "getInventory"
+            },
+            "field": [
+              "outcome",
+              "errorCode"
+            ]
           },
-          "expected": "FORBIDDEN",
+          "expected": [
+            [
+              "REJECTED",
+              "FORBIDDEN"
+            ]
+          ],
           "requirementRefs": [
             "D23",
             "D24",

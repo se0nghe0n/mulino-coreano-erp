@@ -220,12 +220,12 @@
     만일 "A" 역할이 "stale-close" 행동을 수행한다
     만일 "A" 역할이 "after-db-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "after-db" 행동을 수행한다
-    그러면 "stale-close-outcome" assertion으로 "업무 상태의 독립 판정 stale-revision. stale-revision-effects의 독립 고정 기대값을 대조한다."를 확인한다
+    그러면 "stale-close-outcome" assertion으로 "오래된 revision 종료 요청은 CONFLICT다"를 확인한다
     그러면 "stale-close-works-unchanged" assertion으로 "같은 대상의 독립 전후 원행을 비교한다. 조회/거부 감사의 추가는 별도 허용한다."를 확인한다
     그러면 "stale-close-movements-unchanged" assertion으로 "같은 대상의 독립 전후 원행을 비교한다. 조회/거부 감사의 추가는 별도 허용한다."를 확인한다
     그러면 "stale-close-assignments-unchanged" assertion으로 "같은 대상의 독립 전후 원행을 비교한다. 조회/거부 감사의 추가는 별도 허용한다."를 확인한다
     그러면 "stale-close-outbox-unchanged" assertion으로 "같은 대상의 독립 전후 원행을 비교한다. 조회/거부 감사의 추가는 별도 허용한다."를 확인한다
-    그러면 "stale-close-denial-audit" assertion으로 "업무 상태의 독립 판정 stale-revision. stale-revision-effects의 독립 고정 기대값을 대조한다."를 확인한다
+    그러면 "stale-close-denial-audit" assertion으로 "이 종료 요청의 CONFLICT 감사가 정확히 1건 남는다"를 확인한다
     그러면 "stale-code" assertion으로 "업무 상태의 독립 판정 stale-revision. stale-revision-effects의 독립 고정 기대값을 대조한다."를 확인한다
 
   시나리오: 업무 상태의 독립 판정 cancel-after-shipment

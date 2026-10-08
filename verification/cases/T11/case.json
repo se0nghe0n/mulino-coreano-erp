@@ -1245,7 +1245,7 @@
             "actionId": "rejected-db",
             "pointer": "/data/rawRows/audit",
             "where": {
-              "commandKey": "T11-parent90-cancelled-false-close",
+              "commandIdempotencyKey": "T11-parent90-cancelled-false-close",
               "outcome": "REJECTED"
             }
           },
@@ -2989,7 +2989,7 @@
             "actionId": "rejected-db",
             "pointer": "/data/rawRows/audit",
             "where": {
-              "commandKey": "T11-parent90-impossible-false-close",
+              "commandIdempotencyKey": "T11-parent90-impossible-false-close",
               "outcome": "REJECTED"
             }
           },
@@ -4733,7 +4733,7 @@
             "actionId": "rejected-db",
             "pointer": "/data/rawRows/audit",
             "where": {
-              "commandKey": "T11-parent90-superseded-false-close",
+              "commandIdempotencyKey": "T11-parent90-superseded-false-close",
               "outcome": "REJECTED"
             }
           },
@@ -6771,7 +6771,7 @@
             "actionId": "after-db",
             "pointer": "/data/rawRows/audit",
             "where": {
-              "commandKey": "T11-unsupported-evaluator-activate",
+              "commandIdempotencyKey": "T11-unsupported-evaluator-activate",
               "outcome": "REJECTED"
             }
           },
@@ -7900,7 +7900,7 @@
             "actionId": "stale-close",
             "pointer": "/response/outcome"
           },
-          "expected": "REJECTED",
+          "expected": "CONFLICT",
           "requirementRefs": [
             "D11"
           ],
@@ -7916,7 +7916,7 @@
               "$alias": "P"
             }
           },
-          "oracleExplanation": "업무 상태의 독립 판정 stale-revision. stale-revision-effects의 독립 고정 기대값을 대조한다.",
+          "oracleExplanation": "읽은 revision이 commit 경계에서 바뀐 종료 요청은 CONFLICT·STALE_REVISION이다(계획 §3.4 CONFLICT, contracts/domain-vocabulary.json). stale-revision-effects의 독립 고정 기대값을 대조한다.",
           "oracleRef": {
             "oracleId": "T11.work-transitions",
             "observationNames": [
@@ -8075,8 +8075,8 @@
             "actionId": "after-db",
             "pointer": "/data/rawRows/audit",
             "where": {
-              "commandKey": "T11-stale-revision-stale-close",
-              "outcome": "REJECTED"
+              "commandIdempotencyKey": "T11-stale-revision-stale-close",
+              "outcome": "CONFLICT"
             }
           },
           "expected": 1,
@@ -9104,11 +9104,11 @@
             "actionId": "after-db",
             "pointer": "/data/rawRows/audit",
             "where": {
-              "commandKey": "T11-cancel-after-shipment-transfer"
+              "commandIdempotencyKey": "T11-cancel-after-shipment-transfer"
             },
             "field": [
               "actorId",
-              "action",
+              "capabilityId",
               "outcome"
             ]
           },
@@ -9151,7 +9151,7 @@
             "actionId": "after-db",
             "pointer": "/data/rawRows/audit",
             "where": {
-              "commandKey": "T11-cancel-after-shipment-transfer"
+              "commandIdempotencyKey": "T11-cancel-after-shipment-transfer"
             },
             "field": "transactionId"
           },
@@ -9615,7 +9615,7 @@
             "actionId": "after-db",
             "pointer": "/data/rawRows/audit",
             "where": {
-              "commandKey": "T11-dependency-cycle-reverse",
+              "commandIdempotencyKey": "T11-dependency-cycle-reverse",
               "outcome": "REJECTED"
             }
           },

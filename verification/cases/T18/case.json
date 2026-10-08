@@ -1383,9 +1383,9 @@
             "field": "kind"
           },
           "expected": [
-            "EXCHANGE_REVIEW",
-            "REFUND_REVIEW",
-            "SETTLEMENT_REVIEW"
+            "RETURN_COMMERCIAL_REVIEW",
+            "RETURN_QC_REVIEW",
+            "RETURN_SETTLEMENT_REVIEW"
           ],
           "requirementRefs": [
             "D18"
@@ -1403,7 +1403,7 @@
             "caseId": "T18",
             "scenarioId": "return-new-receipt"
           },
-          "oracleExplanation": "return-followup는 인도60 뒤 반품20을 새 수령·보류로 연결하고 같은 실물 재접수 효과를 막는다의 독립 고정값과 실제 원 행을 대조한다.",
+          "oracleExplanation": "인도60 뒤 반품20의 현재 후속 의무 kind는 QC 판단·교환/환불 결정·반품 정산의 RETURN_QC_REVIEW·RETURN_COMMERCIAL_REVIEW·RETURN_SETTLEMENT_REVIEW 셋이다(계획 §6, contracts/domain-vocabulary.json).",
           "oracleRef": {
             "oracleId": "T18.return-new-receipt",
             "observationNames": [
@@ -2170,7 +2170,7 @@
             "actionId": "provisional-db",
             "pointer": "/data/rawRows/obligations",
             "where": {
-              "kind": "RECONCILIATION",
+              "kind": "RETURN_RECONCILIATION",
               "current": true
             }
           },
@@ -2206,7 +2206,7 @@
             "actionId": "provisional-db",
             "pointer": "/data/rawRows/obligations",
             "where": {
-              "kind": "RECONCILIATION",
+              "kind": "RETURN_RECONCILIATION",
               "current": true
             },
             "field": "ownerId"
@@ -2247,7 +2247,7 @@
             "actionId": "provisional-db",
             "pointer": "/data/rawRows/obligations",
             "where": {
-              "kind": "RECONCILIATION",
+              "kind": "RETURN_RECONCILIATION",
               "current": true
             },
             "field": "status"
@@ -2286,7 +2286,7 @@
             "actionId": "provisional-db",
             "pointer": "/data/rawRows/obligations",
             "where": {
-              "kind": "RECONCILIATION",
+              "kind": "RETURN_RECONCILIATION",
               "current": true
             },
             "field": "nextAction"
@@ -2325,7 +2325,7 @@
             "actionId": "provisional-db",
             "pointer": "/data/rawRows/obligations",
             "where": {
-              "kind": "RECONCILIATION",
+              "kind": "RETURN_RECONCILIATION",
               "current": true
             },
             "field": "nextCheckAt"
@@ -2364,7 +2364,7 @@
             "actionId": "provisional-db",
             "pointer": "/data/rawRows/obligations",
             "where": {
-              "kind": "RECONCILIATION",
+              "kind": "RETURN_RECONCILIATION",
               "current": true
             }
           },
@@ -2408,7 +2408,7 @@
             "actionId": "provisional",
             "pointer": "/response/data/obligations",
             "where": {
-              "kind": "RECONCILIATION",
+              "kind": "RETURN_RECONCILIATION",
               "current": true
             },
             "field": [
@@ -2448,7 +2448,7 @@
             "actionId": "provisional-db",
             "pointer": "/data/rawRows/obligations",
             "where": {
-              "kind": "RECONCILIATION",
+              "kind": "RETURN_RECONCILIATION",
               "current": true
             },
             "field": [
@@ -5690,7 +5690,7 @@
             "actionId": "false-close",
             "pointer": "/response/outcome"
           },
-          "expected": "REJECTED",
+          "expected": "HELD",
           "requirementRefs": [
             "D18"
           ],
@@ -5707,7 +5707,39 @@
             "caseId": "T18",
             "scenarioId": "recall-closure-accounting"
           },
-          "oracleExplanation": "false-closure는 ADMIN scope50의 회수25·동일 실물 폐기25와 미확인25는 처리25다의 독립 고정값과 실제 원 행을 대조한다.",
+          "oracleExplanation": "회수25·동일 실물 폐기25를 처리50으로 주장한 종료는 효과 없이 HELD다. 처리는25이고 미확인25의 책임이 남는다(계획 §6, contracts/domain-vocabulary.json RECALL_RESIDUAL_UNKNOWN=HELD).",
+          "oracleRef": {
+            "oracleId": "T18.recall-closure-accounting",
+            "observationNames": [
+              "false-closure"
+            ]
+          }
+        },
+        {
+          "id": "false-closure-code",
+          "op": "equals",
+          "source": {
+            "actionId": "false-close",
+            "pointer": "/response/error/code"
+          },
+          "expected": "RECALL_RESIDUAL_UNKNOWN",
+          "requirementRefs": [
+            "D18"
+          ],
+          "evidenceRefs": [
+            "false-close:actual-response-or-host-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "T18",
+            "scenarioId": "recall-closure-accounting"
+          },
+          "oracleExplanation": "보류 이유는 미확인 잔여25다. 다른 거부 코드로 종료 차단을 대신하지 않는다(contracts/domain-vocabulary.json).",
           "oracleRef": {
             "oracleId": "T18.recall-closure-accounting",
             "observationNames": [
@@ -5829,7 +5861,7 @@
             "actionId": "after-close-db",
             "pointer": "/data/rawRows/obligations",
             "where": {
-              "kind": "RECALL_RESPONSE",
+              "kind": "RECALL_INVESTIGATION",
               "current": true
             }
           },
@@ -5865,7 +5897,7 @@
             "actionId": "after-close-db",
             "pointer": "/data/rawRows/obligations",
             "where": {
-              "kind": "RECALL_RESPONSE",
+              "kind": "RECALL_INVESTIGATION",
               "current": true
             },
             "field": "ownerId"
@@ -5906,7 +5938,7 @@
             "actionId": "after-close-db",
             "pointer": "/data/rawRows/obligations",
             "where": {
-              "kind": "RECALL_RESPONSE",
+              "kind": "RECALL_INVESTIGATION",
               "current": true
             },
             "field": "status"
@@ -5945,7 +5977,7 @@
             "actionId": "after-close-db",
             "pointer": "/data/rawRows/obligations",
             "where": {
-              "kind": "RECALL_RESPONSE",
+              "kind": "RECALL_INVESTIGATION",
               "current": true
             },
             "field": "nextAction"
@@ -5984,7 +6016,7 @@
             "actionId": "after-close-db",
             "pointer": "/data/rawRows/obligations",
             "where": {
-              "kind": "RECALL_RESPONSE",
+              "kind": "RECALL_INVESTIGATION",
               "current": true
             },
             "field": "nextCheckAt"
@@ -6023,7 +6055,7 @@
             "actionId": "after-close-db",
             "pointer": "/data/rawRows/obligations",
             "where": {
-              "kind": "RECALL_RESPONSE",
+              "kind": "RECALL_INVESTIGATION",
               "current": true
             }
           },
@@ -6067,7 +6099,7 @@
             "actionId": "after-close",
             "pointer": "/response/data/obligations",
             "where": {
-              "kind": "RECALL_RESPONSE",
+              "kind": "RECALL_INVESTIGATION",
               "current": true
             },
             "field": [
@@ -6107,7 +6139,7 @@
             "actionId": "after-close-db",
             "pointer": "/data/rawRows/obligations",
             "where": {
-              "kind": "RECALL_RESPONSE",
+              "kind": "RECALL_INVESTIGATION",
               "current": true
             },
             "field": [

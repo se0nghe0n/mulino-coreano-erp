@@ -139,6 +139,7 @@
     그러면 "QC-duty-hold60-resolved" assertion으로 "QC_PASS로 해제한 hold60 의무는 QC·RESOLVED·current로 남는다"를 확인한다
     그러면 "QC-duty-hold60-resolution-evidence" assertion으로 "해소된 hold60 의무는 해소 결정 근거를 가진다"를 확인한다
     그러면 "QC-duty-hold40-identity" assertion으로 "남은 OPEN QC 의무는 QC 보류40의 의무이고 owner는 qc다"를 확인한다
+    그러면 "return-duty-kind-set" assertion으로 "반품10의 현재 의무 kind는 RETURN_QC_REVIEW·RETURN_COMMERCIAL_REVIEW·RETURN_SETTLEMENT_REVIEW 셋이다"를 확인한다
     그러면 "return-duty-12" assertion으로 "return-duty"를 확인한다
     그러면 "return-duty-13" assertion으로 "return-duty"를 확인한다
     그러면 "return-duty-14" assertion으로 "return-duty"를 확인한다
@@ -276,7 +277,7 @@
     그러면 "actual-runtime-observation-10" assertion으로 "actual-runtime-observation"를 확인한다
     그러면 "actual-runtime-observation-10-reason" assertion으로 "이미 소비된 배분의 같은 형식 재출고는 INSUFFICIENT_ELIGIBLE_QUANTITY로 거부된다"를 확인한다
     그러면 "actual-runtime-observation-10-audit" assertion으로 "재출고 거부 감사가 정확히 1건 남는다"를 확인한다
-    그러면 "actual-runtime-observation-11" assertion으로 "actual-runtime-observation"를 확인한다
+    그러면 "actual-runtime-observation-11" assertion으로 "e1 시점 모든 명령 감사 원행에 auditId·actorId·capabilityId·commandId·outcome·evidenceIds·policyVersion이 있다"를 확인한다
     그러면 "actual-runtime-observation-12" assertion으로 "actual-runtime-observation"를 확인한다
     그러면 "actual-runtime-observation-13" assertion으로 "actual-runtime-observation"를 확인한다
     그러면 "actual-runtime-observation-14" assertion으로 "actual-runtime-observation"를 확인한다
@@ -286,7 +287,7 @@
     그러면 "actual-runtime-observation-18" assertion으로 "actual-runtime-observation"를 확인한다
     그러면 "actual-runtime-observation-19" assertion으로 "actual-runtime-observation"를 확인한다
     그러면 "actual-runtime-observation-20" assertion으로 "actual-runtime-observation"를 확인한다
-    그러면 "actual-runtime-observation-21" assertion으로 "actual-runtime-observation"를 확인한다
+    그러면 "actual-runtime-observation-21" assertion으로 "거부 감사로 기록된 행 중 APPLIED는 0건이다"를 확인한다
     그러면 "model-reference-22" assertion으로 "model-reference"를 확인한다
     그러면 "model-reference-23" assertion으로 "model-reference"를 확인한다
     그러면 "model-reference-24" assertion으로 "model-reference"를 확인한다

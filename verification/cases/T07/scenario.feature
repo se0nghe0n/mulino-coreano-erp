@@ -23,7 +23,7 @@
     그러면 "unchanged-capabilityAssignments" assertion으로 "invalid-effects"를 확인한다
     그러면 "unchanged-grants" assertion으로 "invalid-effects"를 확인한다
     그러면 "unchanged-approvals" assertion으로 "invalid-effects"를 확인한다
-    그러면 "denial-audit" assertion으로 "invalid-types"를 확인한다
+    그러면 "denial-audit" assertion으로 "감사 원행은 이 시도 key의 REJECTED·TYPE_INVALID 한 행뿐이다"를 확인한다
 
   시나리오: 잘못된 typed 입력 wrong-endpoint을 거부한다
     먼저 사례 파일 "verification/cases/T07/case.json"의 "wrong-endpoint"를 준비한다
@@ -46,7 +46,7 @@
     그러면 "unchanged-capabilityAssignments" assertion으로 "invalid-effects"를 확인한다
     그러면 "unchanged-grants" assertion으로 "invalid-effects"를 확인한다
     그러면 "unchanged-approvals" assertion으로 "invalid-effects"를 확인한다
-    그러면 "denial-audit" assertion으로 "invalid-types"를 확인한다
+    그러면 "denial-audit" assertion으로 "감사 원행은 이 시도 key의 REJECTED·TYPE_INVALID 한 행뿐이다"를 확인한다
 
   시나리오: 잘못된 typed 입력 cardinality-overflow을 거부한다
     먼저 사례 파일 "verification/cases/T07/case.json"의 "cardinality-overflow"를 준비한다
@@ -69,7 +69,7 @@
     그러면 "unchanged-capabilityAssignments" assertion으로 "invalid-effects"를 확인한다
     그러면 "unchanged-grants" assertion으로 "invalid-effects"를 확인한다
     그러면 "unchanged-approvals" assertion으로 "invalid-effects"를 확인한다
-    그러면 "denial-audit" assertion으로 "invalid-types"를 확인한다
+    그러면 "denial-audit" assertion으로 "감사 원행은 이 시도 key의 REJECTED·TYPE_INVALID 한 행뿐이다"를 확인한다
 
   시나리오: 잘못된 typed 입력 unsupported-operator을 거부한다
     먼저 사례 파일 "verification/cases/T07/case.json"의 "unsupported-operator"를 준비한다
@@ -92,7 +92,7 @@
     그러면 "unchanged-capabilityAssignments" assertion으로 "invalid-effects"를 확인한다
     그러면 "unchanged-grants" assertion으로 "invalid-effects"를 확인한다
     그러면 "unchanged-approvals" assertion으로 "invalid-effects"를 확인한다
-    그러면 "denial-audit" assertion으로 "invalid-types"를 확인한다
+    그러면 "denial-audit" assertion으로 "감사 원행은 이 시도 key의 REJECTED·TYPE_INVALID 한 행뿐이다"를 확인한다
 
   시나리오: 잘못된 typed 입력 extension-eligible을 거부한다
     먼저 사례 파일 "verification/cases/T07/case.json"의 "extension-eligible"를 준비한다
@@ -115,7 +115,7 @@
     그러면 "unchanged-capabilityAssignments" assertion으로 "invalid-effects"를 확인한다
     그러면 "unchanged-grants" assertion으로 "invalid-effects"를 확인한다
     그러면 "unchanged-approvals" assertion으로 "invalid-effects"를 확인한다
-    그러면 "denial-audit" assertion으로 "invalid-types"를 확인한다
+    그러면 "denial-audit" assertion으로 "감사 원행은 이 시도 key의 REJECTED·TYPE_INVALID 한 행뿐이다"를 확인한다
 
   시나리오: 잘못된 typed 입력 extension-role을 거부한다
     먼저 사례 파일 "verification/cases/T07/case.json"의 "extension-role"를 준비한다
@@ -138,7 +138,7 @@
     그러면 "unchanged-capabilityAssignments" assertion으로 "invalid-effects"를 확인한다
     그러면 "unchanged-grants" assertion으로 "invalid-effects"를 확인한다
     그러면 "unchanged-approvals" assertion으로 "invalid-effects"를 확인한다
-    그러면 "denial-audit" assertion으로 "invalid-types"를 확인한다
+    그러면 "denial-audit" assertion으로 "감사 원행은 이 시도 key의 REJECTED·TYPE_INVALID 한 행뿐이다"를 확인한다
 
   시나리오: 유효한 위치 관계 등록은 Work나 Run을 만들지 않는다
     먼저 사례 파일 "verification/cases/T07/case.json"의 "relation-without-work"를 준비한다

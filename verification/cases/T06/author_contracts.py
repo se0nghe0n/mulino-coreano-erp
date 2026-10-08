@@ -29,6 +29,7 @@ ROLES = {
     'intake': READS,
     'supervisor': READS,
 }
+# Command audit and query audit are separate logical sources (contracts/audit-observation-fields.json, plan §7.4).
 TABLES = ['events','evidence_revisions','claims','inbox','identity_matches','canonical_links','movements','segments','allocations','assessments','obligations','assignments','audit','outbox','command_records','restrictions','source_profiles','policies','documents','tombstones','deletion_log','domain_records']
 
 class Case:
@@ -310,7 +311,7 @@ def build_t22():
         s.control('retry-tick','process','tickScheduler',{'schedulerId':'outbox-scheduler','tickId':'retry-outbox-tick','asOf':NOW,'workId':alias('O1')})
         if variant=='failure-retry': s.control('retry-terminal','process','awaitRuntimeTask',{'schedulerId':'outbox-scheduler','taskId':result('retry-tick','/data/hostObservation/extractor/rawRows/tasks/0/taskId')})
         s.control('remote-after','externalResponder','inspectRequests',{'receiverId':'purchase-peer','externalOperationId':result('send','/response/externalOperationId')});s.after(['outbox','command_records','assignments','domain_records','audit'])
-        s.raw('retry-server-derived-target','audit',[[alias('operations'),result('send','/response/commandId'),f'T22-{s.sid}-retry']],'external-transition','relationSet',field=['actorId','targetId','commandIdempotencyKey'],where={'action':'retrySafeCommand'},
+        s.raw('retry-server-derived-target','audit',[[alias('operations'),result('send','/response/commandId'),f'T22-{s.sid}-retry']],'external-transition','relationSet',field=['actorId','targetId','commandIdempotencyKey'],where={'capabilityId':'retrySafeCommand'},
               explain='서버 감사 원행에서 retrySafeCommand의 실행 주체는 인증된 operations이고 대상은 원 발주 전달 command 하나다. 요청은 commandId·사유만 보내며 원 actor·hash·멱등키·외부 operation ID를 payload로 주지 않는다(계획 §7.2).')
         count=2 if variant=='failure-retry' else 1
         obs='confirmed-success-reissue' if variant=='success' else 'unreconciled-external-reissue' if variant in ['unknown','no-lookup'] else 'external-transition'
@@ -341,19 +342,21 @@ def build_t24():
         s.before();s.query('allowed-own','getObject','readAgent',{'objectId':alias('P')})
         if surface in ['search','blob']:s.query('attack',cap,actor,req,route)
         else:s.invoke('attack',cap,actor,req,route)
-        s.after()
+        s.after(TABLES+['queryAudit'] if surface in ['search','blob'] else None)
         if surface=='search':s.ass('search-data-empty','attack','/response/data/items',0,'cross-org-data-leak','count')
         else:
             s.ass('forbidden-code','attack','/response/error/code','FORBIDDEN','surface-auth')
             s.ass('no-secret-reference','attack','/response/error/targetId',True,'cross-org-data-leak','absent')
         for t in ['domain_records','movements','segments','allocations','outbox','command_records']:s.unchanged(t,'forbidden-write-effects')
-        s.raw('denial-audit','audit',1,'surface-auth','count',where={'kind':'DENIAL','action':cap})
+        # A denied read is a query audit row, a denied write a command audit row; both are outcome=REJECTED.
+        s.raw('denial-audit','queryAudit' if surface in ['search','blob'] else 'audit',1,'surface-auth','count',where={'capabilityId':cap,'outcome':'REJECTED'},
+              explain=f'{surface} 경로의 조직 밖/READ 위임 우회 {cap} 시도는 '+('조회 감사(queryAudit)' if surface in ['search','blob'] else '명령 감사(audit)')+'에 outcome=REJECTED 한 행으로 남는다(contracts/audit-observation-fields.json).')
         if surface=='blob':s.ass('no-download-ref','attack','/response/downloadReference',True,'surface-auth','absent')
         if surface=='batch':
             s.unchanged('restrictions','surface-auth')
             s.ass('permitted-first-applied','permitted-first','/response/outcome','APPLIED','surface-auth')
             s.raw('first-hold-survives-batch','restrictions',1,'surface-auth','count')
-        if surface=='worker':s.raw('worker-delegated-actor','audit',[alias('readAgent')],'surface-auth','exactSet',field='actorId',where={'kind':'DENIAL'})
+        if surface=='worker':s.raw('worker-delegated-actor','audit',[alias('readAgent')],'surface-auth','exactSet',field='actorId',where={'commandIdempotencyKey':f'{c.cid}-{s.sid}-attack','outcome':'REJECTED'})
         s.finish()
     s=c.sub('authorized-blob','서버 인가 후 단기참조로 자기 근거 bytes를 읽는다',o)
     p=s.payload('own-document',{'quantity':'60','unit':'BOX','scope':'ORG-A'})
@@ -373,13 +376,14 @@ def build_t24():
     s.ass('audit-error','fail','/response/error/code','AUDIT_PERSISTENCE_FAILED','committed-domain-effects')
     s.control('remove-fault','fault','remove',{'faultId':'audit-persist-failure'});s.invoke('retry','dispatchQuantity','warehouse',request);s.query('retry-view');s.db('retry-db','retry-view',['audit','movements','allocations','outbox','command_records','domain_records'])
     s.ass('retry-applied','retry','/response/outcome','APPLIED','audit-fields')
-    s.ass('audit-complete','retry-db','/data/rawRows/audit',[[alias('warehouse'),alias('supervisor'),alias('S1'),alias('A60'),'dispatchQuantity','definition-v1','SYNTHETIC-policy-v1','APPLIED','T24-audit-effect']],'audit-fields','relationSet',field=['actorId','delegatorId','workId','targetId','action','definitionVersion','policyVersion','result','commandIdempotencyKey'],where={'kind':'MUTATION'})
-    s.ass('audit-before-after','retry-db','/data/rawRows/audit',[{'allocationStatus':'EXECUTABLE','warehouseHeld':{'value':'60','unit':'BOX'}}],'audit-fields',field='before',where={'kind':'MUTATION'})
-    s.ass('audit-after','retry-db','/data/rawRows/audit',[{'allocationStatus':'CONSUMED','warehouseHeld':{'value':'40','unit':'BOX'}}],'audit-fields',field='after',where={'kind':'MUTATION'})
-    s.ass('audit-effect-reference','retry-db','/data/rawRows/audit',[result('retry','/response/movementId')],'audit-fields',field='movementId',where={'kind':'MUTATION'})
-    s.ass('audit-request-ref','retry-db','/data/rawRows/audit',[result('retry','/response/requestId')],'audit-fields',field='requestId',where={'kind':'MUTATION'})
-    s.raw('audit-no-extra-approval','audit',[[]],'audit-fields',field='approvalRefs',where={'kind':'MUTATION'})
-    s.raw('audit-evidence','audit',[[alias('dispatch-basis')]],'audit-fields',field='evidenceIds',where={'kind':'MUTATION'})
+    applied={'commandIdempotencyKey':'T24-audit-effect','outcome':'APPLIED'}
+    s.ass('audit-complete','retry-db','/data/rawRows/audit',[[alias('warehouse'),alias('supervisor'),alias('S1'),alias('A60'),'dispatchQuantity','definition-v1','SYNTHETIC-policy-v1','APPLIED','T24-audit-effect']],'audit-fields','relationSet',field=['actorId','delegatorId','workId','targetId','capabilityId','definitionVersion','policyVersion','outcome','commandIdempotencyKey'],where=applied)
+    s.ass('audit-before-after','retry-db','/data/rawRows/audit',[{'allocationStatus':'EXECUTABLE','warehouseHeld':{'value':'60','unit':'BOX'}}],'audit-fields',field='before',where=applied)
+    s.ass('audit-after','retry-db','/data/rawRows/audit',[{'allocationStatus':'CONSUMED','warehouseHeld':{'value':'40','unit':'BOX'}}],'audit-fields',field='after',where=applied)
+    s.ass('audit-effect-reference','retry-db','/data/rawRows/audit',[result('retry','/response/movementId')],'audit-fields',field='movementId',where=applied)
+    s.ass('audit-request-ref','retry-db','/data/rawRows/audit',[result('retry','/response/requestId')],'audit-fields',field='requestId',where=applied)
+    s.raw('audit-no-extra-approval','audit',[[]],'audit-fields',field='approvalRefs',where=applied)
+    s.raw('audit-evidence','audit',[[alias('dispatch-basis')]],'audit-fields',field='evidenceIds',where=applied)
     s.raw('retry-one-movement','movements',1,'audit-fields','count',where={'commandIdempotencyKey':'T24-audit-effect','evidenceRefs':[alias('dispatch-basis')]})
     s.finish()
     o='T24.retention-legalhold-blob-restore'
@@ -395,7 +399,7 @@ def build_t24():
         s.after(['policies','documents','tombstones','deletion_log','obligations','assignments','audit'])
         # The sweep's authenticated reviewer is read from the server-written audit row, not from the
         # harness provenance that only echoes the identity the driver was asked to sign as.
-        s.raw('sweep-authenticated-reviewer','audit',[[alias('config'),alias('ORG-A'),'retention-v1','sweep-'+variant]],'retention-policy','relationSet',field=['actorId','organizationId','policyVersion','sweepId'],where={'action':'retentionSweep'},
+        s.raw('sweep-authenticated-reviewer','audit',[[alias('config'),alias('ORG-A'),'retention-v1','sweep-'+variant]],'retention-policy','relationSet',field=['actorId','organizationId','policyVersion','sweepId'],where={'capabilityId':'retentionSweep'},
               explain='서버 감사 원행에서 보존 sweep 1건의 실행 주체는 인증된 config, 조직은 ORG-A, 정책은 retention-v1, sweep ID는 sweep-'+variant+'다. harness가 서명을 요청한 provenance를 읽지 않는다(계획 §7.4).')
         obs='legal-hold-delete' if variant=='legal-hold' else 'unresolved-reference-delete' if variant=='active-reference' else 'retention-policy'
         s.raw('different-artifact-policies','policies',[[x['artifactType'],x['retentionDays'],x['basis'],x['effectiveDate'],'REDACT' if x['artifactType']!='document' else 'TOMBSTONE_AND_BLOB_DELETE',alias('config')] for x in policy],'retention-policy','relationSet',field=['artifactType','retentionDays','basis','effectiveDate','deletionMethod','reviewerId'])
@@ -420,13 +424,13 @@ def build_t24():
     s.query('query-audit','getObject','readAgent');s.control('backup','process','backup',{'environmentId':'redaction-isolated','backupId':'redaction-backup','snapshotId':result('query-audit','/response/snapshotRevision')})
     s.control('collect-artifacts','process','dataInventory',{'environmentId':'redaction-isolated','inventoryId':'redaction-artifacts','authoritativeSourceId':'actual-runtime-and-backup','artifactTypes':['queue','error','log','audit','evidence','backupManifest'],'scopeMode':'ENTIRE_ISOLATED_CASE','completeSourceFilesPerType':1,'backupArtifacts':result('backup','/data/hostObservation/generatedOutputs')})
     s.control('inventory','process','inspectArtifacts',{'inspectionId':'redaction-inventory','artifacts':result('collect-artifacts','/data/hostObservation/extractor/rawRows/artifacts')})
-    s.control('scan','process','scanArtifacts',{'scanId':'full-redaction-scan','artifacts':result('inventory','/data/hostObservation/observedArtifacts'),'patterns':[{'id':'synthetic-secret','literal':'SYNTHETIC-DO-NOT-LOG'}]});s.after()
+    s.control('scan','process','scanArtifacts',{'scanId':'full-redaction-scan','artifacts':result('inventory','/data/hostObservation/observedArtifacts'),'patterns':[{'id':'synthetic-secret','literal':'SYNTHETIC-DO-NOT-LOG'}]});s.after(TABLES+['queryAudit'])
     s.ass('scan-six-surfaces','inventory','/data/hostObservation/extractor/rawRows/artifactInventory',['queue','error','log','audit','evidence','backupManifest'],'secret-sentinel-leak','exactSet',field='artifactType')
     s.ass('all-files-scanned','scan','/data/hostObservation/reads',6,'secret-sentinel-leak','count')
     for i in range(6):s.ass('surface-'+str(i)+'-no-sentinel','scan',f'/data/hostObservation/reads/{i}/findings',0,'secret-sentinel-leak','count')
     for t in ['movements','allocations','segments','domain_records','outbox']:s.unchanged(t,'redaction-purpose')
-    s.raw('query-audit-exists','audit',1,'redaction-purpose','count',where={'kind':'QUERY','actorId':alias('readAgent')})
-    s.raw('necessary-refs-preserved','audit',[[alias('readAgent'),alias('P'),'getObject','READ']],'redaction-purpose','relationSet',field=['actorId','targetId','action','result'],where={'kind':'QUERY'})
+    s.raw('query-audit-exists','queryAudit',1,'redaction-purpose','count',where={'actorId':alias('readAgent')})
+    s.raw('necessary-refs-preserved','queryAudit',[[alias('readAgent'),alias('P'),'getObject','READ']],'redaction-purpose','relationSet',field=['actorId','targetId','capabilityId','outcome'])
     s.ass('separate-secret-restore','inventory','/data/hostObservation/extractor/rawRows/backupConfiguration/secretRestoreProcedure','external secret-manager restore','redaction-purpose')
     s.ass('no-secret-config-content','inventory','/data/hostObservation/extractor/rawRows/backupConfiguration/credentials',True,'redaction-purpose','absent')
     s.finish();c.finish();return c

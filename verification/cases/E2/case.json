@@ -1582,7 +1582,7 @@
             "actionId": "after-dispatch-db",
             "pointer": "/data/rawRows/obligations",
             "where": {
-              "kind": "RECALL_RESPONSE",
+              "kind": "RECALL_INVESTIGATION",
               "current": true
             }
           },
@@ -1620,7 +1620,7 @@
             "actionId": "after-dispatch-db",
             "pointer": "/data/rawRows/obligations",
             "where": {
-              "kind": "RECALL_RESPONSE",
+              "kind": "RECALL_INVESTIGATION",
               "current": true
             },
             "field": "ownerId"
@@ -1663,7 +1663,7 @@
             "actionId": "after-dispatch-db",
             "pointer": "/data/rawRows/obligations",
             "where": {
-              "kind": "RECALL_RESPONSE",
+              "kind": "RECALL_INVESTIGATION",
               "current": true
             },
             "field": "status"
@@ -1704,7 +1704,7 @@
             "actionId": "after-dispatch-db",
             "pointer": "/data/rawRows/obligations",
             "where": {
-              "kind": "RECALL_RESPONSE",
+              "kind": "RECALL_INVESTIGATION",
               "current": true
             },
             "field": "nextAction"
@@ -1745,7 +1745,7 @@
             "actionId": "after-dispatch-db",
             "pointer": "/data/rawRows/obligations",
             "where": {
-              "kind": "RECALL_RESPONSE",
+              "kind": "RECALL_INVESTIGATION",
               "current": true
             },
             "field": "nextCheckAt"
@@ -1786,7 +1786,7 @@
             "actionId": "after-dispatch-db",
             "pointer": "/data/rawRows/obligations",
             "where": {
-              "kind": "RECALL_RESPONSE",
+              "kind": "RECALL_INVESTIGATION",
               "current": true
             }
           },
@@ -1832,7 +1832,7 @@
             "actionId": "after-dispatch",
             "pointer": "/response/data/obligations",
             "where": {
-              "kind": "RECALL_RESPONSE",
+              "kind": "RECALL_INVESTIGATION",
               "current": true
             },
             "field": [
@@ -1874,7 +1874,7 @@
             "actionId": "after-dispatch-db",
             "pointer": "/data/rawRows/obligations",
             "where": {
-              "kind": "RECALL_RESPONSE",
+              "kind": "RECALL_INVESTIGATION",
               "current": true
             },
             "field": [
@@ -2314,7 +2314,7 @@
             "actionId": "after-dispatch-db",
             "pointer": "/data/rawRows/audit",
             "where": {
-              "commandKey": "E2-overlapping-holds-dispatch20",
+              "commandIdempotencyKey": "E2-overlapping-holds-dispatch20",
               "outcome": "REJECTED"
             }
           },
@@ -2420,7 +2420,7 @@
             "actionId": "after-dispatch-db",
             "pointer": "/data/rawRows/audit",
             "where": {
-              "commandKey": "E2-overlapping-holds-dispatch40",
+              "commandIdempotencyKey": "E2-overlapping-holds-dispatch40",
               "outcome": "REJECTED"
             }
           },
@@ -2817,7 +2817,7 @@
             "actionId": "after-dispatch-mcp",
             "pointer": "/response/data/obligations",
             "where": {
-              "kind": "RECALL_RESPONSE",
+              "kind": "RECALL_INVESTIGATION",
               "current": true
             },
             "field": [
@@ -2859,7 +2859,7 @@
             "actionId": "after-dispatch-db",
             "pointer": "/data/rawRows/obligations",
             "where": {
-              "kind": "RECALL_RESPONSE",
+              "kind": "RECALL_INVESTIGATION",
               "current": true
             },
             "field": [
@@ -5659,7 +5659,7 @@
             "actionId": "false-close",
             "pointer": "/response/outcome"
           },
-          "expected": "REJECTED",
+          "expected": "HELD",
           "requirementRefs": [
             "D03",
             "D16",
@@ -5678,7 +5678,7 @@
             "caseId": "E2",
             "scenarioId": "same-25-not-50"
           },
-          "oracleExplanation": "unapproved-unknown-close는 승인50 중 회수25와 동일 실물 폐기25는 최종25이며 미확인25의 종료를 막는다의 독립 고정값과 실제 원 행을 대조한다.",
+          "oracleExplanation": "회수25·동일 실물 폐기25를 처리50으로 합산한 종료는 효과 없이 HELD다. 미확인25의 회수 책임이 그대로 남는다(계획 §6·§13.3 E2, contracts/domain-vocabulary.json RECALL_RESIDUAL_UNKNOWN=HELD).",
           "oracleRef": {
             "oracleId": "E2.same-25-not-50",
             "observationNames": [
@@ -5727,8 +5727,8 @@
             "actionId": "after-close-db",
             "pointer": "/data/rawRows/audit",
             "where": {
-              "commandKey": "E2-same-25-not-50-false-close",
-              "outcome": "REJECTED"
+              "commandIdempotencyKey": "E2-same-25-not-50-false-close",
+              "outcome": "HELD"
             }
           },
           "expected": 1,
@@ -8371,7 +8371,7 @@
             "actionId": "closed-db",
             "pointer": "/data/rawRows/obligations",
             "where": {
-              "kind": "RECALL_RESPONSE",
+              "kind": "RECALL_EXCEPTION_RESIDUAL",
               "current": true
             }
           },
@@ -8409,7 +8409,7 @@
             "actionId": "closed-db",
             "pointer": "/data/rawRows/obligations",
             "where": {
-              "kind": "RECALL_RESPONSE",
+              "kind": "RECALL_EXCEPTION_RESIDUAL",
               "current": true
             },
             "field": "ownerId"
@@ -8452,7 +8452,7 @@
             "actionId": "closed-db",
             "pointer": "/data/rawRows/obligations",
             "where": {
-              "kind": "RECALL_RESPONSE",
+              "kind": "RECALL_EXCEPTION_RESIDUAL",
               "current": true
             },
             "field": "status"
@@ -8493,7 +8493,7 @@
             "actionId": "closed-db",
             "pointer": "/data/rawRows/obligations",
             "where": {
-              "kind": "RECALL_RESPONSE",
+              "kind": "RECALL_EXCEPTION_RESIDUAL",
               "current": true
             },
             "field": "nextAction"
@@ -8534,7 +8534,7 @@
             "actionId": "closed-db",
             "pointer": "/data/rawRows/obligations",
             "where": {
-              "kind": "RECALL_RESPONSE",
+              "kind": "RECALL_EXCEPTION_RESIDUAL",
               "current": true
             },
             "field": "nextCheckAt"
@@ -8575,7 +8575,7 @@
             "actionId": "closed-db",
             "pointer": "/data/rawRows/obligations",
             "where": {
-              "kind": "RECALL_RESPONSE",
+              "kind": "RECALL_EXCEPTION_RESIDUAL",
               "current": true
             }
           },
@@ -8621,7 +8621,7 @@
             "actionId": "closed",
             "pointer": "/response/data/obligations",
             "where": {
-              "kind": "RECALL_RESPONSE",
+              "kind": "RECALL_EXCEPTION_RESIDUAL",
               "current": true
             },
             "field": [
@@ -8663,7 +8663,7 @@
             "actionId": "closed-db",
             "pointer": "/data/rawRows/obligations",
             "where": {
-              "kind": "RECALL_RESPONSE",
+              "kind": "RECALL_EXCEPTION_RESIDUAL",
               "current": true
             },
             "field": [
@@ -9397,7 +9397,7 @@
             "actionId": "closed-mcp",
             "pointer": "/response/data/obligations",
             "where": {
-              "kind": "RECALL_RESPONSE",
+              "kind": "RECALL_EXCEPTION_RESIDUAL",
               "current": true
             },
             "field": [
@@ -9439,7 +9439,7 @@
             "actionId": "closed-db",
             "pointer": "/data/rawRows/obligations",
             "where": {
-              "kind": "RECALL_RESPONSE",
+              "kind": "RECALL_EXCEPTION_RESIDUAL",
               "current": true
             },
             "field": [

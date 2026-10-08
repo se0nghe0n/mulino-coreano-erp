@@ -764,11 +764,11 @@
             "pointer": "/data/rawRows/audit",
             "field": [
               "actorId",
-              "action",
+              "capabilityId",
               "outcome"
             ],
             "where": {
-              "action": "dispatchPurchaseOrder"
+              "capabilityId": "dispatchPurchaseOrder"
             }
           },
           "expected": [
@@ -1561,11 +1561,11 @@
             "pointer": "/data/rawRows/audit",
             "field": [
               "actorId",
-              "action",
+              "capabilityId",
               "outcome"
             ],
             "where": {
-              "action": "dispatchPurchaseOrder"
+              "capabilityId": "dispatchPurchaseOrder"
             }
           },
           "expected": [
@@ -2356,11 +2356,11 @@
             "pointer": "/data/rawRows/audit",
             "field": [
               "actorId",
-              "action",
+              "capabilityId",
               "outcome"
             ],
             "where": {
-              "action": "dispatchPurchaseOrder"
+              "capabilityId": "dispatchPurchaseOrder"
             }
           },
           "expected": [
@@ -3152,11 +3152,11 @@
             "pointer": "/data/rawRows/audit",
             "field": [
               "actorId",
-              "action",
+              "capabilityId",
               "outcome"
             ],
             "where": {
-              "action": "dispatchPurchaseOrder"
+              "capabilityId": "dispatchPurchaseOrder"
             }
           },
           "expected": [
@@ -3996,11 +3996,11 @@
             "pointer": "/data/rawRows/audit",
             "field": [
               "actorId",
-              "action",
+              "capabilityId",
               "outcome"
             ],
             "where": {
-              "action": "dispatchPurchaseOrder"
+              "capabilityId": "dispatchPurchaseOrder"
             }
           },
           "expected": [
@@ -4791,11 +4791,11 @@
             "pointer": "/data/rawRows/audit",
             "field": [
               "actorId",
-              "action",
+              "capabilityId",
               "outcome"
             ],
             "where": {
-              "action": "dispatchPurchaseOrder"
+              "capabilityId": "dispatchPurchaseOrder"
             }
           },
           "expected": [
@@ -5582,11 +5582,11 @@
             "pointer": "/data/rawRows/audit",
             "field": [
               "actorId",
-              "action",
+              "capabilityId",
               "outcome"
             ],
             "where": {
-              "action": "dispatchPurchaseOrder"
+              "capabilityId": "dispatchPurchaseOrder"
             }
           },
           "expected": [
@@ -6231,7 +6231,7 @@
             "actionId": "after-db",
             "pointer": "/data/rawRows/audit",
             "where": {
-              "action": "dispatchPurchaseOrder",
+              "capabilityId": "dispatchPurchaseOrder",
               "outcome": "REJECTED"
             }
           },
@@ -6908,7 +6908,7 @@
             "actionId": "after-db",
             "pointer": "/data/rawRows/audit",
             "where": {
-              "action": "dispatchPurchaseOrder",
+              "capabilityId": "dispatchPurchaseOrder",
               "outcome": "WAITING_APPROVAL"
             }
           },
@@ -7491,7 +7491,7 @@
             "actionId": "after-db",
             "pointer": "/data/rawRows/audit",
             "where": {
-              "action": "approvePurchase",
+              "capabilityId": "approvePurchase",
               "outcome": "REJECTED"
             }
           },
@@ -8145,7 +8145,7 @@
             "actionId": "after-db",
             "pointer": "/data/rawRows/audit",
             "where": {
-              "action": "dispatchPurchaseOrder",
+              "capabilityId": "dispatchPurchaseOrder",
               "outcome": "REJECTED"
             }
           },
@@ -8818,12 +8818,12 @@
             "actionId": "after-db",
             "pointer": "/data/rawRows/audit",
             "field": [
-              "action",
+              "capabilityId",
               "policyVersion",
               "outcome"
             ],
             "where": {
-              "action": "dispatchPurchaseOrder"
+              "capabilityId": "dispatchPurchaseOrder"
             }
           },
           "expected": [
@@ -11664,7 +11664,7 @@
             "pointer": "/data/rawRows/obligations",
             "where": {
               "status": "OPEN",
-              "kind": "PURCHASE_CANCELLATION"
+              "kind": "PURCHASE_CANCELLATION_ACCEPTANCE"
             }
           },
           "expected": 1,
@@ -11706,7 +11706,7 @@
             ],
             "where": {
               "status": "OPEN",
-              "kind": "PURCHASE_CANCELLATION"
+              "kind": "PURCHASE_CANCELLATION_ACCEPTANCE"
             }
           },
           "expected": [
@@ -13945,7 +13945,7 @@
             "pointer": "/data/rawRows/obligations",
             "where": {
               "status": "OPEN",
-              "kind": "PURCHASE_EXCESS"
+              "kind": "PURCHASE_EXCESS_RECONCILIATION"
             }
           },
           "expected": 1,
@@ -13987,7 +13987,7 @@
             ],
             "where": {
               "status": "OPEN",
-              "kind": "PURCHASE_EXCESS"
+              "kind": "PURCHASE_EXCESS_RECONCILIATION"
             }
           },
           "expected": [

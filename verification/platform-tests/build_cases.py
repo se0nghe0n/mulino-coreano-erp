@@ -238,10 +238,12 @@ s.host('constraints','compilerSchemaProbe',compilerId='@sap/cds-compiler',compil
 s.inspect('constraints')
 s.query('unauthorized-endpoint',route='mcp',actor='outsider',targetOrganizationId=alias('ORG'))
 s.observe('after')
+# A denied read is a query audit row, not a command audit (contracts/audit-observation-fields.json, plan §7.4).
+s.data['actions'][-1]['observation']['sources'].append('queryAudit')
 s.fact('조직-FK-23503','constraints','constraintAttempts',[['ORG_FK','23503'],['NEGATIVE_QUANTITY','23514'],['PRECISION_OVERFLOW','22003'],['OUTBOX_FK','23503']],'relationSet',field=['case','sqlState'])
 s.check('custom-MCP-현재인가','unauthorized-endpoint','/response/error/code','FORBIDDEN')
 for table in ['segments','movements','allocations','works','approvals','outbox']:s.check('무권한효과0-'+table,'after',D+table,True,'sameAs',baseline={'actionId':'before','pointer':D+table})
-s.check('허용-denial-audit','after',D+'denialAudit/0/outcome','FORBIDDEN')
+s.check('허용-denial-audit','after',D+'queryAudit',[['REJECTED','FORBIDDEN']],'relationSet',field=['outcome','errorCode'],where={'actorId':alias('outsider'),'capabilityId':'getInventory'})
 
 s=v.sub('transaction-rollback-all-effects','감사 outbox 멱등 결과 실패는 하나의 업무 transaction 전체를 rollback한다','fresh')
 s.observe('before')

@@ -760,7 +760,7 @@
             "actionId": "split-db",
             "pointer": "/data/rawRows/audit",
             "where": {
-              "commandKey": "T03-split-merge-split"
+              "commandIdempotencyKey": "T03-split-merge-split"
             },
             "field": "transactionId"
           },
@@ -1524,7 +1524,7 @@
             "actionId": "split-db",
             "pointer": "/data/rawRows/audit",
             "where": {
-              "commandKey": "T03-split-merge-split"
+              "commandIdempotencyKey": "T03-split-merge-split"
             }
           },
           "expected": 1,
@@ -2282,7 +2282,7 @@
             "actionId": "after-db",
             "pointer": "/data/rawRows/audit",
             "where": {
-              "commandKey": "T03-pallet-two-lots-cross-lot-merge",
+              "commandIdempotencyKey": "T03-pallet-two-lots-cross-lot-merge",
               "outcome": "REJECTED"
             }
           },
@@ -3117,7 +3117,7 @@
             "actionId": "after-db",
             "pointer": "/data/rawRows/audit",
             "where": {
-              "commandKey": "T03-reject-cycle-invalid",
+              "commandIdempotencyKey": "T03-reject-cycle-invalid",
               "outcome": "REJECTED"
             }
           },
@@ -3906,7 +3906,7 @@
             "actionId": "after-db",
             "pointer": "/data/rawRows/audit",
             "where": {
-              "commandKey": "T03-reject-consumeRetiredParent-invalid",
+              "commandIdempotencyKey": "T03-reject-consumeRetiredParent-invalid",
               "outcome": "REJECTED"
             }
           },
@@ -4532,7 +4532,7 @@
             "actionId": "after-db",
             "pointer": "/data/rawRows/audit",
             "where": {
-              "commandKey": "T03-reject-mergeDifferentPlace-invalid",
+              "commandIdempotencyKey": "T03-reject-mergeDifferentPlace-invalid",
               "outcome": "REJECTED"
             }
           },
@@ -5158,7 +5158,7 @@
             "actionId": "after-db",
             "pointer": "/data/rawRows/audit",
             "where": {
-              "commandKey": "T03-reject-mergeDifferentControl-invalid",
+              "commandIdempotencyKey": "T03-reject-mergeDifferentControl-invalid",
               "outcome": "REJECTED"
             }
           },
@@ -5784,7 +5784,7 @@
             "actionId": "after-db",
             "pointer": "/data/rawRows/audit",
             "where": {
-              "commandKey": "T03-reject-mergeIncompatibleUnit-invalid",
+              "commandIdempotencyKey": "T03-reject-mergeIncompatibleUnit-invalid",
               "outcome": "REJECTED"
             }
           },
@@ -6515,7 +6515,7 @@
             "actionId": "clean-release",
             "pointer": "/response/outcome"
           },
-          "expected": "REJECTED",
+          "expected": "HELD",
           "requirementRefs": [
             "D03"
           ],
@@ -6531,7 +6531,7 @@
             },
             "caseKey": "T03-indistinguishable-mixture"
           },
-          "oracleExplanation": "공개 명령의 구조화 outcome을 확인한다.",
+          "oracleExplanation": "분리 근거 없는 식별 불가능 혼합 물량의 임의 깨끗한 선택 해제는 효과 없이 HELD로 보류된다(D03 식별 불가능 혼합 범위 보류).",
           "oracleRef": {
             "oracleId": "T03.indistinguishable-mixture",
             "observationNames": [
@@ -6654,8 +6654,8 @@
             "actionId": "after-db",
             "pointer": "/data/rawRows/audit",
             "where": {
-              "commandKey": "T03-indistinguishable-mixture-clean-release",
-              "outcome": "REJECTED"
+              "commandIdempotencyKey": "T03-indistinguishable-mixture-clean-release",
+              "outcome": "HELD"
             }
           },
           "expected": 1,
@@ -6720,7 +6720,7 @@
             "actionId": "clean-release",
             "pointer": "/response/error/code"
           },
-          "expected": "SEPARATION_EVIDENCE_REQUIRED",
+          "expected": "EVIDENCE_UNVERIFIED",
           "requirementRefs": [
             "D03"
           ],
@@ -6736,7 +6736,7 @@
             },
             "caseKey": "T03-indistinguishable-mixture"
           },
-          "oracleExplanation": "응답의 구조화 오류 코드 /response/error/code가 SEPARATION_EVIDENCE_REQUIRED다(계획 §3.4, contracts/command-response.schema.json).",
+          "oracleExplanation": "보류 이유는 정확한 분리 범위의 검증 증거가 없다는 EVIDENCE_UNVERIFIED다(contracts/domain-vocabulary.json EVIDENCE_UNVERIFIED=HELD, 계획 §4.2).",
           "oracleRef": {
             "oracleId": "T03.indistinguishable-mixture",
             "observationNames": [

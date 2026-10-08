@@ -32,7 +32,7 @@
     그러면 "duplicate-return-effects-12" assertion으로 "duplicate-return-effects"를 확인한다
     그러면 "return-added-purchase-contribution-13" assertion으로 "return-added-purchase-contribution"를 확인한다
     그러면 "return-added-purchase-contribution-14" assertion으로 "return-added-purchase-contribution"를 확인한다
-    그러면 "return-followup-15" assertion으로 "return-followup"를 확인한다
+    그러면 "return-followup-15" assertion으로 "반품20의 후속 의무 kind는 RETURN_QC_REVIEW·RETURN_COMMERCIAL_REVIEW·RETURN_SETTLEMENT_REVIEW 셋이다"를 확인한다
     그러면 "return-followup-16" assertion으로 "return-followup"를 확인한다
 
   시나리오: LOT 미식별 반품20의 임시 접수는 가용0과 대조 책임을 유지한다
@@ -128,7 +128,8 @@
     그러면 "false-closure-8" assertion으로 "false-closure"를 확인한다
     그러면 "false-closure-9" assertion으로 "false-closure"를 확인한다
     그러면 "false-closure-10" assertion으로 "false-closure"를 확인한다
-    그러면 "false-closure-11" assertion으로 "false-closure"를 확인한다
+    그러면 "false-closure-11" assertion으로 "처리50 주장 종료는 HELD로 보류된다(처리25·미확인25)"를 확인한다
+    그러면 "false-closure-code" assertion으로 "보류 코드는 미확인 잔여의 RECALL_RESIDUAL_UNKNOWN이다"를 확인한다
     그러면 "exclusive-endstates-12" assertion으로 "exclusive-endstates"를 확인한다
     그러면 "exclusive-endstates-13" assertion으로 "exclusive-endstates"를 확인한다
     그러면 "exclusive-endstates-14" assertion으로 "exclusive-endstates"를 확인한다
