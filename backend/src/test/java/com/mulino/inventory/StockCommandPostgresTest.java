@@ -87,11 +87,21 @@ class StockCommandPostgresTest {
   assertEquals(2,jdbc.queryForObject("SELECT COUNT(*) FROM mulino_inventory_GenealogyEdges WHERE sourceId=?",Integer.class,source));
  }
  @Test void allocation40TransfersExactlyOnceAndLeaves60Unallocated(){
-  jdbc.update("INSERT INTO mulino_inventory_SegmentAllocations(organizationId,id,createdAt,recordedAt,rootId,segmentId,orderLineId,quantity,unit,state,commandId) VALUES (?,?,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP,?,?,?,40,'EA','EXECUTABLE',?)",org,id(301),id(302),source,id(303),id(304));
-  tx(()->commands.execute(context(),splitIntent()));
+  // S4 reservations always carry the exact physical interval; 0..40 lies wholly inside the first child 0..60.
+  jdbc.update("INSERT INTO mulino_inventory_SegmentAllocations(organizationId,id,createdAt,recordedAt,rootId,segmentId,orderLineId,startQuantity,quantity,unit,state,commandId) VALUES (?,?,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP,?,?,?,0,40,'EA','EXECUTABLE',?)",org,id(301),id(302),source,id(303),id(304));
+  var effects=(Map<?,?>)tx(()->commands.execute(context(),splitIntent())).get("effects");var children=(List<?>)effects.get("segmentIds");
   assertEquals("40.000000000000",jdbc.queryForObject("SELECT SUM(quantity)::text FROM mulino_inventory_SegmentAllocations WHERE state='EXECUTABLE'",String.class));
+  assertEquals(1,jdbc.queryForObject("SELECT COUNT(*) FROM mulino_inventory_SegmentAllocations WHERE state='EXECUTABLE' AND predecessorId=? AND segmentId=? AND startQuantity=0",Integer.class,id(301),children.getFirst()));
+  assertEquals(0,jdbc.queryForObject("SELECT COUNT(*) FROM mulino_inventory_SegmentAllocations WHERE segmentId=?",Integer.class,children.getLast()));
   assertEquals("REPLACED",jdbc.queryForObject("SELECT state FROM mulino_inventory_SegmentAllocations WHERE id=?",String.class,id(301)));
   assertEquals(0,jdbc.queryForObject("SELECT COUNT(*) FROM mulino_inventory_SegmentAllocations WHERE segmentId=? AND state='EXECUTABLE'",Integer.class,source));
+ }
+ @Test void coordinatelessAllocation40KeepsSuspendedResponsibilityWithoutInventedChildRange(){
+  jdbc.update("INSERT INTO mulino_inventory_SegmentAllocations(organizationId,id,createdAt,recordedAt,rootId,segmentId,orderLineId,quantity,unit,state,commandId) VALUES (?,?,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP,?,?,?,40,'EA','EXECUTABLE',?)",org,id(301),id(302),source,id(303),id(304));
+  tx(()->commands.execute(context(),splitIntent()));
+  assertEquals(0,jdbc.queryForObject("SELECT COUNT(*) FROM mulino_inventory_SegmentAllocations WHERE state='EXECUTABLE'",Integer.class));
+  assertEquals("40.000000000000",jdbc.queryForObject("SELECT quantity::text FROM mulino_inventory_SegmentAllocations WHERE state='SUSPENDED' AND suspensionReason='PHYSICAL_RANGE_UNCONFIRMED' AND predecessorId=? AND segmentId=? AND startQuantity IS NULL",String.class,id(301),source));
+  assertEquals("REPLACED",jdbc.queryForObject("SELECT state FROM mulino_inventory_SegmentAllocations WHERE id=?",String.class,id(301)));
  }
  @Test void splitMergeKeepsConservationAndRejectsCrossPlaceOrControl(){
   var children=tx(()->stock.split(context(),source,List.of("60","40"),"EA",at,"w",id(300)));
