@@ -3,7 +3,7 @@
   "rationale": {
     "timestampWidening": "R1 absolute instant policy. Explicit CDS Timestamp columns are stored TIMESTAMPTZ; CQN roundtrip and time predicates prove UTC/offset/session timezones.",
     "notNullStrengthening": "Flyway enforces mandatory domain facts above nullable CDS default. Database nullability never weakens compiler requirements; only enumerated mandatory columns may differ.",
-    "scope": "Fresh V1–V28 PostgreSQL comparison: exact 1863 column names, sizes, decimal scales, PKs; only explicit timestamp widening and NOT NULL strengthening."
+    "scope": "Fresh V1–V29 PostgreSQL comparison: exact 1865 column names, sizes, decimal scales, PKs; only explicit timestamp widening and NOT NULL strengthening."
   },
   "timestampWidening": [
     "mulino_commands_approvalconsumptions.consumedat",
@@ -623,6 +623,7 @@
     "mulino_inventory_deliverytransfers.commandid",
     "mulino_inventory_deliverytransfers.createdat",
     "mulino_inventory_deliverytransfers.dispatchid",
+    "mulino_inventory_deliverytransfers.legitimatequantity",
     "mulino_inventory_deliverytransfers.occurredat",
     "mulino_inventory_deliverytransfers.quantity",
     "mulino_inventory_deliverytransfers.recordedat",
@@ -1135,10 +1136,10 @@
     "mulino_trade_shipment_shipments.revision",
     "mulino_trade_shipment_shipments.state"
   ],
-  "baseline": "1387024a6c5176d3f663f41e30dd22c1b268faef",
-  "observedColumnCount": 1863,
-  "observedArtifactSha256": "19ddbda2563e7b772c655af63459b5669b08b882f12fa79200ca4315c1339248",
-  "scope": "S4 V1–V28 exact current CDS/Flyway comparison; earlier S3 1432 columns plus exact 431 additions",
+  "baseline": "1414cfe5305192cc7915fcb35db76e97c411617b",
+  "observedColumnCount": 1865,
+  "observedArtifactSha256": "29f62fe9982d31ecf609b54d7928c7649ed41ab7e4e506258058ca85d225a96b",
+  "scope": "S4 V1–V29 exact current CDS/Flyway comparison; earlier S3 1432 columns plus exact 433 additions",
   "reviewedAdditions": {
     "mulino_commands_approvalconsumptions.consumedat": {
       "migration": "database/migrations/V8__commands.sql",
@@ -5457,6 +5458,16 @@
       "migration": "database/migrations/V27__settlement.sql",
       "cds": "backend/db/settlement.cds",
       "notNullStrengtheningReason": "S4 조직별 확정 관계와 실물·금액·증거의 필수 값을 명시적으로 유지한다."
+    },
+    "mulino_inventory_deliverytransfers.legitimatequantity": {
+      "migration": "database/migrations/V24__fulfillment_ranges.sql",
+      "cds": "backend/db/inventory.cds",
+      "notNullStrengtheningReason": "관측 인도 범위 중 정당한 인도 기여량을 0 이상 원 수량 이하의 필수 값으로 보존한다(8eb247d8)."
+    },
+    "mulino_trade_settlement_matches.scopedifference": {
+      "migration": "database/migrations/V29__settlement_scope_difference.sql",
+      "cds": "backend/db/settlement.cds",
+      "notNullStrengtheningReason": "같은 수령·인도 기여에 대한 누적 송장 중복을 별도 정산 차이로 불변 보존한다(D19)."
     }
   },
   "exactColumnInventory": [
@@ -5932,6 +5943,7 @@
     "mulino_inventory_deliverytransfers.createdat",
     "mulino_inventory_deliverytransfers.dispatchid",
     "mulino_inventory_deliverytransfers.id",
+    "mulino_inventory_deliverytransfers.legitimatequantity",
     "mulino_inventory_deliverytransfers.occurredat",
     "mulino_inventory_deliverytransfers.organizationid",
     "mulino_inventory_deliverytransfers.quantity",
@@ -7081,6 +7093,7 @@
     "mulino_trade_settlement_matches.recordedat",
     "mulino_trade_settlement_matches.referenceid",
     "mulino_trade_settlement_matches.revision",
+    "mulino_trade_settlement_matches.scopedifference",
     "mulino_trade_settlement_matches.scopekind",
     "mulino_trade_settlement_matches.status",
     "mulino_trade_settlement_matches.unit",
@@ -7344,6 +7357,7 @@
     "mulino_inventory_deliverytransfers.createdat",
     "mulino_inventory_deliverytransfers.dispatchid",
     "mulino_inventory_deliverytransfers.id",
+    "mulino_inventory_deliverytransfers.legitimatequantity",
     "mulino_inventory_deliverytransfers.occurredat",
     "mulino_inventory_deliverytransfers.organizationid",
     "mulino_inventory_deliverytransfers.quantity",
@@ -7738,6 +7752,7 @@
     "mulino_trade_settlement_matches.recordedat",
     "mulino_trade_settlement_matches.referenceid",
     "mulino_trade_settlement_matches.revision",
+    "mulino_trade_settlement_matches.scopedifference",
     "mulino_trade_settlement_matches.scopekind",
     "mulino_trade_settlement_matches.status",
     "mulino_trade_settlement_matches.unit",

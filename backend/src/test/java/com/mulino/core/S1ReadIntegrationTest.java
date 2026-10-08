@@ -142,11 +142,11 @@ class S1ReadIntegrationTest {
         if(e.get(4).equals("YES")&&a.get(4).equals("NO")){strengthening.add(key);a.set(4,"YES");}
         if(!e.equals(a))differences.add(Map.of("column",key,"expected",e,"actual",a));
       }
-      Files.writeString(Path.of("target/s4-compatibility-observed.json"),json.writerWithDefaultPrettyPrinter().writeValueAsString(Map.of("timestampWidening",timestamps,"notNullStrengthening",strengthening,"columnCount",actual.size(),"structuralDifferences",differences,"primaryKeyDifferences",!primaryKeys(connection,"s4_compiler_expected").equals(primaryKeys(connection,"public")))));
+      Files.writeString(Path.of("target/s4-compatibility-observed.json"),json.writerWithDefaultPrettyPrinter().writeValueAsString(Map.of("timestampWidening",timestamps,"notNullStrengthening",strengthening,"columnCount",actual.size(),"columns",actual.keySet(),"structuralDifferences",differences,"primaryKeyDifferences",!primaryKeys(connection,"s4_compiler_expected").equals(primaryKeys(connection,"public")))));
       assertEquals(List.of(),differences,"Only enumerated Timestamp widening and mandatory NOT NULL strengthening are eligible for the explicit inventory; other shape changes must be corrected in source");
       assertEquals(((Number)policy.get("observedColumnCount")).intValue(),actual.size(),"Explicit combined inventory column count");
       assertEquals(new TreeSet<>((List<String>)policy.get("exactColumnInventory")),new TreeSet<>(actual.keySet()),"Every installed column has explicit S4 inventory identity");
-      assertEquals(431,((List<?>)policy.get("s4AddedColumnInventory")).size(),"Exact S3 1432 plus S4 431 delta");
+      assertEquals(433,((List<?>)policy.get("s4AddedColumnInventory")).size(),"Exact S3 1432 plus S4 433 delta (V29 scopeDifference, V24 legitimateQuantity)");
       assertEquals(new TreeSet<>((List<String>)policy.get("timestampWidening")),timestamps,"Explicit absolute-instant column list");assertEquals(new TreeSet<>((List<String>)policy.get("notNullStrengthening")),strengthening,"Explicit required-domain column list");
       assertEquals(primaryKeys(connection,"s4_compiler_expected"),primaryKeys(connection,"public"),"Exact CDS/Flyway primary key identity and ordering");
     }
