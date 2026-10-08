@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """Author deterministic S4 inputs; no database or product response is read here."""
-import copy,json,pathlib
+import copy,json,pathlib,uuid
 root=pathlib.Path(__file__).resolve().parents[3]
 out=root/'verification/actual/s4'
 T='2026-10-07T09:00:02Z';NEXT='2026-10-08T09:00:00Z'
@@ -51,10 +51,15 @@ declare_capabilities(fixture['aliases']['DEF']['content'])
 write('fixture.json',fixture)
 # All DISPATCH conditions arise from their own approved originals and gateway decisions.
 base=json.loads((out/'e1-upstream.json').read_text())['actions'];extras=[]
+sell_decisions=[a['fixture']['occurrence']['content']['sourceDecisionId'] for a in base if a['id'] in ['s60-QC','s60-CUSTOMER','s60-COMMERCIAL']]
 for a in base:
  if a['id'] in ['s60-QC','s60-QC-match','s60-QC-link','s60-QC-decision','s60-CUSTOMER','s60-CUSTOMER-match','s60-CUSTOMER-link','s60-CUSTOMER-decision','s60-COMMERCIAL','s60-COMMERCIAL-match','s60-COMMERCIAL-link','s60-COMMERCIAL-decision']:
-  x=json.loads(json.dumps(a).replace('s60-','dispatch-s60-').replace('"SELL"','"DISPATCH"'))
-  extras.append(x)
+  text=json.dumps(a).replace('s60-','dispatch-s60-').replace('"SELL"','"DISPATCH"')
+  # A DISPATCH basis is a separate source decision. Reusing the SELL decision
+  # id gives one occurrence identity two contents, which the gateway must
+  # reconcile as CONFLICT rather than a second verified basis.
+  for decision in sell_decisions:text=text.replace(decision,str(uuid.uuid5(uuid.NAMESPACE_URL,'s4-dispatch:'+decision)))
+  extras.append(json.loads(text))
 for a in base:
  if a['id'].startswith('reg-') or a['id'] in ['submit-reg','allow30','label-verified','draft-not-submitted']:
   x=json.loads(json.dumps(a).replace('reg-','dispatch-reg-').replace('native-s4-regulator','native-s4-dispatch-regulator').replace('$REGPOL','$REGDISPATCH').replace('$PROC','$DPROC').replace('"PROC','"DPROC').replace('"SELL"','"DISPATCH"').replace('"submit-reg"','"dispatch-submit-reg"').replace('"allow30"','"dispatch-allow30"').replace('"label-verified"','"dispatch-label-verified"').replace('"draft-not-submitted"','"dispatch-draft-not-submitted"'))

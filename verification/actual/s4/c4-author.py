@@ -75,7 +75,9 @@ for a in selected:
 # regex replacement must also update original externalEventId/sourceIdentity.
 for a in selected:
  if a['type']=='original':
-  old=a['fixture']['occurrence']['externalEventId'];a['fixture']['occurrence']['externalEventId']='c4-'+old if not old.startswith('c4-') else old
+  # A source decision UUID is already fresh (uuid5 'c4:'); quality gateways
+  # require externalEventId to equal that decision id, so only names get prefixed.
+  old=a['fixture']['occurrence']['externalEventId'];a['fixture']['occurrence']['externalEventId']=old if old.startswith('c4-') or re.fullmatch(r'[0-9a-f-]{36}',old) else 'c4-'+old
 # sourceIdentity external part got prefixed by exact strings only if whole;
 # normalize from each original rather than infer a verified result.
 originals={a['id']:a for a in selected if a['type']=='original'}
