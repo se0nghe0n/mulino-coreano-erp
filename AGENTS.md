@@ -46,7 +46,7 @@ runtime control로 지정한다. prompt에 이름을 쓰는 것으로 대신하�
 
 | 사용자 Step | 작업 | 모델 | effort |
 |---|---|---|---|
-| 1 | 새 개발·업무 skills 구성 | Claude Sonnet 5.5 | high |
+| 1 | 새 개발·업무 skills 구성 | GPT-6.1 Sol | high |
 | 2 | 계획 전체의 tests 구성 | Claude Opus | high |
 | 3 | 새 시스템 구현 | Claude Opus | medium |
 | 4 | 실제 E2E 실행 | Claude Sonnet | medium |
@@ -54,11 +54,13 @@ runtime control로 지정한다. prompt에 이름을 쓰는 것으로 대신하�
 | 6 | 검증된 동작으로 운영 매뉴얼 작성 | Claude Opus | low |
 | 7 | 미완료·실패가 해소될 때까지 반복 | 해당 작업의 모델 | 해당 작업의 effort |
 
-같은 날 Codex 사용량 한도로 GPT-6.1 Sol 작업이 실패했다(재개 가능
-2026-10-14 12:41). 사용자는 Step 1을 Claude Sonnet 5.5 high로 바꿨고,
-이번 목표 동안 Codex 모델에는 위임하지 않는다. 기존 Step 1 산출물은
-GPT-6.1 Sol high로 작성된 기록으로 보존한다. Task branch의 main 병합과
-PR merge는 사용자가 직접 한다.
+같은 날 Codex 사용량 한도로 GPT-6.1 Sol 작업이 실패해(재개 안내 시점
+2026-10-14 12:41) 사용자가 Step 1을 한때 Claude Sonnet 5.5 high로
+바꿨다. 이후 사용자가 GPT 모델 사용을 다시 허용했으므로 Step 1은 원래
+지정인 GPT-6.1 Sol high로 돌아가며 T3 `delegate_task`(provider
+`codex`)로 맡긴다. 대체 기간에 Sonnet 5.5 high가 작성한 Step 1 수정
+(`step1r/skills`, `-r2`, `-r3`)은 그 사실 그대로 기록에 남긴다. Task
+branch의 main 병합과 PR merge는 사용자가 직접 한다.
 
 **매 사용자 Step마다** Claude Opus `xhigh`와 Claude Fable `low`가
 adversarial review를 수행한다. 이미 닫은 Step 1·2도 이 두 reviewer로
