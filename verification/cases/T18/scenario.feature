@@ -86,7 +86,7 @@
     그러면 "unauthorized-recall-decision-2" assertion으로 "unauthorized-recall-decision"를 확인한다
     그러면 "unauthorized-recall-decision-3" assertion으로 "unauthorized-recall-decision"를 확인한다
     그러면 "unauthorized-recall-decision-4" assertion으로 "unauthorized-recall-decision"를 확인한다
-    그러면 "unauthorized-recall-decision-5" assertion으로 "unauthorized-recall-decision"를 확인한다
+    그러면 "unauthorized-recall-decision-5" assertion으로 "응답의 구조화 오류 코드 /response/error/code가 FORBIDDEN다(계획 §3.4, contracts/command-response.schema.json)."를 확인한다
     그러면 "bidirectional-trace-6" assertion으로 "bidirectional-trace"를 확인한다
     그러면 "bidirectional-trace-7" assertion으로 "bidirectional-trace"를 확인한다
     그러면 "bidirectional-trace-8" assertion으로 "bidirectional-trace"를 확인한다

@@ -22,7 +22,7 @@
     그러면 "unreserved-eligible-6" assertion으로 "독립 원 행의 실물·수량·관계·범위를 정확히 대조한다."를 확인한다
     그러면 "customer60-added-by-qc-or-app-write-7" assertion으로 "독립 원 행의 실물·수량·관계·범위를 정확히 대조한다."를 확인한다
     그러면 "customer60-added-by-qc-or-app-write-8" assertion으로 "공개 명령의 구조화 outcome을 확인한다."를 확인한다
-    그러면 "customer60-added-by-qc-or-app-write-9" assertion으로 "검증 실패를 해당 오류 코드로 구별한다."를 확인한다
+    그러면 "customer60-added-by-qc-or-app-write-9" assertion으로 "응답의 구조화 오류 코드 /response/error/code가 INSUFFICIENT_ELIGIBLE_QUANTITY다(계획 §3.4, contracts/command-response.schema.json)."를 확인한다
     그러면 "customer60-added-by-qc-or-app-write-10" assertion으로 "명령 효과 scope에서 생성된 업무 원 행 수가0이다. 감사는 별도로 확인한다."를 확인한다
     그러면 "customer60-added-by-qc-or-app-write-11" assertion으로 "명령 효과 scope에서 생성된 업무 원 행 수가0이다. 감사는 별도로 확인한다."를 확인한다
     그러면 "customer60-added-by-qc-or-app-write-12" assertion으로 "명령 효과 scope에서 생성된 업무 원 행 수가0이다. 감사는 별도로 확인한다."를 확인한다
@@ -44,10 +44,10 @@
     만일 "warehouse" 역할이 "after-api" 행동을 수행한다
     만일 "시스템" 역할이 "after-db" 행동을 수행한다
     그러면 "new-reservation-1" assertion으로 "공개 명령의 구조화 outcome을 확인한다."를 확인한다
-    그러면 "new-reservation-2" assertion으로 "검증 실패를 해당 오류 코드로 구별한다."를 확인한다
+    그러면 "new-reservation-2" assertion으로 "응답의 구조화 오류 코드 /response/error/code가 INSUFFICIENT_ELIGIBLE_QUANTITY다(계획 §3.4, contracts/command-response.schema.json)."를 확인한다
     그러면 "new-reservation-3" assertion으로 "명령 효과 scope에서 생성된 업무 원 행 수가0이다. 감사는 별도로 확인한다."를 확인한다
     그러면 "new-dispatch-4" assertion으로 "공개 명령의 구조화 outcome을 확인한다."를 확인한다
-    그러면 "new-dispatch-5" assertion으로 "검증 실패를 해당 오류 코드로 구별한다."를 확인한다
+    그러면 "new-dispatch-5" assertion으로 "응답의 구조화 오류 코드 /response/error/code가 INSUFFICIENT_ELIGIBLE_QUANTITY다(계획 §3.4, contracts/command-response.schema.json)."를 확인한다
     그러면 "new-dispatch-6" assertion으로 "명령 효과 scope에서 생성된 업무 원 행 수가0이다. 감사는 별도로 확인한다."를 확인한다
     그러면 "new-dispatch-7" assertion으로 "명령 효과 scope에서 생성된 업무 원 행 수가0이다. 감사는 별도로 확인한다."를 확인한다
     그러면 "new-reservation-8" assertion으로 "금지 효과의 동일 scope 전후 원 행을 비교한다. 조회/거부 감사는 별도 scope다."를 확인한다

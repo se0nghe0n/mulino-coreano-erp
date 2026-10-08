@@ -23,7 +23,7 @@
     그러면 "unreserved-eligible-6" assertion으로 "독립 원 행의 실물·수량·관계·범위를 정확히 대조한다."를 확인한다
     그러면 "relations-independent-7" assertion으로 "독립 원 행의 실물·수량·관계·범위를 정확히 대조한다."를 확인한다
     그러면 "relations-independent-8" assertion으로 "공개 명령의 구조화 outcome을 확인한다."를 확인한다
-    그러면 "relations-independent-9" assertion으로 "검증 실패를 해당 오류 코드로 구별한다."를 확인한다
+    그러면 "relations-independent-9" assertion으로 "응답의 구조화 오류 코드 /response/error/code가 INSUFFICIENT_ELIGIBLE_QUANTITY다(계획 §3.4, contracts/command-response.schema.json)."를 확인한다
     그러면 "relations-independent-10" assertion으로 "명령 효과 scope에서 생성된 업무 원 행 수가0이다. 감사는 별도로 확인한다."를 확인한다
     그러면 "relations-independent-11" assertion으로 "명령 효과 scope에서 생성된 업무 원 행 수가0이다. 감사는 별도로 확인한다."를 확인한다
     그러면 "relations-independent-12" assertion으로 "명령 효과 scope에서 생성된 업무 원 행 수가0이다. 감사는 별도로 확인한다."를 확인한다
@@ -75,7 +75,7 @@
     만일 "warehouse" 역할이 "qc-api" 행동을 수행한다
     만일 "시스템" 역할이 "qc-db" 행동을 수행한다
     그러면 "ordinary-write-confirmed-basis-effects-1" assertion으로 "공개 명령의 구조화 outcome을 확인한다."를 확인한다
-    그러면 "ordinary-write-confirmed-basis-effects-2" assertion으로 "검증 실패를 해당 오류 코드로 구별한다."를 확인한다
+    그러면 "ordinary-write-confirmed-basis-effects-2" assertion으로 "응답의 구조화 오류 코드 /response/error/code가 FORBIDDEN다(계획 §3.4, contracts/command-response.schema.json)."를 확인한다
     그러면 "ordinary-write-confirmed-basis-effects-3" assertion으로 "명령 효과 scope에서 생성된 업무 원 행 수가0이다. 감사는 별도로 확인한다."를 확인한다
     그러면 "ordinary-write-confirmed-basis-effects-4" assertion으로 "허용된 denial 감사1과 금지된 업무 효과0을 분리한다."를 확인한다
     그러면 "eligible-before-manager-confirmation-5" assertion으로 "실물량·단위와 독립 손계산을 대조한다."를 확인한다

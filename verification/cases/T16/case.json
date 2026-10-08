@@ -1252,7 +1252,7 @@
           "op": "equals",
           "source": {
             "actionId": "ordinary-release",
-            "pointer": "/response/errorCode"
+            "pointer": "/response/error/code"
           },
           "expected": "FORBIDDEN",
           "requirementRefs": [
@@ -1270,7 +1270,7 @@
             },
             "caseKey": "T16-provisional-holds"
           },
-          "oracleExplanation": "검증 실패를 해당 오류 코드로 구별한다.",
+          "oracleExplanation": "응답의 구조화 오류 코드 /response/error/code가 FORBIDDEN다(계획 §3.4, contracts/command-response.schema.json).",
           "oracleRef": {
             "oracleId": "T16.provisional-and-independent-holds",
             "observationNames": [
@@ -2663,7 +2663,7 @@
           "op": "equals",
           "source": {
             "actionId": "ordinary-adjust",
-            "pointer": "/response/errorCode"
+            "pointer": "/response/error/code"
           },
           "expected": "FORBIDDEN",
           "requirementRefs": [
@@ -2686,7 +2686,7 @@
               ]
             }
           },
-          "oracleExplanation": "검증 실패를 해당 오류 코드로 구별한다.",
+          "oracleExplanation": "응답의 구조화 오류 코드 /response/error/code가 FORBIDDEN다(계획 §3.4, contracts/command-response.schema.json).",
           "oracleRef": {
             "oracleId": "T16.movement-stocktake-adjustment",
             "observationNames": [
@@ -4969,7 +4969,7 @@
           "op": "equals",
           "source": {
             "actionId": "dispatch",
-            "pointer": "/response/errorCode"
+            "pointer": "/response/error/code"
           },
           "expected": "INSUFFICIENT_ELIGIBLE_QUANTITY",
           "requirementRefs": [
@@ -4987,7 +4987,7 @@
             },
             "caseKey": "T16-expiry-delayed-sweep"
           },
-          "oracleExplanation": "검증 실패를 해당 오류 코드로 구별한다.",
+          "oracleExplanation": "응답의 구조화 오류 코드 /response/error/code가 INSUFFICIENT_ELIGIBLE_QUANTITY다(계획 §3.4, contracts/command-response.schema.json).",
           "oracleRef": {
             "oracleId": "T16.no-event-expiry",
             "observationNames": [

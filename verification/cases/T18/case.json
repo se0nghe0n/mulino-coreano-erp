@@ -3774,7 +3774,7 @@
           "op": "equals",
           "source": {
             "actionId": "unauthorized",
-            "pointer": "/response/code"
+            "pointer": "/response/error/code"
           },
           "expected": "FORBIDDEN",
           "requirementRefs": [
@@ -3793,7 +3793,7 @@
             "caseId": "T18",
             "scenarioId": "trace-and-recall-decisions"
           },
-          "oracleExplanation": "unauthorized-recall-decision는 양방향 LOT trace와 후보60·승인50·기관 통지 및 scope 변경 재승인을 확인한다의 독립 고정값과 실제 원 행을 대조한다.",
+          "oracleExplanation": "응답의 구조화 오류 코드 /response/error/code가 FORBIDDEN다(계획 §3.4, contracts/command-response.schema.json).",
           "oracleRef": {
             "oracleId": "T18.trace-and-recall-decisions",
             "observationNames": [

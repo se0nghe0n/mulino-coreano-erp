@@ -762,7 +762,7 @@
           "op": "equals",
           "source": {
             "actionId": "app-write-reserve-customer",
-            "pointer": "/response/errorCode"
+            "pointer": "/response/error/code"
           },
           "expected": "INSUFFICIENT_ELIGIBLE_QUANTITY",
           "requirementRefs": [
@@ -780,7 +780,7 @@
             },
             "caseKey": "T05-custody-not-sale"
           },
-          "oracleExplanation": "검증 실패를 해당 오류 코드로 구별한다.",
+          "oracleExplanation": "응답의 구조화 오류 코드 /response/error/code가 INSUFFICIENT_ELIGIBLE_QUANTITY다(계획 §3.4, contracts/command-response.schema.json).",
           "oracleRef": {
             "oracleId": "T05.ownership-custody-disposition",
             "observationNames": [
@@ -2572,7 +2572,7 @@
           "op": "equals",
           "source": {
             "actionId": "ordinary-confirm",
-            "pointer": "/response/errorCode"
+            "pointer": "/response/error/code"
           },
           "expected": "FORBIDDEN",
           "requirementRefs": [
@@ -2590,7 +2590,7 @@
             },
             "caseKey": "T05-manager-disposition"
           },
-          "oracleExplanation": "검증 실패를 해당 오류 코드로 구별한다.",
+          "oracleExplanation": "응답의 구조화 오류 코드 /response/error/code가 FORBIDDEN다(계획 §3.4, contracts/command-response.schema.json).",
           "oracleRef": {
             "oracleId": "T05.disposition-manager-decision",
             "observationNames": [

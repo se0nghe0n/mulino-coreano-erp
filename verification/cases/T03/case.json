@@ -3216,7 +3216,7 @@
           "op": "equals",
           "source": {
             "actionId": "invalid",
-            "pointer": "/response/errorCode"
+            "pointer": "/response/error/code"
           },
           "expected": "GENEALOGY_CYCLE",
           "requirementRefs": [
@@ -3234,7 +3234,7 @@
             },
             "caseKey": "T03-reject-cycle"
           },
-          "oracleExplanation": "active 자식에서 ancestor 부모로 되돌리는 edge는 계보 순환 오류로 거부한다.",
+          "oracleExplanation": "응답의 구조화 오류 코드 /response/error/code가 GENEALOGY_CYCLE다(계획 §3.4, contracts/command-response.schema.json).",
           "oracleRef": {
             "oracleId": "T03.cycle-and-retired-parent",
             "observationNames": [
@@ -6718,7 +6718,7 @@
           "op": "equals",
           "source": {
             "actionId": "clean-release",
-            "pointer": "/response/errorCode"
+            "pointer": "/response/error/code"
           },
           "expected": "SEPARATION_EVIDENCE_REQUIRED",
           "requirementRefs": [
@@ -6736,7 +6736,7 @@
             },
             "caseKey": "T03-indistinguishable-mixture"
           },
-          "oracleExplanation": "부분 해제는 실제 분리/검사 근거가 필요하다.",
+          "oracleExplanation": "응답의 구조화 오류 코드 /response/error/code가 SEPARATION_EVIDENCE_REQUIRED다(계획 §3.4, contracts/command-response.schema.json).",
           "oracleRef": {
             "oracleId": "T03.indistinguishable-mixture",
             "observationNames": [

@@ -12,7 +12,7 @@
     만일 "시스템" 역할이 "after-db" 행동을 수행한다
     만일 "warehouse" 역할이 "money" 행동을 수행한다
     그러면 "invalid-decimals-1" assertion으로 "공개 명령의 구조화 outcome을 확인한다."를 확인한다
-    그러면 "invalid-decimals-2" assertion으로 "검증 실패를 해당 오류 코드로 구별한다."를 확인한다
+    그러면 "invalid-decimals-2" assertion으로 "EA 불가분·정밀도·scale 위반은 slot 타입/단위 검증 실패이므로 /response/error/code가 TYPE_INVALID다(계획 §3.3·§3.4)."를 확인한다
     그러면 "rounded-effects-3" assertion으로 "금지 효과의 동일 scope 전후 원 행을 비교한다. 조회/거부 감사는 별도 scope다."를 확인한다
     그러면 "rounded-effects-4" assertion으로 "금지 효과의 동일 scope 전후 원 행을 비교한다. 조회/거부 감사는 별도 scope다."를 확인한다
     그러면 "rounded-effects-5" assertion으로 "금지 효과의 동일 scope 전후 원 행을 비교한다. 조회/거부 감사는 별도 scope다."를 확인한다
@@ -37,7 +37,7 @@
     만일 "시스템" 역할이 "after-db" 행동을 수행한다
     만일 "warehouse" 역할이 "money" 행동을 수행한다
     그러면 "invalid-decimals-1" assertion으로 "공개 명령의 구조화 outcome을 확인한다."를 확인한다
-    그러면 "invalid-decimals-2" assertion으로 "검증 실패를 해당 오류 코드로 구별한다."를 확인한다
+    그러면 "invalid-decimals-2" assertion으로 "EA 불가분·정밀도·scale 위반은 slot 타입/단위 검증 실패이므로 /response/error/code가 TYPE_INVALID다(계획 §3.3·§3.4)."를 확인한다
     그러면 "rounded-effects-3" assertion으로 "금지 효과의 동일 scope 전후 원 행을 비교한다. 조회/거부 감사는 별도 scope다."를 확인한다
     그러면 "rounded-effects-4" assertion으로 "금지 효과의 동일 scope 전후 원 행을 비교한다. 조회/거부 감사는 별도 scope다."를 확인한다
     그러면 "rounded-effects-5" assertion으로 "금지 효과의 동일 scope 전후 원 행을 비교한다. 조회/거부 감사는 별도 scope다."를 확인한다
@@ -62,7 +62,7 @@
     만일 "시스템" 역할이 "after-db" 행동을 수행한다
     만일 "warehouse" 역할이 "money" 행동을 수행한다
     그러면 "invalid-decimals-1" assertion으로 "공개 명령의 구조화 outcome을 확인한다."를 확인한다
-    그러면 "invalid-decimals-2" assertion으로 "검증 실패를 해당 오류 코드로 구별한다."를 확인한다
+    그러면 "invalid-decimals-2" assertion으로 "EA 불가분·정밀도·scale 위반은 slot 타입/단위 검증 실패이므로 /response/error/code가 TYPE_INVALID다(계획 §3.3·§3.4)."를 확인한다
     그러면 "rounded-effects-3" assertion으로 "금지 효과의 동일 scope 전후 원 행을 비교한다. 조회/거부 감사는 별도 scope다."를 확인한다
     그러면 "rounded-effects-4" assertion으로 "금지 효과의 동일 scope 전후 원 행을 비교한다. 조회/거부 감사는 별도 scope다."를 확인한다
     그러면 "rounded-effects-5" assertion으로 "금지 효과의 동일 scope 전후 원 행을 비교한다. 조회/거부 감사는 별도 scope다."를 확인한다
@@ -96,7 +96,7 @@
     그러면 "eligible-after-hold-3" assertion으로 "실물량·단위와 독립 손계산을 대조한다."를 확인한다
     그러면 "eligible-after-hold-4" assertion으로 "독립 원 행을 해당 범위에서 합산하며 부모와 자식을 이중 합산하지 않는다."를 확인한다
     그러면 "decrease-evidence-5" assertion으로 "공개 명령의 구조화 outcome을 확인한다."를 확인한다
-    그러면 "decrease-evidence-6" assertion으로 "검증 실패를 해당 오류 코드로 구별한다."를 확인한다
+    그러면 "decrease-evidence-6" assertion으로 "응답의 구조화 오류 코드 /response/error/code가 FORBIDDEN다(계획 §3.4, contracts/command-response.schema.json)."를 확인한다
     그러면 "decrease-evidence-7" assertion으로 "금지 효과의 동일 scope 전후 원 행을 비교한다. 조회/거부 감사는 별도 scope다."를 확인한다
     그러면 "decrease-evidence-8" assertion으로 "금지 효과의 동일 scope 전후 원 행을 비교한다. 조회/거부 감사는 별도 scope다."를 확인한다
     그러면 "decrease-evidence-9" assertion으로 "허용된 denial 감사1과 금지된 업무 효과0을 분리한다."를 확인한다
@@ -121,7 +121,7 @@
     만일 "warehouse" 역할이 "after-api" 행동을 수행한다
     만일 "시스템" 역할이 "after-db" 행동을 수행한다
     그러면 "rollback-committed-result-1" assertion으로 "공개 명령의 구조화 outcome을 확인한다."를 확인한다
-    그러면 "rollback-committed-result-2" assertion으로 "검증 실패를 해당 오류 코드로 구별한다."를 확인한다
+    그러면 "rollback-committed-result-2" assertion으로 "응답의 구조화 오류 코드 /response/error/code가 TRANSACTION_ROLLED_BACK다(계획 §3.4, contracts/command-response.schema.json)."를 확인한다
     그러면 "rollback-ledger-effects-3" assertion으로 "금지 효과의 동일 scope 전후 원 행을 비교한다. 조회/거부 감사는 별도 scope다."를 확인한다
     그러면 "rollback-ledger-effects-4" assertion으로 "금지 효과의 동일 scope 전후 원 행을 비교한다. 조회/거부 감사는 별도 scope다."를 확인한다
     그러면 "rollback-ledger-effects-5" assertion으로 "금지 효과의 동일 scope 전후 원 행을 비교한다. 조회/거부 감사는 별도 scope다."를 확인한다
@@ -143,7 +143,7 @@
     만일 "warehouse" 역할이 "after-api" 행동을 수행한다
     만일 "시스템" 역할이 "after-db" 행동을 수행한다
     그러면 "rollback-committed-result-1" assertion으로 "공개 명령의 구조화 outcome을 확인한다."를 확인한다
-    그러면 "rollback-committed-result-2" assertion으로 "검증 실패를 해당 오류 코드로 구별한다."를 확인한다
+    그러면 "rollback-committed-result-2" assertion으로 "응답의 구조화 오류 코드 /response/error/code가 TRANSACTION_ROLLED_BACK다(계획 §3.4, contracts/command-response.schema.json)."를 확인한다
     그러면 "rollback-ledger-effects-3" assertion으로 "금지 효과의 동일 scope 전후 원 행을 비교한다. 조회/거부 감사는 별도 scope다."를 확인한다
     그러면 "rollback-ledger-effects-4" assertion으로 "금지 효과의 동일 scope 전후 원 행을 비교한다. 조회/거부 감사는 별도 scope다."를 확인한다
     그러면 "rollback-ledger-effects-5" assertion으로 "금지 효과의 동일 scope 전후 원 행을 비교한다. 조회/거부 감사는 별도 scope다."를 확인한다
@@ -165,7 +165,7 @@
     만일 "warehouse" 역할이 "after-api" 행동을 수행한다
     만일 "시스템" 역할이 "after-db" 행동을 수행한다
     그러면 "rollback-committed-result-1" assertion으로 "공개 명령의 구조화 outcome을 확인한다."를 확인한다
-    그러면 "rollback-committed-result-2" assertion으로 "검증 실패를 해당 오류 코드로 구별한다."를 확인한다
+    그러면 "rollback-committed-result-2" assertion으로 "응답의 구조화 오류 코드 /response/error/code가 TRANSACTION_ROLLED_BACK다(계획 §3.4, contracts/command-response.schema.json)."를 확인한다
     그러면 "rollback-ledger-effects-3" assertion으로 "금지 효과의 동일 scope 전후 원 행을 비교한다. 조회/거부 감사는 별도 scope다."를 확인한다
     그러면 "rollback-ledger-effects-4" assertion으로 "금지 효과의 동일 scope 전후 원 행을 비교한다. 조회/거부 감사는 별도 scope다."를 확인한다
     그러면 "rollback-ledger-effects-5" assertion으로 "금지 효과의 동일 scope 전후 원 행을 비교한다. 조회/거부 감사는 별도 scope다."를 확인한다
@@ -187,7 +187,7 @@
     만일 "warehouse" 역할이 "after-api" 행동을 수행한다
     만일 "시스템" 역할이 "after-db" 행동을 수행한다
     그러면 "rollback-committed-result-1" assertion으로 "공개 명령의 구조화 outcome을 확인한다."를 확인한다
-    그러면 "rollback-committed-result-2" assertion으로 "검증 실패를 해당 오류 코드로 구별한다."를 확인한다
+    그러면 "rollback-committed-result-2" assertion으로 "응답의 구조화 오류 코드 /response/error/code가 TRANSACTION_ROLLED_BACK다(계획 §3.4, contracts/command-response.schema.json)."를 확인한다
     그러면 "rollback-ledger-effects-3" assertion으로 "금지 효과의 동일 scope 전후 원 행을 비교한다. 조회/거부 감사는 별도 scope다."를 확인한다
     그러면 "rollback-ledger-effects-4" assertion으로 "금지 효과의 동일 scope 전후 원 행을 비교한다. 조회/거부 감사는 별도 scope다."를 확인한다
     그러면 "rollback-ledger-effects-5" assertion으로 "금지 효과의 동일 scope 전후 원 행을 비교한다. 조회/거부 감사는 별도 scope다."를 확인한다
@@ -213,11 +213,11 @@
     만일 "warehouse" 역할이 "locked-api" 행동을 수행한다
     만일 "시스템" 역할이 "locked-db" 행동을 수행한다
     그러면 "guarded-primitives-1" assertion으로 "공개 명령의 구조화 outcome을 확인한다."를 확인한다
-    그러면 "guarded-primitives-2" assertion으로 "검증 실패를 해당 오류 코드로 구별한다."를 확인한다
+    그러면 "guarded-primitives-2" assertion으로 "응답의 구조화 오류 코드 /response/error/code가 RAW_CORE_WRITE_FORBIDDEN다(계획 §3.4, contracts/command-response.schema.json)."를 확인한다
     그러면 "guarded-primitives-3" assertion으로 "공개 명령의 구조화 outcome을 확인한다."를 확인한다
-    그러면 "guarded-primitives-4" assertion으로 "검증 실패를 해당 오류 코드로 구별한다."를 확인한다
+    그러면 "guarded-primitives-4" assertion으로 "고정 DB probe가 core UPDATE를 시도하면 권한 거부가 /response/error/code=DB_PRIVILEGE_DENIED로 구조화된다."를 확인한다
     그러면 "guarded-primitives-5" assertion으로 "공개 명령의 구조화 outcome을 확인한다."를 확인한다
-    그러면 "guarded-primitives-6" assertion으로 "검증 실패를 해당 오류 코드로 구별한다."를 확인한다
+    그러면 "guarded-primitives-6" assertion으로 "응답의 구조화 오류 코드 /response/error/code가 STALE_REVISION다(계획 §3.4, contracts/command-response.schema.json)."를 확인한다
     그러면 "guarded-primitives-7" assertion으로 "금지 효과의 동일 scope 전후 원 행을 비교한다. 조회/거부 감사는 별도 scope다."를 확인한다
     그러면 "guarded-primitives-8" assertion으로 "금지 효과의 동일 scope 전후 원 행을 비교한다. 조회/거부 감사는 별도 scope다."를 확인한다
     그러면 "guarded-primitives-9" assertion으로 "금지 효과의 동일 scope 전후 원 행을 비교한다. 조회/거부 감사는 별도 scope다."를 확인한다
