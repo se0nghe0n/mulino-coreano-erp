@@ -1,0 +1,58 @@
+{
+  "schemaVersion" : "1.0.0",
+  "recordType" : "ACCEPTANCE_HARNESS_REPORT",
+  "profile" : "prepare",
+  "status" : "PREPARED",
+  "exitCode" : 0,
+  "timestamp" : "2026-10-08T06:02:56.392690Z",
+  "command" : "./verify prepare",
+  "codeCommit" : "be7976d17ced5b1a1f1e291bd381a5ab139de0f8",
+  "workingTreeDirty" : false,
+  "harnessMainClassSha256" : "d215870e2d94476ea5ee40e3845b05e297ac0b5b42f6c4bb33de4d2c091d9728",
+  "javaVersion" : "21.0.5+11-LTS",
+  "harnessVersion" : "1.0.0",
+  "productRuntimeClaimed" : false,
+  "gateComplete" : false,
+  "runtimeStatus" : "NOT_RUN",
+  "runtimeComplete" : false,
+  "preparedCases" : 41,
+  "preparedSubcases" : 799,
+  "preparedAssertions" : 23899,
+  "preparationProblems" : [ ],
+  "artifactKindAttributionGaps" : [ ],
+  "caseAssetChecks" : [ {
+    "name" : "normative-catalog-lock",
+    "script" : "verification/requirements/validate_catalog.py",
+    "argv" : [ "python3", "-I", "verification/requirements/validate_catalog.py" ],
+    "scriptSha256" : "9d13bda02d70c2b1c34e1d83a9f14bbe212f261721f8d044f653c109a68c37a2",
+    "exitCode" : 0,
+    "status" : "PASS",
+    "outputTail" : [ "{\"catalogStatus\": \"NOT_RUN\", \"structure\": \"VALID\", \"oracleCount\": 122, \"observationCount\": 499, \"caseCount\": 41, \"requirementCount\": 26, \"runtimeCoverage\": \"NOT_RUN\", \"semanticCompleteness\": \"REQUIRES_QA_SOURCE_REVIEW\"}" ]
+  }, {
+    "name" : "cases-b-invariants",
+    "script" : "verification/cases/V2/cases_b_invariants.py",
+    "argv" : [ "python3", "-I", "verification/cases/V2/cases_b_invariants.py" ],
+    "scriptSha256" : "13dd0bc92da6c5df283be1e13af64b928116947ac314e49dc0f7f854113b7c91",
+    "exitCode" : 0,
+    "status" : "PASS",
+    "outputTail" : [ "cases-b invariants: 0 problem(s) across E1, E2, C4, V2, V3" ]
+  }, {
+    "name" : "t08-observation-bindings",
+    "script" : "verification/cases/T08/bind_observations.py",
+    "argv" : [ "python3", "-I", "verification/cases/T08/bind_observations.py", "--check" ],
+    "scriptSha256" : "2225e7c8017a68a6528d9534182b350f650e2ef491d3da8a8d176363f40080b1",
+    "exitCode" : 0,
+    "status" : "PASS",
+    "outputTail" : [ "T08 observation bindings: CURRENT" ]
+  }, {
+    "name" : "generators-reproduce",
+    "script" : "verification/mcp-tests/test_generators_reproduce.py",
+    "argv" : [ "python3", "-I", "-m", "unittest", "discover", "-s", "verification/mcp-tests", "-p", "test_generators_reproduce.py" ],
+    "scriptSha256" : "1331cc225b377860ebf8afc1ffdab2d2c74d91321ad080538ae23983d8feb0bf",
+    "exitCode" : 0,
+    "status" : "PASS",
+    "outputTail" : [ "...", "----------------------------------------------------------------------", "Ran 3 tests in 0.571s", "", "OK" ]
+  } ],
+  "artifactCoverageStatus" : "NOT_RUN",
+  "semanticOracleEquivalence" : "REQUIRES_CASE_REVIEW"
+}

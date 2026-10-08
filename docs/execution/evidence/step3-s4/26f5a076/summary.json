@@ -1,0 +1,76 @@
+{
+ "recordType": "S4_COMBINED_CHECKS",
+ "codeCommit": "26f5a076",
+ "recordedBy": "Claude Code coordinator",
+ "checks": [
+  {
+   "name": "backend clean package",
+   "exit": 0,
+   "tests": 495,
+   "failures": 0,
+   "errors": 0,
+   "skipped": 0,
+   "jarSha256": "09730a38927b163d47dfeb4804baf326ee393dc811a02e0bc648c7ff40c76844",
+   "log": "backend.log.gz"
+  },
+  {
+   "name": "harness",
+   "command": "./verify harness",
+   "exit": 0,
+   "tests": 483,
+   "failures": 0,
+   "errors": 0,
+   "skipped": 0
+  },
+  {
+   "name": "prepare",
+   "command": "./verify prepare",
+   "exit": 0,
+   "status": "PREPARED",
+   "cases": 41,
+   "subcases": 799,
+   "assertions": 23899,
+   "problems": 0
+  },
+  {
+   "name": "native S4 suite",
+   "command": "python3 verification/actual/s4/build.py && ./verify actual-s4 <fresh>",
+   "exit": 0,
+   "status": "PASS",
+   "boundedAssertions": 3312,
+   "flows": [
+    "E1",
+    "E2",
+    "C1",
+    "C4"
+   ]
+  },
+  {
+   "name": "native S3",
+   "exit": 0,
+   "status": "PASS",
+   "boundedAssertions": 594
+  },
+  {
+   "name": "native S2",
+   "exit": 0,
+   "status": "PASS",
+   "boundedAssertions": 48
+  },
+  {
+   "name": "native S1",
+   "exit": 0,
+   "status": "PASS",
+   "boundedAssertions": 21
+  }
+ ],
+ "notRun": [
+  "coverage assembly with ACTUAL receipts (native runs are bounded custody evidence, not coverage PASS)",
+  "V2/V3/post-dispatch recall native (backend PostgreSQL tests only)",
+  "paid model/client UAT",
+  "BTP",
+  "regulatory submission",
+  "bank/tax effects"
+ ],
+ "gateComplete": false
+}
